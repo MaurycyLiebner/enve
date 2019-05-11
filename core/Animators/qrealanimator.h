@@ -1,6 +1,7 @@
 #ifndef VALUEANIMATORS_H
 #define VALUEANIMATORS_H
 #include "Animators/graphanimator.h"
+#include "qrealsnapshot.h"
 class QrealKey;
 class QrealPoint;
 class RandomQrealGenerator;
@@ -16,184 +17,6 @@ protected:
                   const qreal &prefferdStep,
                   const QString& name);
 public:
-    class Snapshot {
-        friend class Iterator;
-        struct KeySnaphot {
-            qreal fC0Frame;
-            qreal fC0Value;
-
-            qreal fFrame;
-            qreal fValue;
-
-            qreal fC1Frame;
-            qreal fC1Value;
-        };
-    public:
-        class Iterator {
-        public:
-            Iterator(const qreal& startFrame, const qreal& sampleStep,
-                     const Snapshot * const snap) :
-                mSampleFrameStep(sampleStep) {
-                mInvFrameSpan = 1/sampleStep;
-                mPrevFrame = startFrame - sampleStep;
-                mNextFrame = startFrame;
-                mCurrentFrame = startFrame;
-                mSnapshot = snap;
-                updateSamples();
-            }
-
-            qreal getValueAndProgress(const qreal& progress) {
-                if(mStaticValue) return mPrevValue;
-                qreal result;
-                if(mInterpolate) {
-                    const qreal fracNext = (mCurrentFrame - mPrevFrame)*mInvFrameSpan;
-                    result = (mNextValue - mPrevValue)*fracNext + mPrevValue;
-                } else result = mPrevValue;
-                mCurrentFrame += progress;
-                if(mCurrentFrame > mNextFrame ||
-                   mCurrentFrame < mPrevFrame) updateSamples();
-                return result;
-            }
-
-            bool staticValue() const {
-                return mStaticValue;
-            }
-        private:
-            void updateSamples() {
-                if(mSnapshot->mKeys.count() < 2) {
-                    mPrevFrame = -TEN_MIL;
-                    mNextFrame = TEN_MIL;
-                    mPrevValue = mSnapshot->mCurrentValue;
-                    mNextValue = mPrevValue;
-                    mStaticValue = true;
-                } else {
-                    mPrevFrame += mSampleFrameStep;
-                    mNextFrame += mSampleFrameStep;
-                    mPrevValue = mSnapshot->getValue(mPrevFrame);
-                    mNextValue = mSnapshot->getValue(mNextFrame);
-                    mInterpolate = !isZero4Dec(mNextValue - mPrevValue);
-                }
-            }
-
-            bool mInterpolate;
-            bool mStaticValue;
-            qreal mSampleFrameStep;
-            qreal mInvFrameSpan;
-            qreal mPrevFrame;
-            qreal mNextFrame;
-            qreal mPrevValue;
-            qreal mNextValue;
-            qreal mCurrentFrame;
-            const Snapshot * mSnapshot;
-        };
-
-        Snapshot() {}
-        Snapshot(const qreal& currentValue) :
-            Snapshot(currentValue, 1, 1) {}
-        Snapshot(const qreal& currentValue,
-                 const qreal& frameMultiplier,
-                 const qreal& valueMultiplier) :
-            mCurrentValue(currentValue*valueMultiplier),
-            mFrameMultiplier(frameMultiplier),
-            mValueMultiplier(valueMultiplier) {}
-
-        void appendKey(const QrealKey * const key);
-
-        qreal getValue(const qreal& relFrame) const {
-            const KeySnaphot * prevKey = nullptr;
-            const KeySnaphot * nextKey = nullptr;
-
-            getPrevAndNextKey(relFrame, prevKey, nextKey);
-
-            if(prevKey && nextKey) {
-                const qCubicSegment2D seg{{qreal(prevKey->fFrame), prevKey->fValue},
-                                          {prevKey->fC1Frame, prevKey->fC1Value},
-                                          {nextKey->fC0Frame, nextKey->fC0Value},
-                                          {qreal(nextKey->fFrame), nextKey->fValue}};
-                auto frameSeg =  seg.xSeg();
-                const qreal t = frameSeg.tAtLength(relFrame - frameSeg.p0());
-                const auto valSeg = seg.ySeg();
-                return valSeg.valAtT(t);
-            } else if(prevKey) {
-                return prevKey->fValue;
-            } else if(nextKey) {
-                return nextKey->fValue;
-            }
-            return mCurrentValue;
-        }
-    protected:
-        void getPrevAndNextKey(const qreal& relFrame,
-                               KeySnaphot const *& prevKey,
-                               KeySnaphot const *& nextKey) const {
-            getPrevAndNextKey(relFrame, prevKey, nextKey, 0, mKeys.count() - 1);
-        }
-
-        void getPrevAndNextKey(const qreal& relFrame,
-                               KeySnaphot const *& prevKey,
-                               KeySnaphot const *& nextKey,
-                               const int& minId, const int& maxId) const {
-            if(maxId < minId) return;
-            if(maxId - minId == 0) {
-                prevKey = &mKeys[minId];
-                return;
-            } else if(maxId - minId == 1) {
-                const auto minKey = &mKeys[minId];
-                const auto maxKey = &mKeys[maxId];
-                prevKey = maxKey->fFrame > relFrame ? minKey : nullptr;
-                nextKey = minKey->fFrame < relFrame ? maxKey : nullptr;
-                return;
-            }
-            const int guessId = (minId + maxId)/2;
-            const auto& guessKey = &mKeys[guessId];
-            if(guessKey->fFrame > relFrame) {
-                getPrevAndNextKey(relFrame, prevKey, nextKey, minId, guessId);
-                return;
-            } else if(guessKey->fFrame > relFrame) {
-                getPrevAndNextKey(relFrame, prevKey, nextKey, guessId, maxId);
-                return;
-            }
-            prevKey = guessKey;
-            return;
-        }
-
-        void getPrevAndNextKeyId(const qreal& relFrame,
-                                 int & prevKey, int & nextKey) const {
-            getPrevAndNextKeyId(relFrame, prevKey, nextKey, 0, mKeys.count() - 1);
-        }
-
-        void getPrevAndNextKeyId(const qreal& relFrame,
-                                 int & prevKey, int & nextKey,
-                                 const int& minId, const int& maxId) const {
-            if(maxId < minId) return;
-            if(maxId - minId == 0) {
-                prevKey = minId;
-                return;
-            } else if(maxId - minId == 1) {
-                const auto minKey = &mKeys[minId];
-                const auto maxKey = &mKeys[maxId];
-                prevKey = maxKey->fFrame > relFrame ? minId : -1;
-                nextKey = minKey->fFrame < relFrame ? maxId : -1;
-                return;
-            }
-            const int guessId = (minId + maxId)/2;
-            const auto& guessKey = &mKeys[guessId];
-            if(guessKey->fFrame > relFrame) {
-                getPrevAndNextKeyId(relFrame, prevKey, nextKey, minId, guessId);
-                return;
-            } else if(guessKey->fFrame > relFrame) {
-                getPrevAndNextKeyId(relFrame, prevKey, nextKey, guessId, maxId);
-                return;
-            }
-            prevKey = guessId;
-            return;
-        }
-        qreal mCurrentValue;
-        QList<KeySnaphot> mKeys;
-
-        qreal mFrameMultiplier;
-        qreal mValueMultiplier;
-    };
-
     bool SWT_isQrealAnimator() const { return true; }
     void prp_startTransform();
     void prp_finishTransform();
@@ -229,9 +52,9 @@ protected:
     void graph_getValueConstraints(GraphKey *key, const QrealPointType& type,
                                    qreal &minMoveValue, qreal &maxMoveValue) const;
 public:
-    Snapshot makeSnapshot(const qreal& frameMultiplier = 1,
+    QrealSnapshot makeSnapshot(const qreal& frameMultiplier = 1,
                           const qreal& valueMultiplier = 1) const;
-    Snapshot makeSnapshot(const int& minFrame, const int& maxFrame,
+    QrealSnapshot makeSnapshot(const int& minFrame, const int& maxFrame,
                           const qreal& frameMultiplier = 1,
                           const qreal& valueMultiplier = 1) const;
 

@@ -5,7 +5,7 @@ void mergeData(const float * const & src,
                float * const & dst,
                const SampleRange& dstRange,
                int nSamples,
-               QrealAnimator::Snapshot::Iterator volIt) {
+               QrealSnapshot::Iterator volIt) {
     nSamples = qMin(qMin(nSamples, dstRange.span()), srcRange.span());
     if(volIt.staticValue()) {
         const qreal vol = volIt.getValueAndProgress(1);
@@ -49,7 +49,7 @@ void SoundMerger::processTask() {
         if(!dstRelRange.isValid()) continue;
         if(!srcNeededRelRange.isValid()) continue;
         const int firstVolSample = dstNeededAbsRange.fMin - sound.fSampleShift;
-        QrealAnimator::Snapshot::Iterator volIt(firstVolSample, 1000, &sound.fVolume);
+        QrealSnapshot::Iterator volIt(firstVolSample, 1000, &sound.fVolume);
         if(isOne4Dec(speed)) {
             const int nSamples = qMin(srcNeededRelRange.span(), dstRelRange.span());
             const float * const & src = srcSamples->fData;

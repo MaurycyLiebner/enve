@@ -63,7 +63,7 @@ public:
     }
 
     qreal getSpeed() const { return 1; }
-    QrealAnimator::Snapshot getVolumeSnap() const {
+    QrealSnapshot getVolumeSnap() const {
         return mVolumeAnimator->makeSnapshot(
                     SOUND_SAMPLERATE/getCanvasFPS(), 0.01);
     }

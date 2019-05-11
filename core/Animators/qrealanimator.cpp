@@ -73,10 +73,10 @@ void QrealAnimator::graph_getValueConstraints(
     }
 }
 
-QrealAnimator::Snapshot QrealAnimator::makeSnapshot(
+QrealSnapshot QrealAnimator::makeSnapshot(
         const qreal &frameMultiplier,
         const qreal &valueMultiplier) const {
-    Snapshot snapshot(mCurrentBaseValue, frameMultiplier, valueMultiplier);
+    QrealSnapshot snapshot(mCurrentBaseValue, frameMultiplier, valueMultiplier);
     for(const auto& key : anim_mKeys) {
         const auto qaKey = GetAsPtr(key, QrealKey);
         snapshot.appendKey(qaKey);
@@ -84,7 +84,7 @@ QrealAnimator::Snapshot QrealAnimator::makeSnapshot(
     return snapshot;
 }
 
-QrealAnimator::Snapshot QrealAnimator::makeSnapshot(
+QrealSnapshot QrealAnimator::makeSnapshot(
         const int &minFrame, const int &maxFrame,
         const qreal &frameMultiplier,
         const qreal &valueMultiplier) const {
@@ -92,7 +92,7 @@ QrealAnimator::Snapshot QrealAnimator::makeSnapshot(
     const int nextKeyId = anim_getNextKeyId(maxFrame);
     const int minI = clamp(prevKeyId, 0, anim_mKeys.count() - 1);
     const int maxI = clamp(nextKeyId, 0, anim_mKeys.count() - 1);
-    Snapshot snapshot(mCurrentBaseValue, frameMultiplier, valueMultiplier);
+    QrealSnapshot snapshot(mCurrentBaseValue, frameMultiplier, valueMultiplier);
     for(int i = minI; i <= maxI; i++) {
         const auto iKey = anim_mKeys.atId<QrealKey>(i);
         snapshot.appendKey(iKey);
@@ -435,13 +435,4 @@ void QrealAnimator::multCurrentBaseValue(const qreal &mult) {
 
 qreal QrealAnimator::getSavedBaseValue() {
     return mSavedCurrentValue;
-}
-
-void QrealAnimator::Snapshot::appendKey(const QrealKey * const key) {
-    mKeys.append({key->getStartFrame()*mFrameMultiplier,
-                  key->getStartValue()*mValueMultiplier,
-                  key->getRelFrame()*mFrameMultiplier,
-                  key->getValue()*mValueMultiplier,
-                  key->getEndFrame()*mFrameMultiplier,
-                  key->getEndValue()*mValueMultiplier});
 }

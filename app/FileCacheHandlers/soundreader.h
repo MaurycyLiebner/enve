@@ -51,7 +51,7 @@ class SoundReaderForMerger : public SoundReader {
     struct SingleSound {
         int fSampleShift;
         SampleRange fSamplesRange;
-        QrealAnimator::Snapshot fVolume;
+        QrealSnapshot fVolume;
         qreal fSpeed;
     };
 protected:
@@ -64,7 +64,7 @@ protected:
 public:
     void addSingleSound(const int& sampleShift,
                         const SampleRange& absRange,
-                        const QrealAnimator::Snapshot& volume,
+                        const QrealSnapshot& volume,
                         const qreal& speed) {
         mSSAbsRanges.append({sampleShift, absRange, volume, speed});
     }

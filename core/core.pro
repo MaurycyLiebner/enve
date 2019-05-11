@@ -52,6 +52,7 @@ CONFIG(debug, debug|release) {
 LIBS += -lskia
 
 SOURCES += \
+    Animators/qrealsnapshot.cpp \
     smartPointers/stdpointer.cpp \
     smartPointers/selfref.cpp \
     smartPointers/stdselfref.cpp \
@@ -140,6 +141,7 @@ SOURCES += \
     MovablePoints/brushpolypoint.cpp
 
 HEADERS += \
+    Animators/qrealsnapshot.h \
     core_global.h \
     smartPointers/stdpointer.h \
     smartPointers/selfref.h \

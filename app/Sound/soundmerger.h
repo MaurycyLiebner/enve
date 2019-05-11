@@ -11,7 +11,7 @@ extern "C" {
 struct SingleSoundData {
     int fSampleShift;
     SampleRange fSSAbsRange;
-    QrealAnimator::Snapshot fVolume;
+    QrealSnapshot fVolume;
     qreal fSpeed;
     stdsptr<Samples> fSamples;
 };
