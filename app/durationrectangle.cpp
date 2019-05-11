@@ -48,14 +48,16 @@ bool DurationRectangleMovable::isHovered() {
 void DurationRectangleMovable::pressed(const bool &shiftPressed) {
     if(!mChildProperty) return;
     if(mChildProperty->SWT_isBoundingBox()) {
-        ((BoundingBox*)mChildProperty)->selectionChangeTriggered(shiftPressed);
+        const auto box = GetAsPtr(mChildProperty, BoundingBox);
+        box->selectionChangeTriggered(shiftPressed);
     }
 }
 
 bool DurationRectangleMovable::isSelected() {
     if(mChildProperty) {
         if(mChildProperty->SWT_isBoundingBox()) {
-            return ((BoundingBox*)mChildProperty)->isSelected();
+            const auto box = GetAsPtr(mChildProperty, BoundingBox);
+            return box->isSelected();
         }
     }
     return false;
@@ -145,7 +147,8 @@ int DurationRectangle::getMaxFrameAsAbsFrame() const {
     return mChildProperty->prp_relFrameToAbsFrame(
                 getMaxFrameAsRelFrame());
 }
-
+#include "Boxes/animationbox.h"
+#include "Sound/singlesound.h"
 void DurationRectangle::draw(QPainter * const p,
                              const QRect& drawRect,
                              const qreal& fps,
@@ -169,11 +172,13 @@ void DurationRectangle::draw(QPainter * const p,
     if(mRasterCacheHandler && mSoundCacheHandler) {
         const int soundHeight = drawRect.height()/3;
         const int rasterHeight = drawRect.height() - soundHeight;
-        const QRect rasterRect(0, 0, drawRect.width(), rasterHeight);
+        const QRect rasterRect(drawRect.x(), drawRect.y(),
+                               drawRect.width(), rasterHeight);
         mRasterCacheHandler->drawCacheOnTimeline(p, rasterRect,
                                                  rectStartFrame,
                                                  rectEndFrame);
-        const QRect soundRect(0, rasterHeight, drawRect.width(), soundHeight);
+        const QRect soundRect(drawRect.x(), drawRect.y() + rasterHeight,
+                              drawRect.width(), soundHeight);
         mSoundCacheHandler->drawCacheOnTimeline(p, soundRect,
                                                 rectStartFrame,
                                                 rectEndFrame, fps);

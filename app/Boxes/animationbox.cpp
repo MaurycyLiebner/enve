@@ -140,10 +140,19 @@ void AnimationBox::anim_setAbsFrame(const int &frame) {
 FrameRange AnimationBox::prp_getIdenticalRelRange(const int &relFrame) const {
     if(isVisibleAndInDurationRect(relFrame)) {
         const auto animDur = getAnimationDurationRect();
-        if(animDur) {
-            const auto animRange = animDur->getAnimationRange();
-            if(animRange.inRange(relFrame))
-                return {relFrame, relFrame};
+        const auto animRange = animDur->getAnimationRange();
+        if(animRange.inRange(relFrame))
+            return {relFrame, relFrame};
+        else if(relFrame > animRange.fMax) {
+            const auto baseRange = BoundingBox::prp_getIdenticalRelRange(relFrame);
+            const FrameRange durRect{animRange.fMax + 1,
+                                     animDur->getRelFrameRange().fMax};
+            return baseRange*durRect;
+        } else if(relFrame < animRange.fMin) {
+            const auto baseRange = BoundingBox::prp_getIdenticalRelRange(relFrame);
+            const FrameRange durRect{animRange.fMin - 1,
+                                     animDur->getRelFrameRange().fMin};
+            return baseRange*durRect;
         }
     }
     return BoundingBox::prp_getIdenticalRelRange(relFrame);

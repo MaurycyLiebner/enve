@@ -96,15 +96,35 @@ class DurationRectangle : public DurationRectangleMovable {
 public:
     DurationRectangle(Property * const childProp);
 
+    virtual void setMinFrame(const int &minFrame);
+    virtual void setMaxFrame(const int &maxFrame);
+
+    virtual void draw(QPainter * const p,
+                      const QRect &drawRect,
+                      const qreal &fps,
+                      const qreal &pixelsPerFrame,
+                      const FrameRange &absFrameRange);
+
+    virtual DurationRectangleMovable *getMovableAt(
+                      const int &pressX,
+                      const qreal &pixelsPerFrame,
+                      const int &minViewedFrame);
+    virtual bool hasAnimationFrameRange() { return false; }
+    virtual void writeDurationRectangle(QIODevice *target);
+    virtual void readDurationRectangle(QIODevice *target);
+    virtual void openDurationSettingsDialog(QWidget *parent = nullptr);
+
+    void changeFramePosBy(const int &change);
+
+    Qt::CursorShape getHoverCursorShape() {
+        return Qt::OpenHandCursor;
+    }
+
     int getFrameShift() {
         return getFramePos();
     }
 
     void setFramesDuration(const int &duration);
-
-    virtual void setMinFrame(const int &minFrame);
-
-    virtual void setMaxFrame(const int &maxFrame);
 
     int getFrameDuration() const;
 
@@ -141,27 +161,6 @@ public:
         return {FrameRange::EMIN, getMinFrameAsAbsFrame() - 1};
     }
 
-    virtual void draw(QPainter * const p,
-                      const QRect &drawRect,
-                      const qreal &fps,
-                      const qreal &pixelsPerFrame,
-                      const FrameRange &absFrameRange);
-
-    virtual DurationRectangleMovable *getMovableAt(
-                      const int &pressX,
-                      const qreal &pixelsPerFrame,
-                      const int &minViewedFrame);
-
-    void changeFramePosBy(const int &change);
-
-    Qt::CursorShape getHoverCursorShape() {
-        return Qt::OpenHandCursor;
-    }
-
-    virtual bool hasAnimationFrameRange() { return false; }
-    virtual void writeDurationRectangle(QIODevice *target);
-    virtual void readDurationRectangle(QIODevice *target);
-
     void moveMinFrame(const int &change);
     void finishMinFramePosTransform();
     void startMinFramePosTransform();
@@ -176,8 +175,6 @@ public:
     void setSoundCacheHandler(const HDDCachableCacheHandler * const handler) {
         mSoundCacheHandler = handler;
     }
-
-    virtual void openDurationSettingsDialog(QWidget *parent = nullptr);
 signals:
     void minFrameChangedBy(int);
     void maxFrameChangedBy(int);
