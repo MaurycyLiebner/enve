@@ -109,7 +109,7 @@ SoundMerger *SoundComposition::scheduleSecond(const int &secondId) {
                 task->addSoundToMerge({sound->getSampleShift(),
                                        sound->absSampleRange(),
                                        sound->getVolumeSnap(),
-                                       sound->getSpeed(),
+                                       sound->getStretch(),
                                        SPtrCreate(Samples)(samples)});
             } else {
                 const auto reader = sound->getSecondReader(i);
@@ -119,7 +119,7 @@ SoundMerger *SoundComposition::scheduleSecond(const int &secondId) {
                 reader->addSingleSound(sound->getSampleShift(),
                                        sound->absSampleRange(),
                                        sound->getVolumeSnap(),
-                                       sound->getSpeed());
+                                       sound->getStretch());
             }
         }
     }

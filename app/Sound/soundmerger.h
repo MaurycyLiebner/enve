@@ -12,7 +12,7 @@ struct SingleSoundData {
     int fSampleShift;
     SampleRange fSSAbsRange;
     QrealSnapshot fVolume;
-    qreal fSpeed;
+    qreal fStretch;
     stdsptr<Samples> fSamples;
 };
 

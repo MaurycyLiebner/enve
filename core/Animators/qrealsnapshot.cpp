@@ -101,9 +101,9 @@ qreal QrealSnapshot::Iterator::getValueAndProgress(const qreal &progress) {
         const qreal fracNext = (mCurrentFrame - mPrevFrame)*mInvFrameSpan;
         result = (mNextValue - mPrevValue)*fracNext + mPrevValue;
     } else result = mPrevValue;
+    if(progress < 0) return result;
     mCurrentFrame += progress;
-    if(mCurrentFrame > mNextFrame ||
-            mCurrentFrame < mPrevFrame) updateSamples();
+    if(mCurrentFrame > mNextFrame) updateSamples();
     return result;
 }
 

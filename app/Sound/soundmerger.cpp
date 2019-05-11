@@ -31,15 +31,15 @@ void SoundMerger::processTask() {
     memset(dst, 0, ulong(dstSamples)*sizeof(float));
     for(const auto& sound : mSounds) {
         const auto& srcSamples = sound.fSamples;
-        const qreal& speed = sound.fSpeed;
+        const qreal& stretch = sound.fStretch;
 
         const SampleRange smplsRelRange = srcSamples->fSampleRange;
-        const SampleRange smplsSpeedRelRange{qRound(smplsRelRange.fMin/speed),
-                                             qRound(smplsRelRange.fMax/speed)};
+        const SampleRange smplsSpeedRelRange{qRound(smplsRelRange.fMin*stretch),
+                                             qRound(smplsRelRange.fMax*stretch)};
         const SampleRange smplsAbsRange = smplsSpeedRelRange.shifted(sound.fSampleShift);
         const SampleRange srcAbsRange = smplsAbsRange*sound.fSSAbsRange;
         const SampleRange srcNeededAbsRange = srcAbsRange*mSampleRange;
-        const int absToRel = -qRound(srcSamples->fSampleRange.fMin/speed) - sound.fSampleShift;
+        const int absToRel = -qRound(srcSamples->fSampleRange.fMin*stretch) - sound.fSampleShift;
         const SampleRange srcNeededRelRange = srcNeededAbsRange.shifted(absToRel);
 
         const SampleRange dstAbsRange = mSampleRange;
@@ -50,12 +50,12 @@ void SoundMerger::processTask() {
         if(!srcNeededRelRange.isValid()) continue;
         const int firstVolSample = dstNeededAbsRange.fMin - sound.fSampleShift;
         QrealSnapshot::Iterator volIt(firstVolSample, 1000, &sound.fVolume);
-        if(isOne4Dec(speed)) {
+        if(isOne4Dec(stretch)) {
             const int nSamples = qMin(srcNeededRelRange.span(), dstRelRange.span());
             const float * const & src = srcSamples->fData;
             mergeData(src, srcNeededRelRange, dst, dstRelRange, nSamples, volIt);
         } else {
-            const int sampleRate = qRound(SOUND_SAMPLERATE/speed);
+            const int sampleRate = qRound(SOUND_SAMPLERATE*stretch);
             struct SwrContext * swrContext = swr_alloc();
             av_opt_set_int(swrContext, "in_channel_count",  1, 0);
             av_opt_set_int(swrContext, "out_channel_count", 1, 0);

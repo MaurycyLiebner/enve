@@ -33,7 +33,6 @@ public:
 
     void setFilePath(const QString &path);
 
-    void setDurationRect(const qsptr<FixedLenAnimationRect> &durRect);
     FixedLenAnimationRect *getDurationRect() const;
 
     qreal getVolumeAtRelFrame(const qreal& relFrame) const {
@@ -62,18 +61,21 @@ public:
         return &mCacheHandler->getCacheHandler();
     }
 
-    qreal getSpeed() const { return 1; }
+    void setStretch(const qreal& stretch);
+    qreal getStretch() const { return mStretch; }
     QrealSnapshot getVolumeSnap() const {
         return mVolumeAnimator->makeSnapshot(
                     SOUND_SAMPLERATE/getCanvasFPS(), 0.01);
     }
+
+    void updateDurationRectLength();
 private:
     qreal getCanvasFPS() const;
     void updateAfterDurationRectangleShifted();
     bool mOwnDurationRectangle;
 
+    qreal mStretch = 1;
     stdptr<SoundCacheHandler> mCacheHandler;
-
     qsptr<FixedLenAnimationRect> mDurationRectangle;
 
     qsptr<QrealAnimator> mVolumeAnimator =

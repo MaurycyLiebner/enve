@@ -7,7 +7,20 @@
 
 SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
     ComplexAnimator("sound") {
-    setDurationRect(durRect);    
+    mOwnDurationRectangle = !durRect;
+    if(mOwnDurationRectangle) {
+        mDurationRectangle = SPtrCreate(FixedLenAnimationRect)(this);
+        mDurationRectangle->setBindToAnimationFrameRange();
+        connect(mDurationRectangle.get(), &DurationRectangle::posChanged,
+                this, &SingleSound::anim_updateAfterShifted);
+    } else mDurationRectangle = durRect;
+
+    connect(mDurationRectangle.get(), &DurationRectangle::rangeChanged,
+            this, &SingleSound::prp_afterWholeInfluenceRangeChanged);
+    connect(mDurationRectangle.get(), &DurationRectangle::posChanged,
+            this, &SingleSound::updateAfterDurationRectangleShifted);
+    mDurationRectangle->setSoundCacheHandler(getCacheHandler());
+
     ca_addChildAnimator(mVolumeAnimator);
 }
 
@@ -76,11 +89,11 @@ SampleRange SingleSound::absSampleRange() const {
 
 iValueRange SingleSound::absSecondToRelSeconds(const int &absSecond) {
     const qreal fps = getCanvasFPS();
-    const qreal speed = getSpeed();
+    const qreal speed = isZero6Dec(mStretch) ? TEN_MIL : 1/mStretch;
     const qreal qFirstSecond = prp_absFrameToRelFrameF(absSecond*fps)*speed/fps;
     if(isInteger4Dec(qFirstSecond)) {
         const int round = qRound(qFirstSecond);
-        if(isOne4Dec(speed) || speed < 1) {
+        if(isOne4Dec(mStretch) || mStretch > 1) {
             return {round, round};
         }
         const qreal qLast = qFirstSecond + speed - 1;
@@ -96,6 +109,20 @@ iValueRange SingleSound::absSecondToRelSeconds(const int &absSecond) {
     return {firstSecond, lastSecond};
 }
 
+void SingleSound::setStretch(const qreal &stretch) {
+    mStretch = stretch;
+    updateDurationRectLength();
+}
+
+void SingleSound::updateDurationRectLength() {
+    if(mOwnDurationRectangle) {
+        const int secs = mCacheHandler ? mCacheHandler->durationSec() : 0;
+        const qreal fps = getCanvasFPS();
+        const int frames = qCeil(qAbs(secs*fps*mStretch));
+        mDurationRectangle->setAnimationFrameDuration(frames);
+    }
+}
+
 qreal SingleSound::getCanvasFPS() const {
     auto parentCanvas = getFirstAncestor<Canvas>();
     if(!parentCanvas) {
@@ -105,25 +132,6 @@ qreal SingleSound::getCanvasFPS() const {
         if(!parentCanvas) return 1;
     }
     return parentCanvas->getFps();
-}
-
-void SingleSound::setDurationRect(const qsptr<FixedLenAnimationRect>& durRect) {
-    if(mDurationRectangle) mDurationRectangle->setSoundCacheHandler(nullptr);
-    if(!durRect) {
-        mOwnDurationRectangle = true;
-        mDurationRectangle = SPtrCreate(FixedLenAnimationRect)(this);
-        mDurationRectangle->setBindToAnimationFrameRange();
-        connect(mDurationRectangle.get(), &DurationRectangle::posChanged,
-                this, &SingleSound::anim_updateAfterShifted);
-    } else {
-        mOwnDurationRectangle = false;
-        mDurationRectangle = durRect;
-    }
-    connect(mDurationRectangle.get(), &DurationRectangle::rangeChanged,
-            this, &SingleSound::prp_afterWholeInfluenceRangeChanged);
-    connect(mDurationRectangle.get(), &DurationRectangle::posChanged,
-            this, &SingleSound::updateAfterDurationRectangleShifted);
-    mDurationRectangle->setSoundCacheHandler(getCacheHandler());
 }
 
 void SingleSound::updateAfterDurationRectangleShifted() {
@@ -137,12 +145,7 @@ void SingleSound::setFilePath(const QString &path) {
     else mCacheHandler = FileSourcesCache::getHandlerForFilePath
                 <SoundCacheHandler>(path);
     mDurationRectangle->setSoundCacheHandler(getCacheHandler());
-    if(mOwnDurationRectangle) {
-        const int secs = mCacheHandler ? mCacheHandler->durationSec() : 0;
-        const qreal fps = getCanvasFPS();
-        const int frames = qCeil(secs*fps);
-        mDurationRectangle->setAnimationFrameDuration(frames);
-    }
+    updateDurationRectLength();
 }
 
 int SingleSound::prp_getRelFrameShift() const {
