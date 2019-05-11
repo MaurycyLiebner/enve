@@ -6,6 +6,7 @@ class MainWindow;
 #include "glhelpers.h"
 #include "framerange.h"
 #include "MovablePoints/pointshandler.h"
+#include "basicreadwrite.h"
 
 class ComplexAnimator;
 class Key;

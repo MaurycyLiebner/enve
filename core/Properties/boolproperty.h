@@ -23,12 +23,12 @@ class BoolPropertyContainer : public ComplexAnimator {
 protected:
     BoolPropertyContainer(const QString& name);
 public:
-    bool getValue();
-
     bool SWT_isBoolPropertyContainer() const { return true; }
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
+
     void setValue(const bool &value);
+    bool getValue();
 private:
     bool mValue = false;
 };

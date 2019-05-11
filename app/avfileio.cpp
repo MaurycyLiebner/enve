@@ -85,42 +85,12 @@ char FileFooter::sAVFormat[15] = "AniVect av";
 char FileFooter::sAppName[15] = "AniVect";
 char FileFooter::sAppVersion[15] = "0.0";
 
-void BoolProperty::writeProperty(QIODevice * const target) const {
-    target->write(rcConstChar(&mValue), sizeof(bool));
-}
-
-void BoolProperty::readProperty(QIODevice *target) {
-    target->read(rcChar(&mValue), sizeof(bool));
-}
-
-void BoolPropertyContainer::writeProperty(QIODevice * const target) const {
-    target->write(rcConstChar(&mValue), sizeof(bool));
-}
-
-void BoolPropertyContainer::readProperty(QIODevice *target) {
-    bool value;
-    target->read(rcChar(&value), sizeof(bool));
-    setValue(value);
-}
-
 void ComboBoxProperty::writeProperty(QIODevice * const target) const {
     target->write(rcConstChar(&mCurrentValue), sizeof(int));
 }
 
 void ComboBoxProperty::readProperty(QIODevice *target) {
     target->read(rcChar(&mCurrentValue), sizeof(int));
-}
-
-void IntProperty::writeProperty(QIODevice * const target) const {
-    target->write(rcConstChar(&mMinValue), sizeof(int));
-    target->write(rcConstChar(&mMaxValue), sizeof(int));
-    target->write(rcConstChar(&mValue), sizeof(int));
-}
-
-void IntProperty::readProperty(QIODevice *target) {
-    target->read(rcChar(&mMinValue), sizeof(int));
-    target->read(rcChar(&mMaxValue), sizeof(int));
-    target->read(rcChar(&mValue), sizeof(int));
 }
 
 void Key::writeKey(QIODevice *target) {

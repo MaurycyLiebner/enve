@@ -8,27 +8,27 @@ class IntProperty : public Property {
 protected:
     IntProperty(const QString& name);
 public:
-    void setValueRange(const int &minValue, const int &maxValue);
-
-    void setCurrentValue(const int &value);
-
     bool SWT_isIntProperty() const;
 
-    int getValue();
-
-    int getMaxValue();
-    int getMinValue();
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
     void prp_startTransform();
     void prp_finishTransform();
+
+    void setValueRange(const int &minValue, const int &maxValue);
+
+    void setCurrentValue(const int &value);
+    int getValue();
+
+    int getMaxValue();
+    int getMinValue();
 protected:
     bool mTransformed = false;
     int mValue = 0;
     int mMinValue = 0;
     int mMaxValue = 9999;
 signals:
-    void valueChangedSignal(qreal);
+    void valueChangedSignal(int);
 };
 
 #endif // INTPROPERTY_H

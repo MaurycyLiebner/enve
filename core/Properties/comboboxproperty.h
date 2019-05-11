@@ -3,12 +3,14 @@
 #include "Properties/property.h"
 class ComboBoxProperty : public Property {
     Q_OBJECT
-public:
+    friend class SelfRef;
+protected:
     ComboBoxProperty(const QString& name,
                      const QStringList &list);
-    const int &getCurrentValue() {
-        return mCurrentValue;
-    }
+public:
+    bool SWT_isComboBoxProperty() const { return true; }
+    void writeProperty(QIODevice * const target) const;
+    void readProperty(QIODevice *target);
 
     const QStringList &getValueNames() {
         return mValueNames;
@@ -18,18 +20,18 @@ public:
         if(mCurrentValue >= mValueNames.count()) return "null";
         return mValueNames.at(mCurrentValue);
     }
-    bool SWT_isComboBoxProperty() const { return true; }
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
-signals:
-    void valueChanged(int);
-public slots:
+
+    const int &getCurrentValue() {
+        return mCurrentValue;
+    }
     void setCurrentValue(const int &id) {
         if(mCurrentValue == id) return;
         mCurrentValue = id;
         emit valueChanged(id);
         prp_afterWholeInfluenceRangeChanged();
     }
+signals:
+    void valueChanged(int);
 private:
     int mCurrentValue = 0;
     QStringList mValueNames;
