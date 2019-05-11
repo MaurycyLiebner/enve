@@ -58,7 +58,11 @@ void QrealSnapshot::getPrevAndNextKeyId(const qreal &relFrame,
 void QrealSnapshot::getPrevAndNextKeyId(const qreal &relFrame,
                                         int &prevKey, int &nextKey,
                                         const int &minId, const int &maxId) const {
-    if(maxId < minId) return;
+    if(maxId < minId) {
+        prevKey = -1;
+        nextKey = -1;
+        return;
+    }
     if(maxId - minId == 0) {
         prevKey = minId;
         return;

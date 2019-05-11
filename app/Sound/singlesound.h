@@ -12,6 +12,9 @@ protected:
 public:
     bool SWT_isSingleSound() const { return true; }
 
+    void addActionsToMenu(PropertyTypeMenu * const menu);
+
+
     DurationRectangleMovable *anim_getTimelineMovable(
             const int &relX, const int &minViewedFrame,
             const qreal &pixelsPerFrame);
@@ -61,6 +64,10 @@ public:
         return &mCacheHandler->getCacheHandler();
     }
 
+    bool videoSound() const {
+        return !mOwnDurationRectangle;
+    }
+
     void setStretch(const qreal& stretch);
     qreal getStretch() const { return mStretch; }
     QrealSnapshot getVolumeSnap() const {
@@ -68,12 +75,15 @@ public:
                     SOUND_SAMPLERATE/getCanvasFPS(), 0.01);
     }
 
-
     bool isEnabled() const {
         return mEnabled;
     }
+
     void setEnabled(const bool& enable) {
+        if(enable == mEnabled) return;
         mEnabled = enable;
+        SWT_setDisabled(!mEnabled);
+        prp_afterWholeInfluenceRangeChanged();
     }
 private:
     iValueRange absSecondToRelSecondsAbsStretch(const int& absSecond);

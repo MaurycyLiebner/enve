@@ -79,10 +79,12 @@ class Property : public SingleWidgetTarget {
     Q_OBJECT
 protected:
     Property(const QString &name);
+
+    virtual void updateCanvasProps() {
+        if(mParent) mParent->updateCanvasProps();
+    }
 public:
     ~Property() { emit beingDeleted(); }
-
-    bool SWT_isProperty() const { return true; }
 
     virtual int prp_getRelFrameShift() const {
         return 0;
@@ -137,8 +139,6 @@ public:
         Q_UNUSED(device);
     }
 
-    QMatrix getTransform() const;
-
     virtual BasicTransformAnimator *getTransformAnimator() const {
         if(mParent) return mParent->getTransformAnimator();
         return nullptr;
@@ -148,6 +148,10 @@ public:
 protected:
     virtual void prp_setUpdater(const stdsptr<PropertyUpdater>& updater);
 public:
+    bool SWT_isProperty() const { return true; }
+
+    QMatrix getTransform() const;
+
     void prp_afterWholeInfluenceRangeChanged();
 
     void prp_afterChangedRelRange(const FrameRange &range) {
@@ -220,10 +224,6 @@ public:
 protected:
     void prp_callUpdater();
     void prp_callFinishUpdater();
-
-    virtual void updateCanvasProps() {
-        if(mParent) mParent->updateCanvasProps();
-    }
     void enabledDrawingOnCanvas();
     void setPointsHandler(const stdsptr<PointsHandler>& handler);
 signals:

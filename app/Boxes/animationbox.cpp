@@ -155,6 +155,7 @@ FrameRange AnimationBox::prp_getIdenticalRelRange(const int &relFrame) const {
 //    canvas->drawImage(mUpdateAnimationImageSk, 0, 0, &paint);
 //}
 #include "typemenu.h"
+#include <QInputDialog>
 void AnimationBox::addActionsToMenu(BoxTypeMenu * const menu) {
     const auto widget = menu->getParentWidget();
 
@@ -177,6 +178,19 @@ void AnimationBox::addActionsToMenu(BoxTypeMenu * const menu) {
     };
     menu->addCheckableAction("Frame Remapping",
                              mFrameRemappingEnabled, remapOp);
+
+    const BoxTypeMenu::PlainOp<AnimationBox> stretchOp =
+    [this, widget](AnimationBox * box) {
+        bool ok = false;
+        const int stretch = QInputDialog::getInt(widget,
+                                                 "Stretch " + box->getName(),
+                                                 "Stretch:",
+                                                 qRound(getStretch()*100),
+                                                 -1000, 1000, 1, &ok);
+        if(!ok) return;
+        box->setStretch(stretch*0.01);
+    };
+    menu->addPlainAction("Stretch...", stretchOp);
 
     BoundingBox::addActionsToMenu(menu);
 }

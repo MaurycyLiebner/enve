@@ -69,21 +69,18 @@ void SoundMerger::processTask() {
             if(!swr_is_initialized(swrContext)) {
                 RuntimeThrow("Resampler has not been properly initialized");
             }
-            uint8_t** buffer = nullptr;
-            const int res = av_samples_alloc(buffer,
-                                             nullptr, 1, sampleRate,
+            uint8_t* buffer = nullptr;
+            const int res = av_samples_alloc(&buffer, nullptr, 1, sampleRate,
                                              AV_SAMPLE_FMT_FLT, 0);
             if(res < 0) RuntimeThrow("Resampling output buffer alloc failed");
             int nSamples =
-                    swr_convert(swrContext,
-                                buffer,
-                                sampleRate,
+                    swr_convert(swrContext, &buffer, sampleRate,
                                 (const uint8_t**)&srcSamples->fData,
                                 SOUND_SAMPLERATE);
             if(nSamples < 0) RuntimeThrow("Resampling failed");
             const float * const & src = reinterpret_cast<float*>(buffer);
             mergeData(src, srcNeededRelRange, dst, dstRelRange, nSamples, volIt);
-            av_freep(buffer);
+            av_freep(&buffer);
         }
     }
 }

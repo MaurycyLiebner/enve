@@ -24,6 +24,30 @@ SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
     ca_addChildAnimator(mVolumeAnimator);
 }
 
+#include <QInputDialog>
+#include "typemenu.h"
+void SingleSound::addActionsToMenu(PropertyTypeMenu * const menu) {
+    const BoxTypeMenu::CheckOp<SingleSound> enableOp =
+            [](SingleSound * sound, bool enable) {
+        sound->setEnabled(enable);
+    };
+    menu->addCheckableAction("Enabled", isEnabled(), enableOp);
+    if(videoSound()) return;
+    const auto widget = menu->getParentWidget();
+    const BoxTypeMenu::PlainOp<SingleSound> stretchOp =
+            [this, widget](SingleSound * sound) {
+        bool ok = false;
+        const int stretch = QInputDialog::getInt(widget,
+                                                 "Stretch " + sound->prp_getName(),
+                                                 "Stretch:",
+                                                 qRound(getStretch()*100),
+                                                 -1000, 1000, 1, &ok);
+        if(!ok) return;
+        sound->setStretch(stretch*0.01);
+    };
+    menu->addPlainAction("Stretch...", stretchOp);
+}
+
 DurationRectangleMovable *SingleSound::anim_getTimelineMovable(
         const int &relX, const int &minViewedFrame,
         const qreal &pixelsPerFrame) {
@@ -36,8 +60,8 @@ void SingleSound::drawTimelineControls(QPainter * const p,
                                        const qreal &pixelsPerFrame,
                                        const FrameRange &absFrameRange,
                                        const int &rowHeight) {
-//    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
-//    int startDFrame = mDurationRectangle.getMinAnimationFrame() - startFrame;
+    //    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
+    //    int startDFrame = mDurationRectangle.getMinAnimationFrame() - startFrame;
 //    int frameWidth = ceil(mListOfFrames.count()/qAbs(timeScale));
 //    p->fillRect(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5, drawY,
 //                frameWidth*pixelsPerFrame - pixelsPerFrame,
@@ -122,6 +146,7 @@ iValueRange SingleSound::absSecondToRelSecondsAbsStretch(const int &absSecond) {
 void SingleSound::setStretch(const qreal &stretch) {
     mStretch = stretch;
     updateDurationRectLength();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void SingleSound::updateDurationRectLength() {
