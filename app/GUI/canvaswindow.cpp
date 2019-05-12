@@ -1161,6 +1161,9 @@ void CanvasWindow::nextSaveOutputFrame() {
                             GetAsSPtr(cont, ImageCacheContainer));
             }
         }
+        if(TaskScheduler::sAllQuedTasksFinished()) {
+            nextSaveOutputFrame();
+        }
     }
 }
 

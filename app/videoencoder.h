@@ -69,6 +69,10 @@ class VideoEncoder : public HDDTask {
 protected:
     VideoEncoder();
 public:
+    void processTask();
+    void beforeProcessing();
+    void afterProcessing();
+
     void startNewEncoding(RenderInstanceSettings * const settings) {
         if(!mCurrentlyEncoding) startEncoding(settings);
     }
@@ -85,9 +89,6 @@ public:
     }
 
     void addContainer(const stdsptr<ImageCacheContainer> &cont);
-    void processTask();
-    void beforeProcessing();
-    void afterProcessing();
 
     static VideoEncoder *mVideoEncoderInstance;
     static VideoEncoderEmitter *getVideoEncoderEmitter();

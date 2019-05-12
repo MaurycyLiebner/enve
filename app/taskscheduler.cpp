@@ -137,7 +137,8 @@ void TaskScheduler::tryProcessingNextQuedCPUTask() {
 void TaskScheduler::afterHDDTaskFinished(
         const stdsptr<Task>& finishedTask,
         ExecController * const controller) {
-    if(controller == mHDDExecutor) mHDDThreadBusy = false;
+    if(controller == mHDDExecutor)
+        mHDDThreadBusy = false;
     else {
         const auto hddExec = static_cast<HDDExecController*>(controller);
         mFreeBackupHDDExecs << hddExec;
