@@ -20,22 +20,24 @@ TaskScheduler::TaskScheduler() {
     }
 
     mHDDExecutor = new HDDExecController;
-    mBackupHDDExecutor = new HDDExecController;
+    mHDDExecs << mHDDExecutor;
     connect(mHDDExecutor, &ExecController::finishedTaskSignal,
-            this, &TaskScheduler::afterHDDTaskFinished);
-    connect(mBackupHDDExecutor, &ExecController::finishedTaskSignal,
             this, &TaskScheduler::afterHDDTaskFinished);
     connect(mHDDExecutor, &HDDExecController::HDDPartFinished,
             this, &TaskScheduler::switchToBackupHDDExecutor);
+
+    mFreeBackupHDDExecs << createNewBackupHDDExecutor();
 }
 
 TaskScheduler::~TaskScheduler() {
-    for(const auto& thread : mCPUExecutors) {
-        thread->quit();
-        thread->wait();
+    for(const auto& exec : mCPUExecutors) {
+        exec->quit();
+        exec->wait();
     }
-    mHDDExecutor->quit();
-    mHDDExecutor->wait();
+    for(const auto& exec : mHDDExecs) {
+        exec->quit();
+        exec->wait();
+    }
 }
 
 void TaskScheduler::initializeGPU() {
@@ -72,6 +74,14 @@ bool TaskScheduler::shouldQueMoreCPUTasks() {
     return !mFreeCPUExecs.isEmpty() && !mCPUQueing && !overflowed;
 }
 
+HDDExecController* TaskScheduler::createNewBackupHDDExecutor() {
+    const auto newExec = new HDDExecController;
+    connect(newExec, &ExecController::finishedTaskSignal,
+            this, &TaskScheduler::afterHDDTaskFinished);
+    mHDDExecs << newExec;
+    return newExec;
+}
+
 void TaskScheduler::queScheduledCPUTasks() {
     if(!shouldQueMoreCPUTasks()) return;
     mCPUQueing = true;
@@ -101,16 +111,17 @@ void TaskScheduler::queScheduledHDDTasks() {
 }
 
 void TaskScheduler::switchToBackupHDDExecutor() {
-    if(!mHDDThreadBusy || mBackupHDDThreadBusy) return;
-    const auto hddExecutor = mHDDExecutor;
-    mHDDExecutor = mBackupHDDExecutor;
-    mBackupHDDExecutor = hddExecutor;
-    const auto hddThreadBusy = mHDDThreadBusy;
-    mHDDThreadBusy = mBackupHDDThreadBusy;
-    mBackupHDDThreadBusy = hddThreadBusy;
-
-    disconnect(mBackupHDDExecutor, &HDDExecController::HDDPartFinished,
+    if(!mHDDThreadBusy) return;
+    disconnect(mHDDExecutor, &HDDExecController::HDDPartFinished,
                this, &TaskScheduler::switchToBackupHDDExecutor);
+
+    if(mFreeBackupHDDExecs.isEmpty()) {
+        mHDDExecutor = createNewBackupHDDExecutor();
+    } else {
+        mHDDExecutor = mFreeBackupHDDExecs.takeFirst();
+    }
+    mHDDThreadBusy = false;
+
     connect(mHDDExecutor, &HDDExecController::HDDPartFinished,
             this, &TaskScheduler::switchToBackupHDDExecutor);
     processNextQuedHDDTask();
@@ -128,7 +139,10 @@ void TaskScheduler::afterHDDTaskFinished(
         const stdsptr<Task>& finishedTask,
         ExecController * const controller) {
     if(controller == mHDDExecutor) mHDDThreadBusy = false;
-    else mBackupHDDThreadBusy = false;
+    else {
+        const auto hddExec = static_cast<HDDExecController*>(controller);
+        mFreeBackupHDDExecs << hddExec;
+    }
     if(finishedTask) finishedTask->finishedProcessing();
     if(!mFreeCPUExecs.isEmpty() && !mQuedCPUTasks.isEmpty()) {
         processNextQuedCPUTask();

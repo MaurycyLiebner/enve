@@ -274,7 +274,6 @@ private:
     QList<CPUExecController*> mFreeCPUExecs;
 
     bool mHDDThreadBusy = false;
-    bool mBackupHDDThreadBusy = false;
 
     bool mCPUQueing = false;
     QueHandler mQuedCPUTasks;
@@ -283,8 +282,11 @@ private:
     QList<stdsptr<Task>> mScheduledHDDTasks;
     QList<stdsptr<Task>> mQuedHDDTasks;
 
+    HDDExecController *createNewBackupHDDExecutor();
+
     HDDExecController *mHDDExecutor = nullptr;
-    HDDExecController *mBackupHDDExecutor = nullptr;
+    QList<HDDExecController*> mFreeBackupHDDExecs;
+    QList<HDDExecController*> mHDDExecs;
 
     QList<CPUExecController*> mCPUExecutors;
 
