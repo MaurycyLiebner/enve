@@ -959,13 +959,13 @@ void CanvasWindow::nextCurrentRenderFrame() {
         } else {
             newCurrentRenderFrame = range.fMin;
         }
-        newCurrentRenderFrame = qMin(mMaxRenderFrame, newCurrentRenderFrame);
     }
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
         const int minBlock = mCurrentRenderFrame + 1;
         const int maxBlock = newCurrentRenderFrame - 1;
         cacheHandler.blockConts({minBlock, maxBlock}, true);
     }
+    newCurrentRenderFrame = qMin(mMaxRenderFrame, newCurrentRenderFrame);
     const FrameRange newSoundRange = {mCurrentRenderFrame, newCurrentRenderFrame};
     mCurrentSoundComposition->scheduleFrameRange(newSoundRange);
     mCurrentSoundComposition->blockUpToFrame(newCurrentRenderFrame);

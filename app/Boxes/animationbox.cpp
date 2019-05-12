@@ -150,8 +150,8 @@ FrameRange AnimationBox::prp_getIdenticalRelRange(const int &relFrame) const {
             return baseRange*durRect;
         } else if(relFrame < animRange.fMin) {
             const auto baseRange = BoundingBox::prp_getIdenticalRelRange(relFrame);
-            const FrameRange durRect{animRange.fMin - 1,
-                                     animDur->getRelFrameRange().fMin};
+            const FrameRange durRect{animDur->getRelFrameRange().fMin,
+                                     animRange.fMin - 1};
             return baseRange*durRect;
         }
     }

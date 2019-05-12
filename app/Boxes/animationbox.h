@@ -41,6 +41,11 @@ public:
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 
+    virtual void setStretch(const qreal& stretch) {
+        mStretch = stretch;
+        updateDurationRectangleAnimationRange();
+    }
+
     FixedLenAnimationRect *getAnimationDurationRect() const;
     void updateDurationRectangleAnimationRange();
 
@@ -51,10 +56,6 @@ public:
     void enableFrameRemapping();
     void disableFrameRemapping();
 
-    virtual void setStretch(const qreal& stretch) {
-        mStretch = stretch;
-        updateDurationRectangleAnimationRange();
-    }
     qreal getStretch() const { return mStretch; }
 
     void reload();

@@ -474,8 +474,9 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
 
 void Canvas::prp_afterChangedAbsRange(const FrameRange &range) {
     Property::prp_afterChangedAbsRange(range);
-    const auto relRange = prp_absRangeToRelRange(range);
-    mCacheHandler.clearRelRange(relRange);
+    const int minId = prp_getIdenticalRelRange(range.fMin).fMin;
+    const int maxId = prp_getIdenticalRelRange(range.fMax).fMax;
+    mCacheHandler.clearRelRange({minId, maxId});
     if(!mCacheHandler.atRelFrame(anim_getCurrentRelFrame())) {
         mCurrentPreviewContainerOutdated = true;
         planScheduleUpdate(Animator::USER_CHANGE);

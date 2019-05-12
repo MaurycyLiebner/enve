@@ -124,17 +124,15 @@ int HDDCachableCacheHandler::countAfterRelFrame(const int &relFrame) const {
 
 int HDDCachableCacheHandler::idAtOrBeforeRelFrame(const int &frame) const {
     int id;
-    if(!idAtRelFrame(frame, &id)) {
+    if(!idAtRelFrame(frame, &id))
         id = insertIdForRelFrame(frame) - 1;
-    }
     return id;
 }
 
 int HDDCachableCacheHandler::idAtOrAfterRelFrame(const int &frame) const {
     int id;
-    if(!idAtRelFrame(frame, &id)) {
+    if(!idAtRelFrame(frame, &id))
         id = insertIdForRelFrame(frame);
-    }
     return id;
 }
 #include "pointhelpers.h"
@@ -196,10 +194,10 @@ void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
 }
 
 void HDDCachableCacheHandler::clearRelRange(const FrameRange &range) {
-    int minId = idAtOrBeforeRelFrame(range.fMin);
-    minId = qMax(minId, 0);
-    int maxId = idAtOrAfterRelFrame(range.fMax);
-    maxId = qMin(maxId, mRenderContainers.count() - 1);
+    int minId = idAtOrAfterRelFrame(range.fMin);
+    minId = qMin(minId, mRenderContainers.count() - 1);
+    int maxId = idAtOrBeforeRelFrame(range.fMax);
+    maxId = qMax(maxId, 0);
 
     for(int i = maxId; i >= minId; i--) {
         mRenderContainers.removeAt(i);

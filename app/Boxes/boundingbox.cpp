@@ -1004,7 +1004,7 @@ void BoundingBox::updateAfterDurationMinFrameChangedBy(const int &by) {
 
     const int min = qMin(newMin, oldMin);
     const int max = qMax(newMin, oldMin);
-    prp_afterChangedAbsRange({min, max});
+    Property::prp_afterChangedAbsRange({min, max});
 }
 
 void BoundingBox::updateAfterDurationMaxFrameChangedBy(const int &by) {
@@ -1014,7 +1014,7 @@ void BoundingBox::updateAfterDurationMaxFrameChangedBy(const int &by) {
 
     const int min = qMin(newMax, oldMax);
     const int max = qMax(newMax, oldMax);
-    prp_afterChangedAbsRange({min, max});
+    Property::prp_afterChangedAbsRange({min, max});
 }
 
 void BoundingBox::updateAfterDurationRectangleRangeChanged() {}

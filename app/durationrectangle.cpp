@@ -252,34 +252,28 @@ void DurationRectangle::startMaxFramePosTransform() {
 }
 
 void DurationRectangle::openDurationSettingsDialog(QWidget *parent) {
-    int oldMinFrame = getMinFrame();
-    int oldMaxFrame = getMaxFrame();
+    const int oldMinFrame = getMinFrame();
+    const int oldMaxFrame = getMaxFrame();
 
-    DurationRectSettingsDialog *dialog = nullptr;
-    dialog = new DurationRectSettingsDialog(mType,
-                                            getMinFrame(),
-                                            getMaxFrame(),
-                                            parent);
-    if(dialog->exec()) {
-        setMinFrame(dialog->getMinFrame());
-        setMaxFrame(dialog->getMaxFrame());
+    DurationRectSettingsDialog dialog(mType, getMinFrame(),
+                                      getMaxFrame(), parent);
+    if(dialog.exec()) {
+        setMinFrame(dialog.getMinFrame());
+        setMaxFrame(dialog.getMaxFrame());
     }
 
-    if(dialog) {
-        if(dialog->result() == QDialog::Accepted) {
-            const int newMinFrame = getMinFrame();
-            const int newMaxFrame = getMaxFrame();
+    if(dialog.result() == QDialog::Accepted) {
+        const int newMinFrame = getMinFrame();
+        const int newMaxFrame = getMaxFrame();
 
-            const int minMinFrame = qMin(oldMinFrame, newMinFrame);
-            const int maxMinFrame = qMax(oldMinFrame, newMinFrame);
-            const int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
-            const int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
-            mChildProperty->prp_afterChangedRelRange(
-                                    {minMinFrame, maxMinFrame});
-            mChildProperty->prp_afterChangedRelRange(
-                                    {minMaxFrame, maxMaxFrame});
-        }
-        delete dialog;
+        const int minMinFrame = qMin(oldMinFrame, newMinFrame);
+        const int maxMinFrame = qMax(oldMinFrame, newMinFrame);
+        const int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
+        const int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
+        mChildProperty->prp_afterChangedRelRange(
+                                {minMinFrame, maxMinFrame});
+        mChildProperty->prp_afterChangedRelRange(
+                                {minMaxFrame, maxMaxFrame});
     }
 }
 
@@ -384,50 +378,43 @@ int FixedLenAnimationRect::getMaxAnimationFrame() const {
 }
 
 void FixedLenAnimationRect::openDurationSettingsDialog(QWidget *parent) {
-    int oldMinFrame = getMinFrame();
-    int oldMaxFrame = getMaxFrame();
-    int oldMinAnimationFrame = getMinAnimationFrame();
-    int oldMaxAnimationFrame = getMaxAnimationFrame();
-    DurationRectSettingsDialog *dialog = nullptr;
-    dialog = new DurationRectSettingsDialog(mType,
-                                            getMinFrame(),
-                                            getMaxFrame(),
-                                            getMinAnimationFrame(),
-                                            parent);
-    if(dialog->exec()) {
-        setMinFrame(dialog->getMinFrame());
-        setMaxFrame(dialog->getMaxFrame());
-        setFirstAnimationFrame(dialog->getFirstAnimationFrame());
+    const int oldMinFrame = getMinFrame();
+    const int oldMaxFrame = getMaxFrame();
+    const int oldMinAnimationFrame = getMinAnimationFrame();
+    const int oldMaxAnimationFrame = getMaxAnimationFrame();
+    DurationRectSettingsDialog dialog(mType, getMinFrame(), getMaxFrame(),
+                                      getMinAnimationFrame(), parent);
+    if(dialog.exec()) {
+        setMinFrame(dialog.getMinFrame());
+        setMaxFrame(dialog.getMaxFrame());
+        setFirstAnimationFrame(dialog.getFirstAnimationFrame());
     }
 
-    if(dialog) {
-        if(dialog->result() == QDialog::Accepted) {
-            int newMinFrame = getMinFrame();
-            int newMaxFrame = getMaxFrame();
-            int newMinAnimationFrame = getMinAnimationFrame();
-            int newMaxAnimationFrame = getMaxAnimationFrame();
-            int minMinFrame = qMin(oldMinFrame, newMinFrame);
-            int maxMinFrame = qMax(oldMinFrame, newMinFrame);
-            int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
-            int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
-            mChildProperty->prp_afterChangedRelRange(
-                        {minMinFrame, maxMinFrame});
-            mChildProperty->prp_afterChangedRelRange(
-                        {minMaxFrame, maxMaxFrame});
+    if(dialog.result() == QDialog::Accepted) {
+        const int newMinFrame = getMinFrame();
+        const int newMaxFrame = getMaxFrame();
+        const int newMinAnimationFrame = getMinAnimationFrame();
+        const int newMaxAnimationFrame = getMaxAnimationFrame();
+        const int minMinFrame = qMin(oldMinFrame, newMinFrame);
+        const int maxMinFrame = qMax(oldMinFrame, newMinFrame);
+        const int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
+        const int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
+        mChildProperty->prp_afterChangedRelRange(
+                    {minMinFrame, maxMinFrame});
+        mChildProperty->prp_afterChangedRelRange(
+                    {minMaxFrame, maxMaxFrame});
 
-            int minMinAnimationFrame = qMin(oldMinAnimationFrame,
-                                            newMinAnimationFrame);
-            int maxMinAnimationFrame = qMax(oldMinAnimationFrame,
-                                            newMinAnimationFrame);
-            int minMaxAnimationFrame = qMin(oldMaxAnimationFrame,
-                                            newMaxAnimationFrame);
-            int maxMaxAnimationFrame = qMax(oldMaxAnimationFrame,
-                                            newMaxAnimationFrame);
-            mChildProperty->prp_afterChangedRelRange(
-                        {qMin(minMinAnimationFrame, minMaxAnimationFrame),
-                        qMax(maxMinAnimationFrame, maxMaxAnimationFrame)});
-        }
-        delete dialog;
+        const int minMinAnimationFrame = qMin(oldMinAnimationFrame,
+                                              newMinAnimationFrame);
+        const int maxMinAnimationFrame = qMax(oldMinAnimationFrame,
+                                              newMinAnimationFrame);
+        const int minMaxAnimationFrame = qMin(oldMaxAnimationFrame,
+                                              newMaxAnimationFrame);
+        const int maxMaxAnimationFrame = qMax(oldMaxAnimationFrame,
+                                              newMaxAnimationFrame);
+        mChildProperty->prp_afterChangedRelRange(
+                    {qMin(minMinAnimationFrame, minMaxAnimationFrame),
+                    qMax(maxMinAnimationFrame, maxMaxAnimationFrame)});
     }
 }
 
@@ -455,21 +442,17 @@ void FixedLenAnimationRect::setMinAnimationFrame(const int &minAnimationFrame) {
 }
 
 void FixedLenAnimationRect::setMaxAnimationFrame(const int &maxAnimationFrame) {
-    bool moveMaxPosFrame = getMinFrame() == mFramePos &&
-                           getMaxFrame() == mFramePos + getAnimationFrameDuration();
-    mMaxAnimationFrame = maxAnimationFrame;
     if(mSetMaxFrameAtLeastOnce) {
-        if(moveMaxPosFrame) {
-            setMaxFrame(mMaxAnimationFrame);
+        if(getMaxFrame() == mMaxAnimationFrame) {
+            setMaxFrame(maxAnimationFrame);
         }
     } else {
         mSetMaxFrameAtLeastOnce = true;
         setMaxFrame(maxAnimationFrame);
         mMinFrame.setMaxPos(maxAnimationFrame);
     }
-    if(mBoundToAnimation) {
-        bindToAnimationFrameRange();
-    }
+    mMaxAnimationFrame = maxAnimationFrame;
+    if(mBoundToAnimation) bindToAnimationFrameRange();
 }
 
 void FixedLenAnimationRect::changeFramePosBy(const int &change) {
