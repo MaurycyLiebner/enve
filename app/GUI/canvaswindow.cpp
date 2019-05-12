@@ -998,11 +998,8 @@ void CanvasWindow::renderPreview() {
 }
 
 void CanvasWindow::interruptPreview() {
-    if(mRenderingPreview) {
-        interruptPreviewRendering();
-    } else if(mPreviewing) {
-        stopPreview();
-    }
+    if(mRenderingPreview) interruptPreviewRendering();
+    else if(mPreviewing) stopPreview();
 }
 
 void CanvasWindow::outOfMemory() {
@@ -1282,12 +1279,11 @@ void CanvasWindow::dropEvent(QDropEvent *event) {
     const QMimeData* mimeData = event->mimeData();
 
     if(mimeData->hasUrls()) {
-        QList<QUrl> urlList = mimeData->urls();
+        const QList<QUrl> urlList = mimeData->urls();
 
         for(int i = 0; i < urlList.size() && i < 32; i++) {
             try {
-                const QPointF absPos =
-                        mCurrentCanvas->mapCanvasAbsToRel(
+                const QPointF absPos = mCurrentCanvas->mapCanvasAbsToRel(
                             event->posF());
                 importFile(urlList.at(i).toLocalFile(), absPos);
             } catch(const std::exception& e) {
@@ -1312,13 +1308,11 @@ void CanvasWindow::importFile(const QString &path,
                               const QPointF &relDropPos) {
     if(hasNoCanvas()) return;
 
-    QFile file(path);
-    if(!file.exists()) {
-        RuntimeThrow("File " + path.toStdString() +
-                     " does not exit.");
-    }
+    const QFile file(path);
+    if(!file.exists())
+        RuntimeThrow("File " + path.toStdString() + " does not exit.");
 
-    QString extension = path.split(".").last();
+    const QString extension = path.split(".").last();
     if(isSoundExt(extension)) {
         createSoundForPath(path);
     } else {
