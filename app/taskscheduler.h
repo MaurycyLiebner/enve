@@ -241,7 +241,7 @@ public:
         return mCPUExecutors.count() - mFreeCPUExecs.count();
     }
 signals:
-    void finishedAllQuedTasks();
+    void finishedAllQuedTasks() const;
 private:
     static TaskScheduler* sInstance;
 
@@ -264,6 +264,7 @@ private:
             if(mAllQuedTasksFinishedFunc) {
                 mAllQuedTasksFinishedFunc();
             }
+            emit finishedAllQuedTasks();
         }
     }
 

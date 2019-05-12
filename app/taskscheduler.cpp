@@ -181,16 +181,14 @@ void TaskScheduler::afterCPUTaskFinished(
         const stdsptr<Task>& task,
         ExecController * const controller) {
     mFreeCPUExecs << static_cast<CPUExecController*>(controller);
-    if(task) {
-        if(task->getState() != Task::CANCELED) {
-            if(task->needsGpuProcessing()) {
-                const auto gpuProcess =
-                        SPtrCreate(BoxRenderDataScheduledPostProcess)(
-                            GetAsSPtr(task, BoundingBoxRenderData));
-                mGpuPostProcessor.addToProcess(gpuProcess);
-            } else {
-                task->finishedProcessing();
-            }
+    if(task->getState() != Task::CANCELED) {
+        if(task->needsGpuProcessing()) {
+            const auto gpuProcess =
+                    SPtrCreate(BoxRenderDataScheduledPostProcess)(
+                        GetAsSPtr(task, BoundingBoxRenderData));
+            mGpuPostProcessor.addToProcess(gpuProcess);
+        } else {
+            task->finishedProcessing();
         }
     }
     processNextQuedCPUTask();
@@ -199,8 +197,6 @@ void TaskScheduler::afterCPUTaskFinished(
 void TaskScheduler::processNextQuedCPUTask() {
     if(mQuedCPUTasks.isEmpty() && !mCPUQueing) {
         callAllQuedCPUTasksFinishedFunc();
-        if(mGpuPostProcessor.hasFinished())
-            emit finishedAllQuedTasks();
     } else {
         while(!mFreeCPUExecs.isEmpty()) {
             const auto task = mQuedCPUTasks.takeQuedForProcessing();
