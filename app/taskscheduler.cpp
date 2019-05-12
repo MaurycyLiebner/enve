@@ -23,6 +23,8 @@ TaskScheduler::TaskScheduler() {
     mBackupHDDExecutor = new HDDExecController;
     connect(mHDDExecutor, &ExecController::finishedTaskSignal,
             this, &TaskScheduler::afterHDDTaskFinished);
+    connect(mBackupHDDExecutor, &ExecController::finishedTaskSignal,
+            this, &TaskScheduler::afterHDDTaskFinished);
     connect(mHDDExecutor, &HDDExecController::HDDPartFinished,
             this, &TaskScheduler::switchToBackupHDDExecutor);
 }
@@ -99,7 +101,7 @@ void TaskScheduler::queScheduledHDDTasks() {
 }
 
 void TaskScheduler::switchToBackupHDDExecutor() {
-    if(mBackupHDDThreadBusy) return;
+    if(!mHDDThreadBusy || mBackupHDDThreadBusy) return;
     const auto hddExecutor = mHDDExecutor;
     mHDDExecutor = mBackupHDDExecutor;
     mBackupHDDExecutor = hddExecutor;
