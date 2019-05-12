@@ -69,3 +69,7 @@ void CPUTask::scheduleTaskNow() {
 void HDDTask::scheduleTaskNow() {
     TaskScheduler::sGetInstance()->scheduleHDDTask(ref<Task>());
 }
+
+void HDDTask::HDDPartFinished() {
+    if(mController) emit mController->HDDPartFinished();
+}

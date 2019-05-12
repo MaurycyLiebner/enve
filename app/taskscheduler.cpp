@@ -11,21 +11,24 @@ TaskScheduler::TaskScheduler() {
     sInstance = this;
     const int numberThreads = qMax(1, QThread::idealThreadCount());
     for(int i = 0; i < numberThreads; i++) {
-        const auto taskExecutor = new ExecController(this);
+        const auto taskExecutor = new CPUExecController(this);
         connect(taskExecutor, &ExecController::finishedTaskSignal,
                 this, &TaskScheduler::afterCPUTaskFinished);
 
-        mCPUTaskExecutors << taskExecutor;
+        mCPUExecutors << taskExecutor;
         mFreeCPUExecs << taskExecutor;
     }
 
-    mHDDExecutor = new ExecController;
+    mHDDExecutor = new HDDExecController;
+    mBackupHDDExecutor = new HDDExecController;
     connect(mHDDExecutor, &ExecController::finishedTaskSignal,
             this, &TaskScheduler::afterHDDTaskFinished);
+    connect(mHDDExecutor, &HDDExecController::HDDPartFinished,
+            this, &TaskScheduler::switchToBackupHDDExecutor);
 }
 
 TaskScheduler::~TaskScheduler() {
-    for(const auto& thread : mCPUTaskExecutors) {
+    for(const auto& thread : mCPUExecutors) {
         thread->quit();
         thread->wait();
     }
@@ -62,7 +65,7 @@ void TaskScheduler::queCPUTask(const stdsptr<Task>& task) {
 
 bool TaskScheduler::shouldQueMoreCPUTasks() {
     const int nQues = mQuedCPUTasks.countQues();
-    const int maxQues = mCPUTaskExecutors.count();
+    const int maxQues = mCPUExecutors.count();
     const bool overflowed = nQues >= maxQues;
     return !mFreeCPUExecs.isEmpty() && !mCPUQueing && !overflowed;
 }
@@ -95,6 +98,22 @@ void TaskScheduler::queScheduledHDDTasks() {
     }
 }
 
+void TaskScheduler::switchToBackupHDDExecutor() {
+    if(mBackupHDDThreadBusy) return;
+    const auto hddExecutor = mHDDExecutor;
+    mHDDExecutor = mBackupHDDExecutor;
+    mBackupHDDExecutor = hddExecutor;
+    const auto hddThreadBusy = mHDDThreadBusy;
+    mHDDThreadBusy = mBackupHDDThreadBusy;
+    mBackupHDDThreadBusy = hddThreadBusy;
+
+    disconnect(mBackupHDDExecutor, &HDDExecController::HDDPartFinished,
+               this, &TaskScheduler::switchToBackupHDDExecutor);
+    connect(mHDDExecutor, &HDDExecController::HDDPartFinished,
+            this, &TaskScheduler::switchToBackupHDDExecutor);
+    processNextQuedHDDTask();
+}
+
 void TaskScheduler::tryProcessingNextQuedHDDTask() {
     if(!mHDDThreadBusy) processNextQuedHDDTask();
 }
@@ -106,8 +125,8 @@ void TaskScheduler::tryProcessingNextQuedCPUTask() {
 void TaskScheduler::afterHDDTaskFinished(
         const stdsptr<Task>& finishedTask,
         ExecController * const controller) {
-    Q_UNUSED(controller);
-    mHDDThreadBusy = false;
+    if(controller == mHDDExecutor) mHDDThreadBusy = false;
+    else mBackupHDDThreadBusy = false;
     if(finishedTask) finishedTask->finishedProcessing();
     if(!mFreeCPUExecs.isEmpty() && !mQuedCPUTasks.isEmpty()) {
         processNextQuedCPUTask();
@@ -130,6 +149,8 @@ void TaskScheduler::processNextQuedHDDTask() {
             const auto task = mQuedHDDTasks.at(i);
             if(task->readyToBeProcessed()) {
                 task->aboutToProcess();
+                const auto hddTask = dynamic_cast<HDDTask*>(task.get());
+                if(hddTask) hddTask->setController(mHDDExecutor);
                 mQuedHDDTasks.removeAt(i--);
                 mHDDThreadBusy = true;
                 mHDDExecutor->processTask(task);
@@ -143,7 +164,7 @@ void TaskScheduler::processNextQuedHDDTask() {
 void TaskScheduler::afterCPUTaskFinished(
         const stdsptr<Task>& task,
         ExecController * const controller) {
-    mFreeCPUExecs << controller;
+    mFreeCPUExecs << static_cast<CPUExecController*>(controller);
     if(task) {
         if(task->getState() != Task::CANCELED) {
             if(task->needsGpuProcessing()) {
@@ -179,7 +200,7 @@ void TaskScheduler::processNextQuedCPUTask() {
     }
 #ifdef QT_DEBUG
     auto usageWidget = MainWindow::getInstance()->getUsageWidget();
-    const int cUsed = mCPUTaskExecutors.count() - mFreeCPUExecs.count();
+    const int cUsed = mCPUExecutors.count() - mFreeCPUExecs.count();
     usageWidget->setThreadsUsage(cUsed);
 #endif
 }

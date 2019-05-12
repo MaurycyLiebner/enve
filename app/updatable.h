@@ -3,7 +3,7 @@
 #include <QList>
 #include <QEventLoop>
 #include "smartPointers/sharedpointerdefs.h"
-class TaskExecutor;
+class HDDExecController;
 
 class Que;
 
@@ -95,6 +95,13 @@ class HDDTask : public Task {
     friend class StdSelfRef;
 protected:
     void scheduleTaskNow() final;
+    void HDDPartFinished();
+public:
+    void setController(HDDExecController * const contr) {
+        mController = contr;
+    }
+private:
+    HDDExecController * mController = nullptr;
 };
 
 class CustomCPUTask : public CPUTask {

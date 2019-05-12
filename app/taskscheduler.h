@@ -4,6 +4,8 @@
 #include "updatable.h"
 #include "GPUEffects/gpupostprocessor.h"
 class Canvas;
+class CPUExecController;
+class HDDExecController;
 class ExecController;
 
 class Que {
@@ -174,6 +176,8 @@ public:
         }
     }
 
+    void switchToBackupHDDExecutor();
+
     void afterHDDTaskFinished(const stdsptr<Task>& finishedTask,
                               ExecController * const controller);
     void processNextQuedHDDTask();
@@ -227,11 +231,9 @@ public:
     }
 
     int busyCPUThreads() const {
-        return mCPUTaskExecutors.count() - mFreeCPUExecs.count();
+        return mCPUExecutors.count() - mFreeCPUExecs.count();
     }
 signals:
-    void processCPUTask(Task*, int);
-    void processHDDTask(Task*, int);
     void finishedAllQuedTasks();
 private:
     static TaskScheduler* sInstance;
@@ -269,9 +271,10 @@ private:
         }
     }
 
-    QList<ExecController*> mFreeCPUExecs;
+    QList<CPUExecController*> mFreeCPUExecs;
 
     bool mHDDThreadBusy = false;
+    bool mBackupHDDThreadBusy = false;
 
     bool mCPUQueing = false;
     QueHandler mQuedCPUTasks;
@@ -280,8 +283,10 @@ private:
     QList<stdsptr<Task>> mScheduledHDDTasks;
     QList<stdsptr<Task>> mQuedHDDTasks;
 
-    ExecController *mHDDExecutor = nullptr;
-    QList<ExecController*> mCPUTaskExecutors;
+    HDDExecController *mHDDExecutor = nullptr;
+    HDDExecController *mBackupHDDExecutor = nullptr;
+
+    QList<CPUExecController*> mCPUExecutors;
 
     std::function<void(void)> mFreeThreadsForCPUTasksAvailableFunc;
     std::function<void(void)> mAllQuedCPUTasksFinishedFunc;

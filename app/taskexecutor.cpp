@@ -1,7 +1,5 @@
 #include "taskexecutor.h"
 
-TaskExecutor::TaskExecutor() {}
-
 void TaskExecutor::processTask(Task* task) {
     try {
         task->processTask();

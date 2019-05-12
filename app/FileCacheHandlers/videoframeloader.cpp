@@ -10,7 +10,7 @@ void VideoFrameLoader::readFrame() {
     const auto packet = mOpenedVideo->fPacket;
     const auto decodedFrame = mOpenedVideo->fDecodedFrame;
     const auto codecContext = mOpenedVideo->fCodecContext;
-    const auto swsContext = mOpenedVideo->fSwsContext;
+    //const auto swsContext = mOpenedVideo->fSwsContext;
     const qreal fps = mOpenedVideo->fFps;
 
     const int64_t tsms = qFloor((mFrameId - 1) * 1000 / fps);
@@ -41,8 +41,7 @@ void VideoFrameLoader::readFrame() {
             if(packet->stream_index == videoStreamIndex) {
                 const int sendRet = avcodec_send_packet(codecContext, packet);
                 if(sendRet < 0) {
-                    fprintf(stderr, "Sending packet to the decoder failed\n");
-                    return;
+                    RuntimeThrow("Sending packet to the decoder failed");
                 }
                 const int recRet = avcodec_receive_frame(codecContext, decodedFrame);
                 if(recRet == AVERROR_EOF) {
@@ -51,8 +50,7 @@ void VideoFrameLoader::readFrame() {
                     av_packet_unref(packet);
                     continue;
                 } else if(recRet < 0) {
-                    fprintf(stderr, "Did not receive frame from the decoder\n");
-                    return;
+                    RuntimeThrow("Did not receive frame from the decoder");
                 }
                 av_packet_unref(packet);
             } else {
@@ -75,9 +73,22 @@ void VideoFrameLoader::readFrame() {
         av_frame_unref(decodedFrame);
     }
 
+    av_packet_unref(packet);
     if(frameReceived) {
+        const auto imgFrame = av_frame_alloc();
+        av_frame_move_ref(imgFrame, decodedFrame);
+        const auto swsContext = sws_getContext(codecContext->width,
+                                               codecContext->height,
+                                               codecContext->pix_fmt,
+                                               codecContext->width,
+                                               codecContext->height,
+                                               AV_PIX_FMT_BGRA, SWS_BICUBIC,
+                                               nullptr, nullptr, nullptr);
+        av_frame_unref(decodedFrame);
+        HDDPartFinished();
+
         const auto info = SkiaHelpers::getPremulBGRAInfo(
-                    codecContext->width, codecContext->height);
+                    imgFrame->width, imgFrame->height);
         SkBitmap bitmap;
         bitmap.allocPixels(info);
 
@@ -85,21 +96,22 @@ void VideoFrameLoader::readFrame() {
         bitmap.peekPixels(&pixmap);
 
         void * const addr = pixmap.writable_addr();
-        uint8_t * const dstSk[] = { static_cast<unsigned char*>(addr) };
+        uint8_t * const dstSk[] = { static_cast<uint8_t*>(addr) };
         int linesizesSk[4];
 
         av_image_fill_linesizes(linesizesSk, AV_PIX_FMT_BGRA,
-                                decodedFrame->width);
+                                imgFrame->width);
 
-        sws_scale(swsContext, decodedFrame->data, decodedFrame->linesize,
-                  0, codecContext->height, dstSk, linesizesSk);
+        sws_scale(swsContext, imgFrame->data, imgFrame->linesize,
+                  0, imgFrame->height, dstSk, linesizesSk);
 
         mLoadedFrame = SkiaHelpers::transferDataToSkImage(bitmap);
+
+        av_frame_unref(imgFrame);
     } else {
         mLoadedFrame.reset();
+        av_frame_unref(decodedFrame);
     }
-    av_frame_unref(decodedFrame);
-    av_packet_unref(packet);
 }
 
 void VideoFrameLoader::afterProcessing() {

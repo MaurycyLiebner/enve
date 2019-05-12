@@ -101,12 +101,13 @@ void VideoStreamsData::open(const char * const path) {
     if(avcodec_open2(fCodecContext, vidCodec, nullptr) < 0) {
         RuntimeThrow("Failed to open codec");
     }
-    fSwsContext =
-            sws_getContext(fCodecContext->width, fCodecContext->height,
-                           fCodecContext->pix_fmt,
-                           fCodecContext->width, fCodecContext->height,
-                           AV_PIX_FMT_BGRA, SWS_BICUBIC,
-                           nullptr, nullptr, nullptr);
+    fSwsContext = sws_getContext(fCodecContext->width,
+                                 fCodecContext->height,
+                                 fCodecContext->pix_fmt,
+                                 fCodecContext->width,
+                                 fCodecContext->height,
+                                 AV_PIX_FMT_BGRA, SWS_BICUBIC,
+                                 nullptr, nullptr, nullptr);
 
     fPacket = av_packet_alloc();
     if(!fPacket) RuntimeThrow("Error allocating AVPacket");

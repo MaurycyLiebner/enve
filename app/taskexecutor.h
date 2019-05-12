@@ -8,18 +8,26 @@
 class TaskExecutor : public QObject {
     Q_OBJECT
 public:
-    explicit TaskExecutor();
+    explicit TaskExecutor() {}
+    void processTask(Task* task);
 signals:
     void finishedTask(Task*);
-public slots:
-    void processTask(Task* task);
+};
+
+class HDDTaskExecutor : public TaskExecutor {
+    Q_OBJECT
+public:
+    explicit HDDTaskExecutor() {}
+signals:
+    void HDDPartFinished();
 };
 
 class ExecController : public QObject {
     Q_OBJECT
-public:
-    ExecController(QObject * const parent = nullptr) : QObject(parent),
-        mExecutor(new TaskExecutor),
+protected:
+    ExecController(TaskExecutor * const executor,
+                   QObject * const parent = nullptr) : QObject(parent),
+        mExecutor(executor),
         mExecutorThread(new QThread(this)) {
         connect(this, &ExecController::processTaskSignal,
                 mExecutor, &TaskExecutor::processTask);
@@ -28,9 +36,9 @@ public:
         mExecutor->moveToThread(mExecutorThread);
         mExecutorThread->start();
     }
-
+public:
     void processTask(const stdsptr<Task>& task) {
-        if(mCurrentTask) Q_ASSERT(false);//RuntimeThrow("Previous task did not finish yet");
+        if(mCurrentTask) RuntimeThrow("Previous task did not finish yet");
         mCurrentTask = task;
         emit processTaskSignal(task.get());
     }
@@ -51,6 +59,8 @@ public:
 signals:
     void processTaskSignal(Task*);
     void finishedTaskSignal(stdsptr<Task>, ExecController*);
+protected:
+    TaskExecutor * const mExecutor;
 private:
     void finishedTask() {
         stdsptr<Task> task;
@@ -59,8 +69,26 @@ private:
     }
 
     stdsptr<Task> mCurrentTask;
-    TaskExecutor * const mExecutor;
     QThread * const mExecutorThread;
+};
+
+class CPUExecController : public ExecController {
+public:
+    CPUExecController(QObject * const parent = nullptr) :
+        ExecController(new TaskExecutor, parent) {}
+};
+
+class HDDExecController : public ExecController {
+    Q_OBJECT
+public:
+    HDDExecController(QObject * const parent = nullptr) :
+        ExecController(new HDDTaskExecutor, parent) {
+        connect(static_cast<HDDTaskExecutor*>(mExecutor),
+                &HDDTaskExecutor::HDDPartFinished,
+                this, &HDDExecController::HDDPartFinished);
+    }
+signals:
+    void HDDPartFinished();
 };
 
 #endif // TASKEXECUTOR_H
