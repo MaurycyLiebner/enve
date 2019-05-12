@@ -196,16 +196,13 @@ void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
 }
 
 void HDDCachableCacheHandler::clearRelRange(const FrameRange &range) {
-    int minId;
-    if(!idAtRelFrame(range.fMin, &minId)) {
-        minId = insertIdForRelFrame(range.fMin);
-    }
-    int maxId;
-    if(!idAtRelFrame(range.fMax, &maxId)) {
-        maxId = insertIdForRelFrame(range.fMax) - 1;
-    }
-    for(int i = minId; i <= maxId; i++) {
-        mRenderContainers.removeAt(minId);
+    int minId = idAtOrBeforeRelFrame(range.fMin);
+    minId = qMax(minId, 0);
+    int maxId = idAtOrAfterRelFrame(range.fMax);
+    maxId = qMin(maxId, mRenderContainers.count() - 1);
+
+    for(int i = maxId; i >= minId; i--) {
+        mRenderContainers.removeAt(i);
     }
 }
 

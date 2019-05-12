@@ -473,15 +473,13 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
 }
 
 void Canvas::prp_afterChangedAbsRange(const FrameRange &range) {
-    if(range.inRange(anim_getCurrentAbsFrame())) {
-        mCurrentPreviewContainerOutdated = true;
-    }
-    mCacheHandler.clearRelRange(prp_absRangeToRelRange(range));
     Property::prp_afterChangedAbsRange(range);
-    auto rangeT = prp_getIdenticalRelRange(anim_getCurrentRelFrame());
-    auto cont = mCacheHandler.atRelFrame(anim_getCurrentRelFrame());
-    if(cont) cont->setRange(rangeT);
-    if(range.overlaps(rangeT)) planScheduleUpdate(Animator::USER_CHANGE);
+    const auto relRange = prp_absRangeToRelRange(range);
+    mCacheHandler.clearRelRange(relRange);
+    if(!mCacheHandler.atRelFrame(anim_getCurrentRelFrame())) {
+        mCurrentPreviewContainerOutdated = true;
+        planScheduleUpdate(Animator::USER_CHANGE);
+    }
 }
 
 qsptr<BoundingBox> Canvas::createLink() {

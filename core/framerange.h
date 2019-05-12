@@ -31,7 +31,7 @@ struct iValueRange {
     }
 
     bool overlaps(const iValueRange& b) const {
-        return !this->operator*(b).isValid();
+        return this->operator*(b).isValid();
     }
 
     bool neighbours(const iValueRange& b) const {

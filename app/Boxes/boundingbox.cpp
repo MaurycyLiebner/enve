@@ -992,8 +992,9 @@ void BoundingBox::updateAfterDurationRectangleShifted(const int &dFrame) {
     prp_afterFrameShiftChanged();
     const auto newRange = getVisibleAbsFrameRange();
     const auto oldRange = newRange.shifted(-dFrame);
-    prp_afterChangedAbsRange(newRange + oldRange);
-    anim_setAbsFrame(anim_getCurrentAbsFrame());
+    Property::prp_afterChangedAbsRange(newRange + oldRange);
+    const int absFrame = anim_getCurrentAbsFrame();
+    anim_setAbsFrame(absFrame);
 }
 
 void BoundingBox::updateAfterDurationMinFrameChangedBy(const int &by) {
