@@ -19,19 +19,19 @@ extern "C" {
 class ImageCacheContainer;
 
 typedef struct OutputStream {
-    AVStream *st = nullptr;
-    AVCodecContext *enc = nullptr;
+    AVStream *fStream = nullptr;
+    AVCodecContext *fCodec = nullptr;
 
     /* pts of the next frame that will be generated */
-    int64_t next_pts;
+    int64_t fNextPts;
 
-    AVFrame *frame = nullptr;
-    AVFrame *tmp_frame = nullptr;
+    AVFrame *fFrame = nullptr;
+    AVFrame *fTmpFrame = nullptr;
 
-    float t, tincr, tincr2;
+    float fT, fTincr, fTincr2;
 
-    struct SwsContext *sws_ctx = nullptr;
-    AVAudioResampleContext *avr = nullptr;
+    struct SwsContext *fSwsCtx = nullptr;
+    AVAudioResampleContext *fAvr = nullptr;
 } OutputStream;
 
 class VideoEncoderEmitter : public QObject {

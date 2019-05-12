@@ -168,7 +168,7 @@ public:
             hddTask->cancel();
         mQuedHDDTasks.clear();
 
-        if(!mHDDThreadBusy) {
+        if(!HDDTaskBeingProcessed()) {
             callAllQuedHDDTasksFinishedFunc();
         }
         if(!CPUTasksBeingProcessed()) {
@@ -219,7 +219,7 @@ public:
     }
 
     bool allQuedHDDTasksFinished() const {
-        return !mHDDThreadBusy && mQuedHDDTasks.isEmpty();
+        return !HDDTaskBeingProcessed() && mQuedHDDTasks.isEmpty();
     }
 
     bool CPUTasksBeingProcessed() const {
@@ -227,7 +227,14 @@ public:
     }
 
     bool HDDTaskBeingProcessed() const {
-        return !mHDDThreadBusy;
+        return busyHDDThreads() > 0;
+    }
+
+    int busyHDDThreads() const {
+        const int totalThreads = mHDDExecs.count();
+        const int freeBackup = mFreeBackupHDDExecs.count();
+        const int freeMain = mHDDThreadBusy ? 0 : 1;
+        return totalThreads - freeBackup - freeMain;
     }
 
     int busyCPUThreads() const {
