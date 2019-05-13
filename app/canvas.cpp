@@ -383,7 +383,7 @@ void Canvas::setCurrentPreviewContainer(const stdsptr<ImageCacheContainer>& cont
     setLoadingPreviewContainer(nullptr);
     if(cont == mCurrentPreviewContainer) return;
     if(mCurrentPreviewContainer) {
-        if(!mRenderingPreview || mRenderingOutput) {
+        if(!mRenderingPreview) {
             mCurrentPreviewContainer->setBlocked(false);
 //            if(mRenderingOutput) { // !!! dont keep frames in memory when rendering output
 //                mCurrentPreviewContainer->freeAndRemove();
@@ -440,10 +440,7 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
         cont = mCacheHandler.createNew<ImageCacheContainer>(
                     range, renderData->fRenderedImage);
     }
-    if(mRenderingOutput) {
-        VideoEncoder::sAddCacheContainerToEncoder(
-                    GetAsSPtr(cont, ImageCacheContainer));
-    } else if(mPreviewing) {
+    if(mPreviewing || mRenderingOutput) {
         cont->setBlocked(true);
     } else {
         auto currentRenderData = mDrawRenderContainer.getSrcRenderData();

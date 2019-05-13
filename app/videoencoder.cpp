@@ -217,10 +217,15 @@ static void writeVideoFrame(AVFormatContext * const oc,
 
 static void closeStream(OutputStream * const ost) {
     if(ost) {
-        if(ost->fCodec) avcodec_free_context(&ost->fCodec);
+        if(ost->fCodec) {
+            avcodec_close(ost->fCodec);
+            avcodec_free_context(&ost->fCodec);
+        }
         if(ost->fFrame) av_frame_free(&ost->fFrame);
+        if(ost->fTmpFrame) av_frame_free(&ost->fTmpFrame);
         if(ost->fSwsCtx) sws_freeContext(ost->fSwsCtx);
         if(ost->fAvr) avresample_free(&ost->fAvr);
+        *ost = OutputStream();
     }
 }
 
@@ -631,15 +636,13 @@ void VideoEncoder::beforeProcessing() {
 }
 
 void VideoEncoder::afterProcessing() {
-    bool firstT = true;
-    for(int i = _mCurrentContainerId - 1; i >= 0; i--) {
+    for(int i = 0; i < _mCurrentContainerId; i++) {
         const auto &cont = _mContainers.at(i);
         qDebug() << "{" << cont->getRange().fMin << "," <<
                            cont->getRange().fMax << "}";
-        if(firstT) {
+        if(i == _mCurrentContainerId - 1) {
             auto currCanvas = mRenderInstanceSettings->getTargetCanvas();
             currCanvas->setCurrentPreviewContainer(cont);
-            firstT = false;
         } else {
             cont->setBlocked(false);
         }

@@ -1061,7 +1061,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
 }
 
 bool MainWindow::isEnabled() {
-    return mGrayOutWidget == nullptr;
+    return !mGrayOutWidget;
 }
 
 void MainWindow::clearAll() {

@@ -151,6 +151,7 @@ void TaskScheduler::afterHDDTaskFinished(
     finishedTask->finishedProcessing();
     callAllQuedTasksFinishedFunc();
     processNextTasks();
+    if(!HDDTaskBeingProcessed()) queTasks();
 }
 
 void TaskScheduler::processNextQuedHDDTask() {
@@ -164,7 +165,7 @@ void TaskScheduler::processNextQuedHDDTask() {
             mQuedHDDTasks.removeAt(i--);
             mHDDThreadBusy = true;
             mHDDExecutor->processTask(task);
-            return;
+            break;
         }
     }
 }
@@ -194,18 +195,17 @@ void TaskScheduler::afterCPUTaskFinished(
     }
     callAllQuedTasksFinishedFunc();
     processNextTasks();
+    if(!CPUTasksBeingProcessed()) queTasks();
 }
 
 void TaskScheduler::processNextQuedCPUTask() {
-    if(!mQuedCPUTasks.isEmpty()) {
-        while(!mFreeCPUExecs.isEmpty()) {
-            const auto task = mQuedCPUTasks.takeQuedForProcessing();
-            if(task) {
-                task->aboutToProcess();
-                const auto executor = mFreeCPUExecs.takeLast();
-                executor->processTask(task);
-            } else break;
-        }
+    while(!mFreeCPUExecs.isEmpty() && !mQuedCPUTasks.isEmpty()) {
+        const auto task = mQuedCPUTasks.takeQuedForProcessing();
+        if(task) {
+            task->aboutToProcess();
+            const auto executor = mFreeCPUExecs.takeLast();
+            executor->processTask(task);
+        } else break;
     }
 #ifdef QT_DEBUG
     auto usageWidget = MainWindow::getInstance()->getUsageWidget();

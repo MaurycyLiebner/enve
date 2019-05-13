@@ -173,6 +173,7 @@ private:
     bool mMouseGrabber = false;
     bool mHasFocus = false;
 
+    int mCurrentEncodeFrame;
     int mCurrentRenderFrame;
     int mMaxRenderFrame = 0;
     int mSavedCurrentFrame = 0;

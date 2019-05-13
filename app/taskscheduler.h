@@ -252,7 +252,6 @@ private:
         }
     }
 
-
     bool mHDDThreadBusy = false;
 
     bool mCPUQueing = false;

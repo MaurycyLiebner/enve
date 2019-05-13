@@ -19,17 +19,14 @@ extern "C" {
 class ImageCacheContainer;
 
 typedef struct OutputStream {
-    AVStream *fStream = nullptr;
-    AVCodecContext *fCodec = nullptr;
-
-    /* pts of the next frame that will be generated */
+    // pts of the next frame that will be generated
     int64_t fNextPts;
-
-    AVFrame *fFrame = nullptr;
-    AVFrame *fTmpFrame = nullptr;
-
     float fT, fTincr, fTincr2;
 
+    AVStream *fStream = nullptr;
+    AVCodecContext *fCodec = nullptr;
+    AVFrame *fFrame = nullptr;
+    AVFrame *fTmpFrame = nullptr;
     struct SwsContext *fSwsCtx = nullptr;
     AVAudioResampleContext *fAvr = nullptr;
 } OutputStream;

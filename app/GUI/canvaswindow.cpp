@@ -926,6 +926,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
             nextSaveOutputFrame();
         };
         TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
+        TaskScheduler::sSetAllQuedTasksFinishedFunc(nextFrameFunc);
 
         mCurrentCanvas->fitCanvasToSize();
         if(!isZero6Dec(mSavedResolutionFraction - resolutionFraction)) {
@@ -933,6 +934,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
         }
 
         mCurrentRenderFrame = renderSettings.fMinFrame;
+        mCurrentEncodeFrame = mCurrentRenderFrame;
         mCurrentSoundComposition->startBlockingAtFrame(mCurrentRenderFrame);
         mCurrentCanvas->anim_setAbsFrame(mCurrentRenderFrame);
         mCurrentCanvas->setOutputRendering(true);
@@ -946,15 +948,6 @@ void CanvasWindow::nextCurrentRenderFrame() {
     auto& cacheHandler = mCurrentCanvas->getCacheHandler();
     int newCurrentRenderFrame = cacheHandler.
             getFirstEmptyOrCachedFrameAfterFrame(mCurrentRenderFrame);
-    if(newCurrentRenderFrame < mMaxRenderFrame) {
-        const auto range = mCurrentCanvas->prp_getIdenticalRelRange(
-                    newCurrentRenderFrame);
-        if(mCurrentRenderFrame >= range.fMin) {
-            newCurrentRenderFrame = range.fMax + 1;
-        } else {
-            newCurrentRenderFrame = range.fMin;
-        }
-    }
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
         const int minBlock = mCurrentRenderFrame + 1;
         const int maxBlock = newCurrentRenderFrame - 1;
@@ -966,9 +959,7 @@ void CanvasWindow::nextCurrentRenderFrame() {
     mCurrentSoundComposition->blockUpToFrame(newCurrentRenderFrame);
 
     mCurrentRenderFrame = newCurrentRenderFrame;
-
-    if(mCurrentRenderFrame <= mMaxRenderFrame)
-        changeCurrentFrameAction(mCurrentRenderFrame);
+    changeCurrentFrameAction(mCurrentRenderFrame);
 }
 
 void CanvasWindow::renderPreview() {
@@ -977,6 +968,7 @@ void CanvasWindow::renderPreview() {
         nextPreviewRenderFrame();
     };
     TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
+    TaskScheduler::sSetAllQuedTasksFinishedFunc(nextFrameFunc);
 
     mSavedCurrentFrame = getCurrentFrame();
     mCurrentRenderFrame = mSavedCurrentFrame;
@@ -1123,6 +1115,14 @@ void CanvasWindow::nextPreviewFrame() {
 }
 
 void CanvasWindow::nextSaveOutputFrame() {
+    const auto& cacheHandler = mCurrentCanvas->getCacheHandler();
+    while(mCurrentEncodeFrame <= mMaxRenderFrame) {
+        const auto cont = cacheHandler.atRelFrame(mCurrentEncodeFrame);
+        if(!cont) break;
+        VideoEncoder::sAddCacheContainerToEncoder(
+                    GetAsSPtr(cont, ImageCacheContainer));
+        mCurrentEncodeFrame = cont->getRangeMax() + 1;
+    }
     //mCurrentCanvas->renderCurrentFrameToOutput(*mCurrentRenderSettings);
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
         TaskScheduler::sClearAllFinishedFuncs();
@@ -1146,16 +1146,7 @@ void CanvasWindow::nextSaveOutputFrame() {
         }
     } else {
         mCurrentRenderSettings->setCurrentRenderFrame(mCurrentRenderFrame);
-        const int oldRenderFrame = mCurrentRenderFrame;
         nextCurrentRenderFrame();
-        if(mCurrentRenderFrame - oldRenderFrame > 1) {
-            const auto& cacheHandler = mCurrentCanvas->getCacheHandler();
-            for(int i = oldRenderFrame + 1; i < mCurrentRenderFrame; i++) {
-                const auto cont = cacheHandler.atRelFrame(i);
-                VideoEncoder::sAddCacheContainerToEncoder(
-                            GetAsSPtr(cont, ImageCacheContainer));
-            }
-        }
         if(TaskScheduler::sAllQuedTasksFinished()) {
             nextSaveOutputFrame();
         }
