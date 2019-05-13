@@ -13,9 +13,9 @@ PathEffect::PathEffect(const QString &name,
 }
 
 void PathEffect::prp_startDragging() {
-    QMimeData *mimeData = new PathEffectMimeData(this);
+    const auto mimeData = new PathEffectMimeData(this);
 
-    QDrag *drag = new QDrag(this);
+    const auto drag = new QDrag(this);
     drag->setMimeData(mimeData);
     drag->exec();
 }
