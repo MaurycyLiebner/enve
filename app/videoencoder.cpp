@@ -190,7 +190,7 @@ static void writeVideoFrame(AVFormatContext * const oc,
     }
 
 
-    /* encode the image */
+    // encode the image
     const int ret = avcodec_send_frame(c, frame);
     if(ret < 0) RuntimeThrow("Error submitting a frame for encoding");
 
@@ -203,7 +203,7 @@ static void writeVideoFrame(AVFormatContext * const oc,
             av_packet_rescale_ts(&pkt, c->time_base, ost->fStream->time_base);
             pkt.stream_index = ost->fStream->index;
 
-            /* Write the compressed frame to the media file. */
+            // Write the compressed frame to the media file.
             const int interRet = av_interleaved_write_frame(oc, &pkt);
             if(interRet < 0) RuntimeThrow("Error while writing video frame");
         } else if(recRet == AVERROR(EAGAIN) || recRet == AVERROR_EOF) {
@@ -212,26 +212,8 @@ static void writeVideoFrame(AVFormatContext * const oc,
         } else {
             RuntimeThrow("Error encoding a video frame " + std::to_string(recRet));
         }
-    }
-}
 
-static void closeStream(OutputStream * const ost) {
-    if(ost) {
-        if(ost->fCodec) {
-            AVPacket pkt;
-            av_init_packet(&pkt);
-            avcodec_send_frame(ost->fCodec, nullptr);
-            while(true) {
-                if(avcodec_receive_packet(ost->fCodec, &pkt) < 0) break;
-            }
-            avcodec_close(ost->fCodec);
-            avcodec_free_context(&ost->fCodec);
-        }
-        if(ost->fFrame) av_frame_free(&ost->fFrame);
-        if(ost->fTmpFrame) av_frame_free(&ost->fTmpFrame);
-        if(ost->fSwsCtx) sws_freeContext(ost->fSwsCtx);
-        if(ost->fAvr) avresample_free(&ost->fAvr);
-        *ost = OutputStream();
+        av_packet_unref(&pkt);
     }
 }
 
@@ -556,16 +538,46 @@ void VideoEncoder::finishEncodingSuccess() {
     qDebug() << "FINISHED";
 }
 
+
+static void flushStream(OutputStream * const ost) {
+    if(!ost) return;
+    if(!ost->fCodec) return;
+    AVPacket pkt;
+    av_init_packet(&pkt);
+    avcodec_send_frame(ost->fCodec, nullptr);
+    while(true) {
+        const int ret = avcodec_receive_packet(ost->fCodec, &pkt);
+        av_packet_unref(&pkt);
+        if(ret < 0) break;
+    }
+    avcodec_flush_buffers(ost->fCodec);
+}
+
+static void closeStream(OutputStream * const ost) {
+    if(!ost) return;
+    if(ost->fCodec) {
+        avcodec_close(ost->fCodec);
+        avcodec_free_context(&ost->fCodec);
+    }
+    if(ost->fFrame) av_frame_free(&ost->fFrame);
+    if(ost->fTmpFrame) av_frame_free(&ost->fTmpFrame);
+    if(ost->fSwsCtx) sws_freeContext(ost->fSwsCtx);
+    if(ost->fAvr) avresample_free(&ost->fAvr);
+    *ost = OutputStream();
+}
+
 void VideoEncoder::finishEncodingNow() {
     if(!mCurrentlyEncoding) return;
+
+    if(mHaveVideo) flushStream(&mVideoStream);
+    if(mHaveAudio) flushStream(&mAudioStream);
+    avio_flush(mFormatContext->pb);
 
     /* Write the trailer, if any. The trailer must be written before you
      * close the CodecContexts open when you wrote the header; otherwise
      * av_write_trailer() may try to use memory that was freed on
      * av_codec_close(). */
-    if(mEncodingSuccesfull) {
-        av_write_trailer(mFormatContext);
-    }
+    if(mEncodingSuccesfull) av_write_trailer(mFormatContext);
 
     /* Close each codec. */
     if(mHaveVideo) closeStream(&mVideoStream);
