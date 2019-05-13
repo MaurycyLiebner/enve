@@ -159,12 +159,7 @@ public:
             hddTask->cancel();
         mQuedHDDTasks.clear();
 
-        if(!HDDTaskBeingProcessed()) {
-            callAllQuedHDDTasksFinishedFunc();
-        }
-        if(!CPUTasksBeingProcessed()) {
-            callAllQuedCPUTasksFinishedFunc();
-        }
+        callAllQuedTasksFinishedFunc();
     }
 
     void switchToBackupHDDExecutor();
@@ -190,7 +185,13 @@ public:
     }
 
     bool allQuedTasksFinished() const {
-        return allQuedCPUTasksFinished() && allQuedHDDTasksFinished();
+        return allQuedCPUTasksFinished() &&
+               allQuedHDDTasksFinished() &&
+               allQuedGPUTasksFinished();
+    }
+
+    bool allQuedGPUTasksFinished() const {
+        return mGpuPostProcessor.hasFinished();
     }
 
     bool allQuedCPUTasksFinished() const {
@@ -242,7 +243,7 @@ private:
         }
     }
 
-    void callAllQuedCPUTasksFinishedFunc() const {
+    void callAllQuedTasksFinishedFunc() const {
         if(allQuedTasksFinished()) {
             if(mAllQuedTasksFinishedFunc) {
                 mAllQuedTasksFinishedFunc();
@@ -251,16 +252,6 @@ private:
         }
     }
 
-    void callAllQuedHDDTasksFinishedFunc() const {
-        if(allQuedTasksFinished()) {
-            if(mAllQuedTasksFinishedFunc) {
-                mAllQuedTasksFinishedFunc();
-            }
-            emit finishedAllQuedTasks();
-        }
-    }
-
-    QList<CPUExecController*> mFreeCPUExecs;
 
     bool mHDDThreadBusy = false;
 
@@ -277,6 +268,7 @@ private:
     QList<HDDExecController*> mFreeBackupHDDExecs;
     QList<HDDExecController*> mHDDExecs;
 
+    QList<CPUExecController*> mFreeCPUExecs;
     QList<CPUExecController*> mCPUExecutors;
 
     std::function<void(void)> mFreeThreadsForCPUTasksAvailableFunc;

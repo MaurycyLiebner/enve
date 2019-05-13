@@ -14,7 +14,7 @@ void GpuPostProcessor::initialize() {
         RuntimeThrow("Creating GL context failed.");
     }
     _mContext->moveToThread(this);
-    connect(this, &GpuPostProcessor::finished,
+    connect(this, &QThread::finished,
             this, &GpuPostProcessor::afterProcessed);
 }
 

@@ -89,7 +89,7 @@ public:
     }
 
     //! @brief Returns true if nothing is waiting/being processed.
-    const bool& hasFinished() const {
+    bool hasFinished() const {
         return mFinished;
     }
 signals:

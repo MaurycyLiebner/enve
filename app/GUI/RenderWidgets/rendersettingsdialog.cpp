@@ -511,9 +511,9 @@ void RenderSettingsDialog::restoreInitialSettings() {
 
     int currentSampleRate = mInitialSettings.audioSampleRate;
     if(currentSampleRate <= 0) {
-        int i48000Id = mSampleRateComboBox->findText("48000 Hz");
+        const int i48000Id = mSampleRateComboBox->findText("48000 Hz");
         if(i48000Id == -1) {
-            int i44100Id = mSampleRateComboBox->findText("44100 Hz");
+            const int i44100Id = mSampleRateComboBox->findText("44100 Hz");
             if(i44100Id == -1) {
                 int lastId = mSampleRateComboBox->count() - 1;
                 mSampleRateComboBox->setCurrentIndex(lastId);
@@ -524,8 +524,8 @@ void RenderSettingsDialog::restoreInitialSettings() {
             mSampleRateComboBox->setCurrentIndex(i48000Id);
         }
     } else {
-        QString currentSampleRateStr = QString::number(currentSampleRate) + " Hz";
-        mSampleRateComboBox->setCurrentText(currentSampleRateStr);
+        const QString smplsStr = QString::number(currentSampleRate) + " Hz";
+        mSampleRateComboBox->setCurrentText(smplsStr);
     }
 
     int currentAudioBitrate = mInitialSettings.audioBitrate;
@@ -538,20 +538,20 @@ void RenderSettingsDialog::restoreInitialSettings() {
             mAudioBitrateComboBox->setCurrentIndex(i320Id);
         }
     } else {
-        QString currentAudioBitrateStr = QString::number(currentAudioBitrate/1000) + " kbps";
-        mAudioBitrateComboBox->setCurrentText(currentAudioBitrateStr);
+        const QString btrtStr = QString::number(currentAudioBitrate/1000) + " kbps";
+        mAudioBitrateComboBox->setCurrentText(btrtStr);
     }
 
     uint64_t currentChannelsLayout = mInitialSettings.audioChannelsLayout;
     if(currentChannelsLayout == 0) {
         mAudioChannelLayoutsComboBox->setCurrentIndex(0);
     } else {
-        QString currentChannelsLayoutStr =
+        const QString channLayStr =
                 OutputSettings::getChannelsLayoutNameStatic(currentChannelsLayout);
-        if(currentChannelsLayoutStr == "-") {
+        if(channLayStr == "-") {
             mAudioChannelLayoutsComboBox->setCurrentIndex(0);
         } else {
-            mAudioBitrateComboBox->setCurrentText(currentChannelsLayoutStr);
+            mAudioBitrateComboBox->setCurrentText(channLayStr);
         }
     }
 
@@ -573,17 +573,17 @@ RenderSettingsDialog::FormatCodecs::FormatCodecs(
         const QList<AVCodecID> &vidCodecs,
         const QList<AVCodecID> &audioCodec, const char *name) {
     mFormat = av_guess_format(nullptr, name, nullptr);
-    bool defVidAdded = false;
-    bool defAudAdded = false;
+//    bool defVidAdded = false;
+//    bool defAudAdded = false;
     for(const AVCodecID &vidCodec : vidCodecs) {
         if(avformat_query_codec(mFormat, vidCodec, COMPLIENCE) == 0) continue;
         mVidCodecs << vidCodec;
-        if(vidCodec == mFormat->video_codec) defVidAdded = true;
+//        if(vidCodec == mFormat->video_codec) defVidAdded = true;
     }
     for(const AVCodecID &audCodec : audioCodec) {
         if(avformat_query_codec(mFormat, audCodec, COMPLIENCE) == 0) continue;
         mAudioCodecs << audCodec;
-        if(audCodec == mFormat->audio_codec) defAudAdded = true;
+//        if(audCodec == mFormat->audio_codec) defAudAdded = true;
     }
 //    if(!defAudAdded) {
 //        if(mFormat->audio_codec != AV_CODEC_ID_NONE) {

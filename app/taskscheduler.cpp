@@ -48,9 +48,9 @@ void TaskScheduler::initializeGPU() {
     }
 
     connect(&mGpuPostProcessor, &GpuPostProcessor::finished,
-            this, &TaskScheduler::tryProcessingNextQuedCPUTask);
+            this, &TaskScheduler::processNextTasks);
     connect(&mGpuPostProcessor, &GpuPostProcessor::processedAll,
-            this, &TaskScheduler::finishedAllQuedTasks);
+            this, &TaskScheduler::callAllQuedTasksFinishedFunc);
 }
 
 void TaskScheduler::scheduleCPUTask(const stdsptr<Task>& task) {
@@ -149,7 +149,7 @@ void TaskScheduler::afterHDDTaskFinished(
         mFreeBackupHDDExecs << hddExec;
     }
     finishedTask->finishedProcessing();
-    if(allQuedHDDTasksFinished()) callAllQuedHDDTasksFinishedFunc();
+    callAllQuedTasksFinishedFunc();
     processNextTasks();
 }
 
@@ -192,8 +192,7 @@ void TaskScheduler::afterCPUTaskFinished(
             task->finishedProcessing();
         }
     }
-    if(allQuedCPUTasksFinished())
-        callAllQuedCPUTasksFinishedFunc();
+    callAllQuedTasksFinishedFunc();
     processNextTasks();
 }
 
