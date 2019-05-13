@@ -538,19 +538,32 @@ void VideoEncoder::finishEncodingSuccess() {
     qDebug() << "FINISHED";
 }
 
-
-static void flushStream(OutputStream * const ost) {
+static void flushStream(OutputStream * const ost,
+                        AVFormatContext * const formatCtx) {
     if(!ost) return;
     if(!ost->fCodec) return;
     AVPacket pkt;
     av_init_packet(&pkt);
-    avcodec_send_frame(ost->fCodec, nullptr);
-    while(true) {
-        const int ret = avcodec_receive_packet(ost->fCodec, &pkt);
-        av_packet_unref(&pkt);
-        if(ret < 0) break;
+    int ret = avcodec_send_frame(ost->fCodec, nullptr);
+    while(ret >= 0) {
+        ret = avcodec_receive_packet(ost->fCodec, &pkt);
+        if(ret == AVERROR(EAGAIN)|| ret == AVERROR_EOF) {
+            // Write packet
+            avcodec_flush_buffers(ost->fCodec);
+            break;
+        }
+        if(pkt.pts != AV_NOPTS_VALUE)
+            pkt.pts = av_rescale_q(pkt.pts, ost->fCodec->time_base,
+                                   ost->fStream->time_base);
+        if(pkt.dts != AV_NOPTS_VALUE)
+            pkt.dts = av_rescale_q(pkt.dts, ost->fCodec->time_base,
+                                   ost->fStream->time_base);
+        if(pkt.duration > 0)
+            pkt.duration = av_rescale_q(pkt.duration, ost->fCodec->time_base,
+                                        ost->fStream->time_base);
+        pkt.stream_index = ost->fStream->index;
+        ret = av_interleaved_write_frame(formatCtx, &pkt);
     }
-    avcodec_flush_buffers(ost->fCodec);
 }
 
 static void closeStream(OutputStream * const ost) {
@@ -569,9 +582,8 @@ static void closeStream(OutputStream * const ost) {
 void VideoEncoder::finishEncodingNow() {
     if(!mCurrentlyEncoding) return;
 
-    if(mHaveVideo) flushStream(&mVideoStream);
-    if(mHaveAudio) flushStream(&mAudioStream);
-    avio_flush(mFormatContext->pb);
+    if(mHaveVideo) flushStream(&mVideoStream, mFormatContext);
+    if(mHaveAudio) flushStream(&mAudioStream, mFormatContext);
 
     /* Write the trailer, if any. The trailer must be written before you
      * close the CodecContexts open when you wrote the header; otherwise

@@ -100,16 +100,16 @@ public:
         sInstance->setFreeThreadsForCPUTasksAvailableFunc(func);
     }
 
-    static void sSetAllQuedTasksFinishedFunc(
+    static void sSetAllTasksFinishedFunc(
             const std::function<void(void)>& func) {
-        sInstance->setAllQuedTasksFinishedFunc(func);
+        sInstance->setAllTasksFinishedFunc(func);
     }
     static void sClearAllFinishedFuncs() {
         sSetFreeThreadsForCPUTasksAvailableFunc(nullptr);
-        sSetAllQuedTasksFinishedFunc(nullptr);
+        sSetAllTasksFinishedFunc(nullptr);
     }
 
-    static bool sAllQuedTasksFinished() {
+    static bool sAllTasksFinished() {
         return sInstance->allQuedTasksFinished();
     }
     static bool sAllQuedCPUTasksFinished() {
@@ -159,7 +159,7 @@ public:
             hddTask->cancel();
         mQuedHDDTasks.clear();
 
-        callAllQuedTasksFinishedFunc();
+        callAllTasksFinishedFunc();
     }
 
     void switchToBackupHDDExecutor();
@@ -175,9 +175,9 @@ public:
         mFreeThreadsForCPUTasksAvailableFunc = func;
     }
 
-    void setAllQuedTasksFinishedFunc(
+    void setAllTasksFinishedFunc(
             const std::function<void(void)>& func) {
-        mAllQuedTasksFinishedFunc = func;
+        mAllTasksFinishedFunc = func;
     }
 
     void setCurrentCanvas(Canvas * const canvas) {
@@ -243,10 +243,10 @@ private:
         }
     }
 
-    void callAllQuedTasksFinishedFunc() const {
+    void callAllTasksFinishedFunc() const {
         if(allQuedTasksFinished()) {
-            if(mAllQuedTasksFinishedFunc) {
-                mAllQuedTasksFinishedFunc();
+            if(mAllTasksFinishedFunc) {
+                mAllTasksFinishedFunc();
             }
             emit finishedAllQuedTasks();
         }
@@ -271,7 +271,7 @@ private:
     QList<CPUExecController*> mCPUExecutors;
 
     std::function<void(void)> mFreeThreadsForCPUTasksAvailableFunc;
-    std::function<void(void)> mAllQuedTasksFinishedFunc;
+    std::function<void(void)> mAllTasksFinishedFunc;
 
     GpuPostProcessor mGpuPostProcessor;
 

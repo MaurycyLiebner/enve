@@ -926,7 +926,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
             nextSaveOutputFrame();
         };
         TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
-        TaskScheduler::sSetAllQuedTasksFinishedFunc(nextFrameFunc);
+        TaskScheduler::sSetAllTasksFinishedFunc(nextFrameFunc);
 
         mCurrentCanvas->fitCanvasToSize();
         if(!isZero6Dec(mSavedResolutionFraction - resolutionFraction)) {
@@ -968,7 +968,7 @@ void CanvasWindow::renderPreview() {
         nextPreviewRenderFrame();
     };
     TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
-    TaskScheduler::sSetAllQuedTasksFinishedFunc(nextFrameFunc);
+    TaskScheduler::sSetAllTasksFinishedFunc(nextFrameFunc);
 
     mSavedCurrentFrame = getCurrentFrame();
     mCurrentRenderFrame = mSavedCurrentFrame;
@@ -1050,13 +1050,13 @@ void CanvasWindow::resumePreview() {
 
 void CanvasWindow::playPreviewAfterAllTasksCompleted() {
     if(mRenderingPreview) {
-        if(TaskScheduler::sAllQuedTasksFinished()) {
+        if(TaskScheduler::sAllTasksFinished()) {
             playPreview();
         } else {
             const auto allFinishedFunc = [this]() {
                 playPreview();
             };
-            TaskScheduler::sSetAllQuedTasksFinishedFunc(allFinishedFunc);
+            TaskScheduler::sSetAllTasksFinishedFunc(allFinishedFunc);
         }
     }
 }
@@ -1090,7 +1090,7 @@ void CanvasWindow::nextPreviewRenderFrame() {
         playPreviewAfterAllTasksCompleted();
     } else {
         nextCurrentRenderFrame();
-        if(TaskScheduler::sAllQuedTasksFinished()) {
+        if(TaskScheduler::sAllTasksFinished()) {
             nextPreviewRenderFrame();
         }
     }
@@ -1125,8 +1125,9 @@ void CanvasWindow::nextSaveOutputFrame() {
     }
     //mCurrentCanvas->renderCurrentFrameToOutput(*mCurrentRenderSettings);
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
-        TaskScheduler::sClearAllFinishedFuncs();
-        const auto allFinishedFunc = [this]() {
+        queScheduledTasksAndUpdate();
+        if(TaskScheduler::sAllTasksFinished()) {
+            TaskScheduler::sClearAllFinishedFuncs();
             mCurrentRenderSettings = nullptr;
             mCurrentCanvas->setOutputRendering(false);
             changeCurrentFrameAction(mSavedCurrentFrame);
@@ -1136,18 +1137,11 @@ void CanvasWindow::nextSaveOutputFrame() {
             }
             mCurrentSoundComposition->unblockAll();
             VideoEncoder::sFinishEncoding();
-            TaskScheduler::sClearAllFinishedFuncs();
-        };
-        queScheduledTasksAndUpdate();
-        if(TaskScheduler::sAllQuedTasksFinished()) {
-            allFinishedFunc();
-        } else {
-            TaskScheduler::sSetAllQuedTasksFinishedFunc(allFinishedFunc);
         }
     } else {
         mCurrentRenderSettings->setCurrentRenderFrame(mCurrentRenderFrame);
         nextCurrentRenderFrame();
-        if(TaskScheduler::sAllQuedTasksFinished()) {
+        if(TaskScheduler::sAllTasksFinished()) {
             nextSaveOutputFrame();
         }
     }
