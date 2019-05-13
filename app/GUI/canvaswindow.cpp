@@ -1138,6 +1138,7 @@ void CanvasWindow::nextSaveOutputFrame() {
             VideoEncoder::sFinishEncoding();
             TaskScheduler::sClearAllFinishedFuncs();
         };
+        queScheduledTasksAndUpdate();
         if(TaskScheduler::sAllQuedTasksFinished()) {
             allFinishedFunc();
         } else {

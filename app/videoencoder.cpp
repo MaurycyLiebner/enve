@@ -13,7 +13,7 @@ void VideoEncoder::addContainer(
     if(!cont) return;
     cont->setBlocked(true);
     mNextContainers.append(cont);
-    if(getState() != PROCESSING) scheduleTask();
+    if(getState() < QUED || getState() > PROCESSING) scheduleTask();
 }
 
 static AVFrame *allocPicture(enum AVPixelFormat pix_fmt,
@@ -250,7 +250,7 @@ static void addAudioStream(OutputStream * const ost,
     c->channels       = av_get_channel_layout_nb_channels(c->channel_layout);
     c->bit_rate       = settings.audioBitrate;
 
-    ost->fStream->time_base = (AVRational) { 1, c->sample_rate };
+    ost->fStream->time_base = { 1, c->sample_rate };
 
     // some formats want stream headers to be separate
     if(oc->oformat->flags & AVFMT_GLOBALHEADER)
@@ -264,9 +264,9 @@ static void addAudioStream(OutputStream * const ost,
     ost->fAvr = avresample_alloc_context();
     if(!ost->fAvr) RuntimeThrow("Error allocating the resampling context");
 
-    av_opt_set_int(ost->fAvr, "in_sample_fmt",      AV_SAMPLE_FMT_S16,   0); // !!!
+    av_opt_set_int(ost->fAvr, "in_sample_fmt",      AV_SAMPLE_FMT_FLT,   0);
     av_opt_set_int(ost->fAvr, "in_sample_rate",     44100,               0);
-    av_opt_set_int(ost->fAvr, "in_channel_layout",  AV_CH_LAYOUT_STEREO, 0);
+    av_opt_set_int(ost->fAvr, "in_channel_layout",  AV_CH_LAYOUT_MONO, 0);
     av_opt_set_int(ost->fAvr, "out_sample_fmt",     c->sample_fmt,       0);
     av_opt_set_int(ost->fAvr, "out_sample_rate",    c->sample_rate,      0);
     av_opt_set_int(ost->fAvr, "out_channel_layout", c->channel_layout,   0);
