@@ -857,8 +857,7 @@ void MainWindow::queScheduledTasksAndUpdate() {
         }
     }
 
-    mTaskScheduler.queScheduledCPUTasks();
-    mTaskScheduler.queScheduledHDDTasks();
+    mTaskScheduler.queTasks();
 
     mCanvasWindow->updateHoveredElements();
     mCanvasWindow->updatePivotIfNeeded();

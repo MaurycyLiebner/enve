@@ -925,7 +925,6 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
         const auto nextFrameFunc = [this]() {
             nextSaveOutputFrame();
         };
-        TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(nextFrameFunc);
         TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
 
         mCurrentCanvas->fitCanvasToSize();
@@ -938,10 +937,6 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
         mCurrentCanvas->anim_setAbsFrame(mCurrentRenderFrame);
         mCurrentCanvas->setOutputRendering(true);
         if(TaskScheduler::sAllQuedCPUTasksFinished()) {
-            const auto& cacheHandler = mCurrentCanvas->getCacheHandler();
-            const auto cont = cacheHandler.atRelFrame(mCurrentRenderFrame);
-            VideoEncoder::sAddCacheContainerToEncoder(
-                        GetAsSPtr(cont, ImageCacheContainer));
             nextSaveOutputFrame();
         }
     }
@@ -981,7 +976,6 @@ void CanvasWindow::renderPreview() {
     const auto nextFrameFunc = [this]() {
         nextPreviewRenderFrame();
     };
-    TaskScheduler::sSetAllQuedCPUTasksFinishedFunc(nextFrameFunc);
     TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
 
     mSavedCurrentFrame = getCurrentFrame();

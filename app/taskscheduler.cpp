@@ -82,6 +82,11 @@ HDDExecController* TaskScheduler::createNewBackupHDDExecutor() {
     return newExec;
 }
 
+void TaskScheduler::queTasks() {
+    queScheduledCPUTasks();
+    queScheduledHDDTasks();
+}
+
 void TaskScheduler::queScheduledCPUTasks() {
     if(!shouldQueMoreCPUTasks()) return;
     mCPUQueing = true;
@@ -143,38 +148,34 @@ void TaskScheduler::afterHDDTaskFinished(
         const auto hddExec = static_cast<HDDExecController*>(controller);
         mFreeBackupHDDExecs << hddExec;
     }
-    if(finishedTask) finishedTask->finishedProcessing();
-    if(!mFreeCPUExecs.isEmpty() && !mQuedCPUTasks.isEmpty()) {
-        processNextQuedCPUTask();
-    }
-    processNextQuedHDDTask();
+    finishedTask->finishedProcessing();
+    if(allQuedHDDTasksFinished()) callAllQuedHDDTasksFinishedFunc();
+    processNextTasks();
 }
 
 void TaskScheduler::processNextQuedHDDTask() {
     if(mHDDThreadBusy) return;
-    if(mQuedHDDTasks.isEmpty()) {
-        callAllQuedHDDTasksFinishedFunc();
-//        if(!mRenderingPreview) {
-//            callUpdateSchedulers();
-//        }
-//        if(!mFreeCPUThreads.isEmpty() && !mQuedCPUTasks.isEmpty()) {
-//            processNextQuedCPUTask(mFreeCPUThreads.takeFirst(), nullptr);
-//        }
-    } else {
-        for(int i = 0; i < mQuedHDDTasks.count(); i++) {
-            const auto task = mQuedHDDTasks.at(i);
-            if(task->readyToBeProcessed()) {
-                task->aboutToProcess();
-                const auto hddTask = dynamic_cast<HDDTask*>(task.get());
-                if(hddTask) hddTask->setController(mHDDExecutor);
-                mQuedHDDTasks.removeAt(i--);
-                mHDDThreadBusy = true;
-                mHDDExecutor->processTask(task);
-                return;
-            }
+    for(int i = 0; i < mQuedHDDTasks.count(); i++) {
+        const auto task = mQuedHDDTasks.at(i);
+        if(task->readyToBeProcessed()) {
+            task->aboutToProcess();
+            const auto hddTask = dynamic_cast<HDDTask*>(task.get());
+            if(hddTask) hddTask->setController(mHDDExecutor);
+            mQuedHDDTasks.removeAt(i--);
+            mHDDThreadBusy = true;
+            mHDDExecutor->processTask(task);
+            return;
         }
     }
 }
+
+void TaskScheduler::processNextTasks() {
+    processNextQuedHDDTask();
+    processNextQuedCPUTask();
+    if(shouldQueMoreCPUTasks())
+        callFreeThreadsForCPUTasksAvailableFunc();
+}
+
 #include "GUI/usagewidget.h"
 #include "GUI/mainwindow.h"
 void TaskScheduler::afterCPUTaskFinished(
@@ -191,13 +192,13 @@ void TaskScheduler::afterCPUTaskFinished(
             task->finishedProcessing();
         }
     }
-    processNextQuedCPUTask();
+    if(allQuedCPUTasksFinished())
+        callAllQuedCPUTasksFinishedFunc();
+    processNextTasks();
 }
 
 void TaskScheduler::processNextQuedCPUTask() {
-    if(mQuedCPUTasks.isEmpty() && !mCPUQueing) {
-        callAllQuedCPUTasksFinishedFunc();
-    } else {
+    if(!mQuedCPUTasks.isEmpty()) {
         while(!mFreeCPUExecs.isEmpty()) {
             const auto task = mQuedCPUTasks.takeQuedForProcessing();
             if(task) {
@@ -206,9 +207,6 @@ void TaskScheduler::processNextQuedCPUTask() {
                 executor->processTask(task);
             } else break;
         }
-
-        if(shouldQueMoreCPUTasks())
-            callFreeThreadsForCPUTasksAvailableFunc();
     }
 #ifdef QT_DEBUG
     auto usageWidget = MainWindow::getInstance()->getUsageWidget();

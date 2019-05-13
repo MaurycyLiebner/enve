@@ -99,24 +99,16 @@ public:
             const std::function<void(void)>& func) {
         sInstance->setFreeThreadsForCPUTasksAvailableFunc(func);
     }
-    static void sSetAllQuedCPUTasksFinishedFunc(
-            const std::function<void(void)>& func) {
-        sInstance->setAllQuedCPUTasksFinishedFunc(func);
-    }
-    static void sSetAllQuedHDDTasksFinishedFunc(
-            const std::function<void(void)>& func) {
-        sInstance->setAllQuedHDDTasksFinishedFunc(func);
-    }
+
     static void sSetAllQuedTasksFinishedFunc(
             const std::function<void(void)>& func) {
         sInstance->setAllQuedTasksFinishedFunc(func);
     }
     static void sClearAllFinishedFuncs() {
         sSetFreeThreadsForCPUTasksAvailableFunc(nullptr);
-        sSetAllQuedCPUTasksFinishedFunc(nullptr);
-        sSetAllQuedHDDTasksFinishedFunc(nullptr);
         sSetAllQuedTasksFinishedFunc(nullptr);
     }
+
     static bool sAllQuedTasksFinished() {
         return sInstance->allQuedTasksFinished();
     }
@@ -146,12 +138,11 @@ public:
 
     void initializeGPU();
 
-    void scheduleCPUTask(const stdsptr<Task> &task);
+    void queTasks();
     void queCPUTask(const stdsptr<Task> &task);
-    void queScheduledCPUTasks();
 
+    void scheduleCPUTask(const stdsptr<Task> &task);
     void scheduleHDDTask(const stdsptr<Task> &task);
-    void queScheduledHDDTasks();
 
     void clearTasks() {
         for(const auto& cpuTask : mScheduledCPUTasks)
@@ -180,25 +171,13 @@ public:
 
     void afterHDDTaskFinished(const stdsptr<Task>& finishedTask,
                               ExecController * const controller);
-    void processNextQuedHDDTask();
 
     void afterCPUTaskFinished(const stdsptr<Task>& task,
                               ExecController * const controller);
-    void processNextQuedCPUTask();
 
     void setFreeThreadsForCPUTasksAvailableFunc(
             const std::function<void(void)>& func) {
         mFreeThreadsForCPUTasksAvailableFunc = func;
-    }
-
-    void setAllQuedCPUTasksFinishedFunc(
-            const std::function<void(void)>& func) {
-        mAllQuedCPUTasksFinishedFunc = func;
-    }
-
-    void setAllQuedHDDTasksFinishedFunc(
-            const std::function<void(void)>& func) {
-        mAllQuedHDDTasksFinishedFunc = func;
     }
 
     void setAllQuedTasksFinishedFunc(
@@ -245,6 +224,13 @@ signals:
 private:
     static TaskScheduler* sInstance;
 
+    void queScheduledCPUTasks();
+    void queScheduledHDDTasks();
+
+    void processNextQuedHDDTask();
+    void processNextQuedCPUTask();
+    void processNextTasks();
+
     void tryProcessingNextQuedCPUTask();
     void tryProcessingNextQuedHDDTask();
 
@@ -257,9 +243,6 @@ private:
     }
 
     void callAllQuedCPUTasksFinishedFunc() const {
-        if(mAllQuedCPUTasksFinishedFunc) {
-            mAllQuedCPUTasksFinishedFunc();
-        }
         if(allQuedTasksFinished()) {
             if(mAllQuedTasksFinishedFunc) {
                 mAllQuedTasksFinishedFunc();
@@ -269,13 +252,11 @@ private:
     }
 
     void callAllQuedHDDTasksFinishedFunc() const {
-        if(mAllQuedHDDTasksFinishedFunc) {
-            mAllQuedHDDTasksFinishedFunc();
-        }
         if(allQuedTasksFinished()) {
             if(mAllQuedTasksFinishedFunc) {
                 mAllQuedTasksFinishedFunc();
             }
+            emit finishedAllQuedTasks();
         }
     }
 
@@ -299,8 +280,6 @@ private:
     QList<CPUExecController*> mCPUExecutors;
 
     std::function<void(void)> mFreeThreadsForCPUTasksAvailableFunc;
-    std::function<void(void)> mAllQuedCPUTasksFinishedFunc;
-    std::function<void(void)> mAllQuedHDDTasksFinishedFunc;
     std::function<void(void)> mAllQuedTasksFinishedFunc;
 
     GpuPostProcessor mGpuPostProcessor;
