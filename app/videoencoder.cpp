@@ -218,6 +218,12 @@ static void writeVideoFrame(AVFormatContext * const oc,
 static void closeStream(OutputStream * const ost) {
     if(ost) {
         if(ost->fCodec) {
+            AVPacket pkt;
+            av_init_packet(&pkt);
+            avcodec_send_frame(ost->fCodec, nullptr);
+            while(true) {
+                if(avcodec_receive_packet(ost->fCodec, &pkt) < 0) break;
+            }
             avcodec_close(ost->fCodec);
             avcodec_free_context(&ost->fCodec);
         }
