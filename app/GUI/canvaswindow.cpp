@@ -1124,7 +1124,7 @@ void CanvasWindow::nextPreviewFrame() {
 
 void CanvasWindow::nextSaveOutputFrame() {
     //mCurrentCanvas->renderCurrentFrameToOutput(*mCurrentRenderSettings);
-    if(mCurrentRenderFrame > mMaxRenderFrame) {
+    if(mCurrentRenderFrame >= mMaxRenderFrame) {
         TaskScheduler::sClearAllFinishedFuncs();
         const auto allFinishedFunc = [this]() {
             mCurrentRenderSettings = nullptr;
