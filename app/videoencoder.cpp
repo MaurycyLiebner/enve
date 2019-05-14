@@ -340,9 +340,8 @@ static AVFrame *getAudioFrame(OutputStream * const ost) {
     auto q = reinterpret_cast<float*>(frame->data[0]);
 
     /* check if we want to generate more frames */
-//    if(av_compare_ts(ost->next_pts, ost->enc->time_base,
-//                     STREAM_DURATION, (AVRational) { 1, 1 }) >= 0)
-//        return nullptr;
+    if(av_compare_ts(ost->fNextPts, ost->fCodec->time_base, 20, { 1, 1 }) >= 0)
+        return nullptr;
 
 
     for(int j = 0; j < frame->nb_samples; j++) {
@@ -679,8 +678,6 @@ void VideoEncoder::beforeProcessing() {
 void VideoEncoder::afterProcessing() {
     for(int i = 0; i < _mCurrentContainerId; i++) {
         const auto &cont = _mContainers.at(i);
-        qDebug() << "{" << cont->getRange().fMin << "," <<
-                           cont->getRange().fMax << "}";
         if(i == _mCurrentContainerId - 1) {
             auto currCanvas = mRenderInstanceSettings->getTargetCanvas();
             currCanvas->setCurrentPreviewContainer(cont);
