@@ -127,10 +127,10 @@ protected:
     OutputSettings mOutputSettings;
     RenderInstanceSettings *mRenderInstanceSettings = nullptr;
     QByteArray mPathByteArray;
-    bool mHaveVideo = 0;
-    bool mHaveAudio = 0;
-    bool mEncodeVideo = 0;
-    bool mEncodeAudio = 0;
+    bool mHaveVideo = false;
+    bool mHaveAudio = false;
+    bool mEncodeVideo = false;
+    bool mEncodeAudio = false;
 
     int _mCurrentContainerId = 0;
     int _mCurrentContainerFrame = 0; // some containers will add multiple frames

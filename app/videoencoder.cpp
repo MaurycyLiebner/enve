@@ -457,10 +457,10 @@ void VideoEncoder::startEncodingNow() {
     mFormatContext->oformat = mOutputFormat;
 
     // add streams
-    mHaveVideo = 0;
-    mHaveAudio = 0;
-    mEncodeVideo = 0;
-    mEncodeAudio = 0;
+    mHaveVideo = false;
+    mHaveAudio = false;
+    mEncodeVideo = false;
+    mEncodeAudio = false;
     if(mOutputSettings.videoCodec && mOutputSettings.videoEnabled) {
         try {
             addVideoStream(&mVideoStream, mFormatContext,
@@ -468,8 +468,8 @@ void VideoEncoder::startEncodingNow() {
         } catch (...) {
             RuntimeThrow("Error adding video stream");
         }
-        mHaveVideo = 1;
-        mEncodeVideo = 1;
+        mHaveVideo = true;
+        mEncodeVideo = true;
     }
     if(mOutputFormat->audio_codec != AV_CODEC_ID_NONE &&
        mOutputSettings.audioEnabled) {
@@ -478,8 +478,8 @@ void VideoEncoder::startEncodingNow() {
         } catch (...) {
             RuntimeThrow("Error adding audio stream");
         }
-        mHaveAudio = 1;
-        mEncodeAudio = 1;
+        mHaveAudio = true;
+        mEncodeAudio = true;
     }
     if(!mHaveAudio && !mHaveVideo) RuntimeThrow("No streams to render");
     // open streams
@@ -547,7 +547,6 @@ void VideoEncoder::finishEncodingSuccess() {
     mEncodingSuccesfull = true;
     finishEncodingNow();
     mEmitter.encodingFinished();
-    qDebug() << "FINISHED";
 }
 
 static void flushStream(OutputStream * const ost,
