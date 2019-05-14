@@ -7,13 +7,12 @@
 #include <QGroupBox>
 #include "renderinstancesettings.h"
 
-class OutputSettingsDisplayWidget : public QWidget
-{
+class OutputSettingsDisplayWidget : public QWidget {
     Q_OBJECT
 public:
     explicit OutputSettingsDisplayWidget(QWidget *parent = nullptr);
     void setOutputSettings(const OutputSettings &settings) {
-        if(settings.outputFormat  == nullptr) {
+        if(!settings.outputFormat) {
             setOutputFormatText("-");
         } else {
             setOutputFormatText(QString(settings.outputFormat->long_name));
@@ -21,7 +20,7 @@ public:
         if(!mAlwaysShowAll) {
             setVideoLabelsVisible(settings.videoEnabled);
         }
-        if(settings.videoCodec  == nullptr) {
+        if(!settings.videoCodec) {
             setVideoCodecText("-");
         } else {
             setVideoCodecText(QString(settings.videoCodec->long_name));
@@ -36,7 +35,7 @@ public:
         if(!mAlwaysShowAll) {
             setAudioLabelsVisible(settings.audioEnabled);
         }
-        if(settings.audioCodec  == nullptr) {
+        if(!settings.audioCodec) {
             setAudioCodecText("-");
         } else {
             setAudioCodecText(QString(settings.audioCodec->long_name));
@@ -49,7 +48,10 @@ public:
             setAudioSampleFormatText(OutputSettings::SAMPLE_FORMATS_NAMES.at(formatId));
         }
         setAudioBitrateText(QString::number(settings.audioBitrate/1000) + " kbps");
-        setAudioChannelLayoutText(OutputSettings::getChannelsLayoutNameStatic(settings.audioChannelsLayout));
+
+        const auto channLay = OutputSettings::getChannelsLayoutNameStatic(
+                    settings.audioChannelsLayout);
+        setAudioChannelLayoutText(channLay);
     }
 
     void setAlwaysShowAll(const bool &bT) {

@@ -55,42 +55,42 @@ public:
         settings.audioEnabled = mAudioGroupBox->isChecked();
         AVCodec *currentAudioCodec = nullptr;
         if(mAudioCodecsComboBox->count() > 0) {
-            int codecId = mAudioCodecsComboBox->currentIndex();
+            const int codecId = mAudioCodecsComboBox->currentIndex();
             currentAudioCodec = mAudioCodecsList.at(codecId);
         }
         settings.audioCodec = currentAudioCodec;
 
         AVSampleFormat currentSampleFormat = AV_SAMPLE_FMT_NONE;
         if(mSampleFormatsComboBox->count() > 0) {
-            int formatId = mSampleFormatsComboBox->currentIndex();
+            const int formatId = mSampleFormatsComboBox->currentIndex();
             currentSampleFormat = mSampleFormatsList.at(formatId);
         }
         settings.audioSampleFormat = currentSampleFormat;
 
         int currentSampleRate = 0;
         if(mSampleRateComboBox->count() > 0) {
-            int sampleRateId = mSampleRateComboBox->currentIndex();
+            const int sampleRateId = mSampleRateComboBox->currentIndex();
             currentSampleRate = mSampleRatesList.at(sampleRateId);
         }
         settings.audioSampleRate = currentSampleRate;
 
         int currentAudioBitrate = 0;
         if(mAudioBitrateComboBox->count() > 0) {
-            int bitrateId = mAudioBitrateComboBox->currentIndex();
+            const int bitrateId = mAudioBitrateComboBox->currentIndex();
             currentAudioBitrate = mAudioBitrateList.at(bitrateId);
         }
         settings.audioBitrate = currentAudioBitrate;
 
         uint64_t currentChannelsLayout = 0;
         if(mAudioChannelLayoutsComboBox->count() > 0) {
-            int layoutId = mAudioChannelLayoutsComboBox->currentIndex();
-            currentAudioBitrate = mAudioChannelLayoutsList.at(layoutId);
+            const int layoutId = mAudioChannelLayoutsComboBox->currentIndex();
+            currentChannelsLayout = mAudioChannelLayoutsList.at(layoutId);
         }
         settings.audioChannelsLayout = currentChannelsLayout;
 
         return settings;
     }
-protected slots:
+protected:
     void updateAvailableOutputFormats();
 
     void updateAvailablePixelFormats();
@@ -109,7 +109,8 @@ protected slots:
         mShowAllFormatsAndCodecs = bT;
         updateAvailableOutputFormats();
     }
-protected:
+    void updateAvailableCodecs();
+
     QList<FormatCodecs> mSupportedFormats;
     bool mShowAllFormatsAndCodecs = false;
     QList<AVPixelFormat> mPixelFormatsList;
