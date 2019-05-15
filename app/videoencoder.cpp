@@ -47,7 +47,7 @@ static AVFrame *allocPicture(enum AVPixelFormat pix_fmt,
 
 static void openVideo(AVCodec * const codec, OutputStream * const ost) {
     AVCodecContext * const c = ost->fCodec;
-
+    ost->fNextPts = 0;
     /* open the codec */
     int ret = avcodec_open2(c, codec, nullptr);
     if(ret < 0) AV_RuntimeThrow(ret, "Could not open codec");
@@ -310,6 +310,7 @@ static void openAudio(AVCodec * const codec, OutputStream * const ost) {
     const int ret = avcodec_open2(c, codec, nullptr);
     if(ret < 0) AV_RuntimeThrow(ret, "Could not open codec");
 
+    ost->fNextPts = 0;
     /* init signal generator */
     ost->fT = 0;
     const qreal tincr = 2 * M_PI * 110. / c->sample_rate;
@@ -354,6 +355,18 @@ static AVFrame *getAudioFrame(OutputStream * const ost) {
     return frame;
 }
 
+static AVFrame *getAudioFrame(OutputStream * const ost,
+                              SoundIterator &iterator) {
+    AVFrame * const frame = ost->fTmpFrame;
+    auto q = reinterpret_cast<float*>(frame->data[0]);
+
+    for(int j = 0; j < frame->nb_samples; j++) {
+        *q++ = iterator.hasValue() ? iterator.value() : 0;
+        iterator.next();
+    }
+
+    return frame;
+}
 
 /* if a frame is provided, send it to the encoder, otherwise flush the encoder;
  * return 1 when encoding is finished, 0 otherwise
@@ -376,20 +389,21 @@ static void encodeAudioFrame(AVFormatContext * const oc,
 
             /* Write the compressed frame to the media file. */
             const int interRet = av_interleaved_write_frame(oc, &pkt);
-            if(interRet < 0) AV_RuntimeThrow(interRet, "Error while writing video frame");
+            if(interRet < 0) AV_RuntimeThrow(interRet, "Error while writing audio frame");
         } else if(recRet == AVERROR(EAGAIN) || recRet == AVERROR_EOF) {
             *encodeAudio = recRet == AVERROR(EAGAIN);
             break;
         } else {
-            AV_RuntimeThrow(recRet, "Error encoding a video frame");
+            AV_RuntimeThrow(recRet, "Error encoding an audio frame");
         }
     }
 }
 
 static void processAudioStream(AVFormatContext * const oc,
                                OutputStream * const ost,
+                               SoundIterator &iterator,
                                bool * const audioEnabled) {
-    AVFrame * const frame = getAudioFrame(ost);
+    AVFrame * const frame = getAudioFrame(ost, iterator);
     bool gotOutput = frame;
 
     /* feed the data to lavr */
@@ -429,8 +443,8 @@ static void processAudioStream(AVFormatContext * const oc,
 
         ost->fFrame->nb_samples = sample;
 
-        ost->fFrame->pts        = ost->fNextPts;
-        ost->fNextPts         += ost->fFrame->nb_samples;
+        ost->fFrame->pts = ost->fNextPts;
+        ost->fNextPts += ost->fFrame->nb_samples;
 
         try {
             encodeAudioFrame(oc, ost, ost->fFrame, &gotOutput);
@@ -519,7 +533,7 @@ void VideoEncoder::startEncoding(RenderInstanceSettings * const settings) {
     // get format from audio file
 
     mOutputFormat = mOutputSettings.outputFormat;
-
+    mSoundIterator = SoundIterator();
     try {
         startEncodingNow();
         mCurrentlyEncoding = true;
@@ -634,20 +648,22 @@ void VideoEncoder::processTask() {
     bool encodeVideoT = !_mContainers.isEmpty(); // local encode
     bool encodeAudioT = true; // local encode
     while((mEncodeVideo && encodeVideoT) || (mEncodeAudio && encodeAudioT)) {
-        bool avAligned = true;
+        bool videoAligned = true;
         if(mEncodeAudio) {
-            avAligned = av_compare_ts(mVideoStream.fNextPts,
-                                      mVideoStream.fCodec->time_base,
-                                      mAudioStream.fNextPts,
-                                      mAudioStream.fCodec->time_base) <= 0;
+            videoAligned = av_compare_ts(mVideoStream.fNextPts,
+                                         mVideoStream.fCodec->time_base,
+                                         mAudioStream.fNextPts,
+                                         mAudioStream.fCodec->time_base) <= 0;
         }
-        if(mEncodeVideo && encodeVideoT && avAligned) {
+        const bool encodeVideo = mEncodeVideo && encodeVideoT && videoAligned;
+        if(encodeVideo) {
             const auto cacheCont = _mContainers.at(_mCurrentContainerId);
             const auto contRage = cacheCont->getRange()*_mRenderRange;
             const int nFrames = contRage.span();
             try {
                 writeVideoFrame(mFormatContext, &mVideoStream,
-                                cacheCont->getImageSk(), &mEncodeVideo);
+                                cacheCont->getImageSk(), &encodeVideoT);
+                avcodec_flush_buffers(mVideoStream.fCodec);
             } catch(...) {
                 RuntimeThrow("Failed to write video frame");
             }
@@ -657,13 +673,25 @@ void VideoEncoder::processTask() {
                 _mCurrentContainerFrame = 0;
                 encodeVideoT = _mCurrentContainerId < _mContainers.count();
             }
-        } else if(mEncodeAudio) {
+        }
+        bool audioAligned = true;
+        if(mEncodeVideo) {
+            audioAligned = av_compare_ts(mVideoStream.fNextPts,
+                                         mVideoStream.fCodec->time_base,
+                                         mAudioStream.fNextPts,
+                                         mAudioStream.fCodec->time_base) >= 0;
+        }
+        const bool encodeAudio = mEncodeAudio && encodeAudioT && audioAligned;
+        if(encodeAudio) {
             try {
-                processAudioStream(mFormatContext, &mAudioStream, &mEncodeAudio);
+                processAudioStream(mFormatContext, &mAudioStream,
+                                   mSoundIterator, &encodeAudioT);
+                avcodec_flush_buffers(mAudioStream.fCodec);
             } catch(...) {
                 RuntimeThrow("Failed to process audio stream");
             }
         }
+        if(!encodeVideo && !encodeAudio) break;
     }
 }
 

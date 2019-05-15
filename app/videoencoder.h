@@ -6,6 +6,7 @@
 #include "updatable.h"
 #include "renderinstancesettings.h"
 #include "framerange.h"
+#include "CacheHandlers/samples.h"
 extern "C" {
     #include <libavcodec/avcodec.h>
     #include <libavformat/avformat.h>
@@ -17,6 +18,66 @@ extern "C" {
     #include <libavutil/opt.h>
 }
 class ImageCacheContainer;
+
+
+class SoundIterator {
+public:
+    SoundIterator() {
+        float fT = 0;
+        const qreal tincr = 2 * M_PI * 110 / 44100;
+        float fTincr = static_cast<float>(tincr);
+        /* increment frequency by 110 Hz per second */
+        const float fTincr2 = static_cast<float>(tincr / 44100);
+        for(int i = 0; i < 10; i++) {
+            const auto samples = SPtrCreate(Samples)(SampleRange{0, 44099});
+            float * q = samples->fData;
+            for(int j = 0; j < 44100; j++) {
+                *q++ = sin(fT);
+                fT += fTincr;
+                fTincr += fTincr2;
+            }
+            mSamples << samples;
+        }
+        updateCurrent();
+    }
+
+    bool hasValue() const {
+        return !mSamples.isEmpty();
+    }
+
+    bool next() {
+        if(mSamples.isEmpty()) return false;
+        if(mCurrentSampleId >= mLastSampleId) {
+            mSamples.removeFirst();
+            if(!updateCurrent()) {
+                mCurrentValue = 0;
+                return false;
+            }
+        } else mCurrentSampleId++;
+        mCurrentValue = mSamples.first()->fData[mCurrentSampleId];
+        return true;
+    }
+
+    float value() const {
+        return mCurrentValue;
+    }
+private:
+    bool updateCurrent() {
+        if(mSamples.isEmpty()) return false;
+        const auto& currSamples = mSamples.first();
+        mCurrentSampleId = 0;
+        mLastSampleId = currSamples->fSampleRange.span() - 1;
+        mCurrentValue = *currSamples->fData;
+//        mCurrentSample = currSamples->fData;
+//        mLastSample = currSamples->fData + currSamples->fSampleRange.span() - 1;
+        return true;
+    }
+
+    float mCurrentValue = 0;
+    int mCurrentSampleId;
+    int mLastSampleId;
+    QList<stdsptr<Samples>> mSamples;
+};
 
 typedef struct OutputStream {
     // pts of the next frame that will be generated
@@ -137,6 +198,7 @@ protected:
     FrameRange _mRenderRange;
 
     QList<stdsptr<ImageCacheContainer>> _mContainers;
+    SoundIterator mSoundIterator;
 };
 
 #endif // VIDEOENCODER_H
