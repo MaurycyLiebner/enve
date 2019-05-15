@@ -37,42 +37,6 @@ struct TileImgs {
     }
 };
 
-class TilesTmpFileDataSaver : public TmpFileDataSaver {
-    friend class StdSelfRef;
-public:
-    typedef std::function<void(const qsptr<QTemporaryFile>&)> Func;
-protected:
-    TilesTmpFileDataSaver(const TileImgs &images,
-                          const Func& finishedFunc) :
-        mImages(images), mFinishedFunc(finishedFunc) {}
-
-    void writeToFile(QIODevice * const file);
-    void afterProcessing() {
-        if(mFinishedFunc) mFinishedFunc(mTmpFile);
-    }
-private:
-    const TileImgs mImages;
-    const Func mFinishedFunc;
-};
-
-class TilesTmpFileDataLoader : public TmpFileDataLoader {
-    friend class StdSelfRef;
-public:
-    typedef std::function<void(const TileImgs&)> Func;
-protected:
-    TilesTmpFileDataLoader(const qsptr<QTemporaryFile> &file,
-                           const Func& finishedFunc) :
-        TmpFileDataLoader(file), mFinishedFunc(finishedFunc) {}
-
-    void readFromFile(QIODevice * const file);
-    void afterProcessing() {
-        if(mFinishedFunc) mFinishedFunc(mTileImgs);
-    }
-private:
-    TileImgs mTileImgs;
-    const Func mFinishedFunc;
-};
-
 class DrawableAutoTiledSurface : public HDDCachablePersistent {
     friend class StdSelfRef;
     typedef  QList<QList<sk_sp<SkImage>>> Tiles;
@@ -83,21 +47,9 @@ protected:
         this->operator=(other);
     }
 
-    stdsptr<HDDTask> createTmpFileDataSaver() {
-        const TilesTmpFileDataSaver::Func func =
-            [this](const qsptr<QTemporaryFile>& tmpFile) {
-                setDataSavedToTmpFile(tmpFile);
-            };
-        return SPtrCreate(TilesTmpFileDataSaver)(mTileImgs, func);
-    }
+    stdsptr<HDDTask> createTmpFileDataSaver();
 
-    stdsptr<HDDTask> createTmpFileDataLoader() {
-        const TilesTmpFileDataLoader::Func func =
-            [this](const TileImgs& tiles) {
-                setTileImgs(tiles);
-            };
-        return SPtrCreate(TilesTmpFileDataLoader)(mTmpFile, func);
-    }
+    stdsptr<HDDTask> createTmpFileDataLoader();
 
     int getByteCount() {
         const int spixels = mColumnCount*mRowCount*TILE_SPIXEL_SIZE;
@@ -134,6 +86,15 @@ public:
         return mSurface;
     }
 
+    void pixelRectChanged(const QRect& pixRect) {
+        if(mTmpFile) scheduleDeleteTmpFile();
+        updateTileRectImgs(pixRectToTileRect(pixRect));
+    }
+
+    QRect pixelBoundingRect() const {
+        return tileRectToPixRect(tileBoundingRect());
+    }
+private:
     void updateTileImages() {
         updateTileRectImgs(mSurface.tileBoundingRect());
     }
@@ -141,7 +102,6 @@ public:
     void updateTileRectImgs(QRect tileRect) {
         const QRect maxRect = mSurface.tileBoundingRect();
         if(!maxRect.intersects(tileRect)) return;
-        if(mTmpFile) scheduleDeleteTmpFile();
         tileRect = maxRect.intersected(tileRect);
         const auto min = tileRect.topLeft();
         const auto max = tileRect.bottomRight();
@@ -158,14 +118,6 @@ public:
         }
     }
 
-    void updatePixelRectImgs(const QRect& pixRect) {
-        updateTileRectImgs(pixRectToTileRect(pixRect));
-    }
-
-    QRect pixelBoundingRect() const {
-        return tileRectToPixRect(tileBoundingRect());
-    }
-private:
     void setTileImgs(const TileImgs& tiles) {
         mTileImgs = tiles;
     }

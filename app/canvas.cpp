@@ -1071,7 +1071,7 @@ void Canvas::paintPress(const ulong ts, const qreal &pressure,
                 target.paintPressEvent(mCurrentBrush->getBrush(),
                                        pos, 1, pressure, xTilt, yTilt);
         const QRect qRoi(roi.x, roi.y, roi.width, roi.height);
-        mPaintDrawable->updatePixelRectImgs(qRoi);
+        mPaintDrawable->pixelRectChanged(qRoi);
         mLastTs = ts;
     }
 }
@@ -1088,7 +1088,7 @@ void Canvas::paintMove(const ulong ts, const qreal &pressure,
                                       pos, dt/1000, pressure,
                                       xTilt, yTilt);
         const QRect qRoi(roi.x, roi.y, roi.width, roi.height);
-        mPaintDrawable->updatePixelRectImgs(qRoi);
+        mPaintDrawable->pixelRectChanged(qRoi);
     }
     mLastTs = ts;
 }

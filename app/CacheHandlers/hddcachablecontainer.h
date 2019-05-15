@@ -17,8 +17,8 @@ public:
 
     int free_RAM_k() final {
         const int bytes = clearMemory();
-        if(mTmpFile) setDataInMemory(false);
-        else noDataLeft_k();
+        setDataInMemory(false);
+        if(!mTmpFile) noDataLeft_k();
         return bytes;
     }
 
