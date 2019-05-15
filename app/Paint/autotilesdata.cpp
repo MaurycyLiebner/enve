@@ -326,6 +326,25 @@ bool AutoTilesData::drawOnPixmap(SkPixmap &dst,
     return true;
 }
 
+void AutoTilesData::read(QIODevice * const src) {
+    reset();
+    src->read(rcChar(&mZeroTileCol), sizeof(int));
+    src->read(rcChar(&mZeroTileRow), sizeof(int));
+    src->read(rcChar(&mColumnCount), sizeof(int));
+    src->read(rcChar(&mRowCount), sizeof(int));
+    int nCols;
+    src->read(rcChar(&nCols), sizeof(int));
+    int nRows;
+    src->read(rcChar(&nRows), sizeof(int));
+    for(int col = 0; col < nCols; col++) {
+        for(int row = 0; row < nRows; row++) {
+            const auto tile = allocateTile(TILE_SPIXEL_SIZE);
+            src->read(rcChar(tile),
+                      TILE_SPIXEL_SIZE*sizeof(uint16_t));
+        }
+    }
+}
+
 void AutoTilesData::stretchToTile(const int &tx, const int &ty) {
     const int colId = tx + mZeroTileCol;
     const int rowId = ty + mZeroTileRow;

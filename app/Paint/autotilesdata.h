@@ -3,7 +3,7 @@
 #include <QtCore>
 #include <QList>
 #include "skia/skiaincludes.h"
-
+#include "basicreadwrite.h"
 #ifndef TILE_SIZE
     #define TILE_SIZE 64
 #endif
@@ -71,6 +71,25 @@ struct AutoTilesData {
     }
 
     bool isEmpty() const { return mColumnCount == 0 || mRowCount == 0; }
+
+    void write(QIODevice * const dst) const {
+        dst->write(rcConstChar(&mZeroTileCol), sizeof(int));
+        dst->write(rcConstChar(&mZeroTileRow), sizeof(int));
+        dst->write(rcConstChar(&mColumnCount), sizeof(int));
+        dst->write(rcConstChar(&mRowCount), sizeof(int));
+        const int nCols = mColumns.count();
+        dst->write(rcConstChar(&nCols), sizeof(int));
+        const int nRows = mColumns.isEmpty() ? 0 : mColumns.first().count();
+        dst->write(rcConstChar(&nRows), sizeof(int));
+        for(const auto& col : mColumns) {
+            for(const auto& row : col) {
+                dst->write(rcConstChar(row),
+                           TILE_SPIXEL_SIZE*sizeof(uint16_t));
+            }
+        }
+    }
+
+    void read(QIODevice * const src);
 protected:
     uint16_t* getTileByIndex(const int& colId, const int& rowId) const;
 private:

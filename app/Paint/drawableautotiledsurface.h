@@ -11,6 +11,21 @@ struct TileImgs {
     int fZeroTileCol = 0;
     QList<QList<sk_sp<SkImage>>> fImgs;
 
+    void deepCopy(const TileImgs& src) {
+        fRowCount = src.fRowCount;
+        fColumnCount = src.fColumnCount;
+        fZeroTileRow = src.fZeroTileRow;
+        fZeroTileCol = src.fZeroTileCol;
+        fImgs.clear();
+        for(const auto& srcList : src.fImgs) {
+            fImgs << QList<sk_sp<SkImage>>();
+            auto& list = fImgs.last();
+            for(const auto& srcImg : srcList) {
+                list << SkiaHelpers::makeSkImageCopy(srcImg);
+            }
+        }
+    }
+
     bool isEmpty() const { return fImgs.isEmpty(); }
 
     void clear() {
@@ -65,7 +80,7 @@ protected:
     DrawableAutoTiledSurface();
     DrawableAutoTiledSurface(const DrawableAutoTiledSurface& other) :
         DrawableAutoTiledSurface() {
-        mSurface = other.surface();
+        this->operator=(other);
     }
 
     stdsptr<HDDTask> createTmpFileDataSaver() {
@@ -97,7 +112,7 @@ protected:
 public:
     DrawableAutoTiledSurface& operator=(const DrawableAutoTiledSurface& other) {
         mSurface = other.surface();
-        clearImgs();
+        mTileImgs.deepCopy(other.mTileImgs);
         return *this;
     }
 
