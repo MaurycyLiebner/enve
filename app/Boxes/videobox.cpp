@@ -84,12 +84,10 @@ bool hasSound(const char* path) {
     // get format from audio file
     AVFormatContext* format = avformat_alloc_context();
     if(avformat_open_input(&format, path, nullptr, nullptr) != 0) {
-        fprintf(stderr, "Could not open file '%s'\n", path);
-        return false;
+        RuntimeThrow("Could not open file " + path);
     }
     if(avformat_find_stream_info(format, nullptr) < 0) {
-        fprintf(stderr, "Could not retrieve stream info from file '%s'\n", path);
-        return false;
+        RuntimeThrow("Could not retrieve stream info from file " + path);
     }
 
     // Find the index of the first audio stream
