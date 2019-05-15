@@ -31,7 +31,7 @@ void VideoEncoder::addContainer(
 
 void VideoEncoder::addContainer(const stdsptr<Samples>& cont) {
     if(!cont) return;
-    mNextSoundConts.append(SPtrCreate(Samples)(cont));
+    mNextSoundConts.append(cont);
     if(getState() < QUED || getState() > PROCESSING) scheduleTask();
 }
 

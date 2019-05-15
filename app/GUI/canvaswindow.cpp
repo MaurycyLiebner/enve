@@ -920,6 +920,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
         changeCurrentFrameAction(renderSettings.fMinFrame);
 
         const qreal resolutionFraction = renderSettings.fResolution;
+        mMinRenderFrame = renderSettings.fMinFrame;
         mMaxRenderFrame = renderSettings.fMaxFrame;
 
         const auto nextFrameFunc = [this]() {
@@ -935,7 +936,8 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
 
         mCurrentRenderFrame = renderSettings.fMinFrame;
         mCurrentEncodeFrame = mCurrentRenderFrame;
-        mCurrentEncodeSoundSecond = qRound(mCurrentRenderFrame/mCurrentCanvas->getFps());
+        mFirstEncodeSoundSecond = qRound(mCurrentRenderFrame/mCurrentCanvas->getFps());
+        mCurrentEncodeSoundSecond = mFirstEncodeSoundSecond;
         mCurrentSoundComposition->startBlockingAtFrame(mCurrentRenderFrame);
         mCurrentSoundComposition->scheduleFrameRange({mCurrentRenderFrame,
                                                       mCurrentRenderFrame});
@@ -1119,12 +1121,22 @@ void CanvasWindow::nextPreviewFrame() {
 
 void CanvasWindow::nextSaveOutputFrame() {
     const auto& sCacheHandler = mCurrentCanvas->getSoundComposition()->getCacheHandler();
-    const int maxSec = qCeil(mMaxRenderFrame/mCurrentCanvas->getFps());
+    const qreal fps = mCurrentCanvas->getFps();
+    const int maxSec = qCeil(mMaxRenderFrame/fps);
     while(mCurrentEncodeSoundSecond <= maxSec) {
         const auto cont = sCacheHandler.atRelFrame(mCurrentEncodeSoundSecond);
         if(!cont) break;
-        VideoEncoder::sAddCacheContainerToEncoder(
-                    GetAsSPtr(cont, SoundCacheContainer)->getSamples());
+        const auto sCont = GetAsSPtr(cont, SoundCacheContainer);
+        const auto samples = sCont->getSamples();
+        if(mCurrentEncodeSoundSecond == mFirstEncodeSoundSecond) {
+            const int minSample = qRound(mMinRenderFrame*SOUND_SAMPLERATE/fps);
+            const int max = samples->fSampleRange.fMax;
+            VideoEncoder::sAddCacheContainerToEncoder(
+                        SPtrCreate(Samples)(samples->mid({minSample, max})));
+        } else {
+            VideoEncoder::sAddCacheContainerToEncoder(
+                        SPtrCreate(Samples)(samples));
+        }
         mCurrentEncodeSoundSecond++;
     }
 

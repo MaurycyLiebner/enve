@@ -175,8 +175,10 @@ private:
 
     int mCurrentEncodeFrame;
     int mCurrentEncodeSoundSecond;
+    int mFirstEncodeSoundSecond;
 
     int mCurrentRenderFrame;
+    int mMinRenderFrame = 0;
     int mMaxRenderFrame = 0;
     int mSavedCurrentFrame = 0;
 

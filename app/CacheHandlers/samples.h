@@ -1,6 +1,7 @@
 #ifndef SAMPLES_H
 #define SAMPLES_H
 #include "smartPointers/stdselfref.h"
+#include "smartPointers/sharedpointerdefs.h"
 #include "framerange.h"
 
 struct Samples : public StdSelfRef {
@@ -25,6 +26,19 @@ public:
     ~Samples() { delete[] fData; }
     float * const fData;
     const SampleRange fSampleRange;
+
+    stdsptr<Samples> mid(const SampleRange& range) const {
+        if(!range.isValid()) RuntimeThrow("Invalid range");
+        if(range.fMin < fSampleRange.fMin ||
+           range.fMax > fSampleRange.fMax)
+            RuntimeThrow("Range outside bounds");
+        const auto data = new float[static_cast<size_t>(range.span())];
+
+        memcpy(data, fData + (range.fMin - fSampleRange.fMin),
+               static_cast<size_t>(range.span())*sizeof(float));
+
+        return SPtrCreate(Samples)(data, range);
+    }
 };
 
 #endif // SAMPLES_H
