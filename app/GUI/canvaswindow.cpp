@@ -935,7 +935,10 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
 
         mCurrentRenderFrame = renderSettings.fMinFrame;
         mCurrentEncodeFrame = mCurrentRenderFrame;
+        mCurrentEncodeSoundSecond = qRound(mCurrentRenderFrame/mCurrentCanvas->getFps());
         mCurrentSoundComposition->startBlockingAtFrame(mCurrentRenderFrame);
+        mCurrentSoundComposition->scheduleFrameRange({mCurrentRenderFrame,
+                                                      mCurrentRenderFrame});
         mCurrentCanvas->anim_setAbsFrame(mCurrentRenderFrame);
         mCurrentCanvas->setOutputRendering(true);
         if(TaskScheduler::sAllQuedCPUTasksFinished()) {
@@ -1115,6 +1118,16 @@ void CanvasWindow::nextPreviewFrame() {
 }
 
 void CanvasWindow::nextSaveOutputFrame() {
+    const auto& sCacheHandler = mCurrentCanvas->getSoundComposition()->getCacheHandler();
+    const int maxSec = qCeil(mMaxRenderFrame/mCurrentCanvas->getFps());
+    while(mCurrentEncodeSoundSecond <= maxSec) {
+        const auto cont = sCacheHandler.atRelFrame(mCurrentEncodeSoundSecond);
+        if(!cont) break;
+        VideoEncoder::sAddCacheContainerToEncoder(
+                    GetAsSPtr(cont, SoundCacheContainer)->getSamples());
+        mCurrentEncodeSoundSecond++;
+    }
+
     const auto& cacheHandler = mCurrentCanvas->getCacheHandler();
     while(mCurrentEncodeFrame <= mMaxRenderFrame) {
         const auto cont = cacheHandler.atRelFrame(mCurrentEncodeFrame);
@@ -1123,6 +1136,7 @@ void CanvasWindow::nextSaveOutputFrame() {
                     GetAsSPtr(cont, ImageCacheContainer));
         mCurrentEncodeFrame = cont->getRangeMax() + 1;
     }
+
     //mCurrentCanvas->renderCurrentFrameToOutput(*mCurrentRenderSettings);
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
         queScheduledTasksAndUpdate();

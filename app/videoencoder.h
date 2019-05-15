@@ -23,23 +23,23 @@ class ImageCacheContainer;
 class SoundIterator {
 public:
     SoundIterator() {
-        float fT = 0;
-        const qreal tincr = 2 * M_PI * 110 / 44100;
-        float fTincr = static_cast<float>(tincr);
-        /* increment frequency by 110 Hz per second */
-        const float fTincr2 = static_cast<float>(tincr / 44100);
-        for(int i = 0; i < 10; i++) {
-            const auto data = new float[44100];
-            const auto samples = SPtrCreate(Samples)(data, SampleRange{0, 44099});
-            float * q = samples->fData;
-            for(int j = 0; j < 44100; j++) {
-                *(q++) = sin(fT);
-                fT += fTincr;
-                fTincr += fTincr2;
-            }
-            mSamples << samples;
-        }
-        updateCurrent();
+//        float fT = 0;
+//        const qreal tincr = 2 * M_PI * 110 / 44100;
+//        float fTincr = static_cast<float>(tincr);
+//        /* increment frequency by 110 Hz per second */
+//        const float fTincr2 = static_cast<float>(tincr / 44100);
+//        for(int i = 0; i < 10; i++) {
+//            const auto data = new float[44100];
+//            const auto samples = SPtrCreate(Samples)(data, SampleRange{0, 44099});
+//            float * q = samples->fData;
+//            for(int j = 0; j < 44100; j++) {
+//                *(q++) = sin(fT);
+//                fT += fTincr;
+//                fTincr += fTincr2;
+//            }
+//            mSamples << samples;
+//        }
+//        updateCurrent();
     }
 
     bool hasValue() const {
@@ -64,6 +64,11 @@ public:
         mSamples << sound;
         if(update) updateCurrent();
     }
+
+    void clear() {
+        mSamples.clear();
+        updateCurrent();
+    }
 private:
     bool updateCurrent() {
         if(mSamples.isEmpty()) {
@@ -77,7 +82,7 @@ private:
     }
 
     float mZero = 0;
-    float * mCurrentSample;
+    float * mCurrentSample = &mZero;
     float * mEndSample;
     QList<stdsptr<Samples>> mSamples;
 };
@@ -150,6 +155,7 @@ public:
     }
 
     void addContainer(const stdsptr<ImageCacheContainer> &cont);
+    void addContainer(const stdsptr<Samples> &cont);
 
     static VideoEncoder *mVideoEncoderInstance;
     static VideoEncoderEmitter *getVideoEncoderEmitter();
@@ -157,6 +163,7 @@ public:
     static void sInterruptEncoding();
     static void sStartEncoding(RenderInstanceSettings *settings);
     static void sAddCacheContainerToEncoder(const stdsptr<ImageCacheContainer> &cont);
+    static void sAddCacheContainerToEncoder(const stdsptr<Samples> &cont);
     static void sFinishEncoding();
     static bool sEncodingSuccessfulyStarted();
 
@@ -186,6 +193,7 @@ protected:
     AVOutputFormat *mOutputFormat = nullptr;
     bool mCurrentlyEncoding = false;
     QList<stdsptr<ImageCacheContainer>> mNextContainers;
+    QList<stdsptr<Samples>> mNextSoundConts;
 
     RenderSettings mRenderSettings;
     OutputSettings mOutputSettings;

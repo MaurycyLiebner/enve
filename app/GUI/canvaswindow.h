@@ -174,6 +174,8 @@ private:
     bool mHasFocus = false;
 
     int mCurrentEncodeFrame;
+    int mCurrentEncodeSoundSecond;
+
     int mCurrentRenderFrame;
     int mMaxRenderFrame = 0;
     int mSavedCurrentFrame = 0;

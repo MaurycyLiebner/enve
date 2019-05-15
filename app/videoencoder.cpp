@@ -29,6 +29,12 @@ void VideoEncoder::addContainer(
     if(getState() < QUED || getState() > PROCESSING) scheduleTask();
 }
 
+void VideoEncoder::addContainer(const stdsptr<Samples>& cont) {
+    if(!cont) return;
+    mNextSoundConts.append(SPtrCreate(Samples)(cont));
+    if(getState() < QUED || getState() > PROCESSING) scheduleTask();
+}
+
 static AVFrame *allocPicture(enum AVPixelFormat pix_fmt,
                              const int& width, const int& height) {
     AVFrame * const picture = av_frame_alloc();
@@ -469,6 +475,7 @@ void VideoEncoder::startEncodingNow() {
 
     mFormatContext->oformat = mOutputFormat;
 
+    _mCurrentContainerFrame = 0;
     // add streams
     mHaveVideo = false;
     mHaveAudio = false;
@@ -635,6 +642,7 @@ void VideoEncoder::finishEncodingNow() {
     mCurrentlyEncoding = false;
     mEncodingSuccesfull = false;
     mNextContainers.clear();
+    mNextSoundConts.clear();
     clearContainers();
 }
 
@@ -642,6 +650,7 @@ void VideoEncoder::clearContainers() {
     for(const auto &cont : _mContainers)
         cont->setBlocked(false);
     _mContainers.clear();
+    mSoundIterator.clear();
 }
 
 void VideoEncoder::processTask() {
@@ -696,10 +705,13 @@ void VideoEncoder::processTask() {
     }
 }
 
+
 void VideoEncoder::beforeProcessing() {
     _mCurrentContainerId = 0;
-    _mCurrentContainerFrame = 0;
     _mContainers.swap(mNextContainers);
+    for(const auto& sound : mNextSoundConts)
+        mSoundIterator.add(sound);
+    mNextSoundConts.clear();
     _mRenderRange = {mRenderSettings.fMinFrame, mRenderSettings.fMaxFrame};
     if(!mCurrentlyEncoding) clearContainers();
 }
@@ -713,6 +725,10 @@ void VideoEncoder::afterProcessing() {
         } else {
             cont->setBlocked(false);
         }
+    }
+    for(int i = _mContainers.count() - 1; i >= _mCurrentContainerId; i--) {
+        const auto &cont = _mContainers.at(i);
+        mNextContainers.prepend(cont);
     }
     _mContainers.clear();
 
@@ -753,5 +769,10 @@ void VideoEncoder::sStartEncoding(RenderInstanceSettings *settings) {
 
 void VideoEncoder::sAddCacheContainerToEncoder(
         const stdsptr<ImageCacheContainer> &cont) {
+    mVideoEncoderInstance->addContainer(cont);
+}
+
+void VideoEncoder::sAddCacheContainerToEncoder(
+        const stdsptr<Samples> &cont) {
     mVideoEncoderInstance->addContainer(cont);
 }
