@@ -340,34 +340,13 @@ static void openAudio(AVCodec * const codec, OutputStream * const ost) {
     if(parRet < 0) AV_RuntimeThrow(parRet, "Could not copy the stream parameters");
 }
 
-/* Prepare a 16 bit dummy audio frame of 'frame_size' samples and
- * 'nb_channels' channels. */
-static AVFrame *getAudioFrame(OutputStream * const ost) {
-    AVFrame * const frame = ost->fTmpFrame;
-    auto q = reinterpret_cast<float*>(frame->data[0]);
-
-    /* check if we want to generate more frames */
-    if(av_compare_ts(ost->fNextPts, ost->fCodec->time_base, 20, { 1, 1 }) >= 0)
-        return nullptr;
-
-
-    for(int j = 0; j < frame->nb_samples; j++) {
-        const auto v = sin(ost->fT);
-        for(int i = 0; i < 1/*ost->fCodec->channels*/; i++) *q++ = v;
-        ost->fT     += ost->fTincr;
-        ost->fTincr += ost->fTincr2;
-    }
-
-    return frame;
-}
-
 static AVFrame *getAudioFrame(OutputStream * const ost,
                               SoundIterator &iterator) {
     AVFrame * const frame = ost->fTmpFrame;
     auto q = reinterpret_cast<float*>(frame->data[0]);
 
     for(int j = 0; j < frame->nb_samples; j++) {
-        *q++ = iterator.hasValue() ? iterator.value() : 0;
+        *q++ = iterator.value();
         iterator.next();
     }
 
