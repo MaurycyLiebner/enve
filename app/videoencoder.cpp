@@ -646,7 +646,7 @@ void VideoEncoder::clearContainers() {
 
 void VideoEncoder::processTask() {
     bool encodeVideoT = !_mContainers.isEmpty(); // local encode
-    bool encodeAudioT = true; // local encode
+    bool encodeAudioT = mSoundIterator.hasValue(); // local encode
     while((mEncodeVideo && encodeVideoT) || (mEncodeAudio && encodeAudioT)) {
         bool videoAligned = true;
         if(mEncodeAudio) {
@@ -690,6 +690,7 @@ void VideoEncoder::processTask() {
             } catch(...) {
                 RuntimeThrow("Failed to process audio stream");
             }
+            encodeAudioT = mSoundIterator.hasValue();
         }
         if(!encodeVideo && !encodeAudio) break;
     }

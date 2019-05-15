@@ -29,10 +29,11 @@ public:
         /* increment frequency by 110 Hz per second */
         const float fTincr2 = static_cast<float>(tincr / 44100);
         for(int i = 0; i < 10; i++) {
-            const auto samples = SPtrCreate(Samples)(SampleRange{0, 44099});
+            const auto data = new float[44100];
+            const auto samples = SPtrCreate(Samples)(data, SampleRange{0, 44099});
             float * q = samples->fData;
             for(int j = 0; j < 44100; j++) {
-                *q++ = sin(fT);
+                *(q++) = sin(fT);
                 fT += fTincr;
                 fTincr += fTincr2;
             }
@@ -47,35 +48,37 @@ public:
 
     bool next() {
         if(mSamples.isEmpty()) return false;
-        if(mCurrentSampleId >= mLastSampleId) {
+        if(++mCurrentSample == mEndSample) {
             mSamples.removeFirst();
-            if(!updateCurrent()) {
-                mCurrentValue = 0;
-                return false;
-            }
-        } else mCurrentSampleId++;
-        mCurrentValue = mSamples.first()->fData[mCurrentSampleId];
+            if(!updateCurrent()) return false;
+        }
         return true;
     }
 
     float value() const {
-        return mCurrentValue;
+        return *mCurrentSample;
+    }
+
+    void add(const stdsptr<Samples>& sound) {
+        const bool update = !hasValue();
+        mSamples << sound;
+        if(update) updateCurrent();
     }
 private:
     bool updateCurrent() {
-        if(mSamples.isEmpty()) return false;
+        if(mSamples.isEmpty()) {
+            mCurrentSample = &mZero;
+            return false;
+        }
         const auto& currSamples = mSamples.first();
-        mCurrentSampleId = 0;
-        mLastSampleId = currSamples->fSampleRange.span() - 1;
-        mCurrentValue = *currSamples->fData;
-//        mCurrentSample = currSamples->fData;
-//        mLastSample = currSamples->fData + currSamples->fSampleRange.span() - 1;
+        mCurrentSample = currSamples->fData;
+        mEndSample = currSamples->fData + currSamples->fSampleRange.span();
         return true;
     }
 
-    float mCurrentValue = 0;
-    int mCurrentSampleId;
-    int mLastSampleId;
+    float mZero = 0;
+    float * mCurrentSample;
+    float * mEndSample;
     QList<stdsptr<Samples>> mSamples;
 };
 
