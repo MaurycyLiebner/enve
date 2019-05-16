@@ -159,8 +159,8 @@ mypaint_tile_request_init(MyPaintTileRequest *data, int level,
     data->tx = tx;
     data->ty = ty;
     data->readonly = readonly;
-    data->buffer = NULL;
-    data->context = NULL;
+    data->buffer = nullptr;
+    data->context = nullptr;
 #ifdef _OPENMP
     data->thread_id = omp_get_thread_num();
 #else

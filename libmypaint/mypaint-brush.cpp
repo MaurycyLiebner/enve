@@ -160,7 +160,7 @@ brush_free(MyPaintBrush *self)
         mypaint_mapping_free(self->settings[i]);
     }
     rng_double_free (self->rng);
-    self->rng = NULL;
+    self->rng = nullptr;
 
 #ifdef HAVE_JSON_C
     if (self->brush_json) {
@@ -1349,13 +1349,13 @@ static gboolean
 obj_get(json_object *self, const gchar *key, json_object **obj_out) {
 #if JSON_C_MINOR_VERSION >= 10
     return json_object_object_get_ex(self, key, obj_out)
-        && (obj_out ? (*obj_out != NULL) : TRUE);
+        && (obj_out ? (*obj_out != nullptr) : TRUE);
 #else
     json_object *o = json_object_object_get(self, key);
     if (obj_out) {
         *obj_out = o;
     }
-    return (o != NULL);
+    return (o != nullptr);
 #endif
 }
 
@@ -1378,7 +1378,7 @@ update_brush_setting_from_json_object(MyPaintBrush *self,
     }
 
     // Base value
-    json_object *base_value_obj = NULL;
+    json_object *base_value_obj = nullptr;
     if (! obj_get(setting_obj, "base_value", &base_value_obj)) {
         fprintf(stderr, "Warning: No 'base_value' field for setting: %s\n", setting_name);
         return FALSE;
@@ -1387,7 +1387,7 @@ update_brush_setting_from_json_object(MyPaintBrush *self,
     mypaint_brush_set_base_value(self, setting_id, base_value);
 
     // Inputs
-    json_object *inputs = NULL;
+    json_object *inputs = nullptr;
     if (! obj_get(setting_obj, "inputs", &inputs)) {
         fprintf(stderr, "Warning: No 'inputs' field for setting: %s\n", setting_name);
         return FALSE;
@@ -1423,7 +1423,7 @@ static gboolean
 update_brush_from_json_object(MyPaintBrush *self)
 {
     // Check version
-    json_object *version_object = NULL;
+    json_object *version_object = nullptr;
     if (! obj_get(self->brush_json, "version", &version_object)) {
         fprintf(stderr, "Error: No 'version' field for brush\n");
         return FALSE;
@@ -1435,7 +1435,7 @@ update_brush_from_json_object(MyPaintBrush *self)
     }
 
     // Set settings
-    json_object *settings = NULL;
+    json_object *settings = nullptr;
     if (! obj_get(self->brush_json, "settings", &settings)) {
         fprintf(stderr, "Error: No 'settings' field for brush\n");
         return FALSE;
@@ -1459,12 +1459,12 @@ gboolean
 mypaint_brush_from_string(MyPaintBrush *self, const char *string)
 {
 #ifdef HAVE_JSON_C
-    json_object *brush_json = NULL;
+    json_object *brush_json = nullptr;
 
     if (self->brush_json) {
         // Free
         json_object_put(self->brush_json);
-        self->brush_json = NULL;
+        self->brush_json = nullptr;
     }
     if (string) {
         brush_json = json_tokener_parse(string);
@@ -1488,11 +1488,14 @@ void
 mypaint_brush_from_defaults(MyPaintBrush *self) {
     for (int s = 0; s < MYPAINT_BRUSH_SETTINGS_COUNT; s++) {
         for (int i = 0; i < MYPAINT_BRUSH_INPUTS_COUNT; i++) {
-            mypaint_brush_set_mapping_n(self, s, i, 0);
+            mypaint_brush_set_mapping_n(self,
+                                        static_cast<MyPaintBrushSetting>(s),
+                                        static_cast<MyPaintBrushInput>(i), 0);
         }
 
-        const double def = mypaint_brush_setting_info(s)->def;
-        mypaint_brush_set_base_value(self, s, def);
+        const double def = mypaint_brush_setting_info(
+                    static_cast<MyPaintBrushSetting>(s))->def;
+        mypaint_brush_set_base_value(self, static_cast<MyPaintBrushSetting>(s), def);
     }
 
     mypaint_brush_set_mapping_n(self, MYPAINT_BRUSH_SETTING_OPAQUE_MULTIPLY, MYPAINT_BRUSH_INPUT_PRESSURE, 2);

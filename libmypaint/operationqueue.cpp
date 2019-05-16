@@ -42,7 +42,7 @@ operation_delete_func(void *user_data) {
 
 void
 free_fifo(void *item) {
-    Fifo *op_queue = item;
+    Fifo *op_queue = static_cast<Fifo*>(item);
     if (op_queue) {
         fifo_free(op_queue, operation_delete_func);
     }
@@ -56,9 +56,9 @@ operation_queue_resize(OperationQueue *self, int new_size)
             assert(self->dirty_tiles);
 
             tile_map_free(self->tile_map, TRUE);
-            self->tile_map = NULL;
+            self->tile_map = nullptr;
             free(self->dirty_tiles);
-            self->dirty_tiles = NULL;
+            self->dirty_tiles = nullptr;
             self->dirty_tiles_n = 0;
         }
         return TRUE;
@@ -89,9 +89,9 @@ operation_queue_new(void)
 {
     OperationQueue *self = (OperationQueue *)malloc(sizeof(OperationQueue));
 
-    self->tile_map = NULL;
+    self->tile_map = nullptr;
     self->dirty_tiles_n = 0;
-    self->dirty_tiles = NULL;
+    self->dirty_tiles = nullptr;
 
 #ifdef HEAVY_DEBUG
     operation_queue_resize(self, 1);
@@ -183,13 +183,13 @@ operation_queue_add(OperationQueue *self, TileIndex index, OperationDataDrawDab 
     Fifo **queue_pointer = (Fifo **)tile_map_get(self->tile_map, index);
     Fifo *op_queue = *queue_pointer;
 
-    if (op_queue == NULL) {
+    if (op_queue == nullptr) {
         // Lazy initialization
         op_queue = fifo_new();
         *queue_pointer = op_queue;
     }
 
-    if (fifo_peek_first(op_queue) == NULL) {
+    if (fifo_peek_first(op_queue) == nullptr) {
         // Critical section, not thread-safe
        if (!(self->dirty_tiles_n < self->tile_map->size*2*self->tile_map->size*2)) {
            // Prune duplicate tiles that cause us to almost exceed max
@@ -208,24 +208,24 @@ operation_queue_add(OperationQueue *self, TileIndex index, OperationDataDrawDab 
 OperationDataDrawDab *
 operation_queue_pop(OperationQueue *self, TileIndex index)
 {
-    OperationDataDrawDab *op = NULL;
+    OperationDataDrawDab *op = nullptr;
 
     if (!tile_map_contains(self->tile_map, index)) {
-        return NULL;
+        return nullptr;
     }
 
     Fifo **queue_pointer = (Fifo **)tile_map_get(self->tile_map, index);
     Fifo *op_queue = *queue_pointer;
 
     if (!op_queue) {
-        return NULL;
+        return nullptr;
     }
 
     op = (OperationDataDrawDab *)fifo_pop(op_queue);
     if (!op) {
         // Queue empty
         fifo_free(op_queue, operation_delete_func);
-        *queue_pointer = NULL;
+        *queue_pointer = nullptr;
     }
     return op;
 }
@@ -233,19 +233,19 @@ operation_queue_pop(OperationQueue *self, TileIndex index)
 OperationDataDrawDab *
 operation_queue_peek_first(OperationQueue *self, TileIndex index) {
     if (!tile_map_contains(self->tile_map, index)) {
-        return NULL;
+        return nullptr;
     }
 
     Fifo *op_queue = (Fifo *)*tile_map_get(self->tile_map, index);
-    return (!op_queue) ? NULL : (OperationDataDrawDab *)fifo_peek_first(op_queue);
+    return (!op_queue) ? nullptr : (OperationDataDrawDab *)fifo_peek_first(op_queue);
 }
 
 OperationDataDrawDab *
 operation_queue_peek_last(OperationQueue *self, TileIndex index) {
     if (!tile_map_contains(self->tile_map, index)) {
-        return NULL;
+        return nullptr;
     }
 
     Fifo *op_queue = (Fifo *)*tile_map_get(self->tile_map, index);
-    return (!op_queue) ? NULL : (OperationDataDrawDab *)fifo_peek_last(op_queue);
+    return (!op_queue) ? nullptr : (OperationDataDrawDab *)fifo_peek_last(op_queue);
 }

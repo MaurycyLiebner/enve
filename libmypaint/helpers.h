@@ -2,6 +2,8 @@
 #define HELPERS_H
 
 #include <stdint.h>
+#include <exception>
+
 #include "rng-double.h"
 
 #define MAX(a, b)  (((a) > (b)) ? (a) : (b))
@@ -13,6 +15,8 @@
 #define MAX3(a, b, c) ((a)>(b)?MAX((a),(c)):MAX((b),(c)))
 #define MIN3(a, b, c) ((a)<(b)?MIN((a),(c)):MIN((b),(c)))
 #define WGM_EPSILON 0.001
+#define FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#define RuntimeThrow(msg) std::throw_with_nested(std::runtime_error(std::to_string(__LINE__) + "  :  " + FILENAME + "\n" + __func__ + "()\n" + msg))
 
 void
 hsl_to_rgb_double (double *h_, double *s_, double *l_);

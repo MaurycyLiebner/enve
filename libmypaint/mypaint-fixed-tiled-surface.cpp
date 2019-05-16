@@ -37,7 +37,7 @@ tile_request_start(MyPaintTiledSurface *tiled_surface, MyPaintTileRequest *reque
     const int tx = request->tx;
     const int ty = request->ty;
 
-    uint16_t *tile_pointer = NULL;
+    uint16_t *tile_pointer = nullptr;
 
     if (tx >= self->tiles_width || ty >= self->tiles_height || tx < 0 || ty < 0) {
         // Give it a tile which we will ignore writes to
@@ -116,7 +116,7 @@ mypaint_fixed_tiled_surface_new(int width, int height)
     uint16_t * buffer = (uint16_t *)malloc(buffer_size);
     if (!buffer) {
         fprintf(stderr, "CRITICAL: unable to allocate enough memory: %zu bytes", buffer_size);
-        return NULL;
+        return nullptr;
     }
     memset(buffer, 255, buffer_size);
 

@@ -41,8 +41,8 @@ struct fifo
 struct fifo* fifo_new(void)
 {
     struct fifo *ret = (struct fifo *) malloc(sizeof(struct fifo));
-    ret->first = NULL;
-    ret->last = NULL;
+    ret->first = nullptr;
+    ret->last = nullptr;
     ret->item_count = 0;
     return ret;
 }
@@ -56,7 +56,7 @@ void fifo_free(struct fifo* queue, FifoUserFreeFunction user_free)
 {
     struct fifo_item *item;
 
-    while ((item = queue->first) != NULL)
+    while ((item = queue->first) != nullptr)
     {
         queue->first = item->next;
         user_free(item);
@@ -72,7 +72,7 @@ void fifo_free(struct fifo* queue, FifoUserFreeFunction user_free)
 void fifo_push(struct fifo* queue, void* data)
 {
     struct fifo_item *item = (struct fifo_item*) malloc(sizeof(struct fifo_item));
-    item->next = NULL;
+    item->next = nullptr;
     item->payload = data;
     if (!queue->last)
         queue->first = item;
@@ -84,7 +84,7 @@ void fifo_push(struct fifo* queue, void* data)
 /*
  * fifo_pop:
  *
- * Extract item from queue. Returns NULL on empty queue.
+ * Extract item from queue. Returns nullptr on empty queue.
  */
 void* fifo_pop(struct fifo* queue)
 {
@@ -93,11 +93,11 @@ void* fifo_pop(struct fifo* queue)
 
     item = queue->first;
     if (!item)
-        return NULL;
+        return nullptr;
 
     queue->first = item->next;
     if (!queue->first)
-        queue->last = NULL;
+        queue->last = nullptr;
 
     data = item->payload;
     free(item);
@@ -106,9 +106,9 @@ void* fifo_pop(struct fifo* queue)
 }
 
 void* fifo_peek_first(struct fifo *queue) {
-    return (!queue->first) ? NULL : queue->first->payload;
+    return (!queue->first) ? nullptr : queue->first->payload;
 }
 
 void* fifo_peek_last(struct fifo *queue) {
-    return (!queue->last) ? NULL : queue->last->payload;
+    return (!queue->last) ? nullptr : queue->last->payload;
 }

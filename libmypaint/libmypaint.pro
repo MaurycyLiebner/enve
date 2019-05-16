@@ -35,21 +35,21 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-        brushmodes.c \
-        fifo.c \
-        helpers.c \
-        libmypaint.c \
-        mypaint-brush-settings.c \
-        mypaint-brush.c \
-        mypaint-fixed-tiled-surface.c \
-        mypaint-mapping.c \
-        mypaint-rectangle.c \
-        mypaint-surface.c \
-        mypaint-tiled-surface.c \
-        mypaint.c \
-        operationqueue.c \
-        rng-double.c \
-        tilemap.c
+        brushmodes.cpp \
+        fifo.cpp \
+        helpers.cpp \
+        libmypaint.cpp \
+        mypaint-brush-settings.cpp \
+        mypaint-brush.cpp \
+        mypaint-fixed-tiled-surface.cpp \
+        mypaint-mapping.cpp \
+        mypaint-rectangle.cpp \
+        mypaint-surface.cpp \
+        mypaint-tiled-surface.cpp \
+        mypaint.cpp \
+        operationqueue.cpp \
+        rng-double.cpp \
+        tilemap.cpp
 
 HEADERS += \
         brushmodes.h \

@@ -24,15 +24,15 @@
 TileMap *
 tile_map_new(int size, size_t item_size, TileMapItemFreeFunc item_free_func)
 {
-    TileMap *self = (TileMap *)malloc(sizeof(TileMap));
+    TileMap *self = static_cast<TileMap*>(malloc(sizeof(TileMap)));
 
     self->size = size;
     self->item_size = item_size;
     self->item_free_func = item_free_func;
     const int map_size = 2*self->size*2*self->size;
-    self->map = malloc(map_size*self->item_size);
+    self->map = static_cast<void**>(malloc(map_size*self->item_size));
     for(int i = 0; i < map_size; i++) {
-        self->map[i] = NULL;
+        self->map[i] = nullptr;
     }
 
     return self;
