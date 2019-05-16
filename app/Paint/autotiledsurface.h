@@ -17,13 +17,14 @@ struct AutoTiledSurface {
     friend struct BrushStrokeSet;
 
     AutoTiledSurface();
-    AutoTiledSurface(const AutoTiledSurface& other);
+    AutoTiledSurface(const AutoTiledSurface& other) = delete;
+    AutoTiledSurface& operator=(const AutoTiledSurface& other) = delete;
 
     ~AutoTiledSurface();
 
-    AutoTiledSurface& operator=(const AutoTiledSurface& other) {
-        mAutoTilesData = other.getTileData();
-        return *this;
+
+    void deepCopy(const AutoTiledSurface& other) {
+        mAutoTilesData.deepCopy(other.mAutoTilesData);
     }
 
     void loadBitmap(const SkBitmap &src);
@@ -39,7 +40,7 @@ struct AutoTiledSurface {
                                      const double& dTime,
                                      const double& pressure,
                                      const double& xtilt,
-                                     const double& ytilt) {
+                                     const double& ytilt) const {
         mypaint_brush_reset(brush);
         mypaint_brush_new_stroke(brush);
 
@@ -64,7 +65,7 @@ struct AutoTiledSurface {
                                     const double& dTime,
                                     const double& pressure,
                                     const double& xtilt,
-                                    const double& ytilt) {
+                                    const double& ytilt) const {
         mypaint_surface_begin_atomic(fMyPaintSurface);
         mypaint_brush_stroke_to(brush,
                                 fMyPaintSurface,
@@ -102,10 +103,6 @@ struct AutoTiledSurface {
 
     QRect tileBoundingRect() const {
         return mAutoTilesData.tileBoundingRect();
-    }
-
-    const AutoTilesData& getTileData() const {
-        return mAutoTilesData;
     }
 
     bool isEmpty() const { return mAutoTilesData.isEmpty(); }

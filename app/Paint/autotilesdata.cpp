@@ -17,10 +17,6 @@ uint16_t *newZeroedTile(const size_t& size) {
 
 AutoTilesData::AutoTilesData() {}
 
-AutoTilesData::AutoTilesData(const AutoTilesData &other) {
-    copyFrom(other);
-}
-
 void AutoTilesData::loadBitmap(const SkBitmap &src) {
     reset();
     const int nCols = qCeil(static_cast<qreal>(src.width())/TILE_SIZE);
@@ -93,7 +89,7 @@ uint16_t *AutoTilesData::getTileByIndex(const int &colId,
     return mColumns.at(colId).at(rowId);
 }
 
-void AutoTilesData::copyFrom(const AutoTilesData &other) {
+void AutoTilesData::deepCopy(const AutoTilesData &other) {
     const auto tRect = other.tileBoundingRect();
     mZeroTileCol = -tRect.x();
     mZeroTileRow = -tRect.y();

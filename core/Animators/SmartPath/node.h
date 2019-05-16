@@ -175,7 +175,7 @@ public:
     }
 
     void swap(ListOfNodes& other) {
-        mList.swap(other.getList());
+        mList.swap(other.mList);
     }
 
     Node* at(const int& id) const {
@@ -200,7 +200,7 @@ public:
     }
 
     void shallowCopyFrom(const ListOfNodes& other) {
-        mList = other.getList();
+        mList = other.mList;
     }
 
     void deepCopyFrom(const ListOfNodes& other) {
@@ -251,12 +251,14 @@ public:
     }
 
     ListOfNodes detachNodesStartingWith(const int& first) {
-        QList<stdsptr<Node>> detached;
+        ListOfNodes result;
         const int iniCount = mList.count();
-        for(int i = first; i < iniCount; i++) {
-            detached.prepend(mList.takeLast());
+        for(int i = first, j = 0; i < iniCount; i++, j++) {
+            const auto node = mList.takeLast();
+            node->setNodeId(j);
+            result.mList.prepend(node);
         }
-        return ListOfNodes(detached);
+        return result;
     }
 
     void appendNodesShallowCopy(const ListOfNodes& src) {
@@ -291,19 +293,7 @@ public:
     const_iterator end() const {
         return mList.end();
     }
-protected:
-    QList<stdsptr<Node>> &getList() {
-        return mList;
-    }
-
-    const QList<stdsptr<Node>> &getList() const {
-        return mList;
-    }
 private:
-    ListOfNodes(const QList<stdsptr<Node>>& list) : mList(list) {
-        updateNodeIds();
-    }
-
     void updateNodeIds() {
         updateNodeIds(0);
     }
@@ -319,8 +309,7 @@ private:
     }
 
     void updateNodeId(const int& id) {
-        Node * const iNode = mList.at(id).get();
-        iNode->setNodeId(id);
+        mList.at(id)->setNodeId(id);
     }
 
     Node* insertNewNode(const int& id) {

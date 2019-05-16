@@ -14,13 +14,10 @@
 
 struct AutoTilesData {
     AutoTilesData();
-    AutoTilesData(const AutoTilesData& other);
     ~AutoTilesData();
 
-    AutoTilesData& operator=(const AutoTilesData& other) {
-        copyFrom(other);
-        return *this;
-    }
+    AutoTilesData(const AutoTilesData& other) = delete;
+    AutoTilesData& operator=(const AutoTilesData& other) = delete;
 
     void loadBitmap(const SkBitmap& src);
 
@@ -72,6 +69,8 @@ struct AutoTilesData {
 
     bool isEmpty() const { return mColumnCount == 0 || mRowCount == 0; }
 
+    void deepCopy(const AutoTilesData &other);
+
     void write(QIODevice * const dst) const {
         dst->write(rcConstChar(&mZeroTileCol), sizeof(int));
         dst->write(rcConstChar(&mZeroTileRow), sizeof(int));
@@ -93,7 +92,6 @@ struct AutoTilesData {
 protected:
     uint16_t* getTileByIndex(const int& colId, const int& rowId) const;
 private:
-    void copyFrom(const AutoTilesData &other);
     QList<uint16_t*> newColumn();
     void prependRows(const int& count);
     void appendRows(const int& count);

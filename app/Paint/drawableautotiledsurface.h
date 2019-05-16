@@ -42,10 +42,7 @@ class DrawableAutoTiledSurface : public HDDCachablePersistent {
     typedef  QList<QList<sk_sp<SkImage>>> Tiles;
 protected:
     DrawableAutoTiledSurface();
-    DrawableAutoTiledSurface(const DrawableAutoTiledSurface& other) :
-        DrawableAutoTiledSurface() {
-        this->operator=(other);
-    }
+    DrawableAutoTiledSurface(const DrawableAutoTiledSurface& other) = delete;
 
     stdsptr<HDDTask> createTmpFileDataSaver();
 
@@ -62,11 +59,12 @@ protected:
         return bytes;
     }
 public:
-    DrawableAutoTiledSurface& operator=(const DrawableAutoTiledSurface& other) {
-        mSurface = other.surface();
+    void deepCopy(const DrawableAutoTiledSurface& other) {
+        mSurface.deepCopy(other.mSurface);
         mTileImgs.deepCopy(other.mTileImgs);
-        return *this;
     }
+
+    DrawableAutoTiledSurface& operator=(const DrawableAutoTiledSurface& other) = delete;
 
     void drawOnCanvas(SkCanvas * const canvas,
                       const QPoint &dst,
@@ -76,10 +74,6 @@ public:
                       const QPoint &dst,
                       SkPaint * const paint) const {
         drawOnCanvas(canvas, dst, nullptr, paint);
-    }
-
-    AutoTiledSurface &surface() {
-        return mSurface;
     }
 
     const AutoTiledSurface &surface() const {

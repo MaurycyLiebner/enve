@@ -31,11 +31,6 @@ AutoTiledSurface::AutoTiledSurface() {
     fParent.parent.destroy = autoTiledSurfaceFree;
 }
 
-AutoTiledSurface::AutoTiledSurface(const AutoTiledSurface &other) :
-    AutoTiledSurface() {
-    mAutoTilesData = other.getTileData();
-}
-
 AutoTiledSurface::~AutoTiledSurface() {
     _free();
 }
