@@ -49,8 +49,7 @@ SOURCES += \
         mypaint.c \
         operationqueue.c \
         rng-double.c \
-        tilemap.c \
-        utils.c
+        tilemap.c
 
 HEADERS += \
         brushmodes.h \
@@ -84,8 +83,7 @@ HEADERS += \
         operationqueue.h \
         rng-double.h \
         tiled-surface-private.h \
-        tilemap.h \
-        utils.h
+        tilemap.h
 
 unix {
     target.path = /usr/lib
