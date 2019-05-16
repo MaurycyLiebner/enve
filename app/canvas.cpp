@@ -27,6 +27,8 @@
 #include "Boxes/internallinkcanvas.h"
 #include "pointtypemenu.h"
 #include "Animators/transformanimator.h"
+#include <chrono>
+#include "fastapprox/fastexp.h"
 
 Canvas::Canvas(CanvasWindow *canvasWidget,
                const int &canvasWidth, const int &canvasHeight,
