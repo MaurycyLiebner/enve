@@ -540,7 +540,6 @@ private:
     bool isAltPressed();
     bool isAltPressed(QKeyEvent *event);
 
-    void setPaintBox(PaintBox * const box);
 protected:
     stdsptr<UndoRedoStack> mUndoRedoStack;
 
@@ -548,6 +547,9 @@ protected:
                     const qreal& xTilt, const qreal& yTilt);
     void paintMove(const ulong ts, const qreal& pressure,
                    const qreal& xTilt, const qreal& yTilt);
+    void updatePaintBox();
+    void setPaintBox(PaintBox * const box);
+    void setPaintDrawable(DrawableAutoTiledSurface * const surf);
 
     ulong mLastTs;
     PaintBox * mPaintDrawableBox = nullptr;

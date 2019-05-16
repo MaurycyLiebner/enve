@@ -381,14 +381,14 @@ void Canvas::addBoxToSelection(BoundingBox *box) {
             this, &Canvas::scheduleDisplayedFillStrokeSettingsUpdate);
     box->select();
     mSelectedBoxes.append(box); schedulePivotUpdate();
-    if(mCurrentMode == PAINT_MODE) {
-        if(!mPaintDrawableBox) {
-            setPaintBox(GetAsPtr(box, PaintBox));
-        }
-    }
+
     sortSelectedBoxesByZAscending();
     //setCurrentFillStrokeSettingsFromBox(box);
     mMainWindow->setCurrentBox(box);
+
+    if(mCurrentMode == PAINT_MODE) {
+        if(box->SWT_isPaintBox()) setPaintBox(GetAsPtr(box, PaintBox));
+    }
 }
 
 void Canvas::removeBoxFromSelection(BoundingBox *box) {
@@ -399,11 +399,7 @@ void Canvas::removeBoxFromSelection(BoundingBox *box) {
     box->deselect();
     mSelectedBoxes.removeOne(box); schedulePivotUpdate();
     if(mCurrentMode == PAINT_MODE) {
-        if(mSelectedBoxes.isEmpty()) {
-            setPaintBox(nullptr);
-        } else {
-            setPaintBox(GetAsPtr(mSelectedBoxes.last(), PaintBox));
-        }
+        updatePaintBox();
     }
     if(mSelectedBoxes.isEmpty()) {
         mMainWindow->setCurrentBox(nullptr);

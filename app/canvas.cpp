@@ -590,12 +590,11 @@ void Canvas::setCanvasMode(const CanvasMode &mode) {
     clearCurrentSmartEndPoint();
     clearLastPressedPoint();
     updatePivot();
-    if(mCurrentMode == PAINT_MODE) {
-        if(mSelectedBoxes.isEmpty()) return;
-        setPaintBox(GetAsPtr(mSelectedBoxes.last(), PaintBox));
-    } else if(mPaintDrawableBox) {
-        setPaintBox(nullptr);
-    }
+    updatePaintBox();
+}
+
+void Canvas::setPaintDrawable(DrawableAutoTiledSurface * const surf) {
+    mPaintDrawable = surf;
 }
 
 void Canvas::setPaintBox(PaintBox * const box) {
@@ -603,15 +602,24 @@ void Canvas::setPaintBox(PaintBox * const box) {
         mPaintDrawableBox = GetAsPtr(mSelectedBoxes.last(), PaintBox);
         mPaintAnimSurface = mPaintDrawableBox->getSurface();
         connect(mPaintAnimSurface, &AnimatedSurface::currentSurfaceChanged,
-                [this](DrawableAutoTiledSurface * surf) {
-            mPaintDrawable = surf;
-        });
+                this, &Canvas::setPaintDrawable);
         mPaintDrawable = mPaintAnimSurface->getCurrentSurface();
     } else if(mPaintDrawableBox) {
         mPaintDrawableBox = nullptr;
-        disconnect(mPaintAnimSurface, nullptr, nullptr, nullptr);
+        disconnect(mPaintAnimSurface, nullptr, this, nullptr);
         mPaintAnimSurface = nullptr;
         mPaintDrawable = nullptr;
+    }
+}
+
+void Canvas::updatePaintBox() {
+    setPaintBox(nullptr);
+    if(mCurrentMode != PAINT_MODE) return;
+    for(int i = mSelectedBoxes.count() - 1; i >= 0; i--) {
+        const auto& iBox = mSelectedBoxes.at(i);
+        if(!iBox->SWT_isPaintBox()) continue;
+        setPaintBox(GetAsPtr(mSelectedBoxes.last(), PaintBox));
+        break;
     }
 }
 

@@ -69,9 +69,7 @@ private:
                                 static_cast<float>(pressure),
                                 static_cast<float>(xTilt),
                                 static_cast<float>(yTilt),
-                                time*lenFrag,
-                                static_cast<float>(1),
-                                static_cast<float>(0));
+                                time*lenFrag, 1, 0, 0);
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(surface, &roi);
         return QRect(roi.x, roi.y, roi.width, roi.height);
@@ -96,9 +94,7 @@ private:
                                 static_cast<float>(pressure),
                                 static_cast<float>(xTilt),
                                 static_cast<float>(yTilt),
-                                0.1,
-                                static_cast<float>(1),
-                                static_cast<float>(0));
+                                0.1, 1, 0, 0);
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(surface, &roi);
         return QRect(roi.x, roi.y, roi.width, roi.height);

@@ -56,9 +56,7 @@ struct AutoTiledSurface {
                                 static_cast<float>(pressure),
                                 static_cast<float>(xtilt),
                                 static_cast<float>(ytilt),
-                                dTime,
-                                static_cast<float>(1),
-                                static_cast<float>(0));
+                                dTime, 1, 0, 0);
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(fMyPaintSurface, &roi);
         return roi;
@@ -78,9 +76,7 @@ struct AutoTiledSurface {
                                 static_cast<float>(pressure),
                                 static_cast<float>(xtilt),
                                 static_cast<float>(ytilt),
-                                dTime,
-                                static_cast<float>(1),
-                                static_cast<float>(0));
+                                dTime, 1, 0, 0);
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(fMyPaintSurface, &roi);
         return roi;
