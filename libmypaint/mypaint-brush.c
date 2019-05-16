@@ -34,10 +34,10 @@
 #endif // HAVE_JSON_C
 
 #ifdef _MSC_VER
-#if _MSC_VER < 1700     // Visual Studio 2012 and later has isfinite and roundf
+#if _MSC_VER < 1700     // Visual Studio 2012 and later has isfinite and round
   #include <double.h>
   static inline int    isfinite(double x) { return _finite(x); }
-  static inline double  roundf  (double  x) { return x >= 0.0 ? floorf(x + 0.5) : ceilf(x - 0.5); }
+  static inline double  round  (double  x) { return x >= 0.0 ? floorf(x + 0.5) : ceilf(x - 0.5); }
 #endif
 #endif
 
@@ -474,8 +474,8 @@ mypaint_brush_set_state(MyPaintBrush *self, MyPaintBrushState i, double value)
     gridmap_scale = exp(self->settings_value[MYPAINT_BRUSH_SETTING_GRIDMAP_SCALE]);
     gridmap_scale_x = self->settings_value[MYPAINT_BRUSH_SETTING_GRIDMAP_SCALE_X];
     gridmap_scale_y = self->settings_value[MYPAINT_BRUSH_SETTING_GRIDMAP_SCALE_Y];
-    self->states[MYPAINT_BRUSH_STATE_GRIDMAP_X] = mod_arith(fabsf(self->states[MYPAINT_BRUSH_STATE_ACTUAL_X] * gridmap_scale_x), (gridmap_scale * 256.0)) / (gridmap_scale * 256.0) * 256.0;
-    self->states[MYPAINT_BRUSH_STATE_GRIDMAP_Y] = mod_arith(fabsf(self->states[MYPAINT_BRUSH_STATE_ACTUAL_Y] * gridmap_scale_y), (gridmap_scale * 256.0)) / (gridmap_scale * 256.0) * 256.0;
+    self->states[MYPAINT_BRUSH_STATE_GRIDMAP_X] = mod_arith(fabs(self->states[MYPAINT_BRUSH_STATE_ACTUAL_X] * gridmap_scale_x), (gridmap_scale * 256.0)) / (gridmap_scale * 256.0) * 256.0;
+    self->states[MYPAINT_BRUSH_STATE_GRIDMAP_Y] = mod_arith(fabs(self->states[MYPAINT_BRUSH_STATE_ACTUAL_Y] * gridmap_scale_y), (gridmap_scale * 256.0)) / (gridmap_scale * 256.0) * 256.0;
     
     if (self->states[MYPAINT_BRUSH_STATE_ACTUAL_X] < 0.0) {
       self->states[MYPAINT_BRUSH_STATE_GRIDMAP_X] = 256.0 - self->states[MYPAINT_BRUSH_STATE_GRIDMAP_X];
@@ -892,7 +892,7 @@ mypaint_brush_set_state(MyPaintBrush *self, MyPaintBrushState i, double value)
       //hsv_to_rgb_double (&color_h, &color_s, &color_v);
 
       //determine which smudge bucket to use when mixing with brush color
-      int bucket = CLAMP(roundf(self->settings_value[MYPAINT_BRUSH_SETTING_SMUDGE_BUCKET]), 0, 255);
+      int bucket = CLAMP(round(self->settings_value[MYPAINT_BRUSH_SETTING_SMUDGE_BUCKET]), 0, 255);
             
       if (fac > 1.0) fac = 1.0;
         // If the smudge color somewhat transparent, then the resulting
@@ -957,7 +957,7 @@ mypaint_brush_set_state(MyPaintBrush *self, MyPaintBrushState i, double value)
       //hsv_to_rgb_double (&color_h, &color_s, &color_v);
       rgb_to_hsl_double (&color_h, &color_s, &color_v);
       color_v += self->settings_value[MYPAINT_BRUSH_SETTING_CHANGE_COLOR_L];
-      color_s += color_s * MIN(fabsf(1.0 - color_v), fabsf(color_v)) * 2.0
+      color_s += color_s * MIN(fabs(1.0 - color_v), fabs(color_v)) * 2.0
         * self->settings_value[MYPAINT_BRUSH_SETTING_CHANGE_COLOR_HSL_S];
       hsl_to_rgb_double (&color_h, &color_s, &color_v);
       //rgb_to_hsv_double (&color_h, &color_s, &color_v);
@@ -997,7 +997,7 @@ mypaint_brush_set_state(MyPaintBrush *self, MyPaintBrushState i, double value)
       x = x + (snapped_x - x) * snapToPixel;
       y = y + (snapped_y - y) * snapToPixel;
 
-      double snapped_radius = roundf(radius * 2.0) / 2.0;
+      double snapped_radius = round(radius * 2.0) / 2.0;
       if (snapped_radius < 0.5)
         snapped_radius = 0.5;
 
@@ -1062,7 +1062,7 @@ mypaint_brush_set_state(MyPaintBrush *self, MyPaintBrushState i, double value)
     //on first load if isnan the engine messes up and won't paint
     //until you switch modes
     double res4 = res1 + res2 + res3;
-    if (isnan(res4) || res4 < 0.0) { res4 = 0.0; }
+    if (__isnan(res4) || res4 < 0.0) { res4 = 0.0; }
     return res4;
   }
 
