@@ -27,6 +27,10 @@ struct AutoTiledSurface {
         mAutoTilesData.deepCopy(other.mAutoTilesData);
     }
 
+    void swap(AutoTiledSurface& other) {
+        mAutoTilesData.swap(other.mAutoTilesData);
+    }
+
     void loadBitmap(const SkBitmap &src);
 
     void _free() {

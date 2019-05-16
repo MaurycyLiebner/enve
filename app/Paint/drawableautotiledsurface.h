@@ -43,6 +43,7 @@ class DrawableAutoTiledSurface : public HDDCachablePersistent {
 protected:
     DrawableAutoTiledSurface();
     DrawableAutoTiledSurface(const DrawableAutoTiledSurface& other) = delete;
+    DrawableAutoTiledSurface& operator=(const DrawableAutoTiledSurface& other) = delete;
 
     stdsptr<HDDTask> createTmpFileDataSaver();
 
@@ -63,8 +64,6 @@ public:
         mSurface.deepCopy(other.mSurface);
         mTileImgs.deepCopy(other.mTileImgs);
     }
-
-    DrawableAutoTiledSurface& operator=(const DrawableAutoTiledSurface& other) = delete;
 
     void drawOnCanvas(SkCanvas * const canvas,
                       const QPoint &dst,

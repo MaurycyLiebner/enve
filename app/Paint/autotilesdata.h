@@ -70,6 +70,13 @@ struct AutoTilesData {
     bool isEmpty() const { return mColumnCount == 0 || mRowCount == 0; }
 
     void deepCopy(const AutoTilesData &other);
+    void swap(AutoTilesData& other) {
+        mColumns.swap(other.mColumns);
+        std::swap(mZeroTileCol, other.mZeroTileCol);
+        std::swap(mZeroTileRow, other.mZeroTileRow);
+        std::swap(mColumnCount, other.mColumnCount);
+        std::swap(mRowCount, other.mRowCount);
+    }
 
     void write(QIODevice * const dst) const {
         dst->write(rcConstChar(&mZeroTileCol), sizeof(int));
