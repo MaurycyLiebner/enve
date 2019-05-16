@@ -15,34 +15,34 @@
 #define WGM_EPSILON 0.001
 
 void
-hsl_to_rgb_float (float *h_, float *s_, float *l_);
+hsl_to_rgb_double (double *h_, double *s_, double *l_);
 void
-rgb_to_hsl_float (float *r_, float *g_, float *b_);
-
-void
-hsv_to_rgb_float (float *h_, float *s_, float *v_);
+rgb_to_hsl_double (double *r_, double *g_, double *b_);
 
 void
-rgb_to_hsv_float (float *r_ /*h*/, float *g_ /*s*/, float *b_ /*v*/);
+hsv_to_rgb_double (double *h_, double *s_, double *v_);
 
 void
-hcy_to_rgb_float (float *h_, float *c_, float *y_);
+rgb_to_hsv_double (double *r_ /*h*/, double *g_ /*s*/, double *b_ /*v*/);
 
 void
-rgb_to_hcy_float (float *r_, float *g_, float *b_);
-
-float rand_gauss (RngDouble * rng);
-
-float mod_arith(float a, float N);
-
-float smallest_angular_difference(float angleA, float angleB);
-
-float * mix_colors(float *a, float *b, float fac, float paint_mode);
+hcy_to_rgb_double (double *h_, double *c_, double *y_);
 
 void
-rgb_to_spectral (float r, float g, float b, float *spectral_);
+rgb_to_hcy_double (double *r_, double *g_, double *b_);
+
+double rand_gauss (RngDouble * rng);
+
+double mod_arith(double a, double N);
+
+double smallest_angular_difference(double angleA, double angleB);
+
+double * mix_colors(double *a, double *b, double fac, double paint_mode);
 
 void
-spectral_to_rgb (float *spectral, float *rgb_);
+rgb_to_spectral (double r, double g, double b, double *spectral_);
+
+void
+spectral_to_rgb (double *spectral, double *rgb_);
 
 #endif // HELPERS_H

@@ -41,13 +41,13 @@ void
 mypaint_brush_new_stroke(MyPaintBrush *self);
 
 int
-mypaint_brush_stroke_to(MyPaintBrush *self, MyPaintSurface *surface, float x, float y,
-                        float pressure, float xtilt, float ytilt, double dtime, float viewzoom, float viewrotation, float barrel_rotation);
+mypaint_brush_stroke_to(MyPaintBrush *self, MyPaintSurface *surface, double x, double y,
+                        double pressure, double xtilt, double ytilt, double dtime, double viewzoom, double viewrotation, double barrel_rotation);
 
 void
-mypaint_brush_set_base_value(MyPaintBrush *self, MyPaintBrushSetting id, float value);
+mypaint_brush_set_base_value(MyPaintBrush *self, MyPaintBrushSetting id, double value);
 
-float
+double
 mypaint_brush_get_base_value(MyPaintBrush *self, MyPaintBrushSetting id);
 
 gboolean
@@ -63,16 +63,16 @@ int
 mypaint_brush_get_mapping_n(MyPaintBrush *self, MyPaintBrushSetting id, MyPaintBrushInput input);
 
 void
-mypaint_brush_set_mapping_point(MyPaintBrush *self, MyPaintBrushSetting id, MyPaintBrushInput input, int index, float x, float y);
+mypaint_brush_set_mapping_point(MyPaintBrush *self, MyPaintBrushSetting id, MyPaintBrushInput input, int index, double x, double y);
 
 void
-mypaint_brush_get_mapping_point(MyPaintBrush *self, MyPaintBrushSetting id, MyPaintBrushInput input, int index, float *x, float *y);
+mypaint_brush_get_mapping_point(MyPaintBrush *self, MyPaintBrushSetting id, MyPaintBrushInput input, int index, double *x, double *y);
 
-float
+double
 mypaint_brush_get_state(MyPaintBrush *self, MyPaintBrushState i);
 
 void
-mypaint_brush_set_state(MyPaintBrush *self, MyPaintBrushState i, float value);
+mypaint_brush_set_state(MyPaintBrush *self, MyPaintBrushState i, double value);
 
 double
 mypaint_brush_get_total_stroke_painting_time(MyPaintBrush *self);

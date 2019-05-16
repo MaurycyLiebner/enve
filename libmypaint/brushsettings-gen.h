@@ -69,7 +69,7 @@ static MyPaintBrushSettingInfo settings_info_array[] = {
 };
 
 static MyPaintBrushInputInfo inputs_info_array[] = {
-    {"pressure", 0.0, 0.0, 0.4, 1.0, FLT_MAX, N_("Pressure"), N_("The pressure reported by the tablet. Usually between 0.0 and 1.0, but it may get larger when a pressure gain is used. If you use the mouse, it will be 0.5 when a button is pressed and 0.0 otherwise.")}, 
+    {"pressure", 0.0, 0.0, 0.4, 1.0, DBL_MAX, N_("Pressure"), N_("The pressure reported by the tablet. Usually between 0.0 and 1.0, but it may get larger when a pressure gain is used. If you use the mouse, it will be 0.5 when a button is pressed and 0.0 otherwise.")},
     {"random", 0.0, 0.0, 0.5, 1.0, 1.0, N_("Random"), N_("Fast random noise, changing at each evaluation. Evenly distributed between 0 and 1.")}, 
     {"stroke", 0.0, 0.0, 0.5, 1.0, 1.0, N_("Stroke"), N_("This input slowly goes from zero to one while you draw a stroke. It can also be configured to jump back to zero periodically while you move. Look at the 'stroke duration' and 'stroke hold time' settings.")}, 
     {"direction", 0.0, 0.0, 0.0, 180.0, 180.0, N_("Direction"), N_("The angle of the stroke, in degrees. The value will stay between 0.0 and 180.0, effectively ignoring turns of 180 degrees.")}, 

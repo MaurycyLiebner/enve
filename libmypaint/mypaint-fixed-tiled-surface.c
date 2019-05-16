@@ -104,8 +104,8 @@ mypaint_fixed_tiled_surface_new(int width, int height)
     // MyPaintSurface vfuncs
     self->parent.parent.destroy = free_simple_tiledsurf;
 
-    const int tiles_width = ceil((float)width / tile_size_pixels);
-    const int tiles_height = ceil((float)height / tile_size_pixels);
+    const int tiles_width = ceil((double)width / tile_size_pixels);
+    const int tiles_height = ceil((double)height / tile_size_pixels);
     const size_t tile_size = tile_size_pixels * tile_size_pixels * 4 * sizeof(uint16_t);
     const size_t buffer_size = tiles_width * tiles_height * tile_size;
 

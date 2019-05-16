@@ -5,23 +5,23 @@
 #include "tilemap.h"
 
 typedef struct {
-    float x;
-    float y;
-    float radius;
+    double x;
+    double y;
+    double radius;
     uint16_t color_r;
     uint16_t color_g;
     uint16_t color_b;
-    float color_a;
-    float opaque;
-    float hardness;
-    float aspect_ratio;
-    float angle;
-    float normal;
-    float lock_alpha;
-    float colorize;
-    float posterize;
-    float posterize_num;
-    float paint;
+    double color_a;
+    double opaque;
+    double hardness;
+    double aspect_ratio;
+    double angle;
+    double normal;
+    double lock_alpha;
+    double colorize;
+    double posterize;
+    double posterize_num;
+    double paint;
 } OperationDataDrawDab;
 
 typedef struct OperationQueue OperationQueue;

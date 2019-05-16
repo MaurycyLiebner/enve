@@ -27,9 +27,9 @@ typedef struct {
     const gchar *cname;
     const gchar *name; // FIXME: needs to be accessed through gettext
     gboolean constant;
-    float min;
-    float def; // default
-    float max;
+    double min;
+    double def; // default
+    double max;
     const gchar *tooltip; // FIXME: needs to be accessed through gettext
 } MyPaintBrushSettingInfo;
 
@@ -45,11 +45,11 @@ mypaint_brush_setting_from_cname(const char *cname);
 
 typedef struct {
     const gchar *cname;
-    float hard_min;
-    float soft_min;
-    float normal;
-    float soft_max;
-    float hard_max;
+    double hard_min;
+    double soft_min;
+    double normal;
+    double soft_max;
+    double hard_max;
     const gchar *name; // FIXME: needs to be accessed through gettext
     const gchar *tooltip; // FIXME: needs to be accessed through gettext
 } MyPaintBrushInputInfo;

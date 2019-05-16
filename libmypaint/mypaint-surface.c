@@ -25,17 +25,17 @@
 
 int
 mypaint_surface_draw_dab(MyPaintSurface *self,
-                       float x, float y,
-                       float radius,
-                       float color_r, float color_g, float color_b,
-                       float opaque, float hardness,
-                       float alpha_eraser,
-                       float aspect_ratio, float angle,
-                       float lock_alpha,
-                       float colorize,
-                       float posterize,
-                       float posterize_num,
-                       float paint
+                       double x, double y,
+                       double radius,
+                       double color_r, double color_g, double color_b,
+                       double opaque, double hardness,
+                       double alpha_eraser,
+                       double aspect_ratio, double angle,
+                       double lock_alpha,
+                       double colorize,
+                       double posterize,
+                       double posterize_num,
+                       double paint
                        )
 {
     assert(self->draw_dab);
@@ -47,10 +47,10 @@ mypaint_surface_draw_dab(MyPaintSurface *self,
 
 void
 mypaint_surface_get_color(MyPaintSurface *self,
-                        float x, float y,
-                        float radius,
-                        float * color_r, float * color_g, float * color_b, float * color_a,
-                        float paint
+                        double x, double y,
+                        double radius,
+                        double * color_r, double * color_g, double * color_b, double * color_a,
+                        double paint
                         )
 {
     assert(self->get_color);
@@ -96,9 +96,9 @@ mypaint_surface_unref(MyPaintSurface *self)
     }
 }
 
-float mypaint_surface_get_alpha (MyPaintSurface *self, float x, float y, float radius)
+double mypaint_surface_get_alpha (MyPaintSurface *self, double x, double y, double radius)
 {
-    float color_r, color_g, color_b, color_a;
+    double color_r, color_g, color_b, color_a;
     mypaint_surface_get_color (self, x, y, radius, &color_r, &color_g, &color_b, &color_a, 1.0);
     return color_a;
 }

@@ -59,12 +59,12 @@ void draw_dab_pixels_BlendMode_LockAlpha_Paint (uint16_t * mask,
 
 void get_color_pixels_accumulate (uint16_t * mask,
                                   uint16_t * rgba,
-                                  float * sum_weight,
-                                  float * sum_r,
-                                  float * sum_g,
-                                  float * sum_b,
-                                  float * sum_a,
-                                  float paint
+                                  double * sum_weight,
+                                  double * sum_r,
+                                  double * sum_g,
+                                  double * sum_b,
+                                  double * sum_a,
+                                  double paint
                                   );
 
 

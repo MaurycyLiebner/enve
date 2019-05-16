@@ -26,24 +26,24 @@ G_BEGIN_DECLS
 typedef struct MyPaintSurface MyPaintSurface;
 
 typedef void (*MyPaintSurfaceGetColorFunction) (MyPaintSurface *self,
-                                                float x, float y,
-                                                float radius,
-                                                float * color_r, float * color_g, float * color_b, float * color_a,
-                                                float paint
+                                                double x, double y,
+                                                double radius,
+                                                double * color_r, double * color_g, double * color_b, double * color_a,
+                                                double paint
                                                 );
 
 typedef int (*MyPaintSurfaceDrawDabFunction) (MyPaintSurface *self,
-                       float x, float y,
-                       float radius,
-                       float color_r, float color_g, float color_b,
-                       float opaque, float hardness,
-                       float alpha_eraser,
-                       float aspect_ratio, float angle,
-                       float lock_alpha,
-                       float colorize,
-                       float posterize,
-                       float posterize_num,
-                       float paint);
+                       double x, double y,
+                       double radius,
+                       double color_r, double color_g, double color_b,
+                       double opaque, double hardness,
+                       double alpha_eraser,
+                       double aspect_ratio, double angle,
+                       double lock_alpha,
+                       double colorize,
+                       double posterize,
+                       double posterize_num,
+                       double paint);
 
 typedef void (*MyPaintSurfaceDestroyFunction) (MyPaintSurface *self);
 
@@ -76,31 +76,31 @@ struct MyPaintSurface {
   */
 int
 mypaint_surface_draw_dab(MyPaintSurface *self,
-                       float x, float y,
-                       float radius,
-                       float color_r, float color_g, float color_b,
-                       float opaque, float hardness,
-                       float alpha_eraser,
-                       float aspect_ratio, float angle,
-                       float lock_alpha,
-                       float colorize,
-                       float posterize,
-                       float posterize_num,
-                       float paint
+                       double x, double y,
+                       double radius,
+                       double color_r, double color_g, double color_b,
+                       double opaque, double hardness,
+                       double alpha_eraser,
+                       double aspect_ratio, double angle,
+                       double lock_alpha,
+                       double colorize,
+                       double posterize,
+                       double posterize_num,
+                       double paint
                        );
 
 
 void
 mypaint_surface_get_color(MyPaintSurface *self,
-                        float x, float y,
-                        float radius,
-                        float * color_r, float * color_g, float * color_b, float * color_a,
-                        float paint
+                        double x, double y,
+                        double radius,
+                        double * color_r, double * color_g, double * color_b, double * color_a,
+                        double paint
                         );
                         
 
-float
-mypaint_surface_get_alpha (MyPaintSurface *self, float x, float y, float radius);
+double
+mypaint_surface_get_alpha (MyPaintSurface *self, double x, double y, double radius);
 
 void
 mypaint_surface_save_png(MyPaintSurface *self, const char *path, int x, int y, int width, int height);

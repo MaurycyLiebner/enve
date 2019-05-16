@@ -135,7 +135,7 @@ void mypaint_tiled_surface_tile_request_end(MyPaintTiledSurface *self, MyPaintTi
  */
 void
 mypaint_tiled_surface_set_symmetry_state(MyPaintTiledSurface *self, gboolean active,
-                                         float center_x, float center_y,
+                                         double center_x, double center_y,
                                          MyPaintSymmetryType symmetry_type,
                                          int rot_symmetry_lines)
 {
@@ -170,42 +170,42 @@ mypaint_tile_request_init(MyPaintTileRequest *data, int level,
 }
 
 // Must be threadsafe
-static inline float
-calculate_r_sample(float x, float y, float aspect_ratio,
-                      float sn, float cs)
+static inline double
+calculate_r_sample(double x, double y, double aspect_ratio,
+                      double sn, double cs)
 {
-    const float yyr=(y*cs-x*sn)*aspect_ratio;
-    const float xxr=y*sn+x*cs;
-    const float r = (yyr*yyr + xxr*xxr);
+    const double yyr=(y*cs-x*sn)*aspect_ratio;
+    const double xxr=y*sn+x*cs;
+    const double r = (yyr*yyr + xxr*xxr);
     return r;
 }
 
-static inline float
-calculate_rr(int xp, int yp, float x, float y, float aspect_ratio,
-                      float sn, float cs, float one_over_radius2)
+static inline double
+calculate_rr(int xp, int yp, double x, double y, double aspect_ratio,
+                      double sn, double cs, double one_over_radius2)
 {
     // code duplication, see brush::count_dabs_to()
-    const float yy = (yp + 0.5f - y);
-    const float xx = (xp + 0.5f - x);
-    const float yyr=(yy*cs-xx*sn)*aspect_ratio;
-    const float xxr=yy*sn+xx*cs;
-    const float rr = (yyr*yyr + xxr*xxr) * one_over_radius2;
+    const double yy = (yp + 0.5 - y);
+    const double xx = (xp + 0.5 - x);
+    const double yyr=(yy*cs-xx*sn)*aspect_ratio;
+    const double xxr=yy*sn+xx*cs;
+    const double rr = (yyr*yyr + xxr*xxr) * one_over_radius2;
     // rr is in range 0.0..1.0*sqrt(2)
     return rr;
 }
 
-static inline float
-sign_point_in_line( float px, float py, float vx, float vy )
+static inline double
+sign_point_in_line( double px, double py, double vx, double vy )
 {
     return (px - vx) * (-vy) - (vx) * (py - vy);
 }
 
 static inline void
-closest_point_to_line( float lx, float ly, float px, float py, float *ox, float *oy )
+closest_point_to_line( double lx, double ly, double px, double py, double *ox, double *oy )
 {
-    const float l2 = lx*lx + ly*ly;
-    const float ltp_dot = px*lx + py*ly;
-    const float t = ltp_dot / l2;
+    const double l2 = lx*lx + ly*ly;
+    const double ltp_dot = px*lx + py*ly;
+    const double t = ltp_dot / l2;
     *ox = lx * t;
     *oy = ly * t;
 }
@@ -220,23 +220,23 @@ closest_point_to_line( float lx, float ly, float px, float py, float *ox, float 
 //                   the nearest point
 // - delta: how much occluded is the farthest point relative
 //          to the nearest point
-static inline float
-calculate_rr_antialiased(int xp, int yp, float x, float y, float aspect_ratio,
-                      float sn, float cs, float one_over_radius2,
-                      float r_aa_start)
+static inline double
+calculate_rr_antialiased(int xp, int yp, double x, double y, double aspect_ratio,
+                      double sn, double cs, double one_over_radius2,
+                      double r_aa_start)
 {
     // calculate pixel position and borders in a way
     // that the dab's center is always at zero
-    float pixel_right = x - (float)xp;
-    float pixel_bottom = y - (float)yp;
-    float pixel_center_x = pixel_right - 0.5f;
-    float pixel_center_y = pixel_bottom - 0.5f;
-    float pixel_left = pixel_right - 1.0f;
-    float pixel_top = pixel_bottom - 1.0f;
+    double pixel_right = x - (double)xp;
+    double pixel_bottom = y - (double)yp;
+    double pixel_center_x = pixel_right - 0.5;
+    double pixel_center_y = pixel_bottom - 0.5;
+    double pixel_left = pixel_right - 1.0;
+    double pixel_top = pixel_bottom - 1.0;
 
-    float nearest_x, nearest_y; // nearest to origin, but still inside pixel
-    float farthest_x, farthest_y; // farthest from origin, but still inside pixel
-    float r_near, r_far, rr_near, rr_far;
+    double nearest_x, nearest_y; // nearest to origin, but still inside pixel
+    double farthest_x, farthest_y; // farthest from origin, but still inside pixel
+    double r_near, r_far, rr_near, rr_far;
     // Dab's center is inside pixel?
     if( pixel_left<0 && pixel_right>0 &&
         pixel_top<0 && pixel_bottom>0 )
@@ -259,16 +259,16 @@ calculate_rr_antialiased(int xp, int yp, float x, float y, float aspect_ratio,
     }
 
     // out of dab's reach?
-    if( rr_near > 1.0f )
+    if( rr_near > 1.0 )
         return rr_near;
 
     // check on which side of the dab's line is the pixel center
-    float center_sign = sign_point_in_line( pixel_center_x, pixel_center_y, cs, -sn );
+    double center_sign = sign_point_in_line( pixel_center_x, pixel_center_y, cs, -sn );
 
     // radius of a circle with area=1
     //   A = pi * r * r
     //   r = sqrt(1/pi)
-    const float rad_area_1 = sqrtf( 1.0f / M_PI );
+    const double rad_area_1 = sqrtf( 1.0 / M_PI );
 
     // center is below dab
     if( center_sign < 0 )
@@ -288,42 +288,42 @@ calculate_rr_antialiased(int xp, int yp, float x, float y, float aspect_ratio,
 
     // check if we can skip heavier AA
     if( r_far < r_aa_start )
-        return (rr_far+rr_near) * 0.5f;
+        return (rr_far+rr_near) * 0.5;
 
     // calculate AA approximate
-    float visibilityNear = 1.0f - rr_near;
-    float delta = rr_far - rr_near;
-    float delta2 = 1.0f + delta;
+    double visibilityNear = 1.0 - rr_near;
+    double delta = rr_far - rr_near;
+    double delta2 = 1.0 + delta;
     visibilityNear /= delta2;
 
-    return 1.0f - visibilityNear;
+    return 1.0 - visibilityNear;
 }
 
-static inline float
-calculate_opa(float rr, float hardness,
-              float segment1_offset, float segment1_slope,
-              float segment2_offset, float segment2_slope) {
+static inline double
+calculate_opa(double rr, double hardness,
+              double segment1_offset, double segment1_slope,
+              double segment2_offset, double segment2_slope) {
 
-    const float fac = rr <= hardness ? segment1_slope : segment2_slope;
-    float opa = rr <= hardness ? segment1_offset : segment2_offset;
+    const double fac = rr <= hardness ? segment1_slope : segment2_slope;
+    double opa = rr <= hardness ? segment1_offset : segment2_offset;
     opa += rr*fac;
 
-    if (rr > 1.0f) {
-        opa = 0.0f;
+    if (rr > 1.0) {
+        opa = 0.0;
     }
     #ifdef HEAVY_DEBUG
     assert(isfinite(opa));
-    assert(opa >= 0.0f && opa <= 1.0f);
+    assert(opa >= 0.0 && opa <= 1.0);
     #endif
     return opa;
 }
 
 // Must be threadsafe
 void render_dab_mask (uint16_t * mask,
-                        float x, float y,
-                        float radius,
-                        float hardness,
-                        float aspect_ratio, float angle
+                        double x, double y,
+                        double radius,
+                        double hardness,
+                        double aspect_ratio, double angle
                         )
 {
 
@@ -349,17 +349,17 @@ void render_dab_mask (uint16_t * mask,
     // +-----------*> rr = (distance_from_center/radius)^2
     // 0           1
     //
-    float segment1_offset = 1.0f;
-    float segment1_slope  = -(1.0f/hardness - 1.0f);
-    float segment2_offset = hardness/(1.0f-hardness);
-    float segment2_slope  = -hardness/(1.0f-hardness);
+    double segment1_offset = 1.0;
+    double segment1_slope  = -(1.0/hardness - 1.0);
+    double segment2_offset = hardness/(1.0-hardness);
+    double segment2_slope  = -hardness/(1.0-hardness);
     // for hardness == 1.0, segment2 will never be used
 
-    float angle_rad=angle/360*2*M_PI;
-    float cs=cos(angle_rad);
-    float sn=sin(angle_rad);
+    double angle_rad=angle/360*2*M_PI;
+    double cs=cos(angle_rad);
+    double sn=sin(angle_rad);
 
-    const float r_fringe = radius + 1.0f; // +1.0 should not be required, only to be sure
+    const double r_fringe = radius + 1.0; // +1.0 should not be required, only to be sure
     int x0 = floor (x - r_fringe);
     int y0 = floor (y - r_fringe);
     int x1 = floor (x + r_fringe);
@@ -368,22 +368,22 @@ void render_dab_mask (uint16_t * mask,
     if (y0 < 0) y0 = 0;
     if (x1 > MYPAINT_TILE_SIZE-1) x1 = MYPAINT_TILE_SIZE-1;
     if (y1 > MYPAINT_TILE_SIZE-1) y1 = MYPAINT_TILE_SIZE-1;
-    const float one_over_radius2 = 1.0f/(radius*radius);
+    const double one_over_radius2 = 1.0/(radius*radius);
 
     // Pre-calculate rr and put it in the mask.
     // This an optimization that makes use of auto-vectorization
-    // OPTIMIZE: if using floats for the brush engine, store these directly in the mask
-    float rr_mask[MYPAINT_TILE_SIZE*MYPAINT_TILE_SIZE+2*MYPAINT_TILE_SIZE];
+    // OPTIMIZE: if using doubles for the brush engine, store these directly in the mask
+    double rr_mask[MYPAINT_TILE_SIZE*MYPAINT_TILE_SIZE+2*MYPAINT_TILE_SIZE];
 
-    if (radius < 3.0f)
+    if (radius < 3.0)
     {
-      const float aa_border = 1.0f;
-      float r_aa_start = ((radius>aa_border) ? (radius-aa_border) : 0);
+      const double aa_border = 1.0;
+      double r_aa_start = ((radius>aa_border) ? (radius-aa_border) : 0);
       r_aa_start *= r_aa_start / aspect_ratio;
 
       for (int yp = y0; yp <= y1; yp++) {
         for (int xp = x0; xp <= x1; xp++) {
-          const float rr = calculate_rr_antialiased(xp, yp,
+          const double rr = calculate_rr_antialiased(xp, yp,
                                   x, y, aspect_ratio,
                                   sn, cs, one_over_radius2,
                                   r_aa_start);
@@ -395,7 +395,7 @@ void render_dab_mask (uint16_t * mask,
     {
       for (int yp = y0; yp <= y1; yp++) {
         for (int xp = x0; xp <= x1; xp++) {
-          const float rr = calculate_rr(xp, yp,
+          const double rr = calculate_rr(xp, yp,
                                   x, y, aspect_ratio,
                                   sn, cs, one_over_radius2);
           rr_mask[(yp*MYPAINT_TILE_SIZE)+xp] = rr;
@@ -414,8 +414,8 @@ void render_dab_mask (uint16_t * mask,
 
       int xp;
       for (xp = x0; xp <= x1; xp++) {
-        const float rr = rr_mask[(yp*MYPAINT_TILE_SIZE)+xp];
-        const float opa = calculate_opa(rr, hardness,
+        const double rr = rr_mask[(yp*MYPAINT_TILE_SIZE)+xp];
+        const double opa = calculate_opa(rr, hardness,
                                   segment1_offset, segment1_slope,
                                   segment2_offset, segment2_slope);
         const uint16_t opa_ = opa * (1<<15);
@@ -542,7 +542,7 @@ void
 update_dirty_bbox(MyPaintTiledSurface *self, OperationDataDrawDab *op)
 {
     int bb_x, bb_y, bb_w, bb_h;
-    float r_fringe = op->radius + 1.0f; // +1.0 should not be required, only to be sure
+    double r_fringe = op->radius + 1.0; // +1.0 should not be required, only to be sure
     bb_x = floor (op->x - r_fringe);
     bb_y = floor (op->y - r_fringe);
     bb_w = floor (op->x + r_fringe) - bb_x + 1;
@@ -553,17 +553,17 @@ update_dirty_bbox(MyPaintTiledSurface *self, OperationDataDrawDab *op)
 }
 
 // returns TRUE if the surface was modified
-gboolean draw_dab_internal (MyPaintTiledSurface *self, float x, float y,
-               float radius,
-               float color_r, float color_g, float color_b,
-               float opaque, float hardness,
-               float color_a,
-               float aspect_ratio, float angle,
-               float lock_alpha,
-               float colorize,
-               float posterize,
-               float posterize_num,
-               float paint
+gboolean draw_dab_internal (MyPaintTiledSurface *self, double x, double y,
+               double radius,
+               double color_r, double color_g, double color_b,
+               double opaque, double hardness,
+               double color_a,
+               double aspect_ratio, double angle,
+               double lock_alpha,
+               double colorize,
+               double posterize,
+               double posterize_num,
+               double paint
                )
 
 {
@@ -575,21 +575,21 @@ gboolean draw_dab_internal (MyPaintTiledSurface *self, float x, float y,
     op->radius = radius;
     op->aspect_ratio = aspect_ratio;
     op->angle = angle;
-    op->opaque = CLAMP(opaque, 0.0f, 1.0f);
-    op->hardness = CLAMP(hardness, 0.0f, 1.0f);
-    op->lock_alpha = CLAMP(lock_alpha, 0.0f, 1.0f);
-    op->colorize = CLAMP(colorize, 0.0f, 1.0f);
-    op->posterize = CLAMP(posterize, 0.0f, 1.0f);
+    op->opaque = CLAMP(opaque, 0.0, 1.0);
+    op->hardness = CLAMP(hardness, 0.0, 1.0);
+    op->lock_alpha = CLAMP(lock_alpha, 0.0, 1.0);
+    op->colorize = CLAMP(colorize, 0.0, 1.0);
+    op->posterize = CLAMP(posterize, 0.0, 1.0);
     op->posterize_num= CLAMP(ROUND(posterize_num * 100.0), 1, 128);
-    op->paint = CLAMP(paint, 0.0f, 1.0f);
-    if (op->radius < 0.1f) return FALSE; // don't bother with dabs smaller than 0.1 pixel
-    if (op->hardness == 0.0f) return FALSE; // infintly small center point, fully transparent outside
-    if (op->opaque == 0.0f) return FALSE;
+    op->paint = CLAMP(paint, 0.0, 1.0);
+    if (op->radius < 0.1) return FALSE; // don't bother with dabs smaller than 0.1 pixel
+    if (op->hardness == 0.0) return FALSE; // infintly small center point, fully transparent outside
+    if (op->opaque == 0.0) return FALSE;
 
-    color_r = CLAMP(color_r, 0.0f, 1.0f);
-    color_g = CLAMP(color_g, 0.0f, 1.0f);
-    color_b = CLAMP(color_b, 0.0f, 1.0f);
-    color_a = CLAMP(color_a, 0.0f, 1.0f);
+    color_r = CLAMP(color_r, 0.0, 1.0);
+    color_g = CLAMP(color_g, 0.0, 1.0);
+    color_b = CLAMP(color_b, 0.0, 1.0);
+    color_a = CLAMP(color_a, 0.0, 1.0);
 
     op->color_r = color_r * (1<<15);
     op->color_g = color_g * (1<<15);
@@ -597,16 +597,16 @@ gboolean draw_dab_internal (MyPaintTiledSurface *self, float x, float y,
     op->color_a = color_a;
 
     // blending mode preparation
-    op->normal = 1.0f;
+    op->normal = 1.0;
 
-    op->normal *= 1.0f-op->lock_alpha;
-    op->normal *= 1.0f-op->colorize;
-    op->normal *= 1.0f-op->posterize;
+    op->normal *= 1.0-op->lock_alpha;
+    op->normal *= 1.0-op->colorize;
+    op->normal *= 1.0-op->posterize;
 
-    if (op->aspect_ratio<1.0f) op->aspect_ratio=1.0f;
+    if (op->aspect_ratio<1.0) op->aspect_ratio=1.0;
 
     // Determine the tiles influenced by operation, and queue it for processing for each tile
-    float r_fringe = radius + 1.0f; // +1.0 should not be required, only to be sure
+    double r_fringe = radius + 1.0; // +1.0 should not be required, only to be sure
       
     int tx1 = floor(floor(x - r_fringe) / MYPAINT_TILE_SIZE);
     int tx2 = floor(floor(x + r_fringe) / MYPAINT_TILE_SIZE);
@@ -628,17 +628,17 @@ gboolean draw_dab_internal (MyPaintTiledSurface *self, float x, float y,
 }
 
 // returns TRUE if the surface was modified
-int draw_dab (MyPaintSurface *surface, float x, float y,
-               float radius,
-               float color_r, float color_g, float color_b,
-               float opaque, float hardness,
-               float color_a,
-               float aspect_ratio, float angle,
-               float lock_alpha,
-               float colorize,
-               float posterize,
-               float posterize_num,
-               float paint)
+int draw_dab (MyPaintSurface *surface, double x, double y,
+               double radius,
+               double color_r, double color_g, double color_b,
+               double opaque, double hardness,
+               double color_a,
+               double aspect_ratio, double angle,
+               double lock_alpha,
+               double colorize,
+               double posterize,
+               double posterize_num,
+               double paint)
 {
   MyPaintTiledSurface *self = (MyPaintTiledSurface *)surface;
 
@@ -653,14 +653,14 @@ int draw_dab (MyPaintSurface *surface, float x, float y,
 
   // Symmetry pass
   if(self->surface_do_symmetry) {
-    const float dist_x = (self->surface_center_x - x);
-    const float dist_y = (self->surface_center_y - y);
-    const float symm_x = self->surface_center_x + dist_x;
-    const float symm_y = self->surface_center_y + dist_y;
+    const double dist_x = (self->surface_center_x - x);
+    const double dist_y = (self->surface_center_y - y);
+    const double symm_x = self->surface_center_x + dist_x;
+    const double symm_y = self->surface_center_y + dist_y;
 
-    const float dab_dist = sqrt(dist_x * dist_x + dist_y * dist_y);
-    const float rot_width = 360.0 / ((float) self->rot_symmetry_lines);
-    const float dab_angle_offset = atan2(-dist_y, -dist_x) / (2 * M_PI) * 360.0;
+    const double dab_dist = sqrt(dist_x * dist_x + dist_y * dist_y);
+    const double rot_width = 360.0 / ((double) self->rot_symmetry_lines);
+    const double dab_angle_offset = atan2(-dist_y, -dist_x) / (2 * M_PI) * 360.0;
 
     int dab_count = 1;
     int sub_dab_count = 0;
@@ -713,15 +713,15 @@ int draw_dab (MyPaintSurface *surface, float x, float y,
                 // was not done through carrying out the initial pass
                 for (sub_dab_count = 0; sub_dab_count < self->rot_symmetry_lines; sub_dab_count++) {
                     // calculate the offset from rotational symmetry
-                    const float symmetry_angle_offset = ((float)sub_dab_count) * rot_width;
+                    const double symmetry_angle_offset = ((double)sub_dab_count) * rot_width;
 
                     // subtract the angle offset since we're progressing clockwise
-                    const float cur_angle = symmetry_angle_offset - dab_angle_offset;
+                    const double cur_angle = symmetry_angle_offset - dab_angle_offset;
 
                     // progress through the rotation angle offsets clockwise
                     // to reflect the dab relative to itself
-                    const float rot_x = self->surface_center_x - dab_dist*cos(cur_angle / 180.0 * M_PI);
-                    const float rot_y = self->surface_center_y - dab_dist*sin(cur_angle / 180.0 * M_PI);
+                    const double rot_x = self->surface_center_x - dab_dist*cos(cur_angle / 180.0 * M_PI);
+                    const double rot_y = self->surface_center_y - dab_dist*sin(cur_angle / 180.0 * M_PI);
 
                     if (!draw_dab_internal(self, rot_x, rot_y, radius, color_r, color_g, color_b,
                                            opaque, hardness, color_a,
@@ -745,14 +745,14 @@ int draw_dab (MyPaintSurface *surface, float x, float y,
                 for (dab_count = 1; dab_count < self->rot_symmetry_lines; dab_count++)
                 {
                     // calculate the offset from rotational symmetry
-                    const float symmetry_angle_offset = ((float)dab_count) * rot_width;
+                    const double symmetry_angle_offset = ((double)dab_count) * rot_width;
 
                     // add the angle initial dab is from center point
-                    const float cur_angle = symmetry_angle_offset + dab_angle_offset;
+                    const double cur_angle = symmetry_angle_offset + dab_angle_offset;
 
                     // progress through the rotation cangle offsets counterclockwise
-                    const float rot_x = self->surface_center_x + dab_dist*cos(cur_angle / 180.0 * M_PI);
-                    const float rot_y = self->surface_center_y + dab_dist*sin(cur_angle / 180.0 * M_PI);
+                    const double rot_x = self->surface_center_x + dab_dist*cos(cur_angle / 180.0 * M_PI);
+                    const double rot_y = self->surface_center_y + dab_dist*sin(cur_angle / 180.0 * M_PI);
 
                     if (!draw_dab_internal(self, rot_x, rot_y, radius, color_r, color_g, color_b,
                                            opaque, hardness, color_a, aspect_ratio,
@@ -774,30 +774,30 @@ int draw_dab (MyPaintSurface *surface, float x, float y,
 }
 
 
-void get_color (MyPaintSurface *surface, float x, float y,
-                  float radius,
-                  float * color_r, float * color_g, float * color_b, float * color_a,
-                  float paint
+void get_color (MyPaintSurface *surface, double x, double y,
+                  double radius,
+                  double * color_r, double * color_g, double * color_b, double * color_a,
+                  double paint
                   )
 {
     MyPaintTiledSurface *self = (MyPaintTiledSurface *)surface;
 
-    if (radius < 1.0f) radius = 1.0f;
-    const float hardness = 0.5f;
-    const float aspect_ratio = 1.0f;
-    const float angle = 0.0f;
+    if (radius < 1.0) radius = 1.0;
+    const double hardness = 0.5;
+    const double aspect_ratio = 1.0;
+    const double angle = 0.0;
 
-    float sum_weight, sum_r, sum_g, sum_b, sum_a;
-    sum_weight = sum_r = sum_g = sum_b = sum_a = 0.0f;
+    double sum_weight, sum_r, sum_g, sum_b, sum_a;
+    sum_weight = sum_r = sum_g = sum_b = sum_a = 0.0;
 
     // in case we return with an error
-    *color_r = 0.0f;
-    *color_g = 1.0f;
-    *color_b = 0.0f;
+    *color_r = 0.0;
+    *color_g = 1.0;
+    *color_b = 0.0;
 
     // WARNING: some code duplication with draw_dab
 
-    float r_fringe = radius + 1.0f; // +1 should not be required, only to be sure
+    double r_fringe = radius + 1.0; // +1 should not be required, only to be sure
 
     int tx1 = floor(floor(x - r_fringe) / MYPAINT_TILE_SIZE);
     int tx2 = floor(floor(x + r_fringe) / MYPAINT_TILE_SIZE);
@@ -847,27 +847,27 @@ void get_color (MyPaintSurface *surface, float x, float y,
       }
     }
 
-    assert(sum_weight > 0.0f);
+    assert(sum_weight > 0.0);
     sum_a /= sum_weight;
     *color_a = sum_a;
     // now un-premultiply the alpha
-    if (sum_a > 0.0f) {
+    if (sum_a > 0.0) {
       *color_r = sum_r;
       *color_g = sum_g;
       *color_b = sum_b;
     } else {
       // it is all transparent, so don't care about the colors
       // (let's make them ugly so bugs will be visible)
-      *color_r = 0.0f;
-      *color_g = 1.0f;
-      *color_b = 0.0f;
+      *color_r = 0.0;
+      *color_g = 1.0;
+      *color_b = 0.0;
     }
 
-    // fix rounding problems that do happen due to floating point math
-    *color_r = CLAMP(*color_r, 0.0f, 1.0f);
-    *color_g = CLAMP(*color_g, 0.0f, 1.0f);
-    *color_b = CLAMP(*color_b, 0.0f, 1.0f);
-    *color_a = CLAMP(*color_a, 0.0f, 1.0f);
+    // fix rounding problems that do happen due to doubleing point math
+    *color_r = CLAMP(*color_r, 0.0, 1.0);
+    *color_g = CLAMP(*color_g, 0.0, 1.0);
+    *color_b = CLAMP(*color_b, 0.0, 1.0);
+    *color_a = CLAMP(*color_a, 0.0, 1.0);
 }
 
 
@@ -900,8 +900,8 @@ mypaint_tiled_surface_init(MyPaintTiledSurface *self,
     self->dirty_bbox.height = 0;
     self->surface_do_symmetry = FALSE;
     self->symmetry_type = MYPAINT_SYMMETRY_TYPE_VERTICAL;
-    self->surface_center_x = 0.0f;
-    self->surface_center_y = 0.0f;
+    self->surface_center_x = 0.0;
+    self->surface_center_y = 0.0;
     self->rot_symmetry_lines = 2;
     self->operation_queue = operation_queue_new();
 }

@@ -55,18 +55,6 @@ HEADERS += \
         brushmodes.h \
         brushsettings-gen.h \
         config.h \
-        fastapprox/cast.h \
-        fastapprox/fasterf.h \
-        fastapprox/fastexp.h \
-        fastapprox/fastgamma.h \
-        fastapprox/fasthyperbolic.h \
-        fastapprox/fastlambertw.h \
-        fastapprox/fastlog.h \
-        fastapprox/fastonebigheader.h \
-        fastapprox/fastpow.h \
-        fastapprox/fastsigmoid.h \
-        fastapprox/fasttrig.h \
-        fastapprox/sse.h \
         fifo.h \
         helpers.h \
         mypaint-brush-settings-gen.h \

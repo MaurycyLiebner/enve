@@ -31,13 +31,13 @@
 
 typedef struct {
   // a set of control points (stepwise linear)
-  float xvalues[64];
-  float yvalues[64];
+  double xvalues[64];
+  double yvalues[64];
   int n;
 } ControlPoints;
 
 struct MyPaintMapping {
-    float base_value; // FIXME: accessed directly from mypaint-brush.c
+    double base_value; // FIXME: accessed directly from mypaint-brush.c
 
     int inputs;
     ControlPoints * pointsList; // one for each input
@@ -69,12 +69,12 @@ mypaint_mapping_free(MyPaintMapping *self)
     free(self);
 }
 
-float mypaint_mapping_get_base_value(MyPaintMapping *self)
+double mypaint_mapping_get_base_value(MyPaintMapping *self)
 {
     return self->base_value;
 }
 
-void mypaint_mapping_set_base_value(MyPaintMapping *self, float value)
+void mypaint_mapping_set_base_value(MyPaintMapping *self, double value)
 {
     self->base_value = value;
 }
@@ -102,7 +102,7 @@ int mypaint_mapping_get_n (MyPaintMapping * self, int input)
     return p->n;
 }
 
-void mypaint_mapping_set_point (MyPaintMapping * self, int input, int index, float x, float y)
+void mypaint_mapping_set_point (MyPaintMapping * self, int input, int index, double x, double y)
 {
     assert (input >= 0 && input < self->inputs);
     assert (index >= 0 && index < 64);
@@ -117,7 +117,7 @@ void mypaint_mapping_set_point (MyPaintMapping * self, int input, int index, flo
     p->yvalues[index] = y;
 }
 
-void mypaint_mapping_get_point (MyPaintMapping * self, int input, int index, float *x, float *y)
+void mypaint_mapping_get_point (MyPaintMapping * self, int input, int index, double *x, double *y)
 {
     assert (input >= 0 && input < self->inputs);
     assert (index >= 0 && index < 64);
@@ -139,10 +139,10 @@ mypaint_mapping_get_inputs_used_n(MyPaintMapping *self)
     return self->inputs_used;
 }
 
-float mypaint_mapping_calculate (MyPaintMapping * self, float * data)
+double mypaint_mapping_calculate (MyPaintMapping * self, double * data)
 {
     int j;
-    float result;
+    double result;
     result = self->base_value;
 
     // constant mapping (common case)
@@ -152,11 +152,11 @@ float mypaint_mapping_calculate (MyPaintMapping * self, float * data)
       ControlPoints * p = self->pointsList + j;
 
       if (p->n) {
-        float x, y;
+        double x, y;
         x = data[j];
 
         // find the segment with the slope that we need to use
-        float x0, y0, x1, y1;
+        double x0, y0, x1, y1;
         x0 = p->xvalues[0];
         y0 = p->yvalues[0];
         x1 = p->xvalues[1];
@@ -184,7 +184,7 @@ float mypaint_mapping_calculate (MyPaintMapping * self, float * data)
 }
 
 // used in mypaint itself for the global pressure mapping
-float mypaint_mapping_calculate_single_input (MyPaintMapping * self, float input)
+double mypaint_mapping_calculate_single_input (MyPaintMapping * self, double input)
 {
     assert(self->inputs == 1);
     return mypaint_mapping_calculate(self, &input);
