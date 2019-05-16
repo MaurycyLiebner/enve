@@ -33,14 +33,6 @@
 #include <json-c/json.h>
 #endif // HAVE_JSON_C
 
-#ifdef _MSC_VER
-#if _MSC_VER < 1700     // Visual Studio 2012 and later has isfinite and round
-  #include <double.h>
-  static inline int    isfinite(double x) { return _finite(x); }
-  static inline double  round  (double  x) { return x >= 0.0 ? floorf(x + 0.5) : ceilf(x - 0.5); }
-#endif
-#endif
-
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -1090,7 +1082,7 @@ mypaint_brush_set_state(MyPaintBrush *self, MyPaintBrushState i, double value)
       // shield us from insane tilt input
       xtilt = CLAMP(xtilt, -1.0, 1.0);
       ytilt = CLAMP(ytilt, -1.0, 1.0);
-      assert(isfinite(xtilt) && isfinite(ytilt));
+      assert(__finite(xtilt) && __finite(ytilt));
 
       tilt_ascension = 180.0*atan2(-xtilt, ytilt)/M_PI;
       const double rad = hypot(xtilt, ytilt);
@@ -1098,17 +1090,17 @@ mypaint_brush_set_state(MyPaintBrush *self, MyPaintBrushState i, double value)
       tilt_declinationx = (xtilt * 60);
       tilt_declinationy = (ytilt * 60);
 
-      assert(isfinite(tilt_ascension));
-      assert(isfinite(tilt_declination));
-      assert(isfinite(tilt_declinationx));
-      assert(isfinite(tilt_declinationy));
+      assert(__finite(tilt_ascension));
+      assert(__finite(tilt_declination));
+      assert(__finite(tilt_declinationx));
+      assert(__finite(tilt_declinationy));
     }
 
     // printf("xtilt %f, ytilt %f\n", (double)xtilt, (double)ytilt);
     // printf("ascension %f, declination %f\n", (double)tilt_ascension, (double)tilt_declination);
 
     if (pressure <= 0.0) pressure = 0.0;
-    if (!isfinite(x) || !isfinite(y) ||
+    if (!__finite(x) || !__finite(y) ||
         (x > 1e10 || y > 1e10 || x < -1e10 || y < -1e10)) {
       // workaround attempt for https://gna.org/bugs/?14372
       printf("Warning: ignoring brush::stroke_to with insane inputs (x = %f, y = %f)\n", (double)x, (double)y);

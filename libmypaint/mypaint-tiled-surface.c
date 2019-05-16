@@ -268,7 +268,7 @@ calculate_rr_antialiased(int xp, int yp, double x, double y, double aspect_ratio
     // radius of a circle with area=1
     //   A = pi * r * r
     //   r = sqrt(1/pi)
-    const double rad_area_1 = sqrtf( 1.0 / M_PI );
+    const double rad_area_1 = sqrt( 1.0 / M_PI );
 
     // center is below dab
     if( center_sign < 0 )
@@ -312,7 +312,7 @@ calculate_opa(double rr, double hardness,
         opa = 0.0;
     }
     #ifdef HEAVY_DEBUG
-    assert(isfinite(opa));
+    assert(__finite(opa));
     assert(opa >= 0.0 && opa <= 1.0);
     #endif
     return opa;
