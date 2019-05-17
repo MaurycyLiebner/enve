@@ -10,7 +10,7 @@ struct SWT_RulesCollection;
 
 class SingleWidgetAbstraction;
 template <typename T> using stdfunc = std::function<T>;
-typedef std::function<void(SingleWidgetAbstraction*, int)> SetAbsFunc;
+typedef stdfunc<void(SingleWidgetAbstraction*, int)> SetAbsFunc;
 
 struct UpdateFuncs {
     stdfunc<void(const SWT_BoxRule &)> fContentUpdateIfIsCurrentRule;

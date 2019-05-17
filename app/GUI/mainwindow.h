@@ -161,7 +161,7 @@ public:
     void canvasNameChanged(Canvas *canvas, const QString &name);
 
     stdsptr<void> lock();
-private:
+public:
     //void saveOutput(QString renderDest);
     //void renderOutput();
     //void sendNextBoxForUpdate();
@@ -169,6 +169,7 @@ private:
     void newFile();
     bool askForSaving();
     void openFile();
+    void openFile(const QString& openPath);
     void saveFile();
     void saveFileAs();
     void saveBackup();

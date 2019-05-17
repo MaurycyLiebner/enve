@@ -2,7 +2,6 @@
 
 #include <QVBoxLayout>
 #include <QPushButton>
-#include <QFile>
 #include <QFontMetrics>
 
 #include "global.h"
@@ -30,6 +29,7 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
     connect(openButton, &QPushButton::released, openFunc);
     buttonLay->addWidget(openButton);
 
+    if(recentPaths.isEmpty()) return;
     const auto recentScroll = new ScrollArea(this);
 
     const auto recentWidget = new QWidget(this);
@@ -37,9 +37,7 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
     recentWidget->setLayout(recentLay);
 
     for(const auto& path : recentPaths) {
-        const QFile file(path);
-        if(!file.exists()) continue;
-        QString cutPath;
+        QString cutPath = path;
         const auto fm = newButton->fontMetrics();
         int wholeWidth = fm.width(cutPath);
         const int dotsW = fm.width("...");

@@ -50,8 +50,6 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
             this, &CanvasWindow::interruptOutputRendering);
 }
 
-CanvasWindow::~CanvasWindow() {}
-
 Canvas *CanvasWindow::getCurrentCanvas() {
     return mCurrentCanvas;
 }
@@ -107,6 +105,8 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
                 mCurrentCanvas.data(),
                 SWT_TARGET_CURRENT_CANVAS);
     MainWindow::getInstance()->updateSettingsForCurrentCanvas();
+    if(hasNoCanvas()) openWelcomeDialog();
+    else closeWelcomeDialog();
     queScheduledTasksAndUpdate();
 }
 
@@ -855,6 +855,22 @@ void CanvasWindow::getDisplayedFillStrokeSettingsFromLastSelected(
     if(hasNoCanvas()) return;
     mCurrentCanvas->getDisplayedFillStrokeSettingsFromLastSelected(
                 fillSetings, strokeSettings);
+}
+#include "welcomedialog.h"
+void CanvasWindow::openWelcomeDialog() {
+    if(mWelcomeDialog) return;
+    mWelcomeDialog = new WelcomeDialog(QStringList() << "/home/ailuropoda/Documents/kom/ready/menu.av",
+                                       []() { MainWindow::getInstance()->createNewCanvas(); },
+                                       []() { MainWindow::getInstance()->openFile(); },
+                                       [](QString path) { MainWindow::getInstance()->openFile(path); },
+                                       MainWindow::getInstance());
+    mWelcomeDialog->show();
+}
+
+void CanvasWindow::closeWelcomeDialog() {
+    if(!mWelcomeDialog) return;
+    delete mWelcomeDialog;
+    mWelcomeDialog = nullptr;
 }
 
 void CanvasWindow::changeCurrentFrameAction(const int& frame) {

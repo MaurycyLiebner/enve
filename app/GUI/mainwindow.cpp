@@ -224,7 +224,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->setMouseTracking(true);
     centralWidget()->setMouseTracking(true);
 
-    createNewCanvas();
+    mCanvasWindow->openWelcomeDialog();
 
     mEventFilterDisabled = false;
 
@@ -256,7 +256,7 @@ void MainWindow::setupMenuBar() {
                          this, &MainWindow::newFile,
                          Qt::CTRL + Qt::Key_N);
     mFileMenu->addAction("Open...",
-                         this, &MainWindow::openFile,
+                         this, qOverload<>(&MainWindow::openFile),
                          Qt::CTRL + Qt::Key_O);
     mFileMenu->addSeparator();
     mFileMenu->addAction("Link...",
@@ -1108,16 +1108,20 @@ void MainWindow::openFile() {
         const QString openPath = QFileDialog::getOpenFileName(this,
             "Open File", mCurrentFilePath, "AniVect Files (*.av)");
         if(!openPath.isEmpty()) {
-            clearAll();
-            try {
-                loadAVFile(openPath);
-                setCurrentPath(openPath);
-            } catch(const std::exception& e) {
-                gPrintExceptionCritical(e);
-            }
+            openFile(openPath);
         }
         enable();
+    }
+}
+
+void MainWindow::openFile(const QString& openPath) {
+    clearAll();
+    try {
+        loadAVFile(openPath);
+        setCurrentPath(openPath);
         setFileChangedSinceSaving(false);
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
     }
 }
 

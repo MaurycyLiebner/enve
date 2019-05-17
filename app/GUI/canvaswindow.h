@@ -34,12 +34,14 @@ class CanvasWindow : public GLWindow,
     Q_OBJECT
 public:
     explicit CanvasWindow(QWidget *parent);
-    ~CanvasWindow();
 
     Canvas *getCurrentCanvas();
     const QList<qsptr<Canvas>> &getCanvasList() {
         return mCanvasList;
     }
+
+    void openWelcomeDialog();
+    void closeWelcomeDialog();
 
     void setCurrentCanvas(Canvas * const canvas);
     void addCanvasToList(const qsptr<Canvas> &canvas);
@@ -163,6 +165,8 @@ public:
     void getDisplayedFillStrokeSettingsFromLastSelected(
             PaintSettingsAnimator *&fillSetings, OutlineSettingsAnimator *&strokeSettings);
 private:
+    QDialog * mWelcomeDialog = nullptr;
+
     void changeCurrentFrameAction(const int &frame);
     void playPreviewAfterAllTasksCompleted();
 
@@ -241,7 +245,7 @@ signals:
 
     void changeCurrentFrame(int);
     void changeCanvasFrameRange(int, int);
-public slots:
+public:
     void setCurrentBrush(const SimpleBrushWrapper * const brush);
 
     void setMovePathMode();
@@ -326,7 +330,7 @@ public slots:
 
     void flipHorizontalAction();
     void flipVerticalAction();
-private slots:
+private:
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
     void nextPreviewFrame();

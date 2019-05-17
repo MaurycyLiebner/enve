@@ -13,8 +13,7 @@
 SingleWidgetAbstraction* SingleWidgetTarget::SWT_createAbstraction(
         const UpdateFuncs& updateFuncs,
         const int& visiblePartWidgetId) {
-    stdsptr<SingleWidgetAbstraction> SWT_Abstraction =
-            SPtrCreate(SingleWidgetAbstraction)(
+    const auto SWT_Abstraction = SPtrCreate(SingleWidgetAbstraction)(
                 ref<SingleWidgetTarget>(), updateFuncs, visiblePartWidgetId);
     SWT_addChildrenAbstractions(SWT_Abstraction.get(),
                                 updateFuncs,
