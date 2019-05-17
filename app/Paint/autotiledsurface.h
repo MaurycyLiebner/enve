@@ -49,14 +49,9 @@ struct AutoTiledSurface {
         mypaint_brush_new_stroke(brush);
 
         mypaint_surface_begin_atomic(fMyPaintSurface);
-        mypaint_brush_stroke_to(brush,
-                                fMyPaintSurface,
-                                static_cast<float>(pos.x()),
-                                static_cast<float>(pos.y()),
-                                static_cast<float>(pressure),
-                                static_cast<float>(xtilt),
-                                static_cast<float>(ytilt),
-                                dTime, 1, 0, 0);
+        mypaint_brush_stroke_to(brush, fMyPaintSurface,
+                                pos.x(), pos.y(), pressure,
+                                xtilt, ytilt, dTime, 1, 0, 0);
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(fMyPaintSurface, &roi);
         return roi;
@@ -69,14 +64,9 @@ struct AutoTiledSurface {
                                     const double& xtilt,
                                     const double& ytilt) const {
         mypaint_surface_begin_atomic(fMyPaintSurface);
-        mypaint_brush_stroke_to(brush,
-                                fMyPaintSurface,
-                                static_cast<float>(pos.x()),
-                                static_cast<float>(pos.y()),
-                                static_cast<float>(pressure),
-                                static_cast<float>(xtilt),
-                                static_cast<float>(ytilt),
-                                dTime, 1, 0, 0);
+        mypaint_brush_stroke_to(brush, fMyPaintSurface,
+                                pos.x(), pos.y(), pressure,
+                                xtilt, ytilt, dTime, 1, 0, 0);
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(fMyPaintSurface, &roi);
         return roi;

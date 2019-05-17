@@ -5,7 +5,6 @@
 #-------------------------------------------------
 
 QT       -= core gui
-LIBS += -ljson-c
 
 TARGET = libmypaint
 TEMPLATE = lib
@@ -33,6 +32,9 @@ CONFIG(debug, debug|release) {
     QMAKE_LFLAGS = -m64 -O3
     QMAKE_CXXFLAGS = -m64 -O3
 }
+
+QMAKE_CXXFLAGS += -fopenmp
+LIBS += -ljson-c -fopenmp
 
 SOURCES += \
         brushmodes.cpp \
