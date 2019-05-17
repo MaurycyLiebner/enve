@@ -65,6 +65,7 @@ SOURCES += main.cpp\
     Boxes/patheffectsmenu.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/soundreader.cpp \
+    GUI/welcomedialog.cpp \
     PathEffects/subpatheffect.cpp \
     Sound/soundmerger.cpp \
     canvas.cpp \
@@ -271,6 +272,7 @@ HEADERS  += \
     CacheHandlers/samples.h \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/soundreader.h \
+    GUI/welcomedialog.h \
     PathEffects/subpatheffect.h \
     Sound/soundmerger.h \
     canvas.h \

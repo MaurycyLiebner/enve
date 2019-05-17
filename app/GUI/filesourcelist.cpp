@@ -52,15 +52,16 @@ void FileSourceWidget::paintEvent(QPaintEvent *) {
     if(mFileNameOnly) {
         wholeString = wholeString.split("/").last();
     }
-    int wholeWidth = p.fontMetrics().width(wholeString);
+    const auto fm = p.fontMetrics();
+    const int dotsW = fm.width("...");
+    int wholeWidth = fm.width(wholeString);
     bool addDots = false;
     while(wholeWidth > width() - 1.5*MIN_WIDGET_HEIGHT) {
         addDots = true;
-        const int dotsW = p.fontMetrics().width("...");
         const int spaceForLetters = int(width() - 1.5*MIN_WIDGET_HEIGHT - dotsW);
         const int guessLen = spaceForLetters*wholeString.count()/wholeWidth;
         wholeString = wholeString.right(guessLen);
-        wholeWidth = p.fontMetrics().width("..." + wholeString);
+        wholeWidth = fm.width("..." + wholeString);
     }
     if(addDots) wholeString = "..." + wholeString;
 
