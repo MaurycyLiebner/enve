@@ -67,7 +67,7 @@ void CanvasWindow::SWT_addChildrenAbstractions(
     }
 }
 
-void CanvasWindow::setCurrentCanvas(const int &id) {
+void CanvasWindow::setCurrentCanvas(int id) {
     if(id < 0 || id >= mCanvasList.count()) {
         setCurrentCanvas(nullptr);
     } else {

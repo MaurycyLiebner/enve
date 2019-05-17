@@ -2,7 +2,6 @@
 #include "soundcomposition.h"
 #include "durationrectangle.h"
 #include "filesourcescache.h"
-#include "Decode/audiodecode.h"
 #include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
 
 SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :

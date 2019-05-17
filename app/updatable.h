@@ -18,6 +18,11 @@ protected:
     virtual void afterProcessing() {}
     virtual void afterCanceled() {}
 public:
+    struct Dependent {
+        std::function<void()> fFinished;
+        std::function<void()> fCanceled;
+    };
+
     enum State : char {
         CREATED,
         SCHEDULED,
@@ -45,6 +50,7 @@ public:
     bool readyToBeProcessed();
 
     void addDependent(Task * const updatable);
+    void addDependent(const Dependent& func);
 
     bool finished();
 
@@ -82,6 +88,7 @@ private:
 
     int mNDependancies = 0;
     QList<stdptr<Task>> mDependent;
+    QList<Dependent> mDependentF;
     std::exception_ptr mUpdateException;
 };
 

@@ -149,7 +149,7 @@ public:
     UsageWidget* getUsageWidget() const {
         return mUsageWidget;
     }
-public slots:
+
     void setCurrentFrame(const int &frame);
     //void playPreview();
    // void stopPreview();
@@ -159,7 +159,9 @@ public slots:
     void queScheduledTasksAndUpdate();
     void addCanvasToRenderQue();
     void canvasNameChanged(Canvas *canvas, const QString &name);
-private slots:
+
+    stdsptr<void> lock();
+private:
     //void saveOutput(QString renderDest);
     //void renderOutput();
     //void sendNextBoxForUpdate();
@@ -181,7 +183,20 @@ private slots:
 
 signals:
     void updateAll();
+protected:
+    void lockFinished();
 private:
+    friend class Lock;
+    class Lock : public StdSelfRef {
+        friend class StdSelfRef;
+    protected:
+        Lock(MainWindow * const window) : mWindow(window) {}
+    public:
+        ~Lock() { mWindow->lockFinished(); }
+    private:
+        MainWindow * const mWindow;
+    };
+    stdptr<Lock> mLock;
     static MainWindow *mMainWindowInstance;
     MemoryHandler *mMemoryHandler;
 

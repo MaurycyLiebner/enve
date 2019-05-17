@@ -32,10 +32,18 @@ QComboBox {
     color: black;
     padding: 0px 5px 0px 5px;
 }
+
 QComboBox:on { /* shift the text when the popup opens */
     border-bottom-right-radius: 0px;
     border-bottom-left-radius: 0px;
 }
+
+QComboBox:disabled {
+    background-color: rgb(180, 180, 180);
+    border: 1px solid rgb(60, 60, 60);
+    color: rgb(60, 60, 60);
+}
+
 QComboBox::drop-down {
     margin: -1 -1 -1 -1;
     background-color: rgb(50, 50, 50);
@@ -109,6 +117,10 @@ QMenuBar::item:selected { /* when selected using mouse or keyboard */
     background: #a8a8a8;
 }
 
+QMenuBar::item:disabled {
+    color: rgb(60, 60, 60);
+}
+
 QMenuBar::item:pressed {
     background: #888888;
 }
@@ -179,14 +191,25 @@ QTabBar::tab {
     border-top-right-radius: 2px;
 }
 
-QTabBar::tab:selected
-{
+QTabBar::tab:selected {
     color: black;
     background-color: rgb(144, 144, 144);
     border: 1px solid black;
     border-bottom: 1px transparent black;
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
+}
+
+QTabBar::tab:disabled:selected {
+    color: darkgray;
+    background-color: rgb(120, 120, 120);
+    border: 1px solid rgb(60, 60, 60);
+}
+
+QTabBar::tab:disabled:!selected {
+    background-color: rgb(100, 100, 100);
+    border: 1px solid rgb(60, 60, 60);
+    color: gray;
 }
 
 QTabBar::tab:hover:!selected {
@@ -283,12 +306,24 @@ QPushButton:disabled {
 }
 
 
-QPushButton#middleButton, QPushButton#rightButton, QPushButton#leftButton {
+QPushButton#middleButton,
+QPushButton#rightButton,
+QPushButton#leftButton {
     color: white;
     background: qlineargradient(x1:0, y1:0,
                                 x2:0, y2:1,
         stop:0 rgb(70, 70, 70),
         stop:0.5 rgb(50, 50, 50));
+}
+
+QPushButton#middleButton:disabled,
+QPushButton#rightButton:disabled,
+QPushButton#leftButton:disabled {
+    color: rgb(200, 200, 200)   ;
+    background: qlineargradient(x1:0, y1:0,
+                                x2:0, y2:1,
+        stop:0 rgb(110, 110, 110),
+        stop:0.5 rgb(80, 80, 80));
 }
 
 QPushButton#middleButton {
@@ -315,6 +350,16 @@ QPushButton#leftButton:checked {
         stop:0 rgb(85, 175, 235),
         stop:0.5 rgb(60, 150, 200));
     color: black;
+}
+
+QPushButton#middleButton:checked:disabled,
+QPushButton#rightButton:checked:disabled,
+QPushButton#leftButton:checked:disabled {
+    background: qlineargradient(x1:0, y1:0,
+                                x2:0, y2:1,
+        stop:0 rgb(85, 125, 180),
+        stop:0.5 rgb(60, 120, 160));
+    color: rgb(60, 60, 60);
 }
 
 QPushButton#renderSettings {
@@ -392,6 +437,21 @@ QScrollBar::handle:hover {
 
 QScrollBar::handle:pressed {
     background: rgb(140, 140, 140);
+}
+
+QScrollBar:disabled {
+    border: 1px solid rgb(60, 60, 60);
+    background-color: rgb(90, 90, 90);
+}
+
+QScrollBar::handle:disabled  {
+    background: rgb(150, 150, 150);
+}
+
+QScrollBar::add-line:disabled,
+QScrollBar::sub-line:disabled {
+    border: 1px solid rgb(60, 60, 60);
+    background-color: rgb(90, 90, 90);
 }
 
 QScrollBar:vertical {

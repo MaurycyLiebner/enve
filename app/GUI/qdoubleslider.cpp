@@ -99,10 +99,9 @@ void QDoubleSlider::setValueRange(qreal min, qreal max) {
 }
 
 void QDoubleSlider::paint(QPainter *p) {
-    paint(p,
-          QColor(255, 255, 255),
-          QColor(220, 220, 220),
-          Qt::black);
+    paint(p, isEnabled() ? QColor(255, 255, 255) : QColor(220, 220, 220),
+          isEnabled() ? QColor(220, 220, 220) : QColor(200, 200, 200),
+          isEnabled() ? Qt::black : Qt::darkGray);
 }
 
 void QDoubleSlider::paint(QPainter *p,
@@ -141,7 +140,7 @@ void QDoubleSlider::paint(QPainter *p,
                                adjusted(0, heightRemoval,
                                         0, -heightRemoval), 5, 5.);
         }
-        p->setPen(Qt::black);
+        p->setPen(isEnabled() ? Qt::black : Qt::darkGray);
         if(mShowName) {
             p->drawText(rect(), Qt::AlignCenter,
                         mName + ": " + getValueString());
@@ -149,7 +148,7 @@ void QDoubleSlider::paint(QPainter *p,
             p->drawText(rect(), Qt::AlignCenter, getValueString());
         }
     }
-    p->setPen(QPen(stroke, 1.));
+    p->setPen(QPen(stroke, 1));
     p->setBrush(Qt::NoBrush);
 
     if(mLeftNeighbour) {
@@ -157,7 +156,7 @@ void QDoubleSlider::paint(QPainter *p,
     } else if(mRightNeighbour) {
         p->setClipRect(0, 0, width()/2, height());
     }
-    p->drawRoundedRect(boundingRect, 5., 5.);
+    p->drawRoundedRect(boundingRect, 5, 5);
     if(mLeftNeighbour || mRightNeighbour) {
         if(mLeftNeighbour) {
             boundingRect.adjust(-1, 0, 0, 0);

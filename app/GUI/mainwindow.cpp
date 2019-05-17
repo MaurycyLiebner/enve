@@ -55,10 +55,19 @@ MainWindow::MainWindow(QWidget *parent)
     MIN_WIDGET_HEIGHT = FONT_HEIGHT*4/3;
     KEY_RECT_SIZE = MIN_WIDGET_HEIGHT*3/5;
     av_register_all();
-    QFile file(":/styles/stylesheet.qss");
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        setStyleSheet(file.readAll());
-        file.close();
+
+    QFile customSS(QDir::homePath() + "/.AniVect/" + "stylesheet.qss");
+    if(customSS.exists()) {
+        if(customSS.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            setStyleSheet(customSS.readAll());
+            customSS.close();
+        }
+    } else {
+        QFile file(":/styles/stylesheet.qss");
+        if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            setStyleSheet(file.readAll());
+            file.close();
+        }
     }
     //setMouseTracking(true);
     //mSoundComposition = new SoundComposition();
@@ -337,9 +346,9 @@ void MainWindow::setupMenuBar() {
             setShortcut(Qt::Key_End);
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Rotate 90° CW",
-                           mCanvasWindow, SLOT(rotate90CWAction()));
+                           mCanvasWindow, &CanvasWindow::rotate90CWAction);
     mObjectMenu->addAction("Rotate 90° CCW",
-                           mCanvasWindow, SLOT(rotate90CCWAction()));
+                           mCanvasWindow, &CanvasWindow::rotate90CCWAction);
     mObjectMenu->addAction("Flip Horizontal", mCanvasWindow,
                            &CanvasWindow::flipHorizontalAction, Qt::Key_H);
     mObjectMenu->addAction("Flip Vertical", mCanvasWindow,
@@ -713,8 +722,10 @@ void MainWindow::connectToolBarActions() {
             mCanvasWindow, &CanvasWindow::makeSegmentCurve );
     connect(mCurrentCanvasComboBox, &QComboBox::editTextChanged,
             mCanvasWindow, &CanvasWindow::renameCurrentCanvas);
-    connect(mCurrentCanvasComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
-            mCanvasWindow, qOverload<const int&>(&CanvasWindow::setCurrentCanvas));
+    connect(mCurrentCanvasComboBox,
+            qOverload<int>(&QComboBox::currentIndexChanged),
+            mCanvasWindow,
+            qOverload<int>(&CanvasWindow::setCurrentCanvas));
     connect(mNewCanvasButton, &QPushButton::pressed,
             this, &MainWindow::createNewCanvas);
     connect(mFontWidget, &FontsWidget::fontSizeChanged,
@@ -748,16 +759,20 @@ void MainWindow::createNewCanvas() {
 void MainWindow::addCanvas(const qsptr<Canvas>& newCanvas) {
     mCanvasWindow->addCanvasToListAndSetAsCurrent(newCanvas);
 
-    disconnect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
-            mCanvasWindow, SLOT(setCurrentCanvas(int)));
+    disconnect(mCurrentCanvasComboBox,
+               qOverload<int>(&QComboBox::currentIndexChanged),
+               mCanvasWindow,
+               qOverload<int>(&CanvasWindow::setCurrentCanvas));
     mCurrentCanvasComboBox->addItem(newCanvas->getName());
     mCurrentCanvasComboBox->setCurrentIndex(
                 mCurrentCanvasComboBox->count() - 1);
     connect(newCanvas.get(), &Canvas::canvasNameChanged,
             this, &MainWindow::canvasNameChanged);
 
-    connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
-            mCanvasWindow, SLOT(setCurrentCanvas(int)));
+    connect(mCurrentCanvasComboBox,
+            qOverload<int>(&QComboBox::currentIndexChanged),
+            mCanvasWindow,
+            qOverload<int>(&CanvasWindow::setCurrentCanvas));
     newCanvas->fitCanvasToSize();
 }
 
@@ -904,10 +919,8 @@ bool MainWindow::askForSaving() {
                                       "Save");
         if(buttonId == 1) {
             return false;
-        } else {
-            if(buttonId == 2) {
-                saveFile();
-            }
+        } else if(buttonId == 2) {
+            saveFile();
             return true;
         }
     }
@@ -965,6 +978,9 @@ void MainWindow::newFile() {
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
+    if(mLock) {
+        if(dynamic_cast<QInputEvent*>(e)) return true;
+    }
     if(mEventFilterDisabled) {
         return QMainWindow::eventFilter(obj, e);
     }
@@ -1223,6 +1239,24 @@ void MainWindow::redo() {
     getUndoRedoStack()->redo();
     mCanvasWindow->updateHoveredElements();
     queScheduledTasksAndUpdate();
+}
+
+stdsptr<void> MainWindow::lock() {
+    if(mLock) return GetAsSPtr(mLock, Lock);
+    setEnabled(false);
+    const auto newLock = SPtrCreate(Lock)(this);
+    mLock = newLock.get();
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    return newLock;
+}
+
+void MainWindow::lockFinished() {
+    if(mLock) {
+        gPrintException(false, "Lock finished before lock object deleted");
+    } else {
+        QApplication::restoreOverrideCursor();
+        setEnabled(true);
+    }
 }
 
 void MainWindow::setCurrentFrame(const int &frame) {

@@ -234,7 +234,6 @@ SOURCES += main.cpp\
     FileCacheHandlers/imagesequencecachehandler.cpp \
     FileCacheHandlers/animationcachehandler.cpp \
     FileCacheHandlers/videocachehandler.cpp \
-    Decode/audiodecode.cpp \
     CacheHandlers/minimalcachecontainer.cpp \
     CacheHandlers/rangecachecontainer.cpp \
     CacheHandlers/imagecachecontainer.cpp \
@@ -442,7 +441,6 @@ HEADERS  += \
     FileCacheHandlers/imagesequencecachehandler.h \
     FileCacheHandlers/animationcachehandler.h \
     FileCacheHandlers/videocachehandler.h \
-    Decode/audiodecode.h \
     CacheHandlers/minimalcachecontainer.h \
     CacheHandlers/rangecachecontainer.h \
     CacheHandlers/imagecachecontainer.h \

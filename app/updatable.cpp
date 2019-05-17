@@ -38,6 +38,14 @@ void Task::addDependent(Task * const updatable) {
     }
 }
 
+void Task::addDependent(const Dependent &func) {
+    if(mState == FINISHED) {
+        if(func.fFinished) func.fFinished();
+    } else if(mState == CANCELED) {
+        if(func.fCanceled) func.fCanceled();
+    } else mDependentF << func;
+}
+
 bool Task::finished() { return mState == FINISHED; }
 
 void Task::decDependencies() {
@@ -53,6 +61,10 @@ void Task::tellDependentThatFinished() {
         if(dependent) dependent->decDependencies();
     }
     mDependent.clear();
+    for(const auto& dependent : mDependentF) {
+        if(dependent.fFinished) dependent.fFinished();
+    }
+    mDependentF.clear();
 }
 
 void Task::cancelDependent() {
@@ -60,6 +72,10 @@ void Task::cancelDependent() {
         if(dependent) dependent->cancel();
     }
     mDependent.clear();
+    for(const auto& dependent : mDependentF) {
+        if(dependent.fCanceled) dependent.fCanceled();
+    }
+    mDependentF.clear();
 }
 
 void CPUTask::scheduleTaskNow() {
@@ -67,6 +83,8 @@ void CPUTask::scheduleTaskNow() {
 }
 
 void HDDTask::scheduleTaskNow() {
+    const auto lock = MainWindow::getInstance()->lock();
+    addDependent({[lock]() {}, nullptr});
     TaskScheduler::sGetInstance()->scheduleHDDTask(ref<Task>());
 }
 

@@ -97,7 +97,6 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
     if(!mTarget) {
         QDoubleSlider::paint(p);
     } else {
-        if(isTargetDisabled()) p->setOpacity(.5);
         bool rec = false;
         bool key = false;
         if(mTarget->SWT_isAnimator()) {
@@ -105,11 +104,16 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
             rec = aTarget->anim_isRecording();
             key = aTarget->anim_getKeyOnCurrentFrame();
         }
-        QDoubleSlider::paint(p,
-                    rec ? QColor(255, 200, 200) : QColor(255, 255, 255),
-                    rec ? QColor(255, 160, 160) : QColor(220, 220, 220),
-                    rec && key ? Qt::red : Qt::black);
-        p->setOpacity(1);
+        if(rec) {
+            const bool disabled = isTargetDisabled() || !isEnabled();
+            QDoubleSlider::paint(p,
+                        disabled ? QColor(200, 180, 180) : QColor(255, 200, 200),
+                        rec ? QColor(180, 160, 160) : QColor(255, 160, 160),
+                        key ? (disabled ? QColor(200, 90, 90) : Qt::red) :
+                              (disabled ? Qt::darkGray : Qt::black));
+        } else {
+            QDoubleSlider::paint(p);
+        }
     }
 }
 
