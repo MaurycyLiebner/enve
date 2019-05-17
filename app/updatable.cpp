@@ -83,8 +83,6 @@ void CPUTask::scheduleTaskNow() {
 }
 
 void HDDTask::scheduleTaskNow() {
-    const auto lock = MainWindow::getInstance()->lock();
-    addDependent({[lock]() {}, nullptr});
     TaskScheduler::sGetInstance()->scheduleHDDTask(ref<Task>());
 }
 
