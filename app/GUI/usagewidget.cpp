@@ -22,13 +22,13 @@ void UsageWidget::setThreadsTotal(const int &threads) {
     updateDisplayedText();
 }
 
-void UsageWidget::setCpuUsage(const int &thisPercent) {
-    mCpuUsage = thisPercent;
+void UsageWidget::setHddUsage(const bool &used) {
+    mHddUsage = used;
     updateDisplayedText();
 }
 
 void UsageWidget::setRamUsage(const qreal &thisGB) {
-    if(thisGB >= 0.) {
+    if(thisGB >= 0) {
         mRamUsage = thisGB;
     } else {
         mRamUsage = mTotalRam + thisGB;
@@ -43,14 +43,12 @@ void UsageWidget::setTotalRam(const qreal &totalRamGB) {
 
 void UsageWidget::updateDisplayedText() {
     QLocale locale;
-#ifdef QT_DEBUG
-    setText("threads: " + locale.toString(mThreadsUsage) + " / " +
-            locale.toString(mThreadsTotal) + "     " + "cpu: " +
-            locale.toString(mCpuUsage) + "%" + "     " + "ram: " +
-            locale.toString(mRamUsage, 'f', 1) + " GB / " +
-            locale.toString(mTotalRam, 'f', 1) + " GB");
-#else
-    setText(locale.toString(mRamUsage, 'f', 1) + " GB / " +
-            locale.toString(mTotalRam, 'f', 1) + " GB");
-#endif
+    const int cpuPer = qRound(mThreadsUsage*100./mThreadsTotal);
+    const int hddPer = mHddUsage ? 100 : 0;
+    const int ramPer = qRound(mRamUsage*100./mTotalRam);
+    setText("cpu: " + locale.toString(cpuPer) + "%     " +
+            "hdd: " + locale.toString(hddPer) + "%     " +
+            "ram: " + locale.toString(ramPer) + "%");
+//            locale.toString(mRamUsage, 'f', 1) + " GB / " +
+//            locale.toString(mTotalRam, 'f', 1) + " GB");
 }

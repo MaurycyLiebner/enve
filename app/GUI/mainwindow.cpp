@@ -507,12 +507,10 @@ ClipboardContainer *MainWindow::getClipboardContainer(
 
 #include <QSpacerItem>
 void MainWindow::setupStatusBar() {
-#ifdef QT_DEBUG
     mStatusBar = new QStatusBar(this);
     setStatusBar(mStatusBar);
     mUsageWidget = new UsageWidget(mStatusBar);
     mStatusBar->addWidget(mUsageWidget);
-#endif
 }
 
 void MainWindow::setupToolBar() {
@@ -740,20 +738,18 @@ MainWindow *MainWindow::getInstance() {
 
 #include "newcanvasdialog.h"
 void MainWindow::createNewCanvas() {
-    QString defName = "Scene " +
+    const QString defName = "Scene " +
             QString::number(mCurrentCanvasComboBox->count());
-    qsptr<Canvas> newCanvas =
+    const auto newCanvas =
             SPtrCreate(Canvas)(mCanvasWindow, 1920, 1080, 200);
     newCanvas->setName(defName);
-    const auto dialog =
-            new CanvasSettingsDialog(newCanvas.get(), this);
 
-    int dialogRet = dialog->exec();
+    CanvasSettingsDialog dialog(newCanvas.get(), this);
+    const int dialogRet = dialog.exec();
     if(dialogRet == QDialog::Accepted) {
-        dialog->applySettingsToCanvas(newCanvas.get());
+        dialog.applySettingsToCanvas(newCanvas.get());
         addCanvas(newCanvas);
     }
-    delete dialog;
 }
 
 void MainWindow::addCanvas(const qsptr<Canvas>& newCanvas) {
@@ -778,12 +774,10 @@ void MainWindow::addCanvas(const qsptr<Canvas>& newCanvas) {
 
 void MainWindow::canvasNameChanged(Canvas *canvas,
                                    const QString &name) {
-    const QList<qsptr<Canvas>> &canvasList = mCanvasWindow->getCanvasList();
+    const auto &canvasList = mCanvasWindow->getCanvasList();
     int idT = 0;
     for(const auto& canvasPtr : canvasList) {
-        if(canvasPtr == canvas) {
-            break;
-        }
+        if(canvasPtr == canvas) break;
         idT++;
     }
 
@@ -892,8 +886,7 @@ void MainWindow::queScheduledTasksAndUpdate() {
 #include "Boxes/textbox.h"
 void MainWindow::setCurrentBox(BoundingBox *box) {
     if(!box) {
-        mFillStrokeSettings->setCurrentSettings(nullptr,
-                                                nullptr);
+        mFillStrokeSettings->setCurrentSettings(nullptr, nullptr);
     } else {
         mFillStrokeSettings->setCurrentSettings(box->getFillSettings(),
                                                 box->getStrokeSettings());

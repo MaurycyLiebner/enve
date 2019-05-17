@@ -153,21 +153,26 @@ void TaskScheduler::afterHDDTaskFinished(
     if(!HDDTaskBeingProcessed()) queTasks();
     callAllTasksFinishedFunc();
 }
-
+#include "GUI/usagewidget.h"
+#include "GUI/mainwindow.h"
 void TaskScheduler::processNextQuedHDDTask() {
-    if(mHDDThreadBusy) return;
-    for(int i = 0; i < mQuedHDDTasks.count(); i++) {
-        const auto task = mQuedHDDTasks.at(i);
-        if(task->readyToBeProcessed()) {
-            task->aboutToProcess();
-            const auto hddTask = dynamic_cast<HDDTask*>(task.get());
-            if(hddTask) hddTask->setController(mHDDExecutor);
-            mQuedHDDTasks.removeAt(i--);
-            mHDDThreadBusy = true;
-            mHDDExecutor->processTask(task);
-            break;
+    if(!mHDDThreadBusy) {
+        for(int i = 0; i < mQuedHDDTasks.count(); i++) {
+            const auto task = mQuedHDDTasks.at(i);
+            if(task->readyToBeProcessed()) {
+                task->aboutToProcess();
+                const auto hddTask = dynamic_cast<HDDTask*>(task.get());
+                if(hddTask) hddTask->setController(mHDDExecutor);
+                mQuedHDDTasks.removeAt(i--);
+                mHDDThreadBusy = true;
+                mHDDExecutor->processTask(task);
+                break;
+            }
         }
     }
+    const auto usageWidget = MainWindow::getInstance()->getUsageWidget();
+    if(!usageWidget) return;
+    usageWidget->setHddUsage(mHDDThreadBusy);
 }
 
 void TaskScheduler::processNextTasks() {
@@ -177,8 +182,6 @@ void TaskScheduler::processNextTasks() {
         callFreeThreadsForCPUTasksAvailableFunc();
 }
 
-#include "GUI/usagewidget.h"
-#include "GUI/mainwindow.h"
 void TaskScheduler::afterCPUTaskFinished(
         const stdsptr<Task>& task,
         ExecController * const controller) {
@@ -207,9 +210,8 @@ void TaskScheduler::processNextQuedCPUTask() {
             executor->processTask(task);
         } else break;
     }
-#ifdef QT_DEBUG
-    auto usageWidget = MainWindow::getInstance()->getUsageWidget();
+    const auto usageWidget = MainWindow::getInstance()->getUsageWidget();
+    if(!usageWidget) return;
     const int cUsed = mCPUExecutors.count() - mFreeCPUExecs.count();
     usageWidget->setThreadsUsage(cUsed);
-#endif
 }
