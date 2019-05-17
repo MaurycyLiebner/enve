@@ -12,11 +12,15 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
                              const std::function<void()>& openFunc,
                              const std::function<void(QString)>& openRecentFunc,
                              QWidget * const parent) :
-    QDialog(parent) {
-    setWindowFlag(Qt::FramelessWindowHint);
+    QWidget(parent) {
+    const auto thisLay = new QVBoxLayout;
+
+    const auto mainWid = new QWidget(this);
+    setLayout(thisLay);
+    thisLay->addWidget(mainWid, 0, Qt::AlignHCenter | Qt::AlignVCenter);
 
     const auto mainLay = new QVBoxLayout;
-    setLayout(mainLay);
+    mainWid->setLayout(mainLay);
 
     const auto buttonLay = new QHBoxLayout;
     mainLay->addLayout(buttonLay);
@@ -61,4 +65,10 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
     recentScroll->setWidget(recentWidget);
 
     mainLay->addWidget(recentScroll);
+}
+#include <QPainter>
+void WelcomeDialog::paintEvent(QPaintEvent *) {
+    QPainter p(this);
+    p.fillRect(0, 0, width(), height(), Qt::black);
+    p.end();
 }

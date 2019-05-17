@@ -165,7 +165,7 @@ public:
     void getDisplayedFillStrokeSettingsFromLastSelected(
             PaintSettingsAnimator *&fillSetings, OutlineSettingsAnimator *&strokeSettings);
 private:
-    QDialog * mWelcomeDialog = nullptr;
+    QWidget * mWelcomeDialog = nullptr;
 
     void changeCurrentFrameAction(const int &frame);
     void playPreviewAfterAllTasksCompleted();

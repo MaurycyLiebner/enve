@@ -859,18 +859,22 @@ void CanvasWindow::getDisplayedFillStrokeSettingsFromLastSelected(
 #include "welcomedialog.h"
 void CanvasWindow::openWelcomeDialog() {
     if(mWelcomeDialog) return;
+    const auto mWindow = MainWindow::getInstance();
     mWelcomeDialog = new WelcomeDialog(QStringList() << "/home/ailuropoda/Documents/kom/ready/menu.av",
                                        []() { MainWindow::getInstance()->createNewCanvas(); },
                                        []() { MainWindow::getInstance()->openFile(); },
                                        [](QString path) { MainWindow::getInstance()->openFile(path); },
-                                       MainWindow::getInstance());
-    mWelcomeDialog->show();
+                                       mWindow);
+    mWindow->takeCentralWidget();
+    mWindow->setCentralWidget(mWelcomeDialog);
 }
 
 void CanvasWindow::closeWelcomeDialog() {
     if(!mWelcomeDialog) return;
-    delete mWelcomeDialog;
     mWelcomeDialog = nullptr;
+
+    const auto mWindow = MainWindow::getInstance();
+    mWindow->setCentralWidget(getCanvasWidget());
 }
 
 void CanvasWindow::changeCurrentFrameAction(const int& frame) {
