@@ -89,7 +89,10 @@ bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_BoxRule &rule) {
 }
 
 void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
-    if(!mMainAbstraction) return;
+    if(!mMainAbstraction) {
+        for(const auto& wid : mSingleWidgets) wid->hide();
+        return;
+    }
     //updateParentHeight();
 
     int currentWidgetId = 0;

@@ -288,7 +288,7 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidgetBelow(
 
 void BoxesListAnimationDockWidget::clearAll() {
     QList<BoxesListKeysViewWidget*> widgets = mBoxesListKeysViewWidgets;
-    for(BoxesListKeysViewWidget *widget : widgets) {
+    for(auto widget : widgets) {
         removeBoxesListKeysViewWidget(widget);
     }
 }

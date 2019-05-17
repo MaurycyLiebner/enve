@@ -116,7 +116,7 @@ void CanvasWindow::addCanvasToList(const qsptr<Canvas>& canvas) {
 }
 
 void CanvasWindow::removeCanvas(const int &id) {
-    qsptr<Canvas> canvas = mCanvasList.takeAt(id);
+    const auto canvas = mCanvasList.takeAt(id);
     mWindowSWTTarget->SWT_removeChildAbstractionForTargetFromAll(canvas.data());
     if(mCanvasList.isEmpty()) {
         setCurrentCanvas(nullptr);
