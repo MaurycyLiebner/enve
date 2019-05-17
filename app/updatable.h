@@ -104,8 +104,52 @@ private:
     HDDExecController * mController = nullptr;
 };
 
+class StdSPtrDisposer : public CPUTask {
+    friend class StdSelfRef;
+protected:
+    StdSPtrDisposer(const stdsptr<void>& ptr) : mPtr(ptr) {}
+public:
+    void beforeProcessing() final {}
+    void processTask() final { mPtr.reset(); }
+protected:
+    void afterProcessing() final {}
+private:
+    stdsptr<void> mPtr;
+};
+#include "skia/skiaincludes.h"
+class SkImageSPtrDisposer : public CPUTask {
+    friend class StdSelfRef;
+protected:
+    SkImageSPtrDisposer(const sk_sp<SkImage>& ptr) : mPtr(ptr) {}
+public:
+    void beforeProcessing() final {}
+    void processTask() final { mPtr.reset(); }
+protected:
+    void afterProcessing() final {}
+private:
+    sk_sp<SkImage> mPtr;
+};
+
+class QSPtrDisposer : public CPUTask {
+    friend class StdSelfRef;
+protected:
+    QSPtrDisposer(const qsptr<QObject>& ptr) : mPtr(ptr) {}
+public:
+    void beforeProcessing() final {}
+    void processTask() final { mPtr.reset(); }
+protected:
+    void afterProcessing() final {}
+private:
+    qsptr<QObject> mPtr;
+};
+
 class CustomCPUTask : public CPUTask {
     friend class StdSelfRef;
+protected:
+    CustomCPUTask(const std::function<void(void)>& before,
+                  const std::function<void(void)>& run,
+                  const std::function<void(void)>& after) :
+        mBefore(before), mRun(run), mAfter(after) {}
 public:
     void beforeProcessing() final {
         if(mBefore) mBefore();
@@ -119,11 +163,6 @@ protected:
     void afterProcessing() final {
         if(mAfter) mAfter();
     }
-
-    CustomCPUTask(const std::function<void(void)>& before,
-                  const std::function<void(void)>& run,
-                  const std::function<void(void)>& after) :
-        mBefore(before), mRun(run), mAfter(after) {}
 private:
     const std::function<void(void)> mBefore;
     const std::function<void(void)> mRun;

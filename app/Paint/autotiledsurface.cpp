@@ -29,7 +29,11 @@ AutoTiledSurface::AutoTiledSurface() {
                                autoTiledSurfaceRequestStart,
                                autoTiledSurfaceRequestEnd);
     fParent.parent.destroy = autoTiledSurfaceFree;
+#ifdef _OPENMP
+    fParent.threadsafe_tile_requests = true;
+#else
     fParent.threadsafe_tile_requests = false;
+#endif
 }
 
 AutoTiledSurface::~AutoTiledSurface() {
@@ -39,7 +43,10 @@ AutoTiledSurface::~AutoTiledSurface() {
 void AutoTiledSurface::loadBitmap(const SkBitmap& src) {
     mAutoTilesData.loadBitmap(src);
 }
+
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
 void AutoTiledSurface::_startRequest(MyPaintTileRequest * const request) {
     //qDebug() << request->tx << request->ty;
