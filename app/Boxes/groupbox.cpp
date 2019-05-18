@@ -256,8 +256,8 @@ void GroupBox::updateAllChildPathBoxes(const Animator::UpdateReason &reason) {
         if(box->SWT_isPathBox()) {
             GetAsPtr(box, PathBox)->setPathsOutdated();
             box->planScheduleUpdate(reason);
-        } else if(box->SWT_isLayerBox()) {
-            GetAsPtr(box, LayerBox)->updateAllChildPathBoxes(reason);
+        } else if(box->SWT_isGroupBox()) {
+            GetAsPtr(box, GroupBox)->updateAllChildPathBoxes(reason);
         }
     }
 }

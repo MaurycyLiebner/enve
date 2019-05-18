@@ -27,12 +27,9 @@ bool LayerBox::mCtrlsAlwaysVisible = false;
 //    return box1->getZIndex() < box2->getZIndex();
 //}
 
-LayerBox::LayerBox(const BoundingBoxType &type) :
-    GroupBox(type) {
+LayerBox::LayerBox(const BoundingBoxType &type) : GroupBox(type) {
     setName("Layer");
 }
-
-LayerBox::~LayerBox() {}
 
 qsptr<BoundingBox> LayerBox::createLink() {
     const auto linkBox = SPtrCreate(InternalLinkGroupBox)(this);
@@ -40,11 +37,24 @@ qsptr<BoundingBox> LayerBox::createLink() {
     return std::move(linkBox);
 }
 
-void processChildData(BoundingBox* child,
-                      LayerBoxRenderData* parentData,
-                      const qreal& boxRelFrame) {
+void processChildData(BoundingBox * const child,
+                      LayerBoxRenderData * const parentData,
+                      const qreal& childRelFrame,
+                      const qreal& absFrame,
+                      qreal& childrenEffectsMargin) {
+    if(!child->isFrameFVisibleAndInDurationRect(childRelFrame)) return;
+    if(child->SWT_isGroupBox() && !child->SWT_isLayerBox()) {
+        const auto childGroup = GetAsPtr(child, GroupBox);
+        const auto descs = childGroup->getContainedBoxesList();
+        for(const auto& desc : descs) {
+            processChildData(desc.get(), parentData,
+                             desc->prp_absFrameToRelFrameF(absFrame),
+                             absFrame, childrenEffectsMargin);
+        }
+        return;
+    }
     auto boxRenderData =
-            GetAsSPtr(child->getCurrentRenderData(qRound(boxRelFrame)),
+            GetAsSPtr(child->getCurrentRenderData(qRound(childRelFrame)),
                       BoundingBoxRenderData);
     if(boxRenderData) {
         if(boxRenderData->fCopied) {
@@ -55,15 +65,19 @@ void processChildData(BoundingBox* child,
         boxRenderData->fReason = parentData->fReason;
         //boxRenderData->parentIsTarget = false;
         boxRenderData->fUseCustomRelFrame = true;
-        boxRenderData->fCustomRelFrame = boxRelFrame;
+        boxRenderData->fCustomRelFrame = childRelFrame;
         boxRenderData->scheduleTask();
     }
     boxRenderData->addDependent(parentData);
     parentData->fChildrenRenderData << boxRenderData;
+
+    childrenEffectsMargin =
+            qMax(child->getEffectsMarginAtRelFrameF(childRelFrame),
+                 childrenEffectsMargin);
 }
 
 void LayerBox::setupRenderData(const qreal &relFrame,
-                                 BoundingBoxRenderData * const data) {
+                               BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     const auto groupData = GetAsPtr(data, LayerBoxRenderData);
     groupData->fChildrenRenderData.clear();
@@ -72,13 +86,8 @@ void LayerBox::setupRenderData(const qreal &relFrame,
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     for(const auto& box : mContainedBoxes) {
         const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
-        if(box->isFrameFVisibleAndInDurationRect(boxRelFrame)) {
-            processChildData(box.data(), groupData, boxRelFrame);
-
-            childrenEffectsMargin =
-                    qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
-                         childrenEffectsMargin);
-        }
+        processChildData(box.data(), groupData, boxRelFrame,
+                         absFrame, childrenEffectsMargin);
     }
 
     data->fEffectsMargin += childrenEffectsMargin;

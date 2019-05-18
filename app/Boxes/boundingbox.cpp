@@ -167,7 +167,7 @@ void BoundingBox::setStrokeColorMode(const ColorMode &colorMode) {
 bool BoundingBox::isAncestor(const BoundingBox * const box) const {
     if(!mParentGroup) return false;
     if(mParentGroup == box) return true;
-    if(box->SWT_isLayerBox()) return mParentGroup->isAncestor(box);
+    if(box->SWT_isGroupBox()) return mParentGroup->isAncestor(box);
     return false;
 }
 
@@ -382,6 +382,7 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 }
 
 bool BoundingBox::shouldPlanScheduleUpdate() {
+    if(SWT_isGroupBox() && !SWT_isLayerBox()) return false;
     if(!mParentGroup) return false;
     if(isVisibleAndInVisibleDurationRect()) return true;
     return false;
@@ -389,9 +390,10 @@ bool BoundingBox::shouldPlanScheduleUpdate() {
 
 void BoundingBox::planScheduleUpdate(const UpdateReason& reason) {
     if(!shouldPlanScheduleUpdate()) return;
-    if(mParentGroup) {
-        mParentGroup->planScheduleUpdate(qMin(reason, CHILD_USER_CHANGE));
-    }
+    const auto parentLayer = getFirstAncestor<LayerBox>();
+    if(parentLayer) {
+        parentLayer->planScheduleUpdate(qMin(reason, CHILD_USER_CHANGE));
+    } else if(!SWT_isCanvas()) return;
     if(reason != UpdateReason::FRAME_CHANGE) mStateId++;
     mDrawRenderContainer.setExpired(true);
     if(mSchedulePlanned) {

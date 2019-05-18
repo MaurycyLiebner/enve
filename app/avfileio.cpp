@@ -973,7 +973,8 @@ void TextBox::readBoundingBox(QIODevice * const target) {
     mFont.setStyleName(fontStyle);
 }
 
-void LayerBox::writeBoundingBox(QIODevice * const target) {
+#include "Boxes/groupbox.h"
+void GroupBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
     mPathEffectsAnimators->writeProperty(target);
     mFillPathEffectsAnimators->writeProperty(target);
@@ -984,7 +985,7 @@ void LayerBox::writeBoundingBox(QIODevice * const target) {
         child->writeBoundingBox(target);
     }
 }
-#include "Boxes/groupbox.h"
+
 void GroupBox::readChildBoxes(QIODevice *target) {
     int nChildBoxes;
     target->read(rcChar(&nChildBoxes), sizeof(int));
@@ -1007,7 +1008,9 @@ void GroupBox::readChildBoxes(QIODevice *target) {
         } else if(boxType == TYPE_CIRCLE) {
             box = SPtrCreate(Circle)();
         } else if(boxType == TYPE_LAYER) {
-            box = SPtrCreate(LayerBox)();
+            box = SPtrCreate(GroupBox/*LayerBox*/)();
+        } else if(boxType == TYPE_GROUP) {
+            box = SPtrCreate(GroupBox)();
         } else if(boxType == TYPE_PAINT) {
             box = SPtrCreate(PaintBox)();
         } else if(boxType == TYPE_IMAGESQUENCE) {
@@ -1021,9 +1024,7 @@ void GroupBox::readChildBoxes(QIODevice *target) {
         } else if(boxType == TYPE_INTERNAL_LINK_CANVAS) {
             box = SPtrCreate(InternalLinkCanvas)(nullptr);
         } else {
-            QString errMsg = "Invalid box type '" +
-                    QString::number(boxType) + "'.";
-            RuntimeThrow(errMsg.toStdString());
+            RuntimeThrow("Invalid box type '" + std::to_string(boxType) + "'");
         }
 
         box->readBoundingBox(target);
@@ -1031,7 +1032,7 @@ void GroupBox::readChildBoxes(QIODevice *target) {
     }
 }
 
-void LayerBox::readBoundingBox(QIODevice * const target) {
+void GroupBox::readBoundingBox(QIODevice * const target) {
     BoundingBox::readBoundingBox(target);
     mPathEffectsAnimators->readProperty(target);
     mFillPathEffectsAnimators->readProperty(target);

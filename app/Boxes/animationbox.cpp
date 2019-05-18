@@ -56,7 +56,7 @@ void AnimationBox::setParentGroup(GroupBox * const parent) {
 }
 
 bool AnimationBox::shouldPlanScheduleUpdate() {
-    if(!mSrcFramesCache || !mParentGroup) return false;
+    if(!mSrcFramesCache) return false;
     return BoundingBox::shouldPlanScheduleUpdate();
 }
 

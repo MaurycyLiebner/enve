@@ -79,6 +79,9 @@ public:
     void scheduleWaitingTasks();
     void queScheduledTasks();
 
+    void writeBoundingBox(QIODevice * const target);
+    void readBoundingBox(QIODevice * const target);
+
     const QList<qsptr<BoundingBox>> &getContainedBoxesList() const;
 
     //    bool anim_nextRelFrameWithKey(const int &relFrame,
@@ -170,5 +173,7 @@ private:
 signals:
     void setParentAsCurrentGroup();
 };
+
+
 
 #endif // GROUPBOX_H

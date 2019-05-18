@@ -340,7 +340,7 @@ void Canvas::scaleSelectedBy(const qreal& scaleXBy,
 
 QPointF Canvas::getSelectedBoxesAbsPivotPos() {
     if(mSelectedBoxes.isEmpty()) return QPointF(0, 0);
-    QPointF posSum = QPointF(0, 0);
+    QPointF posSum(0, 0);
     const int count = mSelectedBoxes.length();
     for(const auto &box : mSelectedBoxes) {
         posSum += box->getPivotAbsPos();
@@ -354,8 +354,8 @@ bool Canvas::isBoxSelectionEmpty() {
 
 void Canvas::ungroupSelectedBoxes() {
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isLayerBox()) {
-            GetAsPtr(box, LayerBox)->ungroup_k();
+        if(box->SWT_isGroupBox()) {
+            GetAsPtr(box, GroupBox)->ungroup_k();
         }
     }
 }
@@ -552,20 +552,6 @@ void Canvas::duplicateSelectedBoxes() {
 
     clearBoxesSelection();
     container->pasteTo(mCurrentBoxesGroup);
-}
-
-void Canvas::groupSelectedBoxes() {
-    if(mSelectedBoxes.isEmpty()) return;
-    const auto newGroup = SPtrCreate(LayerBox)();
-    mCurrentBoxesGroup->addContainedBox(newGroup);
-    BoundingBox* box;
-    Q_FOREACHInverted(box, mSelectedBoxes) {
-        const auto boxSP = GetAsSPtr(box, BoundingBox);
-        box->removeFromParent_k();
-        newGroup->addContainedBox(boxSP);
-    }
-    clearBoxesSelectionList(); schedulePivotUpdate();
-    addBoxToSelection(newGroup.get());
 }
 
 SmartVectorPath *Canvas::getPathResultingFromOperation(

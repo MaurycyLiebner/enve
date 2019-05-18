@@ -10,8 +10,6 @@ class LayerBox : public GroupBox {
 protected:
     LayerBox(const BoundingBoxType& type = TYPE_LAYER);
 public:
-    ~LayerBox();
-
     bool SWT_isLayerBox() const;
     void anim_setAbsFrame(const int &frame);
     //MovablePoint *getPointAt(const QPointF &absPos, const CanvasMode &currentMode);
@@ -27,9 +25,6 @@ public:
 
     void setupRenderData(const qreal &relFrame,
                          BoundingBoxRenderData * const data);
-
-    void writeBoundingBox(QIODevice * const target);
-    void readBoundingBox(QIODevice * const target);
 
     qsptr<BoundingBox> createLink();
 

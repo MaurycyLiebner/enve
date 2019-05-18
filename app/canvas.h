@@ -95,7 +95,22 @@ public:
                                  const bool &startTransform);
     void moveSelectedBoxesByAbs(const QPointF &by,
                                 const bool &startTransform);
-    void groupSelectedBoxes();
+    template <typename T = GroupBox>
+    void groupSelectedBoxes() {
+        static_assert(std::is_base_of<GroupBox, T>::value,
+                      "Template class must inherit from GroupBox");
+        if(mSelectedBoxes.isEmpty()) return;
+        const auto newGroup = SPtrCreateTemplated(T)();
+        mCurrentBoxesGroup->addContainedBox(newGroup);
+        BoundingBox* box;
+        Q_FOREACHInverted(box, mSelectedBoxes) {
+            const auto boxSP = GetAsSPtr(box, BoundingBox);
+            box->removeFromParent_k();
+            newGroup->addContainedBox(boxSP);
+        }
+        clearBoxesSelectionList(); schedulePivotUpdate();
+        addBoxToSelection(newGroup.get());
+    }
 
     //void selectAllBoxes();
     void deselectAllBoxes();

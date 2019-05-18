@@ -543,8 +543,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             });
             if(clipboard) {
                 if(target->SWT_isBoundingBox()) {
-                    if(target->SWT_isLayerBox() &&
-                        !target->SWT_isLinkBox()) {
+                    if(target->SWT_isGroupBox() && !target->SWT_isLinkBox()) {
                         auto boxClip = MainWindow::getBoxesClipboardContainer();
                         if(boxClip) {
                             menu.addAction("Paste Boxes", [target]() {

@@ -23,8 +23,8 @@ void PathEffectAnimators::addEffect(const qsptr<PathEffect>& effect) {
         } else {
             pathBox->addPathEffect(effect);
         }
-    } else if(mParentBox->SWT_isLayerBox()) {
-        const auto groupBox = GetAsPtr(mParentBox, LayerBox);
+    } else if(mParentBox->SWT_isGroupBox()) {
+        const auto groupBox = GetAsPtr(mParentBox, GroupBox);
         if(mIsOutline) {
             groupBox->addOutlinePathEffect(effect);
         } else if(mIsFill) {
@@ -45,8 +45,8 @@ void PathEffectAnimators::removeEffect(const qsptr<PathEffect>& effect) {
         } else {
             pathBox->removePathEffect(effect);
         }
-    } else if(mParentBox->SWT_isLayerBox()) {
-        const auto groupBox = GetAsPtr(mParentBox, LayerBox);
+    } else if(mParentBox->SWT_isGroupBox()) {
+        const auto groupBox = GetAsPtr(mParentBox, GroupBox);
         if(mIsOutline) {
             groupBox->removeOutlinePathEffect(effect);
         } else if(mIsFill) {

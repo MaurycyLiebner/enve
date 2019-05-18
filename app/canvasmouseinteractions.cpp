@@ -464,7 +464,7 @@ void Canvas::handleMovePointMouseRelease() {
         } else {
             mLastPressedBox = mCurrentBoxesGroup->getBoxAt(
                         mCurrentMouseEventPosRel);
-            if(!mLastPressedBox ? true : mLastPressedBox->SWT_isLayerBox()) {
+            if(!mLastPressedBox ? true : mLastPressedBox->SWT_isGroupBox()) {
                 BoundingBox * const pressedBox =
                         getBoxAtFromAllDescendents(mCurrentMouseEventPosRel);
                 if(!pressedBox) {
