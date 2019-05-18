@@ -68,7 +68,7 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
         const auto homePath = QDir::homePath();
         QString ttPath = path;
         if(ttPath.contains(homePath)) {
-            ttPath = "~/" + ttPath.mid(homePath.count());
+            ttPath = "~" + ttPath.mid(homePath.count());
         }
         pathButton->setToolTip("<p style='white-space:pre'>" + ttPath + "</p>");
         connect(pathButton, &QPushButton::released, [path, openRecentFunc]() {
