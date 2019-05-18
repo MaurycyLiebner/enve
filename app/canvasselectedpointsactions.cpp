@@ -177,7 +177,7 @@ void Canvas::removePointFromSelection(MovablePoint * const point) {
 }
 
 void Canvas::updateSelectedPointsAfterCtrlsVisiblityChanged() {
-    if(!BoxesGroup::mCtrlsAlwaysVisible) {
+    if(!LayerBox::mCtrlsAlwaysVisible) {
         QList<MovablePoint*> pointsToDeselect;
         for(const auto& point : mSelectedPoints_d) {
             pointsToDeselect << point;
@@ -190,7 +190,7 @@ void Canvas::updateSelectedPointsAfterCtrlsVisiblityChanged() {
 
 void Canvas::removeSelectedPointsAndClearList() {
     if(mIsMouseGrabbing) {
-        if(!BoxesGroup::mCtrlsAlwaysVisible ||
+        if(!LayerBox::mCtrlsAlwaysVisible ||
             mSelectedPoints_d.count() == 1) {
             if(mLastPressedPoint) {
                 if(mLastPressedPoint->isCtrlPoint()) {

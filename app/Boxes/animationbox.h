@@ -35,7 +35,7 @@ public:
     void setupRenderData(const qreal &relFrame,
                          BoundingBoxRenderData * const data);
     stdsptr<BoundingBoxRenderData> createRenderData();
-    void setParentGroup(BoxesGroup * const parent);
+    void setParentGroup(LayerBox * const parent);
     bool shouldPlanScheduleUpdate();
 
     void writeBoundingBox(QIODevice * const target);

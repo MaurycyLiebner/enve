@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QMimeData>
 #include "Boxes/boundingbox.h"
-#include "Boxes/boxesgroup.h"
+#include "Boxes/layerbox.h"
 #include "GUI/mainwindow.h"
 #include "global.h"
 #include "singlewidgetabstraction.h"
@@ -202,7 +202,7 @@ DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
             if(mCurrentlyDragged.fType == Dragged::BOX) {
                 const auto targetUnderMouse = targetAbs->getTarget();
                 if(targetUnderMouse->SWT_isBoxesGroup()) {
-                    const auto bbUnderMouse = GetAsPtr(targetUnderMouse, BoxesGroup);
+                    const auto bbUnderMouse = GetAsPtr(targetUnderMouse, LayerBox);
                     firstId = bbUnderMouse->ca_getNumberOfChildren();
                 }
             }
@@ -310,7 +310,7 @@ bool BoxScrollWidgetVisiblePart::droppingSupported(
         const auto draggedAbs = mCurrentlyDragged.fPtr;
         const auto draggedBox = static_cast<BoundingBox*>(
                     draggedAbs->getTarget());
-        const auto targetGroup = static_cast<const BoxesGroup*>(
+        const auto targetGroup = static_cast<const LayerBox*>(
                     targetSWT);
         if(idInTarget < targetGroup->ca_getNumberOfChildren()) return false;
         if(targetGroup->isAncestor(draggedBox)) return false;
@@ -339,7 +339,7 @@ DropTypes_ BoxScrollWidgetVisiblePart::dropOnSWTSupported(
     if(mCurrentlyDragged.fType == Dragged::BOX) {
         const auto targetUnderMouse = absUnderMouse->getTarget();
         if(targetUnderMouse->SWT_isBoxesGroup()) {
-            const auto bbUnderMouse = GetAsPtr(targetUnderMouse, BoxesGroup);
+            const auto bbUnderMouse = GetAsPtr(targetUnderMouse, LayerBox);
             firstId = bbUnderMouse->ca_getNumberOfChildren();
         }
     }
@@ -433,7 +433,7 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
     const auto targetSWT = fTargetParent->getTarget();
     if(dragged.fType == Dragged::BOX) {
         const auto draggedBox = GetAsSPtr(draggedSWT, BoundingBox);
-        const auto targetGroup = GetAsPtr(targetSWT, BoxesGroup);
+        const auto targetGroup = GetAsPtr(targetSWT, LayerBox);
         const auto currentDraggedParent = draggedBox->getParentGroup();
         int boxTargetId = targetGroup->abstractionIdToBoxId(fTargetId) + 1;
         if(currentDraggedParent != targetGroup) {

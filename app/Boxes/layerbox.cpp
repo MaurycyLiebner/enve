@@ -1,4 +1,4 @@
-#include "Boxes/boxesgroup.h"
+#include "Boxes/layerbox.h"
 #include "undoredo.h"
 #include <QApplication>
 #include "GUI/mainwindow.h"
@@ -20,16 +20,16 @@
 #include "PixmapEffects/pixmapeffect.h"
 #include "Boxes/internallinkgroupbox.h"
 
-bool BoxesGroup::mCtrlsAlwaysVisible = false;
+bool LayerBox::mCtrlsAlwaysVisible = false;
 
 //bool zMoreThan(BoundingBox *box1, BoundingBox *box2)
 //{
 //    return box1->getZIndex() < box2->getZIndex();
 //}
 
-BoxesGroup::BoxesGroup(const BoundingBoxType &type) :
+LayerBox::LayerBox(const BoundingBoxType &type) :
     BoundingBox(type) {
-    setName("Group");
+    setName("Layer");
     iniPathEffects();
 }
 
@@ -66,7 +66,7 @@ BoxesGroup::BoxesGroup(const BoundingBoxType &type) :
 //    return qMax(maxPrevAbsFrame, thisMaxPrevFrame);
 //}
 
-void BoxesGroup::iniPathEffects() {
+void LayerBox::iniPathEffects() {
     mPathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)(false, false, this);
     mPathEffectsAnimators->prp_setName("path effects");
@@ -92,26 +92,26 @@ void BoxesGroup::iniPathEffects() {
     mOutlinePathEffectsAnimators->SWT_hide();
 }
 
-bool BoxesGroup::differenceInFillPathEffectsBetweenFrames(const int& relFrame1,
+bool LayerBox::differenceInFillPathEffectsBetweenFrames(const int& relFrame1,
                                                           const int& relFrame2) const {
     return mFillPathEffectsAnimators->prp_differencesBetweenRelFrames(relFrame1,
                                                                       relFrame2);
 }
 
 
-bool BoxesGroup::differenceInOutlinePathEffectsBetweenFrames(const int& relFrame1,
+bool LayerBox::differenceInOutlinePathEffectsBetweenFrames(const int& relFrame1,
                                                              const int& relFrame2) const {
     return mOutlinePathEffectsAnimators->prp_differencesBetweenRelFrames(relFrame1,
                                                                          relFrame2);
 }
 
-bool BoxesGroup::differenceInPathEffectsBetweenFrames(const int& relFrame1,
+bool LayerBox::differenceInPathEffectsBetweenFrames(const int& relFrame1,
                                                       const int& relFrame2) const {
     return mPathEffectsAnimators->prp_differencesBetweenRelFrames(relFrame1,
                                                                   relFrame2);
 }
 
-void BoxesGroup::addPathEffect(const qsptr<PathEffect>& effect) {
+void LayerBox::addPathEffect(const qsptr<PathEffect>& effect) {
     //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
 
     if(effect->hasReasonsNotToApplyUglyTransform()) {
@@ -126,7 +126,7 @@ void BoxesGroup::addPathEffect(const qsptr<PathEffect>& effect) {
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
-void BoxesGroup::addFillPathEffect(const qsptr<PathEffect>& effect) {
+void LayerBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
     //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         incReasonsNotToApplyUglyTransform();
@@ -140,7 +140,7 @@ void BoxesGroup::addFillPathEffect(const qsptr<PathEffect>& effect) {
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
-void BoxesGroup::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
+void LayerBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
     //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         incReasonsNotToApplyUglyTransform();
@@ -154,7 +154,7 @@ void BoxesGroup::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
-void BoxesGroup::removePathEffect(const qsptr<PathEffect>& effect) {
+void LayerBox::removePathEffect(const qsptr<PathEffect>& effect) {
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         decReasonsNotToApplyUglyTransform();
     }
@@ -167,7 +167,7 @@ void BoxesGroup::removePathEffect(const qsptr<PathEffect>& effect) {
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
-void BoxesGroup::removeFillPathEffect(const qsptr<PathEffect>& effect) {
+void LayerBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         decReasonsNotToApplyUglyTransform();
     }
@@ -180,7 +180,7 @@ void BoxesGroup::removeFillPathEffect(const qsptr<PathEffect>& effect) {
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
-void BoxesGroup::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
+void LayerBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
     if(effect->hasReasonsNotToApplyUglyTransform()) {
         decReasonsNotToApplyUglyTransform();
     }
@@ -193,18 +193,18 @@ void BoxesGroup::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
-void BoxesGroup::updateAllChildPathBoxes(const Animator::UpdateReason &reason) {
+void LayerBox::updateAllChildPathBoxes(const Animator::UpdateReason &reason) {
     for(const auto& box : mContainedBoxes) {
         if(box->SWT_isPathBox()) {
             GetAsPtr(box, PathBox)->setPathsOutdated();
             box->planScheduleUpdate(reason);
         } else if(box->SWT_isBoxesGroup()) {
-            GetAsPtr(box, BoxesGroup)->updateAllChildPathBoxes(reason);
+            GetAsPtr(box, LayerBox)->updateAllChildPathBoxes(reason);
         }
     }
 }
 
-void BoxesGroup::applyPathEffects(const qreal &relFrame,
+void LayerBox::applyPathEffects(const qreal &relFrame,
                                   SkPath * const srcDstPath,
                                   BoundingBox * const box) {
     if(mParentGroup) {
@@ -221,7 +221,7 @@ void BoxesGroup::applyPathEffects(const qreal &relFrame,
 //    mParentGroup->apply(parentRelFrame, srcDstPath, box);
 }
 
-void BoxesGroup::filterOutlinePathBeforeThickness(
+void LayerBox::filterOutlinePathBeforeThickness(
         const qreal &relFrame, SkPath * const srcDstPath) {
     mOutlinePathEffectsAnimators->applyBeforeThickness(relFrame, srcDstPath);
     if(!mParentGroup) return;
@@ -231,7 +231,7 @@ void BoxesGroup::filterOutlinePathBeforeThickness(
     mParentGroup->filterOutlinePathBeforeThickness(parentRelFrame, srcDstPath);
 }
 
-bool BoxesGroup::isLastPathBox(PathBox * const pathBox) {
+bool LayerBox::isLastPathBox(PathBox * const pathBox) {
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
         const auto childAtI = mContainedBoxes.at(i).data();
         if(childAtI == pathBox) return true;
@@ -240,7 +240,7 @@ bool BoxesGroup::isLastPathBox(PathBox * const pathBox) {
     return false;
 }
 
-void BoxesGroup::filterOutlinePath(const qreal &relFrame,
+void LayerBox::filterOutlinePath(const qreal &relFrame,
                                    SkPath * const srcDstPath) {
     mOutlinePathEffectsAnimators->apply(relFrame, srcDstPath);
     if(!mParentGroup) return;
@@ -249,7 +249,7 @@ void BoxesGroup::filterOutlinePath(const qreal &relFrame,
     mParentGroup->filterOutlinePath(parentRelFrame, srcDstPath);
 }
 
-void BoxesGroup::filterFillPath(const qreal &relFrame,
+void LayerBox::filterFillPath(const qreal &relFrame,
                                 SkPath * const srcDstPath) {
     mFillPathEffectsAnimators->apply(relFrame, srcDstPath);
     if(!mParentGroup) return;
@@ -258,35 +258,35 @@ void BoxesGroup::filterFillPath(const qreal &relFrame,
     mParentGroup->filterFillPath(parentRelFrame, srcDstPath);
 }
 
-void BoxesGroup::prp_afterFrameShiftChanged() {
+void LayerBox::prp_afterFrameShiftChanged() {
     ComplexAnimator::prp_afterFrameShiftChanged();
     const int thisShift = prp_getFrameShift();
     for(const auto &child : mContainedBoxes)
         child->prp_setParentFrameShift(thisShift, this);
 }
 
-void BoxesGroup::scheduleWaitingTasks() {
+void LayerBox::scheduleWaitingTasks() {
     for(const auto &child : mContainedBoxes) {
         child->scheduleWaitingTasks();
     }
     BoundingBox::scheduleWaitingTasks();
 }
 
-void BoxesGroup::queScheduledTasks() {
+void LayerBox::queScheduledTasks() {
     for(const auto &child : mContainedBoxes) {
         child->queScheduledTasks();
     }
     BoundingBox::queScheduledTasks();
 }
 
-void BoxesGroup::updateAllBoxes(const UpdateReason &reason) {
+void LayerBox::updateAllBoxes(const UpdateReason &reason) {
     for(const auto &child : mContainedBoxes) {
         child->updateAllBoxes(reason);
     }
     planScheduleUpdate(reason);
 }
 
-QRectF BoxesGroup::getRelBoundingRect(const qreal &relFrame) {
+QRectF LayerBox::getRelBoundingRect(const qreal &relFrame) {
     SkPath boundingPaths;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     for(const auto &child : mContainedBoxes) {
@@ -306,7 +306,7 @@ QRectF BoxesGroup::getRelBoundingRect(const qreal &relFrame) {
     return toQRectF(boundingPaths.computeTightBounds());
 }
 
-bool BoxesGroup::diffsAffectingContainedBoxes(
+bool LayerBox::diffsAffectingContainedBoxes(
         const int &relFrame1, const int &relFrame2) {
     const auto idRange = BoundingBox::prp_getIdenticalRelRange(relFrame1);
     const bool diffThis = !idRange.inRange(relFrame2);
@@ -322,7 +322,7 @@ bool BoxesGroup::diffsAffectingContainedBoxes(
     return diffThis || diffInherited;
 }
 
-FrameRange BoxesGroup::prp_getIdenticalRelRange(const int &relFrame) const {
+FrameRange LayerBox::prp_getIdenticalRelRange(const int &relFrame) const {
     auto range = BoundingBox::prp_getIdenticalRelRange(relFrame);
     const int absFrame = prp_relFrameToAbsFrame(relFrame);
     for(const auto &child : mContainedBoxes) {
@@ -337,7 +337,7 @@ FrameRange BoxesGroup::prp_getIdenticalRelRange(const int &relFrame) const {
     return range;
 }
 
-FrameRange BoxesGroup::getFirstAndLastIdenticalForMotionBlur(
+FrameRange LayerBox::getFirstAndLastIdenticalForMotionBlur(
         const int &relFrame, const bool &takeAncestorsIntoAccount) {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     if(mVisible) {
@@ -376,9 +376,9 @@ FrameRange BoxesGroup::getFirstAndLastIdenticalForMotionBlur(
     return range*parentRange;
 }
 
-BoxesGroup::~BoxesGroup() {}
+LayerBox::~LayerBox() {}
 
-void BoxesGroup::anim_scaleTime(const int &pivotAbsFrame, const qreal &scale) {
+void LayerBox::anim_scaleTime(const int &pivotAbsFrame, const qreal &scale) {
     BoundingBox::anim_scaleTime(pivotAbsFrame, scale);
 
     for(const auto& box : mContainedBoxes) {
@@ -386,7 +386,7 @@ void BoxesGroup::anim_scaleTime(const int &pivotAbsFrame, const qreal &scale) {
     }
 }
 
-bool BoxesGroup::relPointInsidePath(const QPointF &relPos) const {
+bool LayerBox::relPointInsidePath(const QPointF &relPos) const {
     if(mRelBoundingRect.contains(relPos)) {
         const QPointF absPos = mapRelPosToAbs(relPos);
         for(const auto& box : mContainedBoxes) {
@@ -398,61 +398,61 @@ bool BoxesGroup::relPointInsidePath(const QPointF &relPos) const {
     return false;
 }
 
-void BoxesGroup::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
+void LayerBox::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
     for(const auto& box : mContainedBoxes) {
         box->setStrokeCapStyle(capStyle);
     }
 }
 
-void BoxesGroup::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
+void LayerBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     for(const auto& box : mContainedBoxes) {
         box->setStrokeJoinStyle(joinStyle);
     }
 }
 
-void BoxesGroup::setStrokeWidth(const qreal &strokeWidth) {
+void LayerBox::setStrokeWidth(const qreal &strokeWidth) {
     for(const auto& box : mContainedBoxes) {
         box->setStrokeWidth(strokeWidth);
     }
 }
 
-void BoxesGroup::startSelectedStrokeWidthTransform() {
+void LayerBox::startSelectedStrokeWidthTransform() {
     for(const auto& box : mContainedBoxes) {
         box->startSelectedStrokeWidthTransform();
     }
 }
 
-void BoxesGroup::startSelectedStrokeColorTransform() {
+void LayerBox::startSelectedStrokeColorTransform() {
     for(const auto& box : mContainedBoxes) {
         box->startSelectedStrokeColorTransform();
     }
 }
 
-void BoxesGroup::startSelectedFillColorTransform() {
+void LayerBox::startSelectedFillColorTransform() {
     for(const auto& box : mContainedBoxes) {
         box->startSelectedFillColorTransform();
     }
 }
 
-void BoxesGroup::applyPaintSetting(const PaintSettingsApplier &setting) {
+void LayerBox::applyPaintSetting(const PaintSettingsApplier &setting) {
     for(const auto& box : mContainedBoxes) {
         box->applyPaintSetting(setting);
     }
 }
 
-void BoxesGroup::setFillColorMode(const ColorMode &colorMode) {
+void LayerBox::setFillColorMode(const ColorMode &colorMode) {
     for(const auto& box :  mContainedBoxes) {
         box->setFillColorMode(colorMode);
     }
 }
 
-void BoxesGroup::setStrokeColorMode(const ColorMode &colorMode) {
+void LayerBox::setStrokeColorMode(const ColorMode &colorMode) {
     for(const auto& box : mContainedBoxes) {
         box->setStrokeColorMode(colorMode);
     }
 }
 
-void BoxesGroup::shiftAll(const int &shift) {
+void LayerBox::shiftAll(const int &shift) {
     if(hasDurationRectangle()) {
         mDurationRectangle->changeFramePosBy(shift);
     } else {
@@ -463,22 +463,22 @@ void BoxesGroup::shiftAll(const int &shift) {
     }
 }
 
-const QList<qsptr<BoundingBox> > &BoxesGroup::getContainedBoxesList() const {
+const QList<qsptr<BoundingBox> > &LayerBox::getContainedBoxesList() const {
     return mContainedBoxes;
 }
 
-int BoxesGroup::getContainedBoxesCount() const {
+int LayerBox::getContainedBoxesCount() const {
     return mContainedBoxes.count();
 }
 
-qsptr<BoundingBox> BoxesGroup::createLink() {
+qsptr<BoundingBox> LayerBox::createLink() {
     const auto linkBox = SPtrCreate(InternalLinkGroupBox)(this);
     copyBoundingBoxDataTo(linkBox.get());
     return std::move(linkBox);
 }
 
 void processChildData(BoundingBox* child,
-                      BoxesGroupRenderData* parentData,
+                      LayerBoxRenderData* parentData,
                       const qreal& boxRelFrame) {
     auto boxRenderData =
             GetAsSPtr(child->getCurrentRenderData(qRound(boxRelFrame)),
@@ -499,11 +499,10 @@ void processChildData(BoundingBox* child,
     parentData->fChildrenRenderData << boxRenderData;
 }
 
-void BoxesGroup::setupRenderData(const qreal &relFrame,
+void LayerBox::setupRenderData(const qreal &relFrame,
                                  BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
-    const auto groupData = GetAsPtr(data, BoxesGroupRenderData);
-    groupData->fPaintOnImage = shouldPaintOnImage();
+    const auto groupData = GetAsPtr(data, LayerBoxRenderData);
     groupData->fChildrenRenderData.clear();
     groupData->fOtherGlobalRects.clear();
     qreal childrenEffectsMargin = 0;
@@ -523,7 +522,7 @@ void BoxesGroup::setupRenderData(const qreal &relFrame,
 }
 
 
-void BoxesGroup::drawPixmapSk(SkCanvas * const canvas,
+void LayerBox::drawPixmapSk(SkCanvas * const canvas,
                               GrContext* const grContext) {
     if(shouldPaintOnImage()) {
         BoundingBox::drawPixmapSk(canvas, grContext);
@@ -542,7 +541,7 @@ void BoxesGroup::drawPixmapSk(SkCanvas * const canvas,
     }
 }
 
-void BoxesGroup::setIsCurrentGroup_k(const bool &bT) {
+void LayerBox::setIsCurrentGroup_k(const bool &bT) {
     mIsCurrentGroup = bT;
     setDescendantCurrentGroup(bT);
     if(!bT) {
@@ -552,15 +551,15 @@ void BoxesGroup::setIsCurrentGroup_k(const bool &bT) {
     }
 }
 
-bool BoxesGroup::isCurrentGroup() const {
+bool LayerBox::isCurrentGroup() const {
     return mIsCurrentGroup;
 }
 
-bool BoxesGroup::isDescendantCurrentGroup() const {
+bool LayerBox::isDescendantCurrentGroup() const {
     return mIsDescendantCurrentGroup;
 }
 #include "Animators/gpueffectanimators.h"
-bool BoxesGroup::shouldPaintOnImage() const {
+bool LayerBox::shouldPaintOnImage() const {
     if(SWT_isLinkBox() || SWT_isCanvas()) return true;
     if(mIsDescendantCurrentGroup) return false;
 //    return !mIsDescendantCurrentGroup; !!!
@@ -568,16 +567,16 @@ bool BoxesGroup::shouldPaintOnImage() const {
            mGPUEffectsAnimators->hasEffects();
 }
 
-bool BoxesGroup::SWT_isBoxesGroup() const { return true; }
+bool LayerBox::SWT_isBoxesGroup() const { return true; }
 
-void BoxesGroup::setDescendantCurrentGroup(const bool &bT) {
+void LayerBox::setDescendantCurrentGroup(const bool &bT) {
     mIsDescendantCurrentGroup = bT;
     if(!bT) planScheduleUpdate(Animator::USER_CHANGE);
     if(!mParentGroup) return;
     mParentGroup->setDescendantCurrentGroup(bT);
 }
 
-BoundingBox *BoxesGroup::getBoxAtFromAllDescendents(const QPointF &absPos) {
+BoundingBox *LayerBox::getBoxAtFromAllDescendents(const QPointF &absPos) {
     BoundingBox* boxAtPos = nullptr;
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
         const auto& box = mContainedBoxes.at(i);
@@ -590,7 +589,7 @@ BoundingBox *BoxesGroup::getBoxAtFromAllDescendents(const QPointF &absPos) {
     return boxAtPos;
 }
 
-void BoxesGroup::ungroup_k() {
+void LayerBox::ungroup_k() {
     //clearBoxesSelection();
     for(auto box : mContainedBoxes) {
         removeContainedBox(box);
@@ -599,34 +598,34 @@ void BoxesGroup::ungroup_k() {
     removeFromParent_k();
 }
 
-FillSettingsAnimator *BoxesGroup::getFillSettings() const {
+FillSettingsAnimator *LayerBox::getFillSettings() const {
     if(mContainedBoxes.isEmpty()) return nullptr;
     return mContainedBoxes.last()->getFillSettings();
 }
 
-OutlineSettingsAnimator *BoxesGroup::getStrokeSettings() const {
+OutlineSettingsAnimator *LayerBox::getStrokeSettings() const {
     if(mContainedBoxes.isEmpty()) return nullptr;
     return mContainedBoxes.last()->getStrokeSettings();
 }
 
 #include "typemenu.h"
-void BoxesGroup::addActionsToMenu(BoxTypeMenu * const menu) {
-    const auto ungroupAction = menu->addPlainAction<BoxesGroup>(
-                "Ungroup", [](BoxesGroup * box) {
+void LayerBox::addActionsToMenu(BoxTypeMenu * const menu) {
+    const auto ungroupAction = menu->addPlainAction<LayerBox>(
+                "Ungroup", [](LayerBox * box) {
         box->ungroup_k();
     });
     ungroupAction->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
     BoundingBox::addActionsToMenu(menu);
 }
 
-void BoxesGroup::selectAllBoxesFromBoxesGroup() {
+void LayerBox::selectAllBoxesFromBoxesGroup() {
     for(const auto& box : mContainedBoxes) {
         if(box->isSelected()) continue;
         getParentCanvas()->addBoxToSelection(box.get());
     }
 }
 
-void BoxesGroup::deselectAllBoxesFromBoxesGroup() {
+void LayerBox::deselectAllBoxesFromBoxesGroup() {
     for(const auto& box : mContainedBoxes) {
         if(box->isSelected()) {
             getParentCanvas()->removeBoxFromSelection(box.get());
@@ -634,7 +633,7 @@ void BoxesGroup::deselectAllBoxesFromBoxesGroup() {
     }
 }
 
-BoundingBox *BoxesGroup::getBoxAt(const QPointF &absPos) {
+BoundingBox *LayerBox::getBoxAt(const QPointF &absPos) {
     BoundingBox* boxAtPos = nullptr;
 
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
@@ -650,7 +649,7 @@ BoundingBox *BoxesGroup::getBoxAt(const QPointF &absPos) {
     return boxAtPos;
 }
 
-void BoxesGroup::addContainedBoxesToSelection(const QRectF &rect) {
+void LayerBox::addContainedBoxesToSelection(const QRectF &rect) {
     for(const auto& box : mContainedBoxes) {
         if(box->isVisibleAndUnlocked() &&
             box->isVisibleAndInVisibleDurationRect()) {
@@ -661,12 +660,12 @@ void BoxesGroup::addContainedBoxesToSelection(const QRectF &rect) {
     }
 }
 
-void BoxesGroup::addContainedBox(const qsptr<BoundingBox>& child) {
+void LayerBox::addContainedBox(const qsptr<BoundingBox>& child) {
     //child->setParent(this);
     addContainedBoxToListAt(mContainedBoxes.count(), child);
 }
 
-void BoxesGroup::addContainedBoxToListAt(
+void LayerBox::addContainedBoxToListAt(
         const int &index,
         const qsptr<BoundingBox>& child) {
     mContainedBoxes.insert(index, GetAsSPtr(child, BoundingBox));
@@ -689,18 +688,18 @@ void BoxesGroup::addContainedBoxToListAt(
     }
 }
 
-void BoxesGroup::updateContainedBoxIds(const int &firstId) {
+void LayerBox::updateContainedBoxIds(const int &firstId) {
     updateContainedBoxIds(firstId, mContainedBoxes.length() - 1);
 }
 
-void BoxesGroup::updateContainedBoxIds(const int &firstId,
+void LayerBox::updateContainedBoxIds(const int &firstId,
                                        const int &lastId) {
     for(int i = firstId; i <= lastId; i++) {
         mContainedBoxes.at(i)->setZListIndex(i);
     }
 }
 
-void BoxesGroup::anim_setAbsFrame(const int &frame) {
+void LayerBox::anim_setAbsFrame(const int &frame) {
     BoundingBox::anim_setAbsFrame(frame);
 
     updateDrawRenderContainerTransform();
@@ -709,20 +708,20 @@ void BoxesGroup::anim_setAbsFrame(const int &frame) {
     }
 }
 
-stdsptr<BoundingBoxRenderData> BoxesGroup::createRenderData() {
-    return SPtrCreate(BoxesGroupRenderData)(this);
+stdsptr<BoundingBoxRenderData> LayerBox::createRenderData() {
+    return SPtrCreate(LayerBoxRenderData)(this);
 }
 
-void BoxesGroup::removeAllContainedBoxes() {
+void LayerBox::removeAllContainedBoxes() {
     while(mContainedBoxes.count() > 0) {
         removeContainedBox(mContainedBoxes.takeLast());
     }
 }
 
-void BoxesGroup::removeContainedBoxFromList(const int &id) {
+void LayerBox::removeContainedBoxFromList(const int &id) {
     auto box = mContainedBoxes.takeAt(id);
     if(box->SWT_isBoxesGroup()) {
-        auto group = GetAsPtr(box, BoxesGroup);
+        auto group = GetAsPtr(box, LayerBox);
         if(group->isCurrentGroup()) {
             emit group->setParentAsCurrentGroup();
         }
@@ -743,14 +742,14 @@ void BoxesGroup::removeContainedBoxFromList(const int &id) {
     }
 }
 
-int BoxesGroup::getContainedBoxIndex(BoundingBox *child) {
+int LayerBox::getContainedBoxIndex(BoundingBox *child) {
     for(int i = 0; i < mContainedBoxes.count(); i++) {
         if(mContainedBoxes.at(i) == child) return i;
     }
     return -1;
 }
 
-void BoxesGroup::removeContainedBox(const qsptr<BoundingBox>& child) {
+void LayerBox::removeContainedBox(const qsptr<BoundingBox>& child) {
     const int &index = getContainedBoxIndex(child.get());
     if(index < 0) return;
     child->removeFromSelection();
@@ -758,45 +757,45 @@ void BoxesGroup::removeContainedBox(const qsptr<BoundingBox>& child) {
     //child->setParent(nullptr);
 }
 
-void BoxesGroup::removeContainedBox_k(const qsptr<BoundingBox>& child) {
+void LayerBox::removeContainedBox_k(const qsptr<BoundingBox>& child) {
     removeContainedBox(child);
     if(mContainedBoxes.isEmpty() && mParentGroup) {
         removeFromParent_k();
     }
 }
 
-void BoxesGroup::increaseContainedBoxZInList(BoundingBox * const child) {
+void LayerBox::increaseContainedBoxZInList(BoundingBox * const child) {
     const int &index = getContainedBoxIndex(child);
     if(index == mContainedBoxes.count() - 1) return;
     moveContainedBoxInList(child, index, index + 1);
 }
 
-void BoxesGroup::decreaseContainedBoxZInList(BoundingBox * const child) {
+void LayerBox::decreaseContainedBoxZInList(BoundingBox * const child) {
     const int &index = getContainedBoxIndex(child);
     if(index == 0) return;
     moveContainedBoxInList(child, index, index - 1);
 }
 
-void BoxesGroup::bringContainedBoxToEndList(BoundingBox * const child) {
+void LayerBox::bringContainedBoxToEndList(BoundingBox * const child) {
     const int &index = getContainedBoxIndex(child);
     if(index == mContainedBoxes.count() - 1) return;
     moveContainedBoxInList(child, index, mContainedBoxes.length() - 1);
 }
 
-void BoxesGroup::bringContainedBoxToFrontList(BoundingBox * const child) {
+void LayerBox::bringContainedBoxToFrontList(BoundingBox * const child) {
     const int &index = getContainedBoxIndex(child);
     if(index == 0) return;
     moveContainedBoxInList(child, index, 0);
 }
 
-void BoxesGroup::moveContainedBoxInList(BoundingBox * const child,
+void LayerBox::moveContainedBoxInList(BoundingBox * const child,
                                         const int &to) {
     const int from = getContainedBoxIndex(child);
     if(from == -1) return;
     moveContainedBoxInList(child, from, to);
 }
 
-void BoxesGroup::moveContainedBoxInList(BoundingBox * const child,
+void LayerBox::moveContainedBoxInList(BoundingBox * const child,
                                         const int &from, const int &to) {
     mContainedBoxes.move(from, to);
     updateContainedBoxIds(qMin(from, to), qMax(from, to));
@@ -806,7 +805,7 @@ void BoxesGroup::moveContainedBoxInList(BoundingBox * const child,
     prp_afterWholeInfluenceRangeChanged();
 }
 
-void BoxesGroup::moveContainedBoxBelow(BoundingBox * const boxToMove,
+void LayerBox::moveContainedBoxBelow(BoundingBox * const boxToMove,
                                        BoundingBox * const below) {
     const int &indexFrom = getContainedBoxIndex(boxToMove);
     int indexTo = getContainedBoxIndex(below);
@@ -816,7 +815,7 @@ void BoxesGroup::moveContainedBoxBelow(BoundingBox * const boxToMove,
     moveContainedBoxInList(boxToMove, indexFrom, indexTo);
 }
 
-void BoxesGroup::moveContainedBoxAbove(BoundingBox * const boxToMove,
+void LayerBox::moveContainedBoxAbove(BoundingBox * const boxToMove,
                                        BoundingBox * const above) {
     const int &indexFrom = getContainedBoxIndex(boxToMove);
     int indexTo = getContainedBoxIndex(above);
@@ -827,7 +826,7 @@ void BoxesGroup::moveContainedBoxAbove(BoundingBox * const boxToMove,
 }
 
 #include "singlewidgetabstraction.h"
-void BoxesGroup::SWT_addChildrenAbstractions(
+void LayerBox::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction* abstraction,
         const UpdateFuncs &updateFuncs,
         const int& visiblePartWidgetId) {
@@ -842,7 +841,7 @@ void BoxesGroup::SWT_addChildrenAbstractions(
     }
 }
 
-bool BoxesGroup::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
+bool LayerBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                      const bool &parentSatisfies,
                                      const bool &parentMainTarget) const {
     const SWT_BoxRule &rule = rules.fRule;

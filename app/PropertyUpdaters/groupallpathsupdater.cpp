@@ -1,7 +1,7 @@
 #include "groupallpathsupdater.h"
-#include "Boxes/boxesgroup.h"
+#include "Boxes/layerbox.h"
 
-GroupAllPathsUpdater::GroupAllPathsUpdater(BoxesGroup *boxesGroup) {
+GroupAllPathsUpdater::GroupAllPathsUpdater(LayerBox *boxesGroup) {
     mTarget = boxesGroup;
 }
 

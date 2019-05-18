@@ -155,7 +155,7 @@ void Canvas::mouseDoubleClickEvent(const QMouseEvent * const e) {
         }
     } else {
         if(boxAt->SWT_isBoxesGroup()) {
-            setCurrentBoxesGroup(static_cast<BoxesGroup*>(boxAt));
+            setCurrentBoxesGroup(static_cast<LayerBox*>(boxAt));
             updateHoveredElements();
         } else if((mCurrentMode == MOVE_BOX ||
                    mCurrentMode == MOVE_POINT) &&

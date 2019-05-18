@@ -355,7 +355,7 @@ bool Canvas::isBoxSelectionEmpty() {
 void Canvas::ungroupSelectedBoxes() {
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isBoxesGroup()) {
-            GetAsPtr(box, BoxesGroup)->ungroup_k();
+            GetAsPtr(box, LayerBox)->ungroup_k();
         }
     }
 }
@@ -556,7 +556,7 @@ void Canvas::duplicateSelectedBoxes() {
 
 void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.isEmpty()) return;
-    const auto newGroup = SPtrCreate(BoxesGroup)();
+    const auto newGroup = SPtrCreate(LayerBox)();
     mCurrentBoxesGroup->addContainedBox(newGroup);
     BoundingBox* box;
     Q_FOREACHInverted(box, mSelectedBoxes) {

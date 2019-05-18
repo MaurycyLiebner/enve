@@ -1,5 +1,5 @@
 #include "Boxes/boundingbox.h"
-#include "Boxes/boxesgroup.h"
+#include "Boxes/layerbox.h"
 #include "canvas.h"
 #include "singlewidgetabstraction.h"
 #include "durationrectangle.h"
@@ -307,7 +307,7 @@ bool BoundingBox::diffsIncludingInherited(
     return diffThis || diffInherited;
 }
 
-void BoundingBox::setParentGroup(BoxesGroup * const parent) {
+void BoundingBox::setParentGroup(LayerBox * const parent) {
     mParentGroup = parent;
     if(!mParentGroup) return;
     mParentTransform = parent->getTransformAnimator();
@@ -335,7 +335,7 @@ void BoundingBox::clearParent() {
     setParentTransform(mParentGroup->getTransformAnimator());
 }
 
-BoxesGroup *BoundingBox::getParentGroup() const {
+LayerBox *BoundingBox::getParentGroup() const {
     return mParentGroup;
 }
 

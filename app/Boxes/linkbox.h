@@ -4,7 +4,7 @@
 #include "Properties/boxtargetproperty.h"
 #include "Properties/boolproperty.h"
 
-class ExternalLinkBox : public BoxesGroup {
+class ExternalLinkBox : public LayerBox {
     Q_OBJECT
     friend class SelfRef;
 public:

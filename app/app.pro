@@ -53,6 +53,8 @@ TARGET = AniVect
 TEMPLATE = app
 
 SOURCES += main.cpp\
+    Boxes/layerbox.cpp \
+    Boxes/layerboxrenderdata.cpp \
     Boxes/patheffectsmenu.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/soundreader.cpp \
@@ -82,7 +84,6 @@ SOURCES += main.cpp\
     Boxes/imagebox.cpp \
     Boxes/pathbox.cpp \
     Boxes/boundingbox.cpp \
-    Boxes/boxesgroup.cpp \
     Animators/effectanimators.cpp \
     Boxes/animationbox.cpp \
     pathoperations.cpp \
@@ -246,7 +247,6 @@ SOURCES += main.cpp\
     GUI/BrushWidgets/brushcontexedwrapper.cpp \
     GUI/BrushWidgets/brushwidget.cpp \
     Boxes/waitingforboxload.cpp \
-    Boxes/boxesgrouprenderdata.cpp \
     Boxes/canvasrenderdata.cpp \
     Boxes/linkcanvasrenderdata.cpp \
     Boxes/internallinkcanvas.cpp \
@@ -259,6 +259,8 @@ SOURCES += main.cpp\
     Paint/animatedsurface.cpp
 
 HEADERS  += \
+    Boxes/layerbox.h \
+    Boxes/layerboxrenderdata.h \
     Boxes/patheffectsmenu.h \
     CacheHandlers/samples.h \
     FileCacheHandlers/audiostreamsdata.h \
@@ -285,7 +287,6 @@ HEADERS  += \
     Animators/coloranimator.h \
     Boxes/circle.h \
     Boxes/boundingbox.h \
-    Boxes/boxesgroup.h \
     Boxes/imagebox.h \
     Boxes/pathbox.h \
     Boxes/rectangle.h \
@@ -452,7 +453,6 @@ HEADERS  += \
     GUI/BrushWidgets/brushcontexedwrapper.h \
     GUI/BrushWidgets/brushwidget.h \
     Boxes/waitingforboxload.h \
-    Boxes/boxesgrouprenderdata.h \
     Boxes/canvasrenderdata.h \
     Boxes/linkcanvasrenderdata.h \
     Boxes/internallinkcanvas.h \

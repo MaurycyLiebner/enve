@@ -24,10 +24,10 @@ class PixmapEffect;
 class BoxTransformAnimator;
 class BasicTransformAnimator;
 
-class BoxesGroup;
+class LayerBox;
 class SmartVectorPath;
 class DurationRectangle;
-struct BoxesGroupRenderData;
+struct LayerBoxRenderData;
 struct GPURasterEffect;
 enum CanvasMode : short;
 
@@ -87,7 +87,7 @@ protected:
     virtual void getMotionBlurProperties(QList<Property*> &list) const;
 public:
     virtual void updateAfterDurationRectangleRangeChanged();
-    virtual void setParentGroup(BoxesGroup * const parent);
+    virtual void setParentGroup(LayerBox * const parent);
 
     virtual qsptr<BoundingBox> createLink();
     virtual qsptr<BoundingBox> createLinkForLinkGroup();
@@ -274,7 +274,7 @@ public:
     void clearReadId();
 
     void clearParent();
-    BoxesGroup *getParentGroup() const;
+    LayerBox *getParentGroup() const;
     void setParentTransform(BasicTransformAnimator *parent);
     bool isParentLinkBox();
 
@@ -435,7 +435,7 @@ protected:
     SkRect mRelBoundingRectSk;
     SkPath mSkRelBoundingRectPath;
 
-    qptr<BoxesGroup> mParentGroup;
+    qptr<LayerBox> mParentGroup;
     qptr<BasicTransformAnimator> mParentTransform;
 
     QList<qptr<BoundingBox>> mChildBoxes;

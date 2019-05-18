@@ -2,7 +2,7 @@
 #include <QMimeData>
 #include <QPainter>
 #include <QMenu>
-#include "Boxes/boxesgroup.h"
+#include "Boxes/layerbox.h"
 #include "Properties/boxtargetproperty.h"
 #include "GUI/mainwindow.h"
 
@@ -64,7 +64,7 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
         BoundingBox *parentBox =
                 mProperty->getFirstAncestor<BoundingBox>(tester);
         if(!parentBox) return;
-        BoxesGroup *srcGroup = parentBox->getParentGroup();
+        LayerBox *srcGroup = parentBox->getParentGroup();
         if(!srcGroup) return;
         QList<qsptr<BoundingBox> > boxesT =
                 srcGroup->getContainedBoxesList();

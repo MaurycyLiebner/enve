@@ -1,5 +1,5 @@
 #include "svgimporter.h"
-#include "Boxes/boxesgroup.h"
+#include "Boxes/layerbox.h"
 #include "canvas.h"
 #include "GUI/ColorWidgets/colorvaluerect.h"
 #include "colorhelpers.h"
@@ -524,19 +524,19 @@ bool parsePolylineDataFast(const QString &dataStr,
     return true;
 }
 
-qsptr<BoxesGroup> loadBoxesGroup(const QDomElement &groupElement,
-                           BoxesGroup *parentGroup,
+qsptr<LayerBox> loadBoxesGroup(const QDomElement &groupElement,
+                           LayerBox *parentGroup,
                            const BoxSvgAttributes &attributes) {
     QDomNodeList allRootChildNodes = groupElement.childNodes();
-    qsptr<BoxesGroup> boxesGroup;
+    qsptr<LayerBox> boxesGroup;
     const bool hasTransform = attributes.hasTransform();
     if(allRootChildNodes.count() > 1 ||
        hasTransform || parentGroup == nullptr) {
-        boxesGroup = SPtrCreate(BoxesGroup)();
+        boxesGroup = SPtrCreate(LayerBox)();
         attributes.apply(boxesGroup.get());
         if(parentGroup) parentGroup->addContainedBox(boxesGroup);
     } else {
-        boxesGroup = GetAsSPtr(parentGroup, BoxesGroup);
+        boxesGroup = GetAsSPtr(parentGroup, LayerBox);
     }
 
     for(int i = 0; i < allRootChildNodes.count(); i++) {
@@ -549,7 +549,7 @@ qsptr<BoxesGroup> loadBoxesGroup(const QDomElement &groupElement,
 }
 
 void loadVectorPath(const QDomElement &pathElement,
-                    BoxesGroup *parentGroup,
+                    LayerBox *parentGroup,
                     VectorPathSvgAttributes& attributes) {
     const auto vectorPath = SPtrCreate(SmartVectorPath)();
     const QString pathStr = pathElement.attribute("d");
@@ -559,7 +559,7 @@ void loadVectorPath(const QDomElement &pathElement,
 }
 
 void loadPolyline(const QDomElement &pathElement,
-                  BoxesGroup *parentGroup,
+                  LayerBox *parentGroup,
                   VectorPathSvgAttributes &attributes) {
     auto vectorPath = SPtrCreate(SmartVectorPath)();
     const QString pathStr = pathElement.attribute("points");
@@ -569,7 +569,7 @@ void loadPolyline(const QDomElement &pathElement,
 }
 
 void loadCircle(const QDomElement &pathElement,
-                BoxesGroup *parentGroup,
+                LayerBox *parentGroup,
                 const BoxSvgAttributes &attributes) {
 
     const QString cXstr = pathElement.attribute("cx");
@@ -595,7 +595,7 @@ void loadCircle(const QDomElement &pathElement,
 }
 
 void loadRect(const QDomElement &pathElement,
-              BoxesGroup *parentGroup,
+              LayerBox *parentGroup,
               const BoxSvgAttributes &attributes) {
 
     const QString xStr = pathElement.attribute("x");
@@ -623,7 +623,7 @@ void loadRect(const QDomElement &pathElement,
 
 
 void loadText(const QDomElement &pathElement,
-              BoxesGroup *parentGroup,
+              LayerBox *parentGroup,
               const BoxSvgAttributes &attributes) {
 
     const QString xStr = pathElement.attribute("x");
@@ -639,7 +639,7 @@ void loadText(const QDomElement &pathElement,
 }
 
 
-void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
+void loadElement(const QDomElement &element, LayerBox *parentGroup,
                  const BoxSvgAttributes &parentGroupAttributes) {
     if(element.tagName() == "path" || element.tagName() == "path") {
         VectorPathSvgAttributes attributes;
@@ -794,7 +794,7 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
 }
 
 
-qsptr<BoxesGroup> loadSVGFile(const QString &filename) {
+qsptr<LayerBox> loadSVGFile(const QString &filename) {
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QDomDocument document;

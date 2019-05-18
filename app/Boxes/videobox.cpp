@@ -24,7 +24,7 @@ VideoBox::~VideoBox() {
     }
 }
 
-void VideoBox::setParentGroup(BoxesGroup * const parent) {
+void VideoBox::setParentGroup(LayerBox * const parent) {
     if(mParentGroup && mSound) {
         const auto parentCanvas = getParentCanvas();
         if(parentCanvas) {

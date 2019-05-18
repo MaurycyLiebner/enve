@@ -2,21 +2,14 @@
 #define BOXESGROUPRENDERDATA_H
 #include "boundingboxrenderdata.h"
 
-struct BoxesGroupRenderData : public BoundingBoxRenderData {
+struct LayerBoxRenderData : public BoundingBoxRenderData {
     friend class StdSelfRef;
     QList<stdsptr<BoundingBoxRenderData>> fChildrenRenderData;
-    bool fPaintOnImage;
-
-    void processTask();
-
-    void copyFrom(BoundingBoxRenderData *src);
 protected:
-    BoxesGroupRenderData(BoundingBox * const parentBoxT);
+    LayerBoxRenderData(BoundingBox * const parentBoxT);
 
     void drawSk(SkCanvas * const canvas);
-    void drawRenderedImageForParent(SkCanvas * const canvas);
     void transformRenderCanvas(SkCanvas& canvas) const final;
-
     void updateRelBoundingRect();
 };
 

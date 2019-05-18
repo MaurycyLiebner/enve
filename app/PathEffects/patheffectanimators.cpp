@@ -1,7 +1,7 @@
 #include "patheffectanimators.h"
 #include "PathEffects/patheffect.h"
 #include "Boxes/pathbox.h"
-#include "Boxes/boxesgroup.h"
+#include "Boxes/layerbox.h"
 #include <QDebug>
 
 PathEffectAnimators::PathEffectAnimators(const bool &isOutline,
@@ -24,7 +24,7 @@ void PathEffectAnimators::addEffect(const qsptr<PathEffect>& effect) {
             pathBox->addPathEffect(effect);
         }
     } else if(mParentBox->SWT_isBoxesGroup()) {
-        const auto groupBox = GetAsPtr(mParentBox, BoxesGroup);
+        const auto groupBox = GetAsPtr(mParentBox, LayerBox);
         if(mIsOutline) {
             groupBox->addOutlinePathEffect(effect);
         } else if(mIsFill) {
@@ -46,7 +46,7 @@ void PathEffectAnimators::removeEffect(const qsptr<PathEffect>& effect) {
             pathBox->removePathEffect(effect);
         }
     } else if(mParentBox->SWT_isBoxesGroup()) {
-        const auto groupBox = GetAsPtr(mParentBox, BoxesGroup);
+        const auto groupBox = GetAsPtr(mParentBox, LayerBox);
         if(mIsOutline) {
             groupBox->removeOutlinePathEffect(effect);
         } else if(mIsFill) {

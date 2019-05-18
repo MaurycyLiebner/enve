@@ -7,7 +7,7 @@
 #include "paintsettingsapplier.h"
 class VectorPath;
 class Canvas;
-class BoxesGroup;
+class LayerBox;
 class BoundingBox;
 enum CtrlsMode : short;
 
@@ -234,9 +234,9 @@ protected:
 };
 
 
-extern void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
+extern void loadElement(const QDomElement &element, LayerBox *parentGroup,
                         const BoxSvgAttributes &parentGroupAttributes);
-extern qsptr<BoxesGroup> loadSVGFile(const QString &filename);
+extern qsptr<LayerBox> loadSVGFile(const QString &filename);
 /*
 #include <QStringRef>
 #include <QPainterPath>

@@ -6,7 +6,7 @@
 class InternalLinkCanvas : public InternalLinkGroupBox {
     friend class SelfRef;
 protected:
-    InternalLinkCanvas(BoxesGroup * const linkTarget);
+    InternalLinkCanvas(LayerBox * const linkTarget);
 public:
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);

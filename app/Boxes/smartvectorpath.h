@@ -6,7 +6,7 @@
 #include "Animators/SmartPath/smartpathcollection.h"
 
 class NodePoint;
-class BoxesGroup;
+class LayerBox;
 class PathAnimator;
 
 enum CanvasMode : short;

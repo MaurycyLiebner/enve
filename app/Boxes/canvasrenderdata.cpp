@@ -3,7 +3,7 @@
 #include "PixmapEffects/pixmapeffect.h"
 
 CanvasRenderData::CanvasRenderData(BoundingBox * const parentBoxT) :
-    BoxesGroupRenderData(parentBoxT) {}
+    LayerBoxRenderData(parentBoxT) {}
 
 void CanvasRenderData::processTask() {
     if(fRenderedToImage) return;

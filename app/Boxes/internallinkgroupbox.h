@@ -1,13 +1,13 @@
 #ifndef INTERNALLINKGROUPBOX_H
 #define INTERNALLINKGROUPBOX_H
-#include "boxesgroup.h"
+#include "layerbox.h"
 #include "Properties/boxtargetproperty.h"
 
-class InternalLinkGroupBox : public BoxesGroup {
+class InternalLinkGroupBox : public LayerBox {
     Q_OBJECT
     friend class SelfRef;
 protected:
-    InternalLinkGroupBox(BoxesGroup * const linkTarget);
+    InternalLinkGroupBox(LayerBox * const linkTarget);
 public:
     ~InternalLinkGroupBox();
     bool SWT_isLinkBox() const;
@@ -44,9 +44,9 @@ public:
 
     bool relPointInsidePath(const QPointF &relPos) const;
 
-    void setLinkTarget(BoxesGroup *linkTarget);
-    BoxesGroup *getLinkTarget() const;
-    BoxesGroup *getFinalTarget() const;
+    void setLinkTarget(LayerBox *linkTarget);
+    LayerBox *getLinkTarget() const;
+    LayerBox *getFinalTarget() const;
 public slots:
     void setTargetSlot(BoundingBox *target);
 protected:

@@ -5,13 +5,13 @@
 class PathBox;
 class PathEffectAnimators;
 
-class BoxesGroup : public BoundingBox {
+class LayerBox : public BoundingBox {
     Q_OBJECT
     friend class SelfRef;
 protected:
-    BoxesGroup(const BoundingBoxType& type = TYPE_GROUP);
+    LayerBox(const BoundingBoxType& type = TYPE_GROUP);
 public:
-    ~BoxesGroup();
+    ~LayerBox();
 
     virtual BoundingBox *getBoxAt(const QPointF &absPos);
 

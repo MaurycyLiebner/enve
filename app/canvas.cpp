@@ -32,7 +32,7 @@ using namespace std::chrono;
 Canvas::Canvas(CanvasWindow *canvasWidget,
                const int &canvasWidth, const int &canvasHeight,
                const int &frameCount, const qreal &fps) :
-    BoxesGroup(TYPE_CANVAS) {
+    LayerBox(TYPE_CANVAS) {
     mMainWindow = MainWindow::getInstance();
     setCurrentBrush(mMainWindow->getCurrentBrush());
     std::function<bool(int)> changeFrameFunc =
@@ -119,10 +119,10 @@ void Canvas::setCurrentGroupParentAsCurrentGroup() {
 }
 
 #include "GUI/BoxesList/boxscrollwidget.h"
-void Canvas::setCurrentBoxesGroup(BoxesGroup * const group) {
+void Canvas::setCurrentBoxesGroup(LayerBox * const group) {
     if(mCurrentBoxesGroup) {
         mCurrentBoxesGroup->setIsCurrentGroup_k(false);
-        disconnect(mCurrentBoxesGroup, &BoxesGroup::setParentAsCurrentGroup,
+        disconnect(mCurrentBoxesGroup, &LayerBox::setParentAsCurrentGroup,
                    this, &Canvas::setCurrentGroupParentAsCurrentGroup);
     }
     clearBoxesSelection();
@@ -130,7 +130,7 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup * const group) {
     clearCurrentSmartEndPoint();
     clearLastPressedPoint();
     mCurrentBoxesGroup = group;
-    connect(mCurrentBoxesGroup, &BoxesGroup::setParentAsCurrentGroup,
+    connect(mCurrentBoxesGroup, &LayerBox::setParentAsCurrentGroup,
             this, &Canvas::setCurrentGroupParentAsCurrentGroup);
     group->setIsCurrentGroup_k(true);
 
@@ -420,7 +420,7 @@ void Canvas::setLoadingPreviewContainer(
 }
 
 FrameRange Canvas::prp_getIdenticalRelRange(const int &relFrame) const {
-    const auto groupRange = BoxesGroup::prp_getIdenticalRelRange(relFrame);
+    const auto groupRange = LayerBox::prp_getIdenticalRelRange(relFrame);
     //FrameRange canvasRange{0, mMaxFrame};
     return groupRange;//*canvasRange;
 }

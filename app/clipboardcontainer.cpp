@@ -1,6 +1,6 @@
 #include "clipboardcontainer.h"
 #include "Boxes/boundingbox.h"
-#include "Boxes/boxesgroup.h"
+#include "Boxes/layerbox.h"
 #include "Properties/boxtargetproperty.h"
 #include "PathEffects/patheffectanimators.h"
 #include "Animators/SmartPath/smartpathcollection.h"
@@ -26,7 +26,7 @@ QByteArray *ClipboardContainer::getBytesArray() {
 BoxesClipboardContainer::BoxesClipboardContainer() :
     ClipboardContainer(CCT_BOXES) {}
 #include "canvas.h"
-void BoxesClipboardContainer::pasteTo(BoxesGroup* const parent) {
+void BoxesClipboardContainer::pasteTo(LayerBox* const parent) {
     const int oldCount = parent->getContainedBoxesCount();
     QBuffer target(getBytesArray());
     target.open(QIODevice::ReadOnly);

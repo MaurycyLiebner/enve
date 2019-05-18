@@ -1,7 +1,7 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include "Boxes/boxesgroup.h"
+#include "Boxes/layerbox.h"
 #include "colorhelpers.h"
 #include <QThread>
 #include "Boxes/rendercachehandler.h"
@@ -50,7 +50,7 @@ extern bool zLessThan(const qptr<BoundingBox> &box1,
 extern bool boxesZSort(const qptr<BoundingBox> &box1,
                        const qptr<BoundingBox> &box2);
 
-class Canvas : public BoxesGroup, public CanvasBase {
+class Canvas : public LayerBox, public CanvasBase {
     Q_OBJECT
     friend class SelfRef;
 protected:
@@ -69,7 +69,7 @@ public:
     void startSelectionAtPoint(const QPointF &pos);
     void moveSecondSelectionPoint(const QPointF &pos);
     void setPointCtrlsMode(const CtrlsMode& mode);
-    void setCurrentBoxesGroup(BoxesGroup * const group);
+    void setCurrentBoxesGroup(LayerBox * const group);
 
     void updatePivot();
 
@@ -250,7 +250,7 @@ public:
                              const bool &parentSatisfies,
                              const bool &parentMainTarget) const;
 
-    BoxesGroup *getCurrentBoxesGroup() {
+    LayerBox *getCurrentBoxesGroup() {
         return mCurrentBoxesGroup;
     }
 
@@ -310,7 +310,7 @@ public:
 
     void setupRenderData(const qreal &relFrame,
                          BoundingBoxRenderData * const data) {
-        BoxesGroup::setupRenderData(relFrame, data);
+        LayerBox::setupRenderData(relFrame, data);
         auto canvasData = GetAsPtr(data, CanvasRenderData);
         canvasData->fBgColor = toSkColor(mBackgroundColor->getCurrentColor());
         canvasData->fCanvasHeight = mHeight*mResolutionFraction;
@@ -421,11 +421,11 @@ public:
         if(mClipToCanvasSize) {
             if(!getMaxBoundsRect().contains(absPos)) return nullptr;
         }
-        return BoxesGroup::getBoxAt(absPos);
+        return LayerBox::getBoxAt(absPos);
     }
 
     void anim_scaleTime(const int &pivotAbsFrame, const qreal &scale) {
-        BoxesGroup::anim_scaleTime(pivotAbsFrame, scale);
+        LayerBox::anim_scaleTime(pivotAbsFrame, scale);
 //        int newAbsPos = qRound(scale*pivotAbsFrame);
 //        anim_shiftAllKeys(newAbsPos - pivotAbsFrame);
         setMaxFrame(qRound((mMaxFrame - pivotAbsFrame)*scale));
@@ -590,7 +590,7 @@ protected:
     qptr<Rectangle> mCurrentRectangle;
     qptr<TextBox> mCurrentTextBox;
     qptr<ParticleBox> mCurrentParticleBox;
-    qptr<BoxesGroup> mCurrentBoxesGroup;
+    qptr<LayerBox> mCurrentBoxesGroup;
 
     stdptr<MovablePoint> mHoveredPoint_d;
     qptr<BoundingBox> mHoveredBox;
