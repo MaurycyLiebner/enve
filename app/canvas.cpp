@@ -209,7 +209,6 @@ void Canvas::renderSk(SkCanvas * const canvas,
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setStyle(SkPaint::kFill_Style);
-    canvas->clear(SK_ColorBLACK);
 
     const SkScalar reversedRes = toSkScalar(1/mResolutionFraction);
     if(isPreviewingOrRendering()) {

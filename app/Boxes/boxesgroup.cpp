@@ -502,7 +502,8 @@ void processChildData(BoundingBox* child,
 void BoxesGroup::setupRenderData(const qreal &relFrame,
                                  BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
-    const auto groupData = GetAsSPtr(data, BoxesGroupRenderData);
+    const auto groupData = GetAsPtr(data, BoxesGroupRenderData);
+    groupData->fPaintOnImage = shouldPaintOnImage();
     groupData->fChildrenRenderData.clear();
     groupData->fOtherGlobalRects.clear();
     qreal childrenEffectsMargin = 0;
@@ -510,7 +511,7 @@ void BoxesGroup::setupRenderData(const qreal &relFrame,
     for(const auto& box : mContainedBoxes) {
         const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
         if(box->isFrameFVisibleAndInDurationRect(boxRelFrame)) {
-            processChildData(box.data(), groupData.get(), boxRelFrame);
+            processChildData(box.data(), groupData, boxRelFrame);
 
             childrenEffectsMargin =
                     qMax(box->getEffectsMarginAtRelFrameF(boxRelFrame),
@@ -558,15 +559,13 @@ bool BoxesGroup::isCurrentGroup() const {
 bool BoxesGroup::isDescendantCurrentGroup() const {
     return mIsDescendantCurrentGroup;
 }
-
+#include "Animators/gpueffectanimators.h"
 bool BoxesGroup::shouldPaintOnImage() const {
-    if(SWT_isLinkBox()) return true;
+    if(SWT_isLinkBox() || SWT_isCanvas()) return true;
     if(mIsDescendantCurrentGroup) return false;
 //    return !mIsDescendantCurrentGroup; !!!
     return mEffectsAnimators->hasEffects() ||
-           mPathEffectsAnimators->hasEffects() ||
-           mOutlinePathEffectsAnimators->hasEffects() ||
-           mFillPathEffectsAnimators->hasEffects();
+           mGPUEffectsAnimators->hasEffects();
 }
 
 bool BoxesGroup::SWT_isBoxesGroup() const { return true; }

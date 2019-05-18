@@ -90,7 +90,7 @@ public:
     sk_sp<SkImage> fRenderedImage;
     SkBitmap fBitmapTMP;
 
-    void drawRenderedImageForParent(SkCanvas * const canvas);
+    virtual void drawRenderedImageForParent(SkCanvas * const canvas);
 
     void dataSet();
 

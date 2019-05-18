@@ -234,11 +234,8 @@ void CanvasWindow::renameCurrentCanvas(const QString &newName) {
 
 void CanvasWindow::renderSk(SkCanvas * const canvas,
                             GrContext* const grContext) {
-    if(mCurrentCanvas) {
-        mCurrentCanvas->renderSk(canvas, grContext);
-    } else {
-        canvas->clear(SK_ColorBLACK);
-    }
+    canvas->clear(SK_ColorBLACK);
+    if(mCurrentCanvas) mCurrentCanvas->renderSk(canvas, grContext);
 }
 
 void CanvasWindow::tabletEvent(QTabletEvent *e) {
