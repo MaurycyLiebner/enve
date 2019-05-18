@@ -60,7 +60,6 @@ public:
     QMatrix fResolutionScale;
     QMatrix fScaledTransform;
     QMatrix fTransform;
-    QMatrix fParentTransform;
     QMatrix fRelTransform;
     QMatrix fRenderTransform;
 

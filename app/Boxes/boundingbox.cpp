@@ -308,13 +308,11 @@ bool BoundingBox::diffsIncludingInherited(
 }
 
 void BoundingBox::setParentGroup(LayerBox * const parent) {
+    if(parent == mParentGroup) return;
     mParentGroup = parent;
     if(!mParentGroup) return;
-    mParentTransform = parent->getTransformAnimator();
-    mTransformAnimator->setParentTransformAnimator(mParentTransform);
-
     anim_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
-    mTransformAnimator->updateTotalTransform(Animator::USER_CHANGE);
+    setParentTransform(parent->getTransformAnimator());
 }
 
 void BoundingBox::setParentTransform(BasicTransformAnimator *parent) {
@@ -667,9 +665,7 @@ void BoundingBox::setupRenderData(const qreal &relFrame,
     data->fRelFrame = qRound(relFrame);
     data->fRenderedToImage = false;
     data->fRelTransform = getRelativeTransformAtRelFrameF(relFrame);
-    data->fParentTransform =
-            getParentTotalTransformAtRelFrame(relFrame);
-    data->fTransform = data->fRelTransform*data->fParentTransform;
+    data->fTransform = getTotalTransformAtRelFrameF(relFrame);
 
     data->fOpacity = mTransformAnimator->getOpacity(relFrame);
     data->fResolution = getParentCanvas()->getResolutionFraction();
@@ -958,6 +954,10 @@ QMatrix BoundingBox::getRelativeTransformAtRelFrameF(const qreal &relFrame) {
     return mTransformAnimator->getRelativeTransform(relFrame);
 }
 
+QMatrix BoundingBox::getTotalTransformAtRelFrameF(const qreal &relFrame) {
+    return mTransformAnimator->getTotalTransformAtRelFrameF(relFrame);
+}
+
 int BoundingBox::prp_getRelFrameShift() const {
     if(!mDurationRectangle) return 0;
     return mDurationRectangle->getFrameShift();
@@ -969,13 +969,11 @@ void BoundingBox::setDurationRectangle(
     if(mDurationRectangle) {
         disconnect(mDurationRectangle.data(), nullptr, this, nullptr);
     }
-    qsptr<DurationRectangle> oldDurRect = mDurationRectangle;
+    const auto oldDurRect = mDurationRectangle;
     mDurationRectangle = durationRect;
     updateAfterDurationRectangleShifted(0);
-    if(!mDurationRectangle) {
-        shiftAll(oldDurRect->getFrameShift());
-        return;
-    }
+    if(!mDurationRectangle)
+        return shiftAll(oldDurRect->getFrameShift());
 
     connect(mDurationRectangle.data(), &DurationRectangle::posChangedBy,
             this, &BoundingBox::updateAfterDurationRectangleShifted);

@@ -1,5 +1,5 @@
-#ifndef BOXESGROUPRENDERDATA_H
-#define BOXESGROUPRENDERDATA_H
+#ifndef LAYERBOXRENDERDATA_H
+#define LAYERBOXRENDERDATA_H
 #include "boundingboxrenderdata.h"
 
 struct LayerBoxRenderData : public BoundingBoxRenderData {
@@ -13,4 +13,4 @@ protected:
     void updateRelBoundingRect();
 };
 
-#endif // BOXESGROUPRENDERDATA_H
+#endif // LAYERBOXRENDERDATA_H

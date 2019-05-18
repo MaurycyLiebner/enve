@@ -24,10 +24,8 @@ void LayerBoxRenderData::updateRelBoundingRect() {
     for(const auto &child : fChildrenRenderData) {
         if(child->fRelBoundingRect.isEmpty()) continue;
         SkPath childPath;
-        childPath.addRect(
-                    toSkRect(child->fRelBoundingRect));
-        childPath.transform(
-                    toSkMatrix(child->fRelTransform));
+        childPath.addRect(toSkRect(child->fRelBoundingRect));
+        childPath.transform(toSkMatrix(child->fRelTransform));
         boundingPaths.addPath(childPath);
         fOtherGlobalRects << child->fGlobalBoundingRect;
     }

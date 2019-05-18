@@ -12,7 +12,6 @@ BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
 void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     fGlobalBoundingRect = src->fGlobalBoundingRect;
     fTransform = src->fTransform;
-    fParentTransform = src->fParentTransform;
     fCustomRelFrame = src->fCustomRelFrame;
     fUseCustomRelFrame = src->fUseCustomRelFrame;
     fRelFrame = src->fRelFrame;

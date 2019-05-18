@@ -1,5 +1,5 @@
-﻿#ifndef BOXESGROUP_H
-#define BOXESGROUP_H
+﻿#ifndef LAYERBOX_H
+#define LAYERBOX_H
 #include "Boxes/boundingbox.h"
 
 class PathBox;
@@ -198,4 +198,4 @@ signals:
     void addAnimatedBoundingBoxSignal(BoundingBox*);
 };
 
-#endif // BOXESGROUP_H
+#endif // LAYERBOX_H
