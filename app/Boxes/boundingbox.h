@@ -464,7 +464,6 @@ private:
     void afterTotalTransformChanged(const UpdateReason &reason);
 signals:
     void nameChanged(QString);
-    void scheduledUpdate();
     void globalPivotInfluenced();
     void fillStrokeSettingsChanged();
 };

@@ -10,18 +10,12 @@ BoundingBox* BoxTargetProperty::getTarget() const {
 }
 
 void BoxTargetProperty::setTarget(BoundingBox* box) {
-    if(mTarget_d) {
-        QObject::disconnect(mTarget_d, nullptr, this, nullptr);
-    }
     if(!box) {
         mTarget_d.clear();
     } else {
         mTarget_d = box;
     }
-    if(mTarget_d) {
-//        QObject::connect(mTarget_d, SIGNAL(scheduledUpdate()),
-//                         this, SLOT(prp_callUpdater()));
-    }
+
     prp_afterWholeInfluenceRangeChanged();
     emit targetSet(box);
 }

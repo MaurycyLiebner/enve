@@ -416,14 +416,12 @@ void BoundingBox::scheduleUpdate() {
     if(currentRenderData) return;
     currentRenderData = updateCurrentRenderData(relFrame, mPlannedReason);
     currentRenderData->scheduleTask();
-
-    emit scheduledUpdate();
 }
 
 BoundingBoxRenderData *BoundingBox::updateCurrentRenderData(
         const int& relFrame, const UpdateReason& reason) {
-    auto renderData = createRenderData();
-    Q_ASSERT(renderData);
+    const auto renderData = createRenderData();
+    if(!renderData) RuntimeThrow("Failed to create BoundingBoxRenderData instance");
     renderData->fRelFrame = relFrame;
     renderData->fReason = reason;
     mCurrentRenderDataHandler.addItemAtRelFrame(renderData);
@@ -431,7 +429,7 @@ BoundingBoxRenderData *BoundingBox::updateCurrentRenderData(
 }
 
 BoundingBoxRenderData *BoundingBox::getCurrentRenderData(const int& relFrame) {
-    BoundingBoxRenderData* currentRenderData =
+    auto currentRenderData =
             mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
     if(!currentRenderData) {
         if(mDrawRenderContainer.isExpired()) return nullptr;
@@ -1256,11 +1254,6 @@ void BoundingBox::setVisibile(const bool &visible) {
     mVisible = visible;
 
     prp_afterWholeInfluenceRangeChanged();
-
-    if(mVisible) planScheduleUpdate(Animator::USER_CHANGE);
-    else if(mParentGroup) {
-        mParentGroup->planScheduleUpdate(Animator::CHILD_USER_CHANGE);
-    }
 
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_VISIBLE);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_HIDDEN);

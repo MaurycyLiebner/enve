@@ -56,6 +56,7 @@ SOURCES += main.cpp\
     Boxes/layerbox.cpp \
     Boxes/layerboxrenderdata.cpp \
     Boxes/patheffectsmenu.cpp \
+    Boxes/renderedbox.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/soundreader.cpp \
     GUI/welcomedialog.cpp \
@@ -262,6 +263,7 @@ HEADERS  += \
     Boxes/layerbox.h \
     Boxes/layerboxrenderdata.h \
     Boxes/patheffectsmenu.h \
+    Boxes/renderedbox.h \
     CacheHandlers/samples.h \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/soundreader.h \
