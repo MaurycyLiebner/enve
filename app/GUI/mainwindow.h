@@ -215,8 +215,7 @@ private:
 
     void readRecentFiles() {
         QFile file(QDir::homePath() + "/.AniVect/recent");
-        if(file.open(QIODevice::ReadOnly |
-                     QIODevice::Text)) {
+        if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QTextStream stream(&file);
             while(!stream.atEnd()) {
                 const QString path = stream.readLine();
@@ -229,8 +228,7 @@ private:
 
     void writeRecentFiles() {
         QFile file(QDir::homePath() + "/.AniVect/recent");
-        if(file.open(QIODevice::WriteOnly |
-                     QIODevice::Text |
+        if(file.open(QIODevice::WriteOnly | QIODevice::Text |
                      QIODevice::Truncate)) {
             QTextStream stream(&file);
             for(const auto& recent : mRecentFiles) {
