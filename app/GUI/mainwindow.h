@@ -160,6 +160,9 @@ public:
     void addCanvasToRenderQue();
     void canvasNameChanged(Canvas *canvas, const QString &name);
 
+    const QStringList& getRecentFiles() const {
+        return mRecentFiles;
+    }
     stdsptr<void> lock();
 public:
     //void saveOutput(QString renderDest);
@@ -200,6 +203,43 @@ private:
     stdptr<Lock> mLock;
     static MainWindow *mMainWindowInstance;
     MemoryHandler *mMemoryHandler;
+
+    void addRecentFile(const QString& recent) {
+        if(mRecentFiles.contains(recent))
+            mRecentFiles.removeOne(recent);
+        while(mRecentFiles.count() >= 8)
+            mRecentFiles.removeLast();
+        mRecentFiles.prepend(recent);
+        writeRecentFiles();
+    }
+
+    void readRecentFiles() {
+        QFile file(QDir::homePath() + "/.AniVect/recent");
+        if(file.open(QIODevice::ReadOnly |
+                     QIODevice::Text)) {
+            QTextStream stream(&file);
+            while(!stream.atEnd()) {
+                const QString path = stream.readLine();
+                if(path.isEmpty()) continue;
+                //if(QFile(path).exists())
+                mRecentFiles.append(path);
+            }
+        }
+    }
+
+    void writeRecentFiles() {
+        QFile file(QDir::homePath() + "/.AniVect/recent");
+        if(file.open(QIODevice::WriteOnly |
+                     QIODevice::Text |
+                     QIODevice::Truncate)) {
+            QTextStream stream(&file);
+            for(const auto& recent : mRecentFiles) {
+                stream << recent << endl;
+            }
+        }
+    }
+
+    QStringList mRecentFiles;
 
     stdsptr<ClipboardContainer> mClipboardContainer;
 //    bool mRendering = false;

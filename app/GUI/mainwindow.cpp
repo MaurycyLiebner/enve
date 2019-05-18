@@ -224,6 +224,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->setMouseTracking(true);
     centralWidget()->setMouseTracking(true);
 
+    readRecentFiles();
     mCanvasWindow->openWelcomeDialog();
 
     mEventFilterDisabled = false;
@@ -1120,6 +1121,7 @@ void MainWindow::openFile(const QString& openPath) {
         loadAVFile(openPath);
         setCurrentPath(openPath);
         setFileChangedSinceSaving(false);
+        addRecentFile(openPath);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
     }

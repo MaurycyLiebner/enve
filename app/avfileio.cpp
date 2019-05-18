@@ -1102,7 +1102,7 @@ void writeQColor(const QColor& qcol, QIODevice *write) {
 }
 
 void CanvasWindow::writeCanvases(QIODevice *target) {
-    int nCanvases = mCanvasList.count();
+    const int nCanvases = mCanvasList.count();
     target->write(rcConstChar(&nCanvases), sizeof(int));
     int currentCanvasId = -1;
     for(const auto &canvas : mCanvasList) {
@@ -1130,23 +1130,22 @@ void CanvasWindow::readCanvases(QIODevice *target) {
 
 void MainWindow::loadAVFile(const QString &path) {
     QFile target(path);
-    if(target.open(QIODevice::ReadOnly)) {
-        if(FileFooter::sCompatible(&target)) {
-            auto gradientWidget = mFillStrokeSettings->getGradientWidget();
-            gradientWidget->readGradients(&target);
-            mCanvasWindow->readCanvases(&target);
-
-            clearLoadedGradientsList();
-            gradientWidget->clearGradientsLoadIds();
-            BoundingBox::sClearReadBoxes();
-        } else {
-            RuntimeThrow("File incompatible or incomplete " + path.toStdString() + ".");
-        }
-
+    if(!target.exists()) RuntimeThrow("File does not exist " + path.toStdString());
+    if(!target.open(QIODevice::ReadOnly))
+        RuntimeThrow("Could not open file " + path.toStdString());
+    if(!FileFooter::sCompatible(&target)) {
         target.close();
-    } else {
-        RuntimeThrow("Could not open file " + path.toStdString() + ".");
+        RuntimeThrow("File incompatible or incomplete " + path.toStdString());
     }
+    auto gradientWidget = mFillStrokeSettings->getGradientWidget();
+    gradientWidget->readGradients(&target);
+    mCanvasWindow->readCanvases(&target);
+
+    clearLoadedGradientsList();
+    gradientWidget->clearGradientsLoadIds();
+    BoundingBox::sClearReadBoxes();
+
+    target.close();
 }
 
 void MainWindow::saveToFile(const QString &path) {
@@ -1171,4 +1170,5 @@ void MainWindow::saveToFile(const QString &path) {
     }
 
     BoundingBox::sClearWriteBoxes();
+    addRecentFile(path);
 }

@@ -51,7 +51,7 @@ struct AutoTiledSurface {
         mypaint_surface_begin_atomic(fMyPaintSurface);
         mypaint_brush_stroke_to(brush, fMyPaintSurface,
                                 pos.x(), pos.y(), pressure,
-                                xtilt, ytilt, dTime, 1, 0, 0);
+                                xtilt, ytilt, dTime);
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(fMyPaintSurface, &roi);
         return roi;
@@ -66,7 +66,7 @@ struct AutoTiledSurface {
         mypaint_surface_begin_atomic(fMyPaintSurface);
         mypaint_brush_stroke_to(brush, fMyPaintSurface,
                                 pos.x(), pos.y(), pressure,
-                                xtilt, ytilt, dTime, 1, 0, 0);
+                                xtilt, ytilt, dTime);
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(fMyPaintSurface, &roi);
         return roi;

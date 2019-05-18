@@ -46,7 +46,7 @@ struct FixedTiledSurface {
                                 static_cast<float>(pressure),
                                 static_cast<float>(xtilt),
                                 static_cast<float>(ytilt),
-                                dTime, 1, 0, 0);
+                                dTime);
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(fMyPaintSurface, &roi);
         updateImage(QRect(roi.x, roi.y, roi.width, roi.height));
@@ -66,7 +66,7 @@ struct FixedTiledSurface {
                                 static_cast<float>(pressure),
                                 static_cast<float>(xtilt),
                                 static_cast<float>(ytilt),
-                                dTime, 1, 0, 0);
+                                dTime);
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(fMyPaintSurface, &roi);
         updateImage(QRect(roi.x, roi.y, roi.width, roi.height));

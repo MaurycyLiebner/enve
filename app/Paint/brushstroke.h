@@ -57,19 +57,13 @@ private:
 
         mypaint_brush_set_base_value(brush,
                                      MYPAINT_BRUSH_SETTING_DABS_PER_ACTUAL_RADIUS,
-                                     static_cast<float>(spacing));
+                                     spacing);
         mypaint_brush_set_base_value(brush,
                                      MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
-                                     static_cast<float>(qLn(width)));
+                                     qLn(width));
         mypaint_surface_begin_atomic(surface);
-        mypaint_brush_stroke_to(brush,
-                                surface,
-                                static_cast<float>(pos.x()),
-                                static_cast<float>(pos.y()),
-                                static_cast<float>(pressure),
-                                static_cast<float>(xTilt),
-                                static_cast<float>(yTilt),
-                                time*lenFrag, 1, 0, 0);
+        mypaint_brush_stroke_to(brush, surface, pos.x(), pos.y(), pressure,
+                                xTilt, yTilt, time*lenFrag);
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(surface, &roi);
         return QRect(roi.x, roi.y, roi.width, roi.height);
@@ -82,19 +76,22 @@ private:
         const qreal xTilt = fXTilt.p0();
         const qreal yTilt = fYTilt.p0();
         //qreal time = gCubicValueAtT(fTimeCurve, t);
+        const qreal width = fWidthCurve.p0();
+        const qreal spacing = fSpacingCurve.p0();
+
+        mypaint_brush_set_base_value(brush,
+                                     MYPAINT_BRUSH_SETTING_DABS_PER_ACTUAL_RADIUS,
+                                     spacing);
+        mypaint_brush_set_base_value(brush,
+                                     MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
+                                     qLn(width));
 
         mypaint_brush_reset(brush);
         mypaint_brush_new_stroke(brush);
 
         mypaint_surface_begin_atomic(surface);
-        mypaint_brush_stroke_to(brush,
-                                surface,
-                                static_cast<float>(pos.x()),
-                                static_cast<float>(pos.y()),
-                                static_cast<float>(pressure),
-                                static_cast<float>(xTilt),
-                                static_cast<float>(yTilt),
-                                0.1, 1, 0, 0);
+        mypaint_brush_stroke_to(brush, surface, pos.x(), pos.y(), pressure,
+                                xTilt, yTilt, 0.1);
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(surface, &roi);
         return QRect(roi.x, roi.y, roi.width, roi.height);

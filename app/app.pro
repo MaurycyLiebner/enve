@@ -5,24 +5,15 @@
 #-------------------------------------------------
 
 QT += multimedia core gui svg opengl sql qml xml concurrent #widgets-private # gui-private core-private
-LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc -ljson-c# -lmypaint-2.0
+LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc -ljson-c
 
 QMAKE_RPATHDIR += ../core/
 LIBS += -L$$OUT_PWD/../core/ -lcore
 INCLUDEPATH += $$PWD/../core
 DEPENDPATH += $$PWD/../core
 
-QMAKE_RPATHDIR += ../libmypaint/
-LIBS += -L$$OUT_PWD/../libmypaint/ -llibmypaint
-INCLUDEPATH += $$PWD/../libmypaint
-DEPENDPATH += $$PWD/../libmypaint
-
-#LIBS += -L$$PWD/../../build/Debug/libmypaint/ -llibmypaint
-
-#INCLUDEPATH += $$PWD/../../../libmypaint
-#DEPENDPATH += $$PWD/../../../libmypaint
-
-#INCLUDEPATH += /usr/local/include/libmypaint-2.0/
+LIBS += -L/home/ailuropoda/.libmypaint-1.3.0/.libs -lmypaint
+INCLUDEPATH += /usr/local/include/libmypaint/
 
 INCLUDEPATH += /home/ailuropoda/.skia/include/images/
 INCLUDEPATH += /home/ailuropoda/.skia/include/core/

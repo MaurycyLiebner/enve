@@ -860,7 +860,7 @@ void CanvasWindow::getDisplayedFillStrokeSettingsFromLastSelected(
 void CanvasWindow::openWelcomeDialog() {
     if(mWelcomeDialog) return;
     const auto mWindow = MainWindow::getInstance();
-    mWelcomeDialog = new WelcomeDialog(QStringList() << "/home/ailuropoda/Documents/kom/ready/menu.av",
+    mWelcomeDialog = new WelcomeDialog(mWindow->getRecentFiles(),
                                        []() { MainWindow::getInstance()->createNewCanvas(); },
                                        []() { MainWindow::getInstance()->openFile(); },
                                        [](QString path) { MainWindow::getInstance()->openFile(path); },

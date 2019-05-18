@@ -4,7 +4,7 @@
 #include <QDebug>
 #define ERROUT(msg) qDebug() << msg << __LINE__
 #define FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
-#define RuntimeThrow(msg) std::throw_with_nested(std::runtime_error(std::to_string(__LINE__) + "  :  " + FILENAME + "\n" + __func__ + "()\n" + msg))
+#define RuntimeThrow(msg) std::throw_with_nested(std::runtime_error(std::to_string(__LINE__) + "  :  " + FILENAME + "  :  " + __func__ + "()\n" + msg))
 #define CheckInvalidLocation(vLoc, name) \
     if(vLoc < 0) { \
         checkGlErrors(); \
