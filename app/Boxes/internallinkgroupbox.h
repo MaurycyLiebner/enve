@@ -26,7 +26,7 @@ public:
     QRectF getRelBoundingRect(const qreal &relFrame);
     FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
 
-    bool SWT_isBoxesGroup() const;
+    bool SWT_isLayerBox() const;
 
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
 

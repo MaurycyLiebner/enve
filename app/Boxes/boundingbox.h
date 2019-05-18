@@ -24,6 +24,7 @@ class PixmapEffect;
 class BoxTransformAnimator;
 class BasicTransformAnimator;
 
+class GroupBox;
 class LayerBox;
 class SmartVectorPath;
 class DurationRectangle;
@@ -39,7 +40,7 @@ enum BoundingBoxType {
     TYPE_IMAGE,
     TYPE_RECTANGLE,
     TYPE_TEXT,
-    TYPE_GROUP,
+    TYPE_LAYER,
     TYPE_CANVAS,
     TYPE_INTERNAL_LINK,
     TYPE_INTERNAL_LINK_GROUP,
@@ -48,7 +49,8 @@ enum BoundingBoxType {
     TYPE_PARTICLES,
     TYPE_VIDEO,
     TYPE_IMAGESQUENCE,
-    TYPE_PAINT
+    TYPE_PAINT,
+    TYPE_GROUP
 };
 
 typedef PropertyMimeData<BoundingBox,
@@ -87,7 +89,7 @@ protected:
     virtual void getMotionBlurProperties(QList<Property*> &list) const;
 public:
     virtual void updateAfterDurationRectangleRangeChanged();
-    virtual void setParentGroup(LayerBox * const parent);
+    virtual void setParentGroup(GroupBox * const parent);
 
     virtual qsptr<BoundingBox> createLink();
     virtual qsptr<BoundingBox> createLinkForLinkGroup();
@@ -275,7 +277,7 @@ public:
     void clearReadId();
 
     void clearParent();
-    LayerBox *getParentGroup() const;
+    GroupBox *getParentGroup() const;
     void setParentTransform(BasicTransformAnimator *parent);
     bool isParentLinkBox();
 
@@ -436,7 +438,7 @@ protected:
     SkRect mRelBoundingRectSk;
     SkPath mSkRelBoundingRectPath;
 
-    qptr<LayerBox> mParentGroup;
+    qptr<GroupBox> mParentGroup;
     qptr<BasicTransformAnimator> mParentTransform;
 
     QList<qptr<BoundingBox>> mChildBoxes;

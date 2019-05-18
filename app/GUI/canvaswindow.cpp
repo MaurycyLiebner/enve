@@ -89,7 +89,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         mCurrentSoundComposition = nullptr;
         mCurrentCanvas.clear();
     }
-    LayerBox *currentGroup;
+    GroupBox *currentGroup;
     if(mCurrentCanvas) {
         MainWindow::getInstance()->setCurrentUndoRedoStack(
                     mCurrentCanvas->getUndoRedoStack());
@@ -919,7 +919,7 @@ void CanvasWindow::schedulePivotUpdate() {
     mCurrentCanvas->schedulePivotUpdate();
 }
 
-LayerBox *CanvasWindow::getCurrentGroup() {
+GroupBox *CanvasWindow::getCurrentGroup() {
     if(hasNoCanvas()) return nullptr;
     return mCurrentCanvas->getCurrentBoxesGroup();
 }

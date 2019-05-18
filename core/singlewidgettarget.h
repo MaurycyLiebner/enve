@@ -108,7 +108,8 @@ public:
     virtual bool SWT_isCanvas() const { return false; }
     virtual bool SWT_isAnimationBox() const { return false; }
     virtual bool SWT_isBoundingBox() const { return false; }
-    virtual bool SWT_isBoxesGroup() const { return false; }
+    virtual bool SWT_isLayerBox() const { return false; }
+    virtual bool SWT_isGroupBox() const { return false; }
     virtual bool SWT_isCircle() const { return false; }
     virtual bool SWT_isImageBox() const { return false; }
     virtual bool SWT_isImageSequenceBox() const { return false; }
@@ -117,7 +118,6 @@ public:
     virtual bool SWT_isPathBox() const { return false; }
     virtual bool SWT_isRectangle() const { return false; }
     virtual bool SWT_isTextBox() const { return false; }
-    virtual bool SWT_isVectorPath() const { return false; }
     virtual bool SWT_isVideoBox() const { return false; }
     virtual bool SWT_isPaintBox() const { return false; }
     virtual bool SWT_isSmartVectorPath() const { return false; }

@@ -68,7 +68,7 @@ PathBox::~PathBox() {
         mStrokeSettings->getGradient()->removePath(this);
 }
 
-void PathBox::setParentGroup(LayerBox * const parent) {
+void PathBox::setParentGroup(GroupBox * const parent) {
     setPathsOutdated();
     BoundingBox::setParentGroup(parent);
 }

@@ -167,7 +167,7 @@ void BoundingBox::setStrokeColorMode(const ColorMode &colorMode) {
 bool BoundingBox::isAncestor(const BoundingBox * const box) const {
     if(!mParentGroup) return false;
     if(mParentGroup == box) return true;
-    if(box->SWT_isBoxesGroup()) return mParentGroup->isAncestor(box);
+    if(box->SWT_isLayerBox()) return mParentGroup->isAncestor(box);
     return false;
 }
 
@@ -307,7 +307,7 @@ bool BoundingBox::diffsIncludingInherited(
     return diffThis || diffInherited;
 }
 
-void BoundingBox::setParentGroup(LayerBox * const parent) {
+void BoundingBox::setParentGroup(GroupBox * const parent) {
     if(parent == mParentGroup) return;
     mParentGroup = parent;
     if(!mParentGroup) return;
@@ -333,7 +333,7 @@ void BoundingBox::clearParent() {
     setParentTransform(mParentGroup->getTransformAnimator());
 }
 
-LayerBox *BoundingBox::getParentGroup() const {
+GroupBox *BoundingBox::getParentGroup() const {
     return mParentGroup;
 }
 

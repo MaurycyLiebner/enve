@@ -543,7 +543,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             });
             if(clipboard) {
                 if(target->SWT_isBoundingBox()) {
-                    if(target->SWT_isBoxesGroup() &&
+                    if(target->SWT_isLayerBox() &&
                         !target->SWT_isLinkBox()) {
                         auto boxClip = MainWindow::getBoxesClipboardContainer();
                         if(boxClip) {

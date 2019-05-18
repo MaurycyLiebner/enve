@@ -1,9 +1,8 @@
 #include "groupallpathsupdater.h"
-#include "Boxes/layerbox.h"
+#include "Boxes/groupbox.h"
 
-GroupAllPathsUpdater::GroupAllPathsUpdater(LayerBox *boxesGroup) {
-    mTarget = boxesGroup;
-}
+GroupAllPathsUpdater::GroupAllPathsUpdater(
+        GroupBox * const boxesGroup) : mTarget(boxesGroup) {}
 
 void GroupAllPathsUpdater::update() {
     mTarget->updateAllChildPathBoxes(Animator::USER_CHANGE);

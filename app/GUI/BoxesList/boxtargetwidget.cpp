@@ -64,10 +64,9 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
         BoundingBox *parentBox =
                 mProperty->getFirstAncestor<BoundingBox>(tester);
         if(!parentBox) return;
-        LayerBox *srcGroup = parentBox->getParentGroup();
+        const auto srcGroup = parentBox->getParentGroup();
         if(!srcGroup) return;
-        QList<qsptr<BoundingBox> > boxesT =
-                srcGroup->getContainedBoxesList();
+        const auto& boxesT = srcGroup->getContainedBoxesList();
         QMenu menu(this);
 
 

@@ -14,6 +14,7 @@ enum CanvasMode : short;
 class Gradient;
 class BoundingBox;
 class LayerBox;
+class GroupBox;
 class TaskExecutor;
 class SoundComposition;
 class PaintSettingsApplier;
@@ -84,7 +85,7 @@ public:
     void updatePivotIfNeeded();
     void schedulePivotUpdate();
 
-    LayerBox *getCurrentGroup();
+    GroupBox *getCurrentGroup();
     void applyPaintSettingToSelected(const PaintSettingsApplier &setting);
     void setSelectedFillColorMode(const ColorMode &mode);
     void setSelectedStrokeColorMode(const ColorMode &mode);

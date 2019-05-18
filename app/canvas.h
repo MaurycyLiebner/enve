@@ -69,7 +69,7 @@ public:
     void startSelectionAtPoint(const QPointF &pos);
     void moveSecondSelectionPoint(const QPointF &pos);
     void setPointCtrlsMode(const CtrlsMode& mode);
-    void setCurrentBoxesGroup(LayerBox * const group);
+    void setCurrentBoxesGroup(GroupBox * const group);
 
     void updatePivot();
 
@@ -250,7 +250,7 @@ public:
                              const bool &parentSatisfies,
                              const bool &parentMainTarget) const;
 
-    LayerBox *getCurrentBoxesGroup() {
+    GroupBox *getCurrentBoxesGroup() {
         return mCurrentBoxesGroup;
     }
 
@@ -590,7 +590,7 @@ protected:
     qptr<Rectangle> mCurrentRectangle;
     qptr<TextBox> mCurrentTextBox;
     qptr<ParticleBox> mCurrentParticleBox;
-    qptr<LayerBox> mCurrentBoxesGroup;
+    qptr<GroupBox> mCurrentBoxesGroup;
 
     stdptr<MovablePoint> mHoveredPoint_d;
     qptr<BoundingBox> mHoveredBox;

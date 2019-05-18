@@ -53,10 +53,10 @@ TARGET = AniVect
 TEMPLATE = app
 
 SOURCES += main.cpp\
+    Boxes/groupbox.cpp \
     Boxes/layerbox.cpp \
     Boxes/layerboxrenderdata.cpp \
     Boxes/patheffectsmenu.cpp \
-    Boxes/renderedbox.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/soundreader.cpp \
     GUI/welcomedialog.cpp \
@@ -260,10 +260,10 @@ SOURCES += main.cpp\
     Paint/animatedsurface.cpp
 
 HEADERS  += \
+    Boxes/groupbox.h \
     Boxes/layerbox.h \
     Boxes/layerboxrenderdata.h \
     Boxes/patheffectsmenu.h \
-    Boxes/renderedbox.h \
     CacheHandlers/samples.h \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/soundreader.h \

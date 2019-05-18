@@ -48,7 +48,7 @@ FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(
     return range*targetRange;
 }
 
-bool InternalLinkGroupBox::SWT_isBoxesGroup() const { return false; }
+bool InternalLinkGroupBox::SWT_isLayerBox() const { return false; }
 
 QMatrix InternalLinkGroupBox::getRelativeTransformAtRelFrameF(
         const qreal &relFrame) {
@@ -128,7 +128,7 @@ bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) const {
 }
 
 void InternalLinkGroupBox::setTargetSlot(BoundingBox *target) {
-    if(target->SWT_isBoxesGroup())
+    if(target->SWT_isLayerBox())
         setLinkTarget(GetAsPtr(target, LayerBox));
 }
 

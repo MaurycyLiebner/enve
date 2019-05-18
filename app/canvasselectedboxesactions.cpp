@@ -354,7 +354,7 @@ bool Canvas::isBoxSelectionEmpty() {
 
 void Canvas::ungroupSelectedBoxes() {
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isBoxesGroup()) {
+        if(box->SWT_isLayerBox()) {
             GetAsPtr(box, LayerBox)->ungroup_k();
         }
     }

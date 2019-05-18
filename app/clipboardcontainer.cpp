@@ -26,7 +26,7 @@ QByteArray *ClipboardContainer::getBytesArray() {
 BoxesClipboardContainer::BoxesClipboardContainer() :
     ClipboardContainer(CCT_BOXES) {}
 #include "canvas.h"
-void BoxesClipboardContainer::pasteTo(LayerBox* const parent) {
+void BoxesClipboardContainer::pasteTo(GroupBox* const parent) {
     const int oldCount = parent->getContainedBoxesCount();
     QBuffer target(getBytesArray());
     target.open(QIODevice::ReadOnly);

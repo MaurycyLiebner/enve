@@ -6,6 +6,7 @@
 class QrealAnimator;
 class BoundingBox;
 class LayerBox;
+class GroupBox;
 class KeysView;
 class Key;
 class Animator;
@@ -35,7 +36,7 @@ private:
 class BoxesClipboardContainer : public ClipboardContainer {
     friend class StdSelfRef;
 public:
-    void pasteTo(LayerBox * const parent);
+    void pasteTo(GroupBox * const parent);
 protected:
     BoxesClipboardContainer();
 private:

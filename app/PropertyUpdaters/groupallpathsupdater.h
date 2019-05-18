@@ -1,15 +1,15 @@
 #ifndef GROUPALLPATHSUPDATER_H
 #define GROUPALLPATHSUPDATER_H
 #include "PropertyUpdaters/propertyupdater.h"
-class LayerBox;
+class GroupBox;
 
 class GroupAllPathsUpdater : public PropertyUpdater {
 public:
-    GroupAllPathsUpdater(LayerBox *boxesGroup);
+    GroupAllPathsUpdater(GroupBox *boxesGroup);
     void update();
     void frameChangeUpdate();
 private:
-    LayerBox *mTarget;
+    GroupBox * const mTarget;
 };
 
 #endif // GROUPALLPATHSUPDATER_H

@@ -154,7 +154,7 @@ void Canvas::mouseDoubleClickEvent(const QMouseEvent * const e) {
             }
         }
     } else {
-        if(boxAt->SWT_isBoxesGroup()) {
+        if(boxAt->SWT_isLayerBox()) {
             setCurrentBoxesGroup(static_cast<LayerBox*>(boxAt));
             updateHoveredElements();
         } else if((mCurrentMode == MOVE_BOX ||
@@ -163,7 +163,7 @@ void Canvas::mouseDoubleClickEvent(const QMouseEvent * const e) {
             releaseMouseAndDontTrack();
             GetAsPtr(boxAt, TextBox)->openTextEditor(mMainWindow);
         } else if(mCurrentMode == MOVE_BOX &&
-                  boxAt->SWT_isVectorPath()) {
+                  boxAt->SWT_isSmartVectorPath()) {
             mCanvasWindow->setCanvasMode(MOVE_POINT);
         }
     }

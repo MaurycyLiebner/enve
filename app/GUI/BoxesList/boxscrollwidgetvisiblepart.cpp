@@ -201,7 +201,7 @@ DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
             int firstId = 0;
             if(mCurrentlyDragged.fType == Dragged::BOX) {
                 const auto targetUnderMouse = targetAbs->getTarget();
-                if(targetUnderMouse->SWT_isBoxesGroup()) {
+                if(targetUnderMouse->SWT_isLayerBox()) {
                     const auto bbUnderMouse = GetAsPtr(targetUnderMouse, LayerBox);
                     firstId = bbUnderMouse->ca_getNumberOfChildren();
                 }
@@ -306,7 +306,7 @@ bool BoxScrollWidgetVisiblePart::droppingSupported(
     const auto targetSWT = targetAbs->getTarget();
     if(!targetSWT) return false;
     if(mCurrentlyDragged.fType == Dragged::BOX) {
-        if(!targetSWT->SWT_isBoxesGroup()) return false;
+        if(!targetSWT->SWT_isLayerBox()) return false;
         const auto draggedAbs = mCurrentlyDragged.fPtr;
         const auto draggedBox = static_cast<BoundingBox*>(
                     draggedAbs->getTarget());
@@ -338,7 +338,7 @@ DropTypes_ BoxScrollWidgetVisiblePart::dropOnSWTSupported(
     int firstId = 0;
     if(mCurrentlyDragged.fType == Dragged::BOX) {
         const auto targetUnderMouse = absUnderMouse->getTarget();
-        if(targetUnderMouse->SWT_isBoxesGroup()) {
+        if(targetUnderMouse->SWT_isLayerBox()) {
             const auto bbUnderMouse = GetAsPtr(targetUnderMouse, LayerBox);
             firstId = bbUnderMouse->ca_getNumberOfChildren();
         }

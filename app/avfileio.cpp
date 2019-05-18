@@ -984,8 +984,8 @@ void LayerBox::writeBoundingBox(QIODevice * const target) {
         child->writeBoundingBox(target);
     }
 }
-
-void LayerBox::readChildBoxes(QIODevice *target) {
+#include "Boxes/groupbox.h"
+void GroupBox::readChildBoxes(QIODevice *target) {
     int nChildBoxes;
     target->read(rcChar(&nChildBoxes), sizeof(int));
     for(int i = 0; i < nChildBoxes; i++) {
@@ -1006,7 +1006,7 @@ void LayerBox::readChildBoxes(QIODevice *target) {
             box = SPtrCreate(Rectangle)();
         } else if(boxType == TYPE_CIRCLE) {
             box = SPtrCreate(Circle)();
-        } else if(boxType == TYPE_GROUP) {
+        } else if(boxType == TYPE_LAYER) {
             box = SPtrCreate(LayerBox)();
         } else if(boxType == TYPE_PAINT) {
             box = SPtrCreate(PaintBox)();
