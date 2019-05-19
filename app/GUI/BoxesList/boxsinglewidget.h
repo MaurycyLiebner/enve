@@ -73,7 +73,7 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *e);
     void resizeEvent(QResizeEvent *);
 
-    bool mCompositionModeVisible = false;
+    bool mBlendModeVisible = false;
     void updateCompositionBoxVisible();
     void clearAndHideValueAnimators();
     void updateValueSlidersForQPointFAnimator();
@@ -108,7 +108,7 @@ private:
     QrealAnimatorValueSlider *mSecondValueSlider;
 
     QComboBox *mPropertyComboBox;
-    QComboBox *mCompositionModeCombo;
+    QComboBox *mBlendModeCombo;
 };
 
 #endif // BOXSINGLEWIDGET_H

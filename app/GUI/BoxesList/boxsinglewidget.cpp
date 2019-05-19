@@ -166,9 +166,9 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     mPropertyComboBox = new QComboBox(this);
     mMainLayout->addWidget(mPropertyComboBox);
 
-    mCompositionModeCombo = new QComboBox(this);
-    mMainLayout->addWidget(mCompositionModeCombo);
-//    mCompositionModeCombo->addItems(QStringList() <<
+    mBlendModeCombo = new QComboBox(this);
+    mMainLayout->addWidget(mBlendModeCombo);
+//    mBlendModeCombo->addItems(QStringList() <<
 //                                    "Source Over" <<
 //                                    "Destination Over" <<
 //                                    "Clear" <<
@@ -202,7 +202,7 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
 //                                    "Not Source And Destination" <<
 //                                    "Source And Not Destination" <<
 //                                    "Not Source or Destination");
-    mCompositionModeCombo->addItems(QStringList() <<
+    mBlendModeCombo->addItems(QStringList() <<
                                     "SrcOver" <<
                                     "DstOver" <<
                                     "SrcIn" <<
@@ -229,12 +229,12 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
                                     "Saturation" <<
                                     "Color" <<
                                     "Luminosity");
-    mCompositionModeCombo->insertSeparator(10);
-    mCompositionModeCombo->insertSeparator(22);
-    connect(mCompositionModeCombo, qOverload<int>(&QComboBox::activated),
+    mBlendModeCombo->insertSeparator(10);
+    mBlendModeCombo->insertSeparator(22);
+    connect(mBlendModeCombo, qOverload<int>(&QComboBox::activated),
             this, &BoxSingleWidget::setCompositionMode);
-    mCompositionModeCombo->setSizePolicy(QSizePolicy::Maximum,
-                    mCompositionModeCombo->sizePolicy().horizontalPolicy());
+    mBlendModeCombo->setSizePolicy(QSizePolicy::Maximum,
+                    mBlendModeCombo->sizePolicy().horizontalPolicy());
     mPropertyComboBox->setSizePolicy(QSizePolicy::Maximum,
                                      mPropertyComboBox->sizePolicy().horizontalPolicy());
     mBoxTargetWidget = new BoxTargetWidget(this);
@@ -336,7 +336,7 @@ ColorAnimator *BoxSingleWidget::getColorTarget() const {
 
 void BoxSingleWidget::setBlendMode(const SkBlendMode &mode) {
     int id = blendModeToIntSk(mode);
-    mCompositionModeCombo->setCurrentIndex(id);
+    mBlendModeCombo->setCurrentIndex(id);
 }
 
 void BoxSingleWidget::clearAndHideValueAnimators() {
@@ -361,10 +361,10 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
     mLockedButton->setVisible(target->SWT_isBoundingBox());
     mRecordButton->show();
 
-    mCompositionModeCombo->hide();
+    mBlendModeCombo->hide();
     mPropertyComboBox->hide();
 
-    mCompositionModeVisible = false;
+    mBlendModeVisible = false;
 
     mBoxTargetWidget->hide();
     mCheckBox->hide();
@@ -376,8 +376,9 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mRecordButton->hide();
         const auto boxPtr = GetAsPtr(target, BoundingBox);
 
-        mCompositionModeVisible = true;
-        mCompositionModeCombo->setCurrentIndex(
+        mBlendModeVisible = !target->SWT_isGroupBox() ||
+                             target->SWT_isLayerBox();
+        mBlendModeCombo->setCurrentIndex(
             blendModeToIntSk(boxPtr->getBlendMode()));
         updateCompositionBoxVisible();
     } else if(target->SWT_isBoolProperty()) {
@@ -994,11 +995,11 @@ void BoxSingleWidget::clearColorButton() {
 
 void BoxSingleWidget::updateCompositionBoxVisible() {
     if(!mTarget) return;
-    if(mCompositionModeVisible) {
+    if(mBlendModeVisible) {
         if(width() > 20*MIN_WIDGET_HEIGHT) {
-            mCompositionModeCombo->show();
+            mBlendModeCombo->show();
         } else {
-            mCompositionModeCombo->hide();
+            mBlendModeCombo->hide();
         }
     }
     updateValueSlidersForQPointFAnimator();

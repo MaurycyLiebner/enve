@@ -799,6 +799,10 @@ void processChildData(BoundingBox * const child,
 
 void GroupBox::setupRenderData(const qreal &relFrame,
                                BoundingBoxRenderData * const data) {
+    if(!SWT_isLayerBox()) {
+        data->fOpacity = 0;
+        return;
+    }
     BoundingBox::setupRenderData(relFrame, data);
     const auto groupData = GetAsPtr(data, LayerBoxRenderData);
     groupData->fChildrenRenderData.clear();
@@ -812,7 +816,6 @@ void GroupBox::setupRenderData(const qreal &relFrame,
     }
 
     data->fEffectsMargin += childrenEffectsMargin;
-    if(!SWT_isLayerBox()) data->fOpacity = 0;
 }
 
 stdsptr<BoundingBoxRenderData> GroupBox::createRenderData() {
