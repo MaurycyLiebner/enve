@@ -89,7 +89,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         mCurrentSoundComposition = nullptr;
         mCurrentCanvas.clear();
     }
-    GroupBox *currentGroup;
+    ContainerBox *currentGroup;
     if(mCurrentCanvas) {
         MainWindow::getInstance()->setCurrentUndoRedoStack(
                     mCurrentCanvas->getUndoRedoStack());
@@ -747,10 +747,10 @@ void CanvasWindow::clearSelectionAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->clearSelectionAction();
 }
-
+#include "Boxes/groupbox.h"
 void CanvasWindow::groupSelectedBoxes() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->groupSelectedBoxes();
+    mCurrentCanvas->groupSelectedBoxes<GroupBox>();
     queScheduledTasksAndUpdate();
 }
 
@@ -919,7 +919,7 @@ void CanvasWindow::schedulePivotUpdate() {
     mCurrentCanvas->schedulePivotUpdate();
 }
 
-GroupBox *CanvasWindow::getCurrentGroup() {
+ContainerBox *CanvasWindow::getCurrentGroup() {
     if(hasNoCanvas()) return nullptr;
     return mCurrentCanvas->getCurrentBoxesGroup();
 }

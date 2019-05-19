@@ -110,6 +110,7 @@ public:
     virtual bool SWT_isBoundingBox() const { return false; }
     virtual bool SWT_isLayerBox() const { return false; }
     virtual bool SWT_isGroupBox() const { return false; }
+    virtual bool SWT_isContainerBox() const { return false; }
     virtual bool SWT_isCircle() const { return false; }
     virtual bool SWT_isImageBox() const { return false; }
     virtual bool SWT_isImageSequenceBox() const { return false; }

@@ -1,5 +1,5 @@
 #include "Boxes/boundingbox.h"
-#include "Boxes/layerbox.h"
+#include "Boxes/containerbox.h"
 #include "canvas.h"
 #include "singlewidgetabstraction.h"
 #include "durationrectangle.h"
@@ -167,7 +167,7 @@ void BoundingBox::setStrokeColorMode(const ColorMode &colorMode) {
 bool BoundingBox::isAncestor(const BoundingBox * const box) const {
     if(!mParentGroup) return false;
     if(mParentGroup == box) return true;
-    if(box->SWT_isGroupBox()) return mParentGroup->isAncestor(box);
+    if(box->SWT_isContainerBox()) return mParentGroup->isAncestor(box);
     return false;
 }
 
@@ -307,7 +307,7 @@ bool BoundingBox::diffsIncludingInherited(
     return diffThis || diffInherited;
 }
 
-void BoundingBox::setParentGroup(GroupBox * const parent) {
+void BoundingBox::setParentGroup(ContainerBox * const parent) {
     if(parent == mParentGroup) return;
     mParentGroup = parent;
     mParent = parent;
@@ -334,7 +334,7 @@ void BoundingBox::clearParent() {
     setParentTransform(mParentGroup->getTransformAnimator());
 }
 
-GroupBox *BoundingBox::getParentGroup() const {
+ContainerBox *BoundingBox::getParentGroup() const {
     return mParentGroup;
 }
 

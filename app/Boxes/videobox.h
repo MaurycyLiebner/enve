@@ -13,7 +13,7 @@ protected:
 public:
     ~VideoBox();
 
-    void setParentGroup(GroupBox * const parent);
+    void setParentGroup(ContainerBox * const parent);
     void reloadSound();
 
     bool SWT_isVideoBox() const { return true; }

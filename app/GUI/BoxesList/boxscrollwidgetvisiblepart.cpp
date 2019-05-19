@@ -201,8 +201,8 @@ DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
             int firstId = 0;
             if(mCurrentlyDragged.fType == Dragged::BOX) {
                 const auto targetUnderMouse = targetAbs->getTarget();
-                if(targetUnderMouse->SWT_isGroupBox()) {
-                    const auto bbUnderMouse = GetAsPtr(targetUnderMouse, GroupBox);
+                if(targetUnderMouse->SWT_isContainerBox()) {
+                    const auto bbUnderMouse = GetAsPtr(targetUnderMouse, ContainerBox);
                     firstId = bbUnderMouse->ca_getNumberOfChildren();
                 }
             }
@@ -306,11 +306,11 @@ bool BoxScrollWidgetVisiblePart::droppingSupported(
     const auto targetSWT = targetAbs->getTarget();
     if(!targetSWT) return false;
     if(mCurrentlyDragged.fType == Dragged::BOX) {
-        if(!targetSWT->SWT_isGroupBox()) return false;
+        if(!targetSWT->SWT_isContainerBox()) return false;
         const auto draggedAbs = mCurrentlyDragged.fPtr;
         const auto draggedBox = static_cast<BoundingBox*>(
                     draggedAbs->getTarget());
-        const auto targetGroup = static_cast<const GroupBox*>(
+        const auto targetGroup = static_cast<const ContainerBox*>(
                     targetSWT);
         if(idInTarget < targetGroup->ca_getNumberOfChildren()) return false;
         if(targetGroup->isAncestor(draggedBox)) return false;
@@ -338,8 +338,8 @@ DropTypes_ BoxScrollWidgetVisiblePart::dropOnSWTSupported(
     int firstId = 0;
     if(mCurrentlyDragged.fType == Dragged::BOX) {
         const auto targetUnderMouse = absUnderMouse->getTarget();
-        if(targetUnderMouse->SWT_isGroupBox()) {
-            const auto bbUnderMouse = GetAsPtr(targetUnderMouse, GroupBox);
+        if(targetUnderMouse->SWT_isContainerBox()) {
+            const auto bbUnderMouse = GetAsPtr(targetUnderMouse, ContainerBox);
             firstId = bbUnderMouse->ca_getNumberOfChildren();
         }
     }

@@ -973,8 +973,8 @@ void TextBox::readBoundingBox(QIODevice * const target) {
     mFont.setStyleName(fontStyle);
 }
 
-#include "Boxes/groupbox.h"
-void GroupBox::writeBoundingBox(QIODevice * const target) {
+#include "Boxes/containerbox.h"
+void ContainerBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
     mPathEffectsAnimators->writeProperty(target);
     mFillPathEffectsAnimators->writeProperty(target);
@@ -985,8 +985,9 @@ void GroupBox::writeBoundingBox(QIODevice * const target) {
         child->writeBoundingBox(target);
     }
 }
-
-void GroupBox::readChildBoxes(QIODevice *target) {
+#include "Boxes/layerbox.h"
+#include "Boxes/groupbox.h"
+void ContainerBox::readChildBoxes(QIODevice *target) {
     int nChildBoxes;
     target->read(rcChar(&nChildBoxes), sizeof(int));
     for(int i = 0; i < nChildBoxes; i++) {
@@ -1008,7 +1009,7 @@ void GroupBox::readChildBoxes(QIODevice *target) {
         } else if(boxType == TYPE_CIRCLE) {
             box = SPtrCreate(Circle)();
         } else if(boxType == TYPE_LAYER) {
-            box = SPtrCreate(GroupBox/*LayerBox*/)();
+            box = SPtrCreate(LayerBox)();
         } else if(boxType == TYPE_GROUP) {
             box = SPtrCreate(GroupBox)();
         } else if(boxType == TYPE_PAINT) {
@@ -1032,7 +1033,7 @@ void GroupBox::readChildBoxes(QIODevice *target) {
     }
 }
 
-void GroupBox::readBoundingBox(QIODevice * const target) {
+void ContainerBox::readBoundingBox(QIODevice * const target) {
     BoundingBox::readBoundingBox(target);
     mPathEffectsAnimators->readProperty(target);
     mFillPathEffectsAnimators->readProperty(target);

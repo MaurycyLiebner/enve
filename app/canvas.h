@@ -69,7 +69,7 @@ public:
     void startSelectionAtPoint(const QPointF &pos);
     void moveSecondSelectionPoint(const QPointF &pos);
     void setPointCtrlsMode(const CtrlsMode& mode);
-    void setCurrentBoxesGroup(GroupBox * const group);
+    void setCurrentBoxesGroup(ContainerBox * const group);
 
     void updatePivot();
 
@@ -95,10 +95,12 @@ public:
                                  const bool &startTransform);
     void moveSelectedBoxesByAbs(const QPointF &by,
                                 const bool &startTransform);
-    template <typename T = GroupBox>
+    template <typename T>
     void groupSelectedBoxes() {
-        static_assert(std::is_base_of<GroupBox, T>::value,
-                      "Template class must inherit from GroupBox");
+        static_assert(std::is_base_of<ContainerBox, T>::value,
+                      "Template class must inherit from ContainerBox");
+        static_assert(!std::is_base_of<Canvas, T>::value,
+                      "Template class cannot inherit from Canvas");
         if(mSelectedBoxes.isEmpty()) return;
         const auto newGroup = SPtrCreateTemplated(T)();
         mCurrentBoxesGroup->addContainedBox(newGroup);
@@ -265,7 +267,7 @@ public:
                              const bool &parentSatisfies,
                              const bool &parentMainTarget) const;
 
-    GroupBox *getCurrentBoxesGroup() {
+    ContainerBox *getCurrentBoxesGroup() {
         return mCurrentBoxesGroup;
     }
 
@@ -539,9 +541,9 @@ public:
     void selectAllBoxesAction();
     void selectAllPointsAction();
     bool handleTransormationInputKeyEvent(QKeyEvent *event);
-private:
-    void setCurrentGroupParentAsCurrentGroup();
 
+    void setCurrentGroupParentAsCurrentGroup();
+private:
     void openTextEditorForTextBox(TextBox *textBox);
     void callUpdateSchedulers();
 
@@ -603,7 +605,7 @@ protected:
     qptr<Rectangle> mCurrentRectangle;
     qptr<TextBox> mCurrentTextBox;
     qptr<ParticleBox> mCurrentParticleBox;
-    qptr<GroupBox> mCurrentBoxesGroup;
+    qptr<ContainerBox> mCurrentBoxesGroup;
 
     stdptr<MovablePoint> mHoveredPoint_d;
     qptr<BoundingBox> mHoveredBox;

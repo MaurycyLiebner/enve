@@ -5,8 +5,7 @@
 #include "smartPointers/sharedpointerdefs.h"
 class QrealAnimator;
 class BoundingBox;
-class LayerBox;
-class GroupBox;
+class ContainerBox;
 class KeysView;
 class Key;
 class Animator;
@@ -36,7 +35,7 @@ private:
 class BoxesClipboardContainer : public ClipboardContainer {
     friend class StdSelfRef;
 public:
-    void pasteTo(GroupBox * const parent);
+    void pasteTo(ContainerBox * const parent);
 protected:
     BoxesClipboardContainer();
 private:

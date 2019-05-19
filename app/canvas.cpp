@@ -119,19 +119,15 @@ void Canvas::setCurrentGroupParentAsCurrentGroup() {
 }
 
 #include "GUI/BoxesList/boxscrollwidget.h"
-void Canvas::setCurrentBoxesGroup(GroupBox * const group) {
+void Canvas::setCurrentBoxesGroup(ContainerBox * const group) {
     if(mCurrentBoxesGroup) {
         mCurrentBoxesGroup->setIsCurrentGroup_k(false);
-        disconnect(mCurrentBoxesGroup, &GroupBox::setParentAsCurrentGroup,
-                   this, &Canvas::setCurrentGroupParentAsCurrentGroup);
     }
     clearBoxesSelection();
     clearPointsSelection();
     clearCurrentSmartEndPoint();
     clearLastPressedPoint();
     mCurrentBoxesGroup = group;
-    connect(mCurrentBoxesGroup, &GroupBox::setParentAsCurrentGroup,
-            this, &Canvas::setCurrentGroupParentAsCurrentGroup);
     group->setIsCurrentGroup_k(true);
 
     //mMainWindow->getObjectSettingsList()->setMainTarget(mCurrentBoxesGroup);

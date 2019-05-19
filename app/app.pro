@@ -53,6 +53,7 @@ TARGET = AniVect
 TEMPLATE = app
 
 SOURCES += main.cpp\
+    Boxes/containerbox.cpp \
     Boxes/groupbox.cpp \
     Boxes/layerbox.cpp \
     Boxes/layerboxrenderdata.cpp \
@@ -260,6 +261,7 @@ SOURCES += main.cpp\
     Paint/animatedsurface.cpp
 
 HEADERS  += \
+    Boxes/containerbox.h \
     Boxes/groupbox.h \
     Boxes/layerbox.h \
     Boxes/layerboxrenderdata.h \

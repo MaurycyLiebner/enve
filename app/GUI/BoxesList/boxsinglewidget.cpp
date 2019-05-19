@@ -376,8 +376,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mRecordButton->hide();
         const auto boxPtr = GetAsPtr(target, BoundingBox);
 
-        mBlendModeVisible = !target->SWT_isGroupBox() ||
-                             target->SWT_isLayerBox();
+        mBlendModeVisible = !target->SWT_isGroupBox();
         mBlendModeCombo->setCurrentIndex(
             blendModeToIntSk(boxPtr->getBlendMode()));
         updateCompositionBoxVisible();
@@ -544,7 +543,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             });
             if(clipboard) {
                 if(target->SWT_isBoundingBox()) {
-                    if(target->SWT_isGroupBox() && !target->SWT_isLinkBox()) {
+                    if(target->SWT_isContainerBox() && !target->SWT_isLinkBox()) {
                         auto boxClip = MainWindow::getBoxesClipboardContainer();
                         if(boxClip) {
                             menu.addAction("Paste Boxes", [target]() {
