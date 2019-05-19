@@ -21,7 +21,7 @@
 #include "GPUEffects/gpurastereffect.h"
 #include "MovablePoints/smartnodepoint.h"
 #include "pointtypemenu.h"
-#include "Boxes/groupbox.h"
+#include "Boxes/containerbox.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
@@ -68,7 +68,7 @@ void Canvas::addSelectedBoxesActions(QMenu * const qMenu) {
     qMenu->addSeparator();
 
     QAction * const groupAction = qMenu->addAction("Group", [this]() {
-        this->groupSelectedBoxes<GroupBox>();
+        this->groupSelectedBoxes();
     });
     groupAction->setShortcut(Qt::CTRL + Qt::Key_G);
 

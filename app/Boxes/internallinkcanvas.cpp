@@ -3,7 +3,7 @@
 #include "Animators/transformanimator.h"
 #include "canvas.h"
 
-InternalLinkCanvas::InternalLinkCanvas(LayerBox * const linkTarget) :
+InternalLinkCanvas::InternalLinkCanvas(ContainerBox * const linkTarget) :
     InternalLinkGroupBox(linkTarget) {
     ca_prependChildAnimator(mTransformAnimator.data(), mClipToCanvas);
 }
@@ -22,7 +22,7 @@ void InternalLinkCanvas::setupRenderData(
         const qreal &relFrame, BoundingBoxRenderData * const data) {
     InternalLinkGroupBox::setupRenderData(relFrame, data);
 
-    LayerBox* finalTarget = getFinalTarget();
+    ContainerBox* finalTarget = getFinalTarget();
     auto canvasData = GetAsSPtr(data, LinkCanvasRenderData);
     const auto canvasTarget = GetAsSPtr(finalTarget, Canvas);
     canvasData->fBgColor = toSkColor(canvasTarget->getBgColorAnimator()->

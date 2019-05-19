@@ -3,8 +3,8 @@
 #include "durationrectangle.h"
 #include "layerboxrenderdata.h"
 
-InternalLinkGroupBox::InternalLinkGroupBox(LayerBox* linkTarget) :
-    LayerBox(TYPE_INTERNAL_LINK_GROUP) {
+InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget) :
+    ContainerBox(TYPE_INTERNAL_LINK_GROUP) {
     setLinkTarget(linkTarget);
 
     ca_prependChildAnimator(mTransformAnimator.data(), mBoxTarget);
@@ -77,7 +77,7 @@ qreal InternalLinkGroupBox::getEffectsMarginAtRelFrameF(const qreal &relFrame) {
     if(mParentGroup->SWT_isLinkBox()) {
         return getLinkTarget()->getEffectsMarginAtRelFrameF(relFrame);
     }
-    return LayerBox::getEffectsMarginAtRelFrameF(relFrame);
+    return ContainerBox::getEffectsMarginAtRelFrameF(relFrame);
 }
 
 const SkBlendMode &InternalLinkGroupBox::getBlendMode() {
@@ -96,7 +96,7 @@ void InternalLinkGroupBox::setupRenderData(const qreal &relFrame,
                 setupRenderData(relFrame, data);
     }
 
-    LayerBox::setupRenderData(relFrame, data);
+    ContainerBox::setupRenderData(relFrame, data);
     if(linkTarget) {
         const qreal targetMargin =
                 linkTarget->getEffectsMarginAtRelFrameF(relFrame);
@@ -104,7 +104,7 @@ void InternalLinkGroupBox::setupRenderData(const qreal &relFrame,
     }
 }
 
-LayerBox *InternalLinkGroupBox::getFinalTarget() const {
+ContainerBox *InternalLinkGroupBox::getFinalTarget() const {
     if(!getLinkTarget()) return nullptr;
     if(getLinkTarget()->SWT_isLinkBox()) {
         return GetAsPtr(getLinkTarget(), InternalLinkGroupBox)->getFinalTarget();
@@ -116,10 +116,10 @@ int InternalLinkGroupBox::prp_getRelFrameShift() const {
     if(!getLinkTarget()) return 0;
     if(getLinkTarget()->SWT_isLinkBox() ||
        (mParentGroup ? mParentGroup->SWT_isLinkBox() : false)) {
-        return LayerBox::prp_getRelFrameShift() +
+        return ContainerBox::prp_getRelFrameShift() +
                 getLinkTarget()->prp_getRelFrameShift();
     }
-    return LayerBox::prp_getRelFrameShift();
+    return ContainerBox::prp_getRelFrameShift();
 }
 
 bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) const {
@@ -129,10 +129,10 @@ bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) const {
 
 void InternalLinkGroupBox::setTargetSlot(BoundingBox *target) {
     if(target->SWT_isLayerBox())
-        setLinkTarget(GetAsPtr(target, LayerBox));
+        setLinkTarget(GetAsPtr(target, ContainerBox));
 }
 
-void InternalLinkGroupBox::setLinkTarget(LayerBox *linkTarget) {
+void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
     disconnect(mBoxTarget.data(), nullptr, this, nullptr);
     if(getLinkTarget()) {
         disconnect(getLinkTarget(), nullptr, this, nullptr);
@@ -165,8 +165,8 @@ QPointF InternalLinkGroupBox::getRelCenterPosition() {
     return getLinkTarget()->getRelCenterPosition();
 }
 
-LayerBox *InternalLinkGroupBox::getLinkTarget() const {
-    return GetAsPtr(mBoxTarget->getTarget(), LayerBox);
+ContainerBox *InternalLinkGroupBox::getLinkTarget() const {
+    return GetAsPtr(mBoxTarget->getTarget(), ContainerBox);
 }
 
 qsptr<BoundingBox> InternalLinkGroupBox::createLink() {
@@ -187,7 +187,7 @@ bool InternalLinkGroupBox::SWT_isLinkBox() const { return true; }
 
 bool InternalLinkGroupBox::isFrameInDurationRect(const int &relFrame) const {
     if(!getLinkTarget()) return false;
-    return LayerBox::isFrameInDurationRect(relFrame) &&
+    return ContainerBox::isFrameInDurationRect(relFrame) &&
             getLinkTarget()->isFrameInDurationRect(relFrame);
 }
 

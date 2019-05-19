@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QMimeData>
 #include "Boxes/boundingbox.h"
-#include "Boxes/layerbox.h"
+#include "Boxes/containerbox.h"
 #include "GUI/mainwindow.h"
 #include "global.h"
 #include "singlewidgetabstraction.h"
@@ -433,7 +433,7 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
     const auto targetSWT = fTargetParent->getTarget();
     if(dragged.fType == Dragged::BOX) {
         const auto draggedBox = GetAsSPtr(draggedSWT, BoundingBox);
-        const auto targetGroup = GetAsPtr(targetSWT, LayerBox);
+        const auto targetGroup = GetAsPtr(targetSWT, ContainerBox);
         const auto currentDraggedParent = draggedBox->getParentGroup();
         int boxTargetId = targetGroup->abstractionIdToBoxId(fTargetId) + 1;
         if(currentDraggedParent != targetGroup) {

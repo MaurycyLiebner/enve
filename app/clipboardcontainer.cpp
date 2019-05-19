@@ -1,6 +1,6 @@
 #include "clipboardcontainer.h"
 #include "Boxes/boundingbox.h"
-#include "Boxes/layerbox.h"
+#include "Boxes/containerbox.h"
 #include "Properties/boxtargetproperty.h"
 #include "PathEffects/patheffectanimators.h"
 #include "Animators/SmartPath/smartpathcollection.h"

@@ -5,10 +5,22 @@ class PathBox;
 class PathEffectAnimators;
 
 class ContainerBox : public BoundingBox {
+    friend class SelfRef;
 protected:
     ContainerBox(const BoundingBoxType &type);
 public:
     bool SWT_isContainerBox() const { return true; }
+    bool SWT_isGroupBox() const { return mType == TYPE_GROUP; }
+    bool SWT_isLayerBox() const {
+        return mType == TYPE_LAYER || mType == TYPE_CANVAS;
+    }
+
+    void drawPixmapSk(SkCanvas * const canvas,
+                      GrContext * const grContext);
+
+    stdsptr<BoundingBoxRenderData> createRenderData();
+    void setupRenderData(const qreal &relFrame,
+                         BoundingBoxRenderData * const data);
 
     virtual BoundingBox *getBoxAt(const QPointF &absPos);
 
@@ -83,6 +95,24 @@ public:
 
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
+
+    void promoteToLayer() {
+        mType = TYPE_LAYER;
+        if(prp_mName.contains("Group")) {
+            auto newName  = prp_mName;
+            newName.replace("Group", "Layer");
+            setName(newName);
+        }
+    }
+
+    void demoteToGroup() {
+        mType = TYPE_GROUP;
+        if(prp_mName.contains("Layer")) {
+            auto newName  = prp_mName;
+            newName.replace("Layer", "Group");
+            setName(newName);
+        }
+    }
 
     const QList<qsptr<BoundingBox>> &getContainedBoxesList() const;
 
@@ -162,6 +192,7 @@ public:
     }
     int getContainedBoxesCount() const;
     void removeAllContainedBoxes();
+    bool shouldPaintOnImage() const;
 protected:
     void removeContainedBox(const qsptr<BoundingBox> &child);
 

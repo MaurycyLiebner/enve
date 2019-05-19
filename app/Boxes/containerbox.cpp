@@ -437,7 +437,6 @@ int ContainerBox::getContainedBoxesCount() const {
     return mContainedBoxes.count();
 }
 
-
 void ContainerBox::setIsCurrentGroup_k(const bool &bT) {
     mIsCurrentGroup = bT;
     setDescendantCurrentGroup(bT);
@@ -486,7 +485,6 @@ void ContainerBox::ungroup_k() {
     removeFromParent_k();
 }
 
-
 #include "typemenu.h"
 void ContainerBox::addActionsToMenu(BoxTypeMenu * const menu) {
     const auto ungroupAction = menu->addPlainAction<ContainerBox>(
@@ -494,7 +492,123 @@ void ContainerBox::addActionsToMenu(BoxTypeMenu * const menu) {
         box->ungroup_k();
     });
     ungroupAction->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
+
+    menu->addSeparator();
+
+    menu->addPlainAction<ContainerBox>("Promote to Layer",
+                                       [](ContainerBox * box) {
+        box->promoteToLayer();
+    })->setEnabled(SWT_isGroupBox());
+
+    menu->addPlainAction<ContainerBox>("Demote to Group",
+                                       [](ContainerBox * box) {
+        box->demoteToGroup();
+    })->setEnabled(!SWT_isGroupBox());
+
     BoundingBox::addActionsToMenu(menu);
+}
+
+void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
+                            GrContext* const grContext) {
+    if(SWT_isGroupBox()) {
+        for(const auto& box : mContainedBoxes) {
+            if(box->isVisibleAndInVisibleDurationRect())
+                box->drawPixmapSk(canvas, grContext);
+        }
+    } else {
+        if(shouldPaintOnImage()) {
+            BoundingBox::drawPixmapSk(canvas, grContext);
+        } else {
+            SkPaint paint;
+            const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
+            paint.setAlpha(static_cast<U8CPU>(intAlpha));
+            paint.setBlendMode(mBlendModeSk);
+            canvas->saveLayer(nullptr, &paint);
+            for(const auto& box : mContainedBoxes) {
+                if(box->isVisibleAndInVisibleDurationRect())
+                    box->drawPixmapSk(canvas, grContext);
+            }
+            canvas->restore();
+        }
+    }
+}
+
+#include "Animators/gpueffectanimators.h"
+#include "Animators/effectanimators.h"
+bool ContainerBox::shouldPaintOnImage() const {
+    if(SWT_isLinkBox() || SWT_isCanvas()) return true;
+    if(mIsDescendantCurrentGroup) return false;
+    return mEffectsAnimators->hasEffects() ||
+           mGPUEffectsAnimators->hasEffects();
+}
+
+void processChildData(BoundingBox * const child,
+                      LayerBoxRenderData * const parentData,
+                      const qreal& childRelFrame,
+                      const qreal& absFrame,
+                      qreal& childrenEffectsMargin) {
+    if(!child->isFrameFVisibleAndInDurationRect(childRelFrame)) return;
+    if(child->SWT_isGroupBox()) {
+        const auto childGroup = GetAsPtr(child, ContainerBox);
+        const auto descs = childGroup->getContainedBoxesList();
+        for(const auto& desc : descs) {
+            processChildData(desc.get(), parentData,
+                             desc->prp_absFrameToRelFrameF(absFrame),
+                             absFrame, childrenEffectsMargin);
+        }
+        return;
+    }
+    auto boxRenderData =
+            GetAsSPtr(child->getCurrentRenderData(qRound(childRelFrame)),
+                      BoundingBoxRenderData);
+    if(boxRenderData) {
+        if(boxRenderData->fCopied) {
+            child->nullifyCurrentRenderData(boxRenderData->fRelFrame);
+        }
+    } else {
+        boxRenderData = child->createRenderData();
+        boxRenderData->fReason = parentData->fReason;
+        //boxRenderData->parentIsTarget = false;
+        boxRenderData->fUseCustomRelFrame = true;
+        boxRenderData->fCustomRelFrame = childRelFrame;
+        boxRenderData->scheduleTask();
+    }
+    boxRenderData->addDependent(parentData);
+    parentData->fChildrenRenderData << boxRenderData;
+
+    childrenEffectsMargin =
+            qMax(child->getEffectsMarginAtRelFrameF(childRelFrame),
+                 childrenEffectsMargin);
+}
+
+
+void ContainerBox::setupRenderData(const qreal &relFrame,
+                                   BoundingBoxRenderData * const data) {
+    if(SWT_isGroupBox()) {
+        data->fOpacity = 0;
+    } else {
+        BoundingBox::setupRenderData(relFrame, data);
+        const auto groupData = GetAsPtr(data, LayerBoxRenderData);
+        groupData->fChildrenRenderData.clear();
+        groupData->fOtherGlobalRects.clear();
+        qreal childrenEffectsMargin = 0;
+        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+        for(const auto& box : mContainedBoxes) {
+            const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
+            processChildData(box.data(), groupData, boxRelFrame,
+                             absFrame, childrenEffectsMargin);
+        }
+
+        data->fEffectsMargin += childrenEffectsMargin;
+    }
+}
+
+stdsptr<BoundingBoxRenderData> ContainerBox::createRenderData() {
+    if(SWT_isGroupBox()) {
+        return SPtrCreate(GroupBoxRenderData)(this);
+    } else {
+        return SPtrCreate(LayerBoxRenderData)(this);
+    }
 }
 
 void ContainerBox::selectAllBoxesFromBoxesGroup() {

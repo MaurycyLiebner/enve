@@ -4,7 +4,7 @@
 #include "OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "GUI/ColorWidgets/colorsettingswidget.h"
 
-#include "Boxes/layerbox.h"
+#include "Boxes/containerbox.h"
 #include "GUI/qrealanimatorvalueslider.h"
 #include "boxscrollwidgetvisiblepart.h"
 #include "GUI/keysview.h"
@@ -548,7 +548,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                         if(boxClip) {
                             menu.addAction("Paste Boxes", [target]() {
                                 auto clipboard = MainWindow::getBoxesClipboardContainer();
-                                clipboard->pasteTo(GetAsPtr(target, LayerBox));
+                                clipboard->pasteTo(GetAsPtr(target, ContainerBox));
                             });
                         }
                     }

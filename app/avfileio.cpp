@@ -17,7 +17,7 @@
 #include "PathEffects/patheffect.h"
 #include "Boxes/boundingbox.h"
 #include "Boxes/pathbox.h"
-#include "Boxes/layerbox.h"
+#include "Boxes/containerbox.h"
 #include "Boxes/rectangle.h"
 #include "Boxes/circle.h"
 #include "Boxes/imagebox.h"
@@ -985,8 +985,7 @@ void ContainerBox::writeBoundingBox(QIODevice * const target) {
         child->writeBoundingBox(target);
     }
 }
-#include "Boxes/layerbox.h"
-#include "Boxes/groupbox.h"
+#include "Boxes/containerbox.h"
 void ContainerBox::readChildBoxes(QIODevice *target) {
     int nChildBoxes;
     target->read(rcChar(&nChildBoxes), sizeof(int));
@@ -1009,9 +1008,9 @@ void ContainerBox::readChildBoxes(QIODevice *target) {
         } else if(boxType == TYPE_CIRCLE) {
             box = SPtrCreate(Circle)();
         } else if(boxType == TYPE_LAYER) {
-            box = SPtrCreate(LayerBox)();
+            box = SPtrCreate(ContainerBox)(TYPE_LAYER);
         } else if(boxType == TYPE_GROUP) {
-            box = SPtrCreate(GroupBox)();
+            box = SPtrCreate(ContainerBox)(TYPE_GROUP);
         } else if(boxType == TYPE_PAINT) {
             box = SPtrCreate(PaintBox)();
         } else if(boxType == TYPE_IMAGESQUENCE) {
@@ -1042,7 +1041,7 @@ void ContainerBox::readBoundingBox(QIODevice * const target) {
 }
 
 void Canvas::writeBoundingBox(QIODevice * const target) {
-    LayerBox::writeBoundingBox(target);
+    ContainerBox::writeBoundingBox(target);
     const int currFrame = getCurrentFrame();
     target->write(rcConstChar(&currFrame), sizeof(int));
     target->write(rcConstChar(&mClipToCanvasSize), sizeof(bool));
@@ -1058,7 +1057,7 @@ void Canvas::writeBoundingBox(QIODevice * const target) {
 
 void Canvas::readBoundingBox(QIODevice * const target) {
     target->read(rcChar(&mType), sizeof(BoundingBoxType));
-    LayerBox::readBoundingBox(target);
+    ContainerBox::readBoundingBox(target);
     int currFrame;
     target->read(rcChar(&currFrame), sizeof(int));
     target->read(rcChar(&mClipToCanvasSize), sizeof(bool));

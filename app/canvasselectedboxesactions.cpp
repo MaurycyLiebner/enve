@@ -6,6 +6,20 @@
 #include "Boxes/smartvectorpath.h"
 #include "Animators/SmartPath/smartpathcollection.h"
 
+void Canvas::groupSelectedBoxes() {
+    if(mSelectedBoxes.isEmpty()) return;
+    const auto newGroup = SPtrCreate(ContainerBox)(TYPE_GROUP);
+    mCurrentBoxesGroup->addContainedBox(newGroup);
+    BoundingBox* box;
+    Q_FOREACHInverted(box, mSelectedBoxes) {
+        const auto boxSP = GetAsSPtr(box, BoundingBox);
+        box->removeFromParent_k();
+        newGroup->addContainedBox(boxSP);
+    }
+    clearBoxesSelectionList(); schedulePivotUpdate();
+    addBoxToSelection(newGroup.get());
+}
+
 bool Canvas::anim_nextRelFrameWithKey(const int &relFrame,
                                      int &nextRelFrame) {
     int thisNext;

@@ -747,10 +747,10 @@ void CanvasWindow::clearSelectionAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->clearSelectionAction();
 }
-#include "Boxes/groupbox.h"
+
 void CanvasWindow::groupSelectedBoxes() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->groupSelectedBoxes<GroupBox>();
+    mCurrentCanvas->groupSelectedBoxes();
     queScheduledTasksAndUpdate();
 }
 

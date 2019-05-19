@@ -1,7 +1,7 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include "Boxes/layerbox.h"
+#include "Boxes/containerbox.h"
 #include "colorhelpers.h"
 #include <QThread>
 #include "Boxes/rendercachehandler.h"
@@ -50,7 +50,7 @@ extern bool zLessThan(const qptr<BoundingBox> &box1,
 extern bool boxesZSort(const qptr<BoundingBox> &box1,
                        const qptr<BoundingBox> &box2);
 
-class Canvas : public LayerBox, public CanvasBase {
+class Canvas : public ContainerBox, public CanvasBase {
     Q_OBJECT
     friend class SelfRef;
 protected:
@@ -95,24 +95,7 @@ public:
                                  const bool &startTransform);
     void moveSelectedBoxesByAbs(const QPointF &by,
                                 const bool &startTransform);
-    template <typename T>
-    void groupSelectedBoxes() {
-        static_assert(std::is_base_of<ContainerBox, T>::value,
-                      "Template class must inherit from ContainerBox");
-        static_assert(!std::is_base_of<Canvas, T>::value,
-                      "Template class cannot inherit from Canvas");
-        if(mSelectedBoxes.isEmpty()) return;
-        const auto newGroup = SPtrCreateTemplated(T)();
-        mCurrentBoxesGroup->addContainedBox(newGroup);
-        BoundingBox* box;
-        Q_FOREACHInverted(box, mSelectedBoxes) {
-            const auto boxSP = GetAsSPtr(box, BoundingBox);
-            box->removeFromParent_k();
-            newGroup->addContainedBox(boxSP);
-        }
-        clearBoxesSelectionList(); schedulePivotUpdate();
-        addBoxToSelection(newGroup.get());
-    }
+    void groupSelectedBoxes();
 
     //void selectAllBoxes();
     void deselectAllBoxes();
@@ -326,7 +309,7 @@ public:
 
     void setupRenderData(const qreal &relFrame,
                          BoundingBoxRenderData * const data) {
-        LayerBox::setupRenderData(relFrame, data);
+        ContainerBox::setupRenderData(relFrame, data);
         auto canvasData = GetAsPtr(data, CanvasRenderData);
         canvasData->fBgColor = toSkColor(mBackgroundColor->getCurrentColor());
         canvasData->fCanvasHeight = mHeight*mResolutionFraction;
@@ -437,11 +420,11 @@ public:
         if(mClipToCanvasSize) {
             if(!getMaxBoundsRect().contains(absPos)) return nullptr;
         }
-        return LayerBox::getBoxAt(absPos);
+        return ContainerBox::getBoxAt(absPos);
     }
 
     void anim_scaleTime(const int &pivotAbsFrame, const qreal &scale) {
-        LayerBox::anim_scaleTime(pivotAbsFrame, scale);
+        ContainerBox::anim_scaleTime(pivotAbsFrame, scale);
 //        int newAbsPos = qRound(scale*pivotAbsFrame);
 //        anim_shiftAllKeys(newAbsPos - pivotAbsFrame);
         setMaxFrame(qRound((mMaxFrame - pivotAbsFrame)*scale));

@@ -1,7 +1,7 @@
 #include "patheffectanimators.h"
 #include "PathEffects/patheffect.h"
 #include "Boxes/pathbox.h"
-#include "Boxes/layerbox.h"
+#include "Boxes/containerbox.h"
 #include <QDebug>
 
 PathEffectAnimators::PathEffectAnimators(const bool &isOutline,

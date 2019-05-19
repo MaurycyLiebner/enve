@@ -8,7 +8,7 @@
 #include "PixmapEffects/pixmapeffect.h"
 #include "skia/skiahelpers.h"
 
-ExternalLinkBox::ExternalLinkBox() : LayerBox() {
+ExternalLinkBox::ExternalLinkBox() : ContainerBox(TYPE_LAYER) {
     mType = TYPE_EXTERNAL_LINK;
     setName("Link Empty");
 }

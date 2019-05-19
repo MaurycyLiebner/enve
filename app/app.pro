@@ -54,8 +54,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     Boxes/containerbox.cpp \
-    Boxes/groupbox.cpp \
-    Boxes/layerbox.cpp \
     Boxes/layerboxrenderdata.cpp \
     Boxes/patheffectsmenu.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
@@ -262,8 +260,6 @@ SOURCES += main.cpp\
 
 HEADERS  += \
     Boxes/containerbox.h \
-    Boxes/groupbox.h \
-    Boxes/layerbox.h \
     Boxes/layerboxrenderdata.h \
     Boxes/patheffectsmenu.h \
     CacheHandlers/samples.h \

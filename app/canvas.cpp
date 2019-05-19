@@ -32,7 +32,7 @@ using namespace std::chrono;
 Canvas::Canvas(CanvasWindow *canvasWidget,
                const int &canvasWidth, const int &canvasHeight,
                const int &frameCount, const qreal &fps) :
-    LayerBox(TYPE_CANVAS) {
+    ContainerBox(TYPE_CANVAS) {
     mMainWindow = MainWindow::getInstance();
     setCurrentBrush(mMainWindow->getCurrentBrush());
     std::function<bool(int)> changeFrameFunc =
@@ -415,7 +415,7 @@ void Canvas::setLoadingPreviewContainer(
 }
 
 FrameRange Canvas::prp_getIdenticalRelRange(const int &relFrame) const {
-    const auto groupRange = LayerBox::prp_getIdenticalRelRange(relFrame);
+    const auto groupRange = ContainerBox::prp_getIdenticalRelRange(relFrame);
     //FrameRange canvasRange{0, mMaxFrame};
     return groupRange;//*canvasRange;
 }
