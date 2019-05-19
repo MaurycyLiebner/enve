@@ -468,9 +468,7 @@ public:
     void clearSelectionAction();
     void rotateSelectedBoxesStartAndFinish(const qreal &rotBy);
     bool shouldPlanScheduleUpdate() {
-        return (isVisibleAndInVisibleDurationRect() ||
-               isFrameInDurationRect(anim_getCurrentRelFrame())) &&
-               mCurrentPreviewContainerOutdated;
+        return mCurrentPreviewContainerOutdated;
     }
 
     void renderDataFinished(BoundingBoxRenderData *renderData);

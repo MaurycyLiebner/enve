@@ -6,9 +6,6 @@ CanvasRenderData::CanvasRenderData(BoundingBox * const parentBoxT) :
     LayerBoxRenderData(parentBoxT) {}
 
 void CanvasRenderData::processTask() {
-    if(fRenderedToImage) return;
-    fRenderedToImage = true;
-
     const auto info = SkiaHelpers::getPremulBGRAInfo(
                 qCeil(fCanvasWidth), qCeil(fCanvasHeight));
     fBitmapTMP.allocPixels(info);

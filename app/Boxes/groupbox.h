@@ -12,6 +12,7 @@ protected:
 public:
     virtual BoundingBox *getBoxAt(const QPointF &absPos);
 
+    void anim_setAbsFrame(const int &frame);
     bool SWT_isGroupBox() const { return true; }
     BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
     void anim_scaleTime(const int& pivotAbsFrame, const qreal& scale);
@@ -81,6 +82,10 @@ public:
 
     void drawPixmapSk(SkCanvas * const canvas,
                       GrContext * const grContext);
+
+    stdsptr<BoundingBoxRenderData> createRenderData();
+    void setupRenderData(const qreal &relFrame,
+                         BoundingBoxRenderData * const data);
 
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);

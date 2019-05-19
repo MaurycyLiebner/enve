@@ -214,7 +214,7 @@ public:
     virtual FrameRange getFirstAndLastIdenticalForMotionBlur(
             const int &relFrame, const bool &takeAncestorsIntoAccount = true);
 
-    virtual bool shouldPlanScheduleUpdate();
+    virtual bool shouldPlanScheduleUpdate() { return true; }
     virtual void scheduleWaitingTasks();
     virtual void queScheduledTasks();
 
@@ -401,8 +401,6 @@ public:
 
     void requestGlobalPivotUpdateIfSelected();
     void requestGlobalFillStrokeUpdateIfSelected();
-    QMatrix getTotalTransformAtRelFrame(const qreal &relFrame);
-    QMatrix getParentTotalTransformAtRelFrame(const qreal &relFrame);
 
     void planScheduleUpdate(const UpdateReason &reason);
 

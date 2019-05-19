@@ -310,6 +310,7 @@ bool BoundingBox::diffsIncludingInherited(
 void BoundingBox::setParentGroup(GroupBox * const parent) {
     if(parent == mParentGroup) return;
     mParentGroup = parent;
+    mParent = parent;
     if(!mParentGroup) return;
     anim_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
     setParentTransform(parent->getTransformAnimator());
@@ -381,18 +382,11 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
     updateRelBoundingRectFromRenderData(renderData);
 }
 
-bool BoundingBox::shouldPlanScheduleUpdate() {
-    if(SWT_isGroupBox() && !SWT_isLayerBox()) return false;
-    if(!mParentGroup) return false;
-    if(isVisibleAndInVisibleDurationRect()) return true;
-    return false;
-}
-
 void BoundingBox::planScheduleUpdate(const UpdateReason& reason) {
+    if(!isVisibleAndInVisibleDurationRect()) return;
     if(!shouldPlanScheduleUpdate()) return;
-    const auto parentLayer = getFirstAncestor<LayerBox>();
-    if(parentLayer) {
-        parentLayer->planScheduleUpdate(qMin(reason, CHILD_USER_CHANGE));
+    if(mParentGroup) {
+        mParentGroup->planScheduleUpdate(qMin(reason, CHILD_USER_CHANGE));
     } else if(!SWT_isCanvas()) return;
     if(reason != UpdateReason::FRAME_CHANGE) mStateId++;
     mDrawRenderContainer.setExpired(true);
@@ -638,33 +632,10 @@ qreal BoundingBox::getEffectsMarginAtRelFrameF(const qreal &relFrame) {
     return mEffectsAnimators->getEffectsMarginAtRelFrameF(relFrame);
 }
 
-QMatrix BoundingBox::getTotalTransformAtRelFrame(const qreal& relFrame) {
-    if(mParentGroup) {
-        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-        const qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(absFrame);
-        const auto parentTrans = mParentGroup->getTotalTransformAtRelFrame(parentRelFrame);
-        const auto relTrans = getRelativeTransformAtRelFrameF(relFrame);
-        return relTrans*parentTrans;
-    }
-    return getRelativeTransformAtRelFrameF(relFrame);
-}
-
-QMatrix BoundingBox::getParentTotalTransformAtRelFrame(
-        const qreal &relFrame) {
-    if(mParentGroup) {
-        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-        const qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(absFrame);
-        return mParentGroup->getTotalTransformAtRelFrame(parentRelFrame);
-    }
-    return QMatrix();
-}
-
 void BoundingBox::setupRenderData(const qreal &relFrame,
                                   BoundingBoxRenderData * const data) {
     data->fBoxStateId = mStateId;
     data->fRelFrame = qRound(relFrame);
-    data->fRenderedToImage = false;
-    data->fRelTransform = getRelativeTransformAtRelFrameF(relFrame);
     data->fTransform = getTotalTransformAtRelFrameF(relFrame);
 
     data->fOpacity = mTransformAnimator->getOpacity(relFrame);
@@ -951,10 +922,14 @@ void BoundingBox::shiftAll(const int &shift) {
 }
 
 QMatrix BoundingBox::getRelativeTransformAtRelFrameF(const qreal &relFrame) {
+    if(isZero6Dec(relFrame - anim_getCurrentRelFrame()))
+        return mTransformAnimator->BasicTransformAnimator::getRelativeTransform();
     return mTransformAnimator->getRelativeTransform(relFrame);
 }
 
 QMatrix BoundingBox::getTotalTransformAtRelFrameF(const qreal &relFrame) {
+    if(isZero6Dec(relFrame - anim_getCurrentRelFrame()))
+        return mTransformAnimator->BasicTransformAnimator::getTotalTransform();
     return mTransformAnimator->getTotalTransformAtRelFrameF(relFrame);
 }
 

@@ -55,12 +55,9 @@ public:
 
     uint fBoxStateId = 0;
 
-    bool fRenderedToImage = false;
-
     QMatrix fResolutionScale;
     QMatrix fScaledTransform;
     QMatrix fTransform;
-    QMatrix fRelTransform;
     QMatrix fRenderTransform;
 
     QRectF fRelBoundingRect;
@@ -97,8 +94,6 @@ public:
         fRasterEffects.clear();
         fEffectsMargin = 0;
     }
-
-    void setupDirectDraw(const sk_sp<SkImage> &image);
 
     void appendRenderCustomizerFunctor(
             const stdsptr<RenderDataCustomizerFunctor>& customizer) {

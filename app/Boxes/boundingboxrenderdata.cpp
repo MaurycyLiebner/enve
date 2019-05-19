@@ -16,9 +16,7 @@ void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     fUseCustomRelFrame = src->fUseCustomRelFrame;
     fRelFrame = src->fRelFrame;
     fRelBoundingRect = src->fRelBoundingRect;
-    fRelTransform = src->fRelTransform;
     fRenderTransform = src->fRenderTransform;
-    fRenderedToImage = src->fRenderedToImage;
     fBlendMode = src->fBlendMode;
     fDrawPos = src->fDrawPos;
     fOpacity = src->fOpacity;
@@ -68,10 +66,8 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) 
 }
 
 void BoundingBoxRenderData::processTask() {
-    if(fRenderedToImage) return;
-    fRenderedToImage = true;
-    if(fOpacity < 0.001) return;
     updateGlobalFromRelBoundingRect();
+    if(fOpacity < 0.001) return;
 
     const auto info = SkiaHelpers::getPremulBGRAInfo(
                 qCeil(fGlobalBoundingRect.width()),
@@ -84,12 +80,11 @@ void BoundingBoxRenderData::processTask() {
 
     drawSk(&canvas);
 
-    if(!fRasterEffects.isEmpty()) {
-        for(const auto& effect : fRasterEffects) {
-            effect->applyEffectsSk(fBitmapTMP, fResolution);
-        }
-        clearPixmapEffects();
+    for(const auto& effect : fRasterEffects) {
+        effect->applyEffectsSk(fBitmapTMP, fResolution);
     }
+    clearPixmapEffects();
+
     fRenderedImage = SkiaHelpers::transferDataToSkImage(fBitmapTMP);
 }
 
@@ -145,15 +140,6 @@ void BoundingBoxRenderData::dataSet() {
     }
     if(!fParentBox || !fParentIsTarget) return;
     fParentBox->updateCurrentPreviewDataFromRenderData(this);
-}
-
-void BoundingBoxRenderData::setupDirectDraw(const sk_sp<SkImage>& image) {
-    updateRelBoundingRect();
-    updateGlobalFromRelBoundingRect();
-    fRenderTransform = fScaledTransform;
-    fRenderTransform.translate(-fDrawPos.x(), -fDrawPos.y());
-    fRenderedImage = image;
-    fRenderedToImage = true;
 }
 
 bool BoundingBoxRenderData::nullifyBeforeProcessing() {

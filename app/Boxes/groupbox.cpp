@@ -362,13 +362,13 @@ QRectF GroupBox::getRelBoundingRect(const qreal &relFrame) {
         const qreal childRelFrame = child->prp_absFrameToRelFrameF(absFrame);
         if(child->isVisibleAndInDurationRect(qRound(childRelFrame))) {
             SkPath childPath;
-            childPath.addRect(
-                        toSkRect(
-                            child->getRelBoundingRect(childRelFrame)));
-            childPath.transform(
-                        toSkMatrix(
-                            child->getTransformAnimator()->
-                            getRelativeTransform(childRelFrame)) );
+            const auto childRel = child->getRelBoundingRect(childRelFrame);
+            childPath.addRect(toSkRect(childRel));
+
+            const auto childRelTrans =
+                    child->getRelativeTransformAtRelFrameF(childRelFrame);
+            childPath.transform(toSkMatrix(childRelTrans));
+
             boundingPaths.addPath(childPath);
         }
     }
@@ -554,10 +554,19 @@ BoundingBox *GroupBox::getBoxAt(const QPointF &absPos) {
     return boxAtPos;
 }
 
+void GroupBox::anim_setAbsFrame(const int &frame) {
+    BoundingBox::anim_setAbsFrame(frame);
+
+    updateDrawRenderContainerTransform();
+    for(const auto& box : mContainedBoxes) {
+        box->anim_setAbsFrame(frame);
+    }
+}
+
 void GroupBox::addContainedBoxesToSelection(const QRectF &rect) {
     for(const auto& box : mContainedBoxes) {
         if(box->isVisibleAndUnlocked() &&
-            box->isVisibleAndInVisibleDurationRect()) {
+                box->isVisibleAndInVisibleDurationRect()) {
             if(box->isContainedIn(rect)) {
                 getParentCanvas()->addBoxToSelection(box.get());
             }
@@ -747,4 +756,65 @@ bool GroupBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     return BoundingBox::SWT_shouldBeVisible(rules,
                                             parentSatisfies,
                                             parentMainTarget);
+}
+
+void processChildData(BoundingBox * const child,
+                      LayerBoxRenderData * const parentData,
+                      const qreal& childRelFrame,
+                      const qreal& absFrame,
+                      qreal& childrenEffectsMargin) {
+    if(!child->isFrameFVisibleAndInDurationRect(childRelFrame)) return;
+    if(child->SWT_isGroupBox() && !child->SWT_isLayerBox()) {
+        const auto childGroup = GetAsPtr(child, GroupBox);
+        const auto descs = childGroup->getContainedBoxesList();
+        for(const auto& desc : descs) {
+            processChildData(desc.get(), parentData,
+                             desc->prp_absFrameToRelFrameF(absFrame),
+                             absFrame, childrenEffectsMargin);
+        }
+        return;
+    }
+    auto boxRenderData =
+            GetAsSPtr(child->getCurrentRenderData(qRound(childRelFrame)),
+                      BoundingBoxRenderData);
+    if(boxRenderData) {
+        if(boxRenderData->fCopied) {
+            child->nullifyCurrentRenderData(boxRenderData->fRelFrame);
+        }
+    } else {
+        boxRenderData = child->createRenderData();
+        boxRenderData->fReason = parentData->fReason;
+        //boxRenderData->parentIsTarget = false;
+        boxRenderData->fUseCustomRelFrame = true;
+        boxRenderData->fCustomRelFrame = childRelFrame;
+        boxRenderData->scheduleTask();
+    }
+    boxRenderData->addDependent(parentData);
+    parentData->fChildrenRenderData << boxRenderData;
+
+    childrenEffectsMargin =
+            qMax(child->getEffectsMarginAtRelFrameF(childRelFrame),
+                 childrenEffectsMargin);
+}
+
+void GroupBox::setupRenderData(const qreal &relFrame,
+                               BoundingBoxRenderData * const data) {
+    BoundingBox::setupRenderData(relFrame, data);
+    const auto groupData = GetAsPtr(data, LayerBoxRenderData);
+    groupData->fChildrenRenderData.clear();
+    groupData->fOtherGlobalRects.clear();
+    qreal childrenEffectsMargin = 0;
+    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+    for(const auto& box : mContainedBoxes) {
+        const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
+        processChildData(box.data(), groupData, boxRelFrame,
+                         absFrame, childrenEffectsMargin);
+    }
+
+    data->fEffectsMargin += childrenEffectsMargin;
+    if(!SWT_isLayerBox()) data->fOpacity = 0;
+}
+
+stdsptr<BoundingBoxRenderData> GroupBox::createRenderData() {
+    return SPtrCreate(GroupBoxRenderData)(this);
 }

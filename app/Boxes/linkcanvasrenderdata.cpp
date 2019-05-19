@@ -3,10 +3,8 @@
 #include "PixmapEffects/pixmapeffect.h"
 
 void LinkCanvasRenderData::processTask() {
-    if(fRenderedToImage) return;
-    fRenderedToImage = true;
-    if(fOpacity < 0.001) return;
     updateGlobalFromRelBoundingRect();
+    if(fOpacity < 0.001) return;
 
     const auto info = SkiaHelpers::getPremulBGRAInfo(
                 qCeil(fGlobalBoundingRect.width()),

@@ -232,7 +232,6 @@ void Canvas::renderSk(SkCanvas * const canvas,
                 !mCurrentPreviewContainerOutdated;
         drawTransparencyMesh(canvas, viewRect);
 
-
         if(!mClipToCanvasSize || !drawCanvas) {
             canvas->saveLayer(nullptr, nullptr);
             paint.setColor(toSkColor(mBackgroundColor->getCurrentColor()));

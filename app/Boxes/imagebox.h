@@ -33,6 +33,14 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
 
     FileCacheHandler *fSrcCacheHandler;
 private:
+    void setupDirectDraw(const sk_sp<SkImage>& image) {
+        updateRelBoundingRect();
+        updateGlobalFromRelBoundingRect();
+        fRenderTransform = fScaledTransform;
+        fRenderTransform.translate(-fDrawPos.x(), -fDrawPos.y());
+        fRenderedImage = image;
+    }
+
     void drawSk(SkCanvas * const canvas) {
         SkPaint paint;
         //paint.setFilterQuality(kHigh_SkFilterQuality);
