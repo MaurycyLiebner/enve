@@ -93,9 +93,8 @@ void LayerBox::setupRenderData(const qreal &relFrame,
     data->fEffectsMargin += childrenEffectsMargin;
 }
 
-
 void LayerBox::drawPixmapSk(SkCanvas * const canvas,
-                              GrContext* const grContext) {
+                            GrContext* const grContext) {
     if(shouldPaintOnImage()) {
         BoundingBox::drawPixmapSk(canvas, grContext);
     } else {
@@ -105,7 +104,6 @@ void LayerBox::drawPixmapSk(SkCanvas * const canvas,
         paint.setBlendMode(mBlendModeSk);
         canvas->saveLayer(nullptr, &paint);
         for(const auto& box : mContainedBoxes) {
-            //box->draw(p);
             if(box->isVisibleAndInVisibleDurationRect())
                 box->drawPixmapSk(canvas, grContext);
         }
@@ -117,7 +115,6 @@ void LayerBox::drawPixmapSk(SkCanvas * const canvas,
 bool LayerBox::shouldPaintOnImage() const {
     if(SWT_isLinkBox() || SWT_isCanvas()) return true;
     if(mIsDescendantCurrentGroup) return false;
-//    return !mIsDescendantCurrentGroup; !!!
     return mEffectsAnimators->hasEffects() ||
            mGPUEffectsAnimators->hasEffects();
 }

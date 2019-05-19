@@ -79,6 +79,9 @@ public:
     void scheduleWaitingTasks();
     void queScheduledTasks();
 
+    void drawPixmapSk(SkCanvas * const canvas,
+                      GrContext * const grContext);
+
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 

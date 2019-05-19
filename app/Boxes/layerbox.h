@@ -16,10 +16,9 @@ public:
 
 
 //    QPointF getRelCenterPosition();
-
-
     void drawPixmapSk(SkCanvas * const canvas,
-                      GrContext * const grContext);
+                      GrContext* const grContext);
+    bool shouldPaintOnImage() const;
 
     stdsptr<BoundingBoxRenderData> createRenderData();
 
@@ -28,7 +27,6 @@ public:
 
     qsptr<BoundingBox> createLink();
 
-    bool shouldPaintOnImage() const;
 
     void schedulerProccessed();
 protected:

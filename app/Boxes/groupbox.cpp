@@ -47,6 +47,15 @@ GroupBox::GroupBox(const BoundingBoxType &type) : BoundingBox(type) {
 //    return qMax(maxPrevAbsFrame, thisMaxPrevFrame);
 //}
 
+
+void GroupBox::drawPixmapSk(SkCanvas * const canvas,
+                            GrContext* const grContext) {
+    for(const auto& box : mContainedBoxes) {
+        if(box->isVisibleAndInVisibleDurationRect())
+            box->drawPixmapSk(canvas, grContext);
+    }
+}
+
 void GroupBox::iniPathEffects() {
     mPathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)(false, false, this);
