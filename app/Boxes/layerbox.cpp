@@ -21,8 +21,6 @@
 #include "Boxes/internallinkgroupbox.h"
 #include "Boxes/groupbox.h"
 
-bool LayerBox::mCtrlsAlwaysVisible = false;
-
 //bool zMoreThan(BoundingBox *box1, BoundingBox *box2)
 //{
 //    return box1->getZIndex() < box2->getZIndex();

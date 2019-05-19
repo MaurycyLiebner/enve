@@ -127,7 +127,6 @@ public:
     void makeSelectedPointsSegmentsCurves();
     void makeSelectedPointsSegmentsLines();
 
-    void updateSelectedPointsAfterCtrlsVisiblityChanged();
     void centerPivotForSelected();
     void resetSelectedScale();
     void resetSelectedTranslation();

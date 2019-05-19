@@ -29,8 +29,6 @@ public:
 
     bool shouldPaintOnImage() const;
     void schedulerProccessed();
-protected:
-    static bool mCtrlsAlwaysVisible;
 };
 
 #endif // LAYERBOX_H

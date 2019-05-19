@@ -176,31 +176,16 @@ void Canvas::removePointFromSelection(MovablePoint * const point) {
     mSelectedPoints_d.removeOne(point); schedulePivotUpdate();
 }
 
-void Canvas::updateSelectedPointsAfterCtrlsVisiblityChanged() {
-    if(!LayerBox::mCtrlsAlwaysVisible) {
-        QList<MovablePoint*> pointsToDeselect;
-        for(const auto& point : mSelectedPoints_d) {
-            pointsToDeselect << point;
-        }
-        for(const auto& point : pointsToDeselect) {
-            removePointFromSelection(point);
-        }
-    }
-}
-
 void Canvas::removeSelectedPointsAndClearList() {
     if(mIsMouseGrabbing) {
-        if(!LayerBox::mCtrlsAlwaysVisible ||
-            mSelectedPoints_d.count() == 1) {
-            if(mLastPressedPoint) {
-                if(mLastPressedPoint->isCtrlPoint()) {
-                    mLastPressedPoint->cancelTransform();
-                    mLastPressedPoint->deselect();
-                    mLastPressedPoint->remove();
-                    mSelectedPoints_d.removeOne(mLastPressedPoint);
-                    schedulePivotUpdate();
-                    return;
-                }
+        if(mLastPressedPoint) {
+            if(mLastPressedPoint->isCtrlPoint()) {
+                mLastPressedPoint->cancelTransform();
+                mLastPressedPoint->deselect();
+                mLastPressedPoint->remove();
+                mSelectedPoints_d.removeOne(mLastPressedPoint);
+                schedulePivotUpdate();
+                return;
             }
         }
     }
