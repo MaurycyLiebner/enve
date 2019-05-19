@@ -19,6 +19,7 @@
 #include "Animators/effectanimators.h"
 #include "PixmapEffects/pixmapeffect.h"
 #include "Boxes/internallinkgroupbox.h"
+#include "Boxes/groupbox.h"
 
 bool LayerBox::mCtrlsAlwaysVisible = false;
 
@@ -29,6 +30,28 @@ bool LayerBox::mCtrlsAlwaysVisible = false;
 
 LayerBox::LayerBox(const BoundingBoxType &type) : ContainerBox(type) {
     setName("Layer");
+}
+
+qsptr<LayerBox> LayerBox::sReplaceGroupBox(const qsptr<GroupBox> &src) {
+    const auto dst = SPtrCreate(LayerBox)();
+    src->copyBoundingBoxDataTo(dst.get());
+    const auto children = src->getContainedBoxesList();
+    const auto srcParent = src->getParentGroup();
+    if(srcParent) srcParent->replaceContainedBox(src, dst);
+    for(const auto& child : children) {
+        src->removeContainedBox_k(child);
+        dst->addContainedBox(child);
+    }
+    return dst;
+}
+
+#include "typemenu.h"
+void LayerBox::addActionsToMenu(BoxTypeMenu * const menu) {
+    menu->addPlainAction<LayerBox>("Demote to Group",
+                                   [](LayerBox * box) {
+        GroupBox::sReplaceLayerBox(GetAsSPtr(box, LayerBox));
+    });
+    ContainerBox::addActionsToMenu(menu);
 }
 
 qsptr<BoundingBox> LayerBox::createLink() {

@@ -4,12 +4,16 @@
 
 class PathBox;
 class PathEffectAnimators;
+class GroupBox;
 
 class LayerBox : public ContainerBox {
     friend class SelfRef;
 protected:
     LayerBox(const BoundingBoxType& type = TYPE_LAYER);
 public:
+    static qsptr<LayerBox> sReplaceGroupBox(const qsptr<GroupBox> &src);
+
+    void addActionsToMenu(BoxTypeMenu * const menu);
     bool SWT_isLayerBox() const { return true; }
     //MovablePoint *getPointAt(const QPointF &absPos, const CanvasMode &currentMode);
 

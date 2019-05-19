@@ -121,12 +121,15 @@ public:
     void ungroup_k();
 
     bool isCurrentGroup() const;
+    bool replaceContainedBox(const qsptr<BoundingBox>& replaced,
+                             const qsptr<BoundingBox>& replacer);
     void addContainedBox(const qsptr<BoundingBox> &child);
     void addContainedBoxToListAt(const int &index,
                                  const qsptr<BoundingBox> &child);
     void updateContainedBoxIds(const int &firstId);
     void updateContainedBoxIds(const int &firstId,
                               const int &lastId);
+    int getContainedBoxIndex(BoundingBox * const child);
     void removeContainedBox_k(const qsptr<BoundingBox> &child);
     void increaseContainedBoxZInList(BoundingBox * const child);
     void decreaseContainedBoxZInList(BoundingBox * const child);
@@ -161,7 +164,6 @@ public:
     void removeAllContainedBoxes();
 protected:
     void removeContainedBox(const qsptr<BoundingBox> &child);
-    int getContainedBoxIndex(BoundingBox *child);
 
     bool mIsCurrentGroup = false;
     bool mIsDescendantCurrentGroup = false;

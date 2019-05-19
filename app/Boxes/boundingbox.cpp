@@ -95,11 +95,11 @@ qsptr<BoundingBox> BoundingBox::createLink() {
 
 qsptr<BoundingBox> BoundingBox::createLinkForLinkGroup() {
     qsptr<BoundingBox> box = createLink();
-    box->clearEffects();
+    box->clearRasterEffects();
     return box;
 }
 
-void BoundingBox::clearEffects() {
+void BoundingBox::clearRasterEffects() {
     mEffectsAnimators->ca_removeAllChildAnimators();
 }
 
@@ -121,7 +121,7 @@ void BoundingBox::centerPivotPosition() {
 void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
-    writeBoundingBox(&buffer);
+    BoundingBox::writeBoundingBox(&buffer);
     if(buffer.seek(sizeof(BoundingBoxType))) {
         targetBox->BoundingBox::readBoundingBox(&buffer);
     }

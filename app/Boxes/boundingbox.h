@@ -343,7 +343,7 @@ public:
 
     void addEffect(const qsptr<PixmapEffect> &effect);
     void removeEffect(const qsptr<PixmapEffect> &effect);
-    void clearEffects();
+    void clearRasterEffects();
 
     void addGPUEffect(const qsptr<GPURasterEffect> &rasterEffect);
     void removeGPUEffect(const qsptr<GPURasterEffect> &effect);

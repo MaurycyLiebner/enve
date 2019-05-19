@@ -12,6 +12,28 @@ GroupBox::GroupBox() : ContainerBox(TYPE_GROUP) {
     setName("Group");
 }
 
+qsptr<GroupBox> GroupBox::sReplaceLayerBox(const qsptr<LayerBox> &src) {
+    const auto dst = SPtrCreate(GroupBox)();
+    src->copyBoundingBoxDataTo(dst.get());
+    const auto children = src->getContainedBoxesList();
+    const auto srcParent = src->getParentGroup();
+    if(srcParent) srcParent->replaceContainedBox(src, dst);
+    for(const auto& child : children) {
+        src->removeContainedBox_k(child);
+        dst->addContainedBox(child);
+    }
+    return dst;
+}
+
+#include "typemenu.h"
+void GroupBox::addActionsToMenu(BoxTypeMenu * const menu) {
+    menu->addPlainAction<GroupBox>("Promote to Layer",
+                                   [](GroupBox * box) {
+        LayerBox::sReplaceGroupBox(GetAsSPtr(box, GroupBox));
+    });
+    ContainerBox::addActionsToMenu(menu);
+}
+
 void GroupBox::drawPixmapSk(SkCanvas * const canvas,
                             GrContext* const grContext) {
     for(const auto& box : mContainedBoxes) {

@@ -637,11 +637,20 @@ void ContainerBox::removeContainedBoxFromList(const int &id) {
     }
 }
 
-int ContainerBox::getContainedBoxIndex(BoundingBox *child) {
+int ContainerBox::getContainedBoxIndex(BoundingBox * const child) {
     for(int i = 0; i < mContainedBoxes.count(); i++) {
         if(mContainedBoxes.at(i) == child) return i;
     }
     return -1;
+}
+
+bool ContainerBox::replaceContainedBox(const qsptr<BoundingBox> &replaced,
+                                       const qsptr<BoundingBox> &replacer) {
+    const int id = getContainedBoxIndex(replaced.get());
+    if(id == -1) return false;
+    removeContainedBox(replaced);
+    addContainedBoxToListAt(id, replacer);
+    return true;
 }
 
 void ContainerBox::removeContainedBox(const qsptr<BoundingBox>& child) {
