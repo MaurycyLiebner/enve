@@ -11,6 +11,11 @@ protected:
 public:
     ~InternalLinkGroupBox();
     bool SWT_isLinkBox() const;
+    bool SWT_isGroupBox() const {
+        const auto finalTarget = getFinalTarget();
+        if(!finalTarget) return false;
+        return finalTarget->SWT_isGroupBox();
+    }
 
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
@@ -25,8 +30,6 @@ public:
     stdsptr<BoundingBoxRenderData> createRenderData();
     QRectF getRelBoundingRect(const qreal &relFrame);
     FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
-
-    bool SWT_isLayerBox() const;
 
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
 

@@ -1,26 +1,16 @@
-#ifndef LAYERBOXRENDERDATA_H
-#define LAYERBOXRENDERDATA_H
+#ifndef CONTAINERBOXRENDERDATA_H
+#define CONTAINERBOXRENDERDATA_H
 #include "boundingboxrenderdata.h"
 
-struct GroupBoxRenderData : public BoundingBoxRenderData {
+struct ContainerBoxRenderData : public BoundingBoxRenderData {
     friend class StdSelfRef;
     QList<stdsptr<BoundingBoxRenderData>> fChildrenRenderData;
 protected:
-    GroupBoxRenderData(BoundingBox * const parentBoxT);
+    ContainerBoxRenderData(BoundingBox * const parentBoxT);
 
-    void drawSk(SkCanvas * const canvas) {
-        Q_UNUSED(canvas);
-    }
+    void drawSk(SkCanvas * const canvas);
     void transformRenderCanvas(SkCanvas& canvas) const final;
     void updateRelBoundingRect();
 };
 
-struct LayerBoxRenderData : public GroupBoxRenderData {
-    friend class StdSelfRef;
-protected:
-    LayerBoxRenderData(BoundingBox * const parentBoxT);
-
-    void drawSk(SkCanvas * const canvas);
-};
-
-#endif // LAYERBOXRENDERDATA_H
+#endif // CONTAINERBOXRENDERDATA_H

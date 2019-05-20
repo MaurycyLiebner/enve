@@ -11,9 +11,7 @@ protected:
 public:
     bool SWT_isContainerBox() const { return true; }
     bool SWT_isGroupBox() const { return mType == TYPE_GROUP; }
-    bool SWT_isLayerBox() const {
-        return mType == TYPE_LAYER || mType == TYPE_CANVAS;
-    }
+    bool SWT_isLayerBox() const { return !SWT_isGroupBox(); }
 
     void drawPixmapSk(SkCanvas * const canvas,
                       GrContext * const grContext);
@@ -189,6 +187,8 @@ protected:
     qsptr<PathEffectAnimators> mFillPathEffectsAnimators;
     qsptr<PathEffectAnimators> mOutlinePathEffectsAnimators;
 private:
+    void setupLayerRenderData(const qreal &relFrame,
+                              BoundingBoxRenderData * const data);
     void iniPathEffects();
 };
 

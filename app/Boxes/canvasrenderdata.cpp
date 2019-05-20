@@ -3,7 +3,7 @@
 #include "PixmapEffects/pixmapeffect.h"
 
 CanvasRenderData::CanvasRenderData(BoundingBox * const parentBoxT) :
-    LayerBoxRenderData(parentBoxT) {}
+    ContainerBoxRenderData(parentBoxT) {}
 
 void CanvasRenderData::processTask() {
     const auto info = SkiaHelpers::getPremulBGRAInfo(

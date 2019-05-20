@@ -569,7 +569,7 @@ bool ContainerBox::shouldPaintOnImage() const {
 }
 
 void processChildData(BoundingBox * const child,
-                      LayerBoxRenderData * const parentData,
+                      ContainerBoxRenderData * const parentData,
                       const qreal& childRelFrame,
                       const qreal& absFrame,
                       qreal& childrenEffectsMargin) {
@@ -607,34 +607,35 @@ void processChildData(BoundingBox * const child,
                  childrenEffectsMargin);
 }
 
-
-void ContainerBox::setupRenderData(const qreal &relFrame,
-                                   BoundingBoxRenderData * const data) {
+stdsptr<BoundingBoxRenderData> ContainerBox::createRenderData() {
     if(SWT_isGroupBox()) {
-        data->fOpacity = 0;
+        return SPtrCreate(ContainerBoxRenderData)(this);
     } else {
-        BoundingBox::setupRenderData(relFrame, data);
-        const auto groupData = GetAsPtr(data, LayerBoxRenderData);
-        groupData->fChildrenRenderData.clear();
-        groupData->fOtherGlobalRects.clear();
-        qreal childrenEffectsMargin = 0;
-        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-        for(const auto& box : mContainedBoxes) {
-            const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
-            processChildData(box.data(), groupData, boxRelFrame,
-                             absFrame, childrenEffectsMargin);
-        }
-
-        data->fEffectsMargin += childrenEffectsMargin;
+        return SPtrCreate(ContainerBoxRenderData)(this);
     }
 }
 
-stdsptr<BoundingBoxRenderData> ContainerBox::createRenderData() {
-    if(SWT_isGroupBox()) {
-        return SPtrCreate(GroupBoxRenderData)(this);
-    } else {
-        return SPtrCreate(LayerBoxRenderData)(this);
+void ContainerBox::setupRenderData(const qreal &relFrame,
+                                   BoundingBoxRenderData * const data) {
+    if(SWT_isGroupBox()) data->fOpacity = 0;
+    else setupLayerRenderData(relFrame, data);
+}
+
+void ContainerBox::setupLayerRenderData(const qreal &relFrame,
+                                        BoundingBoxRenderData * const data) {
+    BoundingBox::setupRenderData(relFrame, data);
+    const auto groupData = GetAsPtr(data, ContainerBoxRenderData);
+    groupData->fChildrenRenderData.clear();
+    groupData->fOtherGlobalRects.clear();
+    qreal childrenEffectsMargin = 0;
+    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+    for(const auto& box : mContainedBoxes) {
+        const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
+        processChildData(box.data(), groupData, boxRelFrame,
+                         absFrame, childrenEffectsMargin);
     }
+
+    data->fEffectsMargin += childrenEffectsMargin;
 }
 
 void ContainerBox::selectAllBoxesFromBoxesGroup() {

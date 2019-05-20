@@ -27,7 +27,7 @@ class BasicTransformAnimator;
 class ContainerBox;
 class SmartVectorPath;
 class DurationRectangle;
-struct LayerBoxRenderData;
+struct ContainerBoxRenderData;
 struct GPURasterEffect;
 enum CanvasMode : short;
 

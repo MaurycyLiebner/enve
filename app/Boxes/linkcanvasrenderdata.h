@@ -6,7 +6,7 @@ struct LinkCanvasRenderData : public CanvasRenderData {
 
     void updateRelBoundingRect() {
         if(fClipToCanvas) CanvasRenderData::updateRelBoundingRect();
-        else LayerBoxRenderData::updateRelBoundingRect();
+        else ContainerBoxRenderData::updateRelBoundingRect();
     }
 
     bool fClipToCanvas = false;

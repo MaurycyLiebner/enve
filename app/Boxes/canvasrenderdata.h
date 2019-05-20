@@ -1,7 +1,7 @@
 #ifndef CANVASRENDERDATA_H
 #define CANVASRENDERDATA_H
 #include "layerboxrenderdata.h"
-struct CanvasRenderData : public LayerBoxRenderData {
+struct CanvasRenderData : public ContainerBoxRenderData {
     CanvasRenderData(BoundingBox * const parentBoxT);
     void processTask();
     qreal fCanvasWidth;

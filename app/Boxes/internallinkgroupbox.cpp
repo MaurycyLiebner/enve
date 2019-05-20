@@ -48,8 +48,6 @@ FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(
     return range*targetRange;
 }
 
-bool InternalLinkGroupBox::SWT_isLayerBox() const { return false; }
-
 QMatrix InternalLinkGroupBox::getRelativeTransformAtRelFrameF(
         const qreal &relFrame) {
     if(!getLinkTarget() || !mParentGroup)
@@ -91,10 +89,7 @@ const SkBlendMode &InternalLinkGroupBox::getBlendMode() {
 void InternalLinkGroupBox::setupRenderData(const qreal &relFrame,
                                            BoundingBoxRenderData * const data) {
     const auto linkTarget = getLinkTarget();
-    if(linkTarget) {
-        linkTarget->BoundingBox::
-                setupRenderData(relFrame, data);
-    }
+    if(linkTarget) linkTarget->BoundingBox::setupRenderData(relFrame, data);
 
     ContainerBox::setupRenderData(relFrame, data);
     if(linkTarget) {
