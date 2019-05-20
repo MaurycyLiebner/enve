@@ -4,6 +4,8 @@
 
 class RenderDataHandler {
 public:
+    void clear() { mItems.clear(); }
+
     bool removeItem(const stdsptr<BoundingBoxRenderData> &item);
     bool removeItemAtRelFrame(const int& frame);
     BoundingBoxRenderData *getItemAtRelFrame(const int &frame);

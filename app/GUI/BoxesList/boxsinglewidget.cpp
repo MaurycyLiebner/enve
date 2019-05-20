@@ -376,9 +376,10 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mRecordButton->hide();
         const auto boxPtr = GetAsPtr(target, BoundingBox);
 
-        mBlendModeVisible = !target->SWT_isGroupBox();
+        mBlendModeVisible = true;
         mBlendModeCombo->setCurrentIndex(
             blendModeToIntSk(boxPtr->getBlendMode()));
+        mBlendModeCombo->setEnabled(!target->SWT_isGroupBox());
         updateCompositionBoxVisible();
     } else if(target->SWT_isBoolProperty()) {
         mCheckBox->show();

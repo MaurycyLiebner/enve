@@ -2,7 +2,7 @@
 #include <QMimeData>
 #include <QPainter>
 #include <QMenu>
-#include "Boxes/layerbox.h"
+#include "Boxes/containerbox.h"
 #include "Properties/boxtargetproperty.h"
 #include "GUI/mainwindow.h"
 

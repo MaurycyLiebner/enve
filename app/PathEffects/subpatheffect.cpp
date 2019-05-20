@@ -18,7 +18,7 @@ SubPathEffect::SubPathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mMax);
 }
 
-void SubPathEffect::readLengthEffect(QIODevice *target) {
+void SubPathEffect::readLengthEffect(QIODevice * const target) {
     PathEffect::readProperty(target);
     mMin->anim_setRecording(false);
     mMin->setValueRange(0, 100);

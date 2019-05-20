@@ -544,35 +544,40 @@ void addEffectAction(const QString& text,
     };
     menu->addPlainAction(text, op);
 }
+
 #include "patheffectsmenu.h"
 void BoundingBox::addActionsToMenu(BoxTypeMenu * const menu) {
     menu->addSeparator();
 
-    PathEffectsMenu::addPathEffectsToActionMenu(menu);
+//    if(SWT_isPathBox() || SWT_isContainerBox()) {
+        PathEffectsMenu::addPathEffectsToActionMenu(menu);
+//    }
 
     menu->addSeparator();
 
-    const auto effectsMenu = menu->addMenu("Effects");
-    addEffectAction<BlurEffect>("Blur", effectsMenu);
-    addEffectAction<SampledMotionBlurEffect>("Motion Blur", effectsMenu);
-    addEffectAction<ShadowEffect>("Shadow", effectsMenu);
-    addEffectAction<DesaturateEffect>("Desaturate", effectsMenu);
-    addEffectAction<ColorizeEffect>("Colorize", effectsMenu);
-    addEffectAction<ContrastEffect>("Contrast", effectsMenu);
-    addEffectAction<BrightnessEffect>("Brightness", effectsMenu);
-    addEffectAction<ReplaceColorEffect>("Replace Color", effectsMenu);
+//    if(!SWT_isGroupBox()) {
+        const auto effectsMenu = menu->addMenu("Effects");
+        addEffectAction<BlurEffect>("Blur", effectsMenu);
+        addEffectAction<SampledMotionBlurEffect>("Motion Blur", effectsMenu);
+        addEffectAction<ShadowEffect>("Shadow", effectsMenu);
+        addEffectAction<DesaturateEffect>("Desaturate", effectsMenu);
+        addEffectAction<ColorizeEffect>("Colorize", effectsMenu);
+        addEffectAction<ContrastEffect>("Contrast", effectsMenu);
+        addEffectAction<BrightnessEffect>("Brightness", effectsMenu);
+        addEffectAction<ReplaceColorEffect>("Replace Color", effectsMenu);
 
-    const auto gpuEffectsMenu = menu->addMenu("GPU Effects");
-    for(const auto& creator : GPURasterEffectCreator::sEffectCreators) {
-        const BoxTypeMenu::PlainOp<BoundingBox> op =
-        [creator](BoundingBox * box) {
-            const auto effect = GetAsSPtr(creator->create(), GPURasterEffect);
-            box->addGPUEffect(effect);
-        };
-        gpuEffectsMenu->addPlainAction(creator->fName, op);
-    }
+        const auto gpuEffectsMenu = menu->addMenu("GPU Effects");
+        for(const auto& creator : GPURasterEffectCreator::sEffectCreators) {
+            const BoxTypeMenu::PlainOp<BoundingBox> op =
+            [creator](BoundingBox * box) {
+                const auto effect = GetAsSPtr(creator->create(), GPURasterEffect);
+                box->addGPUEffect(effect);
+            };
+            gpuEffectsMenu->addPlainAction(creator->fName, op);
+        }
 
-    menu->addSeparator();
+        menu->addSeparator();
+//    }
 }
 
 

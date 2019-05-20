@@ -107,10 +107,12 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
         if(rec) {
             const bool disabled = isTargetDisabled() || !isEnabled();
             QDoubleSlider::paint(p,
-                        disabled ? QColor(200, 180, 180) : QColor(255, 200, 200),
-                        rec ? QColor(180, 160, 160) : QColor(255, 160, 160),
-                        key ? (disabled ? QColor(200, 90, 90) : Qt::red) :
-                              (disabled ? Qt::darkGray : Qt::black));
+                                 disabled ? QColor(200, 180, 180) :
+                                            QColor(255, 200, 200),
+                                 disabled ? QColor(180, 160, 160) :
+                                            QColor(255, 160, 160),
+                                 key ? (disabled ? QColor(200, 90, 90) : Qt::red) :
+                                       (disabled ? Qt::darkGray : Qt::black));
         } else {
             QDoubleSlider::paint(p);
         }
@@ -161,13 +163,11 @@ void QrealAnimatorValueSlider::setTarget(IntProperty * const animator) {
 }
 
 bool QrealAnimatorValueSlider::hasTarget() {
-    return mTarget != nullptr;
+    return mTarget;
 }
 
 bool QrealAnimatorValueSlider::isTargetDisabled() {
-    if(hasTarget()) {
-        return mTarget->SWT_isDisabled();
-    }
+    if(hasTarget()) return mTarget->SWT_isDisabled();
     return true;
 }
 
@@ -197,9 +197,6 @@ void QrealAnimatorValueSlider::openContextMenu(
             aTarget, &Animator::anim_setRecording);
 
     QAction * const selectedAction = menu.exec(globalPos);
-    if(!selectedAction) {
-        return;
-    } else {
-        MainWindow::getInstance()->queScheduledTasksAndUpdate();
-    }
+    if(!selectedAction) return;
+    else MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }

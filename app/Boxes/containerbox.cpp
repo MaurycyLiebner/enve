@@ -7,6 +7,8 @@
 #include "PathEffects/patheffect.h"
 #include "PropertyUpdaters/groupallpathsupdater.h"
 #include "textbox.h"
+#include "Animators/gpueffectanimators.h"
+#include "Animators/effectanimators.h"
 
 ContainerBox::ContainerBox(const BoundingBoxType &type) :
     BoundingBox(type) {
@@ -320,6 +322,32 @@ void ContainerBox::queScheduledTasks() {
     BoundingBox::queScheduledTasks();
 }
 
+void ContainerBox::promoteToLayer() {
+    mType = TYPE_LAYER;
+    if(prp_mName.contains("Group")) {
+        auto newName  = prp_mName;
+        newName.replace("Group", "Layer");
+        setName(newName);
+    }
+    mEffectsAnimators->SWT_enable();
+    mGPUEffectsAnimators->SWT_enable();
+    mCurrentRenderDataHandler.clear();
+    prp_afterWholeInfluenceRangeChanged();
+}
+
+void ContainerBox::demoteToGroup() {
+    mType = TYPE_GROUP;
+    if(prp_mName.contains("Layer")) {
+        auto newName  = prp_mName;
+        newName.replace("Layer", "Group");
+        setName(newName);
+    }
+    mEffectsAnimators->SWT_disable();
+    mGPUEffectsAnimators->SWT_disable();
+    mCurrentRenderDataHandler.clear();
+    prp_afterWholeInfluenceRangeChanged();
+}
+
 void ContainerBox::updateAllBoxes(const UpdateReason &reason) {
     for(const auto &child : mContainedBoxes) {
         child->updateAllBoxes(reason);
@@ -533,8 +561,6 @@ void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
     }
 }
 
-#include "Animators/gpueffectanimators.h"
-#include "Animators/effectanimators.h"
 bool ContainerBox::shouldPaintOnImage() const {
     if(SWT_isLinkBox() || SWT_isCanvas()) return true;
     if(mIsDescendantCurrentGroup) return false;

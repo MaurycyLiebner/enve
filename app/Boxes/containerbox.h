@@ -96,23 +96,8 @@ public:
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 
-    void promoteToLayer() {
-        mType = TYPE_LAYER;
-        if(prp_mName.contains("Group")) {
-            auto newName  = prp_mName;
-            newName.replace("Group", "Layer");
-            setName(newName);
-        }
-    }
-
-    void demoteToGroup() {
-        mType = TYPE_GROUP;
-        if(prp_mName.contains("Layer")) {
-            auto newName  = prp_mName;
-            newName.replace("Layer", "Group");
-            setName(newName);
-        }
-    }
+    void promoteToLayer();
+    void demoteToGroup();
 
     const QList<qsptr<BoundingBox>> &getContainedBoxesList() const;
 
