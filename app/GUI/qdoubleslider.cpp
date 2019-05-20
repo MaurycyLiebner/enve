@@ -98,10 +98,14 @@ void QDoubleSlider::setValueRange(qreal min, qreal max) {
     fitWidthToContent();
 }
 
+void QDoubleSlider::paint(QPainter * const p, const bool& enabled) {
+    paint(p, enabled ? QColor(255, 255, 255) : QColor(220, 220, 220),
+          enabled ? QColor(220, 220, 220) : QColor(200, 200, 200),
+          enabled ? Qt::black : Qt::darkGray);
+}
+
 void QDoubleSlider::paint(QPainter *p) {
-    paint(p, isEnabled() ? QColor(255, 255, 255) : QColor(220, 220, 220),
-          isEnabled() ? QColor(220, 220, 220) : QColor(200, 200, 200),
-          isEnabled() ? Qt::black : Qt::darkGray);
+    paint(p, isEnabled());
 }
 
 void QDoubleSlider::paint(QPainter *p,
@@ -140,7 +144,7 @@ void QDoubleSlider::paint(QPainter *p,
                                adjusted(0, heightRemoval,
                                         0, -heightRemoval), 5, 5.);
         }
-        p->setPen(isEnabled() ? Qt::black : Qt::darkGray);
+        p->setPen(stroke);
         if(mShowName) {
             p->drawText(rect(), Qt::AlignCenter,
                         mName + ": " + getValueString());

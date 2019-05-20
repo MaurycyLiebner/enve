@@ -38,6 +38,8 @@ public:
                const QColor &allFill,
                const QColor &sliderFill,
                const QColor &stroke);
+    void paint(QPainter * const p, const bool &enabled);
+
     void setPrefferedValueStep(const qreal &step);
 
     qreal maximum();

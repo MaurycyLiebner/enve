@@ -104,6 +104,7 @@ void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
     connect(childProperty.data(), &Property::prp_prependWith,
             this, &ComplexAnimator::ca_prependChildAnimator);
 
+    childProperty->SWT_setAncestorDisabled(SWT_isDisabled());
     SWT_addChildAbstractionForTargetToAllAt(childProperty.get(), id);
     if(changeInfluence) {
         const auto childRange = childProperty->prp_absInfluenceRange();
