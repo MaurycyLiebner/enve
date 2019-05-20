@@ -225,6 +225,7 @@ MainWindow::MainWindow(QWidget *parent)
     centralWidget()->setMouseTracking(true);
 
     readRecentFiles();
+    updateRecentMenu();
     mCanvasWindow->openWelcomeDialog();
 
     mEventFilterDisabled = false;
@@ -259,6 +260,7 @@ void MainWindow::setupMenuBar() {
     mFileMenu->addAction("Open...",
                          this, qOverload<>(&MainWindow::openFile),
                          Qt::CTRL + Qt::Key_O);
+    mRecentMenu = mFileMenu->addMenu("Open Recent");
     mFileMenu->addSeparator();
     mFileMenu->addAction("Link...",
                          this, &MainWindow::linkFile,
@@ -1255,6 +1257,20 @@ void MainWindow::lockFinished() {
     } else {
         QApplication::restoreOverrideCursor();
         setEnabled(true);
+    }
+}
+
+void MainWindow::updateRecentMenu() {
+    mRecentMenu->clear();
+    const auto homePath = QDir::homePath();
+    for(const auto& path : mRecentFiles) {
+        QString ttPath = path;
+        if(ttPath.left(homePath.count()) == homePath) {
+            ttPath = "~" + ttPath.mid(homePath.count());
+        }
+        mRecentMenu->addAction(path, [path, this]() {
+            openFile(path);
+        });
     }
 }
 

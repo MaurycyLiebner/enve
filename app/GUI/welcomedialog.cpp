@@ -45,6 +45,7 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
 
     recentWidget->setLayout(recentLay);
 
+    const auto homePath = QDir::homePath();
     int i = 0;
     const int buttSize = size - 3*MIN_WIDGET_HEIGHT;
     for(const auto& path : recentPaths) {
@@ -65,9 +66,8 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
 
         const auto pathButton = new QPushButton(cutPath, this);
         pathButton->setMinimumHeight(5*MIN_WIDGET_HEIGHT/4);
-        const auto homePath = QDir::homePath();
         QString ttPath = path;
-        if(ttPath.contains(homePath)) {
+        if(ttPath.left(homePath.count()) == homePath) {
             ttPath = "~" + ttPath.mid(homePath.count());
         }
         pathButton->setToolTip("<p style='white-space:pre'>" + ttPath + "</p>");

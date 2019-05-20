@@ -204,12 +204,15 @@ private:
     static MainWindow *mMainWindowInstance;
     MemoryHandler *mMemoryHandler;
 
+    void updateRecentMenu();
+
     void addRecentFile(const QString& recent) {
         if(mRecentFiles.contains(recent))
             mRecentFiles.removeOne(recent);
         while(mRecentFiles.count() >= 8)
             mRecentFiles.removeLast();
         mRecentFiles.prepend(recent);
+        updateRecentMenu();
         writeRecentFiles();
     }
 
@@ -303,6 +306,7 @@ private:
 
     QMenuBar *mMenuBar;
     QMenu *mFileMenu;
+    QMenu *mRecentMenu;
     QMenu *mSelectSameMenu;
     QMenu *mEditMenu;
     QMenu *mObjectMenu;
