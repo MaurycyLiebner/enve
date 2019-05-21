@@ -5,7 +5,6 @@
 #include "Properties/boolproperty.h"
 
 class ExternalLinkBox : public ContainerBox {
-    Q_OBJECT
     friend class SelfRef;
 public:
     void reload();
@@ -19,7 +18,6 @@ private:
 };
 
 class InternalLinkBox : public BoundingBox {
-    Q_OBJECT
     friend class SelfRef;
 protected:
     InternalLinkBox(BoundingBox * const linkTarget);
@@ -95,11 +93,21 @@ public:
             return BoundingBox::getRelativeTransformAtRelFrameF(relFrame);
         }
     }
+
+    QMatrix getTotalTransformAtRelFrameF(const qreal& relFrame) {
+        if(mParentGroup ? mParentGroup->SWT_isLinkBox() : false) {
+            const auto linkTarget = getLinkTarget();
+            return linkTarget->getRelativeTransformAtRelFrameF(relFrame)*
+                    mParentGroup->getTotalTransformAtRelFrameF(relFrame);
+        } else {
+            return BoundingBox::getTotalTransformAtRelFrameF(relFrame);
+        }
+    }
+
     bool isFrameInDurationRect(const int &relFrame) const;
     bool isFrameFInDurationRect(const qreal &relFrame) const;
     BoundingBox *getLinkTarget() const;
-public slots:
-    void setTargetSlot(BoundingBox *target) {
+    void setTargetSlot(BoundingBox * const target) {
         setLinkTarget(target);
     }
 protected:

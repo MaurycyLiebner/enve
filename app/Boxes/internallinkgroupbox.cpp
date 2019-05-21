@@ -122,7 +122,7 @@ bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) const {
     return getFinalTarget()->relPointInsidePath(relPos);
 }
 
-void InternalLinkGroupBox::setTargetSlot(BoundingBox *target) {
+void InternalLinkGroupBox::setTargetSlot(BoundingBox * const target) {
     if(target->SWT_isLayerBox())
         setLinkTarget(GetAsPtr(target, ContainerBox));
 }

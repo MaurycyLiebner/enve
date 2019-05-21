@@ -4,7 +4,6 @@
 #include "Properties/boxtargetproperty.h"
 
 class InternalLinkGroupBox : public ContainerBox {
-    Q_OBJECT
     friend class SelfRef;
 protected:
     InternalLinkGroupBox(ContainerBox * const linkTarget);
@@ -32,6 +31,13 @@ public:
     FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
 
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
+    QMatrix getTotalTransformAtRelFrameF(const qreal& relFrame) {
+        if(mParentGroup ? mParentGroup->SWT_isLinkBox() : false) {
+            return getLinkTarget()->getTotalTransformAtRelFrameF(relFrame);
+        } else {
+            return BoundingBox::getTotalTransformAtRelFrameF(relFrame);
+        }
+    }
 
     void setupEffectsF(const qreal &relFrame,
                        BoundingBoxRenderData * const data);
@@ -47,11 +53,10 @@ public:
 
     bool relPointInsidePath(const QPointF &relPos) const;
 
+    void setTargetSlot(BoundingBox * const target);
     void setLinkTarget(ContainerBox * const linkTarget);
     ContainerBox *getLinkTarget() const;
     ContainerBox *getFinalTarget() const;
-public slots:
-    void setTargetSlot(BoundingBox *target);
 protected:
     qsptr<BoxTargetProperty> mBoxTarget =
             SPtrCreate(BoxTargetProperty)("link target");
