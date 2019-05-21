@@ -10,7 +10,7 @@ protected:
     InternalLinkGroupBox(ContainerBox * const linkTarget);
 public:
     ~InternalLinkGroupBox();
-    bool SWT_isLinkBox() const;
+    bool SWT_isLinkBox() const { return true; }
     bool SWT_isGroupBox() const {
         const auto finalTarget = getFinalTarget();
         if(!finalTarget) return false;

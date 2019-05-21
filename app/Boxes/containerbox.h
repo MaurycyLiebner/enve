@@ -16,6 +16,7 @@ public:
     void drawPixmapSk(SkCanvas * const canvas,
                       GrContext * const grContext);
 
+    qsptr<BoundingBox> createLink();
     stdsptr<BoundingBoxRenderData> createRenderData();
     void setupRenderData(const qreal &relFrame,
                          BoundingBoxRenderData * const data);

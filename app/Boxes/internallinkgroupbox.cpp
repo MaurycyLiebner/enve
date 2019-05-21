@@ -178,8 +178,6 @@ qsptr<BoundingBox> InternalLinkGroupBox::createLinkForLinkGroup() {
     }
 }
 
-bool InternalLinkGroupBox::SWT_isLinkBox() const { return true; }
-
 bool InternalLinkGroupBox::isFrameInDurationRect(const int &relFrame) const {
     if(!getLinkTarget()) return false;
     return ContainerBox::isFrameInDurationRect(relFrame) &&

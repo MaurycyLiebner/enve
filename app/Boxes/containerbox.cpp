@@ -323,7 +323,7 @@ void ContainerBox::queScheduledTasks() {
 }
 
 void ContainerBox::promoteToLayer() {
-    mType = TYPE_LAYER;
+    if(!SWT_isLinkBox()) mType = TYPE_LAYER;
     if(prp_mName.contains("Group")) {
         auto newName  = prp_mName;
         newName.replace("Group", "Layer");
@@ -331,12 +331,15 @@ void ContainerBox::promoteToLayer() {
     }
     mEffectsAnimators->SWT_enable();
     mGPUEffectsAnimators->SWT_enable();
-    mCurrentRenderDataHandler.clear();
     prp_afterWholeInfluenceRangeChanged();
+
+    for(const auto& box : mLinkingBoxes) {
+        GetAsPtr(box, ContainerBox)->promoteToLayer();
+    }
 }
 
 void ContainerBox::demoteToGroup() {
-    mType = TYPE_GROUP;
+    if(!SWT_isLinkBox()) mType = TYPE_GROUP;
     if(prp_mName.contains("Layer")) {
         auto newName  = prp_mName;
         newName.replace("Layer", "Group");
@@ -344,8 +347,11 @@ void ContainerBox::demoteToGroup() {
     }
     mEffectsAnimators->SWT_disable();
     mGPUEffectsAnimators->SWT_disable();
-    mCurrentRenderDataHandler.clear();
     prp_afterWholeInfluenceRangeChanged();
+
+    for(const auto& box : mLinkingBoxes) {
+        GetAsPtr(box, ContainerBox)->demoteToGroup();
+    }
 }
 
 void ContainerBox::updateAllBoxes(const UpdateReason &reason) {
@@ -561,6 +567,10 @@ void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
     }
 }
 
+qsptr<BoundingBox> ContainerBox::createLink() {
+    return SPtrCreate(InternalLinkGroupBox)(this);
+}
+
 bool ContainerBox::shouldPaintOnImage() const {
     if(SWT_isLinkBox() || SWT_isCanvas()) return true;
     if(mIsDescendantCurrentGroup) return false;
@@ -608,17 +618,17 @@ void processChildData(BoundingBox * const child,
 }
 
 stdsptr<BoundingBoxRenderData> ContainerBox::createRenderData() {
-    if(SWT_isGroupBox()) {
-        return SPtrCreate(ContainerBoxRenderData)(this);
-    } else {
-        return SPtrCreate(ContainerBoxRenderData)(this);
-    }
+    return SPtrCreate(ContainerBoxRenderData)(this);
 }
 
 void ContainerBox::setupRenderData(const qreal &relFrame,
                                    BoundingBoxRenderData * const data) {
-    if(SWT_isGroupBox()) data->fOpacity = 0;
-    else setupLayerRenderData(relFrame, data);
+    if(SWT_isGroupBox()) {
+        data->fOpacity = 0;
+        if(data->fParentIsTarget && !data->nullifyBeforeProcessing()) {
+            nullifyCurrentRenderData(data->fRelFrame);
+        }
+    } else setupLayerRenderData(relFrame, data);
 }
 
 void ContainerBox::setupLayerRenderData(const qreal &relFrame,
