@@ -63,7 +63,7 @@ private:
     QList<int> mFramesBeingLoaded;
     QList<stdsptr<VideoFrameLoader>> mFrameLoaders;
 
-    stdsptr<const VideoStreamsData> mVideoStreamsData;
+    stdsptr<VideoStreamsData> mVideoStreamsData;
     RenderCacheHandler mFramesCache;
 };
 

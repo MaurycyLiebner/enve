@@ -1,6 +1,6 @@
 #include "videostreamsdata.h"
 
-stdsptr<const VideoStreamsData> VideoStreamsData::sOpen(const QString &path) {
+stdsptr<VideoStreamsData> VideoStreamsData::sOpen(const QString &path) {
     const auto result = std::shared_ptr<VideoStreamsData>(
                 new VideoStreamsData, VideoStreamsData::sDestroy);
     result->open(path);

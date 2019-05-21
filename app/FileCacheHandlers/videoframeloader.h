@@ -17,7 +17,7 @@ class VideoFrameLoader : public HDDTask {
     friend class StdSelfRef;
 protected:
     VideoFrameLoader(VideoCacheHandler * const cacheHandler,
-                     const stdsptr<const VideoStreamsData>& openedVideo,
+                     const stdsptr<VideoStreamsData>& openedVideo,
                      const int& frameId) :
         mCacheHandler(cacheHandler), mOpenedVideo(openedVideo),
         mFrameId(frameId) {}
@@ -30,7 +30,7 @@ private:
     void readFrame();
 
     VideoCacheHandler * const mCacheHandler;
-    const stdsptr<const VideoStreamsData> mOpenedVideo;
+    const stdsptr<VideoStreamsData> mOpenedVideo;
     const int mFrameId;
     sk_sp<SkImage> mLoadedFrame;
 };

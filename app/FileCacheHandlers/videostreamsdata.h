@@ -28,10 +28,11 @@ public:
     AVFrame *fDecodedFrame = nullptr;
     AVCodecContext * fCodecContext = nullptr;
     struct SwsContext * fSwsContext = nullptr;
+    int fLastFrame = 0;
 
     stdsptr<const AudioStreamsData> fAudioData;
 
-    static stdsptr<const VideoStreamsData> sOpen(const QString& path);
+    static stdsptr<VideoStreamsData> sOpen(const QString& path);
 private:
     void open(const QString& path);
     void open();
