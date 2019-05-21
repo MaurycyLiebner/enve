@@ -748,7 +748,7 @@ QPointF BoundingBox::getAbsolutePos() const {
 void BoundingBox::updateDrawRenderContainerTransform() {
     if(mNReasonsNotToApplyUglyTransform == 0) {
         mDrawRenderContainer.updatePaintTransformGivenNewTotalTransform(
-                    mTransformAnimator->getTotalTransform());
+                    getTotalTransformAtRelFrameF(anim_getCurrentRelFrame()));
     }
 }
 

@@ -33,7 +33,8 @@ public:
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
     QMatrix getTotalTransformAtRelFrameF(const qreal& relFrame) {
         if(mParentGroup ? mParentGroup->SWT_isLinkBox() : false) {
-            return getLinkTarget()->getTotalTransformAtRelFrameF(relFrame);
+            return getRelativeTransformAtRelFrameF(relFrame)*
+                    mParentGroup->getTotalTransformAtRelFrameF(relFrame);
         } else {
             return BoundingBox::getTotalTransformAtRelFrameF(relFrame);
         }

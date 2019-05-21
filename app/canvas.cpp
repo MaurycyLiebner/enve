@@ -378,12 +378,8 @@ void Canvas::setCurrentPreviewContainer(const stdsptr<ImageCacheContainer>& cont
     setLoadingPreviewContainer(nullptr);
     if(cont == mCurrentPreviewContainer) return;
     if(mCurrentPreviewContainer) {
-        if(!mRenderingPreview) {
+        if(!mRenderingPreview)
             mCurrentPreviewContainer->setBlocked(false);
-//            if(mRenderingOutput) { // !!! dont keep frames in memory when rendering output
-//                mCurrentPreviewContainer->freeAndRemove();
-//            }
-        }
     }
     if(!cont) {
         mCurrentPreviewContainer.reset();

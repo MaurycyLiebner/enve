@@ -1154,6 +1154,7 @@ void CanvasWindow::nextSaveOutputFrame() {
             VideoEncoder::sAddCacheContainerToEncoder(
                         SPtrCreate(Samples)(samples));
         }
+        sCont->setBlocked(false);
         mCurrentEncodeSoundSecond++;
     }
 
