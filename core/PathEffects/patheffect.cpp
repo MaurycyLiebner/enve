@@ -40,7 +40,7 @@ void PathEffect::setIsOutlineEffect(const bool &bT) {
     mOutlineEffect = bT;
     if(mOutlineEffect) {
         mApplyBeforeThickness = SPtrCreate(BoolProperty)("pre-thickness");
-        ca_addChildAnimator(mApplyBeforeThickness);
+        ca_addChildAnimator(mApplyBeforeThickness, 0);
     } else if(mApplyBeforeThickness) {
         ca_removeChildAnimator(mApplyBeforeThickness);
         mApplyBeforeThickness.reset();

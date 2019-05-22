@@ -23,14 +23,14 @@ CubicList CubicList::getFragment(const qreal &minLenFrac,
     const qreal minLen = getTotalLength()*CLAMP01(minLenFrac);
     const qreal maxLen = getTotalLength()*CLAMP01(maxLenFrac);
     qreal minT = 0, maxT = 1;
-    int minI = 0, maxI = mSegments.count() - 1;
+    int minI = -1, maxI = mSegments.count() - 1;
     qreal currLen = 0;
     const int iMax = mSegments.count();
     for(int i = 0; i < iMax; i++) {
         auto& seg = mSegments[i];
         const qreal lastLen = currLen;
         currLen += seg.length();
-        if(minI == 0) {
+        if(minI == -1) {
             if(currLen > minLen) {
                 minT = seg.tAtLength(minLen - lastLen);
                 minI = i;
@@ -62,24 +62,23 @@ CubicList CubicList::getFragmentUnbound(const qreal &minLenFrac,
     const qreal shiftToPos = -floor4Dec(minLenFrac);
     const qreal posMinLenFrac = minLenFrac + shiftToPos; // always between 0 and 1
     const qreal posMaxLenFrac = maxLenFrac + shiftToPos;
-    if((isZero4Dec(posMinLenFrac) || posMinLenFrac > 0) &&
-       (isZero4Dec(posMaxLenFrac) || posMaxLenFrac < 1)) {
-        return getFragment(posMinLenFrac, posMaxLenFrac);
+    QList<qCubicSegment2D> fragSegs;
+    if(isInteger4Dec(posMinLenFrac) && isInteger4Dec(posMaxLenFrac)) {
+        const int nFull = qRound(posMaxLenFrac - posMinLenFrac);
+        for(int i = 0; i < nFull; i++) fragSegs << mSegments;
+        return fragSegs;
     }
 
-    QList<qCubicSegment2D> fragSegs;
     if(!isInteger4Dec(posMinLenFrac)) {
-        fragSegs << getFragment(posMinLenFrac, qCeil(posMinLenFrac)).getSegments();
+        fragSegs << getFragment(qCeil(posMinLenFrac) - posMinLenFrac, 1).getSegments();
     }
     const int nFull = qFloor(posMaxLenFrac - posMinLenFrac);
-    for(int i = 0; i < nFull; i++) {
-        fragSegs << mSegments;
-    }
+    for(int i = 0; i < nFull; i++) fragSegs << mSegments;
+
     if(!isInteger4Dec(posMaxLenFrac)) {
-        fragSegs << getFragmentUnbound(
-                        qFloor(posMaxLenFrac), posMaxLenFrac).getSegments();
+        fragSegs << getFragment(0, posMaxLenFrac - qFloor(posMaxLenFrac)).getSegments();
     }
-    return CubicList(fragSegs);
+    return fragSegs;
 }
 
 QList<CubicList> CubicList::sMakeFromSkPath(const SkPath &src) {
