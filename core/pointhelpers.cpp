@@ -562,12 +562,12 @@ SkPath gPathToPolyline(const SkPath& path) {
         }
         case SkPath::kQuad_Verb: {
             const QPointF pt2 = toQPointF(pts[2]);
-            seg = qCubicSegment2D::fromQuad(lastPos, toQPointF(pts[1]), pt2);
+            seg = qCubicSegment2D::sFromQuad(lastPos, toQPointF(pts[1]), pt2);
             lastPos = pt2;
         } break;
         case SkPath::kConic_Verb: {
             const QPointF pt2 = toQPointF(pts[2]);
-            seg = qCubicSegment2D::fromConic(lastPos, toQPointF(pts[1]), pt2,
+            seg = qCubicSegment2D::sFromConic(lastPos, toQPointF(pts[1]), pt2,
                                              toQreal(iter.conicWeight()));
             lastPos = pt2;
         } break;
@@ -615,12 +615,12 @@ void gForEverySegmentInPath(
         } break;
         case SkPath::kQuad_Verb: {
             const QPointF pt2 = toQPointF(pts[2]);
-            func(qCubicSegment2D::fromQuad(lastPos, toQPointF(pts[1]), pt2));
+            func(qCubicSegment2D::sFromQuad(lastPos, toQPointF(pts[1]), pt2));
             lastPos = pt2;
         } break;
         case SkPath::kConic_Verb: {
             const QPointF pt2 = toQPointF(pts[2]);
-            func(qCubicSegment2D::fromConic(lastPos, toQPointF(pts[1]), pt2,
+            func(qCubicSegment2D::sFromConic(lastPos, toQPointF(pts[1]), pt2,
                                             toQreal(iter.conicWeight())));
             lastPos = pt2;
         } break;

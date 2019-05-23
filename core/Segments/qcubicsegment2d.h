@@ -33,14 +33,23 @@ struct qCubicSegment2D {
     qCubicSegment2D(const qCubicSegment1D& xSeg,
                     const qCubicSegment1D& ySeg);
 
-    static qCubicSegment2D fromConic(const QPointF& p0, const QPointF& c,
-                                     const QPointF& p1, const qreal& weight) {
+    static qCubicSegment2D sFromLine(const QLineF& line) {
+        return sFromLine(line.p1(), line.p2());
+    }
+
+    static qCubicSegment2D sFromLine(const QPointF& p0, const QPointF& p1) {
+        return qCubicSegment2D(p0, p0*(2./3) + p1*(1./3),
+                               p0*(1./3) + p1*(2./3), p1);
+    }
+
+    static qCubicSegment2D sFromConic(const QPointF& p0, const QPointF& c,
+                                      const QPointF& p1, const qreal& weight) {
         qreal u = 4*weight/(3*(1 + weight));
         return qCubicSegment2D(p0, p0*(1 - u) + c*u, p1*(1 - u) + c*u, p1);
     }
 
-    static qCubicSegment2D fromQuad(const QPointF& p0, const QPointF& c,
-                                    const QPointF& p1) {
+    static qCubicSegment2D sFromQuad(const QPointF& p0, const QPointF& c,
+                                     const QPointF& p1) {
         return qCubicSegment2D(p0, p0 + 2*(c - p0)/3, p1 + 2*(c - p1)/3, p1);
     }
 
@@ -49,6 +58,14 @@ struct qCubicSegment2D {
         path.moveTo(toSkPoint(mP0));
         path.cubicTo(toSkPoint(mC1), toSkPoint(mC2), toSkPoint(mP3));
         return path;
+    }
+
+    QRectF ptsBoundingRect() const {
+        const QPointF tl(qMin4(mP0.x(), mC1.x(), mC2.x(), mP3.x()),
+                         qMin4(mP0.y(), mC1.y(), mC2.y(), mP3.y()));
+        const QPointF br(qMax4(mP0.x(), mC1.x(), mC2.x(), mP3.x()),
+                         qMax4(mP0.y(), mC1.y(), mC2.y(), mP3.y()));
+        return QRectF(tl, br);
     }
 
     qCubicSegment1D xSeg() const;

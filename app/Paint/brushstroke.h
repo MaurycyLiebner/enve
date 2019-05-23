@@ -142,6 +142,50 @@ struct BrushStrokeSet {
         return result;
     }
 
+    static QList<BrushStrokeSet> lineFillStrokesForSkPath(
+            const SkPath& path,
+            qCubicSegment1D& timeCurve,
+            qCubicSegment1D& pressureCurve,
+            qCubicSegment1D& widthCurve,
+            qCubicSegment1D& spacingCurve,
+            const qreal& degAngle,
+            const qreal& distInc) {
+        QList<BrushStrokeSet> result;
+        auto segLists = CubicList::sMakeFromSkPath(path);
+        const QRectF pathBounds = toQRectF(path.getBounds());
+        const QLineF diagonal(pathBounds.topLeft(), pathBounds.bottomRight());
+        QTransform rotate;
+        rotate.rotate(degAngle);
+        const QPolygonF linesBBPolygon = rotate.map(QPolygonF(pathBounds));
+        const QLineF firstLine(linesBBPolygon.at(0), linesBBPolygon.at(1));
+        const QLineF sideLine(linesBBPolygon.at(1), linesBBPolygon.at(2));
+        const int nLines = qCeil(sideLine.length()/distInc);
+        const QLineF transVec = QLineF::fromPolar(distInc, degAngle - 90);
+        for(int i = 0; i < nLines; i++) {
+            const QLineF iLine = firstLine.translated(i*transVec.p2());
+            QList<QPointF> intersections;
+            for(auto& seg : segLists) {
+//                intersections.append(iLine.p1());
+//                intersections.append(iLine.p2());
+//                continue;
+                seg.lineIntersections(iLine, intersections);
+            }
+
+            BrushStrokeSet lineSet;
+            const int jMin = 0;
+            const int jMax = intersections.count() - 2;
+            for(int j = jMin; j <= jMax; j += 2) {
+                const QLineF line(intersections.at(j), intersections.at(j + 1));
+                BrushStroke stroke{qCubicSegment2D::sFromLine(line), pressureCurve,
+                                   DefaultTiltCurve, DefaultTiltCurve,
+                                   timeCurve, widthCurve, spacingCurve};
+                lineSet.fStrokes.append(stroke);
+            }
+            result << lineSet;
+        }
+        return result;
+    }
+
     static QList<BrushStrokeSet> fillStrokesForSkPath(
             const SkPath& path,
             qCubicSegment1D& timeCurve,

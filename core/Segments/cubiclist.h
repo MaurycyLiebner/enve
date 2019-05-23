@@ -124,6 +124,8 @@ struct CubicList {
         return mSegments;
     }
 
+    int lineIntersections(const QLineF& line, QList<QPointF>& pts);
+
     typedef QList<qCubicSegment2D>::const_iterator const_iterator;
     const_iterator cbegin() const { return mSegments.cbegin(); }
     const_iterator cend() const { return mSegments.cend(); }

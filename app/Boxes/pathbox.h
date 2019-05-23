@@ -59,17 +59,23 @@ protected:
                                 -fGlobalBoundingRect.top());
                 trans = fScaledTransform*trans;
                 fPath.transform(toSkMatrix(trans), &pathT);
-//                auto brushSet = BrushStrokeSet::fillStrokesForSkPath(pathT, 5);
-//                brush->setColor(0, 0, 1);
-//                for(auto& set : brushSet) {
-//                    set.execute(brush->getItem(), &surf, 5);
-//                }
-                auto widthCurve = fStrokeSettings.fWidthCurve*fResolution;
-                auto brushSet = BrushStrokeSet::outlineStrokesForSkPath(
+
+                const auto fillBrush = fStrokeSettings.fStrokeBrush->getBrush();
+                auto fillWidthCurve = fStrokeSettings.fWidthCurve*fResolution;
+
+                auto fillBrushSet = BrushStrokeSet::lineFillStrokesForSkPath(pathT, fStrokeSettings.fTimeCurve,
+                                                                             fStrokeSettings.fPressureCurve,
+                                                                             fillWidthCurve, fStrokeSettings.fSpacingCurve, 0, 10);
+                for(auto& set : fillBrushSet)
+                    surf.execute(fillBrush, set);
+
+                const auto strokeBrush = fStrokeSettings.fStrokeBrush->getBrush();
+                auto strokeWidthCurve = fStrokeSettings.fWidthCurve*fResolution;
+                auto strokeBrushSet = BrushStrokeSet::outlineStrokesForSkPath(
                             pathT,
                             fStrokeSettings.fTimeCurve,
                             fStrokeSettings.fPressureCurve,
-                            widthCurve, fStrokeSettings.fSpacingCurve, 5, 5);
+                            strokeWidthCurve, fStrokeSettings.fSpacingCurve, 5, 5);
                 QColor col = fStrokeSettings.fPaintColor;
                 col.setRgbF(col.blueF(), col.greenF(),
                             col.redF(), col.alphaF());
@@ -77,8 +83,9 @@ protected:
                             toSkScalar(col.hueF()),
                             toSkScalar(col.saturationF()),
                             toSkScalar(col.valueF()));
-                const auto brush = fStrokeSettings.fStrokeBrush->getBrush();
-                for(auto& set : brushSet) surf.execute(brush, set);
+                //const auto brush = fStrokeSettings.fStrokeBrush->getBrush();
+                for(auto& set : strokeBrushSet)
+                    surf.execute(strokeBrush, set);
 
                 fBitmapTMP.reset();
                 const int iMargin = qCeil(fEffectsMargin);
