@@ -60,14 +60,16 @@ protected:
                 trans = fScaledTransform*trans;
                 fPath.transform(toSkMatrix(trans), &pathT);
 
-                const auto fillBrush = fStrokeSettings.fStrokeBrush->getBrush();
-                auto fillWidthCurve = fStrokeSettings.fWidthCurve*fResolution;
+//                const auto fillBrush = fStrokeSettings.fStrokeBrush->getBrush();
+//                auto fillWidthCurve = fStrokeSettings.fWidthCurve*fResolution;
 
-                auto fillBrushSet = BrushStrokeSet::lineFillStrokesForSkPath(pathT, fStrokeSettings.fTimeCurve,
-                                                                             fStrokeSettings.fPressureCurve,
-                                                                             fillWidthCurve, fStrokeSettings.fSpacingCurve, 0, 10);
-                for(auto& set : fillBrushSet)
-                    surf.execute(fillBrush, set);
+//                auto fillBrushSet = BrushStrokeSet::lineFillStrokesForSkPath(
+//                            pathT, fStrokeSettings.fTimeCurve,
+//                            fStrokeSettings.fPressureCurve,
+//                            fillWidthCurve, fStrokeSettings.fSpacingCurve,
+//                            0, 40*fResolution);
+//                for(auto& set : fillBrushSet)
+//                    surf.execute(fillBrush, set);
 
                 const auto strokeBrush = fStrokeSettings.fStrokeBrush->getBrush();
                 auto strokeWidthCurve = fStrokeSettings.fWidthCurve*fResolution;

@@ -297,6 +297,18 @@ int polySolveCubic(double a, double b, double c,
 int cubicBezierLine(qCubicSegment2D& seg,
                     const QLineF& line,
                     QList<QPointF>& result) {
+    const QRectF segBB = seg.ptsBoundingRect();
+    if(segBB.contains(line.p1()) || segBB.contains(line.p2())) {
+    } else if(line.intersect(QLineF(segBB.topLeft(), segBB.bottomLeft()),
+                             nullptr) == QLineF::BoundedIntersection) {
+    } else if(line.intersect(QLineF(segBB.topLeft(), segBB.topRight()),
+                             nullptr) == QLineF::BoundedIntersection) {
+    } else if(line.intersect(QLineF(segBB.topRight(), segBB.bottomRight()),
+                             nullptr) == QLineF::BoundedIntersection) {
+    } else if(line.intersect(QLineF(segBB.bottomRight(), segBB.bottomLeft()),
+                             nullptr) == QLineF::BoundedIntersection) {
+    } else return 0;
+
     const qreal lX1 = line.x1();
     const qreal lX2 = line.x2();
     const qreal lY1 = line.y1();

@@ -61,11 +61,7 @@ struct qCubicSegment2D {
     }
 
     QRectF ptsBoundingRect() const {
-        const QPointF tl(qMin4(mP0.x(), mC1.x(), mC2.x(), mP3.x()),
-                         qMin4(mP0.y(), mC1.y(), mC2.y(), mP3.y()));
-        const QPointF br(qMax4(mP0.x(), mC1.x(), mC2.x(), mP3.x()),
-                         qMax4(mP0.y(), mC1.y(), mC2.y(), mP3.y()));
-        return QRectF(tl, br);
+        return qRectF4Points(mP0, mC1, mC2, mP3);
     }
 
     qCubicSegment1D xSeg() const;

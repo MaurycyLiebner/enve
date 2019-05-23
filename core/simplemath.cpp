@@ -187,7 +187,6 @@ QRectF qRectF4Points(QPointF p1, QPointF c1,
                      QPointF c2, QPointF p2) {
     return QRectF(QPointF(qMin4(p1.x(), c1.x(), c2.x(), p2.x()),
                           qMin4(p1.y(), c1.y(), c2.y(), p2.y())),
-
                   QPointF(qMax4(p1.x(), c1.x(), c2.x(), p2.x()),
                           qMax4(p1.y(), c1.y(), c2.y(), p2.y())));
 }
