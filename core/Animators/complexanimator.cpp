@@ -58,10 +58,10 @@ FrameRange ComplexAnimator::prp_getIdenticalRelRange(const int &relFrame) const 
 bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                           const bool &parentSatisfies,
                                           const bool &parentMainTarget) const {
-    if(hasChildAnimators()) {
+    //if(hasChildAnimators()) {
         return Animator::SWT_shouldBeVisible(rules, parentSatisfies,
                                              parentMainTarget);
-    }
+    //}
     return false;
 }
 

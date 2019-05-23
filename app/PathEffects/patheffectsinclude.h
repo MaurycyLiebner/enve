@@ -8,5 +8,6 @@
 #include "PathEffects/solidifypatheffect.h"
 #include "PathEffects/sumpatheffect.h"
 #include "PathEffects/subpatheffect.h"
+#include "linespatheffect.h"
 
 #endif // PATHEFFECTSINCLUDE_H

@@ -25,6 +25,8 @@ void PathEffectsMenu::addPathEffectsActionToMenu(
                 "Operation", menu, adder, outline);
     addPathEffectActionToMenu<SumPathEffect>(
                 "Sum", menu, adder, outline);
+    addPathEffectActionToMenu<LinesPathEffect>(
+                "Lines", menu, adder, outline);
 }
 
 void PathEffectsMenu::addPathEffectsToActionMenu(BoxTypeMenu * const menu) {

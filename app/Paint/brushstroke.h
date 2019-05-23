@@ -153,7 +153,6 @@ struct BrushStrokeSet {
         QList<BrushStrokeSet> result;
         auto segLists = CubicList::sMakeFromSkPath(path);
         const QRectF pathBounds = toQRectF(path.getBounds());
-        const QLineF diagonal(pathBounds.topLeft(), pathBounds.bottomRight());
         QTransform rotate;
         rotate.rotate(degAngle);
         const QPolygonF linesBBPolygon = rotate.map(QPolygonF(pathBounds));
