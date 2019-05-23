@@ -171,17 +171,17 @@ struct BrushStrokeSet {
                 seg.lineIntersections(iLine, intersections);
             }
 
-            BrushStrokeSet lineSet;
             const int jMin = 0;
             const int jMax = intersections.count() - 2;
             for(int j = jMin; j <= jMax; j += 2) {
                 const QLineF line(intersections.at(j), intersections.at(j + 1));
+                BrushStrokeSet lineSet;
                 BrushStroke stroke{qCubicSegment2D::sFromLine(line), pressureCurve,
                                    DefaultTiltCurve, DefaultTiltCurve,
                                    timeCurve, widthCurve, spacingCurve};
                 lineSet.fStrokes.append(stroke);
+                result << lineSet;
             }
-            result << lineSet;
         }
         return result;
     }
