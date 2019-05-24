@@ -46,6 +46,15 @@ int SmartPath::insertNodeBetween(const int& prevId,
 int SmartPath::actionInsertNodeBetween(const int &prevId,
                                        const int& nextId,
                                        const qreal& t) {
+    const auto prev = getNodePtr(prevId);
+    const auto next = getNodePtr(nextId);
+    if(prev->isDissolved() || next->isDissolved()) {
+        const qreal prevT = prev->isNormal() ? 0 : prev->t();
+        const qreal nextT = next->isNormal() ? 1 : next->t();
+
+        const qreal mappedT = gMapTFromFragment(prevT, nextT, t);
+        return insertNodeBetween(prevId, nextId, Node(mappedT));
+    }
     return insertNodeBetween(prevId, nextId, Node(t));
 }
 

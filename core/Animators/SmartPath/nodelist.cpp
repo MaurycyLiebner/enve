@@ -89,7 +89,9 @@ int NodeList::insertNodeAfter(const int& prevId,
                               const Node& nodeBlueprint) {
     const int insertId = prevId + 1;
 //    Node * const insertedNode =
-    insertNodeToList(insertId, nodeBlueprint);
+   /* const auto node = */insertNodeToList(insertId, nodeBlueprint);
+//    if(nodeBlueprint.isDissolved())
+//        updateDissolvedNodePosition(insertId, node);
 //    if(nodeBlueprint.isDissolved())
 //        promoteDissolvedNodeToNormal(insertId, insertedNode);
     return insertId;
