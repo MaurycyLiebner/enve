@@ -3,6 +3,9 @@
 RandomGrid::RandomGrid() : ComplexAnimator("randomness grid") {
     mSeed = SPtrCreate(QrealAnimator)(qrand() % 9999, 0, 9999, 1, "smooth seed");
     mGridSize = SPtrCreate(QrealAnimator)(100, 1, 9999, 1, "grid size");
+
+    ca_addChildAnimator(mSeed);
+    ca_addChildAnimator(mGridSize);
 }
 
 qreal RandomGrid::getBaseSeed(const qreal &relFrame) const {
@@ -15,6 +18,16 @@ qreal RandomGrid::getGridSize(const qreal &relFrame) const {
 
 qreal RandomGrid::getRandomValue(const qreal &relFrame, const QPointF &pos) const {
     return sGetRandomValue(getBaseSeed(relFrame), getGridSize(relFrame), pos);
+}
+
+void RandomGrid::writeProperty(QIODevice * const target) const {
+    mSeed->writeProperty(target);
+    mGridSize->writeProperty(target);
+}
+
+void RandomGrid::readProperty(QIODevice *target) {
+    mSeed->readProperty(target);
+    mGridSize->readProperty(target);
 }
 
 qreal RandomGrid::sGetRandomValue(const qreal &baseSeed, const qreal &gridSize,

@@ -18,6 +18,9 @@ public:
     static qreal sGetRandomValue(const qreal& min, const qreal& max,
                                  const qreal& baseSeed, const qreal& gridSize,
                                  const QPointF& pos);
+
+    void writeProperty(QIODevice * const target) const;
+    void readProperty(QIODevice *target);
 private:
     static qreal sGetRandomValue(const qreal& baseSeed, const QPoint& gridId);
 
