@@ -170,22 +170,28 @@ void NodeList::demoteNormalNodeToDissolved(const int& nodeId,
     Node * const nextNormalV = nextNormal(nodeId);
     if(!prevNormalV || !nextNormalV) return;
 
-    setNodeType(node, Node::DISSOLVED);
-    const qreal dissT = 0.5;
-    node->setT(dissT);
     if(approx) {
-        approximateBeforeDemoteOrRemoval(dissT, node,
+        approximateBeforeDemoteOrRemoval(node->t(), node,
                                          prevNormalV, nextNormalV);
     }
-    for(int i = prevNormalV->getNodeId() + 1; i < nodeId; i++) {
-        Node * const iNode = mNodes[i];
-        if(iNode->isDissolved()) iNode->setT(iNode->t()*dissT);
+
+    setNodeType(node, Node::DISSOLVED);
+
+    const int prevNormalId = prevNormalV->getNodeId();
+    const int nextNormalId = nextNormalV->getNodeId();
+    const int nDiss = prevNormalId < nextNormalId ?
+                nextNormalId - prevNormalId - 1 :
+                count() - 1 - prevNormalId + nextNormalId;
+    const qreal tInc = 1./(nDiss + 1);
+    qreal iT = tInc;
+    Node * iPrevNode = prevNormalV;
+    for(int i = 0; i < nDiss; i++) {
+        const auto iCurrNode = nextNode(iPrevNode);
+        iCurrNode->setT(iT);
+        iPrevNode = iCurrNode;
+        iT += tInc;
     }
-    const qreal oneMinusDissT = 1 - dissT;
-    for(int i = nodeId + 1; i < nextNormalV->getNodeId(); i++) {
-        Node * const iNode = mNodes[i];
-        if(iNode->isDissolved()) iNode->setT(iNode->t()*oneMinusDissT + dissT);
-    }
+
     updateDissolvedNodePosition(nodeId);
 }
 
