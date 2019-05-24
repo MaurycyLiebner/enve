@@ -729,6 +729,12 @@ void PathEffectAnimators::readPathEffect(QIODevice *target) {
         pathEffect = SPtrCreate(SumPathEffect)(mIsOutline);
     } else if(typeT == SUB_PATH_EFFECT) {
         pathEffect = SPtrCreate(SubPathEffect)(mIsOutline);
+    } else if(typeT == LINES_PATH_EFFECT) {
+        pathEffect = SPtrCreate(LinesPathEffect)(mIsOutline);
+    } else if(typeT == ZIGZAG_PATH_EFFECT) {
+        pathEffect = SPtrCreate(ZigZagPathEffect)(mIsOutline);
+    } else if(typeT == SPATIAL_DISPLACE_PATH_EFFECT) {
+        pathEffect = SPtrCreate(SpatialDisplacePathEffect)(mIsOutline);
     } else {
         const QString errMsg = "Invalid path effect type '" +
                 QString::number(typeT) + "'.";
