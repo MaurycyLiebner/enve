@@ -61,6 +61,6 @@ void LinesPathEffect::writeProperty(QIODevice * const target) const {
 
 void LinesPathEffect::readProperty(QIODevice *target) {
     PathEffect::readProperty(target);
-    mAngle->writeProperty(target);
-    mDistance->writeProperty(target);
+    mAngle->readProperty(target);
+    mDistance->readProperty(target);
 }
