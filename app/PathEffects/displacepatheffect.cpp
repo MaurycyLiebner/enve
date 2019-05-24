@@ -13,11 +13,8 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     mRandomizeStep = SPtrCreate(IntAnimator)("randomize step");
     mSmoothTransform = SPtrCreate(BoolPropertyContainer)("smooth progression");
     mEasing = QrealAnimator::create0to1Animator("ease in/out");
-    mSeed = SPtrCreate(IntAnimator)("seed");
+    mSeed = IntAnimator::sCreateSeed();
     mRepeat = SPtrCreate(BoolProperty)("repeat");
-
-    mSeed->setIntValueRange(0, 9999);
-    mSeed->setCurrentIntValue(qrand() % 9999);
 
     mSegLength->setValueRange(1, 1000);
     mSegLength->setCurrentBaseValue(20);
@@ -94,15 +91,15 @@ void DisplacePathEffect::apply(const qreal &relFrame,
     if(mSmoothTransform->getValue() && mRandomize->getValue()) {
         SkPath path1;
         if(mLengthBased->getValue()) {
-            gDisplaceFilterPath(&path1, src, maxDev, segLen, smooth, mSeedAssist);
+            gAtomicDisplaceFilterPath(&path1, src, maxDev, segLen, smooth, mSeedAssist);
         } else {
-            gDisplaceFilterPath(&path1, src, maxDev, mSeedAssist);
+            gAtomicDisplaceFilterPath(&path1, src, maxDev, mSeedAssist);
         }
         SkPath path2;
         if(mLengthBased->getValue()) {
-            gDisplaceFilterPath(&path2, src, maxDev, segLen, smooth, nextSeed);
+            gAtomicDisplaceFilterPath(&path2, src, maxDev, segLen, smooth, nextSeed);
         } else {
-            gDisplaceFilterPath(&path2, src, maxDev, nextSeed);
+            gAtomicDisplaceFilterPath(&path2, src, maxDev, nextSeed);
         }
         qreal weight = qAbs(qFloor(relFrame) % randStep)*1./randStep;
         const qreal easing = mEasing->getEffectiveValue(relFrame);
@@ -115,9 +112,9 @@ void DisplacePathEffect::apply(const qreal &relFrame,
         path1.interpolate(path2, toSkScalar(weight), dst);
     } else {
         if(mLengthBased->getValue()) {
-            gDisplaceFilterPath(dst, src, maxDev, segLen, smooth, mSeedAssist);
+            gAtomicDisplaceFilterPath(dst, src, maxDev, segLen, smooth, mSeedAssist);
         } else {
-            gDisplaceFilterPath(dst, src, maxDev, mSeedAssist);
+            gAtomicDisplaceFilterPath(dst, src, maxDev, mSeedAssist);
         }
     }
 }

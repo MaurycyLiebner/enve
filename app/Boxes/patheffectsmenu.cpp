@@ -15,6 +15,8 @@ void PathEffectsMenu::addPathEffectsActionToMenu(
         const U &adder, const bool &outline) {
     addPathEffectActionToMenu<DisplacePathEffect>(
                 "Displace", menu, adder, outline);
+    addPathEffectActionToMenu<SpatialDisplacePathEffect>(
+                "Spatial Displace", menu, adder, outline);
     addPathEffectActionToMenu<DuplicatePathEffect>(
                 "Duplicate", menu, adder, outline);
     addPathEffectActionToMenu<SubPathEffect>(

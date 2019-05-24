@@ -14,7 +14,9 @@ enum PathEffectType : short {
     LENGTH_PATH_EFFECT,
     SUM_PATH_EFFECT,
     SUB_PATH_EFFECT,
-    LINES_PATH_EFFECT
+    LINES_PATH_EFFECT,
+    ZIGZAG_PATH_EFFECT,
+    SPATIAL_DISPLACE_PATH_EFFECT
 };
 class PathEffect;
 

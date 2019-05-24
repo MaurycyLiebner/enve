@@ -53,6 +53,7 @@ LIBS += -lskia
 
 SOURCES += \
     Animators/qrealsnapshot.cpp \
+    randomgrid.cpp \
     smartPointers/stdpointer.cpp \
     smartPointers/selfref.cpp \
     smartPointers/stdselfref.cpp \
@@ -143,6 +144,7 @@ SOURCES += \
 HEADERS += \
     Animators/qrealsnapshot.h \
     core_global.h \
+    randomgrid.h \
     smartPointers/stdpointer.h \
     smartPointers/selfref.h \
     smartPointers/stdselfref.h \

@@ -60,6 +60,7 @@ SOURCES += main.cpp\
     FileCacheHandlers/soundreader.cpp \
     GUI/welcomedialog.cpp \
     PathEffects/linespatheffect.cpp \
+    PathEffects/spatialdisplacepatheffect.cpp \
     PathEffects/subpatheffect.cpp \
     PathEffects/zigzagpatheffect.cpp \
     Sound/soundmerger.cpp \
@@ -269,6 +270,7 @@ HEADERS  += \
     FileCacheHandlers/soundreader.h \
     GUI/welcomedialog.h \
     PathEffects/linespatheffect.h \
+    PathEffects/spatialdisplacepatheffect.h \
     PathEffects/subpatheffect.h \
     PathEffects/zigzagpatheffect.h \
     Sound/soundmerger.h \

@@ -19,9 +19,7 @@ RandomQrealGenerator::RandomQrealGenerator() :
     mType->setCurrentValue(2);
     ca_addChildAnimator(mType);
 
-    mSeedAssist = SPtrCreate(IntAnimator)("seed");
-    mSeedAssist->setValueRange(0, 9999);
-    mSeedAssist->setCurrentIntValue(0);
+    mSeedAssist = IntAnimator::sCreateSeed();
     ca_addChildAnimator(mSeedAssist);
 }
 

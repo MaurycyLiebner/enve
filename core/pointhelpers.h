@@ -111,16 +111,31 @@ extern void gGetSmoothAbsCtrlsForPtBetween(const SkPoint &prevP,
                                            SkPoint &c1, SkPoint &c2,
                                            const SkScalar &smoothLen);
 
-extern void gDisplaceFilterPath(SkPath* const dst,
+extern void gAtomicDisplaceFilterPath(SkPath* const dst,
                                 const SkPath& src,
                                 const SkScalar &maxDev,
                                 const uint32_t &seedAssist);
 
-extern bool gDisplaceFilterPath(SkPath * const dst, const SkPath& src,
-                                const SkScalar &maxDev,
-                                const SkScalar &segLen,
-                                const SkScalar &smoothness,
-                                const uint32_t &seedAssist);
+extern bool gAtomicDisplaceFilterPath(SkPath * const dst,
+                                      const SkPath& src,
+                                      const SkScalar &maxDev,
+                                      const SkScalar &segLen,
+                                      const SkScalar &smoothness,
+                                      const uint32_t &seedAssist);
+
+extern void gSpatialDisplaceFilterPath(const qreal& baseSeed,
+                                       const qreal& gridSize,
+                                       SkPath* const dst,
+                                       const SkPath& src,
+                                       const SkScalar &maxDev);
+
+extern bool gSpatialDisplaceFilterPath(const qreal& baseSeed,
+                                       const qreal& gridSize,
+                                       SkPath* const dst,
+                                       const SkPath& src,
+                                       const SkScalar &maxDev,
+                                       const SkScalar &segLen,
+                                       const SkScalar &smoothness);
 
 qreal gMapTToFragment(const qreal& minAbsT,
                       const qreal& maxAbsT,
