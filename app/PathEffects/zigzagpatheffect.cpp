@@ -1,8 +1,8 @@
-#include "linespatheffect.h"
+#include "zigzagpatheffect.h"
 #include "Animators/qrealanimator.h"
 
-LinesPathEffect::LinesPathEffect(const bool &outlinePathEffect) :
-    PathEffect("lines effect", LINES_PATH_EFFECT, outlinePathEffect) {
+ZigZagPathEffect::ZigZagPathEffect(const bool &outlinePathEffect) :
+    PathEffect("zigzag effect", LINES_PATH_EFFECT, outlinePathEffect) {
     mAngle = SPtrCreate(QrealAnimator)(0, -9999, 9999, 1, "angle");
     mDistance = SPtrCreate(QrealAnimator)(10, 1, 9999, 1, "distance");
 
@@ -10,8 +10,8 @@ LinesPathEffect::LinesPathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mDistance);
 }
 
-void LinesPathEffect::apply(const qreal &relFrame, const SkPath &src,
-                            SkPath * const dst) {
+void ZigZagPathEffect::apply(const qreal &relFrame, const SkPath &src,
+                             SkPath * const dst) {
     const qreal degAngle = mAngle->getEffectiveValue(relFrame);
     const qreal distInc = mDistance->getEffectiveValue(relFrame);
 
@@ -33,6 +33,7 @@ void LinesPathEffect::apply(const qreal &relFrame, const SkPath &src,
     QLineF transVec = sideLine;
     transVec.setLength(distInc);
     const QPointF transPt(transVec.dx(), transVec.dy());
+    QList<QLineF> prevLines;
     for(int i = 0; i < nLines; i++) {
         const QLineF iLine = firstLine.translated(i*transPt);
         QList<QPointF> intersections;
@@ -47,16 +48,28 @@ void LinesPathEffect::apply(const qreal &relFrame, const SkPath &src,
         QList<QLineF> currLines;
         for(int j = jMin; j <= jMax; j += 2) {
             const QLineF line(intersections.at(j), intersections.at(j + 1));
-            dst->moveTo(toSkPoint(line.p1()));
-            dst->lineTo(toSkPoint(line.p2()));
+            currLines << line;
         }
+
+        if(prevLines.count() == 1 && currLines.count() == 1) {
+            const auto& currLine = currLines.first();
+            dst->lineTo(toSkPoint(currLine.p1()));
+            dst->lineTo(toSkPoint(currLine.p2()));
+        } else {
+            for(const auto& line : currLines) {
+                dst->moveTo(toSkPoint(line.p1()));
+                dst->lineTo(toSkPoint(line.p2()));
+            }
+        }
+
+        prevLines = currLines;
     }
 }
 
-void LinesPathEffect::writeProperty(QIODevice * const target) const {
+void ZigZagPathEffect::writeProperty(QIODevice * const target) const {
     PathEffect::writeProperty(target);
 }
 
-void LinesPathEffect::readProperty(QIODevice *target) {
+void ZigZagPathEffect::readProperty(QIODevice *target) {
     PathEffect::readProperty(target);
 }

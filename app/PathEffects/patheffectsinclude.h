@@ -9,5 +9,6 @@
 #include "PathEffects/sumpatheffect.h"
 #include "PathEffects/subpatheffect.h"
 #include "linespatheffect.h"
+#include "zigzagpatheffect.h"
 
 #endif // PATHEFFECTSINCLUDE_H

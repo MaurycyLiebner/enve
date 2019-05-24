@@ -61,6 +61,7 @@ SOURCES += main.cpp\
     GUI/welcomedialog.cpp \
     PathEffects/linespatheffect.cpp \
     PathEffects/subpatheffect.cpp \
+    PathEffects/zigzagpatheffect.cpp \
     Sound/soundmerger.cpp \
     canvas.cpp \
     canvasmouseinteractions.cpp \
@@ -269,6 +270,7 @@ HEADERS  += \
     GUI/welcomedialog.h \
     PathEffects/linespatheffect.h \
     PathEffects/subpatheffect.h \
+    PathEffects/zigzagpatheffect.h \
     Sound/soundmerger.h \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
