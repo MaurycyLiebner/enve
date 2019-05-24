@@ -19,19 +19,26 @@ void LinesPathEffect::apply(const qreal &relFrame, const SkPath &src,
     auto segLists = CubicList::sMakeFromSkPath(src);
     const QRectF pathBounds = toQRectF(src.getBounds());
     QTransform rotate;
+    const QPointF pivot = pathBounds.center();
+    rotate.translate(pivot.x(), pivot.y());
     rotate.rotate(degAngle);
+    rotate.translate(-pivot.x(), -pivot.y());
     const QPolygonF linesBBPolygon = rotate.map(QPolygonF(pathBounds));
-    const QLineF firstLine(linesBBPolygon.at(0), linesBBPolygon.at(1));
-    const QLineF sideLine(linesBBPolygon.at(1), linesBBPolygon.at(2));
+    const QRectF secondBB = linesBBPolygon.boundingRect();
+    const QPolygonF secondLinesBB = rotate.map(QPolygonF(secondBB));
+    const QLineF firstLine(secondLinesBB.at(0), secondLinesBB.at(1));
+    const QLineF sideLine(secondLinesBB.at(1), secondLinesBB.at(2));
     const int nLines = qCeil(sideLine.length()/distInc);
-    const QLineF transVec = QLineF::fromPolar(distInc, degAngle - 90);
+//    const QLineF transVec = QLineF::fromPolar(distInc, degAngle - 90);
+    QLineF transVec = sideLine;
+    transVec.setLength(distInc);
+    const QPointF transPt(transVec.dx(), transVec.dy());
     for(int i = 0; i < nLines; i++) {
-        const QLineF iLine = firstLine.translated(i*transVec.p2());
+        const QLineF iLine = firstLine.translated(i*transPt);
         QList<QPointF> intersections;
         for(auto& seg : segLists) {
-//                intersections.append(iLine.p1());
-//                intersections.append(iLine.p2());
-//                continue;
+//            intersections.append(iLine.p1());
+//            intersections.append(iLine.p2());
             seg.lineIntersections(iLine, intersections);
         }
 
