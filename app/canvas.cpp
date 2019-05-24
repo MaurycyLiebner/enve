@@ -214,7 +214,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
             canvas->concat(toSkMatrix(mCanvasTransform));
             canvas->scale(reversedRes, reversedRes);
-            mCurrentPreviewContainer->drawSk(canvas, nullptr, grContext);
+            mCurrentPreviewContainer->drawSk(canvas, grContext);
 
             canvas->restore();
         }
@@ -243,7 +243,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         if(drawCanvas) {
             canvas->save();
             canvas->scale(reversedRes, reversedRes);
-            mCurrentPreviewContainer->drawSk(canvas, nullptr, grContext);
+            mCurrentPreviewContainer->drawSk(canvas, grContext);
             canvas->restore();
         }
 

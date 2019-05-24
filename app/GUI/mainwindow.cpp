@@ -402,6 +402,36 @@ void MainWindow::setupMenuBar() {
 
     mViewMenu = mMenuBar->addMenu("View");
 
+    mLowQuality = mViewMenu->addAction("Low Display Quality", [this]() {
+        BoundingBox::sDisplayQuality = kNone_SkFilterQuality;
+        mCanvasWindow->requestUpdate();
+
+        mMediumQuality->setChecked(false);
+        mHighQuality->setChecked(false);
+    });
+    mLowQuality->setCheckable(true);
+    mLowQuality->setChecked(BoundingBox::sDisplayQuality == kNone_SkFilterQuality);
+    mMediumQuality = mViewMenu->addAction("Medium Display Quality", [this]() {
+        BoundingBox::sDisplayQuality = kLow_SkFilterQuality;
+        mCanvasWindow->requestUpdate();
+
+        mLowQuality->setChecked(false);
+        mHighQuality->setChecked(false);
+    });
+    mMediumQuality->setCheckable(true);
+    mMediumQuality->setChecked(BoundingBox::sDisplayQuality == kLow_SkFilterQuality);
+    mHighQuality = mViewMenu->addAction("High Display Quality", [this]() {
+        BoundingBox::sDisplayQuality = kHigh_SkFilterQuality;
+        mCanvasWindow->requestUpdate();
+
+        mLowQuality->setChecked(false);
+        mMediumQuality->setChecked(false);
+    });
+    mHighQuality->setCheckable(true);
+    mHighQuality->setChecked(BoundingBox::sDisplayQuality == kHigh_SkFilterQuality);
+
+    mViewMenu->addSeparator();
+
     mClipViewToCanvas = mViewMenu->addAction("Clip To Canvas");
     mClipViewToCanvas->setCheckable(true);
     mClipViewToCanvas->setChecked(true);

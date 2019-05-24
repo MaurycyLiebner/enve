@@ -75,6 +75,8 @@ public:
     static BoundingBox *sGetBoxByReadId(const int &readId);
     static void sClearReadBoxes();
     static void sAddWaitingForBoxLoad(const WaitingForBoxLoad& func);
+
+    static SkFilterQuality sDisplayQuality;
 private:
     static int sNextDocumentId;
     static QList<BoundingBox*> sDocumentBoxes;

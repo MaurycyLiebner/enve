@@ -20,6 +20,7 @@
 #include "Animators/qpointfanimator.h"
 #include "MovablePoints/pathpointshandler.h"
 
+SkFilterQuality BoundingBox::sDisplayQuality = kHigh_SkFilterQuality;
 int BoundingBox::sNextDocumentId;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
 
@@ -230,7 +231,7 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
     const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
     paint.setAlpha(static_cast<U8CPU>(intAlpha));
     paint.setBlendMode(mBlendModeSk);
-    //paint.setFilterQuality(kHigh_SkFilterQuality);
+    paint.setFilterQuality(sDisplayQuality);
     drawPixmapSk(canvas, &paint, grContext);
 }
 
@@ -238,7 +239,7 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
                                SkPaint * const paint,
                                GrContext* const grContext) {
     if(mTransformAnimator->getOpacity() < 0.001) return;
-    //paint->setFilterQuality(kHigh_SkFilterQuality);
+    paint->setFilterQuality(sDisplayQuality);
     mDrawRenderContainer.drawSk(canvas, paint, grContext);
 }
 
