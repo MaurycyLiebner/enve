@@ -55,8 +55,12 @@ void LinesPathEffect::apply(const qreal &relFrame, const SkPath &src,
 
 void LinesPathEffect::writeProperty(QIODevice * const target) const {
     PathEffect::writeProperty(target);
+    mAngle->writeProperty(target);
+    mDistance->writeProperty(target);
 }
 
 void LinesPathEffect::readProperty(QIODevice *target) {
     PathEffect::readProperty(target);
+    mAngle->writeProperty(target);
+    mDistance->writeProperty(target);
 }
