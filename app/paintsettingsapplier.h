@@ -60,6 +60,20 @@ private:
     Gradient * const mGradient;
 };
 
+class GradientPtsPosSetting : public PaintSetting {
+public:
+    GradientPtsPosSetting(const Target& target,
+                          const QPointF& pt1, const QPointF& pt2) :
+        PaintSetting(target), mPt1(pt1), mPt2(pt2) {}
+protected:
+    void applyToPS(PaintSettingsAnimator * const target) const {
+        target->setGradientPointsPos(mPt1, mPt2);
+    }
+private:
+    const QPointF mPt1;
+    const QPointF mPt2;
+};
+
 class GradientTypePaintSetting : public PaintSetting {
 public:
     GradientTypePaintSetting(const Target& target,

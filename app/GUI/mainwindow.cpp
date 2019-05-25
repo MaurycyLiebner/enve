@@ -1050,11 +1050,14 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
         //finishUndoRedoSet();
     } else if(obj == mCanvasWindow->getCanvasWidget()) {
         if(e->type() == QEvent::Drop) {
-            mCanvasWindow->dropEvent(static_cast<QDropEvent*>(e));
+            if(mCanvasWindow->dropEvent(static_cast<QDropEvent*>(e)))
+                return true;
         } else if(e->type() == QEvent::DragEnter) {
-            mCanvasWindow->dragEnterEvent(static_cast<QDragEnterEvent*>(e));
+            if(mCanvasWindow->dragEnterEvent(static_cast<QDragEnterEvent*>(e)))
+                return true;
         } else if(e->type() == QEvent::DragMove) {
-            mCanvasWindow->dragMoveEvent(static_cast<QDragMoveEvent*>(e));
+            if(mCanvasWindow->dragMoveEvent(static_cast<QDragMoveEvent*>(e)))
+                return true;
         } else if(e->type() == QEvent::FocusIn) {
             //mCanvasWindow->getCanvasWidget();
         }

@@ -112,7 +112,8 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
                                  disabled ? QColor(180, 160, 160) :
                                             QColor(255, 160, 160),
                                  key ? (disabled ? QColor(200, 90, 90) : Qt::red) :
-                                       (disabled ? Qt::darkGray : Qt::black));
+                                       (disabled ? Qt::darkGray : Qt::black),
+                                 disabled ? Qt::darkGray : Qt::black);
         } else {
             QDoubleSlider::paint(p, !isTargetDisabled() && isEnabled());
         }

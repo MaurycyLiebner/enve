@@ -35,10 +35,12 @@ void Gradient::addColorToList(const qsptr<ColorAnimator>& newColorAnimator) {
 }
 
 QColor Gradient::getCurrentColorAt(const int &id) {
+    if(id < 0 || id >= mColors.count()) return Qt::black;
     return mColors.at(id)->getCurrentColor();
 }
 
 ColorAnimator *Gradient::getColorAnimatorAt(const int &id) {
+    if(id < 0 || id >= mColors.count()) return nullptr;
     return mColors.at(id).get();
 }
 
@@ -47,10 +49,12 @@ int Gradient::getColorCount() {
 }
 
 QColor Gradient::getLastQGradientStopQColor() {
+    if(mQGradientStops.isEmpty()) return Qt::black;
     return mQGradientStops.last().second;
 }
 
 QColor Gradient::getFirstQGradientStopQColor() {
+    if(mQGradientStops.isEmpty()) return Qt::black;
     return mQGradientStops.first().second;
 }
 

@@ -131,9 +131,9 @@ public:
 
     bool isMouseGrabber();
 
-    void dropEvent(QDropEvent *event);
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dragMoveEvent(QDragMoveEvent *event);
+    bool dropEvent(QDropEvent *event);
+    bool dragEnterEvent(QDragEnterEvent *event);
+    bool dragMoveEvent(QDragMoveEvent *event);
 
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);

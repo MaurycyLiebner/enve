@@ -49,6 +49,8 @@ public:
     void setPaintType(const PaintType &paintType);
     ColorAnimator *getColorAnimator();
     void setGradientPoints(GradientPoints * const gradientPoints);
+    void setGradientPointsPos(const QPointF& pt1, const QPointF& pt2);
+
     void duplicateColorAnimatorFrom(ColorAnimator *source);
     void setGradientVar(Gradient * const grad);
     QColor getColorAtRelFrame(const qreal &relFrame) const;

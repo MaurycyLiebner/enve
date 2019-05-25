@@ -37,7 +37,8 @@ public:
     void paint(QPainter *p,
                const QColor &allFill,
                const QColor &sliderFill,
-               const QColor &stroke);
+               const QColor &stroke,
+               const QColor &text);
     void paint(QPainter * const p, const bool &enabled);
 
     void setPrefferedValueStep(const qreal &step);

@@ -109,6 +109,11 @@ void PaintSettingsAnimator::setGradientPoints(GradientPoints* const gradientPoin
     mGradientPoints = gradientPoints;
 }
 
+void PaintSettingsAnimator::setGradientPointsPos(const QPointF &pt1, const QPointF &pt2) {
+    if(!mGradientPoints) return;
+    mGradientPoints->setPositions(pt1, pt2);
+}
+
 OutlineSettingsAnimator::OutlineSettingsAnimator(GradientPoints * const grdPts,
                                                  PathBox * const parent) :
     OutlineSettingsAnimator(grdPts, parent, QColor(0, 0, 0),

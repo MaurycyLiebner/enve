@@ -28,30 +28,12 @@ private:
     QFont mFont;
 };
 
-class GradientsSvgCollection {
-public:
-    GradientsSvgCollection() {}
-
-    void addGradient(Gradient* gradient,
-                     const QString& name) {
-        mGradientNames << name;
-        mGradients << gradient;
-    }
-
-    Gradient* getGradientWithId(QString id) {
-        if(id.isEmpty()) return nullptr;
-        if(id.at(0) == '#') id.remove(0, 1);
-
-        for(int i = 0; i < mGradientNames.count(); i++) {
-            if(mGradientNames.at(i) == id) {
-                return mGradients.at(i);
-            }
-        }
-        return nullptr;
-    }
-private:
-    QList<QString> mGradientNames;
-    QList<Gradient*> mGradients;
+struct SvgGradient {
+    qsptr<Gradient> fGradient;
+    qreal fX1;
+    qreal fY1;
+    qreal fX2;
+    qreal fY2;
 };
 
 class FillSvgAttributes {
@@ -64,7 +46,7 @@ public:
 
     void setPaintType(const PaintType &type);
 
-    void setGradient(Gradient *gradient);
+    void setGradient(const SvgGradient& gradient);
 
     const QColor &getColor() const;
     const PaintType &getPaintType() const;
@@ -77,6 +59,8 @@ protected:
     QColor mColor = QColor(0, 0, 0);
     PaintType mPaintType = FLATPAINT;//NOPAINT;
     Gradient *mGradient = nullptr;
+    QPointF mGradientP1;
+    QPointF mGradientP2;
 };
 
 class StrokeSvgAttributes : public FillSvgAttributes {

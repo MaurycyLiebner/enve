@@ -1302,12 +1302,12 @@ void CanvasWindow::pushTimerExpired() {
     }
 }
 
-void CanvasWindow::dropEvent(QDropEvent *event) {
+bool CanvasWindow::dropEvent(QDropEvent *event) {
     const QMimeData* mimeData = event->mimeData();
 
     if(mimeData->hasUrls()) {
+        event->acceptProposedAction();
         const QList<QUrl> urlList = mimeData->urls();
-
         for(int i = 0; i < urlList.size() && i < 32; i++) {
             try {
                 const QPointF absPos = mCurrentCanvas->mapCanvasAbsToRel(
@@ -1317,18 +1317,25 @@ void CanvasWindow::dropEvent(QDropEvent *event) {
                 gPrintExceptionCritical(e);
             }
         }
-        event->acceptProposedAction();
+        return true;
     }
+    return false;
 }
 
-void CanvasWindow::dragEnterEvent(QDragEnterEvent *event) {
+bool CanvasWindow::dragEnterEvent(QDragEnterEvent *event) {
     if(event->mimeData()->hasUrls()) {
         event->acceptProposedAction();
+        return true;
     }
+    return false;
 }
 
-void CanvasWindow::dragMoveEvent(QDragMoveEvent *event) {
-    event->acceptProposedAction();
+bool CanvasWindow::dragMoveEvent(QDragMoveEvent *event) {
+    if(event->mimeData()->hasUrls()) {
+        event->acceptProposedAction();
+        return true;
+    }
+    return false;
 }
 
 void CanvasWindow::importFile(const QString &path,
