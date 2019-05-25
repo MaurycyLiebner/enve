@@ -704,6 +704,7 @@ void loadText(const QDomElement &pathElement,
     parentGroup->addContainedBox(textBox);
 }
 
+#include "GUI/GradientWidgets/gradientwidget.h"
 static QMap<QString, SvgGradient> gGradients;
 void loadElement(const QDomElement &element, ContainerBox *parentGroup,
                  const BoxSvgAttributes &parentGroupAttributes) {
@@ -723,6 +724,8 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
         qsptr<Gradient> gradient;
         if(linkId.isEmpty()) {
             gradient = SPtrCreate(Gradient)();
+            MainWindow::getInstance()->getFillStrokeSettings()->
+                    getGradientWidget()->addGradientToList(gradient);
             const QDomNodeList allRootChildNodes = element.childNodes();
             for(int i = 0; i < allRootChildNodes.count(); i++) {
                 const QDomNode iNode = allRootChildNodes.at(i);
@@ -752,6 +755,8 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
                 gradient = it.value().fGradient;
             } else {
                 gradient = SPtrCreate(Gradient)();
+                MainWindow::getInstance()->getFillStrokeSettings()->
+                        getGradientWidget()->addGradientToList(gradient);
             }
         }
         const QString x1 = element.attribute("x1");
