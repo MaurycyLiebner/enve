@@ -102,18 +102,14 @@ SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
     const qreal linesDistAtFrame =
             mLinesDist->getEffectiveValue(relFrame)*0.01;
     const QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
-    QFontMetricsF fm(mFont);
+    const QFontMetricsF fm(mFont);
     qreal maxWidth = 0;
     for(const auto& line : lines) {
         const qreal lineWidth = fm.width(line);
         if(lineWidth > maxWidth) maxWidth = lineWidth;
     }
 
-    SkFont font;
-    font.setTypeface(SkTypeface::MakeFromName(
-                     mFont.family().toStdString().c_str(),
-                     SkFontStyle::Normal()));
-    font.setSize(toSkScalar(mFont.pointSizeF()));
+    const SkFont font = toSkFont(mFont);
     SkPath result;
     //QPainterPath result;
     for(int i = 0; i < lines.count(); i++) {

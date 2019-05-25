@@ -14,6 +14,7 @@ extern inline SkScalar toSkScalar(const qreal &qr) {
     return static_cast<SkScalar>(qr);
 }
 
+extern SkFont toSkFont(const QFont& qfont);
 
 extern SkColor toSkColor(const QColor& qcol);
 

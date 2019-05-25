@@ -167,3 +167,26 @@ void switchSkQ(const qreal &q, SkScalar &sk) {
 void switchSkQ(const SkScalar &sk, qreal &q) {
     q = toQreal(sk);
 }
+#include <QFont>
+SkFont toSkFont(const QFont &qfont) {
+    SkFontStyle::Slant slant;
+    switch(qfont.style()) {
+    case QFont::StyleOblique:
+        slant = SkFontStyle::kOblique_Slant;
+        break;
+    case QFont::StyleItalic:
+        slant = SkFontStyle::kItalic_Slant;
+        break;
+    case QFont::StyleNormal:
+        slant = SkFontStyle::kUpright_Slant;
+        break;
+    }
+    SkFontStyle style(qfont.weight()*10, SkFontStyle::kNormal_Width, slant);
+
+    SkFont skFont;
+    const auto fmlStdStr = qfont.family().toStdString();
+    const auto typeface = SkTypeface::MakeFromName(fmlStdStr.c_str(), style);
+    skFont.setTypeface(typeface);
+    skFont.setSize(toSkScalar(qfont.pointSizeF()));
+    return skFont;
+}

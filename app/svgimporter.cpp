@@ -96,10 +96,8 @@ static qreal toDouble(const QChar *&str) {
 
 static qreal toDouble(const QString &str, bool *ok = nullptr) {
     const QChar *c = str.constData();
-    qreal res = toDouble(c);
-    if(ok) {
-        *ok = ((*c) == QLatin1Char('\0'));
-    }
+    const qreal res = toDouble(c);
+    if(ok) *ok = (*c == QLatin1Char('\0'));
     return res;
 }
 
@@ -586,6 +584,11 @@ void loadCircle(const QDomElement &pathElement,
         circle = SPtrCreate(Circle)();
         circle->setHorizontalRadius(rXstr.toDouble());
         circle->setVerticalRadius(rYstr.toDouble());
+    } else if(!rXstr.isEmpty() || !rYstr.isEmpty()) {
+        circle = SPtrCreate(Circle)();
+        const qreal rad = rXstr.isEmpty() ? rYstr.toDouble() : rXstr.toDouble();
+        circle->setHorizontalRadius(rad);
+        circle->setVerticalRadius(rad);
     } else return;
 
     circle->moveByRel(QPointF(cXstr.toDouble(), cYstr.toDouble()));
@@ -602,20 +605,24 @@ void loadRect(const QDomElement &pathElement,
     const QString yStr = pathElement.attribute("y");
     const QString wStr = pathElement.attribute("width");
     const QString hStr = pathElement.attribute("height");
-    QString rYstr = pathElement.attribute("ry");
-    QString rXstr = pathElement.attribute("rx");
-
-    if(rXstr.isEmpty() && rYstr.isEmpty()) return;
-    if(rYstr.isEmpty()) rYstr = rXstr;
-    else if(rXstr.isEmpty()) rXstr = rYstr;
+    const QString rYstr = pathElement.attribute("ry");
+    const QString rXstr = pathElement.attribute("rx");
 
     auto rect = SPtrCreate(Rectangle)();
 
     rect->moveByRel(QPointF(xStr.toDouble(), yStr.toDouble()));
     rect->setTopLeftPos(QPointF(0, 0));
     rect->setBottomRightPos(QPointF(wStr.toDouble(), hStr.toDouble()));
-    rect->setYRadius(rYstr.toDouble());
-    rect->setXRadius(rXstr.toDouble());
+    if(rYstr.isEmpty()) {
+        rect->setYRadius(rXstr.toDouble());
+        rect->setXRadius(rXstr.toDouble());
+    } else if(rXstr.isEmpty()) {
+        rect->setYRadius(rYstr.toDouble());
+        rect->setXRadius(rYstr.toDouble());
+    } else {
+        rect->setYRadius(rYstr.toDouble());
+        rect->setXRadius(rXstr.toDouble());
+    }
 
     attributes.apply(rect.data());
     parentGroup->addContainedBox(rect);
@@ -641,28 +648,27 @@ void loadText(const QDomElement &pathElement,
 
 void loadElement(const QDomElement &element, ContainerBox *parentGroup,
                  const BoxSvgAttributes &parentGroupAttributes) {
-    if(element.tagName() == "path" || element.tagName() == "path") {
+    const QString tagName = element.tagName();
+    if(tagName == "path" || tagName == "polyline") {
         VectorPathSvgAttributes attributes;
         attributes.setParent(parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
-        if(element.tagName() == "path") {
+        if(tagName == "path") {
             loadVectorPath(element, parentGroup, attributes);
-        } else { // if(element.tagName() == "polyline") {
+        } else { // if(tagName == "polyline") {
             loadPolyline(element, parentGroup, attributes);
         }
     } else {
         BoxSvgAttributes attributes;
         attributes.setParent(parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
-        if(element.tagName() == "g" ||
-           element.tagName() == "text") {
+        if(tagName == "g" || tagName == "text") {
             loadBoxesGroup(element, parentGroup, attributes);
-        } else if(element.tagName() == "circle" ||
-                  element.tagName() == "ellipse") {
+        } else if(tagName == "circle" || tagName == "ellipse") {
             loadCircle(element, parentGroup, attributes);
-        } else if(element.tagName() == "rect") {
+        } else if(tagName == "rect") {
             loadRect(element, parentGroup, attributes);
-        } else if(element.tagName() == "tspan") {
+        } else if(tagName == "tspan") {
             loadText(element, parentGroup, attributes);
         }
     }
@@ -733,10 +739,75 @@ bool getFlatColorFromString(const QString &colorStr, FillSvgAttributes *target) 
     return true;
 }
 
-QMatrix getMatrixFromString(const QString &matrixStr) {
-    QMatrix matrix;
-    if(matrixStr.isEmpty()) return matrix;
+bool extractTranslation(const QString& str, QMatrix& target) {
+    const QRegExp rx1("translate\\("
+                      "\\s*(-?\\d+(\\.\\d*)?)"
+                      "\\)", Qt::CaseInsensitive);
+    if(rx1.exactMatch(str)) {
+        rx1.indexIn(str);
+        const QStringList capturedTxt = rx1.capturedTexts();
+        target.translate(capturedTxt.at(1).toDouble(),
+                         capturedTxt.at(1).toDouble());
+        return true;
+    }
 
+    const QRegExp rx2("translate\\("
+                      "\\s*(-?\\d+(\\.\\d*)?),"
+                      "\\s*(-?\\d+(\\.\\d*)?)"
+                      "\\)", Qt::CaseInsensitive);
+    if(rx2.exactMatch(str)) {
+        rx2.indexIn(str);
+        const QStringList capturedTxt = rx2.capturedTexts();
+        target.translate(capturedTxt.at(1).toDouble(),
+                         capturedTxt.at(3).toDouble());
+        return true;
+    }
+
+    return false;
+}
+
+
+bool extractScale(const QString& str, QMatrix& target) {
+    const QRegExp rx1("scale\\("
+                      "\\s*(-?\\d+(\\.\\d*)?)"
+                      "\\)", Qt::CaseInsensitive);
+    if(rx1.exactMatch(str)) {
+        rx1.indexIn(str);
+        const QStringList capturedTxt = rx1.capturedTexts();
+        target.scale(capturedTxt.at(1).toDouble(),
+                     capturedTxt.at(1).toDouble());
+        return true;
+    }
+
+    const QRegExp rx2("scale\\("
+                      "\\s*(-?\\d+(\\.\\d*)?),"
+                      "\\s*(-?\\d+(\\.\\d*)?)"
+                      "\\)", Qt::CaseInsensitive);
+    if(rx2.exactMatch(str)) {
+        rx2.indexIn(str);
+        const QStringList capturedTxt = rx2.capturedTexts();
+        target.scale(capturedTxt.at(1).toDouble(),
+                     capturedTxt.at(3).toDouble());
+        return true;
+    }
+
+    return false;
+}
+
+bool extractRotate(const QString& str, QMatrix& target) {
+    const QRegExp rx5("rotate\\("
+                      "\\s*(-?\\d+(\\.\\d*)?)"
+                      "\\)", Qt::CaseInsensitive);
+    if(rx5.exactMatch(str)) {
+        rx5.indexIn(str);
+        const QStringList capturedTxt = rx5.capturedTexts();
+        target.rotate(capturedTxt.at(1).toDouble());
+        return true;
+    }
+    return false;
+}
+
+bool extractWholeMatrix(const QString& str, QMatrix& target) {
     const QRegExp rx("matrix\\("
                      "\\s*(-?\\d+(\\.\\d*)?),"
                      "\\s*(-?\\d+(\\.\\d*)?),"
@@ -745,51 +816,30 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
                      "\\s*(-?\\d+(\\.\\d*)?),"
                      "\\s*(-?\\d+(\\.\\d*)?)"
                      "\\)", Qt::CaseInsensitive);
-    if(rx.exactMatch(matrixStr)) {
-        rx.indexIn(matrixStr);
+    if(rx.exactMatch(str)) {
+        rx.indexIn(str);
         const QStringList capturedTxt = rx.capturedTexts();
-        matrix.setMatrix(capturedTxt.at(1).toDouble(),
+        target.setMatrix(capturedTxt.at(1).toDouble(),
                          capturedTxt.at(3).toDouble(),
                          capturedTxt.at(5).toDouble(),
                          capturedTxt.at(7).toDouble(),
                          capturedTxt.at(9).toDouble(),
                          capturedTxt.at(11).toDouble());
-    } else {
-        const QRegExp rx2("translate\\("
-                          "\\s*(-?\\d+(\\.\\d*)?),"
-                          "\\s*(-?\\d+(\\.\\d*)?)"
-                          "\\)", Qt::CaseInsensitive);
-        if(rx2.exactMatch(matrixStr)) {
-            rx2.indexIn(matrixStr);
-            const QStringList capturedTxt = rx2.capturedTexts();
-            matrix.translate(capturedTxt.at(1).toDouble(),
-                             capturedTxt.at(3).toDouble());
-        } else {
-            const QRegExp rx3("scale\\("
-                              "\\s*(-?\\d+(\\.\\d*)?),"
-                              "\\s*(-?\\d+(\\.\\d*)?)"
-                              "\\)", Qt::CaseInsensitive);
-            if(rx3.exactMatch(matrixStr)) {
-                rx3.indexIn(matrixStr);
-                const QStringList capturedTxt = rx3.capturedTexts();
-                matrix.scale(capturedTxt.at(1).toDouble(),
-                             capturedTxt.at(3).toDouble());
-            } else {
-                const QRegExp rx4("rotate\\("
-                                  "\\s*(-?\\d+(\\.\\d*)?)"
-                                  "\\)", Qt::CaseInsensitive);
-                if(rx4.exactMatch(matrixStr)) {
-                    rx4.indexIn(matrixStr);
-                    const QStringList capturedTxt = rx4.capturedTexts();
-                    matrix.rotate(capturedTxt.at(1).toDouble());
-                } else {
-                    qDebug() << "getMatrixFromString - could not extract values from string: "
-                             << endl << matrixStr;
-                }
-            }
-        }
+        return true;
     }
+    return false;
+}
 
+QMatrix getMatrixFromString(const QString &str) {
+    QMatrix matrix;
+    if(str.isEmpty()) return matrix;
+    const bool found = str.isEmpty() ||
+                       extractWholeMatrix(str, matrix) ||
+                       extractTranslation(str, matrix) ||
+                       extractScale(str, matrix) ||
+                       extractRotate(str, matrix);
+    if(!found) qDebug() << "getMatrixFromString - could not extract "
+                           "values from string:" << endl << str;
     return matrix;
 }
 
@@ -891,6 +941,12 @@ void BoxSvgAttributes::setStrokeAttribute(const QString &value) {
     }
 }
 
+QString stripPx(const QString& val) {
+    QString result = val;
+    result.remove("px");
+    return result;
+}
+
 void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
     QList<SvgAttribute> styleAttributes;
     const QString styleAttributesStr = element.attribute("style");
@@ -934,9 +990,11 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
             } else if(name == "fill-opacity") {
                 mFillAttributes.setColorOpacity(toDouble(value));
             } else if(name == "font-family") {
-                mTextAttributes.setFontFamily(value);
+                QString stripQuotes = value;
+                stripQuotes.remove("'");
+                mTextAttributes.setFontFamily(stripQuotes);
             } else if(name == "font-size") {
-                mTextAttributes.setFontSize(value.toInt());
+                mTextAttributes.setFontSize(qRound(stripPx(value).toDouble()));
             } else if(name == "font-style") {
                 if(value == "normal") {
                     mTextAttributes.setFontStyle(QFont::StyleNormal);
@@ -954,24 +1012,11 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
                     mTextAttributes.setFontWeight(QFont::ExtraBold);
                 } else if(value == "lighter") {
                     mTextAttributes.setFontWeight(QFont::ExtraLight);
-                } else if(value == "100") {
-                    mTextAttributes.setFontWeight(10);
-                } else if(value == "200") {
-                    mTextAttributes.setFontWeight(20);
-                } else if(value == "300") {
-                    mTextAttributes.setFontWeight(30);
-                } else if(value == "400") {
-                    mTextAttributes.setFontWeight(40);
-                } else if(value == "500") {
-                    mTextAttributes.setFontWeight(50);
-                } else if(value == "600") {
-                    mTextAttributes.setFontWeight(60);
-                } else if(value == "700") {
-                    mTextAttributes.setFontWeight(70);
-                } else if(value == "800") {
-                    mTextAttributes.setFontWeight(80);
-                } else if(value == "900") {
-                    mTextAttributes.setFontWeight(90);
+                } else {
+                    bool ok;
+                    const int val = value.toInt(&ok);
+                    if(ok) mTextAttributes.setFontWeight(val/10);
+                    else qDebug() << "Unrecognized font-weight '" + value + "'";
                 }
             } else if(name == "font-variant") {
                 //fontVariant = value;
@@ -979,8 +1024,7 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
             break;
 
         case 'i':
-            if(name == "id")
-                mId = value;
+            if(name == "id") mId = value;
             break;
 
         case 'o':
@@ -1025,9 +1069,8 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
                                     mStrokeAttributes.getLineWidth()*
                                     value.toDouble()/100.);
                     } else {
-                        QString pxLessValue = value;
-                        pxLessValue.remove("px");
-                        mStrokeAttributes.setLineWidth(pxLessValue.toDouble());
+                        mStrokeAttributes.setLineWidth(
+                                    stripPx(value).toDouble());
                     }
                 }
             } else if(name == "stop-color") {
@@ -2147,7 +2190,7 @@ void TextSvgAttributes::setFontFamily(const QString &family) {
 }
 
 void TextSvgAttributes::setFontSize(const int &size) {
-    mFont.setPixelSize(size);
+    mFont.setPointSize(size);
 }
 
 void TextSvgAttributes::setFontStyle(const QFont::Style &style) {
