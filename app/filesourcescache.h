@@ -18,7 +18,7 @@ bool isVideoExt(const QString &extension);
 bool isSoundExt(const QString &extension);
 bool isVectorExt(const QString &extension);
 bool isImageExt(const QString &extension);
-bool isAvExt(const QString &extension);
+bool isEvExt(const QString &extension);
 
 
 namespace FileSourcesCache {

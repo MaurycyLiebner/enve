@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
     KEY_RECT_SIZE = MIN_WIDGET_HEIGHT*3/5;
     av_register_all();
 
-    QFile customSS(QDir::homePath() + "/.AniVect/" + "stylesheet.qss");
+    QFile customSS(QDir::homePath() + "/.enve/stylesheet.qss");
     if(customSS.exists()) {
         if(customSS.open(QIODevice::ReadOnly | QIODevice::Text)) {
             setStyleSheet(customSS.readAll());
@@ -70,9 +70,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }
     //setMouseTracking(true);
-    //mSoundComposition = new SoundComposition();
-//    mSoundComposition->addSound(
-//                new SingleSound("/home/ailuropoda/.Qt_pro/build-AniVect-Desktop_Qt_5_7_0_GCC_64bit-Debug/lektor.wav"));
     BoxSingleWidget::loadStaticPixmaps();
     setupToolBar();
     setupStatusBar();
@@ -1135,14 +1132,14 @@ void MainWindow::setCurrentPath(QString newPath) {
 void MainWindow::updateTitle() {
     QString star = "";
     if(mChangedSinceSaving) star = "*";
-    setWindowTitle(mCurrentFilePath.split("/").last() + star + " - AniVect");
+    setWindowTitle(mCurrentFilePath.split("/").last() + star + " - enve");
 }
 
 void MainWindow::openFile() {
     if(askForSaving()) {
         disable();
         const QString openPath = QFileDialog::getOpenFileName(this,
-            "Open File", mCurrentFilePath, "AniVect Files (*.av)");
+            "Open File", mCurrentFilePath, "enve Files (*.ev)");
         if(!openPath.isEmpty()) {
             openFile(openPath);
         }
@@ -1153,7 +1150,7 @@ void MainWindow::openFile() {
 void MainWindow::openFile(const QString& openPath) {
     clearAll();
     try {
-        loadAVFile(openPath);
+        loadEVFile(openPath);
         setCurrentPath(openPath);
         setFileChangedSinceSaving(false);
         addRecentFile(openPath);
@@ -1179,7 +1176,7 @@ void MainWindow::saveFileAs() {
     disableEventFilter();
     const QString saveAs = QFileDialog::getSaveFileName(this, "Save File",
                                mCurrentFilePath,
-                               "AniVect Files (*.av)");
+                               "enve Files (*.ev)");
     enableEventFilter();
     if(!saveAs.isEmpty()) {
         try {
@@ -1193,7 +1190,7 @@ void MainWindow::saveFileAs() {
 }
 
 void MainWindow::saveBackup() {
-    const QString backupPath = "backup/backup_%1.av";
+    const QString backupPath = "backup/backup_%1.ev";
     int id = 1;
     QFile backupFile(backupPath.arg(id));
     while(backupFile.exists()) {
@@ -1219,7 +1216,7 @@ bool MainWindow::closeProject() {
 void MainWindow::linkFile() {
     disableEventFilter();
     QStringList importPaths = QFileDialog::getOpenFileNames(this,
-        "Link File", "", "AniVect Files (*.av)");
+        "Link File", "", "enve Files (*.ev)");
     enableEventFilter();
     if(!importPaths.isEmpty()) {
         for(const QString &path : importPaths) {
@@ -1254,7 +1251,7 @@ void MainWindow::importImageSequence() {
 void MainWindow::revert() {
     clearAll();
     try {
-        loadAVFile(mCurrentFilePath);
+        loadEVFile(mCurrentFilePath);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
     }

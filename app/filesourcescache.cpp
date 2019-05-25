@@ -76,7 +76,7 @@ bool isImageExt(const QString &extension) {
            extension == "jpg";
 }
 
-bool isAvExt(const QString &extension) {
+bool isEvExt(const QString &extension) {
     return extension == "av";
 }
 
@@ -102,5 +102,5 @@ bool hasImageExt(const QString &filename) {
 
 bool hasAvExt(const QString &filename) {
     QString extension = filename.split(".").last();
-    return isAvExt(extension);
+    return isEvExt(extension);
 }

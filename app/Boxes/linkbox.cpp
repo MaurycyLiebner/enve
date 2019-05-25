@@ -23,7 +23,7 @@ void ExternalLinkBox::changeSrc(QWidget* dialogParent) {
     QString src = QFileDialog::getOpenFileName(dialogParent,
                                                "Link File",
                                                "",
-                                               "AniVect Files (*.av)");
+                                               "enve Files (*.ev)");
     if(!src.isEmpty()) setSrc(src);
 }
 

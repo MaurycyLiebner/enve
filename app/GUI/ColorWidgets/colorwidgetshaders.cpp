@@ -126,7 +126,7 @@ void iniGradientProgram(QGL33c *gl, const std::string& colorShadersPath) {
 
 void iniColorPrograms(QGL33c *gl) {
     std::string colorShadersPath =
-            "/home/ailuropoda/Dev/AniVect/src/app/GUI/"
+            "/home/ailuropoda/Dev/enve/src/app/GUI/"
             "ColorWidgets/colorwidgetshaders/";
 
     try {

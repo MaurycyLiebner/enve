@@ -97,7 +97,7 @@ public:
     CanvasWindow *getCanvasWindow() { return mCanvasWindow; }
     FillStrokeSettingsWidget *getFillStrokeSettings();
     void saveToFile(const QString &path);
-    void loadAVFile(const QString &path);
+    void loadEVFile(const QString &path);
     void clearAll();
     void setCurrentPath(QString newPath);
     void updateTitle();
@@ -217,7 +217,7 @@ private:
     }
 
     void readRecentFiles() {
-        QFile file(QDir::homePath() + "/.AniVect/recent");
+        QFile file(QDir::homePath() + "/.enve/recent");
         if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QTextStream stream(&file);
             while(!stream.atEnd()) {
@@ -230,7 +230,7 @@ private:
     }
 
     void writeRecentFiles() {
-        QFile file(QDir::homePath() + "/.AniVect/recent");
+        QFile file(QDir::homePath() + "/.enve/recent");
         if(file.open(QIODevice::WriteOnly | QIODevice::Text |
                      QIODevice::Truncate)) {
             QTextStream stream(&file);

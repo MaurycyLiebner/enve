@@ -9,11 +9,11 @@
 #include <iostream>
 
 std::string GL_PLAIN_VERT =
-        "/home/ailuropoda/Dev/AniVect/src/shaders/plain.vert";
+        ":/shaders/plain.vert";
 GLuint GL_PLAIN_SQUARE_VBO;
 
 std::string GL_TEXTURED_VERT =
-        "/home/ailuropoda/Dev/AniVect/src/shaders/textured.vert";
+        ":/shaders/textured.vert";
 GLuint GL_TEXTURED_SQUARE_VBO;
 
 void checkGlErrors(const std::string& msg) {
@@ -103,7 +103,7 @@ void checkCompileErrors(QGL33c* gl,
         }
     }
 }
-
+#include <QFile>
 void iniProgram(QGL33c* gl,
                 GLuint& program,
                 const std::string& vShaderPath,
@@ -116,18 +116,19 @@ void iniProgram(QGL33c* gl,
     vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
-        // open files
-        vShaderFile.open(vShaderPath);
+        // Use QFile to enable reading from resource file
+        QFile vShaderFile(QString::fromStdString(vShaderPath));
+        if(!vShaderFile.open(QIODevice::ReadOnly))
+            RuntimeThrow("Could not open " + vShaderPath);
+        const QByteArray vData = vShaderFile.readAll();
+        vertexCode = vData.toStdString();
+
         fShaderFile.open(fShaderPath);
-        std::stringstream vShaderStream, fShaderStream;
-        // read file's buffer contents into streams
-        vShaderStream << vShaderFile.rdbuf();
+        if(!fShaderFile.is_open())
+            RuntimeThrow("Could not open " + fShaderPath);
+        std::stringstream fShaderStream;
         fShaderStream << fShaderFile.rdbuf();
-        // close file handlers
-        vShaderFile.close();
         fShaderFile.close();
-        // convert stream into string
-        vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
     } catch(...) {
         RuntimeThrow("Could not load shader data from file.");

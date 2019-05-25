@@ -1362,8 +1362,8 @@ void CanvasWindow::importFile(const QString &path,
             const auto vidBox = SPtrCreate(VideoBox)();
             importedBox = vidBox;
             vidBox->setFilePath(path);
-        } else if(isAvExt(extension)) {
-            MainWindow::getInstance()->loadAVFile(path);
+        } else if(isEvExt(extension)) {
+            MainWindow::getInstance()->loadEVFile(path);
         } else {
             mCurrentCanvas->unblockUndoRedo();
             RuntimeThrow("Unrecognized file extension " +

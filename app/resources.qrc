@@ -117,4 +117,8 @@
         <file alias="cursor-pen.xpm">pixmaps/cursor-pen.xpm</file>
         <file alias="cursor-crosshairs.xpm">pixmaps/cursor-crosshairs.xpm</file>
     </qresource>
+    <qresource prefix="/shaders">
+        <file alias="plain.vert">../shaders/plain.vert</file>
+        <file alias="textured.vert">../shaders/textured.vert</file>
+    </qresource>
 </RCC>

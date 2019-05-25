@@ -49,7 +49,7 @@ LIBS += -lskia -lpthread -lfreetype -lpng -ldl -lSDL2 -lSDL2_image \
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = AniVect
+TARGET = enve
 TEMPLATE = app
 
 SOURCES += main.cpp\
@@ -78,6 +78,7 @@ SOURCES += main.cpp\
     GUI/ColorWidgets/savedcolorwidgets.cpp \
     GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
+    evfileio.cpp \
     svgimporter.cpp \
     Animators/coloranimator.cpp \
     Animators/qstringanimator.cpp \
@@ -134,7 +135,6 @@ SOURCES += main.cpp\
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
     Boxes/paintbox.cpp \
-    avfileio.cpp \
     GUI/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
     GUI/BoxesList/boxscrollarea.cpp \
@@ -287,6 +287,7 @@ HEADERS  += \
     GUI/ColorWidgets/savedcolorwidgets.h \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
+    evfileio.h \
     svgimporter.h \
     keypoint.h \
     Animators/qstringanimator.h \
@@ -343,7 +344,6 @@ HEADERS  += \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h \
     Boxes/paintbox.h \
-    avfileio.h \
     GUI/paintboxsettingsdialog.h \
     execdelegator.h \
     GUI/BoxesList/boxscrollarea.h \

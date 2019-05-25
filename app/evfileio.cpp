@@ -1,4 +1,4 @@
-#include "avfileio.h"
+#include "evfileio.h"
 #include <fstream>
 #include "Animators/qrealanimator.h"
 #include "Animators/randomqrealgenerator.h"
@@ -43,14 +43,10 @@
 #include "Boxes/smartvectorpath.h"
 #include "Sound/singlesound.h"
 
-#define FORMAT_STR "AniVect av"
-#define CREATOR_VERSION "0.0a"
-#define CREATOR_APPLICATION "AniVect"
-
 class FileFooter {
 public:
     static bool sWrite(QIODevice * const target) {
-        return target->write(rcConstChar(sAVFormat), sizeof(char[15])) &&
+        return target->write(rcConstChar(sEVFormat), sizeof(char[15])) &&
                target->write(rcConstChar(sAppName), sizeof(char[15])) &&
                target->write(rcConstChar(sAppVersion), sizeof(char[15]));
     }
@@ -63,7 +59,7 @@ public:
 
         char format[15];
         target->read(rcChar(format), sizeof(char[15]));
-        if(std::strcmp(format, sAVFormat)) return false;
+        if(std::strcmp(format, sEVFormat)) return false;
 
 //        char appVersion[15];
 //        target->read(rcChar(appVersion), sizeof(char[15]));
@@ -76,14 +72,14 @@ public:
         return true;
     }
 private:
-    static char sAVFormat[15];
+    static char sEVFormat[15];
     static char sAppName[15];
     static char sAppVersion[15];
 };
 
-char FileFooter::sAVFormat[15] = "AniVect av";
-char FileFooter::sAppName[15] = "AniVect";
-char FileFooter::sAppVersion[15] = "0.0";
+char FileFooter::sEVFormat[15] = "enve ev";
+char FileFooter::sAppName[15] = "enve";
+char FileFooter::sAppVersion[15] = "0.5";
 
 void ComboBoxProperty::writeProperty(QIODevice * const target) const {
     target->write(rcConstChar(&mCurrentValue), sizeof(int));
@@ -1135,7 +1131,7 @@ void CanvasWindow::readCanvases(QIODevice *target) {
     setCurrentCanvas(GetAsPtr(currentCanvas, Canvas));
 }
 
-void MainWindow::loadAVFile(const QString &path) {
+void MainWindow::loadEVFile(const QString &path) {
     QFile target(path);
     if(!target.exists()) RuntimeThrow("File does not exist " + path.toStdString());
     if(!target.open(QIODevice::ReadOnly))

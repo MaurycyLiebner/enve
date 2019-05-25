@@ -58,7 +58,7 @@ void GLWindow::resizeEvent(QResizeEvent *) {
 #include "ColorWidgets/colorwidgetshaders.h"
 #include "GPUEffects/gpurastereffect.h"
 void GLWindow::iniRasterEffectPrograms() {
-    QDirIterator dirIt(QDir::homePath() + "/.AniVect/GPURasterEffects", QDirIterator::NoIteratorFlags);
+    QDirIterator dirIt(QDir::homePath() + "/.enve/GPURasterEffects", QDirIterator::NoIteratorFlags);
     while(dirIt.hasNext()) {
         const QString path = dirIt.next();
         const QFileInfo fileInfo(path);
