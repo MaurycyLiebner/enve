@@ -49,6 +49,22 @@ public:
     void createSegment(const int& node1Id, const int& node2Id);
     void removeSegment(const NormalSegment &segment);
 
+    int getPrevNodeId(const int& startId) const {
+        return targetPath()->prevNodeId(startId);
+    }
+
+    int getNextNodeId(const int& startId) const {
+        return targetPath()->nextNodeId(startId);
+    }
+
+    SmartNodePoint* getPrevNode(const int& startId) const {
+        return getPointWithId<SmartNodePoint>(getPrevNodeId(startId));
+    }
+
+    SmartNodePoint* getNextNode(const int& startId) const {
+        return getPointWithId<SmartNodePoint>(getNextNodeId(startId));
+    }
+
     SmartNodePoint* getPrevNormalNode(const int& startId) const {
         return getPointWithId<SmartNodePoint>(targetPath()->prevNormalId(startId));
     }

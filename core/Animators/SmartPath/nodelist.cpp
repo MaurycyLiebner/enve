@@ -417,15 +417,15 @@ void NodeList::setPath(const SkPath &path) {
 }
 
 qreal NodeList::prevT(const int &nodeId) const {
-    if(nodeId == 0) return 0;
-    const Node * const node = mNodes.at(nodeId - 1);
+    const Node * const node = prevNode(nodeId);
+    if(!node) return 0;
     if(node->isNormal()) return 0;
     return node->t();
 }
 
 qreal NodeList::nextT(const int &nodeId) const {
-    if(nodeId == mNodes.count() - 1) return 1;
-    const Node * const node = mNodes.at(nodeId + 1);
+    const Node * const node = nextNode(nodeId);
+    if(!node) return 1;
     if(node->isNormal()) return 1;
     return node->t();
 }

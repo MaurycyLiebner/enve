@@ -80,7 +80,7 @@ public:
     int nodesCount() const;
 
     int innerNodesCount() const {
-        return mInnerDnD.count();
+        return mInnerDissolved.count();
     }
 
     SmartNodePoint* getNodeAt(const int& id) const;
@@ -97,13 +97,13 @@ public:
                                             qreal& minDist) const;
 
     void afterChanged() const {
-        updateDnDPos();
+        updateDissolvedPos();
     }
 
     qCubicSegment2D getAsAbsSegment() const;
     qCubicSegment2D getAsRelSegment() const;
 
-    void updateDnD();
+    void updateDissolved();
 
     qreal closestRelT(const QPointF& relPos) const {
         return getAsRelSegment().tValueForPointClosestTo(relPos);
@@ -113,14 +113,14 @@ public:
         return getAsAbsSegment().tValueForPointClosestTo(absPos);
     }
 private:
-    void updateDnDPos() const;
+    void updateDissolvedPos() const;
     SubSegment subSegmentAtT(const qreal& t) const;
 
     SkPath mSkPath;
     stdptr<PathPointsHandler> mHandler_k;
     stdptr<SmartNodePoint> mFirstNode;
     stdptr<SmartCtrlPoint> mFirstNodeC2;
-    QList<stdptr<SmartNodePoint>> mInnerDnD;
+    QList<stdptr<SmartNodePoint>> mInnerDissolved;
     stdptr<SmartCtrlPoint> mLastNodeC0;
     stdptr<SmartNodePoint> mLastNode;
 };

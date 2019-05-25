@@ -1,10 +1,31 @@
 ﻿#ifndef EXCEPTIONS_H
 #define EXCEPTIONS_H
 #include <exception>
+#include <csignal>
 #include <QDebug>
 #define ERROUT(msg) qDebug() << msg << __LINE__
 #define FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
-#define RuntimeThrow(msg) std::throw_with_nested(std::runtime_error(std::to_string(__LINE__) + "  :  " + FILENAME + "  :  " + __func__ + "()\n" + msg))
+
+#ifdef QT_DEBUG
+// Breakpoint for QT_DEBUG
+    #define RuntimeThrow(msg) \
+    std::throw_with_nested(\
+        std::runtime_error(\
+            (std::raise(SIGTRAP) ? "" : "") + \
+            std::to_string(__LINE__) + "  :  " + \
+            FILENAME + "  :  " + __func__ + "()\n" + msg\
+        )\
+    )
+#else
+    #define RuntimeThrow(msg) \
+    std::throw_with_nested(\
+        std::runtime_error(\
+            std::to_string(__LINE__) + "  :  " + \
+            FILENAME + "  :  " + __func__ + "()\n" + msg\
+        )\
+    )
+#endif
+
 #define CheckInvalidLocation(vLoc, name) \
     if(vLoc < 0) { \
         checkGlErrors(); \

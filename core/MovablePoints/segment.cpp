@@ -19,7 +19,7 @@ NormalSegment::NormalSegment(SmartNodePoint * const firstNode,
     if(mFirstNode) mFirstNodeC2 = mFirstNode->getC2Pt();
     mLastNode = lastNode;
     if(mLastNode) mLastNodeC0 = mLastNode->getC0Pt();
-    updateDnD();
+    updateDissolved();
 }
 
 SmartNodePoint *NormalSegment::divideAtAbsPos(const QPointF &absPos) {
@@ -37,14 +37,14 @@ void NormalSegment::disconnect() const {
 }
 
 int NormalSegment::nodesCount() const {
-    return mInnerDnD.count() + (mFirstNode ? 1 : 0) + (mLastNode ? 1 : 0);
+    return mInnerDissolved.count() + (mFirstNode ? 1 : 0) + (mLastNode ? 1 : 0);
 }
 
 SmartNodePoint *NormalSegment::getNodeAt(const int &id) const {
     if(id < 0 || id >= nodesCount()) return nullptr;
     if(id == 0) return mFirstNode;
     const int innerId = id - 1;
-    if(innerId < mInnerDnD.count()) mInnerDnD.at(innerId);
+    if(innerId < mInnerDissolved.count()) mInnerDissolved.at(innerId);
     return mLastNode;
 }
 
@@ -53,7 +53,7 @@ NormalSegment::SubSegment NormalSegment::getClosestSubSegmentForDummy(
     auto prevNode = mFirstNode;
     minDist = TEN_MIL;
     SubSegment bestSeg{nullptr, nullptr, nullptr};
-    for(const auto &nextNode : mInnerDnD) {
+    for(const auto &nextNode : mInnerDissolved) {
         const auto subSeg = SubSegment{prevNode, nextNode, this};
         const QPointF halfPos = subSeg.getRelPosAtT(0.5);
         const qreal dist = pointToLen(halfPos - relPos);
@@ -73,8 +73,8 @@ NormalSegment::SubSegment NormalSegment::getClosestSubSegmentForDummy(
     return bestSeg;
 }
 
-void NormalSegment::updateDnDPos() const {
-    for(const auto& inner : mInnerDnD)
+void NormalSegment::updateDissolvedPos() const {
+    for(const auto& inner : mInnerDissolved)
         inner->updateFromNodeDataPosOnly();
 }
 
@@ -169,15 +169,17 @@ qCubicSegment2D NormalSegment::getAsRelSegment() const {
             mLastNode->getRelativePos()};
 }
 
-void NormalSegment::updateDnD() {
-    mInnerDnD.clear();
+void NormalSegment::updateDissolved() {
+    mInnerDissolved.clear();
     if(!mFirstNode || !mLastNode) return;
-    auto currNode = mFirstNode->getNextPoint();
-    while(currNode && currNode != mLastNode) {
-        mInnerDnD << currNode;
-        currNode = currNode->getNextPoint();
+    int currId = mHandler_k->getNextNodeId(mFirstNode->getNodeId());
+    auto currNode = mHandler_k->getPointWithId<SmartNodePoint>(currId);
+    while(currNode && currNode != mLastNode && currNode != mFirstNode) {
+        mInnerDissolved << currNode;
+        currId = mHandler_k->getNextNodeId(currId);
+        currNode = mHandler_k->getPointWithId<SmartNodePoint>(currId);
     }
-    updateDnDPos();
+    updateDissolvedPos();
 }
 
 NormalSegment::SubSegment NormalSegment::subSegmentAtT(const qreal &t) const {
@@ -185,7 +187,7 @@ NormalSegment::SubSegment NormalSegment::subSegmentAtT(const qreal &t) const {
     SmartNodePoint* lastNode = mLastNode;
     qreal firstNodeT = 0;
     qreal lastNodeT = 1;
-    for(const auto& inner : mInnerDnD) {
+    for(const auto& inner : mInnerDissolved) {
         const qreal innerT = inner->getT();
         if(innerT < t && innerT > firstNodeT) {
             firstNodeT = innerT;
@@ -221,7 +223,7 @@ void NormalSegment::clear() {
     mFirstNodeC2 = nullptr;
     mLastNodeC0 = nullptr;
     mLastNode = nullptr;
-    mInnerDnD.clear();
+    mInnerDissolved.clear();
 }
 
 qreal NormalSegment::SubSegment::getMinT() const {
