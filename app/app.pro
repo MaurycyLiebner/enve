@@ -4,6 +4,10 @@
 #
 #-------------------------------------------------
 
+HOME_FOLDER = /home/ailuropoda
+LIBMYPAINT_FOLDER = $$HOME_FOLDER/.libmypaint-1.3.0
+SKIA_FOLDER = $$HOME_FOLDER/.skia
+
 QT += multimedia core gui svg opengl sql qml xml concurrent #widgets-private # gui-private core-private
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc -ljson-c
 
@@ -12,27 +16,27 @@ LIBS += -L$$OUT_PWD/../core/ -lcore
 INCLUDEPATH += $$PWD/../core
 DEPENDPATH += $$PWD/../core
 
-LIBS += -L/home/ailuropoda/.libmypaint-1.3.0/.libs -lmypaint
+LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
 INCLUDEPATH += /usr/local/include/libmypaint/
 
-INCLUDEPATH += /home/ailuropoda/.skia/include/images/
-INCLUDEPATH += /home/ailuropoda/.skia/include/core/
-INCLUDEPATH += /home/ailuropoda/.skia/include/utils/
-INCLUDEPATH += /home/ailuropoda/.skia/include/gpu/
-INCLUDEPATH += /home/ailuropoda/.skia/include/config/
-INCLUDEPATH += /home/ailuropoda/.skia/include/ports/
-INCLUDEPATH += /home/ailuropoda/.skia/include/effects/
-INCLUDEPATH += /home/ailuropoda/.skia/include/private/
-INCLUDEPATH += /home/ailuropoda/.skia/include/pathops/
+INCLUDEPATH += $$SKIA_FOLDER/include/images/
+INCLUDEPATH += $$SKIA_FOLDER/include/core/
+INCLUDEPATH += $$SKIA_FOLDER/include/utils/
+INCLUDEPATH += $$SKIA_FOLDER/include/gpu/
+INCLUDEPATH += $$SKIA_FOLDER/include/config/
+INCLUDEPATH += $$SKIA_FOLDER/include/ports/
+INCLUDEPATH += $$SKIA_FOLDER/include/effects/
+INCLUDEPATH += $$SKIA_FOLDER/include/private/
+INCLUDEPATH += $$SKIA_FOLDER/include/pathops/
 
-INCLUDEPATH += /home/ailuropoda/.skia/third_party/externals/sdl/include/
-INCLUDEPATH += /home/ailuropoda/.skia/third_party/vulkan/
-INCLUDEPATH += /home/ailuropoda/.skia/src/gpu/
+INCLUDEPATH += $$SKIA_FOLDER/third_party/externals/sdl/include/
+INCLUDEPATH += $$SKIA_FOLDER/third_party/vulkan/
+INCLUDEPATH += $$SKIA_FOLDER/src/gpu/
 
 CONFIG(debug, debug|release) {
-    LIBS += -L/home/ailuropoda/.skia/out/Debug
+    LIBS += -L$$SKIA_FOLDER/out/Debug
 } else {
-    LIBS += -L/home/ailuropoda/.skia/out/Release
+    LIBS += -L$$SKIA_FOLDER/out/Release
     QMAKE_CFLAGS -= -O2
     QMAKE_CFLAGS -= -O1
     QMAKE_CXXFLAGS -= -O2
