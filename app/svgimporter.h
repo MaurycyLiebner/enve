@@ -34,6 +34,7 @@ struct SvgGradient {
     qreal fY1;
     qreal fX2;
     qreal fY2;
+    QMatrix fTrans;
 };
 
 class FillSvgAttributes {

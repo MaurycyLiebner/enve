@@ -704,132 +704,6 @@ void loadText(const QDomElement &pathElement,
     parentGroup->addContainedBox(textBox);
 }
 
-#include "GUI/GradientWidgets/gradientwidget.h"
-static QMap<QString, SvgGradient> gGradients;
-void loadElement(const QDomElement &element, ContainerBox *parentGroup,
-                 const BoxSvgAttributes &parentGroupAttributes) {
-    const QString tagName = element.tagName();
-    if(tagName == "defs") {
-        const QDomNodeList allRootChildNodes = element.childNodes();
-        for(int i = 0; i < allRootChildNodes.count(); i++) {
-            const QDomNode iNode = allRootChildNodes.at(i);
-            if(iNode.isElement()) {
-                loadElement(iNode.toElement(), parentGroup, parentGroupAttributes);
-            }
-        }
-        return;
-    } else if(tagName == "linearGradient") {
-        const QString id = element.attribute("id");
-        QString linkId = element.attribute("xlink:href");
-        qsptr<Gradient> gradient;
-        if(linkId.isEmpty()) {
-            gradient = SPtrCreate(Gradient)();
-            MainWindow::getInstance()->getFillStrokeSettings()->
-                    getGradientWidget()->addGradientToList(gradient);
-            const QDomNodeList allRootChildNodes = element.childNodes();
-            for(int i = 0; i < allRootChildNodes.count(); i++) {
-                const QDomNode iNode = allRootChildNodes.at(i);
-                if(!iNode.isElement()) continue;
-                const QDomElement elem = iNode.toElement();
-                if(elem.tagName() != "stop") continue;
-                QColor stopColor;
-                const QString stopStyle = elem.attribute("style");
-                QList<SvgAttribute> attributesList;
-                extractSvgAttributes(stopStyle, &attributesList);
-                for(const auto& attr : attributesList) {
-                    if(attr.fName == "stop-color") {
-                        const qreal alpha = stopColor.alphaF();
-                        toColor(attr.fValue, stopColor);
-                        stopColor.setAlphaF(alpha);
-
-                    } else if(attr.fName == "stop-opacity") {
-                        stopColor.setAlphaF(toDouble(attr.fValue));
-                    }
-                }
-                gradient->addColor(stopColor);
-            }
-        } else {
-            if(linkId.at(0) == "#") linkId.remove(0, 1);
-            const auto it = gGradients.find(linkId);
-            if(it != gGradients.end()) {
-                gradient = it.value().fGradient;
-            } else {
-                gradient = SPtrCreate(Gradient)();
-                MainWindow::getInstance()->getFillStrokeSettings()->
-                        getGradientWidget()->addGradientToList(gradient);
-            }
-        }
-        const QString x1 = element.attribute("x1");
-        const QString y1 = element.attribute("y1");
-        const QString x2 = element.attribute("x2");
-        const QString y2 = element.attribute("y2");
-
-        gGradients.insert(id, {gradient,
-                               toDouble(x1), toDouble(y1),
-                               toDouble(x2), toDouble(y2)});
-    }
-    if(tagName == "path" || tagName == "polyline") {
-        VectorPathSvgAttributes attributes;
-        attributes.setParent(parentGroupAttributes);
-        attributes.loadBoundingBoxAttributes(element);
-        if(tagName == "path") {
-            loadVectorPath(element, parentGroup, attributes);
-        } else { // if(tagName == "polyline") {
-            loadPolyline(element, parentGroup, attributes);
-        }
-    } else {
-        BoxSvgAttributes attributes;
-        attributes.setParent(parentGroupAttributes);
-        attributes.loadBoundingBoxAttributes(element);
-        if(tagName == "g" || tagName == "text") {
-            const auto group = loadBoxesGroup(element, parentGroup, attributes);
-            if(group->getContainedBoxesCount() == 0)
-                group->removeFromParent_k();
-        } else if(tagName == "circle" || tagName == "ellipse") {
-            loadCircle(element, parentGroup, attributes);
-        } else if(tagName == "rect") {
-            loadRect(element, parentGroup, attributes);
-        } else if(tagName == "tspan") {
-            loadText(element, parentGroup, attributes);
-        }
-    }
-}
-
-bool getUrlId(const QString &urlStr, QString *id) {
-    const QRegExp rx = QRegExp("url\\(\\s*#(.*)\\)", Qt::CaseInsensitive);
-    if(rx.exactMatch(urlStr)) {
-        rx.indexIn(urlStr);
-        const QStringList capturedTxt = rx.capturedTexts();
-        *id = capturedTxt.at(1);
-        return true;
-    }
-
-    return false;
-}
-
-bool getGradientFromString(const QString &colorStr,
-                           FillSvgAttributes * const target) {
-    const QRegExp rx = QRegExp("url\\(\\s*(.*)\\s*\\)", Qt::CaseInsensitive);
-    if(rx.exactMatch(colorStr)) {
-        const QStringList capturedTxt = rx.capturedTexts();
-        QString id = capturedTxt.at(1);
-        if(id.at(0) == '#') id.remove(0, 1);
-        const auto it = gGradients.find(id);
-        if(it != gGradients.end()) {
-            target->setGradient(it.value());
-            return true;
-        }
-    }
-    return false;
-}
-
-bool getFlatColorFromString(const QString &colorStr, FillSvgAttributes *target) {
-    QColor color;
-    if(!toColor(colorStr, color)) return false;
-    target->setColor(color);
-    target->setPaintType(FLATPAINT);
-    return true;
-}
 
 bool extractTranslation(const QString& str, QMatrix& target) {
     const QRegExp rx1("translate\\("
@@ -935,6 +809,135 @@ QMatrix getMatrixFromString(const QString &str) {
     return matrix;
 }
 
+#include "GUI/GradientWidgets/gradientwidget.h"
+static QMap<QString, SvgGradient> gGradients;
+void loadElement(const QDomElement &element, ContainerBox *parentGroup,
+                 const BoxSvgAttributes &parentGroupAttributes) {
+    const QString tagName = element.tagName();
+    if(tagName == "defs") {
+        const QDomNodeList allRootChildNodes = element.childNodes();
+        for(int i = 0; i < allRootChildNodes.count(); i++) {
+            const QDomNode iNode = allRootChildNodes.at(i);
+            if(iNode.isElement()) {
+                loadElement(iNode.toElement(), parentGroup, parentGroupAttributes);
+            }
+        }
+        return;
+    } else if(tagName == "linearGradient") {
+        const QString id = element.attribute("id");
+        QString linkId = element.attribute("xlink:href");
+        qsptr<Gradient> gradient;
+        if(linkId.isEmpty()) {
+            gradient = SPtrCreate(Gradient)();
+            MainWindow::getInstance()->getFillStrokeSettings()->
+                    getGradientWidget()->addGradientToList(gradient);
+            const QDomNodeList allRootChildNodes = element.childNodes();
+            for(int i = 0; i < allRootChildNodes.count(); i++) {
+                const QDomNode iNode = allRootChildNodes.at(i);
+                if(!iNode.isElement()) continue;
+                const QDomElement elem = iNode.toElement();
+                if(elem.tagName() != "stop") continue;
+                QColor stopColor;
+                const QString stopStyle = elem.attribute("style");
+                QList<SvgAttribute> attributesList;
+                extractSvgAttributes(stopStyle, &attributesList);
+                for(const auto& attr : attributesList) {
+                    if(attr.fName == "stop-color") {
+                        const qreal alpha = stopColor.alphaF();
+                        toColor(attr.fValue, stopColor);
+                        stopColor.setAlphaF(alpha);
+
+                    } else if(attr.fName == "stop-opacity") {
+                        stopColor.setAlphaF(toDouble(attr.fValue));
+                    }
+                }
+                gradient->addColor(stopColor);
+            }
+        } else {
+            if(linkId.at(0) == "#") linkId.remove(0, 1);
+            const auto it = gGradients.find(linkId);
+            if(it != gGradients.end()) {
+                gradient = it.value().fGradient;
+            } else {
+                gradient = SPtrCreate(Gradient)();
+                MainWindow::getInstance()->getFillStrokeSettings()->
+                        getGradientWidget()->addGradientToList(gradient);
+            }
+        }
+        const QString x1 = element.attribute("x1");
+        const QString y1 = element.attribute("y1");
+        const QString x2 = element.attribute("x2");
+        const QString y2 = element.attribute("y2");
+        const QString gradTrans = element.attribute("gradientTransform");
+        const QMatrix trans = getMatrixFromString(gradTrans);
+
+        gGradients.insert(id, {gradient,
+                               toDouble(x1), toDouble(y1),
+                               toDouble(x2), toDouble(y2),
+                               trans});
+    }
+    if(tagName == "path" || tagName == "polyline") {
+        VectorPathSvgAttributes attributes;
+        attributes.setParent(parentGroupAttributes);
+        attributes.loadBoundingBoxAttributes(element);
+        if(tagName == "path") {
+            loadVectorPath(element, parentGroup, attributes);
+        } else { // if(tagName == "polyline") {
+            loadPolyline(element, parentGroup, attributes);
+        }
+    } else {
+        BoxSvgAttributes attributes;
+        attributes.setParent(parentGroupAttributes);
+        attributes.loadBoundingBoxAttributes(element);
+        if(tagName == "g" || tagName == "text") {
+            const auto group = loadBoxesGroup(element, parentGroup, attributes);
+            if(group->getContainedBoxesCount() == 0)
+                group->removeFromParent_k();
+        } else if(tagName == "circle" || tagName == "ellipse") {
+            loadCircle(element, parentGroup, attributes);
+        } else if(tagName == "rect") {
+            loadRect(element, parentGroup, attributes);
+        } else if(tagName == "tspan") {
+            loadText(element, parentGroup, attributes);
+        }
+    }
+}
+
+bool getUrlId(const QString &urlStr, QString *id) {
+    const QRegExp rx = QRegExp("url\\(\\s*#(.*)\\)", Qt::CaseInsensitive);
+    if(rx.exactMatch(urlStr)) {
+        rx.indexIn(urlStr);
+        const QStringList capturedTxt = rx.capturedTexts();
+        *id = capturedTxt.at(1);
+        return true;
+    }
+
+    return false;
+}
+
+bool getGradientFromString(const QString &colorStr,
+                           FillSvgAttributes * const target) {
+    const QRegExp rx = QRegExp("url\\(\\s*(.*)\\s*\\)", Qt::CaseInsensitive);
+    if(rx.exactMatch(colorStr)) {
+        const QStringList capturedTxt = rx.capturedTexts();
+        QString id = capturedTxt.at(1);
+        if(id.at(0) == '#') id.remove(0, 1);
+        const auto it = gGradients.find(id);
+        if(it != gGradients.end()) {
+            target->setGradient(it.value());
+            return true;
+        }
+    }
+    return false;
+}
+
+bool getFlatColorFromString(const QString &colorStr, FillSvgAttributes *target) {
+    QColor color;
+    if(!toColor(colorStr, color)) return false;
+    target->setColor(color);
+    target->setPaintType(FLATPAINT);
+    return true;
+}
 
 qsptr<ContainerBox> loadSVGFile(const QString &filename) {
     QFile file(filename);
@@ -1993,8 +1996,8 @@ void FillSvgAttributes::setPaintType(const PaintType &type) {
 
 void FillSvgAttributes::setGradient(const SvgGradient& gradient) {
     mGradient = gradient.fGradient.get();
-    mGradientP1 = {gradient.fX1, gradient.fY1};
-    mGradientP2 = {gradient.fX2, gradient.fY2};
+    mGradientP1 = gradient.fTrans.map(QPointF{gradient.fX1, gradient.fY1});
+    mGradientP2 = gradient.fTrans.map(QPointF{gradient.fX2, gradient.fY2});
     if(!mGradient) return;
     setPaintType(GRADIENTPAINT);
 }
