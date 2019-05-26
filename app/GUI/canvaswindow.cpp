@@ -1344,7 +1344,7 @@ void CanvasWindow::importFile(const QString &path,
 
     const QFile file(path);
     if(!file.exists())
-        RuntimeThrow("File " + path.toStdString() + " does not exit.");
+        RuntimeThrow("File " + path + " does not exit.");
 
     const QString extension = path.split(".").last();
     if(isSoundExt(extension)) {
@@ -1366,8 +1366,7 @@ void CanvasWindow::importFile(const QString &path,
             MainWindow::getInstance()->loadEVFile(path);
         } else {
             mCurrentCanvas->unblockUndoRedo();
-            RuntimeThrow("Unrecognized file extension " +
-                         path.toStdString() + ".");
+            RuntimeThrow("Unrecognized file extension " + path + ".");
         }
         mCurrentCanvas->unblockUndoRedo();
 

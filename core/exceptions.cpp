@@ -1,6 +1,18 @@
 #include "exceptions.h"
 #include <QMessageBox>
 
+std::string operator+(const std::string& c, const QString& k) {
+    return c + k.toStdString();
+}
+
+std::string operator<<(const std::string& c, const QString& k) {
+    return c + k.toStdString();
+}
+
+std::string operator>>(const QString& k, const std::string& c) {
+    return k.toStdString() + c;
+}
+
 QDebug operator<<(QDebug out, const std::string& str) {
     out << str.c_str();
     return out;

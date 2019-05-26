@@ -73,7 +73,7 @@ public:
     static int sCreateNewContext() {
         if(!sLoaded) {
             const QString brushesDir = QDir::homePath() +
-                    "/.IsometricEngine/brushes/";
+                    "/.enve/brushes/";
             sLoadCollectionsFromDir(brushesDir);
             sLoaded = true;
         }
@@ -96,13 +96,12 @@ public:
     }
 signals:
     void currentBrushChanged(SimpleBrushWrapper*);
-private slots:
+private:
     void brushCWrapperSelected(BrushContexedWrapper * wrapper) {
         if(mCurrentBrushCWrapper) mCurrentBrushCWrapper->setSelected(false);
         mCurrentBrushCWrapper = wrapper;
         emit currentBrushChanged(getCurrentBrush());
     }
-private:
     static void sLoadCollectionsFromDir(const QString& mainDirPath);
     static QList<BrushCollectionData> sData;
     static bool sLoaded;

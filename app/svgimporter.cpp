@@ -954,7 +954,7 @@ qsptr<ContainerBox> loadSVGFile(const QString &filename) {
             RuntimeThrow("Cannot set file as QDomDocument content");
         }
     } else {
-        RuntimeThrow("Cannot open file " + filename.toStdString());
+        RuntimeThrow("Cannot open file " + filename);
     }
     return nullptr;
 }

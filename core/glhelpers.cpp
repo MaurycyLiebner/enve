@@ -8,12 +8,10 @@
 #include <sstream>
 #include <iostream>
 
-std::string GL_PLAIN_VERT =
-        ":/shaders/plain.vert";
+QString GL_PLAIN_VERT = ":/shaders/plain.vert";
 GLuint GL_PLAIN_SQUARE_VBO;
 
-std::string GL_TEXTURED_VERT =
-        ":/shaders/textured.vert";
+QString GL_TEXTURED_VERT = ":/shaders/textured.vert";
 GLuint GL_TEXTURED_SQUARE_VBO;
 
 void checkGlErrors(const std::string& msg) {
@@ -45,11 +43,11 @@ void iniTexturedVShaderVAO(QGL33c* gl, GLuint &VAO) {
 
     // position attribute
     gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                              5 * sizeof(float), (void*)0);
+                              5 * sizeof(float), BUFFER_OFFSET(0));
     gl->glEnableVertexAttribArray(0);
     // texture coord attribute
     gl->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-                              5 * sizeof(float), (void*)(3 * sizeof(float)));
+                              5 * sizeof(float), BUFFER_OFFSET(3 * sizeof(float)));
     gl->glEnableVertexAttribArray(1);
 }
 
@@ -76,7 +74,7 @@ void iniPlainVShaderVAO(QGL33c* gl, GLuint &VAO) {
 
     // position attribute
     gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                              3 * sizeof(float), (void*)0);
+                              3 * sizeof(float), BUFFER_OFFSET(0));
     gl->glEnableVertexAttribArray(0);
 }
 
@@ -106,8 +104,9 @@ void checkCompileErrors(QGL33c* gl,
 #include <QFile>
 void iniProgram(QGL33c* gl,
                 GLuint& program,
-                const std::string& vShaderPath,
-                const std::string& fShaderPath) {
+                const QString& vShaderPath,
+                const QString& fShaderPath) {
+    Q_INIT_RESOURCE(coreresources);
     std::string vertexCode;
     std::string fragmentCode;
     std::ifstream vShaderFile;
@@ -117,19 +116,19 @@ void iniProgram(QGL33c* gl,
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
         // Use QFile to enable reading from resource file
-        QFile vShaderFile(QString::fromStdString(vShaderPath));
+        QFile vShaderFile(vShaderPath);
         if(!vShaderFile.open(QIODevice::ReadOnly))
             RuntimeThrow("Could not open " + vShaderPath);
         const QByteArray vData = vShaderFile.readAll();
         vertexCode = vData.toStdString();
+        vShaderFile.close();
 
-        fShaderFile.open(fShaderPath);
-        if(!fShaderFile.is_open())
+        QFile fShaderFile(fShaderPath);
+        if(!fShaderFile.open(QIODevice::ReadOnly))
             RuntimeThrow("Could not open " + fShaderPath);
-        std::stringstream fShaderStream;
-        fShaderStream << fShaderFile.rdbuf();
+        const QByteArray fData = fShaderFile.readAll();
+        fragmentCode = fData.toStdString();
         fShaderFile.close();
-        fragmentCode = fShaderStream.str();
     } catch(...) {
         RuntimeThrow("Could not load shader data from file.");
     }

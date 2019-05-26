@@ -23,7 +23,7 @@ void AudioStreamsData::open(const QString &path,
         open(formatContext);
     } catch(...) {
         fPath.clear();
-        RuntimeThrow("Failed to set audio file path to '" + path.toStdString() + "'.");
+        RuntimeThrow("Failed to set audio file path to '" + path + "'.");
     }
 }
 
@@ -33,7 +33,7 @@ void AudioStreamsData::open(const QString &path) {
         open();
     } catch(...) {
         fPath.clear();
-        RuntimeThrow("Failed to set audio file path to '" + path.toStdString() + "'.");
+        RuntimeThrow("Failed to set audio file path to '" + path + "'.");
     }
 }
 

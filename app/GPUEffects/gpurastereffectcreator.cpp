@@ -13,7 +13,6 @@ qsptr<Property> GPURasterEffectCreator::create() const {
     return std::move(rasterEffect);
 }
 
-
 qreal stringToDouble(const QString& str) {
     if(str.isEmpty()) {
         RuntimeThrow("Can not convert an empty string to double.");
@@ -21,22 +20,16 @@ qreal stringToDouble(const QString& str) {
     bool ok;
     qreal val = str.toDouble(&ok);
     if(!ok) {
-        QString errMsg = "Can not convert '" + str + "' to double.";
-        RuntimeThrow(errMsg.toStdString());
+        RuntimeThrow("Can not convert '" + str + "' to double.");
     }
     return val;
 }
 
 int stringToInt(const QString& str) {
-    if(str.isEmpty()) {
-        RuntimeThrow("Can not convert an empty string to int.");
-    }
+    if(str.isEmpty()) RuntimeThrow("Can not convert an empty string to int.");
     bool ok;
     int val = str.toInt(&ok);
-    if(!ok) {
-        QString errMsg = "Can not convert '" + str + "' to int.";
-        RuntimeThrow(errMsg.toStdString());
-    }
+    if(!ok) RuntimeThrow("Can not convert '" + str + "' to int.");
     return val;
 }
 
@@ -44,12 +37,11 @@ qreal tryConvertingAttrToDouble(const QDomElement &elem,
                                 const QString& elemName,
                                 const QString& attr) {
     try {
-        QString valS = elem.attribute(attr);
-        qreal val = stringToDouble(valS);
+        const QString valS = elem.attribute(attr);
+        const qreal val = stringToDouble(valS);
         return val;
     } catch(...) {
-        QString errMsg = "Invalid " + attr + " value for " + elemName + ".";
-        RuntimeThrow(errMsg.toStdString());
+        RuntimeThrow("Invalid " + attr + " value for " + elemName + ".");
     }
 }
 
@@ -61,8 +53,7 @@ int tryConvertingAttrToInt(const QDomElement &elem,
         int val = stringToInt(valS);
         return val;
     } catch(...) {
-        QString errMsg = "Invalid " + attr + " value for " + elemName + ".";
-        RuntimeThrow(errMsg.toStdString());
+        RuntimeThrow("Invalid " + attr + " value for " + elemName + ".");
     }
 }
 
@@ -70,87 +61,73 @@ void readAnimatorCreators(
         const QDomElement &elem,
         stdsptr<PropertyCreator>& propC,
         stdsptr<UniformSpecifierCreator>& uniC) {
-    QString name = elem.attribute("name");
-    if(name.isEmpty()) {
-        RuntimeThrow("Animator name not defined.");
-    }
-    QRegExp rx("[A-Za-z0-9_]*");
-    if(!rx.exactMatch(name)) {
-        RuntimeThrow("Invalid Animator name.");
-    }
+    const QString name = elem.attribute("name");
+    if(name.isEmpty()) RuntimeThrow("Animator name not defined.");
+    const QRegExp rx("[A-Za-z0-9_]*");
+    if(!rx.exactMatch(name)) RuntimeThrow("Invalid Animator name.");
 
-    QString type = elem.attribute("type");
-    if(type.isEmpty()) {
-        QString errMsg = "Animator type not defined for " + name + ".";
-        RuntimeThrow(errMsg.toStdString());
-    }
+    const QString type = elem.attribute("type");
+    if(type.isEmpty())
+        RuntimeThrow("Animator type not defined for " + name + ".");
     if(type == "float") {
         try {
-            qreal minVal = tryConvertingAttrToDouble(elem, name, "min");
-            qreal maxVal = tryConvertingAttrToDouble(elem, name, "max");
-            qreal iniVal = tryConvertingAttrToDouble(elem, name, "ini");
-            qreal stepVal = tryConvertingAttrToDouble(elem, name, "step");
-            QString script = elem.attribute("glValue");
+            const qreal minVal = tryConvertingAttrToDouble(elem, name, "min");
+            const qreal maxVal = tryConvertingAttrToDouble(elem, name, "max");
+            const qreal iniVal = tryConvertingAttrToDouble(elem, name, "ini");
+            const qreal stepVal = tryConvertingAttrToDouble(elem, name, "step");
+            const QString script = elem.attribute("glValue");
 
             propC = SPtrCreate(QrealAnimatorCreator)(
                         iniVal, minVal, maxVal, stepVal, name);
             uniC = SPtrCreate(QrealAnimatorUniformSpecifierCreator)(script);
         } catch(...) {
-            QString errMsg = "Error while parsing Animator '" + name + "' of type " + type + ".";
-            RuntimeThrow(errMsg.toStdString());
+            RuntimeThrow("Error while parsing Animator '" + name +
+                         "' of type " + type + ".");
         }
     } else if(type == "int") {
         try {
-            int minVal = tryConvertingAttrToInt(elem, name, "min");
-            int maxVal = tryConvertingAttrToInt(elem, name, "max");
-            int iniVal = tryConvertingAttrToInt(elem, name, "ini");
-            int stepVal = tryConvertingAttrToInt(elem, name, "step");
-            QString script = elem.attribute("glValue");
+            const int minVal = tryConvertingAttrToInt(elem, name, "min");
+            const int maxVal = tryConvertingAttrToInt(elem, name, "max");
+            const int iniVal = tryConvertingAttrToInt(elem, name, "ini");
+            const int stepVal = tryConvertingAttrToInt(elem, name, "step");
+            const QString script = elem.attribute("glValue");
 
             propC = SPtrCreate(IntAnimatorCreator)(
                         iniVal, minVal, maxVal, stepVal, name);
             uniC = SPtrCreate(IntAnimatorUniformSpecifierCreator)(script);
         } catch(...) {
-            QString errMsg = "Error while parsing Animator '" + name + "' of type " + type + ".";
-            RuntimeThrow(errMsg.toStdString());
+            RuntimeThrow("Error while parsing Animator '" + name +
+                         "' of type " + type + ".");
         }
     } else {
-        QString errMsg = "Invalid Animator type '" + type + "' for " + name + ".";
-        RuntimeThrow(errMsg.toStdString());
+        RuntimeThrow("Invalid Animator type '" + type + "' for " + name + ".");
     }
 }
 
 stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sLoadFromFile(
         QGL33c * const gl, const QString &filePath) {
     QFile file(filePath);
-    if(!file.exists()) {
+    if(!file.exists())
         RuntimeThrow("GPURasterEffect source file does not exist.");
-    }
-    QFileInfo info(file);
-    QString fragPath = info.path() + "/" + info.completeBaseName() + ".frag";
-    QFile fragFile(fragPath);
-    if(!fragFile.exists()) {
-        QString errMsg = "GPURasterEffect shader file (" + fragPath + ") does not exist.";
-        RuntimeThrow(errMsg.toStdString());
-    }
-    if(!file.open(QIODevice::ReadOnly)) {
+    const QFileInfo info(file);
+    const QString fragPath = info.path() + "/" + info.completeBaseName() + ".frag";
+    const QFile fragFile(fragPath);
+    if(!fragFile.exists())
+        RuntimeThrow("GPURasterEffect shader file (" +
+                     fragPath + ") does not exist.");
+    if(!file.open(QIODevice::ReadOnly))
         RuntimeThrow("GPURasterEffect source file could not be opened.");
-    }
     QDomDocument document;
     QString errMsg;
-    if(!document.setContent(&file, &errMsg)) {
-        errMsg = "Error while parsing GPURasterEffect source:\n" + errMsg;
-        RuntimeThrow(errMsg.toStdString());
-    }
+    if(!document.setContent(&file, &errMsg))
+        RuntimeThrow("Error while parsing GPURasterEffect source:\n" + errMsg);
     file.close();
 
     QDomElement root = document.firstChildElement();
-    if(root.tagName() != "GPURasterEffect") {
-        errMsg = "Unrecogized root " + root.tagName() +
-                "in GPURasterEffect source.";
-        RuntimeThrow(errMsg.toStdString());
-    }
-    QString effectName = root.attribute("name");
+    if(root.tagName() != "GPURasterEffect")
+        RuntimeThrow("Unrecogized root " + root.tagName() +
+                     "in GPURasterEffect source.");
+    const QString effectName = root.attribute("name");
 
     QList<stdsptr<PropertyCreator>> propCs;
     UniformSpecifierCreators uniCs;
@@ -158,8 +135,8 @@ stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sLoadFromFile(
     for(int i = 0; i < animatorNodes.count(); i++) {
         QDomNode animNode = animatorNodes.at(i);
         if(!animNode.isElement()) {
-            errMsg = "Animator node " + QString::number(i) + " is not an Element.";
-            RuntimeThrow(errMsg.toStdString());
+            RuntimeThrow("Animator node " + QString::number(i) +
+                         " is not an Element.");
         }
         QDomElement animEle = animNode.toElement();
         try {
@@ -169,25 +146,24 @@ stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sLoadFromFile(
             propCs << propC;
             uniCs << uniC;
         } catch(...) {
-            errMsg = "Animator " + QString::number(i) + " is invalid.";
-            RuntimeThrow(errMsg.toStdString());
+            RuntimeThrow("Animator " + QString::number(i) + " is invalid.");
         }
     }
 
     GPURasterEffectProgram program;
     try {
-        iniProgram(gl, program.fId, GL_TEXTURED_VERT, fragPath.toStdString());
+        iniProgram(gl, program.fId, GL_TEXTURED_VERT, fragPath);
     } catch(...) {
-        errMsg = "Could not create program for GPURasterEffect '" + effectName + "'.";
-        RuntimeThrow(errMsg.toStdString());
+        RuntimeThrow("Could not create program for GPURasterEffect '" +
+                     effectName + "'.");
     }
 
     for(const auto& propC : propCs) {
         GLint loc = propC->getUniformLocation(gl, program.fId);
         if(loc < 0) {
             gl->glDeleteProgram(program.fId);
-            errMsg = "'" + propC->fName + "' does not correspond to an active uniform variable.";
-            RuntimeThrow(errMsg.toStdString());
+            RuntimeThrow("'" + propC->fName +
+                         "' does not correspond to an active uniform variable.");
         }
         program.fArgumentLocs.append(loc);
     }
@@ -237,12 +213,10 @@ UniformSpecifier QrealAnimatorUniformSpecifierCreator::create(
                     gl->glUniform2f(loc, static_cast<GLfloat>(val1),
                                     static_cast<GLfloat>(val2));
                 } else {
-                    QString errMsg = "Invalid glValue script for '" + propName + "'.";
-                    RuntimeThrow(errMsg.toStdString());
+                    RuntimeThrow("Invalid glValue script for '" + propName + "'.");
                 }
             } else {
-                QString errMsg = "Invalid glValue script for '" + propName + "'.";
-                RuntimeThrow(errMsg.toStdString());
+                RuntimeThrow("Invalid glValue script for '" + propName + "'.");
             }
         };
     }

@@ -67,8 +67,7 @@ void GLWindow::iniRasterEffectPrograms() {
         try {
             GPURasterEffectCreator::sLoadFromFile(this, path);
         } catch(...) {
-            QString errMsg = "Error while loading GPURasterEffect from '" + path + "'.";
-            RuntimeThrow(errMsg.toStdString());
+            RuntimeThrow("Error while loading GPURasterEffect from '" + path + "'.");
         }
     }
 }

@@ -14,7 +14,7 @@ void VideoStreamsData::open(const QString &path) {
         open();
     } catch(...) {
         fPath.clear();
-        RuntimeThrow("Failed to set video file path to '" + path.toStdString() + "'.");
+        RuntimeThrow("Failed to set video file path to '" + path + "'.");
     }
 }
 

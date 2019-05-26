@@ -346,9 +346,8 @@ void EffectAnimators::readPixmapEffect(QIODevice *target) {
     } else if(typeT == EFFECT_MOTION_BLUR) {
         effect = SPtrCreate(SampledMotionBlurEffect)(mParentBox_k);
     } else {
-        QString errMsg = "Invalid pixmap effect type '" +
-                QString::number(typeT) + "'.";
-        RuntimeThrow(errMsg.toStdString());
+        RuntimeThrow("Invalid pixmap effect type '" +
+                     QString::number(typeT) + "'.");
     }
     effect->readProperty(target);
     addEffect(effect);
@@ -732,9 +731,8 @@ void PathEffectAnimators::readPathEffect(QIODevice *target) {
     } else if(typeT == SPATIAL_DISPLACE_PATH_EFFECT) {
         pathEffect = SPtrCreate(SpatialDisplacePathEffect)(mIsOutline);
     } else {
-        const QString errMsg = "Invalid path effect type '" +
-                QString::number(typeT) + "'.";
-        RuntimeThrow(errMsg.toStdString());
+        RuntimeThrow("Invalid path effect type '" +
+                     QString::number(typeT) + "'.");
     }
     pathEffect->readProperty(target);
     addEffect(pathEffect);
@@ -1133,12 +1131,12 @@ void CanvasWindow::readCanvases(QIODevice *target) {
 
 void MainWindow::loadEVFile(const QString &path) {
     QFile target(path);
-    if(!target.exists()) RuntimeThrow("File does not exist " + path.toStdString());
+    if(!target.exists()) RuntimeThrow("File does not exist " + path);
     if(!target.open(QIODevice::ReadOnly))
-        RuntimeThrow("Could not open file " + path.toStdString());
+        RuntimeThrow("Could not open file " + path);
     if(!FileFooter::sCompatible(&target)) {
         target.close();
-        RuntimeThrow("File incompatible or incomplete " + path.toStdString());
+        RuntimeThrow("File incompatible or incomplete " + path);
     }
     auto gradientWidget = mFillStrokeSettings->getGradientWidget();
     gradientWidget->readGradients(&target);
@@ -1168,8 +1166,7 @@ void MainWindow::saveToFile(const QString &path) {
 
         target.close();
     } else {
-        RuntimeThrow("Could not open file for writing " +
-                     path.toStdString() + ".");
+        RuntimeThrow("Could not open file for writing " + path + ".");
     }
 
     BoundingBox::sClearWriteBoxes();

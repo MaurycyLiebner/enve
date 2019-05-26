@@ -23,8 +23,8 @@ DoubleBorderProgram DOUBLE_BORDER_PROGRAM;
 
 void iniColorProgram(QGL33c* gl,
                      ColorProgram& program,
-                     const std::string& vShaderPath,
-                     const std::string& fShaderPath) {
+                     const QString& vShaderPath,
+                     const QString& fShaderPath) {
     try {
         iniProgram(gl, program.fID, vShaderPath, fShaderPath);
         program.fHSVColorLoc = gl->glGetUniformLocation(
@@ -50,7 +50,7 @@ void iniColorProgram(QGL33c* gl,
     }
 }
 
-void iniPlainColorProgram(QGL33c *gl, const std::string& colorShadersPath) {
+void iniPlainColorProgram(QGL33c *gl, const QString& colorShadersPath) {
     try {
         iniProgram(gl, PLAIN_PROGRAM.fID, GL_PLAIN_VERT,
                    colorShadersPath + "plain.frag");
@@ -66,10 +66,10 @@ void iniPlainColorProgram(QGL33c *gl, const std::string& colorShadersPath) {
     }
 }
 
-void iniBorderProgram(QGL33c *gl, const std::string& colorShadersPath) {
+void iniBorderProgram(QGL33c *gl, const QString& colorShadersPath) {
     try {
         iniProgram(gl, BORDER_PROGRAM.fID, GL_PLAIN_VERT,
-               colorShadersPath + "border.frag");
+                   colorShadersPath + "border.frag");
         BORDER_PROGRAM.fBorderSizeLoc = gl->glGetUniformLocation(
                     BORDER_PROGRAM.fID, "borderSize");
         CheckInvalidLocation(BORDER_PROGRAM.fBorderSizeLoc, "borderSize");
@@ -81,7 +81,7 @@ void iniBorderProgram(QGL33c *gl, const std::string& colorShadersPath) {
     }
 }
 
-void iniDoubleBorderProgram(QGL33c *gl, const std::string& colorShadersPath) {
+void iniDoubleBorderProgram(QGL33c *gl, const QString& colorShadersPath) {
     try {
         iniProgram(gl, DOUBLE_BORDER_PROGRAM.fID, GL_PLAIN_VERT,
                    colorShadersPath + "doubleborder.frag");
@@ -106,7 +106,7 @@ void iniDoubleBorderProgram(QGL33c *gl, const std::string& colorShadersPath) {
     }
 }
 
-void iniGradientProgram(QGL33c *gl, const std::string& colorShadersPath) {
+void iniGradientProgram(QGL33c *gl, const QString& colorShadersPath) {
     try {
         iniProgram(gl, GRADIENT_PROGRAM.fID, GL_PLAIN_VERT,
                    colorShadersPath + "gradient.frag");
@@ -125,9 +125,7 @@ void iniGradientProgram(QGL33c *gl, const std::string& colorShadersPath) {
 }
 
 void iniColorPrograms(QGL33c *gl) {
-    std::string colorShadersPath =
-            "/home/ailuropoda/Dev/enve/src/app/GUI/"
-            "ColorWidgets/colorwidgetshaders/";
+    const QString colorShadersPath = ":/colorwidgetshaders/";
 
     try {
         iniColorProgram(gl, HUE_PROGRAM, GL_PLAIN_VERT,

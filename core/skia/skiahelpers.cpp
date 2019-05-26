@@ -42,10 +42,10 @@ void SkiaHelpers::saveImage(const QString &fileName,
         const bool flushResult = file.flush();
         file.close();
         if(writeResult == -1) RuntimeThrow("Error while writing to file " +
-                                           fileName.toStdString());
+                                           fileName);
         if(!flushResult) RuntimeThrow("Error while flushing buffered data to file " +
-                                      fileName.toStdString());
-    } else RuntimeThrow("Could not open file " + fileName.toStdString());
+                                      fileName);
+    } else RuntimeThrow("Could not open file " + fileName);
 }
 
 sk_sp<SkImage> SkiaHelpers::transferDataToSkImage(SkBitmap &bitmap) {

@@ -1,10 +1,11 @@
 TEMPLATE = subdirs
 
 SUBDIRS = app \
-    core \
-    shaders \
-    colorwidgetshaders
+          colorwidgetshaders \
+          core \
+          shaders
 
 colorwidgetshaders.subdir = app/GUI/ColorWidgets/colorwidgetshaders
+shaders.subdir = core/shaders
 
 app.depends = core

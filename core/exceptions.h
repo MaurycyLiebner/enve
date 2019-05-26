@@ -32,6 +32,10 @@
         RuntimeThrow("Invalid " name " location."); \
     }
 
+std::string operator+(const std::string& c, const QString& k);
+std::string operator<<(const std::string& c, const QString& k);
+std::string operator>>(const QString& k, const std::string& c);
+
 QDebug operator<<(QDebug out, const std::string& str);
 
 extern QString gAllTextFromException(const std::exception& e,
