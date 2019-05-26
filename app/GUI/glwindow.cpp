@@ -111,7 +111,7 @@ void GLWindow::initialize() {
         iniTexturedVShaderVAO(this, mTexturedSquareVAO);
         iniColorPrograms(this);
     } catch(...) {
-        RuntimeThrow("Error initializing programs.");
+        RuntimeThrow("Error initializing OpenGL programs.");
     }
 
     try {
@@ -137,19 +137,17 @@ void GLWindow::initialize() {
 //}
 
 void GLWindow::renderNow() {
-    if(!isExposed()) return;
+    const bool needsInitialize = !mContext;
+    if(!isExposed() && !needsInitialize) return;
 
     try {
-        bool needsInitialize = false;
-        if(!mContext) {
+        if(needsInitialize) {
             mContext = new QOpenGLContext(this);
     //        mContext->setFormat(QSurfaceFormat::defaultFormat());
             mContext->setShareContext(QOpenGLContext::globalShareContext());
             if(!mContext->create()) {
                 RuntimeThrow("Creating GL context failed.");
             }
-
-            needsInitialize = true;
         }
         if(!mContext->makeCurrent(this)) {
             RuntimeThrow("Making GL context current failed.");
