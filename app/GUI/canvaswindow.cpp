@@ -106,7 +106,10 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
                 SWT_TARGET_CURRENT_CANVAS);
     MainWindow::getInstance()->updateSettingsForCurrentCanvas();
     if(hasNoCanvas()) openWelcomeDialog();
-    else closeWelcomeDialog();
+    else {
+        closeWelcomeDialog();
+        mCurrentCanvas->fitCanvasToSize();
+    }
     queScheduledTasksAndUpdate();
 }
 
@@ -868,9 +871,10 @@ void CanvasWindow::openWelcomeDialog() {
 
 void CanvasWindow::closeWelcomeDialog() {
     if(!mWelcomeDialog) return;
-    mWelcomeDialog = nullptr;
 
     const auto mWindow = MainWindow::getInstance();
+    getCanvasWidget()->resize(mWelcomeDialog->size());
+    mWelcomeDialog = nullptr;
     mWindow->setCentralWidget(getCanvasWidget());
 }
 

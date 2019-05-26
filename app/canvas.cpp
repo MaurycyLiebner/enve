@@ -893,7 +893,7 @@ void Canvas::fitCanvasToSize() {
     mVisibleWidth = mWidth + MIN_WIDGET_HEIGHT;
     qreal widthScale = mCanvasWidget->width()/mVisibleWidth;
     qreal heightScale = mCanvasWidget->height()/mVisibleHeight;
-    zoomCanvas(qMin(heightScale, widthScale), QPointF(0., 0.));
+    zoomCanvas(qMin(heightScale, widthScale), QPointF(0, 0));
     moveByRel(QPointF((mCanvasWidget->width() - mVisibleWidth)*0.5,
                       (mCanvasWidget->height() - mVisibleHeight)*0.5) );
 }
