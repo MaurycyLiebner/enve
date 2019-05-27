@@ -289,9 +289,11 @@ private:
     ActionButton *mActionLine;
     ActionButton *mActionCurve;
 //
+    QAction *mNoneQuality;
     QAction *mLowQuality;
     QAction *mMediumQuality;
     QAction *mHighQuality;
+
     QAction *mClipViewToCanvas;
     QAction *mRasterEffectsVisible;
     QAction *mPathEffectsVisible;

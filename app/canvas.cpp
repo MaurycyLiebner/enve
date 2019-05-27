@@ -28,7 +28,6 @@
 #include "pointtypemenu.h"
 #include "Animators/transformanimator.h"
 
-using namespace std::chrono;
 Canvas::Canvas(CanvasWindow *canvasWidget,
                const int &canvasWidth, const int &canvasHeight,
                const int &frameCount, const qreal &fps) :

@@ -1247,68 +1247,49 @@ void anim_fast_blur(const SkBitmap &bitmap,
 void anim_fast_blur(const SkBitmap &bitmap,
                     const qreal &fRadius) {
     if(fRadius < 0.01) return;
-    uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
-    int w = bitmap.width();
-    int h = bitmap.height();
+    uchar * const pixels = static_cast<uchar*>(bitmap.getPixels());
+    const int w = bitmap.width();
+    const int h = bitmap.height();
 
-    qreal divF = fRadius + fRadius + 1.;
-    qreal divFInv = 1./divF;
-    int iRadius = ceil(fRadius);
-    int nPoints = iRadius + iRadius + 1;
-    qreal fracInf = 1. - iRadius + fRadius;
-    qreal fracInfInv = 1. - fracInf;
+    const qreal divF = fRadius + fRadius + 1;
+    const qreal divFInv = 1/divF;
+    const int iRadius = qCeil(fRadius);
+    qreal fracInf = 1 - iRadius + fRadius;
+    qreal fracInfInv = 1 - fracInf;
 
-    qreal *rLine = new double[nPoints];
-    qreal *gLine = new double[nPoints];
-    qreal *bLine = new double[nPoints];
-    qreal *aLine = new double[nPoints];
-
-    int wm = w-1;
-    int hm = h-1;
-    int wh = w*h;
-    qreal *r = new double[wh];
-    qreal *g = new double[wh];
-    qreal *b = new double[wh];
-    qreal *a = new double[wh];
-    qreal rsum,gsum,bsum,asum;
-    int x,y,i,p,p1,yp,yi,yw;
-    int *vMIN = new int[qMax(w,h)];
-    int *vMAX = new int[qMax(w,h)];
+    const int xMax = w - 1;
+    const int yMax = h - 1;
+    const int wh = w * h;
+    qreal * const r = new double[static_cast<ulong>(wh)];
+    qreal * const g = new double[static_cast<ulong>(wh)];
+    qreal * const b = new double[static_cast<ulong>(wh)];
+    qreal * const a = new double[static_cast<ulong>(wh)];
+    int x,y,i,p,yp,yi,yw;
+    int *vMIN = new int[static_cast<ulong>(qMax(w,h))];
+    int *vMAX = new int[static_cast<ulong>(qMax(w,h))];
 
 
     yw = yi = 0;
 
     for(y = 0; y < h; y++) {
         p = yi * 4;
-        rLine[0] = pixels[p];
-        rsum = pixels[p]*fracInf;
-        gLine[0] = pixels[p + 1];
-        gsum = pixels[p + 1]*fracInf;
-        bLine[0] = pixels[p + 2];
-        bsum = pixels[p + 2]*fracInf;
-        aLine[0] = pixels[p + 3];
-        asum = pixels[p + 3]*fracInf;
+        qreal rsum = pixels[p]*fracInf;
+        qreal gsum = pixels[p + 1]*fracInf;
+        qreal bsum = pixels[p + 2]*fracInf;
+        qreal asum = pixels[p + 3]*fracInf;
 
         for(i = 1 - iRadius; i < iRadius ; i++) {
-            p = (yi + qMin(wm, qMax(i,0))) * 4;
-            rLine[i + iRadius] = pixels[p];
-            rsum += pixels[p];
-            gLine[i + iRadius] = pixels[p + 1];
-            gsum += pixels[p + 1];
-            bLine[i + iRadius] = pixels[p + 2];
-            bsum += pixels[p + 2];
-            aLine[i + iRadius] = pixels[p + 3];
-            asum += pixels[p + 3];
+            const int iP = (yi + qMin(xMax, qMax(i, 0))) * 4;
+            rsum += pixels[iP];
+            gsum += pixels[iP + 1];
+            bsum += pixels[iP + 2];
+            asum += pixels[iP + 3];
         }
 
-        p = (yi + qMin(wm, iRadius)) * 4;
-        rLine[iRadius + iRadius] = pixels[p];
+        p = (yi + qMin(xMax, iRadius)) * 4;
         rsum += pixels[p]*fracInf;
-        gLine[iRadius + iRadius] = pixels[p + 1];
         gsum += pixels[p + 1]*fracInf;
-        bLine[iRadius + iRadius] = pixels[p + 2];
         bsum += pixels[p + 2]*fracInf;
-        aLine[iRadius + iRadius] = pixels[p + 3];
         asum += pixels[p + 3]*fracInf;
 
         for(x = 0; x < w; x++) {
@@ -1318,140 +1299,111 @@ void anim_fast_blur(const SkBitmap &bitmap,
             a[yi] = asum*divFInv;
 
             if(y == 0) {
-                vMIN[x]=qMin(x+iRadius+1,wm);
-                vMAX[x]=qMax(x-iRadius,0);
+                vMIN[x] = qMin(x + iRadius + 1, xMax);
+                vMAX[x] = qMax(x - iRadius, 0);
             }
-            p1 = (yw + vMIN[x])*4;
+            p = (yw + vMAX[x])*4;
 
-            rsum -= rLine[0]*fracInf;
-            gsum -= gLine[0]*fracInf;
-            bsum -= bLine[0]*fracInf;
-            asum -= aLine[0]*fracInf;
+            rsum -= pixels[p]*fracInf;
+            gsum -= pixels[p + 1]*fracInf;
+            bsum -= pixels[p + 2]*fracInf;
+            asum -= pixels[p + 3]*fracInf;
 
-            rsum -= rLine[1]*fracInfInv;
-            gsum -= gLine[1]*fracInfInv;
-            bsum -= bLine[1]*fracInfInv;
-            asum -= aLine[1]*fracInfInv;
+            p = (yw + vMAX[qMax(0, x - 1)])*4;
 
-            for(i = 0; i < nPoints - 1; i++) {
-                rLine[i] = rLine[i + 1];
-                gLine[i] = gLine[i + 1];
-                bLine[i] = bLine[i + 1];
-                aLine[i] = aLine[i + 1];
-            }
+            rsum -= pixels[p]*fracInfInv;
+            gsum -= pixels[p + 1]*fracInfInv;
+            bsum -= pixels[p + 2]*fracInfInv;
+            asum -= pixels[p + 3]*fracInfInv;
 
-            rsum += rLine[nPoints - 1]*fracInfInv;
-            gsum += gLine[nPoints - 1]*fracInfInv;
-            bsum += bLine[nPoints - 1]*fracInfInv;
-            asum += aLine[nPoints - 1]*fracInfInv;
+            p = (yw + vMIN[qMax(0, x - 1)])*4;
 
-            rLine[nPoints - 1] = pixels[p1];
-            gLine[nPoints - 1] = pixels[p1 + 1];
-            bLine[nPoints - 1] = pixels[p1 + 2];
-            aLine[nPoints - 1] = pixels[p1 + 3];
+            rsum += pixels[p]*fracInfInv;
+            gsum += pixels[p + 1]*fracInfInv;
+            bsum += pixels[p + 2]*fracInfInv;
+            asum += pixels[p + 3]*fracInfInv;
 
-            rsum += pixels[p1]*fracInf;
-            gsum += pixels[p1 + 1]*fracInf;
-            bsum += pixels[p1 + 2]*fracInf;
-            asum += pixels[p1 + 3]*fracInf;
+            p = (yw + vMIN[x])*4;
+
+            rsum += pixels[p]*fracInf;
+            gsum += pixels[p + 1]*fracInf;
+            bsum += pixels[p + 2]*fracInf;
+            asum += pixels[p + 3]*fracInf;
 
             yi++;
         }
-        yw+=w;
+        yw += w;
     }
 
     for(x = 0; x < w; x++) {
         yp = -iRadius*w;
 
-        yi = qMax(0,yp)+x;
-        rLine[0] = r[yi];
-        rsum = r[yi]*fracInf;
-        gLine[0] = g[yi];
-        gsum = g[yi]*fracInf;
-        bLine[0] = b[yi];
-        bsum = b[yi]*fracInf;
-        aLine[0] = a[yi];
-        asum = a[yi]*fracInf;
-        yp+=w;
+        yi = qMax(0, yp) + x;
+        qreal rsum = r[yi]*fracInf;
+        qreal gsum = g[yi]*fracInf;
+        qreal bsum = b[yi]*fracInf;
+        qreal asum = a[yi]*fracInf;
+        yp += w;
 
         for(i = 1 - iRadius; i < iRadius ; i++) {
-            yi = qMax(0,yp)+x;
-            rLine[i + iRadius] = r[yi];
+            yi = qMax(0, yp) + x;
             rsum += r[yi];
-            gLine[i + iRadius] = g[yi];
             gsum += g[yi];
-            bLine[i + iRadius] = b[yi];
             bsum += b[yi];
-            aLine[i + iRadius] = a[yi];
             asum += a[yi];
-            yp+=w;
+            yp += w;
         }
 
-        yi = qMax(0,yp)+x;
-        rLine[iRadius + iRadius] = r[yi];
+        yi = qMax(0, yp) + x;
         rsum += r[yi]*fracInf;
-        gLine[iRadius + iRadius] = g[yi];
         gsum += g[yi]*fracInf;
-        bLine[iRadius + iRadius] = b[yi];
         bsum += b[yi]*fracInf;
-        aLine[iRadius + iRadius] = a[yi];
         asum += a[yi]*fracInf;
-        yp+=w;
-
+        yp += w;
 
         yi = x;
         for(y = 0; y < h; y++) {
-            uchar aVal = floorQrealToUChar(asum*divFInv);
+            const uchar aVal = floorQrealToUChar(asum*divFInv);
             pixels[yi*4]		= qMin(aVal, floorQrealToUChar(rsum*divFInv));
             pixels[yi*4 + 1]	= qMin(aVal, floorQrealToUChar(gsum*divFInv));
             pixels[yi*4 + 2]	= qMin(aVal, floorQrealToUChar(bsum*divFInv));
             pixels[yi*4 + 3]	= aVal;
             if(x == 0) {
-                vMIN[y]=qMin(y+iRadius+1,hm)*w;
-                vMAX[y]=qMax(y-iRadius,0)*w;
-            }
-            p1=x+vMIN[y];
-
-            rsum -= rLine[0]*fracInf;
-            gsum -= gLine[0]*fracInf;
-            bsum -= bLine[0]*fracInf;
-            asum -= aLine[0]*fracInf;
-
-            rsum -= rLine[1]*fracInfInv;
-            gsum -= gLine[1]*fracInfInv;
-            bsum -= bLine[1]*fracInfInv;
-            asum -= aLine[1]*fracInfInv;
-
-            for(i = 0; i < nPoints - 1; i++) {
-                rLine[i] = rLine[i + 1];
-                gLine[i] = gLine[i + 1];
-                bLine[i] = bLine[i + 1];
-                aLine[i] = aLine[i + 1];
+                vMIN[y] = qMin(y + iRadius + 1, yMax)*w;
+                vMAX[y] = qMax(y - iRadius, 0)*w;
             }
 
-            rsum += rLine[nPoints - 1]*fracInfInv;
-            gsum += gLine[nPoints - 1]*fracInfInv;
-            bsum += bLine[nPoints - 1]*fracInfInv;
-            asum += aLine[nPoints - 1]*fracInfInv;
+            p = x + vMAX[y];
 
-            rLine[nPoints - 1] = r[p1];
-            gLine[nPoints - 1] = g[p1];
-            bLine[nPoints - 1] = b[p1];
-            aLine[nPoints - 1] = a[p1];
+            rsum -= r[p]*fracInf;
+            gsum -= g[p]*fracInf;
+            bsum -= b[p]*fracInf;
+            asum -= a[p]*fracInf;
 
-            rsum += r[p1]*fracInf;
-            gsum += g[p1]*fracInf;
-            bsum += b[p1]*fracInf;
-            asum += a[p1]*fracInf;
+            p = x + vMAX[qMax(0, y - 1)];
 
-            yi+=w;
+            rsum -= r[p]*fracInfInv;
+            gsum -= g[p]*fracInfInv;
+            bsum -= b[p]*fracInfInv;
+            asum -= a[p]*fracInfInv;
+
+            p = x + vMIN[qMax(0, y - 1)];
+
+            rsum += r[p]*fracInfInv;
+            gsum += g[p]*fracInfInv;
+            bsum += b[p]*fracInfInv;
+            asum += a[p]*fracInfInv;
+
+            p = x + vMIN[y];
+
+            rsum += r[p]*fracInf;
+            gsum += g[p]*fracInf;
+            bsum += b[p]*fracInf;
+            asum += a[p]*fracInf;
+
+            yi += w;
         }
     }
-
-    delete[] rLine;
-    delete[] gLine;
-    delete[] bLine;
-    delete[] aLine;
 
     delete[] r;
     delete[] g;

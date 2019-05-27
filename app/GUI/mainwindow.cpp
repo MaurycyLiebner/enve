@@ -399,35 +399,51 @@ void MainWindow::setupMenuBar() {
 
     mViewMenu = mMenuBar->addMenu("View");
 
-    mLowQuality = mViewMenu->addAction("Low Display Quality", [this]() {
+    const auto filteringMenu = mViewMenu->addMenu("Filtering");
+
+    mNoneQuality = filteringMenu->addAction("None", [this]() {
         BoundingBox::sDisplayQuality = kNone_SkFilterQuality;
         mCanvasWindow->requestUpdate();
 
+        mLowQuality->setChecked(false);
+        mMediumQuality->setChecked(false);
+        mHighQuality->setChecked(false);
+    });
+    mNoneQuality->setCheckable(true);
+    mNoneQuality->setChecked(BoundingBox::sDisplayQuality == kNone_SkFilterQuality);
+
+    mLowQuality = filteringMenu->addAction("Low", [this]() {
+        BoundingBox::sDisplayQuality = kLow_SkFilterQuality;
+        mCanvasWindow->requestUpdate();
+
+        mNoneQuality->setChecked(false);
         mMediumQuality->setChecked(false);
         mHighQuality->setChecked(false);
     });
     mLowQuality->setCheckable(true);
-    mLowQuality->setChecked(BoundingBox::sDisplayQuality == kNone_SkFilterQuality);
-    mMediumQuality = mViewMenu->addAction("Medium Display Quality", [this]() {
-        BoundingBox::sDisplayQuality = kLow_SkFilterQuality;
+    mLowQuality->setChecked(BoundingBox::sDisplayQuality == kLow_SkFilterQuality);
+
+    mMediumQuality = filteringMenu->addAction("Medium", [this]() {
+        BoundingBox::sDisplayQuality = kMedium_SkFilterQuality;
         mCanvasWindow->requestUpdate();
 
+        mNoneQuality->setChecked(false);
         mLowQuality->setChecked(false);
         mHighQuality->setChecked(false);
     });
     mMediumQuality->setCheckable(true);
-    mMediumQuality->setChecked(BoundingBox::sDisplayQuality == kLow_SkFilterQuality);
-    mHighQuality = mViewMenu->addAction("High Display Quality", [this]() {
+    mMediumQuality->setChecked(BoundingBox::sDisplayQuality == kMedium_SkFilterQuality);
+
+    mHighQuality = filteringMenu->addAction("High", [this]() {
         BoundingBox::sDisplayQuality = kHigh_SkFilterQuality;
         mCanvasWindow->requestUpdate();
 
+        mNoneQuality->setChecked(false);
         mLowQuality->setChecked(false);
         mMediumQuality->setChecked(false);
     });
     mHighQuality->setCheckable(true);
     mHighQuality->setChecked(BoundingBox::sDisplayQuality == kHigh_SkFilterQuality);
-
-    mViewMenu->addSeparator();
 
     mClipViewToCanvas = mViewMenu->addAction("Clip To Canvas");
     mClipViewToCanvas->setCheckable(true);
