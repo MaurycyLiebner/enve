@@ -45,45 +45,25 @@ class AnimatedSurface : public GraphAnimator {
 protected:
     AnimatedSurface();
 public:
-    enum Interpolation {
-        INTER_FADE,
-        INTER_STEP
-    };
+    struct OnionSkin {
+        struct Skin {
+            SkIPoint fPos;
+            SkBitmap fBtmp;
+            SkScalar fWeight;
+        };
 
-    struct Interpolator {
-        Interpolation fInter;
-        SkIPoint fPos1;
-        SkBitmap fBtmp1;
-        SkIPoint fPos2;
-        SkBitmap fBtmp2;
-        SkScalar fWeight2;
+        QList<Skin> fSkins;
 
         void draw(SkCanvas * const canvas) {
-            if(fBtmp2.isNull() || fInter == INTER_STEP) {
-                if(fBtmp1.isNull()) return;
-                canvas->drawBitmap(fBtmp1, fPos1.x(), fPos1.y());
-                return;
+            for(const auto& skin : fSkins) {
+                SkPaint paint;
+                SkScalar colorMatrix[20] = {
+                    1, 1, 1, 0, 0,
+                    0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0,
+                    -0.333f, -0.333f, -0.333f, 1, 0};
+                paint.setColorFilter(SkColorFilters::Matrix(colorMatrix));
             }
-            if(fBtmp1.isNull()) {
-                canvas->drawBitmap(fBtmp2, fPos2.x(), fPos2.y());
-                return;
-            }
-            const auto l = qMin(fPos1.x(), fPos2.x());
-            const auto t = qMin(fPos1.y(), fPos2.y());
-            const auto r = qMax(fPos1.x() + fBtmp1.width(),
-                                fPos2.x() + fBtmp2.width());
-            const auto b = qMax(fPos1.y() + fBtmp1.height(),
-                                fPos2.y() + fBtmp2.height());
-            const SkRect rHint = SkRect::MakeLTRB(l, t, r, b);
-            canvas->saveLayer(rHint, nullptr);
-            canvas->drawBitmap(fBtmp1, fPos1.x(), fPos1.y());
-            SkPaint paint;
-            if(fInter == INTER_FADE) {
-                const int alpha =  clamp(qRound(fWeight2*255), 0, 255);
-                paint.setAlpha(static_cast<U8CPU>(alpha));
-            }
-            canvas->drawBitmap(fBtmp2, fPos2.x(), fPos2.y(), &paint);
-            canvas->restore();
         }
     };
 

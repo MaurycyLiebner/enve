@@ -20,6 +20,7 @@
 #include "SkPathMeasure.h"
 #include "SkFont.h"
 #include "SkTextUtils.h"
+#include "SkColorFilter.h"
 
 #include "gl/GrGLUtil.h"
 
