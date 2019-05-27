@@ -12,30 +12,28 @@ void VideoFrameLoader::readFrame() {
     const auto codecContext = mOpenedVideo->fCodecContext;
     //const auto swsContext = mOpenedVideo->fSwsContext;
     const qreal fps = mOpenedVideo->fFps;
-    const bool isNextFrame = mFrameId == mOpenedVideo->fLastFrame + 1;
-    if(!isNextFrame) {
-        const int64_t tsms = qFloor((mFrameId - 1) * 1000 / fps);
-        const int64_t tm = av_rescale(tsms, videoStream->time_base.den,
-                                      videoStream->time_base.num)/1000;
-        if(tm <= 0)
+
+    const int64_t tsms = qMax(0, qFloor((mFrameId - 1) * 1000 / fps));
+    const int64_t tm = av_rescale(tsms, videoStream->time_base.den,
+                                  videoStream->time_base.num)/1000;
+    if(tm <= 0)
+        avformat_seek_file(formatContext, videoStreamIndex,
+                           INT64_MIN, 0, 0, 0);
+    else {
+        const int64_t tsms0 = qMax(0, qFloor((mFrameId - fps) * 1000 / fps));
+        const int64_t tm0 = av_rescale(tsms0, videoStream->time_base.den,
+                                       videoStream->time_base.num)/1000;
+        if(avformat_seek_file(formatContext, videoStreamIndex, tm0,
+                              tm, tm, AVSEEK_FLAG_FRAME) < 0) {
+            qDebug() << "Failed to seek to " << mFrameId;
             avformat_seek_file(formatContext, videoStreamIndex,
-                               INT64_MIN, 0, 0, 0);
-        else {
-            const int64_t tsms0 = qFloor((mFrameId - fps) * 1000 / fps);
-            const int64_t tm0 = av_rescale(tsms0, videoStream->time_base.den,
-                                           videoStream->time_base.num)/1000;
-            if(avformat_seek_file(formatContext, videoStreamIndex, tm0,
-                                  tm, tm, AVSEEK_FLAG_FRAME) < 0) {
-                qDebug() << "Failed to seek to " << mFrameId;
-                avformat_seek_file(formatContext, videoStreamIndex,
-                                   INT64_MIN, 0, INT64_MAX, 0);
-            }
+                               INT64_MIN, 0, INT64_MAX, 0);
         }
     }
 
     avcodec_flush_buffers(codecContext);
     int64_t pts = 0;
-    bool frameReceived = isNextFrame;
+    bool frameReceived = false;
     while(true) {
         if(av_read_frame(formatContext, packet) < 0) {
             break;
@@ -62,7 +60,6 @@ void VideoFrameLoader::readFrame() {
         }
 
         // calculate PTS:
-        if(isNextFrame) break;
         pts = av_frame_get_best_effort_timestamp(decodedFrame);
         pts = av_rescale_q(pts, videoStream->time_base, AV_TIME_BASE_Q);
         const int currFrame = qRound(pts/1000000.*fps);
@@ -78,7 +75,6 @@ void VideoFrameLoader::readFrame() {
 
     av_packet_unref(packet);
     if(frameReceived) {
-        mOpenedVideo->fLastFrame = mFrameId;
         const auto imgFrame = av_frame_alloc();
         av_frame_move_ref(imgFrame, decodedFrame);
         const auto swsContext = sws_getContext(codecContext->width,
