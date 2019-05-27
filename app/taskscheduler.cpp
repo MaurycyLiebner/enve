@@ -106,7 +106,7 @@ void TaskScheduler::queScheduledCPUTasks() {
 void TaskScheduler::queScheduledHDDTasks() {
     if(mHDDThreadBusy) return;
     for(int i = 0; i < mScheduledHDDTasks.count(); i++) {
-        const auto &task = mScheduledHDDTasks.takeAt(i);
+        const auto task = mScheduledHDDTasks.takeAt(i);
         if(!task->isQued()) task->taskQued();
 
         mQuedHDDTasks << task;

@@ -46,12 +46,23 @@ protected:
         const auto loader = SPtrCreate(VideoFrameLoader)(
                     this, mVideoStreamsData, frame);
         mFrameLoaders << loader;
+        for(const auto& nFrame : mNeededFrames) {
+            const auto nLoader = getFrameLoader(nFrame);
+            if(nFrame < frame) nLoader->addDependent(loader.get());
+            else loader->addDependent(nLoader);
+        }
+        mNeededFrames << frame;
+        std::sort(mNeededFrames.begin(), mNeededFrames.end());
+
         return loader.get();
     }
 
     void removeFrameLoader(const int& frame) {
-        const int id = frameLoaderIndex(frame);
-        removeFrameLoaderWithId(id);
+        const int id = mFramesBeingLoaded.indexOf(frame);
+        if(id < 0 || id >= mFramesBeingLoaded.count()) return;
+        mFramesBeingLoaded.removeAt(id);
+        mFrameLoaders.removeAt(id);
+        mNeededFrames.removeOne(frame);
     }
 
     void openVideoStream() {
@@ -59,15 +70,7 @@ protected:
         mFrameCount = mVideoStreamsData->fFrameCount;
     }
 private:
-    int frameLoaderIndex(const int& frame) const {
-        return mFramesBeingLoaded.indexOf(frame);
-    }
-
-    void removeFrameLoaderWithId(const int& id) {
-        if(id < 0 || id >= mFramesBeingLoaded.count()) return;
-        mFramesBeingLoaded.removeAt(id);
-        mFrameLoaders.removeAt(id);
-    }
+    QList<int> mNeededFrames;
 
     QList<int> mFramesBeingLoaded;
     QList<stdsptr<VideoFrameLoader>> mFrameLoaders;
