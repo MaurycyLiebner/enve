@@ -32,6 +32,7 @@ void VideoCacheHandler::frameLoaderFinished(const int& frame,
             vidBox->updateDurationRectangleAnimationRange();
         }
     }
+
     removeFrameLoader(frame);
 }
 

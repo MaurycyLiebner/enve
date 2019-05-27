@@ -50,9 +50,8 @@ protected:
     }
 
     void removeFrameLoader(const int& frame) {
-        const int id = mFramesBeingLoaded.indexOf(frame);
-        mFramesBeingLoaded.removeAt(id);
-        mFrameLoaders.removeAt(id);
+        const int id = frameLoaderIndex(frame);
+        removeFrameLoaderWithId(id);
     }
 
     void openVideoStream() {
@@ -60,6 +59,16 @@ protected:
         mFrameCount = mVideoStreamsData->fFrameCount;
     }
 private:
+    int frameLoaderIndex(const int& frame) const {
+        return mFramesBeingLoaded.indexOf(frame);
+    }
+
+    void removeFrameLoaderWithId(const int& id) {
+        if(id < 0 || id >= mFramesBeingLoaded.count()) return;
+        mFramesBeingLoaded.removeAt(id);
+        mFrameLoaders.removeAt(id);
+    }
+
     QList<int> mFramesBeingLoaded;
     QList<stdsptr<VideoFrameLoader>> mFrameLoaders;
 
