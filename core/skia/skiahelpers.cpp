@@ -1,11 +1,19 @@
 #include "skiahelpers.h"
 #include "exceptions.h"
 
-sk_sp<SkImage> SkiaHelpers::makeSkImageCopy(const sk_sp<SkImage>& img) {
+sk_sp<SkImage> SkiaHelpers::makeCopy(const sk_sp<SkImage>& img) {
     if(!img) return nullptr;
     SkPixmap pix;
     if(!img->peekPixels(&pix)) return img->makeRasterImage();
     return SkImage::MakeRasterCopy(pix);
+}
+
+SkBitmap SkiaHelpers::makeCopy(const SkBitmap& btmp) {
+    if(btmp.isNull()) return SkBitmap();
+    SkBitmap result;
+    result.allocPixels(btmp.info());
+    result.writePixels(btmp.pixmap());
+    return result;
 }
 
 void SkiaHelpers::drawImageGPU(

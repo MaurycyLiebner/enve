@@ -40,7 +40,7 @@ public:
 
     sk_sp<SkImage> getImage() { return mImage; }
     sk_sp<SkImage> getImageCopy() {
-        return SkiaHelpers::makeSkImageCopy(mImage);
+        return SkiaHelpers::makeCopy(mImage);
     }
 protected:
     void setImage(const sk_sp<SkImage>& img) {

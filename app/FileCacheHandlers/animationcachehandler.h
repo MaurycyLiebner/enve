@@ -13,12 +13,12 @@ public:
 
     sk_sp<SkImage> getFrameCopyAtFrame(const int &relFrame) {
         const sk_sp<SkImage> imageToCopy = getFrameAtFrame(relFrame);
-        return SkiaHelpers::makeSkImageCopy(imageToCopy);
+        return SkiaHelpers::makeCopy(imageToCopy);
     }
 
     sk_sp<SkImage> getFrameCopyAtOrBeforeFrame(const int &relFrame) {
         const sk_sp<SkImage> imageToCopy = getFrameAtOrBeforeFrame(relFrame);
-        return SkiaHelpers::makeSkImageCopy(imageToCopy);
+        return SkiaHelpers::makeCopy(imageToCopy);
     }
 
     int getFrameCount() { return mFrameCount; }

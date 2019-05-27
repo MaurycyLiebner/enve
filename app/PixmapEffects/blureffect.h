@@ -5,15 +5,13 @@ class BoolProperty;
 
 struct BlurEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;
-
+protected:
+    BlurEffectRenderData() {}
+public:
     void applyEffectsSk(const SkBitmap &bitmap,
                         const qreal &scale);
 
-    bool hasKeys;
-    bool highQuality;
-    qreal blurRadius;
-protected:
-    BlurEffectRenderData() {}
+    qreal fBlurRadius;
 };
 
 class BlurEffect : public PixmapEffect {
@@ -30,7 +28,6 @@ public:
 protected:
     BlurEffect();
 private:
-    qsptr<BoolProperty> mHighQuality;
     qsptr<QrealAnimator> mBlurRadius;
 };
 

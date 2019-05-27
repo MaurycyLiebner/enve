@@ -1,15 +1,12 @@
 #include "blureffect.h"
+#include "skia/skiahelpers.h"
+
 #include "Animators/qrealanimator.h"
 #include "Properties/boolproperty.h"
-#include "rastereffects.h"
 
 BlurEffect::BlurEffect() : PixmapEffect("blur", EFFECT_BLUR) {
-    mBlurRadius = SPtrCreate(QrealAnimator)(10., 0., 999., 1., "radius");
+    mBlurRadius = SPtrCreate(QrealAnimator)(10., 0., 300., 1., "radius");
 
-    mHighQuality = SPtrCreate(BoolProperty)("high quality");
-    mHighQuality->setValue(false);
-
-    ca_addChildAnimator(mHighQuality);
     ca_addChildAnimator(mBlurRadius);
 
     setPropertyForGUI(mBlurRadius.get());
@@ -17,7 +14,14 @@ BlurEffect::BlurEffect() : PixmapEffect("blur", EFFECT_BLUR) {
 
 void BlurEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                           const qreal &scale) {
-    RasterEffects::applyBlur(bitmap, scale, blurRadius, highQuality, hasKeys);
+    const SkScalar sigma = toSkScalar(fBlurRadius*0.3333*scale);
+    const auto src = SkiaHelpers::makeCopy(bitmap);
+    SkCanvas canvas(bitmap);
+    canvas.clear(SK_ColorTRANSPARENT);
+    SkPaint paint;
+    const auto filter = SkBlurImageFilter::Make(sigma, sigma, nullptr);
+    paint.setImageFilter(filter);
+    canvas.drawBitmap(src, 0, 0, &paint);
 }
 
 qreal BlurEffect::getMargin() {
@@ -31,8 +35,6 @@ qreal BlurEffect::getMarginAtRelFrame(const int &relFrame) {
 stdsptr<PixmapEffectRenderData> BlurEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(BlurEffectRenderData)();
-    renderData->blurRadius = mBlurRadius->getEffectiveValue(relFrame);
-    renderData->hasKeys = mBlurRadius->anim_hasKeys();
-    renderData->highQuality = mHighQuality->getValue();
+    renderData->fBlurRadius = mBlurRadius->getEffectiveValue(relFrame);
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }

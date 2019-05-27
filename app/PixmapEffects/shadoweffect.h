@@ -11,8 +11,6 @@ struct ShadowEffectRenderData : public PixmapEffectRenderData {
     void applyEffectsSk(const SkBitmap &bitmap,
                         const qreal &scale);
 
-    bool hasKeys;
-    bool highQuality;
     qreal blurRadius;
     qreal opacity;
     QColor color;
@@ -35,7 +33,6 @@ protected:
     ShadowEffect();
 private:
 //    QrealAnimator mScale;
-    qsptr<BoolProperty> mHighQuality;
     qsptr<QrealAnimator> mBlurRadius;
     qsptr<QrealAnimator> mOpacity;
     qsptr<ColorAnimator> mColor;

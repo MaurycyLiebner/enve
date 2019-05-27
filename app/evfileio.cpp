@@ -213,19 +213,16 @@ void PixmapEffect::readProperty(QIODevice *target) {
 
 void BlurEffect::readProperty(QIODevice *target) {
     PixmapEffect::readProperty(target);
-    mHighQuality->readProperty(target);
     mBlurRadius->readProperty(target);
 }
 
 void BlurEffect::writeProperty(QIODevice * const target) const {
     PixmapEffect::writeProperty(target);
-    mHighQuality->writeProperty(target);
     mBlurRadius->writeProperty(target);
 }
 
 void ShadowEffect::readProperty(QIODevice *target) {
     PixmapEffect::readProperty(target);
-    mHighQuality->readProperty(target);
     mBlurRadius->readProperty(target);
     mOpacity->readProperty(target);
     mColor->readProperty(target);
@@ -234,7 +231,6 @@ void ShadowEffect::readProperty(QIODevice *target) {
 
 void ShadowEffect::writeProperty(QIODevice * const target) const {
     PixmapEffect::writeProperty(target);
-    mHighQuality->writeProperty(target);
     mBlurRadius->writeProperty(target);
     mOpacity->writeProperty(target);
     mColor->writeProperty(target);

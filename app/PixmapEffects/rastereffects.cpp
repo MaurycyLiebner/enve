@@ -3,7 +3,7 @@
 #include <QColor>
 
 #include <cmath>
-#include "cstring"
+#include <cstring>
 
 using namespace std;
 #include <algorithm>
@@ -384,9 +384,12 @@ void anim_contrast(const SkBitmap &bitmap, qreal contrast) {
             u8 pG = pixels[p + 1];
             u8 pB = pixels[p + 2];
 
-            Rn = (contrast > 0) ? ((pR - Ravg) * 256 / (256 - contrast) + Ravg) : ((pR - Ravg) * (256 + contrast) / 256 + Ravg);
-            Gn = (contrast > 0) ? ((pG - Gavg) * 256 / (256 - contrast) + Gavg) : ((pG - Gavg) * (256 + contrast) / 256 + Gavg);
-            Bn = (contrast > 0) ? ((pB - Bavg) * 256 / (256 - contrast) + Bavg) : ((pB - Bavg) * (256 + contrast) / 256 + Bavg);
+            Rn = (contrast > 0) ? ((pR - Ravg) * 256 / (256 - contrast) + Ravg) :
+                                  ((pR - Ravg) * (256 + contrast) / 256 + Ravg);
+            Gn = (contrast > 0) ? ((pG - Gavg) * 256 / (256 - contrast) + Gavg) :
+                                  ((pG - Gavg) * (256 + contrast) / 256 + Gavg);
+            Bn = (contrast > 0) ? ((pB - Bavg) * 256 / (256 - contrast) + Bavg) :
+                                  ((pB - Bavg) * (256 + contrast) / 256 + Bavg);
 
             pixels[p] = Rn < 0 ? 0 : (Rn > 255 ? 255 : Rn);
             pixels[p + 1] = Gn < 0 ? 0 : (Gn > 255 ? 255 : Gn);
@@ -3490,8 +3493,7 @@ static int getOptimalKernelWidth(qreal radius, qreal sigma)
 void applyBlur(const SkBitmap &bitmap, const qreal &scale,
                const qreal &blurRadius, const bool &highQuality,
                const bool &hasKeys) {
-    qreal radius = blurRadius*scale;
-
+    const qreal radius = blurRadius*scale;
     if(highQuality) {
         if(hasKeys) {
             RasterEffects::anim_fast_blur(bitmap, radius*0.5);

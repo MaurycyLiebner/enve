@@ -21,7 +21,7 @@ void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     fDrawPos = src->fDrawPos;
     fOpacity = src->fOpacity;
     fResolution = src->fResolution;
-    fRenderedImage = SkiaHelpers::makeSkImageCopy(src->fRenderedImage);
+    fRenderedImage = SkiaHelpers::makeCopy(src->fRenderedImage);
     mState = FINISHED;
     fRelBoundingRectSet = true;
     fCopied = true;

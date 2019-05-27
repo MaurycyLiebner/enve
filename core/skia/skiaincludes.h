@@ -28,6 +28,7 @@
 
 #include "include/effects/SkGradientShader.h"
 #include "include/effects/SkBlurImageFilter.h"
+#include "include/effects/SkDropShadowImageFilter.h"
 
 #include "src/gpu/gl/GrGLUtil.h"
 

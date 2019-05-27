@@ -21,7 +21,7 @@ struct TileImgs {
             fImgs << QList<sk_sp<SkImage>>();
             auto& list = fImgs.last();
             for(const auto& srcImg : srcList) {
-                list << SkiaHelpers::makeSkImageCopy(srcImg);
+                list << SkiaHelpers::makeCopy(srcImg);
             }
         }
     }

@@ -7,7 +7,9 @@
 #include "castmacros.h"
 
 namespace SkiaHelpers {
-    sk_sp<SkImage> makeSkImageCopy(const sk_sp<SkImage>& img);
+    sk_sp<SkImage> makeCopy(const sk_sp<SkImage>& img);
+    SkBitmap makeCopy(const SkBitmap& btmp);
+
     void drawImageGPU(SkCanvas* const canvas,
                       const sk_sp<SkImage>& image,
                       const SkScalar& x,
