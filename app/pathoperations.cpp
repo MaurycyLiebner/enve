@@ -2,7 +2,6 @@
 #include "Boxes/pathbox.h"
 #include "Animators/transformanimator.h"
 #include "exceptions.h"
-#include "SkPathOps.h"
 #include "pointhelpers.h"
 
 void gApplyOperation(const qreal &relFrame,

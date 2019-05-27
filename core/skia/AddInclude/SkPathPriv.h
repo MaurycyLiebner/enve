@@ -8,7 +8,7 @@
 #ifndef SkPathPriv_DEFINED
 #define SkPathPriv_DEFINED
 
-#include "SkPath.h"
+#include "include/core/SkPath.h"
 
 class SkPathPriv {
 public:
@@ -18,7 +18,7 @@ public:
     static const int kPathRefGenIDBitCnt = 32;
 #endif
 
-    enum FirstDirection {
+    enum FirstDirection : int {
         kCW_FirstDirection,         // == SkPath::kCW_Direction
         kCCW_FirstDirection,        // == SkPath::kCCW_Direction
         kUnknown_FirstDirection,
@@ -159,6 +159,17 @@ public:
         return path.fPathRef->conicWeights();
     }
 
+#ifndef SK_LEGACY_PATH_CONVEXITY
+    /** Returns true if path formed by pts is convex.
+
+        @param pts    SkPoint array of path
+        @param count  number of entries in array
+
+        @return       true if pts represent a convex geometry
+    */
+    static bool IsConvex(const SkPoint pts[], int count);
+#endif
+
     /** Returns true if the underlying SkPathRef has one single owner. */
     static bool TestingOnly_unique(const SkPath& path) {
         return path.fPathRef->unique();
@@ -219,10 +230,6 @@ public:
         return result;
     }
 
-    // For crbug.com/821353 and skbug.com/6886
-    static bool IsBadForDAA(const SkPath& path) { return path.fIsBadForDAA; }
-    static void SetIsBadForDAA(SkPath& path, bool isBadForDAA) { path.fIsBadForDAA = isBadForDAA; }
-
     /**
      *  Sometimes in the drawing pipeline, we have to perform math on path coordinates, even after
      *  the path is in device-coordinates. Tessellation and clipping are two examples. Usually this
@@ -259,6 +266,11 @@ public:
 
         SkASSERT(verb < SK_ARRAY_COUNT(gPtsInVerb));
         return gPtsInVerb[verb];
+    }
+
+    static bool IsAxisAligned(const SkPath& path) {
+        SkRect tmp;
+        return (path.fPathRef->fIsRRect | path.fPathRef->fIsOval) || path.isRect(&tmp);
     }
 };
 

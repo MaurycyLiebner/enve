@@ -47,22 +47,35 @@ protected:
 public:
     struct OnionSkin {
         struct Skin {
-            SkIPoint fPos;
+            SkScalar fX;
+            SkScalar fY;
             SkBitmap fBtmp;
             SkScalar fWeight;
         };
 
         QList<Skin> fSkins;
+        SkColor4f fColor;
 
         void draw(SkCanvas * const canvas) {
             for(const auto& skin : fSkins) {
                 SkPaint paint;
-                SkScalar colorMatrix[20] = {
-                    1, 1, 1, 0, 0,
-                    0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0,
-                    -0.333f, -0.333f, -0.333f, 1, 0};
-                paint.setColorFilter(SkColorFilters::Matrix(colorMatrix));
+                const SkScalar wAlpha = -0.333333f;
+                const SkScalar opacityM[20] = {
+                    1, 0, 0, 0, 0,
+                    0, 1, 0, 0, 0,
+                    0, 0, 1, 0, 0,
+                    wAlpha, wAlpha, wAlpha, skin.fWeight, 0};
+                const auto opacityF = SkColorFilters::Matrix(opacityM);
+                const SkScalar colM[20] = {
+                    0, 0, 0, fColor.fR, 0,
+                    0, 0, 0, fColor.fG, 0,
+                    0, 0, 0, fColor.fB, 0,
+                    0, 0, 0, 1, 0};
+                const auto colF = SkColorFilters::Matrix(colM);
+                const auto totF = SkColorFilters::Compose(colF, opacityF);
+                paint.setColorFilter(totF);
+
+                canvas->drawBitmap(skin.fBtmp, skin.fX, skin.fY, &paint);
             }
         }
     };

@@ -8,8 +8,8 @@
 #ifndef SkGeometry_DEFINED
 #define SkGeometry_DEFINED
 
-#include "SkMatrix.h"
-#include "SkNx.h"
+#include "include/core/SkMatrix.h"
+#include "include/private/SkNx.h"
 
 static inline Sk2s from_point(const SkPoint& point) {
     return Sk2s::Load(&point);
@@ -310,7 +310,7 @@ struct SkConic {
 };
 
 // inline helpers are contained in a namespace to avoid external leakage to fragile SkNx members
-namespace {
+namespace {  // NOLINT(google-build-namespaces)
 
 /**
  *  use for : eval(t) == A * t^2 + B * t + C
@@ -405,7 +405,7 @@ struct SkCubicCoeff {
 
 }
 
-#include "SkTemplates.h"
+#include "include/private/SkTemplates.h"
 
 /**
  *  Help class to allocate storage for approximating a conic with N quads.

@@ -9,7 +9,6 @@
 #include "GUI/valueinput.h"
 #include "GUI/canvaswindow.h"
 #include "Animators/coloranimator.h"
-#include "SkPathOps.h"
 #include "MovablePoints/segment.h"
 #include "MovablePoints/movablepoint.h"
 #include "Boxes/canvasrenderdata.h"

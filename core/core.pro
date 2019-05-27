@@ -4,6 +4,10 @@
 #
 #-------------------------------------------------
 
+HOME_FOLDER = /home/ailuropoda
+#f06b6d5469a505bb5ce3d823a8362b5ffa5a24dc
+SKIA_FOLDER = $$HOME_FOLDER/.skia2
+
 #QT       -= gui
 QT += opengl
 TARGET = core
@@ -22,24 +26,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-INCLUDEPATH += /home/ailuropoda/.skia/include/images/
-INCLUDEPATH += /home/ailuropoda/.skia/include/core/
-INCLUDEPATH += /home/ailuropoda/.skia/include/utils/
-INCLUDEPATH += /home/ailuropoda/.skia/include/gpu/
-INCLUDEPATH += /home/ailuropoda/.skia/include/config/
-INCLUDEPATH += /home/ailuropoda/.skia/include/ports/
-INCLUDEPATH += /home/ailuropoda/.skia/include/effects/
-INCLUDEPATH += /home/ailuropoda/.skia/include/private/
-INCLUDEPATH += /home/ailuropoda/.skia/include/pathops/
-
-INCLUDEPATH += /home/ailuropoda/.skia/third_party/externals/sdl/include/
-INCLUDEPATH += /home/ailuropoda/.skia/third_party/vulkan/
-INCLUDEPATH += /home/ailuropoda/.skia/src/gpu/
+INCLUDEPATH += $$SKIA_FOLDER/
 
 CONFIG(debug, debug|release) {
-    LIBS += -L/home/ailuropoda/.skia/out/Debug
+    LIBS += -L$$SKIA_FOLDER/out/Debug
 } else {
-    LIBS += -L/home/ailuropoda/.skia/out/Release
+    LIBS += -L$$SKIA_FOLDER/out/Release
     QMAKE_CFLAGS -= -O2
     QMAKE_CFLAGS -= -O1
     QMAKE_CXXFLAGS -= -O2

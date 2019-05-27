@@ -258,14 +258,14 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
     if(gradientType == Gradient::LINEAR) {
         fGradient = SkGradientShader::MakeLinear(gradPoints, gradColors,
                                                  gradPos, nStops,
-                                                 SkShader::kClamp_TileMode);
+                                                 SkTileMode::kClamp);
     } else {
         const QPointF distPt = finalStop - start;
         const qreal radius = qSqrt(pow2(distPt.x()) + pow2(distPt.y()));
         fGradient = SkGradientShader::MakeRadial(
                         toSkPoint(start), toSkScalar(radius),
                         gradColors, gradPos,
-                        nStops, SkShader::kClamp_TileMode);
+                        nStops, SkTileMode::kClamp);
     }
 }
 

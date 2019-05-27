@@ -6,7 +6,8 @@
 
 HOME_FOLDER = /home/ailuropoda
 LIBMYPAINT_FOLDER = $$HOME_FOLDER/.libmypaint-1.3.0
-SKIA_FOLDER = $$HOME_FOLDER/.skia
+#f06b6d5469a505bb5ce3d823a8362b5ffa5a24dc
+SKIA_FOLDER = $$HOME_FOLDER/.skia2
 
 QT += multimedia core gui svg opengl sql qml xml concurrent #widgets-private # gui-private core-private
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc -ljson-c
@@ -19,19 +20,7 @@ DEPENDPATH += $$PWD/../core
 LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
 INCLUDEPATH += /usr/local/include/libmypaint/
 
-INCLUDEPATH += $$SKIA_FOLDER/include/images/
-INCLUDEPATH += $$SKIA_FOLDER/include/core/
-INCLUDEPATH += $$SKIA_FOLDER/include/utils/
-INCLUDEPATH += $$SKIA_FOLDER/include/gpu/
-INCLUDEPATH += $$SKIA_FOLDER/include/config/
-INCLUDEPATH += $$SKIA_FOLDER/include/ports/
-INCLUDEPATH += $$SKIA_FOLDER/include/effects/
-INCLUDEPATH += $$SKIA_FOLDER/include/private/
-INCLUDEPATH += $$SKIA_FOLDER/include/pathops/
-
-INCLUDEPATH += $$SKIA_FOLDER/third_party/externals/sdl/include/
-INCLUDEPATH += $$SKIA_FOLDER/third_party/vulkan/
-INCLUDEPATH += $$SKIA_FOLDER/src/gpu/
+INCLUDEPATH += $$SKIA_FOLDER/
 
 CONFIG(debug, debug|release) {
     LIBS += -L$$SKIA_FOLDER/out/Debug
