@@ -184,12 +184,12 @@ UniformSpecifier QrealAnimatorUniformSpecifierCreator::create(
         const GLint &loc,
         Property * const property,
         const qreal &relFrame) const {
-    auto qa = GetAsPtr(property, QrealAnimator);
-    QString propName = property->prp_getName();
-    qreal val = qa->getEffectiveValue(relFrame);
+    const auto qa = GetAsPtr(property, QrealAnimator);
+    const QString propName = property->prp_getName();
+    const qreal val = qa->getEffectiveValue(relFrame);
 
     if(mScript.isEmpty()) {
-        return [&loc, &val](QGL33c * const gl, QJSEngine&) {
+        return [loc, val](QGL33c * const gl, QJSEngine&) {
             gl->glUniform1f(loc, static_cast<GLfloat>(val));
         };
     } else {
