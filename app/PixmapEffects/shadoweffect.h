@@ -7,16 +7,16 @@
 
 struct ShadowEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;
-
+protected:
+    ShadowEffectRenderData() {}
+public:
     void applyEffectsSk(const SkBitmap &bitmap,
                         const qreal &scale);
 
-    qreal blurRadius;
-    qreal opacity;
-    QColor color;
-    QPointF translation;
-protected:
-    ShadowEffectRenderData() {}
+    qreal fBlurRadius;
+    qreal fOpacity;
+    QColor fColor;
+    QPointF fTranslation;
 };
 
 class ShadowEffect : public PixmapEffect {

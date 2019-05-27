@@ -5,7 +5,7 @@
 #include "Properties/boolproperty.h"
 
 BlurEffect::BlurEffect() : PixmapEffect("blur", EFFECT_BLUR) {
-    mBlurRadius = SPtrCreate(QrealAnimator)(10., 0., 300., 1., "radius");
+    mBlurRadius = SPtrCreate(QrealAnimator)(10, 0, 300, 1, "radius");
 
     ca_addChildAnimator(mBlurRadius);
 

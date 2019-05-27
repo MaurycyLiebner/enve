@@ -24,7 +24,7 @@ ShadowEffect::ShadowEffect() :
     mColor->qra_setCurrentValue(Qt::black);
     ca_addChildAnimator(mColor);
 
-    mOpacity->setValueRange(0, 1000);
+    mOpacity->setValueRange(100, 1000);
     mOpacity->setCurrentBaseValue(100);
     ca_addChildAnimator(mOpacity);
 
@@ -39,27 +39,33 @@ ShadowEffect::ShadowEffect() :
 stdsptr<PixmapEffectRenderData> ShadowEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal &relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ShadowEffectRenderData)();
-    renderData->blurRadius = mBlurRadius->getEffectiveValue(relFrame);
-    renderData->color = mColor->getColorAtRelFrame(relFrame);
-    renderData->translation = mTranslation->
+    renderData->fBlurRadius = mBlurRadius->getEffectiveValue(relFrame);
+    renderData->fColor = mColor->getColorAtRelFrame(relFrame);
+    renderData->fTranslation = mTranslation->
             getEffectiveValueAtRelFrame(relFrame);
-    renderData->opacity = mOpacity->getEffectiveValue(relFrame)/100.;
+    renderData->fOpacity = mOpacity->getEffectiveValue(relFrame)/100.;
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
 void ShadowEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                             const qreal &scale) {
-    const SkScalar sigma = toSkScalar(blurRadius*0.3333*scale);
+    const SkScalar sigma = toSkScalar(fBlurRadius*0.3333*scale);
     const auto src = SkiaHelpers::makeCopy(bitmap);
     SkCanvas canvas(bitmap);
     canvas.clear(SK_ColorTRANSPARENT);
     SkPaint paint;
     const auto filter = SkDropShadowImageFilter::Make(
-                toSkScalar(translation.x()), toSkScalar(translation.y()),
-                sigma, sigma, toSkColor(color),
+                toSkScalar(fTranslation.x()), toSkScalar(fTranslation.y()),
+                sigma, sigma, toSkColor(fColor),
                 SkDropShadowImageFilter::kDrawShadowAndForeground_ShadowMode,
                 nullptr);
     paint.setImageFilter(filter);
+    const SkScalar opacityM[20] = {
+        1, 0, 0, 0, 0,
+        0, 1, 0, 0, 0,
+        0, 0, 1, 0, 0,
+        0, 0, 0, toSkScalar(fOpacity), 0};
+    paint.setColorFilter(SkColorFilters::Matrix(opacityM));
     canvas.drawBitmap(src, 0, 0, &paint);
 }
 
