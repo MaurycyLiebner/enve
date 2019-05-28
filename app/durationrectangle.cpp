@@ -219,8 +219,8 @@ DurationRectangleMovable *DurationRectangle::getMovableAt(
                                           const int &pressX,
                                           const qreal &pixelsPerFrame,
                                           const int &minViewedFrame) {
-    const qreal startX = (getMinFrame() - minViewedFrame + 0.5)*pixelsPerFrame;
-    const qreal endX = (getMaxFrame() - minViewedFrame + 0.5)*pixelsPerFrame;
+    const qreal startX = (getMinFrame() - minViewedFrame)*pixelsPerFrame;
+    const qreal endX = (getMaxFrame() - minViewedFrame + 1)*pixelsPerFrame;
     if(qAbs(pressX - startX) < 5) return &mMinFrame;
     else if(qAbs(pressX - endX) < 5) return &mMaxFrame;
     else if(pressX > startX && pressX < endX) return this;
