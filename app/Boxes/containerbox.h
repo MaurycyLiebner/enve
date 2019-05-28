@@ -144,6 +144,7 @@ public:
     void updateContainedBoxIds(const int &firstId,
                               const int &lastId);
     int getContainedBoxIndex(BoundingBox * const child);
+    qsptr<BoundingBox> takeContainedBox_k(const int &id);
     void removeContainedBox_k(const qsptr<BoundingBox> &child);
     void increaseContainedBoxZInList(BoundingBox * const child);
     void decreaseContainedBoxZInList(BoundingBox * const child);

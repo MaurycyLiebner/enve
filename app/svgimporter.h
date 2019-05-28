@@ -221,7 +221,7 @@ protected:
 
 extern void loadElement(const QDomElement &element, ContainerBox *parentGroup,
                         const BoxSvgAttributes &parentGroupAttributes);
-extern qsptr<ContainerBox> loadSVGFile(const QString &filename);
+extern qsptr<BoundingBox> loadSVGFile(const QString &filename);
 /*
 #include <QStringRef>
 #include <QPainterPath>

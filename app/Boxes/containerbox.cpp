@@ -760,6 +760,12 @@ void ContainerBox::removeContainedBox(const qsptr<BoundingBox>& child) {
     //child->setParent(nullptr);
 }
 
+qsptr<BoundingBox> ContainerBox::takeContainedBox_k(const int &id) {
+    const auto child = mContainedBoxes.at(id);
+    removeContainedBox_k(child);
+    return child;
+}
+
 void ContainerBox::removeContainedBox_k(const qsptr<BoundingBox>& child) {
     removeContainedBox(child);
     if(mContainedBoxes.isEmpty() && mParentGroup) {

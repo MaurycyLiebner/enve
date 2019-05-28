@@ -939,7 +939,7 @@ bool getFlatColorFromString(const QString &colorStr, FillSvgAttributes *target) 
     return true;
 }
 
-qsptr<ContainerBox> loadSVGFile(const QString &filename) {
+qsptr<BoundingBox> loadSVGFile(const QString &filename) {
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QDomDocument document;
@@ -949,6 +949,11 @@ qsptr<ContainerBox> loadSVGFile(const QString &filename) {
                 BoxSvgAttributes attributes;
                 const auto result = loadBoxesGroup(rootElement, nullptr, attributes);
                 gGradients.clear();
+                if(result->getContainedBoxesCount() == 1) {
+                    return result->takeContainedBox_k(0);
+                } else if(result->getContainedBoxesCount() == 0) {
+                    return nullptr;
+                }
                 return result;
             } else {
                 RuntimeThrow("File does not have svg root element");
@@ -959,7 +964,6 @@ qsptr<ContainerBox> loadSVGFile(const QString &filename) {
     } else {
         RuntimeThrow("Cannot open file " + filename);
     }
-    return nullptr;
 }
 
 void BoxSvgAttributes::setParent(const BoxSvgAttributes &parent) {
