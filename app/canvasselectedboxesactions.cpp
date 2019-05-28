@@ -10,13 +10,14 @@ void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.isEmpty()) return;
     const auto newGroup = SPtrCreate(ContainerBox)(TYPE_GROUP);
     mCurrentBoxesGroup->addContainedBox(newGroup);
-    BoundingBox* box;
-    Q_FOREACHInverted(box, mSelectedBoxes) {
-        const auto boxSP = GetAsSPtr(box, BoundingBox);
-        box->removeFromParent_k();
+    for(int i = mSelectedBoxes.count() - 1; i >= 0; i--) {
+        const auto boxSP = GetAsSPtr(mSelectedBoxes.at(i), BoundingBox);
+        boxSP->removeFromParent_k();
         newGroup->addContainedBox(boxSP);
     }
-    clearBoxesSelectionList(); schedulePivotUpdate();
+    clearBoxesSelectionList();
+    newGroup->centerPivotPosition();
+    schedulePivotUpdate();
     addBoxToSelection(newGroup.get());
 }
 
