@@ -25,9 +25,9 @@ public:
     }
 
     void prp_afterChangedAbsRange(const FrameRange &range) {
-        GraphAnimator::prp_afterChangedAbsRange(range);
         if(range.inRange(anim_getCurrentAbsFrame()))
-            mPathUpToDate = false;
+            updateBaseValue();
+        GraphAnimator::prp_afterChangedAbsRange(range);
     }
 
     void anim_setAbsFrame(const int &frame) {
@@ -37,19 +37,8 @@ public:
         const bool diff = prp_differencesBetweenRelFrames(
                     anim_getCurrentRelFrame(), lastRelFrame);
         if(diff) {
-            const auto prevK1 = anim_getPrevKey<SmartPathKey>(lastRelFrame);
-            const auto prevK2 = anim_getPrevKey<SmartPathKey>(anim_getCurrentRelFrame());
-            const auto nextK1 = anim_getNextKey<SmartPathKey>(lastRelFrame);
-            const auto nextK2 = anim_getNextKey<SmartPathKey>(anim_getCurrentRelFrame());
-            const auto keyAtFrame1 = anim_getKeyAtRelFrame(lastRelFrame);
-            const auto keyAtFrame2 = anim_getKeyOnCurrentFrame<SmartPathKey>();
-            if(!prevK1 && !prevK2 && !keyAtFrame1 && !keyAtFrame2) return;
-            if(!nextK1 && !nextK2 && !keyAtFrame1 && !keyAtFrame2) return;
-            deepCopySmartPathFromRelFrame(anim_getCurrentRelFrame(),
-                                          prevK2, nextK2, keyAtFrame2,
-                                          mBaseValue);
+            updateBaseValue();
             anim_callFrameChangeUpdater();
-            mPathUpToDate = false;
         }
     }
 
@@ -361,6 +350,16 @@ protected:
         return mBaseValue;
     }
 private:
+    void updateBaseValue() {
+        const auto prevK = anim_getPrevKey<SmartPathKey>(anim_getCurrentRelFrame());
+        const auto nextK = anim_getNextKey<SmartPathKey>(anim_getCurrentRelFrame());
+        const auto keyAtFrame = anim_getKeyOnCurrentFrame<SmartPathKey>();
+        mPathUpToDate = false;
+        deepCopySmartPathFromRelFrame(anim_getCurrentRelFrame(),
+                                      prevK, nextK, keyAtFrame,
+                                      mBaseValue);
+    }
+
     void updateAllPoints();
 
     void deepCopySmartPathFromRelFrame(const int& relFrame,
