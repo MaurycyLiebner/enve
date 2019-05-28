@@ -13,6 +13,7 @@
 #include "Animators/transformanimator.h"
 #include "MovablePoints/segment.h"
 #include "Animators/SmartPath/smartpathanimator.h"
+#include "PathEffects/patheffectanimators.h"
 
 SmartVectorPath::SmartVectorPath() :
     PathBox(BoundingBoxType::TYPE_VECTOR_PATH) {
@@ -21,7 +22,7 @@ SmartVectorPath::SmartVectorPath() :
     const auto updater = SPtrCreate(NodePointUpdater)(this);
     mPathAnimator->prp_setOwnUpdater(updater);
     ca_addChildAnimator(GetAsSPtr(mPathAnimator, Property));
-    ca_moveChildBelow(mPathAnimator.data(), mEffectsAnimators.data());
+    ca_moveChildAbove(mPathAnimator.data(), mPathEffectsAnimators.data());
 }
 
 bool SmartVectorPath::differenceInEditPathBetweenFrames(

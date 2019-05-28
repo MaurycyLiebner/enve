@@ -195,13 +195,13 @@ void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
 
 void HDDCachableCacheHandler::clearRelRange(const FrameRange &range) {
     int minId = idAtOrAfterRelFrame(range.fMin);
-    minId = qMin(minId, mRenderContainers.count() - 1);
     int maxId = idAtOrBeforeRelFrame(range.fMax);
-    maxId = qMax(maxId, 0);
+    if(minId > maxId) return;
+    minId = clamp(minId, 0, mRenderContainers.count() - 1);
+    maxId = clamp(maxId, 0, mRenderContainers.count() - 1);
 
-    for(int i = maxId; i >= minId; i--) {
+    for(int i = maxId; i >= minId; i--)
         mRenderContainers.removeAt(i);
-    }
 }
 
 QList<FrameRange> HDDCachableCacheHandler::getMissingRanges(const FrameRange &range) const {
