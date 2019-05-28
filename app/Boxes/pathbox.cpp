@@ -12,6 +12,7 @@
 #include "Animators/transformanimator.h"
 #include "paintsettingsapplier.h"
 #include "Animators/gradient.h"
+#include "Animators/gpueffectanimators.h"
 
 PathBox::PathBox(const BoundingBoxType &type) :
     BoundingBox(type) {
@@ -55,10 +56,15 @@ PathBox::PathBox(const BoundingBoxType &type) :
                 mStrokeGradientPoints.data(), this);
     ca_addChildAnimator(mFillSettings);
     ca_addChildAnimator(mStrokeSettings);
-    ca_moveChildAbove(mEffectsAnimators.data(), mStrokeSettings.data());
+
     ca_addChildAnimator(mPathEffectsAnimators);
     ca_addChildAnimator(mFillPathEffectsAnimators);
     ca_addChildAnimator(mOutlinePathEffectsAnimators);
+
+    ca_moveChildBelow(mEffectsAnimators.data(),
+                      mOutlinePathEffectsAnimators.data());
+    ca_moveChildBelow(mGPUEffectsAnimators.data(),
+                      mEffectsAnimators.data());
 }
 
 PathBox::~PathBox() {

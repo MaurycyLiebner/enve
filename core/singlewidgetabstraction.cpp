@@ -20,9 +20,9 @@ bool SingleWidgetAbstraction::getAbstractions(
         const bool &parentSatisfiesRule,
         const bool &parentMainTarget) { // returns whether should abort
     if(currY > maxY) return true;
-    bool satisfiesRule = mTarget->SWT_shouldBeVisible(rules,
-                                                      parentSatisfiesRule,
-                                                      parentMainTarget);
+    const bool satisfiesRule = mTarget->SWT_isVisible() &&
+            mTarget->SWT_shouldBeVisible(rules, parentSatisfiesRule,
+                                         parentMainTarget);
     if(currY > minY && satisfiesRule && !mIsMainTarget) {
         abstractions.append(this);
     }
@@ -30,7 +30,8 @@ bool SingleWidgetAbstraction::getAbstractions(
         currX += swtHeight;
         currY += swtHeight;
     }
-    bool childrenVisible = (satisfiesRule && mContentVisible) || mIsMainTarget;
+    const bool childrenVisible = (satisfiesRule && mContentVisible) ||
+                                 mIsMainTarget;
     for(const auto& abs : mChildren) {
         if(abs->getAbstractions(
                     minY, maxY, currY, currX, swtHeight,
@@ -53,7 +54,8 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         const bool &parentMainTarget) { // returns whether should abort
     if(!mTarget->SWT_isVisible()) return false;
     if(currY > maxY) return true;
-    const bool satisfiesRule = mTarget->SWT_shouldBeVisible(
+    const bool satisfiesRule = mTarget->SWT_isVisible() &&
+            mTarget->SWT_shouldBeVisible(
                 rules, parentSatisfiesRule, parentMainTarget);
     if(currY > minY && satisfiesRule && !mIsMainTarget) {
         setAbsFunc(this, currX);
@@ -82,13 +84,14 @@ int SingleWidgetAbstraction::getHeight(
         const int &swtHeight) {
     int height = 0;
     if(mTarget->SWT_isVisible()) {
-        bool satisfiesRule = mTarget->SWT_shouldBeVisible(rules,
-                                                          parentSatisfiesRule,
-                                                          parentMainTarget);
+        const bool satisfiesRule = mTarget->SWT_isVisible() &&
+                mTarget->SWT_shouldBeVisible(rules, parentSatisfiesRule,
+                                             parentMainTarget);
         if(satisfiesRule && !mIsMainTarget) {
             height += swtHeight;
         }
-        bool childrenVisible = (satisfiesRule && mContentVisible) || mIsMainTarget;
+        const bool childrenVisible = (satisfiesRule && mContentVisible) ||
+                                     mIsMainTarget;
         for(const auto& abs : mChildren) {
             height += abs->getHeight(rules, childrenVisible,
                                      mIsMainTarget, swtHeight);

@@ -15,7 +15,6 @@ void ComplexAnimator::ca_prependChildAnimator(Property *childAnimator,
     ca_addChildAnimator(prependWith, id);
 }
 
-
 void ComplexAnimator::ca_replaceChildAnimator(const qsptr<Property>& childAnimator,
                                               const qsptr<Property> &replaceWith) {
     const int id = getChildPropertyIndex(childAnimator.get());
@@ -62,7 +61,7 @@ bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
         return Animator::SWT_shouldBeVisible(rules, parentSatisfies,
                                              parentMainTarget);
     //}
-    return false;
+    //return false;
 }
 
 bool ComplexAnimator::SWT_isComplexAnimator() const { return true; }
