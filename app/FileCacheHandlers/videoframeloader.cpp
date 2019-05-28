@@ -42,8 +42,9 @@ int frameId(AVFrame * const decodedFrame,
 }
 
 void seek(const int& tryN, const int& frameId, const qreal& fps,
-          AVFormatContext * const formatContext, const int& videoStreamIndex,
-          AVStream * const videoStream, AVCodecContext * const codecContext) {
+          AVFormatContext * const formatContext,
+          const int& videoStreamIndex, AVStream * const videoStream,
+          AVCodecContext * const codecContext) {
     const int64_t tsms = qMax(0, qFloor((frameId - tryN) * 1000 / fps));
     const int64_t tm = av_rescale(tsms, videoStream->time_base.den,
                                   videoStream->time_base.num)/1000;
@@ -85,7 +86,7 @@ void VideoFrameLoader::readFrame() {
     }
 
     while(true) {
-        mOpenedVideo->fLastFrame = 0; // Just in case error occurs
+        mOpenedVideo->fLastFrame = -qFloor(10*fps); // Just in case error occurs
         if(av_read_frame(formatContext, packet) < 0) {
             //RuntimeThrow("Error retrieving AVPacket");
             break;

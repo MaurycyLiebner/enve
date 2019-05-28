@@ -59,7 +59,7 @@ private:
 
     QList<int> mSecondsBeingRead;
     QList<stdsptr<SoundReaderForMerger>> mSecondReaders;
-    stdsptr<const AudioStreamsData> mAudioStreamsData;
+    stdsptr<AudioStreamsData> mAudioStreamsData;
 
     HDDCachableCacheHandler mSecondsCache;
 };

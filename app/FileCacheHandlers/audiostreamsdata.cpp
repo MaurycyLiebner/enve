@@ -9,7 +9,7 @@ stdsptr<const AudioStreamsData> AudioStreamsData::sOpen(
     return result;
 }
 
-stdsptr<const AudioStreamsData> AudioStreamsData::sOpen(const QString &path) {
+stdsptr<AudioStreamsData> AudioStreamsData::sOpen(const QString &path) {
     const auto result = std::shared_ptr<AudioStreamsData>(
                 new AudioStreamsData, AudioStreamsData::sDestroy);
     result->open(path);
@@ -96,8 +96,8 @@ void AudioStreamsData::open(AVFormatContext * const formatContext) {
             audCodecPars = iCodecPars;
             audCodec = avcodec_find_decoder(audCodecPars->codec_id);
             fAudioStream = iStream;
-            fDurationSec = fAudioStream->duration*
-                    fAudioStream->time_base.num/fAudioStream->time_base.den;
+            fDurationSec = static_cast<int>(fAudioStream->duration*
+                    fAudioStream->time_base.num/fAudioStream->time_base.den);
             break;
         }
     }

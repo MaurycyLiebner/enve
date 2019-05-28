@@ -29,8 +29,9 @@ public:
     AVFrame *fDecodedFrame = nullptr;
     AVCodecContext * fCodecContext = nullptr;
     struct SwrContext * fSwrContext = nullptr;
+    int fLastDstSample = 0;
 
-    static stdsptr<const AudioStreamsData> sOpen(const QString& path);
+    static stdsptr<AudioStreamsData> sOpen(const QString& path);
 private:
     void open(const QString& path, AVFormatContext * const formatContext);
     void open(const QString& path);

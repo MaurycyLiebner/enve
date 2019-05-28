@@ -12,25 +12,18 @@ void SoundReader::afterCanceled() {
     mCacheHandler->secondReaderCanceled(mSecondId);
 }
 
-void SoundReader::readFrame() {
-    if(!mOpenedAudio->fOpened)
-        RuntimeThrow("Cannot read frame from closed AudioStream");
-    const auto formatContext = mOpenedAudio->fFormatContext;
-    const auto audioStreamIndex = mOpenedAudio->fAudioStreamIndex;
-    const auto audioStream = mOpenedAudio->fAudioStream;
-    const auto packet = mOpenedAudio->fPacket;
-    const auto decodedFrame = mOpenedAudio->fDecodedFrame;
-    const auto codecContext = mOpenedAudio->fCodecContext;
-    const auto swrContext = mOpenedAudio->fSwrContext;
-
-    const int64_t tsms = qFloor(mSecondId * 1000 - 1);
+void seek(const int& tryN, const int& secondId,
+          AVFormatContext * const formatContext,
+          const int& audioStreamIndex, AVStream * const audioStream,
+          AVCodecContext * const codecContext) {
+    const int64_t tsms = qFloor(secondId * 1000 - tryN);
     const int64_t tm = av_rescale(tsms, audioStream->time_base.den,
                                   audioStream->time_base.num)/1000;
     if(tm <= 0)
         avformat_seek_file(formatContext, audioStreamIndex,
                            INT64_MIN, 0, 0, 0);
     else {
-        const int64_t tsms0 = qFloor((mSecondId - 1) * 1000);
+        const int64_t tsms0 = qFloor((secondId - tryN) * 1000);
         const int64_t tm0 = av_rescale(tsms0, audioStream->time_base.den,
                                        audioStream->time_base.num)/1000;
         if(avformat_seek_file(formatContext, audioStreamIndex, tm0,
@@ -39,29 +32,55 @@ void SoundReader::readFrame() {
                                INT64_MIN, 0, INT64_MAX, 0);
         }
     }
-
     avcodec_flush_buffers(codecContext);
+}
+
+void SoundReader::readFrame() {
+    if(!mOpenedAudio->fOpened)
+        RuntimeThrow("Cannot read frame from closed AudioStream");
+    const auto formatContext = mOpenedAudio->fFormatContext;
+    const auto audioStreamIndex = mOpenedAudio->fAudioStreamIndex;
+    const auto audioStream = mOpenedAudio->fAudioStream;
+    const auto codecPars = audioStream->codecpar;
+    const int srcSampleRate = codecPars->sample_rate;
+    const qreal dstSamplesPerSrc = SOUND_SAMPLERATE/qreal(srcSampleRate);
+    const auto packet = mOpenedAudio->fPacket;
+    const auto decodedFrame = mOpenedAudio->fDecodedFrame;
+    const auto codecContext = mOpenedAudio->fCodecContext;
+    const auto swrContext = mOpenedAudio->fSwrContext;
+
+    const int firstSample = mSecondId*SOUND_SAMPLERATE;
+
+    int seekTry = 0;
+    if(mOpenedAudio->fLastDstSample >= firstSample ||
+       firstSample - mOpenedAudio->fLastDstSample > SOUND_SAMPLERATE) {
+        seek(seekTry++, mSecondId, formatContext,
+             audioStreamIndex, audioStream, codecContext);
+    }
+
     bool firstFrame = true;
-    int currentSample = 0;
+    int currentDstSample = 0;
     float * audioData = nullptr;
     SampleRange audioDataRange{mSampleRange.fMin, mSampleRange.fMin - 1};
     int nSamples = 0;
     while(true) {
+        mOpenedAudio->fLastDstSample = -10*SOUND_SAMPLERATE;
         if(av_read_frame(formatContext, packet) < 0) {
             break;
         } else {
             if(packet->stream_index == audioStreamIndex) {
                 const int sendRet = avcodec_send_packet(codecContext, packet);
-                if(sendRet < 0)
-                    RuntimeThrow("Sending packet to the decoder failed");
+                if(sendRet < 0) RuntimeThrow("Sending packet to the decoder failed");
+
                 const int recRet = avcodec_receive_frame(codecContext, decodedFrame);
-                if(recRet == AVERROR_EOF) return;
+                av_packet_unref(packet);
+
+                if(recRet == AVERROR_EOF)
+                    break;
                 else if(recRet == AVERROR(EAGAIN)) {
-                    av_packet_unref(packet);
                     continue;
                 } else if(recRet < 0)
                     RuntimeThrow("Did not receive frame from the decoder");
-                av_packet_unref(packet);
             } else {
                 av_packet_unref(packet);
                 continue;
@@ -72,25 +91,37 @@ void SoundReader::readFrame() {
         if(firstFrame) {
             int64_t pts = av_frame_get_best_effort_timestamp(decodedFrame);
             pts = av_rescale_q(pts, audioStream->time_base, AV_TIME_BASE_Q);
-            currentSample = pts*SOUND_SAMPLERATE/1000000;
+            currentDstSample = static_cast<int>(pts*SOUND_SAMPLERATE/1000000);
+            if(currentDstSample > firstSample) {
+                if(seekTry > 3) {
+                    qDebug() << "sample" << QString::number(currentDstSample) +
+                                " instead of " + QString::number(firstSample);
+                } else {
+                    av_frame_unref(decodedFrame);
+                    seek(seekTry++, mSecondId, formatContext,
+                         audioStreamIndex, audioStream, codecContext);
+                    continue;
+                }
+            }
         }
-        if(currentSample + decodedFrame->nb_samples >= mSecondId*SOUND_SAMPLERATE) {
+
+        if(currentDstSample + decodedFrame->nb_samples >= mSecondId*SOUND_SAMPLERATE) {
             // resample frames
             float *buffer;
+            const int bufferSamples = qCeil(decodedFrame->nb_samples*dstSamplesPerSrc);
             const int res = av_samples_alloc((uint8_t**)&buffer, nullptr, 1,
-                                             decodedFrame->nb_samples,
-                                             AV_SAMPLE_FMT_FLT, 0);
+                                             bufferSamples, AV_SAMPLE_FMT_FLT, 0);
             if(res < 0) RuntimeThrow("Resampling output buffer alloc failed");
 
-            const int nSamplesT =
+            const int nDstSamples =
                     swr_convert(swrContext,
                                 (uint8_t**)(&buffer),
-                                decodedFrame->nb_samples,
+                                bufferSamples,
                                 (const uint8_t**)decodedFrame->data,
                                 decodedFrame->nb_samples);
             if(nSamples < 0) RuntimeThrow("Resampling failed");
             // append resampled frames to data
-            const SampleRange frameSampleRange{currentSample, currentSample + nSamplesT - 1};
+            const SampleRange frameSampleRange{currentDstSample, currentDstSample + nDstSamples - 1};
             const SampleRange neededSampleRange = mSampleRange*frameSampleRange;
             const int firstRelSample = neededSampleRange.fMin - frameSampleRange.fMin;
             const int nSamplesInRange = neededSampleRange.span();
@@ -108,18 +139,17 @@ void SoundReader::readFrame() {
             }
 
             av_freep(&(reinterpret_cast<uint8_t**>(&buffer))[0]);
-
-            currentSample += nSamplesT;
             firstFrame = false;
-            if(currentSample >= mSampleRange.fMax) break;
+
+            currentDstSample += nDstSamples;
+            mOpenedAudio->fLastDstSample = currentDstSample - 1;
         }
+
+        if(currentDstSample >= mSampleRange.fMax) break;
         av_frame_unref(decodedFrame);
     }
-
-    mSamples = SPtrCreate(Samples)(audioData, audioDataRange);
-
     av_frame_unref(decodedFrame);
-    av_packet_unref(packet);
+    mSamples = SPtrCreate(Samples)(audioData, audioDataRange);
 }
 
 #include "Sound/soundmerger.h"
