@@ -1,5 +1,13 @@
 ﻿#include "videoframeloader.h"
 #include "videocachehandler.h"
+#include "taskscheduler.h"
+
+VideoFrameLoader::VideoFrameLoader(VideoCacheHandler * const cacheHandler,
+                                   const stdsptr<VideoStreamsData> &openedVideo,
+                                   const int &frameId, AVFrame * const frame) :
+    VideoFrameLoader(cacheHandler, openedVideo, frameId) {
+    setFrameToConvert(frame, openedVideo->fCodecContext);
+}
 
 void VideoFrameLoader::convertFrame() {
     const auto info = SkiaHelpers::getPremulBGRAInfo(
@@ -22,10 +30,7 @@ void VideoFrameLoader::convertFrame() {
 
     mLoadedFrame = SkiaHelpers::transferDataToSkImage(bitmap);
 
-    av_frame_unref(mFrameToConvert);
-    sws_freeContext(mSwsContext);
-    mFrameToConvert = nullptr;
-    mSwsContext = nullptr;
+    cleanUp();
 }
 
 int frameId(AVFrame * const decodedFrame,
@@ -43,8 +48,9 @@ void VideoFrameLoader::readFrame() {
     const auto videoStreamIndex = mOpenedVideo->fVideoStreamIndex;
     const auto videoStream = mOpenedVideo->fVideoStream;
     const auto packet = mOpenedVideo->fPacket;
-    const auto decodedFrame = mOpenedVideo->fDecodedFrame;
     const auto codecContext = mOpenedVideo->fCodecContext;
+    auto decodedFrame = mOpenedVideo->fDecodedFrame;
+
     //const auto swsContext = mOpenedVideo->fSwsContext;
     const qreal fps = mOpenedVideo->fFps;
 
@@ -70,7 +76,6 @@ void VideoFrameLoader::readFrame() {
         avcodec_flush_buffers(codecContext);
     }
 
-    bool frameReceived = false;
     while(true) {
         if(av_read_frame(formatContext, packet) < 0) {
             break;
@@ -98,32 +103,60 @@ void VideoFrameLoader::readFrame() {
 
         const int currFrame = frameId(decodedFrame, videoStream, fps);
         mOpenedVideo->fLastFrame = currFrame;
-        qDebug() << "got " << currFrame << " for " << mFrameId;
         if(currFrame >= mFrameId) {
             if(currFrame > mFrameId)
-                qDebug() << "video" << QString::number(currFrame) +
-                            " instead of " + QString::number(mFrameId);
-            frameReceived = true;
-            break;
-        }
-        av_frame_unref(decodedFrame);
+                qDebug() << "frame" << QString::number(currFrame) +
+                            " instead of " + QString::number(mFrameId);            
+            setFrameToConvert(decodedFrame, codecContext);
+            av_packet_unref(packet);
+            mOpenedVideo->fDecodedFrame = av_frame_alloc();
+            return;
+        } else if(mFrameId - currFrame < 10) {
+            mExcessFrames.append({currFrame, decodedFrame});
+            mOpenedVideo->fDecodedFrame = av_frame_alloc();
+            decodedFrame = mOpenedVideo->fDecodedFrame;
+        } else av_frame_unref(decodedFrame);
     }
 
     av_packet_unref(packet);
-    if(frameReceived) {
-        installFrame(decodedFrame, codecContext);
-        HDDPartFinished();
-        convertFrame();
-    } else {
-        mLoadedFrame.reset();
-        av_frame_unref(decodedFrame);
-    }
+    av_frame_unref(decodedFrame);
 }
 
 void VideoFrameLoader::afterProcessing() {
     mCacheHandler->frameLoaderFinished(mFrameId, mLoadedFrame);
+    for(auto& excess : mExcessFrames) {
+        if(mCacheHandler->getFrameAtFrame(excess.first)) {
+            av_frame_unref(excess.second);
+            av_frame_free(&excess.second);
+            continue;
+        }
+        const auto currFL = mCacheHandler->getFrameLoader(excess.first);
+        if(currFL) {
+            currFL->setFrameToConvert(excess.second, mOpenedVideo->fCodecContext);
+        } else {
+            const auto newFL = mCacheHandler->addFrameLoader(excess.first, excess.second);
+            newFL->scheduleTask();
+        }
+    }
+    mExcessFrames.clear();
 }
 
 void VideoFrameLoader::afterCanceled() {
     mCacheHandler->frameLoaderCanceled(mFrameId);
+}
+
+void VideoFrameLoader::scheduleTaskNow() {
+    if(mFrameToConvert) {
+        TaskScheduler::sGetInstance()->scheduleCPUTask(ref<Task>());
+    } else {
+        TaskScheduler::sGetInstance()->scheduleHDDTask(ref<Task>());
+    }
+}
+
+void VideoFrameLoader::processTask() {
+    if(!mFrameToConvert) readFrame();
+    if(mFrameToConvert) {
+        HDDPartFinished();
+        convertFrame();
+    }
 }

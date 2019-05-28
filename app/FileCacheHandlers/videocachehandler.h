@@ -6,6 +6,7 @@
 
 class VideoCacheHandler : public AnimationCacheHandler {
     friend class StdSelfRef;
+    friend class VideoFrameLoader;
 protected:
     VideoCacheHandler() {}
 public:
@@ -38,21 +39,34 @@ protected:
         return nullptr;
     }
 
-    VideoFrameLoader * addFrameLoader(const int& frame) {
-        if(mFramesBeingLoaded.contains(frame) ||
-           getFrameAtFrame(frame))
+    VideoFrameLoader * addFrameLoader(const int& frameId) {
+        if(mFramesBeingLoaded.contains(frameId) ||
+           getFrameAtFrame(frameId))
             RuntimeThrow("Trying to unnecessarily reload video frame");
-        mFramesBeingLoaded << frame;
+        mFramesBeingLoaded << frameId;
         const auto loader = SPtrCreate(VideoFrameLoader)(
-                    this, mVideoStreamsData, frame);
+                    this, mVideoStreamsData, frameId);
         mFrameLoaders << loader;
         for(const auto& nFrame : mNeededFrames) {
             const auto nLoader = getFrameLoader(nFrame);
-            if(nFrame < frame) nLoader->addDependent(loader.get());
+            if(nFrame < frameId) nLoader->addDependent(loader.get());
             else loader->addDependent(nLoader);
         }
-        mNeededFrames << frame;
+        mNeededFrames << frameId;
         std::sort(mNeededFrames.begin(), mNeededFrames.end());
+
+        return loader.get();
+    }
+
+    VideoFrameLoader * addFrameLoader(const int& frameId,
+                                      AVFrame * const frame) {
+        if(mFramesBeingLoaded.contains(frameId) ||
+           getFrameAtFrame(frameId))
+            RuntimeThrow("Trying to unnecessarily reload video frame");
+        mFramesBeingLoaded << frameId;
+        const auto loader = SPtrCreate(VideoFrameLoader)(
+                    this, mVideoStreamsData, frameId, frame);
+        mFrameLoaders << loader;
 
         return loader.get();
     }

@@ -101,7 +101,7 @@ protected:
 class HDDTask : public Task {
     friend class StdSelfRef;
 protected:
-    void scheduleTaskNow() final;
+    void scheduleTaskNow();
     void HDDPartFinished();
 public:
     void setController(HDDExecController * const contr) {

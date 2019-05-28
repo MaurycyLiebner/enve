@@ -1,5 +1,5 @@
 #include "updatable.h"
-#include "GUI/mainwindow.h"
+#include "taskscheduler.h"
 #include "taskexecutor.h"
 
 bool Task::scheduleTask() {

@@ -21,16 +21,18 @@ protected:
                      const int& frameId) :
         mCacheHandler(cacheHandler), mOpenedVideo(openedVideo),
         mFrameId(frameId) {}
+    VideoFrameLoader(VideoCacheHandler * const cacheHandler,
+                     const stdsptr<VideoStreamsData>& openedVideo,
+                     const int& frameId, AVFrame* const frame);
 
     void afterProcessing();
     void afterCanceled();
 
-    void installFrame(AVFrame * const src,
-                      AVCodecContext * const codecContext) {
-        mFrameToConvert = av_frame_alloc();
-        av_frame_move_ref(mFrameToConvert, src);
-        av_frame_unref(src);
+    void scheduleTaskNow();
 
+    void setFrameToConvert(AVFrame * const frame,
+                           AVCodecContext * const codecContext) {
+        mFrameToConvert = frame;
         mSwsContext = sws_getContext(codecContext->width,
                                      codecContext->height,
                                      codecContext->pix_fmt,
@@ -40,8 +42,26 @@ protected:
                                      nullptr, nullptr, nullptr);
     }
 public:
-    void processTask() { readFrame(); }
+    ~VideoFrameLoader() {
+        for(auto& excess : mExcessFrames) {
+            av_frame_unref(excess.second);
+            av_frame_free(&excess.second);
+        }
+        cleanUp();
+    }
+    void processTask();
 private:
+    void cleanUp() {
+        if(mFrameToConvert) {
+            av_frame_unref(mFrameToConvert);
+            av_frame_free(&mFrameToConvert);
+            mFrameToConvert = nullptr;
+        }
+        if(mSwsContext) {
+            sws_freeContext(mSwsContext);
+            mSwsContext = nullptr;
+        }
+    }
     void setupSwsContext(AVCodecContext * const codecContext);
     void readFrame();
     void convertFrame();
@@ -50,6 +70,8 @@ private:
     const stdsptr<VideoStreamsData> mOpenedVideo;
     const int mFrameId;
     sk_sp<SkImage> mLoadedFrame;
+
+    QList<std::pair<int, AVFrame*>> mExcessFrames;
 
     AVFrame * mFrameToConvert = nullptr;
     struct SwsContext * mSwsContext = nullptr;
