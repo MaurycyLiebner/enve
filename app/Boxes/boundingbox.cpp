@@ -119,6 +119,10 @@ void BoundingBox::centerPivotPosition() {
                 getRelCenterPosition());
 }
 
+void BoundingBox::planCenterPivotPosition() {
+    mCenterPivotPlanned = true;
+}
+
 void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
@@ -392,9 +396,11 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
     mSkRelBoundingRectPath.reset();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
 
-    if(mTransformAnimator->getPivotAutoadjust() &&
+    if((mTransformAnimator->getPivotAutoadjust() ||
+        mCenterPivotPlanned) &&
        !mTransformAnimator->posOrPivotRecording()) {
-        setPivotRelPos(renderData->getCenterPosition());
+        mCenterPivotPlanned = false;
+        setPivotRelPos(getRelCenterPosition());
     }
 }
 

@@ -28,6 +28,7 @@ void Canvas::handleAddSmartPointMousePress() {
             nodePointUnderMouse) return;
     if(!mLastEndPoint && !nodePointUnderMouse) {
         const auto newPath = SPtrCreate(SmartVectorPath)();
+        newPath->planCenterPivotPosition();
         mCurrentBoxesGroup->addContainedBox(newPath);
         clearBoxesSelection();
         addBoxToSelection(newPath.get());

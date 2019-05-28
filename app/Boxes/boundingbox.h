@@ -414,6 +414,8 @@ public:
     void updateAfterDurationRectangleShifted(const int &dFrame);
     void updateAfterDurationMinFrameChangedBy(const int &by);
     void updateAfterDurationMaxFrameChangedBy(const int &by);
+
+    void planCenterPivotPosition();
 protected:
     void updateCanvasProps() {
         mCanvasProps.clear();
@@ -458,6 +460,7 @@ protected:
     const qsptr<EffectAnimators> mEffectsAnimators;
     const qsptr<GPUEffectAnimators> mGPUEffectsAnimators;
 
+    bool mCenterPivotPlanned = false;
     bool mSchedulePlanned = false;
     UpdateReason mPlannedReason;
     QList<stdsptr<BoundingBoxRenderData>> mScheduledTasks;

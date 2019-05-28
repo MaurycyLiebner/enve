@@ -590,6 +590,7 @@ qsptr<ContainerBox> loadBoxesGroup(const QDomElement &groupElement,
     if(allRootChildNodes.count() > 1 ||
        hasTransform || parentGroup == nullptr) {
         boxesGroup = SPtrCreate(ContainerBox)(TYPE_GROUP);
+        boxesGroup->planCenterPivotPosition();
         attributes.apply(boxesGroup.get());
         if(parentGroup) parentGroup->addContainedBox(boxesGroup);
     } else {
@@ -609,6 +610,7 @@ void loadVectorPath(const QDomElement &pathElement,
                     ContainerBox *parentGroup,
                     VectorPathSvgAttributes& attributes) {
     const auto vectorPath = SPtrCreate(SmartVectorPath)();
+    vectorPath->planCenterPivotPosition();
     const QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
     attributes.apply(vectorPath.get());
@@ -619,6 +621,7 @@ void loadPolyline(const QDomElement &pathElement,
                   ContainerBox *parentGroup,
                   VectorPathSvgAttributes &attributes) {
     auto vectorPath = SPtrCreate(SmartVectorPath)();
+    vectorPath->planCenterPivotPosition();
     const QString pathStr = pathElement.attribute("points");
     parsePolylineDataFast(pathStr, attributes);
     attributes.apply(vectorPath.get());
@@ -649,6 +652,7 @@ void loadCircle(const QDomElement &pathElement,
         circle->setHorizontalRadius(rad);
         circle->setVerticalRadius(rad);
     } else return;
+    circle->planCenterPivotPosition();
 
     circle->moveByRel(QPointF(cXstr.toDouble(), cYstr.toDouble()));
 
@@ -667,7 +671,8 @@ void loadRect(const QDomElement &pathElement,
     const QString rYstr = pathElement.attribute("ry");
     const QString rXstr = pathElement.attribute("rx");
 
-    auto rect = SPtrCreate(Rectangle)();
+    const auto rect = SPtrCreate(Rectangle)();
+    rect->planCenterPivotPosition();
 
     rect->moveByRel(QPointF(xStr.toDouble(), yStr.toDouble()));
     rect->setTopLeftPos(QPointF(0, 0));
@@ -696,6 +701,7 @@ void loadText(const QDomElement &pathElement,
     const QString yStr = pathElement.attribute("y");
 
     const auto textBox = SPtrCreate(TextBox)();
+    textBox->planCenterPivotPosition();
 
     textBox->moveByRel(QPointF(xStr.toDouble(), yStr.toDouble()));
     textBox->setCurrentValue(pathElement.text());

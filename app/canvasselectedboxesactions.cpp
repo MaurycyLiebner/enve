@@ -16,7 +16,7 @@ void Canvas::groupSelectedBoxes() {
         newGroup->addContainedBox(boxSP);
     }
     clearBoxesSelectionList();
-    newGroup->centerPivotPosition();
+    newGroup->planCenterPivotPosition();
     schedulePivotUpdate();
     addBoxToSelection(newGroup.get());
 }
@@ -572,6 +572,7 @@ void Canvas::duplicateSelectedBoxes() {
 SmartVectorPath *Canvas::getPathResultingFromOperation(
         const SkPathOp& pathOp) {
     auto newPath = SPtrCreate(SmartVectorPath)();
+    newPath->planCenterPivotPosition();
     SkOpBuilder builder;
     bool first = true;
     for(const auto &box : mSelectedBoxes) {
@@ -668,9 +669,11 @@ void Canvas::selectedPathsCombine() {
     }
     if(!firstVectorPath) {
         const auto newPath = SPtrCreate(SmartVectorPath)();
+        newPath->planCenterPivotPosition();
         mCurrentBoxesGroup->addContainedBox(newPath);
         firstVectorPath = newPath.get();
     }
+
     const auto targetVP = firstVectorPath->getPathAnimator();
     const QMatrix firstTranf = firstVectorPath->getTotalTransform();
     for(const auto &box : mSelectedBoxes) {

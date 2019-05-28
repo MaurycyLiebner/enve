@@ -1375,6 +1375,7 @@ void CanvasWindow::importFile(const QString &path,
         mCurrentCanvas->unblockUndoRedo();
 
         if(importedBox) {
+            importedBox->planCenterPivotPosition();
             mCurrentCanvas->getCurrentBoxesGroup()->addContainedBox(importedBox);
             QPointF trans = relDropPos;
             trans -= importedBox->mapRelPosToAbs(

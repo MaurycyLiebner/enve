@@ -475,14 +475,16 @@ qsptr<BoundingBox> Canvas::createLink() {
 }
 
 ImageBox *Canvas::createImageBox(const QString &path) {
-    auto img = SPtrCreate(ImageBox)(path);
+    const auto img = SPtrCreate(ImageBox)(path);
+    img->planCenterPivotPosition();
     mCurrentBoxesGroup->addContainedBox(img);
     return img.get();
 }
 
 #include "Boxes/imagesequencebox.h"
 ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QStringList &paths) {
-    auto aniBox = SPtrCreate(ImageSequenceBox)();
+    const auto aniBox = SPtrCreate(ImageSequenceBox)();
+    aniBox->planCenterPivotPosition();
     aniBox->setListOfFrames(paths);
     mCurrentBoxesGroup->addContainedBox(aniBox);
     return aniBox.get();
@@ -491,6 +493,7 @@ ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QStringList &paths) {
 #include "Boxes/videobox.h"
 VideoBox* Canvas::createVideoForPath(const QString &path) {
     const auto vidBox = SPtrCreate(VideoBox)();
+    vidBox->planCenterPivotPosition();
     vidBox->setFilePath(path);
     mCurrentBoxesGroup->addContainedBox(vidBox);
     return vidBox.get();
@@ -517,11 +520,8 @@ void Canvas::scheduleDisplayedFillStrokeSettingsUpdate() {
 
 void Canvas::schedulePivotUpdate() {
     if(mRotPivot->isRotating() ||
-        mRotPivot->isScaling() ||
-        mRotPivot->isSelected()) return;
-    if(mLastPressedPoint) {
-        if(!mLastPressedPoint->selectionEnabled()) return;
-    }
+       mRotPivot->isScaling() ||
+       mRotPivot->isSelected()) return;
     mPivotUpdateNeeded = true;
 }
 

@@ -240,8 +240,8 @@ void Canvas::rotateSelectedPointsBy(const qreal &rotBy,
                                     const QPointF &absOrigin,
                                     const bool &startTrans) {
     if(mSelectedPoints_d.isEmpty()) return;
-    if(mLocalPivot) {
-        if(startTrans) {
+    if(startTrans) {
+        if(mLocalPivot) {
             for(const auto& point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(point->getAbsolutePos());
@@ -249,20 +249,14 @@ void Canvas::rotateSelectedPointsBy(const qreal &rotBy,
             }
         } else {
             for(const auto& point : mSelectedPoints_d) {
-                point->rotateRelativeToSavedPivot(rotBy);
-            }
-        }
-    } else {
-        if(startTrans) {
-            for(const auto& point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(absOrigin);
                 point->rotateRelativeToSavedPivot(rotBy);
             }
-        } else {
-            for(const auto& point : mSelectedPoints_d) {
-                point->rotateRelativeToSavedPivot(rotBy);
-            }
+        }
+    } else {
+        for(const auto& point : mSelectedPoints_d) {
+            point->rotateRelativeToSavedPivot(rotBy);
         }
     }
 }
@@ -272,29 +266,23 @@ void Canvas::scaleSelectedPointsBy(const qreal &scaleXBy,
                                    const QPointF &absOrigin,
                                    const bool &startTrans) {
     if(mSelectedPoints_d.isEmpty()) return;
-    if(mLocalPivot) {
-        if(startTrans) {
+    if(startTrans) {
+        if(mLocalPivot) {
             for(const auto& point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(point->getAbsolutePos());
-                point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy );
-            }
-        } else {
-            for(const auto& point : mSelectedPoints_d) {
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
-        }
-    } else {
-        if(startTrans) {
+        } else {
             for(const auto& point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(absOrigin);
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
-        } else {
-            for(const auto& point : mSelectedPoints_d) {
-                point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
-            }
+        }
+    } else {
+        for(const auto& point : mSelectedPoints_d) {
+            point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
         }
     }
 }

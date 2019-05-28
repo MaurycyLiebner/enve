@@ -328,6 +328,7 @@ void Canvas::handleLeftButtonMousePress() {
         mLastPressedBox = getBoxAtFromAllDescendents(mLastPressPosRel);
     } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
         const auto newPath = SPtrCreate(Circle)();
+        newPath->planCenterPivotPosition();
         mCurrentBoxesGroup->addContainedBox(newPath);
         newPath->setAbsolutePos(mLastMouseEventPosRel);
         //newPath->startAllPointsTransform();
@@ -338,6 +339,7 @@ void Canvas::handleLeftButtonMousePress() {
 
     } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
         const auto newPath = SPtrCreate(Rectangle)();
+        newPath->planCenterPivotPosition();
         mCurrentBoxesGroup->addContainedBox(newPath);
         newPath->setAbsolutePos(mLastMouseEventPosRel);
         //newPath->startAllPointsTransform();
@@ -347,6 +349,7 @@ void Canvas::handleLeftButtonMousePress() {
         mCurrentRectangle = newPath.get();
     } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
         const auto newPath = SPtrCreate(TextBox)();
+        newPath->planCenterPivotPosition();
         const FontsWidget * const fonstWidget =
                 mMainWindow->getFontsWidget();
         newPath->setSelectedFontFamilyAndStyle(
@@ -382,6 +385,7 @@ void Canvas::handleLeftButtonMousePress() {
     } else if(mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
         //setCanvasMode(CanvasMode::MOVE_POINT);
         const auto paintBox = SPtrCreate(PaintBox)();
+        paintBox->planCenterPivotPosition();
         mCurrentBoxesGroup->addContainedBox(paintBox);
         paintBox->setAbsolutePos(mLastMouseEventPosRel);
         clearBoxesSelection();
@@ -616,7 +620,7 @@ void Canvas::handleMovePointMouseMove() {
     if(mRotPivot->isSelected()) {
         if(mFirstMouseMove) mRotPivot->startTransform();
         mRotPivot->moveByAbs(getMoveByValueForEventPos(mCurrentMouseEventPosRel));
-    } else if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
+    } else if(mRotPivot->isRotating() || mRotPivot->isScaling()) {
            mRotPivot->handleMouseMove(mCurrentMouseEventPosRel,
                                       mLastPressPosRel,
                                       mXOnlyTransform, mYOnlyTransform,
@@ -669,7 +673,7 @@ void Canvas::handleMovePathMouseMove() {
         if(mFirstMouseMove) mRotPivot->startTransform();
 
         mRotPivot->moveByAbs(getMoveByValueForEventPos(mCurrentMouseEventPosRel));
-    } else if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
+    } else if(mRotPivot->isRotating() || mRotPivot->isScaling()) {
         mRotPivot->handleMouseMove(mCurrentMouseEventPosRel,
                                    mLastPressPosRel,
                                    mXOnlyTransform, mYOnlyTransform,
