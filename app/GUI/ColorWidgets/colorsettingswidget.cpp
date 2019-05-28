@@ -435,158 +435,160 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     connect(mTabWidget, SIGNAL(currentChanged(int)),
             SLOT(moveAlphaWidgetToTab(int)));
 
-    connect(rSpin, SIGNAL(valueChanged(qreal)),
-            this, SLOT(setValuesFromRGB()));
-    connect(gSpin, SIGNAL(valueChanged(qreal)),
-            this, SLOT(setValuesFromRGB()));
-    connect(bSpin, SIGNAL(valueChanged(qreal)),
-            this, SLOT(setValuesFromRGB()));
+    connect(rSpin, &QrealAnimatorValueSlider::valueChanged,
+            this, &ColorSettingsWidget::setValuesFromRGB);
+    connect(gSpin, &QrealAnimatorValueSlider::valueChanged,
+            this, &ColorSettingsWidget::setValuesFromRGB);
+    connect(bSpin, &QrealAnimatorValueSlider::valueChanged,
+            this, &ColorSettingsWidget::setValuesFromRGB);
 
-    connect(hSpin, SIGNAL(valueChanged(qreal)),
-            this, SLOT(setValuesFromHSV()));
-    connect(hsvSSpin, SIGNAL(valueChanged(qreal)),
-            this, SLOT(setValuesFromHSV()));
-    connect(vSpin, SIGNAL(valueChanged(qreal)),
-            this, SLOT(setValuesFromHSV()));
-    connect(hslSSpin, SIGNAL(valueChanged(qreal)),
-            this, SLOT(setValuesFromHSL()));
-    connect(lSpin, SIGNAL(valueChanged(qreal)),
-            this, SLOT(setValuesFromHSL()));
-    connect(aSpin, SIGNAL(valueChanged(qreal)),
-            this, SLOT(setAlphaFromSpin(qreal)));
+    connect(hSpin, &QrealAnimatorValueSlider::valueChanged,
+            this, &ColorSettingsWidget::setValuesFromHSV);
+    connect(hsvSSpin, &QrealAnimatorValueSlider::valueChanged,
+            this, &ColorSettingsWidget::setValuesFromHSV);
+    connect(vSpin, &QrealAnimatorValueSlider::valueChanged,
+            this, &ColorSettingsWidget::setValuesFromHSV);
+    connect(hslSSpin, &QrealAnimatorValueSlider::valueChanged,
+            this, &ColorSettingsWidget::setValuesFromHSL);
+    connect(lSpin, &QrealAnimatorValueSlider::valueChanged,
+            this, &ColorSettingsWidget::setValuesFromHSL);
+    connect(aSpin, &QrealAnimatorValueSlider::valueChanged,
+            this, &ColorSettingsWidget::setAlphaFromSpin);
 
-    connect(rSpin, SIGNAL(displayedValueChanged(qreal)),
-            this, SLOT(updateValuesFromRGB()));
-    connect(gSpin, SIGNAL(displayedValueChanged(qreal)),
-            this, SLOT(updateValuesFromRGB()));
-    connect(bSpin, SIGNAL(displayedValueChanged(qreal)),
-            this, SLOT(updateValuesFromRGB()));
+    connect(rSpin, &QrealAnimatorValueSlider::displayedValueChanged,
+            this, &ColorSettingsWidget::updateValuesFromRGB);
+    connect(gSpin, &QrealAnimatorValueSlider::displayedValueChanged,
+            this, &ColorSettingsWidget::updateValuesFromRGB);
+    connect(bSpin, &QrealAnimatorValueSlider::displayedValueChanged,
+            this, &ColorSettingsWidget::updateValuesFromRGB);
 
-    connect(hSpin, SIGNAL(displayedValueChanged(qreal)),
-            this, SLOT(updateValuesFromHSV()));
-    connect(hsvSSpin, SIGNAL(displayedValueChanged(qreal)),
-            this, SLOT(updateValuesFromHSV()));
-    connect(vSpin, SIGNAL(displayedValueChanged(qreal)),
-            this, SLOT(updateValuesFromHSV()));
+    connect(hSpin, &QrealAnimatorValueSlider::displayedValueChanged,
+            this, &ColorSettingsWidget::updateValuesFromHSV);
+    connect(hsvSSpin, &QrealAnimatorValueSlider::displayedValueChanged,
+            this, &ColorSettingsWidget::updateValuesFromHSV);
+    connect(vSpin, &QrealAnimatorValueSlider::displayedValueChanged,
+            this, &ColorSettingsWidget::updateValuesFromHSV);
 
-    connect(hslSSpin, SIGNAL(displayedValueChanged(qreal)),
-            this, SLOT(updateValuesFromHSL()));
-    connect(lSpin, SIGNAL(displayedValueChanged(qreal)),
-            this, SLOT(updateValuesFromHSL()));
+    connect(hslSSpin, &QrealAnimatorValueSlider::displayedValueChanged,
+            this, &ColorSettingsWidget::updateValuesFromHSL);
+    connect(lSpin, &QrealAnimatorValueSlider::displayedValueChanged,
+            this, &ColorSettingsWidget::updateValuesFromHSL);
 
-    connect(aSpin, SIGNAL(displayedValueChanged(qreal)),
-            this, SLOT(updateAlphaFromSpin()));
+    connect(aSpin, &QrealAnimatorValueSlider::displayedValueChanged,
+            this, &ColorSettingsWidget::updateAlphaFromSpin);
 
-    connect(rSpin, SIGNAL(editingStarted(qreal)),
-            this, SLOT(emitEditingStartedRed()));
-    connect(gSpin, SIGNAL(editingStarted(qreal)),
-            this, SLOT(emitEditingStartedGreen()));
-    connect(bSpin, SIGNAL(editingStarted(qreal)),
-            this, SLOT(emitEditingStartedBlue()));
-    connect(hSpin, SIGNAL(editingStarted(qreal)),
-            this, SLOT(emitEditingStartedHue()));
-    connect(hsvSSpin, SIGNAL(editingStarted(qreal)),
-            this, SLOT(emitEditingStartedHSVSaturation()));
-    connect(vSpin, SIGNAL(editingStarted(qreal)),
-            this, SLOT(emitEditingStartedValue()));
-    connect(hslSSpin, SIGNAL(editingStarted(qreal)),
-            this, SLOT(emitEditingStartedHSLSaturation()));
-    connect(lSpin, SIGNAL(editingStarted(qreal)),
-            this, SLOT(emitEditingStartedLightness()));
-    connect(aSpin, SIGNAL(editingStarted(qreal)),
-            this, SLOT(emitEditingStartedAlpha()));
+    connect(rSpin, &QrealAnimatorValueSlider::editingStarted,
+            this, &ColorSettingsWidget::emitEditingStartedRed);
+    connect(gSpin, &QrealAnimatorValueSlider::editingStarted,
+            this, &ColorSettingsWidget::emitEditingStartedGreen);
+    connect(bSpin, &QrealAnimatorValueSlider::editingStarted,
+            this, &ColorSettingsWidget::emitEditingStartedBlue);
+    connect(hSpin, &QrealAnimatorValueSlider::editingStarted,
+            this, &ColorSettingsWidget::emitEditingStartedHue);
+    connect(hsvSSpin, &QrealAnimatorValueSlider::editingStarted,
+            this, &ColorSettingsWidget::emitEditingStartedHSVSaturation);
+    connect(vSpin, &QrealAnimatorValueSlider::editingStarted,
+            this, &ColorSettingsWidget::emitEditingStartedValue);
+    connect(hslSSpin, &QrealAnimatorValueSlider::editingStarted,
+            this, &ColorSettingsWidget::emitEditingStartedHSLSaturation);
+    connect(lSpin, &QrealAnimatorValueSlider::editingStarted,
+            this, &ColorSettingsWidget::emitEditingStartedLightness);
+    connect(aSpin, &QrealAnimatorValueSlider::editingStarted,
+            this, &ColorSettingsWidget::emitEditingStartedAlpha);
 
-    connect(rSpin, SIGNAL(editingFinished(qreal)),
-            this, SLOT(emitEditingFinishedSignal()));
-    connect(gSpin, SIGNAL(editingFinished(qreal)),
-            this, SLOT(emitEditingFinishedSignal()));
-    connect(bSpin, SIGNAL(editingFinished(qreal)),
-            this, SLOT(emitEditingFinishedSignal()));
-    connect(hSpin, SIGNAL(editingFinished(qreal)),
-            this, SLOT(emitEditingFinishedSignal()));
-    connect(hsvSSpin, SIGNAL(editingFinished(qreal)),
-            this, SLOT(emitEditingFinishedSignal()));
-    connect(vSpin, SIGNAL(editingFinished(qreal)),
-            this, SLOT(emitEditingFinishedSignal()));
-    connect(hslSSpin, SIGNAL(editingFinished(qreal)),
-            this, SLOT(emitEditingFinishedSignal()));
-    connect(lSpin, SIGNAL(editingFinished(qreal)),
-            this, SLOT(emitEditingFinishedSignal()));
-    connect(aSpin, SIGNAL(editingFinished(qreal)),
-            this, SLOT(emitEditingFinishedSignal()));
+    connect(rSpin, &QrealAnimatorValueSlider::editingFinished,
+            this, &ColorSettingsWidget::emitEditingFinishedSignal);
+    connect(gSpin, &QrealAnimatorValueSlider::editingFinished,
+            this, &ColorSettingsWidget::emitEditingFinishedSignal);
+    connect(bSpin, &QrealAnimatorValueSlider::editingFinished,
+            this, &ColorSettingsWidget::emitEditingFinishedSignal);
+    connect(hSpin, &QrealAnimatorValueSlider::editingFinished,
+            this, &ColorSettingsWidget::emitEditingFinishedSignal);
+    connect(hsvSSpin, &QrealAnimatorValueSlider::editingFinished,
+            this, &ColorSettingsWidget::emitEditingFinishedSignal);
+    connect(vSpin, &QrealAnimatorValueSlider::editingFinished,
+            this, &ColorSettingsWidget::emitEditingFinishedSignal);
+    connect(hslSSpin, &QrealAnimatorValueSlider::editingFinished,
+            this, &ColorSettingsWidget::emitEditingFinishedSignal);
+    connect(lSpin, &QrealAnimatorValueSlider::editingFinished,
+            this, &ColorSettingsWidget::emitEditingFinishedSignal);
+    connect(aSpin, &QrealAnimatorValueSlider::editingFinished,
+            this, &ColorSettingsWidget::emitEditingFinishedSignal);
 
-    connect(r_rect, SIGNAL(editingStarted(qreal)),
-            rSpin, SLOT(emitEditingStarted(qreal)));
-    connect(g_rect, SIGNAL(editingStarted(qreal)),
-            gSpin, SLOT(emitEditingStarted(qreal)));
-    connect(b_rect, SIGNAL(editingStarted(qreal)),
-            bSpin, SLOT(emitEditingStarted(qreal)));
-    connect(h_rect, SIGNAL(editingStarted(qreal)),
-            hSpin, SLOT(emitEditingStarted(qreal)));
-    connect(hsv_s_rect, SIGNAL(editingStarted(qreal)),
-            hsvSSpin, SLOT(emitEditingStarted(qreal)));
-    connect(v_rect, SIGNAL(editingStarted(qreal)),
-            vSpin, SLOT(emitEditingStarted(qreal)));
-    connect(hsl_s_rect, SIGNAL(editingStarted(qreal)),
-            hslSSpin, SLOT(emitEditingStarted(qreal)));
-    connect(l_rect, SIGNAL(editingStarted(qreal)),
-            lSpin, SLOT(emitEditingStarted(qreal)));
-    connect(aRect, SIGNAL(editingStarted(qreal)),
-            aSpin, SLOT(emitEditingStarted(qreal)));
+    connect(r_rect, &ColorValueRect::editingStarted,
+            rSpin, &QrealAnimatorValueSlider::emitEditingStarted);
+    connect(g_rect, &ColorValueRect::editingStarted,
+            gSpin, &QrealAnimatorValueSlider::emitEditingStarted);
+    connect(b_rect, &ColorValueRect::editingStarted,
+            bSpin, &QrealAnimatorValueSlider::emitEditingStarted);
+    connect(h_rect, &ColorValueRect::editingStarted,
+            hSpin, &QrealAnimatorValueSlider::emitEditingStarted);
+    connect(hsv_s_rect, &ColorValueRect::editingStarted,
+            hsvSSpin, &QrealAnimatorValueSlider::emitEditingStarted);
+    connect(v_rect, &ColorValueRect::editingStarted,
+            vSpin, &QrealAnimatorValueSlider::emitEditingStarted);
+    connect(hsl_s_rect, &ColorValueRect::editingStarted,
+            hslSSpin, &QrealAnimatorValueSlider::emitEditingStarted);
+    connect(l_rect, &ColorValueRect::editingStarted,
+            lSpin, &QrealAnimatorValueSlider::emitEditingStarted);
+    connect(aRect, &ColorValueRect::editingStarted,
+            aSpin, &QrealAnimatorValueSlider::emitEditingStarted);
 
-    connect(r_rect, SIGNAL(editingFinished(qreal)),
-            rSpin, SLOT(emitEditingFinished(qreal)));
-    connect(g_rect, SIGNAL(editingFinished(qreal)),
-            gSpin, SLOT(emitEditingFinished(qreal)));
-    connect(b_rect, SIGNAL(editingFinished(qreal)),
-            bSpin, SLOT(emitEditingFinished(qreal)));
-    connect(h_rect, SIGNAL(editingFinished(qreal)),
-            hSpin, SLOT(emitEditingFinished(qreal)));
-    connect(hsv_s_rect, SIGNAL(editingFinished(qreal)),
-            hsvSSpin, SLOT(emitEditingFinished(qreal)));
-    connect(v_rect, SIGNAL(editingFinished(qreal)),
-            vSpin, SLOT(emitEditingFinished(qreal)));
-    connect(hsl_s_rect, SIGNAL(editingFinished(qreal)),
-            hslSSpin, SLOT(emitEditingFinished(qreal)));
-    connect(l_rect, SIGNAL(editingFinished(qreal)),
-            lSpin, SLOT(emitEditingFinished(qreal)));
-    connect(aRect, SIGNAL(editingFinished(qreal)),
-            aSpin, SLOT(emitEditingFinished(qreal)));
+    connect(r_rect, &ColorValueRect::editingFinished,
+            rSpin, &QrealAnimatorValueSlider::emitEditingFinished);
+    connect(g_rect, &ColorValueRect::editingFinished,
+            gSpin, &QrealAnimatorValueSlider::emitEditingFinished);
+    connect(b_rect, &ColorValueRect::editingFinished,
+            bSpin, &QrealAnimatorValueSlider::emitEditingFinished);
+    connect(h_rect, &ColorValueRect::editingFinished,
+            hSpin, &QrealAnimatorValueSlider::emitEditingFinished);
+    connect(hsv_s_rect, &ColorValueRect::editingFinished,
+            hsvSSpin, &QrealAnimatorValueSlider::emitEditingFinished);
+    connect(v_rect, &ColorValueRect::editingFinished,
+            vSpin, &QrealAnimatorValueSlider::emitEditingFinished);
+    connect(hsl_s_rect, &ColorValueRect::editingFinished,
+            hslSSpin, &QrealAnimatorValueSlider::emitEditingFinished);
+    connect(l_rect, &ColorValueRect::editingFinished,
+            lSpin, &QrealAnimatorValueSlider::emitEditingFinished);
+    connect(aRect, &ColorValueRect::editingFinished,
+            aSpin, &QrealAnimatorValueSlider::emitEditingFinished);
 
-    connect(r_rect, SIGNAL(valChanged(qreal)),
-            rSpin, SLOT(emitValueChangedExternal(qreal)));
-    connect(g_rect, SIGNAL(valChanged(qreal)),
-            gSpin, SLOT(emitValueChangedExternal(qreal)));
-    connect(b_rect, SIGNAL(valChanged(qreal)),
-            bSpin, SLOT(emitValueChangedExternal(qreal)));
-    connect(h_rect, SIGNAL(valChanged(qreal)),
-            hSpin, SLOT(emitValueChangedExternal(qreal)));
-    connect(hsv_s_rect, SIGNAL(valChanged(qreal)),
-            hsvSSpin, SLOT(emitValueChangedExternal(qreal)));
-    connect(v_rect, SIGNAL(valChanged(qreal)),
-            vSpin, SLOT(emitValueChangedExternal(qreal)));
-    connect(hsl_s_rect, SIGNAL(valChanged(qreal)),
-            hslSSpin, SLOT(emitValueChangedExternal(qreal)));
-    connect(l_rect, SIGNAL(valChanged(qreal)),
-            lSpin, SLOT(emitValueChangedExternal(qreal)));
-    connect(aRect, SIGNAL(valChanged(qreal)),
-            aSpin, SLOT(emitValueChangedExternal(qreal)));
+    connect(r_rect, &ColorValueRect::valChanged,
+            rSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
+    connect(g_rect, &ColorValueRect::valChanged,
+            gSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
+    connect(b_rect, &ColorValueRect::valChanged,
+            bSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
+    connect(h_rect, &ColorValueRect::valChanged,
+            hSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
+    connect(hsv_s_rect, &ColorValueRect::valChanged,
+            hsvSSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
+    connect(v_rect, &ColorValueRect::valChanged,
+            vSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
+    connect(hsl_s_rect, &ColorValueRect::valChanged,
+            hslSSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
+    connect(l_rect, &ColorValueRect::valChanged,
+            lSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
+    connect(aRect, &ColorValueRect::valChanged,
+            aSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
 
 
     //setMinimumSize(250, 200);
     mTabWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                               QSizePolicy::Maximum);
-    setCurrentColor(0.f, 0.f, 0.f);
+    setCurrentColor(0, 0, 0);
 
     moveAlphaWidgetToTab(0);
 }
 
 QColor ColorSettingsWidget::getCurrentQColor() {
-    qreal red = rSpin->value();
-    qreal green = gSpin->value();
-    qreal blue = bSpin->value();
-    qreal alpha = aSpin->value();
-    return QColor(red*255, green*255, blue*255, alpha*255);
+    const qreal red = rSpin->value();
+    const qreal green = gSpin->value();
+    const qreal blue = bSpin->value();
+    const qreal alpha = aSpin->value();
+    QColor col;
+    col.setRgbF(red, green, blue, alpha);
+    return col;
 }
 
 void addColorWidgetActionToMenu(QMenu *menu_t,

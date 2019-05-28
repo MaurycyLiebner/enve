@@ -21,6 +21,7 @@ public:
     ~QrealAnimatorValueSlider() {}
 
     void paint(QPainter *p);
+    void openContextMenu(const QPoint &globalPos);
 
     void setTarget(QrealAnimator * const animator);
     void setTarget(IntProperty * const animator);
@@ -29,9 +30,8 @@ public:
 
     bool isTargetDisabled();
 
-    void openContextMenu(const QPoint &globalPos);
     void clearTarget();
-public slots:
+
     void setValueExternal(qreal value);
 
     void emitEditingStarted(qreal value);
@@ -42,7 +42,11 @@ public slots:
     void setValueFromAnimator(qreal val);
 protected:
     void emitValueChanged(qreal value);
+    void mouseMoveEvent(QMouseEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event);
 private:
+    QrealAnimator *getQPointFAnimatorSibling();
+
     bool mBlockAnimatorSignals = false;
     qptr<Property> mTarget;
 signals:

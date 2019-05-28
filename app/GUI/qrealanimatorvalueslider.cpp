@@ -51,6 +51,53 @@ void QrealAnimatorValueSlider::emitValueChangedExternal(qreal value) {
     emitValueChanged(value);
 }
 
+#include "Animators/qpointfanimator.h"
+QrealAnimator* QrealAnimatorValueSlider::getQPointFAnimatorSibling() {
+    if(mTarget->SWT_isQrealAnimator()) {
+        const auto parent = mTarget->getParent();
+        if(parent && parent->SWT_isQPointFAnimator()) {
+            const auto qPA = GetAsPtr(parent, QPointFAnimator);
+            const bool thisX = qPA->getXAnimator() == mTarget;
+            return thisX ? qPA->getYAnimator() :
+                           qPA->getXAnimator();
+        }
+    }
+    return nullptr;
+}
+
+void QrealAnimatorValueSlider::mouseMoveEvent(QMouseEvent *event) {
+    QDoubleSlider::mouseMoveEvent(event);
+    if(event->modifiers() & Qt::ShiftModifier) {
+        const auto other = getQPointFAnimatorSibling();
+        if(!other) return;
+        if(!mMouseMoved) other->prp_startTransform();
+        const qreal dValue = (event->x() - mPressX)*0.1*mPrefferedValueStep;
+        other->incCurrentBaseValue(dValue);
+    }
+}
+
+bool QrealAnimatorValueSlider::eventFilter(QObject *obj, QEvent *event) {
+    const bool keyPress = event->type() == QEvent::KeyPress;
+    const bool keyRelease = event->type() == QEvent::KeyRelease;
+
+    if(keyPress || keyRelease) {
+        const auto keyEvent = static_cast<QKeyEvent*>(event);
+        if(keyEvent->key() == Qt::Key_Shift) {
+            const auto other = getQPointFAnimatorSibling();
+            if(other) {
+                if(keyPress) {
+                    if(mMouseMoved) {
+                        other->prp_startTransform();
+                    }
+                } else if(keyRelease) {
+                    other->prp_cancelTransform();
+                }
+            }
+        }
+    }
+    return QDoubleSlider::eventFilter(obj, event);
+}
+
 void QrealAnimatorValueSlider::emitValueChanged(qreal value) {
     if(mTarget) {
         if(mTarget->SWT_isQrealAnimator()) {
@@ -79,6 +126,8 @@ void QrealAnimatorValueSlider::emitEditingFinished(qreal value) {
     if(mTarget) {
         mTarget->prp_finishTransform();
         mBlockAnimatorSignals = false;
+        const auto other = getQPointFAnimatorSibling();
+        if(other) other->prp_finishTransform();
     }
     QDoubleSlider::emitEditingFinished(value);
 }

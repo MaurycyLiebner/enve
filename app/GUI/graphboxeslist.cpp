@@ -133,7 +133,11 @@ void KeysView::graphPaint(QPainter *p) {
     transform.scale(mPixelsPerFrame, -mPixelsPerValUnit);
     p->setTransform(QTransform(transform), true);
 
-    const FrameRange viewedRange = {mMinViewedFrame, mMaxViewedFrame};
+    const int minVisibleFrame = qFloor(mMinViewedFrame -
+                                       MIN_WIDGET_HEIGHT/(2*mPixelsPerFrame));
+    const int maxVisibleFrame = qCeil(mMaxViewedFrame +
+                                      3*MIN_WIDGET_HEIGHT/(2*mPixelsPerFrame));
+    const FrameRange viewedRange = { minVisibleFrame, maxVisibleFrame};
     for(int i = 0; i < mGraphAnimators.count(); i++) {
         const QColor &col = ANIMATOR_COLORS.at(i % ANIMATOR_COLORS.length());
         p->save();
@@ -144,7 +148,7 @@ void KeysView::graphPaint(QPainter *p) {
 
     if(mSelecting) {
         pen.setColor(Qt::blue);
-        pen.setWidthF(2.);
+        pen.setWidthF(2);
         pen.setStyle(Qt::DotLine);
         pen.setCosmetic(true);
         p->setPen(pen);

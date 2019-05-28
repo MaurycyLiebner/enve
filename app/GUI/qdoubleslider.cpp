@@ -253,7 +253,7 @@ qreal QDoubleSlider::minimum() {
 
 void QDoubleSlider::mouseMoveEvent(QMouseEvent *event) {
     if(!mMouseMoved) emitEditingStarted(mValue);
-    qreal dValue = (event->x() - mPressX)*0.1*mPrefferedValueStep;
+    const qreal dValue = (event->x() - mPressX)*0.1*mPrefferedValueStep;
     setValueNoUpdate(mPressValue + dValue);
     update();
 

@@ -233,6 +233,7 @@ void QrealAnimator::setCurrentBaseValue(qreal newValue) {
     newValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
 
     if(isZero4Dec(newValue - mCurrentBaseValue)) return;
+
     mCurrentBaseValue = newValue;
     const auto currKey = anim_getKeyOnCurrentFrame<QrealKey>();
     if(currKey) currKey->setValue(mCurrentBaseValue);

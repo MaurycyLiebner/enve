@@ -59,7 +59,7 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
             &BoxTransformAnimator::totalTransformChanged,
             this, &BoundingBox::afterTotalTransformChanged);
 
-    mTransformAnimator->setPivotAutoAdjust(false);
+    //mTransformAnimator->setPivotAutoAdjust(false);
 }
 
 BoundingBox::~BoundingBox() {
