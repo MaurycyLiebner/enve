@@ -153,6 +153,26 @@ void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
     canvas->restore();
 }
 
+void BoundingBox::setGPUEffectsEnabled(const bool &enable) {
+    mGPUEffectsAnimators->SWT_setEnabled(enable);
+    mGPUEffectsAnimators->SWT_setVisible(
+                mGPUEffectsAnimators->hasChildAnimators() || enable);
+}
+
+bool BoundingBox::getGPUEffectsEnabled() const {
+    return mGPUEffectsAnimators->SWT_isEnabled();
+}
+
+void BoundingBox::setRasterEffectsEnabled(const bool &enable) {
+    mEffectsAnimators->SWT_setEnabled(enable);
+    mEffectsAnimators->SWT_setVisible(
+                mEffectsAnimators->hasChildAnimators() || enable);
+}
+
+bool BoundingBox::getRasterEffectsEnabled() const {
+    return mEffectsAnimators->SWT_isEnabled();
+}
+
 void BoundingBox::applyPaintSetting(const PaintSettingsApplier &setting) {
     Q_UNUSED(setting);
 }
@@ -859,13 +879,7 @@ bool BoundingBox::isAnimated() const {
 }
 
 void BoundingBox::addGPUEffect(const qsptr<GPURasterEffect>& rasterEffect) {
-    if(mGPUEffectsAnimators->ca_getNumberOfChildren() == 0) {
-        mGPUEffectsAnimators->SWT_show();
-    }
-    mGPUEffectsAnimators->ca_addChildAnimator(rasterEffect);
-    rasterEffect->setParentEffectAnimators(mGPUEffectsAnimators.data());
-
-    prp_afterWholeInfluenceRangeChanged();
+    mGPUEffectsAnimators->addEffect(rasterEffect);
 }
 
 void BoundingBox::removeGPUEffect(const qsptr<GPURasterEffect>& effect) {
@@ -878,15 +892,7 @@ void BoundingBox::removeGPUEffect(const qsptr<GPURasterEffect>& effect) {
 }
 
 void BoundingBox::addEffect(const qsptr<PixmapEffect>& effect) {
-    //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
-
-    if(!mEffectsAnimators->hasChildAnimators()) {
-        mEffectsAnimators->SWT_show();
-    }
-    mEffectsAnimators->ca_addChildAnimator(effect);
-    effect->setParentEffectAnimators(mEffectsAnimators.data());
-
-    prp_afterWholeInfluenceRangeChanged();
+    mEffectsAnimators->addEffect(effect);
 }
 
 void BoundingBox::removeEffect(const qsptr<PixmapEffect>& effect) {

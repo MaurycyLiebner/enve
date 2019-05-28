@@ -338,6 +338,12 @@ public:
                            const SkPath &path,
                            const SkScalar &invScale);
 
+    void setGPUEffectsEnabled(const bool& enable);
+    bool getGPUEffectsEnabled() const;
+
+    void setRasterEffectsEnabled(const bool& enable);
+    bool getRasterEffectsEnabled() const;
+
     template <class T>
     void addEffect() {
         addEffect(SPtrCreateTemplated(T)());

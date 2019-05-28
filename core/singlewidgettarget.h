@@ -195,11 +195,17 @@ public:
     }
 
     void SWT_setVisible(const bool &bT) {
+        if(SWT_mVisible == bT) return;
         SWT_mVisible = bT;
         SWT_afterContentVisibilityChanged();
     }
 
+    void SWT_setEnabled(const bool &enabled) {
+        SWT_setDisabled(!enabled);
+    }
+
     void SWT_setDisabled(const bool &disable) {
+        if(SWT_mDisabled == disable) return;
         SWT_mDisabled = disable;
         SWT_setChildrenAncestorDisabled(SWT_isDisabled());
     }
@@ -210,6 +216,10 @@ public:
 
     void SWT_enable() {
         SWT_setDisabled(false);
+    }
+
+    bool SWT_isEnabled() const {
+        return !SWT_isDisabled();
     }
 
     bool SWT_isDisabled() const {

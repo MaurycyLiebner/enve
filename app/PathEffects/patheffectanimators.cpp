@@ -11,49 +11,26 @@ PathEffectAnimators::PathEffectAnimators(const bool &isOutline,
     mIsOutline = isOutline;
     mIsFill = isFill;
     mParentBox = parentPath;
+
+    SWT_setEnabled(false);
+    SWT_setVisible(false);
 }
 
 void PathEffectAnimators::addEffect(const qsptr<PathEffect>& effect) {
-    if(mParentBox->SWT_isPathBox()) {
-        const auto pathBox = GetAsPtr(mParentBox, PathBox);
-        if(mIsOutline) {
-            pathBox->addOutlinePathEffect(effect);
-        } else if(mIsFill) {
-            pathBox->addFillPathEffect(effect);
-        } else {
-            pathBox->addPathEffect(effect);
-        }
-    } else if(mParentBox->SWT_isContainerBox()) {
-        const auto groupBox = GetAsPtr(mParentBox, ContainerBox);
-        if(mIsOutline) {
-            groupBox->addOutlinePathEffect(effect);
-        } else if(mIsFill) {
-            groupBox->addFillPathEffect(effect);
-        } else {
-            groupBox->addPathEffect(effect);
-        }
+    ca_addChildAnimator(effect);
+    const bool reasons = effect->hasReasonsNotToApplyUglyTransform();
+    if(reasons && mParentBox->SWT_isPathBox()) {
+        mParentBox->incReasonsNotToApplyUglyTransform();
     }
+    SWT_setEnabled(true);
+    SWT_setVisible(true);
 }
 
 void PathEffectAnimators::removeEffect(const qsptr<PathEffect>& effect) {
-    if(mParentBox->SWT_isPathBox()) {
-        const auto pathBox = GetAsPtr(mParentBox, PathBox);
-        if(mIsOutline) {
-            pathBox->removeOutlinePathEffect(effect);
-        } else if(mIsFill) {
-            pathBox->removeFillPathEffect(effect);
-        } else {
-            pathBox->removePathEffect(effect);
-        }
-    } else if(mParentBox->SWT_isContainerBox()) {
-        const auto groupBox = GetAsPtr(mParentBox, ContainerBox);
-        if(mIsOutline) {
-            groupBox->removeOutlinePathEffect(effect);
-        } else if(mIsFill) {
-            groupBox->removeFillPathEffect(effect);
-        } else {
-            groupBox->removePathEffect(effect);
-        }
+    ca_removeChildAnimator(effect);
+    const bool reasons = effect->hasReasonsNotToApplyUglyTransform();
+    if(reasons && mParentBox->SWT_isPathBox()) {
+        mParentBox->decReasonsNotToApplyUglyTransform();
     }
 }
 

@@ -494,15 +494,14 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
         QMenu menu(this);
 
         if(target->SWT_isBoundingBox()) {
-            BoundingBox *boxTarget = GetAsPtr(target, BoundingBox);
+            const auto boxTarget = GetAsPtr(target, BoundingBox);
             menu.addAction("Rename", [this]() {
                 rename();
             });
             if(!target->SWT_isParticleBox() &&
                !target->SWT_isAnimationBox()) {
                 QAction * const durRectAct = menu.addAction("Visibility Range",
-                                                            [target]() {
-                    auto boxTarget = GetAsPtr(target, BoundingBox);
+                                                            [boxTarget]() {
                     if(boxTarget->hasDurationRectangle()) {
                         boxTarget->setDurationRectangle(nullptr);
                     } else {
@@ -520,6 +519,51 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                 });
             }
             menu.addSeparator();
+
+            const auto effMenu = menu.addMenu("Effects");
+
+            if(target->SWT_isPathBox()) {
+                const auto pathTarget = GetAsPtr(target, PathBox);
+                QAction * const pEffects = effMenu->addAction("Path Effects",
+                                                              [pathTarget]() {
+                    pathTarget->setPathEffectsEnabled(
+                                !pathTarget->getPathEffectsEnabled());
+                });
+                pEffects->setCheckable(true);
+                pEffects->setChecked(pathTarget->getPathEffectsEnabled());
+
+                QAction * const fEffects = effMenu->addAction("Fill Effects",
+                                                              [pathTarget]() {
+                    pathTarget->setFillEffectsEnabled(
+                                !pathTarget->getFillEffectsEnabled());
+                });
+                fEffects->setCheckable(true);
+                fEffects->setChecked(pathTarget->getFillEffectsEnabled());
+
+                QAction * const oEffects = effMenu->addAction("Outline Effects",
+                                                              [pathTarget]() {
+                    pathTarget->setOutlineEffectsEnabled(
+                                !pathTarget->getOutlineEffectsEnabled());
+                });
+                oEffects->setCheckable(true);
+                oEffects->setChecked(pathTarget->getOutlineEffectsEnabled());
+            }
+
+            QAction * const rEffects = effMenu->addAction("Raster Effects",
+                                                          [boxTarget]() {
+                boxTarget->setRasterEffectsEnabled(
+                            !boxTarget->getRasterEffectsEnabled());
+            });
+            rEffects->setCheckable(true);
+            rEffects->setChecked(boxTarget->getRasterEffectsEnabled());
+
+            QAction * const gpuEffects = effMenu->addAction("GPU Effects",
+                                                           [boxTarget]() {
+                boxTarget->setGPUEffectsEnabled(
+                            !boxTarget->getGPUEffectsEnabled());
+            });
+            gpuEffects->setCheckable(true);
+            gpuEffects->setChecked(boxTarget->getRasterEffectsEnabled());
         }
         if(target->SWT_isProperty()) {
             auto clipboard = MainWindow::getPropertyClipboardContainer();

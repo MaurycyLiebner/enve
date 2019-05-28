@@ -74,6 +74,36 @@ PathBox::~PathBox() {
         mStrokeSettings->getGradient()->removePath(this);
 }
 
+void PathBox::setPathEffectsEnabled(const bool &enable) {
+    mPathEffectsAnimators->SWT_setEnabled(enable);
+    mPathEffectsAnimators->SWT_setVisible(
+                mPathEffectsAnimators->hasChildAnimators() || enable);
+}
+
+bool PathBox::getPathEffectsEnabled() const {
+    return mPathEffectsAnimators->SWT_isEnabled();
+}
+
+void PathBox::setFillEffectsEnabled(const bool &enable) {
+    mFillPathEffectsAnimators->SWT_setEnabled(enable);
+    mFillPathEffectsAnimators->SWT_setVisible(
+                mFillPathEffectsAnimators->hasChildAnimators() || enable);
+}
+
+bool PathBox::getFillEffectsEnabled() const {
+    return mFillPathEffectsAnimators->SWT_isEnabled();
+}
+
+void PathBox::setOutlineEffectsEnabled(const bool &enable) {
+    mOutlinePathEffectsAnimators->SWT_setEnabled(enable);
+    mOutlinePathEffectsAnimators->SWT_setVisible(
+                mOutlinePathEffectsAnimators->hasChildAnimators() || enable);
+}
+
+bool PathBox::getOutlineEffectsEnabled() const {
+    return mOutlinePathEffectsAnimators->SWT_isEnabled();
+}
+
 void PathBox::setParentGroup(ContainerBox * const parent) {
     setPathsOutdated();
     BoundingBox::setParentGroup(parent);
@@ -215,67 +245,27 @@ void PathBox::setupRenderData(const qreal &relFrame,
 }
 
 void PathBox::addPathEffect(const qsptr<PathEffect>& effect) {
-    //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
-
-    if(effect->hasReasonsNotToApplyUglyTransform()) {
-        incReasonsNotToApplyUglyTransform();
-    }
-    if(!mPathEffectsAnimators->hasChildAnimators()) {
-        mPathEffectsAnimators->SWT_show();
-    }
-    mPathEffectsAnimators->ca_addChildAnimator(effect);
+    mPathEffectsAnimators->addEffect(effect);
 }
 
 void PathBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
-    //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
-    if(effect->hasReasonsNotToApplyUglyTransform()) {
-        incReasonsNotToApplyUglyTransform();
-    }
-    if(!mFillPathEffectsAnimators->hasChildAnimators()) {
-        mFillPathEffectsAnimators->SWT_show();
-    }
-    mFillPathEffectsAnimators->ca_addChildAnimator(effect);
+    mFillPathEffectsAnimators->addEffect(effect);
 }
 
 void PathBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
-    //effect->setUpdater(SPtrCreate(PixmapEffectUpdater)(this));
-    if(effect->hasReasonsNotToApplyUglyTransform()) {
-        incReasonsNotToApplyUglyTransform();
-    }
-    if(!mOutlinePathEffectsAnimators->hasChildAnimators()) {
-        mOutlinePathEffectsAnimators->SWT_show();
-    }
-    mOutlinePathEffectsAnimators->ca_addChildAnimator(effect);
+    mOutlinePathEffectsAnimators->addEffect(effect);
 }
 
 void PathBox::removePathEffect(const qsptr<PathEffect>& effect) {
-    if(effect->hasReasonsNotToApplyUglyTransform()) {
-        decReasonsNotToApplyUglyTransform();
-    }
-    mPathEffectsAnimators->ca_removeChildAnimator(effect);
-    if(!mPathEffectsAnimators->hasChildAnimators()) {
-        mPathEffectsAnimators->SWT_hide();
-    }
+    mPathEffectsAnimators->removeEffect(effect);
 }
 
 void PathBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
-    if(effect->hasReasonsNotToApplyUglyTransform()) {
-        decReasonsNotToApplyUglyTransform();
-    }
-    mFillPathEffectsAnimators->ca_removeChildAnimator(effect);
-    if(!mFillPathEffectsAnimators->hasChildAnimators()) {
-        mFillPathEffectsAnimators->SWT_hide();
-    }
+    mFillPathEffectsAnimators->removeEffect(effect);
 }
 
 void PathBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
-    if(effect->hasReasonsNotToApplyUglyTransform()) {
-        decReasonsNotToApplyUglyTransform();
-    }
-    mOutlinePathEffectsAnimators->ca_removeChildAnimator(effect);
-    if(!mOutlinePathEffectsAnimators->hasChildAnimators()) {
-        mOutlinePathEffectsAnimators->SWT_hide();
-    }
+    mOutlinePathEffectsAnimators->removeEffect(effect);
 }
 
 void PathBox::resetStrokeGradientPointsPos() {

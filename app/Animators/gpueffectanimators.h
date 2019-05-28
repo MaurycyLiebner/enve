@@ -9,9 +9,10 @@ struct BoundingBoxRenderData;
 
 class GPUEffectAnimators : public ComplexAnimator {
     friend class SelfRef;
+protected:
+    GPUEffectAnimators(BoundingBox *parentBox);
 public:
     bool SWT_isRasterGPUEffectAnimators() const { return true; }
-    void ca_removeAllChildAnimators();
 
     void addEffect(const qsptr<GPURasterEffect> &effect);
     qreal getEffectsMargin() const;
@@ -33,8 +34,6 @@ public:
     //void writeProperty(QIODevice * const target) const;
     //void readProperty(QIODevice *target);
     //void readPixmapEffect(QIODevice *target);
-protected:
-    GPUEffectAnimators(BoundingBox *parentBox);
 private:
     BoundingBox * const mParentBox_k;
 };

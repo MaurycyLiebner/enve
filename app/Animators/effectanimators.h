@@ -16,7 +16,6 @@ class EffectAnimators : public ComplexAnimator {
     friend class SelfRef;
 public:
     bool SWT_isPixmapEffectAnimators() const { return true; }
-    void ca_removeAllChildAnimators();
 
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);

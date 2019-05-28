@@ -214,6 +214,15 @@ public:
 
     SkPath getPathWithThisOnlyEffectsAtRelFrameF(const qreal &relFrame);
 
+    void setPathEffectsEnabled(const bool& enable);
+    bool getPathEffectsEnabled() const;
+
+    void setFillEffectsEnabled(const bool& enable);
+    bool getFillEffectsEnabled() const;
+
+    void setOutlineEffectsEnabled(const bool& enable);
+    bool getOutlineEffectsEnabled() const;
+
     PathEffectAnimators *getPathEffectsAnimators() {
         return mPathEffectsAnimators.data();
     }

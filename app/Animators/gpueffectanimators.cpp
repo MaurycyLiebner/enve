@@ -4,10 +4,18 @@
 #include <QDebug>
 
 GPUEffectAnimators::GPUEffectAnimators(BoundingBox *parentBox) :
-    ComplexAnimator("gpu effects"), mParentBox_k(parentBox) {}
+    ComplexAnimator("gpu effects"), mParentBox_k(parentBox) {
+    SWT_setEnabled(false);
+    SWT_setVisible(false);
+}
 
 void GPUEffectAnimators::addEffect(const qsptr<GPURasterEffect>& effect) {
-    mParentBox_k->addGPUEffect(effect);
+    ca_addChildAnimator(effect);
+    effect->setParentEffectAnimators(this);
+
+    prp_afterWholeInfluenceRangeChanged();
+    SWT_setEnabled(true);
+    SWT_setVisible(true);
 }
 
 qreal GPUEffectAnimators::getEffectsMargin() const {
@@ -55,11 +63,6 @@ void GPUEffectAnimators::addEffectRenderDataToListF(
             data->fGPUEffects.append(effectRenderData);
         }
     }
-}
-
-void GPUEffectAnimators::ca_removeAllChildAnimators() {
-    ComplexAnimator::ca_removeAllChildAnimators();
-    mParentBox_k->ca_removeChildAnimator(ref<BoundingBox>());
 }
 
 bool GPUEffectAnimators::hasEffects() {

@@ -4,10 +4,19 @@
 #include <QDebug>
 
 EffectAnimators::EffectAnimators(BoundingBox *parentBox) :
-    ComplexAnimator("effects"), mParentBox_k(parentBox) {}
+    ComplexAnimator("effects"), mParentBox_k(parentBox) {
+    SWT_setEnabled(false);
+    SWT_setVisible(false);
+}
 
 void EffectAnimators::addEffect(const qsptr<PixmapEffect>& effect) {
-    mParentBox_k->addEffect(effect);
+    ca_addChildAnimator(effect);
+    effect->setParentEffectAnimators(this);
+
+    prp_afterWholeInfluenceRangeChanged();
+
+    SWT_setEnabled(true);
+    SWT_setVisible(true);
 }
 
 qreal EffectAnimators::getEffectsMargin() const {
@@ -55,11 +64,6 @@ void EffectAnimators::addEffectRenderDataToListF(
             data->fRasterEffects.append(effectRenderData);
         }
     }
-}
-
-void EffectAnimators::ca_removeAllChildAnimators() {
-    ComplexAnimator::ca_removeAllChildAnimators();
-    mParentBox_k->ca_removeChildAnimator(ref<BoundingBox>());
 }
 
 bool EffectAnimators::hasEffects() {
