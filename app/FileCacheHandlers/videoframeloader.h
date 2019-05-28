@@ -32,6 +32,7 @@ protected:
 
     void setFrameToConvert(AVFrame * const frame,
                            AVCodecContext * const codecContext) {
+        cleanUp();
         mFrameToConvert = frame;
         mSwsContext = sws_getContext(codecContext->width,
                                      codecContext->height,
