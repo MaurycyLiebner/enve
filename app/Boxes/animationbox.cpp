@@ -66,7 +66,7 @@ int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
                 getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
     int pixId;
     if(mFrameRemappingEnabled) {
-        pixId = mFrameAnimator->getCurrentIntValueAtRelFrame(relFrame);
+        pixId = mFrameAnimator->getBaseIntValue(relFrame);
     } else {
         if(isZero6Dec(mStretch)) {
             pixId = lastFrameId;

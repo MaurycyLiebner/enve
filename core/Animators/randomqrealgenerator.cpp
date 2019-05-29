@@ -37,7 +37,7 @@ FrameRange RandomQrealGenerator::prp_getIdenticalRelRange(const int &relFrame) c
 }
 
 qreal RandomQrealGenerator::getDevAtRelFrame(const qreal &relFrame) {
-    const int seed = mSeedAssist->getCurrentIntValueAtRelFrame(relFrame);
+    const int seed = mSeedAssist->getBaseIntValue(relFrame);
     const qreal time = mTime->getEffectiveValue(relFrame);
     const qreal smooth = mSmoothness->getEffectiveValue(relFrame);
     const qreal maxDev = mMaxDev->getEffectiveValue(relFrame);

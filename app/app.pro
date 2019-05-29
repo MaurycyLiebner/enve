@@ -54,6 +54,7 @@ SOURCES += main.cpp\
     GUI/welcomedialog.cpp \
     PathEffects/linespatheffect.cpp \
     PathEffects/spatialdisplacepatheffect.cpp \
+    PathEffects/subdividepatheffect.cpp \
     PathEffects/subpatheffect.cpp \
     PathEffects/zigzagpatheffect.cpp \
     Sound/soundmerger.cpp \
@@ -264,6 +265,7 @@ HEADERS  += \
     GUI/welcomedialog.h \
     PathEffects/linespatheffect.h \
     PathEffects/spatialdisplacepatheffect.h \
+    PathEffects/subdividepatheffect.h \
     PathEffects/subpatheffect.h \
     PathEffects/zigzagpatheffect.h \
     Sound/soundmerger.h \

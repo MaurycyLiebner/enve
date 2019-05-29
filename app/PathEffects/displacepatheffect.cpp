@@ -64,7 +64,7 @@ void DisplacePathEffect::apply(const qreal &relFrame,
                                const SkPath &src,
                                SkPath * const dst) {
     mSeedAssist = static_cast<uint>(mSeed->getCurrentIntValue());
-    const int randStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
+    const int randStep = mRandomizeStep->getBaseIntValue(relFrame);
     uint32_t nextSeed;
     if(mRepeat->getValue()) {
         if((qFloor(relFrame / randStep)) % 2 == 1) {
@@ -125,7 +125,7 @@ FrameRange DisplacePathEffect::prp_getIdenticalRelRange(
         if(mSmoothTransform->getValue()) {
             return {relFrame, relFrame};
         } else {
-            const int frameStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
+            const int frameStep = mRandomizeStep->getBaseIntValue(relFrame);
             const int min = relFrame - relFrame % frameStep;
             const auto otherRange = PathEffect::prp_getIdenticalRelRange(relFrame);
             const FrameRange stepRange{min, min + frameStep - 1};

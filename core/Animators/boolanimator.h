@@ -8,7 +8,7 @@ public:
     bool getCurrentBoolValue();
     void setCurrentBoolValue(const bool &bT);
     bool getCurrentBoolValueAtRelFrame(const qreal &relFrame) {
-        return getCurrentIntValueAtRelFrame(relFrame) == 1;
+        return getBaseIntValue(relFrame) == 1;
     }
 
     bool SWT_isBoolAnimator() const { return true; }

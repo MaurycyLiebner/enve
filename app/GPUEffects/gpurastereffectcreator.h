@@ -31,7 +31,7 @@ struct IntAnimatorUniformSpecifierCreator :
                                     Property * const property,
                                     const qreal& relFrame) const {
         auto ia = GetAsPtr(property, IntAnimator);
-        int val = ia->getCurrentIntEffectiveValueAtRelFrame(relFrame);
+        int val = ia->getEffectiveIntValue(relFrame);
 
         return [loc, val](QGL33c * const gl, QJSEngine&) {
             gl->glUniform1i(loc, val);

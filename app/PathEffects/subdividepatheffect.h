@@ -1,13 +1,12 @@
-#ifndef DUPLICATEPATHEFFECT_H
-#define DUPLICATEPATHEFFECT_H
+#ifndef SUBDIVIDEPATHEFFECT_H
+#define SUBDIVIDEPATHEFFECT_H
 #include "PathEffects/patheffect.h"
 class IntAnimator;
-class QPointFAnimator;
 
-class DuplicatePathEffect : public PathEffect {
+class SubdividePathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    DuplicatePathEffect(const bool &outlinePathEffect);
+    SubdividePathEffect(const bool &outlinePathEffect);
 public:
     void apply(const qreal &relFrame,
                const SkPath &src,
@@ -16,7 +15,6 @@ public:
     void readProperty(QIODevice *target);
 private:
     qsptr<IntAnimator> mCount;
-    qsptr<QPointFAnimator> mTranslation;
 };
 
-#endif // DUPLICATEPATHEFFECT_H
+#endif // SUBDIVIDEPATHEFFECT_H

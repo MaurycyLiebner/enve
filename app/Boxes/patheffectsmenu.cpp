@@ -31,6 +31,8 @@ void PathEffectsMenu::addPathEffectsActionToMenu(
                 "Lines", menu, adder, outline);
     addPathEffectActionToMenu<ZigZagPathEffect>(
                 "ZigZag", menu, adder, outline);
+    addPathEffectActionToMenu<SubdividePathEffect>(
+                "Subdivide", menu, adder, outline);
 }
 
 void PathEffectsMenu::addPathEffectsToActionMenu(BoxTypeMenu * const menu) {

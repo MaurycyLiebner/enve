@@ -11,5 +11,6 @@
 #include "linespatheffect.h"
 #include "zigzagpatheffect.h"
 #include "spatialdisplacepatheffect.h"
+#include "subdividepatheffect.h"
 
 #endif // PATHEFFECTSINCLUDE_H
