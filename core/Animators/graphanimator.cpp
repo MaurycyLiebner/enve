@@ -156,17 +156,19 @@ QPainterPath GraphAnimator::graph_getPathForSegment(
 }
 
 void GraphAnimator::graph_updateKeysPath(const FrameRange &relFrameRange) {
-    const auto prevKeyId = anim_getPrevKeyId(relFrameRange.fMin);
-    auto prevKey = anim_getKeyAtIndex<GraphKey>(prevKeyId);
-    int lastKeyId = anim_getNextKeyId(relFrameRange.fMax);
-    if(lastKeyId == -1) lastKeyId = anim_mKeys.count();
-
-    const auto removeRange = graph_relFrameRangeToGraphPathIdRange(relFrameRange);
+    auto removeRange = graph_relFrameRangeToGraphPathIdRange(relFrameRange);
+    removeRange = {qMax(0, removeRange.fMin - 1),
+                   qMin(removeRange.fMax + 1, graph_mKeyPaths.count() - 1)};
     for(int i = removeRange.fMax; i >= removeRange.fMin; i--) {
         graph_mKeyPaths.removeAt(i);
     }
 
-    int currPathIndex = clamp(removeRange.fMin, 0, graph_mKeyPaths.count());
+    const int prevKeyId = removeRange.fMin - 1;
+    auto prevKey = anim_getKeyAtIndex<GraphKey>(prevKeyId);
+    int lastKeyId = prevKeyId + anim_mKeys.count() + 1 - graph_mKeyPaths.count();
+    if(lastKeyId == -1) lastKeyId = anim_mKeys.count();
+
+    int currPathIndex = removeRange.fMin;
     for(int i = prevKeyId + 1; i <= lastKeyId; i++) {
         const auto iKey = anim_getKeyAtIndex<GraphKey>(i);
         const auto path = graph_getPathForSegment(prevKey, iKey);
@@ -176,6 +178,7 @@ void GraphAnimator::graph_updateKeysPath(const FrameRange &relFrameRange) {
         graph_mKeyPaths.insert(currPathIndex++, graphPath);
         prevKey = iKey;
     }
+    Q_ASSERT(graph_mKeyPaths.count() == anim_mKeys.count() + 1);
 }
 
 void GraphAnimator::graph_constrainCtrlsFrameValues() {

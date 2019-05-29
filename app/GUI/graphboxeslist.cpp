@@ -317,10 +317,9 @@ void KeysView::graphMouseRelease() {
         }
 
         mSelecting = false;
-    } else if(mPressedPoint || mPressedKeyPoint) {
+    } else if(mPressedPoint) {
         if(mPressedKeyPoint) {
             if(mFirstMove) {
-                Q_ASSERT(mPressedPoint);
                 if(!mMainWindow->isShiftPressed()) {
                     clearKeySelection();
                     addKeyToSelection(mPressedPoint->getParentKey());

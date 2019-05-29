@@ -981,13 +981,14 @@ void CanvasWindow::nextCurrentRenderFrame() {
         const int maxBlock = newCurrentRenderFrame - 1;
         cacheHandler.blockConts({minBlock, maxBlock}, true);
     }
+    const bool allDone = newCurrentRenderFrame > mMaxRenderFrame;
     newCurrentRenderFrame = qMin(mMaxRenderFrame, newCurrentRenderFrame);
     const FrameRange newSoundRange = {mCurrentRenderFrame, newCurrentRenderFrame};
     mCurrentSoundComposition->scheduleFrameRange(newSoundRange);
     mCurrentSoundComposition->blockUpToFrame(newCurrentRenderFrame);
 
     mCurrentRenderFrame = newCurrentRenderFrame;
-    changeCurrentFrameAction(mCurrentRenderFrame);
+    if(!allDone) changeCurrentFrameAction(mCurrentRenderFrame);
 }
 
 void CanvasWindow::renderPreview() {
