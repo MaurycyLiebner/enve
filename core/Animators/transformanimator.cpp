@@ -300,7 +300,8 @@ BoxTransformAnimator::BoxTransformAnimator() {
     ca_addChildAnimator(mOpacityAnimator);
 
     setPointsHandler(SPtrCreate(PointsHandler)());
-    mPointsHandler->createAppendNewPt<BoxPathPoint>(mPivotAnimator.get(), this);
+    const auto pivotPt = SPtrCreate(BoxPathPoint)(mPivotAnimator.get(), this);
+    mPointsHandler->appendPt(pivotPt);
 }
 
 MovablePoint *BoxTransformAnimator::getPivotMovablePoint() {

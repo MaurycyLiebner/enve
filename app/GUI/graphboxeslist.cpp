@@ -7,6 +7,14 @@
 #include "global.h"
 #include "Animators/qrealkey.h"
 
+QColor KeysView::sGetAnimatorColor(const int i) {
+    return ANIMATOR_COLORS.at(i % ANIMATOR_COLORS.length());
+}
+
+int KeysView::graphGetAnimatorId(GraphAnimator * const anim) {
+    return mGraphAnimators.indexOf(anim);
+}
+
 void KeysView::graphSetSmoothCtrlAction() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_SMOOTH);
@@ -529,32 +537,20 @@ void KeysView::graphResetValueScaleAndMinShown() {
     graphUpdateDimensions();
 }
 
-void KeysView::updateAnimatorsColors() {
-    int i = 0;
-    for(const auto& anim : mGraphAnimators) {
-        anim->graph_setAnimatorColor(mBoxesListVisible,
-                                   ANIMATOR_COLORS.at(
-                                       i %
-                                       ANIMATOR_COLORS.length()));
-        i++;
-    }
-}
-
 void KeysView::graphAddViewedAnimator(GraphAnimator * const animator) {
     mGraphAnimators << animator;
-    animator->graph_incSelectedForGraph();
-    updateAnimatorsColors();
     graphUpdateDimensions();
     graphResetValueScaleAndMinShown();
+    connect(animator, &Property::beingDeleted, this, [this, animator]() {
+        graphRemoveViewedAnimator(animator);
+    });
 
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
 void KeysView::graphRemoveViewedAnimator(GraphAnimator * const animator) {
+    disconnect(animator, nullptr, this, nullptr);
     mGraphAnimators.removeOne(animator);
-    animator->graph_decSelectedForGraph();
-    animator->graph_removeAnimatorColor(mBoxesListVisible);
-    updateAnimatorsColors();
     graphUpdateDimensions();
     graphResetValueScaleAndMinShown();
 

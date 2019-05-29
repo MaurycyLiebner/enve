@@ -5,6 +5,8 @@ class AnimatedPoint;
 class QPointFAnimator;
 class Rectangle : public PathBox {
     friend class SelfRef;
+protected:
+    Rectangle();
 public:
     void moveSizePointByAbs(const QPointF &absTrans);
     void startAllPointsTransform();
@@ -23,9 +25,7 @@ public:
     void readBoundingBox(QIODevice * const target);
     bool differenceInEditPathBetweenFrames(
                 const int& frame1, const int& frame2) const;
-protected:
-    Rectangle();
-
+private:
     qsptr<QPointFAnimator> mTopLeftAnimator;
     qsptr<QPointFAnimator> mBottomRightAnimator;
     qsptr<QPointFAnimator> mRadiusAnimator;

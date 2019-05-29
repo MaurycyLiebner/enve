@@ -10,13 +10,14 @@ GradientPoints::GradientPoints(PathBox * const parent) :
 
     mStartAnimator = SPtrCreate(QPointFAnimator)("point1");
     ca_addChildAnimator(mStartAnimator);
-    mStartPoint = mPointsHandler->createAppendNewPt<GradientPoint>(
-                mStartAnimator.get(), mParent_k);
+    mStartPoint = SPtrCreate(GradientPoint)(mStartAnimator.get(), mParent_k);
+    mPointsHandler->appendPt(mStartPoint);
 
     mEndAnimator = SPtrCreate(QPointFAnimator)("point2");
     ca_addChildAnimator(mEndAnimator);
-    mEndPoint = mPointsHandler->createAppendNewPt<GradientPoint>(
-                mEndAnimator.get(), mParent_k);
+
+    mEndPoint = SPtrCreate(GradientPoint)(mEndAnimator.get(), mParent_k);
+    mPointsHandler->appendPt(mEndPoint);
 
     mEnabled = false;
 }
@@ -38,6 +39,7 @@ void GradientPoints::disable() {
 void GradientPoints::drawCanvasControls(SkCanvas * const canvas,
                                         const CanvasMode &mode,
                                         const SkScalar &invScale) {
+    if(mode != CanvasMode::MOVE_POINT) return;
     if(mEnabled) {
         const SkPoint startPos = toSkPoint(mStartPoint->getAbsolutePos());
         const SkPoint endPos = toSkPoint(mEndPoint->getAbsolutePos());
@@ -51,10 +53,7 @@ void GradientPoints::drawCanvasControls(SkCanvas * const canvas,
         paint.setColor(SK_ColorWHITE);
         paint.setStrokeWidth(0.75f*invScale);
         canvas->drawLine(startPos, endPos, paint);
-        mStartPoint->drawSk(canvas, mode, invScale,
-                            mStartAnimator->anim_getKeyOnCurrentFrame());
-        mEndPoint->drawSk(canvas, mode, invScale,
-                          mEndAnimator->anim_getKeyOnCurrentFrame());
+        Property::drawCanvasControls(canvas, mode, invScale);
     }
 }
 

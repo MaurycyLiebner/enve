@@ -76,7 +76,7 @@ public:
     static void sClearReadBoxes();
     static void sAddWaitingForBoxLoad(const WaitingForBoxLoad& func);
 
-    static SkFilterQuality sDisplayQuality;
+    static SkFilterQuality sDisplayFiltering;
 private:
     static int sNextDocumentId;
     static QList<BoundingBox*> sDocumentBoxes;
@@ -236,9 +236,9 @@ public:
     QMimeData *SWT_createMimeData();
 
     void prp_afterChangedAbsRange(const FrameRange &range);
-    void drawCanvasControls(SkCanvas * const canvas,
-                            const CanvasMode &mode,
-                            const SkScalar &invScale);
+    void drawAllCanvasControls(SkCanvas * const canvas,
+                               const CanvasMode &mode,
+                               const SkScalar &invScale);
 
     FrameRange prp_relInfluenceRange() const;
     FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
@@ -422,6 +422,7 @@ protected:
         ca_execOnDescendants([this](Property * prop) {
             if(prop->drawsOnCanvas()) mCanvasProps.append(prop);
         });
+        if(drawsOnCanvas()) mCanvasProps.append(this);
     }
 
     bool mSelected = false;

@@ -21,8 +21,8 @@ SmartVectorPath::SmartVectorPath() :
     mPathAnimator = SPtrCreate(SmartPathCollection)();
     const auto updater = SPtrCreate(NodePointUpdater)(this);
     mPathAnimator->prp_setOwnUpdater(updater);
-    ca_addChildAnimator(GetAsSPtr(mPathAnimator, Property));
-    ca_moveChildAbove(mPathAnimator.data(), mPathEffectsAnimators.data());
+    ca_prependChildAnimator(mPathEffectsAnimators.data(),
+                            mPathAnimator);
 }
 
 bool SmartVectorPath::differenceInEditPathBetweenFrames(

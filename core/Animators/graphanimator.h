@@ -40,39 +40,6 @@ public:
     void graph_addKeysInRectToList(const QRectF &frameValueRect,
                                    QList<GraphKey*> &keys);
 
-    void graph_incSelectedForGraph() {
-        graph_mSelected++;
-    }
-
-    void graph_decSelectedForGraph() {
-        graph_mSelected--;
-    }
-
-    bool graph_isSelectedForGraph() {
-        return graph_mSelected;
-    }
-
-    QColor graph_getAnimatorColor(void *ptr) const {
-        for(const auto& x : graph_mAnimatorColors) {
-            if(x.first == ptr) {
-                return x.second;
-            }
-        }
-        return QColor();
-    }
-
-    void graph_setAnimatorColor(void *ptr, const QColor &color) {
-        graph_mAnimatorColors[ptr] = color;
-    }
-
-    void graph_removeAnimatorColor(void *ptr) {
-        graph_mAnimatorColors.erase(ptr);
-    }
-
-    bool graph_isCurrentAnimator(void *ptr) const {
-        return graph_mAnimatorColors.find(ptr) != graph_mAnimatorColors.end();
-    }
-
     void graph_drawKeysPath(QPainter * const p,
                             const QColor &paintColor,
                             const FrameRange &absFrameRange) const;
@@ -124,10 +91,6 @@ private:
     void graph_getFrameConstraints(
             GraphKey *key, const QrealPointType& type,
             qreal &minMoveFrame, qreal &maxMoveFrame) const;
-
-    int graph_mSelected = 0;
-
-    std::map<void*, QColor> graph_mAnimatorColors;
 };
 
 #endif // GRAPHANIMATOR_H

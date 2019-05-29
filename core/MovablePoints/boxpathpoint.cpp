@@ -12,7 +12,6 @@ BoxPathPoint::BoxPathPoint(QPointFAnimator * const associatedAnimator,
 
 void BoxPathPoint::setRelativePos(const QPointF &relPos) {
     const auto bTrans = GetAsPtr(getTransform(), BoxTransformAnimator);
-    bTrans->setPivotAutoAdjust(false);
     bTrans->setPivotFixedTransform(relPos);
 }
 

@@ -5,46 +5,49 @@
 #include "PropertyUpdaters/nodepointupdater.h"
 #include "Animators/transformanimator.h"
 #include "Animators/effectanimators.h"
+#include "MovablePoints/pointshandler.h"
+#include "PathEffects/patheffectanimators.h"
 
 Circle::Circle() :
     PathBox(TYPE_CIRCLE) {
     setName("Circle");
 
+    setPointsHandler(SPtrCreate(PointsHandler)());
+
     mCenterAnimator = SPtrCreate(QPointFAnimator)("center");
     mCenterPoint = SPtrCreate(AnimatedPoint)(mCenterAnimator.get(),
                                              mTransformAnimator.get(),
                                              TYPE_PATH_POINT);
+    mPointsHandler->appendPt(mCenterPoint);
 
     mCenterPoint->disableSelection();
     mCenterPoint->setRelativePos(QPointF(0, 0));
     mCenterAnimator->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
-    ca_addChildAnimator(mCenterAnimator);
-    ca_prependChildAnimator(mCenterAnimator.get(), mEffectsAnimators);
+    ca_prependChildAnimator(mPathEffectsAnimators.data(),
+                            mCenterAnimator);
 
     mHorizontalRadiusAnimator =
             SPtrCreate(QPointFAnimator)("horizontal radius");
-    mHorizontalRadiusPoint =
-            SPtrCreate(CircleRadiusPoint)(mHorizontalRadiusAnimator.get(),
-                                          mTransformAnimator.get(),
-                                          mCenterPoint.get(),
-                                          TYPE_PATH_POINT, false);
+    mHorizontalRadiusPoint = SPtrCreate(CircleRadiusPoint)(
+                mHorizontalRadiusAnimator.get(), mTransformAnimator.get(),
+                mCenterPoint.get(), TYPE_PATH_POINT, false);
+    mPointsHandler->appendPt(mHorizontalRadiusPoint);
     mHorizontalRadiusPoint->setRelativePos(QPointF(10, 0));
-    QrealAnimator *hXAnimator = mHorizontalRadiusAnimator->getXAnimator();
-    ca_addChildAnimator(GetAsSPtr(hXAnimator, QrealAnimator));
-    ca_prependChildAnimator(hXAnimator, mEffectsAnimators);
+    const auto hXAnimator = mHorizontalRadiusAnimator->getXAnimator();
+    ca_prependChildAnimator(mPathEffectsAnimators.data(),
+                            GetAsSPtr(hXAnimator, QrealAnimator));
     hXAnimator->prp_setName("horizontal radius");
 
     mVerticalRadiusAnimator =
             SPtrCreate(QPointFAnimator)("vertical radius");
-    mVerticalRadiusPoint =
-            SPtrCreate(CircleRadiusPoint)(mVerticalRadiusAnimator.get(),
-                                          mTransformAnimator.get(),
-                                          mCenterPoint.get(),
-                                          TYPE_PATH_POINT, true);
+    mVerticalRadiusPoint = SPtrCreate(CircleRadiusPoint)(
+                mVerticalRadiusAnimator.get(), mTransformAnimator.get(),
+                mCenterPoint.get(), TYPE_PATH_POINT, true);
+    mPointsHandler->appendPt(mVerticalRadiusPoint);
     mVerticalRadiusPoint->setRelativePos(QPointF(0, 10));
-    QrealAnimator *vYAnimator = mVerticalRadiusAnimator->getYAnimator();
-    ca_addChildAnimator(GetAsSPtr(vYAnimator, QrealAnimator));
-    ca_prependChildAnimator(vYAnimator, mEffectsAnimators);
+    const auto vYAnimator = mVerticalRadiusAnimator->getYAnimator();
+    ca_prependChildAnimator(mPathEffectsAnimators.data(),
+                            GetAsSPtr(vYAnimator, QrealAnimator));
     vYAnimator->prp_setName("vertical radius");
     prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
 }

@@ -53,7 +53,7 @@ void ImageCacheContainer::drawSk(SkCanvas * const canvas,
 void ImageCacheContainer::drawSk(SkCanvas * const canvas,
                                  GrContext * const grContext,
                                  SkPaint& paint) {
-    paint.setFilterQuality(BoundingBox::sDisplayQuality);
+    paint.setFilterQuality(BoundingBox::sDisplayFiltering);
     SkiaHelpers::drawImageGPU(canvas, mImageSk, 0, 0, &paint, grContext);
 }
 

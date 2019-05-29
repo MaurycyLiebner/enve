@@ -10,6 +10,7 @@
 
 void Canvas::mousePressEvent(const QMouseEvent * const event) {
     if(isPreviewingOrRendering()) return;
+    if(mIsMouseGrabbing) return;
     setLastMouseEventPosAbs(event->pos());
     setLastMousePressPosAbs(event->pos());
     setCurrentMouseEventPosAbs(event->pos());
@@ -56,6 +57,7 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
         moveByRel(mCurrentMouseEventPosRel - mLastMouseEventPosRel);
     } else if(mCurrentMode == PAINT_MODE && event->buttons() & Qt::LeftButton)  {
         paintMove(event->timestamp(), 1, 0, 0);
+        return mCanvasWindow->requestUpdate();
     } else if(event->buttons() & Qt::LeftButton || mIsMouseGrabbing) {
         if(mMovesToSkip > 0) {
             mMovesToSkip--;
@@ -187,6 +189,7 @@ void Canvas::tabletEvent(const QTabletEvent * const e,
     } else if(mStylusDrawing) {
         paintMove(e->timestamp(), e->pressure(),
                   e->xTilt(), e->yTilt());
+        return mCanvasWindow->requestUpdate();
     } // else if
     setLastMouseEventPosAbs(absPos);
     callUpdateSchedulers();

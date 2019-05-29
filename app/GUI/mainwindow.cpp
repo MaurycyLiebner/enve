@@ -402,7 +402,7 @@ void MainWindow::setupMenuBar() {
     const auto filteringMenu = mViewMenu->addMenu("Filtering");
 
     mNoneQuality = filteringMenu->addAction("None", [this]() {
-        BoundingBox::sDisplayQuality = kNone_SkFilterQuality;
+        BoundingBox::sDisplayFiltering = kNone_SkFilterQuality;
         mCanvasWindow->requestUpdate();
 
         mLowQuality->setChecked(false);
@@ -410,10 +410,10 @@ void MainWindow::setupMenuBar() {
         mHighQuality->setChecked(false);
     });
     mNoneQuality->setCheckable(true);
-    mNoneQuality->setChecked(BoundingBox::sDisplayQuality == kNone_SkFilterQuality);
+    mNoneQuality->setChecked(BoundingBox::sDisplayFiltering == kNone_SkFilterQuality);
 
     mLowQuality = filteringMenu->addAction("Low", [this]() {
-        BoundingBox::sDisplayQuality = kLow_SkFilterQuality;
+        BoundingBox::sDisplayFiltering = kLow_SkFilterQuality;
         mCanvasWindow->requestUpdate();
 
         mNoneQuality->setChecked(false);
@@ -421,10 +421,10 @@ void MainWindow::setupMenuBar() {
         mHighQuality->setChecked(false);
     });
     mLowQuality->setCheckable(true);
-    mLowQuality->setChecked(BoundingBox::sDisplayQuality == kLow_SkFilterQuality);
+    mLowQuality->setChecked(BoundingBox::sDisplayFiltering == kLow_SkFilterQuality);
 
     mMediumQuality = filteringMenu->addAction("Medium", [this]() {
-        BoundingBox::sDisplayQuality = kMedium_SkFilterQuality;
+        BoundingBox::sDisplayFiltering = kMedium_SkFilterQuality;
         mCanvasWindow->requestUpdate();
 
         mNoneQuality->setChecked(false);
@@ -432,10 +432,10 @@ void MainWindow::setupMenuBar() {
         mHighQuality->setChecked(false);
     });
     mMediumQuality->setCheckable(true);
-    mMediumQuality->setChecked(BoundingBox::sDisplayQuality == kMedium_SkFilterQuality);
+    mMediumQuality->setChecked(BoundingBox::sDisplayFiltering == kMedium_SkFilterQuality);
 
     mHighQuality = filteringMenu->addAction("High", [this]() {
-        BoundingBox::sDisplayQuality = kHigh_SkFilterQuality;
+        BoundingBox::sDisplayFiltering = kHigh_SkFilterQuality;
         mCanvasWindow->requestUpdate();
 
         mNoneQuality->setChecked(false);
@@ -443,7 +443,7 @@ void MainWindow::setupMenuBar() {
         mMediumQuality->setChecked(false);
     });
     mHighQuality->setCheckable(true);
-    mHighQuality->setChecked(BoundingBox::sDisplayQuality == kHigh_SkFilterQuality);
+    mHighQuality->setChecked(BoundingBox::sDisplayFiltering == kHigh_SkFilterQuality);
 
     mClipViewToCanvas = mViewMenu->addAction("Clip To Canvas");
     mClipViewToCanvas->setCheckable(true);
@@ -1156,9 +1156,7 @@ void MainWindow::openFile() {
         disable();
         const QString openPath = QFileDialog::getOpenFileName(this,
             "Open File", mCurrentFilePath, "enve Files (*.ev)");
-        if(!openPath.isEmpty()) {
-            openFile(openPath);
-        }
+        if(!openPath.isEmpty()) openFile(openPath);
         enable();
     }
 }

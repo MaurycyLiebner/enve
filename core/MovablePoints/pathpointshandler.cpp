@@ -11,7 +11,9 @@ PathPointsHandler::PathPointsHandler(
 }
 
 SmartNodePoint *PathPointsHandler::createNewNodePoint(const int &nodeId) {
-    return createInsertNewPt<SmartNodePoint>(nodeId, this, mTargetAnimator);
+    const auto newPt = SPtrCreate(SmartNodePoint)(this, mTargetAnimator);
+    insertPt(nodeId, newPt);
+    return newPt.get();
 }
 
 SmartNodePoint *PathPointsHandler::createAndAssignNewNodePoint(const int &nodeId) {

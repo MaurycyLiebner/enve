@@ -48,10 +48,7 @@ public:
                         const bool &keyOnCurrent);
 
     virtual void remove() {}
-    virtual bool isVisible(const CanvasMode& mode) const {
-        Q_UNUSED(mode);
-        return true;
-    }
+    virtual bool isVisible(const CanvasMode& mode) const;
 
     virtual void canvasContextMenu(PointTypeMenu * const menu) {
         Q_UNUSED(menu);

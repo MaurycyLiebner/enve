@@ -42,6 +42,6 @@ void SmartPathCollection::applyTransform(const QMatrix &transform) const {
 }
 
 void SmartPathCollection::loadSkPath(const SkPath &path) {
-    QList<SkPath> paths = gBreakApart(path);
+    const QList<SkPath> paths = gBreakApart(path);
     for(const auto& sPath : paths) createNewPath(sPath);
 }

@@ -30,7 +30,11 @@ public:
                        QList<Key *> &listKeys);
 
     void updateDropTarget();
+
     void stopScrolling();
+    void scrollUp();
+    void scrollDown();
+
     DurationRectangleMovable *getRectangleMovableAtPos(
                                         const int &pressX,
                                         const int &pressY,
@@ -108,11 +112,6 @@ private:
     bool droppingSupported(const SingleWidgetAbstraction * const targetAbs,
                            const int &idInTarget) const;
     void updateDragLine();
-signals:
-
-public slots:
-    void scrollUp();
-    void scrollDown();
 };
 
 #endif // BOXSCROLLWIDGETVISIBLEPART_H

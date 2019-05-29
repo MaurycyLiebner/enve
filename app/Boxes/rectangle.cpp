@@ -9,18 +9,21 @@
 Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     setName("Rectangle");
 
+    setPointsHandler(SPtrCreate(PointsHandler)());
+
     mTopLeftAnimator = SPtrCreate(QPointFAnimator)("top left");
     mTopLeftPoint = SPtrCreate(AnimatedPoint)(
                 mTopLeftAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
+    mPointsHandler->appendPt(mTopLeftPoint);
+    mTopLeftPoint->setRelativePos(QPointF(0, 0));
 
-    mTopLeftPoint->setRelativePos(QPointF(0., 0.));
-
-    mBottomRightAnimator = SPtrCreate(QPointFAnimator)("bottom left");
+    mBottomRightAnimator = SPtrCreate(QPointFAnimator)("bottom right");
     mBottomRightPoint = SPtrCreate(AnimatedPoint)(
-                mTopLeftAnimator.get(), mTransformAnimator.data(),
+                mBottomRightAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
-    mBottomRightPoint->setRelativePos(QPointF(0., 0.));
+    mPointsHandler->appendPt(mBottomRightPoint);
+    mBottomRightPoint->setRelativePos(QPointF(10, 10));
 
     //mTopLeftPoint->setBottomRightPoint(mBottomRightPoint);
     //mBottomRightPoint->setRadiusPoint(mRadiusPoint);
@@ -32,7 +35,7 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     ca_prependChildAnimator(mBottomRightAnimator.get(), mEffectsAnimators);
 
     mRadiusAnimator = SPtrCreate(QPointFAnimator)("round radius");
-    mRadiusAnimator->setValuesRange(0., 9999.);
+    mRadiusAnimator->setValuesRange(0, 9999);
 
     mRadiusPoint = SPtrCreate(AnimatedPoint)(
                 mRadiusAnimator.get(), mTransformAnimator.data(),

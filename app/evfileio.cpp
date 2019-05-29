@@ -375,21 +375,16 @@ void BoxTransformAnimator::writeProperty(QIODevice * const target) const {
     mShearAnimator->writeProperty(target);
     mOpacityAnimator->writeProperty(target);
     mPivotAnimator->writeProperty(target);
-    target->write(rcConstChar(&mPivotAutoAdjust), sizeof(bool));
 }
 
 void BoxTransformAnimator::readProperty(QIODevice *target) {
     // pivot will be read anyway, so temporarly disable adjusting
-    mPivotAutoAdjust = false;
     BasicTransformAnimator::readProperty(target);
     mShearAnimator->readProperty(target);
     mOpacityAnimator->readProperty(target);
     mPivotAnimator->readProperty(target);
-    bool pivotAutoAdjust;
-    target->read(rcChar(&pivotAutoAdjust), sizeof(bool));
 
     updateRelativeTransform(Animator::USER_CHANGE);
-    mPivotAutoAdjust = pivotAutoAdjust;
 }
 
 void GradientPoints::writeProperty(QIODevice * const target) const {

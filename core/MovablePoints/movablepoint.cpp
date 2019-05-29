@@ -98,6 +98,10 @@ void MovablePoint::drawSk(SkCanvas * const canvas, const CanvasMode &mode,
     drawOnAbsPosSk(canvas, absPos, invScale, fillCol);
 }
 
+bool MovablePoint::isVisible(const CanvasMode &mode) const {
+    return mode == CanvasMode::MOVE_POINT;
+}
+
 BasicTransformAnimator *MovablePoint::getTransform() {
     return mTrans_cv;
 }

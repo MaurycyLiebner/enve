@@ -11,12 +11,14 @@ SmartPathAnimator::SmartPathAnimator() :
 SmartPathAnimator::SmartPathAnimator(const SkPath &path) :
     SmartPathAnimator() {
     mBaseValue.setPath(path);
+    mCurrentPath = path;
     updateAllPoints();
 }
 
 SmartPathAnimator::SmartPathAnimator(const SmartPath &baseValue) :
     SmartPathAnimator() {
     mBaseValue = baseValue;
+    mPathUpToDate = false;
     updateAllPoints();
 }
 

@@ -144,8 +144,8 @@ public:
     int anim_getNextKeyRelFrame(const int &relFrame) const;
     bool hasSelectedKeys() const;
 
-    void addKeyToSelected(Key* key);
-    void removeKeyFromSelected(Key* key);
+    void addKeyToSelected(Key * const key);
+    void removeKeyFromSelected(Key * const key);
 
     void writeSelectedKeys(QIODevice* target);
 

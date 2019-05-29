@@ -80,7 +80,6 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *e);
     void graphRemoveViewedAnimator(GraphAnimator * const animator);
-    void updateAnimatorsColors();
     void clearHoveredMovable();
     bool KFT_handleKeyEventForTarget(QKeyEvent *event);
     void handleMouseMove(const QPoint &pos,
@@ -110,7 +109,9 @@ protected:
 signals:
     void changedViewedFrames(int, int);
     void wheelEventSignal(QWheelEvent*);
-public slots:
+public:
+    static QColor sGetAnimatorColor(const int i);
+
     void graphResetValueScaleAndMinShownAction();
     void graphUpdateAfterKeysChangedAndRepaint();
 
@@ -131,10 +132,11 @@ public slots:
     void setViewedVerticalRange(const int &top,
                         const int &bottom);
     void clearHovered();
-private slots:
+
+    int graphGetAnimatorId(GraphAnimator * const anim);
+private:
     void scrollRight();
     void scrollLeft();
-private:
     void graphConstrainAnimatorCtrlsFrameValues();
     void graphGetAnimatorsMinMaxValue(qreal &minVal, qreal &maxVal);
     void graphMakeSegmentsSmoothAction(const bool &smooth);

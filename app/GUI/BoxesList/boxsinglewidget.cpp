@@ -788,11 +788,11 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
                                             Qt::ShiftModifier);
         MainWindow::getInstance()->queScheduledTasksAndUpdate();
     } else if(target->SWT_isGraphAnimator()) {
-        auto animTarget = GetAsPtr(target, GraphAnimator);
-        auto bsvt = static_cast<BoxScrollWidgetVisiblePart*>(mParent);
-        KeysView *keysView = bsvt->getKeysView();
+        const auto animTarget = GetAsPtr(target, GraphAnimator);
+        const auto bsvt = static_cast<BoxScrollWidgetVisiblePart*>(mParent);
+        KeysView * const keysView = bsvt->getKeysView();
         if(keysView) {
-            if(animTarget->graph_isCurrentAnimator(mParent)) {
+            if(keysView->graphGetAnimatorId(animTarget) != -1) {
                 keysView->graphRemoveViewedAnimator(animTarget);
             } else {
                 keysView->graphAddViewedAnimator(animTarget);
@@ -942,11 +942,17 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     } else if(!target->SWT_isComplexAnimator()) {
         const auto propTarget = static_cast<Property*>(target);
         if(target->SWT_isGraphAnimator()) {
-            auto graphAnim = static_cast<GraphAnimator*>(target);
-            if(graphAnim->graph_isCurrentAnimator(mParent)) {
-                p.fillRect(nameX + MIN_WIDGET_HEIGHT/4, MIN_WIDGET_HEIGHT/4,
-                           MIN_WIDGET_HEIGHT/2, MIN_WIDGET_HEIGHT/2,
-                           graphAnim->graph_getAnimatorColor(mParent));
+            const auto graphAnim = static_cast<GraphAnimator*>(target);
+            const auto bswvp = static_cast<BoxScrollWidgetVisiblePart*>(mParent);
+            const auto keysView = bswvp->getKeysView();
+            if(keysView) {
+                const int id = keysView->graphGetAnimatorId(graphAnim);
+                if(id >= 0) {
+                    const auto color = keysView->sGetAnimatorColor(id);
+                    p.fillRect(nameX + MIN_WIDGET_HEIGHT/4, MIN_WIDGET_HEIGHT/4,
+                               MIN_WIDGET_HEIGHT/2, MIN_WIDGET_HEIGHT/2,
+                               color);
+                }
             }
         }
         name = propTarget->prp_getName();

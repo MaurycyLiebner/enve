@@ -11,7 +11,6 @@
 #include "Animators/transformanimator.h"
 
 TextBox::TextBox() : PathBox(TYPE_TEXT) {
-    mTransformAnimator->setPivotAutoAdjust(false);
     setName("text");
 
     mFillSettings->setPaintType(PaintType::FLATPAINT);

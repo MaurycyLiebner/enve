@@ -148,17 +148,7 @@ public:
     QrealAnimator *getOpacityAnimator() {
         return mOpacityAnimator.get();
     }
-
-    void setPivotAutoAdjust(const bool& autoAdjust) {
-        mPivotAutoAdjust = autoAdjust;
-    }
-
-    bool getPivotAutoadjust() const {
-        return mPivotAutoAdjust;
-    }
 private:
-    bool mPivotAutoAdjust = true;
-
     stdsptr<BoxPathPoint> mPivotPoint;
     qsptr<QPointFAnimator> mPivotAnimator;
     qsptr<QPointFAnimator> mShearAnimator;

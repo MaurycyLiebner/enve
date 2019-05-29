@@ -253,7 +253,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         for(const auto& box : mSelectedBoxes) {
             canvas->save();
             box->drawBoundingRect(canvas, invZoom);
-            box->drawCanvasControls(canvas, mCurrentMode, invZoom);
+            box->drawAllCanvasControls(canvas, mCurrentMode, invZoom);
             canvas->restore();
         }
 
@@ -802,6 +802,7 @@ void Canvas::setParentToLastSelected() {
 
 bool Canvas::startRotatingAction(const QPointF &cursorPos) {
     if(!isMovingPath() && mCurrentMode != MOVE_POINT) return false;
+    if(mIsMouseGrabbing) return false;
     if(mSelectedBoxes.isEmpty()) return false;
     if(mCurrentMode == MOVE_POINT) {
         if(mSelectedPoints_d.isEmpty()) return false;
@@ -819,6 +820,8 @@ bool Canvas::startRotatingAction(const QPointF &cursorPos) {
 
 bool Canvas::startScalingAction(const QPointF &cursorPos) {
     if(!isMovingPath() && mCurrentMode != MOVE_POINT) return false;
+    if(mIsMouseGrabbing) return false;
+
     if(mSelectedBoxes.isEmpty()) return false;
     if(mCurrentMode == MOVE_POINT) {
         if(mSelectedPoints_d.isEmpty()) return false;
@@ -839,6 +842,7 @@ bool Canvas::startScalingAction(const QPointF &cursorPos) {
 
 bool Canvas::startMovingAction(const QPointF& cursorPos) {
     if(!isMovingPath() && mCurrentMode != MOVE_POINT) return false;
+    if(mIsMouseGrabbing) return false;
     mTransformationFinishedBeforeMouseRelease = false;
     mXOnlyTransform = false;
     mYOnlyTransform = false;

@@ -20,7 +20,7 @@
 #include "Animators/qpointfanimator.h"
 #include "MovablePoints/pathpointshandler.h"
 
-SkFilterQuality BoundingBox::sDisplayQuality = kHigh_SkFilterQuality;
+SkFilterQuality BoundingBox::sDisplayFiltering = kLow_SkFilterQuality;
 int BoundingBox::sNextDocumentId;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
 
@@ -58,8 +58,6 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     connect(mTransformAnimator.get(),
             &BoxTransformAnimator::totalTransformChanged,
             this, &BoundingBox::afterTotalTransformChanged);
-
-    //mTransformAnimator->setPivotAutoAdjust(false);
 }
 
 BoundingBox::~BoundingBox() {
@@ -209,9 +207,9 @@ void BoundingBox::updateAllBoxes(const UpdateReason &reason) {
     planScheduleUpdate(reason);
 }
 
-void BoundingBox::drawCanvasControls(SkCanvas * const canvas,
-                                     const CanvasMode &mode,
-                                     const SkScalar &invScale) {
+void BoundingBox::drawAllCanvasControls(SkCanvas * const canvas,
+                                        const CanvasMode &mode,
+                                        const SkScalar &invScale) {
     for(const auto& prop : mCanvasProps)
         prop->drawCanvasControls(canvas, mode, invScale);
 }
@@ -255,7 +253,7 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
     const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
     paint.setAlpha(static_cast<U8CPU>(intAlpha));
     paint.setBlendMode(mBlendModeSk);
-    paint.setFilterQuality(sDisplayQuality);
+    paint.setFilterQuality(sDisplayFiltering);
     drawPixmapSk(canvas, &paint, grContext);
 }
 
@@ -263,7 +261,7 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
                                SkPaint * const paint,
                                GrContext* const grContext) {
     if(mTransformAnimator->getOpacity() < 0.001) return;
-    paint->setFilterQuality(sDisplayQuality);
+    paint->setFilterQuality(sDisplayFiltering);
     mDrawRenderContainer.drawSk(canvas, paint, grContext);
 }
 
@@ -396,9 +394,7 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
     mSkRelBoundingRectPath.reset();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
 
-    if((mTransformAnimator->getPivotAutoadjust() ||
-        mCenterPivotPlanned) &&
-       !mTransformAnimator->posOrPivotRecording()) {
+    if(mCenterPivotPlanned) {
         mCenterPivotPlanned = false;
         setPivotRelPos(getRelCenterPosition());
     }

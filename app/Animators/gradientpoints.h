@@ -39,8 +39,8 @@ private:
     qsptr<QPointFAnimator> mStartAnimator;
     qsptr<QPointFAnimator> mEndAnimator;
 
-    stdptr<GradientPoint> mStartPoint;
-    stdptr<GradientPoint> mEndPoint;
+    stdsptr<GradientPoint> mStartPoint;
+    stdsptr<GradientPoint> mEndPoint;
 
     PathBox* const mParent_k;
 };

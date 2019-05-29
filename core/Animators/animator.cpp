@@ -279,6 +279,7 @@ void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
 }
 
 void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
+    removeKeyFromSelected(keyToRemove.get());
     const bool isComplex = SWT_isComplexAnimator();
     Key * const keyPtr = keyToRemove.get();
     anim_mKeys.remove(keyToRemove);
@@ -547,14 +548,17 @@ bool Animator::hasSelectedKeys() const {
     return !anim_mSelectedKeys.isEmpty();
 }
 
-void Animator::addKeyToSelected(Key *key) {
+void Animator::addKeyToSelected(Key * const key) {
+    if(key->isSelected()) return;
     anim_mSelectedKeys << key;
     key->setSelected(true);
 }
 
-void Animator::removeKeyFromSelected(Key *key) {
-    key->setSelected(false);
-    anim_mSelectedKeys.removeOne(key);
+void Animator::removeKeyFromSelected(Key * const key) {
+    if(key->isSelected()) {
+        key->setSelected(false);
+        anim_mSelectedKeys.removeOne(key);
+    }
 }
 
 void Animator::deselectAllKeys() {
@@ -566,8 +570,7 @@ void Animator::deselectAllKeys() {
 
 void Animator::selectAllKeys() {
     for(const auto& key : anim_mKeys) {
-        anim_mSelectedKeys.append(key);
-        key->setSelected(true);
+        addKeyToSelected(key);
     }
 }
 

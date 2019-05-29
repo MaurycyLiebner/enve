@@ -157,6 +157,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
     }
 
     mCurrentCanvas->setCanvasMode(mode);
+    requestUpdate();
     MainWindow::getInstance()->updateCanvasModeButtonsChecked();
 }
 
@@ -865,6 +866,7 @@ void CanvasWindow::openWelcomeDialog() {
                                        []() { MainWindow::getInstance()->openFile(); },
                                        [](QString path) { MainWindow::getInstance()->openFile(path); },
                                        mWindow);
+    mWelcomeDialog->resize(getCanvasWidget()->size());
     mWindow->takeCentralWidget();
     mWindow->setCentralWidget(mWelcomeDialog);
 }

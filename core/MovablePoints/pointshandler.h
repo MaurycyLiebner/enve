@@ -10,17 +10,13 @@ class PointsHandler : public StdSelfRef {
 protected:
     PointsHandler();
 public:
-    template <class T, typename... Args>
-    T *createInsertNewPt(const int& id, Args && ...args) {
-        const auto newPt = SPtrCreateTemplated(T)(args...);
-        newPt->setTransform(mTrans);
-        mPts.insert(id, newPt);
-        return newPt.get();
+    void insertPt(const int& id, const stdsptr<MovablePoint>& pt) {
+        pt->setTransform(mTrans);
+        mPts.insert(id, pt);
     }
 
-    template <class T, typename... Args>
-    T *createAppendNewPt(Args && ...args) {
-        return createInsertNewPt<T>(mPts.count(), args...);
+    void appendPt(const stdsptr<MovablePoint>& pt) {
+        return insertPt(mPts.count(), pt);
     }
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
