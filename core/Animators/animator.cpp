@@ -280,6 +280,10 @@ void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
 
 void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
     removeKeyFromSelected(keyToRemove.get());
+    removeKeyWithoutDeselecting(keyToRemove);
+}
+
+void Animator::removeKeyWithoutDeselecting(const stdsptr<Key>& keyToRemove) {
     const bool isComplex = SWT_isComplexAnimator();
     Key * const keyPtr = keyToRemove.get();
     anim_mKeys.remove(keyToRemove);
@@ -304,11 +308,9 @@ void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
 
 void Animator::anim_moveKeyToRelFrame(Key * const key, const int &newFrame) {
     const auto keySPtr = GetAsSPtr(key, Key);
-    const bool wasSelected = key->isSelected();
-    anim_removeKey(keySPtr);
+    removeKeyWithoutDeselecting(keySPtr);
     key->setRelFrame(newFrame);
     anim_appendKey(keySPtr);
-    if(wasSelected) addKeyToSelected(key);
 }
 
 void Animator::anim_updateKeyOnCurrrentFrame() {
@@ -645,13 +647,15 @@ void Animator::OverlappingKeys::merge() {
             if(iKey.get() == target) continue;
             const auto cKey = GetAsSPtr(iKey, ComplexKey);
             cKey->moveAllKeysTo(cTarget);
-            mKeys.removeAt(i--);
+            mAnimator->anim_removeKey(iKey);
+            i--;
         }
     } else {
         for(int i = 0; i < mKeys.count(); i++) {
             const auto& iKey = mKeys.at(i);
             if(iKey.get() == target) continue;
-            mKeys.removeAt(i--);
+            mAnimator->anim_removeKey(iKey);
+            i--;
         }
     }
 }

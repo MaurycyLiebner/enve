@@ -196,6 +196,7 @@ private:
 
         Key * getKey() const {
             if(mKeys.isEmpty()) return nullptr;
+            if(mKeys.count() == 1) return mKeys.last().get();
             for(const auto& iKey : mKeys) {
                 if(iKey->isDescendantSelected()) return iKey.get();
             }
@@ -398,6 +399,7 @@ private:
 signals:
     void anim_isRecordingChanged();
 private:
+    void removeKeyWithoutDeselecting(const stdsptr<Key> &keyToRemove);
     void anim_updateKeyOnCurrrentFrame();
     void anim_setKeyOnCurrentFrame(Key * const key);
     int getInsertIdForKeyRelFrame(const int &relFrame,

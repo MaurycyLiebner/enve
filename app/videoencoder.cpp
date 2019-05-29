@@ -637,7 +637,7 @@ void VideoEncoder::processTask() {
     bool encodeAudioT = mSoundIterator.hasValue(); // local encode
     while((mEncodeVideo && encodeVideoT) || (mEncodeAudio && encodeAudioT)) {
         bool videoAligned = true;
-        if(mEncodeAudio) {
+        if(mEncodeVideo && mEncodeAudio) {
             videoAligned = av_compare_ts(mVideoStream.fNextPts,
                                          mVideoStream.fCodec->time_base,
                                          mAudioStream.fNextPts,
@@ -663,7 +663,7 @@ void VideoEncoder::processTask() {
             }
         }
         bool audioAligned = true;
-        if(mEncodeVideo) {
+        if(mEncodeVideo && mEncodeAudio) {
             audioAligned = av_compare_ts(mVideoStream.fNextPts,
                                          mVideoStream.fCodec->time_base,
                                          mAudioStream.fNextPts,

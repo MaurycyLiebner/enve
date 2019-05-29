@@ -1379,13 +1379,11 @@ void CanvasWindow::importFile(const QString &path,
         if(importedBox) {
             importedBox->planCenterPivotPosition();
             mCurrentCanvas->getCurrentBoxesGroup()->addContainedBox(importedBox);
-            QPointF trans = relDropPos;
-            trans -= importedBox->mapRelPosToAbs(
-                        importedBox->getRelCenterPosition());
-            importedBox->moveByAbs(trans);
+            importedBox->moveByAbs(relDropPos);
         }
         updateHoveredElements();
     }
+    queScheduledTasksAndUpdate();
 }
 
 QWidget *CanvasWindow::getCanvasWidget() {
