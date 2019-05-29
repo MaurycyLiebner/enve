@@ -302,11 +302,13 @@ void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
     prp_afterChangedRelRange({affectedMin, affectedMax});
 }
 
-void Animator::anim_moveKeyToRelFrame(Key *key, const int &newFrame) {
+void Animator::anim_moveKeyToRelFrame(Key * const key, const int &newFrame) {
     const auto keySPtr = GetAsSPtr(key, Key);
+    const bool wasSelected = key->isSelected();
     anim_removeKey(keySPtr);
     key->setRelFrame(newFrame);
     anim_appendKey(keySPtr);
+    if(wasSelected) addKeyToSelected(key);
 }
 
 void Animator::anim_updateKeyOnCurrrentFrame() {

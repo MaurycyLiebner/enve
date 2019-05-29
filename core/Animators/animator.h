@@ -129,7 +129,7 @@ public:
     int anim_getCurrentRelFrame() const;
     int anim_getCurrentAbsFrame() const;
 
-    void anim_moveKeyToRelFrame(Key *key, const int &newFrame);
+    void anim_moveKeyToRelFrame(Key * const key, const int &newFrame);
     void anim_shiftAllKeys(const int &shift);
 
     bool hasFakeComplexAnimator();
