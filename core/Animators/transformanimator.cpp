@@ -354,10 +354,14 @@ void BoxTransformAnimator::setPivotFixedTransform(
 
     const qreal posXInc = currentMatrix.dx() - futureMatrix.dx();
     const qreal posYInc = currentMatrix.dy() - futureMatrix.dy();
-    if(posOrPivotRecording()) {
-        mPosAnimator->incAllBaseValues(posXInc, posYInc);
+    const bool posAnimated = mPosAnimator->anim_isDescendantRecording();
+    const bool pivotAnimated = mPivotAnimator->anim_isDescendantRecording();
+    if(pivotAnimated) {
         mPivotAnimator->setBaseValue(point);
-    } else {
+    } else if(posAnimated && !pivotAnimated) {
+        mPosAnimator->incAllBaseValues(posXInc, posYInc);
+        mPivotAnimator->setBaseValueWithoutCallingUpdater(point);
+    } else { // if(!posAnimated && !pivotAnimated) {
         mPosAnimator->incBaseValuesWithoutCallingUpdater(posXInc, posYInc);
         mPivotAnimator->setBaseValueWithoutCallingUpdater(point);
     }
