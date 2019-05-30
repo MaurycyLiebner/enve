@@ -39,8 +39,8 @@ public:
 
     void updatePixelsPerFrame();
 
-    void addKeyToSelection(Key *key);
-    void removeKeyFromSelection(Key *key);
+    void addKeyToSelection(Key * const key);
+    void removeKeyFromSelection(Key * const key);
     void clearKeySelection();
     void selectKeysInSelectionRect();
 
@@ -48,11 +48,6 @@ public:
 
     void graphPaint(QPainter *p);
     void graphWheelEvent(QWheelEvent *event);
-    void graphMousePressEvent(const QPoint &eventPos,
-                              const Qt::MouseButton &eventButton);
-    void graphMouseMoveEvent(const QPoint &eventPos,
-                             const Qt::MouseButtons &eventButtons);
-    void graphMouseReleaseEvent(const Qt::MouseButton &eventButton);
     bool graphProcessFilteredKeyEvent(QKeyEvent *event);
     void graphResizeEvent(QResizeEvent *);
     void graphAddViewedAnimator(GraphAnimator * const animator);
@@ -70,7 +65,6 @@ public:
     void graphMiddleRelease();
     void graphSetCtrlsModeForSelected(const CtrlsMode &mode);
     void graphDeletePressed();
-    void graphMouseMove(const QPointF &mousePos);
     void graphResetValueScaleAndMinShown();
     void scheduleGraphUpdateAfterKeysChanged();
     void graphUpdateAfterKeysChangedIfNeeded();
@@ -86,8 +80,6 @@ public:
                          const Qt::MouseButtons &buttons);
 protected:
     ValueInput mValueInput;
-    bool graph_mXOnlyTransform = false;
-    bool graph_mYOnlyTransform = false;
 
     QPoint mLastMovePos;
     void focusInEvent(QFocusEvent *);
@@ -172,7 +164,7 @@ private:
     Key *mLastPressedKey = nullptr;
     bool mFirstMove = false;
     int mMoveDFrame = 0;
-    QPointF mLastPressPos;
+    QPoint mLastPressPos;
     bool mMovingKeys = false;
     bool mScalingKeys = false;
     bool mMovingRect = false;

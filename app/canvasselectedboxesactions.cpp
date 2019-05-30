@@ -363,7 +363,7 @@ QPointF Canvas::getSelectedBoxesAbsPivotPos() {
     return posSum/count;
 }
 
-bool Canvas::isBoxSelectionEmpty() {
+bool Canvas::isBoxSelectionEmpty() const {
     return mSelectedBoxes.isEmpty();
 }
 

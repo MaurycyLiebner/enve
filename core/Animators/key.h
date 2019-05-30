@@ -39,8 +39,8 @@ public:
             const bool& useSavedFrame);
 
     virtual bool isSelected() const;
-    virtual void addToSelection(QList<qptr<Animator>> &selectedAnimators);
-    virtual void removeFromSelection(QList<qptr<Animator>> &selectedAnimators);
+    virtual void addToSelection(QList<qptr<Animator>> &toSelect);
+    virtual void removeFromSelection(QList<qptr<Animator>> &toRemove);
     virtual bool isDescendantSelected() const { return isSelected(); }
 
 

@@ -7,8 +7,8 @@ QrealKey::QrealKey(const qreal &value, const int &frame,
                    QrealAnimator * const parentAnimator) :
     GraphKey(frame, parentAnimator) {
     mValue = value;
-    mStartValue = mValue;
-    mEndValue = mValue;
+    setStartValueVar(mValue);
+    setEndValueVar(mValue);
 }
 
 QrealKey::QrealKey(QrealAnimator * const parentAnimator) :
@@ -36,8 +36,8 @@ qreal QrealKey::getValue() const { return mValue; }
 
 void QrealKey::setValue(const qreal& value) {
     const qreal dVal = value - mValue;
-    setEndValueVar(mEndValue + dVal);
-    setStartValueVar(mStartValue + dVal);
+    setStartValueVar(mStartPt.getRawYValue() + dVal);
+    setEndValueVar(mEndPt.getRawYValue() + dVal);
 
     mValue = value;
     if(!this->mParentAnimator) return;
@@ -51,11 +51,14 @@ void QrealKey::finishValueTransform() {
 
 void QrealKey::startValueTransform() {
     mSavedValue = mValue;
+    mStartPt.saveYValue();
+    mEndPt.saveYValue();
 }
 
-void QrealKey::saveCurrentFrameAndValue() {
-    mSavedRelFrame = getRelFrame();
-    mSavedValue = getValue();
+void QrealKey::cancelValueTransform() {
+    setValue(mSavedValue);
+    setStartValueVar(mStartPt.getRawSavedYValue());
+    setEndValueVar(mEndPt.getRawSavedYValue());
 }
 
 bool QrealKey::differsFromKey(Key *key) const {

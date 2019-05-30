@@ -269,7 +269,7 @@ QrealAnimator *BasicTransformAnimator::getRotAnimator() {
 
 QMatrix BasicTransformAnimator::getTotalTransformAtRelFrameF(
         const qreal &relFrame) {
-    if(mParentTransformAnimator.data()) {
+    if(mParentTransformAnimator) {
         const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
         const qreal parentRelFrame =
                 mParentTransformAnimator->prp_absFrameToRelFrameF(absFrame);

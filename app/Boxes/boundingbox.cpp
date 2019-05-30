@@ -412,6 +412,7 @@ void BoundingBox::planScheduleUpdate(const UpdateReason& reason) {
         mParentGroup->planScheduleUpdate(qMin(reason, CHILD_USER_CHANGE));
     } else if(!SWT_isCanvas()) return;
     if(reason != UpdateReason::FRAME_CHANGE) mStateId++;
+
     mDrawRenderContainer.setExpired(true);
     if(mSchedulePlanned) {
         mPlannedReason = qMax(reason, mPlannedReason);
@@ -665,7 +666,6 @@ void BoundingBox::setupRenderData(const qreal &relFrame,
     data->fBoxStateId = mStateId;
     data->fRelFrame = qRound(relFrame);
     data->fTransform = getTotalTransformAtRelFrameF(relFrame);
-
     data->fOpacity = mTransformAnimator->getOpacity(relFrame);
     data->fResolution = getParentCanvas()->getResolutionFraction();
     const bool effectsVisible = getParentCanvas()->getRasterEffectsVisible();
@@ -1389,8 +1389,7 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     bool newerSate = true;
     bool closerFrame = true;
     if(currentRenderData) {
-        newerSate = currentRenderData->fBoxStateId <
-                renderData->fBoxStateId;
+        newerSate = currentRenderData->fBoxStateId < renderData->fBoxStateId;
         const int finishedFrameDist =
                 qAbs(anim_getCurrentRelFrame() - renderData->fRelFrame);
         const int oldFrameDist =

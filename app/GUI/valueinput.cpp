@@ -7,63 +7,56 @@ ValueInput::ValueInput() {
 }
 
 void ValueInput::draw(SkCanvas *canvas, const int &y) {
-    if(mInputTransformationEnabled) {
-        SkPaint paint;
-        const SkRect inputRect = SkRect::MakeXYWH(2*MIN_WIDGET_HEIGHT, y,
-                                                  5*MIN_WIDGET_HEIGHT,
-                                                  MIN_WIDGET_HEIGHT);
-        paint.setStyle(SkPaint::kFill_Style);
-        paint.setColor(SkColorSetARGB(255, 225, 225, 225));
-        canvas->drawRect(inputRect, paint);
-        QString transStr;
-        transStr = mName + ": " + mInputText + "|";
-        paint.setColor(SK_ColorBLACK);
-        paint.setStyle(SkPaint::kFill_Style);
+    SkPaint paint;
+    const SkRect inputRect = SkRect::MakeXYWH(2*MIN_WIDGET_HEIGHT, y,
+                                              10*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
+    paint.setStyle(SkPaint::kFill_Style);
+    paint.setColor(SkColorSetARGB(255, 225, 225, 225));
+    canvas->drawRect(inputRect, paint);
+    const auto transStr = getText();
+    paint.setColor(SK_ColorBLACK);
+    paint.setStyle(SkPaint::kFill_Style);
 
-        SkFont font;
-        font.setSize(FONT_HEIGHT);
-        SkRect bounds;
-        const auto cStr = transStr.toStdString().c_str();
-        font.measureText(cStr,
-                         static_cast<ulong>(transStr.size())*sizeof(char),
-                         SkTextEncoding::kUTF8,
-                         &bounds);
-        font.setTypeface(SkTypeface::MakeDefault());
+    SkFont font;
+    font.setSize(FONT_HEIGHT);
+    SkRect bounds;
+    const auto stdStr = transStr.toStdString();
+    const auto cStr = stdStr.c_str();
+    font.measureText(cStr,
+                     static_cast<ulong>(transStr.size())*sizeof(char),
+                     SkTextEncoding::kUTF8,
+                     &bounds);
+    font.setTypeface(SkTypeface::MakeDefault());
 
-        canvas->drawString(cStr,
-               inputRect.x() + font.getSize(),
-               inputRect.y() + inputRect.height()*0.5f + bounds.height()*0.2f,
-               font, paint);
-    }
+    canvas->drawString(cStr,
+           inputRect.x() + font.getSize(),
+           inputRect.y() + inputRect.height()*0.5f + bounds.height()*0.2f,
+           font, paint);
 }
 
 void ValueInput::draw(QPainter *p, const int &y) {
-    if(mInputTransformationEnabled) {
-        QRectF inputRect = QRectF(
-                                2*MIN_WIDGET_HEIGHT,
-                                y,
-                                5*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
-        p->fillRect(inputRect, QColor(225, 225, 225));
-        QString transStr;
-        transStr = mName + ": " + mInputText + "|";
+    QRectF inputRect(2*MIN_WIDGET_HEIGHT, y,
+                     10*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
+    p->fillRect(inputRect, QColor(225, 225, 225));
+    const auto transStr = getText();
 
-        p->drawText(inputRect, Qt::AlignVCenter, transStr);
-    }
+    p->drawText(inputRect, Qt::AlignVCenter, transStr);
 }
 
 void ValueInput::clearAndDisableInput() {
-    mInputTransformationEnabled = false;
+    mXYMode = MODE_XY;
+    mInputEnabled = false;
     mInputText = "";
 }
 
 void ValueInput::updateInputValue() {
     if(mInputText.isEmpty()) {
-        mInputTransformationEnabled = false;
+        mInputEnabled = false;
     } else {
         //mFirstMouseMove = false;
-        mInputTransformationEnabled = true;
-        if(mInputText == "-") mInputTransformationValue = -1;
-        else mInputTransformationValue = mInputText.toDouble();
+        mInputEnabled = true;
+        if(mInputText == "-") mInputValue = -1;
+        else mInputValue = mInputText.toDouble();
     }
 }
 #include <QKeyEvent>

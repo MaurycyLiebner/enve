@@ -110,12 +110,10 @@ void QrealKey::writeKey(QIODevice *target) {
     target->write(rcConstChar(&mValue), sizeof(qreal));
 
     target->write(rcConstChar(&mStartEnabled), sizeof(bool));
-    target->write(rcConstChar(&mStartFrame), sizeof(qreal));
-    target->write(rcConstChar(&mStartValue), sizeof(qreal));
+    target->write(rcConstChar(&mStartPt), sizeof(ClampedPoint));
 
     target->write(rcConstChar(&mEndEnabled), sizeof(bool));
-    target->write(rcConstChar(&mEndFrame), sizeof(qreal));
-    target->write(rcConstChar(&mEndValue), sizeof(qreal));
+    target->write(rcConstChar(&mEndPt), sizeof(ClampedPoint));
 }
 
 void QrealKey::readKey(QIODevice *target) {
@@ -123,12 +121,12 @@ void QrealKey::readKey(QIODevice *target) {
     target->read(rcChar(&mValue), sizeof(qreal));
 
     target->read(rcChar(&mStartEnabled), sizeof(bool));
-    target->read(rcChar(&mStartFrame), sizeof(qreal));
-    target->read(rcChar(&mStartValue), sizeof(qreal));
+    mStartPt.read(target);
+    //target->read(rcChar(&mStartPt), sizeof(ClampedPoint));
 
     target->read(rcChar(&mEndEnabled), sizeof(bool));
-    target->read(rcChar(&mEndFrame), sizeof(qreal));
-    target->read(rcChar(&mEndValue), sizeof(qreal));
+    mEndPt.read(target);
+    //target->read(rcChar(&mEndPt), sizeof(ClampedPoint));
 }
 
 void QrealAnimator::writeProperty(QIODevice * const target) const {

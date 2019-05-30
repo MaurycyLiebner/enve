@@ -255,23 +255,12 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
     }
     Key *parentKey = pressedPoint ? pressedPoint->getParentKey() : nullptr;
     if(!pressedPoint) {
-        if(mMainWindow->isCtrlPressed()) {
-//            graphClearKeysSelection();
-//            QrealKey *newKey = new QrealKey(qRound(frame), mAnimator, value);
-//            mAnimator->appendKey(newKey);
-//            mAnimator->updateKeysPath();
-//            mCurrentPoint = newKey->getEndPoint();
-//            mAnimator->getMinAndMaxMoveFrame(newKey, mCurrentPoint,
-//                                             &mMinMoveFrame, &mMaxMoveFrame);
-//            mCurrentPoint->setSelected(true);
-        } else {
-            mSelecting = true;
-            qreal value;
-            qreal frame;
-            graphGetValueAndFrameFromPos(pressPos, &value, &frame);
-            mSelectionRect.setBottomRight(QPointF(frame, value));
-            mSelectionRect.setTopLeft(QPointF(frame, value));
-        }
+        mSelecting = true;
+        qreal value;
+        qreal frame;
+        graphGetValueAndFrameFromPos(pressPos, &value, &frame);
+        mSelectionRect.setBottomRight(QPointF(frame, value));
+        mSelectionRect.setTopLeft(QPointF(frame, value));
     } else if(pressedPoint->isKeyPoint()) {
         mPressFrameAndValue = QPointF(frame, value);
         if(mMainWindow->isShiftPressed()) {
@@ -299,6 +288,7 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
         pressedPoint->setSelected(true);
     }
     mPressedPoint = pressedPoint;
+    mMovingKeys = pressedPoint;
 }
 
 void KeysView::graphMouseRelease() {
@@ -311,36 +301,13 @@ void KeysView::graphMouseRelease() {
         for(const auto& anim : mGraphAnimators) {
             anim->graph_addKeysInRectToList(mSelectionRect, keysList);
         }
-        for(GraphKey *const key : keysList) {
+        for(const auto& key : keysList) {
             addKeyToSelection(key);
         }
 
         mSelecting = false;
     } else if(mPressedPoint) {
-        if(mPressedCtrlPoint) {
-            mPressedPoint->setSelected(false);
-            mPressedCtrlPoint = false;
-        } else {
-            if(mFirstMove) {
-                if(!mMainWindow->isShiftPressed()) {
-                    clearKeySelection();
-                    addKeyToSelection(mPressedPoint->getParentKey());
-                }
-            } else {
-                for(const auto& anim : mGraphAnimators) {
-                    if(!anim->hasSelectedKeys()) continue;
-                    anim->finishSelectedKeysTransform();
-//                    key->finishValueTransform();
-                }
-            }
-        }
-        mPressedPoint = nullptr;
 
-        graphConstrainAnimatorCtrlsFrameValues();
-        //graphConstrainAnimatorCtrlsFrameValues();
-
-        // needed ?
-        graphUpdateDimensions();
     }
 }
 
@@ -359,10 +326,6 @@ void KeysView::graphMiddleMove(const QPointF &movePos) {
     setFramesRange(mSavedMinViewedFrame - roundX,
                    mSavedMaxViewedFrame - roundX );
     graphSetMinShownVal(mSavedMinShownValue + diffFrameValue.y());
-}
-
-void KeysView::graphMiddleRelease() {
-
 }
 
 void KeysView::graphConstrainAnimatorCtrlsFrameValues() {
@@ -414,98 +377,6 @@ void KeysView::graphDeletePressed() {
     mPressedPoint = nullptr;
 }
 
-void KeysView::graphMouseMove(const QPointF &mousePos) {
-    qreal value;
-    qreal frame;
-    graphGetValueAndFrameFromPos(mousePos, &value, &frame);
-    if(mSelecting) {
-        mSelectionRect.setBottomRight(QPointF(frame, value));
-    } else if(mScalingKeys) {
-        if(mFirstMove) {
-            for(const auto& anim : mGraphAnimators) {
-                anim->startSelectedKeysTransform();
-            }
-        }
-        qreal keysScale;
-        if(mValueInput.inputEnabled()) {
-            keysScale = mValueInput.getValue();
-        } else {
-            keysScale = 1 + (mousePos.x() - mLastPressPos.x())/150.;
-        }
-        const int absFrame = mMainWindow->getCurrentFrame();
-        for(const auto& anim : mGraphAnimators) {
-            anim->scaleSelectedKeysFrame(absFrame, keysScale);
-        }
-    } else if(mMovingKeys) {
-        if(mPressedCtrlPoint) {
-            //        if(!mPressedPoint->isEnabled()) {
-            //            Key *parentKey = mPressedPoint->getParentKey();
-            //            parentKey->setEndEnabledForGraph(true);
-            //            parentKey->setStartEnabledForGraph(true);
-            //            parentKey->setCtrlsMode(CTRLS_SYMMETRIC);
-            //        }
-            const qreal clampedFrame = clamp(frame, mMinMoveFrame, mMaxMoveFrame);
-            const qreal clamedValue = clamp(value, mMinMoveVal, mMaxMoveVal);
-            mPressedPoint->moveTo(clampedFrame, clamedValue);
-        } else {
-            QPointF frameValueChange;
-            if(mValueInput.inputEnabled()) {
-                frameValueChange = {mValueInput.getValue(),
-                                    mValueInput.getValue()};
-            } else {
-                frameValueChange = QPointF{frame, value} - mPressFrameAndValue;
-            }
-            if(graph_mXOnlyTransform) frameValueChange.setY(0);
-            else if(graph_mYOnlyTransform) frameValueChange.setX(0);
-            if(mFirstMove) {
-                for(const auto& anim : mGraphAnimators) {
-                    if(!anim->hasSelectedKeys()) continue;
-                    anim->graph_changeSelectedKeysFrameAndValueStart(frameValueChange);
-                }
-            } else {
-                for(const auto& anim : mGraphAnimators) {
-                    if(!anim->hasSelectedKeys()) continue;
-                    anim->graph_changeSelectedKeysFrameAndValue(frameValueChange);
-                }
-            }
-        }
-    }
-    mFirstMove = false;
-}
-
-void KeysView::graphMousePressEvent(const QPoint &eventPos,
-                                    const Qt::MouseButton &eventButton) {
-    if(eventButton == Qt::MiddleButton) {
-        graphMiddlePress(eventPos);
-    } else {
-        graphMousePress(eventPos);
-    }
-}
-
-void KeysView::graphMouseMoveEvent(const QPoint &eventPos,
-                                   const Qt::MouseButtons &eventButtons) {
-    if(eventButtons == Qt::MiddleButton) {
-        graphMiddleMove(eventPos);
-        emit changedViewedFrames(mMinViewedFrame,
-                                 mMaxViewedFrame);
-    } else {
-        graphMouseMove(eventPos);
-    }
-}
-
-void KeysView::graphMouseReleaseEvent(const Qt::MouseButton &eventButton) {
-    graph_mXOnlyTransform = false;
-    graph_mYOnlyTransform = false;
-    if(eventButton == Qt::MiddleButton) {
-        graphMiddleRelease();
-    } else {
-        graphMouseRelease();
-        mMovingKeys = false;
-        mScalingKeys = false;
-        mIsMouseGrabbing = false;
-    }
-}
-
 void KeysView::graphWheelEvent(QWheelEvent *event) {
     if(event->modifiers() & Qt::ControlModifier) {
         qreal valUnderMouse;
@@ -536,20 +407,18 @@ void KeysView::graphWheelEvent(QWheelEvent *event) {
 
 bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event) {
     const auto key = event->key();
-    const QPoint posU = mapFromGlobal(QCursor::pos()) +
-            QPoint(-MIN_WIDGET_HEIGHT/2, 0);
 
     if(key == Qt::Key_0 &&
        event->modifiers() & Qt::KeypadModifier) {
         graphResetValueScaleAndMinShownAction();
-    } else if(key == Qt::Key_X) {
-        graph_mXOnlyTransform = true;
-        graph_mYOnlyTransform = false;
-        graphMouseMove(posU);
-    } else if(key == Qt::Key_Y) {
-        graph_mXOnlyTransform = false;
-        graph_mYOnlyTransform = true;
-        graphMouseMove(posU);
+    } else if(key == Qt::Key_X && mMovingKeys) {
+        mValueInput.switchXOnlyMode();
+        handleMouseMove(mapFromGlobal(QCursor::pos()),
+                        Qt::LeftButton);
+    } else if(key == Qt::Key_Y && mMovingKeys) {
+        mValueInput.switchYOnlyMode();
+        handleMouseMove(mapFromGlobal(QCursor::pos()),
+                         Qt::LeftButton);
     } else {
         return false;
     }

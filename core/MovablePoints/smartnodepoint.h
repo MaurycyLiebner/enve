@@ -113,36 +113,44 @@ public:
     }
 
     qreal getT() const {
+        Q_ASSERT(mNode_d);
         return mNode_d->t();
     }
 
     QPointF getC0() const {
+        Q_ASSERT(mNode_d);
         return mNode_d->c0();
     }
 
     QPointF getP1() const {
+        Q_ASSERT(mNode_d);
         return mNode_d->p1();
     }
 
     QPointF getC2() const {
+        Q_ASSERT(mNode_d);
         return mNode_d->c2();
     }
 
     bool getC0Enabled() const {
         if(!mPrevNormalPoint) return false;
+        Q_ASSERT(mNode_d);
         return mNode_d->getC0Enabled();
     }
 
     bool getC2Enabled() const {
         if(!mNextNormalPoint) return false;
+        Q_ASSERT(mNode_d);
         return mNode_d->getC2Enabled();
     }
 
     CtrlsMode getCtrlsMode() const {
+        Q_ASSERT(mNode_d);
         return mNode_d->getCtrlsMode();
     }
 
     Node::NodeType getType() const {
+        Q_ASSERT(mNode_d);
         return mNode_d->getType();
     }
 

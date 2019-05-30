@@ -7,6 +7,8 @@ GraphAnimator::GraphAnimator(const QString& name) : Animator(name) {
 
         graph_constrainCtrlsFrameValues();
     });
+
+    graph_updateKeysPath({FrameRange::EMIN, FrameRange::EMAX});
 }
 
 void GraphAnimator::graph_setCtrlsModeForSelectedKeys(const CtrlsMode &mode) {
@@ -19,8 +21,26 @@ void GraphAnimator::graph_setCtrlsModeForSelectedKeys(const CtrlsMode &mode) {
 void GraphAnimator::graph_changeSelectedKeysFrameAndValueStart(
         const QPointF &frameVal) {
     for(const auto& key : anim_mSelectedKeys) {
-        GetAsGK(key)->saveCurrentFrameAndValue();
+        GetAsGK(key)->startFrameAndValueTransform();
         GetAsGK(key)->changeFrameAndValueBy(frameVal);
+    }
+}
+
+void GraphAnimator::graph_startSelectedKeysTransform() {
+    for(const auto& key : anim_mSelectedKeys) {
+        GetAsGK(key)->startFrameAndValueTransform();
+    }
+}
+
+void GraphAnimator::graph_finishSelectedKeysTransform() {
+    for(const auto& key : anim_mSelectedKeys) {
+        GetAsGK(key)->finishFrameAndValueTransform();
+    }
+}
+
+void GraphAnimator::graph_cancelSelectedKeysTransform() {
+    for(const auto& key : anim_mSelectedKeys) {
+        GetAsGK(key)->cancelFrameAndValueTransform();
     }
 }
 
@@ -182,23 +202,30 @@ void GraphAnimator::graph_updateKeysPath(const FrameRange &relFrameRange) {
 }
 
 void GraphAnimator::graph_constrainCtrlsFrameValues() {
-    GraphKey *lastKey = nullptr;
-    for(const auto &key : anim_mKeys) {
-        auto gKey = GetAsGK(key);
-        if(lastKey) {
-            lastKey->constrainEndCtrlMaxFrame(key->getAbsFrame());
-            qreal endMin; qreal endMax;
-            graph_getValueConstraints(lastKey, QrealPointType::END_POINT,
-                                        endMin, endMax);
-            lastKey->constrainEndCtrlValue(endMin, endMax);
-
-            gKey->constrainStartCtrlMinFrame(lastKey->getAbsFrame());
-            qreal startMin; qreal startMax;
-            graph_getValueConstraints(gKey, QrealPointType::START_POINT,
-                                      startMin, startMax);
-            gKey->constrainStartCtrlValue(startMin, startMax);
+    GraphKey *prevKey = nullptr;
+    const int iMax = anim_mKeys.count() - 1;
+    for(int i = 0; i <= iMax; i++) {
+        const auto iKey = GetAsGK(anim_mKeys.atId(i));
+        if(prevKey) {
+            prevKey->constrainEndCtrlMaxFrame(iKey->getAbsFrame());
+            iKey->constrainStartCtrlMinFrame(prevKey->getAbsFrame());
+        } else {
+            iKey->constrainStartCtrlMinFrame(-DBL_MAX);
         }
-        lastKey = gKey;
+        if(i == iMax) {
+            iKey->constrainEndCtrlMaxFrame(DBL_MAX);
+        }
+        qreal startMin; qreal startMax;
+        graph_getValueConstraints(iKey, QrealPointType::START_POINT,
+                                  startMin, startMax);
+        iKey->constrainStartCtrlValue(startMin, startMax);
+
+        qreal endMin; qreal endMax;
+        graph_getValueConstraints(iKey, QrealPointType::END_POINT,
+                                  endMin, endMax);
+        iKey->constrainEndCtrlValue(endMin, endMax);
+
+        prevKey = iKey;
     }
 }
 

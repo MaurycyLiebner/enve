@@ -260,7 +260,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         if(mCurrentMode == CanvasMode::MOVE_BOX ||
            mCurrentMode == CanvasMode::MOVE_POINT) {
 
-            if(mRotPivot->isScaling() || mRotPivot->isRotating()) {
+            if(mTransMode == MODE_ROTATE || mTransMode == MODE_SCALE) {
                 mRotPivot->drawSk(canvas, mCurrentMode, invZoom, false);
                 paint.setStyle(SkPaint::kStroke_Style);
                 paint.setColor(SK_ColorBLACK);
@@ -348,10 +348,6 @@ void Canvas::decBrushRadius() {
     mCurrentBrush->decPaintBrushSize(0.3);
 }
 
-bool Canvas::isMovingPath() {
-    return mCurrentMode == CanvasMode::MOVE_BOX;
-}
-
 QSize Canvas::getCanvasSize() {
     return QSize(mWidth, mHeight);
 }
@@ -416,12 +412,9 @@ FrameRange Canvas::prp_getIdenticalRelRange(const int &relFrame) const {
 }
 
 void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
+    if(renderData->fBoxStateId < mLastStateId) return;
+    mLastStateId = renderData->fBoxStateId;
     const auto range = prp_getIdenticalRelRange(renderData->fRelFrame);
-//    auto rendRange = range*FrameRange{0, mMaxFrame};
-//    for(int i = rendRange.fMin; i <= rendRange.fMax; i++) {
-//        const auto path = "/home/ailuropoda/Documents/kom/rend5/" + QString::number(i) + ".png";
-//        SkiaHelpers::saveImage(path, renderData->fRenderedImage);
-//    }
     auto cont = mCacheHandler.atRelFrame<ImageCacheContainer>(range.fMin);
     if(cont) {
         cont->replaceImageSk(renderData->fRenderedImage);
@@ -519,8 +512,8 @@ void Canvas::scheduleDisplayedFillStrokeSettingsUpdate() {
 }
 
 void Canvas::schedulePivotUpdate() {
-    if(mRotPivot->isRotating() ||
-       mRotPivot->isScaling() ||
+    if(mTransMode == MODE_ROTATE ||
+       mTransMode == MODE_SCALE ||
        mRotPivot->isSelected()) return;
     mPivotUpdateNeeded = true;
 }
@@ -625,14 +618,8 @@ void Canvas::releaseMouseAndDontTrack() {
 
 bool Canvas::handleTransormationInputKeyEvent(QKeyEvent *event) {
     if(mValueInput.handleTransormationInputKeyEvent(event)) {
-        if(mRotPivot->isRotating()) {
-            mValueInput.setName("rot");
-        } else if(mXOnlyTransform) {
-            mValueInput.setName("x");
-        } else if(mYOnlyTransform) {
-            mValueInput.setName("y");
-        } else {
-            mValueInput.setName("x, y");
+        if(mTransMode == MODE_ROTATE) {
+            mValueInput.setupRotate();
         }
         updateTransformation();
     } else if(event->key() == Qt::Key_Escape) {
@@ -642,24 +629,10 @@ bool Canvas::handleTransormationInputKeyEvent(QKeyEvent *event) {
         handleMouseRelease();
         mValueInput.clearAndDisableInput();
     } else if(event->key() == Qt::Key_X) {
-        mXOnlyTransform = !mXOnlyTransform;
-        mYOnlyTransform = false;
-
-        if(mXOnlyTransform) {
-            mValueInput.setName("x");
-        } else {
-            mValueInput.setName("x, y");
-        }
+        mValueInput.switchXOnlyMode();
         updateTransformation();
     } else if(event->key() == Qt::Key_Y) {
-        mYOnlyTransform = !mYOnlyTransform;
-        mXOnlyTransform = false;
-
-        if(mYOnlyTransform) {
-            mValueInput.setName("y");
-        } else {
-            mValueInput.setName("x, y");
-        }
+        mValueInput.switchYOnlyMode();
         updateTransformation();
     } else if(event->key() == Qt::Key_N) {
         for(const auto& box : mSelectedBoxes) {
@@ -801,16 +774,21 @@ void Canvas::setParentToLastSelected() {
 }
 
 bool Canvas::startRotatingAction(const QPointF &cursorPos) {
-    if(!isMovingPath() && mCurrentMode != MOVE_POINT) return false;
+    if(mCurrentMode != CanvasMode::MOVE_BOX && mCurrentMode != MOVE_POINT) return false;
     if(mIsMouseGrabbing) return false;
     if(mSelectedBoxes.isEmpty()) return false;
     if(mCurrentMode == MOVE_POINT) {
         if(mSelectedPoints_d.isEmpty()) return false;
     }
     mTransformationFinishedBeforeMouseRelease = false;
+    mValueInput.clearAndDisableInput();
+    mValueInput.setupRotate();
     setLastMouseEventPosAbs(cursorPos);
     setLastMousePressPosAbs(cursorPos);
-    mRotPivot->startRotating();
+    mTransMode = MODE_ROTATE;
+    mRotHalfCycles = 0;
+    mLastDRot = 0;
+
     mDoubleClick = false;
     mFirstMouseMove = true;
 
@@ -819,7 +797,7 @@ bool Canvas::startRotatingAction(const QPointF &cursorPos) {
 }
 
 bool Canvas::startScalingAction(const QPointF &cursorPos) {
-    if(!isMovingPath() && mCurrentMode != MOVE_POINT) return false;
+    if(mCurrentMode != CanvasMode::MOVE_BOX && mCurrentMode != MOVE_POINT) return false;
     if(mIsMouseGrabbing) return false;
 
     if(mSelectedBoxes.isEmpty()) return false;
@@ -827,12 +805,12 @@ bool Canvas::startScalingAction(const QPointF &cursorPos) {
         if(mSelectedPoints_d.isEmpty()) return false;
     }
     mTransformationFinishedBeforeMouseRelease = false;
-    mXOnlyTransform = false;
-    mYOnlyTransform = false;
+    mValueInput.clearAndDisableInput();
+    mValueInput.setupScale();
 
     setLastMouseEventPosAbs(cursorPos);
     setLastMousePressPosAbs(cursorPos);
-    mRotPivot->startScaling();
+    mTransMode = MODE_SCALE;
     mDoubleClick = false;
     mFirstMouseMove = true;
 
@@ -841,11 +819,11 @@ bool Canvas::startScalingAction(const QPointF &cursorPos) {
 }
 
 bool Canvas::startMovingAction(const QPointF& cursorPos) {
-    if(!isMovingPath() && mCurrentMode != MOVE_POINT) return false;
+    if(mCurrentMode != CanvasMode::MOVE_BOX && mCurrentMode != MOVE_POINT) return false;
     if(mIsMouseGrabbing) return false;
     mTransformationFinishedBeforeMouseRelease = false;
-    mXOnlyTransform = false;
-    mYOnlyTransform = false;
+    mValueInput.clearAndDisableInput();
+    mValueInput.setupMove();
 
     setLastMouseEventPosAbs(cursorPos);
     setLastMousePressPosAbs(cursorPos);

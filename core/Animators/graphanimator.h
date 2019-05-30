@@ -60,6 +60,10 @@ public:
     void graph_enableCtrlPtsForSelected();
     void graph_setCtrlsModeForSelectedKeys(const CtrlsMode &mode);
     void graph_getSelectedSegments(QList<QList<GraphKey*>> &segments);
+
+    void graph_startSelectedKeysTransform();
+    void graph_finishSelectedKeysTransform();
+    void graph_cancelSelectedKeysTransform();
 protected:
     qreal prevKeyWeight(const GraphKey * const prevKey,
                         const GraphKey * const nextKey,

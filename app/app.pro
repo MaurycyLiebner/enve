@@ -13,7 +13,7 @@ QT += multimedia core gui svg opengl sql qml xml concurrent #widgets-private # g
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc -ljson-c
 
 QMAKE_RPATHDIR += ../core/
-LIBS += -L$$OUT_PWD/../core/ -lcore
+LIBS += -L$$OUT_PWD/../core/ -lenvecore
 INCLUDEPATH += $$PWD/../core
 DEPENDPATH += $$PWD/../core
 

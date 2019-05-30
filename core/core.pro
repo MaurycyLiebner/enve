@@ -10,7 +10,7 @@ SKIA_FOLDER = $$HOME_FOLDER/.skia2
 
 #QT       -= gui
 QT += opengl
-TARGET = core
+TARGET = envecore
 TEMPLATE = lib
 
 DEFINES += CORE_LIBRARY

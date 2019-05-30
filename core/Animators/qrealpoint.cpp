@@ -67,12 +67,10 @@ void QrealPoint::moveTo(const qreal &frameT, const qreal &valueT) {
 }
 
 void QrealPoint::draw(QPainter *p, const QColor &paintColor) {
-    QPointF center = QPointF(getFrame(), getValue());
+    const QPointF center(getFrame(), getValue());
 
     p->setBrush(Qt::black);
-    gDrawCosmeticEllipse(p, center,
-                        mRadius,
-                        mRadius);
+    gDrawCosmeticEllipse(p, center, mRadius, mRadius);
 
     p->setBrush(paintColor);
     if(!isSelected()) {
@@ -82,9 +80,7 @@ void QrealPoint::draw(QPainter *p, const QColor &paintColor) {
                             mRadius*0.5 - 1.,
                             mRadius*0.5 - 1.);
     }*/
-    gDrawCosmeticEllipse(p, center,
-                        mRadius - 1.,
-                        mRadius - 1.);
+    gDrawCosmeticEllipse(p, center, mRadius - 1, mRadius - 1);
 }
 
 void QrealPoint::setSelected(const bool &bT) {

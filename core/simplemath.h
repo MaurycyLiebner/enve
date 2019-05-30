@@ -28,6 +28,10 @@
 #include <QtCore>
 #include "skia/skqtconversions.h"
 
+extern qreal signedSquare(const qreal val);
+
+extern qreal distSign(const QPointF& distPt);
+
 extern unsigned char truncateU8(const int &val);
 extern int clampInt(int val, int min, int max);
 

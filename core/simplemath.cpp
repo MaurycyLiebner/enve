@@ -1,5 +1,15 @@
 #include "simplemath.h"
 
+qreal signedSquare(const qreal val) {
+    return val*val*SIGN(val);
+}
+
+qreal distSign(const QPointF& distPt) {
+    const qreal val = signedSquare(distPt.x()) + signedSquare(distPt.y());
+    if(val > 0) return sqrt(val);
+    else return -sqrt(-val);
+}
+
 qreal gRandF(const qreal &fMin, const qreal &fMax) {
     qreal f = static_cast<qreal>(qrand())/RAND_MAX;
     return fMin + f * (fMax - fMin);

@@ -10,19 +10,20 @@
 
 void Canvas::mousePressEvent(const QMouseEvent * const event) {
     if(isPreviewingOrRendering()) return;
-    if(mIsMouseGrabbing) return;
+    const auto button = event->button();
+    if(mIsMouseGrabbing && button == Qt::LeftButton) return;
     setLastMouseEventPosAbs(event->pos());
     setLastMousePressPosAbs(event->pos());
     setCurrentMouseEventPosAbs(event->pos());
     if(mCurrentMode == PAINT_MODE) {
         if(mStylusDrawing) return;
-        if(event->button() == Qt::LeftButton) {
+        if(button == Qt::LeftButton) {
             paintPress(event->timestamp(), 0.5, 0, 0);
         }
     } else {
-        if(event->button() == Qt::LeftButton) {
+        if(button == Qt::LeftButton) {
             handleLeftButtonMousePress();
-        } else if(event->button() == Qt::RightButton) {
+        } else if(button == Qt::RightButton) {
             handleRightButtonMousePress(event);
         }
     }
@@ -77,7 +78,7 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
                   mCurrentMode == CanvasMode::ADD_PARTICLE_BOX ||
                   mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
             handleMovePointMouseMove();
-        } else if(isMovingPath()) {
+        } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
             if(!mLastPressedPoint) {
                 handleMovePathMouseMove();
             } else {
@@ -117,8 +118,6 @@ void Canvas::mouseReleaseEvent(const QMouseEvent * const event) {
     schedulePivotUpdate();
     if(mCurrentMode == PAINT_MODE) return;
     setCurrentMouseEventPosAbs(event->pos());
-    mXOnlyTransform = false;
-    mYOnlyTransform = false;
     if(mValueInput.inputEnabled()) mFirstMouseMove = false;
     mValueInput.clearAndDisableInput();
 

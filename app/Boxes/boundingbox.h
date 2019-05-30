@@ -111,7 +111,7 @@ public:
 
     virtual void startTransform();
     virtual void finishTransform();
-    virtual void cancelTransform();
+    void cancelTransform();
 
     virtual void startAllPointsTransform();
     virtual void finishAllPointsTransform();

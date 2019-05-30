@@ -20,8 +20,8 @@ public:
         if(frame == mRelFrame) return;
         const int dFrame = frame - mRelFrame;
         mRelFrame = frame;
-        mEndValue += dFrame;
-        mStartValue += dFrame;
+        setStartFrameVar(mStartPt.getRawXValue() + dFrame);
+        setEndFrameVar(mEndPt.getRawXValue() + dFrame);
     }
 };
 

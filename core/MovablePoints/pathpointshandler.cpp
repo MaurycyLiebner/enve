@@ -39,6 +39,7 @@ void PathPointsHandler::updateAllPoints() {
     if(mBlockAllPointsUpdate) return;
     const int newCount = targetPath()->getNodeCount();
     while(newCount < count()) removeLast();
+    for(int i = 0; i < count(); i++) getPointWithId<SmartNodePoint>(i)->clear();
     while(count() < newCount) createNewNodePoint(count());
     for(int i = 0; i < count(); i++) updatePoint(i);
 }

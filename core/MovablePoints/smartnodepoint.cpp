@@ -401,7 +401,7 @@ void SmartNodePoint::setPrevNormalPoint(SmartNodePoint * const prevPoint) {
 void SmartNodePoint::setNextNormalPoint(SmartNodePoint * const nextPoint) {
     if(mNextNormalPoint == this) RuntimeThrow("Node cannot point to itself");
     mNextNormalPoint = nextPoint;
-    if(isNormal() && nextPoint) {
+    if(nextPoint && isNormal()) {
         mNextNormalSegment = NormalSegment(this, nextPoint, mHandler_k);
     } else mNextNormalSegment.reset();
 }

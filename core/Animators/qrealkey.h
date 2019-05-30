@@ -23,8 +23,6 @@ public:
     void setValue(const qreal &value);
 
     void changeFrameAndValueBy(const QPointF &frameValueChange);
-    void saveCurrentFrameAndValue();
-
     void incValue(const qreal &incBy);
 
     QrealAnimator *getParentQrealAnimator() const;
@@ -33,6 +31,7 @@ public:
 
     void startValueTransform();
     void finishValueTransform();
+    void cancelValueTransform();
     void writeKey(QIODevice *target);
     void readKey(QIODevice *target);
 

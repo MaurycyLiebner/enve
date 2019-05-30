@@ -18,7 +18,7 @@ public:
     }
 
     qreal getValueForGraph() const {
-        return this->mRelFrame;
+        return mRelFrame;
     }
 
     void setValueForGraph(const qreal& value) {
@@ -26,11 +26,11 @@ public:
     }
 
     void setRelFrame(const int &frame) {
-        if(frame == this->mRelFrame) return;
-        const int dFrame = frame - this->mRelFrame;
+        if(frame == mRelFrame) return;
+        const int dFrame = frame - mRelFrame;
         GraphKey::setRelFrame(frame);
-        this->mEndValue += dFrame;
-        this->mStartValue += dFrame;
+        setStartFrameVar(mStartPt.getRawXValue() + dFrame);
+        setEndFrameVar(mEndPt.getRawXValue() + dFrame);
     }
 
     DrawableAutoTiledSurface& dSurface() { return *mValue.get(); }

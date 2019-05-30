@@ -133,7 +133,7 @@ public:
                           const bool &startTrans);
 
     QPointF getSelectedBoxesAbsPivotPos();
-    bool isBoxSelectionEmpty();
+    bool isBoxSelectionEmpty() const;
 
     void ungroupSelectedBoxes();
     void scaleSelectedBy(const qreal& scaleBy,
@@ -175,7 +175,7 @@ public:
 
     void applyCurrentTransformationToSelected();
     QPointF getSelectedPointsAbsPivotPos();
-    bool isPointSelectionEmpty();
+    bool isPointSelectionEmpty() const;
     void scaleSelectedPointsBy(const qreal &scaleXBy,
                                const qreal &scaleYBy,
                                const QPointF &absOrigin,
@@ -183,8 +183,7 @@ public:
     void rotateSelectedPointsBy(const qreal &rotBy,
                                 const QPointF &absOrigin,
                                 const bool &startTrans);
-    int getPointsSelectionCount();
-
+    int getPointsSelectionCount() const ;
 
     void clearPointsSelectionOrDeselect();
     NormalSegment getSmartEdgeAt(const QPointF& absPos) const;
@@ -343,7 +342,6 @@ protected:
     void handleMovePathMouseRelease();
     void handleMovePointMouseRelease();
 
-    bool isMovingPath();
     void handleRightButtonMousePress(const QMouseEvent * const event);
     void handleLeftButtonMousePress();
 signals:
@@ -387,7 +385,7 @@ public:
         updatePivot();
     }
 
-    bool getPivotLocal() {
+    bool getPivotLocal() const {
         return mLocalPivot;
     }
 
@@ -536,6 +534,11 @@ private:
     bool isAltPressed();
     bool isAltPressed(QKeyEvent *event);
 
+    void scaleSelected();
+    void rotateSelected();
+    qreal mLastDRot = 0;
+    int mRotHalfCycles = 0;
+    TransformMode mTransMode = MODE_MOVE;
 protected:
     stdsptr<UndoRedoStack> mUndoRedoStack;
 
@@ -557,6 +560,7 @@ protected:
     bool mPickFillFromPath = false;
     bool mPickStrokeFromPath = false;
 
+    uint mLastStateId = 0;
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;
 
@@ -603,10 +607,6 @@ protected:
     bool mTransformationFinishedBeforeMouseRelease = false;
 
     ValueInput mValueInput;
-
-    bool mXOnlyTransform = false;
-    bool mYOnlyTransform = false;
-
 
     bool mPreviewing = false;
     bool mRenderingPreview = false;
