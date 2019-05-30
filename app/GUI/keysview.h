@@ -86,6 +86,9 @@ public:
                          const Qt::MouseButtons &buttons);
 protected:
     ValueInput mValueInput;
+    bool graph_mXOnlyTransform = false;
+    bool graph_mYOnlyTransform = false;
+
     QPoint mLastMovePos;
     void focusInEvent(QFocusEvent *);
 
@@ -173,7 +176,7 @@ private:
     bool mMovingKeys = false;
     bool mScalingKeys = false;
     bool mMovingRect = false;
-    bool mPressedKeyPoint = false;
+    bool mPressedCtrlPoint = false;
 
     MainWindow *mMainWindow;
     QList<qptr<Animator>> mSelectedKeysAnimators;

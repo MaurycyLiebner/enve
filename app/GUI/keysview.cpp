@@ -225,7 +225,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                 mMovingKeys = true;
                 mFirstMove = true;
                 mLastPressPos = mapFromGlobal(QCursor::pos()) +
-                        QPoint(-MIN_WIDGET_HEIGHT/2, 0);;
+                        QPoint(-MIN_WIDGET_HEIGHT/2, 0);
                 mIsMouseGrabbing = true;
                 //setMouseTracking(true);
                 grabMouse();
@@ -236,7 +236,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                 mMovingKeys = true;
                 mFirstMove = true;
                 mLastPressPos = mapFromGlobal(QCursor::pos()) +
-                        QPoint(-MIN_WIDGET_HEIGHT/2, 0);;
+                        QPoint(-MIN_WIDGET_HEIGHT/2, 0);
                 mIsMouseGrabbing = true;
                 //setMouseTracking(true);
                 grabMouse();
