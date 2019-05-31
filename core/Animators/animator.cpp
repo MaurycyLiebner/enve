@@ -459,7 +459,7 @@ FrameRange Animator::prp_getIdenticalRelRange(const int &relFrame) const {
 
     Key *prevKey = anim_getKeyAtIndex(prevId);
     Key *nextKey = anim_getKeyAtIndex(nextId);
-    const bool adjKeys = pn.second - pn.first == 1;
+    const bool adjKeys = nextId - prevId == 1;
     Key * const keyAtRelFrame = adjKeys ? nullptr :
                                           anim_getKeyAtIndex(pn.first + 1);
     Key *prevPrevKey = keyAtRelFrame ? keyAtRelFrame : nextKey;

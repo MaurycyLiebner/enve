@@ -51,9 +51,9 @@ public:
         if(prevKey && nextKey) {
             return getValueAtRelFrameK(frame, prevKey, nextKey);
         } else if(prevKey) {
-            prevKey->getValue();
+            return prevKey->getValue();
         } else if(nextKey) {
-            nextKey->getValue();
+            return nextKey->getValue();
         }
         return mCurrentValue;
     }
@@ -70,7 +70,10 @@ public:
     }
 
     void anim_saveCurrentValueAsKey() {
-        if(this->anim_getKeyOnCurrentFrame()) return;
+        if(this->anim_getKeyOnCurrentFrame()) {
+            const auto currKey = this->template anim_getKeyOnCurrentFrame<K>();
+            return currKey->setValue(mCurrentValue);
+        }
         auto newKey = SPtrCreateTemplated(K)(
                     mCurrentValue, this->anim_getCurrentRelFrame(), this);
         this->anim_appendKey(newKey);

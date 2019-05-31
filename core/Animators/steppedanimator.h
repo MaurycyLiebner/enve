@@ -17,8 +17,11 @@ public:
 
         Key *prevKey = this->anim_getKeyAtIndex(prevId);
         Key *nextKey = this->anim_getKeyAtIndex(nextId);
-        Key *prevPrevKey = prevKey;
-        Key *prevNextKey = nextKey;
+        const bool adjKeys = nextId - prevId == 1;
+        Key * const keyAtRelFrame = adjKeys ? nullptr :
+                                              this->anim_getKeyAtIndex(pn.first + 1);
+        Key *prevPrevKey = keyAtRelFrame ? keyAtRelFrame : prevKey;
+        Key *prevNextKey = keyAtRelFrame ? keyAtRelFrame : prevKey;
 
         int fId = relFrame;
         int lId = relFrame;
@@ -28,7 +31,9 @@ public:
                 fId = FrameRange::EMIN;
                 break;
             }
-            if(prevKey->differsFromKey(prevPrevKey)) break;
+            if(prevPrevKey) {
+                if(prevKey->differsFromKey(prevPrevKey)) break;
+            }
             fId = prevKey->getRelFrame();
             prevPrevKey = prevKey;
             prevKey = prevKey->getPrevKey();
@@ -40,7 +45,9 @@ public:
                 break;
             }
             lId = nextKey->getRelFrame() - 1;
-            if(nextKey->differsFromKey(prevNextKey)) break;
+            if(prevNextKey) {
+                if(nextKey->differsFromKey(prevNextKey)) break;
+            } else break;
             prevNextKey = nextKey;
             nextKey = nextKey->getNextKey();
         }

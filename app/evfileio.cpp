@@ -121,12 +121,10 @@ void QrealKey::readKey(QIODevice *target) {
     target->read(rcChar(&mValue), sizeof(qreal));
 
     target->read(rcChar(&mStartEnabled), sizeof(bool));
-    mStartPt.read(target);
-    //target->read(rcChar(&mStartPt), sizeof(ClampedPoint));
+    target->read(rcChar(&mStartPt), sizeof(ClampedPoint));
 
     target->read(rcChar(&mEndEnabled), sizeof(bool));
-    mEndPt.read(target);
-    //target->read(rcChar(&mEndPt), sizeof(ClampedPoint));
+    target->read(rcChar(&mEndPt), sizeof(ClampedPoint));
 }
 
 void QrealAnimator::writeProperty(QIODevice * const target) const {
