@@ -1,46 +1,48 @@
 #include "valueinput.h"
+
 #include <QPainter>
+#include <QApplication>
+
 #include "skia/skiaincludes.h"
+#include "skia/skqtconversions.h"
 #include "global.h"
+
 ValueInput::ValueInput() {
 
 }
 
 void ValueInput::draw(SkCanvas *canvas, const int &y) {
     SkPaint paint;
-    const SkRect inputRect = SkRect::MakeXYWH(2*MIN_WIDGET_HEIGHT, y,
-                                              10*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
-    paint.setStyle(SkPaint::kFill_Style);
-    paint.setColor(SkColorSetARGB(255, 225, 225, 225));
-    canvas->drawRect(inputRect, paint);
+
     const auto transStr = getText();
-    paint.setColor(SK_ColorBLACK);
+    const int textWidth = QApplication::fontMetrics().width(transStr);
+    const SkRect inputRect =
+            SkRect::MakeXYWH(2*MIN_WIDGET_HEIGHT, y,
+                             textWidth + MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
     paint.setStyle(SkPaint::kFill_Style);
+    paint.setColor(SkColorSetRGB(225, 225, 225));
+    canvas->drawRect(inputRect, paint);
+    paint.setColor(SK_ColorBLACK);
+    paint.setStyle(SkPaint::kStrokeAndFill_Style);
+    paint.setStrokeWidth(.1f);
+    const SkFont font = toSkFont(QApplication::font(), 96, 72);
 
-    SkFont font;
-    font.setSize(FONT_HEIGHT);
-    SkRect bounds;
-    const auto stdStr = transStr.toStdString();
-    const auto cStr = stdStr.c_str();
-    font.measureText(cStr,
-                     static_cast<ulong>(transStr.size())*sizeof(char),
-                     SkTextEncoding::kUTF8,
-                     &bounds);
-    font.setTypeface(SkTypeface::MakeDefault());
-
-    canvas->drawString(cStr,
-           inputRect.x() + font.getSize(),
-           inputRect.y() + inputRect.height()*0.5f + bounds.height()*0.2f,
+    canvas->drawString(transStr.toStdString().c_str(),
+           inputRect.x() + MIN_WIDGET_HEIGHT*0.5f,
+           inputRect.y() + inputRect.height()*0.5f + FONT_HEIGHT*0.2f,
            font, paint);
 }
 
 void ValueInput::draw(QPainter *p, const int &y) {
-    QRectF inputRect(2*MIN_WIDGET_HEIGHT, y,
-                     10*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
-    p->fillRect(inputRect, QColor(225, 225, 225));
+    p->setFont(QApplication::font());
     const auto transStr = getText();
-
-    p->drawText(inputRect, Qt::AlignVCenter, transStr);
+    const int textWidth = QApplication::fontMetrics().width(transStr);
+    const QRect inputRect(2*MIN_WIDGET_HEIGHT, y,
+                          textWidth + MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
+    p->fillRect(inputRect, QColor(225, 225, 225));
+    p->drawText(qRound(inputRect.x() + MIN_WIDGET_HEIGHT*0.5),
+                qRound(inputRect.y() + inputRect.height()*0.5 + FONT_HEIGHT*0.2),
+                transStr);
 }
 
 void ValueInput::clearAndDisableInput() {

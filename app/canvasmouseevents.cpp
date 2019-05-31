@@ -64,14 +64,6 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
             mMovesToSkip--;
             return;
         }
-        if(mFirstMouseMove && event->buttons() & Qt::LeftButton) {
-            if((mCurrentMode == CanvasMode::MOVE_POINT &&
-                !mHoveredPoint_d && !mHoveredNormalSegment.isValid()) ||
-               (mCurrentMode == CanvasMode::MOVE_BOX &&
-                !mHoveredBox && !mHoveredPoint_d)) {
-                startSelectionAtPoint(mLastMouseEventPosRel);
-            }
-        }
         if(mSelecting) {
             moveSecondSelectionPoint(mCurrentMouseEventPosRel);
         } else if(mCurrentMode == CanvasMode::MOVE_POINT ||

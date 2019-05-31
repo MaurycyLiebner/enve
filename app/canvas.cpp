@@ -315,7 +315,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
             paint.setColor(SK_ColorBLACK);
             canvas->drawRect(viewRect.makeInset(1, 1), paint);
         }
-        mValueInput.draw(canvas, mCanvasWidget->height() - MIN_WIDGET_HEIGHT);
+        if(mIsMouseGrabbing)
+            mValueInput.draw(canvas, mCanvasWidget->height() - MIN_WIDGET_HEIGHT);
     }
 
     if(mCanvasWindow->hasFocus()) {

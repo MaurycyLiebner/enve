@@ -90,6 +90,10 @@ public:
     void setDisplayedValue(const QPointF& value) {
         mDisplayValue = value;
     }
+
+    void setForce1D(const bool& d) {
+        mForce1D = d;
+    }
 protected:
     void updateInputValue();
 
@@ -125,6 +129,7 @@ protected:
     }
 
     QString getNameWithXY() const {
+        if(mForce1D) return getName();
         if(mTransMode == MODE_MOVE) {
             if(mXYMode == MODE_XY) return "move x, y";
             else if(mXYMode == MODE_X) return "move x";
@@ -144,6 +149,7 @@ protected:
     qreal mInputValue = 0;
     QPointF mDisplayValue;
     bool mInputEnabled = false;
+    bool mForce1D = false;
 };
 
 #endif // VALUEINPUT_H

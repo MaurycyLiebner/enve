@@ -28,7 +28,12 @@ KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
 
 void KeysView::setGraphViewed(bool bT) {
     mGraphViewed = bT;
-    if(bT) graphResetValueScaleAndMinShown();
+    if(bT) {
+        graphResetValueScaleAndMinShown();
+        mValueInput.setForce1D(false);
+    } else {
+        mValueInput.setForce1D(true);
+    }
     update();
 }
 
@@ -170,9 +175,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
             mMovingKeys = false;
             mScalingKeys = false;
             mMovingRect = false;
-            //setMouseTracking(false);
-            mIsMouseGrabbing = false;
-            releaseMouse();
+            releaseMouseAndDontTrack();
         } else {
             auto movable = mBoxesListVisible->getRectangleMovableAtPos(
                                         posU.x(), posU.y(),
@@ -242,9 +245,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                 mMovingKeys = true;
                 mFirstMove = true;
                 mLastPressPos = posU;
-                mIsMouseGrabbing = true;
-                //setMouseTracking(true);
-                grabMouse();
+                grabMouseAndTrack();
             }
         } else if(event->key() == Qt::Key_G) {
             if(!mMovingKeys) {
@@ -252,9 +253,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                 mMovingKeys = true;
                 mFirstMove = true;
                 mLastPressPos = posU;
-                mIsMouseGrabbing = true;
-                //setMouseTracking(true);
-                grabMouse();
+                grabMouseAndTrack();
             }
         } else if(mMainWindow->isShiftPressed() &&
                  event->key() == Qt::Key_D) {
@@ -272,9 +271,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
             mMovingKeys = true;
             mFirstMove = true;
             mLastPressPos = posU;
-            mIsMouseGrabbing = true;
-            //setMouseTracking(true);
-            grabMouse();
+            grabMouseAndTrack();
         } else if(mMainWindow->isCtrlPressed() &&
                   event->key() == Qt::Key_D) {
             auto container = getSelectedKeysClipboardContainer();
@@ -402,7 +399,7 @@ void KeysView::paintEvent(QPaintEvent *) {
     }
 
     p.resetTransform();
-    mValueInput.draw(&p, height() - MIN_WIDGET_HEIGHT);
+    if(mMovingKeys) mValueInput.draw(&p, height() - MIN_WIDGET_HEIGHT);
     if(hasFocus()) {
         p.setBrush(Qt::NoBrush);
         p.setPen(QPen(Qt::red, 4));
@@ -484,7 +481,7 @@ void KeysView::scrollLeft() {
         mSelectionRect.setBottomRight(mSelectionRect.bottomRight() -
                                       QPointF(inc, 0));
     } else if(mMovingKeys) {
-        mLastPressPos.setX(mLastPressPos.x() + inc*mPixelsPerFrame);
+        mLastPressPos.setX(mLastPressPos.x() + qFloor(inc*mPixelsPerFrame));
         handleMouseMove(mLastMovePos, QApplication::mouseButtons());
     }
     update();
@@ -533,6 +530,7 @@ void KeysView::handleMouseMove(const QPoint &pos,
             } else {
                 const qreal dX = posU.x() - mLastPressPos.x();
                 dFrame = qRound(dX/mPixelsPerFrame);
+                mValueInput.setDisplayedValue(dFrame);
             }
             const int dDFrame = dFrame - mMoveDFrame;
 
@@ -554,6 +552,7 @@ void KeysView::handleMouseMove(const QPoint &pos,
                         keysScale = mValueInput.getValue();
                     } else {
                         keysScale = 1 + (posU.x() - mLastPressPos.x())/150.;
+                        mValueInput.setDisplayedValue(keysScale);
                     }
                     const int absFrame = mMainWindow->getCurrentFrame();
                     if(mGraphViewed) {
@@ -717,9 +716,6 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                 mMoveDFrame = 0;
                 mMovingKeys = false;
                 mScalingKeys = false;
-                mIsMouseGrabbing = false;
-                //setMouseTracking(false);
-                //releaseMouse();
             } else if(mMovingRect) {
                 if(mFirstMove) {
                     if(mLastPressedMovable) {
@@ -747,7 +743,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
         }
     }
     updateHoveredPointFromPos(e->pos() + QPoint(-MIN_WIDGET_HEIGHT/2, 0));
-    if(mouseGrabber() == this) releaseMouse();
+    releaseMouseAndDontTrack();
 
     mValueInput.clearAndDisableInput();
     mMainWindow->queScheduledTasksAndUpdate();

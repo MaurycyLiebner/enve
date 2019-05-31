@@ -418,7 +418,7 @@ bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event) {
     } else if(key == Qt::Key_Y && mMovingKeys) {
         mValueInput.switchYOnlyMode();
         handleMouseMove(mapFromGlobal(QCursor::pos()),
-                         Qt::LeftButton);
+                        Qt::LeftButton);
     } else {
         return false;
     }
@@ -443,7 +443,7 @@ void KeysView::graphAddViewedAnimator(GraphAnimator * const animator) {
     mGraphAnimators << animator;
     graphUpdateDimensions();
     graphResetValueScaleAndMinShown();
-    connect(animator, &Property::beingDeleted, this, [this, animator]() {
+    connect(animator, &QObject::destroyed, this, [this, animator]() {
         graphRemoveViewedAnimator(animator);
     });
 

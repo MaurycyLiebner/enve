@@ -15,6 +15,8 @@ extern inline SkScalar toSkScalar(const qreal &qr) {
 }
 
 extern SkFont toSkFont(const QFont& qfont);
+extern SkFont toSkFont(const QFont& qfont,
+                       const int& qPPI, const int& skPPI);
 
 extern SkColor toSkColor(const QColor& qcol);
 

@@ -147,6 +147,16 @@ private:
     QPointer<DurationRectangleMovable> mHoveredMovable;
     Key *mHoveredKey = nullptr;
 
+    void grabMouseAndTrack() {
+        mIsMouseGrabbing = true;
+        grabMouse();
+    }
+
+    void releaseMouseAndDontTrack() {
+        mIsMouseGrabbing = false;
+        releaseMouse();
+    }
+
     bool mIsMouseGrabbing = false;
     int mViewedTop = 0;
     int mViewedBottom = 0;
