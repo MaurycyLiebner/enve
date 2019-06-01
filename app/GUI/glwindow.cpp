@@ -57,17 +57,27 @@ void GLWindow::resizeEvent(QResizeEvent *) {
 #include "glhelpers.h"
 #include "ColorWidgets/colorwidgetshaders.h"
 #include "GPUEffects/gpurastereffect.h"
+
+void GLWindow::iniRasterEffectProgram(const QString& path) {
+    try {
+        GPURasterEffectCreator::sLoadFromFile(this, path);
+    } catch(...) {
+        RuntimeThrow("Error while loading GPURasterEffect from '" + path + "'.");
+    }
+}
+
 void GLWindow::iniRasterEffectPrograms() {
-    QDirIterator dirIt(QDir::homePath() + "/.enve/GPURasterEffects", QDirIterator::NoIteratorFlags);
+    QDirIterator dirIt(QDir::homePath() + "/.enve/GPURasterEffects",
+                       QDirIterator::NoIteratorFlags);
     while(dirIt.hasNext()) {
         const QString path = dirIt.next();
         const QFileInfo fileInfo(path);
         if(!fileInfo.isFile()) continue;
         if(fileInfo.suffix() != "gre") continue;
         try {
-            GPURasterEffectCreator::sLoadFromFile(this, path);
-        } catch(...) {
-            RuntimeThrow("Error while loading GPURasterEffect from '" + path + "'.");
+            iniRasterEffectProgram(path);
+        } catch(const std::exception& e) {
+            gPrintExceptionCritical(e);
         }
     }
 }
@@ -114,11 +124,7 @@ void GLWindow::initialize() {
         RuntimeThrow("Error initializing OpenGL programs.");
     }
 
-    try {
-        iniRasterEffectPrograms();
-    } catch(const std::exception& e) {
-        gPrintExceptionCritical(e);
-    }
+    iniRasterEffectPrograms();
 //    qDebug() << "OpenGL Info";
 //    qDebug() << "  Vendor: " << rcConstChar(glGetString(GL_VENDOR));
 //    qDebug() << "  Renderer: " << QString((const char*)glGetString(GL_RENDERER));;

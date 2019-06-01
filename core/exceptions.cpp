@@ -29,8 +29,7 @@ void _gPrintException(const std::exception& e,
                       QString allText,
                       const uint& level,
                       const bool& fatal) {
-    allText = (allText.isEmpty() ? "" : allText + "\n") +
-            (std::to_string(level) + ") ").c_str() + e.what();
+    allText = QString::number(level) + ") " + e.what() + "\n " + allText;
     qCritical() << std::to_string(level) + ") " << e.what();
     try {
         if(!isExceptionNested(e)) {

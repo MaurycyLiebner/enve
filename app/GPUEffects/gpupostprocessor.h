@@ -15,9 +15,33 @@ class ScheduledPostProcess : public StdSelfRef,
     friend class BoxRenderDataScheduledPostProcess;
 public:
     ScheduledPostProcess();
+    void finishedProcessing() {
+        afterProcessed();
+        if(unhandledException()) {
+            gPrintExceptionCritical(handleException());
+        }
+    }
+
+    void setException(const std::exception_ptr& exception) {
+        mUpdateException = exception;
+    }
+
+protected:
     virtual void afterProcessed() {}
 private:
     virtual void process(const GLuint &texturedSquareVAO) = 0;
+
+    bool unhandledException() const {
+        return static_cast<bool>(mUpdateException);
+    }
+
+    std::exception_ptr handleException() {
+        std::exception_ptr exc;
+        mUpdateException.swap(exc);
+        return exc;
+    }
+
+    std::exception_ptr mUpdateException;
 };
 
 typedef std::function<void(sk_sp<SkImage>)> ShaderFinishedFunc;
@@ -41,6 +65,7 @@ class BoxRenderDataScheduledPostProcess : public ScheduledPostProcess {
 public:
     BoxRenderDataScheduledPostProcess(
             const stdsptr<BoundingBoxRenderData> &boxData);
+protected:
     void afterProcessed();
 private:
     void process(const GLuint &texturedSquareVAO);
@@ -83,8 +108,7 @@ public:
         if(mScheduledProcesses.isEmpty()) return;
         if(!mFinished) return;
         mFinished = false;
-        _mHandledProcesses = mScheduledProcesses;
-        mScheduledProcesses.clear();
+        _mHandledProcesses << mScheduledProcesses.takeFirst();
         start();
     }
 
@@ -96,9 +120,11 @@ signals:
     void processedAll();
 private slots:
     void afterProcessed() {
+        if(unhandledException())
+            gPrintExceptionCritical(handleException());
         mFinished = true;
         for(const auto& process : _mHandledProcesses) {
-            process->afterProcessed();
+            process->finishedProcessing();
         }
         _mHandledProcesses.clear();
         handleScheduledProcesses();
@@ -106,6 +132,18 @@ private slots:
     }
 protected:
     void run() override {
+        try {
+            processTasks();
+        } catch(...) {
+            setException(std::current_exception());
+        }
+    }
+
+    void setException(const std::exception_ptr& exception) {
+        mProcessException = exception;
+    }
+
+    void processTasks() {
         if(_mHandledProcesses.isEmpty()) return;
         if(!_mContext->makeCurrent(mOffscreenSurface)) {
             RuntimeThrow("Making GL context current failed.");
@@ -123,13 +161,28 @@ protected:
         }
 
         for(const auto& scheduled : _mHandledProcesses) {
-            scheduled->process(_mTextureSquareVAO);
+            try {
+                scheduled->process(_mTextureSquareVAO);
+            } catch(...) {
+                scheduled->setException(std::current_exception());
+            }
         }
         _mContext->doneCurrent();
         //mFrameBuffer->bindDefault();
         //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    bool unhandledException() const {
+        return static_cast<bool>(mProcessException);
+    }
+
+    std::exception_ptr handleException() {
+        std::exception_ptr exc;
+        mProcessException.swap(exc);
+        return exc;
+    }
+
+    std::exception_ptr mProcessException;
     bool mFinished = true;
     bool _mInitialized = false;
     GLuint _mTextureSquareVAO;

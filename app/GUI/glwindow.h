@@ -40,6 +40,7 @@ protected:
     //void exposeEvent(QExposeEvent *event);
 private:
     void checkCompileErrors(GLuint shader, std::string type);
+    void iniRasterEffectProgram(const QString& path);
     void iniRasterEffectPrograms();
 };
 

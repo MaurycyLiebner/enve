@@ -13,7 +13,7 @@
         std::runtime_error(\
             (std::raise(SIGTRAP) ? "" : "") + \
             std::to_string(__LINE__) + "  :  " + \
-            FILENAME + "  :  " + __func__ + "()\n" + msg\
+            FILENAME + "  :  " + __func__ + "()\n  " + msg\
         )\
     )
 #else
@@ -21,7 +21,7 @@
     std::throw_with_nested(\
         std::runtime_error(\
             std::to_string(__LINE__) + "  :  " + \
-            FILENAME + "  :  " + __func__ + "()\n" + msg\
+            FILENAME + "  :  " + __func__ + "()\n  " + msg\
         )\
     )
 #endif

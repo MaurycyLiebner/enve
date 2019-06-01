@@ -19,6 +19,8 @@ struct QrealAnimatorUniformSpecifierCreator :
     virtual UniformSpecifier create(const GLint& loc,
                                     Property * const property,
                                     const qreal& relFrame) const;
+
+    static void sTestScript(const QString& script, const QString& propName);
 private:
     QString mScript;
 };
@@ -29,14 +31,9 @@ struct IntAnimatorUniformSpecifierCreator :
         mScript(script) {}
     virtual UniformSpecifier create(const GLint& loc,
                                     Property * const property,
-                                    const qreal& relFrame) const {
-        auto ia = GetAsPtr(property, IntAnimator);
-        int val = ia->getEffectiveIntValue(relFrame);
+                                    const qreal& relFrame) const;
 
-        return [loc, val](QGL33c * const gl, QJSEngine&) {
-            gl->glUniform1i(loc, val);
-        };
-    }
+    static void sTestScript(const QString& script, const QString& propName);
 private:
     QString mScript;
 };
