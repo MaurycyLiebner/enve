@@ -188,7 +188,7 @@ void ComplexAnimator::ca_removeChildAnimator(
 
 void ComplexAnimator::ca_removeAllChildAnimators() {
     for(int i = ca_mChildAnimators.count() - 1; i >= 0; i--)
-        ca_removeChildAnimator(ca_mChildAnimators.at(i));
+        ca_removeChildAnimator(qsptr<Property>(ca_mChildAnimators.at(i)));
 }
 
 Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {

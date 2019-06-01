@@ -188,9 +188,8 @@ void TaskScheduler::afterCPUTaskFinished(
     mFreeCPUExecs << static_cast<CPUExecController*>(controller);
     if(task->getState() != Task::CANCELED) {
         if(task->needsGpuProcessing()) {
-            const auto gpuProcess =
-                    SPtrCreate(BoxRenderDataScheduledPostProcess)(
-                        GetAsSPtr(task, BoundingBoxRenderData));
+            const auto sTask = GetAsSPtr(task, BoundingBoxRenderData);
+            const auto gpuProcess = SPtrCreate(BoxRenderDataScheduledPostProcess)(sTask);
             mGpuPostProcessor.addToProcess(gpuProcess);
         } else {
             task->finishedProcessing();

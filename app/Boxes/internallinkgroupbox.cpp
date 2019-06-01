@@ -50,9 +50,7 @@ FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(
 
 QMatrix InternalLinkGroupBox::getRelativeTransformAtRelFrameF(
         const qreal &relFrame) {
-    if(!getLinkTarget() || !mParentGroup)
-        return BoundingBox::getRelativeTransformAtRelFrameF(relFrame);
-    if(mParentGroup->SWT_isLinkBox()) {
+    if(isParentLink() && getLinkTarget()) {
         return getLinkTarget()->getRelativeTransformAtRelFrameF(relFrame);
     } else {
         return BoundingBox::getRelativeTransformAtRelFrameF(relFrame);
@@ -61,9 +59,7 @@ QMatrix InternalLinkGroupBox::getRelativeTransformAtRelFrameF(
 
 void InternalLinkGroupBox::setupEffectsF(const qreal &relFrame,
                                          BoundingBoxRenderData * const data) {
-    if(!getLinkTarget() || !mParentGroup)
-        return BoundingBox::setupEffectsF(relFrame, data);
-    if(mParentGroup->SWT_isLinkBox()) {
+    if(isParentLink() && getLinkTarget()) {
         getLinkTarget()->setupEffectsF(relFrame, data);
     } else {
         BoundingBox::setupEffectsF(relFrame, data);
@@ -71,16 +67,14 @@ void InternalLinkGroupBox::setupEffectsF(const qreal &relFrame,
 }
 
 qreal InternalLinkGroupBox::getEffectsMarginAtRelFrameF(const qreal &relFrame) {
-    if(!getLinkTarget()) return 0;
-    if(mParentGroup->SWT_isLinkBox()) {
+    if(isParentLink() && getLinkTarget()) {
         return getLinkTarget()->getEffectsMarginAtRelFrameF(relFrame);
     }
     return ContainerBox::getEffectsMarginAtRelFrameF(relFrame);
 }
 
 const SkBlendMode &InternalLinkGroupBox::getBlendMode() {
-    if(!getLinkTarget()) return BoundingBox::getBlendMode();
-    if(mParentGroup->SWT_isLinkBox()) {
+    if(isParentLink() && getLinkTarget()) {
         return getLinkTarget()->getBlendMode();
     }
     return BoundingBox::getBlendMode();
@@ -108,9 +102,8 @@ ContainerBox *InternalLinkGroupBox::getFinalTarget() const {
 }
 
 int InternalLinkGroupBox::prp_getRelFrameShift() const {
-    if(!getLinkTarget()) return 0;
-    if(getLinkTarget()->SWT_isLinkBox() ||
-       (mParentGroup ? mParentGroup->SWT_isLinkBox() : false)) {
+    if(!getLinkTarget()) return ContainerBox::prp_getRelFrameShift();
+    if(getLinkTarget()->SWT_isLinkBox() || isParentLink()) {
         return ContainerBox::prp_getRelFrameShift() +
                 getLinkTarget()->prp_getRelFrameShift();
     }
@@ -171,7 +164,7 @@ qsptr<BoundingBox> InternalLinkGroupBox::createLink() {
 
 qsptr<BoundingBox> InternalLinkGroupBox::createLinkForLinkGroup() {
     if(!getLinkTarget()) return createLink();
-    if(mParentGroup->SWT_isLinkBox()) {
+    if(isParentLink()) {
         return getLinkTarget()->createLinkForLinkGroup();
     } else {
         return SPtrCreate(InternalLinkGroupBox)(this);

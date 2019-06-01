@@ -110,15 +110,15 @@ public:
         if(keyAtRelFrame) return keyAtRelFrame->getValue().getPathAt();
         if(prevKey && nextKey) {
             SkPath result;
-            const qreal pWeight = prevKeyWeight(prevKey, nextKey, frame);
-            nextKey->getPath().interpolate(prevKey->getPath(),
-                                           toSkScalar(pWeight),
-                                           &result);
-            return result;
+            const qreal nWeight = prevKeyWeight(prevKey, nextKey, frame);
+            SmartPath sPath;
+            gInterpolate(prevKey->getValue(), nextKey->getValue(),
+                         nWeight, sPath);
+            return sPath.getPathAt();
         } else if(!prevKey && nextKey) {
-            return nextKey->getValue().getPathAt();
+            return nextKey->getPath();
         } else if(prevKey && !nextKey) {
-            return prevKey->getValue().getPathAt();
+            return prevKey->getPath();
         }
         return mBaseValue.getPathAt();
     }

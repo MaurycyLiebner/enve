@@ -30,11 +30,15 @@ SpatialDisplacePathEffect::SpatialDisplacePathEffect(const bool &outlinePathEffe
 }
 
 void SpatialDisplacePathEffect::apply(const qreal &relFrame,
-                               const SkPath &src,
-                               SkPath * const dst) {
+                                      const SkPath &src,
+                                      SkPath * const dst) {
     const qreal baseSeed = mSeed->getBaseSeed(relFrame);
     const qreal gridSize = mSeed->getGridSize(relFrame);
     const qreal qMaxDev = mMaxDev->getEffectiveValue(relFrame);
+    if(isZero4Dec(qMaxDev)) {
+        *dst = src;
+        return;
+    }
     const qreal qSegLen = mSegLength->getEffectiveValue(relFrame);
     const qreal qSmooth = mSmoothness->getEffectiveValue(relFrame);    
 

@@ -32,7 +32,7 @@ public:
 
     QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
     QMatrix getTotalTransformAtRelFrameF(const qreal& relFrame) {
-        if(mParentGroup ? mParentGroup->SWT_isLinkBox() : false) {
+        if(isParentLink()) {
             return getRelativeTransformAtRelFrameF(relFrame)*
                     mParentGroup->getTotalTransformAtRelFrameF(relFrame);
         } else {
@@ -59,6 +59,10 @@ public:
     ContainerBox *getLinkTarget() const;
     ContainerBox *getFinalTarget() const;
 protected:
+    bool isParentLink() const {
+        return mParentGroup ? mParentGroup->SWT_isLinkBox() : false;
+    }
+
     qsptr<BoxTargetProperty> mBoxTarget =
             SPtrCreate(BoxTargetProperty)("link target");
 };

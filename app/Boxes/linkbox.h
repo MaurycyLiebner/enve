@@ -68,11 +68,9 @@ public:
 
     stdsptr<BoundingBoxRenderData> createRenderData();
     void setupRenderData(const qreal &relFrame,
-                                                BoundingBoxRenderData * const data);
+                         BoundingBoxRenderData * const data);
     const SkBlendMode &getBlendMode() {
-        if(mParentGroup->SWT_isLinkBox()) {
-            return getLinkTarget()->getBlendMode();
-        }
+        if(isParentLink()) return getLinkTarget()->getBlendMode();
         return BoundingBox::getBlendMode();
     }
 
@@ -95,7 +93,7 @@ public:
     }
 
     QMatrix getTotalTransformAtRelFrameF(const qreal& relFrame) {
-        if(mParentGroup ? mParentGroup->SWT_isLinkBox() : false) {
+        if(isParentLink()) {
             const auto linkTarget = getLinkTarget();
             return linkTarget->getRelativeTransformAtRelFrameF(relFrame)*
                     mParentGroup->getTotalTransformAtRelFrameF(relFrame);
@@ -111,6 +109,10 @@ public:
         setLinkTarget(target);
     }
 protected:
+    bool isParentLink() const {
+        return mParentGroup ? mParentGroup->SWT_isLinkBox() : false;
+    }
+
     qsptr<BoxTargetProperty> mBoxTarget =
             SPtrCreate(BoxTargetProperty)("link target");
 };

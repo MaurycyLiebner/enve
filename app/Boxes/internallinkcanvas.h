@@ -11,9 +11,8 @@ public:
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 
-    void setupRenderData(
-                            const qreal &relFrame,
-                            BoundingBoxRenderData * const data);
+    void setupRenderData(const qreal &relFrame,
+                         BoundingBoxRenderData * const data);
 
     qsptr<BoundingBox> createLinkForLinkGroup();
 

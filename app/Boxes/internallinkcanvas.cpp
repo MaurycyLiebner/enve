@@ -43,7 +43,7 @@ bool InternalLinkCanvas::clipToCanvas() {
 }
 
 qsptr<BoundingBox> InternalLinkCanvas::createLinkForLinkGroup() {
-    if(mParentGroup->SWT_isLinkBox()) {
+    if(isParentLink()) {
         return getLinkTarget()->createLinkForLinkGroup();
     } else {
         return SPtrCreate(InternalLinkCanvas)(this);
