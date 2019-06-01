@@ -185,6 +185,7 @@ private:
     int mMinRenderFrame = 0;
     int mMaxRenderFrame = 0;
     int mSavedCurrentFrame = 0;
+    FrameRange mCurrRenderRange;
 
     qreal mSavedResolutionFraction = 100.;
 
@@ -192,7 +193,7 @@ private:
     RenderInstanceSettings *mCurrentRenderSettings = nullptr;
 
     QWidget *mCanvasWidget;
-    void setRendering(const bool &bT);
+    void setRenderingPreview(const bool &bT);
     void setPreviewing(const bool &bT);
 
     QTimer *mPreviewFPSTimer = nullptr;

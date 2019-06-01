@@ -424,7 +424,8 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
         cont = mCacheHandler.createNew<ImageCacheContainer>(
                     range, renderData->fRenderedImage);
     }
-    if(mPreviewing || mRenderingOutput) {
+    if((mPreviewing || mRenderingOutput) &&
+       mCurrRenderRange.inRange(renderData->fRelFrame)) {
         cont->setBlocked(true);
     } else {
         auto currentRenderData = mDrawRenderContainer.getSrcRenderData();
@@ -448,6 +449,9 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
             mCurrentPreviewContainerOutdated =
                     mDrawRenderContainer.isExpired();
             setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
+        } else if(mRenderingPreview &&
+                  mCurrRenderRange.inRange(renderData->fRelFrame)) {
+            cont->setBlocked(true);
         }
     }
     callUpdateSchedulers();

@@ -77,7 +77,7 @@ bool isImageExt(const QString &extension) {
 }
 
 bool isEvExt(const QString &extension) {
-    return extension == "av";
+    return extension == "ev";
 }
 
 bool hasVideoExt(const QString &filename) {

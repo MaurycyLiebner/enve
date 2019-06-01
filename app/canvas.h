@@ -44,8 +44,6 @@ enum CtrlsMode : short;
 extern bool zLessThan(const qptr<BoundingBox> &box1,
                       const qptr<BoundingBox> &box2);
 
-
-
 extern bool boxesZSort(const qptr<BoundingBox> &box1,
                        const qptr<BoundingBox> &box2);
 
@@ -522,6 +520,10 @@ public:
     bool handleTransormationInputKeyEvent(QKeyEvent *event);
 
     void setCurrentGroupParentAsCurrentGroup();
+
+    void setCurrentRenderRange(const FrameRange& range) {
+        mCurrRenderRange = range;
+    }
 private:
     void openTextEditorForTextBox(TextBox *textBox);
     void callUpdateSchedulers();
@@ -611,6 +613,7 @@ protected:
     bool mPreviewing = false;
     bool mRenderingPreview = false;
     bool mRenderingOutput = false;
+    FrameRange mCurrRenderRange;
 
     bool mCurrentPreviewContainerOutdated = false;
     stdsptr<ImageCacheContainer> mCurrentPreviewContainer;

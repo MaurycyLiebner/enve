@@ -958,6 +958,9 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
         }
 
         mCurrentRenderFrame = renderSettings.fMinFrame;
+        mCurrRenderRange = {mCurrentRenderFrame, mCurrentRenderFrame};
+        mCurrentCanvas->setCurrentRenderRange(mCurrRenderRange);
+
         mCurrentEncodeFrame = mCurrentRenderFrame;
         mFirstEncodeSoundSecond = qRound(mCurrentRenderFrame/mCurrentCanvas->getFps());
         mCurrentEncodeSoundSecond = mFirstEncodeSoundSecond;
@@ -988,6 +991,8 @@ void CanvasWindow::nextCurrentRenderFrame() {
     mCurrentSoundComposition->blockUpToFrame(newCurrentRenderFrame);
 
     mCurrentRenderFrame = newCurrentRenderFrame;
+    mCurrRenderRange.fMax = mCurrentRenderFrame;
+    mCurrentCanvas->setCurrentRenderRange(mCurrRenderRange);
     if(!allDone) changeCurrentFrameAction(mCurrentRenderFrame);
 }
 
@@ -999,12 +1004,14 @@ void CanvasWindow::renderPreview() {
     TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
     TaskScheduler::sSetAllTasksFinishedFunc(nextFrameFunc);
 
-    mSavedCurrentFrame = getCurrentFrame();
+    mSavedCurrentFrame = getCurrentFrame();    
     mCurrentRenderFrame = mSavedCurrentFrame;
+    mCurrRenderRange = {mCurrentRenderFrame, mCurrentRenderFrame};
+    mCurrentCanvas->setCurrentRenderRange(mCurrRenderRange);
     mCurrentSoundComposition->startBlockingAtFrame(mCurrentRenderFrame);
 
     mMaxRenderFrame = getMaxFrame();
-    setRendering(true);
+    setRenderingPreview(true);
 
     MainWindow::getInstance()->previewBeingRendered();
     if(TaskScheduler::sAllQuedCPUTasksFinished()) {
@@ -1024,7 +1031,7 @@ void CanvasWindow::outOfMemory() {
     }
 }
 
-void CanvasWindow::setRendering(const bool &bT) {
+void CanvasWindow::setRenderingPreview(const bool &bT) {
     mRenderingPreview = bT;
     mCurrentCanvas->setRenderingPreview(bT);
 }
@@ -1035,7 +1042,7 @@ void CanvasWindow::setPreviewing(const bool &bT) {
 }
 
 void CanvasWindow::interruptPreviewRendering() {
-    setRendering(false);
+    setRenderingPreview(false);
     TaskScheduler::sClearAllFinishedFuncs();
     clearPreview();
     auto& cacheHandler = mCurrentCanvas->getCacheHandler();
@@ -1102,7 +1109,7 @@ void CanvasWindow::playPreview() {
     mCurrentCanvas->setCurrentPreviewContainer(mCurrentPreviewFrame);
     mCurrentCanvas->setPreviewing(true);
 
-    setRendering(false);
+    setRenderingPreview(false);
     setPreviewing(true);
 
     startAudio();
@@ -1418,7 +1425,7 @@ void CanvasWindow::importFile() {
     QStringList importPaths = QFileDialog::getOpenFileNames(
                                             MainWindow::getInstance(),
                                             "Import File", "",
-                                            "Files (*.av *.svg "
+                                            "Files (*.ev *.svg "
                                                    "*.mp4 *.mov *.avi *.mkv *.m4v "
                                                    "*.png *.jpg "
                                                    "*.wav *.mp3)");
