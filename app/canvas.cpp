@@ -315,7 +315,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
             paint.setColor(SK_ColorBLACK);
             canvas->drawRect(viewRect.makeInset(1, 1), paint);
         }
-        if(mIsMouseGrabbing)
+        if(mTransMode != MODE_NONE || mValueInput.inputEnabled())
             mValueInput.draw(canvas, mCanvasWidget->height() - MIN_WIDGET_HEIGHT);
     }
 
@@ -617,6 +617,7 @@ void Canvas::grabMouseAndTrack() {
 }
 
 void Canvas::releaseMouseAndDontTrack() {
+    mTransMode = MODE_NONE;
     mIsMouseGrabbing = false;
     mCanvasWindow->releaseMouse();
 }
@@ -829,6 +830,7 @@ bool Canvas::startMovingAction(const QPointF& cursorPos) {
     mTransformationFinishedBeforeMouseRelease = false;
     mValueInput.clearAndDisableInput();
     mValueInput.setupMove();
+    mTransMode = MODE_MOVE;
 
     setLastMouseEventPosAbs(cursorPos);
     setLastMousePressPosAbs(cursorPos);

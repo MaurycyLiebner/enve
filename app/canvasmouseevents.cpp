@@ -35,10 +35,10 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
     if(isPreviewingOrRendering()) return;
     setCurrentMouseEventPosAbs(event->pos());
 
-    if(!(event->buttons() & Qt::MiddleButton) &&
-       !(event->buttons() & Qt::RightButton) &&
-       !(event->buttons() & Qt::LeftButton) &&
-       !mIsMouseGrabbing) {
+    const bool leftPressed = event->buttons() & Qt::LeftButton;
+    const bool middlePressed = event->buttons() & Qt::MiddleButton;
+
+    if(!middlePressed && !leftPressed && !mIsMouseGrabbing) {
         const auto lastHoveredBox = mHoveredBox;
         const auto lastHoveredPoint = mHoveredPoint_d;
         const auto lastNSegment = mHoveredNormalSegment;
@@ -54,17 +54,17 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
         return;
     }
 
-    if(event->buttons() & Qt::MiddleButton) {
+    if(middlePressed) {
         moveByRel(mCurrentMouseEventPosRel - mLastMouseEventPosRel);
-    } else if(mCurrentMode == PAINT_MODE && event->buttons() & Qt::LeftButton)  {
+    } else if(mCurrentMode == PAINT_MODE && leftPressed)  {
         paintMove(event->timestamp(), 1, 0, 0);
         return mCanvasWindow->requestUpdate();
-    } else if(event->buttons() & Qt::LeftButton || mIsMouseGrabbing) {
+    } else if(leftPressed || mIsMouseGrabbing) {
         if(mMovesToSkip > 0) {
             mMovesToSkip--;
             return;
         }
-        if(mFirstMouseMove && event->buttons() & Qt::LeftButton) {
+        if(mFirstMouseMove && leftPressed) {
             if((mCurrentMode == CanvasMode::MOVE_POINT &&
                 !mHoveredPoint_d && !mHoveredNormalSegment.isValid()) ||
                (mCurrentMode == CanvasMode::MOVE_BOX &&
@@ -108,9 +108,10 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
         }
     }
     mFirstMouseMove = false;
+
     setLastMouseEventPosAbs(event->pos());
     callUpdateSchedulers();
-    if(!mSelecting && !mIsMouseGrabbing) grabMouseAndTrack();
+    if(!mSelecting && !mIsMouseGrabbing && leftPressed) grabMouseAndTrack();
 }
 
 void Canvas::mouseReleaseEvent(const QMouseEvent * const event) {

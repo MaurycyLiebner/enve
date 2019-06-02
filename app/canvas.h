@@ -540,7 +540,7 @@ private:
     void rotateSelected();
     qreal mLastDRot = 0;
     int mRotHalfCycles = 0;
-    TransformMode mTransMode = MODE_MOVE;
+    TransformMode mTransMode = MODE_NONE;
 protected:
     stdsptr<UndoRedoStack> mUndoRedoStack;
 

@@ -436,7 +436,6 @@ void Canvas::cancelCurrentTransform() {
     }
 
     if(mIsMouseGrabbing) releaseMouseAndDontTrack();
-    mTransMode = MODE_NONE;
 }
 
 void Canvas::handleMovePointMouseRelease() {
@@ -510,7 +509,6 @@ void Canvas::handleMovePathMouseRelease() {
         if(!mFirstMouseMove) mRotPivot->finishTransform();
         mRotPivot->deselect();
     } else if(mTransMode == MODE_ROTATE || mTransMode == MODE_SCALE) {
-        mTransMode = MODE_NONE;
         finishSelectedBoxesTransform();
     } else if(mFirstMouseMove) {
         mSelecting = false;
