@@ -13,19 +13,10 @@ public:
                SkPath * const dst);
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
-
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
-private:
-    uint32_t mSeedAssist = 0;
-
+private:    
+    qsptr<QrealAnimator> mSeed;
     qsptr<QrealAnimator> mMaxDev;
-    qsptr<BoolPropertyContainer> mRandomize;
     qsptr<BoolPropertyContainer> mLengthBased;
-    qsptr<IntAnimator> mRandomizeStep;
-    qsptr<BoolPropertyContainer> mSmoothTransform;
-    qsptr<QrealAnimator> mEasing;
-    qsptr<IntAnimator> mSeed;
-    qsptr<BoolProperty> mRepeat;
 
     qsptr<QrealAnimator> mSegLength;
     qsptr<QrealAnimator> mSmoothness;

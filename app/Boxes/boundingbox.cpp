@@ -343,8 +343,6 @@ void BoundingBox::setParentTransform(BasicTransformAnimator *parent) {
     if(parent == mParentTransform) return;
     mParentTransform = parent;
     mTransformAnimator->setParentTransformAnimator(mParentTransform);
-
-    mTransformAnimator->updateTotalTransform(Animator::USER_CHANGE);
 }
 
 void BoundingBox::afterTotalTransformChanged(const UpdateReason &reason) {

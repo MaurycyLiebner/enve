@@ -25,6 +25,17 @@ public:
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
+    FrameRange prp_getIdenticalRelRange(const int &relFrame) const {
+        if(mParentTransform) {
+            const auto thisIdent = ComplexAnimator::prp_getIdenticalRelRange(relFrame);
+            const int absFrame = prp_relFrameToAbsFrame(relFrame);
+            const int pRelFrame = mParentTransform->prp_absFrameToRelFrame(absFrame);
+            const auto parentIdent = mParentTransform->prp_getIdenticalRelRange(pRelFrame);
+            const auto absParentIdent = mParentTransform->prp_relRangeToAbsRange(parentIdent);
+            return thisIdent*prp_absRangeToRelRange(absParentIdent);
+        } else return ComplexAnimator::prp_getIdenticalRelRange(relFrame);
+    }
+
     void resetScale();
     void resetTranslation();
     void resetRotation();
@@ -83,19 +94,19 @@ public:
     QPointFAnimator *getPosAnimator();
     QPointFAnimator *getScaleAnimator();
     QrealAnimator *getRotAnimator();
+
+    void updateTotalTransform(const UpdateReason &reason);
 protected:
     QList<qsptr<BasicTransformAnimator>> mChildBoxes;
 
     QMatrix mRelTransform;
     QMatrix mTotalTransform;
 
-    qptr<BasicTransformAnimator> mParentTransformAnimator;
+    qptr<BasicTransformAnimator> mParentTransform;
 
     qsptr<QPointFAnimator> mPosAnimator;
     qsptr<QPointFAnimator> mScaleAnimator;
     qsptr<QrealAnimator> mRotAnimator;
-public slots:
-    void updateTotalTransform(const UpdateReason &reason);
 signals:
     void totalTransformChanged(const UpdateReason &);
 };

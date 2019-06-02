@@ -122,7 +122,7 @@ QPointF BasicTransformAnimator::mapRelPosToAbs(const QPointF &relPos) const {
 }
 
 QPointF BasicTransformAnimator::mapFromParent(const QPointF &parentRelPos) const {
-    const auto absPos = mParentTransformAnimator->mapRelPosToAbs(parentRelPos);
+    const auto absPos = mParentTransform->mapRelPosToAbs(parentRelPos);
     return mapAbsPosToRel(absPos);
 }
 
@@ -163,7 +163,7 @@ QMatrix BasicTransformAnimator::getRelativeTransform(
 
 void BasicTransformAnimator::moveByAbs(const QPointF &absTrans) {
     const auto savedRelPos = mPosAnimator->getSavedValue();
-    const auto savedAbsPos = mParentTransformAnimator->mapRelPosToAbs(savedRelPos);
+    const auto savedAbsPos = mParentTransform->mapRelPosToAbs(savedRelPos);
     moveToAbs(savedAbsPos + absTrans);
 }
 
@@ -172,7 +172,7 @@ void BasicTransformAnimator::moveToAbs(const QPointF &absPos) {
 }
 
 void BasicTransformAnimator::setAbsolutePos(const QPointF &pos) {
-    setRelativePos(mParentTransformAnimator->mapAbsPosToRel(pos));
+    setRelativePos(mParentTransform->mapAbsPosToRel(pos));
 }
 
 void BasicTransformAnimator::setRelativePos(const QPointF &relPos) {
@@ -196,11 +196,11 @@ void BasicTransformAnimator::updateRelativeTransform(const UpdateReason &reason)
 }
 
 void BasicTransformAnimator::updateTotalTransform(const UpdateReason &reason) {
-    if(mParentTransformAnimator.isNull()) {
+    if(mParentTransform.isNull()) {
         mTotalTransform = mRelTransform;
     } else {
         mTotalTransform = mRelTransform *
-                             mParentTransformAnimator->getTotalTransform();
+                             mParentTransform->getTotalTransform();
     }
     emit totalTransformChanged(reason);
 }
@@ -215,11 +215,11 @@ const QMatrix &BasicTransformAnimator::getRelativeTransform() const {
 
 void BasicTransformAnimator::setParentTransformAnimator(
         BasicTransformAnimator* parent) {
-    if(mParentTransformAnimator)
-        disconnect(mParentTransformAnimator,
+    if(mParentTransform)
+        disconnect(mParentTransform,
                    &BasicTransformAnimator::totalTransformChanged,
                    this, &BasicTransformAnimator::updateTotalTransform);
-    mParentTransformAnimator = parent;
+    mParentTransform = parent;
     if(parent) connect(parent, &BasicTransformAnimator::totalTransformChanged,
                        this, &BasicTransformAnimator::updateTotalTransform);
     updateTotalTransform(Animator::USER_CHANGE);
@@ -244,13 +244,13 @@ void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal &sx,
 
 QMatrix BasicTransformAnimator::getParentTotalTransformAtRelFrame(
         const qreal &relFrame) {
-    if(mParentTransformAnimator.data() == nullptr) {
+    if(mParentTransform.data() == nullptr) {
         return QMatrix();
     } else {
         const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
         const qreal parentRelFrame =
-                mParentTransformAnimator->prp_absFrameToRelFrameF(absFrame);
-        return mParentTransformAnimator->
+                mParentTransform->prp_absFrameToRelFrameF(absFrame);
+        return mParentTransform->
                 getTotalTransformAtRelFrameF(parentRelFrame);
     }
 }
@@ -269,12 +269,12 @@ QrealAnimator *BasicTransformAnimator::getRotAnimator() {
 
 QMatrix BasicTransformAnimator::getTotalTransformAtRelFrameF(
         const qreal &relFrame) {
-    if(mParentTransformAnimator) {
+    if(mParentTransform) {
         const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
         const qreal parentRelFrame =
-                mParentTransformAnimator->prp_absFrameToRelFrameF(absFrame);
+                mParentTransform->prp_absFrameToRelFrameF(absFrame);
         return getRelativeTransform(relFrame)*
-                mParentTransformAnimator->
+                mParentTransform->
                     getTotalTransformAtRelFrameF(parentRelFrame);
     } else {
         return getRelativeTransform(relFrame);

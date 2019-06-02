@@ -111,17 +111,17 @@ extern void gGetSmoothAbsCtrlsForPtBetween(const SkPoint &prevP,
                                            SkPoint &c1, SkPoint &c2,
                                            const SkScalar &smoothLen);
 
-extern void gAtomicDisplaceFilterPath(SkPath* const dst,
-                                const SkPath& src,
-                                const SkScalar &maxDev,
-                                const uint32_t &seedAssist);
+extern void gAtomicDisplaceFilterPath(const qreal &baseSeed,
+                                      SkPath* const dst,
+                                      const SkPath& src,
+                                      const SkScalar &maxDev);
 
-extern bool gAtomicDisplaceFilterPath(SkPath * const dst,
+extern bool gAtomicDisplaceFilterPath(const qreal &baseSeed,
+                                      SkPath * const dst,
                                       const SkPath& src,
                                       const SkScalar &maxDev,
                                       const SkScalar &segLen,
-                                      const SkScalar &smoothness,
-                                      const uint32_t &seedAssist);
+                                      const SkScalar &smoothness);
 
 extern void gSpatialDisplaceFilterPath(const qreal& baseSeed,
                                        const qreal& gridSize,

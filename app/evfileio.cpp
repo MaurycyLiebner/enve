@@ -573,13 +573,8 @@ void DisplacePathEffect::writeProperty(QIODevice * const target) const {
     mSegLength->writeProperty(target);
     mMaxDev->writeProperty(target);
     mSmoothness->writeProperty(target);
-    mRandomize->writeProperty(target);
     mLengthBased->writeProperty(target);
-    mRandomizeStep->writeProperty(target);
-    mSmoothTransform->writeProperty(target);
-    mEasing->writeProperty(target);
     mSeed->writeProperty(target);
-    mRepeat->writeProperty(target);
 }
 
 void DisplacePathEffect::readProperty(QIODevice *target) {
@@ -587,13 +582,8 @@ void DisplacePathEffect::readProperty(QIODevice *target) {
     mSegLength->readProperty(target);
     mMaxDev->readProperty(target);
     mSmoothness->readProperty(target);
-    mRandomize->readProperty(target);
     mLengthBased->readProperty(target);
-    mRandomizeStep->readProperty(target);
-    mSmoothTransform->readProperty(target);
-    mEasing->readProperty(target);
     mSeed->readProperty(target);
-    mRepeat->readProperty(target);
 }
 
 void DuplicatePathEffect::writeProperty(QIODevice * const target) const {
