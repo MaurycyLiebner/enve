@@ -392,15 +392,6 @@ void Canvas::handleLeftButtonMousePress() {
         clearPointsSelection();
         addBoxToSelection(paintBox.get());
     }
-
-    if((mCurrentMode == CanvasMode::MOVE_POINT &&
-        !mHoveredPoint_d && !mHoveredNormalSegment.isValid()) ||
-       (mCurrentMode == CanvasMode::MOVE_BOX &&
-        !mHoveredBox && !mHoveredPoint_d)) {
-        startSelectionAtPoint(mLastMouseEventPosRel);
-    }
-
-    if(!mSelecting) grabMouseAndTrack();
 }
 
 QPointF Canvas::mapCanvasAbsToRel(const QPointF &pos) {
