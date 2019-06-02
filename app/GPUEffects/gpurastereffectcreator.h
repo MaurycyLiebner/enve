@@ -41,29 +41,77 @@ private:
 typedef QList<stdsptr<UniformSpecifierCreator>> UniformSpecifierCreators;
 struct GPURasterEffectProgram {
     GLuint fId;
-    QList<GLint> fArgumentLocs;
     GLint fGPosLoc;
     GLint fTexLocation;
+    QList<GLint> fArgumentLocs;
     UniformSpecifierCreators fUniformCreators;
+
+    void cleanUp(QGL33c * const gl) {
+        gl->glDeleteProgram(fId);
+    }
+
+    static GPURasterEffectProgram sCreateProgram(
+            QGL33c * const gl, const QString &fragPath,
+            const QList<stdsptr<PropertyCreator>>& propCs,
+            const UniformSpecifierCreators& uniCs) {
+        GPURasterEffectProgram program;
+        try {
+            iniProgram(gl, program.fId, GL_TEXTURED_VERT, fragPath);
+        } catch(...) {
+            RuntimeThrow("Could not initialize a program for GPURasterEffect");
+        }
+
+        for(const auto& propC : propCs) {
+            const GLint loc = propC->getUniformLocation(gl, program.fId);
+            if(loc < 0) {
+                gl->glDeleteProgram(program.fId);
+                RuntimeThrow("'" + propC->fName +
+                             "' does not correspond to an active uniform variable.");
+            }
+            program.fArgumentLocs.append(loc);
+        }
+        program.fGPosLoc = gl->glGetUniformLocation(program.fId, "_gPos");
+        program.fUniformCreators = uniCs;
+        program.fTexLocation = gl->glGetUniformLocation(program.fId, "texture");
+        CheckInvalidLocation(program.fTexLocation, "texture");
+        return program;
+    }
 };
 
 struct GPURasterEffectCreator : public PropertyCreator {
-    GPURasterEffectCreator(const QString& name) : PropertyCreator(name) {}
+    friend class StdSelfRef;
+
     QList<stdsptr<PropertyCreator>> fProperties;
     GPURasterEffectProgram fProgram;
 
+    void reloadProgram(QGL33c * const gl, const QString& fragPath) {
+        if(!QFile(fragPath).exists()) return;
+        GPURasterEffectProgram program;
+        try {
+            program = GPURasterEffectProgram::sCreateProgram(
+                        gl, fragPath, fProperties, fProgram.fUniformCreators);
+        } catch(...) {
+            RuntimeThrow("Failed to load a new version of '" + fragPath + "'");
+        }
+        fProgram.cleanUp(gl);
+        fProgram = program;
+    }
+
     qsptr<Property> create() const;
-    virtual GLint getUniformLocation(
-            QGL33c * const gl, const GLuint& program) const {
+
+    GLint getUniformLocation(QGL33c * const gl, const GLuint& program) const {
         Q_UNUSED(gl);
         Q_UNUSED(program);
         Q_ASSERT(false);
-        return 0;
     }
+
     static stdsptr<GPURasterEffectCreator> sLoadFromFile(
             QGL33c * const gl,
             const QString& filePath);
+
     static QList<stdsptr<GPURasterEffectCreator>> sEffectCreators;
+protected:
+    GPURasterEffectCreator(const QString& name) : PropertyCreator(name) {}
 };
 
 #endif // GPURASTEREFFECTCREATOR_H

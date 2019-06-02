@@ -154,27 +154,14 @@ stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sLoadFromFile(
 
     GPURasterEffectProgram program;
     try {
-        iniProgram(gl, program.fId, GL_TEXTURED_VERT, fragPath);
+        program = GPURasterEffectProgram::sCreateProgram(
+                    gl, fragPath, propCs, uniCs);
     } catch(...) {
-        RuntimeThrow("Could not create program for GPURasterEffect '" +
+        RuntimeThrow("Could not create a program for GPURasterEffect '" +
                      effectName + "'.");
     }
-
-    for(const auto& propC : propCs) {
-        GLint loc = propC->getUniformLocation(gl, program.fId);
-        if(loc < 0) {
-            gl->glDeleteProgram(program.fId);
-            RuntimeThrow("'" + propC->fName +
-                         "' does not correspond to an active uniform variable.");
-        }
-        program.fArgumentLocs.append(loc);
-    }
-    program.fGPosLoc = gl->glGetUniformLocation(program.fId, "_gPos");
-    program.fUniformCreators = uniCs;
-    program.fTexLocation = gl->glGetUniformLocation(program.fId, "texture");
-    CheckInvalidLocation(program.fTexLocation, "texture");
-
-    auto rasterEffectCreator = SPtrCreate(GPURasterEffectCreator)(effectName);
+    auto rasterEffectCreator =
+            SPtrCreate(GPURasterEffectCreator)(effectName);
     rasterEffectCreator->fProgram = program;
     rasterEffectCreator->fProperties = propCs;
     sEffectCreators << rasterEffectCreator;

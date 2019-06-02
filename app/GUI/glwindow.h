@@ -10,6 +10,8 @@
 #include <QResizeEvent>
 #include <QOpenGLPaintDevice>
 
+class GPURasterEffectCreator;
+
 class GLWindow : public QWindow, protected QGL33c {
     Q_OBJECT
 public:
@@ -39,6 +41,31 @@ protected:
     bool event(QEvent *event);
     //void exposeEvent(QExposeEvent *event);
 private:
+    struct NewGPUEffect {
+        QString fGrePath;
+        QString fFragPath;
+
+        bool operator==(const NewGPUEffect& other) const {
+            return fGrePath == other.fGrePath;
+        }
+    };
+
+    struct FragReload {
+        GPURasterEffectCreator *fCreator;
+        QString fFragPath;
+
+        bool operator==(const FragReload& other) const {
+            return fCreator == other.fCreator;
+        }
+    };
+
+    bool mWaitingFragReloads = false;
+    QList<FragReload> mFragReloads;
+
+    bool mWaitingGPUEffects = false;
+    QList<NewGPUEffect> mNewGPUEffects;
+    QList<QString> mLoadedGREPaths;
+
     void checkCompileErrors(GLuint shader, std::string type);
     void iniRasterEffectProgram(const QString& path);
     void iniRasterEffectPrograms();
