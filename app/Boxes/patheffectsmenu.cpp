@@ -9,6 +9,7 @@ void PathEffectsMenu::addPathEffectActionToMenu(
     });
 }
 
+#include "PathEffects/custompatheffectcreator.h"
 template <typename U>
 void PathEffectsMenu::addPathEffectsActionToMenu(
         BoxTypeMenu * const menu,
@@ -33,6 +34,7 @@ void PathEffectsMenu::addPathEffectsActionToMenu(
                 "ZigZag", menu, adder, outline);
     addPathEffectActionToMenu<SubdividePathEffect>(
                 "Subdivide", menu, adder, outline);
+    CustomPathEffectCreator::sAddToMenu(menu, adder, outline);
 }
 
 void PathEffectsMenu::addPathEffectsToActionMenu(BoxTypeMenu * const menu) {

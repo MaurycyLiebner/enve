@@ -52,6 +52,7 @@ SOURCES += main.cpp\
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/soundreader.cpp \
     GUI/welcomedialog.cpp \
+    PathEffects/custompatheffectcreator.cpp \
     PathEffects/linespatheffect.cpp \
     PathEffects/spatialdisplacepatheffect.cpp \
     PathEffects/subdividepatheffect.cpp \
@@ -263,6 +264,7 @@ HEADERS  += \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/soundreader.h \
     GUI/welcomedialog.h \
+    PathEffects/custompatheffectcreator.h \
     PathEffects/linespatheffect.h \
     PathEffects/spatialdisplacepatheffect.h \
     PathEffects/subdividepatheffect.h \

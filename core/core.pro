@@ -45,6 +45,7 @@ LIBS += -lskia
 
 SOURCES += \
     Animators/qrealsnapshot.cpp \
+    PathEffects/custompatheffect.cpp \
     randomgrid.cpp \
     smartPointers/stdpointer.cpp \
     smartPointers/selfref.cpp \
@@ -135,6 +136,7 @@ SOURCES += \
 
 HEADERS += \
     Animators/qrealsnapshot.h \
+    PathEffects/custompatheffect.h \
     core_global.h \
     randomgrid.h \
     smartPointers/stdpointer.h \

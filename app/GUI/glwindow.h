@@ -42,6 +42,7 @@ private:
     void checkCompileErrors(GLuint shader, std::string type);
     void iniRasterEffectProgram(const QString& path);
     void iniRasterEffectPrograms();
+    void iniCustomPathEffects();
 };
 
 #endif // GLWINDOW_H

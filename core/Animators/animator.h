@@ -1,9 +1,6 @@
 #ifndef ANIMATOR_H
 #define ANIMATOR_H
 
-#include <QColor>
-#include <QPainterPath>
-
 class QIODevice;
 #include "Properties/property.h"
 #include "key.h"

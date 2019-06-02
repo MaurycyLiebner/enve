@@ -54,6 +54,32 @@ void GLWindow::resizeEvent(QResizeEvent *) {
     }
 }
 
+#include "PathEffects/custompatheffect.h"
+#include "PathEffects/custompatheffectcreator.h"
+void iniCustomPathEffect(const QString& path) {
+    try {
+        CustomPathEffectCreator::sLoadCustomPathEffect(path);
+    } catch(...) {
+        RuntimeThrow("Error while loading PathEffect from '" + path + "'");
+    }
+}
+
+void GLWindow::iniCustomPathEffects() {
+    QDirIterator dirIt(QDir::homePath() + "/.enve/PathEffects",
+                       QDirIterator::NoIteratorFlags);
+    while(dirIt.hasNext()) {
+        const QString path = dirIt.next();
+        const QFileInfo fileInfo(path);
+        if(!fileInfo.isFile()) continue;
+        if(!fileInfo.completeSuffix().contains("so")) continue;
+        try {
+            iniCustomPathEffect(path);
+        } catch(const std::exception& e) {
+            gPrintExceptionCritical(e);
+        }
+    }
+}
+
 #include "glhelpers.h"
 #include "ColorWidgets/colorwidgetshaders.h"
 #include "GPUEffects/gpurastereffect.h"
@@ -62,7 +88,7 @@ void GLWindow::iniRasterEffectProgram(const QString& path) {
     try {
         GPURasterEffectCreator::sLoadFromFile(this, path);
     } catch(...) {
-        RuntimeThrow("Error while loading GPURasterEffect from '" + path + "'.");
+        RuntimeThrow("Error while loading GPURasterEffect from '" + path + "'");
     }
 }
 
@@ -124,6 +150,7 @@ void GLWindow::initialize() {
         RuntimeThrow("Error initializing OpenGL programs.");
     }
 
+    iniCustomPathEffects();
     iniRasterEffectPrograms();
 //    qDebug() << "OpenGL Info";
 //    qDebug() << "  Vendor: " << rcConstChar(glGetString(GL_VENDOR));
