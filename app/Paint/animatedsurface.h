@@ -199,7 +199,8 @@ public:
     }
 
     void newEmptyFrame(const int relFrame) {
-        if(anim_getKeyAtRelFrame(relFrame)) return;
+        const auto currKey = anim_getKeyAtRelFrame<ASKey>(relFrame);
+        if(currKey) anim_removeKey(GetAsSPtr(currKey, ASKey));
         const auto newKey = SPtrCreate(ASKey)(relFrame, this);
         anim_appendKey(newKey);
     }
