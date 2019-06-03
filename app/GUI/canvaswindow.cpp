@@ -610,6 +610,11 @@ void CanvasWindow::flipVerticalAction() {
     queScheduledTasksAndUpdate();
 }
 
+void CanvasWindow::setCurrentBrushColor(const QColor& color) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->setBrushColor(color);
+}
+
 void CanvasWindow::setCurrentBrush(const SimpleBrushWrapper * const brush) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setCurrentBrush(brush);

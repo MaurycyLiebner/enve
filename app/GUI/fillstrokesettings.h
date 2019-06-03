@@ -46,7 +46,7 @@ public:
     void setCanvasWindowPtr(CanvasWindow *canvasWidget);
     void updateColorAnimator();
     void setCurrentBrushSettings(BrushSettings * const brushSettings);
-public slots:
+
     void emitStrokeBrushChanged();
     void emitStrokeBrushWidthCurveChanged();
     void emitStrokeBrushTimeCurveChanged();
@@ -57,7 +57,7 @@ public slots:
     void emitStrokeWidthChangedTMP();
     void emitCapStyleChanged();
     void emitJoinStyleChanged();
-private slots:
+private:
     void setLinearGradientFill();
     void setRadialGradientFill();
 

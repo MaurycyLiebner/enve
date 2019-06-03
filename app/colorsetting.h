@@ -31,6 +31,18 @@ public:
     const qreal &getVal2() const;
     const qreal &getVal3() const;
     const qreal &getAlpa() const;
+
+    QColor getColor() const {
+        QColor color;
+        if(mSettingMode == RGBMODE) {
+            color.setRgbF(mVal1, mVal2, mVal3, mAlpha);
+        } else if(mSettingMode == HSVMODE) {
+            color.setHsvF(mVal1, mVal2, mVal3, mAlpha);
+        } else if(mSettingMode == HSLMODE) {
+            color.setHslF(mVal1, mVal2, mVal3, mAlpha);
+        }
+        return color;
+    }
 private:
     void finishColorTransform(ColorAnimator *target) const;
 

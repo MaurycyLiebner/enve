@@ -244,6 +244,7 @@ signals:
     void changeCurrentFrame(int);
     void changeCanvasFrameRange(int, int);
 public:
+    void setCurrentBrushColor(const QColor& color);
     void setCurrentBrush(const SimpleBrushWrapper * const brush);
 
     void setMovePathMode();

@@ -284,11 +284,9 @@ public:
 
     QRectF getMaxBoundsRect() const {
         if(mClipToCanvasSize) {
-            return QRectF(0., 0.,
-                          mWidth, mHeight);
+            return QRectF(0, 0, mWidth, mHeight);
         } else {
-            return QRectF(-mWidth, - mHeight,
-                          3*mWidth, 3*mHeight);
+            return QRectF(-mWidth, - mHeight, 3*mWidth, 3*mHeight);
         }
     }
 
@@ -316,9 +314,8 @@ public:
     bool clipToCanvas() { return mClipToCanvasSize; }
 
     const SimpleBrushWrapper * getCurrentBrush() const;
-    void setCurrentBrush(const SimpleBrushWrapper * const brush) {
-        mCurrentBrush = brush;
-    }
+    void setCurrentBrush(const SimpleBrushWrapper * const brush);
+    void setBrushColor(const QColor& color);
 
     void incBrushRadius();
     void decBrushRadius();
@@ -563,6 +560,7 @@ protected:
     bool mPaintPressedSinceUpdate = false;
     DrawableAutoTiledSurface * mPaintDrawable = nullptr;
 
+    QColor mCurrentBrushColor;
     const SimpleBrushWrapper * mCurrentBrush = nullptr;
     bool mStylusDrawing = false;
     bool mPickFillFromPath = false;

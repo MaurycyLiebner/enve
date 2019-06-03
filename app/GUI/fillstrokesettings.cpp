@@ -492,6 +492,7 @@ void FillStrokeSettingsWidget::colorSettingReceived(
     PaintSettingsApplier paintSetting;
     paintSetting << std::make_shared<ColorPaintSetting>(mTarget, colorSetting);
     mCanvasWindow->applyPaintSettingToSelected(paintSetting);
+    mCanvasWindow->setCurrentBrushColor(colorSetting.getColor());
 }
 
 void FillStrokeSettingsWidget::connectGradient() {

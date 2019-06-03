@@ -343,6 +343,19 @@ const SimpleBrushWrapper *Canvas::getCurrentBrush() const {
     return mCurrentBrush;
 }
 
+void Canvas::setCurrentBrush(const SimpleBrushWrapper * const brush) {
+    mCurrentBrush = brush;
+    if(brush) brush->setColor(mCurrentBrushColor);
+}
+
+void Canvas::setBrushColor(const QColor &color) {
+    mCurrentBrushColor = color;
+    mCurrentBrushColor.setBlueF(color.redF());
+    mCurrentBrushColor.setRedF(color.blueF());
+    if(!mCurrentBrush) return;
+    mCurrentBrush->setColor(mCurrentBrushColor);
+}
+
 void Canvas::incBrushRadius() {
     mCurrentBrush->incPaintBrushSize(0.3);
 }
