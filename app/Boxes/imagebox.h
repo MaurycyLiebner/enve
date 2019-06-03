@@ -5,17 +5,15 @@
 class FileCacheHandler;
 class ImageCacheHandler;
 
-struct ImageBoxRenderData : public BoundingBoxRenderData {
-    ImageBoxRenderData(FileCacheHandler * const cacheHandler,
-                       BoundingBox * const parentBoxT) :
+struct ImageRenderData : public BoundingBoxRenderData {
+    ImageRenderData(BoundingBox * const parentBoxT) :
         BoundingBoxRenderData(parentBoxT) {
         mDelayDataSet = true;
-        fSrcCacheHandler = cacheHandler;
     }
 
-    virtual void loadImageFromHandler();
+    virtual void loadImageFromHandler() = 0;
 
-    void setupRenderData() {
+    void setupRenderData() final {
         if(!fImage) loadImageFromHandler();
         if(fRasterEffects.isEmpty() &&
            fGPUEffects.isEmpty()) {
@@ -23,15 +21,13 @@ struct ImageBoxRenderData : public BoundingBoxRenderData {
         }
     }
 
-    void updateRelBoundingRect() {
+    void updateRelBoundingRect() final {
         if(fImage) fRelBoundingRect =
                 QRectF(0, 0, fImage->width(), fImage->height());
         else fRelBoundingRect = QRectF(0, 0, 0, 0);
     }
 
     sk_sp<SkImage> fImage;
-
-    FileCacheHandler *fSrcCacheHandler;
 private:
     void setupDirectDraw(const sk_sp<SkImage>& image) {
         updateRelBoundingRect();
@@ -47,6 +43,19 @@ private:
         //paint.setAntiAlias(true);
         if(fImage) canvas->drawImage(fImage, 0, 0, &paint);
     }
+};
+
+struct ImageBoxRenderData : public ImageRenderData {
+    ImageBoxRenderData(FileCacheHandler * const cacheHandler,
+                       BoundingBox * const parentBoxT) :
+        ImageRenderData(parentBoxT) {
+        mDelayDataSet = true;
+        fSrcCacheHandler = cacheHandler;
+    }
+
+    void loadImageFromHandler();
+
+    FileCacheHandler *fSrcCacheHandler;
 };
 
 class ImageBox : public BoundingBox {

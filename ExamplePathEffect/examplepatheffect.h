@@ -9,12 +9,14 @@ public:
 
     QByteArray getIdentifier() const;
 
-    void read(const QByteArray &identifier, QIODevice * const dst);
+    void read(const QByteArray &identifier, QIODevice * const src);
     void write(QIODevice * const dst) const;
 
     void apply(const qreal &relFrame,
                const SkPath &src,
                SkPath * const dst);
+private:
+    qsptr<QrealAnimator> mInfluence;
 };
 
 #endif // EXAMPLEPATHEFFECT_H

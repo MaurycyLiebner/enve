@@ -45,6 +45,7 @@ struct AutoTiledSurface {
                                      const double& pressure,
                                      const double& xtilt,
                                      const double& ytilt) const {
+        qDebug() << "press" << dTime;
         mypaint_brush_reset(brush);
         mypaint_brush_new_stroke(brush);
 
@@ -63,6 +64,7 @@ struct AutoTiledSurface {
                                     const double& pressure,
                                     const double& xtilt,
                                     const double& ytilt) const {
+        qDebug() << "move" << dTime;
         mypaint_surface_begin_atomic(fMyPaintSurface);
         mypaint_brush_stroke_to(brush, fMyPaintSurface,
                                 pos.x(), pos.y(), pressure,

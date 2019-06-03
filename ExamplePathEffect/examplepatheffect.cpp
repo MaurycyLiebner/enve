@@ -19,9 +19,11 @@ QByteArray effectIdentifier() {
 bool supports(const QByteArray &identifier) {
     return QString(identifier) == QString(effectIdentifier());
 }
-
+#include "Animators/qrealanimator.h"
 ExamplePathEffect::ExamplePathEffect(const bool outlinePathEffect) :
     CustomPathEffect(effectName().toLower(), outlinePathEffect) {
+    mInfluence = SPtrCreate(QrealAnimator)(0, 0, 1, 0.1, "influence");
+    ca_addChildAnimator(mInfluence);
 }
 
 QByteArray ExamplePathEffect::getIdentifier() const {
@@ -29,18 +31,20 @@ QByteArray ExamplePathEffect::getIdentifier() const {
 }
 
 void ExamplePathEffect::read(const QByteArray& identifier,
-                             QIODevice * const dst) {
-
+                             QIODevice * const src) {
+    Q_UNUSED(identifier);
+    mInfluence->readProperty(src);
 }
 
 void ExamplePathEffect::write(QIODevice * const dst) const {
-
+    mInfluence->writeProperty(dst);
 }
 
 void ExamplePathEffect::apply(const qreal &relFrame,
                               const SkPath &src,
                               SkPath * const dst) {
-    Q_UNUSED(relFrame);
+    const SkScalar infl = toSkScalar(mInfluence->getEffectiveValue(relFrame));
+    const SkScalar invInf = 1 - infl;
     dst->reset();
 
     SkPath::Iter iter(src, false);
@@ -51,13 +55,15 @@ void ExamplePathEffect::apply(const qreal &relFrame,
             dst->lineTo(pts[1]);
         } break;
         case SkPath::kQuad_Verb: {
-            dst->lineTo(pts[2]);
+            dst->quadTo(pts[1]*invInf + (pts[0] + pts[2])*0.5f*infl, pts[2]);
         } break;
         case SkPath::kConic_Verb: {
-            dst->lineTo(pts[2]);
+            dst->conicTo(pts[1]*invInf + (pts[0] + pts[2])*0.5f*infl,
+                         pts[2], iter.conicWeight());
         } break;
         case SkPath::kCubic_Verb: {
-            dst->lineTo(pts[3]);
+            dst->cubicTo(pts[0]*infl + pts[1]*invInf,
+                         pts[3]*infl + pts[2]*invInf, pts[3]);
         } break;
         case SkPath::kClose_Verb: {
             dst->close();

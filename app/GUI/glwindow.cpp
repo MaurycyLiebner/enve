@@ -104,14 +104,16 @@ void GLWindow::iniCustomPathEffects() {
 #include "GPUEffects/gpurastereffect.h"
 #include <QFileSystemWatcher>
 
-void GLWindow::iniRasterEffectProgram(const QString& path) {
+void GLWindow::iniRasterEffectProgram(const QString& grePath) {
+    if(!QFile(grePath).exists()) return;
+    const QFileInfo fileInfo(grePath);
+    const QString fragPath = fileInfo.path() + "/" +
+            fileInfo.completeBaseName() + ".frag";
+    if(!QFile(fragPath).exists()) return;
     try {
-        const auto loaded = GPURasterEffectCreator::sLoadFromFile(this, path).get();
-        mLoadedGREPaths << path;
+        const auto loaded = GPURasterEffectCreator::sLoadFromFile(this, grePath).get();
+        mLoadedGREPaths << grePath;
 
-        const QFileInfo fileInfo(path);
-        const QString fragPath = fileInfo.path() + "/" +
-                fileInfo.completeBaseName() + ".frag";
         const auto newFileWatcher = QSharedPointer<QFileSystemWatcher>(
                     new QFileSystemWatcher);
         newFileWatcher->addPath(fragPath);
@@ -123,7 +125,18 @@ void GLWindow::iniRasterEffectProgram(const QString& path) {
             requestUpdate();
         });
     } catch(...) {
-        RuntimeThrow("Error while loading GPURasterEffect from '" + path + "'");
+        const auto newFileWatcher = QSharedPointer<QFileSystemWatcher>(
+                    new QFileSystemWatcher);
+        newFileWatcher->addPath(grePath);
+        newFileWatcher->addPath(fragPath);
+        connect(newFileWatcher.get(), &QFileSystemWatcher::fileChanged,
+                this, [this, grePath, fragPath, newFileWatcher]() {
+            if(mNewGPUEffects.contains({grePath, fragPath})) return;
+            mNewGPUEffects.append({grePath, fragPath});
+            mWaitingGPUEffects = true;
+            requestUpdate();
+        });
+        RuntimeThrow("Error while loading GPURasterEffect from '" + grePath + "'");
     }
 }
 

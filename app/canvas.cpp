@@ -1053,7 +1053,7 @@ void Canvas::paintPress(const ulong ts, const qreal &pressure,
     if(mPaintDrawable && mCurrentBrush) {
         const auto& target = mPaintDrawable->surface();
         const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
-        const auto pos = pDrawTrans.inverted().map(mLastMouseEventPosRel);
+        const auto pos = pDrawTrans.inverted().map(mCurrentMouseEventPosRel);
         const auto roi =
                 target.paintPressEvent(mCurrentBrush->getBrush(),
                                        pos, 1, pressure, xTilt, yTilt);
@@ -1069,7 +1069,7 @@ void Canvas::paintMove(const ulong ts, const qreal &pressure,
         const auto& target = mPaintDrawable->surface();
         const double dt = (ts - mLastTs);
         const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
-        const auto pos = pDrawTrans.inverted().map(mLastMouseEventPosRel);
+        const auto pos = pDrawTrans.inverted().map(mCurrentMouseEventPosRel);
         const auto roi =
                 target.paintMoveEvent(mCurrentBrush->getBrush(),
                                       pos, dt/1000, pressure,

@@ -13,10 +13,12 @@ void PaintBox::setupRenderData(
         const qreal &relFrame, BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     auto paintData = GetAsSPtr(data, PaintBoxRenderData);
+//    auto bitmap = mSurface->getCurrentSurface()->surface().toBitmap();
+//    paintData->fImage = SkiaHelpers::transferDataToSkImage(bitmap);
 }
 
 stdsptr<BoundingBoxRenderData> PaintBox::createRenderData() {
-    return SPtrCreate(PaintBoxRenderData)(this);
+    return SPtrCreate(PaintBoxRenderData)(mSurface.get(), this);
 }
 
 #include <QFileDialog>
@@ -38,10 +40,4 @@ void PaintBox::addActionsToMenu(BoxTypeMenu * const menu) {
     menu->addPlainAction("Load From Image", op);
 
     BoundingBox::addActionsToMenu(menu);
-}
-
-void PaintBoxRenderData::drawSk(SkCanvas * const canvas) {
-    //SkPaint paint;
-    //paint.setFilterQuality(kHigh_SkFilterQuality);
-
 }

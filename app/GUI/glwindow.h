@@ -71,7 +71,7 @@ private:
     QList<QString> mLoadedGREPaths;
 
     void checkCompileErrors(GLuint shader, std::string type);
-    void iniRasterEffectProgram(const QString& path);
+    void iniRasterEffectProgram(const QString& grePath);
     void iniRasterEffectPrograms();
     void iniCustomPathEffects();
 };

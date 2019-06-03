@@ -2,18 +2,23 @@
 #define PAINTBOX_H
 #include "boundingbox.h"
 #include "Paint/animatedsurface.h"
+#include "imagebox.h"
 class QPointFAnimator;
 class AnimatedPoint;
 class SimpleBrushWrapper;
 
-struct PaintBoxRenderData : public BoundingBoxRenderData {
+struct PaintBoxRenderData : public ImageRenderData {
     friend class StdSelfRef;
-    PaintBoxRenderData(BoundingBox * const parentBoxT) :
-        BoundingBoxRenderData(parentBoxT) {
+    PaintBoxRenderData(AnimatedSurface * const surface,
+                       BoundingBox * const parentBoxT) :
+        ImageRenderData(parentBoxT), fSurface(surface) {}
 
+    void loadImageFromHandler() {
+        auto bitmap = fSurface->getCurrentSurface()->surface().toBitmap();
+        fImage = SkiaHelpers::transferDataToSkImage(bitmap);
     }
 
-    void drawSk(SkCanvas * const canvas);
+    AnimatedSurface * const fSurface;
 };
 
 class PaintBox : public BoundingBox {
