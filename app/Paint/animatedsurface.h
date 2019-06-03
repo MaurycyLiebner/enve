@@ -53,32 +53,86 @@ public:
             SkScalar fWeight;
         };
 
-        QList<Skin> fSkins;
-        SkColor4f fColor;
+        struct SkinsSide {
+            SkColor4f fColor;
+            QList<Skin> fSkins;
+
+            void draw(SkCanvas * const canvas) {
+                for(const auto& skin : fSkins) {
+                    SkPaint paint;
+                    const SkScalar wAlpha = -0.25f;
+                    const SkScalar opacityM[20] = {
+                        1, 0, 0, 0, 0,
+                        0, 1, 0, 0, 0,
+                        0, 0, 1, 0, 0,
+                        wAlpha, wAlpha, wAlpha, skin.fWeight + wAlpha, 0};
+                    const auto opacityF = SkColorFilters::Matrix(opacityM);
+                    const SkScalar colM[20] = {
+                        0, 0, 0, fColor.fR, 0,
+                        0, 0, 0, fColor.fG, 0,
+                        0, 0, 0, fColor.fB, 0,
+                        0, 0, 0, fColor.fA, 0};
+                    const auto colF = SkColorFilters::Matrix(colM);
+                    const auto totF = SkColorFilters::Compose(colF, opacityF);
+                    paint.setColorFilter(totF);
+
+                    canvas->drawBitmap(skin.fBtmp, skin.fX, skin.fY, &paint);
+                }
+            }
+
+            void clear() { fSkins.clear(); }
+        };
+
+        SkinsSide fPrev{{0, 0, 1, 1}, QList<Skin>()};
+        SkinsSide fNext{{1, 0, 0, 1}, QList<Skin>()};
 
         void draw(SkCanvas * const canvas) {
-            for(const auto& skin : fSkins) {
-                SkPaint paint;
-                const SkScalar wAlpha = -0.333333f;
-                const SkScalar opacityM[20] = {
-                    1, 0, 0, 0, 0,
-                    0, 1, 0, 0, 0,
-                    0, 0, 1, 0, 0,
-                    wAlpha, wAlpha, wAlpha, skin.fWeight, 0};
-                const auto opacityF = SkColorFilters::Matrix(opacityM);
-                const SkScalar colM[20] = {
-                    0, 0, 0, fColor.fR, 0,
-                    0, 0, 0, fColor.fG, 0,
-                    0, 0, 0, fColor.fB, 0,
-                    0, 0, 0, 1, 0};
-                const auto colF = SkColorFilters::Matrix(colM);
-                const auto totF = SkColorFilters::Compose(colF, opacityF);
-                paint.setColorFilter(totF);
-
-                canvas->drawBitmap(skin.fBtmp, skin.fX, skin.fY, &paint);
-            }
+            fPrev.draw(canvas);
+            fNext.draw(canvas);
         }
+
+        void clear() { fPrev.clear(); fNext.clear(); }
     };
+
+    void setupOnionSkinFor(const int sideRange, OnionSkin &skins) {
+        setupOnionSkinFor(anim_getCurrentRelFrame(), sideRange, skins);
+    }
+
+    void setupOnionSkinFor(const int relFrame, const int sideRange,
+                           OnionSkin &skins) {
+        skins.clear();
+        ASKey * currKey = anim_getKeyAtRelFrame<ASKey>(relFrame);
+        if(!currKey) currKey = anim_getPrevKey<ASKey>(relFrame);
+        if(!currKey) currKey = anim_getNextKey<ASKey>(relFrame);
+        if(!currKey) return;
+        ASKey * prevKey = anim_getPrevKey<ASKey>(currKey);
+        while(prevKey) {
+            const auto& surf = prevKey->dSurface().surface();
+            const auto bitmap = surf.toBitmap();
+            const int dFrame = qAbs(relFrame - prevKey->getRelFrame());
+            if(dFrame > sideRange) break;
+            const qreal weight = 1.*(sideRange - dFrame)/sideRange;
+            const QRect pixRect = surf.pixelBoundingRect();
+            skins.fPrev.fSkins.append({toSkScalar(pixRect.x()),
+                                       toSkScalar(pixRect.y()),
+                                       bitmap, toSkScalar(weight)});
+            prevKey = anim_getPrevKey<ASKey>(prevKey);
+        }
+
+        ASKey * nextKey = anim_getNextKey<ASKey>(currKey);
+        while(nextKey) {
+            const auto& surf = nextKey->dSurface().surface();
+            const auto bitmap = surf.toBitmap();
+            const int dFrame = qAbs(relFrame - nextKey->getRelFrame());
+            if(dFrame > sideRange) break;
+            const qreal weight = 1.*(sideRange - dFrame)/sideRange;
+            const QRect pixRect = surf.pixelBoundingRect();
+            skins.fNext.fSkins.append({toSkScalar(pixRect.x()),
+                                       toSkScalar(pixRect.y()),
+                                       bitmap, toSkScalar(weight)});
+            nextKey = anim_getNextKey<ASKey>(nextKey);
+        }
+    }
 
     stdsptr<Key> readKey(QIODevice *target) {
         auto newKey = SPtrCreate(ASKey)(this);
@@ -137,6 +191,17 @@ public:
 
     DrawableAutoTiledSurface * getCurrentSurface() {
         return mCurrent_d;
+    }
+
+
+    void newEmptyFrame() {
+        newEmptyFrame(anim_getCurrentRelFrame());
+    }
+
+    void newEmptyFrame(const int relFrame) {
+        if(anim_getKeyAtRelFrame(relFrame)) return;
+        const auto newKey = SPtrCreate(ASKey)(relFrame, this);
+        anim_appendKey(newKey);
     }
 signals:
     void currentSurfaceChanged(DrawableAutoTiledSurface*);

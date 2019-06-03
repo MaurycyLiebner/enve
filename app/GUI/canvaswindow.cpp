@@ -168,7 +168,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
     }
 
     mCurrentCanvas->setCanvasMode(mode);
-    requestUpdate();
+    queScheduledTasksAndUpdate();
     MainWindow::getInstance()->updateCanvasModeButtonsChecked();
 }
 
@@ -526,6 +526,7 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     if(isMouseGrabber()) {
         if(mCurrentCanvas->handleTransormationInputKeyEvent(event)) return true;
     }
+    if(mCurrentCanvas->handlePaintModeKeyPress(event)) return true;
     if(handleCanvasModeChangeKeyPress(event)) return true;
     if(handleCutCopyPasteKeyPress(event)) return true;
     if(handleTransformationKeyPress(event)) return true;

@@ -412,10 +412,9 @@ void Canvas::removeBoxFromSelection(BoundingBox *box) {
     disconnect(box, &BoundingBox::fillStrokeSettingsChanged,
                this, &Canvas::scheduleDisplayedFillStrokeSettingsUpdate);
     box->deselect();
-    mSelectedBoxes.removeOne(box); schedulePivotUpdate();
-    if(mCurrentMode == PAINT_MODE) {
-        updatePaintBox();
-    }
+    mSelectedBoxes.removeOne(box);
+    schedulePivotUpdate();
+    if(mCurrentMode == PAINT_MODE) updatePaintBox();
     if(mSelectedBoxes.isEmpty()) {
         mMainWindow->setCurrentBox(nullptr);
     } else {
@@ -426,7 +425,8 @@ void Canvas::removeBoxFromSelection(BoundingBox *box) {
 void Canvas::clearBoxesSelection() {
     for(const auto &box : mSelectedBoxes)
         box->deselect();
-    clearBoxesSelectionList(); schedulePivotUpdate();
+    clearBoxesSelectionList();
+    schedulePivotUpdate();
     mMainWindow->setCurrentBox(nullptr);
 //    if(mLastPressedBox) {
 //        mLastPressedBox->deselect();

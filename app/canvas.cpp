@@ -250,11 +250,13 @@ void Canvas::renderSk(SkCanvas * const canvas,
         const SkScalar invZoom = toSkScalar(qInvZoom);
         if(!mCurrentBoxesGroup->SWT_isCanvas())
             mCurrentBoxesGroup->drawBoundingRect(canvas, invZoom);
-        for(const auto& box : mSelectedBoxes) {
-            canvas->save();
-            box->drawBoundingRect(canvas, invZoom);
-            box->drawAllCanvasControls(canvas, mCurrentMode, invZoom);
-            canvas->restore();
+        if(!mPaintDrawableBox) {
+            for(const auto& box : mSelectedBoxes) {
+                canvas->save();
+                box->drawBoundingRect(canvas, invZoom);
+                box->drawAllCanvasControls(canvas, mCurrentMode, invZoom);
+                canvas->restore();
+            }
         }
 
         if(mCurrentMode == CanvasMode::MOVE_BOX ||
@@ -275,36 +277,36 @@ void Canvas::renderSk(SkCanvas * const canvas,
             }
         }
 
-        if(mSelecting) {
-            paint.setStyle(SkPaint::kStroke_Style);
-            paint.setColor(SkColorSetARGB(255, 0, 0, 255));
-            paint.setStrokeWidth(2*invZoom);
-            const SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invZoom,
-                                           MIN_WIDGET_HEIGHT*0.25f*invZoom};
-            paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
-            canvas->drawRect(toSkRect(mSelectionRect), paint);
-            paint.setPathEffect(nullptr);
-        }
-
-        if(mHoveredPoint_d) {
-            mHoveredPoint_d->drawHovered(canvas, invZoom);
-        } else if(mHoveredNormalSegment.isValid()) {
-            mHoveredNormalSegment.drawHoveredSk(canvas, invZoom);
-        } else if(mHoveredBox) {
-            if(!mCurrentNormalSegment.isValid()) {
-                mHoveredBox->drawHoveredSk(canvas, invZoom);
-            }
-        }
-
         if(mPaintDrawableBox) {
             const QRect widRect(0, 0, mCanvasWidget->width(),
                                 mCanvasWidget->height());
             const auto canvasRect = mCanvasTransform.inverted().mapRect(widRect);
             const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
             const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
-            const auto absPos = QPointF(0, 0);//mPaintDrawableBox->getAbsolutePos();
             canvas->concat(toSkMatrix(pDrawTrans));
-            mPaintDrawable->drawOnCanvas(canvas, absPos.toPoint(), &relDRect);
+            mPaintOnion.draw(canvas);
+            mPaintDrawable->drawOnCanvas(canvas, {0, 0}, &relDRect);
+        } else {
+            if(mSelecting) {
+                paint.setStyle(SkPaint::kStroke_Style);
+                paint.setColor(SkColorSetARGB(255, 0, 0, 255));
+                paint.setStrokeWidth(2*invZoom);
+                const SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invZoom,
+                                               MIN_WIDGET_HEIGHT*0.25f*invZoom};
+                paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
+                canvas->drawRect(toSkRect(mSelectionRect), paint);
+                paint.setPathEffect(nullptr);
+            }
+
+            if(mHoveredPoint_d) {
+                mHoveredPoint_d->drawHovered(canvas, invZoom);
+            } else if(mHoveredNormalSegment.isValid()) {
+                mHoveredNormalSegment.drawHoveredSk(canvas, invZoom);
+            } else if(mHoveredBox) {
+                if(!mCurrentNormalSegment.isValid()) {
+                    mHoveredBox->drawHoveredSk(canvas, invZoom);
+                }
+            }
         }
 
         canvas->resetMatrix();
@@ -581,20 +583,38 @@ void Canvas::setCanvasMode(const CanvasMode &mode) {
     updatePaintBox();
 }
 
+void Canvas::afterPaintAnimSurfaceChanged() {
+    if(mCurrentMode != PAINT_MODE) return;
+    if(mPaintPressedSinceUpdate && mPaintAnimSurface) {
+        mPaintAnimSurface->prp_afterChangedRelRange(
+                    mPaintAnimSurface->prp_getIdenticalRelRange(
+                        mPaintAnimSurface->anim_getCurrentRelFrame()));
+        mPaintPressedSinceUpdate = false;
+    }
+}
+
 void Canvas::setPaintDrawable(DrawableAutoTiledSurface * const surf) {
     mPaintDrawable = surf;
+    mPaintPressedSinceUpdate = false;
 }
 
 void Canvas::setPaintBox(PaintBox * const box) {
+    if(mPaintDrawableBox) {
+        mPaintDrawableBox->setVisibile(mPaintBoxWasVisible);
+        disconnect(mPaintAnimSurface, nullptr, this, nullptr);
+        afterPaintAnimSurfaceChanged();
+    }
     if(box) {
-        mPaintDrawableBox = GetAsPtr(mSelectedBoxes.last(), PaintBox);
+        mPaintDrawableBox = box;
+        mPaintBoxWasVisible = mPaintDrawableBox->isVisible();
+        //mPaintDrawableBox->hide();
         mPaintAnimSurface = mPaintDrawableBox->getSurface();
+        mPaintAnimSurface->setupOnionSkinFor(20, mPaintOnion);
         connect(mPaintAnimSurface, &AnimatedSurface::currentSurfaceChanged,
                 this, &Canvas::setPaintDrawable);
         mPaintDrawable = mPaintAnimSurface->getCurrentSurface();
-    } else if(mPaintDrawableBox) {
+    } else {
         mPaintDrawableBox = nullptr;
-        disconnect(mPaintAnimSurface, nullptr, this, nullptr);
         mPaintAnimSurface = nullptr;
         mPaintDrawable = nullptr;
     }
@@ -605,9 +625,10 @@ void Canvas::updatePaintBox() {
     if(mCurrentMode != PAINT_MODE) return;
     for(int i = mSelectedBoxes.count() - 1; i >= 0; i--) {
         const auto& iBox = mSelectedBoxes.at(i);
-        if(!iBox->SWT_isPaintBox()) continue;
-        setPaintBox(GetAsPtr(mSelectedBoxes.last(), PaintBox));
-        break;
+        if(iBox->SWT_isPaintBox()) {
+            setPaintBox(GetAsPtr(iBox, PaintBox));
+            break;
+        }
     }
 }
 
@@ -622,11 +643,18 @@ void Canvas::releaseMouseAndDontTrack() {
     mCanvasWindow->releaseMouse();
 }
 
-bool Canvas::handleTransormationInputKeyEvent(QKeyEvent *event) {
+bool Canvas::handlePaintModeKeyPress(QKeyEvent * const event) {
+    if(mCurrentMode != PAINT_MODE) return false;
+    if(event->key() == Qt::Key_N && mPaintAnimSurface) {
+        mPaintAnimSurface->newEmptyFrame();
+    } else return false;
+    return true;
+}
+
+bool Canvas::handleTransormationInputKeyEvent(QKeyEvent * const event) {
     if(mValueInput.handleTransormationInputKeyEvent(event)) {
-        if(mTransMode == MODE_ROTATE) {
+        if(mTransMode == MODE_ROTATE)
             mValueInput.setupRotate();
-        }
         updateTransformation();
     } else if(event->key() == Qt::Key_Escape) {
         cancelCurrentTransform();
@@ -640,11 +668,6 @@ bool Canvas::handleTransormationInputKeyEvent(QKeyEvent *event) {
     } else if(event->key() == Qt::Key_Y) {
         mValueInput.switchYOnlyMode();
         updateTransformation();
-    } else if(event->key() == Qt::Key_N) {
-        for(const auto& box : mSelectedBoxes) {
-            const auto paintBox = GetAsPtr(box, PaintBox);
-            //paintBox->newEmptyPaintFrameOnCurrentFrame();
-        }
     } else {
         return false;
     }
@@ -727,10 +750,13 @@ void Canvas::invertSelectionAction() {
 
 void Canvas::anim_setAbsFrame(const int &frame) {
     if(frame == anim_getCurrentAbsFrame()) return;
-    int lastRelFrame = anim_getCurrentRelFrame();
+    afterPaintAnimSurfaceChanged();
+    const int oldRelFrame = anim_getCurrentRelFrame();
     ComplexAnimator::anim_setAbsFrame(frame);
+    const int newRelFrame = anim_getCurrentRelFrame();
+
     const auto cont = mCacheHandler.atRelFrame
-            <ImageCacheContainer>(anim_getCurrentRelFrame());
+            <ImageCacheContainer>(newRelFrame);
     if(cont) {
         if(cont->storesDataInMemory()) { // !!!
             setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
@@ -740,18 +766,19 @@ void Canvas::anim_setAbsFrame(const int &frame) {
         mCurrentPreviewContainerOutdated = !cont->storesDataInMemory();
     } else {
         const bool difference =
-                prp_differencesBetweenRelFrames(lastRelFrame,
-                                                anim_getCurrentRelFrame());
+                prp_differencesBetweenRelFrames(oldRelFrame, newRelFrame);
         if(difference) {
             mCurrentPreviewContainerOutdated = true;
         }
         if(difference) planScheduleUpdate(Animator::FRAME_CHANGE);
     }
 
-    for(const auto &box : mContainedBoxes) {
+    for(const auto &box : mContainedBoxes)
         box->anim_setAbsFrame(frame);
-    }
     mUndoRedoStack->setFrame(frame);
+
+    if(mCurrentMode == PAINT_MODE)
+        mPaintAnimSurface->setupOnionSkinFor(20, mPaintOnion);
 }
 
 void Canvas::clearSelectionAction() {
@@ -1049,6 +1076,7 @@ void Canvas::paintPress(const ulong ts, const qreal &pressure,
         if(mPaintAnimSurface->anim_isRecording())
             mPaintAnimSurface->anim_saveCurrentValueAsKey();
     }
+    mPaintPressedSinceUpdate = true;
 
     if(mPaintDrawable && mCurrentBrush) {
         const auto& target = mPaintDrawable->surface();

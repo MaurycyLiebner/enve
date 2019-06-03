@@ -14,6 +14,7 @@
 #include "Boxes/canvasrenderdata.h"
 #include "Paint/drawableautotiledsurface.h"
 #include "canvasbase.h"
+#include "Paint/animatedsurface.h"
 #include <QAction>
 
 class AnimatedSurface;
@@ -517,7 +518,8 @@ public:
     void deselectAllBoxesAction();
     void selectAllBoxesAction();
     void selectAllPointsAction();
-    bool handleTransormationInputKeyEvent(QKeyEvent *event);
+    bool handlePaintModeKeyPress(QKeyEvent * const event);
+    bool handleTransormationInputKeyEvent(QKeyEvent * const event);
 
     void setCurrentGroupParentAsCurrentGroup();
 
@@ -551,10 +553,14 @@ protected:
     void updatePaintBox();
     void setPaintBox(PaintBox * const box);
     void setPaintDrawable(DrawableAutoTiledSurface * const surf);
+    void afterPaintAnimSurfaceChanged();
 
     ulong mLastTs;
-    PaintBox * mPaintDrawableBox = nullptr;
-    AnimatedSurface * mPaintAnimSurface = nullptr;
+    bool mPaintBoxWasVisible;
+    qptr<PaintBox> mPaintDrawableBox;
+    qptr<AnimatedSurface> mPaintAnimSurface;
+    AnimatedSurface::OnionSkin mPaintOnion;
+    bool mPaintPressedSinceUpdate = false;
     DrawableAutoTiledSurface * mPaintDrawable = nullptr;
 
     const SimpleBrushWrapper * mCurrentBrush = nullptr;
