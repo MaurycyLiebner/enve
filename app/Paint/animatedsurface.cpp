@@ -5,14 +5,15 @@ AnimatedSurface::AnimatedSurface() : GraphAnimator("canvas"),
     mCurrent_d(mBaseValue.get()) {}
 
 ASKey::ASKey(AnimatedSurface * const parent) :
-    GraphKey(parent) {}
+    GraphKey(parent),
+    mValue(SPtrCreate(DrawableAutoTiledSurface)()) {}
 
 ASKey::ASKey(const int &frame, AnimatedSurface * const parent) :
-    GraphKey(frame, parent) {}
+    GraphKey(frame, parent),
+    mValue(SPtrCreate(DrawableAutoTiledSurface)()) {}
 
 ASKey::ASKey(const DrawableAutoTiledSurface &value,
              const int &frame, AnimatedSurface * const parent) :
-    GraphKey(frame, parent),
-    mValue(SPtrCreate(DrawableAutoTiledSurface)()) {
+    ASKey(frame, parent) {
     mValue->deepCopy(value);
 }
