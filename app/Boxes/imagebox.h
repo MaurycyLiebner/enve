@@ -17,31 +17,27 @@ struct ImageRenderData : public BoundingBoxRenderData {
         if(!fImage) loadImageFromHandler();
         if(fRasterEffects.isEmpty() &&
            fGPUEffects.isEmpty()) {
-            setupDirectDraw(fImage);
+            setupDirectDraw();
         }
-    }
-
-    void updateRelBoundingRect() final {
-        if(fImage) fRelBoundingRect =
-                QRectF(0, 0, fImage->width(), fImage->height());
-        else fRelBoundingRect = QRectF(0, 0, 0, 0);
     }
 
     sk_sp<SkImage> fImage;
 private:
-    void setupDirectDraw(const sk_sp<SkImage>& image) {
+    void setupDirectDraw() {
         updateRelBoundingRect();
         updateGlobalFromRelBoundingRect();
-        fRenderTransform = fScaledTransform;
-        fRenderTransform.translate(-fDrawPos.x(), -fDrawPos.y());
-        fRenderedImage = image;
+        //fRenderTransform = fScaledTransform;
+        //fRenderTransform.translate(-fDrawPos.x(), -fDrawPos.y());
+        fRenderedImage = fImage;
     }
 
     void drawSk(SkCanvas * const canvas) {
         SkPaint paint;
         //paint.setFilterQuality(kHigh_SkFilterQuality);
         //paint.setAntiAlias(true);
-        if(fImage) canvas->drawImage(fImage, 0, 0, &paint);
+        if(fImage) canvas->drawImage(fImage,
+                                     qRound(fRelBoundingRect.x()),
+                                     qRound(fRelBoundingRect.y()), &paint);
     }
 };
 
@@ -51,6 +47,12 @@ struct ImageBoxRenderData : public ImageRenderData {
         ImageRenderData(parentBoxT) {
         mDelayDataSet = true;
         fSrcCacheHandler = cacheHandler;
+    }
+
+    void updateRelBoundingRect() final {
+        if(fImage) fRelBoundingRect =
+                QRectF(0, 0, fImage->width(), fImage->height());
+        else fRelBoundingRect = QRectF(0, 0, 0, 0);
     }
 
     void loadImageFromHandler();

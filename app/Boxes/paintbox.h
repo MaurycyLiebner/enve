@@ -18,6 +18,10 @@ struct PaintBoxRenderData : public ImageRenderData {
         fImage = SkiaHelpers::transferDataToSkImage(bitmap);
     }
 
+    void updateRelBoundingRect() final {
+        fRelBoundingRect = fSurface->getCurrentSurface()->pixelBoundingRect();
+    }
+
     AnimatedSurface * const fSurface;
 };
 
