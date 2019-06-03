@@ -20,6 +20,7 @@ class OutlineSettingsAnimator;
 class PaintSettingsApplier;
 class EffectAnimators;
 class GPUEffectAnimators;
+class GPURasterEffectProgram;
 class PixmapEffect;
 class BoxTransformAnimator;
 class BasicTransformAnimator;
@@ -416,6 +417,9 @@ public:
     void updateAfterDurationMaxFrameChangedBy(const int &by);
 
     void planCenterPivotPosition();
+
+    virtual void updateIfUsesProgram(
+            const GPURasterEffectProgram * const program) const;
 protected:
     void updateCanvasProps() {
         mCanvasProps.clear();

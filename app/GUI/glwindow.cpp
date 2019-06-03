@@ -285,12 +285,15 @@ void GLWindow::renderNow() {
             if(!QFile(reload.fFragPath).exists()) continue;
             try {
                 reload.fCreator->reloadProgram(this, reload.fFragPath);
+                emit programChanged(&reload.fCreator->fProgram);
             } catch(const std::exception& e) {
                 gPrintExceptionCritical(e);
             }
         }
         mFragReloads.clear();
         mWaitingFragReloads = false;
+
+        emit queAfterProgramsChanged();
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, mContext->defaultFramebufferObject());

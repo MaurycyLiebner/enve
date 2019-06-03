@@ -241,9 +241,6 @@ private:
     int mMaxPreviewFrame;
     int mCurrentPreviewFrame;
 signals:
-    void processTask(Task*, int);
-    void updateFileUpdatable(Task*, int);
-
     void changeCurrentFrame(int);
     void changeCanvasFrameRange(int, int);
 public:

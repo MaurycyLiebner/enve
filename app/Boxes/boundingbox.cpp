@@ -121,6 +121,11 @@ void BoundingBox::planCenterPivotPosition() {
     mCenterPivotPlanned = true;
 }
 
+void BoundingBox::updateIfUsesProgram(
+        const GPURasterEffectProgram * const program) const {
+    mGPUEffectsAnimators->updateIfUsesProgram(program);
+}
+
 void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);

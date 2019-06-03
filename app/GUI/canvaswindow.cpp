@@ -37,7 +37,7 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
     mCanvasWidget->setMouseTracking(true);
 
 
-    VideoEncoderEmitter *vidEmitter = VideoEncoder::getVideoEncoderEmitter();
+    const auto vidEmitter = VideoEncoder::getVideoEncoderEmitter();
 //    connect(vidEmitter, &VideoEncoderEmitter::encodingStarted,
 //            this, &CanvasWindow::leaveOnlyInterruptionButtonsEnabled);
     connect(vidEmitter, &VideoEncoderEmitter::encodingFinished,
@@ -48,6 +48,15 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
             this, &CanvasWindow::interruptOutputRendering);
     connect(vidEmitter, &VideoEncoderEmitter::encodingStartFailed,
             this, &CanvasWindow::interruptOutputRendering);
+
+    connect(this, &GLWindow::programChanged, this,
+    [this](GPURasterEffectProgram * program) {
+        for(const auto& canvas : mCanvasList)
+            canvas->updateIfUsesProgram(program);
+    });
+
+    connect(this, &GLWindow::queAfterProgramsChanged,
+            this, &CanvasWindow::queScheduledTasksAndUpdate);
 }
 
 Canvas *CanvasWindow::getCurrentCanvas() {

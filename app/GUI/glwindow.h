@@ -11,6 +11,7 @@
 #include <QOpenGLPaintDevice>
 
 class GPURasterEffectCreator;
+class GPURasterEffectProgram;
 
 class GLWindow : public QWindow, protected QGL33c {
     Q_OBJECT
@@ -40,6 +41,9 @@ protected:
 
     bool event(QEvent *event);
     //void exposeEvent(QExposeEvent *event);
+signals:
+    void programChanged(GPURasterEffectProgram*);
+    void queAfterProgramsChanged();
 private:
     struct NewGPUEffect {
         QString fGrePath;

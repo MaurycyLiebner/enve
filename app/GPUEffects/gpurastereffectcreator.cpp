@@ -6,7 +6,7 @@
 QList<stdsptr<GPURasterEffectCreator>> GPURasterEffectCreator::sEffectCreators;
 
 qsptr<Property> GPURasterEffectCreator::create() const {
-    auto rasterEffect = SPtrCreate(GPURasterEffect)(fProgram, fName);
+    auto rasterEffect = SPtrCreate(GPURasterEffect)(&fProgram, fName);
     for(const auto& property : fProperties) {
         rasterEffect->ca_addChildAnimator(property->create());
     }

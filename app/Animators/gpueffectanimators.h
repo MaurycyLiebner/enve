@@ -4,6 +4,7 @@
 #include "smartPointers/sharedpointerdefs.h"
 
 class GPURasterEffect;
+class GPURasterEffectProgram;
 class BoundingBox;
 struct BoundingBoxRenderData;
 
@@ -30,6 +31,7 @@ public:
     void addEffectRenderDataToListF(const qreal &relFrame,
                                     BoundingBoxRenderData * const data);
 
+    void updateIfUsesProgram(const GPURasterEffectProgram * const program);
 
     //void writeProperty(QIODevice * const target) const;
     //void readProperty(QIODevice *target);

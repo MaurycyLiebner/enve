@@ -57,11 +57,19 @@ void GPUEffectAnimators::addEffectRenderDataToListF(
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect, GPURasterEffect);
         if(pixmapEffect->isVisible()) {
-            stdsptr<GPURasterEffectCaller> effectRenderData =
+            const auto effectRenderData =
                     pixmapEffect->getGPURasterEffectCaller(relFrame);
             if(!effectRenderData) continue;
             data->fGPUEffects.append(effectRenderData);
         }
+    }
+}
+
+void GPUEffectAnimators::updateIfUsesProgram(
+        const GPURasterEffectProgram * const program) {
+    for(const auto& effect : ca_mChildAnimators) {
+        const auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
+        pixmapEffect->updateIfUsesProgram(program);
     }
 }
 

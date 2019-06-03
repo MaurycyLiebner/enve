@@ -526,6 +526,15 @@ bool ContainerBox::shouldPaintOnImage() const {
            mGPUEffectsAnimators->hasEffects();
 }
 
+void ContainerBox::updateIfUsesProgram(
+        const GPURasterEffectProgram * const program) const {
+    for(const auto& box : mContainedBoxes) {
+        if(box->isVisibleAndInVisibleDurationRect())
+            box->updateIfUsesProgram(program);
+    }
+    BoundingBox::updateIfUsesProgram(program);
+}
+
 void processChildData(BoundingBox * const child,
                       ContainerBoxRenderData * const parentData,
                       const qreal& childRelFrame,

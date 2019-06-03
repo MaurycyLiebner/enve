@@ -36,6 +36,8 @@ private:
 
 class GPURasterEffect : public ComplexAnimator {
     friend class SelfRef;
+    GPURasterEffect(const GPURasterEffectProgram * const program,
+                    const QString &name);
 public:
     virtual qreal getMargin() { return 0; }
     virtual qreal getMarginAtRelFrame(const int &) { return 0; }
@@ -44,14 +46,14 @@ public:
     stdsptr<GPURasterEffectCaller> getGPURasterEffectCaller(
             const qreal& relFrame) {
         UniformSpecifiers uniformSpecifiers;
-        int argsCount =  mProgram.fArgumentLocs.count();
+        const int argsCount = mProgram->fArgumentLocs.count();
         for(int i = 0; i < argsCount; i++) {
-            const GLint& loc = mProgram.fArgumentLocs.at(i);
+            const GLint& loc = mProgram->fArgumentLocs.at(i);
             const auto prop = ca_getChildAt(i);
-            const auto& uniformC = mProgram.fUniformCreators.at(i);
+            const auto& uniformC = mProgram->fUniformCreators.at(i);
             uniformSpecifiers << uniformC->create(loc, prop, relFrame);
         }
-        return SPtrCreate(GPURasterEffectCaller)(mProgram, uniformSpecifiers);
+        return SPtrCreate(GPURasterEffectCaller)(*mProgram, uniformSpecifiers);
     }
 
     template <typename T = GPUEffectAnimators>
@@ -63,11 +65,14 @@ public:
     void setParentEffectAnimators(T * const parentEffects) {
         mParentEffects = parentEffects;
     }
+
+    void updateIfUsesProgram(const GPURasterEffectProgram * const program) {
+        if(program == mProgram)
+            prp_afterWholeInfluenceRangeChanged();
+    }
 private:
-    const GPURasterEffectProgram mProgram;
+    const GPURasterEffectProgram * const mProgram;
     qptr<GPUEffectAnimators> mParentEffects;
-    GPURasterEffect(const GPURasterEffectProgram &program,
-                    const QString &name);
 };
 
 #endif // GPURASTEREFFECT_H
