@@ -55,8 +55,10 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
             canvas->updateIfUsesProgram(program);
     });
 
-    connect(this, &GLWindow::queAfterProgramsChanged,
-            this, &CanvasWindow::queScheduledTasksAndUpdate);
+    connect(this, &GLWindow::queAfterProgramsChanged, this, [this]() {
+        TaskScheduler::sGetInstance()->clearTasks();
+        queScheduledTasksAndUpdate();
+    });
 }
 
 Canvas *CanvasWindow::getCurrentCanvas() {

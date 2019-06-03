@@ -143,6 +143,7 @@ public:
 
     void scheduleCPUTask(const stdsptr<Task> &task);
     void scheduleHDDTask(const stdsptr<Task> &task);
+    void scheduleGPUTask(const stdsptr<ScheduledPostProcess>& task);
 
     void clearTasks() {
         for(const auto& cpuTask : mScheduledCPUTasks)
@@ -158,6 +159,8 @@ public:
         for(const auto& hddTask : mQuedHDDTasks)
             hddTask->cancel();
         mQuedHDDTasks.clear();
+
+        mGpuPostProcessor.clear();
 
         callAllTasksFinishedFunc();
     }

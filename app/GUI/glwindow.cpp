@@ -238,7 +238,8 @@ void GLWindow::initialize() {
 //    glOrtho(0.0f, w, h, 0.0f, 0.0f, 1.0f);
 //    glMatrixMode(GL_MODELVIEW);
 //}
-
+#include "GPUEffects/gpupostprocessor.h"
+#include "taskscheduler.h"
 void GLWindow::renderNow() {
     const bool needsInitialize = !mContext;
     if(!isExposed() && !needsInitialize) return;

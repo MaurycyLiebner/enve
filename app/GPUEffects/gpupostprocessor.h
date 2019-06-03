@@ -28,9 +28,8 @@ public:
 
 protected:
     virtual void afterProcessed() {}
-private:
     virtual void process(const GLuint &texturedSquareVAO) = 0;
-
+private:
     bool unhandledException() const {
         return static_cast<bool>(mUpdateException);
     }
@@ -50,6 +49,8 @@ public:
     ShaderPostProcess(const sk_sp<SkImage>& srcImg,
                       const stdsptr<GPURasterEffectCaller> &program,
                       const ShaderFinishedFunc& finishedFunc = ShaderFinishedFunc());
+protected:
+    void process(const GLuint &texturedSquareVAO);
 private:
     const stdsptr<GPURasterEffectCaller> mProgram;
     //! @brief Gets called after processing finished, provides resulting image.
@@ -58,8 +59,8 @@ private:
     sk_sp<SkImage> mFinalImage;
 
     //! @brief Uses shaders to draw the source image to the final texture.
-    void process(const GLuint &texturedSquareVAO);
 };
+
 class BoundingBoxRenderData;
 class BoxRenderDataScheduledPostProcess : public ScheduledPostProcess {
 public:
@@ -67,21 +68,21 @@ public:
             const stdsptr<BoundingBoxRenderData> &boxData);
 protected:
     void afterProcessed();
-private:
     void process(const GLuint &texturedSquareVAO);
+private:
     const stdsptr<BoundingBoxRenderData> mBoxData;
 };
 
 class ComplexScheduledPostProcess : public ScheduledPostProcess {
 public:
     ComplexScheduledPostProcess();
-
-private:
+protected:
     void process(const GLuint &texturedSquareVAO) {
         for(const auto& child : mChildProcesses) {
             child->process(texturedSquareVAO);
         }
     }
+private:
     QList<stdsptr<ScheduledPostProcess>> mChildProcesses;
 };
 #include <QOpenGLFramebufferObject>

@@ -40,15 +40,12 @@ private:
 
 typedef QList<stdsptr<UniformSpecifierCreator>> UniformSpecifierCreators;
 struct GPURasterEffectProgram {
-    GLuint fId;
+    GLuint fId = 0;
+    GLuint fFragShader;
     GLint fGPosLoc;
     GLint fTexLocation;
     QList<GLint> fArgumentLocs;
     UniformSpecifierCreators fUniformCreators;
-
-    void cleanUp(QGL33c * const gl) {
-        gl->glDeleteProgram(fId);
-    }
 
     static GPURasterEffectProgram sCreateProgram(
             QGL33c * const gl, const QString &fragPath,
@@ -89,11 +86,12 @@ struct GPURasterEffectCreator : public PropertyCreator {
         GPURasterEffectProgram program;
         try {
             program = GPURasterEffectProgram::sCreateProgram(
-                        gl, fragPath, fProperties, fProgram.fUniformCreators);
+                        gl, fragPath, fProperties,
+                        fProgram.fUniformCreators);
         } catch(...) {
             RuntimeThrow("Failed to load a new version of '" + fragPath + "'");
         }
-        fProgram.cleanUp(gl);
+        gl->glDeleteProgram(fProgram.fId);
         fProgram = program;
     }
 

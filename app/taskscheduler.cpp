@@ -61,6 +61,10 @@ void TaskScheduler::scheduleHDDTask(const stdsptr<Task>& task) {
     mScheduledHDDTasks << task;
 }
 
+void TaskScheduler::scheduleGPUTask(const stdsptr<ScheduledPostProcess> &task) {
+    mGpuPostProcessor.addToProcess(task);
+}
+
 void TaskScheduler::queCPUTask(const stdsptr<Task>& task) {
     if(!task->isQued()) task->taskQued();
     mQuedCPUTasks.addTask(task);
@@ -190,7 +194,7 @@ void TaskScheduler::afterCPUTaskFinished(
         if(task->needsGpuProcessing()) {
             const auto sTask = GetAsSPtr(task, BoundingBoxRenderData);
             const auto gpuProcess = SPtrCreate(BoxRenderDataScheduledPostProcess)(sTask);
-            mGpuPostProcessor.addToProcess(gpuProcess);
+            scheduleGPUTask(gpuProcess);
         } else {
             task->finishedProcessing();
         }
