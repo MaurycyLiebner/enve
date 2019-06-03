@@ -597,7 +597,6 @@ void Canvas::setCanvasMode(const CanvasMode &mode) {
 }
 
 void Canvas::afterPaintAnimSurfaceChanged() {
-    if(mCurrentMode != PAINT_MODE) return;
     if(mPaintPressedSinceUpdate && mPaintAnimSurface) {
         mPaintAnimSurface->prp_afterChangedRelRange(
                     mPaintAnimSurface->prp_getIdenticalRelRange(
@@ -609,6 +608,7 @@ void Canvas::afterPaintAnimSurfaceChanged() {
 void Canvas::setPaintDrawable(DrawableAutoTiledSurface * const surf) {
     mPaintDrawable = surf;
     mPaintPressedSinceUpdate = false;
+    mPaintAnimSurface->setupOnionSkinFor(20, mPaintOnion);
 }
 
 void Canvas::setPaintBox(PaintBox * const box) {
@@ -622,10 +622,9 @@ void Canvas::setPaintBox(PaintBox * const box) {
         mPaintBoxWasVisible = mPaintDrawableBox->isVisible();
         //mPaintDrawableBox->hide();
         mPaintAnimSurface = mPaintDrawableBox->getSurface();
-        mPaintAnimSurface->setupOnionSkinFor(20, mPaintOnion);
         connect(mPaintAnimSurface, &AnimatedSurface::currentSurfaceChanged,
                 this, &Canvas::setPaintDrawable);
-        mPaintDrawable = mPaintAnimSurface->getCurrentSurface();
+        setPaintDrawable(mPaintAnimSurface->getCurrentSurface());
     } else {
         mPaintDrawableBox = nullptr;
         mPaintAnimSurface = nullptr;
