@@ -13,12 +13,12 @@ void PaintBox::setupRenderData(
         const qreal &relFrame, BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     auto paintData = GetAsSPtr(data, PaintBoxRenderData);
-//    auto bitmap = mSurface->getCurrentSurface()->surface().toBitmap();
-//    paintData->fImage = SkiaHelpers::transferDataToSkImage(bitmap);
+    paintData->fSurface = GetAsSPtr(mSurface->getSurface(qFloor(relFrame)),
+                                    DrawableAutoTiledSurface);
 }
 
 stdsptr<BoundingBoxRenderData> PaintBox::createRenderData() {
-    return SPtrCreate(PaintBoxRenderData)(mSurface.get(), this);
+    return SPtrCreate(PaintBoxRenderData)(this);
 }
 
 #include <QFileDialog>

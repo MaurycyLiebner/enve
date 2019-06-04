@@ -47,15 +47,29 @@ protected:
 public:
     struct OnionSkin {
         struct Skin {
-            SkScalar fX;
-            SkScalar fY;
-            SkBitmap fBtmp;
+            DrawableAutoTiledSurface* fSurface;
             SkScalar fWeight;
+
+            SkRect boundingRect() const {
+                return toSkRect(fSurface->pixelBoundingRect());
+            }
         };
 
         struct SkinsSide {
             SkColor4f fColor;
             QList<Skin> fSkins;
+
+            SkRect boundingRect() const {
+                SkRect result = SkRect::MakeXYWH(0, 0, 0, 0);
+                bool first = true;
+                for(const auto& skin : fSkins) {
+                    if(first) {
+                        result = skin.boundingRect();
+                        first = false;
+                    } else result.join(skin.boundingRect());
+                }
+                return result;
+            }
 
             void draw(SkCanvas * const canvas) {
                 for(const auto& skin : fSkins) {
@@ -76,22 +90,32 @@ public:
                     const auto totF = SkColorFilters::Compose(colF, opacityF);
                     paint.setColorFilter(totF);
 
-                    canvas->drawBitmap(skin.fBtmp, skin.fX, skin.fY, &paint);
+                    skin.fSurface->drawOnCanvas(canvas, {0, 0}, &paint);
                 }
             }
 
-            void clear() { fSkins.clear(); }
+            void clear() {
+                fSkins.clear();
+            }
         };
 
         SkinsSide fPrev{{0, 0, 1, 1}, QList<Skin>()};
         SkinsSide fNext{{1, 0, 0, 1}, QList<Skin>()};
+        SkScalar fX;
+        SkScalar fY;
+        SkBitmap fBtmp;
 
         void draw(SkCanvas * const canvas) {
-            fPrev.draw(canvas);
-            fNext.draw(canvas);
+            SkPaint paint;
+            paint.setAlphaf(0.5f);
+            canvas->drawBitmap(fBtmp, fX, fY, &paint);
         }
 
-        void clear() { fPrev.clear(); fNext.clear(); }
+        void clear() {
+            fPrev.clear();
+            fNext.clear();
+            fBtmp.reset();
+        }
     };
 
     void setupOnionSkinFor(const int sideRange, OnionSkin &skins) {
@@ -100,38 +124,49 @@ public:
 
     void setupOnionSkinFor(const int relFrame, const int sideRange,
                            OnionSkin &skins) {
-        skins.clear();
         ASKey * currKey = anim_getKeyAtRelFrame<ASKey>(relFrame);
         if(!currKey) currKey = anim_getPrevKey<ASKey>(relFrame);
         if(!currKey) currKey = anim_getNextKey<ASKey>(relFrame);
         if(!currKey) return;
         ASKey * prevKey = anim_getPrevKey<ASKey>(currKey);
         while(prevKey) {
-            const auto& surf = prevKey->dSurface().surface();
-            const auto bitmap = surf.toBitmap();
+            const auto surf = &prevKey->dSurface();
             const int dFrame = qAbs(relFrame - prevKey->getRelFrame());
             if(dFrame > sideRange) break;
             const qreal weight = 1.*(sideRange - dFrame)/sideRange;
-            const QRect pixRect = surf.pixelBoundingRect();
-            skins.fPrev.fSkins.append({toSkScalar(pixRect.x()),
-                                       toSkScalar(pixRect.y()),
-                                       bitmap, toSkScalar(weight)});
+            skins.fPrev.fSkins.append({surf, toSkScalar(weight)});
             prevKey = anim_getPrevKey<ASKey>(prevKey);
         }
 
         ASKey * nextKey = anim_getNextKey<ASKey>(currKey);
         while(nextKey) {
-            const auto& surf = nextKey->dSurface().surface();
-            const auto bitmap = surf.toBitmap();
+            const auto surf = &nextKey->dSurface();
             const int dFrame = qAbs(relFrame - nextKey->getRelFrame());
             if(dFrame > sideRange) break;
             const qreal weight = 1.*(sideRange - dFrame)/sideRange;
-            const QRect pixRect = surf.pixelBoundingRect();
-            skins.fNext.fSkins.append({toSkScalar(pixRect.x()),
-                                       toSkScalar(pixRect.y()),
-                                       bitmap, toSkScalar(weight)});
+            skins.fNext.fSkins.append({surf, toSkScalar(weight)});
             nextKey = anim_getNextKey<ASKey>(nextKey);
         }
+
+        skins.fBtmp.reset();
+
+        SkRect totalRect = skins.fPrev.boundingRect();
+        totalRect.join(skins.fNext.boundingRect());
+        skins.fX = totalRect.x();
+        skins.fY = totalRect.y();
+        if(!totalRect.isEmpty()) {
+            skins.fBtmp.allocPixels(SkiaHelpers::getPremulBGRAInfo(
+                                  qCeil(totalRect.width()),
+                                  qCeil(totalRect.height())));
+            SkCanvas canvas(skins.fBtmp);
+            canvas.translate(-totalRect.x(), -totalRect.y());
+            skins.fPrev.draw(&canvas);
+            skins.fNext.draw(&canvas);
+            canvas.flush();
+        }
+
+        skins.fPrev.clear();
+        skins.fNext.clear();
     }
 
     stdsptr<Key> readKey(QIODevice *target) {
@@ -164,7 +199,7 @@ public:
         const auto spk = static_cast<ASKey*>(key);
         if(spk) setCurrent(&spk->dSurface());
         else {
-            const auto relFrame = anim_getCurrentRelFrame();
+            const int relFrame = anim_getCurrentRelFrame();
             const auto prevNextKey = anim_getPrevAndNextKey<ASKey>(relFrame);
             if(prevNextKey.first) {
                 setCurrent(&prevNextKey.first->dSurface());
@@ -189,10 +224,22 @@ public:
         }
     }
 
+    DrawableAutoTiledSurface * getSurface(const int relFrame) {
+        const auto spk = anim_getKeyAtRelFrame<ASKey>(relFrame);
+        if(spk) return &spk->dSurface();
+        const auto prevNextKey = anim_getPrevAndNextKey<ASKey>(relFrame);
+        if(prevNextKey.first) {
+            return &prevNextKey.first->dSurface();
+        } else if(prevNextKey.second) {
+            return &prevNextKey.second->dSurface();
+        } else {
+            return mBaseValue.get();
+        }
+    }
+
     DrawableAutoTiledSurface * getCurrentSurface() {
         return mCurrent_d;
     }
-
 
     void newEmptyFrame() {
         newEmptyFrame(anim_getCurrentRelFrame());

@@ -90,24 +90,23 @@ uint16_t *AutoTilesData::getTileByIndex(const int &colId,
 }
 
 void AutoTilesData::deepCopy(const AutoTilesData &other) {
-    const auto tRect = other.tileBoundingRect();
-    mZeroTileCol = -tRect.x();
-    mZeroTileRow = -tRect.y();
-    mColumnCount = tRect.width();
-    mRowCount = tRect.height();
+    mZeroTileCol = other.mZeroTileCol;
+    mZeroTileRow = other.mZeroTileRow;
+    mColumnCount = other.mColumnCount;
+    mRowCount = other.mRowCount;
 
-    for(int i = 0; i < mColumnCount; i++) {
+    for(auto& column : other.mColumns) {
         mColumns.append(QList<uint16_t*>());
         QList<uint16_t*> &col = mColumns.last();
-        for(int j = 0; j < mRowCount; j++) {
-            const auto tile = allocateTile(TILE_SPIXEL_SIZE);
-            uint16_t * dstP = tile;
-            const uint16_t * srcP = other.getTileByIndex(i, j);
+        for(auto& srcTile : column) {
+            const auto dstTile = allocateTile(TILE_SPIXEL_SIZE);
+            uint16_t * dstP = dstTile;
+            const uint16_t * srcP = srcTile;
             for(int sp = 0; sp < TILE_SPIXEL_SIZE; sp++) {
-                *dstP++ = *srcP++;
+                *(dstP++) = *(srcP++);
             }
 
-            col << tile;
+            col << dstTile;
         }
     }
 }

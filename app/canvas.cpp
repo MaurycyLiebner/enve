@@ -612,8 +612,9 @@ void Canvas::setPaintDrawable(DrawableAutoTiledSurface * const surf) {
 }
 
 void Canvas::setPaintBox(PaintBox * const box) {
+    if(box == mPaintDrawableBox) return;
     if(mPaintDrawableBox) {
-        mPaintDrawableBox->setVisibile(mPaintBoxWasVisible);
+        //mPaintDrawableBox->setVisibile(mPaintBoxWasVisible);
         disconnect(mPaintAnimSurface, nullptr, this, nullptr);
         afterPaintAnimSurfaceChanged();
     }

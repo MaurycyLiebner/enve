@@ -10,7 +10,7 @@ DrawableAutoTiledSurface::DrawableAutoTiledSurface() :
     mImgs(mTileImgs.fImgs) {}
 
 void DrawableAutoTiledSurface::drawOnCanvas(SkCanvas * const canvas,
-                                            const QPoint &dst,
+                                            const SkPoint &dst,
                                             const QRect * const minPixSrc,
                                             SkPaint * const paint) const {
     const QRect maxRect = tileBoundingRect();

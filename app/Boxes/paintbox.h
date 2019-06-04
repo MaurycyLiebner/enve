@@ -9,20 +9,19 @@ class SimpleBrushWrapper;
 
 struct PaintBoxRenderData : public ImageRenderData {
     friend class StdSelfRef;
-    PaintBoxRenderData(AnimatedSurface * const surface,
-                       BoundingBox * const parentBoxT) :
-        ImageRenderData(parentBoxT), fSurface(surface) {}
+    PaintBoxRenderData(BoundingBox * const parentBoxT) :
+        ImageRenderData(parentBoxT) {}
 
     void loadImageFromHandler() {
-        auto bitmap = fSurface->getCurrentSurface()->surface().toBitmap();
+        auto bitmap = fSurface->surface().toBitmap();
         fImage = SkiaHelpers::transferDataToSkImage(bitmap);
     }
 
     void updateRelBoundingRect() final {
-        fRelBoundingRect = fSurface->getCurrentSurface()->pixelBoundingRect();
+        fRelBoundingRect = fSurface->pixelBoundingRect();
     }
 
-    AnimatedSurface * const fSurface;
+    stdsptr<DrawableAutoTiledSurface> fSurface;
 };
 
 class PaintBox : public BoundingBox {

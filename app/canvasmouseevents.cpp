@@ -187,7 +187,8 @@ void Canvas::tabletEvent(const QTabletEvent * const e,
                        e->xTilt(), e->yTilt());
         }
     } else if(e->type() == QEvent::TabletRelease) {
-    } else if(mStylusDrawing) {
+        mStylusDrawing = false;
+    } else if(e->type() == QEvent::TabletMove && mStylusDrawing) {
         paintMove(e->timestamp(), e->pressure(),
                   e->xTilt(), e->yTilt());
         return mCanvasWindow->requestUpdate();

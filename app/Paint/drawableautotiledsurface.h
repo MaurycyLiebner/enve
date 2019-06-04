@@ -66,11 +66,23 @@ public:
     }
 
     void drawOnCanvas(SkCanvas * const canvas,
-                      const QPoint &dst,
-                      const QRect * const minPixSrc = nullptr,
-                      SkPaint * const paint = nullptr) const;
+                      const SkPoint &dst,
+                      const QRect * const minPixSrc,
+                      SkPaint * const paint) const;
+
     void drawOnCanvas(SkCanvas * const canvas,
-                      const QPoint &dst,
+                      const SkPoint &dst,
+                      const QRect * const minPixSrc) const {
+        drawOnCanvas(canvas, dst, minPixSrc, nullptr);
+    }
+
+    void drawOnCanvas(SkCanvas * const canvas,
+                      const SkPoint &dst) const {
+        drawOnCanvas(canvas, dst, nullptr, nullptr);
+    }
+
+    void drawOnCanvas(SkCanvas * const canvas,
+                      const SkPoint &dst,
                       SkPaint * const paint) const {
         drawOnCanvas(canvas, dst, nullptr, paint);
     }
@@ -86,6 +98,14 @@ public:
 
     QRect pixelBoundingRect() const {
         return tileRectToPixRect(tileBoundingRect());
+    }
+
+    int width() const {
+        return pixelBoundingRect().width();
+    }
+
+    int height() const {
+        return pixelBoundingRect().height();
     }
 private:
     void updateTileImages() {
