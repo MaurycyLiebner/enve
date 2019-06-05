@@ -78,23 +78,7 @@ struct AutoTilesData {
         std::swap(mRowCount, other.mRowCount);
     }
 
-    void write(QIODevice * const dst) const {
-        dst->write(rcConstChar(&mZeroTileCol), sizeof(int));
-        dst->write(rcConstChar(&mZeroTileRow), sizeof(int));
-        dst->write(rcConstChar(&mColumnCount), sizeof(int));
-        dst->write(rcConstChar(&mRowCount), sizeof(int));
-        const int nCols = mColumns.count();
-        dst->write(rcConstChar(&nCols), sizeof(int));
-        const int nRows = mColumns.isEmpty() ? 0 : mColumns.first().count();
-        dst->write(rcConstChar(&nRows), sizeof(int));
-        for(const auto& col : mColumns) {
-            for(const auto& row : col) {
-                dst->write(rcConstChar(row),
-                           TILE_SPIXEL_SIZE*sizeof(uint16_t));
-            }
-        }
-    }
-
+    void write(QIODevice * const dst) const;
     void read(QIODevice * const src);
 protected:
     uint16_t* getTileByIndex(const int& colId, const int& rowId) const;

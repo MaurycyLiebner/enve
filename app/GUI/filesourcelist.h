@@ -86,9 +86,13 @@ public:
         update();
     }
 
+    void clear() {
+        clearSelected();
+        mCacheList.clear();
+    }
+
     void clearSelected() {
-        foreach(FileCacheHandlerAbstraction *abs,
-                mSelectedList) {
+        for(const auto& abs : mSelectedList) {
             abs->selected = false;
         }
 
@@ -103,7 +107,7 @@ public:
     }
 protected:
     QList<FileCacheHandlerAbstraction*> mSelectedList;
-    QList<FileCacheHandlerAbstraction*> mCacheList;
+    QList<stdsptr<FileCacheHandlerAbstraction>> mCacheList;
     void paintEvent(QPaintEvent *);
 };
 

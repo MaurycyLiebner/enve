@@ -5,7 +5,7 @@
 #include "drawableautotiledsurface.h"
 #include "Animators/qrealpoint.h"
 class AnimatedSurface;
-class ASKey : public GraphKey {
+class ASKey : public Key {
     friend class StdSelfRef;
 protected:
     ASKey(AnimatedSurface * const parent);
@@ -17,20 +17,14 @@ public:
         return key != this;
     }
 
-    qreal getValueForGraph() const {
-        return mRelFrame;
+    void writeKey(QIODevice *target) {
+        Key::writeKey(target);
+        mValue->write(target);
     }
 
-    void setValueForGraph(const qreal& value) {
-        Q_UNUSED(value);
-    }
-
-    void setRelFrame(const int &frame) {
-        if(frame == mRelFrame) return;
-        const int dFrame = frame - mRelFrame;
-        GraphKey::setRelFrame(frame);
-        setStartFrameVar(mStartPt.getRawXValue() + dFrame);
-        setEndFrameVar(mEndPt.getRawXValue() + dFrame);
+    void readKey(QIODevice *target) {
+        Key::readKey(target);
+        mValue->read(target);
     }
 
     DrawableAutoTiledSurface& dSurface() { return *mValue.get(); }
@@ -38,7 +32,7 @@ private:
     const stdsptr<DrawableAutoTiledSurface> mValue;
 };
 
-class AnimatedSurface : public GraphAnimator {
+class AnimatedSurface : public Animator {
     Q_OBJECT
     friend class SelfRef;
     //typedef InterpolationKeyT<AutoTiledSurface> ASKey;
@@ -144,6 +138,18 @@ public:
         return std::move(newKey);
     }
 
+    void readProperty(QIODevice *target) {
+        Animator::readProperty(target);
+        readKeys(target);
+        mBaseValue->read(target);
+    }
+
+    void writeProperty(QIODevice * const target) const {
+        Animator::writeProperty(target);
+        writeKeys(target);
+        mBaseValue->write(target);
+    }
+
     void anim_saveCurrentValueAsKey() {
         anim_addKeyAtRelFrame(anim_getCurrentRelFrame());
     }
@@ -177,19 +183,6 @@ public:
             } else {
                 setCurrent(mBaseValue.get());
             }
-        }
-    }
-
-    void graph_getValueConstraints(
-            GraphKey *key, const QrealPointType &type,
-            qreal &minValue, qreal &maxValue) const {
-        if(type == QrealPointType::KEY_POINT) {
-            minValue = key->getRelFrame();
-            maxValue = minValue;
-            //getFrameConstraints(key, type, minValue, maxValue);
-        } else {
-            minValue = -DBL_MAX;
-            maxValue = DBL_MAX;
         }
     }
 

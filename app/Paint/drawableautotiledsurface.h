@@ -107,6 +107,15 @@ public:
     int height() const {
         return pixelBoundingRect().height();
     }
+
+    void write(QIODevice *target) {
+        mSurface.write(target);
+    }
+
+    void read(QIODevice *target) {
+        mSurface.read(target);
+        updateTileImages();
+    }
 private:
     void updateTileImages() {
         updateTileRectImgs(mSurface.tileBoundingRect());

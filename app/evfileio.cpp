@@ -880,14 +880,6 @@ void VideoBox::readBoundingBox(QIODevice * const target) {
     }
 }
 
-void PaintBox::writeBoundingBox(QIODevice * const target) {
-    BoundingBox::writeBoundingBox(target);
-}
-
-void PaintBox::readBoundingBox(QIODevice * const target) {
-    BoundingBox::readBoundingBox(target);
-}
-
 void AnimationBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
     target->write(rcConstChar(&mFrameRemappingEnabled), sizeof(bool));

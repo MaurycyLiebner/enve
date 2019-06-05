@@ -165,7 +165,7 @@ void FileSourceListVisibleWidget::updateVisibleWidgetsContent() {
         i < mCacheList.count() &&
         idP < mSingleWidgets.count(); i++) {
         const auto fsw = static_cast<FileSourceWidget*>(mSingleWidgets.at(idP));
-        fsw->setTargetCache(mCacheList.at(i));
+        fsw->setTargetCache(mCacheList.at(i).get());
         fsw->show();
         idP++;
     }
@@ -177,7 +177,7 @@ QWidget *FileSourceListVisibleWidget::createNewSingleWidget() {
 
 void FileSourceListVisibleWidget::addCacheHandlerToList(
         FileCacheHandler *handler) {
-    mCacheList << new FileCacheHandlerAbstraction(handler, this);
+    mCacheList << std::make_shared<FileCacheHandlerAbstraction>(handler, this);
     scheduleContentUpdate();
 }
 
@@ -186,7 +186,7 @@ void FileSourceListVisibleWidget::removeCacheHandlerFromList(
     for(int i = 0; i < mCacheList.count(); i++) {
         const auto& abs = mCacheList.at(i);
         if(abs->target == handler) {
-            if(abs->selected) removeFromSelectedList(abs);
+            if(abs->selected) removeFromSelectedList(abs.get());
             mCacheList.removeAt(i);
             scheduleContentUpdate();
             return;

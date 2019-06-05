@@ -41,3 +41,13 @@ void PaintBox::addActionsToMenu(BoxTypeMenu * const menu) {
 
     BoundingBox::addActionsToMenu(menu);
 }
+
+void PaintBox::writeBoundingBox(QIODevice * const target) {
+    BoundingBox::writeBoundingBox(target);
+    mSurface->writeProperty(target);
+}
+
+void PaintBox::readBoundingBox(QIODevice * const target) {
+    BoundingBox::readBoundingBox(target);
+    mSurface->readProperty(target);
+}

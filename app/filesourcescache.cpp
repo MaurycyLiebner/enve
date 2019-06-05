@@ -44,6 +44,9 @@ void FileSourcesCache::removeHandlerFromListWidgets(FileCacheHandler *handlerPtr
 }
 
 void FileSourcesCache::clearAll() {
+    for(const auto &wid : mFileSourceListVisibleWidgets) {
+        wid->clear();
+    }
     for(const auto &handler : mFileCacheHandlers) {
         handler->clearCache();
     }

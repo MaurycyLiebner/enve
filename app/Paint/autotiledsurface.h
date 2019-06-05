@@ -96,6 +96,14 @@ struct AutoTiledSurface {
     }
 
     bool isEmpty() const { return mAutoTilesData.isEmpty(); }
+
+    void write(QIODevice *target) {
+        mAutoTilesData.write(target);
+    }
+
+    void read(QIODevice *target) {
+        mAutoTilesData.read(target);
+    }
 protected:
     MyPaintTiledSurface fParent;
     MyPaintSurface* fMyPaintSurface = nullptr;
