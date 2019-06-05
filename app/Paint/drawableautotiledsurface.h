@@ -39,7 +39,7 @@ struct TileImgs {
 
 class DrawableAutoTiledSurface : public HDDCachablePersistent {
     friend class StdSelfRef;
-    typedef  QList<QList<sk_sp<SkImage>>> Tiles;
+    typedef QList<QList<sk_sp<SkImage>>> Tiles;
 protected:
     DrawableAutoTiledSurface();
     DrawableAutoTiledSurface(const DrawableAutoTiledSurface& other) = delete;
@@ -55,6 +55,7 @@ protected:
     }
 
     int clearMemory() {
+        return 0;
         const int bytes = getByteCount();
         clearImgs();
         return bytes;
