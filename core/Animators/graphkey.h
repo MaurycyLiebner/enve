@@ -299,8 +299,8 @@ public:
     void setCtrlsMode(const CtrlsMode &mode);
     const CtrlsMode& getCtrlsMode() const;
 
-    void constrainStartCtrlMinFrame(const qreal &minFrame);
-    void constrainEndCtrlMaxFrame(const qreal &maxFrame);
+    void constrainStartCtrlMinFrame(const qreal &minRelFrame);
+    void constrainEndCtrlMaxFrame(const qreal &maxRelFrame);
     virtual void changeFrameAndValueBy(const QPointF &frameValueChange);
 
     qreal getPrevKeyValueForGraph() const {
@@ -322,6 +322,9 @@ public:
 
     qreal getStartFrame() const;
     qreal getEndFrame() const;
+
+    qreal getStartAbsFrame() const;
+    qreal getEndAbsFrame() const;
 
     void setStartEnabledForGraph(const bool &bT);
     void setEndEnabledForGraph(const bool &bT);

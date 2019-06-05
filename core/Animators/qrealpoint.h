@@ -16,13 +16,15 @@ class QrealPoint : public StdSelfRef {
 public:
     ~QrealPoint() {}
 
-    qreal getFrame();
+    qreal getRelFrame();
+    qreal getAbsFrame();
 
-    void setFrame(const qreal &frame);
+    void setRelFrame(const qreal &frame);
+    void setAbsFrame(const qreal absFrame);
 
-    virtual qreal getValue();
+    qreal getValue();
 
-    virtual void setValue(const qreal &value);
+    void setValue(const qreal &value);
 
     bool isSelected();
 
@@ -33,7 +35,7 @@ public:
 
     void moveTo(const qreal &frameT, const qreal &valueT);
 
-    void draw(QPainter *p, const QColor &paintColor);
+    void draw(QPainter * const p, const QColor &paintColor);
 
     void setSelected(const bool &bT);
 
@@ -52,7 +54,7 @@ public:
 private:
     QrealPoint(const QrealPointType &type,
                GraphKey * const parentKey,
-               const qreal &radius = 10.);
+               const qreal &radius = 10);
     bool mIsSelected = false;
     QrealPointType mType;
     GraphKey *mParentKey;

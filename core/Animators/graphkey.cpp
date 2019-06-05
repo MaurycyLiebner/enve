@@ -63,7 +63,7 @@ void GraphKey::updateCtrlFromCtrl(const QrealPointType &type) {
         newFrameValue = symmetricToPos(fromPt, graphPt);
     }
     targetPt->setValue(newFrameValue.y());
-    targetPt->setFrame(newFrameValue.x());
+    targetPt->setRelFrame(newFrameValue.x());
 
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
@@ -91,8 +91,7 @@ const CtrlsMode &GraphKey::getCtrlsMode() const {
     return mCtrlsMode;
 }
 
-void GraphKey::drawGraphKey(QPainter *p,
-                       const QColor &paintColor) const {
+void GraphKey::drawGraphKey(QPainter *p, const QColor &paintColor) const {
     if(isSelected()) {
         p->save();
         QPen pen(Qt::black, 1.5);
@@ -101,16 +100,16 @@ void GraphKey::drawGraphKey(QPainter *p,
         QPen pen2(Qt::white, .75);
         pen2.setCosmetic(true);
 
-        const QPointF thisPos(mRelFrame, getValueForGraph());
+        const QPointF thisPos(getAbsFrame(), getValueForGraph());
         if(getStartEnabledForGraph()) {
-            const QPointF startPos(getStartFrame(), getStartValue());
+            const QPointF startPos(getStartAbsFrame(), getStartValue());
             p->setPen(pen);
             p->drawLine(thisPos, startPos);
             p->setPen(pen2);
             p->drawLine(thisPos, startPos);
         }
         if(getEndEnabledForGraph()) {
-            const QPointF endPos(getEndFrame(), getEndValue());
+            const QPointF endPos(getEndAbsFrame(), getEndValue());
             p->setPen(pen);
             p->drawLine(thisPos, endPos);
             p->setPen(pen2);
@@ -150,8 +149,8 @@ void GraphKey::constrainStartCtrlValue(const qreal &minVal,
 }
 
 
-void GraphKey::constrainEndCtrlMaxFrame(const qreal &maxFrame) {
-    mEndPt.setXRange(mRelFrame, maxFrame);
+void GraphKey::constrainEndCtrlMaxFrame(const qreal &maxRelFrame) {
+    mEndPt.setXRange(mRelFrame, maxRelFrame);
 //    const qreal endFrame = getEndFrame();
 //    if(endFrame < maxFrame || !getEndEnabledForGraph()) return;
 //    const qreal endValue = getEndValue();
@@ -162,8 +161,8 @@ void GraphKey::constrainEndCtrlMaxFrame(const qreal &maxFrame) {
     //mEndPoint->moveTo(newFrame, change*(endValue - value) + value);
 }
 
-void GraphKey::constrainStartCtrlMinFrame(const qreal &minFrame) {
-    mStartPt.setXRange(minFrame, mRelFrame);
+void GraphKey::constrainStartCtrlMinFrame(const qreal &minRelFrame) {
+    mStartPt.setXRange(minRelFrame, mRelFrame);
 //    const qreal startFrame = getStartFrame();
 //    if(startFrame > minFrame || !getStartEnabledForGraph()) return;
 //    const qreal startValue = getStartValue();
@@ -232,6 +231,14 @@ qreal GraphKey::getEndFrame() const {
         return mEndPt.getClampedValue(relTo).x();
     }
     return mRelFrame;
+}
+
+qreal GraphKey::getStartAbsFrame() const {
+    return relFrameToAbsFrameF(getStartFrame());
+}
+
+qreal GraphKey::getEndAbsFrame() const {
+    return relFrameToAbsFrameF(getEndFrame());
 }
 
 bool GraphKey::getEndEnabledForGraph() const {

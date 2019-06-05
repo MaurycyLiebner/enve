@@ -353,7 +353,7 @@ Key *Animator::anim_getKeyAtPos(const qreal &relX,
     for(int i = maxPossibleKey; i >= minPossibleKey; i--) {
         const qreal distToFrame = qAbs((i + 0.5)*pixelsPerFrame - absX);
         if(2*distToFrame > keySize) continue;
-        keyAtPos = anim_getKeyAtRelFrame(i);
+        keyAtPos = anim_getKeyAtAbsFrame(i);
         if(keyAtPos) return keyAtPos;
     }
     return nullptr;

@@ -103,6 +103,11 @@ public:
         if(!nextKey) return mRelFrame;
         return getNextKey()->getRelFrame();
     }
+
+    int relFrameToAbsFrame(const int relFrame) const;
+    int absFrameToRelFrame(const int absFrame) const;
+    qreal relFrameToAbsFrameF(const qreal relFrame) const;
+    qreal absFrameToRelFrameF(const qreal absFrame) const;
 protected:
     virtual void setRelFrame(const int &frame);
     bool mIsSelected = false;

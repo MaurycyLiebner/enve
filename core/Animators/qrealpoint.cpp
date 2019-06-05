@@ -9,18 +9,22 @@ QrealPoint::QrealPoint(const QrealPointType& type,
     mParentKey = parentKey;
 }
 
-qreal QrealPoint::getFrame() {
-    if(mType == KEY_POINT) return mParentKey->getAbsFrame();
+qreal QrealPoint::getRelFrame() {
+    if(mType == KEY_POINT) return mParentKey->getRelFrame();
     if(mType == START_POINT) return mParentKey->getStartFrame();
     /*if(mType == END_POINT)*/ return mParentKey->getEndFrame();
 }
 
-void QrealPoint::setFrame(const qreal &frame) {
+void QrealPoint::setRelFrame(const qreal &frame) {
     if(mType == KEY_POINT) {
         return mParentKey->setRelFrameAndUpdateParentAnimator(qRound(frame));
     }
     if(mType == START_POINT) return mParentKey->setStartFrame(frame);
     if(mType == END_POINT) return mParentKey->setEndFrame(frame);
+}
+
+void QrealPoint::setAbsFrame(const qreal absFrame) {
+    setRelFrame(mParentKey->absFrameToRelFrameF(absFrame));
 }
 
 void QrealPoint::startFrameTransform() {
@@ -52,22 +56,26 @@ bool QrealPoint::isNear(const qreal &frameT,
                         const qreal &valueT,
                         const qreal &pixelsPerFrame,
                         const qreal &pixelsPerValue) {
-    qreal value = getValue();
-    qreal frame = getFrame();
+    const qreal value = getValue();
+    const qreal frame = getAbsFrame();
     if(qAbs(frameT - frame)*pixelsPerFrame > mRadius) return false;
     if(qAbs(valueT - value)*pixelsPerValue > mRadius) return false;
     return true;
 }
 
 void QrealPoint::moveTo(const qreal &frameT, const qreal &valueT) {
-    setFrame(frameT);
+    setAbsFrame(frameT);
     setValue(valueT);
     if(isKeyPoint()) return;
     mParentKey->updateCtrlFromCtrl(mType);
 }
 
-void QrealPoint::draw(QPainter *p, const QColor &paintColor) {
-    const QPointF center(getFrame(), getValue());
+qreal QrealPoint::getAbsFrame() {
+    return mParentKey->relFrameToAbsFrameF(getRelFrame());
+}
+
+void QrealPoint::draw(QPainter * const p, const QColor &paintColor) {
+    const QPointF center(getAbsFrame(), getValue());
 
     p->setBrush(Qt::black);
     gDrawCosmeticEllipse(p, center, mRadius, mRadius);

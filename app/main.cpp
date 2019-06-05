@@ -1,5 +1,5 @@
 #include "GUI/mainwindow.h"
-#include "application.h"
+#include <QApplication>
 #include <QSurfaceFormat>
 #include <QProcess>
 #include "Animators/SmartPath/smartpathcontainer.h"

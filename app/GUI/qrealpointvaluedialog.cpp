@@ -30,7 +30,7 @@ QrealPointValueDialog::QrealPointValueDialog(QrealPoint *point,
 
     mPoint = point;
     mSavedValue = mPoint->getValue();
-    mSavedFrame = mPoint->getFrame();
+    mSavedFrame = mPoint->getRelFrame();
     resetValue();
 
     connect(mOkButton, &QPushButton::pressed,
@@ -49,7 +49,7 @@ void QrealPointValueDialog::setValue(double value) {
 }
 
 void QrealPointValueDialog::setFrame(double frame) {
-    mPoint->setFrame(frame);
+    mPoint->setRelFrame(frame);
     emit repaintSignal();
 }
 

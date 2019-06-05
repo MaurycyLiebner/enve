@@ -210,8 +210,8 @@ void GraphAnimator::graph_constrainCtrlsFrameValues() {
     for(int i = 0; i <= iMax; i++) {
         const auto iKey = GetAsGK(anim_mKeys.atId(i));
         if(prevKey) {
-            prevKey->constrainEndCtrlMaxFrame(iKey->getAbsFrame());
-            iKey->constrainStartCtrlMinFrame(prevKey->getAbsFrame());
+            prevKey->constrainEndCtrlMaxFrame(iKey->getRelFrame());
+            iKey->constrainStartCtrlMinFrame(prevKey->getRelFrame());
         } else {
             iKey->constrainStartCtrlMinFrame(-DBL_MAX);
         }

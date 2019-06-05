@@ -85,8 +85,28 @@ void Key::finishFrameTransform() {
 //                                           mRelFrame, this));
 }
 
+int Key::relFrameToAbsFrame(const int relFrame) const {
+    if(!mParentAnimator) return relFrame;
+    return mParentAnimator->prp_relFrameToAbsFrame(relFrame);
+}
+
+int Key::absFrameToRelFrame(const int absFrame) const {
+    if(!mParentAnimator) return absFrame;
+    return mParentAnimator->prp_absFrameToRelFrame(absFrame);
+}
+
+qreal Key::relFrameToAbsFrameF(const qreal relFrame) const {
+    if(!mParentAnimator) return relFrame;
+    return mParentAnimator->prp_relFrameToAbsFrameF(relFrame);
+}
+
+qreal Key::absFrameToRelFrameF(const qreal absFrame) const {
+    if(!mParentAnimator) return absFrame;
+    return mParentAnimator->prp_absFrameToRelFrameF(absFrame);
+}
+
 int Key::getAbsFrame() const {
-    return mParentAnimator->prp_relFrameToAbsFrame(mRelFrame);
+    return relFrameToAbsFrame(mRelFrame);
 }
 
 int Key::getRelFrame() const {
@@ -98,7 +118,7 @@ void Key::setRelFrame(const int &frame) {
 }
 
 void Key::setAbsFrame(const int &frame) {
-    setRelFrame(mParentAnimator->prp_absFrameToRelFrame(frame));
+    setRelFrame(absFrameToRelFrame(frame));
 }
 
 Key *Key::getNextKey() const {
