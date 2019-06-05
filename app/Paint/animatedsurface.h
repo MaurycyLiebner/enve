@@ -74,21 +74,14 @@ public:
             void draw(SkCanvas * const canvas) {
                 for(const auto& skin : fSkins) {
                     SkPaint paint;
-                    const SkScalar wAlpha = -0.25f;
-                    const SkScalar opacityM[20] = {
-                        1, 0, 0, 0, 0,
-                        0, 1, 0, 0, 0,
-                        0, 0, 1, 0, 0,
-                        wAlpha, wAlpha, wAlpha, skin.fWeight + wAlpha, 0};
-                    const auto opacityF = SkColorFilters::Matrix(opacityM);
+                    const SkScalar rgbMax = qMax(fColor.fR, qMax(fColor.fG, fColor.fB));
                     const SkScalar colM[20] = {
-                        0, 0, 0, fColor.fR, 0,
-                        0, 0, 0, fColor.fG, 0,
-                        0, 0, 0, fColor.fB, 0,
-                        0, 0, 0, fColor.fA, 0};
+                        1 - rgbMax, 0, 0, fColor.fR, 0,
+                        0, 1 - rgbMax, 0, fColor.fG, 0,
+                        0, 0, 1 - rgbMax, fColor.fB, 0,
+                        0, 0, 0, fColor.fA*skin.fWeight, 0};
                     const auto colF = SkColorFilters::Matrix(colM);
-                    const auto totF = SkColorFilters::Compose(colF, opacityF);
-                    paint.setColorFilter(totF);
+                    paint.setColorFilter(colF);
 
                     skin.fSurface->drawOnCanvas(canvas, {0, 0}, &paint);
                 }
@@ -99,22 +92,17 @@ public:
             }
         };
 
-        SkinsSide fPrev{{0, 0, 1, 1}, QList<Skin>()};
-        SkinsSide fNext{{1, 0, 0, 1}, QList<Skin>()};
-        SkScalar fX;
-        SkScalar fY;
-        SkBitmap fBtmp;
+        SkinsSide fPrev{{0.5f, 0, 0, 0.5f}, QList<Skin>()};
+        SkinsSide fNext{{0, 0.25f, 0.5f, 0.5f}, QList<Skin>()};
 
         void draw(SkCanvas * const canvas) {
-            SkPaint paint;
-            paint.setAlphaf(0.5f);
-            canvas->drawBitmap(fBtmp, fX, fY, &paint);
+            fPrev.draw(canvas);
+            fNext.draw(canvas);
         }
 
         void clear() {
             fPrev.clear();
             fNext.clear();
-            fBtmp.reset();
         }
     };
 
@@ -124,6 +112,7 @@ public:
 
     void setupOnionSkinFor(const int relFrame, const int sideRange,
                            OnionSkin &skins) {
+        skins.clear();
         ASKey * currKey = anim_getKeyAtRelFrame<ASKey>(relFrame);
         if(!currKey) currKey = anim_getPrevKey<ASKey>(relFrame);
         if(!currKey) currKey = anim_getNextKey<ASKey>(relFrame);
@@ -147,26 +136,6 @@ public:
             skins.fNext.fSkins.append({surf, toSkScalar(weight)});
             nextKey = anim_getNextKey<ASKey>(nextKey);
         }
-
-        skins.fBtmp.reset();
-
-        SkRect totalRect = skins.fPrev.boundingRect();
-        totalRect.join(skins.fNext.boundingRect());
-        skins.fX = totalRect.x();
-        skins.fY = totalRect.y();
-        if(!totalRect.isEmpty()) {
-            skins.fBtmp.allocPixels(SkiaHelpers::getPremulBGRAInfo(
-                                  qCeil(totalRect.width()),
-                                  qCeil(totalRect.height())));
-            SkCanvas canvas(skins.fBtmp);
-            canvas.translate(-totalRect.x(), -totalRect.y());
-            skins.fPrev.draw(&canvas);
-            skins.fNext.draw(&canvas);
-            canvas.flush();
-        }
-
-        skins.fPrev.clear();
-        skins.fNext.clear();
     }
 
     stdsptr<Key> readKey(QIODevice *target) {
