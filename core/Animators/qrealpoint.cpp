@@ -78,7 +78,10 @@ void QrealPoint::draw(QPainter * const p, const QColor &paintColor) {
     const QPointF center(getAbsFrame(), getValue());
 
     p->setBrush(Qt::black);
-    gDrawCosmeticEllipse(p, center, mRadius, mRadius);
+    if(mHovered)
+        gDrawCosmeticEllipse(p, center, mRadius + 1, mRadius + 1);
+    else
+        gDrawCosmeticEllipse(p, center, mRadius, mRadius);
 
     p->setBrush(paintColor);
     if(!isSelected()) {

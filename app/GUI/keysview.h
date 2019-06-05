@@ -57,10 +57,10 @@ public:
     void graphIncMinShownVal(const qreal &inc);
     void graphSetMinShownVal(const qreal &newMinShownVal);
     void graphGetValueAndFrameFromPos(const QPointF &pos,
-                                      qreal *value, qreal *frame);
+                                      qreal &value, qreal &frame) const;
     void graphMiddleMove(const QPointF &movePos);
-    void graphMiddlePress(const QPointF &pressPos);
-    void graphMouseRelease();
+    void gMiddlePress(const QPointF &pressPos);
+    void gMouseRelease();
     void graphMousePress(const QPointF &pressPos);
     void graphMiddleRelease();
     void graphSetCtrlsModeForSelected(const CtrlsMode &mode);
@@ -129,6 +129,7 @@ public:
     void clearHovered();
 
     int graphGetAnimatorId(GraphAnimator * const anim);
+    QrealPoint *graphGetPointAtPos(const QPointF &pressPos) const;
 private:
     void scrollRight();
     void scrollLeft();
@@ -136,16 +137,16 @@ private:
     void graphGetAnimatorsMinMaxValue(qreal &minVal, qreal &maxVal);
     void graphMakeSegmentsSmoothAction(const bool &smooth);
     void sortSelectedKeys();
-    void clearHoveredPoint();
+    void clearHoveredKey();
 
     stdsptr<KeysClipboardContainer> getSelectedKeysClipboardContainer();
 
     QTimer *mScrollTimer;
 
-    void updateHoveredPointFromPos(const QPoint &posU);
+    void updateHovered(const QPoint &posU);
 
     QPointer<DurationRectangleMovable> mHoveredMovable;
-    Key *mHoveredKey = nullptr;
+    stdptr<Key> mHoveredKey;
 
     void grabMouseAndTrack() {
         mIsMouseGrabbing = true;
@@ -192,16 +193,16 @@ private:
 
     // graph
 
-    qreal mPixelsPerValUnit = 0.;
-    qreal mMinShownVal = 0.;
-    stdptr<QrealPoint> mPressedPoint;
-    qreal mMinMoveVal = 0.;
-    qreal mMaxMoveVal = 0.;
-    qreal mMinMoveFrame = 0.;
-    qreal mMaxMoveFrame = 0.;
-    QPointF mPressFrameAndValue = QPointF(0., 0.);
-    qreal mSavedMinShownValue = 0.;
-    qreal mValueInc = 0.;
+    qreal mPixelsPerValUnit = 0;
+    qreal mMinShownVal = 0;
+    stdptr<QrealPoint> mGHoveredPoint;
+    stdptr<QrealPoint> mGPressedPoint;
+    qreal mMinMoveVal = 0;
+    qreal mMaxMoveVal = 0;
+    qreal mMinMoveFrame = 0;
+    qreal mMaxMoveFrame = 0;
+    qreal mSavedMinShownValue = 0;
+    qreal mValueInc = 0;
     int mValuePrec = 2;
 };
 

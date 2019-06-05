@@ -37,7 +37,7 @@ public:
 
     void graph_updateKeysPath(const FrameRange& relFrameRange);
 
-    void graph_addKeysInRectToList(const QRectF &frameValueRect,
+    void gAddKeysInRectToList(const QRectF &frameValueRect,
                                    QList<GraphKey*> &keys);
 
     void graph_drawKeysPath(QPainter * const p,

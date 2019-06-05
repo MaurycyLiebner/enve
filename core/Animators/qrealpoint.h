@@ -51,11 +51,16 @@ public:
     const QrealPointType& getType() const {
         return mType;
     }
+
+    void setHovered(const bool hovered) {
+        mHovered = hovered;
+    }
 private:
     QrealPoint(const QrealPointType &type,
                GraphKey * const parentKey,
                const qreal &radius = 10);
     bool mIsSelected = false;
+    bool mHovered = false;
     QrealPointType mType;
     GraphKey *mParentKey;
     qreal mRadius;

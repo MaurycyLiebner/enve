@@ -290,7 +290,7 @@ qValueRange GraphAnimator::graph_getMinAndMaxValuesBetweenFrames(
 }
 
 
-void GraphAnimator::graph_addKeysInRectToList(const QRectF &frameValueRect,
+void GraphAnimator::gAddKeysInRectToList(const QRectF &frameValueRect,
                                    QList<GraphKey *> &keys) {
     for(const auto &key : anim_mKeys) {
         if(GetAsGK(key)->isInsideRect(frameValueRect)) {

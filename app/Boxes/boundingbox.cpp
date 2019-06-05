@@ -1024,7 +1024,7 @@ void BoundingBox::drawTimelineControls(QPainter * const p,
     if(mDurationRectangle) {
         p->save();
         p->translate(prp_getParentFrameShift()*pixelsPerFrame, 0);
-        const int width = qFloor(absFrameRange.span()*pixelsPerFrame);
+        const int width = qCeil(absFrameRange.span()*pixelsPerFrame);
         const QRect drawRect(0, 0, width, rowHeight);
         const auto parentCanvas = getParentCanvas();
         const qreal fps = parentCanvas ? parentCanvas->getFps() : 1;

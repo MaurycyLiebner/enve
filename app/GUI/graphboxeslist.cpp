@@ -146,7 +146,7 @@ void KeysView::graphPaint(QPainter *p) {
     const int maxVisibleFrame = qCeil(mMaxViewedFrame +
                                       3*MIN_WIDGET_HEIGHT/(2*mPixelsPerFrame));
     const FrameRange viewedRange = { minVisibleFrame, maxVisibleFrame};
-    for(int i = 0; i < mGraphAnimators.count(); i++) {
+    for(int i = mGraphAnimators.count() - 1; i >= 0; i--) {
         const QColor &col = ANIMATOR_COLORS.at(i % ANIMATOR_COLORS.length());
         p->save();
         mGraphAnimators.at(i)->graph_drawKeysPath(p, col, viewedRange);
@@ -177,8 +177,8 @@ void KeysView::graphPaint(QPainter *p) {
 
 void KeysView::graphGetAnimatorsMinMaxValue(qreal &minVal, qreal &maxVal) {
     if(mGraphAnimators.isEmpty()) {
-        minVal = 0.;
-        maxVal = 0.;
+        minVal = 0;
+        maxVal = 0;
     } else {
         minVal = 1000000;
         maxVal = -1000000;
@@ -198,9 +198,8 @@ void KeysView::graphGetAnimatorsMinMaxValue(qreal &minVal, qreal &maxVal) {
     minVal -= valRange*0.05;
 }
 
-const QList<qreal> validIncs = {7.5, 5., 2.5, 1.};
 void KeysView::graphUpdateDimensions() {
-
+    const QList<qreal> validIncs = {7.5, 5, 2.5, 1};
     qreal incMulti = 10000.;
     int currIncId = 0;
     int nDiv = 0;
@@ -235,34 +234,38 @@ void KeysView::graphSetMinShownVal(const qreal &newMinShownVal) {
 }
 
 void KeysView::graphGetValueAndFrameFromPos(const QPointF &pos,
-                                            qreal *value, qreal *frame) {
-    *value = (height() - pos.y())/mPixelsPerValUnit + mMinShownVal;
-    *frame = mMinViewedFrame + pos.x()/mPixelsPerFrame - 0.5;
+                                            qreal &value, qreal &frame) const {
+    value = (height() - pos.y())/mPixelsPerValUnit + mMinShownVal;
+    frame = mMinViewedFrame + pos.x()/mPixelsPerFrame - 0.5;
+}
+
+QrealPoint * KeysView::graphGetPointAtPos(const QPointF &pressPos) const {
+    qreal value;
+    qreal frame;
+    graphGetValueAndFrameFromPos(pressPos, value, frame);
+
+    QrealPoint* point = nullptr;
+    for(const auto& anim : mGraphAnimators) {
+        point = anim->graph_getPointAt(value, frame,
+                                       mPixelsPerFrame,
+                                       mPixelsPerValUnit);
+        if(point) break;
+    }
+    return point;
 }
 
 void KeysView::graphMousePress(const QPointF &pressPos) {
     mFirstMove = true;
-    qreal value;
-    qreal frame;
-    graphGetValueAndFrameFromPos(pressPos, &value, &frame);
-
-    QrealPoint* pressedPoint = nullptr;
-    for(const auto& anim : mGraphAnimators) {
-        pressedPoint = anim->graph_getPointAt(value, frame,
-                                             mPixelsPerFrame,
-                                             mPixelsPerValUnit);
-        if(pressedPoint) break;
-    }
+    QrealPoint * const pressedPoint = graphGetPointAtPos(pressPos);
     Key *parentKey = pressedPoint ? pressedPoint->getParentKey() : nullptr;
     if(!pressedPoint) {
         mSelecting = true;
         qreal value;
         qreal frame;
-        graphGetValueAndFrameFromPos(pressPos, &value, &frame);
-        mSelectionRect.setBottomRight(QPointF(frame, value));
-        mSelectionRect.setTopLeft(QPointF(frame, value));
+        graphGetValueAndFrameFromPos(pressPos, value, frame);
+        mSelectionRect.setBottomRight({frame, value});
+        mSelectionRect.setTopLeft({frame, value});
     } else if(pressedPoint->isKeyPoint()) {
-        mPressFrameAndValue = QPointF(frame, value);
         if(mMainWindow->isShiftPressed()) {
             if(parentKey->isSelected()) {
                 removeKeyFromSelection(parentKey);
@@ -287,31 +290,28 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
                     mMinMoveVal, mMaxMoveVal);
         pressedPoint->setSelected(true);
     }
-    mPressedPoint = pressedPoint;
+    mGPressedPoint = pressedPoint;
     mMovingKeys = pressedPoint;
 }
 
-void KeysView::graphMouseRelease() {
+void KeysView::gMouseRelease() {
     if(mSelecting) {
-        if(!mMainWindow->isShiftPressed()) {
+        if(!mMainWindow->isShiftPressed())
             clearKeySelection();
-        }
 
         QList<GraphKey*> keysList;
-        for(const auto& anim : mGraphAnimators) {
-            anim->graph_addKeysInRectToList(mSelectionRect, keysList);
-        }
-        for(const auto& key : keysList) {
+        for(const auto& anim : mGraphAnimators)
+            anim->gAddKeysInRectToList(mSelectionRect, keysList);
+        for(const auto& key : keysList)
             addKeyToSelection(key);
-        }
 
         mSelecting = false;
-    } else if(mPressedPoint) {
+    } else if(mGPressedPoint) {
 
     }
 }
 
-void KeysView::graphMiddlePress(const QPointF &pressPos) {
+void KeysView::gMiddlePress(const QPointF &pressPos) {
     mSavedMinViewedFrame = mMinViewedFrame;
     mSavedMaxViewedFrame = mMaxViewedFrame;
     mSavedMinShownValue = mMinShownVal;
@@ -363,18 +363,18 @@ void KeysView::graphClearAnimatorSelection() {
 }
 
 void KeysView::graphDeletePressed() {
-    if(mPressedPoint && mPressedCtrlPoint) {
-        const auto parentKey = mPressedPoint->getParentKey();
-        if(mPressedPoint->isEndPoint()) {
+    if(mGPressedPoint && mPressedCtrlPoint) {
+        const auto parentKey = mGPressedPoint->getParentKey();
+        if(mGPressedPoint->isEndPoint()) {
             parentKey->setEndEnabledForGraph(false);
-        } else if(mPressedPoint->isStartPoint()) {
+        } else if(mGPressedPoint->isStartPoint()) {
             parentKey->setStartEnabledForGraph(false);
         }
         parentKey->afterKeyChanged();
     } else {
         deleteSelectedKeys();
     }
-    mPressedPoint = nullptr;
+    mGPressedPoint = nullptr;
 }
 
 void KeysView::graphWheelEvent(QWheelEvent *event) {
@@ -382,8 +382,7 @@ void KeysView::graphWheelEvent(QWheelEvent *event) {
         qreal valUnderMouse;
         qreal frame;
         graphGetValueAndFrameFromPos(event->posF(),
-                                     &valUnderMouse,
-                                     &frame);
+                                     valUnderMouse, frame);
         qreal graphScaleInc;
         if(event->delta() > 0) {
             graphScaleInc = 0.1;

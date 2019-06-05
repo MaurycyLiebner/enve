@@ -81,7 +81,7 @@ void MovablePoint::drawOnAbsPosSk(
         canvas->drawCircle(absPos, halfRadius, paint);
 
         paint.setStyle(SkPaint::kStroke_Style);
-        paint.setStrokeWidth(0.5f);
+        paint.setStrokeWidth(0.5f*invScale);
         paint.setColor(SK_ColorBLACK);
         canvas->drawCircle(absPos, halfRadius, paint);
     }

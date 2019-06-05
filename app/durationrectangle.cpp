@@ -154,13 +154,15 @@ void DurationRectangle::draw(QPainter * const p,
                              const qreal& fps,
                              const qreal &pixelsPerFrame,
                              const FrameRange &absFrameRange) {
-    p->save();
-
-    const int firstRelDrawFrame = qMax(absFrameRange.fMin, getMinFrame()) -
+    const int firstRelDrawFrame = qMax(absFrameRange.fMin,
+                                       getMinFrameAsAbsFrame()) -
             absFrameRange.fMin;
-    const int lastRelDrawFrame = qMin(absFrameRange.fMax, getMaxFrame()) -
+    const int lastRelDrawFrame = qMin(absFrameRange.fMax,
+                                      getMaxFrameAsAbsFrame()) -
             absFrameRange.fMin;
     const int drawFrameSpan = lastRelDrawFrame - firstRelDrawFrame + 1;
+
+    if(drawFrameSpan < 1) return;
 
     const QRect durRect(qFloor(firstRelDrawFrame*pixelsPerFrame),
                         drawRect.y(),
@@ -212,7 +214,6 @@ void DurationRectangle::draw(QPainter * const p,
 //    p->setPen(Qt::black);
 //    p->setBrush(Qt::NoBrush);
     //p->drawRect(drawRect);
-    p->restore();
 }
 
 DurationRectangleMovable *DurationRectangle::getMovableAt(
@@ -353,20 +354,21 @@ void AnimationRect::draw(QPainter * const p,
                          const qreal &fps,
                          const qreal &pixelsPerFrame,
                          const FrameRange &absFrameRange) {
-    p->save();
-
     const int firstRelDrawFrame =
             qMax(absFrameRange.fMin, getMinAnimationFrame()) - absFrameRange.fMin;
     const int lastRelDrawFrame =
             qMin(absFrameRange.fMax, getMaxAnimationFrame()) - absFrameRange.fMin;
     const int drawFrameSpan = lastRelDrawFrame - firstRelDrawFrame + 1;
+    if(drawFrameSpan < 1)
+        return DurationRectangle::draw(p, drawRect, fps,
+                                       pixelsPerFrame, absFrameRange);
+
     QRect animDurRect(qFloor(firstRelDrawFrame*pixelsPerFrame), drawRect.y(),
                       qCeil(drawFrameSpan*pixelsPerFrame), drawRect.height());
 
     p->fillRect(animDurRect.adjusted(0, 1, 0, -1), QColor(125, 125, 255, 180));
 
     DurationRectangle::draw(p, drawRect, fps, pixelsPerFrame, absFrameRange);
-    p->restore();
 }
 
 int FixedLenAnimationRect::getMinAnimationFrame() const {
