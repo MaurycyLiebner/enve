@@ -5,7 +5,7 @@
 struct BrightnessEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;
     void applyEffectsSk(const SkBitmap &bitmap,
-                        const qreal &scale);
+                        const qreal scale);
 
     bool hasKeys = false;
     qreal brightness;
@@ -19,7 +19,7 @@ public:
     qreal getMargin() { return 0.; }
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, BoundingBoxRenderData*);
+            const qreal relFrame, BoundingBoxRenderData*);
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 protected:

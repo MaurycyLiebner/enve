@@ -22,26 +22,26 @@ public:
     DurationRectangleMovable(const Type &type);
     DurationRectangleMovable() {}
 
-    void setFramePos(const int &framePos);
+    void setFramePos(const int framePos);
 
     int getFramePos() const;
 
     virtual DurationRectangleMovable *getMovableAt(
-                      const int &pressX,
-                      const qreal &pixelsPerFrame,
-                      const int &minViewedFrame);
+                      const int pressX,
+                      const qreal pixelsPerFrame,
+                      const int minViewedFrame);
 
-    virtual void changeFramePosBy(const int &change);
+    virtual void changeFramePosBy(const int change);
 
-    void changeFramePosByWithoutSignal(const int &change);
+    void changeFramePosByWithoutSignal(const int change);
 
-    void setHovered(const bool &hovered);
+    void setHovered(const bool hovered);
     bool isHovered();
     virtual Qt::CursorShape getHoverCursorShape() {
         return Qt::SplitHCursor;
     }
 
-    void pressed(const bool &shiftPressed);
+    void pressed(const bool shiftPressed);
 
     void setChildProperty(Property * const childProp) {
         mChildProperty = childProp;
@@ -75,9 +75,9 @@ public:
         return mChildProperty;
     }
 public slots:
-    void setMaxPos(const int &maxPos);
+    void setMaxPos(const int maxPos);
 
-    void setMinPos(const int &minPos);
+    void setMinPos(const int minPos);
 signals:
     void posChangedBy(int);
     void posChanged(int);
@@ -96,25 +96,25 @@ class DurationRectangle : public DurationRectangleMovable {
 public:
     DurationRectangle(Property * const childProp);
 
-    virtual void setMinFrame(const int &minFrame);
-    virtual void setMaxFrame(const int &maxFrame);
+    virtual void setMinFrame(const int minFrame);
+    virtual void setMaxFrame(const int maxFrame);
 
     virtual void draw(QPainter * const p,
                       const QRect &drawRect,
-                      const qreal &fps,
-                      const qreal &pixelsPerFrame,
+                      const qreal fps,
+                      const qreal pixelsPerFrame,
                       const FrameRange &absFrameRange);
 
     virtual DurationRectangleMovable *getMovableAt(
-                      const int &pressX,
-                      const qreal &pixelsPerFrame,
-                      const int &minViewedFrame);
+                      const int pressX,
+                      const qreal pixelsPerFrame,
+                      const int minViewedFrame);
     virtual bool hasAnimationFrameRange() { return false; }
     virtual void writeDurationRectangle(QIODevice *target);
     virtual void readDurationRectangle(QIODevice *target);
     virtual void openDurationSettingsDialog(QWidget *parent = nullptr);
 
-    void changeFramePosBy(const int &change);
+    void changeFramePosBy(const int change);
 
     Qt::CursorShape getHoverCursorShape() {
         return Qt::OpenHandCursor;
@@ -124,7 +124,7 @@ public:
         return getFramePos();
     }
 
-    void setFramesDuration(const int &duration);
+    void setFramesDuration(const int duration);
 
     int getFrameDuration() const;
 
@@ -161,10 +161,10 @@ public:
         return {FrameRange::EMIN, getMinFrameAsAbsFrame() - 1};
     }
 
-    void moveMinFrame(const int &change);
+    void moveMinFrame(const int change);
     void finishMinFramePosTransform();
     void startMinFramePosTransform();
-    void moveMaxFrame(const int &change);
+    void moveMaxFrame(const int change);
     void finishMaxFramePosTransform();
     void startMaxFramePosTransform();
 
@@ -196,8 +196,8 @@ public:
 
     void draw(QPainter * const p,
               const QRect &drawRect,
-              const qreal &fps,
-              const qreal &pixelsPerFrame,
+              const qreal fps,
+              const qreal pixelsPerFrame,
               const FrameRange &absFrameRange);
 
     virtual int getMinAnimationFrame() const = 0;
@@ -214,13 +214,13 @@ public:
     int getMaxAnimationFrameAsAbsFrame() const;
     int getMinAnimationFrameAsAbsFrame() const;
 
-    void setAnimationFrameDuration(const int &frameDuration);
+    void setAnimationFrameDuration(const int frameDuration);
 
     int getAnimationFrameDuration();
 signals:
 protected:
-    virtual void setMinAnimationFrame(const int &minAnimationFrame) = 0;
-    virtual void setMaxAnimationFrame(const int &maxAnimationFrame) = 0;
+    virtual void setMinAnimationFrame(const int minAnimationFrame) = 0;
+    virtual void setMaxAnimationFrame(const int maxAnimationFrame) = 0;
 };
 
 class VaryingLenAnimationRect : public AnimationRect {
@@ -238,11 +238,11 @@ public:
         return getMaxFrame();
     }
 protected:
-    void setMinAnimationFrame(const int &minAnimationFrame) {
+    void setMinAnimationFrame(const int minAnimationFrame) {
         setMinFrame(minAnimationFrame);
     }
 
-    void setMaxAnimationFrame(const int &maxAnimationFrame) {
+    void setMaxAnimationFrame(const int maxAnimationFrame) {
         setMaxFrame(maxAnimationFrame);
     }
 };
@@ -256,13 +256,13 @@ public:
     int getMinAnimationFrame() const;
     int getMaxAnimationFrame() const;
 
-    void changeFramePosBy(const int &change);
+    void changeFramePosBy(const int change);
     void writeDurationRectangle(QIODevice *target);
     void readDurationRectangle(QIODevice *target);
 
     void openDurationSettingsDialog(QWidget *parent = nullptr);
 
-    void setFirstAnimationFrame(const int &minAnimationFrame) {
+    void setFirstAnimationFrame(const int minAnimationFrame) {
         const int animDur = mMaxAnimationFrame - mMinAnimationFrame;
         setMinAnimationFrame(minAnimationFrame);
         setMaxAnimationFrame(minAnimationFrame + animDur);
@@ -271,8 +271,8 @@ public:
     void bindToAnimationFrameRange();
     void setBindToAnimationFrameRange();
 protected:
-    void setMinAnimationFrame(const int &minAnimationFrame);
-    void setMaxAnimationFrame(const int &maxAnimationFrame);
+    void setMinAnimationFrame(const int minAnimationFrame);
+    void setMaxAnimationFrame(const int maxAnimationFrame);
 
     bool mBoundToAnimation = false;
     bool mSetMaxFrameAtLeastOnce = false;

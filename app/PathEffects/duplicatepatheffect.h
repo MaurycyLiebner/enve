@@ -7,9 +7,9 @@ class QPointFAnimator;
 class DuplicatePathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    DuplicatePathEffect(const bool &outlinePathEffect);
+    DuplicatePathEffect(const bool outlinePathEffect);
 public:
-    void apply(const qreal &relFrame,
+    void apply(const qreal relFrame,
                const SkPath &src,
                SkPath * const dst);
     void writeProperty(QIODevice * const target) const;

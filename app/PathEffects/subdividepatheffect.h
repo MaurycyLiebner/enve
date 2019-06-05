@@ -6,9 +6,9 @@ class IntAnimator;
 class SubdividePathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    SubdividePathEffect(const bool &outlinePathEffect);
+    SubdividePathEffect(const bool outlinePathEffect);
 public:
-    void apply(const qreal &relFrame,
+    void apply(const qreal relFrame,
                const SkPath &src,
                SkPath * const dst);
     void writeProperty(QIODevice * const target) const;

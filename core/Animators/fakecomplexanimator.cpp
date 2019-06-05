@@ -11,9 +11,9 @@ Property *FakeComplexAnimator::getTarget() {
 }
 
 void FakeComplexAnimator::drawTimelineControls(QPainter * const p,
-                                               const qreal &pixelsPerFrame,
+                                               const qreal pixelsPerFrame,
                                                const FrameRange &absFrameRange,
-                                               const int &rowHeight) {
+                                               const int rowHeight) {
     if(mTarget->SWT_isAnimator()) {
         const auto aTarget = GetAsPtr(mTarget, Animator);
         aTarget->drawTimelineControls(p, pixelsPerFrame,
@@ -23,10 +23,10 @@ void FakeComplexAnimator::drawTimelineControls(QPainter * const p,
                                           absFrameRange, rowHeight);
 }
 
-Key *FakeComplexAnimator::anim_getKeyAtPos(const qreal &relX,
-                                          const int &minViewedFrame,
-                                          const qreal &pixelsPerFrame,
-                                          const int &keyRectSize) {
+Key *FakeComplexAnimator::anim_getKeyAtPos(const qreal relX,
+                                          const int minViewedFrame,
+                                          const qreal pixelsPerFrame,
+                                          const int keyRectSize) {
     Key *key = ComplexAnimator::anim_getKeyAtPos(relX, minViewedFrame,
                                                 pixelsPerFrame,
                                                 keyRectSize);
@@ -38,9 +38,9 @@ Key *FakeComplexAnimator::anim_getKeyAtPos(const qreal &relX,
 }
 
 void FakeComplexAnimator::anim_getKeysInRect(const QRectF &selectionRect,
-                                            const qreal &pixelsPerFrame,
+                                            const qreal pixelsPerFrame,
                                             QList<Key *> &keysList,
-                                            const int &keyRectSize) {
+                                            const int keyRectSize) {
     if(mTarget->SWT_isAnimator()) {
         const auto aTarget = GetAsPtr(mTarget, Animator);
         aTarget->anim_getKeysInRect(selectionRect, pixelsPerFrame,

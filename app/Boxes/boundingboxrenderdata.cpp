@@ -179,7 +179,7 @@ void RenderDataCustomizerFunctor::operator()(BoundingBoxRenderData * const data)
 }
 
 ReplaceTransformDisplacementCustomizer::ReplaceTransformDisplacementCustomizer(
-        const qreal &dx, const qreal &dy) {
+        const qreal dx, const qreal dy) {
     mDx = dx;
     mDy = dy;
 }
@@ -193,7 +193,7 @@ void ReplaceTransformDisplacementCustomizer::customize(
 }
 
 MultiplyTransformCustomizer::MultiplyTransformCustomizer(
-        const QMatrix &transform, const qreal &opacity) {
+        const QMatrix &transform, const qreal opacity) {
     mTransform = transform;
     mOpacity = opacity;
 }
@@ -203,7 +203,7 @@ void MultiplyTransformCustomizer::customize(BoundingBoxRenderData * const data) 
     data->fOpacity *= mOpacity;
 }
 
-MultiplyOpacityCustomizer::MultiplyOpacityCustomizer(const qreal &opacity) {
+MultiplyOpacityCustomizer::MultiplyOpacityCustomizer(const qreal opacity) {
     mOpacity = opacity;
 }
 

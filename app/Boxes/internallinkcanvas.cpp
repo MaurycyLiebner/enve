@@ -19,7 +19,7 @@ void InternalLinkCanvas::readBoundingBox(QIODevice * const target) {
 }
 
 void InternalLinkCanvas::setupRenderData(
-        const qreal &relFrame, BoundingBoxRenderData * const data) {
+        const qreal relFrame, BoundingBoxRenderData * const data) {
     InternalLinkGroupBox::setupRenderData(relFrame, data);
 
     ContainerBox* finalTarget = getFinalTarget();

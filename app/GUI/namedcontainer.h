@@ -8,7 +8,7 @@
 class NamedContainer : public QWidget {
 public:
     explicit NamedContainer(const QString &name,
-                            QWidget* widget, const bool& vertical,
+                            QWidget* widget, const bool vertical,
                             QWidget *parent = nullptr);
 private:
     QLabel* mNameLabel;

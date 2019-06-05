@@ -33,7 +33,7 @@ struct Node {
         mType = NORMAL;
     }
 
-    Node(const qreal& t) {
+    Node(const qreal t) {
         mT = t;
         mType = DISSOLVED;
     }
@@ -56,10 +56,10 @@ struct Node {
     }
 
     static Node sInterpolateNormal(const Node &node1, const Node &node2,
-                                   const qreal& weight2);
+                                   const qreal weight2);
 
     static Node sInterpolateDissolved(const Node &node1, const Node &node2,
-                                      const qreal &weight2);
+                                      const qreal weight2);
 
     QPointF c0() const {
         if(mC0Enabled) return mC0;
@@ -91,7 +91,7 @@ struct Node {
         mP1 = p1;
     }
 
-    void setT(const qreal& t) {
+    void setT(const qreal t) {
         mT = t;
     }
 
@@ -111,7 +111,7 @@ struct Node {
         mC2 = transform.map(mC2);
     }
 protected:
-    void setNodeId(const int& nodeId) {
+    void setNodeId(const int nodeId) {
         mId = nodeId;
     }
 
@@ -130,11 +130,11 @@ protected:
         setC2Enabled(true);
     }
 
-    void setC0Enabled(const bool& enabled) {
+    void setC0Enabled(const bool enabled) {
         mC0Enabled = enabled;
     }
 
-    void setC2Enabled(const bool& enabled) {
+    void setC2Enabled(const bool enabled) {
         mC2Enabled = enabled;
     }
 private:
@@ -164,7 +164,7 @@ public:
         return id;
     }
 
-    void insert(const int& id, const Node& nodeBlueprint) {
+    void insert(const int id, const Node& nodeBlueprint) {
         Node * const newNode = insertNewNode(id);
         *newNode = nodeBlueprint;
         newNode->setNodeId(id);
@@ -178,11 +178,11 @@ public:
         mList.swap(other.mList);
     }
 
-    Node* at(const int& id) const {
+    Node* at(const int id) const {
         return atSPtr(id).get();
     }
 
-    stdsptr<Node> atSPtr(const int& id) const {
+    stdsptr<Node> atSPtr(const int id) const {
         if(id < 0 || id >= count()) RuntimeThrow("Index out of range.");
         return mList.at(id);
     }
@@ -218,16 +218,16 @@ public:
         }
     }
 
-    void moveNode(const int& fromId, const int& toId) {
+    void moveNode(const int fromId, const int toId) {
         mList.move(fromId, toId);
         updateNodeIds(qMin(fromId, toId));
     }
 
-    Node * operator[](const int& id) const {
+    Node * operator[](const int id) const {
         return at(id);
     }
 
-    void removeAt(const int& id) {
+    void removeAt(const int id) {
         mList.removeAt(id);
         updateNodeIds(id);
     }
@@ -244,13 +244,13 @@ public:
         updateNodeIds();
     }
 
-    void moveNodesToFrontStartingWith(const int& first) {
+    void moveNodesToFrontStartingWith(const int first) {
         for(int i = first; i < mList.count(); i++)
             mList.prepend(mList.takeLast());
         updateNodeIds();
     }
 
-    ListOfNodes detachNodesStartingWith(const int& first) {
+    ListOfNodes detachNodesStartingWith(const int first) {
         ListOfNodes result;
         const int iniCount = mList.count();
         for(int i = first, j = 0; i < iniCount; i++, j++) {
@@ -298,21 +298,21 @@ private:
         updateNodeIds(0);
     }
 
-    void updateNodeIds(const int& minId) {
+    void updateNodeIds(const int minId) {
         const int maxId = mList.count() - 1;
         updateNodeIds(minId, maxId);
     }
 
-    void updateNodeIds(const int& minId, const int& maxId) {
+    void updateNodeIds(const int minId, const int maxId) {
         for(int i = minId; i <= maxId; i++)
             updateNodeId(i);
     }
 
-    void updateNodeId(const int& id) {
+    void updateNodeId(const int id) {
         mList.at(id)->setNodeId(id);
     }
 
-    Node* insertNewNode(const int& id) {
+    Node* insertNewNode(const int id) {
         const auto newNode = stdsptr<Node>(new Node);
         mList.insert(id, newNode);
         updateNodeIds(id);

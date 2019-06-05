@@ -3,7 +3,7 @@
 #include "Animators/complexanimator.h"
 #include "Animators/qrealpoint.h"
 
-QrealKey::QrealKey(const qreal &value, const int &frame,
+QrealKey::QrealKey(const qreal value, const int frame,
                    QrealAnimator * const parentAnimator) :
     GraphKey(frame, parentAnimator) {
     mValue = value;
@@ -14,7 +14,7 @@ QrealKey::QrealKey(const qreal &value, const int &frame,
 QrealKey::QrealKey(QrealAnimator * const parentAnimator) :
     QrealKey(0, 0, parentAnimator) { }
 
-void QrealKey::incValue(const qreal &incBy) {
+void QrealKey::incValue(const qreal incBy) {
     setValue(mValue + incBy);
 }
 
@@ -34,7 +34,7 @@ QrealAnimator *QrealKey::getParentQrealAnimator() const {
 
 qreal QrealKey::getValue() const { return mValue; }
 
-void QrealKey::setValue(const qreal& value) {
+void QrealKey::setValue(const qreal value) {
     const qreal dVal = value - mValue;
     setStartValueVar(mStartPt.getRawYValue() + dVal);
     setEndValueVar(mEndPt.getRawYValue() + dVal);

@@ -1,7 +1,7 @@
 #include "namedcontainer.h"
 
 NamedContainer::NamedContainer(const QString& name, QWidget *widget,
-                               const bool &vertical,
+                               const bool vertical,
                                QWidget *parent) : QWidget(parent) {
     mNameLabel = new QLabel("<center>" + name + "</center>", this);
     mNameLabel->setObjectName("dockLabel");

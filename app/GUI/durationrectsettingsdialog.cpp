@@ -4,9 +4,9 @@
 
 DurationRectSettingsDialog::DurationRectSettingsDialog(
         const DurationRectangleMovable::Type &type,
-        const int &minFrame,
-        const int &maxFrame,
-        const int &firstAnimationFrame,
+        const int minFrame,
+        const int maxFrame,
+        const int firstAnimationFrame,
         QWidget *parent) :
     QDialog(parent) {
     mType = type;
@@ -55,18 +55,18 @@ DurationRectSettingsDialog::DurationRectSettingsDialog(
     setLayout(mMainLayout);
 }
 
-void DurationRectSettingsDialog::setMinFrameSpinBoxMaxFrame(const int &frame) {
+void DurationRectSettingsDialog::setMinFrameSpinBoxMaxFrame(const int frame) {
     mMinFrameSpinBox->setMaximum(frame);
 }
 
-void DurationRectSettingsDialog::setMaxFrameSpinBoxMinFrame(const int &frame) {
+void DurationRectSettingsDialog::setMaxFrameSpinBoxMinFrame(const int frame) {
     mMaxFrameSpinBox->setMinimum(frame);
 }
 
 DurationRectSettingsDialog::DurationRectSettingsDialog(
         const DurationRectangleMovable::Type &type,
-        const int &minFrame,
-        const int &maxFrame,
+        const int minFrame,
+        const int maxFrame,
         QWidget *parent) :
     DurationRectSettingsDialog(type, minFrame,
                                maxFrame, 0, parent) {}

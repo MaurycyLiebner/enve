@@ -22,9 +22,9 @@ protected:
     AnimationBox(const BoundingBoxType &type);
 public:
     ~AnimationBox();
-    void anim_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int frame);
 
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
     void reloadCacheHandler();
     virtual void reloadSound() {}
@@ -32,7 +32,7 @@ public:
     bool SWT_isAnimationBox() const { return true; }
     void addActionsToMenu(BoxTypeMenu * const menu);
     virtual void changeSourceFile(QWidget* dialogParent) = 0;
-    void setupRenderData(const qreal &relFrame,
+    void setupRenderData(const qreal relFrame,
                          BoundingBoxRenderData * const data);
     stdsptr<BoundingBoxRenderData> createRenderData();
     void setParentGroup(ContainerBox * const parent);
@@ -41,7 +41,7 @@ public:
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 
-    virtual void setStretch(const qreal& stretch) {
+    virtual void setStretch(const qreal stretch) {
         mStretch = stretch;
         updateDurationRectangleAnimationRange();
     }
@@ -51,7 +51,7 @@ public:
 
     void afterUpdate();
     void beforeAddingScheduler();
-    int getAnimationFrameForRelFrame(const int &relFrame);
+    int getAnimationFrameForRelFrame(const int relFrame);
 
     void enableFrameRemappingAction();
     void enableFrameRemapping();

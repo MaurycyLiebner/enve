@@ -19,7 +19,7 @@ public slots:
     void setDisplayedValue(GLfloat val_t);
     void setValueExternal(const GLfloat &val);
 private slots:
-    void spinBoxDisplayedValueChanged(const qreal &val);
+    void spinBoxDisplayedValueChanged(const qreal val);
     void spinBoxValSet(double spin_box_val_t);
 private:
     bool mBlockValue = false;

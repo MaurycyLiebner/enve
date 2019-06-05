@@ -19,14 +19,14 @@ public:
     QWidget *createNewSingleWidget();
     void paintEvent(QPaintEvent *);
     void drawKeys(QPainter * const p,
-                  const qreal &pixelsPerFrame,
+                  const qreal pixelsPerFrame,
                   const FrameRange &viewedFrameRange);
-    Key *getKeyAtPos(const int &pressX,
-                          const int &pressY,
-                          const qreal &pixelsPerFrame,
-                          const int &minViewedFrame);
+    Key *getKeyAtPos(const int pressX,
+                          const int pressY,
+                          const qreal pixelsPerFrame,
+                          const int minViewedFrame);
     void getKeysInRect(QRectF selectionRect,
-                       const qreal &pixelsPerFrame,
+                       const qreal pixelsPerFrame,
                        QList<Key *> &listKeys);
 
     void updateDropTarget();
@@ -36,10 +36,10 @@ public:
     void scrollDown();
 
     DurationRectangleMovable *getRectangleMovableAtPos(
-                                        const int &pressX,
-                                        const int &pressY,
-                                        const qreal &pixelsPerFrame,
-                                        const int &minViewedFrame);
+                                        const int pressX,
+                                        const int pressY,
+                                        const qreal pixelsPerFrame,
+                                        const int minViewedFrame);
     KeysView *getKeysView() {
         return mKeysView;
     }
@@ -47,8 +47,8 @@ public:
     void setKeysView(KeysView *keysView) {
         mKeysView = keysView;
     }
-    BoxSingleWidget *getBSWAtPos(const int &yPos) const;
-    int getIdAtPos(const int &yPos) const;
+    BoxSingleWidget *getBSWAtPos(const int yPos) const;
+    int getIdAtPos(const int yPos) const;
     BoxSingleWidget *getLastVisibleBSW() const;
 protected:
     void dropEvent(QDropEvent *event);
@@ -106,11 +106,11 @@ private:
     typedef int DropTypes;
     DropTypes dropOnSWTSupported(SingleWidgetTarget const * const swtUnderMouse) const;
     DropTypes dropOnBSWSupported(const BoxSingleWidget * const bswUnderMouse) const;
-    DropTarget getClosestDropTarget(const int &yPos) const;
+    DropTarget getClosestDropTarget(const int yPos) const;
 
     void updateDraggedFromMimeData(const QMimeData * const mimeData);
     bool droppingSupported(const SingleWidgetAbstraction * const targetAbs,
-                           const int &idInTarget) const;
+                           const int idInTarget) const;
     void updateDragLine();
 };
 

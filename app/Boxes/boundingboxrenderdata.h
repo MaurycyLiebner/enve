@@ -124,8 +124,8 @@ public:
 
 class ReplaceTransformDisplacementCustomizer : public RenderDataCustomizerFunctor {
 public:
-    ReplaceTransformDisplacementCustomizer(const qreal &dx,
-                                           const qreal &dy);
+    ReplaceTransformDisplacementCustomizer(const qreal dx,
+                                           const qreal dy);
 
     void customize(BoundingBoxRenderData * const data);
 protected:
@@ -135,7 +135,7 @@ protected:
 class MultiplyTransformCustomizer : public RenderDataCustomizerFunctor {
 public:
     MultiplyTransformCustomizer(const QMatrix &transform,
-                                const qreal &opacity = 1);
+                                const qreal opacity = 1);
 
     void customize(BoundingBoxRenderData * const data);
 protected:
@@ -145,7 +145,7 @@ protected:
 
 class MultiplyOpacityCustomizer : public RenderDataCustomizerFunctor {
 public:
-    MultiplyOpacityCustomizer(const qreal &opacity);
+    MultiplyOpacityCustomizer(const qreal opacity);
 
     void customize(BoundingBoxRenderData * const data);
 protected:

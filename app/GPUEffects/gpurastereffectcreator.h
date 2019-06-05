@@ -9,7 +9,7 @@ typedef QList<UniformSpecifier> UniformSpecifiers;
 struct UniformSpecifierCreator : public StdSelfRef {
     virtual UniformSpecifier create(const GLint& loc,
                                     Property * const property,
-                                    const qreal& relFrame) const = 0;
+                                    const qreal relFrame) const = 0;
 };
 
 struct QrealAnimatorUniformSpecifierCreator :
@@ -18,7 +18,7 @@ struct QrealAnimatorUniformSpecifierCreator :
         mScript(script) {}
     virtual UniformSpecifier create(const GLint& loc,
                                     Property * const property,
-                                    const qreal& relFrame) const;
+                                    const qreal relFrame) const;
 
     static void sTestScript(const QString& script, const QString& propName);
 private:
@@ -31,7 +31,7 @@ struct IntAnimatorUniformSpecifierCreator :
         mScript(script) {}
     virtual UniformSpecifier create(const GLint& loc,
                                     Property * const property,
-                                    const qreal& relFrame) const;
+                                    const qreal relFrame) const;
 
     static void sTestScript(const QString& script, const QString& propName);
 private:

@@ -12,7 +12,7 @@ SoundComposition::SoundComposition(Canvas * const parent) :
             this, &SoundComposition::frameRangeChanged);
 }
 
-void SoundComposition::start(const int& startFrame) {
+void SoundComposition::start(const int startFrame) {
     mPos = qRound(startFrame/mParent->getFps()*SOUND_SAMPLERATE);
     open(QIODevice::ReadOnly);
 }
@@ -49,7 +49,7 @@ void SoundComposition::removeSoundAnimator(const qsptr<SingleSound>& sound) {
     }
 }
 
-void SoundComposition::secondFinished(const int &secondId,
+void SoundComposition::secondFinished(const int secondId,
                                       const stdsptr<Samples> &samples) {
     mProcessingSeconds.removeOne(secondId);
     if(!samples) return;
@@ -57,7 +57,7 @@ void SoundComposition::secondFinished(const int &secondId,
     if(mBlockRange.inRange(secondId)) cont->setBlocked(true);
 }
 
-void SoundComposition::startBlockingAtFrame(const int &frame) {
+void SoundComposition::startBlockingAtFrame(const int frame) {
     if(mBlockRange.isValid()) unblockAll();
     const qreal fps = mParent->getFps();
     const int sec = qFloor(frame/fps);
@@ -65,7 +65,7 @@ void SoundComposition::startBlockingAtFrame(const int &frame) {
     mSecondsCache.blockConts(mBlockRange, true);
 }
 
-void SoundComposition::blockUpToFrame(const int &frame) {
+void SoundComposition::blockUpToFrame(const int frame) {
     const qreal fps = mParent->getFps();
     const int sec = qFloor(frame/fps);
     if(sec < mBlockRange.fMax) {
@@ -88,12 +88,12 @@ void SoundComposition::scheduleFrameRange(const FrameRange &range) {
         scheduleSecond(i);
 }
 
-SoundMerger *SoundComposition::scheduleFrame(const int &frameId) {
+SoundMerger *SoundComposition::scheduleFrame(const int frameId) {
     const qreal fps = mParent->getFps();
     return scheduleSecond(qFloor(frameId/fps));
 }
 
-SoundMerger *SoundComposition::scheduleSecond(const int &secondId) {
+SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
     if(mSounds.isEmpty()) return nullptr;
     if(mProcessingSeconds.contains(secondId)) return nullptr;
     if(mSecondsCache.atRelFrame(secondId)) return nullptr;

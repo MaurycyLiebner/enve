@@ -38,7 +38,7 @@ void GradientPoints::disable() {
 
 void GradientPoints::drawCanvasControls(SkCanvas * const canvas,
                                         const CanvasMode &mode,
-                                        const SkScalar &invScale) {
+                                        const SkScalar invScale) {
     if(mode != CanvasMode::MOVE_POINT) return;
     if(mEnabled) {
         const SkPoint startPos = toSkPoint(mStartPoint->getAbsolutePos());
@@ -57,19 +57,19 @@ void GradientPoints::drawCanvasControls(SkCanvas * const canvas,
     }
 }
 
-QPointF GradientPoints::getStartPointAtRelFrame(const int &relFrame) {
+QPointF GradientPoints::getStartPointAtRelFrame(const int relFrame) {
     return mStartAnimator->getEffectiveValueAtRelFrame(relFrame);
 }
 
-QPointF GradientPoints::getEndPointAtRelFrame(const int &relFrame) {
+QPointF GradientPoints::getEndPointAtRelFrame(const int relFrame) {
     return mEndAnimator->getEffectiveValueAtRelFrame(relFrame);
 }
 
-QPointF GradientPoints::getStartPointAtRelFrameF(const qreal &relFrame) {
+QPointF GradientPoints::getStartPointAtRelFrameF(const qreal relFrame) {
     return mStartAnimator->getEffectiveValueAtRelFrame(relFrame);
 }
 
-QPointF GradientPoints::getEndPointAtRelFrameF(const qreal &relFrame) {
+QPointF GradientPoints::getEndPointAtRelFrameF(const qreal relFrame) {
     return mEndAnimator->getEffectiveValueAtRelFrame(relFrame);
 }
 

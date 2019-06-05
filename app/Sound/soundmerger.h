@@ -19,7 +19,7 @@ struct SingleSoundData {
 class SoundMerger : public CPUTask {
     friend class StdSelfRef;
 protected:
-    SoundMerger(const int& secondId, const SampleRange& sampleRange,
+    SoundMerger(const int secondId, const SampleRange& sampleRange,
                 SoundComposition* const composition) :
         mSecondId(secondId), mSampleRange(sampleRange),
         mComposition(composition) {

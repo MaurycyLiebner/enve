@@ -19,10 +19,10 @@ class QrealSnapshot {
 public:
     class Iterator {
     public:
-        Iterator(const qreal& startFrame, const qreal& sampleStep,
+        Iterator(const qreal startFrame, const qreal sampleStep,
                  const QrealSnapshot * const snap);
 
-        qreal getValueAndProgress(const qreal& progress);
+        qreal getValueAndProgress(const qreal progress);
 
         bool staticValue() const;
     private:
@@ -41,31 +41,31 @@ public:
     };
 
     QrealSnapshot() {}
-    QrealSnapshot(const qreal& currentValue) :
+    QrealSnapshot(const qreal currentValue) :
         QrealSnapshot(currentValue, 1, 1) {}
-    QrealSnapshot(const qreal& currentValue,
-             const qreal& frameMultiplier,
-             const qreal& valueMultiplier) :
+    QrealSnapshot(const qreal currentValue,
+             const qreal frameMultiplier,
+             const qreal valueMultiplier) :
         mCurrentValue(currentValue*valueMultiplier),
         mFrameMultiplier(frameMultiplier),
         mValueMultiplier(valueMultiplier) {}
 
     void appendKey(const QrealKey * const key);
 
-    qreal getValue(const qreal& relFrame) const;
+    qreal getValue(const qreal relFrame) const;
 protected:
-    void getPrevAndNextKey(const qreal& relFrame,
+    void getPrevAndNextKey(const qreal relFrame,
                            KeySnaphot const *& prevKey,
                            KeySnaphot const *& nextKey) const;
-    void getPrevAndNextKey(const qreal& relFrame,
+    void getPrevAndNextKey(const qreal relFrame,
                            KeySnaphot const *& prevKey,
                            KeySnaphot const *& nextKey,
-                           const int& minId, const int& maxId) const;
-    void getPrevAndNextKeyId(const qreal& relFrame,
+                           const int minId, const int maxId) const;
+    void getPrevAndNextKeyId(const qreal relFrame,
                              int & prevKey, int & nextKey) const;
-    void getPrevAndNextKeyId(const qreal& relFrame,
+    void getPrevAndNextKeyId(const qreal relFrame,
                              int & prevKey, int & nextKey,
-                             const int& minId, const int& maxId) const;
+                             const int minId, const int maxId) const;
     qreal mCurrentValue;
     QList<KeySnaphot> mKeys;
 

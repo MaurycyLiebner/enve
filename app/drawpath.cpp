@@ -26,7 +26,7 @@ void DrawPath::drawPathMove(const QPointF &pos) {
     mDrawPathOriginal.lineTo(pos.x(), pos.y());
 }
 
-void DrawPath::finishDrawingPath(const bool &close) {
+void DrawPath::finishDrawingPath(const bool close) {
     mClosed = close;
 }
 
@@ -97,7 +97,7 @@ void DrawPath::addNodeAt(const QPointF &pos) {
     updateFittedPath();
 }
 
-void DrawPath::incNodePosIdsForIdsAboveOrEqual(const int &idT, const int &inc) {
+void DrawPath::incNodePosIdsForIdsAboveOrEqual(const int idT, const int inc) {
     for(int i = 0; i < mNodes.count(); i++) {
         const DrawPathNode &nodeT = mNodes.at(i);
         int id = nodeT.posId;
@@ -110,7 +110,7 @@ bool drawPathNodeSort(const DrawPath::DrawPathNode &n1,
     return n1.posId < n2.posId;
 }
 
-void DrawPath::decNodePosIdsForIdsBelow(const int &idT, const int &inc) {
+void DrawPath::decNodePosIdsForIdsBelow(const int idT, const int inc) {
     for(int i = 0; i < mNodes.count(); i++) {
         const DrawPathNode &nodeT = mNodes.at(i);
         int id = nodeT.posId;
@@ -122,6 +122,6 @@ void DrawPath::sortNodes() {
     std::sort(mNodes.begin(), mNodes.end(), drawPathNodeSort);
 }
 
-void DrawPath::removePosForNode(const int &idT) {
+void DrawPath::removePosForNode(const int idT) {
     mOriginalPoses.removeAt(idT);
 }

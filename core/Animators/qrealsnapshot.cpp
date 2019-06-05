@@ -10,7 +10,7 @@ void QrealSnapshot::appendKey(const QrealKey * const key) {
                   key->getEndValue()*mValueMultiplier});
 }
 
-qreal QrealSnapshot::getValue(const qreal &relFrame) const {
+qreal QrealSnapshot::getValue(const qreal relFrame) const {
     const KeySnaphot * prevKey = nullptr;
     const KeySnaphot * nextKey = nullptr;
 
@@ -33,16 +33,16 @@ qreal QrealSnapshot::getValue(const qreal &relFrame) const {
     return mCurrentValue;
 }
 
-void QrealSnapshot::getPrevAndNextKey(const qreal &relFrame,
+void QrealSnapshot::getPrevAndNextKey(const qreal relFrame,
                                       const QrealSnapshot::KeySnaphot *&prevKey,
                                       const QrealSnapshot::KeySnaphot *&nextKey) const {
     getPrevAndNextKey(relFrame, prevKey, nextKey, 0, mKeys.count() - 1);
 }
 
-void QrealSnapshot::getPrevAndNextKey(const qreal &relFrame,
+void QrealSnapshot::getPrevAndNextKey(const qreal relFrame,
                                       const QrealSnapshot::KeySnaphot *&prevKey,
                                       const QrealSnapshot::KeySnaphot *&nextKey,
-                                      const int &minId, const int &maxId) const {
+                                      const int minId, const int maxId) const {
     int prevId;
     int nextId;
     getPrevAndNextKeyId(relFrame, prevId, nextId, minId, maxId);
@@ -50,14 +50,14 @@ void QrealSnapshot::getPrevAndNextKey(const qreal &relFrame,
     nextKey = nextId == -1 ? nullptr : &mKeys.at(nextId);
 }
 
-void QrealSnapshot::getPrevAndNextKeyId(const qreal &relFrame,
+void QrealSnapshot::getPrevAndNextKeyId(const qreal relFrame,
                                         int &prevKey, int &nextKey) const {
     getPrevAndNextKeyId(relFrame, prevKey, nextKey, 0, mKeys.count() - 1);
 }
 
-void QrealSnapshot::getPrevAndNextKeyId(const qreal &relFrame,
+void QrealSnapshot::getPrevAndNextKeyId(const qreal relFrame,
                                         int &prevKey, int &nextKey,
-                                        const int &minId, const int &maxId) const {
+                                        const int minId, const int maxId) const {
     if(maxId < minId) {
         prevKey = -1;
         nextKey = -1;
@@ -86,8 +86,8 @@ void QrealSnapshot::getPrevAndNextKeyId(const qreal &relFrame,
     return;
 }
 
-QrealSnapshot::Iterator::Iterator(const qreal &startFrame,
-                                  const qreal &sampleStep,
+QrealSnapshot::Iterator::Iterator(const qreal startFrame,
+                                  const qreal sampleStep,
                                   const QrealSnapshot * const snap) :
     mSampleFrameStep(sampleStep),
     mInvFrameSpan(1/sampleStep),
@@ -98,7 +98,7 @@ QrealSnapshot::Iterator::Iterator(const qreal &startFrame,
     updateSamples();
 }
 
-qreal QrealSnapshot::Iterator::getValueAndProgress(const qreal &progress) {
+qreal QrealSnapshot::Iterator::getValueAndProgress(const qreal progress) {
     if(mStaticValue) return mPrevValue;
     qreal result;
     if(mInterpolate) {

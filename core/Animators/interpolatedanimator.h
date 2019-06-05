@@ -5,7 +5,7 @@
 template <typename T>
 class InterpolatedAnimator : public AnimatorT<T> {
 public:
-    T getValueAtRelFrame(const int &relFrame) const {
+    T getValueAtRelFrame(const int relFrame) const {
         if(Animator::anim_mKeys.isEmpty())
             return this->getCurrentValue();
         int prevId; int nextId;

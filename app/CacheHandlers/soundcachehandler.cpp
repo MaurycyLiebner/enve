@@ -2,7 +2,7 @@
 #include "FileCacheHandlers/soundreader.h"
 #include "Sound/singlesound.h"
 
-stdsptr<Samples> SoundCacheHandler::getSamplesForSecond(const int &secondId) {
+stdsptr<Samples> SoundCacheHandler::getSamplesForSecond(const int secondId) {
     const auto cont = mSecondsCache.atRelFrame
             <SoundCacheContainer>(secondId);
     if(!cont) return nullptr;
@@ -10,7 +10,7 @@ stdsptr<Samples> SoundCacheHandler::getSamplesForSecond(const int &secondId) {
 }
 
 void SoundCacheHandler::secondReaderFinished(
-        const int& secondId,
+        const int secondId,
         const stdsptr<Samples>& samples) {
     if(samples) {
         mSecondsCache.createNew<SoundCacheContainer>(secondId, samples);
@@ -19,7 +19,7 @@ void SoundCacheHandler::secondReaderFinished(
 }
 
 SoundReaderForMerger *SoundCacheHandler::addSecondReader(
-        const int &secondId) {
+        const int secondId) {
     if(mSecondsBeingRead.contains(secondId) ||
        getSamplesForSecond(secondId))
         RuntimeThrow("Trying to unnecessarily reload video frame");

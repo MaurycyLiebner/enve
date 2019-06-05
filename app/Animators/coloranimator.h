@@ -20,7 +20,7 @@ public:
     void qra_setCurrentValue(const QColor &qcolorValue);
 
     QColor getCurrentColor() const;
-    QColor getColorAtRelFrame(const qreal &relFrame);
+    QColor getColorAtRelFrame(const qreal relFrame);
     void setColorMode(const ColorMode &colorMode);
 
     void startVal1Transform();
@@ -28,10 +28,10 @@ public:
     void startVal3Transform();
     void startAlphaTransform();
 
-    void setCurrentVal1Value(const qreal &val1);
-    void setCurrentVal2Value(const qreal &val2);
-    void setCurrentVal3Value(const qreal &val3);
-    void setCurrentAlphaValue(const qreal &alpha);
+    void setCurrentVal1Value(const qreal val1);
+    void setCurrentVal2Value(const qreal val2);
+    void setCurrentVal3Value(const qreal val3);
+    void setCurrentAlphaValue(const qreal alpha);
 
     void duplicateVal1AnimatorFrom(QrealAnimator *source);
     void duplicateVal2AnimatorFrom(QrealAnimator *source);

@@ -1996,7 +1996,7 @@ void FillSvgAttributes::setColor(const QColor &val) {
     setPaintType(FLATPAINT);
 }
 
-void FillSvgAttributes::setColorOpacity(const qreal &opacity) {
+void FillSvgAttributes::setColorOpacity(const qreal opacity) {
     mColor.setAlphaF(opacity);
 }
 
@@ -2014,7 +2014,7 @@ void FillSvgAttributes::setGradient(const SvgGradient& gradient) {
 
 const QColor &FillSvgAttributes::getColor() const { return mColor; }
 
-const PaintType &FillSvgAttributes::getPaintType() const { return mPaintType; }
+PaintType FillSvgAttributes::getPaintType() const { return mPaintType; }
 
 Gradient *FillSvgAttributes::getGradient() const { return mGradient; }
 
@@ -2039,24 +2039,23 @@ void FillSvgAttributes::apply(BoundingBox * const box,
     PaintTypePaintSetting(target, mPaintType).apply(pathBox);
 }
 
-const qreal &StrokeSvgAttributes::getLineWidth() const {
+qreal StrokeSvgAttributes::getLineWidth() const {
     return mLineWidth;
 }
 
-const Qt::PenCapStyle &StrokeSvgAttributes::getCapStyle() const {
+Qt::PenCapStyle StrokeSvgAttributes::getCapStyle() const {
     return mCapStyle;
 }
 
-const Qt::PenJoinStyle &StrokeSvgAttributes::getJoinStyle() const {
+Qt::PenJoinStyle StrokeSvgAttributes::getJoinStyle() const {
     return mJoinStyle;
 }
 
-const QPainter::CompositionMode &
-StrokeSvgAttributes::getOutlineCompositionMode() const {
+QPainter::CompositionMode StrokeSvgAttributes::getOutlineCompositionMode() const {
     return mOutlineCompositionMode;
 }
 
-void StrokeSvgAttributes::setLineWidth(const qreal &val) {
+void StrokeSvgAttributes::setLineWidth(const qreal val) {
     mLineWidth = val;
 }
 
@@ -2073,7 +2072,7 @@ void StrokeSvgAttributes::setOutlineCompositionMode(
     mOutlineCompositionMode = compMode;
 }
 
-void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale) const {
+void StrokeSvgAttributes::apply(BoundingBox *box, const qreal scale) const {
     box->setStrokeWidth(mLineWidth*scale);
     FillSvgAttributes::apply(box, PaintSetting::OUTLINE);
     //box->setStrokePaintType(mPaintType, mColor, mGradient);
@@ -2166,10 +2165,10 @@ void SvgSeparatePath::applyTransfromation(const QMatrix &transformation) {
 }
 
 void SvgSeparatePath::pathArc(qreal rX, qreal rY,
-                              const qreal &xAxisRotation,
-                              const int &largeArcFlag, const int &sweepFlag,
-                              const qreal &x, const qreal &y,
-                              const qreal &curX, const qreal &curY) {
+                              const qreal xAxisRotation,
+                              const int largeArcFlag, const int sweepFlag,
+                              const qreal x, const qreal y,
+                              const qreal curX, const qreal curY) {
     rX = qAbs(rX);
     rY = qAbs(rY);
 
@@ -2232,10 +2231,10 @@ void SvgSeparatePath::pathArc(qreal rX, qreal rY,
     }
 }
 
-void SvgSeparatePath::pathArcSegment(const qreal &xc, const qreal &yc,
-                                     const qreal &th0, const qreal &th1,
-                                     const qreal &rx, const qreal &ry,
-                                     const qreal& xAxisRotation) {
+void SvgSeparatePath::pathArcSegment(const qreal xc, const qreal yc,
+                                     const qreal th0, const qreal th1,
+                                     const qreal rx, const qreal ry,
+                                     const qreal xAxisRotation) {
     const qreal sinTh = qSin(xAxisRotation * (M_PI / 180));
     const qreal cosTh = qCos(xAxisRotation * (M_PI / 180));
 
@@ -2272,7 +2271,7 @@ void TextSvgAttributes::setFontFamily(const QString &family) {
     mFont.setFamily(family);
 }
 
-void TextSvgAttributes::setFontSize(const int &size) {
+void TextSvgAttributes::setFontSize(const int size) {
     mFont.setPointSize(size > 0 ? size : 1);
 }
 
@@ -2280,7 +2279,7 @@ void TextSvgAttributes::setFontStyle(const QFont::Style &style) {
     mFont.setStyle(style);
 }
 
-void TextSvgAttributes::setFontWeight(const int &weight) {
+void TextSvgAttributes::setFontWeight(const int weight) {
     mFont.setWeight(weight);
 }
 

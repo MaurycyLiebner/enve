@@ -15,10 +15,10 @@ public:
     QString getCurrentFontStyle() const;
     QString getCurrentFontFamily() const;
 
-    void setCurrentFontSize(const qreal &size);
+    void setCurrentFontSize(const qreal size);
     void setCurrentFontFamily(const QString &family);
     void setCurrentFontStyle(const QString &style);
-    void setCurrentSettings(const qreal &size,
+    void setCurrentSettings(const qreal size,
                             const QString &family,
                             const QString &style);
 signals:

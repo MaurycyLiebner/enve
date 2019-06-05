@@ -65,7 +65,7 @@ stdsptr<BoundingBoxRenderData> InternalLinkBox::createRenderData() {
 }
 
 void InternalLinkBox::setupRenderData(
-        const qreal &relFrame, BoundingBoxRenderData * const data) {
+        const qreal relFrame, BoundingBoxRenderData * const data) {
     const auto linkTarget = getLinkTarget();
     if(linkTarget) linkTarget->setupRenderData(relFrame, data);
 
@@ -77,7 +77,7 @@ void InternalLinkBox::setupRenderData(
     }
 }
 
-QRectF InternalLinkBox::getRelBoundingRect(const qreal &relFrame) {
+QRectF InternalLinkBox::getRelBoundingRect(const qreal relFrame) {
     if(!getLinkTarget()) return QRectF();
     return getLinkTarget()->getRelBoundingRect(relFrame);
 }
@@ -87,19 +87,19 @@ bool InternalLinkBox::relPointInsidePath(const QPointF &relPos) const {
     return getLinkTarget()->relPointInsidePath(relPos);
 }
 
-bool InternalLinkBox::isFrameInDurationRect(const int &relFrame) const {
+bool InternalLinkBox::isFrameInDurationRect(const int relFrame) const {
     if(!getLinkTarget()) return false;
     return BoundingBox::isFrameInDurationRect(relFrame) &&
             getLinkTarget()->isFrameInDurationRect(relFrame);
 }
 
-bool InternalLinkBox::isFrameFInDurationRect(const qreal &relFrame) const {
+bool InternalLinkBox::isFrameFInDurationRect(const qreal relFrame) const {
     if(!getLinkTarget()) return false;
     return BoundingBox::isFrameFInDurationRect(relFrame) &&
             getLinkTarget()->isFrameFInDurationRect(relFrame);
 }
 
-FrameRange InternalLinkBox::prp_getIdenticalRelRange(const int &relFrame) const {
+FrameRange InternalLinkBox::prp_getIdenticalRelRange(const int relFrame) const {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     if(mVisible) {
         if(isFrameInDurationRect(relFrame)) {

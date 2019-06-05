@@ -29,7 +29,7 @@ void InternalLinkGroupBox::readBoundingBox(QIODevice * const target) {
 //}
 
 FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(
-        const int &relFrame) const {
+        const int relFrame) const {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     if(mVisible) {
         if(isFrameInDurationRect(relFrame)) {
@@ -49,7 +49,7 @@ FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(
 }
 
 QMatrix InternalLinkGroupBox::getRelativeTransformAtRelFrameF(
-        const qreal &relFrame) {
+        const qreal relFrame) {
     if(isParentLink() && getLinkTarget()) {
         return getLinkTarget()->getRelativeTransformAtRelFrameF(relFrame);
     } else {
@@ -57,7 +57,7 @@ QMatrix InternalLinkGroupBox::getRelativeTransformAtRelFrameF(
     }
 }
 
-void InternalLinkGroupBox::setupEffectsF(const qreal &relFrame,
+void InternalLinkGroupBox::setupEffectsF(const qreal relFrame,
                                          BoundingBoxRenderData * const data) {
     if(isParentLink() && getLinkTarget()) {
         getLinkTarget()->setupEffectsF(relFrame, data);
@@ -66,7 +66,7 @@ void InternalLinkGroupBox::setupEffectsF(const qreal &relFrame,
     }
 }
 
-qreal InternalLinkGroupBox::getEffectsMarginAtRelFrameF(const qreal &relFrame) {
+qreal InternalLinkGroupBox::getEffectsMarginAtRelFrameF(const qreal relFrame) {
     if(isParentLink() && getLinkTarget()) {
         return getLinkTarget()->getEffectsMarginAtRelFrameF(relFrame);
     }
@@ -80,7 +80,7 @@ const SkBlendMode &InternalLinkGroupBox::getBlendMode() {
     return BoundingBox::getBlendMode();
 }
 
-void InternalLinkGroupBox::setupRenderData(const qreal &relFrame,
+void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
                                            BoundingBoxRenderData * const data) {
     const auto linkTarget = getLinkTarget();
     if(linkTarget) linkTarget->BoundingBox::setupRenderData(relFrame, data);
@@ -171,7 +171,7 @@ qsptr<BoundingBox> InternalLinkGroupBox::createLinkForLinkGroup() {
     }
 }
 
-bool InternalLinkGroupBox::isFrameInDurationRect(const int &relFrame) const {
+bool InternalLinkGroupBox::isFrameInDurationRect(const int relFrame) const {
     if(!getLinkTarget()) return false;
     return ContainerBox::isFrameInDurationRect(relFrame) &&
             getLinkTarget()->isFrameInDurationRect(relFrame);
@@ -184,7 +184,7 @@ stdsptr<BoundingBoxRenderData> InternalLinkGroupBox::createRenderData() {
     return renderData;
 }
 
-QRectF InternalLinkGroupBox::getRelBoundingRect(const qreal &relFrame) {
+QRectF InternalLinkGroupBox::getRelBoundingRect(const qreal relFrame) {
     if(!getLinkTarget()) return QRectF();
     return getLinkTarget()->getRelBoundingRect(relFrame);
 }

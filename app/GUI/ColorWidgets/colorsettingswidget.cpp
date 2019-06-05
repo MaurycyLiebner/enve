@@ -8,10 +8,10 @@
 #include "global.h"
 #include "GUI/actionbutton.h"
 
-void moveAndResizeValueRect(const int &rect_x_t,
+void moveAndResizeValueRect(const int rect_x_t,
                             int *rect_y_t,
-                            const int &rect_width,
-                            const int &rect_height,
+                            const int rect_width,
+                            const int rect_height,
                             ColorValueRect *rect_t) {
     if(rect_t->isHidden()) {
         return;
@@ -21,10 +21,10 @@ void moveAndResizeValueRect(const int &rect_x_t,
     rect_t->resize(rect_width, rect_height);
 }
 
-void ColorSettingsWidget::setCurrentColor(const qreal &h_t,
-                                          const qreal &s_t,
-                                          const qreal &v_t,
-                                          const qreal &a_t) {
+void ColorSettingsWidget::setCurrentColor(const qreal h_t,
+                                          const qreal s_t,
+                                          const qreal v_t,
+                                          const qreal a_t) {
     GLfloat hueGl = static_cast<GLfloat>(h_t);
     GLfloat satGl = static_cast<GLfloat>(s_t);
     GLfloat valGl = static_cast<GLfloat>(v_t);
@@ -275,7 +275,7 @@ void ColorSettingsWidget::emitFullColorChangedSignal() {
     emitEditingFinishedSignal();
 }
 
-void ColorSettingsWidget::moveAlphaWidgetToTab(const int &tabId) {
+void ColorSettingsWidget::moveAlphaWidgetToTab(const int tabId) {
     if(tabId == 1) {
         QVBoxLayout *hueParentLay = ((QVBoxLayout*)hLayout->parent());
         if(hueParentLay != mHSVLayout) {
@@ -600,9 +600,9 @@ void addColorWidgetActionToMenu(QMenu *menu_t,
 }
 
 void ColorSettingsWidget::setRectValuesAndColor(
-        const qreal &red, const qreal &green, const qreal &blue,
-        const qreal &hue, const qreal &hsvSaturation, const qreal &value,
-        const qreal &hslSaturation, const qreal &lightness) {
+        const qreal red, const qreal green, const qreal blue,
+        const qreal hue, const qreal hsvSaturation, const qreal value,
+        const qreal hslSaturation, const qreal lightness) {
     GLfloat hueGl = static_cast<GLfloat>(hue);
     GLfloat satGl = static_cast<GLfloat>(hsvSaturation);
     GLfloat valGl = static_cast<GLfloat>(value);
@@ -747,7 +747,7 @@ void ColorSettingsWidget::updateAlphaFromSpin() {
     aRect->setDisplayedValue(aSpin->value());
 }
 
-void ColorSettingsWidget::setColorMode(const int &colorMode) {
+void ColorSettingsWidget::setColorMode(const int colorMode) {
     if(mTargetAnimator) {
         mTargetAnimator->setColorMode(static_cast<ColorMode>(colorMode));
     }
@@ -755,7 +755,7 @@ void ColorSettingsWidget::setColorMode(const int &colorMode) {
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
-void ColorSettingsWidget::setAlphaFromSpin(const qreal &val) {
+void ColorSettingsWidget::setAlphaFromSpin(const qreal val) {
     if(mAlphaHidden) return;
     mColorLabel->setAlpha(val);
     aRect->setDisplayedValue(val);

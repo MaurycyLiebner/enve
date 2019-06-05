@@ -24,14 +24,14 @@ public:
     qsptr<BoundingBox> createLink();
     qsptr<BoundingBox> createLinkForLinkGroup();
 
-    bool isFrameInDurationRect(const int &relFrame) const;
+    bool isFrameInDurationRect(const int relFrame) const;
 
     stdsptr<BoundingBoxRenderData> createRenderData();
-    QRectF getRelBoundingRect(const qreal &relFrame);
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
+    QRectF getRelBoundingRect(const qreal relFrame);
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
-    QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
-    QMatrix getTotalTransformAtRelFrameF(const qreal& relFrame) {
+    QMatrix getRelativeTransformAtRelFrameF(const qreal relFrame);
+    QMatrix getTotalTransformAtRelFrameF(const qreal relFrame) {
         if(isParentLink()) {
             return getRelativeTransformAtRelFrameF(relFrame)*
                     mParentGroup->getTotalTransformAtRelFrameF(relFrame);
@@ -40,14 +40,14 @@ public:
         }
     }
 
-    void setupEffectsF(const qreal &relFrame,
+    void setupEffectsF(const qreal relFrame,
                        BoundingBoxRenderData * const data);
 
-    qreal getEffectsMarginAtRelFrameF(const qreal &relFrame);
+    qreal getEffectsMarginAtRelFrameF(const qreal relFrame);
 
     const SkBlendMode &getBlendMode();
 
-    void setupRenderData(const qreal &relFrame,
+    void setupRenderData(const qreal relFrame,
                          BoundingBoxRenderData * const data);
 
     int prp_getRelFrameShift() const;

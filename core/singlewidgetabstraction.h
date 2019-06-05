@@ -25,39 +25,39 @@ class SingleWidgetAbstraction : public StdSelfRef {
 public:
     SingleWidgetAbstraction(const qsptr<SingleWidgetTarget>& target,
                             const UpdateFuncs& updateFuncs,
-                            const int &visiblePartId);
+                            const int visiblePartId);
     ~SingleWidgetAbstraction();
 
-    bool getAbstractions(const int &minY, const int &maxY,
+    bool getAbstractions(const int minY, const int maxY,
                          int& currY, int currX,
-                         const int &swtHeight,
+                         const int swtHeight,
                          QList<SingleWidgetAbstraction*>& abstractions,
                          const SWT_RulesCollection &rules,
-                         const bool &parentSatisfiesRule,
-                         const bool &parentMainTarget);
-    bool setSingleWidgetAbstractions(const int &minY, const int &maxY,
+                         const bool parentSatisfiesRule,
+                         const bool parentMainTarget);
+    bool setSingleWidgetAbstractions(const int minY, const int maxY,
                                      int &currY, int currX,
-                                     const int &swtHeight,
+                                     const int swtHeight,
                                      const SetAbsFunc& setAbsFunc,
                                      const SWT_RulesCollection &rules,
-                                     const bool &parentSatisfiesRule,
-                                     const bool &parentMainTarget);
+                                     const bool parentSatisfiesRule,
+                                     const bool parentMainTarget);
 
     int getHeight(const SWT_RulesCollection &rules,
-                  const bool &parentSatisfiesRule,
-                  const bool &parentMainTarget,
-                  const int& swtHeight);
+                  const bool parentSatisfiesRule,
+                  const bool parentMainTarget,
+                  const int swtHeight);
 
-    void setContentVisible(const bool &bT);
+    void setContentVisible(const bool bT);
 
     SingleWidgetTarget *getTarget() const;
 
     void addChildAbstractionForTarget(SingleWidgetTarget * const target);
     void addChildAbstractionForTargetAt(SingleWidgetTarget * const target,
-                                        const int &id);
+                                        const int id);
     void addChildAbstraction(SingleWidgetAbstraction * const abs);
     void addChildAbstractionAt(SingleWidgetAbstraction * const abs,
-                               const int &id);
+                               const int id);
 
     void removeChildAbstractionForTarget(
             const SingleWidgetTarget * const target);
@@ -83,7 +83,7 @@ public:
             SingleWidgetTarget * const targetP,
             const SWT_Target &target);
 
-    void setIsMainTarget(const bool &bT) {
+    void setIsMainTarget(const bool bT) {
         mIsMainTarget = bT;
     }
 
@@ -91,7 +91,7 @@ public:
             const SingleWidgetTarget * const target);
 
     void moveChildAbstractionForTargetTo(SingleWidgetTarget * const target,
-                                         const int &id);
+                                         const int id);
     void afterContentVisibilityChanged();
 
     SingleWidgetAbstraction* getParent() const {
@@ -111,7 +111,7 @@ protected:
     void setParent(SingleWidgetAbstraction * const parent) {
         mParent = parent;
     }
-    void setIdInParent(const int& id) {
+    void setIdInParent(const int id) {
         mIdInParent = id;
     }
 private:
@@ -121,7 +121,7 @@ private:
     const UpdateFuncs mUpdateFuncs;
     const qptr<SingleWidgetTarget> mTarget;
 
-    void updateChildrenIds(const int& minId, const int& maxId) const {
+    void updateChildrenIds(const int minId, const int maxId) const {
         for(int i = minId; i <= maxId; i++) {
             mChildren.at(i)->setIdInParent(i);
         }

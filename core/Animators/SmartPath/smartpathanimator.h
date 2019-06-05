@@ -18,7 +18,7 @@ public:
 
     void drawCanvasControls(SkCanvas * const canvas,
                             const CanvasMode &mode,
-                            const SkScalar &invScale) {
+                            const SkScalar invScale) {
         SkiaHelpers::drawOutlineOverlay(canvas, mCurrentPath, invScale,
                                         toSkMatrix(getTransform()));
         Property::drawCanvasControls(canvas, mode, invScale);
@@ -30,7 +30,7 @@ public:
         GraphAnimator::prp_afterChangedAbsRange(range);
     }
 
-    void anim_setAbsFrame(const int &frame) {
+    void anim_setAbsFrame(const int frame) {
         if(frame == anim_getCurrentAbsFrame()) return;
         const int lastRelFrame = anim_getCurrentRelFrame();
         Animator::anim_setAbsFrame(frame);
@@ -42,7 +42,7 @@ public:
         }
     }
 
-    void anim_addKeyAtRelFrame(const int& relFrame) {
+    void anim_addKeyAtRelFrame(const int relFrame) {
         if(anim_getKeyAtRelFrame(relFrame)) return;
         const auto newKey = SPtrCreate(SmartPathKey)(this);
         newKey->setRelFrame(relFrame);
@@ -80,7 +80,7 @@ public:
         else mPathBeingChanged_d = &mBaseValue;
     }
 
-    void deepCopySmartPathFromRelFrame(const int& relFrame,
+    void deepCopySmartPathFromRelFrame(const int relFrame,
                                        SmartPath &result) const {
         const auto prevKey = anim_getPrevKey<SmartPathKey>(relFrame);
         const auto nextKey = anim_getNextKey<SmartPathKey>(relFrame);
@@ -89,11 +89,11 @@ public:
                                       keyAtFrame, result);
     }
 
-    SkPath getPathAtAbsFrame(const qreal &frame) {
+    SkPath getPathAtAbsFrame(const qreal frame) {
         return getPathAtRelFrame(prp_absFrameToRelFrameF(frame));
     }
 
-    SkPath getPathAtRelFrame(const qreal &frame) {
+    SkPath getPathAtRelFrame(const qreal frame) {
         const auto diff = prp_differencesBetweenRelFrames(
                     qRound(frame), anim_getCurrentRelFrame());
         if(!diff) return getCurrentPath();
@@ -167,7 +167,7 @@ public:
         pathChanged();
     }
 
-    void actionRemoveNode(const int& nodeId, const bool &approx) {
+    void actionRemoveNode(const int nodeId, const bool approx) {
         for(const auto &key : anim_mKeys) {
             const auto spKey = GetAsPtr(key, SmartPathKey);
             spKey->getValue().actionRemoveNode(nodeId, approx);
@@ -210,9 +210,9 @@ public:
         return id;
     }
 
-    int actionInsertNodeBetween(const int &node1Id,
-                                const int &node2Id,
-                                const qreal &t) {
+    int actionInsertNodeBetween(const int node1Id,
+                                const int node2Id,
+                                const qreal t) {
         beforeBinaryPathChange();
         const auto curr = getCurrentlyEditedPath();
         if(curr->getNodePtr(node1Id)->getCtrlsMode() == CTRLS_SYMMETRIC) {
@@ -231,7 +231,7 @@ public:
         return id;
     }
 
-    void actionConnectNodes(const int &node1Id, const int &node2Id) {
+    void actionConnectNodes(const int node1Id, const int node2Id) {
         for(const auto &key : anim_mKeys) {
             const auto spKey = GetAsPtr(key, SmartPathKey);
             spKey->getValue().actionConnectNodes(node1Id, node2Id);
@@ -240,7 +240,7 @@ public:
         prp_afterWholeInfluenceRangeChanged();
     }
 
-    void actionMergeNodes(const int &node1Id, const int &node2Id) {
+    void actionMergeNodes(const int node1Id, const int node2Id) {
         for(const auto &key : anim_mKeys) {
             const auto spKey = GetAsPtr(key, SmartPathKey);
             spKey->getValue().actionMergeNodes(node1Id, node2Id);
@@ -249,9 +249,9 @@ public:
         prp_afterWholeInfluenceRangeChanged();
     }
 
-    void actionMoveNodeBetween(const int& nodeId,
-                               const int& prevNodeId,
-                               const int& nextNodeId) {
+    void actionMoveNodeBetween(const int nodeId,
+                               const int prevNodeId,
+                               const int nextNodeId) {
         beforeBinaryPathChange();
         getCurrentlyEditedPath()->actionMoveNodeBetween(
                     nodeId, prevNodeId, nextNodeId);
@@ -262,7 +262,7 @@ public:
         actionConnectNodes(0, mBaseValue.getNodeCount() - 1);
     }
 
-    void actionDisconnectNodes(const int &node1Id, const int &node2Id);
+    void actionDisconnectNodes(const int node1Id, const int node2Id);
 
     void actionReverseCurrent() {
         beforeBinaryPathChange();
@@ -362,7 +362,7 @@ private:
 
     void updateAllPoints();
 
-    void deepCopySmartPathFromRelFrame(const int& relFrame,
+    void deepCopySmartPathFromRelFrame(const int relFrame,
                                        SmartPathKey * const prevKey,
                                        SmartPathKey * const nextKey,
                                        SmartPathKey * const keyAtFrame,

@@ -25,11 +25,11 @@ public:
         return mRange.span();
     }
 
-    void setUnaryRange(const int &unary);
-    void setRangeMax(const int &max);
-    void setRangeMin(const int &min);
+    void setUnaryRange(const int unary);
+    void setRangeMax(const int max);
+    void setRangeMin(const int min);
     void setRange(const FrameRange &range);
-    bool inRange(const int &unary) const;
+    bool inRange(const int unary) const;
 private:
     FrameRange mRange;
     HDDCachableCacheHandler * const mParentCacheHandler_k;

@@ -34,12 +34,12 @@ void Gradient::addColorToList(const qsptr<ColorAnimator>& newColorAnimator) {
     ca_addChildAnimator(newColorAnimator);
 }
 
-QColor Gradient::getCurrentColorAt(const int &id) {
+QColor Gradient::getCurrentColorAt(const int id) {
     if(id < 0 || id >= mColors.count()) return Qt::black;
     return mColors.at(id)->getCurrentColor();
 }
 
-ColorAnimator *Gradient::getColorAnimatorAt(const int &id) {
+ColorAnimator *Gradient::getColorAnimatorAt(const int id) {
     if(id < 0 || id >= mColors.count()) return nullptr;
     return mColors.at(id).get();
 }
@@ -62,7 +62,7 @@ QGradientStops Gradient::getQGradientStops() {
     return mQGradientStops;
 }
 
-void Gradient::swapColors(const int &id1, const int &id2) {
+void Gradient::swapColors(const int id1, const int id2) {
     ca_swapChildAnimators(mColors.at(id1).get(),
                           mColors.at(id2).get());
     mColors.swap(id1, id2);
@@ -70,7 +70,7 @@ void Gradient::swapColors(const int &id1, const int &id2) {
     prp_afterWholeInfluenceRangeChanged();
 }
 
-void Gradient::removeColor(const int &id) {
+void Gradient::removeColor(const int id) {
     removeColor(mColors.at(id));
 }
 
@@ -88,7 +88,7 @@ void Gradient::addColor(const QColor &color) {
     prp_afterWholeInfluenceRangeChanged();
 }
 
-void Gradient::replaceColor(const int &id, const QColor &color) {
+void Gradient::replaceColor(const int id, const QColor &color) {
     mColors.at(id)->qra_setCurrentValue(color);
     updateQGradientStops(Animator::USER_CHANGE);
     prp_afterWholeInfluenceRangeChanged();
@@ -106,12 +106,12 @@ bool Gradient::affectsPaths() {
     return !mAffectedPaths.isEmpty();
 }
 
-void Gradient::startColorIdTransform(const int& id) {
+void Gradient::startColorIdTransform(const int id) {
     if(mColors.count() <= id || id < 0) return;
     mColors.at(id)->prp_startTransform();
 }
 
-QGradientStops Gradient::getQGradientStopsAtAbsFrame(const qreal &absFrame) {
+QGradientStops Gradient::getQGradientStopsAtAbsFrame(const qreal absFrame) {
     QGradientStops stops;
     const qreal inc = 1./(mColors.length() - 1);
     qreal cPos = 0.;
@@ -143,6 +143,6 @@ int Gradient::getLoadId() {
     return mLoadId;
 }
 
-void Gradient::setLoadId(const int &id) {
+void Gradient::setLoadId(const int id) {
     mLoadId = id;
 }

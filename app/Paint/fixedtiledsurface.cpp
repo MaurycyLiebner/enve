@@ -32,13 +32,13 @@ void FixedTiledSurface::resetNullTile() {
     memset(fNullTile, 0, fTileSize);
 }
 
-bool FixedTiledSurface::resize(const int &width, const int &height) {
+bool FixedTiledSurface::resize(const int width, const int height) {
     assert(width > 0);
     assert(height > 0);
 
     free(fTileBuffer);
 
-    const int& tileSizePixels = fParent.tile_size;
+    const int tileSizePixels = fParent.tile_size;
 
     const int tilesWidth = qCeil(static_cast<double>(width)/tileSizePixels);
     const int tilesHeight = qCeil(static_cast<double>(height)/tileSizePixels);
@@ -80,7 +80,7 @@ bool FixedTiledSurface::resize(const int &width, const int &height) {
     return true;
 }
 
-bool FixedTiledSurface::initialize(const int &width, const int &height) {
+bool FixedTiledSurface::initialize(const int width, const int height) {
     assert(width > 0);
     assert(height > 0);
 
@@ -128,7 +128,7 @@ void FixedTiledSurface::_endRequest(MyPaintTileRequest * const request) {
     }
 }
 
-void FixedTiledSurface::updateImage(const int &tx, const int &ty) {
+void FixedTiledSurface::updateImage(const int tx, const int ty) {
     MyPaintTileRequest request;
     request.tx = tx; request.ty = ty;
     _startRequest(&request);

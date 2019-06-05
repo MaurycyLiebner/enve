@@ -874,7 +874,7 @@ void MainWindow::previewPaused() {
 //    }
 //}
 
-void MainWindow::setResolutionFractionValue(const qreal &value) {
+void MainWindow::setResolutionFractionValue(const qreal value) {
     mCanvasWindow->setResolutionFraction(value);
 }
 
@@ -1318,14 +1318,14 @@ void MainWindow::updateRecentMenu() {
     }
 }
 
-void MainWindow::setCurrentFrame(const int &frame) {
+void MainWindow::setCurrentFrame(const int frame) {
     mBoxesListAnimationDockWidget->setCurrentFrame(frame);
     mFillStrokeSettings->getGradientWidget()->updateAfterFrameChanged(frame);
     mCanvasWindow->updateAfterFrameChanged(frame);
     queScheduledTasksAndUpdate();
 }
 
-Gradient *MainWindow::getLoadedGradientById(const int &id) {
+Gradient *MainWindow::getLoadedGradientById(const int id) {
     for(const auto gradient : mLoadedGradientsList) {
         if(gradient->getLoadId() == id) return gradient;
     }

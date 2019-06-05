@@ -6,21 +6,21 @@
 #include "GUI/mainwindow.h"
 #include "filesourcescache.h"
 
-sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int &relFrame) {
+sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int relFrame) {
     const auto cont = mFramesCache.atRelFrame
             <ImageCacheContainer>(relFrame);
     if(!cont) return sk_sp<SkImage>();
     return cont->getImageSk();
 }
 
-sk_sp<SkImage> VideoCacheHandler::getFrameAtOrBeforeFrame(const int& relFrame) {
+sk_sp<SkImage> VideoCacheHandler::getFrameAtOrBeforeFrame(const int relFrame) {
     const auto cont = mFramesCache.atOrBeforeRelFrame
             <ImageCacheContainer>(relFrame);
     if(!cont) return sk_sp<SkImage>();
     return cont->getImageSk();
 }
 
-void VideoCacheHandler::frameLoaderFinished(const int& frame,
+void VideoCacheHandler::frameLoaderFinished(const int frame,
                                             const sk_sp<SkImage>& image) {
     if(image) {
         mFramesCache.createNew<ImageCacheContainer>(frame, image);
@@ -60,7 +60,7 @@ void VideoCacheHandler::replace() {
     }
 }
 
-Task* VideoCacheHandler::scheduleFrameLoad(const int &frame) {
+Task* VideoCacheHandler::scheduleFrameLoad(const int frame) {
     if(frame < 0 || frame >= mFrameCount)
         RuntimeThrow("Frame outside of range " + std::to_string(frame));
     const auto currLoader = getFrameLoader(frame);

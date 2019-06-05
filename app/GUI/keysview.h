@@ -51,11 +51,11 @@ public:
     bool graphProcessFilteredKeyEvent(QKeyEvent *event);
     void graphResizeEvent(QResizeEvent *);
     void graphAddViewedAnimator(GraphAnimator * const animator);
-    void graphIncScale(const qreal &inc);
-    void graphSetScale(const qreal &scale);
+    void graphIncScale(const qreal inc);
+    void graphSetScale(const qreal scale);
     void graphUpdateDimensions();
-    void graphIncMinShownVal(const qreal &inc);
-    void graphSetMinShownVal(const qreal &newMinShownVal);
+    void graphIncMinShownVal(const qreal inc);
+    void graphSetMinShownVal(const qreal newMinShownVal);
     void graphGetValueAndFrameFromPos(const QPointF &pos,
                                       qreal &value, qreal &frame) const;
     void graphMiddleMove(const QPointF &movePos);
@@ -112,8 +112,8 @@ public:
 
     void graphUpdateAfterKeysChanged();
 
-    void setFramesRange(const int &startFrame,
-                        const int &endFrame);
+    void setFramesRange(const int startFrame,
+                        const int endFrame);
 
     void graphMakeSegmentsLinearAction();
     void graphMakeSegmentsSmoothAction();
@@ -124,8 +124,8 @@ public:
 
     void graphClearAnimatorSelection();
 
-    void setViewedVerticalRange(const int &top,
-                        const int &bottom);
+    void setViewedVerticalRange(const int top,
+                        const int bottom);
     void clearHovered();
 
     int graphGetAnimatorId(GraphAnimator * const anim);
@@ -135,7 +135,7 @@ private:
     void scrollLeft();
     void graphConstrainAnimatorCtrlsFrameValues();
     void graphGetAnimatorsMinMaxValue(qreal &minVal, qreal &maxVal);
-    void graphMakeSegmentsSmoothAction(const bool &smooth);
+    void graphMakeSegmentsSmoothAction(const bool smooth);
     void sortSelectedKeys();
     void clearHoveredKey();
 

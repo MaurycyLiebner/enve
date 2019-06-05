@@ -396,7 +396,7 @@ void BoxesListAnimationDockWidget::interruptPreview() {
     mMainWindow->getCanvasWindow()->interruptPreview();
 }
 
-void BoxesListAnimationDockWidget::setLocalPivot(const bool &bT) {
+void BoxesListAnimationDockWidget::setLocalPivot(const bool bT) {
     mMainWindow->getCanvasWindow()->setLocalPivot(bT);
     mMainWindow->queScheduledTasksAndUpdate();
 }
@@ -419,7 +419,7 @@ void BoxesListAnimationDockWidget::setRenderMode() {
     mTimelineWidget->hide();
 }
 
-void BoxesListAnimationDockWidget::setCurrentFrame(const int &frame) {
+void BoxesListAnimationDockWidget::setCurrentFrame(const int frame) {
     mAnimationWidgetScrollbar->setFirstViewedFrame(frame);
     mAnimationWidgetScrollbar->update();
     mRenderWidget->setRenderedFrame(frame);
@@ -444,7 +444,7 @@ void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
 }
 
 void BoxesListAnimationDockWidget::setViewedFrameRange(
-        const int &minFrame, const int &maxFrame) {
+        const int minFrame, const int maxFrame) {
     mFrameRangeScrollbar->setViewedFrameRange(minFrame, maxFrame);
     mAnimationWidgetScrollbar->setDisplayedFrameRange(minFrame, maxFrame);
     for(const auto& keysView : mBoxesListKeysViewWidgets) {
@@ -453,7 +453,7 @@ void BoxesListAnimationDockWidget::setViewedFrameRange(
 }
 
 void BoxesListAnimationDockWidget::setCanvasFrameRange(
-        const int &minFrame, const int &maxFrame) {
+        const int minFrame, const int maxFrame) {
     mFrameRangeScrollbar->setDisplayedFrameRange(minFrame, maxFrame);
     setViewedFrameRange(mFrameRangeScrollbar->getFirstViewedFrame(),
                         mFrameRangeScrollbar->getLastViewedFrame());

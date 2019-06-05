@@ -12,7 +12,7 @@ public:
     explicit GradientsListWidget(GradientWidget *gradientWidget,
                                  QWidget *parent = nullptr);
 
-    void setNumberGradients(const int &n);
+    void setNumberGradients(const int n);
 
     DisplayedGradientsWidget *getDisplayedGradientsWidget();
 

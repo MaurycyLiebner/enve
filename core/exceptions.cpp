@@ -27,8 +27,8 @@ bool isExceptionNested(const std::exception& e) {
 
 void _gPrintException(const std::exception& e,
                       QString allText,
-                      const uint& level,
-                      const bool& fatal) {
+                      const uint level,
+                      const bool fatal) {
     allText = QString::number(level) + ") " + e.what() + "\n " + allText;
     qCritical() << std::to_string(level) + ") " << e.what();
     try {
@@ -52,7 +52,7 @@ void gPrintExceptionFatal(const std::exception& e) {
 
 QString gAllTextFromException(const std::exception &e,
                               QString allText,
-                              const uint &level) {
+                              const uint level) {
     allText = (allText.isEmpty() ? "" : allText + "\n") +
             (std::to_string(level) + ") ").c_str() + e.what();
     qCritical() << std::to_string(level) + ") " << e.what();
@@ -65,7 +65,7 @@ QString gAllTextFromException(const std::exception &e,
     return allText;
 }
 
-void gPrintException(const bool& fatal, const QString &allText) {
+void gPrintException(const bool fatal, const QString &allText) {
     const QString txt = fatal ? "Fatal" : "Critical";
     QMessageBox(QMessageBox::Critical, txt + " Error", allText).exec();
 }

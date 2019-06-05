@@ -18,7 +18,7 @@ CirclesEffect::CirclesEffect(qreal circlesRadius,
 }
 
 stdsptr<PixmapEffectRenderData> CirclesEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal &relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(CirclesEffectRenderData)();
     renderData->circlesDistance =
             mCirclesDistance->getEffectiveValue(relFrame);
@@ -29,7 +29,7 @@ stdsptr<PixmapEffectRenderData> CirclesEffect::getPixmapEffectRenderDataForRelFr
 }
 
 void CirclesEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
-                                             const qreal &scale) {
+                                             const qreal scale) {
     Q_UNUSED(bitmap)
     Q_UNUSED(scale)
 }

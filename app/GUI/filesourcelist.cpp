@@ -260,7 +260,7 @@ void FileSourceList::dragEnterEvent(QDragEnterEvent *event) {
     }
 }
 
-void FileCacheHandlerAbstraction::setSelected(const bool &bT) {
+void FileCacheHandlerAbstraction::setSelected(const bool bT) {
     if(bT == selected) return;
     selected = bT;
     if(selected) {

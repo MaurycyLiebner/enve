@@ -4,7 +4,7 @@ bool RenderDataHandler::removeItem(const stdsptr<BoundingBoxRenderData>& item) {
     return removeItemAtRelFrame(item->fRelFrame);
 }
 
-bool RenderDataHandler::removeItemAtRelFrame(const int &frame) {
+bool RenderDataHandler::removeItemAtRelFrame(const int frame) {
     int id;
     if(getItemIdAtRelFrame(frame, &id)) {
         mItems.takeAt(id)->fRefInParent = false;
@@ -13,7 +13,7 @@ bool RenderDataHandler::removeItemAtRelFrame(const int &frame) {
     return false;
 }
 
-BoundingBoxRenderData *RenderDataHandler::getItemAtRelFrame(const int &frame) {
+BoundingBoxRenderData *RenderDataHandler::getItemAtRelFrame(const int frame) {
     int id;
     if(getItemIdAtRelFrame(frame, &id)) {
         const auto item = mItems.at(id).get();
@@ -29,7 +29,7 @@ void RenderDataHandler::addItemAtRelFrame(
     item->fRefInParent = true;
 }
 
-int RenderDataHandler::getItemInsertIdAtRelFrame(const int &relFrame) {
+int RenderDataHandler::getItemInsertIdAtRelFrame(const int relFrame) {
     int minId = 0;
     int maxId = mItems.count();
 
@@ -53,7 +53,7 @@ int RenderDataHandler::getItemInsertIdAtRelFrame(const int &relFrame) {
     return 0;
 }
 
-bool RenderDataHandler::getItemIdAtRelFrame(const int &relFrame, int *id) {
+bool RenderDataHandler::getItemIdAtRelFrame(const int relFrame, int *id) {
     int minId = 0;
     int maxId = mItems.count() - 1;
 

@@ -12,23 +12,23 @@ MinimalScrollWidget::MinimalScrollWidget(ScrollArea * const parent) :
     //createVisiblePartWidget();
 }
 
-void MinimalScrollWidget::scrollParentAreaBy(const int &by) {
+void MinimalScrollWidget::scrollParentAreaBy(const int by) {
     mParentScrollArea->scrollBy(0, by);
 }
 
-void MinimalScrollWidget::setWidth(const int &width) {
+void MinimalScrollWidget::setWidth(const int width) {
     setFixedWidth(width);
     mMinimalVisiblePartWidget->setFixedWidth(width);
     mMinimalVisiblePartWidget->updateWidgetsWidth();
 }
 
-void MinimalScrollWidget::changeVisibleTop(const int &top) {
+void MinimalScrollWidget::changeVisibleTop(const int top) {
     int newTop = top - top % MIN_WIDGET_HEIGHT;
     mMinimalVisiblePartWidget->move(0, newTop);
     mMinimalVisiblePartWidget->setVisibleTop(newTop);
 }
 
-void MinimalScrollWidget::changeVisibleHeight(const int &height) {
+void MinimalScrollWidget::changeVisibleHeight(const int height) {
     int newHeight = qCeil(height/(qreal)MIN_WIDGET_HEIGHT)*
                     MIN_WIDGET_HEIGHT;
     mMinimalVisiblePartWidget->setVisibleHeight(newHeight);

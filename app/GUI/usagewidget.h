@@ -8,11 +8,11 @@ class UsageWidget : public QLabel {
     Q_OBJECT
 public:
     explicit UsageWidget(QWidget *parent = nullptr);
-    void setThreadsUsage(const int& threads);
-    void setThreadsTotal(const int& threads);
-    void setHddUsage(const bool& used);
-    void setRamUsage(const qreal& thisGB);
-    void setTotalRam(const qreal& totalRamGB);
+    void setThreadsUsage(const int threads);
+    void setThreadsTotal(const int threads);
+    void setHddUsage(const bool used);
+    void setRamUsage(const qreal thisGB);
+    void setTotalRam(const qreal totalRamGB);
 private:
     void updateDisplayedText();
 

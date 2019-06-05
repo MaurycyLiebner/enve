@@ -172,7 +172,7 @@ stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sLoadFromFile(
 UniformSpecifier QrealAnimatorUniformSpecifierCreator::create(
         const GLint &loc,
         Property * const property,
-        const qreal &relFrame) const {
+        const qreal relFrame) const {
     const auto qa = GetAsPtr(property, QrealAnimator);
     const QString propName = property->prp_getName();
     const qreal val = qa->getEffectiveValue(relFrame);
@@ -252,7 +252,7 @@ void QrealAnimatorUniformSpecifierCreator::sTestScript(const QString &script,
 UniformSpecifier IntAnimatorUniformSpecifierCreator::create(
         const GLint &loc,
         Property * const property,
-        const qreal &relFrame) const {
+        const qreal relFrame) const {
     const auto ia = GetAsPtr(property, IntAnimator);
     const int val = ia->getEffectiveIntValue(relFrame);
     const QString propName = property->prp_getName();

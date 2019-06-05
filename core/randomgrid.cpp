@@ -8,15 +8,15 @@ RandomGrid::RandomGrid() : ComplexAnimator("randomness grid") {
     ca_addChildAnimator(mGridSize);
 }
 
-qreal RandomGrid::getBaseSeed(const qreal &relFrame) const {
+qreal RandomGrid::getBaseSeed(const qreal relFrame) const {
     return mSeed->getEffectiveValue(relFrame);
 }
 
-qreal RandomGrid::getGridSize(const qreal &relFrame) const {
+qreal RandomGrid::getGridSize(const qreal relFrame) const {
     return mGridSize->getEffectiveValue(relFrame);
 }
 
-qreal RandomGrid::getRandomValue(const qreal &relFrame, const QPointF &pos) const {
+qreal RandomGrid::getRandomValue(const qreal relFrame, const QPointF &pos) const {
     return sGetRandomValue(getBaseSeed(relFrame), getGridSize(relFrame), pos);
 }
 
@@ -30,7 +30,7 @@ void RandomGrid::readProperty(QIODevice *target) {
     mGridSize->readProperty(target);
 }
 
-qreal RandomGrid::sGetRandomValue(const qreal &baseSeed, const qreal &gridSize,
+qreal RandomGrid::sGetRandomValue(const qreal baseSeed, const qreal gridSize,
                                   const QPointF &pos) {
     const QPointF gridIdF = pos/gridSize;
     if(isInteger4Dec(gridIdF.x()) && isInteger4Dec(gridIdF.y())) {
@@ -63,13 +63,13 @@ qreal RandomGrid::sGetRandomValue(const qreal &baseSeed, const qreal &gridSize,
     return (grid1V*grid1W + grid2V*grid2W + grid3V*grid3W + grid4V*grid4W)/wSum;
 }
 
-qreal RandomGrid::sGetRandomValue(const qreal &min, const qreal &max,
-                                  const qreal &baseSeed, const qreal &gridSize,
+qreal RandomGrid::sGetRandomValue(const qreal min, const qreal max,
+                                  const qreal baseSeed, const qreal gridSize,
                                   const QPointF &pos) {
     return sGetRandomValue(baseSeed, gridSize, pos)*(max - min) + min;
 }
 
-qreal RandomGrid::sGetRandomValue(const qreal &baseSeed, const QPoint &gridId) {
+qreal RandomGrid::sGetRandomValue(const qreal baseSeed, const QPoint &gridId) {
     const int seedInc = gridId.x()*100 + gridId.y()*1000;
     if(isInteger4Dec(baseSeed)) {
         QRandomGenerator rand(static_cast<quint32>(qRound(baseSeed) + seedInc));

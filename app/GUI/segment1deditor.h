@@ -11,10 +11,10 @@ class Segment1DEditor : public QWidget {
     };
 
 public:
-    explicit Segment1DEditor(const qreal& minY, const qreal& maxY,
+    explicit Segment1DEditor(const qreal minY, const qreal maxY,
                              QWidget *parent = nullptr);
 
-    void setValueRange(const qreal& minY, const qreal& maxY) {
+    void setValueRange(const qreal minY, const qreal maxY) {
         mMinY = minY;
         mMaxY = maxY;
         update();
@@ -37,12 +37,12 @@ public:
         emit segmentChanged(seg);
     }
 
-    void setMargin(const qreal& margin) {
+    void setMargin(const qreal margin) {
         mMargin = margin;
         clampTopMarginAddMarginY();
     }
 
-    void setPointRadius(const qreal& radius) {
+    void setPointRadius(const qreal radius) {
         mPtRad = radius;
         clampTopMarginAddMarginY();
     }
@@ -60,9 +60,9 @@ protected:
 private:
     void updateDrawPath();
     QPointF valueToPos(const QPointF &value) const;
-    qreal xValueToXPos(const qreal &x) const;
-    qreal yValueToYPos(const qreal &y) const;
-    QPointF valueToPos(const qreal &valX, const qreal& valY) const;
+    qreal xValueToXPos(const qreal x) const;
+    qreal yValueToYPos(const qreal y) const;
+    QPointF valueToPos(const qreal valX, const qreal valY) const;
     QPointF posToValue(const QPointF &pos) const;
     QPointF p0() const;
     QPointF c1() const;

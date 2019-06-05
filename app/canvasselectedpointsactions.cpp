@@ -145,7 +145,7 @@ void Canvas::cancelSelectedPointsTransform() {
 }
 
 void Canvas::moveSelectedPointsByAbs(const QPointF &by,
-                                     const bool &startTransform) {
+                                     const bool startTransform) {
     if(startTransform) {
         startSelectedPointsTransform();
         for(const auto& point : mSelectedPoints_d) {
@@ -236,9 +236,9 @@ int Canvas::getPointsSelectionCount() const {
     return mSelectedPoints_d.length();
 }
 
-void Canvas::rotateSelectedPointsBy(const qreal &rotBy,
+void Canvas::rotateSelectedPointsBy(const qreal rotBy,
                                     const QPointF &absOrigin,
-                                    const bool &startTrans) {
+                                    const bool startTrans) {
     if(mSelectedPoints_d.isEmpty()) return;
     if(startTrans) {
         if(mLocalPivot) {
@@ -261,10 +261,10 @@ void Canvas::rotateSelectedPointsBy(const qreal &rotBy,
     }
 }
 
-void Canvas::scaleSelectedPointsBy(const qreal &scaleXBy,
-                                   const qreal &scaleYBy,
+void Canvas::scaleSelectedPointsBy(const qreal scaleXBy,
+                                   const qreal scaleYBy,
                                    const QPointF &absOrigin,
-                                   const bool &startTrans) {
+                                   const bool startTrans) {
     if(mSelectedPoints_d.isEmpty()) return;
     if(startTrans) {
         if(mLocalPivot) {

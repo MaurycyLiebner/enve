@@ -9,7 +9,7 @@ struct CubicList {
     CubicList(const QList<qCubicSegment2D>& segs);
     CubicList(const CubicList& src);
 
-    PosAndTan posAndTanAtLength(const qreal& atLength) {
+    PosAndTan posAndTanAtLength(const qreal atLength) {
         if(atLength < 0) {
             if(mSegments.isEmpty()) return { QPointF(0, 0), QPointF(0, 0) };
             return { mSegments.first().p0(), mSegments.first().tanAtT(0) };
@@ -27,7 +27,7 @@ struct CubicList {
         return { mSegments.last().p3(), mSegments.last().tanAtT(1) };
     }
 
-    QPointF posAtLength(const qreal& atLength) {
+    QPointF posAtLength(const qreal atLength) {
         if(atLength < 0) {
             if(mSegments.isEmpty()) return QPointF(0, 0);
             return mSegments.first().p0();
@@ -45,7 +45,7 @@ struct CubicList {
         return mSegments.last().p3();
     }
 
-    QPointF tanAtLength(const qreal& atLength) {
+    QPointF tanAtLength(const qreal atLength) {
         if(atLength < 0) {
             if(mSegments.isEmpty()) return QPointF(0, 0);
             return mSegments.first().tanAtT(0);
@@ -63,11 +63,11 @@ struct CubicList {
         return mSegments.last().tanAtT(1);
     }
 
-    CubicList getFragment(const qreal &minLenFrac,
-                          const qreal &maxLenFrac);
+    CubicList getFragment(const qreal minLenFrac,
+                          const qreal maxLenFrac);
 
-    CubicList getFragmentUnbound(const qreal &minLenFrac,
-                                 const qreal &maxLenFrac);
+    CubicList getFragmentUnbound(const qreal minLenFrac,
+                                 const qreal maxLenFrac);
 
     static QList<CubicList> sMakeFromSkPath(const SkPath& src);
 
@@ -105,8 +105,8 @@ struct CubicList {
                         qreal * const pBestT = nullptr,
                         QPointF * const pBestPos = nullptr);
 
-    void opSmoothOut(const qreal &smoothness);
-    void subdivide(const int &sub = 1);
+    void opSmoothOut(const qreal smoothness);
+    void subdivide(const int sub = 1);
 
     void finishedAdding() {
         updateClosed();

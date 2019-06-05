@@ -15,16 +15,16 @@ public:
     void finishAllPointsTransform();
 
     bool SWT_isRectangle() const { return true; }
-    SkPath getPathAtRelFrameF(const qreal &relFrame);
+    SkPath getPathAtRelFrameF(const qreal relFrame);
 
     void setTopLeftPos(const QPointF &pos);
     void setBottomRightPos(const QPointF &pos);
-    void setYRadius(const qreal &radiusY);
-    void setXRadius(const qreal &radiusX);
+    void setYRadius(const qreal radiusY);
+    void setXRadius(const qreal radiusX);
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
     bool differenceInEditPathBetweenFrames(
-                const int& frame1, const int& frame2) const;
+                const int frame1, const int frame2) const;
 private:
     qsptr<QPointFAnimator> mTopLeftAnimator;
     qsptr<QPointFAnimator> mBottomRightAnimator;

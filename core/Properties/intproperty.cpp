@@ -2,13 +2,13 @@
 
 IntProperty::IntProperty(const QString &name) : Property(name) {}
 
-void IntProperty::setValueRange(const int &minValue,
-                                const int &maxValue) {
+void IntProperty::setValueRange(const int minValue,
+                                const int maxValue) {
     mMinValue = minValue;
     mMaxValue = maxValue;
 }
 
-void IntProperty::setCurrentValue(const int &value) {
+void IntProperty::setCurrentValue(const int value) {
     const int newValue = qMin(qMax(value, mMinValue), mMaxValue);
     if(newValue == mValue) return;
 

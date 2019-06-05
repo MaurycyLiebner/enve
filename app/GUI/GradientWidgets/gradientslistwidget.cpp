@@ -11,7 +11,7 @@ GradientsListWidget::GradientsListWidget(GradientWidget *gradientWidget,
     setWidget(mDisplayedGradients);
 }
 
-void GradientsListWidget::setNumberGradients(const int &n) {
+void GradientsListWidget::setNumberGradients(const int n) {
     mDisplayedGradients->setNumberGradients(n);
 }
 

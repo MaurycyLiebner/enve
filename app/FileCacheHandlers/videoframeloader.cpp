@@ -4,7 +4,7 @@
 
 VideoFrameLoader::VideoFrameLoader(VideoCacheHandler * const cacheHandler,
                                    const stdsptr<VideoStreamsData> &openedVideo,
-                                   const int &frameId, AVFrame * const frame) :
+                                   const int frameId, AVFrame * const frame) :
     VideoFrameLoader(cacheHandler, openedVideo, frameId) {
     setFrameToConvert(frame, openedVideo->fCodecContext);
 }
@@ -35,15 +35,15 @@ void VideoFrameLoader::convertFrame() {
 
 int frameId(AVFrame * const decodedFrame,
             AVStream * const videoStream,
-            const qreal& fps) {
+            const qreal fps) {
     int64_t pts = av_frame_get_best_effort_timestamp(decodedFrame);
     pts = av_rescale_q(pts, videoStream->time_base, AV_TIME_BASE_Q);
     return qRound(pts/1000000.*fps);
 }
 
-void seek(const int& tryN, const int& frameId, const qreal& fps,
+void seek(const int tryN, const int frameId, const qreal fps,
           AVFormatContext * const formatContext,
-          const int& videoStreamIndex, AVStream * const videoStream,
+          const int videoStreamIndex, AVStream * const videoStream,
           AVCodecContext * const codecContext) {
     const int64_t tsms = qMax(0, qFloor((frameId - tryN) * 1000 / fps));
     const int64_t tm = av_rescale(tsms, videoStream->time_base.den,

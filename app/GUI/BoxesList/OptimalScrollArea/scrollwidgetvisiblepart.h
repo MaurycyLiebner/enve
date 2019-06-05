@@ -25,7 +25,7 @@ public:
     void setCurrentRule(const SWT_BoxRule &rule);
     void setCurrentTarget(SingleWidgetTarget *targetP,
                           const SWT_Target &target);
-    void setAlwaysShowChildren(const bool &alwaysShowChildren);
+    void setAlwaysShowChildren(const bool alwaysShowChildren);
     void setCurrentSearchText(const QString &text);
 
     void scheduleContentUpdateIfIsCurrentRule(const SWT_BoxRule &rule);

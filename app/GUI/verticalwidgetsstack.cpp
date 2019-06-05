@@ -188,7 +188,7 @@ void VerticalWidgetsStack::appendWidget(QWidget *widget) {
     updateSizesAndPositions();
 }
 
-void VerticalWidgetsStack::insertWidget(const int &id,
+void VerticalWidgetsStack::insertWidget(const int id,
                                         QWidget *widget) {
     mWidgets.insert(id, widget);
     widget->setParent(this);

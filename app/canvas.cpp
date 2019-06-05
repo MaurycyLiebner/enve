@@ -29,13 +29,13 @@
 #include "Animators/transformanimator.h"
 
 Canvas::Canvas(CanvasWindow *canvasWidget,
-               const int &canvasWidth, const int &canvasHeight,
-               const int &frameCount, const qreal &fps) :
+               const int canvasWidth, const int canvasHeight,
+               const int frameCount, const qreal fps) :
     ContainerBox(TYPE_CANVAS) {
     mMainWindow = MainWindow::getInstance();
     setCurrentBrush(mMainWindow->getCurrentBrush());
     std::function<bool(int)> changeFrameFunc =
-    [this](const int& undoRedoFrame) {
+    [this](const int undoRedoFrame) {
         if(undoRedoFrame != mMainWindow->getCurrentFrame()) {
             mMainWindow->setCurrentFrame(undoRedoFrame);
             return true;
@@ -77,7 +77,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
     //setCanvasMode(MOVE_PATH);
 }
 
-QRectF Canvas::getRelBoundingRect(const qreal &) {
+QRectF Canvas::getRelBoundingRect(const qreal ) {
     return QRectF(0, 0, mWidth, mHeight);
 }
 
@@ -89,7 +89,7 @@ qreal Canvas::getResolutionFraction() {
     return mResolutionFraction;
 }
 
-void Canvas::setResolutionFraction(const qreal &percent) {
+void Canvas::setResolutionFraction(const qreal percent) {
     mResolutionFraction = percent;
 }
 
@@ -98,7 +98,7 @@ QRectF Canvas::getPixBoundingRect() {
                   mVisibleWidth, mVisibleHeight);
 }
 
-void Canvas::zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin) {
+void Canvas::zoomCanvas(const qreal scaleBy, const QPointF &absOrigin) {
     const QPointF transPoint = -mapCanvasAbsToRel(absOrigin);
 
     mCanvasTransform.translate(-transPoint.x(), -transPoint.y());
@@ -331,7 +331,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
     }
 }
 
-void Canvas::setMaxFrame(const int &frame) {
+void Canvas::setMaxFrame(const int frame) {
     mMaxFrame = frame;
 }
 
@@ -368,19 +368,19 @@ QSize Canvas::getCanvasSize() {
     return QSize(mWidth, mHeight);
 }
 
-void Canvas::setPreviewing(const bool &bT) {
+void Canvas::setPreviewing(const bool bT) {
     mPreviewing = bT;
 }
 
-void Canvas::setRenderingPreview(const bool &bT) {
+void Canvas::setRenderingPreview(const bool bT) {
     mRenderingPreview = bT;
 }
 
-void Canvas::setOutputRendering(const bool &bT) {
+void Canvas::setOutputRendering(const bool bT) {
     mRenderingOutput = bT;
 }
 
-void Canvas::setCurrentPreviewContainer(const int& relFrame) {
+void Canvas::setCurrentPreviewContainer(const int relFrame) {
     auto cont = mCacheHandler.atRelFrame(relFrame);
     setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
 }
@@ -421,7 +421,7 @@ void Canvas::setLoadingPreviewContainer(
     mLoadingPreviewContainer->setBlocked(true);
 }
 
-FrameRange Canvas::prp_getIdenticalRelRange(const int &relFrame) const {
+FrameRange Canvas::prp_getIdenticalRelRange(const int relFrame) const {
     const auto groupRange = ContainerBox::prp_getIdenticalRelRange(relFrame);
     //FrameRange canvasRange{0, mMaxFrame};
     return groupRange;//*canvasRange;
@@ -761,7 +761,7 @@ void Canvas::invertSelectionAction() {
     }
 }
 
-void Canvas::anim_setAbsFrame(const int &frame) {
+void Canvas::anim_setAbsFrame(const int frame) {
     if(frame == anim_getCurrentAbsFrame()) return;
     afterPaintAnimSurfaceChanged();
     const int oldRelFrame = anim_getCurrentRelFrame();
@@ -938,7 +938,7 @@ void Canvas::moveByRel(const QPointF &trans) {
     schedulePivotUpdate();
 }
 
-//void Canvas::updateAfterFrameChanged(const int &currentFrame) {
+//void Canvas::updateAfterFrameChanged(const int currentFrame) {
 //    anim_mCurrentAbsFrame = currentFrame;
 
 //    for(const auto& box : mChildBoxes) {
@@ -950,12 +950,12 @@ void Canvas::moveByRel(const QPointF &trans) {
 //}
 
 bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
-                                 const bool &parentSatisfies,
-                                 const bool &parentMainTarget) const {
+                                 const bool parentSatisfies,
+                                 const bool parentMainTarget) const {
     Q_UNUSED(parentSatisfies);
     Q_UNUSED(parentMainTarget);
     const SWT_BoxRule &rule = rules.fRule;
-    const bool &alwaysShowChildren = rules.fAlwaysShowChildren;
+    const bool alwaysShowChildren = rules.fAlwaysShowChildren;
     if(alwaysShowChildren) {
         return false;
     } else {
@@ -982,7 +982,7 @@ bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     return false;
 }
 
-void Canvas::setIsCurrentCanvas(const bool &bT) {
+void Canvas::setIsCurrentCanvas(const bool bT) {
     mIsCurrentCanvas = bT;
 }
 
@@ -1012,7 +1012,7 @@ void Canvas::finishDurationRectPosTransformForAllSelected() {
         box->finishDurationRectPosTransform();
 }
 
-void Canvas::moveDurationRectForAllSelected(const int &dFrame) {
+void Canvas::moveDurationRectForAllSelected(const int dFrame) {
     for(const auto& box : mSelectedBoxes)
         box->moveDurationRect(dFrame);
 }
@@ -1027,7 +1027,7 @@ void Canvas::finishMinFramePosTransformForAllSelected() {
         box->finishMinFramePosTransform();
 }
 
-void Canvas::moveMinFrameForAllSelected(const int &dFrame) {
+void Canvas::moveMinFrameForAllSelected(const int dFrame) {
     for(const auto& box : mSelectedBoxes)
         box->moveMinFrame(dFrame);
 }
@@ -1042,7 +1042,7 @@ void Canvas::finishMaxFramePosTransformForAllSelected() {
         box->finishMaxFramePosTransform();
 }
 
-void Canvas::moveMaxFrameForAllSelected(const int &dFrame) {
+void Canvas::moveMaxFrameForAllSelected(const int dFrame) {
     for(const auto& box : mSelectedBoxes)
         box->moveMaxFrame(dFrame);
 }
@@ -1083,8 +1083,8 @@ bool Canvas::isAltPressed(QKeyEvent *event) {
     return event->modifiers() & Qt::AltModifier;
 }
 
-void Canvas::paintPress(const ulong ts, const qreal &pressure,
-                        const qreal &xTilt, const qreal &yTilt) {
+void Canvas::paintPress(const ulong ts, const qreal pressure,
+                        const qreal xTilt, const qreal yTilt) {
     if(mPaintAnimSurface) {
         if(mPaintAnimSurface->anim_isRecording())
             mPaintAnimSurface->anim_saveCurrentValueAsKey();
@@ -1104,8 +1104,8 @@ void Canvas::paintPress(const ulong ts, const qreal &pressure,
     }
 }
 
-void Canvas::paintMove(const ulong ts, const qreal &pressure,
-                       const qreal &xTilt, const qreal &yTilt) {
+void Canvas::paintMove(const ulong ts, const qreal pressure,
+                       const qreal xTilt, const qreal yTilt) {
     if(mPaintDrawable && mCurrentBrush) {
         const auto& target = mPaintDrawable->surface();
         const double dt = (ts - mLastTs);

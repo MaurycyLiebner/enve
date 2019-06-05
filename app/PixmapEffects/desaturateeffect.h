@@ -6,7 +6,7 @@ struct DesaturateEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;
 
     void applyEffectsSk(const SkBitmap &bitmap,
-                        const qreal &scale);
+                        const qreal scale);
 
     qreal influence;
 protected:
@@ -19,7 +19,7 @@ public:
     qreal getMargin() { return 0.; }
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, BoundingBoxRenderData*);
+            const qreal relFrame, BoundingBoxRenderData*);
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 protected:

@@ -22,12 +22,12 @@ MinimalScrollWidgetVisiblePart::~MinimalScrollWidgetVisiblePart() {
     removeInstance(this);
 }
 
-void MinimalScrollWidgetVisiblePart::setVisibleTop(const int &top) {
+void MinimalScrollWidgetVisiblePart::setVisibleTop(const int top) {
     mVisibleTop = top;
     updateVisibleWidgetsContent();
 }
 
-void MinimalScrollWidgetVisiblePart::setVisibleHeight(const int &height) {
+void MinimalScrollWidgetVisiblePart::setVisibleHeight(const int height) {
     setFixedHeight(height);
     mVisibleHeight = height;
     updateVisibleWidgets();

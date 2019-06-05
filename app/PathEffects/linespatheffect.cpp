@@ -1,7 +1,7 @@
 #include "linespatheffect.h"
 #include "Animators/qrealanimator.h"
 
-LinesPathEffect::LinesPathEffect(const bool &outlinePathEffect) :
+LinesPathEffect::LinesPathEffect(const bool outlinePathEffect) :
     PathEffect("lines effect", LINES_PATH_EFFECT, outlinePathEffect) {
     mAngle = SPtrCreate(QrealAnimator)(0, -9999, 9999, 1, "angle");
     mDistance = SPtrCreate(QrealAnimator)(10, 1, 9999, 1, "distance");
@@ -10,7 +10,7 @@ LinesPathEffect::LinesPathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mDistance);
 }
 
-void LinesPathEffect::apply(const qreal &relFrame, const SkPath &src,
+void LinesPathEffect::apply(const qreal relFrame, const SkPath &src,
                             SkPath * const dst) {
     const qreal degAngle = mAngle->getEffectiveValue(relFrame);
     const qreal distInc = mDistance->getEffectiveValue(relFrame);

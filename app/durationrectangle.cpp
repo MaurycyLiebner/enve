@@ -8,7 +8,7 @@ DurationRectangleMovable::DurationRectangleMovable(const Type &type) {
     mType = type;
 }
 
-void DurationRectangleMovable::setFramePos(const int &framePos) {
+void DurationRectangleMovable::setFramePos(const int framePos) {
     mFramePos = qMin(mMaxPos, qMax(mMinPos, framePos));
 }
 
@@ -17,27 +17,27 @@ int DurationRectangleMovable::getFramePos() const {
 }
 
 DurationRectangleMovable *DurationRectangleMovable::getMovableAt(
-                                const int &pressX,
-                                const qreal &pixelsPerFrame,
-                                const int &minViewedFrame) {
+                                const int pressX,
+                                const qreal pixelsPerFrame,
+                                const int minViewedFrame) {
     const int pressedDFrame = qRound(minViewedFrame + pressX/pixelsPerFrame);
     const int thisDFrame = mFramePos - minViewedFrame;
     if(thisDFrame == pressedDFrame) return this;
     return nullptr;
 }
 
-void DurationRectangleMovable::changeFramePosBy(const int &change) {
+void DurationRectangleMovable::changeFramePosBy(const int change) {
     changeFramePosByWithoutSignal(change);
     emit posChanged(mFramePos);
     emit posChangedBy(change);
 }
 
 void DurationRectangleMovable::changeFramePosByWithoutSignal(
-                                const int &change) {
+                                const int change) {
     setFramePos(mFramePos + change);
 }
 
-void DurationRectangleMovable::setHovered(const bool &hovered) {
+void DurationRectangleMovable::setHovered(const bool hovered) {
     mHovered = hovered;
 }
 
@@ -45,7 +45,7 @@ bool DurationRectangleMovable::isHovered() {
     return mHovered;
 }
 
-void DurationRectangleMovable::pressed(const bool &shiftPressed) {
+void DurationRectangleMovable::pressed(const bool shiftPressed) {
     if(!mChildProperty) return;
     if(mChildProperty->SWT_isBoundingBox()) {
         const auto box = GetAsPtr(mChildProperty, BoundingBox);
@@ -63,11 +63,11 @@ bool DurationRectangleMovable::isSelected() {
     return false;
 }
 
-void DurationRectangleMovable::setMaxPos(const int &maxPos) {
+void DurationRectangleMovable::setMaxPos(const int maxPos) {
     mMaxPos = maxPos - 1;
 }
 
-void DurationRectangleMovable::setMinPos(const int &minPos) {
+void DurationRectangleMovable::setMinPos(const int minPos) {
     mMinPos = minPos + 1;
 }
 
@@ -106,15 +106,15 @@ DurationRectangle::DurationRectangle(Property * const childProp) :
             this, &DurationRectangle::maxFrameChangedBy);
 }
 
-void DurationRectangle::setFramesDuration(const int &duration) {
+void DurationRectangle::setFramesDuration(const int duration) {
     mMaxFrame.setFramePos(getMinFrame() + duration - 1);
 }
 
-void DurationRectangle::setMinFrame(const int &minFrame) {
+void DurationRectangle::setMinFrame(const int minFrame) {
     mMinFrame.setFramePos(minFrame);
 }
 
-void DurationRectangle::setMaxFrame(const int &maxFrame) {
+void DurationRectangle::setMaxFrame(const int maxFrame) {
     mMaxFrame.setFramePos(maxFrame);
 }
 
@@ -151,8 +151,8 @@ int DurationRectangle::getMaxFrameAsAbsFrame() const {
 #include "Sound/singlesound.h"
 void DurationRectangle::draw(QPainter * const p,
                              const QRect& drawRect,
-                             const qreal& fps,
-                             const qreal &pixelsPerFrame,
+                             const qreal fps,
+                             const qreal pixelsPerFrame,
                              const FrameRange &absFrameRange) {
     const int firstRelDrawFrame = qMax(absFrameRange.fMin,
                                        getMinFrameAsAbsFrame()) -
@@ -217,9 +217,9 @@ void DurationRectangle::draw(QPainter * const p,
 }
 
 DurationRectangleMovable *DurationRectangle::getMovableAt(
-                                          const int &pressX,
-                                          const qreal &pixelsPerFrame,
-                                          const int &minViewedFrame) {
+                                          const int pressX,
+                                          const qreal pixelsPerFrame,
+                                          const int minViewedFrame) {
     const qreal startX = (getMinFrame() - minViewedFrame)*pixelsPerFrame;
     const qreal endX = (getMaxFrame() - minViewedFrame + 1)*pixelsPerFrame;
     if(qAbs(pressX - startX) < 5) return &mMinFrame;
@@ -228,7 +228,7 @@ DurationRectangleMovable *DurationRectangle::getMovableAt(
     return nullptr;
 }
 
-void DurationRectangle::changeFramePosBy(const int &change) {
+void DurationRectangle::changeFramePosBy(const int change) {
     mMinFrame.changeFramePosByWithoutSignal(change);
     mMaxFrame.setMinPos(getMinFrame());
     mMaxFrame.changeFramePosByWithoutSignal(change);
@@ -244,7 +244,7 @@ void DurationRectangle::finishMinFramePosTransform() {
     mMinFrame.finishPosTransform();
 }
 
-void DurationRectangle::moveMinFrame(const int &change) {
+void DurationRectangle::moveMinFrame(const int change) {
     mMinFrame.changeFramePosBy(change);
 }
 
@@ -282,7 +282,7 @@ void DurationRectangle::finishMaxFramePosTransform() {
     mMaxFrame.finishPosTransform();
 }
 
-void DurationRectangle::moveMaxFrame(const int &change) {
+void DurationRectangle::moveMaxFrame(const int change) {
     mMaxFrame.changeFramePosBy(change);
 }
 
@@ -304,7 +304,7 @@ int AnimationRect::getMinAnimationFrameAsAbsFrame() const {
                 getMinAnimationFrameAsRelFrame());
 }
 
-void AnimationRect::setAnimationFrameDuration(const int &frameDuration) {
+void AnimationRect::setAnimationFrameDuration(const int frameDuration) {
     const int oldMinFrame = getMinFrame();
     const int oldMaxFrame = getMaxFrame();
     const int oldMinAnimFrame = getMinAnimationFrame();
@@ -351,8 +351,8 @@ int AnimationRect::getAnimationFrameDuration() {
 
 void AnimationRect::draw(QPainter * const p,
                          const QRect& drawRect,
-                         const qreal &fps,
-                         const qreal &pixelsPerFrame,
+                         const qreal fps,
+                         const qreal pixelsPerFrame,
                          const FrameRange &absFrameRange) {
     const int firstRelDrawFrame =
             qMax(absFrameRange.fMin, getMinAnimationFrame()) - absFrameRange.fMin;
@@ -438,12 +438,12 @@ void FixedLenAnimationRect::setBindToAnimationFrameRange() {
     mBoundToAnimation = true;
 }
 
-void FixedLenAnimationRect::setMinAnimationFrame(const int &minAnimationFrame) {
+void FixedLenAnimationRect::setMinAnimationFrame(const int minAnimationFrame) {
     mMinAnimationFrame = minAnimationFrame;
     if(mBoundToAnimation) bindToAnimationFrameRange();
 }
 
-void FixedLenAnimationRect::setMaxAnimationFrame(const int &maxAnimationFrame) {
+void FixedLenAnimationRect::setMaxAnimationFrame(const int maxAnimationFrame) {
     if(mSetMaxFrameAtLeastOnce) {
         if(getMaxFrame() == mMaxAnimationFrame) {
             setMaxFrame(maxAnimationFrame);
@@ -457,7 +457,7 @@ void FixedLenAnimationRect::setMaxAnimationFrame(const int &maxAnimationFrame) {
     if(mBoundToAnimation) bindToAnimationFrameRange();
 }
 
-void FixedLenAnimationRect::changeFramePosBy(const int &change) {
+void FixedLenAnimationRect::changeFramePosBy(const int change) {
     mMaxAnimationFrame += change;
     mMinAnimationFrame += change;
     mMinFrame.changeFramePosByWithoutSignal(change);

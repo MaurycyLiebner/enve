@@ -53,7 +53,7 @@ public:
 
     void duplicateColorAnimatorFrom(ColorAnimator *source);
     void setGradientVar(Gradient * const grad);
-    QColor getColorAtRelFrame(const qreal &relFrame) const;
+    QColor getColorAtRelFrame(const qreal relFrame) const;
     Gradient::Type getGradientType() { return mGradientType; }
     void setGradientType(const Gradient::Type &type) {
         if(mGradientType == type) return;
@@ -109,7 +109,7 @@ struct UpdatePaintSettings {
 
 struct UpdateStrokeSettings : UpdatePaintSettings {
     UpdateStrokeSettings(
-            const qreal& width,
+            const qreal width,
             const QColor &paintColorT,
             const PaintType &paintTypeT,
             const QPainter::CompositionMode &outlineCompositionModeT);
@@ -138,7 +138,7 @@ protected:
     void showHideChildrenBeforeChaningPaintType(
                 const PaintType &newPaintType);
 public:
-    void setCurrentStrokeWidth(const qreal &newWidth);
+    void setCurrentStrokeWidth(const qreal newWidth);
     void setCapStyle(const Qt::PenCapStyle &capStyle);
     void setJoinStyle(const Qt::PenJoinStyle &joinStyle);
     void setStrokerSettings(QPainterPathStroker * const stroker);
@@ -184,7 +184,7 @@ public:
 
     QrealAnimator *getLineWidthAnimator();
 
-    void setStrokerSettingsForRelFrameSk(const qreal &relFrame,
+    void setStrokerSettingsForRelFrameSk(const qreal relFrame,
                                          SkStroke * const stroker);
 protected:
     OutlineSettingsAnimator(GradientPoints * const grdPts,

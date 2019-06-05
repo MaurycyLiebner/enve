@@ -27,7 +27,7 @@ public:
         mParentWidget(parent) {}
 
     template <class T>
-    QAction* addCheckableAction(const QString& text, const bool& checked,
+    QAction* addCheckableAction(const QString& text, const bool checked,
                                 const CheckOp<T>& op) {
         QAction * const qAction = mTargetMenu->addAction(text);
         qAction->setCheckable(true);

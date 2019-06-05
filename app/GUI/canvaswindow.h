@@ -45,10 +45,10 @@ public:
 
     void setCurrentCanvas(Canvas * const canvas);
     void addCanvasToList(const qsptr<Canvas> &canvas);
-    void removeCanvas(const int &id);
+    void removeCanvas(const int id);
     void addCanvasToListAndSetAsCurrent(const qsptr<Canvas> &canvas);
     void renameCanvas(Canvas *canvas, const QString &newName);
-    void renameCanvas(const int &id, const QString &newName);
+    void renameCanvas(const int id, const QString &newName);
     bool hasNoCanvas();
     void setCanvasMode(const CanvasMode &mode);
 
@@ -68,7 +68,7 @@ public:
 
     void strokeCapStyleChanged(const Qt::PenCapStyle &capStyle);
     void strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle);
-    void strokeWidthChanged(const qreal &strokeWidth);
+    void strokeWidthChanged(const qreal strokeWidth);
 
     void strokeBrushChanged(SimpleBrushWrapper * const brush);
     void strokeBrushSpacingCurveChanged(
@@ -80,7 +80,7 @@ public:
     void strokeBrushTimeCurveChanged(
             const qCubicSegment1D& curve);
 
-    void setResolutionFraction(const qreal &percent);
+    void setResolutionFraction(const qreal percent);
     void updatePivotIfNeeded();
     void schedulePivotUpdate();
 
@@ -89,7 +89,7 @@ public:
     void setSelectedFillColorMode(const ColorMode &mode);
     void setSelectedStrokeColorMode(const ColorMode &mode);
 
-    void updateAfterFrameChanged(const int &currentFrame);
+    void updateAfterFrameChanged(const int currentFrame);
     void clearAll();
     void createAnimationBoxForPaths(const QStringList &importPaths);
     void createLinkToFileWithPath(const QString &path);
@@ -99,12 +99,12 @@ public:
     void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction *abstraction,
             const UpdateFuncs &updateFuncs,
-            const int& visiblePartWidgetId);
+            const int visiblePartWidgetId);
     ImageBox *createImageForPath(const QString &path);
     SingleSound *createSoundForPath(const QString &path);
     void updateHoveredElements();
 
-    void setLocalPivot(const bool &bT);
+    void setLocalPivot(const bool bT);
 
     void importFile(const QString &path,
                     const QPointF &relDropPos = QPointF(0, 0));
@@ -155,19 +155,19 @@ public:
 
     void startDurationRectPosTransformForAllSelected();
     void finishDurationRectPosTransformForAllSelected();
-    void moveDurationRectForAllSelected(const int &dFrame);
+    void moveDurationRectForAllSelected(const int dFrame);
     void startMinFramePosTransformForAllSelected();
     void finishMinFramePosTransformForAllSelected();
-    void moveMinFrameForAllSelected(const int &dFrame);
+    void moveMinFrameForAllSelected(const int dFrame);
     void startMaxFramePosTransformForAllSelected();
     void finishMaxFramePosTransformForAllSelected();
-    void moveMaxFrameForAllSelected(const int &dFrame);
+    void moveMaxFrameForAllSelected(const int dFrame);
     void getDisplayedFillStrokeSettingsFromLastSelected(
             PaintSettingsAnimator *&fillSetings, OutlineSettingsAnimator *&strokeSettings);
 private:
     QWidget * mWelcomeDialog = nullptr;
 
-    void changeCurrentFrameAction(const int &frame);
+    void changeCurrentFrameAction(const int frame);
     void playPreviewAfterAllTasksCompleted();
 
     //! @brief true if preview is currently playing
@@ -193,8 +193,8 @@ private:
     RenderInstanceSettings *mCurrentRenderSettings = nullptr;
 
     QWidget *mCanvasWidget;
-    void setRenderingPreview(const bool &bT);
-    void setPreviewing(const bool &bT);
+    void setRenderingPreview(const bool bT);
+    void setPreviewing(const bool bT);
 
     QTimer *mPreviewFPSTimer = nullptr;
 
@@ -210,7 +210,7 @@ private:
     void initializeAudio();
     void startAudio();
     void stopAudio();
-    void volumeChanged(const int &value);
+    void volumeChanged(const int value);
 
     QAudioDeviceInfo mAudioDevice;
     qptr<SoundComposition> mCurrentSoundComposition;
@@ -269,7 +269,7 @@ public:
 
     void setFontFamilyAndStyle(const QString& family,
                                const QString& style);
-    void setFontSize(const qreal &size);
+    void setFontSize(const qreal size);
 
     void connectPointsSlot();
     void disconnectPointsSlot();
@@ -293,9 +293,9 @@ public:
     void renameCurrentCanvas(const QString &newName);
     void setCurrentCanvas(int id);
 
-    void setClipToCanvas(const bool &bT);
-    void setRasterEffectsVisible(const bool &bT);
-    void setPathEffectsVisible(const bool &bT);
+    void setClipToCanvas(const bool bT);
+    void setRasterEffectsVisible(const bool bT);
+    void setPathEffectsVisible(const bool bT);
 
     void interruptPreview();
     void outOfMemory();

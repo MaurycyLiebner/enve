@@ -40,7 +40,7 @@ void ExamplePathEffect::write(QIODevice * const dst) const {
     mInfluence->writeProperty(dst);
 }
 
-void ExamplePathEffect::apply(const qreal &relFrame,
+void ExamplePathEffect::apply(const qreal relFrame,
                               const SkPath &src,
                               SkPath * const dst) {
     const SkScalar infl = toSkScalar(mInfluence->getEffectiveValue(relFrame));

@@ -15,7 +15,7 @@ public:
     void printUndoName();
     void printRedoName();
 
-    void setFrame(const int& frame) {
+    void setFrame(const int frame) {
         mFrame = frame;
     }
     int getFrame();
@@ -26,7 +26,7 @@ private:
 
 class UndoRedoSet : public UndoRedo {
 public:
-    UndoRedoSet(const int& absFrame);
+    UndoRedoSet(const int absFrame);
     ~UndoRedoSet();
 
     void undo();
@@ -60,7 +60,7 @@ public:
     void unblockUndoRedo();
     bool undoRedoBlocked();
 
-    void setFrame(const int& frame) {
+    void setFrame(const int frame) {
         mCurrentAbsFrame = frame;
     }
 private:

@@ -42,14 +42,14 @@ ParticleBox::ParticleBox() : BoundingBox(TYPE_PARTICLES) {
 }
 
 void ParticleBox::getAccelerationAt(const QPointF &pos,
-                                    const int &frame,
+                                    const int frame,
                                     QPointF *acc) {
     Q_UNUSED(pos);
     Q_UNUSED(frame);
     *acc = QPointF(0., 9.8)/24.;
 }
 
-void ParticleBox::anim_setAbsFrame(const int &frame) {
+void ParticleBox::anim_setAbsFrame(const int frame) {
     BoundingBox::anim_setAbsFrame(frame);
     planScheduleUpdate(Animator::FRAME_CHANGE);
 }
@@ -80,7 +80,7 @@ void ParticleBox::removeEmitter(const qsptr<ParticleEmitter>& emitter) {
     planScheduleUpdate(Animator::USER_CHANGE);
 }
 
-FrameRange ParticleBox::prp_getIdenticalRelRange(const int &relFrame) const {
+FrameRange ParticleBox::prp_getIdenticalRelRange(const int relFrame) const {
     if(isVisibleAndInDurationRect(relFrame)) {
         return {relFrame, relFrame};
     }
@@ -95,7 +95,7 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
 
 bool ParticleBox::SWT_isParticleBox() const { return true; }
 
-QRectF ParticleBox::getRelBoundingRect(const qreal &relFrame) {
+QRectF ParticleBox::getRelBoundingRect(const qreal relFrame) {
     return QRectF(mTopLeftAnimator->getEffectiveValueAtRelFrame(relFrame),
                   mBottomRightAnimator->getEffectiveValueAtRelFrame(relFrame));
 }
@@ -130,11 +130,11 @@ Particle::Particle(ParticleBox *parentBox) {
     mParentBox = parentBox;
 }
 
-void Particle::initializeParticle(const int &firstFrame,
-                                  const int &nFrames,
+void Particle::initializeParticle(const int firstFrame,
+                                  const int nFrames,
                                   const SkPoint &iniPos,
                                   const SkPoint &iniVel,
-                                  const SkScalar &partSize) {
+                                  const SkScalar partSize) {
     mSize = partSize;
     mPrevVelocityVar = SkPoint::Make(0., 0.);
     mNextVelocityVar = SkPoint::Make(0., 0.);
@@ -153,14 +153,14 @@ void Particle::initializeParticle(const int &firstFrame,
     mParticleStates = new ParticleState[nFrames];
 }
 
-void Particle::generatePathNextFrame(const int &frame,
-                                     const SkScalar &velocityVar,
-                                     const SkScalar &velocityVarPeriod,
+void Particle::generatePathNextFrame(const int frame,
+                                     const SkScalar velocityVar,
+                                     const SkScalar velocityVarPeriod,
                                      const SkPoint &acc,
-                                     const SkScalar &finalScale,
-                                     const SkScalar &finalOpacity,
-                                     const SkScalar &decayFrames,
-                                     const SkScalar &length) {
+                                     const SkScalar finalScale,
+                                     const SkScalar finalOpacity,
+                                     const SkScalar decayFrames,
+                                     const SkScalar length) {
     if(mPrevVelocityDuration > velocityVarPeriod) {
         mPrevVelocityVar = mNextVelocityVar;
         mNextVelocityVar = SkPoint::Make(gRandF(-velocityVar, velocityVar),
@@ -219,18 +219,18 @@ void Particle::generatePathNextFrame(const int &frame,
     mPrevVelocityDuration += 1.;
 }
 
-bool Particle::isVisibleAtFrame(const int &frame) {
+bool Particle::isVisibleAtFrame(const int frame) {
     int arrayId = frame - mFirstFrame;
     if(arrayId < 0 || arrayId >= mNumberFrames) return false;
     return true;
 }
 
-ParticleState Particle::getParticleStateAtFrame(const int &frame) {
+ParticleState Particle::getParticleStateAtFrame(const int frame) {
     int arrayId = frame - mFirstFrame;
     return mParticleStates[arrayId];
 }
 
-bool Particle::getParticleStateAtFrameF(const qreal &frame,
+bool Particle::getParticleStateAtFrameF(const qreal frame,
                                         ParticleState &state) {
     int arrayId = qFloor(frame) - mFirstFrame;
     int arrayId2 = qFloor(frame) + 1 - mFirstFrame;
@@ -361,17 +361,17 @@ void ParticleEmitter::scheduleGenerateParticles() {
     mParentBox_k->planScheduleUpdate(Animator::USER_CHANGE);
 }
 
-void ParticleEmitter::setMinFrame(const int &minFrame) {
+void ParticleEmitter::setMinFrame(const int minFrame) {
     mMinFrame = minFrame;
     scheduleGenerateParticles();
 }
 
-void ParticleEmitter::setMaxFrame(const int &maxFrame) {
+void ParticleEmitter::setMaxFrame(const int maxFrame) {
     mMaxFrame = maxFrame;
     scheduleGenerateParticles();
 }
 
-void ParticleEmitter::setFrameRange(const int &minFrame, const int &maxFrame) {
+void ParticleEmitter::setFrameRange(const int minFrame, const int maxFrame) {
     if(minFrame == mMinFrame && mMaxFrame == maxFrame) return;
     if(mMaxFrame > maxFrame) {
         int currId = mParticles.count() - 1;
@@ -399,7 +399,7 @@ MovablePoint *ParticleEmitter::getPosPoint() {
 }
 
 EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
-        const qreal &relFrame,
+        const qreal relFrame,
         const stdsptr<ParticleBoxRenderData> &particleData) {
     EmitterData data;
     auto qcol = mColorAnimator->getColorAtRelFrame(relFrame);

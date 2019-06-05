@@ -4,7 +4,7 @@
 #include "Animators/qrealanimator.h"
 #include "Properties/boolproperty.h"
 
-SubPathEffect::SubPathEffect(const bool &outlinePathEffect) :
+SubPathEffect::SubPathEffect(const bool outlinePathEffect) :
     PathEffect("sub-path effect", SUB_PATH_EFFECT, outlinePathEffect) {
     mMin = SPtrCreate(QrealAnimator)("min length");
     mMin->setValueRange(-999, 999);
@@ -28,7 +28,7 @@ void SubPathEffect::readLengthEffect(QIODevice * const target) {
     SPtrCreate(BoolProperty)("read only")->readProperty(target);
 }
 
-void SubPathEffect::apply(const qreal &relFrame, const SkPath &src,
+void SubPathEffect::apply(const qreal relFrame, const SkPath &src,
                           SkPath * const dst) {
     const qreal minFrac = mMin->getEffectiveValue(relFrame)/100;
     const qreal maxFrac = mMax->getEffectiveValue(relFrame)/100;

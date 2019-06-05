@@ -52,25 +52,25 @@ struct short_packet
     unsigned short int alpha;
 };
 
-uchar floorQrealToUChar(const qreal &val) {
+uchar floorQrealToUChar(const qreal val) {
     return static_cast<uchar>(qMin(255, qMax(0, qFloor(val))) );
 }
 
-uchar roundQrealToUChar(const qreal &val) {
+uchar roundQrealToUChar(const qreal val) {
     return static_cast<uchar>(qMin(255, qMax(0, qRound(val))) );
 }
 
-uchar intToUChar(const int &val) {
+uchar intToUChar(const int val) {
     return static_cast<uchar>(qMin(255, qMax(0, val)) );
 }
 
 
 // colorize tool
 void colorizeHSV(const SkBitmap &bitmap,
-              const qreal &hue,
-              const qreal &saturation,
-              const qreal &lightness,
-              const qreal &alpha) {
+              const qreal hue,
+              const qreal saturation,
+              const qreal lightness,
+              const qreal alpha) {
     if(bitmap.empty()) return;
 
     uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
@@ -113,16 +113,16 @@ void colorizeHSV(const SkBitmap &bitmap,
 }
 
 void replaceColor(const SkBitmap &bitmap,
-              const int &redR,
-              const int &greenR,
-              const int &blueR,
-              const int &alphaR,
-              const int &redT,
-              const int &greenT,
-              const int &blueT,
-              const int &alphaT,
-              const int &tolerance,
-              const qreal &smooth) {
+              const int redR,
+              const int greenR,
+              const int blueR,
+              const int alphaR,
+              const int redT,
+              const int greenT,
+              const int blueT,
+              const int alphaT,
+              const int tolerance,
+              const qreal smooth) {
     if(bitmap.empty()) return;
     uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     u8 *bits;
@@ -205,16 +205,16 @@ void replaceColor(const SkBitmap &bitmap,
 }
 
 //void replaceColor(const image &im,
-//              const int &redR,
-//              const int &greenR,
-//              const int &blueR,
-//              const int &alphaR,
-//              const int &redT,
-//              const int &greenT,
-//              const int &blueT,
-//              const int &alphaT,
-//              const int &tolerance,
-//              const int &smooth) {
+//              const int redR,
+//              const int greenR,
+//              const int blueR,
+//              const int alphaR,
+//              const int redT,
+//              const int greenT,
+//              const int blueT,
+//              const int alphaT,
+//              const int tolerance,
+//              const int smooth) {
 //    if(bitmap.empty()) return;
 
 //    u8 *bits;
@@ -505,9 +505,9 @@ void blend(const SkBitmap &bitmap, const rgb &rgb, float opacity) {
 }
 
 void replaceColor(const SkBitmap &bitmap,
-                  const int &rInt,
-                  const int &gInt,
-                  const int &bInt) {
+                  const int rInt,
+                  const int gInt,
+                  const int bInt) {
     // check parameters
     if(bitmap.empty()) return;
     uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
@@ -1018,8 +1018,8 @@ void despeckle(const SkBitmap &bitmap) {
 }
 
 void anim_fast_blur(const SkBitmap &bitmap,
-                    const qreal &fRadius,
-                    const qreal &opacityT) {
+                    const qreal fRadius,
+                    const qreal opacityT) {
     if(fRadius < 0.01) return;
     uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     int w = bitmap.width();
@@ -1248,7 +1248,7 @@ void anim_fast_blur(const SkBitmap &bitmap,
 }
 
 void anim_fast_blur(const SkBitmap &bitmap,
-                    const qreal &fRadius) {
+                    const qreal fRadius) {
     if(fRadius < 0.01) return;
     uchar * const pixels = static_cast<uchar*>(bitmap.getPixels());
     const int w = bitmap.width();
@@ -1418,12 +1418,12 @@ void anim_fast_blur(const SkBitmap &bitmap,
 }
 
 void anim_fast_shadow(const SkBitmap &bitmap,
-                      const qreal &fRed,
-                      const qreal &fGreen,
-                      const qreal &fBlue,
-                      const qreal &fDx,
-                      const qreal &fDy,
-                      const qreal &fRadius) {
+                      const qreal fRed,
+                      const qreal fGreen,
+                      const qreal fBlue,
+                      const qreal fDx,
+                      const qreal fDy,
+                      const qreal fRadius) {
     uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     int w = bitmap.width();
     int h = bitmap.height();
@@ -1701,7 +1701,7 @@ void anim_fast_shadow(const SkBitmap &bitmap,
 
 
 void fast_blur(const SkBitmap &bitmap, int radius,
-               const qreal &opacityT) {
+               const qreal opacityT) {
     uchar* pixels = static_cast<uchar*>(bitmap.getPixels());
     int w = bitmap.width();
     int h = bitmap.height();
@@ -3112,9 +3112,9 @@ static s32 getBlurKernel(s32 width, qreal sigma, qreal **kernel)
 }
 
 void qblurMono(qreal *data,
-               const int &w,
-               const int &h,
-               const qreal &fRadius) {
+               const int w,
+               const int h,
+               const qreal fRadius) {
     if(fRadius < 0.01) return;
     qreal divF = fRadius + fRadius + 1.;
     qreal divFInv = 1./divF;
@@ -3240,9 +3240,9 @@ void qblurMono(qreal *data,
 
 
 void qspredMono(qreal *data,
-               const int &w,
-               const int &h,
-               const qreal &fRadius) {
+               const int w,
+               const int h,
+               const qreal fRadius) {
     if(fRadius < 0.01) return;
     qreal divF = fRadius + fRadius + 1.;
     qreal divFInv = 1./divF;
@@ -3490,9 +3490,9 @@ static int getOptimalKernelWidth(qreal radius, qreal sigma)
     return ((int)width-2);
 }
 
-void applyBlur(const SkBitmap &bitmap, const qreal &scale,
-               const qreal &blurRadius, const bool &highQuality,
-               const bool &hasKeys) {
+void applyBlur(const SkBitmap &bitmap, const qreal scale,
+               const qreal blurRadius, const bool highQuality,
+               const bool hasKeys) {
     const qreal radius = blurRadius*scale;
     if(highQuality) {
         if(hasKeys) {
@@ -3511,9 +3511,9 @@ void applyBlur(const SkBitmap &bitmap, const qreal &scale,
     }
 }
 
-void applyBlur(const SkBitmap &bitmap, const qreal &scale,
-               const qreal &blurRadius, const bool &highQuality,
-               const bool &hasKeys, const qreal &opacity) {
+void applyBlur(const SkBitmap &bitmap, const qreal scale,
+               const qreal blurRadius, const bool highQuality,
+               const bool hasKeys, const qreal opacity) {
     qreal radius = blurRadius*scale;
 
     if(highQuality) {

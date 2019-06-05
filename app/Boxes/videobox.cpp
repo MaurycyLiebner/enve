@@ -48,12 +48,12 @@ void VideoBox::changeSourceFile(QWidget *dialogParent) {
     if(!importPath.isEmpty()) setFilePath(importPath);
 }
 
-void VideoBox::setStretch(const qreal &stretch) {
+void VideoBox::setStretch(const qreal stretch) {
     AnimationBox::setStretch(stretch);
     mSound->setStretch(stretch);
 }
 
-void VideoBox::setSoundEnabled(const bool &enable) {
+void VideoBox::setSoundEnabled(const bool enable) {
     if(mSoundEnabled == enable) return;
     mSoundEnabled = enable;
     if(!mSound) return;

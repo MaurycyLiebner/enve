@@ -77,7 +77,7 @@ void FontsWidget::updateSizesFromCurrentFamilyAndStyles() {
     mFontSizeCombo->clear();
     const QList<int> sizes = mFontDatabase.smoothSizes(getCurrentFontFamily(),
                                                        getCurrentFontStyle());
-    for(const int &size : sizes) {
+    for(const int size : sizes) {
         mFontSizeCombo->addItem(QString::number(size));
     }
 
@@ -106,7 +106,7 @@ QString FontsWidget::getCurrentFontFamily() const {
     return mFontFamilyCombo->currentText();
 }
 
-void FontsWidget::setCurrentFontSize(const qreal &size) {
+void FontsWidget::setCurrentFontSize(const qreal size) {
     disconnect(mFontSizeCombo, &QComboBox::currentTextChanged,
                this, &FontsWidget::emitSizeChanged);
     mFontSizeCombo->setCurrentText(QString::number(qRound(size)));
@@ -138,7 +138,7 @@ void FontsWidget::setCurrentFontStyle(const QString &style) {
     updateSizesFromCurrentFamilyAndStyles();
 }
 
-void FontsWidget::setCurrentSettings(const qreal &size,
+void FontsWidget::setCurrentSettings(const qreal size,
                                      const QString &family,
                                      const QString &style) {
     setCurrentFontFamily(family);

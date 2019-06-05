@@ -76,7 +76,7 @@ void H_Wheel_SV_Triangle::drawWheel()
 
 }
 
-void H_Wheel_SV_Triangle::wheelInteraction(const int &x_t, const int &y_t) {
+void H_Wheel_SV_Triangle::wheelInteraction(const int x_t, const int y_t) {
     double radial_x = x_t - wheel_dim*0.5;
     double radial_y = y_t - wheel_dim*0.5;
     mHue = getAngleF(1, 0, -radial_x, radial_y);

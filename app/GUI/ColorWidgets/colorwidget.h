@@ -8,9 +8,9 @@ class ColorWidget : public GLWidget {
 public:
     ColorWidget(QWidget *parent = nullptr);
 
-    void setColorHSV(const qreal& h,
-                     const qreal& s,
-                     const qreal& v) {
+    void setColorHSV(const qreal h,
+                     const qreal s,
+                     const qreal v) {
         setColorHSV_f(static_cast<GLfloat>(h),
                       static_cast<GLfloat>(s),
                       static_cast<GLfloat>(v));

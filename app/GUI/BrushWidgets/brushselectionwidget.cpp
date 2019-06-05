@@ -11,7 +11,7 @@ QList<BrushCollectionData> BrushSelectionWidget::sData;
 bool BrushSelectionWidget::sLoaded = false;
 QList<BrushesContext> BrushSelectionWidget::sBrushContexts;
 
-BrushSelectionWidget::BrushSelectionWidget(const int &contextId,
+BrushSelectionWidget::BrushSelectionWidget(const int contextId,
                                            QWidget * const parent) :
     QTabWidget(parent), mContextId(contextId) {
     setSizePolicy(QSizePolicy::Preferred, sizePolicy().verticalPolicy());

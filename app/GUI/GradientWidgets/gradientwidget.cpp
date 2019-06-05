@@ -40,7 +40,7 @@ void GradientWidget::updateAll() {
     update();
 }
 
-void GradientWidget::setCurrentColorId(const int& id) {
+void GradientWidget::setCurrentColorId(const int id) {
     mCurrentColorId = id;
     //Color col = mCurrentGradient->getCurrentColorAt(mCurrentColorId);
     const auto currCol = mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
@@ -65,7 +65,7 @@ void GradientWidget::newGradient(const QColor &color1,
     updateAll();
 }
 
-void GradientWidget::newGradient(const int &fromGradientId) {
+void GradientWidget::newGradient(const int fromGradientId) {
     const Gradient * const fromGradient = mGradients.at(fromGradientId).data();
     auto newGradient = SPtrCreate(Gradient)();
     QBuffer buffer;
@@ -105,7 +105,7 @@ void GradientWidget::removeGradientFromList(const qsptr<Gradient> &toRemove) {
     updateNumberOfGradients();
 }
 
-void GradientWidget::removeGradient(const int& gradientId) {
+void GradientWidget::removeGradient(const int gradientId) {
     qsptr<Gradient> toRemove = mGradients.at(gradientId);
     if(toRemove->affectsPaths()) return;
     removeGradientFromList(toRemove);
@@ -121,7 +121,7 @@ void GradientWidget::setCurrentColor(const QColor& col) {
 }
 
 void GradientWidget::setCurrentGradient(Gradient *gradient,
-                                        const bool &emitChange) {
+                                        const bool emitChange) {
     if(mCurrentGradient) {
         disconnect(mCurrentGradient,
                    &Gradient::resetGradientWidgetColorIdIfEquals,
@@ -159,18 +159,18 @@ ColorAnimator *GradientWidget::getCurrentColorAnimator() {
     return mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
 }
 
-void GradientWidget::resetColorIdIfEquals(Gradient *gradient, const int &id) {
+void GradientWidget::resetColorIdIfEquals(Gradient *gradient, const int id) {
     if(gradient == mCurrentGradient) {
         if(id == mCurrentColorId) mCurrentColorId = 0;
     }
 }
 
-void GradientWidget::setCurrentGradient(const int &listId) {
+void GradientWidget::setCurrentGradient(const int listId) {
     if(listId >= mGradients.length()) return;
     setCurrentGradient(mGradients.at(listId).data());
 }
 
-void GradientWidget::colorRightPress(const int &x, const QPoint &point) {
+void GradientWidget::colorRightPress(const int x, const QPoint &point) {
     colorLeftPress(x);
     if(mCurrentGradient) {
         QMenu menu(this);
@@ -204,17 +204,17 @@ void GradientWidget::colorRightPress(const int &x, const QPoint &point) {
     }
 }
 
-int GradientWidget::getColorIdAtX(const int &x) {
+int GradientWidget::getColorIdAtX(const int x) {
     const int nCols = mCurrentGradient->getColorCount();
     return clampInt(x*nCols/width(), 0, nCols - 1);
 }
 
-void GradientWidget::colorLeftPress(const int &x) {
+void GradientWidget::colorLeftPress(const int x) {
     if(mCurrentGradient) setCurrentColorId(getColorIdAtX(x));
     updateAll();
 }
 
-void GradientWidget::moveColor(const int &x) {
+void GradientWidget::moveColor(const int x) {
     if(mCurrentGradient) {
         const int nCols = mCurrentGradient->getColorCount();
         const int colorId = clampInt(x*nCols/width(), 0, nCols - 1);
@@ -230,7 +230,7 @@ void GradientWidget::moveColor(const int &x) {
     }
 }
 
-void GradientWidget::updateAfterFrameChanged(const int &absFrame) {
+void GradientWidget::updateAfterFrameChanged(const int absFrame) {
     for(const auto& gradient : mGradients)
         gradient->anim_setAbsFrame(absFrame);
 }
@@ -248,13 +248,13 @@ void GradientWidget::setGradientLoadIds() {
     }
 }
 
-void GradientWidget::gradientLeftPressed(const int &gradId) {
+void GradientWidget::gradientLeftPressed(const int gradId) {
     if(gradId >= mGradients.count() || gradId < 0) return;
     setCurrentGradient(gradId);
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
-void GradientWidget::gradientContextMenuReq(const int &gradId,
+void GradientWidget::gradientContextMenuReq(const int gradId,
                                             const QPoint globalPos) {
     const bool gradPressed = gradId < mGradients.count() && gradId >= 0;
     QMenu menu(this);

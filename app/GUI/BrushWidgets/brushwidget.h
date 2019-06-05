@@ -29,7 +29,7 @@ public slots:
         update();
     }
 private:
-    const bool& isSelected() const {
+    bool isSelected() const {
         return mBrushCWrapper->selected();
     }
 

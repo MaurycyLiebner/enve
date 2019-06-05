@@ -33,7 +33,7 @@ void KeysView::graphSetCornerCtrlAction() {
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void KeysView::graphMakeSegmentsSmoothAction(const bool& smooth) {
+void KeysView::graphMakeSegmentsSmoothAction(const bool smooth) {
     if(mSelectedKeysAnimators.isEmpty()) return;
     QList<QList<GraphKey*>> segments;
     for(const auto& anim : mGraphAnimators) {
@@ -224,12 +224,12 @@ void KeysView::graphResizeEvent(QResizeEvent *) {
     graphUpdateDimensions();
 }
 
-void KeysView::graphIncMinShownVal(const qreal &inc) {
+void KeysView::graphIncMinShownVal(const qreal inc) {
     graphSetMinShownVal((MIN_WIDGET_HEIGHT/2)*inc/mPixelsPerValUnit +
                         mMinShownVal);
 }
 
-void KeysView::graphSetMinShownVal(const qreal &newMinShownVal) {
+void KeysView::graphSetMinShownVal(const qreal newMinShownVal) {
     mMinShownVal = newMinShownVal;
 }
 

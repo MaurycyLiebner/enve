@@ -4,7 +4,7 @@
 
 class QrealValueEffect : public ComplexAnimator {
 public:
-    virtual qreal getDevAtRelFrame(const qreal &relFrame) = 0;
+    virtual qreal getDevAtRelFrame(const qreal relFrame) = 0;
 
 protected:
     QrealValueEffect(const QString& name);

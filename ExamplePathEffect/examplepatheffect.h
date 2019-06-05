@@ -12,7 +12,7 @@ public:
     void read(const QByteArray &identifier, QIODevice * const src);
     void write(QIODevice * const dst) const;
 
-    void apply(const qreal &relFrame,
+    void apply(const qreal relFrame,
                const SkPath &src,
                SkPath * const dst);
 private:

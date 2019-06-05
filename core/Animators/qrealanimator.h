@@ -11,10 +11,10 @@ class QrealAnimator :  public GraphAnimator {
     friend class SelfRef;
 protected:
     QrealAnimator(const QString& name);
-    QrealAnimator(const qreal &iniVal,
-                  const qreal &minVal,
-                  const qreal &maxVal,
-                  const qreal &prefferdStep,
+    QrealAnimator(const qreal iniVal,
+                  const qreal minVal,
+                  const qreal maxVal,
+                  const qreal prefferdStep,
                   const QString& name);
 public:
     bool SWT_isQrealAnimator() const { return true; }
@@ -22,16 +22,16 @@ public:
     void prp_finishTransform();
     void prp_cancelTransform();
     QString prp_getValueText();
-    void prp_setTransformed(const bool &bT) { mTransformed = bT; }
+    void prp_setTransformed(const bool bT) { mTransformed = bT; }
     void prp_afterChangedAbsRange(const FrameRange& range) {
         if(range.inRange(anim_getCurrentAbsFrame()))
             updateBaseValueFromCurrentFrame();
         GraphAnimator::prp_afterChangedAbsRange(range);
     }
 
-    void anim_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int frame);
     void anim_removeAllKeys();
-    void anim_addKeyAtRelFrame(const int& relFrame);
+    void anim_addKeyAtRelFrame(const int relFrame);
 
     QPainterPath graph_getPathForSegment(
             const GraphKey * const prevKey,
@@ -39,9 +39,9 @@ public:
 
     qValueRange graph_getMinAndMaxValues() const;
     qValueRange graph_getMinAndMaxValuesBetweenFrames(
-            const int &startFrame, const int &endFrame) const;
+            const int startFrame, const int endFrame) const;
 
-    qreal graph_clampGraphValue(const qreal &value);
+    qreal graph_clampGraphValue(const qreal value);
 
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
@@ -52,39 +52,39 @@ protected:
     void graph_getValueConstraints(GraphKey *key, const QrealPointType& type,
                                    qreal &minMoveValue, qreal &maxMoveValue) const;
 public:
-    QrealSnapshot makeSnapshot(const qreal& frameMultiplier = 1,
-                          const qreal& valueMultiplier = 1) const;
-    QrealSnapshot makeSnapshot(const int& minFrame, const int& maxFrame,
-                          const qreal& frameMultiplier = 1,
-                          const qreal& valueMultiplier = 1) const;
+    QrealSnapshot makeSnapshot(const qreal frameMultiplier = 1,
+                          const qreal valueMultiplier = 1) const;
+    QrealSnapshot makeSnapshot(const int minFrame, const int maxFrame,
+                          const qreal frameMultiplier = 1,
+                          const qreal valueMultiplier = 1) const;
 
-    void setPrefferedValueStep(const qreal &valueStep);
+    void setPrefferedValueStep(const qreal valueStep);
 
-    void setValueRange(const qreal &minVal, const qreal &maxVal);
-    void setMinValue(const qreal &minVal) {
+    void setValueRange(const qreal minVal, const qreal maxVal);
+    void setMinValue(const qreal minVal) {
         mMinPossibleVal = minVal;
         setCurrentBaseValue(mCurrentBaseValue);
     }
-    void setMaxValue(const qreal &maxVal) {
+    void setMaxValue(const qreal maxVal) {
         mMaxPossibleVal = maxVal;
         setCurrentBaseValue(mCurrentBaseValue);
     }
 
     void setCurrentBaseValue(qreal newValue);
-    void setCurrentBaseValueNoUpdate(const qreal &newValue);
-    void incCurrentBaseValue(const qreal &incBy);
-    void incCurrentValueNoUpdate(const qreal &incBy);
-    void multCurrentBaseValue(const qreal &mult);
+    void setCurrentBaseValueNoUpdate(const qreal newValue);
+    void incCurrentBaseValue(const qreal incBy);
+    void incCurrentValueNoUpdate(const qreal incBy);
+    void multCurrentBaseValue(const qreal mult);
 
     qreal getCurrentBaseValue() const;
     qreal getCurrentEffectiveValue() const;
-    qreal getBaseValue(const qreal &relFrame) const;
-    qreal getBaseValueAtAbsFrame(const qreal &frame) const;
-    qreal getEffectiveValue(const qreal &relFrame) const;
-    qreal getEffectiveValueAtAbsFrame(const qreal &frame) const;
+    qreal getBaseValue(const qreal relFrame) const;
+    qreal getBaseValueAtAbsFrame(const qreal frame) const;
+    qreal getEffectiveValue(const qreal relFrame) const;
+    qreal getEffectiveValueAtAbsFrame(const qreal frame) const;
 
     qreal getSavedBaseValue();
-    void incAllValues(const qreal &valInc);
+    void incAllValues(const qreal valInc);
 
     qreal getMinPossibleValue();
     qreal getMaxPossibleValue();
@@ -93,14 +93,14 @@ public:
 
     void graphFixMinMaxValues();
 
-    void saveValueToKey(const int &frame, const qreal &value);
+    void saveValueToKey(const int frame, const qreal value);
     void removeThisFromGraphAnimator();
 
-    void incSavedValueToCurrentValue(const qreal &incBy);
-    void multSavedValueToCurrentValue(const qreal &multBy);
+    void incSavedValueToCurrentValue(const qreal incBy);
+    void multSavedValueToCurrentValue(const qreal multBy);
 
-    const int &getNumberDecimals() { return mDecimals; }
-    void setNumberDecimals(const int &decimals) { mDecimals = decimals; }
+    int getNumberDecimals() { return mDecimals; }
+    void setNumberDecimals(const int decimals) { mDecimals = decimals; }
 
     bool getBeingTransformed() { return mTransformed; }
 
@@ -114,7 +114,7 @@ public:
         return anim;
     }
 private:
-    qreal calculateBaseValueAtRelFrame(const qreal &frame) const;
+    qreal calculateBaseValueAtRelFrame(const qreal frame) const;
 
     bool mGraphMinMaxValuesFixed = false;
     bool mTransformed = false;

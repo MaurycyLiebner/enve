@@ -28,11 +28,11 @@ public:
         gRead(target, mValue);
     }
 protected:
-    BasedKeyT(const T &value, const int &relFrame,
+    BasedKeyT(const T &value, const int relFrame,
               Animator * const parentAnimator = nullptr) :
         B(relFrame, parentAnimator), mValue(value) {}
 
-    BasedKeyT(const int &relFrame,
+    BasedKeyT(const int relFrame,
               Animator * const parentAnimator = nullptr) :
         B(relFrame, parentAnimator) {}
 

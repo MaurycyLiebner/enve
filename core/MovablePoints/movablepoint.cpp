@@ -20,7 +20,7 @@ const QPointF &MovablePoint::getSavedRelPos() const {
 }
 
 void MovablePoint::drawHovered(SkCanvas * const canvas,
-                               const SkScalar &invScale) {
+                               const SkScalar invScale) {
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setStyle(SkPaint::kStroke_Style);
@@ -56,9 +56,9 @@ QPointF MovablePoint::getAbsolutePos() const {
 void MovablePoint::drawOnAbsPosSk(
         SkCanvas * const canvas,
         const SkPoint &absPos,
-        const SkScalar &invScale,
+        const SkScalar invScale,
         const SkColor& fillColor,
-        const bool &keyOnCurrent) {
+        const bool keyOnCurrent) {
     const SkScalar scaledRadius = static_cast<SkScalar>(mRadius)*invScale;
 
     SkPaint paint;
@@ -88,7 +88,7 @@ void MovablePoint::drawOnAbsPosSk(
 }
 
 void MovablePoint::drawSk(SkCanvas * const canvas, const CanvasMode &mode,
-                          const SkScalar &invScale, const bool &keyOnCurrent) {
+                          const SkScalar invScale, const bool keyOnCurrent) {
     Q_UNUSED(mode);
     Q_UNUSED(keyOnCurrent);
     const SkColor fillCol = mSelected ?
@@ -112,7 +112,7 @@ void MovablePoint::setTransform(BasicTransformAnimator * const trans) {
 
 bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
                                    const CanvasMode &mode,
-                                   const qreal &invScale) {
+                                   const qreal invScale) {
     if(isHidden(mode)) return false;
     const QPointF dist = getAbsolutePos() - absPoint;
     return pointToLen(dist) < mRadius*invScale;
@@ -133,7 +133,7 @@ bool MovablePoint::isContainedInRect(const QRectF &absRect) {
     return absRect.contains(getAbsolutePos());
 }
 
-void MovablePoint::rotateRelativeToSavedPivot(const qreal &rot) {
+void MovablePoint::rotateRelativeToSavedPivot(const qreal rot) {
     QMatrix mat;
     mat.translate(mPivot.x(),
                   mPivot.y());
@@ -143,8 +143,8 @@ void MovablePoint::rotateRelativeToSavedPivot(const qreal &rot) {
     moveToRel(mat.map(mSavedRelPos));
 }
 
-void MovablePoint::scaleRelativeToSavedPivot(const qreal &sx,
-                                             const qreal &sy) {
+void MovablePoint::scaleRelativeToSavedPivot(const qreal sx,
+                                             const qreal sy) {
     QMatrix mat;
     mat.translate(mPivot.x(), mPivot.y());
     mat.scale(sx, sy);
@@ -157,7 +157,7 @@ void MovablePoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
     else mPivot = absPivot;
 }
 
-void MovablePoint::rotateBy(const qreal &rot) {
+void MovablePoint::rotateBy(const qreal rot) {
     QMatrix rotMatrix;
     rotMatrix.translate(-mPivot.x(),
                         -mPivot.y());
@@ -167,8 +167,8 @@ void MovablePoint::rotateBy(const qreal &rot) {
     setRelativePos(rotMatrix.map(mSavedRelPos));
 }
 
-void MovablePoint::scale(const qreal &scaleXBy,
-                         const qreal &scaleYBy) {
+void MovablePoint::scale(const qreal scaleXBy,
+                         const qreal scaleYBy) {
     QMatrix scaleMatrix;
     scaleMatrix.translate(-mPivot.x(),
                           -mPivot.y());
@@ -194,11 +194,11 @@ void MovablePoint::moveByRel(const QPointF &relTranslation) {
     setRelativePos(mSavedRelPos + relTranslation);
 }
 
-void MovablePoint::scale(const qreal &scaleBy) {
+void MovablePoint::scale(const qreal scaleBy) {
     scale(scaleBy, scaleBy);
 }
 
-void MovablePoint::setRadius(const qreal& radius) {
+void MovablePoint::setRadius(const qreal radius) {
     mRadius = radius;
 }
 

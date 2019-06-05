@@ -27,7 +27,7 @@ public:
             const QMatrix &totalTransform);
 
     void setSrcRenderData(BoundingBoxRenderData * const data);
-    const int& getRelFrame() const {
+    int getRelFrame() const {
         return mRelFrame;
     }
 
@@ -35,11 +35,11 @@ public:
         return mSrcRenderData.get();
     }
 
-    const bool& isExpired() const {
+    bool isExpired() const {
         return mExpired;
     }
 
-    void setExpired(const bool& expired) {
+    void setExpired(const bool expired) {
         mExpired = expired;
     }
 protected:

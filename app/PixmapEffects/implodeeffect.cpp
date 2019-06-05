@@ -10,7 +10,7 @@ ImplodeEffect::ImplodeEffect() :
 }
 
 stdsptr<PixmapEffectRenderData> ImplodeEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal &relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ImplodeEffectRenderData)();
     renderData->factor =
             mFactorAnimator->getEffectiveValue(relFrame);
@@ -18,7 +18,7 @@ stdsptr<PixmapEffectRenderData> ImplodeEffect::getPixmapEffectRenderDataForRelFr
 }
 
 void ImplodeEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
-                                             const qreal &scale) {
+                                             const qreal scale) {
     Q_UNUSED(scale);
     RasterEffects::implode(bitmap, factor, RasterEffects::rgba(0, 0, 0, 0));
 }

@@ -8,7 +8,7 @@ WindowSingleWidgetTarget::WindowSingleWidgetTarget(
 void WindowSingleWidgetTarget::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction *abstraction,
         const UpdateFuncs &updateFuncs,
-        const int& visiblePartWidgetId) {
+        const int visiblePartWidgetId) {
     mWindow->SWT_addChildrenAbstractions(abstraction, updateFuncs,
                                          visiblePartWidgetId);
 }

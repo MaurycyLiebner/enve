@@ -47,7 +47,7 @@ public:
     void updateSizesAndPositions();
     void updateResizers();
     void appendWidget(QWidget *widget);
-    void insertWidget(const int &id, QWidget *widget);
+    void insertWidget(const int id, QWidget *widget);
     void removeWidget(QWidget *widget);
 
     void resizeEvent(QResizeEvent *);

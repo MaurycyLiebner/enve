@@ -14,7 +14,7 @@ BrightnessEffect::BrightnessEffect(qreal brightness) :
 }
 
 stdsptr<PixmapEffectRenderData> BrightnessEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal &relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoundingBoxRenderData*) {
     auto renderData =
             SPtrCreate(BrightnessEffectRenderData)();
     renderData->brightness =
@@ -24,7 +24,7 @@ stdsptr<PixmapEffectRenderData> BrightnessEffect::getPixmapEffectRenderDataForRe
 }
 
 void BrightnessEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
-                                                const qreal &scale) {
+                                                const qreal scale) {
     Q_UNUSED(scale);
     if(hasKeys) {
         RasterEffects::anim_brightness(bitmap, brightness);

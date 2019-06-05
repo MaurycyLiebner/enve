@@ -9,7 +9,7 @@ Property::Property(const QString& name) :
 
 void Property::drawCanvasControls(SkCanvas * const canvas,
                                   const CanvasMode &mode,
-                                  const SkScalar &invScale) {
+                                  const SkScalar invScale) {
     if(mPointsHandler) {
         bool key;
         if(SWT_isAnimator()) {
@@ -41,7 +41,7 @@ int Property::prp_getParentFrameShift() const {
     return prp_mParentFrameShift;
 }
 
-void Property::prp_setParentFrameShift(const int &shift,
+void Property::prp_setParentFrameShift(const int shift,
                                        ComplexAnimator *parentAnimator) {
     Q_UNUSED(parentAnimator);
     prp_mParentFrameShift = shift;
@@ -64,25 +64,25 @@ FrameRange Property::prp_absRangeToRelRange(const FrameRange& range) const {
             prp_absFrameToRelFrame(range.fMax)};
 }
 
-int Property::prp_absFrameToRelFrame(const int &absFrame) const {
+int Property::prp_absFrameToRelFrame(const int absFrame) const {
     if(absFrame == FrameRange::EMIN) return FrameRange::EMIN;
     if(absFrame == FrameRange::EMAX) return FrameRange::EMAX;
     return absFrame - prp_getFrameShift();
 }
 
-qreal Property::prp_absFrameToRelFrameF(const qreal &absFrame) const {
+qreal Property::prp_absFrameToRelFrameF(const qreal absFrame) const {
     if(qRound(absFrame) == FrameRange::EMIN) return FrameRange::EMIN;
     if(qRound(absFrame) == FrameRange::EMAX) return FrameRange::EMAX;
     return absFrame - prp_getFrameShift();
 }
 
-int Property::prp_relFrameToAbsFrame(const int &relFrame) const {
+int Property::prp_relFrameToAbsFrame(const int relFrame) const {
     if(relFrame == FrameRange::EMIN) return FrameRange::EMIN;
     if(relFrame == FrameRange::EMAX) return FrameRange::EMAX;
     return relFrame + prp_getFrameShift();
 }
 
-qreal Property::prp_relFrameToAbsFrameF(const qreal &relFrame) const {
+qreal Property::prp_relFrameToAbsFrameF(const qreal relFrame) const {
     if(qRound(relFrame) == FrameRange::EMIN) return FrameRange::EMIN;
     if(qRound(relFrame) == FrameRange::EMAX) return FrameRange::EMAX;
     return relFrame + prp_getFrameShift();

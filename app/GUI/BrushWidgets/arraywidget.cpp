@@ -56,7 +56,7 @@ void ArrayWidget::prependWidget(QWidget *wid) {
     insertWidget(0, wid);
 }
 
-void ArrayWidget::insertWidget(const int &i, QWidget *wid) {
+void ArrayWidget::insertWidget(const int i, QWidget *wid) {
     wid->setParent(this);
     mMainLayout->insertWidget(i + 1, wid);
     mArrayWidgets.insert(i, wid);
@@ -82,20 +82,20 @@ bool ArrayWidget::removeWidget(QWidget *widget) {
     return false;
 }
 
-void ArrayWidget::incFirstWidgetId(const int &inc) {
+void ArrayWidget::incFirstWidgetId(const int inc) {
     setFirstWidgetId(mFirstId + inc);
 }
 
-void ArrayWidget::decFirstWidgetId(const int &dec) {
+void ArrayWidget::decFirstWidgetId(const int dec) {
     setFirstWidgetId(mFirstId - dec);
 }
 
-void ArrayWidget::setFirstWidgetId(const int &id) {
+void ArrayWidget::setFirstWidgetId(const int id) {
     mFirstId = id;
     updateWidgetsVisibility();
 }
 
-void ArrayWidget::setMaxCount(const int &maxCount) {
+void ArrayWidget::setMaxCount(const int maxCount) {
     mMaxCount = std::max(0, maxCount);
 }
 

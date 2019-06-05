@@ -15,15 +15,15 @@ class QrealKey : public GraphKey {
     friend class StdSelfRef;
 public:
     QrealKey(QrealAnimator * const parentAnimator);
-    QrealKey(const qreal &value,
-             const int &frame,
+    QrealKey(const qreal value,
+             const int frame,
              QrealAnimator * const parentAnimator);
 
     qreal getValue() const;
-    void setValue(const qreal &value);
+    void setValue(const qreal value);
 
     void changeFrameAndValueBy(const QPointF &frameValueChange);
-    void incValue(const qreal &incBy);
+    void incValue(const qreal incBy);
 
     QrealAnimator *getParentQrealAnimator() const;
 
@@ -39,7 +39,7 @@ public:
         return getValue();
     }
 
-    void setValueForGraph(const qreal& value) {
+    void setValueForGraph(const qreal value) {
         setValue(value);
     }
 protected:

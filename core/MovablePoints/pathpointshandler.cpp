@@ -10,13 +10,13 @@ PathPointsHandler::PathPointsHandler(
     mTargetAnimator->prp_setOwnUpdater(updater);
 }
 
-SmartNodePoint *PathPointsHandler::createNewNodePoint(const int &nodeId) {
+SmartNodePoint *PathPointsHandler::createNewNodePoint(const int nodeId) {
     const auto newPt = SPtrCreate(SmartNodePoint)(this, mTargetAnimator);
     insertPt(nodeId, newPt);
     return newPt.get();
 }
 
-SmartNodePoint *PathPointsHandler::createAndAssignNewNodePoint(const int &nodeId) {
+SmartNodePoint *PathPointsHandler::createAndAssignNewNodePoint(const int nodeId) {
     const auto newPt = createNewNodePoint(nodeId);
     updatePoint(newPt, nodeId);
     return newPt;
@@ -26,12 +26,12 @@ SmartPath *PathPointsHandler::targetPath() const {
     return mTargetAnimator->getCurrentlyEditedPath();
 }
 
-void PathPointsHandler::updatePoint(const int &nodeId) {
+void PathPointsHandler::updatePoint(const int nodeId) {
     const auto pt = getPointWithId<SmartNodePoint>(nodeId);
     updatePoint(pt, nodeId);
 }
 
-void PathPointsHandler::updatePoint(SmartNodePoint * const pt, const int &nodeId) {
+void PathPointsHandler::updatePoint(SmartNodePoint * const pt, const int nodeId) {
     pt->setNode(targetPath()->getNodePtr(nodeId));
 }
 
@@ -44,7 +44,7 @@ void PathPointsHandler::updateAllPoints() {
     for(int i = 0; i < count(); i++) updatePoint(i);
 }
 
-void PathPointsHandler::setCtrlsMode(const int &nodeId,
+void PathPointsHandler::setCtrlsMode(const int nodeId,
                                      const CtrlsMode &mode) {
     blockAllPointsUpdate();
     mTargetAnimator->beforeBinaryPathChange();
@@ -54,8 +54,8 @@ void PathPointsHandler::setCtrlsMode(const int &nodeId,
     unblockAllPointsUpdate();
 }
 
-void PathPointsHandler::removeNode(const int &nodeId,
-                                   const bool &approx) {
+void PathPointsHandler::removeNode(const int nodeId,
+                                   const bool approx) {
     mTargetAnimator->actionRemoveNode(nodeId, approx);
 }
 
@@ -73,7 +73,7 @@ SmartNodePoint* PathPointsHandler::addNewAtEnd(const QPointF &relPos) {
     return createAndAssignNewNodePoint(id);
 }
 
-void PathPointsHandler::promoteToNormal(const int &nodeId) {
+void PathPointsHandler::promoteToNormal(const int nodeId) {
     blockAllPointsUpdate();
     mTargetAnimator->beforeBinaryPathChange();
     targetPath()->actionPromoteDissolvedNodeToNormal(nodeId);
@@ -86,8 +86,8 @@ void PathPointsHandler::promoteToNormal(const int &nodeId) {
                  qMax(prevNormalId, nextNormalId));
 }
 
-void PathPointsHandler::demoteToDissolved(const int &nodeId,
-                                          const bool& approx) {
+void PathPointsHandler::demoteToDissolved(const int nodeId,
+                                          const bool approx) {
     blockAllPointsUpdate();
     mTargetAnimator->beforeBinaryPathChange();
     targetPath()->actionDemoteToDissolved(nodeId, approx);
@@ -100,7 +100,7 @@ void PathPointsHandler::demoteToDissolved(const int &nodeId,
                  qMax(prevNormalId, nextNormalId));
 }
 
-int PathPointsHandler::moveToClosestSegment(const int &nodeId,
+int PathPointsHandler::moveToClosestSegment(const int nodeId,
                                             const QPointF &relPos) {
     NormalSegment::SubSegment minSubSeg{nullptr, nullptr, nullptr};
     qreal minDist = TEN_MIL;
@@ -127,18 +127,18 @@ int PathPointsHandler::moveToClosestSegment(const int &nodeId,
     return (nodeId < prevNodeId ? prevNodeId : nextNodeId);
 }
 
-void PathPointsHandler::mergeNodes(const int &nodeId1, const int &nodeId2) {
+void PathPointsHandler::mergeNodes(const int nodeId1, const int nodeId2) {
     mTargetAnimator->actionMergeNodes(nodeId1, nodeId2);
 }
 
-SmartNodePoint* PathPointsHandler::divideSegment(const int &node1Id,
-                                                 const int &node2Id,
-                                                 const qreal &t) {
+SmartNodePoint* PathPointsHandler::divideSegment(const int node1Id,
+                                                 const int node2Id,
+                                                 const qreal t) {
     const int id = mTargetAnimator->actionInsertNodeBetween(node1Id, node2Id, t);
     return getPointWithId<SmartNodePoint>(id);
 }
 
-void PathPointsHandler::createSegment(const int &node1Id, const int &node2Id) {
+void PathPointsHandler::createSegment(const int node1Id, const int node2Id) {
     mTargetAnimator->actionConnectNodes(node1Id, node2Id);
 }
 

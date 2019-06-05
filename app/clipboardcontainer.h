@@ -47,10 +47,10 @@ class KeysClipboardContainer : public ClipboardContainer {
 public:
     ~KeysClipboardContainer();
 
-    void paste(const int &pasteFrame,
+    void paste(const int pasteFrame,
                KeysView *keysView,
-               const bool &merge,
-               const bool &selectPasted);
+               const bool merge,
+               const bool selectPasted);
 
     void addTargetAnimator(Animator *anim, const QByteArray& keyData);
 protected:

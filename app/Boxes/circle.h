@@ -11,7 +11,7 @@ protected:
                       BasicTransformAnimator * const parent,
                       AnimatedPoint * const centerPoint,
                       const MovablePointType &type,
-                      const bool &blockX);
+                      const bool blockX);
 public:
     QPointF getRelativePos() const;
     void setRelativePos(const QPointF &relPos);
@@ -30,16 +30,16 @@ public:
     bool SWT_isCircle() const;
 
     void startAllPointsTransform();
-    SkPath getPathAtRelFrameF(const qreal &relFrame);
+    SkPath getPathAtRelFrameF(const qreal relFrame);
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 
     bool differenceInEditPathBetweenFrames(
-                const int& frame1, const int& frame2) const;
+                const int frame1, const int frame2) const;
 
-    void setVerticalRadius(const qreal &verticalRadius);
-    void setHorizontalRadius(const qreal &horizontalRadius);
-    void setRadius(const qreal &radius);
+    void setVerticalRadius(const qreal verticalRadius);
+    void setHorizontalRadius(const qreal horizontalRadius);
+    void setRadius(const qreal radius);
     void moveRadiusesByAbs(const QPointF &absTrans);
 
     qreal getCurrentXRadius();

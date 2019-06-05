@@ -13,38 +13,38 @@ class SmartPath {
 public:
     SmartPath();
 
-    void actionRemoveNode(const int& nodeId, const bool &approx);
+    void actionRemoveNode(const int nodeId, const bool approx);
 
     int actionAddFirstNode(const QPointF& c0,
                            const QPointF& p1,
                            const QPointF& c2);
     int actionAddFirstNode(const NormalNodeData &data);
 
-    void actionMoveNodeBetween(const int& movedNodeId,
-                               const int& prevNodeId,
-                               const int& nextNodeId);
+    void actionMoveNodeBetween(const int movedNodeId,
+                               const int prevNodeId,
+                               const int nextNodeId);
 
-    int actionAppendNodeAtEndNode(const int &endNodeId);
+    int actionAppendNodeAtEndNode(const int endNodeId);
     int actionAppendNodeAtEndNode(const NodePointValues &values);
     int actionAppendNodeAtEndNode();
 
-    int actionInsertNodeBetween(const int &prevId,
-                                const int& nextId,
+    int actionInsertNodeBetween(const int prevId,
+                                const int nextId,
                                 const QPointF &c0,
                                 const QPointF &p1,
                                 const QPointF &c2);
-    int actionInsertNodeBetween(const int &prevId,
-                                const int& nextId,
-                                const qreal& t);
+    int actionInsertNodeBetween(const int prevId,
+                                const int nextId,
+                                const qreal t);
 
-    void actionPromoteDissolvedNodeToNormal(const int& nodeId);
-    void actionDemoteToDissolved(const int &nodeId, const bool &approx);
+    void actionPromoteDissolvedNodeToNormal(const int nodeId);
+    void actionDemoteToDissolved(const int nodeId, const bool approx);
 
-    void actionDisconnectNodes(const int& node1Id, const int& node2Id);
+    void actionDisconnectNodes(const int node1Id, const int node2Id);
 
-    void actionConnectNodes(const int& node1Id, const int& node2Id);
+    void actionConnectNodes(const int node1Id, const int node2Id);
 
-    void actionSetDissolvedNodeT(const int& nodeId, const qreal& t) {
+    void actionSetDissolvedNodeT(const int nodeId, const qreal t) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isDissolved()) RuntimeThrow("Setting dissolved node value "
                                              "on a node of a different type");
@@ -52,7 +52,7 @@ public:
         updateDissolvedNodePosition(nodeId, node);
     }
 
-    void actionSetNormalNodeValues(const int& nodeId,
+    void actionSetNormalNodeValues(const int nodeId,
                                    const QPointF& c0,
                                    const QPointF& p1,
                                    const QPointF& c2) {
@@ -64,7 +64,7 @@ public:
         node->setC2(c2);
     }
 
-    void actionSetNormalNodeValues(const int& nodeId,
+    void actionSetNormalNodeValues(const int nodeId,
                                    const NormalNodeData& data) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
@@ -72,42 +72,42 @@ public:
         node->setNormalData(data);
     }
 
-    void actionSetNormalNodeP1(const int& nodeId, const QPointF& p1) {
+    void actionSetNormalNodeP1(const int nodeId, const QPointF& p1) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
         node->setP1(p1);
     }
 
-    void actionSetNormalNodeC0(const int& nodeId, const QPointF& c0) {
+    void actionSetNormalNodeC0(const int nodeId, const QPointF& c0) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
         node->setC0(c0);
     }
 
-    void actionSetNormalNodeC2(const int& nodeId, const QPointF& c2) {
+    void actionSetNormalNodeC2(const int nodeId, const QPointF& c2) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
         node->setC2(c2);
     }
 
-    void actionSetNormalNodeCtrlsMode(const int& nodeId, const CtrlsMode& mode) {
+    void actionSetNormalNodeCtrlsMode(const int nodeId, const CtrlsMode& mode) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
         mNodesList.setNodeCtrlsMode(node, mode);
     }
 
-    void actionSetNormalNodeC0Enabled(const int& nodeId, const bool& enabled) {
+    void actionSetNormalNodeC0Enabled(const int nodeId, const bool enabled) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                           "on a node of a different type");
         mNodesList.setNodeC0Enabled(node, enabled);
     }
 
-    void actionSetNormalNodeC2Enabled(const int& nodeId, const bool& enabled) {
+    void actionSetNormalNodeC2Enabled(const int nodeId, const bool enabled) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) RuntimeThrow("Setting normal node values "
                                            "on a node of a different type");
@@ -127,7 +127,7 @@ public:
         mNodesList.prependShallowCopyFrom(other.getNodesRef());
         other.clear();
     }
-    void actionMergeNodes(const int &node1Id, const int &node2Id);
+    void actionMergeNodes(const int node1Id, const int node2Id);
 
     void reset() {
         mNodesList.clear();
@@ -146,43 +146,43 @@ public:
     SkPath getPathAt() const;
     void setPath(const SkPath& path);
 
-    const Node * getNodePtr(const int& id) const {
+    const Node * getNodePtr(const int id) const {
         if(id < 0) return nullptr;
         if(id >= mNodesList.count()) return nullptr;
         return mNodesList[id];
     }
 
-    int prevNodeId(const int &nodeId) const {
+    int prevNodeId(const int nodeId) const {
         const auto node = mNodesList.prevNode(nodeId);
         if(node) return node->getNodeId();
         return -1;
     }
 
-    int nextNodeId(const int &nodeId) const {
+    int nextNodeId(const int nodeId) const {
         const auto node = mNodesList.nextNode(nodeId);
         if(node) return node->getNodeId();
         return -1;
     }
 
-    int prevNormalId(const int &nodeId) const {
+    int prevNormalId(const int nodeId) const {
         const auto node = mNodesList.prevNormal(nodeId);
         if(node) return node->getNodeId();
         return -1;
     }
 
-    int nextNormalId(const int &nodeId) const {
+    int nextNormalId(const int nodeId) const {
         const auto node = mNodesList.nextNormal(nodeId);
         if(node) return node->getNodeId();
         return -1;
     }
 
-    qValueRange dissolvedTRange(const int& nodeId);
+    qValueRange dissolvedTRange(const int nodeId);
 
-    void updateDissolvedNodePosition(const int& nodeId) {
+    void updateDissolvedNodePosition(const int nodeId) {
         mNodesList.updateDissolvedNodePosition(nodeId);
     }
 
-    void updateDissolvedNodePosition(const int& nodeId, Node * const node) {
+    void updateDissolvedNodePosition(const int nodeId, Node * const node) {
         mNodesList.updateDissolvedNodePosition(nodeId, node);
     }
 
@@ -226,7 +226,7 @@ public:
 
     static void sInterpolate(const SmartPath &path1,
                              const SmartPath &path2,
-                             const qreal &path2Weight,
+                             const qreal path2Weight,
                              SmartPath& target) {
         const auto list = NodeList::sInterpolate(
                     path1.getNodesRef(),
@@ -261,7 +261,7 @@ protected:
         return mNodesList;
     }
 private:
-    int insertNodeBetween(const int &prevId, const int &nextId,
+    int insertNodeBetween(const int prevId, const int nextId,
                           const Node &nodeBlueprint);
 
     NodeList mNodesList;

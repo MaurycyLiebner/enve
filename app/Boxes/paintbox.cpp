@@ -10,7 +10,7 @@ PaintBox::PaintBox() : BoundingBox(TYPE_PAINT) {
 }
 
 void PaintBox::setupRenderData(
-        const qreal &relFrame, BoundingBoxRenderData * const data) {
+        const qreal relFrame, BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     auto paintData = GetAsSPtr(data, PaintBoxRenderData);
     paintData->fSurface = GetAsSPtr(mSurface->getSurface(qFloor(relFrame)),

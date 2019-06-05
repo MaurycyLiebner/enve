@@ -134,7 +134,7 @@ public:
             const ClipboardContainerType &type);
     void addCanvas(const qsptr<Canvas> &newCanvas);
 
-    Gradient *getLoadedGradientById(const int &id);
+    Gradient *getLoadedGradientById(const int id);
     void clearLoadedGradientsList();
     void previewBeingPlayed();
     void previewBeingRendered();
@@ -150,10 +150,10 @@ public:
         return mUsageWidget;
     }
 
-    void setCurrentFrame(const int &frame);
+    void setCurrentFrame(const int frame);
     //void playPreview();
    // void stopPreview();
-    void setResolutionFractionValue(const qreal &value);
+    void setResolutionFractionValue(const qreal value);
     void createNewCanvas();
 
     void queScheduledTasksAndUpdate();

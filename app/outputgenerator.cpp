@@ -6,7 +6,7 @@ OutputGenerator::OutputGenerator()
 }
 
 static void video_encode_example(const char *filename,
-                                 const int &codec_id) {
+                                 const int codec_id) {
     AVCodec *codec;
     AVCodecContext *c= nullptr;
     int i, ret, x, y, got_output;

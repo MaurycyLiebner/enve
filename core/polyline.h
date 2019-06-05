@@ -28,7 +28,7 @@ struct PolylinePt {
         return newP;
     }
 
-    PolylinePt<PROPS> operator*(const qreal& val) const {
+    PolylinePt<PROPS> operator*(const qreal val) const {
         auto newP = *this;
         for(int i = 0; i < VALS; i++) newP.fVals[i] *= val;
         return newP;
@@ -37,21 +37,21 @@ struct PolylinePt {
 
 class Gaussian {
 public:
-    Gaussian(const qreal& a, const qreal& c) {
+    Gaussian(const qreal a, const qreal c) {
         mA = a;
         m2Csqr = 2*c*c;
     }
 
-    static Gaussian sFromRadius(const qreal& a, const qreal& radius) {
+    static Gaussian sFromRadius(const qreal a, const qreal radius) {
         const qreal c = 0.465991*radius; // tenth of height at radius
         return Gaussian(a, c);
     }
 
-    qreal eval(const qreal& x) const {
+    qreal eval(const qreal x) const {
         return mA*exp(-x*x/m2Csqr);
     }
 
-    qreal xForValue(const qreal& val) const {
+    qreal xForValue(const qreal val) const {
         const qreal expArg = log(val/mA);
         return sqrt(-expArg*m2Csqr);
     }
@@ -68,17 +68,17 @@ public:
     public:
         iterator(Polyline<PROPS> * const polyline) :
             iterator(0, polyline) {}
-        iterator(const int& id, Polyline<PROPS> * const polyline) :
+        iterator(const int id, Polyline<PROPS> * const polyline) :
             mId(id), mPolyline(polyline), mPt(mPolyline->mPts[id]) {
             updateNextMoveId();
         }
 
-        iterator operator+(const int &inc) const {
+        iterator operator+(const int inc) const {
             const int newId = clamp(mId + inc, 0, mPolyline->count() - 1);
             return iterator(newId, mPolyline);
         }
 
-        iterator operator-(const int &inc) const {
+        iterator operator-(const int inc) const {
             const int newId = clamp(mId - inc, 0, mPolyline->count() - 1);
             return iterator(newId, mPolyline);
         }
@@ -111,7 +111,7 @@ public:
             return this->operator-=(1);
         }
 
-        iterator& operator-=(const int& inc) {
+        iterator& operator-=(const int inc) {
             return operator+=(-inc);
         }
 
@@ -170,17 +170,17 @@ public:
     public:
         const_iterator(const Polyline<PROPS> * const polyline) :
             iterator(0, polyline) {}
-        const_iterator(const int& id, const Polyline<PROPS> * const polyline) :
+        const_iterator(const int id, const Polyline<PROPS> * const polyline) :
             mId(id), mPolyline(polyline), mPt(&mPolyline->mPts.at(id)) {
             updateNextMoveId();
         }
 
-        const_iterator operator+(const int &inc) const {
+        const_iterator operator+(const int inc) const {
             const int newId = clamp(mId + inc, 0, mPolyline->count() - 1);
             return const_iterator(newId, mPolyline);
         }
 
-        const_iterator operator-(const int &inc) const {
+        const_iterator operator-(const int inc) const {
             const int newId = clamp(mId - inc, 0, mPolyline->count() - 1);
             return const_iterator(newId, mPolyline);
         }
@@ -213,7 +213,7 @@ public:
             return this->operator-=(1);
         }
 
-        const_iterator& operator-=(const int& inc) {
+        const_iterator& operator-=(const int inc) {
             return operator+=(-inc);
         }
 
@@ -300,7 +300,7 @@ public:
         return len;
     }
 
-    int idBeforeLength(const qreal& len) const {
+    int idBeforeLength(const qreal len) const {
         if(len < 0) return -1;
         qreal currLen = 0;
         const_iterator it(0, this);
@@ -316,8 +316,8 @@ public:
         return mPts.count() - 1;
     }
 
-    void smoothyProperty(const int& propId, const QPointF& pos,
-                         const Gaussian& weightGauss, const int& windowSize) {
+    void smoothyProperty(const int propId, const QPointF& pos,
+                         const Gaussian& weightGauss, const int windowSize) {
         const qreal distCutoff = weightGauss.xForValue(0.00001);
         const int valId = 2 + propId;
         int i = -1;
@@ -344,8 +344,8 @@ public:
         }
     }
 
-    void smoothyPos(const int& propId, const QPointF& pos,
-                    const Gaussian& weightGauss, const int& windowSize) {
+    void smoothyPos(const int propId, const QPointF& pos,
+                    const Gaussian& weightGauss, const int windowSize) {
         const qreal distCutoff = weightGauss.xForValue(0.00001);
         const int valId = 2 + propId;
         int i = -1;
@@ -372,8 +372,8 @@ public:
         }
     }
 
-    void changePropBy(const int& propId, const QPointF& pos,
-                      const qreal& changeBy, const Gaussian& weightGauss) {
+    void changePropBy(const int propId, const QPointF& pos,
+                      const qreal changeBy, const Gaussian& weightGauss) {
         const int valId = 2 + propId;
         const qreal distCutoff = weightGauss.xForValue(0.00001);
         for(auto& pt : mPts) {
@@ -386,8 +386,8 @@ public:
         }
     }
 
-    void changePropTo(const int& propId, const QPointF& pos,
-                      const qreal& changeTo, const Gaussian& weightGauss) {
+    void changePropTo(const int propId, const QPointF& pos,
+                      const qreal changeTo, const Gaussian& weightGauss) {
         const int valId = 2 + propId;
         const qreal distCutoff = weightGauss.xForValue(0.00001);
         for(auto& pt : mPts) {

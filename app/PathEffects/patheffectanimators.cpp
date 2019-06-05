@@ -4,8 +4,8 @@
 #include "Boxes/containerbox.h"
 #include <QDebug>
 
-PathEffectAnimators::PathEffectAnimators(const bool &isOutline,
-                                         const bool &isFill,
+PathEffectAnimators::PathEffectAnimators(const bool isOutline,
+                                         const bool isFill,
                                          BoundingBox * const parentPath) :
     ComplexAnimator("path effects") {
     mIsOutline = isOutline;
@@ -38,11 +38,11 @@ BoundingBox *PathEffectAnimators::getParentBox() {
     return mParentBox;
 }
 
-const bool &PathEffectAnimators::isOutline() const {
+bool PathEffectAnimators::isOutline() const {
     return mIsOutline;
 }
 
-const bool &PathEffectAnimators::isFill() const {
+bool PathEffectAnimators::isFill() const {
     return mIsFill;
 }
 
@@ -54,7 +54,7 @@ bool PathEffectAnimators::SWT_isPathEffectAnimators() const {
     return true;
 }
 
-void PathEffectAnimators::applyBeforeThickness(const qreal &relFrame,
+void PathEffectAnimators::applyBeforeThickness(const qreal relFrame,
                                                SkPath * const srcDstPath) {
     SkPath dstPath = *srcDstPath;
     for(const auto& effect : ca_mChildAnimators) {
@@ -67,7 +67,7 @@ void PathEffectAnimators::applyBeforeThickness(const qreal &relFrame,
     *srcDstPath = dstPath;
 }
 
-void PathEffectAnimators::apply(const qreal &relFrame,
+void PathEffectAnimators::apply(const qreal relFrame,
                                 SkPath * const srcDstPath) {
     SkPath dstPath = *srcDstPath;
     for(const auto& effect : ca_mChildAnimators) {

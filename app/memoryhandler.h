@@ -21,7 +21,7 @@ signals:
 public slots:
     void freeMemory(const MemoryState &state,
                     const unsigned long long &minFreeBytes);
-    void memoryChecked(const int& memKb, const int &totMemKb);
+    void memoryChecked(const int memKb, const int totMemKb);
 private:
     MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;
     static MemoryHandler *sInstance;

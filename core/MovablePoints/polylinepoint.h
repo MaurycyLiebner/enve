@@ -7,14 +7,14 @@ template <uchar PROPS>
 class PolylinePointBase : public MovablePoint {
     friend class StdSelfRef;
 protected:
-    PolylinePointBase(const int& id, Polyline<PROPS> * poly) :
+    PolylinePointBase(const int id, Polyline<PROPS> * poly) :
         MovablePoint(TYPE_PATH_POINT), mId(id), mPoly(poly) {}
 public:
     QPointF getRelativePos() const {
         return getPosRef();
     }
 
-    void set(const int& id, Polyline<PROPS> * poly) {
+    void set(const int id, Polyline<PROPS> * poly) {
         mId = id;
         mPoly = poly;
     }

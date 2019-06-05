@@ -66,7 +66,7 @@ private:
     void setBrushWidthCurve(const qCubicSegment1D& seg);
     void setBrushPressureCurve(const qCubicSegment1D& seg);
     void setBrushSpacingCurve(const qCubicSegment1D& seg);
-    void setStrokeWidth(const qreal &width);
+    void setStrokeWidth(const qreal width);
 
     void colorTypeSet(const PaintType &type);
     void setFillTarget();

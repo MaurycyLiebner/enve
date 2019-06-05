@@ -12,10 +12,10 @@ public:
     explicit DisplayedGradientsWidget(GradientWidget *gradientWidget,
                                       QWidget *parent = nullptr);
 
-    void incTop(const int &inc);
-    void setTop(const int &top);
+    void incTop(const int inc);
+    void setTop(const int top);
     void updateTopGradientId();
-    void setNumberGradients(const int &n);
+    void setNumberGradients(const int n);
     void paintGL();
 
 protected:

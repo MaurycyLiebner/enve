@@ -49,7 +49,7 @@ public:
             addPath(from->ca_takeChildAt<SmartPathAnimator>(i));
     }
 
-    SkPath getPathAtRelFrame(const qreal &relFrame) const;
+    SkPath getPathAtRelFrame(const qreal relFrame) const;
 
     void applyTransform(const QMatrix &transform) const;
 

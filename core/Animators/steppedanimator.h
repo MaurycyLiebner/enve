@@ -8,7 +8,7 @@ protected:
     SteppedAnimator(const QString& name) :
         AnimatorT<T>(name) {}
 public:
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const {
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const {
         if(this->anim_mKeys.isEmpty())
             return {FrameRange::EMIN, FrameRange::EMAX};
         const auto pn = this->anim_getPrevAndNextKeyId(relFrame);
@@ -55,7 +55,7 @@ public:
         return {fId, lId};
     }
 protected:
-    T getValueAtRelFrameK(const qreal &frame,
+    T getValueAtRelFrameK(const qreal frame,
                           const KeyT<T> * const prevKey,
                           const KeyT<T> * const nextKey) const {
         Q_UNUSED(frame);

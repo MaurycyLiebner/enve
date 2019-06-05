@@ -54,6 +54,6 @@ void ScrollWidget::updateHeight() {
     if(isHidden()) show();
 }
 
-void ScrollWidget::updateHeightAfterScrollAreaResize(const int &parentHeight) {
+void ScrollWidget::updateHeightAfterScrollAreaResize(const int parentHeight) {
     setFixedHeight(qMax(mContentHeight, parentHeight));
 }

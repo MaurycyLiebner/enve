@@ -7,7 +7,7 @@ bool BoolProperty::getValue() {
     return mValue;
 }
 
-void BoolProperty::setValue(const bool &value) {
+void BoolProperty::setValue(const bool value) {
     mValue = value;
     prp_afterWholeInfluenceRangeChanged();
 }
@@ -27,7 +27,7 @@ bool BoolPropertyContainer::getValue() {
     return mValue;
 }
 
-void BoolPropertyContainer::setValue(const bool &value) {
+void BoolPropertyContainer::setValue(const bool value) {
     mValue = value;
     prp_afterWholeInfluenceRangeChanged();
 

@@ -6,8 +6,8 @@ class BoolAnimator : public IntAnimator {
     friend class SelfRef;
 public:
     bool getCurrentBoolValue();
-    void setCurrentBoolValue(const bool &bT);
-    bool getCurrentBoolValueAtRelFrame(const qreal &relFrame) {
+    void setCurrentBoolValue(const bool bT);
+    bool getCurrentBoolValueAtRelFrame(const qreal relFrame) {
         return getBaseIntValue(relFrame) == 1;
     }
 

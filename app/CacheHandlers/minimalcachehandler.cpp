@@ -7,7 +7,7 @@ void RangeCacheHandler::removeRenderContainer(
 }
 
 int RangeCacheHandler::insertIdForRelFrame(
-        const int &relFrame) const {
+        const int relFrame) const {
     int minId = 0;
     int maxId = mRenderContainers.count();
 
@@ -28,7 +28,7 @@ int RangeCacheHandler::insertIdForRelFrame(
     return 0;
 }
 
-bool RangeCacheHandler::idAtRelFrame(const int &relFrame, int *id) const {
+bool RangeCacheHandler::idAtRelFrame(const int relFrame, int *id) const {
     int minId = 0;
     int maxId = mRenderContainers.count() - 1;
 
@@ -62,7 +62,7 @@ bool RangeCacheHandler::idAtRelFrame(const int &relFrame, int *id) const {
     return false;
 }
 
-int RangeCacheHandler::getFirstEmptyFrameAfterFrame(const int &frame) const {
+int RangeCacheHandler::getFirstEmptyFrameAfterFrame(const int frame) const {
     int currFrame = frame + 1;
     RCC *cont = nullptr;
     while(true) {
@@ -72,7 +72,7 @@ int RangeCacheHandler::getFirstEmptyFrameAfterFrame(const int &frame) const {
     }
 }
 
-int RangeCacheHandler::firstEmptyFrameAtOrAfterFrame(const int &frame) const {
+int RangeCacheHandler::firstEmptyFrameAtOrAfterFrame(const int frame) const {
     int currFrame = frame;
     RCC *cont = nullptr;
     while(true) {
@@ -83,7 +83,7 @@ int RangeCacheHandler::firstEmptyFrameAtOrAfterFrame(const int &frame) const {
 }
 
 void RangeCacheHandler::blockConts(
-        const FrameRange &range, const bool &blocked) {
+        const FrameRange &range, const bool blocked) {
     IdRange idRange = rangeToListIdRange(range);
     for(int i = idRange.fMin; i <= idRange.fMax; i++) {
         mRenderContainers.at(i)->setBlocked(blocked);
@@ -94,14 +94,14 @@ void RangeCacheHandler::clearCache() {
     mRenderContainers.clear();
 }
 
-void RangeCacheHandler::cacheDataBeforeRelFrame(const int &relFrame) {
+void RangeCacheHandler::cacheDataBeforeRelFrame(const int relFrame) {
     const int lastId = idAtOrBeforeRelFrame(relFrame);
     for(int i = 0; i < lastId; i++) {
         mRenderContainers.at(i)->noDataLeft_k();
     }
 }
 
-void RangeCacheHandler::cacheDataAfterRelFrame(const int &relFrame) {
+void RangeCacheHandler::cacheDataAfterRelFrame(const int relFrame) {
     const int firstId = idAtOrAfterRelFrame(relFrame);
     for(int i = firstId; i < mRenderContainers.count(); i++) {
         mRenderContainers.at(i)->noDataLeft_k();
@@ -118,12 +118,12 @@ void RangeCacheHandler::cacheLastContainer() {
     mRenderContainers.last()->noDataLeft_k();
 }
 
-int RangeCacheHandler::countAfterRelFrame(const int &relFrame) const {
+int RangeCacheHandler::countAfterRelFrame(const int relFrame) const {
     int firstId = idAtOrAfterRelFrame(relFrame + 1);
     return mRenderContainers.count() - firstId;
 }
 
-int RangeCacheHandler::idAtOrBeforeRelFrame(const int &frame) const {
+int RangeCacheHandler::idAtOrBeforeRelFrame(const int frame) const {
     int id;
     if(!idAtRelFrame(frame, &id)) {
         id = insertIdForRelFrame(frame) - 1;
@@ -131,7 +131,7 @@ int RangeCacheHandler::idAtOrBeforeRelFrame(const int &frame) const {
     return id;
 }
 
-int RangeCacheHandler::idAtOrAfterRelFrame(const int &frame) const {
+int RangeCacheHandler::idAtOrAfterRelFrame(const int frame) const {
     int id;
     if(!idAtRelFrame(frame, &id)) {
         id = insertIdForRelFrame(frame);
@@ -141,8 +141,8 @@ int RangeCacheHandler::idAtOrAfterRelFrame(const int &frame) const {
 
 void RangeCacheHandler::drawCacheOnTimeline(QPainter * const p,
                                             const QRect drawRect,
-                                            const int &startFrame,
-                                            const int &endFrame) const {
+                                            const int startFrame,
+                                            const int endFrame) const {
     if(startFrame > endFrame) return;
     p->setBrush(QColor(0, 255, 0, 75));
     p->setPen(Qt::NoPen);

@@ -101,18 +101,18 @@ void ColorValueRect::mouseReleaseEvent(QMouseEvent *) {
 //    MainWindow::getInstance()->callUpdateSchedulers();
 //}
 
-void ColorValueRect::mouseInteraction(const int& x_t) {
+void ColorValueRect::mouseInteraction(const int x_t) {
     setValueAndEmitValueChanged(
                 clamp(static_cast<qreal>(x_t)/width(), 0., 1.));
 }
 
 
-void ColorValueRect::setDisplayedValue(const qreal &val_t) {
+void ColorValueRect::setDisplayedValue(const qreal val_t) {
     mVal = static_cast<GLfloat>(val_t);
     update();
 }
 
-void ColorValueRect::setValueAndEmitValueChanged(const qreal& valT) {
+void ColorValueRect::setValueAndEmitValueChanged(const qreal valT) {
     setDisplayedValue(valT);
     emit valChanged(valT);
 }

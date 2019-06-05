@@ -18,7 +18,7 @@ public:
         B::prp_afterChangedAbsRange(range);
     }
 
-    void anim_setAbsFrame(const int &frame) {
+    void anim_setAbsFrame(const int frame) {
         B::anim_setAbsFrame(frame);
         if(this->anim_hasKeys()) {
             const T newVal = getValueAtRelFrame(this->anim_getCurrentRelFrame());
@@ -30,11 +30,11 @@ public:
         }
     }
 
-    T getValueAtAbsFrame(const qreal &frame) const {
+    T getValueAtAbsFrame(const qreal frame) const {
         return getValueAtRelFrame(this->prp_absFrameToRelFrameF(frame));
     }
 
-    T getValueAtRelFrame(const qreal &frame) const {
+    T getValueAtRelFrame(const qreal frame) const {
         if(this->anim_mKeys.isEmpty()) return this->getCurrentValue();
         const auto pn = this->anim_getPrevAndNextKeyIdF(frame);
         const int prevId = pn.first;
@@ -79,14 +79,14 @@ public:
         this->anim_appendKey(newKey);
     }
 
-    void anim_addKeyAtRelFrame(const int& relFrame) {
+    void anim_addKeyAtRelFrame(const int relFrame) {
         if(this->anim_getKeyAtRelFrame(relFrame)) return;
         const T value = getValueAtRelFrame(relFrame);
         const auto newKey = SPtrCreateTemplated(K)(value, relFrame, this);
         this->anim_appendKey(newKey);
     }
 
-    //FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
+    //FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
     void writeProperty(QIODevice * const target) const {
         this->writeKeys(target);
@@ -105,7 +105,7 @@ public:
         return std::move(newKey);
     }
 protected:
-    virtual T getValueAtRelFrameK(const qreal &frame,
+    virtual T getValueAtRelFrameK(const qreal frame,
                                   const K * const prevKey,
                                   const K * const nextKey) const = 0;
 

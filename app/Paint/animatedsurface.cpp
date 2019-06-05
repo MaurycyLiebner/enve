@@ -8,12 +8,12 @@ ASKey::ASKey(AnimatedSurface * const parent) :
     Key(parent),
     mValue(SPtrCreate(DrawableAutoTiledSurface)()) {}
 
-ASKey::ASKey(const int &frame, AnimatedSurface * const parent) :
+ASKey::ASKey(const int frame, AnimatedSurface * const parent) :
     Key(frame, parent),
     mValue(SPtrCreate(DrawableAutoTiledSurface)()) {}
 
 ASKey::ASKey(const DrawableAutoTiledSurface &value,
-             const int &frame, AnimatedSurface * const parent) :
+             const int frame, AnimatedSurface * const parent) :
     ASKey(frame, parent) {
     mValue->deepCopy(value);
 }

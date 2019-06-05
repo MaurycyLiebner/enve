@@ -1,6 +1,6 @@
 #include "interpolationkey.h"
 
-InterpolationKey::InterpolationKey(const int &frame,
+InterpolationKey::InterpolationKey(const int frame,
                                    Animator * const parentAnimator) :
     GraphKey(frame, parentAnimator) {}
 

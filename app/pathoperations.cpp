@@ -4,7 +4,7 @@
 #include "exceptions.h"
 #include "pointhelpers.h"
 
-void gApplyOperation(const qreal &relFrame,
+void gApplyOperation(const qreal relFrame,
                      const SkPath &src,
                      SkPath * const dst,
                      PathBox * const srcBox,
@@ -47,7 +47,7 @@ void gApplyOperation(const qreal &relFrame,
     if(!Op(src, boxPath, op, dst)) RuntimeThrow("Operation Failed.");
 }
 
-void gSolidify(const qreal &widthT,
+void gSolidify(const qreal widthT,
                const SkPath &src,
                SkPath * const dst) {
     if(isZero4Dec(widthT)) {

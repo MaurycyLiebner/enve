@@ -12,8 +12,8 @@ struct ParticleState {
     ParticleState() {}
 
     ParticleState(const SkPoint &posT,
-                  const SkScalar &scaleT,
-                  const SkScalar &sizeT,
+                  const SkScalar scaleT,
+                  const SkScalar sizeT,
                   const unsigned char &opacityT,
                   const SkPath &path) {
         fPos = posT;
@@ -25,7 +25,7 @@ struct ParticleState {
 
     static ParticleState interpolate(const ParticleState &state1,
                                      const ParticleState &state2,
-                                     const SkScalar &weight2) {
+                                     const SkScalar weight2) {
         SkScalar weight1 = 1.f - weight2;
         SkPath pathT;
         if(state2.fLinePath.isEmpty()) {
@@ -132,23 +132,23 @@ private:
 class Particle {
 public:
     Particle(ParticleBox *parentBox);
-    void initializeParticle(const int &firstFrame,
-                            const int &nFrames,
+    void initializeParticle(const int firstFrame,
+                            const int nFrames,
                             const SkPoint &iniPos,
                             const SkPoint &iniVel,
-                            const SkScalar &partSize);
-    void generatePathNextFrame(const int &frame,
-                               const SkScalar &velocityVar,
-                               const SkScalar &velocityVarPeriod,
+                            const SkScalar partSize);
+    void generatePathNextFrame(const int frame,
+                               const SkScalar velocityVar,
+                               const SkScalar velocityVarPeriod,
                                const SkPoint &acc,
-                               const SkScalar &finalScale,
-                               const SkScalar &finalOpacity,
-                               const SkScalar &decayFrames,
-                               const SkScalar &length);
+                               const SkScalar finalScale,
+                               const SkScalar finalOpacity,
+                               const SkScalar decayFrames,
+                               const SkScalar length);
 
-    bool isVisibleAtFrame(const int &frame);
-    ParticleState getParticleStateAtFrame(const int &frame);
-    bool getParticleStateAtFrameF(const qreal &frame, ParticleState &state);
+    bool isVisibleAtFrame(const int frame);
+    ParticleState getParticleStateAtFrame(const int frame);
+    bool getParticleStateAtFrameF(const qreal frame, ParticleState &state);
 private:
     SkScalar mSize;
     SkPoint mPrevVelocityVar;
@@ -176,18 +176,18 @@ public:
     void generateParticlesIfNeeded();
     void generateParticles();
 
-    void setMinFrame(const int &minFrame);
+    void setMinFrame(const int minFrame);
 
-    void setMaxFrame(const int &maxFrame);
+    void setMaxFrame(const int maxFrame);
 
-    void setFrameRange(const int &minFrame,
-                       const int &maxFrame);
+    void setFrameRange(const int minFrame,
+                       const int maxFrame);
 
     ColorAnimator *getColorAnimator();
     MovablePoint *getPosPoint();
 
     EmitterData getEmitterDataAtRelFrameF(
-            const qreal &relFrame,
+            const qreal relFrame,
             const stdsptr<ParticleBoxRenderData>& particleData);
 
     void writeProperty(QIODevice * const target) const;
@@ -261,9 +261,9 @@ class ParticleBox : public BoundingBox {
 public:
     ParticleBox();
     void getAccelerationAt(const QPointF &pos,
-                           const int &frame,
+                           const int frame,
                            QPointF *acc);
-    void anim_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int frame);
     bool relPointInsidePath(const QPointF &relPos) const;
 
     void addEmitter(const qsptr<ParticleEmitter> &emitter);
@@ -279,7 +279,7 @@ public:
         return SPtrCreate(ParticleBoxRenderData)(this);
     }
 
-    void setupRenderData(const qreal &relFrame,
+    void setupRenderData(const qreal relFrame,
                          BoundingBoxRenderData * const data) {
         BoundingBox::setupRenderData(relFrame, data);
         auto particleData = GetAsSPtr(data, ParticleBoxRenderData);
@@ -291,11 +291,11 @@ public:
         }
     }
 
-    QRectF getRelBoundingRect(const qreal &relFrame);
+    QRectF getRelBoundingRect(const qreal relFrame);
 
     void removeEmitter(const qsptr<ParticleEmitter> &emitter);
 
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 public slots:

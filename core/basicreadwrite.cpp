@@ -39,7 +39,7 @@ bool gRead(QIODevice *src, bool &value) {
     return src->read(rcChar(&value), sizeof(bool)) > 0;
 }
 
-bool gWrite(QIODevice *dst, const bool &value) {
+bool gWrite(QIODevice *dst, const bool value) {
     return dst->write(rcConstChar(&value), sizeof(bool)) > 0;
 }
 

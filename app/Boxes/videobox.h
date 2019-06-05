@@ -22,12 +22,12 @@ public:
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 
-    void setStretch(const qreal& stretch);
+    void setStretch(const qreal stretch);
 
     void enableSound() { setSoundEnabled(true); }
     void disableSound() { setSoundEnabled(false); }
 
-    void setSoundEnabled(const bool& enable);
+    void setSoundEnabled(const bool enable);
 
     void setFilePath(const QString &path);
 private:

@@ -53,10 +53,10 @@ KeysClipboardContainer::~KeysClipboardContainer() {
 
 }
 
-void KeysClipboardContainer::paste(const int &pasteFrame,
+void KeysClipboardContainer::paste(const int pasteFrame,
                                    KeysView *keysView,
-                                   const bool& merge,
-                                   const bool& selectPasted) {
+                                   const bool merge,
+                                   const bool selectPasted) {
     keysView->clearKeySelection();
 
     QList<Key*> rKeys;

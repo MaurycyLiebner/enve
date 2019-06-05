@@ -34,7 +34,7 @@ enum SWT_Type : short {
 struct SWT_RulesCollection {
     SWT_RulesCollection();
     SWT_RulesCollection(const SWT_BoxRule &ruleT,
-                        const bool &alwaysShowChildrenT,
+                        const bool alwaysShowChildrenT,
                         const SWT_Target &targetT,
                         const SWT_Type& typeT,
                         const QString &searchStringT) {
@@ -61,8 +61,8 @@ public:
             const int&) {}
 
     virtual bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
-                                     const bool &parentSatisfies,
-                                     const bool &parentMainTarget) const {
+                                     const bool parentSatisfies,
+                                     const bool parentMainTarget) const {
         Q_UNUSED(rules);
         return parentSatisfies && !parentMainTarget;
     }
@@ -71,7 +71,7 @@ public:
         return nullptr;
     }
 
-    virtual void SWT_setChildrenAncestorDisabled(const bool &bT) {
+    virtual void SWT_setChildrenAncestorDisabled(const bool bT) {
         Q_UNUSED(bT);
     }
 
@@ -135,7 +135,7 @@ public:
     void SWT_addChildAbstractionForTargetToAll(
             SingleWidgetTarget * const target);
     void SWT_addChildAbstractionForTargetToAllAt(
-            SingleWidgetTarget * const target, const int &id);
+            SingleWidgetTarget * const target, const int id);
     void SWT_removeChildAbstractionForTargetFromAll(
             SingleWidgetTarget * const target);
 
@@ -143,8 +143,8 @@ public:
 
     SingleWidgetAbstraction *SWT_createAbstraction(
             const UpdateFuncs &updateFuncs,
-            const int &visiblePartWidgetId);
-    void SWT_removeAbstractionForWidget(const int& visiblePartWidgetId) {
+            const int visiblePartWidgetId);
+    void SWT_removeAbstractionForWidget(const int visiblePartWidgetId) {
         const auto currSwa = SWT_getAbstractionForWidget(visiblePartWidgetId);
         if(!currSwa) return;
         const auto currSwaSPtr = GetAsSPtr(currSwa, SingleWidgetAbstraction);
@@ -155,7 +155,7 @@ public:
             const stdsptr<SingleWidgetAbstraction> &abs);
 
     SingleWidgetAbstraction* SWT_getAbstractionForWidget(
-            const int& visiblePartWidgetId) const {
+            const int visiblePartWidgetId) const {
         for(const auto& abs : SWT_mAllAbstractions) {
             if(abs->getParentVisiblePartWidgetId() == visiblePartWidgetId) {
                 return abs.get();
@@ -166,7 +166,7 @@ public:
 
     SingleWidgetAbstraction* SWT_getOrCreateAbstractionForWidget(
             const UpdateFuncs &updateFuncs,
-            const int& visiblePartWidgetId) {
+            const int visiblePartWidgetId) {
         const auto curr = SWT_getAbstractionForWidget(visiblePartWidgetId);
         if(curr) return curr;
         return SWT_createAbstraction(updateFuncs, visiblePartWidgetId);
@@ -180,7 +180,7 @@ public:
             SingleWidgetTarget *targetP, const SWT_Target &target);
 
     void SWT_moveChildAbstractionForTargetToInAll(
-            SingleWidgetTarget * const target, const int &id);
+            SingleWidgetTarget * const target, const int id);
 
     bool SWT_isVisible() const {
         return SWT_mVisible;
@@ -194,17 +194,17 @@ public:
         SWT_setVisible(true);
     }
 
-    void SWT_setVisible(const bool &bT) {
+    void SWT_setVisible(const bool bT) {
         if(SWT_mVisible == bT) return;
         SWT_mVisible = bT;
         SWT_afterContentVisibilityChanged();
     }
 
-    void SWT_setEnabled(const bool &enabled) {
+    void SWT_setEnabled(const bool enabled) {
         SWT_setDisabled(!enabled);
     }
 
-    void SWT_setDisabled(const bool &disable) {
+    void SWT_setDisabled(const bool disable) {
         if(SWT_mDisabled == disable) return;
         SWT_mDisabled = disable;
         SWT_setChildrenAncestorDisabled(SWT_isDisabled());
@@ -226,7 +226,7 @@ public:
         return SWT_mDisabled || SWT_mAncestorDisabled;
     }
 
-    void SWT_setAncestorDisabled(const bool &bT) {
+    void SWT_setAncestorDisabled(const bool bT) {
         SWT_mAncestorDisabled = bT;
         SWT_setChildrenAncestorDisabled(SWT_isDisabled());
     }

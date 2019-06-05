@@ -6,7 +6,7 @@ class BrushPolylineAnimator;
 class BrushPolyPoint : public PolylinePointBase<3> {
     friend class StdSelfRef;
 protected:
-    BrushPolyPoint(const int& id, Polyline<3> * poly,
+    BrushPolyPoint(const int id, Polyline<3> * poly,
                    BrushPolylineAnimator * const polyAnim) :
         PolylinePointBase(id, poly), mPolyAnim(polyAnim) {}
 public:

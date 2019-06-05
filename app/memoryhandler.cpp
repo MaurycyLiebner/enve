@@ -69,7 +69,7 @@ void MemoryHandler::freeMemory(const MemoryState &state,
     emit memoryFreed();
 }
 
-void MemoryHandler::memoryChecked(const int &memKb, const int& totMemKb) {
+void MemoryHandler::memoryChecked(const int memKb, const int totMemKb) {
     const auto usageWidget = MainWindow::getInstance()->getUsageWidget();
     if(!usageWidget) return;
     usageWidget->setTotalRam(totMemKb/1000000.);

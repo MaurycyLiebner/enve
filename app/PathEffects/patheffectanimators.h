@@ -9,8 +9,8 @@ class PathBox;
 class PathEffectAnimators : public ComplexAnimator {
     friend class SelfRef;
 protected:
-    PathEffectAnimators(const bool &isOutline,
-                        const bool &isFill,
+    PathEffectAnimators(const bool isOutline,
+                        const bool isFill,
                         BoundingBox * const parentPath);
 public:
     bool SWT_isPathEffectAnimators() const;
@@ -21,14 +21,14 @@ public:
     void addEffect(const qsptr<PathEffect> &effect);
     bool hasEffects();
 
-    void apply(const qreal &relFrame, SkPath * const srcDstPath);
-    void applyBeforeThickness(const qreal &relFrame,
+    void apply(const qreal relFrame, SkPath * const srcDstPath);
+    void applyBeforeThickness(const qreal relFrame,
                               SkPath * const srcDstPath);
 
     void removeEffect(const qsptr<PathEffect>& effect);
     BoundingBox *getParentBox();
-    const bool &isOutline() const;
-    const bool &isFill() const;
+    bool isOutline() const;
+    bool isFill() const;
     void readPathEffect(QIODevice *target);
 private:
     bool mIsOutline;

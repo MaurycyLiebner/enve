@@ -26,7 +26,7 @@ protected:
     InterpolationAnimatorT(const QString& name) :
         BasedAnimatorT<GraphAnimator, K, T>(name) {}
 
-    T getValueAtRelFrameK(const qreal &frame,
+    T getValueAtRelFrameK(const qreal frame,
                           const K * const prevKey,
                           const K * const nextKey) const {
         T result;

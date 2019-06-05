@@ -6,17 +6,17 @@
 #include <QColor>
 #include "skiaincludes.h"
 
-extern inline qreal toQreal(const SkScalar &ss) {
+extern inline qreal toQreal(const SkScalar ss) {
     return static_cast<qreal>(ss);
 }
 
-extern inline SkScalar toSkScalar(const qreal &qr) {
+extern inline SkScalar toSkScalar(const qreal qr) {
     return static_cast<SkScalar>(qr);
 }
 
 extern SkFont toSkFont(const QFont& qfont);
 extern SkFont toSkFont(const QFont& qfont,
-                       const int& qPPI, const int& skPPI);
+                       const int qPPI, const int skPPI);
 
 extern SkColor toSkColor(const QColor& qcol);
 
@@ -53,7 +53,7 @@ extern QPainterPath toQPainterPath(const SkPath &path);
 
 extern void switchSkQ(const QPointF& qPos, SkPoint& skPos);
 extern void switchSkQ(const SkPoint& skPos, QPointF& qPos);
-extern void switchSkQ(const qreal& q, SkScalar& sk);
-extern void switchSkQ(const SkScalar& sk, qreal& q);
+extern void switchSkQ(const qreal q, SkScalar& sk);
+extern void switchSkQ(const SkScalar sk, qreal& q);
 
 #endif // SKQTCONVERSIONS_H

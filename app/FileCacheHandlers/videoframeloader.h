@@ -18,12 +18,12 @@ class VideoFrameLoader : public HDDTask {
 protected:
     VideoFrameLoader(VideoCacheHandler * const cacheHandler,
                      const stdsptr<VideoStreamsData>& openedVideo,
-                     const int& frameId) :
+                     const int frameId) :
         mCacheHandler(cacheHandler), mOpenedVideo(openedVideo),
         mFrameId(frameId) {}
     VideoFrameLoader(VideoCacheHandler * const cacheHandler,
                      const stdsptr<VideoStreamsData>& openedVideo,
-                     const int& frameId, AVFrame* const frame);
+                     const int frameId, AVFrame* const frame);
 
     void afterProcessing();
     void afterCanceled();

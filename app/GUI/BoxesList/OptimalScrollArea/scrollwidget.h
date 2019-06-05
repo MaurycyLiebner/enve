@@ -20,11 +20,11 @@ public:
     void updateHeight();
     void setMainTarget(SingleWidgetTarget *target);
     virtual void updateAbstraction();
-    const int &getContentHeight() {
+    int getContentHeight() {
         return mContentHeight;
     }
 private slots:
-    void updateHeightAfterScrollAreaResize(const int &parentHeight);
+    void updateHeightAfterScrollAreaResize(const int parentHeight);
 protected:
     int mContentHeight = 0;
     virtual void createVisiblePartWidget();

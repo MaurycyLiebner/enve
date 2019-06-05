@@ -9,23 +9,23 @@ class RenderCacheHandler;
 class AnimationWidgetScrollBar : public QWidget {
     Q_OBJECT
 public:
-    explicit AnimationWidgetScrollBar(const int &minSpan,
-                                      const int &maxSpan,
-                                      const int &spanInc,
-                                      const int &height,
-                                      const bool &range,
-                                      const bool &clamp,
+    explicit AnimationWidgetScrollBar(const int minSpan,
+                                      const int maxSpan,
+                                      const int spanInc,
+                                      const int height,
+                                      const bool range,
+                                      const bool clamp,
                                       QWidget *parent = nullptr);
     virtual ~AnimationWidgetScrollBar() {}
     void emitChange();
-    bool setFirstViewedFrame(const int &firstFrame);
+    bool setFirstViewedFrame(const int firstFrame);
     void setFramesSpan(int newSpan);
 
     int getMaxFrame();
     int getMinFrame();
     int getFirstViewedFrame();
     int getLastViewedFrame();
-    void setTopBorderVisible(const bool &bT);
+    void setTopBorderVisible(const bool bT);
 
     void setHandleColor(const QColor &col) {
         mHandleColor = col;
@@ -33,12 +33,12 @@ public:
 
     void setCurrentCanvas(Canvas * const canvas);
 
-    void setDisplayedFrameRange(const int &minFrame,
-                                const int &maxFrame);
-    void setViewedFrameRange(const int &minFrame,
-                             const int &maxFrame);
-    void setCanvasFrameRange(const int &minFrame,
-                             const int &maxFrame);
+    void setDisplayedFrameRange(const int minFrame,
+                                const int maxFrame);
+    void setViewedFrameRange(const int minFrame,
+                             const int maxFrame);
+    void setCanvasFrameRange(const int minFrame,
+                             const int maxFrame);
 protected:
     qreal posToFrame(int xPos);
     void paintEvent(QPaintEvent *);

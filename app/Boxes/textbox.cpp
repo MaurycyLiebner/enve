@@ -45,7 +45,7 @@ void TextBox::setFont(const QFont &font) {
     planScheduleUpdate(Animator::USER_CHANGE);
 }
 
-void TextBox::setSelectedFontSize(const qreal &size) {
+void TextBox::setSelectedFontSize(const qreal size) {
     QFont newFont = mFont;
     newFont.setPointSizeF(size);
     setFont(newFont);
@@ -76,8 +76,8 @@ QString TextBox::getCurrentValue() {
 }
 
 qreal textLineX(const Qt::Alignment &alignment,
-                const qreal &lineWidth,
-                const qreal &maxWidth) {
+                const qreal lineWidth,
+                const qreal maxWidth) {
     if(alignment == Qt::AlignCenter) {
         return (maxWidth - lineWidth)*0.5;
     } else if(alignment == Qt::AlignLeft) {
@@ -96,7 +96,7 @@ void TextBox::addActionsToMenu(BoxTypeMenu * const menu) {
     menu->addPlainAction("Set Text...", op);
 }
 
-SkPath TextBox::getPathAtRelFrameF(const qreal &relFrame) {
+SkPath TextBox::getPathAtRelFrameF(const qreal relFrame) {
     const QString textAtFrame = mText->getValueAtRelFrame(relFrame);
     const qreal linesDistAtFrame =
             mLinesDist->getEffectiveValue(relFrame)*0.01;
@@ -137,7 +137,7 @@ void TextBox::setCurrentValue(const QString &text) {
 }
 
 bool TextBox::differenceInEditPathBetweenFrames(
-        const int& frame1, const int& frame2) const {
+        const int frame1, const int frame2) const {
     if(mText->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
     return mLinesDist->prp_differencesBetweenRelFrames(frame1, frame2);
 }

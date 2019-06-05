@@ -40,7 +40,7 @@ private:
     template <typename U>
     static void sAddToMenu(BoxTypeMenu * const menu,
                            const CustomPathEffectCreator& creator,
-                           const U &adder, const bool &outline) {
+                           const U &adder, const bool outline) {
         menu->addPlainAction<BoundingBox>(creator.mName(),
         [adder, outline, creator](BoundingBox * box) {
             const auto cEffect = creator.mCreator(outline);

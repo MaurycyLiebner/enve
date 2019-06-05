@@ -12,7 +12,7 @@ public:
     explicit ArrayWidget(const Qt::Orientation& orientation,
                          QWidget *parent = nullptr);
 
-    QWidget* getWidgetAt(const int& i) const {
+    QWidget* getWidgetAt(const int i) const {
         return mArrayWidgets.at(i);
     }
 
@@ -26,7 +26,7 @@ public:
 
     void prependWidget(QWidget* wid);
 
-    void insertWidget(const int& i, QWidget* wid);
+    void insertWidget(const int i, QWidget* wid);
 
     void removeRedundantWidgets();
 
@@ -63,11 +63,11 @@ public:
         updateWidgetsVisibility();
     }
 
-    void incFirstWidgetId(const int& inc = 1);
+    void incFirstWidgetId(const int inc = 1);
 
-    void decFirstWidgetId(const int& dec = 1);
+    void decFirstWidgetId(const int dec = 1);
 
-    void setFirstWidgetId(const int& id);
+    void setFirstWidgetId(const int id);
 
     template <typename T>
     bool hasWidget(T tester) {
@@ -77,7 +77,7 @@ public:
         return false;
     }
 
-    void setMaxCount(const int& maxCount);
+    void setMaxCount(const int maxCount);
 protected:
     void resizeEvent(QResizeEvent* event);
 

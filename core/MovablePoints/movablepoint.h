@@ -33,9 +33,9 @@ public:
     virtual QPointF getRelativePos() const = 0;
     virtual void setRelativePos(const QPointF &relPos) = 0;
 
-    virtual void scale(const qreal &scaleXBy, const qreal &scaleYBy);
-    virtual void scaleRelativeToSavedPivot(const qreal &sx, const qreal &sy);
-    virtual void rotateRelativeToSavedPivot(const qreal &rot);
+    virtual void scale(const qreal scaleXBy, const qreal scaleYBy);
+    virtual void scaleRelativeToSavedPivot(const qreal sx, const qreal sy);
+    virtual void rotateRelativeToSavedPivot(const qreal rot);
     virtual void saveTransformPivotAbsPos(const QPointF &absPivot);
 
     virtual void startTransform();
@@ -44,8 +44,8 @@ public:
 
     virtual void drawSk(SkCanvas * const canvas,
                         const CanvasMode &mode,
-                        const SkScalar &invScale,
-                        const bool &keyOnCurrent);
+                        const SkScalar invScale,
+                        const bool keyOnCurrent);
 
     virtual void remove() {}
     virtual bool isVisible(const CanvasMode& mode) const;
@@ -56,7 +56,7 @@ public:
 
     virtual MovablePoint * getPointAtAbsPos(const QPointF &absPos,
                                             const CanvasMode &mode,
-                                            const qreal &invScale) {
+                                            const qreal invScale) {
         if(isPointAtAbsPos(absPos, mode, invScale)) return this;
         return nullptr;
     }
@@ -74,7 +74,7 @@ public:
     QPointF getAbsolutePos() const;
     bool isPointAtAbsPos(const QPointF &absPoint,
                          const CanvasMode &mode,
-                         const qreal &invScale);
+                         const qreal invScale);
     void setAbsolutePos(const QPointF &pos);
 
     BasicTransformAnimator *getTransform();
@@ -93,16 +93,16 @@ public:
     bool isPivotPoint();
     bool isCtrlPoint();
 
-    void rotateBy(const qreal &rot);
-    void scale(const qreal &scaleBy);
+    void rotateBy(const qreal rot);
+    void scale(const qreal scaleBy);
     void applyTransform(const QMatrix &transform) {
         setRelativePos(transform.map(getRelativePos()));
     }
-    void setRadius(const qreal& radius);
+    void setRadius(const qreal radius);
     qreal getRadius();
 
     void drawHovered(SkCanvas * const canvas,
-                     const SkScalar &invScale);
+                     const SkScalar invScale);
 
     QPointF mapRelativeToAbsolute(const QPointF &relPos) const;
     QPointF mapAbsoluteToRelative(const QPointF &absPos) const;
@@ -123,15 +123,15 @@ public:
         setSelectionEnabled(false);
     }
 
-    void setSelectionEnabled(const bool& enabled) {
+    void setSelectionEnabled(const bool enabled) {
         mSelectionEnabled = enabled;
     }
 protected:
     void drawOnAbsPosSk(SkCanvas * const canvas,
                         const SkPoint &absPos,
-                        const SkScalar &invScale,
+                        const SkScalar invScale,
                         const SkColor &fillColor,
-                        const bool &keyOnCurrent = false);
+                        const bool keyOnCurrent = false);
 private:
     bool mSelectionEnabled = true;
     bool mSelected = false;

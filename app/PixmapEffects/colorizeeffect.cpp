@@ -3,7 +3,7 @@
 #include "rastereffects.h"
 
 stdsptr<PixmapEffectRenderData> ColorizeEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal &relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ColorizeEffectRenderData)();
     renderData->hue =
             mHueAnimator->getEffectiveValue(relFrame);
@@ -33,7 +33,7 @@ ColorizeEffect::ColorizeEffect() :
 }
 
 void ColorizeEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
-                                              const qreal &scale) {
+                                              const qreal scale) {
     Q_UNUSED(scale);
     RasterEffects::colorizeHSV(bitmap, hue, saturation, lightness, alpha);
 }

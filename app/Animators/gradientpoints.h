@@ -14,7 +14,7 @@ protected:
 public:
     void drawCanvasControls(SkCanvas *const canvas,
                             const CanvasMode &mode,
-                            const SkScalar &invScale);
+                            const SkScalar invScale);
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
@@ -25,10 +25,10 @@ public:
 
     void setPositions(const QPointF &startPos, const QPointF &endPos);
 
-    QPointF getStartPointAtRelFrame(const int &relFrame);
-    QPointF getEndPointAtRelFrame(const int &relFrame);
-    QPointF getStartPointAtRelFrameF(const qreal &relFrame);
-    QPointF getEndPointAtRelFrameF(const qreal &relFrame);
+    QPointF getStartPointAtRelFrame(const int relFrame);
+    QPointF getEndPointAtRelFrame(const int relFrame);
+    QPointF getStartPointAtRelFrameF(const qreal relFrame);
+    QPointF getEndPointAtRelFrameF(const qreal relFrame);
 
     bool enabled() const {
         return mEnabled;

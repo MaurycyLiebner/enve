@@ -19,7 +19,7 @@ bool PixmapEffect::interrupted() {
 
 qreal PixmapEffect::getMargin() { return 0.; }
 
-qreal PixmapEffect::getMarginAtRelFrame(const int &) { return 0.; }
+qreal PixmapEffect::getMarginAtRelFrame(const int ) { return 0.; }
 
 void PixmapEffect::prp_startDragging() {
     QMimeData *mimeData = new PixmapEffectMimeData(this);
@@ -39,13 +39,13 @@ void PixmapEffect::switchVisible() {
     setVisible(!mVisible);
 }
 
-void PixmapEffect::setVisible(const bool &visible) {
+void PixmapEffect::setVisible(const bool visible) {
     if(visible == mVisible) return;
     mVisible = visible;
     prp_afterWholeInfluenceRangeChanged();
 }
 
-const bool &PixmapEffect::isVisible() const {
+bool PixmapEffect::isVisible() const {
     return mVisible;
 }
 

@@ -21,10 +21,10 @@ public:
         return mValueNames.at(mCurrentValue);
     }
 
-    const int &getCurrentValue() {
+    int getCurrentValue() {
         return mCurrentValue;
     }
-    void setCurrentValue(const int &id) {
+    void setCurrentValue(const int id) {
         if(mCurrentValue == id) return;
         mCurrentValue = id;
         emit valueChanged(id);

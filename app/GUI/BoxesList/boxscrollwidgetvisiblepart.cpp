@@ -48,7 +48,7 @@ void BoxScrollWidgetVisiblePart::paintEvent(QPaintEvent *) {
 }
 
 void BoxScrollWidgetVisiblePart::drawKeys(QPainter * const p,
-                                          const qreal &pixelsPerFrame,
+                                          const qreal pixelsPerFrame,
                                           const FrameRange &viewedFrameRange) {
     p->save();
     p->setPen(Qt::NoPen);
@@ -63,9 +63,9 @@ void BoxScrollWidgetVisiblePart::drawKeys(QPainter * const p,
 }
 
 Key *BoxScrollWidgetVisiblePart::getKeyAtPos(
-        const int &pressX, const int &pressY,
-        const qreal &pixelsPerFrame,
-        const int &minViewedFrame) {
+        const int pressX, const int pressY,
+        const qreal pixelsPerFrame,
+        const int minViewedFrame) {
     const int remaining = pressY % MIN_WIDGET_HEIGHT;
     if(remaining < (MIN_WIDGET_HEIGHT - KEY_RECT_SIZE)/2 ||
        remaining > (MIN_WIDGET_HEIGHT + KEY_RECT_SIZE)/2) return nullptr;
@@ -80,10 +80,10 @@ Key *BoxScrollWidgetVisiblePart::getKeyAtPos(
 }
 
 DurationRectangleMovable *BoxScrollWidgetVisiblePart::getRectangleMovableAtPos(
-        const int &pressX,
-        const int &pressY,
-        const qreal &pixelsPerFrame,
-        const int &minViewedFrame) {
+        const int pressX,
+        const int pressY,
+        const qreal pixelsPerFrame,
+        const int minViewedFrame) {
     for(const auto& container : mSingleWidgets) {
         const int containerTop = container->y();
         const int containerBottom = containerTop + container->height();
@@ -97,7 +97,7 @@ DurationRectangleMovable *BoxScrollWidgetVisiblePart::getRectangleMovableAtPos(
 
 void BoxScrollWidgetVisiblePart::getKeysInRect(
         QRectF selectionRect,
-        const qreal& pixelsPerFrame,
+        const qreal pixelsPerFrame,
         QList<Key *>& listKeys) {
     QList<SingleWidgetAbstraction*> abstractions;
 //    selectionRect.adjust(-0.5, -(BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5,
@@ -120,11 +120,11 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
     }
 }
 
-int BoxScrollWidgetVisiblePart::getIdAtPos(const int& yPos) const {
+int BoxScrollWidgetVisiblePart::getIdAtPos(const int yPos) const {
     return yPos / MIN_WIDGET_HEIGHT;
 }
 
-BoxSingleWidget * BoxScrollWidgetVisiblePart::getBSWAtPos(const int& yPos) const {
+BoxSingleWidget * BoxScrollWidgetVisiblePart::getBSWAtPos(const int yPos) const {
     const int idAtYPos = getIdAtPos(yPos);
     if(idAtYPos < 0) return nullptr;
     if(idAtYPos >= mSingleWidgets.count()) return nullptr;
@@ -141,7 +141,7 @@ BoxSingleWidget * BoxScrollWidgetVisiblePart::getLastVisibleBSW() const {
 
 #define DropTarget_ BoxScrollWidgetVisiblePart::DropTarget
 DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
-        const int &yPos) const {
+        const int yPos) const {
     BoxSingleWidget * targetBSW = nullptr;
     DropTypes supportedDropTypes = DROP_NONE;
     targetBSW = getBSWAtPos(yPos);
@@ -300,7 +300,7 @@ void BoxScrollWidgetVisiblePart::dragMoveEvent(QDragMoveEvent *event) {
 
 bool BoxScrollWidgetVisiblePart::droppingSupported(
         const SingleWidgetAbstraction * const targetAbs,
-        const int& idInTarget) const {
+        const int idInTarget) const {
     if(!targetAbs) return false;
     if(targetAbs == mCurrentlyDragged.fPtr) return false;
     const auto targetSWT = targetAbs->getTarget();

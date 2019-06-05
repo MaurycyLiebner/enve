@@ -78,12 +78,12 @@ void AutoTilesData::reset() {
     mRowCount = 0;
 }
 
-uint16_t *AutoTilesData::getTile(const int &tx, const int &ty) const {
+uint16_t *AutoTilesData::getTile(const int tx, const int ty) const {
     return getTileByIndex(tx + mZeroTileCol, ty + mZeroTileRow);
 }
 
-uint16_t *AutoTilesData::getTileByIndex(const int &colId,
-                                        const int &rowId) const {
+uint16_t *AutoTilesData::getTileByIndex(const int colId,
+                                        const int rowId) const {
     if(colId < 0 || colId >= mColumnCount ||
        rowId < 0 || rowId >= mRowCount) return nullptr;
     return mColumns.at(colId).at(rowId);
@@ -119,7 +119,7 @@ int AutoTilesData::height() const {
     return mRowCount*TILE_SIZE;
 }
 
-SkBitmap AutoTilesData::tileToBitmap(const int &tx, const int &ty) {
+SkBitmap AutoTilesData::tileToBitmap(const int tx, const int ty) {
     const auto info = SkiaHelpers::getPremulBGRAInfo(TILE_SIZE, TILE_SIZE);
     SkBitmap dst;
     dst.allocPixels(info);
@@ -360,7 +360,7 @@ void AutoTilesData::read(QIODevice * const src) {
     }
 }
 
-void AutoTilesData::stretchToTile(const int &tx, const int &ty) {
+void AutoTilesData::stretchToTile(const int tx, const int ty) {
     const int colId = tx + mZeroTileCol;
     const int rowId = ty + mZeroTileRow;
 
@@ -384,7 +384,7 @@ QList<uint16_t *> AutoTilesData::newColumn() {
     return col;
 }
 
-void AutoTilesData::prependRows(const int &count) {
+void AutoTilesData::prependRows(const int count) {
     for(QList<uint16_t*>& col : mColumns) {
         for(int i = 0; i < count; i++) {
             col.prepend(newZeroedTile(TILE_SPIXEL_SIZE));
@@ -394,7 +394,7 @@ void AutoTilesData::prependRows(const int &count) {
     mZeroTileRow += count;
 }
 
-void AutoTilesData::appendRows(const int &count) {
+void AutoTilesData::appendRows(const int count) {
     for(QList<uint16_t*>& col : mColumns) {
         for(int i = 0; i < count; i++) {
             col.append(newZeroedTile(TILE_SPIXEL_SIZE));
@@ -403,7 +403,7 @@ void AutoTilesData::appendRows(const int &count) {
     mRowCount += count;
 }
 
-void AutoTilesData::prependColumns(const int &count) {
+void AutoTilesData::prependColumns(const int count) {
     for(int i = 0; i < count; i++) {
         mColumns.prepend(newColumn());
     }
@@ -411,7 +411,7 @@ void AutoTilesData::prependColumns(const int &count) {
     mZeroTileCol += count;
 }
 
-void AutoTilesData::appendColumns(const int &count) {
+void AutoTilesData::appendColumns(const int count) {
     for(int i = 0; i < count; i++) {
         mColumns.append(newColumn());
     }

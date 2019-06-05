@@ -6,7 +6,7 @@
 
 PathEffect::PathEffect(const QString &name,
                        const PathEffectType &type,
-                       const bool &outlinePathEffect) :
+                       const bool outlinePathEffect) :
     ComplexAnimator(name) {
     mPathEffectType = type;
     setIsOutlineEffect(outlinePathEffect);
@@ -35,7 +35,7 @@ QMimeData *PathEffect::SWT_createMimeData() {
 
 bool PathEffect::SWT_isPathEffect() const { return true; }
 
-void PathEffect::setIsOutlineEffect(const bool &bT) {
+void PathEffect::setIsOutlineEffect(const bool bT) {
     if(bT == mOutlineEffect) return;
     mOutlineEffect = bT;
     if(mOutlineEffect) {
@@ -51,13 +51,13 @@ void PathEffect::switchVisible() {
     setVisible(!mVisible);
 }
 
-void PathEffect::setVisible(const bool &bT) {
+void PathEffect::setVisible(const bool bT) {
     if(bT == mVisible) return;
     mVisible = bT;
     prp_afterWholeInfluenceRangeChanged();
 }
 
-const bool &PathEffect::isVisible() const {
+bool PathEffect::isVisible() const {
     return mVisible;
 }
 

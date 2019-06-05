@@ -151,7 +151,7 @@ void UndoRedo::printRedoName() { qDebug() << "REDO " << mName; }
 
 int UndoRedo::getFrame() { return mFrame; }
 
-UndoRedoSet::UndoRedoSet(const int& absFrame) :
+UndoRedoSet::UndoRedoSet(const int absFrame) :
     UndoRedo("UndoRedoSet") {
     setFrame(absFrame);
 }

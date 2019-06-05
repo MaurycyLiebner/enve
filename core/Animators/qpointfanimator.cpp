@@ -19,25 +19,25 @@ QPointF QPointFAnimator::getEffectiveValue() const {
                    mYAnimator->getCurrentEffectiveValue());
 }
 
-QPointF QPointFAnimator::getBaseValueAtAbsFrame(const qreal &frame) const {
+QPointF QPointFAnimator::getBaseValueAtAbsFrame(const qreal frame) const {
     return getBaseValueAtRelFrame(prp_absFrameToRelFrameF(frame));
 }
 
-QPointF QPointFAnimator::getBaseValueAtRelFrame(const qreal &frame) const {
+QPointF QPointFAnimator::getBaseValueAtRelFrame(const qreal frame) const {
     return QPointF(mXAnimator->getBaseValue(frame),
                    mYAnimator->getBaseValue(frame));
 }
 
-QPointF QPointFAnimator::getEffectiveValueAtAbsFrame(const qreal &frame) const {
+QPointF QPointFAnimator::getEffectiveValueAtAbsFrame(const qreal frame) const {
     return getEffectiveValueAtRelFrame(prp_absFrameToRelFrameF(frame));
 }
 
-QPointF QPointFAnimator::getEffectiveValueAtRelFrame(const qreal &frame) const {
+QPointF QPointFAnimator::getEffectiveValueAtRelFrame(const qreal frame) const {
     return QPointF(mXAnimator->getEffectiveValue(frame),
                    mYAnimator->getEffectiveValue(frame));
 }
 
-void QPointFAnimator::setPrefferedValueStep(const qreal &valueStep) {
+void QPointFAnimator::setPrefferedValueStep(const qreal valueStep) {
     mXAnimator->setPrefferedValueStep(valueStep);
     mYAnimator->setPrefferedValueStep(valueStep);
 }
@@ -55,11 +55,11 @@ qreal QPointFAnimator::getEffectiveYValue() {
     return mYAnimator->getCurrentEffectiveValue();
 }
 
-qreal QPointFAnimator::getEffectiveXValue(const qreal &relFrame) {
+qreal QPointFAnimator::getEffectiveXValue(const qreal relFrame) {
     return mXAnimator->getEffectiveValue(relFrame);
 }
 
-qreal QPointFAnimator::getEffectiveYValue(const qreal &relFrame) {
+qreal QPointFAnimator::getEffectiveYValue(const qreal relFrame) {
     return mYAnimator->getEffectiveValue(relFrame);
 }
 
@@ -68,8 +68,8 @@ void QPointFAnimator::setBaseValue(const QPointF &val) {
     mYAnimator->setCurrentBaseValue(val.y());
 }
 
-void QPointFAnimator::setValuesRange(const qreal &minVal,
-                                     const qreal &maxVal) {
+void QPointFAnimator::setValuesRange(const qreal minVal,
+                                     const qreal maxVal) {
     mXAnimator->setValueRange(minVal, maxVal);
     mYAnimator->setValueRange(minVal, maxVal);
 }
@@ -81,23 +81,23 @@ void QPointFAnimator::setBaseValueWithoutCallingUpdater(
 }
 
 void QPointFAnimator::incBaseValuesWithoutCallingUpdater(
-        const qreal &x, const qreal &y) {
+        const qreal x, const qreal y) {
     mXAnimator->incCurrentValueNoUpdate(x);
     mYAnimator->incCurrentValueNoUpdate(y);
 }
 
-void QPointFAnimator::incBaseValues(const qreal &x, const qreal &y) {
+void QPointFAnimator::incBaseValues(const qreal x, const qreal y) {
     mXAnimator->incCurrentBaseValue(x);
     mYAnimator->incCurrentBaseValue(y);
 }
 
-void QPointFAnimator::incAllBaseValues(const qreal &x, const qreal &y) {
+void QPointFAnimator::incAllBaseValues(const qreal x, const qreal y) {
     mXAnimator->incAllValues(x);
     mYAnimator->incAllValues(y);
 }
 
-void QPointFAnimator::incSavedValueToCurrentValue(const qreal &incXBy,
-                                                  const qreal &incYBy) {
+void QPointFAnimator::incSavedValueToCurrentValue(const qreal incXBy,
+                                                  const qreal incYBy) {
     mXAnimator->incSavedValueToCurrentValue(incXBy);
     mYAnimator->incSavedValueToCurrentValue(incYBy);
 }
@@ -110,13 +110,13 @@ QrealAnimator *QPointFAnimator::getYAnimator() {
     return mYAnimator.data();
 }
 
-void QPointFAnimator::multSavedValueToCurrentValue(const qreal &sx,
-                                                   const qreal &sy) {
+void QPointFAnimator::multSavedValueToCurrentValue(const qreal sx,
+                                                   const qreal sy) {
     mXAnimator->multSavedValueToCurrentValue(sx);
     mYAnimator->multSavedValueToCurrentValue(sy);
 }
 
-void QPointFAnimator::multCurrentValues(const qreal& sx, const qreal& sy) {
+void QPointFAnimator::multCurrentValues(const qreal sx, const qreal sy) {
     mXAnimator->multCurrentBaseValue(sx);
     mYAnimator->multCurrentBaseValue(sy);
 }

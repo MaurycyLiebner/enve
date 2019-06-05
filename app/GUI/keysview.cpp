@@ -43,8 +43,8 @@ void KeysView::middlePress(const QPointF &pressPos) {
     mMiddlePressPos = pressPos;
 }
 
-void KeysView::setViewedVerticalRange(const int &top,
-                                      const int &bottom) {
+void KeysView::setViewedVerticalRange(const int top,
+                                      const int bottom) {
     mViewedTop = top;
     mViewedBottom = bottom;
     update();
@@ -755,8 +755,8 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void KeysView::setFramesRange(const int &startFrame,
-                              const int &endFrame) {
+void KeysView::setFramesRange(const int startFrame,
+                              const int endFrame) {
     mMinViewedFrame = startFrame;
     mMaxViewedFrame = endFrame;
     updatePixelsPerFrame();

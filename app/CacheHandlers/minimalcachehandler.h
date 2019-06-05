@@ -14,30 +14,30 @@ class RangeCacheHandler {
 public:
     void removeRenderContainer(const stdsptr<RCC>& cont);
 
-    int insertIdForRelFrame(const int &relFrame) const;
+    int insertIdForRelFrame(const int relFrame) const;
 
-    bool idAtRelFrame(const int &relFrame, int *id) const;
+    bool idAtRelFrame(const int relFrame, int *id) const;
 
-    int getFirstEmptyFrameAfterFrame(const int &frame) const;
+    int getFirstEmptyFrameAfterFrame(const int frame) const;
 
-    int firstEmptyFrameAtOrAfterFrame(const int &frame) const;
+    int firstEmptyFrameAtOrAfterFrame(const int frame) const;
 
-    void blockConts(const FrameRange &range, const bool &blocked);
+    void blockConts(const FrameRange &range, const bool blocked);
 
     void clearCache();
 
-    void cacheDataBeforeRelFrame(const int &relFrame);
+    void cacheDataBeforeRelFrame(const int relFrame);
 
-    void cacheDataAfterRelFrame(const int &relFrame);
+    void cacheDataAfterRelFrame(const int relFrame);
 
     void cacheFirstContainer();
 
     void cacheLastContainer();
 
-    int countAfterRelFrame(const int &relFrame) const;
+    int countAfterRelFrame(const int relFrame) const;
 
     template <typename T = RCC>
-    T *atRelFrame(const int &frame) const {
+    T *atRelFrame(const int frame) const {
         int id;
         if(idAtRelFrame(frame, &id)) {
             return static_cast<T*>(mRenderContainers.at(id).get());
@@ -45,9 +45,9 @@ public:
         return nullptr;
     }
 
-    int idAtOrBeforeRelFrame(const int &frame) const;
+    int idAtOrBeforeRelFrame(const int frame) const;
     template <typename T = RCC>
-    T *atOrBeforeRelFrame(const int &frame) const {
+    T *atOrBeforeRelFrame(const int frame) const {
         T *cont = atRelFrame<T>(frame);
         if(!cont) {
             int id = insertIdForRelFrame(frame) - 1;
@@ -59,10 +59,10 @@ public:
     }
 
 
-    int idAtOrAfterRelFrame(const int &frame) const;
+    int idAtOrAfterRelFrame(const int frame) const;
 
     template <typename T = RCC>
-    T *atOrAfterRelFrame(const int &frame) const {
+    T *atOrAfterRelFrame(const int frame) const {
         T *cont = atRelFrame<T>(frame);
         if(!cont) {
             int id = insertIdForRelFrame(frame);
@@ -76,8 +76,8 @@ public:
 
     void drawCacheOnTimeline(QPainter * const p,
                              const QRect drawRect,
-                             const int &startFrame,
-                             const int &endFrame) const;
+                             const int startFrame,
+                             const int endFrame) const;
 
     void clearRelRange(const FrameRange& range);
 
@@ -93,7 +93,7 @@ public:
     }
 
     template<typename T, typename... Args>
-    T *createNew(const int &relFrame, Args && ...args) {
+    T *createNew(const int relFrame, Args && ...args) {
         return createNew<T>({relFrame, relFrame}, args...);
     }
 

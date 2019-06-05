@@ -11,7 +11,7 @@ ValueInput::ValueInput() {
 
 }
 
-void ValueInput::draw(SkCanvas *canvas, const int &y) {
+void ValueInput::draw(SkCanvas *canvas, const int y) {
     SkPaint paint;
 
     const auto transStr = getText();
@@ -33,7 +33,7 @@ void ValueInput::draw(SkCanvas *canvas, const int &y) {
            font, paint);
 }
 
-void ValueInput::draw(QPainter *p, const int &y) {
+void ValueInput::draw(QPainter *p, const int y) {
     p->setFont(QApplication::font());
     const auto transStr = getText();
     const int textWidth = QApplication::fontMetrics().width(transStr);

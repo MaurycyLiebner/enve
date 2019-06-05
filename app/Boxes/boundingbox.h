@@ -68,12 +68,12 @@ protected:
 public:
     ~BoundingBox();
 
-    static BoundingBox *sGetBoxByDocumentId(const int &documentId);
+    static BoundingBox *sGetBoxByDocumentId(const int documentId);
 
     static void sClearWriteBoxes();
 
     static void sAddReadBox(BoundingBox * const box);
-    static BoundingBox *sGetBoxByReadId(const int &readId);
+    static BoundingBox *sGetBoxByReadId(const int readId);
     static void sClearReadBoxes();
     static void sAddWaitingForBoxLoad(const WaitingForBoxLoad& func);
 
@@ -101,9 +101,9 @@ public:
 
     virtual void moveByRel(const QPointF &trans);
     virtual void moveByAbs(const QPointF &trans);
-    virtual void rotateBy(const qreal &rot);
-    virtual void scale(const qreal &scaleBy);
-    virtual void scale(const qreal &scaleXBy, const qreal &scaleYBy);
+    virtual void rotateBy(const qreal rot);
+    virtual void scale(const qreal scaleBy);
+    virtual void scale(const qreal scaleXBy, const qreal scaleYBy);
     virtual void saveTransformPivotAbsPos(const QPointF &absPivot);
 
     virtual void startPosTransform();
@@ -127,7 +127,7 @@ public:
     virtual bool relPointInsidePath(const QPointF &relPos) const;
 
     virtual void setFont(const QFont &);
-    virtual void setSelectedFontSize(const qreal &);
+    virtual void setSelectedFontSize(const qreal );
     virtual void setSelectedFontFamilyAndStyle(const QString &,
                                                const QString &);
 
@@ -137,10 +137,10 @@ public:
                               SkPaint * const paint,
                               GrContext* const grContext);
     virtual void drawHoveredSk(SkCanvas *canvas,
-                               const SkScalar &invScale);
+                               const SkScalar invScale);
 
     virtual const SkPath &getRelBoundingRectPath();
-    virtual QRectF getRelBoundingRect(const qreal &relFrame);
+    virtual QRectF getRelBoundingRect(const qreal relFrame);
 
     virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
 
@@ -149,7 +149,7 @@ public:
 
     virtual void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
     virtual void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
-    virtual void setStrokeWidth(const qreal &strokeWidth);
+    virtual void setStrokeWidth(const qreal strokeWidth);
 
     virtual void setStrokeBrush(SimpleBrushWrapper * const brush) {
         Q_UNUSED(brush);
@@ -178,8 +178,8 @@ public:
     virtual void updateAllBoxes(const UpdateReason &reason);
 
     virtual QMatrix getRelativeTransformAtCurrentFrame();
-    virtual QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame);
-    virtual QMatrix getTotalTransformAtRelFrameF(const qreal &relFrame);
+    virtual QMatrix getRelativeTransformAtRelFrameF(const qreal relFrame);
+    virtual QMatrix getTotalTransformAtRelFrameF(const qreal relFrame);
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
 
     virtual Canvas *getParentCanvas();
@@ -200,21 +200,21 @@ public:
     virtual void addActionsToMenu(BoxTypeMenu * const menu);
 
     virtual stdsptr<BoundingBoxRenderData> createRenderData();
-    virtual void setupRenderData(const qreal &relFrame,
+    virtual void setupRenderData(const qreal relFrame,
                                  BoundingBoxRenderData * const data);
     virtual void renderDataFinished(BoundingBoxRenderData *renderData);
     virtual void updateCurrentPreviewDataFromRenderData(
             BoundingBoxRenderData* renderData);
 
-    virtual qreal getEffectsMarginAtRelFrame(const int &relFrame);
-    virtual qreal getEffectsMarginAtRelFrameF(const qreal &relFrame);
+    virtual qreal getEffectsMarginAtRelFrame(const int relFrame);
+    virtual qreal getEffectsMarginAtRelFrameF(const qreal relFrame);
 
-    virtual bool isFrameInDurationRect(const int &relFrame) const;
-    virtual bool isFrameFInDurationRect(const qreal &relFrame) const;
-    virtual void shiftAll(const int &shift);
+    virtual bool isFrameInDurationRect(const int relFrame) const;
+    virtual bool isFrameFInDurationRect(const qreal relFrame) const;
+    virtual void shiftAll(const int shift);
 
     virtual FrameRange getFirstAndLastIdenticalForMotionBlur(
-            const int &relFrame, const bool &takeAncestorsIntoAccount = true);
+            const int relFrame, const bool takeAncestorsIntoAccount = true);
 
     virtual bool shouldPlanScheduleUpdate() { return true; }
     virtual void scheduleWaitingTasks();
@@ -223,36 +223,36 @@ public:
     virtual void writeBoundingBox(QIODevice * const target);
     virtual void readBoundingBox(QIODevice * const target);
 
-    virtual void setupEffectsF(const qreal &relFrame,
+    virtual void setupEffectsF(const qreal relFrame,
                                BoundingBoxRenderData * const data);
-    virtual void setupGPUEffectsF(const qreal &relFrame,
+    virtual void setupGPUEffectsF(const qreal relFrame,
                                   BoundingBoxRenderData * const data);
     virtual const SkBlendMode &getBlendMode();
 
     bool SWT_isBoundingBox() const;
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
-                             const bool &parentSatisfies,
-                             const bool &parentMainTarget) const;
+                             const bool parentSatisfies,
+                             const bool parentMainTarget) const;
     bool SWT_visibleOnlyIfParentDescendant() const;
     QMimeData *SWT_createMimeData();
 
     void prp_afterChangedAbsRange(const FrameRange &range);
     void drawAllCanvasControls(SkCanvas * const canvas,
                                const CanvasMode &mode,
-                               const SkScalar &invScale);
+                               const SkScalar invScale);
 
     FrameRange prp_relInfluenceRange() const;
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
     int prp_getRelFrameShift() const;
 
-    void anim_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int frame);
     DurationRectangleMovable *anim_getTimelineMovable(
-            const int &relX, const int &minViewedFrame,
-            const qreal &pixelsPerFrame);
+            const int relX, const int minViewedFrame,
+            const qreal pixelsPerFrame);
     void drawTimelineControls(QPainter * const p,
-                              const qreal &pixelsPerFrame,
+                              const qreal pixelsPerFrame,
                               const FrameRange &absFrameRange,
-                              const int &rowHeight);
+                              const int rowHeight);
 
     void ca_childAnimatorIsRecordingChanged();
 
@@ -260,11 +260,11 @@ public:
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode &mode,
-                                   const qreal &invScale) const;
+                                   const qreal invScale) const;
     NormalSegment getNormalSegment(const QPointF &absPos,
-                                   const qreal &invScale) const;
+                                   const qreal invScale) const;
     void drawBoundingRect(SkCanvas * const canvas,
-                         const SkScalar &invScale);
+                         const SkScalar invScale);
 
     void selectAllCanvasPts(QList<stdptr<MovablePoint>> &selection,
                             const CanvasMode &mode);
@@ -293,7 +293,7 @@ public:
     void moveDown();
     void bringToFront();
     void bringToEnd();
-    void setZListIndex(const int &z);
+    void setZListIndex(const int z);
     int getZIndex() const;
 
     void setPivotAbsPos(const QPointF &absPos);
@@ -305,27 +305,27 @@ public:
     void deselect();
     bool isSelected() const;
     void removeFromSelection();
-    void selectionChangeTriggered(const bool &shiftPressed);
+    void selectionChangeTriggered(const bool shiftPressed);
     void hide();
     void show();
     bool isVisible() const;
-    void setVisibile(const bool &visible);
+    void setVisibile(const bool visible);
     void switchVisible();
     void lock();
     void unlock();
-    void setLocked(const bool &bt);
+    void setLocked(const bool bt);
     void switchLocked();
     bool isLocked() const;
     bool isVisibleAndUnlocked() const;
     bool isAnimated() const;
 
-    void rotateRelativeToSavedPivot(const qreal &rot);
-    void scaleRelativeToSavedPivot(const qreal &scaleBy);
+    void rotateRelativeToSavedPivot(const qreal rot);
+    void scaleRelativeToSavedPivot(const qreal scaleBy);
     void setAbsolutePos(const QPointF &pos);
     void setRelativePos(const QPointF &relPos);
 
-    void scaleRelativeToSavedPivot(const qreal &scaleXBy,
-                                   const qreal &scaleYBy);
+    void scaleRelativeToSavedPivot(const qreal scaleXBy,
+                                   const qreal scaleYBy);
     void startPivotTransform();
     void finishPivotTransform();
     void resetScale();
@@ -337,12 +337,12 @@ public:
     QRectF getRelBoundingRect() const;
     void drawHoveredPathSk(SkCanvas *canvas,
                            const SkPath &path,
-                           const SkScalar &invScale);
+                           const SkScalar invScale);
 
-    void setGPUEffectsEnabled(const bool& enable);
+    void setGPUEffectsEnabled(const bool enable);
     bool getGPUEffectsEnabled() const;
 
-    void setRasterEffectsEnabled(const bool& enable);
+    void setRasterEffectsEnabled(const bool enable);
     bool getRasterEffectsEnabled() const;
 
     template <class T>
@@ -375,23 +375,23 @@ public:
     bool isVisibleAndInVisibleDurationRect() const;
     void startDurationRectPosTransform();
     void finishDurationRectPosTransform();
-    void moveDurationRect(const int &dFrame);
+    void moveDurationRect(const int dFrame);
     void startMinFramePosTransform();
     void finishMinFramePosTransform();
-    void moveMinFrame(const int &dFrame);
+    void moveMinFrame(const int dFrame);
     void startMaxFramePosTransform();
     void finishMaxFramePosTransform();
-    void moveMaxFrame(const int &dFrame);
+    void moveMaxFrame(const int dFrame);
     DurationRectangle *getDurationRectangle();
-    bool isVisibleAndInDurationRect(const int &relFrame) const;
-    bool isFrameFVisibleAndInDurationRect(const qreal &relFrame) const;
+    bool isVisibleAndInDurationRect(const int relFrame) const;
+    bool isFrameFVisibleAndInDurationRect(const qreal relFrame) const;
     bool diffsIncludingInherited(
-            const int &relFrame1, const int &relFrame2);
+            const int relFrame1, const int relFrame2);
 
-    BoundingBoxRenderData *getCurrentRenderData(const int &relFrame);
-    BoundingBoxRenderData *updateCurrentRenderData(const int& relFrame,
+    BoundingBoxRenderData *getCurrentRenderData(const int relFrame);
+    BoundingBoxRenderData *updateCurrentRenderData(const int relFrame,
                                                    const UpdateReason &reason);
-    void nullifyCurrentRenderData(const int& relFrame);
+    void nullifyCurrentRenderData(const int relFrame);
     void updateDrawRenderContainerTransform();
 
     void scheduleTask(const stdsptr<BoundingBoxRenderData> &task);
@@ -412,9 +412,9 @@ public:
 
     void planScheduleUpdate(const UpdateReason &reason);
 
-    void updateAfterDurationRectangleShifted(const int &dFrame);
-    void updateAfterDurationMinFrameChangedBy(const int &by);
-    void updateAfterDurationMaxFrameChangedBy(const int &by);
+    void updateAfterDurationRectangleShifted(const int dFrame);
+    void updateAfterDurationMinFrameChangedBy(const int by);
+    void updateAfterDurationMaxFrameChangedBy(const int by);
 
     void planCenterPivotPosition();
 

@@ -12,8 +12,8 @@ public:
 
     void setLabelWidget(QWidget *widget);
     void addContentWidget(QWidget *widget);
-    void setCheckable(const bool &check);
-    void setChecked(const bool &check);
+    void setCheckable(const bool check);
+    void setChecked(const bool check);
     bool isChecked();
 protected:
     QCheckBox *mCheckBox = nullptr;
@@ -25,7 +25,7 @@ protected:
 signals:
 
 public slots:
-    void setContentVisible(const bool &bT);
+    void setContentVisible(const bool bT);
 };
 
 #endif // CLOSABLECONTAINER_H

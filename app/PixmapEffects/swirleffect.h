@@ -6,7 +6,7 @@ struct SwirlEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;
 
     void applyEffectsSk(const SkBitmap &bitmap,
-                        const qreal &scale);
+                        const qreal scale);
 
     qreal degrees;
 protected:
@@ -19,7 +19,7 @@ public:
     qreal getMargin() { return 0.; }
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, BoundingBoxRenderData*);
+            const qreal relFrame, BoundingBoxRenderData*);
 protected:
     SwirlEffect(qreal degrees = 45.);
 private:

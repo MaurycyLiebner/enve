@@ -13,13 +13,13 @@ class BrushContexedWrapper : public SelfRef {
     Q_OBJECT
     friend class SelfRef;
 public:
-    void setSelected(const bool& selected) {
+    void setSelected(const bool selected) {
         if(selected == mSelected) return;
         mSelected = selected;
         emit selectionChanged(mSelected);
     }
 
-    const bool& selected() const {
+    bool selected() const {
         return mSelected;
     }
 

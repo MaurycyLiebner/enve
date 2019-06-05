@@ -13,13 +13,13 @@ class DurationRectSettingsDialog : public QDialog {
     Q_OBJECT
 public:
     DurationRectSettingsDialog(const DurationRectangle::Type &type,
-                               const int &minFrame,
-                               const int &maxFrame,
-                               const int &firstAnimationFrame,
+                               const int minFrame,
+                               const int maxFrame,
+                               const int firstAnimationFrame,
                                QWidget *parent = nullptr);
     DurationRectSettingsDialog(const DurationRectangle::Type &type,
-                               const int &minFrame,
-                               const int &maxFrame,
+                               const int minFrame,
+                               const int maxFrame,
                                QWidget *parent = nullptr);
 
     int getMinFrame() {
@@ -49,8 +49,8 @@ protected:
     QPushButton *mOkButton;
     QPushButton *mCancelButton;
 protected slots:
-    void setMaxFrameSpinBoxMinFrame(const int &frame);
-    void setMinFrameSpinBoxMaxFrame(const int &frame);
+    void setMaxFrameSpinBoxMinFrame(const int frame);
+    void setMinFrameSpinBoxMaxFrame(const int frame);
 };
 
 #endif // DURATIONRECTSETTINGSDIALOG_H

@@ -32,7 +32,7 @@ extern qreal signedSquare(const qreal val);
 
 extern qreal distSign(const QPointF& distPt);
 
-extern unsigned char truncateU8(const int &val);
+extern unsigned char truncateU8(const int val);
 extern int clampInt(int val, int min, int max);
 
 extern bool isNonZero(const float &val);
@@ -54,8 +54,8 @@ extern bool isZero6Dec(const float &val);
 extern bool isOne4Dec(const float &val);
 extern bool isOne6Dec(const float &val);
 
-extern bool isZero2Dec(const qreal &val);
-extern bool isZero2Dec(const SkScalar &val);
+extern bool isZero2Dec(const qreal val);
+extern bool isZero2Dec(const SkScalar val);
 
 extern bool isZero1Dec(qreal val);
 
@@ -85,7 +85,7 @@ extern qreal radiansBetweenVectors(const QPointF &pt1,
                                    const QPointF &pt2);
 
 template <typename T1, typename T2>
-qreal clamp(const qreal &val, const T1 &min, const T2 &max) {
+qreal clamp(const qreal val, const T1 &min, const T2 &max) {
     static_assert((std::is_same<T1, qreal>::value ||
                   std::is_same<T1, int>::value) &&
                   (std::is_same<T2, qreal>::value ||
@@ -108,21 +108,21 @@ float clamp(const float &val, const T1 &min, const T2 &max) {
     return val;
 }
 
-extern int clamp(const int& val, const int& min, const int& max);
+extern int clamp(const int val, const int min, const int max);
 
-extern qreal gRandF(const qreal &fMin = 0, const qreal &fMax = 1);
-extern SkScalar gSkRandF(const SkScalar &fMin = 0, const SkScalar &fMax = 1);
+extern qreal gRandF(const qreal fMin = 0, const qreal fMax = 1);
+extern SkScalar gSkRandF(const SkScalar fMin = 0, const SkScalar fMax = 1);
 extern QPointF symmetricToPos(const QPointF &toMirror,
                               const QPointF &mirrorCenter);
 extern QPointF symmetricToPosNewLen(const QPointF& toMirror,
                                     const QPointF& mirrorCenter,
-                                    const qreal& newLen);
+                                    const qreal newLen);
 extern qreal pointToLen(QPointF point);
 extern SkScalar pointToLen(SkPoint point);
 extern QPointF scalePointToNewLen(const QPointF &point,
-                                  const qreal &newLen);
-extern QPointF gRotPt(const QPointF& pt, const qreal& deg);
-extern QPointF gQPointFDisplace(const QPointF& pt, const qreal &displ);
+                                  const qreal newLen);
+extern QPointF gRotPt(const QPointF& pt, const qreal deg);
+extern QPointF gQPointFDisplace(const QPointF& pt, const qreal displ);
 
 extern bool isPointZero(QPointF pos);
 #endif // SIMPLEMATH_H

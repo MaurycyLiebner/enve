@@ -8,7 +8,7 @@ UsageWidget::UsageWidget(QWidget *parent) : QLabel(parent) {
     setThreadsTotal(QThread::idealThreadCount());
 }
 
-void UsageWidget::setThreadsUsage(const int &threads) {
+void UsageWidget::setThreadsUsage(const int threads) {
     if(threads >= 0) {
         mThreadsUsage = threads;
     } else {
@@ -17,17 +17,17 @@ void UsageWidget::setThreadsUsage(const int &threads) {
     updateDisplayedText();
 }
 
-void UsageWidget::setThreadsTotal(const int &threads) {
+void UsageWidget::setThreadsTotal(const int threads) {
     mThreadsTotal = threads;
     updateDisplayedText();
 }
 
-void UsageWidget::setHddUsage(const bool &used) {
+void UsageWidget::setHddUsage(const bool used) {
     mHddUsage = used;
     updateDisplayedText();
 }
 
-void UsageWidget::setRamUsage(const qreal &thisGB) {
+void UsageWidget::setRamUsage(const qreal thisGB) {
     if(thisGB >= 0) {
         mRamUsage = thisGB;
     } else {
@@ -36,7 +36,7 @@ void UsageWidget::setRamUsage(const qreal &thisGB) {
     updateDisplayedText();
 }
 
-void UsageWidget::setTotalRam(const qreal &totalRamGB) {
+void UsageWidget::setTotalRam(const qreal totalRamGB) {
     mTotalRam = totalRamGB;
     updateDisplayedText();
 }

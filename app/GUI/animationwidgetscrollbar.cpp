@@ -4,12 +4,12 @@
 #include "global.h"
 #include "colorhelpers.h"
 
-AnimationWidgetScrollBar::AnimationWidgetScrollBar(const int &minSpan,
-                                                   const int &maxSpan,
-                                                   const int &spanInc,
-                                                   const int &height,
-                                                   const bool &range,
-                                                   const bool &clamp,
+AnimationWidgetScrollBar::AnimationWidgetScrollBar(const int minSpan,
+                                                   const int maxSpan,
+                                                   const int spanInc,
+                                                   const int height,
+                                                   const bool range,
+                                                   const bool clamp,
                                                    QWidget *parent) :
     QWidget(parent) {
     mMinSpan = minSpan;
@@ -29,7 +29,7 @@ qreal AnimationWidgetScrollBar::posToFrame(int xPos) {
             ((qreal)width() - 2*MIN_WIDGET_HEIGHT) + mMinFrame;
 }
 
-void AnimationWidgetScrollBar::setTopBorderVisible(const bool &bT) {
+void AnimationWidgetScrollBar::setTopBorderVisible(const bool bT) {
     mTopBorderVisible = bT;
 }
 
@@ -180,7 +180,7 @@ void AnimationWidgetScrollBar::wheelEvent(QWheelEvent *event) {
     update();
 }
 
-bool AnimationWidgetScrollBar::setFirstViewedFrame(const int &firstFrame) {
+bool AnimationWidgetScrollBar::setFirstViewedFrame(const int firstFrame) {
     if(mClamp) {
         if(mRange) {
             mFirstViewedFrame = clampInt(firstFrame, mMinFrame, mMaxFrame -
@@ -250,8 +250,8 @@ void AnimationWidgetScrollBar::mouseReleaseEvent(QMouseEvent *) {
     update();
 }
 
-void AnimationWidgetScrollBar::setDisplayedFrameRange(const int &startFrame,
-                                                      const int &endFrame) {
+void AnimationWidgetScrollBar::setDisplayedFrameRange(const int startFrame,
+                                                      const int endFrame) {
     mMinFrame = startFrame;
     mMaxFrame = endFrame;
     mMaxSpan = mMaxFrame - mMinFrame;
@@ -259,15 +259,15 @@ void AnimationWidgetScrollBar::setDisplayedFrameRange(const int &startFrame,
                         mFirstViewedFrame + mViewedFramesSpan);
 }
 
-void AnimationWidgetScrollBar::setViewedFrameRange(const int &minFrame,
-                                                   const int &maxFrame) {
+void AnimationWidgetScrollBar::setViewedFrameRange(const int minFrame,
+                                                   const int maxFrame) {
     setFirstViewedFrame(minFrame);
     setFramesSpan(maxFrame - minFrame);
     update();
 }
 
-void AnimationWidgetScrollBar::setCanvasFrameRange(const int &minFrame,
-                                                   const int &maxFrame) {
+void AnimationWidgetScrollBar::setCanvasFrameRange(const int minFrame,
+                                                   const int maxFrame) {
     mMinCanvasFrame = minFrame;
     mMaxCanvasFrame = maxFrame;
     update();

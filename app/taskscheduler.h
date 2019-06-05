@@ -80,7 +80,7 @@ public:
         mCurrentQue = nullptr;
     }
 private:
-    void queDone(const Que * const que, const int& queId) {
+    void queDone(const Que * const que, const int queId) {
         if(que == mCurrentQue) return;
         mQues.removeAt(queId);
     }

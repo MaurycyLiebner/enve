@@ -33,7 +33,7 @@ int ComplexAnimator::ca_getNumberOfChildren() const {
 void ComplexAnimator::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction* abstraction,
         const UpdateFuncs &updateFuncs,
-        const int& visiblePartWidgetId) {
+        const int visiblePartWidgetId) {
     for(const auto &property : ca_mChildAnimators) {
         auto newAbs = property->SWT_createAbstraction(updateFuncs,
                                                       visiblePartWidgetId);
@@ -42,7 +42,7 @@ void ComplexAnimator::SWT_addChildrenAbstractions(
 
 }
 
-FrameRange ComplexAnimator::prp_getIdenticalRelRange(const int &relFrame) const {
+FrameRange ComplexAnimator::prp_getIdenticalRelRange(const int relFrame) const {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     for(const auto& child : ca_mChildAnimators) {
         const auto childRange = child->prp_getIdenticalRelRange(relFrame);
@@ -55,8 +55,8 @@ FrameRange ComplexAnimator::prp_getIdenticalRelRange(const int &relFrame) const 
 
 
 bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
-                                          const bool &parentSatisfies,
-                                          const bool &parentMainTarget) const {
+                                          const bool parentSatisfies,
+                                          const bool parentMainTarget) const {
     //if(hasChildAnimators()) {
         return Animator::SWT_shouldBeVisible(rules, parentSatisfies,
                                              parentMainTarget);
@@ -67,7 +67,7 @@ bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 bool ComplexAnimator::SWT_isComplexAnimator() const { return true; }
 
 void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
-                                          const int &id) {
+                                          const int id) {
     if(ca_mChildAnimators.contains(childProperty))
         ca_removeChildAnimator(childProperty);
     ca_mChildAnimators.insert(id, childProperty);
@@ -146,14 +146,14 @@ void ComplexAnimator::ca_moveChildBelow(Property *move, Property *below) {
 }
 
 void ComplexAnimator::ca_moveChildInList(Property* child,
-                                         const int &to) {
+                                         const int to) {
     const int from = getChildPropertyIndex(child);
     if(from == -1) return;
     ca_moveChildInList(child, from, to);
 }
 
 void ComplexAnimator::ca_moveChildInList(Property* child,
-                                         const int &from, const int &to) {
+                                         const int from, const int to) {
     ca_mChildAnimators.move(from, to);
     SWT_moveChildAbstractionForTargetToInAll(child, to);
     prp_afterWholeInfluenceRangeChanged();
@@ -221,7 +221,7 @@ void ComplexAnimator::prp_startTransform() {
         property->prp_startTransform();
 }
 
-void ComplexAnimator::prp_setTransformed(const bool &bT) {
+void ComplexAnimator::prp_setTransformed(const bool bT) {
     for(const auto &property : ca_mChildAnimators)
         property->prp_setTransformed(bT);
 }
@@ -232,8 +232,8 @@ void ComplexAnimator::prp_afterFrameShiftChanged() {
         property->prp_setParentFrameShift(thisShift, this);
 }
 
-void ComplexAnimator::ca_changeChildAnimatorZ(const int &oldIndex,
-                                              const int &newIndex) {
+void ComplexAnimator::ca_changeChildAnimatorZ(const int oldIndex,
+                                              const int newIndex) {
     ca_mChildAnimators.move(oldIndex, newIndex);
     prp_afterWholeInfluenceRangeChanged();
 }
@@ -244,7 +244,7 @@ void ComplexAnimator::prp_setUpdater(const stdsptr<PropertyUpdater> &updater) {
         property->prp_setInheritedUpdater(updater);
 }
 
-void ComplexAnimator::anim_setAbsFrame(const int &frame) {
+void ComplexAnimator::anim_setAbsFrame(const int frame) {
     //if(!anim_isDescendantRecording()) return;
     Animator::anim_setAbsFrame(frame);
 
@@ -279,7 +279,7 @@ void ComplexAnimator::anim_saveCurrentValueAsKey() {
     }
 }
 
-void ComplexAnimator::anim_setRecording(const bool &rec) {
+void ComplexAnimator::anim_setRecording(const bool rec) {
     for(const auto &property : ca_mChildAnimators) {
         if(!property->SWT_isAnimator()) continue;
         GetAsPtr(property, Animator)->anim_setRecording(rec);
@@ -326,7 +326,7 @@ void ComplexAnimator::ca_removeDescendantsKey(Key * const key) {
         anim_removeKey(GetAsSPtr(collection, ComplexKey));
 }
 
-ComplexKey::ComplexKey(const int &absFrame,
+ComplexKey::ComplexKey(const int absFrame,
                        ComplexAnimator * const parentAnimator) :
     Key(parentAnimator) {
     setAbsFrame(absFrame);
@@ -349,7 +349,7 @@ bool ComplexKey::isEmpty() const {
     return mKeys.isEmpty();
 }
 
-//void ComplexKey::setRelFrame(const int &frame) {
+//void ComplexKey::setRelFrame(const int frame) {
 //    Key::setRelFrame(frame);
 
 //    const int absFrame = mParentAnimator->prp_relFrameToAbsFrame(frame);
@@ -371,8 +371,8 @@ bool ComplexKey::isDescendantSelected() const {
     return false;
 }
 
-//void ComplexKey::scaleFrameAndUpdateParentAnimator(const int &relativeToFrame,
-//                                                   const qreal &scaleFactor) {
+//void ComplexKey::scaleFrameAndUpdateParentAnimator(const int relativeToFrame,
+//                                                   const qreal scaleFactor) {
 //    for(QrealKey *key : mKeys) {
 //        if(key->isSelected()) continue;
 //        key->scaleFrameAndUpdateParentAnimator(relativeToFrame,

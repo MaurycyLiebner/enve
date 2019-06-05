@@ -67,17 +67,17 @@ public:
         mypaint_brush_set_base_value(mBrush, id, val);
     }
 
-    void setPaintBrushSize(const qreal &size) const {
+    void setPaintBrushSize(const qreal size) const {
         const float brushSize = static_cast<float>(size);
         setBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC, brushSize);
     }
 
-    void incPaintBrushSize(const qreal &inc) const {
+    void incPaintBrushSize(const qreal inc) const {
         const float sizeF = getBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC);
         setPaintBrushSize(static_cast<qreal>(sizeF) + inc);
     }
 
-    void decPaintBrushSize(const qreal &dec) const {
+    void decPaintBrushSize(const qreal dec) const {
         incPaintBrushSize(-dec);
     }
 

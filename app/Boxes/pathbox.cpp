@@ -74,7 +74,7 @@ PathBox::~PathBox() {
         mStrokeSettings->getGradient()->removePath(this);
 }
 
-void PathBox::setPathEffectsEnabled(const bool &enable) {
+void PathBox::setPathEffectsEnabled(const bool enable) {
     mPathEffectsAnimators->SWT_setEnabled(enable);
     mPathEffectsAnimators->SWT_setVisible(
                 mPathEffectsAnimators->hasChildAnimators() || enable);
@@ -84,7 +84,7 @@ bool PathBox::getPathEffectsEnabled() const {
     return mPathEffectsAnimators->SWT_isEnabled();
 }
 
-void PathBox::setFillEffectsEnabled(const bool &enable) {
+void PathBox::setFillEffectsEnabled(const bool enable) {
     mFillPathEffectsAnimators->SWT_setEnabled(enable);
     mFillPathEffectsAnimators->SWT_setVisible(
                 mFillPathEffectsAnimators->hasChildAnimators() || enable);
@@ -94,7 +94,7 @@ bool PathBox::getFillEffectsEnabled() const {
     return mFillPathEffectsAnimators->SWT_isEnabled();
 }
 
-void PathBox::setOutlineEffectsEnabled(const bool &enable) {
+void PathBox::setOutlineEffectsEnabled(const bool enable) {
     mOutlinePathEffectsAnimators->SWT_setEnabled(enable);
     mOutlinePathEffectsAnimators->SWT_setVisible(
                 mOutlinePathEffectsAnimators->hasChildAnimators() || enable);
@@ -109,7 +109,7 @@ void PathBox::setParentGroup(ContainerBox * const parent) {
     BoundingBox::setParentGroup(parent);
 }
 
-void PathBox::setupRenderData(const qreal &relFrame,
+void PathBox::setupRenderData(const qreal relFrame,
                               BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
 
@@ -292,7 +292,7 @@ void PathBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     planScheduleUpdate(Animator::USER_CHANGE);
 }
 
-void PathBox::setStrokeWidth(const qreal &strokeWidth) {
+void PathBox::setStrokeWidth(const qreal strokeWidth) {
     mStrokeSettings->setCurrentStrokeWidth(strokeWidth);
     //scheduleOutlinePathUpdate();
 }
@@ -321,7 +321,7 @@ GradientPoints *PathBox::getStrokeGradientPoints() {
     return mStrokeGradientPoints.data();
 }
 
-SkPath PathBox::getPathWithThisOnlyEffectsAtRelFrameF(const qreal &relFrame) {
+SkPath PathBox::getPathWithThisOnlyEffectsAtRelFrameF(const qreal relFrame) {
     SkPath path = getPathAtRelFrameF(relFrame);
     mPathEffectsAnimators->apply(relFrame, &path);
     return path;
@@ -424,7 +424,7 @@ void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
     }
 }
 
-void PathBox::drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale) {
+void PathBox::drawHoveredSk(SkCanvas *canvas, const SkScalar invScale) {
     drawHoveredPathSk(canvas, mPathSk, invScale);
 }
 
@@ -454,7 +454,7 @@ void PathBox::copyPathBoxDataTo(PathBox * const targetBox) {
     BoundingBox::sClearReadBoxes();
 }
 
-bool PathBox::differenceInPathBetweenFrames(const int &frame1, const int &frame2) const {
+bool PathBox::differenceInPathBetweenFrames(const int frame1, const int frame2) const {
     if(mPathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
         return true;
     if(!mParentGroup) return false;
@@ -465,7 +465,7 @@ bool PathBox::differenceInPathBetweenFrames(const int &frame1, const int &frame2
     return mParentGroup->differenceInPathEffectsBetweenFrames(pFrame1, pFrame2);
 }
 
-bool PathBox::differenceInOutlinePathBetweenFrames(const int &frame1, const int &frame2) const {
+bool PathBox::differenceInOutlinePathBetweenFrames(const int frame1, const int frame2) const {
     if(mStrokeSettings->getLineWidthAnimator()->
        prp_differencesBetweenRelFrames(frame1, frame2)) return true;
     if(mOutlinePathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
@@ -478,7 +478,7 @@ bool PathBox::differenceInOutlinePathBetweenFrames(const int &frame1, const int 
     return mParentGroup->differenceInOutlinePathEffectsBetweenFrames(pFrame1, pFrame2);
 }
 
-bool PathBox::differenceInFillPathBetweenFrames(const int &frame1, const int &frame2) const {
+bool PathBox::differenceInFillPathBetweenFrames(const int frame1, const int frame2) const {
     if(mFillPathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
         return true;
     if(!mParentGroup) return false;
@@ -549,7 +549,7 @@ void PathBox::updateDrawGradients() {
     updateStrokeDrawGradient();
 }
 
-QRectF PathBox::getRelBoundingRect(const qreal &relFrame) {
+QRectF PathBox::getRelBoundingRect(const qreal relFrame) {
     const SkPath path = getPathAtRelFrameF(relFrame);
     SkPath outline;
     if(mStrokeSettings->nonZeroLineWidth()) {
@@ -587,7 +587,7 @@ bool PathBox::relPointInsidePath(const QPointF &relPos) const {
     }
 }
 
-void PathBox::setOutlineAffectedByScale(const bool &bT) {
+void PathBox::setOutlineAffectedByScale(const bool bT) {
     mOutlineAffectedByScale = bT;
     planScheduleUpdate(Animator::USER_CHANGE);
 }

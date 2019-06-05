@@ -7,7 +7,7 @@ class HDDCachableCacheHandler {
     typedef HDDCachableRangeContainer Cont;
 public:
     int getFirstEmptyOrCachedFrameAfterFrame(
-            const int &frame, Cont **contP = nullptr) const {
+            const int frame, Cont **contP = nullptr) const {
         int currFrame = frame + 1;
         Cont *cont = nullptr;
         while(true) {
@@ -22,30 +22,30 @@ public:
 
     void removeRenderContainer(const stdsptr<Cont>& cont);
 
-    int insertIdForRelFrame(const int &relFrame) const;
+    int insertIdForRelFrame(const int relFrame) const;
 
-    bool idAtRelFrame(const int &relFrame, int *id) const;
+    bool idAtRelFrame(const int relFrame, int *id) const;
 
-    int getFirstEmptyFrameAfterFrame(const int &frame) const;
+    int getFirstEmptyFrameAfterFrame(const int frame) const;
 
-    int firstEmptyFrameAtOrAfterFrame(const int &frame) const;
+    int firstEmptyFrameAtOrAfterFrame(const int frame) const;
 
-    void blockConts(const FrameRange &range, const bool &blocked);
+    void blockConts(const FrameRange &range, const bool blocked);
 
     void clearCache();
 
-    void cacheDataBeforeRelFrame(const int &relFrame);
+    void cacheDataBeforeRelFrame(const int relFrame);
 
-    void cacheDataAfterRelFrame(const int &relFrame);
+    void cacheDataAfterRelFrame(const int relFrame);
 
     void cacheFirstContainer();
 
     void cacheLastContainer();
 
-    int countAfterRelFrame(const int &relFrame) const;
+    int countAfterRelFrame(const int relFrame) const;
 
     template <typename T = Cont>
-    T *atRelFrame(const int &frame) const {
+    T *atRelFrame(const int frame) const {
         int id;
         if(idAtRelFrame(frame, &id)) {
             return static_cast<T*>(mRenderContainers.at(id).get());
@@ -53,9 +53,9 @@ public:
         return nullptr;
     }
 
-    int idAtOrBeforeRelFrame(const int &frame) const;
+    int idAtOrBeforeRelFrame(const int frame) const;
     template <typename T = Cont>
-    T *atOrBeforeRelFrame(const int &frame) const {
+    T *atOrBeforeRelFrame(const int frame) const {
         T *cont = atRelFrame<T>(frame);
         if(!cont) {
             int id = insertIdForRelFrame(frame) - 1;
@@ -67,10 +67,10 @@ public:
     }
 
 
-    int idAtOrAfterRelFrame(const int &frame) const;
+    int idAtOrAfterRelFrame(const int frame) const;
 
     template <typename T = Cont>
-    T *atOrAfterRelFrame(const int &frame) const {
+    T *atOrAfterRelFrame(const int frame) const {
         T *cont = atRelFrame<T>(frame);
         if(!cont) {
             int id = insertIdForRelFrame(frame);
@@ -84,9 +84,9 @@ public:
 
     void drawCacheOnTimeline(QPainter * const p,
                              const QRectF &drawRect,
-                             const int &startFrame,
-                             const int &endFrame,
-                             const qreal &unit = 1) const;
+                             const int startFrame,
+                             const int endFrame,
+                             const qreal unit = 1) const;
 
     void clearRelRange(const FrameRange& range);
 
@@ -102,7 +102,7 @@ public:
     }
 
     template<typename T, typename... Args>
-    T *createNew(const int &relFrame, Args && ...args) {
+    T *createNew(const int relFrame, Args && ...args) {
         return createNew<T>({relFrame, relFrame}, args...);
     }
 

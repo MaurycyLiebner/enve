@@ -7,12 +7,12 @@
 class FlowLayout : public QLayout {
 public:
     explicit FlowLayout(QWidget *parent,
-                        const int& margin = -1,
-                        const int& hSpacing = -1,
-                        const int& vSpacing = -1);
-    explicit FlowLayout(const int& margin = -1,
-                        const int& hSpacing = -1,
-                        const int& vSpacing = -1);
+                        const int margin = -1,
+                        const int hSpacing = -1,
+                        const int vSpacing = -1);
+    explicit FlowLayout(const int margin = -1,
+                        const int hSpacing = -1,
+                        const int vSpacing = -1);
 //    ~FlowLayout();
 
     void addItem(QLayoutItem *item) override;

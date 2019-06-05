@@ -5,7 +5,7 @@
 Key::Key(Animator * const parentAnimator) :
     Key(0, parentAnimator) {}
 
-Key::Key(const int &frame, Animator * const parentAnimator) {
+Key::Key(const int frame, Animator * const parentAnimator) {
     mParentAnimator = parentAnimator;
     mRelFrame = frame;
 }
@@ -27,11 +27,11 @@ bool Key::hasNextKey() const {
     return mParentAnimator->anim_hasNextKey(this);
 }
 
-void Key::incFrameAndUpdateParentAnimator(const int &inc) {
+void Key::incFrameAndUpdateParentAnimator(const int inc) {
     setRelFrameAndUpdateParentAnimator(mRelFrame + inc);
 }
 
-void Key::setRelFrameAndUpdateParentAnimator(const int &relFrame) {
+void Key::setRelFrameAndUpdateParentAnimator(const int relFrame) {
     if(!mParentAnimator) return;
     mParentAnimator->anim_moveKeyToRelFrame(this, relFrame);
 }
@@ -62,9 +62,9 @@ void Key::cancelFrameTransform() {
 }
 
 void Key::scaleFrameAndUpdateParentAnimator(
-        const int &relativeToFrame,
-        const qreal &scaleFactor,
-        const bool &useSavedFrame) {
+        const int relativeToFrame,
+        const qreal scaleFactor,
+        const bool useSavedFrame) {
     int thisRelFrame = useSavedFrame ? mSavedRelFrame : mRelFrame;
     int relativeToRelFrame =
             mParentAnimator->prp_absFrameToRelFrame(relativeToFrame);
@@ -74,7 +74,7 @@ void Key::scaleFrameAndUpdateParentAnimator(
     setRelFrameAndUpdateParentAnimator(newFrame);
 }
 
-void Key::setSelected(const bool &bT) {
+void Key::setSelected(const bool bT) {
     mIsSelected = bT;
 }
 
@@ -113,11 +113,11 @@ int Key::getRelFrame() const {
     return mRelFrame;
 }
 
-void Key::setRelFrame(const int &frame) {
+void Key::setRelFrame(const int frame) {
     mRelFrame = frame;
 }
 
-void Key::setAbsFrame(const int &frame) {
+void Key::setAbsFrame(const int frame) {
     setRelFrame(absFrameToRelFrame(frame));
 }
 

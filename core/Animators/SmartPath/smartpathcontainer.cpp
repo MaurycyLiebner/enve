@@ -2,7 +2,7 @@
 
 SmartPath::SmartPath() : mNodesList() {}
 
-void SmartPath::actionRemoveNode(const int &nodeId, const bool &approx) {
+void SmartPath::actionRemoveNode(const int nodeId, const bool approx) {
     mNodesList.removeNode(nodeId, approx);
 }
 
@@ -18,7 +18,7 @@ int SmartPath::actionAddFirstNode(const NormalNodeData& data) {
     return insertId;
 }
 
-int SmartPath::actionAppendNodeAtEndNode(const int &endNodeId) {
+int SmartPath::actionAppendNodeAtEndNode(const int endNodeId) {
     Node * const endNode = mNodesList.at(endNodeId);
     if(!endNode->isNormal())
         RuntimeThrow("Invalid node type. End nodes should always be NORMAL.");
@@ -35,17 +35,17 @@ int SmartPath::actionAppendNodeAtEndNode() {
     return actionAppendNodeAtEndNode(mNodesList.count() - 1);
 }
 
-int SmartPath::insertNodeBetween(const int& prevId,
-                                 const int& nextId,
+int SmartPath::insertNodeBetween(const int prevId,
+                                 const int nextId,
                                  const Node& nodeBlueprint) {
     if(!mNodesList.nodesConnected(prevId, nextId))
         RuntimeThrow("Cannot insert between not connected nodes");
     return mNodesList.insertNodeAfter(prevId, nodeBlueprint);
 }
 
-int SmartPath::actionInsertNodeBetween(const int &prevId,
-                                       const int& nextId,
-                                       const qreal& t) {
+int SmartPath::actionInsertNodeBetween(const int prevId,
+                                       const int nextId,
+                                       const qreal t) {
     if(prevId == nextId)
         RuntimeThrow("Cannot insert a node between a single node");
 
@@ -84,29 +84,29 @@ int SmartPath::actionInsertNodeBetween(const int &prevId,
 }
 
 int SmartPath::actionInsertNodeBetween(
-        const int &prevId, const int& nextId,
+        const int prevId, const int nextId,
         const QPointF &c0, const QPointF &p1, const QPointF &c2) {
     return insertNodeBetween(prevId, nextId, Node(c0, p1, c2));
 }
 
-void SmartPath::actionPromoteDissolvedNodeToNormal(const int &nodeId) {
+void SmartPath::actionPromoteDissolvedNodeToNormal(const int nodeId) {
     mNodesList.promoteDissolvedNodeToNormal(nodeId);
 }
 
-void SmartPath::actionDemoteToDissolved(const int &nodeId, const bool& approx) {
+void SmartPath::actionDemoteToDissolved(const int nodeId, const bool approx) {
     mNodesList.demoteNormalNodeToDissolved(nodeId, approx);
 }
 
-void SmartPath::actionMoveNodeBetween(const int& movedNodeId,
-                                      const int& prevNodeId,
-                                      const int& nextNodeId) {
+void SmartPath::actionMoveNodeBetween(const int movedNodeId,
+                                      const int prevNodeId,
+                                      const int nextNodeId) {
     if(!mNodesList.nodesConnected(prevNodeId, nextNodeId))
         RuntimeThrow("Trying to move between not connected nodes");
     const int targetId = (movedNodeId < prevNodeId ? prevNodeId : nextNodeId);
     mNodesList.moveNode(movedNodeId, targetId);
 }
 
-void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
+void SmartPath::actionDisconnectNodes(const int node1Id, const int node2Id) {
     int prevId;
     int nextId;
     if(nextNodeId(node1Id) == node2Id) {
@@ -135,14 +135,14 @@ void SmartPath::actionDisconnectNodes(const int &node1Id, const int &node2Id) {
     }
 }
 
-void SmartPath::actionConnectNodes(const int &node1Id, const int &node2Id) {
+void SmartPath::actionConnectNodes(const int node1Id, const int node2Id) {
     if((node1Id == 0 && node2Id == mNodesList.count() - 1) ||
        (node2Id == 0 && node1Id == mNodesList.count() - 1)) {
         mNodesList.setClosed(true);
     } else RuntimeThrow("Only first and last node can be connected");
 }
 
-void SmartPath::actionMergeNodes(const int &node1Id, const int &node2Id) {
+void SmartPath::actionMergeNodes(const int node1Id, const int node2Id) {
     mNodesList.mergeNodes(node1Id, node2Id);
 }
 
@@ -154,6 +154,6 @@ void SmartPath::setPath(const SkPath &path) {
     mNodesList.setPath(path);
 }
 
-qValueRange SmartPath::dissolvedTRange(const int &nodeId) {
+qValueRange SmartPath::dissolvedTRange(const int nodeId) {
     return {mNodesList.prevT(nodeId), mNodesList.nextT(nodeId)};
 }

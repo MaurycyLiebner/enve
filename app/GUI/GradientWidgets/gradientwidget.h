@@ -13,17 +13,17 @@ public:
     ~GradientWidget();
 
     void setCurrentGradient(Gradient *gradient,
-                            const bool &emitChange = true);
+                            const bool emitChange = true);
     Gradient *getCurrentGradient();
     QColor getCurrentColor();
     ColorAnimator *getCurrentColorAnimator();
 
-    void moveColor(const int &x);
+    void moveColor(const int x);
 
     void newGradient(const QColor &color1 = QColor(0, 0, 0),
                      const QColor &color2 = QColor(0, 0, 0));
-    void newGradient(const int &fromGradientId);
-    void removeGradient(const int &gradientId);
+    void newGradient(const int fromGradientId);
+    void removeGradient(const int gradientId);
 
     void finishGradientTransform();
     void startGradientTransform();
@@ -34,15 +34,15 @@ public:
     int getGradientIndex(Gradient *child);
     void updateNumberOfGradients();
 
-    void gradientLeftPressed(const int &gradId);
-    void gradientContextMenuReq(const int &gradId,
+    void gradientLeftPressed(const int gradId);
+    void gradientContextMenuReq(const int gradId,
                                 const QPoint globalPos);
 
-    void colorRightPress(const int &x, const QPoint &point);
-    void colorLeftPress(const int &x);
-    int getColorIdAtX(const int &x);
+    void colorRightPress(const int x, const QPoint &point);
+    void colorLeftPress(const int x);
+    int getColorIdAtX(const int x);
 
-    void updateAfterFrameChanged(const int &absFrame);
+    void updateAfterFrameChanged(const int absFrame);
 
     void clearGradientsLoadIds();
     void setGradientLoadIds();
@@ -53,7 +53,7 @@ public:
         return mGradients.count();
     }
 
-    Gradient* getGradientAt(const int& id) const {
+    Gradient* getGradientAt(const int id) const {
         return mGradients.at(id).get();
     }
 
@@ -65,7 +65,7 @@ signals:
     void currentGradientChanged(Gradient *gradient);
     void gradientSettingsChanged();
 public slots:
-    void resetColorIdIfEquals(Gradient *gradient, const int &id);
+    void resetColorIdIfEquals(Gradient *gradient, const int id);
     void setCurrentColor(const QColor &col);
 private slots:
     void updateAll();
@@ -84,8 +84,8 @@ private:
     Gradient *mCurrentGradient = nullptr;
     int mCurrentColorId = 0;
     int mCenterGradientId = 1;
-    void setCurrentGradient(const int &listId);
-    void setCurrentColorId(const int &id);
+    void setCurrentGradient(const int listId);
+    void setCurrentColorId(const int id);
 };
 
 #endif // GRADIENTWIDGET_H

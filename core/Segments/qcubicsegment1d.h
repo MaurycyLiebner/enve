@@ -10,46 +10,46 @@ struct qCubicSegment1D {
     typedef std::pair<qCubicSegment1D, qCubicSegment1D> Pair;
     qCubicSegment1D() {}
 
-    qCubicSegment1D(const qreal& p) {
+    qCubicSegment1D(const qreal p) {
         mP0 = p; mC1 = p; mC2 = p; mP1 = p;
     }
 
-    qCubicSegment1D(const qreal& p0, const qreal& c1,
-                    const qreal& c2, const qreal& p1){
+    qCubicSegment1D(const qreal p0, const qreal c1,
+                    const qreal c2, const qreal p1){
         mP0 = p0; mC1 = c1; mC2 = c2; mP1 = p1;
     }
 
-    static qCubicSegment1D sMakeLinearToT(const qreal& p0, const qreal& p1) {
+    static qCubicSegment1D sMakeLinearToT(const qreal p0, const qreal p1) {
         const qreal dist = p1 - p0;
         return qCubicSegment1D(p0, p0 + dist/3, p1 - dist/3, p1);
     }
 
-    qreal valAtT(const qreal& t) const;
+    qreal valAtT(const qreal t) const;
 
     qreal length();
-    qreal tAtLength(const qreal& len);
+    qreal tAtLength(const qreal len);
     qreal lengthAtT(qreal t);
     qreal lengthFracAtT(qreal t);
 
     Pair dividedAtT(qreal t);
     qCubicSegment1D tFragment(qreal minT, qreal maxT);
 
-    const qreal &p0() const;
-    const qreal &c1() const;
-    const qreal &c2() const;
-    const qreal &p1() const;
+    qreal p0() const;
+    qreal c1() const;
+    qreal c2() const;
+    qreal p1() const;
 
-    void setP0(const qreal& p0);
-    void setC1(const qreal& c1);
-    void setC2(const qreal& c2);
-    void setP1(const qreal& p1);
+    void setP0(const qreal p0);
+    void setC1(const qreal c1);
+    void setC2(const qreal c2);
+    void setP1(const qreal p1);
 
-    qreal minDistanceTo(const qreal &p,
+    qreal minDistanceTo(const qreal p,
                         qreal * const pBestT = nullptr,
                         qreal * const pBestPos = nullptr);
-    qreal minDistanceTo(const qreal &p,
-                        const qreal &minT,
-                        const qreal &maxT,
+    qreal minDistanceTo(const qreal p,
+                        const qreal minT,
+                        const qreal maxT,
                         qreal * const pBestT = nullptr,
                         qreal * const pBestPos = nullptr);
 
@@ -71,11 +71,11 @@ struct qCubicSegment1D {
                                p1() + b.p1());
     }
 
-    qCubicSegment1D operator*(const qreal& b) const {
+    qCubicSegment1D operator*(const qreal b) const {
         return qCubicSegment1D(p0()*b, c1()*b, c2()*b, p1()*b);
     }
 
-    qCubicSegment1D& operator*=(const qreal& b) {
+    qCubicSegment1D& operator*=(const qreal b) {
         setP0(p0()*b);
         setC1(c1()*b);
         setC2(c2()*b);
@@ -83,11 +83,11 @@ struct qCubicSegment1D {
         return *this;
     }
 
-    qCubicSegment1D operator/(const qreal& b) const {
+    qCubicSegment1D operator/(const qreal b) const {
         return qCubicSegment1D(p0()/b, c1()/b, c2()/b, p1()/b);
     }
 
-    qCubicSegment1D& operator/=(const qreal& b) {
+    qCubicSegment1D& operator/=(const qreal b) {
         setP0(p0()/b);
         setC1(c1()/b);
         setC2(c2()/b);
@@ -102,8 +102,8 @@ struct qCubicSegment1D {
 //    static QList<qrealPair> sIntersectionTs(_qCubicSegment2D& seg1,
 //                                            _qCubicSegment2D& seg2);
 private:
-    qreal tAtLength(const qreal& length, const qreal& maxLenErr,
-                    const qreal& minT, const qreal& maxT);
+    qreal tAtLength(const qreal length, const qreal maxLenErr,
+                    const qreal minT, const qreal maxT);
     void solveDerivativeZero(qreal &t1, qreal &t2, qreal &t3) const;
 
     void updateLength();

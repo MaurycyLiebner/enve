@@ -20,7 +20,7 @@ class SoundReader : public HDDTask {
 protected:
     SoundReader(SoundCacheHandler * const cacheHandler,
                 const stdsptr<AudioStreamsData>& openedAudio,
-                const int& secondId, const SampleRange& sampleRange) :
+                const int secondId, const SampleRange& sampleRange) :
         mCacheHandler(cacheHandler), mOpenedAudio(openedAudio),
         mSecondId(secondId), mSampleRange(sampleRange) {}
 
@@ -56,15 +56,15 @@ class SoundReaderForMerger : public SoundReader {
 protected:
     SoundReaderForMerger(SoundCacheHandler * const cacheHandler,
                          const stdsptr<AudioStreamsData>& openedAudio,
-                         const int& secondId, const SampleRange& sampleRange) :
+                         const int secondId, const SampleRange& sampleRange) :
         SoundReader(cacheHandler, openedAudio, secondId, sampleRange) {}
 
     void afterProcessing();
 public:
-    void addSingleSound(const int& sampleShift,
+    void addSingleSound(const int sampleShift,
                         const SampleRange& absRange,
                         const QrealSnapshot& volume,
-                        const qreal& speed) {
+                        const qreal speed) {
         mSSAbsRanges.append({sampleShift, absRange, volume, speed});
     }
 

@@ -37,7 +37,7 @@ ShadowEffect::ShadowEffect() :
 }
 
 stdsptr<PixmapEffectRenderData> ShadowEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal &relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ShadowEffectRenderData)();
     renderData->fBlurRadius = mBlurRadius->getEffectiveValue(relFrame);
     renderData->fColor = mColor->getColorAtRelFrame(relFrame);
@@ -48,7 +48,7 @@ stdsptr<PixmapEffectRenderData> ShadowEffect::getPixmapEffectRenderDataForRelFra
 }
 
 void ShadowEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
-                                            const qreal &scale) {
+                                            const qreal scale) {
     const SkScalar sigma = toSkScalar(fBlurRadius*0.3333*scale);
     const auto src = SkiaHelpers::makeCopy(bitmap);
     SkCanvas canvas(bitmap);
@@ -74,7 +74,7 @@ qreal ShadowEffect::getMargin() {
             pointToLen(mTranslation->getEffectiveValue());
 }
 
-qreal ShadowEffect::getMarginAtRelFrame(const int &relFrame) {
+qreal ShadowEffect::getMarginAtRelFrame(const int relFrame) {
     return mBlurRadius->getEffectiveValue(relFrame) +
             pointToLen(mTranslation->getEffectiveValueAtRelFrame(relFrame));
 }

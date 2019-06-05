@@ -248,7 +248,7 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     hide();
 }
 
-SkBlendMode idToBlendModeSk(const int &id) {
+SkBlendMode idToBlendModeSk(const int id) {
     switch(id) {
         case 0: return SkBlendMode::kSrcOver;
         case 1: return SkBlendMode::kDstOver;
@@ -312,7 +312,7 @@ int blendModeToIntSk(const SkBlendMode &mode) {
     }
 }
 
-void BoxSingleWidget::setCompositionMode(const int &id) {
+void BoxSingleWidget::setCompositionMode(const int id) {
     SingleWidgetTarget *target = mTarget->getTarget();
 
     if(target->SWT_isBoundingBox()) {
@@ -828,7 +828,7 @@ void BoxSingleWidget::rename() {
 }
 
 void BoxSingleWidget::drawKeys(QPainter * const p,
-                               const qreal &pixelsPerFrame,
+                               const qreal pixelsPerFrame,
                                const FrameRange &viewedFrames) {
     if(isHidden()) return;
     const auto target = mTarget->getTarget();
@@ -839,9 +839,9 @@ void BoxSingleWidget::drawKeys(QPainter * const p,
     }
 }
 
-Key* BoxSingleWidget::getKeyAtPos(const int &pressX,
-                                  const qreal &pixelsPerFrame,
-                                  const int &minViewedFrame) {
+Key* BoxSingleWidget::getKeyAtPos(const int pressX,
+                                  const qreal pixelsPerFrame,
+                                  const int minViewedFrame) {
     if(isHidden()) return nullptr;
     const auto target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
@@ -855,9 +855,9 @@ Key* BoxSingleWidget::getKeyAtPos(const int &pressX,
 }
 
 DurationRectangleMovable* BoxSingleWidget::getRectangleMovableAtPos(
-                            const int &pressX,
-                            const qreal &pixelsPerFrame,
-                            const int &minViewedFrame) {
+                            const int pressX,
+                            const qreal pixelsPerFrame,
+                            const int minViewedFrame) {
     if(isHidden()) return nullptr;
     const auto target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
@@ -871,7 +871,7 @@ DurationRectangleMovable* BoxSingleWidget::getRectangleMovableAtPos(
 }
 
 void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
-                                    const qreal &pixelsPerFrame,
+                                    const qreal pixelsPerFrame,
                                     QList<Key*>& listKeys) {
     if(isHidden()) return;
     const auto target = mTarget->getTarget();

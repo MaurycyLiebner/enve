@@ -12,8 +12,8 @@ PathPivot::PathPivot(const Canvas * const parent) :
 
 void PathPivot::drawSk(SkCanvas * const canvas,
                        const CanvasMode &mode,
-                       const SkScalar &invScale,
-                       const bool &keyOnCurrent) {
+                       const SkScalar invScale,
+                       const bool keyOnCurrent) {
     Q_UNUSED(keyOnCurrent);
     const SkPoint absPos = toSkPoint(getAbsolutePos());
     if(isVisible(mode)) {

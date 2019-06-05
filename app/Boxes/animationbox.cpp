@@ -62,7 +62,7 @@ bool AnimationBox::shouldPlanScheduleUpdate() {
     return BoundingBox::shouldPlanScheduleUpdate();
 }
 
-int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
+int AnimationBox::getAnimationFrameForRelFrame(const int relFrame) {
     const int lastFrameId = mSrcFramesCache->getFrameCount() - 1;
     const int animStartRelFrame =
                 getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
@@ -130,7 +130,7 @@ void AnimationBox::reload() {
     if(mSrcFramesCache) mSrcFramesCache->clearCache();
 }
 
-void AnimationBox::anim_setAbsFrame(const int &frame) {
+void AnimationBox::anim_setAbsFrame(const int frame) {
     BoundingBox::anim_setAbsFrame(frame);
     if(!mSrcFramesCache) return;
 
@@ -143,7 +143,7 @@ void AnimationBox::anim_setAbsFrame(const int &frame) {
     //}
 }
 
-FrameRange AnimationBox::prp_getIdenticalRelRange(const int &relFrame) const {
+FrameRange AnimationBox::prp_getIdenticalRelRange(const int relFrame) const {
     if(isVisibleAndInDurationRect(relFrame)) {
         const auto animDur = getAnimationDurationRect();
         const auto animRange = animDur->getAnimationRange();
@@ -210,7 +210,7 @@ void AnimationBox::addActionsToMenu(BoxTypeMenu * const menu) {
     BoundingBox::addActionsToMenu(menu);
 }
 
-void AnimationBox::setupRenderData(const qreal &relFrame,
+void AnimationBox::setupRenderData(const qreal relFrame,
                                    BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     const auto imageData = GetAsPtr(data, AnimationBoxRenderData);

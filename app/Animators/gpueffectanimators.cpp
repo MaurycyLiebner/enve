@@ -29,7 +29,7 @@ qreal GPUEffectAnimators::getEffectsMargin() const {
     return newMargin;
 }
 
-qreal GPUEffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
+qreal GPUEffectAnimators::getEffectsMarginAtRelFrame(const int relFrame) const {
     qreal newMargin = 0.;
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
@@ -40,7 +40,7 @@ qreal GPUEffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const 
     return newMargin;
 }
 
-qreal GPUEffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) const {
+qreal GPUEffectAnimators::getEffectsMarginAtRelFrameF(const qreal relFrame) const {
     qreal newMargin = 0.;
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
@@ -52,7 +52,7 @@ qreal GPUEffectAnimators::getEffectsMarginAtRelFrameF(const qreal &relFrame) con
 }
 
 void GPUEffectAnimators::addEffectRenderDataToListF(
-        const qreal &relFrame,
+        const qreal relFrame,
         BoundingBoxRenderData * const data) {
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect, GPURasterEffect);

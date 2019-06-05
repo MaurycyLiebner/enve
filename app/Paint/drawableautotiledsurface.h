@@ -149,7 +149,7 @@ private:
         mTileImgs.clear();
     }
 
-    void stretchToTileImg(const int &tx, const int &ty) {
+    void stretchToTileImg(const int tx, const int ty) {
         const int colId = tx + mZeroTileCol;
         const int rowId = ty + mZeroTileRow;
 
@@ -173,7 +173,7 @@ private:
         return col;
     }
 
-    void prependImgRows(const int &count) {
+    void prependImgRows(const int count) {
         for(auto& col : mImgs) {
             for(int i = 0; i < count; i++) {
                 col.prepend(sk_sp<SkImage>());
@@ -183,7 +183,7 @@ private:
         mZeroTileRow += count;
     }
 
-    void appendImgRows(const int &count) {
+    void appendImgRows(const int count) {
         for(auto& col : mImgs) {
             for(int i = 0; i < count; i++) {
                 col.append(sk_sp<SkImage>());
@@ -192,7 +192,7 @@ private:
         mRowCount += count;
     }
 
-    void prependImgColumns(const int &count) {
+    void prependImgColumns(const int count) {
         for(int i = 0; i < count; i++) {
             mImgs.prepend(newImgColumn());
         }
@@ -200,19 +200,19 @@ private:
         mZeroTileCol += count;
     }
 
-    void appendImgColumns(const int &count) {
+    void appendImgColumns(const int count) {
         for(int i = 0; i < count; i++) {
             mImgs.append(newImgColumn());
         }
         mColumnCount += count;
     }
 
-    SkImage * imageForTile(const int &tx, const int &ty) const {
+    SkImage * imageForTile(const int tx, const int ty) const {
         const auto zeroTileV = zeroTile();
         return imageForTileId(tx + zeroTileV.x(), ty + zeroTileV.y());
     }
 
-    SkImage * imageForTileId(const int &colId, const int &rowId) const {
+    SkImage * imageForTileId(const int colId, const int rowId) const {
         return mImgs.at(colId).at(rowId).get();
     }
 

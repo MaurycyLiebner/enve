@@ -37,7 +37,7 @@ void ColorValueSpin::setValueExternal(const GLfloat &val) {
     mSpinBox->setValueExternal(val);
 }
 
-void ColorValueSpin::spinBoxDisplayedValueChanged(const qreal &val) {
+void ColorValueSpin::spinBoxDisplayedValueChanged(const qreal val) {
     emit displayedValueChanged(val);
 }
 

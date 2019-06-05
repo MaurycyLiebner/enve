@@ -21,7 +21,7 @@ void Canvas::groupSelectedBoxes() {
     addBoxToSelection(newGroup.get());
 }
 
-bool Canvas::anim_nextRelFrameWithKey(const int &relFrame,
+bool Canvas::anim_nextRelFrameWithKey(const int relFrame,
                                      int &nextRelFrame) {
     int thisNext;
     const bool thisHasNext = BoundingBox::anim_nextRelFrameWithKey(
@@ -44,7 +44,7 @@ bool Canvas::anim_nextRelFrameWithKey(const int &relFrame,
     return true;
 }
 
-bool Canvas::anim_prevRelFrameWithKey(const int &relFrame,
+bool Canvas::anim_prevRelFrameWithKey(const int relFrame,
                                      int &prevRelFrame) {
     int thisPrev;
     const bool thisHasPrev = BoundingBox::anim_prevRelFrameWithKey(
@@ -67,7 +67,7 @@ bool Canvas::anim_prevRelFrameWithKey(const int &relFrame,
     return true;
 }
 
-void Canvas::shiftAllPointsForAllKeys(const int &by) {
+void Canvas::shiftAllPointsForAllKeys(const int by) {
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isSmartVectorPath()) {
 //            const auto svp = GetAsPtr(box, SmartVectorPath);
@@ -84,7 +84,7 @@ void Canvas::revertAllPointsForAllKeys() {
     }
 }
 
-void Canvas::shiftAllPoints(const int &by) {
+void Canvas::shiftAllPoints(const int by) {
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isSmartVectorPath()) {
             //GetAsPtr(box, SmartVectorPath)->shiftAllPoints(by);
@@ -135,7 +135,7 @@ void Canvas::setSelectedFontFamilyAndStyle(
     }
 }
 
-void Canvas::setSelectedFontSize(const qreal &size) {
+void Canvas::setSelectedFontSize(const qreal size) {
     for(const auto &box : mSelectedBoxes) {
         box->setSelectedFontSize(size);
     }
@@ -199,7 +199,7 @@ void Canvas::setSelectedJoinStyle(const Qt::PenJoinStyle& joinStyle) {
     }
 }
 
-void Canvas::setSelectedStrokeWidth(const qreal &strokeWidth) {
+void Canvas::setSelectedStrokeWidth(const qreal strokeWidth) {
     for(const auto &box : mSelectedBoxes) {
         box->setStrokeWidth(strokeWidth);
     }
@@ -268,7 +268,7 @@ NormalSegment Canvas::getSmartEdgeAt(const QPointF& absPos) const {
     return NormalSegment();
 }
 
-void Canvas::rotateSelectedBoxesStartAndFinish(const qreal &rotBy) {
+void Canvas::rotateSelectedBoxesStartAndFinish(const qreal rotBy) {
     if(mLocalPivot) {
         for(const auto &box : mSelectedBoxes) {
             box->startRotTransform();
@@ -286,9 +286,9 @@ void Canvas::rotateSelectedBoxesStartAndFinish(const qreal &rotBy) {
     }
 }
 
-void Canvas::rotateSelectedBy(const qreal &rotBy,
+void Canvas::rotateSelectedBy(const qreal rotBy,
                               const QPointF &absOrigin,
-                              const bool &startTrans) {
+                              const bool startTrans) {
     if(mLocalPivot) {
         if(startTrans) {
             for(const auto &box : mSelectedBoxes) {
@@ -316,16 +316,16 @@ void Canvas::rotateSelectedBy(const qreal &rotBy,
     }
 }
 
-void Canvas::scaleSelectedBy(const qreal &scaleBy,
+void Canvas::scaleSelectedBy(const qreal scaleBy,
                              const QPointF &absOrigin,
-                             const bool &startTrans) {
+                             const bool startTrans) {
     scaleSelectedBy(scaleBy, scaleBy, absOrigin, startTrans);
 }
 
-void Canvas::scaleSelectedBy(const qreal& scaleXBy,
-                             const qreal& scaleYBy,
+void Canvas::scaleSelectedBy(const qreal scaleXBy,
+                             const qreal scaleYBy,
                              const QPointF& absOrigin,
-                             const bool& startTrans) {
+                             const bool startTrans) {
     if(mLocalPivot) {
         if(startTrans) {
             for(const auto &box : mSelectedBoxes) {
@@ -492,7 +492,7 @@ void Canvas::deselectAllBoxes() {
 
 MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
                                        const CanvasMode &mode,
-                                       const qreal &invScale) {
+                                       const qreal invScale) {
     if(mode == MOVE_POINT || mode == ADD_POINT ||
        mode == ADD_POINT ||  mode == MOVE_BOX) {
         if(mRotPivot->isPointAtAbsPos(absPos, mode, invScale)) {
@@ -519,7 +519,7 @@ void Canvas::cancelSelectedBoxesTransform() {
 }
 
 void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
-                                    const bool &startTransform) {
+                                    const bool startTransform) {
     if(startTransform) {
         for(const auto &box : mSelectedBoxes) {
             box->startPosTransform();

@@ -30,9 +30,9 @@ class PathEffect : public ComplexAnimator {
 protected:
     PathEffect(const QString& name,
                const PathEffectType &type,
-               const bool &outlinePathEffect);
+               const bool outlinePathEffect);
 public:
-    virtual void apply(const qreal &relFrame,
+    virtual void apply(const qreal relFrame,
                        const SkPath &src,
                        SkPath * const dst) = 0;
     virtual bool hasReasonsNotToApplyUglyTransform();
@@ -44,11 +44,11 @@ public:
     void readProperty(QIODevice *target);
 
     const PathEffectType &getEffectType();
-    void setIsOutlineEffect(const bool &bT);
+    void setIsOutlineEffect(const bool bT);
 
     void switchVisible();
-    void setVisible(const bool &bT);
-    const bool &isVisible() const;
+    void setVisible(const bool bT);
+    bool isVisible() const;
 
     bool applyBeforeThickness();
 protected:

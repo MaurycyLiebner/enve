@@ -10,12 +10,12 @@ qreal distSign(const QPointF& distPt) {
     else return -sqrt(-val);
 }
 
-qreal gRandF(const qreal &fMin, const qreal &fMax) {
+qreal gRandF(const qreal fMin, const qreal fMax) {
     qreal f = static_cast<qreal>(qrand())/RAND_MAX;
     return fMin + f * (fMax - fMin);
 }
 
-SkScalar gSkRandF(const SkScalar &fMin, const SkScalar &fMax) {
+SkScalar gSkRandF(const SkScalar fMin, const SkScalar fMax) {
     SkScalar f = static_cast<SkScalar>(qrand())/RAND_MAX;
     return fMin + f * (fMax - fMin);
 }
@@ -29,13 +29,13 @@ SkScalar pointToLen(SkPoint point) {
 }
 
 QPointF scalePointToNewLen(const QPointF& point,
-                           const qreal& newLen) {
+                           const qreal newLen) {
     const qreal currLen = pointToLen(point);
     if(isZero4Dec(currLen)) return QPointF(0, 0);
     return point * newLen / currLen;
 }
 
-int clamp(const int& val, const int& min, const int& max) {
+int clamp(const int val, const int min, const int max) {
     if(val > max) return max;
     if(val < min) return min;
     return val;
@@ -89,11 +89,11 @@ bool isZeroOrOne6Dec(const double &val) {
     return false;
 }
 
-bool isZero2Dec(const qreal& val) {
+bool isZero2Dec(const qreal val) {
     return qAbs(val) < 0.01;
 }
 
-bool isZero2Dec(const SkScalar &val) {
+bool isZero2Dec(const SkScalar val) {
     return qAbs(val) < 0.01f;
 }
 
@@ -131,7 +131,7 @@ void rotate(qreal rad_t, qreal *x_t, qreal *y_t) {
     *y_t = y_rotated_t;
 }
 
-unsigned char truncateU8(const int &val) {
+unsigned char truncateU8(const int val) {
     if(val > 255) {
         return 255;
     } else if(val < 0) {
@@ -217,12 +217,12 @@ qreal radiansBetweenVectors(const QPointF &pt1,
     return atan2(det, dot);
 }
 
-QPointF gRotPt(const QPointF &pt, const qreal &deg) {
+QPointF gRotPt(const QPointF &pt, const qreal deg) {
     return {pt.x() * cos(deg*PI/180) - pt.y() * sin(deg*PI/180),
             pt.x() * sin(deg*PI/180) + pt.y() * cos(deg*PI/180)};
 }
 
-QPointF gQPointFDisplace(const QPointF& pt, const qreal &displ) {
+QPointF gQPointFDisplace(const QPointF& pt, const qreal displ) {
     return QPointF(pt.x() + gRandF(-displ, displ),
                    pt.y() + gRandF(-displ, displ));
 }

@@ -19,30 +19,30 @@ qCubicSegment1D qCubicSegment2D::ySeg() const {
     return qCubicSegment1D(mP0.y(), mC1.y(), mC2.y(), mP3.y());
 }
 
-QPointF qCubicSegment2D::tanAtLength(const qreal& len) {
+QPointF qCubicSegment2D::tanAtLength(const qreal len) {
     return tanAtT(tAtLength(len));
 }
 
-QPointF qCubicSegment2D::tanAtT(const qreal &t) const {
+QPointF qCubicSegment2D::tanAtT(const qreal t) const {
     const qreal oneMinusT = 1 - t;
     return 3 * oneMinusT * oneMinusT * (mC1 - mP0) +
            6 * t * oneMinusT * (mC2 - mC1) +
            3 * t * t * (mP3 - mC2);
 }
 
-PosAndTan qCubicSegment2D::posAndTanAtLength(const qreal& len) {
+PosAndTan qCubicSegment2D::posAndTanAtLength(const qreal len) {
     return posAndTanAtT(tAtLength(len));
 }
 
-PosAndTan qCubicSegment2D::posAndTanAtT(const qreal& t) const {
+PosAndTan qCubicSegment2D::posAndTanAtT(const qreal t) const {
     return {posAtT(t), tanAtT(t)};
 }
 
-QPointF qCubicSegment2D::posAtLength(const qreal& len) {
+QPointF qCubicSegment2D::posAtLength(const qreal len) {
     return posAtT(tAtLength(len));
 }
 
-QPointF qCubicSegment2D::posAtT(const qreal &t) const {
+QPointF qCubicSegment2D::posAtT(const qreal t) const {
     const qreal oneMinusT = 1 - t;
     return qPow(oneMinusT, 3)*p0() +
             3*qPow(oneMinusT, 2)*t*c1() +
@@ -61,7 +61,7 @@ qreal qCubicSegment2D::length() {
     return fLength;
 }
 
-qreal qCubicSegment2D::tAtLength(const qreal &len) {
+qreal qCubicSegment2D::tAtLength(const qreal len) {
     if(isZero6Dec(len) || len < 0) return 0;
     qreal totLen = length();
     if(isZero6Dec(len - totLen) || len > totLen) return 1;
@@ -153,8 +153,8 @@ qreal qCubicSegment2D::minDistanceTo(const QPointF &p,
 }
 
 qreal qCubicSegment2D::minDistanceTo(const QPointF &p,
-                                     const qreal &minT,
-                                     const qreal &maxT,
+                                     const qreal minT,
+                                     const qreal maxT,
                                      qreal * const pBestT,
                                      QPointF * const pBestPos) {
     const qreal maxLen = lengthAtT(maxT);
@@ -233,7 +233,7 @@ qreal qCubicSegment2D::minDistanceTo(const QPointF &p,
     return minError;
 }
 
-qreal qCubicSegment2D::tFurthestInDirection(const qreal &deg) const {
+qreal qCubicSegment2D::tFurthestInDirection(const qreal deg) const {
     auto rotSeg = rotated(deg);
     return rotSeg.xSeg().tWithBiggestValue();
 }
@@ -251,20 +251,20 @@ qCubicSegment2D qCubicSegment2D::tFragment(qreal minT, qreal maxT) const {
     return div1.dividedAtT(mappedMaxT).first;
 }
 
-qCubicSegment2D qCubicSegment2D::lenFragment(const qreal &minLen,
-                                             const qreal &maxLen) {
+qCubicSegment2D qCubicSegment2D::lenFragment(const qreal minLen,
+                                             const qreal maxLen) {
     return tFragment(tAtLength(minLen), tAtLength(maxLen));
 }
 
 qCubicSegment2D qCubicSegment2D::lenFracFragment(
-        const qreal& minLenFrac, const qreal& maxLenFrac) {
+        const qreal minLenFrac, const qreal maxLenFrac) {
     return lenFragment(minLenFrac*length(), maxLenFrac*length());
 }
 
-qreal qCubicSegment2D::tAtLength(const qreal &length,
-                                 const qreal &maxLenErr,
-                                 const qreal &minT,
-                                 const qreal &maxT) {
+qreal qCubicSegment2D::tAtLength(const qreal length,
+                                 const qreal maxLenErr,
+                                 const qreal minT,
+                                 const qreal maxT) {
     qreal guessT = (maxT + minT)*0.5;
     qreal lenAtGuess = lengthAtT(guessT);
     if(abs(lenAtGuess - length) < maxLenErr) return guessT;

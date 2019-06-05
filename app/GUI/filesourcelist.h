@@ -21,7 +21,7 @@ struct FileCacheHandlerAbstraction {
         setSelected(!selected);
     }
 
-    void setSelected(const bool &bT);
+    void setSelected(const bool bT);
 
     const QString &getFilePath() {
         return target->getFilePath();

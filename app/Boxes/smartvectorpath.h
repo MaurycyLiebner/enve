@@ -22,13 +22,13 @@ public:
 
     void addActionsToMenu(BoxTypeMenu * const menu);
 
-    SkPath getPathAtRelFrameF(const qreal &relFrame);
+    SkPath getPathAtRelFrameF(const qreal relFrame);
 
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 
-    bool differenceInEditPathBetweenFrames(const int& frame1,
-                                           const int& frame2) const;
+    bool differenceInEditPathBetweenFrames(const int frame1,
+                                           const int frame2) const;
     void applyCurrentTransformation();
 
     void loadSkPath(const SkPath& path);

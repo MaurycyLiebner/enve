@@ -7,10 +7,10 @@ template <typename T>
 class GraphKeyT : public BasedKeyT<GraphKey, T> {
     friend class StdSelfRef;
 protected:
-    GraphKeyT(const T &value, const int &relFrame,
+    GraphKeyT(const T &value, const int relFrame,
               Animator * const parentAnimator) :
         BasedKeyT<GraphKey, T>(value, relFrame, parentAnimator) {}
-    GraphKeyT(const int &relFrame,
+    GraphKeyT(const int relFrame,
               Animator * const parentAnimator) :
         BasedKeyT<GraphKey, T>(relFrame, parentAnimator) {}
     GraphKeyT(Animator * const parentAnimator) :

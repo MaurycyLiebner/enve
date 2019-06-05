@@ -232,10 +232,10 @@ void GraphAnimator::graph_constrainCtrlsFrameValues() {
     }
 }
 
-QrealPoint *GraphAnimator::graph_getPointAt(const qreal &value,
-                                      const qreal &frame,
-                                      const qreal &pixelsPerFrame,
-                                      const qreal &pixelsPerValUnit) {
+QrealPoint *GraphAnimator::graph_getPointAt(const qreal value,
+                                      const qreal frame,
+                                      const qreal pixelsPerFrame,
+                                      const qreal pixelsPerValUnit) {
     QrealPoint *point = nullptr;
     for(const auto &key : anim_mKeys) {
         point = GetAsGK(key)->mousePress(frame, value,
@@ -266,7 +266,7 @@ qValueRange GraphAnimator::graph_getMinAndMaxValues() const {
 }
 
 qValueRange GraphAnimator::graph_getMinAndMaxValuesBetweenFrames(
-        const int &startFrame, const int &endFrame) const {
+        const int startFrame, const int endFrame) const {
     if(!anim_mKeys.isEmpty()) {
         qreal minVal = 100000.;
         qreal maxVal = -100000.;
@@ -325,7 +325,7 @@ void GraphAnimator::graph_getSelectedSegments(QList<QList<GraphKey*>> &segments)
 
 qreal GraphAnimator::prevKeyWeight(const GraphKey * const prevKey,
                                    const GraphKey * const nextKey,
-                                   const qreal &frame) const {
+                                   const qreal frame) const {
     const qreal prevFrame = prevKey->getRelFrame();
     const qreal nextFrame = nextKey->getRelFrame();
 

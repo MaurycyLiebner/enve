@@ -11,12 +11,12 @@ DisplayedGradientsWidget::DisplayedGradientsWidget(
     mGradientWidget = gradientWidget;
 }
 
-void DisplayedGradientsWidget::incTop(const int &inc) {
+void DisplayedGradientsWidget::incTop(const int inc) {
     mDisplayedTop -= inc;
     updateTopGradientId();
 }
 
-void DisplayedGradientsWidget::setTop(const int &top) {
+void DisplayedGradientsWidget::setTop(const int top) {
     mDisplayedTop = top;
     updateTopGradientId();
 }
@@ -28,7 +28,7 @@ void DisplayedGradientsWidget::updateTopGradientId() {
     update();
 }
 
-void DisplayedGradientsWidget::setNumberGradients(const int &n) {
+void DisplayedGradientsWidget::setNumberGradients(const int n) {
     setFixedHeight(n*MIN_WIDGET_HEIGHT);
 }
 

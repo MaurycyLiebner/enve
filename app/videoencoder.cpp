@@ -36,7 +36,7 @@ void VideoEncoder::addContainer(const stdsptr<Samples>& cont) {
 }
 
 static AVFrame *allocPicture(enum AVPixelFormat pix_fmt,
-                             const int& width, const int& height) {
+                             const int width, const int height) {
     AVFrame * const picture = av_frame_alloc();
     if(!picture) RuntimeThrow("Could not allocate frame");
 
@@ -289,8 +289,8 @@ static void addAudioStream(OutputStream * const ost,
 
 static AVFrame *allocAudioFrame(enum AVSampleFormat sample_fmt,
                                 const uint64_t&  channel_layout,
-                                const int& sample_rate,
-                                const int& nb_samples) {
+                                const int sample_rate,
+                                const int nb_samples) {
     AVFrame * const frame = av_frame_alloc();
 
     if(!frame) RuntimeThrow("Error allocating an audio frame");

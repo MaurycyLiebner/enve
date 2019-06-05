@@ -27,7 +27,7 @@ void BoxPathPoint::finishTransform() {
 }
 
 void BoxPathPoint::drawSk(SkCanvas * const canvas, const CanvasMode &mode,
-                          const SkScalar &invScale, const bool &keyOnCurrent) {
+                          const SkScalar invScale, const bool keyOnCurrent) {
     Q_UNUSED(mode);
     Q_UNUSED(keyOnCurrent);
     const SkPoint absPos = toSkPoint(getAbsolutePos());

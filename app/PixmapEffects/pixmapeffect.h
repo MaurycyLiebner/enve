@@ -10,7 +10,7 @@ class BoundingBoxRenderData;
 
 struct PixmapEffectRenderData : public StdSelfRef {
     virtual void applyEffectsSk(const SkBitmap &bitmap,
-                                const qreal &scale) = 0;
+                                const qreal scale) = 0;
     virtual ~PixmapEffectRenderData();
 };
 
@@ -42,9 +42,9 @@ class PixmapEffect : public ComplexAnimator {
 public:
     PixmapEffect(const QString& name, const PixmapEffectType &type);
     virtual stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, BoundingBoxRenderData * const data) = 0;
+            const qreal relFrame, BoundingBoxRenderData * const data) = 0;
     virtual qreal getMargin();
-    virtual qreal getMarginAtRelFrame(const int &);
+    virtual qreal getMarginAtRelFrame(const int );
 
     bool SWT_isPixmapEffect() const;
 
@@ -74,9 +74,9 @@ public:
 
     void switchVisible();
 
-    void setVisible(const bool &visible);
+    void setVisible(const bool visible);
 
-    const bool &isVisible() const;
+    bool isVisible() const;
 public slots:
     void interrupt();
 protected:

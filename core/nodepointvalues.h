@@ -7,7 +7,7 @@ struct NodePointValues {
     QPointF fP1;
     QPointF fC2;
 
-    NodePointValues &operator/=(const qreal &val) {
+    NodePointValues &operator/=(const qreal val) {
         qreal inv = 1/val;
         fC0 *= inv;
         fP1 *= inv;
@@ -15,7 +15,7 @@ struct NodePointValues {
         return *this;
     }
 
-    NodePointValues &operator*=(const qreal &val) {
+    NodePointValues &operator*=(const qreal val) {
         fC0 *= val;
         fP1 *= val;
         fC2 *= val;
@@ -39,8 +39,8 @@ struct NodePointValues {
 
 NodePointValues operator+(const NodePointValues &ppv1, const NodePointValues &ppv2);
 NodePointValues operator-(const NodePointValues &ppv1, const NodePointValues &ppv2);
-NodePointValues operator/(const NodePointValues &ppv, const qreal &val);
-NodePointValues operator*(const NodePointValues &ppv, const qreal &val);
-NodePointValues operator*(const qreal &val, const NodePointValues &ppv);
+NodePointValues operator/(const NodePointValues &ppv, const qreal val);
+NodePointValues operator*(const NodePointValues &ppv, const qreal val);
+NodePointValues operator*(const qreal val, const NodePointValues &ppv);
 
 #endif // NODEPOINTVALUES_H

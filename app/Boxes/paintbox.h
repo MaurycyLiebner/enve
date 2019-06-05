@@ -30,7 +30,7 @@ protected:
     PaintBox();
 public:
     bool SWT_isPaintBox() const { return true; }
-    void setupRenderData(const qreal &relFrame,
+    void setupRenderData(const qreal relFrame,
                          BoundingBoxRenderData * const data);
     stdsptr<BoundingBoxRenderData> createRenderData();
 

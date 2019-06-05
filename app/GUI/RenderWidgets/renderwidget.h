@@ -21,7 +21,7 @@ public:
 
     void createNewRenderInstanceWidgetForCanvas(Canvas *canvas);
     void removeRenderInstanceWidget(RenderInstanceWidget *wid);
-    void setRenderedFrame(const int &frame);
+    void setRenderedFrame(const int frame);
 private:
     QVBoxLayout *mMainLayout;
     QProgressBar *mRenderProgressBar;

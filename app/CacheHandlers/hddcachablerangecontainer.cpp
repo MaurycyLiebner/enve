@@ -14,20 +14,20 @@ int HDDCachableRangeContainer::getRangeMax() const {
     return mRange.fMax;
 }
 
-bool HDDCachableRangeContainer::inRange(const int &unary) const {
+bool HDDCachableRangeContainer::inRange(const int unary) const {
     return mRange.inRange(unary);
 }
 
-void HDDCachableRangeContainer::setUnaryRange(const int &unary) {
+void HDDCachableRangeContainer::setUnaryRange(const int unary) {
     mRange.fMin = unary;
     mRange.fMax = unary;
 }
 
-void HDDCachableRangeContainer::setRangeMax(const int &max) {
+void HDDCachableRangeContainer::setRangeMax(const int max) {
     mRange.fMax = max;
 }
 
-void HDDCachableRangeContainer::setRangeMin(const int &min) {
+void HDDCachableRangeContainer::setRangeMin(const int min) {
     mRange.fMin = min;
 }
 

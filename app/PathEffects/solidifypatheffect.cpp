@@ -2,7 +2,7 @@
 #include "pathoperations.h"
 #include "Boxes/pathbox.h"
 
-SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
+SolidifyPathEffect::SolidifyPathEffect(const bool outlinePathEffect) :
     PathEffect("solidify effect", SOLIDIFY_PATH_EFFECT, outlinePathEffect) {
     mDisplacement = SPtrCreate(QrealAnimator)("displacement");
     mDisplacement->setValueRange(-999.999, 999.999);
@@ -13,7 +13,7 @@ SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
     setPropertyForGUI(mDisplacement.get());
 }
 
-void SolidifyPathEffect::apply(const qreal &relFrame,
+void SolidifyPathEffect::apply(const qreal relFrame,
                                const SkPath &src,
                                SkPath * const dst) {
     const qreal widthT = mDisplacement->getEffectiveValue(relFrame);

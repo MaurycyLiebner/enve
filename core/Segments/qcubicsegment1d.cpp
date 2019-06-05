@@ -2,7 +2,7 @@
 #include "simplemath.h"
 #include "qcubicsegment2d.h"
 
-qreal qCubicSegment1D::valAtT(const qreal &t) const {
+qreal qCubicSegment1D::valAtT(const qreal t) const {
     return qPow(1 - t, 3)*p0() +
             3*qPow(1 - t, 2)*t*c1() +
             3*(1 - t)*t*t*c2() +
@@ -14,7 +14,7 @@ qreal qCubicSegment1D::length() {
     return fLength;
 }
 
-qreal qCubicSegment1D::tAtLength(const qreal &len) {
+qreal qCubicSegment1D::tAtLength(const qreal len) {
     if(isZero6Dec(len) || len < 0) return 0;
     const qreal totLen = length();
     if(isZero6Dec(len - totLen) || len > totLen) return 1;
@@ -71,31 +71,31 @@ qCubicSegment1D qCubicSegment1D::tFragment(qreal minT, qreal maxT) {
     return div1.dividedAtT(mappedMaxT).first;
 }
 
-const qreal &qCubicSegment1D::p0() const { return mP0; }
+qreal qCubicSegment1D::p0() const { return mP0; }
 
-const qreal &qCubicSegment1D::c1() const { return mC1; }
+qreal qCubicSegment1D::c1() const { return mC1; }
 
-const qreal &qCubicSegment1D::c2() const { return mC2; }
+qreal qCubicSegment1D::c2() const { return mC2; }
 
-const qreal &qCubicSegment1D::p1() const { return mP1; }
+qreal qCubicSegment1D::p1() const { return mP1; }
 
-void qCubicSegment1D::setP0(const qreal &p0) { mP0 = p0; }
+void qCubicSegment1D::setP0(const qreal p0) { mP0 = p0; }
 
-void qCubicSegment1D::setC1(const qreal &c1) { mC1 = c1; }
+void qCubicSegment1D::setC1(const qreal c1) { mC1 = c1; }
 
-void qCubicSegment1D::setC2(const qreal &c2) { mC2 = c2; }
+void qCubicSegment1D::setC2(const qreal c2) { mC2 = c2; }
 
-void qCubicSegment1D::setP1(const qreal &p1) { mP1 = p1; }
+void qCubicSegment1D::setP1(const qreal p1) { mP1 = p1; }
 
-qreal qCubicSegment1D::minDistanceTo(const qreal &p,
+qreal qCubicSegment1D::minDistanceTo(const qreal p,
                                      qreal * const pBestT,
                                      qreal * const pBestPos) {
     return minDistanceTo(p, 0, 1, pBestT, pBestPos);
 }
 
-qreal qCubicSegment1D::minDistanceTo(const qreal &p,
-                                     const qreal &minT,
-                                     const qreal &maxT,
+qreal qCubicSegment1D::minDistanceTo(const qreal p,
+                                     const qreal minT,
+                                     const qreal maxT,
                                      qreal * const pBestT,
                                      qreal * const pBestPos) {
     qreal maxLen = lengthAtT(maxT);
@@ -248,10 +248,10 @@ qreal qCubicSegment1D::tWithSmallestValue() const {
 //    return sols;
 //}
 
-qreal qCubicSegment1D::tAtLength(const qreal &length,
-                                 const qreal &maxLenErr,
-                                 const qreal &minT,
-                                 const qreal &maxT) {
+qreal qCubicSegment1D::tAtLength(const qreal length,
+                                 const qreal maxLenErr,
+                                 const qreal minT,
+                                 const qreal maxT) {
     const qreal guessT = (maxT + minT)*0.5;
     const qreal lenAtGuess = lengthAtT(guessT);
     if(abs(lenAtGuess - length) < maxLenErr) return guessT;

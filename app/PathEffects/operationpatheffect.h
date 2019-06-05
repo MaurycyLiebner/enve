@@ -7,9 +7,9 @@ class BoxTargetProperty;
 class OperationPathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    OperationPathEffect(const bool &outlinePathEffect);
+    OperationPathEffect(const bool outlinePathEffect);
 public:
-    void apply(const qreal &relFrame,
+    void apply(const qreal relFrame,
                const SkPath &src,
                SkPath * const dst);
 

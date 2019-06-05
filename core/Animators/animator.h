@@ -29,48 +29,48 @@ public:
         USER_CHANGE
     };
 
-    virtual void anim_addKeyAtRelFrame(const int &relFrame) = 0;
+    virtual void anim_addKeyAtRelFrame(const int relFrame) = 0;
     virtual void anim_saveCurrentValueAsKey() = 0;
     virtual stdsptr<Key> readKey(QIODevice *target) = 0;
 
-    virtual void anim_scaleTime(const int &pivotAbsFrame,
-                                const qreal &scale);
+    virtual void anim_scaleTime(const int pivotAbsFrame,
+                                const qreal scale);
 
-    virtual bool anim_prevRelFrameWithKey(const int &relFrame,
+    virtual bool anim_prevRelFrameWithKey(const int relFrame,
                                           int &prevRelFrame);
-    virtual bool anim_nextRelFrameWithKey(const int &relFrame,
+    virtual bool anim_nextRelFrameWithKey(const int relFrame,
                                           int &nextRelFrame);
-    virtual Key *anim_getKeyAtPos(const qreal &relX,
-                                 const int &minViewedFrame,
-                                 const qreal &pixelsPerFrame,
-                                 const int &keyRectSize);
-    virtual void anim_setAbsFrame(const int &frame);
+    virtual Key *anim_getKeyAtPos(const qreal relX,
+                                 const int minViewedFrame,
+                                 const qreal pixelsPerFrame,
+                                 const int keyRectSize);
+    virtual void anim_setAbsFrame(const int frame);
     virtual bool anim_isDescendantRecording() const;
 
     virtual DurationRectangleMovable *anim_getTimelineMovable(
-                                           const int &relX,
-                                           const int &minViewedFrame,
-                                           const qreal &pixelsPerFrame);
+                                           const int relX,
+                                           const int minViewedFrame,
+                                           const qreal pixelsPerFrame);
     virtual void anim_removeAllKeys();
     virtual void anim_getKeysInRect(const QRectF &selectionRect,
-                                    const qreal &pixelsPerFrame,
+                                    const qreal pixelsPerFrame,
                                     QList<Key*>& keysList,
-                                    const int &keyRectSize);
+                                    const int keyRectSize);
     virtual void anim_updateAfterShifted();
-    virtual void anim_setRecording(const bool &rec);
+    virtual void anim_setRecording(const bool rec);
 
     bool SWT_isAnimator() const { return true; }
 
     void drawTimelineControls(QPainter * const p,
-                              const qreal &pixelsPerFrame,
+                              const qreal pixelsPerFrame,
                               const FrameRange &absFrameRange,
-                              const int &rowHeight);
+                              const int rowHeight);
 
     void addActionsToMenu(PropertyTypeMenu * const menu);
 
     void prp_startDragging();
     void prp_afterChangedAbsRange(const FrameRange &range);
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 public:
     void anim_appendKey(const stdsptr<Key> &newKey);
     void anim_removeKey(const stdsptr<Key>& keyToRemove);
@@ -84,27 +84,27 @@ public:
     void anim_updateRelFrame();
     void anim_switchRecording();
 
-    bool anim_getClosestsKeyOccupiedRelFrame(const int &frame,
+    bool anim_getClosestsKeyOccupiedRelFrame(const int frame,
                                              int &closest);
     template <class T = Key>
     T* anim_getKeyOnCurrentFrame() const;
     template <class T = Key>
-    T *anim_getKeyAtRelFrame(const int &frame) const;
+    T *anim_getKeyAtRelFrame(const int frame) const;
     template <class T = Key>
-    T *anim_getKeyAtAbsFrame(const int &frame) const;
+    T *anim_getKeyAtAbsFrame(const int frame) const;
     template <class T = Key>
     T *anim_getNextKey(const Key * const key) const;
     template <class T = Key>
     T *anim_getPrevKey(const Key * const key) const;
     template <class T = Key>
-    std::pair<T*, T*> anim_getPrevAndNextKey(const int &relFrame) const;
+    std::pair<T*, T*> anim_getPrevAndNextKey(const int relFrame) const;
     template <class T = Key>
-    T* anim_getPrevKey(const int &relFrame) const;
+    T* anim_getPrevKey(const int relFrame) const;
     template <class T = Key>
-    T* anim_getNextKey(const int &relFrame) const;
+    T* anim_getNextKey(const int relFrame) const;
 
-    int anim_getPrevKeyId(const int &relFrame) const;
-    int anim_getNextKeyId(const int &relFrame) const;
+    int anim_getPrevKeyId(const int relFrame) const;
+    int anim_getNextKeyId(const int relFrame) const;
 
     int anim_getNextKeyRelFrame(const Key * const key) const;
     int anim_getPrevKeyRelFrame(const Key * const key) const;
@@ -116,18 +116,18 @@ public:
 
     void anim_addAllKeysToComplexAnimator(ComplexAnimator *target);
 
-    void anim_setRecordingWithoutChangingKeys(const bool &rec);
+    void anim_setRecordingWithoutChangingKeys(const bool rec);
 
-    std::pair<int, int> anim_getPrevAndNextKeyId(const int &relFrame) const;
-    std::pair<int, int> anim_getPrevAndNextKeyIdF(const qreal &relFrame) const;
+    std::pair<int, int> anim_getPrevAndNextKeyId(const int relFrame) const;
+    std::pair<int, int> anim_getPrevAndNextKeyIdF(const qreal relFrame) const;
 
-    void anim_setRecordingValue(const bool &rec);
+    void anim_setRecordingValue(const bool rec);
 
     int anim_getCurrentRelFrame() const;
     int anim_getCurrentAbsFrame() const;
 
-    void anim_moveKeyToRelFrame(Key * const key, const int &newFrame);
-    void anim_shiftAllKeys(const int &shift);
+    void anim_moveKeyToRelFrame(Key * const key, const int newFrame);
+    void anim_shiftAllKeys(const int shift);
 
     bool hasFakeComplexAnimator();
 
@@ -137,8 +137,8 @@ public:
 
     void disableFakeComplexAnimator();
     void disableFakeComplexAnimatrIfNotNeeded();
-    int anim_getPrevKeyRelFrame(const int &relFrame) const;
-    int anim_getNextKeyRelFrame(const int &relFrame) const;
+    int anim_getPrevKeyRelFrame(const int relFrame) const;
+    int anim_getNextKeyRelFrame(const int relFrame) const;
     bool hasSelectedKeys() const;
 
     void addKeyToSelected(Key * const key);
@@ -149,10 +149,10 @@ public:
     void deselectAllKeys();
     void selectAllKeys();
 
-    void incSelectedKeysFrame(const int& dFrame);
+    void incSelectedKeysFrame(const int dFrame);
 
-    void scaleSelectedKeysFrame(const int& absPivotFrame,
-                                const qreal& scale);
+    void scaleSelectedKeysFrame(const int absPivotFrame,
+                                const qreal scale);
 
     void cancelSelectedKeysTransform();
     void finishSelectedKeysTransform();
@@ -166,10 +166,10 @@ public:
     const QList<stdptr<Key>>& getSelectedKeys() const {
         return anim_mSelectedKeys;
     }
-    int getInsertIdForKeyRelFrame(const int &relFrame) const;
+    int getInsertIdForKeyRelFrame(const int relFrame) const;
 
     template <class T = Key>
-    T* anim_getKeyAtIndex(const int& id) const;
+    T* anim_getKeyAtIndex(const int id) const;
     int anim_getKeyIndex(const Key * const key) const;
 
     void anim_coordinateKeysWith(Animator * const other);
@@ -231,7 +231,7 @@ private:
 
         class iterator {
         public:
-            iterator(const int& id,
+            iterator(const int id,
                     const QList<OverlappingKeys> * const list) :
                 mList(list) {
                 setId(id);
@@ -251,7 +251,7 @@ private:
         protected:
             int mId;
         private:
-            void setId(const int& id) {
+            void setId(const int id) {
                 mId = id;
                 if(mId < 0 || mId >= mList->count()) mKey = nullptr;
                 else mKey = mList->at(mId).getKey();
@@ -299,13 +299,13 @@ private:
             }
         }
 
-//        void removeAt(const int& id) {
+//        void removeAt(const int id) {
 //            if(id < 0) return;
 //            if(id >= mList.count()) return;
 //            return mList.removeAt(id);
 //        }
 
-//        void removeAtRelFrame(const int& relFrame) {
+//        void removeAtRelFrame(const int relFrame) {
 //            const int id = getIdForRelFrame(relFrame);
 //            const auto kAtId = atId(id);
 //            if(!kAtId) return;
@@ -314,14 +314,14 @@ private:
 //        }
 
         template <class T = Key>
-        T * atId(const int& id) const {
+        T * atId(const int id) const {
             if(id < 0) return nullptr;
             if(id >= mList.count()) return nullptr;
             return static_cast<T*>(mList.at(id).getKey());
         }
 
         template <class T = Key>
-        T * atRelFrame(const int& relFrame) const {
+        T * atRelFrame(const int relFrame) const {
             const int id = idForRelFrame(relFrame);
             const auto kAtId = atId<T>(id);
             if(!kAtId) return nullptr;
@@ -339,7 +339,7 @@ private:
             return atId<T>(mList.count() - 1);
         }
 
-        int idForRelFrame(const int& relFrame) const {
+        int idForRelFrame(const int relFrame) const {
             return idForRelFrame(relFrame, 0, mList.count());
         }
 
@@ -350,8 +350,8 @@ private:
             }
         }
     private:
-        int idForRelFrame(const int& relFrame,
-                          const int& min, const int& max) const {
+        int idForRelFrame(const int relFrame,
+                          const int min, const int max) const {
             if(min >= max) return min;
             const int guess = (max + min)/2;
             const Key * const key = mList.at(guess).getKey();
@@ -385,9 +385,9 @@ protected:
     qsptr<FakeComplexAnimator> mFakeComplexAnimator;
 private:
     void anim_drawKey(QPainter * const p, Key * const key,
-                      const qreal &pixelsPerFrame,
-                      const int &startFrame,
-                      const int& rowHeight);
+                      const qreal pixelsPerFrame,
+                      const int startFrame,
+                      const int rowHeight);
 
     bool anim_mIsRecording = false;
 
@@ -399,8 +399,8 @@ private:
     void removeKeyWithoutDeselecting(const stdsptr<Key> &keyToRemove);
     void anim_updateKeyOnCurrrentFrame();
     void anim_setKeyOnCurrentFrame(Key * const key);
-    int getInsertIdForKeyRelFrame(const int &relFrame,
-                                  const int &min, const int &max) const;
+    int getInsertIdForKeyRelFrame(const int relFrame,
+                                  const int min, const int max) const;
     stdptr<Key> anim_mKeyOnCurrentFrame;
 };
 
@@ -411,13 +411,13 @@ T *Animator::anim_getKeyOnCurrentFrame() const {
 }
 
 template <class T>
-T* Animator::anim_getKeyAtIndex(const int& id) const {
+T* Animator::anim_getKeyAtIndex(const int id) const {
     if(id < 0 || id >= anim_mKeys.count()) return nullptr;
     return anim_mKeys.atId<T>(id);
 }
 
 template <class T>
-T *Animator::anim_getKeyAtRelFrame(const int &frame) const {
+T *Animator::anim_getKeyAtRelFrame(const int frame) const {
     if(anim_mKeys.isEmpty()) return nullptr;
     if(frame > anim_mKeys.last()->getRelFrame()) return nullptr;
     if(frame < anim_mKeys.first()->getRelFrame()) return nullptr;
@@ -439,7 +439,7 @@ T *Animator::anim_getKeyAtRelFrame(const int &frame) const {
 }
 
 template <class T>
-T *Animator::anim_getKeyAtAbsFrame(const int &frame) const {
+T *Animator::anim_getKeyAtAbsFrame(const int frame) const {
     return anim_getKeyAtRelFrame<T>(prp_absFrameToRelFrame(frame));
 }
 
@@ -458,7 +458,7 @@ T* Animator::anim_getNextKey(const Key * const key) const {
 }
 
 template <class T>
-std::pair<T*, T*> Animator::anim_getPrevAndNextKey(const int &relFrame) const {
+std::pair<T*, T*> Animator::anim_getPrevAndNextKey(const int relFrame) const {
     const auto prevNext = anim_getPrevAndNextKeyId(relFrame);
     const int prevId = prevNext.first;
     T * const prevKey = anim_getKeyAtIndex<T>(prevId);
@@ -468,12 +468,12 @@ std::pair<T*, T*> Animator::anim_getPrevAndNextKey(const int &relFrame) const {
 }
 
 template <class T>
-T *Animator::anim_getPrevKey(const int &relFrame) const {
+T *Animator::anim_getPrevKey(const int relFrame) const {
     return anim_getKeyAtIndex<T>(anim_getPrevKeyId(relFrame));
 }
 
 template <class T>
-T *Animator::anim_getNextKey(const int &relFrame) const {
+T *Animator::anim_getNextKey(const int relFrame) const {
     return anim_getKeyAtIndex<T>(anim_getNextKeyId(relFrame));
 }
 

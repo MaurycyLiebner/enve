@@ -57,7 +57,7 @@ QColor PaintSettingsAnimator::getCurrentColor() const {
     return mColor->getCurrentColor();
 }
 
-QColor PaintSettingsAnimator::getColorAtRelFrame(const qreal &relFrame) const {
+QColor PaintSettingsAnimator::getColorAtRelFrame(const qreal relFrame) const {
     return mColor->getColorAtRelFrame(relFrame);
 }
 
@@ -139,7 +139,7 @@ void OutlineSettingsAnimator::showHideChildrenBeforeChaningPaintType(
     if(newPaintType == BRUSHPAINT) ca_addChildAnimator(mBrushSettings);
 }
 
-void OutlineSettingsAnimator::setCurrentStrokeWidth(const qreal &newWidth) {
+void OutlineSettingsAnimator::setCurrentStrokeWidth(const qreal newWidth) {
     mLineWidth->setCurrentBaseValue(newWidth);
 }
 
@@ -166,7 +166,7 @@ void OutlineSettingsAnimator::setStrokerSettingsSk(SkStroke * const stroker) {
 }
 
 void OutlineSettingsAnimator::setStrokerSettingsForRelFrameSk(
-        const qreal &relFrame, SkStroke * const stroker) {
+        const qreal relFrame, SkStroke * const stroker) {
     const qreal widthT = mLineWidth->getEffectiveValue(relFrame);
     stroker->setWidth(toSkScalar(widthT));
     stroker->setCap(QCapToSkCap(mCapStyle));
@@ -269,7 +269,7 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
     }
 }
 
-UpdateStrokeSettings::UpdateStrokeSettings(const qreal &width,
+UpdateStrokeSettings::UpdateStrokeSettings(const qreal width,
                    const QColor &paintColorT,
                    const PaintType &paintTypeT,
                    const QPainter::CompositionMode &outlineCompositionModeT) :

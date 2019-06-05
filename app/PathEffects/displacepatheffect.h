@@ -7,9 +7,9 @@ class BoolPropertyContainer;
 class DisplacePathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    DisplacePathEffect(const bool &outlinePathEffect);
+    DisplacePathEffect(const bool outlinePathEffect);
 public:
-    void apply(const qreal &relFrame, const SkPath &src,
+    void apply(const qreal relFrame, const SkPath &src,
                SkPath * const dst);
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);

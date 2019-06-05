@@ -6,7 +6,7 @@ InterpolationAnimator::InterpolationAnimator(const QString &name) :
     GraphAnimator(name) {}
 
 qreal InterpolationAnimator::getInterpolatedFrameAtRelFrame(
-        const qreal &frame) const {
+        const qreal frame) const {
     if(anim_mKeys.isEmpty()) return frame;
     const auto pn = anim_getPrevAndNextKeyIdF(frame);
     const int prevId = pn.first;

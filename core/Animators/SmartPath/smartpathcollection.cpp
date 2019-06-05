@@ -24,7 +24,7 @@ void SmartPathCollection::removePath(const qsptr<SmartPathAnimator> &path) {
     emit pathRemoved(path.get());
 }
 
-SkPath SmartPathCollection::getPathAtRelFrame(const qreal &relFrame) const {
+SkPath SmartPathCollection::getPathAtRelFrame(const qreal relFrame) const {
     SkPath result;
     for(const auto& child : ca_mChildAnimators) {
         const auto path = GetAsPtr(child, SmartPathAnimator);

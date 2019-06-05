@@ -7,7 +7,7 @@ struct ReplaceColorEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;
 
     void applyEffectsSk(const SkBitmap &bitmap,
-                        const qreal &scale);
+                        const qreal scale);
 
     int redR;
     int greenR;
@@ -29,7 +29,7 @@ public:
     qreal getMargin() { return 0.; }
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, BoundingBoxRenderData*);
+            const qreal relFrame, BoundingBoxRenderData*);
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice * const target) const;
 protected:

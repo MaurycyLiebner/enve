@@ -21,36 +21,36 @@ public:
 
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      const UpdateFuncs &updateFuncs,
-                                     const int& visiblePartWidgetId);
+                                     const int visiblePartWidgetId);
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
-                             const bool &parentSatisfies,
-                             const bool &parentMainTarget) const;
+                             const bool parentSatisfies,
+                             const bool parentMainTarget) const;
 
     bool SWT_isComplexAnimator() const;
 
-    void SWT_setChildrenAncestorDisabled(const bool &bT) {
+    void SWT_setChildrenAncestorDisabled(const bool bT) {
         for(const auto& prop : ca_mChildAnimators) {
             prop->SWT_setAncestorDisabled(bT);
         }
     }
 
     void prp_startTransform();
-    void anim_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int frame);
 
     void prp_finishTransform();
     void prp_cancelTransform();
-    void prp_setTransformed(const bool &bT);
+    void prp_setTransformed(const bool bT);
     QString prp_getValueText();
 
     void prp_afterFrameShiftChanged();
 
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
     void anim_saveCurrentValueAsKey();
     bool anim_isDescendantRecording() const;
     virtual void ca_removeAllChildAnimators();
 
-    void anim_addKeyAtRelFrame(const int& relFrame) {
+    void anim_addKeyAtRelFrame(const int relFrame) {
         for(const auto &property : ca_mChildAnimators) {
             if(property->SWT_isAnimator()) {
                 GetAsPtr(property, Animator)->anim_addKeyAtRelFrame(relFrame);
@@ -58,14 +58,14 @@ public:
         }
     }
 
-    void anim_setRecording(const bool &rec);
+    void anim_setRecording(const bool rec);
     virtual void ca_childAnimatorIsRecordingChanged();
 public:
     void ca_addChildAnimator(const qsptr<Property> &childAnimator) {
         ca_addChildAnimator(childAnimator, ca_getNumberOfChildren());
     }
     void ca_addChildAnimator(const qsptr<Property> &childAnimator,
-                             const int &id);
+                             const int id);
     void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
     template <class T>
     qsptr<T> ca_takeChildAnimator(Property * const prop) {
@@ -75,26 +75,26 @@ public:
     }
     void ca_swapChildAnimators(Property * const animator1,
                                Property * const animator2);
-    void ca_moveChildInList(Property *child, const int &to);
-    void ca_moveChildInList(Property *child, const int &from, const int &to);
+    void ca_moveChildInList(Property *child, const int to);
+    void ca_moveChildInList(Property *child, const int from, const int to);
     void ca_moveChildBelow(Property *move, Property *below);
     void ca_moveChildAbove(Property *move, Property *above);    
 
     bool hasChildAnimators() const;
 
 
-    void ca_changeChildAnimatorZ(const int &oldIndex, const int &newIndex);
+    void ca_changeChildAnimatorZ(const int oldIndex, const int newIndex);
     int ca_getNumberOfChildren() const;
 
     template <typename T = Property>
-    T *ca_getChildAt(const int &i) const {
+    T *ca_getChildAt(const int i) const {
         if(i < 0 || i >= ca_getNumberOfChildren())
             RuntimeThrow("Index outside of range");
         return static_cast<T*>(ca_mChildAnimators.at(i).data());
     }
 
     template <typename T = Property>
-    qsptr<T> ca_takeChildAt(const int &i) {
+    qsptr<T> ca_takeChildAt(const int i) {
         if(i < 0 || i >= ca_getNumberOfChildren())
             RuntimeThrow("Index outside of range");
         return GetAsSPtrTemplated(ca_mChildAnimators.takeAt(i), T);
@@ -157,7 +157,7 @@ public:
 
     bool isEmpty() const;
 
-//    void setRelFrame(const int &frame);
+//    void setRelFrame(const int frame);
 
     void moveAllKeysTo(ComplexKey * const target);
     bool hasKey(Key *key) const;
@@ -165,7 +165,7 @@ public:
     int getChildKeysCount() const;
     bool hasSameKey(Key *otherKey) const;
 protected:
-    ComplexKey(const int& absFrame,
+    ComplexKey(const int absFrame,
                ComplexAnimator * const parentAnimator);
 private:
     QList<stdptr<Key>> mKeys;

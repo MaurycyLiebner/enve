@@ -8,14 +8,14 @@
 class QDoubleSlider : public QWidget {
     Q_OBJECT
 public:
-    QDoubleSlider(const qreal& minVal,
-                  const qreal& maxVal,
-                  const qreal& prefferedStep,
+    QDoubleSlider(const qreal minVal,
+                  const qreal maxVal,
+                  const qreal prefferedStep,
                   QWidget * const parent = nullptr);
     QDoubleSlider(const QString& name,
-                  const qreal& minVal,
-                  const qreal& maxVal,
-                  const qreal& prefferedStep,
+                  const qreal minVal,
+                  const qreal maxVal,
+                  const qreal prefferedStep,
                   QWidget * const parent = nullptr);
     QDoubleSlider(QWidget *parent = nullptr);
     virtual ~QDoubleSlider();
@@ -27,7 +27,7 @@ public:
     void setName(QString name);
     void setNumberDecimals(int decimals);
 
-    void setValueNoUpdate(const qreal &value);
+    void setValueNoUpdate(const qreal value);
     void updateLineEditFromValue();
     void fitWidthToContent();
     QString getValueString();
@@ -39,9 +39,9 @@ public:
                const QColor &sliderFill,
                const QColor &stroke,
                const QColor &text);
-    void paint(QPainter * const p, const bool &enabled);
+    void paint(QPainter * const p, const bool enabled);
 
-    void setPrefferedValueStep(const qreal &step);
+    void setPrefferedValueStep(const qreal step);
 
     qreal maximum();
     qreal minimum();
@@ -53,12 +53,12 @@ public:
         Q_UNUSED(globalPos);
     }
 
-    void setNeighbouringSliderToTheLeft(const bool &bT) {
+    void setNeighbouringSliderToTheLeft(const bool bT) {
         mLeftNeighbour = bT;
         update();
     }
 
-    void setNeighbouringSliderToTheRight(const bool &bT) {
+    void setNeighbouringSliderToTheRight(const bool bT) {
         mRightNeighbour = bT;
         update();
     }

@@ -12,7 +12,7 @@ public:
     bool SWT_isBoolProperty() const { return true; }
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
-    void setValue(const bool &value);
+    void setValue(const bool value);
 private:
     bool mValue = false;
 };
@@ -27,7 +27,7 @@ public:
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
-    void setValue(const bool &value);
+    void setValue(const bool value);
     bool getValue();
 private:
     bool mValue = false;

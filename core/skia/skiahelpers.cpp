@@ -19,8 +19,8 @@ SkBitmap SkiaHelpers::makeCopy(const SkBitmap& btmp) {
 void SkiaHelpers::drawImageGPU(
         SkCanvas* const canvas,
         const sk_sp<SkImage>& image,
-        const SkScalar& x,
-        const SkScalar& y,
+        const SkScalar x,
+        const SkScalar y,
         SkPaint * const paint,
         GrContext* const context) {
     if(!image || !context) return;
@@ -28,8 +28,8 @@ void SkiaHelpers::drawImageGPU(
     canvas->drawImage(texture, x, y, paint);
 };
 
-SkImageInfo SkiaHelpers::getPremulBGRAInfo(const int &width,
-                                           const int &height) {
+SkImageInfo SkiaHelpers::getPremulBGRAInfo(const int width,
+                                           const int height) {
     return SkImageInfo::Make(width, height,
                              kBGRA_8888_SkColorType,
                              kPremul_SkAlphaType,
@@ -39,7 +39,7 @@ SkImageInfo SkiaHelpers::getPremulBGRAInfo(const int &width,
 void SkiaHelpers::saveImage(const QString &fileName,
                             const sk_sp<SkImage> &img,
                             const SkEncodedImageFormat &format,
-                            const int &quality) {
+                            const int quality) {
 
     const auto data = img->encodeToData(format, quality);
     QFile file(fileName);
@@ -96,22 +96,22 @@ sk_sp<SkImage> SkiaHelpers::readImg(QIODevice * const file) {
 
 void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
                                      const SkPath &path,
-                                     const SkScalar &invScale) {
+                                     const SkScalar invScale) {
     drawOutlineOverlay(canvas, path, invScale, false, 0);
 }
 
 void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
                                      const SkPath &path,
-                                     const SkScalar &invScale,
+                                     const SkScalar invScale,
                                      const SkMatrix& transform) {
     drawOutlineOverlay(canvas, path, invScale, transform, false, 0);
 }
 
 void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
                                      const SkPath &path,
-                                     const SkScalar &invScale,
-                                     const bool &dashes,
-                                     const SkScalar& intervalSize) {
+                                     const SkScalar invScale,
+                                     const bool dashes,
+                                     const SkScalar intervalSize) {
     SkPaint paint;
     if(dashes) {
         const SkScalar intervals[2] = {intervalSize*invScale,
@@ -130,10 +130,10 @@ void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
 
 void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
                                      const SkPath &path,
-                                     const SkScalar &invScale,
+                                     const SkScalar invScale,
                                      const SkMatrix& transform,
-                                     const bool &dashes,
-                                     const SkScalar &intervalSize) {
+                                     const bool dashes,
+                                     const SkScalar intervalSize) {
     SkPath mappedPath = path;
     mappedPath.transform(transform);
     drawOutlineOverlay(canvas, mappedPath, invScale,

@@ -17,15 +17,15 @@ protected:
 public:
     virtual void reset();
     virtual QMatrix getCurrentTransform();
-    virtual QMatrix getRelativeTransform(const qreal &relFrame);
-    virtual QMatrix getTotalTransformAtRelFrameF(const qreal &relFrame);
+    virtual QMatrix getRelativeTransform(const qreal relFrame);
+    virtual QMatrix getTotalTransformAtRelFrameF(const qreal relFrame);
 
     bool SWT_isBasicTransformAnimator() const;
 
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const {
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const {
         if(mParentTransform) {
             const auto thisIdent = ComplexAnimator::prp_getIdenticalRelRange(relFrame);
             const int absFrame = prp_relFrameToAbsFrame(relFrame);
@@ -40,9 +40,9 @@ public:
     void resetTranslation();
     void resetRotation();
 
-    void setScale(const qreal &sx, const qreal &sy);
-    void setPosition(const qreal &x, const qreal &y);
-    void setRotation(const qreal &rot);
+    void setScale(const qreal sx, const qreal sy);
+    void setPosition(const qreal x, const qreal y);
+    void setRotation(const qreal rot);
 
     void startRotTransform();
     void startPosTransform();
@@ -56,11 +56,11 @@ public:
     void moveToAbs(const QPointF &absPos);
     void moveByAbs(const QPointF &absTrans);
 
-    void rotateRelativeToSavedValue(const qreal &rotRel);
-    void translate(const qreal &dX, const qreal &dY);
-    void scale(const qreal &sx, const qreal &sy);
-    void moveRelativeToSavedValue(const qreal &dX,
-                                  const qreal &dY);
+    void rotateRelativeToSavedValue(const qreal rotRel);
+    void translate(const qreal dX, const qreal dY);
+    void scale(const qreal sx, const qreal sy);
+    void moveRelativeToSavedValue(const qreal dX,
+                                  const qreal dY);
 
     qreal dx();
     qreal dy();
@@ -77,10 +77,10 @@ public:
     SkPoint mapRelPosToAbs(const SkPoint &relPos) const;
     SkPoint mapFromParent(const SkPoint &parentRelPos) const;
 
-    void scaleRelativeToSavedValue(const qreal &sx,
-                                   const qreal &sy,
+    void scaleRelativeToSavedValue(const qreal sx,
+                                   const qreal sy,
                                    const QPointF &pivot);
-    void rotateRelativeToSavedValue(const qreal &rotRel,
+    void rotateRelativeToSavedValue(const qreal rotRel,
                                     const QPointF &pivot);
 
     void updateRelativeTransform(const UpdateReason &reason);
@@ -89,7 +89,7 @@ public:
 
     void setParentTransformAnimator(BasicTransformAnimator *parent);
 
-    QMatrix getParentTotalTransformAtRelFrame(const qreal &relFrame);
+    QMatrix getParentTotalTransformAtRelFrame(const qreal relFrame);
 
     QPointFAnimator *getPosAnimator();
     QPointFAnimator *getScaleAnimator();
@@ -118,7 +118,7 @@ protected:
 public:
     void reset();
     QMatrix getCurrentTransform();
-    QMatrix getRelativeTransform(const qreal &relFrame);
+    QMatrix getRelativeTransform(const qreal relFrame);
 
     bool SWT_isBoxTransformAnimator() const { return true; }
     void writeProperty(QIODevice * const target) const;
@@ -131,19 +131,19 @@ public:
     qreal getPivotX();
     qreal getPivotY();
 
-    void setShear(const qreal& shearX, const qreal& shearY);
+    void setShear(const qreal shearX, const qreal shearY);
 
     qreal getOpacity();
 
     void startOpacityTransform();
-    void setOpacity(const qreal &newOpacity);
+    void setOpacity(const qreal newOpacity);
 
     MovablePoint *getPivotMovablePoint();
     void startPivotTransform();
     void finishPivotTransform();
     QPointF getPivotAbs();
 
-    qreal getOpacity(const qreal &relFrame);
+    qreal getOpacity(const qreal relFrame);
 
     bool posOrPivotRecording() const;
     bool rotOrScaleOrPivotRecording() const;

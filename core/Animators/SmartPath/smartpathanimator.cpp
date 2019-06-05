@@ -42,8 +42,8 @@ void SmartPathAnimator::graph_getValueConstraints(
     }
 }
 
-void SmartPathAnimator::actionDisconnectNodes(const int &node1Id,
-                                              const int &node2Id) {
+void SmartPathAnimator::actionDisconnectNodes(const int node1Id,
+                                              const int node2Id) {
     for(const auto &key : anim_mKeys) {
         const auto spKey = GetAsPtr(key, SmartPathKey);
         auto& keyPath = spKey->getValue();

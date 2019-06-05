@@ -16,7 +16,7 @@ public:
         return bytes;
     }
 
-    void setBlocked(const bool &bT) {
+    void setBlocked(const bool bT) {
         if(bT == mBlocked) return;
         mBlocked = bT;
         if(mBlocked) removeFromMemoryManagment();

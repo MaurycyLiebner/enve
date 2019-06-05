@@ -19,8 +19,8 @@ public:
 
     void drawSk(SkCanvas * const canvas,
                 const CanvasMode &mode,
-                const SkScalar &invScale,
-                const bool &keyOnCurrent);
+                const SkScalar invScale,
+                const bool keyOnCurrent);
 };
 
 #endif // BOXPATHPOINT_H

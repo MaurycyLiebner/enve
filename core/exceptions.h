@@ -40,10 +40,10 @@ QDebug operator<<(QDebug out, const std::string& str);
 
 extern QString gAllTextFromException(const std::exception& e,
                                      QString allText = "",
-                                     const uint& level = 0);
+                                     const uint level = 0);
 extern void gPrintExceptionCritical(const std::exception& e);
 extern void gPrintExceptionFatal(const std::exception& e);
-extern void gPrintException(const bool &fatal, const QString& allText);
+extern void gPrintException(const bool fatal, const QString& allText);
 extern void gPrintExceptionCritical(const std::exception_ptr& eptr);
 extern void gPrintExceptionFatal(const std::exception_ptr& eptr);
 

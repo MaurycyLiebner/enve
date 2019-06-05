@@ -117,8 +117,8 @@ public:
     ~PathBox();
 
     virtual bool differenceInEditPathBetweenFrames(
-            const int& frame1, const int& frame2) const = 0;
-    virtual SkPath getPathAtRelFrameF(const qreal &relFrame) = 0;
+            const int frame1, const int frame2) const = 0;
+    virtual SkPath getPathAtRelFrameF(const qreal relFrame) = 0;
     void setParentGroup(ContainerBox * const parent);
 
     void writeBoundingBox(QIODevice * const target);
@@ -132,7 +132,7 @@ public:
 
     void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
     void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
-    void setStrokeWidth(const qreal &strokeWidth);
+    void setStrokeWidth(const qreal strokeWidth);
 
     void setStrokeBrush(SimpleBrushWrapper * const brush) {
         mStrokeSettings->setStrokeBrush(brush);
@@ -168,14 +168,14 @@ public:
     OutlineSettingsAnimator *getStrokeSettings() const;
     FillSettingsAnimator *getFillSettings() const;
 
-    QRectF getRelBoundingRect(const qreal &relFrame);
+    QRectF getRelBoundingRect(const qreal relFrame);
 
     SmartVectorPath *objectToVectorPathBox();
     SmartVectorPath *strokeToVectorPathBox();
 
     bool relPointInsidePath(const QPointF &relPos) const;
 
-    void drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale);
+    void drawHoveredSk(SkCanvas *canvas, const SkScalar invScale);
 
     void applyPaintSetting(const PaintSettingsApplier &setting);
 
@@ -184,7 +184,7 @@ public:
 
     bool SWT_isPathBox() const { return true; }
 
-    void setupRenderData(const qreal &relFrame,
+    void setupRenderData(const qreal relFrame,
                          BoundingBoxRenderData * const data);
     stdsptr<BoundingBoxRenderData> createRenderData() {
         return SPtrCreate(PathBoxRenderData)(this);
@@ -207,20 +207,20 @@ public:
     void updateFillDrawGradient();
     const SkPath &getRelativePath() const;
     void updateDrawGradients();
-    void setOutlineAffectedByScale(const bool &bT);
+    void setOutlineAffectedByScale(const bool bT);
 
     GradientPoints *getFillGradientPoints();
     GradientPoints *getStrokeGradientPoints();
 
-    SkPath getPathWithThisOnlyEffectsAtRelFrameF(const qreal &relFrame);
+    SkPath getPathWithThisOnlyEffectsAtRelFrameF(const qreal relFrame);
 
-    void setPathEffectsEnabled(const bool& enable);
+    void setPathEffectsEnabled(const bool enable);
     bool getPathEffectsEnabled() const;
 
-    void setFillEffectsEnabled(const bool& enable);
+    void setFillEffectsEnabled(const bool enable);
     bool getFillEffectsEnabled() const;
 
-    void setOutlineEffectsEnabled(const bool& enable);
+    void setOutlineEffectsEnabled(const bool enable);
     bool getOutlineEffectsEnabled() const;
 
     PathEffectAnimators *getPathEffectsAnimators() {
@@ -235,11 +235,11 @@ public:
     void copyPathBoxDataTo(PathBox * const targetBox);
 
     bool differenceInPathBetweenFrames(
-            const int& frame1, const int& frame2) const;
+            const int frame1, const int frame2) const;
     bool differenceInOutlinePathBetweenFrames(
-            const int& frame1, const int& frame2) const;
+            const int frame1, const int frame2) const;
     bool differenceInFillPathBetweenFrames(
-            const int& frame1, const int& frame2) const;
+            const int frame1, const int frame2) const;
     void setPathsOutdated() {
         mCurrentPathsOutdated = true;
     }

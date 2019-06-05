@@ -9,9 +9,9 @@ class ASKey : public Key {
     friend class StdSelfRef;
 protected:
     ASKey(AnimatedSurface * const parent);
-    ASKey(const int& frame, AnimatedSurface * const parent);
+    ASKey(const int frame, AnimatedSurface * const parent);
     ASKey(const DrawableAutoTiledSurface &value,
-          const int& frame, AnimatedSurface * const parent);
+          const int frame, AnimatedSurface * const parent);
 public:
     bool differsFromKey(Key * const key) const {
         return key != this;
@@ -154,7 +154,7 @@ public:
         anim_addKeyAtRelFrame(anim_getCurrentRelFrame());
     }
 
-    void anim_addKeyAtRelFrame(const int& relFrame) {
+    void anim_addKeyAtRelFrame(const int relFrame) {
         if(anim_getKeyAtRelFrame(relFrame)) return;
         const auto prevNextKey = anim_getPrevAndNextKey<ASKey>(relFrame);
         stdsptr<ASKey> newKey;

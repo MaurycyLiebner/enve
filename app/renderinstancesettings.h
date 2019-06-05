@@ -91,8 +91,8 @@ public:
     const QString &getOutputDestination() const;
     void setTargetCanvas(Canvas *canvas);
     Canvas *getTargetCanvas();
-    void setCurrentRenderFrame(const int &currentRenderFrame);
-    const int &currentRenderFrame();
+    void setCurrentRenderFrame(const int currentRenderFrame);
+    int currentRenderFrame();
     const OutputSettings &getOutputRenderSettings();
     void setOutputRenderSettings(const OutputSettings &settings);
     const RenderSettings &getRenderSettings();
@@ -101,7 +101,7 @@ public:
     void setCurrentState(const RenderState &state,
                          const QString &text = "");
     const QString &getRenderError() const;
-    const RenderState &getCurrentState() const;
+    RenderState getCurrentState() const;
     void copySettingsFromOutputSettingsProfile();
     void setOutputSettingsProfile(OutputSettingsProfile *profile);
     OutputSettingsProfile *getOutputSettingsProfile();

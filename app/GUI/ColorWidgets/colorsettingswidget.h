@@ -30,10 +30,10 @@ signals:
     void colorSettingSignal(const ColorSetting&);
     void colorModeChanged(const ColorMode&);
 public slots:
-    void setCurrentColor(const qreal &h_t,
-                         const qreal &s_t,
-                         const qreal &v_t,
-                         const qreal &a_t = 1.);
+    void setCurrentColor(const qreal h_t,
+                         const qreal s_t,
+                         const qreal v_t,
+                         const qreal a_t = 1.);
     void setColorAnimatorTarget(ColorAnimator *target);
     void emitColorChangedSignal();
     void emitEditingFinishedSignal();
@@ -54,11 +54,11 @@ public slots:
 
     void emitFullColorChangedSignal();
 private slots:
-    void moveAlphaWidgetToTab(const int &tabId);
+    void moveAlphaWidgetToTab(const int tabId);
 
     void startColorPicking();
 
-    void setAlphaFromSpin(const qreal &val);
+    void setAlphaFromSpin(const qreal val);
 
     void updateValuesFromRGB();
     void updateValuesFromHSV();
@@ -68,7 +68,7 @@ private slots:
     void setValuesFromHSL();
     void updateAlphaFromSpin();
 
-    void setColorMode(const int &colorMode);
+    void setColorMode(const int colorMode);
     void refreshColorAnimatorTarget();
     void nullifyAnimator();
 private:
@@ -84,14 +84,14 @@ private:
                                                     const char *signal,
                                                     const char *slot);
     void setRectValuesAndColor(
-        const qreal &red,
-        const qreal &green,
-        const qreal &blue,
-        const qreal &hue,
-        const qreal &hsvSaturation,
-        const qreal &value,
-        const qreal &hslSaturation,
-        const qreal &lightness);
+        const qreal red,
+        const qreal green,
+        const qreal blue,
+        const qreal hue,
+        const qreal hsvSaturation,
+        const qreal value,
+        const qreal hslSaturation,
+        const qreal lightness);
 
     bool mBlockColorSettings = false;
     CVR_TYPE mLastTriggeredCVR;

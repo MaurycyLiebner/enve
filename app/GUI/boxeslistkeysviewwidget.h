@@ -33,8 +33,8 @@ public:
     void connectToFrameWidget(AnimationWidgetScrollBar *frameRange);
     void connectToChangeWidthWidget(
             ChangeWidthWidget *changeWidthWidget);
-    void setDisplayedFrameRange(const int& minFrame,
-                             const int& maxFrame);
+    void setDisplayedFrameRange(const int minFrame,
+                             const int maxFrame);
 signals:
     void changedFrameRange(const int&, const int&);
 public slots:
@@ -58,9 +58,9 @@ public slots:
     void setTypeGraphics();
     void setTypeSound();
 
-    void setGraphEnabled(const bool &bT);
+    void setGraphEnabled(const bool bT);
 protected slots:
-    void setBoxesListWidth(const int &width);
+    void setBoxesListWidth(const int width);
 
     void addNewBelowThis();
     void removeThis();

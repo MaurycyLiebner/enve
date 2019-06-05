@@ -30,7 +30,7 @@ void ClosableContainer::addContentWidget(QWidget *widget) {
     widget->setVisible(mContentArrow->isChecked());
 }
 
-void ClosableContainer::setCheckable(const bool &check) {
+void ClosableContainer::setCheckable(const bool check) {
     if(check == (mCheckBox != nullptr)) return;
     if(check) {
         mCheckBox = new QCheckBox(this);
@@ -44,7 +44,7 @@ void ClosableContainer::setCheckable(const bool &check) {
     }
 }
 
-void ClosableContainer::setChecked(const bool &check) {
+void ClosableContainer::setChecked(const bool check) {
     if(!mCheckBox) return;
     if(mCheckBox->isChecked() == check) return;
     mCheckBox->setChecked(true);
@@ -55,7 +55,7 @@ bool ClosableContainer::isChecked() {
     return mCheckBox->isChecked();
 }
 
-void ClosableContainer::setContentVisible(const bool &bT) {
+void ClosableContainer::setContentVisible(const bool bT) {
     if(bT) {
         mContentArrow->setIcon(QIcon(":/icons/list_hide_children.png"));
     } else {

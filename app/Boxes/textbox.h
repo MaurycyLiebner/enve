@@ -10,16 +10,16 @@ public:
 
     bool SWT_isTextBox() const { return true; }
     void addActionsToMenu(BoxTypeMenu * const menu);
-    SkPath getPathAtRelFrameF(const qreal &relFrame);
+    SkPath getPathAtRelFrameF(const qreal relFrame);
 
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 
     bool differenceInEditPathBetweenFrames(
-                const int& frame1, const int& frame2) const;
+                const int frame1, const int frame2) const;
 
     void setFont(const QFont &font);
-    void setSelectedFontSize(const qreal &size);
+    void setSelectedFontSize(const qreal size);
     void setSelectedFontFamilyAndStyle(const QString &fontFamily,
                                        const QString &fontStyle);
 

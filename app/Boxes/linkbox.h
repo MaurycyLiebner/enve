@@ -67,24 +67,24 @@ public:
     qsptr<BoundingBox> createLinkForLinkGroup();
 
     stdsptr<BoundingBoxRenderData> createRenderData();
-    void setupRenderData(const qreal &relFrame,
+    void setupRenderData(const qreal relFrame,
                          BoundingBoxRenderData * const data);
     const SkBlendMode &getBlendMode() {
         if(isParentLink()) return getLinkTarget()->getBlendMode();
         return BoundingBox::getBlendMode();
     }
 
-    qreal getEffectsMarginAtRelFrame(const int &relFrame) {
+    qreal getEffectsMarginAtRelFrame(const int relFrame) {
         qreal margin = 0.;
         margin += getLinkTarget()->getEffectsMarginAtRelFrame(relFrame);
         margin += BoundingBox::getEffectsMarginAtRelFrame(relFrame);
         return margin;
     }
 
-    QRectF getRelBoundingRect(const qreal &relFrame);
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
+    QRectF getRelBoundingRect(const qreal relFrame);
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
-    QMatrix getRelativeTransformAtRelFrameF(const qreal &relFrame) {
+    QMatrix getRelativeTransformAtRelFrameF(const qreal relFrame) {
         if(mParentGroup ? mParentGroup->SWT_isLinkBox() : false) {
             return getLinkTarget()->getRelativeTransformAtRelFrameF(relFrame);
         } else {
@@ -92,7 +92,7 @@ public:
         }
     }
 
-    QMatrix getTotalTransformAtRelFrameF(const qreal& relFrame) {
+    QMatrix getTotalTransformAtRelFrameF(const qreal relFrame) {
         if(isParentLink()) {
             const auto linkTarget = getLinkTarget();
             return linkTarget->getRelativeTransformAtRelFrameF(relFrame)*
@@ -102,8 +102,8 @@ public:
         }
     }
 
-    bool isFrameInDurationRect(const int &relFrame) const;
-    bool isFrameFInDurationRect(const qreal &relFrame) const;
+    bool isFrameInDurationRect(const int relFrame) const;
+    bool isFrameFInDurationRect(const qreal relFrame) const;
     BoundingBox *getLinkTarget() const;
     void setTargetSlot(BoundingBox * const target) {
         setLinkTarget(target);

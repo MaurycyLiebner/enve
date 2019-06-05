@@ -24,34 +24,34 @@ QPointF symmetricToPos(const QPointF& toMirror,
 
 QPointF symmetricToPosNewLen(const QPointF& toMirror,
                              const QPointF& mirrorCenter,
-                             const qreal& newLen) {
+                             const qreal newLen) {
     const QPointF posDist = toMirror - mirrorCenter;
     return mirrorCenter - scalePointToNewLen(posDist, newLen);
 }
 
-QPointF gCubicValueAtT(const qCubicSegment2D &seg, const qreal &t) {
+QPointF gCubicValueAtT(const qCubicSegment2D &seg, const qreal t) {
     return QPointF(gCubicValueAtT(xSeg(seg), t),
                    gCubicValueAtT(ySeg(seg), t));
 }
 
-qreal gCubicValueAtT(const qCubicSegment1D &seg, const qreal& t) {
+qreal gCubicValueAtT(const qCubicSegment1D &seg, const qreal t) {
     return qPow(1 - t, 3)*seg.p0() +
             3*qPow(1 - t, 2)*t*seg.c1() +
             3*(1 - t)*t*t*seg.c2() +
             t*t*t*seg.p1();
 }
 
-qreal gSolveForP2(const qreal& p0, const qreal& p1,
-                  const qreal& p3, const qreal& t,
-                  const qreal& value) {
+qreal gSolveForP2(const qreal p0, const qreal p1,
+                  const qreal p3, const qreal t,
+                  const qreal value) {
     if(isZero4Dec(t*t - t)) RuntimeThrow("Cannot solve with t*t == t.");
     qreal tm1 = t - 1.;
     return -(p0*tm1*tm1*tm1 - 3.*p1*t*tm1*tm1 - p3*t*t*t + value)/(3*tm1*t*t);
 }
 
-qreal gSolveForP1(const qreal& p0, const qreal& p2,
-                  const qreal& p3, const qreal& t,
-                  const qreal& value) {
+qreal gSolveForP1(const qreal p0, const qreal p2,
+                  const qreal p3, const qreal t,
+                  const qreal value) {
     if(isZero4Dec(t*t - t)) RuntimeThrow("Cannot solve with t*t == t.");
     qreal tm1 = t - 1.;
     return (p0*tm1*tm1*tm1 + 3.*p2*t*t*tm1 - p3*t*t*t + value)/(3*tm1*tm1*t);
@@ -60,7 +60,7 @@ qreal gSolveForP1(const qreal& p0, const qreal& p2,
 // only for beziers that do not have multiple points of the same x value
 // for qrealanimators
 qreal gTFromX(const qCubicSegment1D &seg,
-             const qreal& x) {
+             const qreal x) {
     qreal minT = 0.;
     qreal maxT = 1.;
     qreal xGuess;
@@ -113,7 +113,7 @@ void gGetCtrlsSmoothPos(const QPointF& startPos,
 }
 
 void solveClosestToSegment(const qCubicSegment1D &seg,
-                           const qreal &vn,
+                           const qreal vn,
                            QList<qreal> *list) {
     const cmplx v0 = cmplx(seg.p0(), 0.);
     const cmplx v1 = cmplx(seg.c1(), 0.);
@@ -181,7 +181,7 @@ void solveClosestToSegment(const qCubicSegment1D &seg,
 }
 
 void solveOnSegmnet(const qCubicSegment1D &seg,
-                    const qreal &xn,
+                    const qreal xn,
                     QList<qreal> *list) {
     const cmplx i = cmplx(0., 1.);
     const cmplx x0 = cmplx(seg.p0(), 0.);
@@ -230,7 +230,7 @@ void solveOnSegmnet(const qCubicSegment1D &seg,
 }
 
 qreal gGetClosestTValueOnBezier(const qCubicSegment1D &seg,
-                               const qreal &p,
+                               const qreal p,
                                qreal *bestPosPtr,
                                qreal *errorPtr) {
     QList<qreal> values;
@@ -257,9 +257,9 @@ qreal gGetClosestTValueOnBezier(const qCubicSegment1D &seg,
     return bestT;
 }
 
-//void VectorPathAnimator::bezierLeastSquareV1V2(const qreal &v0,
+//void VectorPathAnimator::bezierLeastSquareV1V2(const qreal v0,
 //                                               qreal &v1, qreal &v2,
-//                                               const qreal &v3,
+//                                               const qreal v3,
 //                                               const QList<qreal> &vs,
 //                                               const QList<qreal> &ts) {
 //    qreal v1Inc = 0.;
@@ -267,8 +267,8 @@ qreal gGetClosestTValueOnBezier(const qCubicSegment1D &seg,
 //    qreal v2Inc = 0.;
 //    qreal v2Dec = 0.;
 //    for(int i = 0; i < vs.count(); i++) {
-//        const qreal &val = vs.at(i);
-//        const qreal &t = ts.at(i);
+//        const qreal& val = vs.at(i);
+//        const qreal& t = ts.at(i);
 //        v1Inc += pow(1. - t, 2.)*t*(-v0*pow(1. - t, 3.) - 3.*v2*(1. - t)*pow(t, 2.) -
 //                 v3*pow(t, 3.) + val);
 //        v1Dec += (1. - t)*pow(t, 2.)*(3.*t*pow(1. - t, 2.));
@@ -291,7 +291,7 @@ qCubicSegment2D gBezierLeastSquareV1V2(const qCubicSegment2D &seg,
     qreal v2YInc = 0.;
     for(int i = 0; i < vs.count(); i++) {
         const QPointF &val = vs.at(i);
-        const qreal &t = ts.at(i);
+        const qreal& t = ts.at(i);
         v1XInc += pow(1. - t, 2.)*t*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.c2().x()*(1. - t)*pow(t, 2.) -
                  seg.p3().x()*pow(t, 3.) + val.x());
         v2XInc += (1. - t)*pow(t, 2.)*(-seg.p0().x()*pow(1. - t, 3.) - 3.*seg.c1().x()*pow(1. - t, 2.)*t -
@@ -310,8 +310,8 @@ qCubicSegment2D gBezierLeastSquareV1V2(const qCubicSegment2D &seg,
 qCubicSegment2D gBezierLeastSquareV1V2(
         const qCubicSegment2D &seg,
         const QList<QPointF> &vs,
-        const int &minVs,
-        const int &maxVs) {
+        const int minVs,
+        const int maxVs) {
     QPointF v1, v2;
     for(int j = 0; j < 50; j++) {
         qreal v1XInc = 0.;
@@ -341,10 +341,10 @@ qCubicSegment2D gBezierLeastSquareV1V2(
     return {seg.p0(), v1, v2, seg.p3()};
 }
 
-qreal get1DAccuracyValue(const qreal &x0,
-                         const qreal &x1,
-                         const qreal &x2,
-                         const qreal &x3) {
+qreal get1DAccuracyValue(const qreal x0,
+                         const qreal x1,
+                         const qreal x2,
+                         const qreal x3) {
     return qMax4(x0, x1, x2, x3) - qMin4(x0, x1, x2, x3);
 }
 
@@ -421,7 +421,7 @@ QPointF gClosestPointOnRect(const QRectF &rect,
 
 void gDrawCosmeticEllipse(QPainter *p,
                           const QPointF &absPos,
-                          const qreal& rX, const qreal& rY) {
+                          const qreal rX, const qreal rY) {
     const QTransform &transform = p->transform();
     p->drawEllipse(absPos,
                    rX/transform.m11(),
@@ -433,7 +433,7 @@ void gGetSmoothAbsCtrlsForPtBetween(
         const SkPoint &currP,
         const SkPoint &nextP,
         SkPoint &c1, SkPoint &c2,
-        const SkScalar &smoothness) {
+        const SkScalar smoothness) {
 //    SkPoint sLastP = prevP - currP;
 //    sLastP.setLength(1);
 //    SkPoint sNextP = nextP - currP;
@@ -708,7 +708,7 @@ void gForEverySegmentInPath(
 
 static void Perterb(SkPoint * const p,
                     const SkVector& tangent,
-                    const SkScalar& scale) {
+                    const SkScalar scale) {
     SkVector normal = tangent;
     SkPointPriv::RotateCCW(&normal);
     normal.setLength(scale);
@@ -716,7 +716,7 @@ static void Perterb(SkPoint * const p,
 }
 
 //! @brief Return random in range [0, 1)
-float randFloat01(const qreal& baseSeed) {
+float randFloat01(const qreal baseSeed) {
     if(isInteger4Dec(baseSeed)) {
         QRandomGenerator rand(static_cast<quint32>(qRound(baseSeed)));
         return toSkScalar(rand.generateDouble());
@@ -730,38 +730,38 @@ float randFloat01(const qreal& baseSeed) {
 }
 
 //! @brief Return random in range [-1, 1)
-float randFloat(const qreal& baseSeed) {
+float randFloat(const qreal baseSeed) {
     return randFloat01(baseSeed)*2 - 1;
 }
 
 //! @brief Return random in range [min, max)
-float randFloat(const qreal& baseSeed,
+float randFloat(const qreal baseSeed,
                 const float& min, const float& max) {
     return static_cast<float>(randFloat01(baseSeed))*(max - min) + min;
 }
 
-SkPoint randPt(const qreal& baseSeed, const SkPoint& pt,
+SkPoint randPt(const qreal baseSeed, const SkPoint& pt,
                const float& min, const float& max) {
     const auto xR = randFloat(baseSeed, min, max);
     const auto yR = randFloat(baseSeed, min, max);
     return {pt.x() + xR, pt.y() + yR};
 }
 
-SkPoint randPt(const qreal& baseSeed,
+SkPoint randPt(const qreal baseSeed,
                const SkPoint& pt, const float& dev) {
     return randPt(baseSeed, pt, -dev, dev);
 }
 
-SkPoint randPt(const qreal& baseSeed, const float& dev) {
+SkPoint randPt(const qreal baseSeed, const float& dev) {
     const auto xR = randFloat(baseSeed, -dev, dev);
     const auto yR = randFloat(baseSeed, -dev, dev);
     return SkPoint::Make(xR, yR);
 }
 
-void gAtomicDisplaceFilterPath(const qreal& baseSeed,
+void gAtomicDisplaceFilterPath(const qreal baseSeed,
                                SkPath* const dst,
                                const SkPath& src,
-                               const SkScalar &maxDev) {
+                               const SkScalar maxDev) {
     dst->reset();
 
     uint32_t seedContourInc = 0;
@@ -811,11 +811,11 @@ void gAtomicDisplaceFilterPath(const qreal& baseSeed,
 
 #include "randomgrid.h"
 
-void gSpatialDisplaceFilterPath(const qreal& baseSeed,
-                                const qreal& gridSize,
+void gSpatialDisplaceFilterPath(const qreal baseSeed,
+                                const qreal gridSize,
                                 SkPath* const dst,
                                 const SkPath& src,
-                                const SkScalar &maxDev) {
+                                const SkScalar maxDev) {
     dst->reset();
 
     SkPath::Iter iter(src, false);
@@ -878,12 +878,12 @@ void gSpatialDisplaceFilterPath(const qreal& baseSeed,
 }
 
 template <typename GenDispDataOp>
-void displaceClosedPath(const qreal& baseSeed,
+void displaceClosedPath(const qreal baseSeed,
                         SkPathMeasure &meas,
                         SkPath* const dst,
-                        const SkScalar& segLen,
-                        const SkScalar& maxDev,
-                        const SkScalar& smoothness,
+                        const SkScalar segLen,
+                        const SkScalar maxDev,
+                        const SkScalar smoothness,
                         GenDispDataOp genDispDataOp) {
     const bool zeroSmooth = smoothness < 0.001f;
     const SkScalar length = meas.getLength();
@@ -988,15 +988,15 @@ void displaceClosedPath(const qreal& baseSeed,
     dst->close();
 }
 
-void genSpatialClosedDisplData(const qreal& baseSeed,
-                               const qreal& gridSize,
-                               const int& nTot,
+void genSpatialClosedDisplData(const qreal baseSeed,
+                               const qreal gridSize,
+                               const int nTot,
                                QVector<SkPoint>& pts,
                                QVector<SkPoint>& cPts,
                                SkPathMeasure &meas,
-                               const SkScalar& segLen,
-                               const SkScalar& maxDev,
-                               const SkScalar& smoothness) {
+                               const SkScalar segLen,
+                               const SkScalar maxDev,
+                               const SkScalar smoothness) {
     const bool zeroSmooth = smoothness < 0.001f;
     SkScalar dist = 0;
     for(int i = 0; i < nTot; i++) {
@@ -1022,18 +1022,18 @@ void genSpatialClosedDisplData(const qreal& baseSeed,
     }
 }
 
-void genSpatialOpenedDisplData(const qreal& baseSeed,
-                               const qreal& gridSize,
-                               const SkScalar& halfLength,
-                               const SkScalar& endPtFrac,
-                               const int& nSide,
-                               const int& nTot,
+void genSpatialOpenedDisplData(const qreal baseSeed,
+                               const qreal gridSize,
+                               const SkScalar halfLength,
+                               const SkScalar endPtFrac,
+                               const int nSide,
+                               const int nTot,
                                QVector<SkPoint>& pts,
                                QVector<SkPoint>& cPts,
                                SkPathMeasure &meas,
-                               const SkScalar& segLen,
-                               const SkScalar& maxDev,
-                               const SkScalar& smoothness) {
+                               const SkScalar segLen,
+                               const SkScalar maxDev,
+                               const SkScalar smoothness) {
      const bool zeroSmooth = smoothness < 0.001f;
      SkScalar rand1 = 0;
      SkScalar randNTotM2 = 0;
@@ -1065,14 +1065,14 @@ void genSpatialOpenedDisplData(const qreal& baseSeed,
      }
 }
 
-void genAtomicClosedDisplData(const qreal& baseSeed,
-                              const int& nTot,
+void genAtomicClosedDisplData(const qreal baseSeed,
+                              const int nTot,
                               QVector<SkPoint>& pts,
                               QVector<SkPoint>& cPts,
                               SkPathMeasure &meas,
-                              const SkScalar& segLen,
-                              const SkScalar& maxDev,
-                              const SkScalar& smoothness) {
+                              const SkScalar segLen,
+                              const SkScalar maxDev,
+                              const SkScalar smoothness) {
     const bool zeroSmooth = smoothness < 0.001f;
     SkScalar dist = 0;
     for(int i = 0; i < nTot; i++) {
@@ -1096,17 +1096,17 @@ void genAtomicClosedDisplData(const qreal& baseSeed,
     }
 }
 
-void genAtomicOpenedDisplData(const qreal& baseSeed,
-                              const SkScalar& halfLength,
-                              const SkScalar& endPtFrac,
-                              const int& nSide,
-                              const int& nTot,
+void genAtomicOpenedDisplData(const qreal baseSeed,
+                              const SkScalar halfLength,
+                              const SkScalar endPtFrac,
+                              const int nSide,
+                              const int nTot,
                               QVector<SkPoint>& pts,
                               QVector<SkPoint>& cPts,
                               SkPathMeasure &meas,
-                              const SkScalar& segLen,
-                              const SkScalar& maxDev,
-                              const SkScalar& smoothness) {
+                              const SkScalar segLen,
+                              const SkScalar maxDev,
+                              const SkScalar smoothness) {
     const bool zeroSmooth = smoothness < 0.001f;
     SkScalar rand1 = 0;
     SkScalar randNTotM2 = 0;
@@ -1137,12 +1137,12 @@ void genAtomicOpenedDisplData(const qreal& baseSeed,
 }
 
 template <typename GenDispDataOp>
-void displaceOpenedPath(const qreal& baseSeed,
+void displaceOpenedPath(const qreal baseSeed,
                         SkPathMeasure &meas,
                         SkPath* const dst,
-                        const SkScalar& segLen,
-                        const SkScalar& maxDev,
-                        const SkScalar& smoothness,
+                        const SkScalar segLen,
+                        const SkScalar maxDev,
+                        const SkScalar smoothness,
                         GenDispDataOp genDispDataOp) {
     const bool zeroSmooth = smoothness < 0.001f;
     const SkScalar length = meas.getLength();
@@ -1189,13 +1189,13 @@ void displaceOpenedPath(const qreal& baseSeed,
     }
 }
 
-bool gSpatialDisplaceFilterPath(const qreal& baseSeed,
-                                const qreal& gridSize,
+bool gSpatialDisplaceFilterPath(const qreal baseSeed,
+                                const qreal gridSize,
                                 SkPath* const dst,
                                 const SkPath& src,
-                                const SkScalar &maxDev,
-                                const SkScalar &segLen,
-                                const SkScalar &smoothness) {
+                                const SkScalar maxDev,
+                                const SkScalar segLen,
+                                const SkScalar smoothness) {
     if(segLen < .5f) return false;
     dst->reset();
 
@@ -1203,14 +1203,14 @@ bool gSpatialDisplaceFilterPath(const qreal& baseSeed,
     do {
         if(meas.isClosed()) {
             const auto op = [gridSize](
-                           const qreal& baseSeed,
-                           const int& nTot,
+                           const qreal baseSeed,
+                           const int nTot,
                            QVector<SkPoint>& pts,
                            QVector<SkPoint>& cPts,
                            SkPathMeasure &meas,
-                           const SkScalar& segLen,
-                           const SkScalar& maxDev,
-                           const SkScalar& smoothness) {
+                           const SkScalar segLen,
+                           const SkScalar maxDev,
+                           const SkScalar smoothness) {
                 genSpatialClosedDisplData(baseSeed, gridSize,
                                           nTot, pts, cPts, meas,
                                           segLen, maxDev, smoothness);
@@ -1219,17 +1219,17 @@ bool gSpatialDisplaceFilterPath(const qreal& baseSeed,
                                segLen, maxDev, smoothness, op);
         } else {
             const auto op = [gridSize](
-                           const qreal& baseSeed,
-                           const SkScalar& halfLength,
-                           const SkScalar& endPtFrac,
-                           const int& nSide,
-                           const int& nTot,
+                           const qreal baseSeed,
+                           const SkScalar halfLength,
+                           const SkScalar endPtFrac,
+                           const int nSide,
+                           const int nTot,
                            QVector<SkPoint>& pts,
                            QVector<SkPoint>& cPts,
                            SkPathMeasure &meas,
-                           const SkScalar& segLen,
-                           const SkScalar& maxDev,
-                           const SkScalar& smoothness) {
+                           const SkScalar segLen,
+                           const SkScalar maxDev,
+                           const SkScalar smoothness) {
                 genSpatialOpenedDisplData(baseSeed, gridSize,
                                           halfLength, endPtFrac, nSide,
                                           nTot, pts, cPts, meas,
@@ -1242,12 +1242,12 @@ bool gSpatialDisplaceFilterPath(const qreal& baseSeed,
     return true;
 }
 
-bool gAtomicDisplaceFilterPath(const qreal& baseSeed,
+bool gAtomicDisplaceFilterPath(const qreal baseSeed,
                                SkPath* const dst,
                                const SkPath& src,
-                               const SkScalar &maxDev,
-                               const SkScalar &segLen,
-                               const SkScalar &smoothness) {
+                               const SkScalar maxDev,
+                               const SkScalar segLen,
+                               const SkScalar smoothness) {
     if(segLen < .5f) return false;
     dst->reset();
 
@@ -1270,18 +1270,18 @@ bool gAtomicDisplaceFilterPath(const qreal& baseSeed,
     return true;
 }
 
-qreal gMapTToFragment(const qreal &minAbsT,
-                      const qreal &maxAbsT,
-                      const qreal &absT) {
+qreal gMapTToFragment(const qreal minAbsT,
+                      const qreal maxAbsT,
+                      const qreal absT) {
     const qreal tFrag = maxAbsT - minAbsT;
     if(isZero6Dec(tFrag)) RuntimeThrow("Cannot map to zero range");
     if(tFrag < 0) RuntimeThrow("Cannot map to negative range");
     return (absT - minAbsT)/tFrag;
 }
 
-qreal gMapTFromFragment(const qreal &minAbsT,
-                        const qreal &maxAbsT,
-                        const qreal &relT) {
+qreal gMapTFromFragment(const qreal minAbsT,
+                        const qreal maxAbsT,
+                        const qreal relT) {
     const qreal tFrag = maxAbsT - minAbsT;
     if(isZero6Dec(tFrag)) return minAbsT;
     if(tFrag < 0) RuntimeThrow("Cannot map to negative range");

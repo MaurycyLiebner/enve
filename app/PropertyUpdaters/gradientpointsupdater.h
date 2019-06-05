@@ -5,7 +5,7 @@ class PathBox;
 
 class GradientPointsUpdater : public PropertyUpdater {
 public:
-    GradientPointsUpdater(const bool &isFill, PathBox *target);
+    GradientPointsUpdater(const bool isFill, PathBox *target);
     void update();
     void frameChangeUpdate();
 private:

@@ -4,7 +4,7 @@
 SingleWidgetAbstraction::SingleWidgetAbstraction(
         const qsptr<SingleWidgetTarget>& target,
         const UpdateFuncs &updateFuncs,
-        const int& visiblePartId) :
+        const int visiblePartId) :
     mVisiblePartWidgetId(visiblePartId),
     mUpdateFuncs(updateFuncs),
     mTarget(target.data()) {}
@@ -12,13 +12,13 @@ SingleWidgetAbstraction::SingleWidgetAbstraction(
 SingleWidgetAbstraction::~SingleWidgetAbstraction() {}
 
 bool SingleWidgetAbstraction::getAbstractions(
-        const int &minY, const int &maxY,
+        const int minY, const int maxY,
         int& currY, int currX,
-        const int& swtHeight,
+        const int swtHeight,
         QList<SingleWidgetAbstraction *> &abstractions,
         const SWT_RulesCollection &rules,
-        const bool &parentSatisfiesRule,
-        const bool &parentMainTarget) { // returns whether should abort
+        const bool parentSatisfiesRule,
+        const bool parentMainTarget) { // returns whether should abort
     if(currY > maxY) return true;
     const bool satisfiesRule = mTarget->SWT_isVisible() &&
             mTarget->SWT_shouldBeVisible(rules, parentSatisfiesRule,
@@ -46,12 +46,12 @@ bool SingleWidgetAbstraction::getAbstractions(
 
 
 bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
-        const int &minY, const int &maxY,
-        int &currY, int currX, const int &swtHeight,
+        const int minY, const int maxY,
+        int &currY, int currX, const int swtHeight,
         const SetAbsFunc& setAbsFunc,
         const SWT_RulesCollection &rules,
-        const bool &parentSatisfiesRule,
-        const bool &parentMainTarget) { // returns whether should abort
+        const bool parentSatisfiesRule,
+        const bool parentMainTarget) { // returns whether should abort
     if(!mTarget->SWT_isVisible()) return false;
     if(currY > maxY) return true;
     const bool satisfiesRule = mTarget->SWT_isVisible() &&
@@ -79,9 +79,9 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
 
 int SingleWidgetAbstraction::getHeight(
         const SWT_RulesCollection &rules,
-        const bool &parentSatisfiesRule,
-        const bool &parentMainTarget,
-        const int &swtHeight) {
+        const bool parentSatisfiesRule,
+        const bool parentMainTarget,
+        const int swtHeight) {
     int height = 0;
     if(mTarget->SWT_isVisible()) {
         const bool satisfiesRule = mTarget->SWT_isVisible() &&
@@ -107,7 +107,7 @@ void SingleWidgetAbstraction::addChildAbstraction(
 }
 
 void SingleWidgetAbstraction::addChildAbstractionAt(
-        SingleWidgetAbstraction* const abs, const int &id) {
+        SingleWidgetAbstraction* const abs, const int id) {
     mChildren.insert(id, abs);
     abs->setParent(this);
     updateChildrenIds(id, mChildren.count() - 1);
@@ -164,7 +164,7 @@ void SingleWidgetAbstraction::scheduleWidgetContentUpdateIfSearchNotEmpty() {
     mUpdateFuncs.fContentUpdateIfSearchNotEmpty();
 }
 
-void SingleWidgetAbstraction::setContentVisible(const bool &bT) {
+void SingleWidgetAbstraction::setContentVisible(const bool bT) {
     //if(bT == mContentVisible) return;
     mContentVisible = bT;
     afterContentVisibilityChanged();
@@ -195,14 +195,14 @@ void SingleWidgetAbstraction::addChildAbstractionForTarget(
 
 void SingleWidgetAbstraction::addChildAbstractionForTargetAt(
         SingleWidgetTarget * const target,
-        const int &id) {
+        const int id) {
     auto childAbs = target->SWT_getOrCreateAbstractionForWidget(mUpdateFuncs,
                                                         mVisiblePartWidgetId);
     addChildAbstractionAt(childAbs, id);
 }
 
 void SingleWidgetAbstraction::moveChildAbstractionForTargetTo(
-        SingleWidgetTarget * const target, const int &id) {
+        SingleWidgetTarget * const target, const int id) {
     const auto abs = getChildAbstractionForTarget(target);
     int targetId = id;
 //    if(!abs->getTarget()->SWT_visibleOnlyIfParentDescendant()) {

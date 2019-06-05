@@ -15,9 +15,9 @@ public:
     void prp_startTransform();
     void prp_finishTransform();
 
-    void setValueRange(const int &minValue, const int &maxValue);
+    void setValueRange(const int minValue, const int maxValue);
 
-    void setCurrentValue(const int &value);
+    void setCurrentValue(const int value);
     int getValue();
 
     int getMaxValue();

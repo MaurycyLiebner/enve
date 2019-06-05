@@ -4,7 +4,7 @@
 
 class InterpolationKey : public GraphKey {
 public:
-    InterpolationKey(const int &frame,
+    InterpolationKey(const int frame,
                      Animator * const parentAnimator);
     InterpolationKey(Animator * const parentAnimator);
 
@@ -12,11 +12,11 @@ public:
         return mRelFrame;
     }
 
-    void setValueForGraph(const qreal& value) {
+    void setValueForGraph(const qreal value) {
         Q_UNUSED(value);
     }
 
-    void setRelFrame(const int &frame) {
+    void setRelFrame(const int frame) {
         if(frame == mRelFrame) return;
         const int dFrame = frame - mRelFrame;
         mRelFrame = frame;

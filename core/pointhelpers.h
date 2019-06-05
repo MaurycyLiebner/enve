@@ -23,7 +23,7 @@ enum CtrlsMode : short {
 
 //template <typename T>
 //struct Solution {
-//    Solution(const bool& valid, const T& value = T()) :
+//    Solution(const bool valid, const T& value = T()) :
 //        fValid(valid), fValue(value) {}
 
 //    operator const bool&() const {
@@ -38,13 +38,13 @@ enum CtrlsMode : short {
 //    const T fValue;
 //};
 
-extern qreal gSolveForP1(const qreal& p0, const qreal& p2,
-                         const qreal& p3, const qreal& t,
-                         const qreal& value);
+extern qreal gSolveForP1(const qreal p0, const qreal p2,
+                         const qreal p3, const qreal t,
+                         const qreal value);
 
-extern qreal gSolveForP2(const qreal& p0, const qreal& p1,
-                         const qreal& p3, const qreal& t,
-                         const qreal& value);
+extern qreal gSolveForP2(const qreal p0, const qreal p1,
+                         const qreal p3, const qreal t,
+                         const qreal value);
 
 extern void gGetCtrlsSymmetricPos(const QPointF& startPos,
                                   const QPointF& centerPos,
@@ -59,12 +59,12 @@ extern void gGetCtrlsSmoothPos(const QPointF& startPos,
                                QPointF &newEndPos);
 
 extern qreal gCubicValueAtT(const qCubicSegment1D &seg,
-                            const qreal &t);
+                            const qreal t);
 extern QPointF gCubicValueAtT(const qCubicSegment2D &seg,
-                              const qreal& t);
+                              const qreal t);
 
 extern qreal gTFromX(const qCubicSegment1D &seg,
-                     const qreal &x);
+                     const qreal x);
 
 
 extern QPointF gGetClosestPointOnLineSegment(const QPointF &a,
@@ -76,16 +76,16 @@ extern QPointF gClosestPointOnRect(const QRectF &rect,
 
 extern qCubicSegment2D gBezierLeastSquareV1V2(
         const qCubicSegment2D &seg, const QList<QPointF> &vs,
-        const int &minVs, const int &maxVs);
+        const int minVs, const int maxVs);
 
 
 extern void gDrawCosmeticEllipse(QPainter *p,
                                  const QPointF &absPos,
-                                 const qreal &rX, const qreal &rY);
+                                 const qreal rX, const qreal rY);
 
 
 extern qreal gCubicGetTFurthestInDirection(const qCubicSegment2D& seg,
-                                           const qreal &deg);
+                                           const qreal deg);
 
 extern void gSmoothyAbsCtrlsForPtBetween(
         const QPointF &lastP, const QPointF &currP,
@@ -109,41 +109,41 @@ extern void gGetSmoothAbsCtrlsForPtBetween(const SkPoint &prevP,
                                            const SkPoint &currP,
                                            const SkPoint &nextP,
                                            SkPoint &c1, SkPoint &c2,
-                                           const SkScalar &smoothLen);
+                                           const SkScalar smoothLen);
 
-extern void gAtomicDisplaceFilterPath(const qreal &baseSeed,
+extern void gAtomicDisplaceFilterPath(const qreal baseSeed,
                                       SkPath* const dst,
                                       const SkPath& src,
-                                      const SkScalar &maxDev);
+                                      const SkScalar maxDev);
 
-extern bool gAtomicDisplaceFilterPath(const qreal &baseSeed,
+extern bool gAtomicDisplaceFilterPath(const qreal baseSeed,
                                       SkPath * const dst,
                                       const SkPath& src,
-                                      const SkScalar &maxDev,
-                                      const SkScalar &segLen,
-                                      const SkScalar &smoothness);
+                                      const SkScalar maxDev,
+                                      const SkScalar segLen,
+                                      const SkScalar smoothness);
 
-extern void gSpatialDisplaceFilterPath(const qreal& baseSeed,
-                                       const qreal& gridSize,
+extern void gSpatialDisplaceFilterPath(const qreal baseSeed,
+                                       const qreal gridSize,
                                        SkPath* const dst,
                                        const SkPath& src,
-                                       const SkScalar &maxDev);
+                                       const SkScalar maxDev);
 
-extern bool gSpatialDisplaceFilterPath(const qreal& baseSeed,
-                                       const qreal& gridSize,
+extern bool gSpatialDisplaceFilterPath(const qreal baseSeed,
+                                       const qreal gridSize,
                                        SkPath* const dst,
                                        const SkPath& src,
-                                       const SkScalar &maxDev,
-                                       const SkScalar &segLen,
-                                       const SkScalar &smoothness);
+                                       const SkScalar maxDev,
+                                       const SkScalar segLen,
+                                       const SkScalar smoothness);
 
-qreal gMapTToFragment(const qreal& minAbsT,
-                      const qreal& maxAbsT,
-                      const qreal& absT);
+qreal gMapTToFragment(const qreal minAbsT,
+                      const qreal maxAbsT,
+                      const qreal absT);
 
-qreal gMapTFromFragment(const qreal& minAbsT,
-                        const qreal& maxAbsT,
-                        const qreal& relT);
+qreal gMapTFromFragment(const qreal minAbsT,
+                        const qreal maxAbsT,
+                        const qreal relT);
 
 void gGetValuesForNodeInsertion(
         const QPointF& prevP1, QPointF& prevC2,

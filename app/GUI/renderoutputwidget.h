@@ -11,8 +11,8 @@
 class RenderOutputWidget : public QDialog {
     Q_OBJECT
 public:
-    explicit RenderOutputWidget(const qreal &canvasWidth,
-                                const qreal &canvasHeight,
+    explicit RenderOutputWidget(const qreal canvasWidth,
+                                const qreal canvasHeight,
                                 QWidget *parent = nullptr);
 
 private:

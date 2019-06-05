@@ -6,7 +6,7 @@ struct LinesEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;
 
     void applyEffectsSk(const SkBitmap &bitmap,
-                        const qreal &scale);
+                        const qreal scale);
 
     bool vertical = false;
     qreal linesDistance;
@@ -21,7 +21,7 @@ public:
     qreal getMargin() { return 0.; }
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, BoundingBoxRenderData*);
+            const qreal relFrame, BoundingBoxRenderData*);
 protected:
     LinesEffect(qreal linesWidth = 5.,
                 qreal linesDistance = 5.);

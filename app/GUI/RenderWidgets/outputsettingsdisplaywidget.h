@@ -54,7 +54,7 @@ public:
         setAudioChannelLayoutText(channLay);
     }
 
-    void setAlwaysShowAll(const bool &bT) {
+    void setAlwaysShowAll(const bool bT) {
         mAlwaysShowAll = bT;
         setVideoLabelsVisible(true);
         setAudioLabelsVisible(true);
@@ -63,13 +63,13 @@ signals:
 
 public slots:
 protected:
-    void setVideoLabelsVisible(const bool &bT) {
+    void setVideoLabelsVisible(const bool bT) {
         mVideoCodecLabel->setVisible(bT);
         mVideoPixelFormatLabel->setVisible(bT);
         mVideoBitrateLabel->setVisible(bT);
     }
 
-    void setAudioLabelsVisible(const bool &bT) {
+    void setAudioLabelsVisible(const bool bT) {
         mAudioCodecLabel->setVisible(bT);
         mAudioSampleRateLabel->setVisible(bT);
         mAudioSampleFormatLabel->setVisible(bT);

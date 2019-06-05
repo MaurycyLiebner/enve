@@ -7,10 +7,10 @@ ColorSetting::ColorSetting() {
 
 ColorSetting::ColorSetting(const ColorMode &settingModeT,
                            const CVR_TYPE &changedValueT,
-                           const qreal &val1T,
-                           const qreal &val2T,
-                           const qreal &val3T,
-                           const qreal &alphaT,
+                           const qreal val1T,
+                           const qreal val2T,
+                           const qreal val3T,
+                           const qreal alphaT,
                            const ColorSettingType &typeT,
                            ColorAnimator * const excludeT) {
     mType = typeT;
@@ -34,19 +34,19 @@ void ColorSetting::apply(ColorAnimator * const target) const {
     }
 }
 
-const ColorSettingType &ColorSetting::getType() const { return mType; }
+ColorSettingType ColorSetting::getType() const { return mType; }
 
-const ColorMode &ColorSetting::getSettingMode() const { return mSettingMode; }
+ColorMode ColorSetting::getSettingMode() const { return mSettingMode; }
 
-const CVR_TYPE &ColorSetting::getChangedValue() const { return mChangedValue; }
+CVR_TYPE ColorSetting::getChangedValue() const { return mChangedValue; }
 
-const qreal &ColorSetting::getVal1() const { return mVal1; }
+qreal ColorSetting::getVal1() const { return mVal1; }
 
-const qreal &ColorSetting::getVal2() const { return mVal2; }
+qreal ColorSetting::getVal2() const { return mVal2; }
 
-const qreal &ColorSetting::getVal3() const { return mVal3; }
+qreal ColorSetting::getVal3() const { return mVal3; }
 
-const qreal &ColorSetting::getAlpa() const { return mAlpha; }
+qreal ColorSetting::getAlpa() const { return mAlpha; }
 
 void ColorSetting::finishColorTransform(ColorAnimator *target) const {
     changeColor(target);

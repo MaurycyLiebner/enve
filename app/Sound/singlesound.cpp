@@ -48,17 +48,17 @@ void SingleSound::addActionsToMenu(PropertyTypeMenu * const menu) {
 }
 
 DurationRectangleMovable *SingleSound::anim_getTimelineMovable(
-        const int &relX, const int &minViewedFrame,
-        const qreal &pixelsPerFrame) {
+        const int relX, const int minViewedFrame,
+        const qreal pixelsPerFrame) {
     if(!mDurationRectangle) return nullptr;
     return mDurationRectangle->getMovableAt(relX, pixelsPerFrame,
                                             minViewedFrame);
 }
 
 void SingleSound::drawTimelineControls(QPainter * const p,
-                                       const qreal &pixelsPerFrame,
+                                       const qreal pixelsPerFrame,
                                        const FrameRange &absFrameRange,
-                                       const int &rowHeight) {
+                                       const int rowHeight) {
     //    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
     //    int startDFrame = mDurationRectangle.getMinAnimationFrame() - startFrame;
 //    int frameWidth = ceil(mListOfFrames.count()/qAbs(timeScale));
@@ -110,7 +110,7 @@ SampleRange SingleSound::absSampleRange() const {
     return {qFloor(qSampleRange.fMin), qCeil(qSampleRange.fMax)};
 }
 
-iValueRange SingleSound::absSecondToRelSeconds(const int &absSecond) {
+iValueRange SingleSound::absSecondToRelSeconds(const int absSecond) {
     if(mStretch < 0) {
         const auto absStretch = absSecondToRelSecondsAbsStretch(absSecond);
         const int secs = mCacheHandler ? mCacheHandler->durationSec() : 0;
@@ -119,7 +119,7 @@ iValueRange SingleSound::absSecondToRelSeconds(const int &absSecond) {
     return absSecondToRelSecondsAbsStretch(absSecond);
 }
 
-iValueRange SingleSound::absSecondToRelSecondsAbsStretch(const int &absSecond) {
+iValueRange SingleSound::absSecondToRelSecondsAbsStretch(const int absSecond) {
     const qreal fps = getCanvasFPS();
     const qreal stretch = qAbs(mStretch);
     const qreal speed = isZero6Dec(stretch) ? TEN_MIL : 1/stretch;
@@ -142,7 +142,7 @@ iValueRange SingleSound::absSecondToRelSecondsAbsStretch(const int &absSecond) {
     return {firstSecond, lastSecond};
 }
 
-void SingleSound::setStretch(const qreal &stretch) {
+void SingleSound::setStretch(const qreal stretch) {
     mStretch = stretch;
     updateDurationRectLength();
     prp_afterWholeInfluenceRangeChanged();
@@ -189,8 +189,8 @@ int SingleSound::prp_getRelFrameShift() const {
 }
 
 bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
-                                      const bool &parentSatisfies,
-                                      const bool &parentMainTarget) const {
+                                      const bool parentSatisfies,
+                                      const bool parentMainTarget) const {
     if(rules.fType == SWT_TYPE_SOUND) return true;
     if(rules.fType == SWT_TYPE_GRAPHICS) return false;
     return SingleWidgetTarget::SWT_shouldBeVisible(rules,

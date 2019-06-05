@@ -171,7 +171,7 @@ public:
         return &mEmitter;
     }
 
-    const bool& getCurrentlyEncoding() const {
+    bool getCurrentlyEncoding() const {
         return mCurrentlyEncoding;
     }
 protected:

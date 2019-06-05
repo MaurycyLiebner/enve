@@ -23,7 +23,7 @@ SampledMotionBlurEffect::SampledMotionBlurEffect(BoundingBox *box) :
 }
 
 stdsptr<PixmapEffectRenderData> SampledMotionBlurEffect::
-getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
+getPixmapEffectRenderDataForRelFrameF(const qreal relFrame,
                                      BoundingBoxRenderData * const data) {
     if(!data->fParentIsTarget) return nullptr;
     auto renderData = SPtrCreate(SampledMotionBlurEffectRenderData)();
@@ -61,7 +61,7 @@ getPixmapEffectRenderDataForRelFrameF(const qreal &relFrame,
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
 
-FrameRange SampledMotionBlurEffect::getParentBoxFirstLastMarginAjusted(const int &relFrame) const {
+FrameRange SampledMotionBlurEffect::getParentBoxFirstLastMarginAjusted(const int relFrame) const {
     auto boxRange = mParentBox->getFirstAndLastIdenticalForMotionBlur(relFrame);
     int margin = qCeil(mNumberSamples->getEffectiveValue(relFrame)*
                        mFrameStep->getEffectiveValue(relFrame));
@@ -86,16 +86,16 @@ FrameRange SampledMotionBlurEffect::getParentBoxFirstLastMarginAjusted(const int
     return boxRange;
 }
 
-FrameRange SampledMotionBlurEffect::prp_getIdenticalRelRange(const int &relFrame) const {
+FrameRange SampledMotionBlurEffect::prp_getIdenticalRelRange(const int relFrame) const {
     auto boxRange = getParentBoxFirstLastMarginAjusted(relFrame);
     auto effectRange = PixmapEffect::prp_getIdenticalRelRange(relFrame);
     return boxRange*effectRange;
 }
 
-void replaceIfHigherAlpha(const int &x0, const int &y0,
+void replaceIfHigherAlpha(const int x0, const int y0,
                           const SkBitmap &dst,
                           const sk_sp<SkImage> &src,
-                          const qreal &alphaT) {
+                          const qreal alphaT) {
     SkPixmap dstP;
     SkPixmap srcP;
     dst.peekPixels(&dstP);
@@ -121,7 +121,7 @@ void replaceIfHigherAlpha(const int &x0, const int &y0,
     }
 }
 
-void replaceIfHigherAlpha(const int &x0, const int &y0,
+void replaceIfHigherAlpha(const int x0, const int y0,
                           const SkBitmap &dst,
                           const SkBitmap &src) {
     SkPixmap dstP;
@@ -146,7 +146,7 @@ void replaceIfHigherAlpha(const int &x0, const int &y0,
 }
 
 void SampledMotionBlurEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
-                                                       const qreal &scale) {
+                                                       const qreal scale) {
     Q_UNUSED(scale)
     SkBitmap motionBlur;
     motionBlur.allocPixels(bitmap.info());

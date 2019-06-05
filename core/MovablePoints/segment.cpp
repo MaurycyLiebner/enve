@@ -40,7 +40,7 @@ int NormalSegment::nodesCount() const {
     return mInnerDissolved.count() + (mFirstNode ? 1 : 0) + (mLastNode ? 1 : 0);
 }
 
-SmartNodePoint *NormalSegment::getNodeAt(const int &id) const {
+SmartNodePoint *NormalSegment::getNodeAt(const int id) const {
     if(id < 0 || id >= nodesCount()) return nullptr;
     if(id == 0) return mFirstNode;
     const int innerId = id - 1;
@@ -78,15 +78,15 @@ void NormalSegment::updateDissolvedPos() const {
         inner->updateFromNodeDataPosOnly();
 }
 
-QPointF NormalSegment::getRelPosAtT(const qreal &t) const {
+QPointF NormalSegment::getRelPosAtT(const qreal t) const {
     return getAsRelSegment().posAtT(t);
 }
 
-QPointF NormalSegment::getAbsPosAtT(const qreal &t) const {
+QPointF NormalSegment::getAbsPosAtT(const qreal t) const {
     return getAsAbsSegment().posAtT(t);
 }
 
-void NormalSegment::makePassThroughAbs(const QPointF &absPos, const qreal& t) {
+void NormalSegment::makePassThroughAbs(const QPointF &absPos, const qreal t) {
     if(!mLastNode->getC0Enabled()) mLastNode->setC0Enabled(true);
     if(!mFirstNode->getC2Enabled()) mFirstNode->setC2Enabled(true);
 
@@ -97,7 +97,7 @@ void NormalSegment::makePassThroughAbs(const QPointF &absPos, const qreal& t) {
     mLastNodeC0->moveToAbs(absSeg.c2());
 }
 
-void NormalSegment::makePassThroughRel(const QPointF &relPos, const qreal &t) {
+void NormalSegment::makePassThroughRel(const QPointF &relPos, const qreal t) {
     if(!mLastNode->getC0Enabled()) mLastNode->setC0Enabled(true);
     if(!mFirstNode->getC2Enabled()) mFirstNode->setC2Enabled(true);
 
@@ -132,7 +132,7 @@ void NormalSegment::generateSkPath() {
 }
 
 void NormalSegment::drawHoveredSk(SkCanvas * const canvas,
-                            const SkScalar &invScale) {
+                            const SkScalar invScale) {
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setColor(SK_ColorBLACK);
@@ -182,7 +182,7 @@ void NormalSegment::updateDissolved() {
     updateDissolvedPos();
 }
 
-NormalSegment::SubSegment NormalSegment::subSegmentAtT(const qreal &t) const {
+NormalSegment::SubSegment NormalSegment::subSegmentAtT(const qreal t) const {
     SmartNodePoint* firstNode = mFirstNode;
     SmartNodePoint* lastNode = mLastNode;
     qreal firstNodeT = 0;
@@ -201,7 +201,7 @@ NormalSegment::SubSegment NormalSegment::subSegmentAtT(const qreal &t) const {
     return {firstNode, lastNode, this};
 }
 
-QPointF NormalSegment::getSlopeVector(const qreal &t) {
+QPointF NormalSegment::getSlopeVector(const qreal t) {
     const QPointF posAtT = getRelPosAtT(t);
     const QPointF posAtTPlus = getRelPosAtT(t + 0.01);
     return scalePointToNewLen(posAtTPlus - posAtT, 1);
@@ -236,11 +236,11 @@ qreal NormalSegment::SubSegment::getMaxT() const {
     return fLastPt->getT();
 }
 
-qreal NormalSegment::SubSegment::getParentTAtThisT(const qreal& thisT) const {
+qreal NormalSegment::SubSegment::getParentTAtThisT(const qreal thisT) const {
     return gMapTFromFragment(getMinT(), getMaxT(), thisT);
 }
 
-QPointF NormalSegment::SubSegment::getRelPosAtT(const qreal& thisT) const {
+QPointF NormalSegment::SubSegment::getRelPosAtT(const qreal thisT) const {
     const qreal parentT = getParentTAtThisT(thisT);
     return fParentSeg->getRelPosAtT(parentT);
 }

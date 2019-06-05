@@ -3,7 +3,7 @@
 
 QrealPoint::QrealPoint(const QrealPointType& type,
                        GraphKey * const parentKey,
-                       const qreal &radius) {
+                       const qreal radius) {
     mRadius = radius;
     mType = type;
     mParentKey = parentKey;
@@ -15,7 +15,7 @@ qreal QrealPoint::getRelFrame() {
     /*if(mType == END_POINT)*/ return mParentKey->getEndFrame();
 }
 
-void QrealPoint::setRelFrame(const qreal &frame) {
+void QrealPoint::setRelFrame(const qreal frame) {
     if(mType == KEY_POINT) {
         return mParentKey->setRelFrameAndUpdateParentAnimator(qRound(frame));
     }
@@ -41,7 +41,7 @@ qreal QrealPoint::getValue() {
     /*if(mType == END_POINT)*/ return mParentKey->getEndValue();
 }
 
-void QrealPoint::setValue(const qreal &value) {
+void QrealPoint::setValue(const qreal value) {
     if(mType == KEY_POINT) return mParentKey->setValueForGraph(value);
     if(mType == START_POINT) return mParentKey->setStartValueForGraph(value);
     if(mType == END_POINT) return mParentKey->setEndValueForGraph(value);
@@ -52,10 +52,10 @@ bool QrealPoint::isSelected() {
     return mIsSelected;
 }
 
-bool QrealPoint::isNear(const qreal &frameT,
-                        const qreal &valueT,
-                        const qreal &pixelsPerFrame,
-                        const qreal &pixelsPerValue) {
+bool QrealPoint::isNear(const qreal frameT,
+                        const qreal valueT,
+                        const qreal pixelsPerFrame,
+                        const qreal pixelsPerValue) {
     const qreal value = getValue();
     const qreal frame = getAbsFrame();
     if(qAbs(frameT - frame)*pixelsPerFrame > mRadius) return false;
@@ -63,7 +63,7 @@ bool QrealPoint::isNear(const qreal &frameT,
     return true;
 }
 
-void QrealPoint::moveTo(const qreal &frameT, const qreal &valueT) {
+void QrealPoint::moveTo(const qreal frameT, const qreal valueT) {
     setAbsFrame(frameT);
     setValue(valueT);
     if(isKeyPoint()) return;
@@ -94,7 +94,7 @@ void QrealPoint::draw(QPainter * const p, const QColor &paintColor) {
     gDrawCosmeticEllipse(p, center, mRadius - 1, mRadius - 1);
 }
 
-void QrealPoint::setSelected(const bool &bT) {
+void QrealPoint::setSelected(const bool bT) {
     if(mType == KEY_POINT) {
         Q_ASSERT(false); // key selection handled differently
         mParentKey->setSelected(bT);

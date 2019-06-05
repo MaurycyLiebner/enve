@@ -91,9 +91,9 @@ public:
     }
 
     virtual void drawTimelineControls(QPainter * const p,
-                                      const qreal &pixelsPerFrame,
+                                      const qreal pixelsPerFrame,
                                       const FrameRange &absFrameRange,
-                                      const int &rowHeight) {
+                                      const int rowHeight) {
         Q_UNUSED(p);
         Q_UNUSED(pixelsPerFrame);
         Q_UNUSED(absFrameRange);
@@ -102,7 +102,7 @@ public:
 
     virtual void drawCanvasControls(SkCanvas * const canvas,
                                     const CanvasMode &mode,
-                                    const SkScalar &invScale);
+                                    const SkScalar invScale);
 
     virtual void addActionsToMenu(PropertyTypeMenu * const menu) {
         Q_UNUSED(menu);
@@ -121,12 +121,12 @@ public:
 
     virtual void prp_startDragging() {}
 
-    virtual void prp_setTransformed(const bool &bT) { Q_UNUSED(bT); }
+    virtual void prp_setTransformed(const bool bT) { Q_UNUSED(bT); }
 
-    virtual void prp_setParentFrameShift(const int &shift,
+    virtual void prp_setParentFrameShift(const int shift,
                                          ComplexAnimator* parentAnimator = nullptr);
     virtual void prp_afterFrameShiftChanged() {}
-    virtual FrameRange prp_getIdenticalRelRange(const int &relFrame) const {
+    virtual FrameRange prp_getIdenticalRelRange(const int relFrame) const {
         Q_UNUSED(relFrame);
         return {FrameRange::EMIN, FrameRange::EMAX};
     }
@@ -161,18 +161,18 @@ public:
 
     FrameRange prp_relRangeToAbsRange(const FrameRange &range) const;
     FrameRange prp_absRangeToRelRange(const FrameRange &range) const;
-    int prp_absFrameToRelFrame(const int &absFrame) const;
-    int prp_relFrameToAbsFrame(const int &relFrame) const;
-    qreal prp_absFrameToRelFrameF(const qreal &absFrame) const;
-    qreal prp_relFrameToAbsFrameF(const qreal &relFrame) const;
+    int prp_absFrameToRelFrame(const int absFrame) const;
+    int prp_relFrameToAbsFrame(const int relFrame) const;
+    qreal prp_absFrameToRelFrameF(const qreal absFrame) const;
+    qreal prp_relFrameToAbsFrameF(const qreal relFrame) const;
     const QString &prp_getName() const;
     void prp_setName(const QString &newName);
 
     void prp_setOwnUpdater(const stdsptr<PropertyUpdater> &updater);
     void prp_setInheritedUpdater(const stdsptr<PropertyUpdater> &updater);
 
-    bool prp_differencesBetweenRelFrames(const int &frame1,
-                                         const int &frame2) const {
+    bool prp_differencesBetweenRelFrames(const int frame1,
+                                         const int frame2) const {
         return !prp_getIdenticalRelRange(frame1).inRange(frame2);
     }
 

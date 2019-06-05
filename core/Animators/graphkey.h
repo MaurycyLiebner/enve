@@ -10,7 +10,7 @@ class ClampedValue {
     qreal mMin = -DBL_MAX;
     qreal mMax = DBL_MAX;
 public:
-    ClampedValue(const qreal& value) : mValue(value) {}
+    ClampedValue(const qreal value) : mValue(value) {}
 
     void saveValue() {
         mSavedValue = mValue;
@@ -36,7 +36,7 @@ public:
         return clamp(mValue, mMin, mMax);
     }
 
-    void setValue(const qreal& value) {
+    void setValue(const qreal value) {
         mValue = value;
     }
 
@@ -44,16 +44,16 @@ public:
         mValue = getClampedValue();
     }
 
-    void setRange(const qreal& min, const qreal& max) {
+    void setRange(const qreal min, const qreal max) {
         mMin = min;
         mMax = max;
     }
 
-    void setMax(const qreal& max) {
+    void setMax(const qreal max) {
         mMax = max;
     }
 
-    void setMin(const qreal& min) {
+    void setMin(const qreal min) {
         mMin = min;
     }
 };
@@ -63,7 +63,7 @@ class ClampedPoint {
     ClampedValue mX;
     ClampedValue mY;
 public:
-    ClampedPoint(const qreal& x, const qreal& y) : mX(x), mY(y) {}
+    ClampedPoint(const qreal x, const qreal y) : mX(x), mY(y) {}
 
     void read(QIODevice * const target) {
         target->read(rcChar(&mX), sizeof(qreal));
@@ -152,11 +152,11 @@ public:
         return relTo + minFrac*(rawVals - relTo);
     }
 
-    void setXValue(const qreal& value) {
+    void setXValue(const qreal value) {
         mX.setValue(value);
     }
 
-    void setYValue(const qreal& value) {
+    void setYValue(const qreal value) {
         mY.setValue(value);
     }
 
@@ -170,38 +170,38 @@ public:
         mY.clampValue();
     }
 
-    void setXRange(const qreal& min, const qreal& max) {
+    void setXRange(const qreal min, const qreal max) {
         mX.setRange(min, max);
     }
 
-    void setYRange(const qreal& min, const qreal& max) {
+    void setYRange(const qreal min, const qreal max) {
         mY.setRange(min, max);
     }
 
-    void setXMax(const qreal& max) {
+    void setXMax(const qreal max) {
         mX.setMax(max);
     }
 
-    void setXMin(const qreal& min) {
+    void setXMin(const qreal min) {
         mX.setMin(min);
     }
 
-    void setYMax(const qreal& max) {
+    void setYMax(const qreal max) {
         mY.setMax(max);
     }
 
-    void setYMin(const qreal& min) {
+    void setYMin(const qreal min) {
         mY.setMin(min);
     }
 };
 
 class GraphKey : public Key {
 public:
-    GraphKey(const int &frame,
+    GraphKey(const int frame,
              Animator * const parentAnimator);
     GraphKey(Animator * const parentAnimator);
 
-    virtual void setValueForGraph(const qreal& value) = 0;
+    virtual void setValueForGraph(const qreal value) = 0;
     virtual qreal getValueForGraph() const = 0;
 
     void startFrameAndValueTransform() {
@@ -250,17 +250,17 @@ public:
     }
 
     void scaleFrameAndUpdateParentAnimator(
-            const int &relativeToFrame,
-            const qreal &scaleFactor,
-            const bool& useSavedFrame);
+            const int relativeToFrame,
+            const qreal scaleFactor,
+            const bool useSavedFrame);
 protected:
-    void setRelFrame(const int &frame);
+    void setRelFrame(const int frame);
 public:
     qreal getEndValue() const;
     qreal getStartValue() const;
 
-    void setEndValueForGraph(const qreal& value);
-    void setStartValueForGraph(const qreal& value);
+    void setEndValueForGraph(const qreal value);
+    void setStartValueForGraph(const qreal value);
 
     void drawGraphKey(QPainter * const p,
                       const QColor &paintColor) const;
@@ -275,32 +275,32 @@ public:
                     getStartValue());
     }
 
-    void setEndValueDirectionForGraph(const qreal &value) {
+    void setEndValueDirectionForGraph(const qreal value) {
         if(!hasNextKey()) return;
         setEndValueForGraph(
                     getEndValueForGraphEndValueDirection(value));
     }
 
-    void setStartValueDirectionForGraph(const qreal &value) {
+    void setStartValueDirectionForGraph(const qreal value) {
         if(!hasPrevKey()) return;
         setStartValueForGraph(
                     getStartValueForGraphStartValueDirection(value));
     }
 
-    void setStartFrame(const qreal& frame);
-    void setEndFrame(const qreal& frame);
+    void setStartFrame(const qreal frame);
+    void setEndFrame(const qreal frame);
 
-    QrealPoint *mousePress(const qreal &frameT,
-                           const qreal &valueT,
-                           const qreal &pixelsPerFrame,
-                           const qreal &pixelsPerValue);
+    QrealPoint *mousePress(const qreal frameT,
+                           const qreal valueT,
+                           const qreal pixelsPerFrame,
+                           const qreal pixelsPerValue);
 
     void updateCtrlFromCtrl(const QrealPointType &type);
     void setCtrlsMode(const CtrlsMode &mode);
     const CtrlsMode& getCtrlsMode() const;
 
-    void constrainStartCtrlMinFrame(const qreal &minRelFrame);
-    void constrainEndCtrlMaxFrame(const qreal &maxRelFrame);
+    void constrainStartCtrlMinFrame(const qreal minRelFrame);
+    void constrainEndCtrlMaxFrame(const qreal maxRelFrame);
     virtual void changeFrameAndValueBy(const QPointF &frameValueChange);
 
     qreal getPrevKeyValueForGraph() const {
@@ -317,8 +317,8 @@ public:
     void makeStartAndEndSmooth();
     bool isInsideRect(const QRectF &valueFrameRect) const;
 
-    void setStartFrameVar(const qreal &startFrame);
-    void setEndFrameVar(const qreal &endFrame);
+    void setStartFrameVar(const qreal startFrame);
+    void setEndFrameVar(const qreal endFrame);
 
     qreal getStartFrame() const;
     qreal getEndFrame() const;
@@ -326,20 +326,20 @@ public:
     qreal getStartAbsFrame() const;
     qreal getEndAbsFrame() const;
 
-    void setStartEnabledForGraph(const bool &bT);
-    void setEndEnabledForGraph(const bool &bT);
+    void setStartEnabledForGraph(const bool bT);
+    void setEndEnabledForGraph(const bool bT);
 
     bool getEndEnabledForGraph() const;
     bool getStartEnabledForGraph() const;
 
-    void setStartValueVar(const qreal &value);
-    void setEndValueVar(const qreal &value);
-    void constrainEndCtrlValue(const qreal &minVal,
-                               const qreal &maxVal);
-    void constrainStartCtrlValue(const qreal &minVal,
-                                 const qreal &maxVal);
+    void setStartValueVar(const qreal value);
+    void setEndValueVar(const qreal value);
+    void constrainEndCtrlValue(const qreal minVal,
+                               const qreal maxVal);
+    void constrainStartCtrlValue(const qreal minVal,
+                                 const qreal maxVal);
 protected:
-    qreal getEndValueDirectionForGraphForEndValue(const qreal& endVal) const {
+    qreal getEndValueDirectionForGraphForEndValue(const qreal endVal) const {
         if(!hasNextKey()) return 0;
         qreal nextValue = getNextKeyValueForGraph();
         qreal valG = getValueForGraph();
@@ -347,7 +347,7 @@ protected:
         return (endVal - valG)/(nextValue - valG)/dFrame;
     }
 
-    qreal getStartValueDirectionForGraphForStartValue(const qreal& startVal) const {
+    qreal getStartValueDirectionForGraphForStartValue(const qreal startVal) const {
         if(!hasPrevKey()) return 0;
         qreal prevValue = getPrevKeyValueForGraph();
         qreal valG = getValueForGraph();
@@ -355,7 +355,7 @@ protected:
         return (startVal - valG)/(prevValue - valG)/dFrame;
     }
 
-    qreal getStartValueForGraphStartValueDirection(const qreal& value) const {
+    qreal getStartValueForGraphStartValueDirection(const qreal value) const {
         if(!hasPrevKey()) return 0;
         qreal prevValue = getPrevKeyValueForGraph();
         qreal valG = getValueForGraph();
@@ -363,7 +363,7 @@ protected:
         return valG + (prevValue - valG)*value*dFrame;
     }
 
-    qreal getEndValueForGraphEndValueDirection(const qreal& value) const {
+    qreal getEndValueForGraphEndValueDirection(const qreal value) const {
         if(!hasNextKey()) return 0;
         qreal nextValue = getNextKeyValueForGraph();
         qreal valG = getValueForGraph();

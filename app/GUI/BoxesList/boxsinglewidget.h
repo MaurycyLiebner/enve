@@ -44,20 +44,20 @@ public:
 
     void rename();
     void drawKeys(QPainter * const p,
-                  const qreal &pixelsPerFrame,
+                  const qreal pixelsPerFrame,
                   const FrameRange &viewedFrames);
-    Key *getKeyAtPos(const int &pressX,
-                     const qreal &pixelsPerFrame,
-                     const int &minViewedFrame);
+    Key *getKeyAtPos(const int pressX,
+                     const qreal pixelsPerFrame,
+                     const int minViewedFrame);
     void getKeysInRect(const QRectF &selectionRect,
-                       const qreal &pixelsPerFrame,
+                       const qreal pixelsPerFrame,
                        QList<Key *> &listKeys);
     DurationRectangleMovable *getRectangleMovableAtPos(
-                        const int &pressX,
-                        const qreal &pixelsPerFrame,
-                        const int &minViewedFrame);
+                        const int pressX,
+                        const qreal pixelsPerFrame,
+                        const int minViewedFrame);
     void setBlendMode(const SkBlendMode &mode);
-    void setSelected(const bool &bT) {
+    void setSelected(const bool bT) {
         mSelected = bT;
         update();
     }
@@ -88,7 +88,7 @@ private:
     void switchBoxLockedAction();
 
     void switchBoxVisibleAction();
-    void setCompositionMode(const int &id);
+    void setCompositionMode(const int id);
     ColorAnimator* getColorTarget() const;
 
     QPoint mDragStartPos;

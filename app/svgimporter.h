@@ -16,9 +16,9 @@ public:
     TextSvgAttributes() {}
 
     void setFontFamily(const QString &family);
-    void setFontSize(const int &size);
+    void setFontSize(const int size);
     void setFontStyle(const QFont::Style &style);
-    void setFontWeight(const int &weight);
+    void setFontWeight(const int weight);
 
     void setFontAlignment(const Qt::Alignment &alignment);
 
@@ -43,14 +43,14 @@ public:
 
     void setColor(const QColor &val);
 
-    void setColorOpacity(const qreal &opacity);
+    void setColorOpacity(const qreal opacity);
 
     void setPaintType(const PaintType &type);
 
     void setGradient(const SvgGradient& gradient);
 
     const QColor &getColor() const;
-    const PaintType &getPaintType() const;
+    PaintType getPaintType() const;
     Gradient *getGradient() const;
 
     void apply(BoundingBox * const box) const;
@@ -68,12 +68,12 @@ class StrokeSvgAttributes : public FillSvgAttributes {
 public:
     StrokeSvgAttributes() {}
 
-    const qreal &getLineWidth() const;
-    const Qt::PenCapStyle &getCapStyle() const;
-    const Qt::PenJoinStyle &getJoinStyle() const;
-    const QPainter::CompositionMode &getOutlineCompositionMode() const;
+    qreal getLineWidth() const;
+    Qt::PenCapStyle getCapStyle() const;
+    Qt::PenJoinStyle getJoinStyle() const;
+    QPainter::CompositionMode getOutlineCompositionMode() const;
 
-    void setLineWidth(const qreal &val);
+    void setLineWidth(const qreal val);
 
     void setCapStyle(const Qt::PenCapStyle &capStyle);
 
@@ -81,7 +81,7 @@ public:
 
     void setOutlineCompositionMode(const QPainter::CompositionMode &compMode);
 
-    void apply(BoundingBox *box, const qreal &scale) const;
+    void apply(BoundingBox *box, const qreal scale) const;
 protected:
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
     Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
@@ -184,17 +184,17 @@ public:
     void cubicTo(const QPointF &c1, const QPointF &c2, const QPointF &e);
     void quadTo(const QPointF &c, const QPointF &e);
     void pathArc(qreal rX, qreal rY,
-                 const qreal &xAxisRotation,
-                 const int &largeArcFlag, const int &sweepFlag,
-                 const qreal &x, const qreal &y,
-                 const qreal &curX, const qreal &curY);
+                 const qreal xAxisRotation,
+                 const int largeArcFlag, const int sweepFlag,
+                 const qreal x, const qreal y,
+                 const qreal curX, const qreal curY);
 
     void applyTransfromation(const QMatrix &transformation);
 private:
-    void pathArcSegment(const qreal &xc, const qreal &yc,
-                        const qreal &th0, const qreal &th1,
-                        const qreal &rx, const qreal &ry,
-                        const qreal &xAxisRotation);
+    void pathArcSegment(const qreal xc, const qreal yc,
+                        const qreal th0, const qreal th1,
+                        const qreal rx, const qreal ry,
+                        const qreal xAxisRotation);
 
     void addPoint(const SvgNormalNode &point);
 

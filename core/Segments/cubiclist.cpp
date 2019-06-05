@@ -15,8 +15,8 @@ CubicList::CubicList(const CubicList &src) {
     updateClosed();
 }
 
-CubicList CubicList::getFragment(const qreal &minLenFrac,
-                                 const qreal &maxLenFrac) {
+CubicList CubicList::getFragment(const qreal minLenFrac,
+                                 const qreal maxLenFrac) {
     if(minLenFrac > maxLenFrac) return CubicList();
     //Q_ASSERT(minLenFrac > 0);
     //Q_ASSERT(maxLenFrac < 1);
@@ -56,8 +56,8 @@ CubicList CubicList::getFragment(const qreal &minLenFrac,
     return CubicList(fragSegs);
 }
 
-CubicList CubicList::getFragmentUnbound(const qreal &minLenFrac,
-                                        const qreal &maxLenFrac) {
+CubicList CubicList::getFragmentUnbound(const qreal minLenFrac,
+                                        const qreal maxLenFrac) {
     if(minLenFrac > maxLenFrac) return CubicList();
     const qreal shiftToPos = -floor4Dec(minLenFrac);
     const qreal posMinLenFrac = minLenFrac + shiftToPos; // always between 0 and 1
@@ -169,7 +169,7 @@ qreal CubicList::minDistanceTo(const QPointF &p,
     return smallestDist;
 }
 
-void CubicList::opSmoothOut(const qreal& smoothness) {
+void CubicList::opSmoothOut(const qreal smoothness) {
     if(mSegments.count() < 2) return;
     qCubicSegment2D * prevSeg = nullptr;
     QPointF lastC2;
@@ -215,7 +215,7 @@ void CubicList::opSmoothOut(const qreal& smoothness) {
     }
 }
 
-void CubicList::subdivide(const int &sub) {
+void CubicList::subdivide(const int sub) {
     if(sub <= 0) return;
     for(int i = 0; i < mSegments.count(); i++) {
         auto& seg = mSegments[i];

@@ -6,7 +6,7 @@ template <typename T>
 class KeyT : public BasedKeyT<Key, T> {
     friend class StdSelfRef;
 protected:
-    KeyT(const T &value, const int &relFrame,
+    KeyT(const T &value, const int relFrame,
          Animator * const parentAnimator = nullptr) :
         BasedKeyT<Key, T>(value, relFrame, parentAnimator) {}
 

@@ -16,18 +16,18 @@ public:
 
 
     DurationRectangleMovable *anim_getTimelineMovable(
-            const int &relX, const int &minViewedFrame,
-            const qreal &pixelsPerFrame);
+            const int relX, const int minViewedFrame,
+            const qreal pixelsPerFrame);
     void drawTimelineControls(QPainter * const p,
-                              const qreal &pixelsPerFrame,
+                              const qreal pixelsPerFrame,
                               const FrameRange &absFrameRange,
-                              const int &rowHeight);
+                              const int rowHeight);
 
     int prp_getRelFrameShift() const;
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
-                             const bool &parentSatisfies,
-                             const bool &parentMainTarget) const;
+                             const bool parentSatisfies,
+                             const bool parentMainTarget) const;
 
     FrameRange prp_relInfluenceRange() const;
 
@@ -38,11 +38,11 @@ public:
 
     FixedLenAnimationRect *getDurationRect() const;
 
-    qreal getVolumeAtRelFrame(const qreal& relFrame) const {
+    qreal getVolumeAtRelFrame(const qreal relFrame) const {
         return mVolumeAnimator->getEffectiveValue(relFrame);
     }
 
-    SoundReaderForMerger * getSecondReader(const int& relSecondId) {
+    SoundReaderForMerger * getSecondReader(const int relSecondId) {
         const int maxSec = mCacheHandler->durationSec() - 1;
         if(relSecondId < 0 || relSecondId > maxSec) return nullptr;
         const auto reader = mCacheHandler->getSecondReader(relSecondId);
@@ -50,14 +50,14 @@ public:
         return reader;
     }
 
-    stdsptr<Samples> getSamplesForSecond(const int& relSecondId) {
+    stdsptr<Samples> getSamplesForSecond(const int relSecondId) {
         return mCacheHandler->getSamplesForSecond(relSecondId);
     }
 
     int getSampleShift() const;
     SampleRange relSampleRange() const;
     SampleRange absSampleRange() const;
-    iValueRange absSecondToRelSeconds(const int& absSecond);
+    iValueRange absSecondToRelSeconds(const int absSecond);
 
     const HDDCachableCacheHandler* getCacheHandler() const {
         if(!mCacheHandler) return nullptr;
@@ -68,7 +68,7 @@ public:
         return !mOwnDurationRectangle;
     }
 
-    void setStretch(const qreal& stretch);
+    void setStretch(const qreal stretch);
     qreal getStretch() const { return mStretch; }
     QrealSnapshot getVolumeSnap() const {
         return mVolumeAnimator->makeSnapshot(
@@ -79,14 +79,14 @@ public:
         return mEnabled;
     }
 
-    void setEnabled(const bool& enable) {
+    void setEnabled(const bool enable) {
         if(enable == mEnabled) return;
         mEnabled = enable;
         SWT_setDisabled(!mEnabled);
         prp_afterWholeInfluenceRangeChanged();
     }
 private:
-    iValueRange absSecondToRelSecondsAbsStretch(const int& absSecond);
+    iValueRange absSecondToRelSecondsAbsStretch(const int absSecond);
     void updateDurationRectLength();
 
     qreal getCanvasFPS() const;

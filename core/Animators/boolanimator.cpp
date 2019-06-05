@@ -8,6 +8,6 @@ bool BoolAnimator::getCurrentBoolValue() {
     return getCurrentIntValue() == 1;
 }
 
-void BoolAnimator::setCurrentBoolValue(const bool &bT) {
+void BoolAnimator::setCurrentBoolValue(const bool bT) {
     setCurrentIntValue((bT ? 1 : 0));
 }

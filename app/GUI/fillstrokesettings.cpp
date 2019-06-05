@@ -392,7 +392,7 @@ void FillStrokeSettingsWidget::setBrushTimeCurve(
     emitStrokeBrushTimeCurveChanged();
 }
 
-void FillStrokeSettingsWidget::setStrokeWidth(const qreal &width) {
+void FillStrokeSettingsWidget::setStrokeWidth(const qreal width) {
     //startTransform(SLOT(emitStrokeWidthChanged()));
     mCurrentStrokeWidth = width;
     emitStrokeWidthChangedTMP();

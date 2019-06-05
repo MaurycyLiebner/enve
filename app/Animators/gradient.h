@@ -12,7 +12,7 @@ public:
     enum Type { LINEAR, RADIAL };
     bool SWT_isGradient() const { return true; }
     void prp_startTransform();
-    void prp_setParentFrameShift(const int &shift,
+    void prp_setParentFrameShift(const int shift,
                                  ComplexAnimator* parentAnimator = nullptr) {
         Q_UNUSED(shift);
         if(!parentAnimator) return;
@@ -32,10 +32,10 @@ public:
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice *target);
 
-    void swapColors(const int &id1, const int &id2);
+    void swapColors(const int id1, const int id2);
     void removeColor(const qsptr<ColorAnimator> &color);
     void addColor(const QColor &color);
-    void replaceColor(const int &id, const QColor &color);
+    void replaceColor(const int id, const QColor &color);
     void addPath(PathBox * const path);
     void removePath(PathBox * const path);
     bool affectsPaths();
@@ -43,24 +43,24 @@ public:
     void updateQGradientStops(const UpdateReason &reason);
 
     int getLoadId();
-    void setLoadId(const int &id);
+    void setLoadId(const int id);
 
     void addColorToList(const QColor &color);
-    QColor getCurrentColorAt(const int &id);
+    QColor getCurrentColorAt(const int id);
     int getColorCount();
 
     QColor getLastQGradientStopQColor();
     QColor getFirstQGradientStopQColor();
 
     QGradientStops getQGradientStops();
-    void startColorIdTransform(const int &id);
+    void startColorIdTransform(const int id);
     void addColorToList(const qsptr<ColorAnimator> &newColorAnimator);
-    ColorAnimator *getColorAnimatorAt(const int &id);
-    void removeColor(const int &id);
+    ColorAnimator *getColorAnimatorAt(const int id);
+    void removeColor(const int id);
 
     bool isEmpty() const;
 
-    QGradientStops getQGradientStopsAtAbsFrame(const qreal &absFrame);
+    QGradientStops getQGradientStopsAtAbsFrame(const qreal absFrame);
 signals:
     void resetGradientWidgetColorIdIfEquals(Gradient *, int);
 protected:

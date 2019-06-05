@@ -10,11 +10,11 @@ public:
         return this->mRelFrame;
     }
 
-    void setValueForGraph(const qreal& value) {
+    void setValueForGraph(const qreal value) {
         Q_UNUSED(value);
     }
 
-    void setRelFrame(const int &frame) {
+    void setRelFrame(const int frame) {
         if(frame == this->mRelFrame) return;
         const int dFrame = frame - this->mRelFrame;
         GraphKeyT<T>::setRelFrame(frame);
@@ -22,10 +22,10 @@ public:
         this->setEndFrameVar(this->mEndPt.getRawXValue() + dFrame);
     }
 protected:
-    InterpolationKeyT(const T &value, const int &frame,
+    InterpolationKeyT(const T &value, const int frame,
                       Animator * const parentAnimator) :
         GraphKeyT<T>(value, frame, parentAnimator) {}
-    InterpolationKeyT(const int &frame, Animator * const parentAnimator) :
+    InterpolationKeyT(const int frame, Animator * const parentAnimator) :
         GraphKeyT<T>(frame, parentAnimator) {}
     InterpolationKeyT(Animator * const parentAnimator) :
         GraphKeyT<T>(parentAnimator) {}

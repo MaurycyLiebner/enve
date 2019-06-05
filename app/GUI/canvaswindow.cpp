@@ -68,7 +68,7 @@ Canvas *CanvasWindow::getCurrentCanvas() {
 void CanvasWindow::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction *abstraction,
         const UpdateFuncs &updateFuncs,
-        const int& visiblePartWidgetId) {
+        const int visiblePartWidgetId) {
     for(const auto& child : mCanvasList) {
         auto abs = child->SWT_getOrCreateAbstractionForWidget(updateFuncs,
                                                       visiblePartWidgetId);
@@ -129,7 +129,7 @@ void CanvasWindow::addCanvasToList(const qsptr<Canvas>& canvas) {
     mWindowSWTTarget->SWT_addChildAbstractionForTargetToAll(canvas.get());
 }
 
-void CanvasWindow::removeCanvas(const int &id) {
+void CanvasWindow::removeCanvas(const int id) {
     const auto canvas = mCanvasList.takeAt(id);
     mWindowSWTTarget->SWT_removeChildAbstractionForTargetFromAll(canvas.data());
     if(mCanvasList.isEmpty()) {
@@ -231,7 +231,7 @@ void CanvasWindow::renameCanvas(Canvas *canvas,
     canvas->setName(newName);
 }
 
-void CanvasWindow::renameCanvas(const int &id,
+void CanvasWindow::renameCanvas(const int id,
                                 const QString &newName) {
     renameCanvas(mCanvasList.at(id).data(), newName);
 }
@@ -669,7 +669,7 @@ void CanvasWindow::setFontFamilyAndStyle(const QString& family,
     queScheduledTasksAndUpdate();
 }
 
-void CanvasWindow::setFontSize(const qreal& size) {
+void CanvasWindow::setFontSize(const qreal size) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedFontSize(size);
     queScheduledTasksAndUpdate();
@@ -839,7 +839,7 @@ void CanvasWindow::strokeBrushPressureCurveChanged(
     queScheduledTasksAndUpdate();
 }
 
-void CanvasWindow::strokeWidthChanged(const qreal &strokeWidth) {
+void CanvasWindow::strokeWidthChanged(const qreal strokeWidth) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedStrokeWidth(strokeWidth);
     queScheduledTasksAndUpdate();
@@ -863,7 +863,7 @@ void CanvasWindow::setSelectedStrokeColorMode(const ColorMode &mode) {
     queScheduledTasksAndUpdate();
 }
 
-void CanvasWindow::updateAfterFrameChanged(const int &currentFrame) {
+void CanvasWindow::updateAfterFrameChanged(const int currentFrame) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->anim_setAbsFrame(currentFrame);
 }
@@ -897,34 +897,34 @@ void CanvasWindow::closeWelcomeDialog() {
     mWindow->setCentralWidget(getCanvasWidget());
 }
 
-void CanvasWindow::changeCurrentFrameAction(const int& frame) {
+void CanvasWindow::changeCurrentFrameAction(const int frame) {
     emit changeCurrentFrame(frame);
     updateAfterFrameChanged(frame);
     queScheduledTasksAndUpdate();
 }
 
-void CanvasWindow::setClipToCanvas(const bool &bT) {
+void CanvasWindow::setClipToCanvas(const bool bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setClipToCanvas(bT);
     mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
     queScheduledTasksAndUpdate();
 }
 
-void CanvasWindow::setRasterEffectsVisible(const bool &bT) {
+void CanvasWindow::setRasterEffectsVisible(const bool bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setRasterEffectsVisible(bT);
     mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
     queScheduledTasksAndUpdate();
 }
 
-void CanvasWindow::setPathEffectsVisible(const bool &bT) {
+void CanvasWindow::setPathEffectsVisible(const bool bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setPathEffectsVisible(bT);
     mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
     queScheduledTasksAndUpdate();
 }
 
-void CanvasWindow::setResolutionFraction(const qreal &percent) {
+void CanvasWindow::setResolutionFraction(const qreal percent) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setResolutionFraction(percent);
     mCurrentCanvas->prp_afterWholeInfluenceRangeChanged();
@@ -1048,12 +1048,12 @@ void CanvasWindow::outOfMemory() {
     }
 }
 
-void CanvasWindow::setRenderingPreview(const bool &bT) {
+void CanvasWindow::setRenderingPreview(const bool bT) {
     mRenderingPreview = bT;
     mCurrentCanvas->setRenderingPreview(bT);
 }
 
-void CanvasWindow::setPreviewing(const bool &bT) {
+void CanvasWindow::setPreviewing(const bool bT) {
     mPreviewing = bT;
     mCurrentCanvas->setPreviewing(bT);
 }
@@ -1272,7 +1272,7 @@ void CanvasWindow::updateHoveredElements() {
     mCurrentCanvas->updateHoveredElements();
 }
 
-void CanvasWindow::setLocalPivot(const bool &bT) {
+void CanvasWindow::setLocalPivot(const bool bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setLocalPivot(bT);
 }
@@ -1315,7 +1315,7 @@ void CanvasWindow::stopAudio() {
     mCurrentSoundComposition->stop();
 }
 
-void CanvasWindow::volumeChanged(const int& value) {
+void CanvasWindow::volumeChanged(const int value) {
     if(mAudioOutput) mAudioOutput->setVolume(qreal(value/100.));
 }
 
@@ -1469,7 +1469,7 @@ void CanvasWindow::finishDurationRectPosTransformForAllSelected() {
     mCurrentCanvas->finishDurationRectPosTransformForAllSelected();
 }
 
-void CanvasWindow::moveDurationRectForAllSelected(const int &dFrame) {
+void CanvasWindow::moveDurationRectForAllSelected(const int dFrame) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->moveDurationRectForAllSelected(dFrame);
 }
@@ -1484,7 +1484,7 @@ void CanvasWindow::finishMinFramePosTransformForAllSelected() {
     mCurrentCanvas->finishMinFramePosTransformForAllSelected();
 }
 
-void CanvasWindow::moveMinFrameForAllSelected(const int &dFrame) {
+void CanvasWindow::moveMinFrameForAllSelected(const int dFrame) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->moveMinFrameForAllSelected(dFrame);
 }
@@ -1499,7 +1499,7 @@ void CanvasWindow::finishMaxFramePosTransformForAllSelected() {
     mCurrentCanvas->finishMaxFramePosTransformForAllSelected();
 }
 
-void CanvasWindow::moveMaxFrameForAllSelected(const int &dFrame) {
+void CanvasWindow::moveMaxFrameForAllSelected(const int dFrame) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->moveMaxFrameForAllSelected(dFrame);
 }

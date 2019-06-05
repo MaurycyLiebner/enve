@@ -59,7 +59,7 @@ void Rectangle::finishAllPointsTransform() {
     finishTransform();
 }
 
-SkPath Rectangle::getPathAtRelFrameF(const qreal &relFrame) {
+SkPath Rectangle::getPathAtRelFrameF(const qreal relFrame) {
     SkPath path;
     const SkPoint topLeft =
             toSkPoint(mTopLeftAnimator->
@@ -83,11 +83,11 @@ void Rectangle::setBottomRightPos(const QPointF &pos) {
     mBottomRightPoint->setRelativePos(pos);
 }
 
-void Rectangle::setYRadius(const qreal &radiusY) {
+void Rectangle::setYRadius(const qreal radiusY) {
     mRadiusAnimator->getYAnimator()->setCurrentBaseValue(radiusY);
 }
 
-void Rectangle::setXRadius(const qreal &radiusX) {
+void Rectangle::setXRadius(const qreal radiusX) {
     mRadiusAnimator->getXAnimator()->setCurrentBaseValue(radiusX);
 }
 
@@ -107,7 +107,7 @@ void Rectangle::getMotionBlurProperties(QList<Property*> &list) const {
 }
 
 bool Rectangle::differenceInEditPathBetweenFrames(
-        const int& frame1, const int& frame2) const {
+        const int frame1, const int frame2) const {
     if(mTopLeftAnimator->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
     if(mBottomRightAnimator->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
     return mRadiusAnimator->prp_differencesBetweenRelFrames(frame1, frame2);

@@ -23,13 +23,13 @@ struct AutoTilesData {
 
     void reset();
 
-    void stretchToTile(const int& tx, const int& ty);
-    uint16_t* getTile(const int& tx, const int& ty) const;
+    void stretchToTile(const int tx, const int ty);
+    uint16_t* getTile(const int tx, const int ty) const;
 
     int width() const;
     int height() const;
 
-    SkBitmap tileToBitmap(const int& tx, const int& ty);
+    SkBitmap tileToBitmap(const int tx, const int ty);
     SkBitmap toBitmap(int margin = 0) const;
 
     bool drawOnPixmap(SkPixmap &dst, int drawX, int drawY) const;
@@ -81,13 +81,13 @@ struct AutoTilesData {
     void write(QIODevice * const dst) const;
     void read(QIODevice * const src);
 protected:
-    uint16_t* getTileByIndex(const int& colId, const int& rowId) const;
+    uint16_t* getTileByIndex(const int colId, const int rowId) const;
 private:
     QList<uint16_t*> newColumn();
-    void prependRows(const int& count);
-    void appendRows(const int& count);
-    void prependColumns(const int& count);
-    void appendColumns(const int& count);
+    void prependRows(const int count);
+    void appendRows(const int count);
+    void prependColumns(const int count);
+    void appendColumns(const int count);
 
     int mZeroTileCol = 0;
     int mZeroTileRow = 0;

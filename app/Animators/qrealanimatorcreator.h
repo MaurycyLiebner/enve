@@ -20,10 +20,10 @@ struct QrealAnimatorCreator : public PropertyCreator {
         return gl->glGetUniformLocation(program, fName.toLatin1());
     }
 private:
-    QrealAnimatorCreator(const qreal &iniVal,
-                         const qreal &minVal,
-                         const qreal &maxVal,
-                         const qreal &prefferdStep,
+    QrealAnimatorCreator(const qreal iniVal,
+                         const qreal minVal,
+                         const qreal maxVal,
+                         const qreal prefferdStep,
                          const QString& name) : PropertyCreator(name) {
         fIniVal = iniVal;
         fMinVal = minVal;

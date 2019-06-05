@@ -148,11 +148,11 @@ Canvas *RenderInstanceSettings::getTargetCanvas() {
 }
 
 void RenderInstanceSettings::setCurrentRenderFrame(
-        const int &currentRenderFrame) {
+        const int currentRenderFrame) {
     mCurrentRenderFrame = currentRenderFrame;
 }
 
-const int &RenderInstanceSettings::currentRenderFrame() {
+int RenderInstanceSettings::currentRenderFrame() {
     return mCurrentRenderFrame;
 }
 
@@ -196,7 +196,7 @@ const QString &RenderInstanceSettings::getRenderError() const {
     return mRenderError;
 }
 
-const RenderInstanceSettings::RenderState &RenderInstanceSettings::getCurrentState() const {
+RenderInstanceSettings::RenderState RenderInstanceSettings::getCurrentState() const {
     return mState;
 }
 

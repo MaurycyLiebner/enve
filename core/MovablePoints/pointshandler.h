@@ -10,7 +10,7 @@ class PointsHandler : public StdSelfRef {
 protected:
     PointsHandler();
 public:
-    void insertPt(const int& id, const stdsptr<MovablePoint>& pt) {
+    void insertPt(const int id, const stdsptr<MovablePoint>& pt) {
         pt->setTransform(mTrans);
         mPts.insert(id, pt);
     }
@@ -21,7 +21,7 @@ public:
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode &mode,
-                                   const qreal &invScale) {
+                                   const qreal invScale) {
         for(int i = mPts.count() - 1; i >= 0; i--) {
             const auto& pt = mPts.at(i);
             const auto at = pt->getPointAtAbsPos(absPos, mode, invScale);
@@ -52,8 +52,8 @@ public:
     }
 
     void drawPoints(SkCanvas * const canvas,
-                    const SkScalar &invScale,
-                    const bool& keyOnCurrentFrame,
+                    const SkScalar invScale,
+                    const bool keyOnCurrentFrame,
                     const CanvasMode &mode) const {
         for(int i = mPts.count() - 1; i >= 0; i--) {
             const auto& pt = mPts.at(i);
@@ -63,20 +63,20 @@ public:
     }
 
     template <class T>
-    T* getPointWithId(const int& id) const {
+    T* getPointWithId(const int id) const {
         if(id < 0) return nullptr;
         if(id >= mPts.count()) return nullptr;
         return static_cast<T*>(mPts.at(id).get());
     }
 
     void removeLast() { mPts.removeLast(); }
-    void removeAt(const int& id) { mPts.removeAt(id); }
+    void removeAt(const int id) { mPts.removeAt(id); }
     void clear() { mPts.clear(); }
 
     bool isEmpty() const { return mPts.isEmpty(); }
     int count() const { return mPts.count(); }
 
-    void move(const int& from, const int& to) {
+    void move(const int from, const int to) {
         mPts.move(from, to);
     }
 

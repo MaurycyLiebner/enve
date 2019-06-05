@@ -72,11 +72,11 @@ public:
 
     RenderWidget *getRenderWidget();
 public slots:
-    void setCurrentFrame(const int &frame);
-    void setViewedFrameRange(const int &minFrame,
-                             const int &maxFrame);
-    void setCanvasFrameRange(const int &minFrame,
-                                const int &maxFrame);
+    void setCurrentFrame(const int frame);
+    void setViewedFrameRange(const int minFrame,
+                             const int maxFrame);
+    void setCanvasFrameRange(const int minFrame,
+                                const int maxFrame);
     void addNewBoxesListKeysViewWidget(int id = 0);
     void removeBoxesListKeysViewWidget(
             BoxesListKeysViewWidget *widget);
@@ -87,7 +87,7 @@ private slots:
 
     void interruptPreview();
 
-    void setLocalPivot(const bool &bT);
+    void setLocalPivot(const bool bT);
 
     void setTimelineMode();
     void setRenderMode();

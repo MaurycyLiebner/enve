@@ -35,14 +35,14 @@ void SmartNodePoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
     if(!mC2Pt->isSelected()) mC2Pt->saveTransformPivotAbsPos(absPivot);
 }
 
-void SmartNodePoint::rotateRelativeToSavedPivot(const qreal &rot) {
+void SmartNodePoint::rotateRelativeToSavedPivot(const qreal rot) {
     NonAnimatedMovablePoint::rotateRelativeToSavedPivot(rot);
     if(!mC0Pt->isSelected()) mC0Pt->rotateRelativeToSavedPivot(rot);
     if(!mC2Pt->isSelected()) mC2Pt->rotateRelativeToSavedPivot(rot);
 }
 
-void SmartNodePoint::scaleRelativeToSavedPivot(const qreal &sx,
-                                          const qreal &sy) {
+void SmartNodePoint::scaleRelativeToSavedPivot(const qreal sx,
+                                          const qreal sy) {
     NonAnimatedMovablePoint::scaleRelativeToSavedPivot(sx, sy);
     if(!mC0Pt->isSelected()) mC0Pt->scale(sx, sy);
     if(!mC2Pt->isSelected()) mC2Pt->scale(sx, sy);
@@ -128,7 +128,7 @@ void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {
 
 MovablePoint *SmartNodePoint::getPointAtAbsPos(const QPointF &absPos,
                                                const CanvasMode &mode,
-                                               const qreal &invScale) {
+                                               const qreal invScale) {
     if(mode == CanvasMode::MOVE_POINT) {
         if(mC0Pt->isPointAtAbsPos(absPos, mode, invScale)) {
             return mC0Pt.get();
@@ -205,7 +205,7 @@ void drawCtrlPtLine(SkCanvas * const canvas,
                     const QPointF& qCtrlAbsPos,
                     const QPointF& qAbsPos,
                     const SkPoint& skAbsPos,
-                    const SkScalar &invScale) {
+                    const SkScalar invScale) {
     if(pointToLen(qCtrlAbsPos - qAbsPos) > 1) {
         const SkPoint skCtrlAbsPos = toSkPoint(qCtrlAbsPos);
         SkPaint paint;
@@ -224,8 +224,8 @@ void drawCtrlPtLine(SkCanvas * const canvas,
 void SmartNodePoint::drawSk(
         SkCanvas * const canvas,
         const CanvasMode &mode,
-        const SkScalar &invScale,
-        const bool &keyOnCurrent) {
+        const SkScalar invScale,
+        const bool keyOnCurrent) {
     const QPointF qAbsPos = getAbsolutePos();
     const SkPoint skAbsPos = toSkPoint(qAbsPos);
 
@@ -309,14 +309,14 @@ SmartNodePoint *SmartNodePoint::getConnectedSeparateNodePoint() {
     return mPrevNormalPoint->getConnectedSeparateNodePoint();
 }
 
-void SmartNodePoint::setC2Enabled(const bool &enabled) {
+void SmartNodePoint::setC2Enabled(const bool enabled) {
     if(enabled == getC2Enabled()) return;
     if(getC2Enabled()) setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     currentPath()->actionSetNormalNodeC2Enabled(getNodeId(), enabled);
     mParentAnimator->pathChanged();
 }
 
-void SmartNodePoint::setC0Enabled(const bool &enabled) {
+void SmartNodePoint::setC0Enabled(const bool enabled) {
     if(enabled == getC0Enabled()) return;
     if(mNode_d->getC0Enabled()) setCtrlsMode(CtrlsMode::CTRLS_CORNER);
     currentPath()->actionSetNormalNodeC0Enabled(getNodeId(), enabled);
@@ -363,7 +363,7 @@ SmartPathAnimator *SmartNodePoint::getTargetAnimator() const {
     return mParentAnimator;
 }
 
-void SmartNodePoint::setSeparateNodePoint(const bool &separateNodePoint) {
+void SmartNodePoint::setSeparateNodePoint(const bool separateNodePoint) {
     mSeparateNodePoint = separateNodePoint;
 }
 
@@ -483,11 +483,11 @@ void SmartNodePoint::actionPromoteToNormal() {
     return mHandler_k->promoteToNormal(getNodeId());
 }
 
-void SmartNodePoint::actionDemoteToDissolved(const bool& approx) {
+void SmartNodePoint::actionDemoteToDissolved(const bool approx) {
     return mHandler_k->demoteToDissolved(getNodeId(), approx);
 }
 
-void SmartNodePoint::actionRemove(const bool &approx) {
+void SmartNodePoint::actionRemove(const bool approx) {
     return mHandler_k->removeNode(getNodeId(), approx);
 }
 

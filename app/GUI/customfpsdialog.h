@@ -11,10 +11,10 @@ class CustomFpsDialog : public QDialog
 public:
     CustomFpsDialog();
 
-    void setFps(const qreal &fps) {
+    void setFps(const qreal fps) {
         mSpinBox->setValue(fps);
     }
-    void setEnabled(const bool &bT) {
+    void setEnabled(const bool bT) {
         mCheckBox->setChecked(bT);
     }
 

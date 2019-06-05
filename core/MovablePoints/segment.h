@@ -38,8 +38,8 @@ public:
         qreal getMinT() const;
         qreal getMaxT() const;
 
-        qreal getParentTAtThisT(const qreal& thisT) const;
-        QPointF getRelPosAtT(const qreal &thisT) const;
+        qreal getParentTAtThisT(const qreal thisT) const;
+        QPointF getRelPosAtT(const qreal thisT) const;
     };
     NormalSegment();
     NormalSegment(SmartNodePoint * const firstNode,
@@ -48,11 +48,11 @@ public:
 
     SmartNodePoint* divideAtAbsPos(const QPointF& absPos);
 
-    QPointF getRelPosAtT(const qreal &t) const;
-    QPointF getAbsPosAtT(const qreal &t) const;
+    QPointF getRelPosAtT(const qreal t) const;
+    QPointF getAbsPosAtT(const qreal t) const;
 
-    void makePassThroughAbs(const QPointF &absPos, const qreal &t);
-    void makePassThroughRel(const QPointF &relPos, const qreal &t);
+    void makePassThroughAbs(const QPointF &absPos, const qreal t);
+    void makePassThroughRel(const QPointF &relPos, const qreal t);
 
     void finishPassThroughTransform();
     void startPassThroughTransform();
@@ -61,12 +61,12 @@ public:
     void generateSkPath();
 
     void drawHoveredSk(SkCanvas * const canvas,
-                       const SkScalar &invScale);
+                       const SkScalar invScale);
 
     SmartNodePoint *getFirstNode() const;
     SmartNodePoint *getLastNode() const;
 
-    QPointF getSlopeVector(const qreal &t);
+    QPointF getSlopeVector(const qreal t);
 
     bool isValid() const;
     bool isNormal() const;
@@ -83,7 +83,7 @@ public:
         return mInnerDissolved.count();
     }
 
-    SmartNodePoint* getNodeAt(const int& id) const;
+    SmartNodePoint* getNodeAt(const int id) const;
 
     SubSegment getClosestSubSegment(const QPointF& relPos,
                                     qreal& minDist) const {
@@ -114,7 +114,7 @@ public:
     }
 private:
     void updateDissolvedPos() const;
-    SubSegment subSegmentAtT(const qreal& t) const;
+    SubSegment subSegmentAtT(const qreal t) const;
 
     SkPath mSkPath;
     stdptr<PathPointsHandler> mHandler_k;

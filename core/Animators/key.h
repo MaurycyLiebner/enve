@@ -15,7 +15,7 @@ class Key : public StdSelfRef {
     friend class KeysClipboardContainer;
 public:
     Key(Animator * const parentAnimator);
-    Key(const int &frame, Animator * const parentAnimator);
+    Key(const int frame, Animator * const parentAnimator);
 
 //    QrealPoint *mousePress(qreal frameT, qreal valueT,
 //                    qreal pixelsPerFrame, qreal pixelsPerValue);
@@ -34,9 +34,9 @@ public:
 
     virtual void cancelFrameTransform();
     virtual void scaleFrameAndUpdateParentAnimator(
-            const int &relativeToFrame,
-            const qreal &scaleFactor,
-            const bool& useSavedFrame);
+            const int relativeToFrame,
+            const qreal scaleFactor,
+            const bool useSavedFrame);
 
     virtual bool isSelected() const;
     virtual void addToSelection(QList<qptr<Animator>> &toSelect);
@@ -48,26 +48,26 @@ public:
 
     bool hasPrevKey() const;
     bool hasNextKey() const;
-    void incFrameAndUpdateParentAnimator(const int &inc);
-    void setRelFrameAndUpdateParentAnimator(const int &relFrame);
+    void incFrameAndUpdateParentAnimator(const int inc);
+    void setRelFrameAndUpdateParentAnimator(const int relFrame);
     template <class T = Animator>
     T* getParentAnimator() const {
         return static_cast<T*>(mParentAnimator.data());
     }
     void removeFromAnimator();
 
-    void setSelected(const bool &bT);
+    void setSelected(const bool bT);
 
     bool isHovered() const {
         return mHovered;
     }
 
-    void setHovered(const bool &bT) {
+    void setHovered(const bool bT) {
         mHovered = bT;
     }
 
     int getRelFrame() const;
-    void setAbsFrame(const int &frame);
+    void setAbsFrame(const int frame);
 
     Key* getNextKey() const;
     Key* getPrevKey() const;
@@ -109,7 +109,7 @@ public:
     qreal relFrameToAbsFrameF(const qreal relFrame) const;
     qreal absFrameToRelFrameF(const qreal absFrame) const;
 protected:
-    virtual void setRelFrame(const int &frame);
+    virtual void setRelFrame(const int frame);
     bool mIsSelected = false;
     bool mHovered = false;
 

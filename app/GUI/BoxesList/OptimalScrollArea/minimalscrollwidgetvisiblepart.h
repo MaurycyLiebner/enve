@@ -10,8 +10,8 @@ public:
     MinimalScrollWidgetVisiblePart(MinimalScrollWidget * const parent);
     virtual ~MinimalScrollWidgetVisiblePart();
 
-    void setVisibleTop(const int &top);
-    void setVisibleHeight(const int &height);
+    void setVisibleTop(const int top);
+    void setVisibleHeight(const int height);
 
     void planScheduleUpdateVisibleWidgetsContent();
     void updateVisibleWidgetsContentIfNeeded();

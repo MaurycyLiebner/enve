@@ -14,7 +14,7 @@ void GradientPoint::setColor(const QColor &fillColor) {
 }
 
 void GradientPoint::drawSk(SkCanvas * const canvas, const CanvasMode &mode,
-                           const SkScalar &invScale, const bool &keyOnCurrent) {
+                           const SkScalar invScale, const bool keyOnCurrent) {
     Q_UNUSED(mode);
 
     const SkPoint absPos = toSkPoint(getAbsolutePos());

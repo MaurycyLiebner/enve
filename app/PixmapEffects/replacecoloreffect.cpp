@@ -19,7 +19,7 @@ ReplaceColorEffect::ReplaceColorEffect() :
 }
 
 stdsptr<PixmapEffectRenderData> ReplaceColorEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal &relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ReplaceColorEffectRenderData)();
     QColor fromColor = mFromColor->getColorAtRelFrame(relFrame);
     QColor toColor = mToColor->getColorAtRelFrame(relFrame);
@@ -42,7 +42,7 @@ stdsptr<PixmapEffectRenderData> ReplaceColorEffect::getPixmapEffectRenderDataFor
 }
 
 void ReplaceColorEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
-                                                  const qreal &scale) {
+                                                  const qreal scale) {
     RasterEffects::replaceColor(bitmap, redR, greenR, blueR, alphaR,
                                 redT, greenT, blueT, alphaT,
                                 tolerance, smoothness*scale);

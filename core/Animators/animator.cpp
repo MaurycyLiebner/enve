@@ -9,19 +9,19 @@
 
 Animator::Animator(const QString& name) : Property(name), anim_mKeys(this) {}
 
-void Animator::anim_scaleTime(const int &pivotAbsFrame, const qreal &scale) {
+void Animator::anim_scaleTime(const int pivotAbsFrame, const qreal scale) {
     for(const auto &key : anim_mKeys) {
         key->scaleFrameAndUpdateParentAnimator(pivotAbsFrame, scale, false);
     }
 }
 
-void Animator::anim_shiftAllKeys(const int &shift) {
+void Animator::anim_shiftAllKeys(const int shift) {
     for(const auto &key : anim_mKeys) {
         anim_moveKeyToRelFrame(key, key->getRelFrame() + shift);
     }
 }
 
-bool Animator::anim_nextRelFrameWithKey(const int &relFrame,
+bool Animator::anim_nextRelFrameWithKey(const int relFrame,
                                         int &nextRelFrame) {
     const auto key = anim_getNextKey(relFrame);
     if(!key) return false;
@@ -29,7 +29,7 @@ bool Animator::anim_nextRelFrameWithKey(const int &relFrame,
     return true;
 }
 
-bool Animator::anim_prevRelFrameWithKey(const int &relFrame,
+bool Animator::anim_prevRelFrameWithKey(const int relFrame,
                                        int &prevRelFrame) {
     const auto key = anim_getPrevKey(relFrame);
     if(!key) return false;
@@ -81,13 +81,13 @@ int Animator::anim_getNextKeyRelFrame(const Key * const key) const {
     return nextKey->getRelFrame();
 }
 
-int Animator::anim_getPrevKeyRelFrame(const int &relFrame) const {
+int Animator::anim_getPrevKeyRelFrame(const int relFrame) const {
     Key * const prevKey = anim_getPrevKey(relFrame);
     if(!prevKey) return FrameRange::EMIN;
     return prevKey->getRelFrame();
 }
 
-int Animator::anim_getNextKeyRelFrame(const int &relFrame) const {
+int Animator::anim_getNextKeyRelFrame(const int relFrame) const {
     Key * const nextKey = anim_getNextKey(relFrame);
     if(!nextKey) return FrameRange::EMAX;
     return nextKey->getRelFrame();
@@ -111,7 +111,7 @@ void Animator::anim_updateAfterChangedKey(Key * const key) {
     prp_afterChangedRelRange({prevKeyRelFrame, nextKeyRelFrame});
 }
 
-void Animator::anim_setAbsFrame(const int &frame) {
+void Animator::anim_setAbsFrame(const int frame) {
     anim_mCurrentAbsFrame = frame;
     anim_updateRelFrame();
     anim_updateKeyOnCurrrentFrame();
@@ -122,7 +122,7 @@ void Animator::anim_updateRelFrame() {
     anim_mCurrentRelFrame = anim_mCurrentAbsFrame - prp_getFrameShift();
 }
 
-void Animator::anim_setRecording(const bool &rec) {
+void Animator::anim_setRecording(const bool rec) {
     if(rec == anim_mIsRecording) return;
     if(rec) {
         anim_setRecordingWithoutChangingKeys(rec);
@@ -153,7 +153,7 @@ void Animator::anim_mergeKeysIfNeeded() {
     anim_mKeys.mergeAll();
 }
 
-bool Animator::anim_getClosestsKeyOccupiedRelFrame(const int &frame,
+bool Animator::anim_getClosestsKeyOccupiedRelFrame(const int frame,
                                                    int &closest) {
     int nextT;
     const bool hasNext = anim_nextRelFrameWithKey(frame, nextT);
@@ -187,11 +187,11 @@ bool Animator::anim_hasNextKey(const Key * const key) {
     return false;
 }
 
-int Animator::anim_getPrevKeyId(const int &relFrame) const {
+int Animator::anim_getPrevKeyId(const int relFrame) const {
     return anim_getPrevAndNextKeyId(relFrame).first;
 }
 
-int Animator::anim_getNextKeyId(const int &relFrame) const {
+int Animator::anim_getNextKeyId(const int relFrame) const {
     return anim_getPrevAndNextKeyId(relFrame).second;
 }
 
@@ -251,12 +251,12 @@ void Animator::anim_updateAfterShifted() {
     }
 }
 
-int Animator::getInsertIdForKeyRelFrame(const int& relFrame) const {
+int Animator::getInsertIdForKeyRelFrame(const int relFrame) const {
     return getInsertIdForKeyRelFrame(relFrame, 0, anim_mKeys.count());
 }
 
 int Animator::getInsertIdForKeyRelFrame(
-        const int& relFrame, const int& min, const int& max) const {
+        const int relFrame, const int min, const int max) const {
     if(min >= max) return min;
     const int guess = (max + min)/2;
     const Key * const key = anim_mKeys.atId(guess);
@@ -308,7 +308,7 @@ void Animator::removeKeyWithoutDeselecting(const stdsptr<Key>& keyToRemove) {
     prp_afterChangedRelRange({affectedMin, affectedMax});
 }
 
-void Animator::anim_moveKeyToRelFrame(Key * const key, const int &newFrame) {
+void Animator::anim_moveKeyToRelFrame(Key * const key, const int newFrame) {
     const auto keySPtr = GetAsSPtr(key, Key);
     removeKeyWithoutDeselecting(keySPtr);
     key->setRelFrame(newFrame);
@@ -321,17 +321,17 @@ void Animator::anim_updateKeyOnCurrrentFrame() {
 }
 
 DurationRectangleMovable *Animator::anim_getTimelineMovable(
-        const int &relX, const int &minViewedFrame, const qreal &pixelsPerFrame) {
+        const int relX, const int minViewedFrame, const qreal pixelsPerFrame) {
     Q_UNUSED(relX);
     Q_UNUSED(minViewedFrame);
     Q_UNUSED(pixelsPerFrame);
     return nullptr;
 }
 
-Key *Animator::anim_getKeyAtPos(const qreal &relX,
-                               const int &minViewedFrame,
-                               const qreal &pixelsPerFrame,
-                               const int& keyRectSize) {
+Key *Animator::anim_getKeyAtPos(const qreal relX,
+                               const int minViewedFrame,
+                               const qreal pixelsPerFrame,
+                               const int keyRectSize) {
     const qreal relFrame = relX/pixelsPerFrame - 0.5 - prp_getFrameShift();
     const qreal absX = relX + minViewedFrame*pixelsPerFrame;
     const qreal absFrame = relFrame + minViewedFrame;
@@ -375,11 +375,11 @@ bool Animator::anim_hasKeys() const {
     return !anim_mKeys.isEmpty();
 }
 
-void Animator::anim_setRecordingWithoutChangingKeys(const bool &rec) {
+void Animator::anim_setRecordingWithoutChangingKeys(const bool rec) {
     anim_setRecordingValue(rec);
 }
 
-void Animator::anim_setRecordingValue(const bool &rec) {
+void Animator::anim_setRecordingValue(const bool rec) {
     if(rec == anim_mIsRecording) return;
     anim_mIsRecording = rec;
     emit anim_isRecordingChanged();
@@ -401,9 +401,9 @@ void Animator::anim_setKeyOnCurrentFrame(Key* const key) {
 }
 
 void Animator::anim_getKeysInRect(const QRectF &selectionRect,
-                                 const qreal &pixelsPerFrame,
+                                 const qreal pixelsPerFrame,
                                  QList<Key*> &keysList,
-                                 const int& keyRectSize) {
+                                 const int keyRectSize) {
     //selectionRect.translate(-getFrameShift(), 0.);
     int selLeftFrame = qRound(selectionRect.left());
     if(0.5*(pixelsPerFrame + keyRectSize) <
@@ -421,7 +421,7 @@ void Animator::anim_getKeysInRect(const QRectF &selectionRect,
     }
 }
 
-std::pair<int, int> Animator::anim_getPrevAndNextKeyId(const int &relFrame) const {
+std::pair<int, int> Animator::anim_getPrevAndNextKeyId(const int relFrame) const {
     const int nextOrAtId = anim_mKeys.idForRelFrame(relFrame);
     if(nextOrAtId >= anim_mKeys.count()) return {nextOrAtId - 1, -1};
     const auto keyAtId = anim_mKeys.atId(nextOrAtId);
@@ -435,7 +435,7 @@ std::pair<int, int> Animator::anim_getPrevAndNextKeyId(const int &relFrame) cons
     }
 }
 
-std::pair<int, int> Animator::anim_getPrevAndNextKeyIdF(const qreal &relFrame) const {
+std::pair<int, int> Animator::anim_getPrevAndNextKeyIdF(const qreal relFrame) const {
     if(isInteger4Dec(relFrame))
         return anim_getPrevAndNextKeyId(qRound(relFrame));
     const int fFrame = qFloor(relFrame);
@@ -453,7 +453,7 @@ int Animator::anim_getCurrentRelFrame() const {
     return anim_mCurrentRelFrame;
 }
 
-FrameRange Animator::prp_getIdenticalRelRange(const int &relFrame) const {
+FrameRange Animator::prp_getIdenticalRelRange(const int relFrame) const {
     if(anim_mKeys.isEmpty()) return {FrameRange::EMIN, FrameRange::EMAX};
     const auto pn = anim_getPrevAndNextKeyId(relFrame);
     const int prevId = pn.first;
@@ -501,9 +501,9 @@ FrameRange Animator::prp_getIdenticalRelRange(const int &relFrame) const {
 
 void Animator::anim_drawKey(QPainter * const p,
                             Key * const key,
-                            const qreal &pixelsPerFrame,
-                            const int &startFrame,
-                            const int &rowHeight) {
+                            const qreal pixelsPerFrame,
+                            const int startFrame,
+                            const int rowHeight) {
     if(key->isSelected()) p->setBrush(Qt::yellow);
     else p->setBrush(Qt::red);
     if(key->isHovered()) p->setPen(QPen(Qt::black, 1.5));
@@ -516,9 +516,9 @@ void Animator::anim_drawKey(QPainter * const p,
 }
 
 void Animator::drawTimelineControls(QPainter * const p,
-                                    const qreal &pixelsPerFrame,
+                                    const qreal pixelsPerFrame,
                                     const FrameRange &absFrameRange,
-                                    const int &rowHeight) {
+                                    const int rowHeight) {
     p->translate(prp_getFrameShift()*pixelsPerFrame, 0);
     const auto relRange = prp_absRangeToRelRange(absFrameRange);
     const auto idRange = frameRangeToKeyIdRange(relRange);
@@ -580,15 +580,15 @@ void Animator::selectAllKeys() {
     }
 }
 
-void Animator::incSelectedKeysFrame(const int &dFrame) {
+void Animator::incSelectedKeysFrame(const int dFrame) {
     for(const auto& key : anim_mSelectedKeys) {
         const int newFrame = key->getRelFrame() + dFrame;
         anim_moveKeyToRelFrame(key, newFrame);
     }
 }
 
-void Animator::scaleSelectedKeysFrame(const int &absPivotFrame,
-                                      const qreal &scale) {
+void Animator::scaleSelectedKeysFrame(const int absPivotFrame,
+                                      const qreal scale) {
     for(const auto& key : anim_mSelectedKeys) {
         key->scaleFrameAndUpdateParentAnimator(absPivotFrame, scale, true);
     }

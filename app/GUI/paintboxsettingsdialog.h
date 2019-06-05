@@ -16,11 +16,11 @@ public:
     int getFrameCount();
     int getOverlapFrames();
 
-    void setOverlapFrames(const int &overlapFrames) {
+    void setOverlapFrames(const int overlapFrames) {
         mOverlapFramesSpin->setValue(overlapFrames);
     }
 
-    void setFrameStep(const int &frameStep) {
+    void setFrameStep(const int frameStep) {
         mFrameStepSpin->setValue(frameStep);
     }
 private:

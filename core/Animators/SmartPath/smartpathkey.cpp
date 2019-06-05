@@ -1,6 +1,6 @@
 #include "smartpathkey.h"
 
-SmartPathKey::SmartPathKey(const SmartPath &value, const int &relFrame,
+SmartPathKey::SmartPathKey(const SmartPath &value, const int relFrame,
                            Animator * const parentAnimator) :
     InterpolationKeyT<SmartPath>(relFrame, parentAnimator) {
     assignValue(value);

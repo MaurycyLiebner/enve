@@ -6,7 +6,7 @@ class BoundingBox;
 struct SampledMotionBlurEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;
     void applyEffectsSk(const SkBitmap &bitmap,
-                        const qreal &scale);
+                        const qreal scale);
 
     qreal numberSamples;
     qreal opacity;
@@ -28,14 +28,14 @@ public:
         mParentBox = box;
     }
 
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, BoundingBoxRenderData * const data);
+            const qreal relFrame, BoundingBoxRenderData * const data);
 protected:
     SampledMotionBlurEffect(BoundingBox *box = nullptr);
 private:
-    FrameRange getParentBoxFirstLastMarginAjusted(const int &relFrame) const;
+    FrameRange getParentBoxFirstLastMarginAjusted(const int relFrame) const;
     qptr<BoundingBox> mParentBox;
     qsptr<QrealAnimator> mOpacity;
     qsptr<QrealAnimator> mNumberSamples;

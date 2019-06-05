@@ -11,7 +11,7 @@ protected:
                    const Type &type);
 public:
     void setRelativePos(const QPointF &relPos);
-    void rotateRelativeToSavedPivot(const qreal &rotate);
+    void rotateRelativeToSavedPivot(const qreal rotate);
 
     void startTransform();
     void finishTransform();
@@ -20,7 +20,7 @@ public:
     void remove();
 
     bool isVisible(const CanvasMode &mode) const;
-    void scale(const qreal &sx, const qreal &sy);
+    void scale(const qreal sx, const qreal sy);
 
     void setOtherCtrlPt(SmartCtrlPoint * const ctrlPt);
 private:

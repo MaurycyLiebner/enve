@@ -6,7 +6,7 @@ class BoundingBox;
 struct WaitingForBoxLoad {
     typedef std::function<void(BoundingBox*)> BoxReadFunc;
     typedef std::function<void()> BoxNeverReadFunc;
-    WaitingForBoxLoad(const int &boxReadId,
+    WaitingForBoxLoad(const int boxReadId,
                       const BoxReadFunc& boxRead,
                       const BoxNeverReadFunc& boxNeverRead);
 

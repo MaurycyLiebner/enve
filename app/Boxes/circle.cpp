@@ -62,26 +62,26 @@ void Circle::moveRadiusesByAbs(const QPointF &absTrans) {
     mHorizontalRadiusPoint->moveByAbs(absTrans);
 }
 
-void Circle::setVerticalRadius(const qreal &verticalRadius) {
+void Circle::setVerticalRadius(const qreal verticalRadius) {
     const QPointF centerPos = mCenterPoint->getRelativePos();
     mVerticalRadiusPoint->setRelativePos(
                 centerPos + QPointF(0, verticalRadius));
 }
 
-void Circle::setHorizontalRadius(const qreal &horizontalRadius) {
+void Circle::setHorizontalRadius(const qreal horizontalRadius) {
     const QPointF centerPos = mCenterPoint->getRelativePos();
     mHorizontalRadiusPoint->setRelativePos(
                 centerPos + QPointF(horizontalRadius, 0));
 }
 
-void Circle::setRadius(const qreal &radius) {
+void Circle::setRadius(const qreal radius) {
     setHorizontalRadius(radius);
     setVerticalRadius(radius);
 }
 
 bool Circle::SWT_isCircle() const { return true; }
 
-SkPath Circle::getPathAtRelFrameF(const qreal &relFrame) {
+SkPath Circle::getPathAtRelFrameF(const qreal relFrame) {
     const SkScalar xRadius = static_cast<SkScalar>(
                 mHorizontalRadiusAnimator->getEffectiveXValue(relFrame));
     const SkScalar yRadius = static_cast<SkScalar>(
@@ -109,7 +109,7 @@ void Circle::getMotionBlurProperties(QList<Property*> &list) const {
 }
 
 bool Circle::differenceInEditPathBetweenFrames(
-        const int& frame1, const int& frame2) const {
+        const int frame1, const int frame2) const {
     if(mCenterAnimator->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
     if(mHorizontalRadiusAnimator->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
     return mVerticalRadiusAnimator->prp_differencesBetweenRelFrames(frame1, frame2);
@@ -119,7 +119,7 @@ CircleRadiusPoint::CircleRadiusPoint(QPointFAnimator * const associatedAnimator,
                                      BasicTransformAnimator * const parent,
                                      AnimatedPoint * const centerPoint,
                                      const MovablePointType &type,
-                                     const bool &blockX) :
+                                     const bool blockX) :
     AnimatedPoint(associatedAnimator, type),
     mXBlocked(blockX), mCenterPoint(centerPoint) {
     setTransform(parent);

@@ -13,7 +13,7 @@ BlurEffect::BlurEffect() : PixmapEffect("blur", EFFECT_BLUR) {
 }
 
 void BlurEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
-                                          const qreal &scale) {
+                                          const qreal scale) {
     const SkScalar sigma = toSkScalar(fBlurRadius*0.3333*scale);
     const auto src = SkiaHelpers::makeCopy(bitmap);
     SkCanvas canvas(bitmap);
@@ -28,12 +28,12 @@ qreal BlurEffect::getMargin() {
     return mBlurRadius->getCurrentBaseValue();
 }
 
-qreal BlurEffect::getMarginAtRelFrame(const int &relFrame) {
+qreal BlurEffect::getMarginAtRelFrame(const int relFrame) {
     return mBlurRadius->getEffectiveValue(relFrame);
 }
 
 stdsptr<PixmapEffectRenderData> BlurEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal &relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(BlurEffectRenderData)();
     renderData->fBlurRadius = mBlurRadius->getEffectiveValue(relFrame);
     return GetAsSPtr(renderData, PixmapEffectRenderData);

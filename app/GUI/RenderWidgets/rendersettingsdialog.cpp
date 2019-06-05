@@ -403,7 +403,7 @@ void RenderSettingsDialog::updateAvailableAudioBitrates() {
         mAudioBitrateComboBox->addItem("Loseless");
     } else {
         QList<int> ratesT = { 24, 32, 48, 64, 128, 160, 192, 320, 384 };
-        for(const int &rateT : ratesT) {
+        for(const int rateT : ratesT) {
             mAudioBitrateComboBox->addItem(QString::number(rateT) + " kbps");
             mAudioBitrateList << rateT*1000;
         }
@@ -423,7 +423,7 @@ void RenderSettingsDialog::updateAvailableSampleRates() {
     if(!sampleRates) {
         QList<int> ratesT = { 96000, 88200, 64000, 48000, 44100,
                               32000, 22050, 11025, 8000 };
-        for(const int &rateT : ratesT) {
+        for(const int rateT : ratesT) {
             mSampleRateComboBox->addItem(QString::number(rateT) + " Hz");
             mSampleRatesList << rateT;
         }

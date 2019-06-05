@@ -15,8 +15,8 @@ class ValueInput {
 public:
     ValueInput();
 
-    void draw(SkCanvas *canvas, const int &y);
-    void draw(QPainter *p, const int &y);
+    void draw(SkCanvas *canvas, const int y);
+    void draw(QPainter *p, const int y);
 
     qreal getValue() const { return mInputValue; }
     QPointF getPtValue() const {
@@ -83,7 +83,7 @@ public:
         return mXYMode == MODE_Y;
     }
 
-    void setDisplayedValue(const qreal& value) {
+    void setDisplayedValue(const qreal value) {
         setDisplayedValue({value, value});
     }
 
@@ -91,7 +91,7 @@ public:
         mDisplayValue = value;
     }
 
-    void setForce1D(const bool& d) {
+    void setForce1D(const bool d) {
         mForce1D = d;
     }
 protected:

@@ -4,7 +4,7 @@
 #include "Boxes/pathbox.h"
 #include "pathoperations.h"
 
-OperationPathEffect::OperationPathEffect(const bool &outlinePathEffect) :
+OperationPathEffect::OperationPathEffect(const bool outlinePathEffect) :
     PathEffect("path operation effect",
                OPERATION_PATH_EFFECT, outlinePathEffect) {
     mOperationType = SPtrCreate(ComboBoxProperty)(
@@ -18,7 +18,7 @@ OperationPathEffect::OperationPathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mOperationType);
 }
 
-void OperationPathEffect::apply(const qreal &relFrame,
+void OperationPathEffect::apply(const qreal relFrame,
                                 const SkPath &src,
                                 SkPath * const dst) {
     const auto pathBox = GetAsPtr(mBoxTarget->getTarget(), PathBox);

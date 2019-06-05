@@ -4,7 +4,7 @@
 #include <QApplication>
 #include "pointhelpers.h"
 
-Segment1DEditor::Segment1DEditor(const qreal &minY, const qreal &maxY,
+Segment1DEditor::Segment1DEditor(const qreal minY, const qreal maxY,
                                  QWidget *parent) : QWidget(parent),
     mCurrentSegment(minY, 1./3*(maxY - minY) + minY,
                     2./3*(maxY - minY) + minY, maxY) {
@@ -15,12 +15,12 @@ Segment1DEditor::Segment1DEditor(const qreal &minY, const qreal &maxY,
     //updateDrawPath();
 }
 
-qreal Segment1DEditor::xValueToXPos(const qreal& x) const {
+qreal Segment1DEditor::xValueToXPos(const qreal x) const {
     qreal wid = width() - 2*mPtRad - 2*mMargin;
     return x*wid + mPtRad + mMargin;
 }
 
-qreal Segment1DEditor::yValueToYPos(const qreal &y) const {
+qreal Segment1DEditor::yValueToYPos(const qreal y) const {
     qreal hig = height() - 2*mPtRad - 2*mMargin - 2*mAddMarginY;
     return height() - ((y - mMinY)*hig/(mMaxY - mMinY) +
                     mPtRad + mMargin + mAddMarginY + mTopMargin);
@@ -36,8 +36,8 @@ QPointF Segment1DEditor::valueToPos(const QPointF& value) const {
     return QPointF(pos.x(), height() - pos.y());
 }
 
-QPointF Segment1DEditor::valueToPos(const qreal &valX,
-                                    const qreal &valY) const {
+QPointF Segment1DEditor::valueToPos(const qreal valX,
+                                    const qreal valY) const {
     return valueToPos(QPointF(valX, valY));
 }
 

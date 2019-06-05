@@ -5,9 +5,9 @@
 class LinesPathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    LinesPathEffect(const bool &outlinePathEffect);
+    LinesPathEffect(const bool outlinePathEffect);
 public:
-    void apply(const qreal &relFrame,
+    void apply(const qreal relFrame,
                const SkPath &src,
                SkPath * const dst);
 

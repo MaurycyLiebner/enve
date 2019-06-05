@@ -42,7 +42,7 @@ struct Texture {
 
     //! @brief Generates, binds texture and sets data.
     void gen(QGL33c* gl,
-             const int& fWidth, const int& fHeight,
+             const int fWidth, const int fHeight,
              const void * const data);
 
     void swap(Texture& otherTexture) {
@@ -88,7 +88,7 @@ struct TextureFrameBuffer {
     void bindTexture(QGL33c* gl);
 
     //! @brief Generates and binds framebuffer and associated texture.
-    void gen(QGL33c* gl, const int& widthT, const int& heightT);
+    void gen(QGL33c* gl, const int widthT, const int heightT);
 };
 
 #endif // GLHELPERS_H

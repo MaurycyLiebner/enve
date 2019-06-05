@@ -57,10 +57,10 @@ namespace RasterEffects {
     // aproproriate value.
 
     void colorizeHSV(const SkBitmap &bitmap,
-                     const qreal &hue,
-                     const qreal &saturation,
-                     const qreal &lightness,
-                     const qreal &alpha);
+                     const qreal hue,
+                     const qreal saturation,
+                     const qreal lightness,
+                     const qreal alpha);
 
     // change brightness of the image
     void brightness(const SkBitmap &bitmap, int bn);
@@ -73,16 +73,16 @@ namespace RasterEffects {
     void gamma(const SkBitmap &bitmap, qreal L);
 
     void replaceColor(const SkBitmap &bitmap,
-                  const int &redR,
-                  const int &greenR,
-                  const int &blueR,
-                  const int &alphaR,
-                  const int &redT,
-                  const int &greenT,
-                  const int &blueT,
-                  const int &alphaT,
-                  const int &tolerance,
-                  const qreal &smooth);
+                  const int redR,
+                  const int greenR,
+                  const int blueR,
+                  const int alphaR,
+                  const int redT,
+                  const int greenT,
+                  const int blueT,
+                  const int alphaT,
+                  const int tolerance,
+                  const qreal smooth);
 
     // change contrast with Photoshop-like method
     // contrast should be  -255 <= contrast <= 255
@@ -106,9 +106,9 @@ namespace RasterEffects {
         // opacity = [0.0; 1.0]
     void blend(const SkBitmap &bitmap, const rgb &rgb, float opacity);
     void replaceColor(const SkBitmap &bitmap,
-                      const int &rInt,
-                      const int &gInt,
-                      const int &bInt);
+                      const int rInt,
+                      const int gInt,
+                      const int bInt);
 
         // val = [0.0; 1.0]
         void fade(const SkBitmap &bitmap, const rgb &rgb, float val);
@@ -140,44 +140,44 @@ namespace RasterEffects {
         void equalize(const SkBitmap &bitmap);
 
         void applyBlur(const SkBitmap &bitmap,
-                       const qreal &scale,
-                       const qreal &blurRadius,
-                       const bool &highQuality,
-                       const bool &hasKeys);
+                       const qreal scale,
+                       const qreal blurRadius,
+                       const bool highQuality,
+                       const bool hasKeys);
 
         void applyBlur(const SkBitmap &bitmapg,
-                       const qreal &scale,
-                       const qreal &blurRadius,
-                       const bool &highQuality,
-                       const bool &hasKeys,
-                       const qreal &opacity);
+                       const qreal scale,
+                       const qreal blurRadius,
+                       const bool highQuality,
+                       const bool hasKeys,
+                       const qreal opacity);
 
         // radius = [0.01; 90.0], sigma = [0.01; 50.0]
-        void anim_fast_blur(const SkBitmap &bitmap, const qreal &fRadius);
-        void anim_fast_blur(const SkBitmap &bitmap, const qreal &fRadius,
-                            const qreal &opacityT);
+        void anim_fast_blur(const SkBitmap &bitmap, const qreal fRadius);
+        void anim_fast_blur(const SkBitmap &bitmap, const qreal fRadius,
+                            const qreal opacityT);
         void fast_blur(const SkBitmap &bitmap, int radius);
         void fast_blur(const SkBitmap &bitmap, int radius,
-                       const qreal &opacityT);
+                       const qreal opacityT);
 
         void anim_fast_shadow(const SkBitmap &bitmap,
-                              const qreal &fRed,
-                              const qreal &fGreen,
-                              const qreal &fBlue,
-                              const qreal &fDx,
-                              const qreal &fDy,
-                              const qreal &fRadius);
+                              const qreal fRed,
+                              const qreal fGreen,
+                              const qreal fBlue,
+                              const qreal fDx,
+                              const qreal fDy,
+                              const qreal fRadius);
 
         void blur(const SkBitmap &bitmap, qreal radius, qreal sigma);
 
         void qblurMono(qreal *data,
-                       const int &w,
-                       const int &h,
-                       const qreal &fRadius);
+                       const int w,
+                       const int h,
+                       const qreal fRadius);
         void qspredMono(qreal *data,
-                       const int &w,
-                       const int &h,
-                       const qreal &fRadius);
+                       const int w,
+                       const int h,
+                       const qreal fRadius);
 
         void despeckle(const SkBitmap &bitmap);
 

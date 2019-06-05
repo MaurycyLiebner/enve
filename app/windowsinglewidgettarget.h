@@ -12,7 +12,7 @@ public:
 
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      const UpdateFuncs &updateFuncs,
-                                     const int& visiblePartWidgetId);
+                                     const int visiblePartWidgetId);
 protected:
     WindowSingleWidgetTarget(CanvasWindow * const window);
 

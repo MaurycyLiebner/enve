@@ -13,7 +13,7 @@ DesaturateEffect::DesaturateEffect() :
 }
 
 stdsptr<PixmapEffectRenderData> DesaturateEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal &relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(DesaturateEffectRenderData)();
     renderData->influence =
             mInfluenceAnimator->getEffectiveValue(relFrame);
@@ -21,7 +21,7 @@ stdsptr<PixmapEffectRenderData> DesaturateEffect::getPixmapEffectRenderDataForRe
 }
 
 void DesaturateEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
-                                                const qreal &scale) {
+                                                const qreal scale) {
     Q_UNUSED(scale);
     RasterEffects::desaturate(bitmap, influence);
 }

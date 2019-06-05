@@ -49,13 +49,13 @@ struct BrushesContext {
 class BrushSelectionWidget : public QTabWidget {
     Q_OBJECT
 public:
-    BrushSelectionWidget(const int& contextId,
+    BrushSelectionWidget(const int contextId,
                          QWidget * const parent = nullptr);
     ~BrushSelectionWidget() {}
 
     void updateBrushes();
 
-    const int& getContextId() const {
+    int getContextId() const {
         return mContextId;
     }
 
@@ -83,7 +83,7 @@ public:
     }
 
     static void sSetCurrentBrushForContext(
-            const int& contextId,
+            const int contextId,
             SimpleBrushWrapper* const wrapper) {
         auto& context = sBrushContexts[contextId];
         context.setSelectedWrapper(wrapper);
@@ -107,7 +107,7 @@ private:
     static bool sLoaded;
     static QList<BrushesContext> sBrushContexts;
 
-    static const BrushesContext& sGetContext(const int& id) {
+    static const BrushesContext& sGetContext(const int id) {
         if(id < 0 || id >= sBrushContexts.count())
             RuntimeThrow("Id does not correspond to any context");
         return sBrushContexts.at(id);

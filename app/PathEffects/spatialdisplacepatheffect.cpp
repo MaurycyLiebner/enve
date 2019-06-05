@@ -4,7 +4,7 @@
 #include "Properties/boolproperty.h"
 #include "pointhelpers.h"
 
-SpatialDisplacePathEffect::SpatialDisplacePathEffect(const bool &outlinePathEffect) :
+SpatialDisplacePathEffect::SpatialDisplacePathEffect(const bool outlinePathEffect) :
     PathEffect("spatial displace effect",
                SPATIAL_DISPLACE_PATH_EFFECT,
                outlinePathEffect) {
@@ -29,7 +29,7 @@ SpatialDisplacePathEffect::SpatialDisplacePathEffect(const bool &outlinePathEffe
     mLengthBased->setValue(false);
 }
 
-void SpatialDisplacePathEffect::apply(const qreal &relFrame,
+void SpatialDisplacePathEffect::apply(const qreal relFrame,
                                       const SkPath &src,
                                       SkPath * const dst) {
     const qreal baseSeed = mSeed->getBaseSeed(relFrame);

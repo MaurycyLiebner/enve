@@ -68,7 +68,7 @@ protected:
         if(mTmpFile) scheduleDeleteTmpFile();
     }
 
-    void setDataInMemory(const bool& dataInMemory) {
+    void setDataInMemory(const bool dataInMemory) {
         mDataInMemory = dataInMemory;
     }
 

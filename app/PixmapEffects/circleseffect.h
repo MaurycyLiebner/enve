@@ -6,7 +6,7 @@ struct CirclesEffectRenderData : public PixmapEffectRenderData {
     friend class StdSelfRef;
 
     void applyEffectsSk(const SkBitmap &bitmap,
-                        const qreal &scale);
+                        const qreal scale);
 
     qreal circlesDistance;
     qreal circlesRadius;
@@ -19,7 +19,7 @@ class CirclesEffect : public PixmapEffect {
 public:
     qreal getMargin() { return 0.; }
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal &relFrame, BoundingBoxRenderData*);
+            const qreal relFrame, BoundingBoxRenderData*);
 protected:
     CirclesEffect(qreal circlesRadius = 5.,
                   qreal circlesDistance = 5.);

@@ -26,7 +26,7 @@ SmartVectorPath::SmartVectorPath() :
 }
 
 bool SmartVectorPath::differenceInEditPathBetweenFrames(
-        const int &frame1, const int &frame2) const {
+        const int frame1, const int frame2) const {
     return mPathAnimator->prp_differencesBetweenRelFrames(frame1, frame2);
 }
 
@@ -57,7 +57,7 @@ void SmartVectorPath::applyCurrentTransformation() {
     mNReasonsNotToApplyUglyTransform--;
 }
 
-SkPath SmartVectorPath::getPathAtRelFrameF(const qreal &relFrame) {
+SkPath SmartVectorPath::getPathAtRelFrameF(const qreal relFrame) {
      return mPathAnimator->getPathAtRelFrame(relFrame);
 }
 

@@ -56,20 +56,20 @@ extern void applyXYNoise(qreal noise_t,
                          qreal &next_noise_x,
                          qreal &previous_noise_y,
                          qreal &next_noise_y,
-                         const qreal &noise_frequency,
+                         const qreal noise_frequency,
                          uchar &noise_count,
                          qreal &value_x,
                          qreal &value_y);
 extern void applyUNoise(qreal noise_t,
                         qreal &previous_noise,
                         qreal &next_noise,
-                        const qreal &noise_frequency,
+                        const qreal noise_frequency,
                         uchar &noise_count,
                         qreal &value);
 extern void applyNoise(qreal noise_t,
                        qreal &previous_noise,
                        qreal &next_noise,
-                       const qreal &noise_frequency,
+                       const qreal noise_frequency,
                        uchar &noise_count,
                        qreal &value);
 

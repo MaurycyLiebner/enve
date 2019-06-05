@@ -5,9 +5,9 @@
 class ZigZagPathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    ZigZagPathEffect(const bool &outlinePathEffect);
+    ZigZagPathEffect(const bool outlinePathEffect);
 public:
-    void apply(const qreal &relFrame,
+    void apply(const qreal relFrame,
                const SkPath &src,
                SkPath * const dst);
 

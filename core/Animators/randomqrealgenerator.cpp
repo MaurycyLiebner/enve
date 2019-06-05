@@ -23,20 +23,20 @@ RandomQrealGenerator::RandomQrealGenerator() :
     ca_addChildAnimator(mSeedAssist);
 }
 
-void RandomQrealGenerator::anim_setAbsFrame(const int &frame) {
+void RandomQrealGenerator::anim_setAbsFrame(const int frame) {
     ComplexAnimator::anim_setAbsFrame(frame);
     if(mMaxDev->getCurrentEffectiveValue() < 0.001) return;
     anim_callFrameChangeUpdater();
 }
 
-FrameRange RandomQrealGenerator::prp_getIdenticalRelRange(const int &relFrame) const {
+FrameRange RandomQrealGenerator::prp_getIdenticalRelRange(const int relFrame) const {
     if(mMaxDev->getEffectiveValue(relFrame) < 0.001) {
         return ComplexAnimator::prp_getIdenticalRelRange(relFrame);
     }
     return {relFrame, relFrame};
 }
 
-qreal RandomQrealGenerator::getDevAtRelFrame(const qreal &relFrame) {
+qreal RandomQrealGenerator::getDevAtRelFrame(const qreal relFrame) {
     const int seed = mSeedAssist->getBaseIntValue(relFrame);
     const qreal time = mTime->getEffectiveValue(relFrame);
     const qreal smooth = mSmoothness->getEffectiveValue(relFrame);

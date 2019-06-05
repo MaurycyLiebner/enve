@@ -2,8 +2,8 @@
 #include <QFileDialog>
 #include <QLineEdit>
 
-RenderOutputWidget::RenderOutputWidget(const qreal &canvasWidth,
-                                       const qreal &canvasHeight,
+RenderOutputWidget::RenderOutputWidget(const qreal canvasWidth,
+                                       const qreal canvasHeight,
                                        QWidget *parent) : QDialog(parent) {
     mCanvasWidth = canvasWidth;
     mCanvasHeight = canvasHeight;

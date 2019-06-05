@@ -1,7 +1,7 @@
 #include "gradientpointsupdater.h"
 #include "Boxes/pathbox.h"
 
-GradientPointsUpdater::GradientPointsUpdater(const bool &isFill,
+GradientPointsUpdater::GradientPointsUpdater(const bool isFill,
                                              PathBox *target) :
     PropertyUpdater() {
     mTarget = target;

@@ -21,21 +21,21 @@ public:
         openAudioStream();
     }
 
-    stdsptr<Samples> getSamplesForSecond(const int &secondId);
+    stdsptr<Samples> getSamplesForSecond(const int secondId);
 
-    void secondReaderFinished(const int& secondId,
+    void secondReaderFinished(const int secondId,
                               const stdsptr<Samples>& samples);
-    void secondReaderCanceled(const int &secondId) {
+    void secondReaderCanceled(const int secondId) {
         removeSecondReader(secondId);
     }
 
-    SoundReaderForMerger * getSecondReader(const int& second) {
+    SoundReaderForMerger * getSecondReader(const int second) {
         const int id = mSecondsBeingRead.indexOf(second);
         if(id >= 0) return mSecondReaders.at(id).get();
         return nullptr;
     }
 
-    SoundReaderForMerger * addSecondReader(const int& secondId);
+    SoundReaderForMerger * addSecondReader(const int secondId);
 
     int durationSec() const {
         if(!mAudioStreamsData) return 0;
@@ -46,7 +46,7 @@ public:
         return mSecondsCache;
     }
 protected:
-    void removeSecondReader(const int& second) {
+    void removeSecondReader(const int second) {
         const int id = mSecondsBeingRead.indexOf(second);
         mSecondsBeingRead.removeAt(id);
         mSecondReaders.removeAt(id);

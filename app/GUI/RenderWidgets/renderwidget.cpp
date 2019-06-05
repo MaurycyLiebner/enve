@@ -97,7 +97,7 @@ void RenderWidget::removeRenderInstanceWidget(RenderInstanceWidget *wid) {
     delete wid;
 }
 
-void RenderWidget::setRenderedFrame(const int &frame) {
+void RenderWidget::setRenderedFrame(const int frame) {
     if(!mCurrentRenderedSettings) return;
     mRenderProgressBar->setValue(frame);
 }

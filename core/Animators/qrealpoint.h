@@ -19,25 +19,25 @@ public:
     qreal getRelFrame();
     qreal getAbsFrame();
 
-    void setRelFrame(const qreal &frame);
+    void setRelFrame(const qreal frame);
     void setAbsFrame(const qreal absFrame);
 
     qreal getValue();
 
-    void setValue(const qreal &value);
+    void setValue(const qreal value);
 
     bool isSelected();
 
-    bool isNear(const qreal &frameT,
-                const qreal &valueT,
-                const qreal &pixelsPerFrame,
-                const qreal &pixelsPerValue);
+    bool isNear(const qreal frameT,
+                const qreal valueT,
+                const qreal pixelsPerFrame,
+                const qreal pixelsPerValue);
 
-    void moveTo(const qreal &frameT, const qreal &valueT);
+    void moveTo(const qreal frameT, const qreal valueT);
 
     void draw(QPainter * const p, const QColor &paintColor);
 
-    void setSelected(const bool &bT);
+    void setSelected(const bool bT);
 
     bool isKeyPoint();
     bool isStartPoint();
@@ -58,7 +58,7 @@ public:
 private:
     QrealPoint(const QrealPointType &type,
                GraphKey * const parentKey,
-               const qreal &radius = 10);
+               const qreal radius = 10);
     bool mIsSelected = false;
     bool mHovered = false;
     QrealPointType mType;

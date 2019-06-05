@@ -12,14 +12,14 @@ ImageSequenceCacheHandler::ImageSequenceCacheHandler(
     updateFrameCount();
 }
 
-sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtFrame(const int &relFrame) {
+sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtFrame(const int relFrame) {
     ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame);
     if(!cacheHandler) return sk_sp<SkImage>();
     return cacheHandler->getImage();
 }
 
 sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtOrBeforeFrame(
-        const int &relFrame) {
+        const int relFrame) {
     if(mFrameImageHandlers.isEmpty()) return sk_sp<SkImage>();
     if(relFrame >= mFrameImageHandlers.count()) {
         return mFrameImageHandlers.last()->getImage();
@@ -39,7 +39,7 @@ void ImageSequenceCacheHandler::clearCache() {
     FileCacheHandler::clearCache();
 }
 
-Task *ImageSequenceCacheHandler::scheduleFrameLoad(const int &frame) {
+Task *ImageSequenceCacheHandler::scheduleFrameLoad(const int frame) {
     const auto& imageHandler = mFrameImageHandlers.at(frame);
     if(imageHandler->hasImage()) return nullptr;
     return imageHandler->scheduleLoad();

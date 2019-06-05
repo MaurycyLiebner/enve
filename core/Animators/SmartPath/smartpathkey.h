@@ -14,7 +14,7 @@ public:
     }
     void assignValue(const SmartPath &value);
 protected:
-    SmartPathKey(const SmartPath& value, const int &relFrame,
+    SmartPathKey(const SmartPath& value, const int relFrame,
                  Animator * const parentAnimator);
     SmartPathKey(Animator * const parentAnimator);
 };

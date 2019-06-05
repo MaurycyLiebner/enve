@@ -3,10 +3,10 @@
 
 // used mainly for loading layers (transparent PNG)
 void rgba8_to_rgba16(uint8_t* src,
-                     const int& srcWidth,
+                     const int srcWidth,
                      uint16_t* dst,
-                     const int& dstWidth,
-                     const int& height) {
+                     const int dstWidth,
+                     const int height) {
     for(int i = 0; i < height; i++) {
         uint8_t *srcLine = src + i * srcWidth * 4;
         uint16_t *dstLine = dst + i * dstWidth * 4;
@@ -35,10 +35,10 @@ void rgba8_to_rgba16(uint8_t* src,
 // Naive conversion code from the internal MyPaint format and 8 bit RGB
 void rgba16_to_rgba8_unpremultiplied(
         uint16_t* src,
-        const int& srcWidth,
+        const int srcWidth,
         uint8_t* dst,
-        const int& dstWidth,
-        const int& height) {
+        const int dstWidth,
+        const int height) {
     for(int i = 0; i < height; i++) {
         uint16_t *srcLine = src + i * srcWidth * 4;
         uint8_t *dstLine = dst + i * dstWidth * 4;
@@ -81,10 +81,10 @@ void rgba16_to_rgba8_unpremultiplied(
 
 void rgba16_to_rgba8_premultiplied(
         uint16_t* src,
-        const int& srcWidth,
+        const int srcWidth,
         uint8_t* dst,
-        const int& dstWidth,
-        const int& height) {
+        const int dstWidth,
+        const int height) {
     for(int i = 0; i < height; i++) {
         uint16_t *srcLine = src + i * srcWidth * 4;
         uint8_t *dstLine = dst + i * dstWidth * 4;

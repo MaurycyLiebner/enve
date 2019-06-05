@@ -16,21 +16,21 @@ public:
     ColorSetting();
     ColorSetting(const ColorMode &settingModeT,
                  const CVR_TYPE &changedValueT,
-                 const qreal &val1T,
-                 const qreal &val2T,
-                 const qreal &val3T,
-                 const qreal &alphaT,
+                 const qreal val1T,
+                 const qreal val2T,
+                 const qreal val3T,
+                 const qreal alphaT,
                  const ColorSettingType &typeT,
                  ColorAnimator * const excludeT = nullptr);
     void apply(ColorAnimator * const target) const;
 
-    const ColorSettingType &getType() const;
-    const ColorMode &getSettingMode() const;
-    const CVR_TYPE &getChangedValue() const;
-    const qreal &getVal1() const;
-    const qreal &getVal2() const;
-    const qreal &getVal3() const;
-    const qreal &getAlpa() const;
+    ColorSettingType getType() const;
+    ColorMode getSettingMode() const;
+    CVR_TYPE getChangedValue() const;
+    qreal getVal1() const;
+    qreal getVal2() const;
+    qreal getVal3() const;
+    qreal getAlpa() const;
 
     QColor getColor() const {
         QColor color;

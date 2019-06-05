@@ -2,16 +2,16 @@
 #include <QtWidgets>
 
 FlowLayout::FlowLayout(QWidget *parent,
-                       const int& margin,
-                       const int& hSpacing,
-                       const int& vSpacing)
+                       const int margin,
+                       const int hSpacing,
+                       const int vSpacing)
     : QLayout(parent), mHSpace(hSpacing), mVSpace(vSpacing) {
     setContentsMargins(margin, margin, margin, margin);
 }
 
-FlowLayout::FlowLayout(const int &margin,
-                       const int &hSpacing,
-                       const int &vSpacing)
+FlowLayout::FlowLayout(const int margin,
+                       const int hSpacing,
+                       const int vSpacing)
     : mHSpace(hSpacing), mVSpace(vSpacing) {
     setContentsMargins(margin, margin, margin, margin);
 }

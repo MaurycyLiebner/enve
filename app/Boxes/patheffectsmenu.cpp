@@ -3,7 +3,7 @@
 template <typename T, typename U>
 void PathEffectsMenu::addPathEffectActionToMenu(
         const QString& text, BoxTypeMenu * const menu,
-        const U& adder, const bool& outline) {
+        const U& adder, const bool outline) {
     menu->addPlainAction<BoundingBox>(text, [adder, outline](BoundingBox * box) {
         (box->*adder)(SPtrCreateTemplated(T)(outline));
     });
@@ -13,7 +13,7 @@ void PathEffectsMenu::addPathEffectActionToMenu(
 template <typename U>
 void PathEffectsMenu::addPathEffectsActionToMenu(
         BoxTypeMenu * const menu,
-        const U &adder, const bool &outline) {
+        const U &adder, const bool outline) {
     addPathEffectActionToMenu<DisplacePathEffect>(
                 "Displace", menu, adder, outline);
     addPathEffectActionToMenu<SpatialDisplacePathEffect>(

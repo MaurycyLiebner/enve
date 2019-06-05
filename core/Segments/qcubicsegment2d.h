@@ -43,7 +43,7 @@ struct qCubicSegment2D {
     }
 
     static qCubicSegment2D sFromConic(const QPointF& p0, const QPointF& c,
-                                      const QPointF& p1, const qreal& weight) {
+                                      const QPointF& p1, const qreal weight) {
         qreal u = 4*weight/(3*(1 + weight));
         return qCubicSegment2D(p0, p0*(1 - u) + c*u, p1*(1 - u) + c*u, p1);
     }
@@ -67,18 +67,18 @@ struct qCubicSegment2D {
     qCubicSegment1D xSeg() const;
     qCubicSegment1D ySeg() const;
 
-    QPointF tanAtLength(const qreal &len);
-    QPointF tanAtT(const qreal &t) const;
+    QPointF tanAtLength(const qreal len);
+    QPointF tanAtT(const qreal t) const;
 
-    PosAndTan posAndTanAtLength(const qreal& len);
-    PosAndTan posAndTanAtT(const qreal& t) const;
+    PosAndTan posAndTanAtLength(const qreal len);
+    PosAndTan posAndTanAtT(const qreal t) const;
 
-    QPointF posAtT(const qreal& t) const;
-    QPointF posAtLength(const qreal &len);
+    QPointF posAtT(const qreal t) const;
+    QPointF posAtLength(const qreal len);
     qreal tAtPos(const QPointF& pos);
 
     qreal length();
-    qreal tAtLength(const qreal& len);
+    qreal tAtLength(const qreal len);
     qreal lengthAtT(qreal t);
     qreal lengthFracAtT(qreal t);
 
@@ -100,18 +100,18 @@ struct qCubicSegment2D {
                         qreal * const pBestT = nullptr,
                         QPointF * const pBestPos = nullptr);
     qreal minDistanceTo(const QPointF &p,
-                        const qreal &minT,
-                        const qreal &maxT,
+                        const qreal minT,
+                        const qreal maxT,
                         qreal * const pBestT = nullptr,
                         QPointF * const pBestPos = nullptr);
 
-    qCubicSegment2D rotated(const qreal& deg) const {
+    qCubicSegment2D rotated(const qreal deg) const {
         qCubicSegment2D result(*this);
         result.rotate(deg);
         return result;
     }
 
-    void rotate(const qreal& deg) {
+    void rotate(const qreal deg) {
         if(isZero6Dec(deg)) return;
         mP0 = gRotPt(p0(), deg);
         mC1 = gRotPt(c1(), deg);
@@ -120,7 +120,7 @@ struct qCubicSegment2D {
         mLengthUpToDate = false;
     }
 
-    void makePassThroughRel(const QPointF &relPos, const qreal &t) {
+    void makePassThroughRel(const QPointF &relPos, const qreal t) {
         const qreal oneMinusT = 1 - t;
         QPointF dPos = relPos - posAtT(t);
         while(pointToLen(dPos) > 1) {
@@ -130,13 +130,13 @@ struct qCubicSegment2D {
         }
     }
 
-    qCubicSegment2D randomDisplaced(const qreal &displ) {
+    qCubicSegment2D randomDisplaced(const qreal displ) {
         qCubicSegment2D result(*this);
         result.randomDisplace(displ);
         return result;
     }
 
-    void randomDisplace(const qreal &displ) {
+    void randomDisplace(const qreal displ) {
         setP0(gQPointFDisplace(p0(), displ));
         setC1(gQPointFDisplace(c1(), displ));
         setC2(gQPointFDisplace(c2(), displ));
@@ -145,12 +145,12 @@ struct qCubicSegment2D {
     }
 
     //! @brief -90 is y direction 0 is x direction
-    qreal tFurthestInDirection(const qreal& deg) const;
+    qreal tFurthestInDirection(const qreal deg) const;
 
     qCubicSegment2D tFragment(qreal minT, qreal maxT) const;
-    qCubicSegment2D lenFragment(const qreal& minLen, const qreal& maxLen);
-    qCubicSegment2D lenFracFragment(const qreal& minLenFrac,
-                                    const qreal& maxLenFrac);
+    qCubicSegment2D lenFragment(const qreal minLen, const qreal maxLen);
+    qCubicSegment2D lenFracFragment(const qreal minLenFrac,
+                                    const qreal maxLenFrac);
 
     bool isLine() const {
         const qreal arr1 = mP0.x()*(mC1.y() - mC2.y()) +
@@ -171,8 +171,8 @@ struct qCubicSegment2D {
         return true;
     }
 private:
-    qreal tAtLength(const qreal& length, const qreal& maxLenErr,
-                    const qreal& minT, const qreal& maxT);
+    qreal tAtLength(const qreal length, const qreal maxLenErr,
+                    const qreal minT, const qreal maxT);
 
     void updateLength();
     bool mLengthUpToDate = false;

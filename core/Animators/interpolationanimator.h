@@ -9,7 +9,7 @@ public:
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType& type,
             qreal &minValue, qreal &maxValue) const;
-    qreal getInterpolatedFrameAtRelFrame(const qreal &frame) const;
+    qreal getInterpolatedFrameAtRelFrame(const qreal frame) const;
 };
 
 #endif // INTERPOLATIONANIMATOR_H

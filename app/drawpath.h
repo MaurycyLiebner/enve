@@ -15,7 +15,7 @@ public:
 
     void drawPathMove(const QPointF &pos);
 
-    void finishDrawingPath(const bool &close);
+    void finishDrawingPath(const bool close);
 
     void drawPath(SkCanvas *canvas);
 
@@ -23,18 +23,18 @@ public:
 
     void addNodeAt(const QPointF &pos);
 
-    void incNodePosIdsForIdsAboveOrEqual(const int &idT,
-                                         const int &inc = 1);
+    void incNodePosIdsForIdsAboveOrEqual(const int idT,
+                                         const int inc = 1);
 
-    void decNodePosIdsForIdsBelow(const int &idT,
-                                  const int &inc = 1);
+    void decNodePosIdsForIdsBelow(const int idT,
+                                  const int inc = 1);
 
     void sortNodes();
 
-    void removePosForNode(const int &idT);
+    void removePosForNode(const int idT);
 
     struct DrawPathNode {
-        DrawPathNode(const int &idT,
+        DrawPathNode(const int idT,
                      const QPointF &posT) {
             posId = idT;
             pos = posT;

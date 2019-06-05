@@ -17,7 +17,7 @@ LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) :
 
 
 stdsptr<PixmapEffectRenderData> LinesEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal &relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(LinesEffectRenderData)();
     renderData->linesDistance = mLinesDistance->getEffectiveValue(relFrame);
     renderData->linesWidth = mLinesWidth->getEffectiveValue(relFrame);
@@ -27,7 +27,7 @@ stdsptr<PixmapEffectRenderData> LinesEffect::getPixmapEffectRenderDataForRelFram
 }
 
 void LinesEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
-                                           const qreal &scale) {
+                                           const qreal scale) {
     Q_UNUSED(bitmap)
     Q_UNUSED(scale)
 }

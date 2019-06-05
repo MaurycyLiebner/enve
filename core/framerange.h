@@ -18,7 +18,7 @@ struct iValueRange {
         return fMax >= fMin;
     }
 
-    bool inRange(const int& val) const {
+    bool inRange(const int val) const {
         return val >= fMin && val <= fMax;
     }
 
@@ -26,7 +26,7 @@ struct iValueRange {
         return qMax(0, fMax - fMin + 1);
     }
 
-    iValueRange shifted(const int& by) const {
+    iValueRange shifted(const int by) const {
         return {fMin + by, fMax + by};
     }
 
@@ -93,7 +93,7 @@ struct qValueRange {
         return fMax > fMin;
     }
 
-    bool inRange(const qreal& val) const {
+    bool inRange(const qreal val) const {
         return val >= fMin && val <= fMax;
     }
 
@@ -101,7 +101,7 @@ struct qValueRange {
         return qMax(0., fMax - fMin);
     }
 
-    qValueRange shifted(const qreal& by) const {
+    qValueRange shifted(const qreal by) const {
         return {fMin + by, fMax + by};
     }
 
@@ -116,11 +116,11 @@ struct qValueRange {
         fMin = maxT;
     }
 
-    qValueRange operator/(const qreal& b) const {
+    qValueRange operator/(const qreal b) const {
         return {this->fMin/b, this->fMax/b};
     }
 
-    qValueRange operator*(const qreal& b) const {
+    qValueRange operator*(const qreal b) const {
         return {this->fMin*b, this->fMax*b};
     }
 

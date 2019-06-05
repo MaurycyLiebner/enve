@@ -25,8 +25,8 @@ public:
     void cancelTransform();
 
     void saveTransformPivotAbsPos(const QPointF &absPivot);
-    void rotateRelativeToSavedPivot(const qreal &rot);
-    void scaleRelativeToSavedPivot(const qreal &sx, const qreal &sy);
+    void rotateRelativeToSavedPivot(const qreal rot);
+    void scaleRelativeToSavedPivot(const qreal sx, const qreal sy);
 
     void setRelativePos(const QPointF &relPos);
 
@@ -43,12 +43,12 @@ public:
 
     void drawSk(SkCanvas * const canvas,
                 const CanvasMode &mode,
-                const SkScalar &invScale,
-                const bool &keyOnCurrent);
+                const SkScalar invScale,
+                const bool keyOnCurrent);
     void setTransform(BasicTransformAnimator * const trans);
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode &mode,
-                                   const qreal &invScale);
+                                   const qreal invScale);
 
     int moveToClosestSegment(const QPointF &absPos);
     SmartNodePoint *actionAddPointRelPos(const QPointF &relPos);
@@ -57,8 +57,8 @@ public:
     void actionDisconnectFromNormalPoint(SmartNodePoint * const other);
     void actionMergeWithNormalPoint(SmartNodePoint * const other);
     void actionPromoteToNormal();
-    void actionDemoteToDissolved(const bool &approx);
-    void actionRemove(const bool& approx);
+    void actionDemoteToDissolved(const bool approx);
+    void actionRemove(const bool approx);
 
     //void moveByRel(const QPointF &relTranslation);
 
@@ -75,7 +75,7 @@ public:
 
     bool isEndPoint() const;
 
-    void setSeparateNodePoint(const bool &separateNodePoint);
+    void setSeparateNodePoint(const bool separateNodePoint);
     bool isSeparateNodePoint();
 
     void setCtrlsMode(const CtrlsMode &mode);
@@ -89,12 +89,12 @@ public:
         return currentPath();
     }
 
-    void setC0Enabled(const bool &enabled);
-    void setC2Enabled(const bool &enabled);
+    void setC0Enabled(const bool enabled);
+    void setC2Enabled(const bool enabled);
     void resetC0();
     void resetC2();
 
-    void setNodeId(const int &idT);
+    void setNodeId(const int idT);
 
     int getNodeId() const;
 

@@ -5,8 +5,8 @@
 #include "mainwindow.h"
 #include "global.h"
 
-QDoubleSlider::QDoubleSlider(const qreal &minVal, const qreal &maxVal,
-                             const qreal &prefferedStep,
+QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
+                             const qreal prefferedStep,
                              QWidget * const parent) : QWidget(parent) {
     mValue = minVal;
     mMinValue = minVal;
@@ -35,9 +35,9 @@ QDoubleSlider::QDoubleSlider(const qreal &minVal, const qreal &maxVal,
 }
 
 QDoubleSlider::QDoubleSlider(const QString &name,
-                             const qreal &minVal,
-                             const qreal &maxVal,
-                             const qreal &prefferedStep,
+                             const qreal minVal,
+                             const qreal maxVal,
+                             const qreal prefferedStep,
                              QWidget * const parent) :
     QDoubleSlider(minVal, maxVal, prefferedStep, parent) {
     setName(name);
@@ -77,7 +77,7 @@ void QDoubleSlider::setNumberDecimals(int decimals) {
     fitWidthToContent();
 }
 
-void QDoubleSlider::setValueNoUpdate(const qreal& value) {
+void QDoubleSlider::setValueNoUpdate(const qreal value) {
     mValue = clamp(value, mMinValue, mMaxValue);
 }
 
@@ -98,7 +98,7 @@ void QDoubleSlider::setValueRange(qreal min, qreal max) {
     fitWidthToContent();
 }
 
-void QDoubleSlider::paint(QPainter * const p, const bool& enabled) {
+void QDoubleSlider::paint(QPainter * const p, const bool enabled) {
     paint(p, enabled ? QColor(255, 255, 255) : QColor(220, 220, 220),
           enabled ? QColor(220, 220, 220) : QColor(200, 200, 200),
           enabled ? Qt::black : Qt::darkGray,
@@ -239,7 +239,7 @@ void QDoubleSlider::mousePressEvent(QMouseEvent *event) {
     }
 }
 
-void QDoubleSlider::setPrefferedValueStep(const qreal& step) {
+void QDoubleSlider::setPrefferedValueStep(const qreal step) {
     mPrefferedValueStep = step;
 }
 

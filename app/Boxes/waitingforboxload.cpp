@@ -1,7 +1,7 @@
 #include "waitingforboxload.h"
 #include "Boxes/boundingbox.h"
 
-WaitingForBoxLoad::WaitingForBoxLoad(const int &boxReadId,
+WaitingForBoxLoad::WaitingForBoxLoad(const int boxReadId,
                                      const BoxReadFunc &boxRead,
                                      const BoxNeverReadFunc &boxNeverRead) :
     mBoxReadId(boxReadId),

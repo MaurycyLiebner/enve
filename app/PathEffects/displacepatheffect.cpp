@@ -3,7 +3,7 @@
 #include "Properties/boolproperty.h"
 #include "pointhelpers.h"
 
-DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
+DisplacePathEffect::DisplacePathEffect(const bool outlinePathEffect) :
     PathEffect("displace effect", DISPLACE_PATH_EFFECT, outlinePathEffect) {
     mSegLength = SPtrCreate(QrealAnimator)("segment length");
     mMaxDev = SPtrCreate(QrealAnimator)("max deviation");
@@ -28,7 +28,7 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
 
 std::pair<QPointF, QPointF> posAndTanToC1C2(const PosAndTan& prev,
                                             const PosAndTan& next,
-                                            const qreal& smooth) {
+                                            const qreal smooth) {
     const qreal thirdDist = 0.333*pointToLen(next.fPos - prev.fPos);
     const auto c1Vector = scalePointToNewLen(prev.fTan, thirdDist);
     const QPointF c1 = prev.fPos + c1Vector*smooth;
@@ -37,13 +37,13 @@ std::pair<QPointF, QPointF> posAndTanToC1C2(const PosAndTan& prev,
     return {c1, c2};
 }
 
-void perterb(PosAndTan& posAndTan, const qreal& dev) {
+void perterb(PosAndTan& posAndTan, const qreal dev) {
     posAndTan.fTan = scalePointToNewLen(posAndTan.fTan, dev);
     const auto displ = gRotPt(posAndTan.fTan, 90);
     posAndTan.fPos += displ;
 }
 
-void DisplacePathEffect::apply(const qreal &relFrame,
+void DisplacePathEffect::apply(const qreal relFrame,
                                const SkPath &src,
                                SkPath * const dst) {
     const qreal baseSeed = mSeed->getEffectiveValue(relFrame);

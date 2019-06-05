@@ -217,7 +217,7 @@ BoxesListKeysViewWidget::~BoxesListKeysViewWidget() {
 
 }
 
-void BoxesListKeysViewWidget::setGraphEnabled(const bool &bT) {
+void BoxesListKeysViewWidget::setGraphEnabled(const bool bT) {
     mKeysView->setGraphViewed(bT);
     mAnimationDockWidget->setVisible(bT);
 }
@@ -258,12 +258,12 @@ void BoxesListKeysViewWidget::connectToChangeWidthWidget(
     setBoxesListWidth(changeWidthWidget->getCurrentWidth());
 }
 
-void BoxesListKeysViewWidget::setDisplayedFrameRange(const int &minFrame,
-                                                  const int &maxFrame) {
+void BoxesListKeysViewWidget::setDisplayedFrameRange(const int minFrame,
+                                                  const int maxFrame) {
     mKeysView->setFramesRange(minFrame, maxFrame);
 }
 
-void BoxesListKeysViewWidget::setBoxesListWidth(const int &width) {
+void BoxesListKeysViewWidget::setBoxesListWidth(const int width) {
     const int sizeHintWidth = mBoxesListMenuBar->sizeHint().width();
     const int cornerSizeHintWidth = mCornerMenuBar->sizeHint().width();
     const int widthT = width - mCornerMenuBar->sizeHint().width();

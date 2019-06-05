@@ -10,11 +10,11 @@ class NodeList {
 protected:
     NodeList() {}
 public:
-    Node* operator[](const int& i) const {
+    Node* operator[](const int i) const {
         return mNodes[i];
     }
 
-    Node* at(const int& i) const {
+    Node* at(const int i) const {
         return mNodes[i];
     }
 
@@ -22,7 +22,7 @@ public:
         return mNodes.count();
     }
 
-    void setNodeType(const int& nodeId, const Node::NodeType& type) const {
+    void setNodeType(const int nodeId, const Node::NodeType& type) const {
         if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodeType(mNodes[nodeId], type);
     }
@@ -31,7 +31,7 @@ public:
         node->setType(type);
     }
 
-    void setNodeCtrlsMode(const int& nodeId, const CtrlsMode& ctrlsMode) {
+    void setNodeCtrlsMode(const int nodeId, const CtrlsMode& ctrlsMode) {
         if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodeCtrlsMode(mNodes[nodeId], ctrlsMode);
     }
@@ -40,21 +40,21 @@ public:
         node->setCtrlsMode(ctrlsMode);
     }
 
-    void setNodeC0Enabled(const int& nodeId, const bool& enabled) {
+    void setNodeC0Enabled(const int nodeId, const bool enabled) {
         if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodeC0Enabled(mNodes[nodeId], enabled);
     }
 
-    void setNodeC0Enabled(Node * const node, const bool& enabled) {
+    void setNodeC0Enabled(Node * const node, const bool enabled) {
         node->setC0Enabled(enabled);
     }
 
-    void setNodeC2Enabled(const int& nodeId, const bool& enabled) {
+    void setNodeC2Enabled(const int nodeId, const bool enabled) {
         if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodeC2Enabled(mNodes[nodeId], enabled);
     }
 
-    void setNodeC2Enabled(Node * const node, const bool& enabled) {
+    void setNodeC2Enabled(Node * const node, const bool enabled) {
         node->setC2Enabled(enabled);
     }
 
@@ -66,14 +66,14 @@ public:
         return nextNode(node->getNodeId());
     }
 
-    Node * prevNode(const int& nodeId) const {
+    Node * prevNode(const int nodeId) const {
         if(mNodes.count() <= 1) return nullptr;
         if(nodeId > 0) return mNodes[nodeId - 1];
         if(mClosed) return mNodes.last();
         return nullptr;
     }
 
-    Node * nextNode(const int& nodeId) const {
+    Node * nextNode(const int nodeId) const {
         if(mNodes.count() <= 1) return nullptr;
         if(nodeId < mNodes.count() - 1) return mNodes[nodeId + 1];
         if(mClosed) return mNodes.first();
@@ -88,15 +88,15 @@ public:
         return nextNormal(node->getNodeId());
     }
 
-    Node * prevNormal(const int &nodeId) const;
-    Node * nextNormal(const int &nodeId) const;
+    Node * prevNormal(const int nodeId) const;
+    Node * nextNormal(const int nodeId) const;
 
     SkPath toSkPath() const;
     void setPath(const SkPath &path);
-    void removeNodeFromList(const int &nodeId);
+    void removeNodeFromList(const int nodeId);
     void reverse();
     bool isClosed() const;
-    void setClosed(const bool& closed) {
+    void setClosed(const bool closed) {
         mClosed = closed;
     }
 
@@ -111,25 +111,25 @@ public:
 
     int insertFirstNode(const Node &nodeBlueprint);
 
-    void promoteDissolvedNodeToNormal(const int &nodeId);
-    void promoteDissolvedNodeToNormal(const int &nodeId, Node * const node);
+    void promoteDissolvedNodeToNormal(const int nodeId);
+    void promoteDissolvedNodeToNormal(const int nodeId, Node * const node);
 
-    void removeNode(const int &nodeId, const bool &approx);
-    void removeNode(const int &nodeId, Node * const node,
-                    const bool &approx);
+    void removeNode(const int nodeId, const bool approx);
+    void removeNode(const int nodeId, Node * const node,
+                    const bool approx);
 
-    void demoteNormalNodeToDissolved(const int& nodeId, const bool &approx);
-    void demoteNormalNodeToDissolved(const int &nodeId, Node * const node,
-                                     const bool &approx);
+    void demoteNormalNodeToDissolved(const int nodeId, const bool approx);
+    void demoteNormalNodeToDissolved(const int nodeId, Node * const node,
+                                     const bool approx);
 
-    void splitNode(const int &nodeId);
-    void splitNodeAndDisconnect(const int &nodeId);
-    void mergeNodes(const int &node1Id, const int &node2Id);
-    bool nodesConnected(const int &node1Id, const int &node2Id) const;
+    void splitNode(const int nodeId);
+    void splitNodeAndDisconnect(const int nodeId);
+    void mergeNodes(const int node1Id, const int node2Id);
+    bool nodesConnected(const int node1Id, const int node2Id) const;
 
-    void moveNode(const int& fromId, const int& toId);
-    void updateDissolvedNodePosition(const int& nodeId);
-    void updateDissolvedNodePosition(const int &nodeId, Node * const node);
+    void moveNode(const int fromId, const int toId);
+    void updateDissolvedNodePosition(const int nodeId);
+    void updateDissolvedNodePosition(const int nodeId, Node * const node);
 
     NodeList createDeepCopy() const {
         NodeList copy;
@@ -153,11 +153,11 @@ protected:
         mNodes.prependNodesShallowCopy(other.getList());
     }
 
-    void moveNodesToFrontStartingWith(const int& first) {
+    void moveNodesToFrontStartingWith(const int first) {
         mNodes.moveNodesToFrontStartingWith(first);
     }
 
-    NodeList detachNodesStartingWith(const int& first) {
+    NodeList detachNodesStartingWith(const int first) {
         const auto detachedList = mNodes.detachNodesStartingWith(first);
         NodeList detached;
         detached.shallowCopyNodeList(detachedList);
@@ -187,8 +187,8 @@ protected:
         mNodes.shallowCopyFrom(list);
     }
 
-    int insertNodeBefore(const int &nextId, const Node &nodeBlueprint);
-    int insertNodeAfter(const int &prevId, const Node &nodeBlueprint);
+    int insertNodeBefore(const int nextId, const Node &nodeBlueprint);
+    int insertNodeAfter(const int prevId, const Node &nodeBlueprint);
     int appendNode(const Node &nodeBlueprint);
     Node * appendAndGetNode(const Node &nodeBlueprint) {
         return mNodes[appendNode(nodeBlueprint)];
@@ -196,12 +196,12 @@ protected:
 
     static NodeList sInterpolate(const NodeList &list1,
                                  const NodeList &list2,
-                                 const qreal &weight2);
+                                 const qreal weight2);
 private:
-    qreal prevT(const int &nodeId) const;
-    qreal nextT(const int &nodeId) const;
-    Node *insertNodeToList(const int &nodeId, const Node &node);
-    void approximateBeforeDemoteOrRemoval(const qreal &nodeT,
+    qreal prevT(const int nodeId) const;
+    qreal nextT(const int nodeId) const;
+    Node *insertNodeToList(const int nodeId, const Node &node);
+    void approximateBeforeDemoteOrRemoval(const qreal nodeT,
                                           Node * const node,
                                           Node * const prevNormalV,
                                           Node * const nextNormalV);

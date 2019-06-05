@@ -6,7 +6,7 @@ void HDDCachableCacheHandler::removeRenderContainer(
 }
 
 int HDDCachableCacheHandler::insertIdForRelFrame(
-        const int &relFrame) const {
+        const int relFrame) const {
     int minId = 0;
     int maxId = mRenderContainers.count();
 
@@ -27,7 +27,7 @@ int HDDCachableCacheHandler::insertIdForRelFrame(
     return 0;
 }
 
-bool HDDCachableCacheHandler::idAtRelFrame(const int &relFrame, int *id) const {
+bool HDDCachableCacheHandler::idAtRelFrame(const int relFrame, int *id) const {
     int minId = 0;
     int maxId = mRenderContainers.count() - 1;
 
@@ -61,7 +61,7 @@ bool HDDCachableCacheHandler::idAtRelFrame(const int &relFrame, int *id) const {
     return false;
 }
 
-int HDDCachableCacheHandler::getFirstEmptyFrameAfterFrame(const int &frame) const {
+int HDDCachableCacheHandler::getFirstEmptyFrameAfterFrame(const int frame) const {
     int currFrame = frame + 1;
     Cont *cont = nullptr;
     while(true) {
@@ -71,7 +71,7 @@ int HDDCachableCacheHandler::getFirstEmptyFrameAfterFrame(const int &frame) cons
     }
 }
 
-int HDDCachableCacheHandler::firstEmptyFrameAtOrAfterFrame(const int &frame) const {
+int HDDCachableCacheHandler::firstEmptyFrameAtOrAfterFrame(const int frame) const {
     int currFrame = frame;
     Cont *cont = nullptr;
     while(true) {
@@ -82,7 +82,7 @@ int HDDCachableCacheHandler::firstEmptyFrameAtOrAfterFrame(const int &frame) con
 }
 
 void HDDCachableCacheHandler::blockConts(
-        const FrameRange &range, const bool &blocked) {
+        const FrameRange &range, const bool blocked) {
     IdRange idRange = rangeToListIdRange(range);
     for(int i = idRange.fMin; i <= idRange.fMax; i++) {
         mRenderContainers.at(i)->setBlocked(blocked);
@@ -93,14 +93,14 @@ void HDDCachableCacheHandler::clearCache() {
     mRenderContainers.clear();
 }
 
-void HDDCachableCacheHandler::cacheDataBeforeRelFrame(const int &relFrame) {
+void HDDCachableCacheHandler::cacheDataBeforeRelFrame(const int relFrame) {
     const int lastId = idAtOrBeforeRelFrame(relFrame);
     for(int i = 0; i < lastId; i++) {
         mRenderContainers.at(i)->noDataLeft_k();
     }
 }
 
-void HDDCachableCacheHandler::cacheDataAfterRelFrame(const int &relFrame) {
+void HDDCachableCacheHandler::cacheDataAfterRelFrame(const int relFrame) {
     const int firstId = idAtOrAfterRelFrame(relFrame);
     for(int i = firstId; i < mRenderContainers.count(); i++) {
         mRenderContainers.at(i)->noDataLeft_k();
@@ -117,19 +117,19 @@ void HDDCachableCacheHandler::cacheLastContainer() {
     mRenderContainers.last()->noDataLeft_k();
 }
 
-int HDDCachableCacheHandler::countAfterRelFrame(const int &relFrame) const {
+int HDDCachableCacheHandler::countAfterRelFrame(const int relFrame) const {
     int firstId = idAtOrAfterRelFrame(relFrame + 1);
     return mRenderContainers.count() - firstId;
 }
 
-int HDDCachableCacheHandler::idAtOrBeforeRelFrame(const int &frame) const {
+int HDDCachableCacheHandler::idAtOrBeforeRelFrame(const int frame) const {
     int id;
     if(!idAtRelFrame(frame, &id))
         id = insertIdForRelFrame(frame) - 1;
     return id;
 }
 
-int HDDCachableCacheHandler::idAtOrAfterRelFrame(const int &frame) const {
+int HDDCachableCacheHandler::idAtOrAfterRelFrame(const int frame) const {
     int id;
     if(!idAtRelFrame(frame, &id))
         id = insertIdForRelFrame(frame);
@@ -138,9 +138,9 @@ int HDDCachableCacheHandler::idAtOrAfterRelFrame(const int &frame) const {
 #include "pointhelpers.h"
 void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
                                                   const QRectF& drawRect,
-                                                  const int &startFrame,
-                                                  const int &endFrame,
-                                                  const qreal& unit) const {
+                                                  const int startFrame,
+                                                  const int endFrame,
+                                                  const qreal unit) const {
     if(startFrame > endFrame) return;
     p->save();
     const qreal quStartFrame = startFrame/unit;

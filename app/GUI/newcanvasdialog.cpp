@@ -17,10 +17,10 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &defName,
     CanvasSettingsDialog(defName, 1920, 1080, 200, 24., nullptr, parent) {}
 
 CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
-                                           const int &currWidth,
-                                           const int &currHeight,
-                                           const int &currFrameCount,
-                                           const qreal &currFps,
+                                           const int currWidth,
+                                           const int currHeight,
+                                           const int currFrameCount,
+                                           const qreal currFps,
                                            ColorAnimator *bgColorAnimator,
                                            QWidget *parent) :
     QDialog(parent) {

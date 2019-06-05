@@ -76,10 +76,10 @@ struct AutoTiledSurface {
         set.execute(brush, fMyPaintSurface, 5);
     }
 
-    SkBitmap tileToBitmap(const int& tx, const int& ty) {
+    SkBitmap tileToBitmap(const int tx, const int ty) {
         return mAutoTilesData.tileToBitmap(tx, ty);
     }
-    SkBitmap toBitmap(const int& margin = 0) const {
+    SkBitmap toBitmap(const int margin = 0) const {
         return mAutoTilesData.toBitmap(margin);
     }
 

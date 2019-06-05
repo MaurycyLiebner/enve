@@ -40,11 +40,11 @@ class GPURasterEffect : public ComplexAnimator {
                     const QString &name);
 public:
     virtual qreal getMargin() { return 0; }
-    virtual qreal getMarginAtRelFrame(const int &) { return 0; }
+    virtual qreal getMarginAtRelFrame(const int ) { return 0; }
     bool isVisible() const { return true; }
 
     stdsptr<GPURasterEffectCaller> getGPURasterEffectCaller(
-            const qreal& relFrame) {
+            const qreal relFrame) {
         UniformSpecifiers uniformSpecifiers;
         const int argsCount = mProgram->fArgumentLocs.count();
         for(int i = 0; i < argsCount; i++) {

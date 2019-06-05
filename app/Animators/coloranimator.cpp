@@ -51,7 +51,7 @@ QColor ColorAnimator::getCurrentColor() const {
     return color;
 }
 
-QColor ColorAnimator::getColorAtRelFrame(const qreal &relFrame) {
+QColor ColorAnimator::getColorAtRelFrame(const qreal relFrame) {
     qreal val1 = mVal1Animator->getEffectiveValue(relFrame);
     qreal val2 = mVal2Animator->getEffectiveValue(relFrame);
     qreal val3 = mVal3Animator->getEffectiveValue(relFrame);
@@ -152,19 +152,19 @@ void ColorAnimator::startAlphaTransform() {
     mAlphaAnimator->prp_startTransform();
 }
 
-void ColorAnimator::setCurrentVal1Value(const qreal &val1) {
+void ColorAnimator::setCurrentVal1Value(const qreal val1) {
     mVal1Animator->setCurrentBaseValue(val1);
 }
 
-void ColorAnimator::setCurrentVal2Value(const qreal &val2) {
+void ColorAnimator::setCurrentVal2Value(const qreal val2) {
     mVal2Animator->setCurrentBaseValue(val2);
 }
 
-void ColorAnimator::setCurrentVal3Value(const qreal &val3) {
+void ColorAnimator::setCurrentVal3Value(const qreal val3) {
     mVal3Animator->setCurrentBaseValue(val3);
 }
 
-void ColorAnimator::setCurrentAlphaValue(const qreal &alpha) {
+void ColorAnimator::setCurrentAlphaValue(const qreal alpha) {
     mAlphaAnimator->setCurrentBaseValue(alpha);
 }
 

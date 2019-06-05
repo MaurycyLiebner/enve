@@ -160,15 +160,15 @@ void switchSkQ(const SkPoint &skPos, QPointF &qPos) {
     qPos = toQPointF(skPos);
 }
 
-void switchSkQ(const qreal &q, SkScalar &sk) {
+void switchSkQ(const qreal q, SkScalar &sk) {
     sk = toSkScalar(q);
 }
 
-void switchSkQ(const SkScalar &sk, qreal &q) {
+void switchSkQ(const SkScalar sk, qreal &q) {
     q = toQreal(sk);
 }
 #include <QFont>
-SkFont toSkFont(const QFont &qfont, const int& qPPI, const int& skPPI) {
+SkFont toSkFont(const QFont &qfont, const int qPPI, const int skPPI) {
     SkFontStyle::Slant slant;
     switch(qfont.style()) {
     case QFont::StyleOblique:

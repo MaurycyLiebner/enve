@@ -102,7 +102,7 @@ private:
 
 class OutlineWidthPaintSetting : public PaintSetting {
 public:
-    OutlineWidthPaintSetting(const qreal& width) :
+    OutlineWidthPaintSetting(const qreal width) :
         PaintSetting(OUTLINE), mWidth(width) {}
 protected:
     void applyToPS(PaintSettingsAnimator * const target) const {

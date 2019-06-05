@@ -18,10 +18,10 @@ public:
     CanvasSettingsDialog(const QString &defName,
                          QWidget *parent = nullptr);
     CanvasSettingsDialog(const QString &currName,
-                         const int &currWidth,
-                         const int &currHeight,
-                         const int &currFrameCount,
-                         const qreal &currFps,
+                         const int currWidth,
+                         const int currHeight,
+                         const int currFrameCount,
+                         const qreal currFps,
                          ColorAnimator* bgColorAnimator,
                          QWidget *parent = nullptr);
 

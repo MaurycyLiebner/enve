@@ -9,8 +9,8 @@ public:
     void setColor(const QColor &fillColor);
     void drawSk(SkCanvas * const canvas,
                 const CanvasMode &mode,
-                const SkScalar &invScale,
-                const bool &keyOnCurrent);
+                const SkScalar invScale,
+                const bool keyOnCurrent);
 protected:
     GradientPoint(QPointFAnimator* const associatedAnimator,
                   PathBox * const parent);

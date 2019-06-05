@@ -12,9 +12,9 @@ void SoundReader::afterCanceled() {
     mCacheHandler->secondReaderCanceled(mSecondId);
 }
 
-void seek(const int& tryN, const int& secondId,
+void seek(const int tryN, const int secondId,
           AVFormatContext * const formatContext,
-          const int& audioStreamIndex, AVStream * const audioStream,
+          const int audioStreamIndex, AVStream * const audioStream,
           AVCodecContext * const codecContext) {
     const int64_t tsms = qFloor(secondId * 1000 - tryN);
     const int64_t tm = av_rescale(tsms, audioStream->time_base.den,

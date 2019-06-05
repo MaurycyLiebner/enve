@@ -5,9 +5,9 @@
 class SolidifyPathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    SolidifyPathEffect(const bool &outlinePathEffect);
+    SolidifyPathEffect(const bool outlinePathEffect);
 public:
-    void apply(const qreal &relFrame,
+    void apply(const qreal relFrame,
                const SkPath &src,
                SkPath * const dst);
 

@@ -59,7 +59,7 @@ void ImageBox::changeSourceFile(QWidget* dialogParent) {
     if(!importPath.isEmpty()) setFilePath(importPath);
 }
 
-void ImageBox::setupRenderData(const qreal &relFrame,
+void ImageBox::setupRenderData(const qreal relFrame,
                                BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     const auto imgData = GetAsPtr(data, ImageBoxRenderData);

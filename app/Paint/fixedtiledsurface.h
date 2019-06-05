@@ -25,8 +25,8 @@ struct FixedTiledSurface {
     void _startRequest(MyPaintTileRequest * const request);
     void _endRequest(MyPaintTileRequest * const request);
 
-    bool initialize(const int& width, const int& height);
-    bool resize(const int &width, const int &height);
+    bool initialize(const int width, const int height);
+    bool resize(const int width, const int height);
 
 
     void paintPressEvent(MyPaintBrush * const brush,
@@ -73,7 +73,7 @@ struct FixedTiledSurface {
     }
 
     void draw(SkCanvas * const canvas,
-              const SkScalar& left, const SkScalar& top,
+              const SkScalar left, const SkScalar top,
               const SkPaint * const paint = nullptr) {
         canvas->drawBitmap(fBitmap, left, top, paint);
     }
@@ -127,7 +127,7 @@ protected:
         }
     }
 
-    void updateImage(const int& tx, const int& ty);
+    void updateImage(const int tx, const int ty);
     void resetNullTile();
 };
 

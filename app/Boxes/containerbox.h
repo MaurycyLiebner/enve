@@ -18,34 +18,34 @@ public:
 
     qsptr<BoundingBox> createLink();
     stdsptr<BoundingBoxRenderData> createRenderData();
-    void setupRenderData(const qreal &relFrame,
+    void setupRenderData(const qreal relFrame,
                          BoundingBoxRenderData * const data);
 
     virtual BoundingBox *getBoxAt(const QPointF &absPos);
 
-    void anim_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int frame);
 
     BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
-    void anim_scaleTime(const int& pivotAbsFrame, const qreal& scale);
+    void anim_scaleTime(const int pivotAbsFrame, const qreal scale);
     void updateAllBoxes(const UpdateReason &reason);
 
-    QRectF getRelBoundingRect(const qreal &relFrame);
+    QRectF getRelBoundingRect(const qreal relFrame);
 
     bool relPointInsidePath(const QPointF &relPos) const;
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      const UpdateFuncs &updateFuncs,
-                                     const int& visiblePartWidgetId);
+                                     const int visiblePartWidgetId);
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
-                             const bool &parentSatisfies,
-                             const bool &parentMainTarget) const;
+                             const bool parentSatisfies,
+                             const bool parentMainTarget) const;
     void addActionsToMenu(BoxTypeMenu * const menu);
 
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
     FrameRange getFirstAndLastIdenticalForMotionBlur(
-            const int &relFrame, const bool &takeAncestorsIntoAccount = true);
+            const int relFrame, const bool takeAncestorsIntoAccount = true);
 
     void prp_afterFrameShiftChanged();
-    void shiftAll(const int &shift);
+    void shiftAll(const int shift);
 
     void addPathEffect(const qsptr<PathEffect>& effect);
     void addFillPathEffect(const qsptr<PathEffect>& effect);
@@ -63,7 +63,7 @@ public:
 
     void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
     void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
-    void setStrokeWidth(const qreal &strokeWidth);
+    void setStrokeWidth(const qreal strokeWidth);
     void setStrokeBrush(SimpleBrushWrapper * const brush) {
         for(const auto& box : mContainedBoxes) {
             box->setStrokeBrush(brush);
@@ -100,78 +100,78 @@ public:
 
     const QList<qsptr<BoundingBox>> &getContainedBoxesList() const;
 
-    //    bool anim_nextRelFrameWithKey(const int &relFrame,
+    //    bool anim_nextRelFrameWithKey(const int relFrame,
     //                                 int &nextRelFrame);
-    //    bool anim_prevRelFrameWithKey(const int &relFrame,
+    //    bool anim_prevRelFrameWithKey(const int relFrame,
     //                                 int &prevRelFrame);
 
-    bool differenceInPathEffectsBetweenFrames(const int &relFrame1,
-                                              const int &relFrame2) const;
-    bool differenceInFillPathEffectsBetweenFrames(const int &relFrame1,
-                                                  const int &relFrame2) const;
-    bool differenceInOutlinePathEffectsBetweenFrames(const int &relFrame1,
-                                                     const int &relFrame2) const;
+    bool differenceInPathEffectsBetweenFrames(const int relFrame1,
+                                              const int relFrame2) const;
+    bool differenceInFillPathEffectsBetweenFrames(const int relFrame1,
+                                                  const int relFrame2) const;
+    bool differenceInOutlinePathEffectsBetweenFrames(const int relFrame1,
+                                                     const int relFrame2) const;
     void updateAllChildPathBoxes(const UpdateReason &reason);
 
-    void applyPathEffects(const qreal &relFrame,
+    void applyPathEffects(const qreal relFrame,
                           SkPath * const srcDstPath,
                           BoundingBox * const box);
 
-    void filterOutlinePathBeforeThickness(const qreal &relFrame,
+    void filterOutlinePathBeforeThickness(const qreal relFrame,
                                           SkPath * const srcDstPath);
-    void filterOutlinePath(const qreal &relFrame,
+    void filterOutlinePath(const qreal relFrame,
                            SkPath * const srcDstPath);
-    void filterFillPath(const qreal &relFrame,
+    void filterFillPath(const qreal relFrame,
                         SkPath * const srcDstPath);
 
-    bool diffsAffectingContainedBoxes(const int &relFrame1,
-                                      const int &relFrame2);
+    bool diffsAffectingContainedBoxes(const int relFrame1,
+                                      const int relFrame2);
 
     void deselectAllBoxesFromBoxesGroup();
     void selectAllBoxesFromBoxesGroup();
     void addContainedBoxesToSelection(const QRectF &rect);
 
-    void setIsCurrentGroup_k(const bool &bT);
+    void setIsCurrentGroup_k(const bool bT);
     void ungroup_k();
 
     bool isCurrentGroup() const;
     bool replaceContainedBox(const qsptr<BoundingBox>& replaced,
                              const qsptr<BoundingBox>& replacer);
     void addContainedBox(const qsptr<BoundingBox> &child);
-    void addContainedBoxToListAt(const int &index,
+    void addContainedBoxToListAt(const int index,
                                  const qsptr<BoundingBox> &child);
-    void updateContainedBoxIds(const int &firstId);
-    void updateContainedBoxIds(const int &firstId,
-                              const int &lastId);
+    void updateContainedBoxIds(const int firstId);
+    void updateContainedBoxIds(const int firstId,
+                              const int lastId);
     int getContainedBoxIndex(BoundingBox * const child);
-    qsptr<BoundingBox> takeContainedBox_k(const int &id);
+    qsptr<BoundingBox> takeContainedBox_k(const int id);
     void removeContainedBox_k(const qsptr<BoundingBox> &child);
     void increaseContainedBoxZInList(BoundingBox * const child);
     void decreaseContainedBoxZInList(BoundingBox * const child);
     void bringContainedBoxToEndList(BoundingBox * const child);
     void bringContainedBoxToFrontList(BoundingBox * const child);
-    void moveContainedBoxInList(BoundingBox * const child, const int &to);
+    void moveContainedBoxInList(BoundingBox * const child, const int to);
     void moveContainedBoxInList(BoundingBox * const child,
-                                const int &from,
-                                const int &to);
+                                const int from,
+                                const int to);
     void moveContainedBoxBelow(BoundingBox * const boxToMove,
                                BoundingBox * const below);
     void moveContainedBoxAbove(BoundingBox * const boxToMove,
                                BoundingBox * const above);
 
-    void removeContainedBoxFromList(const int &id);
-    void setDescendantCurrentGroup(const bool &bT);
+    void removeContainedBoxFromList(const int id);
+    void setDescendantCurrentGroup(const bool bT);
     bool isDescendantCurrentGroup() const;
 
     void readChildBoxes(QIODevice *target);
 
-    int abstractionIdToBoxId(const int& absId) const {
+    int abstractionIdToBoxId(const int absId) const {
         if(absId < ca_getNumberOfChildren()) return -1;
         const int revId = absId - ca_getNumberOfChildren();
         return mContainedBoxes.count() - revId - 1;
     }
 
-    int boxIdToAbstractionId(const int& boxId) const {
+    int boxIdToAbstractionId(const int boxId) const {
         const int revId = mContainedBoxes.count() - boxId - 1;
         return revId + ca_getNumberOfChildren();
     }
@@ -192,7 +192,7 @@ protected:
     qsptr<PathEffectAnimators> mFillPathEffectsAnimators;
     qsptr<PathEffectAnimators> mOutlinePathEffectsAnimators;
 private:
-    void setupLayerRenderData(const qreal &relFrame,
+    void setupLayerRenderData(const qreal relFrame,
                               BoundingBoxRenderData * const data);
     void iniPathEffects();
 };

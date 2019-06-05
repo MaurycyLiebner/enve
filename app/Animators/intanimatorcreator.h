@@ -20,10 +20,10 @@ struct IntAnimatorCreator : public PropertyCreator {
         return gl->glGetUniformLocation(program, fName.toLatin1());
     }
 private:
-    IntAnimatorCreator(const int &iniVal,
-                       const int &minVal,
-                       const int &maxVal,
-                       const int &prefferdStep,
+    IntAnimatorCreator(const int iniVal,
+                       const int minVal,
+                       const int maxVal,
+                       const int prefferdStep,
                        const QString& name) : PropertyCreator(name) {
         fIniVal = iniVal;
         fMinVal = minVal;

@@ -26,7 +26,7 @@ class SoundComposition : public QIODevice {
 public:
     SoundComposition(Canvas * const parent);
 
-    void start(const int &startFrame);
+    void start(const int startFrame);
     void stop();
 
     qint64 readData(char *data, qint64 maxLen);
@@ -43,21 +43,21 @@ public:
     void addSoundAnimator(const qsptr<SingleSound> &sound);
     void removeSoundAnimator(const qsptr<SingleSound> &sound);
 
-    void secondFinished(const int& secondId,
+    void secondFinished(const int secondId,
                         const stdsptr<Samples>& samples);
 
-    void startBlockingAtFrame(const int& frame);
-    void blockUpToFrame(const int& frame);
+    void startBlockingAtFrame(const int frame);
+    void blockUpToFrame(const int frame);
 
     void unblockAll();
 
     void scheduleFrameRange(const FrameRange& range);
-    SoundMerger * scheduleFrame(const int& frameId);
+    SoundMerger * scheduleFrame(const int frameId);
     HDDCachableCacheHandler& getCacheHandler() {
         return mSecondsCache;
     }
 private:
-    SoundMerger * scheduleSecond(const int& secondId);
+    SoundMerger * scheduleSecond(const int secondId);
 
     void frameRangeChanged(const FrameRange &range);
 

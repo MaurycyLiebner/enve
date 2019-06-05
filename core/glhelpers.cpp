@@ -193,7 +193,7 @@ void Texture::gen(QGL33c *gl) {
 }
 
 void Texture::gen(QGL33c *gl,
-                  const int &width, const int &height,
+                  const int width, const int height,
                   const void * const data) {
     gen(gl);
     gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
@@ -244,7 +244,7 @@ void TextureFrameBuffer::bindTexture(QGL33c *gl) {
 }
 
 void TextureFrameBuffer::gen(QGL33c *gl,
-                             const int &widthT, const int &heightT) {
+                             const int widthT, const int heightT) {
     fWidth = widthT;
     fHeight = heightT;
     gl->glGenFramebuffers(1, &fFrameBufferId);

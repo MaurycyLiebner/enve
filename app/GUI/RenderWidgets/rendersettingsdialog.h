@@ -104,7 +104,7 @@ protected:
 
     void restoreInitialSettings();
 
-    void setShowAllFormatsAndCodecs(const bool &bT) {
+    void setShowAllFormatsAndCodecs(const bool bT) {
         if(mShowAllFormatsAndCodecs == bT) return;
         mShowAllFormatsAndCodecs = bT;
         updateAvailableOutputFormats();

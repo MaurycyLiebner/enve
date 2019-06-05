@@ -53,10 +53,10 @@ class Canvas : public ContainerBox, public CanvasBase {
     friend class SelfRef;
 protected:
     explicit Canvas(CanvasWindow *canvasWidget,
-                    const int &canvasWidth = 1920,
-                    const int &canvasHeight = 1080,
-                    const int &frameCount = 200,
-                    const qreal &fps = 24);
+                    const int canvasWidth = 1920,
+                    const int canvasHeight = 1080,
+                    const int frameCount = 200,
+                    const qreal fps = 24);
 public:
     QRectF getPixBoundingRect();
     void selectOnlyLastPressedBox();
@@ -77,10 +77,10 @@ public:
 
     void resetTransormation();
     void fitCanvasToSize();
-    void zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin);
+    void zoomCanvas(const qreal scaleBy, const QPointF &absOrigin);
     void moveByRel(const QPointF &trans);
 
-    //void updateAfterFrameChanged(const int &currentFrame);
+    //void updateAfterFrameChanged(const int currentFrame);
 
     QSize getCanvasSize();
 
@@ -90,9 +90,9 @@ public:
     void finishSelectedPointsTransform();
     void finishSelectedBoxesTransform();
     void moveSelectedPointsByAbs(const QPointF &by,
-                                 const bool &startTransform);
+                                 const bool startTransform);
     void moveSelectedBoxesByAbs(const QPointF &by,
-                                const bool &startTransform);
+                                const bool startTransform);
     void groupSelectedBoxes();
 
     //void selectAllBoxes();
@@ -127,23 +127,23 @@ public:
     void applyContrastEffectToSelected();
     void applyBrightnessEffectToSelected();
 
-    void rotateSelectedBy(const qreal &rotBy,
+    void rotateSelectedBy(const qreal rotBy,
                           const QPointF &absOrigin,
-                          const bool &startTrans);
+                          const bool startTrans);
 
     QPointF getSelectedBoxesAbsPivotPos();
     bool isBoxSelectionEmpty() const;
 
     void ungroupSelectedBoxes();
-    void scaleSelectedBy(const qreal& scaleBy,
+    void scaleSelectedBy(const qreal scaleBy,
                          const QPointF &absOrigin,
-                         const bool& startTrans);
+                         const bool startTrans);
     void cancelSelectedBoxesTransform();
     void cancelSelectedPointsTransform();
 
     void setSelectedCapStyle(const Qt::PenCapStyle& capStyle);
     void setSelectedJoinStyle(const Qt::PenJoinStyle &joinStyle);
-    void setSelectedStrokeWidth(const qreal &strokeWidth);
+    void setSelectedStrokeWidth(const qreal strokeWidth);
     void setSelectedStrokeBrush(SimpleBrushWrapper * const brush);
     void setSelectedStrokeBrushWidthCurve(
             const qCubicSegment1D& curve);
@@ -160,8 +160,8 @@ public:
 
     void getDisplayedFillStrokeSettingsFromLastSelected(
             PaintSettingsAnimator*& fillSetings, OutlineSettingsAnimator*& strokeSettings);
-    void scaleSelectedBy(const qreal &scaleXBy, const qreal &scaleYBy,
-                         const QPointF &absOrigin, const bool &startTrans);
+    void scaleSelectedBy(const qreal scaleXBy, const qreal scaleYBy,
+                         const QPointF &absOrigin, const bool startTrans);
 
     void grabMouseAndTrack();
 
@@ -170,18 +170,18 @@ public:
     void partialRepaintRectToPoint(QPointF point);
 
     qreal getResolutionFraction();
-    void setResolutionFraction(const qreal &percent);
+    void setResolutionFraction(const qreal percent);
 
     void applyCurrentTransformationToSelected();
     QPointF getSelectedPointsAbsPivotPos();
     bool isPointSelectionEmpty() const;
-    void scaleSelectedPointsBy(const qreal &scaleXBy,
-                               const qreal &scaleYBy,
+    void scaleSelectedPointsBy(const qreal scaleXBy,
+                               const qreal scaleYBy,
                                const QPointF &absOrigin,
-                               const bool &startTrans);
-    void rotateSelectedPointsBy(const qreal &rotBy,
+                               const bool startTrans);
+    void rotateSelectedPointsBy(const qreal rotBy,
                                 const QPointF &absOrigin,
-                                const bool &startTrans);
+                                const bool startTrans);
     int getPointsSelectionCount() const ;
 
     void clearPointsSelectionOrDeselect();
@@ -196,7 +196,7 @@ public:
 
     void setSelectedFontFamilyAndStyle(
             const QString& family, const QString& style);
-    void setSelectedFontSize(const qreal& size);
+    void setSelectedFontSize(const qreal size);
     void removeSelectedPointsAndClearList();
     void removeSelectedBoxesAndClearList();
 
@@ -231,8 +231,8 @@ public:
     ExternalLinkBox *createLinkToFileWithPath(const QString &path);
     SingleSound* createSoundForPath(const QString &path);
 
-    void setPreviewing(const bool &bT);
-    void setOutputRendering(const bool &bT);
+    void setPreviewing(const bool bT);
+    void setOutputRendering(const bool bT);
 
     const CanvasMode &getCurrentCanvasMode() const {
         return mCurrentMode;
@@ -243,8 +243,8 @@ public:
     }
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
-                             const bool &parentSatisfies,
-                             const bool &parentMainTarget) const;
+                             const bool parentSatisfies,
+                             const bool parentMainTarget) const;
 
     ContainerBox *getCurrentBoxesGroup() {
         return mCurrentBoxesGroup;
@@ -264,14 +264,14 @@ public:
         return absPos;
     }
 
-    void setIsCurrentCanvas(const bool &bT);
+    void setIsCurrentCanvas(const bool bT);
 
     void scheduleEffectsMarginUpdate() {}
 
     void renderSk(SkCanvas * const canvas,
                   GrContext * const grContext);
 
-    void setCanvasSize(const int &width, const int &height) {
+    void setCanvasSize(const int width, const int height) {
         if(width == mWidth && height == mHeight) return;
         mWidth = width;
         mHeight = height;
@@ -294,7 +294,7 @@ public:
         return mHeight;
     }
 
-    void setMaxFrame(const int &frame);
+    void setMaxFrame(const int frame);
 
     ColorAnimator *getBgColorAnimator() {
         return mBackgroundColor.get();
@@ -302,7 +302,7 @@ public:
 
     stdsptr<BoundingBoxRenderData> createRenderData();
 
-    void setupRenderData(const qreal &relFrame,
+    void setupRenderData(const qreal relFrame,
                          BoundingBoxRenderData * const data) {
         ContainerBox::setupRenderData(relFrame, data);
         auto canvasData = GetAsPtr(data, CanvasRenderData);
@@ -321,9 +321,9 @@ public:
     void decBrushRadius();
 
     void schedulePivotUpdate();
-    void setClipToCanvas(const bool &bT) { mClipToCanvasSize = bT; }
-    void setRasterEffectsVisible(const bool &bT) { mRasterEffectsVisible = bT; }
-    void setPathEffectsVisible(const bool &bT) { mPathEffectsVisible = bT; }
+    void setClipToCanvas(const bool bT) { mClipToCanvasSize = bT; }
+    void setRasterEffectsVisible(const bool bT) { mRasterEffectsVisible = bT; }
+    void setPathEffectsVisible(const bool bT) { mPathEffectsVisible = bT; }
 protected:
 //    void updateAfterTotalTransformationChanged() {
 ////        for(const auto& child : mChildBoxes) {
@@ -358,7 +358,7 @@ public:
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode &mode,
-                                   const qreal &invScale);
+                                   const qreal invScale);
     void duplicateSelectedBoxes();
     void clearLastPressedPoint();
     void clearCurrentSmartEndPoint();
@@ -376,7 +376,7 @@ public:
     void updateHoveredEdge();
     void updateHoveredElements();
 
-    void setLocalPivot(const bool &localPivot) {
+    void setLocalPivot(const bool localPivot) {
         mLocalPivot = localPivot;
         updatePivot();
     }
@@ -394,20 +394,20 @@ public:
 
     HDDCachableCacheHandler& getSoundCacheHandler();
 
-    void setCurrentPreviewContainer(const int& relFrame);
+    void setCurrentPreviewContainer(const int relFrame);
     void setCurrentPreviewContainer(const stdsptr<ImageCacheContainer> &cont);
     void setLoadingPreviewContainer(
             const stdsptr<ImageCacheContainer> &cont);
 
-    void setRenderingPreview(const bool &bT);
+    void setRenderingPreview(const bool bT);
 
     bool isPreviewingOrRendering() const {
         return mPreviewing || mRenderingPreview || mRenderingOutput;
     }
     QPointF mapCanvasAbsToRel(const QPointF &pos);
 
-    const qreal &getFps() const { return mFps; }
-    void setFps(const qreal &fps) { mFps = fps; }
+    qreal getFps() const { return mFps; }
+    void setFps(const qreal fps) { mFps = fps; }
 
     BoundingBox *getBoxAt(const QPointF &absPos) {
         if(mClipToCanvasSize) {
@@ -416,7 +416,7 @@ public:
         return ContainerBox::getBoxAt(absPos);
     }
 
-    void anim_scaleTime(const int &pivotAbsFrame, const qreal &scale) {
+    void anim_scaleTime(const int pivotAbsFrame, const qreal scale) {
         ContainerBox::anim_scaleTime(pivotAbsFrame, scale);
 //        int newAbsPos = qRound(scale*pivotAbsFrame);
 //        anim_shiftAllKeys(newAbsPos - pivotAbsFrame);
@@ -424,7 +424,7 @@ public:
         mCanvasWindow->setCurrentCanvas(this);
     }
 
-    void changeFpsTo(const qreal& fps) {
+    void changeFpsTo(const qreal fps) {
         anim_scaleTime(0, fps/mFps);
         setFps(fps);
     }
@@ -443,30 +443,30 @@ public:
     void duplicateAction();
     void selectAllAction();
     void clearSelectionAction();
-    void rotateSelectedBoxesStartAndFinish(const qreal &rotBy);
+    void rotateSelectedBoxesStartAndFinish(const qreal rotBy);
     bool shouldPlanScheduleUpdate() {
         return mCurrentPreviewContainerOutdated;
     }
 
     void renderDataFinished(BoundingBoxRenderData *renderData);
-    FrameRange prp_getIdenticalRelRange(const int &relFrame) const;
-    void setPickingFromPath(const bool &pickFill,
-                            const bool &pickStroke) {
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
+    void setPickingFromPath(const bool pickFill,
+                            const bool pickStroke) {
         mPickFillFromPath = pickFill;
         mPickStrokeFromPath = pickStroke;
     }
 
     void tabletEvent(const QTabletEvent * const e,
                      const QPointF &absPos);
-    QRectF getRelBoundingRect(const qreal &);
+    QRectF getRelBoundingRect(const qreal );
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
-    bool anim_prevRelFrameWithKey(const int &relFrame, int &prevRelFrame);
-    bool anim_nextRelFrameWithKey(const int &relFrame, int &nextRelFrame);
+    bool anim_prevRelFrameWithKey(const int relFrame, int &prevRelFrame);
+    bool anim_nextRelFrameWithKey(const int relFrame, int &nextRelFrame);
 
-    void shiftAllPointsForAllKeys(const int &by);
+    void shiftAllPointsForAllKeys(const int by);
     void revertAllPointsForAllKeys();
-    void shiftAllPoints(const int &by);
+    void shiftAllPoints(const int by);
     void revertAllPoints();
     void flipSelectedBoxesHorizontally();
     void flipSelectedBoxesVertically();
@@ -475,30 +475,30 @@ public:
                 qCeil(mHeight*mResolutionFraction)*4;
         //return mCurrentPreviewContainer->getByteCount();
     }
-    int getMaxPreviewFrame(const int &minFrame, const int &maxFrame);
+    int getMaxPreviewFrame(const int minFrame, const int maxFrame);
     void selectedPathsCombine();
     void selectedPathsBreakApart();
     void invertSelectionAction();
 
-    const bool &getRasterEffectsVisible() const {
+    bool getRasterEffectsVisible() const {
         return mRasterEffectsVisible;
     }
 
-    const bool &getPathEffectsVisible() const {
+    bool getPathEffectsVisible() const {
         return mPathEffectsVisible;
     }
 
-    void anim_setAbsFrame(const int &frame);
+    void anim_setAbsFrame(const int frame);
 
-    void moveDurationRectForAllSelected(const int &dFrame);
+    void moveDurationRectForAllSelected(const int dFrame);
     void startDurationRectPosTransformForAllSelected();
     void finishDurationRectPosTransformForAllSelected();
     void startMinFramePosTransformForAllSelected();
     void finishMinFramePosTransformForAllSelected();
-    void moveMinFrameForAllSelected(const int &dFrame);
+    void moveMinFrameForAllSelected(const int dFrame);
     void startMaxFramePosTransformForAllSelected();
     void finishMaxFramePosTransformForAllSelected();
-    void moveMaxFrameForAllSelected(const int &dFrame);
+    void moveMaxFrameForAllSelected(const int dFrame);
 
     UndoRedoStack *getUndoRedoStack() {
         return mUndoRedoStack.get();
@@ -543,10 +543,10 @@ private:
 protected:
     stdsptr<UndoRedoStack> mUndoRedoStack;
 
-    void paintPress(const ulong ts, const qreal& pressure,
-                    const qreal& xTilt, const qreal& yTilt);
-    void paintMove(const ulong ts, const qreal& pressure,
-                   const qreal& xTilt, const qreal& yTilt);
+    void paintPress(const ulong ts, const qreal pressure,
+                    const qreal xTilt, const qreal yTilt);
+    void paintMove(const ulong ts, const qreal pressure,
+                   const qreal xTilt, const qreal yTilt);
     void updatePaintBox();
     void setPaintBox(PaintBox * const box);
     void setPaintDrawable(DrawableAutoTiledSurface * const surf);

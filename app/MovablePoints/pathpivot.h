@@ -13,7 +13,7 @@ protected:
     PathPivot(const Canvas*  const parent);
 public:
     void drawSk(SkCanvas * const canvas, const CanvasMode &mode,
-                const SkScalar &invScale, const bool &keyOnCurrent);
+                const SkScalar invScale, const bool keyOnCurrent);
     bool isVisible(const CanvasMode& mode) const;
 protected:
     const Canvas * const mCanvas = nullptr;

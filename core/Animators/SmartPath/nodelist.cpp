@@ -10,7 +10,7 @@ qCubicSegment2D gSegmentFromNodes(const Node& prevNode,
                            nextNode.c0(), nextNode.p1());
 }
 
-void NodeList::moveNode(const int& fromId, const int& toId) {
+void NodeList::moveNode(const int fromId, const int toId) {
     mNodes.moveNode(fromId, toId);
     Node * const node = at(toId);
     if(node->isDissolved()) {
@@ -20,11 +20,11 @@ void NodeList::moveNode(const int& fromId, const int& toId) {
     }
 }
 
-void NodeList::updateDissolvedNodePosition(const int &nodeId) {
+void NodeList::updateDissolvedNodePosition(const int nodeId) {
     updateDissolvedNodePosition(nodeId, at(nodeId));
 }
 
-void NodeList::updateDissolvedNodePosition(const int &nodeId,
+void NodeList::updateDissolvedNodePosition(const int nodeId,
                                            Node * const node) {
     if(node->isNormal()) RuntimeThrow("Unsupported node type");
     const Node * const prevNode = prevNormal(nodeId);
@@ -56,11 +56,11 @@ bool NodeList::write(QIODevice * const dst) const {
     return true;
 }
 
-void NodeList::removeNodeFromList(const int &nodeId) {
+void NodeList::removeNodeFromList(const int nodeId) {
     mNodes.removeAt(nodeId);
 }
 
-Node *NodeList::insertNodeToList(const int &nodeId, const Node &node) {
+Node *NodeList::insertNodeToList(const int nodeId, const Node &node) {
     if(nodeId < 0 || nodeId > mNodes.count())
         RuntimeThrow("Wrong insert id");
     mNodes.insert(nodeId, node);
@@ -76,7 +76,7 @@ bool NodeList::isClosed() const {
     return mClosed;
 }
 
-int NodeList::insertNodeBefore(const int& nextId,
+int NodeList::insertNodeBefore(const int nextId,
                                const Node& nodeBlueprint) {
     const int insertId = nextId;
     Node * const insertedNode = insertNodeToList(insertId, nodeBlueprint);
@@ -85,7 +85,7 @@ int NodeList::insertNodeBefore(const int& nextId,
     return insertId;
 }
 
-int NodeList::insertNodeAfter(const int& prevId,
+int NodeList::insertNodeAfter(const int prevId,
                               const Node& nodeBlueprint) {
     const int insertId = prevId + 1;
 //    Node * const insertedNode =
@@ -104,7 +104,7 @@ int NodeList::appendNode(const Node &nodeBlueprint) {
 }
 
 void NodeList::approximateBeforeDemoteOrRemoval(
-        const qreal& nodeT,
+        const qreal nodeT,
         Node * const node,
         Node * const prevNormalV,
         Node * const nextNormalV) {
@@ -128,12 +128,12 @@ void NodeList::approximateBeforeDemoteOrRemoval(
     nextNormalV->setC0(seg.c2());
 }
 
-void NodeList::removeNode(const int &nodeId, const bool &approx) {
+void NodeList::removeNode(const int nodeId, const bool approx) {
     removeNode(nodeId, at(nodeId), approx);
 }
 
-void NodeList::removeNode(const int& nodeId, Node * const node,
-                          const bool& approx) {
+void NodeList::removeNode(const int nodeId, Node * const node,
+                          const bool approx) {
     if(node->isNormal()) {
         if(approx) {
             Node * const prevNormalV = prevNormal(nodeId);
@@ -157,14 +157,14 @@ void NodeList::removeNode(const int& nodeId, Node * const node,
     removeNodeFromList(nodeId);
 }
 
-void NodeList::demoteNormalNodeToDissolved(const int& nodeId,
-                                           const bool& approx) {
+void NodeList::demoteNormalNodeToDissolved(const int nodeId,
+                                           const bool approx) {
     demoteNormalNodeToDissolved(nodeId, at(nodeId), approx);
 }
 
-void NodeList::demoteNormalNodeToDissolved(const int& nodeId,
+void NodeList::demoteNormalNodeToDissolved(const int nodeId,
                                            Node * const node,
-                                           const bool& approx) {
+                                           const bool approx) {
     if(node->isDissolved()) return;
     Node * const prevNormalV = prevNormal(nodeId);
     Node * const nextNormalV = nextNormal(nodeId);
@@ -195,7 +195,7 @@ void NodeList::demoteNormalNodeToDissolved(const int& nodeId,
     updateDissolvedNodePosition(nodeId);
 }
 
-void NodeList::promoteDissolvedNodeToNormal(const int& nodeId,
+void NodeList::promoteDissolvedNodeToNormal(const int nodeId,
                                             Node * const node) {
     if(node->isNormal()) return;
     Node * const prevNormalV = prevNormal(nodeId);
@@ -228,11 +228,11 @@ void NodeList::promoteDissolvedNodeToNormal(const int& nodeId,
     }
 }
 
-void NodeList::promoteDissolvedNodeToNormal(const int& nodeId) {
+void NodeList::promoteDissolvedNodeToNormal(const int nodeId) {
     promoteDissolvedNodeToNormal(nodeId, at(nodeId));
 }
 
-void NodeList::splitNode(const int& nodeId) {
+void NodeList::splitNode(const int nodeId) {
     Node * const node = mNodes[nodeId];
     Node newNode = *node;
     if(node->isNormal()) {
@@ -245,11 +245,11 @@ void NodeList::splitNode(const int& nodeId) {
     } else insertNodeAfter(nodeId, newNode);
 }
 
-void NodeList::splitNodeAndDisconnect(const int& nodeId) {
+void NodeList::splitNodeAndDisconnect(const int nodeId) {
     splitNode(nodeId);
 }
 
-void NodeList::mergeNodes(const int &node1Id, const int &node2Id) {
+void NodeList::mergeNodes(const int node1Id, const int node2Id) {
     if(!nodesConnected(node1Id, node2Id))
         RuntimeThrow("Only neighbouring connected nodes can be merged");
     const int resId = qMin(node1Id, node2Id);
@@ -261,7 +261,7 @@ void NodeList::mergeNodes(const int &node1Id, const int &node2Id) {
     removeNodeFromList(node2Id);
 }
 
-bool NodeList::nodesConnected(const int& node1Id, const int& node2Id) const {
+bool NodeList::nodesConnected(const int node1Id, const int node2Id) const {
     if(qAbs(node2Id - node1Id) == 1) return true;
     const bool oneIsFirst = node1Id == 0 || node2Id == 0;
     const bool oneIsLast = node1Id == mNodes.count() - 1 ||
@@ -275,7 +275,7 @@ void gCubicTo(const Node& prevNode, const Node& nextNode,
     qCubicSegment2D seg(prevNode.p1(), prevNode.c2(),
                         nextNode.c0(), nextNode.p1());
     qreal lastT = 0;
-    for(const qreal& t : dissolvedTs) {
+    for(const qreal t : dissolvedTs) {
         const qreal mappedT = gMapTToFragment(lastT, 1, t);
         auto div = seg.dividedAtT(mappedT);
         const auto& first = div.first;
@@ -416,21 +416,21 @@ void NodeList::setPath(const SkPath &path) {
     }
 }
 
-qreal NodeList::prevT(const int &nodeId) const {
+qreal NodeList::prevT(const int nodeId) const {
     const Node * const node = prevNode(nodeId);
     if(!node) return 0;
     if(node->isNormal()) return 0;
     return node->t();
 }
 
-qreal NodeList::nextT(const int &nodeId) const {
+qreal NodeList::nextT(const int nodeId) const {
     const Node * const node = nextNode(nodeId);
     if(!node) return 1;
     if(node->isNormal()) return 1;
     return node->t();
 }
 
-Node * NodeList::prevNormal(const int& nodeId) const {
+Node * NodeList::prevNormal(const int nodeId) const {
     if(mNodes.count() <= 1) return nullptr;
     Node * currNode = mNodes.at(nodeId);
     while(prevNode(currNode)) {
@@ -441,7 +441,7 @@ Node * NodeList::prevNormal(const int& nodeId) const {
     return nullptr;
 }
 
-Node * NodeList::nextNormal(const int& nodeId) const {
+Node * NodeList::nextNormal(const int nodeId) const {
     if(mNodes.count() <= 1) return nullptr;
     Node * currNode = mNodes.at(nodeId);
     while(nextNode(currNode)) {
@@ -454,7 +454,7 @@ Node * NodeList::nextNormal(const int& nodeId) const {
 
 NodeList NodeList::sInterpolate(const NodeList &list1,
                                 const NodeList &list2,
-                                const qreal& weight2) {
+                                const qreal weight2) {
     if(list1.count() != list2.count())
         RuntimeThrow("Cannot interpolate paths with different node count");
     if(list1.isClosed() != list2.isClosed())
