@@ -301,18 +301,19 @@ void GraphAnimator::graph_getSelectedSegments(QList<QList<GraphKey*>> &segments)
     QList<GraphKey*> currentSegment;
     GraphKey* lastKey = nullptr;
     for(const auto& key : anim_mSelectedKeys) {
+        const auto gkKey = GetAsGK(key);
         if(!lastKey) {
-            lastKey = GetAsGK(key);
+            lastKey = gkKey;
+            currentSegment << lastKey;
             continue;
         }
         if(lastKey->getNextKey() != key) {
-            if(currentSegment.count() >= 2) {
+            if(currentSegment.count() >= 2)
                 segments << currentSegment;
-            }
             currentSegment.clear();
         }
-        currentSegment << GetAsGK(key);
-        lastKey = GetAsGK(key);
+        currentSegment << gkKey;
+        lastKey = gkKey;
     }
     if(currentSegment.count() >= 2) {
         segments << currentSegment;

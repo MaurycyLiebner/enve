@@ -703,7 +703,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
 
                 mSelecting = false;
             } else if(mMovingKeys) {
-                if(mFirstMove) {
+                if(mFirstMove && mLastPressedKey) {
                     if(!mMainWindow->isShiftPressed()) {
                         clearKeySelection();
                         addKeyToSelection(mLastPressedKey);
@@ -777,6 +777,7 @@ void KeysView::updatePixelsPerFrame() {
 }
 
 void KeysView::addKeyToSelection(Key * const key) {
+    if(!key) return;
     QList<qptr<Animator>> toSelect;
     key->addToSelection(toSelect);
     for(const auto& anim : toSelect) {
