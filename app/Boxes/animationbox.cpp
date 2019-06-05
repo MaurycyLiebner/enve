@@ -23,7 +23,9 @@ FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() const {
 
 void AnimationBox::updateDurationRectangleAnimationRange() {
     if(mFrameRemappingEnabled) {
+        const int nFrames = getAnimationDurationRect()->getFrameDuration();
         getAnimationDurationRect()->setAnimationFrameDuration(0);
+        getAnimationDurationRect()->setFramesDuration(nFrames);
     } else {
         int frameCount;
         if(mSrcFramesCache) frameCount = mSrcFramesCache->getFrameCount();
@@ -81,10 +83,9 @@ int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
 
     return pixId;
 }
-
 #include "Animators/qrealkey.h"
 #include "Animators/effectanimators.h"
-void AnimationBox::enableFrameRemapping() {
+void AnimationBox::enableFrameRemappingAction() {
     if(mFrameRemappingEnabled) return;
     const int frameCount = mSrcFramesCache->getFrameCount();
     mFrameAnimator->setIntValueRange(0, frameCount - 1);
@@ -102,11 +103,16 @@ void AnimationBox::enableFrameRemapping() {
     } else {
         mFrameAnimator->setCurrentIntValue(0);
     }
-    mFrameRemappingEnabled = true;
-    ca_prependChildAnimator(mEffectsAnimators.get(), mFrameAnimator);
+    enableFrameRemapping();
     prp_afterWholeInfluenceRangeChanged();
     planScheduleUpdate(Animator::USER_CHANGE);
     updateDurationRectangleAnimationRange();
+}
+
+void AnimationBox::enableFrameRemapping() {
+    if(mFrameRemappingEnabled) return;
+    mFrameRemappingEnabled = true;
+    ca_prependChildAnimator(mEffectsAnimators.get(), mFrameAnimator);
 }
 
 void AnimationBox::disableFrameRemapping() {
@@ -182,7 +188,7 @@ void AnimationBox::addActionsToMenu(BoxTypeMenu * const menu) {
 
     const BoxTypeMenu::CheckOp<AnimationBox> remapOp =
     [](AnimationBox * box, bool checked) {
-        if(checked) box->enableFrameRemapping();
+        if(checked) box->enableFrameRemappingAction();
         else box->disableFrameRemapping();
     };
     menu->addCheckableAction("Frame Remapping",

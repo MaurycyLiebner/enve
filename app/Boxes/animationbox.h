@@ -53,6 +53,7 @@ public:
     void beforeAddingScheduler();
     int getAnimationFrameForRelFrame(const int &relFrame);
 
+    void enableFrameRemappingAction();
     void enableFrameRemapping();
     void disableFrameRemapping();
 

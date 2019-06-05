@@ -861,7 +861,7 @@ void Rectangle::readBoundingBox(QIODevice * const target) {
 }
 
 void VideoBox::writeBoundingBox(QIODevice * const target) {
-    BoundingBox::writeBoundingBox(target);
+    AnimationBox::writeBoundingBox(target);
     gWrite(target, mSrcFilePath);
     const bool hasSound = mSound;
     gWrite(target, hasSound);
@@ -869,7 +869,7 @@ void VideoBox::writeBoundingBox(QIODevice * const target) {
 }
 
 void VideoBox::readBoundingBox(QIODevice * const target) {
-    BoundingBox::readBoundingBox(target);
+    AnimationBox::readBoundingBox(target);
     QString path;
     gRead(target, path);
     setFilePath(path);
