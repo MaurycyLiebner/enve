@@ -562,10 +562,12 @@ void BoundingBox::readBoundingBox(QIODevice * const target) {
 void PathEffect::writeProperty(QIODevice * const target) const {
     target->write(rcConstChar(&mPathEffectType), sizeof(PathEffectType));
     target->write(rcConstChar(&mVisible), sizeof(bool));
+    target->write(rcConstChar(&mApplyBeforeThickness), sizeof(bool));
 }
 
 void PathEffect::readProperty(QIODevice *target) {
     target->read(rcChar(&mVisible), sizeof(bool));
+    target->read(rcChar(&mApplyBeforeThickness), sizeof(bool));
 }
 
 void DisplacePathEffect::writeProperty(QIODevice * const target) const {
