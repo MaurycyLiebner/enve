@@ -54,7 +54,7 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
 
     mFrameCountLabel = new QLabel("Frame Count:", this);
     mFrameCountSpinBox = new QSpinBox(this);
-    mFrameCountSpinBox->setRange(1, 9999);
+    mFrameCountSpinBox->setRange(1, 999999);
     mFrameCountSpinBox->setValue(currFrameCount);
 
     mFrameCountLayout = new QHBoxLayout();
@@ -64,7 +64,7 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
 
     mFPSLabel = new QLabel("Fps:", this);
     mFPSSpinBox = new QDoubleSpinBox(this);
-    mFPSSpinBox->setRange(1., 300.);
+    mFPSSpinBox->setRange(1, 300);
     mFPSSpinBox->setValue(currFps);
 
     mFPSLayout = new QHBoxLayout();
