@@ -65,6 +65,8 @@ void GraphAnimator::graph_drawKeysPath(QPainter * const p,
     const auto relFrameRange = prp_absRangeToRelRange(absFrameRange);
     const auto idRange = graph_relFrameRangeToGraphPathIdRange(relFrameRange);
     if(idRange.fMin == -1 || idRange.fMax == -1) return;
+    p->save();
+    p->translate(absFrameRange.fMin - relFrameRange.fMin, 0);
     QPen pen(Qt::black, 4);
     pen.setCosmetic(true);
     p->setPen(pen);
@@ -77,6 +79,7 @@ void GraphAnimator::graph_drawKeysPath(QPainter * const p,
     for(int i = idRange.fMin; i <= idRange.fMax; i++) {
         p->drawPath(graph_mKeyPaths.at(i));
     }
+    p->restore();
 
     p->setPen(Qt::NoPen);
 
