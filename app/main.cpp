@@ -17,8 +17,8 @@ void setDefaultFormat() {
 
 int main(int argc, char *argv[]) {
     setDefaultFormat();
-    Application::setAttribute(Qt::AA_ShareOpenGLContexts);
-    Application a(argc, argv);
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    QApplication a(argc, argv);
 
     MainWindow w;
 //#ifdef QT_DEBUG

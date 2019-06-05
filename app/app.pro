@@ -141,7 +141,6 @@ SOURCES += main.cpp\
     GUI/RenderWidgets/outputsettingsdisplaywidget.cpp \
     Boxes/renderdatahandler.cpp \
     Boxes/boundingboxrenderdata.cpp \
-    application.cpp \
     PathEffects/displacepatheffect.cpp \
     PathEffects/lengthpatheffect.cpp \
     PathEffects/duplicatepatheffect.cpp \
@@ -352,7 +351,6 @@ HEADERS  += \
     GUI/RenderWidgets/outputsettingsdisplaywidget.h \
     Boxes/renderdatahandler.h \
     Boxes/boundingboxrenderdata.h \
-    application.h \
     PathEffects/displacepatheffect.h \
     PathEffects/lengthpatheffect.h \
     PathEffects/duplicatepatheffect.h \
