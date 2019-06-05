@@ -410,6 +410,11 @@ void KeysView::paintEvent(QPaintEvent *) {
 }
 
 void KeysView::updateHoveredPointFromPos(const QPoint &posU) {
+    if(mGraphViewed) {
+        clearHoveredPoint();
+        clearHoveredMovable();
+        return;
+    }
     if(mHoveredKey) mHoveredKey->setHovered(false);
     mHoveredKey = mBoxesListVisible->getKeyAtPos(
                                     posU.x(), posU.y(),
