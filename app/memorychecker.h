@@ -17,6 +17,8 @@ class MemoryChecker : public QObject {
 public:
     explicit MemoryChecker(QObject * const parent = nullptr);
     static MemoryChecker *getInstance() { return mInstance; }
+
+    void checkMemory();
 private:
     void setCurrentMemoryState(const MemoryState &state);
 
@@ -28,12 +30,9 @@ private:
     QTimer *mTimer;
 
     static MemoryChecker *mInstance;
-public slots:
-    void checkMemory();
 signals:
-    void memoryChecked(const int&, const int&);
-    void handleMemoryState(const MemoryState &,
-                           const unsigned long long &);
+    void memoryChecked(int, int);
+    void handleMemoryState(MemoryState, unsigned long long);
 };
 
 #endif // MEMORYCHECKER_H

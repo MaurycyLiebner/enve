@@ -14,8 +14,308 @@ class DurationRectangleMovable;
 class FakeComplexAnimator;
 enum CtrlsMode : short;
 
+template <class T,
+          class Compare = std::less<T>,
+          class Allocator = std::allocator<T>>
+class sQList {
+    typedef typename QList<T>::iterator iterator;
+    typedef typename QList<T>::const_iterator cIterator;
+public:
+    sQList(const Compare& comp = Compare()) : mCompare(comp) {}
+
+    inline int count() const { return mList.count(); }
+    void clear() const { mList.clear(); }
+
+    inline cIterator begin() const { return mList.begin(); }
+    inline cIterator end() const { return mList.end(); }
+
+    inline iterator begin() { return mList.begin(); }
+    inline iterator end() { return mList.end(); }
+
+    iterator insert(const T& value) {
+        const auto notLess = lowerBound(value);
+        if(notLess == mList.end()) {
+            mList.append(value);
+            return mList.end() - 1;
+        }
+        if(!mCompare(value, notLess) && !mCompare(notLess, value))
+            return mList.end();
+        const int insertId = notLess - mList.begin();
+        mList.insert(insertId, value);
+        return mList.begin() + insertId;
+    }
+
+    template <class K, class CompareK = std::less<K>>
+    iterator at(const K& key, const CompareK& compare = CompareK()) {
+        const auto lb = lowerBound(key, compare);
+        if(!compare(lb, key)) return lb;
+        return end();
+    }
+
+    iterator at(const T& value) {
+        const auto lb = lowerBound(value);
+        if(!mCompare(lb, value)) return lb;
+        return end();
+    }
+
+    inline bool remove(const cIterator& pos) {
+        const int id = pos - mList.begin();
+        if(id < 0 || id >= count()) return false;
+        mList.removeAt(id);
+        return true;
+    }
+
+    inline bool remove(const iterator& pos) {
+        return remove(pos);
+    }
+
+    inline bool remove(const T& value) {
+        const auto valueIt = at(value);
+        return remove(valueIt);
+    }
+
+    template <class K, class CompareK = std::less<K>>
+    cIterator upperBound(const K& key, const CompareK& compare = CompareK()) const {
+        const auto lb = lowerBound(key);
+        if(lb == end()) return lb();
+        if(!compare(key, lb)) return lb + 1;
+        return lb;
+    }
+
+    template <class K, class CompareK = std::less<K>>
+    cIterator lowerBound(const K& key, const CompareK& compare = CompareK()) const {
+        return std::lower_bound(begin(), end(), key, compare);
+    }
+
+    template <class K, class CompareK = std::less<K>>
+    iterator upperBound(const K& key, const CompareK& compare = CompareK()) {
+        const auto lb = lowerBound(key);
+        if(lb == end()) return lb();
+        if(!compare(key, lb)) return lb + 1;
+        return lb;
+    }
+
+    template <class K, class CompareK = std::less<K>>
+    iterator lowerBound(const K& key, const CompareK& compare = CompareK()) {
+        return std::lower_bound(begin(), end(), key, compare);
+    }
+
+    cIterator upperBound(const T& value) const {
+        const auto lb = lowerBound(value);
+        if(lb == end()) return lb();
+        if(!mCompare(value, lb)) return lb + 1;
+        return lb;
+    }
+
+    cIterator lowerBound(const T& value) const {
+        return std::lower_bound(begin(), end(), value, mCompare);
+    }
+
+    iterator upperBound(const T& value) {
+        const auto lb = lowerBound(value);
+        if(lb == end()) return lb();
+        if(!mCompare(value, lb)) return lb + 1;
+        return lb;
+    }
+
+    iterator lowerBound(const T& value) {
+        return std::lower_bound(begin(), end(), value, mCompare);
+    }
+private:
+    const Compare mCompare;
+    QList<T> mList;
+};
+
+class OverlappingKeys {
+public:
+    OverlappingKeys(const stdsptr<Key>& key,
+                    Animator * const animator) :
+        mAnimator(animator) {
+        mKeys << key;
+    }
+
+    int getFrame() const {
+        const auto key = getKey();
+        if(key) return key->getRelFrame();
+        return 0;
+    }
+
+    Key * getKey() const {
+        if(mKeys.isEmpty()) return nullptr;
+        if(mKeys.count() == 1) return mKeys.last().get();
+        for(const auto& iKey : mKeys) {
+            if(iKey->isDescendantSelected()) return iKey.get();
+        }
+        return mKeys.last().get();
+    }
+
+    bool isEmpty() const {
+        return mKeys.isEmpty();
+    }
+
+    void removeKey(const stdsptr<Key>& key) {
+        for(int i = 0; i < mKeys.count(); i++) {
+            const auto& iKey = mKeys.at(i);
+            if(iKey.get() == key.get()) {
+                mKeys.removeAt(i);
+                break;
+            }
+        }
+    }
+
+    void addKey(const stdsptr<Key>& key) {
+        mKeys.append(key);
+    }
+
+    void merge();
+private:
+    Animator * mAnimator;
+    QList<stdsptr<Key>> mKeys;
+};
+
+typedef QList<OverlappingKeys>::const_iterator OKeyListCIter;
+typedef QList<OverlappingKeys>::iterator OKeyListIter;
+class OverlappingKeyList {
+public:
+    OverlappingKeyList(Animator * const animator) :
+        mAnimator(animator) {}
+
+    class iterator {
+    public:
+        iterator(const int id,
+                const QList<OverlappingKeys> * const list) :
+            mList(list) {
+            setId(id);
+        }
+
+        iterator& operator++() {
+            setId(mId + 1);
+            return *this;
+        }
+
+        bool operator!=(const iterator& other) const {
+            return this->mId != other.mId;
+        }
+
+        Key * const & operator->() const { return mKey; }
+        Key * const &operator*() const { return mKey; }
+    protected:
+        int mId;
+    private:
+        void setId(const int id) {
+            mId = id;
+            if(mId < 0 || mId >= mList->count()) mKey = nullptr;
+            else mKey = mList->at(mId).getKey();
+        }
+        const QList<OverlappingKeys> * mList = nullptr;
+        Key * mKey = nullptr;
+    };
+
+    iterator begin() const {
+        return iterator(0, &mList);
+    }
+
+    iterator end() const {
+        return iterator(mList.count(), &mList);
+    }
+
+    int count() const {
+        return mList.count();
+    }
+
+    bool isEmpty() const {
+        return mList.isEmpty();
+    }
+
+    void add(const stdsptr<Key>& key);
+
+    void remove(const stdsptr<Key>& key) {
+        const int relFrame = key->getRelFrame();
+        const int removeId = idAtFrame(relFrame);
+        if(removeId == -1) return;
+        auto& ovrlp = mList[removeId];
+        ovrlp.removeKey(key);
+        if(ovrlp.isEmpty()) mList.removeAt(removeId);
+    }
+
+//        void removeAt(const int id) {
+//            if(id < 0) return;
+//            if(id >= mList.count()) return;
+//            return mList.removeAt(id);
+//        }
+
+//        void removeAtRelFrame(const int relFrame) {
+//            const int id = getIdForRelFrame(relFrame);
+//            const auto kAtId = atId(id);
+//            if(!kAtId) return;
+//            if(kAtId->getRelFrame() != relFrame) return;
+//            return mList.removeAt(id);
+//        }
+
+    template <class T = Key>
+    T * atId(const int id) const {
+        if(id < 0) return nullptr;
+        if(id >= mList.count()) return nullptr;
+        return static_cast<T*>(mList.at(id).getKey());
+    }
+
+    template <class T = Key>
+    T * atRelFrame(const int relFrame) const {
+        const int id = idAtFrame(relFrame);
+        const auto kAtId = atId<T>(id);
+        if(!kAtId) return nullptr;
+        if(kAtId->getRelFrame() == relFrame) return kAtId;
+        return nullptr;
+    }
+
+    std::pair<int, int> prevAndNextId(const int relFrame) const {
+        if(mList.isEmpty()) return {-1, -1};
+        const auto notLess = lowerBound(relFrame);
+        if(notLess == mList.end())
+            return {mList.count() - 1, -1};
+        const int notLessId = notLess - mList.begin();
+        if(notLess->getFrame() == relFrame) {
+            if(notLessId == mList.count() - 1)
+                return {notLessId - 1, -1};
+            return {notLessId - 1, notLessId + 1};
+        }
+        // notLess is greater than relFrame
+        return {notLessId - 1, notLessId};
+    }
+
+    template <class T = Key>
+    T * first() const {
+        return atId<T>(0);
+    }
+
+    template <class T = Key>
+    T * last() const {
+        return atId<T>(mList.count() - 1);
+    }
+
+    void mergeAll() {
+        for(int i = 0; i < mList.count(); i++) {
+            auto& iOKey = mList[i];
+            iOKey.merge();
+        }
+    }
+private:
+    OKeyListCIter upperBound(const int relFrame) const;
+    OKeyListCIter lowerBound(const int relFrame) const;
+    OKeyListIter upperBound(const int relFrame);
+    OKeyListIter lowerBound(const int relFrame);
+
+    int upperBoundId(const int relFrame) const;
+    int lowerBoundId(const int relFrame) const;
+    int idAtFrame(const int relFrame) const;
+
+    Animator * const mAnimator;
+    QList<OverlappingKeys> mList;
+};
+
 class Animator : public Property {
     Q_OBJECT
+    friend class OverlappingKeys;
 protected:
     Animator(const QString &name);
 
@@ -166,208 +466,12 @@ public:
     const QList<stdptr<Key>>& getSelectedKeys() const {
         return anim_mSelectedKeys;
     }
-    int getInsertIdForKeyRelFrame(const int relFrame) const;
-
     template <class T = Key>
     T* anim_getKeyAtIndex(const int id) const;
     int anim_getKeyIndex(const Key * const key) const;
 
     void anim_coordinateKeysWith(Animator * const other);
     void anim_addKeysWhereOtherHasKeys(const Animator * const other);
-private:
-    friend class OverlappingKeys;
-
-    class OverlappingKeys {
-    public:
-        OverlappingKeys(const stdsptr<Key>& key,
-                        Animator * const animator) :
-            mAnimator(animator) {
-            mKeys << key;
-        }
-
-        int getFrame() const {
-            const auto key = getKey();
-            if(key) return key->getRelFrame();
-            return 0;
-        }
-
-        Key * getKey() const {
-            if(mKeys.isEmpty()) return nullptr;
-            if(mKeys.count() == 1) return mKeys.last().get();
-            for(const auto& iKey : mKeys) {
-                if(iKey->isDescendantSelected()) return iKey.get();
-            }
-            return mKeys.last().get();
-        }
-
-        bool isEmpty() const {
-            return mKeys.isEmpty();
-        }
-
-        void removeKey(const stdsptr<Key>& key) {
-            for(int i = 0; i < mKeys.count(); i++) {
-                const auto& iKey = mKeys.at(i);
-                if(iKey.get() == key.get()) {
-                    mKeys.removeAt(i);
-                    break;
-                }
-            }
-        }
-
-        void addKey(const stdsptr<Key>& key) {
-            mKeys.append(key);
-        }
-
-        void merge();
-    private:
-        Animator * mAnimator;
-        QList<stdsptr<Key>> mKeys;
-    };
-
-    class OverlappingKeyList {
-    public:
-        OverlappingKeyList(Animator * const animator) :
-            mAnimator(animator) {}
-
-        class iterator {
-        public:
-            iterator(const int id,
-                    const QList<OverlappingKeys> * const list) :
-                mList(list) {
-                setId(id);
-            }
-
-            iterator& operator++() {
-                setId(mId + 1);
-                return *this;
-            }
-
-            bool operator!=(const iterator& other) const {
-                return this->mId != other.mId;
-            }
-
-            Key * const & operator->() const { return mKey; }
-            Key * const &operator*() const { return mKey; }
-        protected:
-            int mId;
-        private:
-            void setId(const int id) {
-                mId = id;
-                if(mId < 0 || mId >= mList->count()) mKey = nullptr;
-                else mKey = mList->at(mId).getKey();
-            }
-            const QList<OverlappingKeys> * mList = nullptr;
-            Key * mKey = nullptr;
-        };
-
-        iterator begin() const {
-            return iterator(0, &mList);
-        }
-
-        iterator end() const {
-            return iterator(mList.count(), &mList);
-        }
-
-        int count() const {
-            return mList.count();
-        }
-
-        bool isEmpty() const {
-            return mList.isEmpty();
-        }
-
-        int add(const stdsptr<Key>& key) {
-            const int relFrame = key->getRelFrame();
-            const int insertId = idForRelFrame(relFrame);
-            if(insertId < 0 || insertId >= mList.count()) {
-                mList.insert(insertId, OverlappingKeys(key, mAnimator));
-            } else {
-                auto& ovrlp = mList[insertId];
-                if(ovrlp.getFrame() == relFrame) ovrlp.addKey(key);
-                else mList.insert(insertId, OverlappingKeys(key, mAnimator));
-            }
-            return insertId;
-        }
-
-        void remove(const stdsptr<Key>& key) {
-            const int relFrame = key->getRelFrame();
-            const int removeId = idForRelFrame(relFrame);
-            auto& ovrlp = mList[removeId];
-            if(ovrlp.getFrame() == relFrame) {
-                ovrlp.removeKey(key);
-                if(ovrlp.isEmpty()) mList.removeAt(removeId);
-            }
-        }
-
-//        void removeAt(const int id) {
-//            if(id < 0) return;
-//            if(id >= mList.count()) return;
-//            return mList.removeAt(id);
-//        }
-
-//        void removeAtRelFrame(const int relFrame) {
-//            const int id = getIdForRelFrame(relFrame);
-//            const auto kAtId = atId(id);
-//            if(!kAtId) return;
-//            if(kAtId->getRelFrame() != relFrame) return;
-//            return mList.removeAt(id);
-//        }
-
-        template <class T = Key>
-        T * atId(const int id) const {
-            if(id < 0) return nullptr;
-            if(id >= mList.count()) return nullptr;
-            return static_cast<T*>(mList.at(id).getKey());
-        }
-
-        template <class T = Key>
-        T * atRelFrame(const int relFrame) const {
-            const int id = idForRelFrame(relFrame);
-            const auto kAtId = atId<T>(id);
-            if(!kAtId) return nullptr;
-            if(kAtId->getRelFrame() == relFrame) return kAtId;
-            return nullptr;
-        }
-
-        template <class T = Key>
-        T * first() const {
-            return atId<T>(0);
-        }
-
-        template <class T = Key>
-        T * last() const {
-            return atId<T>(mList.count() - 1);
-        }
-
-        int idForRelFrame(const int relFrame) const {
-            return idForRelFrame(relFrame, 0, mList.count());
-        }
-
-        void mergeAll() {
-            for(int i = 0; i < mList.count(); i++) {
-                auto& iOKey = mList[i];
-                iOKey.merge();
-            }
-        }
-    private:
-        int idForRelFrame(const int relFrame,
-                          const int min, const int max) const {
-            if(min >= max) return min;
-            const int guess = (max + min)/2;
-            const Key * const key = mList.at(guess).getKey();
-            const int guessFrame = key->getRelFrame();
-            if(guessFrame > relFrame) {
-                return idForRelFrame(relFrame, min, guess);
-            } else if(guessFrame < relFrame) {
-                return idForRelFrame(relFrame, guess + 1, max);
-            }
-            // guessFrame == relFrame
-            return guess;
-        }
-
-        Animator * const mAnimator;
-        QList<OverlappingKeys> mList;
-    };
 protected:
     void readKeys(QIODevice *target);
     void writeKeys(QIODevice *target) const;
@@ -399,8 +503,7 @@ private:
     void removeKeyWithoutDeselecting(const stdsptr<Key> &keyToRemove);
     void anim_updateKeyOnCurrrentFrame();
     void anim_setKeyOnCurrentFrame(Key * const key);
-    int getInsertIdForKeyRelFrame(const int relFrame,
-                                  const int min, const int max) const;
+
     stdptr<Key> anim_mKeyOnCurrentFrame;
 };
 

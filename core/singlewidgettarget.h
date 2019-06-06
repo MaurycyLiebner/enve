@@ -58,7 +58,7 @@ public:
     virtual void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction*,
             const UpdateFuncs &,
-            const int&) {}
+            const int) {}
 
     virtual bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                      const bool parentSatisfies,

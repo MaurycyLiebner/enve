@@ -31,10 +31,10 @@ struct FixedTiledSurface {
 
     void paintPressEvent(MyPaintBrush * const brush,
                          const QPointF& pos,
-                         const double& dTime,
-                         const double& pressure,
-                         const double& xtilt,
-                         const double& ytilt) {
+                         const double dTime,
+                         const double pressure,
+                         const double xtilt,
+                         const double ytilt) {
         mypaint_brush_reset(brush);
         mypaint_brush_new_stroke(brush);
 
@@ -54,10 +54,10 @@ struct FixedTiledSurface {
 
     void paintMoveEvent(MyPaintBrush * const brush,
                         const QPointF &pos,
-                        const double& dTime,
-                        const double& pressure,
-                        const double& xtilt,
-                        const double& ytilt) {
+                        const double dTime,
+                        const double pressure,
+                        const double xtilt,
+                        const double ytilt) {
         mypaint_surface_begin_atomic(fMyPaintSurface);
         mypaint_brush_stroke_to(brush,
                                 fMyPaintSurface,

@@ -251,25 +251,6 @@ void Animator::anim_updateAfterShifted() {
     }
 }
 
-int Animator::getInsertIdForKeyRelFrame(const int relFrame) const {
-    return getInsertIdForKeyRelFrame(relFrame, 0, anim_mKeys.count());
-}
-
-int Animator::getInsertIdForKeyRelFrame(
-        const int relFrame, const int min, const int max) const {
-    if(min >= max) return min;
-    const int guess = (max + min)/2;
-    const Key * const key = anim_mKeys.atId(guess);
-    const int guessFrame = key->getRelFrame();
-    if(guessFrame > relFrame) {
-        return getInsertIdForKeyRelFrame(relFrame, min, guess);
-    } else if(guessFrame < relFrame) {
-        return getInsertIdForKeyRelFrame(relFrame, guess + 1, max);
-    }
-    // guessFrame == relFrame
-    return guess;
-}
-
 void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
     const bool isComplex = SWT_isComplexAnimator();
     if(!isComplex) anim_setRecordingValue(true);
@@ -422,17 +403,7 @@ void Animator::anim_getKeysInRect(const QRectF &selectionRect,
 }
 
 std::pair<int, int> Animator::anim_getPrevAndNextKeyId(const int relFrame) const {
-    const int nextOrAtId = anim_mKeys.idForRelFrame(relFrame);
-    if(nextOrAtId >= anim_mKeys.count()) return {nextOrAtId - 1, -1};
-    const auto keyAtId = anim_mKeys.atId(nextOrAtId);
-    if(keyAtId->getRelFrame() == relFrame) {
-        int nextId;
-        if(nextOrAtId == anim_mKeys.count() - 1) nextId = -1;
-        else nextId = nextOrAtId + 1;
-        return {nextOrAtId - 1, nextId};
-    } else {
-        return {nextOrAtId - 1, nextOrAtId};
-    }
+    return anim_mKeys.prevAndNextId(relFrame);
 }
 
 std::pair<int, int> Animator::anim_getPrevAndNextKeyIdF(const qreal relFrame) const {
@@ -631,7 +602,7 @@ int Animator::getLowestAbsFrameForSelectedKey() {
     return lowestKey;
 }
 
-void Animator::OverlappingKeys::merge() {
+void OverlappingKeys::merge() {
     if(mKeys.count() < 2) return;
     Key * target = nullptr;
     for(const auto& iKey : mKeys) {
@@ -660,4 +631,67 @@ void Animator::OverlappingKeys::merge() {
             i--;
         }
     }
+}
+
+void OverlappingKeyList::add(const stdsptr<Key> &key) {
+    const int relFrame = key->getRelFrame();
+    const auto notLess = lowerBound(relFrame);
+    if(notLess == mList.end()) {
+        mList.append(OverlappingKeys(key, mAnimator));
+    } else {
+        if(notLess->getFrame() == relFrame) notLess->addKey(key);
+        else {
+            const int insertId = notLess - mList.begin();
+            mList.insert(insertId, OverlappingKeys(key, mAnimator));
+        }
+    }
+}
+
+bool OKeyFrameMore(const int relFrame, const OverlappingKeys& keys) {
+    return keys.getFrame() > relFrame;
+}
+
+OKeyListCIter OverlappingKeyList::upperBound(const int relFrame) const {
+    return std::upper_bound(mList.begin(), mList.end(),
+                            relFrame, OKeyFrameMore);
+}
+
+OKeyListIter OverlappingKeyList::upperBound(const int relFrame) {
+    return std::upper_bound(mList.begin(), mList.end(),
+                            relFrame, OKeyFrameMore);
+}
+
+bool OKeyFrameLess(const OverlappingKeys& keys,
+                   const int relFrame) {
+    return keys.getFrame() < relFrame;
+}
+
+OKeyListCIter OverlappingKeyList::lowerBound(const int relFrame) const {
+    return std::lower_bound(mList.begin(), mList.end(),
+                            relFrame, OKeyFrameLess);
+}
+
+OKeyListIter OverlappingKeyList::lowerBound(const int relFrame) {
+    return std::lower_bound(mList.begin(), mList.end(),
+                            relFrame, OKeyFrameLess);
+}
+
+int OverlappingKeyList::upperBoundId(const int relFrame) const {
+    const auto it = mList.begin();
+    if(it == mList.end()) return -1;
+    return upperBound(relFrame) - it;
+}
+
+int OverlappingKeyList::lowerBoundId(const int relFrame) const {
+    const auto it = mList.begin();
+    if(it == mList.end()) return -1;
+    return lowerBound(relFrame) - it;
+}
+
+int OverlappingKeyList::idAtFrame(const int relFrame) const {
+    const auto notPrevious = lowerBound(relFrame);
+    if(notPrevious == mList.end()) return -1;
+    if(notPrevious->getFrame() == relFrame)
+        return notPrevious - mList.begin();
+    return -1;
 }

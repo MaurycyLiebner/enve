@@ -25,18 +25,18 @@ public:
         return col;
     }
 
-    void setColor(const float& hue,
-                  const float& saturation,
-                  const float& value) const {
+    void setColor(const float hue,
+                  const float saturation,
+                  const float value) const {
         setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_H, clamp(hue, 0, 1));
         setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_S, clamp(saturation, 0, 1));
         setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_V, clamp(value, 0, 1));
     }
 
-    void setColor(const float& hue,
-                  const float& saturation,
-                  const float& value,
-                  const float& opacity) const {
+    void setColor(const float hue,
+                  const float saturation,
+                  const float value,
+                  const float opacity) const {
         setColor(hue, saturation, value);
         setOpactiy(opacity);
     }
@@ -63,7 +63,7 @@ public:
         return mypaint_brush_get_base_value(mBrush, id);
     }
 
-    void setBaseValue(const MyPaintBrushSetting& id, const float& val) const {
+    void setBaseValue(const MyPaintBrushSetting& id, const float val) const {
         mypaint_brush_set_base_value(mBrush, id, val);
     }
 

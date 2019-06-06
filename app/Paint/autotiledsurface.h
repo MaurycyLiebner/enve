@@ -41,10 +41,10 @@ struct AutoTiledSurface {
 
     MyPaintRectangle paintPressEvent(MyPaintBrush * const brush,
                                      const QPointF& pos,
-                                     const double& dTime,
-                                     const double& pressure,
-                                     const double& xtilt,
-                                     const double& ytilt) const {
+                                     const double dTime,
+                                     const double pressure,
+                                     const double xtilt,
+                                     const double ytilt) const {
         mypaint_brush_reset(brush);
         mypaint_brush_new_stroke(brush);
 
@@ -59,10 +59,10 @@ struct AutoTiledSurface {
 
     MyPaintRectangle paintMoveEvent(MyPaintBrush * const brush,
                                     const QPointF &pos,
-                                    const double& dTime,
-                                    const double& pressure,
-                                    const double& xtilt,
-                                    const double& ytilt) const {
+                                    const double dTime,
+                                    const double pressure,
+                                    const double xtilt,
+                                    const double ytilt) const {
         mypaint_surface_begin_atomic(fMyPaintSurface);
         mypaint_brush_stroke_to(brush, fMyPaintSurface,
                                 pos.x(), pos.y(), pressure,

@@ -45,45 +45,45 @@ bool isZero4Dec(const float val) {
     return abs(val) < 0.0001f;
 }
 
-bool isZero4Dec(const double& val) {
+bool isZero4Dec(const double val) {
     return qAbs(val) < 0.0001;
 }
 
-bool isInteger4Dec(const double& val) {
+bool isInteger4Dec(const double val) {
     return isZero4Dec(val - qRound(val));
 }
 
-double floor4Dec(const double& val) {
+double floor4Dec(const double val) {
     const double roundVal = qRound(val);
     if(isZero4Dec(val - roundVal)) return roundVal;
     return qFloor(val);
 }
 
-bool isZero6Dec(const double &val) {
+bool isZero6Dec(const double val) {
     return qAbs(val) < 0.000001;
 }
 
-bool isOne4Dec(const double &val) {
+bool isOne4Dec(const double val) {
     return isZero4Dec(val - 1);
 }
 
-bool isOne6Dec(const double &val) {
+bool isOne6Dec(const double val) {
     return isZero6Dec(val - 1);
 }
 
-bool isZero6Dec(const float &val) {
+bool isZero6Dec(const float val) {
     return qAbs(val) < 0.000001f;
 }
 
-bool isOne4Dec(const float &val) {
+bool isOne4Dec(const float val) {
     return isZero4Dec(val - 1);
 }
 
-bool isOne6Dec(const float &val) {
+bool isOne6Dec(const float val) {
     return isZero6Dec(val - 1);
 }
 
-bool isZeroOrOne6Dec(const double &val) {
+bool isZeroOrOne6Dec(const double val) {
     if(isZero6Dec(val)) return true;
     if(isOne6Dec(val)) return true;
     return false;
@@ -105,11 +105,11 @@ bool isPointZero(QPointF pos) {
     return pointToLen(pos) < 0.0001;
 }
 
-bool isNonZero(const float &val) {
+bool isNonZero(const float val) {
     return val > 0.0001f || val < - 0.0001f;
 }
 
-bool isNonZero(const double &val) {
+bool isNonZero(const double val) {
     return val > 0.0001 || val < - 0.0001;
 }
 

@@ -26,7 +26,7 @@ enum CtrlsMode : short {
 //    Solution(const bool valid, const T& value = T()) :
 //        fValid(valid), fValue(value) {}
 
-//    operator const bool&() const {
+//    operator bool() const {
 //        return fValid;
 //    }
 

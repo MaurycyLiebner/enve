@@ -736,23 +736,23 @@ float randFloat(const qreal baseSeed) {
 
 //! @brief Return random in range [min, max)
 float randFloat(const qreal baseSeed,
-                const float& min, const float& max) {
+                const float min, const float max) {
     return static_cast<float>(randFloat01(baseSeed))*(max - min) + min;
 }
 
 SkPoint randPt(const qreal baseSeed, const SkPoint& pt,
-               const float& min, const float& max) {
+               const float min, const float max) {
     const auto xR = randFloat(baseSeed, min, max);
     const auto yR = randFloat(baseSeed, min, max);
     return {pt.x() + xR, pt.y() + yR};
 }
 
 SkPoint randPt(const qreal baseSeed,
-               const SkPoint& pt, const float& dev) {
+               const SkPoint& pt, const float dev) {
     return randPt(baseSeed, pt, -dev, dev);
 }
 
-SkPoint randPt(const qreal baseSeed, const float& dev) {
+SkPoint randPt(const qreal baseSeed, const float dev) {
     const auto xR = randFloat(baseSeed, -dev, dev);
     const auto yR = randFloat(baseSeed, -dev, dev);
     return SkPoint::Make(xR, yR);

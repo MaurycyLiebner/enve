@@ -45,8 +45,8 @@ private:
 
     QRect executeMove(MyPaintBrush * const brush,
                       MyPaintSurface * const surface,
-                      const double& t,
-                      const double& lenFrag) const {
+                      const double t,
+                      const double lenFrag) const {
         const QPointF pos = fStrokePath.posAtT(t);
         const qreal pressure = fPressure.valAtT(t);
         const qreal xTilt = fXTilt.valAtT(t);
@@ -243,7 +243,7 @@ struct BrushStrokeSet {
 
     QRect execute(MyPaintBrush * const brush,
                   MyPaintSurface * const surface,
-                  const double& dLen) {
+                  const double dLen) {
         if(fStrokes.isEmpty()) return QRect();
         QRect updateRect = fStrokes[0].execute(brush, surface, true, dLen);
         for(int i = 1; i < fStrokes.count(); i++) {

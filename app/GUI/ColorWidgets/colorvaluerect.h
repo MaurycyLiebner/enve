@@ -5,7 +5,7 @@
 class ColorValueRect : public ColorWidget {
     Q_OBJECT
 public:
-    ColorValueRect(const CVR_TYPE &type_t, QWidget *parent = nullptr);
+    ColorValueRect(const CVR_TYPE type_t, QWidget *parent = nullptr);
     void updateVal();
     void setDisplayedValue(const qreal val_t);
     qreal qVal() const {
@@ -22,12 +22,12 @@ private:
     void setColorParameterFromVal();
     void setValueAndEmitValueChanged(const qreal valT);
 signals:
-    void valChanged(const qreal&);
-    void editingFinished(const qreal&);
-    void editingStarted(const qreal&);
+    void valChanged(qreal);
+    void editingFinished(qreal);
+    void editingStarted(qreal);
 private:
     CVR_TYPE mType;
-    GLfloat mVal = 0.f;
+    GLfloat mVal = 0;
 };
 
 #endif // COLORVALUERECT_H

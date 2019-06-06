@@ -35,24 +35,24 @@ extern qreal distSign(const QPointF& distPt);
 extern unsigned char truncateU8(const int val);
 extern int clampInt(int val, int min, int max);
 
-extern bool isNonZero(const float &val);
+extern bool isNonZero(const float val);
 
 extern bool isZero4Dec(const float val);
-extern bool isZero4Dec(const double &val);
+extern bool isZero4Dec(const double val);
 
-extern double floor4Dec(const double& val);
+extern double floor4Dec(const double val);
 
-extern bool isInteger4Dec(const double& val);
+extern bool isInteger4Dec(const double val);
 
-extern bool isZero6Dec(const double &val);
-extern bool isZeroOrOne6Dec(const double &val);
+extern bool isZero6Dec(const double val);
+extern bool isZeroOrOne6Dec(const double val);
 
-extern bool isOne4Dec(const double &val);
-extern bool isOne6Dec(const double &val);
+extern bool isOne4Dec(const double val);
+extern bool isOne6Dec(const double val);
 
-extern bool isZero6Dec(const float &val);
-extern bool isOne4Dec(const float &val);
-extern bool isOne6Dec(const float &val);
+extern bool isZero6Dec(const float val);
+extern bool isOne4Dec(const float val);
+extern bool isOne6Dec(const float val);
 
 extern bool isZero2Dec(const qreal val);
 extern bool isZero2Dec(const SkScalar val);
@@ -67,7 +67,7 @@ extern qreal qMax4(qreal v1, qreal v2,
 extern QRectF qRectF4Points(QPointF p1, QPointF c1,
                             QPointF c2, QPointF p2);
 
-extern bool isNonZero(const double &val);
+extern bool isNonZero(const double val);
 extern void rotate(float rad_t, float *x_t, float *y_t);
 extern void rotate(qreal rad_t, qreal *x_t, qreal *y_t);
 
@@ -97,7 +97,7 @@ qreal clamp(const qreal val, const T1 &min, const T2 &max) {
 }
 
 template <typename T1, typename T2>
-float clamp(const float &val, const T1 &min, const T2 &max) {
+float clamp(const float val, const T1 &min, const T2 &max) {
     static_assert((std::is_same<T1, float>::value ||
                   std::is_same<T1, int>::value) &&
                   (std::is_same<T2, float>::value ||

@@ -7,13 +7,13 @@
 #include "colorwidgetshaders.h"
 #include "global.h"
 
-ColorValueRect::ColorValueRect(const CVR_TYPE& type_t, QWidget *parent) :
+ColorValueRect::ColorValueRect(const CVR_TYPE type_t, QWidget *parent) :
     ColorWidget(parent) {
     mType = type_t;
 }
 
 void ColorValueRect::paintGL() {
-    glClearColor(1.f, 0.f, 0.f, 1.f);
+    glClearColor(1, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
     ColorProgram programToUse;
     if(mType == CVR_RED) {
@@ -76,16 +76,14 @@ void ColorValueRect::mouseMoveEvent(QMouseEvent *e) {
 }
 
 void ColorValueRect::mousePressEvent(QMouseEvent *e) {
-    if(e->button() == Qt::RightButton) {
-        return;
-    }
+    if(e->button() == Qt::RightButton) return;
     emit editingStarted(qVal());
     mouseInteraction(e->x());
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 void ColorValueRect::mouseReleaseEvent(QMouseEvent *) {
-    mHslSaturatonTmp = -1.f;
+    mHslSaturatonTmp = -1;
     emit editingFinished(qVal());
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
@@ -102,8 +100,7 @@ void ColorValueRect::mouseReleaseEvent(QMouseEvent *) {
 //}
 
 void ColorValueRect::mouseInteraction(const int x_t) {
-    setValueAndEmitValueChanged(
-                clamp(static_cast<qreal>(x_t)/width(), 0., 1.));
+    setValueAndEmitValueChanged(clamp(qreal(x_t)/width(), 0, 1));
 }
 
 
