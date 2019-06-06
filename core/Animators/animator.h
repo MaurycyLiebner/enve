@@ -14,118 +14,6 @@ class DurationRectangleMovable;
 class FakeComplexAnimator;
 enum CtrlsMode : short;
 
-template <class T,
-          class Compare = std::less<T>,
-          class Allocator = std::allocator<T>>
-class sQList {
-    typedef typename QList<T>::iterator iterator;
-    typedef typename QList<T>::const_iterator cIterator;
-public:
-    sQList(const Compare& comp = Compare()) : mCompare(comp) {}
-
-    inline int count() const { return mList.count(); }
-    void clear() const { mList.clear(); }
-
-    inline cIterator begin() const { return mList.begin(); }
-    inline cIterator end() const { return mList.end(); }
-
-    inline iterator begin() { return mList.begin(); }
-    inline iterator end() { return mList.end(); }
-
-    iterator insert(const T& value) {
-        const auto notLess = lowerBound(value);
-        if(notLess == mList.end()) {
-            mList.append(value);
-            return mList.end() - 1;
-        }
-        if(!mCompare(value, notLess) && !mCompare(notLess, value))
-            return mList.end();
-        const int insertId = notLess - mList.begin();
-        mList.insert(insertId, value);
-        return mList.begin() + insertId;
-    }
-
-    template <class K, class CompareK = std::less<K>>
-    iterator at(const K& key, const CompareK& compare = CompareK()) {
-        const auto lb = lowerBound(key, compare);
-        if(!compare(lb, key)) return lb;
-        return end();
-    }
-
-    iterator at(const T& value) {
-        const auto lb = lowerBound(value);
-        if(!mCompare(lb, value)) return lb;
-        return end();
-    }
-
-    inline bool remove(const cIterator& pos) {
-        const int id = pos - mList.begin();
-        if(id < 0 || id >= count()) return false;
-        mList.removeAt(id);
-        return true;
-    }
-
-    inline bool remove(const iterator& pos) {
-        return remove(pos);
-    }
-
-    inline bool remove(const T& value) {
-        const auto valueIt = at(value);
-        return remove(valueIt);
-    }
-
-    template <class K, class CompareK = std::less<K>>
-    cIterator upperBound(const K& key, const CompareK& compare = CompareK()) const {
-        const auto lb = lowerBound(key);
-        if(lb == end()) return lb();
-        if(!compare(key, lb)) return lb + 1;
-        return lb;
-    }
-
-    template <class K, class CompareK = std::less<K>>
-    cIterator lowerBound(const K& key, const CompareK& compare = CompareK()) const {
-        return std::lower_bound(begin(), end(), key, compare);
-    }
-
-    template <class K, class CompareK = std::less<K>>
-    iterator upperBound(const K& key, const CompareK& compare = CompareK()) {
-        const auto lb = lowerBound(key);
-        if(lb == end()) return lb();
-        if(!compare(key, lb)) return lb + 1;
-        return lb;
-    }
-
-    template <class K, class CompareK = std::less<K>>
-    iterator lowerBound(const K& key, const CompareK& compare = CompareK()) {
-        return std::lower_bound(begin(), end(), key, compare);
-    }
-
-    cIterator upperBound(const T& value) const {
-        const auto lb = lowerBound(value);
-        if(lb == end()) return lb();
-        if(!mCompare(value, lb)) return lb + 1;
-        return lb;
-    }
-
-    cIterator lowerBound(const T& value) const {
-        return std::lower_bound(begin(), end(), value, mCompare);
-    }
-
-    iterator upperBound(const T& value) {
-        const auto lb = lowerBound(value);
-        if(lb == end()) return lb();
-        if(!mCompare(value, lb)) return lb + 1;
-        return lb;
-    }
-
-    iterator lowerBound(const T& value) {
-        return std::lower_bound(begin(), end(), value, mCompare);
-    }
-private:
-    const Compare mCompare;
-    QList<T> mList;
-};
-
 class OverlappingKeys {
 public:
     OverlappingKeys(const stdsptr<Key>& key,
@@ -173,9 +61,9 @@ private:
     QList<stdsptr<Key>> mKeys;
 };
 
-typedef QList<OverlappingKeys>::const_iterator OKeyListCIter;
-typedef QList<OverlappingKeys>::iterator OKeyListIter;
 class OverlappingKeyList {
+    typedef QList<OverlappingKeys>::const_iterator OKeyListCIter;
+    typedef QList<OverlappingKeys>::iterator OKeyListIter;
 public:
     OverlappingKeyList(Animator * const animator) :
         mAnimator(animator) {}
@@ -238,20 +126,6 @@ public:
         if(ovrlp.isEmpty()) mList.removeAt(removeId);
     }
 
-//        void removeAt(const int id) {
-//            if(id < 0) return;
-//            if(id >= mList.count()) return;
-//            return mList.removeAt(id);
-//        }
-
-//        void removeAtRelFrame(const int relFrame) {
-//            const int id = getIdForRelFrame(relFrame);
-//            const auto kAtId = atId(id);
-//            if(!kAtId) return;
-//            if(kAtId->getRelFrame() != relFrame) return;
-//            return mList.removeAt(id);
-//        }
-
     template <class T = Key>
     T * atId(const int id) const {
         if(id < 0) return nullptr;
@@ -294,10 +168,7 @@ public:
     }
 
     void mergeAll() {
-        for(int i = 0; i < mList.count(); i++) {
-            auto& iOKey = mList[i];
-            iOKey.merge();
-        }
+        for(auto& oKey : mList) oKey.merge();
     }
 private:
     OKeyListCIter upperBound(const int relFrame) const;
@@ -305,8 +176,6 @@ private:
     OKeyListIter upperBound(const int relFrame);
     OKeyListIter lowerBound(const int relFrame);
 
-    int upperBoundId(const int relFrame) const;
-    int lowerBoundId(const int relFrame) const;
     int idAtFrame(const int relFrame) const;
 
     Animator * const mAnimator;

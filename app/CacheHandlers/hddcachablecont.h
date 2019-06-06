@@ -1,5 +1,5 @@
-#ifndef HDDCACHABLECONTAINER_H
-#define HDDCACHABLECONTAINER_H
+#ifndef HDDCACHABLECONT_H
+#define HDDCACHABLECONT_H
 #include "minimalcachecontainer.h"
 #include "tmpfilehandlers.h"
 class Task;
@@ -86,4 +86,4 @@ public:
     void noDataLeft_k() final {}
 };
 
-#endif // HDDCACHABLECONTAINER_H
+#endif // HDDCACHABLECONT_H

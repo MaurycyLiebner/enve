@@ -381,7 +381,7 @@ void Canvas::setOutputRendering(const bool bT) {
 }
 
 void Canvas::setCurrentPreviewContainer(const int relFrame) {
-    auto cont = mCacheHandler.atRelFrame(relFrame);
+    auto cont = mCacheHandler.atFrame(relFrame);
     setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
 }
 
@@ -431,13 +431,15 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     if(renderData->fBoxStateId < mLastStateId) return;
     mLastStateId = renderData->fBoxStateId;
     const auto range = prp_getIdenticalRelRange(renderData->fRelFrame);
-    auto cont = mCacheHandler.atRelFrame<ImageCacheContainer>(range.fMin);
+    auto cont = mCacheHandler.atFrame<ImageCacheContainer>(range.fMin);
     if(cont) {
         cont->replaceImageSk(renderData->fRenderedImage);
         cont->setRange(range);
     } else {
-        cont = mCacheHandler.createNew<ImageCacheContainer>(
-                    range, renderData->fRenderedImage);
+        const auto sCont = SPtrCreate(ImageCacheContainer)(
+                    renderData->fRenderedImage, range, &mCacheHandler);
+        mCacheHandler.add(sCont);
+        cont = sCont.get();
     }
     if((mPreviewing || mRenderingOutput) &&
        mCurrRenderRange.inRange(renderData->fRelFrame)) {
@@ -476,8 +478,8 @@ void Canvas::prp_afterChangedAbsRange(const FrameRange &range) {
     Property::prp_afterChangedAbsRange(range);
     const int minId = prp_getIdenticalRelRange(range.fMin).fMin;
     const int maxId = prp_getIdenticalRelRange(range.fMax).fMax;
-    mCacheHandler.clearRelRange({minId, maxId});
-    if(!mCacheHandler.atRelFrame(anim_getCurrentRelFrame())) {
+    mCacheHandler.remove({minId, maxId});
+    if(!mCacheHandler.atFrame(anim_getCurrentRelFrame())) {
         mCurrentPreviewContainerOutdated = true;
         planScheduleUpdate(Animator::USER_CHANGE);
     }
@@ -768,8 +770,7 @@ void Canvas::anim_setAbsFrame(const int frame) {
     ComplexAnimator::anim_setAbsFrame(frame);
     const int newRelFrame = anim_getCurrentRelFrame();
 
-    const auto cont = mCacheHandler.atRelFrame
-            <ImageCacheContainer>(newRelFrame);
+    const auto cont = mCacheHandler.atFrame<ImageCacheContainer>(newRelFrame);
     if(cont) {
         if(cont->storesDataInMemory()) { // !!!
             setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));

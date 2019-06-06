@@ -1,9 +1,9 @@
 #ifndef SOUNDCACHECONTAINER_H
 #define SOUNDCACHECONTAINER_H
-#include "hddcachablerangecontainer.h"
+#include "hddcachablerangecont.h"
 #include "CacheHandlers/samples.h"
 
-class SoundCacheContainer : public HDDCachableRangeContainer {
+class SoundCacheContainer : public HDDCachableRangeCont {
     friend class StdSelfRef;
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
 protected:

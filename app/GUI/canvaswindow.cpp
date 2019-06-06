@@ -1172,7 +1172,7 @@ void CanvasWindow::nextSaveOutputFrame() {
     const qreal fps = mCurrentCanvas->getFps();
     const int maxSec = qCeil(mMaxRenderFrame/fps);
     while(mCurrentEncodeSoundSecond <= maxSec) {
-        const auto cont = sCacheHandler.atRelFrame(mCurrentEncodeSoundSecond);
+        const auto cont = sCacheHandler.atFrame(mCurrentEncodeSoundSecond);
         if(!cont) break;
         const auto sCont = GetAsSPtr(cont, SoundCacheContainer);
         const auto samples = sCont->getSamples();
@@ -1191,7 +1191,7 @@ void CanvasWindow::nextSaveOutputFrame() {
 
     const auto& cacheHandler = mCurrentCanvas->getCacheHandler();
     while(mCurrentEncodeFrame <= mMaxRenderFrame) {
-        const auto cont = cacheHandler.atRelFrame(mCurrentEncodeFrame);
+        const auto cont = cacheHandler.atFrame(mCurrentEncodeFrame);
         if(!cont) break;
         VideoEncoder::sAddCacheContainerToEncoder(
                     GetAsSPtr(cont, ImageCacheContainer));

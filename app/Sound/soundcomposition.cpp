@@ -53,8 +53,10 @@ void SoundComposition::secondFinished(const int secondId,
                                       const stdsptr<Samples> &samples) {
     mProcessingSeconds.removeOne(secondId);
     if(!samples) return;
-    const auto cont = mSecondsCache.createNew<SoundCacheContainer>(secondId, samples);
-    if(mBlockRange.inRange(secondId)) cont->setBlocked(true);
+    const auto sCont = SPtrCreate(SoundCacheContainer)(
+                samples, iValueRange{secondId, secondId}, &mSecondsCache);
+    mSecondsCache.add(sCont);
+    if(mBlockRange.inRange(secondId)) sCont->setBlocked(true);
 }
 
 void SoundComposition::startBlockingAtFrame(const int frame) {
@@ -96,7 +98,7 @@ SoundMerger *SoundComposition::scheduleFrame(const int frameId) {
 SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
     if(mSounds.isEmpty()) return nullptr;
     if(mProcessingSeconds.contains(secondId)) return nullptr;
-    if(mSecondsCache.atRelFrame(secondId)) return nullptr;
+    if(mSecondsCache.atFrame(secondId)) return nullptr;
     mProcessingSeconds.append(secondId);
     const SampleRange sampleRange = {secondId*SOUND_SAMPLERATE,
                                      (secondId + 1)*SOUND_SAMPLERATE - 1};
@@ -143,7 +145,7 @@ qint64 SoundComposition::readData(char *data, qint64 maxLen) {
                                   static_cast<int>(mPos + maxLen/sizeof(float))};
     while(maxLen > total) {
         const int secondId = static_cast<int>(mPos/SOUND_SAMPLERATE);
-        const auto cont = mSecondsCache.atRelFrame<SoundCacheContainer>(secondId);
+        const auto cont = mSecondsCache.atFrame<SoundCacheContainer>(secondId);
         if(!cont) break;
         const auto contSampleRange = cont->getSamples()->fSampleRange;
         const auto secondData = cont->getSamplesData();

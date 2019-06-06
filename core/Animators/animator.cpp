@@ -651,12 +651,14 @@ bool OKeyFrameMore(const int relFrame, const OverlappingKeys& keys) {
     return keys.getFrame() > relFrame;
 }
 
-OKeyListCIter OverlappingKeyList::upperBound(const int relFrame) const {
+OverlappingKeyList::OKeyListCIter
+    OverlappingKeyList::upperBound(const int relFrame) const {
     return std::upper_bound(mList.begin(), mList.end(),
                             relFrame, OKeyFrameMore);
 }
 
-OKeyListIter OverlappingKeyList::upperBound(const int relFrame) {
+OverlappingKeyList::OKeyListIter
+    OverlappingKeyList::upperBound(const int relFrame) {
     return std::upper_bound(mList.begin(), mList.end(),
                             relFrame, OKeyFrameMore);
 }
@@ -666,26 +668,16 @@ bool OKeyFrameLess(const OverlappingKeys& keys,
     return keys.getFrame() < relFrame;
 }
 
-OKeyListCIter OverlappingKeyList::lowerBound(const int relFrame) const {
+OverlappingKeyList::OKeyListCIter
+    OverlappingKeyList::lowerBound(const int relFrame) const {
     return std::lower_bound(mList.begin(), mList.end(),
                             relFrame, OKeyFrameLess);
 }
 
-OKeyListIter OverlappingKeyList::lowerBound(const int relFrame) {
+OverlappingKeyList::OKeyListIter
+    OverlappingKeyList::lowerBound(const int relFrame) {
     return std::lower_bound(mList.begin(), mList.end(),
                             relFrame, OKeyFrameLess);
-}
-
-int OverlappingKeyList::upperBoundId(const int relFrame) const {
-    const auto it = mList.begin();
-    if(it == mList.end()) return -1;
-    return upperBound(relFrame) - it;
-}
-
-int OverlappingKeyList::lowerBoundId(const int relFrame) const {
-    const auto it = mList.begin();
-    if(it == mList.end()) return -1;
-    return lowerBound(relFrame) - it;
 }
 
 int OverlappingKeyList::idAtFrame(const int relFrame) const {

@@ -5,7 +5,7 @@
 
 ImageCacheContainer::ImageCacheContainer(const FrameRange &range,
                                          HDDCachableCacheHandler * const parent) :
-    HDDCachableRangeContainer(range, parent) {}
+    HDDCachableRangeCont(range, parent) {}
 
 ImageCacheContainer::ImageCacheContainer(const sk_sp<SkImage> &img,
                                          const FrameRange &range,

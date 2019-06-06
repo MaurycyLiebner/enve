@@ -3,7 +3,7 @@
 #include "Sound/singlesound.h"
 
 stdsptr<Samples> SoundCacheHandler::getSamplesForSecond(const int secondId) {
-    const auto cont = mSecondsCache.atRelFrame
+    const auto cont = mSecondsCache.atFrame
             <SoundCacheContainer>(secondId);
     if(!cont) return nullptr;
     return cont->getSamples();
@@ -13,7 +13,9 @@ void SoundCacheHandler::secondReaderFinished(
         const int secondId,
         const stdsptr<Samples>& samples) {
     if(samples) {
-        mSecondsCache.createNew<SoundCacheContainer>(secondId, samples);
+        mSecondsCache.add(SPtrCreate(SoundCacheContainer)(
+                              samples, iValueRange{secondId, secondId},
+                              &mSecondsCache));
     }
     removeSecondReader(secondId);
 }

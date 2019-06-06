@@ -3,7 +3,7 @@
 
 SoundCacheContainer::SoundCacheContainer(const iValueRange &second,
                                          HDDCachableCacheHandler * const parent) :
-    HDDCachableRangeContainer(second, parent) {}
+    HDDCachableRangeCont(second, parent) {}
 
 SoundCacheContainer::SoundCacheContainer(const stdsptr<Samples>& samples,
                                          const iValueRange &second,

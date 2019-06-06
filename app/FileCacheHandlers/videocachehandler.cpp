@@ -7,14 +7,14 @@
 #include "filesourcescache.h"
 
 sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int relFrame) {
-    const auto cont = mFramesCache.atRelFrame
+    const auto cont = mFramesCache.atFrame
             <ImageCacheContainer>(relFrame);
     if(!cont) return sk_sp<SkImage>();
     return cont->getImageSk();
 }
 
 sk_sp<SkImage> VideoCacheHandler::getFrameAtOrBeforeFrame(const int relFrame) {
-    const auto cont = mFramesCache.atOrBeforeRelFrame
+    const auto cont = mFramesCache.atOrBeforeFrame
             <ImageCacheContainer>(relFrame);
     if(!cont) return sk_sp<SkImage>();
     return cont->getImageSk();
@@ -23,7 +23,8 @@ sk_sp<SkImage> VideoCacheHandler::getFrameAtOrBeforeFrame(const int relFrame) {
 void VideoCacheHandler::frameLoaderFinished(const int frame,
                                             const sk_sp<SkImage>& image) {
     if(image) {
-        mFramesCache.createNew<ImageCacheContainer>(frame, image);
+        mFramesCache.add(SPtrCreate(ImageCacheContainer)(
+                             image, FrameRange{frame, frame}, &mFramesCache));
     } else {
         mFrameCount = frame;
         for(const auto &box : mDependentBoxes) {
@@ -37,7 +38,7 @@ void VideoCacheHandler::frameLoaderFinished(const int frame,
 }
 
 void VideoCacheHandler::clearCache() {
-    mFramesCache.clearCache();
+    mFramesCache.clear();
     FileCacheHandler::clearCache();
 }
 
@@ -65,7 +66,7 @@ Task* VideoCacheHandler::scheduleFrameLoad(const int frame) {
         RuntimeThrow("Frame outside of range " + std::to_string(frame));
     const auto currLoader = getFrameLoader(frame);
     if(currLoader) return currLoader;
-    const auto contAtFrame = mFramesCache.atRelFrame
+    const auto contAtFrame = mFramesCache.atFrame
             <ImageCacheContainer>(frame);
     if(contAtFrame) return contAtFrame->scheduleLoadFromTmpFile();
     const auto loader = addFrameLoader(frame);

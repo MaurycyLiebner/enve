@@ -1,15 +1,15 @@
-#ifndef HDDCACHABLERANGECONTAINER_H
-#define HDDCACHABLERANGECONTAINER_H
-#include "hddcachablecontainer.h"
+#ifndef HDDCACHABLERANGECONT_H
+#define HDDCACHABLERANGECONT_H
+#include "hddcachablecont.h"
 #include "tmpfilehandlers.h"
 #include "framerange.h"
 class Task;
 class HDDCachableCacheHandler;
 
-class HDDCachableRangeContainer : public HDDCachable {
+class HDDCachableRangeCont : public HDDCachable {
     friend class SoundContainerTmpFileDataSaver;
 protected:
-    HDDCachableRangeContainer(const FrameRange &range,
+    HDDCachableRangeCont(const FrameRange &range,
                               HDDCachableCacheHandler * const parent) :
         mRange(range), mParentCacheHandler_k(parent) {}
     virtual int clearMemory() = 0;
@@ -35,4 +35,4 @@ private:
     HDDCachableCacheHandler * const mParentCacheHandler_k;
 };
 
-#endif // HDDCACHABLERANGECONTAINER_H
+#endif // HDDCACHABLERANGECONT_H

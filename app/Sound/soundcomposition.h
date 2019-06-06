@@ -62,7 +62,7 @@ private:
     void frameRangeChanged(const FrameRange &range);
 
     void secondRangeChanged(const iValueRange &range) {
-        mSecondsCache.clearRelRange(range);
+        mSecondsCache.remove(range);
     }
 
     iValueRange mBlockRange{0, -1};

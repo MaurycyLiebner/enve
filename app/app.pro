@@ -49,6 +49,7 @@ SOURCES += main.cpp\
     Boxes/containerbox.cpp \
     Boxes/layerboxrenderdata.cpp \
     Boxes/patheffectsmenu.cpp \
+    CacheHandlers/hddcachablerangecont.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/soundreader.cpp \
     GUI/welcomedialog.cpp \
@@ -228,7 +229,6 @@ SOURCES += main.cpp\
     CacheHandlers/rangecachecontainer.cpp \
     CacheHandlers/imagecachecontainer.cpp \
     CacheHandlers/tmpfilehandlers.cpp \
-    CacheHandlers/hddcachablerangecontainer.cpp \
     CacheHandlers/soundcachecontainer.cpp \
     CacheHandlers/soundtmpfilehandlers.cpp \
     CacheHandlers/hddcachablecachehandler.cpp \
@@ -259,6 +259,8 @@ HEADERS  += \
     Boxes/containerbox.h \
     Boxes/layerboxrenderdata.h \
     Boxes/patheffectsmenu.h \
+    CacheHandlers/hddcachablecont.h \
+    CacheHandlers/hddcachablerangecont.h \
     CacheHandlers/samples.h \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/soundreader.h \
@@ -440,7 +442,6 @@ HEADERS  += \
     CacheHandlers/rangecachecontainer.h \
     CacheHandlers/imagecachecontainer.h \
     CacheHandlers/tmpfilehandlers.h \
-    CacheHandlers/hddcachablerangecontainer.h \
     CacheHandlers/soundcachecontainer.h \
     CacheHandlers/soundtmpfilehandlers.h \
     CacheHandlers/hddcachablecachehandler.h \
@@ -464,8 +465,7 @@ HEADERS  += \
     Paint/drawableautotiledsurface.h \
     FileCacheHandlers/videoframeloader.h \
     FileCacheHandlers/videostreamsdata.h \
-    Paint/animatedsurface.h \
-    CacheHandlers/hddcachablecontainer.h
+    Paint/animatedsurface.h
 
 RESOURCES += \
     resources.qrc

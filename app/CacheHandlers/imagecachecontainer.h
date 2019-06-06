@@ -1,10 +1,10 @@
 #ifndef IMAGECACHECONTAINER_H
 #define IMAGECACHECONTAINER_H
 #include "skia/skiaincludes.h"
-#include "hddcachablerangecontainer.h"
+#include "hddcachablerangecont.h"
 class Canvas;
 
-class ImageCacheContainer : public HDDCachableRangeContainer {
+class ImageCacheContainer : public HDDCachableRangeCont {
     friend class StdSelfRef;
 protected:
     ImageCacheContainer(const FrameRange& range,
