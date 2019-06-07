@@ -22,9 +22,9 @@ SmartPathAnimator::SmartPathAnimator(const SmartPath &baseValue) :
     updateAllPoints();
 }
 
-void SmartPathAnimator::readProperty(QIODevice *target) {
-    readKeys(target);
-    gRead(target, mBaseValue);
+void SmartPathAnimator::readProperty(QIODevice * const src) {
+    readKeys(src);
+    gRead(src, mBaseValue);
     prp_afterWholeInfluenceRangeChanged();
     updateAllPoints();
 }

@@ -18,12 +18,12 @@ void SubdividePathEffect::apply(const qreal relFrame,
     }
 }
 
-void SubdividePathEffect::writeProperty(QIODevice * const target) const {
-    PathEffect::writeProperty(target);
-    mCount->writeProperty(target);
+void SubdividePathEffect::writeProperty(QIODevice * const dst) const {
+    PathEffect::writeProperty(dst);
+    mCount->writeProperty(dst);
 }
 
-void SubdividePathEffect::readProperty(QIODevice *target) {
-    PathEffect::readProperty(target);
-    mCount->readProperty(target);
+void SubdividePathEffect::readProperty(QIODevice * const src) {
+    PathEffect::readProperty(src);
+    mCount->readProperty(src);
 }

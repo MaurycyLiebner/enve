@@ -22,8 +22,8 @@ public:
 
     bool SWT_isBasicTransformAnimator() const;
 
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice * const dst) const;
+    void readProperty(QIODevice * const src);
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const {
         if(mParentTransform) {
@@ -122,7 +122,7 @@ public:
 
     bool SWT_isBoxTransformAnimator() const { return true; }
     void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void readProperty(QIODevice * const src);
 
     void resetPivot();
     void setPivotFixedTransform(const QPointF &point);

@@ -6,7 +6,7 @@
 QList<stdsptr<GPURasterEffectCreator>> GPURasterEffectCreator::sEffectCreators;
 
 qsptr<Property> GPURasterEffectCreator::create() const {
-    auto rasterEffect = SPtrCreate(GPURasterEffect)(&fProgram, fName);
+    auto rasterEffect = SPtrCreate(GPURasterEffect)(this, &fProgram, fName);
     for(const auto& property : fProperties) {
         rasterEffect->ca_addChildAnimator(property->create());
     }
@@ -196,12 +196,10 @@ QList<stdsptr<GPURasterEffectCreator>>
 }
 
 QList<stdsptr<GPURasterEffectCreator>>
-    GPURasterEffectCreator::sGetBestCompatibleEffects(
-        const QString &grePath, const QString &name,
-        const QList<PropertyType> &props) {
-    const auto pathBased = sWithGrePathAndCompatible(grePath, props);
+    GPURasterEffectCreator::sGetBestCompatibleEffects(const Identifier &id) {
+    const auto pathBased = sWithGrePathAndCompatible(id.fGrePath, id.fTypes);
     if(pathBased) return QList<stdsptr<GPURasterEffectCreator>>() << pathBased;
-    const auto nameBased = sWithNameAndCompatible(name, props);
+    const auto nameBased = sWithNameAndCompatible(id.fName, id.fTypes);
     if(!nameBased.isEmpty()) return nameBased;
-    return sWithCompatibleProps(props);
+    return sWithCompatibleProps(id.fTypes);
 }

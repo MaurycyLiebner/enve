@@ -57,20 +57,20 @@ void SpatialDisplacePathEffect::apply(const qreal relFrame,
     }
 }
 
-void SpatialDisplacePathEffect::writeProperty(QIODevice * const target) const {
-    PathEffect::writeProperty(target);
-    mMaxDev->writeProperty(target);
-    mLengthBased->writeProperty(target);
-    mSeed->writeProperty(target);
-    mSegLength->writeProperty(target);
-    mSmoothness->writeProperty(target);
+void SpatialDisplacePathEffect::writeProperty(QIODevice * const dst) const {
+    PathEffect::writeProperty(dst);
+    mMaxDev->writeProperty(dst);
+    mLengthBased->writeProperty(dst);
+    mSeed->writeProperty(dst);
+    mSegLength->writeProperty(dst);
+    mSmoothness->writeProperty(dst);
 }
 
-void SpatialDisplacePathEffect::readProperty(QIODevice *target) {
-    PathEffect::readProperty(target);
-    mMaxDev->readProperty(target);
-    mLengthBased->readProperty(target);
-    mSeed->readProperty(target);
-    mSegLength->readProperty(target);
-    mSmoothness->readProperty(target);
+void SpatialDisplacePathEffect::readProperty(QIODevice * const src) {
+    PathEffect::readProperty(src);
+    mMaxDev->readProperty(src);
+    mLengthBased->readProperty(src);
+    mSeed->readProperty(src);
+    mSegLength->readProperty(src);
+    mSmoothness->readProperty(src);
 }

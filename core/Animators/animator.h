@@ -313,7 +313,7 @@ public:
     void addKeyToSelected(Key * const key);
     void removeKeyFromSelected(Key * const key);
 
-    void writeSelectedKeys(QIODevice* target);
+    void writeSelectedKeys(QIODevice * const dst);
 
     void deselectAllKeys();
     void selectAllKeys();

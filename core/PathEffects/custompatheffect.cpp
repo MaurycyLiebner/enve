@@ -15,10 +15,10 @@ void CustomPathEffect::writeProperty(QIODevice * const target) const {
     write(target);
 }
 
-void CustomPathEffect::readProperty(QIODevice *target) {
-    PathEffect::readProperty(target);
+void CustomPathEffect::readProperty(QIODevice * const src) {
+    PathEffect::readProperty(src);
     int size;
-    target->read(rcChar(&size), sizeof(int));
-    const QByteArray identifier = target->read(size);
-    read(identifier, target);
+    src->read(rcChar(&size), sizeof(int));
+    const QByteArray identifier = src->read(size);
+    read(identifier, src);
 }

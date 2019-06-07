@@ -4,44 +4,23 @@
 #include "Animators/gpueffectanimators.h"
 #include "gpurastereffectcreator.h"
 
-GPURasterEffect::GPURasterEffect(const GPURasterEffectProgram * const program,
+GPURasterEffect::GPURasterEffect(const GPURasterEffectCreator * const creator,
+                                 const GPURasterEffectProgram * const program,
                                  const QString& name) :
-    ComplexAnimator(name), mProgram(program) {
+    ComplexAnimator(name), mProgram(program), mCreator(creator) {
 
 }
 
-void GPURasterEffect::writeProperty(QIODevice * const target) const {
+void GPURasterEffect::writeProperty(QIODevice * const dst) const {
     for(const auto& anim : ca_mChildAnimators)
-        anim->writeProperty(target);
+        anim->writeProperty(dst);
 }
 
-void GPURasterEffect::readProperty(QIODevice * const target) {
+void GPURasterEffect::readProperty(QIODevice * const src) {
     for(const auto& anim : ca_mChildAnimators)
-        anim->readProperty(target);
+        anim->readProperty(src);
 }
 
-void GPURasterEffect::writeType(QIODevice * const dst) const {
-    const int nChildren = ca_mChildAnimators.count();
-    dst->write(rcConstChar(&nChildren), sizeof(int));
-    for(const auto& anim : ca_mChildAnimators) {
-        PropertyType type;
-        if(dynamic_cast<QrealAnimator*>(anim.get())) {
-            type = PTYPE_FLOAT;
-        } else if(dynamic_cast<IntAnimator*>(anim.get())) {
-            type = PTYPE_INT;
-        } else RuntimeThrow("Only QrealAnimator and IntAnimator supported");
-        dst->write(rcConstChar(&type), sizeof(PropertyType));
-    }
-}
-
-QList<PropertyType> GPURasterEffect::sReadType(QIODevice * const src) {
-    QList<PropertyType> props;
-    int nChildren;
-    src->read(rcChar(&nChildren), sizeof(int));
-    for(int i = 0; i < nChildren; i++) {
-        PropertyType type;
-        src->read(rcChar(&type), sizeof(PropertyType));
-        props << type;
-    }
-    return props;
+void GPURasterEffect::writeIdentifier(QIODevice * const dst) const {
+    mCreator->writeIdentifier(dst);
 }

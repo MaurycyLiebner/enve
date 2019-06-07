@@ -24,7 +24,7 @@ public:
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData*);
     void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void readProperty(QIODevice * const src);
 protected:
     ColorizeEffect();
 private:

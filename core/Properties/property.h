@@ -131,12 +131,12 @@ public:
         return {FrameRange::EMIN, FrameRange::EMAX};
     }
 
-    virtual void readProperty(QIODevice *device) {
-        Q_UNUSED(device);
+    virtual void readProperty(QIODevice * const src) {
+        Q_UNUSED(src);
     }
 
-    virtual void writeProperty(QIODevice * const device) const {
-        Q_UNUSED(device);
+    virtual void writeProperty(QIODevice * const dst) const {
+        Q_UNUSED(dst);
     }
 
     virtual BasicTransformAnimator *getTransformAnimator() const {

@@ -110,8 +110,8 @@ public:
                       const qreal pixelsPerFrame,
                       const int minViewedFrame);
     virtual bool hasAnimationFrameRange() { return false; }
-    virtual void writeDurationRectangle(QIODevice *target);
-    virtual void readDurationRectangle(QIODevice *target);
+    virtual void writeDurationRectangle(QIODevice *dst);
+    virtual void readDurationRectangle(QIODevice *src);
     virtual void openDurationSettingsDialog(QWidget *parent = nullptr);
 
     void changeFramePosBy(const int change);

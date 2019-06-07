@@ -15,7 +15,7 @@ public:
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
     void writeProperty(QIODevice * const device) const;
-    void readProperty(QIODevice *device);
+    void readProperty(QIODevice * const src);
 private:
     qsptr<QrealAnimator> mTime;
     qsptr<QrealAnimator> mSmoothness;

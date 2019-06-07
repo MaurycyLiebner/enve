@@ -17,14 +17,14 @@ public:
         return key != this;
     }
 
-    void writeKey(QIODevice *target) {
-        Key::writeKey(target);
-        mValue->write(target);
+    void writeKey(QIODevice * const dst) {
+        Key::writeKey(dst);
+        mValue->write(dst);
     }
 
-    void readKey(QIODevice *target) {
-        Key::readKey(target);
-        mValue->read(target);
+    void readKey(QIODevice * const src) {
+        Key::readKey(src);
+        mValue->read(src);
     }
 
     DrawableAutoTiledSurface& dSurface() { return *mValue.get(); }
@@ -132,16 +132,16 @@ public:
         }
     }
 
-    stdsptr<Key> readKey(QIODevice *target) {
+    stdsptr<Key> readKey(QIODevice * const dst) {
         auto newKey = SPtrCreate(ASKey)(this);
-        newKey->readKey(target);
+        newKey->readKey(dst);
         return std::move(newKey);
     }
 
-    void readProperty(QIODevice *target) {
-        Animator::readProperty(target);
-        readKeys(target);
-        mBaseValue->read(target);
+    void readProperty(QIODevice * const src) {
+        Animator::readProperty(src);
+        readKeys(src);
+        mBaseValue->read(src);
     }
 
     void writeProperty(QIODevice * const target) const {

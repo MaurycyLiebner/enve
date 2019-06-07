@@ -10,8 +10,8 @@ public:
     bool getValue();
 
     bool SWT_isBoolProperty() const { return true; }
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice * const dst) const;
+    void readProperty(QIODevice * const src);
     void setValue(const bool value);
 private:
     bool mValue = false;
@@ -24,8 +24,8 @@ protected:
     BoolPropertyContainer(const QString& name);
 public:
     bool SWT_isBoolPropertyContainer() const { return true; }
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice * const dst) const;
+    void readProperty(QIODevice * const src);
 
     void setValue(const bool value);
     bool getValue();

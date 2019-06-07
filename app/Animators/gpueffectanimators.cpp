@@ -73,6 +73,34 @@ void GPUEffectAnimators::updateIfUsesProgram(
     }
 }
 
+void GPUEffectAnimators::writeProperty(QIODevice * const target) const {
+    const int nEffects = ca_mChildAnimators.count();
+    target->write(rcConstChar(&nEffects), sizeof(int));
+    for(const auto& effect : ca_mChildAnimators) {
+        const auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
+        pixmapEffect->writeIdentifier(target);
+        pixmapEffect->writeProperty(target);
+    }
+}
+
+void GPUEffectAnimators::readProperty(QIODevice * const src) {
+    int nEffects;
+    src->read(rcChar(&nEffects), sizeof(int));
+    for(int i = 0; i < nEffects; i++) {
+        const auto id = GPURasterEffectCreator::sReadIdentifier(src);
+        const auto best = GPURasterEffectCreator::sGetBestCompatibleEffects(id);
+        if(best.isEmpty()) RuntimeThrow("No compatible GPU effect found for " + id.fName);
+        if(best.count() == 1) {
+            const auto bestCreator = best.first();
+            const auto effect = GetAsSPtr(bestCreator->create(), GPURasterEffect);
+            effect->readProperty(src);
+            addEffect(effect);
+        } else {
+            // exec ask dialog
+        }
+    }
+}
+
 bool GPUEffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();
 }

@@ -48,7 +48,7 @@ public:
     ~KeysClipboardContainer();
 
     void paste(const int pasteFrame,
-               KeysView *keysView,
+               KeysView * const keysView,
                const bool merge,
                const bool selectPasted);
 

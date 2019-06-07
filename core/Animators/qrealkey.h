@@ -32,8 +32,8 @@ public:
     void startValueTransform();
     void finishValueTransform();
     void cancelValueTransform();
-    void writeKey(QIODevice *target);
-    void readKey(QIODevice *target);
+    void writeKey(QIODevice * const dst);
+    void readKey(QIODevice * const src);
 
     qreal getValueForGraph() const {
         return getValue();

@@ -43,9 +43,9 @@ public:
 
     qreal graph_clampGraphValue(const qreal value);
 
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
-    stdsptr<Key> readKey(QIODevice *target);
+    void writeProperty(QIODevice * const dst) const;
+    void readProperty(QIODevice * const src);
+    stdsptr<Key> readKey(QIODevice * const src);
 public slots:
     void anim_saveCurrentValueAsKey();
 protected:

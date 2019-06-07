@@ -54,7 +54,7 @@ KeysClipboardContainer::~KeysClipboardContainer() {
 }
 
 void KeysClipboardContainer::paste(const int pasteFrame,
-                                   KeysView *keysView,
+                                   KeysView * const keysView,
                                    const bool merge,
                                    const bool selectPasted) {
     keysView->clearKeySelection();
@@ -68,17 +68,16 @@ void KeysClipboardContainer::paste(const int pasteFrame,
         if(!animator) continue;
         QList<stdsptr<Key>> keys;
         int nKeys;
-        QBuffer target(const_cast<QByteArray*>(&animData.second));
-        target.open(QIODevice::ReadOnly);
-        target.read(rcChar(&nKeys), sizeof(int));
+        QBuffer dst(const_cast<QByteArray*>(&animData.second));
+        dst.open(QIODevice::ReadOnly);
+        dst.read(rcChar(&nKeys), sizeof(int));
         for(int i = 0; i < nKeys; i++) {
-            const auto keyT = animator->readKey(&target);
-            if(keyT->getAbsFrame() < firstKeyFrame) {
+            const auto keyT = animator->readKey(&dst);
+            if(keyT->getAbsFrame() < firstKeyFrame)
                 firstKeyFrame = keyT->getAbsFrame();
-            }
             keys << keyT;
         }
-        target.close();
+        dst.close();
 
         animatorKeys << keys;
     }

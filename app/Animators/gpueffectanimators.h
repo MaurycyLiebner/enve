@@ -19,9 +19,7 @@ public:
     qreal getEffectsMargin() const;
 
     void setParentBox(BoundingBox *box);
-    BoundingBox *getParentBox() {
-        return mParentBox_k;
-    }
+    BoundingBox *getParentBox() { return mParentBox_k; }
 
     bool hasEffects();
 
@@ -33,8 +31,8 @@ public:
 
     void updateIfUsesProgram(const GPURasterEffectProgram * const program);
 
-    //void writeProperty(QIODevice * const target) const;
-    //void readProperty(QIODevice *target);
+    void writeProperty(QIODevice * const target) const;
+    void readProperty(QIODevice * const src);
     //void readPixmapEffect(QIODevice *target);
 private:
     BoundingBox * const mParentBox_k;

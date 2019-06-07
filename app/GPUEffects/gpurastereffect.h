@@ -36,17 +36,17 @@ private:
 
 class GPURasterEffect : public ComplexAnimator {
     friend class SelfRef;
-    GPURasterEffect(const GPURasterEffectProgram * const program,
+    GPURasterEffect(const GPURasterEffectCreator * const creator,
+                    const GPURasterEffectProgram * const program,
                     const QString &name);
 public:
     virtual qreal getMargin() { return 0; }
     virtual qreal getMarginAtRelFrame(const int ) { return 0; }
 
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice * const target);
+    void writeProperty(QIODevice * const dst) const;
+    void readProperty(QIODevice * const src);
 
-    void writeType(QIODevice * const dst) const;
-    static QList<PropertyType> sReadType(QIODevice * const src);
+    void writeIdentifier(QIODevice * const dst) const;
 
     bool isVisible() const { return true; }
 
@@ -79,6 +79,7 @@ public:
     }
 private:
     const GPURasterEffectProgram * const mProgram;
+    const GPURasterEffectCreator * const mCreator;
     qptr<GPUEffectAnimators> mParentEffects;
 };
 

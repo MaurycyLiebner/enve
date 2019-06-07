@@ -41,7 +41,7 @@ public:
     QMimeData *SWT_createMimeData();
     void prp_startDragging();
     void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void readProperty(QIODevice * const src);
 
     const PathEffectType &getEffectType();
     void setIsOutlineEffect(const bool bT);

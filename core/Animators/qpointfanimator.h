@@ -10,7 +10,7 @@ protected:
 public:
     bool SWT_isQPointFAnimator() const { return true; }
     void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void readProperty(QIODevice * const src);
 
     void setBaseValue(const qreal valX, const qreal valY) {
         setBaseValue({valX, valY});

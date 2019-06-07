@@ -13,7 +13,7 @@ public:
                       QIODevice * const dst) = 0;
     virtual void write(QIODevice * const dst) const = 0;
 
-    void readProperty(QIODevice *target) final;
+    void readProperty(QIODevice * const src) final;
     void writeProperty(QIODevice * const target) const final;
 };
 

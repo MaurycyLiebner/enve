@@ -18,7 +18,7 @@ public:
     bool SWT_isPixmapEffectAnimators() const { return true; }
 
     void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void readProperty(QIODevice * const src);
 
     void addEffect(const qsptr<PixmapEffect> &effect);
 
@@ -37,7 +37,7 @@ public:
     void addEffectRenderDataToListF(const qreal relFrame,
                                     BoundingBoxRenderData * const data);
 
-    void readPixmapEffect(QIODevice *target);
+    void readPixmapEffect(QIODevice * const src);
 protected:
     EffectAnimators(BoundingBox *parentBox);
 private:

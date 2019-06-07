@@ -17,6 +17,16 @@ protected:
 public:
     friend class StdSelfRef;
 
+    struct Identifier {
+        Identifier(const QString& grePath, const QString& name,
+                   const QList<PropertyType>& types) :
+        fGrePath(grePath), fName(name), fTypes(types) {}
+
+        const QString fGrePath;
+        const QString fName;
+        const QList<PropertyType> fTypes;
+    };
+
     const QString fGrePath;
     const QList<stdsptr<PropertyCreator>> fProperties;
     GPURasterEffectProgram fProgram;
@@ -61,6 +71,36 @@ public:
         Q_ASSERT(false);
     }
 
+    void writeIdentifier(QIODevice * const dst) const {
+        gWrite(dst, fName);
+        gWrite(dst, fGrePath);
+        const int nChildren = fProperties.count();
+        dst->write(rcConstChar(&nChildren), sizeof(int));
+        for(const auto& anim : fProperties) {
+            PropertyType type;
+            if(dynamic_cast<QrealAnimatorCreator*>(anim.get())) {
+                type = PTYPE_FLOAT;
+            } else if(dynamic_cast<IntAnimatorCreator*>(anim.get())) {
+                type = PTYPE_INT;
+            } else RuntimeThrow("Only QrealAnimator and IntAnimator supported");
+            dst->write(rcConstChar(&type), sizeof(PropertyType));
+        }
+    }
+
+    static Identifier sReadIdentifier(QIODevice * const src) {
+        const QString name = gReadString(src);
+        const QString grePath = gReadString(src);
+        QList<PropertyType> props;
+        int nChildren;
+        src->read(rcChar(&nChildren), sizeof(int));
+        for(int i = 0; i < nChildren; i++) {
+            PropertyType type;
+            src->read(rcChar(&type), sizeof(PropertyType));
+            props << type;
+        }
+        return Identifier(grePath, name, props);
+    }
+
     static stdsptr<GPURasterEffectCreator> sLoadFromFile(
             QGL33c * const gl, const QString& grePath);
 
@@ -82,8 +122,7 @@ public:
             const QList<PropertyType>& props);
 
     static QList<stdsptr<GPURasterEffectCreator>> sGetBestCompatibleEffects(
-            const QString& grePath, const QString &name,
-            const QList<PropertyType>& props);
+            const Identifier& id);
 
     static QList<stdsptr<GPURasterEffectCreator>> sEffectCreators;
 };

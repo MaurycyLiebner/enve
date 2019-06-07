@@ -88,20 +88,20 @@ public:
 
     //FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
-    void writeProperty(QIODevice * const target) const {
-        this->writeKeys(target);
-        gWrite(target, mCurrentValue);
+    void writeProperty(QIODevice * const dst) const {
+        this->writeKeys(dst);
+        gWrite(dst, mCurrentValue);
     }
 
-    void readProperty(QIODevice *target) {
-        this->readKeys(target);
-        gRead(target, mCurrentValue);
+    void readProperty(QIODevice * const src) {
+        this->readKeys(src);
+        gRead(src, mCurrentValue);
         afterValueChanged();
     }
 
-    stdsptr<Key> readKey(QIODevice *target) {
+    stdsptr<Key> readKey(QIODevice * const src) {
         auto newKey = SPtrCreateTemplated(K)(this);
-        newKey->readKey(target);
+        newKey->readKey(src);
         return std::move(newKey);
     }
 protected:

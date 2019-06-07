@@ -12,12 +12,12 @@ void BoolProperty::setValue(const bool value) {
     prp_afterWholeInfluenceRangeChanged();
 }
 
-void BoolProperty::writeProperty(QIODevice * const target) const {
-    target->write(rcConstChar(&mValue), sizeof(bool));
+void BoolProperty::writeProperty(QIODevice * const dst) const {
+    dst->write(rcConstChar(&mValue), sizeof(bool));
 }
 
-void BoolProperty::readProperty(QIODevice *target) {
-    target->read(rcChar(&mValue), sizeof(bool));
+void BoolProperty::readProperty(QIODevice * const src) {
+    src->read(rcChar(&mValue), sizeof(bool));
 }
 
 BoolPropertyContainer::BoolPropertyContainer(const QString &name) :
@@ -38,12 +38,12 @@ void BoolPropertyContainer::setValue(const bool value) {
 }
 
 
-void BoolPropertyContainer::writeProperty(QIODevice * const target) const {
-    target->write(rcConstChar(&mValue), sizeof(bool));
+void BoolPropertyContainer::writeProperty(QIODevice * const dst) const {
+    dst->write(rcConstChar(&mValue), sizeof(bool));
 }
 
-void BoolPropertyContainer::readProperty(QIODevice *target) {
+void BoolPropertyContainer::readProperty(QIODevice * const src) {
     bool value;
-    target->read(rcChar(&value), sizeof(bool));
+    src->read(rcChar(&value), sizeof(bool));
     setValue(value);
 }

@@ -10,7 +10,7 @@ protected:
 public:
     bool SWT_isComboBoxProperty() const { return true; }
     void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void readProperty(QIODevice * const src);
 
     const QStringList &getValueNames() {
         return mValueNames;

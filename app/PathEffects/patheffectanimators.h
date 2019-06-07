@@ -15,7 +15,7 @@ protected:
 public:
     bool SWT_isPathEffectAnimators() const;
 
-    void readProperty(QIODevice *target);
+    void readProperty(QIODevice * const src);
     void writeProperty(QIODevice * const target) const;
 
     void addEffect(const qsptr<PathEffect> &effect);

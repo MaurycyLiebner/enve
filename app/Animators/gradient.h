@@ -30,7 +30,7 @@ public:
     }
 
     void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void readProperty(QIODevice * const src);
 
     void swapColors(const int id1, const int id2);
     void removeColor(const qsptr<ColorAnimator> &color);

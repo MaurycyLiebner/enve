@@ -68,7 +68,7 @@ public:
         gWrite(target, mBaseValue);
     }
 
-    void readProperty(QIODevice *target);
+    void readProperty(QIODevice * const src);
 
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType &type,

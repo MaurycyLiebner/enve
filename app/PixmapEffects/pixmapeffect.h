@@ -48,8 +48,8 @@ public:
 
     bool SWT_isPixmapEffect() const;
 
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice * const dst) const;
+    void readProperty(QIODevice * const src);
 
     void prp_startDragging();
 

@@ -191,7 +191,7 @@ public:
             const stdsptr<ParticleBoxRenderData>& particleData);
 
     void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void readProperty(QIODevice * const src);
 private:
     bool mGenerateParticlesScheduled = false;
     bool mUpdateParticlesForFrameScheduled = false;

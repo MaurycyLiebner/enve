@@ -38,8 +38,8 @@ protected:
     virtual void showHideChildrenBeforeChaningPaintType(
             const PaintType &newPaintType);
 public:
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice * const dst) const;
+    void readProperty(QIODevice * const src);
 
     QColor getCurrentColor() const;
     const PaintType &getPaintType() const;
@@ -132,8 +132,8 @@ class OutlineSettingsAnimator : public PaintSettingsAnimator {
     friend class SelfRef;
 public:
     bool SWT_isStrokeSettings() const { return true; }
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice * const dst) const;
+    void readProperty(QIODevice * const src);
 protected:
     void showHideChildrenBeforeChaningPaintType(
                 const PaintType &newPaintType);

@@ -12,7 +12,7 @@ public:
                SkPath * const dst);
 
     void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice *target);
+    void readProperty(QIODevice * const src);
 private:
     qsptr<QrealAnimator> mDisplacement;
 };

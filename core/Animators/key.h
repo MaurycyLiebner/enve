@@ -28,8 +28,8 @@ public:
     }
 
     virtual bool differsFromKey(Key* key) const = 0;
-    virtual void writeKey(QIODevice *target);
-    virtual void readKey(QIODevice *target);
+    virtual void writeKey(QIODevice * const dst);
+    virtual void readKey(QIODevice * const src);
 
 
     virtual void cancelFrameTransform();
