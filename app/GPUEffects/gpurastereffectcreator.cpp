@@ -107,23 +107,23 @@ void readAnimatorCreators(
 }
 
 stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sLoadFromFile(
-        QGL33c * const gl, const QString &filePath) {
-    QFile file(filePath);
-    if(!file.exists())
+        QGL33c * const gl, const QString &grePath) {
+    QFile greFile(grePath);
+    if(!greFile.exists())
         RuntimeThrow("GPURasterEffect source file does not exist.");
-    const QFileInfo info(file);
+    const QFileInfo info(greFile);
     const QString fragPath = info.path() + "/" + info.completeBaseName() + ".frag";
     const QFile fragFile(fragPath);
     if(!fragFile.exists())
         RuntimeThrow("GPURasterEffect shader file (" +
                      fragPath + ") does not exist.");
-    if(!file.open(QIODevice::ReadOnly))
+    if(!greFile.open(QIODevice::ReadOnly))
         RuntimeThrow("GPURasterEffect source file could not be opened.");
     QDomDocument document;
     QString errMsg;
-    if(!document.setContent(&file, &errMsg))
+    if(!document.setContent(&greFile, &errMsg))
         RuntimeThrow("Error while parsing GPURasterEffect source:\n" + errMsg);
-    file.close();
+    greFile.close();
 
     QDomElement root = document.firstChildElement();
     if(root.tagName() != "GPURasterEffect")
@@ -167,6 +167,12 @@ stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sLoadFromFile(
     sEffectCreators << rasterEffectCreator;
 
     return rasterEffectCreator;
+}
+
+stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sGetCompatibleEffect(
+        const QString &grePath,
+        const QList<GPURasterEffectCreator::PropertyType> &props) {
+    return nullptr;
 }
 
 UniformSpecifier QrealAnimatorUniformSpecifierCreator::create(

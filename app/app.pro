@@ -272,6 +272,7 @@ HEADERS  += \
     PathEffects/subpatheffect.h \
     PathEffects/zigzagpatheffect.h \
     Sound/soundmerger.h \
+    atomicset.h \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
     GUI/ColorWidgets/colorsettingswidget.h \
@@ -286,6 +287,7 @@ HEADERS  += \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
     evfileio.h \
+    rangeset.h \
     svgimporter.h \
     keypoint.h \
     Animators/qstringanimator.h \

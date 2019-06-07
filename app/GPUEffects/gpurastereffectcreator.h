@@ -76,6 +76,11 @@ struct GPURasterEffectProgram {
 };
 
 struct GPURasterEffectCreator : public PropertyCreator {
+    enum PropertyType {
+        PTYPE_FLOAT,
+        PTYPE_INT
+    };
+
     friend class StdSelfRef;
 
     QList<stdsptr<PropertyCreator>> fProperties;
@@ -104,8 +109,9 @@ struct GPURasterEffectCreator : public PropertyCreator {
     }
 
     static stdsptr<GPURasterEffectCreator> sLoadFromFile(
-            QGL33c * const gl,
-            const QString& filePath);
+            QGL33c * const gl, const QString& grePath);
+    static stdsptr<GPURasterEffectCreator> sGetCompatibleEffect(
+            const QString& grePath, const QList<PropertyType>& props);
 
     static QList<stdsptr<GPURasterEffectCreator>> sEffectCreators;
 protected:
