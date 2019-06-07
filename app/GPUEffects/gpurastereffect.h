@@ -41,6 +41,13 @@ class GPURasterEffect : public ComplexAnimator {
 public:
     virtual qreal getMargin() { return 0; }
     virtual qreal getMarginAtRelFrame(const int ) { return 0; }
+
+    void writeProperty(QIODevice * const target) const;
+    void readProperty(QIODevice * const target);
+
+    void writeType(QIODevice * const dst) const;
+    static QList<PropertyType> sReadType(QIODevice * const src);
+
     bool isVisible() const { return true; }
 
     stdsptr<GPURasterEffectCaller> getGPURasterEffectCaller(

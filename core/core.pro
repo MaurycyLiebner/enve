@@ -139,6 +139,8 @@ HEADERS += \
     PathEffects/custompatheffect.h \
     core_global.h \
     randomgrid.h \
+    rangeset.h \
+    atomicset.h \
     smartPointers/stdpointer.h \
     smartPointers/selfref.h \
     smartPointers/stdselfref.h \

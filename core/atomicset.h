@@ -11,12 +11,12 @@ struct RawVal {
     T& operator*() const { return fVal; }
 };
 
-template <class T, const int& (T::*KeyGetter)() const,
+template <class T, const int& (T::*FrameGetter)() const,
           class TCont = RawVal<T>>
 class AtomicSet {
     struct ContFrameLess {
-        bool operator()(const TCont& element, const int relFrame) {
-            return ((*element).*KeyGetter)() < relFrame;
+        bool operator()(const TCont& element, const int frame) {
+            return ((*element).*FrameGetter)() < frame;
         }
     };
 
@@ -74,7 +74,7 @@ public:
         while(true) {
             cont = atFrame(currFrame);
             if(!cont) return currFrame;
-            currFrame = (cont->*KeyGetter)() + 1;
+            currFrame = (cont->*FrameGetter)() + 1;
         }
     }
 
@@ -84,7 +84,7 @@ public:
         while(true) {
             cont = atFrame(currFrame);
             if(!cont) return currFrame;
-            currFrame = (cont->*KeyGetter)() + 1;
+            currFrame = (cont->*FrameGetter)() + 1;
         }
     }
 
@@ -97,8 +97,8 @@ public:
                 result.append({currentFrame, range.fMax});
                 break;
             }
-            const auto contRange = FrameRange{(cont->*KeyGetter)(),
-                                              (cont->*KeyGetter)()};
+            const auto contRange = FrameRange{(cont->*FrameGetter)(),
+                                              (cont->*FrameGetter)()};
             if(!contRange.inRange(currentFrame)) {
                 result.append({currentFrame,
                                qMin(range.fMax, contRange.fMin - 1)});
@@ -112,7 +112,7 @@ public:
     bool isEmpty() const { return mList.isEmpty(); }
 
     void add(const TCont& element) {
-        const int contId = idAtOrAfterFrame(((*element).*KeyGetter)());
+        const int contId = idAtOrAfterFrame(((*element).*FrameGetter)());
         if(contId == -1) mList.append(element);
         else mList.insert(contId, element);
     }
@@ -134,46 +134,95 @@ public:
 
     template <class U = T>
     U* atFrame(const int frame) const {
+        if(isEmpty()) return nullptr;
         const auto notPrev = lower_bound(frame);
         if(notPrev == end()) return nullptr;
-        if(((**notPrev).*KeyGetter)() == frame)
+        if(((**notPrev).*FrameGetter)() == frame)
             return static_cast<U*>(&**notPrev);
         return nullptr;
     }
 
     template <class U = T>
     U* atOrBeforeFrame(const int frame) const {
+        if(isEmpty()) return nullptr;
         const auto notPrev = lower_bound(frame);
-        if(notPrev == end()) return nullptr;
-        if(((**notPrev).*KeyGetter)() == frame)
+        if(notPrev == end()) return static_cast<U*>(&**(end() - 1));
+        if(((**notPrev).*FrameGetter)() == frame)
             return static_cast<U*>(&**notPrev);
+        if(notPrev == begin()) return nullptr;
         return static_cast<U*>(&**(notPrev - 1));
     }
 
     template <class U = T>
     U* atOrAfterFrame(const int frame) const {
+        if(isEmpty()) return nullptr;
         return static_cast<U*>(&**lower_bound(frame));
     }
 
+    template <class U = T>
+    U* beforeFrame(const int frame) const {
+        if(isEmpty()) return nullptr;
+        const auto notPrev = lower_bound(frame);
+        if(notPrev == begin()) return nullptr;
+        return static_cast<U*>(&**(notPrev - 1));
+    }
+
+    template <class U = T>
+    U* afterFrame(const int frame) const {
+        if(isEmpty()) return nullptr;
+        const auto notPrev = lower_bound(frame);
+        if(notPrev == end()) return nullptr;
+        if(((**notPrev).*FrameGetter)() == frame) {
+            if(notPrev + 1 == end()) return nullptr;
+            return static_cast<U*>(&**(notPrev + 1));
+        }
+        return static_cast<U*>(&**(notPrev));
+    }
+
     int idAtFrame(const int frame) const {
+        if(isEmpty()) return -1;
         const auto notPrev = lower_bound(frame);
         if(notPrev == end()) return -1;
-        if(((**notPrev).*KeyGetter)() == frame)
+        if(((**notPrev).*FrameGetter)() == frame)
             return notPrev - begin();
         return -1;
     }
 
     int idAtOrBeforeFrame(const int frame) const {
+        if(isEmpty()) return -1;
         const auto notPrev = lower_bound(frame);
-        if(notPrev != mList.end() &&
-           (notPrev->get()->*KeyGetter)() == frame)
+        if(notPrev == end()) return count() - 1;
+        if(((**notPrev).*FrameGetter)() == frame)
             return notPrev - begin();
         return notPrev - begin() - 1;
     }
 
     int idAtOrAfterFrame(const int frame) const {
+        if(isEmpty()) return -1;
         const auto notPrev = lower_bound(frame);
         if(notPrev == end()) return -1;
+        return notPrev - begin();
+    }
+
+    int idBeforeFrame(const int frame) const {
+        if(isEmpty()) return -1;
+        const auto notPrev = lower_bound(frame);
+        if(notPrev == end()) return count() - 1;
+        if(((**notPrev).*FrameGetter)() == frame) {
+            return notPrev - 1 - begin();
+        }
+        if(notPrev - begin() < 2) return -1;
+        return notPrev - 2 - begin();
+    }
+
+    int idAfterFrame(const int frame) const {
+        if(isEmpty()) return -1;
+        const auto notPrev = lower_bound(frame);
+        if(notPrev == end()) return -1;
+        if(((**notPrev).*FrameGetter)() == frame) {
+            if(notPrev + 1 == end()) return -1;
+            return notPrev + 1 - begin();
+        }
         return notPrev - begin();
     }
 

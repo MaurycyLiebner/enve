@@ -1,90 +1,43 @@
 #ifndef GPURASTEREFFECTCREATOR_H
 #define GPURASTEREFFECTCREATOR_H
-#include "Animators/qrealanimatorcreator.h"
-#include "Animators/intanimatorcreator.h"
-#include <QJSEngine>
+#include "gpurastereffectprogram.h"
 
-typedef std::function<void(QGL33c * const, QJSEngine&)> UniformSpecifier;
-typedef QList<UniformSpecifier> UniformSpecifiers;
-struct UniformSpecifierCreator : public StdSelfRef {
-    virtual UniformSpecifier create(const GLint& loc,
-                                    Property * const property,
-                                    const qreal relFrame) const = 0;
-};
-
-struct QrealAnimatorUniformSpecifierCreator :
-        public UniformSpecifierCreator {
-    QrealAnimatorUniformSpecifierCreator(const QString& script) :
-        mScript(script) {}
-    virtual UniformSpecifier create(const GLint& loc,
-                                    Property * const property,
-                                    const qreal relFrame) const;
-
-    static void sTestScript(const QString& script, const QString& propName);
-private:
-    QString mScript;
-};
-
-struct IntAnimatorUniformSpecifierCreator :
-        public UniformSpecifierCreator {
-    IntAnimatorUniformSpecifierCreator(const QString& script) :
-        mScript(script) {}
-    virtual UniformSpecifier create(const GLint& loc,
-                                    Property * const property,
-                                    const qreal relFrame) const;
-
-    static void sTestScript(const QString& script, const QString& propName);
-private:
-    QString mScript;
-};
-
-typedef QList<stdsptr<UniformSpecifierCreator>> UniformSpecifierCreators;
-struct GPURasterEffectProgram {
-    GLuint fId = 0;
-    GLuint fFragShader;
-    GLint fGPosLoc;
-    GLint fTexLocation;
-    QList<GLint> fArgumentLocs;
-    UniformSpecifierCreators fUniformCreators;
-
-    static GPURasterEffectProgram sCreateProgram(
-            QGL33c * const gl, const QString &fragPath,
-            const QList<stdsptr<PropertyCreator>>& propCs,
-            const UniformSpecifierCreators& uniCs) {
-        GPURasterEffectProgram program;
-        try {
-            iniProgram(gl, program.fId, GL_TEXTURED_VERT, fragPath);
-        } catch(...) {
-            RuntimeThrow("Could not initialize a program for GPURasterEffect");
-        }
-
-        for(const auto& propC : propCs) {
-            const GLint loc = propC->getUniformLocation(gl, program.fId);
-            if(loc < 0) {
-                gl->glDeleteProgram(program.fId);
-                RuntimeThrow("'" + propC->fName +
-                             "' does not correspond to an active uniform variable.");
-            }
-            program.fArgumentLocs.append(loc);
-        }
-        program.fGPosLoc = gl->glGetUniformLocation(program.fId, "_gPos");
-        program.fUniformCreators = uniCs;
-        program.fTexLocation = gl->glGetUniformLocation(program.fId, "texture");
-        CheckInvalidLocation(program.fTexLocation, "texture");
-        return program;
-    }
+enum PropertyType {
+    PTYPE_FLOAT,
+    PTYPE_INT
 };
 
 struct GPURasterEffectCreator : public PropertyCreator {
-    enum PropertyType {
-        PTYPE_FLOAT,
-        PTYPE_INT
-    };
-
+protected:
+    GPURasterEffectCreator(const QString& grePath, const QString& name,
+                           const QList<stdsptr<PropertyCreator>>& propCs,
+                           const GPURasterEffectProgram& program) :
+        PropertyCreator(name), fGrePath(grePath),
+        fProperties(propCs), fProgram(program) {}
+public:
     friend class StdSelfRef;
 
-    QList<stdsptr<PropertyCreator>> fProperties;
+    const QString fGrePath;
+    const QList<stdsptr<PropertyCreator>> fProperties;
     GPURasterEffectProgram fProgram;
+
+    bool compatible(const QList<PropertyType>& props) const {
+        if(props.count() != fProperties.count()) return false;
+        for(int i = 0; i < props.count(); i++) {
+            const auto& iType = props.at(i);
+            const auto prop = fProperties.at(i).get();
+            if(iType == PTYPE_FLOAT) {
+                const bool iCompatible =
+                        dynamic_cast<QrealAnimatorCreator*>(prop);
+                if(!iCompatible) return false;
+            } else if(iType == PTYPE_INT) {
+                const bool iCompatible =
+                        dynamic_cast<IntAnimatorCreator*>(prop);
+                if(!iCompatible) return false;
+            } else return false;
+        }
+        return true;
+    }
 
     void reloadProgram(QGL33c * const gl, const QString& fragPath) {
         if(!QFile(fragPath).exists()) return;
@@ -110,12 +63,29 @@ struct GPURasterEffectCreator : public PropertyCreator {
 
     static stdsptr<GPURasterEffectCreator> sLoadFromFile(
             QGL33c * const gl, const QString& grePath);
-    static stdsptr<GPURasterEffectCreator> sGetCompatibleEffect(
-            const QString& grePath, const QList<PropertyType>& props);
+
+    static stdsptr<GPURasterEffectCreator> sWithGrePath(
+            const QString& grePath);
+
+    static stdsptr<GPURasterEffectCreator> sWithGrePathAndCompatible(
+            const QString& grePath,
+            const QList<PropertyType>& props);
+
+    static QList<stdsptr<GPURasterEffectCreator>> sWithName(
+            const QString &name);
+
+    static QList<stdsptr<GPURasterEffectCreator>> sWithNameAndCompatible(
+            const QString &name,
+            const QList<PropertyType>& props);
+
+    static QList<stdsptr<GPURasterEffectCreator>> sWithCompatibleProps(
+            const QList<PropertyType>& props);
+
+    static QList<stdsptr<GPURasterEffectCreator>> sGetBestCompatibleEffects(
+            const QString& grePath, const QString &name,
+            const QList<PropertyType>& props);
 
     static QList<stdsptr<GPURasterEffectCreator>> sEffectCreators;
-protected:
-    GPURasterEffectCreator(const QString& name) : PropertyCreator(name) {}
 };
 
 #endif // GPURASTEREFFECTCREATOR_H

@@ -13,29 +13,9 @@ qsptr<Property> GPURasterEffectCreator::create() const {
     return std::move(rasterEffect);
 }
 
-qreal stringToDouble(const QString& str) {
-    if(str.isEmpty()) {
-        RuntimeThrow("Can not convert an empty string to double.");
-    }
-    bool ok;
-    qreal val = str.toDouble(&ok);
-    if(!ok) {
-        RuntimeThrow("Can not convert '" + str + "' to double.");
-    }
-    return val;
-}
-
-int stringToInt(const QString& str) {
-    if(str.isEmpty()) RuntimeThrow("Can not convert an empty string to int.");
-    bool ok;
-    int val = str.toInt(&ok);
-    if(!ok) RuntimeThrow("Can not convert '" + str + "' to int.");
-    return val;
-}
-
-qreal tryConvertingAttrToDouble(const QDomElement &elem,
-                                const QString& elemName,
-                                const QString& attr) {
+qreal attrToDouble(const QDomElement &elem,
+                   const QString& elemName,
+                   const QString& attr) {
     try {
         const QString valS = elem.attribute(attr);
         const qreal val = stringToDouble(valS);
@@ -45,12 +25,12 @@ qreal tryConvertingAttrToDouble(const QDomElement &elem,
     }
 }
 
-int tryConvertingAttrToInt(const QDomElement &elem,
-                           const QString& elemName,
-                           const QString& attr) {
+int attrToInt(const QDomElement &elem,
+              const QString& elemName,
+              const QString& attr) {
     try {
-        QString valS = elem.attribute(attr);
-        int val = stringToInt(valS);
+        const QString valS = elem.attribute(attr);
+        const int val = stringToInt(valS);
         return val;
     } catch(...) {
         RuntimeThrow("Invalid " + attr + " value for " + elemName + ".");
@@ -71,10 +51,10 @@ void readAnimatorCreators(
         RuntimeThrow("Animator type not defined for " + name + ".");
     if(type == "float") {
         try {
-            const qreal minVal = tryConvertingAttrToDouble(elem, name, "min");
-            const qreal maxVal = tryConvertingAttrToDouble(elem, name, "max");
-            const qreal iniVal = tryConvertingAttrToDouble(elem, name, "ini");
-            const qreal stepVal = tryConvertingAttrToDouble(elem, name, "step");
+            const qreal minVal = attrToDouble(elem, name, "min");
+            const qreal maxVal = attrToDouble(elem, name, "max");
+            const qreal iniVal = attrToDouble(elem, name, "ini");
+            const qreal stepVal = attrToDouble(elem, name, "step");
             const QString script = elem.attribute("glValue");
 
             QrealAnimatorUniformSpecifierCreator::sTestScript(script, name);
@@ -87,10 +67,10 @@ void readAnimatorCreators(
         }
     } else if(type == "int") {
         try {
-            const int minVal = tryConvertingAttrToInt(elem, name, "min");
-            const int maxVal = tryConvertingAttrToInt(elem, name, "max");
-            const int iniVal = tryConvertingAttrToInt(elem, name, "ini");
-            const int stepVal = tryConvertingAttrToInt(elem, name, "step");
+            const int minVal = attrToInt(elem, name, "min");
+            const int maxVal = attrToInt(elem, name, "max");
+            const int iniVal = attrToInt(elem, name, "ini");
+            const int stepVal = attrToInt(elem, name, "step");
             const QString script = elem.attribute("glValue");
 
             IntAnimatorUniformSpecifierCreator::sTestScript(script, name);
@@ -158,179 +138,70 @@ stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sLoadFromFile(
                     gl, fragPath, propCs, uniCs);
     } catch(...) {
         RuntimeThrow("Could not create a program for GPURasterEffect '" +
-                     effectName + "'.");
+                     effectName + "'");
     }
     auto rasterEffectCreator =
-            SPtrCreate(GPURasterEffectCreator)(effectName);
-    rasterEffectCreator->fProgram = program;
-    rasterEffectCreator->fProperties = propCs;
+            SPtrCreate(GPURasterEffectCreator)(grePath, effectName, propCs, program);
     sEffectCreators << rasterEffectCreator;
 
     return rasterEffectCreator;
 }
 
-stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sGetCompatibleEffect(
-        const QString &grePath,
-        const QList<GPURasterEffectCreator::PropertyType> &props) {
+stdsptr<GPURasterEffectCreator>
+    GPURasterEffectCreator::sWithGrePath(const QString &grePath) {
+    for(const auto& effectC : sEffectCreators) {
+        if(effectC->fGrePath == grePath) return effectC;
+    }
     return nullptr;
 }
 
-UniformSpecifier QrealAnimatorUniformSpecifierCreator::create(
-        const GLint &loc,
-        Property * const property,
-        const qreal relFrame) const {
-    const auto qa = GetAsPtr(property, QrealAnimator);
-    const QString propName = property->prp_getName();
-    const qreal val = qa->getEffectiveValue(relFrame);
-
-    if(mScript.isEmpty()) {
-        return [loc, val](QGL33c * const gl, QJSEngine&) {
-            gl->glUniform1f(loc, static_cast<GLfloat>(val));
-        };
-    } else {
-        QString script = mScript;
-        return [loc, val, script, propName](
-                QGL33c * const gl, QJSEngine& engine) {
-            const QString valScript = propName + " = " + QString::number(val);
-            engine.evaluate(valScript);
-            const QJSValue jsVal = engine.evaluate(script);
-            if(jsVal.isNumber()) {
-                gl->glUniform1f(loc, static_cast<GLfloat>(jsVal.toNumber()));
-            } else if(jsVal.isArray()) {
-                const QStringList vals = jsVal.toString().split(',');
-                if(vals.count() == 1) {
-                    const qreal val1 = stringToDouble(vals.first());
-                    gl->glUniform1f(loc, static_cast<GLfloat>(val1));
-                } else if(vals.count() == 2) {
-                    const qreal val1 = stringToDouble(vals.first());
-                    const qreal val2 = stringToDouble(vals.last());
-
-                    gl->glUniform2f(loc, static_cast<GLfloat>(val1),
-                                    static_cast<GLfloat>(val2));
-                } else {
-                    RuntimeThrow("Invalid glValue script '" + script + "' for '" + propName + "'");
-                }
-            } else {
-                RuntimeThrow("Invalid glValue script '" + script + "' for '" + propName + "'");
-            }
-        };
-    }
+stdsptr<GPURasterEffectCreator>
+    GPURasterEffectCreator::sWithGrePathAndCompatible(
+        const QString &grePath, const QList<PropertyType> &props) {
+    const auto pathBased = sWithGrePath(grePath);
+    if(!pathBased) return nullptr;
+    if(pathBased->compatible(props))
+        return pathBased;
+    return nullptr;
 }
 
-void QrealAnimatorUniformSpecifierCreator::sTestScript(const QString &script,
-                                                       const QString &propName) {
-    if(script.isEmpty()) return;
-    QJSEngine engine;
-    engine.evaluate("_texSize = [0,0]");
-    engine.evaluate("_gPos = [0,0]");
-    const QString valScript = propName + " = " + QString::number(0);
-    engine.evaluate(valScript);
-    const QJSValue jsVal = engine.evaluate(script);
-    if(jsVal.isNumber()) {
-    } else if(jsVal.isArray()) {
-        const QStringList vals = jsVal.toString().split(',');
-        if(vals.count() == 1) {
-            try {
-                stringToDouble(vals.first());
-            } catch(...) {
-                RuntimeThrow("Invalid glValue script '" + script + "' for '" + propName + "'");
-            }
-        } else if(vals.count() == 2) {
-            try {
-                stringToDouble(vals.first());
-            } catch(...) {
-                RuntimeThrow("Invalid glValue[0] script '" + script + "' for '" + propName + "'");
-            }
-
-            try {
-                stringToDouble(vals.last());
-            } catch(...) {
-                RuntimeThrow("Invalid glValue[1] script '" + script + "' for '" + propName + "'");
-            }
-        } else {
-            RuntimeThrow("Invalid glValue script '" + script + "' for '" + propName + "'");
-        }
-    } else {
-        RuntimeThrow("Invalid glValue script '" + script + "' for '" + propName + "'");
+QList<stdsptr<GPURasterEffectCreator>>
+    GPURasterEffectCreator::sWithName(const QString &name) {
+    QList<stdsptr<GPURasterEffectCreator>> named;
+    for(const auto& effectC : sEffectCreators) {
+        if(effectC->fName == name) named << effectC;
     }
+    return named;
 }
 
-UniformSpecifier IntAnimatorUniformSpecifierCreator::create(
-        const GLint &loc,
-        Property * const property,
-        const qreal relFrame) const {
-    const auto ia = GetAsPtr(property, IntAnimator);
-    const int val = ia->getEffectiveIntValue(relFrame);
-    const QString propName = property->prp_getName();
-
-    if(mScript.isEmpty()) {
-        return [loc, val](QGL33c * const gl, QJSEngine&) {
-            gl->glUniform1i(loc, val);
-        };
-    } else {
-        QString script = mScript;
-        return [loc, val, script, propName](
-                QGL33c * const gl, QJSEngine& engine) {
-            const QString valScript = propName + " = " + QString::number(val);
-            engine.evaluate(valScript);
-            const QJSValue jsVal = engine.evaluate(script);
-            if(jsVal.isNumber()) {
-                gl->glUniform1i(loc, static_cast<GLint>(jsVal.toNumber()));
-            } else if(jsVal.isArray()) {
-                const QStringList vals = jsVal.toString().split(',');
-                if(vals.count() == 1) {
-                    const int val1 = stringToInt(vals.first());
-                    gl->glUniform1i(loc, static_cast<GLint>(val1));
-                } else if(vals.count() == 2) {
-                    const int val1 = stringToInt(vals.first());
-                    const int val2 = stringToInt(vals.last());
-
-                    gl->glUniform2i(loc, static_cast<GLint>(val1),
-                                    static_cast<GLint>(val2));
-                } else {
-                    RuntimeThrow("Invalid glValue script '" + script + "' for '" + propName + "'");
-                }
-            } else {
-                RuntimeThrow("Invalid glValue script '" + script + "' for '" + propName + "'");
-            }
-        };
+QList<stdsptr<GPURasterEffectCreator>>
+    GPURasterEffectCreator::sWithNameAndCompatible(
+        const QString &name, const QList<PropertyType> &props) {
+    QList<stdsptr<GPURasterEffectCreator>> comp;
+    for(const auto& effectC : sEffectCreators) {
+        if(effectC->fName != name) continue;
+        if(effectC->compatible(props)) comp << effectC;
     }
+    return comp;
 }
 
-void IntAnimatorUniformSpecifierCreator::sTestScript(const QString &script,
-                                                     const QString &propName) {
-    if(script.isEmpty()) return;
-    QJSEngine engine;
-    engine.evaluate("_texSize = [0,0]");
-    engine.evaluate("_gPos = [0,0]");
-    const QString valScript = propName + " = " + QString::number(0);
-    engine.evaluate(valScript);
-    const QJSValue jsVal = engine.evaluate(script);
-    if(jsVal.isNumber()) {
-    } else if(jsVal.isArray()) {
-        const QStringList vals = jsVal.toString().split(',');
-        if(vals.count() == 1) {
-            try {
-                stringToInt(vals.first());
-            } catch(...) {
-                RuntimeThrow("Invalid glValue script '" + script + "' for '" + propName + "'");
-            }
-        } else if(vals.count() == 2) {
-            try {
-                stringToInt(vals.first());
-            } catch(...) {
-                RuntimeThrow("Invalid glValue[0] script '" + script + "' for '" + propName + "'");
-            }
-
-            try {
-                stringToInt(vals.last());
-            } catch(...) {
-                RuntimeThrow("Invalid glValue[1] script '" + script + "' for '" + propName + "'");
-            }
-        } else {
-            RuntimeThrow("Invalid glValue script '" + script + "' for '" + propName + "'");
-        }
-    } else {
-        RuntimeThrow("Invalid glValue script '" + script + "' for '" + propName + "'");
+QList<stdsptr<GPURasterEffectCreator>>
+    GPURasterEffectCreator::sWithCompatibleProps(
+        const QList<PropertyType> &props) {
+    QList<stdsptr<GPURasterEffectCreator>> comp;
+    for(const auto& effectC : sEffectCreators) {
+        if(effectC->compatible(props)) comp << effectC;
     }
+    return comp;
+}
+
+QList<stdsptr<GPURasterEffectCreator>>
+    GPURasterEffectCreator::sGetBestCompatibleEffects(
+        const QString &grePath, const QString &name,
+        const QList<PropertyType> &props) {
+    const auto pathBased = sWithGrePathAndCompatible(grePath, props);
+    if(pathBased) return QList<stdsptr<GPURasterEffectCreator>>() << pathBased;
+    const auto nameBased = sWithNameAndCompatible(name, props);
+    if(!nameBased.isEmpty()) return nameBased;
+    return sWithCompatibleProps(props);
 }

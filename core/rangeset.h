@@ -122,6 +122,7 @@ public:
 
     template <class U = T>
     U* atFrame(const int frame) const {
+        if(isEmpty()) return nullptr;
         const auto notPrev = lower_bound(frame);
         if(notPrev == end()) return nullptr;
         if(((**notPrev).*RangeGetter)().inRange(frame))
@@ -131,19 +132,44 @@ public:
 
     template <class U = T>
     U* atOrBeforeFrame(const int frame) const {
+        if(isEmpty()) return nullptr;
         const auto notPrev = lower_bound(frame);
-        if(notPrev == end()) return nullptr;
+        if(notPrev == end()) return static_cast<U*>(last());
         if(((**notPrev).*RangeGetter)().inRange(frame))
             return static_cast<U*>(&**notPrev);
+        if(notPrev == begin()) return nullptr;
         return static_cast<U*>(&**(notPrev - 1));
     }
 
     template <class U = T>
     U* atOrAfterFrame(const int frame) const {
+        if(isEmpty()) return nullptr;
         return static_cast<U*>(&**lower_bound(frame));
     }
 
+    template <class U = T>
+    U* beforeFrame(const int frame) const {
+        if(isEmpty()) return nullptr;
+        const auto notPrev = lower_bound(frame);
+        if(notPrev == end()) return static_cast<U*>(last());
+        if(notPrev == begin()) return nullptr;
+        return static_cast<U*>(&**(notPrev - 1));
+    }
+
+    template <class U = T>
+    U* afterFrame(const int frame) const {
+        if(isEmpty()) return nullptr;
+        const auto notPrev = lower_bound(frame);
+        if(notPrev == end()) return nullptr;
+        if(((**notPrev).*RangeGetter)().inRange(frame)) {
+            if(notPrev + 1 == end()) return nullptr;
+            return static_cast<U*>(&**notPrev + 1);
+        }
+        return static_cast<U*>(&**notPrev);
+    }
+
     int idAtFrame(const int frame) const {
+        if(isEmpty()) return -1;
         const auto notPrev = lower_bound(frame);
         if(notPrev == end()) return -1;
         if(((**notPrev).*RangeGetter)().inRange(frame))
@@ -152,16 +178,36 @@ public:
     }
 
     int idAtOrBeforeFrame(const int frame) const {
+        if(isEmpty()) return -1;
         const auto notPrev = lower_bound(frame);
         if(notPrev != end() &&
-           (notPrev->get()->*RangeGetter)().inRange(frame))
+           ((**notPrev).*RangeGetter)().inRange(frame))
             return notPrev - begin();
         return notPrev - begin() - 1;
     }
 
     int idAtOrAfterFrame(const int frame) const {
+        if(isEmpty()) return -1;
         const auto notPrev = lower_bound(frame);
         if(notPrev == end()) return -1;
+        return notPrev - begin();
+    }
+
+    int idBeforeFrame(const int frame) const {
+        if(isEmpty()) return -1;
+        const auto notPrev = lower_bound(frame);
+        if(notPrev == end()) return count() - 1;
+        return notPrev - begin() - 1;
+    }
+
+    int idAfterFrame(const int frame) const {
+        if(isEmpty()) return -1;
+        const auto notPrev = lower_bound(frame);
+        if(notPrev == end()) return -1;
+        if(((**notPrev).*RangeGetter)().inRange(frame)) {
+            if(notPrev + 1 == end()) return -1;
+            return notPrev + 1 - begin();
+        }
         return notPrev - begin();
     }
 

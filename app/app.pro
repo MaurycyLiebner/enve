@@ -52,6 +52,8 @@ SOURCES += main.cpp\
     CacheHandlers/hddcachablerangecont.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/soundreader.cpp \
+    GPUEffects/gpurastereffectprogram.cpp \
+    GPUEffects/uniformspecifiercreator.cpp \
     GUI/welcomedialog.cpp \
     PathEffects/custompatheffectcreator.cpp \
     PathEffects/linespatheffect.cpp \
@@ -264,6 +266,8 @@ HEADERS  += \
     CacheHandlers/samples.h \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/soundreader.h \
+    GPUEffects/gpurastereffectprogram.h \
+    GPUEffects/uniformspecifiercreator.h \
     GUI/welcomedialog.h \
     PathEffects/custompatheffectcreator.h \
     PathEffects/linespatheffect.h \
@@ -272,7 +276,6 @@ HEADERS  += \
     PathEffects/subpatheffect.h \
     PathEffects/zigzagpatheffect.h \
     Sound/soundmerger.h \
-    atomicset.h \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
     GUI/ColorWidgets/colorsettingswidget.h \
@@ -287,7 +290,6 @@ HEADERS  += \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
     evfileio.h \
-    rangeset.h \
     svgimporter.h \
     keypoint.h \
     Animators/qstringanimator.h \
