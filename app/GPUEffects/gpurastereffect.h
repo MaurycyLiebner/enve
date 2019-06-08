@@ -8,9 +8,7 @@ class GPURasterEffectCaller : public StdSelfRef {
 public:
     GPURasterEffectCaller(const GPURasterEffectProgram& program,
                           const UniformSpecifiers& uniformSpecifiers) :
-        mProgram(program), mUniformSpecifiers(uniformSpecifiers) {
-
-    }
+        mProgram(program), mUniformSpecifiers(uniformSpecifiers) {}
 
     void setGlobalPos(const QPointF& gPos) {
         mGPosX = static_cast<GLfloat>(gPos.x());
@@ -38,7 +36,8 @@ class GPURasterEffect : public ComplexAnimator {
     friend class SelfRef;
     GPURasterEffect(const GPURasterEffectCreator * const creator,
                     const GPURasterEffectProgram * const program,
-                    const QString &name);
+                    const QString &name,
+                    const QList<stdsptr<PropertyCreator>>& props);
 public:
     virtual qreal getMargin() { return 0; }
     virtual qreal getMarginAtRelFrame(const int ) { return 0; }
@@ -63,15 +62,7 @@ public:
         return SPtrCreate(GPURasterEffectCaller)(*mProgram, uniformSpecifiers);
     }
 
-    template <typename T = GPUEffectAnimators>
-    T *getParentEffectAnimators() {
-        return mParentEffects;
-    }
-
-    template <typename T = GPUEffectAnimators>
-    void setParentEffectAnimators(T * const parentEffects) {
-        mParentEffects = parentEffects;
-    }
+    GPUEffectAnimators *getParentEffectAnimators();
 
     void updateIfUsesProgram(const GPURasterEffectProgram * const program) {
         if(program == mProgram)
@@ -80,7 +71,6 @@ public:
 private:
     const GPURasterEffectProgram * const mProgram;
     const GPURasterEffectCreator * const mCreator;
-    qptr<GPUEffectAnimators> mParentEffects;
 };
 
 #endif // GPURASTEREFFECT_H

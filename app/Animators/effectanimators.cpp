@@ -4,19 +4,14 @@
 #include <QDebug>
 
 EffectAnimators::EffectAnimators(BoundingBox *parentBox) :
-    ComplexAnimator("effects"), mParentBox_k(parentBox) {
-    SWT_setEnabled(false);
-    SWT_setVisible(false);
+    EffectAnimatorsBase("effects"), mParentBox_k(parentBox) {
+    makeHiddenWhenEmpty();
 }
 
-void EffectAnimators::addEffect(const qsptr<PixmapEffect>& effect) {
-    ca_addChildAnimator(effect);
-    effect->setParentEffectAnimators(this);
-
-    prp_afterWholeInfluenceRangeChanged();
-
-    SWT_setEnabled(true);
-    SWT_setVisible(true);
+void EffectAnimators::readPixmapEffect(QIODevice * const src) {
+    const auto effect = readIdCreatePixmapEffect(src);
+    effect->readProperty(src);
+    addChild(effect);
 }
 
 qreal EffectAnimators::getEffectsMargin() const {
@@ -68,4 +63,40 @@ void EffectAnimators::addEffectRenderDataToListF(
 
 bool EffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();
+}
+
+#include "PixmapEffects/blureffect.h"
+#include "PixmapEffects/shadoweffect.h"
+#include "PixmapEffects/desaturateeffect.h"
+#include "PixmapEffects/colorizeeffect.h"
+#include "PixmapEffects/replacecoloreffect.h"
+#include "PixmapEffects/brightnesseffect.h"
+#include "PixmapEffects/contrasteffect.h"
+#include "PixmapEffects/sampledmotionblureffect.h"
+
+qsptr<PixmapEffect> readIdCreatePixmapEffect(QIODevice * const src) {
+    PixmapEffectType typeT;
+    src->read(rcChar(&typeT), sizeof(PixmapEffectType));
+    qsptr<PixmapEffect> effect;
+    if(typeT == EFFECT_BLUR) {
+        effect = SPtrCreate(BlurEffect)();
+    } else if(typeT == EFFECT_SHADOW) {
+        effect = SPtrCreate(ShadowEffect)();
+    } else if(typeT == EFFECT_DESATURATE) {
+        effect = SPtrCreate(DesaturateEffect)();
+    } else if(typeT == EFFECT_COLORIZE) {
+        effect = SPtrCreate(ColorizeEffect)();
+    } else if(typeT == EFFECT_REPLACE_COLOR) {
+        effect = SPtrCreate(ReplaceColorEffect)();
+    } else if(typeT == EFFECT_BRIGHTNESS) {
+        effect = SPtrCreate(BrightnessEffect)();
+    } else if(typeT == EFFECT_CONTRAST) {
+        effect = SPtrCreate(ContrastEffect)();
+    } else if(typeT == EFFECT_MOTION_BLUR) {
+        effect = SPtrCreate(SampledMotionBlurEffect)(nullptr);
+    } else {
+        RuntimeThrow("Invalid pixmap effect type '" +
+                     QString::number(typeT) + "'.");
+    }
+    return effect;
 }

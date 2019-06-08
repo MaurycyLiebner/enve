@@ -71,10 +71,10 @@ QList<qsptr<SmartVectorPath>> SmartVectorPath::breakPathsApart_k() {
     const int iMax = mPathAnimator->ca_getNumberOfChildren() - 1;
     if(iMax < 1) return result;
     for(int i = iMax; i >= 0; i--) {
-        const auto srcPath = mPathAnimator->ca_takeChildAt<SmartPathAnimator>(i);
+        const auto srcPath = mPathAnimator->takeChildAt(i);
         const auto newPath = SPtrCreate(SmartVectorPath)();
         copyPathBoxDataTo(newPath.get());
-        newPath->getPathAnimator()->addPath(srcPath);
+        newPath->getPathAnimator()->addChild(srcPath);
         result.append(newPath);
     }
     removeFromParent_k();

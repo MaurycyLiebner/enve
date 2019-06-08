@@ -884,29 +884,19 @@ bool BoundingBox::isAnimated() const {
 }
 
 void BoundingBox::addGPUEffect(const qsptr<GPURasterEffect>& rasterEffect) {
-    mGPUEffectsAnimators->addEffect(rasterEffect);
+    mGPUEffectsAnimators->addChild(rasterEffect);
 }
 
 void BoundingBox::removeGPUEffect(const qsptr<GPURasterEffect>& effect) {
-    mGPUEffectsAnimators->ca_removeChildAnimator(effect);
-    if(!mGPUEffectsAnimators->hasChildAnimators()) {
-        mGPUEffectsAnimators->SWT_hide();
-    }
-
-    prp_afterWholeInfluenceRangeChanged();
+    mGPUEffectsAnimators->removeChild(effect);
 }
 
 void BoundingBox::addEffect(const qsptr<PixmapEffect>& effect) {
-    mEffectsAnimators->addEffect(effect);
+    mEffectsAnimators->addChild(effect);
 }
 
 void BoundingBox::removeEffect(const qsptr<PixmapEffect>& effect) {
-    mEffectsAnimators->ca_removeChildAnimator(effect);
-    if(!mEffectsAnimators->hasChildAnimators()) {
-        mEffectsAnimators->SWT_hide();
-    }
-
-    prp_afterWholeInfluenceRangeChanged();
+    mEffectsAnimators->removeChild(effect);
 }
 
 //int BoundingBox::prp_getParentFrameShift() const {

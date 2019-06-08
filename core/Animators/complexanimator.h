@@ -13,10 +13,6 @@ protected:
     ComplexAnimator(const QString& name);
     void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
 public:
-
-    void writeProperty(QIODevice * const dst) const = 0;
-    void readProperty(QIODevice * const src) = 0;
-
 //    ~ComplexAnimator();
     stdsptr<Key> readKey(QIODevice *target) final {
         Q_UNUSED(target);
@@ -111,16 +107,20 @@ public:
     void ca_removeDescendantsKey(Key * const key);
 protected:
     void ca_addChildAnimator(const qsptr<Property> &childAnimator) {
-        ca_addChildAnimator(childAnimator, ca_getNumberOfChildren());
+        ca_insertChildAnimator(childAnimator, ca_getNumberOfChildren());
     }
-    void ca_addChildAnimator(const qsptr<Property> &childAnimator,
-                             const int id);
+    void ca_insertChildAnimator(const qsptr<Property> &childAnimator,
+                                const int id);
     void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
 
     template <typename T = Property>
     qsptr<T> ca_takeChildAt(const int i) {
         if(i < 0 || i >= ca_getNumberOfChildren())
             RuntimeThrow("Index outside of range");
+        if(mHiddenEmpty && ca_getNumberOfChildren() == 1) {
+            SWT_setEnabled(false);
+            SWT_setVisible(false);
+        }
         return GetAsSPtrTemplated(ca_mChildAnimators.takeAt(i), T);
     }
 
@@ -130,7 +130,17 @@ protected:
                                  const qsptr<Property>& replaceWith);
 
     QList<qsptr<Property>> ca_mChildAnimators;
+
+    void makeHiddenWhenEmpty() {
+        if(mHiddenEmpty) return;
+        mHiddenEmpty = true;
+        if(!hasChildAnimators()) {
+            SWT_setEnabled(false);
+            SWT_setVisible(false);
+        }
+    }
 private:
+    bool mHiddenEmpty = false;
     qptr<Property> mPropertyGUI;
     bool ca_mChildAnimatorRecording = false;
 };

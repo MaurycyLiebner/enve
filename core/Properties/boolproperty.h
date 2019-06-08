@@ -17,8 +17,8 @@ private:
     bool mValue = false;
 };
 
-#include "Animators/complexanimator.h"
-class BoolPropertyContainer : public ComplexAnimator {
+#include "Animators/staticcomplexanimator.h"
+class BoolPropertyContainer : public StaticComplexAnimator {
     friend class SelfRef;
 protected:
     BoolPropertyContainer(const QString& name);

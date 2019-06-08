@@ -13,6 +13,7 @@
 #include "Boxes/videobox.h"
 #include "Boxes/imagebox.h"
 #include "Sound/singlesound.h"
+#include "CacheHandlers/soundcachecontainer.h"
 #include "svgimporter.h"
 #include "filesourcescache.h"
 #include <QFileDialog>

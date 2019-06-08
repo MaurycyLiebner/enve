@@ -2108,7 +2108,7 @@ void VectorPathSvgAttributes::apply(SmartVectorPath * const path) {
     for(const auto& separatePath : mSvgSeparatePaths) {
         const auto singlePath = SPtrCreate(SmartPathAnimator)();
         separatePath->apply(singlePath.get());
-        pathAnimator->addPath(singlePath);
+        pathAnimator->addChild(singlePath);
     }
 
     BoxSvgAttributes::apply(path);

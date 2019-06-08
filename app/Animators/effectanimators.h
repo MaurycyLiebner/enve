@@ -1,26 +1,28 @@
 #ifndef EFFECTANIMATORS_H
 #define EFFECTANIMATORS_H
-#include "Animators/complexanimator.h"
+#include "Animators/dynamiccomplexanimator.h"
 #include "smartPointers/sharedpointerdefs.h"
+#include "PixmapEffects/pixmapeffect.h"
 
-class PixmapEffect;
 class BoundingBox;
 class SkImage;
 class SkCanvas;
 class SkBitmap;
-struct BoundingBoxRenderData;
 struct PixmapEffectRenderData;
 
+qsptr<PixmapEffect> readIdCreatePixmapEffect(QIODevice * const src);
 
-class EffectAnimators : public ComplexAnimator {
+typedef DynamicComplexAnimator<PixmapEffect,
+        &PixmapEffect::writeIdentifier,
+        &readIdCreatePixmapEffect> EffectAnimatorsBase;
+class EffectAnimators : public EffectAnimatorsBase {
     friend class SelfRef;
+protected:
+    EffectAnimators(BoundingBox *parentBox);
 public:
     bool SWT_isPixmapEffectAnimators() const { return true; }
 
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice * const src);
-
-    void addEffect(const qsptr<PixmapEffect> &effect);
+    void readPixmapEffect(QIODevice * const src);
 
     qreal getEffectsMargin() const;
 
@@ -36,10 +38,6 @@ public:
 
     void addEffectRenderDataToListF(const qreal relFrame,
                                     BoundingBoxRenderData * const data);
-
-    void readPixmapEffect(QIODevice * const src);
-protected:
-    EffectAnimators(BoundingBox *parentBox);
 private:
     BoundingBox * const mParentBox_k;
 };

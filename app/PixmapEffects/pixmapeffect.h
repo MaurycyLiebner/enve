@@ -1,7 +1,7 @@
 #ifndef PIXMAPEFFECT_H
 #define PIXMAPEFFECT_H
 #include "skia/skiaincludes.h"
-#include "Animators/complexanimator.h"
+#include "Animators/dynamiccomplexanimator.h"
 #include <QMimeData>
 #include <QPointF>
 class EffectAnimators;
@@ -11,7 +11,6 @@ class BoundingBoxRenderData;
 struct PixmapEffectRenderData : public StdSelfRef {
     virtual void applyEffectsSk(const SkBitmap &bitmap,
                                 const qreal scale) = 0;
-    virtual ~PixmapEffectRenderData();
 };
 
 class PixmapEffect;
@@ -37,10 +36,10 @@ enum PixmapEffectType : short {
 };
 
 class PixmapEffect : public ComplexAnimator {
-    Q_OBJECT
     friend class SelfRef;
+protected:
+    PixmapEffect(const QString& name, const PixmapEffectType type);
 public:
-    PixmapEffect(const QString& name, const PixmapEffectType &type);
     virtual stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData * const data) = 0;
     virtual qreal getMargin();
@@ -60,29 +59,14 @@ public:
 
     QMimeData *SWT_createMimeData();
 
-    bool interrupted();
-
-    template <class T = EffectAnimators>
-    T *getParentEffectAnimators() {
-        return mParentEffects;
-    }
-
-    template <class T = EffectAnimators>
-    void setParentEffectAnimators(T *parentEffects) {
-        mParentEffects = parentEffects;
-    }
+    EffectAnimators *getParentEffectAnimators();
+    void writeIdentifier(QIODevice * const dst) const;
 
     void switchVisible();
-
     void setVisible(const bool visible);
-
     bool isVisible() const;
-public slots:
-    void interrupt();
 protected:
-    bool mInterrupted = false;
     bool mVisible = true;
     PixmapEffectType mType;
-    qptr<EffectAnimators> mParentEffects;
 };
 #endif // PIXMAPEFFECT_H

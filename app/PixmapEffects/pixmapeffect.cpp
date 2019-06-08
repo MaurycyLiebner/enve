@@ -1,20 +1,13 @@
 #include "pixmapeffect.h"
+#include "Animators/effectanimators.h"
 #include <QDrag>
 
-PixmapEffectRenderData::~PixmapEffectRenderData() {}
-
 PixmapEffect::PixmapEffect(const QString &name,
-                           const PixmapEffectType &type) :
-    ComplexAnimator(name) {
-    mType = type;
-}
+                           const PixmapEffectType type) :
+    ComplexAnimator(name), mType(type) {}
 
-bool PixmapEffect::interrupted() {
-    if(mInterrupted) {
-        mInterrupted = false;
-        return true;
-    }
-    return false;
+EffectAnimators *PixmapEffect::getParentEffectAnimators() {
+    return static_cast<EffectAnimators*>(mParent.data());
 }
 
 qreal PixmapEffect::getMargin() { return 0.; }
@@ -47,8 +40,4 @@ void PixmapEffect::setVisible(const bool visible) {
 
 bool PixmapEffect::isVisible() const {
     return mVisible;
-}
-
-void PixmapEffect::interrupt() {
-    mInterrupted = true;
 }

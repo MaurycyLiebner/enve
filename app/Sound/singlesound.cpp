@@ -3,6 +3,7 @@
 #include "durationrectangle.h"
 #include "filesourcescache.h"
 #include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
+#include "CacheHandlers/soundcachehandler.h"
 
 SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
     ComplexAnimator("sound") {
@@ -83,6 +84,18 @@ FixedLenAnimationRect *SingleSound::getDurationRect() const {
     return mDurationRectangle.get();
 }
 
+SoundReaderForMerger *SingleSound::getSecondReader(const int relSecondId) {
+    const int maxSec = mCacheHandler->durationSec() - 1;
+    if(relSecondId < 0 || relSecondId > maxSec) return nullptr;
+    const auto reader = mCacheHandler->getSecondReader(relSecondId);
+    if(!reader) return mCacheHandler->addSecondReader(relSecondId);
+    return reader;
+}
+
+stdsptr<Samples> SingleSound::getSamplesForSecond(const int relSecondId) {
+    return mCacheHandler->getSamplesForSecond(relSecondId);
+}
+
 #include "canvas.h"
 
 int SingleSound::getSampleShift() const{
@@ -119,6 +132,11 @@ iValueRange SingleSound::absSecondToRelSeconds(const int absSecond) {
     return absSecondToRelSecondsAbsStretch(absSecond);
 }
 
+const HDDCachableCacheHandler *SingleSound::getCacheHandler() const {
+    if(!mCacheHandler) return nullptr;
+    return &mCacheHandler->getCacheHandler();
+}
+
 iValueRange SingleSound::absSecondToRelSecondsAbsStretch(const int absSecond) {
     const qreal fps = getCanvasFPS();
     const qreal stretch = qAbs(mStretch);
@@ -146,6 +164,11 @@ void SingleSound::setStretch(const qreal stretch) {
     mStretch = stretch;
     updateDurationRectLength();
     prp_afterWholeInfluenceRangeChanged();
+}
+
+QrealSnapshot SingleSound::getVolumeSnap() const {
+    return mVolumeAnimator->makeSnapshot(
+                SOUND_SAMPLERATE/getCanvasFPS(), 0.01);
 }
 
 void SingleSound::updateDurationRectLength() {

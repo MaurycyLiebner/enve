@@ -154,6 +154,6 @@ void PathPointsHandler::removeSegment(const NormalSegment &segment) {
         const auto spColl = mTargetAnimator->getParent<SmartPathCollection>();
         if(!spColl) return;
         const auto newAnim = mTargetAnimator->createFromDetached();
-        spColl->addPath(newAnim);
+        spColl->addChild(newAnim);
     }
 }

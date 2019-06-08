@@ -4,6 +4,7 @@
 #include "canvas.h"
 #include "CacheHandlers/soundcachecontainer.h"
 #include "soundmerger.h"
+#include "FileCacheHandlers/soundreader.h"
 
 SoundComposition::SoundComposition(Canvas * const parent) :
     QIODevice(parent), mParent(parent) {
@@ -40,13 +41,12 @@ void SoundComposition::removeSound(const qsptr<SingleSound>& sound) {
 
 void SoundComposition::addSoundAnimator(const qsptr<SingleSound>& sound) {
     addSound(sound);
-    mSoundsContainer->ca_addChildAnimator(sound);
+    mSoundsContainer->addChild(sound);
 }
 
 void SoundComposition::removeSoundAnimator(const qsptr<SingleSound>& sound) {
-    if(mSounds.removeOne(sound)) {
-        mSoundsContainer->ca_removeChildAnimator(sound);
-    }
+    if(mSounds.removeOne(sound))
+        mSoundsContainer->removeChild(sound);
 }
 
 void SoundComposition::secondFinished(const int secondId,

@@ -17,6 +17,7 @@ public:
     }
 
     using ComplexAnimator::ca_addChildAnimator;
+    using ComplexAnimator::ca_insertChildAnimator;
     using ComplexAnimator::ca_prependChildAnimator;
 };
 

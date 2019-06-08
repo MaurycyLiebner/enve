@@ -2,6 +2,7 @@
 #define PATHEFFECT_H
 #include "Animators/complexanimator.h"
 #include "skia/skiaincludes.h"
+#include "Animators/staticcomplexanimator.h"
 class BoolProperty;
 class PathBox;
 class BoundingBox;
@@ -25,11 +26,11 @@ class PathEffect;
 typedef PropertyMimeData<PathEffect,
     InternalMimeData::PATH_EFFECT> PathEffectMimeData;
 
-class PathEffect : public ComplexAnimator {
+class PathEffect : public StaticComplexAnimator {
     Q_OBJECT
 protected:
     PathEffect(const QString& name,
-               const PathEffectType &type,
+               const PathEffectType type,
                const bool outlinePathEffect);
 public:
     virtual void apply(const qreal relFrame,

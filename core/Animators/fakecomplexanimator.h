@@ -4,6 +4,8 @@
 
 class FakeComplexAnimator : public ComplexAnimator {
     friend class SelfRef;
+protected:
+    FakeComplexAnimator(const QString& name, Property *target);
 public:
     Property *getTarget();
 
@@ -23,8 +25,13 @@ public:
                            const int keyRectSize);
 
     bool SWT_isFakeComplexAnimator() const;
-protected:
-    FakeComplexAnimator(const QString& name, Property *target);
+
+    using ComplexAnimator::ca_addChildAnimator;
+    using ComplexAnimator::ca_insertChildAnimator;
+    using ComplexAnimator::ca_removeChildAnimator;
+    using ComplexAnimator::ca_takeChildAt;
+    using ComplexAnimator::ca_prependChildAnimator;
+    using ComplexAnimator::ca_replaceChildAnimator;
 private:
     Property *mTarget = nullptr;
 };

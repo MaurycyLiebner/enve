@@ -2,8 +2,11 @@
 #define SINGLESOUND_H
 #include "Animators/complexanimator.h"
 #include "Animators/qrealanimator.h"
-#include "CacheHandlers/soundcachehandler.h"
 class FixedLenAnimationRect;
+class SoundCacheHandler;
+class Samples;
+class SoundReaderForMerger;
+class HDDCachableCacheHandler;
 
 class SingleSound : public ComplexAnimator {
     friend class SelfRef;
@@ -13,7 +16,6 @@ public:
     bool SWT_isSingleSound() const { return true; }
 
     void addActionsToMenu(PropertyTypeMenu * const menu);
-
 
     DurationRectangleMovable *anim_getTimelineMovable(
             const int relX, const int minViewedFrame,
@@ -42,27 +44,16 @@ public:
         return mVolumeAnimator->getEffectiveValue(relFrame);
     }
 
-    SoundReaderForMerger * getSecondReader(const int relSecondId) {
-        const int maxSec = mCacheHandler->durationSec() - 1;
-        if(relSecondId < 0 || relSecondId > maxSec) return nullptr;
-        const auto reader = mCacheHandler->getSecondReader(relSecondId);
-        if(!reader) return mCacheHandler->addSecondReader(relSecondId);
-        return reader;
-    }
+    SoundReaderForMerger * getSecondReader(const int relSecondId);
 
-    stdsptr<Samples> getSamplesForSecond(const int relSecondId) {
-        return mCacheHandler->getSamplesForSecond(relSecondId);
-    }
+    stdsptr<Samples> getSamplesForSecond(const int relSecondId);
 
     int getSampleShift() const;
     SampleRange relSampleRange() const;
     SampleRange absSampleRange() const;
     iValueRange absSecondToRelSeconds(const int absSecond);
 
-    const HDDCachableCacheHandler* getCacheHandler() const {
-        if(!mCacheHandler) return nullptr;
-        return &mCacheHandler->getCacheHandler();
-    }
+    const HDDCachableCacheHandler* getCacheHandler() const;
 
     bool videoSound() const {
         return !mOwnDurationRectangle;
@@ -70,10 +61,7 @@ public:
 
     void setStretch(const qreal stretch);
     qreal getStretch() const { return mStretch; }
-    QrealSnapshot getVolumeSnap() const {
-        return mVolumeAnimator->makeSnapshot(
-                    SOUND_SAMPLERATE/getCanvasFPS(), 0.01);
-    }
+    QrealSnapshot getVolumeSnap() const;
 
     bool isEnabled() const {
         return mEnabled;

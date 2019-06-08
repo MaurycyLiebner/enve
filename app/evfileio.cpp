@@ -42,6 +42,7 @@
 #include "Boxes/internallinkcanvas.h"
 #include "Boxes/smartvectorpath.h"
 #include "Sound/singlesound.h"
+#include "Sound/soundcomposition.h"
 #include "Animators/gpueffectanimators.h"
 
 class FileFooter {
@@ -198,8 +199,11 @@ void ColorAnimator::readProperty(QIODevice * const src) {
     mAlphaAnimator->readProperty(src);
 }
 
-void PixmapEffect::writeProperty(QIODevice * const dst) const {
+void PixmapEffect::writeIdentifier(QIODevice * const dst) const {
     dst->write(rcConstChar(&mType), sizeof(PixmapEffectType));
+}
+
+void PixmapEffect::writeProperty(QIODevice * const dst) const {
     dst->write(rcConstChar(&mVisible), sizeof(bool));
 }
 
@@ -307,50 +311,6 @@ void SampledMotionBlurEffect::writeProperty(QIODevice * const dst) const {
     mOpacity->writeProperty(dst);
     mNumberSamples->writeProperty(dst);
     mFrameStep->writeProperty(dst);
-}
-
-void EffectAnimators::writeProperty(QIODevice * const dst) const {
-    const int nEffects = ca_mChildAnimators.count();
-    dst->write(rcConstChar(&nEffects), sizeof(int));
-    for(const auto &effect : ca_mChildAnimators) {
-        effect->writeProperty(dst);
-    }
-}
-
-void EffectAnimators::readPixmapEffect(QIODevice * const src) {
-    PixmapEffectType typeT;
-    src->read(rcChar(&typeT), sizeof(PixmapEffectType));
-    qsptr<PixmapEffect> effect;
-    if(typeT == EFFECT_BLUR) {
-        effect = SPtrCreate(BlurEffect)();
-    } else if(typeT == EFFECT_SHADOW) {
-        effect = SPtrCreate(ShadowEffect)();
-    } else if(typeT == EFFECT_DESATURATE) {
-        effect = SPtrCreate(DesaturateEffect)();
-    } else if(typeT == EFFECT_COLORIZE) {
-        effect = SPtrCreate(ColorizeEffect)();
-    } else if(typeT == EFFECT_REPLACE_COLOR) {
-        effect = SPtrCreate(ReplaceColorEffect)();
-    } else if(typeT == EFFECT_BRIGHTNESS) {
-        effect = SPtrCreate(BrightnessEffect)();
-    } else if(typeT == EFFECT_CONTRAST) {
-        effect = SPtrCreate(ContrastEffect)();
-    } else if(typeT == EFFECT_MOTION_BLUR) {
-        effect = SPtrCreate(SampledMotionBlurEffect)(mParentBox_k);
-    } else {
-        RuntimeThrow("Invalid pixmap effect type '" +
-                     QString::number(typeT) + "'.");
-    }
-    effect->readProperty(src);
-    addEffect(effect);
-}
-
-void EffectAnimators::readProperty(QIODevice * const src) {
-    int nEffects;
-    src->read(rcChar(&nEffects), sizeof(int));
-    for(int i = 0; i < nEffects; i++) {
-        readPixmapEffect(src);
-    }
 }
 
 void BasicTransformAnimator::writeProperty(QIODevice * const dst) const {

@@ -5,10 +5,12 @@
 #include <QDrag>
 
 PathEffect::PathEffect(const QString &name,
-                       const PathEffectType &type,
+                       const PathEffectType type,
                        const bool outlinePathEffect) :
-    ComplexAnimator(name) {
+    StaticComplexAnimator(name) {
     mPathEffectType = type;
+    mApplyBeforeThickness = SPtrCreate(BoolProperty)("pre-thickness");
+    ca_addChildAnimator(mApplyBeforeThickness);
     setIsOutlineEffect(outlinePathEffect);
 }
 
@@ -38,13 +40,7 @@ bool PathEffect::SWT_isPathEffect() const { return true; }
 void PathEffect::setIsOutlineEffect(const bool bT) {
     if(bT == mOutlineEffect) return;
     mOutlineEffect = bT;
-    if(mOutlineEffect) {
-        mApplyBeforeThickness = SPtrCreate(BoolProperty)("pre-thickness");
-        ca_addChildAnimator(mApplyBeforeThickness, 0);
-    } else if(mApplyBeforeThickness) {
-        ca_removeChildAnimator(mApplyBeforeThickness);
-        mApplyBeforeThickness.reset();
-    }
+    mApplyBeforeThickness->SWT_setVisible(bT);
 }
 
 void PathEffect::switchVisible() {

@@ -3,7 +3,7 @@
 #include "Animators/transformanimator.h"
 
 SmartPathCollection::SmartPathCollection() :
-    ComplexAnimator("paths") {}
+    SmartPathCollectionBase("paths") {}
 
 SmartNodePoint *SmartPathCollection::createNewSubPathAtPos(const QPointF &absPos) {
     const auto newPath = createNewPath();
@@ -12,16 +12,6 @@ SmartNodePoint *SmartPathCollection::createNewSubPathAtPos(const QPointF &absPos
     const auto trans = handler->transform();
     const auto relPos = trans ? trans->mapAbsPosToRel(absPos) : absPos;
     return handler->addFirstNode(relPos);
-}
-
-void SmartPathCollection::addPath(const qsptr<SmartPathAnimator> &path) {
-    ca_addChildAnimator(path);
-    emit pathAdded(path.get());
-}
-
-void SmartPathCollection::removePath(const qsptr<SmartPathAnimator> &path) {
-    ca_removeChildAnimator(path);
-    emit pathRemoved(path.get());
 }
 
 SkPath SmartPathCollection::getPathAtRelFrame(const qreal relFrame) const {

@@ -44,7 +44,6 @@ CONFIG(debug, debug|release) {
 LIBS += -lskia
 
 SOURCES += \
-    Animators/dynamiccomplexanimator.cpp \
     Animators/qrealsnapshot.cpp \
     Animators/staticcomplexanimator.cpp \
     PathEffects/custompatheffect.cpp \

@@ -12,7 +12,7 @@ void ComplexAnimator::ca_prependChildAnimator(Property *childAnimator,
     if(!prependWith) return;
     const int id = getChildPropertyIndex(childAnimator);
     if(id == -1) return;
-    ca_addChildAnimator(prependWith, id);
+    ca_insertChildAnimator(prependWith, id);
 }
 
 void ComplexAnimator::ca_replaceChildAnimator(const qsptr<Property>& childAnimator,
@@ -21,7 +21,7 @@ void ComplexAnimator::ca_replaceChildAnimator(const qsptr<Property>& childAnimat
     if(id == -1) return;
     ca_removeChildAnimator(childAnimator);
     if(!replaceWith) return;
-    ca_addChildAnimator(replaceWith, id);
+    ca_insertChildAnimator(replaceWith, id);
 }
 
 int ComplexAnimator::ca_getNumberOfChildren() const {
@@ -66,8 +66,12 @@ bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 
 bool ComplexAnimator::SWT_isComplexAnimator() const { return true; }
 
-void ComplexAnimator::ca_addChildAnimator(const qsptr<Property>& childProperty,
-                                          const int id) {
+void ComplexAnimator::ca_insertChildAnimator(const qsptr<Property>& childProperty,
+                                             const int id) {
+    if(mHiddenEmpty && !hasChildAnimators()) {
+        SWT_setEnabled(true);
+        SWT_setVisible(true);
+    }
     if(ca_mChildAnimators.contains(childProperty))
         ca_removeChildAnimator(childProperty);
     ca_mChildAnimators.insert(id, childProperty);
@@ -183,6 +187,11 @@ void ComplexAnimator::ca_removeChildAnimator(
     if(changeInfluence) {
         const auto changedRange = childRange*prp_absInfluenceRange();
         prp_afterChangedAbsRange(changedRange);
+    }
+
+    if(mHiddenEmpty && !hasChildAnimators()) {
+        SWT_setEnabled(false);
+        SWT_setVisible(false);
     }
 }
 

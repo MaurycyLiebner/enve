@@ -4,22 +4,12 @@
 #include <QDebug>
 
 GPUEffectAnimators::GPUEffectAnimators(BoundingBox *parentBox) :
-    ComplexAnimator("gpu effects"), mParentBox_k(parentBox) {
-    SWT_setEnabled(false);
-    SWT_setVisible(false);
-}
-
-void GPUEffectAnimators::addEffect(const qsptr<GPURasterEffect>& effect) {
-    ca_addChildAnimator(effect);
-    effect->setParentEffectAnimators(this);
-
-    prp_afterWholeInfluenceRangeChanged();
-    SWT_setEnabled(true);
-    SWT_setVisible(true);
+    GPUEffectAnimatorsBase("gpu effects"), mParentBox_k(parentBox) {
+    makeHiddenWhenEmpty();
 }
 
 qreal GPUEffectAnimators::getEffectsMargin() const {
-    qreal newMargin = 2.;
+    qreal newMargin = 2;
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
         if(pixmapEffect->isVisible()) {
@@ -30,7 +20,7 @@ qreal GPUEffectAnimators::getEffectsMargin() const {
 }
 
 qreal GPUEffectAnimators::getEffectsMarginAtRelFrame(const int relFrame) const {
-    qreal newMargin = 0.;
+    qreal newMargin = 0;
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
         if(pixmapEffect->isVisible()) {
@@ -73,32 +63,18 @@ void GPUEffectAnimators::updateIfUsesProgram(
     }
 }
 
-void GPUEffectAnimators::writeProperty(QIODevice * const target) const {
-    const int nEffects = ca_mChildAnimators.count();
-    target->write(rcConstChar(&nEffects), sizeof(int));
-    for(const auto& effect : ca_mChildAnimators) {
-        const auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
-        pixmapEffect->writeIdentifier(target);
-        pixmapEffect->writeProperty(target);
+qsptr<GPURasterEffect> readIdCreateGPURasterEffect(QIODevice * const src) {
+    const auto id = GPURasterEffectCreator::sReadIdentifier(src);
+    const auto best = GPURasterEffectCreator::sGetBestCompatibleEffects(id);
+    if(best.isEmpty()) RuntimeThrow("No compatible GPU effect found for " + id.fName);
+    qsptr<GPURasterEffect> effect;
+    if(best.count() == 1) {
+        const auto bestCreator = best.first();
+        effect = GetAsSPtr(bestCreator->create(), GPURasterEffect);
+    } else {
+        // exec ask dialog
     }
-}
-
-void GPUEffectAnimators::readProperty(QIODevice * const src) {
-    int nEffects;
-    src->read(rcChar(&nEffects), sizeof(int));
-    for(int i = 0; i < nEffects; i++) {
-        const auto id = GPURasterEffectCreator::sReadIdentifier(src);
-        const auto best = GPURasterEffectCreator::sGetBestCompatibleEffects(id);
-        if(best.isEmpty()) RuntimeThrow("No compatible GPU effect found for " + id.fName);
-        if(best.count() == 1) {
-            const auto bestCreator = best.first();
-            const auto effect = GetAsSPtr(bestCreator->create(), GPURasterEffect);
-            effect->readProperty(src);
-            addEffect(effect);
-        } else {
-            // exec ask dialog
-        }
-    }
+    return effect;
 }
 
 bool GPUEffectAnimators::hasEffects() {

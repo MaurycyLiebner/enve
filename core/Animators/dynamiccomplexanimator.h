@@ -2,11 +2,18 @@
 #define DYNAMICCOMPLEXANIMATOR_H
 #include "complexanimator.h"
 
+template <class T>
+qsptr<T> TCreateOnly(QIODevice * const src) {
+    Q_UNUSED(src);
+    return SPtrCreateTemplated(T)();
+}
+
 template <class T,
-          void (T::*TWriteType)(QIODevice * const dst) const,
-          qsptr<T> (*TReadTypeAndCreate)(QIODevice * const src)>
+          void (T::*TWriteType)(QIODevice * const dst) const = nullptr,
+          qsptr<T> (*TReadTypeAndCreate)(QIODevice * const src) = &TCreateOnly<T>>
 class DynamicComplexAnimator : public ComplexAnimator {
     friend class SelfRef;
+protected:
     DynamicComplexAnimator(const QString &name) :
         ComplexAnimator(name) {}
 public:
@@ -15,7 +22,7 @@ public:
         dst->write(rcConstChar(&nProps), sizeof(int));
         for(const auto& prop : ca_mChildAnimators) {
             const auto TProp = static_cast<T*>(prop.get());
-            (TProp->*TWriteType)(dst);
+            if(TWriteType) (TProp->*TWriteType)(dst);
             TProp->writeProperty(dst);
         }
     }

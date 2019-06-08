@@ -1,10 +1,10 @@
 #ifndef SOUNDCOMPOSITION_H
 #define SOUNDCOMPOSITION_H
 
-#include "Animators/complexanimator.h"
+#include "Animators/dynamiccomplexanimator.h"
 #include "CacheHandlers/hddcachablecachehandler.h"
 #include "CacheHandlers/samples.h"
-
+#include "singlesound.h"
 #include <math.h>
 
 #include <QAudioOutput>
@@ -17,7 +17,6 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QTimer>
-class SingleSound;
 class Canvas;
 class SoundMerger;
 const int SOUND_SAMPLERATE = 44100;
@@ -69,8 +68,8 @@ private:
     QList<int> mProcessingSeconds;
     const Canvas * const mParent;
     qint64 mPos;
-    qsptr<ComplexAnimator> mSoundsContainer =
-            SPtrCreate(ComplexAnimator)("sounds");
+    typedef DynamicComplexAnimator<SingleSound> ContType;
+    qsptr<ContType> mSoundsContainer = SPtrCreate(ContType)("sounds");
     QList<qsptr<SingleSound>> mSounds;
     HDDCachableCacheHandler mSecondsCache;
 };
