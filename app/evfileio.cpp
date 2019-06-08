@@ -56,7 +56,7 @@ public:
         const qint64 savedPos = target->pos();
         const qint64 pos = target->size() -
                 static_cast<qint64>(3*sizeof(char[15]));
-        if(!target->seek(pos)) return false;
+        if(!target->seek(pos)) RuntimeThrow("Failed to seek to FileFooter");
 
         char format[15];
         target->read(rcChar(format), sizeof(char[15]));
@@ -1123,21 +1123,21 @@ void MainWindow::loadEVFile(const QString &path) {
 }
 
 void MainWindow::saveToFile(const QString &path) {
-    QFile target(path);
-    if(target.exists()) target.remove();
+    QFile file(path);
+    if(file.exists()) file.remove();
 
-    if(target.open(QIODevice::WriteOnly)) {
+    if(file.open(QIODevice::WriteOnly)) {
         auto gradientWidget = mFillStrokeSettings->getGradientWidget();
         gradientWidget->setGradientLoadIds();
-        gradientWidget->writeGradients(&target);
-        mCanvasWindow->writeCanvases(&target);
+        gradientWidget->writeGradients(&file);
+        mCanvasWindow->writeCanvases(&file);
 
         clearLoadedGradientsList();
         gradientWidget->clearGradientsLoadIds();
 
-        FileFooter::sWrite(&target);
+        FileFooter::sWrite(&file);
 
-        target.close();
+        file.close();
     } else {
         RuntimeThrow("Could not open file for writing " + path + ".");
     }

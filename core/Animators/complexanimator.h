@@ -13,6 +13,10 @@ protected:
     ComplexAnimator(const QString& name);
     void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
 public:
+
+    void writeProperty(QIODevice * const dst) const = 0;
+    void readProperty(QIODevice * const src) = 0;
+
 //    ~ComplexAnimator();
     stdsptr<Key> readKey(QIODevice *target) final {
         Q_UNUSED(target);
@@ -60,28 +64,15 @@ public:
 
     void anim_setRecording(const bool rec);
     virtual void ca_childAnimatorIsRecordingChanged();
-public:
-    void ca_addChildAnimator(const qsptr<Property> &childAnimator) {
-        ca_addChildAnimator(childAnimator, ca_getNumberOfChildren());
-    }
-    void ca_addChildAnimator(const qsptr<Property> &childAnimator,
-                             const int id);
-    void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
-    template <class T>
-    qsptr<T> ca_takeChildAnimator(Property * const prop) {
-        const auto prpSPtr = GetAsSPtrTemplated(prop, T);
-        ca_removeChildAnimator(prpSPtr);
-        return prpSPtr;
-    }
+
     void ca_swapChildAnimators(Property * const animator1,
                                Property * const animator2);
     void ca_moveChildInList(Property *child, const int to);
     void ca_moveChildInList(Property *child, const int from, const int to);
     void ca_moveChildBelow(Property *move, Property *below);
-    void ca_moveChildAbove(Property *move, Property *above);    
+    void ca_moveChildAbove(Property *move, Property *above);
 
     bool hasChildAnimators() const;
-
 
     void ca_changeChildAnimatorZ(const int oldIndex, const int newIndex);
     int ca_getNumberOfChildren() const;
@@ -91,13 +82,6 @@ public:
         if(i < 0 || i >= ca_getNumberOfChildren())
             RuntimeThrow("Index outside of range");
         return static_cast<T*>(ca_mChildAnimators.at(i).data());
-    }
-
-    template <typename T = Property>
-    qsptr<T> ca_takeChildAt(const int i) {
-        if(i < 0 || i >= ca_getNumberOfChildren())
-            RuntimeThrow("Index outside of range");
-        return GetAsSPtrTemplated(ca_mChildAnimators.takeAt(i), T);
     }
 
     int getChildPropertyIndex(Property * const child);
@@ -123,17 +107,32 @@ public:
         mPropertyGUI = prop;
     }
 
+    void ca_addDescendantsKey(Key * const key);
+    void ca_removeDescendantsKey(Key * const key);
+protected:
+    void ca_addChildAnimator(const qsptr<Property> &childAnimator) {
+        ca_addChildAnimator(childAnimator, ca_getNumberOfChildren());
+    }
+    void ca_addChildAnimator(const qsptr<Property> &childAnimator,
+                             const int id);
+    void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
+
+    template <typename T = Property>
+    qsptr<T> ca_takeChildAt(const int i) {
+        if(i < 0 || i >= ca_getNumberOfChildren())
+            RuntimeThrow("Index outside of range");
+        return GetAsSPtrTemplated(ca_mChildAnimators.takeAt(i), T);
+    }
+
     void ca_prependChildAnimator(Property *childAnimator,
                                  const qsptr<Property>& prependWith);
     void ca_replaceChildAnimator(const qsptr<Property> &childAnimator,
                                  const qsptr<Property>& replaceWith);
 
-    void ca_addDescendantsKey(Key * const key);
-    void ca_removeDescendantsKey(Key * const key);
-protected:
+    QList<qsptr<Property>> ca_mChildAnimators;
+private:
     qptr<Property> mPropertyGUI;
     bool ca_mChildAnimatorRecording = false;
-    QList<qsptr<Property>> ca_mChildAnimators;
 };
 
 class ComplexKey : public Key {

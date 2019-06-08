@@ -44,7 +44,9 @@ CONFIG(debug, debug|release) {
 LIBS += -lskia
 
 SOURCES += \
+    Animators/dynamiccomplexanimator.cpp \
     Animators/qrealsnapshot.cpp \
+    Animators/staticcomplexanimator.cpp \
     PathEffects/custompatheffect.cpp \
     randomgrid.cpp \
     smartPointers/stdpointer.cpp \
@@ -135,7 +137,9 @@ SOURCES += \
     MovablePoints/brushpolypoint.cpp
 
 HEADERS += \
+    Animators/dynamiccomplexanimator.h \
     Animators/qrealsnapshot.h \
+    Animators/staticcomplexanimator.h \
     PathEffects/custompatheffect.h \
     core_global.h \
     randomgrid.h \
