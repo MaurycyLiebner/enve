@@ -1,6 +1,6 @@
 ﻿#ifndef SINGLESOUND_H
 #define SINGLESOUND_H
-#include "Animators/complexanimator.h"
+#include "Animators/staticcomplexanimator.h"
 #include "Animators/qrealanimator.h"
 class FixedLenAnimationRect;
 class SoundCacheHandler;
@@ -8,7 +8,7 @@ class Samples;
 class SoundReaderForMerger;
 class HDDCachableCacheHandler;
 
-class SingleSound : public ComplexAnimator {
+class SingleSound : public StaticComplexAnimator {
     friend class SelfRef;
 protected:
     SingleSound(const qsptr<FixedLenAnimationRect> &durRect = nullptr);

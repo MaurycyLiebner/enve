@@ -6,7 +6,7 @@
 #include "CacheHandlers/soundcachehandler.h"
 
 SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
-    ComplexAnimator("sound") {
+    StaticComplexAnimator("sound") {
     mOwnDurationRectangle = !durRect;
     if(mOwnDurationRectangle) {
         mDurationRectangle = SPtrCreate(FixedLenAnimationRect)(this);
@@ -227,14 +227,14 @@ FrameRange SingleSound::prp_relInfluenceRange() const {
 
 #include "basicreadwrite.h"
 void SingleSound::writeProperty(QIODevice * const target) const {
+    StaticComplexAnimator::writeProperty(target);
     const auto filePath = mCacheHandler ? mCacheHandler->getFilePath() : "";
     gWrite(target, filePath);
-    mVolumeAnimator->writeProperty(target);
     mDurationRectangle->writeDurationRectangle(target);
 }
 
 void SingleSound::readProperty(QIODevice * const target) {
+    StaticComplexAnimator::readProperty(target);
     const QString filePath = gReadString(target);
-    mVolumeAnimator->readProperty(target);
     mDurationRectangle->readDurationRectangle(target);
 }

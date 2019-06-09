@@ -4,7 +4,7 @@
 #include "Boxes/pathbox.h"
 
 GradientPoints::GradientPoints(PathBox * const parent) :
-    ComplexAnimator("gradient points"), mParent_k(parent) {
+    StaticComplexAnimator("gradient points"), mParent_k(parent) {
 
     setPointsHandler(SPtrCreate(PointsHandler)());
 

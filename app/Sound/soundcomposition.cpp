@@ -174,20 +174,15 @@ qint64 SoundComposition::writeData(const char *data, qint64 len) {
 
 #include "basicreadwrite.h"
 void SoundComposition::writeSounds(QIODevice * const target) const {
-    const int soundCount = mSoundsContainer->ca_getNumberOfChildren();
-    target->write(rcConstChar(&soundCount), sizeof(int));
-    for(int i = 0; i < soundCount; i++) {
-        const auto iSound = mSoundsContainer->ca_getChildAt<SingleSound>(i);
-        iSound->writeProperty(target);
-    }
+    mSoundsContainer->writeProperty(target);
 }
 
 void SoundComposition::readSounds(QIODevice * const target) {
-    int soundCount;
-    target->read(rcChar(&soundCount), sizeof(int));
-    for(int i = 0; i < soundCount; i++) {
-        const auto iSound = SPtrCreate(SingleSound)();
-        iSound->readProperty(target);
-        addSoundAnimator(iSound);
+    const int oldSoundCount = mSoundsContainer->ca_getNumberOfChildren();
+    mSoundsContainer->readProperty(target);
+    const int soundCount = mSoundsContainer->ca_getNumberOfChildren();
+    for(int i = oldSoundCount; i < soundCount; i++) {
+        const auto iSound = mSoundsContainer->ca_getChildAt<SingleSound>(i);
+        addSoundAnimator(GetAsSPtr(iSound, SingleSound));
     }
 }

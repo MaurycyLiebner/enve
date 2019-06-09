@@ -166,7 +166,7 @@ private:
     SkPoint mLastVel;
 };
 
-class ParticleEmitter : public ComplexAnimator {
+class ParticleEmitter : public StaticComplexAnimator {
 public:
     ParticleEmitter(ParticleBox *parentBox);
 

@@ -30,12 +30,10 @@ public:
 
     void writeBoundingBox(QIODevice * const target) {
         BoundingBox::writeBoundingBox(target);
-        mBoxTarget->writeProperty(target);
     }
 
     void readBoundingBox(QIODevice * const target) {
         BoundingBox::readBoundingBox(target);
-        mBoxTarget->readProperty(target);
     }
 
     void setLinkTarget(BoundingBox * const linkTarget) {

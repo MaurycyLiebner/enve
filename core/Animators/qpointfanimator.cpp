@@ -2,7 +2,7 @@
 #include "Animators/qrealanimator.h"
 
 QPointFAnimator::QPointFAnimator(const QString &name) :
-    ComplexAnimator(name) {
+    StaticComplexAnimator(name) {
     mXAnimator = SPtrCreate(QrealAnimator)("x");
     mYAnimator = SPtrCreate(QrealAnimator)("y");
     ca_addChildAnimator(mXAnimator);

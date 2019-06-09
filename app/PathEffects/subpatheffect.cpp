@@ -101,15 +101,3 @@ void SubPathEffect::apply(const qreal relFrame, const SkPath &src,
 
     *dst = result;
 }
-
-void SubPathEffect::writeProperty(QIODevice * const dst) const {
-    PathEffect::writeProperty(dst);
-    mMin->writeProperty(dst);
-    mMax->writeProperty(dst);
-}
-
-void SubPathEffect::readProperty(QIODevice * const src) {
-    PathEffect::readProperty(src);
-    mMin->readProperty(src);
-    mMax->readProperty(src);
-}

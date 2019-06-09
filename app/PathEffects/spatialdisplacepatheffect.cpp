@@ -55,21 +55,3 @@ void SpatialDisplacePathEffect::apply(const qreal relFrame,
                                    dst, src, maxDev);
     }
 }
-
-void SpatialDisplacePathEffect::writeProperty(QIODevice * const dst) const {
-    PathEffect::writeProperty(dst);
-    mMaxDev->writeProperty(dst);
-    mLengthBased->writeProperty(dst);
-    mSeed->writeProperty(dst);
-    mSegLength->writeProperty(dst);
-    mSmoothness->writeProperty(dst);
-}
-
-void SpatialDisplacePathEffect::readProperty(QIODevice * const src) {
-    PathEffect::readProperty(src);
-    mMaxDev->readProperty(src);
-    mLengthBased->readProperty(src);
-    mSeed->readProperty(src);
-    mSegLength->readProperty(src);
-    mSmoothness->readProperty(src);
-}

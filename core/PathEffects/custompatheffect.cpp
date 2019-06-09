@@ -1,23 +1,17 @@
 #include "custompatheffect.h"
 #include "basicreadwrite.h"
 CustomPathEffect::CustomPathEffect(const QString &name) :
-    PathEffect(name, CUSTOM_PATH_EFFECT) {
+    PathEffect(name, CUSTOM_PATH_EFFECT) {}
 
-}
-
-void CustomPathEffect::writeProperty(QIODevice * const target) const {
-    PathEffect::writeProperty(target);
+void CustomPathEffect::writeIdentifier(QIODevice * const dst) const {
     const auto identifier = getIdentifier();
     const int size = identifier.size();
-    target->write(rcConstChar(&size), sizeof(int));
-    target->write(identifier);
-    write(target);
+    dst->write(rcConstChar(&size), sizeof(int));
+    dst->write(identifier);
 }
 
-void CustomPathEffect::readProperty(QIODevice * const src) {
-    PathEffect::readProperty(src);
+QByteArray CustomPathEffect::sReadIdentifier(QIODevice * const src) {
     int size;
     src->read(rcChar(&size), sizeof(int));
-    const QByteArray identifier = src->read(size);
-    read(identifier, src);
+    return src->read(size);
 }

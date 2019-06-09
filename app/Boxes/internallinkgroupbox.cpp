@@ -17,11 +17,11 @@ InternalLinkGroupBox::~InternalLinkGroupBox() {
 }
 
 void InternalLinkGroupBox::writeBoundingBox(QIODevice * const target) {
-    mBoxTarget->writeProperty(target);
+    BoundingBox::writeBoundingBox(target);
 }
 
 void InternalLinkGroupBox::readBoundingBox(QIODevice * const target) {
-    mBoxTarget->readProperty(target);
+    BoundingBox::readBoundingBox(target);
 }
 
 //bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) {

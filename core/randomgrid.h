@@ -1,9 +1,9 @@
 #ifndef RANDOMGRID_H
 #define RANDOMGRID_H
-#include "Animators/complexanimator.h"
+#include "Animators/staticcomplexanimator.h"
 #include "Animators/intanimator.h"
 
-class RandomGrid : public ComplexAnimator {
+class RandomGrid : public StaticComplexAnimator {
     friend class SelfRef;
 protected:
     RandomGrid();
@@ -18,9 +18,6 @@ public:
     static qreal sGetRandomValue(const qreal min, const qreal max,
                                  const qreal baseSeed, const qreal gridSize,
                                  const QPointF& pos);
-
-    void writeProperty(QIODevice * const dst) const;
-    void readProperty(QIODevice * const src);
 private:
     static qreal sGetRandomValue(const qreal baseSeed, const QPoint& gridId);
 

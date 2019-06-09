@@ -1,13 +1,13 @@
 #ifndef GRADIENTPOINTS_H
 #define GRADIENTPOINTS_H
-#include "Animators/complexanimator.h"
+#include "Animators/staticcomplexanimator.h"
 class GradientPoint;
 class MovablePoint;
 class PathBox;
 class QPointFAnimator;
 #include "skia/skiaincludes.h"
 
-class GradientPoints : public ComplexAnimator {
+class GradientPoints : public StaticComplexAnimator {
     friend class SelfRef;
 protected:
     GradientPoints(PathBox * const parent);

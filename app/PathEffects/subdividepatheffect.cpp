@@ -17,13 +17,3 @@ void SubdividePathEffect::apply(const qreal relFrame,
         dst->addPath(list.toSkPath());
     }
 }
-
-void SubdividePathEffect::writeProperty(QIODevice * const dst) const {
-    PathEffect::writeProperty(dst);
-    mCount->writeProperty(dst);
-}
-
-void SubdividePathEffect::readProperty(QIODevice * const src) {
-    PathEffect::readProperty(src);
-    mCount->readProperty(src);
-}

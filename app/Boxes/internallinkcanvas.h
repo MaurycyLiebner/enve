@@ -8,9 +8,6 @@ class InternalLinkCanvas : public InternalLinkGroupBox {
 protected:
     InternalLinkCanvas(ContainerBox * const linkTarget);
 public:
-    void writeBoundingBox(QIODevice * const target);
-    void readBoundingBox(QIODevice * const target);
-
     void setupRenderData(const qreal relFrame,
                          BoundingBoxRenderData * const data);
 

@@ -1,9 +1,9 @@
 #ifndef QPOINTFANIMATOR_H
 #define QPOINTFANIMATOR_H
-#include "Animators/complexanimator.h"
+#include "Animators/staticcomplexanimator.h"
 #include "skia/skiaincludes.h"
 
-class QPointFAnimator : public ComplexAnimator {
+class QPointFAnimator : public StaticComplexAnimator {
     friend class SelfRef;
 protected:
     QPointFAnimator(const QString& name);

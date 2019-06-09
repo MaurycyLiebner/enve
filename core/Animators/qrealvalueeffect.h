@@ -1,8 +1,8 @@
 #ifndef QREALVALUEEFFECT_H
 #define QREALVALUEEFFECT_H
-#include "Animators/complexanimator.h"
+#include "Animators/staticcomplexanimator.h"
 
-class QrealValueEffect : public ComplexAnimator {
+class QrealValueEffect : public StaticComplexAnimator {
 public:
     virtual qreal getDevAtRelFrame(const qreal relFrame) = 0;
 

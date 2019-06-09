@@ -245,7 +245,7 @@ bool Particle::getParticleStateAtFrameF(const qreal frame,
 }
 
 ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
-    ComplexAnimator("particle emitter") {
+    StaticComplexAnimator("particle emitter") {
     setParentBox(parentBox);
 
     mPosPoint = SPtrCreate(AnimatedPoint)(

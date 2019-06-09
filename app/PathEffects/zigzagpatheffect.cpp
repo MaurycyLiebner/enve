@@ -65,15 +65,3 @@ void ZigZagPathEffect::apply(const qreal relFrame, const SkPath &src,
         prevLines = currLines;
     }
 }
-
-void ZigZagPathEffect::writeProperty(QIODevice * const dst) const {
-    PathEffect::writeProperty(dst);
-    mAngle->writeProperty(dst);
-    mDistance->writeProperty(dst);
-}
-
-void ZigZagPathEffect::readProperty(QIODevice * const src) {
-    PathEffect::readProperty(src);
-    mAngle->readProperty(src);
-    mDistance->readProperty(src);
-}

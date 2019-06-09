@@ -1,6 +1,6 @@
 #ifndef GPURASTEREFFECT_H
 #define GPURASTEREFFECT_H
-#include "Animators/complexanimator.h"
+#include "Animators/staticcomplexanimator.h"
 #include "gpurastereffectcreator.h"
 class GPUEffectAnimators;
 
@@ -32,7 +32,7 @@ private:
     const UniformSpecifiers mUniformSpecifiers;
 };
 
-class GPURasterEffect : public ComplexAnimator {
+class GPURasterEffect : public StaticComplexAnimator {
     friend class SelfRef;
     GPURasterEffect(const GPURasterEffectCreator * const creator,
                     const GPURasterEffectProgram * const program,
@@ -41,9 +41,6 @@ class GPURasterEffect : public ComplexAnimator {
 public:
     virtual qreal getMargin() { return 0; }
     virtual qreal getMarginAtRelFrame(const int ) { return 0; }
-
-    void writeProperty(QIODevice * const dst) const;
-    void readProperty(QIODevice * const src);
 
     void writeIdentifier(QIODevice * const dst) const;
 
