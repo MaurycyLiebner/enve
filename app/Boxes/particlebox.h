@@ -189,9 +189,6 @@ public:
     EmitterData getEmitterDataAtRelFrameF(
             const qreal relFrame,
             const stdsptr<ParticleBoxRenderData>& particleData);
-
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice * const src);
 private:
     bool mGenerateParticlesScheduled = false;
     bool mUpdateParticlesForFrameScheduled = false;
@@ -296,8 +293,6 @@ public:
     void removeEmitter(const qsptr<ParticleEmitter> &emitter);
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
-    void writeBoundingBox(QIODevice * const target);
-    void readBoundingBox(QIODevice * const target);
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:

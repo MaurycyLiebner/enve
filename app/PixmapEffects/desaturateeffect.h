@@ -15,15 +15,13 @@ protected:
 
 class DesaturateEffect : public PixmapEffect {
     friend class SelfRef;
+protected:
+    DesaturateEffect();
 public:
-    qreal getMargin() { return 0.; }
+    qreal getMargin() { return 0; }
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData*);
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice * const src);
-protected:
-    DesaturateEffect();
 private:
     qsptr<QrealAnimator> mInfluenceAnimator;
 };

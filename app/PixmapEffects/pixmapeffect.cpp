@@ -4,7 +4,7 @@
 
 PixmapEffect::PixmapEffect(const QString &name,
                            const PixmapEffectType type) :
-    ComplexAnimator(name), mType(type) {}
+    StaticComplexAnimator(name), mType(type) {}
 
 EffectAnimators *PixmapEffect::getParentEffectAnimators() {
     return static_cast<EffectAnimators*>(mParent.data());

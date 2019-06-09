@@ -1,7 +1,7 @@
 #ifndef TRANSFORMANIMATOR_H
 #define TRANSFORMANIMATOR_H
 #include <QMatrix>
-#include "Animators/complexanimator.h"
+#include "Animators/staticcomplexanimator.h"
 #include "skia/skiaincludes.h"
 
 class TransformUpdater;
@@ -9,7 +9,7 @@ class BoxPathPoint;
 class MovablePoint;
 class QPointFAnimator;
 
-class BasicTransformAnimator : public ComplexAnimator {
+class BasicTransformAnimator : public StaticComplexAnimator {
     Q_OBJECT
     friend class SeflRef;
 protected:
@@ -21,9 +21,6 @@ public:
     virtual QMatrix getTotalTransformAtRelFrameF(const qreal relFrame);
 
     bool SWT_isBasicTransformAnimator() const;
-
-    void writeProperty(QIODevice * const dst) const;
-    void readProperty(QIODevice * const src);
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const {
         if(mParentTransform) {
@@ -121,8 +118,6 @@ public:
     QMatrix getRelativeTransform(const qreal relFrame);
 
     bool SWT_isBoxTransformAnimator() const { return true; }
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice * const src);
 
     void resetPivot();
     void setPivotFixedTransform(const QPointF &point);

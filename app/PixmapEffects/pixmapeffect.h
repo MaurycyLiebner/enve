@@ -1,7 +1,7 @@
 #ifndef PIXMAPEFFECT_H
 #define PIXMAPEFFECT_H
 #include "skia/skiaincludes.h"
-#include "Animators/dynamiccomplexanimator.h"
+#include "Animators/staticcomplexanimator.h"
 #include <QMimeData>
 #include <QPointF>
 class EffectAnimators;
@@ -35,7 +35,7 @@ enum PixmapEffectType : short {
     EFFECT_MOTION_BLUR
 };
 
-class PixmapEffect : public ComplexAnimator {
+class PixmapEffect : public StaticComplexAnimator {
     friend class SelfRef;
 protected:
     PixmapEffect(const QString& name, const PixmapEffectType type);

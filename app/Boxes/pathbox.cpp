@@ -28,6 +28,12 @@ PathBox::PathBox(const BoundingBoxType &type) :
     mFillPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(NodePointUpdater)(this));
 
+    mOutlineBasePathEffectsAnimators =
+            SPtrCreate(PathEffectAnimators)(this);
+    mOutlineBasePathEffectsAnimators->prp_setName("outline base effects");
+    mOutlineBasePathEffectsAnimators->prp_setOwnUpdater(
+                SPtrCreate(NodePointUpdater)(this));
+
     mOutlinePathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)(this);
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
@@ -59,6 +65,7 @@ PathBox::PathBox(const BoundingBoxType &type) :
 
     ca_addChildAnimator(mPathEffectsAnimators);
     ca_addChildAnimator(mFillPathEffectsAnimators);
+    ca_addChildAnimator(mOutlineBasePathEffectsAnimators);
     ca_addChildAnimator(mOutlinePathEffectsAnimators);
 
     ca_moveChildBelow(mEffectsAnimators.data(),
@@ -92,6 +99,16 @@ void PathBox::setFillEffectsEnabled(const bool enable) {
 
 bool PathBox::getFillEffectsEnabled() const {
     return mFillPathEffectsAnimators->SWT_isEnabled();
+}
+
+void PathBox::setOutlineBaseEffectsEnabled(const bool enable) {
+    mOutlinePathEffectsAnimators->SWT_setEnabled(enable);
+    mOutlinePathEffectsAnimators->SWT_setVisible(
+                mOutlinePathEffectsAnimators->hasChildAnimators() || enable);
+}
+
+bool PathBox::getOutlineBaseEffectsEnabled() const {
+    return mOutlinePathEffectsAnimators->SWT_isEnabled();
 }
 
 void PathBox::setOutlineEffectsEnabled(const bool enable) {
@@ -472,6 +489,8 @@ bool PathBox::differenceInPathBetweenFrames(const int frame1, const int frame2) 
 bool PathBox::differenceInOutlinePathBetweenFrames(const int frame1, const int frame2) const {
     if(mStrokeSettings->getLineWidthAnimator()->
        prp_differencesBetweenRelFrames(frame1, frame2)) return true;
+    if(mOutlineBasePathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
+        return true;
     if(mOutlinePathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
         return true;
     if(!mParentGroup) return false;

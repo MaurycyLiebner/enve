@@ -1,11 +1,11 @@
 #ifndef COLORANIMATOR_H
 #define COLORANIMATOR_H
 
-#include "Animators/complexanimator.h"
+#include "Animators/staticcomplexanimator.h"
 #include "colorhelpers.h"
 #include "Animators/qrealanimator.h"
 
-class ColorAnimator : public ComplexAnimator {
+class ColorAnimator : public StaticComplexAnimator {
     Q_OBJECT
     friend class SelfRef;
 protected:

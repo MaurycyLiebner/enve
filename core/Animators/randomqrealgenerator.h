@@ -13,9 +13,6 @@ public:
     qreal getDevAtRelFrame(const qreal relFrame);
     void anim_setAbsFrame(const int frame);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
-
-    void writeProperty(QIODevice * const device) const;
-    void readProperty(QIODevice * const src);
 private:
     qsptr<QrealAnimator> mTime;
     qsptr<QrealAnimator> mSmoothness;

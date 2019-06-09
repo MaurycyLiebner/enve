@@ -16,6 +16,8 @@ public:
 
 class BlurEffect : public PixmapEffect {
     friend class SelfRef;
+protected:
+    BlurEffect();
 public:
     qreal getMargin();
     qreal getMarginAtRelFrame(const int relFrame);
@@ -23,10 +25,6 @@ public:
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData* );
-    void readProperty(QIODevice * const src);
-    void writeProperty(QIODevice * const target) const;
-protected:
-    BlurEffect();
 private:
     qsptr<QrealAnimator> mBlurRadius;
 };

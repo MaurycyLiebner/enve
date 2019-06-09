@@ -1,6 +1,6 @@
 #include "brushsettings.h"
 
-BrushSettings::BrushSettings() : ComplexAnimator("brush settings") {
+BrushSettings::BrushSettings() : StaticComplexAnimator("brush settings") {
     ca_addChildAnimator(mWidthCurve);
     ca_addChildAnimator(mPressureCurve);
     ca_addChildAnimator(mSpacingCurve);

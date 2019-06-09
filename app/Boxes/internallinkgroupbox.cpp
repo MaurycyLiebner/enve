@@ -31,6 +31,7 @@ void InternalLinkGroupBox::readBoundingBox(QIODevice * const target) {
 FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(
         const int relFrame) const {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
+    if(!getLinkTarget()) return range;
     if(mVisible) {
         if(isFrameInDurationRect(relFrame)) {
             range *= BoundingBox::prp_getIdenticalRelRange(relFrame);
@@ -42,7 +43,6 @@ FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(
             }
         }
     }
-    if(!getLinkTarget()) return range;
     auto targetRange = getLinkTarget()->prp_getIdenticalRelRange(relFrame);
 
     return range*targetRange;

@@ -25,15 +25,13 @@ private:
 
 class ReplaceColorEffect : public PixmapEffect {
     friend class SelfRef;
+protected:
+    ReplaceColorEffect();
 public:
-    qreal getMargin() { return 0.; }
+    qreal getMargin() { return 0; }
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData*);
-    void readProperty(QIODevice * const src);
-    void writeProperty(QIODevice * const target) const;
-protected:
-    ReplaceColorEffect();
 private:
     qsptr<ColorAnimator> mFromColor;
     qsptr<ColorAnimator> mToColor;

@@ -121,8 +121,6 @@ public:
     virtual SkPath getPathAtRelFrameF(const qreal relFrame) = 0;
     void setParentGroup(ContainerBox * const parent);
 
-    void writeBoundingBox(QIODevice * const target);
-    void readBoundingBox(QIODevice * const target);
     void addPathEffect(const qsptr<PathEffect> &effect);
     void addFillPathEffect(const qsptr<PathEffect> &effect);
     void addOutlineBasePathEffect(const qsptr<PathEffect> &effect);
@@ -221,15 +219,24 @@ public:
     void setFillEffectsEnabled(const bool enable);
     bool getFillEffectsEnabled() const;
 
+    void setOutlineBaseEffectsEnabled(const bool enable);
+    bool getOutlineBaseEffectsEnabled() const;
+
     void setOutlineEffectsEnabled(const bool enable);
     bool getOutlineEffectsEnabled() const;
 
     PathEffectAnimators *getPathEffectsAnimators() {
         return mPathEffectsAnimators.data();
     }
+
     PathEffectAnimators *getFillPathEffectsAnimators() {
         return mFillPathEffectsAnimators.data();
     }
+
+    PathEffectAnimators *getOutlineBasrPathEffectsAnimators() {
+        return mOutlineBasePathEffectsAnimators.data();
+    }
+
     PathEffectAnimators *getOutlinePathEffectsAnimators() {
         return mOutlinePathEffectsAnimators.data();
     }

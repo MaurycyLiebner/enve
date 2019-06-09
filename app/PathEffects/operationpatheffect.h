@@ -13,9 +13,6 @@ public:
                const SkPath &src,
                SkPath * const dst);
 
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice * const src);
-
     bool hasReasonsNotToApplyUglyTransform() {
         return true;//mBoxTarget->getTarget() != nullptr;
     }

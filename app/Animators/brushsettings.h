@@ -1,10 +1,10 @@
 #ifndef BRUSHSETTINGS_H
 #define BRUSHSETTINGS_H
-#include "Animators/complexanimator.h"
+#include "Animators/staticcomplexanimator.h"
 #include "Animators/qcubicsegment1danimator.h"
 #include "GUI/BrushWidgets/simplebrushwrapper.h"
 
-class BrushSettings : public ComplexAnimator {
+class BrushSettings : public StaticComplexAnimator {
 public:
     BrushSettings();
 

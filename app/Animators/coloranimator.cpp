@@ -2,7 +2,7 @@
 #include "colorhelpers.h"
 #include "pointtypemenu.h"
 
-ColorAnimator::ColorAnimator(const QString &name) : ComplexAnimator(name) {
+ColorAnimator::ColorAnimator(const QString &name) : StaticComplexAnimator(name) {
     setColorMode(RGBMODE);
 
     ca_addChildAnimator(mVal1Animator);

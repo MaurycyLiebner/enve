@@ -1,7 +1,7 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
 
-#include "Animators/complexanimator.h"
+#include "Animators/staticcomplexanimator.h"
 #include "boundingboxrendercontainer.h"
 #include "skia/skiaincludes.h"
 #include "renderdatahandler.h"
@@ -60,11 +60,11 @@ class BoundingBox;
 template<typename T> class TypeMenu;
 typedef TypeMenu<BoundingBox> BoxTypeMenu;
 
-class BoundingBox : public ComplexAnimator {
+class BoundingBox : public StaticComplexAnimator {
     Q_OBJECT
     friend class SelfRef;
 protected:
-    BoundingBox(const BoundingBoxType &type);
+    BoundingBox(const BoundingBoxType type);
 public:
     ~BoundingBox();
 

@@ -131,10 +131,6 @@ void QrealKey::readKey(QIODevice * const src) {
 void QrealAnimator::writeProperty(QIODevice * const dst) const {
     writeKeys(dst);
     dst->write(rcConstChar(&mCurrentBaseValue), sizeof(qreal));
-
-    const bool hasRandomGenerator = !mRandomGenerator.isNull();
-    dst->write(rcConstChar(&hasRandomGenerator), sizeof(bool));
-    if(hasRandomGenerator) mRandomGenerator->writeProperty(dst);
 }
 
 stdsptr<Key> QrealAnimator::readKey(QIODevice * const src) {
@@ -143,60 +139,23 @@ stdsptr<Key> QrealAnimator::readKey(QIODevice * const src) {
     return std::move(newKey);
 }
 
-void RandomQrealGenerator::writeProperty(QIODevice * const target) const {
-    mTime->writeProperty(target);
-    mSmoothness->writeProperty(target);
-    mMaxDev->writeProperty(target);
-    mType->writeProperty(target);
-}
-
-void RandomQrealGenerator::readProperty(QIODevice * const src) {
-    mTime->readProperty(src);
-    mSmoothness->readProperty(src);
-    mMaxDev->readProperty(src);
-    mType->readProperty(src);
-}
-
 void QrealAnimator::readProperty(QIODevice * const src) {
     readKeys(src);
 
     qreal val;
     src->read(rcChar(&val), sizeof(qreal));
     setCurrentBaseValue(val);
-    bool hasRandomGenerator;
-    src->read(rcChar(&hasRandomGenerator), sizeof(bool));
-    if(hasRandomGenerator) {
-        auto generator = SPtrCreate(RandomQrealGenerator)();
-        generator->readProperty(src);
-        setGenerator(generator);
-    }
-}
-
-void QPointFAnimator::writeProperty(QIODevice * const target) const {
-    mXAnimator->writeProperty(target);
-    mYAnimator->writeProperty(target);
-}
-
-void QPointFAnimator::readProperty(QIODevice * const src) {
-    mXAnimator->readProperty(src);
-    mYAnimator->readProperty(src);
 }
 
 void ColorAnimator::writeProperty(QIODevice * const dst) const {
+    StaticComplexAnimator::writeProperty(dst);
     dst->write(rcConstChar(&mColorMode), sizeof(ColorMode));
-    mVal1Animator->writeProperty(dst);
-    mVal2Animator->writeProperty(dst);
-    mVal3Animator->writeProperty(dst);
-    mAlphaAnimator->writeProperty(dst);
 }
 
 void ColorAnimator::readProperty(QIODevice * const src) {
+    StaticComplexAnimator::readProperty(src);
     src->read(rcChar(&mColorMode), sizeof(ColorMode));
     setColorMode(mColorMode);
-    mVal1Animator->readProperty(src);
-    mVal2Animator->readProperty(src);
-    mVal3Animator->readProperty(src);
-    mAlphaAnimator->readProperty(src);
 }
 
 void PixmapEffect::writeIdentifier(QIODevice * const dst) const {
@@ -204,153 +163,13 @@ void PixmapEffect::writeIdentifier(QIODevice * const dst) const {
 }
 
 void PixmapEffect::writeProperty(QIODevice * const dst) const {
+    StaticComplexAnimator::writeProperty(dst);
     dst->write(rcConstChar(&mVisible), sizeof(bool));
 }
 
 void PixmapEffect::readProperty(QIODevice * const src) {
+    StaticComplexAnimator::readProperty(src);
     src->read(rcChar(&mVisible), sizeof(bool));
-}
-
-void BlurEffect::readProperty(QIODevice * const src) {
-    PixmapEffect::readProperty(src);
-    mBlurRadius->readProperty(src);
-}
-
-void BlurEffect::writeProperty(QIODevice * const dst) const {
-    PixmapEffect::writeProperty(dst);
-    mBlurRadius->writeProperty(dst);
-}
-
-void ShadowEffect::readProperty(QIODevice * const src) {
-    PixmapEffect::readProperty(src);
-    mBlurRadius->readProperty(src);
-    mOpacity->readProperty(src);
-    mColor->readProperty(src);
-    mTranslation->readProperty(src);
-}
-
-void ShadowEffect::writeProperty(QIODevice * const dst) const {
-    PixmapEffect::writeProperty(dst);
-    mBlurRadius->writeProperty(dst);
-    mOpacity->writeProperty(dst);
-    mColor->writeProperty(dst);
-    mTranslation->writeProperty(dst);
-}
-
-void DesaturateEffect::readProperty(QIODevice * const src) {
-    PixmapEffect::readProperty(src);
-    mInfluenceAnimator->readProperty(src);
-}
-
-void DesaturateEffect::writeProperty(QIODevice * const dst) const {
-    PixmapEffect::writeProperty(dst);
-    mInfluenceAnimator->writeProperty(dst);
-}
-
-void ColorizeEffect::readProperty(QIODevice * const src) {
-    PixmapEffect::readProperty(src);
-    mHueAnimator->readProperty(src);
-    mSaturationAnimator->readProperty(src);
-    mLightnessAnimator->readProperty(src);
-    mAlphaAnimator->readProperty(src);
-}
-
-void ColorizeEffect::writeProperty(QIODevice * const dst) const {
-    PixmapEffect::writeProperty(dst);
-    mHueAnimator->writeProperty(dst);
-    mSaturationAnimator->writeProperty(dst);
-    mLightnessAnimator->writeProperty(dst);
-    mAlphaAnimator->writeProperty(dst);
-}
-
-void ReplaceColorEffect::readProperty(QIODevice * const src) {
-    PixmapEffect::readProperty(src);
-    mFromColor->readProperty(src);
-    mToColor->readProperty(src);
-    mToleranceAnimator->readProperty(src);
-    mSmoothnessAnimator->readProperty(src);
-}
-
-void ReplaceColorEffect::writeProperty(QIODevice * const target) const {
-    PixmapEffect::writeProperty(target);
-    mFromColor->writeProperty(target);
-    mToColor->writeProperty(target);
-    mToleranceAnimator->writeProperty(target);
-    mSmoothnessAnimator->writeProperty(target);
-}
-
-void ContrastEffect::readProperty(QIODevice * const src) {
-    PixmapEffect::readProperty(src);
-    mContrastAnimator->readProperty(src);
-}
-
-void ContrastEffect::writeProperty(QIODevice * const dst) const {
-    PixmapEffect::writeProperty(dst);
-    mContrastAnimator->writeProperty(dst);
-}
-
-void BrightnessEffect::readProperty(QIODevice * const src) {
-    PixmapEffect::readProperty(src);
-    mBrightnessAnimator->readProperty(src);
-}
-
-void BrightnessEffect::writeProperty(QIODevice * const dst) const {
-    PixmapEffect::writeProperty(dst);
-    mBrightnessAnimator->writeProperty(dst);
-}
-
-void SampledMotionBlurEffect::readProperty(QIODevice * const src) {
-    PixmapEffect::readProperty(src);
-    mOpacity->readProperty(src);
-    mNumberSamples->readProperty(src);
-    mFrameStep->readProperty(src);
-}
-
-void SampledMotionBlurEffect::writeProperty(QIODevice * const dst) const {
-    PixmapEffect::writeProperty(dst);
-    mOpacity->writeProperty(dst);
-    mNumberSamples->writeProperty(dst);
-    mFrameStep->writeProperty(dst);
-}
-
-void BasicTransformAnimator::writeProperty(QIODevice * const dst) const {
-    mPosAnimator->writeProperty(dst);
-    mScaleAnimator->writeProperty(dst);
-    mRotAnimator->writeProperty(dst);
-}
-
-void BasicTransformAnimator::readProperty(QIODevice * const src) {
-    mPosAnimator->readProperty(src);
-    mScaleAnimator->readProperty(src);
-    mRotAnimator->readProperty(src);
-    updateRelativeTransform(Animator::USER_CHANGE);
-}
-
-void BoxTransformAnimator::writeProperty(QIODevice * const target) const {
-    BasicTransformAnimator::writeProperty(target);
-    mShearAnimator->writeProperty(target);
-    mOpacityAnimator->writeProperty(target);
-    mPivotAnimator->writeProperty(target);
-}
-
-void BoxTransformAnimator::readProperty(QIODevice * const src) {
-    // pivot will be read anyway, so temporarly disable adjusting
-    BasicTransformAnimator::readProperty(src);
-    mShearAnimator->readProperty(src);
-    mOpacityAnimator->readProperty(src);
-    mPivotAnimator->readProperty(src);
-
-    updateRelativeTransform(Animator::USER_CHANGE);
-}
-
-void GradientPoints::writeProperty(QIODevice * const target) const {
-    mStartAnimator->writeProperty(target);
-    mEndAnimator->writeProperty(target);
-}
-
-void GradientPoints::readProperty(QIODevice * const src) {
-    mStartAnimator->readProperty(src);
-    mEndAnimator->readProperty(src);
 }
 
 void Gradient::writeProperty(QIODevice * const target) const {
@@ -375,19 +194,13 @@ void Gradient::readProperty(QIODevice * const src) {
 }
 
 void BrushSettings::writeProperty(QIODevice * const dst) const {
-    mWidthCurve->writeProperty(dst);
-    mPressureCurve->writeProperty(dst);
-    mSpacingCurve->writeProperty(dst);
-    mTimeCurve->writeProperty(dst);
+    StaticComplexAnimator::writeProperty(dst);
     gWrite(dst, mBrush ? mBrush->getCollectionName() : "");
     gWrite(dst, mBrush ? mBrush->getBrushName() : "");
 }
 
 void BrushSettings::readProperty(QIODevice * const src) {
-    mWidthCurve->readProperty(src);
-    mPressureCurve->readProperty(src);
-    mSpacingCurve->readProperty(src);
-    mTimeCurve->readProperty(src);
+    StaticComplexAnimator::readProperty(src);
     const QString brushCollection = gReadString(src);
     const QString brushName = gReadString(src);
     mBrush = BrushSelectionWidget::sGetBrush(brushCollection, brushName);
@@ -395,27 +208,22 @@ void BrushSettings::readProperty(QIODevice * const src) {
 
 void OutlineSettingsAnimator::writeProperty(QIODevice * const dst) const {
     PaintSettingsAnimator::writeProperty(dst);
-    mLineWidth->writeProperty(dst);
     dst->write(rcConstChar(&mCapStyle), sizeof(Qt::PenCapStyle));
     dst->write(rcConstChar(&mJoinStyle), sizeof(Qt::PenJoinStyle));
     dst->write(rcConstChar(&mOutlineCompositionMode),
                sizeof(QPainter::CompositionMode));
-    mBrushSettings->writeProperty(dst);
 }
 
 void OutlineSettingsAnimator::readProperty(QIODevice * const src) {
     PaintSettingsAnimator::readProperty(src);
-    mLineWidth->readProperty(src);
     src->read(rcChar(&mCapStyle), sizeof(Qt::PenCapStyle));
     src->read(rcChar(&mJoinStyle), sizeof(Qt::PenJoinStyle));
     src->read(rcChar(&mOutlineCompositionMode),
               sizeof(QPainter::CompositionMode));
-    mBrushSettings->readProperty(src);
 }
 
 void PaintSettingsAnimator::writeProperty(QIODevice * const dst) const {
-    mGradientPoints->writeProperty(dst);
-    mColor->writeProperty(dst);
+    StaticComplexAnimator::writeProperty(dst);
     dst->write(rcConstChar(&mPaintType), sizeof(PaintType));
     dst->write(rcConstChar(&mGradientType), sizeof(bool));
     const int gradId = mGradient ? mGradient->getLoadId() : -1;
@@ -423,8 +231,7 @@ void PaintSettingsAnimator::writeProperty(QIODevice * const dst) const {
 }
 
 void PaintSettingsAnimator::readProperty(QIODevice * const src) {
-    mGradientPoints->readProperty(src);
-    mColor->readProperty(src);
+    StaticComplexAnimator::readProperty(src);
     PaintType paintType;
     src->read(rcChar(&paintType), sizeof(PaintType));
     int gradId;
@@ -437,9 +244,9 @@ void PaintSettingsAnimator::readProperty(QIODevice * const src) {
 }
 
 void DurationRectangle::writeDurationRectangle(QIODevice *dst) {
-    int minFrame = getMinFrame();
-    int maxFrame = getMaxFrame();
-    int framePos = getFramePos();
+    const int minFrame = getMinFrame();
+    const int maxFrame = getMaxFrame();
+    const int framePos = getFramePos();
     dst->write(rcConstChar(&minFrame), sizeof(int));
     dst->write(rcConstChar(&maxFrame), sizeof(int));
     dst->write(rcConstChar(&framePos), sizeof(int));
@@ -479,6 +286,7 @@ void FixedLenAnimationRect::readDurationRectangle(QIODevice *target) {
 
 void BoundingBox::writeBoundingBox(QIODevice * const target) {
     if(mWriteId < 0) assignWriteId();
+    StaticComplexAnimator::writeProperty(target);
 
     target->write(rcConstChar(&mType), sizeof(BoundingBoxType));
     gWrite(target, prp_mName);
@@ -491,13 +299,10 @@ void BoundingBox::writeBoundingBox(QIODevice * const target) {
 
     if(hasDurRect)
         mDurationRectangle->writeDurationRectangle(target);
-
-    mTransformAnimator->writeProperty(target);
-    mEffectsAnimators->writeProperty(target);
-    mGPUEffectsAnimators->writeProperty(target);
 }
 
 void BoundingBox::readBoundingBox(QIODevice * const target) {
+    StaticComplexAnimator::readProperty(target);
     gRead(target, prp_mName);
     target->read(rcChar(&mReadId), sizeof(int));
     target->read(rcChar(&mVisible), sizeof(bool));
@@ -512,10 +317,6 @@ void BoundingBox::readBoundingBox(QIODevice * const target) {
         updateAfterDurationRectangleShifted(0);
     }
 
-    mTransformAnimator->readProperty(target);
-    mEffectsAnimators->readProperty(target);
-    mGPUEffectsAnimators->readProperty(target);
-
     if(hasDurRect) anim_shiftAllKeys(prp_getFrameShift());
 
     BoundingBox::sAddReadBox(this);
@@ -529,56 +330,6 @@ void PathEffect::readProperty(QIODevice * const src) {
     src->read(rcChar(&mVisible), sizeof(bool));
     bool tmp;
     src->read(rcChar(&tmp), sizeof(bool));
-}
-
-void DisplacePathEffect::writeProperty(QIODevice * const target) const {
-    PathEffect::writeProperty(target);
-    mSegLength->writeProperty(target);
-    mMaxDev->writeProperty(target);
-    mSmoothness->writeProperty(target);
-    mLengthBased->writeProperty(target);
-    mSeed->writeProperty(target);
-}
-
-void DisplacePathEffect::readProperty(QIODevice * const src) {
-    PathEffect::readProperty(src);
-    mSegLength->readProperty(src);
-    mMaxDev->readProperty(src);
-    mSmoothness->readProperty(src);
-    mLengthBased->readProperty(src);
-    mSeed->readProperty(src);
-}
-
-void DuplicatePathEffect::writeProperty(QIODevice * const target) const {
-    PathEffect::writeProperty(target);
-    mTranslation->writeProperty(target);
-}
-
-void DuplicatePathEffect::readProperty(QIODevice * const src) {
-    PathEffect::readProperty(src);
-    mTranslation->readProperty(src);
-}
-
-void LengthPathEffect::writeProperty(QIODevice * const target) const {
-    PathEffect::writeProperty(target);
-    mLength->writeProperty(target);
-    mReverse->writeProperty(target);
-}
-
-void LengthPathEffect::readProperty(QIODevice * const src) {
-    PathEffect::readProperty(src);
-    mLength->readProperty(src);
-    mReverse->readProperty(src);
-}
-
-void SolidifyPathEffect::writeProperty(QIODevice * const target) const {
-    PathEffect::writeProperty(target);
-    mDisplacement->writeProperty(target);
-}
-
-void SolidifyPathEffect::readProperty(QIODevice * const src) {
-    PathEffect::readProperty(src);
-    mDisplacement->readProperty(src);
 }
 
 void BoxTargetProperty::writeProperty(QIODevice * const target) const {
@@ -622,114 +373,7 @@ void BoxTargetProperty::readProperty(QIODevice * const src) {
     }
 }
 
-void OperationPathEffect::writeProperty(QIODevice * const target) const {
-    PathEffect::writeProperty(target);
-    mBoxTarget->writeProperty(target);
-}
-
-void OperationPathEffect::readProperty(QIODevice * const src) {
-    PathEffect::readProperty(src);
-    mBoxTarget->readProperty(src);
-}
-
-void PathBox::writeBoundingBox(QIODevice * const target) {
-    BoundingBox::writeBoundingBox(target);
-    mPathEffectsAnimators->writeProperty(target);
-    mFillPathEffectsAnimators->writeProperty(target);
-    mOutlinePathEffectsAnimators->writeProperty(target);
-    mFillGradientPoints->writeProperty(target);
-    mStrokeGradientPoints->writeProperty(target);
-    mFillSettings->writeProperty(target);
-    mStrokeSettings->writeProperty(target);
-}
-
-void PathBox::readBoundingBox(QIODevice * const target) {
-    BoundingBox::readBoundingBox(target);
-    mPathEffectsAnimators->readProperty(target);
-    mFillPathEffectsAnimators->readProperty(target);
-    mOutlinePathEffectsAnimators->readProperty(target);
-    mFillGradientPoints->readProperty(target);
-    mStrokeGradientPoints->readProperty(target);
-    mFillSettings->readProperty(target);
-    mStrokeSettings->readProperty(target);
-}
 #include "Animators/SmartPath/smartpathcollection.h"
-void SmartVectorPath::writeBoundingBox(QIODevice * const target) {
-    PathBox::writeBoundingBox(target);
-    mPathAnimator->writeProperty(target);
-}
-void SmartVectorPath::readBoundingBox(QIODevice * const target) {
-    PathBox::readBoundingBox(target);
-    mPathAnimator->readProperty(target);
-}
-
-void ParticleEmitter::writeProperty(QIODevice * const target) const {
-    mColorAnimator->writeProperty(target);
-    mPos->writeProperty(target);
-    mWidth->writeProperty(target);
-    mSrcVelInfl->writeProperty(target);
-    mIniVelocity->writeProperty(target);
-    mIniVelocityVar->writeProperty(target);
-    mIniVelocityAngle->writeProperty(target);
-    mIniVelocityAngleVar->writeProperty(target);
-    mAcceleration->writeProperty(target);
-    mParticlesPerSecond->writeProperty(target);
-    mParticlesFrameLifetime->writeProperty(target);
-    mVelocityRandomVar->writeProperty(target);
-    mVelocityRandomVarPeriod->writeProperty(target);
-    mParticleSize->writeProperty(target);
-    mParticleSizeVar->writeProperty(target);
-    mParticleLength->writeProperty(target);
-    mParticlesDecayFrames->writeProperty(target);
-    mParticlesSizeDecay->writeProperty(target);
-    mParticlesOpacityDecay->writeProperty(target);
-}
-
-void ParticleEmitter::readProperty(QIODevice * const src) {
-    mColorAnimator->readProperty(src);
-    mPos->readProperty(src);
-    mWidth->readProperty(src);
-    mSrcVelInfl->readProperty(src);
-    mIniVelocity->readProperty(src);
-    mIniVelocityVar->readProperty(src);
-    mIniVelocityAngle->readProperty(src);
-    mIniVelocityAngleVar->readProperty(src);
-    mAcceleration->readProperty(src);
-    mParticlesPerSecond->readProperty(src);
-    mParticlesFrameLifetime->readProperty(src);
-    mVelocityRandomVar->readProperty(src);
-    mVelocityRandomVarPeriod->readProperty(src);
-    mParticleSize->readProperty(src);
-    mParticleSizeVar->readProperty(src);
-    mParticleLength->readProperty(src);
-    mParticlesDecayFrames->readProperty(src);
-    mParticlesSizeDecay->readProperty(src);
-    mParticlesOpacityDecay->readProperty(src);
-}
-
-void ParticleBox::writeBoundingBox(QIODevice * const target) {
-    BoundingBox::writeBoundingBox(target);
-    mTopLeftAnimator->writeProperty(target);
-    mBottomRightAnimator->writeProperty(target);
-    int nEmitters = mEmitters.count();
-    target->write(rcConstChar(&nEmitters), sizeof(int));
-    for(const auto& emitter : mEmitters) {
-        emitter->writeProperty(target);
-    }
-}
-
-void ParticleBox::readBoundingBox(QIODevice * const target) {
-    BoundingBox::readBoundingBox(target);
-    mTopLeftAnimator->readProperty(target);
-    mBottomRightAnimator->readProperty(target);
-    int nEmitters;
-    target->read(rcChar(&nEmitters), sizeof(int));
-    for(int i = 0; i < nEmitters; i++) {
-        auto emitter = SPtrCreate(ParticleEmitter)(this);
-        emitter->readProperty(target);
-        addEmitter(emitter);
-    }
-}
 
 void ImageBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
@@ -743,38 +387,9 @@ void ImageBox::readBoundingBox(QIODevice * const target) {
     setFilePath(path);
 }
 
-void Circle::writeBoundingBox(QIODevice * const target) {
-    PathBox::writeBoundingBox(target);
-    mHorizontalRadiusAnimator->writeProperty(target);
-    mVerticalRadiusAnimator->writeProperty(target);
-}
-
-void Circle::readBoundingBox(QIODevice * const target) {
-    PathBox::readBoundingBox(target);
-    mHorizontalRadiusAnimator->readProperty(target);
-    mVerticalRadiusAnimator->readProperty(target);
-}
-
-void Rectangle::writeBoundingBox(QIODevice * const target) {
-    PathBox::writeBoundingBox(target);
-    mRadiusAnimator->writeProperty(target);
-    mTopLeftAnimator->writeProperty(target);
-    mBottomRightAnimator->writeProperty(target);
-}
-
-void Rectangle::readBoundingBox(QIODevice * const target) {
-    PathBox::readBoundingBox(target);
-    mRadiusAnimator->readProperty(target);
-    mTopLeftAnimator->readProperty(target);
-    mBottomRightAnimator->readProperty(target);
-}
-
 void VideoBox::writeBoundingBox(QIODevice * const target) {
     AnimationBox::writeBoundingBox(target);
     gWrite(target, mSrcFilePath);
-    const bool hasSound = mSound;
-    gWrite(target, hasSound);
-    if(hasSound) mSound->writeProperty(target);
 }
 
 void VideoBox::readBoundingBox(QIODevice * const target) {
@@ -782,24 +397,17 @@ void VideoBox::readBoundingBox(QIODevice * const target) {
     QString path;
     gRead(target, path);
     setFilePath(path);
-    const bool hasSound = gReadBool(target);
-    if(hasSound) {
-        if(!mSound) mSound = SPtrCreate(SingleSound)();
-        mSound->readProperty(target);
-    }
 }
 
 void AnimationBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
     target->write(rcConstChar(&mFrameRemappingEnabled), sizeof(bool));
-    mFrameAnimator->writeProperty(target);
 }
 
 void AnimationBox::readBoundingBox(QIODevice * const target) {
     BoundingBox::readBoundingBox(target);
     bool frameRemapping;
     target->read(rcChar(&frameRemapping), sizeof(bool));
-    mFrameAnimator->readProperty(target);
     if(frameRemapping) enableFrameRemapping();
     else disableFrameRemapping();
 }
@@ -826,7 +434,6 @@ void ImageSequenceBox::readBoundingBox(QIODevice * const target) {
 
 void TextBox::writeBoundingBox(QIODevice * const target) {
     PathBox::writeBoundingBox(target);
-    mText->writeProperty(target);
     target->write(rcConstChar(&mAlignment), sizeof(Qt::Alignment));
     const qreal fontSize = mFont.pointSizeF();
     const QString fontFamily = mFont.family();
@@ -838,7 +445,6 @@ void TextBox::writeBoundingBox(QIODevice * const target) {
 
 void TextBox::readBoundingBox(QIODevice * const target) {
     PathBox::readBoundingBox(target);
-    mText->readProperty(target);
     target->read(rcChar(&mAlignment), sizeof(Qt::Alignment));
     qreal fontSize;
     QString fontFamily;
@@ -854,9 +460,6 @@ void TextBox::readBoundingBox(QIODevice * const target) {
 #include "Boxes/containerbox.h"
 void ContainerBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
-    mPathEffectsAnimators->writeProperty(target);
-    mFillPathEffectsAnimators->writeProperty(target);
-    mOutlinePathEffectsAnimators->writeProperty(target);
     int nChildBoxes = mContainedBoxes.count();
     target->write(rcConstChar(&nChildBoxes), sizeof(int));
     for(const auto &child : mContainedBoxes) {
@@ -912,9 +515,6 @@ void ContainerBox::readChildBoxes(QIODevice *target) {
 
 void ContainerBox::readBoundingBox(QIODevice * const target) {
     BoundingBox::readBoundingBox(target);
-    mPathEffectsAnimators->readProperty(target);
-    mFillPathEffectsAnimators->readProperty(target);
-    mOutlinePathEffectsAnimators->readProperty(target);
     readChildBoxes(target);
 }
 
@@ -926,7 +526,6 @@ void Canvas::writeBoundingBox(QIODevice * const target) {
     target->write(rcConstChar(&mWidth), sizeof(int));
     target->write(rcConstChar(&mHeight), sizeof(int));
     target->write(rcConstChar(&mFps), sizeof(qreal));
-    mBackgroundColor->writeProperty(target);
     target->write(rcConstChar(&mMaxFrame), sizeof(int));
     target->write(rcConstChar(&mCanvasTransform),
                   sizeof(QMatrix));
@@ -942,7 +541,6 @@ void Canvas::readBoundingBox(QIODevice * const target) {
     target->read(rcChar(&mWidth), sizeof(int));
     target->read(rcChar(&mHeight), sizeof(int));
     target->read(rcChar(&mFps), sizeof(qreal));
-    mBackgroundColor->readProperty(target);
     target->read(rcChar(&mMaxFrame), sizeof(int));
     target->read(rcChar(&mCanvasTransform), sizeof(QMatrix));
     mVisibleHeight = mCanvasTransform.m22()*mHeight;

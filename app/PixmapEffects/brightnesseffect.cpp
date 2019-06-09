@@ -2,7 +2,7 @@
 #include "rastereffects.h"
 #include "Animators/qrealanimator.h"
 
-BrightnessEffect::BrightnessEffect(qreal brightness) :
+BrightnessEffect::BrightnessEffect(const qreal brightness) :
     PixmapEffect("brightness", EFFECT_BRIGHTNESS) {
     mBrightnessAnimator = SPtrCreate(QrealAnimator)("brightness");
 

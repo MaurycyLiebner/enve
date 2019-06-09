@@ -2,7 +2,7 @@
 #include "Animators/qrealanimator.h"
 #include "Boxes/boundingbox.h"
 
-SampledMotionBlurEffect::SampledMotionBlurEffect(BoundingBox *box) :
+SampledMotionBlurEffect::SampledMotionBlurEffect(BoundingBox * const box) :
     PixmapEffect("motion blur", EFFECT_MOTION_BLUR) {
     mParentBox = box;
     mOpacity = SPtrCreate(QrealAnimator)("opacity");

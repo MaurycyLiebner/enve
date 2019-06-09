@@ -47,5 +47,5 @@ void BoolPropertyContainer::readProperty(QIODevice * const src) {
     bool value;
     src->read(rcChar(&value), sizeof(bool));
     setValue(value);
-    //r StaticComplexAnimator::readProperty(src);
+    StaticComplexAnimator::readProperty(src);
 }

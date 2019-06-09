@@ -16,15 +16,13 @@ private:
 
 class ContrastEffect : public PixmapEffect {
     friend class SelfRef;
+protected:
+    ContrastEffect(const qreal contrast = 0);
 public:
-    qreal getMargin() { return 0.; }
+    qreal getMargin() { return 0; }
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData*);
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice * const src);
-protected:
-    ContrastEffect(qreal contrast = .0);
 private:
     qsptr<QrealAnimator> mContrastAnimator;
 };

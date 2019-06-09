@@ -15,6 +15,11 @@ extern "C" {
 
 VideoBox::VideoBox() : AnimationBox(TYPE_VIDEO) {
     setName("Video");
+    const auto flar = GetAsSPtr(mDurationRectangle,
+                                FixedLenAnimationRect);
+    mSound = SPtrCreate(SingleSound)(flar);
+    ca_addChildAnimator(mSound);
+    mSound->SWT_hide();
 }
 
 VideoBox::~VideoBox() {
@@ -107,20 +112,22 @@ bool hasSound(const char* path) {
 
 void VideoBox::reloadSound() {
     if(hasSound(mSrcFilePath.toLatin1().data())) {
-        if(!mSound) { // !!!
-            const auto flar = GetAsSPtr(mDurationRectangle,
-                                        FixedLenAnimationRect);
-            mSound = SPtrCreate(SingleSound)(flar);
-            ca_addChildAnimator(mSound);
+        if(!mSound->SWT_isVisible()) {
             const auto parentCanvas = getParentCanvas();
             if(parentCanvas) {
                 parentCanvas->getSoundComposition()->addSound(mSound);
             }
-            mSound->setEnabled(mSoundEnabled);
         }
         mSound->setFilePath(mSrcFilePath);
+        mSound->SWT_show();
     } else {
-        mSound.reset();
+        if(mSound->SWT_isVisible()) {
+            const auto parentCanvas = getParentCanvas();
+            if(parentCanvas) {
+                parentCanvas->getSoundComposition()->removeSound(mSound);
+            }
+        }
+        mSound->SWT_hide();
         mDurationRectangle->setSoundCacheHandler(nullptr);
     }
 }

@@ -19,12 +19,10 @@ protected:
 class ColorizeEffect : public PixmapEffect {
     friend class SelfRef;
 public:
-    qreal getMargin() { return 0.; }
+    qreal getMargin() { return 0; }
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData*);
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice * const src);
 protected:
     ColorizeEffect();
 private:

@@ -8,6 +8,7 @@
 #include "smartPointers/sharedpointerdefs.h"
 #include "brushsettings.h"
 #include "Animators/gradient.h"
+#include "Animators/staticcomplexanimator.h"
 
 enum PaintType : short {
     NOPAINT,
@@ -21,7 +22,7 @@ class SkStroke;
 
 class GradientPoints;
 
-class PaintSettingsAnimator : public ComplexAnimator {
+class PaintSettingsAnimator : public StaticComplexAnimator {
 protected:
     PaintSettingsAnimator(const QString &name,
                           GradientPoints * const grdPts,

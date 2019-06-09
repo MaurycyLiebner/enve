@@ -30,8 +30,8 @@ QList<WaitingForBoxLoad> BoundingBox::sFunctionsWaitingForBoxRead;
 int BoundingBox::sNextWriteId;
 QList<BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 
-BoundingBox::BoundingBox(const BoundingBoxType &type) :
-    ComplexAnimator("box"),
+BoundingBox::BoundingBox(const BoundingBoxType type) :
+    StaticComplexAnimator("box"),
     mDocumentId(sNextDocumentId++), mType(type),
     mTransformAnimator(SPtrCreate(BoxTransformAnimator)()),
     mEffectsAnimators(SPtrCreate(EffectAnimators)(this)),

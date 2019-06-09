@@ -21,8 +21,6 @@ public:
     void setBottomRightPos(const QPointF &pos);
     void setYRadius(const qreal radiusY);
     void setXRadius(const qreal radiusX);
-    void writeBoundingBox(QIODevice * const target);
-    void readBoundingBox(QIODevice * const target);
     bool differenceInEditPathBetweenFrames(
                 const int frame1, const int frame2) const;
 private:

@@ -15,8 +15,6 @@ public:
     void drawCanvasControls(SkCanvas *const canvas,
                             const CanvasMode &mode,
                             const SkScalar invScale);
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice * const src);
 
     void enable();
     void disable();

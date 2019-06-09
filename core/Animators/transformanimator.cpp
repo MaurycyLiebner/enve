@@ -7,7 +7,7 @@
 #include "skia/skqtconversions.h"
 
 BasicTransformAnimator::BasicTransformAnimator() :
-    ComplexAnimator("transformation") {
+    StaticComplexAnimator("transformation") {
     mPosAnimator = SPtrCreate(QPointFAnimator)("pos");
     mPosAnimator->setBaseValue(QPointF(0, 0));
 

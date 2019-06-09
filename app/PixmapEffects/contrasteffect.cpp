@@ -2,7 +2,7 @@
 #include "rastereffects.h"
 #include "Animators/qrealanimator.h"
 
-ContrastEffect::ContrastEffect(qreal contrast) :
+ContrastEffect::ContrastEffect(const qreal contrast) :
     PixmapEffect("contrast", EFFECT_CONTRAST) {
     mContrastAnimator = SPtrCreate(QrealAnimator)("contrast");
 
