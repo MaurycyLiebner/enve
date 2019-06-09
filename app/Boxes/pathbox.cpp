@@ -17,19 +17,19 @@
 PathBox::PathBox(const BoundingBoxType &type) :
     BoundingBox(type) {
     mPathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(false, false, this);
+            SPtrCreate(PathEffectAnimators)(this);
     mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(NodePointUpdater)(this));
 
     mFillPathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(false, true, this);
+            SPtrCreate(PathEffectAnimators)(this);
     mFillPathEffectsAnimators->prp_setName("fill effects");
     mFillPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(NodePointUpdater)(this));
 
     mOutlinePathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(true, false, this);
+            SPtrCreate(PathEffectAnimators)(this);
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
     mOutlinePathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(NodePointUpdater)(this));
@@ -163,9 +163,9 @@ void PathBox::setupRenderData(const qreal relFrame,
         SkPath outline;
         if(mStrokeSettings->nonZeroLineWidth()) {
             SkPath outlineBase = pathData->fPath;
-            mOutlinePathEffectsAnimators->applyBeforeThickness(
+            mOutlineBasePathEffectsAnimators->apply(
                         relFrame, &outlineBase);
-            mParentGroup->filterOutlinePathBeforeThickness(
+            mParentGroup->filterOutlineBasePath(
                         relFrame, &outlineBase);
             SkStroke strokerSk;
             mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
@@ -250,6 +250,10 @@ void PathBox::addPathEffect(const qsptr<PathEffect>& effect) {
 
 void PathBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
     mFillPathEffectsAnimators->addEffect(effect);
+}
+
+void PathBox::addOutlineBasePathEffect(const qsptr<PathEffect>& effect) {
+    mOutlineBasePathEffectsAnimators->addEffect(effect);
 }
 
 void PathBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {

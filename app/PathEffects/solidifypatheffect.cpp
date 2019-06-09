@@ -2,8 +2,8 @@
 #include "pathoperations.h"
 #include "Boxes/pathbox.h"
 
-SolidifyPathEffect::SolidifyPathEffect(const bool outlinePathEffect) :
-    PathEffect("solidify effect", SOLIDIFY_PATH_EFFECT, outlinePathEffect) {
+SolidifyPathEffect::SolidifyPathEffect() :
+    PathEffect("solidify effect", SOLIDIFY_PATH_EFFECT) {
     mDisplacement = SPtrCreate(QrealAnimator)("displacement");
     mDisplacement->setValueRange(-999.999, 999.999);
     mDisplacement->setCurrentBaseValue(5);

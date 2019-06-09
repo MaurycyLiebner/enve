@@ -6,7 +6,7 @@ class IntAnimator;
 class SubdividePathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    SubdividePathEffect(const bool outlinePathEffect);
+    SubdividePathEffect();
 public:
     void apply(const qreal relFrame,
                const SkPath &src,

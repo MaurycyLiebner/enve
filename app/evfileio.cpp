@@ -522,14 +522,13 @@ void BoundingBox::readBoundingBox(QIODevice * const target) {
 }
 
 void PathEffect::writeProperty(QIODevice * const target) const {
-    target->write(rcConstChar(&mPathEffectType), sizeof(PathEffectType));
     target->write(rcConstChar(&mVisible), sizeof(bool));
-    target->write(rcConstChar(&mApplyBeforeThickness), sizeof(bool));
 }
 
 void PathEffect::readProperty(QIODevice * const src) {
     src->read(rcChar(&mVisible), sizeof(bool));
-    src->read(rcChar(&mApplyBeforeThickness), sizeof(bool));
+    bool tmp;
+    src->read(rcChar(&tmp), sizeof(bool));
 }
 
 void DisplacePathEffect::writeProperty(QIODevice * const target) const {
@@ -631,60 +630,6 @@ void OperationPathEffect::writeProperty(QIODevice * const target) const {
 void OperationPathEffect::readProperty(QIODevice * const src) {
     PathEffect::readProperty(src);
     mBoxTarget->readProperty(src);
-}
-
-void PathEffectAnimators::writeProperty(QIODevice * const target) const {   
-    const int nEffects = ca_mChildAnimators.count();
-    target->write(rcConstChar(&nEffects), sizeof(int));
-    for(const auto &effect : ca_mChildAnimators) {
-        effect->writeProperty(target);
-    }
-}
-
-void PathEffectAnimators::readPathEffect(QIODevice *target) {
-    PathEffectType typeT;
-    target->read(rcChar(&typeT), sizeof(PathEffectType));
-    qsptr<PathEffect> pathEffect;
-    if(typeT == DISPLACE_PATH_EFFECT) {
-        pathEffect =
-                SPtrCreate(DisplacePathEffect)(mIsOutline);
-    } else if(typeT == DUPLICATE_PATH_EFFECT) {
-        pathEffect =
-                SPtrCreate(DuplicatePathEffect)(mIsOutline);
-    } else if(typeT == OPERATION_PATH_EFFECT) {
-        pathEffect = SPtrCreate(OperationPathEffect)(mIsOutline);
-    } else if(typeT == LENGTH_PATH_EFFECT) {
-        //pathEffect = SPtrCreate(LengthPathEffect)(mIsOutline);
-        const auto subPathEffect = SPtrCreate(SubPathEffect)(mIsOutline);
-        subPathEffect->readLengthEffect(target);
-        addEffect(subPathEffect);
-        return;
-    } else if(typeT == SOLIDIFY_PATH_EFFECT) {
-        pathEffect = SPtrCreate(SolidifyPathEffect)(mIsOutline);
-    } else if(typeT == SUM_PATH_EFFECT) {
-        pathEffect = SPtrCreate(SumPathEffect)(mIsOutline);
-    } else if(typeT == SUB_PATH_EFFECT) {
-        pathEffect = SPtrCreate(SubPathEffect)(mIsOutline);
-    } else if(typeT == LINES_PATH_EFFECT) {
-        pathEffect = SPtrCreate(LinesPathEffect)(mIsOutline);
-    } else if(typeT == ZIGZAG_PATH_EFFECT) {
-        pathEffect = SPtrCreate(ZigZagPathEffect)(mIsOutline);
-    } else if(typeT == SPATIAL_DISPLACE_PATH_EFFECT) {
-        pathEffect = SPtrCreate(SpatialDisplacePathEffect)(mIsOutline);
-    } else {
-        RuntimeThrow("Invalid path effect type '" +
-                     QString::number(typeT) + "'.");
-    }
-    pathEffect->readProperty(target);
-    addEffect(pathEffect);
-}
-
-void PathEffectAnimators::readProperty(QIODevice * const src) {
-    int nEffects;
-    src->read(rcChar(&nEffects), sizeof(int));
-    for(int i = 0; i < nEffects; i++) {
-        readPathEffect(src);
-    }
 }
 
 void PathBox::writeBoundingBox(QIODevice * const target) {

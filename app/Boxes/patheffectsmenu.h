@@ -8,10 +8,10 @@ namespace PathEffectsMenu {
     template <typename T, typename U>
     void addPathEffectActionToMenu(const QString& text,
                                    BoxTypeMenu * const menu,
-                                   const U& adder, const bool outline);
+                                   const U& adder);
     template <typename U>
     void addPathEffectsActionToMenu(BoxTypeMenu * const menu,
-                                    const U &adder, const bool outline);
+                                    const U &adder);
     void addPathEffectsToActionMenu(BoxTypeMenu * const menu);
 }
 

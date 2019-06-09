@@ -49,6 +49,7 @@ public:
 
     void addPathEffect(const qsptr<PathEffect>& effect);
     void addFillPathEffect(const qsptr<PathEffect>& effect);
+    void addOutlineBasePathEffect(const qsptr<PathEffect>& effect);
     void addOutlinePathEffect(const qsptr<PathEffect>& effect);
     void removePathEffect(const qsptr<PathEffect>& effect);
     void removeFillPathEffect(const qsptr<PathEffect>& effect);
@@ -117,7 +118,7 @@ public:
                           SkPath * const srcDstPath,
                           BoundingBox * const box);
 
-    void filterOutlinePathBeforeThickness(const qreal relFrame,
+    void filterOutlineBasePath(const qreal relFrame,
                                           SkPath * const srcDstPath);
     void filterOutlinePath(const qreal relFrame,
                            SkPath * const srcDstPath);
@@ -190,6 +191,7 @@ protected:
 
     qsptr<PathEffectAnimators> mPathEffectsAnimators;
     qsptr<PathEffectAnimators> mFillPathEffectsAnimators;
+    qsptr<PathEffectAnimators> mOutlineBasePathEffectsAnimators;
     qsptr<PathEffectAnimators> mOutlinePathEffectsAnimators;
 private:
     void setupLayerRenderData(const qreal relFrame,

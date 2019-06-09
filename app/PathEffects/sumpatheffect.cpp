@@ -2,8 +2,8 @@
 #include "pathoperations.h"
 #include "Boxes/pathbox.h"
 
-SumPathEffect::SumPathEffect(const bool outlinePathEffect) :
-    PathEffect("sum effect", SUM_PATH_EFFECT, outlinePathEffect) {
+SumPathEffect::SumPathEffect() :
+    PathEffect("sum effect", SUM_PATH_EFFECT) {
 }
 
 void SumPathEffect::apply(const qreal relFrame,

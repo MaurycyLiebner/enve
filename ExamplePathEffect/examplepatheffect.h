@@ -5,7 +5,7 @@
 
 class ExamplePathEffect : public CustomPathEffect {
 public:
-    ExamplePathEffect(const bool outlinePathEffect);
+    ExamplePathEffect();
 
     QByteArray getIdentifier() const;
 

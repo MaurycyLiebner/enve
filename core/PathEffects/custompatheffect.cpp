@@ -1,8 +1,7 @@
 #include "custompatheffect.h"
 #include "basicreadwrite.h"
-CustomPathEffect::CustomPathEffect(const QString &name,
-                                   const bool outlinePathEffect) :
-    PathEffect(name, CUSTOM_PATH_EFFECT, outlinePathEffect) {
+CustomPathEffect::CustomPathEffect(const QString &name) :
+    PathEffect(name, CUSTOM_PATH_EFFECT) {
 
 }
 

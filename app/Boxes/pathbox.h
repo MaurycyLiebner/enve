@@ -125,6 +125,7 @@ public:
     void readBoundingBox(QIODevice * const target);
     void addPathEffect(const qsptr<PathEffect> &effect);
     void addFillPathEffect(const qsptr<PathEffect> &effect);
+    void addOutlineBasePathEffect(const qsptr<PathEffect> &effect);
     void addOutlinePathEffect(const qsptr<PathEffect> &effect);
     void removePathEffect(const qsptr<PathEffect> &effect);
     void removeFillPathEffect(const qsptr<PathEffect> &effect);
@@ -264,6 +265,7 @@ protected:
 
     qsptr<PathEffectAnimators> mPathEffectsAnimators;
     qsptr<PathEffectAnimators> mFillPathEffectsAnimators;
+    qsptr<PathEffectAnimators> mOutlineBasePathEffectsAnimators;
     qsptr<PathEffectAnimators> mOutlinePathEffectsAnimators;
     qsptr<GradientPoints> mFillGradientPoints;
     qsptr<GradientPoints> mStrokeGradientPoints;

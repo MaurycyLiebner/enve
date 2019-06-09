@@ -5,7 +5,7 @@
 class LinesPathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    LinesPathEffect(const bool outlinePathEffect);
+    LinesPathEffect();
 public:
     void apply(const qreal relFrame,
                const SkPath &src,

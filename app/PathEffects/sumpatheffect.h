@@ -5,7 +5,7 @@
 class SumPathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    SumPathEffect(const bool outlinePathEffect);
+    SumPathEffect();
 public:
     void apply(const qreal relFrame,
                const SkPath &src,

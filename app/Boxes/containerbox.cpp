@@ -17,28 +17,32 @@ ContainerBox::ContainerBox(const BoundingBoxType &type) :
 
 void ContainerBox::iniPathEffects() {
     mPathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(false, false, this);
+            SPtrCreate(PathEffectAnimators)(this);
     mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(GroupAllPathsUpdater)(this));
     ca_addChildAnimator(mPathEffectsAnimators);
-    mPathEffectsAnimators->SWT_hide();
 
     mFillPathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(false, true, this);
+            SPtrCreate(PathEffectAnimators)(this);
     mFillPathEffectsAnimators->prp_setName("fill effects");
     mFillPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(GroupAllPathsUpdater)(this));
     ca_addChildAnimator(mFillPathEffectsAnimators);
-    mFillPathEffectsAnimators->SWT_hide();
 
     mOutlinePathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(true, false, this);
+            SPtrCreate(PathEffectAnimators)(this);
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
     mOutlinePathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(GroupAllPathsUpdater)(this));
     ca_addChildAnimator(mOutlinePathEffectsAnimators);
-    mOutlinePathEffectsAnimators->SWT_hide();
+
+    mOutlineBasePathEffectsAnimators =
+            SPtrCreate(PathEffectAnimators)(this);
+    mOutlineBasePathEffectsAnimators->prp_setName("outline effects");
+    mOutlineBasePathEffectsAnimators->prp_setOwnUpdater(
+                SPtrCreate(GroupAllPathsUpdater)(this));
+    ca_addChildAnimator(mOutlineBasePathEffectsAnimators);
 }
 
 
@@ -180,6 +184,11 @@ void ContainerBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
+void ContainerBox::addOutlineBasePathEffect(const qsptr<PathEffect>& effect) {
+    mOutlineBasePathEffectsAnimators->addEffect(effect);
+    updateAllChildPathBoxes(Animator::USER_CHANGE);
+}
+
 void ContainerBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
     mOutlinePathEffectsAnimators->addEffect(effect);
     updateAllChildPathBoxes(Animator::USER_CHANGE);
@@ -228,14 +237,14 @@ void ContainerBox::applyPathEffects(const qreal relFrame,
 //    mParentGroup->apply(parentRelFrame, srcDstPath, box);
 }
 
-void ContainerBox::filterOutlinePathBeforeThickness(
+void ContainerBox::filterOutlineBasePath(
         const qreal relFrame, SkPath * const srcDstPath) {
-    mOutlinePathEffectsAnimators->applyBeforeThickness(relFrame, srcDstPath);
+    mOutlineBasePathEffectsAnimators->apply(relFrame, srcDstPath);
     if(!mParentGroup) return;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     const qreal parentRelFrame =
             mParentGroup->prp_absFrameToRelFrameF(absFrame);
-    mParentGroup->filterOutlinePathBeforeThickness(parentRelFrame, srcDstPath);
+    mParentGroup->filterOutlineBasePath(parentRelFrame, srcDstPath);
 }
 
 void ContainerBox::filterOutlinePath(const qreal relFrame,

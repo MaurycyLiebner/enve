@@ -484,23 +484,8 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
         const auto currentParent = draggedEffect->getParent<PathEffectAnimators>();
 
         if(currentParent != targetParent) {
-            if(currentParent->isOutline()) {
-                currentParent->getParentBox()->removeOutlinePathEffect(draggedEffect);
-            } else if(currentParent->isFill()) {
-                currentParent->getParentBox()->removeFillPathEffect(draggedEffect);
-            } else {
-                currentParent->getParentBox()->removePathEffect(draggedEffect);
-            }
-            if(targetParent->isOutline()) {
-                targetParent->getParentBox()->addOutlinePathEffect(draggedEffect);
-                draggedEffect->setIsOutlineEffect(true);
-            } else if(targetParent->isFill()) {
-                targetParent->getParentBox()->addFillPathEffect(draggedEffect);
-                draggedEffect->setIsOutlineEffect(false);
-            } else {
-                targetParent->getParentBox()->addPathEffect(draggedEffect);
-                draggedEffect->setIsOutlineEffect(false);
-            }
+            currentParent->removeEffect(draggedEffect);
+            targetParent->addEffect(draggedEffect);
         } else {
             if(fTargetId == draggedAbs->getIdInParent() ||
                fTargetId == draggedAbs->getIdInParent() + 1) return false;

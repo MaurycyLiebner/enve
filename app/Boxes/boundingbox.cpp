@@ -1031,6 +1031,8 @@ void BoundingBox::addPathEffect(const qsptr<PathEffect> &) {}
 
 void BoundingBox::addFillPathEffect(const qsptr<PathEffect> &) {}
 
+void BoundingBox::addOutlineBasePathEffect(const qsptr<PathEffect> &) {}
+
 void BoundingBox::addOutlinePathEffect(const qsptr<PathEffect> &) {}
 
 void BoundingBox::removePathEffect(const qsptr<PathEffect> &) {}

@@ -14,7 +14,7 @@
 
 extern "C" {
 EXAMPLEPATHEFFECTSHARED_EXPORT
-    qsptr<CustomPathEffect> createEffect(const bool outlinePathEffect);
+    qsptr<CustomPathEffect> createEffect();
 
 EXAMPLEPATHEFFECTSHARED_EXPORT
     QString effectName();

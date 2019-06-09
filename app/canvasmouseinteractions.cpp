@@ -144,23 +144,23 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
 
     QMenu * const pathEffectsMenu = menu->addMenu("Path Effects");
     pathEffectsMenu->addAction("Displace Effect", [this]() {
-        addPathEffect(SPtrCreate(DisplacePathEffect)(false));
+        addPathEffect(SPtrCreate(DisplacePathEffect)());
     });
 
     pathEffectsMenu->addAction("Duplicate Effect", [this]() {
-        addPathEffect(SPtrCreate(DuplicatePathEffect)(false));
+        addPathEffect(SPtrCreate(DuplicatePathEffect)());
     });
 
     pathEffectsMenu->addAction("Sub-Path Effect", [this]() {
-        addPathEffect(SPtrCreate(SubPathEffect)(false));
+        addPathEffect(SPtrCreate(SubPathEffect)());
     });
 
     pathEffectsMenu->addAction("Solidify Effect", [this]() {
-        addPathEffect(SPtrCreate(SolidifyPathEffect)(false));
+        addPathEffect(SPtrCreate(SolidifyPathEffect)());
     });
 
     pathEffectsMenu->addAction("Sum Effect", [this]() {
-        addPathEffect(SPtrCreate(SumPathEffect)(false));
+        addPathEffect(SPtrCreate(SumPathEffect)());
     });
 //    pathEffectsMenu->addAction("Operation Effect");
 //    pathEffectsMenu->addAction("Group Sum Effect");
@@ -168,42 +168,42 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
     QMenu * const fillPathEffectsMenu = menu->addMenu("Fill Effects");
 
     fillPathEffectsMenu->addAction("Displace Effect", [this]() {
-        addFillPathEffect(SPtrCreate(DisplacePathEffect)(false));
+        addFillPathEffect(SPtrCreate(DisplacePathEffect)());
     });
 
     fillPathEffectsMenu->addAction("Duplicate Effect", [this]() {
-        addFillPathEffect(SPtrCreate(DuplicatePathEffect)(false));
+        addFillPathEffect(SPtrCreate(DuplicatePathEffect)());
     });
 
     fillPathEffectsMenu->addAction("Solidify Effect", [this]() {
-        addFillPathEffect(SPtrCreate(SolidifyPathEffect)(false));
+        addFillPathEffect(SPtrCreate(SolidifyPathEffect)());
     });
 
     fillPathEffectsMenu->addAction("Sum Effect", [this]() {
-        addFillPathEffect(SPtrCreate(SumPathEffect)(false));
+        addFillPathEffect(SPtrCreate(SumPathEffect)());
     });
 //    fillPathEffectsMenu->addAction("Operation Effect");
 
     QMenu * const outlinePathEffectsMenu = menu->addMenu("Outline Effects");
 
     outlinePathEffectsMenu->addAction("Displace Effect", [this]() {
-        addOutlinePathEffect(SPtrCreate(DisplacePathEffect)(true));
+        addOutlinePathEffect(SPtrCreate(DisplacePathEffect)());
     });
 
     outlinePathEffectsMenu->addAction("Duplicate Effect", [this]() {
-        addOutlinePathEffect(SPtrCreate(DuplicatePathEffect)(true));
+        addOutlinePathEffect(SPtrCreate(DuplicatePathEffect)());
     });
 
     pathEffectsMenu->addAction("Sub-Path Effect", [this]() {
-        addOutlinePathEffect(SPtrCreate(SubPathEffect)(true));
+        addOutlinePathEffect(SPtrCreate(SubPathEffect)());
     });
 
     outlinePathEffectsMenu->addAction("Solidify Effect", [this]() {
-        addOutlinePathEffect(SPtrCreate(SolidifyPathEffect)(true));
+        addOutlinePathEffect(SPtrCreate(SolidifyPathEffect)());
     });
 
     outlinePathEffectsMenu->addAction("Sum Effect", [this]() {
-        addOutlinePathEffect(SPtrCreate(SumPathEffect)(true));
+        addOutlinePathEffect(SPtrCreate(SumPathEffect)());
     });
 //    outlinePathEffectsMenu->addAction("Operation Effect");
 

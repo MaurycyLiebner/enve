@@ -5,7 +5,7 @@
 class ZigZagPathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    ZigZagPathEffect(const bool outlinePathEffect);
+    ZigZagPathEffect();
 public:
     void apply(const qreal relFrame,
                const SkPath &src,

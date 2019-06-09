@@ -4,7 +4,7 @@
 class SubPathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    SubPathEffect(const bool outlinePathEffect);
+    SubPathEffect();
 public:
     void readLengthEffect(QIODevice * const target)
     __attribute__ ((deprecated("Use only to support old saves")));

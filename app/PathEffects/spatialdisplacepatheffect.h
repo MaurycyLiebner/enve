@@ -8,7 +8,7 @@ class BoolPropertyContainer;
 class SpatialDisplacePathEffect : public PathEffect {
     friend class SelfRef;
 protected:
-    SpatialDisplacePathEffect(const bool outlinePathEffect);
+    SpatialDisplacePathEffect();
 public:
     void apply(const qreal relFrame, const SkPath &src,
                SkPath * const dst);

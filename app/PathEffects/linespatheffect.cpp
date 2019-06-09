@@ -1,8 +1,8 @@
 #include "linespatheffect.h"
 #include "Animators/qrealanimator.h"
 
-LinesPathEffect::LinesPathEffect(const bool outlinePathEffect) :
-    PathEffect("lines effect", LINES_PATH_EFFECT, outlinePathEffect) {
+LinesPathEffect::LinesPathEffect() :
+    PathEffect("lines effect", LINES_PATH_EFFECT) {
     mAngle = SPtrCreate(QrealAnimator)(0, -9999, 9999, 1, "angle");
     mDistance = SPtrCreate(QrealAnimator)(10, 1, 9999, 1, "distance");
 

@@ -3,8 +3,8 @@
 #include "Animators/qrealanimator.h"
 #include "Properties/boolproperty.h"
 
-LengthPathEffect::LengthPathEffect(const bool outlinePathEffect) :
-    PathEffect("length effect", LENGTH_PATH_EFFECT, outlinePathEffect) {
+LengthPathEffect::LengthPathEffect() :
+    PathEffect("length effect", LENGTH_PATH_EFFECT) {
     mLength = SPtrCreate(QrealAnimator)("segment length");
     mLength->setValueRange(0, 100);
     mLength->setCurrentBaseValue(100);

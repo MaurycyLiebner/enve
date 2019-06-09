@@ -192,6 +192,7 @@ public:
 
     virtual void addPathEffect(const qsptr<PathEffect>&);
     virtual void addFillPathEffect(const qsptr<PathEffect>&);
+    virtual void addOutlineBasePathEffect(const qsptr<PathEffect>&);
     virtual void addOutlinePathEffect(const qsptr<PathEffect>&);
     virtual void removePathEffect(const qsptr<PathEffect>&);
     virtual void removeFillPathEffect(const qsptr<PathEffect>&);

@@ -5,13 +5,9 @@
 #include <QDrag>
 
 PathEffect::PathEffect(const QString &name,
-                       const PathEffectType type,
-                       const bool outlinePathEffect) :
+                       const PathEffectType type) :
     StaticComplexAnimator(name) {
     mPathEffectType = type;
-    mApplyBeforeThickness = SPtrCreate(BoolProperty)("pre-thickness");
-    ca_addChildAnimator(mApplyBeforeThickness);
-    setIsOutlineEffect(outlinePathEffect);
 }
 
 void PathEffect::prp_startDragging() {
@@ -22,13 +18,12 @@ void PathEffect::prp_startDragging() {
     drag->exec();
 }
 
-const PathEffectType &PathEffect::getEffectType() {
-    return mPathEffectType;
+void PathEffect::writeIdentifier(QIODevice * const dst) const {
+    dst->write(rcConstChar(&mPathEffectType), sizeof(PathEffectType));
 }
 
-bool PathEffect::applyBeforeThickness() {
-    if(!mApplyBeforeThickness) return false;
-    return mApplyBeforeThickness->getValue();
+PathEffectType PathEffect::getEffectType() {
+    return mPathEffectType;
 }
 
 QMimeData *PathEffect::SWT_createMimeData() {
@@ -36,12 +31,6 @@ QMimeData *PathEffect::SWT_createMimeData() {
 }
 
 bool PathEffect::SWT_isPathEffect() const { return true; }
-
-void PathEffect::setIsOutlineEffect(const bool bT) {
-    if(bT == mOutlineEffect) return;
-    mOutlineEffect = bT;
-    mApplyBeforeThickness->SWT_setVisible(bT);
-}
 
 void PathEffect::switchVisible() {
     setVisible(!mVisible);

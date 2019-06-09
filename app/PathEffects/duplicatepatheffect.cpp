@@ -2,8 +2,8 @@
 #include "Animators/qpointfanimator.h"
 #include "Animators/intanimator.h"
 
-DuplicatePathEffect::DuplicatePathEffect(const bool outlinePathEffect) :
-    PathEffect("duplicate effect", DUPLICATE_PATH_EFFECT, outlinePathEffect) {
+DuplicatePathEffect::DuplicatePathEffect() :
+    PathEffect("duplicate effect", DUPLICATE_PATH_EFFECT) {
     mTranslation = SPtrCreate(QPointFAnimator)("translation");
     mTranslation->setBaseValue(QPointF(10, 10));
     ca_addChildAnimator(mTranslation);

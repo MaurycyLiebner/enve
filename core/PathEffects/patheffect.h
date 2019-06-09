@@ -27,11 +27,9 @@ typedef PropertyMimeData<PathEffect,
     InternalMimeData::PATH_EFFECT> PathEffectMimeData;
 
 class PathEffect : public StaticComplexAnimator {
-    Q_OBJECT
 protected:
     PathEffect(const QString& name,
-               const PathEffectType type,
-               const bool outlinePathEffect);
+               const PathEffectType type);
 public:
     virtual void apply(const qreal relFrame,
                        const SkPath &src,
@@ -41,22 +39,19 @@ public:
     bool SWT_isPathEffect() const;
     QMimeData *SWT_createMimeData();
     void prp_startDragging();
-    void writeProperty(QIODevice * const target) const;
+
+    void writeIdentifier(QIODevice * const dst) const;
+    void writeProperty(QIODevice * const dst) const;
     void readProperty(QIODevice * const src);
 
-    const PathEffectType &getEffectType();
-    void setIsOutlineEffect(const bool bT);
+    PathEffectType getEffectType();
 
     void switchVisible();
     void setVisible(const bool bT);
     bool isVisible() const;
-
-    bool applyBeforeThickness();
 protected:
     bool mVisible = true;
-    bool mOutlineEffect = false;
     PathEffectType mPathEffectType;
-    qsptr<BoolProperty> mApplyBeforeThickness;
 };
 
 #endif // PATHEFFECT_H

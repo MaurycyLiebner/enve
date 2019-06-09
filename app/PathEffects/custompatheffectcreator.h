@@ -6,7 +6,7 @@
 #include "PathEffects/custompatheffect.h"
 class CustomPathEffect;
 
-typedef qsptr<CustomPathEffect> (*CPathEffectCreatorFunc)(const bool);
+typedef qsptr<CustomPathEffect> (*CPathEffectCreatorFunc)();
 typedef QString (*CPathEffectNameFunc)();
 typedef QByteArray (*CPathEffectIdentifierFunc)();
 typedef bool (*CPathEffectSupport)(const QByteArray&);
@@ -22,28 +22,28 @@ public:
     static void sLoadCustomPathEffect(const QString& libPath);
 
     static qsptr<CustomPathEffect> sCreateForIdentifier(
-            const QByteArray &identifier, const bool outline) {
+            const QByteArray &identifier) {
         for(const auto& creator : sEffectCreators) {
             if(!creator.mSupport(identifier)) continue;
-            return creator.mCreator(outline);
+            return creator.mCreator();
         }
         return nullptr;
     }
 
     template <typename U>
     static void sAddToMenu(BoxTypeMenu * const menu,
-                           const U &adder, const bool outline) {
+                           const U &adder) {
         for(const auto& creator : sEffectCreators)
-            sAddToMenu(menu, creator, adder, outline);
+            sAddToMenu(menu, creator, adder);
     }
 private:
     template <typename U>
     static void sAddToMenu(BoxTypeMenu * const menu,
                            const CustomPathEffectCreator& creator,
-                           const U &adder, const bool outline) {
+                           const U &adder) {
         menu->addPlainAction<BoundingBox>(creator.mName(),
-        [adder, outline, creator](BoundingBox * box) {
-            const auto cEffect = creator.mCreator(outline);
+        [adder, creator](BoundingBox * box) {
+            const auto cEffect = creator.mCreator();
             (box->*adder)(GetAsSPtr(cEffect, PathEffect));
         });
     }

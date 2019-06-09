@@ -4,8 +4,7 @@
 
 class CustomPathEffect : public PathEffect {
 protected:
-    CustomPathEffect(const QString& name,
-                     const bool outlinePathEffect);
+    CustomPathEffect(const QString& name);
 public:
     virtual QByteArray getIdentifier() const = 0;
 

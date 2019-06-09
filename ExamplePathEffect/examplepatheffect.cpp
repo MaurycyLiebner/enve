@@ -1,7 +1,7 @@
 #include "examplepatheffect.h"
 
-qsptr<CustomPathEffect> createEffect(const bool outlinePathEffect) {
-    return SPtrCreate(ExamplePathEffect)(outlinePathEffect);
+qsptr<CustomPathEffect> createEffect() {
+    return SPtrCreate(ExamplePathEffect)();
 }
 
 QString effectName() {
@@ -20,8 +20,8 @@ bool supports(const QByteArray &identifier) {
     return QString(identifier) == QString(effectIdentifier());
 }
 #include "Animators/qrealanimator.h"
-ExamplePathEffect::ExamplePathEffect(const bool outlinePathEffect) :
-    CustomPathEffect(effectName().toLower(), outlinePathEffect) {
+ExamplePathEffect::ExamplePathEffect() :
+    CustomPathEffect(effectName().toLower()) {
     mInfluence = SPtrCreate(QrealAnimator)(0, 0, 1, 0.1, "influence");
     ca_addChildAnimator(mInfluence);
 }

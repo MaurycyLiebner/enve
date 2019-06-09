@@ -4,8 +4,8 @@
 #include "Animators/qrealanimator.h"
 #include "Properties/boolproperty.h"
 
-SubPathEffect::SubPathEffect(const bool outlinePathEffect) :
-    PathEffect("sub-path effect", SUB_PATH_EFFECT, outlinePathEffect) {
+SubPathEffect::SubPathEffect() :
+    PathEffect("sub-path effect", SUB_PATH_EFFECT) {
     mMin = SPtrCreate(QrealAnimator)("min length");
     mMin->setValueRange(-999, 999);
     mMin->setCurrentBaseValue(0);

@@ -3,8 +3,8 @@
 #include "Properties/boolproperty.h"
 #include "pointhelpers.h"
 
-DisplacePathEffect::DisplacePathEffect(const bool outlinePathEffect) :
-    PathEffect("displace effect", DISPLACE_PATH_EFFECT, outlinePathEffect) {
+DisplacePathEffect::DisplacePathEffect() :
+    PathEffect("displace effect", DISPLACE_PATH_EFFECT) {
     mSegLength = SPtrCreate(QrealAnimator)("segment length");
     mMaxDev = SPtrCreate(QrealAnimator)("max deviation");
     mSmoothness = QrealAnimator::create0to1Animator("smoothness");

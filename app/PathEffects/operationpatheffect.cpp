@@ -4,9 +4,9 @@
 #include "Boxes/pathbox.h"
 #include "pathoperations.h"
 
-OperationPathEffect::OperationPathEffect(const bool outlinePathEffect) :
+OperationPathEffect::OperationPathEffect() :
     PathEffect("path operation effect",
-               OPERATION_PATH_EFFECT, outlinePathEffect) {
+               OPERATION_PATH_EFFECT) {
     mOperationType = SPtrCreate(ComboBoxProperty)(
                 "operation type",
                  QStringList() << "Union" <<

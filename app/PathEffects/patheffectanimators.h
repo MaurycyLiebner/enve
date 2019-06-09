@@ -1,38 +1,32 @@
 #ifndef PATHEFFECTANIMATORS_H
 #define PATHEFFECTANIMATORS_H
-class PathEffect;
-class BoundingBox;
-#include "Animators/complexanimator.h"
+#include "PathEffects/patheffect.h"
+#include "Animators/dynamiccomplexanimator.h"
 #include "skia/skiaincludes.h"
 class PathBox;
+class BoundingBox;
 
-class PathEffectAnimators : public ComplexAnimator {
+qsptr<PathEffect> readIdCreatePathEffect(QIODevice * const src);
+
+typedef DynamicComplexAnimator<PathEffect,
+        &PathEffect::writeIdentifier,
+        &readIdCreatePathEffect> PathEffectAnimatorsBase;
+class PathEffectAnimators : public PathEffectAnimatorsBase {
     friend class SelfRef;
 protected:
-    PathEffectAnimators(const bool isOutline,
-                        const bool isFill,
-                        BoundingBox * const parentPath);
+    PathEffectAnimators(BoundingBox * const parentPath);
 public:
     bool SWT_isPathEffectAnimators() const;
-
-    void readProperty(QIODevice * const src);
-    void writeProperty(QIODevice * const target) const;
 
     void addEffect(const qsptr<PathEffect> &effect);
     bool hasEffects();
 
     void apply(const qreal relFrame, SkPath * const srcDstPath);
-    void applyBeforeThickness(const qreal relFrame,
-                              SkPath * const srcDstPath);
 
     void removeEffect(const qsptr<PathEffect>& effect);
     BoundingBox *getParentBox();
-    bool isOutline() const;
-    bool isFill() const;
-    void readPathEffect(QIODevice *target);
+    void readPathEffect(QIODevice * const target);
 private:
-    bool mIsOutline;
-    bool mIsFill;
     qptr<BoundingBox> mParentBox;
 };
 
