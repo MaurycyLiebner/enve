@@ -17,11 +17,11 @@ public:
     }
 
     void setRelFrame(const int frame) {
-        if(frame == mRelFrame) return;
+        if(frame == this->mRelFrame) return;
         const int dFrame = frame - mRelFrame;
-        mRelFrame = frame;
-        setStartFrameVar(mStartPt.getRawXValue() + dFrame);
-        setEndFrameVar(mEndPt.getRawXValue() + dFrame);
+        GraphKey::setRelFrame(frame);
+        setStartValueVar(mStartPt.getRawYValue() + dFrame);
+        setEndValueVar(mEndPt.getRawYValue() + dFrame);
     }
 };
 

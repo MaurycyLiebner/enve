@@ -18,8 +18,8 @@ public:
         if(frame == this->mRelFrame) return;
         const int dFrame = frame - this->mRelFrame;
         GraphKeyT<T>::setRelFrame(frame);
-        this->setStartFrameVar(this->mStartPt.getRawXValue() + dFrame);
-        this->setEndFrameVar(this->mEndPt.getRawXValue() + dFrame);
+        this->setStartValueVar(this->mStartPt.getRawYValue() + dFrame);
+        this->setEndValueVar(this->mEndPt.getRawYValue() + dFrame);
     }
 protected:
     InterpolationKeyT(const T &value, const int frame,
