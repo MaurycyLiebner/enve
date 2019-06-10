@@ -29,6 +29,10 @@ public:
 
     void setValue(const bool value);
     bool getValue();
+
+    using ComplexAnimator::ca_addChildAnimator;
+    using ComplexAnimator::ca_insertChildAnimator;
+    using ComplexAnimator::ca_prependChildAnimator;
 private:
     bool mValue = false;
 };

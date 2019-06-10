@@ -56,6 +56,16 @@ public:
                       const qsptr<T> &newChild) {
         ca_replaceChildAnimator(oldChild, newChild);
     }
+
+    using ComplexAnimator::ca_removeAllChildAnimators;
+private:
+    using ComplexAnimator::ca_addChildAnimator;
+    using ComplexAnimator::ca_insertChildAnimator;
+    using ComplexAnimator::ca_prependChildAnimator;
+
+    using ComplexAnimator::ca_removeChildAnimator;
+    using ComplexAnimator::ca_replaceChildAnimator;
+    using ComplexAnimator::ca_takeChildAt;
 };
 
 #endif // DYNAMICCOMPLEXANIMATOR_H

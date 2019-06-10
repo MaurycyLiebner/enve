@@ -4,6 +4,7 @@
 #include "Properties/boxtargetproperty.h"
 #include "Animators/coloranimator.h"
 #include "Animators/qpointfanimator.h"
+#include "Animators/dynamiccomplexanimator.h"
 class QPointFAnimator;
 class AnimatedPoint;
 class ParticleBox;
@@ -131,7 +132,7 @@ private:
 
 class Particle {
 public:
-    Particle(ParticleBox *parentBox);
+    Particle();
     void initializeParticle(const int firstFrame,
                             const int nFrames,
                             const SkPoint &iniPos,
@@ -155,7 +156,6 @@ private:
     SkPoint mNextVelocityVar;
     SkScalar mPrevVelocityDuration;
 
-    ParticleBox *mParentBox;
     int mFirstFrame;
     int mNumberFrames;
     ParticleState *mParticleStates = nullptr;
@@ -168,9 +168,7 @@ private:
 
 class ParticleEmitter : public StaticComplexAnimator {
 public:
-    ParticleEmitter(ParticleBox *parentBox);
-
-    void setParentBox(ParticleBox *parentBox);
+    ParticleEmitter();
 
     void scheduleGenerateParticles();
     void generateParticlesIfNeeded();
@@ -197,7 +195,6 @@ private:
 
     QList<Particle*> mParticles;
     QList<Particle*> mNotFinishedParticles;
-    ParticleBox* mParentBox_k = nullptr;
 
     qsptr<ColorAnimator> mColorAnimator =
             SPtrCreate(ColorAnimator)();
@@ -254,7 +251,6 @@ private:
 };
 
 class ParticleBox : public BoundingBox {
-    Q_OBJECT
 public:
     ParticleBox();
     void getAccelerationAt(const QPointF &pos,
@@ -293,7 +289,6 @@ public:
     void removeEmitter(const qsptr<ParticleEmitter> &emitter);
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
-public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:
     qsptr<QPointFAnimator> mTopLeftAnimator;
@@ -301,6 +296,7 @@ private:
 
     stdsptr<AnimatedPoint> mTopLeftPoint;
     stdsptr<AnimatedPoint> mBottomRightPoint;
+    stdsptr<DynamicComplexAnimator<ParticleEmitter>> mEmitterCol;
     QList<qsptr<ParticleEmitter>> mEmitters;
 };
 

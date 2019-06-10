@@ -16,9 +16,15 @@ public:
             prop->readProperty(src);
     }
 
-    using ComplexAnimator::ca_addChildAnimator;
-    using ComplexAnimator::ca_insertChildAnimator;
-    using ComplexAnimator::ca_prependChildAnimator;
+private:
+    //    using ComplexAnimator::ca_addChildAnimator;
+    //    using ComplexAnimator::ca_insertChildAnimator;
+    //    using ComplexAnimator::ca_prependChildAnimator;
+
+    using ComplexAnimator::ca_removeAllChildAnimators;
+    using ComplexAnimator::ca_removeChildAnimator;
+    using ComplexAnimator::ca_replaceChildAnimator;
+    using ComplexAnimator::ca_takeChildAt;
 };
 
 #endif // STATICCOMPLEXANIMATOR_H

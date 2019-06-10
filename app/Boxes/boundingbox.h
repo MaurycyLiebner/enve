@@ -221,6 +221,9 @@ public:
     virtual void scheduleWaitingTasks();
     virtual void queScheduledTasks();
 
+    void writeBoxType(QIODevice * const dst) const;
+    static BoundingBoxType sReadBoxType(QIODevice * const src);
+
     virtual void writeBoundingBox(QIODevice * const target);
     virtual void readBoundingBox(QIODevice * const target);
 

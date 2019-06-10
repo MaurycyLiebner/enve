@@ -130,9 +130,7 @@ void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     BoundingBox::writeBoundingBox(&buffer);
-    if(buffer.seek(sizeof(BoundingBoxType))) {
-        targetBox->BoundingBox::readBoundingBox(&buffer);
-    }
+    targetBox->BoundingBox::readBoundingBox(&buffer);
     buffer.close();
 }
 
@@ -1146,6 +1144,16 @@ void BoundingBox::queScheduledTasks() {
     for(const auto& task : mScheduledTasks)
         taskScheduler->queCPUTask(task);
     mScheduledTasks.clear();
+}
+
+void BoundingBox::writeBoxType(QIODevice * const dst) const {
+    dst->write(rcConstChar(&mType), sizeof(BoundingBoxType));
+}
+
+BoundingBoxType BoundingBox::sReadBoxType(QIODevice * const src) {
+    BoundingBoxType type;
+    src->read(rcChar(&type), sizeof(BoundingBoxType));
+    return type;
 }
 
 int BoundingBox::getReadId() const {

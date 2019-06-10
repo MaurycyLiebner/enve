@@ -69,7 +69,7 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
 
     mRotPivot = SPtrCreate(PathPivot)(this);
 
-    ca_removeChildAnimator(mTransformAnimator);
+    mTransformAnimator->SWT_hide();
 
     //anim_setAbsFrame(0);
 

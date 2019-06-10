@@ -12,7 +12,7 @@ PathEffectAnimators::PathEffectAnimators(BoundingBox * const parentPath) :
 }
 
 void PathEffectAnimators::addEffect(const qsptr<PathEffect>& effect) {
-    ca_addChildAnimator(effect);
+    addChild(effect);
     const bool reasons = effect->hasReasonsNotToApplyUglyTransform();
     if(reasons && mParentBox->SWT_isPathBox()) {
         mParentBox->incReasonsNotToApplyUglyTransform();
@@ -22,7 +22,7 @@ void PathEffectAnimators::addEffect(const qsptr<PathEffect>& effect) {
 }
 
 void PathEffectAnimators::removeEffect(const qsptr<PathEffect>& effect) {
-    ca_removeChildAnimator(effect);
+    removeChild(effect);
     const bool reasons = effect->hasReasonsNotToApplyUglyTransform();
     if(reasons && mParentBox->SWT_isPathBox()) {
         mParentBox->decReasonsNotToApplyUglyTransform();

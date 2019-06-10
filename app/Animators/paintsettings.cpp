@@ -26,7 +26,7 @@ PaintSettingsAnimator::PaintSettingsAnimator(
         const QColor &colorT,
         const PaintType &paintTypeT,
         Gradient* const gradientT) :
-    StaticComplexAnimator(name), mTarget_k(parent) {
+    ComplexAnimator(name), mTarget_k(parent) {
     mColor->qra_setCurrentValue(colorT);
     showHideChildrenBeforeChaningPaintType(paintTypeT);
     mPaintType = paintTypeT;

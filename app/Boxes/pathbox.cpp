@@ -467,9 +467,7 @@ void PathBox::copyPathBoxDataTo(PathBox * const targetBox) {
     PathBox::writeBoundingBox(&buffer);
     BoundingBox::sClearWriteBoxes();
 
-    if(buffer.seek(sizeof(BoundingBoxType))) {
-        targetBox->PathBox::readBoundingBox(&buffer);
-    }
+    targetBox->PathBox::readBoundingBox(&buffer);
     buffer.close();
 
     BoundingBox::sClearReadBoxes();

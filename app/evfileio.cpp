@@ -208,6 +208,8 @@ void BrushSettings::readProperty(QIODevice * const src) {
 
 void OutlineSettingsAnimator::writeProperty(QIODevice * const dst) const {
     PaintSettingsAnimator::writeProperty(dst);
+    mLineWidth->writeProperty(dst);
+    mBrushSettings->writeProperty(dst);
     dst->write(rcConstChar(&mCapStyle), sizeof(Qt::PenCapStyle));
     dst->write(rcConstChar(&mJoinStyle), sizeof(Qt::PenJoinStyle));
     dst->write(rcConstChar(&mOutlineCompositionMode),
@@ -216,6 +218,8 @@ void OutlineSettingsAnimator::writeProperty(QIODevice * const dst) const {
 
 void OutlineSettingsAnimator::readProperty(QIODevice * const src) {
     PaintSettingsAnimator::readProperty(src);
+    mLineWidth->readProperty(src);
+    mBrushSettings->readProperty(src);
     src->read(rcChar(&mCapStyle), sizeof(Qt::PenCapStyle));
     src->read(rcChar(&mJoinStyle), sizeof(Qt::PenJoinStyle));
     src->read(rcChar(&mOutlineCompositionMode),
@@ -223,7 +227,8 @@ void OutlineSettingsAnimator::readProperty(QIODevice * const src) {
 }
 
 void PaintSettingsAnimator::writeProperty(QIODevice * const dst) const {
-    StaticComplexAnimator::writeProperty(dst);
+    mGradientPoints->writeProperty(dst);
+    mColor->writeProperty(dst);
     dst->write(rcConstChar(&mPaintType), sizeof(PaintType));
     dst->write(rcConstChar(&mGradientType), sizeof(bool));
     const int gradId = mGradient ? mGradient->getLoadId() : -1;
@@ -231,7 +236,8 @@ void PaintSettingsAnimator::writeProperty(QIODevice * const dst) const {
 }
 
 void PaintSettingsAnimator::readProperty(QIODevice * const src) {
-    StaticComplexAnimator::readProperty(src);
+    mGradientPoints->readProperty(src);
+    mColor->readProperty(src);
     PaintType paintType;
     src->read(rcChar(&paintType), sizeof(PaintType));
     int gradId;
@@ -288,7 +294,6 @@ void BoundingBox::writeBoundingBox(QIODevice * const target) {
     if(mWriteId < 0) assignWriteId();
     StaticComplexAnimator::writeProperty(target);
 
-    target->write(rcConstChar(&mType), sizeof(BoundingBoxType));
     gWrite(target, prp_mName);
     target->write(rcConstChar(&mWriteId), sizeof(int));
     target->write(rcConstChar(&mVisible), sizeof(bool));
@@ -463,6 +468,7 @@ void ContainerBox::writeBoundingBox(QIODevice * const target) {
     int nChildBoxes = mContainedBoxes.count();
     target->write(rcConstChar(&nChildBoxes), sizeof(int));
     for(const auto &child : mContainedBoxes) {
+        child->writeBoxType(target);
         child->writeBoundingBox(target);
     }
 }
@@ -472,8 +478,7 @@ void ContainerBox::readChildBoxes(QIODevice *target) {
     target->read(rcChar(&nChildBoxes), sizeof(int));
     for(int i = 0; i < nChildBoxes; i++) {
         qsptr<BoundingBox> box;
-        BoundingBoxType boxType;
-        target->read(rcChar(&boxType), sizeof(BoundingBoxType));
+        const auto boxType = BoundingBox::sReadBoxType(target);
         if(boxType == TYPE_VECTOR_PATH) {
             box = SPtrCreate(SmartVectorPath)();
         } else if(boxType == TYPE_IMAGE) {
@@ -533,7 +538,6 @@ void Canvas::writeBoundingBox(QIODevice * const target) {
 }
 
 void Canvas::readBoundingBox(QIODevice * const target) {
-    target->read(rcChar(&mType), sizeof(BoundingBoxType));
     ContainerBox::readBoundingBox(target);
     int currFrame;
     target->read(rcChar(&currFrame), sizeof(int));

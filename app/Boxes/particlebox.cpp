@@ -70,14 +70,12 @@ bool ParticleBox::relPointInsidePath(const QPointF &relPos) const {
 
 void ParticleBox::addEmitter(const qsptr<ParticleEmitter>& emitter) {
     mEmitters << emitter;
-    ca_addChildAnimator(emitter);
-    planScheduleUpdate(Animator::USER_CHANGE);
+    mEmitterCol->addChild(emitter);
 }
 
 void ParticleBox::removeEmitter(const qsptr<ParticleEmitter>& emitter) {
     mEmitters.removeOne(emitter);
-    ca_removeChildAnimator(emitter);
-    planScheduleUpdate(Animator::USER_CHANGE);
+    mEmitterCol->removeChild(emitter);
 }
 
 FrameRange ParticleBox::prp_getIdenticalRelRange(const int relFrame) const {
@@ -88,7 +86,7 @@ FrameRange ParticleBox::prp_getIdenticalRelRange(const int relFrame) const {
 }
 
 void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
-    auto emitter = SPtrCreate(ParticleEmitter)(this);
+    const auto emitter = SPtrCreate(ParticleEmitter)();
     emitter->getPosPoint()->setRelativePos(mapAbsPosToRel(absPos));
     addEmitter(emitter);
 }
@@ -126,9 +124,7 @@ MovablePoint *ParticleBox::getBottomRightPoint() {
     return mBottomRightPoint.get();
 }
 
-Particle::Particle(ParticleBox *parentBox) {
-    mParentBox = parentBox;
-}
+Particle::Particle() {}
 
 void Particle::initializeParticle(const int firstFrame,
                                   const int nFrames,
@@ -244,13 +240,11 @@ bool Particle::getParticleStateAtFrameF(const qreal frame,
     return true;
 }
 
-ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
+ParticleEmitter::ParticleEmitter() :
     StaticComplexAnimator("particle emitter") {
-    setParentBox(parentBox);
-
     mPosPoint = SPtrCreate(AnimatedPoint)(
                 mPos.get(),
-                mParentBox_k->getTransformAnimator(),
+                getTransformAnimator(),
                 TYPE_PATH_POINT);
     //mPos->setName("pos");
     //mPos.setCurrentValue(QPointF(0., 0.));
@@ -343,22 +337,9 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     scheduleGenerateParticles();
 }
 
-void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
-    mParentBox_k = parentBox;
-
-    scheduleGenerateParticles();
-    if(!parentBox) {
-        mColorAnimator->prp_setInheritedUpdater(nullptr);
-    } else {
-        mColorAnimator->prp_setInheritedUpdater(
-                    SPtrCreate(DisplayedFillStrokeSettingsUpdater)(parentBox));
-    }
-}
-
 void ParticleEmitter::scheduleGenerateParticles() {
     mGenerateParticlesScheduled = true;
-    mParentBox_k->prp_afterWholeInfluenceRangeChanged();
-    mParentBox_k->planScheduleUpdate(Animator::USER_CHANGE);
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void ParticleEmitter::setMinFrame(const int minFrame) {
@@ -514,7 +495,7 @@ void ParticleEmitter::generateParticles() {
                 currentReuseParticle++;
                 reuseParticle = currentReuseParticle < nReuseParticles;
             } else {
-                newParticle = new Particle(mParentBox_k);
+                newParticle = new Particle();
                 mParticles << newParticle;
             }
             qreal partVelAmp = gRandF(iniVelocity - iniVelocityVar,

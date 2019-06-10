@@ -120,7 +120,7 @@ void AnimationBox::disableFrameRemapping() {
     mFrameRemappingEnabled = false;
     mFrameAnimator->anim_removeAllKeys();
     mFrameAnimator->anim_setRecordingValue(false);
-    ca_removeChildAnimator(mFrameAnimator);
+    mFrameAnimator->SWT_hide();
     prp_afterWholeInfluenceRangeChanged();
     planScheduleUpdate(Animator::USER_CHANGE);
     updateDurationRectangleAnimationRange();

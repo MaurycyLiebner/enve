@@ -22,7 +22,7 @@ class SkStroke;
 
 class GradientPoints;
 
-class PaintSettingsAnimator : public StaticComplexAnimator {
+class PaintSettingsAnimator : public ComplexAnimator {
 protected:
     PaintSettingsAnimator(const QString &name,
                           GradientPoints * const grdPts,

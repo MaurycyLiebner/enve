@@ -27,7 +27,7 @@ public:
     void moveAllFrom(SmartPathCollection * const from) {
         const int iMax = from->ca_getNumberOfChildren() - 1;
         for(int i = iMax; i >= 0; i--)
-            addChild(from->ca_takeChildAt<SmartPathAnimator>(i));
+            addChild(from->takeChildAt(i));
     }
 
     SkPath getPathAtRelFrame(const qreal relFrame) const;
