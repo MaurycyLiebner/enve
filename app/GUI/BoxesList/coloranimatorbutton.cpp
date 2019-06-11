@@ -59,5 +59,5 @@ void ColorAnimatorButton::openColorSettingsDialog() {
     connect(MainWindow::getInstance(), &MainWindow::updateAll,
             dialog, qOverload<>(&QDialog::update));
     dialog->raise();
-    dialog->exec();
+    dialog->show();
 }

@@ -273,8 +273,6 @@ void BoxesListAnimationDockWidget::removeBoxesListKeysViewWidget(
         if(mBoxesListKeysViewWidgets.count() > 1) {
             mBoxesListKeysViewWidgets.at(1)->setTopWidget(
                                             mAnimationWidgetScrollbar);
-        } else {
-            return;
         }
     }
     mBoxesListKeysViewWidgets.removeOne(widget);

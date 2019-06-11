@@ -786,16 +786,17 @@ MainWindow *MainWindow::getInstance() {
 void MainWindow::createNewCanvas() {
     const QString defName = "Scene " +
             QString::number(mCurrentCanvasComboBox->count());
-    const auto newCanvas =
-            SPtrCreate(Canvas)(mCanvasWindow, 1920, 1080, 200);
+    const auto newCanvas = SPtrCreate(Canvas)(mCanvasWindow, 1920, 1080, 200);
     newCanvas->setName(defName);
 
-    CanvasSettingsDialog dialog(newCanvas.get(), this);
-    const int dialogRet = dialog.exec();
-    if(dialogRet == QDialog::Accepted) {
-        dialog.applySettingsToCanvas(newCanvas.get());
+    const auto dialog = new CanvasSettingsDialog(newCanvas.data(),
+                                                 MainWindow::getInstance());
+    connect(dialog, &QDialog::accepted, [this, dialog, newCanvas]() {
+        dialog->applySettingsToCanvas(newCanvas.get());
         addCanvas(newCanvas);
-    }
+    });
+
+    dialog->show();
 }
 
 void MainWindow::addCanvas(const qsptr<Canvas>& newCanvas) {

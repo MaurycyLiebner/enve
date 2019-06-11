@@ -85,7 +85,7 @@ void ColorSettingsWidget::setCurrentColor(const qreal h_t,
 }
 
 void ColorSettingsWidget::setCurrentColor(const QColor &color) {
-    setCurrentColor(color.redF(), color.greenF(), color.blueF(),
+    setCurrentColor(color.hueF(), color.saturationF(), color.valueF(),
                     color.alphaF());
 }
 
@@ -325,7 +325,12 @@ void ColorSettingsWidget::moveAlphaWidgetToTab(const int tabId) {
 }
 
 void ColorSettingsWidget::startColorPicking() {
-    new ColorPickingWidget(this);
+    const auto wid = new ColorPickingWidget(MainWindow::getInstance());
+    connect(wid, &ColorPickingWidget::colorSelected,
+            [this](const QColor & color) {
+        setCurrentColor(color);
+        emitFullColorChangedSignal();
+    });
 }
 
 ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {

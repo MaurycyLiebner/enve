@@ -71,7 +71,7 @@ public:
     void clearAll();
 
     RenderWidget *getRenderWidget();
-public slots:
+
     void setCurrentFrame(const int frame);
     void setViewedFrameRange(const int minFrame,
                              const int maxFrame);
