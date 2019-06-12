@@ -2,36 +2,10 @@
 
 void HDDCachableCacheHandler::blockConts(
         const FrameRange &range, const bool blocked) {
-    const IdRange idRange = rangeToIdRange(range);
-    if(idRange.fMin == -1) return;
-    if(idRange.fMax == -1) return;
-    for(int i = idRange.fMin; i <= idRange.fMax; i++) {
-        atId(i)->setBlocked(blocked);
+    const auto its = itRange(range);
+    for(auto it = its.first; it != its.second; it++) {
+        extractElement(it)->setBlocked(blocked);
     }
-}
-
-void HDDCachableCacheHandler::cacheDataBeforeRelFrame(const int relFrame) {
-    const int lastId = idAtOrBeforeFrame(relFrame);
-    for(int i = 0; i < lastId; i++) {
-        atId(i)->noDataLeft_k();
-    }
-}
-
-void HDDCachableCacheHandler::cacheDataAfterRelFrame(const int relFrame) {
-    const int firstId = idAtOrAfterFrame(relFrame);
-    for(int i = firstId; i < count(); i++) {
-        atId(i)->noDataLeft_k();
-    }
-}
-
-void HDDCachableCacheHandler::cacheFirstContainer() {
-    if(isEmpty()) return;
-    first()->noDataLeft_k();
-}
-
-void HDDCachableCacheHandler::cacheLastContainer() {
-    if(isEmpty()) return;
-    last()->noDataLeft_k();
 }
 
 #include "pointhelpers.h"
@@ -56,9 +30,8 @@ void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
     int lastDrawnFrame = uStartFrame;
     int lastDrawX = qRound(drawRect.x());
     //bool lastStoresInMemory = true;
-    const int iMin = qMax(0, idAtOrAfterFrame(uStartFrame));
-    for(int i = iMin; i < count(); i++) {
-        const auto cont = atId(i);
+    for(auto it = itAtOrAfterFrame(uStartFrame); it != end(); it++) {
+        const auto cont = extractElement(it);
         const int minFrame = qMax(startFrame - 1,
                                   qRound(cont->getRangeMin()*unit));
         if(minFrame > endFrame + 1) break;

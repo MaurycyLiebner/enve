@@ -10,7 +10,7 @@ class HDDCachableRangeCont : public HDDCachable {
     friend class SoundContainerTmpFileDataSaver;
 protected:
     HDDCachableRangeCont(const FrameRange &range,
-                              HDDCachableCacheHandler * const parent) :
+                         HDDCachableCacheHandler * const parent) :
         mRange(range), mParentCacheHandler_k(parent) {}
     virtual int clearMemory() = 0;
 public:

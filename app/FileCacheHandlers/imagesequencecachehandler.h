@@ -5,20 +5,16 @@
 
 class ImageSequenceCacheHandler : public AnimationCacheHandler {
     friend class StdSelfRef;
+protected:
+    ImageSequenceCacheHandler(const QStringList &framePaths);
 public:
     sk_sp<SkImage> getFrameAtFrame(const int relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame);
+    void clearCache();
+    Task* scheduleFrameLoad(const int frame);
 
     void updateFrameCount();
-
-    void processTask() {}
-
-    void clearCache();
-
-    Task* scheduleFrameLoad(const int frame);
-protected:
-    ImageSequenceCacheHandler(const QStringList &framePaths);
-
+private:
     QStringList mFramePaths;
     QList<stdptr<ImageCacheHandler>> mFrameImageHandlers;
 };

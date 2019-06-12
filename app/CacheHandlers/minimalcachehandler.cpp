@@ -72,7 +72,7 @@ int RangeCacheHandler::getFirstEmptyFrameAfterFrame(const int frame) const {
     }
 }
 
-int RangeCacheHandler::firstEmptyFrameAtOrAfterFrame(const int frame) const {
+int RangeCacheHandler::firstEmptyRangeLowerBound(const int frame) const {
     int currFrame = frame;
     RCC *cont = nullptr;
     while(true) {
@@ -92,35 +92,6 @@ void RangeCacheHandler::blockConts(
 
 void RangeCacheHandler::clearCache() {
     mRenderContainers.clear();
-}
-
-void RangeCacheHandler::cacheDataBeforeRelFrame(const int relFrame) {
-    const int lastId = idAtOrBeforeRelFrame(relFrame);
-    for(int i = 0; i < lastId; i++) {
-        mRenderContainers.at(i)->noDataLeft_k();
-    }
-}
-
-void RangeCacheHandler::cacheDataAfterRelFrame(const int relFrame) {
-    const int firstId = idAtOrAfterRelFrame(relFrame);
-    for(int i = firstId; i < mRenderContainers.count(); i++) {
-        mRenderContainers.at(i)->noDataLeft_k();
-    }
-}
-
-void RangeCacheHandler::cacheFirstContainer() {
-    if(mRenderContainers.isEmpty()) return;
-    mRenderContainers.first()->noDataLeft_k();
-}
-
-void RangeCacheHandler::cacheLastContainer() {
-    if(mRenderContainers.isEmpty()) return;
-    mRenderContainers.last()->noDataLeft_k();
-}
-
-int RangeCacheHandler::countAfterRelFrame(const int relFrame) const {
-    int firstId = idAtOrAfterRelFrame(relFrame + 1);
-    return mRenderContainers.count() - firstId;
 }
 
 int RangeCacheHandler::idAtOrBeforeRelFrame(const int frame) const {

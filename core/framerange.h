@@ -22,6 +22,10 @@ struct iValueRange {
         return val >= fMin && val <= fMax;
     }
 
+    bool inRange(const iValueRange& range) const {
+        return inRange(range.fMin) && inRange(range.fMax);
+    }
+
     int span() const {
         return qMax(0, fMax - fMin + 1);
     }
@@ -48,12 +52,12 @@ struct iValueRange {
     }
 
     bool operator<(const iValueRange& b) const {
-        Q_ASSERT(!overlaps(b));
+        if(overlaps(b)) return false;
         return fMin < b.fMin;
     }
 
     bool operator>(const iValueRange& b) const {
-        Q_ASSERT(!overlaps(b));
+        if(overlaps(b)) return false;
         return fMin > b.fMin;
     }
 

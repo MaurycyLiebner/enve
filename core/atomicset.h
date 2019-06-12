@@ -2,6 +2,7 @@
 #define ATOMICSET_H
 
 #include <QList>
+#include "exceptions.h"
 #include "framerange.h"
 
 template <class T>
@@ -63,11 +64,6 @@ public:
 
     int count() const { return mList.count(); }
 
-    int countAfterFrame(const int frame) const {
-        const int firstId = idAtOrAfterFrame(frame + 1);
-        return mList.count() - firstId;
-    }
-
     int getFirstEmptyFrameAfterFrame(const int frame) const {
         int currFrame = frame + 1;
         T *cont = nullptr;
@@ -78,7 +74,7 @@ public:
         }
     }
 
-    int firstEmptyFrameAtOrAfterFrame(const int frame) const {
+    int firstEmptyRangeLowerBound(const int frame) const {
         int currFrame = frame;
         T *cont = nullptr;
         while(true) {

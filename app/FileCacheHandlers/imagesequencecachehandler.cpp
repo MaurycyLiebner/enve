@@ -13,7 +13,7 @@ ImageSequenceCacheHandler::ImageSequenceCacheHandler(
 }
 
 sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtFrame(const int relFrame) {
-    ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame);
+    const auto cacheHandler = mFrameImageHandlers.at(relFrame);
     if(!cacheHandler) return sk_sp<SkImage>();
     return cacheHandler->getImage();
 }
@@ -24,7 +24,7 @@ sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtOrBeforeFrame(
     if(relFrame >= mFrameImageHandlers.count()) {
         return mFrameImageHandlers.last()->getImage();
     }
-    ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame);
+    const auto cacheHandler = mFrameImageHandlers.at(relFrame);
     return cacheHandler->getImage();
 }
 

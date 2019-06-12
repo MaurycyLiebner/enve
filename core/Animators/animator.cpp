@@ -410,9 +410,9 @@ std::pair<int, int> Animator::anim_getPrevAndNextKeyIdF(const qreal relFrame) co
     if(isInteger4Dec(relFrame))
         return anim_getPrevAndNextKeyId(qRound(relFrame));
     const int fFrame = qFloor(relFrame);
-    const int next = anim_getPrevAndNextKeyId(fFrame).second;
+    const int next = anim_getNextKeyId(fFrame);
     const int cFrame = qCeil(relFrame);
-    const int prev = anim_getPrevAndNextKeyId(cFrame).first;
+    const int prev = anim_getPrevKeyId(cFrame);
     return {prev, next};
 }
 

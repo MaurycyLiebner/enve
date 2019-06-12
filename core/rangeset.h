@@ -2,221 +2,218 @@
 #define RANGESET_H
 #include "atomicset.h"
 
-template <class T, const FrameRange& (T::*RangeGetter)() const,
+template <class T, const iValueRange& (T::*RangeGetter)() const,
           class TCont = RawVal<T>>
 class RangeSet {
-    struct ContFrameLess {
-        bool operator()(const TCont& element, const int relFrame) {
-            return ((*element).*RangeGetter)().fMax < relFrame;
-        }
-    };
-
-    void removeId(const int id) {
-        mList.removeAt(id);
-    }
+    typedef typename std::map<iValueRange, TCont>::iterator iterator;
+    typedef typename std::map<iValueRange, TCont>::const_iterator const_iterator;
 public:
-    typedef typename QList<TCont>::iterator iterator;
-    typedef typename QList<TCont>::const_iterator const_iterator;
-
-    const_iterator lower_bound(const int frame) const {
-        return std::lower_bound(begin(), end(), frame, ContFrameLess());
-    }
-
-    iterator lower_bound(const int frame) {
-        return std::lower_bound(begin(), end(), frame, ContFrameLess());
-    }
-
-    inline iterator begin() { return mList.begin(); }
-    inline iterator end() { return mList.end(); }
-
-    inline const_iterator begin() const { return mList.begin(); }
-    inline const_iterator end() const { return mList.end(); }
-
-    bool remove(const TCont& element) {
-        return mList.removeOne(element);
+    void remove(const TCont& element) {
+        remove(((*element).*RangeGetter)());
     }
 
     void remove(const iterator& begin, const iterator& end) {
         mList.erase(begin, end);
     }
 
-    void remove(const FrameRange &range) {
-        const auto idRange = rangeToIdRange(range);
-        if(idRange.fMin == -1 || idRange.fMax == -1) return;
+    void remove(const iValueRange &range) {
+        mList.erase(range);
+    }
 
-        for(int i = idRange.fMin; i <= idRange.fMax; i++)
-            removeId(i);
+    //! @brief Returns iterator range [first, second)
+    std::pair<iterator, iterator> itRange(const iValueRange &range) {
+        return {itAtOrAfterFrame(range.fMin),
+                itAfterFrame(range.fMax)};
+    }
+
+    //! @brief Returns iterator range [first, second)
+    std::pair<const_iterator, const_iterator>
+        itRange(const iValueRange &range) const {
+        return {itAtOrAfterFrame(range.fMin),
+                itAfterFrame(range.fMax)};
     }
 
     void clear() { mList.clear(); }
 
-    int count() const { return mList.count(); }
+    int count() const { return mList.size(); }
 
-    int countAfterFrame(const int frame) const {
-        const int firstId = idAtOrAfterFrame(frame + 1);
-        return mList.count() - firstId;
+    iValueRange firstEmptyRangeUpperBound(const int keyMin) const {
+        return firstEmptyRangeLowerBound(keyMin + 1);
     }
 
-    int getFirstEmptyFrameAfterFrame(const int frame) const {
-        int currFrame = frame + 1;
-        T *cont = nullptr;
+    iValueRange firstEmptyRangeLowerBound(const int keyMin) const {
+        int currKeyMin = keyMin;
         while(true) {
-            cont = atFrame(currFrame);
-            if(!cont) return currFrame;
-            currFrame = (cont->*RangeGetter)().fMax + 1;
+            auto cont = itAtFrame(currKeyMin);
+            if(cont == mList.end()) {
+                const auto after = itAfterFrame(currKeyMin);
+                const int lastEmpty = after == mList.end() ?
+                            iValueRange::EMAX :
+                            (extractElement<T>(cont)->*RangeGetter)().fMin - 1;
+                return {currKeyMin, lastEmpty};
+            }
+            currKeyMin = (extractElement<T>(cont)->*RangeGetter)().fMax + 1;
         }
     }
 
-    int firstEmptyFrameAtOrAfterFrame(const int frame) const {
-        int currFrame = frame;
-        T *cont = nullptr;
-        while(true) {
-            cont = atFrame(currFrame);
-            if(!cont) return currFrame;
-            currFrame = (cont->*RangeGetter)().fMax + 1;
-        }
-    }
+    QList<iValueRange> getMissingRanges(const iValueRange &range) const {
+        QList<iValueRange> result;
 
-    QList<FrameRange> getMissingRanges(const FrameRange &range) const {
-        QList<FrameRange> result;
-        int currentFrame = range.fMin;
-        while(currentFrame <= range.fMax) {
-            auto cont = atOrAfterFrame(currentFrame);
-            if(!cont) {
-                result.append({currentFrame, range.fMax});
-                break;
-            }
-            auto contRange = (cont->*RangeGetter)();
-            if(!contRange.inRange(currentFrame)) {
-                result.append({currentFrame,
-                               qMin(range.fMax, contRange.fMin - 1)});
-            }
-            currentFrame = contRange.fMax + 1;
+        int currKeyMin = range.fMin;
+        while(currKeyMin < range.fMax) {
+            const auto empty = firstEmptyRangeLowerBound(currKeyMin);
+            result << empty;
+            currKeyMin = empty.fMax + 1;
         }
 
         return result;
     }
 
-    bool isEmpty() const { return mList.isEmpty(); }
+    bool isEmpty() const { return mList.empty(); }
 
     void add(const TCont& element) {
-        const int contId = idAtOrAfterFrame(((*element).*RangeGetter)().fMax);
-        if(contId == -1) mList.append(element);
-        else mList.insert(contId, element);
+        const auto ret = mList.insert({((*element).*RangeGetter)(), element});
+        if(!ret.second) RuntimeThrow("Range already occupied by a different element");
     }
 
     template <class U = T>
-    U* atId(const int id) const {
-        return static_cast<U*>(&*mList.at(id));
+    inline U* extractElement(const iterator it) {
+        if(it == mList.end()) return nullptr;
+        return static_cast<U*>(&*it->second);
     }
 
     template <class U = T>
-    U* first() const {
-        return static_cast<U*>(&*mList.first());
+    inline const U* extractElement(const const_iterator it) const {
+        if(it == mList.end()) return nullptr;
+        return static_cast<const U*>(&*it->second);
     }
 
     template <class U = T>
-    U* last() const {
-        return static_cast<U*>(&*mList.last());
+    U* first() {
+        return extractElement<U>(mList.begin());
     }
 
     template <class U = T>
-    U* atFrame(const int frame) const {
-        if(isEmpty()) return nullptr;
-        const auto notPrev = lower_bound(frame);
-        if(notPrev == end()) return nullptr;
-        if(((**notPrev).*RangeGetter)().inRange(frame))
-            return static_cast<U*>(&**notPrev);
-        return nullptr;
+    const U* first() const {
+        return extractElement<U>(mList.begin());
     }
 
     template <class U = T>
-    U* atOrBeforeFrame(const int frame) const {
-        if(isEmpty()) return nullptr;
-        const auto notPrev = lower_bound(frame);
-        if(notPrev == end()) return static_cast<U*>(last());
-        if(((**notPrev).*RangeGetter)().inRange(frame))
-            return static_cast<U*>(&**notPrev);
-        if(notPrev == begin()) return nullptr;
-        return static_cast<U*>(&**(notPrev - 1));
+    U* last() {
+        return extractElement<U>(mList.rbegin());
     }
 
     template <class U = T>
-    U* atOrAfterFrame(const int frame) const {
-        if(isEmpty()) return nullptr;
-        return static_cast<U*>(&**lower_bound(frame));
+    const U* last() const {
+        return extractElement<U>(mList.rbegin());
     }
 
     template <class U = T>
-    U* beforeFrame(const int frame) const {
-        if(isEmpty()) return nullptr;
-        const auto notPrev = lower_bound(frame);
-        if(notPrev == end()) return static_cast<U*>(last());
-        if(notPrev == begin()) return nullptr;
-        return static_cast<U*>(&**(notPrev - 1));
+    U* atFrame(const int frame) {
+        return extractElement<U>(itAtFrame(frame));
     }
 
     template <class U = T>
-    U* afterFrame(const int frame) const {
-        if(isEmpty()) return nullptr;
-        const auto notPrev = lower_bound(frame);
-        if(notPrev == end()) return nullptr;
-        if(((**notPrev).*RangeGetter)().inRange(frame)) {
-            if(notPrev + 1 == end()) return nullptr;
-            return static_cast<U*>(&**notPrev + 1);
-        }
-        return static_cast<U*>(&**notPrev);
+    const U* atFrame(const int frame) const {
+        return extractElement<U>(itAtFrame(frame));
     }
 
-    int idAtFrame(const int frame) const {
-        if(isEmpty()) return -1;
-        const auto notPrev = lower_bound(frame);
-        if(notPrev == end()) return -1;
-        if(((**notPrev).*RangeGetter)().inRange(frame))
-            return notPrev - begin();
-        return -1;
+    template <class U = T>
+    U* atOrBeforeFrame(const int frame) {
+        return extractElement<U>(itAtOrBeforeFrame(frame));
     }
 
-    int idAtOrBeforeFrame(const int frame) const {
-        if(isEmpty()) return -1;
-        const auto notPrev = lower_bound(frame);
-        if(notPrev != end() &&
-           ((**notPrev).*RangeGetter)().inRange(frame))
-            return notPrev - begin();
-        return notPrev - begin() - 1;
+    template <class U = T>
+    const U* atOrBeforeFrame(const int frame) const {
+        return extractElement<U>(itAtOrBeforeFrame(frame));
     }
 
-    int idAtOrAfterFrame(const int frame) const {
-        if(isEmpty()) return -1;
-        const auto notPrev = lower_bound(frame);
-        if(notPrev == end()) return -1;
-        return notPrev - begin();
+    template <class U = T>
+    U* atOrAfterFrame(const int frame) {
+        return extractElement<U>(itAtOrAfterFrame(frame));
     }
 
-    int idBeforeFrame(const int frame) const {
-        if(isEmpty()) return -1;
-        const auto notPrev = lower_bound(frame);
-        if(notPrev == end()) return count() - 1;
-        return notPrev - begin() - 1;
+    template <class U = T>
+    const U* atOrAfterFrame(const int frame) const {
+        return extractElement<U>(itAtOrAfterFrame(frame));
     }
 
-    int idAfterFrame(const int frame) const {
-        if(isEmpty()) return -1;
-        const auto notPrev = lower_bound(frame);
-        if(notPrev == end()) return -1;
-        if(((**notPrev).*RangeGetter)().inRange(frame)) {
-            if(notPrev + 1 == end()) return -1;
-            return notPrev + 1 - begin();
-        }
-        return notPrev - begin();
+    template <class U = T>
+    U* beforeFrame(const int frame) {
+        return extractElement<U>(itBeforeFrame(frame));
     }
 
-    IdRange rangeToIdRange(const FrameRange &range) {
-        return {idAtOrAfterFrame(range.fMin),
-                idAtOrBeforeFrame(range.fMax)};
+    template <class U = T>
+    const U* beforeFrame(const int frame) const {
+        return extractElement<U>(itBeforeFrame(frame));
     }
+
+    template <class U = T>
+    U* afterFrame(const int frame) {
+        return extractElement<U>(itAfterFrame(frame));
+    }
+
+    template <class U = T>
+    const U* afterFrame(const int frame) const {
+        return extractElement<U>(itAfterFrame(frame));
+    }
+
+    iterator begin() { return mList.begin(); }
+    const_iterator begin() const { return mList.begin(); }
+
+    iterator end() { return mList.end(); }
+    const_iterator end() const { return mList.end(); }
+
+    iterator itAtFrame(const int frame) {
+        return mList.find({frame, frame});
+    }
+
+    const_iterator itAtFrame(const int frame) const {
+        return mList.find({frame, frame});
+    }
+
+    iterator itAtOrBeforeFrame(const int frame) {
+        auto nextIt = itAfterFrame(frame);
+        if(nextIt == mList.begin()) return mList.end();
+        return --nextIt;
+    }
+
+    const_iterator itAtOrBeforeFrame(const int frame) const {
+        auto nextIt = itAfterFrame(frame);
+        if(nextIt == mList.begin()) return mList.end();
+        return --nextIt;
+    }
+
+    iterator itAtOrAfterFrame(const int frame) {
+        return mList.lower_bound({frame, frame});
+    }
+
+    const_iterator itAtOrAfterFrame(const int frame) const {
+        return mList.lower_bound({frame, frame});
+    }
+
+    iterator itBeforeFrame(const int frame) {
+        auto nextIt = itAtOrAfterFrame(frame);
+        if(nextIt == mList.begin()) return mList.end();
+        return --nextIt;
+    }
+
+    const_iterator itBeforeFrame(const int frame) const {
+        auto nextIt = itAtOrAfterFrame(frame);
+        if(nextIt == mList.begin()) return mList.end();
+        return --nextIt;
+    }
+
+    iterator itAfterFrame(const int frame) {
+        return mList.upper_bound({frame, frame});
+    }
+
+    const_iterator itAfterFrame(const int frame) const {
+        return mList.upper_bound({frame, frame});
+    }
+
 private:
-    QList<TCont> mList;
+    std::map<iValueRange, TCont> mList;
 };
 
 #endif // RANGESET_H

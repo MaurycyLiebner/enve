@@ -20,21 +20,11 @@ public:
 
     int getFirstEmptyFrameAfterFrame(const int frame) const;
 
-    int firstEmptyFrameAtOrAfterFrame(const int frame) const;
+    int firstEmptyRangeLowerBound(const int frame) const;
 
     void blockConts(const FrameRange &range, const bool blocked);
 
     void clearCache();
-
-    void cacheDataBeforeRelFrame(const int relFrame);
-
-    void cacheDataAfterRelFrame(const int relFrame);
-
-    void cacheFirstContainer();
-
-    void cacheLastContainer();
-
-    int countAfterRelFrame(const int relFrame) const;
 
     template <typename T = RCC>
     T *atRelFrame(const int frame) const {
