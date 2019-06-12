@@ -3,7 +3,6 @@
 #include <unordered_map>
 #include <QString>
 #include <QList>
-#include "Boxes/rendercachehandler.h"
 #include "FileCacheHandlers/filecachehandler.h"
 
 class FileSourceListVisibleWidget;

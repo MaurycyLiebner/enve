@@ -2,7 +2,6 @@
 #include "boundingbox.h"
 #include <QElapsedTimer>
 #include "memoryhandler.h"
-#include "rendercachehandler.h"
 #include "GUI/mainwindow.h"
 #include "canvas.h"
 #include "skia/skiahelpers.h"

@@ -996,7 +996,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
 void CanvasWindow::nextCurrentRenderFrame() {
     auto& cacheHandler = mCurrentCanvas->getCacheHandler();
     int newCurrentRenderFrame = cacheHandler.
-            firstEmptyRangeLowerBound(mCurrentRenderFrame).fMin;
+            firstEmptyFrameAtOrAfter(mCurrentRenderFrame);
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
         const int minBlock = mCurrentRenderFrame + 1;
         const int maxBlock = newCurrentRenderFrame - 1;

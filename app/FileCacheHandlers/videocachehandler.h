@@ -1,7 +1,6 @@
 #ifndef VIDEOCACHEHANDLER_H
 #define VIDEOCACHEHANDLER_H
 #include "animationcachehandler.h"
-#include "Boxes/rendercachehandler.h"
 #include "videostreamsdata.h"
 
 class VideoCacheHandler : public AnimationCacheHandler {
@@ -29,7 +28,7 @@ public:
         removeFrameLoader(frameId);
     }
 
-    const RenderCacheHandler& getCacheHandler() const {
+    const HDDCachableCacheHandler& getCacheHandler() const {
         return mFramesCache;
     }
 protected:
@@ -90,7 +89,7 @@ private:
     QList<stdsptr<VideoFrameLoader>> mFrameLoaders;
 
     stdsptr<VideoStreamsData> mVideoStreamsData;
-    RenderCacheHandler mFramesCache;
+    HDDCachableCacheHandler mFramesCache;
 };
 
 #endif // VIDEOCACHEHANDLER_H

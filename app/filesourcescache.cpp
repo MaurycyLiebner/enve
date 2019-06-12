@@ -1,7 +1,6 @@
 #include "filesourcescache.h"
 #include "FileCacheHandlers/imagecachehandler.h"
 #include "FileCacheHandlers/videocachehandler.h"
-#include "Boxes/rendercachehandler.h"
 #include "Boxes/boundingboxrendercontainer.h"
 #include "GUI/mainwindow.h"
 #include "Boxes/boundingbox.h"

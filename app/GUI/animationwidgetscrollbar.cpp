@@ -37,7 +37,6 @@ void AnimationWidgetScrollBar::setCurrentCanvas(Canvas * const canvas) {
     mCurrentCanvas = canvas;
 }
 
-#include "Boxes/rendercachehandler.h"
 void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
     QPainter p(this);
     p.fillRect(rect(), QColor(60, 60, 60));

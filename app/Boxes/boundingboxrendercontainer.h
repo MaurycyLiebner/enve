@@ -12,7 +12,7 @@ class BoundingBox;
 #include "CacheHandlers/imagecachecontainer.h"
 class Canvas;
 
-class RenderCacheHandler;
+class HDDCachableCacheHandler;
 struct BoundingBoxRenderData;
 
 class RenderContainer {

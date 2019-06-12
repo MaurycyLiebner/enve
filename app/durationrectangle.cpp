@@ -1,5 +1,5 @@
 #include "durationrectangle.h"
-#include "Boxes/rendercachehandler.h"
+#include "CacheHandlers/hddcachablecachehandler.h"
 #include "global.h"
 #include "Boxes/boundingbox.h"
 #include "GUI/durationrectsettingsdialog.h"

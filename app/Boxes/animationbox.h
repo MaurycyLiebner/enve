@@ -3,7 +3,6 @@
 #include "Animators/intanimator.h"
 #include "durationrectangle.h"
 #include "boundingbox.h"
-#include "rendercachehandler.h"
 #include "imagebox.h"
 class AnimationCacheHandler;
 

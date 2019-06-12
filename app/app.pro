@@ -112,7 +112,6 @@ SOURCES += main.cpp\
     durationrectangle.cpp \
     GUI/BoxesList/boolpropertywidget.cpp \
     Boxes/imagesequencebox.cpp \
-    Boxes/rendercachehandler.cpp \
     memorychecker.cpp \
     memoryhandler.cpp \
     outputgenerator.cpp \
@@ -324,7 +323,6 @@ HEADERS  += \
     durationrectangle.h \
     GUI/BoxesList/boolpropertywidget.h \
     Boxes/imagesequencebox.h \
-    Boxes/rendercachehandler.h \
     memorychecker.h \
     memoryhandler.h \
     outputgenerator.h \

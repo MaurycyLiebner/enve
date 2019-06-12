@@ -4,7 +4,7 @@
 #include "Boxes/containerbox.h"
 #include "colorhelpers.h"
 #include <QThread>
-#include "Boxes/rendercachehandler.h"
+#include "CacheHandlers/hddcachablecachehandler.h"
 #include "skia/skiaincludes.h"
 #include "GUI/valueinput.h"
 #include "GUI/canvaswindow.h"
@@ -388,7 +388,7 @@ public:
     int getMaxFrame();
 
     //void updatePixmaps();
-    RenderCacheHandler& getCacheHandler() {
+    HDDCachableCacheHandler& getCacheHandler() {
         return mCacheHandler;
     }
 
@@ -567,7 +567,7 @@ protected:
     bool mPickStrokeFromPath = false;
 
     uint mLastStateId = 0;
-    RenderCacheHandler mCacheHandler;
+    HDDCachableCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;
 
     sk_sp<SkImage> mRenderImageSk;

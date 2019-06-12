@@ -2,9 +2,9 @@
 
 void HDDCachableCacheHandler::blockConts(
         const FrameRange &range, const bool blocked) {
-    const auto its = itRange(range);
+    const auto its = mConts.range(range);
     for(auto it = its.first; it != its.second; it++) {
-        extractElement(it)->setBlocked(blocked);
+        it->second->setBlocked(blocked);
     }
 }
 
@@ -30,8 +30,8 @@ void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
     int lastDrawnFrame = uStartFrame;
     int lastDrawX = qRound(drawRect.x());
     //bool lastStoresInMemory = true;
-    for(auto it = itAtOrAfterFrame(uStartFrame); it != end(); it++) {
-        const auto cont = extractElement(it);
+    for(auto it = mConts.atOrAfterFrame(uStartFrame); it != mConts.end(); it++) {
+        const auto cont = it->second.get();
         const int minFrame = qMax(startFrame - 1,
                                   qRound(cont->getRangeMin()*unit));
         if(minFrame > endFrame + 1) break;

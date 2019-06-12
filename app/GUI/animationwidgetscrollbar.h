@@ -4,7 +4,7 @@
 #include <QWidget>
 #include "smartPointers/sharedpointerdefs.h"
 #include "canvas.h"
-class RenderCacheHandler;
+class HDDCachableCacheHandler;
 
 class AnimationWidgetScrollBar : public QWidget {
     Q_OBJECT
