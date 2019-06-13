@@ -7,7 +7,7 @@ PixmapEffect::PixmapEffect(const QString &name,
     StaticComplexAnimator(name), mType(type) {}
 
 EffectAnimators *PixmapEffect::getParentEffectAnimators() {
-    return static_cast<EffectAnimators*>(mParent_k);
+    return static_cast<EffectAnimators*>(mParent_k.data());
 }
 
 qreal PixmapEffect::getMargin() { return 0.; }

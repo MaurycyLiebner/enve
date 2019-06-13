@@ -5,13 +5,22 @@
 #include <QDialog>
 #include "GUI/mainwindow.h"
 
-ColorAnimatorButton::ColorAnimatorButton(ColorAnimator * const colorTarget,
-                                         QWidget * const parent) :
+ColorAnimatorButton::ColorAnimatorButton(QWidget * const parent) :
     BoxesListActionButton(parent) {
-    setColorTarget(colorTarget);
-
     connect(this, &BoxesListActionButton::pressed,
             this, &ColorAnimatorButton::openColorSettingsDialog);
+}
+
+ColorAnimatorButton::ColorAnimatorButton(ColorAnimator * const colorTarget,
+                                         QWidget * const parent) :
+    ColorAnimatorButton(parent) {
+    setColorTarget(colorTarget);
+}
+
+ColorAnimatorButton::ColorAnimatorButton(const QColor &color,
+                                         QWidget * const parent) :
+    ColorAnimatorButton(parent) {
+    mColor = color;
 }
 
 void ColorAnimatorButton::setColorTarget(ColorAnimator * const target) {

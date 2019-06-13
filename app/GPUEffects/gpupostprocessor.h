@@ -119,7 +119,7 @@ public:
     }
 signals:
     void processedAll();
-private slots:
+private:
     void afterProcessed() {
         if(unhandledException())
             gPrintExceptionCritical(handleException());

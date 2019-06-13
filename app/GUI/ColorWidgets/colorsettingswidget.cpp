@@ -155,8 +155,8 @@ void ColorSettingsWidget::setTarget(ColorAnimator *target) {
         updateAlphaFromSpin();
         connect(target, SIGNAL(colorModeChanged(ColorMode)),
                 this, SLOT(refreshColorAnimatorTarget()));
-        connect(target, SIGNAL(beingDeleted()),
-                this, SLOT(nullifyAnimator()));
+        connect(target, &QObject::destroyed,
+                this, &ColorSettingsWidget::nullifyAnimator);
     }
 }
 

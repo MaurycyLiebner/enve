@@ -18,16 +18,18 @@ public:
     explicit ScrollWidget(ScrollArea * const parent);
 
     void updateHeight();
-    void setMainTarget(SingleWidgetTarget *target);
     virtual void updateAbstraction();
+
+    void setMainTarget(SingleWidgetTarget *target);
     int getContentHeight() {
         return mContentHeight;
     }
-private slots:
+private:
     void updateHeightAfterScrollAreaResize(const int parentHeight);
 protected:
-    int mContentHeight = 0;
     virtual void createVisiblePartWidget();
+
+    int mContentHeight = 0;
     qptr<SingleWidgetTarget> mMainTarget;
     stdptr<SingleWidgetAbstraction> mMainAbstraction;
     ScrollWidgetVisiblePart *mVisiblePartWidget = nullptr;

@@ -192,7 +192,7 @@ public:
 
     template <class T = ComplexAnimator>
     T *getParent() const {
-        return static_cast<T*>(mParent_k);
+        return static_cast<T*>(mParent_k.data());
     }
 
     void setParent(ComplexAnimator * const parent);
@@ -200,14 +200,14 @@ public:
     template <class T = Property>
     T *getFirstAncestor(const std::function<bool(Property*)>& tester) const {
         if(!mParent_k) return nullptr;
-        if(tester(mParent_k)) return static_cast<T*>(mParent_k);
+        if(tester(mParent_k)) return static_cast<T*>(mParent_k.data());
         return mParent_k->getFirstAncestor<T>(tester);
     }
 
     template <class T = Property>
     T *getFirstAncestor() const {
         if(!mParent_k) return nullptr;
-        const auto target = dynamic_cast<T*>(mParent_k);
+        const auto target = dynamic_cast<T*>(mParent_k.data());
         if(target) return target;
         return mParent_k->getFirstAncestor<T>();
     }
@@ -237,7 +237,7 @@ protected:
     stdsptr<PropertyUpdater> prp_mUpdater;
     QString prp_mName = "";
     stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;
-    Property * mParent_k = nullptr;
+    qptr<Property> mParent_k;
     stdsptr<PointsHandler> mPointsHandler;
 };
 

@@ -23,6 +23,8 @@
 #include "PixmapEffects/pixmapeffect.h"
 #include "Boxes/pathbox.h"
 
+#include "Animators/SmartPath/smartpathcollection.h"
+
 #include "typemenu.h"
 
 QPixmap* BoxSingleWidget::VISIBLE_PIXMAP;
@@ -168,6 +170,7 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
 
     mBlendModeCombo = new QComboBox(this);
     mMainLayout->addWidget(mBlendModeCombo);
+
 //    mBlendModeCombo->addItems(QStringList() <<
 //                                    "Source Over" <<
 //                                    "Destination Over" <<
@@ -235,6 +238,25 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
             this, &BoxSingleWidget::setCompositionMode);
     mBlendModeCombo->setSizePolicy(QSizePolicy::Maximum,
                     mBlendModeCombo->sizePolicy().horizontalPolicy());
+
+    mPathBlendModeCombo = new QComboBox(this);
+    mMainLayout->addWidget(mPathBlendModeCombo);
+    mPathBlendModeCombo->addItems(QStringList() << "Normal" <<
+                                  "Add" << "Remove" << "Remove reverse" <<
+                                  "Intersect" << "Exclude" << "Divide");
+    connect(mPathBlendModeCombo, qOverload<int>(&QComboBox::activated),
+            this, &BoxSingleWidget::setPathCompositionMode);
+    mPathBlendModeCombo->setSizePolicy(QSizePolicy::Maximum,
+                    mPathBlendModeCombo->sizePolicy().horizontalPolicy());
+
+    mFillTypeCombo = new QComboBox(this);
+    mMainLayout->addWidget(mFillTypeCombo);
+    mFillTypeCombo->addItems(QStringList() << "Winding" << "Even-odd");
+    connect(mFillTypeCombo, qOverload<int>(&QComboBox::activated),
+            this, &BoxSingleWidget::setFillType);
+    mFillTypeCombo->setSizePolicy(QSizePolicy::Maximum,
+                    mFillTypeCombo->sizePolicy().horizontalPolicy());
+
     mPropertyComboBox->setSizePolicy(QSizePolicy::Maximum,
                                      mPropertyComboBox->sizePolicy().horizontalPolicy());
     mBoxTargetWidget = new BoxTargetWidget(this);
@@ -313,11 +335,31 @@ int blendModeToIntSk(const SkBlendMode &mode) {
 }
 
 void BoxSingleWidget::setCompositionMode(const int id) {
-    SingleWidgetTarget *target = mTarget->getTarget();
+    const auto target = mTarget->getTarget();
 
     if(target->SWT_isBoundingBox()) {
-        auto boxTarget = GetAsPtr(target, BoundingBox);
+        const auto boxTarget = GetAsPtr(target, BoundingBox);
         boxTarget->setBlendModeSk(idToBlendModeSk(id));
+    }
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+}
+
+void BoxSingleWidget::setPathCompositionMode(const int id) {
+    const auto target = mTarget->getTarget();
+
+    if(target->SWT_isSmartPathAnimator()) {
+        const auto pAnim = GetAsPtr(target, SmartPathAnimator);
+        pAnim->setMode(static_cast<SmartPathAnimator::Mode>(id));
+    }
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+}
+
+void BoxSingleWidget::setFillType(const int id) {
+    const auto target = mTarget->getTarget();
+
+    if(target->SWT_isSmartPathCollection()) {
+        const auto pAnim = GetAsPtr(target, SmartPathCollection);
+        pAnim->setFillType(static_cast<SkPath::FillType>(id));
     }
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
@@ -332,11 +374,6 @@ ColorAnimator *BoxSingleWidget::getColorTarget() const {
         color = GetAsPtr(ca->getPropertyForGUI(), ColorAnimator);
     }
     return color;
-}
-
-void BoxSingleWidget::setBlendMode(const SkBlendMode &mode) {
-    int id = blendModeToIntSk(mode);
-    mBlendModeCombo->setCurrentIndex(id);
 }
 
 void BoxSingleWidget::clearAndHideValueAnimators() {
@@ -361,10 +398,14 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
     mLockedButton->setVisible(target->SWT_isBoundingBox());
     mRecordButton->show();
 
+    mFillTypeCombo->hide();
     mBlendModeCombo->hide();
+    mPathBlendModeCombo->hide();
     mPropertyComboBox->hide();
 
+    mPathBlendModeVisible = false;
     mBlendModeVisible = false;
+    mFillTypeVisible = false;
 
     mBoxTargetWidget->hide();
     mCheckBox->hide();
@@ -419,6 +460,11 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         if(target->SWT_isColorAnimator()) {
             mColorButton->setColorTarget(GetAsPtr(target, ColorAnimator));
             mColorButton->show();
+        } else if(target->SWT_isSmartPathCollection()) {
+            const auto coll = GetAsPtr(target, SmartPathCollection);
+            mFillTypeVisible = true;
+            mFillTypeCombo->setCurrentIndex(coll->getFillType());
+            updateFillTypeBoxVisible();
         }
         if(target->SWT_isComplexAnimator() && !abs->contentVisible()) {
             if(target->SWT_isQPointFAnimator()) {
@@ -444,6 +490,9 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->show();
         mBoxTargetWidget->setTargetProperty(
                     GetAsPtr(target, BoxTargetProperty));
+    } else if(target->SWT_isSmartPathAnimator()) {
+        mPathBlendModeVisible = true;
+        updatePathCompositionBoxVisible();
     }
 }
 
@@ -1033,6 +1082,17 @@ void BoxSingleWidget::clearColorButton() {
     mColorButton->hide();
 }
 
+void BoxSingleWidget::updatePathCompositionBoxVisible() {
+    if(!mTarget) return;
+    if(mPathBlendModeVisible) {
+        if(width() > 20*MIN_WIDGET_HEIGHT) {
+            mPathBlendModeCombo->show();
+        } else {
+            mPathBlendModeCombo->hide();
+        }
+    }
+}
+
 void BoxSingleWidget::updateCompositionBoxVisible() {
     if(!mTarget) return;
     if(mBlendModeVisible) {
@@ -1042,9 +1102,21 @@ void BoxSingleWidget::updateCompositionBoxVisible() {
             mBlendModeCombo->hide();
         }
     }
-    updateValueSlidersForQPointFAnimator();
+}
+
+void BoxSingleWidget::updateFillTypeBoxVisible() {
+    if(!mTarget) return;
+    if(mFillTypeVisible) {
+        if(width() > 20*MIN_WIDGET_HEIGHT) {
+            mFillTypeCombo->show();
+        } else {
+            mFillTypeCombo->hide();
+        }
+    }
 }
 
 void BoxSingleWidget::resizeEvent(QResizeEvent *) {
     updateCompositionBoxVisible();
+    updatePathCompositionBoxVisible();
+    updateFillTypeBoxVisible();
 }

@@ -76,6 +76,7 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &name,
 
     mBgColorLabel = new QLabel("Backgroud:", this);
     mBgColorButton = new ColorAnimatorButton(bg, this);
+    if(!bg) mBgColorButton->setColor(Qt::white);
 
     mBgColorLayout = new QHBoxLayout();
     mBgColorLayout->addWidget(mBgColorLabel);

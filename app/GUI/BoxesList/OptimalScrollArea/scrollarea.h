@@ -2,23 +2,21 @@
 #define SCROLLAREA_H
 #include <QScrollArea>
 
-class ScrollArea : public QScrollArea
-{
+class ScrollArea : public QScrollArea {
     Q_OBJECT
 public:
-    ScrollArea(QWidget *parent = nullptr);
+    ScrollArea(QWidget * const parent = nullptr);
 
-    void scrollBy(const int x,
-                  const int y);
-protected:
-    int mLastHeight = 0;
-    int mLastWidth = 0;
-    void resizeEvent(QResizeEvent *e);
+    void scrollBy(const int x, const int y);
+    void callWheelEvent(QWheelEvent *event);
 signals:
     void heightChanged(int);
     void widthChanged(int);
-public slots:
-    void callWheelEvent(QWheelEvent *event);
+protected:
+    void resizeEvent(QResizeEvent *e);
+private:
+    int mLastHeight = 0;
+    int mLastWidth = 0;
 };
 
 #endif // SCROLLAREA_H

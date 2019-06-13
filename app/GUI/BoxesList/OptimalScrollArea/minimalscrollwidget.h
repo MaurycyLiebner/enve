@@ -18,9 +18,7 @@ public:
     virtual void updateHeight() = 0;
 
     void scrollParentAreaBy(const int by);
-signals:
 
-public slots:
     void changeVisibleTop(const int top);
     void changeVisibleHeight(const int height);
     void setWidth(const int width);

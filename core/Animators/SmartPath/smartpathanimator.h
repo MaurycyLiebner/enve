@@ -14,6 +14,13 @@ protected:
     SmartPathAnimator(const SkPath& path);
     SmartPathAnimator(const SmartPath& baseValue);
 public:
+    enum Mode {
+        NORMAL,
+        ADD, REMOVE, REMOVE_REVERSE,
+        INTERSECT, EXCLUDE,
+        DIVIDE
+    };
+
     bool SWT_isSmartPathAnimator() const { return true; }
 
     void drawCanvasControls(SkCanvas * const canvas,
@@ -345,6 +352,13 @@ public:
         }
         return mCurrentPath;
     }
+
+    void setMode(const Mode mode) {
+        mMode = mode;
+        prp_afterWholeInfluenceRangeChanged();
+    }
+
+    Mode getMode() const { return mMode; }
 protected:
     SmartPath& getBaseValue() {
         return mBaseValue;
@@ -387,6 +401,7 @@ private:
     SkPath mCurrentPath;
     SmartPath mBaseValue;
     SmartPath * mPathBeingChanged_d = &mBaseValue;
+    Mode mMode = NORMAL;
 };
 
 #endif // SMARTPATHANIMATOR_H

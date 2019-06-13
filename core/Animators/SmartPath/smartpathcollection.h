@@ -35,6 +35,17 @@ public:
     void applyTransform(const QMatrix &transform) const;
 
     void loadSkPath(const SkPath& path);
+
+    void setFillType(const SkPath::FillType fillType) {
+        mFillType = fillType;
+        prp_afterWholeInfluenceRangeChanged();
+    }
+
+    SkPath::FillType getFillType() const {
+        return mFillType;
+    }
+private:
+    SkPath::FillType mFillType = SkPath::kWinding_FillType;
 };
 
 #endif // SMARTPATHCOLLECTION_H

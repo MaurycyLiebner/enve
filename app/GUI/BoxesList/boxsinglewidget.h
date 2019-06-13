@@ -10,6 +10,7 @@
 #include "skia/skiaincludes.h"
 #include "smartPointers/sharedpointerdefs.h"
 #include "framerange.h"
+#include "Animators/SmartPath/smartpathanimator.h"
 class QrealAnimatorValueSlider;
 class DurationRectangleMovable;
 class Key;
@@ -56,7 +57,7 @@ public:
                         const int pressX,
                         const qreal pixelsPerFrame,
                         const int minViewedFrame);
-    void setBlendMode(const SkBlendMode &mode);
+
     void setSelected(const bool bT) {
         mSelected = bT;
         update();
@@ -74,7 +75,13 @@ protected:
     void resizeEvent(QResizeEvent *);
 
     bool mBlendModeVisible = false;
+    bool mPathBlendModeVisible = false;
+    bool mFillTypeVisible = false;
+
+    void updatePathCompositionBoxVisible();
     void updateCompositionBoxVisible();
+    void updateFillTypeBoxVisible();
+
     void clearAndHideValueAnimators();
     void updateValueSlidersForQPointFAnimator();
 private:
@@ -89,6 +96,8 @@ private:
 
     void switchBoxVisibleAction();
     void setCompositionMode(const int id);
+    void setPathCompositionMode(const int id);
+    void setFillType(const int id);
     ColorAnimator* getColorTarget() const;
 
     QPoint mDragStartPos;
@@ -109,6 +118,8 @@ private:
 
     QComboBox *mPropertyComboBox;
     QComboBox *mBlendModeCombo;
+    QComboBox *mPathBlendModeCombo;
+    QComboBox *mFillTypeCombo;
 };
 
 #endif // BOXSINGLEWIDGET_H
