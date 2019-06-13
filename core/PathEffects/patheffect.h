@@ -11,8 +11,6 @@ enum PathEffectType : short {
     DASH_PATH_EFFECT,
     DUPLICATE_PATH_EFFECT,
     SOLIDIFY_PATH_EFFECT,
-    OPERATION_PATH_EFFECT,
-    LENGTH_PATH_EFFECT,
     SUM_PATH_EFFECT,
     SUB_PATH_EFFECT,
     LINES_PATH_EFFECT,
@@ -34,7 +32,6 @@ public:
     virtual void apply(const qreal relFrame,
                        const SkPath &src,
                        SkPath * const dst) = 0;
-    virtual bool hasReasonsNotToApplyUglyTransform();
 
     bool SWT_isPathEffect() const;
     QMimeData *SWT_createMimeData();

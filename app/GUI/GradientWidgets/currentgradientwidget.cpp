@@ -18,8 +18,8 @@ void CurrentGradientWidget::paintGL() {
     glUseProgram(PLAIN_PROGRAM.fID);
     Gradient *gradient = mGradientWidget->getCurrentGradient();
     int nColors = gradient->getColorCount();
-    int currentColorId = mGradientWidget->getCurrentColorId();
-    mGradientWidget->getCurrentColor();
+    int currentColorId = mGradientWidget->getColorId();
+    mGradientWidget->getColor();
     qreal xT = 0;
     const qreal xInc = static_cast<qreal>(width())/nColors;
     int hoveredColorId = qFloor(mHoveredX/xInc);
@@ -27,7 +27,7 @@ void CurrentGradientWidget::paintGL() {
     glUniform2f(PLAIN_PROGRAM.fMeshSizeLoc,
                 height()/static_cast<float>(3*xInc), 1.f/3);
     for(int j = 0; j < nColors; j++) {
-        QColor currentColor = gradient->getCurrentColorAt(j);
+        QColor currentColor = gradient->getColorAt(j);
         glViewport(qRound(xT), 0, qCeil(xInc), height());
 
 

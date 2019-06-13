@@ -40,7 +40,7 @@ stdsptr<PixmapEffectRenderData> ShadowEffect::getPixmapEffectRenderDataForRelFra
         const qreal relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ShadowEffectRenderData)();
     renderData->fBlurRadius = mBlurRadius->getEffectiveValue(relFrame);
-    renderData->fColor = mColor->getColorAtRelFrame(relFrame);
+    renderData->fColor = mColor->getColor(relFrame);
     renderData->fTranslation = mTranslation->
             getEffectiveValueAtRelFrame(relFrame);
     renderData->fOpacity = mOpacity->getEffectiveValue(relFrame)/100.;

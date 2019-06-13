@@ -34,7 +34,7 @@ void ColorAnimator::qra_setCurrentValue(const QColor &colorValue) {
     mAlphaAnimator->setCurrentBaseValue(alpha);
 }
 
-QColor ColorAnimator::getCurrentColor() const {
+QColor ColorAnimator::getColor() const {
     qreal val1 = mVal1Animator->getCurrentEffectiveValue();
     qreal val2 = mVal2Animator->getCurrentEffectiveValue();
     qreal val3 = mVal3Animator->getCurrentEffectiveValue();
@@ -51,11 +51,11 @@ QColor ColorAnimator::getCurrentColor() const {
     return color;
 }
 
-QColor ColorAnimator::getColorAtRelFrame(const qreal relFrame) {
-    qreal val1 = mVal1Animator->getEffectiveValue(relFrame);
-    qreal val2 = mVal2Animator->getEffectiveValue(relFrame);
-    qreal val3 = mVal3Animator->getEffectiveValue(relFrame);
-    qreal alpha = mAlphaAnimator->getEffectiveValue(relFrame);
+QColor ColorAnimator::getColor(const qreal relFrame) {
+    const qreal val1 = mVal1Animator->getEffectiveValue(relFrame);
+    const qreal val2 = mVal2Animator->getEffectiveValue(relFrame);
+    const qreal val3 = mVal3Animator->getEffectiveValue(relFrame);
+    const qreal alpha = mAlphaAnimator->getEffectiveValue(relFrame);
 
     QColor color;
     if(mColorMode == RGBMODE) {
@@ -66,6 +66,29 @@ QColor ColorAnimator::getColorAtRelFrame(const qreal relFrame) {
         color.setHslF(val1, val2, val3, alpha);
     }
     return color;
+}
+
+void ColorAnimator::setColor(const QColor &col) {
+    qreal val1, val2, val3;
+    const qreal alpha = col.alphaF();
+    if(mColorMode == RGBMODE) {
+        val1 = col.redF();
+        val2 = col.greenF();
+        val3 = col.blueF();
+    } else if(mColorMode == HSVMODE) {
+        val1 = col.hueF();
+        val2 = col.hsvSaturationF();
+        val3 = col.valueF();
+    } else { // HSLMODE
+        val1 = col.hueF();
+        val2 = col.hslSaturationF();
+        val3 = col.lightnessF();
+    }
+
+    mVal1Animator->setCurrentBaseValue(val1);
+    mVal2Animator->setCurrentBaseValue(val2);
+    mVal3Animator->setCurrentBaseValue(val3);
+    mAlphaAnimator->setCurrentBaseValue(alpha);
 }
 
 void ColorAnimator::setColorMode(const ColorMode &colorMode) {

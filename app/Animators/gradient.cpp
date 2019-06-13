@@ -34,9 +34,9 @@ void Gradient::addColorToList(const qsptr<ColorAnimator>& newColorAnimator) {
     ca_addChildAnimator(newColorAnimator);
 }
 
-QColor Gradient::getCurrentColorAt(const int id) {
+QColor Gradient::getColorAt(const int id) {
     if(id < 0 || id >= mColors.count()) return Qt::black;
-    return mColors.at(id)->getCurrentColor();
+    return mColors.at(id)->getColor();
 }
 
 ColorAnimator *Gradient::getColorAnimatorAt(const int id) {
@@ -117,7 +117,7 @@ QGradientStops Gradient::getQGradientStopsAtAbsFrame(const qreal absFrame) {
     qreal cPos = 0.;
     for(int i = 0; i < mColors.length(); i++) {
         stops.append(QPair<qreal, QColor>(clamp(cPos, 0, 1),
-                     mColors.at(i)->getColorAtRelFrame(absFrame)) );
+                     mColors.at(i)->getColor(absFrame)) );
         cPos += inc;
     }
     return stops;
@@ -129,7 +129,7 @@ void Gradient::updateQGradientStops(const Animator::UpdateReason& reason) {
     qreal cPos = 0;
     for(int i = 0; i < mColors.length(); i++) {
         mQGradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0, 1),
-                                    mColors.at(i)->getCurrentColor()) );
+                                    mColors.at(i)->getColor()) );
         cPos += inc;
     }
     for(const auto& path : mAffectedPaths) {

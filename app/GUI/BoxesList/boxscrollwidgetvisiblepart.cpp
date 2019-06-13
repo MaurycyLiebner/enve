@@ -484,8 +484,8 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
         const auto currentParent = draggedEffect->getParent<PathEffectAnimators>();
 
         if(currentParent != targetParent) {
-            currentParent->removeEffect(draggedEffect);
-            targetParent->addEffect(draggedEffect);
+            currentParent->removeChild(draggedEffect);
+            targetParent->addChild(draggedEffect);
         } else {
             if(fTargetId == draggedAbs->getIdInParent() ||
                fTargetId == draggedAbs->getIdInParent() + 1) return false;

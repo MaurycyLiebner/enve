@@ -306,7 +306,7 @@ public:
                          BoundingBoxRenderData * const data) {
         ContainerBox::setupRenderData(relFrame, data);
         auto canvasData = GetAsPtr(data, CanvasRenderData);
-        canvasData->fBgColor = toSkColor(mBackgroundColor->getCurrentColor());
+        canvasData->fBgColor = toSkColor(mBackgroundColor->getColor());
         canvasData->fCanvasHeight = mHeight*mResolutionFraction;
         canvasData->fCanvasWidth = mWidth*mResolutionFraction;
     }

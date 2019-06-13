@@ -23,8 +23,6 @@ void PathEffectsMenu::addPathEffectsActionToMenu(
                 "Sub-Path", menu, adder);
     addPathEffectActionToMenu<SolidifyPathEffect>(
                 "Solidify", menu, adder);
-    addPathEffectActionToMenu<OperationPathEffect>(
-                "Operation", menu, adder);
     addPathEffectActionToMenu<SumPathEffect>(
                 "Sum", menu, adder);
     addPathEffectActionToMenu<LinesPathEffect>(

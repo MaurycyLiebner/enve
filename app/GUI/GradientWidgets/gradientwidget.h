@@ -15,8 +15,8 @@ public:
     void setCurrentGradient(Gradient *gradient,
                             const bool emitChange = true);
     Gradient *getCurrentGradient();
-    QColor getCurrentColor();
-    ColorAnimator *getCurrentColorAnimator();
+    QColor getColor();
+    ColorAnimator *getColorAnimator();
 
     void moveColor(const int x);
 
@@ -57,7 +57,7 @@ public:
         return mGradients.at(id).get();
     }
 
-    int getCurrentColorId() const {
+    int getColorId() const {
         return mCurrentColorId;
     }
 signals:

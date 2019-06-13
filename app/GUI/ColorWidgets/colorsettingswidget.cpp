@@ -100,14 +100,14 @@ void ColorSettingsWidget::hideAlphaControlers() {
 }
 
 void ColorSettingsWidget::refreshColorAnimatorTarget() {
-    setColorAnimatorTarget(mTargetAnimator);
+    setTarget(mTargetAnimator);
 }
 
 void ColorSettingsWidget::nullifyAnimator() {
-    setColorAnimatorTarget(nullptr);
+    setTarget(nullptr);
 }
 
-void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
+void ColorSettingsWidget::setTarget(ColorAnimator *target) {
     if(mTargetAnimator) {
         disconnect(mTargetAnimator, nullptr, this, nullptr);
     }
@@ -160,7 +160,7 @@ void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
     }
 }
 
-ColorSetting ColorSettingsWidget::getCurrentColorSetting(
+ColorSetting ColorSettingsWidget::getColorSetting(
         const ColorSettingType& type) const {
     const int tabId = mTabWidget->currentIndex();
     qreal alphaVal = 1;
@@ -194,7 +194,7 @@ ColorSetting ColorSettingsWidget::getCurrentColorSetting(
 }
 
 void ColorSettingsWidget::emitColorChangedSignal() {
-    emit colorSettingSignal(getCurrentColorSetting(CST_CHANGE));
+    emit colorSettingSignal(getColorSetting(CST_CHANGE));
 }
 
 void ColorSettingsWidget::emitEditingFinishedSignal() {
@@ -204,7 +204,7 @@ void ColorSettingsWidget::emitEditingFinishedSignal() {
             mTargetAnimator->prp_finishTransform();
         }
     }
-    emit colorSettingSignal(getCurrentColorSetting(CST_FINISH));
+    emit colorSettingSignal(getColorSetting(CST_FINISH));
 }
 
 void ColorSettingsWidget::emitEditingStartedSignal() {
@@ -216,7 +216,7 @@ void ColorSettingsWidget::emitEditingStartedSignal() {
             mTargetAnimator->startVal3Transform();
         }
     }
-    emit colorSettingSignal(getCurrentColorSetting(CST_START));
+    emit colorSettingSignal(getColorSetting(CST_START));
 }
 
 void ColorSettingsWidget::emitEditingStartedRed() {

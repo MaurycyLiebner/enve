@@ -42,7 +42,7 @@ public:
     void writeProperty(QIODevice * const dst) const;
     void readProperty(QIODevice * const src);
 
-    QColor getCurrentColor() const;
+    QColor getColor() const;
     const PaintType &getPaintType() const;
     Gradient *getGradient() const;
     void setGradient(Gradient *gradient);
@@ -54,7 +54,7 @@ public:
 
     void duplicateColorAnimatorFrom(ColorAnimator *source);
     void setGradientVar(Gradient * const grad);
-    QColor getColorAtRelFrame(const qreal relFrame) const;
+    QColor getColor(const qreal relFrame) const;
     Gradient::Type getGradientType() { return mGradientType; }
     void setGradientType(const Gradient::Type &type) {
         if(mGradientType == type) return;

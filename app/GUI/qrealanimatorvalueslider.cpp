@@ -182,7 +182,7 @@ void QrealAnimatorValueSlider::setTarget(QrealAnimator * const animator) {
         setNumberDecimals(animator->getNumberDecimals());
         connect(animator, &QrealAnimator::valueChangedSignal,
                 this, &QrealAnimatorValueSlider::setValueFromAnimator);
-        connect(animator, &QrealAnimator::beingDeleted,
+        connect(animator, &QrealAnimator::destroyed,
                 this, &QrealAnimatorValueSlider::nullifyAnimator);
 
         setValueRange(animator->getMinPossibleValue(),
@@ -200,7 +200,7 @@ void QrealAnimatorValueSlider::setTarget(IntProperty * const animator) {
         setNumberDecimals(0);
         connect(animator, &IntProperty::valueChangedSignal,
                 this, &QrealAnimatorValueSlider::setValueFromAnimator);
-        connect(animator, &IntProperty::beingDeleted,
+        connect(animator, &IntProperty::destroyed,
                 this, &QrealAnimatorValueSlider::nullifyAnimator);
 
         setValueRange(animator->getMinValue(),

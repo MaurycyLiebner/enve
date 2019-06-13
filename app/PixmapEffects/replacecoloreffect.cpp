@@ -21,8 +21,8 @@ ReplaceColorEffect::ReplaceColorEffect() :
 stdsptr<PixmapEffectRenderData> ReplaceColorEffect::getPixmapEffectRenderDataForRelFrameF(
         const qreal relFrame, BoundingBoxRenderData*) {
     auto renderData = SPtrCreate(ReplaceColorEffectRenderData)();
-    QColor fromColor = mFromColor->getColorAtRelFrame(relFrame);
-    QColor toColor = mToColor->getColorAtRelFrame(relFrame);
+    QColor fromColor = mFromColor->getColor(relFrame);
+    QColor toColor = mToColor->getColor(relFrame);
 
     renderData->redR = qRound(fromColor.red()*fromColor.alphaF());
     renderData->greenR = qRound(fromColor.green()*fromColor.alphaF());

@@ -2,14 +2,12 @@
 #include "singlewidgettarget.h"
 
 SingleWidgetAbstraction::SingleWidgetAbstraction(
-        const qsptr<SingleWidgetTarget>& target,
+        SingleWidgetTarget * const target,
         const UpdateFuncs &updateFuncs,
         const int visiblePartId) :
     mVisiblePartWidgetId(visiblePartId),
     mUpdateFuncs(updateFuncs),
-    mTarget(target.data()) {}
-
-SingleWidgetAbstraction::~SingleWidgetAbstraction() {}
+    mTarget_k(target) {}
 
 bool SingleWidgetAbstraction::getAbstractions(
         const int minY, const int maxY,
@@ -20,8 +18,8 @@ bool SingleWidgetAbstraction::getAbstractions(
         const bool parentSatisfiesRule,
         const bool parentMainTarget) { // returns whether should abort
     if(currY > maxY) return true;
-    const bool satisfiesRule = mTarget->SWT_isVisible() &&
-            mTarget->SWT_shouldBeVisible(rules, parentSatisfiesRule,
+    const bool satisfiesRule = mTarget_k->SWT_isVisible() &&
+            mTarget_k->SWT_shouldBeVisible(rules, parentSatisfiesRule,
                                          parentMainTarget);
     if(currY > minY && satisfiesRule && !mIsMainTarget) {
         abstractions.append(this);
@@ -52,10 +50,10 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         const SWT_RulesCollection &rules,
         const bool parentSatisfiesRule,
         const bool parentMainTarget) { // returns whether should abort
-    if(!mTarget->SWT_isVisible()) return false;
+    if(!mTarget_k->SWT_isVisible()) return false;
     if(currY > maxY) return true;
-    const bool satisfiesRule = mTarget->SWT_isVisible() &&
-            mTarget->SWT_shouldBeVisible(
+    const bool satisfiesRule = mTarget_k->SWT_isVisible() &&
+            mTarget_k->SWT_shouldBeVisible(
                 rules, parentSatisfiesRule, parentMainTarget);
     if(currY > minY && satisfiesRule && !mIsMainTarget) {
         setAbsFunc(this, currX);
@@ -83,9 +81,9 @@ int SingleWidgetAbstraction::getHeight(
         const bool parentMainTarget,
         const int swtHeight) {
     int height = 0;
-    if(mTarget->SWT_isVisible()) {
-        const bool satisfiesRule = mTarget->SWT_isVisible() &&
-                mTarget->SWT_shouldBeVisible(rules, parentSatisfiesRule,
+    if(mTarget_k->SWT_isVisible()) {
+        const bool satisfiesRule = mTarget_k->SWT_isVisible() &&
+                mTarget_k->SWT_shouldBeVisible(rules, parentSatisfiesRule,
                                              parentMainTarget);
         if(satisfiesRule && !mIsMainTarget) {
             height += swtHeight;
@@ -171,7 +169,7 @@ void SingleWidgetAbstraction::setContentVisible(const bool bT) {
 }
 
 SingleWidgetTarget *SingleWidgetAbstraction::getTarget() const {
-    return mTarget;
+    return mTarget_k;
 }
 
 void SingleWidgetAbstraction::afterContentVisibilityChanged() {
@@ -182,7 +180,7 @@ void SingleWidgetAbstraction::afterContentVisibilityChanged() {
 void SingleWidgetAbstraction::removeAlongWithAllChildren_k() {
     for(const auto& child : mChildren)
         child->removeAlongWithAllChildren_k();
-    if(mTarget) mTarget->SWT_removeAbstractionFromList(
+    if(mTarget_k) mTarget_k->SWT_removeAbstractionFromList(
                 ref<SingleWidgetAbstraction>());
 }
 

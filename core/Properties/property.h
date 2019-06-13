@@ -81,11 +81,9 @@ protected:
     Property(const QString &name);
 
     virtual void updateCanvasProps() {
-        if(mParent) mParent->updateCanvasProps();
+        if(mParent_k) mParent_k->updateCanvasProps();
     }
 public:
-    ~Property() { emit beingDeleted(); }
-
     virtual int prp_getRelFrameShift() const {
         return 0;
     }
@@ -140,7 +138,7 @@ public:
     }
 
     virtual BasicTransformAnimator *getTransformAnimator() const {
-        if(mParent) return mParent->getTransformAnimator();
+        if(mParent_k) return mParent_k->getTransformAnimator();
         return nullptr;
     }
 
@@ -194,24 +192,24 @@ public:
 
     template <class T = ComplexAnimator>
     T *getParent() const {
-        return static_cast<T*>(mParent.data());
+        return static_cast<T*>(mParent_k);
     }
 
     void setParent(ComplexAnimator * const parent);
 
     template <class T = Property>
     T *getFirstAncestor(const std::function<bool(Property*)>& tester) const {
-        if(!mParent) return nullptr;
-        if(tester(mParent.data())) return static_cast<T*>(mParent.data());
-        return mParent->getFirstAncestor<T>(tester);
+        if(!mParent_k) return nullptr;
+        if(tester(mParent_k)) return static_cast<T*>(mParent_k);
+        return mParent_k->getFirstAncestor<T>(tester);
     }
 
     template <class T = Property>
     T *getFirstAncestor() const {
-        if(!mParent) return nullptr;
-        const auto target = dynamic_cast<T*>(mParent.data());
+        if(!mParent_k) return nullptr;
+        const auto target = dynamic_cast<T*>(mParent_k);
         if(target) return target;
-        return mParent->getFirstAncestor<T>();
+        return mParent_k->getFirstAncestor<T>();
     }
 
     bool drawsOnCanvas() const {
@@ -232,7 +230,6 @@ signals:
     void prp_addingKey(Key*);
     void prp_replaceWith(const qsptr<Property>&, const qsptr<Property>&);
     void prp_prependWith(Property*, const qsptr<Property>&);
-    void beingDeleted();
 protected:
     bool prp_mOwnUpdater = false;
     bool mDrawOnCanvas = false;
@@ -240,7 +237,7 @@ protected:
     stdsptr<PropertyUpdater> prp_mUpdater;
     QString prp_mName = "";
     stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;
-    QPointer<Property> mParent;
+    Property * mParent_k = nullptr;
     stdsptr<PointsHandler> mPointsHandler;
 };
 

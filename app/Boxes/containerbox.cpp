@@ -17,32 +17,32 @@ ContainerBox::ContainerBox(const BoundingBoxType &type) :
 
 void ContainerBox::iniPathEffects() {
     mPathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(this);
+            SPtrCreate(PathEffectAnimators)();
     mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(GroupAllPathsUpdater)(this));
     ca_addChildAnimator(mPathEffectsAnimators);
 
     mFillPathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(this);
+            SPtrCreate(PathEffectAnimators)();
     mFillPathEffectsAnimators->prp_setName("fill effects");
     mFillPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(GroupAllPathsUpdater)(this));
     ca_addChildAnimator(mFillPathEffectsAnimators);
 
+    mOutlineBasePathEffectsAnimators =
+            SPtrCreate(PathEffectAnimators)();
+    mOutlineBasePathEffectsAnimators->prp_setName("outline base effects");
+    mOutlineBasePathEffectsAnimators->prp_setOwnUpdater(
+                SPtrCreate(GroupAllPathsUpdater)(this));
+    ca_addChildAnimator(mOutlineBasePathEffectsAnimators);
+
     mOutlinePathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(this);
+            SPtrCreate(PathEffectAnimators)();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
     mOutlinePathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(GroupAllPathsUpdater)(this));
     ca_addChildAnimator(mOutlinePathEffectsAnimators);
-
-    mOutlineBasePathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(this);
-    mOutlineBasePathEffectsAnimators->prp_setName("outline effects");
-    mOutlineBasePathEffectsAnimators->prp_setOwnUpdater(
-                SPtrCreate(GroupAllPathsUpdater)(this));
-    ca_addChildAnimator(mOutlineBasePathEffectsAnimators);
 }
 
 
@@ -175,37 +175,37 @@ bool ContainerBox::differenceInPathEffectsBetweenFrames(const int relFrame1,
 }
 
 void ContainerBox::addPathEffect(const qsptr<PathEffect>& effect) {
-    mPathEffectsAnimators->addEffect(effect);
+    mPathEffectsAnimators->addChild(effect);
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
 void ContainerBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
-    mFillPathEffectsAnimators->addEffect(effect);
+    mFillPathEffectsAnimators->addChild(effect);
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
 void ContainerBox::addOutlineBasePathEffect(const qsptr<PathEffect>& effect) {
-    mOutlineBasePathEffectsAnimators->addEffect(effect);
+    mOutlineBasePathEffectsAnimators->addChild(effect);
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
 void ContainerBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
-    mOutlinePathEffectsAnimators->addEffect(effect);
+    mOutlinePathEffectsAnimators->addChild(effect);
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
 void ContainerBox::removePathEffect(const qsptr<PathEffect>& effect) {
-    mPathEffectsAnimators->removeEffect(effect);
+    mPathEffectsAnimators->removeChild(effect);
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
 void ContainerBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
-    mFillPathEffectsAnimators->removeEffect(effect);
+    mFillPathEffectsAnimators->removeChild(effect);
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
 void ContainerBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
-    mOutlinePathEffectsAnimators->removeEffect(effect);
+    mOutlinePathEffectsAnimators->removeChild(effect);
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 

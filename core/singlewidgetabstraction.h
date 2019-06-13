@@ -23,10 +23,9 @@ struct UpdateFuncs {
 
 class SingleWidgetAbstraction : public StdSelfRef {
 public:
-    SingleWidgetAbstraction(const qsptr<SingleWidgetTarget>& target,
+    SingleWidgetAbstraction(SingleWidgetTarget * const target,
                             const UpdateFuncs& updateFuncs,
                             const int visiblePartId);
-    ~SingleWidgetAbstraction();
 
     bool getAbstractions(const int minY, const int maxY,
                          int& currY, int currX,
@@ -119,7 +118,7 @@ private:
     bool mContentVisible = false;
     const int mVisiblePartWidgetId;
     const UpdateFuncs mUpdateFuncs;
-    const qptr<SingleWidgetTarget> mTarget;
+    SingleWidgetTarget * const mTarget_k;
 
     void updateChildrenIds(const int minId, const int maxId) const {
         for(int i = minId; i <= maxId; i++) {

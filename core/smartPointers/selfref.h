@@ -8,7 +8,6 @@
 template <class T> using qsptr = QSharedPointer<T>;
 template <class T> using qptr = QPointer<T>;
 class SelfRef : public QObject {
-    Q_OBJECT
 public:
     template<class D, class B>
     static inline D* getAsPtr(B* base) {

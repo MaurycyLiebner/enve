@@ -144,10 +144,8 @@ SOURCES += main.cpp\
     Boxes/renderdatahandler.cpp \
     Boxes/boundingboxrenderdata.cpp \
     PathEffects/displacepatheffect.cpp \
-    PathEffects/lengthpatheffect.cpp \
     PathEffects/duplicatepatheffect.cpp \
     PathEffects/solidifypatheffect.cpp \
-    PathEffects/operationpatheffect.cpp \
     PixmapEffects/blureffect.cpp \
     PixmapEffects/shadoweffect.cpp \
     PixmapEffects/lineseffect.cpp \
@@ -356,10 +354,8 @@ HEADERS  += \
     Boxes/renderdatahandler.h \
     Boxes/boundingboxrenderdata.h \
     PathEffects/displacepatheffect.h \
-    PathEffects/lengthpatheffect.h \
     PathEffects/duplicatepatheffect.h \
     PathEffects/solidifypatheffect.h \
-    PathEffects/operationpatheffect.h \
     PixmapEffects/blureffect.h \
     PixmapEffects/shadoweffect.h \
     PixmapEffects/lineseffect.h \

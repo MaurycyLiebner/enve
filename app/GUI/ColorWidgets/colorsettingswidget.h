@@ -25,7 +25,7 @@ public:
     QColor getCurrentQColor();
     void setCurrentColor(const QColor &color);
     void hideAlphaControlers();
-    ColorSetting getCurrentColorSetting(const ColorSettingType &type) const;
+    ColorSetting getColorSetting(const ColorSettingType &type) const;
 signals:
     void colorSettingSignal(const ColorSetting&);
     void colorModeChanged(const ColorMode&);
@@ -34,7 +34,7 @@ public slots:
                          const qreal s_t,
                          const qreal v_t,
                          const qreal a_t = 1.);
-    void setColorAnimatorTarget(ColorAnimator *target);
+    void setTarget(ColorAnimator *target);
     void emitColorChangedSignal();
     void emitEditingFinishedSignal();
     void emitEditingStartedSignal();

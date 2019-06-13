@@ -3,8 +3,6 @@
 
 #include "PathEffects/displacepatheffect.h"
 #include "PathEffects/duplicatepatheffect.h"
-#include "PathEffects/lengthpatheffect.h"
-#include "PathEffects/operationpatheffect.h"
 #include "PathEffects/solidifypatheffect.h"
 #include "PathEffects/sumpatheffect.h"
 #include "PathEffects/subpatheffect.h"

@@ -11,9 +11,12 @@ public:
 
     void setColorTarget(ColorAnimator * const target);
     void openColorSettingsDialog();
+
+    QColor color() const;
 protected:
     void paintEvent(QPaintEvent *);
 private:
+    QColor mColor;
     qptr<ColorAnimator> mColorTarget;
 };
 

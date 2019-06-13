@@ -17,25 +17,25 @@
 PathBox::PathBox(const BoundingBoxType &type) :
     BoundingBox(type) {
     mPathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(this);
+            SPtrCreate(PathEffectAnimators)();
     mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(NodePointUpdater)(this));
 
     mFillPathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(this);
+            SPtrCreate(PathEffectAnimators)();
     mFillPathEffectsAnimators->prp_setName("fill effects");
     mFillPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(NodePointUpdater)(this));
 
     mOutlineBasePathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(this);
+            SPtrCreate(PathEffectAnimators)();
     mOutlineBasePathEffectsAnimators->prp_setName("outline base effects");
     mOutlineBasePathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(NodePointUpdater)(this));
 
     mOutlinePathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)(this);
+            SPtrCreate(PathEffectAnimators)();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
     mOutlinePathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(NodePointUpdater)(this));
@@ -170,7 +170,7 @@ void PathBox::setupRenderData(const qreal relFrame,
             const qreal parentRelFrame =
                     mParentGroup->prp_absFrameToRelFrameF(absFrame);
             mParentGroup->applyPathEffects(parentRelFrame, &pathData->fPath,
-                                                data->fParentBox.data());
+                                                data->fParentBox);
         }
     }
 
@@ -212,7 +212,7 @@ void PathBox::setupRenderData(const qreal relFrame,
     UpdatePaintSettings &fillSettings = pathData->fPaintSettings;
 
     fillSettings.fPaintColor = mFillSettings->
-            getColorAtRelFrame(relFrame);
+            getColor(relFrame);
     fillSettings.fPaintType = mFillSettings->getPaintType();
     const auto fillGrad = mFillSettings->getGradient();
     if(fillGrad) {
@@ -248,7 +248,7 @@ void PathBox::setupRenderData(const qreal relFrame,
         }
     }
     strokeSettings.fPaintColor = mStrokeSettings->
-            getColorAtRelFrame(relFrame);
+            getColor(relFrame);
     strokeSettings.fPaintType = mStrokeSettings->getPaintType();
     const auto strokeGrad = mStrokeSettings->getGradient();
     if(strokeGrad) {
@@ -262,31 +262,31 @@ void PathBox::setupRenderData(const qreal relFrame,
 }
 
 void PathBox::addPathEffect(const qsptr<PathEffect>& effect) {
-    mPathEffectsAnimators->addEffect(effect);
+    mPathEffectsAnimators->addChild(effect);
 }
 
 void PathBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
-    mFillPathEffectsAnimators->addEffect(effect);
+    mFillPathEffectsAnimators->addChild(effect);
 }
 
 void PathBox::addOutlineBasePathEffect(const qsptr<PathEffect>& effect) {
-    mOutlineBasePathEffectsAnimators->addEffect(effect);
+    mOutlineBasePathEffectsAnimators->addChild(effect);
 }
 
 void PathBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
-    mOutlinePathEffectsAnimators->addEffect(effect);
+    mOutlinePathEffectsAnimators->addChild(effect);
 }
 
 void PathBox::removePathEffect(const qsptr<PathEffect>& effect) {
-    mPathEffectsAnimators->removeEffect(effect);
+    mPathEffectsAnimators->removeChild(effect);
 }
 
 void PathBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
-    mFillPathEffectsAnimators->removeEffect(effect);
+    mFillPathEffectsAnimators->removeChild(effect);
 }
 
 void PathBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
-    mOutlinePathEffectsAnimators->removeEffect(effect);
+    mOutlinePathEffectsAnimators->removeChild(effect);
 }
 
 void PathBox::resetStrokeGradientPointsPos() {
@@ -401,7 +401,7 @@ void PathBox::duplicateFillSettingsNotAnimatedFrom(
         mFillSettings->setPaintType(paintType);
         if(paintType == FLATPAINT) {
             mFillSettings->setCurrentColor(
-                        fillSettings->getCurrentColor());
+                        fillSettings->getColor());
         } else if(paintType == GRADIENTPAINT) {
             mFillSettings->setGradient(
                         fillSettings->getGradient());
@@ -420,7 +420,7 @@ void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
         mStrokeSettings->setPaintType(paintType);
         if(paintType == FLATPAINT || paintType == BRUSHPAINT) {
             mStrokeSettings->getColorAnimator()->qra_setCurrentValue(
-                        strokeSettings->getCurrentColor());
+                        strokeSettings->getColor());
             if(paintType == BRUSHPAINT) {
                 const auto srcBrushSettings = strokeSettings->getBrushSettings();
                 const auto dstBrushSettings = mStrokeSettings->getBrushSettings();

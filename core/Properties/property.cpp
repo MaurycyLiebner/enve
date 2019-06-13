@@ -115,7 +115,7 @@ void Property::prp_callFinishUpdater() {
 
 void Property::enabledDrawingOnCanvas() {
     mDrawOnCanvas = true;
-    if(mParent) mParent->updateCanvasProps();
+    if(mParent_k) mParent_k->updateCanvasProps();
 }
 
 void Property::setPointsHandler(const stdsptr<PointsHandler> &handler) {
@@ -132,6 +132,6 @@ void Property::addUndoRedo(const stdsptr<UndoRedo>& undoRedo) {
 }
 
 void Property::setParent(ComplexAnimator * const parent) {
-    mParent = parent;
+    mParent_k = parent;
     if(mPointsHandler) mPointsHandler->setTransform(getTransformAnimator());
 }

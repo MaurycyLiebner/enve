@@ -53,12 +53,12 @@ void PaintSettingsAnimator::setGradientVar(Gradient* const grad) {
     prp_callFinishUpdater();
 }
 
-QColor PaintSettingsAnimator::getCurrentColor() const {
-    return mColor->getCurrentColor();
+QColor PaintSettingsAnimator::getColor() const {
+    return mColor->getColor();
 }
 
-QColor PaintSettingsAnimator::getColorAtRelFrame(const qreal relFrame) const {
-    return mColor->getColorAtRelFrame(relFrame);
+QColor PaintSettingsAnimator::getColor(const qreal relFrame) const {
+    return mColor->getColor(relFrame);
 }
 
 const PaintType& PaintSettingsAnimator::getPaintType() const {

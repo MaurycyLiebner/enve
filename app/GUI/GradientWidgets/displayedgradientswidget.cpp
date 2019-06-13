@@ -46,13 +46,13 @@ void DisplayedGradientsWidget::paintGL() {
         int yInverted = height() - yT - MIN_WIDGET_HEIGHT;
         Gradient *gradient = mGradientWidget->getGradientAt(i);
         int nColors = gradient->getColorCount();
-        QColor lastColor = gradient->getCurrentColorAt(0);
+        QColor lastColor = gradient->getColorAt(0);
         qreal xT = 0.;
         qreal xInc = static_cast<qreal>(width())/(nColors - 1);
         glUniform2f(GRADIENT_PROGRAM.fMeshSizeLoc,
                     MIN_WIDGET_HEIGHT/(3.f*xInc), 1.f/3);
         for(int j = 1; j < nColors; j++) {
-            QColor currentColor = gradient->getCurrentColorAt(j);
+            QColor currentColor = gradient->getColorAt(j);
             glViewport(qRound(xT), yInverted, qRound(xInc), MIN_WIDGET_HEIGHT);
 
             glUniform4f(GRADIENT_PROGRAM.fRGBAColor1Loc,

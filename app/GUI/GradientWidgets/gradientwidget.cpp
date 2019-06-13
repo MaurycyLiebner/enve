@@ -42,7 +42,7 @@ void GradientWidget::updateAll() {
 
 void GradientWidget::setCurrentColorId(const int id) {
     mCurrentColorId = id;
-    //Color col = mCurrentGradient->getCurrentColorAt(mCurrentColorId);
+    //Color col = mCurrentGradient->getColorAt(mCurrentColorId);
     const auto currCol = mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
     emit selectedColorChanged(currCol);
     update();
@@ -149,12 +149,12 @@ Gradient *GradientWidget::getCurrentGradient() {
     return mCurrentGradient;
 }
 
-QColor GradientWidget::getCurrentColor() {
+QColor GradientWidget::getColor() {
     if(!mCurrentGradient) return QColor();
-    return mCurrentGradient->getCurrentColorAt(mCurrentColorId);
+    return mCurrentGradient->getColorAt(mCurrentColorId);
 }
 
-ColorAnimator *GradientWidget::getCurrentColorAnimator() {
+ColorAnimator *GradientWidget::getColorAnimator() {
     if(!mCurrentGradient) return nullptr;
     return mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
 }

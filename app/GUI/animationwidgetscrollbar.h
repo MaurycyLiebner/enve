@@ -16,7 +16,6 @@ public:
                                       const bool range,
                                       const bool clamp,
                                       QWidget *parent = nullptr);
-    virtual ~AnimationWidgetScrollBar() {}
     void emitChange();
     bool setFirstViewedFrame(const int firstFrame);
     void setFramesSpan(int newSpan);
@@ -74,7 +73,7 @@ private:
     qreal mLastMousePressFrame;
 
     QColor mHandleColor = QColor(100, 100, 100);
-    qptr<Canvas> mCurrentCanvas;
+    Canvas * mCurrentCanvas = nullptr;
 };
 
 #endif // ANIMATiONWIDGETSCROLLBAR_H

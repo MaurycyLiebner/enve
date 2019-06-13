@@ -177,6 +177,7 @@ void ComplexAnimator::ca_removeChildAnimator(
 
     SWT_removeChildAbstractionForTargetFromAll(removeAnimator.get());
 
+    removeAnimator->setParent(nullptr);
     ca_mChildAnimators.removeAt(getChildPropertyIndex(removeAnimator.get()));
     if(removeAnimator->drawsOnCanvas() ||
        removeAnimator->SWT_isComplexAnimator()) {

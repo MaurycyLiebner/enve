@@ -162,7 +162,7 @@ void Canvas::updateHoveredElements() {
 
 void Canvas::drawTransparencyMesh(SkCanvas *canvas,
                                   const SkRect &viewRect) {
-    if(mBackgroundColor->getCurrentColor().alpha() != 255) {
+    if(mBackgroundColor->getColor().alpha() != 255) {
         SkPaint paint;
         paint.setAntiAlias(true);
         paint.setStyle(SkPaint::kFill_Style);
@@ -229,7 +229,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
         if(!mClipToCanvasSize || !drawCanvas) {
             canvas->saveLayer(nullptr, nullptr);
-            paint.setColor(toSkColor(mBackgroundColor->getCurrentColor()));
+            paint.setColor(toSkColor(mBackgroundColor->getColor()));
             canvas->drawRect(viewRect, paint);
             canvas->concat(toSkMatrix(mCanvasTransform));
             for(const auto& box : mContainedBoxes) {

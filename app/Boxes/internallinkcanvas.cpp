@@ -16,7 +16,7 @@ void InternalLinkCanvas::setupRenderData(
     auto canvasData = GetAsSPtr(data, LinkCanvasRenderData);
     const auto canvasTarget = GetAsSPtr(finalTarget, Canvas);
     canvasData->fBgColor = toSkColor(canvasTarget->getBgColorAnimator()->
-            getColorAtRelFrame(relFrame));
+            getColor(relFrame));
     //qreal res = getParentCanvas()->getResolutionFraction();
     canvasData->fCanvasHeight = canvasTarget->getCanvasHeight();//*res;
     canvasData->fCanvasWidth = canvasTarget->getCanvasWidth();//*res;

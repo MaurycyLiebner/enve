@@ -2,27 +2,29 @@
 #include "canvas.h"
 #include "GUI/BoxesList/coloranimatorbutton.h"
 
-CanvasSettingsDialog::CanvasSettingsDialog(Canvas *canvas,
-                                           QWidget *parent) :
+CanvasSettingsDialog::CanvasSettingsDialog(Canvas * const canvas,
+                                           QWidget * const parent) :
     CanvasSettingsDialog(canvas->getName(),
                          canvas->getCanvasWidth(),
                          canvas->getCanvasHeight(),
                          canvas->getMaxFrame(),
                          canvas->getFps(),
                          canvas->getBgColorAnimator(),
-                         parent) {}
+                         parent) {
+    mTargetCanvas = canvas;
+}
 
 CanvasSettingsDialog::CanvasSettingsDialog(const QString &defName,
-                                           QWidget *parent) :
+                                           QWidget * const parent) :
     CanvasSettingsDialog(defName, 1920, 1080, 200, 24., nullptr, parent) {}
 
-CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
-                                           const int currWidth,
-                                           const int currHeight,
-                                           const int currFrameCount,
-                                           const qreal currFps,
-                                           ColorAnimator *bgColorAnimator,
-                                           QWidget *parent) :
+CanvasSettingsDialog::CanvasSettingsDialog(const QString &name,
+                                           const int width,
+                                           const int height,
+                                           const int frameCount,
+                                           const qreal fps,
+                                           ColorAnimator * const bg,
+                                           QWidget * const parent) :
     QDialog(parent) {
     setWindowTitle("Canvas Settings");
     mMainLayout = new QVBoxLayout(this);
@@ -30,7 +32,7 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
 
     mNameLayout = new QHBoxLayout();
     mNameEditLabel = new QLabel("Name: ", this);
-    mNameEdit = new QLineEdit(currName, this);
+    mNameEdit = new QLineEdit(name, this);
     mNameLayout->addWidget(mNameEditLabel);
     mNameLayout->addWidget(mNameEdit);
     mMainLayout->addLayout(mNameLayout);
@@ -38,12 +40,12 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
     mWidthLabel = new QLabel("Width:", this);
     mWidthSpinBox = new QSpinBox(this);
     mWidthSpinBox->setRange(1, 9999);
-    mWidthSpinBox->setValue(currWidth);
+    mWidthSpinBox->setValue(width);
 
     mHeightLabel = new QLabel("Height:", this);
     mHeightSpinBox = new QSpinBox(this);
     mHeightSpinBox->setRange(1, 9999);
-    mHeightSpinBox->setValue(currHeight);
+    mHeightSpinBox->setValue(height);
 
     mSizeLayout = new QHBoxLayout();
     mSizeLayout->addWidget(mWidthLabel);
@@ -55,7 +57,7 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
     mFrameCountLabel = new QLabel("Frame Count:", this);
     mFrameCountSpinBox = new QSpinBox(this);
     mFrameCountSpinBox->setRange(1, 999999);
-    mFrameCountSpinBox->setValue(currFrameCount);
+    mFrameCountSpinBox->setValue(frameCount);
 
     mFrameCountLayout = new QHBoxLayout();
     mFrameCountLayout->addWidget(mFrameCountLabel);
@@ -65,7 +67,7 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
     mFPSLabel = new QLabel("Fps:", this);
     mFPSSpinBox = new QDoubleSpinBox(this);
     mFPSSpinBox->setRange(1, 300);
-    mFPSSpinBox->setValue(currFps);
+    mFPSSpinBox->setValue(fps);
 
     mFPSLayout = new QHBoxLayout();
     mFPSLayout->addWidget(mFPSLabel);
@@ -73,7 +75,7 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
     mMainLayout->addLayout(mFPSLayout);
 
     mBgColorLabel = new QLabel("Backgroud:", this);
-    mBgColorButton = new ColorAnimatorButton(bgColorAnimator, this);
+    mBgColorButton = new ColorAnimatorButton(bg, this);
 
     mBgColorLayout = new QHBoxLayout();
     mBgColorLayout->addWidget(mBgColorLabel);
@@ -89,33 +91,40 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
 
     connect(mOkButton, &QPushButton::released,
             this, &CanvasSettingsDialog::accept);
+    connect(mOkButton, &QPushButton::released,
+            this, &CanvasSettingsDialog::accept);
     connect(mCancelButton, &QPushButton::released,
             this, &CanvasSettingsDialog::reject);
+    connect(this, &QDialog::rejected, this, &QDialog::close);
 }
 
-int CanvasSettingsDialog::getCanvasWidth() {
+int CanvasSettingsDialog::getCanvasWidth() const {
     return mWidthSpinBox->value();
 }
 
-int CanvasSettingsDialog::getCanvasHeight() {
+int CanvasSettingsDialog::getCanvasHeight() const {
     return mHeightSpinBox->value();
 }
 
-QString CanvasSettingsDialog::getCanvasName() {
+QString CanvasSettingsDialog::getCanvasName() const {
     return mNameEdit->text();
 }
 
-int CanvasSettingsDialog::getCanvasFrameCount() {
+int CanvasSettingsDialog::getCanvasFrameCount() const {
     return mFrameCountSpinBox->value();
 }
 
-qreal CanvasSettingsDialog::getFps() {
+qreal CanvasSettingsDialog::getFps() const {
     return mFPSSpinBox->value();
 }
 
-void CanvasSettingsDialog::applySettingsToCanvas(Canvas *canvas) {
+void CanvasSettingsDialog::applySettingsToCanvas(Canvas * const canvas) const {
+    if(!canvas) return;
     canvas->setName(getCanvasName());
     canvas->setCanvasSize(getCanvasWidth(), getCanvasHeight());
     canvas->setFps(getFps());
     canvas->setMaxFrame(getCanvasFrameCount());
+    if(canvas != mTargetCanvas) {
+        canvas->getBgColorAnimator()->setColor(mBgColorButton->color());
+    }
 }

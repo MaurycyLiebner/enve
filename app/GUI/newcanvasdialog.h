@@ -13,26 +13,28 @@ class ColorAnimatorButton;
 
 class CanvasSettingsDialog : public QDialog {
 public:
-    CanvasSettingsDialog(Canvas* canvas,
-                         QWidget *parent = nullptr);
+    CanvasSettingsDialog(Canvas * const canvas,
+                         QWidget * const parent = nullptr);
     CanvasSettingsDialog(const QString &defName,
-                         QWidget *parent = nullptr);
-    CanvasSettingsDialog(const QString &currName,
-                         const int currWidth,
-                         const int currHeight,
-                         const int currFrameCount,
-                         const qreal currFps,
-                         ColorAnimator* bgColorAnimator,
-                         QWidget *parent = nullptr);
+                         QWidget * const parent = nullptr);
+    CanvasSettingsDialog(const QString &name,
+                         const int width,
+                         const int height,
+                         const int frameCount,
+                         const qreal fps,
+                         ColorAnimator * const bg,
+                         QWidget * const parent = nullptr);
 
-    int getCanvasWidth();
-    int getCanvasHeight();
-    QString getCanvasName();
-    int getCanvasFrameCount();
-    qreal getFps();
+    int getCanvasWidth() const;
+    int getCanvasHeight() const;
+    QString getCanvasName() const;
+    int getCanvasFrameCount() const;
+    qreal getFps() const;
 
-    void applySettingsToCanvas(Canvas *canvas);
+    void applySettingsToCanvas(Canvas * const canvas) const;
 private:
+    Canvas * mTargetCanvas = nullptr;
+
     QVBoxLayout *mMainLayout;
 
     QHBoxLayout *mNameLayout;

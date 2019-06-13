@@ -4,33 +4,9 @@
 #include "Boxes/containerbox.h"
 #include <QDebug>
 
-PathEffectAnimators::PathEffectAnimators(BoundingBox * const parentPath) :
+PathEffectAnimators::PathEffectAnimators() :
     PathEffectAnimatorsBase("path effects") {
-    mParentBox = parentPath;
-
     makeHiddenWhenEmpty();
-}
-
-void PathEffectAnimators::addEffect(const qsptr<PathEffect>& effect) {
-    addChild(effect);
-    const bool reasons = effect->hasReasonsNotToApplyUglyTransform();
-    if(reasons && mParentBox->SWT_isPathBox()) {
-        mParentBox->incReasonsNotToApplyUglyTransform();
-    }
-    SWT_setEnabled(true);
-    SWT_setVisible(true);
-}
-
-void PathEffectAnimators::removeEffect(const qsptr<PathEffect>& effect) {
-    removeChild(effect);
-    const bool reasons = effect->hasReasonsNotToApplyUglyTransform();
-    if(reasons && mParentBox->SWT_isPathBox()) {
-        mParentBox->decReasonsNotToApplyUglyTransform();
-    }
-}
-
-BoundingBox *PathEffectAnimators::getParentBox() {
-    return mParentBox;
 }
 
 bool PathEffectAnimators::hasEffects() {
@@ -56,7 +32,7 @@ void PathEffectAnimators::apply(const qreal relFrame,
 void PathEffectAnimators::readPathEffect(QIODevice * const src) {
     const auto pathEffect = readIdCreatePathEffect(src);
     pathEffect->readProperty(src);
-    addEffect(pathEffect);
+    addChild(pathEffect);
 }
 
 #include "patheffectsinclude.h"
@@ -68,13 +44,6 @@ qsptr<PathEffect> readIdCreatePathEffect(QIODevice * const src) {
         pathEffect = SPtrCreate(DisplacePathEffect)();
     } else if(typeT == DUPLICATE_PATH_EFFECT) {
         pathEffect = SPtrCreate(DuplicatePathEffect)();
-    } else if(typeT == OPERATION_PATH_EFFECT) {
-        pathEffect = SPtrCreate(OperationPathEffect)();
-    } else if(typeT == LENGTH_PATH_EFFECT) {
-        //pathEffect = SPtrCreate(LengthPathEffect)(mIsOutline);
-        const auto subPathEffect = SPtrCreate(SubPathEffect)();
-        subPathEffect->readLengthEffect(src);
-        pathEffect = subPathEffect;
     } else if(typeT == SOLIDIFY_PATH_EFFECT) {
         pathEffect = SPtrCreate(SolidifyPathEffect)();
     } else if(typeT == SUM_PATH_EFFECT) {

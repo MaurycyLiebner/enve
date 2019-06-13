@@ -45,5 +45,3 @@ void PathEffect::setVisible(const bool bT) {
 bool PathEffect::isVisible() const {
     return mVisible;
 }
-
-bool PathEffect::hasReasonsNotToApplyUglyTransform() { return false; }

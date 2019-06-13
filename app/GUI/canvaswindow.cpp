@@ -295,14 +295,10 @@ void CanvasWindow::openSettingsWindowForCurrentCanvas() {
                                      MainWindow::getInstance());
     connect(dialog, &QDialog::accepted, this, [dialog, this]() {
         dialog->applySettingsToCanvas(mCurrentCanvas.data());
-        this->setCurrentCanvas(mCurrentCanvas.data());
+        setCurrentCanvas(mCurrentCanvas.data());
+        dialog->close();
     });
     dialog->show();
-
-//    if(dialog->exec() == QDialog::Accepted) {
-//        dialog->applySettingsToCanvas(mCurrentCanvas.data());
-//        setCurrentCanvas(mCurrentCanvas.data());
-//    }
 }
 
 void CanvasWindow::rotate90CCW() {

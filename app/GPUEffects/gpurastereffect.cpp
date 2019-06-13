@@ -19,5 +19,5 @@ void GPURasterEffect::writeIdentifier(QIODevice * const dst) const {
 }
 
 GPUEffectAnimators *GPURasterEffect::getParentEffectAnimators() {
-    return static_cast<GPUEffectAnimators*>(mParent.data());
+    return static_cast<GPUEffectAnimators*>(mParent_k);
 }

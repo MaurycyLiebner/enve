@@ -273,6 +273,8 @@ void BoxesListAnimationDockWidget::removeBoxesListKeysViewWidget(
         if(mBoxesListKeysViewWidgets.count() > 1) {
             mBoxesListKeysViewWidgets.at(1)->setTopWidget(
                                             mAnimationWidgetScrollbar);
+        } else {
+            mAnimationWidgetScrollbar->setParent(nullptr);
         }
     }
     mBoxesListKeysViewWidgets.removeOne(widget);
@@ -285,8 +287,8 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidgetBelow(
 }
 
 void BoxesListAnimationDockWidget::clearAll() {
-    QList<BoxesListKeysViewWidget*> widgets = mBoxesListKeysViewWidgets;
-    for(auto widget : widgets) {
+    const auto widgets = mBoxesListKeysViewWidgets;
+    for(const auto widget : widgets) {
         removeBoxesListKeysViewWidget(widget);
     }
 }

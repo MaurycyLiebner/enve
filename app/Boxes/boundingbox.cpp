@@ -336,7 +336,7 @@ bool BoundingBox::diffsIncludingInherited(
 void BoundingBox::setParentGroup(ContainerBox * const parent) {
     if(parent == mParentGroup) return;
     mParentGroup = parent;
-    mParent = parent;
+    mParent_k = parent;
     if(!mParentGroup) return;
     anim_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
     setParentTransform(parent->getTransformAnimator());

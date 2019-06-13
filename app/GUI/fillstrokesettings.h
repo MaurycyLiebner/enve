@@ -115,7 +115,7 @@ private:
 
     void setCurrentPaintTypeVal(const PaintType& paintType);
 
-    QColor getCurrentColorVal();
+    QColor getColorVal();
 
     void setCurrentColorVal(const QColor& color);
 

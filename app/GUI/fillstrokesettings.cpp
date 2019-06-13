@@ -306,7 +306,7 @@ void FillStrokeSettingsWidget::updateColorAnimator() {
             setColorAnimatorTarget(mCurrentStrokeColorAnimator);
         }
     } else if(getCurrentPaintTypeVal() == GRADIENTPAINT) {
-        setColorAnimatorTarget(mGradientWidget->getCurrentColorAnimator());
+        setColorAnimatorTarget(mGradientWidget->getColorAnimator());
     }
 }
 
@@ -499,7 +499,7 @@ void FillStrokeSettingsWidget::connectGradient() {
     connect(mGradientWidget,
             &GradientWidget::selectedColorChanged,
             mColorsSettingsWidget,
-            &ColorSettingsWidget::setColorAnimatorTarget);
+            &ColorSettingsWidget::setTarget);
     connect(mGradientWidget,
             &GradientWidget::currentGradientChanged,
             this, &FillStrokeSettingsWidget::setGradient);
@@ -510,14 +510,14 @@ void FillStrokeSettingsWidget::disconnectGradient() {
     disconnect(mGradientWidget,
                &GradientWidget::selectedColorChanged,
                mColorsSettingsWidget,
-               &ColorSettingsWidget::setColorAnimatorTarget);
+               &ColorSettingsWidget::setTarget);
     disconnect(mGradientWidget, &GradientWidget::currentGradientChanged,
                this, &FillStrokeSettingsWidget::setGradient);
 }
 
 void FillStrokeSettingsWidget::setColorAnimatorTarget(
         ColorAnimator *animator) {
-    mColorsSettingsWidget->setColorAnimatorTarget(animator);
+    mColorsSettingsWidget->setTarget(animator);
 }
 
 void FillStrokeSettingsWidget::setJoinStyle(Qt::PenJoinStyle joinStyle) {
@@ -544,7 +544,7 @@ void FillStrokeSettingsWidget::setCurrentPaintTypeVal(const PaintType& paintType
     else mCurrentStrokePaintType = paintType;
 }
 
-QColor FillStrokeSettingsWidget::getCurrentColorVal() {
+QColor FillStrokeSettingsWidget::getColorVal() {
     if(mTarget == PaintSetting::FILL) return mCurrentFillColor;
     else return mCurrentStrokeColor;
 }
@@ -574,7 +574,7 @@ void FillStrokeSettingsWidget::setFillValuesFromFillSettings(
         PaintSettingsAnimator *settings) {
     if(settings) {
         mCurrentFillGradientType = settings->getGradientType();
-        mCurrentFillColor = settings->getCurrentColor();
+        mCurrentFillColor = settings->getColor();
         mCurrentFillColorAnimator = settings->getColorAnimator();
         mCurrentFillGradient = settings->getGradient();
         mCurrentFillPaintType = settings->getPaintType();
@@ -587,7 +587,7 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
         OutlineSettingsAnimator *settings) {
     if(settings) {
         mCurrentStrokeGradientType = settings->getGradientType();
-        mCurrentStrokeColor = settings->getCurrentColor();
+        mCurrentStrokeColor = settings->getColor();
         mCurrentStrokeColorAnimator = settings->getColorAnimator();
         mCurrentStrokeGradient = settings->getGradient();
         setCurrentBrushSettings(settings->getBrushSettings());

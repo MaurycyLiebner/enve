@@ -46,7 +46,7 @@ public:
     void setLoadId(const int id);
 
     void addColorToList(const QColor &color);
-    QColor getCurrentColorAt(const int id);
+    QColor getColorAt(const int id);
     int getColorCount();
 
     QColor getLastQGradientStopQColor();

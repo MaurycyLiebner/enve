@@ -383,7 +383,7 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
         const qreal relFrame,
         const stdsptr<ParticleBoxRenderData> &particleData) {
     EmitterData data;
-    auto qcol = mColorAnimator->getColorAtRelFrame(relFrame);
+    auto qcol = mColorAnimator->getColor(relFrame);
     data.color = toSkColor(qcol);
 
     BoundingBox *targetT = mBoxTargetProperty->getTarget();
