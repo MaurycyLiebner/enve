@@ -26,7 +26,7 @@ int ComplexAnimator::ca_getNumberOfChildren() const {
 
 #include <QDebug>
 #include "singlewidgetabstraction.h"
-void ComplexAnimator::SWT_addChildrenAbstractions(
+void ComplexAnimator::SWT_setupAbstraction(
         SingleWidgetAbstraction* abstraction,
         const UpdateFuncs &updateFuncs,
         const int visiblePartWidgetId) {

@@ -1085,7 +1085,7 @@ void BoxSingleWidget::clearColorButton() {
 void BoxSingleWidget::updatePathCompositionBoxVisible() {
     if(!mTarget) return;
     if(mPathBlendModeVisible) {
-        if(width() > 20*MIN_WIDGET_HEIGHT) {
+        if(width() > 15*MIN_WIDGET_HEIGHT) {
             mPathBlendModeCombo->show();
         } else {
             mPathBlendModeCombo->hide();
@@ -1096,7 +1096,7 @@ void BoxSingleWidget::updatePathCompositionBoxVisible() {
 void BoxSingleWidget::updateCompositionBoxVisible() {
     if(!mTarget) return;
     if(mBlendModeVisible) {
-        if(width() > 20*MIN_WIDGET_HEIGHT) {
+        if(width() > 15*MIN_WIDGET_HEIGHT) {
             mBlendModeCombo->show();
         } else {
             mBlendModeCombo->hide();
@@ -1107,7 +1107,7 @@ void BoxSingleWidget::updateCompositionBoxVisible() {
 void BoxSingleWidget::updateFillTypeBoxVisible() {
     if(!mTarget) return;
     if(mFillTypeVisible) {
-        if(width() > 20*MIN_WIDGET_HEIGHT) {
+        if(width() > 15*MIN_WIDGET_HEIGHT) {
             mFillTypeCombo->show();
         } else {
             mFillTypeCombo->hide();

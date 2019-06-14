@@ -1,6 +1,7 @@
 #ifndef SINGLEWIDGETTARGET_H
 #define SINGLEWIDGETTARGET_H
 #include <QList>
+#include <map>
 #include "singlewidgetabstraction.h"
 
 class QMenu;
@@ -55,7 +56,7 @@ struct SWT_RulesCollection {
 class SingleWidgetTarget : public SelfRef {
 public:
     SingleWidgetTarget() {}
-    virtual void SWT_addChildrenAbstractions(
+    virtual void SWT_setupAbstraction(
             SingleWidgetAbstraction*,
             const UpdateFuncs &,
             const int) {}
@@ -144,27 +145,19 @@ public:
     SingleWidgetAbstraction *SWT_createAbstraction(
             const UpdateFuncs &updateFuncs,
             const int visiblePartWidgetId);
-    void SWT_removeAbstractionForWidget(const int visiblePartWidgetId) {
-        const auto currSwa = SWT_getAbstractionForWidget(visiblePartWidgetId);
-        if(!currSwa) return;
-        const auto currSwaSPtr = GetAsSPtr(currSwa, SingleWidgetAbstraction);
-        SWT_removeAbstractionFromList(currSwaSPtr);
-    }
 
-    void SWT_removeAbstractionFromList(
-            const stdsptr<SingleWidgetAbstraction> &abs);
+    void SWT_removeAbstractionForWidget(const int visiblePartWidgetId) {
+        SWT_mAllAbstractions.erase(visiblePartWidgetId);
+    }
 
     SingleWidgetAbstraction* SWT_getAbstractionForWidget(
             const int visiblePartWidgetId) const {
-        for(const auto& abs : SWT_mAllAbstractions) {
-            if(abs->getParentVisiblePartWidgetId() == visiblePartWidgetId) {
-                return abs.get();
-            }
-        }
-        return nullptr;
+        const auto it = SWT_mAllAbstractions.find(visiblePartWidgetId);
+        if(it == SWT_mAllAbstractions.end()) return nullptr;
+        return it->second.get();
     }
 
-    SingleWidgetAbstraction* SWT_getOrCreateAbstractionForWidget(
+    SingleWidgetAbstraction* SWT_abstractionForWidget(
             const UpdateFuncs &updateFuncs,
             const int visiblePartWidgetId) {
         const auto curr = SWT_getAbstractionForWidget(visiblePartWidgetId);
@@ -232,11 +225,11 @@ public:
     }
 
     void SWT_afterContentVisibilityChanged();
-protected:
+private:
     bool SWT_mAncestorDisabled = false;
     bool SWT_mVisible = true;
     bool SWT_mDisabled = false;
-    QList<stdsptr<SingleWidgetAbstraction>> SWT_mAllAbstractions;
+    std::map<int, stdsptr<SingleWidgetAbstraction>> SWT_mAllAbstractions;
 };
 
 #endif // SINGLEWIDGETTARGET_H

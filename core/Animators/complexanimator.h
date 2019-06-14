@@ -17,7 +17,7 @@ public:
         return nullptr;
     }
 
-    void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
+    void SWT_setupAbstraction(SingleWidgetAbstraction *abstraction,
                                      const UpdateFuncs &updateFuncs,
                                      const int visiblePartWidgetId);
 

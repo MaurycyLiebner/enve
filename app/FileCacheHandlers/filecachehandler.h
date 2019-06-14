@@ -16,7 +16,7 @@ public:
         mFileMissing = !file.exists();
     }
 
-    const QString &getFilePath() {
+    const QString &getFilePath() const {
         return mFilePath;
     }
 

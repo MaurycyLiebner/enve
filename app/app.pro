@@ -80,6 +80,7 @@ SOURCES += main.cpp\
     GUI/ColorWidgets/savedcolorwidgets.cpp \
     GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
+    document.cpp \
     evfileio.cpp \
     svgimporter.cpp \
     Animators/coloranimator.cpp \
@@ -291,6 +292,7 @@ HEADERS  += \
     GUI/ColorWidgets/savedcolorwidgets.h \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
+    document.h \
     svgimporter.h \
     keypoint.h \
     Animators/qstringanimator.h \

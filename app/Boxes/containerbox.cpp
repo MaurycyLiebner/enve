@@ -853,24 +853,24 @@ void ContainerBox::moveContainedBoxAbove(BoundingBox * const boxToMove,
 }
 
 #include "singlewidgetabstraction.h"
-void ContainerBox::SWT_addChildrenAbstractions(
+void ContainerBox::SWT_setupAbstraction(
         SingleWidgetAbstraction* abstraction,
         const UpdateFuncs &updateFuncs,
         const int visiblePartWidgetId) {
-    BoundingBox::SWT_addChildrenAbstractions(abstraction, updateFuncs,
+    BoundingBox::SWT_setupAbstraction(abstraction, updateFuncs,
                                              visiblePartWidgetId);
 
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
         const auto &child = mContainedBoxes.at(i);
-        auto abs = child->SWT_getOrCreateAbstractionForWidget(updateFuncs,
+        auto abs = child->SWT_abstractionForWidget(updateFuncs,
                                                               visiblePartWidgetId);
         abstraction->addChildAbstraction(abs);
     }
 }
 
 bool ContainerBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
-                                     const bool parentSatisfies,
-                                     const bool parentMainTarget) const {
+                                       const bool parentSatisfies,
+                                       const bool parentMainTarget) const {
     const SWT_BoxRule &rule = rules.fRule;
     if(rule == SWT_BR_SELECTED) {
         return BoundingBox::SWT_shouldBeVisible(rules,

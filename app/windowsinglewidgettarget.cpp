@@ -5,11 +5,11 @@
 WindowSingleWidgetTarget::WindowSingleWidgetTarget(
         CanvasWindow * const window) : mWindow(window) {}
 
-void WindowSingleWidgetTarget::SWT_addChildrenAbstractions(
+void WindowSingleWidgetTarget::SWT_setupAbstraction(
         SingleWidgetAbstraction *abstraction,
         const UpdateFuncs &updateFuncs,
         const int visiblePartWidgetId) {
-    mWindow->SWT_addChildrenAbstractions(abstraction, updateFuncs,
+    mWindow->SWT_setupAbstraction(abstraction, updateFuncs,
                                          visiblePartWidgetId);
 }
 

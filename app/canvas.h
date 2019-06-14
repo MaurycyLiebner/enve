@@ -568,9 +568,6 @@ protected:
 
     uint mLastStateId = 0;
     HDDCachableCacheHandler mCacheHandler;
-    bool mUpdateReplaceCache = false;
-
-    sk_sp<SkImage> mRenderImageSk;
 
     qsptr<ColorAnimator> mBackgroundColor =
             SPtrCreate(ColorAnimator)();

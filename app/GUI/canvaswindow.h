@@ -47,7 +47,6 @@ public:
     void addCanvasToList(const qsptr<Canvas> &canvas);
     void removeCanvas(const int id);
     void addCanvasToListAndSetAsCurrent(const qsptr<Canvas> &canvas);
-    void renameCanvas(Canvas *canvas, const QString &newName);
     void renameCanvas(const int id, const QString &newName);
     bool hasNoCanvas();
     void setCanvasMode(const CanvasMode &mode);
@@ -96,7 +95,7 @@ public:
     VideoBox *createVideoForPath(const QString &path);
     int getCurrentFrame();
     int getMaxFrame();
-    void SWT_addChildrenAbstractions(
+    void SWT_setupAbstraction(
             SingleWidgetAbstraction *abstraction,
             const UpdateFuncs &updateFuncs,
             const int visiblePartWidgetId);

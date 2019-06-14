@@ -66,12 +66,12 @@ Canvas *CanvasWindow::getCurrentCanvas() {
     return mCurrentCanvas;
 }
 
-void CanvasWindow::SWT_addChildrenAbstractions(
+void CanvasWindow::SWT_setupAbstraction(
         SingleWidgetAbstraction *abstraction,
         const UpdateFuncs &updateFuncs,
         const int visiblePartWidgetId) {
     for(const auto& child : mCanvasList) {
-        auto abs = child->SWT_getOrCreateAbstractionForWidget(updateFuncs,
+        auto abs = child->SWT_abstractionForWidget(updateFuncs,
                                                       visiblePartWidgetId);
         abstraction->addChildAbstraction(abs);
     }
@@ -221,20 +221,13 @@ void CanvasWindow::setPaintMode() {
     setCanvasMode(PAINT_MODE);
 }
 
-void CanvasWindow::addCanvasToListAndSetAsCurrent(
-        const qsptr<Canvas>& canvas) {
+void CanvasWindow::addCanvasToListAndSetAsCurrent(const qsptr<Canvas>& canvas) {
     addCanvasToList(canvas);
     setCurrentCanvas(canvas.get());
 }
 
-void CanvasWindow::renameCanvas(Canvas *canvas,
-                                const QString &newName) {
-    canvas->setName(newName);
-}
-
-void CanvasWindow::renameCanvas(const int id,
-                                const QString &newName) {
-    renameCanvas(mCanvasList.at(id).data(), newName);
+void CanvasWindow::renameCanvas(const int id, const QString &newName) {
+    mCanvasList.at(id)->setName(newName);
 }
 
 bool CanvasWindow::hasNoCanvas() {
@@ -243,7 +236,7 @@ bool CanvasWindow::hasNoCanvas() {
 
 void CanvasWindow::renameCurrentCanvas(const QString &newName) {
     if(!mCurrentCanvas) return;
-    renameCanvas(mCurrentCanvas.data(), newName);
+    mCurrentCanvas->setName(newName);
 }
 
 #include "glhelpers.h"
