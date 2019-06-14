@@ -91,7 +91,7 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
         pasteAct->setShortcut(Qt::CTRL + Qt::Key_V);
     }
 
-    const auto &listOfCanvas = mCanvasWindow->getCanvasList();
+    const auto &listOfCanvas = mActiveWindow->getCanvasList();
     if(listOfCanvas.count() > 1) {
         QMenu * const linkCanvasMenu = menu->addMenu("Link Canvas");
         for(const auto& canvas : listOfCanvas) {
@@ -216,7 +216,7 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
     });
 
     menu->addAction("Settings...", [this]() {
-        mCanvasWindow->openSettingsWindowForCurrentCanvas();
+        mActiveWindow->openSettingsWindowForCurrentCanvas();
     });
 }
 
@@ -256,7 +256,7 @@ void Canvas::handleRightButtonMousePress(const QMouseEvent * const event) {
         } else {
             clearPointsSelection();
             clearBoxesSelection();
-            QMenu menu(mCanvasWindow->getCanvasWidget());
+            QMenu menu(mActiveWindow->getCanvasWidget());
             addActionsToMenu(&menu);
             menu.exec(event->globalPos());
         }
@@ -544,7 +544,7 @@ void Canvas::handleMouseRelease() {
            mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
             handleMovePointMouseRelease();
             if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
-                mCanvasWindow->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
+                mActiveWindow->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
             }
         } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
             if(!mLastPressedPoint) {
@@ -591,7 +591,7 @@ void Canvas::handleMouseRelease() {
                 mCurrentTextBox->openTextEditor(mMainWindow);
             }
         } else if(mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
-            mCanvasWindow->setCanvasMode(CanvasMode::PAINT_MODE);
+            mActiveWindow->setCanvasMode(CanvasMode::PAINT_MODE);
         }
     }
 }

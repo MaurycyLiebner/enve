@@ -58,7 +58,7 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
         moveByRel(mCurrentMouseEventPosRel - mLastMouseEventPosRel);
     } else if(mCurrentMode == PAINT_MODE && leftPressed)  {
         paintMove(event->timestamp(), 1, 0, 0);
-        return mCanvasWindow->requestUpdate();
+        return mActiveWindow->requestUpdate();
     } else if(leftPressed || mIsMouseGrabbing) {
         if(mMovesToSkip > 0) {
             mMovesToSkip--;
@@ -167,7 +167,7 @@ void Canvas::mouseDoubleClickEvent(const QMouseEvent * const e) {
             GetAsPtr(boxAt, TextBox)->openTextEditor(mMainWindow);
         } else if(mCurrentMode == MOVE_BOX &&
                   boxAt->SWT_isSmartVectorPath()) {
-            mCanvasWindow->setCanvasMode(MOVE_POINT);
+            mActiveWindow->setCanvasMode(MOVE_POINT);
         }
     }
 
@@ -191,7 +191,7 @@ void Canvas::tabletEvent(const QTabletEvent * const e,
     } else if(e->type() == QEvent::TabletMove && mStylusDrawing) {
         paintMove(e->timestamp(), e->pressure(),
                   e->xTilt(), e->yTilt());
-        return mCanvasWindow->requestUpdate();
+        return mActiveWindow->requestUpdate();
     } // else if
     setLastMouseEventPosAbs(absPos);
     callUpdateSchedulers();

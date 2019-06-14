@@ -421,7 +421,7 @@ public:
 //        int newAbsPos = qRound(scale*pivotAbsFrame);
 //        anim_shiftAllKeys(newAbsPos - pivotAbsFrame);
         setMaxFrame(qRound((mMaxFrame - pivotAbsFrame)*scale));
-        mCanvasWindow->setCurrentCanvas(this);
+        mActiveWindow->setCurrentCanvas(this);
     }
 
     void changeFpsTo(const qreal fps) {
@@ -586,8 +586,8 @@ protected:
     qreal mResolutionFraction;
 
     MainWindow *mMainWindow;
-    CanvasWindow *mCanvasWindow;
-    QWidget *mCanvasWidget;
+    CanvasWindow *mActiveWindow;
+    QWidget *mActiveWidget;
 
     qptr<Circle> mCurrentCircle;
     qptr<Rectangle> mCurrentRectangle;

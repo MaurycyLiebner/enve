@@ -25,6 +25,11 @@ public:
 
     qptr<Canvas> fTimelineScene;
 
+    Canvas * createNewCanvas();
+
+    void write(QIODevice * const dst) const;
+    void read(QIODevice * const src) const;
+
     void SWT_setupAbstraction(SWT_Abstraction * const abstraction,
                               const UpdateFuncs &updateFuncs,
                               const int visiblePartWidgetId);

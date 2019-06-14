@@ -61,8 +61,8 @@ Canvas::Canvas(CanvasWindow *canvasWidget,
     mHeight = canvasHeight;
     mVisibleWidth = mWidth;
     mVisibleHeight = mHeight;
-    mCanvasWindow = canvasWidget;
-    mCanvasWidget = mCanvasWindow->getCanvasWidget();
+    mActiveWindow = canvasWidget;
+    mActiveWidget = mActiveWindow->getCanvasWidget();
 
     mCurrentBoxesGroup = this;
     mIsCurrentGroup = true;
@@ -278,8 +278,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
         }
 
         if(mPaintDrawableBox) {
-            const QRect widRect(0, 0, mCanvasWidget->width(),
-                                mCanvasWidget->height());
+            const QRect widRect(0, 0, mActiveWidget->width(),
+                                mActiveWidget->height());
             const auto canvasRect = mCanvasTransform.inverted().mapRect(widRect);
             const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
             const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
@@ -318,15 +318,15 @@ void Canvas::renderSk(SkCanvas * const canvas,
             canvas->drawRect(viewRect.makeInset(1, 1), paint);
         }
         if(mTransMode != MODE_NONE || mValueInput.inputEnabled())
-            mValueInput.draw(canvas, mCanvasWidget->height() - MIN_WIDGET_HEIGHT);
+            mValueInput.draw(canvas, mActiveWidget->height() - MIN_WIDGET_HEIGHT);
     }
 
-    if(mCanvasWindow->hasFocus()) {
+    if(mActiveWindow->hasFocus()) {
         paint.setColor(SK_ColorRED);
         paint.setStrokeWidth(4);
         paint.setStyle(SkPaint::kStroke_Style);
-        canvas->drawRect(SkRect::MakeWH(mCanvasWidget->width(),
-                                        mCanvasWidget->height()),
+        canvas->drawRect(SkRect::MakeWH(mActiveWidget->width(),
+                                        mActiveWidget->height()),
                                         paint);
     }
 }
@@ -649,13 +649,13 @@ void Canvas::updatePaintBox() {
 
 void Canvas::grabMouseAndTrack() {
     mIsMouseGrabbing = true;
-    mCanvasWindow->grabMouse();
+    mActiveWindow->grabMouse();
 }
 
 void Canvas::releaseMouseAndDontTrack() {
     mTransMode = MODE_NONE;
     mIsMouseGrabbing = false;
-    mCanvasWindow->releaseMouse();
+    mActiveWindow->releaseMouse();
 }
 
 bool Canvas::handlePaintModeKeyPress(QKeyEvent * const event) {
@@ -911,8 +911,8 @@ void Canvas::resetTransormation() {
     mCanvasTransform.reset();
     mVisibleHeight = mHeight;
     mVisibleWidth = mWidth;
-    moveByRel(QPointF((mCanvasWidget->width() - mVisibleWidth)*0.5,
-                      (mCanvasWidget->height() - mVisibleHeight)*0.5) );
+    moveByRel(QPointF((mActiveWidget->width() - mVisibleWidth)*0.5,
+                      (mActiveWidget->height() - mVisibleHeight)*0.5) );
 
 }
 
@@ -920,11 +920,11 @@ void Canvas::fitCanvasToSize() {
     mCanvasTransform.reset();
     mVisibleHeight = mHeight + MIN_WIDGET_HEIGHT;
     mVisibleWidth = mWidth + MIN_WIDGET_HEIGHT;
-    qreal widthScale = mCanvasWidget->width()/mVisibleWidth;
-    qreal heightScale = mCanvasWidget->height()/mVisibleHeight;
+    qreal widthScale = mActiveWidget->width()/mVisibleWidth;
+    qreal heightScale = mActiveWidget->height()/mVisibleHeight;
     zoomCanvas(qMin(heightScale, widthScale), QPointF(0, 0));
-    moveByRel(QPointF((mCanvasWidget->width() - mVisibleWidth)*0.5,
-                      (mCanvasWidget->height() - mVisibleHeight)*0.5) );
+    moveByRel(QPointF((mActiveWidget->width() - mVisibleWidth)*0.5,
+                      (mActiveWidget->height() - mVisibleHeight)*0.5) );
 }
 
 void Canvas::moveByRel(const QPointF &trans) {
