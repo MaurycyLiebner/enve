@@ -16,7 +16,7 @@
 #include <QWidgetAction>
 #include <QToolBar>
 #include "smartPointers/sharedpointerdefs.h"
-class AnimationWidgetScrollBar;
+class FrameScrollBar;
 class BoxesListKeysViewWidget;
 class VerticalWidgetsStack;
 class RenderWidget;
@@ -65,7 +65,7 @@ public:
     void previewBeingRendered();
     void previewPaused();
 
-    void updateSettingsForCurrentCanvas(Canvas *canvas);
+    void updateSettingsForCurrentCanvas(Canvas * const canvas);
     void addNewBoxesListKeysViewWidgetBelow(
             BoxesListKeysViewWidget *widget);
     void clearAll();
@@ -122,8 +122,8 @@ private:
 
     MainWindow *mMainWindow;
 
-    AnimationWidgetScrollBar *mFrameRangeScrollbar;
-    AnimationWidgetScrollBar *mAnimationWidgetScrollbar;
+    FrameScrollBar *mFrameRangeScrollbar;
+    FrameScrollBar *mAnimationWidgetScrollbar;
 };
 
 #endif // BOXESLISTANIMATIONDOCKWIDGET_H

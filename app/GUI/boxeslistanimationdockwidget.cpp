@@ -84,25 +84,21 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mTimelineLayout->setSpacing(0);
     mTimelineLayout->setMargin(0);
 
-    mFrameRangeScrollbar = new AnimationWidgetScrollBar(20, 200,
-                                                       20, MIN_WIDGET_HEIGHT,
-                                                       true,
-                                                       true, this);
-    mAnimationWidgetScrollbar = new AnimationWidgetScrollBar(1, 1,
-                                                            10, MIN_WIDGET_HEIGHT,
-                                                            false,
-                                                            false, this);
+    mFrameRangeScrollbar = new FrameScrollBar(20, 200, MIN_WIDGET_HEIGHT,
+                                              true, true, this);
+    mAnimationWidgetScrollbar = new FrameScrollBar(1, 1, MIN_WIDGET_HEIGHT,
+                                                   false, false, this);
     connect(MemoryHandler::sGetInstance(), &MemoryHandler::memoryFreed,
             mAnimationWidgetScrollbar,
-            qOverload<>(&AnimationWidgetScrollBar::update));
+            qOverload<>(&FrameScrollBar::update));
     mAnimationWidgetScrollbar->setTopBorderVisible(false);
 
     connect(mAnimationWidgetScrollbar,
-            &AnimationWidgetScrollBar::viewedFrameRangeChanged,
+            &FrameScrollBar::viewedFrameRangeChanged,
             parent, &MainWindow::setCurrentFrame);
 
     connect(mFrameRangeScrollbar,
-            &AnimationWidgetScrollBar::viewedFrameRangeChanged,
+            &FrameScrollBar::viewedFrameRangeChanged,
             this,
             &BoxesListAnimationDockWidget::setViewedFrameRange);
 
@@ -182,7 +178,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mLocalPivot->setFocusPolicy(Qt::NoFocus);
     mToolBar->addSeparator();
 
-    QWidget *spacerWidget = new QWidget(this);
+    QWidget * const spacerWidget = new QWidget(this);
     spacerWidget->setSizePolicy(QSizePolicy::Expanding,
                                 QSizePolicy::Minimum);
     spacerWidget->setStyleSheet("QWidget {"
@@ -192,8 +188,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mToolBar->addSeparator();
 
-    mTimelineAction = mToolBar->addAction("Timeline",
-                                          this, SLOT(setTimelineMode()));
+    mTimelineAction = mToolBar->addAction("Timeline", this,
+                                          &BoxesListAnimationDockWidget::setTimelineMode);
     mTimelineAction->setObjectName("customToolButton");
     mTimelineAction->setCheckable(true);
     mTimelineAction->setChecked(true);
@@ -354,8 +350,8 @@ void BoxesListAnimationDockWidget::previewBeingPlayed() {
     mPlayButton->setIcon(":/icons/pausePreviewButton.png");
     mPlayButton->setToolTip("pause preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
-    connect(mPlayButton, SIGNAL(pressed()),
-            this, SLOT(pausePreview()));
+    connect(mPlayButton, &ActionButton::pressed,
+            this, &BoxesListAnimationDockWidget::pausePreview);
 }
 
 void BoxesListAnimationDockWidget::previewBeingRendered() {
@@ -363,8 +359,8 @@ void BoxesListAnimationDockWidget::previewBeingRendered() {
     mPlayButton->setIcon(":/icons/playPreviewButton.png");
     mPlayButton->setToolTip("play preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
-    connect(mPlayButton, SIGNAL(pressed()),
-            this, SLOT(playPreview()));
+    connect(mPlayButton, &ActionButton::pressed,
+            this, &BoxesListAnimationDockWidget::playPreview);
 }
 
 void BoxesListAnimationDockWidget::previewPaused() {
@@ -372,8 +368,8 @@ void BoxesListAnimationDockWidget::previewPaused() {
     mPlayButton->setIcon(":/icons/playPreviewButton.png");
     mPlayButton->setToolTip("resume preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
-    connect(mPlayButton, SIGNAL(pressed()),
-            this, SLOT(resumePreview()));
+    connect(mPlayButton, &ActionButton::pressed,
+            this, &BoxesListAnimationDockWidget::resumePreview);
 }
 
 void BoxesListAnimationDockWidget::resumePreview() {
@@ -429,16 +425,16 @@ void BoxesListAnimationDockWidget::setCurrentFrame(const int frame) {
 }
 
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
-        Canvas* canvas) {
+        Canvas* const canvas) {
     if(!canvas) {
         mAnimationWidgetScrollbar->setCurrentCanvas(nullptr);
     } else {
-        disconnect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
-                   this, SLOT(setResolutionFractionText(QString)));
+        disconnect(mResolutionComboBox, &QComboBox::currentTextChanged,
+                   this, &BoxesListAnimationDockWidget::setResolutionFractionText);
         mResolutionComboBox->setCurrentText(
                     QString::number(canvas->getResolutionFraction()*100.) + " %");
-        connect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
-                this, SLOT(setResolutionFractionText(QString)));
+        connect(mResolutionComboBox, &QComboBox::currentTextChanged,
+                this, &BoxesListAnimationDockWidget::setResolutionFractionText);
         mAnimationWidgetScrollbar->setCurrentCanvas(canvas);
     }
 }

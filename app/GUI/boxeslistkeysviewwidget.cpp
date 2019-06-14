@@ -246,7 +246,7 @@ void BoxesListKeysViewWidget::moveSlider(int val) {
 }
 
 void BoxesListKeysViewWidget::connectToFrameWidget(
-        AnimationWidgetScrollBar *frameRange) {
+        FrameScrollBar *frameRange) {
     mKeysView->setFramesRange(frameRange->getFirstViewedFrame(),
                               frameRange->getLastViewedFrame());
 }

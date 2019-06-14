@@ -6,12 +6,11 @@
 #include "canvas.h"
 class HDDCachableCacheHandler;
 
-class AnimationWidgetScrollBar : public QWidget {
+class FrameScrollBar : public QWidget {
     Q_OBJECT
 public:
-    explicit AnimationWidgetScrollBar(const int minSpan,
+    explicit FrameScrollBar(const int minSpan,
                                       const int maxSpan,
-                                      const int spanInc,
                                       const int height,
                                       const bool range,
                                       const bool clamp,
@@ -73,7 +72,7 @@ private:
     qreal mLastMousePressFrame;
 
     QColor mHandleColor = QColor(100, 100, 100);
-    Canvas * mCurrentCanvas = nullptr;
+    qptr<Canvas> mCurrentCanvas;
 };
 
 #endif // ANIMATiONWIDGETSCROLLBAR_H

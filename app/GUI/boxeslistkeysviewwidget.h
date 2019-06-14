@@ -9,7 +9,7 @@
 #include "smartPointers/stdselfref.h"
 
 class SWT_Abstraction;
-class AnimationWidgetScrollBar;
+class FrameScrollBar;
 class KeysView;
 class BoxesListAnimationDockWidget;
 class ChangeWidthWidget;
@@ -30,7 +30,7 @@ public:
     ~BoxesListKeysViewWidget();
 
     void setTopWidget(QWidget *topWidget);
-    void connectToFrameWidget(AnimationWidgetScrollBar *frameRange);
+    void connectToFrameWidget(FrameScrollBar *frameRange);
     void connectToChangeWidthWidget(
             ChangeWidthWidget *changeWidthWidget);
     void setDisplayedFrameRange(const int minFrame, const int maxFrame);

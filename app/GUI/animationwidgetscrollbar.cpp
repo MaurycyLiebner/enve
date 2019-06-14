@@ -4,9 +4,8 @@
 #include "global.h"
 #include "colorhelpers.h"
 
-AnimationWidgetScrollBar::AnimationWidgetScrollBar(const int minSpan,
+FrameScrollBar::FrameScrollBar(const int minSpan,
                                                    const int maxSpan,
-                                                   const int spanInc,
                                                    const int height,
                                                    const bool range,
                                                    const bool clamp,
@@ -14,7 +13,6 @@ AnimationWidgetScrollBar::AnimationWidgetScrollBar(const int minSpan,
     QWidget(parent) {
     mMinSpan = minSpan;
     mMaxSpan = maxSpan;
-    mSpanInc = spanInc;
     mRange = range;
     mClamp = clamp;
     setFramesSpan(0);
@@ -23,21 +21,21 @@ AnimationWidgetScrollBar::AnimationWidgetScrollBar(const int minSpan,
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 }
 
-qreal AnimationWidgetScrollBar::posToFrame(int xPos) {
+qreal FrameScrollBar::posToFrame(int xPos) {
     return (xPos - MIN_WIDGET_HEIGHT/2)*
             (mMaxFrame - mMinFrame + (mRange ? 0 : 1) ) /
             ((qreal)width() - 2*MIN_WIDGET_HEIGHT) + mMinFrame;
 }
 
-void AnimationWidgetScrollBar::setTopBorderVisible(const bool bT) {
+void FrameScrollBar::setTopBorderVisible(const bool bT) {
     mTopBorderVisible = bT;
 }
 
-void AnimationWidgetScrollBar::setCurrentCanvas(Canvas * const canvas) {
+void FrameScrollBar::setCurrentCanvas(Canvas * const canvas) {
     mCurrentCanvas = canvas;
 }
 
-void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
+void FrameScrollBar::paintEvent(QPaintEvent *) {
     QPainter p(this);
     p.fillRect(rect(), QColor(60, 60, 60));
 
@@ -148,27 +146,35 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
     p.end();
 }
 
-void AnimationWidgetScrollBar::setFramesSpan(int newSpan) {
+void FrameScrollBar::setFramesSpan(int newSpan) {
     mViewedFramesSpan = clampInt(newSpan, mMinSpan, mMaxSpan);
     if(mClamp) setFirstViewedFrame(mFirstViewedFrame);
 }
 
-int AnimationWidgetScrollBar::getMaxFrame() {
+int FrameScrollBar::getMaxFrame() {
     return mMaxFrame;
 }
 
-int AnimationWidgetScrollBar::getMinFrame() {
+int FrameScrollBar::getMinFrame() {
     return mMinFrame;
 }
 
-void AnimationWidgetScrollBar::wheelEvent(QWheelEvent *event) {
+void FrameScrollBar::wheelEvent(QWheelEvent *event) {
     if(mRange) {
-        int newFramesSpan = mViewedFramesSpan;
-        if(event->delta() > 0) newFramesSpan -= mSpanInc;
-        else newFramesSpan += mSpanInc;
-        setFramesSpan(newFramesSpan);
+        if(event->modifiers() & Qt::CTRL) {
+            if(event->delta() > 0) {
+                setFirstViewedFrame(mFirstViewedFrame - mViewedFramesSpan/20);
+            } else {
+                setFirstViewedFrame(mFirstViewedFrame + mViewedFramesSpan/20);
+            }
+        } else {
+            int newFramesSpan = mViewedFramesSpan;
+            if(event->delta() > 0) newFramesSpan *= 0.85;
+            else newFramesSpan *= 1.15;
+            setFramesSpan(newFramesSpan);
+        }
     } else {
-        if(event->delta() < 0) {
+        if(event->delta() > 0) {
             setFirstViewedFrame(mFirstViewedFrame - 1);
         } else {
             setFirstViewedFrame(mFirstViewedFrame + 1);
@@ -179,7 +185,7 @@ void AnimationWidgetScrollBar::wheelEvent(QWheelEvent *event) {
     update();
 }
 
-bool AnimationWidgetScrollBar::setFirstViewedFrame(const int firstFrame) {
+bool FrameScrollBar::setFirstViewedFrame(const int firstFrame) {
     if(mClamp) {
         if(mRange) {
             mFirstViewedFrame = clampInt(firstFrame, mMinFrame, mMaxFrame -
@@ -194,7 +200,7 @@ bool AnimationWidgetScrollBar::setFirstViewedFrame(const int firstFrame) {
     }
 }
 #include <QMenu>
-void AnimationWidgetScrollBar::mousePressEvent(QMouseEvent *event) {
+void FrameScrollBar::mousePressEvent(QMouseEvent *event) {
     if(event->button() == Qt::RightButton) {
         QMenu menu(this);
         QAction *clampAction = new QAction("Clamp", this);
@@ -235,7 +241,7 @@ void AnimationWidgetScrollBar::mousePressEvent(QMouseEvent *event) {
     update();
 }
 
-void AnimationWidgetScrollBar::mouseMoveEvent(QMouseEvent *event) {
+void FrameScrollBar::mouseMoveEvent(QMouseEvent *event) {
     qreal newFrame = posToFrame(event->x() );
     int moveFrame = qRound(newFrame - mLastMousePressFrame);
     if(setFirstViewedFrame(mSavedFirstFrame + moveFrame)) {
@@ -244,12 +250,12 @@ void AnimationWidgetScrollBar::mouseMoveEvent(QMouseEvent *event) {
     }
 }
 
-void AnimationWidgetScrollBar::mouseReleaseEvent(QMouseEvent *) {
+void FrameScrollBar::mouseReleaseEvent(QMouseEvent *) {
     mPressed = false;
     update();
 }
 
-void AnimationWidgetScrollBar::setDisplayedFrameRange(const int startFrame,
+void FrameScrollBar::setDisplayedFrameRange(const int startFrame,
                                                       const int endFrame) {
     mMinFrame = startFrame;
     mMaxFrame = endFrame;
@@ -258,29 +264,29 @@ void AnimationWidgetScrollBar::setDisplayedFrameRange(const int startFrame,
                         mFirstViewedFrame + mViewedFramesSpan);
 }
 
-void AnimationWidgetScrollBar::setViewedFrameRange(const int minFrame,
+void FrameScrollBar::setViewedFrameRange(const int minFrame,
                                                    const int maxFrame) {
     setFirstViewedFrame(minFrame);
     setFramesSpan(maxFrame - minFrame);
     update();
 }
 
-void AnimationWidgetScrollBar::setCanvasFrameRange(const int minFrame,
+void FrameScrollBar::setCanvasFrameRange(const int minFrame,
                                                    const int maxFrame) {
     mMinCanvasFrame = minFrame;
     mMaxCanvasFrame = maxFrame;
     update();
 }
 
-void AnimationWidgetScrollBar::emitChange() {
+void FrameScrollBar::emitChange() {
     emit viewedFrameRangeChanged(mFirstViewedFrame,
                              mFirstViewedFrame + mViewedFramesSpan);
 }
 
-int AnimationWidgetScrollBar::getFirstViewedFrame() {
+int FrameScrollBar::getFirstViewedFrame() {
     return mFirstViewedFrame;
 }
 
-int AnimationWidgetScrollBar::getLastViewedFrame() {
+int FrameScrollBar::getLastViewedFrame() {
     return mFirstViewedFrame + mViewedFramesSpan;
 }
