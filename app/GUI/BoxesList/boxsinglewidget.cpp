@@ -43,7 +43,7 @@ bool BoxSingleWidget::sStaticPixmapsLoaded = false;
 #include "global.h"
 #include "GUI/mainwindow.h"
 #include "clipboardcontainer.h"
-#include "durationrectangle.h"
+#include "GUI/Timeline/durationrectangle.h"
 #include "boxeslistactionbutton.h"
 #include "coloranimatorbutton.h"
 #include "canvas.h"

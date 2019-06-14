@@ -228,13 +228,11 @@ SOURCES += main.cpp\
     FileCacheHandlers/animationcachehandler.cpp \
     FileCacheHandlers/videocachehandler.cpp \
     CacheHandlers/minimalcachecontainer.cpp \
-    CacheHandlers/rangecachecontainer.cpp \
     CacheHandlers/imagecachecontainer.cpp \
     CacheHandlers/tmpfilehandlers.cpp \
     CacheHandlers/soundcachecontainer.cpp \
     CacheHandlers/soundtmpfilehandlers.cpp \
     CacheHandlers/hddcachablecachehandler.cpp \
-    CacheHandlers/minimalcachehandler.cpp \
     CacheHandlers/soundcachehandler.cpp \
     canvasmouseevents.cpp \
     canvashandlesmartpath.cpp \
@@ -442,13 +440,11 @@ HEADERS  += \
     FileCacheHandlers/animationcachehandler.h \
     FileCacheHandlers/videocachehandler.h \
     CacheHandlers/minimalcachecontainer.h \
-    CacheHandlers/rangecachecontainer.h \
     CacheHandlers/imagecachecontainer.h \
     CacheHandlers/tmpfilehandlers.h \
     CacheHandlers/soundcachecontainer.h \
     CacheHandlers/soundtmpfilehandlers.h \
     CacheHandlers/hddcachablecachehandler.h \
-    CacheHandlers/minimalcachehandler.h \
     CacheHandlers/soundcachehandler.h \
     Boxes/smartvectorpath.h \
     paintsettingsapplier.h \

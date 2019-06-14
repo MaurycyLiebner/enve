@@ -8,7 +8,6 @@ class BoundingBox;
 #include "smartPointers/sharedpointerdefs.h"
 #include "updatable.h"
 #include "framerange.h"
-#include "CacheHandlers/minimalcachehandler.h"
 #include "CacheHandlers/imagecachecontainer.h"
 class Canvas;
 

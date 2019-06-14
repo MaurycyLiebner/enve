@@ -1,6 +1,5 @@
 #ifndef HDDCACHABLECACHEHANDLER_H
 #define HDDCACHABLECACHEHANDLER_H
-#include "minimalcachehandler.h"
 #include "hddcachablerangecont.h"
 #include "rangemap.h"
 
