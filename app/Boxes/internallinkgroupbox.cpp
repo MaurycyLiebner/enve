@@ -1,6 +1,6 @@
 #include "internallinkgroupbox.h"
 #include "Animators/transformanimator.h"
-#include "durationrectangle.h"
+#include "GUI/Timeline/durationrectangle.h"
 #include "layerboxrenderdata.h"
 
 InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget) :

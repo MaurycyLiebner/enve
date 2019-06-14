@@ -1,4 +1,3 @@
-#include "evfileio.h"
 #include <fstream>
 #include "Animators/qrealanimator.h"
 #include "Animators/randomqrealgenerator.h"
@@ -29,7 +28,7 @@
 #include "Boxes/paintbox.h"
 //#include "GUI/BrushWidgets/brushsettingswidget.h"
 #include "canvas.h"
-#include "durationrectangle.h"
+#include "GUI/Timeline/durationrectangle.h"
 #include "Animators/gradientpoints.h"
 #include "MovablePoints/gradientpoint.h"
 #include "Animators/qrealkey.h"
@@ -82,27 +81,6 @@ private:
 char FileFooter::sEVFormat[15] = "enve ev";
 char FileFooter::sAppName[15] = "enve";
 char FileFooter::sAppVersion[15] = "0.5";
-
-void DurationRectangle::writeDurationRectangle(QIODevice *dst) {
-    const int minFrame = getMinFrame();
-    const int maxFrame = getMaxFrame();
-    const int framePos = getFramePos();
-    dst->write(rcConstChar(&minFrame), sizeof(int));
-    dst->write(rcConstChar(&maxFrame), sizeof(int));
-    dst->write(rcConstChar(&framePos), sizeof(int));
-}
-
-void DurationRectangle::readDurationRectangle(QIODevice *src) {
-    int minFrame;
-    int maxFrame;
-    int framePos;
-    src->read(rcChar(&minFrame), sizeof(int));
-    src->read(rcChar(&maxFrame), sizeof(int));
-    src->read(rcChar(&framePos), sizeof(int));
-    setMinFrame(minFrame);
-    setMaxFrame(maxFrame);
-    setFramePos(framePos);
-}
 
 void FixedLenAnimationRect::writeDurationRectangle(QIODevice *target) {
     DurationRectangle::writeDurationRectangle(target);

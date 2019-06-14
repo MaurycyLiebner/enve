@@ -1,6 +1,6 @@
 #include "singlesound.h"
 #include "soundcomposition.h"
-#include "durationrectangle.h"
+#include "GUI/Timeline/fixedlenanimationrect.h"
 #include "filesourcescache.h"
 #include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
 #include "CacheHandlers/soundcachehandler.h"

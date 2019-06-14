@@ -4,7 +4,7 @@
 #include <QSpinBox>
 #include <QLabel>
 #include <QPushButton>
-#include "durationrectangle.h"
+#include "Timeline/durationrectangle.h"
 class QHBoxLayout;
 class QVBoxLayout;
 class TwoColumnLayout;

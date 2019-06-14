@@ -1,5 +1,5 @@
 #include "containerbox.h"
-#include "durationrectangle.h"
+#include "GUI/Timeline/durationrectangle.h"
 #include "Animators/transformanimator.h"
 #include "canvas.h"
 #include "internallinkgroupbox.h"

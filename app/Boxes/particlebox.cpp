@@ -1,6 +1,6 @@
 #include "particlebox.h"
 #include "GUI/mainwindow.h"
-#include "durationrectangle.h"
+#include "GUI/Timeline/durationrectangle.h"
 #include "canvas.h"
 #include "pointhelpers.h"
 #include "MovablePoints/animatedpoint.h"
@@ -32,8 +32,7 @@ ParticleBox::ParticleBox() : BoundingBox(TYPE_PARTICLES) {
     ca_prependChildAnimator(mTopLeftAnimator.data(), mEffectsAnimators);
     ca_prependChildAnimator(mBottomRightAnimator.data(), mEffectsAnimators);
 
-    qsptr<VaryingLenAnimationRect> durRect =
-            SPtrCreate(VaryingLenAnimationRect)(this);
+    const auto durRect = SPtrCreate(DurationRectangle)(this);
     setDurationRectangle(durRect);
     durRect->setMaxFrame(200);
     durRect->setMinFrame(-10);

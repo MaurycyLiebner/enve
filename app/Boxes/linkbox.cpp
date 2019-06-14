@@ -2,7 +2,7 @@
 #include <QFileDialog>
 #include "GUI/mainwindow.h"
 #include "canvas.h"
-#include "durationrectangle.h"
+#include "GUI/Timeline/durationrectangle.h"
 #include "Animators/transformanimator.h"
 #include "PixmapEffects/pixmapeffect.h"
 #include "skia/skiahelpers.h"

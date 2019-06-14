@@ -55,6 +55,9 @@ SOURCES += main.cpp\
     FileCacheHandlers/soundreader.cpp \
     GPUEffects/gpurastereffectprogram.cpp \
     GPUEffects/uniformspecifiercreator.cpp \
+    GUI/Timeline/animationrect.cpp \
+    GUI/Timeline/durationrectangle.cpp \
+    GUI/Timeline/fixedlenanimationrect.cpp \
     GUI/welcomedialog.cpp \
     PathEffects/custompatheffectcreator.cpp \
     PathEffects/linespatheffect.cpp \
@@ -110,7 +113,6 @@ SOURCES += main.cpp\
     Sound/singlesound.cpp \
     Sound/soundcomposition.cpp \
     Boxes/boundingboxrendercontainer.cpp \
-    durationrectangle.cpp \
     GUI/BoxesList/boolpropertywidget.cpp \
     Boxes/imagesequencebox.cpp \
     memorychecker.cpp \
@@ -267,6 +269,9 @@ HEADERS  += \
     FileCacheHandlers/soundreader.h \
     GPUEffects/gpurastereffectprogram.h \
     GPUEffects/uniformspecifiercreator.h \
+    GUI/Timeline/animationrect.h \
+    GUI/Timeline/durationrectangle.h \
+    GUI/Timeline/fixedlenanimationrect.h \
     GUI/welcomedialog.h \
     PathEffects/custompatheffectcreator.h \
     PathEffects/linespatheffect.h \
@@ -288,7 +293,6 @@ HEADERS  += \
     GUI/ColorWidgets/savedcolorwidgets.h \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
-    evfileio.h \
     svgimporter.h \
     keypoint.h \
     Animators/qstringanimator.h \
@@ -320,7 +324,6 @@ HEADERS  += \
     Sound/singlesound.h \
     Sound/soundcomposition.h \
     Boxes/boundingboxrendercontainer.h \
-    durationrectangle.h \
     GUI/BoxesList/boolpropertywidget.h \
     Boxes/imagesequencebox.h \
     memorychecker.h \

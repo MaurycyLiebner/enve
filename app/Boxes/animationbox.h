@@ -1,7 +1,7 @@
 #ifndef ANIMATIONBOX_H
 #define ANIMATIONBOX_H
 #include "Animators/intanimator.h"
-#include "durationrectangle.h"
+#include "GUI/Timeline/fixedlenanimationrect.h"
 #include "boundingbox.h"
 #include "imagebox.h"
 class AnimationCacheHandler;
@@ -21,16 +21,22 @@ protected:
     AnimationBox(const BoundingBoxType &type);
 public:
     ~AnimationBox();
+
+    virtual void changeSourceFile(QWidget* dialogParent) = 0;
+    virtual void reloadSound() {}
+    virtual void setStretch(const qreal stretch) {
+        mStretch = stretch;
+        updateDurationRectangleAnimationRange();
+    }
+
     void anim_setAbsFrame(const int frame);
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
     void reloadCacheHandler();
-    virtual void reloadSound() {}
 
     bool SWT_isAnimationBox() const { return true; }
     void addActionsToMenu(BoxTypeMenu * const menu);
-    virtual void changeSourceFile(QWidget* dialogParent) = 0;
     void setupRenderData(const qreal relFrame,
                          BoundingBoxRenderData * const data);
     stdsptr<BoundingBoxRenderData> createRenderData();
@@ -39,11 +45,6 @@ public:
 
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
-
-    virtual void setStretch(const qreal stretch) {
-        mStretch = stretch;
-        updateDurationRectangleAnimationRange();
-    }
 
     FixedLenAnimationRect *getAnimationDurationRect() const;
     void updateDurationRectangleAnimationRange();

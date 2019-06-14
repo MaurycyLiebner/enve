@@ -2,7 +2,7 @@
 #include "Boxes/containerbox.h"
 #include "canvas.h"
 #include "singlewidgetabstraction.h"
-#include "durationrectangle.h"
+#include "GUI/Timeline/durationrectangle.h"
 #include "pointhelpers.h"
 #include "skia/skqtconversions.h"
 #include "global.h"

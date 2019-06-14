@@ -5,7 +5,7 @@
 #include <QMenu>
 #include "mainwindow.h"
 #include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
-#include "durationrectangle.h"
+#include "Timeline/durationrectangle.h"
 #include "global.h"
 #include "pointhelpers.h"
 #include "canvaswindow.h"
