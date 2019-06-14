@@ -99,10 +99,8 @@ public:
         afterValueChanged();
     }
 
-    stdsptr<Key> readKey(QIODevice * const src) {
-        auto newKey = SPtrCreateTemplated(K)(this);
-        newKey->readKey(src);
-        return std::move(newKey);
+    stdsptr<Key> createKey() {
+        return SPtrCreateTemplated(K)(this);
     }
 protected:
     virtual T getValueAtRelFrameK(const qreal frame,

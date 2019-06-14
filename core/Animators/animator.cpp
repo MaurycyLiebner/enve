@@ -213,14 +213,23 @@ void Animator::anim_addKeysWhereOtherHasKeys(const Animator * const other) {
     }
 }
 #include "basicreadwrite.h"
-void Animator::readKeys(QIODevice *target) {
+void Animator::readKeys(QIODevice * const src) {
     int nKeys;
-    target->read(rcChar(&nKeys), sizeof(int));
+    src->read(rcChar(&nKeys), sizeof(int));
     if(nKeys < 0 || nKeys > 10000)
         RuntimeThrow("Invalid key count " + std::to_string(nKeys));
     for(int i = 0; i < nKeys; i++) {
-        anim_appendKey(readKey(target));
+        const auto key = createKey();
+        key->readKey(src);
+        anim_appendKey(key);
     }
+}
+
+void Animator::writeSelectedKeys(QIODevice * const dst) {
+    const int nKeys = anim_mSelectedKeys.count();
+    dst->write(rcConstChar(&nKeys), sizeof(int));
+    for(const auto& key : anim_mSelectedKeys)
+        key->writeKey(dst);
 }
 
 void Animator::writeKeys(QIODevice *target) const {

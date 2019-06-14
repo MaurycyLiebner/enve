@@ -784,7 +784,7 @@ void KeysView::updatePixelsPerFrame() {
 
 void KeysView::addKeyToSelection(Key * const key) {
     if(!key) return;
-    QList<qptr<Animator>> toSelect;
+    QList<Animator*> toSelect;
     key->addToSelection(toSelect);
     for(const auto& anim : toSelect) {
         connect(anim, &QObject::destroyed, this, [this, anim]() {
@@ -795,7 +795,7 @@ void KeysView::addKeyToSelection(Key * const key) {
 }
 
 void KeysView::removeKeyFromSelection(Key * const key) {
-    QList<qptr<Animator>> toRemove;
+    QList<Animator*> toRemove;
     key->removeFromSelection(toRemove);
     for(const auto& anim : toRemove) {
         disconnect(anim, &QObject::destroyed, this, nullptr);

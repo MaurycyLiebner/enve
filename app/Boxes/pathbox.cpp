@@ -13,6 +13,7 @@
 #include "paintsettingsapplier.h"
 #include "Animators/gradient.h"
 #include "Animators/gpueffectanimators.h"
+#include "Animators/outlinesettingsanimator.h"
 
 PathBox::PathBox(const BoundingBoxType &type) :
     BoundingBox(type) {
@@ -316,6 +317,28 @@ void PathBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
 void PathBox::setStrokeWidth(const qreal strokeWidth) {
     mStrokeSettings->setCurrentStrokeWidth(strokeWidth);
     //scheduleOutlinePathUpdate();
+}
+
+void PathBox::setStrokeBrush(SimpleBrushWrapper * const brush) {
+    mStrokeSettings->setStrokeBrush(brush);
+    prp_afterWholeInfluenceRangeChanged();
+    planScheduleUpdate(Animator::USER_CHANGE);
+}
+
+void PathBox::setStrokeBrushWidthCurve(const qCubicSegment1D &curve) {
+    mStrokeSettings->setStrokeBrushWidthCurve(curve);
+}
+
+void PathBox::setStrokeBrushTimeCurve(const qCubicSegment1D &curve) {
+    mStrokeSettings->setStrokeBrushTimeCurve(curve);
+}
+
+void PathBox::setStrokeBrushPressureCurve(const qCubicSegment1D &curve) {
+    mStrokeSettings->setStrokeBrushPressureCurve(curve);
+}
+
+void PathBox::setStrokeBrushSpacingCurve(const qCubicSegment1D &curve) {
+    mStrokeSettings->setStrokeBrushSpacingCurve(curve);
 }
 
 void PathBox::setOutlineCompositionMode(

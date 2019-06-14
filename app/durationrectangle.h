@@ -19,7 +19,7 @@ public:
         FIXED_LEN_ANIMATION_LEN,
         NOT_SPECIFIED
     };
-    DurationRectangleMovable(const Type &type);
+    DurationRectangleMovable(const Type type);
     DurationRectangleMovable() {}
 
     void setFramePos(const int framePos);
@@ -60,10 +60,12 @@ public:
     bool isMinFrame() {
         return mType == MIN_FRAME;
     }
+
     bool isMaxFrame() {
         return mType == MAX_FRAME;
     }
-    void setType(const Type &type) {
+
+    void setType(const Type type) {
         mType = type;
     }
 
@@ -74,10 +76,9 @@ public:
     Property * getChildProperty() {
         return mChildProperty;
     }
-public slots:
-    void setMaxPos(const int maxPos);
 
     void setMinPos(const int minPos);
+    void setMaxPos(const int maxPos);
 signals:
     void posChangedBy(int);
     void posChanged(int);
@@ -188,7 +189,6 @@ protected:
 };
 
 class AnimationRect : public DurationRectangle {
-    Q_OBJECT
 public:
     AnimationRect(Property *childProp) : DurationRectangle(childProp) {}
 
@@ -217,14 +217,12 @@ public:
     void setAnimationFrameDuration(const int frameDuration);
 
     int getAnimationFrameDuration();
-signals:
 protected:
     virtual void setMinAnimationFrame(const int minAnimationFrame) = 0;
     virtual void setMaxAnimationFrame(const int maxAnimationFrame) = 0;
 };
 
 class VaryingLenAnimationRect : public AnimationRect {
-    Q_OBJECT
 public:
     VaryingLenAnimationRect(Property *childProp) : AnimationRect(childProp) {
         mType = VARYING_LEN_ANIMATION_RECT;

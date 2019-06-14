@@ -39,8 +39,8 @@ public:
             const bool useSavedFrame);
 
     virtual bool isSelected() const;
-    virtual void addToSelection(QList<qptr<Animator>> &toSelect);
-    virtual void removeFromSelection(QList<qptr<Animator>> &toRemove);
+    virtual void addToSelection(QList<Animator *> &toSelect);
+    virtual void removeFromSelection(QList<Animator *> &toRemove);
     virtual bool isDescendantSelected() const { return isSelected(); }
 
 
@@ -116,7 +116,7 @@ protected:
     int mRelFrame;
     int mSavedRelFrame;
 
-    QPointer<Animator> mParentAnimator;
+    const QPointer<Animator> mParentAnimator;
 };
 
 #endif // KEY_H

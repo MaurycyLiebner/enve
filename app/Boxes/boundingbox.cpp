@@ -64,6 +64,43 @@ BoundingBox::~BoundingBox() {
     sDocumentBoxes.removeOne(this);
 }
 
+void BoundingBox::writeBoundingBox(QIODevice * const target) {
+    if(mWriteId < 0) assignWriteId();
+    StaticComplexAnimator::writeProperty(target);
+
+    gWrite(target, prp_mName);
+    target->write(rcConstChar(&mWriteId), sizeof(int));
+    target->write(rcConstChar(&mVisible), sizeof(bool));
+    target->write(rcConstChar(&mLocked), sizeof(bool));
+    target->write(rcConstChar(&mBlendModeSk), sizeof(SkBlendMode));
+    const bool hasDurRect = mDurationRectangle;
+    target->write(rcConstChar(&hasDurRect), sizeof(bool));
+
+    if(hasDurRect)
+        mDurationRectangle->writeDurationRectangle(target);
+}
+
+void BoundingBox::readBoundingBox(QIODevice * const target) {
+    StaticComplexAnimator::readProperty(target);
+    gRead(target, prp_mName);
+    target->read(rcChar(&mReadId), sizeof(int));
+    target->read(rcChar(&mVisible), sizeof(bool));
+    target->read(rcChar(&mLocked), sizeof(bool));
+    target->read(rcChar(&mBlendModeSk), sizeof(SkBlendMode));
+    bool hasDurRect;
+    target->read(rcChar(&hasDurRect), sizeof(bool));
+
+    if(hasDurRect) {
+        if(!mDurationRectangle) createDurationRectangle();
+        mDurationRectangle->readDurationRectangle(target);
+        updateAfterDurationRectangleShifted(0);
+    }
+
+    if(hasDurRect) anim_shiftAllKeys(prp_getFrameShift());
+
+    BoundingBox::sAddReadBox(this);
+}
+
 BoundingBox *BoundingBox::sGetBoxByDocumentId(const int documentId) {
     for(const auto& box : sDocumentBoxes) {
         if(box->getDocumentId() == documentId) return box;

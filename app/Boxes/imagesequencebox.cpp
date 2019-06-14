@@ -28,3 +28,23 @@ void ImageSequenceBox::changeSourceFile(QWidget *dialogParent) {
         setListOfFrames(importPaths);
     }
 }
+
+void ImageSequenceBox::writeBoundingBox(QIODevice * const target) {
+    AnimationBox::writeBoundingBox(target);
+    int nFrames = mListOfFrames.count();
+    target->write(rcConstChar(&nFrames), sizeof(int));
+    for(const QString &frame : mListOfFrames) {
+        gWrite(target, frame);
+    }
+}
+
+void ImageSequenceBox::readBoundingBox(QIODevice * const target) {
+    AnimationBox::readBoundingBox(target);
+    int nFrames;
+    target->read(rcChar(&nFrames), sizeof(int));
+    QStringList frames;
+    for(int i = 0; i < nFrames; i++) {
+        frames << gReadString(target);
+    }
+    setListOfFrames(frames);
+}

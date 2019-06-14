@@ -1125,3 +1125,34 @@ void Canvas::paintMove(const ulong ts, const qreal pressure,
 SoundComposition *Canvas::getSoundComposition() {
     return mSoundComposition.get();
 }
+
+
+void Canvas::writeBoundingBox(QIODevice * const target) {
+    ContainerBox::writeBoundingBox(target);
+    const int currFrame = getCurrentFrame();
+    target->write(rcConstChar(&currFrame), sizeof(int));
+    target->write(rcConstChar(&mClipToCanvasSize), sizeof(bool));
+    target->write(rcConstChar(&mWidth), sizeof(int));
+    target->write(rcConstChar(&mHeight), sizeof(int));
+    target->write(rcConstChar(&mFps), sizeof(qreal));
+    target->write(rcConstChar(&mMaxFrame), sizeof(int));
+    target->write(rcConstChar(&mCanvasTransform),
+                  sizeof(QMatrix));
+    mSoundComposition->writeSounds(target);
+}
+
+void Canvas::readBoundingBox(QIODevice * const target) {
+    ContainerBox::readBoundingBox(target);
+    int currFrame;
+    target->read(rcChar(&currFrame), sizeof(int));
+    target->read(rcChar(&mClipToCanvasSize), sizeof(bool));
+    target->read(rcChar(&mWidth), sizeof(int));
+    target->read(rcChar(&mHeight), sizeof(int));
+    target->read(rcChar(&mFps), sizeof(qreal));
+    target->read(rcChar(&mMaxFrame), sizeof(int));
+    target->read(rcChar(&mCanvasTransform), sizeof(QMatrix));
+    mVisibleHeight = mCanvasTransform.m22()*mHeight;
+    mVisibleWidth = mCanvasTransform.m11()*mWidth;
+    anim_setAbsFrame(currFrame);
+    mSoundComposition->readSounds(target);
+}

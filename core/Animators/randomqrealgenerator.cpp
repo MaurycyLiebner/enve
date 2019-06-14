@@ -10,7 +10,7 @@ RandomQrealGenerator::RandomQrealGenerator() :
     QrealValueEffect("noise") {
     mTime = SPtrCreate(QrealAnimator)(0, 0, 9999, 1, "time");
     ca_addChildAnimator(mTime);
-    mSmoothness = QrealAnimator::create0to1Animator("smoothness");
+    mSmoothness = QrealAnimator::sCreate0to1Animator("smoothness");
     ca_addChildAnimator(mSmoothness);
     mMaxDev = SPtrCreate(QrealAnimator)(0, 0, 999, 1, "amplitude");
     ca_addChildAnimator(mMaxDev);

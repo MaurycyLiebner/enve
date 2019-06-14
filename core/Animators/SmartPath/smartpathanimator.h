@@ -64,10 +64,8 @@ public:
         anim_appendKey(newKey);
     }
 
-    stdsptr<Key> readKey(QIODevice *target) {
-        auto newKey = SPtrCreate(SmartPathKey)(this);
-        newKey->readKey(target);
-        return std::move(newKey);
+    stdsptr<Key> createKey() {
+        return SPtrCreate(SmartPathKey)(this);
     }
 
     void writeProperty(QIODevice * const target) const {

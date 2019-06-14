@@ -133,35 +133,17 @@ public:
     void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
     void setStrokeWidth(const qreal strokeWidth);
 
-    void setStrokeBrush(SimpleBrushWrapper * const brush) {
-        mStrokeSettings->setStrokeBrush(brush);
-        prp_afterWholeInfluenceRangeChanged();
-        planScheduleUpdate(Animator::USER_CHANGE);
-    }
-    void setStrokeBrushWidthCurve(
-            const qCubicSegment1D& curve) {
-        mStrokeSettings->setStrokeBrushWidthCurve(curve);
-    }
-    void setStrokeBrushTimeCurve(
-            const qCubicSegment1D& curve) {
-        mStrokeSettings->setStrokeBrushTimeCurve(curve);
-    }
-    void setStrokeBrushPressureCurve(
-            const qCubicSegment1D& curve) {
-        mStrokeSettings->setStrokeBrushPressureCurve(curve);
-    }
-    void setStrokeBrushSpacingCurve(
-            const qCubicSegment1D& curve) {
-        mStrokeSettings->setStrokeBrushSpacingCurve(curve);
-    }
+    void setStrokeBrush(SimpleBrushWrapper * const brush);
+    void setStrokeBrushWidthCurve(const qCubicSegment1D& curve);
+    void setStrokeBrushTimeCurve(const qCubicSegment1D& curve);
+    void setStrokeBrushPressureCurve(const qCubicSegment1D& curve);
+    void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve);
 
     void setOutlineCompositionMode(
             const QPainter::CompositionMode &compositionMode);
 
     void startSelectedStrokeWidthTransform();
-
     void startSelectedStrokeColorTransform();
-
     void startSelectedFillColorTransform();
 
     OutlineSettingsAnimator *getStrokeSettings() const;

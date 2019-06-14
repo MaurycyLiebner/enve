@@ -882,3 +882,75 @@ bool ContainerBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                             parentSatisfies,
                                             parentMainTarget);
 }
+
+void ContainerBox::writeBoundingBox(QIODevice * const target) {
+    BoundingBox::writeBoundingBox(target);
+    int nChildBoxes = mContainedBoxes.count();
+    target->write(rcConstChar(&nChildBoxes), sizeof(int));
+    for(const auto &child : mContainedBoxes) {
+        child->writeBoxType(target);
+        child->writeBoundingBox(target);
+    }
+}
+
+#include "smartvectorpath.h"
+#include "imagebox.h"
+#include "textbox.h"
+#include "videobox.h"
+#include "particlebox.h"
+#include "rectangle.h"
+#include "circle.h"
+#include "paintbox.h"
+#include "imagesequencebox.h"
+#include "internallinkcanvas.h"
+#include "linkbox.h"
+
+void ContainerBox::readChildBoxes(QIODevice *target) {
+    int nChildBoxes;
+    target->read(rcChar(&nChildBoxes), sizeof(int));
+    for(int i = 0; i < nChildBoxes; i++) {
+        qsptr<BoundingBox> box;
+        const auto boxType = BoundingBox::sReadBoxType(target);
+        if(boxType == TYPE_VECTOR_PATH) {
+            box = SPtrCreate(SmartVectorPath)();
+        } else if(boxType == TYPE_IMAGE) {
+            box = SPtrCreate(ImageBox)();
+        } else if(boxType == TYPE_TEXT) {
+            box = SPtrCreate(TextBox)();
+        } else if(boxType == TYPE_VIDEO) {
+            box = SPtrCreate(VideoBox)();
+        } else if(boxType == TYPE_PARTICLES) {
+            box = SPtrCreate(ParticleBox)();
+        } else if(boxType == TYPE_RECTANGLE) {
+            box = SPtrCreate(Rectangle)();
+        } else if(boxType == TYPE_CIRCLE) {
+            box = SPtrCreate(Circle)();
+        } else if(boxType == TYPE_LAYER) {
+            box = SPtrCreate(ContainerBox)(TYPE_LAYER);
+        } else if(boxType == TYPE_GROUP) {
+            box = SPtrCreate(ContainerBox)(TYPE_GROUP);
+        } else if(boxType == TYPE_PAINT) {
+            box = SPtrCreate(PaintBox)();
+        } else if(boxType == TYPE_IMAGESQUENCE) {
+            box = SPtrCreate(ImageSequenceBox)();
+        } else if(boxType == TYPE_INTERNAL_LINK) {
+            box = SPtrCreate(InternalLinkBox)(nullptr);
+        } else if(boxType == TYPE_INTERNAL_LINK_GROUP) {
+            box = SPtrCreate(InternalLinkGroupBox)(nullptr);
+        } else if(boxType == TYPE_EXTERNAL_LINK) {
+            box = SPtrCreate(ExternalLinkBox)();
+        } else if(boxType == TYPE_INTERNAL_LINK_CANVAS) {
+            box = SPtrCreate(InternalLinkCanvas)(nullptr);
+        } else {
+            RuntimeThrow("Invalid box type '" + std::to_string(boxType) + "'");
+        }
+
+        box->readBoundingBox(target);
+        addContainedBox(box);
+    }
+}
+
+void ContainerBox::readBoundingBox(QIODevice * const target) {
+    BoundingBox::readBoundingBox(target);
+    readChildBoxes(target);
+}

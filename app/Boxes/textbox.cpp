@@ -9,6 +9,7 @@
 #include "Animators/effectanimators.h"
 #include "typemenu.h"
 #include "Animators/transformanimator.h"
+#include "Animators/outlinesettingsanimator.h"
 
 TextBox::TextBox() : PathBox(TYPE_TEXT) {
     setName("text");
@@ -140,4 +141,30 @@ bool TextBox::differenceInEditPathBetweenFrames(
         const int frame1, const int frame2) const {
     if(mText->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
     return mLinesDist->prp_differencesBetweenRelFrames(frame1, frame2);
+}
+
+
+void TextBox::writeBoundingBox(QIODevice * const target) {
+    PathBox::writeBoundingBox(target);
+    target->write(rcConstChar(&mAlignment), sizeof(Qt::Alignment));
+    const qreal fontSize = mFont.pointSizeF();
+    const QString fontFamily = mFont.family();
+    const QString fontStyle = mFont.styleName();
+    target->write(rcConstChar(&fontSize), sizeof(qreal));
+    gWrite(target, fontFamily);
+    gWrite(target, fontStyle);
+}
+
+void TextBox::readBoundingBox(QIODevice * const target) {
+    PathBox::readBoundingBox(target);
+    target->read(rcChar(&mAlignment), sizeof(Qt::Alignment));
+    qreal fontSize;
+    QString fontFamily;
+    QString fontStyle;
+    target->read(rcChar(&fontSize), sizeof(qreal));
+    gRead(target, fontFamily);
+    gRead(target, fontStyle);
+    mFont.setPointSizeF(fontSize);
+    mFont.setFamily(fontFamily);
+    mFont.setStyleName(fontStyle);
 }

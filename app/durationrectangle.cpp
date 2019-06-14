@@ -4,7 +4,7 @@
 #include "Boxes/boundingbox.h"
 #include "GUI/durationrectsettingsdialog.h"
 
-DurationRectangleMovable::DurationRectangleMovable(const Type &type) {
+DurationRectangleMovable::DurationRectangleMovable(const Type type) {
     mType = type;
 }
 

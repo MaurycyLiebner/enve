@@ -8,9 +8,9 @@ ReplaceColorEffect::ReplaceColorEffect() :
     mFromColor = SPtrCreate(ColorAnimator)("from color");
     mToColor = SPtrCreate(ColorAnimator)("to color");
 
-    mToleranceAnimator = QrealAnimator::create0to1Animator("tolerance");
+    mToleranceAnimator = QrealAnimator::sCreate0to1Animator("tolerance");
 
-    mSmoothnessAnimator = QrealAnimator::create0to1Animator("smoothness");
+    mSmoothnessAnimator = QrealAnimator::sCreate0to1Animator("smoothness");
 
     ca_addChildAnimator(mFromColor);
     ca_addChildAnimator(mToColor);

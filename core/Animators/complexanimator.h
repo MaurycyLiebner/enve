@@ -13,9 +13,7 @@ protected:
     ComplexAnimator(const QString& name);
     void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
 public:
-//    ~ComplexAnimator();
-    stdsptr<Key> readKey(QIODevice *target) final {
-        Q_UNUSED(target);
+    stdsptr<Key> createKey() final {
         return nullptr;
     }
 
@@ -156,8 +154,8 @@ public:
     void cancelFrameTransform();
 
     bool isSelected() const;
-    void addToSelection(QList<qptr<Animator>> &selectedAnimators);
-    void removeFromSelection(QList<qptr<Animator>> &selectedAnimators);
+    void addToSelection(QList<Animator *> &selectedAnimators);
+    void removeFromSelection(QList<Animator*> &selectedAnimators);
     bool differsFromKey(Key *otherKey) const;
 
     void addAnimatorKey(Key * const key);

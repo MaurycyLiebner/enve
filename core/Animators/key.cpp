@@ -5,12 +5,20 @@
 Key::Key(Animator * const parentAnimator) :
     Key(0, parentAnimator) {}
 
-Key::Key(const int frame, Animator * const parentAnimator) {
-    mParentAnimator = parentAnimator;
+Key::Key(const int frame, Animator * const parentAnimator) :
+    mParentAnimator(parentAnimator) {
     mRelFrame = frame;
 }
 
 bool Key::isSelected() const { return mIsSelected; }
+
+void Key::writeKey(QIODevice * const dst) {
+    dst->write(rcConstChar(&mRelFrame), sizeof(int));
+}
+
+void Key::readKey(QIODevice * const src) {
+    src->read(rcChar(&mRelFrame), sizeof(int));
+}
 
 void Key::removeFromAnimator() {
     if(!mParentAnimator) return;
@@ -36,7 +44,7 @@ void Key::setRelFrameAndUpdateParentAnimator(const int relFrame) {
     mParentAnimator->anim_moveKeyToRelFrame(this, relFrame);
 }
 
-void Key::addToSelection(QList<qptr<Animator>> &toSelect) {
+void Key::addToSelection(QList<Animator*> &toSelect) {
     if(isSelected()) return;
     if(!mParentAnimator->hasSelectedKeys()) {
         toSelect << mParentAnimator;
@@ -44,7 +52,7 @@ void Key::addToSelection(QList<qptr<Animator>> &toSelect) {
     mParentAnimator->addKeyToSelected(this);
 }
 
-void Key::removeFromSelection(QList<qptr<Animator>> &toRemove) {
+void Key::removeFromSelection(QList<Animator*> &toRemove) {
     if(isSelected()) {
         mParentAnimator->removeKeyFromSelected(this);
         if(!mParentAnimator->hasSelectedKeys()) {

@@ -9,7 +9,6 @@
 #include "skia/skiaincludes.h"
 #include "Boxes/pathbox.h"
 #include "gradientpoints.h"
-#include "PropertyUpdaters/strokewidthupdater.h"
 #include "gradient.h"
 
 PaintSettingsAnimator::PaintSettingsAnimator(
@@ -34,6 +33,29 @@ PaintSettingsAnimator::PaintSettingsAnimator(
     setGradientPoints(grdPts);
 
     prp_setOwnUpdater(SPtrCreate(DisplayedFillStrokeSettingsUpdater)(parent));
+}
+
+void PaintSettingsAnimator::writeProperty(QIODevice * const dst) const {
+    mGradientPoints->writeProperty(dst);
+    mColor->writeProperty(dst);
+    dst->write(rcConstChar(&mPaintType), sizeof(PaintType));
+    dst->write(rcConstChar(&mGradientType), sizeof(bool));
+    const int gradId = mGradient ? mGradient->getLoadId() : -1;
+    dst->write(rcConstChar(&gradId), sizeof(int));
+}
+
+void PaintSettingsAnimator::readProperty(QIODevice * const src) {
+    mGradientPoints->readProperty(src);
+    mColor->readProperty(src);
+    PaintType paintType;
+    src->read(rcChar(&paintType), sizeof(PaintType));
+    int gradId;
+    src->read(rcChar(&mGradientType), sizeof(bool));
+    src->read(rcChar(&gradId), sizeof(int));
+    if(gradId != -1) {
+        mGradient = MainWindow::getInstance()->getLoadedGradientById(gradId);
+    }
+    setPaintType(paintType);
 }
 
 void PaintSettingsAnimator::setGradientVar(Gradient* const grad) {
@@ -112,99 +134,6 @@ void PaintSettingsAnimator::setGradientPoints(GradientPoints* const gradientPoin
 void PaintSettingsAnimator::setGradientPointsPos(const QPointF &pt1, const QPointF &pt2) {
     if(!mGradientPoints) return;
     mGradientPoints->setPositions(pt1, pt2);
-}
-
-OutlineSettingsAnimator::OutlineSettingsAnimator(GradientPoints * const grdPts,
-                                                 PathBox * const parent) :
-    OutlineSettingsAnimator(grdPts, parent, QColor(0, 0, 0),
-                            PaintType::FLATPAINT, nullptr) {}
-
-OutlineSettingsAnimator::OutlineSettingsAnimator(
-        GradientPoints * const grdPts,
-        PathBox * const parent,
-        const QColor &color,
-        const PaintType &paintType,
-        Gradient* const gradient) :
-    PaintSettingsAnimator("outline", grdPts, parent,
-                          color, paintType, gradient) {
-
-    ca_addChildAnimator(mLineWidth);
-    mLineWidth->prp_setOwnUpdater(SPtrCreate(StrokeWidthUpdater)(parent));
-}
-
-void OutlineSettingsAnimator::showHideChildrenBeforeChaningPaintType(
-        const PaintType &newPaintType) {
-    PaintSettingsAnimator::showHideChildrenBeforeChaningPaintType(newPaintType);
-    if(getPaintType() == BRUSHPAINT) ca_removeChildAnimator(mBrushSettings);
-    if(newPaintType == BRUSHPAINT) ca_addChildAnimator(mBrushSettings);
-}
-
-void OutlineSettingsAnimator::setCurrentStrokeWidth(const qreal newWidth) {
-    mLineWidth->setCurrentBaseValue(newWidth);
-}
-
-void OutlineSettingsAnimator::setCapStyle(const Qt::PenCapStyle &capStyle) {
-    mCapStyle = capStyle;
-    prp_callFinishUpdater();
-}
-
-void OutlineSettingsAnimator::setJoinStyle(const Qt::PenJoinStyle &joinStyle) {
-    mJoinStyle = joinStyle;
-    prp_callFinishUpdater();
-}
-
-void OutlineSettingsAnimator::setStrokerSettings(QPainterPathStroker * const stroker) {
-    stroker->setWidth(mLineWidth->getCurrentBaseValue());
-    stroker->setCapStyle(mCapStyle);
-    stroker->setJoinStyle(mJoinStyle);
-}
-
-void OutlineSettingsAnimator::setStrokerSettingsSk(SkStroke * const stroker) {
-    stroker->setWidth(toSkScalar(mLineWidth->getCurrentBaseValue()));
-    stroker->setCap(QCapToSkCap(mCapStyle));
-    stroker->setJoin(QJoinToSkJoin(mJoinStyle));
-}
-
-void OutlineSettingsAnimator::setStrokerSettingsForRelFrameSk(
-        const qreal relFrame, SkStroke * const stroker) {
-    const qreal widthT = mLineWidth->getEffectiveValue(relFrame);
-    stroker->setWidth(toSkScalar(widthT));
-    stroker->setCap(QCapToSkCap(mCapStyle));
-    stroker->setJoin(QJoinToSkJoin(mJoinStyle));
-}
-
-qreal OutlineSettingsAnimator::getCurrentStrokeWidth() const {
-    return mLineWidth->getCurrentBaseValue();
-}
-
-Qt::PenCapStyle OutlineSettingsAnimator::getCapStyle() const {
-    return mCapStyle;
-}
-
-Qt::PenJoinStyle OutlineSettingsAnimator::getJoinStyle() const {
-    return mJoinStyle;
-}
-
-QrealAnimator *OutlineSettingsAnimator::getStrokeWidthAnimator() {
-    return mLineWidth.data();
-}
-
-void OutlineSettingsAnimator::setOutlineCompositionMode(
-        const QPainter::CompositionMode &compositionMode) {
-    mOutlineCompositionMode = compositionMode;
-}
-
-QPainter::CompositionMode OutlineSettingsAnimator::getOutlineCompositionMode() {
-    return mOutlineCompositionMode;
-}
-
-bool OutlineSettingsAnimator::nonZeroLineWidth() {
-    return !isZero4Dec(mLineWidth->getCurrentBaseValue());
-}
-
-
-QrealAnimator *OutlineSettingsAnimator::getLineWidthAnimator() {
-    return mLineWidth.data();
 }
 
 UpdatePaintSettings::UpdatePaintSettings(const QColor &paintColorT,

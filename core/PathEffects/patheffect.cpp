@@ -10,6 +10,18 @@ PathEffect::PathEffect(const QString &name,
     mPathEffectType = type;
 }
 
+void PathEffect::writeProperty(QIODevice * const dst) const {
+    StaticComplexAnimator::writeProperty(dst);
+    dst->write(rcConstChar(&mVisible), sizeof(bool));
+}
+
+void PathEffect::readProperty(QIODevice * const src) {
+    StaticComplexAnimator::readProperty(src);
+    src->read(rcChar(&mVisible), sizeof(bool));
+    bool tmp;
+    src->read(rcChar(&tmp), sizeof(bool));
+}
+
 void PathEffect::prp_startDragging() {
     const auto mimeData = new PathEffectMimeData(this);
 

@@ -11,6 +11,17 @@ ColorAnimator::ColorAnimator(const QString &name) : StaticComplexAnimator(name) 
     ca_addChildAnimator(mAlphaAnimator);
 }
 
+void ColorAnimator::writeProperty(QIODevice * const dst) const {
+    StaticComplexAnimator::writeProperty(dst);
+    dst->write(rcConstChar(&mColorMode), sizeof(ColorMode));
+}
+
+void ColorAnimator::readProperty(QIODevice * const src) {
+    StaticComplexAnimator::readProperty(src);
+    src->read(rcChar(&mColorMode), sizeof(ColorMode));
+    setColorMode(mColorMode);
+}
+
 void ColorAnimator::qra_setCurrentValue(const QColor &colorValue) {
     qreal val1, val2, val3;
     if(mColorMode == RGBMODE) {
@@ -26,7 +37,7 @@ void ColorAnimator::qra_setCurrentValue(const QColor &colorValue) {
         val2 = colorValue.hslSaturationF();
         val3 = colorValue.lightnessF();
     }
-    qreal alpha = colorValue.alphaF();
+    const qreal alpha = colorValue.alphaF();
 
     mVal1Animator->setCurrentBaseValue(val1);
     mVal2Animator->setCurrentBaseValue(val2);

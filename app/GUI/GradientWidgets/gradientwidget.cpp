@@ -41,10 +41,13 @@ void GradientWidget::updateAll() {
 }
 
 void GradientWidget::setCurrentColorId(const int id) {
+    if(mCurrentColor) disconnect(mCurrentColor, nullptr, this, nullptr);
     mCurrentColorId = id;
-    //Color col = mCurrentGradient->getColorAt(mCurrentColorId);
-    const auto currCol = mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
-    emit selectedColorChanged(currCol);
+    mCurrentColor = mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
+    connect(mCurrentColor, &QObject::destroyed, this, [this]() {
+        setCurrentColorId(0);
+    });
+    emit selectedColorChanged(mCurrentColor);
     update();
 }
 
@@ -122,11 +125,6 @@ void GradientWidget::setCurrentColor(const QColor& col) {
 
 void GradientWidget::setCurrentGradient(Gradient *gradient,
                                         const bool emitChange) {
-    if(mCurrentGradient) {
-        disconnect(mCurrentGradient,
-                   &Gradient::resetGradientWidgetColorIdIfEquals,
-                   this, &GradientWidget::resetColorIdIfEquals);
-    }
     if(!gradient) {
         if(mGradients.isEmpty()) newGradient();
         setCurrentGradient(0);
@@ -135,11 +133,6 @@ void GradientWidget::setCurrentGradient(Gradient *gradient,
         return;
     }
     mCurrentGradient = gradient;
-    if(mCurrentGradient) {
-        connect(mCurrentGradient,
-                &Gradient::resetGradientWidgetColorIdIfEquals,
-                this, &GradientWidget::resetColorIdIfEquals);
-    }
     setCurrentColorId(0);
 
     if(emitChange) emit currentGradientChanged(mCurrentGradient);
@@ -157,12 +150,6 @@ QColor GradientWidget::getColor() {
 ColorAnimator *GradientWidget::getColorAnimator() {
     if(!mCurrentGradient) return nullptr;
     return mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
-}
-
-void GradientWidget::resetColorIdIfEquals(Gradient *gradient, const int id) {
-    if(gradient == mCurrentGradient) {
-        if(id == mCurrentColorId) mCurrentColorId = 0;
-    }
 }
 
 void GradientWidget::setCurrentGradient(const int listId) {
@@ -291,4 +278,23 @@ void GradientWidget::finishGradientTransform() {
 void GradientWidget::startGradientTransform() {
     if(!mCurrentGradient) return;
     mCurrentGradient->prp_startTransform();
+}
+
+void GradientWidget::writeGradients(QIODevice *target) {
+    const int nGradients = mGradients.count();
+    target->write(rcConstChar(&nGradients), sizeof(int));
+    for(const auto &gradient : mGradients) {
+        gradient->writeProperty(target);
+    }
+}
+
+void GradientWidget::readGradients(QIODevice *target) {
+    int nGradients;
+    target->read(rcChar(&nGradients), sizeof(int));
+    for(int i = 0; i < nGradients; i++) {
+        auto gradient = SPtrCreate(Gradient)();
+        gradient->readProperty(target);
+        addGradientToList(gradient);
+        MainWindow::getInstance()->addLoadedGradient(gradient.get());
+    }
 }

@@ -1500,3 +1500,30 @@ void CanvasWindow::moveMaxFrameForAllSelected(const int dFrame) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->moveMaxFrameForAllSelected(dFrame);
 }
+
+void CanvasWindow::writeCanvases(QIODevice *target) {
+    const int nCanvases = mCanvasList.count();
+    target->write(rcConstChar(&nCanvases), sizeof(int));
+    int currentCanvasId = -1;
+    for(const auto &canvas : mCanvasList) {
+        canvas->writeBoundingBox(target);
+        if(canvas.get() == mCurrentCanvas) {
+            currentCanvasId = mCurrentCanvas->getWriteId();
+        }
+    }
+    target->write(rcConstChar(&currentCanvasId), sizeof(int));
+}
+
+void CanvasWindow::readCanvases(QIODevice *target) {
+    int nCanvases;
+    target->read(rcChar(&nCanvases), sizeof(int));
+    for(int i = 0; i < nCanvases; i++) {
+        auto canvas = SPtrCreate(Canvas)(this);
+        canvas->readBoundingBox(target);
+        MainWindow::getInstance()->addCanvas(canvas);
+    }
+    int currentCanvasId;
+    target->read(rcChar(&currentCanvasId), sizeof(int));
+    auto currentCanvas = BoundingBox::sGetBoxByReadId(currentCanvasId);
+    setCurrentCanvas(GetAsPtr(currentCanvas, Canvas));
+}

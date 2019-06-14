@@ -7,7 +7,7 @@ DisplacePathEffect::DisplacePathEffect() :
     PathEffect("displace effect", DISPLACE_PATH_EFFECT) {
     mSegLength = SPtrCreate(QrealAnimator)("segment length");
     mMaxDev = SPtrCreate(QrealAnimator)("max deviation");
-    mSmoothness = QrealAnimator::create0to1Animator("smoothness");
+    mSmoothness = QrealAnimator::sCreate0to1Animator("smoothness");
     mLengthBased = SPtrCreate(BoolPropertyContainer)("length inc");
     mSeed = SPtrCreate(QrealAnimator)(qrand() % 9999, 0, 9999, 1, "smooth seed");
 

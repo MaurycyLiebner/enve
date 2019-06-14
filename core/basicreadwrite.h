@@ -8,6 +8,22 @@ class SmartPath;
 class BrushPolyline;
 struct AutoTiledSurface;
 
+class QReadSrc : public QIODevice {
+    using QIODevice::write;
+public:
+    static QReadSrc * sCastQIODevice(QIODevice * const src) {
+        return reinterpret_cast<QReadSrc*>(src);
+    }
+};
+
+class QWriteSrc : public QIODevice {
+    using QIODevice::read;
+public:
+    static QWriteSrc * sCastQIODevice(QIODevice * const src) {
+        return reinterpret_cast<QWriteSrc*>(src);
+    }
+};
+
 extern QString gReadString(QIODevice * src);
 extern bool gReadBool(QIODevice * src);
 

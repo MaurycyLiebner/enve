@@ -45,8 +45,7 @@ public:
 
     void writeProperty(QIODevice * const dst) const;
     void readProperty(QIODevice * const src);
-    stdsptr<Key> readKey(QIODevice * const src);
-public slots:
+    stdsptr<Key> createKey();
     void anim_saveCurrentValueAsKey();
 protected:
     void graph_getValueConstraints(GraphKey *key, const QrealPointType& type,
@@ -108,7 +107,7 @@ public:
 
     bool hasNoise();
 
-    static auto create0to1Animator(const QString& name) {
+    static auto sCreate0to1Animator(const QString& name) {
         auto anim = SPtrCreate(QrealAnimator)(0, 0, 1, 0.01, name);
         anim->graphFixMinMaxValues();
         return anim;

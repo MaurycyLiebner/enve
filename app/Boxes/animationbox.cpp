@@ -210,6 +210,19 @@ void AnimationBox::addActionsToMenu(BoxTypeMenu * const menu) {
     BoundingBox::addActionsToMenu(menu);
 }
 
+void AnimationBox::writeBoundingBox(QIODevice * const target) {
+    BoundingBox::writeBoundingBox(target);
+    target->write(rcConstChar(&mFrameRemappingEnabled), sizeof(bool));
+}
+
+void AnimationBox::readBoundingBox(QIODevice * const target) {
+    BoundingBox::readBoundingBox(target);
+    bool frameRemapping;
+    target->read(rcChar(&frameRemapping), sizeof(bool));
+    if(frameRemapping) enableFrameRemapping();
+    else disableFrameRemapping();
+}
+
 void AnimationBox::setupRenderData(const qreal relFrame,
                                    BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);

@@ -3,10 +3,6 @@
 
 ComplexAnimator::ComplexAnimator(const QString &name) : Animator(name) {}
 
-//ComplexAnimator::~ComplexAnimator() {
-//    anim_removeAllKeys();
-//}
-
 void ComplexAnimator::ca_prependChildAnimator(Property *childAnimator,
                                               const qsptr<Property> &prependWith) {
     if(!prependWith) return;
@@ -407,7 +403,7 @@ bool ComplexKey::isSelected() const {
     return true;
 }
 
-void ComplexKey::addToSelection(QList<qptr<Animator>> &selectedAnimators) {
+void ComplexKey::addToSelection(QList<Animator*> &selectedAnimators) {
     for(const auto& key : mKeys) key->addToSelection(selectedAnimators);
 }
 
@@ -430,7 +426,7 @@ bool ComplexKey::differsFromKey(Key *otherKey) const {
     return true;
 }
 
-void ComplexKey::removeFromSelection(QList<qptr<Animator>> &selectedAnimators) {
+void ComplexKey::removeFromSelection(QList<Animator *> &selectedAnimators) {
     for(const auto& key : mKeys)
         key->removeFromSelection(selectedAnimators);
 }

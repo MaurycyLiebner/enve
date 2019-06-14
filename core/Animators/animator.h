@@ -200,7 +200,7 @@ public:
 
     virtual void anim_addKeyAtRelFrame(const int relFrame) = 0;
     virtual void anim_saveCurrentValueAsKey() = 0;
-    virtual stdsptr<Key> readKey(QIODevice *target) = 0;
+    virtual stdsptr<Key> createKey() = 0;
 
     virtual void anim_scaleTime(const int pivotAbsFrame,
                                 const qreal scale);
@@ -342,7 +342,7 @@ public:
     void anim_coordinateKeysWith(Animator * const other);
     void anim_addKeysWhereOtherHasKeys(const Animator * const other);
 protected:
-    void readKeys(QIODevice *target);
+    void readKeys(QIODevice * const src);
     void writeKeys(QIODevice *target) const;
 
     IdRange frameRangeToKeyIdRange(const FrameRange& relRange) const {

@@ -18,6 +18,18 @@ ImageBox::~ImageBox() {
         mImgCacheHandler->removeDependentBox(this);
 }
 
+void ImageBox::writeBoundingBox(QIODevice * const target) {
+    BoundingBox::writeBoundingBox(target);
+    gWrite(target, mImageFilePath);
+}
+
+void ImageBox::readBoundingBox(QIODevice * const target) {
+    BoundingBox::readBoundingBox(target);
+    QString path;
+    gRead(target, path);
+    setFilePath(path);
+}
+
 void ImageBox::setFilePath(const QString &path) {
     mImageFilePath = path;
     if(mImgCacheHandler) {

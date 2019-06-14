@@ -46,6 +46,7 @@ TARGET = enve
 TEMPLATE = app
 
 SOURCES += main.cpp\
+    Animators/outlinesettingsanimator.cpp \
     Boxes/containerbox.cpp \
     Boxes/layerboxrenderdata.cpp \
     Boxes/patheffectsmenu.cpp \
@@ -255,6 +256,7 @@ SOURCES += main.cpp\
     Paint/animatedsurface.cpp
 
 HEADERS  += \
+    Animators/outlinesettingsanimator.h \
     Boxes/containerbox.h \
     Boxes/layerboxrenderdata.h \
     Boxes/patheffectsmenu.h \

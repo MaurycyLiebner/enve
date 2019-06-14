@@ -60,16 +60,15 @@ public:
     int getColorId() const {
         return mCurrentColorId;
     }
+
+    void setCurrentColor(const QColor &col);
 signals:
     void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);
     void gradientSettingsChanged();
-public slots:
-    void resetColorIdIfEquals(Gradient *gradient, const int id);
-    void setCurrentColor(const QColor &col);
-private slots:
-    void updateAll();
 private:
+    void updateAll();
+
     QVBoxLayout *mMainLayout;
     GradientsListWidget *mGradientsListWidget;
     CurrentGradientWidget *mCurrentGradientWidget;
@@ -80,8 +79,9 @@ private:
     int mScrollItemHeight;
 
     MainWindow *mMainWindow;
-    QList<qsptr<Gradient> > mGradients;
+    QList<qsptr<Gradient>> mGradients;
     Gradient *mCurrentGradient = nullptr;
+    ColorAnimator *mCurrentColor = nullptr;
     int mCurrentColorId = 0;
     int mCenterGradientId = 1;
     void setCurrentGradient(const int listId);

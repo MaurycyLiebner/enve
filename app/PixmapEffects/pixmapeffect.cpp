@@ -6,6 +6,20 @@ PixmapEffect::PixmapEffect(const QString &name,
                            const PixmapEffectType type) :
     StaticComplexAnimator(name), mType(type) {}
 
+void PixmapEffect::writeIdentifier(QIODevice * const dst) const {
+    dst->write(rcConstChar(&mType), sizeof(PixmapEffectType));
+}
+
+void PixmapEffect::writeProperty(QIODevice * const dst) const {
+    StaticComplexAnimator::writeProperty(dst);
+    dst->write(rcConstChar(&mVisible), sizeof(bool));
+}
+
+void PixmapEffect::readProperty(QIODevice * const src) {
+    StaticComplexAnimator::readProperty(src);
+    src->read(rcChar(&mVisible), sizeof(bool));
+}
+
 EffectAnimators *PixmapEffect::getParentEffectAnimators() {
     return static_cast<EffectAnimators*>(mParent_k.data());
 }

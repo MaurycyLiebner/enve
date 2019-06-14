@@ -29,6 +29,18 @@ VideoBox::~VideoBox() {
     }
 }
 
+void VideoBox::writeBoundingBox(QIODevice * const target) {
+    AnimationBox::writeBoundingBox(target);
+    gWrite(target, mSrcFilePath);
+}
+
+void VideoBox::readBoundingBox(QIODevice * const target) {
+    AnimationBox::readBoundingBox(target);
+    QString path;
+    gRead(target, path);
+    setFilePath(path);
+}
+
 void VideoBox::setParentGroup(ContainerBox * const parent) {
     if(mParentGroup && mSound) {
         const auto parentCanvas = getParentCanvas();

@@ -63,13 +63,13 @@ private:
     ColorMode mColorMode = RGBMODE;
 
     qsptr<QrealAnimator> mVal1Animator =
-            QrealAnimator::create0to1Animator("");
+            QrealAnimator::sCreate0to1Animator("");
     qsptr<QrealAnimator> mVal2Animator =
-            QrealAnimator::create0to1Animator("");
+            QrealAnimator::sCreate0to1Animator("");
     qsptr<QrealAnimator> mVal3Animator =
-            QrealAnimator::create0to1Animator("");
+            QrealAnimator::sCreate0to1Animator("");
     qsptr<QrealAnimator> mAlphaAnimator =
-            QrealAnimator::create0to1Animator("alpha");
+            QrealAnimator::sCreate0to1Animator("alpha");
 signals:
     void colorModeChanged(ColorMode);
 };

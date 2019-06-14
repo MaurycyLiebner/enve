@@ -18,13 +18,13 @@ stdsptr<PixmapEffectRenderData> ColorizeEffect::getPixmapEffectRenderDataForRelF
 
 ColorizeEffect::ColorizeEffect() :
     PixmapEffect("colorize", EFFECT_COLORIZE) {
-    mHueAnimator = QrealAnimator::create0to1Animator("hue");
+    mHueAnimator = QrealAnimator::sCreate0to1Animator("hue");
 
-    mSaturationAnimator = QrealAnimator::create0to1Animator("saturation");
+    mSaturationAnimator = QrealAnimator::sCreate0to1Animator("saturation");
 
     mLightnessAnimator = SPtrCreate(QrealAnimator)(0., -1., 1., 0.01, "lightness");
 
-    mAlphaAnimator = QrealAnimator::create0to1Animator("alpha");
+    mAlphaAnimator = QrealAnimator::sCreate0to1Animator("alpha");
 
     ca_addChildAnimator(mHueAnimator);
     ca_addChildAnimator(mSaturationAnimator);

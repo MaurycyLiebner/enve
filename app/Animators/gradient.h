@@ -61,8 +61,6 @@ public:
     bool isEmpty() const;
 
     QGradientStops getQGradientStopsAtAbsFrame(const qreal absFrame);
-signals:
-    void resetGradientWidgetColorIdIfEquals(Gradient *, int);
 protected:
     Gradient();
     Gradient(const QColor &color1, const QColor &color2);

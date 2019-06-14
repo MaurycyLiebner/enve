@@ -182,8 +182,8 @@ private:
     bool mPressedCtrlPoint = false;
 
     MainWindow *mMainWindow;
-    QList<qptr<Animator>> mSelectedKeysAnimators;
-    QList<qptr<GraphAnimator>> mGraphAnimators;
+    QList<Animator*> mSelectedKeysAnimators;
+    QList<GraphAnimator*> mGraphAnimators;
 
     int mMinViewedFrame = 0;
     int mMaxViewedFrame = 50;

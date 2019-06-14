@@ -132,10 +132,8 @@ public:
         }
     }
 
-    stdsptr<Key> readKey(QIODevice * const dst) {
-        auto newKey = SPtrCreate(ASKey)(this);
-        newKey->readKey(dst);
-        return std::move(newKey);
+    stdsptr<Key> createKey() {
+        return SPtrCreate(ASKey)(this);
     }
 
     void readProperty(QIODevice * const src) {

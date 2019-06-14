@@ -4,7 +4,7 @@
 
 DesaturateEffect::DesaturateEffect() :
     PixmapEffect("desaturate", EFFECT_DESATURATE) {
-    mInfluenceAnimator = QrealAnimator::create0to1Animator("factor");
+    mInfluenceAnimator = QrealAnimator::sCreate0to1Animator("factor");
     mInfluenceAnimator->setCurrentBaseValue(0.2);
 
     ca_addChildAnimator(mInfluenceAnimator);

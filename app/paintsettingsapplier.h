@@ -7,6 +7,7 @@
 #include <QPainter>
 #include "Boxes/pathbox.h"
 #include "Animators/gradient.h"
+#include "Animators/outlinesettingsanimator.h"
 class ColorAnimator;
 class Gradient;
 class PathBox;

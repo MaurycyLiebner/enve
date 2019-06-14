@@ -19,6 +19,23 @@ QrealAnimator::QrealAnimator(const qreal iniVal,
 
 QrealAnimator::QrealAnimator(const QString &name) : GraphAnimator(name) {}
 
+void QrealAnimator::writeProperty(QIODevice * const dst) const {
+    writeKeys(dst);
+    dst->write(rcConstChar(&mCurrentBaseValue), sizeof(qreal));
+}
+
+stdsptr<Key> QrealAnimator::createKey() {
+    return SPtrCreate(QrealKey)(this);
+}
+
+void QrealAnimator::readProperty(QIODevice * const src) {
+    readKeys(src);
+
+    qreal val;
+    src->read(rcChar(&val), sizeof(qreal));
+    setCurrentBaseValue(val);
+}
+
 void QrealAnimator::graph_getValueConstraints(
         GraphKey *key, const QrealPointType &type,
         qreal &minMoveValue, qreal &maxMoveValue) const {

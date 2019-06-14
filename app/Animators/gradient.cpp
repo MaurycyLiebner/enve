@@ -14,6 +14,27 @@ Gradient::Gradient(const QColor &color1, const QColor &color2) :
     updateQGradientStops(Animator::USER_CHANGE);
 }
 
+void Gradient::writeProperty(QIODevice * const target) const {
+    target->write(rcConstChar(&mLoadId), sizeof(int));
+    const int nColors = mColors.count();
+    target->write(rcConstChar(&nColors), sizeof(int));
+    for(const auto& color : mColors) {
+        color->writeProperty(target);
+    }
+}
+
+void Gradient::readProperty(QIODevice * const src) {
+    src->read(rcChar(&mLoadId), sizeof(int));
+    int nColors;
+    src->read(rcChar(&nColors), sizeof(int));
+    for(int i = 0; i < nColors; i++) {
+        const auto colorAnim = SPtrCreate(ColorAnimator)();
+        colorAnim->readProperty(src);
+        addColorToList(colorAnim);
+    }
+    updateQGradientStops(UpdateReason::USER_CHANGE);
+}
+
 bool Gradient::isEmpty() const {
     return mColors.isEmpty();
 }
@@ -76,7 +97,6 @@ void Gradient::removeColor(const int id) {
 
 void Gradient::removeColor(const qsptr<ColorAnimator>& color) {
     ca_removeChildAnimator(color);
-    emit resetGradientWidgetColorIdIfEquals(this, mColors.indexOf(color));
     mColors.removeOne(color);
     updateQGradientStops(Animator::USER_CHANGE);
     prp_afterWholeInfluenceRangeChanged();

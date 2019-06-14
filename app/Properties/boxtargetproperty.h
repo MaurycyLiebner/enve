@@ -13,7 +13,7 @@ public:
     BoxTargetProperty(const QString& name);
 
     BoundingBox *getTarget() const;
-    void setTarget(BoundingBox *box);
+    void setTarget(BoundingBox * const box);
 
     bool SWT_isBoxTargetProperty() const { return true; }
     void writeProperty(QIODevice * const target) const;
