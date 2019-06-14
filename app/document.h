@@ -25,10 +25,9 @@ public:
 
     qptr<Canvas> fTimelineScene;
 
-    void SWT_setupAbstraction(
-            SingleWidgetAbstraction *abstraction,
-            const UpdateFuncs &updateFuncs,
-            const int visiblePartWidgetId);
+    void SWT_setupAbstraction(SWT_Abstraction * const abstraction,
+                              const UpdateFuncs &updateFuncs,
+                              const int visiblePartWidgetId);
 };
 
 #endif // DOCUMENT_H

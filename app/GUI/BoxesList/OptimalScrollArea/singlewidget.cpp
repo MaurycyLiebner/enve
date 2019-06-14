@@ -9,7 +9,7 @@ SingleWidget::SingleWidget(ScrollWidgetVisiblePart *parent) :
     setFixedHeight(MIN_WIDGET_HEIGHT);
 }
 
-void SingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
+void SingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mTarget = abs;
     if(!abs) hide();
     else if(isHidden()) show();

@@ -26,7 +26,7 @@ class BoxSingleWidget : public SingleWidget {
 public:
     explicit BoxSingleWidget(ScrollWidgetVisiblePart *parent = nullptr);
 
-    void setTargetAbstraction(SingleWidgetAbstraction *abs);
+    void setTargetAbstraction(SWT_Abstraction *abs);
 
     static QPixmap* VISIBLE_PIXMAP;
     static QPixmap* INVISIBLE_PIXMAP;

@@ -8,7 +8,7 @@
 #include "smartPointers/sharedpointerdefs.h"
 class SingleWidget;
 class ScrollWidgetVisiblePart;
-class SingleWidgetAbstraction;
+class SWT_Abstraction;
 class SingleWidgetTarget;
 class ScrollArea;
 
@@ -31,7 +31,7 @@ protected:
 
     int mContentHeight = 0;
     qptr<SingleWidgetTarget> mMainTarget;
-    stdptr<SingleWidgetAbstraction> mMainAbstraction;
+    stdptr<SWT_Abstraction> mMainAbstraction;
     ScrollWidgetVisiblePart *mVisiblePartWidget = nullptr;
 };
 

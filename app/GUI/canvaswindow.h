@@ -96,7 +96,7 @@ public:
     int getCurrentFrame();
     int getMaxFrame();
     void SWT_setupAbstraction(
-            SingleWidgetAbstraction *abstraction,
+            SWT_Abstraction *abstraction,
             const UpdateFuncs &updateFuncs,
             const int visiblePartWidgetId);
     ImageBox *createImageForPath(const QString &path);

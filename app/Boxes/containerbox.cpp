@@ -695,8 +695,8 @@ void ContainerBox::addContainedBoxToListAt(
             this, &BoundingBox::prp_afterChangedAbsRange);
     updateContainedBoxIds(index);
 
-    //SWT_addChildAbstractionForTargetToAll(child);
-    SWT_addChildAbstractionForTargetToAllAt(
+    //SWT_addChild(child);
+    SWT_addChildAt(
                 child.get(), boxIdToAbstractionId(index));
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());
 
@@ -745,7 +745,7 @@ void ContainerBox::removeContainedBoxFromList(const int id) {
 
     updateContainedBoxIds(id);
 
-    SWT_removeChildAbstractionForTargetFromAll(box.get());
+    SWT_removeChild(box.get());
     box->setParentGroup(nullptr);
 
     for(const auto& box : mLinkingBoxes) {
@@ -826,7 +826,7 @@ void ContainerBox::moveContainedBoxInList(BoundingBox * const child,
                                         const int from, const int to) {
     mContainedBoxes.move(from, to);
     updateContainedBoxIds(qMin(from, to), qMax(from, to));
-    SWT_moveChildAbstractionForTargetToInAll(child, boxIdToAbstractionId(to));
+    SWT_moveChildTo(child, boxIdToAbstractionId(to));
     planScheduleUpdate(Animator::USER_CHANGE);
 
     prp_afterWholeInfluenceRangeChanged();
@@ -854,7 +854,7 @@ void ContainerBox::moveContainedBoxAbove(BoundingBox * const boxToMove,
 
 #include "singlewidgetabstraction.h"
 void ContainerBox::SWT_setupAbstraction(
-        SingleWidgetAbstraction* abstraction,
+        SWT_Abstraction* abstraction,
         const UpdateFuncs &updateFuncs,
         const int visiblePartWidgetId) {
     BoundingBox::SWT_setupAbstraction(abstraction, updateFuncs,

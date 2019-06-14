@@ -123,7 +123,7 @@ void MinimalScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
 //    int currY;
 //    currX = 0;
 //    currY = MIN_WIDGET_HEIGHT/2;
-//    mMainAbstraction->setSingleWidgetAbstractions(
+//    mMainAbstraction->setAbstractions(
 //                mVisibleTop,
 //                mVisibleTop + mVisibleHeight + currY,
 //                &currY, currX,

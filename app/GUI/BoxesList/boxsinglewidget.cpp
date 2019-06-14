@@ -383,7 +383,7 @@ void BoxSingleWidget::clearAndHideValueAnimators() {
     mSecondValueSlider->hide();
 }
 
-void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
+void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     SingleWidget::setTargetAbstraction(abs);
     SingleWidgetTarget *target = abs->getTarget();
 
@@ -861,7 +861,7 @@ void BoxSingleWidget::rename() {
                                              boxTarget->getName(), &ok);
         if(ok) {
             boxTarget->setName(text);
-            boxTarget->SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty();
+            boxTarget->SWT_scheduleSearchContentUpdate();
         }
     }
 }

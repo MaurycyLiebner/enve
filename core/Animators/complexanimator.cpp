@@ -27,7 +27,7 @@ int ComplexAnimator::ca_getNumberOfChildren() const {
 #include <QDebug>
 #include "singlewidgetabstraction.h"
 void ComplexAnimator::SWT_setupAbstraction(
-        SingleWidgetAbstraction* abstraction,
+        SWT_Abstraction* abstraction,
         const UpdateFuncs &updateFuncs,
         const int visiblePartWidgetId) {
     for(const auto &property : ca_mChildAnimators) {
@@ -104,7 +104,7 @@ void ComplexAnimator::ca_insertChildAnimator(const qsptr<Property>& childPropert
             this, &ComplexAnimator::ca_prependChildAnimator);
 
     childProperty->SWT_setAncestorDisabled(SWT_isDisabled());
-    SWT_addChildAbstractionForTargetToAllAt(childProperty.get(), id);
+    SWT_addChildAt(childProperty.get(), id);
     if(changeInfluence) {
         const auto childRange = childProperty->prp_absInfluenceRange();
         const auto changedRange = childRange*prp_absInfluenceRange();
@@ -155,7 +155,7 @@ void ComplexAnimator::ca_moveChildInList(Property* child,
 void ComplexAnimator::ca_moveChildInList(Property* child,
                                          const int from, const int to) {
     ca_mChildAnimators.move(from, to);
-    SWT_moveChildAbstractionForTargetToInAll(child, to);
+    SWT_moveChildTo(child, to);
     prp_afterWholeInfluenceRangeChanged();
 }
 
@@ -171,7 +171,7 @@ void ComplexAnimator::ca_removeChildAnimator(
     }
     disconnect(removeAnimator.get(), nullptr, this, nullptr);
 
-    SWT_removeChildAbstractionForTargetFromAll(removeAnimator.get());
+    SWT_removeChild(removeAnimator.get());
 
     removeAnimator->setParent(nullptr);
     ca_mChildAnimators.removeAt(getChildPropertyIndex(removeAnimator.get()));

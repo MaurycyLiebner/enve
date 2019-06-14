@@ -6,7 +6,7 @@ WindowSingleWidgetTarget::WindowSingleWidgetTarget(
         CanvasWindow * const window) : mWindow(window) {}
 
 void WindowSingleWidgetTarget::SWT_setupAbstraction(
-        SingleWidgetAbstraction *abstraction,
+        SWT_Abstraction *abstraction,
         const UpdateFuncs &updateFuncs,
         const int visiblePartWidgetId) {
     mWindow->SWT_setupAbstraction(abstraction, updateFuncs,

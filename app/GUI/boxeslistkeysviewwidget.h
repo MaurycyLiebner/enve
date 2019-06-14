@@ -8,7 +8,7 @@
 #include <QMenuBar>
 #include "smartPointers/stdselfref.h"
 
-class SingleWidgetAbstraction;
+class SWT_Abstraction;
 class AnimationWidgetScrollBar;
 class KeysView;
 class BoxesListAnimationDockWidget;

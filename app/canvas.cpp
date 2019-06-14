@@ -130,7 +130,7 @@ void Canvas::setCurrentBoxesGroup(ContainerBox * const group) {
     group->setIsCurrentGroup_k(true);
 
     //mMainWindow->getObjectSettingsList()->setMainTarget(mCurrentBoxesGroup);
-    SWT_scheduleWidgetsContentUpdateWithTarget(mCurrentBoxesGroup,
+    SWT_scheduleContentUpdate(mCurrentBoxesGroup,
                                                SWT_TARGET_CURRENT_GROUP);
 }
 

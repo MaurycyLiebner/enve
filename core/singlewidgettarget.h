@@ -57,7 +57,7 @@ class SingleWidgetTarget : public SelfRef {
 public:
     SingleWidgetTarget() {}
     virtual void SWT_setupAbstraction(
-            SingleWidgetAbstraction*,
+            SWT_Abstraction*,
             const UpdateFuncs &,
             const int) {}
 
@@ -133,16 +133,13 @@ public:
     // Sound
     virtual bool SWT_isSingleSound() const { return false; }
 
-    void SWT_addChildAbstractionForTargetToAll(
-            SingleWidgetTarget * const target);
-    void SWT_addChildAbstractionForTargetToAllAt(
-            SingleWidgetTarget * const target, const int id);
-    void SWT_removeChildAbstractionForTargetFromAll(
-            SingleWidgetTarget * const target);
+    void SWT_addChild(SingleWidgetTarget * const child);
+    void SWT_addChildAt(SingleWidgetTarget * const child, const int id);
+    void SWT_removeChild(SingleWidgetTarget * const child);
 
 
 
-    SingleWidgetAbstraction *SWT_createAbstraction(
+    SWT_Abstraction *SWT_createAbstraction(
             const UpdateFuncs &updateFuncs,
             const int visiblePartWidgetId);
 
@@ -150,14 +147,14 @@ public:
         SWT_mAllAbstractions.erase(visiblePartWidgetId);
     }
 
-    SingleWidgetAbstraction* SWT_getAbstractionForWidget(
+    SWT_Abstraction* SWT_getAbstractionForWidget(
             const int visiblePartWidgetId) const {
         const auto it = SWT_mAllAbstractions.find(visiblePartWidgetId);
         if(it == SWT_mAllAbstractions.end()) return nullptr;
         return it->second.get();
     }
 
-    SingleWidgetAbstraction* SWT_abstractionForWidget(
+    SWT_Abstraction* SWT_abstractionForWidget(
             const UpdateFuncs &updateFuncs,
             const int visiblePartWidgetId) {
         const auto curr = SWT_getAbstractionForWidget(visiblePartWidgetId);
@@ -165,15 +162,13 @@ public:
         return SWT_createAbstraction(updateFuncs, visiblePartWidgetId);
     }
 
-    void SWT_scheduleWidgetsContentUpdateWithRule(
-            const SWT_BoxRule &rule);
+    void SWT_scheduleContentUpdate(const SWT_BoxRule rule);
 
-    void SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty();
-    void SWT_scheduleWidgetsContentUpdateWithTarget(
-            SingleWidgetTarget *targetP, const SWT_Target &target);
+    void SWT_scheduleSearchContentUpdate();
+    void SWT_scheduleContentUpdate(SingleWidgetTarget * const targetP,
+                                   const SWT_Target target);
 
-    void SWT_moveChildAbstractionForTargetToInAll(
-            SingleWidgetTarget * const target, const int id);
+    void SWT_moveChildTo(SingleWidgetTarget * const target, const int id);
 
     bool SWT_isVisible() const {
         return SWT_mVisible;
@@ -229,7 +224,7 @@ private:
     bool SWT_mAncestorDisabled = false;
     bool SWT_mVisible = true;
     bool SWT_mDisabled = false;
-    std::map<int, stdsptr<SingleWidgetAbstraction>> SWT_mAllAbstractions;
+    std::map<int, stdsptr<SWT_Abstraction>> SWT_mAllAbstractions;
 };
 
 #endif // SINGLEWIDGETTARGET_H

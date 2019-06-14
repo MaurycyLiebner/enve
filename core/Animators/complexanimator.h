@@ -17,7 +17,7 @@ public:
         return nullptr;
     }
 
-    void SWT_setupAbstraction(SingleWidgetAbstraction *abstraction,
+    void SWT_setupAbstraction(SWT_Abstraction *abstraction,
                                      const UpdateFuncs &updateFuncs,
                                      const int visiblePartWidgetId);
 

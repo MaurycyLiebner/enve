@@ -2,7 +2,7 @@
 #define SINGLEWIDGET_H
 
 #include <QWidget>
-class SingleWidgetAbstraction;
+class SWT_Abstraction;
 class ScrollWidgetVisiblePart;
 class SingleWidgetTarget;
 
@@ -10,13 +10,13 @@ class SingleWidget : public QWidget {
     Q_OBJECT
 public:
     SingleWidget(ScrollWidgetVisiblePart *parent = nullptr);
-    virtual void setTargetAbstraction(SingleWidgetAbstraction *abs);
-    SingleWidgetAbstraction *getTargetAbstraction() {
+    virtual void setTargetAbstraction(SWT_Abstraction *abs);
+    SWT_Abstraction *getTargetAbstraction() {
         return mTarget;
     }
     SingleWidgetTarget *getTarget() const;
 protected:
-    SingleWidgetAbstraction *mTarget;
+    SWT_Abstraction *mTarget;
     ScrollWidgetVisiblePart *mParent;
 };
 

@@ -7,9 +7,9 @@ bool Document::FileCompare::operator()(const FileHandler &f1,
     return f1->getFilePath() < f2->getFilePath();
 }
 
-void Document::SWT_setupAbstraction(SingleWidgetAbstraction *abstraction,
-                                           const UpdateFuncs &updateFuncs,
-                                           const int visiblePartWidgetId) {
+void Document::SWT_setupAbstraction(SWT_Abstraction * const abstraction,
+                                    const UpdateFuncs &updateFuncs,
+                                    const int visiblePartWidgetId) {
     for(const auto& scene : fScenes) {
         auto abs = scene->SWT_abstractionForWidget(updateFuncs,
                                                    visiblePartWidgetId);

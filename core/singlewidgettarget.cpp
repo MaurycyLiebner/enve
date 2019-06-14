@@ -1,71 +1,60 @@
 #include "singlewidgettarget.h"
 #include "singlewidgetabstraction.h"
 
-//void SingleWidgetTarget::SWT_setupAbstraction(
-//        const stdsptr<SingleWidgetAbstraction>&  SWT_Abstraction,
-//        const int visiblePartWidgetId) {
-//    for(const auto& child : mChildren) {
-//        SWT_Abstraction->addChildAbstraction(
-//                    child->createAbstraction(visiblePartWidget));
-//    }
-//}
-
-SingleWidgetAbstraction* SingleWidgetTarget::SWT_createAbstraction(
+SWT_Abstraction* SingleWidgetTarget::SWT_createAbstraction(
         const UpdateFuncs& updateFuncs,
         const int visiblePartWidgetId) {
-    const auto abs = SPtrCreate(SingleWidgetAbstraction)(
+    const auto abs = SPtrCreate(SWT_Abstraction)(
                 this, updateFuncs, visiblePartWidgetId);
     SWT_setupAbstraction(abs.get(), updateFuncs, visiblePartWidgetId);
     SWT_mAllAbstractions[visiblePartWidgetId] = abs;
     return abs.get();
 }
 
-void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAll(
-        SingleWidgetTarget * const target) {
+void SingleWidgetTarget::SWT_addChild(SingleWidgetTarget * const child) {
     for(const auto& abs : SWT_mAllAbstractions) {
-        abs.second->addChildAbstractionForTarget(target);
+        abs.second->addChild(child);
     }
 }
 
-void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAllAt(
-        SingleWidgetTarget * const target, const int id) {
+void SingleWidgetTarget::SWT_addChildAt(
+        SingleWidgetTarget * const child, const int id) {
     for(const auto& abs : SWT_mAllAbstractions) {
-        abs.second->addChildAbstractionForTargetAt(target, id);
+        abs.second->addChildAt(child, id);
     }
 }
 
-void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithRule(
-        const SWT_BoxRule &rule) {
+void SingleWidgetTarget::SWT_scheduleContentUpdate(const SWT_BoxRule rule) {
     for(const auto& abs : SWT_mAllAbstractions) {
-        abs.second->scheduleWidgetContentUpdateIfIsCurrentRule(rule);
+        abs.second->scheduleContentUpdate(rule);
     }
 }
 
-void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithTarget(
-        SingleWidgetTarget *targetP,
-        const SWT_Target &target) {
+void SingleWidgetTarget::SWT_scheduleContentUpdate(
+        SingleWidgetTarget * const targetP,
+        const SWT_Target target) {
     for(const auto& abs : SWT_mAllAbstractions) {
-        abs.second->scheduleWidgetContentUpdateIfIsCurrentTarget(targetP, target);
+        abs.second->scheduleContentUpdate(targetP, target);
     }
 }
 
-void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty() {
+void SingleWidgetTarget::SWT_scheduleSearchContentUpdate() {
     for(const auto& abs : SWT_mAllAbstractions) {
-        abs.second->scheduleWidgetContentUpdateIfSearchNotEmpty();
+        abs.second->scheduleSearchContentUpdate();
     }
 }
 
-void SingleWidgetTarget::SWT_removeChildAbstractionForTargetFromAll(
-        SingleWidgetTarget* const target) {
+void SingleWidgetTarget::SWT_removeChild(
+        SingleWidgetTarget * const child) {
     for(const auto& abs : SWT_mAllAbstractions) {
-        abs.second->removeChildAbstractionForTarget(target);
+        abs.second->removeChild(child);
     }
 }
 
-void SingleWidgetTarget::SWT_moveChildAbstractionForTargetToInAll(
-        SingleWidgetTarget * const target, const int id) {
+void SingleWidgetTarget::SWT_moveChildTo(
+        SingleWidgetTarget * const child, const int id) {
     for(const auto& abs : SWT_mAllAbstractions) {
-        abs.second->moveChildAbstractionForTargetTo(target, id);
+        abs.second->moveChildTo(child, id);
     }
 }
 

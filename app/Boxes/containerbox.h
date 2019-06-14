@@ -32,7 +32,7 @@ public:
     QRectF getRelBoundingRect(const qreal relFrame);
 
     bool relPointInsidePath(const QPointF &relPos) const;
-    void SWT_setupAbstraction(SingleWidgetAbstraction *abstraction,
+    void SWT_setupAbstraction(SWT_Abstraction *abstraction,
                                      const UpdateFuncs &updateFuncs,
                                      const int visiblePartWidgetId);
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,

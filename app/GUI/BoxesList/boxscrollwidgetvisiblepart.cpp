@@ -99,16 +99,19 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
         QRectF selectionRect,
         const qreal pixelsPerFrame,
         QList<Key *>& listKeys) {
-    QList<SingleWidgetAbstraction*> abstractions;
+    QList<SWT_Abstraction*> abstractions;
 //    selectionRect.adjust(-0.5, -(BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5,
 //                         0.5, (BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5);
     selectionRect.adjust(0.5, 0, 0.5, 0);
     const int minX = qRound(selectionRect.top() - MIN_WIDGET_HEIGHT*0.5);
     const int minY = qRound(selectionRect.bottom() - MIN_WIDGET_HEIGHT*0.5);
     int currY = 0;
-    mMainAbstraction->getAbstractions(
+    const SetAbsFunc setter = [&abstractions](SWT_Abstraction * abs, int) {
+        abstractions.append(abs);
+    };
+    mMainAbstraction->setAbstractions(
             minX, minY, currY, 0, MIN_WIDGET_HEIGHT,
-            abstractions, mCurrentRulesCollection, true, false);
+            setter, mCurrentRulesCollection, true, false);
 
     for(const auto& abs : abstractions) {
         const auto target = abs->getTarget();
@@ -299,7 +302,7 @@ void BoxScrollWidgetVisiblePart::dragMoveEvent(QDragMoveEvent *event) {
 }
 
 bool BoxScrollWidgetVisiblePart::droppingSupported(
-        const SingleWidgetAbstraction * const targetAbs,
+        const SWT_Abstraction * const targetAbs,
         const int idInTarget) const {
     if(!targetAbs) return false;
     if(targetAbs == mCurrentlyDragged.fPtr) return false;

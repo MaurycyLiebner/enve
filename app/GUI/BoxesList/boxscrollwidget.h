@@ -16,7 +16,7 @@ public:
     BoxScrollWidgetVisiblePart *getVisiblePartWidget();
     //    void updateAbstraction();
 protected:
-    stdptr<SingleWidgetAbstraction> mCoreAbs;
+    stdptr<SWT_Abstraction> mCoreAbs;
     void createVisiblePartWidget();
 };
 

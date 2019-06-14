@@ -67,7 +67,7 @@ Canvas *CanvasWindow::getCurrentCanvas() {
 }
 
 void CanvasWindow::SWT_setupAbstraction(
-        SingleWidgetAbstraction *abstraction,
+        SWT_Abstraction *abstraction,
         const UpdateFuncs &updateFuncs,
         const int visiblePartWidgetId) {
     for(const auto& child : mCanvasList) {
@@ -110,10 +110,10 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         MainWindow::getInstance()->setCurrentUndoRedoStack(nullptr);
         currentGroup = nullptr;
     }
-    mWindowSWTTarget->SWT_scheduleWidgetsContentUpdateWithTarget(
+    mWindowSWTTarget->SWT_scheduleContentUpdate(
                 currentGroup,
                 SWT_TARGET_CURRENT_GROUP);
-    mWindowSWTTarget->SWT_scheduleWidgetsContentUpdateWithTarget(
+    mWindowSWTTarget->SWT_scheduleContentUpdate(
                 mCurrentCanvas.data(),
                 SWT_TARGET_CURRENT_CANVAS);
     MainWindow::getInstance()->updateSettingsForCurrentCanvas();
@@ -127,12 +127,12 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
 
 void CanvasWindow::addCanvasToList(const qsptr<Canvas>& canvas) {
     mCanvasList << canvas;
-    mWindowSWTTarget->SWT_addChildAbstractionForTargetToAll(canvas.get());
+    mWindowSWTTarget->SWT_addChild(canvas.get());
 }
 
 void CanvasWindow::removeCanvas(const int id) {
     const auto canvas = mCanvasList.takeAt(id);
-    mWindowSWTTarget->SWT_removeChildAbstractionForTargetFromAll(canvas.data());
+    mWindowSWTTarget->SWT_removeChild(canvas.data());
     if(mCanvasList.isEmpty()) {
         setCurrentCanvas(nullptr);
     } else if(id < mCanvasList.count()) {
@@ -1214,7 +1214,7 @@ void CanvasWindow::nextSaveOutputFrame() {
 
 void CanvasWindow::clearAll() {
     for(const auto& canvas : mCanvasList) {
-        mWindowSWTTarget->SWT_removeChildAbstractionForTargetFromAll(canvas.data());
+        mWindowSWTTarget->SWT_removeChild(canvas.data());
     }
 
     mCanvasList.clear();

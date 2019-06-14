@@ -119,8 +119,8 @@ void BoundingBox::prp_afterChangedAbsRange(const FrameRange &range) {
 
 void BoundingBox::ca_childAnimatorIsRecordingChanged() {
     ComplexAnimator::ca_childAnimatorIsRecordingChanged();
-    SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_ANIMATED);
-    SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_NOT_ANIMATED);
+    SWT_scheduleContentUpdate(SWT_BR_ANIMATED);
+    SWT_scheduleContentUpdate(SWT_BR_NOT_ANIMATED);
 }
 
 qsptr<BoundingBox> BoundingBox::createLink() {
@@ -422,7 +422,7 @@ QPointF BoundingBox::getPivotAbsPos() {
 
 void BoundingBox::select() {
     mSelected = true;
-    SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_SELECTED);
+    SWT_scheduleContentUpdate(SWT_BR_SELECTED);
 }
 
 void BoundingBox::updateRelBoundingRectFromRenderData(
@@ -513,7 +513,7 @@ void BoundingBox::nullifyCurrentRenderData(const int relFrame) {
 void BoundingBox::deselect() {
     mSelected = false;
 
-    SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_SELECTED);
+    SWT_scheduleContentUpdate(SWT_BR_SELECTED);
 }
 
 bool BoundingBox::isContainedIn(const QRectF &absRect) const {
@@ -1286,8 +1286,8 @@ void BoundingBox::setVisibile(const bool visible) {
 
     prp_afterWholeInfluenceRangeChanged();
 
-    SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_VISIBLE);
-    SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_HIDDEN);
+    SWT_scheduleContentUpdate(SWT_BR_VISIBLE);
+    SWT_scheduleContentUpdate(SWT_BR_HIDDEN);
     for(const auto&  box : mLinkingBoxes) {
         if(box->isParentLinkBox())
             box->setVisibile(visible);
@@ -1338,8 +1338,8 @@ void BoundingBox::setLocked(const bool bt) {
     if(bt == mLocked) return;
     if(mSelected) getParentCanvas()->removeBoxFromSelection(this);
     mLocked = bt;
-    SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_LOCKED);
-    SWT_scheduleWidgetsContentUpdateWithRule(SWT_BR_UNLOCKED);
+    SWT_scheduleContentUpdate(SWT_BR_LOCKED);
+    SWT_scheduleContentUpdate(SWT_BR_UNLOCKED);
 }
 
 bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,

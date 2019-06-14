@@ -21,7 +21,7 @@ public:
     void updateVisibleWidgetsContent();
     void callUpdaters();
 
-    void setMainAbstraction(SingleWidgetAbstraction *abs);
+    void setMainAbstraction(SWT_Abstraction *abs);
     void setCurrentRule(const SWT_BoxRule &rule);
     void setCurrentTarget(SingleWidgetTarget *targetP,
                           const SWT_Target &target);
@@ -74,7 +74,7 @@ protected:
     const int mId;
     bool mAlwaysShowChildren = false;
     SWT_RulesCollection mCurrentRulesCollection;
-    stdptr<SingleWidgetAbstraction> mMainAbstraction;
+    stdptr<SWT_Abstraction> mMainAbstraction;
 };
 
 

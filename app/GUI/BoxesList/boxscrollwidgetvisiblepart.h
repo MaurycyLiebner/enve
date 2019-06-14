@@ -64,7 +64,7 @@ private:
     QTimer *mScrollTimer = nullptr;
     KeysView *mKeysView = nullptr;
     struct Dragged {
-        SingleWidgetAbstraction * fPtr;
+        SWT_Abstraction * fPtr;
         enum Type { BOX,
                     RASTER_EFFECT, RASTER_GPU_EFFECT, PATH_EFFECT,
                     NONE } fType;
@@ -81,7 +81,7 @@ private:
     };
     Dragged mCurrentlyDragged;
     struct DropTarget {
-        SingleWidgetAbstraction * fTargetParent;
+        SWT_Abstraction * fTargetParent;
         int fTargetId;
 
         bool drop(const Dragged& dragged);
@@ -109,7 +109,7 @@ private:
     DropTarget getClosestDropTarget(const int yPos) const;
 
     void updateDraggedFromMimeData(const QMimeData * const mimeData);
-    bool droppingSupported(const SingleWidgetAbstraction * const targetAbs,
+    bool droppingSupported(const SWT_Abstraction * const targetAbs,
                            const int idInTarget) const;
     void updateDragLine();
 };
