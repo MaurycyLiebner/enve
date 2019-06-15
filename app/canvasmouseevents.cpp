@@ -24,11 +24,9 @@ void Canvas::mousePressEvent(const QMouseEvent * const event) {
         if(button == Qt::LeftButton) {
             handleLeftButtonMousePress();
         } else if(button == Qt::RightButton) {
-            handleRightButtonMousePress(event);
+            handleRightButtonMousePress(event->globalPos());
         }
     }
-
-    callUpdateSchedulers();
 }
 
 void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
@@ -46,11 +44,6 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
         updateHoveredElements();
 
         setLastMouseEventPosAbs(event->pos());
-        if(mHoveredPoint_d != lastHoveredPoint ||
-           mHoveredBox != lastHoveredBox ||
-           mHoveredNormalSegment != lastNSegment) {
-            callUpdateSchedulers();
-        }
         return;
     }
 
@@ -110,7 +103,6 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
     mFirstMouseMove = false;
 
     setLastMouseEventPosAbs(event->pos());
-    callUpdateSchedulers();
     if(!mSelecting && !mIsMouseGrabbing && leftPressed) grabMouseAndTrack();
 }
 
@@ -130,18 +122,6 @@ void Canvas::mouseReleaseEvent(const QMouseEvent * const event) {
     mLastPressedPoint = nullptr;
 
     setLastMouseEventPosAbs(event->pos());
-    callUpdateSchedulers();
-}
-
-void Canvas::wheelEvent(const QWheelEvent * const event) {
-    if(isPreviewingOrRendering()) return;
-    if(event->delta() > 0) {
-        zoomCanvas(1.1, event->posF());
-    } else {
-        zoomCanvas(0.9, event->posF());
-    }
-
-    callUpdateSchedulers();
 }
 
 void Canvas::mouseDoubleClickEvent(const QMouseEvent * const e) {
@@ -170,15 +150,18 @@ void Canvas::mouseDoubleClickEvent(const QMouseEvent * const e) {
             mActiveWindow->setCanvasMode(MOVE_POINT);
         }
     }
-
-    callUpdateSchedulers();
 }
 
 void Canvas::tabletEvent(const QTabletEvent * const e,
                          const QPointF &absPos) {
-    if(mCurrentMode != PAINT_MODE || e->buttons() & Qt::MiddleButton) return;
+    if(mCurrentMode != PAINT_MODE) return;
+    const auto type = e->type();
     setCurrentMouseEventPosAbs(absPos);
-    if(e->type() == QEvent::TabletPress) {
+
+    if(type == QEvent::TabletRelease ||
+       e->buttons() & Qt::MiddleButton) {
+        mStylusDrawing = false;
+    } else if(e->type() == QEvent::TabletPress) {
         if(e->button() == Qt::RightButton) return;
         if(e->button() == Qt::LeftButton) {
             mStylusDrawing = true;
@@ -186,13 +169,9 @@ void Canvas::tabletEvent(const QTabletEvent * const e,
             paintPress(e->timestamp(), e->pressure(),
                        e->xTilt(), e->yTilt());
         }
-    } else if(e->type() == QEvent::TabletRelease) {
-        mStylusDrawing = false;
-    } else if(e->type() == QEvent::TabletMove && mStylusDrawing) {
+    } else if(type == QEvent::TabletMove && mStylusDrawing) {
         paintMove(e->timestamp(), e->pressure(),
                   e->xTilt(), e->yTilt());
-        return mActiveWindow->requestUpdate();
-    } // else if
+    }
     setLastMouseEventPosAbs(absPos);
-    callUpdateSchedulers();
 }

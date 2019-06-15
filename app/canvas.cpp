@@ -105,8 +105,6 @@ void Canvas::zoomCanvas(const qreal scaleBy, const QPointF &absOrigin) {
     mCanvasTransform.scale(scaleBy, scaleBy);
     mCanvasTransform.translate(transPoint.x(), transPoint.y());
 
-    mLastPressPosAbs = mCanvasTransform.map(mLastPressPosRel);
-
     mVisibleHeight = mCanvasTransform.m22()*mHeight;
     mVisibleWidth = mCanvasTransform.m11()*mWidth;
 
@@ -198,7 +196,8 @@ void Canvas::drawTransparencyMesh(SkCanvas *canvas,
 }
 
 void Canvas::renderSk(SkCanvas * const canvas,
-                      GrContext* const grContext) {
+                      GrContext* const grContext,
+                      const QRect& drawRect) {
     const SkRect viewRect = toSkRect(getPixBoundingRect());
 
     SkPaint paint;
@@ -278,9 +277,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         }
 
         if(mPaintDrawableBox) {
-            const QRect widRect(0, 0, mActiveWidget->width(),
-                                mActiveWidget->height());
-            const auto canvasRect = mCanvasTransform.inverted().mapRect(widRect);
+            const auto canvasRect = mCanvasTransform.inverted().mapRect(drawRect);
             const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
             const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
             canvas->concat(toSkMatrix(pDrawTrans));
@@ -318,16 +315,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
             canvas->drawRect(viewRect.makeInset(1, 1), paint);
         }
         if(mTransMode != MODE_NONE || mValueInput.inputEnabled())
-            mValueInput.draw(canvas, mActiveWidget->height() - MIN_WIDGET_HEIGHT);
-    }
-
-    if(mActiveWindow->hasFocus()) {
-        paint.setColor(SK_ColorRED);
-        paint.setStrokeWidth(4);
-        paint.setStyle(SkPaint::kStroke_Style);
-        canvas->drawRect(SkRect::MakeWH(mActiveWidget->width(),
-                                        mActiveWidget->height()),
-                                        paint);
+            mValueInput.draw(canvas, drawRect.height() - MIN_WIDGET_HEIGHT);
     }
 }
 
@@ -471,7 +459,6 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
             cont->setBlocked(true);
         }
     }
-    callUpdateSchedulers();
 }
 
 void Canvas::prp_afterChangedAbsRange(const FrameRange &range) {
@@ -1054,10 +1041,6 @@ void Canvas::blockUndoRedo() {
 
 void Canvas::unblockUndoRedo() {
     mUndoRedoStack->unblockUndoRedo();
-}
-
-void Canvas::callUpdateSchedulers() {
-    mMainWindow->queScheduledTasksAndUpdate();
 }
 
 bool Canvas::isShiftPressed() {

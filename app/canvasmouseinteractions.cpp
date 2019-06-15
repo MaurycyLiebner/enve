@@ -220,7 +220,7 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
     });
 }
 
-void Canvas::handleRightButtonMousePress(const QMouseEvent * const event) {
+void Canvas::handleRightButtonMousePress(const QPoint& globalPos) {
     if(mIsMouseGrabbing) {
         cancelCurrentTransform();
         mValueInput.clearAndDisableInput();
@@ -243,7 +243,7 @@ void Canvas::handleRightButtonMousePress(const QMouseEvent * const event) {
             } else {
                 mLastPressedPoint->canvasContextMenu(&menu);
             }
-            qMenu.exec(event->globalPos());
+            qMenu.exec(globalPos);
         } else if(mLastPressedBox) {
             if(!mLastPressedBox->isSelected()) {
                 if(!isShiftPressed()) clearBoxesSelection();
@@ -252,13 +252,13 @@ void Canvas::handleRightButtonMousePress(const QMouseEvent * const event) {
 
             QMenu qMenu;
             addSelectedBoxesActions(&qMenu);
-            qMenu.exec(event->globalPos());
+            qMenu.exec(globalPos);
         } else {
             clearPointsSelection();
             clearBoxesSelection();
             QMenu menu(mActiveWindow->getCanvasWidget());
             addActionsToMenu(&menu);
-            menu.exec(event->globalPos());
+            menu.exec(globalPos);
         }
     }
 }
@@ -399,18 +399,15 @@ QPointF Canvas::mapCanvasAbsToRel(const QPointF &pos) {
 }
 
 void Canvas::setLastMouseEventPosAbs(const QPointF &abs) {
-    mLastMouseEventPosAbs = abs;
-    mLastMouseEventPosRel = mapCanvasAbsToRel(mLastMouseEventPosAbs);
+    mLastMouseEventPosRel = mapCanvasAbsToRel(abs);
 }
 
 void Canvas::setLastMousePressPosAbs(const QPointF &abs) {
-    mLastPressPosAbs = abs;
-    mLastPressPosRel = mapCanvasAbsToRel(mLastMouseEventPosAbs);
+    mLastPressPosRel = mapCanvasAbsToRel(abs);
 }
 
 void Canvas::setCurrentMouseEventPosAbs(const QPointF &abs) {
-    mCurrentMouseEventPosAbs = abs;
-    mCurrentMouseEventPosRel = mapCanvasAbsToRel(mCurrentMouseEventPosAbs);
+    mCurrentMouseEventPosRel = mapCanvasAbsToRel(abs);
 }
 
 void Canvas::cancelCurrentTransform() {

@@ -244,41 +244,60 @@ void CanvasWindow::renameCurrentCanvas(const QString &newName) {
 void CanvasWindow::renderSk(SkCanvas * const canvas,
                             GrContext* const grContext) {
     canvas->clear(SK_ColorBLACK);
-    if(mCurrentCanvas) mCurrentCanvas->renderSk(canvas, grContext);
+    if(mCurrentCanvas) mCurrentCanvas->renderSk(canvas, grContext, rect());
+    if(hasFocus()) {
+        SkPaint paint;
+        paint.setColor(SK_ColorRED);
+        paint.setStrokeWidth(4);
+        paint.setStyle(SkPaint::kStroke_Style);
+        canvas->drawRect(SkRect::MakeWH(width(), height()), paint);
+    }
 }
 
 void CanvasWindow::tabletEvent(QTabletEvent *e) {
-    if(hasNoCanvas()) return;
-    QPoint global_pos = mapToGlobal( QPoint(0, 0) );
-    qreal w_x_t = e->hiResGlobalX() - global_pos.x();
-    qreal w_y_t = e->hiResGlobalY() - global_pos.y();
-    mCurrentCanvas->tabletEvent(e, QPointF(w_x_t, w_y_t));
+    if(!mCurrentCanvas) return;
+    if(mCurrentMode != PAINT_MODE) return;
+    const QPoint globalPos = mapToGlobal(QPoint(0, 0));
+    const qreal x = e->hiResGlobalX() - globalPos.x();
+    const qreal y = e->hiResGlobalY() - globalPos.y();
+    mCurrentCanvas->tabletEvent(e, QPointF(x, y));
+    requestUpdate();
 }
 
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
     KFT_setFocus();
     if(!mCurrentCanvas) return;
     mCurrentCanvas->mousePressEvent(event);
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
     if(!mCurrentCanvas) return;
     mCurrentCanvas->mouseReleaseEvent(event);
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
     if(!mCurrentCanvas) return;
     mCurrentCanvas->mouseMoveEvent(event);
+    if(mCurrentMode == PAINT_MODE) requestUpdate();
+    else queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::wheelEvent(QWheelEvent *event) {
     if(!mCurrentCanvas) return;
-    mCurrentCanvas->wheelEvent(event);
+    if(event->delta() > 0) {
+        mCurrentCanvas->zoomCanvas(1.1, event->posF());
+    } else {
+        mCurrentCanvas->zoomCanvas(0.9, event->posF());
+    }
+    requestUpdate();
 }
 
 void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     if(!mCurrentCanvas) return;
     mCurrentCanvas->mouseDoubleClickEvent(event);
+    queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::openSettingsWindowForCurrentCanvas() {

@@ -8,9 +8,9 @@ bool Document::FileCompare::operator()(const FileHandler &f1,
 }
 
 Canvas *Document::createNewCanvas() {
-    const auto newCanvas = SPtrCreate(Canvas)();
-    fScenes.append(newCanvas);
-    return newCanvas.get();
+    //const auto newCanvas = SPtrCreate(Canvas)();
+    //fScenes.append(newCanvas);
+    //return newCanvas.get();
 }
 
 void Document::write(QIODevice * const dst) const {

@@ -51,6 +51,7 @@ extern bool boxesZSort(const qptr<BoundingBox> &box1,
 class Canvas : public ContainerBox, public CanvasBase {
     Q_OBJECT
     friend class SelfRef;
+    friend class CanvasWindow;
 protected:
     explicit Canvas(CanvasWindow *canvasWidget,
                     const int canvasWidth = 1920,
@@ -216,11 +217,43 @@ public:
 
     void selectAndAddContainedPointsToSelection(const QRectF &absRect);
 //
+    struct MouseEvent {
+        MouseEvent(QMouseEvent * const src, QWidget * const widget) :
+            fPos(src->pos()), fGlobalPos(src->globalPos()),
+            fButton(src->button()), fButtons(src->buttons()),
+            fModifiers(src->modifiers()), fTimestamp(src->timestamp()),
+            fWidget(widget) {}
+
+        CanvasMode fMode;
+        QPoint fPos;
+        QPoint fGlobalPos;
+        Qt::MouseButton fButton;
+        Qt::MouseButtons fButtons;
+        Qt::KeyboardModifiers fModifiers;
+        ulong fTimestamp;
+        QWidget* fWidget;
+    };
+
     void mousePressEvent(const QMouseEvent * const event);
     void mouseReleaseEvent(const QMouseEvent * const event);
     void mouseMoveEvent(const QMouseEvent * const event);
-    void wheelEvent(const QWheelEvent * const event);
     void mouseDoubleClickEvent(const QMouseEvent * const e);
+
+    struct TabletEvent {
+        QPointF fPos;
+        QEvent::Type fType;
+        Qt::MouseButton fButton;
+        Qt::MouseButtons fButtons;
+        Qt::KeyboardModifiers fModifiers;
+        qreal fPressure;
+        int fXTilt;
+        int fYTilt;
+        ulong fTimestamp;
+        QWidget* fWidget;
+    };
+
+    void tabletEvent(const QTabletEvent * const e,
+                     const QPointF &absPos);
 
     bool keyPressEvent(QKeyEvent *event);
 
@@ -269,7 +302,8 @@ public:
     void scheduleEffectsMarginUpdate() {}
 
     void renderSk(SkCanvas * const canvas,
-                  GrContext * const grContext);
+                  GrContext * const grContext,
+                  const QRect &drawRect);
 
     void setCanvasSize(const int width, const int height) {
         if(width == mWidth && height == mHeight) return;
@@ -338,7 +372,7 @@ protected:
     void handleMovePathMouseRelease();
     void handleMovePointMouseRelease();
 
-    void handleRightButtonMousePress(const QMouseEvent * const event);
+    void handleRightButtonMousePress(const QPoint &globalPos);
     void handleLeftButtonMousePress();
 signals:
     void canvasNameChanged(Canvas *, QString);
@@ -456,8 +490,6 @@ public:
         mPickStrokeFromPath = pickStroke;
     }
 
-    void tabletEvent(const QTabletEvent * const e,
-                     const QPointF &absPos);
     QRectF getRelBoundingRect(const qreal );
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
@@ -525,7 +557,6 @@ public:
     }
 private:
     void openTextEditorForTextBox(TextBox *textBox);
-    void callUpdateSchedulers();
 
     bool isShiftPressed();
 
@@ -648,11 +679,8 @@ protected:
     bool mSelecting = false;
 //    bool mMoving = false;
     QPointF mLastMouseEventPosRel;
-    QPointF mLastMouseEventPosAbs;
-    QPointF mLastPressPosAbs;
     QPointF mLastPressPosRel;
     QPointF mCurrentMouseEventPosRel;
-    QPointF mCurrentMouseEventPosAbs;
 
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = MOVE_BOX;

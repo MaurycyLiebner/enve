@@ -169,6 +169,8 @@ private:
     void changeCurrentFrameAction(const int frame);
     void playPreviewAfterAllTasksCompleted();
 
+    CanvasMode mCurrentMode = MOVE_BOX;
+
     //! @brief true if preview is currently playing
     bool mPreviewing = false;
     //! @brief true if currently preview is being rendered
