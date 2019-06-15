@@ -259,10 +259,10 @@ void Canvas::startSelectedFillColorTransform() {
 }
 
 #include "Boxes/smartvectorpath.h"
-NormalSegment Canvas::getSmartEdgeAt(const QPointF& absPos) const {
-    const qreal zoomInv = 1/mCanvasTransform.m11();
+NormalSegment Canvas::getSegment(const MouseEvent& e) const {
+    const qreal zoomInv = 1/e.fScale;
     for(const auto &box : mSelectedBoxes) {
-        const auto pathEdge = box->getNormalSegment(absPos, zoomInv);
+        const auto pathEdge = box->getNormalSegment(e.fPos, zoomInv);
         if(pathEdge.isValid()) return pathEdge;
     }
     return NormalSegment();
@@ -397,7 +397,7 @@ void Canvas::addBoxToSelection(BoundingBox *box) {
     box->select();
     mSelectedBoxes.append(box); schedulePivotUpdate();
 
-    sortSelectedBoxesByZAscending();
+    sortSelectedBoxesAsc();
     //setCurrentFillStrokeSettingsFromBox(box);
     mMainWindow->setCurrentBox(box);
 
@@ -442,18 +442,27 @@ void Canvas::clearBoxesSelectionList() {
 void Canvas::applyCurrentTransformationToSelected() {
 }
 
-bool zLessThan(const qptr<BoundingBox> &box1, const qptr<BoundingBox> &box2) {
+bool zAsc(const qptr<BoundingBox> &box1, const qptr<BoundingBox> &box2) {
     return box1->getZIndex() > box2->getZIndex();
 }
 
-void Canvas::sortSelectedBoxesByZAscending() {
-    std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zLessThan);
+void Canvas::sortSelectedBoxesAsc() {
+    std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zAsc);
+}
+
+bool zDesc(const qptr<BoundingBox>& box1, const qptr<BoundingBox>& box2) {
+    return box1->getZIndex() < box2->getZIndex();
+}
+
+void Canvas::sortSelectedBoxesDesc() {
+    std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zDesc);
 }
 
 void Canvas::raiseSelectedBoxesToTop() {
-    BoundingBox* box;
-    Q_FOREACHInverted(box, mSelectedBoxes) {
-        box->bringToFront();
+    const auto begin = mSelectedBoxes.rbegin();
+    const auto end = mSelectedBoxes.rend();
+    for(auto it = begin; it != end; it++) {
+        (*it)->bringToFront();
     }
 }
 
@@ -465,8 +474,10 @@ void Canvas::lowerSelectedBoxesToBottom() {
 void Canvas::lowerSelectedBoxes() {
     int lastZ = -10000;
     bool lastBoxChanged = true;
-    BoundingBox* box;
-    Q_FOREACHInverted(box, mSelectedBoxes) {
+    const auto begin = mSelectedBoxes.rbegin();
+    const auto end = mSelectedBoxes.rend();
+    for(auto it = begin; it != end; it++) {
+        const auto box = *it;
         const int boxZ = box->getZIndex();
         if(boxZ - 1 != lastZ || lastBoxChanged) box->moveDown();
         lastZ = boxZ;
@@ -558,7 +569,6 @@ void Canvas::duplicateSelectedBoxes() {
     const int nBoxes = mSelectedBoxes.count();
     target.write(rcConstChar(&nBoxes), sizeof(int));
 
-    std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), boxesZSort);
     for(const auto &box : mSelectedBoxes) {
         box->writeBoundingBox(&target);
     }

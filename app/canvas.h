@@ -7,7 +7,6 @@
 #include "CacheHandlers/hddcachablecachehandler.h"
 #include "skia/skiaincludes.h"
 #include "GUI/valueinput.h"
-#include "GUI/canvaswindow.h"
 #include "Animators/coloranimator.h"
 #include "MovablePoints/segment.h"
 #include "MovablePoints/movablepoint.h"
@@ -16,6 +15,7 @@
 #include "canvasbase.h"
 #include "Paint/animatedsurface.h"
 #include <QAction>
+#include "Animators/outlinesettingsanimator.h"
 
 class AnimatedSurface;
 class PaintBox;
@@ -32,39 +32,96 @@ class NodePoint;
 class UndoRedoStack;
 class ExternalLinkBox;
 struct GPURasterEffectCreator;
-
-#define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? nullptr : (list).at( (index) ))
-
-#define Q_FOREACHInverted(item, list) item = getAtIndexOrGiveNull((list).count() - 1, (list)); \
-    for(int i = (list).count() - 1; i >= 0; i--, item = getAtIndexOrGiveNull(i, (list)) )
-#define Q_FOREACHInverted2(item, list) for(int i = (list).count() - 1; i >= 0; i--) { \
-            item = getAtIndexOrGiveNull(i, (list));
+class CanvasWindow;
+class SingleSound;
+class VideoBox;
+class ImageBox;
 
 enum CtrlsMode : short;
 
-extern bool zLessThan(const qptr<BoundingBox> &box1,
-                      const qptr<BoundingBox> &box2);
+class MouseEvent {
+protected:
+    MouseEvent(const QPointF& pos,
+               const QPointF& lastPos,
+               const QPointF& lastPressPos,
+               const bool mouseGrabbing,
+               const qreal scale,
+               const CanvasMode mode,
+               const QPoint& globalPos,
+               const Qt::MouseButton button,
+               const Qt::MouseButtons buttons,
+               const Qt::KeyboardModifiers modifiers,
+               const ulong& timestamp,
+               QWidget * const widget) :
+        fPos(pos), fLastPos(lastPos), fLastPressPos(lastPressPos),
+        fMouseGrabbing(mouseGrabbing), fScale(scale),
+        fMode(mode), fGlobalPos(globalPos),
+        fButton(button), fButtons(buttons),
+        fModifiers(modifiers), fTimestamp(timestamp),
+        fWidget(widget) {}
+public:
+    MouseEvent(const QPointF& pos,
+               const QPointF& lastPos,
+               const QPointF& lastPressPos,
+               const bool mouseGrabbing,
+               const qreal scale,
+               const CanvasMode mode,
+               const QMouseEvent * const e,
+               QWidget * const widget) :
+        MouseEvent(pos, lastPos, lastPressPos, mouseGrabbing,
+                   scale, mode, e->globalPos(), e->button(),
+                   e->buttons(), e->modifiers(), e->timestamp(),
+                   widget) {}
 
-extern bool boxesZSort(const qptr<BoundingBox> &box1,
-                       const qptr<BoundingBox> &box2);
+    QPointF fPos;
+    QPointF fLastPos;
+    QPointF fLastPressPos;
+    bool fMouseGrabbing;
+    qreal fScale;
+    CanvasMode fMode;
+    QPoint fGlobalPos;
+    Qt::MouseButton fButton;
+    Qt::MouseButtons fButtons;
+    Qt::KeyboardModifiers fModifiers;
+    ulong fTimestamp;
+    QWidget* fWidget;
+};
+
+struct KeyEvent : public MouseEvent {
+    KeyEvent(const QPointF& pos,
+             const QPointF& lastPos,
+             const QPointF& lastPressPos,
+             const bool mouseGrabbing,
+             const qreal scale,
+             const CanvasMode mode,
+             const QPoint globalPos,
+             const Qt::MouseButtons buttons,
+             const QKeyEvent * const e,
+             QWidget * const widget) :
+      MouseEvent(pos, lastPos, lastPressPos, mouseGrabbing,
+                 scale, mode, globalPos, Qt::NoButton,
+                 buttons, e->modifiers(), e->timestamp(),
+                 widget), fKey(e->key()) {}
+
+    int fKey;
+};
 
 class Canvas : public ContainerBox, public CanvasBase {
     Q_OBJECT
     friend class SelfRef;
     friend class CanvasWindow;
 protected:
-    explicit Canvas(CanvasWindow *canvasWidget,
+    explicit Canvas(CanvasWindow * const canvasWidget,
                     const int canvasWidth = 1920,
                     const int canvasHeight = 1080,
                     const int frameCount = 200,
                     const qreal fps = 24);
 public:
-    QRectF getPixBoundingRect();
     void selectOnlyLastPressedBox();
     void selectOnlyLastPressedPoint();
 
     void repaintIfNeeded();
-    void setCanvasMode(const CanvasMode &mode);
+    void setCanvasMode(const CanvasMode mode);
     void startSelectionAtPoint(const QPointF &pos);
     void moveSecondSelectionPoint(const QPointF &pos);
     void setPointCtrlsMode(const CtrlsMode& mode);
@@ -73,13 +130,6 @@ public:
     void updatePivot();
 
     void updatePivotIfNeeded();
-
-    void awaitUpdate() {}
-
-    void resetTransormation();
-    void fitCanvasToSize();
-    void zoomCanvas(const qreal scaleBy, const QPointF &absOrigin);
-    void moveByRel(const QPointF &trans);
 
     //void updateAfterFrameChanged(const int currentFrame);
 
@@ -166,10 +216,6 @@ public:
 
     void grabMouseAndTrack();
 
-    void setPartialRepaintRect(QRectF absRect);
-    void makePartialRepaintInclude(QPointF pointToInclude);
-    void partialRepaintRectToPoint(QPointF point);
-
     qreal getResolutionFraction();
     void setResolutionFraction(const qreal percent);
 
@@ -186,7 +232,7 @@ public:
     int getPointsSelectionCount() const ;
 
     void clearPointsSelectionOrDeselect();
-    NormalSegment getSmartEdgeAt(const QPointF& absPos) const;
+    NormalSegment getSegment(const MouseEvent &e) const;
 
     void createLinkBoxForSelected();
     void startSelectedPointsTransform();
@@ -217,43 +263,31 @@ public:
 
     void selectAndAddContainedPointsToSelection(const QRectF &absRect);
 //
-    struct MouseEvent {
-        MouseEvent(QMouseEvent * const src, QWidget * const widget) :
-            fPos(src->pos()), fGlobalPos(src->globalPos()),
-            fButton(src->button()), fButtons(src->buttons()),
-            fModifiers(src->modifiers()), fTimestamp(src->timestamp()),
-            fWidget(widget) {}
 
-        CanvasMode fMode;
-        QPoint fPos;
-        QPoint fGlobalPos;
-        Qt::MouseButton fButton;
-        Qt::MouseButtons fButtons;
-        Qt::KeyboardModifiers fModifiers;
-        ulong fTimestamp;
-        QWidget* fWidget;
-    };
-
-    void mousePressEvent(const QMouseEvent * const event);
-    void mouseReleaseEvent(const QMouseEvent * const event);
-    void mouseMoveEvent(const QMouseEvent * const event);
-    void mouseDoubleClickEvent(const QMouseEvent * const e);
+    void mousePressEvent(const MouseEvent &e);
+    void mouseReleaseEvent(const MouseEvent &e);
+    void mouseMoveEvent(const MouseEvent &e);
+    void mouseDoubleClickEvent(const MouseEvent &e);
 
     struct TabletEvent {
+        TabletEvent(const QPointF& pos, QTabletEvent * const e) :
+            fPos(pos), fType(e->type()),
+            fButton(e->button()), fButtons(e->buttons()),
+            fModifiers(e->modifiers()), fTimestamp(e->timestamp()) {}
+
         QPointF fPos;
         QEvent::Type fType;
         Qt::MouseButton fButton;
         Qt::MouseButtons fButtons;
         Qt::KeyboardModifiers fModifiers;
+        ulong fTimestamp;
         qreal fPressure;
         int fXTilt;
         int fYTilt;
-        ulong fTimestamp;
-        QWidget* fWidget;
     };
 
     void tabletEvent(const QTabletEvent * const e,
-                     const QPointF &absPos);
+                     const QPointF &pos);
 
     bool keyPressEvent(QKeyEvent *event);
 
@@ -303,13 +337,11 @@ public:
 
     void renderSk(SkCanvas * const canvas,
                   GrContext * const grContext,
-                  const QRect &drawRect);
+                  const QRect &drawRect, const QMatrix &viewTrans);
 
     void setCanvasSize(const int width, const int height) {
-        if(width == mWidth && height == mHeight) return;
         mWidth = width;
         mHeight = height;
-        fitCanvasToSize();
     }
 
     int getCanvasWidth() const {
@@ -369,11 +401,11 @@ protected:
     void setCurrentSmartEndPoint(SmartNodePoint * const point);
     NodePoint *getCurrentPoint();
 
-    void handleMovePathMouseRelease();
-    void handleMovePointMouseRelease();
+    void handleMovePathMouseRelease(const MouseEvent &e);
+    void handleMovePointMouseRelease(const MouseEvent &e);
 
     void handleRightButtonMousePress(const QPoint &globalPos);
-    void handleLeftButtonMousePress();
+    void handleLeftButtonMousePress(const MouseEvent &e);
 signals:
     void canvasNameChanged(Canvas *, QString);
 private slots:
@@ -396,7 +428,6 @@ public:
     void duplicateSelectedBoxes();
     void clearLastPressedPoint();
     void clearCurrentSmartEndPoint();
-    void clearHoveredEdge();
     void applyPaintSettingToSelected(const PaintSettingsApplier &setting);
     void setSelectedFillColorMode(const ColorMode &mode);
     void setSelectedStrokeColorMode(const ColorMode &mode);
@@ -405,10 +436,12 @@ public:
 
     SoundComposition *getSoundComposition();
 
-    void updateHoveredBox();
-    void updateHoveredPoint();
-    void updateHoveredEdge();
-    void updateHoveredElements();
+    void updateHoveredBox(const MouseEvent& e);
+    void updateHoveredPoint(const MouseEvent& e);
+    void updateHoveredEdge(const MouseEvent &e);
+    void updateHovered(const MouseEvent &e);
+    void clearHoveredEdge();
+    void clearHovered();
 
     void setLocalPivot(const bool localPivot) {
         mLocalPivot = localPivot;
@@ -438,7 +471,6 @@ public:
     bool isPreviewingOrRendering() const {
         return mPreviewing || mRenderingPreview || mRenderingOutput;
     }
-    QPointF mapCanvasAbsToRel(const QPointF &pos);
 
     qreal getFps() const { return mFps; }
     void setFps(const qreal fps) { mFps = fps; }
@@ -450,19 +482,13 @@ public:
         return ContainerBox::getBoxAt(absPos);
     }
 
-    void anim_scaleTime(const int pivotAbsFrame, const qreal scale) {
-        ContainerBox::anim_scaleTime(pivotAbsFrame, scale);
-//        int newAbsPos = qRound(scale*pivotAbsFrame);
-//        anim_shiftAllKeys(newAbsPos - pivotAbsFrame);
-        setMaxFrame(qRound((mMaxFrame - pivotAbsFrame)*scale));
-        mActiveWindow->setCurrentCanvas(this);
-    }
+    void anim_scaleTime(const int pivotAbsFrame, const qreal scale);
 
     void changeFpsTo(const qreal fps) {
         anim_scaleTime(0, fps/mFps);
         setFps(fps);
     }
-    void drawTransparencyMesh(SkCanvas *canvas, const SkRect &viewRect);
+    void drawTransparencyMesh(SkCanvas * const canvas, const SkRect &viewRect, const qreal scale);
 
     bool SWT_isCanvas() const { return true; }
 
@@ -541,14 +567,16 @@ public:
 
     void setParentToLastSelected();
     void clearParentForSelected();
-    bool startRotatingAction(const QPointF &cursorPos);
-    bool startScalingAction(const QPointF &cursorPos);
-    bool startMovingAction(const QPointF &cursorPos);
+
+    bool startRotatingAction(const KeyEvent &e);
+    bool startScalingAction(const KeyEvent &e);
+    bool startMovingAction(const KeyEvent &e);
+
     void deselectAllBoxesAction();
     void selectAllBoxesAction();
     void selectAllPointsAction();
-    bool handlePaintModeKeyPress(QKeyEvent * const event);
-    bool handleTransormationInputKeyEvent(QKeyEvent * const event);
+    bool handlePaintModeKeyPress(const KeyEvent &e);
+    bool handleTransormationInputKeyEvent(const KeyEvent &e);
 
     void setCurrentGroupParentAsCurrentGroup();
 
@@ -566,17 +594,19 @@ private:
     bool isAltPressed();
     bool isAltPressed(QKeyEvent *event);
 
-    void scaleSelected();
-    void rotateSelected();
+    void scaleSelected(const MouseEvent &e);
+    void rotateSelected(const MouseEvent &e);
     qreal mLastDRot = 0;
     int mRotHalfCycles = 0;
     TransformMode mTransMode = MODE_NONE;
 protected:
     stdsptr<UndoRedoStack> mUndoRedoStack;
 
-    void paintPress(const ulong ts, const qreal pressure,
+    void paintPress(const QPointF &pos, const ulong ts,
+                    const qreal pressure,
                     const qreal xTilt, const qreal yTilt);
-    void paintMove(const ulong ts, const qreal pressure,
+    void paintMove(const QPointF &pos, const ulong ts,
+                   const qreal pressure,
                    const qreal xTilt, const qreal yTilt);
     void updatePaintBox();
     void setPaintBox(PaintBox * const box);
@@ -605,9 +635,9 @@ protected:
 
     SmartVectorPath *getPathResultingFromOperation(const SkPathOp &pathOp);
 
-    void sortSelectedBoxesByZAscending();
+    void sortSelectedBoxesAsc();
+    void sortSelectedBoxesDesc();
 
-    QMatrix mCanvasTransform;
     qsptr<SoundComposition> mSoundComposition;
 
     bool mLocalPivot = false;
@@ -671,39 +701,31 @@ protected:
 
     qreal mFps = 24;
 
-    qreal mVisibleWidth;
-    qreal mVisibleHeight;
     bool mPivotUpdateNeeded = false;
 
     bool mFirstMouseMove = false;
     bool mSelecting = false;
 //    bool mMoving = false;
-    QPointF mLastMouseEventPosRel;
-    QPointF mLastPressPosRel;
-    QPointF mCurrentMouseEventPosRel;
 
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = MOVE_BOX;
 
-    void setCtrlPointsEnabled(bool enabled);
-    void handleMovePointMousePressEvent();
-    void handleMovePointMouseMove();
+    void handleMovePointMousePressEvent(const MouseEvent& e);
+    void handleMovePointMouseMove(const MouseEvent& e);
 
-    void handleMovePathMousePressEvent();
-    void handleMovePathMouseMove();
+    void handleMovePathMousePressEvent(const MouseEvent &e);
+    void handleMovePathMouseMove(const MouseEvent &e);
 
-    void handleAddSmartPointMousePress();
-    void handleAddSmartPointMouseMove();
-    void handleAddSmartPointMouseRelease();
+    void handleMouseRelease(const MouseEvent &e);
 
-    void updateTransformation();
-    void handleMouseRelease();
-    QPointF getMoveByValueForEventPos(const QPointF &eventPos);
+    void handleAddSmartPointMousePress(const MouseEvent &e);
+    void handleAddSmartPointMouseMove(const MouseEvent &e);
+    void handleAddSmartPointMouseRelease(const MouseEvent &e);
+
+    void updateTransformation(const KeyEvent &e);
+    QPointF getMoveByValueForEvent(const MouseEvent &e);
     void cancelCurrentTransform();
     void releaseMouseAndDontTrack();
-    void setLastMouseEventPosAbs(const QPointF &abs);
-    void setLastMousePressPosAbs(const QPointF &abs);
-    void setCurrentMouseEventPosAbs(const QPointF &abs);
 };
 
 #endif // CANVAS_H

@@ -1257,8 +1257,8 @@ void BoundingBox::sClearReadBoxes() {
 }
 
 void BoundingBox::selectAndAddContainedPointsToList(
-        const QRectF &absRect, QList<stdptr<MovablePoint>> &selection,
-        const CanvasMode& mode) {
+        const QRectF &absRect, QList<MovablePoint*> &selection,
+        const CanvasMode mode) {
     for(const auto& desc : mCanvasProps) {
         const auto handler = desc->getPointsHandler();
         if(!handler) continue;
@@ -1266,7 +1266,7 @@ void BoundingBox::selectAndAddContainedPointsToList(
     }
 }
 
-void BoundingBox::selectAllCanvasPts(QList<stdptr<MovablePoint> > &selection,
+void BoundingBox::selectAllCanvasPts(QList<MovablePoint*> &selection,
                                      const CanvasMode& mode) {
     for(const auto& desc : mCanvasProps) {
         const auto handler = desc->getPointsHandler();

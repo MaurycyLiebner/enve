@@ -62,52 +62,52 @@ void ValueInput::updateInputValue() {
     }
 }
 #include <QKeyEvent>
-bool ValueInput::handleTransormationInputKeyEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Minus) {
+bool ValueInput::handleTransormationInputKeyEvent(const int key) {
+    if(key == Qt::Key_Minus) {
         if( ((mInputText.isEmpty()) ? false : mInputText.at(0) == '-') ) {
             mInputText.remove("-");
         } else {
             mInputText.prepend("-");
         }
         updateInputValue();
-    } else if(event->key() == Qt::Key_0) {
+    } else if(key == Qt::Key_0) {
         mInputText += "0";
         if(mInputText == "0" || mInputText == "-0") mInputText += ".";
         updateInputValue();
-    } else if(event->key() == Qt::Key_1) {
+    } else if(key == Qt::Key_1) {
         mInputText += "1";
         updateInputValue();
-    } else if(event->key() == Qt::Key_2) {
+    } else if(key == Qt::Key_2) {
         mInputText += "2";
         updateInputValue();
-    } else if(event->key() == Qt::Key_3) {
+    } else if(key == Qt::Key_3) {
         mInputText += "3";
         updateInputValue();
-    } else if(event->key() == Qt::Key_4) {
+    } else if(key == Qt::Key_4) {
         mInputText += "4";
         updateInputValue();
-    } else if(event->key() == Qt::Key_5) {
+    } else if(key == Qt::Key_5) {
         mInputText += "5";
         updateInputValue();
-    } else if(event->key() == Qt::Key_6) {
+    } else if(key == Qt::Key_6) {
         mInputText += "6";
         updateInputValue();
-    } else if(event->key() == Qt::Key_7) {
+    } else if(key == Qt::Key_7) {
         mInputText += "7";
         updateInputValue();
-    } else if(event->key() == Qt::Key_8) {
+    } else if(key == Qt::Key_8) {
         mInputText += "8";
         updateInputValue();
-    } else if(event->key() == Qt::Key_9) {
+    } else if(key == Qt::Key_9) {
         mInputText += "9";
         updateInputValue();
-    } else if(event->key() == Qt::Key_Period ||
-              event->key() == Qt::Key_Comma) {
+    } else if(key == Qt::Key_Period ||
+              key == Qt::Key_Comma) {
         if(!mInputText.contains(".")) {
             mInputText += ".";
             updateInputValue();
         }
-    } else if(event->key() == Qt::Key_Backspace) {
+    } else if(key == Qt::Key_Backspace) {
         mInputText.chop(1);
         if(mInputText == "0" ||
            mInputText == "-" ||

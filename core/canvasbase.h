@@ -15,7 +15,7 @@ public:
     void execOpOnSelectedBoxes(const std::function<void(QList<T*>)> &op) {
         QList<T*> all;
         for(const auto& box : mSelectedBoxes) {
-            const auto boxT = dynamic_cast<T*>(box.data());
+            const auto boxT = dynamic_cast<T*>(box);
             if(boxT) all << boxT;
         }
         op(all);
@@ -24,7 +24,7 @@ public:
     template <class T = BoundingBox>
     void execOpOnSelectedBoxes(const std::function<void(T*)> &op) {
         for(const auto& box : mSelectedBoxes) {
-            const auto boxT = dynamic_cast<T*>(box.data());
+            const auto boxT = dynamic_cast<T*>(box);
             if(boxT) op(boxT);
         }
     }
@@ -33,7 +33,7 @@ public:
     void execOpOnSelectedPoints(const std::function<void(QList<T*>)> &op) {
         QList<T*> all;
         for(const auto& pt : mSelectedPoints_d) {
-            const auto ptT = dynamic_cast<T*>(pt.data());
+            const auto ptT = dynamic_cast<T*>(pt);
             if(ptT) all << ptT;
         }
         op(all);
@@ -52,7 +52,7 @@ public:
             }
         }
         for(const auto& pt : mSelectedPoints_d) {
-            const auto ptT = dynamic_cast<T*>(pt.data());
+            const auto ptT = dynamic_cast<T*>(pt);
             if(ptT) {
                 op(ptT);
                 //if(!ptT->selectionEnabled()) removePointFromSelection(ptT);
@@ -71,10 +71,10 @@ public:
     }
 
 protected:
-    QList<stdptr<MovablePoint>> mSelectedPoints_d;
+    QList<MovablePoint*> mSelectedPoints_d;
     stdptr<MovablePoint> mLastPressedPoint;
 
-    QList<qptr<BoundingBox>> mSelectedBoxes;
+    QList<BoundingBox*> mSelectedBoxes;
 };
 
 #endif // CANVASBASE_H

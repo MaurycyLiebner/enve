@@ -34,7 +34,7 @@ public:
 
     void clearAndDisableInput();
 
-    bool handleTransormationInputKeyEvent(QKeyEvent *event);
+    bool handleTransormationInputKeyEvent(const int key);
 
     bool inputEnabled() const { return mInputEnabled; }
 

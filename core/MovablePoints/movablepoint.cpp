@@ -120,7 +120,7 @@ bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
 
 void MovablePoint::rectPointsSelection(const QRectF &absRect,
                                        const CanvasMode &mode,
-                                       QList<stdptr<MovablePoint>> &list) {
+                                       QList<MovablePoint*> &list) {
     if(!selectionEnabled()) return;
     if(isHidden(mode)) return;
     if(isContainedInRect(absRect)) {

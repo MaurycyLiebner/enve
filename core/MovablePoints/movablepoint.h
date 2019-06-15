@@ -63,7 +63,7 @@ public:
 
     virtual void rectPointsSelection(const QRectF &absRect,
                                      const CanvasMode &mode,
-                                     QList<stdptr<MovablePoint>> &list);
+                                     QList<MovablePoint*> &list);
 
     virtual void setTransform(BasicTransformAnimator * const trans);
 

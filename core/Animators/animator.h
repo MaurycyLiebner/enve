@@ -332,7 +332,7 @@ public:
 
     int getLowestAbsFrameForSelectedKey();
 
-    const QList<stdptr<Key>>& getSelectedKeys() const {
+    const QList<Key*>& getSelectedKeys() const {
         return anim_mSelectedKeys;
     }
     template <class T = Key>
@@ -354,7 +354,7 @@ protected:
     }
 
     OverlappingKeyList anim_mKeys;
-    QList<stdptr<Key>> anim_mSelectedKeys;
+    QList<Key*> anim_mSelectedKeys;
     qsptr<FakeComplexAnimator> mFakeComplexAnimator;
 private:
     void anim_drawKey(QPainter * const p, Key * const key,

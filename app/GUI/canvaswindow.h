@@ -7,6 +7,7 @@
 #include "keyfocustarget.h"
 #include "smartPointers/sharedpointerdefs.h"
 #include "GPUEffects/gpupostprocessor.h"
+#include "canvas.h"
 class Brush;
 class WindowSingleWidgetTarget;
 enum ColorMode : short;
@@ -101,7 +102,6 @@ public:
             const int visiblePartWidgetId);
     ImageBox *createImageForPath(const QString &path);
     SingleSound *createSoundForPath(const QString &path);
-    void updateHoveredElements();
 
     void setLocalPivot(const bool bT);
 
@@ -171,6 +171,11 @@ private:
 
     CanvasMode mCurrentMode = MOVE_BOX;
 
+    QMatrix mViewTransform;
+    QPointF mPrevMousePos;
+    QPointF mPrevPressPos;
+
+    bool mBlockInput = false;
     //! @brief true if preview is currently playing
     bool mPreviewing = false;
     //! @brief true if currently preview is being rendered
@@ -234,7 +239,7 @@ private:
     bool handleGroupChangeKeyPress(QKeyEvent *event);
     bool handleResetTransformKeyPress(QKeyEvent *event);
     bool handleRevertPathKeyPress(QKeyEvent *event);
-    bool handleStartTransformKeyPress(QKeyEvent *event);
+    bool handleStartTransformKeyPress(const KeyEvent &e);
     bool handleSelectAllKeyPress(QKeyEvent *event);
     bool handleShiftKeysKeyPress(QKeyEvent *event);
 
@@ -330,6 +335,12 @@ public:
 
     void flipHorizontalAction();
     void flipVerticalAction();
+
+    QPointF mapToCanvasCoord(const QPointF& windowCoord);
+    void translateView(const QPointF &trans);
+    void zoomView(const qreal scaleBy, const QPointF &absOrigin);
+    void fitCanvasToSize();
+    void resetTransormation();
 private:
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();

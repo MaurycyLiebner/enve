@@ -175,7 +175,7 @@ protected:
     ComplexKey(const int absFrame,
                ComplexAnimator * const parentAnimator);
 private:
-    QList<stdptr<Key>> mKeys;
+    QList<Key*> mKeys;
 };
 
 #endif // COMPLEXANIMATOR_H

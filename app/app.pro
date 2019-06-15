@@ -58,6 +58,7 @@ SOURCES += main.cpp\
     GUI/Timeline/animationrect.cpp \
     GUI/Timeline/durationrectangle.cpp \
     GUI/Timeline/fixedlenanimationrect.cpp \
+    GUI/canvaswindowevents.cpp \
     GUI/welcomedialog.cpp \
     PathEffects/custompatheffectcreator.cpp \
     PathEffects/linespatheffect.cpp \

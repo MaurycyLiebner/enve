@@ -121,8 +121,8 @@ public:
     virtual QPointF getRelCenterPosition();
 
     virtual void selectAndAddContainedPointsToList(
-            const QRectF &absRect, QList<stdptr<MovablePoint>> &selection,
-            const CanvasMode& mode);
+            const QRectF &absRect, QList<MovablePoint*> &selection,
+            const CanvasMode mode);
 
     virtual bool relPointInsidePath(const QPointF &relPos) const;
 
@@ -270,7 +270,7 @@ public:
     void drawBoundingRect(SkCanvas * const canvas,
                          const SkScalar invScale);
 
-    void selectAllCanvasPts(QList<stdptr<MovablePoint>> &selection,
+    void selectAllCanvasPts(QList<MovablePoint *> &selection,
                             const CanvasMode &mode);
 
     int getDocumentId() const { return mDocumentId; }

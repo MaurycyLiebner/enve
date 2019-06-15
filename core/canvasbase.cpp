@@ -1,6 +1,5 @@
 #include "canvasbase.h"
 
-CanvasBase::CanvasBase()
-{
+CanvasBase::CanvasBase() {
 
 }

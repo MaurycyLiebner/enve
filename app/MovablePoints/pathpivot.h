@@ -10,13 +10,20 @@ enum CanvasMode : short;
 class PathPivot : public NonAnimatedMovablePoint {
     friend class StdSelfRef;
 protected:
-    PathPivot(const Canvas*  const parent);
+    PathPivot(const Canvas* const parent);
 public:
     void drawSk(SkCanvas * const canvas, const CanvasMode &mode,
                 const SkScalar invScale, const bool keyOnCurrent);
+    void drawTransforming(SkCanvas * const canvas,
+                          const CanvasMode mode,
+                          const SkScalar invScale,
+                          const SkScalar interval);
     bool isVisible(const CanvasMode& mode) const;
-protected:
+
+    void setMousePos(const QPointF& pos) { mMousePos = pos; }
+private:
     const Canvas * const mCanvas = nullptr;
+    QPointF mMousePos;
 };
 
 #endif // PATHPIVOT_H

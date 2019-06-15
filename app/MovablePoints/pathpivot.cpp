@@ -27,12 +27,28 @@ void PathPivot::drawSk(SkCanvas * const canvas,
     canvas->save();
     canvas->translate(absPos.x(), absPos.y());
     SkPaint paint;
+    paint.setAntiAlias(true);
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
     const SkScalar scaledHalfRadius = toSkScalar(getRadius()*0.5)*invScale;
     canvas->drawLine(-scaledHalfRadius, 0, scaledHalfRadius, 0, paint);
     canvas->drawLine(0, -scaledHalfRadius, 0, scaledHalfRadius, paint);
     canvas->restore();
+}
+
+void PathPivot::drawTransforming(SkCanvas * const canvas,
+                                 const CanvasMode mode,
+                                 const SkScalar invScale,
+                                 const SkScalar interval) {
+    drawSk(canvas, mode, invScale, false);
+    SkPaint paint;
+    paint.setStyle(SkPaint::kStroke_Style);
+    paint.setColor(SK_ColorBLACK);
+    const SkScalar intervals[2] = {interval, interval};
+    paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
+    canvas->drawLine(toSkPoint(getAbsolutePos()),
+                     toSkPoint(mMousePos), paint);
+    paint.setPathEffect(nullptr);
 }
 
 bool PathPivot::isVisible(const CanvasMode &mode) const {

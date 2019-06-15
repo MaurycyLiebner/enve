@@ -816,7 +816,6 @@ void MainWindow::addCanvas(const qsptr<Canvas>& newCanvas) {
             qOverload<int>(&QComboBox::currentIndexChanged),
             mCanvasWindow,
             qOverload<int>(&CanvasWindow::setCurrentCanvas));
-    newCanvas->fitCanvasToSize();
 }
 
 void MainWindow::canvasNameChanged(Canvas *canvas,
@@ -915,7 +914,6 @@ void MainWindow::queScheduledTasksAndUpdate() {
 
     mTaskScheduler.queTasks();
 
-    mCanvasWindow->updateHoveredElements();
     mCanvasWindow->updatePivotIfNeeded();
     mCanvasWindow->requestUpdate();
     ScrollWidgetVisiblePart::callAllInstanceUpdaters();
@@ -1276,14 +1274,12 @@ void MainWindow::revert() {
 void MainWindow::undo() {
     if(!mCurrentUndoRedoStack) return;
     getUndoRedoStack()->undo();
-    mCanvasWindow->updateHoveredElements();
     queScheduledTasksAndUpdate();
 }
 
 void MainWindow::redo() {
     if(!mCurrentUndoRedoStack) return;
     getUndoRedoStack()->redo();
-    mCanvasWindow->updateHoveredElements();
     queScheduledTasksAndUpdate();
 }
 

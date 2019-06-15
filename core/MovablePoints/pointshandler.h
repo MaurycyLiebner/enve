@@ -30,7 +30,7 @@ public:
         return nullptr;
     }
 
-    void addAllPointsToSelection(QList<stdptr<MovablePoint>> &selection,
+    void addAllPointsToSelection(QList<MovablePoint*> &selection,
                                  const CanvasMode &mode) {
         for(const auto& pt : mPts) {
             if(pt->isSelected() || pt->isHidden(mode)) continue;
@@ -42,7 +42,7 @@ public:
     }
 
     void addInRectForSelection(const QRectF &absRect,
-                               QList<stdptr<MovablePoint>> &selection,
+                               QList<MovablePoint*> &selection,
                                const CanvasMode &mode) const {
         for(const auto& pt : mPts) {
             if(!pt->selectionEnabled()) continue;

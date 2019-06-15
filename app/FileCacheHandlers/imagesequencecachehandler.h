@@ -16,6 +16,6 @@ public:
     void updateFrameCount();
 private:
     QStringList mFramePaths;
-    QList<stdptr<ImageCacheHandler>> mFrameImageHandlers;
+    QList<ImageCacheHandler*> mFrameImageHandlers;
 };
 #endif // IMAGESEQUENCECACHEHANDLER_H

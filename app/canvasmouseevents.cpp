@@ -1,6 +1,6 @@
 #include "canvas.h"
 #include "GUI/mainwindow.h"
-
+#include "GUI/canvaswindow.h"
 #include "Boxes/paintbox.h"
 #include "Boxes/textbox.h"
 #include "Boxes/rectangle.h"
@@ -8,49 +8,39 @@
 
 #include "MovablePoints/pathpivot.h"
 
-void Canvas::mousePressEvent(const QMouseEvent * const event) {
+void Canvas::mousePressEvent(const MouseEvent &e) {
     if(isPreviewingOrRendering()) return;
-    const auto button = event->button();
-    if(mIsMouseGrabbing && button == Qt::LeftButton) return;
-    setLastMouseEventPosAbs(event->pos());
-    setLastMousePressPosAbs(event->pos());
-    setCurrentMouseEventPosAbs(event->pos());
+    if(mIsMouseGrabbing && e.fButton == Qt::LeftButton) return;
     if(mCurrentMode == PAINT_MODE) {
         if(mStylusDrawing) return;
-        if(button == Qt::LeftButton) {
-            paintPress(event->timestamp(), 0.5, 0, 0);
+        if(e.fButton == Qt::LeftButton) {
+            paintPress(e.fPos, e.fTimestamp, 0.5, 0, 0);
         }
     } else {
-        if(button == Qt::LeftButton) {
-            handleLeftButtonMousePress();
-        } else if(button == Qt::RightButton) {
-            handleRightButtonMousePress(event->globalPos());
+        if(e.fButton == Qt::LeftButton) {
+            handleLeftButtonMousePress(e);
+        } else if(e.fButton == Qt::RightButton) {
+            handleRightButtonMousePress(e.fGlobalPos);
         }
     }
 }
 
-void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
+void Canvas::mouseMoveEvent(const MouseEvent &e) {
     if(isPreviewingOrRendering()) return;
-    setCurrentMouseEventPosAbs(event->pos());
 
-    const bool leftPressed = event->buttons() & Qt::LeftButton;
-    const bool middlePressed = event->buttons() & Qt::MiddleButton;
+    const bool leftPressed = e.fButtons & Qt::LeftButton;
 
-    if(!middlePressed && !leftPressed && !mIsMouseGrabbing) {
+    if(!leftPressed && !mIsMouseGrabbing) {
         const auto lastHoveredBox = mHoveredBox;
         const auto lastHoveredPoint = mHoveredPoint_d;
         const auto lastNSegment = mHoveredNormalSegment;
 
-        updateHoveredElements();
-
-        setLastMouseEventPosAbs(event->pos());
+        updateHovered(e);
         return;
     }
 
-    if(middlePressed) {
-        moveByRel(mCurrentMouseEventPosRel - mLastMouseEventPosRel);
-    } else if(mCurrentMode == PAINT_MODE && leftPressed)  {
-        paintMove(event->timestamp(), 1, 0, 0);
+    if(mCurrentMode == PAINT_MODE && leftPressed)  {
+        paintMove(e.fPos, e.fTimestamp, 1, 0, 0);
         return mActiveWindow->requestUpdate();
     } else if(leftPressed || mIsMouseGrabbing) {
         if(mMovesToSkip > 0) {
@@ -62,74 +52,65 @@ void Canvas::mouseMoveEvent(const QMouseEvent * const event) {
                 !mHoveredPoint_d && !mHoveredNormalSegment.isValid()) ||
                (mCurrentMode == CanvasMode::MOVE_BOX &&
                 !mHoveredBox && !mHoveredPoint_d)) {
-                startSelectionAtPoint(mLastMouseEventPosRel);
+                startSelectionAtPoint(e.fPos);
             }
         }
         if(mSelecting) {
-            moveSecondSelectionPoint(mCurrentMouseEventPosRel);
+            moveSecondSelectionPoint(e.fPos);
         } else if(mCurrentMode == CanvasMode::MOVE_POINT ||
                   mCurrentMode == CanvasMode::ADD_PARTICLE_BOX ||
                   mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
-            handleMovePointMouseMove();
+            handleMovePointMouseMove(e);
         } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
             if(!mLastPressedPoint) {
-                handleMovePathMouseMove();
+                handleMovePathMouseMove(e);
             } else {
-                handleMovePointMouseMove();
+                handleMovePointMouseMove(e);
             }
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
-            handleAddSmartPointMouseMove();
+            handleAddSmartPointMouseMove(e);
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
             if(isShiftPressed()) {
-                const qreal lenR = pointToLen(mCurrentMouseEventPosRel -
-                                              mLastPressPosRel);
-                mCurrentCircle->moveRadiusesByAbs(QPointF(lenR, lenR));
+                const qreal lenR = pointToLen(e.fPos - e.fLastPressPos);
+                mCurrentCircle->moveRadiusesByAbs({lenR, lenR});
             } else {
-                mCurrentCircle->moveRadiusesByAbs(mCurrentMouseEventPosRel -
-                                                  mLastPressPosRel);
+                mCurrentCircle->moveRadiusesByAbs(e.fPos - e.fLastPressPos);
             }
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
             if(isShiftPressed()) {
-                QPointF trans = mCurrentMouseEventPosRel - mLastPressPosRel;
+                const QPointF trans = e.fPos - e.fLastPressPos;
                 const qreal valF = qMax(trans.x(), trans.y());
-                trans = QPointF(valF, valF);
-                mCurrentRectangle->moveSizePointByAbs(trans);
+                mCurrentRectangle->moveSizePointByAbs({valF, valF});
             } else {
-                mCurrentRectangle->moveSizePointByAbs(mCurrentMouseEventPosRel -
-                                                      mLastPressPosRel);
+                mCurrentRectangle->moveSizePointByAbs(e.fPos - e.fLastPressPos);
             }
         }
     }
     mFirstMouseMove = false;
 
-    setLastMouseEventPosAbs(event->pos());
     if(!mSelecting && !mIsMouseGrabbing && leftPressed) grabMouseAndTrack();
 }
 
-void Canvas::mouseReleaseEvent(const QMouseEvent * const event) {
+void Canvas::mouseReleaseEvent(const MouseEvent &e) {
     if(isPreviewingOrRendering()) return;
-    if(event->button() != Qt::LeftButton) return;
+    if(e.fButton != Qt::LeftButton) return;
     schedulePivotUpdate();
     if(mCurrentMode == PAINT_MODE) return;
-    setCurrentMouseEventPosAbs(event->pos());
     if(mValueInput.inputEnabled()) mFirstMouseMove = false;
     mValueInput.clearAndDisableInput();
 
-    handleMouseRelease();
+    handleMouseRelease(e);
 
     mLastPressedBox = nullptr;
     mHoveredPoint_d = mLastPressedPoint;
     mLastPressedPoint = nullptr;
-
-    setLastMouseEventPosAbs(event->pos());
 }
 
-void Canvas::mouseDoubleClickEvent(const QMouseEvent * const e) {
-    if(e->modifiers() & Qt::ShiftModifier) return;
+void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
+    if(e.fModifiers & Qt::ShiftModifier) return;
     mDoubleClick = true;
 
-    BoundingBox * const boxAt =
-            mCurrentBoxesGroup->getBoxAt(mLastPressPosRel);
+    const auto boxAt = mCurrentBoxesGroup->getBoxAt(e.fPos);
     if(!boxAt) {
         if(!mHoveredPoint_d && !mHoveredNormalSegment.isValid()) {
             if(mCurrentBoxesGroup != this) {
@@ -139,7 +120,7 @@ void Canvas::mouseDoubleClickEvent(const QMouseEvent * const e) {
     } else {
         if(boxAt->SWT_isContainerBox()) {
             setCurrentBoxesGroup(static_cast<ContainerBox*>(boxAt));
-            updateHoveredElements();
+            updateHovered(e);
         } else if((mCurrentMode == MOVE_BOX ||
                    mCurrentMode == MOVE_POINT) &&
                   boxAt->SWT_isTextBox()) {
@@ -153,11 +134,9 @@ void Canvas::mouseDoubleClickEvent(const QMouseEvent * const e) {
 }
 
 void Canvas::tabletEvent(const QTabletEvent * const e,
-                         const QPointF &absPos) {
+                         const QPointF &pos) {
     if(mCurrentMode != PAINT_MODE) return;
     const auto type = e->type();
-    setCurrentMouseEventPosAbs(absPos);
-
     if(type == QEvent::TabletRelease ||
        e->buttons() & Qt::MiddleButton) {
         mStylusDrawing = false;
@@ -165,13 +144,11 @@ void Canvas::tabletEvent(const QTabletEvent * const e,
         if(e->button() == Qt::RightButton) return;
         if(e->button() == Qt::LeftButton) {
             mStylusDrawing = true;
-
-            paintPress(e->timestamp(), e->pressure(),
+            paintPress(pos, e->timestamp(), e->pressure(),
                        e->xTilt(), e->yTilt());
         }
     } else if(type == QEvent::TabletMove && mStylusDrawing) {
-        paintMove(e->timestamp(), e->pressure(),
+        paintMove(pos, e->timestamp(), e->pressure(),
                   e->xTilt(), e->yTilt());
     }
-    setLastMouseEventPosAbs(absPos);
 }
