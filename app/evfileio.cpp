@@ -7,7 +7,7 @@
 #include "PixmapEffects/pixmapeffect.h"
 #include "Animators/qstringanimator.h"
 #include "Animators/transformanimator.h"
-#include "Animators/paintsettings.h"
+#include "Animators/paintsettingsanimator.h"
 #include "Animators/qrealanimator.h"
 #include "Animators/gradient.h"
 #include "Properties/comboboxproperty.h"

@@ -1,21 +1,15 @@
-﻿#ifndef PAINTSETTINGS_H
-#define PAINTSETTINGS_H
+﻿#ifndef PAINTSETTINGSANIMATOR_H
+#define PAINTSETTINGSANIMATOR_H
 
 #include "Animators/qrealanimator.h"
 #include "coloranimator.h"
 #include "colorhelpers.h"
 #include "skia/skiaincludes.h"
 #include "smartPointers/sharedpointerdefs.h"
-#include "brushsettings.h"
+#include "brushsettingsanimator.h"
 #include "Animators/gradient.h"
 #include "Animators/staticcomplexanimator.h"
-
-enum PaintType : short {
-    NOPAINT,
-    FLATPAINT,
-    GRADIENTPAINT,
-    BRUSHPAINT
-};
+#include "paintsettings.h"
 
 class PathBox;
 class SkStroke;
@@ -55,14 +49,14 @@ public:
     void duplicateColorAnimatorFrom(ColorAnimator *source);
     void setGradientVar(Gradient * const grad);
     QColor getColor(const qreal relFrame) const;
-    Gradient::Type getGradientType() { return mGradientType; }
-    void setGradientType(const Gradient::Type &type) {
+    GradientType getGradientType() { return mGradientType; }
+    void setGradientType(const GradientType &type) {
         if(mGradientType == type) return;
         mGradientType = type;
         prp_callFinishUpdater();
     }
 private:
-    Gradient::Type mGradientType = Gradient::LINEAR;
+    GradientType mGradientType = GradientType::LINEAR;
     PaintType mPaintType = NOPAINT;
 
     PathBox * const mTarget_k;
@@ -102,7 +96,7 @@ struct UpdatePaintSettings {
     void updateGradient(const QGradientStops &stops,
                         const QPointF &start,
                         const QPointF &finalStop,
-                        const Gradient::Type &gradientType);
+                        const GradientType &gradientType);
     PaintType fPaintType;
     QColor fPaintColor;
     sk_sp<SkShader> fGradient;
@@ -129,4 +123,4 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
     qCubicSegment1D fSpacingCurve;
 };
 
-#endif // PAINTSETTINGS_H
+#endif // PAINTSETTINGSANIMATOR_H

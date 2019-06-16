@@ -187,13 +187,13 @@ void Canvas::setSelectedStrokeColorMode(const ColorMode &mode) {
     }
 }
 
-void Canvas::setSelectedCapStyle(const Qt::PenCapStyle &capStyle) {
+void Canvas::setSelectedCapStyle(const Qt::PenCapStyle capStyle) {
     for(const auto &box : mSelectedBoxes) {
         box->setStrokeCapStyle(capStyle);
     }
 }
 
-void Canvas::setSelectedJoinStyle(const Qt::PenJoinStyle& joinStyle) {
+void Canvas::setSelectedJoinStyle(const Qt::PenJoinStyle joinStyle) {
     for(const auto &box : mSelectedBoxes) {
         box->setStrokeJoinStyle(joinStyle);
     }
@@ -388,7 +388,7 @@ void Canvas::removeSelectedBoxesAndClearList() {
     clearBoxesSelectionList(); schedulePivotUpdate();
 }
 #include "Boxes/paintbox.h"
-void Canvas::addBoxToSelection(BoundingBox *box) {
+void Canvas::addBoxToSelection(BoundingBox * const box) {
     if(box->isSelected()) return;
     connect(box, &BoundingBox::globalPivotInfluenced,
             this, &Canvas::schedulePivotUpdate);
@@ -406,7 +406,7 @@ void Canvas::addBoxToSelection(BoundingBox *box) {
     }
 }
 
-void Canvas::removeBoxFromSelection(BoundingBox *box) {
+void Canvas::removeBoxFromSelection(BoundingBox * const box) {
     disconnect(box, &BoundingBox::globalPivotInfluenced,
                this, &Canvas::schedulePivotUpdate);
     disconnect(box, &BoundingBox::fillStrokeSettingsChanged,
@@ -502,7 +502,7 @@ void Canvas::deselectAllBoxes() {
 }
 
 MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
-                                       const CanvasMode &mode,
+                                       const CanvasMode mode,
                                        const qreal invScale) {
     if(mode == MOVE_POINT || mode == ADD_POINT ||
        mode == ADD_POINT ||  mode == MOVE_BOX) {

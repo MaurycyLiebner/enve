@@ -1,6 +1,6 @@
 #ifndef OUTLINESETTINGSANIMATOR_H
 #define OUTLINESETTINGSANIMATOR_H
-#include "paintsettings.h"
+#include "paintsettingsanimator.h"
 
 class OutlineSettingsAnimator : public PaintSettingsAnimator {
     friend class SelfRef;
@@ -53,15 +53,13 @@ public:
     Qt::PenJoinStyle getJoinStyle() const;
 
     QrealAnimator *getStrokeWidthAnimator();
-    BrushSettings *getBrushSettings() {
+    BrushSettingsAnimator *getBrushSettings() {
         return mBrushSettings.get();
     }
-
     void setOutlineCompositionMode(
             const QPainter::CompositionMode &compositionMode);
 
     QPainter::CompositionMode getOutlineCompositionMode();
-
     void setLineWidthUpdaterTarget(PathBox * const path);
     bool nonZeroLineWidth();
 
@@ -74,8 +72,8 @@ private:
     Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
     QPainter::CompositionMode mOutlineCompositionMode =
             QPainter::CompositionMode_Source;
-    qsptr<BrushSettings> mBrushSettings =
-            SPtrCreate(BrushSettings)();
+    qsptr<BrushSettingsAnimator> mBrushSettings =
+            SPtrCreate(BrushSettingsAnimator)();
     qsptr<QrealAnimator> mLineWidth =
             SPtrCreate(QrealAnimator)(1, 0, 999, 1, "thickness");
 };

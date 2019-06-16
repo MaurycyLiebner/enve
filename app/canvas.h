@@ -28,7 +28,6 @@ class SoundComposition;
 class SkCanvas;
 class ImageSequenceBox;
 class Brush;
-class NodePoint;
 class UndoRedoStack;
 class ExternalLinkBox;
 struct GPURasterEffectCreator;
@@ -52,12 +51,15 @@ protected:
                const Qt::MouseButtons buttons,
                const Qt::KeyboardModifiers modifiers,
                const ulong& timestamp,
+               std::function<void()> releaseMouse,
+               std::function<void()> grabMouse,
                QWidget * const widget) :
         fPos(pos), fLastPos(lastPos), fLastPressPos(lastPressPos),
         fMouseGrabbing(mouseGrabbing), fScale(scale),
         fMode(mode), fGlobalPos(globalPos),
         fButton(button), fButtons(buttons),
         fModifiers(modifiers), fTimestamp(timestamp),
+        fReleaseMouse(releaseMouse), fGrabMouse(grabMouse),
         fWidget(widget) {}
 public:
     MouseEvent(const QPointF& pos,
@@ -67,11 +69,21 @@ public:
                const qreal scale,
                const CanvasMode mode,
                const QMouseEvent * const e,
+               std::function<void()> releaseMouse,
+               std::function<void()> grabMouse,
                QWidget * const widget) :
         MouseEvent(pos, lastPos, lastPressPos, mouseGrabbing,
                    scale, mode, e->globalPos(), e->button(),
                    e->buttons(), e->modifiers(), e->timestamp(),
-                   widget) {}
+                   releaseMouse, grabMouse, widget) {}
+
+    bool shiftMod() const {
+        return fModifiers & Qt::SHIFT;
+    }
+
+    bool ctrlMod() const {
+        return fModifiers & Qt::CTRL;
+    }
 
     QPointF fPos;
     QPointF fLastPos;
@@ -84,6 +96,8 @@ public:
     Qt::MouseButtons fButtons;
     Qt::KeyboardModifiers fModifiers;
     ulong fTimestamp;
+    std::function<void()> fReleaseMouse;
+    std::function<void()> fGrabMouse;
     QWidget* fWidget;
 };
 
@@ -97,11 +111,13 @@ struct KeyEvent : public MouseEvent {
              const QPoint globalPos,
              const Qt::MouseButtons buttons,
              const QKeyEvent * const e,
+             std::function<void()> releaseMouse,
+             std::function<void()> grabMouse,
              QWidget * const widget) :
       MouseEvent(pos, lastPos, lastPressPos, mouseGrabbing,
                  scale, mode, globalPos, Qt::NoButton,
                  buttons, e->modifiers(), e->timestamp(),
-                 widget), fKey(e->key()) {}
+                 releaseMouse, grabMouse, widget), fKey(e->key()) {}
 
     int fKey;
 };
@@ -192,8 +208,8 @@ public:
     void cancelSelectedBoxesTransform();
     void cancelSelectedPointsTransform();
 
-    void setSelectedCapStyle(const Qt::PenCapStyle& capStyle);
-    void setSelectedJoinStyle(const Qt::PenJoinStyle &joinStyle);
+    void setSelectedCapStyle(const Qt::PenCapStyle capStyle);
+    void setSelectedJoinStyle(const Qt::PenJoinStyle joinStyle);
     void setSelectedStrokeWidth(const qreal strokeWidth);
     void setSelectedStrokeBrush(SimpleBrushWrapper * const brush);
     void setSelectedStrokeBrushWidthCurve(
@@ -213,8 +229,6 @@ public:
             PaintSettingsAnimator*& fillSetings, OutlineSettingsAnimator*& strokeSettings);
     void scaleSelectedBy(const qreal scaleXBy, const qreal scaleYBy,
                          const QPointF &absOrigin, const bool startTrans);
-
-    void grabMouseAndTrack();
 
     qreal getResolutionFraction();
     void setResolutionFraction(const qreal percent);
@@ -241,14 +255,14 @@ public:
     void disconnectPoints();
     void connectPoints();
 
-    void setSelectedFontFamilyAndStyle(
-            const QString& family, const QString& style);
+    void setSelectedFontFamilyAndStyle(const QString& family,
+                                       const QString& style);
     void setSelectedFontSize(const qreal size);
     void removeSelectedPointsAndClearList();
     void removeSelectedBoxesAndClearList();
 
-    void addBoxToSelection(BoundingBox *box);
-    void removeBoxFromSelection(BoundingBox *box);
+    void addBoxToSelection(BoundingBox * const box);
+    void removeBoxFromSelection(BoundingBox * const box);
     void clearBoxesSelection();
     void clearBoxesSelectionList();
 
@@ -301,7 +315,7 @@ public:
     void setPreviewing(const bool bT);
     void setOutputRendering(const bool bT);
 
-    const CanvasMode &getCurrentCanvasMode() const {
+    CanvasMode getCurrentCanvasMode() const {
         return mCurrentMode;
     }
 
@@ -337,7 +351,9 @@ public:
 
     void renderSk(SkCanvas * const canvas,
                   GrContext * const grContext,
-                  const QRect &drawRect, const QMatrix &viewTrans);
+                  const QRect &drawRect,
+                  const QMatrix &viewTrans,
+                  const bool mouseGrabbing);
 
     void setCanvasSize(const int width, const int height) {
         mWidth = width;
@@ -391,25 +407,15 @@ public:
     void setRasterEffectsVisible(const bool bT) { mRasterEffectsVisible = bT; }
     void setPathEffectsVisible(const bool bT) { mPathEffectsVisible = bT; }
 protected:
-//    void updateAfterTotalTransformationChanged() {
-////        for(const auto& child : mChildBoxes) {
-////            child->updateTotalTransformTmp();
-////            child->scheduleSoftUpdate();
-////        }
-//    }
-
     void setCurrentSmartEndPoint(SmartNodePoint * const point);
-    NodePoint *getCurrentPoint();
 
     void handleMovePathMouseRelease(const MouseEvent &e);
     void handleMovePointMouseRelease(const MouseEvent &e);
 
-    void handleRightButtonMousePress(const QPoint &globalPos);
+    void handleRightButtonMousePress(const MouseEvent &e);
     void handleLeftButtonMousePress(const MouseEvent &e);
 signals:
     void canvasNameChanged(Canvas *, QString);
-private slots:
-    void emitCanvasNameChanged();
 public:
     void scheduleDisplayedFillStrokeSettingsUpdate();
 
@@ -423,7 +429,7 @@ public:
     void makeSegmentCurve();
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
-                                   const CanvasMode &mode,
+                                   const CanvasMode mode,
                                    const qreal invScale);
     void duplicateSelectedBoxes();
     void clearLastPressedPoint();
@@ -488,7 +494,9 @@ public:
         anim_scaleTime(0, fps/mFps);
         setFps(fps);
     }
-    void drawTransparencyMesh(SkCanvas * const canvas, const SkRect &viewRect, const qreal scale);
+    void drawTransparencyMesh(SkCanvas * const canvas,
+                              const SkRect &viewRect,
+                              const qreal scale);
 
     bool SWT_isCanvas() const { return true; }
 
@@ -510,11 +518,6 @@ public:
 
     void renderDataFinished(BoundingBoxRenderData *renderData);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
-    void setPickingFromPath(const bool pickFill,
-                            const bool pickStroke) {
-        mPickFillFromPath = pickFill;
-        mPickStrokeFromPath = pickStroke;
-    }
 
     QRectF getRelBoundingRect(const qreal );
     void writeBoundingBox(QIODevice * const target);
@@ -586,14 +589,6 @@ public:
 private:
     void openTextEditorForTextBox(TextBox *textBox);
 
-    bool isShiftPressed();
-
-    bool isShiftPressed(QKeyEvent *event);
-    bool isCtrlPressed();
-    bool isCtrlPressed(QKeyEvent *event);
-    bool isAltPressed();
-    bool isAltPressed(QKeyEvent *event);
-
     void scaleSelected(const MouseEvent &e);
     void rotateSelected(const MouseEvent &e);
     qreal mLastDRot = 0;
@@ -624,14 +619,11 @@ protected:
     QColor mCurrentBrushColor;
     const SimpleBrushWrapper * mCurrentBrush = nullptr;
     bool mStylusDrawing = false;
-    bool mPickFillFromPath = false;
-    bool mPickStrokeFromPath = false;
 
     uint mLastStateId = 0;
     HDDCachableCacheHandler mCacheHandler;
 
-    qsptr<ColorAnimator> mBackgroundColor =
-            SPtrCreate(ColorAnimator)();
+    qsptr<ColorAnimator> mBackgroundColor = SPtrCreate(ColorAnimator)();
 
     SmartVectorPath *getPathResultingFromOperation(const SkPathOp &pathOp);
 
@@ -659,7 +651,7 @@ protected:
     stdptr<MovablePoint> mHoveredPoint_d;
     qptr<BoundingBox> mHoveredBox;
 
-    qptr<BoundingBox> mLastPressedBox;
+    qptr<BoundingBox> mPressedBox;
     stdsptr<PathPivot> mRotPivot;
 
     stdptr<SmartNodePoint> mLastEndPoint;
@@ -667,8 +659,6 @@ protected:
     NormalSegment mHoveredNormalSegment;
     NormalSegment mCurrentNormalSegment;
     qreal mCurrentNormalSegmentT;
-
-    bool mTransformationFinishedBeforeMouseRelease = false;
 
     ValueInput mValueInput;
 
@@ -681,25 +671,16 @@ protected:
     stdsptr<ImageCacheContainer> mCurrentPreviewContainer;
     stdsptr<ImageCacheContainer> mLoadingPreviewContainer;
 
-    int mCurrentPreviewFrameId;
-    int mMaxPreviewFrameId = 0;
-
     bool mClipToCanvasSize = false;
     bool mRasterEffectsVisible = true;
     bool mPathEffectsVisible = true;
 
-    bool mIsMouseGrabbing = false;
-
     bool mDoubleClick = false;
     int mMovesToSkip = 0;
 
-    QColor mFillColor;
-    QColor mOutlineColor;
-
     int mWidth;
     int mHeight;
-
-    qreal mFps = 24;
+    qreal mFps;
 
     bool mPivotUpdateNeeded = false;
 
@@ -716,7 +697,7 @@ protected:
     void handleMovePathMousePressEvent(const MouseEvent &e);
     void handleMovePathMouseMove(const MouseEvent &e);
 
-    void handleMouseRelease(const MouseEvent &e);
+    void handleLeftMouseRelease(const MouseEvent &e);
 
     void handleAddSmartPointMousePress(const MouseEvent &e);
     void handleAddSmartPointMouseMove(const MouseEvent &e);
@@ -725,7 +706,6 @@ protected:
     void updateTransformation(const KeyEvent &e);
     QPointF getMoveByValueForEvent(const MouseEvent &e);
     void cancelCurrentTransform();
-    void releaseMouseAndDontTrack();
 };
 
 #endif // CANVAS_H

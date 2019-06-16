@@ -50,7 +50,7 @@ public:
     void addCanvasToListAndSetAsCurrent(const qsptr<Canvas> &canvas);
     void renameCanvas(const int id, const QString &newName);
     bool hasNoCanvas();
-    void setCanvasMode(const CanvasMode &mode);
+    void setCanvasMode(const CanvasMode mode);
 
     void queScheduledTasksAndUpdate();
     bool KFT_handleKeyEventForTarget(QKeyEvent *event);
@@ -111,6 +111,8 @@ public:
     QWidget *getCanvasWidget();
 
     void grabMouse();
+    void releaseMouse();
+    bool isMouseGrabber();
 
     bool hasFocus() {
         return mHasFocus;
@@ -125,10 +127,6 @@ public:
     }
 
     QRect rect();
-
-    void releaseMouse();
-
-    bool isMouseGrabber();
 
     bool dropEvent(QDropEvent *event);
     bool dragEnterEvent(QDragEnterEvent *event);
@@ -341,6 +339,8 @@ public:
     void zoomView(const qreal scaleBy, const QPointF &absOrigin);
     void fitCanvasToSize();
     void resetTransormation();
+
+    void updatePaintModeCursor();
 private:
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();

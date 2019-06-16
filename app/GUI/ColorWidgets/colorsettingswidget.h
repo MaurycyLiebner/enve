@@ -11,7 +11,7 @@
 #include <QComboBox>
 #include "GUI/qrealanimatorvalueslider.h"
 #include "Animators/coloranimator.h"
-#include "Animators/paintsettings.h"
+#include "Animators/paintsettingsanimator.h"
 #include "paintsettingsapplier.h"
 
 class ColorLabel;
@@ -25,9 +25,9 @@ public:
     QColor getCurrentQColor();
     void setCurrentColor(const QColor &color);
     void hideAlphaControlers();
-    ColorSetting getColorSetting(const ColorSettingType &type) const;
+    ColorSettingApplier getColorSetting(const ColorSettingType &type) const;
 signals:
-    void colorSettingSignal(const ColorSetting&);
+    void colorSettingSignal(const ColorSettingApplier&);
     void colorModeChanged(const ColorMode&);
 public slots:
     void setCurrentColor(const qreal h_t,

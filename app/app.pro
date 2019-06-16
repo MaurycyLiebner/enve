@@ -46,7 +46,9 @@ TARGET = enve
 TEMPLATE = app
 
 SOURCES += main.cpp\
+    Animators/brushsettingsanimator.cpp \
     Animators/outlinesettingsanimator.cpp \
+    Animators/paintsettingsanimator.cpp \
     Boxes/containerbox.cpp \
     Boxes/layerboxrenderdata.cpp \
     Boxes/patheffectsmenu.cpp \
@@ -83,6 +85,7 @@ SOURCES += main.cpp\
     GUI/ColorWidgets/glwidget.cpp \
     document.cpp \
     evfileio.cpp \
+    paintsettings.cpp \
     svgimporter.cpp \
     Animators/coloranimator.cpp \
     Animators/qstringanimator.cpp \
@@ -110,7 +113,6 @@ SOURCES += main.cpp\
     canvasselectedpointsactions.cpp \
     canvasselectedboxesactions.cpp \
     clipboardcontainer.cpp \
-    Animators/paintsettings.cpp \
     Boxes/videobox.cpp \
     Sound/singlesound.cpp \
     Sound/soundcomposition.cpp \
@@ -218,7 +220,6 @@ SOURCES += main.cpp\
     Paint/fixedtiledsurface.cpp \
     GUI/segment1deditor.cpp \
     GUI/namedcontainer.cpp \
-    Animators/brushsettings.cpp \
     Animators/qcubicsegment1danimator.cpp \
     Paint/autotiledsurface.cpp \
     Paint/brushstroke.cpp \
@@ -258,7 +259,9 @@ SOURCES += main.cpp\
     Paint/animatedsurface.cpp
 
 HEADERS  += \
+    Animators/brushsettingsanimator.h \
     Animators/outlinesettingsanimator.h \
+    Animators/paintsettingsanimator.h \
     Boxes/containerbox.h \
     Boxes/layerboxrenderdata.h \
     Boxes/patheffectsmenu.h \
@@ -294,6 +297,7 @@ HEADERS  += \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
     document.h \
+    paintsettings.h \
     svgimporter.h \
     keypoint.h \
     Animators/qstringanimator.h \
@@ -320,7 +324,6 @@ HEADERS  += \
     GUI/BoxesList/boxscrollwidget.h \
     GUI/BoxesList/boxeslistactionbutton.h \
     clipboardcontainer.h \
-    Animators/paintsettings.h \
     Boxes/videobox.h \
     Sound/singlesound.h \
     Sound/soundcomposition.h \
@@ -431,7 +434,6 @@ HEADERS  += \
     Paint/fixedtiledsurface.h \
     GUI/segment1deditor.h \
     GUI/namedcontainer.h \
-    Animators/brushsettings.h \
     Animators/qcubicsegment1danimator.h \
     Paint/autotiledsurface.h \
     Paint/brushstroke.h \

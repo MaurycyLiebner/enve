@@ -5,6 +5,7 @@
 
 #include "smartPointers/sharedpointerdefs.h"
 #include "singlewidgettarget.h"
+#include "paintsettings.h"
 
 class Gradient;
 class FileCacheHandler;
@@ -18,12 +19,22 @@ class Document : public SingleWidgetTarget {
 public:
     QString fEvFile;
 
+    // bookmarked
     QList<QColor> fColors;
-    QList<qsptr<Gradient>> fGradients;
-    std::set<FileHandler, FileCompare> fFiles;
-    QList<qsptr<Canvas>> fScenes;
+    QList<SimpleBrushWrapper*> fBrushes;
 
+    // all in document
+    QList<qsptr<Gradient>> fGradients;
+
+    FillSettings fLastFill;
+    StrokeSettings fLastStroke;
+    SimpleBrushWrapper* fLastBrush = nullptr;
+
+    std::set<FileHandler, FileCompare> fFiles;
+
+    QList<qsptr<Canvas>> fScenes;
     qptr<Canvas> fTimelineScene;
+    qptr<Canvas> fLastActiveScene;
 
     Canvas * createNewCanvas();
 

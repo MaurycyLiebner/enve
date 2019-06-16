@@ -5,23 +5,19 @@
 #include "glhelpers.h"
 
 
-bool shouldValPointerBeLightHSV(const GLfloat &hue,
-                                const GLfloat &saturation,
-                                const GLfloat &value) {
-    if(value < 0.6f) return true;
-    return hue > 0.55f && (saturation > 0.5f || value < 0.7f);
+bool shouldValPointerBeLightHSV(const GLfloat h,
+                                const GLfloat s,
+                                const GLfloat v) {
+    if(v < 0.6f) return true;
+    return h > 0.55f && (s > 0.5f || v < 0.7f);
 }
 
-bool shouldValPointerBeLightHSL(GLfloat hue,
-                                GLfloat saturation,
-                                GLfloat lightness) {
-    hsl_to_hsv(hue, saturation, lightness);
-    return shouldValPointerBeLightHSV(hue, saturation, lightness);
+bool shouldValPointerBeLightHSL(GLfloat h, GLfloat s, GLfloat l) {
+    hsl_to_hsv(h, s, l);
+    return shouldValPointerBeLightHSV(h, s, l);
 }
 
-bool shouldValPointerBeLightRGB(GLfloat r,
-                                GLfloat g,
-                                GLfloat b) {
+bool shouldValPointerBeLightRGB(GLfloat r, GLfloat g, GLfloat b) {
     rgb_to_hsv_float(r, g, b);
     return shouldValPointerBeLightHSV(r, g, b);
 }
@@ -553,111 +549,4 @@ void qrgb_to_hsl(qreal &r_, qreal &g_, qreal &b_) {
     r_ = h;
     g_ = s;
     b_ = l;
-}
-
-
-qreal getUNoise(qreal noise_scale) {
-    if(isNonZero(noise_scale)) {
-        return ( rand() % 101 )*0.01 * noise_scale;
-    } else {
-        return 0.;
-    }
-}
-
-qreal getNoise(qreal noise_scale) {
-    if(isNonZero(noise_scale)) {
-        return ( rand() % 201 - 100)*0.01 * noise_scale;
-    } else {
-        return 0.;
-    }
-}
-
-void applyXYNoise(qreal noise_t,
-                  qreal &previous_noise_x,
-                  qreal &next_noise_x,
-                  qreal &previous_noise_y,
-                  qreal &next_noise_y,
-                  const qreal noise_frequency,
-                  uchar &noise_count,
-                  qreal &value_x,
-                  qreal &value_y) {
-    if(isNonZero(noise_t)) {
-        uchar max_stroke_noise_count = static_cast<uchar>(100 - noise_frequency*100);
-        if(noise_count >= max_stroke_noise_count) {
-            noise_count = 0;
-            previous_noise_x = next_noise_x;
-            previous_noise_y = next_noise_y;
-            next_noise_x = getNoise(noise_t );
-            next_noise_y = getNoise(noise_t );
-        } else {
-            noise_count = noise_count + 1;
-        }
-        qreal current_noise_x = ( next_noise_x*noise_count +
-                                  previous_noise_x*
-                                  (max_stroke_noise_count - noise_count)
-                                  )/max_stroke_noise_count;
-        value_x += current_noise_x;
-        qreal current_noise_y = (next_noise_y*noise_count +
-                                  previous_noise_y*
-                                  (max_stroke_noise_count - noise_count )
-                                  )/max_stroke_noise_count;
-        value_y += current_noise_y;
-    }
-}
-
-void applyNoise(qreal noise_t,
-                qreal &previous_noise,
-                qreal &next_noise,
-                const qreal noise_frequency,
-                uchar &noise_count,
-                qreal &value) {
-    if(isNonZero(noise_t) ) {
-        uchar max_stroke_noise_count = static_cast<uchar>(100 - noise_frequency*100);
-        if(noise_count >= max_stroke_noise_count) {
-            noise_count = 0;
-            previous_noise = next_noise;
-            next_noise = getNoise(noise_t );
-        } else {
-            noise_count = noise_count + 1;
-        }
-        qreal current_noise = (next_noise*noise_count +
-                                  previous_noise*
-                                  (max_stroke_noise_count - noise_count)
-                                  )/max_stroke_noise_count;
-        value += current_noise;
-    }
-}
-
-void applyUNoise(qreal noise_t,
-                 qreal &previous_noise,
-                 qreal &next_noise,
-                 const qreal noise_frequency,
-                 uchar &noise_count,
-                 qreal &value) {
-    if(isNonZero(noise_t)) {
-        uchar max_stroke_noise_count = static_cast<uchar>(10000 - noise_frequency*10000);
-        if(noise_count >= max_stroke_noise_count) {
-            noise_count = 0;
-            previous_noise = next_noise;
-            next_noise = getUNoise(noise_t );
-        } else {
-            noise_count = noise_count + 1;
-        }
-        qreal current_noise = ( next_noise*noise_count +
-                                  previous_noise*
-                                  (max_stroke_noise_count - noise_count)
-                                  )/max_stroke_noise_count;
-        value += current_noise;
-    }
-}
-
-#include <QInputDialog>
-#include <QString>
-#include <QFile>
-#include <QTextStream>
-
-ushort getFreeRamMB() {
-    struct sysinfo info_t;
-    sysinfo(&info_t);
-    return static_cast<ushort>(info_t.freeram/1000000);
 }

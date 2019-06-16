@@ -25,13 +25,10 @@
 #include "Boxes/containerbox.h"
 
 void Canvas::handleMovePathMousePressEvent(const MouseEvent& e) {
-    mLastPressedBox = mCurrentBoxesGroup->getBoxAt(e.fPos);
-    if(!mLastPressedBox) {
-        if(!isShiftPressed()) clearBoxesSelection();
-    } else {
-        if(!isShiftPressed() && !mLastPressedBox->isSelected()) {
-            clearBoxesSelection();
-        }
+    mPressedBox = mCurrentBoxesGroup->getBoxAt(e.fPos);
+    if(e.shiftMod()) return;
+    if(mPressedBox ? !mPressedBox->isSelected() : true) {
+        clearBoxesSelection();
     }
 }
 
@@ -73,7 +70,7 @@ void Canvas::addSelectedBoxesActions(QMenu * const qMenu) {
     });
     groupAction->setShortcut(Qt::CTRL + Qt::Key_G);
 
-    BoxTypeMenu menu(qMenu, this, mMainWindow);
+    BoxTypeMenu menu(qMenu, this, qMenu->parentWidget());
     for(const auto& box : mSelectedBoxes) {
         if(menu.hasActionsForType(box)) continue;
         box->addActionsToMenu(&menu);
@@ -208,10 +205,11 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
     });
 //    outlinePathEffectsMenu->addAction("Operation Effect");
 
-    menu->addAction("Map to Different Fps...", [this]() {
+    const auto parentWidget = menu->parentWidget();
+    menu->addAction("Map to Different Fps...", [this, parentWidget]() {
         bool ok;
         const qreal newFps = QInputDialog::getDouble(
-                    mMainWindow, "Map to Different Fps",
+                    parentWidget, "Map to Different Fps",
                     "New Fps:", mFps, 1, 999, 2, &ok);
         if(ok) changeFpsTo(newFps);
     });
@@ -221,20 +219,21 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
     });
 }
 
-void Canvas::handleRightButtonMousePress(const QPoint& globalPos) {
-    if(mIsMouseGrabbing) {
+void Canvas::handleRightButtonMousePress(const MouseEvent& e) {
+    if(e.fMouseGrabbing) {
         cancelCurrentTransform();
+        e.fReleaseMouse();
         mValueInput.clearAndDisableInput();
     } else {
-        mLastPressedBox = mHoveredBox;
-        mLastPressedPoint = mHoveredPoint_d;
-        if(mLastPressedPoint) {
+        mPressedBox = mHoveredBox;
+        mPressedPoint = mHoveredPoint_d;
+        if(mPressedPoint) {
             QMenu qMenu;
-            PointTypeMenu menu(&qMenu, this, mMainWindow);
-            if(mLastPressedPoint->selectionEnabled()) {
-                if(!mLastPressedPoint->isSelected()) {
-                    if(!isShiftPressed()) clearPointsSelection();
-                    addPointToSelection(mLastPressedPoint);
+            PointTypeMenu menu(&qMenu, this, e.fWidget);
+            if(mPressedPoint->selectionEnabled()) {
+                if(!mPressedPoint->isSelected()) {
+                    if(!e.shiftMod()) clearPointsSelection();
+                    addPointToSelection(mPressedPoint);
                 }
                 for(const auto& pt : mSelectedPoints_d) {
                     if(menu.hasActionsForType(pt)) continue;
@@ -242,24 +241,24 @@ void Canvas::handleRightButtonMousePress(const QPoint& globalPos) {
                     menu.addedActionsForType(pt);
                 }
             } else {
-                mLastPressedPoint->canvasContextMenu(&menu);
+                mPressedPoint->canvasContextMenu(&menu);
             }
-            qMenu.exec(globalPos);
-        } else if(mLastPressedBox) {
-            if(!mLastPressedBox->isSelected()) {
-                if(!isShiftPressed()) clearBoxesSelection();
-                addBoxToSelection(mLastPressedBox);
+            qMenu.exec(e.fGlobalPos);
+        } else if(mPressedBox) {
+            if(!mPressedBox->isSelected()) {
+                if(!e.shiftMod()) clearBoxesSelection();
+                addBoxToSelection(mPressedBox);
             }
 
-            QMenu qMenu;
+            QMenu qMenu(e.fWidget);
             addSelectedBoxesActions(&qMenu);
-            qMenu.exec(globalPos);
+            qMenu.exec(e.fGlobalPos);
         } else {
             clearPointsSelection();
             clearBoxesSelection();
-            QMenu menu(mActiveWindow->getCanvasWidget());
+            QMenu menu(e.fWidget);
             addActionsToMenu(&menu);
-            menu.exec(globalPos);
+            menu.exec(e.fGlobalPos);
         }
     }
 }
@@ -270,9 +269,9 @@ void Canvas::clearHoveredEdge() {
 
 void Canvas::handleMovePointMousePressEvent(const MouseEvent& e) {
     if(mHoveredNormalSegment.isValid()) {
-        if(isCtrlPressed()) {
+        if(e.ctrlMod()) {
             clearPointsSelection();
-            mLastPressedPoint = mHoveredNormalSegment.divideAtAbsPos(e.fPos);
+            mPressedPoint = mHoveredNormalSegment.divideAtAbsPos(e.fPos);
         } else {
             mCurrentNormalSegment = mHoveredNormalSegment;
             mCurrentNormalSegmentT = mCurrentNormalSegment.closestAbsT(e.fPos);
@@ -281,13 +280,13 @@ void Canvas::handleMovePointMousePressEvent(const MouseEvent& e) {
             clearLastPressedPoint();
         }
         clearHovered();
-    } else if(mLastPressedPoint) {
-        if(mLastPressedPoint->isSelected()) return;
-        if(!isShiftPressed() && mLastPressedPoint->selectionEnabled()) {
+    } else if(mPressedPoint) {
+        if(mPressedPoint->isSelected()) return;
+        if(!e.shiftMod() && mPressedPoint->selectionEnabled()) {
             clearPointsSelection();
         }
-        if(!mLastPressedPoint->selectionEnabled()) {
-            addPointToSelection(mLastPressedPoint);
+        if(!mPressedPoint->selectionEnabled()) {
+            addPointToSelection(mPressedPoint);
         }
     }
 }
@@ -305,7 +304,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     mFirstMouseMove = true;
 
     const qreal invScale = 1/e.fScale;
-    mLastPressedPoint = getPointAtAbsPos(e.fPos, e.fMode, invScale);
+    mPressedPoint = getPointAtAbsPos(e.fPos, e.fMode, invScale);
 
     if(mRotPivot->isPointAtAbsPos(e.fPos, e.fMode, invScale)) {
         return mRotPivot->select();
@@ -321,7 +320,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     } else if(e.fMode == CanvasMode::MOVE_POINT) {
         handleMovePointMousePressEvent(e);
     } else if(e.fMode == CanvasMode::PICK_PAINT_SETTINGS) {
-        mLastPressedBox = getBoxAtFromAllDescendents(e.fPos);
+        mPressedBox = getBoxAtFromAllDescendents(e.fPos);
     } else if(e.fMode == CanvasMode::ADD_CIRCLE) {
         const auto newPath = SPtrCreate(Circle)();
         newPath->planCenterPivotPosition();
@@ -367,7 +366,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
         clearBoxesSelection();
         addBoxToSelection(partBox.get());
 
-        mLastPressedPoint = partBox->getBottomRightPoint();
+        mPressedPoint = partBox->getBottomRightPoint();
     } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_EMITTER) {
         for(const auto& box : mSelectedBoxes) {
             if(box->SWT_isParticleBox()) {
@@ -391,7 +390,6 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
 }
 
 void Canvas::cancelCurrentTransform() {
-    mTransformationFinishedBeforeMouseRelease = true;
     if(mCurrentMode == CanvasMode::MOVE_POINT) {
         if(mCurrentNormalSegment.isValid()) {
             mCurrentNormalSegment.cancelPassThroughTransform();
@@ -409,8 +407,8 @@ void Canvas::cancelCurrentTransform() {
     } else if(mCurrentMode == PICK_PAINT_SETTINGS) {
         //mCanvasWindow->setCanvasMode(MOVE_PATH);
     }
-
-    if(mIsMouseGrabbing) releaseMouseAndDontTrack();
+    mValueInput.clearAndDisableInput();
+    mTransMode = MODE_NONE;
 }
 
 void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
@@ -421,26 +419,26 @@ void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
         mTransMode = MODE_NONE;
     } else if(mSelecting) {
         mSelecting = false;
-        if(!isShiftPressed()) clearPointsSelection();
+        if(!e.shiftMod()) clearPointsSelection();
         moveSecondSelectionPoint(e.fPos);
         selectAndAddContainedPointsToSelection(mSelectionRect);
     } else if(mFirstMouseMove) {
-        if(mLastPressedPoint) {
-            if(isShiftPressed()) {
-                if(mLastPressedPoint->isSelected()) {
-                    removePointFromSelection(mLastPressedPoint);
+        if(mPressedPoint) {
+            if(e.shiftMod()) {
+                if(mPressedPoint->isSelected()) {
+                    removePointFromSelection(mPressedPoint);
                 } else {
-                    addPointToSelection(mLastPressedPoint);
+                    addPointToSelection(mPressedPoint);
                 }
             } else {
                 selectOnlyLastPressedPoint();
             }
         } else {
-            mLastPressedBox = mCurrentBoxesGroup->getBoxAt(e.fPos);
-            if(!mLastPressedBox ? true : mLastPressedBox->SWT_isContainerBox()) {
+            mPressedBox = mCurrentBoxesGroup->getBoxAt(e.fPos);
+            if(!mPressedBox ? true : mPressedBox->SWT_isContainerBox()) {
                 const auto pressedBox = getBoxAtFromAllDescendents(e.fPos);
                 if(!pressedBox) {
-                    if(!isShiftPressed()) {
+                    if(!e.shiftMod()) {
                         clearPointsSelectionOrDeselect();
                     }
                 } else {
@@ -449,15 +447,15 @@ void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
                     clearLastPressedPoint();
                     setCurrentBoxesGroup(pressedBox->getParentGroup());
                     addBoxToSelection(pressedBox);
-                    mLastPressedBox = pressedBox;
+                    mPressedBox = pressedBox;
                 }
             }
-            if(mLastPressedBox) {
-                if(isShiftPressed()) {
-                    if(mLastPressedBox->isSelected()) {
-                        removeBoxFromSelection(mLastPressedBox);
+            if(mPressedBox) {
+                if(e.shiftMod()) {
+                    if(mPressedBox->isSelected()) {
+                        removeBoxFromSelection(mPressedBox);
                     } else {
-                        addBoxToSelection(mLastPressedBox);
+                        addBoxToSelection(mPressedBox);
                     }
                 } else {
                     clearPointsSelection();
@@ -469,9 +467,9 @@ void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
         }
     } else {
         finishSelectedPointsTransform();
-        if(mLastPressedPoint) {
-            if(!mLastPressedPoint->selectionEnabled()) {
-                removePointFromSelection(mLastPressedPoint);
+        if(mPressedPoint) {
+            if(!mPressedPoint->selectionEnabled()) {
+                removePointFromSelection(mPressedPoint);
             }
         }
     }
@@ -485,11 +483,11 @@ void Canvas::handleMovePathMouseRelease(const MouseEvent &e) {
         finishSelectedBoxesTransform();
     } else if(mFirstMouseMove) {
         mSelecting = false;
-        if(isShiftPressed() && mLastPressedBox) {
-            if(mLastPressedBox->isSelected()) {
-                removeBoxFromSelection(mLastPressedBox);
+        if(e.shiftMod() && mPressedBox) {
+            if(mPressedBox->isSelected()) {
+                removeBoxFromSelection(mPressedBox);
             } else {
-                addBoxToSelection(mLastPressedBox);
+                addBoxToSelection(mPressedBox);
             }
         } else {
             selectOnlyLastPressedBox();
@@ -503,8 +501,8 @@ void Canvas::handleMovePathMouseRelease(const MouseEvent &e) {
     }
 }
 
-void Canvas::handleMouseRelease(const MouseEvent &e) {
-    if(mIsMouseGrabbing) releaseMouseAndDontTrack();
+void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
+    if(e.fMouseGrabbing) e.fReleaseMouse();
     if(mCurrentNormalSegment.isValid()) {
         if(!mFirstMouseMove) mCurrentNormalSegment.finishPassThroughTransform();
         mHoveredNormalSegment = mCurrentNormalSegment;
@@ -512,61 +510,62 @@ void Canvas::handleMouseRelease(const MouseEvent &e) {
         mCurrentNormalSegment.reset();
         return;
     }
-    if(!mDoubleClick) {
-        if(mCurrentMode == CanvasMode::MOVE_POINT ||
-           mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
+    if(mDoubleClick) return;
+    if(mCurrentMode == CanvasMode::MOVE_POINT ||
+       mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
+        handleMovePointMouseRelease(e);
+        if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
+            mActiveWindow->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
+        }
+    } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
+        if(!mPressedPoint) {
+            handleMovePathMouseRelease(e);
+        } else {
             handleMovePointMouseRelease(e);
-            if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
-                mActiveWindow->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
-            }
-        } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
-            if(!mLastPressedPoint) {
-                handleMovePathMouseRelease(e);
-            } else {
-                handleMovePointMouseRelease(e);
-                clearPointsSelection();
-            }
-        } else if(mCurrentMode == CanvasMode::ADD_POINT) {
-            handleAddSmartPointMouseRelease(e);
-        } else if(mCurrentMode == PICK_PAINT_SETTINGS) {
-            if(mLastPressedBox) {
-                const auto srcPathBox = GetAsPtr(mLastPressedBox, PathBox);
-                for(const auto& box : mSelectedBoxes) {
-                    if(box->SWT_isPathBox()) {
-                        const auto pathBox = GetAsPtr(box, PathBox);
-                        if(isCtrlPressed()) {
-                            if(isShiftPressed()) {
-                                pathBox->duplicateStrokeSettingsFrom(
-                                            srcPathBox->getStrokeSettings());
-                                pathBox->resetStrokeGradientPointsPos();
-                            } else {
-                                pathBox->duplicateFillSettingsFrom(
-                                            srcPathBox->getFillSettings());
-                                pathBox->resetFillGradientPointsPos();
-                            }
+            clearPointsSelection();
+        }
+    } else if(mCurrentMode == CanvasMode::ADD_POINT) {
+        handleAddSmartPointMouseRelease(e);
+    } else if(mCurrentMode == PICK_PAINT_SETTINGS) {
+        if(mPressedBox) {
+            const auto srcPathBox = GetAsPtr(mPressedBox, PathBox);
+            for(const auto& box : mSelectedBoxes) {
+                if(box->SWT_isPathBox()) {
+                    const auto pathBox = GetAsPtr(box, PathBox);
+                    if(e.ctrlMod()) {
+                        if(e.shiftMod()) {
+                            pathBox->duplicateStrokeSettingsFrom(
+                                        srcPathBox->getStrokeSettings());
+                            pathBox->resetStrokeGradientPointsPos();
                         } else {
-                            if(isShiftPressed()) {
-                                pathBox->duplicateStrokeSettingsNotAnimatedFrom(
-                                            srcPathBox->getStrokeSettings());
-                                pathBox->resetStrokeGradientPointsPos();
-                            } else {
-                                pathBox->duplicateFillSettingsNotAnimatedFrom(
-                                            srcPathBox->getFillSettings());
-                                pathBox->resetFillGradientPointsPos();
-                            }
+                            pathBox->duplicateFillSettingsFrom(
+                                        srcPathBox->getFillSettings());
+                            pathBox->resetFillGradientPointsPos();
+                        }
+                    } else {
+                        if(e.shiftMod()) {
+                            pathBox->duplicateStrokeSettingsNotAnimatedFrom(
+                                        srcPathBox->getStrokeSettings());
+                            pathBox->resetStrokeGradientPointsPos();
+                        } else {
+                            pathBox->duplicateFillSettingsNotAnimatedFrom(
+                                        srcPathBox->getFillSettings());
+                            pathBox->resetFillGradientPointsPos();
                         }
                     }
                 }
             }
-            //mCanvasWindow->setCanvasMode(MOVE_PATH);
-        } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
-            if(mCurrentTextBox) {
-                mCurrentTextBox->openTextEditor(mMainWindow);
-            }
-        } else if(mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
-            mActiveWindow->setCanvasMode(CanvasMode::PAINT_MODE);
         }
+        //mCanvasWindow->setCanvasMode(MOVE_PATH);
+    } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
+        if(mCurrentTextBox) {
+            mCurrentTextBox->openTextEditor(mMainWindow);
+        }
+    } else if(mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
+        mActiveWindow->setCanvasMode(CanvasMode::PAINT_MODE);
     }
+    mValueInput.clearAndDisableInput();
+    mTransMode = MODE_NONE;
 }
 
 QPointF Canvas::getMoveByValueForEvent(const MouseEvent &e) {
@@ -591,13 +590,13 @@ void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
         if(mFirstMouseMove) mCurrentNormalSegment.startPassThroughTransform();
         mCurrentNormalSegment.makePassThroughAbs(e.fPos, mCurrentNormalSegmentT);
     } else {
-        if(mLastPressedPoint) {
-            addPointToSelection(mLastPressedPoint);
+        if(mPressedPoint) {
+            addPointToSelection(mPressedPoint);
 
             const auto keyMods = QApplication::queryKeyboardModifiers();
             const bool ctrlPressed = keyMods.testFlag(Qt::ControlModifier);
-            if(ctrlPressed && mLastPressedPoint->isSmartNodePoint()) {
-                const auto nodePt = GetAsPtr(mLastPressedPoint,
+            if(ctrlPressed && mPressedPoint->isSmartNodePoint()) {
+                const auto nodePt = GetAsPtr(mPressedPoint,
                                              SmartNodePoint);
                 if(nodePt->isDissolved()) {
                     const int selId = nodePt->moveToClosestSegment(e.fPos);
@@ -607,14 +606,14 @@ void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
                         removePointFromSelection(nodePt);
                         addPointToSelection(dissPt);
                     }
-                    mLastPressedPoint = dissPt;
+                    mPressedPoint = dissPt;
                     return;
                 }
             }
 
-            if(!mLastPressedPoint->selectionEnabled()) {
-                if(mFirstMouseMove) mLastPressedPoint->startTransform();
-                mLastPressedPoint->moveByAbs(getMoveByValueForEvent(e));
+            if(!mPressedPoint->selectionEnabled()) {
+                if(mFirstMouseMove) mPressedPoint->startTransform();
+                mPressedPoint->moveByAbs(getMoveByValueForEvent(e));
                 return;
             }
         }
@@ -697,9 +696,9 @@ void Canvas::handleMovePathMouseMove(const MouseEvent& e) {
     } else if(mTransMode == MODE_ROTATE) {
         rotateSelected(e);
     } else {
-        if(mLastPressedBox) {
-            addBoxToSelection(mLastPressedBox);
-            mLastPressedBox = nullptr;
+        if(mPressedBox) {
+            addBoxToSelection(mPressedBox);
+            mPressedBox = nullptr;
         }
 
         const auto moveBy = getMoveByValueForEvent(e);
@@ -713,7 +712,7 @@ void Canvas::updateTransformation(const KeyEvent &e) {
     } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
         handleMovePointMouseMove(e);
     } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
-        if(!mLastPressedPoint) {
+        if(!mPressedPoint) {
             handleMovePathMouseMove(e);
         } else {
             handleMovePointMouseMove(e);

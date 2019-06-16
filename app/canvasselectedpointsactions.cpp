@@ -177,17 +177,13 @@ void Canvas::removePointFromSelection(MovablePoint * const point) {
 }
 
 void Canvas::removeSelectedPointsAndClearList() {
-    if(mIsMouseGrabbing) {
-        if(mLastPressedPoint) {
-            if(mLastPressedPoint->isCtrlPoint()) {
-                mLastPressedPoint->cancelTransform();
-                mLastPressedPoint->deselect();
-                mLastPressedPoint->remove();
-                mSelectedPoints_d.removeOne(mLastPressedPoint);
-                schedulePivotUpdate();
-                return;
-            }
-        }
+    if(mPressedPoint && mPressedPoint->isCtrlPoint()) {
+        mPressedPoint->cancelTransform();
+        mPressedPoint->deselect();
+        mPressedPoint->remove();
+        mSelectedPoints_d.removeOne(mPressedPoint);
+        schedulePivotUpdate();
+        return;
     }
 
     for(const auto& point : mSelectedPoints_d) {
@@ -212,9 +208,9 @@ void Canvas::clearPointsSelection() {
 }
 
 void Canvas::clearLastPressedPoint() {
-    if(mLastPressedPoint) {
-        mLastPressedPoint->deselect();
-        mLastPressedPoint = nullptr;
+    if(mPressedPoint) {
+        mPressedPoint->deselect();
+        mPressedPoint = nullptr;
     }
 }
 

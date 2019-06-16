@@ -6,7 +6,7 @@
 #include "MovablePoints/animatedpoint.h"
 #include "PropertyUpdaters/displayedfillstrokesettingsupdater.h"
 #include "PropertyUpdaters/particlesupdater.h"
-#include "Animators/paintsettings.h"
+#include "Animators/paintsettingsanimator.h"
 #include "Animators/transformanimator.h"
 #include "Animators/effectanimators.h"
 #include "paintsettingsapplier.h"

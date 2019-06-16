@@ -1,12 +1,12 @@
-#ifndef BRUSHSETTINGS_H
-#define BRUSHSETTINGS_H
+#ifndef BRUSHSETTINGSANIMATOR_H
+#define BRUSHSETTINGSANIMATOR_H
 #include "Animators/staticcomplexanimator.h"
 #include "Animators/qcubicsegment1danimator.h"
 #include "GUI/BrushWidgets/simplebrushwrapper.h"
 
-class BrushSettings : public StaticComplexAnimator {
+class BrushSettingsAnimator : public StaticComplexAnimator {
 public:
-    BrushSettings();
+    BrushSettingsAnimator();
 
     qCubicSegment1DAnimator * getWidthAnimator() const {
         return mWidthCurve.data();
@@ -59,7 +59,7 @@ private:
     qsptr<qCubicSegment1DAnimator> mTimeCurve =
             SPtrCreate(qCubicSegment1DAnimator)("time");
 
-    SimpleBrushWrapper * mBrush = nullptr;
+    stdptr<SimpleBrushWrapper> mBrush;
 };
 
-#endif // BRUSHSETTINGS_H
+#endif // BRUSHSETTINGSANIMATOR_H

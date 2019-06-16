@@ -253,11 +253,11 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
 }
 
 void FillStrokeSettingsWidget::setLinearGradientFill() {
-    setGradientType(Gradient::LINEAR);
+    setGradientType(GradientType::LINEAR);
 }
 
 void FillStrokeSettingsWidget::setRadialGradientFill() {
-    setGradientType(Gradient::RADIAL);
+    setGradientType(GradientType::RADIAL);
 }
 
 void FillStrokeSettingsWidget::setGradientFill() {
@@ -328,8 +328,8 @@ void FillStrokeSettingsWidget::updateAfterTargetChanged() {
     if(getCurrentPaintTypeVal() == GRADIENTPAINT) {
         mGradientWidget->setCurrentGradient(getCurrentGradientVal(), false);
         const auto gradType = getCurrentGradientTypeVal();
-        mLinearGradientButton->setChecked(gradType == Gradient::LINEAR);
-        mRadialGradientButton->setChecked(gradType == Gradient::RADIAL);
+        mLinearGradientButton->setChecked(gradType == GradientType::LINEAR);
+        mRadialGradientButton->setChecked(gradType == GradientType::RADIAL);
     }
     setCurrentPaintType(getCurrentPaintTypeVal());
     if(getCurrentPaintTypeVal() == NOPAINT) {
@@ -425,7 +425,7 @@ void FillStrokeSettingsWidget::clearAll() {
 }
 
 void FillStrokeSettingsWidget::setCurrentBrushSettings(
-        BrushSettings * const brushSettings) {
+        BrushSettingsAnimator * const brushSettings) {
     if(brushSettings) {
         BrushSelectionWidget::sSetCurrentBrushForContext(
                     mBrushSelectionWidget->getContextId(),
@@ -465,7 +465,7 @@ void FillStrokeSettingsWidget::colorTypeSet(const PaintType &type) {
 
     PaintType currentPaintType;
     Gradient *currentGradient;
-    Gradient::Type currentGradientType;
+    GradientType currentGradientType;
     if(mTarget == PaintSetting::FILL) {
         currentPaintType = mCurrentFillPaintType;
         currentGradient = mCurrentFillGradient;
@@ -477,19 +477,19 @@ void FillStrokeSettingsWidget::colorTypeSet(const PaintType &type) {
     }
     PaintSettingsApplier paintSetting;
     if(currentPaintType == FLATPAINT) {
-        paintSetting << std::make_shared<ColorPaintSetting>(mTarget, ColorSetting());
+        paintSetting << std::make_shared<ColorPaintSetting>(mTarget, ColorSettingApplier());
     } else if(currentPaintType == GRADIENTPAINT) {
         paintSetting << std::make_shared<GradientPaintSetting>(mTarget, currentGradient);
         paintSetting << std::make_shared<GradientTypePaintSetting>(mTarget, currentGradientType);
     } else if(currentPaintType == BRUSHPAINT) {
-        paintSetting << std::make_shared<ColorPaintSetting>(mTarget, ColorSetting());
+        paintSetting << std::make_shared<ColorPaintSetting>(mTarget, ColorSettingApplier());
     }
     paintSetting << std::make_shared<PaintTypePaintSetting>(mTarget, currentPaintType);
     mCanvasWindow->applyPaintSettingToSelected(paintSetting);
 }
 
 void FillStrokeSettingsWidget::colorSettingReceived(
-        const ColorSetting &colorSetting) {
+        const ColorSettingApplier &colorSetting) {
     PaintSettingsApplier paintSetting;
     paintSetting << std::make_shared<ColorPaintSetting>(mTarget, colorSetting);
     mCanvasWindow->applyPaintSettingToSelected(paintSetting);
@@ -566,7 +566,7 @@ void FillStrokeSettingsWidget::setCurrentGradientVal(Gradient *gradient) {
 }
 
 void FillStrokeSettingsWidget::setCurrentGradientTypeVal(
-                                const Gradient::Type &type) {
+                                const GradientType &type) {
     if(mTarget == PaintSetting::FILL) mCurrentFillGradientType = type;
     else mCurrentStrokeGradientType = type;
 }
@@ -648,7 +648,7 @@ void FillStrokeSettingsWidget::emitJoinStyleChanged() {
 
 void FillStrokeSettingsWidget::applyGradient() {
     Gradient *currentGradient;
-    Gradient::Type currentGradientType;
+    GradientType currentGradientType;
     if(mTarget == PaintSetting::FILL) {
         currentGradient = mCurrentFillGradient;
         currentGradientType = mCurrentFillGradientType;
@@ -669,10 +669,10 @@ void FillStrokeSettingsWidget::setGradient(Gradient *gradient) {
     applyGradient();
 }
 
-void FillStrokeSettingsWidget::setGradientType(const Gradient::Type &type) {
+void FillStrokeSettingsWidget::setGradientType(const GradientType &type) {
     setCurrentGradientTypeVal(type);
-    mLinearGradientButton->setChecked(type == Gradient::LINEAR);
-    mRadialGradientButton->setChecked(type == Gradient::RADIAL);
+    mLinearGradientButton->setChecked(type == GradientType::LINEAR);
+    mRadialGradientButton->setChecked(type == GradientType::RADIAL);
     applyGradient();
 }
 

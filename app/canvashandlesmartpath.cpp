@@ -20,7 +20,7 @@ void Canvas::handleAddSmartPointMousePress(const MouseEvent &e) {
     }
     qptr<BoundingBox> test;
 
-    auto nodePointUnderMouse = GetAsPtr(mLastPressedPoint, SmartNodePoint);
+    auto nodePointUnderMouse = GetAsPtr(mPressedPoint, SmartNodePoint);
     if(nodePointUnderMouse ? !nodePointUnderMouse->isEndPoint() : false) {
         nodePointUnderMouse = nullptr;
     }

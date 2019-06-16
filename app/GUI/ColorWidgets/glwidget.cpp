@@ -1,7 +1,7 @@
 #include "glwidget.h"
 #include "colorhelpers.h"
 #include "global.h"
-#include "Animators/paintsettings.h"
+#include "Animators/paintsettingsanimator.h"
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent) {
 //    setFormat(QSurfaceFormat::defaultFormat());

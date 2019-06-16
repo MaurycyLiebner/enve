@@ -160,13 +160,13 @@ void ColorSettingsWidget::setTarget(ColorAnimator *target) {
     }
 }
 
-ColorSetting ColorSettingsWidget::getColorSetting(
+ColorSettingApplier ColorSettingsWidget::getColorSetting(
         const ColorSettingType& type) const {
     const int tabId = mTabWidget->currentIndex();
     qreal alphaVal = 1;
     if(!mAlphaHidden) alphaVal = aSpin->value();
     if(tabId == 0) {
-        return ColorSetting(
+        return ColorSettingApplier(
                     RGBMODE, mLastTriggeredCVR,
                     rSpin->value(),
                     gSpin->value(),
@@ -174,7 +174,7 @@ ColorSetting ColorSettingsWidget::getColorSetting(
                     alphaVal,
                     type, mTargetAnimator);
     } else if(tabId == 1) {
-        return ColorSetting(
+        return ColorSettingApplier(
                     HSVMODE, mLastTriggeredCVR,
                     hSpin->value(),
                     hsvSSpin->value(),
@@ -182,7 +182,7 @@ ColorSetting ColorSettingsWidget::getColorSetting(
                     alphaVal,
                     type, mTargetAnimator);
     } else if(tabId == 2) {
-        return ColorSetting(
+        return ColorSettingApplier(
                     HSLMODE, mLastTriggeredCVR,
                     hSpin->value(),
                     hslSSpin->value(),
@@ -190,7 +190,7 @@ ColorSetting ColorSettingsWidget::getColorSetting(
                     alphaVal,
                     type, mTargetAnimator);
     }
-    return ColorSetting();
+    return ColorSettingApplier();
 }
 
 void ColorSettingsWidget::emitColorChangedSignal() {

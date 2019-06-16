@@ -45,7 +45,9 @@ Canvas::Canvas(CanvasWindow * const canvasWidget,
     };
     mUndoRedoStack = SPtrCreate(UndoRedoStack)(changeFrameFunc);
     mFps = fps;
-    connect(this, &Canvas::nameChanged, this, &Canvas::emitCanvasNameChanged);
+    connect(this, &Canvas::nameChanged, this, [this]() {
+        emit canvasNameChanged(this, prp_mName);
+    });
     mBackgroundColor->qra_setCurrentValue(QColor(75, 75, 75));
     ca_addChildAnimator(mBackgroundColor);
     mBackgroundColor->prp_setInheritedUpdater(
@@ -75,12 +77,8 @@ Canvas::Canvas(CanvasWindow * const canvasWidget,
     //setCanvasMode(MOVE_PATH);
 }
 
-QRectF Canvas::getRelBoundingRect(const qreal ) {
+QRectF Canvas::getRelBoundingRect(const qreal) {
     return QRectF(0, 0, mWidth, mHeight);
-}
-
-void Canvas::emitCanvasNameChanged() {
-    emit canvasNameChanged(this, prp_mName);
 }
 
 qreal Canvas::getResolutionFraction() {
@@ -181,7 +179,8 @@ void Canvas::drawTransparencyMesh(SkCanvas * const canvas,
 void Canvas::renderSk(SkCanvas * const canvas,
                       GrContext* const grContext,
                       const QRect& drawRect,
-                      const QMatrix& viewTrans) {
+                      const QMatrix& viewTrans,
+                      const bool mouseGrabbing) {
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setStyle(SkPaint::kFill_Style);
@@ -244,7 +243,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
             if(mTransMode == MODE_ROTATE || mTransMode == MODE_SCALE) {
                 mRotPivot->drawTransforming(canvas, mCurrentMode, invZoom,
                                             MIN_WIDGET_HEIGHT*0.25f*invZoom);
-            } else if(!mIsMouseGrabbing || mRotPivot->isSelected()) {
+            } else if(!mouseGrabbing || mRotPivot->isSelected()) {
                 mRotPivot->drawSk(canvas, mCurrentMode, invZoom, false);
             }
         }
@@ -612,17 +611,6 @@ void Canvas::updatePaintBox() {
     }
 }
 
-void Canvas::grabMouseAndTrack() {
-    mIsMouseGrabbing = true;
-    mActiveWindow->grabMouse();
-}
-
-void Canvas::releaseMouseAndDontTrack() {
-    mTransMode = MODE_NONE;
-    mIsMouseGrabbing = false;
-    mActiveWindow->releaseMouse();
-}
-
 bool Canvas::handlePaintModeKeyPress(const KeyEvent &e) {
     if(mCurrentMode != PAINT_MODE) return false;
     if(e.fKey == Qt::Key_N && mPaintAnimSurface) {
@@ -638,10 +626,10 @@ bool Canvas::handleTransormationInputKeyEvent(const KeyEvent &e) {
         updateTransformation(e);
     } else if(e.fKey == Qt::Key_Escape) {
         cancelCurrentTransform();
+        e.fReleaseMouse();
     } else if(e.fKey == Qt::Key_Return ||
               e.fKey == Qt::Key_Enter) {
-        handleMouseRelease(e);
-        mValueInput.clearAndDisableInput();
+        handleLeftMouseRelease(e);
     } else if(e.fKey == Qt::Key_X) {
         mValueInput.switchXOnlyMode();
         updateTransformation(e);
@@ -786,7 +774,6 @@ bool Canvas::startRotatingAction(const KeyEvent &e) {
     if(e.fMode == MOVE_POINT) {
         if(mSelectedPoints_d.isEmpty()) return false;
     }
-    mTransformationFinishedBeforeMouseRelease = false;
     mValueInput.clearAndDisableInput();
     mValueInput.setupRotate();
 
@@ -797,8 +784,7 @@ bool Canvas::startRotatingAction(const KeyEvent &e) {
 
     mDoubleClick = false;
     mFirstMouseMove = true;
-
-    grabMouseAndTrack();
+    e.fGrabMouse();
     return true;
 }
 
@@ -810,7 +796,6 @@ bool Canvas::startScalingAction(const KeyEvent &e) {
     if(e.fMode == MOVE_POINT) {
         if(mSelectedPoints_d.isEmpty()) return false;
     }
-    mTransformationFinishedBeforeMouseRelease = false;
     mValueInput.clearAndDisableInput();
     mValueInput.setupScale();
 
@@ -818,23 +803,20 @@ bool Canvas::startScalingAction(const KeyEvent &e) {
     mTransMode = MODE_SCALE;
     mDoubleClick = false;
     mFirstMouseMove = true;
-
-    grabMouseAndTrack();
+    e.fGrabMouse();
     return true;
 }
 
 bool Canvas::startMovingAction(const KeyEvent &e) {
     if(e.fMode != MOVE_BOX &&
        e.fMode != MOVE_POINT) return false;
-    mTransformationFinishedBeforeMouseRelease = false;
     mValueInput.clearAndDisableInput();
     mValueInput.setupMove();
 
     mTransMode = MODE_MOVE;
     mDoubleClick = false;
     mFirstMouseMove = true;
-
-    grabMouseAndTrack();
+    e.fGrabMouse();
     return true;
 }
 
@@ -853,14 +835,14 @@ void Canvas::selectAllPointsAction() {
 
 void Canvas::selectOnlyLastPressedBox() {
     clearBoxesSelection();
-    if(mLastPressedBox)
-        addBoxToSelection(mLastPressedBox);
+    if(mPressedBox)
+        addBoxToSelection(mPressedBox);
 }
 
 void Canvas::selectOnlyLastPressedPoint() {
     clearPointsSelection();
-    if(mLastPressedPoint)
-        addPointToSelection(mLastPressedPoint);
+    if(mPressedPoint)
+        addPointToSelection(mPressedPoint);
 }
 
 //void Canvas::updateAfterFrameChanged(const int currentFrame) {
@@ -978,30 +960,6 @@ void Canvas::blockUndoRedo() {
 
 void Canvas::unblockUndoRedo() {
     mUndoRedoStack->unblockUndoRedo();
-}
-
-bool Canvas::isShiftPressed() {
-    return mMainWindow->isShiftPressed();
-}
-
-bool Canvas::isShiftPressed(QKeyEvent *event) {
-    return event->modifiers() & Qt::ShiftModifier;
-}
-
-bool Canvas::isCtrlPressed() {
-    return mMainWindow->isCtrlPressed();
-}
-
-bool Canvas::isCtrlPressed(QKeyEvent *event) {
-    return event->modifiers() & Qt::ControlModifier;
-}
-
-bool Canvas::isAltPressed() {
-    return mMainWindow->isAltPressed();
-}
-
-bool Canvas::isAltPressed(QKeyEvent *event) {
-    return event->modifiers() & Qt::AltModifier;
 }
 
 void Canvas::paintPress(const QPointF& pos,

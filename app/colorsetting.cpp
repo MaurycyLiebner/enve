@@ -1,17 +1,17 @@
 #include "colorsetting.h"
 #include "Animators/coloranimator.h"
 
-ColorSetting::ColorSetting() {
+ColorSettingApplier::ColorSettingApplier() {
     mChangedValue = CVR_ALL;
 }
 
-ColorSetting::ColorSetting(const ColorMode &settingModeT,
-                           const CVR_TYPE &changedValueT,
+ColorSettingApplier::ColorSettingApplier(const ColorMode settingModeT,
+                           const CVR_TYPE changedValueT,
                            const qreal val1T,
                            const qreal val2T,
                            const qreal val3T,
                            const qreal alphaT,
-                           const ColorSettingType &typeT,
+                           const ColorSettingType typeT,
                            ColorAnimator * const excludeT) {
     mType = typeT;
     mSettingMode = settingModeT;
@@ -23,7 +23,7 @@ ColorSetting::ColorSetting(const ColorMode &settingModeT,
     mExclude = excludeT;
 }
 
-void ColorSetting::apply(ColorAnimator * const target) const {
+void ColorSettingApplier::apply(ColorAnimator * const target) const {
     if(target == mExclude) return;
     if(mType == CST_START) {
         startColorTransform(target);
@@ -34,27 +34,13 @@ void ColorSetting::apply(ColorAnimator * const target) const {
     }
 }
 
-ColorSettingType ColorSetting::getType() const { return mType; }
-
-ColorMode ColorSetting::getSettingMode() const { return mSettingMode; }
-
-CVR_TYPE ColorSetting::getChangedValue() const { return mChangedValue; }
-
-qreal ColorSetting::getVal1() const { return mVal1; }
-
-qreal ColorSetting::getVal2() const { return mVal2; }
-
-qreal ColorSetting::getVal3() const { return mVal3; }
-
-qreal ColorSetting::getAlpa() const { return mAlpha; }
-
-void ColorSetting::finishColorTransform(ColorAnimator *target) const {
+void ColorSettingApplier::finishColorTransform(ColorAnimator* const target) const {
     changeColor(target);
     target->prp_finishTransform();
 }
 
-void ColorSetting::changeColor(ColorAnimator *target) const {
-    const ColorMode &targetMode = target->getColorMode();
+void ColorSettingApplier::changeColor(ColorAnimator* const target) const {
+    const ColorMode targetMode = target->getColorMode();
     if(targetMode == mSettingMode) {
         target->setCurrentVal1Value(mVal1);
         target->setCurrentVal2Value(mVal2);
@@ -89,7 +75,7 @@ void ColorSetting::changeColor(ColorAnimator *target) const {
     target->setCurrentAlphaValue(mAlpha);
 }
 
-void ColorSetting::startColorTransform(ColorAnimator *target) const {
+void ColorSettingApplier::startColorTransform(ColorAnimator* const target) const {
     const ColorMode &targetMode = target->getColorMode();
     if(targetMode == mSettingMode && mChangedValue != CVR_ALL) {
         if(mChangedValue == CVR_RED || mChangedValue == CVR_HUE) {

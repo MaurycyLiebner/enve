@@ -13,8 +13,8 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include "Animators/coloranimator.h"
-#include "Animators/paintsettings.h"
-#include "Animators/brushsettings.h"
+#include "Animators/paintsettingsanimator.h"
+#include "Animators/brushsettingsanimator.h"
 #include "GUI/BrushWidgets/brushselectionwidget.h"
 #include "paintsettingsapplier.h"
 class GradientWidget;
@@ -25,7 +25,7 @@ class QrealAnimatorValueSlider;
 class ActionButton;
 class Segment1DEditor;
 class QDockWidget;
-class ColorSetting;
+class ColorSettingApplier;
 
 class FillStrokeSettingsWidget : public QTabWidget {
     Q_OBJECT
@@ -45,7 +45,7 @@ public:
 
     void setCanvasWindowPtr(CanvasWindow *canvasWidget);
     void updateColorAnimator();
-    void setCurrentBrushSettings(BrushSettings * const brushSettings);
+    void setCurrentBrushSettings(BrushSettingsAnimator * const brushSettings);
 
     void emitStrokeBrushChanged();
     void emitStrokeBrushWidthCurveChanged();
@@ -73,7 +73,7 @@ private:
     void setStrokeTarget();
 
     void setGradient(Gradient* gradient);
-    void setGradientType(const Gradient::Type &type);
+    void setGradientType(const GradientType &type);
 
     void setBevelJoinStyle();
     void setMiterJoinStyle();
@@ -89,7 +89,7 @@ private:
     void setNoneFill();
 
     void setColorAnimatorTarget(ColorAnimator *animator);
-    void colorSettingReceived(const ColorSetting &colorSetting);
+    void colorSettingReceived(const ColorSettingApplier &colorSetting);
     void setCurrentColorMode(const ColorMode &mode);
 private:
     void applyGradient();
@@ -121,13 +121,13 @@ private:
 
     Gradient *getCurrentGradientVal();
 
-    const Gradient::Type &getCurrentGradientTypeVal() {
+    const GradientType &getCurrentGradientTypeVal() {
         if(mTarget == PaintSetting::FILL) return mCurrentFillGradientType;
         else return mCurrentStrokeGradientType;
     }
 
     void setCurrentGradientVal(Gradient *gradient);
-    void setCurrentGradientTypeVal(const Gradient::Type &type);
+    void setCurrentGradientTypeVal(const GradientType &type);
 
     qptr<ColorAnimator> mCurrentFillColorAnimator;
     qptr<ColorAnimator> mCurrentStrokeColorAnimator;
@@ -136,8 +136,8 @@ private:
     QColor mCurrentFillColor;
     QColor mCurrentStrokeColor;
 
-    Gradient::Type mCurrentStrokeGradientType = Gradient::LINEAR;
-    Gradient::Type mCurrentFillGradientType = Gradient::LINEAR;
+    GradientType mCurrentStrokeGradientType = GradientType::LINEAR;
+    GradientType mCurrentFillGradientType = GradientType::LINEAR;
 
     qptr<Gradient> mCurrentStrokeGradient;
     qptr<Gradient> mCurrentFillGradient;

@@ -1,4 +1,4 @@
-#include "paintsettings.h"
+#include "paintsettingsanimator.h"
 #include "undoredo.h"
 #include "colorhelpers.h"
 #include "GUI/GradientWidgets/gradientwidget.h"
@@ -161,7 +161,7 @@ void UpdatePaintSettings::applyPainterSettingsSk(SkPaint *paint) {
 void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
                                          const QPointF &start,
                                          const QPointF &finalStop,
-                                         const Gradient::Type &gradientType) {
+                                         const GradientType &gradientType) {
     int nStops = stops.count();
     SkPoint gradPoints[nStops];
     SkColor gradColors[nStops];
@@ -184,7 +184,7 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
         currY += yInc;
         currT += tInc;
     }
-    if(gradientType == Gradient::LINEAR) {
+    if(gradientType == GradientType::LINEAR) {
         fGradient = SkGradientShader::MakeLinear(gradPoints, gradColors,
                                                  gradPos, nStops,
                                                  SkTileMode::kClamp);
@@ -210,5 +210,4 @@ UpdateStrokeSettings::UpdateStrokeSettings() {}
 
 void UpdateStrokeSettings::applyPainterSettingsSk(SkPaint *paint) {
     UpdatePaintSettings::applyPainterSettingsSk(paint);
-    //canvas->setCompositionMode(outlineCompositionMode);
 }

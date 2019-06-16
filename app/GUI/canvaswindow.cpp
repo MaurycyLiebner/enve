@@ -142,7 +142,12 @@ void CanvasWindow::removeCanvas(const int id) {
     }
 }
 
-void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
+void CanvasWindow::updatePaintModeCursor() {
+    setCursor(QCursor(QPixmap(":/cursors/cursor_crosshair_precise_open.png")));
+    setCursor(QCursor(QPixmap(":/cursors/cursor_crosshair_open.png")));
+}
+
+void CanvasWindow::setCanvasMode(const CanvasMode mode) {
     if(mode == MOVE_BOX) {
         setCursor(QCursor(Qt::ArrowCursor) );
     } else if(mode == MOVE_POINT) {
@@ -158,7 +163,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
     } else if(mode == ADD_TEXT) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-text.xpm"), 4, 4) );
     } else if(mode == PAINT_MODE) {
-        setCursor(QCursor(QPixmap(":/cursors/cursor-crosshairs.xpm"), 4, 4) );
+        updatePaintModeCursor();
     } else {
         setCursor(QCursor(QPixmap(":/cursors/cursor-pen.xpm"), 4, 4) );
     }
@@ -166,6 +171,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
     MainWindow::getInstance()->updateCanvasModeButtonsChecked();
     if(!mCurrentCanvas) return;
     mCurrentCanvas->cancelCurrentTransform();
+    releaseMouse();
     mCurrentCanvas->setCanvasMode(mode);
     queScheduledTasksAndUpdate();
 }
@@ -242,7 +248,8 @@ void CanvasWindow::renderSk(SkCanvas * const canvas,
                             GrContext* const grContext) {
     canvas->clear(SK_ColorBLACK);
     if(mCurrentCanvas)
-        mCurrentCanvas->renderSk(canvas, grContext, rect(), mViewTransform);
+        mCurrentCanvas->renderSk(canvas, grContext, rect(),
+                                 mViewTransform, mMouseGrabber);
     if(hasFocus()) {
         SkPaint paint;
         paint.setColor(SK_ColorRED);
@@ -265,11 +272,15 @@ void CanvasWindow::tabletEvent(QTabletEvent *e) {
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
     KFT_setFocus();
     if(!mCurrentCanvas || mBlockInput) return;
+    if(mMouseGrabber && event->button() == Qt::LeftButton) return;
     const auto pos = mapToCanvasCoord(event->pos());
     mCurrentCanvas->mousePressEvent(
                 MouseEvent(pos, pos, pos, mMouseGrabber,
                            mViewTransform.m11(), mCurrentMode,
-                           event, mCanvasWidget));
+                           event,
+                           [this]() { releaseMouse(); },
+                           [this]() { grabMouse(); },
+                           mCanvasWidget));
     queScheduledTasksAndUpdate();
     mPrevMousePos = pos;
     if(event->button() == Qt::LeftButton) mPrevPressPos = pos;
@@ -281,7 +292,10 @@ void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
     mCurrentCanvas->mouseReleaseEvent(
                 MouseEvent(pos, mPrevMousePos, mPrevPressPos,
                            mMouseGrabber, mViewTransform.m11(),
-                           mCurrentMode, event, mCanvasWidget));
+                           mCurrentMode, event,
+                           [this]() { releaseMouse(); },
+                           [this]() { grabMouse(); },
+                           mCanvasWidget));
     queScheduledTasksAndUpdate();
 }
 
@@ -295,7 +309,10 @@ void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
     mCurrentCanvas->mouseMoveEvent(
                 MouseEvent(pos, mPrevMousePos, mPrevPressPos,
                            mMouseGrabber, mViewTransform.m11(),
-                           mCurrentMode, event, mCanvasWidget));
+                           mCurrentMode, event,
+                           [this]() { releaseMouse(); },
+                           [this]() { grabMouse(); },
+                           mCanvasWidget));
     if(mCurrentMode == PAINT_MODE) requestUpdate();
     else queScheduledTasksAndUpdate();
     mPrevMousePos = pos;
@@ -317,7 +334,10 @@ void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     mCurrentCanvas->mouseDoubleClickEvent(
                 MouseEvent(pos, mPrevMousePos, mPrevPressPos,
                            mMouseGrabber, mViewTransform.m11(),
-                           mCurrentMode, event, mCanvasWidget));
+                           mCurrentMode, event,
+                           [this]() { releaseMouse(); },
+                           [this]() { grabMouse(); },
+                           mCanvasWidget));
     queScheduledTasksAndUpdate();
 }
 
@@ -553,7 +573,10 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     const auto pos = mapToCanvasCoord(mapFromGlobal(globalPos));
     const KeyEvent e(pos, mPrevMousePos, mPrevPressPos, mMouseGrabber,
                      mViewTransform.m11(), mCurrentMode, globalPos,
-                     QApplication::mouseButtons(), event, mCanvasWidget);
+                     QApplication::mouseButtons(), event,
+                     [this]() { releaseMouse(); },
+                     [this]() { grabMouse(); },
+                     mCanvasWidget);
     if(isMouseGrabber()) {
         if(mCurrentCanvas->handleTransormationInputKeyEvent(e)) return true;
     }

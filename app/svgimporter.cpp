@@ -1989,7 +1989,7 @@ bool parsePathDataFast(const QStringRef &dataStr, VectorPath *path)
     }
     return true;
 }*/
-#include "Animators/paintsettings.h"
+#include "Animators/paintsettingsanimator.h"
 
 void FillSvgAttributes::setColor(const QColor &val) {
     mColor = val;
@@ -2027,7 +2027,7 @@ void FillSvgAttributes::apply(BoundingBox * const box,
     if(!box->SWT_isPathBox()) return;
     const auto pathBox = GetAsPtr(box, PathBox);
     if(mPaintType == FLATPAINT) {
-        ColorSetting colorSetting(RGBMODE, CVR_ALL,
+        ColorSettingApplier colorSetting(RGBMODE, CVR_ALL,
                                   mColor.redF(), mColor.greenF(),
                                   mColor.blueF(), mColor.alphaF(),
                                   CST_CHANGE);

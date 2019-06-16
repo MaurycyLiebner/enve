@@ -726,7 +726,6 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                 const auto boxTarget = GetAsPtr(target, BoundingBox);
                 QMenu * const canvasMenu = menu.addMenu("Canvas");
                 const auto canvas = boxTarget->getParentCanvas();
-                BoxTypeMenu bMenu(canvasMenu, canvas, this);
                 canvas->addSelectedBoxesActions(canvasMenu);
             } else if(target->SWT_isAnimator()) {
                 menu.addSeparator();

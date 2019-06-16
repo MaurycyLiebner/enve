@@ -71,7 +71,7 @@ void ColorAnimatorButton::openColorSettingsDialog() {
     } else {
         colorWidget->setCurrentColor(mColor);
         connect(colorWidget, &ColorSettingsWidget::colorSettingSignal,
-                this, [this](const ColorSetting& setting) {
+                this, [this](const ColorSettingApplier& setting) {
             mColor = setting.getColor();
             update();
         });

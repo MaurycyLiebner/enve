@@ -41,9 +41,9 @@ public:
 
     template <class T = MovablePoint>
     void execOpOnSelectedPoints(const std::function<void(T*)> &op) {
-        if(mLastPressedPoint) {
-            if(!mLastPressedPoint->selectionEnabled()) {
-                const auto ptT = dynamic_cast<T*>(mLastPressedPoint.data());
+        if(mPressedPoint) {
+            if(!mPressedPoint->selectionEnabled()) {
+                const auto ptT = dynamic_cast<T*>(mPressedPoint.data());
                 if(ptT) {
                     op(ptT);
                     //if(ptT->selectionEnabled()) addPointToSelection(ptT);
@@ -72,7 +72,7 @@ public:
 
 protected:
     QList<MovablePoint*> mSelectedPoints_d;
-    stdptr<MovablePoint> mLastPressedPoint;
+    stdptr<MovablePoint> mPressedPoint;
 
     QList<BoundingBox*> mSelectedBoxes;
 };

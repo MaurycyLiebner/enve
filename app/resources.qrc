@@ -111,11 +111,12 @@
     <qresource prefix="/cursors">
         <file alias="cursor-node.xpm">pixmaps/cursor-node.xpm</file>
         <file alias="cursor_color_picker.png">pixmaps/cursor_color_picker.png</file>
+        <file alias="cursor_crosshair_precise_open.png">pixmaps/cursor_crosshair_precise_open.png</file>
+        <file alias="cursor_crosshair_open.png">pixmaps/cursor_crosshair_open.png</file>
         <file alias="cursor-ellipse.xpm">pixmaps/cursor-ellipse.xpm</file>
         <file alias="cursor-rect.xpm">pixmaps/cursor-rect.xpm</file>
         <file alias="cursor-text.xpm">pixmaps/cursor-text.xpm</file>
         <file alias="cursor-pen.xpm">pixmaps/cursor-pen.xpm</file>
-        <file alias="cursor-crosshairs.xpm">pixmaps/cursor-crosshairs.xpm</file>
     </qresource>
     <qresource prefix="/colorwidgetshaders">
         <file alias="alpha.frag">GUI/ColorWidgets/colorwidgetshaders/alpha.frag</file>

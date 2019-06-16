@@ -10,7 +10,7 @@
 
 void Canvas::mousePressEvent(const MouseEvent &e) {
     if(isPreviewingOrRendering()) return;
-    if(mIsMouseGrabbing && e.fButton == Qt::LeftButton) return;
+    if(e.fMouseGrabbing && e.fButton == Qt::LeftButton) return;
     if(mCurrentMode == PAINT_MODE) {
         if(mStylusDrawing) return;
         if(e.fButton == Qt::LeftButton) {
@@ -20,7 +20,7 @@ void Canvas::mousePressEvent(const MouseEvent &e) {
         if(e.fButton == Qt::LeftButton) {
             handleLeftButtonMousePress(e);
         } else if(e.fButton == Qt::RightButton) {
-            handleRightButtonMousePress(e.fGlobalPos);
+            handleRightButtonMousePress(e);
         }
     }
 }
@@ -30,7 +30,7 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
 
     const bool leftPressed = e.fButtons & Qt::LeftButton;
 
-    if(!leftPressed && !mIsMouseGrabbing) {
+    if(!leftPressed && !e.fMouseGrabbing) {
         const auto lastHoveredBox = mHoveredBox;
         const auto lastHoveredPoint = mHoveredPoint_d;
         const auto lastNSegment = mHoveredNormalSegment;
@@ -41,8 +41,8 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
 
     if(mCurrentMode == PAINT_MODE && leftPressed)  {
         paintMove(e.fPos, e.fTimestamp, 1, 0, 0);
-        return mActiveWindow->requestUpdate();
-    } else if(leftPressed || mIsMouseGrabbing) {
+        return;
+    } else if(leftPressed || e.fMouseGrabbing) {
         if(mMovesToSkip > 0) {
             mMovesToSkip--;
             return;
@@ -62,7 +62,7 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
                   mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
             handleMovePointMouseMove(e);
         } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
-            if(!mLastPressedPoint) {
+            if(!mPressedPoint) {
                 handleMovePathMouseMove(e);
             } else {
                 handleMovePointMouseMove(e);
@@ -70,14 +70,14 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddSmartPointMouseMove(e);
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
-            if(isShiftPressed()) {
+            if(e.shiftMod()) {
                 const qreal lenR = pointToLen(e.fPos - e.fLastPressPos);
                 mCurrentCircle->moveRadiusesByAbs({lenR, lenR});
             } else {
                 mCurrentCircle->moveRadiusesByAbs(e.fPos - e.fLastPressPos);
             }
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
-            if(isShiftPressed()) {
+            if(e.shiftMod()) {
                 const QPointF trans = e.fPos - e.fLastPressPos;
                 const qreal valF = qMax(trans.x(), trans.y());
                 mCurrentRectangle->moveSizePointByAbs({valF, valF});
@@ -88,7 +88,8 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
     }
     mFirstMouseMove = false;
 
-    if(!mSelecting && !mIsMouseGrabbing && leftPressed) grabMouseAndTrack();
+    if(!mSelecting && !e.fMouseGrabbing && leftPressed)
+        e.fGrabMouse();
 }
 
 void Canvas::mouseReleaseEvent(const MouseEvent &e) {
@@ -97,13 +98,12 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
     schedulePivotUpdate();
     if(mCurrentMode == PAINT_MODE) return;
     if(mValueInput.inputEnabled()) mFirstMouseMove = false;
-    mValueInput.clearAndDisableInput();
 
-    handleMouseRelease(e);
+    handleLeftMouseRelease(e);
 
-    mLastPressedBox = nullptr;
-    mHoveredPoint_d = mLastPressedPoint;
-    mLastPressedPoint = nullptr;
+    mPressedBox = nullptr;
+    mHoveredPoint_d = mPressedPoint;
+    mPressedPoint = nullptr;
 }
 
 void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
@@ -124,7 +124,7 @@ void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
         } else if((mCurrentMode == MOVE_BOX ||
                    mCurrentMode == MOVE_POINT) &&
                   boxAt->SWT_isTextBox()) {
-            releaseMouseAndDontTrack();
+            e.fReleaseMouse();
             GetAsPtr(boxAt, TextBox)->openTextEditor(mMainWindow);
         } else if(mCurrentMode == MOVE_BOX &&
                   boxAt->SWT_isSmartVectorPath()) {

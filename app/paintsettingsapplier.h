@@ -38,14 +38,14 @@ private:
 class ColorPaintSetting : public PaintSetting {
 public:
     ColorPaintSetting(const Target& target,
-                      const ColorSetting& colorSettings) :
+                      const ColorSettingApplier& colorSettings) :
         PaintSetting(target), mColorSetting(colorSettings) {}
 protected:
     void applyToPS(PaintSettingsAnimator * const target) const {
         mColorSetting.apply(target->getColorAnimator());
     }
 private:
-    const ColorSetting mColorSetting;
+    const ColorSettingApplier mColorSetting;
 };
 
 class GradientPaintSetting : public PaintSetting {
@@ -78,14 +78,14 @@ private:
 class GradientTypePaintSetting : public PaintSetting {
 public:
     GradientTypePaintSetting(const Target& target,
-                             const Gradient::Type& type) :
+                             const GradientType& type) :
         PaintSetting(target), mGradientType(type) {}
 protected:
     void applyToPS(PaintSettingsAnimator * const target) const {
         target->setGradientType(mGradientType);
     }
 private:
-    const Gradient::Type mGradientType;
+    const GradientType mGradientType;
 };
 
 class PaintTypePaintSetting : public PaintSetting {

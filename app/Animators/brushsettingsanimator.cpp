@@ -1,7 +1,7 @@
-#include "brushsettings.h"
+#include "brushsettingsanimator.h"
 #include "GUI/BrushWidgets/brushselectionwidget.h"
 
-BrushSettings::BrushSettings() : StaticComplexAnimator("brush settings") {
+BrushSettingsAnimator::BrushSettingsAnimator() : StaticComplexAnimator("brush settings") {
     ca_addChildAnimator(mWidthCurve);
     ca_addChildAnimator(mPressureCurve);
     ca_addChildAnimator(mSpacingCurve);
@@ -13,13 +13,13 @@ BrushSettings::BrushSettings() : StaticComplexAnimator("brush settings") {
     mTimeCurve->setCurrentValue(qCubicSegment1D(1));
 }
 
-void BrushSettings::writeProperty(QIODevice * const dst) const {
+void BrushSettingsAnimator::writeProperty(QIODevice * const dst) const {
     StaticComplexAnimator::writeProperty(dst);
     gWrite(dst, mBrush ? mBrush->getCollectionName() : "");
     gWrite(dst, mBrush ? mBrush->getBrushName() : "");
 }
 
-void BrushSettings::readProperty(QIODevice * const src) {
+void BrushSettingsAnimator::readProperty(QIODevice * const src) {
     StaticComplexAnimator::readProperty(src);
     const QString brushCollection = gReadString(src);
     const QString brushName = gReadString(src);
