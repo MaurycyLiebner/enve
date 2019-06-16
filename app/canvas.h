@@ -315,6 +315,7 @@ public:
 
     void selectAndAddContainedPointsToSelection(const QRectF &absRect);
 //
+    void newPaintBox(const QPointF &pos);
 
     void mousePressEvent(const MouseEvent &e);
     void mouseReleaseEvent(const MouseEvent &e);

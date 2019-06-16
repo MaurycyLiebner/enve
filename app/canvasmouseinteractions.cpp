@@ -377,15 +377,6 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
                 }
             }
         }
-    } else if(mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
-        //setCanvasMode(CanvasMode::MOVE_POINT);
-        const auto paintBox = SPtrCreate(PaintBox)();
-        paintBox->planCenterPivotPosition();
-        mCurrentBoxesGroup->addContainedBox(paintBox);
-        paintBox->setAbsolutePos(e.fPos);
-        clearBoxesSelection();
-        clearPointsSelection();
-        addBoxToSelection(paintBox.get());
     }
 }
 
@@ -561,8 +552,6 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
         if(mCurrentTextBox) {
             mCurrentTextBox->openTextEditor(mMainWindow);
         }
-    } else if(mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
-        mActiveWindow->setCanvasMode(CanvasMode::PAINT_MODE);
     }
     mValueInput.clearAndDisableInput();
     mTransMode = MODE_NONE;

@@ -275,7 +275,6 @@ private:
     ActionButton *mParticleBoxMode;
     ActionButton *mParticleEmitterMode;
 
-    ActionButton *mPaintBoxMode;
     ActionButton *mPaintMode;
 //
     ActionButton *mActionConnectPoints;

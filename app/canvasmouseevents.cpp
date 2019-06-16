@@ -8,12 +8,24 @@
 
 #include "MovablePoints/pathpivot.h"
 
+void Canvas::newPaintBox(const QPointF &pos) {
+    const auto paintBox = SPtrCreate(PaintBox)();
+    paintBox->planCenterPivotPosition();
+    mCurrentBoxesGroup->addContainedBox(paintBox);
+    paintBox->setAbsolutePos(pos);
+    clearBoxesSelection();
+    clearPointsSelection();
+    addBoxToSelection(paintBox.get());
+}
+
 void Canvas::mousePressEvent(const MouseEvent &e) {
     if(isPreviewingOrRendering()) return;
     if(e.fMouseGrabbing && e.fButton == Qt::LeftButton) return;
     if(mCurrentMode == PAINT_MODE) {
         if(mStylusDrawing) return;
         if(e.fButton == Qt::LeftButton) {
+            if(!mPaintTarget.isValid())
+                newPaintBox(e.fPos);
             mPaintTarget.paintPress(e.fPos, e.fTimestamp, 0.5,
                                     0, 0, mCurrentBrush);
         }
@@ -60,8 +72,7 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
         if(mSelecting) {
             moveSecondSelectionPoint(e.fPos);
         } else if(mCurrentMode == CanvasMode::MOVE_POINT ||
-                  mCurrentMode == CanvasMode::ADD_PARTICLE_BOX ||
-                  mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
+                  mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
             handleMovePointMouseMove(e);
         } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
             if(!mPressedPoint) {
@@ -146,6 +157,8 @@ void Canvas::tabletEvent(const QTabletEvent * const e,
         if(e->button() == Qt::RightButton) return;
         if(e->button() == Qt::LeftButton) {
             mStylusDrawing = true;
+            if(!mPaintTarget.isValid())
+                newPaintBox(pos);
             mPaintTarget.paintPress(pos, e->timestamp(), e->pressure(),
                                     e->xTilt(), e->yTilt(), mCurrentBrush);
         }

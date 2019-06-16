@@ -25,7 +25,6 @@ enum CanvasMode : short {
     ADD_TEXT,
     ADD_PARTICLE_BOX,
     ADD_PARTICLE_EMITTER,
-    ADD_PAINT_BOX,
     PAINT_MODE
 };
 

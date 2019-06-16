@@ -628,16 +628,9 @@ void MainWindow::setupToolBar() {
                 ":/icons/draw_particle_emitter_checked.png");
     mToolBar->addWidget(mParticleEmitterMode);
 
-    mPaintBoxMode = new ActionButton(
-                ":/icons/add_paint_box.png",
-                "F11", this);
-    mPaintBoxMode->setCheckable(
-                ":/icons/add_paint_box_checked.png");
-    mToolBar->addWidget(mPaintBoxMode);
-
     mPaintMode = new ActionButton(
                 ":/icons/paint_mode.png",
-                "F12", this);
+                "F11", this);
     mPaintMode->setCheckable(
                 ":/icons/paint_mode_checked.png");
     mToolBar->addWidget(mPaintMode);
@@ -744,8 +737,6 @@ void MainWindow::connectToolBarActions() {
             mCanvasWindow, &CanvasWindow::setParticleBoxMode );
     connect(mParticleEmitterMode, &ActionButton::pressed,
             mCanvasWindow, &CanvasWindow::setParticleEmitterMode);
-    connect(mPaintBoxMode, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::setPaintBoxMode);
     connect(mPaintMode, &ActionButton::pressed,
             mCanvasWindow, &CanvasWindow::setPaintMode);
     connect(mActionConnectPoints, &ActionButton::pressed,
@@ -844,7 +835,6 @@ void MainWindow::updateCanvasModeButtonsChecked() {
     mTextMode->setChecked(currentMode == ADD_TEXT);
     mParticleBoxMode->setChecked(currentMode == ADD_PARTICLE_BOX);
     mParticleEmitterMode->setChecked(currentMode == ADD_PARTICLE_EMITTER);
-    mPaintBoxMode->setChecked(currentMode == ADD_PAINT_BOX);
     mPaintMode->setChecked(currentMode == PAINT_MODE);
 }
 
