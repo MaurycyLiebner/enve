@@ -6,11 +6,12 @@
 class BoxScrollWidgetVisiblePart;
 class ScrollArea;
 class WindowSingleWidgetTarget;
+class Document;
 
 class BoxScrollWidget : public ScrollWidget {
     Q_OBJECT
 public:
-    explicit BoxScrollWidget(WindowSingleWidgetTarget * const target,
+    explicit BoxScrollWidget(Document& document,
                              ScrollArea * const parent = nullptr);
     ~BoxScrollWidget();
     BoxScrollWidgetVisiblePart *getVisiblePartWidget();

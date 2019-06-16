@@ -65,9 +65,7 @@ public:
 
     void scheduleContentUpdate(const SWT_BoxRule &rule);
 
-    bool isMainTarget() {
-        return mIsMainTarget;
-    }
+    bool isMainTarget() { return mIsMainTarget; }
 
     void scheduleSearchContentUpdate();
     void scheduleContentUpdate(

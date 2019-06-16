@@ -16,6 +16,7 @@
 #include "Paint/animatedsurface.h"
 #include <QAction>
 #include "Animators/outlinesettingsanimator.h"
+#include "document.h"
 
 class AnimatedSurface;
 class PaintBox;
@@ -165,7 +166,7 @@ class Canvas : public ContainerBox, public CanvasBase {
     friend class SelfRef;
     friend class CanvasWindow;
 protected:
-    explicit Canvas(CanvasWindow * const canvasWidget,
+    explicit Canvas(Document& document,
                     const int canvasWidth = 1920,
                     const int canvasHeight = 1080,
                     const int frameCount = 200,
@@ -366,7 +367,7 @@ public:
                              const bool parentSatisfies,
                              const bool parentMainTarget) const;
 
-    ContainerBox *getCurrentBoxesGroup() {
+    ContainerBox *getCurrentGroup() {
         return mCurrentBoxesGroup;
     }
 
@@ -455,6 +456,7 @@ protected:
     void handleLeftButtonMousePress(const MouseEvent &e);
 signals:
     void canvasNameChanged(Canvas *, QString);
+    void requestCanvasMode(CanvasMode);
 public:
     void scheduleDisplayedFillStrokeSettingsUpdate();
 
@@ -638,7 +640,10 @@ private:
     int mRotHalfCycles = 0;
     TransformMode mTransMode = MODE_NONE;
 protected:
+    Document& mDocument;
+
     stdsptr<UndoRedoStack> mUndoRedoStack;
+
     void updatePaintBox();
 
     PaintTarget mPaintTarget;
@@ -665,8 +670,6 @@ protected:
     qreal mResolutionFraction;
 
     MainWindow *mMainWindow;
-    CanvasWindow *mActiveWindow;
-    QWidget *mActiveWidget;
 
     qptr<Circle> mCurrentCircle;
     qptr<Rectangle> mCurrentRectangle;

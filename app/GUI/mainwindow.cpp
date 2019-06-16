@@ -106,11 +106,11 @@ MainWindow::MainWindow(QWidget *parent)
     mBottomDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
 
-    mCanvasWindow = new CanvasWindow(this);
+    mCanvasWindow = new CanvasWindow(mDocument, this);
     connect(mMemoryHandler, &MemoryHandler::allMemoryUsed,
             mCanvasWindow, &CanvasWindow::outOfMemory);
 
-    mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(this);
+    mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(mDocument, this);
     connect(mCanvasWindow, &CanvasWindow::changeCurrentFrame,
             mBoxesListAnimationDockWidget,
             &BoxesListAnimationDockWidget::setCurrentFrame);
@@ -157,8 +157,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     mObjectSettingsScrollArea = new ScrollArea(this);
     mObjectSettingsWidget = new BoxScrollWidget(
-                mCanvasWindow->getWindowSWT(),
-                mObjectSettingsScrollArea);
+                mDocument, mObjectSettingsScrollArea);
     mObjectSettingsScrollArea->setWidget(mObjectSettingsWidget);
     mObjectSettingsWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_BR_SELECTED);
@@ -533,7 +532,7 @@ void MainWindow::updateSettingsForCurrentCanvas() {
     mRasterEffectsVisible->setChecked(canvas->getRasterEffectsVisible());
     mPathEffectsVisible->setChecked(canvas->getPathEffectsVisible());
     mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
-    mObjectSettingsWidget->setMainTarget(canvas->getCurrentBoxesGroup());
+    mObjectSettingsWidget->setMainTarget(canvas->getCurrentGroup());
 //    mBrushSettingsWidget->setCurrentBrush(canvas->getCurrentBrush());
     updateDisplayedFillStrokeSettings();
 }
@@ -781,8 +780,8 @@ void MainWindow::createNewCanvas() {
     const auto dialog = new CanvasSettingsDialog(defName,
                                                  MainWindow::getInstance());
     connect(dialog, &QDialog::accepted, this, [this, dialog]() {
-        const auto newCanvas = SPtrCreate(Canvas)(mCanvasWindow, 1920, 1080, 200);
-        dialog->applySettingsToCanvas(newCanvas.get());
+        const auto newCanvas = mDocument.createNewScene();
+        dialog->applySettingsToCanvas(newCanvas);
         addCanvas(newCanvas);
         dialog->close();
     });
@@ -790,8 +789,8 @@ void MainWindow::createNewCanvas() {
     dialog->show();
 }
 
-void MainWindow::addCanvas(const qsptr<Canvas>& newCanvas) {
-    mCanvasWindow->addCanvasToListAndSetAsCurrent(newCanvas);
+void MainWindow::addCanvas(Canvas* const newCanvas) {
+    mCanvasWindow->setCurrentCanvas(newCanvas);
 
     disconnect(mCurrentCanvasComboBox,
                qOverload<int>(&QComboBox::currentIndexChanged),
@@ -800,7 +799,7 @@ void MainWindow::addCanvas(const qsptr<Canvas>& newCanvas) {
     mCurrentCanvasComboBox->addItem(newCanvas->getName());
     mCurrentCanvasComboBox->setCurrentIndex(
                 mCurrentCanvasComboBox->count() - 1);
-    connect(newCanvas.get(), &Canvas::canvasNameChanged,
+    connect(newCanvas, &Canvas::canvasNameChanged,
             this, &MainWindow::canvasNameChanged);
 
     connect(mCurrentCanvasComboBox,
@@ -811,14 +810,13 @@ void MainWindow::addCanvas(const qsptr<Canvas>& newCanvas) {
 
 void MainWindow::canvasNameChanged(Canvas *canvas,
                                    const QString &name) {
-    const auto &canvasList = mCanvasWindow->getCanvasList();
     int idT = 0;
-    for(const auto& canvasPtr : canvasList) {
+    for(const auto& canvasPtr : mDocument.fScenes) {
         if(canvasPtr == canvas) break;
         idT++;
     }
 
-    if(idT < 0 || idT >= canvasList.count()) return;
+    if(idT < 0 || idT >= mDocument.fScenes.count()) return;
     mCurrentCanvasComboBox->setItemText(idT, name);
 }
 
@@ -1118,6 +1116,7 @@ void MainWindow::clearAll() {
     mCurrentCanvasComboBox->clear();
     mCanvasWindow->clearAll();
     mFillStrokeSettings->clearAll();
+    mDocument.clear();
 //    for(ClipboardContainer *cont : mClipboardContainers) {
 //        delete cont;
 //    }

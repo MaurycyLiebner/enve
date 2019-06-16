@@ -17,13 +17,12 @@
 #include "svgimporter.h"
 #include "filesourcescache.h"
 #include <QFileDialog>
-#include "windowsinglewidgettarget.h"
 #include "videoencoder.h"
 #include "usagewidget.h"
 #include "memorychecker.h"
 
-CanvasWindow::CanvasWindow(QWidget *parent) {
-    mWindowSWTTarget = SPtrCreate(WindowSingleWidgetTarget)(this);
+CanvasWindow::CanvasWindow(Document &document, QWidget * const parent) :
+    mDocument(document) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
 
     mPreviewFPSTimer = new QTimer(this);
@@ -52,7 +51,7 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
 
     connect(this, &GLWindow::programChanged, this,
     [this](GPURasterEffectProgram * program) {
-        for(const auto& canvas : mCanvasList)
+        for(const auto& canvas : mDocument.fScenes)
             canvas->updateIfUsesProgram(program);
     });
 
@@ -66,56 +65,41 @@ Canvas *CanvasWindow::getCurrentCanvas() {
     return mCurrentCanvas;
 }
 
-void CanvasWindow::SWT_setupAbstraction(
-        SWT_Abstraction *abstraction,
-        const UpdateFuncs &updateFuncs,
-        const int visiblePartWidgetId) {
-    for(const auto& child : mCanvasList) {
-        auto abs = child->SWT_abstractionForWidget(updateFuncs,
-                                                      visiblePartWidgetId);
-        abstraction->addChildAbstraction(abs);
-    }
-}
-
 void CanvasWindow::setCurrentCanvas(int id) {
-    if(id < 0 || id >= mCanvasList.count()) {
+    if(id < 0 || id >= mDocument.fScenes.count()) {
         setCurrentCanvas(nullptr);
     } else {
-        setCurrentCanvas(mCanvasList.at(id).get());
+        setCurrentCanvas(mDocument.fScenes.at(id).get());
     }
 }
 
 void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     TaskScheduler::sSetCurrentCanvas(canvas);
-    if(mCurrentCanvas) mCurrentCanvas->setIsCurrentCanvas(false);
-
-    if(canvas) {
-        mCurrentCanvas = canvas;
+    if(mCurrentCanvas) {
+        mCurrentCanvas->setIsCurrentCanvas(false);
+        disconnect(mCurrentCanvas, nullptr, this, nullptr);
+    }
+    mCurrentCanvas = canvas;
+    mDocument.setActiveScene(mCurrentCanvas);
+    if(mCurrentCanvas) {
         mCurrentSoundComposition = mCurrentCanvas->getSoundComposition();
         mCurrentCanvas->setIsCurrentCanvas(true);
         setCanvasMode(mCurrentCanvas->getCurrentCanvasMode());
 
         emit changeCanvasFrameRange(0, getMaxFrame());
         changeCurrentFrameAction(getCurrentFrame());
+        connect(mCurrentCanvas, &Canvas::requestCanvasMode,
+                this, &CanvasWindow::setCanvasMode);
     } else {
         mCurrentSoundComposition = nullptr;
-        mCurrentCanvas.clear();
     }
-    ContainerBox *currentGroup;
     if(mCurrentCanvas) {
         MainWindow::getInstance()->setCurrentUndoRedoStack(
                     mCurrentCanvas->getUndoRedoStack());
-        currentGroup = mCurrentCanvas->getCurrentBoxesGroup();
     } else {
         MainWindow::getInstance()->setCurrentUndoRedoStack(nullptr);
-        currentGroup = nullptr;
     }
-    mWindowSWTTarget->SWT_scheduleContentUpdate(
-                currentGroup,
-                SWT_TARGET_CURRENT_GROUP);
-    mWindowSWTTarget->SWT_scheduleContentUpdate(
-                mCurrentCanvas.data(),
-                SWT_TARGET_CURRENT_CANVAS);
+
     MainWindow::getInstance()->updateSettingsForCurrentCanvas();
     if(hasNoCanvas()) openWelcomeDialog();
     else {
@@ -123,23 +107,6 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         fitCanvasToSize();
     }
     queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::addCanvasToList(const qsptr<Canvas>& canvas) {
-    mCanvasList << canvas;
-    mWindowSWTTarget->SWT_addChild(canvas.get());
-}
-
-void CanvasWindow::removeCanvas(const int id) {
-    const auto canvas = mCanvasList.takeAt(id);
-    mWindowSWTTarget->SWT_removeChild(canvas.data());
-    if(mCanvasList.isEmpty()) {
-        setCurrentCanvas(nullptr);
-    } else if(id < mCanvasList.count()) {
-        setCurrentCanvas(id);
-    } else {
-        setCurrentCanvas(id - 1);
-    }
 }
 
 void CanvasWindow::updatePaintModeCursor() {
@@ -225,13 +192,8 @@ void CanvasWindow::setPaintMode() {
     setCanvasMode(PAINT_MODE);
 }
 
-void CanvasWindow::addCanvasToListAndSetAsCurrent(const qsptr<Canvas>& canvas) {
-    addCanvasToList(canvas);
-    setCurrentCanvas(canvas.get());
-}
-
 void CanvasWindow::renameCanvas(const int id, const QString &newName) {
-    mCanvasList.at(id)->setName(newName);
+    mDocument.fScenes.at(id)->setName(newName);
 }
 
 bool CanvasWindow::hasNoCanvas() {
@@ -1005,7 +967,7 @@ void CanvasWindow::schedulePivotUpdate() {
 
 ContainerBox *CanvasWindow::getCurrentGroup() {
     if(hasNoCanvas()) return nullptr;
-    return mCurrentCanvas->getCurrentBoxesGroup();
+    return mCurrentCanvas->getCurrentGroup();
 }
 
 void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
@@ -1284,11 +1246,6 @@ void CanvasWindow::nextSaveOutputFrame() {
 }
 
 void CanvasWindow::clearAll() {
-    for(const auto& canvas : mCanvasList) {
-        mWindowSWTTarget->SWT_removeChild(canvas.data());
-    }
-
-    mCanvasList.clear();
     setCurrentCanvas(nullptr);
 }
 
@@ -1458,7 +1415,7 @@ void CanvasWindow::importFile(const QString &path,
 
         if(importedBox) {
             importedBox->planCenterPivotPosition();
-            mCurrentCanvas->getCurrentBoxesGroup()->addContainedBox(importedBox);
+            mCurrentCanvas->getCurrentGroup()->addContainedBox(importedBox);
             importedBox->moveByAbs(relDropPos);
         }
     }
@@ -1556,31 +1513,4 @@ void CanvasWindow::finishMaxFramePosTransformForAllSelected() {
 void CanvasWindow::moveMaxFrameForAllSelected(const int dFrame) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->moveMaxFrameForAllSelected(dFrame);
-}
-
-void CanvasWindow::writeCanvases(QIODevice *target) {
-    const int nCanvases = mCanvasList.count();
-    target->write(rcConstChar(&nCanvases), sizeof(int));
-    int currentCanvasId = -1;
-    for(const auto &canvas : mCanvasList) {
-        canvas->writeBoundingBox(target);
-        if(canvas.get() == mCurrentCanvas) {
-            currentCanvasId = mCurrentCanvas->getWriteId();
-        }
-    }
-    target->write(rcConstChar(&currentCanvasId), sizeof(int));
-}
-
-void CanvasWindow::readCanvases(QIODevice *target) {
-    int nCanvases;
-    target->read(rcChar(&nCanvases), sizeof(int));
-    for(int i = 0; i < nCanvases; i++) {
-        auto canvas = SPtrCreate(Canvas)(this);
-        canvas->readBoundingBox(target);
-        MainWindow::getInstance()->addCanvas(canvas);
-    }
-    int currentCanvasId;
-    target->read(rcChar(&currentCanvasId), sizeof(int));
-    auto currentCanvas = BoundingBox::sGetBoxByReadId(currentCanvasId);
-    setCurrentCanvas(GetAsPtr(currentCanvas, Canvas));
 }

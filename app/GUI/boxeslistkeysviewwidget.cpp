@@ -12,14 +12,13 @@
 #include "animationdockwidget.h"
 #include "global.h"
 #include "canvas.h"
-#include "windowsinglewidgettarget.h"
 #include <QToolButton>
 
-BoxesListKeysViewWidget::BoxesListKeysViewWidget(
+BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
                             QWidget *topWidget,
                             BoxesListAnimationDockWidget *animationDock,
                             QWidget *parent) :
-    QWidget(parent) {
+    QWidget(parent), mDocument(document) {
     mMainWindow = MainWindow::getInstance();
     mBoxesListAnimationDockWidget = animationDock;
 
@@ -157,12 +156,11 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
 
     mBoxesListScrollArea = new BoxScrollArea(this);
 
-    const auto window = mMainWindow->getCanvasWindow()->getWindowSWT();
-    mBoxesListWidget = new BoxScrollWidget(window, mBoxesListScrollArea);
+    mBoxesListWidget = new BoxScrollWidget(mDocument, mBoxesListScrollArea);
     auto visiblePartWidget = mBoxesListWidget->getVisiblePartWidget();
     visiblePartWidget->setCurrentRule(SWT_BR_ALL);
-    auto newTarget = window->getCanvasWindow()->getCurrentCanvas();
-    visiblePartWidget->setCurrentTarget(newTarget, SWT_TARGET_CURRENT_CANVAS);
+    visiblePartWidget->setCurrentTarget(
+                mDocument.fLastActiveScene, SWT_TARGET_CURRENT_CANVAS);
 
     mBoxesListScrollArea->setWidget(mBoxesListWidget);
     mBoxesListLayout->addWidget(mBoxesListScrollArea);
@@ -324,9 +322,7 @@ void BoxesListKeysViewWidget::setRuleLocked() {
 
 void BoxesListKeysViewWidget::setTargetAll() {
     mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentTarget(
-                mMainWindow->getCanvasWindow()->getWindowSWT(),
-                SWT_TARGET_ALL);
+            setCurrentTarget(&mDocument, SWT_TARGET_ALL);
     mMainWindow->queScheduledTasksAndUpdate();
 }
 

@@ -14,6 +14,7 @@
 #include "animationwidgetscrollbar.h"
 #include "global.h"
 #include "renderinstancesettings.h"
+#include "document.h"
 
 ChangeWidthWidget::ChangeWidthWidget(QWidget *parent) :
     QWidget(parent) {
@@ -69,8 +70,9 @@ void ChangeWidthWidget::leaveEvent(QEvent *) {
     update();
 }
 #include "memoryhandler.h"
-BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
-    QWidget(parent) {
+BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
+                                                           MainWindow *parent) :
+    QWidget(parent), mDocument(document) {
     setFocusPolicy(Qt::NoFocus);
 
     mMainWindow = parent;
@@ -244,11 +246,13 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(int id) {
     id = qMin(id, mBoxesListKeysViewWidgets.count());
     BoxesListKeysViewWidget *newWidget;
     if(id == 0) {
-        newWidget = new BoxesListKeysViewWidget(mAnimationWidgetScrollbar,
+        newWidget = new BoxesListKeysViewWidget(mDocument,
+                                                mAnimationWidgetScrollbar,
                                                 this,
                                                 mBoxesListKeysViewStack);
     } else {
-        newWidget = new BoxesListKeysViewWidget(nullptr,
+        newWidget = new BoxesListKeysViewWidget(mDocument,
+                                                nullptr,
                                                 this,
                                                 mBoxesListKeysViewStack);
     }

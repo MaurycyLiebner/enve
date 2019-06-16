@@ -142,7 +142,6 @@ SOURCES += main.cpp\
     GUI/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
     GUI/BoxesList/boxscrollarea.cpp \
-    windowsinglewidgettarget.cpp \
     drawpath.cpp \
     videoencoder.cpp \
     GUI/RenderWidgets/rendersettingsdialog.cpp \
@@ -354,7 +353,6 @@ HEADERS  += \
     GUI/paintboxsettingsdialog.h \
     execdelegator.h \
     GUI/BoxesList/boxscrollarea.h \
-    windowsinglewidgettarget.h \
     drawpath.h \
     videoencoder.h \
     GUI/RenderWidgets/rendersettingsdialog.h \

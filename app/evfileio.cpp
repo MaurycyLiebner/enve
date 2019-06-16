@@ -115,7 +115,7 @@ void MainWindow::loadEVFile(const QString &path) {
     }
     auto gradientWidget = mFillStrokeSettings->getGradientWidget();
     gradientWidget->readGradients(&target);
-    mCanvasWindow->readCanvases(&target);
+    mDocument.read(&target);
 
     clearLoadedGradientsList();
     gradientWidget->clearGradientsLoadIds();
@@ -132,7 +132,7 @@ void MainWindow::saveToFile(const QString &path) {
         auto gradientWidget = mFillStrokeSettings->getGradientWidget();
         gradientWidget->setGradientLoadIds();
         gradientWidget->writeGradients(&file);
-        mCanvasWindow->writeCanvases(&file);
+        mDocument.write(&file);
 
         clearLoadedGradientsList();
         gradientWidget->clearGradientsLoadIds();

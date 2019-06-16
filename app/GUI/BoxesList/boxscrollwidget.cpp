@@ -4,13 +4,13 @@
 #include "boxscrollwidgetvisiblepart.h"
 #include "GUI/canvaswindow.h"
 #include "GUI/mainwindow.h"
-#include "windowsinglewidgettarget.h"
+#include "document.h"
 
-BoxScrollWidget::BoxScrollWidget(WindowSingleWidgetTarget * const target,
+BoxScrollWidget::BoxScrollWidget(Document &document,
                                  ScrollArea * const parent) :
     ScrollWidget(parent) {
     createVisiblePartWidget();
-    mCoreAbs = target->SWT_createAbstraction(
+    mCoreAbs = document.SWT_createAbstraction(
                 mVisiblePartWidget->getUpdateFuncs(),
                 mVisiblePartWidget->getId());
 }

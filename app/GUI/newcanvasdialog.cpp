@@ -92,8 +92,6 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &name,
 
     connect(mOkButton, &QPushButton::released,
             this, &CanvasSettingsDialog::accept);
-    connect(mOkButton, &QPushButton::released,
-            this, &CanvasSettingsDialog::accept);
     connect(mCancelButton, &QPushButton::released,
             this, &CanvasSettingsDialog::reject);
     connect(this, &QDialog::rejected, this, &QDialog::close);

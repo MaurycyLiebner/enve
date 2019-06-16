@@ -25,6 +25,7 @@ class AnimationDockWidget;
 class RenderWidget;
 class ActionButton;
 class Canvas;
+class Document;
 
 class ChangeWidthWidget : public QWidget {
     Q_OBJECT
@@ -58,7 +59,7 @@ private:
 class BoxesListAnimationDockWidget : public QWidget {
     Q_OBJECT
 public:
-    explicit BoxesListAnimationDockWidget(MainWindow *parent);
+    explicit BoxesListAnimationDockWidget(Document &document, MainWindow *parent);
     bool processKeyEvent(QKeyEvent *event);
     void previewFinished();
     void previewBeingPlayed();
@@ -96,6 +97,8 @@ private slots:
     void pausePreview();
     void resumePreview();
 private:
+    Document& mDocument;
+
     QToolBar *mToolBar;
 
     QWidget *mTimelineWidget;

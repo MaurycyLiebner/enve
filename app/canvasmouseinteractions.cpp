@@ -80,6 +80,7 @@ void Canvas::addSelectedBoxesActions(QMenu * const qMenu) {
 
 #include <QInputDialog>
 #include "PathEffects/patheffect.h"
+#include "GUI/newcanvasdialog.h"
 void Canvas::addActionsToMenu(QMenu * const menu) {
     const BoxesClipboardContainer * const clipboard =
             MainWindow::getBoxesClipboardContainer();
@@ -89,21 +90,18 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
         pasteAct->setShortcut(Qt::CTRL + Qt::Key_V);
     }
 
-    const auto &listOfCanvas = mActiveWindow->getCanvasList();
-    if(listOfCanvas.count() > 1) {
-        QMenu * const linkCanvasMenu = menu->addMenu("Link Canvas");
-        for(const auto& canvas : listOfCanvas) {
-            const auto slot = [this, canvas]() {
-                auto newLink = canvas->createLink();
-                mCurrentBoxesGroup->addContainedBox(newLink);
-                newLink->centerPivotPosition();
-            };
-            QAction * const action = linkCanvasMenu->addAction(
-                        canvas->getName(), this, slot);
-            if(canvas == this) {
-                action->setEnabled(false);
-                action->setVisible(false);
-            }
+    QMenu * const linkCanvasMenu = menu->addMenu("Link Scene");
+    for(const auto& canvas : mDocument.fScenes) {
+        const auto slot = [this, canvas]() {
+            auto newLink = canvas->createLink();
+            mCurrentBoxesGroup->addContainedBox(newLink);
+            newLink->centerPivotPosition();
+        };
+        QAction * const action = linkCanvasMenu->addAction(
+                    canvas->getName(), this, slot);
+        if(canvas == this) {
+            action->setEnabled(false);
+            action->setVisible(false);
         }
     }
 
@@ -214,8 +212,13 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
         if(ok) changeFpsTo(newFps);
     });
 
-    menu->addAction("Settings...", [this]() {
-        mActiveWindow->openSettingsWindowForCurrentCanvas();
+    menu->addAction("Settings...", [this, parentWidget]() {
+        const auto dialog = new CanvasSettingsDialog(this, parentWidget);
+        connect(dialog, &QDialog::accepted, this, [this, dialog]() {
+            dialog->applySettingsToCanvas(this);
+            dialog->close();
+        });
+        dialog->show();
     });
 }
 
@@ -506,7 +509,7 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
        mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
         handleMovePointMouseRelease(e);
         if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
-            mActiveWindow->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
+            emit requestCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
         }
     } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
         if(!mPressedPoint) {

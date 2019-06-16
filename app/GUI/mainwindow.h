@@ -9,6 +9,7 @@
 #include "undoredo.h"
 #include "clipboardcontainer.h"
 #include "taskscheduler.h"
+#include "document.h"
 class VideoEncoder;
 enum ClipboardContainerType : short;
 
@@ -132,7 +133,7 @@ public:
     void replaceClipboard(const stdsptr<ClipboardContainer> &container);
     ClipboardContainer *getClipboardContainer(
             const ClipboardContainerType &type);
-    void addCanvas(const qsptr<Canvas> &newCanvas);
+    void addCanvas(Canvas * const newCanvas);
 
     Gradient *getLoadedGradientById(const int id);
     void clearLoadedGradientsList();
@@ -321,6 +322,7 @@ private:
     QMenu *mRenderMenu;
 
     TaskScheduler mTaskScheduler;
+    Document mDocument;
     CanvasWindow *mCanvasWindow;
     stdptr<UndoRedoStack> mCurrentUndoRedoStack;
 

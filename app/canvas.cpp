@@ -29,10 +29,10 @@
 #include "Animators/transformanimator.h"
 #include "GUI/canvaswindow.h"
 
-Canvas::Canvas(CanvasWindow * const canvasWidget,
+Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
                const int frameCount, const qreal fps) :
-    ContainerBox(TYPE_CANVAS) {
+    ContainerBox(TYPE_CANVAS), mDocument(document) {
     mMainWindow = MainWindow::getInstance();
     setCurrentBrush(mMainWindow->getCurrentBrush());
     std::function<bool(int)> changeFrameFunc =
@@ -62,8 +62,6 @@ Canvas::Canvas(CanvasWindow * const canvasWidget,
 
     mWidth = canvasWidth;
     mHeight = canvasHeight;
-    mActiveWindow = canvasWidget;
-    mActiveWidget = mActiveWindow->getCanvasWidget();
 
     mCurrentBoxesGroup = this;
     mIsCurrentGroup = true;
@@ -336,7 +334,6 @@ void Canvas::anim_scaleTime(const int pivotAbsFrame, const qreal scale) {
     //        int newAbsPos = qRound(scale*pivotAbsFrame);
     //        anim_shiftAllKeys(newAbsPos - pivotAbsFrame);
     setMaxFrame(qRound((mMaxFrame - pivotAbsFrame)*scale));
-    mActiveWindow->setCurrentCanvas(this);
 }
 
 void Canvas::setOutputRendering(const bool bT) {

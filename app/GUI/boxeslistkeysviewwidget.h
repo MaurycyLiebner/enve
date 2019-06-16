@@ -17,6 +17,7 @@ class MainWindow;
 class ScrollArea;
 class AnimationDockWidget;
 class BoxScrollWidget;
+class Document;
 
 enum SWT_Type : short;
 enum SWT_BoxRule : short;
@@ -24,7 +25,8 @@ enum SWT_BoxRule : short;
 class BoxesListKeysViewWidget : public QWidget {
     Q_OBJECT
 public:
-    explicit BoxesListKeysViewWidget(QWidget *topWidget,
+    explicit BoxesListKeysViewWidget(Document& document,
+                                     QWidget *topWidget,
                                      BoxesListAnimationDockWidget *animationDock,
                                      QWidget *parent);
     ~BoxesListKeysViewWidget();
@@ -66,6 +68,8 @@ protected slots:
 private:
     void setCurrentType(const SWT_Type &type);
     void setBoxRule(const SWT_BoxRule &rule);
+
+    Document& mDocument;
 
     QHBoxLayout *mMainLayout;
     QVBoxLayout *mBoxesListLayout;

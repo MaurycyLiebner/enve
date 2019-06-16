@@ -34,20 +34,14 @@ class CanvasWindow : public GLWindow,
         public KeyFocusTarget {
     Q_OBJECT
 public:
-    explicit CanvasWindow(QWidget *parent);
+    explicit CanvasWindow(Document& document, QWidget * const parent);
 
     Canvas *getCurrentCanvas();
-    const QList<qsptr<Canvas>> &getCanvasList() const {
-        return mCanvasList;
-    }
 
     void openWelcomeDialog();
     void closeWelcomeDialog();
 
     void setCurrentCanvas(Canvas * const canvas);
-    void addCanvasToList(const qsptr<Canvas> &canvas);
-    void removeCanvas(const int id);
-    void addCanvasToListAndSetAsCurrent(const qsptr<Canvas> &canvas);
     void renameCanvas(const int id, const QString &newName);
     bool hasNoCanvas();
 
@@ -98,10 +92,7 @@ public:
     VideoBox *createVideoForPath(const QString &path);
     int getCurrentFrame();
     int getMaxFrame();
-    void SWT_setupAbstraction(
-            SWT_Abstraction *abstraction,
-            const UpdateFuncs &updateFuncs,
-            const int visiblePartWidgetId);
+
     ImageBox *createImageForPath(const QString &path);
     SingleSound *createSoundForPath(const QString &path);
 
@@ -145,13 +136,6 @@ public:
     void rotate90CCW();
     void rotate90CW();
 
-    void writeCanvases(QIODevice *target);
-    void readCanvases(QIODevice *target);
-
-    WindowSingleWidgetTarget *getWindowSWT() {
-        return mWindowSWTTarget.get();
-    }
-
     void startDurationRectPosTransformForAllSelected();
     void finishDurationRectPosTransformForAllSelected();
     void moveDurationRectForAllSelected(const int dFrame);
@@ -169,6 +153,7 @@ private:
     void changeCurrentFrameAction(const int frame);
     void playPreviewAfterAllTasksCompleted();
 
+    Document& mDocument;
     CanvasMode mCurrentMode = MOVE_BOX;
 
     QMatrix mViewTransform;
@@ -206,7 +191,6 @@ private:
     QTimer *mPreviewFPSTimer = nullptr;
 
     qptr<Canvas> mCurrentCanvas;
-    QList<qsptr<Canvas>> mCanvasList;
 
     //void paintEvent(QPaintEvent *);
 
