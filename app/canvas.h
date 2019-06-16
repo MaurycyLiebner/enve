@@ -625,6 +625,10 @@ public:
     void setCurrentRenderRange(const FrameRange& range) {
         mCurrRenderRange = range;
     }
+
+    bool hasValidPaintTarget() const {
+        return mPaintTarget.isValid();
+    }
 private:
     void openTextEditorForTextBox(TextBox *textBox);
 

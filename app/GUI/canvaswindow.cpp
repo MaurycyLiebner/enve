@@ -143,8 +143,12 @@ void CanvasWindow::removeCanvas(const int id) {
 }
 
 void CanvasWindow::updatePaintModeCursor() {
-    setCursor(QCursor(QPixmap(":/cursors/cursor_crosshair_precise_open.png")));
-    setCursor(QCursor(QPixmap(":/cursors/cursor_crosshair_open.png")));
+    mValidPaintTarget = mCurrentCanvas && mCurrentCanvas->hasValidPaintTarget();
+    if(mValidPaintTarget) {
+        setCursor(QCursor(QPixmap(":/cursors/cursor_crosshair_precise_open.png")));
+    } else {
+        setCursor(QCursor(QPixmap(":/cursors/cursor_crosshair_open.png")));
+    }
 }
 
 void CanvasWindow::setCanvasMode(const CanvasMode mode) {
@@ -169,8 +173,10 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
     mCurrentMode = mode;
     MainWindow::getInstance()->updateCanvasModeButtonsChecked();
     if(!mCurrentCanvas) return;
-    mCurrentCanvas->cancelCurrentTransform();
-    releaseMouse();
+    if(mMouseGrabber) {
+        mCurrentCanvas->cancelCurrentTransform();
+        releaseMouse();
+    }
     mCurrentCanvas->setCanvasMode(mode);
     queScheduledTasksAndUpdate();
 }
@@ -261,6 +267,7 @@ void CanvasWindow::tabletEvent(QTabletEvent *e) {
     const qreal x = e->hiResGlobalX() - globalPos.x();
     const qreal y = e->hiResGlobalY() - globalPos.y();
     mCurrentCanvas->tabletEvent(e, QPointF(x, y));
+    if(!mValidPaintTarget) updatePaintModeCursor();
     requestUpdate();
 }
 
@@ -278,7 +285,11 @@ void CanvasWindow::mousePressEvent(QMouseEvent *event) {
                            mCanvasWidget));
     queScheduledTasksAndUpdate();
     mPrevMousePos = pos;
-    if(event->button() == Qt::LeftButton) mPrevPressPos = pos;
+    if(event->button() == Qt::LeftButton) {
+        mPrevPressPos = pos;
+        if(mCurrentMode == PAINT_MODE && !mValidPaintTarget)
+            updatePaintModeCursor();
+    }
 }
 
 void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {

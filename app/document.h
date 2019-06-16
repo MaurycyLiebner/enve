@@ -10,6 +10,7 @@
 class Gradient;
 class FileCacheHandler;
 class Canvas;
+enum CanvasMode : short;
 
 class Document : public SingleWidgetTarget {
     typedef stdsptr<FileCacheHandler> FileHandler;
@@ -18,6 +19,8 @@ class Document : public SingleWidgetTarget {
     };
 public:
     QString fEvFile;
+
+    CanvasMode fCanvasMode;
 
     // bookmarked
     QList<QColor> fColors;

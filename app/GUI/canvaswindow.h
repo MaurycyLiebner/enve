@@ -37,7 +37,7 @@ public:
     explicit CanvasWindow(QWidget *parent);
 
     Canvas *getCurrentCanvas();
-    const QList<qsptr<Canvas>> &getCanvasList() {
+    const QList<qsptr<Canvas>> &getCanvasList() const {
         return mCanvasList;
     }
 
@@ -50,6 +50,8 @@ public:
     void addCanvasToListAndSetAsCurrent(const qsptr<Canvas> &canvas);
     void renameCanvas(const int id, const QString &newName);
     bool hasNoCanvas();
+
+    CanvasMode getCanvasMode() const { return mCurrentMode; }
     void setCanvasMode(const CanvasMode mode);
 
     void queScheduledTasksAndUpdate();
@@ -172,6 +174,7 @@ private:
     QMatrix mViewTransform;
     QPointF mPrevMousePos;
     QPointF mPrevPressPos;
+    bool mValidPaintTarget = false;
 
     bool mBlockInput = false;
     //! @brief true if preview is currently playing

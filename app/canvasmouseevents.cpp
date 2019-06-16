@@ -63,9 +63,9 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
         }
         if(mFirstMouseMove && leftPressed) {
             if((mCurrentMode == CanvasMode::MOVE_POINT &&
-                !mHoveredPoint_d && !mHoveredNormalSegment.isValid()) ||
+                !mPressedPoint && !mCurrentNormalSegment.isValid()) ||
                (mCurrentMode == CanvasMode::MOVE_BOX &&
-                !mHoveredBox && !mHoveredPoint_d)) {
+                !mPressedBox && !mPressedPoint)) {
                 startSelectionAtPoint(e.fPos);
             }
         }
