@@ -1288,7 +1288,7 @@ void BoundingBox::setVisibile(const bool visible) {
 
     SWT_scheduleContentUpdate(SWT_BR_VISIBLE);
     SWT_scheduleContentUpdate(SWT_BR_HIDDEN);
-    for(const auto&  box : mLinkingBoxes) {
+    for(const auto& box : mLinkingBoxes) {
         if(box->isParentLinkBox())
             box->setVisibile(visible);
     }

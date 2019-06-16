@@ -402,7 +402,7 @@ void Canvas::addBoxToSelection(BoundingBox * const box) {
     mMainWindow->setCurrentBox(box);
 
     if(mCurrentMode == PAINT_MODE) {
-        if(box->SWT_isPaintBox()) setPaintBox(GetAsPtr(box, PaintBox));
+        if(box->SWT_isPaintBox()) mPaintTarget.setPaintBox(GetAsPtr(box, PaintBox));
     }
 }
 
@@ -435,7 +435,7 @@ void Canvas::clearBoxesSelection() {
 }
 
 void Canvas::clearBoxesSelectionList() {
-    if(mCurrentMode == PAINT_MODE) setPaintBox(nullptr);
+    if(mCurrentMode == PAINT_MODE) mPaintTarget.setPaintBox(nullptr);
     mSelectedBoxes.clear();
 }
 

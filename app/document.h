@@ -28,6 +28,8 @@ public:
 
     FillSettings fLastFill;
     StrokeSettings fLastStroke;
+
+    QColor fLastBrushColor;
     SimpleBrushWrapper* fLastBrush = nullptr;
 
     std::set<FileHandler, FileCompare> fFiles;

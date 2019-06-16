@@ -228,7 +228,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         const SkScalar invZoom = toSkScalar(qInvZoom);
         if(!mCurrentBoxesGroup->SWT_isCanvas())
             mCurrentBoxesGroup->drawBoundingRect(canvas, invZoom);
-        if(!mPaintDrawableBox) {
+        if(!mPaintTarget.isValid()) {
             for(const auto& box : mSelectedBoxes) {
                 canvas->save();
                 box->drawBoundingRect(canvas, invZoom);
@@ -248,13 +248,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
             }
         }
 
-        if(mPaintDrawableBox) {
-            const auto canvasRect = viewTrans.inverted().mapRect(drawRect);
-            const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
-            const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
-            canvas->concat(toSkMatrix(pDrawTrans));
-            mPaintOnion.draw(canvas);
-            mPaintDrawable->drawOnCanvas(canvas, {0, 0}, &relDRect);
+        if(mPaintTarget.isValid()) {
+            mPaintTarget.draw(canvas, viewTrans, drawRect);
         } else {
             if(mSelecting) {
                 paint.setStyle(SkPaint::kStroke_Style);
@@ -562,7 +557,7 @@ void Canvas::setCanvasMode(const CanvasMode mode) {
     updatePaintBox();
 }
 
-void Canvas::afterPaintAnimSurfaceChanged() {
+void PaintTarget::afterPaintAnimSurfaceChanged() {
     if(mPaintPressedSinceUpdate && mPaintAnimSurface) {
         mPaintAnimSurface->prp_afterChangedRelRange(
                     mPaintAnimSurface->prp_getIdenticalRelRange(
@@ -571,41 +566,13 @@ void Canvas::afterPaintAnimSurfaceChanged() {
     }
 }
 
-void Canvas::setPaintDrawable(DrawableAutoTiledSurface * const surf) {
-    mPaintDrawable = surf;
-    mPaintPressedSinceUpdate = false;
-    mPaintAnimSurface->setupOnionSkinFor(20, mPaintOnion);
-}
-
-void Canvas::setPaintBox(PaintBox * const box) {
-    if(box == mPaintDrawableBox) return;
-    if(mPaintDrawableBox) {
-        //mPaintDrawableBox->setVisibile(mPaintBoxWasVisible);
-        disconnect(mPaintAnimSurface, nullptr, this, nullptr);
-        afterPaintAnimSurfaceChanged();
-    }
-    if(box) {
-        mPaintDrawableBox = box;
-        mPaintBoxWasVisible = mPaintDrawableBox->isVisible();
-        //mPaintDrawableBox->hide();
-        mPaintAnimSurface = mPaintDrawableBox->getSurface();
-        connect(mPaintAnimSurface, &AnimatedSurface::currentSurfaceChanged,
-                this, &Canvas::setPaintDrawable);
-        setPaintDrawable(mPaintAnimSurface->getCurrentSurface());
-    } else {
-        mPaintDrawableBox = nullptr;
-        mPaintAnimSurface = nullptr;
-        mPaintDrawable = nullptr;
-    }
-}
-
 void Canvas::updatePaintBox() {
-    setPaintBox(nullptr);
+    mPaintTarget.setPaintBox(nullptr);
     if(mCurrentMode != PAINT_MODE) return;
     for(int i = mSelectedBoxes.count() - 1; i >= 0; i--) {
         const auto& iBox = mSelectedBoxes.at(i);
         if(iBox->SWT_isPaintBox()) {
-            setPaintBox(GetAsPtr(iBox, PaintBox));
+            mPaintTarget.setPaintBox(GetAsPtr(iBox, PaintBox));
             break;
         }
     }
@@ -613,8 +580,8 @@ void Canvas::updatePaintBox() {
 
 bool Canvas::handlePaintModeKeyPress(const KeyEvent &e) {
     if(mCurrentMode != PAINT_MODE) return false;
-    if(e.fKey == Qt::Key_N && mPaintAnimSurface) {
-        mPaintAnimSurface->newEmptyFrame();
+    if(e.fKey == Qt::Key_N && mPaintTarget.isValid()) {
+        mPaintTarget.newEmptyFrame();
     } else return false;
     return true;
 }
@@ -712,7 +679,7 @@ void Canvas::invertSelectionAction() {
 
 void Canvas::anim_setAbsFrame(const int frame) {
     if(frame == anim_getCurrentAbsFrame()) return;
-    afterPaintAnimSurfaceChanged();
+    mPaintTarget.afterPaintAnimSurfaceChanged();
     const int oldRelFrame = anim_getCurrentRelFrame();
     ComplexAnimator::anim_setAbsFrame(frame);
     const int newRelFrame = anim_getCurrentRelFrame();
@@ -739,7 +706,7 @@ void Canvas::anim_setAbsFrame(const int frame) {
     mUndoRedoStack->setFrame(frame);
 
     if(mCurrentMode == PAINT_MODE)
-        mPaintAnimSurface->setupOnionSkinFor(20, mPaintOnion);
+        mPaintTarget.setupOnionSkin();
 }
 
 void Canvas::clearSelectionAction() {
@@ -962,21 +929,64 @@ void Canvas::unblockUndoRedo() {
     mUndoRedoStack->unblockUndoRedo();
 }
 
-void Canvas::paintPress(const QPointF& pos,
-                        const ulong ts, const qreal pressure,
-                        const qreal xTilt, const qreal yTilt) {
+void PaintTarget::draw(SkCanvas * const canvas, const QMatrix& viewTrans,
+                       const QRect& drawRect) {
+    const auto canvasRect = viewTrans.inverted().mapRect(drawRect);
+    const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
+    const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
+    canvas->concat(toSkMatrix(pDrawTrans));
+    mPaintOnion.draw(canvas);
+    mPaintDrawable->drawOnCanvas(canvas, {0, 0}, &relDRect);
+}
+
+void PaintTarget::setPaintDrawable(DrawableAutoTiledSurface * const surf) {
+    mPaintDrawable = surf;
+    mPaintPressedSinceUpdate = false;
+    mPaintAnimSurface->setupOnionSkinFor(20, mPaintOnion);
+}
+
+void PaintTarget::setPaintBox(PaintBox * const box) {
+    if(box == mPaintDrawableBox) return;
+    if(mPaintDrawableBox) {
+        QObject::disconnect(mPaintAnimSurface,
+                            &AnimatedSurface::currentSurfaceChanged,
+                            mCanvas, nullptr);
+        afterPaintAnimSurfaceChanged();
+    }
+    if(box) {
+        mPaintDrawableBox = box;
+        mPaintAnimSurface = mPaintDrawableBox->getSurface();
+        const auto setter = [this](DrawableAutoTiledSurface * const surf) {
+            setPaintDrawable(surf);
+        };
+        QObject::connect(mPaintAnimSurface,
+                         &AnimatedSurface::currentSurfaceChanged,
+                         mCanvas, setter);
+        setPaintDrawable(mPaintAnimSurface->getCurrentSurface());
+    } else {
+        mPaintDrawableBox = nullptr;
+        mPaintAnimSurface = nullptr;
+        mPaintDrawable = nullptr;
+    }
+}
+
+void PaintTarget::paintPress(const QPointF& pos,
+                             const ulong ts, const qreal pressure,
+                             const qreal xTilt, const qreal yTilt,
+                             const SimpleBrushWrapper * const brush) {
     if(mPaintAnimSurface) {
-        if(mPaintAnimSurface->anim_isRecording())
+        if(mPaintAnimSurface->anim_isRecording() &&
+           !mPaintAnimSurface->anim_getKeyOnCurrentFrame())
             mPaintAnimSurface->anim_saveCurrentValueAsKey();
     }
-    mPaintPressedSinceUpdate = true;
 
-    if(mPaintDrawable && mCurrentBrush) {
+    if(mPaintDrawable && brush) {
+        mPaintPressedSinceUpdate = true;
         const auto& target = mPaintDrawable->surface();
         const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
         const auto drawPos = pDrawTrans.inverted().map(pos);
         const auto roi =
-                target.paintPressEvent(mCurrentBrush->getBrush(),
+                target.paintPressEvent(brush->getBrush(),
                                        drawPos, 1, pressure, xTilt, yTilt);
         const QRect qRoi(roi.x, roi.y, roi.width, roi.height);
         mPaintDrawable->pixelRectChanged(qRoi);
@@ -984,16 +994,17 @@ void Canvas::paintPress(const QPointF& pos,
     }
 }
 
-void Canvas::paintMove(const QPointF& pos,
-                       const ulong ts, const qreal pressure,
-                       const qreal xTilt, const qreal yTilt) {
-    if(mPaintDrawable && mCurrentBrush) {
+void PaintTarget::paintMove(const QPointF& pos,
+                            const ulong ts, const qreal pressure,
+                            const qreal xTilt, const qreal yTilt,
+                            const SimpleBrushWrapper * const brush) {
+    if(mPaintDrawable && brush) {
         const auto& target = mPaintDrawable->surface();
         const double dt = (ts - mLastTs);
         const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
         const auto drawPos = pDrawTrans.inverted().map(pos);
         const auto roi =
-                target.paintMoveEvent(mCurrentBrush->getBrush(),
+                target.paintMoveEvent(brush->getBrush(),
                                       drawPos, dt/1000, pressure,
                                       xTilt, yTilt);
         const QRect qRoi(roi.x, roi.y, roi.width, roi.height);

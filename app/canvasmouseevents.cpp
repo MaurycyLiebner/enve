@@ -14,7 +14,8 @@ void Canvas::mousePressEvent(const MouseEvent &e) {
     if(mCurrentMode == PAINT_MODE) {
         if(mStylusDrawing) return;
         if(e.fButton == Qt::LeftButton) {
-            paintPress(e.fPos, e.fTimestamp, 0.5, 0, 0);
+            mPaintTarget.paintPress(e.fPos, e.fTimestamp, 0.5,
+                                    0, 0, mCurrentBrush);
         }
     } else {
         if(e.fButton == Qt::LeftButton) {
@@ -40,7 +41,8 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
     }
 
     if(mCurrentMode == PAINT_MODE && leftPressed)  {
-        paintMove(e.fPos, e.fTimestamp, 1, 0, 0);
+        mPaintTarget.paintMove(e.fPos, e.fTimestamp, 1,
+                               0, 0, mCurrentBrush);
         return;
     } else if(leftPressed || e.fMouseGrabbing) {
         if(mMovesToSkip > 0) {
@@ -144,11 +146,11 @@ void Canvas::tabletEvent(const QTabletEvent * const e,
         if(e->button() == Qt::RightButton) return;
         if(e->button() == Qt::LeftButton) {
             mStylusDrawing = true;
-            paintPress(pos, e->timestamp(), e->pressure(),
-                       e->xTilt(), e->yTilt());
+            mPaintTarget.paintPress(pos, e->timestamp(), e->pressure(),
+                                    e->xTilt(), e->yTilt(), mCurrentBrush);
         }
     } else if(type == QEvent::TabletMove && mStylusDrawing) {
-        paintMove(pos, e->timestamp(), e->pressure(),
-                  e->xTilt(), e->yTilt());
+        mPaintTarget.paintMove(pos, e->timestamp(), e->pressure(),
+                               e->xTilt(), e->yTilt(), mCurrentBrush);
     }
 }
