@@ -148,12 +148,9 @@ protected:
     void processTasks() {
         if(_mHandledProcesses.isEmpty()) return;
         makeCurrent();
-        if(!_mInitialized) {
-            if(!initializeOpenGLFunctions()) {
-                RuntimeThrow("Initializing GL functions failed.");
-            }
+        if(!mInitialized) {
             iniTexturedVShaderVAO(this, _mTextureSquareVAO);
-            _mInitialized = true;
+            mInitialized = true;
 
             glEnable(GL_BLEND);
             glDisable(GL_DEPTH_TEST);
@@ -184,7 +181,7 @@ protected:
 
     std::exception_ptr mProcessException;
     bool mFinished = true;
-    bool _mInitialized = false;
+    bool mInitialized = false;
     GLuint _mTextureSquareVAO;
     QList<stdsptr<ScheduledPostProcess>> _mHandledProcesses;
     QList<stdsptr<ScheduledPostProcess>> mScheduledProcesses;

@@ -1,5 +1,3 @@
 #include "effectsloader.h"
 
-EffectsLoader::EffectsLoader() {
-
-}
+EffectsLoader::EffectsLoader() {}

@@ -9,6 +9,7 @@
 #include "undoredo.h"
 #include "clipboardcontainer.h"
 #include "taskscheduler.h"
+#include "effectsloader.h"
 #include "document.h"
 class VideoEncoder;
 enum ClipboardContainerType : short;
@@ -324,6 +325,7 @@ private:
     TaskScheduler mTaskScheduler;
     Document mDocument;
     CanvasWindow *mCanvasWindow;
+    EffectsLoader mEffectsLoader;
     stdptr<UndoRedoStack> mCurrentUndoRedoStack;
 
     bool processKeyEvent(QKeyEvent *event);

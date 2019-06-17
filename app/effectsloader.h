@@ -9,6 +9,7 @@ public:
     void initialize() {
         OffscreenQGL33c::initialize();
     }
+signals:
 private:
 };
 

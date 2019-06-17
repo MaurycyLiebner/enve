@@ -106,6 +106,8 @@ MainWindow::MainWindow(QWidget *parent)
     mBottomDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
 
+    mEffectsLoader.initialize();
+
     mCanvasWindow = new CanvasWindow(mDocument, this);
     connect(mMemoryHandler, &MemoryHandler::allMemoryUsed,
             mCanvasWindow, &CanvasWindow::outOfMemory);

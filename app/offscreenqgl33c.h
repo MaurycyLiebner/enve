@@ -21,6 +21,11 @@ public:
     void makeCurrent() {
         if(!mContext->makeCurrent(mOffscreenSurface))
             RuntimeThrow("Making GL context current failed.");
+        if(!mInitialized) {
+            if(!initializeOpenGLFunctions())
+                RuntimeThrow("Initializing GL functions failed.");
+            mInitialized = true;
+        }
     }
 
     void doneCurrent() {
@@ -31,6 +36,7 @@ public:
         mContext->moveToThread(thread);
     }
 private:
+    bool mInitialized = false;
     QOpenGLContext* mContext = nullptr;
     QOffscreenSurface *mOffscreenSurface = nullptr;
 };
