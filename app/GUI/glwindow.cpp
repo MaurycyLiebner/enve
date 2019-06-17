@@ -64,20 +64,23 @@ void iniCustomPathEffect(const QString& path) {
     }
 }
 
+void iniIfCustomPathEffect(const QString& path) {
+    const QFileInfo fileInfo(path);
+    if(!fileInfo.isFile()) return;
+    if(!fileInfo.completeSuffix().contains("so")) return;
+    try {
+        iniCustomPathEffect(path);
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
+}
+
 #include <QFileSystemModel>
 void GLWindow::iniCustomPathEffects() {
     const QString dirPath = QDir::homePath() + "/.enve/PathEffects";
     QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
     while(dirIt.hasNext()) {
-        const QString path = dirIt.next();
-        const QFileInfo fileInfo(path);
-        if(!fileInfo.isFile()) continue;
-        if(!fileInfo.completeSuffix().contains("so")) continue;
-        try {
-            iniCustomPathEffect(path);
-        } catch(const std::exception& e) {
-            gPrintExceptionCritical(e);
-        }
+        iniIfCustomPathEffect(dirIt.next());
     }
     const auto newFileWatcher = QSharedPointer<QFileSystemModel>(
                 new QFileSystemModel);
@@ -87,14 +90,7 @@ void GLWindow::iniCustomPathEffects() {
         for(int row = first; row <= last; row++) {
             const auto rowIndex = newFileWatcher->index(row, 0, parent);
             const QString path = newFileWatcher->filePath(rowIndex);
-            const QFileInfo fileInfo(path);
-            if(!fileInfo.isFile()) continue;
-            if(!fileInfo.completeSuffix().contains("so")) continue;
-            try {
-                iniCustomPathEffect(path);
-            } catch(const std::exception& e) {
-                gPrintExceptionCritical(e);
-            }
+            iniIfCustomPathEffect(path);
         }
     });
 }

@@ -3,6 +3,7 @@
 #include <QOpenGLFramebufferObject>
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
+#include "offscreenqgl33c.h"
 #include "smartPointers/stdselfref.h"
 #include "skia/skiaincludes.h"
 #include "glhelpers.h"
@@ -87,7 +88,7 @@ private:
 };
 #include <QOpenGLFramebufferObject>
 #include "exceptions.h"
-class GpuPostProcessor : public QThread, protected QGL33c {
+class GpuPostProcessor : public QThread, protected OffscreenQGL33c {
     Q_OBJECT
 public:
     GpuPostProcessor();
@@ -146,9 +147,7 @@ protected:
 
     void processTasks() {
         if(_mHandledProcesses.isEmpty()) return;
-        if(!_mContext->makeCurrent(mOffscreenSurface)) {
-            RuntimeThrow("Making GL context current failed.");
-        }
+        makeCurrent();
         if(!_mInitialized) {
             if(!initializeOpenGLFunctions()) {
                 RuntimeThrow("Initializing GL functions failed.");
@@ -168,7 +167,7 @@ protected:
                 scheduled->setException(std::current_exception());
             }
         }
-        _mContext->doneCurrent();
+        doneCurrent();
         //mFrameBuffer->bindDefault();
         //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -187,11 +186,8 @@ protected:
     bool mFinished = true;
     bool _mInitialized = false;
     GLuint _mTextureSquareVAO;
-    QOpenGLContext* _mContext = nullptr;
     QList<stdsptr<ScheduledPostProcess>> _mHandledProcesses;
-
     QList<stdsptr<ScheduledPostProcess>> mScheduledProcesses;
-    QOffscreenSurface *mOffscreenSurface = nullptr;
     //QOpenGLFramebufferObject* mFrameBuffer = nullptr;
 };
 

@@ -86,7 +86,9 @@ SOURCES += main.cpp\
     GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
     document.cpp \
+    effectsloader.cpp \
     evfileio.cpp \
+    offscreenqgl33c.cpp \
     paintsettings.cpp \
     stackwidgetwrapper.cpp \
     svgimporter.cpp \
@@ -300,6 +302,8 @@ HEADERS  += \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
     document.h \
+    effectsloader.h \
+    offscreenqgl33c.h \
     paintsettings.h \
     stackwidgetwrapper.h \
     svgimporter.h \

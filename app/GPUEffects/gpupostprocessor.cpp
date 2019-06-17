@@ -3,19 +3,14 @@
 #include <QOpenGLTexture>
 #include "skia/skqtconversions.h"
 
-GpuPostProcessor::GpuPostProcessor() {}
-
-void GpuPostProcessor::initialize() {
-    mOffscreenSurface = new QOffscreenSurface(nullptr, this);
-    mOffscreenSurface->create();
-    _mContext = new QOpenGLContext();
-    _mContext->setShareContext(QOpenGLContext::globalShareContext());
-    if(!_mContext->create()) {
-        RuntimeThrow("Creating GL context failed.");
-    }
-    _mContext->moveToThread(this);
+GpuPostProcessor::GpuPostProcessor() {
     connect(this, &QThread::finished,
             this, &GpuPostProcessor::afterProcessed);
+}
+
+void GpuPostProcessor::initialize() {
+    OffscreenQGL33c::initialize();
+    moveContextToThread(this);
 }
 
 ScheduledPostProcess::ScheduledPostProcess() {}
