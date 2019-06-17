@@ -1,18 +1,17 @@
 #include "verticalwidgetsstack.h"
 #include <QResizeEvent>
 #include <QPainter>
-#include "global.h"
 
-BoxesListKeysViewWidgetResizer::BoxesListKeysViewWidgetResizer(
-                                                QWidget *parent) :
+StackWidgetResizer::StackWidgetResizer(QWidget * const parent) :
     QWidget(parent) {
     setFixedHeight(10);
-    setFixedWidth(2*MIN_WIDGET_HEIGHT*100);
+    setFixedWidth(2*MIN_WIDGET_DIM*100);
     setCursor(Qt::SplitVCursor);
+    setWindowFlags(Qt::WindowStaysOnTopHint);
     show();
 }
 
-void BoxesListKeysViewWidgetResizer::paintEvent(QPaintEvent *) {
+void StackWidgetResizer::paintEvent(QPaintEvent *) {
     QPainter p(this);
     if(mPressed) {
         p.fillRect(rect().adjusted(0, 3, 0, -4), Qt::black);
@@ -23,25 +22,23 @@ void BoxesListKeysViewWidgetResizer::paintEvent(QPaintEvent *) {
     }
     p.end();
 }
-#include <QDebug>
-void BoxesListKeysViewWidgetResizer::displace(int totDy) {
+
+void StackWidgetResizer::displace(const int totDy) {
     int dY = totDy;
-    int newAboveHeight = mAboveWidget->height() + dY;
-    int newBelowHeight = mBelowWidget->height() - dY;
-    if(newAboveHeight < 2*MIN_WIDGET_HEIGHT) {
-        dY = 2*MIN_WIDGET_HEIGHT - mAboveWidget->height();
-    } else if(newBelowHeight < 2*MIN_WIDGET_HEIGHT) {
-        dY = mBelowWidget->height() - 2*MIN_WIDGET_HEIGHT;
+    const int newAboveHeight = mAboveWidget->height() + dY;
+    const int newBelowHeight = mBelowWidget->height() - dY;
+    if(newAboveHeight < 2*MIN_WIDGET_DIM) {
+        dY = 2*MIN_WIDGET_DIM - mAboveWidget->height();
+    } else if(newBelowHeight < 2*MIN_WIDGET_DIM) {
+        dY = mBelowWidget->height() - 2*MIN_WIDGET_DIM;
     }
     if(totDy != dY) {
         if(totDy > 0) {
-            if(mBelowResizer) {
+            if(mBelowResizer)
                 mBelowResizer->displace(totDy - dY);
-            }
         } else {
-            if(mAboveResizer) {
+            if(mAboveResizer)
                 mAboveResizer->displace(totDy - dY);
-            }
         }
     }
     mAboveWidget->setFixedHeight(mAboveWidget->height() + dY);
@@ -50,164 +47,64 @@ void BoxesListKeysViewWidgetResizer::displace(int totDy) {
     move(0, y() + dY);
 }
 
-void BoxesListKeysViewWidgetResizer::mouseMoveEvent(QMouseEvent *event) {
+void StackWidgetResizer::mouseMoveEvent(QMouseEvent *event) {
     displace(event->y() - mPressY);
 }
 
-void BoxesListKeysViewWidgetResizer::mousePressEvent(QMouseEvent *event) {
+void StackWidgetResizer::mousePressEvent(QMouseEvent *event) {
     mPressed = true;
     mPressY = event->y();
     update();
 }
 
-void BoxesListKeysViewWidgetResizer::mouseReleaseEvent(QMouseEvent *) {
+void StackWidgetResizer::mouseReleaseEvent(QMouseEvent *) {
     mPressed = false;
     update();
     emit finishedChanging();
 }
 
-void BoxesListKeysViewWidgetResizer::enterEvent(QEvent *) {
+void StackWidgetResizer::enterEvent(QEvent *) {
     mHover = true;
     update();
 }
 
-void BoxesListKeysViewWidgetResizer::leaveEvent(QEvent *) {
+void StackWidgetResizer::leaveEvent(QEvent *) {
     mHover = false;
     update();
 }
 
-void BoxesListKeysViewWidgetResizer::setAboveWidget(QWidget *aboveWidget) {
+void StackWidgetResizer::setAboveWidget(QWidget *aboveWidget) {
     mAboveWidget = aboveWidget;
 }
 
-void BoxesListKeysViewWidgetResizer::setBelowWidget(QWidget *belowWidget) {
+void StackWidgetResizer::setBelowWidget(QWidget *belowWidget) {
     mBelowWidget = belowWidget;
 }
 
-void BoxesListKeysViewWidgetResizer::setAboveResizer(
-        BoxesListKeysViewWidgetResizer *aboveResizer) {
+void StackWidgetResizer::setAboveResizer(
+        StackWidgetResizer *aboveResizer) {
     mAboveResizer = aboveResizer;
 }
 
-void BoxesListKeysViewWidgetResizer::setBelowResizer(
-        BoxesListKeysViewWidgetResizer *belowResizer) {
+void StackWidgetResizer::setBelowResizer(
+        StackWidgetResizer *belowResizer) {
     mBelowResizer = belowResizer;
 }
 
-VerticalWidgetsStack::VerticalWidgetsStack(QWidget *parent) :
+void moveY(const int y, QWidget * const widget) {
+    widget->move(widget->x(), y);
+}
+
+VWidgetStack::VWidgetStack(QWidget * const parent) :
     QWidget(parent) {
-
-}
-#include <QDebug>
-void VerticalWidgetsStack::updateSizesAndPositions() {
-    int newHeight = height();
-    if(mWidgets.isEmpty()) {
-        return;
-    }
-
-    int accumulated = 0;
-    int wCount = mWidgets.count() - 1;
-    for(int i = 0; i < wCount; i++) {
-        QWidget *widget = mWidgets.at(i);
-        widget->move(0, accumulated);
-        int newWidgetHeight = mHeightPercent.at(i)*newHeight;
-        if(newWidgetHeight < 2*MIN_WIDGET_HEIGHT) newWidgetHeight = 2*MIN_WIDGET_HEIGHT;
-        widget->setFixedHeight(newWidgetHeight);
-        widget->setFixedWidth(width());
-        accumulated += newWidgetHeight;
-        if(i < mResizers.count()) {
-            mResizers.at(i)->move(0, widget->y() + widget->height() - 5);
-        }
-    }
-    QWidget *lastWidget = mWidgets.last();
-    lastWidget->move(0, accumulated);
-    int newWidgetHeight = newHeight - accumulated;
-    lastWidget->setFixedHeight(newWidgetHeight);
-    lastWidget->setFixedWidth(width());
+    setThis(this);
 }
 
-void VerticalWidgetsStack::updateResizers() {
-    int resId = 0;
-    BoxesListKeysViewWidgetResizer *lastRes = nullptr;
-    for(int i = 0; i < mWidgets.count() - 1; i++) {
-        QWidget *currWid = mWidgets.at(i);
-        QWidget *nextWid = mWidgets.at(i + 1);
-
-        BoxesListKeysViewWidgetResizer *res;
-        if(resId < mResizers.count()) {
-            res = mResizers.at(resId);
-        } else {
-            res = new BoxesListKeysViewWidgetResizer(this);
-            mResizers << res;
-            connect(res, SIGNAL(finishedChanging()),
-                    this, SLOT(updatePercent()));
-        }
-        res->setAboveWidget(currWid);
-        res->setBelowWidget(nextWid);
-        resId++;
-        res->move(0, nextWid->y());
-        res->setAboveResizer(lastRes);
-        if(lastRes) {
-            lastRes->setBelowResizer(res);
-        }
-        lastRes = res;
-    }
-    if(lastRes) {
-        lastRes->setBelowResizer(nullptr);
-    }
-    for(int i = resId; i < mResizers.count(); i++) {
-        delete mResizers.takeAt(i);
-    }
+void moveX(const int x, QWidget * const widget) {
+    widget->move(x, widget->y());
 }
 
-int VerticalWidgetsStack::getIdOf(QWidget *idOf) {
-    return mWidgets.indexOf(idOf);
-}
-
-void VerticalWidgetsStack::updatePercent() {
-    qreal totHeight = 0.;
-    for(QWidget *wid : mWidgets) {
-        totHeight += wid->height();
-        if(wid->height() == 0) totHeight += 2*MIN_WIDGET_HEIGHT;
-    }
-
-    mHeightPercent.clear();
-    for(int i = 0; i < mWidgets.count(); i++) {
-        int widHeight = mWidgets.at(i)->height();
-        if(widHeight == 0) widHeight = 2*MIN_WIDGET_HEIGHT;
-        mHeightPercent << widHeight/(qreal)totHeight;
-    }
-}
-
-void VerticalWidgetsStack::appendWidget(QWidget *widget) {
-    mWidgets.append(widget);
-    widget->setParent(this);
-    widget->setFixedHeight(3*MIN_WIDGET_HEIGHT);
-    updatePercent();
-    updateResizers();
-    updateSizesAndPositions();
-}
-
-void VerticalWidgetsStack::insertWidget(const int id,
-                                        QWidget *widget) {
-    mWidgets.insert(id, widget);
-    widget->setParent(this);
-    widget->setFixedHeight(3*MIN_WIDGET_HEIGHT);
-    updatePercent();
-    updateResizers();
-    updateSizesAndPositions();
-    widget->show();
-}
-
-void VerticalWidgetsStack::removeWidget(QWidget *widget) {
-    if(mWidgets.removeOne(widget) ) {
-        delete widget;
-        updatePercent();
-        updateResizers();
-        updateSizesAndPositions();
-    }
-}
-
-void VerticalWidgetsStack::resizeEvent(QResizeEvent *) {
-    updateSizesAndPositions();
+HWidgetStack::HWidgetStack(QWidget * const parent) :
+    QWidget(parent) {
+    setThis(this);
 }

@@ -48,7 +48,7 @@ void ScrollWidget::updateHeight() {
     }
     mContentHeight = mMainAbstraction->getHeight(
                 mVisiblePartWidget->getCurrentRulesCollection(),
-                false, false, MIN_WIDGET_HEIGHT) + MIN_WIDGET_HEIGHT/2;
+                false, false, MIN_WIDGET_DIM) + MIN_WIDGET_DIM/2;
     int parentHeight = mParentScrollArea->height();
     setFixedHeight(qMax(mContentHeight, parentHeight));
     if(isHidden()) show();

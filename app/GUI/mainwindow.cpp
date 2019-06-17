@@ -45,15 +45,15 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 }
 
 int FONT_HEIGHT;
-int MIN_WIDGET_HEIGHT;
+int MIN_WIDGET_DIM;
 int KEY_RECT_SIZE;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) {
     mVideoEncoder = SPtrCreate(VideoEncoder)();
     FONT_HEIGHT = QApplication::fontMetrics().height();
-    MIN_WIDGET_HEIGHT = FONT_HEIGHT*4/3;
-    KEY_RECT_SIZE = MIN_WIDGET_HEIGHT*3/5;
+    MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
+    KEY_RECT_SIZE = MIN_WIDGET_DIM*3/5;
     av_register_all();
 
     QFile customSS(QDir::homePath() + "/.enve/stylesheet.qss");
@@ -97,8 +97,8 @@ MainWindow::MainWindow(QWidget *parent)
     mFillStrokeSettingsDock->setFeatures(QDockWidget::DockWidgetMovable |
                                          QDockWidget::DockWidgetFloatable);
     addDockWidget(Qt::RightDockWidgetArea, mFillStrokeSettingsDock);
-    mFillStrokeSettingsDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
-    mFillStrokeSettingsDock->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
+    mFillStrokeSettingsDock->setMinimumWidth(MIN_WIDGET_DIM*10);
+    mFillStrokeSettingsDock->setMaximumWidth(MIN_WIDGET_DIM*20);
 
     mBottomDock = new QDockWidget(this);
 
@@ -122,8 +122,8 @@ MainWindow::MainWindow(QWidget *parent)
     mBrushSettingsDock = new QDockWidget(this);
     mBrushSettingsDock->setFeatures(QDockWidget::DockWidgetMovable |
                                     QDockWidget::DockWidgetFloatable);
-    mBrushSettingsDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
-    mBrushSettingsDock->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
+    mBrushSettingsDock->setMinimumWidth(MIN_WIDGET_DIM*10);
+    mBrushSettingsDock->setMaximumWidth(MIN_WIDGET_DIM*20);
     const auto brushDockLabel = new QLabel("Brush Settings", this);
     brushDockLabel->setObjectName("dockLabel");
     brushDockLabel->setAlignment(Qt::AlignCenter);
@@ -148,8 +148,8 @@ MainWindow::MainWindow(QWidget *parent)
     mLeftDock = new QDockWidget(this);
     mLeftDock->setFeatures(QDockWidget::DockWidgetMovable |
                            QDockWidget::DockWidgetFloatable);
-    mLeftDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
-    mLeftDock->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
+    mLeftDock->setMinimumWidth(MIN_WIDGET_DIM*10);
+    mLeftDock->setMaximumWidth(MIN_WIDGET_DIM*20);
     const auto leftDockLabel = new QLabel("Current Object", this);
     leftDockLabel->setObjectName("dockLabel");
     leftDockLabel->setAlignment(Qt::AlignCenter);
@@ -173,7 +173,7 @@ MainWindow::MainWindow(QWidget *parent)
             mObjectSettingsWidget, &BoxScrollWidget::setWidth);
 
     mObjectSettingsScrollArea->verticalScrollBar()->setSingleStep(
-                MIN_WIDGET_HEIGHT);
+                MIN_WIDGET_DIM);
 
     mLeftDock->setWidget(mObjectSettingsScrollArea);
     addDockWidget(Qt::LeftDockWidgetArea, mLeftDock);
@@ -181,8 +181,8 @@ MainWindow::MainWindow(QWidget *parent)
     mLeftDock2 = new QDockWidget(this);
     mLeftDock2->setFeatures(QDockWidget::DockWidgetMovable |
                             QDockWidget::DockWidgetFloatable);
-    mLeftDock2->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
-    mLeftDock2->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
+    mLeftDock2->setMinimumWidth(MIN_WIDGET_DIM*10);
+    mLeftDock2->setMaximumWidth(MIN_WIDGET_DIM*20);
 
     mLeftDock2->setWidget(new FileSourceList(this));
     addDockWidget(Qt::LeftDockWidgetArea, mLeftDock2);

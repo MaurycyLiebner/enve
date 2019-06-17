@@ -42,7 +42,7 @@ void ChangeWidthWidget::paintEvent(QPaintEvent *) {
 void ChangeWidthWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int newWidth = mCurrentWidth + event->x() - mPressX;
-    mCurrentWidth = qMax(10*MIN_WIDGET_HEIGHT, newWidth);
+    mCurrentWidth = qMax(10*MIN_WIDGET_DIM, newWidth);
     emit widthSet(mCurrentWidth);
     //mBoxesList->setFixedWidth(newWidth);
     updatePos();
@@ -76,7 +76,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
     setFocusPolicy(Qt::NoFocus);
 
     mMainWindow = parent;
-    setMinimumSize(10*MIN_WIDGET_HEIGHT, 10*MIN_WIDGET_HEIGHT);
+    setMinimumSize(10*MIN_WIDGET_DIM, 10*MIN_WIDGET_DIM);
     mMainLayout = new QVBoxLayout(this);
     setLayout(mMainLayout);
     mMainLayout->setSpacing(0);
@@ -86,9 +86,9 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
     mTimelineLayout->setSpacing(0);
     mTimelineLayout->setMargin(0);
 
-    mFrameRangeScrollbar = new FrameScrollBar(20, 200, MIN_WIDGET_HEIGHT,
+    mFrameRangeScrollbar = new FrameScrollBar(20, 200, MIN_WIDGET_DIM,
                                               true, true, this);
-    mAnimationWidgetScrollbar = new FrameScrollBar(1, 1, MIN_WIDGET_HEIGHT,
+    mAnimationWidgetScrollbar = new FrameScrollBar(1, 1, MIN_WIDGET_DIM,
                                                    false, false, this);
     connect(MemoryHandler::sGetInstance(), &MemoryHandler::memoryFreed,
             mAnimationWidgetScrollbar,
@@ -157,8 +157,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
     mToolBar = new QToolBar(this);
     mToolBar->setMovable(false);
 
-    mToolBar->setIconSize(QSize(5*MIN_WIDGET_HEIGHT/4,
-                                5*MIN_WIDGET_HEIGHT/4));
+    mToolBar->setIconSize(QSize(5*MIN_WIDGET_DIM/4,
+                                5*MIN_WIDGET_DIM/4));
     mToolBar->addSeparator();
 
 //    mControlButtonsLayout->addWidget(mGoToPreviousKeyButton);
@@ -204,7 +204,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
 
     mMainLayout->addWidget(mToolBar);
 
-    mBoxesListKeysViewStack = new VerticalWidgetsStack(this);
+    mBoxesListKeysViewStack = new VWidgetStack(this);
     mTimelineLayout->addWidget(mBoxesListKeysViewStack);
 
     mTimelineLayout->addWidget(mFrameRangeScrollbar, Qt::AlignBottom);
@@ -239,8 +239,8 @@ void BoxesListAnimationDockWidget::setResolutionFractionText(QString text) {
 void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(int id) {
     if(mBoxesListKeysViewStack->isHidden()) {
         mBoxesListKeysViewStack->show();
-        setMinimumHeight(10*MIN_WIDGET_HEIGHT);
-        setMaximumHeight(100*MIN_WIDGET_HEIGHT);
+        setMinimumHeight(10*MIN_WIDGET_DIM);
+        setMaximumHeight(100*MIN_WIDGET_DIM);
     }
     if(id < 0) id = 0;
     id = qMin(id, mBoxesListKeysViewWidgets.count());
@@ -278,12 +278,12 @@ void BoxesListAnimationDockWidget::removeBoxesListKeysViewWidget(
         }
     }
     mBoxesListKeysViewWidgets.removeOne(widget);
-    mBoxesListKeysViewStack->removeWidget(widget);
+    delete mBoxesListKeysViewStack->takeWidget(widget);
 }
 
 void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidgetBelow(
                                         BoxesListKeysViewWidget *widget) {
-    addNewBoxesListKeysViewWidget(mBoxesListKeysViewStack->getIdOf(widget) + 1);
+    addNewBoxesListKeysViewWidget(mBoxesListKeysViewStack->childId(widget) + 1);
 }
 
 void BoxesListAnimationDockWidget::clearAll() {

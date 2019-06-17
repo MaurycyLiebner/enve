@@ -6,7 +6,7 @@
 SingleWidget::SingleWidget(ScrollWidgetVisiblePart *parent) :
     QWidget(parent) {
     mParent = parent;
-    setFixedHeight(MIN_WIDGET_HEIGHT);
+    setFixedHeight(MIN_WIDGET_DIM);
 }
 
 void SingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {

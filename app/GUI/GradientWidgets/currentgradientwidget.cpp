@@ -9,7 +9,7 @@ CurrentGradientWidget::CurrentGradientWidget(GradientWidget *gradientWidget,
     GLWidget(parent) {
     setMouseTracking(true);
     mGradientWidget = gradientWidget;
-    setFixedHeight(MIN_WIDGET_HEIGHT);
+    setFixedHeight(MIN_WIDGET_DIM);
 }
 
 void CurrentGradientWidget::paintGL() {

@@ -110,11 +110,11 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
         }
     };
     int currX = 0;
-    int currY = MIN_WIDGET_HEIGHT/2;
+    int currY = MIN_WIDGET_DIM/2;
     mMainAbstraction->setAbstractions(
                 mVisibleTop,
                 mVisibleTop + mVisibleHeight + currY,
-                currY, currX, MIN_WIDGET_HEIGHT,
+                currY, currX, MIN_WIDGET_DIM,
                 setAbsFunc,
                 mCurrentRulesCollection,
                 true, false);

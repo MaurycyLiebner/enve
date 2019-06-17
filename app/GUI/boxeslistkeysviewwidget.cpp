@@ -30,7 +30,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
     mMenuLayout->setSpacing(0);
     mMenuLayout->setMargin(0);
     mBoxesListMenuBar = new QMenuBar(this);
-    mBoxesListMenuBar->setFixedHeight(MIN_WIDGET_HEIGHT);
+    mBoxesListMenuBar->setFixedHeight(MIN_WIDGET_DIM);
     mBoxesListMenuBar->setStyleSheet("QMenuBar {"
                                         "border-top: 0;"
                                         "border-bottom: 1px solid black;"
@@ -99,7 +99,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
 
     mCornerMenuBar = new QMenuBar(this);
     mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
-    mCornerMenuBar->setFixedHeight(MIN_WIDGET_HEIGHT);
+    mCornerMenuBar->setFixedHeight(MIN_WIDGET_DIM);
     mCornerMenuBar->setStyleSheet("QMenuBar {"
                                      "border-top: 0;"
                                      "border-bottom: 1px solid black;"
@@ -116,7 +116,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
     mMenuWidgetsLayout->setMargin(0);
     mMenuWidgetsLayout->setSpacing(0);
     mSearchLine = new QLineEdit("", mBoxesListMenuBar);
-    mSearchLine->setFixedHeight(MIN_WIDGET_HEIGHT/*FONT_HEIGHT*/);
+    mSearchLine->setFixedHeight(MIN_WIDGET_DIM/*FONT_HEIGHT*/);
     mSearchLine->setProperty("forceHandleEvent", QVariant(true));
     mSearchLine->setStyleSheet("background-color: rgb(255, 255, 255);"
                                "border-bottom: 0;"
@@ -204,7 +204,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
     connect(mBoxesListAnimationDockWidget,
             &BoxesListAnimationDockWidget::viewedVerticalRangeChanged,
             mKeysView, &KeysView::setViewedVerticalRange);
-    mBoxesListScrollArea->setFixedWidth(20*MIN_WIDGET_HEIGHT);
+    mBoxesListScrollArea->setFixedWidth(20*MIN_WIDGET_DIM);
 
     setLayout(mMainLayout);
 
@@ -224,7 +224,7 @@ void BoxesListKeysViewWidget::setTopWidget(QWidget *topWidget) {
     if(mTopWidget) delete mTopWidget;
     if(!topWidget) {
         mTopWidget = new QWidget(this);
-        mTopWidget->setFixedHeight(MIN_WIDGET_HEIGHT);
+        mTopWidget->setFixedHeight(MIN_WIDGET_DIM);
         mTopWidget->setStyleSheet("background-color: rgb(50, 50, 50)");
     } else {
         mTopWidget = topWidget;
@@ -233,7 +233,7 @@ void BoxesListKeysViewWidget::setTopWidget(QWidget *topWidget) {
 }
 
 void BoxesListKeysViewWidget::moveSlider(int val) {
-    int diff = val%MIN_WIDGET_HEIGHT;
+    int diff = val%MIN_WIDGET_DIM;
     if(diff != 0) {
         val -= diff;
         mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(val);

@@ -22,9 +22,9 @@ FrameScrollBar::FrameScrollBar(const int minSpan,
 }
 
 qreal FrameScrollBar::posToFrame(int xPos) {
-    return (xPos - MIN_WIDGET_HEIGHT/2)*
+    return (xPos - MIN_WIDGET_DIM/2)*
             (mMaxFrame - mMinFrame + (mRange ? 0 : 1) ) /
-            ((qreal)width() - 2*MIN_WIDGET_HEIGHT) + mMinFrame;
+            ((qreal)width() - 2*MIN_WIDGET_DIM) + mMinFrame;
 }
 
 void FrameScrollBar::setTopBorderVisible(const bool bT) {
@@ -40,15 +40,15 @@ void FrameScrollBar::paintEvent(QPaintEvent *) {
     p.fillRect(rect(), QColor(60, 60, 60));
 
     const int dFrame = mMaxFrame - mMinFrame + (mRange ? 0 : 1);
-    const qreal pixPerFrame = (width() - 2.*MIN_WIDGET_HEIGHT)/dFrame;
+    const qreal pixPerFrame = (width() - 2.*MIN_WIDGET_DIM)/dFrame;
 
-    const int f0 = -qCeil(0.5*MIN_WIDGET_HEIGHT/pixPerFrame);
+    const int f0 = -qCeil(0.5*MIN_WIDGET_DIM/pixPerFrame);
     const int minFrame = mMinFrame + f0;
-    const qreal x0 = f0*pixPerFrame + MIN_WIDGET_HEIGHT*0.5;
+    const qreal x0 = f0*pixPerFrame + MIN_WIDGET_DIM*0.5;
 
-    const int f1 = qCeil(1.5*MIN_WIDGET_HEIGHT/pixPerFrame);
+    const int f1 = qCeil(1.5*MIN_WIDGET_DIM/pixPerFrame);
     const int maxFrame = mMaxFrame + f1;
-    const qreal w1 = width() - 1.5*MIN_WIDGET_HEIGHT + f1*pixPerFrame - x0;
+    const qreal w1 = width() - 1.5*MIN_WIDGET_DIM + f1*pixPerFrame - x0;
 
     QRect canvasMinRect;
     canvasMinRect.setLeft(qRound(x0));
@@ -80,8 +80,8 @@ void FrameScrollBar::paintEvent(QPaintEvent *) {
     p.fillRect(handleRect, col);
 
     if(mCurrentCanvas) {
-        const int soundHeight = MIN_WIDGET_HEIGHT/3;
-        const int rasterHeight = MIN_WIDGET_HEIGHT - soundHeight;
+        const int soundHeight = MIN_WIDGET_DIM/3;
+        const int rasterHeight = MIN_WIDGET_DIM - soundHeight;
         const QRectF rasterRect(x0, 0, w1, rasterHeight);
         const auto& rasterCache = mCurrentCanvas->getCacheHandler();
         rasterCache.drawCacheOnTimeline(&p, rasterRect, minFrame, maxFrame);
@@ -121,7 +121,7 @@ void FrameScrollBar::paintEvent(QPaintEvent *) {
     const qreal halfHeight = height()*0.5;
     const qreal quarterHeight = height()*0.25;
     const qreal threeFourthsHeight = height()*0.75;
-    const qreal maxX = width() + MIN_WIDGET_HEIGHT;
+    const qreal maxX = width() + MIN_WIDGET_DIM;
     while(xL < maxX) {
         p.drawText(QRectF(xL - inc, quarterHeight, 2*inc, halfHeight),
                    Qt::AlignCenter, QString::number(currentFrame));
@@ -133,8 +133,8 @@ void FrameScrollBar::paintEvent(QPaintEvent *) {
 
     p.setPen(QPen(Qt::white, 1));
     if(!mRange) {
-        const QRectF textRect(MIN_WIDGET_HEIGHT, 0,
-                              5*MIN_WIDGET_HEIGHT, height());
+        const QRectF textRect(MIN_WIDGET_DIM, 0,
+                              5*MIN_WIDGET_DIM, height());
         p.drawText(textRect, Qt::AlignVCenter | Qt::AlignLeft,
                    QString::number(mFirstViewedFrame));
     }

@@ -9,7 +9,7 @@
 
 GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
     QWidget(parent) {
-    setFixedHeight(qRound((3 + mNumberVisibleGradients + 0.5)*MIN_WIDGET_HEIGHT));
+    setFixedHeight(qRound((3 + mNumberVisibleGradients + 0.5)*MIN_WIDGET_DIM));
     mMainLayout = new QVBoxLayout(this);
     mMainLayout->setMargin(0);
     mMainLayout->setSpacing(0);
@@ -17,11 +17,11 @@ GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
     mGradientsListWidget = new GradientsListWidget(this, this);
     mCurrentGradientWidget = new CurrentGradientWidget(this, this);
     mMainLayout->addWidget(mGradientsListWidget);
-    mMainLayout->addSpacing(MIN_WIDGET_HEIGHT/2);
+    mMainLayout->addSpacing(MIN_WIDGET_DIM/2);
     mMainLayout->addWidget(mCurrentGradientWidget);
     setLayout(mMainLayout);
 
-    mScrollItemHeight = MIN_WIDGET_HEIGHT;
+    mScrollItemHeight = MIN_WIDGET_DIM;
 
     mMainWindow = mainWindow;  
 

@@ -12,7 +12,7 @@
 FileSourceWidget::FileSourceWidget(FileSourceListVisibleWidget *parent) :
     QWidget(parent) {
     mParentVisibleWidget = parent;
-    setFixedHeight(MIN_WIDGET_HEIGHT);
+    setFixedHeight(MIN_WIDGET_DIM);
 }
 
 void FileSourceWidget::setTargetCache(FileCacheHandlerAbstraction *target) {
@@ -45,7 +45,7 @@ void FileSourceWidget::mouseMoveEvent(QMouseEvent *event) {
 
 
 void FileSourceWidget::paintEvent(QPaintEvent *) {
-    if(!mTargetCache || width() <= 2*MIN_WIDGET_HEIGHT) return;
+    if(!mTargetCache || width() <= 2*MIN_WIDGET_DIM) return;
     QPainter p(this);
 
     QString wholeString = mTargetCache->getFilePath();
@@ -56,9 +56,9 @@ void FileSourceWidget::paintEvent(QPaintEvent *) {
     const int dotsW = fm.width("...");
     int wholeWidth = fm.width(wholeString);
     bool addDots = false;
-    while(wholeWidth > width() - 1.5*MIN_WIDGET_HEIGHT) {
+    while(wholeWidth > width() - 1.5*MIN_WIDGET_DIM) {
         addDots = true;
-        const int spaceForLetters = int(width() - 1.5*MIN_WIDGET_HEIGHT - dotsW);
+        const int spaceForLetters = int(width() - 1.5*MIN_WIDGET_DIM - dotsW);
         const int guessLen = spaceForLetters*wholeString.count()/wholeWidth;
         wholeString = wholeString.right(guessLen);
         wholeWidth = fm.width("..." + wholeString);
@@ -66,16 +66,16 @@ void FileSourceWidget::paintEvent(QPaintEvent *) {
     if(addDots) wholeString = "..." + wholeString;
 
     if(mTargetCache->selected) {
-        p.fillRect(QRect(0.5*MIN_WIDGET_HEIGHT, 0,
-                         wholeWidth + MIN_WIDGET_HEIGHT,
-                         MIN_WIDGET_HEIGHT),
+        p.fillRect(QRect(0.5*MIN_WIDGET_DIM, 0,
+                         wholeWidth + MIN_WIDGET_DIM,
+                         MIN_WIDGET_DIM),
                    QColor(180, 180, 180));
         p.setPen(Qt::black);
     }
     if(mTargetCache->isFileMissing()) p.setPen(Qt::red);
 
-    p.drawText(rect().adjusted(MIN_WIDGET_HEIGHT, 0,
-                               -0.5*MIN_WIDGET_HEIGHT, 0),
+    p.drawText(rect().adjusted(MIN_WIDGET_DIM, 0,
+                               -0.5*MIN_WIDGET_DIM, 0),
                Qt::AlignVCenter | Qt::AlignLeft,
                wholeString);
 
@@ -119,7 +119,7 @@ FileSourceListScrollWidget::FileSourceListScrollWidget(ScrollArea *parent) :
 void FileSourceListScrollWidget::updateHeight() {
     FileSourceListVisibleWidget *visWid =
             ((FileSourceListVisibleWidget*)mMinimalVisiblePartWidget);
-    setFixedHeight((visWid->getCacheListCount() + 0.5) * MIN_WIDGET_HEIGHT);
+    setFixedHeight((visWid->getCacheListCount() + 0.5) * MIN_WIDGET_DIM);
 }
 
 void FileSourceListScrollWidget::createVisiblePartWidget() {
@@ -134,12 +134,12 @@ FileSourceListVisibleWidget::FileSourceListVisibleWidget(MinimalScrollWidget *pa
 void FileSourceListVisibleWidget::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
-    int currY = MIN_WIDGET_HEIGHT;
+    int currY = MIN_WIDGET_DIM;
     p.setPen(QPen(QColor(40, 40, 40), 1.));
     while(currY < height()) {
         p.drawLine(0, currY, width(), currY);
 
-        currY += MIN_WIDGET_HEIGHT;
+        currY += MIN_WIDGET_DIM;
     }
 
 //    if(mDragging) {
@@ -156,7 +156,7 @@ FileSourceListVisibleWidget::~FileSourceListVisibleWidget() {
 }
 
 void FileSourceListVisibleWidget::updateVisibleWidgetsContent() {
-    int firstVisibleId = mVisibleTop/MIN_WIDGET_HEIGHT;
+    int firstVisibleId = mVisibleTop/MIN_WIDGET_DIM;
 
     for(const auto& wid : mSingleWidgets) wid->hide();
 
@@ -227,7 +227,7 @@ FileSourceList::FileSourceList(QWidget *parent) : ScrollArea(parent) {
     connect(this, &FileSourceList::widthChanged,
             mScrollWidget, &FileSourceListScrollWidget::setWidth);
 
-    verticalScrollBar()->setSingleStep(MIN_WIDGET_HEIGHT);
+    verticalScrollBar()->setSingleStep(MIN_WIDGET_DIM);
     setAcceptDrops(true);
 }
 

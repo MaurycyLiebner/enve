@@ -22,14 +22,14 @@ void DisplayedGradientsWidget::setTop(const int top) {
 }
 
 void DisplayedGradientsWidget::updateTopGradientId() {
-    int newGradientId = mDisplayedTop/MIN_WIDGET_HEIGHT;
+    int newGradientId = mDisplayedTop/MIN_WIDGET_DIM;
     mHoveredGradientId += newGradientId - mTopGradientId;
     mTopGradientId = newGradientId;
     update();
 }
 
 void DisplayedGradientsWidget::setNumberGradients(const int n) {
-    setFixedHeight(n*MIN_WIDGET_HEIGHT);
+    setFixedHeight(n*MIN_WIDGET_DIM);
 }
 
 #include "GUI/ColorWidgets/colorwidgetshaders.h"
@@ -43,17 +43,17 @@ void DisplayedGradientsWidget::paintGL() {
     glBindVertexArray(mPlainSquareVAO);
     Gradient* currentGradient = mGradientWidget->getCurrentGradient();
     for(int i = mTopGradientId; i < mTopGradientId + visibleGradients; i++) {
-        int yInverted = height() - yT - MIN_WIDGET_HEIGHT;
+        int yInverted = height() - yT - MIN_WIDGET_DIM;
         Gradient *gradient = mGradientWidget->getGradientAt(i);
         int nColors = gradient->getColorCount();
         QColor lastColor = gradient->getColorAt(0);
         qreal xT = 0.;
         qreal xInc = static_cast<qreal>(width())/(nColors - 1);
         glUniform2f(GRADIENT_PROGRAM.fMeshSizeLoc,
-                    MIN_WIDGET_HEIGHT/(3.f*xInc), 1.f/3);
+                    MIN_WIDGET_DIM/(3.f*xInc), 1.f/3);
         for(int j = 1; j < nColors; j++) {
             QColor currentColor = gradient->getColorAt(j);
-            glViewport(qRound(xT), yInverted, qRound(xInc), MIN_WIDGET_HEIGHT);
+            glViewport(qRound(xT), yInverted, qRound(xInc), MIN_WIDGET_DIM);
 
             glUniform4f(GRADIENT_PROGRAM.fRGBAColor1Loc,
                         lastColor.redF(), lastColor.greenF(),
@@ -66,11 +66,11 @@ void DisplayedGradientsWidget::paintGL() {
             if(gradient == currentGradient) {
                 glUseProgram(DOUBLE_BORDER_PROGRAM.fID);
                 glUniform2f(DOUBLE_BORDER_PROGRAM.fInnerBorderSizeLoc,
-                            1.f/xInc, 1.f/MIN_WIDGET_HEIGHT);
+                            1.f/xInc, 1.f/MIN_WIDGET_DIM);
                 glUniform4f(DOUBLE_BORDER_PROGRAM.fInnerBorderColorLoc,
                             1.f, 1.f, 1.f, 1.f);
                 glUniform2f(DOUBLE_BORDER_PROGRAM.fOuterBorderSizeLoc,
-                            1.f/xInc, 1.f/MIN_WIDGET_HEIGHT);
+                            1.f/xInc, 1.f/MIN_WIDGET_DIM);
                 glUniform4f(DOUBLE_BORDER_PROGRAM.fOuterBorderColorLoc,
                             0.f, 0.f, 0.f, 1.f);
 
@@ -83,18 +83,18 @@ void DisplayedGradientsWidget::paintGL() {
         if(i == mHoveredGradientId || i == mContextMenuGradientId) {
             glUseProgram(BORDER_PROGRAM.fID);
             glUniform2f(BORDER_PROGRAM.fBorderSizeLoc,
-                        1.f/width(), 1.f/MIN_WIDGET_HEIGHT);
+                        1.f/width(), 1.f/MIN_WIDGET_DIM);
             glUniform4f(BORDER_PROGRAM.fBorderColorLoc,
                         1.f, 1.f, 1.f, 1.f);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             glUseProgram(GRADIENT_PROGRAM.fID);
         }
-        yT += MIN_WIDGET_HEIGHT;
+        yT += MIN_WIDGET_DIM;
     }
 }
 
 void DisplayedGradientsWidget::mousePressEvent(QMouseEvent *event) {
-    int gradientId = event->y()/MIN_WIDGET_HEIGHT;
+    int gradientId = event->y()/MIN_WIDGET_DIM;
     if(event->button() == Qt::LeftButton) {
         mGradientWidget->gradientLeftPressed(gradientId);
     } else if(event->button() == Qt::RightButton) {
@@ -106,14 +106,14 @@ void DisplayedGradientsWidget::mousePressEvent(QMouseEvent *event) {
                 relCursorPos.x() > width() || relCursorPos.y() > height()) {
             mHoveredGradientId = -1;
         } else {
-            mHoveredGradientId = relCursorPos.y()/MIN_WIDGET_HEIGHT;
+            mHoveredGradientId = relCursorPos.y()/MIN_WIDGET_DIM;
         }
     }
     update();
 }
 
 void DisplayedGradientsWidget::mouseMoveEvent(QMouseEvent *event) {
-    mHoveredGradientId = event->y()/MIN_WIDGET_HEIGHT;
+    mHoveredGradientId = event->y()/MIN_WIDGET_DIM;
     update();
 }
 

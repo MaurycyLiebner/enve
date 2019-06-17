@@ -30,13 +30,13 @@ void BoxScrollWidgetVisiblePart::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
 //    p.fillRect(rect(), Qt::red);
-    int currY = MIN_WIDGET_HEIGHT;
+    int currY = MIN_WIDGET_DIM;
     p.setPen(QPen(QColor(40, 40, 40), 1));
     auto parentWidgetT = static_cast<BoxScrollWidget*>(mParentWidget);
     int parentContHeight = parentWidgetT->getContentHeight();
     while(currY < parentContHeight) {
         p.drawLine(0, currY, width(), currY);
-        currY += MIN_WIDGET_HEIGHT;
+        currY += MIN_WIDGET_DIM;
     }
 
     if(mDragging) {
@@ -66,9 +66,9 @@ Key *BoxScrollWidgetVisiblePart::getKeyAtPos(
         const int pressX, const int pressY,
         const qreal pixelsPerFrame,
         const int minViewedFrame) {
-    const int remaining = pressY % MIN_WIDGET_HEIGHT;
-    if(remaining < (MIN_WIDGET_HEIGHT - KEY_RECT_SIZE)/2 ||
-       remaining > (MIN_WIDGET_HEIGHT + KEY_RECT_SIZE)/2) return nullptr;
+    const int remaining = pressY % MIN_WIDGET_DIM;
+    if(remaining < (MIN_WIDGET_DIM - KEY_RECT_SIZE)/2 ||
+       remaining > (MIN_WIDGET_DIM + KEY_RECT_SIZE)/2) return nullptr;
     for(const auto& container : mSingleWidgets) {
         const int containerTop = container->y();
         const int containerBottom = containerTop + container->height();
@@ -103,14 +103,14 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
 //    selectionRect.adjust(-0.5, -(BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5,
 //                         0.5, (BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5);
     selectionRect.adjust(0.5, 0, 0.5, 0);
-    const int minX = qRound(selectionRect.top() - MIN_WIDGET_HEIGHT*0.5);
-    const int minY = qRound(selectionRect.bottom() - MIN_WIDGET_HEIGHT*0.5);
+    const int minX = qRound(selectionRect.top() - MIN_WIDGET_DIM*0.5);
+    const int minY = qRound(selectionRect.bottom() - MIN_WIDGET_DIM*0.5);
     int currY = 0;
     const SetAbsFunc setter = [&abstractions](SWT_Abstraction * abs, int) {
         abstractions.append(abs);
     };
     mMainAbstraction->setAbstractions(
-            minX, minY, currY, 0, MIN_WIDGET_HEIGHT,
+            minX, minY, currY, 0, MIN_WIDGET_DIM,
             setter, mCurrentRulesCollection, true, false);
 
     for(const auto& abs : abstractions) {
@@ -124,7 +124,7 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
 }
 
 int BoxScrollWidgetVisiblePart::getIdAtPos(const int yPos) const {
-    return yPos / MIN_WIDGET_HEIGHT;
+    return yPos / MIN_WIDGET_DIM;
 }
 
 BoxSingleWidget * BoxScrollWidgetVisiblePart::getBSWAtPos(const int yPos) const {
@@ -165,8 +165,8 @@ DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
     }
 
     const int idAtPos = getIdAtPos(yPos);
-    const int relYPos = yPos % MIN_WIDGET_HEIGHT;
-    bool above = relYPos < MIN_WIDGET_HEIGHT*0.5;
+    const int relYPos = yPos % MIN_WIDGET_DIM;
+    bool above = relYPos < MIN_WIDGET_DIM*0.5;
     for(int i = idAtPos - 1; i >= 0; i--) {
         if(supportedDropTypes) break;
         targetBSW = static_cast<BoxSingleWidget*>(
@@ -380,7 +380,7 @@ void BoxScrollWidgetVisiblePart::updateDragLine() {
                 yPos = bsw->y() + abs->getHeight(getCurrentRulesCollection(),
                                                  true,
                                                  absParent->isMainTarget(),
-                                                 MIN_WIDGET_HEIGHT);
+                                                 MIN_WIDGET_DIM);
             } else continue;
             mCurrentDragLine = QLine(bsw->x(), yPos, width(), yPos);
             mDragging = true;
@@ -394,13 +394,13 @@ void BoxScrollWidgetVisiblePart::updateDropTarget() {
 }
 
 void BoxScrollWidgetVisiblePart::scrollUp() {
-    mParentWidget->scrollParentAreaBy(-MIN_WIDGET_HEIGHT);
+    mParentWidget->scrollParentAreaBy(-MIN_WIDGET_DIM);
     updateDropTarget();
     update();
 }
 
 void BoxScrollWidgetVisiblePart::scrollDown() {
-    mParentWidget->scrollParentAreaBy(MIN_WIDGET_HEIGHT);
+    mParentWidget->scrollParentAreaBy(MIN_WIDGET_DIM);
     updateDropTarget();
     update();
 }

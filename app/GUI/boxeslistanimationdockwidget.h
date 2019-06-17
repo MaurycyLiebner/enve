@@ -18,7 +18,7 @@
 #include "smartPointers/sharedpointerdefs.h"
 class FrameScrollBar;
 class BoxesListKeysViewWidget;
-class VerticalWidgetsStack;
+class VWidgetStack;
 class RenderWidget;
 class MainWindow;
 class AnimationDockWidget;
@@ -116,7 +116,7 @@ private:
     QAction *mTimelineAction;
     QAction *mRenderAction;
 
-    VerticalWidgetsStack *mBoxesListKeysViewStack;
+    VWidgetStack *mBoxesListKeysViewStack;
     QList<BoxesListKeysViewWidget*> mBoxesListKeysViewWidgets;
     RenderWidget *mRenderWidget;
     AnimationDockWidget *mAnimationDockWidget;

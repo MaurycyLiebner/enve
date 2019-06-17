@@ -17,7 +17,7 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
     const auto thisLay = new QVBoxLayout;
 
     const auto mainWid = new QWidget(this);
-    const int size = MIN_WIDGET_HEIGHT*12;
+    const int size = MIN_WIDGET_DIM*12;
     mainWid->setMinimumWidth(size);
     setLayout(thisLay);
     thisLay->addWidget(mainWid, 0, Qt::AlignHCenter | Qt::AlignVCenter);
@@ -47,7 +47,7 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
 
     const auto homePath = QDir::homePath();
     int i = 0;
-    const int buttSize = size - 3*MIN_WIDGET_HEIGHT;
+    const int buttSize = size - 3*MIN_WIDGET_DIM;
     for(const auto& path : recentPaths) {
         QString cutPath = path;
         if(true) cutPath = cutPath.split("/").last();
@@ -65,7 +65,7 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
         if(addDots) cutPath = "..." + cutPath;
 
         const auto pathButton = new QPushButton(cutPath, this);
-        pathButton->setMinimumHeight(5*MIN_WIDGET_HEIGHT/4);
+        pathButton->setMinimumHeight(5*MIN_WIDGET_DIM/4);
         QString ttPath = path;
         if(ttPath.left(homePath.count()) == homePath) {
             ttPath = "~" + ttPath.mid(homePath.count());
@@ -97,7 +97,7 @@ WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,
         }
     }
 
-    mainLay->addSpacing(MIN_WIDGET_HEIGHT);
+    mainLay->addSpacing(MIN_WIDGET_DIM);
 //    const auto recentScroll = new ScrollArea(this);
 //    recentScroll->setWidget(recentWidget);
 //    mainLay->addWidget(recentScroll);

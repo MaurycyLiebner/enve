@@ -5,8 +5,8 @@
 GradientsListWidget::GradientsListWidget(GradientWidget *gradientWidget,
                                          QWidget *parent) :
     ScrollArea(parent) {
-    setFixedHeight(6*MIN_WIDGET_HEIGHT);
-    verticalScrollBar()->setSingleStep(MIN_WIDGET_HEIGHT);
+    setFixedHeight(6*MIN_WIDGET_DIM);
+    verticalScrollBar()->setSingleStep(MIN_WIDGET_DIM);
     mDisplayedGradients = new DisplayedGradientsWidget(gradientWidget, this);
     setWidget(mDisplayedGradients);
 }

@@ -541,7 +541,7 @@ void BoundingBox::drawBoundingRect(SkCanvas * const canvas,
                                    const SkScalar invScale) {
     SkiaHelpers::drawOutlineOverlay(canvas, mSkRelBoundingRectPath,
                                     invScale, toSkMatrix(getTotalTransform()),
-                                    true, MIN_WIDGET_HEIGHT*0.25f);
+                                    true, MIN_WIDGET_DIM*0.25f);
 }
 
 const SkPath &BoundingBox::getRelBoundingRectPath() {

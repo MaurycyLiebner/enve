@@ -93,7 +93,7 @@ void MinimalScrollWidgetVisiblePart::updateParentHeightIfNeeded() {
 
 void MinimalScrollWidgetVisiblePart::updateVisibleWidgets() {
     int neededWidgets = qCeil(mVisibleHeight/
-                              static_cast<qreal>(MIN_WIDGET_HEIGHT));
+                              static_cast<qreal>(MIN_WIDGET_DIM));
     int currentNWidgets = mSingleWidgets.count();
 
     if(neededWidgets == currentNWidgets) return;
@@ -111,7 +111,7 @@ void MinimalScrollWidgetVisiblePart::updateVisibleWidgets() {
     for(const auto& widget : mSingleWidgets) {
         widget->move(widget->x(), yT);
         widget->setFixedWidth(width() - widget->x());
-        yT += MIN_WIDGET_HEIGHT;
+        yT += MIN_WIDGET_DIM;
     }
 
     updateVisibleWidgetsContent();

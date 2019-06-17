@@ -8,7 +8,7 @@ SavedColorButton::SavedColorButton(const QColor &colorT,
                                    QWidget *parent) :
     QWidget(parent) {
     mColor = colorT;
-    setFixedSize(2*MIN_WIDGET_HEIGHT, 2*MIN_WIDGET_HEIGHT);
+    setFixedSize(2*MIN_WIDGET_DIM, 2*MIN_WIDGET_DIM);
 }
 
 void SavedColorButton::mousePressEvent(QMouseEvent *e) {

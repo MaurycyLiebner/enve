@@ -12,7 +12,7 @@ QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
     mMinValue = minVal;
     mMaxValue = maxVal;
     mPrefferedValueStep = prefferedStep;
-    setFixedHeight(MIN_WIDGET_HEIGHT);
+    setFixedHeight(MIN_WIDGET_DIM);
     mLineEdit = new QLineEdit(QLocale().toString(mValue, 'f', mDecimals), this);
     mLineEdit->setProperty("forceHandleEvent", QVariant(true));
     mLineEdit->setAttribute(Qt::WA_TranslucentBackground);
@@ -21,7 +21,7 @@ QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
     mLineEdit->setFocusPolicy(Qt::NoFocus);
     mLineEdit->installEventFilter(this);
     installEventFilter(this);
-    mLineEdit->setFixedHeight(MIN_WIDGET_HEIGHT);
+    mLineEdit->setFixedHeight(MIN_WIDGET_DIM);
     mValidator = new QDoubleValidator(minVal, maxVal, 3, this);
     mValidator->setNotation(QDoubleValidator::StandardNotation);
     mLineEdit->setValidator(mValidator);
@@ -141,7 +141,7 @@ void QDoubleSlider::paint(QPainter *p,
             const qreal valFrac = (mValue - mMinValue)/(mMaxValue - mMinValue);
             const qreal valWidth = clamp(valFrac*width(), 0, width() - 3);
             p->setBrush(sliderFill);
-            const qreal heightRemoval = qMax(0., MIN_WIDGET_HEIGHT/2 - valWidth)*0.5;
+            const qreal heightRemoval = qMax(0., MIN_WIDGET_DIM/2 - valWidth)*0.5;
             p->drawRoundedRect(QRectF(1, 1, valWidth, height() - 2).
                                adjusted(0, heightRemoval,
                                         0, -heightRemoval), 5, 5.);
@@ -207,9 +207,9 @@ void QDoubleSlider::fitWidthToContent() {
         textMin = QString::number(mMinValue, 'f', mDecimals);
     }
     int textWidth = qMax(fm.width(textMax), fm.width(textMin));
-    int newWidth = qMin(3*MIN_WIDGET_HEIGHT,
-                        textWidth + textWidth%2 + MIN_WIDGET_HEIGHT/2);
-    int minWidth = qMax(0, newWidth - MIN_WIDGET_HEIGHT);
+    int newWidth = qMin(3*MIN_WIDGET_DIM,
+                        textWidth + textWidth%2 + MIN_WIDGET_DIM/2);
+    int minWidth = qMax(0, newWidth - MIN_WIDGET_DIM);
     setMinimumWidth(minWidth);
     mLineEdit->setMinimumWidth(minWidth);
     setMaximumWidth(newWidth);

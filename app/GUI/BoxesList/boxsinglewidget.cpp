@@ -265,7 +265,7 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     mCheckBox = new BoolPropertyWidget(this);
     mMainLayout->addWidget(mCheckBox);
 
-    mMainLayout->addSpacing(MIN_WIDGET_HEIGHT/2);
+    mMainLayout->addSpacing(MIN_WIDGET_DIM/2);
 
     hide();
 }
@@ -818,7 +818,7 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
 void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
     if(isTargetDisabled()) return;
     setSelected(false);
-    if(pointToLen(event->pos() - mDragStartPos) > MIN_WIDGET_HEIGHT/2) return;
+    if(pointToLen(event->pos() - mDragStartPos) > MIN_WIDGET_DIM/2) return;
     SingleWidgetTarget *target = mTarget->getTarget();
     if(target->SWT_isBoundingBox() && !target->SWT_isCanvas()) {
         auto boxTarget = GetAsPtr(target, BoundingBox);
@@ -873,7 +873,7 @@ void BoxSingleWidget::drawKeys(QPainter * const p,
     if(target->SWT_isAnimator()) {
         const auto anim_target = static_cast<Animator*>(target);
         anim_target->drawTimelineControls(p, pixelsPerFrame, viewedFrames,
-                                          MIN_WIDGET_HEIGHT);
+                                          MIN_WIDGET_DIM);
     }
 }
 
@@ -936,15 +936,15 @@ int BoxSingleWidget::getOptimalNameRightX() {
     int nameX = mFillWidget->x();
     //return nameX;
     if(target->SWT_isBoundingBox()) {
-        nameX += MIN_WIDGET_HEIGHT/4;
+        nameX += MIN_WIDGET_DIM/4;
     } else if(target->SWT_isQrealAnimator()) {
         if(!fakeComplexAnimator) {
-            nameX += MIN_WIDGET_HEIGHT;
+            nameX += MIN_WIDGET_DIM;
         }
     } else if(target->SWT_isBoxTargetProperty()) {
-        nameX += 2*MIN_WIDGET_HEIGHT;
+        nameX += 2*MIN_WIDGET_DIM;
     } else {//if(target->SWT_isBoolProperty()) {
-        nameX += 2*MIN_WIDGET_HEIGHT;
+        nameX += 2*MIN_WIDGET_DIM;
     }
     return nameX + fm.width(name);
 }
@@ -966,7 +966,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(target->SWT_isBoundingBox()) {
         const auto bb_target = static_cast<BoundingBox*>(target);
 
-        nameX += MIN_WIDGET_HEIGHT/4;
+        nameX += MIN_WIDGET_DIM/4;
         name = bb_target->getName();
 
         p.fillRect(rect(), QColor(0, 0, 0, 50));
@@ -987,14 +987,14 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                 const int id = keysView->graphGetAnimatorId(graphAnim);
                 if(id >= 0) {
                     const auto color = keysView->sGetAnimatorColor(id);
-                    p.fillRect(nameX + MIN_WIDGET_HEIGHT/4, MIN_WIDGET_HEIGHT/4,
-                               MIN_WIDGET_HEIGHT/2, MIN_WIDGET_HEIGHT/2,
+                    p.fillRect(nameX + MIN_WIDGET_DIM/4, MIN_WIDGET_DIM/4,
+                               MIN_WIDGET_DIM/2, MIN_WIDGET_DIM/2,
                                color);
                 }
             }
         }
         name = propTarget->prp_getName();
-        if(!fakeComplexAnimator) nameX += MIN_WIDGET_HEIGHT;
+        if(!fakeComplexAnimator) nameX += MIN_WIDGET_DIM;
 
         p.setPen(Qt::white);
     } else { //if(target->SWT_isComplexAnimator()) {
@@ -1005,7 +1005,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     }
 
     p.drawText(QRect(nameX, 0, width() - nameX -
-                     MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT),
+                     MIN_WIDGET_DIM, MIN_WIDGET_DIM),
                name, QTextOption(Qt::AlignVCenter));
     if(mSelected) {
         p.setBrush(Qt::NoBrush);
@@ -1062,7 +1062,7 @@ void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
         mTarget->contentVisible()) return;
     int nameRightX = getOptimalNameRightX();
     int slidersWidth = mValueSlider->minimumWidth() +
-            mSecondValueSlider->minimumWidth() + MIN_WIDGET_HEIGHT;
+            mSecondValueSlider->minimumWidth() + MIN_WIDGET_DIM;
     if(width() - nameRightX > slidersWidth) {
         const auto pt_target = GetAsPtr(target, QPointFAnimator);
         mValueSlider->setTarget(pt_target->getXAnimator());
@@ -1084,7 +1084,7 @@ void BoxSingleWidget::clearColorButton() {
 void BoxSingleWidget::updatePathCompositionBoxVisible() {
     if(!mTarget) return;
     if(mPathBlendModeVisible) {
-        if(width() > 15*MIN_WIDGET_HEIGHT) {
+        if(width() > 15*MIN_WIDGET_DIM) {
             mPathBlendModeCombo->show();
         } else {
             mPathBlendModeCombo->hide();
@@ -1095,7 +1095,7 @@ void BoxSingleWidget::updatePathCompositionBoxVisible() {
 void BoxSingleWidget::updateCompositionBoxVisible() {
     if(!mTarget) return;
     if(mBlendModeVisible) {
-        if(width() > 15*MIN_WIDGET_HEIGHT) {
+        if(width() > 15*MIN_WIDGET_DIM) {
             mBlendModeCombo->show();
         } else {
             mBlendModeCombo->hide();
@@ -1106,7 +1106,7 @@ void BoxSingleWidget::updateCompositionBoxVisible() {
 void BoxSingleWidget::updateFillTypeBoxVisible() {
     if(!mTarget) return;
     if(mFillTypeVisible) {
-        if(width() > 15*MIN_WIDGET_HEIGHT) {
+        if(width() > 15*MIN_WIDGET_DIM) {
             mFillTypeCombo->show();
         } else {
             mFillTypeCombo->hide();

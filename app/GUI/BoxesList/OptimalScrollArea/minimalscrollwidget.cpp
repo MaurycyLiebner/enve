@@ -23,13 +23,13 @@ void MinimalScrollWidget::setWidth(const int width) {
 }
 
 void MinimalScrollWidget::changeVisibleTop(const int top) {
-    int newTop = top - top % MIN_WIDGET_HEIGHT;
+    int newTop = top - top % MIN_WIDGET_DIM;
     mMinimalVisiblePartWidget->move(0, newTop);
     mMinimalVisiblePartWidget->setVisibleTop(newTop);
 }
 
 void MinimalScrollWidget::changeVisibleHeight(const int height) {
-    int newHeight = qCeil(height/(qreal)MIN_WIDGET_HEIGHT)*
-                    MIN_WIDGET_HEIGHT;
+    int newHeight = qCeil(height/(qreal)MIN_WIDGET_DIM)*
+                    MIN_WIDGET_DIM;
     mMinimalVisiblePartWidget->setVisibleHeight(newHeight);
 }

@@ -346,7 +346,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
 //    mWheelLayout->addWidget(wheel_triangle_widget, Qt::AlignHCenter);
 //    mWheelLayout->setAlignment(wheel_triangle_widget, Qt::AlignHCenter);
 
-    int LABEL_WIDTH = MIN_WIDGET_HEIGHT;
+    int LABEL_WIDTH = MIN_WIDGET_DIM;
 
     r_rect = new ColorValueRect(CVR_RED, this);
     rLabel->setFixedWidth(LABEL_WIDTH);

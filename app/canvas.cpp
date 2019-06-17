@@ -147,7 +147,7 @@ void Canvas::drawTransparencyMesh(SkCanvas * const canvas,
         SkScalar currX = viewRect.left();
         SkScalar currY = viewRect.top();
         SkScalar widthT = static_cast<SkScalar>(
-                    MIN_WIDGET_HEIGHT*0.5*scale);
+                    MIN_WIDGET_DIM*0.5*scale);
         SkScalar heightT = widthT;
         bool isOdd = false;
         while(currY < viewRect.bottom()) {
@@ -240,7 +240,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
             if(mTransMode == MODE_ROTATE || mTransMode == MODE_SCALE) {
                 mRotPivot->drawTransforming(canvas, mCurrentMode, invZoom,
-                                            MIN_WIDGET_HEIGHT*0.25f*invZoom);
+                                            MIN_WIDGET_DIM*0.25f*invZoom);
             } else if(!mouseGrabbing || mRotPivot->isSelected()) {
                 mRotPivot->drawSk(canvas, mCurrentMode, invZoom, false);
             }
@@ -253,8 +253,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
                 paint.setStyle(SkPaint::kStroke_Style);
                 paint.setColor(SkColorSetARGB(255, 0, 0, 255));
                 paint.setStrokeWidth(2*invZoom);
-                const SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invZoom,
-                                               MIN_WIDGET_HEIGHT*0.25f*invZoom};
+                const SkScalar intervals[2] = {MIN_WIDGET_DIM*0.25f*invZoom,
+                                               MIN_WIDGET_DIM*0.25f*invZoom};
                 paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
                 canvas->drawRect(toSkRect(mSelectionRect), paint);
                 paint.setPathEffect(nullptr);
@@ -280,7 +280,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
             canvas->drawRect(canvasRect.makeInset(1, 1), paint);
         }
         if(mTransMode != MODE_NONE || mValueInput.inputEnabled())
-            mValueInput.draw(canvas, drawRect.height() - MIN_WIDGET_HEIGHT);
+            mValueInput.draw(canvas, drawRect.height() - MIN_WIDGET_DIM);
     }
 }
 

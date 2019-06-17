@@ -5,7 +5,7 @@
 
 BoolPropertyWidget::BoolPropertyWidget(QWidget *parent) :
     QWidget(parent) {
-    setFixedSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
+    setFixedSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM);
 }
 
 void BoolPropertyWidget::setTarget(BoolProperty *property) {

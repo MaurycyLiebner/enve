@@ -119,12 +119,12 @@ void KeysView::graphPaint(QPainter *p) {
     QLine *lines = new QLine[static_cast<uint>(nLines)];
     int currLine = 0;
     while(yL > 0) {
-        p->drawText(QRectF(-MIN_WIDGET_HEIGHT/4, yL - incY,
-                           2*MIN_WIDGET_HEIGHT, 2*incY),
+        p->drawText(QRectF(-MIN_WIDGET_DIM/4, yL - incY,
+                           2*MIN_WIDGET_DIM, 2*incY),
                     Qt::AlignCenter,
                     QString::number(currValue, 'f', mValuePrec));
         int yLi = qRound(yL);
-        lines[currLine] = QLine(2*MIN_WIDGET_HEIGHT, yLi, width(), yLi);
+        lines[currLine] = QLine(2*MIN_WIDGET_DIM, yLi, width(), yLi);
         currLine++;
         yL -= incY;
         currValue += mValueInc;
@@ -142,9 +142,9 @@ void KeysView::graphPaint(QPainter *p) {
     p->setTransform(QTransform(transform), true);
 
     const int minVisibleFrame = qFloor(mMinViewedFrame -
-                                       MIN_WIDGET_HEIGHT/(2*mPixelsPerFrame));
+                                       MIN_WIDGET_DIM/(2*mPixelsPerFrame));
     const int maxVisibleFrame = qCeil(mMaxViewedFrame +
-                                      3*MIN_WIDGET_HEIGHT/(2*mPixelsPerFrame));
+                                      3*MIN_WIDGET_DIM/(2*mPixelsPerFrame));
     const FrameRange viewedRange = { minVisibleFrame, maxVisibleFrame};
     for(int i = mGraphAnimators.count() - 1; i >= 0; i--) {
         const QColor &col = ANIMATOR_COLORS.at(i % ANIMATOR_COLORS.length());
@@ -225,7 +225,7 @@ void KeysView::graphResizeEvent(QResizeEvent *) {
 }
 
 void KeysView::graphIncMinShownVal(const qreal inc) {
-    graphSetMinShownVal((MIN_WIDGET_HEIGHT/2)*inc/mPixelsPerValUnit +
+    graphSetMinShownVal((MIN_WIDGET_DIM/2)*inc/mPixelsPerValUnit +
                         mMinShownVal);
 }
 

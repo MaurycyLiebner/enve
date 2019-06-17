@@ -9,8 +9,8 @@ ClosableContainer::ClosableContainer(QWidget *parent) : QWidget(parent) {
                                     this);
     mContentArrow->setObjectName("iconButton");
     mContentArrow->setCheckable(true);
-    mContentArrow->setIconSize(QSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT));
-    mContentArrow->setFixedSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
+    mContentArrow->setIconSize(QSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM));
+    mContentArrow->setFixedSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM);
     connect(mContentArrow, SIGNAL(toggled(bool)),
             this, SLOT(setContentVisible(bool)));
 
@@ -34,7 +34,7 @@ void ClosableContainer::setCheckable(const bool check) {
     if(check == (mCheckBox != nullptr)) return;
     if(check) {
         mCheckBox = new QCheckBox(this);
-        mCheckBox->setFixedSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
+        mCheckBox->setFixedSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM);
         mMainLayout->insertWidget(0, mCheckBox, Qt::AlignTop);
         mMainLayout->setAlignment(mCheckBox, Qt::AlignTop);
         mCheckBox->setChecked(true);

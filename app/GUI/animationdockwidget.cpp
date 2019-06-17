@@ -10,8 +10,8 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     QToolBar(parent) {
     setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-    setIconSize(QSize(qRound(1.25*MIN_WIDGET_HEIGHT),
-                      qRound(1.25*MIN_WIDGET_HEIGHT)));
+    setIconSize(QSize(qRound(1.25*MIN_WIDGET_DIM),
+                      qRound(1.25*MIN_WIDGET_DIM)));
     mLineButton = new ActionButton(
                 ":/icons/node_line.png",
                 "MAKE SEGMENT LINE", this);

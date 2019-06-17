@@ -6,7 +6,7 @@
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent) {
 //    setFormat(QSurfaceFormat::defaultFormat());
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    setMinimumSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
+    setMinimumSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM);
     SkColor bgColor = SkColorSetARGB(255, 60, 60, 60);
     mBgColor = SkColor4f::FromColor(bgColor);
 }
