@@ -248,13 +248,11 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(int id) {
     if(id == 0) {
         newWidget = new BoxesListKeysViewWidget(mDocument,
                                                 mAnimationWidgetScrollbar,
-                                                this,
-                                                mBoxesListKeysViewStack);
+                                                this, mBoxesListKeysViewStack);
+        mAnimationWidgetScrollbar->show();
     } else {
-        newWidget = new BoxesListKeysViewWidget(mDocument,
-                                                nullptr,
-                                                this,
-                                                mBoxesListKeysViewStack);
+        newWidget = new BoxesListKeysViewWidget(mDocument, nullptr,
+                                                this, mBoxesListKeysViewStack);
     }
     newWidget->connectToChangeWidthWidget(mChww);
     newWidget->connectToFrameWidget(mFrameRangeScrollbar);
@@ -274,7 +272,8 @@ void BoxesListAnimationDockWidget::removeBoxesListKeysViewWidget(
             mBoxesListKeysViewWidgets.at(1)->setTopWidget(
                                             mAnimationWidgetScrollbar);
         } else {
-            mAnimationWidgetScrollbar->setParent(nullptr);
+            mAnimationWidgetScrollbar->setParent(this);
+            mAnimationWidgetScrollbar->hide();
         }
     }
     mBoxesListKeysViewWidgets.removeOne(widget);
@@ -297,20 +296,16 @@ RenderWidget *BoxesListAnimationDockWidget::getRenderWidget() {
     return mRenderWidget;
 }
 
-bool BoxesListAnimationDockWidget::processKeyEvent(
-        QKeyEvent *event) {
-    if(event->key() == Qt::Key_Right &&
-            !(event->modifiers() & Qt::ControlModifier)) {
+bool BoxesListAnimationDockWidget::processKeyEvent(QKeyEvent *event) {
+    const int key = event->key();
+    const auto mods = event->modifiers();
+    if(key == Qt::Key_Right && !(mods & Qt::ControlModifier)) {
         mMainWindow->setCurrentFrame(
                     mMainWindow->getCurrentFrame() + 1);
-    } else if(event->key() == Qt::Key_Left &&
-              !(event->modifiers() & Qt::ControlModifier)) {
-        mMainWindow->setCurrentFrame(
-                    mMainWindow->getCurrentFrame() - 1);
-    } else if(event->key() == Qt::Key_Down &&
-              !(event->modifiers() & Qt::ControlModifier)) {
-        Canvas *currCanvas =
-                mMainWindow->getCanvasWindow()->getCurrentCanvas();
+    } else if(key == Qt::Key_Left && !(mods & Qt::ControlModifier)) {
+        mMainWindow->setCurrentFrame(mMainWindow->getCurrentFrame() - 1);
+    } else if(key == Qt::Key_Down && !(mods & Qt::ControlModifier)) {
+        const auto currCanvas = mMainWindow->getCanvasWindow()->getCurrentCanvas();
         if(!currCanvas) return false;
         int targetFrame;
         if(currCanvas->anim_prevRelFrameWithKey(
@@ -318,8 +313,7 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
                 targetFrame)) {
             mMainWindow->setCurrentFrame(targetFrame);
         }
-    } else if(event->key() == Qt::Key_Up &&
-              !(event->modifiers() & Qt::ControlModifier)) {
+    } else if(key == Qt::Key_Up && !(mods & Qt::ControlModifier)) {
         Canvas *currCanvas =
                 mMainWindow->getCanvasWindow()->getCurrentCanvas();
         if(!currCanvas) return false;
@@ -329,9 +323,8 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
                 targetFrame)) {
             mMainWindow->setCurrentFrame(targetFrame);
         }
-    } else if(event->key() == Qt::Key_P &&
-              !(event->modifiers() & Qt::ControlModifier) &&
-              !(event->modifiers() & Qt::AltModifier)) {
+    } else if(key == Qt::Key_P &&
+              !(mods & Qt::ControlModifier) && !(mods & Qt::AltModifier)) {
         mLocalPivot->toggle();
     } else {
         return false;

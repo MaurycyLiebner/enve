@@ -226,8 +226,8 @@ protected:
         for(int i = 0; i < wCount; i++) {
             const auto widget = mWidgets.at(i);
             PosSetter(accumulated, widget);
-            int iNewDim = qRound(mDimPercent.at(i)*thisDim);
-            if(iNewDim < 2*MIN_WIDGET_DIM) iNewDim = 2*MIN_WIDGET_DIM;
+            const int iNewDim = qMax(qRound(mDimPercent.at(i)*thisDim),
+                                     2*MIN_WIDGET_DIM);
             (widget->*DimSetter)(iNewDim);
             (widget->*OtherDimSetter)(thisOtherDim);
             if(i < mResizers.count()) {
@@ -272,18 +272,17 @@ protected:
     }
 
     void updatePercent() {
-        qreal totDim = 0;
+        int totDim = 0;
         for(const auto wid : mWidgets) {
             const int widDim = (wid->*DimGetter)();
-            if(widDim < 2*MIN_WIDGET_DIM) totDim += 2*MIN_WIDGET_DIM;
-            else totDim += widDim;
+            totDim += qMax(2*MIN_WIDGET_DIM, widDim);
         }
 
         mDimPercent.clear();
         for(int i = 0; i < mWidgets.count(); i++) {
-            int widDim = (mWidgets.at(i)->*DimGetter)();
-            if(widDim < 2*MIN_WIDGET_DIM) widDim = 2*MIN_WIDGET_DIM;
-            mDimPercent << widDim/qreal(totDim);
+            const int widDim = qMax(2*MIN_WIDGET_DIM,
+                                    (mWidgets.at(i)->*DimGetter)());
+            mDimPercent << qreal(widDim)/totDim;
         }
     }
 
@@ -299,7 +298,13 @@ public:
     void insertWidget(const int id, QWidget * const widget) {
         mWidgets.insert(id, widget);
         widget->setParent(mThis);
-        (widget->*DimSetter)(3*MIN_WIDGET_DIM);
+        if(id > 0 && mWidgets.count() > 1) {
+            const auto prevWid = mWidgets.at(id - 1);
+            const int dim = (prevWid->*DimGetter)();
+            const int halfDim = dim/2;
+            (prevWid->*DimSetter)(dim % 2 == 0 ? halfDim : halfDim + 1);
+            (widget->*DimSetter)(halfDim);
+        } else (widget->*DimSetter)(3*MIN_WIDGET_DIM);
         updatePercent();
         updateResizers();
         updateSizesAndPositions();
