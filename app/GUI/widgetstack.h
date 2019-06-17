@@ -1,9 +1,10 @@
-#ifndef VERTICALWIDGETSSTACK_H
-#define VERTICALWIDGETSSTACK_H
+#ifndef WIDGETSTACK_H
+#define WIDGETSTACK_H
 
 #include <QWidget>
 #include <QPainter>
 #include <QMouseEvent>
+#include <QBoxLayout>
 
 #include "global.h"
 
@@ -210,10 +211,13 @@ signals:
 template <STACK_TMPL_DEFS>
 class WidgetStackBase {
 protected:
-    WidgetStackBase() {}
+    WidgetStackBase(const QBoxLayout::Direction direction) :
+        mLayout(new QBoxLayout(direction)) {}
 
     void setThis(QWidget * const thisP) {
+        Q_ASSERT(!mThis && thisP);
         mThis = thisP;
+        mThis->setLayout(mLayout);
     }
 
     void updateSizesAndPositions() {
@@ -285,7 +289,6 @@ protected:
             mDimPercent << qreal(widDim)/totDim;
         }
     }
-
 public:
     int childId(QWidget * const child) const {
         return mWidgets.indexOf(child);
@@ -305,27 +308,54 @@ public:
             (prevWid->*DimSetter)(dim % 2 == 0 ? halfDim : halfDim + 1);
             (widget->*DimSetter)(halfDim);
         } else (widget->*DimSetter)(3*MIN_WIDGET_DIM);
-        updatePercent();
-        updateResizers();
-        updateSizesAndPositions();
+        updateAll();
         widget->show();
 
         QObject::connect(widget, &QObject::destroyed, mThis,
-                         [this, widget]() { takeWidget(widget); });
+                         [this, widget]() { removeWidgetBeforeDestroyed(widget); });
     }
 
-    QWidget *takeWidget(QWidget * const widget) {
+    QWidget* replaceWidget(QWidget * const oldWid, QWidget * const newWid) {
+        const int id = mWidgets.indexOf(oldWid);
+        if(id == -1) return nullptr;
+        mWidgets.replace(id, newWid);
+        newWid->setParent(mThis);
+        newWid->setFixedSize(oldWid->size());
+        newWid->move(oldWid->x(), oldWid->y());
+        updateAll();
+        QObject::connect(newWid, &QObject::destroyed, mThis,
+                         [this, newWid]() { removeWidgetBeforeDestroyed(newWid); });
+        QObject::disconnect(oldWid, &QObject::destroyed, mThis, nullptr);
+        return oldWid;
+    }
+
+    QWidget* takeWidget(QWidget * const widget) {
         if(mWidgets.removeOne(widget)) {
             QObject::disconnect(widget, &QObject::destroyed, mThis, nullptr);
-            updatePercent();
-            updateResizers();
-            updateSizesAndPositions();
+            updateAll();
+            widget->setParent(nullptr);
             return widget;
         }
         return nullptr;
     }
+
+    QWidget* asWidget() {
+        return mThis;
+    }
 private:
+    void updateAll() {
+        updatePercent();
+        updateResizers();
+        updateSizesAndPositions();
+    }
+
+    void removeWidgetBeforeDestroyed(QObject * const widObj) {
+        mWidgets.removeOne(static_cast<QWidget*>(widObj));
+        updateAll();
+    }
+
     QWidget * mThis = nullptr;
+    QBoxLayout * const mLayout;
     QList<QWidget*> mWidgets;
     QList<qreal> mDimPercent;
     QList<TResizer*> mResizers;
@@ -349,5 +379,4 @@ protected:
     }
 };
 
-
-#endif // VERTICALWIDGETSSTACK_H
+#endif // WIDGETSTACK_H

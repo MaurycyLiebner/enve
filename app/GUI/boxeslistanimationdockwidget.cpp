@@ -7,7 +7,7 @@
 #include <QScrollBar>
 #include "GUI/BoxesList/boxscrollwidget.h"
 #include "GUI/BoxesList/boxsinglewidget.h"
-#include "verticalwidgetsstack.h"
+#include "widgetstack.h"
 #include "actionbutton.h"
 #include "GUI/RenderWidgets/renderwidget.h"
 #include "boxeslistkeysviewwidget.h"

@@ -62,6 +62,7 @@ SOURCES += main.cpp\
     GUI/Timeline/fixedlenanimationrect.cpp \
     GUI/canvaswindowevents.cpp \
     GUI/welcomedialog.cpp \
+    GUI/widgetstack.cpp \
     PathEffects/custompatheffectcreator.cpp \
     PathEffects/linespatheffect.cpp \
     PathEffects/spatialdisplacepatheffect.cpp \
@@ -86,6 +87,7 @@ SOURCES += main.cpp\
     document.cpp \
     evfileio.cpp \
     paintsettings.cpp \
+    stackwidgetwrapper.cpp \
     svgimporter.cpp \
     Animators/coloranimator.cpp \
     Animators/qstringanimator.cpp \
@@ -178,7 +180,6 @@ SOURCES += main.cpp\
     GUI/noshortcutaction.cpp \
     GUI/keyfocustarget.cpp \
     GUI/usagewidget.cpp \
-    GUI/verticalwidgetsstack.cpp \
     GUI/valueinput.cpp \
     GUI/twocolumnlayout.cpp \
     GUI/qrealpointvaluedialog.cpp \
@@ -275,6 +276,7 @@ HEADERS  += \
     GUI/Timeline/durationrectangle.h \
     GUI/Timeline/fixedlenanimationrect.h \
     GUI/welcomedialog.h \
+    GUI/widgetstack.h \
     PathEffects/custompatheffectcreator.h \
     PathEffects/linespatheffect.h \
     PathEffects/spatialdisplacepatheffect.h \
@@ -297,6 +299,7 @@ HEADERS  += \
     GUI/ColorWidgets/glwidget.h \
     document.h \
     paintsettings.h \
+    stackwidgetwrapper.h \
     svgimporter.h \
     keypoint.h \
     Animators/qstringanimator.h \
@@ -398,7 +401,6 @@ HEADERS  += \
     GUI/twocolumnlayout.h \
     GUI/usagewidget.h \
     GUI/valueinput.h \
-    GUI/verticalwidgetsstack.h \
     GUI/glwindow.h \
     GUI/noshortcutaction.h \
     GUI/qrealpointvaluedialog.h \
