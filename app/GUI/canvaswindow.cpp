@@ -48,17 +48,6 @@ CanvasWindow::CanvasWindow(Document &document, QWidget * const parent) :
             this, &CanvasWindow::interruptOutputRendering);
     connect(vidEmitter, &VideoEncoderEmitter::encodingStartFailed,
             this, &CanvasWindow::interruptOutputRendering);
-
-    connect(this, &GLWindow::programChanged, this,
-    [this](GPURasterEffectProgram * program) {
-        for(const auto& canvas : mDocument.fScenes)
-            canvas->updateIfUsesProgram(program);
-    });
-
-    connect(this, &GLWindow::queAfterProgramsChanged, this, [this]() {
-        TaskScheduler::sGetInstance()->clearTasks();
-        queScheduledTasksAndUpdate();
-    });
 }
 
 Canvas *CanvasWindow::getCurrentCanvas() {

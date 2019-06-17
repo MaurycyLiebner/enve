@@ -28,9 +28,6 @@ protected:
     void bindSkia();
     void resizeEvent(QResizeEvent *);
 
-    GLuint mPlainSquareVAO;
-    GLuint mTexturedSquareVAO;
-
     sk_sp<const GrGLInterface> mInterface;
     sk_sp<GrContext> mGrContext;
     sk_sp<SkSurface> mSurface;
@@ -41,39 +38,6 @@ protected:
 
     bool event(QEvent *event);
     //void exposeEvent(QExposeEvent *event);
-signals:
-    void programChanged(GPURasterEffectProgram*);
-    void queAfterProgramsChanged();
-private:
-    struct NewGPUEffect {
-        QString fGrePath;
-        QString fFragPath;
-
-        bool operator==(const NewGPUEffect& other) const {
-            return fGrePath == other.fGrePath;
-        }
-    };
-
-    struct FragReload {
-        GPURasterEffectCreator *fCreator;
-        QString fFragPath;
-
-        bool operator==(const FragReload& other) const {
-            return fCreator == other.fCreator;
-        }
-    };
-
-    bool mWaitingFragReloads = false;
-    QList<FragReload> mFragReloads;
-
-    bool mWaitingGPUEffects = false;
-    QList<NewGPUEffect> mNewGPUEffects;
-    QList<QString> mLoadedGREPaths;
-
-    void checkCompileErrors(GLuint shader, std::string type);
-    void iniRasterEffectProgram(const QString& grePath);
-    void iniRasterEffectPrograms();
-    void iniCustomPathEffects();
 };
 
 #endif // GLWINDOW_H

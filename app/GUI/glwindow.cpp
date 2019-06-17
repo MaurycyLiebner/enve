@@ -54,139 +54,6 @@ void GLWindow::resizeEvent(QResizeEvent *) {
     }
 }
 
-#include "PathEffects/custompatheffect.h"
-#include "PathEffects/custompatheffectcreator.h"
-void iniCustomPathEffect(const QString& path) {
-    try {
-        CustomPathEffectCreator::sLoadCustomPathEffect(path);
-    } catch(...) {
-        RuntimeThrow("Error while loading PathEffect from '" + path + "'");
-    }
-}
-
-void iniIfCustomPathEffect(const QString& path) {
-    const QFileInfo fileInfo(path);
-    if(!fileInfo.isFile()) return;
-    if(!fileInfo.completeSuffix().contains("so")) return;
-    try {
-        iniCustomPathEffect(path);
-    } catch(const std::exception& e) {
-        gPrintExceptionCritical(e);
-    }
-}
-
-#include <QFileSystemModel>
-void GLWindow::iniCustomPathEffects() {
-    const QString dirPath = QDir::homePath() + "/.enve/PathEffects";
-    QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
-    while(dirIt.hasNext()) {
-        iniIfCustomPathEffect(dirIt.next());
-    }
-    const auto newFileWatcher = QSharedPointer<QFileSystemModel>(
-                new QFileSystemModel);
-    newFileWatcher->setRootPath(dirPath);
-    connect(newFileWatcher.get(), &QFileSystemModel::rowsInserted, this,
-    [newFileWatcher](const QModelIndex &parent, int first, int last) {
-        for(int row = first; row <= last; row++) {
-            const auto rowIndex = newFileWatcher->index(row, 0, parent);
-            const QString path = newFileWatcher->filePath(rowIndex);
-            iniIfCustomPathEffect(path);
-        }
-    });
-}
-
-#include "glhelpers.h"
-#include "ColorWidgets/colorwidgetshaders.h"
-#include "GPUEffects/gpurastereffect.h"
-#include <QFileSystemWatcher>
-
-void GLWindow::iniRasterEffectProgram(const QString& grePath) {
-    if(!QFile(grePath).exists()) return;
-    const QFileInfo fileInfo(grePath);
-    const QString fragPath = fileInfo.path() + "/" +
-            fileInfo.completeBaseName() + ".frag";
-    if(!QFile(fragPath).exists()) return;
-    try {
-        const auto loaded = GPURasterEffectCreator::sLoadFromFile(this, grePath).get();
-        mLoadedGREPaths << grePath;
-
-        const auto newFileWatcher = QSharedPointer<QFileSystemWatcher>(
-                    new QFileSystemWatcher);
-        newFileWatcher->addPath(fragPath);
-        connect(newFileWatcher.get(), &QFileSystemWatcher::fileChanged,
-                this, [this, loaded, fragPath, newFileWatcher]() {
-            if(mFragReloads.contains({loaded, fragPath})) return;
-            mFragReloads.append({loaded, fragPath});
-            mWaitingFragReloads = true;
-            requestUpdate();
-        });
-    } catch(...) {
-        const auto newFileWatcher = QSharedPointer<QFileSystemWatcher>(
-                    new QFileSystemWatcher);
-        newFileWatcher->addPath(grePath);
-        newFileWatcher->addPath(fragPath);
-        connect(newFileWatcher.get(), &QFileSystemWatcher::fileChanged,
-                this, [this, grePath, fragPath, newFileWatcher]() {
-            if(mNewGPUEffects.contains({grePath, fragPath})) return;
-            mNewGPUEffects.append({grePath, fragPath});
-            mWaitingGPUEffects = true;
-            requestUpdate();
-        });
-        RuntimeThrow("Error while loading GPURasterEffect from '" + grePath + "'");
-    }
-}
-
-void GLWindow::iniRasterEffectPrograms() {
-    const QString dirPath = QDir::homePath() + "/.enve/GPURasterEffects";
-    QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
-    while(dirIt.hasNext()) {
-        const QString path = dirIt.next();
-        const QFileInfo fileInfo(path);
-        if(!fileInfo.isFile()) continue;
-        if(fileInfo.suffix() != "gre") continue;
-        try {
-            iniRasterEffectProgram(path);
-        } catch(const std::exception& e) {
-            gPrintExceptionCritical(e);
-        }
-    }
-
-    const auto newFileWatcher = QSharedPointer<QFileSystemModel>(
-                new QFileSystemModel);
-    newFileWatcher->setRootPath(dirPath);
-    connect(newFileWatcher.get(), &QFileSystemModel::directoryLoaded,
-            this, [this, newFileWatcher]() {
-        connect(newFileWatcher.get(), &QFileSystemModel::rowsInserted, this,
-        [this, newFileWatcher](const QModelIndex &parent, int first, int last) {
-            for(int row = first; row <= last; row++) {
-                const auto rowIndex = newFileWatcher->index(row, 0, parent);
-                const QString path = newFileWatcher->filePath(rowIndex);
-                const QFileInfo fileInfo(path);
-                if(!fileInfo.isFile()) return;
-                const QString suffix = fileInfo.suffix();
-                QString grePath;
-                QString fragPath;
-                if(suffix == "gre") {
-                    fragPath = fileInfo.path() + "/" +
-                            fileInfo.completeBaseName() + ".frag";
-                    if(!QFile(fragPath).exists()) continue;
-                    grePath = path;
-                } else if(suffix == "frag") {
-                    grePath = fileInfo.path() + "/" +
-                            fileInfo.completeBaseName() + ".gre";
-                    fragPath = path;
-                    if(!QFile(grePath).exists()) continue;
-                } else continue;
-                if(mLoadedGREPaths.contains(grePath)) continue;
-                if(mNewGPUEffects.contains({grePath, fragPath})) continue;
-                mNewGPUEffects.append({grePath, fragPath});
-                mWaitingGPUEffects = true;
-                requestUpdate();
-            }
-        });
-    });
-}
-
 void GLWindow::initialize() {
     glClearColor(1, 1, 1, 1);
 
@@ -219,18 +86,6 @@ void GLWindow::initialize() {
         RuntimeThrow("Failed to bind SKIA.");
     }
 
-    try {
-        iniPlainVShaderVBO(this);
-        iniPlainVShaderVAO(this, mPlainSquareVAO);
-        iniTexturedVShaderVBO(this);
-        iniTexturedVShaderVAO(this, mTexturedSquareVAO);
-        iniColorPrograms(this);
-    } catch(...) {
-        RuntimeThrow("Error initializing OpenGL programs.");
-    }
-
-    iniCustomPathEffects();
-    iniRasterEffectPrograms();
 //    qDebug() << "OpenGL Info";
 //    qDebug() << "  Vendor: " << rcConstChar(glGetString(GL_VENDOR));
 //    qDebug() << "  Renderer: " << QString((const char*)glGetString(GL_RENDERER));;
@@ -274,36 +129,6 @@ void GLWindow::renderNow() {
         }
     } catch(const std::exception& e) {
         gPrintExceptionFatal(e);
-    }
-
-    if(mWaitingGPUEffects) {
-        for(const auto& newGPUEffect : mNewGPUEffects) {
-            if(!QFile(newGPUEffect.fGrePath).exists() ||
-               !QFile(newGPUEffect.fFragPath).exists()) continue;
-            try {
-                iniRasterEffectProgram(newGPUEffect.fGrePath);
-            } catch(const std::exception& e) {
-                gPrintExceptionCritical(e);
-            }
-        }
-        mNewGPUEffects.clear();
-        mWaitingGPUEffects = false;
-    }
-
-    if(mWaitingFragReloads) {
-        for(const auto& reload : mFragReloads) {
-            if(!QFile(reload.fFragPath).exists()) continue;
-            try {
-                reload.fCreator->reloadProgram(this, reload.fFragPath);
-                emit programChanged(&reload.fCreator->fProgram);
-            } catch(const std::exception& e) {
-                gPrintExceptionCritical(e);
-            }
-        }
-        mFragReloads.clear();
-        mWaitingFragReloads = false;
-
-        emit queAfterProgramsChanged();
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, mContext->defaultFramebufferObject());

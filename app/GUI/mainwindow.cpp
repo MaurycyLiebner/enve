@@ -106,7 +106,14 @@ MainWindow::MainWindow(QWidget *parent)
     mBottomDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
 
-    mEffectsLoader.initialize();
+    mEffectsLoader = new EffectsLoader;
+    mEffectsLoader->initialize();
+    connect(mEffectsLoader, &EffectsLoader::programChanged, this,
+    [this](GPURasterEffectProgram * program) {
+        for(const auto& scene : mDocument.fScenes)
+            scene->updateIfUsesProgram(program);
+        queScheduledTasksAndUpdate();
+    });
 
     mCanvasWindow = new CanvasWindow(mDocument, this);
     connect(mMemoryHandler, &MemoryHandler::allMemoryUsed,

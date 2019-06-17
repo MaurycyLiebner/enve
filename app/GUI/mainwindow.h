@@ -325,7 +325,7 @@ private:
     TaskScheduler mTaskScheduler;
     Document mDocument;
     CanvasWindow *mCanvasWindow;
-    EffectsLoader mEffectsLoader;
+    EffectsLoader *mEffectsLoader;
     stdptr<UndoRedoStack> mCurrentUndoRedoStack;
 
     bool processKeyEvent(QKeyEvent *event);
