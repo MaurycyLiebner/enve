@@ -34,6 +34,7 @@
 #include "memoryhandler.h"
 #include "GUI/BrushWidgets/brushselectionwidget.h"
 #include "Animators/gradient.h"
+#include "canvaswindowwrapper.h"
 extern "C" {
     #include <libavformat/avformat.h>
 }
@@ -222,16 +223,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     connectToolBarActions();
 
-    setCentralWidget(mCanvasWindow->getCanvasWidget());
+    setCentralWidget(new CanvasWindowWrapper(&mDocument, this));
+    //setCentralWidget(mCanvasWindow->getCanvasWidget());
 
     showMaximized();
 
     this->setMouseTracking(true);
     centralWidget()->setMouseTracking(true);
+    mCanvasWindow->hide();
 
     readRecentFiles();
     updateRecentMenu();
-    mCanvasWindow->openWelcomeDialog();
+    //mCanvasWindow->openWelcomeDialog();
 
     mEventFilterDisabled = false;
 

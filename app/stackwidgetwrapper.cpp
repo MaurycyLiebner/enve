@@ -6,7 +6,8 @@ StackWidgetWrapper::StackWidgetWrapper(const SetupOp &setup,
     QWidget(parent), mSetupOp(setup) {
     mLayout = new QVBoxLayout(this);
     setLayout(mLayout);
-
+    mLayout->setSpacing(0);
+    mLayout->setMargin(0);
     mSetupOp(this);
 }
 
@@ -32,9 +33,9 @@ void StackWidgetWrapper::splitV() {
 }
 
 StackWrapperMenu::StackWrapperMenu() {
-    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
-
+    setFixedHeight(MIN_WIDGET_DIM);
     QMenuBar * const actBar = new QMenuBar(this);
+    actBar->setFixedHeight(MIN_WIDGET_DIM);
     mSplitV = new QAction("split v");
     mSplitH = new QAction("split h");
     mClose = new QAction("x");
@@ -42,7 +43,23 @@ StackWrapperMenu::StackWrapperMenu() {
     actBar->addAction(mSplitV);
     actBar->addAction(mSplitH);
     actBar->addAction(mClose);
-    setCornerWidget(actBar);
+
+
+    mMenuBarLayout = new QHBoxLayout(this);
+    mMenuBarLayout->setSpacing(0);
+    mMenuBarLayout->setMargin(0);
+    mLayout = new QHBoxLayout();
+    mMenuBarLayout->addLayout(mLayout);
+//    mLayout->setContentsMargins(MIN_WIDGET_DIM, MIN_WIDGET_DIM/10,
+//                                MIN_WIDGET_DIM/10, MIN_WIDGET_DIM);
+    mMenuBarLayout->addWidget(actBar, 0, Qt::AlignRight);
+    setLayout(mMenuBarLayout);
+
+    setObjectName("menuBarWidget");
+}
+
+void StackWrapperMenu::addWidget(QWidget * const widget) {
+    mLayout->addWidget(widget);
 }
 
 void StackWrapperMenu::setParent(StackWidgetWrapper * const parent) {

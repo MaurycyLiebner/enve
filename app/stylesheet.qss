@@ -22,6 +22,14 @@ QWidget#darkWidget {
     background: rgb(45, 45, 45);
 }
 
+QWidget#menuBarWidget {
+    border-top: 0;
+    border-bottom: 1px solid black;
+    color: black;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+    stop:0 lightgray, stop:1 darkgray);
+}
+
 QComboBox {
     background-color: rgb(200, 200, 200);
     border: 1px solid black;

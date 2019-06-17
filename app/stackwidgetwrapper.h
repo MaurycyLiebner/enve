@@ -41,12 +41,17 @@ private:
     QWidget* mCenterWidget = nullptr;
 };
 
-class StackWrapperMenu : public QMenuBar {
+class StackWrapperMenu : public QWidget {
     friend class StackWidgetWrapper;
 protected:
     explicit StackWrapperMenu();
+
+    void addWidget(QWidget * const widget);
 private:
     void setParent(StackWidgetWrapper * const parent);
+
+    QHBoxLayout* mMenuBarLayout = nullptr;
+    QHBoxLayout* mLayout = nullptr;
 
     StackWidgetWrapper * mParent = nullptr;
 

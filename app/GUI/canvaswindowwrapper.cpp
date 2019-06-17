@@ -9,16 +9,15 @@ class CanvasWrapperMenuBar : public StackWrapperMenu {
 public:
     CanvasWrapperMenuBar(Document& document, CanvasWindow * const window) :
         mDocument(document), mWindow(window) {
-        mLayout = new QHBoxLayout(this);
-        setLayout(mLayout);
         mSceneCombo = new QComboBox(this);
-        mSceneCombo->addItem("");
-        mLayout->addWidget(mSceneCombo);
+        mSceneCombo->setMinimumContentsLength(10);
+        mSceneCombo->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         for(const auto& scene : mDocument.fScenes)
             addScene(scene.get());
+        addWidget(mSceneCombo);
 
         connect(mSceneCombo, qOverload<int>(&QComboBox::currentIndexChanged),
-                this, [this](const int id) { setCurrentSceneId(id - 1); });
+                this, &CanvasWrapperMenuBar::setCurrentSceneId);
         connect(&mDocument, qOverload<int>(&Document::sceneRemoved),
                 this, &CanvasWrapperMenuBar::removeScene);
         connect(&mDocument, &Document::sceneCreated,
@@ -30,22 +29,16 @@ private:
     }
 
     void removeScene(const int id) {
-        mSceneCombo->removeItem(id + 1);
+        mSceneCombo->removeItem(id);
     }
 
     void setCurrentSceneId(const int id) {
-        if(id < 0) setCurrentScene(nullptr);
-        else setCurrentScene(mDocument.fScenes.at(id).get());
-    }
-
-    void setCurrentScene(Canvas * const scene) {
-        if(!scene) mSceneCombo->setCurrentIndex(0);
-        mWindow->setCurrentCanvas(scene);
+        if(id < 0) mWindow->setCurrentCanvas(nullptr);
+        else mWindow->setCurrentCanvas(mDocument.fScenes.at(id).get());
     }
 
     Document& mDocument;
     CanvasWindow * const mWindow;
-    QHBoxLayout * mLayout;
     QComboBox* mSceneCombo;
 };
 
