@@ -13,6 +13,7 @@ class Canvas;
 enum CanvasMode : short;
 
 class Document : public SingleWidgetTarget {
+    Q_OBJECT
     typedef stdsptr<FileCacheHandler> FileHandler;
     struct FileCompare {
         bool operator()(const FileHandler& f1, const FileHandler& f2);
@@ -54,6 +55,10 @@ public:
     void SWT_setupAbstraction(SWT_Abstraction * const abstraction,
                               const UpdateFuncs &updateFuncs,
                               const int visiblePartWidgetId);
+signals:
+    void sceneCreated(Canvas*);
+    void sceneRemoved(Canvas*);
+    void sceneRemoved(int);
 };
 
 #endif // DOCUMENT_H

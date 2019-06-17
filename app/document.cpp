@@ -8,15 +8,18 @@ bool Document::FileCompare::operator()(const FileHandler &f1,
 }
 
 Canvas *Document::createNewScene() {
-    const auto newCanvas = SPtrCreate(Canvas)(*this);
-    fScenes.append(newCanvas);
-    SWT_addChild(newCanvas.get());
-    return newCanvas.get();
+    const auto newScene = SPtrCreate(Canvas)(*this);
+    fScenes.append(newScene);
+    SWT_addChild(newScene.get());
+    emit sceneCreated(newScene.get());
+    return newScene.get();
 }
 
 void Document::removeScene(const int id) {
-    const auto canvas = fScenes.takeAt(id);
-    SWT_removeChild(canvas.data());
+    const auto scene = fScenes.takeAt(id);
+    SWT_removeChild(scene.data());
+    emit sceneRemoved(scene.data());
+    emit sceneRemoved(id);
 }
 
 void Document::setActiveScene(Canvas * const scene) {

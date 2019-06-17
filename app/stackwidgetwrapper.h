@@ -29,7 +29,7 @@ private:
         if(window) {
             window->takeCentralWidget();
             window->setCentralWidget(stack);
-        } else layout->replaceWidget(this, stack);
+        } else layout->replaceWidget(this, stack, Qt::FindDirectChildrenOnly);
         stack->appendWidget(this);
         const auto newWid = new StackWidgetWrapper(mSetupOp, stack);
         stack->appendWidget(newWid);

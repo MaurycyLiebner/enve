@@ -63,7 +63,7 @@ protected:
         }
         (mPrevWidget->*DimSetter)((mPrevWidget->*DimGetter)() + dDim);
         (mNextWidget->*DimSetter)((mNextWidget->*DimGetter)() - dDim);
-        PosSetter((mNextWidget->*PosGetter)() + dDim, mNextWidget);
+        //PosSetter((mNextWidget->*PosGetter)() + dDim, mNextWidget);
         PosSetter((mThis->*PosGetter)() + dDim, mThis);
     }
 
@@ -212,7 +212,10 @@ template <STACK_TMPL_DEFS>
 class WidgetStackBase {
 protected:
     WidgetStackBase(const QBoxLayout::Direction direction) :
-        mLayout(new QBoxLayout(direction)) {}
+        mLayout(new QBoxLayout(direction)) {
+        mLayout->setSpacing(0);
+        mLayout->setMargin(0);
+    }
 
     void setThis(QWidget * const thisP) {
         Q_ASSERT(!mThis && thisP);
@@ -229,7 +232,7 @@ protected:
         const int thisOtherDim = (mThis->*OtherDimGetter)();;
         for(int i = 0; i < wCount; i++) {
             const auto widget = mWidgets.at(i);
-            PosSetter(accumulated, widget);
+            //PosSetter(accumulated, widget);
             const int iNewDim = qMax(qRound(mDimPercent.at(i)*thisDim),
                                      2*MIN_WIDGET_DIM);
             (widget->*DimSetter)(iNewDim);
@@ -240,7 +243,7 @@ protected:
             accumulated += iNewDim;
         }
         const auto lastWidget = mWidgets.last();
-        PosSetter(accumulated, lastWidget);
+        //PosSetter(accumulated, lastWidget);
         const int lastDim = thisDim - accumulated;
         (lastWidget->*DimSetter)(lastDim);
         (lastWidget->*OtherDimSetter)(thisOtherDim);
@@ -299,8 +302,9 @@ public:
     }
 
     void insertWidget(const int id, QWidget * const widget) {
-        mWidgets.insert(id, widget);
-        widget->setParent(mThis);
+        mWidgets.insert(id >= 0 ? id : mWidgets.count(), widget);
+        mLayout->insertWidget(id, widget);
+        //widget->setParent(mThis);
         if(id > 0 && mWidgets.count() > 1) {
             const auto prevWid = mWidgets.at(id - 1);
             const int dim = (prevWid->*DimGetter)();
@@ -319,9 +323,10 @@ public:
         const int id = mWidgets.indexOf(oldWid);
         if(id == -1) return nullptr;
         mWidgets.replace(id, newWid);
-        newWid->setParent(mThis);
+        mLayout->replaceWidget(oldWid, newWid);
+        //newWid->setParent(mThis);
         newWid->setFixedSize(oldWid->size());
-        newWid->move(oldWid->x(), oldWid->y());
+        //newWid->move(oldWid->x(), oldWid->y());
         updateAll();
         QObject::connect(newWid, &QObject::destroyed, mThis,
                          [this, newWid]() { removeWidgetBeforeDestroyed(newWid); });
@@ -332,16 +337,15 @@ public:
     QWidget* takeWidget(QWidget * const widget) {
         if(mWidgets.removeOne(widget)) {
             QObject::disconnect(widget, &QObject::destroyed, mThis, nullptr);
+            mLayout->removeWidget(widget);
             updateAll();
-            widget->setParent(nullptr);
+            //widget->setParent(nullptr);
             return widget;
         }
         return nullptr;
     }
 
-    QWidget* asWidget() {
-        return mThis;
-    }
+    QWidget* asWidget() { return mThis; }
 private:
     void updateAll() {
         updatePercent();

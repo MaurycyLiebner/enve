@@ -34,7 +34,7 @@ class CanvasWindow : public GLWindow,
         public KeyFocusTarget {
     Q_OBJECT
 public:
-    explicit CanvasWindow(Document& document, QWidget * const parent);
+    explicit CanvasWindow(Document& document, QWidget * const parent = nullptr);
 
     Canvas *getCurrentCanvas();
 
