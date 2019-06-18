@@ -9,39 +9,70 @@ class CanvasWrapperMenuBar : public StackWrapperMenu {
 public:
     CanvasWrapperMenuBar(Document& document, CanvasWindow * const window) :
         mDocument(document), mWindow(window) {
-        mSceneCombo = new QComboBox(this);
-        mSceneCombo->setMinimumContentsLength(10);
-        mSceneCombo->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        mSceneMenu = addMenu("none");
+        mSceneMenu->setDisabled(true);
         for(const auto& scene : mDocument.fScenes)
             addScene(scene.get());
-        addWidget(mSceneCombo);
 
-        connect(mSceneCombo, qOverload<int>(&QComboBox::currentIndexChanged),
-                this, &CanvasWrapperMenuBar::setCurrentSceneId);
-        connect(&mDocument, qOverload<int>(&Document::sceneRemoved),
+        connect(&mDocument, qOverload<Canvas*>(&Document::sceneRemoved),
                 this, &CanvasWrapperMenuBar::removeScene);
         connect(&mDocument, &Document::sceneCreated,
                 this, &CanvasWrapperMenuBar::addScene);
     }
 private:
     void addScene(Canvas * const scene) {
-        mSceneCombo->addItem(scene->getName());
+        if(!scene) return;
+        if(mSceneToAct.empty()) mSceneMenu->setEnabled(true);
+        const auto act = mSceneMenu->addAction(scene->getName());
+        act->setCheckable(true);
+        connect(act, &QAction::triggered, this,
+                [this, scene, act]() { setCurrentScene(scene, act); });
+        connect(scene, &Canvas::canvasNameChanged, act,
+                [this, act](Canvas* const scene, const QString& name) {
+            if(scene == mCurrentScene) mSceneMenu->setTitle(name);
+            act->setText(name);
+        });
+        mSceneToAct.insert({scene, act});
+        if(!mCurrentScene) setCurrentScene(scene, act);
     }
 
-    void removeScene(const int id) {
-        mSceneCombo->removeItem(id);
+    void removeScene(Canvas * const scene) {
+        const auto removeIt = mSceneToAct.find(scene);
+        if(removeIt == mSceneToAct.end()) return;
+        if(mCurrentScene == scene) {
+            const auto newIt = mSceneToAct.begin();
+            if(newIt == mSceneToAct.end()) setCurrentScene(nullptr, nullptr);
+            else {
+                setCurrentScene(newIt->first, newIt->second);
+            }
+        }
+        mSceneMenu->removeAction(removeIt->second);
+        delete removeIt->second;
+        mSceneToAct.erase(removeIt);
+        if(mSceneToAct.empty()) mSceneMenu->setDisabled(true);
     }
 
-    void setCurrentSceneId(const int id) {
-        if(id < 0) mWindow->setCurrentCanvas(nullptr);
-        else mWindow->setCurrentCanvas(mDocument.fScenes.at(id).get());
+    void setCurrentScene(Canvas * const scene, QAction * const act) {
+        if(act) {
+            act->setChecked(true);
+            act->setDisabled(true);
+        } if(mCurrentScene) {
+            const auto currAct = mSceneToAct[mCurrentScene];
+            currAct->setChecked(false);
+            currAct->setEnabled(true);
+        }
+        mSceneMenu->setTitle(scene ? scene->getName() : "none");
+        mWindow->setCurrentCanvas(scene);
+        mCurrentScene = scene;
     }
 
     Document& mDocument;
     CanvasWindow * const mWindow;
-    QComboBox* mSceneCombo;
+    QMenu * mSceneMenu;
+    Canvas * mCurrentScene = nullptr;
+    std::map<Canvas*, QAction*> mSceneToAct;
 };
-
+#include <QLabel>
 CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
                                          QWidget * const parent) :
     StackWidgetWrapper(

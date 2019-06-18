@@ -32,6 +32,40 @@ void StackWidgetWrapper::splitV() {
     split<VWidgetStack>();
 }
 
+void StackWidgetWrapper::closeWrapper() {
+    const auto vStack = dynamic_cast<VWidgetStack*>(parentWidget());
+    if(vStack) {
+        vStack->takeWidget(this);
+        if(vStack->count() == 1) {
+            const auto wid = vStack->takeWidget(0);
+            bool central = false;
+            gReplaceWidget(vStack, wid, &central);
+            vStack->deleteLater();
+            if(central) {
+                const auto sww = dynamic_cast<StackWidgetWrapper*>(wid);
+                if(sww) sww->disableClose();
+            }
+        }
+    } else {
+        const auto hStack = dynamic_cast<HWidgetStack*>(parentWidget());
+        if(hStack) {
+            hStack->takeWidget(this);
+            if(hStack->count() == 1) {
+                const auto wid = hStack->takeWidget(0);
+                bool central = false;
+                gReplaceWidget(hStack, wid, &central);
+                hStack->deleteLater();
+                if(central) {
+                    const auto sww = dynamic_cast<StackWidgetWrapper*>(wid);
+                    if(sww) sww->disableClose();
+                }
+            }
+        }
+    }
+
+    deleteLater();
+}
+
 StackWrapperMenu::StackWrapperMenu() {
     setFixedHeight(MIN_WIDGET_DIM);
     QMenuBar * const actBar = new QMenuBar(this);
@@ -44,22 +78,7 @@ StackWrapperMenu::StackWrapperMenu() {
     actBar->addAction(mSplitH);
     actBar->addAction(mClose);
 
-
-    mMenuBarLayout = new QHBoxLayout(this);
-    mMenuBarLayout->setSpacing(0);
-    mMenuBarLayout->setMargin(0);
-    mLayout = new QHBoxLayout();
-    mMenuBarLayout->addLayout(mLayout);
-//    mLayout->setContentsMargins(MIN_WIDGET_DIM, MIN_WIDGET_DIM/10,
-//                                MIN_WIDGET_DIM/10, MIN_WIDGET_DIM);
-    mMenuBarLayout->addWidget(actBar, 0, Qt::AlignRight);
-    setLayout(mMenuBarLayout);
-
-    setObjectName("menuBarWidget");
-}
-
-void StackWrapperMenu::addWidget(QWidget * const widget) {
-    mLayout->addWidget(widget);
+    setCornerWidget(actBar);
 }
 
 void StackWrapperMenu::setParent(StackWidgetWrapper * const parent) {
@@ -78,6 +97,6 @@ void StackWrapperMenu::setParent(StackWidgetWrapper * const parent) {
         connect(mSplitH, &QAction::triggered,
                 mParent, &StackWidgetWrapper::splitH);
         connect(mClose, &QAction::triggered,
-                mParent, &StackWidgetWrapper::deleteLater);
+                mParent, &StackWidgetWrapper::closeWrapper);
     }
 }

@@ -1,11 +1,34 @@
 #ifndef STACKWIDGETWRAPPER_H
 #define STACKWIDGETWRAPPER_H
 
-#include <QWidget>
+#include "GUI/widgetstack.h"
+
 #include <QMenuBar>
 #include <QVBoxLayout>
 #include <QMainWindow>
-class StackWrapperMenu;
+class StackWidgetWrapper;
+
+class StackWrapperMenu : public QMenuBar {
+    friend class StackWidgetWrapper;
+protected:
+    explicit StackWrapperMenu();
+private:
+    void setParent(StackWidgetWrapper * const parent);
+
+    void disableClose() {
+        mClose->setVisible(false);
+    }
+
+    void enableClose() {
+        mClose->setVisible(true);
+    }
+
+    StackWidgetWrapper * mParent = nullptr;
+
+    QAction * mSplitV = nullptr;
+    QAction * mSplitH = nullptr;
+    QAction * mClose = nullptr;
+};
 
 class StackWidgetWrapper : public QWidget {
 public:
@@ -18,22 +41,14 @@ public:
 
     void splitH();
     void splitV();
+
+    void closeWrapper();
+    void disableClose() {
+        if(mMenuBar) mMenuBar->disableClose();
+    }
 private:
     template <class T>
-    void split() {
-        if(!parentWidget()) return;
-        const auto layout = parentWidget()->layout();
-        const auto window = qobject_cast<QMainWindow*>(parentWidget());
-        if(!layout && !window) return;
-        const auto stack = new T(parentWidget());
-        if(window) {
-            window->takeCentralWidget();
-            window->setCentralWidget(stack);
-        } else layout->replaceWidget(this, stack, Qt::FindDirectChildrenOnly);
-        stack->appendWidget(this);
-        const auto newWid = new StackWidgetWrapper(mSetupOp, stack);
-        stack->appendWidget(newWid);
-    }
+    void split();
 
     const SetupOp mSetupOp;
     QVBoxLayout* mLayout;
@@ -41,23 +56,19 @@ private:
     QWidget* mCenterWidget = nullptr;
 };
 
-class StackWrapperMenu : public QWidget {
-    friend class StackWidgetWrapper;
-protected:
-    explicit StackWrapperMenu();
+template <class T>
+void StackWidgetWrapper::split() {
+    if(mMenuBar) mMenuBar->enableClose();
+    const auto stack = new T(parentWidget());
 
-    void addWidget(QWidget * const widget);
-private:
-    void setParent(StackWidgetWrapper * const parent);
+    if(!gReplaceWidget(this, stack)) {
+        delete stack;
+        return;
+    }
 
-    QHBoxLayout* mMenuBarLayout = nullptr;
-    QHBoxLayout* mLayout = nullptr;
-
-    StackWidgetWrapper * mParent = nullptr;
-
-    QAction * mSplitV = nullptr;
-    QAction * mSplitH = nullptr;
-    QAction * mClose = nullptr;
-};
+    stack->appendWidget(this);
+    const auto newWid = new StackWidgetWrapper(mSetupOp, stack);
+    stack->appendWidget(newWid);
+}
 
 #endif // STACKWIDGETWRAPPER_H

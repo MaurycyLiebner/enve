@@ -281,7 +281,7 @@ public:
     void pathsBreakApartAction();
 
     void renameCurrentCanvas(const QString &newName);
-    void setCurrentCanvas(int id);
+    void setCurrentCanvas(const int id);
 
     void setClipToCanvas(const bool bT);
     void setRasterEffectsVisible(const bool bT);

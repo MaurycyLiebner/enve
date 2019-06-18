@@ -54,7 +54,7 @@ Canvas *CanvasWindow::getCurrentCanvas() {
     return mCurrentCanvas;
 }
 
-void CanvasWindow::setCurrentCanvas(int id) {
+void CanvasWindow::setCurrentCanvas(const int id) {
     if(id < 0 || id >= mDocument.fScenes.count()) {
         setCurrentCanvas(nullptr);
     } else {
@@ -85,6 +85,11 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     if(mCurrentCanvas) {
         MainWindow::getInstance()->setCurrentUndoRedoStack(
                     mCurrentCanvas->getUndoRedoStack());
+        connect(mCurrentCanvas, &Canvas::prp_absFrameRangeChanged,
+                this, [this](const FrameRange& range) {
+            const int currFrame = mCurrentCanvas->anim_getCurrentAbsFrame();
+            if(range.inRange(currFrame)) requestUpdate();
+        });
     } else {
         MainWindow::getInstance()->setCurrentUndoRedoStack(nullptr);
     }
@@ -96,6 +101,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         fitCanvasToSize();
     }
     queScheduledTasksAndUpdate();
+    requestUpdate();
 }
 
 void CanvasWindow::updatePaintModeCursor() {
@@ -135,6 +141,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
     }
     mCurrentCanvas->setCanvasMode(mode);
     queScheduledTasksAndUpdate();
+    requestUpdate();
 }
 
 void CanvasWindow::queScheduledTasksAndUpdate() {
@@ -262,6 +269,7 @@ void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
     if(event->buttons() & Qt::MiddleButton) {
         translateView(pos - mPrevMousePos);
         pos = mPrevMousePos;
+        requestUpdate();
     }
     mCurrentCanvas->mouseMoveEvent(
                 MouseEvent(pos, mPrevMousePos, mPrevPressPos,
@@ -373,24 +381,19 @@ bool CanvasWindow::handleCutCopyPasteKeyPress(QKeyEvent *event) {
 }
 
 bool CanvasWindow::handleTransformationKeyPress(QKeyEvent *event) {
-    if(event->key() == Qt::Key_0 &&
-              event->modifiers() & Qt::KeypadModifier) {
+    const int key = event->key();
+    const bool keypad = event->modifiers() & Qt::KeypadModifier;
+    if(key == Qt::Key_0 && keypad) {
         fitCanvasToSize();
-    } else if(event->key() == Qt::Key_1 &&
-              event->modifiers() & Qt::KeypadModifier) {
+    } else if(key == Qt::Key_1 && keypad) {
         resetTransormation();
-    } else if(event->key() == Qt::Key_Minus ||
-             event->key() == Qt::Key_Plus) {
+    } else if(key == Qt::Key_Minus || key == Qt::Key_Plus) {
        if(mCurrentCanvas->isPreviewingOrRendering()) return false;
-       auto relPos = mapFromGlobal(QCursor::pos());
-       if(event->key() == Qt::Key_Plus) {
-           zoomView(1.2, relPos);
-       } else {
-           zoomView(0.8, relPos);
-       }
-    } else {
-        return false;
-    }
+       const auto relPos = mapFromGlobal(QCursor::pos());
+       if(event->key() == Qt::Key_Plus) zoomView(1.2, relPos);
+       else zoomView(0.8, relPos);
+    } else return false;
+    requestUpdate();
     return true;
 }
 
@@ -403,9 +406,7 @@ bool CanvasWindow::handleZValueKeyPress(QKeyEvent *event) {
        mCurrentCanvas->lowerSelectedBoxesToBottom();
     } else if(event->key() == Qt::Key_Home) {
        mCurrentCanvas->raiseSelectedBoxesToTop();
-    } else {
-        return false;
-    }
+    } else return false;
     return true;
 }
 
@@ -600,13 +601,13 @@ void CanvasWindow::strokeToPathAction() {
 
 void CanvasWindow::rotate90CWAction() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->rotateSelectedBoxesStartAndFinish(90.);
+    mCurrentCanvas->rotateSelectedBoxesStartAndFinish(90);
     queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::rotate90CCWAction() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->rotateSelectedBoxesStartAndFinish(-90.);
+    mCurrentCanvas->rotateSelectedBoxesStartAndFinish(-90);
     queScheduledTasksAndUpdate();
 }
 

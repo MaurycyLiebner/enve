@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QBoxLayout>
+#include <QMainWindow>
 
 #include "global.h"
 
@@ -16,18 +17,21 @@
 
 #define V_STACK_TMPL \
     &QWidget::height, &QWidget::setFixedHeight, \
-    &QWidget::y, &moveY, \
+    &QWidget::y, &gMoveY, \
     &QWidget::width, &QWidget::setFixedWidth, \
     &QMouseEvent::y, VStackResizer
 
 #define H_STACK_TMPL \
     &QWidget::width, &QWidget::setFixedWidth, \
-    &QWidget::x, &moveX, \
+    &QWidget::x, &gMoveX, \
     &QWidget::height, &QWidget::setFixedHeight, \
     &QMouseEvent::x, HStackResizer
 
-void moveY(const int y, QWidget * const widget);
-void moveX(const int x, QWidget * const widget);
+void gMoveY(const int y, QWidget * const widget);
+void gMoveX(const int x, QWidget * const widget);
+
+bool gReplaceWidget(QWidget * const from, QWidget * const to,
+                    bool * const centralWid = nullptr);
 
 template <STACK_TMPL_DEFS>
 class StackResizerBase {
@@ -38,7 +42,6 @@ protected:
         mThis = thisP;
         (mThis->*DimSetter)(10);
         (mThis->*OtherDimSetter)(2*MIN_WIDGET_DIM*100);
-        mThis->setCursor(Qt::SplitVCursor);
         mThis->setWindowFlags(Qt::WindowStaysOnTopHint);
         mThis->show();
     }
@@ -63,7 +66,7 @@ protected:
         }
         (mPrevWidget->*DimSetter)((mPrevWidget->*DimGetter)() + dDim);
         (mNextWidget->*DimSetter)((mNextWidget->*DimGetter)() - dDim);
-        //PosSetter((mNextWidget->*PosGetter)() + dDim, mNextWidget);
+        PosSetter((mNextWidget->*PosGetter)() + dDim, mNextWidget);
         PosSetter((mThis->*PosGetter)() + dDim, mThis);
     }
 
@@ -127,6 +130,7 @@ class VStackResizer : public QWidget, public StackResizerBase<V_STACK_TMPL> {
 public:
     VStackResizer(QWidget * const parent) : QWidget(parent) {
         setThis(this);
+        setCursor(Qt::SplitVCursor);
     }
 protected:
     void paintEvent(QPaintEvent *) {
@@ -170,6 +174,7 @@ class HStackResizer : public QWidget, public StackResizerBase<H_STACK_TMPL> {
 public:
     HStackResizer(QWidget * const parent) : QWidget(parent) {
         setThis(this);
+        setCursor(Qt::SplitHCursor);
     }
 protected:
     void paintEvent(QPaintEvent *) {
@@ -210,17 +215,14 @@ signals:
 
 template <STACK_TMPL_DEFS>
 class WidgetStackBase {
+public:
+    virtual ~WidgetStackBase() {}
 protected:
-    WidgetStackBase(const QBoxLayout::Direction direction) :
-        mLayout(new QBoxLayout(direction)) {
-        mLayout->setSpacing(0);
-        mLayout->setMargin(0);
-    }
+    WidgetStackBase() {}
 
     void setThis(QWidget * const thisP) {
         Q_ASSERT(!mThis && thisP);
         mThis = thisP;
-        mThis->setLayout(mLayout);
     }
 
     void updateSizesAndPositions() {
@@ -232,19 +234,19 @@ protected:
         const int thisOtherDim = (mThis->*OtherDimGetter)();;
         for(int i = 0; i < wCount; i++) {
             const auto widget = mWidgets.at(i);
-            //PosSetter(accumulated, widget);
+            PosSetter(accumulated, widget);
             const int iNewDim = qMax(qRound(mDimPercent.at(i)*thisDim),
                                      2*MIN_WIDGET_DIM);
             (widget->*DimSetter)(iNewDim);
             (widget->*OtherDimSetter)(thisOtherDim);
-            if(i < mResizers.count()) {
-                PosSetter(accumulated + iNewDim - 5, mResizers.at(i));
-            }
             accumulated += iNewDim;
+            if(i < mResizers.count()) {
+                PosSetter(accumulated - 5, mResizers.at(i));
+            }
         }
         const auto lastWidget = mWidgets.last();
-        //PosSetter(accumulated, lastWidget);
-        const int lastDim = thisDim - accumulated;
+        PosSetter(accumulated, lastWidget);
+        const int lastDim = qMax(2*MIN_WIDGET_DIM, thisDim - accumulated);
         (lastWidget->*DimSetter)(lastDim);
         (lastWidget->*OtherDimSetter)(thisOtherDim);
     }
@@ -303,8 +305,7 @@ public:
 
     void insertWidget(const int id, QWidget * const widget) {
         mWidgets.insert(id >= 0 ? id : mWidgets.count(), widget);
-        mLayout->insertWidget(id, widget);
-        //widget->setParent(mThis);
+        widget->setParent(mThis);
         if(id > 0 && mWidgets.count() > 1) {
             const auto prevWid = mWidgets.at(id - 1);
             const int dim = (prevWid->*DimGetter)();
@@ -323,29 +324,34 @@ public:
         const int id = mWidgets.indexOf(oldWid);
         if(id == -1) return nullptr;
         mWidgets.replace(id, newWid);
-        mLayout->replaceWidget(oldWid, newWid);
-        //newWid->setParent(mThis);
-        newWid->setFixedSize(oldWid->size());
-        //newWid->move(oldWid->x(), oldWid->y());
+        newWid->setParent(mThis);
+        (newWid->*DimSetter)((oldWid->*DimGetter)());
         updateAll();
+        newWid->show();
         QObject::connect(newWid, &QObject::destroyed, mThis,
                          [this, newWid]() { removeWidgetBeforeDestroyed(newWid); });
-        QObject::disconnect(oldWid, &QObject::destroyed, mThis, nullptr);
+        QObject::disconnect(oldWid, nullptr, mThis, nullptr);
         return oldWid;
+    }
+
+    QWidget* takeWidget(const int id) {
+        return takeWidget(mWidgets.at(id));
     }
 
     QWidget* takeWidget(QWidget * const widget) {
         if(mWidgets.removeOne(widget)) {
-            QObject::disconnect(widget, &QObject::destroyed, mThis, nullptr);
-            mLayout->removeWidget(widget);
+            QObject::disconnect(widget, nullptr, mThis, nullptr);
             updateAll();
-            //widget->setParent(nullptr);
+            widget->setParent(nullptr);
             return widget;
         }
         return nullptr;
     }
 
     QWidget* asWidget() { return mThis; }
+
+    int count() const { return mWidgets.count(); }
+    bool isEmpty() const { return mWidgets.isEmpty(); }
 private:
     void updateAll() {
         updatePercent();
@@ -353,13 +359,13 @@ private:
         updateSizesAndPositions();
     }
 
-    void removeWidgetBeforeDestroyed(QObject * const widObj) {
+    bool removeWidgetBeforeDestroyed(QObject * const widObj) {
         mWidgets.removeOne(static_cast<QWidget*>(widObj));
         updateAll();
+        return false;
     }
 
     QWidget * mThis = nullptr;
-    QBoxLayout * const mLayout;
     QList<QWidget*> mWidgets;
     QList<qreal> mDimPercent;
     QList<TResizer*> mResizers;

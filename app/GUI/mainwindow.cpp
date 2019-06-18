@@ -223,7 +223,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connectToolBarActions();
 
-    setCentralWidget(new CanvasWindowWrapper(&mDocument, this));
+    const auto cww = new CanvasWindowWrapper(&mDocument, this);
+    cww->disableClose();
+    setCentralWidget(cww);
     //setCentralWidget(mCanvasWindow->getCanvasWidget());
 
     showMaximized();
@@ -913,7 +915,7 @@ void MainWindow::queScheduledTasksAndUpdate() {
     mTaskScheduler.queTasks();
 
     mCanvasWindow->updatePivotIfNeeded();
-    mCanvasWindow->requestUpdate();
+    //mCanvasWindow->requestUpdate();
     ScrollWidgetVisiblePart::callAllInstanceUpdaters();
     mObjectSettingsWidget->update();
     //mKeysView->repaint();

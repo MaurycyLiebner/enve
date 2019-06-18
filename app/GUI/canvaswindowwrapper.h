@@ -7,7 +7,6 @@ class CanvasWindowWrapper : public StackWidgetWrapper {
 public:
     CanvasWindowWrapper(Document * const document,
                         QWidget * const parent = nullptr);
-
 private:
     using StackWidgetWrapper::setMenuBar;
     using StackWidgetWrapper::setCentralWidget;
