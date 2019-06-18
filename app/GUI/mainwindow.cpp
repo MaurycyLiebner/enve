@@ -915,7 +915,7 @@ void MainWindow::queScheduledTasksAndUpdate() {
     mTaskScheduler.queTasks();
 
     mCanvasWindow->updatePivotIfNeeded();
-    //mCanvasWindow->requestUpdate();
+    //mCanvasWindow->update();
     ScrollWidgetVisiblePart::callAllInstanceUpdaters();
     mObjectSettingsWidget->update();
     //mKeysView->repaint();

@@ -125,6 +125,7 @@ void GLWindow::initialize() {
 void GLWindow::paintGL() {
     //glBindFramebuffer(GL_FRAMEBUFFER, context()->defaultFramebufferObject());
     glViewport(0, 0, width(), height());
+    glClear(GL_COLOR_BUFFER_BIT);
 
     renderSk(mCanvas, mGrContext.get());
     mCanvas->flush();

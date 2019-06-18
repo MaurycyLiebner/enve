@@ -78,7 +78,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         changeCurrentFrameAction(getCurrentFrame());
         connect(mCurrentCanvas, &Canvas::requestCanvasMode,
                 this, &CanvasWindow::setCanvasMode);
-        connect(mCurrentCanvas, &Canvas::changed,
+        connect(mCurrentCanvas, &Canvas::newerState,
                 this, qOverload<>(&CanvasWindow::update));
         MainWindow::getInstance()->setCurrentUndoRedoStack(
                     mCurrentCanvas->getUndoRedoStack());
@@ -276,6 +276,7 @@ void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
                            [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
                            this));
+
     if(mCurrentMode == PAINT_MODE) update();
     else queScheduledTasksAndUpdate();
     mPrevMousePos = pos;

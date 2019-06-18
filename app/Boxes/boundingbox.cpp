@@ -52,7 +52,7 @@ BoundingBox::BoundingBox(const BoundingBoxType type) :
 
     mGPUEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(PixmapEffectUpdater)(this));
-    ca_prependChildAnimator(mEffectsAnimators.data(), mGPUEffectsAnimators);
+    ca_addChildAnimator(mGPUEffectsAnimators);
     mGPUEffectsAnimators->SWT_hide();
 
     connect(mTransformAnimator.get(),
@@ -163,12 +163,20 @@ void BoundingBox::updateIfUsesProgram(
     mGPUEffectsAnimators->updateIfUsesProgram(program);
 }
 
-void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
+template <typename T>
+void transferData(const T& from, const T& to) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
-    BoundingBox::writeBoundingBox(&buffer);
-    targetBox->BoundingBox::readBoundingBox(&buffer);
+    from->writeProperty(&buffer);
+    buffer.seek(0);
+    to->readProperty(&buffer);
     buffer.close();
+}
+
+void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
+    transferData(mTransformAnimator, targetBox->mTransformAnimator);
+    transferData(mEffectsAnimators, targetBox->mEffectsAnimators);
+    transferData(mGPUEffectsAnimators, targetBox->mGPUEffectsAnimators);
 }
 
 void BoundingBox::drawHoveredSk(SkCanvas *canvas, const SkScalar invScale) {
@@ -357,7 +365,7 @@ void BoundingBox::startSelectedStrokeColorTransform() {}
 void BoundingBox::startSelectedFillColorTransform() {}
 
 bool BoundingBox::diffsIncludingInherited(
-        const int relFrame1, const int relFrame2) {
+        const int relFrame1, const int relFrame2) const {
     const bool diffThis = prp_differencesBetweenRelFrames(relFrame1, relFrame2);
     if(!mParentGroup || diffThis) return diffThis;
     const int absFrame1 = prp_relFrameToAbsFrame(relFrame1);
@@ -468,9 +476,8 @@ void BoundingBox::scheduleUpdate() {
     if(!mSchedulePlanned) return;
     mSchedulePlanned = false;
     const int relFrame = anim_getCurrentRelFrame();
-    auto currentRenderData = getCurrentRenderData(relFrame);
-    if(currentRenderData) return;
-    currentRenderData = updateCurrentRenderData(relFrame, mPlannedReason);
+    if(hasCurrentRenderData(relFrame)) return;
+    const auto currentRenderData = updateCurrentRenderData(relFrame, mPlannedReason);
     currentRenderData->scheduleTask();
 }
 
@@ -484,22 +491,30 @@ BoundingBoxRenderData *BoundingBox::updateCurrentRenderData(
     return renderData.get();
 }
 
-BoundingBoxRenderData *BoundingBox::getCurrentRenderData(const int relFrame) {
-    auto currentRenderData =
+bool BoundingBox::hasCurrentRenderData(const int relFrame) const {
+    const auto currentRenderData =
             mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
-    if(!currentRenderData) {
-        if(mDrawRenderContainer.isExpired()) return nullptr;
-        currentRenderData = mDrawRenderContainer.getSrcRenderData();
-        if(!currentRenderData) return nullptr;
-//        if(currentRenderData->fRelFrame == relFrame) {
-        if(!diffsIncludingInherited(currentRenderData->fRelFrame, relFrame)) {
-            auto copy = currentRenderData->makeCopy();
-            copy->fRelFrame = relFrame;
-            return copy.get();
-        }
-        return nullptr;
+    if(currentRenderData) return true;
+    if(mDrawRenderContainer.isExpired()) return false;
+    const auto drawData = mDrawRenderContainer.getSrcRenderData();
+    if(!drawData) return false;
+    return !diffsIncludingInherited(drawData->fRelFrame, relFrame);
+}
+
+stdsptr<BoundingBoxRenderData> BoundingBox::getCurrentRenderData(const int relFrame) const {
+    const auto currentRenderData =
+            mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
+    if(currentRenderData)
+        return GetAsSPtr(currentRenderData, BoundingBoxRenderData);
+    if(mDrawRenderContainer.isExpired()) return nullptr;
+    const auto drawData = mDrawRenderContainer.getSrcRenderData();
+    if(!drawData) return nullptr;
+    if(!diffsIncludingInherited(drawData->fRelFrame, relFrame)) {
+        const auto copy = drawData->makeCopy();
+        copy->fRelFrame = relFrame;
+        return copy;
     }
-    return currentRenderData;
+    return nullptr;
 }
 
 

@@ -69,10 +69,10 @@ PathBox::PathBox(const BoundingBoxType &type) :
     ca_addChildAnimator(mOutlineBasePathEffectsAnimators);
     ca_addChildAnimator(mOutlinePathEffectsAnimators);
 
-    ca_moveChildBelow(mEffectsAnimators.data(),
-                      mOutlinePathEffectsAnimators.data());
     ca_moveChildBelow(mGPUEffectsAnimators.data(),
-                      mEffectsAnimators.data());
+                      mOutlinePathEffectsAnimators.data());
+    ca_moveChildBelow(mEffectsAnimators.data(),
+                      mGPUEffectsAnimators.data());
 }
 
 PathBox::~PathBox() {
@@ -212,8 +212,7 @@ void PathBox::setupRenderData(const qreal relFrame,
 
     UpdatePaintSettings &fillSettings = pathData->fPaintSettings;
 
-    fillSettings.fPaintColor = mFillSettings->
-            getColor(relFrame);
+    fillSettings.fPaintColor = mFillSettings->getColor(relFrame);
     fillSettings.fPaintType = mFillSettings->getPaintType();
     const auto fillGrad = mFillSettings->getGradient();
     if(fillGrad) {

@@ -8,7 +8,7 @@ bool RenderDataHandler::removeItemAtRelFrame(const int frame) {
     return mFrameToData.erase(frame);
 }
 
-BoundingBoxRenderData *RenderDataHandler::getItemAtRelFrame(const int frame) {
+BoundingBoxRenderData *RenderDataHandler::getItemAtRelFrame(const int frame) const {
     const auto it = mFrameToData.find(frame);
     if(it == mFrameToData.end()) return nullptr;
     return it->second.get();

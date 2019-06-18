@@ -84,7 +84,7 @@ int AnimationBox::getAnimationFrameForRelFrame(const int relFrame) {
     return pixId;
 }
 #include "Animators/qrealkey.h"
-#include "Animators/effectanimators.h"
+#include "Animators/gpueffectanimators.h"
 void AnimationBox::enableFrameRemappingAction() {
     if(mFrameRemappingEnabled) return;
     const int frameCount = mSrcFramesCache->getFrameCount();
@@ -112,7 +112,7 @@ void AnimationBox::enableFrameRemappingAction() {
 void AnimationBox::enableFrameRemapping() {
     if(mFrameRemappingEnabled) return;
     mFrameRemappingEnabled = true;
-    ca_prependChildAnimator(mEffectsAnimators.get(), mFrameAnimator);
+    ca_prependChildAnimator(mGPUEffectsAnimators.get(), mFrameAnimator);
 }
 
 void AnimationBox::disableFrameRemapping() {

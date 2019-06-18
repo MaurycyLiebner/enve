@@ -560,9 +560,7 @@ void processChildData(BoundingBox * const child,
         }
         return;
     }
-    auto boxRenderData =
-            GetAsSPtr(child->getCurrentRenderData(qRound(childRelFrame)),
-                      BoundingBoxRenderData);
+    auto boxRenderData = child->getCurrentRenderData(qRound(childRelFrame));
     if(!boxRenderData) {
         boxRenderData = child->createRenderData();
         boxRenderData->fReason = parentData->fReason;

@@ -390,9 +390,10 @@ public:
     bool isVisibleAndInDurationRect(const int relFrame) const;
     bool isFrameFVisibleAndInDurationRect(const qreal relFrame) const;
     bool diffsIncludingInherited(
-            const int relFrame1, const int relFrame2);
+            const int relFrame1, const int relFrame2) const;
 
-    BoundingBoxRenderData *getCurrentRenderData(const int relFrame);
+    bool hasCurrentRenderData(const int relFrame) const;
+    stdsptr<BoundingBoxRenderData> getCurrentRenderData(const int relFrame) const;
     BoundingBoxRenderData *updateCurrentRenderData(const int relFrame,
                                                    const UpdateReason &reason);
     void nullifyCurrentRenderData(const int relFrame);
