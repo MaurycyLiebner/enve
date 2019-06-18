@@ -206,14 +206,17 @@ void Canvas::renderSk(SkCanvas * const canvas,
         drawTransparencyMesh(canvas, canvasRect, scale);
 
         if(!mClipToCanvasSize || !drawCanvas) {
-            canvas->saveLayer(nullptr, nullptr);
+            // saveLayer rebinds framebuffer to 0,
+            // which is invalid for QOpenGLWidget,
+            // should rebind to defultFramebuffer()
+            //canvas->saveLayer(nullptr, nullptr);
             paint.setColor(toSkColor(mBackgroundColor->getColor()));
             canvas->drawRect(canvasRect, paint);
             for(const auto& box : mContainedBoxes) {
                 if(box->isVisibleAndInVisibleDurationRect())
                     box->drawPixmapSk(canvas, grContext);
             }
-            canvas->restore();
+            //canvas->restore();
         }
         if(drawCanvas) {
             canvas->save();
@@ -352,12 +355,10 @@ void Canvas::setCurrentPreviewContainer(const stdsptr<ImageCacheContainer>& cont
         if(!mRenderingPreview)
             mCurrentPreviewContainer->setBlocked(false);
     }
-    if(!cont) {
-        mCurrentPreviewContainer.reset();
-        return;
-    }
+
     mCurrentPreviewContainer = cont;
-    mCurrentPreviewContainer->setBlocked(true);
+    if(cont) cont->setBlocked(true);
+    emit changed();
 }
 
 void Canvas::setLoadingPreviewContainer(

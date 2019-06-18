@@ -1,7 +1,7 @@
 #ifndef GLWINDOW_H
 #define GLWINDOW_H
 
-#include <QWindow>
+#include <QOpenGLWidget>
 #include "glhelpers.h"
 #include <string>
 
@@ -13,20 +13,21 @@
 class GPURasterEffectCreator;
 class GPURasterEffectProgram;
 
-class GLWindow : public QWindow, protected QGL33c {
+class GLWindow : public QOpenGLWidget, protected QGL33c {
     Q_OBJECT
 public:
-    GLWindow(QScreen *screen = nullptr);
+    GLWindow(QWidget * const parent = nullptr);
     ~GLWindow();
 protected:
-    void initialize();
-    void renderNow();
 
     virtual void renderSk(SkCanvas * const canvas,
                           GrContext * const grContext) = 0;
+    void resizeGL(int w, int h);
+    void initializeGL();
+    void paintGL();
 
-    void bindSkia();
-    void resizeEvent(QResizeEvent *);
+    void initialize();
+    void bindSkia(const int w, const int h);
 
     sk_sp<const GrGLInterface> mInterface;
     sk_sp<GrContext> mGrContext;
@@ -34,10 +35,6 @@ protected:
     SkCanvas *mCanvas;
 
     GrGLFramebufferInfo mFbInfo;
-    QOpenGLContext *mContext = nullptr;
-
-    bool event(QEvent *event);
-    //void exposeEvent(QExposeEvent *event);
 };
 
 #endif // GLWINDOW_H

@@ -4,9 +4,9 @@
 #include <QDebug>
 #include "exceptions.h"
 
-GLWindow::GLWindow(QScreen *screen)
-    : QWindow(screen) {
-    setSurfaceType(OpenGLSurface);
+GLWindow::GLWindow(QWidget * const parent)
+    : QOpenGLWidget(parent) {
+    setUpdateBehavior(QOpenGLWidget::NoPartialUpdate);
 }
 
 GLWindow::~GLWindow() {
@@ -19,9 +19,9 @@ GLWindow::~GLWindow() {
 //    mContext->doneCurrent();
 }
 
-void GLWindow::bindSkia() {
+void GLWindow::bindSkia(const int w, const int h) {
     GrBackendRenderTarget backendRT = GrBackendRenderTarget(
-                                        width(), height(),
+                                        w, h,
                                         0, 8, // (optional) 4, 8,
                                         mFbInfo
                                         /*kRGBA_half_GrPixelConfig*/
@@ -45,17 +45,32 @@ void GLWindow::bindSkia() {
     mCanvas = mSurface->getCanvas();
 }
 
-void GLWindow::resizeEvent(QResizeEvent *) {
-    if(!mContext) return;
+void GLWindow::resizeGL(int w, int h) {
     try {
-        bindSkia();
+        bindSkia(w, h);
+        update();
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
     }
 }
 
+void GLWindow::initializeGL() {
+    try {
+        if(context()->shareContext() != QOpenGLContext::globalShareContext()) {
+            context()->setShareContext(QOpenGLContext::globalShareContext());
+        }
+
+        if(!initializeOpenGLFunctions()) {
+            RuntimeThrow("Initializing GL functions failed.");
+        }
+        initialize();
+    } catch(const std::exception& e) {
+        gPrintExceptionFatal(e);
+    }
+}
+
 void GLWindow::initialize() {
-    glClearColor(1, 1, 1, 1);
+    glClearColor(0, 0, 0, 1);
 
     //Set blending
     glEnable(GL_BLEND);
@@ -77,11 +92,11 @@ void GLWindow::initialize() {
     // a Skia render target so Skia can render to it
     //GrGLint buffer;
     //GR_GL_GetIntegerv(mInterface, GR_GL_FRAMEBUFFER_BINDING, &buffer);
-    mFbInfo.fFBOID = mContext->defaultFramebufferObject();//buffer;
+    mFbInfo.fFBOID = context()->defaultFramebufferObject();//buffer;
     mFbInfo.fFormat = GR_GL_RGBA8;//buffer;
 
     try {
-        bindSkia();
+        bindSkia(width(), height());
     } catch(...) {
         RuntimeThrow("Failed to bind SKIA.");
     }
@@ -102,74 +117,15 @@ void GLWindow::initialize() {
 //    glOrtho(0.0f, w, h, 0.0f, 0.0f, 1.0f);
 //    glMatrixMode(GL_MODELVIEW);
 //}
+
+
+
 #include "GPUEffects/gpupostprocessor.h"
 #include "taskscheduler.h"
-void GLWindow::renderNow() {
-    const bool needsInitialize = !mContext;
-    if(!isExposed() && !needsInitialize) return;
-
-    try {
-        if(needsInitialize) {
-            mContext = new QOpenGLContext(this);
-    //        mContext->setFormat(QSurfaceFormat::defaultFormat());
-            mContext->setShareContext(QOpenGLContext::globalShareContext());
-            if(!mContext->create()) {
-                RuntimeThrow("Creating GL context failed.");
-            }
-        }
-        if(!mContext->makeCurrent(this)) {
-            RuntimeThrow("Making GL context current failed.");
-        }
-
-        if(needsInitialize) {
-            if(!initializeOpenGLFunctions()) {
-                RuntimeThrow("Initializing GL functions failed.");
-            }
-            initialize();
-        }
-    } catch(const std::exception& e) {
-        gPrintExceptionFatal(e);
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, mContext->defaultFramebufferObject());
+void GLWindow::paintGL() {
+    //glBindFramebuffer(GL_FRAMEBUFFER, context()->defaultFramebufferObject());
     glViewport(0, 0, width(), height());
 
     renderSk(mCanvas, mGrContext.get());
     mCanvas->flush();
-
-    mContext->swapBuffers(this);
-    mContext->doneCurrent();
 }
-
-bool GLWindow::event(QEvent *event) {
-    switch (event->type()) {
-    case QEvent::UpdateRequest:
-        renderNow();
-        //QWindow::event(event);
-        return true;
-    case QEvent::WindowStateChange:
-    case QEvent::WindowActivate:
-    case QEvent::Expose:
-    case QEvent::Resize:
-        requestUpdate();
-        [[fallthrough]];
-       // return true;
-    default:
-//        qDebug() << event->type();
-//        if(isExposed()) {
-//            QEvent::Type type = event->type();
-//            if(type == QEvent::MouseMove ||
-//                type == QEvent::MouseButtonPress ||
-//                type == QEvent::) {
-//                requestUpdate();
-//            }
-//        }
-        return QWindow::event(event);
-    }
-}
-
-//void GLWindow::exposeEvent(QExposeEvent *event) {
-//    Q_UNUSED(event);
-
-//    if(isExposed()) renderNow();
-//}

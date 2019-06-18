@@ -22,7 +22,7 @@
 #include "memorychecker.h"
 
 CanvasWindow::CanvasWindow(Document &document, QWidget * const parent) :
-    mDocument(document) {
+    GLWindow(parent), mDocument(document) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
 
     mPreviewFPSTimer = new QTimer(this);
@@ -31,10 +31,9 @@ CanvasWindow::CanvasWindow(Document &document, QWidget * const parent) :
 
     initializeAudio();
 
-    mCanvasWidget = QWidget::createWindowContainer(this, parent);
-    mCanvasWidget->setAcceptDrops(true);
+    this->setAcceptDrops(true);
 
-    mCanvasWidget->setMouseTracking(true);
+    this->setMouseTracking(true);
 
 
     const auto vidEmitter = VideoEncoder::getVideoEncoderEmitter();
@@ -79,18 +78,17 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         changeCurrentFrameAction(getCurrentFrame());
         connect(mCurrentCanvas, &Canvas::requestCanvasMode,
                 this, &CanvasWindow::setCanvasMode);
-    } else {
-        mCurrentSoundComposition = nullptr;
-    }
-    if(mCurrentCanvas) {
+        connect(mCurrentCanvas, &Canvas::changed,
+                this, qOverload<>(&CanvasWindow::update));
         MainWindow::getInstance()->setCurrentUndoRedoStack(
                     mCurrentCanvas->getUndoRedoStack());
-        connect(mCurrentCanvas, &Canvas::prp_absFrameRangeChanged,
-                this, [this](const FrameRange& range) {
-            const int currFrame = mCurrentCanvas->anim_getCurrentAbsFrame();
-            if(range.inRange(currFrame)) requestUpdate();
-        });
+//        connect(mCurrentCanvas, &Canvas::prp_absFrameRangeChanged,
+//                this, [this](const FrameRange& range) {
+//            const int currFrame = mCurrentCanvas->anim_getCurrentAbsFrame();
+//            if(range.inRange(currFrame)) update();
+//        });
     } else {
+        mCurrentSoundComposition = nullptr;
         MainWindow::getInstance()->setCurrentUndoRedoStack(nullptr);
     }
 
@@ -100,8 +98,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         closeWelcomeDialog();
         fitCanvasToSize();
     }
-    queScheduledTasksAndUpdate();
-    requestUpdate();
+    update();
 }
 
 void CanvasWindow::updatePaintModeCursor() {
@@ -140,12 +137,12 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
         releaseMouse();
     }
     mCurrentCanvas->setCanvasMode(mode);
-    queScheduledTasksAndUpdate();
-    requestUpdate();
+    update();
 }
 
 void CanvasWindow::queScheduledTasksAndUpdate() {
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    update();
 }
 
 void CanvasWindow::setMovePathMode() {
@@ -205,10 +202,12 @@ void CanvasWindow::renameCurrentCanvas(const QString &newName) {
 
 void CanvasWindow::renderSk(SkCanvas * const canvas,
                             GrContext* const grContext) {
-    canvas->clear(SK_ColorBLACK);
-    if(mCurrentCanvas)
+    if(mCurrentCanvas) {
+        canvas->save();
         mCurrentCanvas->renderSk(canvas, grContext, rect(),
                                  mViewTransform, mMouseGrabber);
+        canvas->restore();
+    }
     if(hasFocus()) {
         SkPaint paint;
         paint.setColor(SK_ColorRED);
@@ -226,7 +225,7 @@ void CanvasWindow::tabletEvent(QTabletEvent *e) {
     const qreal y = e->hiResGlobalY() - globalPos.y();
     mCurrentCanvas->tabletEvent(e, QPointF(x, y));
     if(!mValidPaintTarget) updatePaintModeCursor();
-    requestUpdate();
+    update();
 }
 
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
@@ -240,7 +239,7 @@ void CanvasWindow::mousePressEvent(QMouseEvent *event) {
                            event,
                            [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
-                           mCanvasWidget));
+                           this));
     queScheduledTasksAndUpdate();
     mPrevMousePos = pos;
     if(event->button() == Qt::LeftButton) {
@@ -259,7 +258,7 @@ void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
                            mCurrentMode, event,
                            [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
-                           mCanvasWidget));
+                           this));
     queScheduledTasksAndUpdate();
 }
 
@@ -269,7 +268,6 @@ void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
     if(event->buttons() & Qt::MiddleButton) {
         translateView(pos - mPrevMousePos);
         pos = mPrevMousePos;
-        requestUpdate();
     }
     mCurrentCanvas->mouseMoveEvent(
                 MouseEvent(pos, mPrevMousePos, mPrevPressPos,
@@ -277,8 +275,8 @@ void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
                            mCurrentMode, event,
                            [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
-                           mCanvasWidget));
-    if(mCurrentMode == PAINT_MODE) requestUpdate();
+                           this));
+    if(mCurrentMode == PAINT_MODE) update();
     else queScheduledTasksAndUpdate();
     mPrevMousePos = pos;
 }
@@ -290,7 +288,7 @@ void CanvasWindow::wheelEvent(QWheelEvent *event) {
     } else {
         zoomView(0.9, event->posF());
     }
-    requestUpdate();
+    update();
 }
 
 void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
@@ -302,13 +300,13 @@ void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
                            mCurrentMode, event,
                            [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
-                           mCanvasWidget));
+                           this));
     queScheduledTasksAndUpdate();
 }
 
 void CanvasWindow::openSettingsWindowForCurrentCanvas() {
     if(!mCurrentCanvas) return;
-    const auto dialog = new CanvasSettingsDialog(mCurrentCanvas, mCanvasWidget);
+    const auto dialog = new CanvasSettingsDialog(mCurrentCanvas, this);
     connect(dialog, &QDialog::accepted, this, [dialog, this]() {
         dialog->applySettingsToCanvas(mCurrentCanvas.data());
         setCurrentCanvas(mCurrentCanvas.data());
@@ -393,7 +391,7 @@ bool CanvasWindow::handleTransformationKeyPress(QKeyEvent *event) {
        if(event->key() == Qt::Key_Plus) zoomView(1.2, relPos);
        else zoomView(0.8, relPos);
     } else return false;
-    requestUpdate();
+    update();
     return true;
 }
 
@@ -532,7 +530,7 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                      QApplication::mouseButtons(), event,
                      [this]() { releaseMouse(); },
                      [this]() { grabMouse(); },
-                     mCanvasWidget);
+                     this);
     if(isMouseGrabber()) {
         if(mCurrentCanvas->handleTransormationInputKeyEvent(e)) return true;
     }
@@ -879,6 +877,7 @@ void CanvasWindow::setSelectedStrokeColorMode(const ColorMode &mode) {
 void CanvasWindow::updateAfterFrameChanged(const int currentFrame) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->anim_setAbsFrame(currentFrame);
+    update();
 }
 
 void CanvasWindow::getDisplayedFillStrokeSettingsFromLastSelected(
@@ -1096,7 +1095,7 @@ void CanvasWindow::stopPreview() {
     mCurrentCanvas->setCurrentPreviewContainer(mSavedCurrentFrame);
     mPreviewFPSTimer->stop();
     stopAudio();
-    requestUpdate();
+    update();
     MainWindow::getInstance()->previewFinished();
 }
 
@@ -1147,7 +1146,7 @@ void CanvasWindow::playPreview() {
     mPreviewFPSTimer->setInterval(mSecInterval);
     mPreviewFPSTimer->start();
     MainWindow::getInstance()->previewBeingPlayed();
-    requestUpdate();
+    update();
 }
 
 void CanvasWindow::nextPreviewRenderFrame() {
@@ -1177,7 +1176,7 @@ void CanvasWindow::nextPreviewFrame() {
                     mCurrentPreviewFrame);
         emit changeCurrentFrame(mCurrentPreviewFrame);
     }
-    requestUpdate();
+    update();
 }
 
 void CanvasWindow::nextSaveOutputFrame() {
@@ -1336,7 +1335,7 @@ void CanvasWindow::pushTimerExpired() {
     }
 }
 
-bool CanvasWindow::dropEvent(QDropEvent *event) {
+void CanvasWindow::dropEvent(QDropEvent *event) {
     const QMimeData* mimeData = event->mimeData();
 
     if(mimeData->hasUrls()) {
@@ -1350,25 +1349,19 @@ bool CanvasWindow::dropEvent(QDropEvent *event) {
                 gPrintExceptionCritical(e);
             }
         }
-        return true;
     }
-    return false;
 }
 
-bool CanvasWindow::dragEnterEvent(QDragEnterEvent *event) {
+void CanvasWindow::dragEnterEvent(QDragEnterEvent *event) {
     if(event->mimeData()->hasUrls()) {
         event->acceptProposedAction();
-        return true;
     }
-    return false;
 }
 
-bool CanvasWindow::dragMoveEvent(QDragMoveEvent *event) {
+void CanvasWindow::dragMoveEvent(QDragMoveEvent *event) {
     if(event->mimeData()->hasUrls()) {
         event->acceptProposedAction();
-        return true;
     }
-    return false;
 }
 
 void CanvasWindow::importFile(const QString &path,
@@ -1413,7 +1406,7 @@ void CanvasWindow::importFile(const QString &path,
 }
 
 QWidget *CanvasWindow::getCanvasWidget() {
-    return mCanvasWidget;
+    return this;
 }
 
 void CanvasWindow::grabMouse() {
@@ -1432,10 +1425,6 @@ void CanvasWindow::releaseMouse() {
 
 bool CanvasWindow::isMouseGrabber() {
     return mMouseGrabber;
-}
-
-QRect CanvasWindow::rect() {
-    return mCanvasWidget->rect();
 }
 
 void CanvasWindow::importFile() {

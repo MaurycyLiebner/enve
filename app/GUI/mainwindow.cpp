@@ -416,7 +416,7 @@ void MainWindow::setupMenuBar() {
 
     mNoneQuality = filteringMenu->addAction("None", [this]() {
         BoundingBox::sDisplayFiltering = kNone_SkFilterQuality;
-        mCanvasWindow->requestUpdate();
+        mCanvasWindow->update();
 
         mLowQuality->setChecked(false);
         mMediumQuality->setChecked(false);
@@ -427,7 +427,7 @@ void MainWindow::setupMenuBar() {
 
     mLowQuality = filteringMenu->addAction("Low", [this]() {
         BoundingBox::sDisplayFiltering = kLow_SkFilterQuality;
-        mCanvasWindow->requestUpdate();
+        mCanvasWindow->update();
 
         mNoneQuality->setChecked(false);
         mMediumQuality->setChecked(false);
@@ -438,7 +438,7 @@ void MainWindow::setupMenuBar() {
 
     mMediumQuality = filteringMenu->addAction("Medium", [this]() {
         BoundingBox::sDisplayFiltering = kMedium_SkFilterQuality;
-        mCanvasWindow->requestUpdate();
+        mCanvasWindow->update();
 
         mNoneQuality->setChecked(false);
         mLowQuality->setChecked(false);
@@ -449,7 +449,7 @@ void MainWindow::setupMenuBar() {
 
     mHighQuality = filteringMenu->addAction("High", [this]() {
         BoundingBox::sDisplayFiltering = kHigh_SkFilterQuality;
-        mCanvasWindow->requestUpdate();
+        mCanvasWindow->update();
 
         mNoneQuality->setChecked(false);
         mLowQuality->setChecked(false);
@@ -1060,19 +1060,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
         //finishUndoRedoSet();
     } else if(e->type() == QEvent::MouseButtonRelease) {
         //finishUndoRedoSet();
-    } else if(obj == mCanvasWindow->getCanvasWidget()) {
-        if(e->type() == QEvent::Drop) {
-            if(mCanvasWindow->dropEvent(static_cast<QDropEvent*>(e)))
-                return true;
-        } else if(e->type() == QEvent::DragEnter) {
-            if(mCanvasWindow->dragEnterEvent(static_cast<QDragEnterEvent*>(e)))
-                return true;
-        } else if(e->type() == QEvent::DragMove) {
-            if(mCanvasWindow->dragMoveEvent(static_cast<QDragMoveEvent*>(e)))
-                return true;
-        } else if(e->type() == QEvent::FocusIn) {
-            //mCanvasWindow->getCanvasWidget();
-        }
     }
     return QMainWindow::eventFilter(obj, e);
 }

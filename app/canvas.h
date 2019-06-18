@@ -457,6 +457,7 @@ protected:
 signals:
     void canvasNameChanged(Canvas *, QString);
     void requestCanvasMode(CanvasMode);
+    void changed();
 public:
     void scheduleDisplayedFillStrokeSettingsUpdate();
 

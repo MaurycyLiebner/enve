@@ -52,7 +52,7 @@ public:
     bool KFT_handleKeyEventForTarget(QKeyEvent *event);
     void KFT_setFocusToWidget() {
         setFocus();
-        requestUpdate();
+        update();
     }
 
     void KFT_clearFocus() {
@@ -119,11 +119,9 @@ public:
         mHasFocus = false;
     }
 
-    QRect rect();
-
-    bool dropEvent(QDropEvent *event);
-    bool dragEnterEvent(QDragEnterEvent *event);
-    bool dragMoveEvent(QDragMoveEvent *event);
+    void dropEvent(QDropEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
 
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -184,7 +182,6 @@ private:
     qsptr<WindowSingleWidgetTarget> mWindowSWTTarget;
     RenderInstanceSettings *mCurrentRenderSettings = nullptr;
 
-    QWidget *mCanvasWidget;
     void setRenderingPreview(const bool bT);
     void setPreviewing(const bool bT);
 
