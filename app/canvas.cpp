@@ -274,14 +274,15 @@ void Canvas::renderSk(SkCanvas * const canvas,
             }
         }
 
-        canvas->resetMatrix();
-
         if(!mClipToCanvasSize) {
             paint.setStyle(SkPaint::kStroke_Style);
-            paint.setStrokeWidth(2);
+            paint.setStrokeWidth(invZoom);
             paint.setColor(SK_ColorBLACK);
-            canvas->drawRect(canvasRect.makeInset(1, 1), paint);
+            canvas->drawRect(canvasRect, paint);
         }
+
+        canvas->resetMatrix();
+
         if(mTransMode != MODE_NONE || mValueInput.inputEnabled())
             mValueInput.draw(canvas, drawRect.height() - MIN_WIDGET_DIM);
     }
