@@ -273,10 +273,10 @@ void ContainerBox::scheduleWaitingTasks() {
 }
 
 void ContainerBox::queScheduledTasks() {
+    BoundingBox::queScheduledTasks();
     for(const auto &child : mContainedBoxes) {
         child->queScheduledTasks();
     }
-    BoundingBox::queScheduledTasks();
 }
 
 void ContainerBox::promoteToLayer() {
@@ -563,11 +563,7 @@ void processChildData(BoundingBox * const child,
     auto boxRenderData =
             GetAsSPtr(child->getCurrentRenderData(qRound(childRelFrame)),
                       BoundingBoxRenderData);
-    if(boxRenderData) {
-        if(boxRenderData->fCopied) {
-            child->nullifyCurrentRenderData(boxRenderData->fRelFrame);
-        }
-    } else {
+    if(!boxRenderData) {
         boxRenderData = child->createRenderData();
         boxRenderData->fReason = parentData->fReason;
         //boxRenderData->parentIsTarget = false;
@@ -575,6 +571,7 @@ void processChildData(BoundingBox * const child,
         boxRenderData->fCustomRelFrame = childRelFrame;
         boxRenderData->scheduleTask();
     }
+    //qDebug() << boxRenderData->fBoxStateId;
     boxRenderData->addDependent(parentData);
     parentData->fChildrenRenderData << boxRenderData;
 

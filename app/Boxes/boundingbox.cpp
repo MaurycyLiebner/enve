@@ -450,7 +450,6 @@ void BoundingBox::planScheduleUpdate(const UpdateReason& reason) {
         mParentGroup->planScheduleUpdate(qMin(reason, CHILD_USER_CHANGE));
     } else if(!SWT_isCanvas()) return;
     if(reason != UpdateReason::FRAME_CHANGE) mStateId++;
-
     mDrawRenderContainer.setExpired(true);
     if(mSchedulePlanned) {
         mPlannedReason = qMax(reason, mPlannedReason);
@@ -460,8 +459,7 @@ void BoundingBox::planScheduleUpdate(const UpdateReason& reason) {
     mPlannedReason = reason;
 
     const auto parentCanvas = getParentCanvas();
-    if(!parentCanvas) return;
-    if(parentCanvas->isPreviewingOrRendering()) {
+    if(parentCanvas && parentCanvas->isPreviewingOrRendering()) {
         scheduleUpdate();
     }
 }
@@ -497,7 +495,6 @@ BoundingBoxRenderData *BoundingBox::getCurrentRenderData(const int relFrame) {
         if(!diffsIncludingInherited(currentRenderData->fRelFrame, relFrame)) {
             auto copy = currentRenderData->makeCopy();
             copy->fRelFrame = relFrame;
-            mCurrentRenderDataHandler.addItemAtRelFrame(copy);
             return copy.get();
         }
         return nullptr;
@@ -1172,11 +1169,11 @@ void BoundingBox::cancelWaitingTasks() {
 
 void BoundingBox::scheduleWaitingTasks() {
     scheduleUpdate();
-    for(const auto &task : mScheduledTasks)
-        task->taskQued();
 }
 
 void BoundingBox::queScheduledTasks() {
+    for(const auto &task : mScheduledTasks)
+        task->taskQued();
     const auto taskScheduler = TaskScheduler::sGetInstance();
     for(const auto& task : mScheduledTasks)
         taskScheduler->queCPUTask(task);
