@@ -1,16 +1,24 @@
 #include "widgetstack.h"
 
+void gMoveX(const int x, QWidget * const widget) {
+    widget->move(x, 0);
+}
+
+void gResizeW(QWidget * const widget, const int w) {
+    widget->resize(w, widget->height());
+}
+
 void gMoveY(const int y, QWidget * const widget) {
     widget->move(0, y);
+}
+
+void gResizeH(QWidget * const widget, const int h) {
+    widget->resize(widget->width(), h);
 }
 
 VWidgetStack::VWidgetStack(QWidget * const parent) :
     QWidget(parent), WidgetStackBase<V_STACK_TMPL>() {
     setThis(this);
-}
-
-void gMoveX(const int x, QWidget * const widget) {
-    widget->move(x, 0);
 }
 
 HWidgetStack::HWidgetStack(QWidget * const parent) :
@@ -20,6 +28,7 @@ HWidgetStack::HWidgetStack(QWidget * const parent) :
 
 bool gReplaceWidget(QWidget * const from, QWidget * const to,
                     bool * const centralWid) {
+    const QSize size = from->size();
     const auto fromParent = from->parentWidget();
     if(!fromParent) return false;
     const auto layout = fromParent->layout();
@@ -42,5 +51,6 @@ bool gReplaceWidget(QWidget * const from, QWidget * const to,
         hStack->replaceWidget(from, to);
     }
     if(centralWid) *centralWid = window;
+    to->resize(size.width(), size.height());
     return true;
 }

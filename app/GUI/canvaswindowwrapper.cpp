@@ -1,6 +1,7 @@
 #include "canvaswindowwrapper.h"
 
 #include <QComboBox>
+#include <QLabel>
 
 #include "canvaswindow.h"
 #include "document.h"
@@ -72,7 +73,7 @@ private:
     Canvas * mCurrentScene = nullptr;
     std::map<Canvas*, QAction*> mSceneToAct;
 };
-#include <QLabel>
+
 CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
                                          QWidget * const parent) :
     StackWidgetWrapper(

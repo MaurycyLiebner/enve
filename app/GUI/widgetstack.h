@@ -10,25 +10,28 @@
 #include "global.h"
 
 #define STACK_TMPL_DEFS \
-    int (QWidget::*DimGetter)() const, void (QWidget::*DimSetter)(int), \
+    int (QWidget::*DimGetter)() const, void (*DimSetter)(QWidget*, int), \
     int (QWidget::*PosGetter)() const, void (*PosSetter)(int, QWidget*), \
-    int (QWidget::*OtherDimGetter)() const, void (QWidget::*OtherDimSetter)(int), \
+    int (QWidget::*OtherDimGetter)() const, void (*OtherDimSetter)(QWidget*, int), \
     int (QMouseEvent::*MousePosGetter)() const, class TResizer
 
 #define V_STACK_TMPL \
-    &QWidget::height, &QWidget::setFixedHeight, \
+    &QWidget::height, &gResizeH, \
     &QWidget::y, &gMoveY, \
-    &QWidget::width, &QWidget::setFixedWidth, \
+    &QWidget::width, &gResizeW, \
     &QMouseEvent::y, VStackResizer
 
 #define H_STACK_TMPL \
-    &QWidget::width, &QWidget::setFixedWidth, \
+    &QWidget::width, &gResizeW, \
     &QWidget::x, &gMoveX, \
-    &QWidget::height, &QWidget::setFixedHeight, \
+    &QWidget::height, &gResizeH, \
     &QMouseEvent::x, HStackResizer
 
-void gMoveY(const int y, QWidget * const widget);
 void gMoveX(const int x, QWidget * const widget);
+void gMoveY(const int y, QWidget * const widget);
+
+void gResizeW(QWidget * const widget, const int w);
+void gResizeH(QWidget * const widget, const int h);
 
 bool gReplaceWidget(QWidget * const from, QWidget * const to,
                     bool * const centralWid = nullptr);
@@ -40,8 +43,8 @@ protected:
 
     void setThis(QWidget * const thisP) {
         mThis = thisP;
-        (mThis->*DimSetter)(10);
-        (mThis->*OtherDimSetter)(2*MIN_WIDGET_DIM*100);
+        DimSetter(mThis, 10);
+        OtherDimSetter(mThis, 2*MIN_WIDGET_DIM*100);
         mThis->setWindowFlags(Qt::WindowStaysOnTopHint);
         mThis->show();
     }
@@ -64,8 +67,8 @@ protected:
                     mPrevResizer->displace(totDDim - dDim);
             }
         }
-        (mPrevWidget->*DimSetter)((mPrevWidget->*DimGetter)() + dDim);
-        (mNextWidget->*DimSetter)((mNextWidget->*DimGetter)() - dDim);
+        DimSetter(mPrevWidget, (mPrevWidget->*DimGetter)() + dDim);
+        DimSetter(mNextWidget, (mNextWidget->*DimGetter)() - dDim);
         PosSetter((mNextWidget->*PosGetter)() + dDim, mNextWidget);
         PosSetter((mThis->*PosGetter)() + dDim, mThis);
     }
@@ -237,8 +240,8 @@ protected:
             PosSetter(accumulated, widget);
             const int iNewDim = qMax(qRound(mDimPercent.at(i)*thisDim),
                                      2*MIN_WIDGET_DIM);
-            (widget->*DimSetter)(iNewDim);
-            (widget->*OtherDimSetter)(thisOtherDim);
+            DimSetter(widget, iNewDim);
+            OtherDimSetter(widget, thisOtherDim);
             accumulated += iNewDim;
             if(i < mResizers.count()) {
                 PosSetter(accumulated - 5, mResizers.at(i));
@@ -247,8 +250,8 @@ protected:
         const auto lastWidget = mWidgets.last();
         PosSetter(accumulated, lastWidget);
         const int lastDim = qMax(2*MIN_WIDGET_DIM, thisDim - accumulated);
-        (lastWidget->*DimSetter)(lastDim);
-        (lastWidget->*OtherDimSetter)(thisOtherDim);
+        DimSetter(lastWidget, lastDim);
+        OtherDimSetter(lastWidget, thisOtherDim);
     }
 
     void updateResizers() {
@@ -310,9 +313,9 @@ public:
             const auto prevWid = mWidgets.at(id - 1);
             const int dim = (prevWid->*DimGetter)();
             const int halfDim = dim/2;
-            (prevWid->*DimSetter)(dim % 2 == 0 ? halfDim : halfDim + 1);
-            (widget->*DimSetter)(halfDim);
-        } else (widget->*DimSetter)(3*MIN_WIDGET_DIM);
+            DimSetter(prevWid, dim % 2 == 0 ? halfDim : halfDim + 1);
+            DimSetter(widget, halfDim);
+        } else DimSetter(widget, 3*MIN_WIDGET_DIM);
         updateAll();
         widget->show();
 
@@ -325,7 +328,7 @@ public:
         if(id == -1) return nullptr;
         mWidgets.replace(id, newWid);
         newWid->setParent(mThis);
-        (newWid->*DimSetter)((oldWid->*DimGetter)());
+        DimSetter(newWid, (oldWid->*DimGetter)());
         updateAll();
         newWid->show();
         QObject::connect(newWid, &QObject::destroyed, mThis,
