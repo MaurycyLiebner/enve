@@ -79,6 +79,6 @@ CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
     StackWidgetWrapper(
         [document](StackWidgetWrapper * toSetup) {
             const auto window = new CanvasWindow(*document, toSetup);
-            toSetup->setMenuBar(new CanvasWrapperMenuBar(*document, window));
             toSetup->setCentralWidget(window->getCanvasWidget());
+            toSetup->setMenuBar(new CanvasWrapperMenuBar(*document, window));
         }, parent) {}

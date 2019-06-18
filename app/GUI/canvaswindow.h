@@ -119,6 +119,10 @@ public:
         mHasFocus = false;
     }
 
+    bool event(QEvent *event);
+
+    void resizeEvent(QResizeEvent* e);
+
     void dropEvent(QDropEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
@@ -320,6 +324,8 @@ public:
     QPointF mapToCanvasCoord(const QPointF& windowCoord);
     void translateView(const QPointF &trans);
     void zoomView(const qreal scaleBy, const QPointF &absOrigin);
+
+    void requestFitCanvasToSize();
     void fitCanvasToSize();
     void resetTransormation();
 

@@ -96,7 +96,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     if(hasNoCanvas()) openWelcomeDialog();
     else {
         closeWelcomeDialog();
-        fitCanvasToSize();
+        requestFitCanvasToSize();
     }
     update();
 }

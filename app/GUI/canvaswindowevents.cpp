@@ -19,6 +19,25 @@ void CanvasWindow::zoomView(const qreal scaleBy, const QPointF &absOrigin) {
     mViewTransform.scale(scaleBy, scaleBy);
     mViewTransform.translate(transPoint.x(), transPoint.y());
 }
+#include <QApplication>
+#include <QEvent>
+void CanvasWindow::requestFitCanvasToSize() {
+    QApplication::postEvent(this, new QEvent(QEvent::User));
+}
+
+bool CanvasWindow::event(QEvent *event) {
+    if(event->type() == QEvent::User) {
+        fitCanvasToSize();
+    }
+    return QWidget::event(event);
+}
+#include <QResizeEvent>
+void CanvasWindow::resizeEvent(QResizeEvent *e) {
+    const auto dSize = e->size() - e->oldSize();
+    const qreal div = 2*mViewTransform.m11();
+    translateView({dSize.width()/div, dSize.height()/div});
+    GLWindow::resizeEvent(e);
+}
 
 void CanvasWindow::fitCanvasToSize() {
     if(!mCurrentCanvas) return;
@@ -29,9 +48,9 @@ void CanvasWindow::fitCanvasToSize() {
     const qreal widthScale = (widWidth - MIN_WIDGET_DIM)/canvasSize.width();
     const qreal heightScale = (widHeight - MIN_WIDGET_DIM)/canvasSize.height();
     const qreal minScale = qMin(widthScale, heightScale);
-    mViewTransform.scale(minScale, minScale);
     translateView({(widWidth - canvasSize.width()*minScale)*0.5,
                    (widHeight - canvasSize.height()*minScale)*0.5});
+    mViewTransform.scale(minScale, minScale);
 }
 
 void CanvasWindow::resetTransormation() {
