@@ -10,6 +10,9 @@ enum class GradientType : short { LINEAR, RADIAL };
 class Gradient : public ComplexAnimator {
     Q_OBJECT
     friend class SelfRef;
+protected:
+    Gradient();
+    Gradient(const QColor &color1, const QColor &color2);
 public:
     bool SWT_isGradient() const { return true; }
     void prp_startTransform();
@@ -61,9 +64,6 @@ public:
     bool isEmpty() const;
 
     QGradientStops getQGradientStopsAtAbsFrame(const qreal absFrame);
-protected:
-    Gradient();
-    Gradient(const QColor &color1, const QColor &color2);
 private:
     void writeProperty(QIODevice * const dst) const;
     void readProperty(QIODevice * const src);

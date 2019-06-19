@@ -393,7 +393,7 @@ void Canvas::addBoxToSelection(BoundingBox * const box) {
     connect(box, &BoundingBox::globalPivotInfluenced,
             this, &Canvas::schedulePivotUpdate);
     connect(box, &BoundingBox::fillStrokeSettingsChanged,
-            this, &Canvas::scheduleDisplayedFillStrokeSettingsUpdate);
+            this, &Canvas::selectedPaintSettingsChanged);
     box->select();
     mSelectedBoxes.append(box); schedulePivotUpdate();
 
@@ -404,13 +404,15 @@ void Canvas::addBoxToSelection(BoundingBox * const box) {
     if(mCurrentMode == PAINT_MODE) {
         if(box->SWT_isPaintBox()) mPaintTarget.setPaintBox(GetAsPtr(box, PaintBox));
     }
+    emit boxSelectionChanged();
+    emit selectedPaintSettingsChanged();
 }
 
 void Canvas::removeBoxFromSelection(BoundingBox * const box) {
     disconnect(box, &BoundingBox::globalPivotInfluenced,
                this, &Canvas::schedulePivotUpdate);
     disconnect(box, &BoundingBox::fillStrokeSettingsChanged,
-               this, &Canvas::scheduleDisplayedFillStrokeSettingsUpdate);
+               this, &Canvas::selectedPaintSettingsChanged);
     box->deselect();
     mSelectedBoxes.removeOne(box);
     schedulePivotUpdate();
@@ -420,6 +422,8 @@ void Canvas::removeBoxFromSelection(BoundingBox * const box) {
     } else {
         mMainWindow->setCurrentBox(mSelectedBoxes.last());
     }
+    emit boxSelectionChanged();
+    emit selectedPaintSettingsChanged();
 }
 
 void Canvas::clearBoxesSelection() {
@@ -437,6 +441,8 @@ void Canvas::clearBoxesSelection() {
 void Canvas::clearBoxesSelectionList() {
     if(mCurrentMode == PAINT_MODE) mPaintTarget.setPaintBox(nullptr);
     mSelectedBoxes.clear();
+    emit boxSelectionChanged();
+    emit selectedPaintSettingsChanged();
 }
 
 void Canvas::applyCurrentTransformationToSelected() {

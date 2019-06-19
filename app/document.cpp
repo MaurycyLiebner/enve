@@ -31,12 +31,54 @@ bool Document::removeScene(const int id) {
 }
 
 void Document::setActiveScene(Canvas * const scene) {
-    if(scene == fLastActiveScene) return;
-    fLastActiveScene = scene;
+    if(scene == fActiveScene) return;
+    if(fActiveScene) {
+        disconnect(fActiveScene, nullptr, this, nullptr);
+    }
+    fActiveScene = scene;
+    if(fActiveScene) {
+        connect(fActiveScene, &Canvas::boxSelectionChanged,
+                this, &Document::activeSceneBoxSelectionChanged);
+        connect(fActiveScene, &Canvas::selectedPaintSettingsChanged,
+                this, &Document::selectedPaintSettingsChanged);
+    }
     SWT_scheduleContentUpdate(scene ? scene->getCurrentGroup() : nullptr,
                               SWT_TARGET_CURRENT_GROUP);
     SWT_scheduleContentUpdate(scene, SWT_TARGET_CURRENT_CANVAS);
-    emit activeSceneChanged(scene);
+    emit activeSceneSet(scene);
+    emit activeSceneBoxSelectionChanged();
+}
+
+Gradient *Document::createNewGradient() {
+    const auto grad = SPtrCreate(Gradient)();
+    fGradients.append(grad);
+    emit gradientCreated(grad.get());
+    return grad.get();
+}
+
+Gradient *Document::duplicateGradient(const int id) {
+    if(id < 0 || id >= fGradients.count()) return nullptr;
+    const auto from = fGradients.at(id).get();
+    const auto newGrad = createNewGradient();
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    from->write(-1, &buffer);
+    if(buffer.reset()) newGrad->read(&buffer);
+    buffer.close();
+    return newGrad;
+}
+
+bool Document::removeGradient(const qsptr<Gradient> &gradient) {
+    const int id = fGradients.indexOf(gradient);
+    return removeGradient(id);
+}
+
+bool Document::removeGradient(const int id) {
+    if(id < 0 || id >= fGradients.count()) return false;
+    const auto grad = fGradients.takeAt(id);
+    emit gradientRemoved(grad.data());
+    emit gradientRemoved(id);
+    return true;
 }
 
 void Document::clear() {

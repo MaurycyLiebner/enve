@@ -168,7 +168,7 @@ void transferData(const T& from, const T& to) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     from->writeProperty(&buffer);
-    buffer.seek(0);
+    buffer.reset();
     to->readProperty(&buffer);
     buffer.close();
 }

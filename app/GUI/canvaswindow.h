@@ -137,8 +137,6 @@ public:
     void startMaxFramePosTransformForAllSelected();
     void finishMaxFramePosTransformForAllSelected();
     void moveMaxFrameForAllSelected(const int dFrame);
-    void getDisplayedFillStrokeSettingsFromLastSelected(
-            PaintSettingsAnimator *&fillSetings, OutlineSettingsAnimator *&strokeSettings);
 private:
     QWidget * mWelcomeDialog = nullptr;
 
@@ -226,9 +224,6 @@ signals:
     void changeCurrentFrame(int);
     void changeCanvasFrameRange(FrameRange);
 public:
-    void setCurrentBrushColor(const QColor& color);
-    void setCurrentBrush(const SimpleBrushWrapper * const brush);
-
     void setMovePathMode();
     void setMovePointMode();
     void setAddPointMode();

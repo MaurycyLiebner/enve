@@ -27,6 +27,11 @@ GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
 
     connect(mMainWindow, &MainWindow::updateAll,
             this, &GradientWidget::updateAll);
+
+    connect(Document::sInstance, &Document::gradientCreated,
+            this, &GradientWidget::updateNumberOfGradients);
+    connect(Document::sInstance, qOverload<int>(&Document::gradientRemoved),
+            this, &GradientWidget::updateNumberOfGradients);
 //    newGradient();
 //    newGradient(Color(1.f, 1.f, 0.f), Color(0.f, 1.f, 1.f, 0.5f));
 //    newGradient(Color(1.f, 0.f, 0.f), Color(0.f, 1.f, 0.f));
@@ -50,69 +55,13 @@ void GradientWidget::setCurrentColorId(const int id) {
 }
 
 void GradientWidget::updateNumberOfGradients() {
-    mGradientsListWidget->setNumberGradients(mGradients.count());
-}
-
-void GradientWidget::addGradientToList(const qsptr<Gradient>& gradient) {
-    mGradients << gradient;
-    updateNumberOfGradients();
-}
-
-void GradientWidget::newGradient(const QColor &color1,
-                                 const QColor &color2) {
-    auto newGradient = SPtrCreate(Gradient)(color1, color2);
-    addGradientToList(newGradient);
-    setCurrentGradient(newGradient.get());
-    updateAll();
-}
-
-void GradientWidget::newGradient(const int fromGradientId) {
-    const auto fromGradient = mGradients.at(fromGradientId).data();
-    auto newGradient = SPtrCreate(Gradient)();
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    fromGradient->write(-1, &buffer);
-    if(buffer.reset()) newGradient->read(&buffer);
-    else return;
-    buffer.close();
-    addGradientToList(newGradient);
-    setCurrentGradient(mGradients.last().data());
-    updateAll();
+    mGradientsListWidget->setNumberGradients(Document::sInstance->fGradients.count());
 }
 
 void GradientWidget::clearAll() {
-    mGradients.clear();
-
     mCurrentGradient = nullptr;
     mCenterGradientId = 1;
     mCurrentColorId = 0;
-    updateAll();
-}
-
-int GradientWidget::getGradientIndex(Gradient *child) {
-    int index = -1;
-    for(int i = 0; i < mGradients.count(); i++) {
-        if(mGradients.at(i) == child) index = i;
-    }
-    return index;
-}
-
-void GradientWidget::removeGradientFromList(const qsptr<Gradient> &toRemove) {
-    mGradients.removeAt(getGradientIndex(toRemove.get()));
-    if(mCurrentGradient == toRemove) {
-        mCurrentGradient = nullptr;
-        setCurrentGradient(nullptr);
-    }
-    updateNumberOfGradients();
-}
-
-void GradientWidget::removeGradient(const int gradientId) {
-    qsptr<Gradient> toRemove = mGradients.at(gradientId);
-    if(toRemove->affectsPaths()) return;
-    removeGradientFromList(toRemove);
-
-    mCenterGradientId = clampInt(mCenterGradientId, 1,
-                                 mGradients.length() - 2);
     updateAll();
 }
 
@@ -124,7 +73,11 @@ void GradientWidget::setCurrentColor(const QColor& col) {
 void GradientWidget::setCurrentGradient(Gradient *gradient,
                                         const bool emitChange) {
     if(!gradient) {
-        if(mGradients.isEmpty()) newGradient();
+        if(Document::sInstance->fGradients.isEmpty()) {
+            const auto newGrad = Document::sInstance->createNewGradient();
+            newGrad->addColor(Qt::black);
+            newGrad->addColor(Qt::white);
+        }
         setCurrentGradient(0);
         return;
     } else if(mCurrentGradient == gradient) {
@@ -151,8 +104,8 @@ ColorAnimator *GradientWidget::getColorAnimator() {
 }
 
 void GradientWidget::setCurrentGradient(const int listId) {
-    if(listId >= mGradients.length()) return;
-    setCurrentGradient(mGradients.at(listId).data());
+    if(listId >= Document::sInstance->fGradients.length()) return;
+    setCurrentGradient(Document::sInstance->fGradients.at(listId).data());
 }
 
 void GradientWidget::colorRightPress(const int x, const QPoint &point) {
@@ -216,19 +169,19 @@ void GradientWidget::moveColor(const int x) {
 }
 
 void GradientWidget::updateAfterFrameChanged(const int absFrame) {
-    for(const auto& gradient : mGradients)
+    for(const auto& gradient : Document::sInstance->fGradients)
         gradient->anim_setAbsFrame(absFrame);
 }
 
 void GradientWidget::gradientLeftPressed(const int gradId) {
-    if(gradId >= mGradients.count() || gradId < 0) return;
+    if(gradId >= Document::sInstance->fGradients.count() || gradId < 0) return;
     setCurrentGradient(gradId);
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 void GradientWidget::gradientContextMenuReq(const int gradId,
                                             const QPoint globalPos) {
-    const bool gradPressed = gradId < mGradients.count() && gradId >= 0;
+    const bool gradPressed = gradId < Document::sInstance->fGradients.count() && gradId >= 0;
     QMenu menu(this);
     menu.addAction("New Gradient");
     if(gradPressed) {
@@ -238,11 +191,14 @@ void GradientWidget::gradientContextMenuReq(const int gradId,
     const auto selected_action = menu.exec(globalPos);
     if(selected_action) {
         if(selected_action->text() == "Delete Gradient") {
-            removeGradient(gradId);
+            Document::sInstance->removeGradient(gradId);
         } else if(selected_action->text() == "Duplicate Gradient") {
-            newGradient(gradId);
+            Document::sInstance->duplicateGradient(gradId);
         } else if(selected_action->text() == "New Gradient") {
-            newGradient();
+            const auto newGrad = Document::sInstance->createNewGradient();
+            newGrad->addColor(Qt::black);
+            newGrad->addColor(Qt::white);
+            setCurrentGradient(newGrad);
         }
         mMainWindow->queScheduledTasksAndUpdate();
     } else {

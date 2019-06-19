@@ -437,13 +437,6 @@ public:
 
     bool clipToCanvas() { return mClipToCanvasSize; }
 
-    const SimpleBrushWrapper * getCurrentBrush() const;
-    void setCurrentBrush(const SimpleBrushWrapper * const brush);
-    void setBrushColor(const QColor& color);
-
-    void incBrushRadius();
-    void decBrushRadius();
-
     void schedulePivotUpdate();
     void setClipToCanvas(const bool bT) { mClipToCanvasSize = bT; }
     void setRasterEffectsVisible(const bool bT) { mRasterEffectsVisible = bT; }
@@ -461,9 +454,9 @@ signals:
     void requestCanvasMode(CanvasMode);
     void newerState();
     void newFrameRange(FrameRange);
+    void boxSelectionChanged();
+    void selectedPaintSettingsChanged();
 public:
-    void scheduleDisplayedFillStrokeSettingsUpdate();
-
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
@@ -649,8 +642,6 @@ protected:
     void updatePaintBox();
 
     PaintTarget mPaintTarget;
-    QColor mCurrentBrushColor;
-    const SimpleBrushWrapper * mCurrentBrush = nullptr;
     bool mStylusDrawing = false;
 
     uint mLastStateId = 0;

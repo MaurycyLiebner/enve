@@ -62,7 +62,6 @@ void CanvasWindow::setCurrentCanvas(const int id) {
 }
 
 void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
-    TaskScheduler::sSetCurrentCanvas(canvas);
     if(mCurrentCanvas) {
         mCurrentCanvas->setIsCurrentCanvas(false);
         disconnect(mCurrentCanvas, nullptr, this, nullptr);
@@ -554,9 +553,9 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     if(e.fKey == Qt::Key_I && !isMouseGrabber()) {
         invertSelectionAction();
     } else if(e.fKey == Qt::Key_W) {
-        mCurrentCanvas->incBrushRadius();
+        mDocument.incBrushRadius();
     } else if(e.fKey == Qt::Key_Q) {
-        mCurrentCanvas->decBrushRadius();
+        mDocument.decBrushRadius();
     } else return false;
 
     return true;
@@ -620,16 +619,6 @@ void CanvasWindow::flipVerticalAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->flipSelectedBoxesVertically();
     queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::setCurrentBrushColor(const QColor& color) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setBrushColor(color);
-}
-
-void CanvasWindow::setCurrentBrush(const SimpleBrushWrapper * const brush) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setCurrentBrush(brush);
 }
 
 void CanvasWindow::pathsUnionAction() {
@@ -881,12 +870,6 @@ void CanvasWindow::updateAfterFrameChanged(const int currentFrame) {
     update();
 }
 
-void CanvasWindow::getDisplayedFillStrokeSettingsFromLastSelected(
-        PaintSettingsAnimator*& fillSetings, OutlineSettingsAnimator*& strokeSettings) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->getDisplayedFillStrokeSettingsFromLastSelected(
-                fillSetings, strokeSettings);
-}
 #include "welcomedialog.h"
 void CanvasWindow::openWelcomeDialog() {
     if(mWelcomeDialog) return;

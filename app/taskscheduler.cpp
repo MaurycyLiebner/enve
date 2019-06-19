@@ -95,9 +95,10 @@ void TaskScheduler::queScheduledCPUTasks() {
     if(!shouldQueMoreCPUTasks()) return;
     mCPUQueing = true;
     mQuedCPUTasks.beginQue();
-    if(mCurrentCanvas) {
-        mCurrentCanvas->scheduleWaitingTasks();
-        mCurrentCanvas->queScheduledTasks();
+    const auto scene = Document::sInstance->fActiveScene;
+    if(scene) {
+        scene->scheduleWaitingTasks();
+        scene->queScheduledTasks();
     }
     while(!mScheduledCPUTasks.isEmpty())
         queCPUTask(mScheduledCPUTasks.takeLast());

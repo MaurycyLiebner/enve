@@ -145,7 +145,7 @@ MainWindow::MainWindow(QWidget *parent)
     const int ctxt = BrushSelectionWidget::sCreateNewContext();
     mBrushSelectionWidget = new BrushSelectionWidget(ctxt, this);
     connect(mBrushSelectionWidget, &BrushSelectionWidget::currentBrushChanged,
-            mCanvasWindow, &CanvasWindow::setCurrentBrush);
+            &mDocument, &Document::setBrush);
 //    connect(mBrushSettingsWidget,
 //            SIGNAL(brushReplaced(const Brush*,const Brush*)),
 //            mCanvasWindow,
@@ -155,8 +155,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     addDockWidget(Qt::LeftDockWidgetArea, mBrushSettingsDock);
     mBrushSettingsDock->hide();
-
-    mFillStrokeSettings->setCanvasWindowPtr(mCanvasWindow);
 
     mLeftDock = new QDockWidget(this);
     mLeftDock->setFeatures(QDockWidget::DockWidgetMovable |
@@ -551,7 +549,6 @@ void MainWindow::updateSettingsForCurrentCanvas() {
     mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
     mObjectSettingsWidget->setMainTarget(canvas->getCurrentGroup());
 //    mBrushSettingsWidget->setCurrentBrush(canvas->getCurrentBrush());
-    updateDisplayedFillStrokeSettings();
 }
 
 void MainWindow::replaceClipboard(const stdsptr<ClipboardContainer>& container) {
@@ -850,7 +847,6 @@ void MainWindow::queScheduledTasksAndUpdate() {
     mObjectSettingsWidget->update();
     //mKeysView->repaint();
     mBoxesListAnimationDockWidget->update();
-    updateDisplayedFillStrokeSettingsIfNeeded();
     mFillStrokeSettings->update();
     emit updateAll();
 
@@ -999,26 +995,6 @@ void MainWindow::closeEvent(QCloseEvent *e) {
     if(!closeProject()) {
         e->ignore();
     }
-}
-
-void MainWindow::updateDisplayedFillStrokeSettings() {
-    PaintSettingsAnimator* fillSettings;
-    OutlineSettingsAnimator* strokeSettings;
-    mCanvasWindow->getDisplayedFillStrokeSettingsFromLastSelected(
-                fillSettings, strokeSettings);
-    mFillStrokeSettings->setCurrentSettings(
-                fillSettings, strokeSettings);
-}
-
-void MainWindow::updateDisplayedFillStrokeSettingsIfNeeded() {
-    if(mDisplayedFillStrokeSettingsUpdateNeeded) {
-        mDisplayedFillStrokeSettingsUpdateNeeded = false;
-        updateDisplayedFillStrokeSettings();
-    }
-}
-
-void MainWindow::scheduleDisplayedFillStrokeSettingsUpdate() {
-    mDisplayedFillStrokeSettingsUpdateNeeded = true;
 }
 
 bool MainWindow::processKeyEvent(QKeyEvent *event) {

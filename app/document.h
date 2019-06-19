@@ -6,6 +6,7 @@
 #include "smartPointers/sharedpointerdefs.h"
 #include "singlewidgettarget.h"
 #include "paintsettings.h"
+#include "GUI/BrushWidgets/simplebrushwrapper.h"
 
 class Gradient;
 class FileCacheHandler;
@@ -34,17 +35,17 @@ public:
     // all in document
     QList<qsptr<Gradient>> fGradients;
 
-    FillSettings fLastFill;
-    StrokeSettings fLastStroke;
+    FillSettings fFill;
+    StrokeSettings fStroke;
 
-    QColor fLastBrushColor;
-    SimpleBrushWrapper* fLastBrush = nullptr;
+    QColor fBrushColor;
+    const SimpleBrushWrapper* fBrush = nullptr;
 
     std::set<FileHandler, FileCompare> fFiles;
 
     QList<qsptr<Canvas>> fScenes;
     qptr<Canvas> fTimelineScene;
-    qptr<Canvas> fLastActiveScene;
+    qptr<Canvas> fActiveScene;
 
     void setPath(const QString& path) {
         fEvFile = path;
@@ -56,6 +57,34 @@ public:
     bool removeScene(const int id);
 
     void setActiveScene(Canvas * const scene);
+
+    Gradient * createNewGradient();
+    Gradient * duplicateGradient(const int id);
+    bool removeGradient(const qsptr<Gradient>& gradient);
+    bool removeGradient(const int id);
+
+    void setBrush(const SimpleBrushWrapper * const brush) {
+        fBrush = brush;
+        if(fBrush) fBrush->setColor(fBrushColor);
+    }
+
+    void setBrushColor(const QColor &color) {
+        fBrushColor = color;
+        fBrushColor.setBlueF(color.redF());
+        fBrushColor.setRedF(color.blueF());
+        if(!fBrush) return;
+        fBrush->setColor(fBrushColor);
+    }
+
+    void incBrushRadius() {
+        if(!fBrush) return;
+        fBrush->incPaintBrushSize(0.3);
+    }
+
+    void decBrushRadius() {
+        if(!fBrush) return;
+        fBrush->decPaintBrushSize(0.3);
+    }
 
     void clear();
 
@@ -79,7 +108,14 @@ signals:
     void sceneRemoved(Canvas*);
     void sceneRemoved(int);
 
-    void activeSceneChanged(Canvas*);
+    void activeSceneSet(Canvas*);
+    void activeSceneBoxSelectionChanged();
+
+    void selectedPaintSettingsChanged();
+
+    void gradientCreated(Gradient*);
+    void gradientRemoved(Gradient*);
+    void gradientRemoved(int);
 
     void evFilePathChanged(QString);
 };

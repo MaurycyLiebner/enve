@@ -34,7 +34,6 @@ Canvas::Canvas(Document &document,
                const int frameCount, const qreal fps) :
     ContainerBox(TYPE_CANVAS), mDocument(document) {
     mMainWindow = MainWindow::getInstance();
-    setCurrentBrush(mMainWindow->getCurrentBrush());
     std::function<bool(int)> changeFrameFunc =
     [this](const int undoRedoFrame) {
         if(undoRedoFrame != mMainWindow->getCurrentFrame()) {
@@ -297,31 +296,6 @@ stdsptr<BoundingBoxRenderData> Canvas::createRenderData() {
     return SPtrCreate(CanvasRenderData)(this);
 }
 
-const SimpleBrushWrapper *Canvas::getCurrentBrush() const {
-    return mCurrentBrush;
-}
-
-void Canvas::setCurrentBrush(const SimpleBrushWrapper * const brush) {
-    mCurrentBrush = brush;
-    if(brush) brush->setColor(mCurrentBrushColor);
-}
-
-void Canvas::setBrushColor(const QColor &color) {
-    mCurrentBrushColor = color;
-    mCurrentBrushColor.setBlueF(color.redF());
-    mCurrentBrushColor.setRedF(color.blueF());
-    if(!mCurrentBrush) return;
-    mCurrentBrush->setColor(mCurrentBrushColor);
-}
-
-void Canvas::incBrushRadius() {
-    mCurrentBrush->incPaintBrushSize(0.3);
-}
-
-void Canvas::decBrushRadius() {
-    mCurrentBrush->decPaintBrushSize(0.3);
-}
-
 QSize Canvas::getCanvasSize() {
     return QSize(mWidth, mHeight);
 }
@@ -491,10 +465,6 @@ SingleSound* Canvas::createSoundForPath(const QString &path) {
     getSoundComposition()->addSoundAnimator(singleSound);
     singleSound->setFilePath(path);
     return singleSound.get();
-}
-
-void Canvas::scheduleDisplayedFillStrokeSettingsUpdate() {
-    mMainWindow->scheduleDisplayedFillStrokeSettingsUpdate();
 }
 
 void Canvas::schedulePivotUpdate() {

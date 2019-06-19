@@ -128,10 +128,6 @@ public:
         return sInstance->allQuedHDDTasksFinished();
     }
 
-    static void sSetCurrentCanvas(Canvas* const canvas) {
-        sInstance->setCurrentCanvas(canvas);
-    }
-
     static void sClearTasks() {
         sInstance->clearTasks();
     }
@@ -181,10 +177,6 @@ public:
     void setAllTasksFinishedFunc(
             const std::function<void(void)>& func) {
         mAllTasksFinishedFunc = func;
-    }
-
-    void setCurrentCanvas(Canvas * const canvas) {
-        mCurrentCanvas = canvas;
     }
 
     bool allQuedTasksFinished() const {
@@ -277,8 +269,6 @@ private:
     std::function<void(void)> mAllTasksFinishedFunc;
 
     GpuPostProcessor mGpuPostProcessor;
-
-    Canvas* mCurrentCanvas = nullptr;
 };
 
 #endif // TASKSCHEDULER_H

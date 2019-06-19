@@ -43,7 +43,6 @@ public:
     void setFillValuesFromFillSettings(PaintSettingsAnimator *settings);
     void setStrokeValuesFromStrokeSettings(OutlineSettingsAnimator *settings);
 
-    void setCanvasWindowPtr(CanvasWindow *canvasWidget);
     void updateColorAnimator();
     void setCurrentBrushSettings(BrushSettingsAnimator * const brushSettings);
 
@@ -92,9 +91,8 @@ private:
     void colorSettingReceived(const ColorSettingApplier &colorSetting);
     void setCurrentColorMode(const ColorMode &mode);
 private:
+    void updateCurrentSettings();
     void applyGradient();
-
-    CanvasWindow *mCanvasWindow;
 
     MainWindow *mMainWindow;
     bool mTransormStarted = false;

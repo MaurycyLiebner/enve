@@ -29,7 +29,7 @@ private:
 };
 
 struct SvgGradient {
-    qsptr<Gradient> fGradient;
+    Gradient* fGradient;
     qreal fX1;
     qreal fY1;
     qreal fX2;

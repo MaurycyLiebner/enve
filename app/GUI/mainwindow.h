@@ -115,9 +115,6 @@ public:
     int getFrameCount();
 
     void previewFinished();
-    void updateDisplayedFillStrokeSettings();
-    void scheduleDisplayedFillStrokeSettingsUpdate();
-    void updateDisplayedFillStrokeSettingsIfNeeded();
     void updateCanvasModeButtonsChecked();
 
     //void addBoxAwaitingUpdate(BoundingBox *box);

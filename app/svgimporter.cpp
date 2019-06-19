@@ -832,11 +832,9 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
     } else if(tagName == "linearGradient") {
         const QString id = element.attribute("id");
         QString linkId = element.attribute("xlink:href");
-        qsptr<Gradient> gradient;
+        Gradient* gradient = nullptr;
         if(linkId.isEmpty()) {
-            gradient = SPtrCreate(Gradient)();
-            MainWindow::getInstance()->getFillStrokeSettings()->
-                    getGradientWidget()->addGradientToList(gradient);
+            gradient = Document::sInstance->createNewGradient();
             const QDomNodeList allRootChildNodes = element.childNodes();
             for(int i = 0; i < allRootChildNodes.count(); i++) {
                 const QDomNode iNode = allRootChildNodes.at(i);
@@ -865,9 +863,7 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
             if(it != gGradients.end()) {
                 gradient = it.value().fGradient;
             } else {
-                gradient = SPtrCreate(Gradient)();
-                MainWindow::getInstance()->getFillStrokeSettings()->
-                        getGradientWidget()->addGradientToList(gradient);
+                gradient = Document::sInstance->createNewGradient();
             }
         }
         const QString x1 = element.attribute("x1");
@@ -2005,7 +2001,7 @@ void FillSvgAttributes::setPaintType(const PaintType &type) {
 }
 
 void FillSvgAttributes::setGradient(const SvgGradient& gradient) {
-    mGradient = gradient.fGradient.get();
+    mGradient = gradient.fGradient;
     mGradientP1 = gradient.fTrans.map(QPointF{gradient.fX1, gradient.fY1});
     mGradientP2 = gradient.fTrans.map(QPointF{gradient.fX2, gradient.fY2});
     if(!mGradient) return;

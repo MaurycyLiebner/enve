@@ -19,18 +19,10 @@ public:
 
     void moveColor(const int x);
 
-    void newGradient(const QColor &color1 = QColor(0, 0, 0),
-                     const QColor &color2 = QColor(0, 0, 0));
-    void newGradient(const int fromGradientId);
-    void removeGradient(const int gradientId);
-
     void finishGradientTransform();
     void startGradientTransform();
     void clearAll();
-    void addGradientToList(const qsptr<Gradient> &gradient);
-    void removeGradientFromList(const qsptr<Gradient>& toRemove);
     void startSelectedColorTransform();
-    int getGradientIndex(Gradient *child);
     void updateNumberOfGradients();
 
     void gradientLeftPressed(const int gradId);
@@ -44,11 +36,11 @@ public:
     void updateAfterFrameChanged(const int absFrame);
 
     int getGradientsCount() const {
-        return mGradients.count();
+        return Document::sInstance->fGradients.count();
     }
 
     Gradient* getGradientAt(const int id) const {
-        return mGradients.at(id).get();
+        return Document::sInstance->fGradients.at(id).get();
     }
 
     int getColorId() const {
@@ -73,7 +65,6 @@ private:
     int mScrollItemHeight;
 
     MainWindow *mMainWindow;
-    QList<qsptr<Gradient>> mGradients;
     Gradient *mCurrentGradient = nullptr;
     ColorAnimator *mCurrentColor = nullptr;
     int mCurrentColorId = 0;

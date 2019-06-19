@@ -11,7 +11,6 @@ Gradient::Gradient(const QColor &color1, const QColor &color2) :
     Gradient() {
     addColorToList(color1);
     addColorToList(color2);
-    updateQGradientStops(Animator::USER_CHANGE);
 }
 
 void Gradient::write(const int id, QIODevice * const dst) {
