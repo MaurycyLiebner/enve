@@ -56,7 +56,7 @@ Canvas::Canvas(Document &document,
     auto soundsAnimatorContainer = mSoundComposition->getSoundsAnimatorContainer();
     ca_addChildAnimator(GetAsSPtr(soundsAnimatorContainer, Property));
 
-    mMaxFrame = frameCount;
+    mRange = {0, frameCount};
 
     mResolutionFraction = 1;
 
@@ -288,8 +288,9 @@ void Canvas::renderSk(SkCanvas * const canvas,
     }
 }
 
-void Canvas::setMaxFrame(const int frame) {
-    mMaxFrame = frame;
+void Canvas::setFrameRange(const FrameRange &range) {
+    mRange = range;
+    emit newFrameRange(range);
 }
 
 stdsptr<BoundingBoxRenderData> Canvas::createRenderData() {
@@ -337,7 +338,9 @@ void Canvas::anim_scaleTime(const int pivotAbsFrame, const qreal scale) {
     ContainerBox::anim_scaleTime(pivotAbsFrame, scale);
     //        int newAbsPos = qRound(scale*pivotAbsFrame);
     //        anim_shiftAllKeys(newAbsPos - pivotAbsFrame);
-    setMaxFrame(qRound((mMaxFrame - pivotAbsFrame)*scale));
+    const int newMin = qRound((mRange.fMin - pivotAbsFrame)*scale);
+    const int newMax = qRound((mRange.fMax - pivotAbsFrame)*scale);
+    setFrameRange({newMin, newMax});
 }
 
 void Canvas::setOutputRendering(const bool bT) {
@@ -863,12 +866,8 @@ int Canvas::getCurrentFrame() {
     return anim_getCurrentAbsFrame();
 }
 
-int Canvas::getFrameCount() {
-    return mMaxFrame + 1;
-}
-
 int Canvas::getMaxFrame() {
-    return mMaxFrame;
+    return mRange.fMax;
 }
 
 HDDCachableCacheHandler &Canvas::getSoundCacheHandler() {
@@ -1025,7 +1024,7 @@ void Canvas::writeBoundingBox(QIODevice * const target) {
     target->write(rcConstChar(&mWidth), sizeof(int));
     target->write(rcConstChar(&mHeight), sizeof(int));
     target->write(rcConstChar(&mFps), sizeof(qreal));
-    target->write(rcConstChar(&mMaxFrame), sizeof(int));
+    target->write(rcConstChar(&mRange), sizeof(FrameRange));
     mSoundComposition->writeSounds(target);
 }
 
@@ -1037,7 +1036,7 @@ void Canvas::readBoundingBox(QIODevice * const target) {
     target->read(rcChar(&mWidth), sizeof(int));
     target->read(rcChar(&mHeight), sizeof(int));
     target->read(rcChar(&mFps), sizeof(qreal));
-    target->read(rcChar(&mMaxFrame), sizeof(int));
+    target->read(rcChar(&mRange), sizeof(FrameRange));
     anim_setAbsFrame(currFrame);
     mSoundComposition->readSounds(target);
 }

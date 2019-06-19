@@ -86,6 +86,7 @@ SOURCES += main.cpp\
     GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
     document.cpp \
+    documentrw.cpp \
     effectsloader.cpp \
     evfileio.cpp \
     offscreenqgl33c.cpp \

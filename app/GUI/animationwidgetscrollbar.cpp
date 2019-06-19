@@ -23,8 +23,8 @@ FrameScrollBar::FrameScrollBar(const int minSpan,
 
 qreal FrameScrollBar::posToFrame(int xPos) {
     return (xPos - MIN_WIDGET_DIM/2)*
-            (mMaxFrame - mMinFrame + (mRange ? 0 : 1) ) /
-            ((qreal)width() - 2*MIN_WIDGET_DIM) + mMinFrame;
+            (mFrameRange.fMax - mFrameRange.fMin + (mRange ? 0 : 1) ) /
+            (qreal(width()) - 2*MIN_WIDGET_DIM) + mFrameRange.fMin;
 }
 
 void FrameScrollBar::setTopBorderVisible(const bool bT) {
@@ -39,27 +39,27 @@ void FrameScrollBar::paintEvent(QPaintEvent *) {
     QPainter p(this);
     p.fillRect(rect(), QColor(60, 60, 60));
 
-    const int dFrame = mMaxFrame - mMinFrame + (mRange ? 0 : 1);
+    const int dFrame = mFrameRange.fMax - mFrameRange.fMin + (mRange ? 0 : 1);
     const qreal pixPerFrame = (width() - 2.*MIN_WIDGET_DIM)/dFrame;
 
     const int f0 = -qCeil(0.5*MIN_WIDGET_DIM/pixPerFrame);
-    const int minFrame = mMinFrame + f0;
+    const int minFrame = mFrameRange.fMin + f0;
     const qreal x0 = f0*pixPerFrame + MIN_WIDGET_DIM*0.5;
 
     const int f1 = qCeil(1.5*MIN_WIDGET_DIM/pixPerFrame);
-    const int maxFrame = mMaxFrame + f1;
+    const int maxFrame = mFrameRange.fMax + f1;
     const qreal w1 = width() - 1.5*MIN_WIDGET_DIM + f1*pixPerFrame - x0;
 
     QRect canvasMinRect;
     canvasMinRect.setLeft(qRound(x0));
     canvasMinRect.setTop(0);
-    const int cRightFrames = mMinCanvasFrame - minFrame;
+    const int cRightFrames = mCanvasRange.fMin - minFrame;
     canvasMinRect.setRight(qRound(x0 + cRightFrames*pixPerFrame));
     canvasMinRect.setBottom(height());
     p.fillRect(canvasMinRect, QColor(30, 30, 30));
 
     QRect canvasMaxRect;
-    const int cLeftFrames = mMaxCanvasFrame - minFrame + (mRange ? 0 : 1);
+    const int cLeftFrames = mCanvasRange.fMax - minFrame + (mRange ? 0 : 1);
     const qreal left = cLeftFrames*pixPerFrame + x0;
     canvasMaxRect.setLeft(qMax(0, qRound(left)));
     canvasMaxRect.setTop(0);
@@ -96,7 +96,7 @@ void FrameScrollBar::paintEvent(QPaintEvent *) {
 
     int divInc = 3;
     int frameInc = 5000;
-    while(dFrame/frameInc < 3) {
+    while(frameInc && dFrame/frameInc < 3) {
         if(divInc == 3) {
             divInc = 0;
             frameInc *= 4;
@@ -152,11 +152,11 @@ void FrameScrollBar::setFramesSpan(int newSpan) {
 }
 
 int FrameScrollBar::getMaxFrame() {
-    return mMaxFrame;
+    return mFrameRange.fMax;
 }
 
 int FrameScrollBar::getMinFrame() {
-    return mMinFrame;
+    return mFrameRange.fMin;
 }
 
 void FrameScrollBar::wheelEvent(QWheelEvent *event) {
@@ -188,10 +188,10 @@ void FrameScrollBar::wheelEvent(QWheelEvent *event) {
 bool FrameScrollBar::setFirstViewedFrame(const int firstFrame) {
     if(mClamp) {
         if(mRange) {
-            mFirstViewedFrame = clampInt(firstFrame, mMinFrame, mMaxFrame -
+            mFirstViewedFrame = clampInt(firstFrame, mFrameRange.fMin, mFrameRange.fMax -
                                           mViewedFramesSpan);
         } else {
-            mFirstViewedFrame = clampInt(firstFrame, mMinFrame, mMaxFrame);
+            mFirstViewedFrame = clampInt(firstFrame, mFrameRange.fMin, mFrameRange.fMax);
         }
         return true;
     } else {
@@ -255,38 +255,36 @@ void FrameScrollBar::mouseReleaseEvent(QMouseEvent *) {
     update();
 }
 
-void FrameScrollBar::setDisplayedFrameRange(const int startFrame,
-                                                      const int endFrame) {
-    mMinFrame = startFrame;
-    mMaxFrame = endFrame;
-    mMaxSpan = mMaxFrame - mMinFrame;
-    setViewedFrameRange(mFirstViewedFrame,
-                        mFirstViewedFrame + mViewedFramesSpan);
+void FrameScrollBar::setDisplayedFrameRange(const FrameRange& range) {
+    mFrameRange = range;
+    mMaxSpan = range.span() - 1;
+    setViewedFrameRange({mFirstViewedFrame,
+                         mFirstViewedFrame + mViewedFramesSpan});
 }
 
-void FrameScrollBar::setViewedFrameRange(const int minFrame,
-                                                   const int maxFrame) {
-    setFirstViewedFrame(minFrame);
-    setFramesSpan(maxFrame - minFrame);
+void FrameScrollBar::setViewedFrameRange(const FrameRange& range) {
+    setFirstViewedFrame(range.fMin);
+    setFramesSpan(range.span() - 1);
     update();
 }
 
-void FrameScrollBar::setCanvasFrameRange(const int minFrame,
-                                                   const int maxFrame) {
-    mMinCanvasFrame = minFrame;
-    mMaxCanvasFrame = maxFrame;
+void FrameScrollBar::setCanvasFrameRange(const FrameRange &range) {
+    mCanvasRange = range;
     update();
 }
 
 void FrameScrollBar::emitChange() {
-    emit viewedFrameRangeChanged(mFirstViewedFrame,
-                             mFirstViewedFrame + mViewedFramesSpan);
+    emit viewedFrameRangeChanged(getViewedRange());
 }
 
-int FrameScrollBar::getFirstViewedFrame() {
+FrameRange FrameScrollBar::getViewedRange() const {
+    return {mFirstViewedFrame, getLastViewedFrame()};
+}
+
+int FrameScrollBar::getFirstViewedFrame() const {
     return mFirstViewedFrame;
 }
 
-int FrameScrollBar::getLastViewedFrame() {
+int FrameScrollBar::getLastViewedFrame() const {
     return mFirstViewedFrame + mViewedFramesSpan;
 }

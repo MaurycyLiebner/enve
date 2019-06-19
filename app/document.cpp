@@ -1,6 +1,7 @@
 #include "document.h"
 #include "FileCacheHandlers/filecachehandler.h"
 #include "canvas.h"
+Document* Document::sInstance = nullptr;
 
 bool Document::FileCompare::operator()(const FileHandler &f1,
                                        const FileHandler &f2) {
@@ -15,11 +16,18 @@ Canvas *Document::createNewScene() {
     return newScene.get();
 }
 
-void Document::removeScene(const int id) {
+bool Document::removeScene(const qsptr<Canvas>& scene) {
+    const int id = fScenes.indexOf(scene);
+    return removeScene(id);
+}
+
+bool Document::removeScene(const int id) {
+    if(id < 0 || id >= fScenes.count()) return false;
     const auto scene = fScenes.takeAt(id);
     SWT_removeChild(scene.data());
     emit sceneRemoved(scene.data());
     emit sceneRemoved(id);
+    return true;
 }
 
 void Document::setActiveScene(Canvas * const scene) {
@@ -28,37 +36,13 @@ void Document::setActiveScene(Canvas * const scene) {
     SWT_scheduleContentUpdate(scene ? scene->getCurrentGroup() : nullptr,
                               SWT_TARGET_CURRENT_GROUP);
     SWT_scheduleContentUpdate(scene, SWT_TARGET_CURRENT_CANVAS);
+    emit activeSceneChanged(scene);
 }
 
 void Document::clear() {
     for(const auto& scene : fScenes)
         SWT_removeChild(scene.data());
     fScenes.clear();
-}
-
-void Document::write(QIODevice * const dst) const {
-    const int nScenes = fScenes.count();
-    dst->write(rcConstChar(&nScenes), sizeof(int));
-    for(const auto &scene : fScenes)
-        scene->writeBoundingBox(dst);
-//        if(canvas.get() == mCurrentCanvas) {
-//            currentCanvasId = mCurrentCanvas->getWriteId();
-//        }
-//    }
-//    target->write(rcConstChar(&currentCanvasId), sizeof(int));
-}
-
-void Document::read(QIODevice * const src) {
-    int nScenes;
-    src->read(rcChar(&nScenes), sizeof(int));
-    for(int i = 0; i < nScenes; i++) {
-        const auto canvas = createNewScene();
-        canvas->readBoundingBox(src);
-    }
-//    int currentCanvasId;
-//    src->read(rcChar(&currentCanvasId), sizeof(int));
-//    auto currentCanvas = BoundingBox::sGetBoxByReadId(currentCanvasId);
-//    setCurrentCanvas(GetAsPtr(currentCanvas, Canvas));
 }
 
 void Document::SWT_setupAbstraction(SWT_Abstraction * const abstraction,

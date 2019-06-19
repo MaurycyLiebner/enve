@@ -51,6 +51,9 @@ int KEY_RECT_SIZE;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) {
+    connect(&mDocument, &Document::evFilePathChanged,
+            this, &MainWindow::updateTitle);
+
     mVideoEncoder = SPtrCreate(VideoEncoder)();
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
@@ -84,7 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
     mMainWindowInstance = this;
     //int nThreads = QThread::idealThreadCount();
 
-    setCurrentPath("");
+    mDocument.setPath("");
 
     mFillStrokeSettingsDock = new QDockWidget(this);
     //const auto fillStrokeSettingsScroll = new ScrollArea(this);
@@ -710,23 +713,6 @@ void MainWindow::setupToolBar() {
     mToolBar->widgetForAction(mToolBar->addAction("     "))->
             setObjectName("inactiveToolButton");
     //mToolBar->addSeparator();
-    QWidget *canvasComboWidget = new QWidget(this);
-    canvasComboWidget->setAttribute(Qt::WA_TranslucentBackground);
-    QHBoxLayout *canvasComboLayout = new QHBoxLayout();
-    canvasComboLayout->setSpacing(0);
-    canvasComboWidget->setLayout(canvasComboLayout);
-    mCurrentCanvasComboBox = new QComboBox(mToolBar);
-    mCurrentCanvasComboBox->setMinimumContentsLength(20);
-
-    mNewCanvasButton = new QPushButton("+", mToolBar);
-    mNewCanvasButton->setObjectName("addCanvasButton");
-    mCurrentCanvasComboBox->setObjectName("currentCanvasComboBox");
-    mNewCanvasButton->setFixedHeight(
-                mCurrentCanvasComboBox->sizeHint().height());
-    canvasComboLayout->addWidget(mNewCanvasButton);
-    canvasComboLayout->addWidget(mCurrentCanvasComboBox);
-
-    mToolBar->addWidget(canvasComboWidget);
 
     addToolBar(mToolBar);
 }
@@ -768,14 +754,6 @@ void MainWindow::connectToolBarActions() {
             mCanvasWindow, &CanvasWindow::makeSegmentLine );
     connect(mActionCurve, &ActionButton::pressed,
             mCanvasWindow, &CanvasWindow::makeSegmentCurve );
-    connect(mCurrentCanvasComboBox, &QComboBox::editTextChanged,
-            mCanvasWindow, &CanvasWindow::renameCurrentCanvas);
-    connect(mCurrentCanvasComboBox,
-            qOverload<int>(&QComboBox::currentIndexChanged),
-            mCanvasWindow,
-            qOverload<int>(&CanvasWindow::setCurrentCanvas));
-    connect(mNewCanvasButton, &QPushButton::pressed,
-            this, &MainWindow::createNewCanvas);
     connect(mFontWidget, &FontsWidget::fontSizeChanged,
             mCanvasWindow, &CanvasWindow::setFontSize);
     connect(mFontWidget, &FontsWidget::fontFamilyAndStyleChanged,
@@ -784,54 +762,6 @@ void MainWindow::connectToolBarActions() {
 
 MainWindow *MainWindow::getInstance() {
     return mMainWindowInstance;
-}
-
-#include "newcanvasdialog.h"
-void MainWindow::createNewCanvas() {
-    const QString defName = "Scene " +
-            QString::number(mCurrentCanvasComboBox->count());
-
-    const auto dialog = new CanvasSettingsDialog(defName,
-                                                 MainWindow::getInstance());
-    connect(dialog, &QDialog::accepted, this, [this, dialog]() {
-        const auto newCanvas = mDocument.createNewScene();
-        dialog->applySettingsToCanvas(newCanvas);
-        addCanvas(newCanvas);
-        dialog->close();
-    });
-
-    dialog->show();
-}
-
-void MainWindow::addCanvas(Canvas* const newCanvas) {
-    mCanvasWindow->setCurrentCanvas(newCanvas);
-
-    disconnect(mCurrentCanvasComboBox,
-               qOverload<int>(&QComboBox::currentIndexChanged),
-               mCanvasWindow,
-               qOverload<int>(&CanvasWindow::setCurrentCanvas));
-    mCurrentCanvasComboBox->addItem(newCanvas->getName());
-    mCurrentCanvasComboBox->setCurrentIndex(
-                mCurrentCanvasComboBox->count() - 1);
-    connect(newCanvas, &Canvas::canvasNameChanged,
-            this, &MainWindow::canvasNameChanged);
-
-    connect(mCurrentCanvasComboBox,
-            qOverload<int>(&QComboBox::currentIndexChanged),
-            mCanvasWindow,
-            qOverload<int>(&CanvasWindow::setCurrentCanvas));
-}
-
-void MainWindow::canvasNameChanged(Canvas *canvas,
-                                   const QString &name) {
-    int idT = 0;
-    for(const auto& canvasPtr : mDocument.fScenes) {
-        if(canvasPtr == canvas) break;
-        idT++;
-    }
-
-    if(idT < 0 || idT >= mDocument.fScenes.count()) return;
-    mCurrentCanvasComboBox->setItemText(idT, name);
 }
 
 void MainWindow::updateCanvasModeButtonsChecked() {
@@ -951,7 +881,7 @@ FillStrokeSettingsWidget *MainWindow::getFillStrokeSettings() {
 bool MainWindow::askForSaving() {
     if(mChangedSinceSaving) {
         int buttonId = QMessageBox::question(this, "Save", "Save changes to document \"" +
-                                      mCurrentFilePath.split("/").last() +
+                                      mDocument.fEvFile.split("/").last() +
                                       "\"?", "Close without saving",
                                       "Cancel",
                                       "Save");
@@ -1007,11 +937,12 @@ int MainWindow::getFrameCount() {
     return mCanvasWindow->getMaxFrame();
 }
 #include "GUI/GradientWidgets/gradientwidget.h"
+#include "GUI/newcanvasdialog.h"
 
 void MainWindow::newFile() {
     if(askForSaving()) {
         closeProject();
-        createNewCanvas();
+        CanvasSettingsDialog::sNewCanvasDialog(mDocument, this);
     }
 }
 
@@ -1114,7 +1045,6 @@ void MainWindow::clearAll() {
     mObjectSettingsWidget->setMainTarget(nullptr);
 
     mBoxesListAnimationDockWidget->clearAll();
-    mCurrentCanvasComboBox->clear();
     mCanvasWindow->clearAll();
     mFillStrokeSettings->clearAll();
     mDocument.clear();
@@ -1127,22 +1057,17 @@ void MainWindow::clearAll() {
     //mBoxListWidget->clearAll();
 }
 
-void MainWindow::setCurrentPath(QString newPath) {
-    mCurrentFilePath = newPath;
-    updateTitle();
-}
-
 void MainWindow::updateTitle() {
     QString star = "";
     if(mChangedSinceSaving) star = "*";
-    setWindowTitle(mCurrentFilePath.split("/").last() + star + " - enve");
+    setWindowTitle(mDocument.fEvFile.split("/").last() + star + " - enve");
 }
 
 void MainWindow::openFile() {
     if(askForSaving()) {
         disable();
         const QString openPath = QFileDialog::getOpenFileName(this,
-            "Open File", mCurrentFilePath, "enve Files (*.ev)");
+            "Open File", mDocument.fEvFile, "enve Files (*.ev)");
         if(!openPath.isEmpty()) openFile(openPath);
         enable();
     }
@@ -1152,7 +1077,7 @@ void MainWindow::openFile(const QString& openPath) {
     clearAll();
     try {
         loadEVFile(openPath);
-        setCurrentPath(openPath);
+        mDocument.setPath(openPath);
         setFileChangedSinceSaving(false);
         addRecentFile(openPath);
     } catch(const std::exception& e) {
@@ -1161,12 +1086,12 @@ void MainWindow::openFile(const QString& openPath) {
 }
 
 void MainWindow::saveFile() {
-    if(mCurrentFilePath.isEmpty()) {
+    if(mDocument.fEvFile.isEmpty()) {
         saveFileAs();
         return;
     }
     try {
-        saveToFile(mCurrentFilePath);
+        saveToFile(mDocument.fEvFile);
         setFileChangedSinceSaving(false);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
@@ -1176,13 +1101,13 @@ void MainWindow::saveFile() {
 void MainWindow::saveFileAs() {
     disableEventFilter();
     const QString saveAs = QFileDialog::getSaveFileName(this, "Save File",
-                               mCurrentFilePath,
+                               mDocument.fEvFile,
                                "enve Files (*.ev)");
     enableEventFilter();
     if(!saveAs.isEmpty()) {
         try {
             saveToFile(saveAs);
-            setCurrentPath(saveAs);
+            mDocument.setPath(saveAs);
             setFileChangedSinceSaving(false);
         } catch(const std::exception& e) {
             gPrintExceptionCritical(e);
@@ -1207,7 +1132,7 @@ void MainWindow::saveBackup() {
 
 bool MainWindow::closeProject() {
     if(askForSaving()) {
-        setCurrentPath("");
+        mDocument.setPath("");
         clearAll();
         return true;
     }
@@ -1252,7 +1177,7 @@ void MainWindow::importImageSequence() {
 void MainWindow::revert() {
     clearAll();
     try {
-        loadEVFile(mCurrentFilePath);
+        loadEVFile(mDocument.fEvFile);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
     }
@@ -1308,19 +1233,4 @@ void MainWindow::setCurrentFrame(const int frame) {
     mFillStrokeSettings->getGradientWidget()->updateAfterFrameChanged(frame);
     mCanvasWindow->updateAfterFrameChanged(frame);
     queScheduledTasksAndUpdate();
-}
-
-Gradient *MainWindow::getLoadedGradientById(const int id) {
-    for(const auto gradient : mLoadedGradientsList) {
-        if(gradient->getLoadId() == id) return gradient;
-    }
-    return nullptr;
-}
-
-void MainWindow::clearLoadedGradientsList() {
-    mLoadedGradientsList.clear();
-}
-
-void MainWindow::addLoadedGradient(Gradient * const gradient) {
-    mLoadedGradientsList << gradient;
 }

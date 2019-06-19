@@ -32,8 +32,6 @@ GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
 //    newGradient(Color(1.f, 0.f, 0.f), Color(0.f, 1.f, 0.f));
 }
 
-GradientWidget::~GradientWidget() {}
-
 void GradientWidget::updateAll() {
     mCurrentGradientWidget->update();
     mGradientsListWidget->getDisplayedGradientsWidget()->update();
@@ -69,12 +67,12 @@ void GradientWidget::newGradient(const QColor &color1,
 }
 
 void GradientWidget::newGradient(const int fromGradientId) {
-    const Gradient * const fromGradient = mGradients.at(fromGradientId).data();
+    const auto fromGradient = mGradients.at(fromGradientId).data();
     auto newGradient = SPtrCreate(Gradient)();
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
-    fromGradient->writeProperty(&buffer);
-    if(buffer.reset()) newGradient->readProperty(&buffer);
+    fromGradient->write(-1, &buffer);
+    if(buffer.reset()) newGradient->read(&buffer);
     else return;
     buffer.close();
     addGradientToList(newGradient);
@@ -222,19 +220,6 @@ void GradientWidget::updateAfterFrameChanged(const int absFrame) {
         gradient->anim_setAbsFrame(absFrame);
 }
 
-void GradientWidget::clearGradientsLoadIds() {
-    for(const auto& gradient : mGradients)
-        gradient->setLoadId(-1);
-}
-
-void GradientWidget::setGradientLoadIds() {
-    int id = 0;
-    for(const auto& gradient : mGradients) {
-        gradient->setLoadId(id);
-        id++;
-    }
-}
-
 void GradientWidget::gradientLeftPressed(const int gradId) {
     if(gradId >= mGradients.count() || gradId < 0) return;
     setCurrentGradient(gradId);
@@ -278,23 +263,4 @@ void GradientWidget::finishGradientTransform() {
 void GradientWidget::startGradientTransform() {
     if(!mCurrentGradient) return;
     mCurrentGradient->prp_startTransform();
-}
-
-void GradientWidget::writeGradients(QIODevice *target) {
-    const int nGradients = mGradients.count();
-    target->write(rcConstChar(&nGradients), sizeof(int));
-    for(const auto &gradient : mGradients) {
-        gradient->writeProperty(target);
-    }
-}
-
-void GradientWidget::readGradients(QIODevice *target) {
-    int nGradients;
-    target->read(rcChar(&nGradients), sizeof(int));
-    for(int i = 0; i < nGradients; i++) {
-        auto gradient = SPtrCreate(Gradient)();
-        gradient->readProperty(target);
-        addGradientToList(gradient);
-        MainWindow::getInstance()->addLoadedGradient(gradient.get());
-    }
 }

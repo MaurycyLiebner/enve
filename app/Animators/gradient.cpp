@@ -14,17 +14,26 @@ Gradient::Gradient(const QColor &color1, const QColor &color2) :
     updateQGradientStops(Animator::USER_CHANGE);
 }
 
-void Gradient::writeProperty(QIODevice * const target) const {
-    target->write(rcConstChar(&mLoadId), sizeof(int));
+void Gradient::write(const int id, QIODevice * const dst) {
+    mReadWriteId = id;
+    dst->write(rcConstChar(&id), sizeof(int));
+    writeProperty(dst);
+}
+
+int Gradient::read(QIODevice * const src) {
+    src->read(rcChar(&mReadWriteId), sizeof(int));
+    readProperty(src);
+    return mReadWriteId;
+}
+
+void Gradient::writeProperty(QIODevice * const dst) const {
     const int nColors = mColors.count();
-    target->write(rcConstChar(&nColors), sizeof(int));
-    for(const auto& color : mColors) {
-        color->writeProperty(target);
-    }
+    dst->write(rcConstChar(&nColors), sizeof(int));
+    for(const auto& color : mColors)
+        color->writeProperty(dst);
 }
 
 void Gradient::readProperty(QIODevice * const src) {
-    src->read(rcChar(&mLoadId), sizeof(int));
     int nColors;
     src->read(rcChar(&nColors), sizeof(int));
     for(int i = 0; i < nColors; i++) {
@@ -158,11 +167,10 @@ void Gradient::updateQGradientStops(const Animator::UpdateReason& reason) {
     }
 }
 
-
-int Gradient::getLoadId() {
-    return mLoadId;
+int Gradient::getReadWriteId() {
+    return mReadWriteId;
 }
 
-void Gradient::setLoadId(const int id) {
-    mLoadId = id;
+void Gradient::clearReadWriteId() {
+    mReadWriteId = -1;
 }

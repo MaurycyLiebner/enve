@@ -245,8 +245,7 @@ void BoxesListKeysViewWidget::moveSlider(int val) {
 
 void BoxesListKeysViewWidget::connectToFrameWidget(
         FrameScrollBar *frameRange) {
-    mKeysView->setFramesRange(frameRange->getFirstViewedFrame(),
-                              frameRange->getLastViewedFrame());
+    mKeysView->setFramesRange(frameRange->getViewedRange());
 }
 
 void BoxesListKeysViewWidget::connectToChangeWidthWidget(
@@ -256,9 +255,8 @@ void BoxesListKeysViewWidget::connectToChangeWidthWidget(
     setBoxesListWidth(changeWidthWidget->getCurrentWidth());
 }
 
-void BoxesListKeysViewWidget::setDisplayedFrameRange(const int minFrame,
-                                                  const int maxFrame) {
-    mKeysView->setFramesRange(minFrame, maxFrame);
+void BoxesListKeysViewWidget::setDisplayedFrameRange(const FrameRange& range) {
+    mKeysView->setFramesRange(range);
 }
 
 void BoxesListKeysViewWidget::setBoxesListWidth(const int width) {

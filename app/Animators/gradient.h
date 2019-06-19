@@ -30,8 +30,10 @@ public:
         return 0;
     }
 
-    void writeProperty(QIODevice * const target) const;
-    void readProperty(QIODevice * const src);
+    void write(const int id, QIODevice * const dst);
+    int read(QIODevice * const src);
+    int getReadWriteId();
+    void clearReadWriteId();
 
     void swapColors(const int id1, const int id2);
     void removeColor(const qsptr<ColorAnimator> &color);
@@ -42,9 +44,6 @@ public:
     bool affectsPaths();
 
     void updateQGradientStops(const UpdateReason &reason);
-
-    int getLoadId();
-    void setLoadId(const int id);
 
     void addColorToList(const QColor &color);
     QColor getColorAt(const int id);
@@ -66,7 +65,10 @@ protected:
     Gradient();
     Gradient(const QColor &color1, const QColor &color2);
 private:
-    int mLoadId = -1;
+    void writeProperty(QIODevice * const dst) const;
+    void readProperty(QIODevice * const src);
+
+    int mReadWriteId = -1;
     QGradientStops mQGradientStops;
     QList<qsptr<ColorAnimator>> mColors;
     QList<qptr<PathBox>> mAffectedPaths;

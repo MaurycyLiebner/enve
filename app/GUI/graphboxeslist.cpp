@@ -322,9 +322,9 @@ void KeysView::graphMiddleMove(const QPointF &movePos) {
     QPointF diffFrameValue = (movePos - mMiddlePressPos);
     diffFrameValue.setX(diffFrameValue.x()/mPixelsPerFrame);
     diffFrameValue.setY(diffFrameValue.y()/mPixelsPerValUnit);
-    int roundX = qRound(diffFrameValue.x() );
-    setFramesRange(mSavedMinViewedFrame - roundX,
-                   mSavedMaxViewedFrame - roundX );
+    const int roundX = qRound(diffFrameValue.x() );
+    setFramesRange({mSavedMinViewedFrame - roundX,
+                    mSavedMaxViewedFrame - roundX});
     graphSetMinShownVal(mSavedMinShownValue + diffFrameValue.y());
 }
 

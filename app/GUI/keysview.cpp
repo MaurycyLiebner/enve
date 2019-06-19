@@ -54,8 +54,8 @@ void KeysView::middleMove(const QPointF &movePos) {
     const qreal diffFrame = (movePos.x() - mMiddlePressPos.x())/
                                     mPixelsPerFrame;
     const int roundX = qRound(diffFrame);
-    setFramesRange(mSavedMinViewedFrame - roundX,
-                   mSavedMaxViewedFrame - roundX);
+    setFramesRange({mSavedMinViewedFrame - roundX,
+                    mSavedMaxViewedFrame - roundX});
 }
 
 void KeysView::deleteSelectedKeys() {
@@ -466,7 +466,7 @@ void KeysView::scrollRight() {
     const int inc = qMax(1, qFloor(pixelInc/mPixelsPerFrame));
     mMinViewedFrame += inc;
     mMaxViewedFrame += inc;
-    emit changedViewedFrames(mMinViewedFrame, mMaxViewedFrame);
+    emit changedViewedFrames({mMinViewedFrame, mMaxViewedFrame});
     if(mSelecting) {
         mSelectionRect.setBottomRight(mSelectionRect.bottomRight() +
                                       QPointF(inc, 0));
@@ -482,7 +482,7 @@ void KeysView::scrollLeft() {
     const int inc = qMax(1, qFloor(pixelInc/mPixelsPerFrame));
     mMinViewedFrame -= inc;
     mMaxViewedFrame -= inc;
-    emit changedViewedFrames(mMinViewedFrame, mMaxViewedFrame);
+    emit changedViewedFrames({mMinViewedFrame, mMaxViewedFrame});
     if(mSelecting) {
         mSelectionRect.setBottomRight(mSelectionRect.bottomRight() -
                                       QPointF(inc, 0));
@@ -511,8 +511,7 @@ void KeysView::handleMouseMove(const QPoint &pos,
         } else if(buttons & Qt::MiddleButton) {
             if(mGraphViewed) graphMiddleMove(posU);
             else middleMove(posU);
-            emit changedViewedFrames(mMinViewedFrame,
-                                     mMaxViewedFrame);
+            emit changedViewedFrames({mMinViewedFrame, mMaxViewedFrame});
         } else {
             if(posU.x() < -MIN_WIDGET_DIM/2) {
                 if(!mScrollTimer->isActive()) {
@@ -755,10 +754,9 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void KeysView::setFramesRange(const int startFrame,
-                              const int endFrame) {
-    mMinViewedFrame = startFrame;
-    mMaxViewedFrame = endFrame;
+void KeysView::setFramesRange(const FrameRange& range) {
+    mMinViewedFrame = range.fMin;
+    mMaxViewedFrame = range.fMax;
     updatePixelsPerFrame();
     if(mGraphViewed) graphUpdateDimensions();
     update();

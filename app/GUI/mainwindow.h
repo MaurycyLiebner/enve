@@ -101,7 +101,6 @@ public:
     void saveToFile(const QString &path);
     void loadEVFile(const QString &path);
     void clearAll();
-    void setCurrentPath(QString newPath);
     void updateTitle();
     void setFileChangedSinceSaving(bool changed);
     void disableEventFilter();
@@ -136,13 +135,10 @@ public:
             const ClipboardContainerType &type);
     void addCanvas(Canvas * const newCanvas);
 
-    Gradient *getLoadedGradientById(const int id);
-    void clearLoadedGradientsList();
     void previewBeingPlayed();
     void previewBeingRendered();
     void previewPaused();
 
-    void addLoadedGradient(Gradient * const gradient);
     FontsWidget *getFontsWidget() const {
         return mFontWidget;
     }
@@ -156,7 +152,6 @@ public:
     //void playPreview();
    // void stopPreview();
     void setResolutionFractionValue(const qreal value);
-    void createNewCanvas();
 
     void queScheduledTasksAndUpdate();
     void addCanvasToRenderQue();
@@ -247,7 +242,6 @@ private:
     stdsptr<ClipboardContainer> mClipboardContainer;
 //    bool mRendering = false;
 
-    QComboBox *mCurrentCanvasComboBox;
 //    bool mCancelLastBoxUpdate = false;
 //    BoundingBox *mLastUpdatedBox = nullptr;
 //    QList<BoundingBox*> mBoxesAwaitingUpdate;
@@ -304,11 +298,7 @@ private:
     QAction *mFillAndStrokeSettingsDock;
     QAction *mBrushSettingsDockAction;
 
-    QPushButton *mNewCanvasButton;
-
     FontsWidget *mFontWidget = nullptr;
-
-    QString mCurrentFilePath = "";
 
     QMenuBar *mMenuBar;
     QMenu *mFileMenu;

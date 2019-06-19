@@ -97,12 +97,13 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
 
     connect(mAnimationWidgetScrollbar,
             &FrameScrollBar::viewedFrameRangeChanged,
-            parent, &MainWindow::setCurrentFrame);
+            parent, [parent](const FrameRange& range){
+        parent->setCurrentFrame(range.fMin);
+    });
 
     connect(mFrameRangeScrollbar,
             &FrameScrollBar::viewedFrameRangeChanged,
-            this,
-            &BoxesListAnimationDockWidget::setViewedFrameRange);
+            this, &BoxesListAnimationDockWidget::setViewedFrameRange);
 
 
     mAnimationWidgetScrollbar->setSizePolicy(QSizePolicy::MinimumExpanding,
@@ -437,19 +438,18 @@ void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
 }
 
 void BoxesListAnimationDockWidget::setViewedFrameRange(
-        const int minFrame, const int maxFrame) {
-    mFrameRangeScrollbar->setViewedFrameRange(minFrame, maxFrame);
-    mAnimationWidgetScrollbar->setDisplayedFrameRange(minFrame, maxFrame);
+        const FrameRange& range) {
+    mFrameRangeScrollbar->setViewedFrameRange(range);
+    mAnimationWidgetScrollbar->setDisplayedFrameRange(range);
     for(const auto& keysView : mBoxesListKeysViewWidgets) {
-        keysView->setDisplayedFrameRange(minFrame, maxFrame);
+        keysView->setDisplayedFrameRange(range);
     }
 }
 
 void BoxesListAnimationDockWidget::setCanvasFrameRange(
-        const int minFrame, const int maxFrame) {
-    mFrameRangeScrollbar->setDisplayedFrameRange(minFrame, maxFrame);
-    setViewedFrameRange(mFrameRangeScrollbar->getFirstViewedFrame(),
-                        mFrameRangeScrollbar->getLastViewedFrame());
-    mFrameRangeScrollbar->setCanvasFrameRange(minFrame, maxFrame);
-    mAnimationWidgetScrollbar->setCanvasFrameRange(minFrame, maxFrame);
+        const FrameRange& range) {
+    mFrameRangeScrollbar->setDisplayedFrameRange(range);
+    setViewedFrameRange(mFrameRangeScrollbar->getViewedRange());
+    mFrameRangeScrollbar->setCanvasFrameRange(range);
+    mAnimationWidgetScrollbar->setCanvasFrameRange(range);
 }

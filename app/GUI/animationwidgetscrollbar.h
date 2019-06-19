@@ -21,8 +21,10 @@ public:
 
     int getMaxFrame();
     int getMinFrame();
-    int getFirstViewedFrame();
-    int getLastViewedFrame();
+
+    FrameRange getViewedRange() const;
+    int getFirstViewedFrame() const;
+    int getLastViewedFrame() const;
     void setTopBorderVisible(const bool bT);
 
     void setHandleColor(const QColor &col) {
@@ -31,12 +33,9 @@ public:
 
     void setCurrentCanvas(Canvas * const canvas);
 
-    void setDisplayedFrameRange(const int minFrame,
-                                const int maxFrame);
-    void setViewedFrameRange(const int minFrame,
-                             const int maxFrame);
-    void setCanvasFrameRange(const int minFrame,
-                             const int maxFrame);
+    void setDisplayedFrameRange(const FrameRange& range);
+    void setViewedFrameRange(const FrameRange& range);
+    void setCanvasFrameRange(const FrameRange& range);
 protected:
     qreal posToFrame(int xPos);
     void paintEvent(QPaintEvent *);
@@ -45,7 +44,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *);
 signals:
-    void viewedFrameRangeChanged(int, int);
+    void viewedFrameRangeChanged(FrameRange);
 private:
     bool mTopBorderVisible = true;
     bool mClamp;
@@ -58,15 +57,13 @@ private:
     int mFirstViewedFrame = 0;
     int mViewedFramesSpan = 50;
 
-    int mMinFrame = 0;
-    int mMaxFrame = 200;
+    FrameRange mFrameRange{0, 200};
 
     int mMinSpan;
     int mMaxSpan;
     int mSpanInc;
 
-    int mMinCanvasFrame = 0;
-    int mMaxCanvasFrame = 200;
+    FrameRange mCanvasRange{0, 200};
 
     qreal mFps;
     qreal mLastMousePressFrame;

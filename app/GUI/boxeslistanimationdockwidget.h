@@ -16,6 +16,7 @@
 #include <QWidgetAction>
 #include <QToolBar>
 #include "smartPointers/sharedpointerdefs.h"
+#include "framerange.h"
 class FrameScrollBar;
 class BoxesListKeysViewWidget;
 class VWidgetStack;
@@ -74,10 +75,8 @@ public:
     RenderWidget *getRenderWidget();
 
     void setCurrentFrame(const int frame);
-    void setViewedFrameRange(const int minFrame,
-                             const int maxFrame);
-    void setCanvasFrameRange(const int minFrame,
-                                const int maxFrame);
+    void setViewedFrameRange(const FrameRange &range);
+    void setCanvasFrameRange(const FrameRange &range);
     void addNewBoxesListKeysViewWidget(int id = 0);
     void removeBoxesListKeysViewWidget(
             BoxesListKeysViewWidget *widget);

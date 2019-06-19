@@ -19,6 +19,10 @@ class Document : public SingleWidgetTarget {
         bool operator()(const FileHandler& f1, const FileHandler& f2);
     };
 public:
+    Document() { sInstance = this; }
+
+    static Document* sInstance;
+
     QString fEvFile;
 
     CanvasMode fCanvasMode;
@@ -42,8 +46,14 @@ public:
     qptr<Canvas> fTimelineScene;
     qptr<Canvas> fLastActiveScene;
 
+    void setPath(const QString& path) {
+        fEvFile = path;
+        emit evFilePathChanged(fEvFile);
+    }
+
     Canvas * createNewScene();
-    void removeScene(const int id);
+    bool removeScene(const qsptr<Canvas>& scene);
+    bool removeScene(const int id);
 
     void setActiveScene(Canvas * const scene);
 
@@ -52,13 +62,26 @@ public:
     void write(QIODevice * const dst) const;
     void read(QIODevice * const src);
 
+    Gradient * getGradientWithRWId(const int rwId);
+
     void SWT_setupAbstraction(SWT_Abstraction * const abstraction,
                               const UpdateFuncs &updateFuncs,
                               const int visiblePartWidgetId);
+private:
+    void clearGradientRWIds() const;
+    void writeGradients(QIODevice * const dst) const;
+    void writeScenes(QIODevice * const dst) const;
+
+    void readGradients(QIODevice * const src);
+    void readScenes(QIODevice * const src);
 signals:
     void sceneCreated(Canvas*);
     void sceneRemoved(Canvas*);
     void sceneRemoved(int);
+
+    void activeSceneChanged(Canvas*);
+
+    void evFilePathChanged(QString);
 };
 
 #endif // DOCUMENT_H

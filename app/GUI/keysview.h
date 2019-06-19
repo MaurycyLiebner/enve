@@ -5,6 +5,7 @@
 #include <QPointer>
 #include "keyfocustarget.h"
 #include "smartPointers/sharedpointerdefs.h"
+#include "framerange.h"
 
 const QList<QColor> ANIMATOR_COLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
                                       QColor(255, 255, 0), QColor(255, 0, 255),
@@ -99,10 +100,15 @@ protected:
 
     void KFT_setFocusToWidget() {
         setFocus();
+        update();
     }
 
+    void KFT_clearFocus() {
+        clearFocus();
+        update();
+    }
 signals:
-    void changedViewedFrames(int, int);
+    void changedViewedFrames(FrameRange);
     void wheelEventSignal(QWheelEvent*);
 public:
     static QColor sGetAnimatorColor(const int i);
@@ -112,8 +118,7 @@ public:
 
     void graphUpdateAfterKeysChanged();
 
-    void setFramesRange(const int startFrame,
-                        const int endFrame);
+    void setFramesRange(const FrameRange &range);
 
     void graphMakeSegmentsLinearAction();
     void graphMakeSegmentsSmoothAction();

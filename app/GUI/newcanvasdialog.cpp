@@ -7,7 +7,7 @@ CanvasSettingsDialog::CanvasSettingsDialog(Canvas * const canvas,
     CanvasSettingsDialog(canvas->getName(),
                          canvas->getCanvasWidth(),
                          canvas->getCanvasHeight(),
-                         canvas->getMaxFrame(),
+                         canvas->getFrameRange(),
                          canvas->getFps(),
                          canvas->getBgColorAnimator(),
                          parent) {
@@ -16,12 +16,12 @@ CanvasSettingsDialog::CanvasSettingsDialog(Canvas * const canvas,
 
 CanvasSettingsDialog::CanvasSettingsDialog(const QString &defName,
                                            QWidget * const parent) :
-    CanvasSettingsDialog(defName, 1920, 1080, 200, 24., nullptr, parent) {}
+    CanvasSettingsDialog(defName, 1920, 1080, {0, 200}, 24., nullptr, parent) {}
 
 CanvasSettingsDialog::CanvasSettingsDialog(const QString &name,
                                            const int width,
                                            const int height,
-                                           const int frameCount,
+                                           const FrameRange& range,
                                            const qreal fps,
                                            ColorAnimator * const bg,
                                            QWidget * const parent) :
@@ -54,15 +54,21 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &name,
     mSizeLayout->addWidget(mHeightSpinBox);
     mMainLayout->addLayout(mSizeLayout);
 
-    mFrameCountLabel = new QLabel("Frame Count:", this);
-    mFrameCountSpinBox = new QSpinBox(this);
-    mFrameCountSpinBox->setRange(1, 999999);
-    mFrameCountSpinBox->setValue(frameCount);
+    mFrameRangeLabel = new QLabel("Frame Range:", this);
+    mMinFrameSpin = new QSpinBox(this);
+    mMinFrameSpin->setRange(0, 999999);
+    mMinFrameSpin->setValue(range.fMin);
 
-    mFrameCountLayout = new QHBoxLayout();
-    mFrameCountLayout->addWidget(mFrameCountLabel);
-    mFrameCountLayout->addWidget(mFrameCountSpinBox);
-    mMainLayout->addLayout(mFrameCountLayout);
+    mMaxFrameSpin = new QSpinBox(this);
+    mMaxFrameSpin->setRange(0, 999999);
+    mMaxFrameSpin->setValue(range.fMax);
+
+    mFrameRangeLayout = new QHBoxLayout();
+    mFrameRangeLayout->addWidget(mFrameRangeLabel);
+    mFrameRangeLayout->addWidget(mMinFrameSpin);
+    mFrameRangeLayout->addWidget(mMaxFrameSpin);
+
+    mMainLayout->addLayout(mFrameRangeLayout);
 
     mFPSLabel = new QLabel("Fps:", this);
     mFPSSpinBox = new QDoubleSpinBox(this);
@@ -109,8 +115,10 @@ QString CanvasSettingsDialog::getCanvasName() const {
     return mNameEdit->text();
 }
 
-int CanvasSettingsDialog::getCanvasFrameCount() const {
-    return mFrameCountSpinBox->value();
+FrameRange CanvasSettingsDialog::getFrameRange() const {
+    FrameRange range = {mMinFrameSpin->value(), mMaxFrameSpin->value()};
+    range.fixOrder();
+    return range;
 }
 
 qreal CanvasSettingsDialog::getFps() const {
@@ -122,8 +130,24 @@ void CanvasSettingsDialog::applySettingsToCanvas(Canvas * const canvas) const {
     canvas->setName(getCanvasName());
     canvas->setCanvasSize(getCanvasWidth(), getCanvasHeight());
     canvas->setFps(getFps());
-    canvas->setMaxFrame(getCanvasFrameCount());
+    canvas->setFrameRange(getFrameRange());
     if(canvas != mTargetCanvas) {
         canvas->getBgColorAnimator()->setColor(mBgColorButton->color());
     }
+}
+
+void CanvasSettingsDialog::sNewCanvasDialog(Document& document,
+                                            QWidget * const parent) {
+    const QString defName = "Scene " +
+            QString::number(document.fScenes.count());
+
+    const auto dialog = new CanvasSettingsDialog(defName, parent);
+    const auto docPtr = &document;
+    connect(dialog, &QDialog::accepted, dialog, [dialog, docPtr]() {
+        const auto newCanvas = docPtr->createNewScene();
+        dialog->applySettingsToCanvas(newCanvas);
+        dialog->close();
+    });
+
+    dialog->show();
 }

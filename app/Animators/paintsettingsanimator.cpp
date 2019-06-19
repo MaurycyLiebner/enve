@@ -40,7 +40,7 @@ void PaintSettingsAnimator::writeProperty(QIODevice * const dst) const {
     mColor->writeProperty(dst);
     dst->write(rcConstChar(&mPaintType), sizeof(PaintType));
     dst->write(rcConstChar(&mGradientType), sizeof(bool));
-    const int gradId = mGradient ? mGradient->getLoadId() : -1;
+    const int gradId = mGradient ? mGradient->getReadWriteId() : -1;
     dst->write(rcConstChar(&gradId), sizeof(int));
 }
 
@@ -53,7 +53,7 @@ void PaintSettingsAnimator::readProperty(QIODevice * const src) {
     src->read(rcChar(&mGradientType), sizeof(bool));
     src->read(rcChar(&gradId), sizeof(int));
     if(gradId != -1) {
-        mGradient = MainWindow::getInstance()->getLoadedGradientById(gradId);
+        mGradient = Document::sInstance->getGradientWithRWId(gradId);
     }
     setPaintType(paintType);
 }

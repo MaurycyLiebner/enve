@@ -68,13 +68,13 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         disconnect(mCurrentCanvas, nullptr, this, nullptr);
     }
     mCurrentCanvas = canvas;
-    mDocument.setActiveScene(mCurrentCanvas);
+    if(hasFocus()) mDocument.setActiveScene(mCurrentCanvas);
     if(mCurrentCanvas) {
         mCurrentSoundComposition = mCurrentCanvas->getSoundComposition();
         mCurrentCanvas->setIsCurrentCanvas(true);
         setCanvasMode(mCurrentCanvas->getCurrentCanvasMode());
 
-        emit changeCanvasFrameRange(0, getMaxFrame());
+        emit changeCanvasFrameRange(canvas->getFrameRange());
         changeCurrentFrameAction(getCurrentFrame());
         connect(mCurrentCanvas, &Canvas::requestCanvasMode,
                 this, &CanvasWindow::setCanvasMode);
@@ -892,7 +892,7 @@ void CanvasWindow::openWelcomeDialog() {
     if(mWelcomeDialog) return;
     const auto mWindow = MainWindow::getInstance();
     mWelcomeDialog = new WelcomeDialog(mWindow->getRecentFiles(),
-                                       []() { MainWindow::getInstance()->createNewCanvas(); },
+                                       [this]() { CanvasSettingsDialog::sNewCanvasDialog(mDocument, this); },
                                        []() { MainWindow::getInstance()->openFile(); },
                                        [](QString path) { MainWindow::getInstance()->openFile(path); },
                                        mWindow);

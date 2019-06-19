@@ -10,7 +10,6 @@ class GradientWidget : public QWidget {
     Q_OBJECT
 public:
     GradientWidget(QWidget *parent, MainWindow *mainWindow);
-    ~GradientWidget();
 
     void setCurrentGradient(Gradient *gradient,
                             const bool emitChange = true);
@@ -43,11 +42,6 @@ public:
     int getColorIdAtX(const int x);
 
     void updateAfterFrameChanged(const int absFrame);
-
-    void clearGradientsLoadIds();
-    void setGradientLoadIds();
-    void writeGradients(QIODevice *target);
-    void readGradients(QIODevice *target);
 
     int getGradientsCount() const {
         return mGradients.count();

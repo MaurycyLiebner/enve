@@ -51,12 +51,14 @@ public:
     void queScheduledTasksAndUpdate();
     bool KFT_handleKeyEventForTarget(QKeyEvent *event);
     void KFT_setFocusToWidget() {
+        if(mCurrentCanvas) mDocument.setActiveScene(mCurrentCanvas);
         setFocus();
         update();
     }
 
     void KFT_clearFocus() {
         clearFocus();
+        update();
     }
 
     void startSelectedStrokeColorTransform();
@@ -106,18 +108,6 @@ public:
     void grabMouse();
     void releaseMouse();
     bool isMouseGrabber();
-
-    bool hasFocus() {
-        return mHasFocus;
-    }
-
-    void setFocus() {
-        mHasFocus = true;
-    }
-
-    void clearFocus() {
-        mHasFocus = false;
-    }
 
     bool event(QEvent *event);
 
@@ -234,7 +224,7 @@ private:
     int mCurrentPreviewFrame;
 signals:
     void changeCurrentFrame(int);
-    void changeCanvasFrameRange(int, int);
+    void changeCanvasFrameRange(FrameRange);
 public:
     void setCurrentBrushColor(const QColor& color);
     void setCurrentBrush(const SimpleBrushWrapper * const brush);

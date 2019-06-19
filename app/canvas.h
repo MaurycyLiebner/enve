@@ -172,6 +172,8 @@ protected:
                     const int frameCount = 200,
                     const qreal fps = 24);
 public:
+    void prp_afterChangedAbsRange(const FrameRange &range);
+
     void selectOnlyLastPressedBox();
     void selectOnlyLastPressedPoint();
 
@@ -416,7 +418,7 @@ public:
         return mHeight;
     }
 
-    void setMaxFrame(const int frame);
+    void setFrameRange(const FrameRange& range);
 
     ColorAnimator *getBgColorAnimator() {
         return mBackgroundColor.get();
@@ -458,10 +460,9 @@ signals:
     void canvasNameChanged(Canvas *, QString);
     void requestCanvasMode(CanvasMode);
     void newerState();
+    void newFrameRange(FrameRange);
 public:
     void scheduleDisplayedFillStrokeSettingsUpdate();
-
-    void prp_afterChangedAbsRange(const FrameRange &range);
 
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
@@ -480,7 +481,7 @@ public:
     void setSelectedFillColorMode(const ColorMode &mode);
     void setSelectedStrokeColorMode(const ColorMode &mode);
     int getCurrentFrame();
-    int getFrameCount();
+    FrameRange getFrameRange() const { return mRange; }
 
     SoundComposition *getSoundComposition();
 
@@ -666,7 +667,7 @@ protected:
 
     bool mLocalPivot = false;
     bool mIsCurrentCanvas = true;
-    int mMaxFrame = 0;
+    FrameRange mRange{0, 200};
 
     qreal mResolutionFraction;
 

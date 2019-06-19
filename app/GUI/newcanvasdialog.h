@@ -7,6 +7,9 @@
 #include <QLineEdit>
 #include <QLabel>
 #include "smartPointers/sharedpointerdefs.h"
+#include "framerange.h"
+
+class Document;
 class Canvas;
 class ColorAnimator;
 class ColorAnimatorButton;
@@ -20,7 +23,7 @@ public:
     CanvasSettingsDialog(const QString &name,
                          const int width,
                          const int height,
-                         const int frameCount,
+                         const FrameRange &range,
                          const qreal fps,
                          ColorAnimator * const bg,
                          QWidget * const parent = nullptr);
@@ -28,10 +31,12 @@ public:
     int getCanvasWidth() const;
     int getCanvasHeight() const;
     QString getCanvasName() const;
-    int getCanvasFrameCount() const;
+    FrameRange getFrameRange() const;
     qreal getFps() const;
 
     void applySettingsToCanvas(Canvas * const canvas) const;
+
+    static void sNewCanvasDialog(Document &document, QWidget * const parent);
 private:
     Canvas * mTargetCanvas = nullptr;
 
@@ -47,9 +52,10 @@ private:
     QLabel *mHeightLabel;
     QSpinBox *mHeightSpinBox;
 
-    QHBoxLayout *mFrameCountLayout;
-    QLabel *mFrameCountLabel;
-    QSpinBox *mFrameCountSpinBox;
+    QHBoxLayout *mFrameRangeLayout;
+    QLabel *mFrameRangeLabel;
+    QSpinBox *mMinFrameSpin;
+    QSpinBox *mMaxFrameSpin;
 
     QHBoxLayout *mFPSLayout;
     QLabel *mFPSLabel;

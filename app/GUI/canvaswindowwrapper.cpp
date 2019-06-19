@@ -3,6 +3,7 @@
 #include <QComboBox>
 #include <QLabel>
 
+#include "GUI/newcanvasdialog.h"
 #include "canvaswindow.h"
 #include "document.h"
 
@@ -10,7 +11,24 @@ class CanvasWrapperMenuBar : public StackWrapperMenu {
 public:
     CanvasWrapperMenuBar(Document& document, CanvasWindow * const window) :
         mDocument(document), mWindow(window) {
+        addAction("+", this, [this]() {
+            const QString defName = "Scene " +
+                    QString::number(mDocument.fScenes.count());
+
+            const auto dialog = new CanvasSettingsDialog(defName, mWindow);
+            connect(dialog, &QDialog::accepted, this, [this, dialog]() {
+                const auto newCanvas = mDocument.createNewScene();
+                dialog->applySettingsToCanvas(newCanvas);
+                dialog->close();
+            });
+
+            dialog->show();
+        });
         mSceneMenu = addMenu("none");
+        addAction("x", this, [this]() {
+            if(!mCurrentScene) return;
+            mDocument.removeScene(GetAsSPtr(mCurrentScene, Canvas));
+        });
         mSceneMenu->setDisabled(true);
         for(const auto& scene : mDocument.fScenes)
             addScene(scene.get());

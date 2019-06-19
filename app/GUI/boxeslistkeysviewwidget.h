@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QMenuBar>
 #include "smartPointers/stdselfref.h"
+#include "framerange.h"
 
 class SWT_Abstraction;
 class FrameScrollBar;
@@ -35,9 +36,9 @@ public:
     void connectToFrameWidget(FrameScrollBar *frameRange);
     void connectToChangeWidthWidget(
             ChangeWidthWidget *changeWidthWidget);
-    void setDisplayedFrameRange(const int minFrame, const int maxFrame);
+    void setDisplayedFrameRange(const FrameRange &range);
 signals:
-    void changedFrameRange(int, int);
+    void changedFrameRange(FrameRange);
 public slots:
     void setRuleNone();
     void setRuleSelected();

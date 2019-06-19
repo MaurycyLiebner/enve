@@ -45,43 +45,6 @@
 #include "Sound/soundcomposition.h"
 #include "Animators/gpueffectanimators.h"
 
-class FileFooter {
-public:
-    static bool sWrite(QIODevice * const target) {
-        return target->write(rcConstChar(sEVFormat), sizeof(char[15])) &&
-               target->write(rcConstChar(sAppName), sizeof(char[15])) &&
-               target->write(rcConstChar(sAppVersion), sizeof(char[15]));
-    }
-
-    static bool sCompatible(QIODevice *target) {
-        const qint64 savedPos = target->pos();
-        const qint64 pos = target->size() -
-                static_cast<qint64>(3*sizeof(char[15]));
-        if(!target->seek(pos)) RuntimeThrow("Failed to seek to FileFooter");
-
-        char format[15];
-        target->read(rcChar(format), sizeof(char[15]));
-        if(std::strcmp(format, sEVFormat)) return false;
-
-//        char appVersion[15];
-//        target->read(rcChar(appVersion), sizeof(char[15]));
-
-//        char appName[15];
-//        target->read(rcChar(appName), sizeof(char[15]));
-
-        if(!target->seek(savedPos))
-            RuntimeThrow("Could not restore current position for QIODevice.");
-        return true;
-    }
-private:
-    static char sEVFormat[15];
-    static char sAppName[15];
-    static char sAppVersion[15];
-};
-
-char FileFooter::sEVFormat[15] = "enve ev";
-char FileFooter::sAppName[15] = "enve";
-char FileFooter::sAppVersion[15] = "0.5";
 
 void FixedLenAnimationRect::writeDurationRectangle(QIODevice *target) {
     DurationRectangle::writeDurationRectangle(target);
@@ -105,44 +68,31 @@ void FixedLenAnimationRect::readDurationRectangle(QIODevice *target) {
 
 
 void MainWindow::loadEVFile(const QString &path) {
-    QFile target(path);
-    if(!target.exists()) RuntimeThrow("File does not exist " + path);
-    if(!target.open(QIODevice::ReadOnly))
+    QFile file(path);
+    if(!file.exists()) RuntimeThrow("File does not exist " + path);
+    if(!file.open(QIODevice::ReadOnly))
         RuntimeThrow("Could not open file " + path);
-    if(!FileFooter::sCompatible(&target)) {
-        target.close();
-        RuntimeThrow("File incompatible or incomplete " + path);
+
+    try {
+        mDocument.read(&file);
+    } catch(...) {
+        file.close();
+        RuntimeThrow("Error while reading file " + path);
     }
-    auto gradientWidget = mFillStrokeSettings->getGradientWidget();
-    gradientWidget->readGradients(&target);
-    mDocument.read(&target);
+    file.close();
 
-    clearLoadedGradientsList();
-    gradientWidget->clearGradientsLoadIds();
     BoundingBox::sClearReadBoxes();
-
-    target.close();
 }
 
 void MainWindow::saveToFile(const QString &path) {
     QFile file(path);
     if(file.exists()) file.remove();
 
-    if(file.open(QIODevice::WriteOnly)) {
-        auto gradientWidget = mFillStrokeSettings->getGradientWidget();
-        gradientWidget->setGradientLoadIds();
-        gradientWidget->writeGradients(&file);
-        mDocument.write(&file);
-
-        clearLoadedGradientsList();
-        gradientWidget->clearGradientsLoadIds();
-
-        FileFooter::sWrite(&file);
-
-        file.close();
-    } else {
+    if(!file.open(QIODevice::WriteOnly))
         RuntimeThrow("Could not open file for writing " + path + ".");
-    }
+
+    mDocument.write(&file);
+    file.close();
 
     BoundingBox::sClearWriteBoxes();
     addRecentFile(path);
