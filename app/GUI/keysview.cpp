@@ -222,16 +222,15 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
         handleMouseMove(mLastMovePos, QApplication::mouseButtons());
     } else if(graphProcessFilteredKeyEvent(event)) {
     } else if(event->modifiers() & Qt::ControlModifier &&
-       event->key() == Qt::Key_V) {
+              event->key() == Qt::Key_V) {
         if(event->isAutoRepeat()) return false;
         auto cont = mMainWindow->getClipboardContainer(CCT_KEYS);
-        const auto container =
-                GetAsPtr(cont, KeysClipboardContainer);
+        const auto container = GetAsPtr(cont, KeysClipboardContainer);
         if(!container) return false;
         container->paste(mMainWindow->getCurrentFrame(), this, true, true);
     } else if(!mSelectedKeysAnimators.isEmpty()) {
         if(event->modifiers() & Qt::ControlModifier &&
-                  event->key() == Qt::Key_C) {
+           event->key() == Qt::Key_C) {
             if(event->isAutoRepeat()) return false;
             auto container = getSelectedKeysClipboardContainer();
             mMainWindow->replaceClipboard(container);

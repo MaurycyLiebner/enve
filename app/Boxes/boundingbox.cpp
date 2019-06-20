@@ -256,7 +256,7 @@ void BoundingBox::updateAllBoxes(const UpdateReason &reason) {
 }
 
 void BoundingBox::drawAllCanvasControls(SkCanvas * const canvas,
-                                        const CanvasMode &mode,
+                                        const CanvasMode mode,
                                         const SkScalar invScale) {
     for(const auto& prop : mCanvasProps)
         prop->drawCanvasControls(canvas, mode, invScale);
@@ -269,7 +269,7 @@ FrameRange BoundingBox::prp_relInfluenceRange() const {
 }
 
 MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPos,
-                                            const CanvasMode &mode,
+                                            const CanvasMode mode,
                                             const qreal invScale) const {
 
     for(const auto& prop : mCanvasProps) {
@@ -1279,7 +1279,7 @@ void BoundingBox::selectAndAddContainedPointsToList(
 }
 
 void BoundingBox::selectAllCanvasPts(QList<MovablePoint*> &selection,
-                                     const CanvasMode& mode) {
+                                     const CanvasMode mode) {
     for(const auto& desc : mCanvasProps) {
         const auto handler = desc->getPointsHandler();
         if(!handler) continue;

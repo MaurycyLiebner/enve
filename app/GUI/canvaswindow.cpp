@@ -24,6 +24,8 @@
 CanvasWindow::CanvasWindow(Document &document, QWidget * const parent) :
     GLWindow(parent), mDocument(document) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
+    connect(&mDocument, &Document::canvasModeSet,
+            this, &CanvasWindow::setCanvasMode);
 
     mPreviewFPSTimer = new QTimer(this);
     connect(mPreviewFPSTimer, &QTimer::timeout,
@@ -49,6 +51,10 @@ CanvasWindow::CanvasWindow(Document &document, QWidget * const parent) :
             this, &CanvasWindow::interruptOutputRendering);
 }
 
+CanvasWindow::~CanvasWindow() {
+    setCurrentCanvas(nullptr);
+}
+
 Canvas *CanvasWindow::getCurrentCanvas() {
     return mCurrentCanvas;
 }
@@ -65,10 +71,12 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     if(mCurrentCanvas) {
         mCurrentCanvas->setIsCurrentCanvas(false);
         disconnect(mCurrentCanvas, nullptr, this, nullptr);
+        mDocument.removeVisibleScene(canvas);
     }
     mCurrentCanvas = canvas;
     if(hasFocus()) mDocument.setActiveScene(mCurrentCanvas);
     if(mCurrentCanvas) {
+        mDocument.addVisibleScene(canvas);
         mCurrentSoundComposition = mCurrentCanvas->getSoundComposition();
         mCurrentCanvas->setIsCurrentCanvas(true);
         setCanvasMode(mCurrentCanvas->getCurrentCanvasMode());
@@ -135,7 +143,6 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
         mCurrentCanvas->cancelCurrentTransform();
         releaseMouse();
     }
-    mCurrentCanvas->setCanvasMode(mode);
     update();
 }
 
@@ -234,8 +241,7 @@ void CanvasWindow::mousePressEvent(QMouseEvent *event) {
     const auto pos = mapToCanvasCoord(event->pos());
     mCurrentCanvas->mousePressEvent(
                 MouseEvent(pos, pos, pos, mMouseGrabber,
-                           mViewTransform.m11(), mCurrentMode,
-                           event,
+                           mViewTransform.m11(), event,
                            [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
                            this));
@@ -254,8 +260,7 @@ void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
     mCurrentCanvas->mouseReleaseEvent(
                 MouseEvent(pos, mPrevMousePos, mPrevPressPos,
                            mMouseGrabber, mViewTransform.m11(),
-                           mCurrentMode, event,
-                           [this]() { releaseMouse(); },
+                           event, [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
                            this));
     queScheduledTasksAndUpdate();
@@ -271,8 +276,7 @@ void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
     mCurrentCanvas->mouseMoveEvent(
                 MouseEvent(pos, mPrevMousePos, mPrevPressPos,
                            mMouseGrabber, mViewTransform.m11(),
-                           mCurrentMode, event,
-                           [this]() { releaseMouse(); },
+                           event, [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
                            this));
 
@@ -297,8 +301,7 @@ void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     mCurrentCanvas->mouseDoubleClickEvent(
                 MouseEvent(pos, mPrevMousePos, mPrevPressPos,
                            mMouseGrabber, mViewTransform.m11(),
-                           mCurrentMode, event,
-                           [this]() { releaseMouse(); },
+                           event, [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
                            this));
     queScheduledTasksAndUpdate();
@@ -323,34 +326,6 @@ void CanvasWindow::rotate90CCW() {
 void CanvasWindow::rotate90CW() {
     if(hasNoCanvas()) return;
     //mCurrentCanvas->rotate90CW();
-}
-
-bool CanvasWindow::handleCanvasModeChangeKeyPress(QKeyEvent *event) {
-    if(event->key() == Qt::Key_F1) {
-        setCanvasMode(CanvasMode::MOVE_BOX);
-    } else if(event->key() == Qt::Key_F2) {
-        setCanvasMode(CanvasMode::MOVE_POINT);
-    } else if(event->key() == Qt::Key_F3) {
-            //setCanvasMode(CanvasMode::ADD_POINT);
-       setCanvasMode(CanvasMode::ADD_POINT);
-    } else if(event->key() == Qt::Key_F4) {
-        setCanvasMode(CanvasMode::PICK_PAINT_SETTINGS);
-    } else if(event->key() == Qt::Key_F6) {
-        setCanvasMode(CanvasMode::ADD_CIRCLE);
-    } else if(event->key() == Qt::Key_F7) {
-        setCanvasMode(CanvasMode::ADD_RECTANGLE);
-    } else if(event->key() == Qt::Key_F8) {
-        setCanvasMode(CanvasMode::ADD_TEXT);
-    } else if(event->key() == Qt::Key_F9) {
-        setCanvasMode(CanvasMode::ADD_PARTICLE_BOX);
-    } else if(event->key() == Qt::Key_F10) {
-        setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
-    } else if(event->key() == Qt::Key_F11) {
-        setCanvasMode(CanvasMode::PAINT_MODE);
-    } else {
-        return false;
-    }
-    return true;
 }
 
 bool CanvasWindow::handleCutCopyPasteKeyPress(QKeyEvent *event) {
@@ -526,7 +501,7 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     const QPoint globalPos = QCursor::pos();
     const auto pos = mapToCanvasCoord(mapFromGlobal(globalPos));
     const KeyEvent e(pos, mPrevMousePos, mPrevPressPos, mMouseGrabber,
-                     mViewTransform.m11(), mCurrentMode, globalPos,
+                     mViewTransform.m11(), globalPos,
                      QApplication::mouseButtons(), event,
                      [this]() { releaseMouse(); },
                      [this]() { grabMouse(); },
@@ -535,7 +510,6 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
         if(mCurrentCanvas->handleTransormationInputKeyEvent(e)) return true;
     }
     if(mCurrentCanvas->handlePaintModeKeyPress(e)) return true;
-    if(handleCanvasModeChangeKeyPress(event)) return true;
     if(handleCutCopyPasteKeyPress(event)) return true;
     if(handleTransformationKeyPress(event)) return true;
     if(handleZValueKeyPress(event)) return true;

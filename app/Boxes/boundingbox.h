@@ -242,7 +242,7 @@ public:
 
     void prp_afterChangedAbsRange(const FrameRange &range);
     void drawAllCanvasControls(SkCanvas * const canvas,
-                               const CanvasMode &mode,
+                               const CanvasMode mode,
                                const SkScalar invScale);
 
     FrameRange prp_relInfluenceRange() const;
@@ -263,7 +263,7 @@ public:
     QMatrix getTotalTransform() const;
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
-                                   const CanvasMode &mode,
+                                   const CanvasMode mode,
                                    const qreal invScale) const;
     NormalSegment getNormalSegment(const QPointF &absPos,
                                    const qreal invScale) const;
@@ -271,7 +271,7 @@ public:
                          const SkScalar invScale);
 
     void selectAllCanvasPts(QList<MovablePoint *> &selection,
-                            const CanvasMode &mode);
+                            const CanvasMode mode);
 
     int getDocumentId() const { return mDocumentId; }
 

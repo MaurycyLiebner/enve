@@ -14,9 +14,10 @@
 #include "paintsettingsapplier.h"
 #include "Animators/gradient.h"
 
-FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
-    QTabWidget(parent) {
-    connect(Document::sInstance, &Document::selectedPaintSettingsChanged,
+FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
+                                                   MainWindow *parent) :
+    QTabWidget(parent), mDocument(document) {
+    connect(&mDocument, &Document::selectedPaintSettingsChanged,
             this, &FillStrokeSettingsWidget::updateCurrentSettings);
     //setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     mMainWindow = parent;
@@ -316,13 +317,13 @@ void FillStrokeSettingsWidget::updateColorAnimator() {
 void FillStrokeSettingsWidget::setCurrentColorMode(const ColorMode &mode) {
     if(mTarget == PaintSetting::FILL) {
         if(mCurrentFillPaintType == FLATPAINT) {
-            const auto scene = Document::sInstance->fActiveScene;
+            const auto scene = mDocument.fActiveScene;
             if(scene) scene->setSelectedFillColorMode(mode);
         }
     } else {
         if(mCurrentStrokePaintType == FLATPAINT ||
            mCurrentStrokePaintType == BRUSHPAINT) {
-            const auto scene = Document::sInstance->fActiveScene;
+            const auto scene = mDocument.fActiveScene;
             if(scene) scene->setSelectedStrokeColorMode(mode);
         }
     }
@@ -404,7 +405,7 @@ void FillStrokeSettingsWidget::setStrokeWidth(const qreal width) {
 }
 
 void FillStrokeSettingsWidget::updateCurrentSettings() {
-    const auto scene = Document::sInstance->fActiveScene;
+    const auto scene = mDocument.fActiveScene;
     if(scene) {
         PaintSettingsAnimator* fillSetings;
         OutlineSettingsAnimator* strokeSettings;
@@ -502,7 +503,7 @@ void FillStrokeSettingsWidget::colorTypeSet(const PaintType &type) {
         paintSetting << std::make_shared<ColorPaintSetting>(mTarget, ColorSettingApplier());
     }
     paintSetting << std::make_shared<PaintTypePaintSetting>(mTarget, currentPaintType);
-    const auto scene = Document::sInstance->fActiveScene;
+    const auto scene = mDocument.fActiveScene;
     if(scene) scene->applyPaintSettingToSelected(paintSetting);
 }
 
@@ -510,9 +511,9 @@ void FillStrokeSettingsWidget::colorSettingReceived(
         const ColorSettingApplier &colorSetting) {
     PaintSettingsApplier paintSetting;
     paintSetting << std::make_shared<ColorPaintSetting>(mTarget, colorSetting);
-    const auto scene = Document::sInstance->fActiveScene;
+    const auto scene = mDocument.fActiveScene;
     if(scene) scene->applyPaintSettingToSelected(paintSetting);
-    Document::sInstance->setBrushColor(colorSetting.getColor());
+    mDocument.setBrushColor(colorSetting.getColor());
 }
 
 void FillStrokeSettingsWidget::connectGradient() {
@@ -624,47 +625,47 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
 }
 
 void FillStrokeSettingsWidget::emitStrokeBrushChanged() {
-    const auto scene = Document::sInstance->fActiveScene;
+    const auto scene = mDocument.fActiveScene;
     if(scene) scene->setSelectedStrokeBrush(mCurrentStrokeBrush);
 }
 
 void FillStrokeSettingsWidget::emitStrokeBrushWidthCurveChanged() {
-    const auto scene = Document::sInstance->fActiveScene;
+    const auto scene = mDocument.fActiveScene;
     if(scene) scene->setSelectedStrokeBrushWidthCurve(mCurrentStrokeBrushWidthCurve);
 }
 
 void FillStrokeSettingsWidget::emitStrokeBrushTimeCurveChanged() {
-    const auto scene = Document::sInstance->fActiveScene;
+    const auto scene = mDocument.fActiveScene;
     if(scene) scene->setSelectedStrokeBrushTimeCurve(mCurrentStrokeBrushTimeCurve);
 }
 
 void FillStrokeSettingsWidget::emitStrokeBrushSpacingCurveChanged() {
-    const auto scene = Document::sInstance->fActiveScene;
+    const auto scene = mDocument.fActiveScene;
     if(scene) scene->setSelectedStrokeBrushSpacingCurve(mCurrentStrokeBrushSpacingCurve);
 }
 
 void FillStrokeSettingsWidget::emitStrokeBrushPressureCurveChanged() {
-    const auto scene = Document::sInstance->fActiveScene;
+    const auto scene = mDocument.fActiveScene;
     if(scene) scene->setSelectedStrokeBrushPressureCurve(mCurrentStrokeBrushPressureCurve);
 }
 
 void FillStrokeSettingsWidget::emitStrokeWidthChanged() {
-    const auto scene = Document::sInstance->fActiveScene;
+    const auto scene = mDocument.fActiveScene;
     if(scene) scene->setSelectedStrokeWidth(mCurrentStrokeWidth);
 }
 
 void FillStrokeSettingsWidget::emitStrokeWidthChangedTMP() {
-    const auto scene = Document::sInstance->fActiveScene;
+    const auto scene = mDocument.fActiveScene;
     if(scene) scene->setSelectedStrokeWidth(mCurrentStrokeWidth);
 }
 
 void FillStrokeSettingsWidget::emitCapStyleChanged() {
-    const auto scene = Document::sInstance->fActiveScene;
+    const auto scene = mDocument.fActiveScene;
     if(scene) scene->setSelectedCapStyle(mCurrentCapStyle);
 }
 
 void FillStrokeSettingsWidget::emitJoinStyleChanged() {
-    const auto scene = Document::sInstance->fActiveScene;
+    const auto scene = mDocument.fActiveScene;
     if(scene) scene->setSelectedJoinStyle(mCurrentJoinStyle);
 }
 
@@ -683,7 +684,7 @@ void FillStrokeSettingsWidget::applyGradient() {
                std::make_shared<GradientTypePaintSetting>(mTarget, currentGradientType) <<
                std::make_shared<PaintTypePaintSetting>(mTarget, PaintType::GRADIENTPAINT);
 
-    const auto scene = Document::sInstance->fActiveScene;
+    const auto scene = mDocument.fActiveScene;
     if(scene) scene->applyPaintSettingToSelected(applier);
 }
 

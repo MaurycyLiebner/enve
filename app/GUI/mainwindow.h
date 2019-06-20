@@ -145,7 +145,6 @@ public:
         return mUsageWidget;
     }
 
-    void setCurrentFrame(const int frame);
     //void playPreview();
    // void stopPreview();
     void setResolutionFractionValue(const qreal value);

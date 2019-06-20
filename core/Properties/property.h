@@ -98,7 +98,7 @@ public:
     }
 
     virtual void drawCanvasControls(SkCanvas * const canvas,
-                                    const CanvasMode &mode,
+                                    const CanvasMode mode,
                                     const SkScalar invScale);
 
     virtual void addActionsToMenu(PropertyTypeMenu * const menu) {

@@ -13,12 +13,12 @@ public:
     void startTransform();
     void finishTransform();
 
-    bool isVisible(const CanvasMode& mode) const {
+    bool isVisible(const CanvasMode mode) const {
         return mode == MOVE_BOX;
     }
 
     void drawSk(SkCanvas * const canvas,
-                const CanvasMode &mode,
+                const CanvasMode mode,
                 const SkScalar invScale,
                 const bool keyOnCurrent);
 };

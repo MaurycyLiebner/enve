@@ -31,11 +31,19 @@ bool CanvasWindow::event(QEvent *event) {
     }
     return QWidget::event(event);
 }
+
 #include <QResizeEvent>
 void CanvasWindow::resizeEvent(QResizeEvent *e) {
-    const auto dSize = e->size() - e->oldSize();
-    const qreal div = 2*mViewTransform.m11();
-    translateView({dSize.width()/div, dSize.height()/div});
+    if(e->size().isValid()) {
+        if(mOldSize.isValid()) {
+            const auto dSize = e->size() - mOldSize;
+            const qreal div = 2*mViewTransform.m11();
+            const QPointF trans{dSize.width()/div, dSize.height()/div};
+            translateView(trans);
+        }
+        // e->oldSize() returns {-1, -1} after chaning parent
+        mOldSize = e->size();
+    }
     GLWindow::resizeEvent(e);
 }
 

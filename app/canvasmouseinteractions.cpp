@@ -307,24 +307,24 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     mFirstMouseMove = true;
 
     const qreal invScale = 1/e.fScale;
-    mPressedPoint = getPointAtAbsPos(e.fPos, e.fMode, invScale);
+    mPressedPoint = getPointAtAbsPos(e.fPos, mCurrentMode, invScale);
 
-    if(mRotPivot->isPointAtAbsPos(e.fPos, e.fMode, invScale)) {
+    if(mRotPivot->isPointAtAbsPos(e.fPos, mCurrentMode, invScale)) {
         return mRotPivot->select();
     }
-    if(e.fMode == CanvasMode::MOVE_BOX) {
+    if(mCurrentMode == CanvasMode::MOVE_BOX) {
         if(mHoveredPoint_d) {
             handleMovePointMousePressEvent(e);
         } else {
             handleMovePathMousePressEvent(e);
         }
-    } else if(e.fMode == CanvasMode::ADD_POINT) {
+    } else if(mCurrentMode == CanvasMode::ADD_POINT) {
         handleAddSmartPointMousePress(e);
-    } else if(e.fMode == CanvasMode::MOVE_POINT) {
+    } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
         handleMovePointMousePressEvent(e);
-    } else if(e.fMode == CanvasMode::PICK_PAINT_SETTINGS) {
+    } else if(mCurrentMode == CanvasMode::PICK_PAINT_SETTINGS) {
         mPressedBox = getBoxAtFromAllDescendents(e.fPos);
-    } else if(e.fMode == CanvasMode::ADD_CIRCLE) {
+    } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
         const auto newPath = SPtrCreate(Circle)();
         newPath->planCenterPivotPosition();
         mCurrentBoxesGroup->addContainedBox(newPath);
@@ -335,7 +335,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
 
         mCurrentCircle = newPath.get();
 
-    } else if(e.fMode == CanvasMode::ADD_RECTANGLE) {
+    } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
         const auto newPath = SPtrCreate(Rectangle)();
         newPath->planCenterPivotPosition();
         mCurrentBoxesGroup->addContainedBox(newPath);
@@ -345,7 +345,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
         addBoxToSelection(newPath.get());
 
         mCurrentRectangle = newPath.get();
-    } else if(e.fMode == CanvasMode::ADD_TEXT) {
+    } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
         const auto newPath = SPtrCreate(TextBox)();
         newPath->planCenterPivotPosition();
         const FontsWidget * const fonstWidget =
@@ -361,7 +361,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
 
         clearBoxesSelection();
         addBoxToSelection(newPath.get());
-    } else if(e.fMode == CanvasMode::ADD_PARTICLE_BOX) {
+    } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
         //setCanvasMode(CanvasMode::MOVE_POINT);
         const auto partBox = SPtrCreate(ParticleBox)();
         mCurrentBoxesGroup->addContainedBox(partBox);
@@ -637,7 +637,7 @@ void Canvas::scaleSelected(const MouseEvent& e) {
         scaleY = scaleBy;
     }
 
-    if(e.fMode == CanvasMode::MOVE_BOX) {
+    if(mCurrentMode == CanvasMode::MOVE_BOX) {
         scaleSelectedBy(scaleX, scaleY, absPos, mFirstMouseMove);
     } else {
         scaleSelectedPointsBy(scaleX, scaleY, absPos, mFirstMouseMove);

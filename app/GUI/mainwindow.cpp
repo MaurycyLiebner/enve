@@ -91,7 +91,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     mFillStrokeSettingsDock = new QDockWidget(this);
     //const auto fillStrokeSettingsScroll = new ScrollArea(this);
-    mFillStrokeSettings = new FillStrokeSettingsWidget(this);
+    mFillStrokeSettings = new FillStrokeSettingsWidget(mDocument, this);
     //fillStrokeSettingsScroll->setWidget(mFillStrokeSettings);
     const auto fillStrokeDockLabel = new QLabel("Fill and Stroke", this);
     fillStrokeDockLabel->setObjectName("dockLabel");
@@ -711,6 +711,30 @@ void MainWindow::setupToolBar() {
             setObjectName("inactiveToolButton");
     //mToolBar->addSeparator();
 
+    const auto canvasComboWidget = new QWidget(this);
+    canvasComboWidget->setAttribute(Qt::WA_TranslucentBackground);
+    const auto canvasComboLayout = new QHBoxLayout();
+    canvasComboLayout->setSpacing(0);
+    canvasComboWidget->setLayout(canvasComboLayout);
+    const auto layCombo = new QComboBox(mToolBar);
+    layCombo->setMinimumContentsLength(20);
+    layCombo->setObjectName("currentLayoutComboBox");
+    layCombo->setLayoutDirection(Qt::RightToLeft);
+    const int comboDim = layCombo->sizeHint().height();
+    const auto newLayPush = new QPushButton("+", mToolBar);
+    newLayPush->setObjectName("addCanvasButton");
+
+    const auto removeLayPush = new QPushButton("x", mToolBar);
+    removeLayPush->setObjectName("removeCanvasButton");
+
+    canvasComboLayout->addWidget(layCombo);
+    canvasComboLayout->addWidget(newLayPush);
+    canvasComboLayout->addWidget(removeLayPush);
+    newLayPush->setFixedSize(comboDim, comboDim);
+    removeLayPush->setFixedSize(comboDim, comboDim);
+
+    mToolBar->addWidget(canvasComboWidget);
+
     addToolBar(mToolBar);
 }
 
@@ -942,18 +966,44 @@ void MainWindow::newFile() {
     }
 }
 
+
+bool handleCanvasModeKeyPress(Document& document, const int key) {
+    if(key == Qt::Key_F1) {
+        document.setCanvasMode(CanvasMode::MOVE_BOX);
+    } else if(key == Qt::Key_F2) {
+        document.setCanvasMode(CanvasMode::MOVE_POINT);
+    } else if(key == Qt::Key_F3) {
+            //setCanvasMode(CanvasMode::ADD_POINT);
+        document.setCanvasMode(CanvasMode::ADD_POINT);
+    } else if(key == Qt::Key_F4) {
+        document.setCanvasMode(CanvasMode::PICK_PAINT_SETTINGS);
+    } else if(key == Qt::Key_F6) {
+        document.setCanvasMode(CanvasMode::ADD_CIRCLE);
+    } else if(key == Qt::Key_F7) {
+        document.setCanvasMode(CanvasMode::ADD_RECTANGLE);
+    } else if(key == Qt::Key_F8) {
+        document.setCanvasMode(CanvasMode::ADD_TEXT);
+    } else if(key == Qt::Key_F9) {
+        document.setCanvasMode(CanvasMode::ADD_PARTICLE_BOX);
+    } else if(key == Qt::Key_F10) {
+        document.setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
+    } else if(key == Qt::Key_F11) {
+        document.setCanvasMode(CanvasMode::PAINT_MODE);
+    } else return false;
+    return true;
+}
+
 bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
-    if(mLock) {
-        if(dynamic_cast<QInputEvent*>(e)) return true;
-    }
+    if(mLock) if(dynamic_cast<QInputEvent*>(e)) return true;
     if(mEventFilterDisabled) {
         return QMainWindow::eventFilter(obj, e);
     }
+    const auto type = e->type();
     const auto focusWidget = QApplication::focusWidget();
     if(focusWidget) {
         if(focusWidget->property("forceHandleEvent").isValid()) return false;
     }
-    if(e->type() == QEvent::KeyPress) {
+    if(type == QEvent::KeyPress) {
         const auto keyEvent = static_cast<QKeyEvent*>(e);
         if(keyEvent->key() == Qt::Key_Delete && focusWidget) {
             mEventFilterDisabled = true;
@@ -963,29 +1013,27 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
             if(widHandled) return false;
         }
         return processKeyEvent(keyEvent);
-    } else if(e->type() == QEvent::ShortcutOverride) {
+    } else if(type == QEvent::ShortcutOverride) {
         const auto keyEvent = static_cast<QKeyEvent*>(e);
-        if(isShiftPressed() && keyEvent->key() == Qt::Key_D) {
+        const int key = keyEvent->key();
+        if(handleCanvasModeKeyPress(mDocument, key)) return true;
+        if(isShiftPressed() && key == Qt::Key_D) {
             return processKeyEvent(keyEvent);
         }
         if(isCtrlPressed()) {
-            if(keyEvent->key() == Qt::Key_C ||
-               keyEvent->key() == Qt::Key_V ||
-               keyEvent->key() == Qt::Key_X ||
-               keyEvent->key() == Qt::Key_D //||
-/*                keyEvent->key() == Qt::Key_Up ||
-                keyEvent->key() == Qt::Key_Down*/) {
+            if(key == Qt::Key_C || key == Qt::Key_V ||
+               key == Qt::Key_X || key == Qt::Key_D //||
+/*                key == Qt::Key_Up ||
+                key == Qt::Key_Down*/) {
                 return processKeyEvent(keyEvent);
             }
-        } else if(
-             keyEvent->key() == Qt::Key_A ||
-             keyEvent->key() == Qt::Key_I ||
-             keyEvent->key() == Qt::Key_Delete) {
+        } else if(key == Qt::Key_A || key == Qt::Key_I ||
+                  key == Qt::Key_Delete) {
               return processKeyEvent(keyEvent);
         }
-    } else if(e->type() == QEvent::KeyRelease) {
+    } else if(type == QEvent::KeyRelease) {
         //finishUndoRedoSet();
-    } else if(e->type() == QEvent::MouseButtonRelease) {
+    } else if(type == QEvent::MouseButtonRelease) {
         //finishUndoRedoSet();
     }
     return QMainWindow::eventFilter(obj, e);
@@ -1202,11 +1250,4 @@ void MainWindow::updateRecentMenu() {
             openFile(path);
         });
     }
-}
-
-void MainWindow::setCurrentFrame(const int frame) {
-    mBoxesListAnimationDockWidget->setCurrentFrame(frame);
-    mFillStrokeSettings->getGradientWidget()->updateAfterFrameChanged(frame);
-    mCanvasWindow->updateAfterFrameChanged(frame);
-    queScheduledTasksAndUpdate();
 }

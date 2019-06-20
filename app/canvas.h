@@ -84,7 +84,6 @@ protected:
                const QPointF& lastPressPos,
                const bool mouseGrabbing,
                const qreal scale,
-               const CanvasMode mode,
                const QPoint& globalPos,
                const Qt::MouseButton button,
                const Qt::MouseButtons buttons,
@@ -95,8 +94,7 @@ protected:
                QWidget * const widget) :
         fPos(pos), fLastPos(lastPos), fLastPressPos(lastPressPos),
         fMouseGrabbing(mouseGrabbing), fScale(scale),
-        fMode(mode), fGlobalPos(globalPos),
-        fButton(button), fButtons(buttons),
+        fGlobalPos(globalPos), fButton(button), fButtons(buttons),
         fModifiers(modifiers), fTimestamp(timestamp),
         fReleaseMouse(releaseMouse), fGrabMouse(grabMouse),
         fWidget(widget) {}
@@ -106,13 +104,12 @@ public:
                const QPointF& lastPressPos,
                const bool mouseGrabbing,
                const qreal scale,
-               const CanvasMode mode,
                const QMouseEvent * const e,
                std::function<void()> releaseMouse,
                std::function<void()> grabMouse,
                QWidget * const widget) :
         MouseEvent(pos, lastPos, lastPressPos, mouseGrabbing,
-                   scale, mode, e->globalPos(), e->button(),
+                   scale, e->globalPos(), e->button(),
                    e->buttons(), e->modifiers(), e->timestamp(),
                    releaseMouse, grabMouse, widget) {}
 
@@ -146,7 +143,6 @@ struct KeyEvent : public MouseEvent {
              const QPointF& lastPressPos,
              const bool mouseGrabbing,
              const qreal scale,
-             const CanvasMode mode,
              const QPoint globalPos,
              const Qt::MouseButtons buttons,
              const QKeyEvent * const e,
@@ -154,7 +150,7 @@ struct KeyEvent : public MouseEvent {
              std::function<void()> grabMouse,
              QWidget * const widget) :
       MouseEvent(pos, lastPos, lastPressPos, mouseGrabbing,
-                 scale, mode, globalPos, Qt::NoButton,
+                 scale, globalPos, Qt::NoButton,
                  buttons, e->modifiers(), e->timestamp(),
                  releaseMouse, grabMouse, widget), fKey(e->key()) {}
 
@@ -456,6 +452,7 @@ signals:
     void newFrameRange(FrameRange);
     void boxSelectionChanged();
     void selectedPaintSettingsChanged();
+    void currentFrameChanged(int);
 public:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();

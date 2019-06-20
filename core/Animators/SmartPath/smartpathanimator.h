@@ -24,7 +24,7 @@ public:
     bool SWT_isSmartPathAnimator() const { return true; }
 
     void drawCanvasControls(SkCanvas * const canvas,
-                            const CanvasMode &mode,
+                            const CanvasMode mode,
                             const SkScalar invScale) {
         SkiaHelpers::drawOutlineOverlay(canvas, mCurrentPath, invScale,
                                         toSkMatrix(getTransform()));

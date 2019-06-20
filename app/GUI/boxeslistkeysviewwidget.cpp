@@ -211,10 +211,6 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
     setTopWidget(topWidget);
 }
 
-BoxesListKeysViewWidget::~BoxesListKeysViewWidget() {
-
-}
-
 void BoxesListKeysViewWidget::setGraphEnabled(const bool bT) {
     mKeysView->setGraphViewed(bT);
     mAnimationDockWidget->setVisible(bT);
@@ -239,12 +235,10 @@ void BoxesListKeysViewWidget::moveSlider(int val) {
         mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(val);
     }
     emit mBoxesListAnimationDockWidget->viewedVerticalRangeChanged(
-                        val,
-                        val + mBoxesListScrollArea->height());
+                        val, val + mBoxesListScrollArea->height());
 }
 
-void BoxesListKeysViewWidget::connectToFrameWidget(
-        FrameScrollBar *frameRange) {
+void BoxesListKeysViewWidget::connectToFrameWidget(FrameScrollBar *frameRange) {
     mKeysView->setFramesRange(frameRange->getViewedRange());
 }
 
@@ -281,7 +275,7 @@ void BoxesListKeysViewWidget::removeThis() {
     mBoxesListAnimationDockWidget->removeBoxesListKeysViewWidget(this);
 }
 
-void BoxesListKeysViewWidget::setBoxRule(const SWT_BoxRule& rule) {
+void BoxesListKeysViewWidget::setBoxRule(const SWT_BoxRule rule) {
     mBoxesListWidget->getVisiblePartWidget()->setCurrentRule(rule);
     mMainWindow->queScheduledTasksAndUpdate();
 }
@@ -340,7 +334,7 @@ void BoxesListKeysViewWidget::setTargetCurrentGroup() {
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void BoxesListKeysViewWidget::setCurrentType(const SWT_Type& type) {
+void BoxesListKeysViewWidget::setCurrentType(const SWT_Type type) {
     mBoxesListWidget->getVisiblePartWidget()->setCurrentType(type);
     mMainWindow->queScheduledTasksAndUpdate();
 }

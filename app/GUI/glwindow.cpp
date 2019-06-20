@@ -110,18 +110,6 @@ void GLWindow::initialize() {
 //    qDebug() << "  Current format:   " << mContext->format();
 }
 
-//void glOrthoAndViewportSet(GLuint w, GLuint h) {
-//    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
-//    glMatrixMode(GL_PROJECTION);
-//    glLoadIdentity();
-//    glOrtho(0.0f, w, h, 0.0f, 0.0f, 1.0f);
-//    glMatrixMode(GL_MODELVIEW);
-//}
-
-
-
-#include "GPUEffects/gpupostprocessor.h"
-#include "taskscheduler.h"
 void GLWindow::paintGL() {
     //glBindFramebuffer(GL_FRAMEBUFFER, context()->defaultFramebufferObject());
     glViewport(0, 0, width(), height());

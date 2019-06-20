@@ -23,8 +23,9 @@ void SkiaHelpers::drawImageGPU(
         const SkScalar y,
         SkPaint * const paint,
         GrContext* const context) {
-    if(!image || !context) return;
+    if(!image || !context) RuntimeThrow("Invalid draw request");
     sk_sp<SkImage> texture(image->makeTextureImage(context, nullptr));
+    if(!texture) RuntimeThrow("Failed to make texture image");
     canvas->drawImage(texture, x, y, paint);
 };
 

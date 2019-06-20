@@ -13,7 +13,7 @@ protected:
     GradientPoints(PathBox * const parent);
 public:
     void drawCanvasControls(SkCanvas *const canvas,
-                            const CanvasMode &mode,
+                            const CanvasMode mode,
                             const SkScalar invScale);
 
     void enable();

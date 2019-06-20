@@ -33,11 +33,14 @@ Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
                const int frameCount, const qreal fps) :
     ContainerBox(TYPE_CANVAS), mDocument(document) {
+    connect(&mDocument, &Document::canvasModeSet,
+            this, &Canvas::setCanvasMode);
     mMainWindow = MainWindow::getInstance();
     std::function<bool(int)> changeFrameFunc =
     [this](const int undoRedoFrame) {
-        if(undoRedoFrame != mMainWindow->getCurrentFrame()) {
-            mMainWindow->setCurrentFrame(undoRedoFrame);
+        if(mDocument.fActiveScene != this) return false;
+        if(undoRedoFrame != anim_getCurrentAbsFrame()) {
+            mDocument.setActiveSceneFrame(undoRedoFrame);
             return true;
         }
         return false;
@@ -112,11 +115,11 @@ void Canvas::updateHoveredBox(const MouseEvent& e) {
 }
 
 void Canvas::updateHoveredPoint(const MouseEvent& e) {
-    mHoveredPoint_d = getPointAtAbsPos(e.fPos, e.fMode, 1/e.fScale);
+    mHoveredPoint_d = getPointAtAbsPos(e.fPos, mCurrentMode, 1/e.fScale);
 }
 
 void Canvas::updateHoveredEdge(const MouseEvent& e) {
-    if(e.fMode != MOVE_POINT || mHoveredPoint_d)
+    if(mCurrentMode != MOVE_POINT || mHoveredPoint_d)
         return mHoveredNormalSegment.clear();
     mHoveredNormalSegment = getSegment(e);
     if(mHoveredNormalSegment.isValid())
@@ -679,6 +682,7 @@ void Canvas::anim_setAbsFrame(const int frame) {
 
     if(mCurrentMode == PAINT_MODE)
         mPaintTarget.setupOnionSkin();
+    emit currentFrameChanged(frame);
 }
 
 void Canvas::clearSelectionAction() {
@@ -707,10 +711,10 @@ void Canvas::setParentToLastSelected() {
 }
 
 bool Canvas::startRotatingAction(const KeyEvent &e) {
-    if(e.fMode != MOVE_BOX &&
-       e.fMode != MOVE_POINT) return false;
+    if(mCurrentMode != MOVE_BOX &&
+       mCurrentMode != MOVE_POINT) return false;
     if(mSelectedBoxes.isEmpty()) return false;
-    if(e.fMode == MOVE_POINT) {
+    if(mCurrentMode == MOVE_POINT) {
         if(mSelectedPoints_d.isEmpty()) return false;
     }
     mValueInput.clearAndDisableInput();
@@ -728,11 +732,11 @@ bool Canvas::startRotatingAction(const KeyEvent &e) {
 }
 
 bool Canvas::startScalingAction(const KeyEvent &e) {
-    if(e.fMode != MOVE_BOX &&
-       e.fMode != MOVE_POINT) return false;
+    if(mCurrentMode != MOVE_BOX &&
+       mCurrentMode != MOVE_POINT) return false;
 
     if(mSelectedBoxes.isEmpty()) return false;
-    if(e.fMode == MOVE_POINT) {
+    if(mCurrentMode == MOVE_POINT) {
         if(mSelectedPoints_d.isEmpty()) return false;
     }
     mValueInput.clearAndDisableInput();
@@ -747,8 +751,8 @@ bool Canvas::startScalingAction(const KeyEvent &e) {
 }
 
 bool Canvas::startMovingAction(const KeyEvent &e) {
-    if(e.fMode != MOVE_BOX &&
-       e.fMode != MOVE_POINT) return false;
+    if(mCurrentMode != MOVE_BOX &&
+       mCurrentMode != MOVE_POINT) return false;
     mValueInput.clearAndDisableInput();
     mValueInput.setupMove();
 

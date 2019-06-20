@@ -20,7 +20,7 @@ public:
     }
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
-                                   const CanvasMode &mode,
+                                   const CanvasMode mode,
                                    const qreal invScale) {
         for(int i = mPts.count() - 1; i >= 0; i--) {
             const auto& pt = mPts.at(i);
@@ -31,7 +31,7 @@ public:
     }
 
     void addAllPointsToSelection(QList<MovablePoint*> &selection,
-                                 const CanvasMode &mode) {
+                                 const CanvasMode mode) {
         for(const auto& pt : mPts) {
             if(pt->isSelected() || pt->isHidden(mode)) continue;
             if(pt->selectionEnabled()) {
@@ -43,7 +43,7 @@ public:
 
     void addInRectForSelection(const QRectF &absRect,
                                QList<MovablePoint*> &selection,
-                               const CanvasMode &mode) const {
+                               const CanvasMode mode) const {
         for(const auto& pt : mPts) {
             if(!pt->selectionEnabled()) continue;
             if(pt->isSelected() || pt->isHidden(mode)) continue;
@@ -54,7 +54,7 @@ public:
     void drawPoints(SkCanvas * const canvas,
                     const SkScalar invScale,
                     const bool keyOnCurrentFrame,
-                    const CanvasMode &mode) const {
+                    const CanvasMode mode) const {
         for(int i = mPts.count() - 1; i >= 0; i--) {
             const auto& pt = mPts.at(i);
             if(pt->isVisible(mode))

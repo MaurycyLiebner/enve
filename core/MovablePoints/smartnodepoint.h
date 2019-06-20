@@ -34,7 +34,7 @@ public:
 
     void canvasContextMenu(PointTypeMenu * const menu);
 
-    bool isVisible(const CanvasMode& mode) const {
+    bool isVisible(const CanvasMode mode) const {
         if(mode == CanvasMode::MOVE_POINT) return true;
         else if(mode == CanvasMode::ADD_POINT)
             return isEndPoint() || isSelected();
@@ -42,12 +42,12 @@ public:
     }
 
     void drawSk(SkCanvas * const canvas,
-                const CanvasMode &mode,
+                const CanvasMode mode,
                 const SkScalar invScale,
                 const bool keyOnCurrent);
     void setTransform(BasicTransformAnimator * const trans);
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
-                                   const CanvasMode &mode,
+                                   const CanvasMode mode,
                                    const qreal invScale);
 
     int moveToClosestSegment(const QPointF &absPos);

@@ -8,7 +8,7 @@ class GradientPoint : public AnimatedPoint {
 public:
     void setColor(const QColor &fillColor);
     void drawSk(SkCanvas * const canvas,
-                const CanvasMode &mode,
+                const CanvasMode mode,
                 const SkScalar invScale,
                 const bool keyOnCurrent);
 protected:

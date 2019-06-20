@@ -328,6 +328,7 @@ public:
         if(id == -1) return nullptr;
         mWidgets.replace(id, newWid);
         newWid->setParent(mThis);
+        oldWid->setParent(nullptr);
         DimSetter(newWid, (oldWid->*DimGetter)());
         updateAll();
         newWid->show();

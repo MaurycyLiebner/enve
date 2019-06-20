@@ -26,7 +26,7 @@ void BoxPathPoint::finishTransform() {
     bTrans->finishPivotTransform();
 }
 
-void BoxPathPoint::drawSk(SkCanvas * const canvas, const CanvasMode &mode,
+void BoxPathPoint::drawSk(SkCanvas * const canvas, const CanvasMode mode,
                           const SkScalar invScale, const bool keyOnCurrent) {
     Q_UNUSED(mode);
     Q_UNUSED(keyOnCurrent);

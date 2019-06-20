@@ -12,7 +12,7 @@ protected:
     BrushPolylineAnimator();
 public:
     void drawCanvasControls(SkCanvas * const canvas,
-                            const CanvasMode &mode,
+                            const CanvasMode mode,
                             const SkScalar invScale) {
         if(mode != CanvasMode::MOVE_POINT) return;
         const auto trans = getTransformAnimator();

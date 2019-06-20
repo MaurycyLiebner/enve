@@ -35,7 +35,7 @@ class CanvasWindow : public GLWindow,
     Q_OBJECT
 public:
     explicit CanvasWindow(Document& document, QWidget * const parent = nullptr);
-
+    ~CanvasWindow();
     Canvas *getCurrentCanvas();
 
     void openWelcomeDialog();
@@ -146,6 +146,7 @@ private:
     Document& mDocument;
     CanvasMode mCurrentMode = MOVE_BOX;
 
+    QSize mOldSize{-1, -1};
     QMatrix mViewTransform;
     QPointF mPrevMousePos;
     QPointF mPrevPressPos;

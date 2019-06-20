@@ -19,7 +19,7 @@ public:
 
     void remove();
 
-    bool isVisible(const CanvasMode &mode) const;
+    bool isVisible(const CanvasMode mode) const;
     void scale(const qreal sx, const qreal sy);
 
     void setOtherCtrlPt(SmartCtrlPoint * const ctrlPt);

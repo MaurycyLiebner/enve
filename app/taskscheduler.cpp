@@ -95,8 +95,8 @@ void TaskScheduler::queScheduledCPUTasks() {
     if(!shouldQueMoreCPUTasks()) return;
     mCPUQueing = true;
     mQuedCPUTasks.beginQue();
-    const auto scene = Document::sInstance->fActiveScene;
-    if(scene) {
+    for(const auto& it : Document::sInstance->fVisibleScenes) {
+        const auto scene = it.first;
         scene->scheduleWaitingTasks();
         scene->queScheduledTasks();
     }

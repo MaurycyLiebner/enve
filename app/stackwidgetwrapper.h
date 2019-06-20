@@ -60,12 +60,7 @@ template <class T>
 void StackWidgetWrapper::split() {
     if(mMenuBar) mMenuBar->enableClose();
     const auto stack = new T(parentWidget());
-
-    if(!gReplaceWidget(this, stack)) {
-        delete stack;
-        return;
-    }
-
+    gReplaceWidget(this, stack);
     stack->appendWidget(this);
     const auto newWid = new StackWidgetWrapper(mSetupOp, stack);
     stack->appendWidget(newWid);

@@ -8,7 +8,7 @@ Property::Property(const QString& name) :
     prp_mName(name) {}
 
 void Property::drawCanvasControls(SkCanvas * const canvas,
-                                  const CanvasMode &mode,
+                                  const CanvasMode mode,
                                   const SkScalar invScale) {
     if(mPointsHandler) {
         bool key;

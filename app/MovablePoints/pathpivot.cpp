@@ -11,7 +11,7 @@ PathPivot::PathPivot(const Canvas * const parent) :
 }
 
 void PathPivot::drawSk(SkCanvas * const canvas,
-                       const CanvasMode &mode,
+                       const CanvasMode mode,
                        const SkScalar invScale,
                        const bool keyOnCurrent) {
     Q_UNUSED(keyOnCurrent);
@@ -51,7 +51,7 @@ void PathPivot::drawTransforming(SkCanvas * const canvas,
     paint.setPathEffect(nullptr);
 }
 
-bool PathPivot::isVisible(const CanvasMode &mode) const {
+bool PathPivot::isVisible(const CanvasMode mode) const {
     if(mCanvas->getPivotLocal()) return false;
     if(mode == MOVE_POINT) return !mCanvas->isPointSelectionEmpty();
     else if(mode == MOVE_BOX) return !mCanvas->isBoxSelectionEmpty();

@@ -127,7 +127,7 @@ void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {
 }
 
 MovablePoint *SmartNodePoint::getPointAtAbsPos(const QPointF &absPos,
-                                               const CanvasMode &mode,
+                                               const CanvasMode mode,
                                                const qreal invScale) {
     if(mode == CanvasMode::MOVE_POINT) {
         if(mC0Pt->isPointAtAbsPos(absPos, mode, invScale)) {
@@ -223,7 +223,7 @@ void drawCtrlPtLine(SkCanvas * const canvas,
 
 void SmartNodePoint::drawSk(
         SkCanvas * const canvas,
-        const CanvasMode &mode,
+        const CanvasMode mode,
         const SkScalar invScale,
         const bool keyOnCurrent) {
     const QPointF qAbsPos = getAbsolutePos();

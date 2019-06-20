@@ -30,7 +30,6 @@ public:
                                      QWidget *topWidget,
                                      BoxesListAnimationDockWidget *animationDock,
                                      QWidget *parent);
-    ~BoxesListKeysViewWidget();
 
     void setTopWidget(QWidget *topWidget);
     void connectToFrameWidget(FrameScrollBar *frameRange);
@@ -39,7 +38,7 @@ public:
     void setDisplayedFrameRange(const FrameRange &range);
 signals:
     void changedFrameRange(FrameRange);
-public slots:
+private:
     void setRuleNone();
     void setRuleSelected();
     void setRuleAnimated();
@@ -61,14 +60,14 @@ public slots:
     void setTypeSound();
 
     void setGraphEnabled(const bool bT);
-protected slots:
+protected:
     void setBoxesListWidth(const int width);
 
     void addNewBelowThis();
     void removeThis();
 private:
-    void setCurrentType(const SWT_Type &type);
-    void setBoxRule(const SWT_BoxRule &rule);
+    void setCurrentType(const SWT_Type type);
+    void setBoxRule(const SWT_BoxRule rule);
 
     Document& mDocument;
 

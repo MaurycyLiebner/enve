@@ -43,26 +43,26 @@ public:
     virtual void cancelTransform() {}
 
     virtual void drawSk(SkCanvas * const canvas,
-                        const CanvasMode &mode,
+                        const CanvasMode mode,
                         const SkScalar invScale,
                         const bool keyOnCurrent);
 
     virtual void remove() {}
-    virtual bool isVisible(const CanvasMode& mode) const;
+    virtual bool isVisible(const CanvasMode mode) const;
 
     virtual void canvasContextMenu(PointTypeMenu * const menu) {
         Q_UNUSED(menu);
     }
 
     virtual MovablePoint * getPointAtAbsPos(const QPointF &absPos,
-                                            const CanvasMode &mode,
+                                            const CanvasMode mode,
                                             const qreal invScale) {
         if(isPointAtAbsPos(absPos, mode, invScale)) return this;
         return nullptr;
     }
 
     virtual void rectPointsSelection(const QRectF &absRect,
-                                     const CanvasMode &mode,
+                                     const CanvasMode mode,
                                      QList<MovablePoint*> &list);
 
     virtual void setTransform(BasicTransformAnimator * const trans);
@@ -73,7 +73,7 @@ public:
     void moveByRel(const QPointF &relTranslation);
     QPointF getAbsolutePos() const;
     bool isPointAtAbsPos(const QPointF &absPoint,
-                         const CanvasMode &mode,
+                         const CanvasMode mode,
                          const qreal invScale);
     void setAbsolutePos(const QPointF &pos);
 
@@ -84,7 +84,7 @@ public:
     void select();
     void deselect();
 
-    bool isHidden(const CanvasMode& mode) const {
+    bool isHidden(const CanvasMode mode) const {
         return !isVisible(mode);
     }
 

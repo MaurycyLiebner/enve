@@ -8,6 +8,11 @@ bool Document::FileCompare::operator()(const FileHandler &f1,
     return f1->getFilePath() < f2->getFilePath();
 }
 
+void Document::setCanvasMode(const CanvasMode mode) {
+    fCanvasMode = mode;
+    emit canvasModeSet(mode);
+}
+
 Canvas *Document::createNewScene() {
     const auto newScene = SPtrCreate(Canvas)(*this);
     fScenes.append(newScene);
@@ -30,6 +35,18 @@ bool Document::removeScene(const int id) {
     return true;
 }
 
+void Document::addVisibleScene(Canvas * const scene) {
+    fVisibleScenes[scene]++;
+}
+
+bool Document::removeVisibleScene(Canvas * const scene) {
+    const auto it = fVisibleScenes.find(scene);
+    if(it == fVisibleScenes.end()) return false;
+    if(it->second == 1) fVisibleScenes.erase(it);
+    else it->second--;
+    return true;
+}
+
 void Document::setActiveScene(Canvas * const scene) {
     if(scene == fActiveScene) return;
     if(fActiveScene) {
@@ -41,12 +58,38 @@ void Document::setActiveScene(Canvas * const scene) {
                 this, &Document::activeSceneBoxSelectionChanged);
         connect(fActiveScene, &Canvas::selectedPaintSettingsChanged,
                 this, &Document::selectedPaintSettingsChanged);
+        connect(fActiveScene, &Canvas::destroyed,
+                this, &Document::clearActiveScene);
     }
     SWT_scheduleContentUpdate(scene ? scene->getCurrentGroup() : nullptr,
                               SWT_TARGET_CURRENT_GROUP);
     SWT_scheduleContentUpdate(scene, SWT_TARGET_CURRENT_CANVAS);
     emit activeSceneSet(scene);
     emit activeSceneBoxSelectionChanged();
+}
+
+void Document::clearActiveScene() {
+    setActiveScene(nullptr);
+}
+
+int Document::getActiveSceneFrame() const {
+    if(!fActiveScene) return 0;
+    return fActiveScene->anim_getCurrentAbsFrame();
+}
+
+void Document::setActiveSceneFrame(const int frame) {
+    if(!fActiveScene) return;
+    if(fActiveScene->anim_getCurrentRelFrame() == frame) return;
+    fActiveScene->anim_setAbsFrame(frame);
+    emit activeSceneFrameSet(frame);
+}
+
+void Document::incActiveSceneFrame() {
+    setActiveSceneFrame(getActiveSceneFrame() + 1);
+}
+
+void Document::decActiveSceneFrame() {
+    setActiveSceneFrame(getActiveSceneFrame() - 1);
 }
 
 Gradient *Document::createNewGradient() {

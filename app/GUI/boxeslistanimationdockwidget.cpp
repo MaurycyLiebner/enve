@@ -95,12 +95,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
             qOverload<>(&FrameScrollBar::update));
     mAnimationWidgetScrollbar->setTopBorderVisible(false);
 
-    connect(mAnimationWidgetScrollbar,
-            &FrameScrollBar::viewedFrameRangeChanged,
-            parent, [parent](const FrameRange& range){
-        parent->setCurrentFrame(range.fMin);
-    });
-
     connect(mFrameRangeScrollbar,
             &FrameScrollBar::viewedFrameRangeChanged,
             this, &BoxesListAnimationDockWidget::setViewedFrameRange);
@@ -229,6 +223,18 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
     previewFinished();
     //addNewBoxesListKeysViewWidget(1);
     //addNewBoxesListKeysViewWidget(0);
+
+    connect(&mDocument, &Document::activeSceneSet,
+            this, &BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas);
+    connect(mAnimationWidgetScrollbar,
+            &FrameScrollBar::viewedFrameRangeChanged,
+            this, [this](const FrameRange& range){
+        mDocument.setActiveSceneFrame(range.fMin);
+    });
+    connect(&mDocument, &Document::activeSceneFrameSet,
+            this, [this](const int frame){
+        setCurrentFrame(frame);
+    });
 }
 
 void BoxesListAnimationDockWidget::setResolutionFractionText(QString text) {
@@ -301,28 +307,22 @@ bool BoxesListAnimationDockWidget::processKeyEvent(QKeyEvent *event) {
     const int key = event->key();
     const auto mods = event->modifiers();
     if(key == Qt::Key_Right && !(mods & Qt::ControlModifier)) {
-        mMainWindow->setCurrentFrame(
-                    mMainWindow->getCurrentFrame() + 1);
+        mDocument.incActiveSceneFrame();
     } else if(key == Qt::Key_Left && !(mods & Qt::ControlModifier)) {
-        mMainWindow->setCurrentFrame(mMainWindow->getCurrentFrame() - 1);
+        mDocument.decActiveSceneFrame();
     } else if(key == Qt::Key_Down && !(mods & Qt::ControlModifier)) {
-        const auto currCanvas = mMainWindow->getCanvasWindow()->getCurrentCanvas();
-        if(!currCanvas) return false;
+        const auto scene = mDocument.fActiveScene;
+        if(!scene) return false;
         int targetFrame;
-        if(currCanvas->anim_prevRelFrameWithKey(
-                mMainWindow->getCurrentFrame(),
-                targetFrame)) {
-            mMainWindow->setCurrentFrame(targetFrame);
+        if(scene->anim_prevRelFrameWithKey(mDocument.getActiveSceneFrame(), targetFrame)) {
+            mDocument.setActiveSceneFrame(targetFrame);
         }
     } else if(key == Qt::Key_Up && !(mods & Qt::ControlModifier)) {
-        Canvas *currCanvas =
-                mMainWindow->getCanvasWindow()->getCurrentCanvas();
-        if(!currCanvas) return false;
+        const auto scene = mDocument.fActiveScene;
+        if(!scene) return false;
         int targetFrame;
-        if(currCanvas->anim_nextRelFrameWithKey(
-                mMainWindow->getCurrentFrame(),
-                targetFrame)) {
-            mMainWindow->setCurrentFrame(targetFrame);
+        if(scene->anim_nextRelFrameWithKey(mDocument.getActiveSceneFrame(), targetFrame)) {
+            mDocument.setActiveSceneFrame(targetFrame);
         }
     } else if(key == Qt::Key_P &&
               !(mods & Qt::ControlModifier) && !(mods & Qt::AltModifier)) {
@@ -339,8 +339,8 @@ void BoxesListAnimationDockWidget::previewFinished() {
     mPlayButton->setIcon(":/icons/renderPreviewButton.png");
     mPlayButton->setToolTip("render preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
-    connect(mPlayButton, SIGNAL(pressed()),
-            this, SLOT(renderPreview()));
+    connect(mPlayButton, &ActionButton::pressed,
+            this, &BoxesListAnimationDockWidget::renderPreview);
 }
 
 void BoxesListAnimationDockWidget::previewBeingPlayed() {
@@ -424,16 +424,16 @@ void BoxesListAnimationDockWidget::setCurrentFrame(const int frame) {
 
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
         Canvas* const canvas) {
-    if(!canvas) {
-        mAnimationWidgetScrollbar->setCurrentCanvas(nullptr);
-    } else {
+    if(canvas) {
         disconnect(mResolutionComboBox, &QComboBox::currentTextChanged,
                    this, &BoxesListAnimationDockWidget::setResolutionFractionText);
         mResolutionComboBox->setCurrentText(
-                    QString::number(canvas->getResolutionFraction()*100.) + " %");
+                    QString::number(canvas->getResolutionFraction()*100) + " %");
         connect(mResolutionComboBox, &QComboBox::currentTextChanged,
                 this, &BoxesListAnimationDockWidget::setResolutionFractionText);
         mAnimationWidgetScrollbar->setCurrentCanvas(canvas);
+    } else {
+        mAnimationWidgetScrollbar->setCurrentCanvas(nullptr);
     }
 }
 

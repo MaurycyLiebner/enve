@@ -30,7 +30,8 @@ class ColorSettingApplier;
 class FillStrokeSettingsWidget : public QTabWidget {
     Q_OBJECT
 public:
-    explicit FillStrokeSettingsWidget(MainWindow *parent = nullptr);
+    explicit FillStrokeSettingsWidget(Document& document,
+                                      MainWindow *parent = nullptr);
 
     void setCurrentSettings(PaintSettingsAnimator *fillPaintSettings,
                             OutlineSettingsAnimator *strokePaintSettings);
@@ -94,8 +95,6 @@ private:
     void updateCurrentSettings();
     void applyGradient();
 
-    MainWindow *mMainWindow;
-    bool mTransormStarted = false;
 
     void connectGradient();
     void disconnectGradient();
@@ -103,9 +102,6 @@ private:
     void setJoinStyle(Qt::PenJoinStyle joinStyle);
 
     void setCapStyle(Qt::PenCapStyle capStyle);
-
-
-    PaintSetting::Target mTarget = PaintSetting::FILL;
 
     //
 
@@ -126,6 +122,11 @@ private:
 
     void setCurrentGradientVal(Gradient *gradient);
     void setCurrentGradientTypeVal(const GradientType &type);
+
+    Document& mDocument;
+    MainWindow *mMainWindow;
+    bool mTransormStarted = false;
+    PaintSetting::Target mTarget = PaintSetting::FILL;
 
     qptr<ColorAnimator> mCurrentFillColorAnimator;
     qptr<ColorAnimator> mCurrentStrokeColorAnimator;

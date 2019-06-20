@@ -129,8 +129,7 @@ public:
 
     void graphClearAnimatorSelection();
 
-    void setViewedVerticalRange(const int top,
-                        const int bottom);
+    void setViewedVerticalRange(const int top, const int bottom);
     void clearHovered();
 
     int graphGetAnimatorId(GraphAnimator * const anim);

@@ -87,7 +87,7 @@ void MovablePoint::drawOnAbsPosSk(
     }
 }
 
-void MovablePoint::drawSk(SkCanvas * const canvas, const CanvasMode &mode,
+void MovablePoint::drawSk(SkCanvas * const canvas, const CanvasMode mode,
                           const SkScalar invScale, const bool keyOnCurrent) {
     Q_UNUSED(mode);
     Q_UNUSED(keyOnCurrent);
@@ -98,7 +98,7 @@ void MovablePoint::drawSk(SkCanvas * const canvas, const CanvasMode &mode,
     drawOnAbsPosSk(canvas, absPos, invScale, fillCol);
 }
 
-bool MovablePoint::isVisible(const CanvasMode &mode) const {
+bool MovablePoint::isVisible(const CanvasMode mode) const {
     return mode == CanvasMode::MOVE_POINT;
 }
 
@@ -111,7 +111,7 @@ void MovablePoint::setTransform(BasicTransformAnimator * const trans) {
 }
 
 bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
-                                   const CanvasMode &mode,
+                                   const CanvasMode mode,
                                    const qreal invScale) {
     if(isHidden(mode)) return false;
     const QPointF dist = getAbsolutePos() - absPoint;
@@ -119,7 +119,7 @@ bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
 }
 
 void MovablePoint::rectPointsSelection(const QRectF &absRect,
-                                       const CanvasMode &mode,
+                                       const CanvasMode mode,
                                        QList<MovablePoint*> &list) {
     if(!selectionEnabled()) return;
     if(isHidden(mode)) return;
