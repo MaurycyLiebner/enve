@@ -35,6 +35,7 @@
 #include "GUI/BrushWidgets/brushselectionwidget.h"
 #include "Animators/gradient.h"
 #include "canvaswindowwrapper.h"
+#include "scenelayout.h"
 extern "C" {
     #include <libavformat/avformat.h>
 }
@@ -224,9 +225,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connectToolBarActions();
 
-    const auto cww = new CanvasWindowWrapper(&mDocument, this);
-    cww->disableClose();
-    setCentralWidget(cww);
+    new SceneLayout(mDocument, this);
     //setCentralWidget(mCanvasWindow->getCanvasWidget());
 
     showMaximized();

@@ -8,6 +8,7 @@
 #include "document.h"
 
 class CanvasWrapperMenuBar : public StackWrapperMenu {
+    friend struct CWWidgetStackLayoutItem;
 public:
     CanvasWrapperMenuBar(Document& document, CanvasWindow * const window) :
         mDocument(document), mWindow(window) {
@@ -60,10 +61,8 @@ private:
         if(removeIt == mSceneToAct.end()) return;
         if(mCurrentScene == scene) {
             const auto newIt = mSceneToAct.begin();
-            if(newIt == mSceneToAct.end()) setCurrentScene(nullptr, nullptr);
-            else {
-                setCurrentScene(newIt->first, newIt->second);
-            }
+            if(newIt == mSceneToAct.end()) setCurrentScene(nullptr);
+            else setCurrentScene(newIt->first, newIt->second);
         }
         mSceneMenu->removeAction(removeIt->second);
         delete removeIt->second;
@@ -71,11 +70,19 @@ private:
         if(mSceneToAct.empty()) mSceneMenu->setDisabled(true);
     }
 
+    void setCurrentScene(Canvas * const scene) {
+        if(!scene) return setCurrentScene(nullptr, nullptr);
+        const auto it = mSceneToAct.find(scene);
+        if(it == mSceneToAct.end()) return;
+        setCurrentScene(scene, it->second);
+    }
+
     void setCurrentScene(Canvas * const scene, QAction * const act) {
         if(act) {
             act->setChecked(true);
             act->setDisabled(true);
-        } if(mCurrentScene) {
+        }
+        if(mCurrentScene) {
             const auto currAct = mSceneToAct[mCurrentScene];
             currAct->setChecked(false);
             currAct->setEnabled(true);
@@ -93,10 +100,36 @@ private:
 };
 
 CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
+                                         WidgetStackLayoutItem* const layItem,
                                          QWidget * const parent) :
     StackWidgetWrapper(
+        layItem,
+        []() {
+            const auto rPtr = new CWWidgetStackLayoutItem();
+            return std::unique_ptr<WidgetStackLayoutItem>(rPtr);
+        },
+        [document](WidgetStackLayoutItem* const layItem,
+                   QWidget * const parent) {
+            const auto derived = new CanvasWindowWrapper(document, layItem, parent);
+            return static_cast<StackWidgetWrapper*>(derived);
+        },
         [document](StackWidgetWrapper * toSetup) {
             const auto window = new CanvasWindow(*document, toSetup);
             toSetup->setCentralWidget(window->getCanvasWidget());
             toSetup->setMenuBar(new CanvasWrapperMenuBar(*document, window));
         }, parent) {}
+
+void CWWidgetStackLayoutItem::clear() {
+    setScene(nullptr);
+}
+
+void CWWidgetStackLayoutItem::apply(StackWidgetWrapper * const stack) {
+    const auto cwWrapper = static_cast<CanvasWindowWrapper*>(stack);
+    const auto menu = cwWrapper->getMenuBar();
+    const auto swMenu = static_cast<CanvasWrapperMenuBar*>(menu);
+    swMenu->setCurrentScene(mScene);
+}
+
+void CWWidgetStackLayoutItem::setScene(Canvas * const scene) {
+    mScene = scene;
+}

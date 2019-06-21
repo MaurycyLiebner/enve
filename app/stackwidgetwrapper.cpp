@@ -1,9 +1,14 @@
 #include "stackwidgetwrapper.h"
 #include "GUI/widgetstack.h"
 
-StackWidgetWrapper::StackWidgetWrapper(const SetupOp &setup,
-                                       QWidget * const parent) :
-    QWidget(parent), mSetupOp(setup) {
+StackWidgetWrapper::StackWidgetWrapper(WidgetStackLayoutItem* const layoutItem,
+                                       const LayoutItemCreator &layoutItemCreator,
+                                       const Creator &creator,
+                                       const SetupOp &setup,
+                                       QWidget* const parent) :
+    QWidget(parent), mLayoutItem(layoutItem),
+    mLayoutItemCreator(layoutItemCreator),
+    mCreator(creator), mSetupOp(setup) {
     mLayout = new QVBoxLayout(this);
     setLayout(mLayout);
     mLayout->setSpacing(0);
@@ -24,15 +29,22 @@ void StackWidgetWrapper::setCentralWidget(QWidget * const widget) {
     mLayout->insertWidget(-1, mCenterWidget);
 }
 
-void StackWidgetWrapper::splitH() {
-    split<HWidgetStack>();
+StackWidgetWrapper* StackWidgetWrapper::splitH() {
+    auto otherLayoutItem = mLayoutItemCreator();
+    const auto otherLayoutItemPtr = otherLayoutItem.get();
+    mLayoutItem->splitH(std::move(otherLayoutItem));
+    return split<HWidgetStack>(otherLayoutItemPtr);
 }
 
-void StackWidgetWrapper::splitV() {
-    split<VWidgetStack>();
+StackWidgetWrapper* StackWidgetWrapper::splitV() {
+    auto otherLayoutItem = mLayoutItemCreator();
+    const auto otherLayoutItemPtr = otherLayoutItem.get();
+    mLayoutItem->splitV(std::move(otherLayoutItem));
+    return split<VWidgetStack>(otherLayoutItemPtr);
 }
 
 void StackWidgetWrapper::closeWrapper() {
+    mLayoutItem->close();
     const auto vStack = dynamic_cast<VWidgetStack*>(parentWidget());
     if(vStack) {
         vStack->takeWidget(this);
@@ -64,6 +76,10 @@ void StackWidgetWrapper::closeWrapper() {
     }
 
     deleteLater();
+}
+
+void StackWidgetWrapper::disableClose() {
+    if(mMenuBar) mMenuBar->disableClose();
 }
 
 StackWrapperMenu::StackWrapperMenu() {
@@ -99,4 +115,39 @@ void StackWrapperMenu::setParent(StackWidgetWrapper * const parent) {
         connect(mClose, &QAction::triggered,
                 mParent, &StackWidgetWrapper::closeWrapper);
     }
+}
+
+template<class SplitItemClass>
+void SplittableStackItem::split(WidgetPtr &&other) {
+    Q_ASSERT(mParent);
+    SplitPtr vStack = std::make_unique<SplitItemClass>();
+    const auto vStackPtr = vStack.get();
+    UniPtr thisUni = mParent->replaceChild(this, std::move(vStack));
+    vStackPtr->setChildren(std::move(thisUni), std::move(other));
+}
+
+template<class SplitItemClass>
+StackLayoutItem::SplitPtr SplittableStackItem::split(WidgetPtr &&thisUni,
+                                                     WidgetPtr &&other) {
+    SplitPtr vStack = std::make_unique<SplitItemClass>();
+    vStack->setChildren(std::move(thisUni), std::move(other));
+    return vStack;
+}
+
+void SplittableStackItem::splitV(WidgetPtr &&other) {
+    split<VSplitStackItem>(std::move(other));
+}
+
+StackLayoutItem::SplitPtr SplittableStackItem::splitV(WidgetPtr &&thisUni,
+                                                      WidgetPtr &&other) {
+    return split<VSplitStackItem>(std::move(thisUni), std::move(other));
+}
+
+void SplittableStackItem::splitH(WidgetPtr &&other) {
+    split<HSplitStackItem>(std::move(other));
+}
+
+StackLayoutItem::SplitPtr SplittableStackItem::splitH(WidgetPtr &&thisUni,
+                                                      WidgetPtr &&other) {
+    return split<HSplitStackItem>(std::move(thisUni), std::move(other));
 }

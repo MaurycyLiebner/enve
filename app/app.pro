@@ -62,6 +62,7 @@ SOURCES += main.cpp\
     GUI/Timeline/fixedlenanimationrect.cpp \
     GUI/canvaswindowevents.cpp \
     GUI/canvaswindowwrapper.cpp \
+    GUI/scenelayout.cpp \
     GUI/welcomedialog.cpp \
     GUI/widgetstack.cpp \
     PathEffects/custompatheffectcreator.cpp \
@@ -280,6 +281,7 @@ HEADERS  += \
     GUI/Timeline/durationrectangle.h \
     GUI/Timeline/fixedlenanimationrect.h \
     GUI/canvaswindowwrapper.h \
+    GUI/scenelayout.h \
     GUI/welcomedialog.h \
     GUI/widgetstack.h \
     PathEffects/custompatheffectcreator.h \
