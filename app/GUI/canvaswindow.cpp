@@ -846,6 +846,7 @@ void CanvasWindow::updateAfterFrameChanged(const int currentFrame) {
 
 #include "welcomedialog.h"
 void CanvasWindow::openWelcomeDialog() {
+    return;
     if(mWelcomeDialog) return;
     const auto mWindow = MainWindow::getInstance();
     mWelcomeDialog = new WelcomeDialog(mWindow->getRecentFiles(),
@@ -853,18 +854,19 @@ void CanvasWindow::openWelcomeDialog() {
                                        []() { MainWindow::getInstance()->openFile(); },
                                        [](QString path) { MainWindow::getInstance()->openFile(path); },
                                        mWindow);
-    mWelcomeDialog->resize(getCanvasWidget()->size());
+    mWelcomeDialog->resize(size());
     mWindow->takeCentralWidget();
     mWindow->setCentralWidget(mWelcomeDialog);
 }
 
 void CanvasWindow::closeWelcomeDialog() {
+    return;
     if(!mWelcomeDialog) return;
 
     const auto mWindow = MainWindow::getInstance();
-    getCanvasWidget()->resize(mWelcomeDialog->size());
+    resize(mWelcomeDialog->size());
     mWelcomeDialog = nullptr;
-    mWindow->setCentralWidget(getCanvasWidget());
+    mWindow->setCentralWidget(this);
 }
 
 void CanvasWindow::changeCurrentFrameAction(const int frame) {
@@ -1361,10 +1363,6 @@ void CanvasWindow::importFile(const QString &path,
         }
     }
     queScheduledTasksAndUpdate();
-}
-
-QWidget *CanvasWindow::getCanvasWidget() {
-    return this;
 }
 
 void CanvasWindow::grabMouse() {

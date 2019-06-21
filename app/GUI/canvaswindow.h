@@ -103,8 +103,6 @@ public:
     void importFile(const QString &path,
                     const QPointF &relDropPos = QPointF(0, 0));
 
-    QWidget *getCanvasWidget();
-
     void grabMouse();
     void releaseMouse();
     bool isMouseGrabber();
