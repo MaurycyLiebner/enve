@@ -7,13 +7,12 @@ class SceneLayout {
 public:
     SceneLayout(Document& document, QMainWindow* const window);
 
-    void reset();
+    BaseStackItem::UPtr reset(CanvasWindowWrapper ** const cwwP = nullptr);
+    BaseStackItem::UPtr apply(const BaseStackItem::UPtr &stack);
 private:
-
     Document& mDocument;
     QMainWindow* const mWindow;
-    std::unique_ptr<BaseStackItem> mBaseStack;
-    //std::unique_ptr<Ca
+    BaseStackItem::UPtr mBaseStack;
 };
 
 #endif // SCENELAYOUT_H

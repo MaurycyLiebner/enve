@@ -168,6 +168,8 @@ struct WidgetStackLayoutItem : public SplittableStackItem {
 };
 
 struct BaseStackItem : public ParentStackLayoutItem {
+    typedef std::unique_ptr<BaseStackItem> UPtr;
+
     void apply(StackWidgetWrapper* const stack) {
         if(mChild) mChild->apply(stack);
     }
