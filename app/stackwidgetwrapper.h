@@ -87,7 +87,7 @@ struct StackLayoutItem {
     typedef std::unique_ptr<SplitStackLayoutItem> SplitPtr;
     typedef std::unique_ptr<WidgetStackLayoutItem> WidgetPtr;
     virtual ~StackLayoutItem() {}
-    virtual void apply(StackWidgetWrapper* const stack) = 0;
+    virtual void apply(StackWidgetWrapper* const stack) const = 0;
     void setParent(ParentStackLayoutItem* const parent) {
         mParent = parent;
     }
@@ -109,7 +109,7 @@ struct SplitStackLayoutItem : public ParentStackLayoutItem {
         mChildItems.second = std::move(child2);
     }
 
-    void apply(StackWidgetWrapper* const stack) {
+    void apply(StackWidgetWrapper* const stack) const {
         const auto other = split(stack);
         if(mChildItems.first) mChildItems.first->apply(stack);
         if(mChildItems.second) mChildItems.second->apply(other);
@@ -141,7 +141,7 @@ struct SplitStackLayoutItem : public ParentStackLayoutItem {
         return nullptr;
     }
 protected:
-    virtual StackWidgetWrapper* split(StackWidgetWrapper* const stack) = 0;
+    virtual StackWidgetWrapper* split(StackWidgetWrapper* const stack) const = 0;
 private:
     std::pair<UniPtr, UniPtr> mChildItems;
 };
@@ -168,9 +168,9 @@ struct WidgetStackLayoutItem : public SplittableStackItem {
 };
 
 struct BaseStackItem : public ParentStackLayoutItem {
+    typedef std::unique_ptr<const BaseStackItem> cUPtr;
     typedef std::unique_ptr<BaseStackItem> UPtr;
-
-    void apply(StackWidgetWrapper* const stack) {
+    void apply(StackWidgetWrapper* const stack) const {
         if(mChild) mChild->apply(stack);
     }
 
@@ -192,20 +192,29 @@ struct BaseStackItem : public ParentStackLayoutItem {
         if(mChild) mChild->setParent(this);
         return tmp;
     }
+
+    void setName(const QString& name) {
+        mName = name;
+    }
+
+    const QString& getName() const {
+        return mName;
+    }
 private:
+    QString mName;
     UniPtr mChild;
 };
 
 struct HSplitStackItem : public SplitStackLayoutItem {
 protected:
-    StackWidgetWrapper* split(StackWidgetWrapper* const stack) {
+    StackWidgetWrapper* split(StackWidgetWrapper* const stack) const {
         return stack->splitH();
     }
 };
 
 struct VSplitStackItem : public SplitStackLayoutItem {
 protected:
-    StackWidgetWrapper* split(StackWidgetWrapper* const stack) {
+    StackWidgetWrapper* split(StackWidgetWrapper* const stack) const {
         return stack->splitV();
     }
 };

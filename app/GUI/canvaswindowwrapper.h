@@ -17,7 +17,7 @@ private:
 
 struct CWWidgetStackLayoutItem : public WidgetStackLayoutItem {
     void clear();
-    void apply(StackWidgetWrapper* const stack);
+    void apply(StackWidgetWrapper* const stack) const;
     void setScene(Canvas* const scene);
 private:
     Canvas* mScene = nullptr;

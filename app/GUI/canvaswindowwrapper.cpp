@@ -123,7 +123,7 @@ void CWWidgetStackLayoutItem::clear() {
     setScene(nullptr);
 }
 
-void CWWidgetStackLayoutItem::apply(StackWidgetWrapper * const stack) {
+void CWWidgetStackLayoutItem::apply(StackWidgetWrapper * const stack) const {
     const auto cwWrapper = static_cast<CanvasWindowWrapper*>(stack);
     const auto menu = cwWrapper->getMenuBar();
     const auto swMenu = static_cast<CanvasWrapperMenuBar*>(menu);
