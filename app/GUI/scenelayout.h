@@ -14,6 +14,11 @@ struct SceneOnlyBaseStackItem : public BaseStackItem {
     }
 
     Canvas* getScene() const { return mScene; }
+
+    static cUPtr sRead(QIODevice* const src) {
+        const QString name = gReadString(src);
+
+    }
 private:
     Canvas* const mScene;
 };
@@ -50,8 +55,7 @@ public:
 
     int addSceneLayout(Canvas * const scene) {
         auto newL = std::make_unique<SceneOnlyBaseStackItem>(scene);
-        mSceneLayouts.insert(mSceneLayouts.begin(), std::move(newL));
-        return int(mLayouts.size());
+        return addSceneLayout(std::move(newL));
     }
 
     int removeSceneLayout(Canvas * const scene) {
@@ -90,7 +94,36 @@ public:
     }
 
     int customCount() const { return int(mLayouts.size()); }
+
+    void write(QIODevice* const dst) const {
+        const int nCustom = customCount();
+        dst->write(rcConstChar(&nCustom), sizeof(int));
+        for(const auto& lay : mLayouts)
+            lay->write(dst);
+
+        const int nScene = int(mSceneLayouts.size());
+        dst->write(rcConstChar(&nScene), sizeof(int));
+        for(const auto& lay : mSceneLayouts)
+            lay->write(dst);
+    }
+
+    void read(QIODevice* const src) {
+        int nCustom;
+        src->read(rcChar(&nCustom), sizeof(int));
+        for(int i = 0; i < nCustom; i++)
+            addCustomLayout(BaseStackItem::sRead(src));
+
+        int nScene;
+        src->read(rcChar(&nScene), sizeof(int));
+        for(int i = 0; i < nScene; i++)
+            addSceneLayout(SceneOnlyBaseStackItem::sRead(src));
+    }
 private:
+    int addSceneLayout(SceneOnlyBaseStackItem::cUPtr&& newL) {
+        mSceneLayouts.insert(mSceneLayouts.begin(), std::move(newL));
+        return int(mLayouts.size());
+    }
+
     std::vector<BaseStackItem::UPtr> mLayouts;
     std::vector<SceneOnlyBaseStackItem::cUPtr> mSceneLayouts;
 };
@@ -116,6 +149,15 @@ public:
 
     bool isCurrentCustom() const {
         return mCollection.isCustom(mCurrentId);
+    }
+
+    void write(QIODevice* const dst) const {
+        mCollection.write(dst);
+
+    }
+
+    void read(QIODevice* const src) {
+        mCollection.read(src);
     }
 signals:
     void removed(int);

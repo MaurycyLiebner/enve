@@ -2,6 +2,7 @@
 #define STACKWIDGETWRAPPER_H
 
 #include "GUI/widgetstack.h"
+#include "basicreadwrite.h"
 
 #include <QMenuBar>
 #include <QVBoxLayout>
@@ -202,6 +203,15 @@ struct BaseStackItem : public ParentStackLayoutItem {
 
     const QString& getName() const {
         return mName;
+    }
+
+    void write(QIODevice* const dst) const {
+        gWrite(dst, mName);
+    }
+
+    static UPtr sRead(QIODevice* const src) {
+        const QString name = gReadString(src);
+
     }
 private:
     mutable QString mName;
