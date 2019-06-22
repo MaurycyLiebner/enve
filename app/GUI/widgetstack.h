@@ -219,7 +219,11 @@ signals:
 template <STACK_TMPL_DEFS>
 class WidgetStackBase {
 public:
-    virtual ~WidgetStackBase() {}
+    virtual ~WidgetStackBase() {
+        for(int i = 0; i < mWidgets.count();) {
+            delete takeWidget(i);
+        }
+    }
 protected:
     WidgetStackBase() {}
 

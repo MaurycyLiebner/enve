@@ -8,8 +8,9 @@ struct CWWidgetStackLayoutItem;
 class CanvasWindowWrapper : public StackWidgetWrapper {
 public:
     CanvasWindowWrapper(Document * const document,
-                        WidgetStackLayoutItem * const layItem,
+                        CWWidgetStackLayoutItem * const layItem,
                         QWidget * const parent = nullptr);
+    void setScene(Canvas* const scene);
 private:
     using StackWidgetWrapper::setMenuBar;
     using StackWidgetWrapper::setCentralWidget;

@@ -11,6 +11,7 @@
 #include "taskscheduler.h"
 #include "effectsloader.h"
 #include "document.h"
+#include "scenelayout.h"
 class VideoEncoder;
 enum ClipboardContainerType : short;
 
@@ -194,7 +195,7 @@ private:
         MainWindow * const mWindow;
     };
     stdptr<Lock> mLock;
-    static MainWindow *mMainWindowInstance;
+    static MainWindow *sMainWindowInstance;
     MemoryHandler *mMemoryHandler;
 
     void updateRecentMenu();
@@ -310,6 +311,7 @@ private:
 
     TaskScheduler mTaskScheduler;
     Document mDocument;
+    SceneLayout *mSceneLayout = nullptr;
     CanvasWindow *mCanvasWindow;
     EffectsLoader *mEffectsLoader;
     stdptr<UndoRedoStack> mCurrentUndoRedoStack;

@@ -9,9 +9,11 @@
 
 class CanvasWrapperMenuBar : public StackWrapperMenu {
     friend struct CWWidgetStackLayoutItem;
+    friend class CanvasWindowWrapper;
 public:
-    CanvasWrapperMenuBar(Document& document, CanvasWindow * const window) :
-        mDocument(document), mWindow(window) {
+    CanvasWrapperMenuBar(Document& document, CanvasWindow * const window,
+                         CWWidgetStackLayoutItem* const layoutItem) :
+        mDocument(document), mWindow(window), mLayoutItem(layoutItem) {
         addAction("+", this, [this]() {
             const QString defName = "Scene " +
                     QString::number(mDocument.fScenes.count());
@@ -90,17 +92,19 @@ private:
         mSceneMenu->setTitle(scene ? scene->getName() : "none");
         mWindow->setCurrentCanvas(scene);
         mCurrentScene = scene;
+        mLayoutItem->setScene(scene);
     }
 
     Document& mDocument;
-    CanvasWindow * const mWindow;
+    CanvasWindow* const mWindow;
+    CWWidgetStackLayoutItem* const mLayoutItem;
     QMenu * mSceneMenu;
     Canvas * mCurrentScene = nullptr;
     std::map<Canvas*, QAction*> mSceneToAct;
 };
 
 CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
-                                         WidgetStackLayoutItem* const layItem,
+                                         CWWidgetStackLayoutItem* const layItem,
                                          QWidget * const parent) :
     StackWidgetWrapper(
         layItem,
@@ -110,14 +114,23 @@ CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
         },
         [document](WidgetStackLayoutItem* const layItem,
                    QWidget * const parent) {
-            const auto derived = new CanvasWindowWrapper(document, layItem, parent);
+            const auto cLayItem = static_cast<CWWidgetStackLayoutItem*>(layItem);
+            const auto derived = new CanvasWindowWrapper(document, cLayItem, parent);
             return static_cast<StackWidgetWrapper*>(derived);
         },
         [document](StackWidgetWrapper * toSetup) {
             const auto window = new CanvasWindow(*document, toSetup);
             toSetup->setCentralWidget(window);
-            toSetup->setMenuBar(new CanvasWrapperMenuBar(*document, window));
-        }, parent) {}
+            const auto lItem = toSetup->getLayoutItem();
+            const auto lItemC = static_cast<CWWidgetStackLayoutItem*>(lItem);
+            toSetup->setMenuBar(new CanvasWrapperMenuBar(*document, window,
+                                                         lItemC));
+}, parent) {}
+
+void CanvasWindowWrapper::setScene(Canvas * const scene) {
+    const auto menu = static_cast<CanvasWrapperMenuBar*>(getMenuBar());
+    menu->setCurrentScene(scene);
+}
 
 void CWWidgetStackLayoutItem::clear() {
     setScene(nullptr);
@@ -125,9 +138,7 @@ void CWWidgetStackLayoutItem::clear() {
 
 void CWWidgetStackLayoutItem::apply(StackWidgetWrapper * const stack) const {
     const auto cwWrapper = static_cast<CanvasWindowWrapper*>(stack);
-    const auto menu = cwWrapper->getMenuBar();
-    const auto swMenu = static_cast<CanvasWrapperMenuBar*>(menu);
-    swMenu->setCurrentScene(mScene);
+    cwWrapper->setScene(mScene);
 }
 
 void CWWidgetStackLayoutItem::setScene(Canvas * const scene) {

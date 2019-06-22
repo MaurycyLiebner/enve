@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "canvas.h"
 #include <QKeyEvent>
 #include <QApplication>
@@ -40,7 +40,7 @@ extern "C" {
     #include <libavformat/avformat.h>
 }
 
-MainWindow *MainWindow::mMainWindowInstance;
+MainWindow *MainWindow::sMainWindowInstance;
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
     processKeyEvent(event);
@@ -52,14 +52,17 @@ int KEY_RECT_SIZE;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) {
-    connect(&mDocument, &Document::evFilePathChanged,
-            this, &MainWindow::updateTitle);
-
-    mVideoEncoder = SPtrCreate(VideoEncoder)();
+    sMainWindowInstance = this;
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
     KEY_RECT_SIZE = MIN_WIDGET_DIM*3/5;
     av_register_all();
+
+    mVideoEncoder = SPtrCreate(VideoEncoder)();
+    mCanvasWindow = new CanvasWindow(mDocument, this);
+
+    connect(&mDocument, &Document::evFilePathChanged,
+            this, &MainWindow::updateTitle);
 
     QFile customSS(QDir::homePath() + "/.enve/stylesheet.qss");
     if(customSS.exists()) {
@@ -76,8 +79,6 @@ MainWindow::MainWindow(QWidget *parent)
     }
     //setMouseTracking(true);
     BoxSingleWidget::loadStaticPixmaps();
-    setupToolBar();
-    setupStatusBar();
 
 //    for(int i = 0; i < ClipboardContainerType::CCT_COUNT; i++) {
 //        mClipboardContainers << nullptr;
@@ -85,7 +86,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     mMemoryHandler = new MemoryHandler(this);
 
-    mMainWindowInstance = this;
     //int nThreads = QThread::idealThreadCount();
 
     mDocument.setPath("");
@@ -120,7 +120,6 @@ MainWindow::MainWindow(QWidget *parent)
         queScheduledTasksAndUpdate();
     });
 
-    mCanvasWindow = new CanvasWindow(mDocument, this);
     connect(mMemoryHandler, &MemoryHandler::allMemoryUsed,
             mCanvasWindow, &CanvasWindow::outOfMemory);
 
@@ -221,6 +220,10 @@ MainWindow::MainWindow(QWidget *parent)
 //    mCanvas = mCanvasWindow->getCurrentCanvas();
 //    mCurrentCanvasComboBox->addItem(mCanvas->getName());
 
+    mSceneLayout = new SceneLayout(mDocument, this);
+
+    setupToolBar();
+    setupStatusBar();
     setupMenuBar();
 
     connectToolBarActions();
@@ -732,6 +735,34 @@ void MainWindow::setupToolBar() {
     newLayPush->setFixedSize(comboDim, comboDim);
     removeLayPush->setFixedSize(comboDim, comboDim);
 
+    connect(mSceneLayout, &SceneLayout::removed,
+            this, [layCombo](const int id) {
+        layCombo->removeItem(id);
+    });
+
+    connect(mSceneLayout, &SceneLayout::created,
+            this, [this, layCombo](const int id, const QString& name) {
+        layCombo->insertItem(id, name);
+        if(!mSceneLayout->isCurrentCustom())
+            layCombo->setCurrentIndex(id);
+    });
+
+    connect(mSceneLayout, &SceneLayout::renamed,
+            this, [layCombo](const int id, const QString& name) {
+        layCombo->setItemText(id, name);
+    });
+
+    connect(newLayPush, &QPushButton::pressed,
+            mSceneLayout, &SceneLayout::newEmpty);
+    connect(removeLayPush, &QPushButton::pressed,
+            mSceneLayout, &SceneLayout::removeCurrent);
+
+    connect(layCombo, &QComboBox::editTextChanged,
+            mSceneLayout, &SceneLayout::setCurrentName);
+    connect(layCombo, qOverload<int>(&QComboBox::currentIndexChanged),
+            mSceneLayout, &SceneLayout::setCurrent);
+
+
     mToolBar->addWidget(canvasComboWidget);
 
     addToolBar(mToolBar);
@@ -781,7 +812,7 @@ void MainWindow::connectToolBarActions() {
 }
 
 MainWindow *MainWindow::getInstance() {
-    return mMainWindowInstance;
+    return sMainWindowInstance;
 }
 
 void MainWindow::updateCanvasModeButtonsChecked() {

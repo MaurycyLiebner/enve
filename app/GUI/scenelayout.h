@@ -2,21 +2,44 @@
 #define SCENELAYOUT_H
 #include <QMainWindow>
 #include "canvaswindowwrapper.h"
+#include "canvas.h"
+
+struct SceneOnlyBaseStackItem : public BaseStackItem {
+    typedef std::unique_ptr<const SceneOnlyBaseStackItem> cUPtr;
+    SceneOnlyBaseStackItem(Canvas* const scene) : mScene(scene) {
+        setName(scene->getName());
+        auto cwwItem = new CWWidgetStackLayoutItem;
+        cwwItem->setScene(scene);
+        setChild(std::unique_ptr<WidgetStackLayoutItem>(cwwItem));
+    }
+
+    Canvas* getScene() const { return mScene; }
+private:
+    Canvas* const mScene;
+};
 
 class LayoutCollection {
 public:
     const BaseStackItem* getAt(const int id) const {
         if(id < 0) return nullptr;
-        if(id < mLayouts.size()) mLayouts.at(id).get();
-        else if(id - mLayouts.size() < mConstLayouts.size()) {
-            mConstLayouts.at(id - mLayouts.size()).get();
+        if(id < int(mLayouts.size())) return mLayouts.at(uint(id)).get();
+        else if(uint(id) - mLayouts.size() < mSceneLayouts.size()) {
+            return mSceneLayouts.at(uint(id) - mLayouts.size()).get();
         }
         return nullptr;
     }
 
+    int idForScene(Canvas* const scene) {
+        for(uint i = 0; i < mSceneLayouts.size(); i++) {
+            if(mSceneLayouts[i]->getScene() == scene)
+                return int(i + mLayouts.size());
+        }
+        return -1;
+    }
+
     void replaceCustomLayout(const int id, BaseStackItem::UPtr&& layout) {
-        if(id >= 0 && id < mLayouts.size()) {
-            mLayouts[id] = std::move(layout);
+        if(id >= 0 && id < int(mLayouts.size())) {
+            mLayouts[uint(id)] = std::move(layout);
         }
     }
 
@@ -25,37 +48,87 @@ public:
         return 0;
     }
 
-    int addConstLayout(BaseStackItem::cUPtr&& layout) {
-        mConstLayouts.insert(mConstLayouts.begin(), std::move(layout));
-        return mLayouts.size();
+    int addSceneLayout(Canvas * const scene) {
+        auto newL = std::make_unique<SceneOnlyBaseStackItem>(scene);
+        mSceneLayouts.insert(mSceneLayouts.begin(), std::move(newL));
+        return int(mLayouts.size());
     }
 
-    void removeLayout(const int id) {
-        if(id < 0) return;
-        if(id < mLayouts.size()) mLayouts.erase(mLayouts.begin() + id);
-        else if(id - mLayouts.size() < mConstLayouts.size()) {
-            mConstLayouts.erase(mConstLayouts.begin() + id - mLayouts.size());
+    int removeSceneLayout(Canvas * const scene) {
+        int id = -1;
+        for(uint i = 0; i < mSceneLayouts.size(); i++) {
+            if(mSceneLayouts[i]->getScene() == scene) {
+                id = int(i);
+                mSceneLayouts.erase(mSceneLayouts.begin() + i);
+                break;
+            }
         }
+        return int(mLayouts.size()) + id;
     }
 
-    bool isCustom(const int id) {
+    void removeCustomLayout(const int id) {
+        if(id >= 0 && id < int(mLayouts.size()))
+            mLayouts.erase(mLayouts.begin() + id);
+    }
+
+    bool isCustom(const int id) const {
         return id < customCount();
     }
 
-    int customCount() const { return static_cast<int>(mLayouts.size()); }
+    QStringList getCustomNames() const {
+        QStringList result;
+        for(const auto& lay : mLayouts)
+            result << lay->getName();
+        return result;
+    }
+
+    QStringList getSceneNames() const {
+        QStringList result;
+        for(const auto& lay : mSceneLayouts)
+            result << lay->getName();
+        return result;
+    }
+
+    int customCount() const { return int(mLayouts.size()); }
 private:
     std::vector<BaseStackItem::UPtr> mLayouts;
-    std::vector<BaseStackItem::cUPtr> mConstLayouts;
+    std::vector<SceneOnlyBaseStackItem::cUPtr> mSceneLayouts;
 };
 
-class SceneLayout {
+class SceneLayout : public QObject {
+    Q_OBJECT
 public:
     SceneLayout(Document& document, QMainWindow* const window);
 
-    void duplicateLayout(const int id);
+    void setCurrent(const int id);
+    void remove(const int id);
+    void removeCurrent();
+    QString duplicate();
+    QString newEmpty();
+    void setCurrentName(const QString& name);
+    QStringList getCustomNames() const {
+        return mCollection.getCustomNames();
+    }
+
+    QStringList getSceneNames() const {
+        return mCollection.getSceneNames();
+    }
+
+    bool isCurrentCustom() const {
+        return mCollection.isCustom(mCurrentId);
+    }
+signals:
+    void removed(int);
+    void created(int, QString);
+    void renamed(int, QString);
 private:
-    BaseStackItem::UPtr apply(const int id);
-    BaseStackItem::UPtr reset(CanvasWindowWrapper ** const cwwP = nullptr);
+    void setName(const int id, const QString& name);
+
+    void sceneNameChanged(Canvas* const scene);
+    void newForScene(Canvas* const scene);
+    void removeForScene(Canvas* const scene);
+    void reset(CanvasWindowWrapper ** const cwwP = nullptr,
+               Canvas * const scene = nullptr);
 
     int mCurrentId = -1;
     LayoutCollection mCollection;

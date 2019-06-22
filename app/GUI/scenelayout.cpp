@@ -1,40 +1,54 @@
 #include "scenelayout.h"
+#include "document.h"
 
 SceneLayout::SceneLayout(Document& document,
-                         QMainWindow* const window) :
+                         QMainWindow* const window) : QObject(window),
     mDocument(document), mWindow(window) {
     reset();
+    connect(&mDocument, &Document::sceneCreated,
+            this, &SceneLayout::newForScene);
+    connect(&mDocument, qOverload<Canvas*>(&Document::sceneRemoved),
+            this, &SceneLayout::removeForScene);
 }
 
-BaseStackItem::UPtr SceneLayout::reset(CanvasWindowWrapper** const cwwP) {
+void SceneLayout::reset(CanvasWindowWrapper** const cwwP,
+                        Canvas * const scene) {
     if(mCurrentId != -1)
         mCollection.replaceCustomLayout(mCurrentId, std::move(mBaseStack));
-    auto tmp = std::move(mBaseStack);
     mBaseStack = std::make_unique<BaseStackItem>();
     mCurrentId = -1;
     auto cwwItem = new CWWidgetStackLayoutItem;
     mBaseStack->setChild(std::unique_ptr<WidgetStackLayoutItem>(cwwItem));
     const auto cww = new CanvasWindowWrapper(&mDocument, cwwItem, mWindow);
+    cww->setScene(scene);
     cww->disableClose();
     mWindow->setCentralWidget(cww);
     if(cwwP) *cwwP = cww;
-    return tmp;
 }
 
-BaseStackItem::UPtr SceneLayout::apply(const int id) {
+void SceneLayout::setCurrent(const int id) {
     CanvasWindowWrapper* cwwP = nullptr;
-    auto tmp = reset(&cwwP);
+    reset(&cwwP);
     const auto stack = mCollection.getAt(id);
     stack->apply(cwwP);
     mCurrentId = id;
     mBaseStack->setName(stack->getName());
-    return tmp;
 }
 
-void SceneLayout::duplicateLayout(const int id) {
-    apply(id);
+void SceneLayout::removeCurrent() {
+    remove(mCurrentId);
+}
+
+void SceneLayout::remove(const int id) {
+    if(id == -1) return;
+    mCollection.removeCustomLayout(id);
+    if(id == mCurrentId) mCurrentId = -1;
+    emit removed(id);
+}
+
+QString SceneLayout::duplicate() {
     QString name;
-    if(mCollection.isCustom(id)) {
+    if(mCollection.isCustom(mCurrentId)) {
         name = mBaseStack->getName().trimmed();
         QRegExp exp("(.*)([0-9]+)$");
         if(exp.exactMatch(name)) {
@@ -45,7 +59,49 @@ void SceneLayout::duplicateLayout(const int id) {
         name = "Layout " + QString::number(mCollection.customCount());
     }
 
+    mBaseStack->setName(name);
     auto dupli = std::make_unique<BaseStackItem>();
     dupli->setName(name);
     mCurrentId = mCollection.addCustomLayout(std::move(dupli));
+    emit created(mCurrentId, name);
+    return name;
+}
+
+QString SceneLayout::newEmpty() {
+    reset();
+    const QString name = "Layout " + QString::number(mCollection.customCount());
+    mBaseStack->setName(name);
+    auto newL = std::make_unique<BaseStackItem>();
+    newL->setName(name);
+    mCurrentId = mCollection.addCustomLayout(std::move(newL));
+    emit created(mCurrentId, name);
+    return name;
+}
+
+void SceneLayout::newForScene(Canvas * const scene) {
+    const int id = mCollection.addSceneLayout(scene);
+    connect(scene, &Canvas::nameChanged,
+            this, [this, scene]() { sceneNameChanged(scene); });
+    emit created(id, scene->getName());
+}
+
+void SceneLayout::removeForScene(Canvas * const scene) {
+    const int id = mCollection.removeSceneLayout(scene);
+    if(mCurrentId == id) mCurrentId = -1;
+    emit removed(id);
+}
+
+void SceneLayout::setCurrentName(const QString &name) {
+    if(mCurrentId >= mCollection.customCount()) return;
+    setName(mCurrentId, name);
+}
+
+void SceneLayout::sceneNameChanged(Canvas * const scene) {
+    const int id = mCollection.idForScene(scene);
+    setName(id, scene->getName());
+}
+
+void SceneLayout::setName(const int id, const QString &name) {
+    mCollection.getAt(id)->setName(name);
+    emit renamed(id, name);
 }

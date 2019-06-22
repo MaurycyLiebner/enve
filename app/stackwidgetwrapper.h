@@ -54,6 +54,10 @@ public:
 
     void closeWrapper();
     void disableClose();
+
+    WidgetStackLayoutItem* getLayoutItem() const {
+        return mLayoutItem;
+    }
 private:
     template <class T>
     StackWidgetWrapper* split(
@@ -168,7 +172,6 @@ struct WidgetStackLayoutItem : public SplittableStackItem {
 };
 
 struct BaseStackItem : public ParentStackLayoutItem {
-    typedef std::unique_ptr<const BaseStackItem> cUPtr;
     typedef std::unique_ptr<BaseStackItem> UPtr;
     void apply(StackWidgetWrapper* const stack) const {
         if(mChild) mChild->apply(stack);
@@ -193,7 +196,7 @@ struct BaseStackItem : public ParentStackLayoutItem {
         return tmp;
     }
 
-    void setName(const QString& name) {
+    void setName(const QString& name) const {
         mName = name;
     }
 
@@ -201,7 +204,7 @@ struct BaseStackItem : public ParentStackLayoutItem {
         return mName;
     }
 private:
-    QString mName;
+    mutable QString mName;
     UniPtr mChild;
 };
 
