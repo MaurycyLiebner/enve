@@ -125,9 +125,9 @@ bool Document::removeGradient(const int id) {
 }
 
 void Document::clear() {
-    for(const auto& scene : fScenes)
-        SWT_removeChild(scene.data());
-    fScenes.clear();
+    const int nScenes = fScenes.count();
+    for(int i = 0; i < nScenes; i++)
+        removeScene(0);
 }
 
 void Document::SWT_setupAbstraction(SWT_Abstraction * const abstraction,

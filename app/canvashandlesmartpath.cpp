@@ -47,7 +47,7 @@ void Canvas::handleAddSmartPointMousePress(const MouseEvent &e) {
         } else { // mCurrentSmartEndPoint
             const auto targetNode = nodePointUnderMouse->getTargetNode();
             const auto handler = nodePointUnderMouse->getHandler();
-            const bool success =
+            const bool success = nodePointUnderMouse->isEndPoint() &&
                     mLastEndPoint->actionConnectToNormalPoint(
                         nodePointUnderMouse);
             if(success) {

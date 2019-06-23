@@ -151,3 +151,9 @@ StackLayoutItem::SplitPtr SplittableStackItem::splitH(WidgetPtr &&thisUni,
                                                       WidgetPtr &&other) {
     return split<HSplitStackItem>(std::move(thisUni), std::move(other));
 }
+
+void ParentStackLayoutItem::sWriteChild(
+        StackLayoutItem * const child, QIODevice * const dst) {
+    child->writeType(dst);
+    child->write(dst);
+}

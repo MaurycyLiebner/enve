@@ -14,12 +14,8 @@ struct SceneOnlyBaseStackItem : public BaseStackItem {
     }
 
     Canvas* getScene() const { return mScene; }
-
-    static cUPtr sRead(QIODevice* const src) {
-        const QString name = gReadString(src);
-
-    }
 private:
+    using BaseStackItem::write;
     Canvas* const mScene;
 };
 
@@ -70,9 +66,10 @@ public:
         return int(mLayouts.size()) + id;
     }
 
-    void removeCustomLayout(const int id) {
-        if(id >= 0 && id < int(mLayouts.size()))
-            mLayouts.erase(mLayouts.begin() + id);
+    bool removeCustomLayout(const int id) {
+        if(id < 0 || id >= int(mLayouts.size())) return false;
+        mLayouts.erase(mLayouts.begin() + id);
+        return true;
     }
 
     bool isCustom(const int id) const {
@@ -94,30 +91,6 @@ public:
     }
 
     int customCount() const { return int(mLayouts.size()); }
-
-    void write(QIODevice* const dst) const {
-        const int nCustom = customCount();
-        dst->write(rcConstChar(&nCustom), sizeof(int));
-        for(const auto& lay : mLayouts)
-            lay->write(dst);
-
-        const int nScene = int(mSceneLayouts.size());
-        dst->write(rcConstChar(&nScene), sizeof(int));
-        for(const auto& lay : mSceneLayouts)
-            lay->write(dst);
-    }
-
-    void read(QIODevice* const src) {
-        int nCustom;
-        src->read(rcChar(&nCustom), sizeof(int));
-        for(int i = 0; i < nCustom; i++)
-            addCustomLayout(BaseStackItem::sRead(src));
-
-        int nScene;
-        src->read(rcChar(&nScene), sizeof(int));
-        for(int i = 0; i < nScene; i++)
-            addSceneLayout(SceneOnlyBaseStackItem::sRead(src));
-    }
 private:
     int addSceneLayout(SceneOnlyBaseStackItem::cUPtr&& newL) {
         mSceneLayouts.insert(mSceneLayouts.begin(), std::move(newL));
@@ -152,17 +125,44 @@ public:
     }
 
     void write(QIODevice* const dst) const {
-        mCollection.write(dst);
-
+        const int nCustom = mCollection.customCount();
+        dst->write(rcConstChar(&nCustom), sizeof(int));
+        for(int i = 0; i < nCustom; i++) {
+            if(i == mCurrentId) mBaseStack->write(dst);
+            else mCollection.getAt(i)->write(dst);
+        }
     }
 
     void read(QIODevice* const src) {
-        mCollection.read(src);
+        int nCustom;
+        src->read(rcChar(&nCustom), sizeof(int));
+        for(int i = 0; i < nCustom; i++) {
+            auto newL = BaseStackItem::sRead<CWWidgetStackLayoutItem>(src);
+            const QString& name = newL->getName();
+            const int id = mCollection.addCustomLayout(std::move(newL));
+            emit created(id, name);
+        }
+    }
+
+    void writeCurrentId(QIODevice* const dst) {
+        dst->write(rcConstChar(&mCurrentId), sizeof(int));
+    }
+
+    void readCurrentId(QIODevice* const src) {
+        int newCurrentId;
+        src->read(rcChar(&newCurrentId), sizeof(int));
+        setCurrent(newCurrentId);
+    }
+
+    void clear() {
+        for(int i = 0; i < mCollection.customCount(); i++)
+            remove(0);
     }
 signals:
     void removed(int);
     void created(int, QString);
     void renamed(int, QString);
+    void currentRemovable(bool);
 private:
     void setName(const int id, const QString& name);
 
@@ -178,7 +178,6 @@ private:
     Document& mDocument;
     QMainWindow* const mWindow;
     BaseStackItem::UPtr mBaseStack;
-
 };
 
 #endif // SCENELAYOUT_H

@@ -109,7 +109,7 @@ CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
     StackWidgetWrapper(
         layItem,
         []() {
-            const auto rPtr = new CWWidgetStackLayoutItem();
+            const auto rPtr = new CWWidgetStackLayoutItem;
             return std::unique_ptr<WidgetStackLayoutItem>(rPtr);
         },
         [document](WidgetStackLayoutItem* const layItem,
@@ -139,6 +139,19 @@ void CWWidgetStackLayoutItem::clear() {
 void CWWidgetStackLayoutItem::apply(StackWidgetWrapper * const stack) const {
     const auto cwWrapper = static_cast<CanvasWindowWrapper*>(stack);
     cwWrapper->setScene(mScene);
+}
+
+void CWWidgetStackLayoutItem::write(QIODevice * const dst) const {
+    const int sceneId = mScene ? mScene->getWriteId() : -1;
+    dst->write(rcConstChar(&sceneId), sizeof(int));
+}
+
+void CWWidgetStackLayoutItem::read(QIODevice * const src) {
+    int sceneId;
+    src->read(rcChar(&sceneId), sizeof(int));
+    const auto sceneBox = BoundingBox::sGetBoxByReadId(sceneId);
+    const auto scene = dynamic_cast<Canvas*>(sceneBox);
+    setScene(scene);
 }
 
 void CWWidgetStackLayoutItem::setScene(Canvas * const scene) {

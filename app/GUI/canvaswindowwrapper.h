@@ -19,6 +19,8 @@ private:
 struct CWWidgetStackLayoutItem : public WidgetStackLayoutItem {
     void clear();
     void apply(StackWidgetWrapper* const stack) const;
+    void write(QIODevice* const dst) const;
+    void read(QIODevice* const src);
     void setScene(Canvas* const scene);
 private:
     Canvas* mScene = nullptr;

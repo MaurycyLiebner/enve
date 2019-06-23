@@ -64,35 +64,35 @@ BoundingBox::~BoundingBox() {
     sDocumentBoxes.removeOne(this);
 }
 
-void BoundingBox::writeBoundingBox(QIODevice * const target) {
+void BoundingBox::writeBoundingBox(QIODevice * const dst) {
     if(mWriteId < 0) assignWriteId();
-    StaticComplexAnimator::writeProperty(target);
+    StaticComplexAnimator::writeProperty(dst);
 
-    gWrite(target, prp_mName);
-    target->write(rcConstChar(&mWriteId), sizeof(int));
-    target->write(rcConstChar(&mVisible), sizeof(bool));
-    target->write(rcConstChar(&mLocked), sizeof(bool));
-    target->write(rcConstChar(&mBlendModeSk), sizeof(SkBlendMode));
+    gWrite(dst, prp_mName);
+    dst->write(rcConstChar(&mWriteId), sizeof(int));
+    dst->write(rcConstChar(&mVisible), sizeof(bool));
+    dst->write(rcConstChar(&mLocked), sizeof(bool));
+    dst->write(rcConstChar(&mBlendModeSk), sizeof(SkBlendMode));
     const bool hasDurRect = mDurationRectangle;
-    target->write(rcConstChar(&hasDurRect), sizeof(bool));
+    dst->write(rcConstChar(&hasDurRect), sizeof(bool));
 
     if(hasDurRect)
-        mDurationRectangle->writeDurationRectangle(target);
+        mDurationRectangle->writeDurationRectangle(dst);
 }
 
-void BoundingBox::readBoundingBox(QIODevice * const target) {
-    StaticComplexAnimator::readProperty(target);
-    gRead(target, prp_mName);
-    target->read(rcChar(&mReadId), sizeof(int));
-    target->read(rcChar(&mVisible), sizeof(bool));
-    target->read(rcChar(&mLocked), sizeof(bool));
-    target->read(rcChar(&mBlendModeSk), sizeof(SkBlendMode));
+void BoundingBox::readBoundingBox(QIODevice * const src) {
+    StaticComplexAnimator::readProperty(src);
+    setName(gReadString(src));
+    src->read(rcChar(&mReadId), sizeof(int));
+    src->read(rcChar(&mVisible), sizeof(bool));
+    src->read(rcChar(&mLocked), sizeof(bool));
+    src->read(rcChar(&mBlendModeSk), sizeof(SkBlendMode));
     bool hasDurRect;
-    target->read(rcChar(&hasDurRect), sizeof(bool));
+    src->read(rcChar(&hasDurRect), sizeof(bool));
 
     if(hasDurRect) {
         if(!mDurationRectangle) createDurationRectangle();
-        mDurationRectangle->readDurationRectangle(target);
+        mDurationRectangle->readDurationRectangle(src);
         updateAfterDurationRectangleShifted(0);
     }
 

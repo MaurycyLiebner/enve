@@ -224,8 +224,8 @@ public:
     void writeBoxType(QIODevice * const dst) const;
     static BoundingBoxType sReadBoxType(QIODevice * const src);
 
-    virtual void writeBoundingBox(QIODevice * const target);
-    virtual void readBoundingBox(QIODevice * const target);
+    virtual void writeBoundingBox(QIODevice * const dst);
+    virtual void readBoundingBox(QIODevice * const src);
 
     virtual void setupEffectsF(const qreal relFrame,
                                BoundingBoxRenderData * const data);

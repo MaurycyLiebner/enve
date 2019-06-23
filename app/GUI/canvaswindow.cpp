@@ -71,12 +71,12 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     if(mCurrentCanvas) {
         mCurrentCanvas->setIsCurrentCanvas(false);
         disconnect(mCurrentCanvas, nullptr, this, nullptr);
-        mDocument.removeVisibleScene(canvas);
+        mDocument.removeVisibleScene(mCurrentCanvas);
     }
     mCurrentCanvas = canvas;
     if(hasFocus()) mDocument.setActiveScene(mCurrentCanvas);
     if(mCurrentCanvas) {
-        mDocument.addVisibleScene(canvas);
+        mDocument.addVisibleScene(mCurrentCanvas);
         mCurrentSoundComposition = mCurrentCanvas->getSoundComposition();
         mCurrentCanvas->setIsCurrentCanvas(true);
         setCanvasMode(mCurrentCanvas->getCurrentCanvasMode());

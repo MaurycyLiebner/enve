@@ -1,4 +1,4 @@
-#ifndef STACKWIDGETWRAPPER_H
+﻿#ifndef STACKWIDGETWRAPPER_H
 #define STACKWIDGETWRAPPER_H
 
 #include "GUI/widgetstack.h"
@@ -88,25 +88,53 @@ StackWidgetWrapper* StackWidgetWrapper::split(
 struct ParentStackLayoutItem;
 struct SplitStackLayoutItem;
 struct StackLayoutItem {
+    enum Type {
+        V_SPLIT, H_SPLIT,
+        WIDGET, NONE
+    };
+
     typedef std::unique_ptr<StackLayoutItem> UniPtr;
     typedef std::unique_ptr<SplitStackLayoutItem> SplitPtr;
     typedef std::unique_ptr<WidgetStackLayoutItem> WidgetPtr;
     virtual ~StackLayoutItem() {}
     virtual void apply(StackWidgetWrapper* const stack) const = 0;
+    virtual void write(QIODevice* const dst) const = 0;
+    void writeType(QIODevice* const dst) const {
+        dst->write(rcConstChar(&mType), sizeof(Type));
+    }
+
     void setParent(ParentStackLayoutItem* const parent) {
         mParent = parent;
     }
 protected:
+    Type mType = NONE;
     ParentStackLayoutItem* mParent = nullptr;
 };
 
-struct ParentStackLayoutItem : StackLayoutItem {
+struct ParentStackLayoutItem : public StackLayoutItem {
     virtual void childClosed_k(StackLayoutItem* const child) = 0;
     virtual UniPtr replaceChild(StackLayoutItem* const from,
                                 UniPtr&& to) = 0;
+protected:
+    template <typename WidgetT>
+    static UniPtr sReadChild(QIODevice* const src);
+    static void sWriteChild(StackLayoutItem* const child,
+                            QIODevice* const dst);
 };
 
 struct SplitStackLayoutItem : public ParentStackLayoutItem {
+    void write(QIODevice* const dst) const {
+        sWriteChild(mChildItems.first.get(), dst);
+        sWriteChild(mChildItems.second.get(), dst);
+    }
+
+    template <typename WidgetT>
+    void read(QIODevice* const src) {
+        auto child1 = sReadChild<WidgetT>(src);
+        auto child2 = sReadChild<WidgetT>(src);
+        setChildren(std::move(child1), std::move(child2));
+    }
+
     void setChildren(UniPtr&& child1, UniPtr&& child2) {
         if(child1) child1->setParent(this);
         if(child2) child2->setParent(this);
@@ -165,7 +193,10 @@ private:
 };
 
 struct WidgetStackLayoutItem : public SplittableStackItem {
+    WidgetStackLayoutItem() { mType = Type::WIDGET; }
+
     virtual void clear() = 0;
+    virtual void read(QIODevice* const src) = 0;
     void close() {
         if(!mParent) return clear();
         mParent->childClosed_k(this);
@@ -207,11 +238,17 @@ struct BaseStackItem : public ParentStackLayoutItem {
 
     void write(QIODevice* const dst) const {
         gWrite(dst, mName);
+        ParentStackLayoutItem::sWriteChild(mChild.get(), dst);
     }
 
+    template<typename WidgetT>
     static UPtr sRead(QIODevice* const src) {
         const QString name = gReadString(src);
-
+        const auto result = new BaseStackItem;
+        result->setName(name);
+        auto child = ParentStackLayoutItem::sReadChild<WidgetT>(src);
+        result->setChild(std::move(child));
+        return UPtr(result);
     }
 private:
     mutable QString mName;
@@ -219,6 +256,8 @@ private:
 };
 
 struct HSplitStackItem : public SplitStackLayoutItem {
+public:
+    HSplitStackItem() { mType = Type::H_SPLIT; }
 protected:
     StackWidgetWrapper* split(StackWidgetWrapper* const stack) const {
         return stack->splitH();
@@ -226,9 +265,31 @@ protected:
 };
 
 struct VSplitStackItem : public SplitStackLayoutItem {
+public:
+    VSplitStackItem() { mType = Type::V_SPLIT; }
 protected:
     StackWidgetWrapper* split(StackWidgetWrapper* const stack) const {
         return stack->splitV();
     }
 };
+
+template <typename WidgetT>
+StackLayoutItem::UniPtr ParentStackLayoutItem::sReadChild(
+        QIODevice * const src) {
+    Type type;
+    src->read(rcChar(&type), sizeof(Type));
+    if(type == Type::H_SPLIT) {
+        const auto hSplit = new HSplitStackItem;
+        hSplit->read<WidgetT>(src);
+        return UniPtr(hSplit);
+    } else if(type == Type::V_SPLIT) {
+        const auto vSplit = new VSplitStackItem;
+        vSplit->read<WidgetT>(src);
+        return UniPtr(vSplit);
+    } else if(type == Type::WIDGET) {
+        const auto wid = new WidgetT;
+        wid->read(src);
+        return UniPtr(wid);
+    } else Q_ASSERT(false);
+}
 #endif // STACKWIDGETWRAPPER_H

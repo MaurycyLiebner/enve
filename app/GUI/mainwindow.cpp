@@ -228,7 +228,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     connectToolBarActions();
 
-    new SceneLayout(mDocument, this);
     //setCentralWidget(mCanvasWindow->getCanvasWidget());
 
     showMaximized();
@@ -756,6 +755,8 @@ void MainWindow::setupToolBar() {
             mSceneLayout, &SceneLayout::newEmpty);
     connect(removeLayPush, &QPushButton::pressed,
             mSceneLayout, &SceneLayout::removeCurrent);
+    connect(mSceneLayout, &SceneLayout::currentRemovable,
+            removeLayPush, &QPushButton::setEnabled);
 
     connect(layCombo, &QComboBox::editTextChanged,
             mSceneLayout, &SceneLayout::setCurrentName);
@@ -1102,6 +1103,7 @@ void MainWindow::clearAll() {
     mCanvasWindow->clearAll();
     mFillStrokeSettings->clearAll();
     mDocument.clear();
+    mSceneLayout->clear();
 //    for(ClipboardContainer *cont : mClipboardContainers) {
 //        delete cont;
 //    }
@@ -1133,7 +1135,6 @@ void MainWindow::openFile(const QString& openPath) {
         loadEVFile(openPath);
         mDocument.setPath(openPath);
         setFileChangedSinceSaving(false);
-        addRecentFile(openPath);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
     }

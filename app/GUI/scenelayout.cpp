@@ -9,6 +9,11 @@ SceneLayout::SceneLayout(Document& document,
             this, &SceneLayout::newForScene);
     connect(&mDocument, qOverload<Canvas*>(&Document::sceneRemoved),
             this, &SceneLayout::removeForScene);
+    connect(this, &SceneLayout::created,
+            this, [this](const int id) {
+        if(mCurrentId == -1) return;
+        if(id >= mCurrentId) mCurrentId++;
+    });
 }
 
 void SceneLayout::reset(CanvasWindowWrapper** const cwwP,
@@ -30,9 +35,15 @@ void SceneLayout::setCurrent(const int id) {
     CanvasWindowWrapper* cwwP = nullptr;
     reset(&cwwP);
     const auto stack = mCollection.getAt(id);
+    if(!stack) {
+        mCurrentId = -1;
+        return;
+    }
     stack->apply(cwwP);
     mCurrentId = id;
     mBaseStack->setName(stack->getName());
+    const bool removable = mCollection.isCustom(mCurrentId);
+    emit currentRemovable(removable);
 }
 
 void SceneLayout::removeCurrent() {
@@ -41,9 +52,10 @@ void SceneLayout::removeCurrent() {
 
 void SceneLayout::remove(const int id) {
     if(id == -1) return;
-    mCollection.removeCustomLayout(id);
-    if(id == mCurrentId) mCurrentId = -1;
-    emit removed(id);
+    if(mCollection.removeCustomLayout(id)) {
+        if(id == mCurrentId) mCurrentId = -1;
+        emit removed(id);
+    }
 }
 
 QString SceneLayout::duplicate() {
