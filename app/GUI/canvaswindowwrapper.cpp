@@ -140,10 +140,24 @@ Canvas* CanvasWindowWrapper::getScene() const {
     return menu->getCurrentScene();
 }
 
+void CanvasWindowWrapper::saveDataToLayout() const {
+    const auto lItem = static_cast<CWWidgetStackLayoutItem*>(getLayoutItem());
+    if(!lItem) return;
+    const auto sceneWidget = getSceneWidget();
+    lItem->setTransform(sceneWidget->getViewTransform());
+}
+
+CanvasWindow* CanvasWindowWrapper::getSceneWidget() const {
+    return static_cast<CanvasWindow*>(getCentralWidget());
+}
+
 void CanvasWindowWrapper::changeEvent(QEvent *e) {
     if(e->type() == QEvent::ParentChange) {
-        const auto sceneWidget = static_cast<CanvasWindow*>(getCentralWidget());
-        if(sceneWidget) sceneWidget->requestFitCanvasToSize();
+        const auto sceneWidget = getSceneWidget();
+        if(sceneWidget) {
+            sceneWidget->unblockAutomaticSizeFit();
+            sceneWidget->fitCanvasToSize();
+        }
     }
     StackWidgetWrapper::changeEvent(e);
 }
@@ -155,6 +169,9 @@ void CWWidgetStackLayoutItem::clear() {
 void CWWidgetStackLayoutItem::apply(StackWidgetWrapper * const stack) const {
     const auto cwWrapper = static_cast<CanvasWindowWrapper*>(stack);
     cwWrapper->setScene(mScene);
+    const auto cw = cwWrapper->getSceneWidget();
+    cw->blockAutomaticSizeFit();
+    cw->setViewTransform(mTransform);
 }
 
 void CWWidgetStackLayoutItem::write(QIODevice * const dst) const {
@@ -168,6 +185,10 @@ void CWWidgetStackLayoutItem::read(QIODevice * const src) {
     const auto sceneBox = BoundingBox::sGetBoxByReadId(sceneId);
     const auto scene = dynamic_cast<Canvas*>(sceneBox);
     setScene(scene);
+}
+
+void CWWidgetStackLayoutItem::setTransform(const QMatrix& transform) {
+    mTransform = transform;
 }
 
 void CWWidgetStackLayoutItem::setScene(Canvas * const scene) {

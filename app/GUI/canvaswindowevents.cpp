@@ -19,21 +19,10 @@ void CanvasWindow::zoomView(const qreal scaleBy, const QPointF &absOrigin) {
     mViewTransform.scale(scaleBy, scaleBy);
     mViewTransform.translate(transPoint.x(), transPoint.y());
 }
-#include <QApplication>
-#include <QEvent>
-void CanvasWindow::requestFitCanvasToSize() {
-    QApplication::postEvent(this, new QEvent(QEvent::User));
-}
-
-bool CanvasWindow::event(QEvent *event) {
-    if(event->type() == QEvent::User)
-        fitCanvasToSize();
-    return QWidget::event(event);
-}
 
 #include <QResizeEvent>
 void CanvasWindow::resizeEvent(QResizeEvent *e) {
-    if(!e->oldSize().isValid()) {
+    if(mAutomaticSizeFit && !e->oldSize().isValid()) {
         fitCanvasToSize();
     } else if(e->size().isValid()) {
         if(mOldSize.isValid()) {
@@ -46,6 +35,14 @@ void CanvasWindow::resizeEvent(QResizeEvent *e) {
         mOldSize = e->size();
     }
     GLWindow::resizeEvent(e);
+}
+
+void CanvasWindow::blockAutomaticSizeFit() {
+    mAutomaticSizeFit = false;
+}
+
+void CanvasWindow::unblockAutomaticSizeFit() {
+    mAutomaticSizeFit = true;
 }
 
 void CanvasWindow::fitCanvasToSize() {

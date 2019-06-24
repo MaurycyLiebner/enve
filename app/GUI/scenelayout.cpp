@@ -16,9 +16,27 @@ SceneLayout::SceneLayout(Document& document,
     });
 }
 
+void saveAllChildrenLayoutsData(QWidget* const parent) {
+    const auto cww = dynamic_cast<CanvasWindowWrapper*>(parent);
+    if(cww) {
+        cww->saveDataToLayout();
+        return;
+    }
+    const auto children = parent->children();
+    for(const auto& child : children) {
+        const auto childWidget = qobject_cast<QWidget*>(child);
+        if(!childWidget) continue;
+        const auto cww = dynamic_cast<CanvasWindowWrapper*>(childWidget);
+        if(cww) cww->saveDataToLayout();
+        else saveAllChildrenLayoutsData(childWidget);
+    }
+}
+
 void SceneLayout::reset(CanvasWindowWrapper** const cwwP) {
-    if(mCurrentId != -1)
+    if(mCurrentId != -1) {
+        saveAllChildrenLayoutsData(mWindow->centralWidget());
         mCollection.replaceCustomLayout(mCurrentId, std::move(mBaseStack));
+    }
     mBaseStack = std::make_unique<BaseStackItem>();
     mCurrentId = -1;
     auto cwwItem = new CWWidgetStackLayoutItem;

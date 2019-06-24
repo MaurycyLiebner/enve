@@ -37,7 +37,11 @@ public:
     explicit CanvasWindow(Document& document, QWidget * const parent = nullptr);
     ~CanvasWindow();
     Canvas *getCurrentCanvas();
-
+    const QMatrix& getViewTransform() const { return mViewTransform; }
+    void blockAutomaticSizeFit();
+    void unblockAutomaticSizeFit();
+    void setViewTransform(const QMatrix& transform) {
+        mViewTransform = transform; }
     void openWelcomeDialog();
     void closeWelcomeDialog();
 
@@ -107,8 +111,6 @@ public:
     void releaseMouse();
     bool isMouseGrabber();
 
-    bool event(QEvent *event);
-
     void resizeEvent(QResizeEvent* e);
 
     void dropEvent(QDropEvent *event);
@@ -140,10 +142,10 @@ private:
 
     void changeCurrentFrameAction(const int frame);
     void playPreviewAfterAllTasksCompleted();
-
     Document& mDocument;
     CanvasMode mCurrentMode = MOVE_BOX;
 
+    bool mAutomaticSizeFit = true;
     QSize mOldSize{-1, -1};
     QMatrix mViewTransform;
     QPointF mPrevMousePos;
@@ -309,7 +311,6 @@ public:
     void translateView(const QPointF &trans);
     void zoomView(const qreal scaleBy, const QPointF &absOrigin);
 
-    void requestFitCanvasToSize();
     void fitCanvasToSize();
     void resetTransormation();
 
