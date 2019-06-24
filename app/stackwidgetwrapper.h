@@ -44,8 +44,8 @@ public:
                                 const Creator& creator, const SetupOp& setup,
                                 QWidget* const parent = nullptr);
 
-    StackWrapperMenu* getMenuBar() { return mMenuBar; }
-    QWidget* getCentralWidget() { return mCenterWidget; }
+    StackWrapperMenu* getMenuBar() const { return mMenuBar; }
+    QWidget* getCentralWidget() const { return mCenterWidget; }
 
     void setMenuBar(StackWrapperMenu * const menu);
     void setCentralWidget(QWidget * const widget);

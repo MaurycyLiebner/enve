@@ -20,9 +20,10 @@ public:
 
             const auto dialog = new CanvasSettingsDialog(defName, mWindow);
             connect(dialog, &QDialog::accepted, this, [this, dialog]() {
-                const auto newCanvas = mDocument.createNewScene();
-                dialog->applySettingsToCanvas(newCanvas);
+                const auto newScene = mDocument.createNewScene();
+                dialog->applySettingsToCanvas(newScene);
                 dialog->close();
+                setCurrentScene(newScene);
             });
 
             dialog->show();
@@ -55,7 +56,7 @@ private:
             act->setText(name);
         });
         mSceneToAct.insert({scene, act});
-        if(!mCurrentScene) setCurrentScene(scene, act);
+        //if(!mCurrentScene) setCurrentScene(scene, act);
     }
 
     void removeScene(Canvas * const scene) {
@@ -95,6 +96,8 @@ private:
         mLayoutItem->setScene(scene);
     }
 
+    Canvas* getCurrentScene() const { return mCurrentScene; }
+
     Document& mDocument;
     CanvasWindow* const mWindow;
     CWWidgetStackLayoutItem* const mLayoutItem;
@@ -130,6 +133,19 @@ CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
 void CanvasWindowWrapper::setScene(Canvas * const scene) {
     const auto menu = static_cast<CanvasWrapperMenuBar*>(getMenuBar());
     menu->setCurrentScene(scene);
+}
+
+Canvas* CanvasWindowWrapper::getScene() const {
+    const auto menu = static_cast<CanvasWrapperMenuBar*>(getMenuBar());
+    return menu->getCurrentScene();
+}
+
+void CanvasWindowWrapper::changeEvent(QEvent *e) {
+    if(e->type() == QEvent::ParentChange) {
+        const auto sceneWidget = static_cast<CanvasWindow*>(getCentralWidget());
+        if(sceneWidget) sceneWidget->requestFitCanvasToSize();
+    }
+    StackWidgetWrapper::changeEvent(e);
 }
 
 void CWWidgetStackLayoutItem::clear() {

@@ -11,6 +11,9 @@ public:
                         CWWidgetStackLayoutItem * const layItem,
                         QWidget * const parent = nullptr);
     void setScene(Canvas* const scene);
+    Canvas* getScene() const;
+protected:
+    void changeEvent(QEvent* e);
 private:
     using StackWidgetWrapper::setMenuBar;
     using StackWidgetWrapper::setCentralWidget;
