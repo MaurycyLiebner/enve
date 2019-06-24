@@ -41,7 +41,6 @@ bool CanvasWindow::event(QEvent *event) {
 
 #include <QResizeEvent>
 void CanvasWindow::resizeEvent(QResizeEvent *e) {
-    qDebug() << e->size() << this << parentWidget();
     if(mFitRequested) {
         mFitRequested = false;
         fitCanvasToSize();

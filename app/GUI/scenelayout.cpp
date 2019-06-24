@@ -39,7 +39,10 @@ void SceneLayout::setCurrent(const int id) {
         return;
     }
     stack->apply(cwwP);
-    mWindow->setCentralWidget(cwwP);
+    QWidget* mainW = cwwP;
+    while(mainW->parentWidget())
+        mainW = mainW->parentWidget();
+    mWindow->setCentralWidget(mainW);
     mCurrentId = id;
     mBaseStack->setName(stack->getName());
     const bool removable = mCollection.isCustom(mCurrentId);
