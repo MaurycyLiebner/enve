@@ -1369,14 +1369,14 @@ void CanvasWindow::importFile(const QString &path,
 void CanvasWindow::grabMouse() {
     mMouseGrabber = true;
 #ifndef QT_DEBUG
-    setMouseGrabEnabled(true);
+    QWidget::grabMouse();
 #endif
 }
 
 void CanvasWindow::releaseMouse() {
     mMouseGrabber = false;
 #ifndef QT_DEBUG
-    setMouseGrabEnabled(false);
+    QWidget::releaseMouse();
 #endif
 }
 
