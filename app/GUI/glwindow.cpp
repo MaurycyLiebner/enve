@@ -48,6 +48,7 @@ void GLWindow::bindSkia(const int w, const int h) {
 void GLWindow::resizeGL(int w, int h) {
     try {
         bindSkia(w, h);
+        //glViewport(0, 0, width(), height());
         update();
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
@@ -79,15 +80,12 @@ void GLWindow::initialize() {
 
     // setup GrContext
     mInterface = GrGLMakeNativeInterface();
-    if(!mInterface) {
+    if(!mInterface)
         RuntimeThrow("Failed to make native interface.");
-    }
 //    GrContextOptions options;
     // setup contexts
     mGrContext = GrContext::MakeGL(mInterface/*, options*/);
-    if(!mGrContext) {
-        RuntimeThrow("Failed to make GrContext.");
-    }
+    if(!mGrContext) RuntimeThrow("Failed to make GrContext.");
     // Wrap the frame buffer object attached to the screen in
     // a Skia render target so Skia can render to it
     //GrGLint buffer;
@@ -112,7 +110,7 @@ void GLWindow::initialize() {
 
 void GLWindow::paintGL() {
     //glBindFramebuffer(GL_FRAMEBUFFER, context()->defaultFramebufferObject());
-    glViewport(0, 0, width(), height());
+    //glViewport(0, 0, width(), height());
     glClear(GL_COLOR_BUFFER_BIT);
 
     renderSk(mCanvas, mGrContext.get());

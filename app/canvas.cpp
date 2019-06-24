@@ -182,7 +182,6 @@ void Canvas::renderSk(SkCanvas * const canvas,
                       const QMatrix& viewTrans,
                       const bool mouseGrabbing) {
     SkPaint paint;
-    paint.setAntiAlias(true);
     paint.setStyle(SkPaint::kFill_Style);
     const qreal scale = viewTrans.m11();
     const SkRect canvasRect = SkRect::MakeWH(mWidth, mHeight);
@@ -205,7 +204,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         }
         const bool drawCanvas = mCurrentPreviewContainer &&
                 !mCurrentPreviewContainerOutdated;
-        drawTransparencyMesh(canvas, canvasRect, scale);
+//        drawTransparencyMesh(canvas, canvasRect, scale);
 
         if(!mClipToCanvasSize || !drawCanvas) {
             // saveLayer rebinds framebuffer to 0,
@@ -242,7 +241,6 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
         if(mCurrentMode == CanvasMode::MOVE_BOX ||
            mCurrentMode == CanvasMode::MOVE_POINT) {
-
             if(mTransMode == MODE_ROTATE || mTransMode == MODE_SCALE) {
                 mRotPivot->drawTransforming(canvas, mCurrentMode, invZoom,
                                             MIN_WIDGET_DIM*0.25f*invZoom);
