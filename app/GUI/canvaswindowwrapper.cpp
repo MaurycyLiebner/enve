@@ -11,9 +11,8 @@ class CanvasWrapperMenuBar : public StackWrapperMenu {
     friend struct CWWidgetStackLayoutItem;
     friend class CanvasWindowWrapper;
 public:
-    CanvasWrapperMenuBar(Document& document, CanvasWindow * const window,
-                         CWWidgetStackLayoutItem* const layoutItem) :
-        mDocument(document), mWindow(window), mLayoutItem(layoutItem) {
+    CanvasWrapperMenuBar(Document& document, CanvasWindow * const window) :
+        mDocument(document), mWindow(window) {
         addAction("+", this, [this]() {
             const QString defName = "Scene " +
                     QString::number(mDocument.fScenes.count());
@@ -93,14 +92,12 @@ private:
         mSceneMenu->setTitle(scene ? scene->getName() : "none");
         mWindow->setCurrentCanvas(scene);
         mCurrentScene = scene;
-        mLayoutItem->setScene(scene);
     }
 
     Canvas* getCurrentScene() const { return mCurrentScene; }
 
     Document& mDocument;
     CanvasWindow* const mWindow;
-    CWWidgetStackLayoutItem* const mLayoutItem;
     QMenu * mSceneMenu;
     Canvas * mCurrentScene = nullptr;
     std::map<Canvas*, QAction*> mSceneToAct;
@@ -124,10 +121,7 @@ CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
         [document](StackWidgetWrapper * toSetup) {
             const auto window = new CanvasWindow(*document, toSetup);
             toSetup->setCentralWidget(window);
-            const auto lItem = toSetup->getLayoutItem();
-            const auto lItemC = static_cast<CWWidgetStackLayoutItem*>(lItem);
-            toSetup->setMenuBar(new CanvasWrapperMenuBar(*document, window,
-                                                         lItemC));
+            toSetup->setMenuBar(new CanvasWrapperMenuBar(*document, window));
 }, parent) {}
 
 void CanvasWindowWrapper::setScene(Canvas * const scene) {
@@ -145,6 +139,7 @@ void CanvasWindowWrapper::saveDataToLayout() const {
     if(!lItem) return;
     const auto sceneWidget = getSceneWidget();
     lItem->setTransform(sceneWidget->getViewTransform());
+    lItem->setScene(sceneWidget->getCurrentCanvas());
 }
 
 CanvasWindow* CanvasWindowWrapper::getSceneWidget() const {

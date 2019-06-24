@@ -12,7 +12,7 @@ SceneLayout::SceneLayout(Document& document,
     connect(this, &SceneLayout::created,
             this, [this](const int id) {
         if(mCurrentId == -1) return;
-        if(id >= mCurrentId) mCurrentId++;
+        if(id <= mCurrentId) mCurrentId++;
     });
 }
 
@@ -37,10 +37,10 @@ void SceneLayout::reset(CanvasWindowWrapper** const cwwP) {
         saveAllChildrenLayoutsData(mWindow->centralWidget());
         mCollection.replaceCustomLayout(mCurrentId, std::move(mBaseStack));
     }
-    mBaseStack = std::make_unique<BaseStackItem>();
     mCurrentId = -1;
+
     auto cwwItem = new CWWidgetStackLayoutItem;
-    mBaseStack->setChild(std::unique_ptr<WidgetStackLayoutItem>(cwwItem));
+    mBaseStack = std::make_unique<SceneBaseStackItem>(cwwItem);
     const auto cww = new CanvasWindowWrapper(&mDocument, cwwItem);
     //cww->setScene(scene);
     cww->disableClose();
@@ -63,8 +63,11 @@ void SceneLayout::setCurrent(const int id) {
     mWindow->setCentralWidget(mainW);
     mCurrentId = id;
     mBaseStack->setName(stack->getName());
-    const bool removable = mCollection.isCustom(mCurrentId);
-    emit currentRemovable(removable);
+    if(!mCollection.isCustom(id)) {
+        static_cast<SceneBaseStackItem*>(mBaseStack.get())->setScene(
+                    static_cast<const SceneBaseStackItem*>(stack)->getScene());
+    }
+    emit currentSet(mCurrentId);
 }
 
 void SceneLayout::removeCurrent() {
@@ -73,9 +76,15 @@ void SceneLayout::removeCurrent() {
 
 void SceneLayout::remove(const int id) {
     if(id == -1) return;
-    if(mCollection.removeCustomLayout(id)) {
-        if(id == mCurrentId) mCurrentId = -1;
-        emit removed(id);
+    if(mCollection.isCustom(id)) {
+        if(mCollection.removeCustomLayout(id)) {
+            if(id == mCurrentId) mCurrentId = -1;
+            emit removed(id);
+        }
+    } else {
+        if(mCollection.resetSceneLayout(id)) {
+            if(id == mCurrentId) setCurrent(id);
+        }
     }
 }
 
@@ -106,8 +115,9 @@ QString SceneLayout::newEmpty() {
     mBaseStack->setName(name);
     auto newL = std::make_unique<BaseStackItem>();
     newL->setName(name);
-    mCurrentId = mCollection.addCustomLayout(std::move(newL));
-    emit created(mCurrentId, name);
+    const int newId = mCollection.addCustomLayout(std::move(newL));
+    emit created(newId, name);
+    setCurrent(newId);
     return name;
 }
 
