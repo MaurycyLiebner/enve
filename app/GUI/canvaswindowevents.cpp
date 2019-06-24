@@ -22,7 +22,14 @@ void CanvasWindow::zoomView(const qreal scaleBy, const QPointF &absOrigin) {
 #include <QApplication>
 #include <QEvent>
 void CanvasWindow::requestFitCanvasToSize() {
-    QApplication::postEvent(this, new QEvent(QEvent::User));
+    mFitRequested = true;
+    //QApplication::postEvent(this, new QEvent(QEvent::User));
+}
+
+void CanvasWindow::changeEvent(QEvent *e) {
+    if(e->type() == QEvent::ParentChange)
+        requestFitCanvasToSize();
+    QWidget::changeEvent(e);
 }
 
 bool CanvasWindow::event(QEvent *event) {
@@ -34,7 +41,11 @@ bool CanvasWindow::event(QEvent *event) {
 
 #include <QResizeEvent>
 void CanvasWindow::resizeEvent(QResizeEvent *e) {
-    if(e->size().isValid()) {
+    qDebug() << e->size() << this << parentWidget();
+    if(mFitRequested) {
+        mFitRequested = false;
+        fitCanvasToSize();
+    } else if(e->size().isValid()) {
         if(mOldSize.isValid()) {
             const auto dSize = e->size() - mOldSize;
             const qreal div = 2*mViewTransform.m11();

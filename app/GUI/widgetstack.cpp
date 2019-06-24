@@ -47,9 +47,9 @@ bool gReplaceWidget(QWidget * const from, QWidget * const to,
         layout->replaceWidget(from, to, Qt::FindDirectChildrenOnly);
     } else if(vStack) {
         vStack->replaceWidget(from, to);
-    } else { // hStack
+    } else if(hStack) { // hStack
         hStack->replaceWidget(from, to);
-    }
+    } else return false;
     if(centralWid) *centralWid = window;
     to->resize(size.width(), size.height());
     return true;

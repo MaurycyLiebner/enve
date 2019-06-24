@@ -16,19 +16,18 @@ SceneLayout::SceneLayout(Document& document,
     });
 }
 
-void SceneLayout::reset(CanvasWindowWrapper** const cwwP,
-                        Canvas * const scene) {
+void SceneLayout::reset(CanvasWindowWrapper** const cwwP) {
     if(mCurrentId != -1)
         mCollection.replaceCustomLayout(mCurrentId, std::move(mBaseStack));
     mBaseStack = std::make_unique<BaseStackItem>();
     mCurrentId = -1;
     auto cwwItem = new CWWidgetStackLayoutItem;
     mBaseStack->setChild(std::unique_ptr<WidgetStackLayoutItem>(cwwItem));
-    const auto cww = new CanvasWindowWrapper(&mDocument, cwwItem, mWindow);
-    cww->setScene(scene);
+    const auto cww = new CanvasWindowWrapper(&mDocument, cwwItem);
+    //cww->setScene(scene);
     cww->disableClose();
-    mWindow->setCentralWidget(cww);
     if(cwwP) *cwwP = cww;
+    else mWindow->setCentralWidget(cww);
 }
 
 void SceneLayout::setCurrent(const int id) {
@@ -40,6 +39,7 @@ void SceneLayout::setCurrent(const int id) {
         return;
     }
     stack->apply(cwwP);
+    mWindow->setCentralWidget(cwwP);
     mCurrentId = id;
     mBaseStack->setName(stack->getName());
     const bool removable = mCollection.isCustom(mCurrentId);

@@ -108,6 +108,7 @@ public:
     bool isMouseGrabber();
 
     bool event(QEvent *event);
+    void changeEvent(QEvent *e);
 
     void resizeEvent(QResizeEvent* e);
 
@@ -144,6 +145,7 @@ private:
     Document& mDocument;
     CanvasMode mCurrentMode = MOVE_BOX;
 
+    bool mFitRequested = false;
     QSize mOldSize{-1, -1};
     QMatrix mViewTransform;
     QPointF mPrevMousePos;

@@ -169,8 +169,7 @@ private:
     void sceneNameChanged(Canvas* const scene);
     void newForScene(Canvas* const scene);
     void removeForScene(Canvas* const scene);
-    void reset(CanvasWindowWrapper ** const cwwP = nullptr,
-               Canvas * const scene = nullptr);
+    void reset(CanvasWindowWrapper ** const cwwP = nullptr);
 
     int mCurrentId = -1;
     LayoutCollection mCollection;
