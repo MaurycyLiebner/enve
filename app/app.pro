@@ -73,6 +73,7 @@ SOURCES += main.cpp\
     PathEffects/subpatheffect.cpp \
     PathEffects/zigzagpatheffect.cpp \
     Sound/soundmerger.cpp \
+    actions.cpp \
     canvas.cpp \
     canvasmouseinteractions.cpp \
     GUI/ColorWidgets/colorlabel.cpp \
@@ -293,6 +294,7 @@ HEADERS  += \
     PathEffects/subpatheffect.h \
     PathEffects/zigzagpatheffect.h \
     Sound/soundmerger.h \
+    actions.h \
     canvas.h \
     GUI/ColorWidgets/colorlabel.h \
     GUI/ColorWidgets/colorsettingswidget.h \
