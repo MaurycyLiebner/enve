@@ -119,7 +119,7 @@ void SWT_Abstraction::scheduleContentUpdate(const SWT_BoxRule &rule) {
 
 void SWT_Abstraction::scheduleContentUpdate(
         SingleWidgetTarget * const targetP,
-        const SWT_Target &target) {
+        const SWT_Target target) {
     mUpdateFuncs.fContentUpdateIfIsCurrentTarget(targetP, target);
 }
 

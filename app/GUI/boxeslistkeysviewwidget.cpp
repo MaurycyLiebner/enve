@@ -60,8 +60,9 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
                     "color: white;"
                 "}");
     mBoxesListMenuBar->addSeparator();
-    mBoxesListMenuBar->addMenu(new SceneChooser(mDocument, true,
-                                                mBoxesListMenuBar));
+    const auto sceneChooser = new SceneChooser(mDocument, true,
+                                               mBoxesListMenuBar);
+    mBoxesListMenuBar->addMenu(sceneChooser);
 
     mCornerMenuBar = new QMenuBar(this);
     mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
@@ -210,6 +211,10 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
     connect(mBoxesListAnimationDockWidget,
             &BoxesListAnimationDockWidget::viewedVerticalRangeChanged,
             mKeysView, &KeysView::setViewedVerticalRange);
+
+    connect(sceneChooser, &SceneChooser::currentChanged,
+            mKeysView, &KeysView::setCurrentScene);
+
     mBoxesListScrollArea->setFixedWidth(20*MIN_WIDGET_DIM);
 
     setLayout(mMainLayout);

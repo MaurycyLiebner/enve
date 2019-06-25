@@ -107,7 +107,7 @@ void Canvas::setCurrentBoxesGroup(ContainerBox * const group) {
 
     //mMainWindow->getObjectSettingsList()->setMainTarget(mCurrentBoxesGroup);
     SWT_scheduleContentUpdate(mCurrentBoxesGroup,
-                                               SWT_TARGET_CURRENT_GROUP);
+                              SWT_TARGET_CURRENT_GROUP);
 }
 
 void Canvas::updateHoveredBox(const MouseEvent& e) {

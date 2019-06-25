@@ -32,7 +32,9 @@ public:
     explicit KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
                       QWidget *parent = nullptr);
 
-    void setGraphViewed(bool bT);
+    void setCurrentScene(Canvas* const scene);
+
+    void setGraphViewed(const bool bT);
 
     int getMinViewedFrame();
     int getMaxViewedFrame();
@@ -186,6 +188,7 @@ private:
     bool mPressedCtrlPoint = false;
 
     MainWindow *mMainWindow;
+    Canvas* mCurrentScene = nullptr;
     QList<Animator*> mSelectedKeysAnimators;
     QList<GraphAnimator*> mGraphAnimators;
 

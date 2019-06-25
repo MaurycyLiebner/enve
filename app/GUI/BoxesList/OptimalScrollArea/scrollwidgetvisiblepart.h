@@ -24,7 +24,7 @@ public:
     void setMainAbstraction(SWT_Abstraction *abs);
     void setCurrentRule(const SWT_BoxRule &rule);
     void setCurrentTarget(SingleWidgetTarget *targetP,
-                          const SWT_Target &target);
+                          const SWT_Target target);
     void setAlwaysShowChildren(const bool alwaysShowChildren);
     void setCurrentSearchText(const QString &text);
 
@@ -41,7 +41,7 @@ public:
 
     void scheduleContentUpdateIfSearchNotEmpty();
     void scheduleContentUpdateIfIsCurrentTarget(SingleWidgetTarget *targetP,
-                                                const SWT_Target &target);
+                                                const SWT_Target target);
     void setCurrentType(const SWT_Type &type);
     int getId() const { return mId; }
     const UpdateFuncs& getUpdateFuncs() const {
@@ -55,7 +55,7 @@ protected:
         };
         mUpdateFuncs.fContentUpdateIfIsCurrentTarget =
                 [this](SingleWidgetTarget* targetP,
-                       const SWT_Target &target) {
+                       const SWT_Target target) {
             scheduleContentUpdateIfIsCurrentTarget(targetP, target);
         };
         mUpdateFuncs.fContentUpdateIfSearchNotEmpty = [this]() {

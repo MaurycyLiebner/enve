@@ -14,7 +14,7 @@ typedef stdfunc<void(SWT_Abstraction*, int)> SetAbsFunc;
 
 struct UpdateFuncs {
     stdfunc<void(const SWT_BoxRule &)> fContentUpdateIfIsCurrentRule;
-    stdfunc<void(SingleWidgetTarget*, const SWT_Target &)>
+    stdfunc<void(SingleWidgetTarget*, const SWT_Target )>
         fContentUpdateIfIsCurrentTarget;
     stdfunc<void()> fContentUpdateIfSearchNotEmpty;
     stdfunc<void()> fUpdateParentHeight;
@@ -70,7 +70,7 @@ public:
     void scheduleSearchContentUpdate();
     void scheduleContentUpdate(
             SingleWidgetTarget * const targetP,
-            const SWT_Target &target);
+            const SWT_Target target);
 
     void setIsMainTarget(const bool bT) {
         mIsMainTarget = bT;

@@ -33,7 +33,7 @@ void ScrollWidgetVisiblePart::setCurrentRule(
 
 void ScrollWidgetVisiblePart::setCurrentTarget(
         SingleWidgetTarget* targetP,
-        const SWT_Target &target) {
+        const SWT_Target target) {
     mCurrentRulesCollection.fTarget = target;
     static_cast<ScrollWidget*>(mParentWidget)->setMainTarget(targetP);
     updateParentHeight();
@@ -69,7 +69,7 @@ void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(
 }
 
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentTarget(
-        SingleWidgetTarget* targetP, const SWT_Target &target) {
+        SingleWidgetTarget* targetP, const SWT_Target target) {
     if(mCurrentRulesCollection.fTarget == target) {
         static_cast<ScrollWidget*>(mParentWidget)->setMainTarget(targetP);
         planScheduleUpdateParentHeight();

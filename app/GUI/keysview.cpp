@@ -26,7 +26,13 @@ KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
     mScrollTimer = new QTimer(this);
 }
 
-void KeysView::setGraphViewed(bool bT) {
+void KeysView::setCurrentScene(Canvas * const scene) {
+    mCurrentScene = scene;
+    mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
+                scene, SWT_TARGET_CURRENT_CANVAS);
+}
+
+void KeysView::setGraphViewed(const bool bT) {
     mGraphViewed = bT;
     if(bT) {
         graphResetValueScaleAndMinShown();
@@ -138,12 +144,11 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                     mMovingRect = true;
                 }
             } else {
-                if(!mMainWindow->isShiftPressed() &&
-                    !mLastPressedKey->isSelected()) {
+                const bool shiftPressed = e->modifiers() & Qt::SHIFT;
+                if(!shiftPressed && !mLastPressedKey->isSelected()) {
                     clearKeySelection();
                 }
-                if(mMainWindow->isShiftPressed() &&
-                    mLastPressedKey->isSelected()) {
+                if(shiftPressed && mLastPressedKey->isSelected()) {
                     removeKeyFromSelection(mLastPressedKey);
                 } else {
                     clearHoveredKey();
@@ -251,8 +256,8 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                 mLastPressPos = posU;
                 grabMouseAndTrack();
             }
-        } else if(mMainWindow->isShiftPressed() &&
-                 event->key() == Qt::Key_D) {
+        } else if(event->modifiers() & Qt::SHIFT &&
+                  event->key() == Qt::Key_D) {
             auto container = getSelectedKeysClipboardContainer();
             int lowestKey = FrameRange::EMAX;
             for(const auto& anim : mSelectedKeysAnimators) {
@@ -268,7 +273,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
             mFirstMove = true;
             mLastPressPos = posU;
             grabMouseAndTrack();
-        } else if(mMainWindow->isCtrlPressed() &&
+        } else if(event->modifiers() & Qt::CTRL &&
                   event->key() == Qt::Key_D) {
             auto container = getSelectedKeysClipboardContainer();
             container->paste(mMainWindow->getCurrentFrame(), this, true, true);
@@ -279,12 +284,12 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                 deleteSelectedKeys();
             }
             update();
-        } else if(event->modifiers() & Qt::ControlModifier &&
+        } else if(event->modifiers() & Qt::CTRL &&
                   event->key() == Qt::Key_Right) {
             for(const auto& anim : mSelectedKeysAnimators) {
                 anim->incSelectedKeysFrame(1);
             }
-        } else if(event->modifiers() & Qt::ControlModifier &&
+        } else if(event->modifiers() & Qt::CTRL &&
                   event->key() == Qt::Key_Left) {
             for(const auto& anim : mSelectedKeysAnimators) {
                 anim->incSelectedKeysFrame(-1);
@@ -587,22 +592,21 @@ void KeysView::handleMouseMove(const QPoint &pos,
                     }
                 }
             } else if(mMovingRect) {
-                auto canvasWindow = mMainWindow->getCanvasWindow();
                 if(mFirstMove) {
                     if(mLastPressedMovable) {
                         if(!mLastPressedMovable->isSelected()) {
                             mLastPressedMovable->pressed(
-                                        mMainWindow->isShiftPressed());
+                                        QApplication::keyboardModifiers() & Qt::SHIFT);
                         }
 
                         const auto childProp = mLastPressedMovable->getChildProperty();
                         if(childProp->SWT_isBoundingBox()) {
                             if(mLastPressedMovable->isDurationRect()) {
-                                canvasWindow->startDurationRectPosTransformForAllSelected();
+                                mCurrentScene->startDurationRectPosTransformForAllSelected();
                             } else if(mLastPressedMovable->isMaxFrame()) {
-                                canvasWindow->startMaxFramePosTransformForAllSelected();
+                                mCurrentScene->startMaxFramePosTransformForAllSelected();
                             } else if(mLastPressedMovable->isMinFrame()) {
-                                canvasWindow->startMinFramePosTransformForAllSelected();
+                                mCurrentScene->startMinFramePosTransformForAllSelected();
                             }
                         } else {
                             mLastPressedMovable->startPosTransform();
@@ -616,11 +620,11 @@ void KeysView::handleMouseMove(const QPoint &pos,
                         const auto childProp = mLastPressedMovable->getChildProperty();
                         if(childProp->SWT_isBoundingBox()) {
                             if(mLastPressedMovable->isDurationRect()) {
-                                canvasWindow->moveDurationRectForAllSelected(dDFrame);
+                                mCurrentScene->moveDurationRectForAllSelected(dDFrame);
                             } else if(mLastPressedMovable->isMaxFrame()) {
-                                canvasWindow->moveMaxFrameForAllSelected(dDFrame);
+                                mCurrentScene->moveMaxFrameForAllSelected(dDFrame);
                             } else if(mLastPressedMovable->isMinFrame()) {
-                                canvasWindow->moveMinFrameForAllSelected(dDFrame);
+                                mCurrentScene->moveMinFrameForAllSelected(dDFrame);
                             }
                         } else {
                             mLastPressedMovable->changeFramePosBy(dDFrame);
@@ -667,7 +671,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
             mPressedCtrlPoint = false;
         } else {
             if(mFirstMove) {
-                if(!mMainWindow->isShiftPressed()) {
+                if(!(e->modifiers() & Qt::SHIFT)) {
                     clearKeySelection();
                     addKeyToSelection(mGPressedPoint->getParentKey());
                 }
@@ -700,7 +704,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                     mSelectionRect.setTop(bottomT);
                     mSelectionRect.setBottom(topT);
                 }
-                if(!mMainWindow->isShiftPressed()) {
+                if(!(e->modifiers() & Qt::SHIFT)) {
                     clearKeySelection();
                 }
                 selectKeysInSelectionRect();
@@ -723,21 +727,19 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
             } else if(mMovingRect) {
                 if(mFirstMove) {
                     if(mLastPressedMovable) {
-                        mLastPressedMovable->pressed(
-                                    mMainWindow->isShiftPressed());
+                        mLastPressedMovable->pressed(e->modifiers() & Qt::SHIFT);
                     }
                 } else {
                     mMoveDFrame = 0;
                     mMovingRect = false;
-                    auto canvasWindow = mMainWindow->getCanvasWindow();
                     const auto childProp = mLastPressedMovable->getChildProperty();
                     if(childProp->SWT_isBoundingBox()) {
                         if(mLastPressedMovable->isDurationRect()) {
-                            canvasWindow->finishDurationRectPosTransformForAllSelected();
+                            mCurrentScene->finishDurationRectPosTransformForAllSelected();
                         } else if(mLastPressedMovable->isMinFrame()) {
-                            canvasWindow->finishMinFramePosTransformForAllSelected();
+                            mCurrentScene->finishMinFramePosTransformForAllSelected();
                         } else if(mLastPressedMovable->isMaxFrame()) {
-                            canvasWindow->finishMaxFramePosTransformForAllSelected();
+                            mCurrentScene->finishMaxFramePosTransformForAllSelected();
                         }
                     } else {
                         mLastPressedMovable->finishPosTransform();
