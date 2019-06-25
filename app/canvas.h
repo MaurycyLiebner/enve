@@ -366,7 +366,7 @@ public:
                              const bool parentMainTarget) const;
 
     ContainerBox *getCurrentGroup() {
-        return mCurrentBoxesGroup;
+        return mCurrentContainer;
     }
 
     void updateTotalTransform() {}
@@ -453,6 +453,7 @@ signals:
     void boxSelectionChanged();
     void selectedPaintSettingsChanged();
     void currentFrameChanged(int);
+    void currentContainerSet(ContainerBox*);
 public:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
@@ -665,7 +666,7 @@ protected:
     qptr<Rectangle> mCurrentRectangle;
     qptr<TextBox> mCurrentTextBox;
     qptr<ParticleBox> mCurrentParticleBox;
-    qptr<ContainerBox> mCurrentBoxesGroup;
+    qptr<ContainerBox> mCurrentContainer;
 
     stdptr<MovablePoint> mHoveredPoint_d;
     qptr<BoundingBox> mHoveredBox;

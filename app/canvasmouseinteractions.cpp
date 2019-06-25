@@ -25,7 +25,7 @@
 #include "Boxes/containerbox.h"
 
 void Canvas::handleMovePathMousePressEvent(const MouseEvent& e) {
-    mPressedBox = mCurrentBoxesGroup->getBoxAt(e.fPos);
+    mPressedBox = mCurrentContainer->getBoxAt(e.fPos);
     if(e.shiftMod()) return;
     if(mPressedBox ? !mPressedBox->isSelected() : true) {
         clearBoxesSelection();
@@ -36,7 +36,7 @@ void Canvas::addSelectedBoxesActions(QMenu * const qMenu) {
     qMenu->addSeparator();
     qMenu->addAction("Create Link", [this]() {
         for(const auto& box : mSelectedBoxes)
-            mCurrentBoxesGroup->addContainedBox(box->createLink());
+            mCurrentContainer->addContainedBox(box->createLink());
     });
     qMenu->addAction("Center Pivot", [this]() {
         centerPivotForSelected();
@@ -94,7 +94,7 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
     for(const auto& canvas : mDocument.fScenes) {
         const auto slot = [this, canvas]() {
             auto newLink = canvas->createLink();
-            mCurrentBoxesGroup->addContainedBox(newLink);
+            mCurrentContainer->addContainedBox(newLink);
             newLink->centerPivotPosition();
         };
         QAction * const action = linkCanvasMenu->addAction(
@@ -327,7 +327,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
         const auto newPath = SPtrCreate(Circle)();
         newPath->planCenterPivotPosition();
-        mCurrentBoxesGroup->addContainedBox(newPath);
+        mCurrentContainer->addContainedBox(newPath);
         newPath->setAbsolutePos(e.fPos);
         //newPath->startAllPointsTransform();
         clearBoxesSelection();
@@ -338,7 +338,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
         const auto newPath = SPtrCreate(Rectangle)();
         newPath->planCenterPivotPosition();
-        mCurrentBoxesGroup->addContainedBox(newPath);
+        mCurrentContainer->addContainedBox(newPath);
         newPath->setAbsolutePos(e.fPos);
         //newPath->startAllPointsTransform();
         clearBoxesSelection();
@@ -354,7 +354,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
                     fonstWidget->getCurrentFontFamily(),
                     fonstWidget->getCurrentFontStyle());
         newPath->setSelectedFontSize(fonstWidget->getCurrentFontSize());
-        mCurrentBoxesGroup->addContainedBox(newPath);
+        mCurrentContainer->addContainedBox(newPath);
         newPath->setAbsolutePos(e.fPos);
 
         mCurrentTextBox = newPath.get();
@@ -364,7 +364,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
         //setCanvasMode(CanvasMode::MOVE_POINT);
         const auto partBox = SPtrCreate(ParticleBox)();
-        mCurrentBoxesGroup->addContainedBox(partBox);
+        mCurrentContainer->addContainedBox(partBox);
         partBox->setAbsolutePos(e.fPos);
         clearBoxesSelection();
         addBoxToSelection(partBox.get());
@@ -428,7 +428,7 @@ void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
                 selectOnlyLastPressedPoint();
             }
         } else {
-            mPressedBox = mCurrentBoxesGroup->getBoxAt(e.fPos);
+            mPressedBox = mCurrentContainer->getBoxAt(e.fPos);
             if(!mPressedBox ? true : mPressedBox->SWT_isContainerBox()) {
                 const auto pressedBox = getBoxAtFromAllDescendents(e.fPos);
                 if(!pressedBox) {
@@ -488,7 +488,7 @@ void Canvas::handleMovePathMouseRelease(const MouseEvent &e) {
         }
     } else if(mSelecting) {
         moveSecondSelectionPoint(e.fPos);
-        mCurrentBoxesGroup->addContainedBoxesToSelection(mSelectionRect);
+        mCurrentContainer->addContainedBoxesToSelection(mSelectionRect);
         mSelecting = false;
     } else {
         finishSelectedBoxesTransform();

@@ -65,7 +65,7 @@ Canvas::Canvas(Document &document,
     mWidth = canvasWidth;
     mHeight = canvasHeight;
 
-    mCurrentBoxesGroup = this;
+    mCurrentContainer = this;
     mIsCurrentGroup = true;
 
     mRotPivot = SPtrCreate(PathPivot)(this);
@@ -90,28 +90,26 @@ void Canvas::setResolutionFraction(const qreal percent) {
 }
 
 void Canvas::setCurrentGroupParentAsCurrentGroup() {
-    setCurrentBoxesGroup(mCurrentBoxesGroup->getParentGroup());
+    setCurrentBoxesGroup(mCurrentContainer->getParentGroup());
 }
 
 #include "GUI/BoxesList/boxscrollwidget.h"
 void Canvas::setCurrentBoxesGroup(ContainerBox * const group) {
-    if(mCurrentBoxesGroup) {
-        mCurrentBoxesGroup->setIsCurrentGroup_k(false);
+    if(mCurrentContainer) {
+        mCurrentContainer->setIsCurrentGroup_k(false);
     }
     clearBoxesSelection();
     clearPointsSelection();
     clearCurrentSmartEndPoint();
     clearLastPressedPoint();
-    mCurrentBoxesGroup = group;
+    mCurrentContainer = group;
     group->setIsCurrentGroup_k(true);
 
-    //mMainWindow->getObjectSettingsList()->setMainTarget(mCurrentBoxesGroup);
-    SWT_scheduleContentUpdate(mCurrentBoxesGroup,
-                              SWT_TARGET_CURRENT_GROUP);
+    emit currentContainerSet(group);
 }
 
 void Canvas::updateHoveredBox(const MouseEvent& e) {
-    mHoveredBox = mCurrentBoxesGroup->getBoxAt(e.fPos);
+    mHoveredBox = mCurrentContainer->getBoxAt(e.fPos);
 }
 
 void Canvas::updateHoveredPoint(const MouseEvent& e) {
@@ -228,8 +226,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
         const qreal qInvZoom = 1/viewTrans.m11();
         const SkScalar invZoom = toSkScalar(qInvZoom);
-        if(!mCurrentBoxesGroup->SWT_isCanvas())
-            mCurrentBoxesGroup->drawBoundingRect(canvas, invZoom);
+        if(!mCurrentContainer->SWT_isCanvas())
+            mCurrentContainer->drawBoundingRect(canvas, invZoom);
         if(!mPaintTarget.isValid()) {
             for(const auto& box : mSelectedBoxes) {
                 canvas->save();
@@ -431,7 +429,7 @@ qsptr<BoundingBox> Canvas::createLink() {
 ImageBox *Canvas::createImageBox(const QString &path) {
     const auto img = SPtrCreate(ImageBox)(path);
     img->planCenterPivotPosition();
-    mCurrentBoxesGroup->addContainedBox(img);
+    mCurrentContainer->addContainedBox(img);
     return img.get();
 }
 
@@ -440,7 +438,7 @@ ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QStringList &paths) {
     const auto aniBox = SPtrCreate(ImageSequenceBox)();
     aniBox->planCenterPivotPosition();
     aniBox->setListOfFrames(paths);
-    mCurrentBoxesGroup->addContainedBox(aniBox);
+    mCurrentContainer->addContainedBox(aniBox);
     return aniBox.get();
 }
 
@@ -449,7 +447,7 @@ VideoBox* Canvas::createVideoForPath(const QString &path) {
     const auto vidBox = SPtrCreate(VideoBox)();
     vidBox->planCenterPivotPosition();
     vidBox->setFilePath(path);
-    mCurrentBoxesGroup->addContainedBox(vidBox);
+    mCurrentContainer->addContainedBox(vidBox);
     return vidBox.get();
 }
 
@@ -457,7 +455,7 @@ VideoBox* Canvas::createVideoForPath(const QString &path) {
 ExternalLinkBox* Canvas::createLinkToFileWithPath(const QString &path) {
     const auto extLinkBox = SPtrCreate(ExternalLinkBox)();
     extLinkBox->setSrc(path);
-    mCurrentBoxesGroup->addContainedBox(extLinkBox);
+    mCurrentContainer->addContainedBox(extLinkBox);
     return extLinkBox.get();
 }
 
@@ -613,7 +611,7 @@ void Canvas::pasteAction() {
             mMainWindow->getClipboardContainer(CCT_BOXES));
     if(!container) return;
     clearBoxesSelection();
-    container->pasteTo(mCurrentBoxesGroup);
+    container->pasteTo(mCurrentContainer);
 }
 
 void Canvas::cutAction() {
@@ -762,11 +760,11 @@ bool Canvas::startMovingAction(const KeyEvent &e) {
 }
 
 void Canvas::selectAllBoxesAction() {
-    mCurrentBoxesGroup->selectAllBoxesFromBoxesGroup();
+    mCurrentContainer->selectAllBoxesFromBoxesGroup();
 }
 
 void Canvas::deselectAllBoxesAction() {
-    mCurrentBoxesGroup->deselectAllBoxesFromBoxesGroup();
+    mCurrentContainer->deselectAllBoxesFromBoxesGroup();
 }
 
 void Canvas::selectAllPointsAction() {

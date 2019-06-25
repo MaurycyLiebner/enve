@@ -61,9 +61,6 @@ void Document::setActiveScene(Canvas * const scene) {
         connect(fActiveScene, &Canvas::destroyed,
                 this, &Document::clearActiveScene);
     }
-    SWT_scheduleContentUpdate(scene ? scene->getCurrentGroup() : nullptr,
-                              SWT_TARGET_CURRENT_GROUP);
-    SWT_scheduleContentUpdate(scene, SWT_TARGET_CURRENT_CANVAS);
     emit activeSceneSet(scene);
     emit activeSceneBoxSelectionChanged();
 }

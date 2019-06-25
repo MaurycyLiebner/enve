@@ -9,7 +9,7 @@
 void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.isEmpty()) return;
     const auto newGroup = SPtrCreate(ContainerBox)(TYPE_GROUP);
-    mCurrentBoxesGroup->addContainedBox(newGroup);
+    mCurrentContainer->addContainedBox(newGroup);
     for(int i = mSelectedBoxes.count() - 1; i >= 0; i--) {
         const auto boxSP = GetAsSPtr(mSelectedBoxes.at(i), BoundingBox);
         boxSP->removeFromParent_k();
@@ -562,7 +562,7 @@ void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
 #include "Boxes/linkbox.h"
 void Canvas::createLinkBoxForSelected() {
     for(const auto& selectedBox : mSelectedBoxes) {
-        mCurrentBoxesGroup->addContainedBox(selectedBox->createLink());
+        mCurrentContainer->addContainedBox(selectedBox->createLink());
     }
 }
 
@@ -582,7 +582,7 @@ void Canvas::duplicateSelectedBoxes() {
     BoundingBox::sClearWriteBoxes();
 
     clearBoxesSelection();
-    container->pasteTo(mCurrentBoxesGroup);
+    container->pasteTo(mCurrentContainer);
 }
 
 SmartVectorPath *Canvas::getPathResultingFromOperation(
@@ -607,7 +607,7 @@ SmartVectorPath *Canvas::getPathResultingFromOperation(
     SkPath resultPath;
     builder.resolve(&resultPath);
     //newPath->loadPathFromSkPath(resultPath);
-    mCurrentBoxesGroup->addContainedBox(newPath);
+    mCurrentContainer->addContainedBox(newPath);
     return newPath.get();
 }
 
@@ -661,7 +661,7 @@ void Canvas::selectedPathsBreakApart() {
         }
     }
     for(const auto& path : created) {
-        mCurrentBoxesGroup->addContainedBox(path);
+        mCurrentContainer->addContainedBox(path);
         addBoxToSelection(path.get());
     }
 }
@@ -686,7 +686,7 @@ void Canvas::selectedPathsCombine() {
     if(!firstVectorPath) {
         const auto newPath = SPtrCreate(SmartVectorPath)();
         newPath->planCenterPivotPosition();
-        mCurrentBoxesGroup->addContainedBox(newPath);
+        mCurrentContainer->addContainedBox(newPath);
         firstVectorPath = newPath.get();
     }
 

@@ -27,9 +27,23 @@ KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
 }
 
 void KeysView::setCurrentScene(Canvas * const scene) {
+    if(mCurrentScene) disconnect(mCurrentScene, nullptr, this, nullptr);
     mCurrentScene = scene;
-    mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
-                scene, SWT_TARGET_CURRENT_CANVAS);
+    const auto rules = mBoxesListVisible->getCurrentRulesCollection();
+    if(rules.fTarget == SWT_TARGET_CURRENT_CANVAS) {
+        mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
+                    scene, SWT_TARGET_CURRENT_CANVAS);
+    } else if(rules.fTarget == SWT_TARGET_CURRENT_GROUP) {
+        mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
+                    scene->getCurrentGroup(), SWT_TARGET_CURRENT_GROUP);
+    }
+    if(scene) {
+        connect(scene, &Canvas::currentContainerSet, this,
+                [this](ContainerBox* const container) {
+            mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
+                        container, SWT_TARGET_CURRENT_GROUP);
+        });
+    }
 }
 
 void KeysView::setGraphViewed(const bool bT) {

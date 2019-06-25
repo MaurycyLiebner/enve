@@ -11,7 +11,7 @@
 void Canvas::newPaintBox(const QPointF &pos) {
     const auto paintBox = SPtrCreate(PaintBox)();
     paintBox->planCenterPivotPosition();
-    mCurrentBoxesGroup->addContainedBox(paintBox);
+    mCurrentContainer->addContainedBox(paintBox);
     paintBox->setAbsolutePos(pos);
     clearBoxesSelection();
     clearPointsSelection();
@@ -123,11 +123,11 @@ void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
     if(e.fModifiers & Qt::ShiftModifier) return;
     mDoubleClick = true;
 
-    const auto boxAt = mCurrentBoxesGroup->getBoxAt(e.fPos);
+    const auto boxAt = mCurrentContainer->getBoxAt(e.fPos);
     if(!boxAt) {
         if(!mHoveredPoint_d && !mHoveredNormalSegment.isValid()) {
-            if(mCurrentBoxesGroup != this) {
-                setCurrentBoxesGroup(mCurrentBoxesGroup->getParentGroup());
+            if(mCurrentContainer != this) {
+                setCurrentBoxesGroup(mCurrentContainer->getParentGroup());
             }
         }
     } else {
