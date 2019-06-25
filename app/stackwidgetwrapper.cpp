@@ -84,6 +84,7 @@ void StackWidgetWrapper::disableClose() {
 
 StackWrapperMenu::StackWrapperMenu() {
     setFixedHeight(MIN_WIDGET_DIM);
+    setStyleSheet("QMenuBar { border-bottom: 1px solid black; }");
     QMenuBar * const actBar = new QMenuBar(this);
     actBar->setFixedHeight(MIN_WIDGET_DIM);
     mSplitV = new QAction("split v");

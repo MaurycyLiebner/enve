@@ -6,6 +6,7 @@
 #include "GUI/newcanvasdialog.h"
 #include "canvaswindow.h"
 #include "document.h"
+#include "scenechooser.h"
 
 class CanvasWrapperMenuBar : public StackWrapperMenu {
     friend struct CWWidgetStackLayoutItem;
@@ -27,78 +28,26 @@ public:
 
             dialog->show();
         });
-        mSceneMenu = addMenu("none");
+        mSceneMenu = new SceneChooser(mDocument, this);
+        addMenu(mSceneMenu);
         addAction("x", this, [this]() {
             if(!mCurrentScene) return;
             mDocument.removeScene(GetAsSPtr(mCurrentScene, Canvas));
         });
-        mSceneMenu->setDisabled(true);
-        for(const auto& scene : mDocument.fScenes)
-            addScene(scene.get());
-
-        connect(&mDocument, qOverload<Canvas*>(&Document::sceneRemoved),
-                this, &CanvasWrapperMenuBar::removeScene);
-        connect(&mDocument, &Document::sceneCreated,
-                this, &CanvasWrapperMenuBar::addScene);
+        connect(mSceneMenu, &SceneChooser::currentChanged,
+                this, &CanvasWrapperMenuBar::setCurrentScene);
     }
 private:
-    void addScene(Canvas * const scene) {
-        if(!scene) return;
-        if(mSceneToAct.empty()) mSceneMenu->setEnabled(true);
-        const auto act = mSceneMenu->addAction(scene->getName());
-        act->setCheckable(true);
-        connect(act, &QAction::triggered, this,
-                [this, scene, act]() { setCurrentScene(scene, act); });
-        connect(scene, &Canvas::canvasNameChanged, act,
-                [this, act](Canvas* const scene, const QString& name) {
-            if(scene == mCurrentScene) mSceneMenu->setTitle(name);
-            act->setText(name);
-        });
-        mSceneToAct.insert({scene, act});
-        //if(!mCurrentScene) setCurrentScene(scene, act);
-    }
-
-    void removeScene(Canvas * const scene) {
-        const auto removeIt = mSceneToAct.find(scene);
-        if(removeIt == mSceneToAct.end()) return;
-        if(mCurrentScene == scene) {
-            const auto newIt = mSceneToAct.begin();
-            if(newIt == mSceneToAct.end()) setCurrentScene(nullptr);
-            else setCurrentScene(newIt->first, newIt->second);
-        }
-        mSceneMenu->removeAction(removeIt->second);
-        delete removeIt->second;
-        mSceneToAct.erase(removeIt);
-        if(mSceneToAct.empty()) mSceneMenu->setDisabled(true);
-    }
-
     void setCurrentScene(Canvas * const scene) {
-        if(!scene) return setCurrentScene(nullptr, nullptr);
-        const auto it = mSceneToAct.find(scene);
-        if(it == mSceneToAct.end()) return;
-        setCurrentScene(scene, it->second);
-    }
-
-    void setCurrentScene(Canvas * const scene, QAction * const act) {
-        if(act) {
-            act->setChecked(true);
-            act->setDisabled(true);
-        }
-        if(mCurrentScene) {
-            const auto currAct = mSceneToAct[mCurrentScene];
-            currAct->setChecked(false);
-            currAct->setEnabled(true);
-        }
-        mSceneMenu->setTitle(scene ? scene->getName() : "none");
         mWindow->setCurrentCanvas(scene);
-        mCurrentScene = scene;
+        mSceneMenu->setCurrentScene(scene);
     }
 
     Canvas* getCurrentScene() const { return mCurrentScene; }
 
     Document& mDocument;
     CanvasWindow* const mWindow;
-    QMenu * mSceneMenu;
+    SceneChooser * mSceneMenu;
     Canvas * mCurrentScene = nullptr;
     std::map<Canvas*, QAction*> mSceneToAct;
 };

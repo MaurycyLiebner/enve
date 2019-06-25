@@ -63,6 +63,7 @@ SOURCES += main.cpp\
     GUI/canvaswindowevents.cpp \
     GUI/canvaswindowwrapper.cpp \
     GUI/layoutcollection.cpp \
+    GUI/scenechooser.cpp \
     GUI/scenelayout.cpp \
     GUI/welcomedialog.cpp \
     GUI/widgetstack.cpp \
@@ -284,6 +285,7 @@ HEADERS  += \
     GUI/Timeline/fixedlenanimationrect.h \
     GUI/canvaswindowwrapper.h \
     GUI/layoutcollection.h \
+    GUI/scenechooser.h \
     GUI/scenelayout.h \
     GUI/welcomedialog.h \
     GUI/widgetstack.h \

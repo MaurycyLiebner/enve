@@ -59,7 +59,17 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
                     "color: white;"
                 "}");
     mBoxesListMenuBar->addSeparator();
-    QMenu * const objectsMenu = mBoxesListMenuBar->addMenu("State");
+
+    mCornerMenuBar = new QMenuBar(this);
+    mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
+    mCornerMenuBar->setFixedHeight(MIN_WIDGET_DIM);
+    mCornerMenuBar->setStyleSheet("QMenuBar {"
+                                     "border-top: 0;"
+                                     "border-bottom: 1px solid black;"
+                                  "}");
+
+    QMenu * const settingsMenu = mCornerMenuBar->addMenu("o");
+    QMenu * const objectsMenu = settingsMenu->addMenu("State");
     objectsMenu->addAction("All", this,
                            &BoxesListKeysViewWidget::setRuleNone);
     objectsMenu->addAction("Selected", this,
@@ -77,14 +87,14 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
     objectsMenu->addAction("Locked", this,
                            &BoxesListKeysViewWidget::setRuleLocked);
 
-    QMenu * const targetMenu = mBoxesListMenuBar->addMenu("Target");
-    targetMenu->addAction("All", this,
-                          &BoxesListKeysViewWidget::setTargetAll);
+    QMenu * const targetMenu = settingsMenu->addMenu("Target");
+//    targetMenu->addAction("All", this,
+//                          &BoxesListKeysViewWidget::setTargetAll);
     targetMenu->addAction("Current Canvas", this,
                           &BoxesListKeysViewWidget::setTargetCurrentCanvas);
     targetMenu->addAction("Current Group", this,
                           &BoxesListKeysViewWidget::setTargetCurrentGroup);
-    QMenu * const typeMenu = mBoxesListMenuBar->addMenu("Type");
+    QMenu * const typeMenu = settingsMenu->addMenu("Type");
     typeMenu->addAction("All", this, &BoxesListKeysViewWidget::setTypeAll);
     typeMenu->addAction("Graphics", this,
                         &BoxesListKeysViewWidget::setTypeGraphics);
@@ -92,18 +102,11 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
                         &BoxesListKeysViewWidget::setTypeSound);
 
     //QMenu *viewMenu = mBoxesListMenuBar->addMenu("View");
-    mGraphAct = mBoxesListMenuBar->addAction("Graph");
+    mGraphAct = mCornerMenuBar->addAction("/");
     mGraphAct->setCheckable(true);
     connect(mGraphAct, &QAction::toggled,
             this, &BoxesListKeysViewWidget::setGraphEnabled);
 
-    mCornerMenuBar = new QMenuBar(this);
-    mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
-    mCornerMenuBar->setFixedHeight(MIN_WIDGET_DIM);
-    mCornerMenuBar->setStyleSheet("QMenuBar {"
-                                     "border-top: 0;"
-                                     "border-bottom: 1px solid black;"
-                                  "}");
     mCornerMenuBar->addSeparator();
     mCornerMenuBar->addAction(" + ", this,
                               &BoxesListKeysViewWidget::addNewBelowThis);
@@ -116,7 +119,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
     mMenuWidgetsLayout->setMargin(0);
     mMenuWidgetsLayout->setSpacing(0);
     mSearchLine = new QLineEdit("", mBoxesListMenuBar);
-    mSearchLine->setFixedHeight(MIN_WIDGET_DIM/*FONT_HEIGHT*/);
+    mSearchLine->setFixedHeight(MIN_WIDGET_DIM);
     mSearchLine->setProperty("forceHandleEvent", QVariant(true));
     mSearchLine->setStyleSheet("background-color: rgb(255, 255, 255);"
                                "border-bottom: 0;"
