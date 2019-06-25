@@ -152,10 +152,6 @@ void CanvasWindow::queScheduledTasksAndUpdate() {
     update();
 }
 
-void CanvasWindow::renameCanvas(const int id, const QString &newName) {
-    mDocument.fScenes.at(id)->setName(newName);
-}
-
 bool CanvasWindow::hasNoCanvas() {
     return !mCurrentCanvas;
 }

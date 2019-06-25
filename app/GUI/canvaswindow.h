@@ -47,7 +47,6 @@ public:
     void closeWelcomeDialog();
 
     void setCurrentCanvas(Canvas * const canvas);
-    void renameCanvas(const int id, const QString &newName);
     bool hasNoCanvas();
 
     void queScheduledTasksAndUpdate();
