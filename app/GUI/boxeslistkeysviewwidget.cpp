@@ -12,6 +12,7 @@
 #include "animationdockwidget.h"
 #include "global.h"
 #include "canvas.h"
+#include "scenechooser.h"
 #include <QToolButton>
 
 BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
@@ -59,6 +60,8 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
                     "color: white;"
                 "}");
     mBoxesListMenuBar->addSeparator();
+    mBoxesListMenuBar->addMenu(new SceneChooser(mDocument, true,
+                                                mBoxesListMenuBar));
 
     mCornerMenuBar = new QMenuBar(this);
     mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
