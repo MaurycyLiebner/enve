@@ -7,7 +7,8 @@ class Document;
 class SceneChooser : public QMenu {
     Q_OBJECT
 public:
-    SceneChooser(Document &document, QWidget * const parent = nullptr);
+    SceneChooser(Document &document, const bool active,
+                 QWidget * const parent = nullptr);
 
     void setCurrentScene(Canvas * const scene);
     Canvas* getCurrentScene() const { return mCurrentScene; }

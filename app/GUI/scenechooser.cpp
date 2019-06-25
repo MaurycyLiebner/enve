@@ -2,9 +2,26 @@
 #include "document.h"
 #include "canvas.h"
 
-SceneChooser::SceneChooser(Document& document, QWidget* const parent) :
+SceneChooser::SceneChooser(Document& document, const bool active,
+                           QWidget* const parent) :
     QMenu("none", parent), mDocument(document) {
     setDisabled(true);
+    if(active) {
+        const auto active = addAction("Active");
+        active->setCheckable(true);
+        addSeparator();
+        connect(active, &QAction::toggled,
+                this, [this](const bool active) {
+            if(active) {
+                connect(&mDocument, &Document::activeSceneSet,
+                        this, qOverload<Canvas*>(&SceneChooser::setCurrentScene));
+                setCurrentScene(mDocument.fActiveScene);
+            } else {
+                disconnect(&mDocument, &Document::activeSceneSet,
+                           this, qOverload<Canvas*>(&SceneChooser::setCurrentScene));
+            }
+        });
+    }
     for(const auto& scene : mDocument.fScenes)
         addScene(scene.get());
 

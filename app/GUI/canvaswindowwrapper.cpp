@@ -28,7 +28,7 @@ public:
 
             dialog->show();
         });
-        mSceneMenu = new SceneChooser(mDocument, this);
+        mSceneMenu = new SceneChooser(mDocument, false, this);
         addMenu(mSceneMenu);
         addAction("x", this, [this]() {
             if(!mCurrentScene) return;
