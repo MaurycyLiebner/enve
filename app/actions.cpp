@@ -317,6 +317,67 @@ void Actions::updateAfterFrameChanged(const int currentFrame) const {
     afterAction();
 }
 
+void Actions::setClipToCanvas(const bool bT) {
+    if(!mActiveScene) return;
+    mActiveScene->setClipToCanvas(bT);
+    mActiveScene->updateAllBoxes(Animator::USER_CHANGE);
+    afterAction();
+}
+
+void Actions::setRasterEffectsVisible(const bool bT) {
+    if(!mActiveScene) return;
+    mActiveScene->setRasterEffectsVisible(bT);
+    mActiveScene->updateAllBoxes(Animator::USER_CHANGE);
+    afterAction();
+}
+
+void Actions::setPathEffectsVisible(const bool bT) {
+    if(!mActiveScene) return;
+    mActiveScene->setPathEffectsVisible(bT);
+    mActiveScene->updateAllBoxes(Animator::USER_CHANGE);
+    afterAction();
+}
+
+void Actions::setMovePathMode() {
+    mDocument.setCanvasMode(MOVE_BOX);
+}
+
+void Actions::setMovePointMode() {
+    mDocument.setCanvasMode(MOVE_POINT);
+}
+
+void Actions::setAddPointMode() {
+    mDocument.setCanvasMode(ADD_POINT);
+}
+
+void Actions::setRectangleMode() {
+    mDocument.setCanvasMode(ADD_RECTANGLE);
+}
+
+void Actions::setPickPaintSettingsMode() {
+    mDocument.setCanvasMode(PICK_PAINT_SETTINGS);
+}
+
+void Actions::setCircleMode() {
+    mDocument.setCanvasMode(ADD_CIRCLE);
+}
+
+void Actions::setTextMode() {
+    mDocument.setCanvasMode(ADD_TEXT);
+}
+
+void Actions::setParticleBoxMode() {
+    mDocument.setCanvasMode(ADD_PARTICLE_BOX);
+}
+
+void Actions::setParticleEmitterMode() {
+    mDocument.setCanvasMode(ADD_PARTICLE_EMITTER);
+}
+
+void Actions::setPaintMode() {
+    mDocument.setCanvasMode(PAINT_MODE);
+}
+
 void Actions::afterAction() const {
 
 }

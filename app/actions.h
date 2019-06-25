@@ -92,6 +92,22 @@ public:
     void setSelectedStrokeColorMode(const ColorMode mode) const;
 
     void updateAfterFrameChanged(const int currentFrame) const;
+
+    void setClipToCanvas(const bool bT);
+
+    void setRasterEffectsVisible(const bool bT);
+    void setPathEffectsVisible(const bool bT);
+
+    void setMovePathMode();
+    void setMovePointMode();
+    void setAddPointMode();
+    void setPickPaintSettingsMode();
+    void setRectangleMode();
+    void setCircleMode();
+    void setTextMode();
+    void setParticleBoxMode();
+    void setParticleEmitterMode();
+    void setPaintMode();
 private:
     void afterAction() const;
 

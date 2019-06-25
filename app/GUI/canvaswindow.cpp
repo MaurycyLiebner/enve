@@ -138,7 +138,6 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
     } else {
         setCursor(QCursor(QPixmap(":/cursors/cursor-pen.xpm"), 4, 4) );
     }
-    mCurrentMode = mode;
     MainWindow::getInstance()->updateCanvasModeButtonsChecked();
     if(!mCurrentCanvas) return;
     if(mMouseGrabber) {
@@ -151,46 +150,6 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
 void CanvasWindow::queScheduledTasksAndUpdate() {
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
     update();
-}
-
-void CanvasWindow::setMovePathMode() {
-    setCanvasMode(MOVE_BOX);
-}
-
-void CanvasWindow::setMovePointMode() {
-    setCanvasMode(MOVE_POINT);
-}
-
-void CanvasWindow::setAddPointMode() {
-    setCanvasMode(ADD_POINT);
-}
-
-void CanvasWindow::setRectangleMode() {
-    setCanvasMode(ADD_RECTANGLE);
-}
-
-void CanvasWindow::setPickPaintSettingsMode() {
-    setCanvasMode(PICK_PAINT_SETTINGS);
-}
-
-void CanvasWindow::setCircleMode() {
-    setCanvasMode(ADD_CIRCLE);
-}
-
-void CanvasWindow::setTextMode() {
-    setCanvasMode(ADD_TEXT);
-}
-
-void CanvasWindow::setParticleBoxMode() {
-    setCanvasMode(ADD_PARTICLE_BOX);
-}
-
-void CanvasWindow::setParticleEmitterMode() {
-    setCanvasMode(ADD_PARTICLE_EMITTER);
-}
-
-void CanvasWindow::setPaintMode() {
-    setCanvasMode(PAINT_MODE);
 }
 
 void CanvasWindow::renameCanvas(const int id, const QString &newName) {
@@ -227,7 +186,7 @@ void CanvasWindow::renderSk(SkCanvas * const canvas,
 
 void CanvasWindow::tabletEvent(QTabletEvent *e) {
     if(!mCurrentCanvas) return;
-    if(mCurrentMode != PAINT_MODE) return;
+    if(mDocument.fCanvasMode != PAINT_MODE) return;
     const QPoint globalPos = mapToGlobal(QPoint(0, 0));
     const qreal x = e->hiResGlobalX() - globalPos.x();
     const qreal y = e->hiResGlobalY() - globalPos.y();
@@ -251,7 +210,7 @@ void CanvasWindow::mousePressEvent(QMouseEvent *event) {
     mPrevMousePos = pos;
     if(event->button() == Qt::LeftButton) {
         mPrevPressPos = pos;
-        if(mCurrentMode == PAINT_MODE && !mValidPaintTarget)
+        if(mDocument.fCanvasMode == PAINT_MODE && !mValidPaintTarget)
             updatePaintModeCursor();
     }
 }
@@ -282,7 +241,7 @@ void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
                            [this]() { grabMouse(); },
                            this));
 
-    if(mCurrentMode == PAINT_MODE) update();
+    if(mDocument.fCanvasMode == PAINT_MODE) update();
     else queScheduledTasksAndUpdate();
     mPrevMousePos = pos;
 }
@@ -318,16 +277,6 @@ void CanvasWindow::openSettingsWindowForCurrentCanvas() {
         dialog->close();
     });
     dialog->show();
-}
-
-void CanvasWindow::rotate90CCW() {
-    if(hasNoCanvas()) return;
-    //mCurrentCanvas->rotate90CCW();
-}
-
-void CanvasWindow::rotate90CW() {
-    if(hasNoCanvas()) return;
-    //mCurrentCanvas->rotate90CW();
 }
 
 bool CanvasWindow::handleCutCopyPasteKeyPress(QKeyEvent *event) {
@@ -537,18 +486,6 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     return true;
 }
 
-void CanvasWindow::raiseAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->raiseSelectedBoxes();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::lowerAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->lowerSelectedBoxes();
-    queScheduledTasksAndUpdate();
-}
-
 #include "welcomedialog.h"
 void CanvasWindow::openWelcomeDialog() {
     return;
@@ -577,27 +514,6 @@ void CanvasWindow::closeWelcomeDialog() {
 void CanvasWindow::changeCurrentFrameAction(const int frame) {
     emit changeCurrentFrame(frame);
     if(mCurrentCanvas) mCurrentCanvas->anim_setAbsFrame(frame);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::setClipToCanvas(const bool bT) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setClipToCanvas(bT);
-    mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::setRasterEffectsVisible(const bool bT) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setRasterEffectsVisible(bT);
-    mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::setPathEffectsVisible(const bool bT) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setPathEffectsVisible(bT);
-    mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
     queScheduledTasksAndUpdate();
 }
 

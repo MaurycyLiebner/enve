@@ -465,19 +465,19 @@ void MainWindow::setupMenuBar() {
     mClipViewToCanvas->setChecked(true);
     mClipViewToCanvas->setShortcut(QKeySequence(Qt::Key_C));
     connect(mClipViewToCanvas, &QAction::toggled,
-            mCanvasWindow, &CanvasWindow::setClipToCanvas);
+            &mActions, &Actions::setClipToCanvas);
 
     mRasterEffectsVisible = mViewMenu->addAction("Raster Effects");
     mRasterEffectsVisible->setCheckable(true);
     mRasterEffectsVisible->setChecked(true);
     connect(mRasterEffectsVisible, &QAction::toggled,
-            mCanvasWindow, &CanvasWindow::setRasterEffectsVisible);
+            &mActions, &Actions::setRasterEffectsVisible);
 
     mPathEffectsVisible = mViewMenu->addAction("Path Effects");
     mPathEffectsVisible->setCheckable(true);
     mPathEffectsVisible->setChecked(true);
     connect(mPathEffectsVisible, &QAction::toggled,
-            mCanvasWindow, &CanvasWindow::setPathEffectsVisible);
+            &mActions, &Actions::setPathEffectsVisible);
 
 
     mPanelsMenu = mViewMenu->addMenu("Docks");
@@ -773,25 +773,25 @@ void MainWindow::setupToolBar() {
 
 void MainWindow::connectToolBarActions() {
     connect(mMovePathMode, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::setMovePathMode );
+            &mActions, &Actions::setMovePathMode);
     connect(mMovePointMode, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::setMovePointMode );
+            &mActions, &Actions::setMovePointMode);
     connect(mAddPointMode, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::setAddPointMode );
+            &mActions, &Actions::setAddPointMode);
     connect(mPickPaintSettingsMode, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::setPickPaintSettingsMode );
+            &mActions, &Actions::setPickPaintSettingsMode);
     connect(mCircleMode, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::setCircleMode );
+            &mActions, &Actions::setCircleMode);
     connect(mRectangleMode, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::setRectangleMode );
+            &mActions, &Actions::setRectangleMode);
     connect(mTextMode, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::setTextMode );
+            &mActions, &Actions::setTextMode);
     connect(mParticleBoxMode, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::setParticleBoxMode );
+            &mActions, &Actions::setParticleBoxMode);
     connect(mParticleEmitterMode, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::setParticleEmitterMode);
+            &mActions, &Actions::setParticleEmitterMode);
     connect(mPaintMode, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::setPaintMode);
+            &mActions, &Actions::setPaintMode);
     connect(mActionConnectPoints, &ActionButton::pressed,
             &mActions, &Actions::connectPointsSlot);
     connect(mActionDisconnectPoints, &ActionButton::pressed,
@@ -819,7 +819,7 @@ MainWindow *MainWindow::getInstance() {
 }
 
 void MainWindow::updateCanvasModeButtonsChecked() {
-    const CanvasMode currentMode = mCanvasWindow->getCanvasMode();
+    const CanvasMode currentMode = mDocument.fCanvasMode;
     mMovePathMode->setChecked(currentMode == MOVE_BOX);
     mMovePointMode->setChecked(currentMode == MOVE_POINT);
     mAddPointMode->setChecked(currentMode == ADD_POINT);

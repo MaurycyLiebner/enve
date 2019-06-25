@@ -18,7 +18,6 @@ class ContainerBox;
 class TaskExecutor;
 class SoundComposition;
 class PaintSettingsApplier;
-class CanvasWidget;
 class RenderInstanceSettings;
 class Task;
 class ImageBox;
@@ -50,9 +49,6 @@ public:
     void setCurrentCanvas(Canvas * const canvas);
     void renameCanvas(const int id, const QString &newName);
     bool hasNoCanvas();
-
-    CanvasMode getCanvasMode() const { return mCurrentMode; }
-    void setCanvasMode(const CanvasMode mode);
 
     void queScheduledTasksAndUpdate();
     bool KFT_handleKeyEventForTarget(QKeyEvent *event);
@@ -109,9 +105,6 @@ public:
 
     void openSettingsWindowForCurrentCanvas();
 
-    void rotate90CCW();
-    void rotate90CW();
-
     void startDurationRectPosTransformForAllSelected();
     void finishDurationRectPosTransformForAllSelected();
     void moveDurationRectForAllSelected(const int dFrame);
@@ -122,13 +115,16 @@ public:
     void finishMaxFramePosTransformForAllSelected();
     void moveMaxFrameForAllSelected(const int dFrame);
 private:
-    QWidget * mWelcomeDialog = nullptr;
+    void setCanvasMode(const CanvasMode mode);
+    void updatePaintModeCursor();
 
     void changeCurrentFrameAction(const int frame);
     void playPreviewAfterAllTasksCompleted();
+
+    QWidget * mWelcomeDialog = nullptr;
+
     Document& mDocument;
     Actions& mActions;
-    CanvasMode mCurrentMode = MOVE_BOX;
 
     bool mAutomaticSizeFit = true;
     QSize mOldSize{-1, -1};
@@ -210,54 +206,8 @@ signals:
     void changeCurrentFrame(int);
     void changeCanvasFrameRange(FrameRange);
 public:
-    void setMovePathMode();
-    void setMovePointMode();
-    void setAddPointMode();
-    void setPickPaintSettingsMode();
-    void setRectangleMode();
-    void setCircleMode();
-    void setTextMode();
-    void setParticleBoxMode();
-    void setParticleEmitterMode();
-    void setPaintMode();
-
-    void raiseAction();
-    void lowerAction();
-    void raiseToTopAction();
-    void lowerToBottomAction();
-
-    void objectsToPathAction();
-    void strokeToPathAction();
-
-    void setFontFamilyAndStyle(const QString& family,
-                               const QString& style);
-    void setFontSize(const qreal size);
-
-    void connectPointsSlot();
-    void disconnectPointsSlot();
-    void mergePointsSlot();
-
-    void makePointCtrlsSymmetric();
-    void makePointCtrlsSmooth();
-    void makePointCtrlsCorner();
-
-    void makeSegmentLine();
-    void makeSegmentCurve();
-
-    void pathsUnionAction();
-    void pathsDifferenceAction();
-    void pathsIntersectionAction();
-    void pathsDivisionAction();
-    void pathsExclusionAction();
-    void pathsCombineAction();
-    void pathsBreakApartAction();
-
     void renameCurrentCanvas(const QString &newName);
     void setCurrentCanvas(const int id);
-
-    void setClipToCanvas(const bool bT);
-    void setRasterEffectsVisible(const bool bT);
-    void setPathEffectsVisible(const bool bT);
 
     void interruptPreview();
     void outOfMemory();
@@ -273,33 +223,12 @@ public:
 
     void importFile();
 
-    void startSelectedStrokeWidthTransform();
-
-    void deleteAction();
-    void copyAction();
-    void pasteAction();
-    void cutAction();
-    void duplicateAction();
-    void selectAllAction();
-    void invertSelectionAction();
-    void clearSelectionAction();
-
-    void groupSelectedBoxes();
-    void ungroupSelectedBoxes();
-    void rotate90CWAction();
-    void rotate90CCWAction();
-
-    void flipHorizontalAction();
-    void flipVerticalAction();
-
     QPointF mapToCanvasCoord(const QPointF& windowCoord);
     void translateView(const QPointF &trans);
     void zoomView(const qreal scaleBy, const QPointF &absOrigin);
 
     void fitCanvasToSize();
     void resetTransormation();
-
-    void updatePaintModeCursor();
 private:
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
