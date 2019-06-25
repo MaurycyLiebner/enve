@@ -28,7 +28,7 @@ public:
     ColorSettingApplier getColorSetting(const ColorSettingType &type) const;
 signals:
     void colorSettingSignal(const ColorSettingApplier&);
-    void colorModeChanged(const ColorMode&);
+    void colorModeChanged(const ColorMode);
 public slots:
     void setCurrentColor(const qreal h_t,
                          const qreal s_t,

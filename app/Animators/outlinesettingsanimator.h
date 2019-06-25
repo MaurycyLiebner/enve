@@ -22,9 +22,8 @@ protected:
                 const PaintType &newPaintType);
 public:
     void setCurrentStrokeWidth(const qreal newWidth);
-    void setCapStyle(const Qt::PenCapStyle &capStyle);
-    void setJoinStyle(const Qt::PenJoinStyle &joinStyle);
-    void setStrokerSettings(QPainterPathStroker * const stroker);
+    void setCapStyle(const SkPaint::Cap capStyle);
+    void setJoinStyle(const SkPaint::Join joinStyle);
     void setStrokerSettingsSk(SkStroke * const stroker);
 
     void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve) {
@@ -49,8 +48,8 @@ public:
 
     qreal getCurrentStrokeWidth() const;
 
-    Qt::PenCapStyle getCapStyle() const;
-    Qt::PenJoinStyle getJoinStyle() const;
+    SkPaint::Cap getCapStyle() const;
+    SkPaint::Join getJoinStyle() const;
 
     QrealAnimator *getStrokeWidthAnimator();
     BrushSettingsAnimator *getBrushSettings() {
@@ -68,8 +67,8 @@ public:
     void setStrokerSettingsForRelFrameSk(const qreal relFrame,
                                          SkStroke * const stroker);
 private:
-    Qt::PenCapStyle mCapStyle = Qt::RoundCap;
-    Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
+    SkPaint::Cap mCapStyle = SkPaint::kRound_Cap;
+    SkPaint::Join mJoinStyle = SkPaint::kRound_Join;
     QPainter::CompositionMode mOutlineCompositionMode =
             QPainter::CompositionMode_Source;
     qsptr<BrushSettingsAnimator> mBrushSettings =

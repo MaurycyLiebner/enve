@@ -76,7 +76,7 @@ void ColorSettingApplier::changeColor(ColorAnimator* const target) const {
 }
 
 void ColorSettingApplier::startColorTransform(ColorAnimator* const target) const {
-    const ColorMode &targetMode = target->getColorMode();
+    const ColorMode targetMode = target->getColorMode();
     if(targetMode == mSettingMode && mChangedValue != CVR_ALL) {
         if(mChangedValue == CVR_RED || mChangedValue == CVR_HUE) {
             target->startVal1Transform();

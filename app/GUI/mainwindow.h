@@ -11,6 +11,7 @@
 #include "taskscheduler.h"
 #include "effectsloader.h"
 #include "document.h"
+#include "actions.h"
 #include "scenelayout.h"
 class VideoEncoder;
 enum ClipboardContainerType : short;
@@ -311,6 +312,7 @@ private:
 
     TaskScheduler mTaskScheduler;
     Document mDocument;
+    Actions mActions;
     SceneLayout *mSceneLayout = nullptr;
     CanvasWindow *mCanvasWindow;
     EffectsLoader *mEffectsLoader;

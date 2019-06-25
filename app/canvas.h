@@ -245,8 +245,8 @@ public:
     void cancelSelectedBoxesTransform();
     void cancelSelectedPointsTransform();
 
-    void setSelectedCapStyle(const Qt::PenCapStyle capStyle);
-    void setSelectedJoinStyle(const Qt::PenJoinStyle joinStyle);
+    void setSelectedCapStyle(const SkPaint::Cap capStyle);
+    void setSelectedJoinStyle(const SkPaint::Join joinStyle);
     void setSelectedStrokeWidth(const qreal strokeWidth);
     void setSelectedStrokeBrush(SimpleBrushWrapper * const brush);
     void setSelectedStrokeBrushWidthCurve(
@@ -468,8 +468,8 @@ public:
     void clearLastPressedPoint();
     void clearCurrentSmartEndPoint();
     void applyPaintSettingToSelected(const PaintSettingsApplier &setting);
-    void setSelectedFillColorMode(const ColorMode &mode);
-    void setSelectedStrokeColorMode(const ColorMode &mode);
+    void setSelectedFillColorMode(const ColorMode mode);
+    void setSelectedStrokeColorMode(const ColorMode mode);
     int getCurrentFrame();
     FrameRange getFrameRange() const { return mRange; }
 

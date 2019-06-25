@@ -251,8 +251,8 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mGradientTypeWidget->hide();
 
     setFillTarget();
-    setCapStyle(Qt::RoundCap);
-    setJoinStyle(Qt::RoundJoin);
+    setCapStyle(SkPaint::kRound_Cap);
+    setJoinStyle(SkPaint::kRound_Join);
 }
 
 void FillStrokeSettingsWidget::setLinearGradientFill() {
@@ -314,7 +314,7 @@ void FillStrokeSettingsWidget::updateColorAnimator() {
     }
 }
 
-void FillStrokeSettingsWidget::setCurrentColorMode(const ColorMode &mode) {
+void FillStrokeSettingsWidget::setCurrentColorMode(const ColorMode mode) {
     if(mTarget == PaintSetting::FILL) {
         if(mCurrentFillPaintType == FLATPAINT) {
             const auto scene = mDocument.fActiveScene;
@@ -541,18 +541,18 @@ void FillStrokeSettingsWidget::setColorAnimatorTarget(
     mColorsSettingsWidget->setTarget(animator);
 }
 
-void FillStrokeSettingsWidget::setJoinStyle(Qt::PenJoinStyle joinStyle) {
+void FillStrokeSettingsWidget::setJoinStyle(const SkPaint::Join joinStyle) {
     mCurrentJoinStyle = joinStyle;
-    mBevelJoinStyleButton->setChecked(joinStyle == Qt::BevelJoin);
-    mMiterJointStyleButton->setChecked(joinStyle == Qt::MiterJoin);
-    mRoundJoinStyleButton->setChecked(joinStyle == Qt::RoundJoin);
+    mBevelJoinStyleButton->setChecked(joinStyle == SkPaint::kBevel_Join);
+    mMiterJointStyleButton->setChecked(joinStyle == SkPaint::kMiter_Join);
+    mRoundJoinStyleButton->setChecked(joinStyle == SkPaint::kRound_Join);
 }
 
-void FillStrokeSettingsWidget::setCapStyle(Qt::PenCapStyle capStyle) {
+void FillStrokeSettingsWidget::setCapStyle(const SkPaint::Cap capStyle) {
     mCurrentCapStyle = capStyle;
-    mFlatCapStyleButton->setChecked(capStyle == Qt::FlatCap);
-    mSquareCapStyleButton->setChecked(capStyle == Qt::SquareCap);
-    mRoundCapStyleButton->setChecked(capStyle == Qt::RoundCap);
+    mFlatCapStyleButton->setChecked(capStyle == SkPaint::kButt_Cap);
+    mSquareCapStyleButton->setChecked(capStyle == SkPaint::kSquare_Cap);
+    mRoundCapStyleButton->setChecked(capStyle == SkPaint::kRound_Cap);
 }
 
 PaintType FillStrokeSettingsWidget::getCurrentPaintTypeVal() {
@@ -701,32 +701,32 @@ void FillStrokeSettingsWidget::setGradientType(const GradientType &type) {
 }
 
 void FillStrokeSettingsWidget::setBevelJoinStyle() {
-    setJoinStyle(Qt::BevelJoin);
+    setJoinStyle(SkPaint::kBevel_Join);
     emitJoinStyleChanged();
 }
 
 void FillStrokeSettingsWidget::setMiterJoinStyle() {
-    setJoinStyle(Qt::MiterJoin);
+    setJoinStyle(SkPaint::kMiter_Join);
     emitJoinStyleChanged();
 }
 
 void FillStrokeSettingsWidget::setRoundJoinStyle() {
-    setJoinStyle(Qt::RoundJoin);
+    setJoinStyle(SkPaint::kRound_Join);
     emitJoinStyleChanged();
 }
 
 void FillStrokeSettingsWidget::setFlatCapStyle() {
-    setCapStyle(Qt::FlatCap);
+    setCapStyle(SkPaint::kButt_Cap);
     emitCapStyleChanged();
 }
 
 void FillStrokeSettingsWidget::setSquareCapStyle() {
-    setCapStyle(Qt::SquareCap);
+    setCapStyle(SkPaint::kSquare_Cap);
     emitCapStyleChanged();
 }
 
 void FillStrokeSettingsWidget::setRoundCapStyle() {
-    setCapStyle(Qt::RoundCap);
+    setCapStyle(SkPaint::kRound_Cap);
     emitCapStyleChanged();
 }
 

@@ -28,13 +28,15 @@ class Canvas;
 class PaintSettingsAnimator;
 class OutlineSettingsAnimator;
 class SimpleBrushWrapper;
+class Actions;
 #include <QAudioOutput>
 
 class CanvasWindow : public GLWindow,
         public KeyFocusTarget {
     Q_OBJECT
 public:
-    explicit CanvasWindow(Document& document, QWidget * const parent = nullptr);
+    explicit CanvasWindow(Document& document,
+                          QWidget * const parent = nullptr);
     ~CanvasWindow();
     Canvas *getCurrentCanvas();
     const QMatrix& getViewTransform() const { return mViewTransform; }
@@ -65,33 +67,15 @@ public:
         update();
     }
 
-    void startSelectedStrokeColorTransform();
-    void startSelectedFillColorTransform();
-
-    void strokeCapStyleChanged(const Qt::PenCapStyle &capStyle);
-    void strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle);
-    void strokeWidthChanged(const qreal strokeWidth);
-
-    void strokeBrushChanged(SimpleBrushWrapper * const brush);
-    void strokeBrushSpacingCurveChanged(
-            const qCubicSegment1D& curve);
-    void strokeBrushPressureCurveChanged(
-            const qCubicSegment1D& curve);
-    void strokeBrushWidthCurveChanged(
-            const qCubicSegment1D& curve);
-    void strokeBrushTimeCurveChanged(
-            const qCubicSegment1D& curve);
-
     void setResolutionFraction(const qreal percent);
     void updatePivotIfNeeded();
     void schedulePivotUpdate();
 
     ContainerBox *getCurrentGroup();
     void applyPaintSettingToSelected(const PaintSettingsApplier &setting);
-    void setSelectedFillColorMode(const ColorMode &mode);
-    void setSelectedStrokeColorMode(const ColorMode &mode);
+    void setSelectedFillColorMode(const ColorMode mode);
+    void setSelectedStrokeColorMode(const ColorMode mode);
 
-    void updateAfterFrameChanged(const int currentFrame);
     void clearAll();
     void createAnimationBoxForPaths(const QStringList &importPaths);
     void createLinkToFileWithPath(const QString &path);
@@ -143,6 +127,7 @@ private:
     void changeCurrentFrameAction(const int frame);
     void playPreviewAfterAllTasksCompleted();
     Document& mDocument;
+    Actions& mActions;
     CanvasMode mCurrentMode = MOVE_BOX;
 
     bool mAutomaticSizeFit = true;

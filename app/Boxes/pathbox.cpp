@@ -301,13 +301,13 @@ void PathBox::resetFillGradientPointsPos() {
                                       mRelBoundingRect.bottomRight());
 }
 
-void PathBox::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
+void PathBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
     mStrokeSettings->setCapStyle(capStyle);
     prp_afterWholeInfluenceRangeChanged();
     planScheduleUpdate(Animator::USER_CHANGE);
 }
 
-void PathBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
+void PathBox::setStrokeJoinStyle(const SkPaint::Join joinStyle) {
     mStrokeSettings->setJoinStyle(joinStyle);
     prp_afterWholeInfluenceRangeChanged();
     planScheduleUpdate(Animator::USER_CHANGE);
@@ -475,11 +475,11 @@ void PathBox::applyPaintSetting(const PaintSettingsApplier &setting) {
     setting.apply(this);
 }
 
-void PathBox::setFillColorMode(const ColorMode &colorMode) {
+void PathBox::setFillColorMode(const ColorMode colorMode) {
     mFillSettings->getColorAnimator()->setColorMode(colorMode);
 }
 
-void PathBox::setStrokeColorMode(const ColorMode &colorMode) {
+void PathBox::setStrokeColorMode(const ColorMode colorMode) {
     mFillSettings->getColorAnimator()->setColorMode(colorMode);
 }
 

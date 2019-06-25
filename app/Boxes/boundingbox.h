@@ -147,8 +147,8 @@ public:
     virtual FillSettingsAnimator *getFillSettings() const;
     virtual OutlineSettingsAnimator *getStrokeSettings() const;
 
-    virtual void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
-    virtual void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
+    virtual void setStrokeCapStyle(const SkPaint::Cap capStyle);
+    virtual void setStrokeJoinStyle(const SkPaint::Join joinStyle);
     virtual void setStrokeWidth(const qreal strokeWidth);
 
     virtual void setStrokeBrush(SimpleBrushWrapper * const brush) {
@@ -187,8 +187,8 @@ public:
 
     virtual void applyPaintSetting(const PaintSettingsApplier &setting);
 
-    virtual void setFillColorMode(const ColorMode &colorMode);
-    virtual void setStrokeColorMode(const ColorMode &colorMode);
+    virtual void setFillColorMode(const ColorMode colorMode);
+    virtual void setStrokeColorMode(const ColorMode colorMode);
 
     virtual void addPathEffect(const qsptr<PathEffect>&);
     virtual void addFillPathEffect(const qsptr<PathEffect>&);

@@ -7,6 +7,7 @@
 #include "singlewidgettarget.h"
 #include "paintsettings.h"
 #include "GUI/BrushWidgets/simplebrushwrapper.h"
+#include "actions.h"
 
 class Gradient;
 class FileCacheHandler;
@@ -20,9 +21,11 @@ class Document : public SingleWidgetTarget {
         bool operator()(const FileHandler& f1, const FileHandler& f2);
     };
 public:
-    Document() { sInstance = this; }
+    Document() : fActions(*this) { sInstance = this; }
 
     static Document* sInstance;
+
+    Actions fActions;
 
     QString fEvFile;
 

@@ -102,7 +102,7 @@ void ColorAnimator::setColor(const QColor &col) {
     mAlphaAnimator->setCurrentBaseValue(alpha);
 }
 
-void ColorAnimator::setColorMode(const ColorMode &colorMode) {
+void ColorAnimator::setColorMode(const ColorMode colorMode) {
     if(colorMode == RGBMODE) {
         mVal1Animator->prp_setName("red");
         mVal2Animator->prp_setName("green");

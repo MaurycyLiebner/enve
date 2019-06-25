@@ -23,7 +23,7 @@ public:
     QColor getColor(const qreal relFrame);
     void setColor(const QColor& col);
 
-    void setColorMode(const ColorMode &colorMode);
+    void setColorMode(const ColorMode colorMode);
 
     void startVal1Transform();
     void startVal2Transform();

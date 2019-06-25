@@ -1121,19 +1121,19 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
                     //strokeDashOffset = value;
                 } else if(name == "stroke-linecap") {
                     if(value == "butt") {
-                        mStrokeAttributes.setCapStyle(Qt::FlatCap);
+                        mStrokeAttributes.setCapStyle(SkPaint::kButt_Cap);
                     } else if(value == "round") {
-                        mStrokeAttributes.setCapStyle(Qt::RoundCap);
+                        mStrokeAttributes.setCapStyle(SkPaint::kRound_Cap);
                     } else {
-                        mStrokeAttributes.setCapStyle(Qt::SquareCap);
+                        mStrokeAttributes.setCapStyle(SkPaint::kSquare_Cap);
                     }
                 } else if(name == "stroke-linejoin") {
                     if(value == "miter") {
-                        mStrokeAttributes.setJoinStyle(Qt::MiterJoin);
+                        mStrokeAttributes.setJoinStyle(SkPaint::kMiter_Join);
                     } else if(value == "round") {
-                        mStrokeAttributes.setJoinStyle(Qt::RoundJoin);
+                        mStrokeAttributes.setJoinStyle(SkPaint::kRound_Join);
                     } else {
-                        mStrokeAttributes.setJoinStyle(Qt::BevelJoin);
+                        mStrokeAttributes.setJoinStyle(SkPaint::kBevel_Join);
                     }
                 } else if(name == "stroke-miterlimit") {
                     //mStrokeAttributes.setMiterLimit(toDouble(value));
@@ -2039,11 +2039,11 @@ qreal StrokeSvgAttributes::getLineWidth() const {
     return mLineWidth;
 }
 
-Qt::PenCapStyle StrokeSvgAttributes::getCapStyle() const {
+SkPaint::Cap StrokeSvgAttributes::getCapStyle() const {
     return mCapStyle;
 }
 
-Qt::PenJoinStyle StrokeSvgAttributes::getJoinStyle() const {
+SkPaint::Join StrokeSvgAttributes::getJoinStyle() const {
     return mJoinStyle;
 }
 
@@ -2055,16 +2055,15 @@ void StrokeSvgAttributes::setLineWidth(const qreal val) {
     mLineWidth = val;
 }
 
-void StrokeSvgAttributes::setCapStyle(const Qt::PenCapStyle &capStyle) {
+void StrokeSvgAttributes::setCapStyle(const SkPaint::Cap capStyle) {
     mCapStyle = capStyle;
 }
 
-void StrokeSvgAttributes::setJoinStyle(const Qt::PenJoinStyle &joinStyle) {
+void StrokeSvgAttributes::setJoinStyle(const SkPaint::Join joinStyle) {
     mJoinStyle = joinStyle;
 }
 
-void StrokeSvgAttributes::setOutlineCompositionMode(
-        const QPainter::CompositionMode &compMode) {
+void StrokeSvgAttributes::setOutlineCompositionMode(const QPainter::CompositionMode compMode) {
     mOutlineCompositionMode = compMode;
 }
 

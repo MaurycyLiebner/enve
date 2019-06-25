@@ -59,11 +59,11 @@ public:
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
     void applyPaintSetting(const PaintSettingsApplier &setting);
-    void setFillColorMode(const ColorMode &colorMode);
-    void setStrokeColorMode(const ColorMode &colorMode);
+    void setFillColorMode(const ColorMode colorMode);
+    void setStrokeColorMode(const ColorMode colorMode);
 
-    void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
-    void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
+    void setStrokeCapStyle(const SkPaint::Cap capStyle);
+    void setStrokeJoinStyle(const SkPaint::Join joinStyle);
     void setStrokeWidth(const qreal strokeWidth);
     void setStrokeBrush(SimpleBrushWrapper * const brush) {
         for(const auto& box : mContainedBoxes) {

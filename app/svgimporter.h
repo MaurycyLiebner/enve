@@ -69,25 +69,24 @@ public:
     StrokeSvgAttributes() {}
 
     qreal getLineWidth() const;
-    Qt::PenCapStyle getCapStyle() const;
-    Qt::PenJoinStyle getJoinStyle() const;
+    SkPaint::Cap getCapStyle() const;
+    SkPaint::Join getJoinStyle() const;
     QPainter::CompositionMode getOutlineCompositionMode() const;
 
     void setLineWidth(const qreal val);
 
-    void setCapStyle(const Qt::PenCapStyle &capStyle);
+    void setCapStyle(const SkPaint::Cap capStyle);
+    void setJoinStyle(const SkPaint::Join joinStyle);
 
-    void setJoinStyle(const Qt::PenJoinStyle &joinStyle);
-
-    void setOutlineCompositionMode(const QPainter::CompositionMode &compMode);
+    void setOutlineCompositionMode(const QPainter::CompositionMode compMode);
 
     void apply(BoundingBox *box, const qreal scale) const;
 protected:
-    Qt::PenCapStyle mCapStyle = Qt::RoundCap;
-    Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
+    SkPaint::Cap mCapStyle = SkPaint::kRound_Cap;
+    SkPaint::Join mJoinStyle = SkPaint::kRound_Join;
     QPainter::CompositionMode mOutlineCompositionMode =
             QPainter::CompositionMode_Source;
-    qreal mLineWidth = 0.;
+    qreal mLineWidth = 0;
 };
 
 class BoxSvgAttributes {

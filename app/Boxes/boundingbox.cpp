@@ -227,11 +227,11 @@ void BoundingBox::applyPaintSetting(const PaintSettingsApplier &setting) {
     Q_UNUSED(setting);
 }
 
-void BoundingBox::setFillColorMode(const ColorMode &colorMode) {
+void BoundingBox::setFillColorMode(const ColorMode colorMode) {
     Q_UNUSED(colorMode);
 }
 
-void BoundingBox::setStrokeColorMode(const ColorMode &colorMode) {
+void BoundingBox::setStrokeColorMode(const ColorMode colorMode) {
     Q_UNUSED(colorMode);
 }
 
@@ -348,10 +348,10 @@ void BoundingBox::startAllPointsTransform() {}
 
 void BoundingBox::finishAllPointsTransform() {}
 
-void BoundingBox::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
+void BoundingBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
     Q_UNUSED(capStyle); }
 
-void BoundingBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
+void BoundingBox::setStrokeJoinStyle(const SkPaint::Join joinStyle) {
     Q_UNUSED(joinStyle); }
 
 void BoundingBox::setStrokeWidth(const qreal strokeWidth) {

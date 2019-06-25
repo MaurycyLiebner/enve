@@ -90,7 +90,7 @@ private:
 
     void setColorAnimatorTarget(ColorAnimator *animator);
     void colorSettingReceived(const ColorSettingApplier &colorSetting);
-    void setCurrentColorMode(const ColorMode &mode);
+    void setCurrentColorMode(const ColorMode mode);
 private:
     void updateCurrentSettings();
     void applyGradient();
@@ -99,9 +99,8 @@ private:
     void connectGradient();
     void disconnectGradient();
 
-    void setJoinStyle(Qt::PenJoinStyle joinStyle);
-
-    void setCapStyle(Qt::PenCapStyle capStyle);
+    void setJoinStyle(const SkPaint::Join joinStyle);
+    void setCapStyle(const SkPaint::Cap capStyle);
 
     //
 
@@ -140,8 +139,8 @@ private:
 
     qptr<Gradient> mCurrentStrokeGradient;
     qptr<Gradient> mCurrentFillGradient;
-    Qt::PenCapStyle mCurrentCapStyle;
-    Qt::PenJoinStyle mCurrentJoinStyle;
+    SkPaint::Cap mCurrentCapStyle;
+    SkPaint::Join mCurrentJoinStyle;
     qreal mCurrentStrokeWidth;
     SimpleBrushWrapper* mCurrentStrokeBrush = nullptr;
     qCubicSegment1D mCurrentStrokeBrushWidthCurve;

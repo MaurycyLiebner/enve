@@ -41,8 +41,8 @@ struct BrushSettings {
 
 struct StrokeSettings : public FillSettings {
     qreal fWidth;
-    Qt::PenCapStyle fCapStyle;
-    Qt::PenJoinStyle fJoinStyle;
+    SkPaint::Cap fCapStyle;
+    SkPaint::Join fJoinStyle;
     BrushSettings fBrush;
 };
 

@@ -51,7 +51,7 @@ int MIN_WIDGET_DIM;
 int KEY_RECT_SIZE;
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent) {
+    : QMainWindow(parent), mActions(mDocument) {
     sMainWindowInstance = this;
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
@@ -310,31 +310,31 @@ void MainWindow::setupMenuBar() {
     mEditMenu->addAction("Undo History...");
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Cut",
-                         mCanvasWindow, &CanvasWindow::cutAction,
+                         &mActions, &Actions::cutAction,
                          Qt::CTRL + Qt::Key_X, mEditMenu));
     mEditMenu->addAction(new NoShortcutAction("Copy",
-                         mCanvasWindow, &CanvasWindow::copyAction,
+                         &mActions, &Actions::copyAction,
                          Qt::CTRL + Qt::Key_C, mEditMenu));
     mEditMenu->addAction(new NoShortcutAction("Paste",
-                         mCanvasWindow, &CanvasWindow::pasteAction,
+                         &mActions, &Actions::pasteAction,
                          Qt::CTRL + Qt::Key_V, mEditMenu));
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Duplicate",
-                         mCanvasWindow, &CanvasWindow::duplicateAction,
+                         &mActions, &Actions::duplicateAction,
                          Qt::CTRL + Qt::Key_D, mEditMenu));
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Delete",
-                         mCanvasWindow, &CanvasWindow::deleteAction,
+                         &mActions, &Actions::deleteAction,
                          Qt::Key_Delete, mEditMenu));
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Select All",
-                         mCanvasWindow, &CanvasWindow::selectAllAction,
+                         &mActions, &Actions::selectAllAction,
                          Qt::Key_A, mEditMenu));
     mEditMenu->addAction(new NoShortcutAction("Invert Selection",
-                                              mCanvasWindow, &CanvasWindow::invertSelectionAction,
+                                              &mActions, &Actions::invertSelectionAction,
                                               Qt::Key_I, mEditMenu));
     mEditMenu->addAction(new NoShortcutAction("Clear Selection",
-                         mCanvasWindow, &CanvasWindow::clearSelectionAction,
+                         &mActions, &Actions::clearSelectionAction,
                          Qt::ALT + Qt::Key_A, mEditMenu));
 
 //    mSelectSameMenu = mEditMenu->addMenu("Select Same");
@@ -348,64 +348,64 @@ void MainWindow::setupMenuBar() {
 
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Raise",
-                           mCanvasWindow, &CanvasWindow::raiseAction,
+                           &mActions, &Actions::raiseAction,
                            Qt::Key_PageUp);
     mObjectMenu->addAction("Lower",
-                           mCanvasWindow, &CanvasWindow::lowerAction,
+                           &mActions, &Actions::lowerAction,
                            Qt::Key_PageDown);
     mObjectMenu->addAction("Rasie to Top",
-                           mCanvasWindow, &CanvasWindow::raiseToTopAction,
+                           &mActions, &Actions::raiseToTopAction,
                            Qt::Key_Home);
     mObjectMenu->addAction("Lower to Bottom",
-                           mCanvasWindow, &CanvasWindow::lowerToBottomAction)->
+                           &mActions, &Actions::lowerToBottomAction)->
             setShortcut(Qt::Key_End);
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Rotate 90° CW",
-                           mCanvasWindow, &CanvasWindow::rotate90CWAction);
+                           &mActions, &Actions::rotate90CWAction);
     mObjectMenu->addAction("Rotate 90° CCW",
-                           mCanvasWindow, &CanvasWindow::rotate90CCWAction);
-    mObjectMenu->addAction("Flip Horizontal", mCanvasWindow,
-                           &CanvasWindow::flipHorizontalAction, Qt::Key_H);
-    mObjectMenu->addAction("Flip Vertical", mCanvasWindow,
-                           &CanvasWindow::flipVerticalAction, Qt::Key_V);
+                           &mActions, &Actions::rotate90CCWAction);
+    mObjectMenu->addAction("Flip Horizontal", &mActions,
+                           &Actions::flipHorizontalAction, Qt::Key_H);
+    mObjectMenu->addAction("Flip Vertical", &mActions,
+                           &Actions::flipVerticalAction, Qt::Key_V);
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Group", mCanvasWindow,
-                           &CanvasWindow::groupSelectedBoxes,
+    mObjectMenu->addAction("Group", &mActions,
+                           &Actions::groupSelectedBoxes,
                            Qt::CTRL + Qt::Key_G);
-    mObjectMenu->addAction("Ungroup", mCanvasWindow,
-                           &CanvasWindow::ungroupSelectedBoxes,
+    mObjectMenu->addAction("Ungroup", &mActions,
+                           &Actions::ungroupSelectedBoxes,
                            Qt::CTRL + Qt::SHIFT + Qt::Key_G);
 
     mPathMenu = mMenuBar->addMenu("Path");
 
-    mPathMenu->addAction("Object to Path", mCanvasWindow,
-                         &CanvasWindow::objectsToPathAction);
-    mPathMenu->addAction("Stroke to Path", mCanvasWindow,
-                         &CanvasWindow::strokeToPathAction);
+    mPathMenu->addAction("Object to Path", &mActions,
+                         &Actions::objectsToPathAction);
+    mPathMenu->addAction("Stroke to Path", &mActions,
+                         &Actions::strokeToPathAction);
     mPathMenu->addSeparator();
-    mPathMenu->addAction("Union", mCanvasWindow,
-                         &CanvasWindow::pathsUnionAction)->
+    mPathMenu->addAction("Union", &mActions,
+                         &Actions::pathsUnionAction)->
             setShortcut(Qt::CTRL + Qt::Key_Plus);
-    mPathMenu->addAction("Difference", mCanvasWindow,
-                         &CanvasWindow::pathsDifferenceAction)->
+    mPathMenu->addAction("Difference", &mActions,
+                         &Actions::pathsDifferenceAction)->
             setShortcut(Qt::CTRL + Qt::Key_Minus);
-    mPathMenu->addAction("Intersection", mCanvasWindow,
-                         &CanvasWindow::pathsIntersectionAction)->
+    mPathMenu->addAction("Intersection", &mActions,
+                         &Actions::pathsIntersectionAction)->
             setShortcut(Qt::CTRL + Qt::Key_Asterisk);
-    mPathMenu->addAction("Exclusion", mCanvasWindow,
-                         &CanvasWindow::pathsExclusionAction)->
+    mPathMenu->addAction("Exclusion", &mActions,
+                         &Actions::pathsExclusionAction)->
             setShortcut(Qt::CTRL + Qt::Key_AsciiCircum);
-    mPathMenu->addAction("Division", mCanvasWindow,
-                         &CanvasWindow::pathsDivisionAction)->
+    mPathMenu->addAction("Division", &mActions,
+                         &Actions::pathsDivisionAction)->
             setShortcut(Qt::CTRL + Qt::Key_Slash);
 //    mPathMenu->addAction("Cut Path", mCanvas,
-//                         &CanvasWindow::pathsCutAction);
+//                         &Actions::pathsCutAction);
     mPathMenu->addSeparator();
-    mPathMenu->addAction("Combine", mCanvasWindow,
-                         &CanvasWindow::pathsCombineAction)->
+    mPathMenu->addAction("Combine", &mActions,
+                         &Actions::pathsCombineAction)->
             setShortcut(Qt::CTRL + Qt::Key_K);
-    mPathMenu->addAction("Break Apart", mCanvasWindow,
-                         &CanvasWindow::pathsBreakApartAction)->
+    mPathMenu->addAction("Break Apart", &mActions,
+                         &Actions::pathsBreakApartAction)->
             setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_K);
 
 //    mEffectsMenu = mMenuBar->addMenu("Effects");
@@ -793,25 +793,25 @@ void MainWindow::connectToolBarActions() {
     connect(mPaintMode, &ActionButton::pressed,
             mCanvasWindow, &CanvasWindow::setPaintMode);
     connect(mActionConnectPoints, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::connectPointsSlot );
+            &mActions, &Actions::connectPointsSlot);
     connect(mActionDisconnectPoints, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::disconnectPointsSlot );
+            &mActions, &Actions::disconnectPointsSlot);
     connect(mActionMergePoints, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::mergePointsSlot );
+            &mActions, &Actions::mergePointsSlot);
     connect(mActionSymmetricPointCtrls, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::makePointCtrlsSymmetric );
+            &mActions, &Actions::makePointCtrlsSymmetric);
     connect(mActionSmoothPointCtrls, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::makePointCtrlsSmooth );
+            &mActions, &Actions::makePointCtrlsSmooth);
     connect(mActionCornerPointCtrls, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::makePointCtrlsCorner );
+            &mActions, &Actions::makePointCtrlsCorner);
     connect(mActionLine, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::makeSegmentLine );
+            &mActions, &Actions::makeSegmentLine);
     connect(mActionCurve, &ActionButton::pressed,
-            mCanvasWindow, &CanvasWindow::makeSegmentCurve );
+            &mActions, &Actions::makeSegmentCurve);
     connect(mFontWidget, &FontsWidget::fontSizeChanged,
-            mCanvasWindow, &CanvasWindow::setFontSize);
+            &mActions, &Actions::setFontSize);
     connect(mFontWidget, &FontsWidget::fontFamilyAndStyleChanged,
-            mCanvasWindow, &CanvasWindow::setFontFamilyAndStyle);
+            &mActions, &Actions::setFontFamilyAndStyle);
 }
 
 MainWindow *MainWindow::getInstance() {

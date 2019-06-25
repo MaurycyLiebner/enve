@@ -129,8 +129,8 @@ public:
     void removeFillPathEffect(const qsptr<PathEffect> &effect);
     void removeOutlinePathEffect(const qsptr<PathEffect> &effect);
 
-    void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
-    void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
+    void setStrokeCapStyle(const SkPaint::Cap capStyle);
+    void setStrokeJoinStyle(const SkPaint::Join joinStyle);
     void setStrokeWidth(const qreal strokeWidth);
 
     void setStrokeBrush(SimpleBrushWrapper * const brush);
@@ -160,8 +160,8 @@ public:
 
     void applyPaintSetting(const PaintSettingsApplier &setting);
 
-    void setFillColorMode(const ColorMode &colorMode);
-    void setStrokeColorMode(const ColorMode &colorMode);
+    void setFillColorMode(const ColorMode colorMode);
+    void setStrokeColorMode(const ColorMode colorMode);
 
     bool SWT_isPathBox() const { return true; }
 

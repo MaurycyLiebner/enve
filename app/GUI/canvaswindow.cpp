@@ -21,8 +21,9 @@
 #include "usagewidget.h"
 #include "memorychecker.h"
 
-CanvasWindow::CanvasWindow(Document &document, QWidget * const parent) :
-    GLWindow(parent), mDocument(document) {
+CanvasWindow::CanvasWindow(Document &document,
+                           QWidget * const parent) :
+    GLWindow(parent), mDocument(document), mActions(document.fActions) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
     connect(&mDocument, &Document::canvasModeSet,
             this, &CanvasWindow::setCanvasMode);
@@ -333,21 +334,21 @@ bool CanvasWindow::handleCutCopyPasteKeyPress(QKeyEvent *event) {
     if(event->modifiers() & Qt::ControlModifier &&
             event->key() == Qt::Key_V) {
         if(event->isAutoRepeat()) return false;
-        pasteAction();
+        mActions.pasteAction();
     } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_C) {
         if(event->isAutoRepeat()) return false;
-        copyAction();
+        mActions.copyAction();
     } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_D) {
         if(event->isAutoRepeat()) return false;
-        duplicateAction();
+        mActions.duplicateAction();
     } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_X) {
         if(event->isAutoRepeat()) return false;
-        cutAction();
+        mActions.cutAction();
     } else if(event->key() == Qt::Key_Delete) {
-        deleteAction();
+        mActions.deleteAction();
     } else {
         return false;
     }
@@ -401,9 +402,9 @@ bool CanvasWindow::handleGroupChangeKeyPress(QKeyEvent *event) {
     if(event->modifiers() & Qt::ControlModifier &&
        event->key() == Qt::Key_G) {
        if(event->modifiers() & Qt::ShiftModifier) {
-           ungroupSelectedBoxes();
+           mActions.ungroupSelectedBoxes();
        } else {
-           groupSelectedBoxes();
+           mActions.groupSelectedBoxes();
        }
     } else {
         return false;
@@ -526,7 +527,7 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     if(handleShiftKeysKeyPress(event)) return true;
 
     if(e.fKey == Qt::Key_I && !isMouseGrabber()) {
-        invertSelectionAction();
+        mActions.invertSelectionAction();
     } else if(e.fKey == Qt::Key_W) {
         mDocument.incBrushRadius();
     } else if(e.fKey == Qt::Key_Q) {
@@ -546,303 +547,6 @@ void CanvasWindow::lowerAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->lowerSelectedBoxes();
     queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::raiseToTopAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->raiseSelectedBoxesToTop();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::lowerToBottomAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->lowerSelectedBoxesToBottom();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::objectsToPathAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->convertSelectedBoxesToPath();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::strokeToPathAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->convertSelectedPathStrokesToPath();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::rotate90CWAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->rotateSelectedBoxesStartAndFinish(90);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::rotate90CCWAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->rotateSelectedBoxesStartAndFinish(-90);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::flipHorizontalAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->flipSelectedBoxesHorizontally();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::flipVerticalAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->flipSelectedBoxesVertically();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::pathsUnionAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->selectedPathsUnion();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::pathsDifferenceAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->selectedPathsDifference();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::pathsIntersectionAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->selectedPathsIntersection();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::pathsDivisionAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->selectedPathsDivision();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::pathsExclusionAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->selectedPathsExclusion();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::pathsCombineAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->selectedPathsCombine();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::pathsBreakApartAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->selectedPathsBreakApart();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::setFontFamilyAndStyle(const QString& family,
-                                         const QString& style) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedFontFamilyAndStyle(family, style);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::setFontSize(const qreal size) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedFontSize(size);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::connectPointsSlot() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->connectPoints();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::disconnectPointsSlot() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->disconnectPoints();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::mergePointsSlot() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->mergePoints();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::makePointCtrlsSymmetric() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->makePointCtrlsSymmetric();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::makePointCtrlsSmooth() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->makePointCtrlsSmooth();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::makePointCtrlsCorner() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->makePointCtrlsCorner();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::makeSegmentLine() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->makeSegmentLine();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::makeSegmentCurve() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->makeSegmentCurve();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::startSelectedStrokeWidthTransform() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->startSelectedStrokeWidthTransform();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::deleteAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->deleteAction();
-}
-
-void CanvasWindow::copyAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->copyAction();
-}
-
-void CanvasWindow::pasteAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->pasteAction();
-}
-
-void CanvasWindow::cutAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->cutAction();
-}
-
-void CanvasWindow::duplicateAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->duplicateAction();
-}
-
-void CanvasWindow::selectAllAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->selectAllAction();
-}
-
-void CanvasWindow::invertSelectionAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->invertSelectionAction();
-}
-
-void CanvasWindow::clearSelectionAction() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->clearSelectionAction();
-}
-
-void CanvasWindow::groupSelectedBoxes() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->groupSelectedBoxes();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::ungroupSelectedBoxes() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->ungroupSelectedBoxes();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::startSelectedStrokeColorTransform() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->startSelectedStrokeColorTransform();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::startSelectedFillColorTransform() {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->startSelectedFillColorTransform();
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::strokeCapStyleChanged(const Qt::PenCapStyle &capStyle) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedCapStyle(capStyle);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedJoinStyle(joinStyle);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::strokeBrushChanged(SimpleBrushWrapper * const brush) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedStrokeBrush(brush);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::strokeBrushWidthCurveChanged(
-        const qCubicSegment1D& curve) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedStrokeBrushWidthCurve(curve);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::strokeBrushTimeCurveChanged(
-        const qCubicSegment1D& curve) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedStrokeBrushTimeCurve(curve);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::strokeBrushSpacingCurveChanged(
-        const qCubicSegment1D& curve) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedStrokeBrushSpacingCurve(curve);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::strokeBrushPressureCurveChanged(
-        const qCubicSegment1D& curve) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedStrokeBrushPressureCurve(curve);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::strokeWidthChanged(const qreal strokeWidth) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedStrokeWidth(strokeWidth);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::applyPaintSettingToSelected(const PaintSettingsApplier &setting) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->applyPaintSettingToSelected(setting);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::setSelectedFillColorMode(const ColorMode &mode) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedFillColorMode(mode);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::setSelectedStrokeColorMode(const ColorMode &mode) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedStrokeColorMode(mode);
-    queScheduledTasksAndUpdate();
-}
-
-void CanvasWindow::updateAfterFrameChanged(const int currentFrame) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->anim_setAbsFrame(currentFrame);
-    update();
 }
 
 #include "welcomedialog.h"
@@ -872,7 +576,7 @@ void CanvasWindow::closeWelcomeDialog() {
 
 void CanvasWindow::changeCurrentFrameAction(const int frame) {
     emit changeCurrentFrame(frame);
-    updateAfterFrameChanged(frame);
+    if(mCurrentCanvas) mCurrentCanvas->anim_setAbsFrame(frame);
     queScheduledTasksAndUpdate();
 }
 

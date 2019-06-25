@@ -175,25 +175,25 @@ void Canvas::applyPaintSettingToSelected(const PaintSettingsApplier &setting) {
     }
 }
 
-void Canvas::setSelectedFillColorMode(const ColorMode &mode) {
+void Canvas::setSelectedFillColorMode(const ColorMode mode) {
     for(const auto &box : mSelectedBoxes) {
         box->setFillColorMode(mode);
     }
 }
 
-void Canvas::setSelectedStrokeColorMode(const ColorMode &mode) {
+void Canvas::setSelectedStrokeColorMode(const ColorMode mode) {
     for(const auto &box : mSelectedBoxes) {
         box->setStrokeColorMode(mode);
     }
 }
 
-void Canvas::setSelectedCapStyle(const Qt::PenCapStyle capStyle) {
+void Canvas::setSelectedCapStyle(const SkPaint::Cap capStyle) {
     for(const auto &box : mSelectedBoxes) {
         box->setStrokeCapStyle(capStyle);
     }
 }
 
-void Canvas::setSelectedJoinStyle(const Qt::PenJoinStyle joinStyle) {
+void Canvas::setSelectedJoinStyle(const SkPaint::Join joinStyle) {
     for(const auto &box : mSelectedBoxes) {
         box->setStrokeJoinStyle(joinStyle);
     }

@@ -89,13 +89,13 @@ OutlineSettingsAnimator *ContainerBox::getStrokeSettings() const {
     return mContainedBoxes.last()->getStrokeSettings();
 }
 
-void ContainerBox::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
+void ContainerBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
     for(const auto& box : mContainedBoxes) {
         box->setStrokeCapStyle(capStyle);
     }
 }
 
-void ContainerBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
+void ContainerBox::setStrokeJoinStyle(const SkPaint::Join joinStyle) {
     for(const auto& box : mContainedBoxes) {
         box->setStrokeJoinStyle(joinStyle);
     }
@@ -131,13 +131,13 @@ void ContainerBox::applyPaintSetting(const PaintSettingsApplier &setting) {
     }
 }
 
-void ContainerBox::setFillColorMode(const ColorMode &colorMode) {
+void ContainerBox::setFillColorMode(const ColorMode colorMode) {
     for(const auto& box :  mContainedBoxes) {
         box->setFillColorMode(colorMode);
     }
 }
 
-void ContainerBox::setStrokeColorMode(const ColorMode &colorMode) {
+void ContainerBox::setStrokeColorMode(const ColorMode colorMode) {
     for(const auto& box : mContainedBoxes) {
         box->setStrokeColorMode(colorMode);
     }
