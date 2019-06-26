@@ -21,6 +21,7 @@ ChangeWidthWidget::ChangeWidthWidget(QWidget *parent) :
     setFixedWidth(10);
     setFixedHeight(4000);
     setCursor(Qt::SplitHCursor);
+    setWindowFlags(Qt::WindowStaysOnTopHint);
 }
 
 void ChangeWidthWidget::updatePos() {
@@ -72,7 +73,10 @@ void ChangeWidthWidget::leaveEvent(QEvent *) {
 #include "memoryhandler.h"
 BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
                                                            MainWindow *parent) :
-    QWidget(parent), mDocument(document) {
+    QWidget(parent), mDocument(document),
+    mChww(new ChangeWidthWidget(this)),
+    mTimelineWLayout(new QVBoxLayout),
+    mTimelineLayout(document, mChww, this) {
     setFocusPolicy(Qt::NoFocus);
 
     mMainWindow = parent;
@@ -82,9 +86,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
     mMainLayout->setSpacing(0);
     mMainLayout->setMargin(0);
 
-    mTimelineLayout = new QVBoxLayout();
-    mTimelineLayout->setSpacing(0);
-    mTimelineLayout->setMargin(0);
+    mTimelineWLayout->setSpacing(0);
+    mTimelineWLayout->setMargin(0);
 
 //    mAnimationDockWidget = new AnimationDockWidget(mBoxesListWidget,
 //                                                   mKeysView);
@@ -119,16 +122,16 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
     mStopButton = new ActionButton(
                 ":/icons/stopPreviewButton.png",
                 "stop preview", this);
-    connect(mStopButton, SIGNAL(pressed()),
-            this, SLOT(interruptPreview()));
+    connect(mStopButton, &ActionButton::pressed,
+            this, &BoxesListAnimationDockWidget::interruptPreview);
 
     mLocalPivot = new ActionButton(
                 ":/icons/globalPivot.png",
                 "", this);
     mLocalPivot->setToolTip("P");
     mLocalPivot->setCheckable(":/icons/localPivot.png");
-    connect(mLocalPivot, SIGNAL(toggled(bool)),
-            this, SLOT(setLocalPivot(bool)) );
+    connect(mLocalPivot, &ActionButton::toggled,
+            this, &BoxesListAnimationDockWidget::setLocalPivot);
 
     mToolBar = new QToolBar(this);
     mToolBar->setMovable(false);
@@ -171,8 +174,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
     mTimelineAction->setObjectName("customToolButton");
     mTimelineAction->setCheckable(true);
     mTimelineAction->setChecked(true);
-    mRenderAction = mToolBar->addAction("Render",
-                                        this, SLOT(setRenderMode()));
+    mRenderAction = mToolBar->addAction("Render", this,
+                                        &BoxesListAnimationDockWidget::setRenderMode);
     mRenderAction->setObjectName("customToolButton");
     mRenderAction->setCheckable(true);
 
@@ -181,9 +184,9 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
     mMainLayout->addWidget(mToolBar);
 
     mBoxesListKeysViewStack = new VWidgetStack(this);
-    mTimelineLayout->addWidget(mBoxesListKeysViewStack);
+    mTimelineWLayout->addWidget(mBoxesListKeysViewStack);
 
-    mChww = new ChangeWidthWidget(mBoxesListKeysViewStack);
+    mChww->setParent(mBoxesListKeysViewStack);
 
     mChww->updatePos();
 
@@ -191,12 +194,11 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
     mRenderWidget = new RenderWidget(this);
     connect(mRenderWidget, &RenderWidget::renderFromSettings,
             mMainWindow->getCanvasWindow(), &CanvasWindow::renderFromSettings);
-    mTimelineWidget->setLayout(mTimelineLayout);
+    mTimelineWidget->setLayout(mTimelineWLayout);
     mMainLayout->addWidget(mTimelineWidget);
     mMainLayout->addWidget(mRenderWidget);
     mRenderWidget->hide();
 
-    addNewBoxesListKeysViewWidget(0);
     previewFinished();
     //addNewBoxesListKeysViewWidget(1);
     //addNewBoxesListKeysViewWidget(0);
@@ -211,39 +213,8 @@ void BoxesListAnimationDockWidget::setResolutionFractionText(QString text) {
     mMainWindow->setResolutionFractionValue(res);
 }
 
-void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(int id) {
-    if(mBoxesListKeysViewStack->isHidden()) {
-        mBoxesListKeysViewStack->show();
-        setMinimumHeight(10*MIN_WIDGET_DIM);
-        setMaximumHeight(100*MIN_WIDGET_DIM);
-    }
-    if(id < 0) id = 0;
-    id = qMin(id, mBoxesListKeysViewWidgets.count());
-    const auto newWidget = new BoxesListKeysViewWidget(mDocument, this,
-                                                       mBoxesListKeysViewStack);
-    newWidget->connectToChangeWidthWidget(mChww);
-    mBoxesListKeysViewStack->insertWidget(id, newWidget);
-    mBoxesListKeysViewWidgets.insert(id, newWidget);
-
-    mChww->raise();
-}
-
-void BoxesListAnimationDockWidget::removeBoxesListKeysViewWidget(
-                                        BoxesListKeysViewWidget *widget) {
-    mBoxesListKeysViewWidgets.removeOne(widget);
-    delete mBoxesListKeysViewStack->takeWidget(widget);
-}
-
-void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidgetBelow(
-                                        BoxesListKeysViewWidget *widget) {
-    addNewBoxesListKeysViewWidget(mBoxesListKeysViewStack->childId(widget) + 1);
-}
-
 void BoxesListAnimationDockWidget::clearAll() {
-    const auto widgets = mBoxesListKeysViewWidgets;
-    for(const auto widget : widgets) {
-        removeBoxesListKeysViewWidget(widget);
-    }
+
 }
 
 RenderWidget *BoxesListAnimationDockWidget::getRenderWidget() {

@@ -2,18 +2,18 @@
 #define LAYOUTCOLLECTION_H
 #include "canvas.h"
 #include "canvaswindowwrapper.h"
+#include "timelinewrapper.h"
 
 struct SceneBaseStackItem : public BaseStackItem {
     typedef std::unique_ptr<const SceneBaseStackItem> cUPtr;
-    SceneBaseStackItem(Canvas* const scene = nullptr) :
-        SceneBaseStackItem(new CWWidgetStackLayoutItem, scene) {}
-
-    SceneBaseStackItem(CWWidgetStackLayoutItem* const cwwItem,
+protected:
+    SceneBaseStackItem(std::unique_ptr<SceneWidgetStackLayoutItem>&& cwwItem,
                        Canvas* const scene = nullptr) : mScene(scene) {
         if(scene) setName(scene->getName());
         cwwItem->setScene(scene);
-        setChild(std::unique_ptr<WidgetStackLayoutItem>(cwwItem));
+        setChild(std::move(cwwItem));
     }
+public:
 
     void setScene(Canvas* const scene) {
         mScene = scene;
@@ -25,8 +25,28 @@ private:
     Canvas* mScene = nullptr;
 };
 
+struct TSceneBaseStackItem : public SceneBaseStackItem {
+    TSceneBaseStackItem(Canvas* const scene = nullptr) :
+        SceneBaseStackItem(std::make_unique<TWidgetStackLayoutItem>(), scene) {}
+};
+
+struct CWSceneBaseStackItem : public SceneBaseStackItem {
+    CWSceneBaseStackItem(Canvas* const scene = nullptr) :
+        SceneBaseStackItem(std::make_unique<CWWidgetStackLayoutItem>(), scene) {}
+};
+
 class LayoutCollection {
+    typedef std::function<SceneBaseStackItem::cUPtr(Canvas*)> Creator;
 public:
+    LayoutCollection(const Creator& creator);
+
+    template <typename T>
+    static std::function<SceneBaseStackItem::cUPtr(Canvas*)> sCreator() {
+        return [](Canvas* const scene) {
+            return std::make_unique<T>(scene);
+        };
+    }
+
     const BaseStackItem* getAt(const int id) const;
 
     int idForScene(Canvas* const scene);
@@ -54,6 +74,7 @@ private:
 
     int addSceneLayout(SceneBaseStackItem::cUPtr&& newL);
 
+    const Creator mCreator;
     std::vector<BaseStackItem::UPtr> mLayouts;
     std::vector<SceneBaseStackItem::cUPtr> mSceneLayouts;
 };

@@ -20,22 +20,27 @@ class AnimationDockWidget;
 class BoxScrollWidget;
 class Document;
 class Canvas;
+class SceneChooser;
+class StackWrapperCornerMenu;
 
 enum SWT_Type : short;
 enum SWT_BoxRule : short;
 
-class BoxesListKeysViewWidget : public QWidget {
+class TimelineWidget : public QWidget {
 public:
-    explicit BoxesListKeysViewWidget(Document& document,
-                                     BoxesListAnimationDockWidget *animationDock,
-                                     QWidget *parent);
+    explicit TimelineWidget(Document& document,
+                            StackWrapperCornerMenu* const menu,
+                            QWidget *parent);
 
-    void connectToChangeWidthWidget(
-            ChangeWidthWidget *changeWidthWidget);
+    Canvas* getCurrrentScene() const {
+        return mCurrentScene;
+    }
+
+    void setCurrentScene(Canvas* const scene);
+    void setBoxesListWidth(const int width);
 private:
     void setViewedFrameRange(const FrameRange &range);
     void setCanvasFrameRange(const FrameRange &range);
-    void setCurrentScene(Canvas* const scene);
 
     void setRuleNone();
     void setRuleSelected();
@@ -58,11 +63,6 @@ private:
     void setTypeSound();
 
     void setGraphEnabled(const bool bT);
-protected:
-    void setBoxesListWidth(const int width);
-
-    void addNewBelowThis();
-    void removeThis();
 private:
     void setCurrentType(const SWT_Type type);
     void setBoxRule(const SWT_BoxRule rule);
@@ -70,6 +70,8 @@ private:
     Canvas* mCurrentScene = nullptr;
 
     Document& mDocument;
+
+    SceneChooser* mSceneChooser;
 
     FrameScrollBar* mFrameScrollBar;
     FrameScrollBar* mFrameRangeScrollBar;
@@ -89,8 +91,6 @@ private:
     KeysView *mKeysView;
     MainWindow *mMainWindow;
     AnimationDockWidget *mAnimationDockWidget;
-
-    BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
 };
 
 #endif // BOXESLISTKEYSVIEWWIDGET_H

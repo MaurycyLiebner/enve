@@ -4,7 +4,25 @@
 class Document;
 class Canvas;
 class CanvasWindow;
-struct CWWidgetStackLayoutItem;
+
+struct SceneWidgetStackLayoutItem : public WidgetStackLayoutItem {
+    void clear();
+    void write(QIODevice* const dst) const;
+    void read(QIODevice* const src);
+    void setScene(Canvas* const scene);
+protected:
+    Canvas* mScene = nullptr;
+};
+
+struct CWWidgetStackLayoutItem : public SceneWidgetStackLayoutItem {
+    void clear();
+    void apply(StackWidgetWrapper* const stack) const;
+    void write(QIODevice* const dst) const;
+    void read(QIODevice* const src);
+    void setTransform(const QMatrix& transform);
+private:
+    QMatrix mTransform;
+};
 
 class CanvasWindowWrapper : public StackWidgetWrapper {
 public:
@@ -23,18 +41,5 @@ private:
     using StackWidgetWrapper::setMenuBar;
     using StackWidgetWrapper::setCentralWidget;
 };
-
-struct CWWidgetStackLayoutItem : public WidgetStackLayoutItem {
-    void clear();
-    void apply(StackWidgetWrapper* const stack) const;
-    void write(QIODevice* const dst) const;
-    void read(QIODevice* const src);
-    void setScene(Canvas* const scene);
-    void setTransform(const QMatrix& transform);
-private:
-    QMatrix mTransform;
-    Canvas* mScene = nullptr;
-};
-
 
 #endif // CANVASWINDOWWRAPPER_H

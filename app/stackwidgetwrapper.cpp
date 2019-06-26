@@ -20,7 +20,7 @@ void StackWidgetWrapper::setMenuBar(StackWrapperMenu * const menu) {
     if(mMenuBar) delete mMenuBar;
     mMenuBar = menu;
     mLayout->insertWidget(0, mMenuBar);
-    menu->setParent(this);
+    menu->setTarget(this);
 }
 
 void StackWidgetWrapper::setCentralWidget(QWidget * const widget) {
@@ -85,37 +85,13 @@ void StackWidgetWrapper::disableClose() {
 StackWrapperMenu::StackWrapperMenu() {
     setFixedHeight(MIN_WIDGET_DIM);
     setStyleSheet("QMenuBar { border-bottom: 1px solid black; }");
-    QMenuBar * const actBar = new QMenuBar(this);
-    actBar->setFixedHeight(MIN_WIDGET_DIM);
-    mSplitV = new QAction("split v");
-    mSplitH = new QAction("split h");
-    mClose = new QAction("x");
 
-    actBar->addAction(mSplitV);
-    actBar->addAction(mSplitH);
-    actBar->addAction(mClose);
-
-    setCornerWidget(actBar);
+    mCornerMenu = new StackWrapperCornerMenu();
+    setCornerWidget(mCornerMenu);
 }
 
-void StackWrapperMenu::setParent(StackWidgetWrapper * const parent) {
-    if(mParent) {
-        disconnect(mSplitV, &QAction::triggered,
-                   mParent, &StackWidgetWrapper::splitV);
-        disconnect(mSplitH, &QAction::triggered,
-                   mParent, &StackWidgetWrapper::splitH);
-        disconnect(mClose, &QAction::triggered,
-                   mParent, &StackWidgetWrapper::deleteLater);
-    }
-    mParent = parent;
-    if(mParent) {
-        connect(mSplitV, &QAction::triggered,
-                mParent, &StackWidgetWrapper::splitV);
-        connect(mSplitH, &QAction::triggered,
-                mParent, &StackWidgetWrapper::splitH);
-        connect(mClose, &QAction::triggered,
-                mParent, &StackWidgetWrapper::closeWrapper);
-    }
+void StackWrapperMenu::setTarget(StackWidgetWrapper * const target) {
+    mCornerMenu->setTarget(target);
 }
 
 template<class SplitItemClass>
@@ -157,4 +133,29 @@ void ParentStackLayoutItem::sWriteChild(
         StackLayoutItem * const child, QIODevice * const dst) {
     child->writeType(dst);
     child->write(dst);
+}
+
+StackWrapperCornerMenu::StackWrapperCornerMenu() {
+    setFixedHeight(MIN_WIDGET_DIM);
+    setStyleSheet("QMenuBar { border-bottom: 1px solid black; }");
+    mSplitV = addAction("split v");
+    mSplitH = addAction("split h");
+    mClose = addAction("x");
+}
+
+void StackWrapperCornerMenu::setTarget(StackWidgetWrapper * const target) {
+    if(mTarget) {
+        disconnect(mSplitV, nullptr, mTarget, nullptr);
+        disconnect(mSplitH, nullptr, mTarget, nullptr);
+        disconnect(mClose, nullptr, mTarget, nullptr);
+    }
+    mTarget = target;
+    if(mTarget) {
+        connect(mSplitV, &QAction::triggered,
+                mTarget, &StackWidgetWrapper::splitV);
+        connect(mSplitH, &QAction::triggered,
+                mTarget, &StackWidgetWrapper::splitH);
+        connect(mClose, &QAction::triggered,
+                mTarget, &StackWidgetWrapper::closeWrapper);
+    }
 }

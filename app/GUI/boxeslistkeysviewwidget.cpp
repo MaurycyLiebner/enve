@@ -15,12 +15,11 @@
 #include "scenechooser.h"
 #include <QToolButton>
 
-BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
-                            BoxesListAnimationDockWidget *animationDock,
-                            QWidget *parent) :
+TimelineWidget::TimelineWidget(Document &document,
+                               StackWrapperCornerMenu * const menu,
+                               QWidget *parent) :
     QWidget(parent), mDocument(document) {
     mMainWindow = MainWindow::getInstance();
-    mBoxesListAnimationDockWidget = animationDock;
 
     mMainLayout = new QHBoxLayout(this);
     mMainLayout->setSpacing(0);
@@ -59,9 +58,9 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
                     "color: white;"
                 "}");
     mBoxesListMenuBar->addSeparator();
-    const auto sceneChooser = new SceneChooser(mDocument, true,
-                                               mBoxesListMenuBar);
-    mBoxesListMenuBar->addMenu(sceneChooser);
+    mSceneChooser = new SceneChooser(mDocument, true,
+                                     mBoxesListMenuBar);
+    mBoxesListMenuBar->addMenu(mSceneChooser);
 
     mCornerMenuBar = new QMenuBar(this);
     mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
@@ -74,48 +73,49 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
     QMenu * const settingsMenu = mCornerMenuBar->addMenu("o");
     QMenu * const objectsMenu = settingsMenu->addMenu("State");
     objectsMenu->addAction("All", this,
-                           &BoxesListKeysViewWidget::setRuleNone);
+                           &TimelineWidget::setRuleNone);
     objectsMenu->addAction("Selected", this,
-                           &BoxesListKeysViewWidget::setRuleSelected);
+                           &TimelineWidget::setRuleSelected);
     objectsMenu->addAction("Animated", this,
-                           &BoxesListKeysViewWidget::setRuleAnimated);
+                           &TimelineWidget::setRuleAnimated);
     objectsMenu->addAction("Not Animated", this,
-                           &BoxesListKeysViewWidget::setRuleNotAnimated);
+                           &TimelineWidget::setRuleNotAnimated);
     objectsMenu->addAction("Visible", this,
-                           &BoxesListKeysViewWidget::setRuleVisible);
+                           &TimelineWidget::setRuleVisible);
     objectsMenu->addAction("Hidden", this,
-                           &BoxesListKeysViewWidget::setRuleHidden);
+                           &TimelineWidget::setRuleHidden);
     objectsMenu->addAction("Unlocked", this,
-                           &BoxesListKeysViewWidget::setRuleUnloced);
+                           &TimelineWidget::setRuleUnloced);
     objectsMenu->addAction("Locked", this,
-                           &BoxesListKeysViewWidget::setRuleLocked);
+                           &TimelineWidget::setRuleLocked);
 
     QMenu * const targetMenu = settingsMenu->addMenu("Target");
 //    targetMenu->addAction("All", this,
 //                          &BoxesListKeysViewWidget::setTargetAll);
     targetMenu->addAction("Current Canvas", this,
-                          &BoxesListKeysViewWidget::setTargetCurrentCanvas);
+                          &TimelineWidget::setTargetCurrentCanvas);
     targetMenu->addAction("Current Group", this,
-                          &BoxesListKeysViewWidget::setTargetCurrentGroup);
+                          &TimelineWidget::setTargetCurrentGroup);
     QMenu * const typeMenu = settingsMenu->addMenu("Type");
-    typeMenu->addAction("All", this, &BoxesListKeysViewWidget::setTypeAll);
+    typeMenu->addAction("All", this, &TimelineWidget::setTypeAll);
     typeMenu->addAction("Graphics", this,
-                        &BoxesListKeysViewWidget::setTypeGraphics);
+                        &TimelineWidget::setTypeGraphics);
     typeMenu->addAction("Sound", this,
-                        &BoxesListKeysViewWidget::setTypeSound);
+                        &TimelineWidget::setTypeSound);
 
     //QMenu *viewMenu = mBoxesListMenuBar->addMenu("View");
     mGraphAct = mCornerMenuBar->addAction("/");
     mGraphAct->setCheckable(true);
     connect(mGraphAct, &QAction::toggled,
-            this, &BoxesListKeysViewWidget::setGraphEnabled);
+            this, &TimelineWidget::setGraphEnabled);
 
-    mCornerMenuBar->addSeparator();
-    mCornerMenuBar->addAction(" + ", this,
-                              &BoxesListKeysViewWidget::addNewBelowThis);
-    mCornerMenuBar->addAction(" - ", this,
-                              &BoxesListKeysViewWidget::removeThis);
-    mCornerMenuBar->addSeparator();
+    mCornerMenuBar->setCornerWidget(menu);
+//    mCornerMenuBar->addSeparator();
+//    mCornerMenuBar->addAction(" + ", this,
+//                              &TimelineWidget::addNewBelowThis);
+//    mCornerMenuBar->addAction(" - ", this,
+//                              &TimelineWidget::removeThis);
+//    mCornerMenuBar->addSeparator();
 
     mMenuWidgetsLayout = new QHBoxLayout();
     mMenuWidgetsLayout->setAlignment(Qt::AlignRight);
@@ -131,7 +131,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
                                "margin-top: 1px;"
                                "margin-bottom: 1px;");
     connect(mSearchLine, &QLineEdit::textChanged,
-            this, &BoxesListKeysViewWidget::setSearchText);
+            this, &TimelineWidget::setSearchText);
     mSearchLine->setSizePolicy(QSizePolicy::Maximum,
                                QSizePolicy::Fixed);
 
@@ -200,13 +200,13 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
 
     connect(mBoxesListScrollArea->verticalScrollBar(),
             &QScrollBar::valueChanged,
-            this, &BoxesListKeysViewWidget::moveSlider);
+            this, &TimelineWidget::moveSlider);
     connect(mKeysView, &KeysView::wheelEventSignal,
             mBoxesListScrollArea, &ScrollArea::callWheelEvent);
 
-    connect(sceneChooser, &SceneChooser::currentChanged,
-            this, &BoxesListKeysViewWidget::setCurrentScene);
-    sceneChooser->setCurrentScene(mDocument.fActiveScene);
+    connect(mSceneChooser, &SceneChooser::currentChanged,
+            this, &TimelineWidget::setCurrentScene);
+    mSceneChooser->setCurrentScene(mDocument.fActiveScene);
 
     mBoxesListScrollArea->setFixedWidth(20*MIN_WIDGET_DIM);
 
@@ -218,8 +218,8 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
 //            frameScrollBar,
 //            qOverload<>(&FrameScrollBar::update));
     connect(mFrameScrollBar, &FrameScrollBar::viewedFrameRangeChanged,
-            this, [sceneChooser](const FrameRange& range){
-        const auto scene = sceneChooser->getCurrentScene();
+            this, [this](const FrameRange& range){
+        const auto scene = mSceneChooser->getCurrentScene();
         if(scene) scene->anim_setAbsFrame(range.fMin);
         MainWindow::getInstance()->queScheduledTasksAndUpdate();
     });
@@ -231,33 +231,35 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
                                               true, true, this);
 
     connect(mFrameRangeScrollBar, &FrameScrollBar::viewedFrameRangeChanged,
-            this, &BoxesListKeysViewWidget::setViewedFrameRange);
+            this, &TimelineWidget::setViewedFrameRange);
     mKeysViewLayout->addWidget(mFrameRangeScrollBar);
 }
 
-void BoxesListKeysViewWidget::setCurrentScene(Canvas * const scene) {
+void TimelineWidget::setCurrentScene(Canvas * const scene) {
+    if(scene == mCurrentScene) return;
     if(mCurrentScene) {
         disconnect(mCurrentScene, nullptr, mFrameScrollBar, nullptr);
         disconnect(mCurrentScene, nullptr, this, nullptr);
     }
 
     mCurrentScene = scene;
+    mSceneChooser->setCurrentScene(scene);
     mFrameScrollBar->setCurrentCanvas(scene);
     mKeysView->setCurrentScene(scene);
     if(scene) {
         connect(scene, &Canvas::currentFrameChanged,
                 mFrameScrollBar, &FrameScrollBar::setFirstViewedFrame);
         connect(scene, &Canvas::newFrameRange,
-                this, &BoxesListKeysViewWidget::setCanvasFrameRange);
+                this, &TimelineWidget::setCanvasFrameRange);
     }
 }
 
-void BoxesListKeysViewWidget::setGraphEnabled(const bool bT) {
+void TimelineWidget::setGraphEnabled(const bool bT) {
     mKeysView->setGraphViewed(bT);
     mAnimationDockWidget->setVisible(bT);
 }
 
-void BoxesListKeysViewWidget::moveSlider(int val) {
+void TimelineWidget::moveSlider(int val) {
     int diff = val%MIN_WIDGET_DIM;
     if(diff != 0) {
         val -= diff;
@@ -267,14 +269,7 @@ void BoxesListKeysViewWidget::moveSlider(int val) {
                 val, val + mBoxesListScrollArea->height());
 }
 
-void BoxesListKeysViewWidget::connectToChangeWidthWidget(
-                                    ChangeWidthWidget *changeWidthWidget) {
-    connect(changeWidthWidget, &ChangeWidthWidget::widthSet,
-            this, &BoxesListKeysViewWidget::setBoxesListWidth);
-    setBoxesListWidth(changeWidthWidget->getCurrentWidth());
-}
-
-void BoxesListKeysViewWidget::setBoxesListWidth(const int width) {
+void TimelineWidget::setBoxesListWidth(const int width) {
     const int sizeHintWidth = mBoxesListMenuBar->sizeHint().width();
     const int cornerSizeHintWidth = mCornerMenuBar->sizeHint().width();
     const int widthT = width - mCornerMenuBar->sizeHint().width();
@@ -288,58 +283,50 @@ void BoxesListKeysViewWidget::setBoxesListWidth(const int width) {
     mBoxesListScrollArea->setFixedWidth(width);
 }
 
-void BoxesListKeysViewWidget::addNewBelowThis() {
-    mBoxesListAnimationDockWidget->addNewBoxesListKeysViewWidgetBelow(this);
-}
-
-void BoxesListKeysViewWidget::removeThis() {
-    mBoxesListAnimationDockWidget->removeBoxesListKeysViewWidget(this);
-}
-
-void BoxesListKeysViewWidget::setBoxRule(const SWT_BoxRule rule) {
+void TimelineWidget::setBoxRule(const SWT_BoxRule rule) {
     mBoxesListWidget->getVisiblePartWidget()->setCurrentRule(rule);
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void BoxesListKeysViewWidget::setRuleNone() {
+void TimelineWidget::setRuleNone() {
     setBoxRule(SWT_BR_ALL);
 }
 
-void BoxesListKeysViewWidget::setRuleSelected() {
+void TimelineWidget::setRuleSelected() {
     setBoxRule(SWT_BR_SELECTED);
 }
 
-void BoxesListKeysViewWidget::setRuleAnimated() {
+void TimelineWidget::setRuleAnimated() {
     setBoxRule(SWT_BR_ANIMATED);
 }
 
-void BoxesListKeysViewWidget::setRuleNotAnimated() {
+void TimelineWidget::setRuleNotAnimated() {
     setBoxRule(SWT_BR_NOT_ANIMATED);
 }
 
-void BoxesListKeysViewWidget::setRuleVisible() {
+void TimelineWidget::setRuleVisible() {
     setBoxRule(SWT_BR_VISIBLE);
 }
 
-void BoxesListKeysViewWidget::setRuleHidden() {
+void TimelineWidget::setRuleHidden() {
     setBoxRule(SWT_BR_HIDDEN);
 }
 
-void BoxesListKeysViewWidget::setRuleUnloced() {
+void TimelineWidget::setRuleUnloced() {
     setBoxRule(SWT_BR_UNLOCKED);
 }
 
-void BoxesListKeysViewWidget::setRuleLocked() {
+void TimelineWidget::setRuleLocked() {
     setBoxRule(SWT_BR_LOCKED);
 }
 
-void BoxesListKeysViewWidget::setTargetAll() {
+void TimelineWidget::setTargetAll() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(&mDocument, SWT_TARGET_ALL);
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void BoxesListKeysViewWidget::setTargetCurrentCanvas() {
+void TimelineWidget::setTargetCurrentCanvas() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(
                 mMainWindow->getCanvasWindow()->getCurrentCanvas(),
@@ -347,7 +334,7 @@ void BoxesListKeysViewWidget::setTargetCurrentCanvas() {
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void BoxesListKeysViewWidget::setTargetCurrentGroup() {
+void TimelineWidget::setTargetCurrentGroup() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(
                 mMainWindow->getCanvasWindow()->getCurrentGroup(),
@@ -355,36 +342,36 @@ void BoxesListKeysViewWidget::setTargetCurrentGroup() {
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void BoxesListKeysViewWidget::setCurrentType(const SWT_Type type) {
+void TimelineWidget::setCurrentType(const SWT_Type type) {
     mBoxesListWidget->getVisiblePartWidget()->setCurrentType(type);
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void BoxesListKeysViewWidget::setTypeAll() {
+void TimelineWidget::setTypeAll() {
     setCurrentType(SWT_TYPE_ALL);
 }
 
-void BoxesListKeysViewWidget::setTypeSound() {
+void TimelineWidget::setTypeSound() {
     setCurrentType(SWT_TYPE_SOUND);
 }
 
-void BoxesListKeysViewWidget::setTypeGraphics() {
+void TimelineWidget::setTypeGraphics() {
     setCurrentType(SWT_TYPE_GRAPHICS);
 }
 
-void BoxesListKeysViewWidget::setSearchText(const QString &text) {
+void TimelineWidget::setSearchText(const QString &text) {
     mBoxesListWidget->getVisiblePartWidget()->setCurrentSearchText(text);
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
-void BoxesListKeysViewWidget::setViewedFrameRange(
+void TimelineWidget::setViewedFrameRange(
         const FrameRange& range) {
     mFrameRangeScrollBar->setViewedFrameRange(range);
     mFrameScrollBar->setDisplayedFrameRange(range);
     mKeysView->setFramesRange(range);
 }
 
-void BoxesListKeysViewWidget::setCanvasFrameRange(
+void TimelineWidget::setCanvasFrameRange(
         const FrameRange& range) {
     mFrameRangeScrollBar->setDisplayedFrameRange(range);
     setViewedFrameRange(mFrameRangeScrollBar->getViewedRange());

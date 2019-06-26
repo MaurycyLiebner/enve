@@ -751,9 +751,7 @@ void MainWindow::setupToolBar() {
     connect(removeLayPush, &QPushButton::pressed,
             mSceneLayout, &SceneLayout::removeCurrent);
     connect(mSceneLayout, &SceneLayout::currentSet,
-            removeLayPush, [layCombo](const int id) {
-        layCombo->setCurrentIndex(id);
-    });
+            layCombo, &QComboBox::setCurrentIndex);
 
     connect(layCombo, &QComboBox::editTextChanged,
             mSceneLayout, &SceneLayout::setCurrentName);

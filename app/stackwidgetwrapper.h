@@ -10,12 +10,11 @@
 #include <memory>
 class StackWidgetWrapper;
 
-class StackWrapperMenu : public QMenuBar {
-    friend class StackWidgetWrapper;
-protected:
-    explicit StackWrapperMenu();
-private:
-    void setParent(StackWidgetWrapper * const parent);
+class StackWrapperCornerMenu : public QMenuBar {
+public:
+    StackWrapperCornerMenu();
+
+    void setTarget(StackWidgetWrapper * const target);
 
     void disableClose() {
         mClose->setVisible(false);
@@ -24,12 +23,29 @@ private:
     void enableClose() {
         mClose->setVisible(true);
     }
-
-    StackWidgetWrapper * mParent = nullptr;
-
+private:
     QAction * mSplitV = nullptr;
     QAction * mSplitH = nullptr;
     QAction * mClose = nullptr;
+
+    StackWidgetWrapper * mTarget = nullptr;
+};
+
+class StackWrapperMenu : public QMenuBar {
+    friend class StackWidgetWrapper;
+protected:
+    explicit StackWrapperMenu();
+private:
+    void setTarget(StackWidgetWrapper * const target);
+    void disableClose() {
+        mCornerMenu->disableClose();
+    }
+
+    void enableClose() {
+        mCornerMenu->enableClose();
+    }
+
+    StackWrapperCornerMenu* mCornerMenu;
 };
 
 struct WidgetStackLayoutItem;
@@ -226,6 +242,10 @@ struct BaseStackItem : public ParentStackLayoutItem {
         mChild = std::move(to);
         if(mChild) mChild->setParent(this);
         return tmp;
+    }
+
+    StackLayoutItem* getChild() const {
+        return mChild.get();
     }
 
     void setName(const QString& name) const {

@@ -108,7 +108,8 @@ void CanvasWindowWrapper::changeEvent(QEvent *e) {
 }
 
 void CWWidgetStackLayoutItem::clear() {
-    setScene(nullptr);
+    SceneWidgetStackLayoutItem::clear();
+    mTransform.reset();
 }
 
 void CWWidgetStackLayoutItem::apply(StackWidgetWrapper * const stack) const {
@@ -120,11 +121,29 @@ void CWWidgetStackLayoutItem::apply(StackWidgetWrapper * const stack) const {
 }
 
 void CWWidgetStackLayoutItem::write(QIODevice * const dst) const {
+    SceneWidgetStackLayoutItem::write(dst);
+    dst->write(rcConstChar(&mTransform), sizeof(QMatrix));
+}
+
+void CWWidgetStackLayoutItem::read(QIODevice * const src) {
+    SceneWidgetStackLayoutItem::read(src);
+    src->read(rcChar(&mTransform), sizeof(QMatrix));
+}
+
+void CWWidgetStackLayoutItem::setTransform(const QMatrix& transform) {
+    mTransform = transform;
+}
+
+void SceneWidgetStackLayoutItem::clear() {
+    setScene(nullptr);
+}
+
+void SceneWidgetStackLayoutItem::write(QIODevice * const dst) const {
     const int sceneId = mScene ? mScene->getWriteId() : -1;
     dst->write(rcConstChar(&sceneId), sizeof(int));
 }
 
-void CWWidgetStackLayoutItem::read(QIODevice * const src) {
+void SceneWidgetStackLayoutItem::read(QIODevice * const src) {
     int sceneId;
     src->read(rcChar(&sceneId), sizeof(int));
     const auto sceneBox = BoundingBox::sGetBoxByReadId(sceneId);
@@ -132,10 +151,6 @@ void CWWidgetStackLayoutItem::read(QIODevice * const src) {
     setScene(scene);
 }
 
-void CWWidgetStackLayoutItem::setTransform(const QMatrix& transform) {
-    mTransform = transform;
-}
-
-void CWWidgetStackLayoutItem::setScene(Canvas * const scene) {
+void SceneWidgetStackLayoutItem::setScene(Canvas * const scene) {
     mScene = scene;
 }

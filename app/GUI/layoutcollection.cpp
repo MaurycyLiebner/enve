@@ -1,8 +1,12 @@
 #include "layoutcollection.h"
+
 template<typename TO, typename FROM>
-std::unique_ptr<TO> static_unique_pointer_cast(std::unique_ptr<FROM>&& old){
+std::unique_ptr<TO> unique_ptr_cast(std::unique_ptr<FROM>&& old){
     return std::unique_ptr<TO>{static_cast<TO*>(old.release())};
 }
+
+LayoutCollection::LayoutCollection(const LayoutCollection::Creator &creator) :
+    mCreator(creator) {}
 
 const BaseStackItem *LayoutCollection::getAt(const int id) const {
     if(id < 0) return nullptr;
@@ -22,10 +26,11 @@ int LayoutCollection::idForScene(Canvas * const scene) {
 }
 
 auto sceneOnlyBaseStackItemCast(BaseStackItem::UPtr&& old) {
-    return static_unique_pointer_cast<SceneBaseStackItem>(std::move(old));
+    return unique_ptr_cast<SceneBaseStackItem>(std::move(old));
 }
 
-void LayoutCollection::replaceCustomLayout(const int id, BaseStackItem::UPtr &&layout) {
+void LayoutCollection::replaceCustomLayout(const int id,
+                                           BaseStackItem::UPtr &&layout) {
     if(id >= 0 && id < int(mLayouts.size())) {
         mLayouts[uint(id)] = std::move(layout);
     } else if(id >= 0 && id < int(mSceneLayouts.size() + mLayouts.size())) {
@@ -40,7 +45,7 @@ int LayoutCollection::addCustomLayout(BaseStackItem::UPtr &&layout) {
 }
 
 int LayoutCollection::addSceneLayout(Canvas * const scene) {
-    auto newL = std::make_unique<SceneBaseStackItem>(scene);
+    auto newL = mCreator(scene);
     return addSceneLayout(std::move(newL));
 }
 
@@ -58,7 +63,7 @@ bool LayoutCollection::removeCustomLayout(const int id) {
 
 bool LayoutCollection::resetSceneLayout(const int id, Canvas * const scene) {
     if(id == -1 || !scene) return false;
-    mSceneLayouts[id] = std::make_unique<SceneBaseStackItem>(scene);
+    mSceneLayouts[id] = mCreator(scene);
     return true;
 }
 

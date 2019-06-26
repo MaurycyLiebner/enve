@@ -1,15 +1,18 @@
-#include "scenelayout.h"
+#include "timelinelayout.h"
 #include "document.h"
+#include "boxeslistkeysviewwidget.h"
+#include "boxeslistanimationdockwidget.h"
+#include "timelinewrapper.h"
 
-SceneLayout::SceneLayout(Document& document,
-                         QMainWindow* const window) : QObject(window),
-    mCollection(LayoutCollection::sCreator<CWSceneBaseStackItem>()),
-    mDocument(document), mWindow(window) {
+TimelineLayout::TimelineLayout(Document& document, ChangeWidthWidget * const chww,
+                               BoxesListAnimationDockWidget * const window) : QObject(window),
+    mCollection(LayoutCollection::sCreator<TSceneBaseStackItem>()),
+    mDocument(document), mWindow(window), mChww(chww) {
     connect(&mDocument, &Document::sceneCreated,
-            this, &SceneLayout::newForScene);
+            this, &TimelineLayout::newForScene);
     connect(&mDocument, qOverload<Canvas*>(&Document::sceneRemoved),
-            this, &SceneLayout::removeForScene);
-    connect(this, &SceneLayout::created,
+            this, &TimelineLayout::removeForScene);
+    connect(this, &TimelineLayout::created,
             this, [this](const int id) {
         if(mCurrentId == -1) return;
         if(id <= mCurrentId) mCurrentId++;
@@ -17,8 +20,8 @@ SceneLayout::SceneLayout(Document& document,
     reset();
 }
 
-void saveAllChildrenLayoutsData(QWidget* const parent) {
-    const auto cww = dynamic_cast<CanvasWindowWrapper*>(parent);
+void TSaveAllChildrenLayoutsData(QWidget* const parent) {
+    const auto cww = dynamic_cast<TimelineWrapper*>(parent);
     if(cww) {
         cww->saveDataToLayout();
         return;
@@ -27,30 +30,30 @@ void saveAllChildrenLayoutsData(QWidget* const parent) {
     for(const auto& child : children) {
         const auto childWidget = qobject_cast<QWidget*>(child);
         if(!childWidget) continue;
-        const auto cww = dynamic_cast<CanvasWindowWrapper*>(childWidget);
+        const auto cww = dynamic_cast<TimelineWrapper*>(childWidget);
         if(cww) cww->saveDataToLayout();
-        else saveAllChildrenLayoutsData(childWidget);
+        else TSaveAllChildrenLayoutsData(childWidget);
     }
 }
 
-void SceneLayout::reset(CanvasWindowWrapper** const cwwP) {
+void TimelineLayout::reset(TimelineWrapper** const cwwP) {
     if(mCurrentId != -1) {
-        saveAllChildrenLayoutsData(mWindow->centralWidget());
+        TSaveAllChildrenLayoutsData(mWindow->centralWidget());
         mCollection.replaceCustomLayout(mCurrentId, std::move(mBaseStack));
     }
     mCurrentId = -1;
 
-    mBaseStack = std::make_unique<CWSceneBaseStackItem>();
-    const auto cwwItem = static_cast<CWWidgetStackLayoutItem*>(
+    mBaseStack = std::make_unique<TSceneBaseStackItem>();
+    const auto cwwItem = static_cast<TWidgetStackLayoutItem*>(
                 mBaseStack->getChild());
-    const auto cww = new CanvasWindowWrapper(&mDocument, cwwItem);
+    const auto cww = new TimelineWrapper(&mDocument, mChww, cwwItem);
     cww->disableClose();
     if(cwwP) *cwwP = cww;
     else mWindow->setCentralWidget(cww);
 }
 
-void SceneLayout::setCurrent(const int id) {
-    CanvasWindowWrapper* cwwP = nullptr;
+void TimelineLayout::setCurrent(const int id) {
+    TimelineWrapper* cwwP = nullptr;
     reset(&cwwP);
     const auto stack = mCollection.getAt(id);
     if(!stack) {
@@ -71,11 +74,11 @@ void SceneLayout::setCurrent(const int id) {
     emit currentSet(mCurrentId);
 }
 
-void SceneLayout::removeCurrent() {
+void TimelineLayout::removeCurrent() {
     remove(mCurrentId);
 }
 
-void SceneLayout::remove(const int id) {
+void TimelineLayout::remove(const int id) {
     if(id == -1) return;
     if(mCollection.isCustom(id)) {
         if(mCollection.removeCustomLayout(id)) {
@@ -89,7 +92,7 @@ void SceneLayout::remove(const int id) {
     }
 }
 
-QString SceneLayout::duplicate() {
+QString TimelineLayout::duplicate() {
     QString name;
     if(mCollection.isCustom(mCurrentId)) {
         name = mBaseStack->getName().trimmed();
@@ -110,7 +113,7 @@ QString SceneLayout::duplicate() {
     return name;
 }
 
-QString SceneLayout::newEmpty() {
+QString TimelineLayout::newEmpty() {
     reset();
     const QString name = "Layout " + QString::number(mCollection.customCount());
     mBaseStack->setName(name);
@@ -122,30 +125,41 @@ QString SceneLayout::newEmpty() {
     return name;
 }
 
-void SceneLayout::newForScene(Canvas * const scene) {
+void TimelineLayout::newForScene(Canvas * const scene) {
     const int id = mCollection.addSceneLayout(scene);
     connect(scene, &Canvas::nameChanged,
             this, [this, scene]() { sceneNameChanged(scene); });
     emit created(id, scene->getName());
 }
 
-void SceneLayout::removeForScene(Canvas * const scene) {
+void TimelineLayout::removeForScene(Canvas * const scene) {
     const int id = mCollection.removeSceneLayout(scene);
     if(mCurrentId == id) mCurrentId = -1;
     emit removed(id);
 }
 
-void SceneLayout::setCurrentName(const QString &name) {
+void TimelineLayout::setCurrentName(const QString &name) {
     if(mCurrentId >= mCollection.customCount()) return;
     setName(mCurrentId, name);
 }
 
-void SceneLayout::sceneNameChanged(Canvas * const scene) {
+void TimelineLayout::read(QIODevice * const src) {
+    int nCustom;
+    src->read(rcChar(&nCustom), sizeof(int));
+    for(int i = 0; i < nCustom; i++) {
+        auto newL = BaseStackItem::sRead<TWidgetStackLayoutItem>(src);
+        const QString& name = newL->getName();
+        const int id = mCollection.addCustomLayout(std::move(newL));
+        emit created(id, name);
+    }
+}
+
+void TimelineLayout::sceneNameChanged(Canvas * const scene) {
     const int id = mCollection.idForScene(scene);
     setName(id, scene->getName());
 }
 
-void SceneLayout::setName(const int id, const QString &name) {
+void TimelineLayout::setName(const int id, const QString &name) {
     mCollection.getAt(id)->setName(name);
     emit renamed(id, name);
 }

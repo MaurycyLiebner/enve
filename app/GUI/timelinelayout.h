@@ -1,12 +1,15 @@
-#ifndef SCENELAYOUT_H
-#define SCENELAYOUT_H
-#include <QMainWindow>
+#ifndef TIMELINELAYOUT_H
+#define TIMELINELAYOUT_H
 #include "layoutcollection.h"
+class TimelineWrapper;
+class ChangeWidthWidget;
+class BoxesListAnimationDockWidget;
 
-class SceneLayout : public QObject {
+class TimelineLayout : public QObject {
     Q_OBJECT
 public:
-    SceneLayout(Document& document, QMainWindow* const window);
+    TimelineLayout(Document& document, ChangeWidthWidget* const chww,
+                   BoxesListAnimationDockWidget* const window);
 
     void setCurrent(const int id);
     void remove(const int id);
@@ -35,16 +38,7 @@ public:
         }
     }
 
-    void read(QIODevice* const src) {
-        int nCustom;
-        src->read(rcChar(&nCustom), sizeof(int));
-        for(int i = 0; i < nCustom; i++) {
-            auto newL = BaseStackItem::sRead<CWWidgetStackLayoutItem>(src);
-            const QString& name = newL->getName();
-            const int id = mCollection.addCustomLayout(std::move(newL));
-            emit created(id, name);
-        }
-    }
+    void read(QIODevice* const src);
 
     void writeCurrentId(QIODevice* const dst) {
         dst->write(rcConstChar(&mCurrentId), sizeof(int));
@@ -71,14 +65,15 @@ private:
     void sceneNameChanged(Canvas* const scene);
     void newForScene(Canvas* const scene);
     void removeForScene(Canvas* const scene);
-    void reset(CanvasWindowWrapper ** const cwwP = nullptr);
+    void reset(TimelineWrapper ** const cwwP = nullptr);
 
     int mCurrentId = -1;
     LayoutCollection mCollection;
 
     Document& mDocument;
-    QMainWindow* const mWindow;
+    BoxesListAnimationDockWidget* const mWindow;
+    ChangeWidthWidget *mChww;
     BaseStackItem::UPtr mBaseStack;
 };
 
-#endif // SCENELAYOUT_H
+#endif // TIMELINELAYOUT_H

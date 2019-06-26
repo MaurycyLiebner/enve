@@ -17,8 +17,9 @@
 #include <QToolBar>
 #include "smartPointers/sharedpointerdefs.h"
 #include "framerange.h"
+#include "timelinelayout.h"
 class FrameScrollBar;
-class BoxesListKeysViewWidget;
+class TimelineWidget;
 class VWidgetStack;
 class RenderWidget;
 class MainWindow;
@@ -67,15 +68,18 @@ public:
     void previewPaused();
 
     void updateSettingsForCurrentCanvas(Canvas * const canvas);
-    void addNewBoxesListKeysViewWidgetBelow(
-            BoxesListKeysViewWidget *widget);
     void clearAll();
 
     RenderWidget *getRenderWidget();
 
-    void addNewBoxesListKeysViewWidget(int id = 0);
-    void removeBoxesListKeysViewWidget(
-            BoxesListKeysViewWidget *widget);
+    void setCentralWidget(QWidget* const wid) {
+        if(wid) mTimelineWLayout->addWidget(wid);
+        mCentralWidget = wid;
+    }
+
+    QWidget* centralWidget() {
+        return mCentralWidget;
+    }
 private:
     void setResolutionFractionText(QString text);
 
@@ -92,10 +96,15 @@ private:
 private:
     Document& mDocument;
 
+    ChangeWidthWidget *mChww;
+    QVBoxLayout *mTimelineWLayout;
+    TimelineLayout mTimelineLayout;
+
+    QWidget* mCentralWidget = nullptr;
+
     QToolBar *mToolBar;
 
     QWidget *mTimelineWidget;
-    QVBoxLayout *mTimelineLayout;
     QVBoxLayout *mMainLayout;
 
     QLabel *mControlButtonsWidget;
@@ -110,11 +119,9 @@ private:
     QAction *mRenderAction;
 
     VWidgetStack *mBoxesListKeysViewStack;
-    QList<BoxesListKeysViewWidget*> mBoxesListKeysViewWidgets;
+    QList<TimelineWidget*> mBoxesListKeysViewWidgets;
     RenderWidget *mRenderWidget;
     AnimationDockWidget *mAnimationDockWidget;
-
-    ChangeWidthWidget *mChww;
 
     MainWindow *mMainWindow;
 };
