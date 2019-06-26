@@ -13,8 +13,8 @@ template <typename T> using stdfunc = std::function<T>;
 typedef stdfunc<void(SWT_Abstraction*, int)> SetAbsFunc;
 
 struct UpdateFuncs {
-    stdfunc<void(const SWT_BoxRule &)> fContentUpdateIfIsCurrentRule;
-    stdfunc<void(SingleWidgetTarget*, const SWT_Target )>
+    stdfunc<void(const SWT_BoxRule)> fContentUpdateIfIsCurrentRule;
+    stdfunc<void(SingleWidgetTarget*, const SWT_Target)>
         fContentUpdateIfIsCurrentTarget;
     stdfunc<void()> fContentUpdateIfSearchNotEmpty;
     stdfunc<void()> fUpdateParentHeight;
@@ -63,14 +63,10 @@ public:
         return mVisiblePartWidgetId;
     }
 
-    void scheduleContentUpdate(const SWT_BoxRule &rule);
+    void scheduleContentUpdate(const SWT_BoxRule rule);
+    void scheduleSearchContentUpdate();
 
     bool isMainTarget() { return mIsMainTarget; }
-
-    void scheduleSearchContentUpdate();
-    void scheduleContentUpdate(
-            SingleWidgetTarget * const targetP,
-            const SWT_Target target);
 
     void setIsMainTarget(const bool bT) {
         mIsMainTarget = bT;

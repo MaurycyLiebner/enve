@@ -127,7 +127,7 @@ public:
 
     void setResolutionFraction(qreal percent);
 
-    void updateSettingsForCurrentCanvas();
+    void updateSettingsForCurrentCanvas(Canvas * const scene);
 
     void replaceClipboard(const stdsptr<ClipboardContainer> &container);
     ClipboardContainer *getClipboardContainer(

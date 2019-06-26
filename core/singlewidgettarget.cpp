@@ -30,14 +30,6 @@ void SingleWidgetTarget::SWT_scheduleContentUpdate(const SWT_BoxRule rule) {
     }
 }
 
-void SingleWidgetTarget::SWT_scheduleContentUpdate(
-        SingleWidgetTarget * const targetP,
-        const SWT_Target target) {
-    for(const auto& abs : SWT_mAllAbstractions) {
-        abs.second->scheduleContentUpdate(targetP, target);
-    }
-}
-
 void SingleWidgetTarget::SWT_scheduleSearchContentUpdate() {
     for(const auto& abs : SWT_mAllAbstractions) {
         abs.second->scheduleSearchContentUpdate();

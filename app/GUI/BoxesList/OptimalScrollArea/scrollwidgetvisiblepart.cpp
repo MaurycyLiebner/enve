@@ -72,8 +72,10 @@ void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentTarget(
         SingleWidgetTarget* targetP, const SWT_Target target) {
     if(mCurrentRulesCollection.fTarget == target) {
         static_cast<ScrollWidget*>(mParentWidget)->setMainTarget(targetP);
-        planScheduleUpdateParentHeight();
-        planScheduleUpdateVisibleWidgetsContent();
+        updateParentHeight();
+        updateVisibleWidgetsContent();
+        //planScheduleUpdateParentHeight();
+        //planScheduleUpdateVisibleWidgetsContent();
     }
 }
 
@@ -83,7 +85,7 @@ void ScrollWidgetVisiblePart::scheduleContentUpdateIfSearchNotEmpty() {
     planScheduleUpdateVisibleWidgetsContent();
 }
 
-bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_BoxRule &rule) {
+bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_BoxRule rule) {
     return rule == mCurrentRulesCollection.fRule;
 }
 

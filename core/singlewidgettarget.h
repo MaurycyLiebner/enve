@@ -165,8 +165,6 @@ public:
     void SWT_scheduleContentUpdate(const SWT_BoxRule rule);
 
     void SWT_scheduleSearchContentUpdate();
-    void SWT_scheduleContentUpdate(SingleWidgetTarget * const targetP,
-                                   const SWT_Target target);
 
     void SWT_moveChildTo(SingleWidgetTarget * const target, const int id);
 

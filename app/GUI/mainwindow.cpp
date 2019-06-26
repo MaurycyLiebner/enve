@@ -63,6 +63,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(&mDocument, &Document::evFilePathChanged,
             this, &MainWindow::updateTitle);
+    connect(&mDocument, &Document::activeSceneSet,
+            this, &MainWindow::updateSettingsForCurrentCanvas);
 
     QFile customSS(QDir::homePath() + "/.enve/stylesheet.qss");
     if(customSS.exists()) {
@@ -536,19 +538,18 @@ void MainWindow::addCanvasToRenderQue() {
     createNewRenderInstanceWidgetForCanvas(mCanvasWindow->getCurrentCanvas());
 }
 
-void MainWindow::updateSettingsForCurrentCanvas() {
-    if(mCanvasWindow->hasNoCanvas()) {
+void MainWindow::updateSettingsForCurrentCanvas(Canvas* const scene) {
+    if(!scene) {
         mObjectSettingsWidget->setMainTarget(nullptr);
         //mBrushSettingsWidget->setCurrentBrush(nullptr);
         mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(nullptr);
         return;
     }
-    const auto canvas = mCanvasWindow->getCurrentCanvas();
-    mClipViewToCanvas->setChecked(canvas->clipToCanvas());
-    mRasterEffectsVisible->setChecked(canvas->getRasterEffectsVisible());
-    mPathEffectsVisible->setChecked(canvas->getPathEffectsVisible());
-    mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
-    mObjectSettingsWidget->setMainTarget(canvas->getCurrentGroup());
+    mClipViewToCanvas->setChecked(scene->clipToCanvas());
+    mRasterEffectsVisible->setChecked(scene->getRasterEffectsVisible());
+    mPathEffectsVisible->setChecked(scene->getPathEffectsVisible());
+    mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(scene);
+    mObjectSettingsWidget->setMainTarget(scene->getCurrentGroup());
 //    mBrushSettingsWidget->setCurrentBrush(canvas->getCurrentBrush());
 }
 

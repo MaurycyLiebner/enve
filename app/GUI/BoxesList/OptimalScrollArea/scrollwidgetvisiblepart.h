@@ -29,7 +29,7 @@ public:
     void setCurrentSearchText(const QString &text);
 
     void scheduleContentUpdateIfIsCurrentRule(const SWT_BoxRule &rule);
-    bool isCurrentRule(const SWT_BoxRule &rule);
+    bool isCurrentRule(const SWT_BoxRule rule);
 
     SWT_RulesCollection getCurrentRulesCollection() {
         return mCurrentRulesCollection;

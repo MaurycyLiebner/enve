@@ -166,8 +166,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
     mBoxesListWidget = new BoxScrollWidget(mDocument, mBoxesListScrollArea);
     auto visiblePartWidget = mBoxesListWidget->getVisiblePartWidget();
     visiblePartWidget->setCurrentRule(SWT_BR_ALL);
-    visiblePartWidget->setCurrentTarget(
-                mDocument.fActiveScene, SWT_TARGET_CURRENT_CANVAS);
+    visiblePartWidget->setCurrentTarget(nullptr, SWT_TARGET_CURRENT_CANVAS);
 
     mBoxesListScrollArea->setWidget(mBoxesListWidget);
     mBoxesListLayout->addWidget(mBoxesListScrollArea);
@@ -214,6 +213,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
 
     connect(sceneChooser, &SceneChooser::currentChanged,
             mKeysView, &KeysView::setCurrentScene);
+    sceneChooser->setCurrentScene(mDocument.fActiveScene);
 
     mBoxesListScrollArea->setFixedWidth(20*MIN_WIDGET_DIM);
 

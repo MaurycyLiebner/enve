@@ -100,7 +100,6 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         MainWindow::getInstance()->setCurrentUndoRedoStack(nullptr);
     }
 
-    MainWindow::getInstance()->updateSettingsForCurrentCanvas();
 //    if(hasNoCanvas()) openWelcomeDialog();
 //    else {
 //        closeWelcomeDialog();
