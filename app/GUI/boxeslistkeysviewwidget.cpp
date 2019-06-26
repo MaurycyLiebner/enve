@@ -206,7 +206,6 @@ TimelineWidget::TimelineWidget(Document &document,
 
     connect(mSceneChooser, &SceneChooser::currentChanged,
             this, &TimelineWidget::setCurrentScene);
-    mSceneChooser->setCurrentScene(mDocument.fActiveScene);
 
     mBoxesListScrollArea->setFixedWidth(20*MIN_WIDGET_DIM);
 
@@ -233,6 +232,7 @@ TimelineWidget::TimelineWidget(Document &document,
     connect(mFrameRangeScrollBar, &FrameScrollBar::viewedFrameRangeChanged,
             this, &TimelineWidget::setViewedFrameRange);
     mKeysViewLayout->addWidget(mFrameRangeScrollBar);
+    mSceneChooser->setCurrentScene(mDocument.fActiveScene);
 }
 
 void TimelineWidget::setCurrentScene(Canvas * const scene) {

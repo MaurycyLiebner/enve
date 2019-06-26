@@ -75,6 +75,12 @@ public:
     void setCentralWidget(QWidget* const wid) {
         if(wid) mTimelineWLayout->addWidget(wid);
         mCentralWidget = wid;
+        mChww->setParent(wid);
+        if(wid) {
+            mChww->updatePos();
+            mChww->show();
+            mChww->raise();
+        }
     }
 
     QWidget* centralWidget() {
@@ -118,7 +124,6 @@ private:
     QAction *mTimelineAction;
     QAction *mRenderAction;
 
-    VWidgetStack *mBoxesListKeysViewStack;
     QList<TimelineWidget*> mBoxesListKeysViewWidgets;
     RenderWidget *mRenderWidget;
     AnimationDockWidget *mAnimationDockWidget;

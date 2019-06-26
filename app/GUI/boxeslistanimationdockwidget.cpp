@@ -40,8 +40,7 @@ void ChangeWidthWidget::paintEvent(QPaintEvent *) {
     p.end();
 }
 
-void ChangeWidthWidget::mouseMoveEvent(QMouseEvent *event)
-{
+void ChangeWidthWidget::mouseMoveEvent(QMouseEvent *event) {
     int newWidth = mCurrentWidth + event->x() - mPressX;
     mCurrentWidth = qMax(10*MIN_WIDGET_DIM, newWidth);
     emit widthSet(mCurrentWidth);
@@ -49,8 +48,7 @@ void ChangeWidthWidget::mouseMoveEvent(QMouseEvent *event)
     updatePos();
 }
 
-void ChangeWidthWidget::mousePressEvent(QMouseEvent *event)
-{
+void ChangeWidthWidget::mousePressEvent(QMouseEvent *event) {
     mPressed = true;
     mPressX = event->x();
     update();
@@ -70,11 +68,12 @@ void ChangeWidthWidget::leaveEvent(QEvent *) {
     mHover = false;
     update();
 }
+
 #include "memoryhandler.h"
 BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
                                                            MainWindow *parent) :
     QWidget(parent), mDocument(document),
-    mChww(new ChangeWidthWidget(this)),
+    mChww(new ChangeWidthWidget),
     mTimelineWLayout(new QVBoxLayout),
     mTimelineLayout(document, mChww, this) {
     setFocusPolicy(Qt::NoFocus);
@@ -182,13 +181,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
     mToolBar->addSeparator();
 
     mMainLayout->addWidget(mToolBar);
-
-    mBoxesListKeysViewStack = new VWidgetStack(this);
-    mTimelineWLayout->addWidget(mBoxesListKeysViewStack);
-
-    mChww->setParent(mBoxesListKeysViewStack);
-
-    mChww->updatePos();
 
     mTimelineWidget = new QWidget(this);
     mRenderWidget = new RenderWidget(this);
