@@ -320,6 +320,7 @@ void KeysView::focusInEvent(QFocusEvent *) {
 #include "GUI/BoxesList/boxsinglewidget.h"
 
 void KeysView::paintEvent(QPaintEvent *) {
+    if(!mCurrentScene) return;
     QPainter p(this);
 
     if(mGraphViewed) p.fillRect(rect(), QColor(60, 60, 60));
@@ -378,9 +379,9 @@ void KeysView::paintEvent(QPaintEvent *) {
         p.drawLine(QPointF(xTT, 0), QPointF(xTT, height()));
     }
 
-    if(mMainWindow->getCurrentFrame() <= maxFrame &&
-       mMainWindow->getCurrentFrame() >= minFrame) {
-        xT = (mMainWindow->getCurrentFrame() - mMinViewedFrame)*mPixelsPerFrame +
+    if(mCurrentScene->getCurrentFrame() <= maxFrame &&
+       mCurrentScene->getCurrentFrame() >= minFrame) {
+        xT = (mCurrentScene->getCurrentFrame() - mMinViewedFrame)*mPixelsPerFrame +
                 mPixelsPerFrame*0.5;
         p.setPen(QPen(Qt::darkGray, 2));
         p.drawLine(QPointF(xT, 0), QPointF(xT, height()));
@@ -435,18 +436,16 @@ void KeysView::updateHovered(const QPoint &posU) {
         return;
     }
     if(mHoveredKey) mHoveredKey->setHovered(false);
-    mHoveredKey = mBoxesListVisible->getKeyAtPos(
-                                    posU.x(), posU.y(),
-                                    mPixelsPerFrame,
-                                    mMinViewedFrame);
+    mHoveredKey = mBoxesListVisible->getKeyAtPos(posU.x(), posU.y(),
+                                                 mPixelsPerFrame,
+                                                 mMinViewedFrame);
     if(mHoveredKey) {
         mHoveredKey->setHovered(true);
         clearHoveredMovable();
     } else {
         const auto lastMovable = mHoveredMovable;
         mHoveredMovable = mBoxesListVisible->getRectangleMovableAtPos(
-                            posU.x(), posU.y(),
-                            mPixelsPerFrame,
+                            posU.x(), posU.y(), mPixelsPerFrame,
                             mMinViewedFrame);
         if(lastMovable != mHoveredMovable) {
             if(lastMovable) lastMovable->setHovered(false);

@@ -99,6 +99,7 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
         QRectF selectionRect,
         const qreal pixelsPerFrame,
         QList<Key *>& listKeys) {
+    if(!mMainAbstraction) return;
     QList<SWT_Abstraction*> abstractions;
 //    selectionRect.adjust(-0.5, -(BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5,
 //                         0.5, (BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5);

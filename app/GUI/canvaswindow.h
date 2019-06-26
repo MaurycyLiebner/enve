@@ -51,16 +51,6 @@ public:
 
     void queScheduledTasksAndUpdate();
     bool KFT_handleKeyEventForTarget(QKeyEvent *event);
-    void KFT_setFocusToWidget() {
-        if(mCurrentCanvas) mDocument.setActiveScene(mCurrentCanvas);
-        setFocus();
-        update();
-    }
-
-    void KFT_clearFocus() {
-        clearFocus();
-        update();
-    }
 
     void setResolutionFraction(const qreal percent);
     void updatePivotIfNeeded();
@@ -113,6 +103,17 @@ public:
     void startMaxFramePosTransformForAllSelected();
     void finishMaxFramePosTransformForAllSelected();
     void moveMaxFrameForAllSelected(const int dFrame);
+protected:
+    void KFT_setFocusToWidget() {
+        if(mCurrentCanvas) mDocument.setActiveScene(mCurrentCanvas);
+        setFocus();
+        update();
+    }
+
+    void KFT_clearFocus() {
+        clearFocus();
+        update();
+    }
 private:
     void setCanvasMode(const CanvasMode mode);
     void updatePaintModeCursor();

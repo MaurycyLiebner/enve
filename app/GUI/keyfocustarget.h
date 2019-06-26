@@ -20,13 +20,12 @@ public:
         KFT_setFocusToWidget();
     }
 
-    virtual void KFT_setFocusToWidget() = 0;
-
-    virtual void KFT_clearFocus() {}
-
     static KeyFocusTarget *KFT_getCurrentTarget();
 
     static void KFT_setCurrentTarget(KeyFocusTarget *target);
+protected:
+    virtual void KFT_setFocusToWidget() = 0;
+    virtual void KFT_clearFocus() = 0;
 private:
     static KeyFocusTarget *KFT_mCurrentTarget;
     static QList<KeyFocusTarget*> KFT_mAllTargets;

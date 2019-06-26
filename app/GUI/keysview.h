@@ -99,7 +99,7 @@ protected:
         clearHovered();
         update();
     }
-
+protected:
     void KFT_setFocusToWidget() {
         setFocus();
         update();

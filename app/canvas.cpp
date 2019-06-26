@@ -335,6 +335,7 @@ void Canvas::setCurrentPreviewContainer(const stdsptr<ImageCacheContainer>& cont
 
     mCurrentPreviewContainer = cont;
     if(cont) cont->setBlocked(true);
+    emit newerState();
 }
 
 void Canvas::setLoadingPreviewContainer(
@@ -403,7 +404,6 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
             mDrawRenderContainer.setExpired(outdated);
             mCurrentPreviewContainerOutdated = outdated;
             setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
-            emit newerState();
         } else if(mRenderingPreview &&
                   mCurrRenderRange.inRange(renderData->fRelFrame)) {
             cont->setBlocked(true);

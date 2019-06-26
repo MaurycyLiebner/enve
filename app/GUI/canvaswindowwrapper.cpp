@@ -24,6 +24,7 @@ public:
                 dialog->applySettingsToCanvas(newScene);
                 dialog->close();
                 setCurrentScene(newScene);
+                mWindow->KFT_setFocus();
             });
 
             dialog->show();

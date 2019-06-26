@@ -225,6 +225,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
             this, [sceneChooser](const FrameRange& range){
         const auto scene = sceneChooser->getCurrentScene();
         if(scene) scene->anim_setAbsFrame(range.fMin);
+        MainWindow::getInstance()->queScheduledTasksAndUpdate();
     });
     mFrameScrollBar->setSizePolicy(QSizePolicy::MinimumExpanding,
                                   QSizePolicy::Maximum);
@@ -245,13 +246,13 @@ void BoxesListKeysViewWidget::setCurrentScene(Canvas * const scene) {
     }
 
     mCurrentScene = scene;
+    mFrameScrollBar->setCurrentCanvas(scene);
     mKeysView->setCurrentScene(scene);
     if(scene) {
         connect(scene, &Canvas::currentFrameChanged,
                 mFrameScrollBar, &FrameScrollBar::setFirstViewedFrame);
         connect(scene, &Canvas::newFrameRange,
-                mFrameScrollBar, &FrameScrollBar::setCanvasFrameRange);
-
+                this, &BoxesListKeysViewWidget::setCanvasFrameRange);
     }
 }
 
