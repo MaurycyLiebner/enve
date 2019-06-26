@@ -74,9 +74,6 @@ public:
 
     RenderWidget *getRenderWidget();
 
-    void setCurrentFrame(const int frame);
-    void setViewedFrameRange(const FrameRange &range);
-    void setCanvasFrameRange(const FrameRange &range);
     void addNewBoxesListKeysViewWidget(int id = 0);
     void removeBoxesListKeysViewWidget(
             BoxesListKeysViewWidget *widget);
@@ -123,9 +120,6 @@ private:
     ChangeWidthWidget *mChww;
 
     MainWindow *mMainWindow;
-
-    FrameScrollBar *mFrameRangeScrollbar;
-    FrameScrollBar *mAnimationWidgetScrollbar;
 };
 
 #endif // BOXESLISTANIMATIONDOCKWIDGET_H

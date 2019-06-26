@@ -126,12 +126,6 @@ MainWindow::MainWindow(QWidget *parent)
             mCanvasWindow, &CanvasWindow::outOfMemory);
 
     mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(mDocument, this);
-    connect(mCanvasWindow, &CanvasWindow::changeCurrentFrame,
-            mBoxesListAnimationDockWidget,
-            &BoxesListAnimationDockWidget::setCurrentFrame);
-    connect(mCanvasWindow, &CanvasWindow::changeCanvasFrameRange,
-            mBoxesListAnimationDockWidget,
-            &BoxesListAnimationDockWidget::setCanvasFrameRange);
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);
 
     mBrushSettingsDock = new QDockWidget(this);

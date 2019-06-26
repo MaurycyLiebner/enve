@@ -86,25 +86,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
     mTimelineLayout->setSpacing(0);
     mTimelineLayout->setMargin(0);
 
-    mFrameRangeScrollbar = new FrameScrollBar(20, 200, MIN_WIDGET_DIM,
-                                              true, true, this);
-    mAnimationWidgetScrollbar = new FrameScrollBar(1, 1, MIN_WIDGET_DIM,
-                                                   false, false, this);
-    connect(MemoryHandler::sGetInstance(), &MemoryHandler::memoryFreed,
-            mAnimationWidgetScrollbar,
-            qOverload<>(&FrameScrollBar::update));
-    mAnimationWidgetScrollbar->setTopBorderVisible(false);
-
-    connect(mFrameRangeScrollbar,
-            &FrameScrollBar::viewedFrameRangeChanged,
-            this, &BoxesListAnimationDockWidget::setViewedFrameRange);
-
-
-    mAnimationWidgetScrollbar->setSizePolicy(QSizePolicy::MinimumExpanding,
-                                             QSizePolicy::Maximum);
-
-
-
 //    mAnimationDockWidget = new AnimationDockWidget(mBoxesListWidget,
 //                                                   mKeysView);
 //    mKeysView->setAnimationDockWidget(mAnimationDockWidget);
@@ -202,13 +183,9 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
     mBoxesListKeysViewStack = new VWidgetStack(this);
     mTimelineLayout->addWidget(mBoxesListKeysViewStack);
 
-    mTimelineLayout->addWidget(mFrameRangeScrollbar, Qt::AlignBottom);
-
     mChww = new ChangeWidthWidget(mBoxesListKeysViewStack);
 
     mChww->updatePos();
-
-    mFrameRangeScrollbar->raise();
 
     mTimelineWidget = new QWidget(this);
     mRenderWidget = new RenderWidget(this);
@@ -226,15 +203,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
 
     connect(&mDocument, &Document::activeSceneSet,
             this, &BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas);
-    connect(mAnimationWidgetScrollbar,
-            &FrameScrollBar::viewedFrameRangeChanged,
-            this, [this](const FrameRange& range){
-        mDocument.setActiveSceneFrame(range.fMin);
-    });
-    connect(&mDocument, &Document::activeSceneFrameSet,
-            this, [this](const int frame){
-        setCurrentFrame(frame);
-    });
 }
 
 void BoxesListAnimationDockWidget::setResolutionFractionText(QString text) {
@@ -251,38 +219,17 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(int id) {
     }
     if(id < 0) id = 0;
     id = qMin(id, mBoxesListKeysViewWidgets.count());
-    BoxesListKeysViewWidget *newWidget;
-    if(id == 0) {
-        newWidget = new BoxesListKeysViewWidget(mDocument,
-                                                mAnimationWidgetScrollbar,
-                                                this, mBoxesListKeysViewStack);
-        mAnimationWidgetScrollbar->show();
-    } else {
-        newWidget = new BoxesListKeysViewWidget(mDocument, nullptr,
-                                                this, mBoxesListKeysViewStack);
-    }
+    const auto newWidget = new BoxesListKeysViewWidget(mDocument, this,
+                                                       mBoxesListKeysViewStack);
     newWidget->connectToChangeWidthWidget(mChww);
-    newWidget->connectToFrameWidget(mFrameRangeScrollbar);
-    connect(newWidget, &BoxesListKeysViewWidget::changedFrameRange,
-            this, &BoxesListAnimationDockWidget::setViewedFrameRange);
     mBoxesListKeysViewStack->insertWidget(id, newWidget);
     mBoxesListKeysViewWidgets.insert(id, newWidget);
 
     mChww->raise();
-    mFrameRangeScrollbar->raise();
 }
 
 void BoxesListAnimationDockWidget::removeBoxesListKeysViewWidget(
                                         BoxesListKeysViewWidget *widget) {
-    if(mBoxesListKeysViewWidgets.indexOf(widget) == 0) {
-        if(mBoxesListKeysViewWidgets.count() > 1) {
-            mBoxesListKeysViewWidgets.at(1)->setTopWidget(
-                                            mAnimationWidgetScrollbar);
-        } else {
-            mAnimationWidgetScrollbar->setParent(this);
-            mAnimationWidgetScrollbar->hide();
-        }
-    }
     mBoxesListKeysViewWidgets.removeOne(widget);
     delete mBoxesListKeysViewStack->takeWidget(widget);
 }
@@ -413,15 +360,6 @@ void BoxesListAnimationDockWidget::setRenderMode() {
     mTimelineWidget->hide();
 }
 
-void BoxesListAnimationDockWidget::setCurrentFrame(const int frame) {
-    mAnimationWidgetScrollbar->setFirstViewedFrame(frame);
-    mAnimationWidgetScrollbar->update();
-    mRenderWidget->setRenderedFrame(frame);
-    for(const auto& keysView : mBoxesListKeysViewWidgets) {
-        keysView->update();
-    }
-}
-
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
         Canvas* const canvas) {
     if(canvas) {
@@ -431,25 +369,5 @@ void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
                     QString::number(canvas->getResolutionFraction()*100) + " %");
         connect(mResolutionComboBox, &QComboBox::currentTextChanged,
                 this, &BoxesListAnimationDockWidget::setResolutionFractionText);
-        mAnimationWidgetScrollbar->setCurrentCanvas(canvas);
-    } else {
-        mAnimationWidgetScrollbar->setCurrentCanvas(nullptr);
     }
-}
-
-void BoxesListAnimationDockWidget::setViewedFrameRange(
-        const FrameRange& range) {
-    mFrameRangeScrollbar->setViewedFrameRange(range);
-    mAnimationWidgetScrollbar->setDisplayedFrameRange(range);
-    for(const auto& keysView : mBoxesListKeysViewWidgets) {
-        keysView->setDisplayedFrameRange(range);
-    }
-}
-
-void BoxesListAnimationDockWidget::setCanvasFrameRange(
-        const FrameRange& range) {
-    mFrameRangeScrollbar->setDisplayedFrameRange(range);
-    setViewedFrameRange(mFrameRangeScrollbar->getViewedRange());
-    mFrameRangeScrollbar->setCanvasFrameRange(range);
-    mAnimationWidgetScrollbar->setCanvasFrameRange(range);
 }

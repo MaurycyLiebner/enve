@@ -19,26 +19,24 @@ class ScrollArea;
 class AnimationDockWidget;
 class BoxScrollWidget;
 class Document;
+class Canvas;
 
 enum SWT_Type : short;
 enum SWT_BoxRule : short;
 
 class BoxesListKeysViewWidget : public QWidget {
-    Q_OBJECT
 public:
     explicit BoxesListKeysViewWidget(Document& document,
-                                     QWidget *topWidget,
                                      BoxesListAnimationDockWidget *animationDock,
                                      QWidget *parent);
 
-    void setTopWidget(QWidget *topWidget);
-    void connectToFrameWidget(FrameScrollBar *frameRange);
     void connectToChangeWidthWidget(
             ChangeWidthWidget *changeWidthWidget);
-    void setDisplayedFrameRange(const FrameRange &range);
-signals:
-    void changedFrameRange(FrameRange);
 private:
+    void setViewedFrameRange(const FrameRange &range);
+    void setCanvasFrameRange(const FrameRange &range);
+    void setCurrentScene(Canvas* const scene);
+
     void setRuleNone();
     void setRuleSelected();
     void setRuleAnimated();
@@ -69,7 +67,12 @@ private:
     void setCurrentType(const SWT_Type type);
     void setBoxRule(const SWT_BoxRule rule);
 
+    Canvas* mCurrentScene = nullptr;
+
     Document& mDocument;
+
+    FrameScrollBar* mFrameScrollBar;
+    FrameScrollBar* mFrameRangeScrollBar;
 
     QHBoxLayout *mMainLayout;
     QVBoxLayout *mBoxesListLayout;
@@ -78,7 +81,6 @@ private:
     QHBoxLayout *mMenuWidgetsLayout;
     QAction *mGraphAct = nullptr;
     QWidget *mMenuWidgetsCont;
-    QWidget *mTopWidget = nullptr;
     QMenuBar *mBoxesListMenuBar;
     QMenuBar *mCornerMenuBar;
     QLineEdit *mSearchLine;

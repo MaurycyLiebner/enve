@@ -16,7 +16,6 @@
 #include <QToolButton>
 
 BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
-                            QWidget *topWidget,
                             BoxesListAnimationDockWidget *animationDock,
                             QWidget *parent) :
     QWidget(parent), mDocument(document) {
@@ -174,8 +173,6 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
 
     mKeysViewLayout = new QVBoxLayout();
     mKeysView = new KeysView(mBoxesListWidget->getVisiblePartWidget(), this);
-    connect(mKeysView, &KeysView::changedViewedFrames,
-            this, &BoxesListKeysViewWidget::changedFrameRange);
     mKeysViewLayout->addWidget(mKeysView);
     mAnimationDockWidget = new AnimationDockWidget(this, mKeysView);
     mAnimationDockWidget->hide();
@@ -212,31 +209,55 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
             mKeysView, &KeysView::setViewedVerticalRange);
 
     connect(sceneChooser, &SceneChooser::currentChanged,
-            mKeysView, &KeysView::setCurrentScene);
+            this, &BoxesListKeysViewWidget::setCurrentScene);
     sceneChooser->setCurrentScene(mDocument.fActiveScene);
 
     mBoxesListScrollArea->setFixedWidth(20*MIN_WIDGET_DIM);
 
     setLayout(mMainLayout);
 
-    setTopWidget(topWidget);
+    mFrameScrollBar = new FrameScrollBar(1, 1, MIN_WIDGET_DIM,
+                                                   false, false, this);
+//    connect(MemoryHandler::sGetInstance(), &MemoryHandler::memoryFreed,
+//            frameScrollBar,
+//            qOverload<>(&FrameScrollBar::update));
+    connect(mFrameScrollBar, &FrameScrollBar::viewedFrameRangeChanged,
+            this, [sceneChooser](const FrameRange& range){
+        const auto scene = sceneChooser->getCurrentScene();
+        if(scene) scene->anim_setAbsFrame(range.fMin);
+    });
+    mFrameScrollBar->setSizePolicy(QSizePolicy::MinimumExpanding,
+                                  QSizePolicy::Maximum);
+    mKeysViewLayout->insertWidget(0, mFrameScrollBar);
+
+    mFrameRangeScrollBar = new FrameScrollBar(20, 200, MIN_WIDGET_DIM,
+                                              true, true, this);
+
+    connect(mFrameRangeScrollBar, &FrameScrollBar::viewedFrameRangeChanged,
+            this, &BoxesListKeysViewWidget::setViewedFrameRange);
+    mKeysViewLayout->addWidget(mFrameRangeScrollBar);
+}
+
+void BoxesListKeysViewWidget::setCurrentScene(Canvas * const scene) {
+    if(mCurrentScene) {
+        disconnect(mCurrentScene, nullptr, mFrameScrollBar, nullptr);
+        disconnect(mCurrentScene, nullptr, this, nullptr);
+    }
+
+    mCurrentScene = scene;
+    mKeysView->setCurrentScene(scene);
+    if(scene) {
+        connect(scene, &Canvas::currentFrameChanged,
+                mFrameScrollBar, &FrameScrollBar::setFirstViewedFrame);
+        connect(scene, &Canvas::newFrameRange,
+                mFrameScrollBar, &FrameScrollBar::setCanvasFrameRange);
+
+    }
 }
 
 void BoxesListKeysViewWidget::setGraphEnabled(const bool bT) {
     mKeysView->setGraphViewed(bT);
     mAnimationDockWidget->setVisible(bT);
-}
-
-void BoxesListKeysViewWidget::setTopWidget(QWidget *topWidget) {
-    if(mTopWidget) delete mTopWidget;
-    if(!topWidget) {
-        mTopWidget = new QWidget(this);
-        mTopWidget->setFixedHeight(MIN_WIDGET_DIM);
-        mTopWidget->setStyleSheet("background-color: rgb(50, 50, 50)");
-    } else {
-        mTopWidget = topWidget;
-    }
-    mKeysViewLayout->insertWidget(0, mTopWidget);
 }
 
 void BoxesListKeysViewWidget::moveSlider(int val) {
@@ -249,19 +270,11 @@ void BoxesListKeysViewWidget::moveSlider(int val) {
                         val, val + mBoxesListScrollArea->height());
 }
 
-void BoxesListKeysViewWidget::connectToFrameWidget(FrameScrollBar *frameRange) {
-    mKeysView->setFramesRange(frameRange->getViewedRange());
-}
-
 void BoxesListKeysViewWidget::connectToChangeWidthWidget(
                                     ChangeWidthWidget *changeWidthWidget) {
     connect(changeWidthWidget, &ChangeWidthWidget::widthSet,
             this, &BoxesListKeysViewWidget::setBoxesListWidth);
     setBoxesListWidth(changeWidthWidget->getCurrentWidth());
-}
-
-void BoxesListKeysViewWidget::setDisplayedFrameRange(const FrameRange& range) {
-    mKeysView->setFramesRange(range);
 }
 
 void BoxesListKeysViewWidget::setBoxesListWidth(const int width) {
@@ -365,4 +378,19 @@ void BoxesListKeysViewWidget::setTypeGraphics() {
 void BoxesListKeysViewWidget::setSearchText(const QString &text) {
     mBoxesListWidget->getVisiblePartWidget()->setCurrentSearchText(text);
     mMainWindow->queScheduledTasksAndUpdate();
+}
+
+void BoxesListKeysViewWidget::setViewedFrameRange(
+        const FrameRange& range) {
+    mFrameRangeScrollBar->setViewedFrameRange(range);
+    mFrameScrollBar->setDisplayedFrameRange(range);
+    mKeysView->setFramesRange(range);
+}
+
+void BoxesListKeysViewWidget::setCanvasFrameRange(
+        const FrameRange& range) {
+    mFrameRangeScrollBar->setDisplayedFrameRange(range);
+    setViewedFrameRange(mFrameRangeScrollBar->getViewedRange());
+    mFrameRangeScrollBar->setCanvasFrameRange(range);
+    mFrameScrollBar->setCanvasFrameRange(range);
 }
