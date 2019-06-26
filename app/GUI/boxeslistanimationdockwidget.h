@@ -58,7 +58,6 @@ private:
 };
 
 class BoxesListAnimationDockWidget : public QWidget {
-    Q_OBJECT
 public:
     explicit BoxesListAnimationDockWidget(Document &document, MainWindow *parent);
     bool processKeyEvent(QKeyEvent *event);
@@ -77,9 +76,7 @@ public:
     void addNewBoxesListKeysViewWidget(int id = 0);
     void removeBoxesListKeysViewWidget(
             BoxesListKeysViewWidget *widget);
-signals:
-    void viewedVerticalRangeChanged(int, int);
-private slots:
+private:
     void setResolutionFractionText(QString text);
 
     void interruptPreview();

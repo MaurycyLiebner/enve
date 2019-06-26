@@ -204,10 +204,6 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(Document &document,
     connect(mKeysView, &KeysView::wheelEventSignal,
             mBoxesListScrollArea, &ScrollArea::callWheelEvent);
 
-    connect(mBoxesListAnimationDockWidget,
-            &BoxesListAnimationDockWidget::viewedVerticalRangeChanged,
-            mKeysView, &KeysView::setViewedVerticalRange);
-
     connect(sceneChooser, &SceneChooser::currentChanged,
             this, &BoxesListKeysViewWidget::setCurrentScene);
     sceneChooser->setCurrentScene(mDocument.fActiveScene);
@@ -267,8 +263,8 @@ void BoxesListKeysViewWidget::moveSlider(int val) {
         val -= diff;
         mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(val);
     }
-    emit mBoxesListAnimationDockWidget->viewedVerticalRangeChanged(
-                        val, val + mBoxesListScrollArea->height());
+    mKeysView->setViewedVerticalRange(
+                val, val + mBoxesListScrollArea->height());
 }
 
 void BoxesListKeysViewWidget::connectToChangeWidthWidget(
