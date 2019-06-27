@@ -40,7 +40,9 @@ void FrameScrollBar::paintEvent(QPaintEvent *) {
     p.fillRect(rect(), QColor(60, 60, 60));
 
     const int dFrame = mFrameRange.fMax - mFrameRange.fMin + (mRange ? 0 : 1);
+    if(dFrame <= 0) return;
     const qreal pixPerFrame = (width() - 2.*MIN_WIDGET_DIM)/dFrame;
+    if(pixPerFrame < 0 || isZero2Dec(pixPerFrame)) return;
 
     const int f0 = -qCeil(0.5*MIN_WIDGET_DIM/pixPerFrame);
     const int minFrame = mFrameRange.fMin + f0;

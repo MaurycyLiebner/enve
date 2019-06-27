@@ -138,7 +138,6 @@ TimelineWidget::TimelineWidget(Document &document,
     mBoxesListMenuBar->setSizePolicy(QSizePolicy::Minimum,
                                      QSizePolicy::Fixed);
 
-    mMenuLayout->addWidget(mBoxesListMenuBar);
 
     mMenuWidgetsLayout->addWidget(mSearchLine);
     mMenuWidgetsCont = new QWidget(this);
@@ -152,13 +151,17 @@ TimelineWidget::TimelineWidget(Document &document,
                 "}");
     mMenuWidgetsCont->setLayout(mMenuWidgetsLayout);
 
+    mMenuLayout->addWidget(mBoxesListMenuBar);
     mMenuLayout->addWidget(mMenuWidgetsCont);
     mMenuLayout->addWidget(mCornerMenuBar);
+
+    mMenuWidget = new QWidget(this);
+    mMenuWidget->setLayout(mMenuLayout);
 
     mBoxesListLayout = new QVBoxLayout();
     mBoxesListLayout->setSpacing(0);
     mBoxesListLayout->setMargin(0);
-    mBoxesListLayout->addLayout(mMenuLayout);
+    mBoxesListLayout->addWidget(mMenuWidget);
 
     mBoxesListScrollArea = new BoxScrollArea(this);
 
@@ -270,16 +273,7 @@ void TimelineWidget::moveSlider(int val) {
 }
 
 void TimelineWidget::setBoxesListWidth(const int width) {
-    const int sizeHintWidth = mBoxesListMenuBar->sizeHint().width();
-    const int cornerSizeHintWidth = mCornerMenuBar->sizeHint().width();
-    const int widthT = width - mCornerMenuBar->sizeHint().width();
-    if(widthT > sizeHintWidth + cornerSizeHintWidth) {
-        mBoxesListMenuBar->setFixedWidth(sizeHintWidth);
-        mMenuWidgetsCont->setFixedWidth(widthT - sizeHintWidth);
-    } else {
-        mMenuWidgetsCont->setFixedWidth(cornerSizeHintWidth);
-        mBoxesListMenuBar->setFixedWidth(widthT - cornerSizeHintWidth);
-    }
+    mMenuWidget->setFixedWidth(width);
     mBoxesListScrollArea->setFixedWidth(width);
 }
 

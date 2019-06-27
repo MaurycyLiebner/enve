@@ -4,8 +4,10 @@
 #include "boxeslistanimationdockwidget.h"
 #include "timelinewrapper.h"
 
-TimelineLayout::TimelineLayout(Document& document, ChangeWidthWidget * const chww,
-                               BoxesListAnimationDockWidget * const window) : QObject(window),
+TimelineLayout::TimelineLayout(Document& document,
+                               ChangeWidthWidget * const chww,
+                               BoxesListAnimationDockWidget * const window) :
+    QObject(window),
     mCollection(LayoutCollection::sCreator<TSceneBaseStackItem>()),
     mDocument(document), mWindow(window), mChww(chww) {
     connect(&mDocument, &Document::sceneCreated,

@@ -82,6 +82,7 @@ private:
     QHBoxLayout *mMenuLayout;
     QHBoxLayout *mMenuWidgetsLayout;
     QAction *mGraphAct = nullptr;
+    QWidget* mMenuWidget;
     QWidget *mMenuWidgetsCont;
     QMenuBar *mBoxesListMenuBar;
     QMenuBar *mCornerMenuBar;

@@ -22,10 +22,10 @@ TimelineWrapper::TimelineWrapper(Document * const document,
             const auto menu = new StackWrapperCornerMenu();
             menu->setTarget(toSetup);
             const auto newWidget = new TimelineWidget(*document, menu, toSetup);
+            toSetup->setCentralWidget(newWidget);
             connect(chww, &ChangeWidthWidget::widthSet,
                     newWidget, &TimelineWidget::setBoxesListWidth);
             newWidget->setBoxesListWidth(chww->getCurrentWidth());
-            toSetup->setCentralWidget(newWidget);
             //toSetup->setMenuBar(new CanvasWrapperMenuBar(*document, window));
 }, parent) {}
 

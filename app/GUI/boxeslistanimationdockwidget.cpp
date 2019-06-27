@@ -42,7 +42,7 @@ void ChangeWidthWidget::paintEvent(QPaintEvent *) {
 
 void ChangeWidthWidget::mouseMoveEvent(QMouseEvent *event) {
     int newWidth = mCurrentWidth + event->x() - mPressX;
-    mCurrentWidth = qMax(10*MIN_WIDGET_DIM, newWidth);
+    mCurrentWidth = clamp(newWidth, 10*MIN_WIDGET_DIM, 20*MIN_WIDGET_DIM);
     emit widthSet(mCurrentWidth);
     //mBoxesList->setFixedWidth(newWidth);
     updatePos();
