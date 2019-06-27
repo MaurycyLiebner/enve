@@ -64,6 +64,7 @@ SOURCES += main.cpp\
     GUI/canvaswindowwrapper.cpp \
     GUI/changewidthwidget.cpp \
     GUI/layoutcollection.cpp \
+    GUI/layouthandler.cpp \
     GUI/scenechooser.cpp \
     GUI/scenelayout.cpp \
     GUI/timelinelayout.cpp \
@@ -289,6 +290,7 @@ HEADERS  += \
     GUI/canvaswindowwrapper.h \
     GUI/changewidthwidget.h \
     GUI/layoutcollection.h \
+    GUI/layouthandler.h \
     GUI/scenechooser.h \
     GUI/scenelayout.h \
     GUI/timelinelayout.h \

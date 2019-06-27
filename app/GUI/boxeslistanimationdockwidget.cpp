@@ -15,12 +15,14 @@
 #include "global.h"
 #include "renderinstancesettings.h"
 #include "document.h"
-
+#include "layouthandler.h"
 #include "memoryhandler.h"
-BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
-                                                           MainWindow *parent) :
+
+BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
+        Document& document, LayoutHandler * const layoutH,
+        MainWindow *parent) :
     QWidget(parent), mDocument(document),
-    mTimelineLayout(new TimelineLayout(document, this)) {
+    mTimelineLayout(layoutH->timelineLayout()) {
     setFocusPolicy(Qt::NoFocus);
 
     mMainWindow = parent;

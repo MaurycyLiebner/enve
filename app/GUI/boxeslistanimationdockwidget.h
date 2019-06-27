@@ -28,10 +28,13 @@ class RenderWidget;
 class ActionButton;
 class Canvas;
 class Document;
+class LayoutHandler;
 
 class BoxesListAnimationDockWidget : public QWidget {
 public:
-    explicit BoxesListAnimationDockWidget(Document &document, MainWindow *parent);
+    explicit BoxesListAnimationDockWidget(Document &document,
+                                          LayoutHandler* const layoutH,
+                                          MainWindow *parent);
     bool processKeyEvent(QKeyEvent *event);
     void previewFinished();
     void previewBeingPlayed();

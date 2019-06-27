@@ -127,7 +127,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(mMemoryHandler, &MemoryHandler::allMemoryUsed,
             mCanvasWindow, &CanvasWindow::outOfMemory);
 
-    mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(mDocument, this);
+    mLayoutHandler = new LayoutHandler(mDocument);
+    mBoxesListAnimationDockWidget =
+            new BoxesListAnimationDockWidget(mDocument, mLayoutHandler, this);
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);
 
     mBrushSettingsDock = new QDockWidget(this);
@@ -218,8 +220,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    mCanvas = mCanvasWindow->getCurrentCanvas();
 //    mCurrentCanvasComboBox->addItem(mCanvas->getName());
 
-    mSceneLayout = new SceneLayout(mDocument, this);
-    setCentralWidget(mSceneLayout);
+    setCentralWidget(mLayoutHandler->sceneLayout());
 
     setupToolBar();
     setupStatusBar();
@@ -716,60 +717,7 @@ void MainWindow::setupToolBar() {
             setObjectName("inactiveToolButton");
     //mToolBar->addSeparator();
 
-    const auto canvasComboWidget = new QWidget(this);
-    canvasComboWidget->setAttribute(Qt::WA_TranslucentBackground);
-    const auto canvasComboLayout = new QHBoxLayout();
-    canvasComboLayout->setSpacing(0);
-    canvasComboWidget->setLayout(canvasComboLayout);
-    const auto layCombo = new QComboBox(mToolBar);
-    layCombo->setMinimumContentsLength(20);
-    layCombo->setObjectName("currentLayoutComboBox");
-    layCombo->setLayoutDirection(Qt::RightToLeft);
-    const int comboDim = layCombo->sizeHint().height();
-    const auto newLayPush = new QPushButton("+", mToolBar);
-    newLayPush->setObjectName("addCanvasButton");
-
-    const auto removeLayPush = new QPushButton("x", mToolBar);
-    removeLayPush->setObjectName("removeCanvasButton");
-
-    canvasComboLayout->addWidget(layCombo);
-    canvasComboLayout->addWidget(newLayPush);
-    canvasComboLayout->addWidget(removeLayPush);
-    newLayPush->setFixedSize(comboDim, comboDim);
-    removeLayPush->setFixedSize(comboDim, comboDim);
-
-    connect(mSceneLayout, &SceneLayout::removed,
-            this, [layCombo](const int id) {
-        layCombo->removeItem(id);
-    });
-
-    connect(mSceneLayout, &SceneLayout::created,
-            this, [layCombo](const int id, const QString& name) {
-        layCombo->insertItem(id, name);
-        layCombo->setCurrentIndex(id);
-    });
-
-    connect(mSceneLayout, &SceneLayout::renamed,
-            this, [layCombo](const int id, const QString& name) {
-        layCombo->setItemText(id, name);
-    });
-
-    connect(newLayPush, &QPushButton::pressed,
-            mSceneLayout, &SceneLayout::newEmpty);
-    connect(removeLayPush, &QPushButton::pressed,
-            mSceneLayout, &SceneLayout::removeCurrent);
-    connect(mSceneLayout, &SceneLayout::currentSet,
-            layCombo, &QComboBox::setCurrentIndex);
-
-    connect(layCombo, &QComboBox::editTextChanged,
-            mSceneLayout, &SceneLayout::setCurrentName);
-    connect(layCombo, qOverload<int>(&QComboBox::currentIndexChanged),
-            mSceneLayout, &SceneLayout::setCurrent);
-    const auto timelineLay = mBoxesListAnimationDockWidget->getTimelineLayout();
-    connect(layCombo, qOverload<int>(&QComboBox::currentIndexChanged),
-            timelineLay, &TimelineLayout::setCurrent);
-
-    mToolBar->addWidget(canvasComboWidget);
+    mToolBar->addWidget(mLayoutHandler->comboWidget());
 
     addToolBar(mToolBar);
 
@@ -1108,7 +1056,7 @@ void MainWindow::clearAll() {
     mCanvasWindow->clearAll();
     mFillStrokeSettings->clearAll();
     mDocument.clear();
-    mSceneLayout->clear();
+    mLayoutHandler->clear();
 //    for(ClipboardContainer *cont : mClipboardContainers) {
 //        delete cont;
 //    }

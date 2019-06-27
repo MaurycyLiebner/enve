@@ -12,7 +12,7 @@
 #include "effectsloader.h"
 #include "document.h"
 #include "actions.h"
-#include "scenelayout.h"
+#include "layouthandler.h"
 class VideoEncoder;
 enum ClipboardContainerType : short;
 
@@ -314,7 +314,7 @@ private:
     TaskScheduler mTaskScheduler;
     Document mDocument;
     Actions mActions;
-    SceneLayout *mSceneLayout = nullptr;
+    LayoutHandler *mLayoutHandler = nullptr;
     CanvasWindow *mCanvasWindow;
     EffectsLoader *mEffectsLoader;
     stdptr<UndoRedoStack> mCurrentUndoRedoStack;

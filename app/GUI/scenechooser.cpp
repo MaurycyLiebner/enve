@@ -5,7 +5,6 @@
 SceneChooser::SceneChooser(Document& document, const bool active,
                            QWidget* const parent) :
     QMenu("none", parent), mDocument(document) {
-    setDisabled(true);
     if(active) {
         const auto active = addAction("Active");
         active->setCheckable(true);
@@ -29,11 +28,13 @@ SceneChooser::SceneChooser(Document& document, const bool active,
             this, &SceneChooser::removeScene);
     connect(&mDocument, &Document::sceneCreated,
             this, &SceneChooser::addScene);
+
+    if(isEmpty()) setDisabled(true);
 }
 
 void SceneChooser::addScene(Canvas * const scene) {
     if(!scene) return;
-    if(mSceneToAct.empty()) setEnabled(true);
+    if(isEmpty()) setEnabled(true);
     const auto act = addAction(scene->getName());
     act->setCheckable(true);
     connect(act, &QAction::triggered, this,
@@ -58,7 +59,7 @@ void SceneChooser::removeScene(Canvas * const scene) {
     removeAction(removeIt->second);
     delete removeIt->second;
     mSceneToAct.erase(removeIt);
-    if(mSceneToAct.empty()) setDisabled(true);
+    if(isEmpty()) setDisabled(true);
 }
 
 void SceneChooser::setCurrentScene(Canvas * const scene) {
