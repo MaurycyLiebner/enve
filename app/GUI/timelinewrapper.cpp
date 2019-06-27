@@ -3,7 +3,6 @@
 #include "boxeslistanimationdockwidget.h"
 
 TimelineWrapper::TimelineWrapper(Document * const document,
-                                 ChangeWidthWidget * const chww,
                                  TWidgetStackLayoutItem* const layItem,
                                  QWidget * const parent) :
     StackWidgetWrapper(
@@ -12,20 +11,17 @@ TimelineWrapper::TimelineWrapper(Document * const document,
             const auto rPtr = new TWidgetStackLayoutItem;
             return std::unique_ptr<WidgetStackLayoutItem>(rPtr);
         },
-        [document, chww](WidgetStackLayoutItem* const layItem,
+        [document](WidgetStackLayoutItem* const layItem,
                    QWidget * const parent) {
             const auto tLayItem = static_cast<TWidgetStackLayoutItem*>(layItem);
-            const auto derived = new TimelineWrapper(document, chww, tLayItem, parent);
+            const auto derived = new TimelineWrapper(document, tLayItem, parent);
             return static_cast<StackWidgetWrapper*>(derived);
         },
-        [document, chww](StackWidgetWrapper * toSetup) {
+        [document](StackWidgetWrapper * toSetup) {
             const auto menu = new StackWrapperCornerMenu();
             menu->setTarget(toSetup);
             const auto newWidget = new TimelineWidget(*document, menu, toSetup);
             toSetup->setCentralWidget(newWidget);
-            connect(chww, &ChangeWidthWidget::widthSet,
-                    newWidget, &TimelineWidget::setBoxesListWidth);
-            newWidget->setBoxesListWidth(chww->getCurrentWidth());
             //toSetup->setMenuBar(new CanvasWrapperMenuBar(*document, window));
 }, parent) {}
 

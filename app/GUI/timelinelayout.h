@@ -5,11 +5,11 @@ class TimelineWrapper;
 class ChangeWidthWidget;
 class BoxesListAnimationDockWidget;
 
-class TimelineLayout : public QObject {
+class TimelineLayout : public QWidget {
     Q_OBJECT
 public:
-    TimelineLayout(Document& document, ChangeWidthWidget* const chww,
-                   BoxesListAnimationDockWidget* const window);
+    TimelineLayout(Document& document,
+                   QWidget * const parent);
 
     void setCurrent(const int id);
     void remove(const int id);
@@ -71,7 +71,6 @@ private:
     LayoutCollection mCollection;
 
     Document& mDocument;
-    BoxesListAnimationDockWidget* const mWindow;
     ChangeWidthWidget *mChww;
     BaseStackItem::UPtr mBaseStack;
 };

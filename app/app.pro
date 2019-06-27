@@ -62,6 +62,7 @@ SOURCES += main.cpp\
     GUI/Timeline/fixedlenanimationrect.cpp \
     GUI/canvaswindowevents.cpp \
     GUI/canvaswindowwrapper.cpp \
+    GUI/changewidthwidget.cpp \
     GUI/layoutcollection.cpp \
     GUI/scenechooser.cpp \
     GUI/scenelayout.cpp \
@@ -286,6 +287,7 @@ HEADERS  += \
     GUI/Timeline/durationrectangle.h \
     GUI/Timeline/fixedlenanimationrect.h \
     GUI/canvaswindowwrapper.h \
+    GUI/changewidthwidget.h \
     GUI/layoutcollection.h \
     GUI/scenechooser.h \
     GUI/scenelayout.h \

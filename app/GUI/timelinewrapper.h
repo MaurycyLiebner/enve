@@ -11,7 +11,6 @@ struct TWidgetStackLayoutItem : public SceneWidgetStackLayoutItem {
 class TimelineWrapper : public StackWidgetWrapper {
 public:
     TimelineWrapper(Document * const document,
-                    ChangeWidthWidget * const chww,
                     TWidgetStackLayoutItem * const layItem,
                     QWidget * const parent = nullptr);
 

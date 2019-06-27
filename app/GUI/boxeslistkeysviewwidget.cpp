@@ -13,6 +13,7 @@
 #include "global.h"
 #include "canvas.h"
 #include "scenechooser.h"
+#include "changewidthwidget.h"
 #include <QToolButton>
 
 TimelineWidget::TimelineWidget(Document &document,
@@ -236,6 +237,15 @@ TimelineWidget::TimelineWidget(Document &document,
             this, &TimelineWidget::setViewedFrameRange);
     mKeysViewLayout->addWidget(mFrameRangeScrollBar);
     mSceneChooser->setCurrentScene(mDocument.fActiveScene);
+
+
+    const auto chww = new ChangeWidthWidget(this);
+    chww->show();
+    chww->updatePos();
+    chww->raise();
+    connect(chww, &ChangeWidthWidget::widthSet,
+            this, &TimelineWidget::setBoxesListWidth);
+    setBoxesListWidth(chww->getCurrentWidth());
 }
 
 void TimelineWidget::setCurrentScene(Canvas * const scene) {

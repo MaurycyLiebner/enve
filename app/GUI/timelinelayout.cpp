@@ -5,11 +5,14 @@
 #include "timelinewrapper.h"
 
 TimelineLayout::TimelineLayout(Document& document,
-                               ChangeWidthWidget * const chww,
-                               BoxesListAnimationDockWidget * const window) :
-    QObject(window),
+                               QWidget * const parent) :
+    QWidget(parent),
     mCollection(LayoutCollection::sCreator<TSceneBaseStackItem>()),
-    mDocument(document), mWindow(window), mChww(chww) {
+    mDocument(document) {
+    setLayout(new QVBoxLayout);
+    layout()->setSpacing(0);
+    layout()->setMargin(0);
+
     connect(&mDocument, &Document::sceneCreated,
             this, &TimelineLayout::newForScene);
     connect(&mDocument, qOverload<Canvas*>(&Document::sceneRemoved),
@@ -40,7 +43,7 @@ void TSaveAllChildrenLayoutsData(QWidget* const parent) {
 
 void TimelineLayout::reset(TimelineWrapper** const cwwP) {
     if(mCurrentId != -1) {
-        TSaveAllChildrenLayoutsData(mWindow->centralWidget());
+        TSaveAllChildrenLayoutsData(this);
         mCollection.replaceCustomLayout(mCurrentId, std::move(mBaseStack));
     }
     mCurrentId = -1;
@@ -48,10 +51,10 @@ void TimelineLayout::reset(TimelineWrapper** const cwwP) {
     mBaseStack = std::make_unique<TSceneBaseStackItem>();
     const auto cwwItem = static_cast<TWidgetStackLayoutItem*>(
                 mBaseStack->getChild());
-    const auto cww = new TimelineWrapper(&mDocument, mChww, cwwItem);
+    const auto cww = new TimelineWrapper(&mDocument, cwwItem);
     cww->disableClose();
     if(cwwP) *cwwP = cww;
-    else mWindow->setCentralWidget(cww);
+    else layout()->addWidget(cww);
 }
 
 void TimelineLayout::setCurrent(const int id) {
@@ -66,7 +69,7 @@ void TimelineLayout::setCurrent(const int id) {
     QWidget* mainW = cwwP;
     while(mainW->parentWidget())
         mainW = mainW->parentWidget();
-    mWindow->setCentralWidget(mainW);
+    layout()->addWidget(mainW);
     mCurrentId = id;
     mBaseStack->setName(stack->getName());
     if(!mCollection.isCustom(id)) {

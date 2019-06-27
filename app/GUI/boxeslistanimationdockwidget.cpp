@@ -16,66 +16,11 @@
 #include "renderinstancesettings.h"
 #include "document.h"
 
-ChangeWidthWidget::ChangeWidthWidget(QWidget *parent) :
-    QWidget(parent) {
-    setFixedWidth(10);
-    setFixedHeight(4000);
-    setCursor(Qt::SplitHCursor);
-    setWindowFlags(Qt::WindowStaysOnTopHint);
-}
-
-void ChangeWidthWidget::updatePos() {
-    move(mCurrentWidth - 5, 0);
-}
-
-void ChangeWidthWidget::paintEvent(QPaintEvent *) {
-    QPainter p(this);
-    if(mPressed) {
-        p.fillRect(rect().adjusted(3, 0, -4, 0), Qt::black);
-    } else if(mHover) {
-        p.fillRect(rect().adjusted(4, 0, -4, 0), Qt::black);
-    } else {
-        p.fillRect(rect().adjusted(5, 0, -4, 0), Qt::black);
-    }
-    p.end();
-}
-
-void ChangeWidthWidget::mouseMoveEvent(QMouseEvent *event) {
-    int newWidth = mCurrentWidth + event->x() - mPressX;
-    mCurrentWidth = clamp(newWidth, 10*MIN_WIDGET_DIM, 20*MIN_WIDGET_DIM);
-    emit widthSet(mCurrentWidth);
-    //mBoxesList->setFixedWidth(newWidth);
-    updatePos();
-}
-
-void ChangeWidthWidget::mousePressEvent(QMouseEvent *event) {
-    mPressed = true;
-    mPressX = event->x();
-    update();
-}
-
-void ChangeWidthWidget::mouseReleaseEvent(QMouseEvent *) {
-    mPressed = false;
-    update();
-}
-
-void ChangeWidthWidget::enterEvent(QEvent *) {
-    mHover = true;
-    update();
-}
-
-void ChangeWidthWidget::leaveEvent(QEvent *) {
-    mHover = false;
-    update();
-}
-
 #include "memoryhandler.h"
 BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
                                                            MainWindow *parent) :
     QWidget(parent), mDocument(document),
-    mChww(new ChangeWidthWidget),
-    mTimelineWLayout(new QVBoxLayout),
-    mTimelineLayout(document, mChww, this) {
+    mTimelineLayout(new TimelineLayout(document, this)) {
     setFocusPolicy(Qt::NoFocus);
 
     mMainWindow = parent;
@@ -84,9 +29,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
     setLayout(mMainLayout);
     mMainLayout->setSpacing(0);
     mMainLayout->setMargin(0);
-
-    mTimelineWLayout->setSpacing(0);
-    mTimelineWLayout->setMargin(0);
 
 //    mAnimationDockWidget = new AnimationDockWidget(mBoxesListWidget,
 //                                                   mKeysView);
@@ -182,12 +124,10 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(Document& document,
 
     mMainLayout->addWidget(mToolBar);
 
-    mTimelineWidget = new QWidget(this);
     mRenderWidget = new RenderWidget(this);
     connect(mRenderWidget, &RenderWidget::renderFromSettings,
             mMainWindow->getCanvasWindow(), &CanvasWindow::renderFromSettings);
-    mTimelineWidget->setLayout(mTimelineWLayout);
-    mMainLayout->addWidget(mTimelineWidget);
+    mMainLayout->addWidget(mTimelineLayout);
     mMainLayout->addWidget(mRenderWidget);
     mRenderWidget->hide();
 
@@ -310,7 +250,7 @@ void BoxesListAnimationDockWidget::setTimelineMode() {
     mRenderAction->setDisabled(false);
 
     mRenderAction->setChecked(false);
-    mTimelineWidget->show();
+    mTimelineLayout->show();
     mRenderWidget->hide();
 }
 
@@ -320,7 +260,7 @@ void BoxesListAnimationDockWidget::setRenderMode() {
 
     mTimelineAction->setChecked(false);
     mRenderWidget->show();
-    mTimelineWidget->hide();
+    mTimelineLayout->hide();
 }
 
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(

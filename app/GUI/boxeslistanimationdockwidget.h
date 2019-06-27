@@ -29,35 +29,6 @@ class ActionButton;
 class Canvas;
 class Document;
 
-class ChangeWidthWidget : public QWidget {
-    Q_OBJECT
-public:
-    ChangeWidthWidget(QWidget *parent = nullptr);
-
-    void updatePos();
-
-    void paintEvent(QPaintEvent *);
-
-    void mouseMoveEvent(QMouseEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *);
-
-    void enterEvent(QEvent *);
-
-    void leaveEvent(QEvent *);
-    int getCurrentWidth() {
-        return mCurrentWidth;
-    }
-
-signals:
-    void widthSet(int);
-private:
-    bool mHover = false;
-    bool mPressed = false;
-    int mCurrentWidth = 400;
-    int mPressX;
-};
-
 class BoxesListAnimationDockWidget : public QWidget {
 public:
     explicit BoxesListAnimationDockWidget(Document &document, MainWindow *parent);
@@ -71,21 +42,6 @@ public:
     void clearAll();
 
     RenderWidget *getRenderWidget();
-
-    void setCentralWidget(QWidget* const wid) {
-        if(wid) mTimelineWLayout->addWidget(wid);
-        mCentralWidget = wid;
-        mChww->setParent(wid);
-        if(wid) {
-            mChww->updatePos();
-            mChww->show();
-            mChww->raise();
-        }
-    }
-
-    QWidget* centralWidget() {
-        return mCentralWidget;
-    }
 private:
     void setResolutionFractionText(QString text);
 
@@ -102,15 +58,12 @@ private:
 private:
     Document& mDocument;
 
-    ChangeWidthWidget *mChww;
-    QVBoxLayout *mTimelineWLayout;
-    TimelineLayout mTimelineLayout;
+    TimelineLayout* mTimelineLayout;
 
     QWidget* mCentralWidget = nullptr;
 
     QToolBar *mToolBar;
 
-    QWidget *mTimelineWidget;
     QVBoxLayout *mMainLayout;
 
     QLabel *mControlButtonsWidget;
