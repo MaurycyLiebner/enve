@@ -25,7 +25,6 @@ public:
     FrameRange getViewedRange() const;
     int getFirstViewedFrame() const;
     int getLastViewedFrame() const;
-    void setTopBorderVisible(const bool bT);
 
     void setHandleColor(const QColor &col) {
         mHandleColor = col;
@@ -46,7 +45,6 @@ protected:
 signals:
     void viewedFrameRangeChanged(FrameRange);
 private:
-    bool mTopBorderVisible = true;
     bool mClamp;
     bool mDisplayTime = false;
     bool mRange;

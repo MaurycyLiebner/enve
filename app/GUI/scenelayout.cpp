@@ -2,9 +2,13 @@
 #include "document.h"
 
 SceneLayout::SceneLayout(Document& document,
-                         QMainWindow* const window) : QObject(window),
+                         QWidget * const parent) : QWidget(parent),
     mCollection(LayoutCollection::sCreator<CWSceneBaseStackItem>()),
-    mDocument(document), mWindow(window) {
+    mDocument(document) {
+    setLayout(new QHBoxLayout);
+    layout()->setMargin(0);
+    layout()->setSpacing(0);
+
     connect(&mDocument, &Document::sceneCreated,
             this, &SceneLayout::newForScene);
     connect(&mDocument, qOverload<Canvas*>(&Document::sceneRemoved),
@@ -35,7 +39,7 @@ void saveAllChildrenLayoutsData(QWidget* const parent) {
 
 void SceneLayout::reset(CanvasWindowWrapper** const cwwP) {
     if(mCurrentId != -1) {
-        saveAllChildrenLayoutsData(mWindow->centralWidget());
+        saveAllChildrenLayoutsData(this);
         mCollection.replaceCustomLayout(mCurrentId, std::move(mBaseStack));
     }
     mCurrentId = -1;
@@ -46,7 +50,7 @@ void SceneLayout::reset(CanvasWindowWrapper** const cwwP) {
     const auto cww = new CanvasWindowWrapper(&mDocument, cwwItem);
     cww->disableClose();
     if(cwwP) *cwwP = cww;
-    else mWindow->setCentralWidget(cww);
+    else setWidget(cww);
 }
 
 void SceneLayout::setCurrent(const int id) {
@@ -61,7 +65,7 @@ void SceneLayout::setCurrent(const int id) {
     QWidget* mainW = cwwP;
     while(mainW->parentWidget())
         mainW = mainW->parentWidget();
-    mWindow->setCentralWidget(mainW);
+    setWidget(mainW);
     mCurrentId = id;
     mBaseStack->setName(stack->getName());
     if(!mCollection.isCustom(id)) {
@@ -138,6 +142,16 @@ void SceneLayout::removeForScene(Canvas * const scene) {
 void SceneLayout::setCurrentName(const QString &name) {
     if(mCurrentId >= mCollection.customCount()) return;
     setName(mCurrentId, name);
+}
+
+void SceneLayout::setWidget(QWidget * const wid) {
+    while(layout()->count() > 0) {
+        const auto item = layout()->takeAt(0);
+        delete item->widget();
+        delete item->layout();
+        delete item;
+    }
+    layout()->addWidget(wid);
 }
 
 void SceneLayout::sceneNameChanged(Canvas * const scene) {

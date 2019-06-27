@@ -50,7 +50,7 @@ bool gReplaceWidget(QWidget * const from, QWidget * const to,
     } else if(hStack) { // hStack
         hStack->replaceWidget(from, to);
     } else return false;
-    if(centralWid) *centralWid = window;
+    if(centralWid) *centralWid = window || layout;
     to->resize(size.width(), size.height());
     return true;
 }

@@ -3,10 +3,10 @@
 #include <QMainWindow>
 #include "layoutcollection.h"
 
-class SceneLayout : public QObject {
+class SceneLayout : public QWidget {
     Q_OBJECT
 public:
-    SceneLayout(Document& document, QMainWindow* const window);
+    SceneLayout(Document& document, QWidget* const parent);
 
     void setCurrent(const int id);
     void remove(const int id);
@@ -66,6 +66,8 @@ signals:
     void renamed(int, QString);
     void currentSet(int);
 private:
+    void setWidget(QWidget * const wid);
+
     void setName(const int id, const QString& name);
 
     void sceneNameChanged(Canvas* const scene);
@@ -77,7 +79,6 @@ private:
     LayoutCollection mCollection;
 
     Document& mDocument;
-    QMainWindow* const mWindow;
     BaseStackItem::UPtr mBaseStack;
 };
 

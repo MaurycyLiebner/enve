@@ -14,27 +14,8 @@ class CanvasWrapperMenuBar : public StackWrapperMenu {
 public:
     CanvasWrapperMenuBar(Document& document, CanvasWindow * const window) :
         mDocument(document), mWindow(window) {
-        addAction("+", this, [this]() {
-            const QString defName = "Scene " +
-                    QString::number(mDocument.fScenes.count());
-
-            const auto dialog = new CanvasSettingsDialog(defName, mWindow);
-            connect(dialog, &QDialog::accepted, this, [this, dialog]() {
-                const auto newScene = mDocument.createNewScene();
-                dialog->applySettingsToCanvas(newScene);
-                dialog->close();
-                setCurrentScene(newScene);
-                mWindow->KFT_setFocus();
-            });
-
-            dialog->show();
-        });
         mSceneMenu = new SceneChooser(mDocument, false, this);
         addMenu(mSceneMenu);
-        addAction("x", this, [this]() {
-            if(!mCurrentScene) return;
-            mDocument.removeScene(GetAsSPtr(mCurrentScene, Canvas));
-        });
         connect(mSceneMenu, &SceneChooser::currentChanged,
                 this, &CanvasWrapperMenuBar::setCurrentScene);
     }

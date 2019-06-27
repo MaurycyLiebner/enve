@@ -36,6 +36,8 @@
 #include "Animators/gradient.h"
 #include "canvaswindowwrapper.h"
 #include "scenelayout.h"
+#include "GUI/GradientWidgets/gradientwidget.h"
+#include "GUI/newcanvasdialog.h"
 extern "C" {
     #include <libavformat/avformat.h>
 }
@@ -217,6 +219,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    mCurrentCanvasComboBox->addItem(mCanvas->getName());
 
     mSceneLayout = new SceneLayout(mDocument, this);
+    setCentralWidget(mSceneLayout);
 
     setupToolBar();
     setupStatusBar();
@@ -408,6 +411,11 @@ void MainWindow::setupMenuBar() {
 
 //    mEffectsMenu->addAction("Blur");
 
+    mSceneMenu = mMenuBar->addMenu("Scene");
+    mSceneMenu->addAction("New scene...", this, [this]() {
+        CanvasSettingsDialog::sNewCanvasDialog(mDocument, this);
+    });
+
     mViewMenu = mMenuBar->addMenu("View");
 
     const auto filteringMenu = mViewMenu->addMenu("Filtering");
@@ -563,6 +571,7 @@ ClipboardContainer *MainWindow::getClipboardContainer(
 #include <QSpacerItem>
 void MainWindow::setupStatusBar() {
     mStatusBar = new QStatusBar(this);
+    mStatusBar->setStyleSheet("QStatusBar { border-top: 1px solid black; }");
     setStatusBar(mStatusBar);
     mUsageWidget = new UsageWidget(mStatusBar);
     mStatusBar->addWidget(mUsageWidget);
@@ -735,10 +744,9 @@ void MainWindow::setupToolBar() {
     });
 
     connect(mSceneLayout, &SceneLayout::created,
-            this, [this, layCombo](const int id, const QString& name) {
+            this, [layCombo](const int id, const QString& name) {
         layCombo->insertItem(id, name);
-        if(!mSceneLayout->isCurrentCustom())
-            layCombo->setCurrentIndex(id);
+        layCombo->setCurrentIndex(id);
     });
 
     connect(mSceneLayout, &SceneLayout::renamed,
@@ -986,8 +994,6 @@ int MainWindow::getCurrentFrame() {
 int MainWindow::getFrameCount() {
     return mCanvasWindow->getMaxFrame();
 }
-#include "GUI/GradientWidgets/gradientwidget.h"
-#include "GUI/newcanvasdialog.h"
 
 void MainWindow::newFile() {
     if(askForSaving()) {

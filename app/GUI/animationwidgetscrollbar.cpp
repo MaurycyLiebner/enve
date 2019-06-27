@@ -5,11 +5,11 @@
 #include "colorhelpers.h"
 
 FrameScrollBar::FrameScrollBar(const int minSpan,
-                                                   const int maxSpan,
-                                                   const int height,
-                                                   const bool range,
-                                                   const bool clamp,
-                                                   QWidget *parent) :
+                               const int maxSpan,
+                               const int height,
+                               const bool range,
+                               const bool clamp,
+                               QWidget *parent) :
     QWidget(parent) {
     mMinSpan = minSpan;
     mMaxSpan = maxSpan;
@@ -25,10 +25,6 @@ qreal FrameScrollBar::posToFrame(int xPos) {
     return (xPos - MIN_WIDGET_DIM/2)*
             (mFrameRange.fMax - mFrameRange.fMin + (mRange ? 0 : 1) ) /
             (qreal(width()) - 2*MIN_WIDGET_DIM) + mFrameRange.fMin;
-}
-
-void FrameScrollBar::setTopBorderVisible(const bool bT) {
-    mTopBorderVisible = bT;
 }
 
 void FrameScrollBar::setCurrentCanvas(Canvas * const canvas) {
@@ -142,8 +138,8 @@ void FrameScrollBar::paintEvent(QPaintEvent *) {
     }
 
     p.setPen(QPen(Qt::black, 1));
-    p.drawLine(0, height() - 1, width(), height() - 1);
-    if(mTopBorderVisible) p.drawLine(0, 0, width(), 0);
+    if(mRange) p.drawLine(0, 0, width(), 0);
+    else p.drawLine(0, height() - 1, width(), height() - 1);
 
     p.end();
 }

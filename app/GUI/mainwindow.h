@@ -306,6 +306,7 @@ private:
     QMenu *mObjectMenu;
     QMenu *mPathMenu;
     QMenu *mEffectsMenu;
+    QMenu *mSceneMenu;
     QMenu *mViewMenu;
     QMenu *mPanelsMenu;
     QMenu *mRenderMenu;
