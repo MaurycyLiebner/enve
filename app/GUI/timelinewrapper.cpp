@@ -18,11 +18,10 @@ TimelineWrapper::TimelineWrapper(Document * const document,
             return static_cast<StackWidgetWrapper*>(derived);
         },
         [document](StackWidgetWrapper * toSetup) {
-            const auto menu = new StackWrapperCornerMenu();
-            menu->setTarget(toSetup);
-            const auto newWidget = new TimelineWidget(*document, menu, toSetup);
+            const auto newWidget = new TimelineWidget(*document,
+                                                      toSetup->getCornerMenu(),
+                                                      toSetup);
             toSetup->setCentralWidget(newWidget);
-            //toSetup->setMenuBar(new CanvasWrapperMenuBar(*document, window));
 }, parent) {}
 
 void TimelineWrapper::setScene(Canvas * const scene) {

@@ -60,6 +60,8 @@ signals:
     void renamed(int, QString);
     void currentSet(int);
 private:
+    void setWidget(QWidget* const wid);
+
     void setName(const int id, const QString& name);
 
     void sceneNameChanged(Canvas* const scene);

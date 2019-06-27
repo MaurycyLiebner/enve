@@ -9,7 +9,7 @@ TimelineLayout::TimelineLayout(Document& document,
     QWidget(parent),
     mCollection(LayoutCollection::sCreator<TSceneBaseStackItem>()),
     mDocument(document) {
-    setLayout(new QVBoxLayout);
+    setLayout(new QHBoxLayout);
     layout()->setSpacing(0);
     layout()->setMargin(0);
 
@@ -54,7 +54,7 @@ void TimelineLayout::reset(TimelineWrapper** const cwwP) {
     const auto cww = new TimelineWrapper(&mDocument, cwwItem);
     cww->disableClose();
     if(cwwP) *cwwP = cww;
-    else layout()->addWidget(cww);
+    else setWidget(cww);
 }
 
 void TimelineLayout::setCurrent(const int id) {
@@ -69,7 +69,7 @@ void TimelineLayout::setCurrent(const int id) {
     QWidget* mainW = cwwP;
     while(mainW->parentWidget())
         mainW = mainW->parentWidget();
-    layout()->addWidget(mainW);
+    setWidget(mainW);
     mCurrentId = id;
     mBaseStack->setName(stack->getName());
     if(!mCollection.isCustom(id)) {
@@ -157,6 +157,16 @@ void TimelineLayout::read(QIODevice * const src) {
         const int id = mCollection.addCustomLayout(std::move(newL));
         emit created(id, name);
     }
+}
+
+void TimelineLayout::setWidget(QWidget * const wid) {
+    while(layout()->count() > 0) {
+        const auto item = layout()->takeAt(0);
+        delete item->widget();
+        delete item->layout();
+        delete item;
+    }
+    layout()->addWidget(wid);
 }
 
 void TimelineLayout::sceneNameChanged(Canvas * const scene) {

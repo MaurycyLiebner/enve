@@ -42,6 +42,9 @@ public:
     void clearAll();
 
     RenderWidget *getRenderWidget();
+    TimelineLayout* getTimelineLayout() {
+        return mTimelineLayout;
+    }
 private:
     void setResolutionFractionText(QString text);
 

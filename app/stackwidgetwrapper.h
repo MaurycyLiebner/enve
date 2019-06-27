@@ -12,9 +12,7 @@ class StackWidgetWrapper;
 
 class StackWrapperCornerMenu : public QMenuBar {
 public:
-    StackWrapperCornerMenu();
-
-    void setTarget(StackWidgetWrapper * const target);
+    StackWrapperCornerMenu(StackWidgetWrapper* const target);
 
     void disableClose() {
         mClose->setVisible(false);
@@ -35,17 +33,6 @@ class StackWrapperMenu : public QMenuBar {
     friend class StackWidgetWrapper;
 protected:
     explicit StackWrapperMenu();
-private:
-    void setTarget(StackWidgetWrapper * const target);
-    void disableClose() {
-        mCornerMenu->disableClose();
-    }
-
-    void enableClose() {
-        mCornerMenu->enableClose();
-    }
-
-    StackWrapperCornerMenu* mCornerMenu;
 };
 
 struct WidgetStackLayoutItem;
@@ -59,6 +46,10 @@ public:
                                 const LayoutItemCreator& layoutItemCreator,
                                 const Creator& creator, const SetupOp& setup,
                                 QWidget* const parent = nullptr);
+
+    StackWrapperCornerMenu* getCornerMenu() {
+        return mCornerMenu;
+    }
 
     StackWrapperMenu* getMenuBar() const { return mMenuBar; }
     QWidget* getCentralWidget() const { return mCenterWidget; }
@@ -80,6 +71,7 @@ private:
     StackWidgetWrapper* split(
             WidgetStackLayoutItem* const otherLayoutItem);
 
+    StackWrapperCornerMenu* mCornerMenu;
     WidgetStackLayoutItem* const mLayoutItem;
     const LayoutItemCreator mLayoutItemCreator;
     const Creator mCreator;
@@ -92,7 +84,7 @@ private:
 template <class T>
 StackWidgetWrapper* StackWidgetWrapper::split(
         WidgetStackLayoutItem * const otherLayoutItem) {
-    if(mMenuBar) mMenuBar->enableClose();
+    mCornerMenu->enableClose();
     const auto stack = new T(parentWidget());
     gReplaceWidget(this, stack);
     stack->appendWidget(this);

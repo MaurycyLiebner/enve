@@ -757,11 +757,15 @@ void MainWindow::setupToolBar() {
             mSceneLayout, &SceneLayout::setCurrentName);
     connect(layCombo, qOverload<int>(&QComboBox::currentIndexChanged),
             mSceneLayout, &SceneLayout::setCurrent);
-
+    const auto timelineLay = mBoxesListAnimationDockWidget->getTimelineLayout();
+    connect(layCombo, qOverload<int>(&QComboBox::currentIndexChanged),
+            timelineLay, &TimelineLayout::setCurrent);
 
     mToolBar->addWidget(canvasComboWidget);
 
     addToolBar(mToolBar);
+
+    mDocument.setCanvasMode(CanvasMode::MOVE_BOX);
 }
 
 void MainWindow::connectToolBarActions() {

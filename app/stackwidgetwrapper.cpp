@@ -9,6 +9,7 @@ StackWidgetWrapper::StackWidgetWrapper(WidgetStackLayoutItem* const layoutItem,
     QWidget(parent), mLayoutItem(layoutItem),
     mLayoutItemCreator(layoutItemCreator),
     mCreator(creator), mSetupOp(setup) {
+    mCornerMenu = new StackWrapperCornerMenu(this);
     mLayout = new QVBoxLayout(this);
     setLayout(mLayout);
     mLayout->setSpacing(0);
@@ -19,8 +20,8 @@ StackWidgetWrapper::StackWidgetWrapper(WidgetStackLayoutItem* const layoutItem,
 void StackWidgetWrapper::setMenuBar(StackWrapperMenu * const menu) {
     if(mMenuBar) delete mMenuBar;
     mMenuBar = menu;
+    mMenuBar->setCornerWidget(mCornerMenu);
     mLayout->insertWidget(0, mMenuBar);
-    menu->setTarget(this);
 }
 
 void StackWidgetWrapper::setCentralWidget(QWidget * const widget) {
@@ -79,19 +80,12 @@ void StackWidgetWrapper::closeWrapper() {
 }
 
 void StackWidgetWrapper::disableClose() {
-    if(mMenuBar) mMenuBar->disableClose();
+    mCornerMenu->disableClose();
 }
 
 StackWrapperMenu::StackWrapperMenu() {
     setFixedHeight(MIN_WIDGET_DIM);
     setStyleSheet("QMenuBar { border-bottom: 1px solid black; }");
-
-    mCornerMenu = new StackWrapperCornerMenu();
-    setCornerWidget(mCornerMenu);
-}
-
-void StackWrapperMenu::setTarget(StackWidgetWrapper * const target) {
-    mCornerMenu->setTarget(target);
 }
 
 template<class SplitItemClass>
@@ -135,27 +129,17 @@ void ParentStackLayoutItem::sWriteChild(
     child->write(dst);
 }
 
-StackWrapperCornerMenu::StackWrapperCornerMenu() {
+StackWrapperCornerMenu::StackWrapperCornerMenu(StackWidgetWrapper * const target) {
     setFixedHeight(MIN_WIDGET_DIM);
     setStyleSheet("QMenuBar { border-bottom: 1px solid black; }");
     mSplitV = addAction("split v");
     mSplitH = addAction("split h");
     mClose = addAction("x");
-}
 
-void StackWrapperCornerMenu::setTarget(StackWidgetWrapper * const target) {
-    if(mTarget) {
-        disconnect(mSplitV, nullptr, mTarget, nullptr);
-        disconnect(mSplitH, nullptr, mTarget, nullptr);
-        disconnect(mClose, nullptr, mTarget, nullptr);
-    }
-    mTarget = target;
-    if(mTarget) {
-        connect(mSplitV, &QAction::triggered,
-                mTarget, &StackWidgetWrapper::splitV);
-        connect(mSplitH, &QAction::triggered,
-                mTarget, &StackWidgetWrapper::splitH);
-        connect(mClose, &QAction::triggered,
-                mTarget, &StackWidgetWrapper::closeWrapper);
-    }
+    connect(mSplitV, &QAction::triggered,
+            target, &StackWidgetWrapper::splitV);
+    connect(mSplitH, &QAction::triggered,
+            target, &StackWidgetWrapper::splitH);
+    connect(mClose, &QAction::triggered,
+            target, &StackWidgetWrapper::closeWrapper);
 }
