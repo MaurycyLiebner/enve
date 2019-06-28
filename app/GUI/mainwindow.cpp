@@ -524,6 +524,7 @@ void MainWindow::setupMenuBar() {
     mRenderMenu->addAction("Render", this, &MainWindow::addCanvasToRenderQue);
 
     setMenuBar(mMenuBar);
+    mMenuBar->setStyleSheet("QMenuBar { padding-top: 1px; }");
 //
 
 }

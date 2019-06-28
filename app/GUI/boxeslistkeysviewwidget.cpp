@@ -30,6 +30,7 @@ TimelineWidget::TimelineWidget(Document &document,
     mMenuLayout->setSpacing(0);
     mMenuLayout->setMargin(0);
     mBoxesListMenuBar = new QMenuBar(this);
+    mBoxesListMenuBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
     ((QToolButton*)mBoxesListMenuBar->children()[0])->setStyleSheet(
                 "QToolButton {"
                     "padding: 0px 0px;"
@@ -60,6 +61,7 @@ TimelineWidget::TimelineWidget(Document &document,
 
     mCornerMenuBar = new QMenuBar(this);
     mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    mCornerMenuBar->setStyleSheet("QMenuBar::item { padding: 1px 0px; }");
 
     QMenu * const settingsMenu = mCornerMenuBar->addMenu(
                 QIcon(":/icons/settings_dots.png"), "Settings");
@@ -111,6 +113,7 @@ TimelineWidget::TimelineWidget(Document &document,
 //    mCornerMenuBar->addSeparator();
 
     mSearchLine = new QLineEdit("", mBoxesListMenuBar);
+    mSearchLine->setMinimumHeight(0);
     mSearchLine->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     mSearchLine->setProperty("forceHandleEvent", QVariant(true));
     mSearchLine->setStyleSheet("background-color: white;"
@@ -123,9 +126,6 @@ TimelineWidget::TimelineWidget(Document &document,
                                "margin: 0;");
     connect(mSearchLine, &QLineEdit::textChanged,
             this, &TimelineWidget::setSearchText);
-
-    mBoxesListMenuBar->setSizePolicy(QSizePolicy::Minimum,
-                                     QSizePolicy::Fixed);
 
     mMenuLayout->addWidget(mBoxesListMenuBar);
     mMenuLayout->addWidget(mSearchLine);

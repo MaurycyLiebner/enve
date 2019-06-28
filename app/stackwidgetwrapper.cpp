@@ -10,6 +10,7 @@ StackWidgetWrapper::StackWidgetWrapper(WidgetStackLayoutItem* const layoutItem,
     mLayoutItemCreator(layoutItemCreator),
     mCreator(creator), mSetupOp(setup) {
     mCornerMenu = new StackWrapperCornerMenu(this);
+    mCornerMenu->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
     mLayout = new QVBoxLayout(this);
     setLayout(mLayout);
     mLayout->setSpacing(0);
@@ -28,6 +29,8 @@ void StackWidgetWrapper::setCentralWidget(QWidget * const widget) {
     if(mCenterWidget) delete mCenterWidget;
     mCenterWidget = widget;
     mLayout->insertWidget(-1, mCenterWidget);
+    mCenterWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
+                                 QSizePolicy::MinimumExpanding);
 }
 
 StackWidgetWrapper* StackWidgetWrapper::splitH() {
@@ -85,6 +88,10 @@ void StackWidgetWrapper::disableClose() {
 
 StackWrapperMenu::StackWrapperMenu() {
     //setStyleSheet("QMenuBar { border-bottom: 1px solid black; }");
+    //setStyleSheet("QMenuBar#cornerMenuBar::item { padding: 2px 4px; }");
+
+    setStyleSheet("QMenuBar#cornerMenuBar::item { padding-top: 1px; margin-bottom: 2px; }");
+
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 }
 
@@ -145,4 +152,6 @@ StackWrapperCornerMenu::StackWrapperCornerMenu(StackWidgetWrapper * const target
             target, &StackWidgetWrapper::closeWrapper);
 
     setObjectName("cornerMenuBar");
+
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
 }
