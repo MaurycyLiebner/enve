@@ -10,11 +10,11 @@ class FrameScrollBar : public QWidget {
     Q_OBJECT
 public:
     explicit FrameScrollBar(const int minSpan,
-                                      const int maxSpan,
-                                      const int height,
-                                      const bool range,
-                                      const bool clamp,
-                                      QWidget *parent = nullptr);
+                            const int maxSpan,
+                            const int height,
+                            const bool range,
+                            const bool clamp,
+                            QWidget *parent = nullptr);
     void emitChange();
     bool setFirstViewedFrame(const int firstFrame);
     void setFramesSpan(int newSpan);

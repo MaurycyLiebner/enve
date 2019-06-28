@@ -88,6 +88,8 @@ QAbstractItemView {
 QMenu {
     background-color: rgb(255, 255, 255);
     border: 1px solid black;
+/*    margin-top: -1px;*/
+/*    padding-top: -1px;*/
 }
 
 QMenu::item {
@@ -110,13 +112,19 @@ QMenuBar {
     padding-right: 4px;
     padding-left: 4px;
     color: black;
+    border-bottom: 1px solid black;
     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                       stop:0 lightgray, stop:1 darkgray);
+}
+
+QMenuBar#cornerMenuBar {
+    margin-bottom: -1px;
 }
 
 QMenuBar::item {
     spacing: 3px; /* spacing between menu bar items */
     padding: 1px 4px;
+    margin-bottom: 1px;
     background: transparent;
     border-radius: 4px;
 }
@@ -168,8 +176,10 @@ QLabel {
 }
 
 QLabel#dockLabel {
-    border-top: 0;
+    border: 0;
     border-bottom: 1px solid black;
+    padding-top: 1px;
+    padding-bottom: 1px;
     color: black;
     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
     stop:0 lightgray, stop:1 darkgray);
@@ -386,7 +396,6 @@ QPushButton#renderSettings:hover {
 }
 
 QToolBar {
-    border-top: 1px solid black;
     spacing: 4;
     background: qlineargradient(x1:0, y1:0,
                                 x2:0, y2:1,

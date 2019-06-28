@@ -8,21 +8,25 @@ LayoutHandler::LayoutHandler(Document& document) {
     canvasComboLayout->setMargin(0);
 
     mComboWidget = new QWidget;
+    mComboWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     mComboWidget->setLayout(canvasComboLayout);
+    mComboWidget->setObjectName("invisWid");
+    mComboWidget->setStyleSheet("QWidget#invisWid { background: transparent; }");
 
     mComboBox = new QComboBox;
     mComboBox->setMinimumContentsLength(20);
     mComboBox->setObjectName("currentLayoutComboBox");
     mComboBox->setLayoutDirection(Qt::RightToLeft);
-    const int comboDim = mComboBox->sizeHint().height();
 
     const auto newLayPush = new QPushButton("+", mComboWidget);
     newLayPush->setObjectName("addCanvasButton");
-    newLayPush->setFixedSize(comboDim, comboDim);
+    newLayPush->setFixedWidth(MIN_WIDGET_DIM);
+    newLayPush->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     const auto removeLayPush = new QPushButton("x", mComboWidget);
     removeLayPush->setObjectName("removeCanvasButton");
-    removeLayPush->setFixedSize(comboDim, comboDim);
+    removeLayPush->setFixedWidth(MIN_WIDGET_DIM);
+    removeLayPush->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     canvasComboLayout->addWidget(mComboBox);
     canvasComboLayout->addWidget(newLayPush);

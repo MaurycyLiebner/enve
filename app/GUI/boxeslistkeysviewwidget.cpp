@@ -22,7 +22,7 @@ TimelineWidget::TimelineWidget(Document &document,
     QWidget(parent), mDocument(document) {
     mMainWindow = MainWindow::getInstance();
 
-    mMainLayout = new QHBoxLayout(this);
+    mMainLayout = new QGridLayout(this);
     mMainLayout->setSpacing(0);
     mMainLayout->setMargin(0);
 
@@ -30,11 +30,6 @@ TimelineWidget::TimelineWidget(Document &document,
     mMenuLayout->setSpacing(0);
     mMenuLayout->setMargin(0);
     mBoxesListMenuBar = new QMenuBar(this);
-    mBoxesListMenuBar->setFixedHeight(MIN_WIDGET_DIM);
-    mBoxesListMenuBar->setStyleSheet("QMenuBar {"
-                                        "border-top: 0;"
-                                        "border-bottom: 1px solid black;"
-                                     "}");
     ((QToolButton*)mBoxesListMenuBar->children()[0])->setStyleSheet(
                 "QToolButton {"
                     "padding: 0px 0px;"
@@ -64,14 +59,10 @@ TimelineWidget::TimelineWidget(Document &document,
     mBoxesListMenuBar->addMenu(mSceneChooser);
 
     mCornerMenuBar = new QMenuBar(this);
-    mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
-    mCornerMenuBar->setFixedHeight(MIN_WIDGET_DIM);
-    mCornerMenuBar->setStyleSheet("QMenuBar {"
-                                     "border-top: 0;"
-                                     "border-bottom: 1px solid black;"
-                                  "}");
+    mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
-    QMenu * const settingsMenu = mCornerMenuBar->addMenu("o");
+    QMenu * const settingsMenu = mCornerMenuBar->addMenu(
+                QIcon(":/icons/settings_dots.png"), "Settings");
     QMenu * const objectsMenu = settingsMenu->addMenu("State");
     objectsMenu->addAction("All", this,
                            &TimelineWidget::setRuleNone);
@@ -105,7 +96,8 @@ TimelineWidget::TimelineWidget(Document &document,
                         &TimelineWidget::setTypeSound);
 
     //QMenu *viewMenu = mBoxesListMenuBar->addMenu("View");
-    mGraphAct = mCornerMenuBar->addAction("/");
+    mGraphAct = mCornerMenuBar->addAction("Graph");
+    mGraphAct->setIcon(QIcon(":/icons/graphDisabled.png"));
     mGraphAct->setCheckable(true);
     connect(mGraphAct, &QAction::toggled,
             this, &TimelineWidget::setGraphEnabled);
@@ -118,51 +110,29 @@ TimelineWidget::TimelineWidget(Document &document,
 //                              &TimelineWidget::removeThis);
 //    mCornerMenuBar->addSeparator();
 
-    mMenuWidgetsLayout = new QHBoxLayout();
-    mMenuWidgetsLayout->setAlignment(Qt::AlignRight);
-    mMenuWidgetsLayout->setMargin(0);
-    mMenuWidgetsLayout->setSpacing(0);
     mSearchLine = new QLineEdit("", mBoxesListMenuBar);
-    mSearchLine->setFixedHeight(MIN_WIDGET_DIM);
+    mSearchLine->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     mSearchLine->setProperty("forceHandleEvent", QVariant(true));
-    mSearchLine->setStyleSheet("background-color: rgb(255, 255, 255);"
-                               "border-bottom: 0;"
-                               "border-radius: 4px;"
-                               "border: 1px solid rgb(100, 100, 100);"
-                               "margin-top: 1px;"
-                               "margin-bottom: 1px;");
+    mSearchLine->setStyleSheet("background-color: white;"
+                               "color: black;"
+                               "border-radius: 0;"
+                               "border: 0;"
+                               "border-right: 1px solid black;"
+                               "border-left: 1px solid black;"
+                               "border-bottom: 1px solid black;"
+                               "margin: 0;");
     connect(mSearchLine, &QLineEdit::textChanged,
             this, &TimelineWidget::setSearchText);
-    mSearchLine->setSizePolicy(QSizePolicy::Maximum,
-                               QSizePolicy::Fixed);
 
     mBoxesListMenuBar->setSizePolicy(QSizePolicy::Minimum,
                                      QSizePolicy::Fixed);
 
-
-    mMenuWidgetsLayout->addWidget(mSearchLine);
-    mMenuWidgetsCont = new QWidget(this);
-    mMenuWidgetsCont->setStyleSheet(
-                "QWidget {"
-                    "border-top: 0;"
-                    "border-bottom: 1px solid black;"
-                    "color: black;"
-                    "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-                    "stop:0 lightgray, stop:1 darkgray);"
-                "}");
-    mMenuWidgetsCont->setLayout(mMenuWidgetsLayout);
-
     mMenuLayout->addWidget(mBoxesListMenuBar);
-    mMenuLayout->addWidget(mMenuWidgetsCont);
+    mMenuLayout->addWidget(mSearchLine);
     mMenuLayout->addWidget(mCornerMenuBar);
 
     mMenuWidget = new QWidget(this);
     mMenuWidget->setLayout(mMenuLayout);
-
-    mBoxesListLayout = new QVBoxLayout();
-    mBoxesListLayout->setSpacing(0);
-    mBoxesListLayout->setMargin(0);
-    mBoxesListLayout->addWidget(mMenuWidget);
 
     mBoxesListScrollArea = new BoxScrollArea(this);
 
@@ -172,15 +142,15 @@ TimelineWidget::TimelineWidget(Document &document,
     visiblePartWidget->setCurrentTarget(nullptr, SWT_TARGET_CURRENT_CANVAS);
 
     mBoxesListScrollArea->setWidget(mBoxesListWidget);
-    mBoxesListLayout->addWidget(mBoxesListScrollArea);
-    mMainLayout->addLayout(mBoxesListLayout);
+    mMainLayout->addWidget(mMenuWidget, 0, 0);
+    mMainLayout->addWidget(mBoxesListScrollArea, 1, 0);
 
     mKeysViewLayout = new QVBoxLayout();
     mKeysView = new KeysView(mBoxesListWidget->getVisiblePartWidget(), this);
     mKeysViewLayout->addWidget(mKeysView);
     mAnimationDockWidget = new AnimationDockWidget(this, mKeysView);
     mAnimationDockWidget->hide();
-    mMainLayout->addLayout(mKeysViewLayout);
+    mMainLayout->addLayout(mKeysViewLayout, 1, 1);
 
     const auto keysViewScrollbarLayout = new QHBoxLayout();
     const auto layoutT = new QVBoxLayout();
@@ -215,8 +185,10 @@ TimelineWidget::TimelineWidget(Document &document,
 
     setLayout(mMainLayout);
 
-    mFrameScrollBar = new FrameScrollBar(1, 1, MIN_WIDGET_DIM,
-                                                   false, false, this);
+    mFrameScrollBar = new FrameScrollBar(1, 1, 0,
+                                         false, false, this);
+    mFrameScrollBar->setSizePolicy(QSizePolicy::Minimum,
+                                   QSizePolicy::Preferred);
 //    connect(MemoryHandler::sGetInstance(), &MemoryHandler::memoryFreed,
 //            frameScrollBar,
 //            qOverload<>(&FrameScrollBar::update));
@@ -226,11 +198,9 @@ TimelineWidget::TimelineWidget(Document &document,
         if(scene) scene->anim_setAbsFrame(range.fMin);
         MainWindow::getInstance()->queScheduledTasksAndUpdate();
     });
-    mFrameScrollBar->setSizePolicy(QSizePolicy::MinimumExpanding,
-                                  QSizePolicy::Maximum);
-    mKeysViewLayout->insertWidget(0, mFrameScrollBar);
+    mMainLayout->addWidget(mFrameScrollBar, 0, 1);
 
-    mFrameRangeScrollBar = new FrameScrollBar(20, 200, MIN_WIDGET_DIM,
+    mFrameRangeScrollBar = new FrameScrollBar(20, 200, MIN_WIDGET_DIM*2/3,
                                               true, true, this);
 
     connect(mFrameRangeScrollBar, &FrameScrollBar::viewedFrameRangeChanged,
@@ -267,9 +237,11 @@ void TimelineWidget::setCurrentScene(Canvas * const scene) {
     }
 }
 
-void TimelineWidget::setGraphEnabled(const bool bT) {
-    mKeysView->setGraphViewed(bT);
-    mAnimationDockWidget->setVisible(bT);
+void TimelineWidget::setGraphEnabled(const bool enabled) {
+    mKeysView->setGraphViewed(enabled);
+    mAnimationDockWidget->setVisible(enabled);
+    if(enabled) mGraphAct->setIcon(QIcon(":/icons/graphEnabled.png"));
+    else mGraphAct->setIcon(QIcon(":/icons/graphDisabled.png"));
 }
 
 void TimelineWidget::moveSlider(int val) {

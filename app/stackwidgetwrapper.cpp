@@ -84,8 +84,8 @@ void StackWidgetWrapper::disableClose() {
 }
 
 StackWrapperMenu::StackWrapperMenu() {
-    setFixedHeight(MIN_WIDGET_DIM);
-    setStyleSheet("QMenuBar { border-bottom: 1px solid black; }");
+    //setStyleSheet("QMenuBar { border-bottom: 1px solid black; }");
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 }
 
 template<class SplitItemClass>
@@ -130,11 +130,12 @@ void ParentStackLayoutItem::sWriteChild(
 }
 
 StackWrapperCornerMenu::StackWrapperCornerMenu(StackWidgetWrapper * const target) {
-    setFixedHeight(MIN_WIDGET_DIM);
-    setStyleSheet("QMenuBar { border-bottom: 1px solid black; }");
     mSplitV = addAction("split v");
+    mSplitV->setIcon(QIcon(":/icons/split_v.png"));
     mSplitH = addAction("split h");
+    mSplitH->setIcon(QIcon(":/icons/split_h.png"));
     mClose = addAction("x");
+    mClose->setIcon(QIcon(":/icons/close.png"));
 
     connect(mSplitV, &QAction::triggered,
             target, &StackWidgetWrapper::splitV);
@@ -142,4 +143,6 @@ StackWrapperCornerMenu::StackWrapperCornerMenu(StackWidgetWrapper * const target
             target, &StackWidgetWrapper::splitH);
     connect(mClose, &QAction::triggered,
             target, &StackWidgetWrapper::closeWrapper);
+
+    setObjectName("cornerMenuBar");
 }

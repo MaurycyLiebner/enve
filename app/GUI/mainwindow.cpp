@@ -94,7 +94,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     mDocument.setPath("");
 
-    mFillStrokeSettingsDock = new QDockWidget(this);
+    mFillStrokeSettingsDock = new QDockWidget("Fill and Stroke", this);
     //const auto fillStrokeSettingsScroll = new ScrollArea(this);
     mFillStrokeSettings = new FillStrokeSettingsWidget(mDocument, this);
     //fillStrokeSettingsScroll->setWidget(mFillStrokeSettings);
@@ -109,7 +109,7 @@ MainWindow::MainWindow(QWidget *parent)
     mFillStrokeSettingsDock->setMinimumWidth(MIN_WIDGET_DIM*10);
     mFillStrokeSettingsDock->setMaximumWidth(MIN_WIDGET_DIM*20);
 
-    mBottomDock = new QDockWidget(this);
+    mBottomDock = new QDockWidget("Timeline", this);
 
     mBottomDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
     mBottomDock->setTitleBarWidget(new QWidget());
@@ -132,7 +132,7 @@ MainWindow::MainWindow(QWidget *parent)
             new BoxesListAnimationDockWidget(mDocument, mLayoutHandler, this);
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);
 
-    mBrushSettingsDock = new QDockWidget(this);
+    mBrushSettingsDock = new QDockWidget("Brush Settings", this);
     mBrushSettingsDock->setFeatures(QDockWidget::DockWidgetMovable |
                                     QDockWidget::DockWidgetFloatable);
     mBrushSettingsDock->setMinimumWidth(MIN_WIDGET_DIM*10);
@@ -156,7 +156,7 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::LeftDockWidgetArea, mBrushSettingsDock);
     mBrushSettingsDock->hide();
 
-    mLeftDock = new QDockWidget(this);
+    mLeftDock = new QDockWidget("Current Object", this);
     mLeftDock->setFeatures(QDockWidget::DockWidgetMovable |
                            QDockWidget::DockWidgetFloatable);
     mLeftDock->setMinimumWidth(MIN_WIDGET_DIM*10);
@@ -199,14 +199,7 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::LeftDockWidgetArea, mLeftDock2);
 
     const auto leftDock2Label = new QLabel("Files", this);
-    leftDock2Label->setStyleSheet(
-                "QLabel {"
-                    "border-top: 0;"
-                    "border-bottom: 1px solid black;"
-                    "color: black;"
-                    "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-                    "stop:0 lightgray, stop:1 darkgray);"
-                "}");
+    leftDock2Label->setObjectName("dockLabel");
     leftDock2Label->setAlignment(Qt::AlignCenter);
     mLeftDock2->setTitleBarWidget(leftDock2Label);
 
@@ -579,7 +572,7 @@ void MainWindow::setupStatusBar() {
 }
 
 void MainWindow::setupToolBar() {
-    mToolBar = new QToolBar(this);
+    mToolBar = new QToolBar("Toolbar", this);
     mToolBar->setMovable(false);
 
 

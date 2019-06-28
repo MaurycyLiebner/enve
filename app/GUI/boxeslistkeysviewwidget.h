@@ -2,7 +2,7 @@
 #define BOXESLISTKEYSVIEWWIDGET_H
 
 #include <QWidget>
-#include <QVBoxLayout>
+#include <QGridLayout>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QMenuBar>
@@ -62,7 +62,7 @@ private:
     void setTypeGraphics();
     void setTypeSound();
 
-    void setGraphEnabled(const bool bT);
+    void setGraphEnabled(const bool enabled);
 private:
     void setCurrentType(const SWT_Type type);
     void setBoxRule(const SWT_BoxRule rule);
@@ -76,7 +76,7 @@ private:
     FrameScrollBar* mFrameScrollBar;
     FrameScrollBar* mFrameRangeScrollBar;
 
-    QHBoxLayout *mMainLayout;
+    QGridLayout *mMainLayout;
     QVBoxLayout *mBoxesListLayout;
     QVBoxLayout *mKeysViewLayout;
     QHBoxLayout *mMenuLayout;

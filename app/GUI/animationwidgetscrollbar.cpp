@@ -116,12 +116,10 @@ void FrameScrollBar::paintEvent(QPaintEvent *) {
         }
     }
 
-    const qreal halfHeight = height()*0.5;
-    const qreal quarterHeight = height()*0.25;
     const qreal threeFourthsHeight = height()*0.75;
     const qreal maxX = width() + MIN_WIDGET_DIM;
     while(xL < maxX) {
-        p.drawText(QRectF(xL - inc, quarterHeight, 2*inc, halfHeight),
+        p.drawText(QRectF(xL - inc, 0, 2*inc, height()),
                    Qt::AlignCenter, QString::number(currentFrame));
         p.drawLine(QPointF(xL, threeFourthsHeight + 2),
                    QPointF(xL, height()));
