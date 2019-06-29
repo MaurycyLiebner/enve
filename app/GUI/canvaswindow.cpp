@@ -451,7 +451,6 @@ bool CanvasWindow::handleShiftKeysKeyPress(QKeyEvent* event) {
 }
 #include <QApplication>
 bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
-    update();
     if(!mCurrentCanvas) return false;
     if(mCurrentCanvas->isPreviewingOrRendering()) return false;
     const QPoint globalPos = QCursor::pos();

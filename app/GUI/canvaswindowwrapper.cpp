@@ -78,14 +78,14 @@ CanvasWindow* CanvasWindowWrapper::getSceneWidget() const {
 }
 
 void CanvasWindowWrapper::changeEvent(QEvent *e) {
+    StackWidgetWrapper::changeEvent(e);
     if(e->type() == QEvent::ParentChange) {
         const auto sceneWidget = getSceneWidget();
-        if(sceneWidget) {
+        if(sceneWidget && !sceneWidget->hasNoCanvas()) {
             sceneWidget->unblockAutomaticSizeFit();
             sceneWidget->fitCanvasToSize();
         }
     }
-    StackWidgetWrapper::changeEvent(e);
 }
 
 void CWWidgetStackLayoutItem::clear() {
