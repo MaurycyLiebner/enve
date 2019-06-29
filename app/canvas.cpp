@@ -202,7 +202,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         }
         const bool drawCanvas = mCurrentPreviewContainer &&
                 !mCurrentPreviewContainerOutdated;
-//        drawTransparencyMesh(canvas, canvasRect, scale);
+        drawTransparencyMesh(canvas, canvasRect, scale);
 
         if(!mClipToCanvasSize || !drawCanvas) {
             // saveLayer rebinds framebuffer to 0,
@@ -327,7 +327,7 @@ void Canvas::setCurrentPreviewContainer(const int relFrame) {
 
 void Canvas::setCurrentPreviewContainer(const stdsptr<ImageCacheContainer>& cont) {
     setLoadingPreviewContainer(nullptr);
-    if(cont == mCurrentPreviewContainer) return;
+    if(cont == mCurrentPreviewContainer) return emit newerState();
     if(mCurrentPreviewContainer) {
         if(!mRenderingPreview)
             mCurrentPreviewContainer->setBlocked(false);

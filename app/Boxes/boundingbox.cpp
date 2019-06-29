@@ -301,7 +301,7 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
     const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
     paint.setAlpha(static_cast<U8CPU>(intAlpha));
     paint.setBlendMode(mBlendModeSk);
-    paint.setFilterQuality(sDisplayFiltering);
+    paint.setFilterQuality(BoundingBox::sDisplayFiltering);
     drawPixmapSk(canvas, &paint, grContext);
 }
 
@@ -309,7 +309,7 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
                                SkPaint * const paint,
                                GrContext* const grContext) {
     if(mTransformAnimator->getOpacity() < 0.001) return;
-    paint->setFilterQuality(sDisplayFiltering);
+    paint->setFilterQuality(BoundingBox::sDisplayFiltering);
     mDrawRenderContainer.drawSk(canvas, paint, grContext);
 }
 

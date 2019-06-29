@@ -10,8 +10,9 @@ void setDefaultFormat() {
     format.setProfile(QSurfaceFormat::CoreProfile);
     format.setDepthBufferSize(24);
     format.setStencilBufferSize(8);
-    format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-    format.setSwapInterval(0); // Disable vertical refresh syncing
+    format.setSamples(0);
+    //format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+    //format.setSwapInterval(0); // Disable vertical refresh syncing
     QSurfaceFormat::setDefaultFormat(format);
 }
 

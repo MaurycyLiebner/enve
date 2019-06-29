@@ -20,10 +20,13 @@ GLWindow::~GLWindow() {
 }
 
 void GLWindow::bindSkia(const int w, const int h) {
+    GrGLFramebufferInfo fbInfo;
+    fbInfo.fFBOID = context()->defaultFramebufferObject();//buffer;
+    fbInfo.fFormat = GR_GL_RGBA8;//buffer;
     GrBackendRenderTarget backendRT = GrBackendRenderTarget(
                                         w, h,
                                         0, 8, // (optional) 4, 8,
-                                        mFbInfo
+                                        fbInfo
                                         /*kRGBA_half_GrPixelConfig*/
                                         /*kSkia8888_GrPixelConfig*/);
 
@@ -90,8 +93,6 @@ void GLWindow::initialize() {
     // a Skia render target so Skia can render to it
     //GrGLint buffer;
     //GR_GL_GetIntegerv(mInterface, GR_GL_FRAMEBUFFER_BINDING, &buffer);
-    mFbInfo.fFBOID = context()->defaultFramebufferObject();//buffer;
-    mFbInfo.fFormat = GR_GL_RGBA8;//buffer;
 
     try {
         bindSkia(width(), height());

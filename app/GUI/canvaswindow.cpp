@@ -148,8 +148,8 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
 
 void CanvasWindow::queScheduledTasksAndUpdate() {
     updatePivotIfNeeded();
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
     update();
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
 }
 
 bool CanvasWindow::hasNoCanvas() {
@@ -165,12 +165,20 @@ void CanvasWindow::renameCurrentCanvas(const QString &newName) {
 
 void CanvasWindow::renderSk(SkCanvas * const canvas,
                             GrContext* const grContext) {
+//    if(hasFocus()) {
+//        SkPaint paint;
+//        paint.setColor(SK_ColorRED);
+//        paint.setStrokeWidth(4);
+//        paint.setStyle(SkPaint::kStroke_Style);
+//        canvas->drawRect(SkRect::MakeWH(width(), height()), paint);
+//    }
     if(mCurrentCanvas) {
         canvas->save();
         mCurrentCanvas->renderSk(canvas, grContext, rect(),
                                  mViewTransform, mMouseGrabber);
         canvas->restore();
     }
+
     if(hasFocus()) {
         SkPaint paint;
         paint.setColor(SK_ColorRED);
@@ -443,6 +451,7 @@ bool CanvasWindow::handleShiftKeysKeyPress(QKeyEvent* event) {
 }
 #include <QApplication>
 bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
+    update();
     if(!mCurrentCanvas) return false;
     if(mCurrentCanvas->isPreviewingOrRendering()) return false;
     const QPoint globalPos = QCursor::pos();

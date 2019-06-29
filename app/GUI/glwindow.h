@@ -33,8 +33,6 @@ protected:
     sk_sp<GrContext> mGrContext;
     sk_sp<SkSurface> mSurface;
     SkCanvas *mCanvas;
-
-    GrGLFramebufferInfo mFbInfo;
 };
 
 #endif // GLWINDOW_H
