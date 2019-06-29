@@ -11,6 +11,7 @@
 #include "taskscheduler.h"
 #include "effectsloader.h"
 #include "document.h"
+#include "audiohandler.h"
 #include "actions.h"
 #include "layouthandler.h"
 class VideoEncoder;
@@ -313,6 +314,7 @@ private:
 
     TaskScheduler mTaskScheduler;
     Document mDocument;
+    AudioHandler mAudioHandler;
     Actions mActions;
     LayoutHandler *mLayoutHandler = nullptr;
     CanvasWindow *mCanvasWindow;

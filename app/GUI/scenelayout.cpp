@@ -2,8 +2,9 @@
 #include "document.h"
 
 SceneLayout::SceneLayout(Document& document,
+                         AudioHandler& audioHandler,
                          QWidget * const parent) : QWidget(parent),
-    mDocument(document) {
+    mDocument(document), mAudioHandler(audioHandler) {
     setLayout(new QHBoxLayout);
     layout()->setMargin(0);
     layout()->setSpacing(0);
@@ -19,7 +20,8 @@ void SceneLayout::reset(CanvasWindowWrapper** const cwwP) {
     mBaseStack = std::make_unique<CWSceneBaseStackItem>();
     const auto cwwItem = static_cast<CWWidgetStackLayoutItem*>(
                 mBaseStack->getChild());
-    const auto cww = new CanvasWindowWrapper(&mDocument, cwwItem);
+    const auto cww = new CanvasWindowWrapper(&mDocument, &mAudioHandler,
+                                             cwwItem);
     cww->disableClose();
     if(cwwP) *cwwP = cww;
     else setWidget(cww);

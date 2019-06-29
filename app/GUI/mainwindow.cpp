@@ -59,9 +59,10 @@ MainWindow::MainWindow(QWidget *parent)
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
     KEY_RECT_SIZE = MIN_WIDGET_DIM*3/5;
     av_register_all();
+    mAudioHandler.initializeAudio();
 
     mVideoEncoder = SPtrCreate(VideoEncoder)();
-    mCanvasWindow = new CanvasWindow(mDocument, this);
+    mCanvasWindow = new CanvasWindow(mDocument, mAudioHandler, this);
 
     connect(&mDocument, &Document::evFilePathChanged,
             this, &MainWindow::updateTitle);
@@ -127,7 +128,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(mMemoryHandler, &MemoryHandler::allMemoryUsed,
             mCanvasWindow, &CanvasWindow::outOfMemory);
 
-    mLayoutHandler = new LayoutHandler(mDocument);
+    mLayoutHandler = new LayoutHandler(mDocument, mAudioHandler);
     mBoxesListAnimationDockWidget =
             new BoxesListAnimationDockWidget(mDocument, mLayoutHandler, this);
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);

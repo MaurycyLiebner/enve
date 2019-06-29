@@ -4,6 +4,7 @@
 class Document;
 class Canvas;
 class CanvasWindow;
+class AudioHandler;
 
 struct SceneWidgetStackLayoutItem : public WidgetStackLayoutItem {
     void clear();
@@ -27,6 +28,7 @@ private:
 class CanvasWindowWrapper : public StackWidgetWrapper {
 public:
     CanvasWindowWrapper(Document * const document,
+                        AudioHandler * const audioHandler,
                         CWWidgetStackLayoutItem * const layItem,
                         QWidget * const parent = nullptr);
 

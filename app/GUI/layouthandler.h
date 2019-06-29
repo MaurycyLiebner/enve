@@ -25,7 +25,7 @@ struct LayoutData {
 
 class LayoutHandler : public QObject {
 public:
-    LayoutHandler(Document &document);
+    LayoutHandler(Document &document, AudioHandler &audioHandler);
 
     QWidget* comboWidget() {
         return mComboWidget;

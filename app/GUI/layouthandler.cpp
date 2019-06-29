@@ -2,7 +2,8 @@
 
 #include <QPushButton>
 
-LayoutHandler::LayoutHandler(Document& document) {
+LayoutHandler::LayoutHandler(Document& document,
+                             AudioHandler& audioHandler) {
     const auto canvasComboLayout = new QHBoxLayout;
     canvasComboLayout->setSpacing(0);
     canvasComboLayout->setMargin(0);
@@ -35,7 +36,7 @@ LayoutHandler::LayoutHandler(Document& document) {
     canvasComboLayout->addWidget(newLayPush);
     canvasComboLayout->addWidget(removeLayPush);
 
-    mSceneLayout = new SceneLayout(document);
+    mSceneLayout = new SceneLayout(document, audioHandler);
     mTimelineLayout = new TimelineLayout(document);
 
     connect(mComboBox, qOverload<int>(&QComboBox::activated),

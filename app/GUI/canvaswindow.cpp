@@ -22,8 +22,10 @@
 #include "memorychecker.h"
 
 CanvasWindow::CanvasWindow(Document &document,
+                           AudioHandler& audioHandler,
                            QWidget * const parent) :
-    GLWindow(parent), mDocument(document), mActions(document.fActions) {
+    GLWindow(parent), mDocument(document),
+    mActions(document.fActions), mAudioHandler(audioHandler) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
     connect(&mDocument, &Document::canvasModeSet,
             this, &CanvasWindow::setCanvasMode);
@@ -31,8 +33,8 @@ CanvasWindow::CanvasWindow(Document &document,
     mPreviewFPSTimer = new QTimer(this);
     connect(mPreviewFPSTimer, &QTimer::timeout,
             this, &CanvasWindow::nextPreviewFrame);
-
-    initializeAudio();
+    connect(mPreviewFPSTimer, &QTimer::timeout,
+            this, &CanvasWindow::audioPushTimerExpired);
 
     this->setAcceptDrops(true);
 
@@ -861,58 +863,22 @@ int CanvasWindow::getMaxFrame() {
 
 const int BufferSize = 32768;
 
-void CanvasWindow::initializeAudio() {
-    mAudioBuffer = QByteArray(BufferSize, 0);
-    connect(mPreviewFPSTimer, &QTimer::timeout,
-            this, &CanvasWindow::pushTimerExpired);
-
-    mAudioDevice = QAudioDeviceInfo::defaultOutputDevice();
-    mAudioFormat.setSampleRate(SOUND_SAMPLERATE);
-    mAudioFormat.setChannelCount(1);
-    mAudioFormat.setSampleSize(32);
-    mAudioFormat.setCodec("audio/pcm");
-    mAudioFormat.setByteOrder(QAudioFormat::LittleEndian);
-    mAudioFormat.setSampleType(QAudioFormat::Float);
-
-    QAudioDeviceInfo info(mAudioDevice);
-    if(!info.isFormatSupported(mAudioFormat)) {
-        //RuntimeThrow("Default format not supported - trying to use nearest");
-        mAudioFormat = info.nearestFormat(mAudioFormat);
-    }
-
-    mAudioOutput = new QAudioOutput(mAudioDevice, mAudioFormat, this);
-}
-
 void CanvasWindow::startAudio() {
+    mAudioHandler.startAudio();
     mCurrentSoundComposition->start(mCurrentPreviewFrame);
-    mAudioIOOutput = mAudioOutput->start();
 }
 
 void CanvasWindow::stopAudio() {
-    //mAudioOutput->suspend();
-    //mCurrentSoundComposition->stop();
-    mAudioIOOutput = nullptr;
-    mAudioOutput->stop();
-    mAudioOutput->reset();
+    mAudioHandler.stopAudio();
     mCurrentSoundComposition->stop();
 }
 
-void CanvasWindow::volumeChanged(const int value) {
-    if(mAudioOutput) mAudioOutput->setVolume(qreal(value/100.));
-}
-
-void CanvasWindow::pushTimerExpired() {
-    if(mAudioOutput && mAudioOutput->state() != QAudio::StoppedState) {
-        int chunks = mAudioOutput->bytesFree()/mAudioOutput->periodSize();
-        while(chunks) {
-           const qint64 len = mCurrentSoundComposition->read(
-                                                mAudioBuffer.data(),
-                                                mAudioOutput->periodSize());
-           if(len) mAudioIOOutput->write(mAudioBuffer.data(), len);
-           if(len != mAudioOutput->periodSize()) break;
-           --chunks;
-        }
-    }
+void CanvasWindow::audioPushTimerExpired() {
+    auto request = mAudioHandler.dataRequest();
+    const qint64 len = mCurrentSoundComposition->read(
+                request.fData, request.fSize);
+    request.fSize = int(len);
+    mAudioHandler.provideData(request);
 }
 
 void CanvasWindow::dropEvent(QDropEvent *event) {

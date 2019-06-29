@@ -5,7 +5,8 @@
 
 class SceneLayout : public QWidget {
 public:
-    SceneLayout(Document& document, QWidget* const parent = nullptr);
+    SceneLayout(Document& document, AudioHandler &audioHandler,
+                QWidget* const parent = nullptr);
 
     SceneBaseStackItem::cUPtr extract();
     void setCurrent(const SceneBaseStackItem* const item);
@@ -33,6 +34,7 @@ private:
     void reset(CanvasWindowWrapper ** const cwwP = nullptr);
 
     Document& mDocument;
+    AudioHandler& mAudioHandler;
     SceneBaseStackItem::cUPtr mBaseStack;
 };
 

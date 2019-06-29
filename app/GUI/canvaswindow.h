@@ -8,6 +8,7 @@
 #include "smartPointers/sharedpointerdefs.h"
 #include "GPUEffects/gpupostprocessor.h"
 #include "canvas.h"
+#include "audiohandler.h"
 class Brush;
 class WindowSingleWidgetTarget;
 enum ColorMode : short;
@@ -28,13 +29,12 @@ class PaintSettingsAnimator;
 class OutlineSettingsAnimator;
 class SimpleBrushWrapper;
 class Actions;
-#include <QAudioOutput>
 
-class CanvasWindow : public GLWindow,
-        public KeyFocusTarget {
+class CanvasWindow : public GLWindow, public KeyFocusTarget {
     Q_OBJECT
 public:
     explicit CanvasWindow(Document& document,
+                          AudioHandler &audioHandler,
                           QWidget * const parent = nullptr);
     ~CanvasWindow();
     Canvas *getCurrentCanvas();
@@ -167,18 +167,13 @@ private:
 
 
     // AUDIO
-    void initializeAudio();
+    AudioHandler& mAudioHandler;
+
     void startAudio();
+    void audioPushTimerExpired();
     void stopAudio();
-    void volumeChanged(const int value);
 
-    QAudioDeviceInfo mAudioDevice;
     qptr<SoundComposition> mCurrentSoundComposition;
-    QAudioOutput *mAudioOutput;
-    QIODevice *mAudioIOOutput; // not owned
-    QAudioFormat mAudioFormat;
-
-    QByteArray mAudioBuffer;
     // AUDIO
 
     void renderSk(SkCanvas * const canvas,
@@ -231,8 +226,6 @@ private:
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
     void nextPreviewFrame();
-
-    void pushTimerExpired();
 };
 
 #endif // CANVASWINDOW_H

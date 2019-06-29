@@ -7,6 +7,7 @@
 #include "canvaswindow.h"
 #include "document.h"
 #include "scenechooser.h"
+#include "audiohandler.h"
 
 class CanvasWrapperMenuBar : public StackWrapperMenu {
     friend struct CWWidgetStackLayoutItem;
@@ -35,6 +36,7 @@ private:
 };
 
 CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
+                                         AudioHandler * const audioHandler,
                                          CWWidgetStackLayoutItem* const layItem,
                                          QWidget * const parent) :
     StackWidgetWrapper(
@@ -43,17 +45,19 @@ CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
             const auto rPtr = new CWWidgetStackLayoutItem;
             return std::unique_ptr<WidgetStackLayoutItem>(rPtr);
         },
-        [document](WidgetStackLayoutItem* const layItem,
-                   QWidget * const parent) {
+        [document, audioHandler](WidgetStackLayoutItem* const layItem,
+                                 QWidget * const parent) {
             const auto cLayItem = static_cast<CWWidgetStackLayoutItem*>(layItem);
-            const auto derived = new CanvasWindowWrapper(document, cLayItem, parent);
+            const auto derived = new CanvasWindowWrapper(document, audioHandler,
+                                                         cLayItem, parent);
             return static_cast<StackWidgetWrapper*>(derived);
         },
-        [document](StackWidgetWrapper * toSetup) {
-            const auto window = new CanvasWindow(*document, toSetup);
+        [document, audioHandler](StackWidgetWrapper * toSetup) {
+            const auto window = new CanvasWindow(*document, *audioHandler,
+                                                 toSetup);
             toSetup->setCentralWidget(window);
             toSetup->setMenuBar(new CanvasWrapperMenuBar(*document, window));
-}, parent) {}
+        }, parent) {}
 
 void CanvasWindowWrapper::setScene(Canvas * const scene) {
     const auto menu = static_cast<CanvasWrapperMenuBar*>(getMenuBar());
