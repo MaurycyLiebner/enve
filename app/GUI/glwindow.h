@@ -19,15 +19,16 @@ public:
     GLWindow(QWidget * const parent = nullptr);
     ~GLWindow();
 protected:
-
     virtual void renderSk(SkCanvas * const canvas,
                           GrContext * const grContext) = 0;
-    void resizeGL(int w, int h);
-    void initializeGL();
-    void paintGL();
+    void resizeGL(int w, int h) final;
+    void initializeGL() final;
+    void paintGL() final;
+    void showEvent(QShowEvent *e) final;
 
     void initialize();
     void bindSkia(const int w, const int h);
+    void updateFix();
 
     sk_sp<const GrGLInterface> mInterface;
     sk_sp<GrContext> mGrContext;

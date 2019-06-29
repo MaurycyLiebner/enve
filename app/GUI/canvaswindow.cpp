@@ -106,7 +106,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
 //        requestFitCanvasToSize();
 //    }
     if(mCurrentCanvas) fitCanvasToSize();
-    update();
+    updateFix();
 }
 
 void CanvasWindow::updatePaintModeCursor() {

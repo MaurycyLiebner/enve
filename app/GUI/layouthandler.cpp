@@ -17,15 +17,18 @@ LayoutHandler::LayoutHandler(Document& document) {
     mComboBox->setMinimumContentsLength(20);
     mComboBox->setObjectName("currentLayoutComboBox");
     mComboBox->setLayoutDirection(Qt::RightToLeft);
+    mComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     const auto newLayPush = new QPushButton("+", mComboWidget);
     newLayPush->setObjectName("addCanvasButton");
     newLayPush->setFixedWidth(MIN_WIDGET_DIM);
+    newLayPush->setMinimumHeight(0);
     newLayPush->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     const auto removeLayPush = new QPushButton("x", mComboWidget);
     removeLayPush->setObjectName("removeCanvasButton");
     removeLayPush->setFixedWidth(MIN_WIDGET_DIM);
+    removeLayPush->setMinimumHeight(0);
     removeLayPush->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     canvasComboLayout->addWidget(mComboBox);

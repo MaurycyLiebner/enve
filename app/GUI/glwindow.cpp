@@ -52,7 +52,6 @@ void GLWindow::bindSkia(const int w, const int h) {
 void GLWindow::resizeGL(int w, int h) {
     try {
         bindSkia(w, h);
-        //glViewport(0, 0, width(), height());
         update();
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
@@ -114,7 +113,16 @@ void GLWindow::paintGL() {
     //glBindFramebuffer(GL_FRAMEBUFFER, context()->defaultFramebufferObject());
     //glViewport(0, 0, width(), height());
     glClear(GL_COLOR_BUFFER_BIT);
-
     renderSk(mCanvas, mGrContext.get());
     mCanvas->flush();
+}
+void GLWindow::showEvent(QShowEvent *e) {
+    resizeGL(width(), height());
+    updateFix();
+    QOpenGLWidget::showEvent(e);
+}
+
+#include <QTimer>
+void GLWindow::updateFix() {
+    QTimer::singleShot(1, this, [this]() { update(); });
 }
