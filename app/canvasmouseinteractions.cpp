@@ -574,7 +574,10 @@ QPointF Canvas::getMoveByValueForEvent(const MouseEvent &e) {
 #include "MovablePoints/smartctrlpoint.h"
 #include "MovablePoints/pathpointshandler.h"
 void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
-    if(mTransMode == MODE_SCALE) {
+    if(mRotPivot->isSelected()) {
+        if(mFirstMouseMove) mRotPivot->startTransform();
+        mRotPivot->moveByAbs(getMoveByValueForEvent(e));
+    } else if(mTransMode == MODE_SCALE) {
         scaleSelected(e);
     } else if(mTransMode == MODE_ROTATE) {
         rotateSelected(e);

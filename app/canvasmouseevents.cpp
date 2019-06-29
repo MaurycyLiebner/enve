@@ -75,10 +75,10 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
                   mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
             handleMovePointMouseMove(e);
         } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
-            if(!mPressedPoint) {
-                handleMovePathMouseMove(e);
-            } else {
+            if(mPressedPoint) {
                 handleMovePointMouseMove(e);
+            } else {
+                handleMovePathMouseMove(e);
             }
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddSmartPointMouseMove(e);

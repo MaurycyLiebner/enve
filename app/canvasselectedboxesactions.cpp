@@ -269,7 +269,7 @@ NormalSegment Canvas::getSegment(const MouseEvent& e) const {
 }
 
 void Canvas::rotateSelectedBoxesStartAndFinish(const qreal rotBy) {
-    if(mLocalPivot) {
+    if(mDocument.fLocalPivot) {
         for(const auto &box : mSelectedBoxes) {
             box->startRotTransform();
             box->rotateBy(rotBy);
@@ -289,7 +289,7 @@ void Canvas::rotateSelectedBoxesStartAndFinish(const qreal rotBy) {
 void Canvas::rotateSelectedBy(const qreal rotBy,
                               const QPointF &absOrigin,
                               const bool startTrans) {
-    if(mLocalPivot) {
+    if(mDocument.fLocalPivot) {
         if(startTrans) {
             for(const auto &box : mSelectedBoxes) {
                 box->startRotTransform();
@@ -326,7 +326,7 @@ void Canvas::scaleSelectedBy(const qreal scaleXBy,
                              const qreal scaleYBy,
                              const QPointF& absOrigin,
                              const bool startTrans) {
-    if(mLocalPivot) {
+    if(mDocument.fLocalPivot) {
         if(startTrans) {
             for(const auto &box : mSelectedBoxes) {
                 box->startScaleTransform();

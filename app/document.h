@@ -29,6 +29,7 @@ public:
 
     QString fEvFile;
 
+    bool fLocalPivot = true;
     CanvasMode fCanvasMode;
 
     // bookmarked

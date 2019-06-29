@@ -483,13 +483,8 @@ public:
     void clearHoveredEdge();
     void clearHovered();
 
-    void setLocalPivot(const bool localPivot) {
-        mLocalPivot = localPivot;
-        updatePivot();
-    }
-
     bool getPivotLocal() const {
-        return mLocalPivot;
+        return mDocument.fLocalPivot;
     }
 
     int getMaxFrame();

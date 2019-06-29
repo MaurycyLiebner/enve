@@ -71,8 +71,6 @@ public:
     ImageBox *createImageForPath(const QString &path);
     SingleSound *createSoundForPath(const QString &path);
 
-    void setLocalPivot(const bool bT);
-
     void importFile(const QString &path,
                     const QPointF &relDropPos = QPointF(0, 0));
 

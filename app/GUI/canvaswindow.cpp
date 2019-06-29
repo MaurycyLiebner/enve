@@ -100,7 +100,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         MainWindow::getInstance()->setCurrentUndoRedoStack(nullptr);
     }
 
-//    if(hasNoCanvas()) openWelcomeDialog();
+//    if(!mCurrentCanvas) openWelcomeDialog();
 //    else {
 //        closeWelcomeDialog();
 //        requestFitCanvasToSize();
@@ -147,6 +147,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
 }
 
 void CanvasWindow::queScheduledTasksAndUpdate() {
+    updatePivotIfNeeded();
     MainWindow::getInstance()->queScheduledTasksAndUpdate();
     update();
 }
@@ -442,7 +443,7 @@ bool CanvasWindow::handleShiftKeysKeyPress(QKeyEvent* event) {
 }
 #include <QApplication>
 bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
-    if(hasNoCanvas()) return false;
+    if(!mCurrentCanvas) return false;
     if(mCurrentCanvas->isPreviewingOrRendering()) return false;
     const QPoint globalPos = QCursor::pos();
     const auto pos = mapToCanvasCoord(mapFromGlobal(globalPos));
@@ -513,7 +514,7 @@ void CanvasWindow::changeCurrentFrameAction(const int frame) {
 }
 
 void CanvasWindow::setResolutionFraction(const qreal percent) {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->setResolutionFraction(percent);
     mCurrentCanvas->prp_afterWholeInfluenceRangeChanged();
     mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
@@ -521,17 +522,17 @@ void CanvasWindow::setResolutionFraction(const qreal percent) {
 }
 
 void CanvasWindow::updatePivotIfNeeded() {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->updatePivotIfNeeded();
 }
 
 void CanvasWindow::schedulePivotUpdate() {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->schedulePivotUpdate();
 }
 
 ContainerBox *CanvasWindow::getCurrentGroup() {
-    if(hasNoCanvas()) return nullptr;
+    if(!mCurrentCanvas) return nullptr;
     return mCurrentCanvas->getCurrentGroup();
 }
 
@@ -602,7 +603,7 @@ void CanvasWindow::nextCurrentRenderFrame() {
 }
 
 void CanvasWindow::renderPreview() {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     const auto nextFrameFunc = [this]() {
         nextPreviewRenderFrame();
     };
@@ -703,7 +704,7 @@ void CanvasWindow::playPreviewAfterAllTasksCompleted() {
 }
 
 void CanvasWindow::playPreview() {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     //changeCurrentFrameAction(mSavedCurrentFrame);
     TaskScheduler::sClearAllFinishedFuncs();
     const int minPreviewFrame = mSavedCurrentFrame;
@@ -743,7 +744,7 @@ void CanvasWindow::clearPreview() {
 }
 
 void CanvasWindow::nextPreviewFrame() {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentPreviewFrame++;
     if(mCurrentPreviewFrame > mMaxPreviewFrame) {
         clearPreview();
@@ -815,44 +816,39 @@ void CanvasWindow::clearAll() {
 }
 
 void CanvasWindow::createLinkToFileWithPath(const QString &path) {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->createLinkToFileWithPath(path);
 }
 
 void CanvasWindow::createAnimationBoxForPaths(
         const QStringList &importPaths) {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->createAnimationBoxForPaths(importPaths);
 }
 
 VideoBox *CanvasWindow::createVideoForPath(const QString &path) {
-    if(hasNoCanvas()) return nullptr;
+    if(!mCurrentCanvas) return nullptr;
     return mCurrentCanvas->createVideoForPath(path);
 }
 
 ImageBox *CanvasWindow::createImageForPath(const QString &path) {
-    if(hasNoCanvas()) return nullptr;
+    if(!mCurrentCanvas) return nullptr;
     return mCurrentCanvas->createImageBox(path);
 }
 
 SingleSound *CanvasWindow::createSoundForPath(const QString &path) {
-    if(hasNoCanvas()) return nullptr;
+    if(!mCurrentCanvas) return nullptr;
     return mCurrentCanvas->createSoundForPath(path);
 }
 
 int CanvasWindow::getCurrentFrame() {
-    if(hasNoCanvas()) return 0;
+    if(!mCurrentCanvas) return 0;
     return mCurrentCanvas->getCurrentFrame();
 }
 
 int CanvasWindow::getMaxFrame() {
-    if(hasNoCanvas()) return 0;
+    if(!mCurrentCanvas) return 0;
     return mCurrentCanvas->getMaxFrame();
-}
-
-void CanvasWindow::setLocalPivot(const bool bT) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setLocalPivot(bT);
 }
 
 const int BufferSize = 32768;
@@ -942,7 +938,7 @@ void CanvasWindow::dragMoveEvent(QDragMoveEvent *event) {
 
 void CanvasWindow::importFile(const QString &path,
                               const QPointF &relDropPos) {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
 
     const QFile file(path);
     if(!file.exists())
@@ -1022,46 +1018,46 @@ void CanvasWindow::importFile() {
 }
 
 void CanvasWindow::startDurationRectPosTransformForAllSelected() {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->startDurationRectPosTransformForAllSelected();
 }
 
 void CanvasWindow::finishDurationRectPosTransformForAllSelected() {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->finishDurationRectPosTransformForAllSelected();
 }
 
 void CanvasWindow::moveDurationRectForAllSelected(const int dFrame) {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->moveDurationRectForAllSelected(dFrame);
 }
 
 void CanvasWindow::startMinFramePosTransformForAllSelected() {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->startMinFramePosTransformForAllSelected();
 }
 
 void CanvasWindow::finishMinFramePosTransformForAllSelected() {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->finishMinFramePosTransformForAllSelected();
 }
 
 void CanvasWindow::moveMinFrameForAllSelected(const int dFrame) {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->moveMinFrameForAllSelected(dFrame);
 }
 
 void CanvasWindow::startMaxFramePosTransformForAllSelected() {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->startMaxFramePosTransformForAllSelected();
 }
 
 void CanvasWindow::finishMaxFramePosTransformForAllSelected() {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->finishMaxFramePosTransformForAllSelected();
 }
 
 void CanvasWindow::moveMaxFrameForAllSelected(const int dFrame) {
-    if(hasNoCanvas()) return;
+    if(!mCurrentCanvas) return;
     mCurrentCanvas->moveMaxFrameForAllSelected(dFrame);
 }

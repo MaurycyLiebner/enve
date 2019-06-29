@@ -237,7 +237,7 @@ void Canvas::rotateSelectedPointsBy(const qreal rotBy,
                                     const bool startTrans) {
     if(mSelectedPoints_d.isEmpty()) return;
     if(startTrans) {
-        if(mLocalPivot) {
+        if(mDocument.fLocalPivot) {
             for(const auto& point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(point->getAbsolutePos());
@@ -263,7 +263,7 @@ void Canvas::scaleSelectedPointsBy(const qreal scaleXBy,
                                    const bool startTrans) {
     if(mSelectedPoints_d.isEmpty()) return;
     if(startTrans) {
-        if(mLocalPivot) {
+        if(mDocument.fLocalPivot) {
             for(const auto& point : mSelectedPoints_d) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(point->getAbsolutePos());

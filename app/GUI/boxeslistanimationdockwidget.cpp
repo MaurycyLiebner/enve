@@ -73,6 +73,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
                 "", this);
     mLocalPivot->setToolTip("P");
     mLocalPivot->setCheckable(":/icons/localPivot.png");
+    mLocalPivot->setChecked(mDocument.fLocalPivot);
     connect(mLocalPivot, &ActionButton::toggled,
             this, &BoxesListAnimationDockWidget::setLocalPivot);
 
@@ -243,7 +244,9 @@ void BoxesListAnimationDockWidget::interruptPreview() {
 }
 
 void BoxesListAnimationDockWidget::setLocalPivot(const bool bT) {
-    mMainWindow->getCanvasWindow()->setLocalPivot(bT);
+    mDocument.fLocalPivot = bT;
+    for(const auto& scene : mDocument.fScenes)
+        scene->updatePivot();
     mMainWindow->queScheduledTasksAndUpdate();
 }
 
