@@ -3,7 +3,8 @@
 #include <QPushButton>
 
 LayoutHandler::LayoutHandler(Document& document,
-                             AudioHandler& audioHandler) {
+                             AudioHandler& audioHandler) :
+    mDocument(document), mAudioHandler(audioHandler) {
     const auto canvasComboLayout = new QHBoxLayout;
     canvasComboLayout->setSpacing(0);
     canvasComboLayout->setMargin(0);
@@ -36,8 +37,8 @@ LayoutHandler::LayoutHandler(Document& document,
     canvasComboLayout->addWidget(newLayPush);
     canvasComboLayout->addWidget(removeLayPush);
 
-    mSceneLayout = new SceneLayout(document, audioHandler);
-    mTimelineLayout = new TimelineLayout(document);
+    mSceneLayout = new SceneLayout();
+    mTimelineLayout = new TimelineLayout();
 
     connect(mComboBox, qOverload<int>(&QComboBox::activated),
             this, &LayoutHandler::setCurrent);
@@ -74,9 +75,6 @@ void saveAllChildrenLayoutsData(QWidget* const parent) {
 
 void LayoutHandler::saveCurrent() {
     if(mCurrentId == -1) return;
-    auto& current = mLayouts[uint(mCurrentId)];
     saveAllChildrenLayoutsData<CanvasWindowWrapper>(mSceneLayout);
     saveAllChildrenLayoutsData<TimelineWrapper>(mTimelineLayout);
-    current.fCanvas = mSceneLayout->extract();
-    current.fTimeline = mTimelineLayout->extract();
 }

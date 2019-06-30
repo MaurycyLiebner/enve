@@ -41,8 +41,8 @@ CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
                                          QWidget * const parent) :
     StackWidgetWrapper(
         layItem,
-        []() {
-            const auto rPtr = new CWWidgetStackLayoutItem;
+        [document, audioHandler]() {
+            const auto rPtr = new CWWidgetStackLayoutItem(*document, *audioHandler);
             return std::unique_ptr<WidgetStackLayoutItem>(rPtr);
         },
         [document, audioHandler](WidgetStackLayoutItem* const layItem,
@@ -102,13 +102,14 @@ void CWWidgetStackLayoutItem::clear() {
     mTransform.reset();
 }
 
-void CWWidgetStackLayoutItem::apply(StackWidgetWrapper * const stack) const {
-    SceneWidgetStackLayoutItem::apply(stack);
-    const auto cwWrapper = static_cast<CanvasWindowWrapper*>(stack);
+QWidget* CWWidgetStackLayoutItem::create() {
+    const auto cwWrapper = new CanvasWindowWrapper(
+                &mDocument, &mAudioHandler, this);
     cwWrapper->setScene(mScene);
     const auto cw = cwWrapper->getSceneWidget();
     cw->blockAutomaticSizeFit();
     cw->setViewTransform(mTransform);
+    return cwWrapper;
 }
 
 void CWWidgetStackLayoutItem::write(QIODevice * const dst) const {

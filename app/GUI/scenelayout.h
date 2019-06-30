@@ -5,11 +5,10 @@
 
 class SceneLayout : public QWidget {
 public:
-    SceneLayout(Document& document, AudioHandler &audioHandler,
-                QWidget* const parent = nullptr);
+    SceneLayout(QWidget* const parent = nullptr);
 
-    SceneBaseStackItem::cUPtr extract();
-    void setCurrent(const SceneBaseStackItem* const item);
+    SceneBaseStackItem *extract();
+    void setCurrent(SceneBaseStackItem * const item);
 
 //    void write(QIODevice* const dst) const {
 //        const int nCustom = mCollection.customCount();
@@ -31,11 +30,9 @@ public:
 //    }
 private:
     void setWidget(QWidget * const wid);
-    void reset(CanvasWindowWrapper ** const cwwP = nullptr);
+    void reset();
 
-    Document& mDocument;
-    AudioHandler& mAudioHandler;
-    SceneBaseStackItem::cUPtr mBaseStack;
+    SceneBaseStackItem* mBaseStack = nullptr;
 };
 
 #endif // SCENELAYOUT_H

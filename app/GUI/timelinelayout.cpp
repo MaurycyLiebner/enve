@@ -4,10 +4,8 @@
 #include "boxeslistanimationdockwidget.h"
 #include "timelinewrapper.h"
 
-TimelineLayout::TimelineLayout(Document& document,
-                               QWidget * const parent) :
-    QWidget(parent),
-    mDocument(document) {
+TimelineLayout::TimelineLayout(QWidget * const parent) :
+    QWidget(parent) {
     setLayout(new QHBoxLayout);
     layout()->setSpacing(0);
     layout()->setMargin(0);
@@ -15,30 +13,21 @@ TimelineLayout::TimelineLayout(Document& document,
     reset();
 }
 
-SceneBaseStackItem::cUPtr TimelineLayout::extract() {
-    return std::move(mBaseStack);
+SceneBaseStackItem* TimelineLayout::extract() {
+    const auto tmp = mBaseStack;
+    mBaseStack = nullptr;
+    return tmp;
 }
 
-void TimelineLayout::reset(TimelineWrapper** const cwwP) {
-    mBaseStack = std::make_unique<TSceneBaseStackItem>();
-    const auto cwwItem = static_cast<TWidgetStackLayoutItem*>(
-                mBaseStack->getChild());
-    const auto cww = new TimelineWrapper(&mDocument, cwwItem);
-    cww->disableClose();
-    if(cwwP) *cwwP = cww;
-    else setWidget(cww);
+void TimelineLayout::reset() {
+    mBaseStack = nullptr;
+    setWidget(nullptr);
 }
 
-void TimelineLayout::setCurrent(const SceneBaseStackItem* const item) {
-    TimelineWrapper* cwwP = nullptr;
+void TimelineLayout::setCurrent(SceneBaseStackItem* const item) {
     if(!item) return reset();
-    reset(&cwwP);
-    item->apply(cwwP);
-    QWidget* mainW = cwwP;
-    while(mainW->parentWidget())
-        mainW = mainW->parentWidget();
-    setWidget(mainW);
-    mBaseStack->setScene(item->getScene());
+    setWidget(item->create());
+    mBaseStack = item;
 }
 
 
@@ -49,5 +38,5 @@ void TimelineLayout::setWidget(QWidget * const wid) {
         delete item->layout();
         delete item;
     }
-    layout()->addWidget(wid);
+    if(wid) layout()->addWidget(wid);
 }

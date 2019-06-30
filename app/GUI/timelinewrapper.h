@@ -5,7 +5,11 @@ class TimelineWidget;
 class ChangeWidthWidget;
 
 struct TWidgetStackLayoutItem : public SceneWidgetStackLayoutItem {
-    void apply(StackWidgetWrapper* const stack) const;
+    TWidgetStackLayoutItem(Document& document) :
+        mDocument(document) {}
+    QWidget* create();
+private:
+    Document& mDocument;
 };
 
 class TimelineWrapper : public StackWidgetWrapper {

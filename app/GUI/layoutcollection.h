@@ -14,7 +14,6 @@ protected:
         setChild(std::move(cwwItem));
     }
 public:
-
     void setScene(Canvas* const scene) {
         mScene = scene;
     }
@@ -26,13 +25,15 @@ private:
 };
 
 struct TSceneBaseStackItem : public SceneBaseStackItem {
-    TSceneBaseStackItem(Canvas* const scene = nullptr) :
-        SceneBaseStackItem(std::make_unique<TWidgetStackLayoutItem>(), scene) {}
+    TSceneBaseStackItem(Document& document, Canvas* const scene = nullptr) :
+        SceneBaseStackItem(std::make_unique<TWidgetStackLayoutItem>(document), scene) {}
 };
 
 struct CWSceneBaseStackItem : public SceneBaseStackItem {
-    CWSceneBaseStackItem(Canvas* const scene = nullptr) :
-        SceneBaseStackItem(std::make_unique<CWWidgetStackLayoutItem>(), scene) {}
+    CWSceneBaseStackItem(Document& document, AudioHandler& audioHandler,
+                         Canvas* const scene = nullptr) :
+        SceneBaseStackItem(std::make_unique<CWWidgetStackLayoutItem>(
+                               document, audioHandler), scene) {}
 };
 
 #endif // LAYOUTCOLLECTION_H

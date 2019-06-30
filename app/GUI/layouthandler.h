@@ -5,16 +5,20 @@
 #include "timelinelayout.h"
 
 struct LayoutData {
-    LayoutData(const QString& name) : fName(name) {}
-    LayoutData(Canvas* const scene) :
-        fName(scene->getName()), fScene(scene) {
-        fCanvas = std::make_unique<CWSceneBaseStackItem>(fScene);
-        fTimeline = std::make_unique<TSceneBaseStackItem>(fScene);
+    LayoutData(Document& document, AudioHandler& audioHandler,
+               const QString& name) : fName(name) {
+        reset(document, audioHandler);
     }
 
-    void reset() {
-        fCanvas = std::make_unique<CWSceneBaseStackItem>(fScene);
-        fTimeline = std::make_unique<TSceneBaseStackItem>(fScene);
+    LayoutData(Document& document, AudioHandler& audioHandler,
+               Canvas* const scene) :
+        fName(scene->getName()), fScene(scene) {
+        reset(document, audioHandler);
+    }
+
+    void reset(Document& document, AudioHandler& audioHandler) {
+        fCanvas = std::make_unique<CWSceneBaseStackItem>(document, audioHandler, fScene);
+        fTimeline = std::make_unique<TSceneBaseStackItem>(document, fScene);
     }
 
     QString fName;
@@ -56,7 +60,7 @@ private:
     }
 
     void resetCurrentScene() {
-        mLayouts[uint(mCurrentId)].reset();
+        mLayouts[uint(mCurrentId)].reset(mDocument, mAudioHandler);
         const int idTmp = mCurrentId;
         mCurrentId = -1;
         setCurrent(idTmp);
@@ -85,7 +89,8 @@ private:
 
     void newLayout() {
         const QString name = "Layout " + QString::number(mLayouts.size());
-        mLayouts.insert(mLayouts.begin(), LayoutData(name));
+        mLayouts.insert(mLayouts.begin(),
+                        LayoutData(mDocument, mAudioHandler, name));
         mComboBox->insertItem(0, name);
         if(mCurrentId != -1) mCurrentId++;
         mNumberLayouts++;
@@ -93,7 +98,7 @@ private:
 
     void newForScene(Canvas* const scene) {
         mLayouts.insert(mLayouts.begin() + mNumberLayouts,
-                        LayoutData(scene));
+                        LayoutData(mDocument, mAudioHandler, scene));
         mComboBox->insertItem(mNumberLayouts, scene->getName());
         if(mCurrentId >= mNumberLayouts) mCurrentId++;
         setCurrent(mNumberLayouts);
@@ -132,6 +137,9 @@ private:
         else if(mCurrentId > id) mCurrentId--;
         setCurrent(newId);
     }
+
+    Document& mDocument;
+    AudioHandler& mAudioHandler;
 
     int mCurrentId = -1;
     int mNumberLayouts = 0;

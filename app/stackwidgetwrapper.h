@@ -105,7 +105,7 @@ struct StackLayoutItem {
     typedef std::unique_ptr<SplitStackLayoutItem> SplitPtr;
     typedef std::unique_ptr<WidgetStackLayoutItem> WidgetPtr;
     virtual ~StackLayoutItem() {}
-    virtual void apply(StackWidgetWrapper* const stack) const = 0;
+    virtual QWidget* create() = 0;
     virtual void write(QIODevice* const dst) const = 0;
     void writeType(QIODevice* const dst) const {
         dst->write(rcConstChar(&mType), sizeof(Type));
@@ -150,12 +150,6 @@ struct SplitStackLayoutItem : public ParentStackLayoutItem {
         mChildItems.second = std::move(child2);
     }
 
-    void apply(StackWidgetWrapper* const stack) const {
-        const auto other = split(stack);
-        if(mChildItems.first) mChildItems.first->apply(stack);
-        if(mChildItems.second) mChildItems.second->apply(other);
-    }
-
     void childClosed_k(StackLayoutItem* const child) {
         if(mChildItems.first.get() == child) {
             mParent->replaceChild(this, std::move(mChildItems.second));
@@ -183,7 +177,6 @@ struct SplitStackLayoutItem : public ParentStackLayoutItem {
     }
 protected:
     virtual StackWidgetWrapper* split(StackWidgetWrapper* const stack) const = 0;
-private:
     std::pair<UniPtr, UniPtr> mChildItems;
 };
 
@@ -229,8 +222,9 @@ protected:
 
 struct BaseStackItem : public ParentStackLayoutItem {
     typedef std::unique_ptr<BaseStackItem> UPtr;
-    void apply(StackWidgetWrapper* const stack) const {
-        if(mChild) mChild->apply(stack);
+
+    QWidget* create() {
+        return mChild->create();
     }
 
     void childClosed_k(StackLayoutItem* const child) {
@@ -278,7 +272,7 @@ struct BaseStackItem : public ParentStackLayoutItem {
         result->setChild(std::move(child));
         return UPtr(result);
     }
-private:
+protected:
     mutable QString mName;
     UniPtr mChild;
 };
@@ -286,6 +280,13 @@ private:
 struct HSplitStackItem : public SplitStackLayoutItem {
 public:
     HSplitStackItem() { mType = Type::H_SPLIT; }
+
+    QWidget* create() {
+        const auto split = new HWidgetStack;
+        split->appendWidget(mChildItems.first->create());
+        split->appendWidget(mChildItems.second->create());
+        return split;
+    }
 protected:
     StackWidgetWrapper* split(StackWidgetWrapper* const stack) const {
         return stack->splitH();
@@ -295,6 +296,13 @@ protected:
 struct VSplitStackItem : public SplitStackLayoutItem {
 public:
     VSplitStackItem() { mType = Type::V_SPLIT; }
+
+    QWidget* create() {
+        const auto split = new VWidgetStack;
+        split->appendWidget(mChildItems.first->create());
+        split->appendWidget(mChildItems.second->create());
+        return split;
+    }
 protected:
     StackWidgetWrapper* split(StackWidgetWrapper* const stack) const {
         return stack->splitV();

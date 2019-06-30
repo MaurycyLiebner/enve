@@ -7,16 +7,15 @@ class BoxesListAnimationDockWidget;
 
 class TimelineLayout : public QWidget {
 public:
-    TimelineLayout(Document& document, QWidget * const parent = nullptr);
+    TimelineLayout(QWidget * const parent = nullptr);
 
-    SceneBaseStackItem::cUPtr extract();
-    void setCurrent(const SceneBaseStackItem* const item);
+    SceneBaseStackItem* extract();
+    void setCurrent(SceneBaseStackItem* const item);
 private:
     void setWidget(QWidget* const wid);
-    void reset(TimelineWrapper ** const cwwP = nullptr);
+    void reset();
 
-    Document& mDocument;
-    SceneBaseStackItem::cUPtr mBaseStack;
+    SceneBaseStackItem* mBaseStack = nullptr;
 };
 
 #endif // TIMELINELAYOUT_H

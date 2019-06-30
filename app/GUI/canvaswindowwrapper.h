@@ -16,12 +16,17 @@ protected:
 };
 
 struct CWWidgetStackLayoutItem : public SceneWidgetStackLayoutItem {
+    CWWidgetStackLayoutItem(Document& document, AudioHandler& audioHandler) :
+        mDocument(document), mAudioHandler(audioHandler) {}
+
     void clear();
-    void apply(StackWidgetWrapper* const stack) const;
+    QWidget* create();
     void write(QIODevice* const dst) const;
     void read(QIODevice* const src);
     void setTransform(const QMatrix& transform);
 private:
+    Document& mDocument;
+    AudioHandler& mAudioHandler;
     QMatrix mTransform;
 };
 

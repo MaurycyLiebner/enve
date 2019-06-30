@@ -7,8 +7,8 @@ TimelineWrapper::TimelineWrapper(Document * const document,
                                  QWidget * const parent) :
     StackWidgetWrapper(
         layItem,
-        []() {
-            const auto rPtr = new TWidgetStackLayoutItem;
+        [document]() {
+            const auto rPtr = new TWidgetStackLayoutItem(*document);
             return std::unique_ptr<WidgetStackLayoutItem>(rPtr);
         },
         [document](WidgetStackLayoutItem* const layItem,
@@ -47,9 +47,8 @@ TimelineWidget* TimelineWrapper::getTimelineWidget() const {
     return static_cast<TimelineWidget*>(getCentralWidget());
 }
 
-void TWidgetStackLayoutItem::apply(StackWidgetWrapper * const stack) const {
-    SceneWidgetStackLayoutItem::apply(stack);
-    const auto tWrapper = static_cast<TimelineWrapper*>(stack);
-    tWrapper->setScene(mScene);
-    //const auto tWid = tWrapper->getTimelineWidget();
+QWidget *TWidgetStackLayoutItem::create() {
+    const auto cwWrapper = new TimelineWrapper(&mDocument, this);
+    cwWrapper->setScene(mScene);
+    return cwWrapper;
 }

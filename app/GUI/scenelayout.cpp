@@ -1,10 +1,8 @@
 #include "scenelayout.h"
 #include "document.h"
 
-SceneLayout::SceneLayout(Document& document,
-                         AudioHandler& audioHandler,
-                         QWidget * const parent) : QWidget(parent),
-    mDocument(document), mAudioHandler(audioHandler) {
+SceneLayout::SceneLayout(QWidget * const parent) :
+    QWidget(parent) {
     setLayout(new QHBoxLayout);
     layout()->setMargin(0);
     layout()->setSpacing(0);
@@ -12,31 +10,21 @@ SceneLayout::SceneLayout(Document& document,
     reset();
 }
 
-SceneBaseStackItem::cUPtr SceneLayout::extract() {
-    return std::move(mBaseStack);
+SceneBaseStackItem* SceneLayout::extract() {
+    const auto tmp = mBaseStack;
+    mBaseStack = nullptr;
+    return tmp;
 }
 
-void SceneLayout::reset(CanvasWindowWrapper** const cwwP) {
-    mBaseStack = std::make_unique<CWSceneBaseStackItem>();
-    const auto cwwItem = static_cast<CWWidgetStackLayoutItem*>(
-                mBaseStack->getChild());
-    const auto cww = new CanvasWindowWrapper(&mDocument, &mAudioHandler,
-                                             cwwItem);
-    cww->disableClose();
-    if(cwwP) *cwwP = cww;
-    else setWidget(cww);
+void SceneLayout::reset() {
+    mBaseStack = nullptr;
+    setWidget(nullptr);
 }
 
-void SceneLayout::setCurrent(const SceneBaseStackItem* const item) {
-    CanvasWindowWrapper* cwwP = nullptr;
+void SceneLayout::setCurrent(SceneBaseStackItem* const item) {
     if(!item) return reset();
-    reset(&cwwP);
-    item->apply(cwwP);
-    QWidget* mainW = cwwP;
-    while(mainW->parentWidget())
-        mainW = mainW->parentWidget();
-    setWidget(mainW);
-    mBaseStack->setScene(item->getScene());
+    setWidget(item->create());
+    mBaseStack = item;
 }
 
 void SceneLayout::setWidget(QWidget * const wid) {
@@ -46,5 +34,5 @@ void SceneLayout::setWidget(QWidget * const wid) {
         delete item->layout();
         delete item;
     }
-    layout()->addWidget(wid);
+    if(wid) layout()->addWidget(wid);
 }
