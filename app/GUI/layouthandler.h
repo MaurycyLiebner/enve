@@ -88,12 +88,13 @@ private:
     }
 
     void newLayout() {
-        const QString name = "Layout " + QString::number(mLayouts.size());
+        const QString name = "Layout " + QString::number(mNumberLayouts);
         mLayouts.insert(mLayouts.begin(),
                         LayoutData(mDocument, mAudioHandler, name));
         mComboBox->insertItem(0, name);
         if(mCurrentId != -1) mCurrentId++;
         mNumberLayouts++;
+        setCurrent(0);
     }
 
     void newForScene(Canvas* const scene) {
