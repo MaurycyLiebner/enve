@@ -82,7 +82,6 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         mDocument.addVisibleScene(mCurrentCanvas);
         mCurrentSoundComposition = mCurrentCanvas->getSoundComposition();
         mCurrentCanvas->setIsCurrentCanvas(true);
-        setCanvasMode(mCurrentCanvas->getCurrentCanvasMode());
 
         emit changeCanvasFrameRange(canvas->getFrameRange());
         changeCurrentFrameAction(getCurrentFrame());
@@ -409,7 +408,7 @@ bool CanvasWindow::handleStartTransformKeyPress(const KeyEvent& e) {
 bool CanvasWindow::handleSelectAllKeyPress(QKeyEvent* event) {
     if(event->key() == Qt::Key_A && !isMouseGrabber()) {
         bool altPressed = event->modifiers() & Qt::AltModifier;
-        auto currentMode = mCurrentCanvas->getCurrentCanvasMode();
+        auto currentMode = mDocument.fCanvasMode;
         if(currentMode == MOVE_BOX) {
             if(altPressed) {
                mCurrentCanvas->deselectAllBoxesAction();
@@ -989,49 +988,4 @@ void CanvasWindow::importFile() {
             }
         }
     }
-}
-
-void CanvasWindow::startDurationRectPosTransformForAllSelected() {
-    if(!mCurrentCanvas) return;
-    mCurrentCanvas->startDurationRectPosTransformForAllSelected();
-}
-
-void CanvasWindow::finishDurationRectPosTransformForAllSelected() {
-    if(!mCurrentCanvas) return;
-    mCurrentCanvas->finishDurationRectPosTransformForAllSelected();
-}
-
-void CanvasWindow::moveDurationRectForAllSelected(const int dFrame) {
-    if(!mCurrentCanvas) return;
-    mCurrentCanvas->moveDurationRectForAllSelected(dFrame);
-}
-
-void CanvasWindow::startMinFramePosTransformForAllSelected() {
-    if(!mCurrentCanvas) return;
-    mCurrentCanvas->startMinFramePosTransformForAllSelected();
-}
-
-void CanvasWindow::finishMinFramePosTransformForAllSelected() {
-    if(!mCurrentCanvas) return;
-    mCurrentCanvas->finishMinFramePosTransformForAllSelected();
-}
-
-void CanvasWindow::moveMinFrameForAllSelected(const int dFrame) {
-    if(!mCurrentCanvas) return;
-    mCurrentCanvas->moveMinFrameForAllSelected(dFrame);
-}
-
-void CanvasWindow::startMaxFramePosTransformForAllSelected() {
-    if(!mCurrentCanvas) return;
-    mCurrentCanvas->startMaxFramePosTransformForAllSelected();
-}
-
-void CanvasWindow::finishMaxFramePosTransformForAllSelected() {
-    if(!mCurrentCanvas) return;
-    mCurrentCanvas->finishMaxFramePosTransformForAllSelected();
-}
-
-void CanvasWindow::moveMaxFrameForAllSelected(const int dFrame) {
-    if(!mCurrentCanvas) return;
-    mCurrentCanvas->moveMaxFrameForAllSelected(dFrame);
 }

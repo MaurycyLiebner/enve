@@ -75,6 +75,11 @@ void CanvasWindowWrapper::saveDataToLayout() const {
     const auto sceneWidget = getSceneWidget();
     lItem->setTransform(sceneWidget->getViewTransform());
     lItem->setScene(sceneWidget->getCurrentCanvas());
+    const QSizeF sizeF = size();
+    const QSizeF parentSize = parentWidget() ? parentWidget()->size() : sizeF;
+    lItem->setSizeFrac({sizeF.width()/parentSize.width(),
+                        sizeF.height()/parentSize.height()});
+
 }
 
 CanvasWindow* CanvasWindowWrapper::getSceneWidget() const {
@@ -98,6 +103,7 @@ void CWWidgetStackLayoutItem::clear() {
 }
 
 void CWWidgetStackLayoutItem::apply(StackWidgetWrapper * const stack) const {
+    SceneWidgetStackLayoutItem::apply(stack);
     const auto cwWrapper = static_cast<CanvasWindowWrapper*>(stack);
     cwWrapper->setScene(mScene);
     const auto cw = cwWrapper->getSceneWidget();

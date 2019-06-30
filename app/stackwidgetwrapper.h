@@ -205,10 +205,26 @@ struct WidgetStackLayoutItem : public SplittableStackItem {
 
     virtual void clear() = 0;
     virtual void read(QIODevice* const src) = 0;
+
+    void apply(StackWidgetWrapper * const stack) const {
+        if(!stack->parentWidget()) return;
+        const QSizeF parentSize = stack->parentWidget()->size();
+
+        stack->resize(qRound(mSizeFrac.width()*parentSize.width()),
+                      qRound(mSizeFrac.height()*parentSize.height()));
+    }
+
+
     void close() {
         if(!mParent) return clear();
         mParent->childClosed_k(this);
     }
+
+    void setSizeFrac(const QSizeF& frac) {
+        mSizeFrac = frac;
+    }
+protected:
+    QSizeF mSizeFrac;
 };
 
 struct BaseStackItem : public ParentStackLayoutItem {

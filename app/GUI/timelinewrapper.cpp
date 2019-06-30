@@ -37,6 +37,10 @@ void TimelineWrapper::saveDataToLayout() const {
     if(!lItem) return;
     const auto sceneWidget = getTimelineWidget();
     lItem->setScene(sceneWidget->getCurrrentScene());
+    const QSizeF sizeF = size();
+    const QSizeF parentSize = parentWidget() ? parentWidget()->size() : sizeF;
+    lItem->setSizeFrac({sizeF.width()/parentSize.width(),
+                        sizeF.height()/parentSize.height()});
 }
 
 TimelineWidget* TimelineWrapper::getTimelineWidget() const {
@@ -44,6 +48,7 @@ TimelineWidget* TimelineWrapper::getTimelineWidget() const {
 }
 
 void TWidgetStackLayoutItem::apply(StackWidgetWrapper * const stack) const {
+    SceneWidgetStackLayoutItem::apply(stack);
     const auto tWrapper = static_cast<TimelineWrapper*>(stack);
     tWrapper->setScene(mScene);
     //const auto tWid = tWrapper->getTimelineWidget();

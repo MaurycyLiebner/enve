@@ -91,16 +91,6 @@ public:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
     void openSettingsWindowForCurrentCanvas();
-
-    void startDurationRectPosTransformForAllSelected();
-    void finishDurationRectPosTransformForAllSelected();
-    void moveDurationRectForAllSelected(const int dFrame);
-    void startMinFramePosTransformForAllSelected();
-    void finishMinFramePosTransformForAllSelected();
-    void moveMinFrameForAllSelected(const int dFrame);
-    void startMaxFramePosTransformForAllSelected();
-    void finishMaxFramePosTransformForAllSelected();
-    void moveMaxFrameForAllSelected(const int dFrame);
 protected:
     void KFT_setFocusToWidget() {
         if(mCurrentCanvas) mDocument.setActiveScene(mCurrentCanvas);

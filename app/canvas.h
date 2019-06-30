@@ -353,10 +353,6 @@ public:
     void setPreviewing(const bool bT);
     void setOutputRendering(const bool bT);
 
-    CanvasMode getCurrentCanvasMode() const {
-        return mCurrentMode;
-    }
-
     Canvas *getParentCanvas() {
         return this;
     }
