@@ -2,7 +2,6 @@
 #define LAYOUTHANDLER_H
 #include <QComboBox>
 #include "scenelayout.h"
-#include "timelinelayout.h"
 
 struct LayoutData {
     LayoutData(Document& document, AudioHandler& audioHandler,
@@ -39,7 +38,7 @@ public:
         return mSceneLayout;
     }
 
-    TimelineLayout* timelineLayout() {
+    SceneLayout* timelineLayout() {
         return mTimelineLayout;
     }
 
@@ -149,7 +148,7 @@ private:
     QWidget* mComboWidget;
     QComboBox* mComboBox;
     SceneLayout* mSceneLayout;
-    TimelineLayout* mTimelineLayout;
+    SceneLayout* mTimelineLayout;
 };
 
 #endif // LAYOUTHANDLER_H

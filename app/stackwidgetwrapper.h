@@ -72,8 +72,9 @@ public:
         return mLayoutItem;
     }
 private:
-    template <class T>
+    template <class T, class U>
     StackWidgetWrapper* split(
+            U* const lItem,
             WidgetStackLayoutItem* const otherLayoutItem);
 
     StackWrapperCornerMenu* mCornerMenu;
@@ -86,11 +87,12 @@ private:
     QWidget* mCenterWidget = nullptr;
 };
 
-template <class T>
+template <class T, class U>
 StackWidgetWrapper* StackWidgetWrapper::split(
+        U* const lItem,
         WidgetStackLayoutItem * const otherLayoutItem) {
     mCornerMenu->enableClose();
-    const auto stack = new T(parentWidget());
+    const auto stack = new T(lItem, parentWidget());
     gReplaceWidget(this, stack);
     stack->appendWidget(this);
     const auto newWid = mCreator(otherLayoutItem, stack);
@@ -110,10 +112,10 @@ struct StackLayoutItem {
     typedef std::unique_ptr<SplitStackLayoutItem> SplitPtr;
     typedef std::unique_ptr<WidgetStackLayoutItem> WidgetPtr;
     virtual ~StackLayoutItem() {}
-    virtual QWidget* create(QWidget* const parent) = 0;
+    virtual QWidget* create(QWidget* const parent,
+                            QLayout* const layout = nullptr) = 0;
     virtual void write(QIODevice* const dst) const = 0;
     virtual void saveData() = 0;
-    virtual void apply() const = 0;
 
     void writeType(QIODevice* const dst) const {
         dst->write(rcConstChar(&mType), sizeof(Type));
@@ -188,11 +190,6 @@ struct SplitStackLayoutItem : public ParentStackLayoutItem {
         mChildItems.first->saveData();
         mChildItems.second->saveData();
     }
-
-    void apply() const {
-        mChildItems.first->apply();
-        mChildItems.second->apply();
-    }
 protected:
     std::pair<UniPtr, UniPtr> mChildItems;
     qreal mSecondSizeFrac = 0.5;
@@ -222,9 +219,6 @@ struct WidgetStackLayoutItem : public SplittableStackItem {
         mCurrent = nullptr;
     }
 
-    void apply() const {}
-
-
     void close() {
         if(!mParent) return clear();
         mParent->childClosed_k(this);
@@ -240,12 +234,8 @@ struct BaseStackItem : public ParentStackLayoutItem {
         mChild->saveData();
     }
 
-    void apply() const {
-        mChild->apply();
-    }
-
-    QWidget* create(QWidget* const parent) {
-        return mChild->create(parent);
+    QWidget* create(QWidget* const parent, QLayout* const layout = nullptr) {
+        return mChild->create(parent, layout);
     }
 
     void childClosed_k(StackLayoutItem* const child) {
@@ -302,28 +292,56 @@ struct HSplitStackItem : public SplitStackLayoutItem {
 public:
     HSplitStackItem() { mType = Type::H_SPLIT; }
 
-    QWidget* create(QWidget* const parent) {
-        const auto split = new HWidgetStack(parent);
+    QWidget* create(QWidget* const parent, QLayout* const layout = nullptr) {
+        const auto split = new HWidgetStack(this, parent);
+        if(layout) layout->addWidget(split);
         split->appendWidget(mChildItems.first->create(split),
                             1 - mSecondSizeFrac);
         split->appendWidget(mChildItems.second->create(split),
                             mSecondSizeFrac);
         return split;
     }
+
+    void saveData() {
+        Q_ASSERT(mCurrent);
+        SplitStackLayoutItem::saveData();
+        mSecondSizeFrac = mCurrent->percentAt(1);
+        mCurrent = nullptr;
+    }
+
+    void setCurrent(HWidgetStack* const current) {
+        mCurrent = current;
+    }
+private:
+    HWidgetStack* mCurrent = nullptr;
 };
 
 struct VSplitStackItem : public SplitStackLayoutItem {
 public:
     VSplitStackItem() { mType = Type::V_SPLIT; }
 
-    QWidget* create(QWidget* const parent) {
-        const auto split = new VWidgetStack(parent);
+    QWidget* create(QWidget* const parent, QLayout* const layout = nullptr) {
+        const auto split = new VWidgetStack(this, parent);
+        if(layout) layout->addWidget(split);
         split->appendWidget(mChildItems.first->create(split),
                             1 - mSecondSizeFrac);
         split->appendWidget(mChildItems.second->create(split),
                             mSecondSizeFrac);
         return split;
     }
+
+    void saveData() {
+        Q_ASSERT(mCurrent);
+        SplitStackLayoutItem::saveData();
+        mSecondSizeFrac = mCurrent->percentAt(1);
+        mCurrent = nullptr;
+    }
+
+    void setCurrent(VWidgetStack* const current) {
+        mCurrent = current;
+    }
+private:
+    VWidgetStack* mCurrent = nullptr;
 };
 
 template <typename WidgetT>

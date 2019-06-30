@@ -68,7 +68,6 @@ SOURCES += main.cpp\
     GUI/layouthandler.cpp \
     GUI/scenechooser.cpp \
     GUI/scenelayout.cpp \
-    GUI/timelinelayout.cpp \
     GUI/timelinewrapper.cpp \
     GUI/welcomedialog.cpp \
     GUI/widgetstack.cpp \
@@ -295,7 +294,6 @@ HEADERS  += \
     GUI/layouthandler.h \
     GUI/scenechooser.h \
     GUI/scenelayout.h \
-    GUI/timelinelayout.h \
     GUI/timelinewrapper.h \
     GUI/welcomedialog.h \
     GUI/widgetstack.h \

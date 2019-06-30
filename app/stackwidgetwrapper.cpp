@@ -37,15 +37,15 @@ void StackWidgetWrapper::setCentralWidget(QWidget * const widget) {
 StackWidgetWrapper* StackWidgetWrapper::splitH() {
     auto otherLayoutItem = mLayoutItemCreator();
     const auto otherLayoutItemPtr = otherLayoutItem.get();
-    mLayoutItem->splitH(std::move(otherLayoutItem));
-    return split<HWidgetStack>(otherLayoutItemPtr);
+    const auto lItem = mLayoutItem->splitH(std::move(otherLayoutItem));
+    return split<HWidgetStack>(lItem, otherLayoutItemPtr);
 }
 
 StackWidgetWrapper* StackWidgetWrapper::splitV() {
     auto otherLayoutItem = mLayoutItemCreator();
     const auto otherLayoutItemPtr = otherLayoutItem.get();
-    mLayoutItem->splitV(std::move(otherLayoutItem));
-    return split<VWidgetStack>(otherLayoutItemPtr);
+    const auto lItem = mLayoutItem->splitV(std::move(otherLayoutItem));
+    return split<VWidgetStack>(lItem, otherLayoutItemPtr);
 }
 
 void StackWidgetWrapper::closeWrapper() {
@@ -103,7 +103,7 @@ SplitItemClass* SplittableStackItem::split(WidgetPtr &&other) {
     const auto vStackPtr = vStack.get();
     UniPtr thisUni = mParent->replaceChild(this, std::move(vStack));
     vStackPtr->setChildren(std::move(thisUni), std::move(other));
-    return vStack.get();
+    return vStackPtr;
 }
 
 VSplitStackItem* SplittableStackItem::splitV(WidgetPtr &&other) {

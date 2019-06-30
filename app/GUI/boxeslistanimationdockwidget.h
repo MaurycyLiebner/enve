@@ -17,7 +17,7 @@
 #include <QToolBar>
 #include "smartPointers/sharedpointerdefs.h"
 #include "framerange.h"
-#include "timelinelayout.h"
+#include "scenelayout.h"
 class FrameScrollBar;
 class TimelineWidget;
 class RenderWidget;
@@ -44,7 +44,7 @@ public:
     void clearAll();
 
     RenderWidget *getRenderWidget();
-    TimelineLayout* getTimelineLayout() {
+    SceneLayout* getTimelineLayout() {
         return mTimelineLayout;
     }
 private:
@@ -63,7 +63,7 @@ private:
 private:
     Document& mDocument;
 
-    TimelineLayout* mTimelineLayout;
+    SceneLayout* mTimelineLayout;
 
     QWidget* mCentralWidget = nullptr;
 

@@ -242,8 +242,7 @@ protected:
         for(int i = 0; i < wCount; i++) {
             const auto widget = mWidgets.at(i);
             PosSetter(accumulated, widget);
-            const int iNewDim = qMax(qRound(mDimPercent.at(i)*thisDim),
-                                     2*MIN_WIDGET_DIM);
+            const int iNewDim = qMax(minDim(), qRound(mDimPercent.at(i)*thisDim));
             DimSetter(widget, iNewDim);
             OtherDimSetter(widget, thisOtherDim);
             accumulated += iNewDim;
@@ -253,7 +252,7 @@ protected:
         }
         const auto lastWidget = mWidgets.last();
         PosSetter(accumulated, lastWidget);
-        const int lastDim = qMax(2*MIN_WIDGET_DIM, thisDim - accumulated);
+        const int lastDim = qMax(minDim(), thisDim - accumulated);
         DimSetter(lastWidget, lastDim);
         OtherDimSetter(lastWidget, thisOtherDim);
     }
@@ -291,15 +290,18 @@ protected:
         int totDim = 0;
         for(const auto wid : mWidgets) {
             const int widDim = (wid->*DimGetter)();
-            totDim += qMax(2*MIN_WIDGET_DIM, widDim);
+            totDim += qMax(minDim(), widDim);
         }
 
         mDimPercent.clear();
         for(int i = 0; i < mWidgets.count(); i++) {
-            const int widDim = qMax(2*MIN_WIDGET_DIM,
-                                    (mWidgets.at(i)->*DimGetter)());
+            const int widDim = qMax(minDim(), (mWidgets.at(i)->*DimGetter)());
             mDimPercent << qreal(widDim)/totDim;
         }
+    }
+
+    int minDim() const {
+        return mThis->isVisible() ? 2*MIN_WIDGET_DIM : 1;
     }
 public:
     qreal percentAt(const int id) const {
@@ -324,7 +326,9 @@ public:
             const int widDim = qRound(prevDim*frac);
             DimSetter(widget, widDim);
             DimSetter(prevWid, prevDim - widDim);
-        } else DimSetter(widget, 3*MIN_WIDGET_DIM);
+        } else {
+            DimSetter(widget, minDim());
+        }
         updateAll();
         widget->show();
 
@@ -384,9 +388,13 @@ private:
     QList<TResizer*> mResizers;
 };
 
+struct VSplitStackItem;
+struct HSplitStackItem;
+
 class VWidgetStack : public QWidget, public WidgetStackBase<V_STACK_TMPL> {
 public:
-    VWidgetStack(QWidget * const parent = nullptr);
+    VWidgetStack(VSplitStackItem* const lItem,
+                 QWidget * const parent = nullptr);
 protected:
     void resizeEvent(QResizeEvent *) {
         updateSizesAndPositions();
@@ -395,7 +403,8 @@ protected:
 
 class HWidgetStack : public QWidget, public WidgetStackBase<H_STACK_TMPL> {
 public:
-    HWidgetStack(QWidget * const parent = nullptr);
+    HWidgetStack(HSplitStackItem* const lItem,
+                 QWidget * const parent = nullptr);
 protected:
     void resizeEvent(QResizeEvent *) {
         updateSizesAndPositions();

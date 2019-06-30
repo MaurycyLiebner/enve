@@ -85,9 +85,11 @@ void CWWidgetStackLayoutItem::clear() {
     mTransform.reset();
 }
 
-QWidget* CWWidgetStackLayoutItem::create(QWidget* const parent) {
+QWidget* CWWidgetStackLayoutItem::create(QWidget* const parent,
+                                         QLayout * const layout) {
     const auto cwWrapper = new CanvasWindowWrapper(
                 &mDocument, &mAudioHandler, this, parent);
+    if(layout) layout->addWidget(cwWrapper);
     cwWrapper->setScene(mScene);
     const auto cw = cwWrapper->getSceneWidget();
     cw->blockAutomaticSizeFit();

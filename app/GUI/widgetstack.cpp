@@ -1,4 +1,5 @@
 #include "widgetstack.h"
+#include "stackwidgetwrapper.h"
 
 void gMoveX(const int x, QWidget * const widget) {
     widget->move(x, 0);
@@ -16,13 +17,17 @@ void gResizeH(QWidget * const widget, const int h) {
     widget->resize(widget->width(), h);
 }
 
-VWidgetStack::VWidgetStack(QWidget * const parent) :
+VWidgetStack::VWidgetStack(VSplitStackItem * const lItem,
+                           QWidget * const parent) :
     QWidget(parent), WidgetStackBase<V_STACK_TMPL>() {
+    lItem->setCurrent(this);
     setThis(this);
 }
 
-HWidgetStack::HWidgetStack(QWidget * const parent) :
+HWidgetStack::HWidgetStack(HSplitStackItem * const lItem,
+                           QWidget * const parent) :
     QWidget(parent), WidgetStackBase<H_STACK_TMPL>() {
+    lItem->setCurrent(this);
     setThis(this);
 }
 

@@ -20,7 +20,8 @@ struct CWWidgetStackLayoutItem : public SceneWidgetStackLayoutItem {
         mDocument(document), mAudioHandler(audioHandler) {}
 
     void clear();
-    QWidget* create(QWidget * const parent);
+    QWidget* create(QWidget * const parent,
+                    QLayout* const layout = nullptr);
     void write(QIODevice* const dst) const;
     void read(QIODevice* const src);
     void setTransform(const QMatrix& transform);

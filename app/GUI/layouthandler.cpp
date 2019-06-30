@@ -38,7 +38,7 @@ LayoutHandler::LayoutHandler(Document& document,
     canvasComboLayout->addWidget(removeLayPush);
 
     mSceneLayout = new SceneLayout();
-    mTimelineLayout = new TimelineLayout();
+    mTimelineLayout = new SceneLayout();
 
     connect(mComboBox, qOverload<int>(&QComboBox::activated),
             this, &LayoutHandler::setCurrent);

@@ -10,27 +10,8 @@ public:
     SceneBaseStackItem *extract();
     void setCurrent(SceneBaseStackItem * const item);
     void saveData();
-
-//    void write(QIODevice* const dst) const {
-//        const int nCustom = mCollection.customCount();
-//        dst->write(rcConstChar(&nCustom), sizeof(int));
-//        for(int i = 0; i < nCustom; i++) {
-//            if(i == mCurrentId) mBaseStack->write(dst);
-//            else mCollection.getAt(i)->write(dst);
-//        }
-//    }
-
-//    void read(QIODevice* const src) {
-//        int nCustom;
-//        src->read(rcChar(&nCustom), sizeof(int));
-//        for(int i = 0; i < nCustom; i++) {
-//            auto newL = BaseStackItem::sRead<CWWidgetStackLayoutItem>(src);
-//            const QString& name = newL->getName();
-//            const int id = mCollection.addCustomLayout(std::move(newL));
-//        }
-//    }
 private:
-    void setWidget(QWidget * const wid);
+    void clearWidget();
     void reset();
 
     SceneBaseStackItem* mBaseStack = nullptr;

@@ -42,8 +42,10 @@ TimelineWidget* TimelineWrapper::getTimelineWidget() const {
     return static_cast<TimelineWidget*>(getCentralWidget());
 }
 
-QWidget *TWidgetStackLayoutItem::create(QWidget* const parent) {
+QWidget *TWidgetStackLayoutItem::create(QWidget* const parent,
+                                        QLayout * const layout) {
     const auto cwWrapper = new TimelineWrapper(&mDocument, this, parent);
+    if(layout) layout->addWidget(cwWrapper);
     cwWrapper->setScene(mScene);
     return cwWrapper;
 }
