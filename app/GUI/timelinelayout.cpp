@@ -27,9 +27,13 @@ void TimelineLayout::reset() {
 void TimelineLayout::setCurrent(SceneBaseStackItem* const item) {
     if(!item) return reset();
     setWidget(item->create());
+    item->apply();
     mBaseStack = item;
 }
 
+void TimelineLayout::saveData() {
+    mBaseStack->saveData();
+}
 
 void TimelineLayout::setWidget(QWidget * const wid) {
     while(layout()->count() > 0) {

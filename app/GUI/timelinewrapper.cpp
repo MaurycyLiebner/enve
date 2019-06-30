@@ -33,14 +33,10 @@ Canvas* TimelineWrapper::getScene() const {
 }
 
 void TimelineWrapper::saveDataToLayout() const {
+    StackWidgetWrapper::saveDataToLayout();
     const auto lItem = static_cast<TWidgetStackLayoutItem*>(getLayoutItem());
-    if(!lItem) return;
     const auto sceneWidget = getTimelineWidget();
     lItem->setScene(sceneWidget->getCurrrentScene());
-    const QSizeF sizeF = size();
-    const QSizeF parentSize = parentWidget() ? parentWidget()->size() : sizeF;
-    lItem->setSizeFrac({sizeF.width()/parentSize.width(),
-                        sizeF.height()/parentSize.height()});
 }
 
 TimelineWidget* TimelineWrapper::getTimelineWidget() const {

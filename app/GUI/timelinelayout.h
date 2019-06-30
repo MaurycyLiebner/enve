@@ -11,6 +11,7 @@ public:
 
     SceneBaseStackItem* extract();
     void setCurrent(SceneBaseStackItem* const item);
+    void saveData();
 private:
     void setWidget(QWidget* const wid);
     void reset();

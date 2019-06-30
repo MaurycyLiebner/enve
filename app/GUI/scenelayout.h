@@ -9,6 +9,7 @@ public:
 
     SceneBaseStackItem *extract();
     void setCurrent(SceneBaseStackItem * const item);
+    void saveData();
 
 //    void write(QIODevice* const dst) const {
 //        const int nCustom = mCollection.customCount();

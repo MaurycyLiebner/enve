@@ -42,8 +42,6 @@ public:
     CanvasWindow *getSceneWidget() const;
 
     void saveDataToLayout() const;
-protected:
-    void changeEvent(QEvent* e);
 private:
     using StackWidgetWrapper::setMenuBar;
     using StackWidgetWrapper::setCentralWidget;

@@ -9,6 +9,7 @@ StackWidgetWrapper::StackWidgetWrapper(WidgetStackLayoutItem* const layoutItem,
     QWidget(parent), mLayoutItem(layoutItem),
     mLayoutItemCreator(layoutItemCreator),
     mCreator(creator), mSetupOp(setup) {
+    mLayoutItem->setCurrent(this);
     mCornerMenu = new StackWrapperCornerMenu(this);
     mCornerMenu->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
     mLayout = new QVBoxLayout(this);
@@ -16,6 +17,14 @@ StackWidgetWrapper::StackWidgetWrapper(WidgetStackLayoutItem* const layoutItem,
     mLayout->setSpacing(0);
     mLayout->setMargin(0);
     mSetupOp(this);
+}
+
+void StackWidgetWrapper::saveDataToLayout() const {
+    Q_ASSERT(mLayoutItem && parentWidget());
+    const QSizeF sizeF = size();
+    const QSizeF parentSize = parentWidget()->size();
+    mLayoutItem->setSizeFrac({sizeF.width()/parentSize.width(),
+                              sizeF.height()/parentSize.height()});
 }
 
 void StackWidgetWrapper::setMenuBar(StackWrapperMenu * const menu) {

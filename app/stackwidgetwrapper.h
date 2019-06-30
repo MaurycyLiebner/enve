@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <QMainWindow>
 #include <memory>
+#include <QDebug>
 class StackWidgetWrapper;
 
 class StackWrapperCornerMenu : public QMenuBar {
@@ -46,6 +47,8 @@ public:
                                 const LayoutItemCreator& layoutItemCreator,
                                 const Creator& creator, const SetupOp& setup,
                                 QWidget* const parent = nullptr);
+
+    virtual void saveDataToLayout() const;
 
     StackWrapperCornerMenu* getCornerMenu() {
         return mCornerMenu;
@@ -107,6 +110,9 @@ struct StackLayoutItem {
     virtual ~StackLayoutItem() {}
     virtual QWidget* create() = 0;
     virtual void write(QIODevice* const dst) const = 0;
+    virtual void saveData() = 0;
+    virtual void apply() const = 0;
+
     void writeType(QIODevice* const dst) const {
         dst->write(rcConstChar(&mType), sizeof(Type));
     }
@@ -175,6 +181,16 @@ struct SplitStackLayoutItem : public ParentStackLayoutItem {
         }
         return nullptr;
     }
+
+    void saveData() {
+        mChildItems.first->saveData();
+        mChildItems.second->saveData();
+    }
+
+    void apply() const {
+        mChildItems.first->apply();
+        mChildItems.second->apply();
+    }
 protected:
     virtual StackWidgetWrapper* split(StackWidgetWrapper* const stack) const = 0;
     std::pair<UniPtr, UniPtr> mChildItems;
@@ -199,12 +215,22 @@ struct WidgetStackLayoutItem : public SplittableStackItem {
     virtual void clear() = 0;
     virtual void read(QIODevice* const src) = 0;
 
-    void apply(StackWidgetWrapper * const stack) const {
-        if(!stack->parentWidget()) return;
-        const QSizeF parentSize = stack->parentWidget()->size();
+    void setCurrent(StackWidgetWrapper* const current) {
+        mCurrent = current;
+    }
 
-        stack->resize(qRound(mSizeFrac.width()*parentSize.width()),
-                      qRound(mSizeFrac.height()*parentSize.height()));
+    void saveData() {
+        Q_ASSERT(mCurrent);
+        mCurrent->saveDataToLayout();
+        mCurrent = nullptr;
+    }
+
+    void apply() const {
+        Q_ASSERT(mCurrent && mCurrent->parentWidget());
+        const QSizeF parentSize = mCurrent->parentWidget()->size();
+
+        mCurrent->resize(qRound(mSizeFrac.width()*parentSize.width()),
+                         qRound(mSizeFrac.height()*parentSize.height()));
     }
 
 
@@ -217,11 +243,20 @@ struct WidgetStackLayoutItem : public SplittableStackItem {
         mSizeFrac = frac;
     }
 protected:
+    StackWidgetWrapper* mCurrent = nullptr;
     QSizeF mSizeFrac;
 };
 
 struct BaseStackItem : public ParentStackLayoutItem {
     typedef std::unique_ptr<BaseStackItem> UPtr;
+
+    void saveData() {
+        mChild->saveData();
+    }
+
+    void apply() const {
+        mChild->apply();
+    }
 
     QWidget* create() {
         return mChild->create();

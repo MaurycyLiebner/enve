@@ -24,7 +24,12 @@ void SceneLayout::reset() {
 void SceneLayout::setCurrent(SceneBaseStackItem* const item) {
     if(!item) return reset();
     setWidget(item->create());
+    item->apply();
     mBaseStack = item;
+}
+
+void SceneLayout::saveData() {
+    mBaseStack->saveData();
 }
 
 void SceneLayout::setWidget(QWidget * const wid) {

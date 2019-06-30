@@ -70,31 +70,15 @@ Canvas* CanvasWindowWrapper::getScene() const {
 }
 
 void CanvasWindowWrapper::saveDataToLayout() const {
+    StackWidgetWrapper::saveDataToLayout();
     const auto lItem = static_cast<CWWidgetStackLayoutItem*>(getLayoutItem());
-    if(!lItem) return;
     const auto sceneWidget = getSceneWidget();
     lItem->setTransform(sceneWidget->getViewTransform());
     lItem->setScene(sceneWidget->getCurrentCanvas());
-    const QSizeF sizeF = size();
-    const QSizeF parentSize = parentWidget() ? parentWidget()->size() : sizeF;
-    lItem->setSizeFrac({sizeF.width()/parentSize.width(),
-                        sizeF.height()/parentSize.height()});
-
 }
 
 CanvasWindow* CanvasWindowWrapper::getSceneWidget() const {
     return static_cast<CanvasWindow*>(getCentralWidget());
-}
-
-void CanvasWindowWrapper::changeEvent(QEvent *e) {
-    StackWidgetWrapper::changeEvent(e);
-    if(e->type() == QEvent::ParentChange) {
-        const auto sceneWidget = getSceneWidget();
-        if(sceneWidget && !sceneWidget->hasNoCanvas()) {
-            sceneWidget->unblockAutomaticSizeFit();
-            sceneWidget->fitCanvasToSize();
-        }
-    }
 }
 
 void CWWidgetStackLayoutItem::clear() {

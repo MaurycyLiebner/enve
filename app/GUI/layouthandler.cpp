@@ -56,25 +56,8 @@ LayoutHandler::LayoutHandler(Document& document,
             this, &LayoutHandler::removeForScene);
 }
 
-template <typename T>
-void saveAllChildrenLayoutsData(QWidget* const parent) {
-    const auto cww = dynamic_cast<T*>(parent);
-    if(cww) {
-        cww->saveDataToLayout();
-        return;
-    }
-    const auto children = parent->children();
-    for(const auto& child : children) {
-        const auto childWidget = qobject_cast<QWidget*>(child);
-        if(!childWidget) continue;
-        const auto cww = dynamic_cast<T*>(childWidget);
-        if(cww) cww->saveDataToLayout();
-        else saveAllChildrenLayoutsData<T>(childWidget);
-    }
-}
-
 void LayoutHandler::saveCurrent() {
     if(mCurrentId == -1) return;
-    saveAllChildrenLayoutsData<CanvasWindowWrapper>(mSceneLayout);
-    saveAllChildrenLayoutsData<TimelineWrapper>(mTimelineLayout);
+    mSceneLayout->saveData();
+    mTimelineLayout->saveData();
 }

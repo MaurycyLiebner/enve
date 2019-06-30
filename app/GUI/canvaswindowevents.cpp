@@ -22,9 +22,7 @@ void CanvasWindow::zoomView(const qreal scaleBy, const QPointF &absOrigin) {
 
 #include <QResizeEvent>
 void CanvasWindow::resizeEvent(QResizeEvent *e) {
-    if(mAutomaticSizeFit && !e->oldSize().isValid()) {
-        fitCanvasToSize();
-    } else if(e->size().isValid()) {
+    if(e->size().isValid()) {
         if(mOldSize.isValid()) {
             const auto dSize = e->size() - mOldSize;
             const qreal div = 2*mViewTransform.m11();
