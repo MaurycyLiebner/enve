@@ -19,14 +19,6 @@ StackWidgetWrapper::StackWidgetWrapper(WidgetStackLayoutItem* const layoutItem,
     mSetupOp(this);
 }
 
-void StackWidgetWrapper::saveDataToLayout() const {
-    Q_ASSERT(mLayoutItem && parentWidget());
-    const QSizeF sizeF = size();
-    const QSizeF parentSize = parentWidget()->size();
-    mLayoutItem->setSizeFrac({sizeF.width()/parentSize.width(),
-                              sizeF.height()/parentSize.height()});
-}
-
 void StackWidgetWrapper::setMenuBar(StackWrapperMenu * const menu) {
     if(mMenuBar) delete mMenuBar;
     mMenuBar = menu;
@@ -105,38 +97,21 @@ StackWrapperMenu::StackWrapperMenu() {
 }
 
 template<class SplitItemClass>
-void SplittableStackItem::split(WidgetPtr &&other) {
+SplitItemClass* SplittableStackItem::split(WidgetPtr &&other) {
     Q_ASSERT(mParent);
-    SplitPtr vStack = std::make_unique<SplitItemClass>();
+    auto vStack = std::make_unique<SplitItemClass>();
     const auto vStackPtr = vStack.get();
     UniPtr thisUni = mParent->replaceChild(this, std::move(vStack));
     vStackPtr->setChildren(std::move(thisUni), std::move(other));
+    return vStack.get();
 }
 
-template<class SplitItemClass>
-StackLayoutItem::SplitPtr SplittableStackItem::split(WidgetPtr &&thisUni,
-                                                     WidgetPtr &&other) {
-    SplitPtr vStack = std::make_unique<SplitItemClass>();
-    vStack->setChildren(std::move(thisUni), std::move(other));
-    return vStack;
+VSplitStackItem* SplittableStackItem::splitV(WidgetPtr &&other) {
+    return split<VSplitStackItem>(std::move(other));
 }
 
-void SplittableStackItem::splitV(WidgetPtr &&other) {
-    split<VSplitStackItem>(std::move(other));
-}
-
-StackLayoutItem::SplitPtr SplittableStackItem::splitV(WidgetPtr &&thisUni,
-                                                      WidgetPtr &&other) {
-    return split<VSplitStackItem>(std::move(thisUni), std::move(other));
-}
-
-void SplittableStackItem::splitH(WidgetPtr &&other) {
-    split<HSplitStackItem>(std::move(other));
-}
-
-StackLayoutItem::SplitPtr SplittableStackItem::splitH(WidgetPtr &&thisUni,
-                                                      WidgetPtr &&other) {
-    return split<HSplitStackItem>(std::move(thisUni), std::move(other));
+HSplitStackItem* SplittableStackItem::splitH(WidgetPtr &&other) {
+    return split<HSplitStackItem>(std::move(other));
 }
 
 void ParentStackLayoutItem::sWriteChild(

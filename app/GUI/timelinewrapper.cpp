@@ -33,7 +33,6 @@ Canvas* TimelineWrapper::getScene() const {
 }
 
 void TimelineWrapper::saveDataToLayout() const {
-    StackWidgetWrapper::saveDataToLayout();
     const auto lItem = static_cast<TWidgetStackLayoutItem*>(getLayoutItem());
     const auto sceneWidget = getTimelineWidget();
     lItem->setScene(sceneWidget->getCurrrentScene());
@@ -43,8 +42,8 @@ TimelineWidget* TimelineWrapper::getTimelineWidget() const {
     return static_cast<TimelineWidget*>(getCentralWidget());
 }
 
-QWidget *TWidgetStackLayoutItem::create() {
-    const auto cwWrapper = new TimelineWrapper(&mDocument, this);
+QWidget *TWidgetStackLayoutItem::create(QWidget* const parent) {
+    const auto cwWrapper = new TimelineWrapper(&mDocument, this, parent);
     cwWrapper->setScene(mScene);
     return cwWrapper;
 }

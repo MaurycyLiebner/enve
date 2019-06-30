@@ -302,23 +302,28 @@ protected:
         }
     }
 public:
+    qreal percentAt(const int id) const {
+        return mDimPercent.at(id);
+    }
+
     int childId(QWidget * const child) const {
         return mWidgets.indexOf(child);
     }
 
-    void appendWidget(QWidget * const widget) {
-        insertWidget(mWidgets.count(), widget);
+    void appendWidget(QWidget * const widget, const qreal frac = 0.5) {
+        insertWidget(mWidgets.count(), widget, frac);
     }
 
-    void insertWidget(const int id, QWidget * const widget) {
+    void insertWidget(const int id, QWidget * const widget,
+                      const qreal frac = 0.5) {
         mWidgets.insert(id >= 0 ? id : mWidgets.count(), widget);
         widget->setParent(mThis);
         if(id > 0 && mWidgets.count() > 1) {
             const auto prevWid = mWidgets.at(id - 1);
-            const int dim = (prevWid->*DimGetter)();
-            const int halfDim = dim/2;
-            DimSetter(prevWid, dim % 2 == 0 ? halfDim : halfDim + 1);
-            DimSetter(widget, halfDim);
+            const int prevDim = (prevWid->*DimGetter)();
+            const int widDim = qRound(prevDim*frac);
+            DimSetter(widget, widDim);
+            DimSetter(prevWid, prevDim - widDim);
         } else DimSetter(widget, 3*MIN_WIDGET_DIM);
         updateAll();
         widget->show();

@@ -26,7 +26,7 @@ void TimelineLayout::reset() {
 
 void TimelineLayout::setCurrent(SceneBaseStackItem* const item) {
     if(!item) return reset();
-    setWidget(item->create());
+    setWidget(item->create(this));
     item->apply();
     mBaseStack = item;
 }

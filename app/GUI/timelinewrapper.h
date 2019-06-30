@@ -7,7 +7,7 @@ class ChangeWidthWidget;
 struct TWidgetStackLayoutItem : public SceneWidgetStackLayoutItem {
     TWidgetStackLayoutItem(Document& document) :
         mDocument(document) {}
-    QWidget* create();
+    QWidget* create(QWidget * const parent);
 private:
     Document& mDocument;
 };

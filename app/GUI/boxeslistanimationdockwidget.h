@@ -20,7 +20,6 @@
 #include "timelinelayout.h"
 class FrameScrollBar;
 class TimelineWidget;
-class VWidgetStack;
 class RenderWidget;
 class MainWindow;
 class AnimationDockWidget;

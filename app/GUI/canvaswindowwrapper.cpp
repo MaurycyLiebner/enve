@@ -70,7 +70,6 @@ Canvas* CanvasWindowWrapper::getScene() const {
 }
 
 void CanvasWindowWrapper::saveDataToLayout() const {
-    StackWidgetWrapper::saveDataToLayout();
     const auto lItem = static_cast<CWWidgetStackLayoutItem*>(getLayoutItem());
     const auto sceneWidget = getSceneWidget();
     lItem->setTransform(sceneWidget->getViewTransform());
@@ -86,9 +85,9 @@ void CWWidgetStackLayoutItem::clear() {
     mTransform.reset();
 }
 
-QWidget* CWWidgetStackLayoutItem::create() {
+QWidget* CWWidgetStackLayoutItem::create(QWidget* const parent) {
     const auto cwWrapper = new CanvasWindowWrapper(
-                &mDocument, &mAudioHandler, this);
+                &mDocument, &mAudioHandler, this, parent);
     cwWrapper->setScene(mScene);
     const auto cw = cwWrapper->getSceneWidget();
     cw->blockAutomaticSizeFit();
