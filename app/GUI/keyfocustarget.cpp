@@ -8,9 +8,8 @@ KeyFocusTarget::KeyFocusTarget() {
 
 KeyFocusTarget::~KeyFocusTarget() {
     KFT_mAllTargets.removeOne(this);
-    if(KFT_mCurrentTarget == this) {
+    if(KFT_mCurrentTarget == this)
         KFT_mCurrentTarget = nullptr;
-    }
 }
 
 KeyFocusTarget * KeyFocusTarget::KFT_getCurrentTarget() {
@@ -37,8 +36,7 @@ bool KeyFocusTarget::KFT_handleKeyEvent(QKeyEvent *e) {
 
 void KeyFocusTarget::KFT_setCurrentTarget(KeyFocusTarget *target) {
     if(target == KFT_mCurrentTarget) return;
-    if(KFT_mCurrentTarget != nullptr) {
+    if(KFT_mCurrentTarget)
         KFT_mCurrentTarget->KFT_clearFocus();
-    }
     KFT_mCurrentTarget = target;
 }

@@ -98,6 +98,9 @@ public:
     void setRasterEffectsVisible(const bool bT);
     void setPathEffectsVisible(const bool bT);
 
+    void importFile(const QString &path,
+                    const QPointF &relDropPos = QPointF(0, 0));
+
     void setMovePathMode();
     void setMovePointMode();
     void setAddPointMode();

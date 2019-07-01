@@ -62,7 +62,6 @@ MainWindow::MainWindow(QWidget *parent)
     mAudioHandler.initializeAudio();
 
     mVideoEncoder = SPtrCreate(VideoEncoder)();
-    mCanvasWindow = new CanvasWindow(mDocument, mAudioHandler, this);
 
     connect(&mDocument, &Document::evFilePathChanged,
             this, &MainWindow::updateTitle);
@@ -124,9 +123,6 @@ MainWindow::MainWindow(QWidget *parent)
             scene->updateIfUsesProgram(program);
         queScheduledTasksAndUpdate();
     });
-
-    connect(mMemoryHandler, &MemoryHandler::allMemoryUsed,
-            mCanvasWindow, &CanvasWindow::outOfMemory);
 
     mLayoutHandler = new LayoutHandler(mDocument, mAudioHandler);
     mBoxesListAnimationDockWidget =
@@ -228,11 +224,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setMouseTracking(true);
     centralWidget()->setMouseTracking(true);
-    mCanvasWindow->hide();
 
     readRecentFiles();
     updateRecentMenu();
-    //mCanvasWindow->openWelcomeDialog();
 
     mEventFilterDisabled = false;
 
@@ -272,8 +266,8 @@ void MainWindow::setupMenuBar() {
                          this, &MainWindow::linkFile,
                          Qt::CTRL + Qt::Key_L);
     mFileMenu->addAction("Import File...",
-                         mCanvasWindow,
-                         qOverload<>(&CanvasWindow::importFile),
+                         this,
+                         qOverload<>(&MainWindow::importFile),
                          Qt::CTRL + Qt::Key_I);
     mFileMenu->addAction("Import Image Sequence...",
                          this, &MainWindow::importImageSequence);
@@ -417,7 +411,7 @@ void MainWindow::setupMenuBar() {
 
     mNoneQuality = filteringMenu->addAction("None", [this]() {
         BoundingBox::sDisplayFiltering = kNone_SkFilterQuality;
-        mCanvasWindow->update();
+        centralWidget()->update();
 
         mLowQuality->setChecked(false);
         mMediumQuality->setChecked(false);
@@ -428,7 +422,7 @@ void MainWindow::setupMenuBar() {
 
     mLowQuality = filteringMenu->addAction("Low", [this]() {
         BoundingBox::sDisplayFiltering = kLow_SkFilterQuality;
-        mCanvasWindow->update();
+        centralWidget()->update();
 
         mNoneQuality->setChecked(false);
         mMediumQuality->setChecked(false);
@@ -439,7 +433,7 @@ void MainWindow::setupMenuBar() {
 
     mMediumQuality = filteringMenu->addAction("Medium", [this]() {
         BoundingBox::sDisplayFiltering = kMedium_SkFilterQuality;
-        mCanvasWindow->update();
+        centralWidget()->update();
 
         mNoneQuality->setChecked(false);
         mLowQuality->setChecked(false);
@@ -450,7 +444,7 @@ void MainWindow::setupMenuBar() {
 
     mHighQuality = filteringMenu->addAction("High", [this]() {
         BoundingBox::sDisplayFiltering = kHigh_SkFilterQuality;
-        mCanvasWindow->update();
+        centralWidget()->update();
 
         mNoneQuality->setChecked(false);
         mLowQuality->setChecked(false);
@@ -531,9 +525,9 @@ void MainWindow::setupMenuBar() {
 }
 
 void MainWindow::addCanvasToRenderQue() {
-    if(mCanvasWindow->hasNoCanvas()) return;
+    if(!mDocument.fActiveScene) return;
     mBoxesListAnimationDockWidget->getRenderWidget()->
-    createNewRenderInstanceWidgetForCanvas(mCanvasWindow->getCurrentCanvas());
+    createNewRenderInstanceWidgetForCanvas(mDocument.fActiveScene);
 }
 
 void MainWindow::updateSettingsForCurrentCanvas(Canvas* const scene) {
@@ -894,10 +888,6 @@ bool MainWindow::askForSaving() {
     return true;
 }
 
-void MainWindow::schedulePivotUpdate() {
-    mCanvasWindow->schedulePivotUpdate();
-}
-
 BoxScrollWidget *MainWindow::getObjectSettingsList() {
     return mObjectSettingsWidget;
 }
@@ -932,17 +922,12 @@ int MainWindow::getCurrentFrame() {
     return mCanvasWindow->getCurrentFrame();
 }
 
-int MainWindow::getFrameCount() {
-    return mCanvasWindow->getMaxFrame();
-}
-
 void MainWindow::newFile() {
     if(askForSaving()) {
         closeProject();
         CanvasSettingsDialog::sNewCanvasDialog(mDocument, this);
     }
 }
-
 
 bool handleCanvasModeKeyPress(Document& document, const int key) {
     if(key == Qt::Key_F1) {
@@ -1046,7 +1031,6 @@ void MainWindow::clearAll() {
     mObjectSettingsWidget->setMainTarget(nullptr);
 
     mBoxesListAnimationDockWidget->clearAll();
-    mCanvasWindow->clearAll();
     mFillStrokeSettings->clearAll();
     mDocument.clear();
     mLayoutHandler->clear();
@@ -1140,6 +1124,28 @@ bool MainWindow::closeProject() {
     return false;
 }
 
+void MainWindow::importFile() {
+    disableEventFilter();
+    QStringList importPaths = QFileDialog::getOpenFileNames(
+                                            this,
+                                            "Import File", "",
+                                            "Files (*.ev *.svg "
+                                                   "*.mp4 *.mov *.avi *.mkv *.m4v "
+                                                   "*.png *.jpg "
+                                                   "*.wav *.mp3)");
+    enableEventFilter();
+    if(!importPaths.isEmpty()) {
+        for(const QString &path : importPaths) {
+            if(path.isEmpty()) continue;
+            try {
+                mActions.importFile(path);
+            } catch(const std::exception& e) {
+                gPrintExceptionCritical(e);
+            }
+        }
+    }
+}
+
 void MainWindow::linkFile() {
     disableEventFilter();
     QStringList importPaths = QFileDialog::getOpenFileNames(this,
@@ -1148,7 +1154,7 @@ void MainWindow::linkFile() {
     if(!importPaths.isEmpty()) {
         for(const QString &path : importPaths) {
             if(path.isEmpty()) continue;
-            mCanvasWindow->createLinkToFileWithPath(path);
+            mDocument.fActiveScene->createLinkToFileWithPath(path);
         }
     }
 }
@@ -1159,7 +1165,7 @@ void MainWindow::importImageSequence() {
         "Import Image Sequence", "", "Images (*.png *.jpg)");
     enableEventFilter();
     if(!importPaths.isEmpty()) {
-        mCanvasWindow->createAnimationBoxForPaths(importPaths);
+        mDocument.fActiveScene->createAnimationBoxForPaths(importPaths);
     }
     queScheduledTasksAndUpdate();
 }

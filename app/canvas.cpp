@@ -327,7 +327,7 @@ void Canvas::setCurrentPreviewContainer(const int relFrame) {
 
 void Canvas::setCurrentPreviewContainer(const stdsptr<ImageCacheContainer>& cont) {
     setLoadingPreviewContainer(nullptr);
-    if(cont == mCurrentPreviewContainer) return emit newerState();
+    if(cont == mCurrentPreviewContainer) return emit requestUpdate();
     if(mCurrentPreviewContainer) {
         if(!mRenderingPreview)
             mCurrentPreviewContainer->setBlocked(false);
@@ -335,7 +335,7 @@ void Canvas::setCurrentPreviewContainer(const stdsptr<ImageCacheContainer>& cont
 
     mCurrentPreviewContainer = cont;
     if(cont) cont->setBlocked(true);
-    emit newerState();
+    emit requestUpdate();
 }
 
 void Canvas::setLoadingPreviewContainer(

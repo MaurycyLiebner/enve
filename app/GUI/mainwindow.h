@@ -94,8 +94,6 @@ public:
     static bool isCtrlPressed();
     static bool isAltPressed();
 
-    void schedulePivotUpdate();
-
     AnimationDockWidget *getAnimationDockWidget();
     BoxScrollWidget *getObjectSettingsList();
 
@@ -114,8 +112,6 @@ public:
     void enable();
 
     int getCurrentFrame();
-
-    int getFrameCount();
 
     void previewFinished();
     void updateCanvasModeButtonsChecked();
@@ -175,6 +171,7 @@ public:
     bool closeProject();
     void linkFile();
     void importImageSequence();
+    void importFile();
     //void importVideo();
     void revert();
 

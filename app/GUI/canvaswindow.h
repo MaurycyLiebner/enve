@@ -61,18 +61,8 @@ public:
     void setSelectedFillColorMode(const ColorMode mode);
     void setSelectedStrokeColorMode(const ColorMode mode);
 
-    void clearAll();
-    void createAnimationBoxForPaths(const QStringList &importPaths);
-    void createLinkToFileWithPath(const QString &path);
-    VideoBox *createVideoForPath(const QString &path);
     int getCurrentFrame();
     int getMaxFrame();
-
-    ImageBox *createImageForPath(const QString &path);
-    SingleSound *createSoundForPath(const QString &path);
-
-    void importFile(const QString &path,
-                    const QPointF &relDropPos = QPointF(0, 0));
 
     void grabMouse();
     void releaseMouse();
@@ -203,8 +193,6 @@ public:
     void resumePreview();
     void renderPreview();
     void renderFromSettings(RenderInstanceSettings * const settings);
-
-    void importFile();
 
     QPointF mapToCanvasCoord(const QPointF& windowCoord);
     void translateView(const QPointF &trans);

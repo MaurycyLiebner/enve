@@ -10,8 +10,6 @@
 #include "global.h"
 #include "renderinstancesettings.h"
 #include "newcanvasdialog.h"
-#include "Boxes/videobox.h"
-#include "Boxes/imagebox.h"
 #include "Sound/singlesound.h"
 #include "CacheHandlers/soundcachecontainer.h"
 #include "svgimporter.h"
@@ -20,12 +18,15 @@
 #include "videoencoder.h"
 #include "usagewidget.h"
 #include "memorychecker.h"
+#include "memoryhandler.h"
 
 CanvasWindow::CanvasWindow(Document &document,
                            AudioHandler& audioHandler,
                            QWidget * const parent) :
     GLWindow(parent), mDocument(document),
     mActions(document.fActions), mAudioHandler(audioHandler) {
+    connect(MemoryHandler::sGetInstance(), &MemoryHandler::allMemoryUsed,
+            this, &CanvasWindow::outOfMemory);
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
     connect(&mDocument, &Document::canvasModeSet,
             this, &CanvasWindow::setCanvasMode);
@@ -87,7 +88,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         changeCurrentFrameAction(getCurrentFrame());
         connect(mCurrentCanvas, &Canvas::requestCanvasMode,
                 this, &CanvasWindow::setCanvasMode);
-        connect(mCurrentCanvas, &Canvas::newerState,
+        connect(mCurrentCanvas, &Canvas::requestUpdate,
                 this, qOverload<>(&CanvasWindow::update));
         MainWindow::getInstance()->setCurrentUndoRedoStack(
                     mCurrentCanvas->getUndoRedoStack());
@@ -820,36 +821,6 @@ void CanvasWindow::nextSaveOutputFrame() {
     }
 }
 
-void CanvasWindow::clearAll() {
-    setCurrentCanvas(nullptr);
-}
-
-void CanvasWindow::createLinkToFileWithPath(const QString &path) {
-    if(!mCurrentCanvas) return;
-    mCurrentCanvas->createLinkToFileWithPath(path);
-}
-
-void CanvasWindow::createAnimationBoxForPaths(
-        const QStringList &importPaths) {
-    if(!mCurrentCanvas) return;
-    mCurrentCanvas->createAnimationBoxForPaths(importPaths);
-}
-
-VideoBox *CanvasWindow::createVideoForPath(const QString &path) {
-    if(!mCurrentCanvas) return nullptr;
-    return mCurrentCanvas->createVideoForPath(path);
-}
-
-ImageBox *CanvasWindow::createImageForPath(const QString &path) {
-    if(!mCurrentCanvas) return nullptr;
-    return mCurrentCanvas->createImageBox(path);
-}
-
-SingleSound *CanvasWindow::createSoundForPath(const QString &path) {
-    if(!mCurrentCanvas) return nullptr;
-    return mCurrentCanvas->createSoundForPath(path);
-}
-
 int CanvasWindow::getCurrentFrame() {
     if(!mCurrentCanvas) return 0;
     return mCurrentCanvas->getCurrentFrame();
@@ -889,7 +860,7 @@ void CanvasWindow::dropEvent(QDropEvent *event) {
         for(int i = 0; i < urlList.size() && i < 32; i++) {
             try {
                 const QPointF pos = mapToCanvasCoord(event->posF());
-                importFile(urlList.at(i).toLocalFile(), pos);
+                mActions.importFile(urlList.at(i).toLocalFile(), pos);
             } catch(const std::exception& e) {
                 gPrintExceptionCritical(e);
             }
@@ -909,47 +880,6 @@ void CanvasWindow::dragMoveEvent(QDragMoveEvent *event) {
     }
 }
 
-void CanvasWindow::importFile(const QString &path,
-                              const QPointF &relDropPos) {
-    if(!mCurrentCanvas) return;
-
-    const QFile file(path);
-    if(!file.exists())
-        RuntimeThrow("File " + path + " does not exit.");
-
-    const QString extension = path.split(".").last();
-    if(isSoundExt(extension)) {
-        createSoundForPath(path);
-    } else {
-        qsptr<BoundingBox> importedBox;
-        mCurrentCanvas->blockUndoRedo();
-        if(isVectorExt(extension)) {
-            importedBox = loadSVGFile(path);
-        } else if(isImageExt(extension)) {
-            const auto imgBox = SPtrCreate(ImageBox)();
-            importedBox = imgBox;
-            imgBox->setFilePath(path);
-        } else if(isVideoExt(extension)) {
-            const auto vidBox = SPtrCreate(VideoBox)();
-            importedBox = vidBox;
-            vidBox->setFilePath(path);
-        } else if(isEvExt(extension)) {
-            MainWindow::getInstance()->loadEVFile(path);
-        } else {
-            mCurrentCanvas->unblockUndoRedo();
-            RuntimeThrow("Unrecognized file extension " + path + ".");
-        }
-        mCurrentCanvas->unblockUndoRedo();
-
-        if(importedBox) {
-            importedBox->planCenterPivotPosition();
-            mCurrentCanvas->getCurrentGroup()->addContainedBox(importedBox);
-            importedBox->moveByAbs(relDropPos);
-        }
-    }
-    queScheduledTasksAndUpdate();
-}
-
 void CanvasWindow::grabMouse() {
     mMouseGrabber = true;
 #ifndef QT_DEBUG
@@ -966,26 +896,4 @@ void CanvasWindow::releaseMouse() {
 
 bool CanvasWindow::isMouseGrabber() {
     return mMouseGrabber;
-}
-
-void CanvasWindow::importFile() {
-    MainWindow::getInstance()->disableEventFilter();
-    QStringList importPaths = QFileDialog::getOpenFileNames(
-                                            MainWindow::getInstance(),
-                                            "Import File", "",
-                                            "Files (*.ev *.svg "
-                                                   "*.mp4 *.mov *.avi *.mkv *.m4v "
-                                                   "*.png *.jpg "
-                                                   "*.wav *.mp3)");
-    MainWindow::getInstance()->enableEventFilter();
-    if(!importPaths.isEmpty()) {
-        for(const QString &path : importPaths) {
-            if(path.isEmpty()) continue;
-            try {
-                importFile(path);
-            } catch(const std::exception& e) {
-                gPrintExceptionCritical(e);
-            }
-        }
-    }
 }

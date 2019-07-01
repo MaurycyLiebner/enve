@@ -134,7 +134,7 @@ TimelineWidget::TimelineWidget(Document &document,
     mMenuWidget = new QWidget(this);
     mMenuWidget->setLayout(mMenuLayout);
 
-    mBoxesListScrollArea = new BoxScrollArea(this);
+    mBoxesListScrollArea = new ScrollArea(this);
 
     mBoxesListWidget = new BoxScrollWidget(mDocument, mBoxesListScrollArea);
     auto visiblePartWidget = mBoxesListWidget->getVisiblePartWidget();
@@ -305,7 +305,7 @@ void TimelineWidget::setTargetAll() {
 void TimelineWidget::setTargetCurrentCanvas() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(
-                mMainWindow->getCanvasWindow()->getCurrentCanvas(),
+                mCurrentScene,
                 SWT_TARGET_CURRENT_CANVAS);
     mMainWindow->queScheduledTasksAndUpdate();
 }
@@ -313,7 +313,7 @@ void TimelineWidget::setTargetCurrentCanvas() {
 void TimelineWidget::setTargetCurrentGroup() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(
-                mMainWindow->getCanvasWindow()->getCurrentGroup(),
+                mCurrentScene->getCurrentGroup(),
                 SWT_TARGET_CURRENT_GROUP);
     mMainWindow->queScheduledTasksAndUpdate();
 }

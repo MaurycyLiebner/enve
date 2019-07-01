@@ -338,6 +338,49 @@ void Actions::setPathEffectsVisible(const bool bT) {
     afterAction();
 }
 
+#include "filesourcescache.h"
+#include "GUI/mainwindow.h"
+#include "svgimporter.h"
+#include "Boxes/videobox.h"
+#include "Boxes/imagebox.h"
+
+void Actions::importFile(const QString &path,
+                         const QPointF &relDropPos) {
+    if(!mActiveScene) return;
+
+    const QFile file(path);
+    if(!file.exists())
+        RuntimeThrow("File " + path + " does not exit.");
+
+    const QString extension = path.split(".").last();
+    if(isSoundExt(extension)) {
+        mActiveScene->createSoundForPath(path);
+    } else {
+        qsptr<BoundingBox> importedBox;
+        mActiveScene->blockUndoRedo();
+        if(isVectorExt(extension)) {
+            importedBox = loadSVGFile(path);
+        } else if(isImageExt(extension)) {
+            mActiveScene->createImageBox(path);
+        } else if(isVideoExt(extension)) {
+            mActiveScene->createVideoForPath(path);
+        } else if(isEvExt(extension)) {
+            MainWindow::getInstance()->loadEVFile(path);
+        } else {
+            mActiveScene->unblockUndoRedo();
+            RuntimeThrow("Unrecognized file extension " + path + ".");
+        }
+        mActiveScene->unblockUndoRedo();
+
+        if(importedBox) {
+            importedBox->planCenterPivotPosition();
+            mActiveScene->getCurrentGroup()->addContainedBox(importedBox);
+            importedBox->moveByAbs(relDropPos);
+        }
+    }
+    afterAction();
+}
+
 void Actions::setMovePathMode() {
     mDocument.setCanvasMode(MOVE_BOX);
 }
@@ -379,5 +422,6 @@ void Actions::setPaintMode() {
 }
 
 void Actions::afterAction() const {
-
+    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    emit mActiveScene->requestUpdate();
 }

@@ -444,7 +444,7 @@ protected:
 signals:
     void canvasNameChanged(Canvas *, QString);
     void requestCanvasMode(CanvasMode);
-    void newerState();
+    void requestUpdate();
     void newFrameRange(FrameRange);
     void boxSelectionChanged();
     void selectedPaintSettingsChanged();
