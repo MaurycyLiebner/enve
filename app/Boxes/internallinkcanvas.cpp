@@ -14,7 +14,7 @@ void InternalLinkCanvas::setupRenderData(
 
     ContainerBox* finalTarget = getFinalTarget();
     auto canvasData = GetAsSPtr(data, LinkCanvasRenderData);
-    const auto canvasTarget = GetAsSPtr(finalTarget, Canvas);
+    const auto canvasTarget = GetAsPtr(finalTarget, Canvas);
     canvasData->fBgColor = toSkColor(canvasTarget->getBgColorAnimator()->
             getColor(relFrame));
     //qreal res = getParentCanvas()->getResolutionFraction();
@@ -47,4 +47,11 @@ stdsptr<BoundingBoxRenderData> InternalLinkCanvas::createRenderData() {
 bool InternalLinkCanvas::relPointInsidePath(const QPointF &relPos) const {
     if(mClipToCanvas->getValue()) return mRelBoundingRect.contains(relPos);
     return InternalLinkGroupBox::relPointInsidePath(relPos);
+}
+
+void InternalLinkCanvas::anim_setAbsFrame(const int frame) {
+    InternalLinkGroupBox::anim_setAbsFrame(frame);
+    const auto canvasTarget = GetAsPtr(getFinalTarget(), Canvas);
+    if(!canvasTarget) return;
+    canvasTarget->anim_setAbsFrame(anim_getCurrentRelFrame());
 }

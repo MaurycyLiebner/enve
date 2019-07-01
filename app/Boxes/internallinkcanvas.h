@@ -16,6 +16,7 @@ public:
     stdsptr<BoundingBoxRenderData> createRenderData();
 
     bool relPointInsidePath(const QPointF &relPos) const;
+    void anim_setAbsFrame(const int frame);
 
     bool clipToCanvas();
 private:

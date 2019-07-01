@@ -203,7 +203,7 @@ void CanvasWindow::tabletEvent(QTabletEvent *e) {
 }
 
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
-    KFT_setFocus();
+    if(!hasFocus()) KFT_setFocus();
     if(!mCurrentCanvas || mBlockInput) return;
     if(mMouseGrabber && event->button() == Qt::LeftButton) return;
     const auto pos = mapToCanvasCoord(event->pos());

@@ -126,18 +126,23 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mToolBar->addSeparator();
 
     mMainLayout->addWidget(mToolBar);
-    mToolBar->setEnabled(false);
+
+    mPlayButton->setEnabled(false);
+    mStopButton->setEnabled(false);
 
     mRenderWidget = new RenderWidget(this);
 
     connect(&mDocument, &Document::activeSceneWidgetSet,
             this, [this](CanvasWindow* const sceneWidget) {
-        mToolBar->setEnabled(sceneWidget);
+        mPlayButton->setEnabled(sceneWidget);
+        mStopButton->setEnabled(sceneWidget);
     });
+
     connect(mRenderWidget, &RenderWidget::renderFromSettings,
             this, [this](RenderInstanceSettings* const settings) {
         mDocument.fActiveSceneWidget->renderFromSettings(settings);
     });
+
     mMainLayout->addWidget(mTimelineLayout);
     mMainLayout->addWidget(mRenderWidget);
     mRenderWidget->hide();
