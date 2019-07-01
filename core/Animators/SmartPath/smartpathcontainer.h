@@ -46,8 +46,7 @@ public:
 
     void actionSetDissolvedNodeT(const int nodeId, const qreal t) {
         Node * const node = mNodesList.at(nodeId);
-        if(!node->isDissolved()) RuntimeThrow("Setting dissolved node value "
-                                             "on a node of a different type");
+        if(!node->isDissolved()) return;
         node->setT(t);
         updateDissolvedNodePosition(nodeId, node);
     }
@@ -57,8 +56,7 @@ public:
                                    const QPointF& p1,
                                    const QPointF& c2) {
         Node * const node = mNodesList.at(nodeId);
-        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
-                                          "on a node of a different type");
+        if(!node->isNormal()) return;
         node->setC0(c0);
         node->setP1(p1);
         node->setC2(c2);
@@ -67,50 +65,43 @@ public:
     void actionSetNormalNodeValues(const int nodeId,
                                    const NormalNodeData& data) {
         Node * const node = mNodesList.at(nodeId);
-        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
-                                          "on a node of a different type");
+        if(!node->isNormal()) return;
         node->setNormalData(data);
     }
 
     void actionSetNormalNodeP1(const int nodeId, const QPointF& p1) {
         Node * const node = mNodesList.at(nodeId);
-        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
-                                          "on a node of a different type");
+        if(!node->isNormal()) return;
         node->setP1(p1);
     }
 
     void actionSetNormalNodeC0(const int nodeId, const QPointF& c0) {
         Node * const node = mNodesList.at(nodeId);
-        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
-                                          "on a node of a different type");
+        if(!node->isNormal()) return;
         node->setC0(c0);
     }
 
     void actionSetNormalNodeC2(const int nodeId, const QPointF& c2) {
         Node * const node = mNodesList.at(nodeId);
-        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
-                                          "on a node of a different type");
+        if(!node->isNormal()) return;
         node->setC2(c2);
     }
 
     void actionSetNormalNodeCtrlsMode(const int nodeId, const CtrlsMode& mode) {
         Node * const node = mNodesList.at(nodeId);
-        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
-                                          "on a node of a different type");
+        if(!node->isNormal()) return;
         mNodesList.setNodeCtrlsMode(node, mode);
     }
 
     void actionSetNormalNodeC0Enabled(const int nodeId, const bool enabled) {
         Node * const node = mNodesList.at(nodeId);
-        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
-                                          "on a node of a different type");
+        if(!node->isNormal()) return;
         mNodesList.setNodeC0Enabled(node, enabled);
     }
 
     void actionSetNormalNodeC2Enabled(const int nodeId, const bool enabled) {
         Node * const node = mNodesList.at(nodeId);
-        if(!node->isNormal()) RuntimeThrow("Setting normal node values "
-                                           "on a node of a different type");
+        if(!node->isNormal()) return;
         mNodesList.setNodeC2Enabled(node, enabled);
     }
 
