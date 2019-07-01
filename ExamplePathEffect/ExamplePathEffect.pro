@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT += multimedia core gui svg opengl sql qml xml concurrent
+QT += core
 
 QMAKE_RPATHDIR += ../core/
 LIBS += -L$$OUT_PWD/../core/ -lenvecore
@@ -16,9 +16,7 @@ SKIA_FOLDER = $$HOME_FOLDER/.skia2
 INCLUDEPATH += $$SKIA_FOLDER/
 
 CONFIG(debug, debug|release) {
-    LIBS += -L$$SKIA_FOLDER/out/Debug
 } else {
-    LIBS += -L$$SKIA_FOLDER/out/Release
     QMAKE_CFLAGS -= -O2
     QMAKE_CFLAGS -= -O1
     QMAKE_CXXFLAGS -= -O2
@@ -27,8 +25,6 @@ CONFIG(debug, debug|release) {
     QMAKE_LFLAGS = -m64 -O3
     QMAKE_CXXFLAGS = -m64 -O3
 }
-
-LIBS += -lskia
 
 TARGET = ExamplePathEffect
 TEMPLATE = lib

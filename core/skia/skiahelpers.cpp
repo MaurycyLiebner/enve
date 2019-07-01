@@ -142,3 +142,11 @@ void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
     drawOutlineOverlay(canvas, mappedPath, invScale,
                        dashes, intervalSize);
 }
+
+void SkiaHelpers::forceLink() {
+#define FORCE_UNDEFINED_SYMBOL(x, nid) \
+    auto __fus_fp_ ## nid = &x; Q_UNUSED(__fus_fp_ ## nid)
+
+    FORCE_UNDEFINED_SYMBOL(SkTextUtils::GetPath, 0);
+    FORCE_UNDEFINED_SYMBOL(SkOpBuilder::add, 1);
+}

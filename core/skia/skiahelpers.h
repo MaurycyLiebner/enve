@@ -50,6 +50,8 @@ namespace SkiaHelpers {
                             const SkMatrix& transform,
                             const bool dashes,
                             const SkScalar intervalSize);
+
+    void forceLink();
 }
 
 #endif // SKIAHELPERS_H
