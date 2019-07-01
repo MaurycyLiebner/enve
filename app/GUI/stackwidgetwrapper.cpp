@@ -1,5 +1,6 @@
 #include "stackwidgetwrapper.h"
 #include "GUI/widgetstack.h"
+#include "stacklayouts.h"
 
 StackWidgetWrapper::StackWidgetWrapper(WidgetStackLayoutItem* const layoutItem,
                                        const LayoutItemCreator &layoutItemCreator,
@@ -94,30 +95,6 @@ StackWrapperMenu::StackWrapperMenu() {
     setStyleSheet("QMenuBar#cornerMenuBar::item { padding-top: 1px; margin-bottom: 2px; }");
 
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-}
-
-template<class SplitItemClass>
-SplitItemClass* SplittableStackItem::split(WidgetPtr &&other) {
-    Q_ASSERT(mParent);
-    auto vStack = std::make_unique<SplitItemClass>();
-    const auto vStackPtr = vStack.get();
-    UniPtr thisUni = mParent->replaceChild(this, std::move(vStack));
-    vStackPtr->setChildren(std::move(thisUni), std::move(other));
-    return vStackPtr;
-}
-
-VSplitStackItem* SplittableStackItem::splitV(WidgetPtr &&other) {
-    return split<VSplitStackItem>(std::move(other));
-}
-
-HSplitStackItem* SplittableStackItem::splitH(WidgetPtr &&other) {
-    return split<HSplitStackItem>(std::move(other));
-}
-
-void ParentStackLayoutItem::sWriteChild(
-        StackLayoutItem * const child, QIODevice * const dst) {
-    child->writeType(dst);
-    child->write(dst);
 }
 
 StackWrapperCornerMenu::StackWrapperCornerMenu(StackWidgetWrapper * const target) {

@@ -1,5 +1,6 @@
 #include "widgetstack.h"
 #include "stackwidgetwrapper.h"
+#include "stacklayouts.h"
 
 void gMoveX(const int x, QWidget * const widget) {
     widget->move(x, 0);

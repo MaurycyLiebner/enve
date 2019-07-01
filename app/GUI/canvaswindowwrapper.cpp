@@ -41,8 +41,8 @@ CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
                                          QWidget * const parent) :
     StackWidgetWrapper(
         layItem,
-        [document, audioHandler]() {
-            const auto rPtr = new CWWidgetStackLayoutItem(*document, *audioHandler);
+        []() {
+            const auto rPtr = new CWWidgetStackLayoutItem();
             return std::unique_ptr<WidgetStackLayoutItem>(rPtr);
         },
         [document, audioHandler](WidgetStackLayoutItem* const layItem,
@@ -85,10 +85,11 @@ void CWWidgetStackLayoutItem::clear() {
     mTransform.reset();
 }
 
-QWidget* CWWidgetStackLayoutItem::create(QWidget* const parent,
-                                         QLayout * const layout) {
+QWidget* CWWidgetStackLayoutItem::create(
+        Document& document, AudioHandler& audioHandler,
+        QWidget* const parent, QLayout * const layout) {
     const auto cwWrapper = new CanvasWindowWrapper(
-                &mDocument, &mAudioHandler, this, parent);
+                &document, &audioHandler, this, parent);
     if(layout) layout->addWidget(cwWrapper);
     cwWrapper->setScene(mScene);
     const auto cw = cwWrapper->getSceneWidget();

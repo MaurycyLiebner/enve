@@ -51,14 +51,14 @@ void SceneChooser::addScene(Canvas * const scene) {
 void SceneChooser::removeScene(Canvas * const scene) {
     const auto removeIt = mSceneToAct.find(scene);
     if(removeIt == mSceneToAct.end()) return;
+    removeAction(removeIt->second);
+    delete removeIt->second;
+    mSceneToAct.erase(removeIt);
     if(mCurrentScene == scene) {
         const auto newIt = mSceneToAct.begin();
         if(newIt == mSceneToAct.end()) setCurrentScene(nullptr);
         else setCurrentScene(newIt->first, newIt->second);
     }
-    removeAction(removeIt->second);
-    delete removeIt->second;
-    mSceneToAct.erase(removeIt);
     if(isEmpty()) setDisabled(true);
 }
 
@@ -76,9 +76,12 @@ void SceneChooser::setCurrentScene(Canvas * const scene, QAction * const act) {
         act->setDisabled(true);
     }
     if(mCurrentScene) {
-        const auto currAct = mSceneToAct[mCurrentScene];
-        currAct->setChecked(false);
-        currAct->setEnabled(true);
+        const auto currIt = mSceneToAct.find(mCurrentScene);
+        if(currIt != mSceneToAct.end()) {
+            const auto currAct = currIt->second;
+            currAct->setChecked(false);
+            currAct->setEnabled(true);
+        }
     }
     setTitle(scene ? scene->getName() : "none");
     mCurrentScene = scene;

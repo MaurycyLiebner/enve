@@ -13,6 +13,11 @@ protected:
         cwwItem->setScene(scene);
         setChild(std::move(cwwItem));
     }
+
+    template <typename WidgetT>
+    void readSceneBaseStackItem(QIODevice* const src) {
+        readBaseStackItem<WidgetT>(src);
+    }
 public:
     void setScene(Canvas* const scene) {
         mScene = scene;
@@ -20,20 +25,25 @@ public:
 
     Canvas* getScene() const { return mScene; }
 private:
-    using BaseStackItem::write;
     Canvas* mScene = nullptr;
 };
 
 struct TSceneBaseStackItem : public SceneBaseStackItem {
-    TSceneBaseStackItem(Document& document, Canvas* const scene = nullptr) :
-        SceneBaseStackItem(std::make_unique<TWidgetStackLayoutItem>(document), scene) {}
+    TSceneBaseStackItem(Canvas* const scene = nullptr) :
+        SceneBaseStackItem(std::make_unique<TWidgetStackLayoutItem>(), scene) {}
+
+    void read(QIODevice* const src) {
+        readSceneBaseStackItem<TWidgetStackLayoutItem>(src);
+    }
 };
 
 struct CWSceneBaseStackItem : public SceneBaseStackItem {
-    CWSceneBaseStackItem(Document& document, AudioHandler& audioHandler,
-                         Canvas* const scene = nullptr) :
-        SceneBaseStackItem(std::make_unique<CWWidgetStackLayoutItem>(
-                               document, audioHandler), scene) {}
+    CWSceneBaseStackItem(Canvas* const scene = nullptr) :
+        SceneBaseStackItem(std::make_unique<CWWidgetStackLayoutItem>(), scene) {}
+
+    void read(QIODevice* const src) {
+        readSceneBaseStackItem<CWWidgetStackLayoutItem>(src);
+    }
 };
 
 #endif // LAYOUTCOLLECTION_H

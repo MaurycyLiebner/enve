@@ -149,7 +149,7 @@ private:
 
     QTimer *mPreviewFPSTimer = nullptr;
 
-    qptr<Canvas> mCurrentCanvas;
+    Canvas* mCurrentCanvas = nullptr;
 
     //void paintEvent(QPaintEvent *);
 

@@ -1,107 +1,18 @@
-﻿#ifndef STACKWIDGETWRAPPER_H
-#define STACKWIDGETWRAPPER_H
-
-#include "GUI/widgetstack.h"
+#ifndef STACKLAYOUTS_H
+#define STACKLAYOUTS_H
+#include <memory>
+#include <QWidget>
 #include "basicreadwrite.h"
 
-#include <QMenuBar>
-#include <QVBoxLayout>
-#include <QMainWindow>
-#include <memory>
-#include <QDebug>
-class StackWidgetWrapper;
-struct VSplitStackItem;
-struct HSplitStackItem;
-
-class StackWrapperCornerMenu : public QMenuBar {
-public:
-    StackWrapperCornerMenu(StackWidgetWrapper* const target);
-
-    void disableClose() {
-        mClose->setVisible(false);
-    }
-
-    void enableClose() {
-        mClose->setVisible(true);
-    }
-private:
-    QAction * mSplitV = nullptr;
-    QAction * mSplitH = nullptr;
-    QAction * mClose = nullptr;
-
-    StackWidgetWrapper * mTarget = nullptr;
-};
-
-class StackWrapperMenu : public QMenuBar {
-    friend class StackWidgetWrapper;
-protected:
-    explicit StackWrapperMenu();
-};
+#include "stackwidgetwrapper.h"
 
 struct WidgetStackLayoutItem;
-class StackWidgetWrapper : public QWidget {
-public:
-    typedef std::function<void(StackWidgetWrapper*)> SetupOp;
-    typedef std::function<StackWidgetWrapper*(WidgetStackLayoutItem* const layoutItem,
-                                              QWidget * const parent)> Creator;
-    typedef std::function<std::unique_ptr<WidgetStackLayoutItem>()> LayoutItemCreator;
-    explicit StackWidgetWrapper(WidgetStackLayoutItem* const layoutItem,
-                                const LayoutItemCreator& layoutItemCreator,
-                                const Creator& creator, const SetupOp& setup,
-                                QWidget* const parent = nullptr);
-
-    virtual void saveDataToLayout() const = 0;
-
-    StackWrapperCornerMenu* getCornerMenu() {
-        return mCornerMenu;
-    }
-
-    StackWrapperMenu* getMenuBar() const { return mMenuBar; }
-    QWidget* getCentralWidget() const { return mCenterWidget; }
-
-    void setMenuBar(StackWrapperMenu * const menu);
-    void setCentralWidget(QWidget * const widget);
-
-    StackWidgetWrapper* splitH();
-    StackWidgetWrapper* splitV();
-
-    void closeWrapper();
-    void disableClose();
-
-    WidgetStackLayoutItem* getLayoutItem() const {
-        return mLayoutItem;
-    }
-private:
-    template <class T, class U>
-    StackWidgetWrapper* split(
-            U* const lItem,
-            WidgetStackLayoutItem* const otherLayoutItem);
-
-    StackWrapperCornerMenu* mCornerMenu;
-    WidgetStackLayoutItem* const mLayoutItem;
-    const LayoutItemCreator mLayoutItemCreator;
-    const Creator mCreator;
-    const SetupOp mSetupOp;
-    QVBoxLayout* mLayout;
-    StackWrapperMenu* mMenuBar = nullptr;
-    QWidget* mCenterWidget = nullptr;
-};
-
-template <class T, class U>
-StackWidgetWrapper* StackWidgetWrapper::split(
-        U* const lItem,
-        WidgetStackLayoutItem * const otherLayoutItem) {
-    mCornerMenu->enableClose();
-    const auto stack = new T(lItem, parentWidget());
-    gReplaceWidget(this, stack);
-    stack->appendWidget(this);
-    const auto newWid = mCreator(otherLayoutItem, stack);
-    stack->appendWidget(newWid);
-    return newWid;
-}
-
 struct ParentStackLayoutItem;
 struct SplitStackLayoutItem;
+
+class Document;
+class AudioHandler;
+
 struct StackLayoutItem {
     enum Type {
         V_SPLIT, H_SPLIT,
@@ -112,8 +23,8 @@ struct StackLayoutItem {
     typedef std::unique_ptr<SplitStackLayoutItem> SplitPtr;
     typedef std::unique_ptr<WidgetStackLayoutItem> WidgetPtr;
     virtual ~StackLayoutItem() {}
-    virtual QWidget* create(QWidget* const parent,
-                            QLayout* const layout = nullptr) = 0;
+    virtual QWidget* create(Document &document, AudioHandler &audioHandler,
+                            QWidget* const parent, QLayout* const layout = nullptr) = 0;
     virtual void write(QIODevice* const dst) const = 0;
     virtual void saveData() = 0;
 
@@ -142,12 +53,14 @@ protected:
 
 struct SplitStackLayoutItem : public ParentStackLayoutItem {
     void write(QIODevice* const dst) const {
+        dst->write(rcConstChar(&mSecondSizeFrac), sizeof(qreal));
         sWriteChild(mChildItems.first.get(), dst);
         sWriteChild(mChildItems.second.get(), dst);
     }
 
     template <typename WidgetT>
     void read(QIODevice* const src) {
+        src->read(rcChar(&mSecondSizeFrac), sizeof(qreal));
         auto child1 = sReadChild<WidgetT>(src);
         auto child2 = sReadChild<WidgetT>(src);
         setChildren(std::move(child1), std::move(child2));
@@ -234,8 +147,9 @@ struct BaseStackItem : public ParentStackLayoutItem {
         mChild->saveData();
     }
 
-    QWidget* create(QWidget* const parent, QLayout* const layout = nullptr) {
-        return mChild->create(parent, layout);
+    QWidget* create(Document &document, AudioHandler &audioHandler,
+                    QWidget* const parent, QLayout* const layout = nullptr) {
+        return mChild->create(document, audioHandler, parent, layout);
     }
 
     void childClosed_k(StackLayoutItem* const child) {
@@ -273,17 +187,15 @@ struct BaseStackItem : public ParentStackLayoutItem {
         gWrite(dst, mName);
         ParentStackLayoutItem::sWriteChild(mChild.get(), dst);
     }
-
-    template<typename WidgetT>
-    static UPtr sRead(QIODevice* const src) {
-        const QString name = gReadString(src);
-        const auto result = new BaseStackItem;
-        result->setName(name);
-        auto child = ParentStackLayoutItem::sReadChild<WidgetT>(src);
-        result->setChild(std::move(child));
-        return UPtr(result);
-    }
 protected:
+    template <typename WidgetT>
+    void readBaseStackItem(QIODevice* const src) {
+        const QString name = gReadString(src);
+        setName(name);
+        auto child = ParentStackLayoutItem::sReadChild<WidgetT>(src);
+        setChild(std::move(child));
+    }
+
     mutable QString mName;
     UniPtr mChild;
 };
@@ -292,12 +204,13 @@ struct HSplitStackItem : public SplitStackLayoutItem {
 public:
     HSplitStackItem() { mType = Type::H_SPLIT; }
 
-    QWidget* create(QWidget* const parent, QLayout* const layout = nullptr) {
+    QWidget* create(Document &document, AudioHandler &audioHandler,
+                    QWidget* const parent, QLayout* const layout = nullptr) {
         const auto split = new HWidgetStack(this, parent);
         if(layout) layout->addWidget(split);
-        split->appendWidget(mChildItems.first->create(split),
+        split->appendWidget(mChildItems.first->create(document, audioHandler, split),
                             1 - mSecondSizeFrac);
-        split->appendWidget(mChildItems.second->create(split),
+        split->appendWidget(mChildItems.second->create(document, audioHandler, split),
                             mSecondSizeFrac);
         return split;
     }
@@ -320,12 +233,13 @@ struct VSplitStackItem : public SplitStackLayoutItem {
 public:
     VSplitStackItem() { mType = Type::V_SPLIT; }
 
-    QWidget* create(QWidget* const parent, QLayout* const layout = nullptr) {
+    QWidget* create(Document &document, AudioHandler &audioHandler,
+                    QWidget* const parent, QLayout* const layout = nullptr) {
         const auto split = new VWidgetStack(this, parent);
         if(layout) layout->addWidget(split);
-        split->appendWidget(mChildItems.first->create(split),
+        split->appendWidget(mChildItems.first->create(document, audioHandler, split),
                             1 - mSecondSizeFrac);
-        split->appendWidget(mChildItems.second->create(split),
+        split->appendWidget(mChildItems.second->create(document, audioHandler, split),
                             mSecondSizeFrac);
         return split;
     }
@@ -363,4 +277,5 @@ StackLayoutItem::UniPtr ParentStackLayoutItem::sReadChild(
         return UniPtr(wid);
     } else Q_ASSERT(false);
 }
-#endif // STACKWIDGETWRAPPER_H
+
+#endif // STACKLAYOUTS_H

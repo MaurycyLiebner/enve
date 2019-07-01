@@ -5,11 +5,15 @@ class TimelineWidget;
 class ChangeWidthWidget;
 
 struct TWidgetStackLayoutItem : public SceneWidgetStackLayoutItem {
-    TWidgetStackLayoutItem(Document& document) :
-        mDocument(document) {}
-    QWidget* create(QWidget * const parent, QLayout* const layout = nullptr);
+    TWidgetStackLayoutItem() {}
+    void clear();
+    QWidget* create(Document &document, AudioHandler &audioHandler,
+                    QWidget * const parent, QLayout* const layout = nullptr);
+    void write(QIODevice* const dst) const;
+    void read(QIODevice* const src);
+    void setGraph(const bool graph);
 private:
-    Document& mDocument;
+    bool mGraph = false;
 };
 
 class TimelineWrapper : public StackWidgetWrapper {

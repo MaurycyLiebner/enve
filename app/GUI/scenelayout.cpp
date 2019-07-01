@@ -1,8 +1,10 @@
 #include "scenelayout.h"
 #include "document.h"
 
-SceneLayout::SceneLayout(QWidget * const parent) :
-    QWidget(parent) {
+SceneLayout::SceneLayout(Document &document, AudioHandler &audioHandler,
+                         QWidget * const parent) :
+    QWidget(parent),
+    mDocument(document), mAudioHandler(audioHandler) {
     setLayout(new QHBoxLayout);
     layout()->setMargin(0);
     layout()->setSpacing(0);
@@ -22,14 +24,14 @@ void SceneLayout::reset() {
 }
 
 void SceneLayout::setCurrent(SceneBaseStackItem* const item) {
-    if(!item) return reset();
-    clearWidget();
-    item->create(this, layout());
+    reset();
+    if(!item) return;
+    item->create(mDocument, mAudioHandler, this, layout());
     mBaseStack = item;
 }
 
 void SceneLayout::saveData() {
-    mBaseStack->saveData();
+    if(mBaseStack) mBaseStack->saveData();
 }
 
 void SceneLayout::clearWidget() {

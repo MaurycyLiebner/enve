@@ -37,8 +37,8 @@ LayoutHandler::LayoutHandler(Document& document,
     canvasComboLayout->addWidget(newLayPush);
     canvasComboLayout->addWidget(removeLayPush);
 
-    mSceneLayout = new SceneLayout();
-    mTimelineLayout = new SceneLayout();
+    mSceneLayout = new SceneLayout(mDocument, mAudioHandler);
+    mTimelineLayout = new SceneLayout(mDocument, mAudioHandler);
 
     connect(mComboBox, qOverload<int>(&QComboBox::activated),
             this, &LayoutHandler::setCurrent);
@@ -46,12 +46,12 @@ LayoutHandler::LayoutHandler(Document& document,
             this, &LayoutHandler::renameCurrent);
 
     connect(newLayPush, &QPushButton::pressed,
-            this, &LayoutHandler::newLayout);
+            this, &LayoutHandler::newLayoutAction);
     connect(removeLayPush, &QPushButton::pressed,
             this, &LayoutHandler::removeCurrent);
 
     connect(&document, &Document::sceneCreated,
-            this, &LayoutHandler::newForScene);
+            this, &LayoutHandler::newForSceneAction);
     connect(&document, qOverload<Canvas*>(&Document::sceneRemoved),
             this, &LayoutHandler::removeForScene);
 }

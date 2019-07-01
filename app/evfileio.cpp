@@ -115,6 +115,7 @@ void MainWindow::loadEVFile(const QString &path) {
             RuntimeThrow("Incompatible or incomplete data");
         }
         mDocument.read(&file);
+        mLayoutHandler->read(&file);
     } catch(...) {
         file.close();
         RuntimeThrow("Error while reading from file " + path);
@@ -134,6 +135,8 @@ void MainWindow::saveToFile(const QString &path) {
 
     try {
         mDocument.write(&file);
+        mLayoutHandler->write(&file);
+
         FileFooter::sWrite(&file);
     } catch(...) {
         file.close();

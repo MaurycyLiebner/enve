@@ -1,6 +1,7 @@
 #ifndef CANVASWINDOWWRAPPER_H
 #define CANVASWINDOWWRAPPER_H
 #include "stackwidgetwrapper.h"
+#include "stacklayouts.h"
 class Document;
 class Canvas;
 class CanvasWindow;
@@ -16,18 +17,15 @@ protected:
 };
 
 struct CWWidgetStackLayoutItem : public SceneWidgetStackLayoutItem {
-    CWWidgetStackLayoutItem(Document& document, AudioHandler& audioHandler) :
-        mDocument(document), mAudioHandler(audioHandler) {}
+    CWWidgetStackLayoutItem() {}
 
     void clear();
-    QWidget* create(QWidget * const parent,
-                    QLayout* const layout = nullptr);
+    QWidget* create(Document &document, AudioHandler &audioHandler,
+                    QWidget * const parent, QLayout* const layout = nullptr);
     void write(QIODevice* const dst) const;
     void read(QIODevice* const src);
     void setTransform(const QMatrix& transform);
 private:
-    Document& mDocument;
-    AudioHandler& mAudioHandler;
     QMatrix mTransform;
 };
 

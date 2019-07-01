@@ -7,8 +7,8 @@ TimelineWrapper::TimelineWrapper(Document * const document,
                                  QWidget * const parent) :
     StackWidgetWrapper(
         layItem,
-        [document]() {
-            const auto rPtr = new TWidgetStackLayoutItem(*document);
+        []() {
+            const auto rPtr = new TWidgetStackLayoutItem();
             return std::unique_ptr<WidgetStackLayoutItem>(rPtr);
         },
         [document](WidgetStackLayoutItem* const layItem,
@@ -42,10 +42,32 @@ TimelineWidget* TimelineWrapper::getTimelineWidget() const {
     return static_cast<TimelineWidget*>(getCentralWidget());
 }
 
-QWidget *TWidgetStackLayoutItem::create(QWidget* const parent,
-                                        QLayout * const layout) {
-    const auto cwWrapper = new TimelineWrapper(&mDocument, this, parent);
-    if(layout) layout->addWidget(cwWrapper);
-    cwWrapper->setScene(mScene);
-    return cwWrapper;
+void TWidgetStackLayoutItem::clear() {
+    SceneWidgetStackLayoutItem::clear();
+    mGraph = false;
+}
+
+QWidget *TWidgetStackLayoutItem::create(Document &document, AudioHandler &audioHandler,
+                                        QWidget* const parent, QLayout * const layout) {
+    Q_UNUSED(audioHandler);
+    const auto tWrapper = new TimelineWrapper(&document, this, parent);
+    if(layout) layout->addWidget(tWrapper);
+    tWrapper->setScene(mScene);
+    const auto tw = tWrapper->getTimelineWidget();
+    if(mGraph) tw->setGraphEnabled(mGraph);
+    return tWrapper;
+}
+
+void TWidgetStackLayoutItem::write(QIODevice * const dst) const {
+    SceneWidgetStackLayoutItem::write(dst);
+    dst->write(rcConstChar(&mGraph), sizeof(bool));
+}
+
+void TWidgetStackLayoutItem::read(QIODevice * const src) {
+    SceneWidgetStackLayoutItem::read(src);
+    src->read(rcChar(&mGraph), sizeof(bool));
+}
+
+void TWidgetStackLayoutItem::setGraph(const bool graph) {
+    mGraph = graph;
 }

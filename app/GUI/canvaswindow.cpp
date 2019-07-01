@@ -277,8 +277,8 @@ void CanvasWindow::openSettingsWindowForCurrentCanvas() {
     if(!mCurrentCanvas) return;
     const auto dialog = new CanvasSettingsDialog(mCurrentCanvas, this);
     connect(dialog, &QDialog::accepted, this, [dialog, this]() {
-        dialog->applySettingsToCanvas(mCurrentCanvas.data());
-        setCurrentCanvas(mCurrentCanvas.data());
+        dialog->applySettingsToCanvas(mCurrentCanvas);
+        setCurrentCanvas(mCurrentCanvas);
         dialog->close();
     });
     dialog->show();

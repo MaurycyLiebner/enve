@@ -38,6 +38,7 @@ public:
 
     void setCurrentScene(Canvas* const scene);
     void setBoxesListWidth(const int width);
+    void setGraphEnabled(const bool enabled);
 private:
     void setViewedFrameRange(const FrameRange &range);
     void setCanvasFrameRange(const FrameRange &range);
@@ -61,8 +62,6 @@ private:
     void setTypeAll();
     void setTypeGraphics();
     void setTypeSound();
-
-    void setGraphEnabled(const bool enabled);
 private:
     void setCurrentType(const SWT_Type type);
     void setBoxRule(const SWT_BoxRule rule);

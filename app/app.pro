@@ -68,6 +68,8 @@ SOURCES += main.cpp\
     GUI/layouthandler.cpp \
     GUI/scenechooser.cpp \
     GUI/scenelayout.cpp \
+    GUI/stacklayouts.cpp \
+    GUI/stackwidgetwrapper.cpp \
     GUI/timelinewrapper.cpp \
     GUI/welcomedialog.cpp \
     GUI/widgetstack.cpp \
@@ -99,7 +101,6 @@ SOURCES += main.cpp\
     evfileio.cpp \
     offscreenqgl33c.cpp \
     paintsettings.cpp \
-    stackwidgetwrapper.cpp \
     svgimporter.cpp \
     Animators/coloranimator.cpp \
     Animators/qstringanimator.cpp \
@@ -294,6 +295,8 @@ HEADERS  += \
     GUI/layouthandler.h \
     GUI/scenechooser.h \
     GUI/scenelayout.h \
+    GUI/stacklayouts.h \
+    GUI/stackwidgetwrapper.h \
     GUI/timelinewrapper.h \
     GUI/welcomedialog.h \
     GUI/widgetstack.h \
@@ -322,7 +325,6 @@ HEADERS  += \
     effectsloader.h \
     offscreenqgl33c.h \
     paintsettings.h \
-    stackwidgetwrapper.h \
     svgimporter.h \
     keypoint.h \
     Animators/qstringanimator.h \
