@@ -246,7 +246,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
         auto cont = mMainWindow->getClipboardContainer(CCT_KEYS);
         const auto container = GetAsPtr(cont, KeysClipboardContainer);
         if(!container) return false;
-        container->paste(mMainWindow->getCurrentFrame(), this, true, true);
+        container->paste(mCurrentScene->getCurrentFrame(), this, true, true);
     } else if(!mSelectedKeysAnimators.isEmpty()) {
         if(event->modifiers() & Qt::ControlModifier &&
            event->key() == Qt::Key_C) {
@@ -290,7 +290,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
         } else if(event->modifiers() & Qt::CTRL &&
                   event->key() == Qt::Key_D) {
             auto container = getSelectedKeysClipboardContainer();
-            container->paste(mMainWindow->getCurrentFrame(), this, true, true);
+            container->paste(mCurrentScene->getCurrentFrame(), this, true, true);
          } else if(event->key() == Qt::Key_Delete) {
             if(mGraphViewed) {
                 graphDeletePressed();
@@ -576,7 +576,7 @@ void KeysView::handleMouseMove(const QPoint &pos,
                         keysScale = 1 + (posU.x() - mLastPressPos.x())/150.;
                         mValueInput.setDisplayedValue(keysScale);
                     }
-                    const int absFrame = mMainWindow->getCurrentFrame();
+                    const int absFrame = mCurrentScene->getCurrentFrame();
                     if(mGraphViewed) {
                         for(const auto& anim : mGraphAnimators) {
                             anim->scaleSelectedKeysFrame(absFrame, keysScale);

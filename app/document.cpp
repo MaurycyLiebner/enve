@@ -89,6 +89,11 @@ void Document::decActiveSceneFrame() {
     setActiveSceneFrame(getActiveSceneFrame() - 1);
 }
 
+void Document::setActiveSceneWidget(CanvasWindow * const sceneWidget) {
+    fActiveSceneWidget = sceneWidget;
+    emit activeSceneWidgetSet(sceneWidget);
+}
+
 Gradient *Document::createNewGradient() {
     const auto grad = SPtrCreate(Gradient)();
     fGradients.append(grad);

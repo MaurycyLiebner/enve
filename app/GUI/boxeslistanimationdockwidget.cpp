@@ -126,10 +126,18 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mToolBar->addSeparator();
 
     mMainLayout->addWidget(mToolBar);
+    mToolBar->setEnabled(false);
 
     mRenderWidget = new RenderWidget(this);
+
+    connect(&mDocument, &Document::activeSceneWidgetSet,
+            this, [this](CanvasWindow* const sceneWidget) {
+        mToolBar->setEnabled(sceneWidget);
+    });
     connect(mRenderWidget, &RenderWidget::renderFromSettings,
-            mMainWindow->getCanvasWindow(), &CanvasWindow::renderFromSettings);
+            this, [this](RenderInstanceSettings* const settings) {
+        mDocument.fActiveSceneWidget->renderFromSettings(settings);
+    });
     mMainLayout->addWidget(mTimelineLayout);
     mMainLayout->addWidget(mRenderWidget);
     mRenderWidget->hide();
@@ -224,23 +232,23 @@ void BoxesListAnimationDockWidget::previewPaused() {
 }
 
 void BoxesListAnimationDockWidget::resumePreview() {
-    mMainWindow->getCanvasWindow()->resumePreview();
+    mDocument.fActiveSceneWidget->resumePreview();
 }
 
 void BoxesListAnimationDockWidget::pausePreview() {
-    mMainWindow->getCanvasWindow()->pausePreview();
+    mDocument.fActiveSceneWidget->pausePreview();
 }
 
 void BoxesListAnimationDockWidget::playPreview() {
-    mMainWindow->getCanvasWindow()->playPreview();
+    mDocument.fActiveSceneWidget->playPreview();
 }
 
 void BoxesListAnimationDockWidget::renderPreview() {
-    mMainWindow->getCanvasWindow()->renderPreview();
+    mDocument.fActiveSceneWidget->renderPreview();
 }
 
 void BoxesListAnimationDockWidget::interruptPreview() {
-    mMainWindow->getCanvasWindow()->interruptPreview();
+    mDocument.fActiveSceneWidget->interruptPreview();
 }
 
 void BoxesListAnimationDockWidget::setLocalPivot(const bool bT) {

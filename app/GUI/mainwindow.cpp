@@ -801,7 +801,7 @@ void MainWindow::previewPaused() {
 //}
 
 void MainWindow::setResolutionFractionValue(const qreal value) {
-    mCanvasWindow->setResolutionFraction(value);
+    mDocument.fActiveSceneWidget->setResolutionFraction(value);
 }
 
 UndoRedoStack *MainWindow::getUndoRedoStack() {
@@ -916,10 +916,6 @@ void MainWindow::enable() {
     delete mGrayOutWidget;
     mGrayOutWidget = nullptr;
     queScheduledTasksAndUpdate();
-}
-
-int MainWindow::getCurrentFrame() {
-    return mCanvasWindow->getCurrentFrame();
 }
 
 void MainWindow::newFile() {

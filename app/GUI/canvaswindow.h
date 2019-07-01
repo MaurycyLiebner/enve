@@ -68,6 +68,8 @@ public:
     void releaseMouse();
     bool isMouseGrabber();
 
+    void openSettingsWindowForCurrentCanvas();
+
     void resizeEvent(QResizeEvent* e);
 
     void dropEvent(QDropEvent *event);
@@ -79,16 +81,16 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
-
-    void openSettingsWindowForCurrentCanvas();
 protected:
     void KFT_setFocusToWidget() {
+        mDocument.setActiveSceneWidget(this);
         if(mCurrentCanvas) mDocument.setActiveScene(mCurrentCanvas);
         setFocus();
         update();
     }
 
     void KFT_clearFocus() {
+        mDocument.setActiveSceneWidget(nullptr);
         clearFocus();
         update();
     }

@@ -57,6 +57,7 @@ CanvasWindow::CanvasWindow(Document &document,
 
 CanvasWindow::~CanvasWindow() {
     setCurrentCanvas(nullptr);
+    KFT_clearFocus();
 }
 
 Canvas *CanvasWindow::getCurrentCanvas() {

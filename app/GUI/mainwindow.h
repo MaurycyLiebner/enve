@@ -97,7 +97,6 @@ public:
     AnimationDockWidget *getAnimationDockWidget();
     BoxScrollWidget *getObjectSettingsList();
 
-    CanvasWindow *getCanvasWindow() { return mCanvasWindow; }
     FillStrokeSettingsWidget *getFillStrokeSettings();
     void saveToFile(const QString &path);
     void loadEVFile(const QString &path);
@@ -110,8 +109,6 @@ public:
     void scheduleBoxesListRepaint();
     void disable();
     void enable();
-
-    int getCurrentFrame();
 
     void previewFinished();
     void updateCanvasModeButtonsChecked();
@@ -314,7 +311,6 @@ private:
     AudioHandler mAudioHandler;
     Actions mActions;
     LayoutHandler *mLayoutHandler = nullptr;
-    CanvasWindow *mCanvasWindow;
     EffectsLoader *mEffectsLoader;
     stdptr<UndoRedoStack> mCurrentUndoRedoStack;
 
