@@ -398,11 +398,11 @@ public:
         return mWidth;
     }
 
-    QRectF getMaxBoundsRect() const {
+    QRect getMaxBoundsRect() const {
         if(mClipToCanvasSize) {
-            return QRectF(0, 0, mWidth, mHeight);
+            return QRect(0, 0, mWidth, mHeight);
         } else {
-            return QRectF(-mWidth, - mHeight, 3*mWidth, 3*mHeight);
+            return QRect(-mWidth, - mHeight, 3*mWidth, 3*mHeight);
         }
     }
 
@@ -508,7 +508,7 @@ public:
 
     BoundingBox *getBoxAt(const QPointF &absPos) {
         if(mClipToCanvasSize) {
-            if(!getMaxBoundsRect().contains(absPos)) return nullptr;
+            if(!QRectF(getMaxBoundsRect()).contains(absPos)) return nullptr;
         }
         return ContainerBox::getBoxAt(absPos);
     }
@@ -519,9 +519,6 @@ public:
         anim_scaleTime(0, fps/mFps);
         setFps(fps);
     }
-    void drawTransparencyMesh(SkCanvas * const canvas,
-                              const SkRect &viewRect,
-                              const qreal scale);
 
     bool SWT_isCanvas() const { return true; }
 

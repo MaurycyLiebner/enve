@@ -23,7 +23,8 @@ void SkiaHelpers::drawImageGPU(
         const SkScalar y,
         SkPaint * const paint,
         GrContext* const context) {
-    if(!image || !context) RuntimeThrow("Invalid draw request");
+    if(!image) return;
+    if(!context) RuntimeThrow("Invalid draw request");
     const auto mipMap = paint->getFilterQuality() > kLow_SkFilterQuality ?
             GrMipMapped::kYes : GrMipMapped::kNo;
     sk_sp<SkImage> texture(image->makeTextureImage(context, nullptr, mipMap));

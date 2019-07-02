@@ -168,13 +168,6 @@ void CanvasWindow::renameCurrentCanvas(const QString &newName) {
 
 void CanvasWindow::renderSk(SkCanvas * const canvas,
                             GrContext* const grContext) {
-//    if(hasFocus()) {
-//        SkPaint paint;
-//        paint.setColor(SK_ColorRED);
-//        paint.setStrokeWidth(4);
-//        paint.setStyle(SkPaint::kStroke_Style);
-//        canvas->drawRect(SkRect::MakeWH(width(), height()), paint);
-//    }
     if(mCurrentCanvas) {
         canvas->save();
         mCurrentCanvas->renderSk(canvas, grContext, rect(),

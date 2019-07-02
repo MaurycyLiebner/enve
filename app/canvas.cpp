@@ -136,41 +136,42 @@ void Canvas::updateHovered(const MouseEvent& e) {
     updateHoveredBox(e);
 }
 
-void Canvas::drawTransparencyMesh(SkCanvas * const canvas,
-                                  const SkRect &viewRect,
-                                  const qreal scale) {
-    if(mBackgroundColor->getColor().alpha() != 255) {
-        SkPaint paint;
-        paint.setAntiAlias(true);
-        paint.setStyle(SkPaint::kFill_Style);
-        paint.setColor(SkColorSetARGB(125, 255, 255, 255));
-        SkScalar currX = viewRect.left();
-        SkScalar currY = viewRect.top();
-        SkScalar widthT = static_cast<SkScalar>(
-                    MIN_WIDGET_DIM*0.5*scale);
-        SkScalar heightT = widthT;
-        bool isOdd = false;
-        while(currY < viewRect.bottom()) {
-            widthT = heightT;
-            if(currY + heightT > viewRect.bottom()) {
-                heightT = viewRect.bottom() - currY;
-            }
-            currX = viewRect.left();
-            if(isOdd) currX += widthT;
-
-            while(currX < viewRect.right()) {
-                if(currX + widthT > viewRect.right()) {
-                    widthT = viewRect.right() - currX;
-                }
-                canvas->drawRect(SkRect::MakeXYWH(currX, currY,
-                                                  widthT, heightT),
-                                 paint);
-                currX += 2*widthT;
-            }
-
-            isOdd = !isOdd;
-            currY += heightT;
+void drawTransparencyMesh(SkCanvas * const canvas,
+                          const SkRect &drawRect) {
+    SkPaint paint;
+    paint.setAntiAlias(true);
+    paint.setStyle(SkPaint::kFill_Style);
+    paint.setColor(SkColorSetARGB(125, 255, 255, 255));
+    SkScalar currX = drawRect.left();
+    SkScalar currY = drawRect.top();
+    SkScalar widthT = static_cast<SkScalar>(MIN_WIDGET_DIM*0.5);
+    const SkScalar scale = canvas->getTotalMatrix().getMinScale();
+    if(scale < 1) {
+        const SkScalar nL = floor(log(scale)/log(0.5f));
+        widthT *= pow(2.f, nL);
+    }
+    SkScalar heightT = widthT;
+    bool isOdd = false;
+    while(currY < drawRect.bottom()) {
+        widthT = heightT;
+        if(currY + heightT > drawRect.bottom()) {
+            heightT = drawRect.bottom() - currY;
         }
+        currX = drawRect.left();
+        if(isOdd) currX += widthT;
+
+        while(currX < drawRect.right()) {
+            if(currX + widthT > drawRect.right()) {
+                widthT = drawRect.right() - currX;
+            }
+            canvas->drawRect(SkRect::MakeXYWH(currX, currY,
+                                              widthT, heightT),
+                             paint);
+            currX += 2*widthT;
+        }
+
+        isOdd = !isOdd;
+        currY += heightT;
     }
 }
 
@@ -181,15 +182,16 @@ void Canvas::renderSk(SkCanvas * const canvas,
                       const bool mouseGrabbing) {
     SkPaint paint;
     paint.setStyle(SkPaint::kFill_Style);
-    const qreal scale = viewTrans.m11();
     const SkRect canvasRect = SkRect::MakeWH(mWidth, mHeight);
+    const QRectF viewedRect = viewTrans.inverted().mapRect(QRectF(drawRect)).adjusted(1, 1, -1, -1);
 
     canvas->concat(toSkMatrix(viewTrans));
     const SkScalar reversedRes = toSkScalar(1/mResolutionFraction);
     if(isPreviewingOrRendering()) {
         if(mCurrentPreviewContainer) {
             canvas->save();
-            drawTransparencyMesh(canvas, canvasRect, scale);
+            if(mBackgroundColor->getColor().alpha() != 255)
+                drawTransparencyMesh(canvas, canvasRect);
             canvas->scale(reversedRes, reversedRes);
             mCurrentPreviewContainer->drawSk(canvas, grContext);
             canvas->restore();
@@ -197,12 +199,14 @@ void Canvas::renderSk(SkCanvas * const canvas,
     } else {
         if(!mClipToCanvasSize) {
             paint.setColor(SkColorSetARGB(255, 75, 75, 75));
-            const auto bgRect = getMaxBoundsRect();
-            canvas->drawRect(toSkRect(bgRect), paint);
+            const QRect bgRect = getMaxBoundsRect();
+            //canvas->drawRect(toSkRect(bgRect), paint);
+            canvas->drawRect(toSkRect(viewedRect.intersected(bgRect)), paint);
         }
         const bool drawCanvas = mCurrentPreviewContainer &&
                 !mCurrentPreviewContainerOutdated;
-        drawTransparencyMesh(canvas, canvasRect, scale);
+        if(mBackgroundColor->getColor().alpha() != 255)
+            drawTransparencyMesh(canvas, canvasRect);
 
         if(!mClipToCanvasSize || !drawCanvas) {
             // saveLayer rebinds framebuffer to 0,
@@ -210,7 +214,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
             // should rebind to defultFramebuffer()
             //canvas->saveLayer(nullptr, nullptr);
             paint.setColor(toSkColor(mBackgroundColor->getColor()));
-            canvas->drawRect(canvasRect, paint);
+            //canvas->drawRect(canvasRect, paint);
+            canvas->drawRect(toSkRect(viewedRect.intersected(toQRectF(canvasRect))), paint);
             for(const auto& box : mContainedBoxes) {
                 if(box->isVisibleAndInVisibleDurationRect())
                     box->drawPixmapSk(canvas, grContext);
