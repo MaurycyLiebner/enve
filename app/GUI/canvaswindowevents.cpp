@@ -35,14 +35,6 @@ void CanvasWindow::resizeEvent(QResizeEvent *e) {
     GLWindow::resizeEvent(e);
 }
 
-void CanvasWindow::blockAutomaticSizeFit() {
-    mAutomaticSizeFit = false;
-}
-
-void CanvasWindow::unblockAutomaticSizeFit() {
-    mAutomaticSizeFit = true;
-}
-
 void CanvasWindow::fitCanvasToSize() {
     if(!mCurrentCanvas) return;
     mViewTransform.reset();
@@ -55,6 +47,18 @@ void CanvasWindow::fitCanvasToSize() {
     translateView({(widWidth - canvasSize.width()*minScale)*0.5,
                    (widHeight - canvasSize.height()*minScale)*0.5});
     mViewTransform.scale(minScale, minScale);
+}
+
+#include <QApplication>
+#include <QEvent>
+void CanvasWindow::requestFitCanvasToSize() {
+    QApplication::postEvent(this, new QEvent(QEvent::User));
+}
+
+bool CanvasWindow::event(QEvent *e) {
+    if(e->type() == QEvent::User)
+        fitCanvasToSize();
+    return QWidget::event(e);
 }
 
 void CanvasWindow::resetTransormation() {

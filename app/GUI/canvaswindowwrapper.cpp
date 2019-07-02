@@ -93,8 +93,8 @@ QWidget* CWWidgetStackLayoutItem::create(
     if(layout) layout->addWidget(cwWrapper);
     cwWrapper->setScene(mScene);
     const auto cw = cwWrapper->getSceneWidget();
-    cw->blockAutomaticSizeFit();
-    cw->setViewTransform(mTransform);
+    if(mTransformSet) cw->setViewTransform(mTransform);
+    else cw->requestFitCanvasToSize();
     return cwWrapper;
 }
 
@@ -105,11 +105,14 @@ void CWWidgetStackLayoutItem::write(QIODevice * const dst) const {
 
 void CWWidgetStackLayoutItem::read(QIODevice * const src) {
     SceneWidgetStackLayoutItem::read(src);
-    src->read(rcChar(&mTransform), sizeof(QMatrix));
+    QMatrix transform;
+    src->read(rcChar(&transform), sizeof(QMatrix));
+    setTransform(transform);
 }
 
 void CWWidgetStackLayoutItem::setTransform(const QMatrix& transform) {
     mTransform = transform;
+    mTransformSet = true;
 }
 
 void SceneWidgetStackLayoutItem::clear() {

@@ -26,6 +26,7 @@ struct CWWidgetStackLayoutItem : public SceneWidgetStackLayoutItem {
     void read(QIODevice* const src);
     void setTransform(const QMatrix& transform);
 private:
+    bool mTransformSet = false;
     QMatrix mTransform;
 };
 

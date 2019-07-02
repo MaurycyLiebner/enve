@@ -70,6 +70,8 @@ public:
 
     void openSettingsWindowForCurrentCanvas();
 
+    bool event(QEvent *e);
+
     void resizeEvent(QResizeEvent* e);
 
     void dropEvent(QDropEvent *event);
@@ -106,7 +108,6 @@ private:
     Document& mDocument;
     Actions& mActions;
 
-    bool mAutomaticSizeFit = true;
     QSize mOldSize{-1, -1};
     QMatrix mViewTransform;
     QPointF mPrevMousePos;
@@ -201,6 +202,7 @@ public:
     void zoomView(const qreal scaleBy, const QPointF &absOrigin);
 
     void fitCanvasToSize();
+    void requestFitCanvasToSize();
     void resetTransormation();
 private:
     void nextSaveOutputFrame();

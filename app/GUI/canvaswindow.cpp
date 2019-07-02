@@ -832,8 +832,6 @@ int CanvasWindow::getMaxFrame() {
     return mCurrentCanvas->getMaxFrame();
 }
 
-const int BufferSize = 32768;
-
 void CanvasWindow::startAudio() {
     mAudioHandler.startAudio();
     mCurrentSoundComposition->start(mCurrentPreviewFrame);
@@ -845,11 +843,12 @@ void CanvasWindow::stopAudio() {
 }
 
 void CanvasWindow::audioPushTimerExpired() {
-    auto request = mAudioHandler.dataRequest();
-    const qint64 len = mCurrentSoundComposition->read(
-                request.fData, request.fSize);
-    request.fSize = int(len);
-    mAudioHandler.provideData(request);
+    while(auto request = mAudioHandler.dataRequest()) {
+        const qint64 len = mCurrentSoundComposition->read(
+                    request.fData, request.fSize);
+        request.fSize = int(len);
+        mAudioHandler.provideData(request);
+    }
 }
 
 void CanvasWindow::dropEvent(QDropEvent *event) {
@@ -872,6 +871,7 @@ void CanvasWindow::dropEvent(QDropEvent *event) {
 void CanvasWindow::dragEnterEvent(QDragEnterEvent *event) {
     if(event->mimeData()->hasUrls()) {
         event->acceptProposedAction();
+        if(!hasFocus()) KFT_setFocus();
     }
 }
 

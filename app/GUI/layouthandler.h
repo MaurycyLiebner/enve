@@ -16,6 +16,8 @@ struct LayoutData {
     void reset() {
         fCanvas = std::make_unique<CWSceneBaseStackItem>(fScene);
         fTimeline = std::make_unique<TSceneBaseStackItem>(fScene);
+
+
     }
 
     void write(QIODevice* const dst) const {

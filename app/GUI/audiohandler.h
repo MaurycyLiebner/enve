@@ -17,10 +17,8 @@ public:
 
     DataRequest dataRequest() {
         if(mAudioOutput && mAudioOutput->state() != QAudio::StoppedState) {
-            if(mAudioOutput->bytesFree() <= 0) return {nullptr, 0};
-            const int size = qMin(mAudioOutput->periodSize(),
-                                  mAudioOutput->bytesFree());
-            return {mAudioBuffer.data(), size};
+            if(mAudioOutput->bytesFree() >= mAudioOutput->periodSize())
+                return {mAudioBuffer.data(), mAudioOutput->periodSize()};
         }
         return {nullptr, 0};
     }
