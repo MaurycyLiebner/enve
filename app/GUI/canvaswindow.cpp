@@ -846,6 +846,7 @@ void CanvasWindow::audioPushTimerExpired() {
     while(auto request = mAudioHandler.dataRequest()) {
         const qint64 len = mCurrentSoundComposition->read(
                     request.fData, request.fSize);
+        if(len <= 0) break;
         request.fSize = int(len);
         mAudioHandler.provideData(request);
     }
