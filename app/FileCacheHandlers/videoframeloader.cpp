@@ -38,7 +38,10 @@ int frameId(AVFrame * const decodedFrame,
             const qreal fps) {
     int64_t pts = av_frame_get_best_effort_timestamp(decodedFrame);
     pts = av_rescale_q(pts, videoStream->time_base, AV_TIME_BASE_Q);
-    return qRound(pts/1000000.*fps);
+    const qreal frameApprox = pts/1000000.*fps;
+    const int frameRound = qRound(frameApprox);
+    if(frameRound - frameApprox > 0.4) return frameRound - 1;
+    return frameRound;
 }
 
 void seek(const int tryN, const int frameId, const qreal fps,
