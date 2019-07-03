@@ -110,7 +110,6 @@ void GLWindow::initialize() {
 }
 
 void GLWindow::paintGL() {
-    glClear(GL_COLOR_BUFFER_BIT);
     renderSk(mCanvas, mGrContext.get());
     mCanvas->flush();
 }

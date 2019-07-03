@@ -51,7 +51,7 @@ public:
 
     void afterUpdate();
     void beforeAddingScheduler();
-    int getAnimationFrameForRelFrame(const int relFrame);
+    int getAnimationFrameForRelFrame(const qreal relFrame);
 
     void enableFrameRemappingAction();
     void enableFrameRemapping();

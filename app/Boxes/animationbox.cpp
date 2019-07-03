@@ -5,12 +5,15 @@
 #include "FileCacheHandlers/animationcachehandler.h"
 #include "imagebox.h"
 #include "undoredo.h"
+#include "Animators/qrealkey.h"
+#include "Animators/gpueffectanimators.h"
 
 AnimationBox::AnimationBox(const BoundingBoxType& type) : BoundingBox(type) {
     setName("Animation");
 
     setDurationRectangle(SPtrCreate(FixedLenAnimationRect)(this));
     mFrameAnimator = SPtrCreate(IntAnimator)("frame");
+    ca_prependChildAnimator(mGPUEffectsAnimators.get(), mFrameAnimator);
 }
 
 AnimationBox::~AnimationBox() {
@@ -62,7 +65,7 @@ bool AnimationBox::shouldPlanScheduleUpdate() {
     return BoundingBox::shouldPlanScheduleUpdate();
 }
 
-int AnimationBox::getAnimationFrameForRelFrame(const int relFrame) {
+int AnimationBox::getAnimationFrameForRelFrame(const qreal relFrame) {
     const int lastFrameId = mSrcFramesCache->getFrameCount() - 1;
     const int animStartRelFrame =
                 getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
@@ -83,8 +86,7 @@ int AnimationBox::getAnimationFrameForRelFrame(const int relFrame) {
 
     return pixId;
 }
-#include "Animators/qrealkey.h"
-#include "Animators/gpueffectanimators.h"
+
 void AnimationBox::enableFrameRemappingAction() {
     if(mFrameRemappingEnabled) return;
     const int frameCount = mSrcFramesCache->getFrameCount();
@@ -112,7 +114,7 @@ void AnimationBox::enableFrameRemappingAction() {
 void AnimationBox::enableFrameRemapping() {
     if(mFrameRemappingEnabled) return;
     mFrameRemappingEnabled = true;
-    ca_prependChildAnimator(mGPUEffectsAnimators.get(), mFrameAnimator);
+    mFrameAnimator->SWT_show();
 }
 
 void AnimationBox::disableFrameRemapping() {
@@ -144,7 +146,7 @@ void AnimationBox::anim_setAbsFrame(const int frame) {
 }
 
 FrameRange AnimationBox::prp_getIdenticalRelRange(const int relFrame) const {
-    if(isVisibleAndInDurationRect(relFrame)) {
+    if(isVisibleAndInDurationRect(relFrame) && !mFrameRemappingEnabled) {
         const auto animDur = getAnimationDurationRect();
         const auto animRange = animDur->getAnimationRange();
         if(animRange.inRange(relFrame))
@@ -227,7 +229,7 @@ void AnimationBox::setupRenderData(const qreal relFrame,
                                    BoundingBoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     const auto imageData = GetAsPtr(data, AnimationBoxRenderData);
-    const int animationFrame = getAnimationFrameForRelFrame(qRound(relFrame));
+    const int animationFrame = getAnimationFrameForRelFrame(relFrame);
     imageData->fAnimationFrame = animationFrame;
     const auto upd = mSrcFramesCache->scheduleFrameLoad(animationFrame);
     if(upd) upd->addDependent(imageData);

@@ -139,40 +139,20 @@ void Canvas::updateHovered(const MouseEvent& e) {
 void drawTransparencyMesh(SkCanvas * const canvas,
                           const SkRect &drawRect) {
     SkPaint paint;
-    paint.setAntiAlias(true);
-    paint.setStyle(SkPaint::kFill_Style);
-    paint.setColor(SkColorSetARGB(125, 255, 255, 255));
-    SkScalar currX = drawRect.left();
-    SkScalar currY = drawRect.top();
-    SkScalar widthT = static_cast<SkScalar>(MIN_WIDGET_DIM*0.5);
+    SkBitmap bitmap;
+    bitmap.setInfo(SkImageInfo::MakeA8(2, 2), 2);
+    uint8_t pixels[4] = { 0, 255, 255, 0 };
+    bitmap.setPixels(pixels);
+
+    SkMatrix matr;
     const SkScalar scale = canvas->getTotalMatrix().getMinScale();
-    if(scale < 1) {
-        const SkScalar nL = floor(log(scale)/log(0.5f));
-        widthT *= pow(2.f, nL);
-    }
-    SkScalar heightT = widthT;
-    bool isOdd = false;
-    while(currY < drawRect.bottom()) {
-        widthT = heightT;
-        if(currY + heightT > drawRect.bottom()) {
-            heightT = drawRect.bottom() - currY;
-        }
-        currX = drawRect.left();
-        if(isOdd) currX += widthT;
-
-        while(currX < drawRect.right()) {
-            if(currX + widthT > drawRect.right()) {
-                widthT = drawRect.right() - currX;
-            }
-            canvas->drawRect(SkRect::MakeXYWH(currX, currY,
-                                              widthT, heightT),
-                             paint);
-            currX += 2*widthT;
-        }
-
-        isOdd = !isOdd;
-        currY += heightT;
-    }
+    const SkScalar dim = MIN_WIDGET_DIM*0.5f / (scale > 1.f ? 1.f : scale);
+    matr.setScale(dim, dim);
+    const auto shader = bitmap.makeShader(SkTileMode::kRepeat,
+                                          SkTileMode::kRepeat, &matr);
+    paint.setShader(shader);
+    paint.setColor(SkColorSetARGB(255, 200, 200, 200));
+    canvas->drawRect(drawRect, paint);
 }
 
 void Canvas::renderSk(SkCanvas * const canvas,
@@ -180,32 +160,49 @@ void Canvas::renderSk(SkCanvas * const canvas,
                       const QRect& drawRect,
                       const QMatrix& viewTrans,
                       const bool mouseGrabbing) {
+    SkBitmap bitmap;
+    bitmap.makeShader(SkTileMode::kRepeat, SkTileMode::kRepeat);
     SkPaint paint;
     paint.setStyle(SkPaint::kFill_Style);
     const SkRect canvasRect = SkRect::MakeWH(mWidth, mHeight);
-    const QRectF viewedRect = viewTrans.inverted().mapRect(QRectF(drawRect)).adjusted(1, 1, -1, -1);
+    const qreal qInvZoom = 1/viewTrans.m11();
+    const SkScalar invZoom = toSkScalar(qInvZoom);
+    const SkMatrix skViewTrans = toSkMatrix(viewTrans);
+    const QColor bgColor = mBackgroundColor->getColor();
+    const SkScalar intervals[2] = {MIN_WIDGET_DIM*0.25f*invZoom,
+                                   MIN_WIDGET_DIM*0.25f*invZoom};
+    const auto dashPathEffect = SkDashPathEffect::Make(intervals, 2, 0);
 
-    canvas->concat(toSkMatrix(viewTrans));
+    canvas->concat(skViewTrans);
     const SkScalar reversedRes = toSkScalar(1/mResolutionFraction);
     if(isPreviewingOrRendering()) {
         if(mCurrentPreviewContainer) {
+            glClearColor(0, 0, 0, 1);
+            glClear(GL_COLOR_BUFFER_BIT);
             canvas->save();
-            if(mBackgroundColor->getColor().alpha() != 255)
+            if(bgColor.alpha() != 255)
                 drawTransparencyMesh(canvas, canvasRect);
             canvas->scale(reversedRes, reversedRes);
             mCurrentPreviewContainer->drawSk(canvas, grContext);
             canvas->restore();
         }
     } else {
-        if(!mClipToCanvasSize) {
-            paint.setColor(SkColorSetARGB(255, 75, 75, 75));
-            const QRect bgRect = getMaxBoundsRect();
-            //canvas->drawRect(toSkRect(bgRect), paint);
-            canvas->drawRect(toSkRect(viewedRect.intersected(bgRect)), paint);
+        canvas->save();
+        if(mClipToCanvasSize) {
+            glClearColor(0, 0, 0, 1);
+            glClear(GL_COLOR_BUFFER_BIT);
+            canvas->clipRect(canvasRect);
+        } else {
+            glClearColor(0.294f, 0.294f, 0.294f, 1);
+            glClear(GL_COLOR_BUFFER_BIT);
+            paint.setColor(SK_ColorBLACK);
+            paint.setStyle(SkPaint::kStroke_Style);
+            paint.setPathEffect(dashPathEffect);
+            canvas->drawRect(toSkRect(getMaxBoundsRect()), paint);
         }
         const bool drawCanvas = mCurrentPreviewContainer &&
                 !mCurrentPreviewContainerOutdated;
-        if(mBackgroundColor->getColor().alpha() != 255)
+        if(bgColor.alpha() != 255)
             drawTransparencyMesh(canvas, canvasRect);
 
         if(!mClipToCanvasSize || !drawCanvas) {
@@ -213,24 +210,33 @@ void Canvas::renderSk(SkCanvas * const canvas,
             // which is invalid for QOpenGLWidget,
             // should rebind to defultFramebuffer()
             //canvas->saveLayer(nullptr, nullptr);
-            paint.setColor(toSkColor(mBackgroundColor->getColor()));
-            //canvas->drawRect(canvasRect, paint);
-            canvas->drawRect(toSkRect(viewedRect.intersected(toQRectF(canvasRect))), paint);
+//            if(!drawCanvas) {
+                if(bgColor.alpha() == 255 &&
+                   skViewTrans.mapRect(canvasRect).contains(toSkRect(drawRect))) {
+                    glClearColor(toSkScalar(bgColor.redF()),
+                                 toSkScalar(bgColor.greenF()),
+                                 toSkScalar(bgColor.blueF()), 1);
+                    glClear(GL_COLOR_BUFFER_BIT);
+                } else {
+                    paint.setStyle(SkPaint::kFill_Style);
+                    paint.setColor(toSkColor(bgColor));
+                    canvas->drawRect(canvasRect, paint);
+                }
+//            }
             for(const auto& box : mContainedBoxes) {
                 if(box->isVisibleAndInVisibleDurationRect())
                     box->drawPixmapSk(canvas, grContext);
             }
             //canvas->restore();
-        }
-        if(drawCanvas) {
+        } else if(drawCanvas) {
             canvas->save();
             canvas->scale(reversedRes, reversedRes);
             mCurrentPreviewContainer->drawSk(canvas, grContext);
             canvas->restore();
         }
 
-        const qreal qInvZoom = 1/viewTrans.m11();
-        const SkScalar invZoom = toSkScalar(qInvZoom);
+        canvas->restore();
+
         if(!mCurrentContainer->SWT_isCanvas())
             mCurrentContainer->drawBoundingRect(canvas, invZoom);
         if(!mPaintTarget.isValid()) {
@@ -257,13 +263,14 @@ void Canvas::renderSk(SkCanvas * const canvas,
         } else {
             if(mSelecting) {
                 paint.setStyle(SkPaint::kStroke_Style);
-                paint.setColor(SkColorSetARGB(255, 0, 0, 255));
+                paint.setPathEffect(dashPathEffect);
                 paint.setStrokeWidth(2*invZoom);
-                const SkScalar intervals[2] = {MIN_WIDGET_DIM*0.25f*invZoom,
-                                               MIN_WIDGET_DIM*0.25f*invZoom};
-                paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
+                paint.setColor(SkColorSetARGB(255, 0, 55, 255));
                 canvas->drawRect(toSkRect(mSelectionRect), paint);
-                paint.setPathEffect(nullptr);
+                paint.setStrokeWidth(invZoom);
+                paint.setColor(SkColorSetARGB(255, 150, 150, 255));
+                canvas->drawRect(toSkRect(mSelectionRect), paint);
+                //paint.setPathEffect(nullptr);
             }
 
             if(mHoveredPoint_d) {
@@ -277,12 +284,11 @@ void Canvas::renderSk(SkCanvas * const canvas,
             }
         }
 
-        if(!mClipToCanvasSize) {
-            paint.setStyle(SkPaint::kStroke_Style);
-            paint.setStrokeWidth(invZoom);
-            paint.setColor(SK_ColorBLACK);
-            canvas->drawRect(canvasRect, paint);
-        }
+        paint.setStyle(SkPaint::kStroke_Style);
+        paint.setStrokeWidth(invZoom);
+        paint.setColor(mClipToCanvasSize ? SK_ColorGRAY : SK_ColorBLACK);
+        paint.setPathEffect(nullptr);
+        canvas->drawRect(canvasRect, paint);
 
         canvas->resetMatrix();
 
