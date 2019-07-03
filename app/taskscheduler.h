@@ -22,10 +22,6 @@ protected:
     int countQued() const { return mQued.count(); }
     bool allDone() const { return countQued() == 0; }
     void addTask(const stdsptr<Task>& task) {
-        for(int i = 0; i < mQued.count(); i++) {
-            const auto& iTask = mQued.at(i);
-            if(iTask == task) Q_ASSERT(false);
-        }
         mQued << task;
     }
 

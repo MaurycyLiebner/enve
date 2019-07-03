@@ -850,6 +850,9 @@ void MainWindow::queScheduledTasksAndUpdate() {
     if(mCurrentUndoRedoStack) {
         mCurrentUndoRedoStack->startNewSet();
     }
+
+    if(mDocument.fActiveScene)
+        emit mDocument.fActiveScene->requestUpdate();
 }
 #include "Boxes/textbox.h"
 void MainWindow::setCurrentBox(BoundingBox *box) {
