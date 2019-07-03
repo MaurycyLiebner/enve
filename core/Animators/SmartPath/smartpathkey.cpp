@@ -3,7 +3,7 @@
 SmartPathKey::SmartPathKey(const SmartPath &value, const int relFrame,
                            Animator * const parentAnimator) :
     InterpolationKeyT<SmartPath>(relFrame, parentAnimator) {
-    assignValue(value);
+    mValue = value;
 }
 
 SmartPathKey::SmartPathKey(Animator * const parentAnimator) :
@@ -18,5 +18,5 @@ void SmartPathKey::restore() {
 }
 
 void SmartPathKey::assignValue(const SmartPath &value) {
-    mValue.deepCopy(value);
+    mValue = value;
 }

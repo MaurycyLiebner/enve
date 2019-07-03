@@ -109,15 +109,16 @@ public:
         mNodesList.reverse();
     }
 
-    void actionAppendMoveAllFrom(SmartPath& other) {
-        mNodesList.appendShallowCopyFrom(other.getNodesRef());
+    void actionAppendMoveAllFrom(SmartPath&& other) {
+        mNodesList.appendShallowCopyFrom(std::move(other.mNodesList));
         other.clear();
     }
 
-    void actionPrependMoveAllFrom(SmartPath& other) {
-        mNodesList.prependShallowCopyFrom(other.getNodesRef());
+    void actionPrependMoveAllFrom(SmartPath&& other) {
+        mNodesList.prependShallowCopyFrom(std::move(other.mNodesList));
         other.clear();
     }
+
     void actionMergeNodes(const int node1Id, const int node2Id);
 
     void reset() {
@@ -182,48 +183,33 @@ public:
     }
 
     void save() {
-        mSavedList = mNodesList.createDeepCopy();
+        mSavedList = mNodesList;
     }
 
     void restore() {
-        mNodesList = mSavedList.createDeepCopy();
-    }
-
-    SmartPath createCopy() const {
-        SmartPath copy;
-        copy.deepCopy(*this);
-        return copy;
+        mNodesList = mSavedList;
     }
 
     int getNodeCount() const {
         return mNodesList.count();
     }
 
-    void deepCopy(const SmartPath& src) {
-        deepCopy(src.getNodesRef());
-    }
-
-    void deepCopy(const NodeList& src) {
-        mNodesList = src.createDeepCopy();
-    }
-
-    void shallowCopy(const SmartPath& src) {
-        shallowCopy(src.getNodesRef());
-    }
-
-    void shallowCopy(const NodeList& src) {
+    void assign(const NodeList& src) {
         mNodesList = src;
+    }
+
+    void assign(NodeList&& src) {
+        mNodesList = std::move(src);
     }
 
     static void sInterpolate(const SmartPath &path1,
                              const SmartPath &path2,
                              const qreal path2Weight,
                              SmartPath& target) {
-        const auto list = NodeList::sInterpolate(
-                    path1.getNodesRef(),
-                    path2.getNodesRef(),
-                    path2Weight);
-        target.shallowCopy(list);
+        target.assign(NodeList::sInterpolate(
+                      path1.getNodesRef(),
+                      path2.getNodesRef(),
+                      path2Weight));
     }
 
     bool hasDetached() const {

@@ -289,9 +289,10 @@ public:
         for(int i = 0; i < anim_mKeys.count(); i++) {
             const auto thisKey = anim_getKeyAtIndex<SmartPathKey>(i);
             const auto otherKey = other->anim_getKeyAtIndex<SmartPathKey>(i);
-            thisKey->getValue().actionAppendMoveAllFrom(otherKey->getValue());
+            thisKey->getValue().actionAppendMoveAllFrom(
+                        std::move(otherKey->getValue()));
         }
-        mBaseValue.actionAppendMoveAllFrom(other->getBaseValue());
+        mBaseValue.actionAppendMoveAllFrom(std::move(other->getBaseValue()));
         prp_afterWholeInfluenceRangeChanged();
         other->prp_afterWholeInfluenceRangeChanged();
         updateAllPoints();
@@ -302,9 +303,10 @@ public:
         for(int i = 0; i < anim_mKeys.count(); i++) {
             const auto thisKey = anim_getKeyAtIndex<SmartPathKey>(i);
             const auto otherKey = other->anim_getKeyAtIndex<SmartPathKey>(i);
-            thisKey->getValue().actionPrependMoveAllFrom(otherKey->getValue());
+            thisKey->getValue().actionPrependMoveAllFrom(
+                        std::move(otherKey->getValue()));
         }
-        mBaseValue.actionPrependMoveAllFrom(other->getBaseValue());
+        mBaseValue.actionPrependMoveAllFrom(std::move(other->getBaseValue()));
         prp_afterWholeInfluenceRangeChanged();
         other->prp_afterWholeInfluenceRangeChanged();
         updateAllPoints();
@@ -318,14 +320,14 @@ public:
         if(!hasDetached()) return nullptr;
         const auto baseDetached = mBaseValue.getAndClearLastDetached();
         SmartPath baseSmartPath;
-        baseSmartPath.deepCopy(baseDetached);
+        baseSmartPath.assign(baseDetached);
         const auto newAnim = SPtrCreate(SmartPathAnimator)(baseSmartPath);
         for(const auto &key : anim_mKeys) {
             const auto spKey = GetAsPtr(key, SmartPathKey);
             auto& sp = spKey->getValue();
             const auto keyDetached = sp.getAndClearLastDetached();
             SmartPath keySmartPath;
-            keySmartPath.deepCopy(keyDetached);
+            keySmartPath.assign(keyDetached);
             const auto newKey = SPtrCreate(SmartPathKey)(
                         keySmartPath, key->getRelFrame(), newAnim.get());
             newAnim->anim_appendKey(newKey);
@@ -380,18 +382,18 @@ private:
                                        SmartPathKey * const keyAtFrame,
                                        SmartPath &result) const {
         if(keyAtFrame) {
-            result.deepCopy(keyAtFrame->getValue());
+            result = keyAtFrame->getValue();
         } else if(prevKey && nextKey) {
             const qreal nWeight = prevKeyWeight(prevKey, nextKey, relFrame);
             gInterpolate(prevKey->getValue(), nextKey->getValue(),
                          nWeight, result);
         } else if(prevKey) {
-            result.deepCopy(prevKey->getValue());
+            result = prevKey->getValue();
         } else if(nextKey) {
-            result.deepCopy(nextKey->getValue());
+            result = nextKey->getValue();
         } else {
             if(&result == &mBaseValue) return;
-            result.deepCopy(mBaseValue);
+            result = mBaseValue;
         }
     }
 

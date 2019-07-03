@@ -153,6 +153,20 @@ private:
 class ListOfNodes {
 public:
     ListOfNodes() {}
+    ListOfNodes(ListOfNodes&& other) : mList(std::move(other.mList)) {}
+    ListOfNodes(const ListOfNodes& other) {
+        deepCopyFrom(other);
+    }
+
+    ListOfNodes& operator=(const ListOfNodes& other) {
+        deepCopyFrom(other);
+        return *this;
+    }
+
+    ListOfNodes& operator=(ListOfNodes&& other) {
+        mList = std::move(other.mList);
+        return *this;
+    }
 
     bool isEmpty() const {
         return mList.isEmpty();
@@ -197,10 +211,6 @@ public:
 
     int count() const {
         return mList.count();
-    }
-
-    void shallowCopyFrom(const ListOfNodes& other) {
-        mList = other.mList;
     }
 
     void deepCopyFrom(const ListOfNodes& other) {
@@ -261,7 +271,7 @@ public:
         return result;
     }
 
-    void appendNodesShallowCopy(const ListOfNodes& src) {
+    void appendNodes(ListOfNodes&& src) {
         if(src.isEmpty()) return;
         const int oldCount = count();
         for(const auto& node : src)
@@ -269,7 +279,7 @@ public:
         updateNodeIds(oldCount);
     }
 
-    void prependNodesShallowCopy(const ListOfNodes& src) {
+    void prependNodes(ListOfNodes&& src) {
         if(src.isEmpty()) return;
         for(int i = src.count() - 1; i >= 0; i--) {
             const auto node = src.atSPtr(i);

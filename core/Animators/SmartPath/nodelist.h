@@ -10,6 +10,22 @@ class NodeList {
 protected:
     NodeList() {}
 public:
+    NodeList(NodeList&& other) : mNodes(std::move(other.mNodes)),
+        mClosed(other.mClosed) {}
+    NodeList(ListOfNodes&& other) : mNodes(std::move(other)) {}
+
+    NodeList& operator=(const NodeList& other) {
+        mNodes = other.mNodes;
+        mClosed = other.mClosed;
+        return *this;
+    }
+
+    NodeList& operator=(NodeList&& other) {
+        mNodes = std::move(other.mNodes);
+        mClosed = other.mClosed;
+        return *this;
+    }
+
     Node* operator[](const int i) const {
         return mNodes[i];
     }
@@ -133,7 +149,7 @@ public:
 
     NodeList createDeepCopy() const {
         NodeList copy;
-        copy.deepCopyNodeList(mNodes);
+        copy.setNodeList(mNodes);
         copy.setClosed(mClosed);
         return copy;
     }
@@ -145,12 +161,12 @@ public:
     bool read(QIODevice * const src);
     bool write(QIODevice * const dst) const;
 protected:
-    void appendShallowCopyFrom(const NodeList& other) {
-        mNodes.appendNodesShallowCopy(other.getList());
+    void appendShallowCopyFrom(NodeList&& other) {
+        mNodes.appendNodes(std::move(other.mNodes));
     }
 
-    void prependShallowCopyFrom(const NodeList& other) {
-        mNodes.prependNodesShallowCopy(other.getList());
+    void prependShallowCopyFrom(NodeList&& other) {
+        mNodes.prependNodes(std::move(other.mNodes));
     }
 
     void moveNodesToFrontStartingWith(const int first) {
@@ -158,10 +174,7 @@ protected:
     }
 
     NodeList detachNodesStartingWith(const int first) {
-        const auto detachedList = mNodes.detachNodesStartingWith(first);
-        NodeList detached;
-        detached.shallowCopyNodeList(detachedList);
-        return detached;
+        return NodeList(mNodes.detachNodesStartingWith(first));
     }
 
     void swap(NodeList& other) {
@@ -179,12 +192,12 @@ protected:
         return mNodes;
     }
 
-    void deepCopyNodeList(const ListOfNodes& list) {
-        mNodes.deepCopyFrom(list);
+    void setNodeList(ListOfNodes&& list) {
+        mNodes = std::move(list);
     }
 
-    void shallowCopyNodeList(const ListOfNodes& list) {
-        mNodes.shallowCopyFrom(list);
+    void setNodeList(const ListOfNodes& list) {
+        mNodes = list;
     }
 
     int insertNodeBefore(const int nextId, const Node &nodeBlueprint);
