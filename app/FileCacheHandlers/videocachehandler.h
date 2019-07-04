@@ -2,6 +2,7 @@
 #define VIDEOCACHEHANDLER_H
 #include "animationcachehandler.h"
 #include "videostreamsdata.h"
+#include <set>
 
 class VideoCacheHandler : public AnimationCacheHandler {
     friend class StdSelfRef;
@@ -51,8 +52,7 @@ protected:
             if(nFrame < frameId) nLoader->addDependent(loader.get());
             else loader->addDependent(nLoader);
         }
-        mNeededFrames << frameId;
-        std::sort(mNeededFrames.begin(), mNeededFrames.end());
+        mNeededFrames.insert(frameId);
 
         return loader.get();
     }
@@ -75,7 +75,7 @@ protected:
         if(id < 0 || id >= mFramesBeingLoaded.count()) return;
         mFramesBeingLoaded.removeAt(id);
         mFrameLoaders.removeAt(id);
-        mNeededFrames.removeOne(frame);
+        mNeededFrames.erase(frame);
     }
 
     void openVideoStream() {
@@ -83,7 +83,7 @@ protected:
         mFrameCount = mVideoStreamsData->fFrameCount;
     }
 private:
-    QList<int> mNeededFrames;
+    std::set<int> mNeededFrames;
 
     QList<int> mFramesBeingLoaded;
     QList<stdsptr<VideoFrameLoader>> mFrameLoaders;
