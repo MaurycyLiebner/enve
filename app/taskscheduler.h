@@ -226,7 +226,8 @@ private:
     void tryProcessingNextQuedCPUTask();
     void tryProcessingNextQuedHDDTask();
 
-    bool shouldQueMoreCPUTasks();
+    bool shouldQueMoreCPUTasks() const;
+    bool shouldQueMoreHDDTasks() const;
 
     void callFreeThreadsForCPUTasksAvailableFunc() const {
         if(mFreeThreadsForCPUTasksAvailableFunc) {

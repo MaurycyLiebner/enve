@@ -71,11 +71,15 @@ void TaskScheduler::queCPUTask(const stdsptr<Task>& task) {
     if(task->readyToBeProcessed()) processNextQuedCPUTask();
 }
 
-bool TaskScheduler::shouldQueMoreCPUTasks() {
+bool TaskScheduler::shouldQueMoreCPUTasks() const {
     const int nQues = mQuedCPUTasks.countQues();
     const int maxQues = mCPUExecutors.count();
     const bool overflowed = nQues >= maxQues;
     return !mFreeCPUExecs.isEmpty() && !mCPUQueing && !overflowed;
+}
+
+bool TaskScheduler::shouldQueMoreHDDTasks() const {
+    return mQuedHDDTasks.count() < 2 && mHDDThreadBusy;
 }
 
 HDDExecController* TaskScheduler::createNewBackupHDDExecutor() {
@@ -183,7 +187,7 @@ void TaskScheduler::processNextQuedHDDTask() {
 void TaskScheduler::processNextTasks() {
     processNextQuedHDDTask();
     processNextQuedCPUTask();
-    if(shouldQueMoreCPUTasks())
+    if(shouldQueMoreCPUTasks() || shouldQueMoreHDDTasks())
         callFreeThreadsForCPUTasksAvailableFunc();
 }
 
