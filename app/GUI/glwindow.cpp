@@ -49,9 +49,9 @@ void GLWindow::bindSkia(const int w, const int h) {
     mGrContext->freeGpuResources();
 }
 
-void GLWindow::resizeGL(int w, int h) {
+void GLWindow::resizeGL(int, int) {
     try {
-        bindSkia(w, h);
+        mRebind = true;
         update();
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
@@ -110,6 +110,15 @@ void GLWindow::initialize() {
 }
 
 void GLWindow::paintGL() {
+    if(mRebind) {
+        mRebind = false;
+        try {
+            bindSkia(width(), height());
+        } catch(const std::exception& e) {
+            gPrintExceptionCritical(e);
+        }
+    }
+    glClear(GL_COLOR_BUFFER_BIT);
     renderSk(mCanvas, mGrContext.get());
     mCanvas->flush();
 }

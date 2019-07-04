@@ -500,7 +500,7 @@ void ContainerBox::addActionsToMenu(BoxTypeMenu * const menu) {
 }
 
 void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
-                            GrContext* const grContext) {
+                                GrContext* const grContext) {
     if(SWT_isGroupBox()) {
         for(const auto& box : mContainedBoxes) {
             if(box->isVisibleAndInVisibleDurationRect())

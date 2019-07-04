@@ -21,7 +21,7 @@ public:
 protected:
     virtual void renderSk(SkCanvas * const canvas,
                           GrContext * const grContext) = 0;
-    void resizeGL(int w, int h) final;
+    void resizeGL(int, int) final;
     void initializeGL() final;
     void paintGL() final;
     void showEvent(QShowEvent *e) final;
@@ -29,6 +29,8 @@ protected:
     void initialize();
     void bindSkia(const int w, const int h);
     void updateFix();
+
+    bool mRebind = false;
 
     sk_sp<const GrGLInterface> mInterface;
     sk_sp<GrContext> mGrContext;

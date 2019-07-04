@@ -206,28 +206,23 @@ void Canvas::renderSk(SkCanvas * const canvas,
             drawTransparencyMesh(canvas, canvasRect);
 
         if(!mClipToCanvasSize || !drawCanvas) {
-            // saveLayer rebinds framebuffer to 0,
-            // which is invalid for QOpenGLWidget,
-            // should rebind to defultFramebuffer()
-            //canvas->saveLayer(nullptr, nullptr);
-//            if(!drawCanvas) {
-                if(bgColor.alpha() == 255 &&
-                   skViewTrans.mapRect(canvasRect).contains(toSkRect(drawRect))) {
-                    glClearColor(toSkScalar(bgColor.redF()),
-                                 toSkScalar(bgColor.greenF()),
-                                 toSkScalar(bgColor.blueF()), 1);
-                    glClear(GL_COLOR_BUFFER_BIT);
-                } else {
-                    paint.setStyle(SkPaint::kFill_Style);
-                    paint.setColor(toSkColor(bgColor));
-                    canvas->drawRect(canvasRect, paint);
-                }
-//            }
+            if(bgColor.alpha() == 255 &&
+               skViewTrans.mapRect(canvasRect).contains(toSkRect(drawRect))) {
+                glClearColor(toSkScalar(bgColor.redF()),
+                             toSkScalar(bgColor.greenF()),
+                             toSkScalar(bgColor.blueF()), 1);
+                glClear(GL_COLOR_BUFFER_BIT);
+            } else {
+                paint.setStyle(SkPaint::kFill_Style);
+                paint.setColor(toSkColor(bgColor));
+                canvas->drawRect(canvasRect, paint);
+            }
+            canvas->saveLayer(nullptr, nullptr);
             for(const auto& box : mContainedBoxes) {
                 if(box->isVisibleAndInVisibleDurationRect())
                     box->drawPixmapSk(canvas, grContext);
             }
-            //canvas->restore();
+            canvas->restore();
         } else if(drawCanvas) {
             canvas->save();
             canvas->scale(reversedRes, reversedRes);
