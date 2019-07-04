@@ -94,6 +94,7 @@ void VideoStreamsData::open(const char * const path) {
 
     fCodecContext = avcodec_alloc_context3(vidCodec);
     if(!fCodecContext) RuntimeThrow("Error allocating AVCodecContext");
+    fCodecContext->thread_count = 5;
     if(avcodec_parameters_to_context(fCodecContext, vidCodecPars) < 0) {
         RuntimeThrow("Failed to copy codec params to codec context");
     }

@@ -77,7 +77,6 @@ void VideoFrameLoader::readFrame() {
     const auto packet = mOpenedVideo->fPacket;
     const auto codecContext = mOpenedVideo->fCodecContext;
     auto decodedFrame = mOpenedVideo->fDecodedFrame;
-
     //const auto swsContext = mOpenedVideo->fSwsContext;
     const qreal fps = mOpenedVideo->fFps;
 
@@ -90,27 +89,25 @@ void VideoFrameLoader::readFrame() {
 
     while(true) {
         mOpenedVideo->fLastFrame = -qFloor(10*fps); // Just in case error occurs
-        if(av_read_frame(formatContext, packet) < 0) {
+        const int readRet = av_read_frame(formatContext, packet);
+        if(readRet < 0) return;
             //RuntimeThrow("Error retrieving AVPacket");
-            break;
-        } else {
-            if(packet->stream_index == videoStreamIndex) {
-                const int sendRet = avcodec_send_packet(codecContext, packet);
-                if(sendRet < 0) RuntimeThrow("Sending packet to the decoder failed");
+        if(packet->stream_index == videoStreamIndex) {
+            const int sendRet = avcodec_send_packet(codecContext, packet);
+            if(sendRet < 0) RuntimeThrow("Sending packet to the decoder failed");
 
-                const int recRet = avcodec_receive_frame(codecContext, decodedFrame);
-                av_packet_unref(packet);
+            const int recRet = avcodec_receive_frame(codecContext, decodedFrame);
+            av_packet_unref(packet);
 
-                if(recRet == AVERROR_EOF)
-                    break;
-                else if(recRet == AVERROR(EAGAIN)) {
-                    continue;
-                } else if(recRet < 0)
-                    RuntimeThrow("Did not receive frame from the decoder");
-            } else {
-                av_packet_unref(packet);
+            if(recRet == AVERROR_EOF)
+                break;
+            else if(recRet == AVERROR(EAGAIN))
                 continue;
-            }
+            else if(recRet < 0)
+                RuntimeThrow("Did not receive frame from the decoder");
+        } else {
+            av_packet_unref(packet);
+            continue;
         }
 
         const int currFrame = frameId(decodedFrame, videoStream, fps);
@@ -118,7 +115,7 @@ void VideoFrameLoader::readFrame() {
         const bool reseek = currFrame > mFrameId && seekTry <= 3;
         if(currFrame == mFrameId || (!reseek && currFrame > mFrameId)) {
             if(currFrame > mFrameId)
-                qDebug() << "frame" << QString::number(currFrame) +
+                qDebug() << "frame " + QString::number(currFrame) +
                             " instead of " + QString::number(mFrameId);            
             setFrameToConvert(decodedFrame, codecContext);
             mOpenedVideo->fDecodedFrame = av_frame_alloc();
