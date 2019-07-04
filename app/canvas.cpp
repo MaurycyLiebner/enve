@@ -177,8 +177,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
     const SkScalar reversedRes = toSkScalar(1/mResolutionFraction);
     if(isPreviewingOrRendering()) {
         if(mCurrentPreviewContainer) {
-            glClearColor(0, 0, 0, 1);
-            glClear(GL_COLOR_BUFFER_BIT);
+            canvas->clear(SK_ColorBLACK);
             canvas->save();
             if(bgColor.alpha() != 255)
                 drawTransparencyMesh(canvas, canvasRect);
@@ -189,12 +188,10 @@ void Canvas::renderSk(SkCanvas * const canvas,
     } else {
         canvas->save();
         if(mClipToCanvasSize) {
-            glClearColor(0, 0, 0, 1);
-            glClear(GL_COLOR_BUFFER_BIT);
+            canvas->clear(SK_ColorBLACK);
             canvas->clipRect(canvasRect);
         } else {
-            glClearColor(0.294f, 0.294f, 0.294f, 1);
-            glClear(GL_COLOR_BUFFER_BIT);
+            canvas->clear(SkColorSetARGB(255, 70, 70, 70));
             paint.setColor(SK_ColorBLACK);
             paint.setStyle(SkPaint::kStroke_Style);
             paint.setPathEffect(dashPathEffect);
@@ -208,10 +205,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         if(!mClipToCanvasSize || !drawCanvas) {
             if(bgColor.alpha() == 255 &&
                skViewTrans.mapRect(canvasRect).contains(toSkRect(drawRect))) {
-                glClearColor(toSkScalar(bgColor.redF()),
-                             toSkScalar(bgColor.greenF()),
-                             toSkScalar(bgColor.blueF()), 1);
-                glClear(GL_COLOR_BUFFER_BIT);
+                canvas->clear(toSkColor(bgColor));
             } else {
                 paint.setStyle(SkPaint::kFill_Style);
                 paint.setColor(toSkColor(bgColor));

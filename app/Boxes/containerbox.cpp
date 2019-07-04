@@ -507,9 +507,7 @@ void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
                 box->drawPixmapSk(canvas, grContext);
         }
     } else {
-        if(shouldPaintOnImage()) {
-            BoundingBox::drawPixmapSk(canvas, grContext);
-        } else {
+        if(mIsDescendantCurrentGroup) {
             SkPaint paint;
             const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
             paint.setAlpha(static_cast<U8CPU>(intAlpha));
@@ -520,19 +518,14 @@ void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
                     box->drawPixmapSk(canvas, grContext);
             }
             canvas->restore();
+        } else {
+            BoundingBox::drawPixmapSk(canvas, grContext);
         }
     }
 }
 
 qsptr<BoundingBox> ContainerBox::createLink() {
     return SPtrCreate(InternalLinkGroupBox)(this);
-}
-
-bool ContainerBox::shouldPaintOnImage() const {
-    if(SWT_isLinkBox() || SWT_isCanvas()) return true;
-    if(mIsDescendantCurrentGroup) return false;
-    return mEffectsAnimators->hasEffects() ||
-           mGPUEffectsAnimators->hasEffects();
 }
 
 void ContainerBox::updateIfUsesProgram(

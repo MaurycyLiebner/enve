@@ -178,7 +178,6 @@ public:
     }
     int getContainedBoxesCount() const;
     void removeAllContainedBoxes();
-    bool shouldPaintOnImage() const;
 
     void updateIfUsesProgram(
             const GPURasterEffectProgram * const program) const final;
