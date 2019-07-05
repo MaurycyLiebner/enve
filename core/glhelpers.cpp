@@ -20,7 +20,7 @@ void checkGlErrors(const std::string& msg) {
     RuntimeThrow("OpenGL error " + std::to_string(glError) + " " + msg);
 }
 
-void iniTexturedVShaderVBO(QGL33c* gl) {
+void iniTexturedVShaderVBO(QGL33c * const gl) {
     float vertices[] = {
     //  positions  | texture coords
          1, -1, 0,   1, 0,   // bottom right
@@ -35,7 +35,7 @@ void iniTexturedVShaderVBO(QGL33c* gl) {
                      vertices, GL_STATIC_DRAW);
 }
 
-void iniTexturedVShaderVAO(QGL33c* gl, GLuint &VAO) {
+void iniTexturedVShaderVAO(QGL33c * const gl, GLuint &VAO) {
     gl->glGenVertexArrays(1, &VAO);
     gl->glBindVertexArray(VAO);
 
@@ -51,7 +51,7 @@ void iniTexturedVShaderVAO(QGL33c* gl, GLuint &VAO) {
     gl->glEnableVertexAttribArray(1);
 }
 
-void iniPlainVShaderVBO(QGL33c* gl) {
+void iniPlainVShaderVBO(QGL33c * const gl) {
     float vertices[] = {
         // positions
          1, -1, 0,   // bottom right
@@ -66,7 +66,7 @@ void iniPlainVShaderVBO(QGL33c* gl) {
                      vertices, GL_STATIC_DRAW);
 }
 
-void iniPlainVShaderVAO(QGL33c* gl, GLuint &VAO) {
+void iniPlainVShaderVAO(QGL33c * const gl, GLuint &VAO) {
     gl->glGenVertexArrays(1, &VAO);
     gl->glBindVertexArray(VAO);
 
@@ -79,7 +79,7 @@ void iniPlainVShaderVAO(QGL33c* gl, GLuint &VAO) {
 }
 
 //! @brief Checks for errors after program linking and shader compilation.
-void checkCompileErrors(QGL33c* gl,
+void checkCompileErrors(QGL33c * const gl,
                         const GLuint& shader,
                         const std::string& type) {
     GLint success;
@@ -102,7 +102,7 @@ void checkCompileErrors(QGL33c* gl,
     }
 }
 #include <QFile>
-void iniProgram(QGL33c* gl,
+void iniProgram(QGL33c * const gl,
                 GLuint& program,
                 const QString& vShaderPath,
                 const QString& fShaderPath) {
@@ -167,23 +167,26 @@ void iniProgram(QGL33c* gl,
     gl->glDeleteShader(fragmentShader);
 }
 
-Texture Texture::createTextureFromImage(QGL33c *gl,
-                                        const std::string &imagePath) {
+Texture Texture::sCreateTextureFromImage(QGL33c * const gl,
+                                         const std::string &imagePath) {
     Texture tex;
     tex.gen(gl);
     tex.loadImage(gl, imagePath);
     return tex;
 }
 
-void Texture::bind(QGL33c *gl) {
+void Texture::bind(QGL33c * const gl) const {
     gl->glBindTexture(GL_TEXTURE_2D, fID);
 }
 
-void Texture::deleteTexture(QGL33c *gl) {
+void Texture::clear(QGL33c * const gl) {
     gl->glDeleteTextures(1, &fID);
+    fID = 0;
+    fWidth = 0;
+    fHeight = 0;
 }
 
-void Texture::gen(QGL33c *gl) {
+void Texture::gen(QGL33c * const gl) {
     gl->glGenTextures(1, &fID);
     gl->glBindTexture(GL_TEXTURE_2D, fID);
     gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -192,15 +195,17 @@ void Texture::gen(QGL33c *gl) {
     gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
-void Texture::gen(QGL33c *gl,
+void Texture::gen(QGL33c * const gl,
                   const int width, const int height,
                   const void * const data) {
     gen(gl);
     gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
                      0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    fWidth = width;
+    fHeight = height;
 }
 
-bool Texture::loadImage(QGL33c *gl, const std::string &imagePath) {
+bool Texture::loadImage(QGL33c * const gl, const std::string &imagePath) {
     int nrChannels;
     stbi_set_flip_vertically_on_load(true);
     unsigned char * const data = stbi_load(imagePath.c_str(),
@@ -209,7 +214,7 @@ bool Texture::loadImage(QGL33c *gl, const std::string &imagePath) {
     if(data) {
         gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fWidth, fHeight,
                          0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        gl->glGenerateMipmap(GL_TEXTURE_2D);
+        //gl->glGenerateMipmap(GL_TEXTURE_2D);
     } else {
         RuntimeThrow("Failed to load texture" + imagePath);
     }
@@ -218,39 +223,41 @@ bool Texture::loadImage(QGL33c *gl, const std::string &imagePath) {
 }
 
 #include "skia/skiahelpers.h"
-sk_sp<SkImage> TextureFrameBuffer::toImage() {
+sk_sp<SkImage> Texture::toImage(QGL33c * const gl) {
+    bind(gl);
     SkBitmap btmp;
     const auto info = SkiaHelpers::getPremulBGRAInfo(fWidth, fHeight);
     btmp.allocPixels(info);
-    glReadPixels(0, 0, fWidth, fHeight,
-                 GL_RGBA, GL_UNSIGNED_BYTE, btmp.getPixels());
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, btmp.getPixels());
+//    glReadPixels(0, 0, fWidth, fHeight,
+//                 GL_RGBA, GL_UNSIGNED_BYTE, btmp.getPixels());
     return SkiaHelpers::transferDataToSkImage(btmp);
 }
 
-void TextureFrameBuffer::deleteTexture(QGL33c *gl) {
-    fTexture.deleteTexture(gl);
+void TextureFrameBuffer::clear(QGL33c * const gl) {
+    gl->glDeleteFramebuffers(1, &fFBOId);
+    fTexture.clear(gl);
+    fFBOId = 0;
+    fWidth = 0;
+    fHeight = 0;
 }
 
-void TextureFrameBuffer::deleteFrameBuffer(QGL33c *gl) {
-    gl->glDeleteFramebuffers(1, &fFrameBufferId);
+void TextureFrameBuffer::bind(QGL33c * const gl) {
+    gl->glBindFramebuffer(GL_FRAMEBUFFER, fFBOId);
 }
 
-void TextureFrameBuffer::bindFrameBuffer(QGL33c *gl) {
-    gl->glBindFramebuffer(GL_FRAMEBUFFER, fFrameBufferId);
-}
-
-void TextureFrameBuffer::bindTexture(QGL33c *gl) {
+void TextureFrameBuffer::bindTexture(QGL33c * const gl) {
     fTexture.bind(gl);
 }
 
-void TextureFrameBuffer::gen(QGL33c *gl,
-                             const int widthT, const int heightT) {
-    fWidth = widthT;
-    fHeight = heightT;
-    gl->glGenFramebuffers(1, &fFrameBufferId);
-    gl->glBindFramebuffer(GL_FRAMEBUFFER, fFrameBufferId);
+void TextureFrameBuffer::gen(QGL33c * const gl,
+                             const int width, const int height) {
+    fWidth = width;
+    fHeight = height;
+    gl->glGenFramebuffers(1, &fFBOId);
+    gl->glBindFramebuffer(GL_FRAMEBUFFER, fFBOId);
     // create a color attachment texture
-    fTexture.gen(gl, widthT, heightT, nullptr);
+    fTexture.gen(gl, width, height, nullptr);
     gl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                GL_TEXTURE_2D, fTexture.fID, 0);
     // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now

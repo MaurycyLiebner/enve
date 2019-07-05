@@ -22,7 +22,7 @@ ShaderPostProcess::ShaderPostProcess(const sk_sp<SkImage> &srcImg,
     mFinishedFunc(finishedFunc),
     mSrcImage(srcImg) {}
 
-void ShaderPostProcess::process(const GLuint& texturedSquareVAO) {
+void ShaderPostProcess::process(const GLuint texturedSquareVAO) {
 //    mFinalImage = mSrcImage;
 //    if(mFinishedFunc) mFinishedFunc(mFinalImage);
 //    return;
@@ -52,10 +52,9 @@ void ShaderPostProcess::process(const GLuint& texturedSquareVAO) {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     frameBufferObject.bindTexture(this);
 
-    mFinalImage = frameBufferObject.toImage();
-    frameBufferObject.deleteFrameBuffer(this);
-    frameBufferObject.deleteTexture(this);
-    srcTexture.deleteTexture(this);
+    mFinalImage = frameBufferObject.toImage(this);
+    frameBufferObject.clear(this);
+    srcTexture.clear(this);
     if(mFinishedFunc) mFinishedFunc(mFinalImage);
 }
 
@@ -68,7 +67,7 @@ void BoxRenderDataScheduledPostProcess::afterProcessed() {
 }
 
 void BoxRenderDataScheduledPostProcess::process(
-        const GLuint &texturedSquareVAO) {
+        const GLuint texturedSquareVAO) {
     if(!initializeOpenGLFunctions()) {
         RuntimeThrow("Initializing GL functions failed.");
     }
@@ -87,18 +86,16 @@ void BoxRenderDataScheduledPostProcess::process(
     glViewport(0, 0, srcWidth, srcHeight);
     SkPixmap pix;
     srcImage->peekPixels(&pix);
-    Texture srcTexture;
-    srcTexture.gen(this, srcWidth, srcHeight, pix.addr());
+    Texture drawTexture;
+    drawTexture.gen(this, srcWidth, srcHeight, pix.addr());
 
     TextureFrameBuffer frameBufferObject;
     frameBufferObject.gen(this, srcWidth, srcHeight);
 
     for(int i = 0; i < mBoxData->fGPUEffects.count(); i++) {
-        if(i != 0) frameBufferObject.swapTexture(this, srcTexture);
-
         glClear(GL_COLOR_BUFFER_BIT);
         glActiveTexture(GL_TEXTURE0);
-        srcTexture.bind(this);
+        drawTexture.bind(this);
 
         const auto& program = mBoxData->fGPUEffects.at(i);
         program->setGlobalPos(gPos);
@@ -107,12 +104,11 @@ void BoxRenderDataScheduledPostProcess::process(
         glBindVertexArray(texturedSquareVAO);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
+        frameBufferObject.swapTexture(this, drawTexture);
     }
     mBoxData->fGPUEffects.clear();
 
-    frameBufferObject.bindTexture(this);
-    mBoxData->fRenderedImage = frameBufferObject.toImage();
-    frameBufferObject.deleteFrameBuffer(this);
-    frameBufferObject.deleteTexture(this);
-    srcTexture.deleteTexture(this);
+    mBoxData->fRenderedImage = drawTexture.toImage(this);
+    frameBufferObject.clear(this);
+    drawTexture.clear(this);
 }

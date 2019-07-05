@@ -13,9 +13,16 @@ class ScheduledPostProcess : public StdSelfRef,
         protected QGL33c {
     friend class GpuPostProcessor;
     friend class ComplexScheduledPostProcess;
-    friend class BoxRenderDataScheduledPostProcess;
 public:
     ScheduledPostProcess();
+protected:
+    virtual void afterProcessed() {}
+    virtual void process(const GLuint texturedSquareVAO) = 0;
+private:
+    bool unhandledException() const {
+        return static_cast<bool>(mUpdateException);
+    }
+
     void finishedProcessing() {
         afterProcessed();
         if(unhandledException()) {
@@ -25,14 +32,6 @@ public:
 
     void setException(const std::exception_ptr& exception) {
         mUpdateException = exception;
-    }
-
-protected:
-    virtual void afterProcessed() {}
-    virtual void process(const GLuint &texturedSquareVAO) = 0;
-private:
-    bool unhandledException() const {
-        return static_cast<bool>(mUpdateException);
     }
 
     std::exception_ptr handleException() {
@@ -51,7 +50,7 @@ public:
                       const stdsptr<GPURasterEffectCaller> &program,
                       const ShaderFinishedFunc& finishedFunc = ShaderFinishedFunc());
 protected:
-    void process(const GLuint &texturedSquareVAO);
+    void process(const GLuint texturedSquareVAO);
 private:
     const stdsptr<GPURasterEffectCaller> mProgram;
     //! @brief Gets called after processing finished, provides resulting image.
@@ -69,7 +68,7 @@ public:
             const stdsptr<BoundingBoxRenderData> &boxData);
 protected:
     void afterProcessed();
-    void process(const GLuint &texturedSquareVAO);
+    void process(const GLuint texturedSquareVAO);
 private:
     const stdsptr<BoundingBoxRenderData> mBoxData;
 };
@@ -78,7 +77,7 @@ class ComplexScheduledPostProcess : public ScheduledPostProcess {
 public:
     ComplexScheduledPostProcess();
 protected:
-    void process(const GLuint &texturedSquareVAO) {
+    void process(const GLuint texturedSquareVAO) {
         for(const auto& child : mChildProcesses) {
             child->process(texturedSquareVAO);
         }
