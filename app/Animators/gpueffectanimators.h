@@ -17,15 +17,11 @@ protected:
 public:
     bool SWT_isRasterGPUEffectAnimators() const { return true; }
 
-    void setParentBox(BoundingBox *box);
     BoundingBox *getParentBox() { return mParentBox_k; }
-
     bool hasEffects();
-
     QMarginsF getEffectsMargin(const qreal relFrame) const;
-
-    void addEffectRenderDataToListF(const qreal relFrame,
-                                    BoundingBoxRenderData * const data);
+    void addEffects(const qreal relFrame,
+                    BoundingBoxRenderData * const data);
 
     void updateIfUsesProgram(const GPURasterEffectProgram * const program);
     //void readPixmapEffect(QIODevice *target);

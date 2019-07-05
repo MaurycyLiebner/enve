@@ -33,8 +33,8 @@ public:
 
     QMarginsF getEffectsMargin(const qreal relFrame) const;
 
-    void addEffectRenderDataToListF(const qreal relFrame,
-                                    BoundingBoxRenderData * const data);
+    void addEffects(const qreal relFrame,
+                    BoundingBoxRenderData * const data);
 private:
     BoundingBox * const mParentBox_k;
 };

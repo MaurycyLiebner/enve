@@ -19,9 +19,8 @@ QMarginsF GPUEffectAnimators::getEffectsMargin(const qreal relFrame) const {
     return newMargin;
 }
 
-void GPUEffectAnimators::addEffectRenderDataToListF(
-        const qreal relFrame,
-        BoundingBoxRenderData * const data) {
+void GPUEffectAnimators::addEffects(const qreal relFrame,
+                                    BoundingBoxRenderData * const data) {
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect, GPURasterEffect);
         if(pixmapEffect->isVisible()) {

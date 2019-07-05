@@ -738,12 +738,12 @@ stdsptr<BoundingBoxRenderData> BoundingBox::createRenderData() { return nullptr;
 
 void BoundingBox::setupEffectsF(const qreal relFrame,
                                 BoundingBoxRenderData * const data) {
-    mEffectsAnimators->addEffectRenderDataToListF(relFrame, data);
+    mEffectsAnimators->addEffects(relFrame, data);
 }
 
 void BoundingBox::setupGPUEffectsF(const qreal relFrame,
                                    BoundingBoxRenderData * const data) {
-    mGPUEffectsAnimators->addEffectRenderDataToListF(relFrame, data);
+    mGPUEffectsAnimators->addEffects(relFrame, data);
 }
 
 void BoundingBox::addLinkingBox(BoundingBox *box) {

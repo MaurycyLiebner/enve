@@ -80,7 +80,7 @@ void BoxRenderDataScheduledPostProcess::process(
     QJSEngine engine;
     engine.evaluate("_texSize = [" + QString::number(srcWidth) + "," +
                     QString::number(srcHeight) + "]");
-    QPointF gPos = mBoxData->fGlobalBoundingRect.topLeft();
+    const QPointF gPos = mBoxData->fGlobalBoundingRect.topLeft();
     engine.evaluate("_gPos = [" + QString::number(gPos.x()) + "," +
                     QString::number(gPos.y()) + "]");
 
@@ -94,18 +94,19 @@ void BoxRenderDataScheduledPostProcess::process(
     frameBufferObject.gen(this, srcWidth, srcHeight);
 
     for(int i = 0; i < mBoxData->fGPUEffects.count(); i++) {
-        const auto& program = mBoxData->fGPUEffects.at(i);
+        if(i != 0) frameBufferObject.swapTexture(this, srcTexture);
+
         glClear(GL_COLOR_BUFFER_BIT);
-        program->setGlobalPos(gPos);
-        program->use(this, engine);
         glActiveTexture(GL_TEXTURE0);
         srcTexture.bind(this);
 
-        glBindVertexArray(texturedSquareVAO);
+        const auto& program = mBoxData->fGPUEffects.at(i);
+        program->setGlobalPos(gPos);
+        program->use(this, engine);
 
+        glBindVertexArray(texturedSquareVAO);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        if(i == mBoxData->fGPUEffects.count() - 1) break;
-        frameBufferObject.swapTexture(this, srcTexture);
+
     }
     mBoxData->fGPUEffects.clear();
 
