@@ -15,49 +15,6 @@ void GpuPostProcessor::initialize() {
 
 ScheduledPostProcess::ScheduledPostProcess() {}
 
-ShaderPostProcess::ShaderPostProcess(const sk_sp<SkImage> &srcImg,
-                                     const stdsptr<GPURasterEffectCaller> &program,
-                                     const ShaderFinishedFunc &finishedFunc) :
-    mProgram(program),
-    mFinishedFunc(finishedFunc),
-    mSrcImage(srcImg) {}
-
-void ShaderPostProcess::process(const GLuint texturedSquareVAO) {
-//    mFinalImage = mSrcImage;
-//    if(mFinishedFunc) mFinishedFunc(mFinalImage);
-//    return;
-    if(!initializeOpenGLFunctions()) {
-        RuntimeThrow("Initializing GL functions failed.");
-    }
-    if(!mSrcImage) return;
-    int srcWidth = mSrcImage->width();
-    int srcHeight = mSrcImage->height();
-    glViewport(0, 0, srcWidth, srcHeight);
-    SkPixmap pix;
-    mSrcImage->peekPixels(&pix);
-    Texture srcTexture;
-    srcTexture.gen(this, srcWidth, srcHeight, pix.addr());
-
-    TextureFrameBuffer frameBufferObject;
-    frameBufferObject.gen(this, srcWidth, srcHeight);
-
-    glClear(GL_COLOR_BUFFER_BIT);
-    QJSEngine engine;
-    mProgram->use(this, engine);
-    glActiveTexture(GL_TEXTURE0);
-    srcTexture.bind(this);
-
-    glBindVertexArray(texturedSquareVAO);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    frameBufferObject.bindTexture(this);
-
-    mFinalImage = frameBufferObject.toImage(this);
-    frameBufferObject.clear(this);
-    srcTexture.clear(this);
-    if(mFinishedFunc) mFinishedFunc(mFinalImage);
-}
-
 #include "Boxes/boundingboxrenderdata.h"
 BoxRenderDataScheduledPostProcess::BoxRenderDataScheduledPostProcess(
         const stdsptr<BoundingBoxRenderData>& boxData) : mBoxData(boxData) {}
@@ -68,13 +25,12 @@ void BoxRenderDataScheduledPostProcess::afterProcessed() {
 
 void BoxRenderDataScheduledPostProcess::process(
         const GLuint texturedSquareVAO) {
-    if(!initializeOpenGLFunctions()) {
+    if(!initializeOpenGLFunctions())
         RuntimeThrow("Initializing GL functions failed.");
-    }
-    auto srcImage = mBoxData->fRenderedImage;
+    auto& srcImage = mBoxData->fRenderedImage;
     if(!srcImage) return;
-    int srcWidth = srcImage->width();
-    int srcHeight = srcImage->height();
+    const int srcWidth = srcImage->width();
+    const int srcHeight = srcImage->height();
 
     QJSEngine engine;
     engine.evaluate("_texSize = [" + QString::number(srcWidth) + "," +
@@ -84,31 +40,16 @@ void BoxRenderDataScheduledPostProcess::process(
                     QString::number(gPos.y()) + "]");
 
     glViewport(0, 0, srcWidth, srcHeight);
-    SkPixmap pix;
-    srcImage->peekPixels(&pix);
-    Texture drawTexture;
-    drawTexture.gen(this, srcWidth, srcHeight, pix.addr());
 
-    TextureFrameBuffer frameBufferObject;
-    frameBufferObject.gen(this, srcWidth, srcHeight);
-
-    for(int i = 0; i < mBoxData->fGPUEffects.count(); i++) {
-        glClear(GL_COLOR_BUFFER_BIT);
-        glActiveTexture(GL_TEXTURE0);
-        drawTexture.bind(this);
-
-        const auto& program = mBoxData->fGPUEffects.at(i);
-        program->setGlobalPos(gPos);
-        program->use(this, engine);
-
-        glBindVertexArray(texturedSquareVAO);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        frameBufferObject.swapTexture(this, drawTexture);
+    GpuRenderTools renderTools(this, srcImage, texturedSquareVAO);
+    auto& effects = mBoxData->fGPUEffects;
+    const auto gPosX = static_cast<GLfloat>(gPos.x());
+    const auto gPosY = static_cast<GLfloat>(gPos.y());
+    for(const auto& effect : mBoxData->fGPUEffects) {
+        effect->render(this, renderTools, engine, gPosX, gPosY);
+        renderTools.swapTextures();
     }
-    mBoxData->fGPUEffects.clear();
+    effects.clear();
 
-    mBoxData->fRenderedImage = drawTexture.toImage(this);
-    frameBufferObject.clear(this);
-    drawTexture.clear(this);
+    srcImage = renderTools.getSrcTexture().toImage(this);
 }

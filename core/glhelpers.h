@@ -26,9 +26,9 @@ extern QString GL_TEXTURED_VERT;
 extern GLuint GL_TEXTURED_SQUARE_VBO;
 
 struct Texture {
-    GLuint fID;
-    int fWidth;
-    int fHeight;
+    GLuint fId = 0;
+    int fWidth = 0;
+    int fHeight = 0;
 
     static Texture sCreateTextureFromImage(QGL33c * const gl,
                                            const std::string& imagePath);
@@ -46,52 +46,68 @@ struct Texture {
              const void * const data);
 
     void swap(Texture& otherTexture) {
-        std::swap(fID, otherTexture.fID);
+        std::swap(fId, otherTexture.fId);
         std::swap(fWidth, otherTexture.fWidth);
         std::swap(fHeight, otherTexture.fHeight);
     }
 
-    sk_sp<SkImage> toImage(QGL33c * const gl);
+    sk_sp<SkImage> toImage(QGL33c * const gl) const;
 private:
     bool loadImage(QGL33c * const gl, const std::string& imagePath);
 };
 
 struct TextureFrameBuffer {
     Texture fTexture;
-    GLuint fFBOId;
-    int fWidth;
-    int fHeight;
+    GLuint fFBOId = 0;
+    int fWidth = 0;
+    int fHeight = 0;
+    bool fBound = false;
 
     //! @brief Swaps underlying texture and bind FBO
     void swapTexture(QGL33c * const gl, Texture& otherTexture) {
         fTexture.swap(otherTexture);
 
-        gl->glBindFramebuffer(GL_FRAMEBUFFER, fFBOId);
+        bind(gl);
         // create a color attachment texture
         gl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                   GL_TEXTURE_2D, fTexture.fID, 0);
+                                   GL_TEXTURE_2D, fTexture.fId, 0);
     }
 
     void clear(QGL33c * const gl);
 
     void bind(QGL33c * const gl);
+    void unbind() { fBound = false; }
 
     void bindTexture(QGL33c * const gl);
 
     //! @brief Generates and binds framebuffer and associated texture.
     void gen(QGL33c * const gl, const int width, const int height);
 
-    sk_sp<SkImage> toImage(QGL33c * const gl) { return fTexture.toImage(gl); }
+    sk_sp<SkImage> toImage(QGL33c * const gl) const {
+        return fTexture.toImage(gl); }
 };
 
 
 class GpuRenderTools {
 public:
-    GpuRenderTools(QGL33c* const gl,
-                   Texture& tex, TextureFrameBuffer& fboTex) :
-        mGL(gl), mSrcTexture(tex), mTargetTextureFbo(fboTex) {}
+    GpuRenderTools(QGL33c* const gl, const sk_sp<SkImage>& img,
+                   const GLuint texturedSquareVAO) :
+        mGL(gl), mSquareVAO(texturedSquareVAO) {
+        SkPixmap pix;
+        img->peekPixels(&pix);
+        mSrcTexture.gen(gl, img->width(), img->height(), pix.addr());
+    }
 
-    void swapSourceAndTarget() {
+    ~GpuRenderTools() {
+        mTargetTextureFbo.clear(mGL);
+        mSrcTexture.clear(mGL);
+    }
+
+    GLuint getSquareVAO() const { return mSquareVAO; }
+
+    //! @brief Swaps the source and the target texture if.
+    void swapTextures() {
+        if(!validTargetFbo()) return;
         mTargetTextureFbo.swapTexture(mGL, mSrcTexture);
     }
 
@@ -99,6 +115,7 @@ public:
     //! If there is no SkCanvas new SkCanvas is created.
     SkCanvas* requestTargetCanvas() {
         if(!mCanvas) {
+            requestTargetFbo();
             mGrContext = GrContext::MakeGL();
     //        GrGLTextureInfo texInfo;
     //        texInfo.fFormat = GR_GL_BGRA8;
@@ -132,12 +149,14 @@ public:
         return mTargetTextureFbo;
     }
 
-    bool validCanvas() const { return mCanvas; }
+    bool validTargetCanvas() const { return mCanvas; }
+    bool validTargetFbo() const { return mTargetTextureFbo.fFBOId; }
 private:
     QGL33c* const mGL;
+    const GLuint mSquareVAO;
 
-    Texture& mSrcTexture;
-    TextureFrameBuffer& mTargetTextureFbo;
+    Texture mSrcTexture;
+    TextureFrameBuffer mTargetTextureFbo;
 
     sk_sp<GrContext> mGrContext;
     sk_sp<SkSurface> mSurface;

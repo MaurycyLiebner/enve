@@ -12,7 +12,6 @@
 class ScheduledPostProcess : public StdSelfRef,
         protected QGL33c {
     friend class GpuPostProcessor;
-    friend class ComplexScheduledPostProcess;
 public:
     ScheduledPostProcess();
 protected:
@@ -43,24 +42,6 @@ private:
     std::exception_ptr mUpdateException;
 };
 
-typedef std::function<void(sk_sp<SkImage>)> ShaderFinishedFunc;
-class ShaderPostProcess : public ScheduledPostProcess {
-public:
-    ShaderPostProcess(const sk_sp<SkImage>& srcImg,
-                      const stdsptr<GPURasterEffectCaller> &program,
-                      const ShaderFinishedFunc& finishedFunc = ShaderFinishedFunc());
-protected:
-    void process(const GLuint texturedSquareVAO);
-private:
-    const stdsptr<GPURasterEffectCaller> mProgram;
-    //! @brief Gets called after processing finished, provides resulting image.
-    const ShaderFinishedFunc mFinishedFunc;
-    sk_sp<SkImage> mSrcImage;
-    sk_sp<SkImage> mFinalImage;
-
-    //! @brief Uses shaders to draw the source image to the final texture.
-};
-
 class BoundingBoxRenderData;
 class BoxRenderDataScheduledPostProcess : public ScheduledPostProcess {
 public:
@@ -73,18 +54,6 @@ private:
     const stdsptr<BoundingBoxRenderData> mBoxData;
 };
 
-class ComplexScheduledPostProcess : public ScheduledPostProcess {
-public:
-    ComplexScheduledPostProcess();
-protected:
-    void process(const GLuint texturedSquareVAO) {
-        for(const auto& child : mChildProcesses) {
-            child->process(texturedSquareVAO);
-        }
-    }
-private:
-    QList<stdsptr<ScheduledPostProcess>> mChildProcesses;
-};
 #include <QOpenGLFramebufferObject>
 #include "exceptions.h"
 class GpuPostProcessor : public QThread, protected OffscreenQGL33c {

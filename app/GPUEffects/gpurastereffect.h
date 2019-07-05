@@ -10,25 +10,34 @@ public:
                           const UniformSpecifiers& uniformSpecifiers) :
         mProgram(program), mUniformSpecifiers(uniformSpecifiers) {}
 
-    void setGlobalPos(const QPointF& gPos) {
-        mGPosX = static_cast<GLfloat>(gPos.x());
-        mGPosY = static_cast<GLfloat>(gPos.y());
-    }
+    void render(QGL33c * const gl,
+                GpuRenderTools& renderTools,
+                QJSEngine& engine,
+                const GLfloat gPosX,
+                const GLfloat gPosY) {
+        renderTools.requestTargetFbo().bind(gl);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glActiveTexture(GL_TEXTURE0);
+        renderTools.getSrcTexture().bind(gl);
 
-    void use(QGL33c * const gl, QJSEngine& engine) {
-        gl->glUseProgram(mProgram.fId);
-        for(const auto& uni : mUniformSpecifiers) {
-            uni(gl, engine);
-        }
-        if(mProgram.fGPosLoc >= 0) {
-            gl->glUniform2f(mProgram.fGPosLoc, mGPosX, mGPosY);
-        }
-        gl->glUniform1i(mProgram.fTexLocation, 0);
+        setupProgram(gl, engine, gPosX, gPosY);
+
+        gl->glBindVertexArray(renderTools.getSquareVAO());
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 private:
+    void setupProgram(QGL33c * const gl, QJSEngine& engine,
+                      const GLfloat gPosX,
+                      const GLfloat gPosY) {
+        gl->glUseProgram(mProgram.fId);
+        for(const auto& uni : mUniformSpecifiers)
+            uni(gl, engine);
+        if(mProgram.fGPosLoc >= 0)
+            gl->glUniform2f(mProgram.fGPosLoc, gPosX, gPosY);
+        gl->glUniform1i(mProgram.fTexLocation, 0);
+    }
+
     const GPURasterEffectProgram mProgram;
-    GLfloat mGPosX;
-    GLfloat mGPosY;
     const UniformSpecifiers mUniformSpecifiers;
 };
 

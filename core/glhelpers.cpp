@@ -176,19 +176,19 @@ Texture Texture::sCreateTextureFromImage(QGL33c * const gl,
 }
 
 void Texture::bind(QGL33c * const gl) const {
-    gl->glBindTexture(GL_TEXTURE_2D, fID);
+    gl->glBindTexture(GL_TEXTURE_2D, fId);
 }
 
 void Texture::clear(QGL33c * const gl) {
-    gl->glDeleteTextures(1, &fID);
-    fID = 0;
+    if(fId) gl->glDeleteTextures(1, &fId);
+    fId = 0;
     fWidth = 0;
     fHeight = 0;
 }
 
 void Texture::gen(QGL33c * const gl) {
-    gl->glGenTextures(1, &fID);
-    gl->glBindTexture(GL_TEXTURE_2D, fID);
+    gl->glGenTextures(1, &fId);
+    gl->glBindTexture(GL_TEXTURE_2D, fId);
     gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -223,7 +223,7 @@ bool Texture::loadImage(QGL33c * const gl, const std::string &imagePath) {
 }
 
 #include "skia/skiahelpers.h"
-sk_sp<SkImage> Texture::toImage(QGL33c * const gl) {
+sk_sp<SkImage> Texture::toImage(QGL33c * const gl) const {
     bind(gl);
     SkBitmap btmp;
     const auto info = SkiaHelpers::getPremulBGRAInfo(fWidth, fHeight);
@@ -235,15 +235,19 @@ sk_sp<SkImage> Texture::toImage(QGL33c * const gl) {
 }
 
 void TextureFrameBuffer::clear(QGL33c * const gl) {
-    gl->glDeleteFramebuffers(1, &fFBOId);
-    fTexture.clear(gl);
+    if(fFBOId) gl->glDeleteFramebuffers(1, &fFBOId);
     fFBOId = 0;
     fWidth = 0;
     fHeight = 0;
+    unbind();
+
+    fTexture.clear(gl);
 }
 
 void TextureFrameBuffer::bind(QGL33c * const gl) {
+    if(fBound) return;
     gl->glBindFramebuffer(GL_FRAMEBUFFER, fFBOId);
+    fBound = true;
 }
 
 void TextureFrameBuffer::bindTexture(QGL33c * const gl) {
@@ -255,11 +259,11 @@ void TextureFrameBuffer::gen(QGL33c * const gl,
     fWidth = width;
     fHeight = height;
     gl->glGenFramebuffers(1, &fFBOId);
-    gl->glBindFramebuffer(GL_FRAMEBUFFER, fFBOId);
+    bind(gl);
     // create a color attachment texture
     fTexture.gen(gl, width, height, nullptr);
     gl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                               GL_TEXTURE_2D, fTexture.fID, 0);
+                               GL_TEXTURE_2D, fTexture.fId, 0);
     // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
     if(gl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         RuntimeThrow("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
