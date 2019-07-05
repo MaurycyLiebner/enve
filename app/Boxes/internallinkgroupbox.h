@@ -43,7 +43,7 @@ public:
     void setupEffectsF(const qreal relFrame,
                        BoundingBoxRenderData * const data);
 
-    qreal getEffectsMarginAtRelFrameF(const qreal relFrame);
+    QMarginsF getEffectsMargin(const qreal relFrame);
 
     const SkBlendMode &getBlendMode();
 

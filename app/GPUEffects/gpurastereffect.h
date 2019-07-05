@@ -39,8 +39,10 @@ class GPURasterEffect : public StaticComplexAnimator {
                     const QString &name,
                     const QList<stdsptr<PropertyCreator>>& props);
 public:
-    virtual qreal getMargin() { return 0; }
-    virtual qreal getMarginAtRelFrame(const int ) { return 0; }
+    virtual QMarginsF getMarginAtRelFrame(const qreal frame) {
+        Q_UNUSED(frame);
+        return QMarginsF();
+    }
 
     void writeIdentifier(QIODevice * const dst) const;
 

@@ -18,8 +18,6 @@ class DesaturateEffect : public PixmapEffect {
 protected:
     DesaturateEffect();
 public:
-    qreal getMargin() { return 0; }
-
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData*);
 private:

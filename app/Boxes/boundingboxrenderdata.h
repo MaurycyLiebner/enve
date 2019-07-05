@@ -64,7 +64,7 @@ public:
     QRectF fGlobalBoundingRect;
     qreal fOpacity = 1;
     qreal fResolution;
-    qreal fEffectsMargin;
+    QMarginsF fEffectsMargin;
     int fRelFrame;
 
     // for motion blur
@@ -92,7 +92,7 @@ public:
 
     void clearPixmapEffects() {
         fRasterEffects.clear();
-        fEffectsMargin = 0;
+        fEffectsMargin = QMarginsF();
     }
 
     void appendRenderCustomizerFunctor(

@@ -30,7 +30,7 @@ struct AutoTilesData {
     int height() const;
 
     SkBitmap tileToBitmap(const int tx, const int ty);
-    SkBitmap toBitmap(int margin = 0) const;
+    SkBitmap toBitmap(const QMargins& margin = QMargins()) const;
 
     bool drawOnPixmap(SkPixmap &dst, int drawX, int drawY) const;
 

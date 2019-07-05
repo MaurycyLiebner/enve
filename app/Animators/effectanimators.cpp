@@ -14,34 +14,12 @@ void EffectAnimators::readPixmapEffect(QIODevice * const src) {
     addChild(effect);
 }
 
-qreal EffectAnimators::getEffectsMargin() const {
-    qreal newMargin = 2;
-    for(const auto& effect : ca_mChildAnimators) {
-        auto pixmapEffect = GetAsPtr(effect.get(), PixmapEffect);
-        if(pixmapEffect->isVisible()) {
-            newMargin += pixmapEffect->getMargin();
-        }
-    }
-    return newMargin;
-}
-
-qreal EffectAnimators::getEffectsMarginAtRelFrame(const int relFrame) const {
-    qreal newMargin = 0;
+QMarginsF EffectAnimators::getEffectsMargin(const qreal relFrame) const {
+    QMarginsF newMargin;
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), PixmapEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMarginAtRelFrame(relFrame);
-        }
-    }
-    return newMargin;
-}
-
-qreal EffectAnimators::getEffectsMarginAtRelFrameF(const qreal relFrame) const {
-    qreal newMargin = 0;
-    for(const auto& effect : ca_mChildAnimators) {
-        auto pixmapEffect = GetAsPtr(effect.get(), PixmapEffect);
-        if(pixmapEffect->isVisible()) {
-            newMargin += pixmapEffect->getMarginAtRelFrame(qRound(relFrame));
         }
     }
     return newMargin;

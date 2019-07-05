@@ -148,51 +148,56 @@ SkBitmap AutoTilesData::tileToBitmap(const int tx, const int ty) {
     return dst;
 }
 
-SkBitmap AutoTilesData::toBitmap(int margin) const {
-    if(margin < 0) margin = 0;
-    const auto info = SkiaHelpers::getPremulBGRAInfo(width() + 2*margin,
-                                                     height() + 2*margin);
+SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
+    const int lM = qMax(0, margin.left());
+    const int tM = qMax(0, margin.top());
+    const int rM = qMax(0, margin.right());
+    const int bM = qMax(0, margin.bottom());
+
+    const auto info = SkiaHelpers::getPremulBGRAInfo(width() + lM + rM,
+                                                     height() + tM + bM);
     SkBitmap dst;
     dst.allocPixels(info);
 
     uint8_t * const dstP = static_cast<uint8_t*>(dst.getPixels());
 
-    if(margin > 0) {
+    if(lM != 0 || rM != 0) {
         for(int y = 0; y < dst.height(); y++) {
-            uint8_t * dstLine1 = dstP + y*dst.width()*4;
-            uint8_t * dstLine2 = dstP + ((y + 1)*dst.width() - margin)*4;
+            auto lLine = dstP + y*dst.width()*4;
+            for(int x = 0; x < lM; x++) {
+                *lLine++ = 0;
+                *lLine++ = 0;
+                *lLine++ = 0;
+                *lLine++ = 0;
+            }
 
-            for(int x = 0; x < margin; x++) {
-                *dstLine1++ = 0;
-                *dstLine1++ = 0;
-                *dstLine1++ = 0;
-                *dstLine1++ = 0;
-
-                *dstLine2++ = 0;
-                *dstLine2++ = 0;
-                *dstLine2++ = 0;
-                *dstLine2++ = 0;
+            auto rLine = dstP + ((y + 1)*dst.width() - rM)*4;
+            for(int x = 0; x < rM; x++) {
+                *rLine++ = 0;
+                *rLine++ = 0;
+                *rLine++ = 0;
+                *rLine++ = 0;
             }
         }
+    }
 
-        for(int y = 0; y < margin; y++) {
-            uint8_t * dstLine = dstP + (y*dst.width() + margin)*4;
-            for(int x = margin; x < dst.width() - margin; x++) {
-                *dstLine++ = 0;
-                *dstLine++ = 0;
-                *dstLine++ = 0;
-                *dstLine++ = 0;
-            }
+    for(int y = 0; y < tM; y++) {
+        auto tLine = dstP + (y*dst.width() + lM)*4;
+        for(int x = lM; x < dst.width() - rM; x++) {
+            *tLine++ = 0;
+            *tLine++ = 0;
+            *tLine++ = 0;
+            *tLine++ = 0;
         }
+    }
 
-        for(int y = dst.height() - margin; y < dst.height(); y++) {
-            uint8_t * dstLine = dstP + (y*dst.width() + margin)*4;
-            for(int x = margin; x < dst.width() - margin; x++) {
-                *dstLine++ = 0;
-                *dstLine++ = 0;
-                *dstLine++ = 0;
-                *dstLine++ = 0;
-            }
+    for(int y = dst.height() - bM; y < dst.height(); y++) {
+        auto bLine = dstP + (y*dst.width() + lM)*4;
+        for(int x = lM; x < dst.width() - rM; x++) {
+            *bLine++ = 0;
+            *bLine++ = 0;
+            *bLine++ = 0;
+            *bLine++ = 0;
         }
     }
 
@@ -202,12 +207,12 @@ SkBitmap AutoTilesData::toBitmap(int margin) const {
     const uint32_t add_a = (1<<15)/2;
 
     for(int col = 0; col < mColumnCount; col++) {
-        const int x0 = col*TILE_SIZE + margin;
-        const int maxX = qMin(x0 + TILE_SIZE, dst.width() - margin);
+        const int x0 = col*TILE_SIZE + lM;
+        const int maxX = qMin(x0 + TILE_SIZE, dst.width() - rM);
         for(int row = 0; row < mRowCount; row++) {
             const uint16_t * const srcP = getTileByIndex(col, row);
-            const int y0 = row*TILE_SIZE + margin;
-            const int maxY = qMin(y0 + TILE_SIZE, dst.height() - margin);
+            const int y0 = row*TILE_SIZE + tM;
+            const int maxY = qMin(y0 + TILE_SIZE, dst.height() - bM);
             for(int y = y0; y < maxY; y++) {
                 uint8_t * dstLine = dstP + (y*dst.width() + x0)*4;
                 const uint16_t * srcLine = srcP + (y - y0)*TILE_SIZE*4;

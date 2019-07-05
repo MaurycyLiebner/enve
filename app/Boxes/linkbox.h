@@ -72,10 +72,10 @@ public:
         return BoundingBox::getBlendMode();
     }
 
-    qreal getEffectsMarginAtRelFrame(const int relFrame) {
-        qreal margin = 0.;
-        margin += getLinkTarget()->getEffectsMarginAtRelFrame(relFrame);
-        margin += BoundingBox::getEffectsMarginAtRelFrame(relFrame);
+    QMarginsF getEffectsMargin(const qreal relFrame) {
+        QMarginsF margin;
+        margin += getLinkTarget()->getEffectsMargin(relFrame);
+        margin += BoundingBox::getEffectsMargin(relFrame);
         return margin;
     }
 

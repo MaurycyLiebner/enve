@@ -58,19 +58,19 @@ void GradientPoints::drawCanvasControls(SkCanvas * const canvas,
 }
 
 QPointF GradientPoints::getStartPointAtRelFrame(const int relFrame) {
-    return mStartAnimator->getEffectiveValueAtRelFrame(relFrame);
+    return mStartAnimator->getEffectiveValue(relFrame);
 }
 
 QPointF GradientPoints::getEndPointAtRelFrame(const int relFrame) {
-    return mEndAnimator->getEffectiveValueAtRelFrame(relFrame);
+    return mEndAnimator->getEffectiveValue(relFrame);
 }
 
 QPointF GradientPoints::getStartPointAtRelFrameF(const qreal relFrame) {
-    return mStartAnimator->getEffectiveValueAtRelFrame(relFrame);
+    return mStartAnimator->getEffectiveValue(relFrame);
 }
 
 QPointF GradientPoints::getEndPointAtRelFrameF(const qreal relFrame) {
-    return mEndAnimator->getEffectiveValueAtRelFrame(relFrame);
+    return mEndAnimator->getEffectiveValue(relFrame);
 }
 
 void GradientPoints::setColors(const QColor& startColor,

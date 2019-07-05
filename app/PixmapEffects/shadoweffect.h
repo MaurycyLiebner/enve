@@ -22,8 +22,7 @@ public:
 class ShadowEffect : public PixmapEffect {
     friend class SelfRef;
 public:
-    qreal getMargin();
-    qreal getMarginAtRelFrame(const int relFrame);
+    QMarginsF getMarginAtRelFrame(const qreal relFrame);
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData*);

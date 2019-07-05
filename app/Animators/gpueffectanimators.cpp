@@ -8,34 +8,12 @@ GPUEffectAnimators::GPUEffectAnimators(BoundingBox *parentBox) :
     makeHiddenWhenEmpty();
 }
 
-qreal GPUEffectAnimators::getEffectsMargin() const {
-    qreal newMargin = 2;
-    for(const auto& effect : ca_mChildAnimators) {
-        auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
-        if(pixmapEffect->isVisible()) {
-            newMargin += pixmapEffect->getMargin();
-        }
-    }
-    return newMargin;
-}
-
-qreal GPUEffectAnimators::getEffectsMarginAtRelFrame(const int relFrame) const {
-    qreal newMargin = 0;
+QMarginsF GPUEffectAnimators::getEffectsMargin(const qreal relFrame) const {
+    QMarginsF newMargin;
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMarginAtRelFrame(relFrame);
-        }
-    }
-    return newMargin;
-}
-
-qreal GPUEffectAnimators::getEffectsMarginAtRelFrameF(const qreal relFrame) const {
-    qreal newMargin = 0.;
-    for(const auto& effect : ca_mChildAnimators) {
-        auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
-        if(pixmapEffect->isVisible()) {
-            newMargin += pixmapEffect->getMarginAtRelFrame(qRound(relFrame));
         }
     }
     return newMargin;

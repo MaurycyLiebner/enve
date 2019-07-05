@@ -155,8 +155,8 @@ void BoundingBoxRenderData::updateGlobalFromRelBoundingRect() {
     for(const QRectF &rectT : fOtherGlobalRects) {
         fGlobalBoundingRect = fGlobalBoundingRect.united(rectT);
     }
-    fGlobalBoundingRect.adjust(-fEffectsMargin, -fEffectsMargin,
-                               fEffectsMargin, fEffectsMargin);
+    fGlobalBoundingRect.adjust(-fEffectsMargin.left(), -fEffectsMargin.top(),
+                               fEffectsMargin.right(), fEffectsMargin.bottom());
     if(fMaxBoundsEnabled) {
         const auto maxBounds = fResolutionScale.mapRect(fMaxBoundsRect);
         fGlobalBoundingRect = fGlobalBoundingRect.intersected(maxBounds);

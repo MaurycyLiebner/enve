@@ -207,8 +207,7 @@ public:
     virtual void updateCurrentPreviewDataFromRenderData(
             BoundingBoxRenderData* renderData);
 
-    virtual qreal getEffectsMarginAtRelFrame(const int relFrame);
-    virtual qreal getEffectsMarginAtRelFrameF(const qreal relFrame);
+    virtual QMarginsF getEffectsMargin(const qreal relFrame);
 
     virtual bool isFrameInDurationRect(const int relFrame) const;
     virtual bool isFrameFInDurationRect(const qreal relFrame) const;

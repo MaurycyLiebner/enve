@@ -21,8 +21,6 @@ class SampledMotionBlurEffect : public PixmapEffect {
 protected:
     SampledMotionBlurEffect(BoundingBox * const box = nullptr);
 public:
-    qreal getMargin() { return 0; }
-
     void setParentBox(BoundingBox *box) {
         mParentBox = box;
     }

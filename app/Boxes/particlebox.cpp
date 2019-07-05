@@ -93,8 +93,8 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
 bool ParticleBox::SWT_isParticleBox() const { return true; }
 
 QRectF ParticleBox::getRelBoundingRect(const qreal relFrame) {
-    return QRectF(mTopLeftAnimator->getEffectiveValueAtRelFrame(relFrame),
-                  mBottomRightAnimator->getEffectiveValueAtRelFrame(relFrame));
+    return QRectF(mTopLeftAnimator->getEffectiveValue(relFrame),
+                  mBottomRightAnimator->getEffectiveValue(relFrame));
 }
 
 void ParticleBox::updateAfterDurationRectangleRangeChanged() {
@@ -443,7 +443,7 @@ void ParticleEmitter::generateParticles() {
     bool reuseParticle = nReuseParticles > 0;
 
     int totalNeededParticles = 0;
-    QPointF lastPos = mPos->getEffectiveValueAtRelFrame(mMinFrame);
+    QPointF lastPos = mPos->getEffectiveValue(mMinFrame);
     for(int i = mMinFrame; i < mMaxFrame; i++) {
         qreal srcVelInfl =
                 mSrcVelInfl->getEffectiveValue(i);
@@ -460,7 +460,7 @@ void ParticleEmitter::generateParticles() {
         int particlesFrameLifetime = qRound(
                     mParticlesFrameLifetime->getEffectiveValue(i));
         QPointF pos =
-                mPos->getEffectiveValueAtRelFrame(i);
+                mPos->getEffectiveValue(i);
         qreal width =
                 mWidth->getEffectiveValue(i);
         qreal velocityVar =
@@ -468,7 +468,7 @@ void ParticleEmitter::generateParticles() {
         qreal velocityVarPeriod =
                 mVelocityRandomVarPeriod->getEffectiveValue(i);
         QPointF acceleration =
-                mAcceleration->getEffectiveValueAtRelFrame(i)/24.;
+                mAcceleration->getEffectiveValue(i)/24.;
         qreal finalScale =
                 mParticlesSizeDecay->getEffectiveValue(i);
         qreal finalOpacity =

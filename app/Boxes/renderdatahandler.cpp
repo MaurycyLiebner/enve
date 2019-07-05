@@ -16,6 +16,9 @@ BoundingBoxRenderData *RenderDataHandler::getItemAtRelFrame(const int frame) con
 
 void RenderDataHandler::addItemAtRelFrame(
         const stdsptr<BoundingBoxRenderData>& item) {
-    mFrameToData.insert({item->fRelFrame, item});
+    const auto ret = mFrameToData.insert({item->fRelFrame, item});
+    if(!ret.second)
+        RuntimeThrow("Item already present at rel frame" +
+                     QString::number(item->fRelFrame));
     item->fRefInParent = true;
 }

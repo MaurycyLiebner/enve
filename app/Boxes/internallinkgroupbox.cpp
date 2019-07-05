@@ -66,11 +66,11 @@ void InternalLinkGroupBox::setupEffectsF(const qreal relFrame,
     }
 }
 
-qreal InternalLinkGroupBox::getEffectsMarginAtRelFrameF(const qreal relFrame) {
+QMarginsF InternalLinkGroupBox::getEffectsMargin(const qreal relFrame) {
     if(isParentLink() && getLinkTarget()) {
-        return getLinkTarget()->getEffectsMarginAtRelFrameF(relFrame);
+        return getLinkTarget()->getEffectsMargin(relFrame);
     }
-    return ContainerBox::getEffectsMarginAtRelFrameF(relFrame);
+    return ContainerBox::getEffectsMargin(relFrame);
 }
 
 const SkBlendMode &InternalLinkGroupBox::getBlendMode() {
@@ -87,8 +87,8 @@ void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
 
     ContainerBox::setupRenderData(relFrame, data);
     if(linkTarget) {
-        const qreal targetMargin =
-                linkTarget->getEffectsMarginAtRelFrameF(relFrame);
+        const QMarginsF targetMargin =
+                linkTarget->getEffectsMargin(relFrame);
         data->fEffectsMargin += targetMargin*data->fResolution;
     }
 }

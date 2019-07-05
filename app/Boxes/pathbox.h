@@ -90,11 +90,14 @@ protected:
                     surf.execute(strokeBrush, set);
 
                 fBitmapTMP.reset();
-                const int iMargin = qCeil(fEffectsMargin);
-                fBitmapTMP = surf.toBitmap(iMargin);
+
+                const auto iMargins = fEffectsMargin.toMargins();
+
+                fBitmapTMP = surf.toBitmap(iMargins);
 
                 fGlobalBoundingRect.translate(-surf.zeroTilePos() -
-                                              QPoint(iMargin, iMargin));
+                                              QPoint(iMargins.left(),
+                                                     iMargins.top()));
                 fGlobalBoundingRect.setSize(QSizeF(fBitmapTMP.width(),
                                                    fBitmapTMP.height()));
                 fixupGlobalBoundingRect();

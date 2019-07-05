@@ -42,7 +42,7 @@ stdsptr<PixmapEffectRenderData> ShadowEffect::getPixmapEffectRenderDataForRelFra
     renderData->fBlurRadius = mBlurRadius->getEffectiveValue(relFrame);
     renderData->fColor = mColor->getColor(relFrame);
     renderData->fTranslation = mTranslation->
-            getEffectiveValueAtRelFrame(relFrame);
+            getEffectiveValue(relFrame);
     renderData->fOpacity = mOpacity->getEffectiveValue(relFrame)/100.;
     return GetAsSPtr(renderData, PixmapEffectRenderData);
 }
@@ -69,12 +69,14 @@ void ShadowEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
     canvas.drawBitmap(src, 0, 0, &paint);
 }
 
-qreal ShadowEffect::getMargin() {
-    return mBlurRadius->getCurrentBaseValue() +
-            pointToLen(mTranslation->getEffectiveValue());
-}
+QMarginsF ShadowEffect::getMarginAtRelFrame(const qreal relFrame) {
+    const qreal blur = mBlurRadius->getEffectiveValue(relFrame);
+    const QPointF trans = mTranslation->getEffectiveValue(relFrame);
 
-qreal ShadowEffect::getMarginAtRelFrame(const int relFrame) {
-    return mBlurRadius->getEffectiveValue(relFrame) +
-            pointToLen(mTranslation->getEffectiveValueAtRelFrame(relFrame));
+    const qreal iL = qMax(0., blur - trans.x());
+    const qreal iT = qMax(0., blur - trans.y());
+    const qreal iR = qMax(0., blur + trans.x());
+    const qreal iB = qMax(0., blur + trans.y());
+
+    return QMarginsF(iL, iT, iR, iB);;
 }

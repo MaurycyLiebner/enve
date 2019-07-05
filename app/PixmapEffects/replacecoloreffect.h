@@ -28,8 +28,6 @@ class ReplaceColorEffect : public PixmapEffect {
 protected:
     ReplaceColorEffect();
 public:
-    qreal getMargin() { return 0; }
-
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData*);
 private:

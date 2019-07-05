@@ -24,9 +24,10 @@ EffectAnimators *PixmapEffect::getParentEffectAnimators() {
     return static_cast<EffectAnimators*>(mParent_k.data());
 }
 
-qreal PixmapEffect::getMargin() { return 0.; }
-
-qreal PixmapEffect::getMarginAtRelFrame(const int ) { return 0.; }
+QMarginsF PixmapEffect::getMarginAtRelFrame(const qreal relFrame) {
+    Q_UNUSED(relFrame);
+    return QMarginsF();
+}
 
 void PixmapEffect::prp_startDragging() {
     QMimeData *mimeData = new PixmapEffectMimeData(this);

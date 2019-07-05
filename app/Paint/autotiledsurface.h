@@ -79,7 +79,7 @@ struct AutoTiledSurface {
     SkBitmap tileToBitmap(const int tx, const int ty) {
         return mAutoTilesData.tileToBitmap(tx, ty);
     }
-    SkBitmap toBitmap(const int margin = 0) const {
+    SkBitmap toBitmap(const QMargins& margin = QMargins()) const {
         return mAutoTilesData.toBitmap(margin);
     }
 

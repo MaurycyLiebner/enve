@@ -19,8 +19,7 @@ class BlurEffect : public PixmapEffect {
 protected:
     BlurEffect();
 public:
-    qreal getMargin();
-    qreal getMarginAtRelFrame(const int relFrame);
+    QMarginsF getMarginAtRelFrame(const qreal relFrame);
 
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(

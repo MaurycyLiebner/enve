@@ -6,9 +6,7 @@
 
 BlurEffect::BlurEffect() : PixmapEffect("blur", EFFECT_BLUR) {
     mBlurRadius = SPtrCreate(QrealAnimator)(10, 0, 300, 1, "radius");
-
     ca_addChildAnimator(mBlurRadius);
-
     setPropertyForGUI(mBlurRadius.get());
 }
 
@@ -24,12 +22,9 @@ void BlurEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
     canvas.drawBitmap(src, 0, 0, &paint);
 }
 
-qreal BlurEffect::getMargin() {
-    return mBlurRadius->getCurrentBaseValue();
-}
-
-qreal BlurEffect::getMarginAtRelFrame(const int relFrame) {
-    return mBlurRadius->getEffectiveValue(relFrame);
+QMarginsF BlurEffect::getMarginAtRelFrame(const qreal relFrame) {
+    const qreal blur = mBlurRadius->getEffectiveValue(relFrame);
+    return QMarginsF(blur, blur, blur, blur);
 }
 
 stdsptr<PixmapEffectRenderData> BlurEffect::getPixmapEffectRenderDataForRelFrameF(

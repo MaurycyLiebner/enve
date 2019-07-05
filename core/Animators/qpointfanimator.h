@@ -38,7 +38,7 @@ public:
 
     QPointF getBaseValue() const;
     QPointF getBaseValueAtAbsFrame(const qreal frame) const;
-    QPointF getBaseValueAtRelFrame(const qreal frame) const;
+    QPointF getBaseValue(const qreal relFrame) const;
 
     void setPrefferedValueStep(const qreal valueStep);
 
@@ -46,7 +46,7 @@ public:
 
     QPointF getEffectiveValue() const;
     QPointF getEffectiveValueAtAbsFrame(const qreal frame) const;
-    QPointF getEffectiveValueAtRelFrame(const qreal frame) const;
+    QPointF getEffectiveValue(const qreal relFrame) const;
 
     qreal getEffectiveXValue();
     qreal getEffectiveXValue(const qreal relFrame);

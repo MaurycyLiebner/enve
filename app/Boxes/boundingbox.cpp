@@ -703,12 +703,8 @@ void BoundingBox::finishTransform() {
     //updateTotalTransform();
 }
 
-qreal BoundingBox::getEffectsMarginAtRelFrame(const int relFrame) {
-    return mEffectsAnimators->getEffectsMarginAtRelFrame(relFrame);
-}
-
-qreal BoundingBox::getEffectsMarginAtRelFrameF(const qreal relFrame) {
-    return mEffectsAnimators->getEffectsMarginAtRelFrameF(relFrame);
+QMarginsF BoundingBox::getEffectsMargin(const qreal relFrame) {
+    return mEffectsAnimators->getEffectsMargin(relFrame);
 }
 
 void BoundingBox::setupRenderData(const qreal relFrame,
@@ -720,10 +716,10 @@ void BoundingBox::setupRenderData(const qreal relFrame,
     data->fResolution = getParentCanvas()->getResolutionFraction();
     const bool effectsVisible = getParentCanvas()->getRasterEffectsVisible();
     if(effectsVisible) {
-        data->fEffectsMargin = getEffectsMarginAtRelFrameF(relFrame)*
+        data->fEffectsMargin = getEffectsMargin(relFrame)*
                 data->fResolution + 2;
     } else {
-        data->fEffectsMargin = 2;
+        data->fEffectsMargin = QMarginsF() + 2;
     }
     data->fBlendMode = getBlendMode();
 

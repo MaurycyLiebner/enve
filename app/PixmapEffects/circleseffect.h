@@ -17,7 +17,6 @@ protected:
 class CirclesEffect : public PixmapEffect {
     friend class SelfRef;
 public:
-    qreal getMargin() { return 0.; }
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData*);
 protected:

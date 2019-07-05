@@ -42,8 +42,7 @@ protected:
 public:
     virtual stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData * const data) = 0;
-    virtual qreal getMargin();
-    virtual qreal getMarginAtRelFrame(const int );
+    virtual QMarginsF getMarginAtRelFrame(const qreal relFrame);
 
     bool SWT_isPixmapEffect() const;
 

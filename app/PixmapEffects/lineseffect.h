@@ -18,13 +18,11 @@ protected:
 class LinesEffect : public PixmapEffect {
     friend class SelfRef;
 public:
-    qreal getMargin() { return 0.; }
-
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData*);
 protected:
-    LinesEffect(qreal linesWidth = 5.,
-                qreal linesDistance = 5.);
+    LinesEffect(qreal linesWidth = 5,
+                qreal linesDistance = 5);
 private:
     bool mVertical = false;
     qsptr<QrealAnimator> mLinesDistance;

@@ -18,8 +18,6 @@ class BrightnessEffect : public PixmapEffect {
 protected:
     BrightnessEffect(const qreal brightness = 0);
 public:
-    qreal getMargin() { return 0; }
-
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
             const qreal relFrame, BoundingBoxRenderData*);
 private:
