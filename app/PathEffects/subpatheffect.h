@@ -6,9 +6,6 @@ class SubPathEffect : public PathEffect {
 protected:
     SubPathEffect();
 public:
-    void readLengthEffect(QIODevice * const target)
-    __attribute__ ((deprecated("Use only to support old saves")));
-
     void apply(const qreal relFrame, const SkPath &src,
                SkPath * const dst);
 private:

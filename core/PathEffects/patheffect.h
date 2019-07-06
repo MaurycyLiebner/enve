@@ -6,18 +6,19 @@
 class BoolProperty;
 class PathBox;
 class BoundingBox;
-enum PathEffectType : short {
-    DISPLACE_PATH_EFFECT,
-    DASH_PATH_EFFECT,
-    DUPLICATE_PATH_EFFECT,
-    SOLIDIFY_PATH_EFFECT,
-    SUM_PATH_EFFECT,
-    SUB_PATH_EFFECT,
-    LINES_PATH_EFFECT,
-    ZIGZAG_PATH_EFFECT,
-    SPATIAL_DISPLACE_PATH_EFFECT,
-    SUBDIVIDE_PATH_EFFECT,
-    CUSTOM_PATH_EFFECT
+enum class PathEffectType : short {
+    DISPLACE,
+    DASH,
+    DUPLICATE,
+    SOLIDIFY,
+    SUM,
+    SUB,
+    LINES,
+    ZIGZAG,
+    SPATIAL_DISPLACE,
+    SUBDIVIDE,
+    CUSTOM,
+    TYPE_COUNT
 };
 class PathEffect;
 

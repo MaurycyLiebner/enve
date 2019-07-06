@@ -3,7 +3,7 @@
 #include "Animators/intanimator.h"
 
 DuplicatePathEffect::DuplicatePathEffect() :
-    PathEffect("duplicate effect", DUPLICATE_PATH_EFFECT) {
+    PathEffect("duplicate effect", PathEffectType::DUPLICATE) {
     mTranslation = SPtrCreate(QPointFAnimator)("translation");
     mTranslation->setBaseValue(QPointF(10, 10));
     ca_addChildAnimator(mTranslation);

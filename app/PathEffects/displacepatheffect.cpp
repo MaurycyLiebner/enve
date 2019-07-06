@@ -4,7 +4,7 @@
 #include "pointhelpers.h"
 
 DisplacePathEffect::DisplacePathEffect() :
-    PathEffect("displace effect", DISPLACE_PATH_EFFECT) {
+    PathEffect("displace effect", PathEffectType::DISPLACE) {
     mSegLength = SPtrCreate(QrealAnimator)("segment length");
     mMaxDev = SPtrCreate(QrealAnimator)("max deviation");
     mSmoothness = QrealAnimator::sCreate0to1Animator("smoothness");

@@ -2,7 +2,7 @@
 #include "Animators/intanimator.h"
 
 SubdividePathEffect::SubdividePathEffect() :
-    PathEffect("subdivide effect", SUBDIVIDE_PATH_EFFECT) {
+    PathEffect("subdivide effect", PathEffectType::SUBDIVIDE) {
     mCount = SPtrCreate(IntAnimator)(1, 0, 9, 1, "count");
     ca_addChildAnimator(mCount);
 }

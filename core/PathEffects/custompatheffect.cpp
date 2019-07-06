@@ -1,7 +1,7 @@
 #include "custompatheffect.h"
 #include "basicreadwrite.h"
 CustomPathEffect::CustomPathEffect(const QString &name) :
-    PathEffect(name, CUSTOM_PATH_EFFECT) {}
+    PathEffect(name, PathEffectType::CUSTOM) {}
 
 void CustomPathEffect::writeIdentifier(QIODevice * const dst) const {
     const auto identifier = getIdentifier();

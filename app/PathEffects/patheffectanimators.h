@@ -19,9 +19,7 @@ public:
     bool SWT_isPathEffectAnimators() const;
 
     bool hasEffects();
-
     void apply(const qreal relFrame, SkPath * const srcDstPath);
-
     void readPathEffect(QIODevice * const target);
 private:
 };

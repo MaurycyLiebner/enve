@@ -23,6 +23,7 @@
 #include "include/utils/SkRandom.h"
 #include "include/utils/SkTextUtils.h"
 
+#include "include/core/SkStrokeRec.h"
 #include "include/effects/SkDashPathEffect.h"
 #include "include/effects/SkDiscretePathEffect.h"
 

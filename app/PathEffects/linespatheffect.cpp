@@ -2,7 +2,7 @@
 #include "Animators/qrealanimator.h"
 
 LinesPathEffect::LinesPathEffect() :
-    PathEffect("lines effect", LINES_PATH_EFFECT) {
+    PathEffect("lines effect", PathEffectType::LINES) {
     mAngle = SPtrCreate(QrealAnimator)(0, -9999, 9999, 1, "angle");
     mDistance = SPtrCreate(QrealAnimator)(10, 1, 9999, 1, "distance");
 

@@ -37,28 +37,32 @@ void PathEffectAnimators::readPathEffect(QIODevice * const src) {
 
 #include "patheffectsinclude.h"
 qsptr<PathEffect> readIdCreatePathEffect(QIODevice * const src) {
-    PathEffectType typeT;
-    src->read(rcChar(&typeT), sizeof(PathEffectType));
-    qsptr<PathEffect> pathEffect;
-    if(typeT == DISPLACE_PATH_EFFECT) {
-        pathEffect = SPtrCreate(DisplacePathEffect)();
-    } else if(typeT == DUPLICATE_PATH_EFFECT) {
-        pathEffect = SPtrCreate(DuplicatePathEffect)();
-    } else if(typeT == SOLIDIFY_PATH_EFFECT) {
-        pathEffect = SPtrCreate(SolidifyPathEffect)();
-    } else if(typeT == SUM_PATH_EFFECT) {
-        pathEffect = SPtrCreate(SumPathEffect)();
-    } else if(typeT == SUB_PATH_EFFECT) {
-        pathEffect = SPtrCreate(SubPathEffect)();
-    } else if(typeT == LINES_PATH_EFFECT) {
-        pathEffect = SPtrCreate(LinesPathEffect)();
-    } else if(typeT == ZIGZAG_PATH_EFFECT) {
-        pathEffect = SPtrCreate(ZigZagPathEffect)();
-    } else if(typeT == SPATIAL_DISPLACE_PATH_EFFECT) {
-        pathEffect = SPtrCreate(SpatialDisplacePathEffect)();
-    } else {
-        RuntimeThrow("Invalid path effect type '" +
-                     QString::number(typeT) + "'");
+    PathEffectType type;
+    src->read(rcChar(&type), sizeof(PathEffectType));
+    switch(type) {
+        case(PathEffectType::DISPLACE):
+            return SPtrCreate(DisplacePathEffect)();
+        case(PathEffectType::DASH):
+            return SPtrCreate(DashPathEffect)();
+        case(PathEffectType::DUPLICATE):
+            return SPtrCreate(DuplicatePathEffect)();
+        case(PathEffectType::SOLIDIFY):
+            return SPtrCreate(SolidifyPathEffect)();
+        case(PathEffectType::SUM):
+            return SPtrCreate(SumPathEffect)();
+        case(PathEffectType::SUB):
+            return SPtrCreate(SubPathEffect)();
+        case(PathEffectType::LINES):
+            return SPtrCreate(LinesPathEffect)();
+        case(PathEffectType::ZIGZAG):
+            return SPtrCreate(ZigZagPathEffect)();
+        case(PathEffectType::SPATIAL_DISPLACE):
+            return SPtrCreate(SpatialDisplacePathEffect)();
+        case(PathEffectType::SUBDIVIDE):
+            return SPtrCreate(SubdividePathEffect)();
+        case(PathEffectType::CUSTOM):
+            return nullptr;
+        default: RuntimeThrow("Invalid path effect type '" +
+                              QString::number(int(type)) + "'");
     }
-    return pathEffect;
 }

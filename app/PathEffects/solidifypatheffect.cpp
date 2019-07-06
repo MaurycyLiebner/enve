@@ -3,7 +3,7 @@
 #include "Boxes/pathbox.h"
 
 SolidifyPathEffect::SolidifyPathEffect() :
-    PathEffect("solidify effect", SOLIDIFY_PATH_EFFECT) {
+    PathEffect("solidify effect", PathEffectType::SOLIDIFY) {
     mDisplacement = SPtrCreate(QrealAnimator)("displacement");
     mDisplacement->setValueRange(-999.999, 999.999);
     mDisplacement->setCurrentBaseValue(5);

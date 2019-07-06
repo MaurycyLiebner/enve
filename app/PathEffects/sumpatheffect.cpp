@@ -3,7 +3,7 @@
 #include "Boxes/pathbox.h"
 
 SumPathEffect::SumPathEffect() :
-    PathEffect("sum effect", SUM_PATH_EFFECT) {
+    PathEffect("sum effect", PathEffectType::SUM) {
 }
 
 void SumPathEffect::apply(const qreal relFrame,

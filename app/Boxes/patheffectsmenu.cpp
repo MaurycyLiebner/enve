@@ -17,6 +17,8 @@ void PathEffectsMenu::addPathEffectsActionToMenu(
                 "Displace", menu, adder);
     addPathEffectActionToMenu<SpatialDisplacePathEffect>(
                 "Spatial Displace", menu, adder);
+    addPathEffectActionToMenu<DashPathEffect>(
+                "Dash", menu, adder);
     addPathEffectActionToMenu<DuplicatePathEffect>(
                 "Duplicate", menu, adder);
     addPathEffectActionToMenu<SubPathEffect>(

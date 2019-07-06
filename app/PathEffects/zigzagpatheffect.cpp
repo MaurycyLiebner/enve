@@ -2,7 +2,7 @@
 #include "Animators/qrealanimator.h"
 
 ZigZagPathEffect::ZigZagPathEffect() :
-    PathEffect("zigzag effect", ZIGZAG_PATH_EFFECT) {
+    PathEffect("zigzag effect", PathEffectType::ZIGZAG) {
     mAngle = SPtrCreate(QrealAnimator)(0, -9999, 9999, 1, "angle");
     mDistance = SPtrCreate(QrealAnimator)(10, 1, 9999, 1, "distance");
 

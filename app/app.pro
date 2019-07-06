@@ -76,6 +76,7 @@ SOURCES += main.cpp\
     GUI/welcomedialog.cpp \
     GUI/widgetstack.cpp \
     PathEffects/custompatheffectcreator.cpp \
+    PathEffects/dashpatheffect.cpp \
     PathEffects/linespatheffect.cpp \
     PathEffects/spatialdisplacepatheffect.cpp \
     PathEffects/subdividepatheffect.cpp \
@@ -304,6 +305,7 @@ HEADERS  += \
     GUI/welcomedialog.h \
     GUI/widgetstack.h \
     PathEffects/custompatheffectcreator.h \
+    PathEffects/dashpatheffect.h \
     PathEffects/linespatheffect.h \
     PathEffects/spatialdisplacepatheffect.h \
     PathEffects/subdividepatheffect.h \

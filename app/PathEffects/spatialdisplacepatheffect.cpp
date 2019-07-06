@@ -6,7 +6,7 @@
 
 SpatialDisplacePathEffect::SpatialDisplacePathEffect() :
     PathEffect("spatial displace effect",
-               SPATIAL_DISPLACE_PATH_EFFECT) {
+               PathEffectType::SPATIAL_DISPLACE) {
     mSegLength = SPtrCreate(QrealAnimator)("segment length");
     mMaxDev = SPtrCreate(QrealAnimator)("max deviation");
     mSmoothness = QrealAnimator::sCreate0to1Animator("smoothness");
