@@ -35,12 +35,12 @@ public:
                        SkPath * const dst) = 0;
 
     bool SWT_isPathEffect() const;
-    QMimeData *SWT_createMimeData();
-    void prp_startDragging();
+    QMimeData *SWT_createMimeData() final;
+    void prp_startDragging() final;
 
     virtual void writeIdentifier(QIODevice * const dst) const;
-    void writeProperty(QIODevice * const dst) const;
-    void readProperty(QIODevice * const src);
+    void writeProperty(QIODevice * const dst) const final;
+    void readProperty(QIODevice * const src) final;
 
     PathEffectType getEffectType();
 
@@ -49,7 +49,7 @@ public:
     bool isVisible() const;
 protected:
     bool mVisible = true;
-    PathEffectType mPathEffectType;
+    const PathEffectType mPathEffectType;
 };
 
 #endif // PATHEFFECT_H

@@ -7,10 +7,8 @@ protected:
     CustomPathEffect(const QString& name);
 public:
     virtual QByteArray getIdentifier() const = 0;
-
-    static QByteArray sReadIdentifier(QIODevice * const src);
 private:
-    void writeIdentifier(QIODevice * const dst) const;
+    void writeIdentifier(QIODevice * const dst) const final;
 };
 
 #endif // CUSTOMPATHEFFECT_H

@@ -62,7 +62,9 @@ qsptr<PathEffect> readIdCreatePathEffect(QIODevice * const src) {
         case(PathEffectType::SUBDIVIDE):
             return SPtrCreate(SubdividePathEffect)();
         case(PathEffectType::CUSTOM): {
-            const auto id = CustomPathEffect::sReadIdentifier(src);
+            int size;
+            src->read(rcChar(&size), sizeof(int));
+            const auto id = src->read(size);
             return CustomPathEffectCreator::sCreateForIdentifier(id);
         }
         default: RuntimeThrow("Invalid path effect type '" +

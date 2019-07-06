@@ -6,9 +6,7 @@
 
 PathEffect::PathEffect(const QString &name,
                        const PathEffectType type) :
-    StaticComplexAnimator(name) {
-    mPathEffectType = type;
-}
+    StaticComplexAnimator(name), mPathEffectType(type) {}
 
 void PathEffect::writeProperty(QIODevice * const dst) const {
     StaticComplexAnimator::writeProperty(dst);

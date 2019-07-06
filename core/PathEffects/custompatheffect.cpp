@@ -10,9 +10,3 @@ void CustomPathEffect::writeIdentifier(QIODevice * const dst) const {
     dst->write(rcConstChar(&size), sizeof(int));
     dst->write(identifier);
 }
-
-QByteArray CustomPathEffect::sReadIdentifier(QIODevice * const src) {
-    int size;
-    src->read(rcChar(&size), sizeof(int));
-    return src->read(size);
-}
