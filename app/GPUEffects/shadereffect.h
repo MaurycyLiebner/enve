@@ -37,17 +37,14 @@ private:
     const UniformSpecifiers mUniformSpecifiers;
 };
 
-class ShaderEffect : public StaticComplexAnimator {
+class ShaderEffect : public GpuEffect {
     friend class SelfRef;
-    ShaderEffect(const ShaderEffectCreator * const creator,
+    ShaderEffect(const QString &name,
+                 const ShaderEffectCreator * const creator,
                  const ShaderEffectProgram * const program,
-                 const QString &name,
                  const QList<stdsptr<PropertyCreator>>& props);
 public:
-    virtual QMarginsF getMarginAtRelFrame(const qreal frame) {
-        Q_UNUSED(frame);
-        return QMarginsF();
-    }
+    bool SWT_isShaderEffect() const { return true; }
 
     void writeIdentifier(QIODevice * const dst) const;
 
@@ -57,15 +54,13 @@ public:
         UniformSpecifiers uniformSpecifiers;
         const int argsCount = mProgram->fArgumentLocs.count();
         for(int i = 0; i < argsCount; i++) {
-            const GLint& loc = mProgram->fArgumentLocs.at(i);
+            const GLint loc = mProgram->fArgumentLocs.at(i);
             const auto prop = ca_getChildAt(i);
             const auto& uniformC = mProgram->fUniformCreators.at(i);
             uniformSpecifiers << uniformC->create(loc, prop, relFrame);
         }
         return SPtrCreate(ShaderEffectCaller)(*mProgram, uniformSpecifiers);
     }
-
-    GPUEffectAnimators *getParentEffectAnimators();
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) {
         if(program == mProgram)

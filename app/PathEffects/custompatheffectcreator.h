@@ -6,17 +6,20 @@
 #include "PathEffects/custompatheffect.h"
 class CustomPathEffect;
 
-typedef qsptr<CustomPathEffect> (*CPathEffectCreatorFunc)();
+typedef qsptr<CustomPathEffect> (*CPathEffectCreatorNewFunc)();
+typedef qsptr<CustomPathEffect> (*CPathEffectCreatorFunc)(
+        const QByteArray &identifier);
 typedef QString (*CPathEffectNameFunc)();
 typedef QByteArray (*CPathEffectIdentifierFunc)();
 typedef bool (*CPathEffectSupport)(const QByteArray&);
 
 class CustomPathEffectCreator {
-    CustomPathEffectCreator(const CPathEffectCreatorFunc creator,
+    CustomPathEffectCreator(const CPathEffectCreatorNewFunc creatorNew,
+                            const CPathEffectCreatorFunc creator,
                             const CPathEffectNameFunc name,
                             const CPathEffectIdentifierFunc identifier,
                             const CPathEffectSupport support) :
-        mCreator(creator), mName(name),
+        mCreatorNew(creatorNew), mCreator(creator), mName(name),
         mIdentifier(identifier), mSupport(support) {}
 public:
     static void sLoadCustomPathEffect(const QString& libPath);
@@ -25,7 +28,7 @@ public:
             const QByteArray &identifier) {
         for(const auto& creator : sEffectCreators) {
             if(!creator.mSupport(identifier)) continue;
-            return creator.mCreator();
+            return creator.mCreator(identifier);
         }
         return nullptr;
     }
@@ -43,12 +46,13 @@ private:
                            const U &adder) {
         menu->addPlainAction<BoundingBox>(creator.mName(),
         [adder, creator](BoundingBox * box) {
-            const auto cEffect = creator.mCreator();
+            const auto cEffect = creator.mCreatorNew();
             (box->*adder)(GetAsSPtr(cEffect, PathEffect));
         });
     }
     static QList<CustomPathEffectCreator> sEffectCreators;
 
+    CPathEffectCreatorNewFunc mCreatorNew;
     CPathEffectCreatorFunc mCreator;
     CPathEffectNameFunc mName;
     CPathEffectIdentifierFunc mIdentifier;

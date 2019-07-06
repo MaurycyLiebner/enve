@@ -747,8 +747,9 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     menu.addAction("Delete Effect", [target]() {
                         if(target->SWT_isPixmapEffect()) {
                             auto effectTarget = GetAsSPtr(target, PixmapEffect);
-                            effectTarget->getParentEffectAnimators()->
-                                    getParentBox()->removeEffect(effectTarget);
+                            const auto parent =
+                                    effectTarget->getParent<EffectAnimators>();
+                            parent->removeChild(effectTarget);
                         } else {
                             auto effectTarget = GetAsSPtr(target, PathEffect);
                             const auto parentAnimators =

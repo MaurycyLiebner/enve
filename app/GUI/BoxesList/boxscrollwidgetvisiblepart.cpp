@@ -455,7 +455,7 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
     } else if(dragged.fType == Dragged::RASTER_EFFECT) {
         const auto draggedEffect = GetAsSPtr(draggedSWT, PixmapEffect);
         auto targetParent = static_cast<EffectAnimators*>(targetSWT);
-        auto currentParent = draggedEffect->getParentEffectAnimators();
+        auto currentParent = draggedEffect->getParent<EffectAnimators>();
         if(currentParent != targetParent) {
             targetParent->getParentBox()->addEffect(draggedEffect);
             currentParent->getParentBox()->removeEffect(draggedEffect);
@@ -470,7 +470,7 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
     } else if(dragged.fType == Dragged::RASTER_GPU_EFFECT) {
         const auto draggedEffect = GetAsSPtr(draggedSWT, ShaderEffect);
         auto targetParent = static_cast<GPUEffectAnimators*>(targetSWT);
-        auto currentParent = draggedEffect->getParentEffectAnimators();
+        auto currentParent = draggedEffect->getParent<GPUEffectAnimators>();
         if(currentParent != targetParent) {
             targetParent->getParentBox()->addGPUEffect(draggedEffect);
             currentParent->getParentBox()->removeGPUEffect(draggedEffect);

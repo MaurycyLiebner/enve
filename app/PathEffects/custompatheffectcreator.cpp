@@ -6,6 +6,11 @@ QList<CustomPathEffectCreator> CustomPathEffectCreator::sEffectCreators;
 
 void CustomPathEffectCreator::sLoadCustomPathEffect(const QString &libPath) {
     QLibrary lib(libPath);
+
+    const auto creatorNewFunc = reinterpret_cast<CPathEffectCreatorNewFunc>(
+                lib.resolve("createNewestVersionEffect"));
+    if(!creatorNewFunc) RuntimeThrow("Could not resolve 'createNewestVersionEffect' symbol");
+
     const auto creatorFunc = reinterpret_cast<CPathEffectCreatorFunc>(
                 lib.resolve("createEffect"));
     if(!creatorFunc) RuntimeThrow("Could not resolve 'createEffect' symbol");
@@ -22,7 +27,7 @@ void CustomPathEffectCreator::sLoadCustomPathEffect(const QString &libPath) {
                 lib.resolve("supports"));
     if(!supportFunc) RuntimeThrow("Could not resolve 'supports' symbol");
 
-    CustomPathEffectCreator creator(creatorFunc, nameFunc,
+    CustomPathEffectCreator creator(creatorNewFunc, creatorFunc, nameFunc,
                                     identifierFunc, supportFunc);
     sEffectCreators.append(creator);
 }

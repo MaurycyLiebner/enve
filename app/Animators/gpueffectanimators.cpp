@@ -35,12 +35,13 @@ void GPUEffectAnimators::addEffects(const qreal relFrame,
 void GPUEffectAnimators::updateIfUsesProgram(
         const ShaderEffectProgram * const program) {
     for(const auto& effect : ca_mChildAnimators) {
+        if(!effect->SWT_isShaderEffect()) continue;
         const auto pixmapEffect = GetAsPtr(effect.get(), ShaderEffect);
         pixmapEffect->updateIfUsesProgram(program);
     }
 }
 
-qsptr<ShaderEffect> readIdCreateGPURasterEffect(QIODevice * const src) {
+qsptr<ShaderEffect> readIdCreateShaderEffect(QIODevice * const src) {
     const auto id = ShaderEffectCreator::sReadIdentifier(src);
     const auto best = ShaderEffectCreator::sGetBestCompatibleEffects(id);
     if(best.isEmpty()) RuntimeThrow("No compatible GPU effect found for " + id.fName);
@@ -52,6 +53,23 @@ qsptr<ShaderEffect> readIdCreateGPURasterEffect(QIODevice * const src) {
         // exec ask dialog
     }
     return effect;
+}
+
+qsptr<GpuEffect> readIdCreateGPURasterEffect(QIODevice * const src) {
+    GpuEffectType type;
+    src->read(rcChar(&type), sizeof(GpuEffectType));
+    switch(type) {
+        case(GpuEffectType::BLUR):
+            return nullptr;
+        case(GpuEffectType::SHADOW):
+            return nullptr;
+        case(GpuEffectType::CUSTOM):
+            return nullptr;
+        case(GpuEffectType::CUSTOM_SHADER):
+            return readIdCreateShaderEffect(src);
+        default: RuntimeThrow("Invalid gpu effect type '" +
+                              QString::number(int(type)) + "'");
+    }
 }
 
 bool GPUEffectAnimators::hasEffects() {

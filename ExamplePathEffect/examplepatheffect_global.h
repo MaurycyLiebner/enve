@@ -13,16 +13,21 @@
 #include "smartPointers/selfref.h"
 
 extern "C" {
+
 EXAMPLEPATHEFFECTSHARED_EXPORT
-    qsptr<CustomPathEffect> createEffect();
+    qsptr<CustomPathEffect> createNewestVersionEffect();
+
+EXAMPLEPATHEFFECTSHARED_EXPORT
+    qsptr<CustomPathEffect> createEffect(
+        const CustomPathEffect::Identifier &identifier);
 
 EXAMPLEPATHEFFECTSHARED_EXPORT
     QString effectName();
 
 EXAMPLEPATHEFFECTSHARED_EXPORT
-    QByteArray effectIdentifier();
+    CustomPathEffect::Identifier effectIdentifier();
 
 EXAMPLEPATHEFFECTSHARED_EXPORT
-    bool supports(const QByteArray &identifier);
+    bool supports(const CustomPathEffect::Identifier &identifier);
 }
 #endif // EXAMPLEPATHEFFECT_GLOBAL_H

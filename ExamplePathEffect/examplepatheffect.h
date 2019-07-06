@@ -3,11 +3,11 @@
 
 #include "examplepatheffect_global.h"
 
-class ExamplePathEffect : public CustomPathEffect {
+class ExamplePathEffect000 : public CustomPathEffect {
 public:
-    ExamplePathEffect();
+    ExamplePathEffect000();
 
-    QByteArray getIdentifier() const;
+    CustomPathEffect::Identifier getIdentifier() const;
 
     void apply(const qreal relFrame,
                const SkPath &src,

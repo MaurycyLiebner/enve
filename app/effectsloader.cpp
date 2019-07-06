@@ -54,10 +54,10 @@ void iniIfCustomPathEffect(const QString& path) {
 
 void EffectsLoader::iniCustomPathEffects() {
     const QString dirPath = QDir::homePath() + "/.enve/PathEffects";
-    QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
-    while(dirIt.hasNext()) {
-        iniIfCustomPathEffect(dirIt.next());
-    }
+//    QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
+//    while(dirIt.hasNext()) {
+//        iniIfCustomPathEffect(dirIt.next());
+//    }
     const auto newFileWatcher = QSharedPointer<QFileSystemModel>(
                 new QFileSystemModel);
     newFileWatcher->setRootPath(dirPath);

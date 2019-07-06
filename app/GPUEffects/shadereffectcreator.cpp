@@ -6,8 +6,8 @@
 QList<stdsptr<ShaderEffectCreator>> ShaderEffectCreator::sEffectCreators;
 
 qsptr<Property> ShaderEffectCreator::create() const {
-    auto rasterEffect = SPtrCreate(ShaderEffect)(this, &fProgram,
-                                                    fName, fProperties);
+    auto rasterEffect = SPtrCreate(ShaderEffect)(
+                fName, this, &fProgram, fProperties);
     return std::move(rasterEffect);
 }
 

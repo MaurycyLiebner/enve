@@ -5,8 +5,5 @@ CustomPathEffect::CustomPathEffect(const QString &name) :
 
 void CustomPathEffect::writeIdentifier(QIODevice * const dst) const {
     PathEffect::writeIdentifier(dst);
-    const auto identifier = getIdentifier();
-    const int size = identifier.size();
-    dst->write(rcConstChar(&size), sizeof(int));
-    dst->write(identifier);
+    getIdentifier().write(dst);
 }

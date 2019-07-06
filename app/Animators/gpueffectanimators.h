@@ -7,9 +7,9 @@
 
 class BoundingBox;
 struct BoundingBoxRenderData;
-qsptr<ShaderEffect> readIdCreateGPURasterEffect(QIODevice * const src);
+qsptr<GpuEffect> readIdCreateGPURasterEffect(QIODevice * const src);
 typedef DynamicComplexAnimator<
-    ShaderEffect, &ShaderEffect::writeIdentifier,
+    GpuEffect, &GpuEffect::writeIdentifier,
     &readIdCreateGPURasterEffect> GPUEffectAnimatorsBase;
 class GPUEffectAnimators : public GPUEffectAnimatorsBase {
     friend class SelfRef;

@@ -1,36 +1,59 @@
 #include "examplepatheffect.h"
 
-qsptr<CustomPathEffect> createEffect() {
-    return SPtrCreate(ExamplePathEffect)();
+qsptr<CustomPathEffect> createNewestVersionEffect() {
+    // Use default, most up to date, version
+    return SPtrCreate(ExamplePathEffect000)();
 }
 
+qsptr<CustomPathEffect> createEffect(
+        const CustomPathEffect::Identifier &identifier) {
+    Q_UNUSED(identifier);
+    // Choose version based on identifier
+    return SPtrCreate(ExamplePathEffect000)();
+}
+
+// Returned value must be unique, lets enve distinguish effects
+QString effectId() {
+    return "waer9yv11r3gl10x1qtm";
+}
+
+// Name of your effect used in UI
 QString effectName() {
     return "Example";
 }
 
-QByteArray effectIdentifier() {
-    return
-// make sure identifier for every effect is unique by adding random string
-    "waer9yv11r3gl10x1qtm"
-// here specify your effect's name and version
-    "example.0.0.0";
+QString effectVersion() {
+    return "0.0.0";
 }
 
-bool supports(const QByteArray &identifier) {
-    return QString(identifier) == QString(effectIdentifier());
+CustomPathEffect::Identifier effectIdentifier() {
+    return
+// make sure identifier for every effect is unique by adding random string
+    { effectId(),
+// here specify your effect's name
+      effectName(),
+// here specify your effect's version
+      effectVersion() };
 }
+
+bool supports(const CustomPathEffect::Identifier &identifier) {
+    if(identifier.fEffectId != effectId()) return false;
+    if(identifier.fEffectName != effectName()) return false;
+    return identifier.fVersion == effectVersion();
+}
+
 #include "Animators/qrealanimator.h"
-ExamplePathEffect::ExamplePathEffect() :
+ExamplePathEffect000::ExamplePathEffect000() :
     CustomPathEffect(effectName().toLower()) {
     mInfluence = SPtrCreate(QrealAnimator)(0, 0, 1, 0.1, "influence");
     ca_addChildAnimator(mInfluence);
 }
 
-QByteArray ExamplePathEffect::getIdentifier() const {
+CustomPathEffect::Identifier ExamplePathEffect000::getIdentifier() const {
     return effectIdentifier();
 }
 
-void ExamplePathEffect::apply(const qreal relFrame,
+void ExamplePathEffect000::apply(const qreal relFrame,
                               const SkPath &src,
                               SkPath * const dst) {
     const SkScalar infl = toSkScalar(mInfluence->getEffectiveValue(relFrame));

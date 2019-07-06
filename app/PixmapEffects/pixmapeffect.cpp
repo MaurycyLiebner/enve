@@ -20,10 +20,6 @@ void PixmapEffect::readProperty(QIODevice * const src) {
     src->read(rcChar(&mVisible), sizeof(bool));
 }
 
-EffectAnimators *PixmapEffect::getParentEffectAnimators() {
-    return static_cast<EffectAnimators*>(mParent_k.data());
-}
-
 QMarginsF PixmapEffect::getMarginAtRelFrame(const qreal relFrame) {
     Q_UNUSED(relFrame);
     return QMarginsF();

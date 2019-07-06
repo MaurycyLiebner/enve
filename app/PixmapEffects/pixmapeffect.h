@@ -58,7 +58,6 @@ public:
 
     QMimeData *SWT_createMimeData();
 
-    EffectAnimators *getParentEffectAnimators();
     void writeIdentifier(QIODevice * const dst) const;
 
     void switchVisible();
