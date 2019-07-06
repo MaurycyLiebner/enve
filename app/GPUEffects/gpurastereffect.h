@@ -1,8 +1,7 @@
 #ifndef GPURASTEREFFECT_H
 #define GPURASTEREFFECT_H
 #include "Animators/staticcomplexanimator.h"
-#include "shadereffectcreator.h"
-class GPUEffectAnimators;
+#include "glhelpers.h"
 
 enum class GpuEffectType : short {
     BLUR,
@@ -18,7 +17,6 @@ public:
                         GpuRenderTools& renderTools,
                         GpuRenderData& data) = 0;
 };
-
 
 class GpuEffect : public StaticComplexAnimator {
     friend class SelfRef;

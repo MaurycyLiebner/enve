@@ -141,6 +141,7 @@ HEADERS += \
     Animators/staticcomplexanimator.h \
     PathEffects/custompatheffect.h \
     core_global.h \
+    customidentifier.h \
     randomgrid.h \
     rangemap.h \
     smartPointers/stdpointer.h \

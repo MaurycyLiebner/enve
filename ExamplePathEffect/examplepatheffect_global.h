@@ -19,15 +19,16 @@ EXAMPLEPATHEFFECTSHARED_EXPORT
 
 EXAMPLEPATHEFFECTSHARED_EXPORT
     qsptr<CustomPathEffect> createEffect(
-        const CustomPathEffect::Identifier &identifier);
+        const CustomIdentifier &identifier);
 
 EXAMPLEPATHEFFECTSHARED_EXPORT
     QString effectName();
 
 EXAMPLEPATHEFFECTSHARED_EXPORT
-    CustomPathEffect::Identifier effectIdentifier();
+    CustomIdentifier effectIdentifier();
 
 EXAMPLEPATHEFFECTSHARED_EXPORT
-    bool supports(const CustomPathEffect::Identifier &identifier);
+    bool supports(const CustomIdentifier &identifier);
+
 }
 #endif // EXAMPLEPATHEFFECT_GLOBAL_H

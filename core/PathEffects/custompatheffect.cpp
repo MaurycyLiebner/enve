@@ -1,5 +1,6 @@
 #include "custompatheffect.h"
 #include "basicreadwrite.h"
+
 CustomPathEffect::CustomPathEffect(const QString &name) :
     PathEffect(name, PathEffectType::CUSTOM) {}
 

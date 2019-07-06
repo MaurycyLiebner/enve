@@ -1,5 +1,4 @@
 #include "gpurastereffect.h"
-class GPUEffectAnimators;
 
 GpuEffect::GpuEffect(const QString &name, const GpuEffectType type) :
     StaticComplexAnimator(name), mType(type) {}

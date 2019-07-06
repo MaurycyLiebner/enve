@@ -7,7 +7,7 @@ class ExamplePathEffect000 : public CustomPathEffect {
 public:
     ExamplePathEffect000();
 
-    CustomPathEffect::Identifier getIdentifier() const;
+    CustomIdentifier getIdentifier() const;
 
     void apply(const qreal relFrame,
                const SkPath &src,

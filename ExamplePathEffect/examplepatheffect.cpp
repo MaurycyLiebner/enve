@@ -6,9 +6,10 @@ qsptr<CustomPathEffect> createNewestVersionEffect() {
 }
 
 qsptr<CustomPathEffect> createEffect(
-        const CustomPathEffect::Identifier &identifier) {
+        const CustomIdentifier &identifier) {
     Q_UNUSED(identifier);
     // Choose version based on identifier
+    // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
     return SPtrCreate(ExamplePathEffect000)();
 }
 
@@ -22,21 +23,16 @@ QString effectName() {
     return "Example";
 }
 
-QString effectVersion() {
-    return "0.0.0";
+// here specify your effect's most up to date version
+CustomIdentifier::Version effectVersion() {
+    return { 0, 0, 0 };
 }
 
-CustomPathEffect::Identifier effectIdentifier() {
-    return
-// make sure identifier for every effect is unique by adding random string
-    { effectId(),
-// here specify your effect's name
-      effectName(),
-// here specify your effect's version
-      effectVersion() };
+CustomIdentifier effectIdentifier() {
+    return { effectId(), effectName(), effectVersion() };
 }
 
-bool supports(const CustomPathEffect::Identifier &identifier) {
+bool supports(const CustomIdentifier &identifier) {
     if(identifier.fEffectId != effectId()) return false;
     if(identifier.fEffectName != effectName()) return false;
     return identifier.fVersion == effectVersion();
@@ -49,13 +45,13 @@ ExamplePathEffect000::ExamplePathEffect000() :
     ca_addChildAnimator(mInfluence);
 }
 
-CustomPathEffect::Identifier ExamplePathEffect000::getIdentifier() const {
-    return effectIdentifier();
+CustomIdentifier ExamplePathEffect000::getIdentifier() const {
+    return { effectId(), effectName(), { 0, 0, 0 } };
 }
 
 void ExamplePathEffect000::apply(const qreal relFrame,
-                              const SkPath &src,
-                              SkPath * const dst) {
+                                 const SkPath &src,
+                                 SkPath * const dst) {
     const SkScalar infl = toSkScalar(mInfluence->getEffectiveValue(relFrame));
     const SkScalar invInf = 1 - infl;
     dst->reset();

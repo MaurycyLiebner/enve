@@ -38,6 +38,7 @@
 #include "scenelayout.h"
 #include "GUI/GradientWidgets/gradientwidget.h"
 #include "GUI/newcanvasdialog.h"
+#include "GPUEffects/shadereffectprogram.h"
 extern "C" {
     #include <libavformat/avformat.h>
 }

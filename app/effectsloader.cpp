@@ -3,6 +3,7 @@
 #include "GPUEffects/gpurastereffect.h"
 #include <QFileSystemWatcher>
 #include <QFileSystemModel>
+#include "GPUEffects/shadereffectcreator.h"
 
 EffectsLoader::EffectsLoader() {}
 

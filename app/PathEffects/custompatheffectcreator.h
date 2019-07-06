@@ -8,10 +8,10 @@ class CustomPathEffect;
 
 typedef qsptr<CustomPathEffect> (*CPathEffectCreatorNewFunc)();
 typedef qsptr<CustomPathEffect> (*CPathEffectCreatorFunc)(
-        const QByteArray &identifier);
+        const CustomIdentifier &identifier);
 typedef QString (*CPathEffectNameFunc)();
 typedef QByteArray (*CPathEffectIdentifierFunc)();
-typedef bool (*CPathEffectSupport)(const QByteArray&);
+typedef bool (*CPathEffectSupport)(const CustomIdentifier&);
 
 class CustomPathEffectCreator {
     CustomPathEffectCreator(const CPathEffectCreatorNewFunc creatorNew,
@@ -25,7 +25,7 @@ public:
     static void sLoadCustomPathEffect(const QString& libPath);
 
     static qsptr<CustomPathEffect> sCreateForIdentifier(
-            const QByteArray &identifier) {
+            const CustomIdentifier &identifier) {
         for(const auto& creator : sEffectCreators) {
             if(!creator.mSupport(identifier)) continue;
             return creator.mCreator(identifier);
