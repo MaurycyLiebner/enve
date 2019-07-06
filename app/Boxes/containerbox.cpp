@@ -529,7 +529,7 @@ qsptr<BoundingBox> ContainerBox::createLink() {
 }
 
 void ContainerBox::updateIfUsesProgram(
-        const GPURasterEffectProgram * const program) const {
+        const ShaderEffectProgram * const program) const {
     for(const auto& box : mContainedBoxes) {
         if(box->isVisibleAndInVisibleDurationRect())
             box->updateIfUsesProgram(program);

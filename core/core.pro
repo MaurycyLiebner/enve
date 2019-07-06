@@ -9,7 +9,7 @@ HOME_FOLDER = /home/ailuropoda
 SKIA_FOLDER = $$HOME_FOLDER/.skia2
 
 #QT       -= gui
-QT += opengl
+QT += opengl qml
 TARGET = envecore
 TEMPLATE = lib
 

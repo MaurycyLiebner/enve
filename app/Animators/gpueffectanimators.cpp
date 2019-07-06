@@ -3,7 +3,7 @@
 #include "Boxes/boundingbox.h"
 #include <QDebug>
 
-GPUEffectAnimators::GPUEffectAnimators(BoundingBox *parentBox) :
+GPUEffectAnimators::GPUEffectAnimators(BoundingBox * const parentBox) :
     GPUEffectAnimatorsBase("gpu effects"), mParentBox_k(parentBox) {
     makeHiddenWhenEmpty();
 }
@@ -11,7 +11,7 @@ GPUEffectAnimators::GPUEffectAnimators(BoundingBox *parentBox) :
 QMarginsF GPUEffectAnimators::getEffectsMargin(const qreal relFrame) const {
     QMarginsF newMargin;
     for(const auto& effect : ca_mChildAnimators) {
-        auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
+        auto pixmapEffect = GetAsPtr(effect.get(), ShaderEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMarginAtRelFrame(relFrame);
         }
@@ -22,10 +22,10 @@ QMarginsF GPUEffectAnimators::getEffectsMargin(const qreal relFrame) const {
 void GPUEffectAnimators::addEffects(const qreal relFrame,
                                     BoundingBoxRenderData * const data) {
     for(const auto& effect : ca_mChildAnimators) {
-        auto pixmapEffect = GetAsPtr(effect, GPURasterEffect);
+        auto pixmapEffect = GetAsPtr(effect, ShaderEffect);
         if(pixmapEffect->isVisible()) {
             const auto effectRenderData =
-                    pixmapEffect->getGPURasterEffectCaller(relFrame);
+                    pixmapEffect->getEffectCaller(relFrame);
             if(!effectRenderData) continue;
             data->fGPUEffects.append(effectRenderData);
         }
@@ -33,21 +33,21 @@ void GPUEffectAnimators::addEffects(const qreal relFrame,
 }
 
 void GPUEffectAnimators::updateIfUsesProgram(
-        const GPURasterEffectProgram * const program) {
+        const ShaderEffectProgram * const program) {
     for(const auto& effect : ca_mChildAnimators) {
-        const auto pixmapEffect = GetAsPtr(effect.get(), GPURasterEffect);
+        const auto pixmapEffect = GetAsPtr(effect.get(), ShaderEffect);
         pixmapEffect->updateIfUsesProgram(program);
     }
 }
 
-qsptr<GPURasterEffect> readIdCreateGPURasterEffect(QIODevice * const src) {
-    const auto id = GPURasterEffectCreator::sReadIdentifier(src);
-    const auto best = GPURasterEffectCreator::sGetBestCompatibleEffects(id);
+qsptr<ShaderEffect> readIdCreateGPURasterEffect(QIODevice * const src) {
+    const auto id = ShaderEffectCreator::sReadIdentifier(src);
+    const auto best = ShaderEffectCreator::sGetBestCompatibleEffects(id);
     if(best.isEmpty()) RuntimeThrow("No compatible GPU effect found for " + id.fName);
-    qsptr<GPURasterEffect> effect;
+    qsptr<ShaderEffect> effect;
     if(best.count() == 1) {
         const auto bestCreator = best.first();
-        effect = GetAsSPtr(bestCreator->create(), GPURasterEffect);
+        effect = GetAsSPtr(bestCreator->create(), ShaderEffect);
     } else {
         // exec ask dialog
     }

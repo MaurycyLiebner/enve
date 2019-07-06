@@ -180,7 +180,7 @@ public:
     void removeAllContainedBoxes();
 
     void updateIfUsesProgram(
-            const GPURasterEffectProgram * const program) const final;
+            const ShaderEffectProgram * const program) const final;
 protected:
     void removeContainedBox(const qsptr<BoundingBox> &child);
 

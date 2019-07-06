@@ -2,8 +2,8 @@
 #define EFFECTSLOADER_H
 #include "offscreenqgl33c.h"
 
-class GPURasterEffectProgram;
-class GPURasterEffectCreator;
+class ShaderEffectProgram;
+class ShaderEffectCreator;
 
 class EffectsLoader : public QObject, protected OffscreenQGL33c {
     Q_OBJECT
@@ -12,10 +12,10 @@ public:
 
     void initialize();
 signals:
-    void programChanged(GPURasterEffectProgram*);
+    void programChanged(ShaderEffectProgram*);
 private:
     void iniRasterEffectPrograms();
-    void reloadProgram(GPURasterEffectCreator * const loaded,
+    void reloadProgram(ShaderEffectCreator * const loaded,
                        const QString& fragPath);
     void iniSingleRasterEffectProgram(const QString &grePath);
     void iniRasterEffectProgramExec(const QString &grePath);

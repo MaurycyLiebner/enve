@@ -3,7 +3,6 @@
 class UndoRedo;
 class MainWindow;
 #include "singlewidgettarget.h"
-#include "glhelpers.h"
 #include "framerange.h"
 #include "MovablePoints/pointshandler.h"
 #include "basicreadwrite.h"

@@ -1,12 +1,12 @@
-#include "gpurastereffectcreator.h"
+#include "shadereffectcreator.h"
 #include "exceptions.h"
-#include "gpurastereffect.h"
+#include "shadereffect.h"
 #include <QDomDocument>
 
-QList<stdsptr<GPURasterEffectCreator>> GPURasterEffectCreator::sEffectCreators;
+QList<stdsptr<ShaderEffectCreator>> ShaderEffectCreator::sEffectCreators;
 
-qsptr<Property> GPURasterEffectCreator::create() const {
-    auto rasterEffect = SPtrCreate(GPURasterEffect)(this, &fProgram,
+qsptr<Property> ShaderEffectCreator::create() const {
+    auto rasterEffect = SPtrCreate(ShaderEffect)(this, &fProgram,
                                                     fName, fProperties);
     return std::move(rasterEffect);
 }
@@ -84,7 +84,7 @@ void readAnimatorCreators(
     }
 }
 
-stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sLoadFromFile(
+stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
         QGL33c * const gl, const QString &grePath) {
     QFile greFile(grePath);
     if(!greFile.exists())
@@ -130,31 +130,31 @@ stdsptr<GPURasterEffectCreator> GPURasterEffectCreator::sLoadFromFile(
         }
     }
 
-    GPURasterEffectProgram program;
+    ShaderEffectProgram program;
     try {
-        program = GPURasterEffectProgram::sCreateProgram(
+        program = ShaderEffectProgram::sCreateProgram(
                     gl, fragPath, propCs, uniCs);
     } catch(...) {
         RuntimeThrow("Could not create a program for GPURasterEffect '" +
                      effectName + "'");
     }
     auto rasterEffectCreator =
-            SPtrCreate(GPURasterEffectCreator)(grePath, effectName, propCs, program);
+            SPtrCreate(ShaderEffectCreator)(grePath, effectName, propCs, program);
     sEffectCreators << rasterEffectCreator;
 
     return rasterEffectCreator;
 }
 
-stdsptr<GPURasterEffectCreator>
-    GPURasterEffectCreator::sWithGrePath(const QString &grePath) {
+stdsptr<ShaderEffectCreator>
+    ShaderEffectCreator::sWithGrePath(const QString &grePath) {
     for(const auto& effectC : sEffectCreators) {
         if(effectC->fGrePath == grePath) return effectC;
     }
     return nullptr;
 }
 
-stdsptr<GPURasterEffectCreator>
-    GPURasterEffectCreator::sWithGrePathAndCompatible(
+stdsptr<ShaderEffectCreator>
+    ShaderEffectCreator::sWithGrePathAndCompatible(
         const QString &grePath, const QList<PropertyType> &props) {
     const auto pathBased = sWithGrePath(grePath);
     if(!pathBased) return nullptr;
@@ -163,19 +163,19 @@ stdsptr<GPURasterEffectCreator>
     return nullptr;
 }
 
-QList<stdsptr<GPURasterEffectCreator>>
-    GPURasterEffectCreator::sWithName(const QString &name) {
-    QList<stdsptr<GPURasterEffectCreator>> named;
+QList<stdsptr<ShaderEffectCreator>>
+    ShaderEffectCreator::sWithName(const QString &name) {
+    QList<stdsptr<ShaderEffectCreator>> named;
     for(const auto& effectC : sEffectCreators) {
         if(effectC->fName == name) named << effectC;
     }
     return named;
 }
 
-QList<stdsptr<GPURasterEffectCreator>>
-    GPURasterEffectCreator::sWithNameAndCompatible(
+QList<stdsptr<ShaderEffectCreator>>
+    ShaderEffectCreator::sWithNameAndCompatible(
         const QString &name, const QList<PropertyType> &props) {
-    QList<stdsptr<GPURasterEffectCreator>> comp;
+    QList<stdsptr<ShaderEffectCreator>> comp;
     for(const auto& effectC : sEffectCreators) {
         if(effectC->fName != name) continue;
         if(effectC->compatible(props)) comp << effectC;
@@ -183,20 +183,20 @@ QList<stdsptr<GPURasterEffectCreator>>
     return comp;
 }
 
-QList<stdsptr<GPURasterEffectCreator>>
-    GPURasterEffectCreator::sWithCompatibleProps(
+QList<stdsptr<ShaderEffectCreator>>
+    ShaderEffectCreator::sWithCompatibleProps(
         const QList<PropertyType> &props) {
-    QList<stdsptr<GPURasterEffectCreator>> comp;
+    QList<stdsptr<ShaderEffectCreator>> comp;
     for(const auto& effectC : sEffectCreators) {
         if(effectC->compatible(props)) comp << effectC;
     }
     return comp;
 }
 
-QList<stdsptr<GPURasterEffectCreator>>
-    GPURasterEffectCreator::sGetBestCompatibleEffects(const Identifier &id) {
+QList<stdsptr<ShaderEffectCreator>>
+    ShaderEffectCreator::sGetBestCompatibleEffects(const Identifier &id) {
     const auto pathBased = sWithGrePathAndCompatible(id.fGrePath, id.fTypes);
-    if(pathBased) return QList<stdsptr<GPURasterEffectCreator>>() << pathBased;
+    if(pathBased) return QList<stdsptr<ShaderEffectCreator>>() << pathBased;
     const auto nameBased = sWithNameAndCompatible(id.fName, id.fTypes);
     if(!nameBased.isEmpty()) return nameBased;
     return sWithCompatibleProps(id.fTypes);

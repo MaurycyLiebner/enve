@@ -10,8 +10,8 @@
 #include <QResizeEvent>
 #include <QOpenGLPaintDevice>
 
-class GPURasterEffectCreator;
-class GPURasterEffectProgram;
+class ShaderEffectCreator;
+class ShaderEffectProgram;
 
 class GLWindow : public QOpenGLWidget, protected QGL33c {
     Q_OBJECT

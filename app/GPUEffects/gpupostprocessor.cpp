@@ -31,22 +31,25 @@ void BoxRenderDataScheduledPostProcess::process(
     if(!srcImage) return;
     const int srcWidth = srcImage->width();
     const int srcHeight = srcImage->height();
-
-    QJSEngine engine;
-    engine.evaluate("_texSize = [" + QString::number(srcWidth) + "," +
-                    QString::number(srcHeight) + "]");
     const QPointF gPos = mBoxData->fGlobalBoundingRect.topLeft();
-    engine.evaluate("_gPos = [" + QString::number(gPos.x()) + "," +
-                    QString::number(gPos.y()) + "]");
 
     glViewport(0, 0, srcWidth, srcHeight);
 
+    GpuRenderData renderData;
+    renderData.fPosX = static_cast<GLfloat>(gPos.x());
+    renderData.fPosY = static_cast<GLfloat>(gPos.y());
+    renderData.fWidth = static_cast<GLuint>(srcWidth);
+    renderData.fHeight = static_cast<GLuint>(srcHeight);
+    auto& engine = renderData.fJSEngine;
+    engine.evaluate("_texSize = [" + QString::number(srcWidth) + "," +
+                    QString::number(srcHeight) + "]");
+    engine.evaluate("_gPos = [" + QString::number(gPos.x()) + "," +
+                    QString::number(gPos.y()) + "]");
+
     GpuRenderTools renderTools(this, srcImage, texturedSquareVAO);
     auto& effects = mBoxData->fGPUEffects;
-    const auto gPosX = static_cast<GLfloat>(gPos.x());
-    const auto gPosY = static_cast<GLfloat>(gPos.y());
     for(const auto& effect : mBoxData->fGPUEffects) {
-        effect->render(this, renderTools, engine, gPosX, gPosY);
+        effect->render(this, renderTools, renderData);
         renderTools.swapTextures();
     }
     effects.clear();

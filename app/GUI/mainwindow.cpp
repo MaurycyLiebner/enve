@@ -118,7 +118,7 @@ MainWindow::MainWindow(QWidget *parent)
     mEffectsLoader = new EffectsLoader;
     mEffectsLoader->initialize();
     connect(mEffectsLoader, &EffectsLoader::programChanged, this,
-    [this](GPURasterEffectProgram * program) {
+    [this](ShaderEffectProgram * program) {
         for(const auto& scene : mDocument.fScenes)
             scene->updateIfUsesProgram(program);
         queScheduledTasksAndUpdate();

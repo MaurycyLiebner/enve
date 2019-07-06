@@ -3,7 +3,7 @@
 #include "uniformspecifiercreator.h"
 
 typedef QList<stdsptr<UniformSpecifierCreator>> UniformSpecifierCreators;
-struct GPURasterEffectProgram {
+struct ShaderEffectProgram {
     GLuint fId = 0;
     GLuint fFragShader;
     GLint fGPosLoc;
@@ -11,11 +11,11 @@ struct GPURasterEffectProgram {
     QList<GLint> fArgumentLocs;
     UniformSpecifierCreators fUniformCreators;
 
-    static GPURasterEffectProgram sCreateProgram(
+    static ShaderEffectProgram sCreateProgram(
             QGL33c * const gl, const QString &fragPath,
             const QList<stdsptr<PropertyCreator>>& propCs,
             const UniformSpecifierCreators& uniCs) {
-        GPURasterEffectProgram program;
+        ShaderEffectProgram program;
         try {
             iniProgram(gl, program.fId, GL_TEXTURED_VERT, fragPath);
         } catch(...) {

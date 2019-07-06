@@ -71,7 +71,7 @@ void EffectsLoader::iniCustomPathEffects() {
     });
 }
 
-void EffectsLoader::reloadProgram(GPURasterEffectCreator* const loaded,
+void EffectsLoader::reloadProgram(ShaderEffectCreator* const loaded,
                                   const QString &fragPath) {
     try {
         makeCurrent();
@@ -151,7 +151,7 @@ void EffectsLoader::iniRasterEffectProgramExec(const QString& grePath) {
             fileInfo.completeBaseName() + ".frag";
     if(!QFile(fragPath).exists()) return;
     try {
-        const auto loaded = GPURasterEffectCreator::sLoadFromFile(this, grePath).get();
+        const auto loaded = ShaderEffectCreator::sLoadFromFile(this, grePath).get();
         mLoadedGREPaths << grePath;
 
         const auto newFileWatcher = QSharedPointer<QFileSystemWatcher>(

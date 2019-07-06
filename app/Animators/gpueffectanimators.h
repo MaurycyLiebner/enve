@@ -3,17 +3,18 @@
 #include "Animators/dynamiccomplexanimator.h"
 #include "smartPointers/sharedpointerdefs.h"
 #include "GPUEffects/gpurastereffect.h"
+#include "GPUEffects/shadereffect.h"
 
 class BoundingBox;
 struct BoundingBoxRenderData;
-qsptr<GPURasterEffect> readIdCreateGPURasterEffect(QIODevice * const src);
+qsptr<ShaderEffect> readIdCreateGPURasterEffect(QIODevice * const src);
 typedef DynamicComplexAnimator<
-    GPURasterEffect, &GPURasterEffect::writeIdentifier,
+    ShaderEffect, &ShaderEffect::writeIdentifier,
     &readIdCreateGPURasterEffect> GPUEffectAnimatorsBase;
 class GPUEffectAnimators : public GPUEffectAnimatorsBase {
     friend class SelfRef;
 protected:
-    GPUEffectAnimators(BoundingBox *parentBox);
+    GPUEffectAnimators(BoundingBox * const parentBox);
 public:
     bool SWT_isRasterGPUEffectAnimators() const { return true; }
 
@@ -23,7 +24,7 @@ public:
     void addEffects(const qreal relFrame,
                     BoundingBoxRenderData * const data);
 
-    void updateIfUsesProgram(const GPURasterEffectProgram * const program);
+    void updateIfUsesProgram(const ShaderEffectProgram * const program);
     //void readPixmapEffect(QIODevice *target);
 private:
     BoundingBox * const mParentBox_k;

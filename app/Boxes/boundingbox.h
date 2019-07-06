@@ -20,7 +20,7 @@ class OutlineSettingsAnimator;
 class PaintSettingsApplier;
 class EffectAnimators;
 class GPUEffectAnimators;
-class GPURasterEffectProgram;
+class ShaderEffectProgram;
 class PixmapEffect;
 class BoxTransformAnimator;
 class BasicTransformAnimator;
@@ -29,7 +29,7 @@ class ContainerBox;
 class SmartVectorPath;
 class DurationRectangle;
 struct ContainerBoxRenderData;
-struct GPURasterEffect;
+struct ShaderEffect;
 enum CanvasMode : short;
 
 class SimpleBrushWrapper;
@@ -357,8 +357,8 @@ public:
     void removeEffect(const qsptr<PixmapEffect> &effect);
     void clearRasterEffects();
 
-    void addGPUEffect(const qsptr<GPURasterEffect> &rasterEffect);
-    void removeGPUEffect(const qsptr<GPURasterEffect> &effect);
+    void addGPUEffect(const qsptr<ShaderEffect> &rasterEffect);
+    void removeGPUEffect(const qsptr<ShaderEffect> &effect);
 
     void setBlendModeSk(const SkBlendMode &blendMode);
 
@@ -423,7 +423,7 @@ public:
     void planCenterPivotPosition();
 
     virtual void updateIfUsesProgram(
-            const GPURasterEffectProgram * const program) const;
+            const ShaderEffectProgram * const program) const;
 protected:
     void updateCanvasProps() {
         mCanvasProps.clear();

@@ -468,7 +468,7 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
         }
         targetParent->prp_afterWholeInfluenceRangeChanged();
     } else if(dragged.fType == Dragged::RASTER_GPU_EFFECT) {
-        const auto draggedEffect = GetAsSPtr(draggedSWT, GPURasterEffect);
+        const auto draggedEffect = GetAsSPtr(draggedSWT, ShaderEffect);
         auto targetParent = static_cast<GPUEffectAnimators*>(targetSWT);
         auto currentParent = draggedEffect->getParentEffectAnimators();
         if(currentParent != targetParent) {

@@ -87,6 +87,19 @@ struct TextureFrameBuffer {
         return fTexture.toImage(gl); }
 };
 
+#include <QJSEngine>
+struct GpuRenderData {
+    //! @brief Position in scene coordinates
+    GLfloat fPosX;
+    GLfloat fPosY;
+
+    //! @brief Texture size
+    GLuint fWidth;
+    GLuint fHeight;
+
+    //! @brief Used for shader based effects
+    QJSEngine fJSEngine;
+};
 
 class GpuRenderTools {
 public:

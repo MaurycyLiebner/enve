@@ -159,7 +159,7 @@ void BoundingBox::planCenterPivotPosition() {
 }
 
 void BoundingBox::updateIfUsesProgram(
-        const GPURasterEffectProgram * const program) const {
+        const ShaderEffectProgram * const program) const {
     mGPUEffectsAnimators->updateIfUsesProgram(program);
 }
 
@@ -641,10 +641,10 @@ void BoundingBox::addActionsToMenu(BoxTypeMenu * const menu) {
         addEffectAction<ReplaceColorEffect>("Replace Color", effectsMenu);
 
         const auto gpuEffectsMenu = menu->addMenu("GPU Effects");
-        for(const auto& creator : GPURasterEffectCreator::sEffectCreators) {
+        for(const auto& creator : ShaderEffectCreator::sEffectCreators) {
             const BoxTypeMenu::PlainOp<BoundingBox> op =
             [creator](BoundingBox * box) {
-                const auto effect = GetAsSPtr(creator->create(), GPURasterEffect);
+                const auto effect = GetAsSPtr(creator->create(), ShaderEffect);
                 box->addGPUEffect(effect);
             };
             gpuEffectsMenu->addPlainAction(creator->fName, op);
@@ -926,11 +926,11 @@ bool BoundingBox::isAnimated() const {
     return anim_isDescendantRecording();
 }
 
-void BoundingBox::addGPUEffect(const qsptr<GPURasterEffect>& rasterEffect) {
+void BoundingBox::addGPUEffect(const qsptr<ShaderEffect>& rasterEffect) {
     mGPUEffectsAnimators->addChild(rasterEffect);
 }
 
-void BoundingBox::removeGPUEffect(const qsptr<GPURasterEffect>& effect) {
+void BoundingBox::removeGPUEffect(const qsptr<ShaderEffect>& effect) {
     mGPUEffectsAnimators->removeChild(effect);
 }
 

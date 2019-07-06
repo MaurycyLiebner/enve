@@ -55,7 +55,9 @@ SOURCES += main.cpp\
     CacheHandlers/hddcachablerangecont.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/soundreader.cpp \
-    GPUEffects/gpurastereffectprogram.cpp \
+    GPUEffects/shadereffect.cpp \
+    GPUEffects/shadereffectcreator.cpp \
+    GPUEffects/shadereffectprogram.cpp \
     GPUEffects/uniformspecifiercreator.cpp \
     GUI/Timeline/animationrect.cpp \
     GUI/Timeline/durationrectangle.cpp \
@@ -229,7 +231,6 @@ SOURCES += main.cpp\
     Animators/gpueffectanimators.cpp \
     GPUEffects/gpurastereffect.cpp \
     GPUEffects/gpupostprocessor.cpp \
-    GPUEffects/gpurastereffectcreator.cpp \
     Paint/fixedtiledsurface.cpp \
     GUI/segment1deditor.cpp \
     GUI/namedcontainer.cpp \
@@ -283,7 +284,9 @@ HEADERS  += \
     CacheHandlers/samples.h \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/soundreader.h \
-    GPUEffects/gpurastereffectprogram.h \
+    GPUEffects/shadereffect.h \
+    GPUEffects/shadereffectcreator.h \
+    GPUEffects/shadereffectprogram.h \
     GPUEffects/uniformspecifiercreator.h \
     GUI/Timeline/animationrect.h \
     GUI/Timeline/durationrectangle.h \
@@ -455,7 +458,6 @@ HEADERS  += \
     Animators/gpueffectanimators.h \
     GPUEffects/gpurastereffect.h \
     GPUEffects/gpupostprocessor.h \
-    GPUEffects/gpurastereffectcreator.h \
     Paint/fixedtiledsurface.h \
     GUI/segment1deditor.h \
     GUI/namedcontainer.h \

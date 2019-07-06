@@ -31,7 +31,7 @@ class ImageSequenceBox;
 class Brush;
 class UndoRedoStack;
 class ExternalLinkBox;
-struct GPURasterEffectCreator;
+struct ShaderEffectCreator;
 class CanvasWindow;
 class SingleSound;
 class VideoBox;

@@ -1,17 +1,17 @@
 #ifndef GPURASTEREFFECTCREATOR_H
 #define GPURASTEREFFECTCREATOR_H
-#include "gpurastereffectprogram.h"
+#include "shadereffectprogram.h"
 
 enum PropertyType {
     PTYPE_FLOAT,
     PTYPE_INT
 };
 
-struct GPURasterEffectCreator : public PropertyCreator {
+struct ShaderEffectCreator : public PropertyCreator {
 protected:
-    GPURasterEffectCreator(const QString& grePath, const QString& name,
+    ShaderEffectCreator(const QString& grePath, const QString& name,
                            const QList<stdsptr<PropertyCreator>>& propCs,
-                           const GPURasterEffectProgram& program) :
+                           const ShaderEffectProgram& program) :
         PropertyCreator(name), fGrePath(grePath),
         fProperties(propCs), fProgram(program) {}
 public:
@@ -29,7 +29,7 @@ public:
 
     const QString fGrePath;
     const QList<stdsptr<PropertyCreator>> fProperties;
-    GPURasterEffectProgram fProgram;
+    ShaderEffectProgram fProgram;
 
     bool compatible(const QList<PropertyType>& props) const {
         if(props.count() != fProperties.count()) return false;
@@ -51,9 +51,9 @@ public:
 
     void reloadProgram(QGL33c * const gl, const QString& fragPath) {
         if(!QFile(fragPath).exists()) return;
-        GPURasterEffectProgram program;
+        ShaderEffectProgram program;
         try {
-            program = GPURasterEffectProgram::sCreateProgram(
+            program = ShaderEffectProgram::sCreateProgram(
                         gl, fragPath, fProperties,
                         fProgram.fUniformCreators);
         } catch(...) {
@@ -101,30 +101,30 @@ public:
         return Identifier(grePath, name, props);
     }
 
-    static stdsptr<GPURasterEffectCreator> sLoadFromFile(
+    static stdsptr<ShaderEffectCreator> sLoadFromFile(
             QGL33c * const gl, const QString& grePath);
 
-    static stdsptr<GPURasterEffectCreator> sWithGrePath(
+    static stdsptr<ShaderEffectCreator> sWithGrePath(
             const QString& grePath);
 
-    static stdsptr<GPURasterEffectCreator> sWithGrePathAndCompatible(
+    static stdsptr<ShaderEffectCreator> sWithGrePathAndCompatible(
             const QString& grePath,
             const QList<PropertyType>& props);
 
-    static QList<stdsptr<GPURasterEffectCreator>> sWithName(
+    static QList<stdsptr<ShaderEffectCreator>> sWithName(
             const QString &name);
 
-    static QList<stdsptr<GPURasterEffectCreator>> sWithNameAndCompatible(
+    static QList<stdsptr<ShaderEffectCreator>> sWithNameAndCompatible(
             const QString &name,
             const QList<PropertyType>& props);
 
-    static QList<stdsptr<GPURasterEffectCreator>> sWithCompatibleProps(
+    static QList<stdsptr<ShaderEffectCreator>> sWithCompatibleProps(
             const QList<PropertyType>& props);
 
-    static QList<stdsptr<GPURasterEffectCreator>> sGetBestCompatibleEffects(
+    static QList<stdsptr<ShaderEffectCreator>> sGetBestCompatibleEffects(
             const Identifier& id);
 
-    static QList<stdsptr<GPURasterEffectCreator>> sEffectCreators;
+    static QList<stdsptr<ShaderEffectCreator>> sEffectCreators;
 };
 
 #endif // GPURASTEREFFECTCREATOR_H
