@@ -83,8 +83,7 @@ void GLWindow::initialize() {
 
     // setup GrContext
     mInterface = GrGLMakeNativeInterface();
-    if(!mInterface)
-        RuntimeThrow("Failed to make native interface.");
+    if(!mInterface) RuntimeThrow("Failed to make native interface.");
 //    GrContextOptions options;
     // setup contexts
     mGrContext = GrContext::MakeGL(mInterface/*, options*/);

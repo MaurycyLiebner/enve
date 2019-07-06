@@ -1,6 +1,6 @@
 #include "effectsloader.h"
 #include "GUI/ColorWidgets/colorwidgetshaders.h"
-#include "GPUEffects/gpurastereffect.h"
+#include "GPUEffects/gpueffect.h"
 #include <QFileSystemWatcher>
 #include <QFileSystemModel>
 #include "GPUEffects/shadereffectcreator.h"
@@ -30,6 +30,7 @@ void EffectsLoader::initialize() {
     }
 
     iniCustomPathEffects();
+    iniCustomGpuEffects();
 }
 
 #include "PathEffects/custompatheffect.h"
@@ -68,6 +69,46 @@ void EffectsLoader::iniCustomPathEffects() {
             const auto rowIndex = newFileWatcher->index(row, 0, parent);
             const QString path = newFileWatcher->filePath(rowIndex);
             iniIfCustomPathEffect(path);
+        }
+    });
+}
+
+#include "GPUEffects/customgpueffect.h"
+#include "GPUEffects/customgpueffectcreator.h"
+void iniCustomGpuEffect(const QString& gpu) {
+    try {
+        CustomGpuEffectCreator::sLoadCustomGpuEffect(gpu);
+    } catch(...) {
+        RuntimeThrow("Error while loading GpuEffect from '" + gpu + "'");
+    }
+}
+
+void iniIfCustomGpuEffect(const QString& gpu) {
+    const QFileInfo fileInfo(gpu);
+    if(!fileInfo.isFile()) return;
+    if(!fileInfo.completeSuffix().contains("so")) return;
+    try {
+        iniCustomGpuEffect(gpu);
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
+}
+
+void EffectsLoader::iniCustomGpuEffects() {
+    const QString dirPath = QDir::homePath() + "/.enve/GPURasterEffects";
+//    QDirIterator dirIt(dirGpu, QDirIterator::NoIteratorFlags);
+//    while(dirIt.hasNext()) {
+//        iniIfCustomGpuEffect(dirIt.next());
+//    }
+    const auto newFileWatcher = QSharedPointer<QFileSystemModel>(
+                new QFileSystemModel);
+    newFileWatcher->setRootPath(dirPath);
+    connect(newFileWatcher.get(), &QFileSystemModel::rowsInserted, this,
+    [newFileWatcher](const QModelIndex &parent, int first, int last) {
+        for(int row = first; row <= last; row++) {
+            const auto rowIndex = newFileWatcher->index(row, 0, parent);
+            const QString path = newFileWatcher->filePath(rowIndex);
+            iniIfCustomGpuEffect(path);
         }
     });
 }

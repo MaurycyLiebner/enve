@@ -46,6 +46,8 @@ LIBS += -lskia
 SOURCES += \
     Animators/qrealsnapshot.cpp \
     Animators/staticcomplexanimator.cpp \
+    GPUEffects/customgpueffect.cpp \
+    GPUEffects/gpueffect.cpp \
     PathEffects/custompatheffect.cpp \
     randomgrid.cpp \
     smartPointers/stdpointer.cpp \
@@ -139,6 +141,8 @@ HEADERS += \
     Animators/dynamiccomplexanimator.h \
     Animators/qrealsnapshot.h \
     Animators/staticcomplexanimator.h \
+    GPUEffects/customgpueffect.h \
+    GPUEffects/gpueffect.h \
     PathEffects/custompatheffect.h \
     core_global.h \
     customidentifier.h \

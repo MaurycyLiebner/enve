@@ -1,5 +1,5 @@
 #include "gpueffectanimators.h"
-#include "GPUEffects/gpurastereffect.h"
+#include "GPUEffects/gpueffect.h"
 #include "Boxes/boundingbox.h"
 #include <QDebug>
 

@@ -7,7 +7,7 @@
 #include "smartPointers/stdselfref.h"
 #include "skia/skiaincludes.h"
 #include "glhelpers.h"
-#include "gpurastereffect.h"
+#include "GPUEffects/gpueffect.h"
 
 class ScheduledPostProcess : public StdSelfRef,
         protected QGL33c {

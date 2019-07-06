@@ -26,7 +26,7 @@ CONFIG(debug, debug|release) {
     QMAKE_CXXFLAGS = -m64 -O3
 }
 
-TARGET = ExamplePathEffect
+TARGET = examplePathEffect
 TEMPLATE = lib
 
 DEFINES += EXAMPLEPATHEFFECT_LIBRARY

@@ -1,5 +1,4 @@
 #include "custompatheffectcreator.h"
-#include "PathEffects/custompatheffect.h"
 #include <QLibrary>
 
 QList<CustomPathEffectCreator> CustomPathEffectCreator::sEffectCreators;

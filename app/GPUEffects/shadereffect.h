@@ -1,6 +1,6 @@
 #ifndef SHADEREFFECT_H
 #define SHADEREFFECT_H
-#include "GPUEffects/gpurastereffect.h"
+#include "GPUEffects/gpueffect.h"
 #include "shadereffectcreator.h"
 
 class ShaderEffectCaller : public GPURasterEffectCaller {

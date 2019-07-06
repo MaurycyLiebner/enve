@@ -69,6 +69,7 @@ public:
         Q_UNUSED(gl);
         Q_UNUSED(program);
         Q_ASSERT(false);
+        return 0;
     }
 
     void writeIdentifier(QIODevice * const dst) const {

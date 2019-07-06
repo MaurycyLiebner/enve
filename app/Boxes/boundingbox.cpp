@@ -13,7 +13,8 @@
 #include "Animators/effectanimators.h"
 #include "Animators/gpueffectanimators.h"
 #include "Animators/transformanimator.h"
-#include "GPUEffects/gpurastereffect.h"
+#include "GPUEffects/gpueffect.h"
+#include "GPUEffects/customgpueffectcreator.h"
 #include "linkbox.h"
 #include "PropertyUpdaters/transformupdater.h"
 #include "PropertyUpdaters/boxpathpointupdater.h"
@@ -641,6 +642,8 @@ void BoundingBox::addActionsToMenu(BoxTypeMenu * const menu) {
         addEffectAction<ReplaceColorEffect>("Replace Color", effectsMenu);
 
         const auto gpuEffectsMenu = menu->addMenu("GPU Effects");
+        CustomGpuEffectCreator::sAddToMenu(gpuEffectsMenu, &BoundingBox::addGPUEffect);
+        if(!gpuEffectsMenu->isEmpty()) gpuEffectsMenu->addSeparator();
         for(const auto& creator : ShaderEffectCreator::sEffectCreators) {
             const BoxTypeMenu::PlainOp<BoundingBox> op =
             [creator](BoundingBox * box) {
@@ -704,7 +707,8 @@ void BoundingBox::finishTransform() {
 }
 
 QMarginsF BoundingBox::getEffectsMargin(const qreal relFrame) {
-    return mEffectsAnimators->getEffectsMargin(relFrame);
+    return mEffectsAnimators->getEffectsMargin(relFrame) +
+            mGPUEffectsAnimators->getEffectsMargin(relFrame);
 }
 
 void BoundingBox::setupRenderData(const qreal relFrame,
@@ -926,11 +930,11 @@ bool BoundingBox::isAnimated() const {
     return anim_isDescendantRecording();
 }
 
-void BoundingBox::addGPUEffect(const qsptr<ShaderEffect>& rasterEffect) {
+void BoundingBox::addGPUEffect(const qsptr<GpuEffect>& rasterEffect) {
     mGPUEffectsAnimators->addChild(rasterEffect);
 }
 
-void BoundingBox::removeGPUEffect(const qsptr<ShaderEffect>& effect) {
+void BoundingBox::removeGPUEffect(const qsptr<GpuEffect> &effect) {
     mGPUEffectsAnimators->removeChild(effect);
 }
 

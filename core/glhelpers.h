@@ -2,6 +2,7 @@
 #define GLHELPERS_H
 #include <QOpenGLFunctions_3_3_Core>
 #include "skia/skiaincludes.h"
+#include "exceptions.h"
 
 typedef QOpenGLFunctions_3_3_Core QGL33c;
 #define BUFFER_OFFSET(i) ((void*)(i))
@@ -128,23 +129,34 @@ public:
     //! If there is no SkCanvas new SkCanvas is created.
     SkCanvas* requestTargetCanvas() {
         if(!mCanvas) {
+            mInterface = GrGLMakeNativeInterface();
+            if(!mInterface) RuntimeThrow("Failed to make native interface.");
+            mGrContext = GrContext::MakeGL(mInterface);
+            if(!mGrContext) RuntimeThrow("Failed to make GrContext.");
+
+//            GrGLTextureInfo texInfo;
+//            texInfo.fID = mSrcTexture.fId;
+//            texInfo.fFormat = GR_GL_RGBA8;
+//            texInfo.fTarget = GR_GL_TEXTURE_2D;
+//            const auto grTex = GrBackendTexture(mSrcTexture.fWidth, mSrcTexture.fHeight,
+//                                                GrMipMapped::kNo, texInfo);
+//            mSurface = SkSurface::MakeFromBackendTexture(
+//                        mGrContext.get(),
+//                        grTex, kBottomLeft_GrSurfaceOrigin, 0,
+//                        kRGBA_8888_SkColorType, nullptr, nullptr);
             requestTargetFbo();
-            mGrContext = GrContext::MakeGL();
-    //        GrGLTextureInfo texInfo;
-    //        texInfo.fFormat = GR_GL_BGRA8;
-    //        texInfo.fTarget = GR_GL_TEXTURE_2D;
-    //        const auto grTex = GrBackendTexture(mTexture.fWidth, mTexture.fHeight,
-    //                                            GrMipMapped::kNo, texInfo);
-    //        mSurface = SkSurface::MakeFromBackendTexture(
-    //                    mGrContext.get(),
-    //                    grTex, kTopLeft_GrSurfaceOrigin, 0,
-    //                    kBGRA_8888_SkColorType, nullptr, nullptr);
             GrGLFramebufferInfo fboInfo;
             fboInfo.fFBOID = mTargetTextureFbo.fFBOId;
-            fboInfo.fFormat = GR_GL_BGRA8;
+            fboInfo.fFormat = GR_GL_RGBA8;
             const auto grFbo = GrBackendRenderTarget(mTargetTextureFbo.fWidth,
                                                      mTargetTextureFbo.fHeight,
-                                                     0, 0, fboInfo);
+                                                     0, 8, fboInfo);
+            mSurface = SkSurface::MakeFromBackendRenderTarget(
+                        mGrContext.get(),
+                        grFbo, kBottomLeft_GrSurfaceOrigin,
+                        kRGBA_8888_SkColorType, nullptr, nullptr);
+            if(!mSurface) RuntimeThrow("Failed to make SkSurface.");
+
             mCanvas = mSurface->getCanvas();
         }
         return mCanvas;
@@ -162,15 +174,34 @@ public:
         return mTargetTextureFbo;
     }
 
+    sk_sp<SkImage> requestSrcTextureImageWrapper() {
+        return SkImage::MakeFromTexture(mGrContext.get(),
+                                        sourceBackedTexture(),
+                                        kBottomLeft_GrSurfaceOrigin,
+                                        kRGBA_8888_SkColorType,
+                                        kPremul_SkAlphaType,
+                                        nullptr);
+    }
+
     bool validTargetCanvas() const { return mCanvas; }
     bool validTargetFbo() const { return mTargetTextureFbo.fFBOId; }
 private:
+    GrBackendTexture sourceBackedTexture() {
+        GrGLTextureInfo texInfo;
+        texInfo.fID = mSrcTexture.fId;
+        texInfo.fFormat = GR_GL_RGBA8;
+        texInfo.fTarget = GR_GL_TEXTURE_2D;
+        return GrBackendTexture(mSrcTexture.fWidth, mSrcTexture.fHeight,
+                                GrMipMapped::kNo, texInfo);
+    }
+
     QGL33c* const mGL;
     const GLuint mSquareVAO;
 
     Texture mSrcTexture;
     TextureFrameBuffer mTargetTextureFbo;
 
+    sk_sp<const GrGLInterface> mInterface;
     sk_sp<GrContext> mGrContext;
     sk_sp<SkSurface> mSurface;
     SkCanvas* mCanvas = nullptr;

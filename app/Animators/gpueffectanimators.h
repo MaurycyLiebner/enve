@@ -2,7 +2,7 @@
 #define GPUEFFECTANIMATORS_H
 #include "Animators/dynamiccomplexanimator.h"
 #include "smartPointers/sharedpointerdefs.h"
-#include "GPUEffects/gpurastereffect.h"
+#include "GPUEffects/gpueffect.h"
 #include "GPUEffects/shadereffect.h"
 
 class BoundingBox;

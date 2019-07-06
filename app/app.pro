@@ -55,6 +55,7 @@ SOURCES += main.cpp\
     CacheHandlers/hddcachablerangecont.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/soundreader.cpp \
+    GPUEffects/customgpueffectcreator.cpp \
     GPUEffects/shadereffect.cpp \
     GPUEffects/shadereffectcreator.cpp \
     GPUEffects/shadereffectprogram.cpp \
@@ -230,7 +231,6 @@ SOURCES += main.cpp\
     colorhelpers.cpp \
     Animators/qrealanimatorcreator.cpp \
     Animators/gpueffectanimators.cpp \
-    GPUEffects/gpurastereffect.cpp \
     GPUEffects/gpupostprocessor.cpp \
     Paint/fixedtiledsurface.cpp \
     GUI/segment1deditor.cpp \
@@ -285,6 +285,7 @@ HEADERS  += \
     CacheHandlers/samples.h \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/soundreader.h \
+    GPUEffects/customgpueffectcreator.h \
     GPUEffects/shadereffect.h \
     GPUEffects/shadereffectcreator.h \
     GPUEffects/shadereffectprogram.h \
@@ -458,7 +459,6 @@ HEADERS  += \
     Animators/qrealanimatorcreator.h \
     Animators/intanimatorcreator.h \
     Animators/gpueffectanimators.h \
-    GPUEffects/gpurastereffect.h \
     GPUEffects/gpupostprocessor.h \
     Paint/fixedtiledsurface.h \
     GUI/segment1deditor.h \

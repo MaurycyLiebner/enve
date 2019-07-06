@@ -4,13 +4,12 @@
 #include "smartPointers/sharedpointerdefs.h"
 #include "typemenu.h"
 #include "PathEffects/custompatheffect.h"
-class CustomPathEffect;
 
 typedef qsptr<CustomPathEffect> (*CPathEffectCreatorNewFunc)();
 typedef qsptr<CustomPathEffect> (*CPathEffectCreatorFunc)(
         const CustomIdentifier &identifier);
 typedef QString (*CPathEffectNameFunc)();
-typedef QByteArray (*CPathEffectIdentifierFunc)();
+typedef CustomIdentifier (*CPathEffectIdentifierFunc)();
 typedef bool (*CPathEffectSupport)(const CustomIdentifier&);
 
 class CustomPathEffectCreator {

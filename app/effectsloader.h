@@ -22,6 +22,8 @@ private:
 
     void iniCustomPathEffects();
 
+    void iniCustomGpuEffects();
+
     QStringList mLoadedGREPaths;
     GLuint mPlainSquareVAO;
     GLuint mTexturedSquareVAO;

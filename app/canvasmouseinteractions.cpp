@@ -19,7 +19,7 @@
 #include <QFileDialog>
 #include "GUI/paintboxsettingsdialog.h"
 #include "GUI/customfpsdialog.h"
-#include "GPUEffects/gpurastereffect.h"
+#include "GPUEffects/gpueffect.h"
 #include "MovablePoints/smartnodepoint.h"
 #include "pointtypemenu.h"
 #include "Boxes/containerbox.h"
