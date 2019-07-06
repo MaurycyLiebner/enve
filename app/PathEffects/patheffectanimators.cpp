@@ -2,6 +2,7 @@
 #include "PathEffects/patheffect.h"
 #include "Boxes/pathbox.h"
 #include "Boxes/containerbox.h"
+#include "custompatheffectcreator.h"
 #include <QDebug>
 
 PathEffectAnimators::PathEffectAnimators() :
@@ -60,8 +61,10 @@ qsptr<PathEffect> readIdCreatePathEffect(QIODevice * const src) {
             return SPtrCreate(SpatialDisplacePathEffect)();
         case(PathEffectType::SUBDIVIDE):
             return SPtrCreate(SubdividePathEffect)();
-        case(PathEffectType::CUSTOM):
-            return nullptr;
+        case(PathEffectType::CUSTOM): {
+            const auto id = CustomPathEffect::sReadIdentifier(src);
+            return CustomPathEffectCreator::sCreateForIdentifier(id);
+        }
         default: RuntimeThrow("Invalid path effect type '" +
                               QString::number(int(type)) + "'");
     }

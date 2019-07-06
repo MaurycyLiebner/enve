@@ -38,7 +38,7 @@ public:
     QMimeData *SWT_createMimeData();
     void prp_startDragging();
 
-    void writeIdentifier(QIODevice * const dst) const;
+    virtual void writeIdentifier(QIODevice * const dst) const;
     void writeProperty(QIODevice * const dst) const;
     void readProperty(QIODevice * const src);
 
