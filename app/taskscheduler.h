@@ -17,12 +17,14 @@ public:
 
     ~Que() {
         for(const auto& cpuTask : mQued) cpuTask->cancel();
+        for(const auto& cpuTask : mGpuPreffered) cpuTask->cancel();
     }
 protected:
-    int countQued() const { return mQued.count(); }
+    int countQued() const { return mQued.count() + mGpuPreffered.count(); }
     bool allDone() const { return countQued() == 0; }
     void addTask(const stdsptr<Task>& task) {
-        mQued << task;
+        if(task->needsGpuProcessing()) mGpuPreffered << task;
+        else mQued << task;
     }
 
     stdsptr<Task> takeQuedForProcessing() {
@@ -30,10 +32,18 @@ protected:
             const auto& task = mQued.at(i);
             if(task->readyToBeProcessed()) return mQued.takeAt(i);
         }
+        for(int i = 0; i < mGpuPreffered.count(); i++) {
+            const auto& task = mGpuPreffered.at(i);
+            if(task->readyToBeProcessed()) return mGpuPreffered.takeAt(i);
+        }
         return nullptr;
     }
 
     stdsptr<Task> takeQuedForGpuProcessing() {
+        for(int i = 0; i < mGpuPreffered.count(); i++) {
+            const auto& task = mGpuPreffered.at(i);
+            if(task->readyToBeProcessed()) return mGpuPreffered.takeAt(i);
+        }
         for(int i = 0; i < mQued.count(); i++) {
             const auto& task = mQued.at(i);
             if(task->readyToBeProcessed() &&
@@ -42,6 +52,7 @@ protected:
         return nullptr;
     }
 private:
+    QList<stdsptr<Task>> mGpuPreffered;
     QList<stdsptr<Task>> mQued;
 };
 
