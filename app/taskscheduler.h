@@ -32,6 +32,15 @@ protected:
         }
         return nullptr;
     }
+
+    stdsptr<Task> takeQuedForGpuProcessing() {
+        for(int i = 0; i < mQued.count(); i++) {
+            const auto& task = mQued.at(i);
+            if(task->readyToBeProcessed() &&
+               task->canBeGpuProcessed()) return mQued.takeAt(i);
+        }
+        return nullptr;
+    }
 private:
     QList<stdsptr<Task>> mQued;
 };
@@ -44,6 +53,19 @@ public:
     void clear() {
         mQues.clear();
         mCurrentQue = nullptr;
+    }
+
+    stdsptr<Task> takeQuedForGpuProcessing() {
+        int queId = 0;
+        for(const auto& que : mQues) {
+            const auto task = que->takeQuedForGpuProcessing();
+            if(task) {
+                if(que->allDone()) queDone(que.get(), queId);
+                return task;
+            }
+            queId++;
+        }
+        return nullptr;
     }
 
     stdsptr<Task> takeQuedForProcessing() {
@@ -221,6 +243,7 @@ private:
 
     void processNextQuedHDDTask();
     void processNextQuedCPUTask();
+    void processNextQuedGPUTask();
     void processNextTasks();
 
     void tryProcessingNextQuedCPUTask();

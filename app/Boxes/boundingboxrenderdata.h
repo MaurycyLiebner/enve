@@ -11,6 +11,7 @@ class BoundingBox;
 class ShaderProgramCallerBase;
 class GPURasterEffectCaller;
 #include "smartPointers/sharedpointerdefs.h"
+#include "glhelpers.h"
 
 class RenderDataCustomizerFunctor;
 struct BoundingBoxRenderData : public Task {
@@ -30,20 +31,27 @@ protected:
 
     void scheduleTaskNow() final;
     void afterCanceled();
+
+    virtual SkColor eraseColor() const { return SK_ColorTRANSPARENT; }
 public:
     virtual QPointF getCenterPosition() {
         return fRelBoundingRect.center();
     }
 
+    virtual void processTaskWithGPU(QGL33c * const gl,
+                                    GrContext * const grContext);
     void processTask();
     void beforeProcessing() final;
     void afterProcessing() final;
     void taskQued() final;
 
     // gpu
-    bool needsGpuProcessing() const final {
+    bool needsGpuProcessing() const {
         return !fGPUEffects.isEmpty();
     }
+
+    bool canBeGpuProcessed() const { return true; }
+
     QList<stdsptr<GPURasterEffectCaller>> fGPUEffects;
     // gpu
 
@@ -106,7 +114,7 @@ public:
     }
     bool nullifyBeforeProcessing();
 protected:
-    void updateGlobalFromRelBoundingRect();
+    virtual void updateGlobalFromRelBoundingRect();
 
     void fixupGlobalBoundingRect();
 

@@ -109,9 +109,18 @@ public:
                    const sk_sp<SkImage>& img,
                    const GLuint texturedSquareVAO) :
         mGL(gl), mGrContext(grContext), mSquareVAO(texturedSquareVAO) {
-        SkPixmap pix;
-        img->peekPixels(&pix);
-        mSrcTexture.gen(gl, img->width(), img->height(), pix.addr());
+        if(img->isTextureBacked()) {
+            const auto grTex = img->getBackendTexture(true);
+            GrGLTextureInfo texInfo;
+            grTex.getGLTextureInfo(&texInfo);
+            mSrcTexture.fId = texInfo.fID;
+            mSrcTexture.fWidth = grTex.width();
+            mSrcTexture.fHeight = grTex.height();
+        } else {
+            SkPixmap pix;
+            img->peekPixels(&pix);
+            mSrcTexture.gen(gl, img->width(), img->height(), pix.addr());
+        }
     }
 
     ~GpuRenderTools() {

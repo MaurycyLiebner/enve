@@ -11,6 +11,7 @@ public:
     void setThreadsUsage(const int threads);
     void setThreadsTotal(const int threads);
     void setHddUsage(const bool used);
+    void setGpuUsage(const bool used);
     void setRamUsage(const qreal thisGB);
     void setTotalRam(const qreal totalRamGB);
 private:
@@ -18,6 +19,7 @@ private:
 
     int mThreadsUsage = 0;
     int mThreadsTotal = 0;
+    bool mGpuUsage = false;
     bool mHddUsage = false;
     qreal mRamUsage = 0;
     qreal mTotalRam = 0;

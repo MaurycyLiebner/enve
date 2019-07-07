@@ -29,7 +29,11 @@ void BoxRenderDataScheduledPostProcess::process(
     if(!initializeOpenGLFunctions())
         RuntimeThrow("Initializing GL functions failed.");
     auto& srcImage = mBoxData->fRenderedImage;
-    if(!srcImage) return;
+    if(!srcImage) mBoxData->processTaskWithGPU(this, grContext);
+    if(mBoxData->fGPUEffects.isEmpty()) {
+        srcImage = srcImage->makeRasterImage();
+        return;
+    }
     const int srcWidth = srcImage->width();
     const int srcHeight = srcImage->height();
     const QPointF gPos = mBoxData->fGlobalBoundingRect.topLeft();

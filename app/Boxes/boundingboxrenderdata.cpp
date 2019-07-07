@@ -66,6 +66,44 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) 
     canvas->drawImage(fRenderedImage, fDrawPos.x(), fDrawPos.y(), &paint);
 }
 
+void BoundingBoxRenderData::processTaskWithGPU(QGL33c * const gl,
+                                               GrContext * const grContext) {
+    updateGlobalFromRelBoundingRect();
+    if(fOpacity < 0.001) return;
+
+    const int width = qCeil(fGlobalBoundingRect.width());
+    const int height = qCeil(fGlobalBoundingRect.height());
+    //const auto info = SkiaHelpers::getPremulBGRAInfo(width, height);
+//    Texture tex;
+//    tex.gen(gl, width, height, nullptr);
+//    GrGLTextureInfo texInfo;
+//    texInfo.fID = tex.fId;
+//    texInfo.fFormat = GR_GL_RGBA8;
+//    texInfo.fTarget = GR_GL_TEXTURE_2D;
+    const auto grTex = grContext->createBackendTexture(
+                width, height, kRGBA_8888_SkColorType,
+                GrMipMapped::kNo, GrRenderable::kYes);
+//    const auto grTex = GrBackendTexture(tex.fWidth, tex.fHeight,
+//                                        GrMipMapped::kNo, texInfo);
+    const auto surf = SkSurface::MakeFromBackendTexture(
+                grContext, grTex, kTopLeft_GrSurfaceOrigin, 0,
+                kRGBA_8888_SkColorType, nullptr, nullptr);
+
+    const auto canvas = surf->getCanvas();
+    transformRenderCanvas(*canvas);
+    canvas->clear(eraseColor());
+    drawSk(canvas);
+    canvas->flush();
+    fRenderedImage = SkImage::MakeFromAdoptedTexture(grContext, grTex,
+                                                     kTopLeft_GrSurfaceOrigin,
+                                                     kRGBA_8888_SkColorType);
+//    GrGLTextureInfo info;
+//    grTex.getGLTextureInfo(&info);
+//    info.fID;
+//    fRenderedImage = tex.toImage(gl);
+//    tex.clear(gl);
+}
+
 void BoundingBoxRenderData::processTask() {
     updateGlobalFromRelBoundingRect();
     if(fOpacity < 0.001) return;
@@ -74,7 +112,7 @@ void BoundingBoxRenderData::processTask() {
                 qCeil(fGlobalBoundingRect.width()),
                 qCeil(fGlobalBoundingRect.height()));
     fBitmapTMP.allocPixels(info);
-    fBitmapTMP.eraseColor(SK_ColorTRANSPARENT);
+    fBitmapTMP.eraseColor(eraseColor());
 
     SkCanvas canvas(fBitmapTMP);
     transformRenderCanvas(canvas);

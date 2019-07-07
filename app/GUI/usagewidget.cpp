@@ -22,6 +22,11 @@ void UsageWidget::setThreadsTotal(const int threads) {
     updateDisplayedText();
 }
 
+void UsageWidget::setGpuUsage(const bool used) {
+    mGpuUsage = used;
+    updateDisplayedText();
+}
+
 void UsageWidget::setHddUsage(const bool used) {
     mHddUsage = used;
     updateDisplayedText();
@@ -43,10 +48,12 @@ void UsageWidget::setTotalRam(const qreal totalRamGB) {
 
 void UsageWidget::updateDisplayedText() {
     QLocale locale;
+    const int gpuPer = mGpuUsage ? 100 : 0;
     const int cpuPer = qRound(mThreadsUsage*100./mThreadsTotal);
     const int hddPer = mHddUsage ? 100 : 0;
     const int ramPer = qRound(mRamUsage*100./mTotalRam);
-    setText("cpu: " + locale.toString(cpuPer) + "%     " +
+    setText("gpu: " + locale.toString(gpuPer) + "%     " +
+            "cpu: " + locale.toString(cpuPer) + "%     " +
             "hdd: " + locale.toString(hddPer) + "%     " +
             "ram: " + locale.toString(ramPer) + "%");
 //            locale.toString(mRamUsage, 'f', 1) + " GB / " +

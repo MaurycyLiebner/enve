@@ -3,12 +3,14 @@
 #include "layerboxrenderdata.h"
 struct CanvasRenderData : public ContainerBoxRenderData {
     CanvasRenderData(BoundingBox * const parentBoxT);
-    void processTask();
-    qreal fCanvasWidth;
-    qreal fCanvasHeight;
+
+    int fCanvasWidth;
+    int fCanvasHeight;
     SkColor fBgColor;
+
+    virtual SkColor eraseColor() const { return fBgColor; }
 protected:
-    void drawSk(SkCanvas * const canvas);
+    void updateGlobalFromRelBoundingRect();
     void updateRelBoundingRect();
 };
 

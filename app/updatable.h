@@ -35,6 +35,7 @@ public:
 
     virtual void processTask() = 0;
     virtual bool needsGpuProcessing() const { return false; }
+    virtual bool canBeGpuProcessed() const { return false; }
     virtual void taskQued() { mState = QUED; }
 
     bool scheduleTask();

@@ -5,50 +5,12 @@
 CanvasRenderData::CanvasRenderData(BoundingBox * const parentBoxT) :
     ContainerBoxRenderData(parentBoxT) {}
 
-void CanvasRenderData::processTask() {
-    const auto info = SkiaHelpers::getPremulBGRAInfo(
-                qCeil(fCanvasWidth), qCeil(fCanvasHeight));
-    fBitmapTMP.allocPixels(info);
-    fBitmapTMP.eraseColor(fBgColor);
-    SkCanvas rasterCanvas(fBitmapTMP);
-    //rasterCanvas->clear(bgColor);
-
-    drawSk(&rasterCanvas);
-    rasterCanvas.flush();
-
-    if(!fRasterEffects.isEmpty()) {
-        uint8_t* src = static_cast<uint8_t*>(fBitmapTMP.getPixels());
-        const int iMax = fBitmapTMP.width()*fBitmapTMP.height();
-        for(int i = 0; i < iMax; i++) {
-            const uint8_t newAlpha = 255 - *src;
-            *(src++) = 0;
-            *(src++) = 0;
-            *(src++) = 0;
-            *(src++) = newAlpha;
-        }
-
-        for(const auto& effect : fRasterEffects) {
-            effect->applyEffectsSk(fBitmapTMP, fResolution);
-        }
-        clearPixmapEffects();
-
-        rasterCanvas.drawColor(SK_ColorWHITE, SkBlendMode::kDstOver);
-    }
-
-    fRenderedImage = SkiaHelpers::transferDataToSkImage(fBitmapTMP);
-}
-
-void CanvasRenderData::drawSk(SkCanvas * const canvas) {
-    canvas->save();
-
-    canvas->scale(toSkScalar(fResolution), toSkScalar(fResolution));
-    for(const auto &renderData : fChildrenRenderData) {
-        canvas->save();
-        renderData->drawRenderedImageForParent(canvas);
-        canvas->restore();
-    }
-
-    canvas->restore();
+void CanvasRenderData::updateGlobalFromRelBoundingRect() {
+    fResolutionScale.reset();
+    fResolutionScale.scale(fResolution, fResolution);
+    fScaledTransform = fResolutionScale;
+    fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
+    fixupGlobalBoundingRect();
 }
 
 void CanvasRenderData::updateRelBoundingRect() {

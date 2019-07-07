@@ -186,9 +186,23 @@ void TaskScheduler::processNextQuedHDDTask() {
 
 void TaskScheduler::processNextTasks() {
     processNextQuedHDDTask();
+    processNextQuedGPUTask();
     processNextQuedCPUTask();
     if(shouldQueMoreCPUTasks() || shouldQueMoreHDDTasks())
         callFreeThreadsForCPUTasksAvailableFunc();
+}
+
+void TaskScheduler::processNextQuedGPUTask() {
+    if(!mGpuPostProcessor.hasFinished()) return;
+    const auto task = mQuedCPUTasks.takeQuedForGpuProcessing();
+    if(task) {
+        task->aboutToProcess();
+        scheduleGPUTask(SPtrCreate(BoxRenderDataScheduledPostProcess)(
+                            GetAsSPtr(task, BoundingBoxRenderData)));
+    }
+    const auto usageWidget = MainWindow::getInstance()->getUsageWidget();
+    if(!usageWidget) return;
+    usageWidget->setGpuUsage(!mGpuPostProcessor.hasFinished());
 }
 
 void TaskScheduler::afterCPUTaskFinished(

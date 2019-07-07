@@ -423,8 +423,8 @@ public:
         ContainerBox::setupRenderData(relFrame, data);
         auto canvasData = GetAsPtr(data, CanvasRenderData);
         canvasData->fBgColor = toSkColor(mBackgroundColor->getColor());
-        canvasData->fCanvasHeight = mHeight*mResolutionFraction;
-        canvasData->fCanvasWidth = mWidth*mResolutionFraction;
+        canvasData->fCanvasHeight = mHeight;
+        canvasData->fCanvasWidth = mWidth;
     }
 
     bool clipToCanvas() { return mClipToCanvasSize; }
