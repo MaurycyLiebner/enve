@@ -185,105 +185,105 @@ void Canvas::renderSk(SkCanvas * const canvas,
             mCurrentPreviewContainer->drawSk(canvas, grContext);
             canvas->restore();
         }
+        return;
+    }
+    canvas->save();
+    if(mClipToCanvasSize) {
+        canvas->clear(SK_ColorBLACK);
+        canvas->clipRect(canvasRect);
     } else {
-        canvas->save();
-        if(mClipToCanvasSize) {
-            canvas->clear(SK_ColorBLACK);
-            canvas->clipRect(canvasRect);
+        canvas->clear(SkColorSetARGB(255, 70, 70, 70));
+        paint.setColor(SK_ColorBLACK);
+        paint.setStyle(SkPaint::kStroke_Style);
+        paint.setPathEffect(dashPathEffect);
+        canvas->drawRect(toSkRect(getMaxBoundsRect()), paint);
+    }
+    const bool drawCanvas = mCurrentPreviewContainer &&
+            !mCurrentPreviewContainerOutdated;
+    if(bgColor.alpha() != 255)
+        drawTransparencyMesh(canvas, canvasRect);
+
+    if(!mClipToCanvasSize || !drawCanvas) {
+        if(bgColor.alpha() == 255 &&
+           skViewTrans.mapRect(canvasRect).contains(toSkRect(drawRect))) {
+            canvas->clear(toSkColor(bgColor));
         } else {
-            canvas->clear(SkColorSetARGB(255, 70, 70, 70));
-            paint.setColor(SK_ColorBLACK);
+            paint.setStyle(SkPaint::kFill_Style);
+            paint.setColor(toSkColor(bgColor));
+            canvas->drawRect(canvasRect, paint);
+        }
+        canvas->saveLayer(nullptr, nullptr);
+        for(const auto& box : mContainedBoxes) {
+            if(box->isVisibleAndInVisibleDurationRect())
+                box->drawPixmapSk(canvas, grContext);
+        }
+        canvas->restore();
+    } else if(drawCanvas) {
+        canvas->save();
+        canvas->scale(reversedRes, reversedRes);
+        mCurrentPreviewContainer->drawSk(canvas, grContext);
+        canvas->restore();
+    }
+
+    canvas->restore();
+
+    if(!mCurrentContainer->SWT_isCanvas())
+        mCurrentContainer->drawBoundingRect(canvas, invZoom);
+    if(!mPaintTarget.isValid()) {
+        for(const auto& box : mSelectedBoxes) {
+            canvas->save();
+            box->drawBoundingRect(canvas, invZoom);
+            box->drawAllCanvasControls(canvas, mCurrentMode, invZoom);
+            canvas->restore();
+        }
+    }
+
+    if(mCurrentMode == CanvasMode::MOVE_BOX ||
+       mCurrentMode == CanvasMode::MOVE_POINT) {
+        if(mTransMode == MODE_ROTATE || mTransMode == MODE_SCALE) {
+            mRotPivot->drawTransforming(canvas, mCurrentMode, invZoom,
+                                        MIN_WIDGET_DIM*0.25f*invZoom);
+        } else if(!mouseGrabbing || mRotPivot->isSelected()) {
+            mRotPivot->drawSk(canvas, mCurrentMode, invZoom, false);
+        }
+    }
+
+    if(mPaintTarget.isValid()) {
+        mPaintTarget.draw(canvas, viewTrans, drawRect);
+    } else {
+        if(mSelecting) {
             paint.setStyle(SkPaint::kStroke_Style);
             paint.setPathEffect(dashPathEffect);
-            canvas->drawRect(toSkRect(getMaxBoundsRect()), paint);
-        }
-        const bool drawCanvas = mCurrentPreviewContainer &&
-                !mCurrentPreviewContainerOutdated;
-        if(bgColor.alpha() != 255)
-            drawTransparencyMesh(canvas, canvasRect);
-
-        if(!mClipToCanvasSize || !drawCanvas) {
-            if(bgColor.alpha() == 255 &&
-               skViewTrans.mapRect(canvasRect).contains(toSkRect(drawRect))) {
-                canvas->clear(toSkColor(bgColor));
-            } else {
-                paint.setStyle(SkPaint::kFill_Style);
-                paint.setColor(toSkColor(bgColor));
-                canvas->drawRect(canvasRect, paint);
-            }
-            canvas->saveLayer(nullptr, nullptr);
-            for(const auto& box : mContainedBoxes) {
-                if(box->isVisibleAndInVisibleDurationRect())
-                    box->drawPixmapSk(canvas, grContext);
-            }
-            canvas->restore();
-        } else if(drawCanvas) {
-            canvas->save();
-            canvas->scale(reversedRes, reversedRes);
-            mCurrentPreviewContainer->drawSk(canvas, grContext);
-            canvas->restore();
+            paint.setStrokeWidth(2*invZoom);
+            paint.setColor(SkColorSetARGB(255, 0, 55, 255));
+            canvas->drawRect(toSkRect(mSelectionRect), paint);
+            paint.setStrokeWidth(invZoom);
+            paint.setColor(SkColorSetARGB(255, 150, 150, 255));
+            canvas->drawRect(toSkRect(mSelectionRect), paint);
+            //paint.setPathEffect(nullptr);
         }
 
-        canvas->restore();
-
-        if(!mCurrentContainer->SWT_isCanvas())
-            mCurrentContainer->drawBoundingRect(canvas, invZoom);
-        if(!mPaintTarget.isValid()) {
-            for(const auto& box : mSelectedBoxes) {
-                canvas->save();
-                box->drawBoundingRect(canvas, invZoom);
-                box->drawAllCanvasControls(canvas, mCurrentMode, invZoom);
-                canvas->restore();
+        if(mHoveredPoint_d) {
+            mHoveredPoint_d->drawHovered(canvas, invZoom);
+        } else if(mHoveredNormalSegment.isValid()) {
+            mHoveredNormalSegment.drawHoveredSk(canvas, invZoom);
+        } else if(mHoveredBox) {
+            if(!mCurrentNormalSegment.isValid()) {
+                mHoveredBox->drawHoveredSk(canvas, invZoom);
             }
         }
-
-        if(mCurrentMode == CanvasMode::MOVE_BOX ||
-           mCurrentMode == CanvasMode::MOVE_POINT) {
-            if(mTransMode == MODE_ROTATE || mTransMode == MODE_SCALE) {
-                mRotPivot->drawTransforming(canvas, mCurrentMode, invZoom,
-                                            MIN_WIDGET_DIM*0.25f*invZoom);
-            } else if(!mouseGrabbing || mRotPivot->isSelected()) {
-                mRotPivot->drawSk(canvas, mCurrentMode, invZoom, false);
-            }
-        }
-
-        if(mPaintTarget.isValid()) {
-            mPaintTarget.draw(canvas, viewTrans, drawRect);
-        } else {
-            if(mSelecting) {
-                paint.setStyle(SkPaint::kStroke_Style);
-                paint.setPathEffect(dashPathEffect);
-                paint.setStrokeWidth(2*invZoom);
-                paint.setColor(SkColorSetARGB(255, 0, 55, 255));
-                canvas->drawRect(toSkRect(mSelectionRect), paint);
-                paint.setStrokeWidth(invZoom);
-                paint.setColor(SkColorSetARGB(255, 150, 150, 255));
-                canvas->drawRect(toSkRect(mSelectionRect), paint);
-                //paint.setPathEffect(nullptr);
-            }
-
-            if(mHoveredPoint_d) {
-                mHoveredPoint_d->drawHovered(canvas, invZoom);
-            } else if(mHoveredNormalSegment.isValid()) {
-                mHoveredNormalSegment.drawHoveredSk(canvas, invZoom);
-            } else if(mHoveredBox) {
-                if(!mCurrentNormalSegment.isValid()) {
-                    mHoveredBox->drawHoveredSk(canvas, invZoom);
-                }
-            }
-        }
-
-        paint.setStyle(SkPaint::kStroke_Style);
-        paint.setStrokeWidth(invZoom);
-        paint.setColor(mClipToCanvasSize ? SK_ColorGRAY : SK_ColorBLACK);
-        paint.setPathEffect(nullptr);
-        canvas->drawRect(canvasRect, paint);
-
-        canvas->resetMatrix();
-
-        if(mTransMode != MODE_NONE || mValueInput.inputEnabled())
-            mValueInput.draw(canvas, drawRect.height() - MIN_WIDGET_DIM);
     }
+
+    paint.setStyle(SkPaint::kStroke_Style);
+    paint.setStrokeWidth(invZoom);
+    paint.setColor(mClipToCanvasSize ? SK_ColorGRAY : SK_ColorBLACK);
+    paint.setPathEffect(nullptr);
+    canvas->drawRect(canvasRect, paint);
+
+    canvas->resetMatrix();
+
+    if(mTransMode != MODE_NONE || mValueInput.inputEnabled())
+        mValueInput.draw(canvas, drawRect.height() - MIN_WIDGET_DIM);
 }
 
 void Canvas::setFrameRange(const FrameRange &range) {
