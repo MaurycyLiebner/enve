@@ -16,7 +16,8 @@ public:
     ScheduledPostProcess();
 protected:
     virtual void afterProcessed() {}
-    virtual void process(const GLuint texturedSquareVAO) = 0;
+    virtual void process(GrContext * const grContext,
+                         const GLuint texturedSquareVAO) = 0;
 private:
     bool unhandledException() const {
         return static_cast<bool>(mUpdateException);
@@ -49,7 +50,8 @@ public:
             const stdsptr<BoundingBoxRenderData> &boxData);
 protected:
     void afterProcessed();
-    void process(const GLuint texturedSquareVAO);
+    void process(GrContext * const grContext,
+                 const GLuint texturedSquareVAO);
 private:
     const stdsptr<BoundingBoxRenderData> mBoxData;
 };
@@ -117,6 +119,11 @@ protected:
         if(_mHandledProcesses.isEmpty()) return;
         makeCurrent();
         if(!mInitialized) {
+            mInterface = GrGLMakeNativeInterface();
+            if(!mInterface) RuntimeThrow("Failed to make native interface.");
+            mGrContext = GrContext::MakeGL(mInterface);
+            if(!mGrContext) RuntimeThrow("Failed to make GrContext.");
+
             iniTexturedVShaderVAO(this, _mTextureSquareVAO);
             mInitialized = true;
 
@@ -127,7 +134,7 @@ protected:
 
         for(const auto& scheduled : _mHandledProcesses) {
             try {
-                scheduled->process(_mTextureSquareVAO);
+                scheduled->process(mGrContext.get(), _mTextureSquareVAO);
             } catch(...) {
                 scheduled->setException(std::current_exception());
             }
@@ -147,6 +154,8 @@ protected:
         return exc;
     }
 
+    sk_sp<const GrGLInterface> mInterface;
+    sk_sp<GrContext> mGrContext;
     std::exception_ptr mProcessException;
     bool mFinished = true;
     bool mInitialized = false;

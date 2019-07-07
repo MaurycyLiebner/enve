@@ -24,6 +24,7 @@ void BoxRenderDataScheduledPostProcess::afterProcessed() {
 }
 
 void BoxRenderDataScheduledPostProcess::process(
+        GrContext* const grContext,
         const GLuint texturedSquareVAO) {
     if(!initializeOpenGLFunctions())
         RuntimeThrow("Initializing GL functions failed.");
@@ -46,7 +47,8 @@ void BoxRenderDataScheduledPostProcess::process(
     engine.evaluate("_gPos = [" + QString::number(gPos.x()) + "," +
                     QString::number(gPos.y()) + "]");
 
-    GpuRenderTools renderTools(this, srcImage, texturedSquareVAO);
+    GpuRenderTools renderTools(this, grContext,
+                               srcImage, texturedSquareVAO);
     auto& effects = mBoxData->fGPUEffects;
     for(const auto& effect : mBoxData->fGPUEffects) {
         effect->render(this, renderTools, renderData);

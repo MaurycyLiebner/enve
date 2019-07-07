@@ -121,6 +121,7 @@ void GLWindow::paintGL() {
     renderSk(mCanvas, mGrContext.get());
     mCanvas->flush();
 }
+
 void GLWindow::showEvent(QShowEvent *e) {
     resizeGL(width(), height());
     updateFix();

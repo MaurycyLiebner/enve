@@ -41,7 +41,7 @@ bool supports(const CustomIdentifier &identifier) {
 #include "Animators/qrealanimator.h"
 ExampleGpuEffect000::ExampleGpuEffect000() :
     CustomGpuEffect(effectName().toLower()) {
-    mRadius = SPtrCreate(QrealAnimator)(5, 0, 500, 1, "radius");
+    mRadius = SPtrCreate(QrealAnimator)(10, 0, 999.999, 1, "radius");
     ca_addChildAnimator(mRadius);
 }
 
@@ -66,12 +66,12 @@ void ExampleGpuEffectCaller000::render(QGL33c * const gl,
     Q_UNUSED(gl);
     Q_UNUSED(data);
     const auto canvas = renderTools.requestTargetCanvas();
-//    canvas->clear(SK_ColorRED);
+    const auto srcTex = renderTools.requestSrcTextureImageWrapper();
+
     canvas->clear(SK_ColorTRANSPARENT);
     SkPaint paint;
     const auto filter = SkBlurImageFilter::Make(mSigma, mSigma, nullptr);
     paint.setImageFilter(filter);
-    const auto srcTex = renderTools.requestSrcTextureImageWrapper();
     canvas->drawImage(srcTex, 0, 0, &paint);
     canvas->flush();
 }

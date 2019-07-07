@@ -104,9 +104,11 @@ struct GpuRenderData {
 
 class GpuRenderTools {
 public:
-    GpuRenderTools(QGL33c* const gl, const sk_sp<SkImage>& img,
+    GpuRenderTools(QGL33c* const gl,
+                   GrContext* const grContext,
+                   const sk_sp<SkImage>& img,
                    const GLuint texturedSquareVAO) :
-        mGL(gl), mSquareVAO(texturedSquareVAO) {
+        mGL(gl), mGrContext(grContext), mSquareVAO(texturedSquareVAO) {
         SkPixmap pix;
         img->peekPixels(&pix);
         mSrcTexture.gen(gl, img->width(), img->height(), pix.addr());
@@ -129,11 +131,6 @@ public:
     //! If there is no SkCanvas new SkCanvas is created.
     SkCanvas* requestTargetCanvas() {
         if(!mCanvas) {
-            mInterface = GrGLMakeNativeInterface();
-            if(!mInterface) RuntimeThrow("Failed to make native interface.");
-            mGrContext = GrContext::MakeGL(mInterface);
-            if(!mGrContext) RuntimeThrow("Failed to make GrContext.");
-
 //            GrGLTextureInfo texInfo;
 //            texInfo.fID = mSrcTexture.fId;
 //            texInfo.fFormat = GR_GL_RGBA8;
@@ -152,7 +149,7 @@ public:
                                                      mTargetTextureFbo.fHeight,
                                                      0, 8, fboInfo);
             mSurface = SkSurface::MakeFromBackendRenderTarget(
-                        mGrContext.get(),
+                        mGrContext,
                         grFbo, kBottomLeft_GrSurfaceOrigin,
                         kRGBA_8888_SkColorType, nullptr, nullptr);
             if(!mSurface) RuntimeThrow("Failed to make SkSurface.");
@@ -175,7 +172,7 @@ public:
     }
 
     sk_sp<SkImage> requestSrcTextureImageWrapper() {
-        return SkImage::MakeFromTexture(mGrContext.get(),
+        return SkImage::MakeFromTexture(mGrContext,
                                         sourceBackedTexture(),
                                         kBottomLeft_GrSurfaceOrigin,
                                         kRGBA_8888_SkColorType,
@@ -196,13 +193,12 @@ private:
     }
 
     QGL33c* const mGL;
+    GrContext* const mGrContext;
     const GLuint mSquareVAO;
 
     Texture mSrcTexture;
     TextureFrameBuffer mTargetTextureFbo;
 
-    sk_sp<const GrGLInterface> mInterface;
-    sk_sp<GrContext> mGrContext;
     sk_sp<SkSurface> mSurface;
     SkCanvas* mCanvas = nullptr;
 };
