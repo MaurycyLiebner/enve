@@ -5,7 +5,7 @@
 #include "CacheHandlers/soundcachecontainer.h"
 #include "FileCacheHandlers/audiostreamsdata.h"
 #include "FileCacheHandlers/soundreader.h"
-class SoundCacheHandler;
+class SoundHandler;
 class SingleSound;
 
 class SoundCacheHandler : public FileDataCacheHandler {
@@ -14,6 +14,58 @@ class SoundCacheHandler : public FileDataCacheHandler {
 public:
     void clearCache() {}
     void replace() {}
+    void afterPathChanged();
+
+    const HDDCachableCacheHandler& getCacheHandler() const {
+        return mSecondsCache;
+    }
+
+    void addSecondReader(const int secondId,
+                         const stdsptr<SoundReaderForMerger>& reader) {
+        mSecondsBeingRead << secondId;
+        mSecondReaders << reader;
+    }
+
+    stdsptr<Samples> getSamplesForSecond(const int secondId) {
+        const auto cont = mSecondsCache.atFrame
+                <SoundCacheContainer>(secondId);
+        if(!cont) return nullptr;
+        return cont->getSamples();
+    }
+
+    SoundReaderForMerger * getSecondReader(const int second) {
+        const int id = mSecondsBeingRead.indexOf(second);
+        if(id >= 0) return mSecondReaders.at(id).get();
+        return nullptr;
+    }
+
+    void removeSecondReader(const int second) {
+        const int id = mSecondsBeingRead.indexOf(second);
+        mSecondsBeingRead.removeAt(id);
+        mSecondReaders.removeAt(id);
+    }
+
+    void secondReaderFinished(const int secondId,
+                             const stdsptr<Samples>& samples) {
+        mSecondsCache.add(SPtrCreate(SoundCacheContainer)(
+                              samples, iValueRange{secondId, secondId},
+                              &mSecondsCache));
+    }
+private:
+    QList<SoundHandler*> mSoundHandlers;
+    QList<int> mSecondsBeingRead;
+    QList<stdsptr<SoundReaderForMerger>> mSecondReaders;
+    HDDCachableCacheHandler mSecondsCache;
+};
+
+class SoundHandler : public StdSelfRef {
+    typedef stdsptr<SoundCacheContainer> stdptrSCC;
+    friend class StdSelfRef;
+public:
+    SoundHandler(SoundCacheHandler* const dataHandler) :
+        mDataHandler(dataHandler) {
+        openAudioStream();
+    }
 
     void afterPathChanged() {
         openAudioStream();
@@ -28,9 +80,7 @@ public:
     }
 
     SoundReaderForMerger * getSecondReader(const int second) {
-        const int id = mSecondsBeingRead.indexOf(second);
-        if(id >= 0) return mSecondReaders.at(id).get();
-        return nullptr;
+        return mDataHandler->getSecondReader(second);
     }
 
     SoundReaderForMerger * addSecondReader(const int secondId);
@@ -40,26 +90,29 @@ public:
         return mAudioStreamsData->fDurationSec;
     }
 
+    SoundCacheHandler* getDataHandler() const {
+        return mDataHandler;
+    }
     const HDDCachableCacheHandler& getCacheHandler() const {
-        return mSecondsCache;
+        return mDataHandler->getCacheHandler();
+    }
+
+    const QString& getFilePath() const {
+        return mDataHandler->getFilePath();
     }
 protected:
     void removeSecondReader(const int second) {
-        const int id = mSecondsBeingRead.indexOf(second);
-        mSecondsBeingRead.removeAt(id);
-        mSecondReaders.removeAt(id);
+        mDataHandler->removeSecondReader(second);
     }
-
 private:
     void openAudioStream() {
-        mAudioStreamsData = AudioStreamsData::sOpen(mFilePath);
+        const auto filePath = mDataHandler->getFilePath();
+        mAudioStreamsData = AudioStreamsData::sOpen(filePath);
     }
 
-    QList<int> mSecondsBeingRead;
-    QList<stdsptr<SoundReaderForMerger>> mSecondReaders;
+    SoundCacheHandler* const mDataHandler;
     stdsptr<AudioStreamsData> mAudioStreamsData;
 
-    HDDCachableCacheHandler mSecondsCache;
 };
 
 #endif // SOUNDCACHEHANDLER_H

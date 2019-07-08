@@ -2,35 +2,29 @@
 #include "FileCacheHandlers/soundreader.h"
 #include "Sound/singlesound.h"
 
-stdsptr<Samples> SoundCacheHandler::getSamplesForSecond(const int secondId) {
-    const auto cont = mSecondsCache.atFrame
-            <SoundCacheContainer>(secondId);
-    if(!cont) return nullptr;
-    return cont->getSamples();
+stdsptr<Samples> SoundHandler::getSamplesForSecond(const int secondId) {
+    return mDataHandler->getSamplesForSecond(secondId);
 }
 
-void SoundCacheHandler::secondReaderFinished(
+void SoundHandler::secondReaderFinished(
         const int secondId,
         const stdsptr<Samples>& samples) {
-    if(samples) {
-        mSecondsCache.add(SPtrCreate(SoundCacheContainer)(
-                              samples, iValueRange{secondId, secondId},
-                              &mSecondsCache));
-    }
+    if(samples) mDataHandler->secondReaderFinished(secondId, samples);
     removeSecondReader(secondId);
 }
 
-SoundReaderForMerger *SoundCacheHandler::addSecondReader(
-        const int secondId) {
-    if(mSecondsBeingRead.contains(secondId) ||
-       getSamplesForSecond(secondId))
-        RuntimeThrow("Trying to unnecessarily reload video frame");
-    mSecondsBeingRead << secondId;
-    const int sR = 44100;
-    const SampleRange& range = {secondId*sR, (secondId + 1)*sR - 1};
+SoundReaderForMerger *SoundHandler::addSecondReader(const int secondId) {
+    const SampleRange& range = {secondId*SOUND_SAMPLERATE,
+                                (secondId + 1)*SOUND_SAMPLERATE - 1};
     const auto reader = SPtrCreate(SoundReaderForMerger)(
                 this, mAudioStreamsData, secondId, range);
-    mSecondReaders << reader;
+    mDataHandler->addSecondReader(secondId, reader);
     reader->scheduleTask();
     return reader.get();
+}
+
+void SoundCacheHandler::afterPathChanged() {
+    for(const auto& handler : mSoundHandlers) {
+        handler->afterPathChanged();
+    }
 }

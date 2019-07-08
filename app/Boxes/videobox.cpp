@@ -95,7 +95,6 @@ void VideoBox::setFilePath(const QString &path) {
                     &newDataHandler->getCacheHandler());
     } else {
         getAnimationDurationRect()->setRasterCacheHandler(nullptr);
-
     }
 
     reloadCacheHandler();

@@ -70,9 +70,9 @@ void VideoFrameHandler::removeFrameLoader(const int frame) {
 }
 
 void VideoFrameHandler::openVideoStream() {
-    mVideoStreamsData = VideoStreamsData::sOpen(
-                    mDataHandler->getFilePath());
-        mDataHandler->setFrameCount(mVideoStreamsData->fFrameCount);
+    const auto filePath = mDataHandler->getFilePath();
+    mVideoStreamsData = VideoStreamsData::sOpen(filePath);
+    mDataHandler->setFrameCount(mVideoStreamsData->fFrameCount);
 }
 
 Task* VideoFrameHandler::scheduleFrameLoad(const int frame) {
@@ -99,8 +99,6 @@ void VideoFrameHandler::reload() {
 void VideoFrameHandler::afterPathChanged() {
     openVideoStream();
 }
-
-VideoFrameCacheHandler::VideoFrameCacheHandler() {}
 
 void VideoFrameCacheHandler::clearCache() {
     mFramesCache.clear();

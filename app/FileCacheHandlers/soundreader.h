@@ -12,13 +12,13 @@ extern "C" {
     #include <libavutil/imgutils.h>
 }
 
-class SoundCacheHandler;
+class SoundHandler;
 struct AudioStreamsData;
 
 class SoundReader : public HDDTask {
     friend class StdSelfRef;
 protected:
-    SoundReader(SoundCacheHandler * const cacheHandler,
+    SoundReader(SoundHandler * const cacheHandler,
                 const stdsptr<AudioStreamsData>& openedAudio,
                 const int secondId, const SampleRange& sampleRange) :
         mCacheHandler(cacheHandler), mOpenedAudio(openedAudio),
@@ -37,7 +37,7 @@ protected:
 private:
     void readFrame();
 
-    SoundCacheHandler * const mCacheHandler;
+    SoundHandler * const mCacheHandler;
     const stdsptr<AudioStreamsData> mOpenedAudio;
     const int mSecondId;
     const SampleRange mSampleRange;
@@ -54,7 +54,7 @@ class SoundReaderForMerger : public SoundReader {
         qreal fSpeed;
     };
 protected:
-    SoundReaderForMerger(SoundCacheHandler * const cacheHandler,
+    SoundReaderForMerger(SoundHandler * const cacheHandler,
                          const stdsptr<AudioStreamsData>& openedAudio,
                          const int secondId, const SampleRange& sampleRange) :
         SoundReader(cacheHandler, openedAudio, secondId, sampleRange) {}

@@ -3,7 +3,7 @@
 #include "Animators/staticcomplexanimator.h"
 #include "Animators/qrealanimator.h"
 class FixedLenAnimationRect;
-class SoundCacheHandler;
+class SoundHandler;
 class Samples;
 class SoundReaderForMerger;
 class HDDCachableCacheHandler;
@@ -83,7 +83,7 @@ private:
 
     bool mEnabled = true;
     qreal mStretch = 1;
-    SoundCacheHandler* mCacheHandler;
+    stdsptr<SoundHandler> mCacheHandler;
     qsptr<FixedLenAnimationRect> mDurationRectangle;
 
     qsptr<QrealAnimator> mVolumeAnimator =

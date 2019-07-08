@@ -9,7 +9,7 @@ class VideoFrameHandler;
 
 class VideoFrameCacheHandler : public FileDataCacheHandler {
 public:
-    VideoFrameCacheHandler();
+    VideoFrameCacheHandler() {}
 
     void clearCache();
     void replace();
@@ -17,18 +17,11 @@ public:
 
     const HDDCachableCacheHandler& getCacheHandler() const;
 
-    void addFrameLoader(const int frameId,
-                        const stdsptr<VideoFrameLoader>& loader);
-
+    void addFrameLoader(const int frameId, const stdsptr<VideoFrameLoader>& loader);
     VideoFrameLoader * getFrameLoader(const int frame) const;
-
     void removeFrameLoader(const int frame);
-
-    void frameLoaderFinished(const int frame,
-                             const sk_sp<SkImage>& image);
-
+    void frameLoaderFinished(const int frame, const sk_sp<SkImage>& image);
     Task* scheduleFrameHddCacheLoad(const int frame);
-
     sk_sp<SkImage> getFrameAtFrame(const int relFrame) const;
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame) const;
     int getFrameCount() const;
@@ -55,21 +48,15 @@ public:
 
     void afterPathChanged();
 
-    void frameLoaderFinished(const int frame,
-                             const sk_sp<SkImage>& image);
+    void frameLoaderFinished(const int frame, const sk_sp<SkImage>& image);
     void frameLoaderCanceled(const int frameId);
 
     VideoFrameCacheHandler* getDataHandler() const;
-
     const HDDCachableCacheHandler& getCacheHandler() const;
 protected:
     VideoFrameLoader * getFrameLoader(const int frame);
-
     VideoFrameLoader * addFrameLoader(const int frameId);
-
-    VideoFrameLoader * addFrameLoader(const int frameId,
-                                      AVFrame * const frame);
-
+    VideoFrameLoader * addFrameLoader(const int frameId, AVFrame * const frame);
     void removeFrameLoader(const int frame);
 
     void openVideoStream();
