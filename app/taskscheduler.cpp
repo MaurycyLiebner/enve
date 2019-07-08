@@ -210,7 +210,7 @@ void TaskScheduler::afterCPUTaskFinished(
         ExecController * const controller) {
     mFreeCPUExecs << static_cast<CPUExecController*>(controller);
     if(task->getState() != Task::CANCELED) {
-        if(task->needsGpuProcessing()) {
+        if(task->gpuProcessingPreferred()) {
             const auto sTask = GetAsSPtr(task, BoundingBoxRenderData);
             const auto gpuProcess = SPtrCreate(BoxRenderDataScheduledPostProcess)(sTask);
             scheduleGPUTask(gpuProcess);
@@ -225,7 +225,7 @@ void TaskScheduler::afterCPUTaskFinished(
 
 void TaskScheduler::processNextQuedCPUTask() {
     while(!mFreeCPUExecs.isEmpty() && !mQuedCPUTasks.isEmpty()) {
-        const auto task = mQuedCPUTasks.takeQuedForProcessing();
+        const auto task = mQuedCPUTasks.takeQuedForCpuProcessing();
         if(task) {
             task->aboutToProcess();
             const auto executor = mFreeCPUExecs.takeLast();

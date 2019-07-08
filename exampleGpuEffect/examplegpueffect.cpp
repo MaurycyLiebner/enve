@@ -70,8 +70,14 @@ void ExampleGpuEffectCaller000::render(QGL33c * const gl,
 
     canvas->clear(SK_ColorTRANSPARENT);
     SkPaint paint;
-    const auto filter = SkBlurImageFilter::Make(mSigma, mSigma, nullptr);
+    const SkScalar sigma = mRadius*0.3333333f;
+    const auto filter = SkBlurImageFilter::Make(sigma, sigma, nullptr);
     paint.setImageFilter(filter);
-    canvas->drawImage(srcTex, 0, 0, &paint);
+    const uint fRadius = static_cast<uint>(mRadius);
+    const SkRect rect = SkRect::MakeXYWH(fRadius, fRadius,
+                                         data.fWidth - fRadius,
+                                         data.fHeight - fRadius);
+    canvas->drawImageRect(srcTex, rect, rect, &paint,
+                          SkCanvas::kFast_SrcRectConstraint);
     canvas->flush();
 }

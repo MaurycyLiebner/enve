@@ -33,9 +33,17 @@ public:
         FAILED
     };
 
+    enum GpuSupport {
+        GPU_NO_SUPPORT,
+        GPU_PREFERRED,
+        GPU_REQUIRED
+    };
+
     virtual void processTask() = 0;
-    virtual bool needsGpuProcessing() const { return false; }
-    virtual bool canBeGpuProcessed() const { return false; }
+    virtual GpuSupport gpuSupport() const { return GPU_NO_SUPPORT; }
+    bool gpuProcessingSupported() const { return gpuSupport() > GPU_NO_SUPPORT; }
+    bool gpuProcessingPreferred() const { return gpuSupport() == GPU_PREFERRED; }
+    bool gpuProcessingOnly() const { return gpuSupport() == GPU_REQUIRED; }
     virtual void taskQued() { mState = QUED; }
 
     bool scheduleTask();
