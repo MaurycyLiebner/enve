@@ -11,27 +11,33 @@ protected:
 public:
     void processTask();
     void afterProcessing();
+    void afterCanceled();
 private:
     ImageCacheHandler * const mTargetHandler;
     const QString mFilePath;
     sk_sp<SkImage> mImage;
 };
 
-class ImageCacheHandler : public FileCacheHandler {
-    friend class StdSelfRef;
+class ImageCacheHandler : public FileDataCacheHandler {
+    friend class SelfRef;
     friend class ImageLoader;
 protected:
     ImageCacheHandler();
 public:
+    void replace() {}
+    void afterPathChanged() {}
+
     void clearCache() {
         mImage.reset();
-        FileCacheHandler::clearCache();
+        mImageLoader.reset();
     }
 
     ImageLoader * scheduleLoad() {
-        const auto loader = SPtrCreate(ImageLoader)(mFilePath, this);
-        loader->scheduleTask();
-        return loader.get();
+        if(mImage) return nullptr;
+        if(mImageLoader) return mImageLoader.get();
+        mImageLoader = SPtrCreate(ImageLoader)(mFilePath, this);
+        mImageLoader->scheduleTask();
+        return mImageLoader.get();
     }
 
     bool hasImage() const {
@@ -45,9 +51,11 @@ public:
 protected:
     void setImage(const sk_sp<SkImage>& img) {
         mImage = img;
+        mImageLoader.reset();
     }
 private:
     sk_sp<SkImage> mImage;
+    stdsptr<ImageLoader> mImageLoader;
 };
 
 #endif // IMAGECACHEHANDLER_H

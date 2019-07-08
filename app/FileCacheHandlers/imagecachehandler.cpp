@@ -18,3 +18,7 @@ void ImageLoader::processTask() {
 void ImageLoader::afterProcessing() {
     mTargetHandler->setImage(mImage);
 }
+
+void ImageLoader::afterCanceled() {
+    mTargetHandler->setImage(mImage);
+}

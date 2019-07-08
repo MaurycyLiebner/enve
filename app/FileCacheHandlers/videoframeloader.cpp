@@ -2,7 +2,7 @@
 #include "videocachehandler.h"
 #include "taskscheduler.h"
 
-VideoFrameLoader::VideoFrameLoader(VideoCacheHandler * const cacheHandler,
+VideoFrameLoader::VideoFrameLoader(VideoFrameHandler * const cacheHandler,
                                    const stdsptr<VideoStreamsData> &openedVideo,
                                    const int frameId, AVFrame * const frame) :
     VideoFrameLoader(cacheHandler, openedVideo, frameId) {
@@ -131,6 +131,7 @@ void VideoFrameLoader::readFrame() {
 }
 
 void VideoFrameLoader::afterProcessing() {
+    if(!mCacheHandler) return;
     mCacheHandler->frameLoaderFinished(mFrameId, mLoadedFrame);
     for(auto& excess : mExcessFrames) {
         if(mCacheHandler->getFrameAtFrame(excess.first)) {
@@ -150,6 +151,7 @@ void VideoFrameLoader::afterProcessing() {
 }
 
 void VideoFrameLoader::afterCanceled() {
+    if(!mCacheHandler) return;
     mCacheHandler->frameLoaderCanceled(mFrameId);
 }
 

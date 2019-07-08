@@ -2,6 +2,7 @@
 #define VIDEOFRAMELOADER_H
 #include "updatable.h"
 #include "skia/skiaincludes.h"
+#include "videocachehandler.h"
 extern "C" {
     #include <libavutil/opt.h>
     #include <libavcodec/avcodec.h>
@@ -11,17 +12,16 @@ extern "C" {
     #include <libavutil/imgutils.h>
 }
 
-class VideoCacheHandler;
 struct VideoStreamsData;
 class VideoFrameLoader : public HDDTask {
     friend class StdSelfRef;
 protected:
-    VideoFrameLoader(VideoCacheHandler * const cacheHandler,
+    VideoFrameLoader(VideoFrameHandler * const cacheHandler,
                      const stdsptr<VideoStreamsData>& openedVideo,
                      const int frameId) :
         mCacheHandler(cacheHandler), mOpenedVideo(openedVideo),
         mFrameId(frameId) {}
-    VideoFrameLoader(VideoCacheHandler * const cacheHandler,
+    VideoFrameLoader(VideoFrameHandler * const cacheHandler,
                      const stdsptr<VideoStreamsData>& openedVideo,
                      const int frameId, AVFrame* const frame);
 
@@ -67,7 +67,7 @@ private:
     void readFrame();
     void convertFrame();
 
-    VideoCacheHandler * const mCacheHandler;
+    const stdptr<VideoFrameHandler> mCacheHandler;
     const stdsptr<VideoStreamsData> mOpenedVideo;
     const int mFrameId;
     sk_sp<SkImage> mLoadedFrame;

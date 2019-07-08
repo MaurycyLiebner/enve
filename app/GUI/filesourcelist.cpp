@@ -176,13 +176,13 @@ QWidget *FileSourceListVisibleWidget::createNewSingleWidget() {
 }
 
 void FileSourceListVisibleWidget::addCacheHandlerToList(
-        FileCacheHandler *handler) {
+        FileDataCacheHandler *handler) {
     mCacheList << std::make_shared<FileCacheHandlerAbstraction>(handler, this);
     scheduleContentUpdate();
 }
 
 void FileSourceListVisibleWidget::removeCacheHandlerFromList(
-        FileCacheHandler *handler) {
+        FileDataCacheHandler *handler) {
     for(int i = 0; i < mCacheList.count(); i++) {
         const auto& abs = mCacheList.at(i);
         if(abs->target == handler) {
@@ -239,7 +239,7 @@ void FileSourceList::dropEvent(QDropEvent *event) {
                 const QString urlStr = url.toLocalFile();
                 const QString ext = urlStr.split(".").last();
                 if(isVideoExt(ext)) {
-                    FileSourcesCache::getHandlerForFilePath<VideoCacheHandler>(urlStr);
+                    FileSourcesCache::getHandlerForFilePath<VideoFrameCacheHandler>(urlStr);
                 } else if(isImageExt(ext)) {
                     FileSourcesCache::getHandlerForFilePath<ImageCacheHandler>(urlStr);
                 }

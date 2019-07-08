@@ -4,14 +4,18 @@
 #include "GUI/Timeline/fixedlenanimationrect.h"
 #include "boundingbox.h"
 #include "imagebox.h"
-class AnimationCacheHandler;
+class AnimationFrameHandler;
 
-struct AnimationBoxRenderData : public ImageBoxRenderData {
-    AnimationBoxRenderData(FileCacheHandler *cacheHandler,
+struct AnimationBoxRenderData : public ImageRenderData {
+    AnimationBoxRenderData(AnimationFrameHandler *cacheHandler,
                            BoundingBox *parentBox) :
-        ImageBoxRenderData(cacheHandler, parentBox) {}
+        ImageRenderData(parentBox) {
+        fSrcCacheHandler = cacheHandler;
+    }
 
     void loadImageFromHandler();
+
+    AnimationFrameHandler *fSrcCacheHandler;
     int fAnimationFrame;
 };
 
@@ -20,8 +24,6 @@ class AnimationBox : public BoundingBox {
 protected:
     AnimationBox(const BoundingBoxType &type);
 public:
-    ~AnimationBox();
-
     virtual void changeSourceFile(QWidget* dialogParent) = 0;
     virtual void reloadSound() {}
     virtual void setStretch(const qreal stretch) {
@@ -64,7 +66,7 @@ protected:
     qreal mStretch = 1;
 
     bool mNewCurrentFrameUpdateNeeded = false;
-    stdptr<AnimationCacheHandler> mSrcFramesCache;
+    stdsptr<AnimationFrameHandler> mSrcFramesCache;
 
     bool mFrameRemappingEnabled = false;
     qsptr<IntAnimator> mFrameAnimator;

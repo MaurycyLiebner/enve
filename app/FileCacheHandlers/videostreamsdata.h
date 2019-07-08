@@ -1,6 +1,5 @@
 #ifndef VIDEOSTREAMSDATA_H
 #define VIDEOSTREAMSDATA_H
-#include "videoframeloader.h"
 #include "audiostreamsdata.h"
 
 struct VideoStreamsData {

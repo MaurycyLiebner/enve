@@ -8,52 +8,51 @@
 #include "Boxes/videobox.h"
 #include <QFileDialog>
 
+QList<FileSourceListVisibleWidget*> FileSourcesCache::sFileSourceListVisibleWidgets;
+QList<qsptr<FileDataCacheHandler>> FileSourcesCache::sFileCacheHandlers;
+
 void FileSourcesCache::addFileSourceListVisibleWidget(
         FileSourceListVisibleWidget *wid) {
-    mFileSourceListVisibleWidgets << wid;
+    sFileSourceListVisibleWidgets << wid;
 }
 
 void FileSourcesCache::removeFileSourceListVisibleWidget(
         FileSourceListVisibleWidget *wid) {
-    mFileSourceListVisibleWidgets.removeOne(wid);
+    sFileSourceListVisibleWidgets.removeOne(wid);
 }
 
-void FileSourcesCache::addHandlerToHandlersList(
-        const stdsptr<FileCacheHandler> &handlerPtr) {
-    mFileCacheHandlers.append(handlerPtr);
-}
-
-void FileSourcesCache::addHandlerToListWidgets(FileCacheHandler *handlerPtr) {
-    for(const auto& wid : mFileSourceListVisibleWidgets) {
-        wid->addCacheHandlerToList(handlerPtr);
+void FileSourcesCache::addNewHandler(const qsptr<FileDataCacheHandler> &handler) {
+    sFileCacheHandlers.append(handler);
+    for(const auto& wid : sFileSourceListVisibleWidgets) {
+        wid->addCacheHandlerToList(handler.get());
     }
 }
 
-void FileSourcesCache::removeHandler(const stdsptr<FileCacheHandler>& handler) {
-    mFileCacheHandlers.removeOne(handler);
-    for(const auto& wid : mFileSourceListVisibleWidgets) {
+void FileSourcesCache::removeHandler(const qsptr<FileDataCacheHandler>& handler) {
+    sFileCacheHandlers.removeOne(handler);
+    for(const auto& wid : sFileSourceListVisibleWidgets) {
         wid->removeCacheHandlerFromList(handler.get());
     }
 }
 
-void FileSourcesCache::removeHandlerFromListWidgets(FileCacheHandler *handlerPtr) {
-    for(const auto& wid : mFileSourceListVisibleWidgets) {
+void FileSourcesCache::removeHandlerFromListWidgets(FileDataCacheHandler *handlerPtr) {
+    for(const auto& wid : sFileSourceListVisibleWidgets) {
         wid->removeCacheHandlerFromList(handlerPtr);
     }
 }
 
 void FileSourcesCache::clearAll() {
-    for(const auto &wid : mFileSourceListVisibleWidgets) {
+    for(const auto &wid : sFileSourceListVisibleWidgets) {
         wid->clear();
     }
-    for(const auto &handler : mFileCacheHandlers) {
+    for(const auto &handler : sFileCacheHandlers) {
         handler->clearCache();
     }
-    mFileCacheHandlers.clear();
+    sFileCacheHandlers.clear();
 }
 
 int FileSourcesCache::getFileCacheListCount() {
-    return mFileCacheHandlers.count();
+    return sFileCacheHandlers.count();
 }
 
 bool isVideoExt(const QString &extension) {

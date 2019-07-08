@@ -16,10 +16,6 @@ AnimationBox::AnimationBox(const BoundingBoxType& type) : BoundingBox(type) {
     ca_prependChildAnimator(mGPUEffectsAnimators.get(), mFrameAnimator);
 }
 
-AnimationBox::~AnimationBox() {
-    mSrcFramesCache->removeDependentBox(this);
-}
-
 FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() const {
     return GetAsPtr(mDurationRectangle, FixedLenAnimationRect);
 }
@@ -50,9 +46,6 @@ void AnimationBox::reloadCacheHandler() {
     }
     reloadSound();
     prp_afterWholeInfluenceRangeChanged();
-
-    //mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame);
-    planScheduleUpdate(Animator::USER_CHANGE);
 }
 
 void AnimationBox::setParentGroup(ContainerBox * const parent) {
@@ -129,7 +122,7 @@ void AnimationBox::disableFrameRemapping() {
 }
 
 void AnimationBox::reload() {
-    if(mSrcFramesCache) mSrcFramesCache->clearCache();
+    if(mSrcFramesCache) mSrcFramesCache->reload();
 }
 
 void AnimationBox::anim_setAbsFrame(const int frame) {
@@ -237,10 +230,9 @@ void AnimationBox::setupRenderData(const qreal relFrame,
 }
 
 stdsptr<BoundingBoxRenderData> AnimationBox::createRenderData() {
-    return SPtrCreate(AnimationBoxRenderData)(mSrcFramesCache, this);
+    return SPtrCreate(AnimationBoxRenderData)(mSrcFramesCache.get(), this);
 }
 
 void AnimationBoxRenderData::loadImageFromHandler() {
-    fImage = GetAsPtr(fSrcCacheHandler, AnimationCacheHandler)->
-            getFrameCopyAtOrBeforeFrame(fAnimationFrame);
+    fImage = fSrcCacheHandler->getFrameCopyAtOrBeforeFrame(fAnimationFrame);
 }

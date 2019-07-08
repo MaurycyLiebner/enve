@@ -8,16 +8,14 @@
 class SoundCacheHandler;
 class SingleSound;
 
-class SoundCacheHandler : public FileCacheHandler {
+class SoundCacheHandler : public FileDataCacheHandler {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
     friend class StdSelfRef;
 public:
-//    void clearCache();
-//    void replace();
+    void clearCache() {}
+    void replace() {}
 
-    void setFilePath(const QString& path) { // throw
-        clearCache();
-        FileCacheHandler::setFilePath(path);
+    void afterPathChanged() {
         openAudioStream();
     }
 

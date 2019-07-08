@@ -79,16 +79,20 @@ void VideoBox::setSoundEnabled(const bool enable) {
 
 void VideoBox::setFilePath(const QString &path) {
     mSrcFilePath = path;
-    if(mSrcFramesCache) mSrcFramesCache->removeDependentBox(this);
-    mSrcFramesCache.clear();
+    if(mSrcFramesCache) {
+        const auto videoSrc = GetAsPtr(mSrcFramesCache, VideoFrameHandler);
+        const auto oldDataHandler = videoSrc->getDataHandler();
+        oldDataHandler->removeDependentBox(this);
+    }
+    mSrcFramesCache.reset();
 
-    auto currentHandler = FileSourcesCache::getHandlerForFilePath<VideoCacheHandler>(mSrcFilePath);
-    if(currentHandler) {
-        mSrcFramesCache = GetAsPtr(currentHandler, AnimationCacheHandler);
-        mSrcFramesCache->addDependentBox(this);
-        const auto videoHandler = GetAsPtr(currentHandler, VideoCacheHandler);
+    const auto newDataHandler = FileSourcesCache::
+            getHandlerForFilePath<VideoFrameCacheHandler>(mSrcFilePath);
+    if(newDataHandler) {
+        mSrcFramesCache = SPtrCreate(VideoFrameHandler)(newDataHandler);
+        newDataHandler->addDependentBox(this);
         getAnimationDurationRect()->setRasterCacheHandler(
-                    &videoHandler->getCacheHandler());
+                    &newDataHandler->getCacheHandler());
     } else {
         getAnimationDurationRect()->setRasterCacheHandler(nullptr);
 

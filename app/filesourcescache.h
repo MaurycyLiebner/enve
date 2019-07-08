@@ -21,6 +21,9 @@ bool isEvExt(const QString &extension);
 
 
 namespace FileSourcesCache {
+    extern QList<FileSourceListVisibleWidget*> sFileSourceListVisibleWidgets;
+    extern QList<qsptr<FileDataCacheHandler>> sFileCacheHandlers;
+
     void addFileSourceListVisibleWidget(
             FileSourceListVisibleWidget *wid);
     void removeFileSourceListVisibleWidget(
@@ -30,46 +33,31 @@ namespace FileSourcesCache {
     void clearAll();
     int getFileCacheListCount();
 
-    void removeHandler(const stdsptr<FileCacheHandler> &handler);
-    void addHandlerToHandlersList(
-            const stdsptr<FileCacheHandler>& handlerPtr);
-    void addHandlerToListWidgets(
-            FileCacheHandler *handlerPtr);
+    void removeHandler(const qsptr<FileDataCacheHandler> &handler);
     void removeHandlerFromListWidgets(
-            FileCacheHandler *handlerPtr);
+            FileDataCacheHandler *handlerPtr);
 
-    template<typename T, typename... Args>
-    T* createNewHandler(Args && ...arguments) {
-        auto newHandler = SPtrCreateTemplated(T)(arguments...);
-        FileSourcesCache::addHandlerToHandlersList(newHandler);
-        FileSourcesCache::addHandlerToListWidgets(newHandler.get());
-        return newHandler.get();
-    }
-
-    namespace {
-        QList<FileSourceListVisibleWidget*> mFileSourceListVisibleWidgets;
-        QList<stdsptr<FileCacheHandler>> mFileCacheHandlers;
-    }
+    void addNewHandler(const qsptr<FileDataCacheHandler>& handler);
 };
 
 template<typename T>
 T *FileSourcesCache::getHandlerForFilePath(const QString &filePath) {
-    for(const auto &handler : mFileCacheHandlers) {
+    for(const auto &handler : sFileCacheHandlers) {
         if(handler->getFilePath() == filePath) {
             const auto handlerT = dynamic_cast<T*>(handler.get());
             if(handlerT) return handlerT;
         }
     }
-    const auto handler = FileSourcesCache::createNewHandler<T>();
+    const auto handler = SPtrCreateTemplated(T)();
+    addNewHandler(handler);
     try {
         handler->setFilePath(filePath);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
-        const auto handlerSPtr = GetAsSPtr(handler, FileCacheHandler);
-        FileSourcesCache::removeHandler(handlerSPtr);
+        FileSourcesCache::removeHandler(handler);
         return nullptr;
     }
-    return handler;
+    return handler.get();
 }
 
 #endif // FILESOURCESCACHE_H

@@ -45,6 +45,7 @@ void ImageBox::setFilePath(const QString &path) {
 void ImageBox::reload() {
     if(mImgCacheHandler) mImgCacheHandler->clearCache();
 }
+
 #include "typemenu.h"
 void ImageBox::addActionsToMenu(BoxTypeMenu * const menu) {
     const auto widget = menu->getParentWidget();
@@ -89,5 +90,5 @@ stdsptr<BoundingBoxRenderData> ImageBox::createRenderData() {
 
 #include "filesourcescache.h"
 void ImageBoxRenderData::loadImageFromHandler() {
-    fImage = GetAsPtr(fSrcCacheHandler, ImageCacheHandler)->getImageCopy();
+    fImage = fSrcCacheHandler->getImageCopy();
 }

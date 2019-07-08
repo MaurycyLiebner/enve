@@ -198,7 +198,7 @@ void SingleSound::updateAfterDurationRectangleShifted() {
 }
 
 void SingleSound::setFilePath(const QString &path) {
-    if(path.isEmpty()) mCacheHandler.clear();
+    if(path.isEmpty()) mCacheHandler = nullptr;
     else mCacheHandler = FileSourcesCache::getHandlerForFilePath
                 <SoundCacheHandler>(path);
     mDurationRectangle->setSoundCacheHandler(getCacheHandler());

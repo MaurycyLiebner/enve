@@ -10,12 +10,13 @@ ImageSequenceBox::ImageSequenceBox() : AnimationBox(TYPE_IMAGESQUENCE) {
 
 void ImageSequenceBox::setListOfFrames(const QStringList &listOfFrames) {
     mListOfFrames = listOfFrames;
-    if(mSrcFramesCache) {
-        mSrcFramesCache->removeDependentBox(this);
-    }
-    mSrcFramesCache = FileSourcesCache::
-            createNewHandler<ImageSequenceCacheHandler>(mListOfFrames);
-    mSrcFramesCache->addDependentBox(this);
+//    if(mSrcFramesCache) {
+//        mSrcFramesCache->removeDependentBox(this);
+//    }
+    mSrcFramesCache = SPtrCreate(ImageSequenceCacheHandler)(mListOfFrames);
+//    mSrcFramesCache = FileSourcesCache::
+//            createNewHandler<ImageSequenceCacheHandler>(mListOfFrames);
+//    mSrcFramesCache->addDependentBox(this);
 
     reloadCacheHandler();
 }

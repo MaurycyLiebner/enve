@@ -8,13 +8,13 @@
 
 struct FileCacheHandlerAbstraction {
     FileCacheHandlerAbstraction(
-            FileCacheHandler *targetT,
+            FileDataCacheHandler *targetT,
             FileSourceListVisibleWidget *parentVisibleWidgetT) {
         target = targetT;
         parentVisibleWidget = parentVisibleWidgetT;
     }
 
-    FileCacheHandler *target;
+    FileDataCacheHandler *target;
     bool selected = false;
 
     void switchSelected() {
@@ -72,9 +72,9 @@ public:
     void updateVisibleWidgetsContent();
 
     QWidget *createNewSingleWidget();
-    void addCacheHandlerToList(FileCacheHandler *handler);
+    void addCacheHandlerToList(FileDataCacheHandler *handler);
 
-    void removeCacheHandlerFromList(FileCacheHandler *handler);
+    void removeCacheHandlerFromList(FileDataCacheHandler *handler);
 
     void addToSelectedList(FileCacheHandlerAbstraction *item) {
         mSelectedList << item;

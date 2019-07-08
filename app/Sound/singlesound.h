@@ -83,7 +83,7 @@ private:
 
     bool mEnabled = true;
     qreal mStretch = 1;
-    stdptr<SoundCacheHandler> mCacheHandler;
+    SoundCacheHandler* mCacheHandler;
     qsptr<FixedLenAnimationRect> mDurationRectangle;
 
     qsptr<QrealAnimator> mVolumeAnimator =

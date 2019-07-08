@@ -2,7 +2,7 @@
 #define IMAGEBOX_H
 #include "Boxes/boundingbox.h"
 #include "skia/skiaincludes.h"
-class FileCacheHandler;
+class FileDataCacheHandler;
 class ImageCacheHandler;
 
 struct ImageRenderData : public BoundingBoxRenderData {
@@ -12,6 +12,12 @@ struct ImageRenderData : public BoundingBoxRenderData {
     }
 
     virtual void loadImageFromHandler() = 0;
+
+    void updateRelBoundingRect() {
+        if(fImage) fRelBoundingRect =
+                QRectF(0, 0, fImage->width(), fImage->height());
+        else fRelBoundingRect = QRectF(0, 0, 0, 0);
+    }
 
     void setupRenderData() final {
         if(!fImage) loadImageFromHandler();
@@ -42,22 +48,16 @@ private:
 };
 
 struct ImageBoxRenderData : public ImageRenderData {
-    ImageBoxRenderData(FileCacheHandler * const cacheHandler,
+    ImageBoxRenderData(ImageCacheHandler * const cacheHandler,
                        BoundingBox * const parentBoxT) :
         ImageRenderData(parentBoxT) {
         mDelayDataSet = true;
         fSrcCacheHandler = cacheHandler;
     }
 
-    void updateRelBoundingRect() final {
-        if(fImage) fRelBoundingRect =
-                QRectF(0, 0, fImage->width(), fImage->height());
-        else fRelBoundingRect = QRectF(0, 0, 0, 0);
-    }
-
     void loadImageFromHandler();
 
-    FileCacheHandler *fSrcCacheHandler;
+    ImageCacheHandler *fSrcCacheHandler;
 };
 
 class ImageBox : public BoundingBox {
@@ -82,7 +82,7 @@ public:
 
     void reload();
 private:
-    stdptr<ImageCacheHandler> mImgCacheHandler;
+    ImageCacheHandler* mImgCacheHandler;
     QString mImageFilePath;
 };
 

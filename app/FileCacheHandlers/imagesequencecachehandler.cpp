@@ -9,7 +9,6 @@ ImageSequenceCacheHandler::ImageSequenceCacheHandler(
                 <ImageCacheHandler>(path);
         if(imgCacheHandler) mFrameImageHandlers << imgCacheHandler;
     }
-    updateFrameCount();
 }
 
 sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtFrame(const int relFrame) {
@@ -28,19 +27,14 @@ sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtOrBeforeFrame(
     return cacheHandler->getImage();
 }
 
-void ImageSequenceCacheHandler::updateFrameCount() {
-    mFrameCount = mFramePaths.count();
-}
-
-void ImageSequenceCacheHandler::clearCache() {
-    for(const auto &cacheHandler : mFrameImageHandlers) {
-        cacheHandler->clearCache();
-    }
-    FileCacheHandler::clearCache();
-}
-
 Task *ImageSequenceCacheHandler::scheduleFrameLoad(const int frame) {
     const auto& imageHandler = mFrameImageHandlers.at(frame);
     if(imageHandler->hasImage()) return nullptr;
     return imageHandler->scheduleLoad();
+}
+
+void ImageSequenceCacheHandler::reload() {
+    for(const auto handler : mFrameImageHandlers) {
+        handler->clearCache();
+    }
 }

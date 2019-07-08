@@ -10,14 +10,14 @@
 #include "actions.h"
 
 class Gradient;
-class FileCacheHandler;
+class FileDataCacheHandler;
 class Canvas;
 class CanvasWindow;
 enum CanvasMode : short;
 
 class Document : public SingleWidgetTarget {
     Q_OBJECT
-    typedef stdsptr<FileCacheHandler> FileHandler;
+    typedef stdsptr<FileDataCacheHandler> FileHandler;
     struct FileCompare {
         bool operator()(const FileHandler& f1, const FileHandler& f2);
     };

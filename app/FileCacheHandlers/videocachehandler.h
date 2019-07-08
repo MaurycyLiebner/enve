@@ -3,93 +3,81 @@
 #include "animationcachehandler.h"
 #include "videostreamsdata.h"
 #include <set>
+#include "filecachehandler.h"
+class VideoFrameLoader;
+class VideoFrameHandler;
 
-class VideoCacheHandler : public AnimationCacheHandler {
+class VideoFrameCacheHandler : public FileDataCacheHandler {
+public:
+    VideoFrameCacheHandler();
+
+    void clearCache();
+    void replace();
+    void afterPathChanged();
+
+    const HDDCachableCacheHandler& getCacheHandler() const;
+
+    void addFrameLoader(const int frameId,
+                        const stdsptr<VideoFrameLoader>& loader);
+
+    VideoFrameLoader * getFrameLoader(const int frame) const;
+
+    void removeFrameLoader(const int frame);
+
+    void frameLoaderFinished(const int frame,
+                             const sk_sp<SkImage>& image);
+
+    Task* scheduleFrameHddCacheLoad(const int frame);
+
+    sk_sp<SkImage> getFrameAtFrame(const int relFrame) const;
+    sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame) const;
+    int getFrameCount() const;
+    void setFrameCount(const int count);
+private:
+    int mFrameCount = 0;
+    QList<VideoFrameHandler*> mFrameHandlers;
+    QList<int> mFramesBeingLoaded;
+    QList<stdsptr<VideoFrameLoader>> mFrameLoaders;
+    HDDCachableCacheHandler mFramesCache;
+};
+
+class VideoFrameHandler : public AnimationFrameHandler {
     friend class StdSelfRef;
     friend class VideoFrameLoader;
 protected:
-    VideoCacheHandler() {}
+    VideoFrameHandler(VideoFrameCacheHandler* const cacheHandler);
 public:
     sk_sp<SkImage> getFrameAtFrame(const int relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame);
     Task *scheduleFrameLoad(const int frame);
+    int getFrameCount() const;
+    void reload();
 
-    void clearCache();
-    void replace();
-
-    void setFilePath(const QString& path) { // throw
-        clearCache();
-        AnimationCacheHandler::setFilePath(path);
-        openVideoStream();
-    }
+    void afterPathChanged();
 
     void frameLoaderFinished(const int frame,
                              const sk_sp<SkImage>& image);
-    void frameLoaderCanceled(const int frameId) {
-        removeFrameLoader(frameId);
-    }
+    void frameLoaderCanceled(const int frameId);
 
-    const HDDCachableCacheHandler& getCacheHandler() const {
-        return mFramesCache;
-    }
+    VideoFrameCacheHandler* getDataHandler() const;
+
+    const HDDCachableCacheHandler& getCacheHandler() const;
 protected:
-    VideoFrameLoader * getFrameLoader(const int frame) {
-        const int id = mFramesBeingLoaded.indexOf(frame);
-        if(id >= 0) return mFrameLoaders.at(id).get();
-        return nullptr;
-    }
+    VideoFrameLoader * getFrameLoader(const int frame);
 
-    VideoFrameLoader * addFrameLoader(const int frameId) {
-        if(mFramesBeingLoaded.contains(frameId) ||
-           getFrameAtFrame(frameId))
-            RuntimeThrow("Trying to unnecessarily reload video frame");
-        mFramesBeingLoaded << frameId;
-        const auto loader = SPtrCreate(VideoFrameLoader)(
-                    this, mVideoStreamsData, frameId);
-        mFrameLoaders << loader;
-        for(const auto& nFrame : mNeededFrames) {
-            const auto nLoader = getFrameLoader(nFrame);
-            if(nFrame < frameId) nLoader->addDependent(loader.get());
-            else loader->addDependent(nLoader);
-        }
-        mNeededFrames.insert(frameId);
-
-        return loader.get();
-    }
+    VideoFrameLoader * addFrameLoader(const int frameId);
 
     VideoFrameLoader * addFrameLoader(const int frameId,
-                                      AVFrame * const frame) {
-        if(mFramesBeingLoaded.contains(frameId) ||
-           getFrameAtFrame(frameId))
-            RuntimeThrow("Trying to unnecessarily reload video frame");
-        mFramesBeingLoaded << frameId;
-        const auto loader = SPtrCreate(VideoFrameLoader)(
-                    this, mVideoStreamsData, frameId, frame);
-        mFrameLoaders << loader;
+                                      AVFrame * const frame);
 
-        return loader.get();
-    }
+    void removeFrameLoader(const int frame);
 
-    void removeFrameLoader(const int frame) {
-        const int id = mFramesBeingLoaded.indexOf(frame);
-        if(id < 0 || id >= mFramesBeingLoaded.count()) return;
-        mFramesBeingLoaded.removeAt(id);
-        mFrameLoaders.removeAt(id);
-        mNeededFrames.erase(frame);
-    }
-
-    void openVideoStream() {
-        mVideoStreamsData = VideoStreamsData::sOpen(mFilePath);
-        mFrameCount = mVideoStreamsData->fFrameCount;
-    }
+    void openVideoStream();
 private:
     std::set<int> mNeededFrames;
 
-    QList<int> mFramesBeingLoaded;
-    QList<stdsptr<VideoFrameLoader>> mFrameLoaders;
-
+    VideoFrameCacheHandler* const mDataHandler;
     stdsptr<VideoStreamsData> mVideoStreamsData;
-    HDDCachableCacheHandler mFramesCache;
 };
 
 #endif // VIDEOCACHEHANDLER_H
