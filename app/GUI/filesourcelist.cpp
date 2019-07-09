@@ -20,7 +20,7 @@ void FileSourceWidget::setTargetCache(FileCacheHandlerAbstraction *target) {
     if(!mTargetCache) {
         setToolTip("");
     } else {
-        setToolTip(mTargetCache->getFilePath());
+        setToolTip(mTargetCache->getName());
     }
 }
 
@@ -36,7 +36,7 @@ void FileSourceWidget::mouseMoveEvent(QMouseEvent *event) {
 
     QMimeData *mimeData = new QMimeData();
     mimeData->setUrls(QList<QUrl>() <<
-                      QUrl::fromLocalFile(mTargetCache->getFilePath()));
+                      QUrl::fromLocalFile(mTargetCache->getName()));
     drag->setMimeData(mimeData);
 
     drag->installEventFilter(MainWindow::getInstance());
@@ -48,7 +48,7 @@ void FileSourceWidget::paintEvent(QPaintEvent *) {
     if(!mTargetCache || width() <= 2*MIN_WIDGET_DIM) return;
     QPainter p(this);
 
-    QString wholeString = mTargetCache->getFilePath();
+    QString wholeString = mTargetCache->getName();
     if(mFileNameOnly) {
         wholeString = wholeString.split("/").last();
     }
@@ -128,7 +128,7 @@ void FileSourceListScrollWidget::createVisiblePartWidget() {
 
 FileSourceListVisibleWidget::FileSourceListVisibleWidget(MinimalScrollWidget *parent) :
     MinimalScrollWidgetVisiblePart(parent) {
-    FileSourcesCache::addFileSourceListVisibleWidget(this);
+    sWidgets.append(this);
 }
 
 void FileSourceListVisibleWidget::paintEvent(QPaintEvent *) {
@@ -152,7 +152,7 @@ void FileSourceListVisibleWidget::paintEvent(QPaintEvent *) {
 }
 
 FileSourceListVisibleWidget::~FileSourceListVisibleWidget() {
-    FileSourcesCache::removeFileSourceListVisibleWidget(this);
+    sWidgets.removeOne(this);
 }
 
 void FileSourceListVisibleWidget::updateVisibleWidgetsContent() {
@@ -175,17 +175,16 @@ QWidget *FileSourceListVisibleWidget::createNewSingleWidget() {
     return new FileSourceWidget(this);
 }
 
-void FileSourceListVisibleWidget::addCacheHandlerToList(
-        FileDataCacheHandler *handler) {
+void FileSourceListVisibleWidget::addCacheHandlerToList(FileCacheHandler * const handler) {
     mCacheList << std::make_shared<FileCacheHandlerAbstraction>(handler, this);
     scheduleContentUpdate();
 }
 
 void FileSourceListVisibleWidget::removeCacheHandlerFromList(
-        FileDataCacheHandler *handler) {
+        FileCacheHandler * const handler) {
     for(int i = 0; i < mCacheList.count(); i++) {
         const auto& abs = mCacheList.at(i);
-        if(abs->target == handler) {
+        if(abs->fTarget == handler) {
             if(abs->selected) removeFromSelectedList(abs.get());
             mCacheList.removeAt(i);
             scheduleContentUpdate();
@@ -204,10 +203,10 @@ void FileSourceListVisibleWidget::showContextMenu(const QPoint &globalPos) {
     if(selected_action != nullptr) {
         if(selected_action->text() == "reload") {
             for(const auto& abs : mSelectedList) {
-                abs->target->clearCache();
+                abs->fTarget->reload();
             }
         } else if(selected_action->text() == "replace...") {
-            mSelectedList.first()->target->replace();
+            mSelectedList.first()->fTarget->replace();
         }
 
         MainWindow::getInstance()->queScheduledTasksAndUpdate();
@@ -239,9 +238,9 @@ void FileSourceList::dropEvent(QDropEvent *event) {
                 const QString urlStr = url.toLocalFile();
                 const QString ext = urlStr.split(".").last();
                 if(isVideoExt(ext)) {
-                    FileSourcesCache::getHandlerForFilePath<VideoFrameCacheHandler>(urlStr);
+                    //FileCacheHandler::sGetHandlerForFilePath<VideoFrameCacheHandler>(urlStr);
                 } else if(isImageExt(ext)) {
-                    FileSourcesCache::getHandlerForFilePath<ImageCacheHandler>(urlStr);
+                    //FileCacheHandler::sGetHandlerForFilePath<ImageCacheHandler>(urlStr);
                 }
             }
         }

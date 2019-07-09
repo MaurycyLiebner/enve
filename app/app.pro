@@ -54,6 +54,7 @@ SOURCES += main.cpp\
     Boxes/patheffectsmenu.cpp \
     CacheHandlers/hddcachablerangecont.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
+    FileCacheHandlers/filedatacachehandler.cpp \
     FileCacheHandlers/soundreader.cpp \
     GPUEffects/customgpueffectcreator.cpp \
     GPUEffects/shadereffect.cpp \
@@ -284,6 +285,7 @@ HEADERS  += \
     CacheHandlers/hddcachablerangecont.h \
     CacheHandlers/samples.h \
     FileCacheHandlers/audiostreamsdata.h \
+    FileCacheHandlers/filedatacachehandler.h \
     FileCacheHandlers/soundreader.h \
     GPUEffects/customgpueffectcreator.h \
     GPUEffects/shadereffect.h \

@@ -1,55 +1,28 @@
 #ifndef FILECACHEHANDLER_H
 #define FILECACHEHANDLER_H
-#include "updatable.h"
-class BoundingBox;
-
-class FileDataCacheHandler : public SelfRef {
-    Q_OBJECT
-protected:
-    FileDataCacheHandler();
-    virtual void afterSourceChanged() = 0;
-public:
-    virtual void clearCache() = 0;
-    virtual void replace() = 0;
-
-    void reload() {
-        clearCache();
-        afterSourceChanged();
-        emit sourceChanged();
-    }
-
-    bool setFilePath(const QString &path);
-
-    const QString &getFilePath() const {
-        return mFilePath;
-    }
-
-    bool isFileMissing() { return mFileMissing; }
-
-    //! @brief How many FileCacheHandlers reference this
-    int useCount() const { return mUseCount; }
-    int incUseCount() { return ++mUseCount; }
-    int decUseCount() { return --mUseCount; }
-signals:
-    void pathChanged(const QString& path, bool missing);
-    void sourceChanged();
-protected:
-    bool mFileMissing = false;
-    int mUseCount = 0;
-    QString mFilePath;
-};
+#include "smartPointers/stdselfref.h"
+#include "filedatacachehandler.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 class FileCacheHandler : public StdSelfRef {
 protected:
     FileCacheHandler(const QString& name);
+public:
     ~FileCacheHandler();
 
-    void addDataHandler(FileDataCacheHandler* const data);
-public:
+    virtual void reload() = 0;
+    virtual void replace() = 0;
+
     const QString& name() const { return mName; }
+    bool fileMissing() const { return mFileMissing; }
+
+    static FileCacheHandler *sGetFileHandler(const QString &filePath);
 private:
-    QList<FileDataCacheHandler*> mData;
+    static QList<FileCacheHandler*> sFileHandlers;
     const QString mName; // Usually filename
+    bool mFileMissing = false;
 };
+
+
 
 #endif // FILECACHEHANDLER_H

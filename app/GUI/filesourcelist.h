@@ -1,20 +1,21 @@
 #ifndef FILESOURCELIST_H
 #define FILESOURCELIST_H
+#include "FileCacheHandlers/filecachehandler.h"
 #include "filesourcescache.h"
 #include <QWidget>
 #include "GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h"
 #include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 #include "GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h"
-
+class FileSourceListVisibleWidget;
 struct FileCacheHandlerAbstraction {
     FileCacheHandlerAbstraction(
-            FileDataCacheHandler *targetT,
+            FileCacheHandler *targetT,
             FileSourceListVisibleWidget *parentVisibleWidgetT) {
-        target = targetT;
+        fTarget = targetT;
         parentVisibleWidget = parentVisibleWidgetT;
     }
 
-    FileDataCacheHandler *target;
+    FileCacheHandler *fTarget;
     bool selected = false;
 
     void switchSelected() {
@@ -23,12 +24,12 @@ struct FileCacheHandlerAbstraction {
 
     void setSelected(const bool bT);
 
-    const QString &getFilePath() {
-        return target->getFilePath();
+    const QString &getName() {
+        return fTarget->name();
     }
 
     bool isFileMissing() {
-        return target->isFileMissing();
+        return fTarget->fileMissing();
     }
 
     FileSourceListVisibleWidget *parentVisibleWidget;
@@ -72,9 +73,8 @@ public:
     void updateVisibleWidgetsContent();
 
     QWidget *createNewSingleWidget();
-    void addCacheHandlerToList(FileDataCacheHandler *handler);
-
-    void removeCacheHandlerFromList(FileDataCacheHandler *handler);
+    void addCacheHandlerToList(FileCacheHandler * const handler);
+    void removeCacheHandlerFromList(FileCacheHandler * const handler);
 
     void addToSelectedList(FileCacheHandlerAbstraction *item) {
         mSelectedList << item;
@@ -106,6 +106,8 @@ public:
         return mCacheList.count();
     }
 protected:
+    static QList<FileSourceListVisibleWidget*> sWidgets;
+
     QList<FileCacheHandlerAbstraction*> mSelectedList;
     QList<stdsptr<FileCacheHandlerAbstraction>> mCacheList;
     void paintEvent(QPaintEvent *);

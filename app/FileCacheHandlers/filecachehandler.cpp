@@ -1,31 +1,21 @@
 #include "filecachehandler.h"
 #include "Boxes/boundingbox.h"
 #include "filesourcescache.h"
-
-FileDataCacheHandler::FileDataCacheHandler() {}
-
-bool FileDataCacheHandler::setFilePath(const QString &path) {
-    if(mFilePath == path) return false;
-    mFilePath = path;
-    const QFile file(mFilePath);
-    mFileMissing = !file.exists();
-    reload();
-    emit pathChanged(mFilePath, mFileMissing);
-    return true;
-}
+#include "filedatacachehandler.h"
+QList<FileCacheHandler*> FileCacheHandler::sFileHandlers;
 
 FileCacheHandler::FileCacheHandler(const QString &name) :
-    mName(name) {}
-
-FileCacheHandler::~FileCacheHandler() {
-    for(const auto& data : mData) {
-        if(data->decUseCount() == 0)
-            FileSourcesCache::removeHandler(
-                        GetAsSPtr(data, FileDataCacheHandler));
-    }
+    mName(name) {
+    sFileHandlers.append(this);
 }
 
-void FileCacheHandler::addDataHandler(FileDataCacheHandler* const data) {
-    mData << data;
-    data->incUseCount();
+FileCacheHandler::~FileCacheHandler() {
+    sFileHandlers.removeOne(this);
+}
+
+FileCacheHandler *FileCacheHandler::sGetFileHandler(const QString &filePath) {
+    for(const auto fh : sFileHandlers) {
+        if(filePath == fh->name()) return fh;
+    }
+    return nullptr;
 }

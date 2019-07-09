@@ -31,7 +31,7 @@ void ImageBox::setFilePath(const QString &path) {
         disconnect(mImgCacheHandler, &ImageCacheHandler::pathChanged,
                    this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
     }
-    mImgCacheHandler = FileSourcesCache::getHandlerForFilePath<ImageCacheHandler>(path);
+    mImgCacheHandler = FileCacheHandler::sGetDataHandler<ImageCacheHandler>(path);
 
     prp_setName(path.split("/").last());
     if(mImgCacheHandler) {
