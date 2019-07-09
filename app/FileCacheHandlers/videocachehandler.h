@@ -7,6 +7,13 @@
 class VideoFrameLoader;
 class VideoFrameHandler;
 
+class VideoCacheHandler : public FileCacheHandler {
+public:
+    VideoCacheHandler(const QString& path);
+
+    bool hasSound() const { ; }
+};
+
 class VideoFrameCacheHandler : public FileDataCacheHandler {
     Q_OBJECT
 public:
@@ -38,7 +45,7 @@ private:
 };
 
 class VideoFrameHandler : public AnimationFrameHandler {
-    friend class StdSelfRef;
+    friend class SelfRef;
     friend class VideoFrameLoader;
 protected:
     VideoFrameHandler(VideoFrameCacheHandler* const cacheHandler);

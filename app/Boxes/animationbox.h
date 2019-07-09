@@ -65,7 +65,7 @@ protected:
     qreal mStretch = 1;
 
     bool mNewCurrentFrameUpdateNeeded = false;
-    stdsptr<AnimationFrameHandler> mSrcFramesCache;
+    qsptr<AnimationFrameHandler> mSrcFramesCache;
 
     bool mFrameRemappingEnabled = false;
     qsptr<IntAnimator> mFrameAnimator;

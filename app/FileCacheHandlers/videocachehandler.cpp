@@ -191,3 +191,13 @@ sk_sp<SkImage> VideoFrameCacheHandler::getFrameAtOrBeforeFrame(const int relFram
 int VideoFrameCacheHandler::getFrameCount() const { return mFrameCount; }
 
 void VideoFrameCacheHandler::setFrameCount(const int count) { mFrameCount = count; }
+
+VideoCacheHandler::VideoCacheHandler(const QString &path) :
+    FileCacheHandler(path) {
+    const auto frameHandler = FileSourcesCache::
+            getHandlerForFilePath<VideoFrameCacheHandler>(path);
+    addDataHandler(frameHandler);
+    const auto soundHandler = FileSourcesCache::
+            getHandlerForFilePath<SoundCacheHandler>(path);
+    addDataHandler(frameHandler);
+}

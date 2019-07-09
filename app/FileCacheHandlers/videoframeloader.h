@@ -67,7 +67,7 @@ private:
     void readFrame();
     void convertFrame();
 
-    const stdptr<VideoFrameHandler> mCacheHandler;
+    const qptr<VideoFrameHandler> mCacheHandler;
     const stdsptr<VideoStreamsData> mOpenedVideo;
     const int mFrameId;
     sk_sp<SkImage> mLoadedFrame;

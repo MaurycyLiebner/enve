@@ -20,12 +20,12 @@ FileCacheHandler::FileCacheHandler(const QString &name) :
 FileCacheHandler::~FileCacheHandler() {
     for(const auto& data : mData) {
         if(data->decUseCount() == 0)
-            FileSourcesCache::removeHandler(data);
+            FileSourcesCache::removeHandler(
+                        GetAsSPtr(data, FileDataCacheHandler));
     }
 }
 
-void FileCacheHandler::addDataHandler(
-        const qsptr<FileDataCacheHandler> &data) {
+void FileCacheHandler::addDataHandler(FileDataCacheHandler* const data) {
     mData << data;
     data->incUseCount();
 }

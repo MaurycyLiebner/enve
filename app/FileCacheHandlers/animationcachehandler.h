@@ -1,10 +1,10 @@
 #ifndef ANIMATIONCACHEHANDLER_H
 #define ANIMATIONCACHEHANDLER_H
-#include "smartPointers/stdselfref.h"
+#include "smartPointers/selfref.h"
 #include "skia/skiahelpers.h"
 class Task;
 
-class AnimationFrameHandler : public StdSelfRef {
+class AnimationFrameHandler : public SelfRef {
 protected:
     AnimationFrameHandler();
 public:

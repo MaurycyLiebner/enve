@@ -4,7 +4,7 @@
 #include "animationcachehandler.h"
 
 class ImageSequenceCacheHandler : public AnimationFrameHandler {
-    friend class StdSelfRef;
+    friend class SelfRef;
 protected:
     ImageSequenceCacheHandler(const QStringList &framePaths);
 public:

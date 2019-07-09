@@ -44,11 +44,11 @@ protected:
     FileCacheHandler(const QString& name);
     ~FileCacheHandler();
 
-    void addDataHandler(const qsptr<FileDataCacheHandler>& data);
+    void addDataHandler(FileDataCacheHandler* const data);
 public:
     const QString& name() const { return mName; }
 private:
-    QList<qsptr<FileDataCacheHandler>> mData;
+    QList<FileDataCacheHandler*> mData;
     const QString mName; // Usually filename
 };
 
