@@ -14,7 +14,7 @@ class SoundCacheHandler : public FileDataCacheHandler {
 public:
     void clearCache() {}
     void replace() {}
-    void afterPathChanged();
+    void afterSourceChanged();
 
     const HDDCachableCacheHandler& getCacheHandler() const {
         return mSecondsCache;
@@ -67,7 +67,7 @@ public:
         openAudioStream();
     }
 
-    void afterPathChanged() {
+    void afterSourceChanged() {
         openAudioStream();
     }
 

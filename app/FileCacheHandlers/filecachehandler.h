@@ -7,20 +7,22 @@ class FileDataCacheHandler : public SelfRef {
     Q_OBJECT
 protected:
     FileDataCacheHandler();
-    virtual void afterPathChanged() = 0;
+    virtual void afterSourceChanged() = 0;
 public:
     virtual void clearCache() = 0;
     virtual void replace() = 0;
 
-    void setFilePath(const QString &path);
+    void reload() {
+        clearCache();
+        afterSourceChanged();
+        emit sourceChanged();
+    }
+
+    bool setFilePath(const QString &path);
 
     const QString &getFilePath() const {
         return mFilePath;
     }
-
-    void planScheduleUpdateForAllDependent();
-    void addDependentBox(BoundingBox * const dependent);
-    void removeDependentBox(BoundingBox * const dependent);
 
     bool isFileMissing() { return mFileMissing; }
 
@@ -30,10 +32,10 @@ public:
     int decUseCount() { return --mUseCount; }
 signals:
     void pathChanged(const QString& path, bool missing);
+    void sourceChanged();
 protected:
     bool mFileMissing = false;
     int mUseCount = 0;
-    QList<qptr<BoundingBox>> mDependentBoxes;
     QString mFilePath;
 };
 

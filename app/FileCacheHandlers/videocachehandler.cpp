@@ -46,27 +46,28 @@ VideoFrameLoader *VideoFrameHandler::getFrameLoader(const int frame) {
 VideoFrameLoader *VideoFrameHandler::addFrameLoader(const int frameId) {
     const auto loader = SPtrCreate(VideoFrameLoader)(
                     this, mVideoStreamsData, frameId);
-        mDataHandler->addFrameLoader(frameId, loader);
-        for(const auto& nFrame : mNeededFrames) {
-            const auto nLoader = getFrameLoader(nFrame);
-            if(nFrame < frameId) nLoader->addDependent(loader.get());
-            else loader->addDependent(nLoader);
-        }
-        mNeededFrames.insert(frameId);
+    mDataHandler->addFrameLoader(frameId, loader);
+    for(const auto& nFrame : mNeededFrames) {
+        const auto nLoader = getFrameLoader(nFrame);
+        if(nFrame < frameId) nLoader->addDependent(loader.get());
+        else loader->addDependent(nLoader);
+    }
+    mNeededFrames.insert(frameId);
 
-        return loader.get();
+    return loader.get();
 }
 
-VideoFrameLoader *VideoFrameHandler::addFrameLoader(const int frameId, AVFrame * const frame) {
+VideoFrameLoader *VideoFrameHandler::addFrameLoader(const int frameId,
+                                                    AVFrame * const frame) {
     const auto loader = SPtrCreate(VideoFrameLoader)(
                     this, mVideoStreamsData, frameId, frame);
-        mDataHandler->addFrameLoader(frameId, loader);
-        return loader.get();
+    mDataHandler->addFrameLoader(frameId, loader);
+    return loader.get();
 }
 
 void VideoFrameHandler::removeFrameLoader(const int frame) {
     mDataHandler->removeFrameLoader(frame);
-        mNeededFrames.erase(frame);
+    mNeededFrames.erase(frame);
 }
 
 void VideoFrameHandler::openVideoStream() {
@@ -78,9 +79,9 @@ void VideoFrameHandler::openVideoStream() {
 Task* VideoFrameHandler::scheduleFrameLoad(const int frame) {
     if(frame < 0 || frame >= getFrameCount())
         RuntimeThrow("Frame outside of range " + std::to_string(frame));
-    if(mDataHandler->getFrameAtFrame(frame)) return nullptr;
     const auto currLoader = getFrameLoader(frame);
     if(currLoader) return currLoader;
+    if(mDataHandler->getFrameAtFrame(frame)) return nullptr;
     const auto loadTask = mDataHandler->scheduleFrameHddCacheLoad(frame);
     if(loadTask) return loadTask;
     const auto loader = addFrameLoader(frame);
@@ -94,14 +95,20 @@ int VideoFrameHandler::getFrameCount() const {
 
 void VideoFrameHandler::reload() {
     mDataHandler->clearCache();
+    openVideoStream();
 }
 
-void VideoFrameHandler::afterPathChanged() {
+void VideoFrameHandler::afterSourceChanged() {
     openVideoStream();
 }
 
 void VideoFrameCacheHandler::clearCache() {
     mFramesCache.clear();
+    mFramesBeingLoaded.clear();
+    const auto frameLoaders = mFrameLoaders;
+    for(const auto& loader : frameLoaders)
+        loader->cancel();
+    mFrameLoaders.clear();
 }
 
 void VideoFrameCacheHandler::replace() {
@@ -123,9 +130,9 @@ void VideoFrameCacheHandler::replace() {
     }
 }
 
-void VideoFrameCacheHandler::afterPathChanged() {
+void VideoFrameCacheHandler::afterSourceChanged() {
     for(const auto& handler : mFrameHandlers) {
-        handler->afterPathChanged();
+        handler->afterSourceChanged();
     }
 }
 
@@ -133,7 +140,8 @@ const HDDCachableCacheHandler &VideoFrameCacheHandler::getCacheHandler() const {
     return mFramesCache;
 }
 
-void VideoFrameCacheHandler::addFrameLoader(const int frameId, const stdsptr<VideoFrameLoader> &loader) {
+void VideoFrameCacheHandler::addFrameLoader(const int frameId,
+                                            const stdsptr<VideoFrameLoader> &loader) {
     mFramesBeingLoaded << frameId;
     mFrameLoaders << loader;
 }
@@ -151,17 +159,14 @@ void VideoFrameCacheHandler::removeFrameLoader(const int frame) {
     mFrameLoaders.removeAt(id);
 }
 
-void VideoFrameCacheHandler::frameLoaderFinished(const int frame, const sk_sp<SkImage> &image) {
+void VideoFrameCacheHandler::frameLoaderFinished(const int frame,
+                                                 const sk_sp<SkImage> &image) {
     if(image) {
         mFramesCache.add(SPtrCreate(ImageCacheContainer)(
                              image, FrameRange{frame, frame}, &mFramesCache));
     } else {
         mFrameCount = frame;
-        for(const auto &box : mDependentBoxes) {
-            if(!box) continue;
-            const auto vidBox = GetAsPtr(box, VideoBox);
-            vidBox->updateDurationRectangleAnimationRange();
-        }
+        emit frameCountUpdated(mFrameCount);
     }
 }
 

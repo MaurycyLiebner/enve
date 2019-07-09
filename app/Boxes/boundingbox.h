@@ -184,7 +184,6 @@ public:
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
 
     virtual Canvas *getParentCanvas();
-    virtual void reloadCacheHandler();
 
     virtual void applyPaintSetting(const PaintSettingsApplier &setting);
 

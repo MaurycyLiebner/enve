@@ -11,7 +11,7 @@ public:
 
     bool SWT_isImageSequenceBox() const { return true; }
 
-    void changeSourceFile(QWidget* dialogParent);
+    void changeSourceFile(QWidget * const dialogParent);
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 private:

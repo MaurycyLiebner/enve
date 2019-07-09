@@ -24,8 +24,8 @@ class AnimationBox : public BoundingBox {
 protected:
     AnimationBox(const BoundingBoxType &type);
 public:
-    virtual void changeSourceFile(QWidget* dialogParent) = 0;
-    virtual void reloadSound() {}
+    virtual void changeSourceFile(QWidget * const dialogParent) = 0;
+    virtual void animationDataChanged();
     virtual void setStretch(const qreal stretch) {
         mStretch = stretch;
         updateDurationRectangleAnimationRange();
@@ -35,7 +35,6 @@ public:
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
-    void reloadCacheHandler();
 
     bool SWT_isAnimationBox() const { return true; }
     void addActionsToMenu(BoxTypeMenu * const menu);

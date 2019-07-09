@@ -18,10 +18,10 @@ void ImageSequenceBox::setListOfFrames(const QStringList &listOfFrames) {
 //            createNewHandler<ImageSequenceCacheHandler>(mListOfFrames);
 //    mSrcFramesCache->addDependentBox(this);
 
-    reloadCacheHandler();
+    animationDataChanged();
 }
 
-void ImageSequenceBox::changeSourceFile(QWidget *dialogParent) {
+void ImageSequenceBox::changeSourceFile(QWidget * const dialogParent) {
     QStringList importPaths = QFileDialog::getOpenFileNames(
                 dialogParent, "Import Image Sequence",
                 "", "Images (*.png *.jpg)");

@@ -25,7 +25,7 @@ protected:
     ImageCacheHandler();
 public:
     void replace() {}
-    void afterPathChanged() {}
+    void afterSourceChanged() {}
 
     void clearCache() {
         mImage.reset();

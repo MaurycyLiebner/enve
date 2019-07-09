@@ -58,7 +58,7 @@ void VideoBox::setParentGroup(ContainerBox * const parent) {
 }
 
 #include <QFileDialog>
-void VideoBox::changeSourceFile(QWidget *dialogParent) {
+void VideoBox::changeSourceFile(QWidget * const dialogParent) {
     const QString importPath = QFileDialog::getOpenFileName(
                 dialogParent, "Change Source", "",
                 "Video Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
@@ -82,7 +82,10 @@ void VideoBox::setFilePath(const QString &path) {
     if(mSrcFramesCache) {
         const auto videoSrc = GetAsPtr(mSrcFramesCache, VideoFrameHandler);
         const auto oldDataHandler = videoSrc->getDataHandler();
-        oldDataHandler->removeDependentBox(this);
+        disconnect(oldDataHandler, &VideoFrameCacheHandler::pathChanged,
+                   this, &VideoBox::animationDataChanged);
+        disconnect(oldDataHandler, &VideoFrameCacheHandler::frameCountUpdated,
+                   this, &VideoBox::updateDurationRectangleAnimationRange);
     }
     mSrcFramesCache.reset();
 
@@ -90,14 +93,22 @@ void VideoBox::setFilePath(const QString &path) {
             getHandlerForFilePath<VideoFrameCacheHandler>(mSrcFilePath);
     if(newDataHandler) {
         mSrcFramesCache = SPtrCreate(VideoFrameHandler)(newDataHandler);
-        newDataHandler->addDependentBox(this);
         getAnimationDurationRect()->setRasterCacheHandler(
                     &newDataHandler->getCacheHandler());
+        connect(newDataHandler, &VideoFrameCacheHandler::pathChanged,
+                this, &VideoBox::animationDataChanged);
+        connect(newDataHandler, &VideoFrameCacheHandler::frameCountUpdated,
+                this, &VideoBox::updateDurationRectangleAnimationRange);
     } else {
         getAnimationDurationRect()->setRasterCacheHandler(nullptr);
     }
 
-    reloadCacheHandler();
+    animationDataChanged();
+}
+
+void VideoBox::animationDataChanged() {
+    soundDataChanged();
+    AnimationBox::animationDataChanged();
 }
 
 bool hasSound(const char* path) {
@@ -125,7 +136,7 @@ bool hasSound(const char* path) {
     return false;
 }
 
-void VideoBox::reloadSound() {
+void VideoBox::soundDataChanged() {
     if(hasSound(mSrcFilePath.toLatin1().data())) {
         if(!mSound->SWT_isVisible()) {
             const auto parentCanvas = getParentCanvas();

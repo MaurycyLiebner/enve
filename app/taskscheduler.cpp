@@ -209,14 +209,13 @@ void TaskScheduler::afterCPUTaskFinished(
         const stdsptr<Task>& task,
         ExecController * const controller) {
     mFreeCPUExecs << static_cast<CPUExecController*>(controller);
-    if(task->getState() != Task::CANCELED) {
-        if(task->gpuProcessingPreferred()) {
-            const auto sTask = GetAsSPtr(task, BoundingBoxRenderData);
-            const auto gpuProcess = SPtrCreate(BoxRenderDataScheduledPostProcess)(sTask);
-            scheduleGPUTask(gpuProcess);
-        } else {
-            task->finishedProcessing();
-        }
+    if(task->getState() != Task::CANCELED &&
+       task->gpuProcessingPreferred()) {
+        const auto sTask = GetAsSPtr(task, BoundingBoxRenderData);
+        const auto gpuProcess = SPtrCreate(BoxRenderDataScheduledPostProcess)(sTask);
+        scheduleGPUTask(gpuProcess);
+    } else {
+        task->finishedProcessing();
     }
     processNextTasks();
     if(!CPUTasksBeingProcessed()) queTasks();

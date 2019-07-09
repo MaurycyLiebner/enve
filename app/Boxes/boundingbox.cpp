@@ -248,8 +248,6 @@ Canvas *BoundingBox::getParentCanvas() {
     return mParentGroup->getParentCanvas();
 }
 
-void BoundingBox::reloadCacheHandler() { prp_afterWholeInfluenceRangeChanged(); }
-
 bool BoundingBox::SWT_isBoundingBox() const { return true; }
 
 void BoundingBox::updateAllBoxes(const UpdateReason &reason) {

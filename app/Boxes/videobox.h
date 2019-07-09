@@ -14,10 +14,11 @@ public:
     ~VideoBox();
 
     void setParentGroup(ContainerBox * const parent);
-    void reloadSound();
+    void animationDataChanged();
+    void soundDataChanged();
 
     bool SWT_isVideoBox() const { return true; }
-    void changeSourceFile(QWidget* dialogParent);
+    void changeSourceFile(QWidget * const dialogParent);
 
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);

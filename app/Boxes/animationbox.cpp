@@ -34,9 +34,9 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
     }
 }
 
-void AnimationBox::reloadCacheHandler() {
+void AnimationBox::animationDataChanged() {
     //if(mParentGroup) {
-        updateDurationRectangleAnimationRange();
+    updateDurationRectangleAnimationRange();
     //}
     if(mFrameRemappingEnabled) {
         int frameCount;
@@ -44,7 +44,6 @@ void AnimationBox::reloadCacheHandler() {
         else frameCount = 1;
         mFrameAnimator->setIntValueRange(0, frameCount - 1);
     }
-    reloadSound();
     prp_afterWholeInfluenceRangeChanged();
 }
 

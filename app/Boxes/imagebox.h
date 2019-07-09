@@ -66,8 +66,6 @@ protected:
     ImageBox();
     ImageBox(const QString &filePath);
 public:
-    ~ImageBox();
-
     bool SWT_isImageBox() const { return true; }
     void addActionsToMenu(BoxTypeMenu * const menu);
 
@@ -77,7 +75,7 @@ public:
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 
-    void changeSourceFile(QWidget *dialogParent);
+    void changeSourceFile(QWidget * const dialogParent);
     void setFilePath(const QString &path);
 
     void reload();

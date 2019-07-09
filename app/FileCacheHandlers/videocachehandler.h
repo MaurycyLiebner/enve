@@ -8,12 +8,13 @@ class VideoFrameLoader;
 class VideoFrameHandler;
 
 class VideoFrameCacheHandler : public FileDataCacheHandler {
+    Q_OBJECT
 public:
     VideoFrameCacheHandler() {}
 
     void clearCache();
     void replace();
-    void afterPathChanged();
+    void afterSourceChanged();
 
     const HDDCachableCacheHandler& getCacheHandler() const;
 
@@ -26,6 +27,8 @@ public:
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame) const;
     int getFrameCount() const;
     void setFrameCount(const int count);
+signals:
+    void frameCountUpdated(int);
 private:
     int mFrameCount = 0;
     QList<VideoFrameHandler*> mFrameHandlers;
@@ -46,7 +49,7 @@ public:
     int getFrameCount() const;
     void reload();
 
-    void afterPathChanged();
+    void afterSourceChanged();
 
     void frameLoaderFinished(const int frame, const sk_sp<SkImage>& image);
     void frameLoaderCanceled(const int frameId);

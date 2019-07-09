@@ -13,11 +13,6 @@ ImageBox::ImageBox(const QString &filePath) : ImageBox() {
     setFilePath(filePath);
 }
 
-ImageBox::~ImageBox() {
-    if(mImgCacheHandler)
-        mImgCacheHandler->removeDependentBox(this);
-}
-
 void ImageBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
     gWrite(target, mImageFilePath);
@@ -33,12 +28,16 @@ void ImageBox::readBoundingBox(QIODevice * const target) {
 void ImageBox::setFilePath(const QString &path) {
     mImageFilePath = path;
     if(mImgCacheHandler) {
-        mImgCacheHandler->removeDependentBox(this);
+        disconnect(mImgCacheHandler, &ImageCacheHandler::pathChanged,
+                   this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
     }
     mImgCacheHandler = FileSourcesCache::getHandlerForFilePath<ImageCacheHandler>(path);
 
     prp_setName(path.split("/").last());
-    mImgCacheHandler->addDependentBox(this);
+    if(mImgCacheHandler) {
+        connect(mImgCacheHandler, &ImageCacheHandler::pathChanged,
+               this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
+    }
     prp_afterWholeInfluenceRangeChanged();
 }
 
@@ -65,7 +64,7 @@ void ImageBox::addActionsToMenu(BoxTypeMenu * const menu) {
     BoundingBox::addActionsToMenu(menu);
 }
 
-void ImageBox::changeSourceFile(QWidget* dialogParent) {
+void ImageBox::changeSourceFile(QWidget * const dialogParent) {
     QString importPath = QFileDialog::getOpenFileName(dialogParent,
                                             "Change Source", mImageFilePath,
                                             "Image Files (*.png *.jpg)");

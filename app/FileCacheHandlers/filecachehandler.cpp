@@ -4,32 +4,14 @@
 
 FileDataCacheHandler::FileDataCacheHandler() {}
 
-void FileDataCacheHandler::setFilePath(const QString &path) {
-    clearCache();
+bool FileDataCacheHandler::setFilePath(const QString &path) {
+    if(mFilePath == path) return false;
     mFilePath = path;
     const QFile file(mFilePath);
     mFileMissing = !file.exists();
-    afterPathChanged();
+    reload();
     emit pathChanged(mFilePath, mFileMissing);
-    for(const auto &boxPtr : mDependentBoxes) {
-        if(boxPtr) boxPtr->reloadCacheHandler();
-    }
-}
-
-void FileDataCacheHandler::addDependentBox(
-        BoundingBox * const dependent) {
-    mDependentBoxes << dependent;
-}
-
-void FileDataCacheHandler::removeDependentBox(
-        BoundingBox * const dependent) {
-    for(int i = 0; i < mDependentBoxes.count(); i++) {
-        const auto &boxPtr = mDependentBoxes.at(i);
-        if(boxPtr == dependent) {
-            mDependentBoxes.removeAt(i);
-            return;
-        }
-    }
+    return true;
 }
 
 FileCacheHandler::FileCacheHandler(const QString &name) :
