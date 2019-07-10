@@ -13,8 +13,9 @@ public:
     VideoDataHandler() {}
 
     void clearCache();
-    void replace();
     void afterSourceChanged();
+
+    void replace();
 
     const HDDCachableCacheHandler& getCacheHandler() const;
 
@@ -71,13 +72,18 @@ private:
 };
 #include "CacheHandlers/soundcachehandler.h"
 class VideoFileHandler : public FileCacheHandler {
-public:
+    friend class SelfRef;
+protected:
     VideoFileHandler() {}
+    void afterPathSet(const QString& path);
 
-    void reload() {}
+    void reload() {
+        mDataHandler->reload();
+        mSoundHandler->reload();
+    }
+public:
     void replace() {}
 
-    void afterPathSet(const QString& path);
 
     VideoDataHandler* getFrameHandler() const {
         return mDataHandler.get();

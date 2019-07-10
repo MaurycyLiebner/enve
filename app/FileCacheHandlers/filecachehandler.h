@@ -35,12 +35,13 @@ protected:
         afterPathSet(path);
         emit pathChanged(path);
     }
+
+    bool mFileMissing = false;
+    QString mPath; // filename / dirname
 private:
     static void sAddToWidgets(FileCacheHandler* const fh);
 
     static QList<qsptr<FileCacheHandler>> sFileHandlers;
-    QString mPath; // Usually filename
-    bool mFileMissing = false;
 };
 
 template <typename T>

@@ -5,14 +5,14 @@
 
 class ImageSequenceFileHandler : public FileCacheHandler {
 protected:
-public:
     void afterPathSet(const QString& folderPath);
+    void reload();
+public:
+    void replace();
 
     sk_sp<SkImage> getFrameAtFrame(const int relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame);
     Task* scheduleFrameLoad(const int frame);
-    void reload();
-    void replace();
     int getFrameCount() const { return mFrameImageHandlers.count(); }
 private:
     QString mFolderPath;
@@ -39,7 +39,7 @@ public:
         return mFileHandler->scheduleFrameLoad(frame);
     }
     void reload() {
-        if(mFileHandler) mFileHandler->reload();
+        if(mFileHandler) mFileHandler->reloadAction();
     }
     int getFrameCount() const {
         if(!mFileHandler) return 0;
@@ -47,7 +47,6 @@ public:
     }
 private:
     qptr<ImageSequenceFileHandler> mFileHandler;
-    QString mFolderPath;
 
 };
 #endif // IMAGESEQUENCECACHEHANDLER_H

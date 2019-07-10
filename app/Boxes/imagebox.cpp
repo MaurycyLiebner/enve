@@ -42,7 +42,7 @@ void ImageBox::setFilePath(const QString &path) {
 }
 
 void ImageBox::reload() {
-    if(mImgCacheHandler) mImgCacheHandler->reload();
+    if(mImgCacheHandler) mImgCacheHandler->reloadAction();
 }
 
 #include "typemenu.h"

@@ -54,12 +54,18 @@ protected:
     ImageFileHandler() {}
 
     void afterPathSet(const QString& path) {
+        mFileMissing = !QFile(path).exists();
+        mDataHandler.reset();
+        if(mFileMissing) return;
         const auto current = ImageDataHandler::sGetDataHandler<ImageDataHandler>(path);
         if(current) mDataHandler = GetAsSPtr(current, ImageDataHandler);
         else mDataHandler = ImageDataHandler::sCreateDataHandler<ImageDataHandler>(path);
     }
+
+    void reload() {
+        mDataHandler->clearCache();
+    }
 public:
-    void reload() {}
     void replace() {}
 
     ImageLoader * scheduleLoad() {

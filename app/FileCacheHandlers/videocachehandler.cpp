@@ -141,7 +141,7 @@ const HDDCachableCacheHandler &VideoDataHandler::getCacheHandler() const {
 }
 
 void VideoDataHandler::addFrameLoader(const int frameId,
-                                            const stdsptr<VideoFrameLoader> &loader) {
+                                      const stdsptr<VideoFrameLoader> &loader) {
     mFramesBeingLoaded << frameId;
     mFrameLoaders << loader;
 }

@@ -8,11 +8,12 @@ void ImageSequenceCacheHandler::setFolderPath(const QString &folderPath) {
 }
 
 void ImageSequenceFileHandler::afterPathSet(const QString &folderPath) {
-    mFolderPath = folderPath;
+    Q_UNUSED(folderPath);
     reload();
 }
 
 sk_sp<SkImage> ImageSequenceFileHandler::getFrameAtFrame(const int relFrame) {
+    if(mFrameImageHandlers.isEmpty()) return nullptr;
     const auto cacheHandler = mFrameImageHandlers.at(relFrame);
     if(!cacheHandler) return sk_sp<SkImage>();
     return cacheHandler->getImage();
@@ -20,7 +21,7 @@ sk_sp<SkImage> ImageSequenceFileHandler::getFrameAtFrame(const int relFrame) {
 
 sk_sp<SkImage> ImageSequenceFileHandler::getFrameAtOrBeforeFrame(
         const int relFrame) {
-    if(mFrameImageHandlers.isEmpty()) return sk_sp<SkImage>();
+    if(mFrameImageHandlers.isEmpty()) return nullptr;
     if(relFrame >= mFrameImageHandlers.count()) {
         return mFrameImageHandlers.last()->getImage();
     }
@@ -29,6 +30,7 @@ sk_sp<SkImage> ImageSequenceFileHandler::getFrameAtOrBeforeFrame(
 }
 
 Task *ImageSequenceFileHandler::scheduleFrameLoad(const int frame) {
+    if(mFrameImageHandlers.isEmpty()) return nullptr;
     const auto& imageHandler = mFrameImageHandlers.at(frame);
     if(imageHandler->hasImage()) return nullptr;
     return imageHandler->scheduleLoad();
@@ -37,16 +39,19 @@ Task *ImageSequenceFileHandler::scheduleFrameLoad(const int frame) {
 void ImageSequenceFileHandler::reload() {
     mFrameImageHandlers.clear();
     QDir dir(mFolderPath);
-    if(!dir.exists()) return;
+    mFileMissing = !dir.exists();
+    if(mFileMissing) return;
     dir.setFilter(QDir::Files);
     dir.setSorting(QDir::Name);
     const auto files = dir.entryInfoList();
     for(const auto& fileInfo : files) {
+        if(!isImageExt(fileInfo.suffix())) continue;
         const auto filePath = fileInfo.absoluteFilePath();
         const auto handler = ImageDataHandler::sGetCreateDataHandler<ImageDataHandler>(filePath);
         handler->clearCache();
         mFrameImageHandlers << handler;
     }
+    if(mFrameImageHandlers.isEmpty()) mFileMissing = true;
 }
 
 void ImageSequenceFileHandler::replace() {

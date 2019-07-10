@@ -120,12 +120,18 @@ protected:
     SoundFileHandler() {}
 
     void afterPathSet(const QString& path) {
+        mFileMissing = !QFile(path).exists();
+        mDataHandler.reset();
+        if(mFileMissing) return;
         const auto current = SoundDataHandler::sGetDataHandler<SoundDataHandler>(path);
         if(current) mDataHandler = GetAsSPtr(current, SoundDataHandler);
         else mDataHandler = SoundDataHandler::sCreateDataHandler<SoundDataHandler>(path);
     }
+
+    void reload() {
+        mDataHandler->reload();
+    }
 public:
-    void reload() {}
     void replace() {}
 private:
     qsptr<SoundDataHandler> mDataHandler;
