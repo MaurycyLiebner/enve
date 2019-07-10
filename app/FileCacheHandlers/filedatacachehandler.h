@@ -14,11 +14,12 @@ public:
 
     void reload() {
         clearCache();
+        mFileMissing = !QFile(mFilePath).exists();
         afterSourceChanged();
         emit sourceChanged();
     }
 
-    bool setFilePath(const QString &path);
+    void setFilePath(const QString &path);
 
     const QString &getFilePath() const {
         return mFilePath;
@@ -33,11 +34,9 @@ public:
     template<typename T>
     static qsptr<T> sCreateDataHandler(const QString &filePath);
 signals:
-    void pathChanged(const QString& path, bool missing);
     void sourceChanged();
 protected:
     bool mFileMissing = false;
-    int mUseCount = 0;
     QString mFilePath;
 private:
     static QList<FileDataCacheHandler*> sDataHandlers;

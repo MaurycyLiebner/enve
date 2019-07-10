@@ -6,6 +6,7 @@ class FixedLenAnimationRect;
 class SoundHandler;
 class Samples;
 class SoundReaderForMerger;
+class SoundDataHandler;
 class HDDCachableCacheHandler;
 
 class SingleSound : public StaticComplexAnimator {
@@ -73,6 +74,7 @@ public:
         SWT_setDisabled(!mEnabled);
         prp_afterWholeInfluenceRangeChanged();
     }
+    void setSoundDataHandler(SoundDataHandler * const newDataHandler);
 private:
     iValueRange absSecondToRelSecondsAbsStretch(const int absSecond);
     void updateDurationRectLength();

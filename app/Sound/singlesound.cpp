@@ -198,15 +198,16 @@ void SingleSound::updateAfterDurationRectangleShifted() {
 }
 
 void SingleSound::setFilePath(const QString &path) {
-    if(path.isEmpty()) mCacheHandler.reset();
-    else {
-        if(!videoSound()) FileCacheHandler::sGetFileHandler<SoundFileHandler>(path);
-        const auto newDataHandler = FileDataCacheHandler::
-                sGetDataHandler<SoundDataHandler>(path);
-        if(newDataHandler) {
-            mCacheHandler = SPtrCreate(SoundHandler)(newDataHandler);
-        }
-    }
+    FileCacheHandler::sGetFileHandler<SoundFileHandler>(path);
+    if(videoSound()) RuntimeThrow("Setting file path for video sound");
+    const auto newDataHandler = FileDataCacheHandler::
+            sGetDataHandler<SoundDataHandler>(path);
+    setSoundDataHandler(newDataHandler);
+}
+
+void SingleSound::setSoundDataHandler(SoundDataHandler* const newDataHandler) {
+    mCacheHandler.reset();
+    if(newDataHandler) mCacheHandler = SPtrCreate(SoundHandler)(newDataHandler);
     mDurationRectangle->setSoundCacheHandler(getCacheHandler());
     updateDurationRectLength();
 }

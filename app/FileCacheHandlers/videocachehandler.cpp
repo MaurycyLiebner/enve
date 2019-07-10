@@ -191,3 +191,35 @@ sk_sp<SkImage> VideoDataHandler::getFrameAtOrBeforeFrame(const int relFrame) con
 int VideoDataHandler::getFrameCount() const { return mFrameCount; }
 
 void VideoDataHandler::setFrameCount(const int count) { mFrameCount = count; }
+
+
+bool hasSound(const char* path) {
+    // get format from audio file
+    AVFormatContext* format = avformat_alloc_context();
+    if(avformat_open_input(&format, path, nullptr, nullptr) != 0) {
+        RuntimeThrow("Could not open file " + path);
+    }
+    if(avformat_find_stream_info(format, nullptr) < 0) {
+        RuntimeThrow("Could not retrieve stream info from file " + path);
+    }
+
+    // Find the index of the first audio stream
+    for(uint i = 0; i < format->nb_streams; i++) {
+        AVStream *streamT = format->streams[i];
+        const AVMediaType &mediaType = streamT->codecpar->codec_type;
+        if(mediaType == AVMEDIA_TYPE_AUDIO) {
+            return true;
+        }
+    }
+
+    avformat_free_context(format);
+
+    // success
+    return false;
+}
+
+void VideoFileHandler::afterPathSet(const QString &path) {
+    mDataHandler = VideoDataHandler::sGetCreateDataHandler<VideoDataHandler>(path);
+    if(!hasSound(path.toLatin1().data())) return mSoundHandler.reset();
+    mSoundHandler = SoundDataHandler::sGetCreateDataHandler<SoundDataHandler>(path);
+}

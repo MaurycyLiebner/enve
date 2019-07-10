@@ -3,6 +3,7 @@
 #include <QString>
 #include <unordered_map>
 #include "Boxes/animationbox.h"
+#include "FileCacheHandlers/videocachehandler.h"
 
 class SingleSound;
 
@@ -25,16 +26,16 @@ public:
 
     void setStretch(const qreal stretch);
 
+    void setFilePath(const QString& path);
+
     void enableSound() { setSoundEnabled(true); }
     void disableSound() { setSoundEnabled(false); }
 
     void setSoundEnabled(const bool enable);
-
-    void setFilePath(const QString &path);
 private:
     bool mSoundEnabled = true;
     qsptr<SingleSound> mSound;
-    QString mSrcFilePath;
+    qptr<VideoFileHandler> mFileHandler;
 };
 
 #endif // VIDEOBOX_H

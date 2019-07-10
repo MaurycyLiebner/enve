@@ -11,7 +11,6 @@ extern "C" {
 #include "canvas.h"
 #include "Sound/soundcomposition.h"
 #include "filesourcescache.h"
-#include "FileCacheHandlers/videocachehandler.h"
 
 VideoBox::VideoBox() : AnimationBox(TYPE_VIDEO) {
     setName("Video");
@@ -31,14 +30,12 @@ VideoBox::~VideoBox() {
 
 void VideoBox::writeBoundingBox(QIODevice * const target) {
     AnimationBox::writeBoundingBox(target);
-    gWrite(target, mSrcFilePath);
+
 }
 
 void VideoBox::readBoundingBox(QIODevice * const target) {
     AnimationBox::readBoundingBox(target);
-    QString path;
-    gRead(target, path);
-    setFilePath(path);
+
 }
 
 void VideoBox::setParentGroup(ContainerBox * const parent) {
@@ -59,10 +56,10 @@ void VideoBox::setParentGroup(ContainerBox * const parent) {
 
 #include <QFileDialog>
 void VideoBox::changeSourceFile(QWidget * const dialogParent) {
-    const QString importPath = QFileDialog::getOpenFileName(
+    const QString path = QFileDialog::getOpenFileName(
                 dialogParent, "Change Source", "",
                 "Video Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
-    if(!importPath.isEmpty()) setFilePath(importPath);
+    if(!path.isEmpty()) setFilePath(path);
 }
 
 void VideoBox::setStretch(const qreal stretch) {
@@ -70,33 +67,24 @@ void VideoBox::setStretch(const qreal stretch) {
     mSound->setStretch(stretch);
 }
 
-void VideoBox::setSoundEnabled(const bool enable) {
-    if(mSoundEnabled == enable) return;
-    mSoundEnabled = enable;
-    if(!mSound) return;
-    mSound->setEnabled(enable);
-}
-
 void VideoBox::setFilePath(const QString &path) {
-    mSrcFilePath = path;
     if(mSrcFramesCache) {
         const auto videoSrc = GetAsPtr(mSrcFramesCache, VideoFrameHandler);
         const auto oldDataHandler = videoSrc->getDataHandler();
-        disconnect(oldDataHandler, &VideoDataHandler::pathChanged,
+        disconnect(mFileHandler, &VideoFileHandler::pathChanged,
                    this, &VideoBox::animationDataChanged);
         disconnect(oldDataHandler, &VideoDataHandler::frameCountUpdated,
                    this, &VideoBox::updateDurationRectangleAnimationRange);
     }
     mSrcFramesCache.reset();
 
-    VideoFileHandler::sGetFileHandler<VideoFileHandler>(mSrcFilePath);
-    const auto newDataHandler = VideoDataHandler::
-            sGetDataHandler<VideoDataHandler>(mSrcFilePath);
+    mFileHandler = VideoFileHandler::sGetFileHandler<VideoFileHandler>(path);
+    const auto newDataHandler = mFileHandler->getFrameHandler();
     if(newDataHandler) {
         mSrcFramesCache = SPtrCreate(VideoFrameHandler)(newDataHandler);
         getAnimationDurationRect()->setRasterCacheHandler(
                     &newDataHandler->getCacheHandler());
-        connect(newDataHandler, &VideoDataHandler::pathChanged,
+        connect(mFileHandler, &VideoFileHandler::pathChanged,
                 this, &VideoBox::animationDataChanged);
         connect(newDataHandler, &VideoDataHandler::frameCountUpdated,
                 this, &VideoBox::updateDurationRectangleAnimationRange);
@@ -107,46 +95,27 @@ void VideoBox::setFilePath(const QString &path) {
     animationDataChanged();
 }
 
+void VideoBox::setSoundEnabled(const bool enable) {
+    if(mSoundEnabled == enable) return;
+    mSoundEnabled = enable;
+    mSound->setEnabled(enable);
+}
+
 void VideoBox::animationDataChanged() {
     soundDataChanged();
     AnimationBox::animationDataChanged();
 }
 
-bool hasSound(const char* path) {
-    // get format from audio file
-    AVFormatContext* format = avformat_alloc_context();
-    if(avformat_open_input(&format, path, nullptr, nullptr) != 0) {
-        RuntimeThrow("Could not open file " + path);
-    }
-    if(avformat_find_stream_info(format, nullptr) < 0) {
-        RuntimeThrow("Could not retrieve stream info from file " + path);
-    }
-
-    // Find the index of the first audio stream
-    for(uint i = 0; i < format->nb_streams; i++) {
-        AVStream *streamT = format->streams[i];
-        const AVMediaType &mediaType = streamT->codecpar->codec_type;
-        if(mediaType == AVMEDIA_TYPE_AUDIO) {
-            return true;
-        }
-    }
-
-    avformat_free_context(format);
-
-    // success
-    return false;
-}
-
 void VideoBox::soundDataChanged() {
-    if(hasSound(mSrcFilePath.toLatin1().data())) {
+    const auto soundHandler = mFileHandler->getSoundHandler();
+    if(soundHandler) {
         if(!mSound->SWT_isVisible()) {
             const auto parentCanvas = getParentCanvas();
             if(parentCanvas) {
                 parentCanvas->getSoundComposition()->addSound(mSound);
             }
         }
-        mSound->setFilePath(mSrcFilePath);
-        mSound->SWT_show();
+        mDurationRectangle->setSoundCacheHandler(&soundHandler->getCacheHandler());
     } else {
         if(mSound->SWT_isVisible()) {
             const auto parentCanvas = getParentCanvas();
@@ -154,7 +123,8 @@ void VideoBox::soundDataChanged() {
                 parentCanvas->getSoundComposition()->removeSound(mSound);
             }
         }
-        mSound->SWT_hide();
         mDurationRectangle->setSoundCacheHandler(nullptr);
     }
+    mSound->setSoundDataHandler(soundHandler);
+    mSound->SWT_setVisible(soundHandler);
 }

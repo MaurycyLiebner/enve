@@ -10,12 +10,9 @@ FileDataCacheHandler::~FileDataCacheHandler() {
     sDataHandlers.removeOne(this);
 }
 
-bool FileDataCacheHandler::setFilePath(const QString &path) {
-    if(mFilePath == path) return false;
+void FileDataCacheHandler::setFilePath(const QString &path) {
     mFilePath = path;
     const QFile file(mFilePath);
     mFileMissing = !file.exists();
     reload();
-    emit pathChanged(mFilePath, mFileMissing);
-    return true;
 }

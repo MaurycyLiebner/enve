@@ -77,11 +77,15 @@ public:
     void reload() {}
     void replace() {}
 
-    void afterPathSet(const QString& path) {
-        mDataHandler = VideoDataHandler::sGetCreateDataHandler<VideoDataHandler>(path);
-        mSoundHandler = SoundDataHandler::sGetCreateDataHandler<SoundDataHandler>(path);
+    void afterPathSet(const QString& path);
+
+    VideoDataHandler* getFrameHandler() const {
+        return mDataHandler.get();
     }
 
+    SoundDataHandler* getSoundHandler() const {
+        return mSoundHandler.get();
+    }
 private:
     qsptr<VideoDataHandler> mDataHandler;
     qsptr<SoundDataHandler> mSoundHandler;
