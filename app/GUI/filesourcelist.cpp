@@ -48,27 +48,16 @@ void FileSourceWidget::paintEvent(QPaintEvent *) {
     if(!mTargetCache || width() <= 2*MIN_WIDGET_DIM) return;
     QPainter p(this);
 
-    QString wholeString = mTargetCache->getName();
-    if(mFileNameOnly) {
-        wholeString = wholeString.split("/").last();
-    }
+    QString pathString = mTargetCache->getName();
+    if(mFileNameOnly) pathString = pathString.split("/").last();
     const auto fm = p.fontMetrics();
-    const int dotsW = fm.width("...");
-    int wholeWidth = fm.width(wholeString);
-    bool addDots = false;
-    while(wholeWidth > width() - 1.5*MIN_WIDGET_DIM) {
-        addDots = true;
-        const int spaceForLetters = int(width() - 1.5*MIN_WIDGET_DIM - dotsW);
-        const int guessLen = spaceForLetters*wholeString.count()/wholeWidth;
-        wholeString = wholeString.right(guessLen);
-        wholeWidth = fm.width("..." + wholeString);
-    }
-    if(addDots) wholeString = "..." + wholeString;
+    const int spaceForPath = int(width() - 1.5*MIN_WIDGET_DIM);
+    pathString = fm.elidedText(pathString, Qt::ElideLeft, spaceForPath);
+    const int pathWidth = fm.width(pathString);
 
     if(mTargetCache->selected) {
         p.fillRect(QRect(0.5*MIN_WIDGET_DIM, 0,
-                         wholeWidth + MIN_WIDGET_DIM,
-                         MIN_WIDGET_DIM),
+                         pathWidth + MIN_WIDGET_DIM, MIN_WIDGET_DIM),
                    QColor(180, 180, 180));
         p.setPen(Qt::black);
     }
@@ -77,7 +66,7 @@ void FileSourceWidget::paintEvent(QPaintEvent *) {
     p.drawText(rect().adjusted(MIN_WIDGET_DIM, 0,
                                -0.5*MIN_WIDGET_DIM, 0),
                Qt::AlignVCenter | Qt::AlignLeft,
-               wholeString);
+               pathString);
 
     p.end();
 }

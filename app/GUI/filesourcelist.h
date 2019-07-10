@@ -36,7 +36,6 @@ struct FileCacheHandlerAbstraction {
 };
 
 class FileSourceWidget : public QWidget {
-    Q_OBJECT
 public:
     FileSourceWidget(FileSourceListVisibleWidget *parent = nullptr);
 
@@ -55,7 +54,6 @@ protected:
 };
 
 class FileSourceListScrollWidget : public MinimalScrollWidget {
-    Q_OBJECT
 public:
     FileSourceListScrollWidget(ScrollArea *parent);
 
@@ -65,7 +63,6 @@ public:
 };
 
 class FileSourceListVisibleWidget : public MinimalScrollWidgetVisiblePart {
-    Q_OBJECT
 public:
     FileSourceListVisibleWidget(MinimalScrollWidget *parent = nullptr);
     ~FileSourceListVisibleWidget();
@@ -124,7 +121,6 @@ protected:
 };
 
 class FileSourceList : public ScrollArea {
-    Q_OBJECT
 public:
     FileSourceList(QWidget *parent = nullptr);
 
