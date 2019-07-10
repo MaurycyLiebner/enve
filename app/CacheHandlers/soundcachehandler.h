@@ -8,12 +8,11 @@
 class SoundHandler;
 class SingleSound;
 
-class SoundCacheHandler : public FileDataCacheHandler {
+class SoundDataHandler : public FileDataCacheHandler {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
     friend class StdSelfRef;
 public:
     void clearCache() {}
-    void replace() {}
     void afterSourceChanged();
 
     const HDDCachableCacheHandler& getCacheHandler() const {
@@ -62,7 +61,7 @@ class SoundHandler : public StdSelfRef {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
     friend class StdSelfRef;
 public:
-    SoundHandler(SoundCacheHandler* const dataHandler) :
+    SoundHandler(SoundDataHandler* const dataHandler) :
         mDataHandler(dataHandler) {
         openAudioStream();
     }
@@ -90,7 +89,7 @@ public:
         return mAudioStreamsData->fDurationSec;
     }
 
-    SoundCacheHandler* getDataHandler() const {
+    SoundDataHandler* getDataHandler() const {
         return mDataHandler;
     }
     const HDDCachableCacheHandler& getCacheHandler() const {
@@ -110,9 +109,25 @@ private:
         mAudioStreamsData = AudioStreamsData::sOpen(filePath);
     }
 
-    SoundCacheHandler* const mDataHandler;
+    SoundDataHandler* const mDataHandler;
     stdsptr<AudioStreamsData> mAudioStreamsData;
 
 };
 
+class SoundFileHandler : public FileCacheHandler {
+    friend class SelfRef;
+protected:
+    SoundFileHandler() {}
+
+    void afterPathSet(const QString& path) {
+        const auto current = SoundDataHandler::sGetDataHandler<SoundDataHandler>(path);
+        if(current) mDataHandler = GetAsSPtr(current, SoundDataHandler);
+        else mDataHandler = SoundDataHandler::sCreateDataHandler<SoundDataHandler>(path);
+    }
+public:
+    void reload() {}
+    void replace() {}
+private:
+    qsptr<SoundDataHandler> mDataHandler;
+};
 #endif // SOUNDCACHEHANDLER_H

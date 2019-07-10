@@ -28,21 +28,21 @@ void ImageBox::readBoundingBox(QIODevice * const target) {
 void ImageBox::setFilePath(const QString &path) {
     mImageFilePath = path;
     if(mImgCacheHandler) {
-        disconnect(mImgCacheHandler, &ImageCacheHandler::pathChanged,
+        disconnect(mImgCacheHandler, &ImageFileHandler::pathChanged,
                    this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
     }
-    mImgCacheHandler = FileCacheHandler::sGetDataHandler<ImageCacheHandler>(path);
+    mImgCacheHandler = FileCacheHandler::sGetFileHandler<ImageFileHandler>(path);
 
     prp_setName(path.split("/").last());
     if(mImgCacheHandler) {
-        connect(mImgCacheHandler, &ImageCacheHandler::pathChanged,
-               this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
+        connect(mImgCacheHandler, &ImageFileHandler::pathChanged,
+                this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
     }
     prp_afterWholeInfluenceRangeChanged();
 }
 
 void ImageBox::reload() {
-    if(mImgCacheHandler) mImgCacheHandler->clearCache();
+    if(mImgCacheHandler) mImgCacheHandler->reload();
 }
 
 #include "typemenu.h"

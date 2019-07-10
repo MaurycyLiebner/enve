@@ -6,6 +6,10 @@ FileDataCacheHandler::FileDataCacheHandler() {
     sDataHandlers.append(this);
 }
 
+FileDataCacheHandler::~FileDataCacheHandler() {
+    sDataHandlers.removeOne(this);
+}
+
 bool FileDataCacheHandler::setFilePath(const QString &path) {
     if(mFilePath == path) return false;
     mFilePath = path;

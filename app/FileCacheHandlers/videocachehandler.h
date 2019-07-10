@@ -7,17 +7,10 @@
 class VideoFrameLoader;
 class VideoFrameHandler;
 
-class VideoCacheHandler : public FileCacheHandler {
-public:
-    VideoCacheHandler(const QString& path);
-
-    bool hasSound() const { ; }
-};
-
-class VideoFrameCacheHandler : public FileDataCacheHandler {
+class VideoDataHandler : public FileDataCacheHandler {
     Q_OBJECT
 public:
-    VideoFrameCacheHandler() {}
+    VideoDataHandler() {}
 
     void clearCache();
     void replace();
@@ -48,7 +41,7 @@ class VideoFrameHandler : public AnimationFrameHandler {
     friend class SelfRef;
     friend class VideoFrameLoader;
 protected:
-    VideoFrameHandler(VideoFrameCacheHandler* const cacheHandler);
+    VideoFrameHandler(VideoDataHandler* const cacheHandler);
 public:
     sk_sp<SkImage> getFrameAtFrame(const int relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame);
@@ -61,7 +54,7 @@ public:
     void frameLoaderFinished(const int frame, const sk_sp<SkImage>& image);
     void frameLoaderCanceled(const int frameId);
 
-    VideoFrameCacheHandler* getDataHandler() const;
+    VideoDataHandler* getDataHandler() const;
     const HDDCachableCacheHandler& getCacheHandler() const;
 protected:
     VideoFrameLoader * getFrameLoader(const int frame);
@@ -73,8 +66,25 @@ protected:
 private:
     std::set<int> mNeededFrames;
 
-    VideoFrameCacheHandler* const mDataHandler;
+    VideoDataHandler* const mDataHandler;
     stdsptr<VideoStreamsData> mVideoStreamsData;
+};
+#include "CacheHandlers/soundcachehandler.h"
+class VideoFileHandler : public FileCacheHandler {
+public:
+    VideoFileHandler() {}
+
+    void reload() {}
+    void replace() {}
+
+    void afterPathSet(const QString& path) {
+        mDataHandler = VideoDataHandler::sGetCreateDataHandler<VideoDataHandler>(path);
+        mSoundHandler = SoundDataHandler::sGetCreateDataHandler<SoundDataHandler>(path);
+    }
+
+private:
+    qsptr<VideoDataHandler> mDataHandler;
+    qsptr<SoundDataHandler> mSoundHandler;
 };
 
 #endif // VIDEOCACHEHANDLER_H

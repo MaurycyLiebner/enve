@@ -2,8 +2,8 @@
 #define IMAGEBOX_H
 #include "Boxes/boundingbox.h"
 #include "skia/skiaincludes.h"
+#include "FileCacheHandlers/imagecachehandler.h"
 class FileDataCacheHandler;
-class ImageCacheHandler;
 
 struct ImageRenderData : public BoundingBoxRenderData {
     ImageRenderData(BoundingBox * const parentBoxT) :
@@ -48,7 +48,7 @@ private:
 };
 
 struct ImageBoxRenderData : public ImageRenderData {
-    ImageBoxRenderData(ImageCacheHandler * const cacheHandler,
+    ImageBoxRenderData(ImageFileHandler * const cacheHandler,
                        BoundingBox * const parentBoxT) :
         ImageRenderData(parentBoxT) {
         mDelayDataSet = true;
@@ -57,7 +57,7 @@ struct ImageBoxRenderData : public ImageRenderData {
 
     void loadImageFromHandler();
 
-    ImageCacheHandler *fSrcCacheHandler;
+    qptr<ImageFileHandler> fSrcCacheHandler;
 };
 
 class ImageBox : public BoundingBox {
@@ -80,7 +80,7 @@ public:
 
     void reload();
 private:
-    ImageCacheHandler* mImgCacheHandler;
+    ImageFileHandler* mImgCacheHandler;
     QString mImageFilePath;
 };
 

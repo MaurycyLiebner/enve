@@ -1,27 +1,54 @@
 #ifndef FILECACHEHANDLER_H
 #define FILECACHEHANDLER_H
-#include "smartPointers/stdselfref.h"
 #include "filedatacachehandler.h"
 #include "smartPointers/sharedpointerdefs.h"
 
-class FileCacheHandler : public StdSelfRef {
+class FileCacheHandler : public SelfRef {
+    Q_OBJECT
 protected:
-    FileCacheHandler(const QString& name);
-public:
-    ~FileCacheHandler();
+    FileCacheHandler();
 
+    virtual void afterPathSet(const QString& path) = 0;
+public:
     virtual void reload() = 0;
     virtual void replace() = 0;
 
-    const QString& name() const { return mName; }
+    const QString& path() const { return mPath; }
     bool fileMissing() const { return mFileMissing; }
 
-    static FileCacheHandler *sGetFileHandler(const QString &filePath);
+    template <typename T>
+    static T *sGetFileHandler(const QString &filePath);
+    static bool sRemoveFileHandler(const qsptr<FileCacheHandler> &fh);
+    static void sClear() { sFileHandlers.clear(); }
+signals:
+    void pathChanged(const QString& newPath);
+//    void reloaded();
+protected:
+    void setPath(const QString& path) {
+        mPath = path;
+        afterPathSet(path);
+    }
 private:
-    static QList<FileCacheHandler*> sFileHandlers;
-    const QString mName; // Usually filename
+    static QList<qsptr<FileCacheHandler>> sFileHandlers;
+    QString mPath; // Usually filename
     bool mFileMissing = false;
 };
+
+template <typename T>
+T *FileCacheHandler::sGetFileHandler(const QString &filePath) {
+    for(const auto& fh : sFileHandlers) {
+        if(filePath == fh->path()) return static_cast<T*>(fh.get());
+    }
+    const auto fh = SPtrCreateTemplated(T)();
+    try {
+        fh->setPath(filePath);
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+        return nullptr;
+    }
+    sFileHandlers.append(fh);
+    return fh.get();
+}
 
 
 

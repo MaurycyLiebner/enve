@@ -200,8 +200,9 @@ void SingleSound::updateAfterDurationRectangleShifted() {
 void SingleSound::setFilePath(const QString &path) {
     if(path.isEmpty()) mCacheHandler.reset();
     else {
-        const auto newDataHandler = FileSourcesCache::
-                getHandlerForFilePath<SoundCacheHandler>(path);
+        if(!videoSound()) FileCacheHandler::sGetFileHandler<SoundFileHandler>(path);
+        const auto newDataHandler = FileDataCacheHandler::
+                sGetDataHandler<SoundDataHandler>(path);
         if(newDataHandler) {
             mCacheHandler = SPtrCreate(SoundHandler)(newDataHandler);
         }

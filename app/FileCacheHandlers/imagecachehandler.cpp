@@ -1,10 +1,18 @@
 #include "imagecachehandler.h"
 #include "filecachehandler.h"
 
-ImageCacheHandler::ImageCacheHandler() {}
+ImageDataHandler::ImageDataHandler() {}
+
+ImageLoader *ImageDataHandler::scheduleLoad() {
+    if(mImage) return nullptr;
+    if(mImageLoader) return mImageLoader.get();
+    mImageLoader = SPtrCreate(ImageLoader)(mFilePath, this);
+    mImageLoader->scheduleTask();
+    return mImageLoader.get();
+}
 
 ImageLoader::ImageLoader(const QString &filePath,
-                         ImageCacheHandler * const handler) :
+                         ImageDataHandler * const handler) :
     mTargetHandler(handler), mFilePath(filePath) {
 
 }

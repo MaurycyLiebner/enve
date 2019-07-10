@@ -25,7 +25,7 @@ struct FileCacheHandlerAbstraction {
     void setSelected(const bool bT);
 
     const QString &getName() {
-        return fTarget->name();
+        return fTarget->path();
     }
 
     bool isFileMissing() {

@@ -2,29 +2,29 @@
 #define IMAGECACHEHANDLER_H
 #include "skia/skiahelpers.h"
 #include "filecachehandler.h"
-class ImageCacheHandler;
+#include "updatable.h"
+class ImageDataHandler;
 class ImageLoader : public HDDTask {
     friend class StdSelfRef;
 protected:
     ImageLoader(const QString &filePath,
-                ImageCacheHandler * const handler);
+                ImageDataHandler * const handler);
 public:
     void processTask();
     void afterProcessing();
     void afterCanceled();
 private:
-    ImageCacheHandler * const mTargetHandler;
+    ImageDataHandler * const mTargetHandler;
     const QString mFilePath;
     sk_sp<SkImage> mImage;
 };
 
-class ImageCacheHandler : public FileDataCacheHandler {
+class ImageDataHandler : public FileDataCacheHandler {
     friend class SelfRef;
     friend class ImageLoader;
 protected:
-    ImageCacheHandler();
+    ImageDataHandler();
 public:
-    void replace() {}
     void afterSourceChanged() {}
 
     void clearCache() {
@@ -32,20 +32,10 @@ public:
         mImageLoader.reset();
     }
 
-    ImageLoader * scheduleLoad() {
-        if(mImage) return nullptr;
-        if(mImageLoader) return mImageLoader.get();
-        mImageLoader = SPtrCreate(ImageLoader)(mFilePath, this);
-        mImageLoader->scheduleTask();
-        return mImageLoader.get();
-    }
-
-    bool hasImage() const {
-        return mImage.get();
-    }
-
-    sk_sp<SkImage> getImage() { return mImage; }
-    sk_sp<SkImage> getImageCopy() {
+    ImageLoader * scheduleLoad();
+    bool hasImage() const { return mImage.get(); }
+    sk_sp<SkImage> getImage() const { return mImage; }
+    sk_sp<SkImage> getImageCopy() const {
         return SkiaHelpers::makeCopy(mImage);
     }
 protected:
@@ -56,6 +46,42 @@ protected:
 private:
     sk_sp<SkImage> mImage;
     stdsptr<ImageLoader> mImageLoader;
+};
+
+class ImageFileHandler : public FileCacheHandler {
+    friend class SelfRef;
+protected:
+    ImageFileHandler() {}
+
+    void afterPathSet(const QString& path) {
+        const auto current = ImageDataHandler::sGetDataHandler<ImageDataHandler>(path);
+        if(current) mDataHandler = GetAsSPtr(current, ImageDataHandler);
+        else mDataHandler = ImageDataHandler::sCreateDataHandler<ImageDataHandler>(path);
+    }
+public:
+    void reload() {}
+    void replace() {}
+
+    ImageLoader * scheduleLoad() {
+        if(!mDataHandler) return nullptr;
+        return mDataHandler->scheduleLoad();
+    }
+
+    bool hasImage() const {
+        if(!mDataHandler) return false;
+        return mDataHandler->hasImage();
+    }
+
+    sk_sp<SkImage> getImage() const {
+        if(!mDataHandler) return nullptr;
+        return mDataHandler->getImage();
+    }
+    sk_sp<SkImage> getImageCopy() const {
+        if(!mDataHandler) return nullptr;
+        return mDataHandler->getImageCopy();
+    }
+private:
+    qsptr<ImageDataHandler> mDataHandler;
 };
 
 #endif // IMAGECACHEHANDLER_H

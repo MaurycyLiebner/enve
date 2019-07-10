@@ -338,14 +338,13 @@ public:
         int fYTilt;
     };
 
-    void tabletEvent(const QTabletEvent * const e,
-                     const QPointF &pos);
+    void tabletEvent(const QTabletEvent * const e, const QPointF &pos);
 
     bool keyPressEvent(QKeyEvent *event);
 
     qsptr<BoundingBox> createLink();
     ImageBox* createImageBox(const QString &path);
-    ImageSequenceBox* createAnimationBoxForPaths(const QStringList &paths);
+    ImageSequenceBox* createAnimationBoxForPaths(const QString &folderPath);
     VideoBox* createVideoForPath(const QString &path);
     ExternalLinkBox *createLinkToFileWithPath(const QString &path);
     SingleSound* createSoundForPath(const QString &path);

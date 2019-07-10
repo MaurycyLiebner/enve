@@ -7,15 +7,13 @@ class ImageSequenceBox : public AnimationBox {
 protected:
     ImageSequenceBox();
 public:
-    void setListOfFrames(const QStringList &listOfFrames);
+    void setFolderPath(const QString &folderPath);
 
     bool SWT_isImageSequenceBox() const { return true; }
 
     void changeSourceFile(QWidget * const dialogParent);
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
-private:
-    QStringList mListOfFrames;
 };
 
 #endif // IMAGESEQUENCEBOX_H

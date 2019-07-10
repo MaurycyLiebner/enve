@@ -126,6 +126,8 @@ void FileSourceListScrollWidget::createVisiblePartWidget() {
     mMinimalVisiblePartWidget = new FileSourceListVisibleWidget(this);
 }
 
+QList<FileSourceListVisibleWidget*> FileSourceListVisibleWidget::sWidgets;
+
 FileSourceListVisibleWidget::FileSourceListVisibleWidget(MinimalScrollWidget *parent) :
     MinimalScrollWidgetVisiblePart(parent) {
     sWidgets.append(this);

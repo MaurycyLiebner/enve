@@ -8,7 +8,7 @@
 
 #include "videoframeloader.h"
 
-VideoFrameHandler::VideoFrameHandler(VideoFrameCacheHandler * const cacheHandler) :
+VideoFrameHandler::VideoFrameHandler(VideoDataHandler * const cacheHandler) :
     mDataHandler(cacheHandler) {
     openVideoStream();
 }
@@ -31,7 +31,7 @@ void VideoFrameHandler::frameLoaderCanceled(const int frameId) {
     removeFrameLoader(frameId);
 }
 
-VideoFrameCacheHandler *VideoFrameHandler::getDataHandler() const {
+VideoDataHandler *VideoFrameHandler::getDataHandler() const {
     return mDataHandler;
 }
 
@@ -102,7 +102,7 @@ void VideoFrameHandler::afterSourceChanged() {
     openVideoStream();
 }
 
-void VideoFrameCacheHandler::clearCache() {
+void VideoDataHandler::clearCache() {
     mFramesCache.clear();
     mFramesBeingLoaded.clear();
     const auto frameLoaders = mFrameLoaders;
@@ -111,7 +111,7 @@ void VideoFrameCacheHandler::clearCache() {
     mFrameLoaders.clear();
 }
 
-void VideoFrameCacheHandler::replace() {
+void VideoDataHandler::replace() {
     const QString importPath = QFileDialog::getOpenFileName(
                 MainWindow::getInstance(),
                 "Replace Video Source " + mFilePath, "",
@@ -130,36 +130,36 @@ void VideoFrameCacheHandler::replace() {
     }
 }
 
-void VideoFrameCacheHandler::afterSourceChanged() {
+void VideoDataHandler::afterSourceChanged() {
     for(const auto& handler : mFrameHandlers) {
         handler->afterSourceChanged();
     }
 }
 
-const HDDCachableCacheHandler &VideoFrameCacheHandler::getCacheHandler() const {
+const HDDCachableCacheHandler &VideoDataHandler::getCacheHandler() const {
     return mFramesCache;
 }
 
-void VideoFrameCacheHandler::addFrameLoader(const int frameId,
+void VideoDataHandler::addFrameLoader(const int frameId,
                                             const stdsptr<VideoFrameLoader> &loader) {
     mFramesBeingLoaded << frameId;
     mFrameLoaders << loader;
 }
 
-VideoFrameLoader *VideoFrameCacheHandler::getFrameLoader(const int frame) const {
+VideoFrameLoader *VideoDataHandler::getFrameLoader(const int frame) const {
     const int id = mFramesBeingLoaded.indexOf(frame);
     if(id >= 0) return mFrameLoaders.at(id).get();
     return nullptr;
 }
 
-void VideoFrameCacheHandler::removeFrameLoader(const int frame) {
+void VideoDataHandler::removeFrameLoader(const int frame) {
     const int id = mFramesBeingLoaded.indexOf(frame);
     if(id < 0 || id >= mFramesBeingLoaded.count()) return;
     mFramesBeingLoaded.removeAt(id);
     mFrameLoaders.removeAt(id);
 }
 
-void VideoFrameCacheHandler::frameLoaderFinished(const int frame,
+void VideoDataHandler::frameLoaderFinished(const int frame,
                                                  const sk_sp<SkImage> &image) {
     if(image) {
         mFramesCache.add(SPtrCreate(ImageCacheContainer)(
@@ -170,34 +170,24 @@ void VideoFrameCacheHandler::frameLoaderFinished(const int frame,
     }
 }
 
-Task *VideoFrameCacheHandler::scheduleFrameHddCacheLoad(const int frame) {
+Task *VideoDataHandler::scheduleFrameHddCacheLoad(const int frame) {
     const auto contAtFrame = mFramesCache.atFrame<ImageCacheContainer>(frame);
     if(contAtFrame) return contAtFrame->scheduleLoadFromTmpFile();
     return nullptr;
 }
 
-sk_sp<SkImage> VideoFrameCacheHandler::getFrameAtFrame(const int relFrame) const {
+sk_sp<SkImage> VideoDataHandler::getFrameAtFrame(const int relFrame) const {
     const auto cont = mFramesCache.atFrame<ImageCacheContainer>(relFrame);
     if(!cont) return sk_sp<SkImage>();
     return cont->getImageSk();
 }
 
-sk_sp<SkImage> VideoFrameCacheHandler::getFrameAtOrBeforeFrame(const int relFrame) const {
+sk_sp<SkImage> VideoDataHandler::getFrameAtOrBeforeFrame(const int relFrame) const {
     const auto cont = mFramesCache.atOrBeforeFrame<ImageCacheContainer>(relFrame);
     if(!cont) return sk_sp<SkImage>();
     return cont->getImageSk();
 }
 
-int VideoFrameCacheHandler::getFrameCount() const { return mFrameCount; }
+int VideoDataHandler::getFrameCount() const { return mFrameCount; }
 
-void VideoFrameCacheHandler::setFrameCount(const int count) { mFrameCount = count; }
-
-VideoCacheHandler::VideoCacheHandler(const QString &path) :
-    FileCacheHandler(path) {
-    const auto frameHandler = FileSourcesCache::
-            getHandlerForFilePath<VideoFrameCacheHandler>(path);
-    addDataHandler(frameHandler);
-    const auto soundHandler = FileSourcesCache::
-            getHandlerForFilePath<SoundCacheHandler>(path);
-    addDataHandler(frameHandler);
-}
+void VideoDataHandler::setFrameCount(const int count) { mFrameCount = count; }

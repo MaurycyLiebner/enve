@@ -1,6 +1,7 @@
 #ifndef FILEDATACACHEHANDLER_H
 #define FILEDATACACHEHANDLER_H
 #include "smartPointers/selfref.h"
+#include "smartPointers/sharedpointerdefs.h"
 
 class FileDataCacheHandler : public SelfRef {
     Q_OBJECT
@@ -8,11 +9,8 @@ protected:
     FileDataCacheHandler();
     virtual void afterSourceChanged() = 0;
 public:
-    ~FileDataCacheHandler() {
-        sDataHandlers.removeOne(this);
-    }
+    ~FileDataCacheHandler();
     virtual void clearCache() = 0;
-    virtual void replace() = 0;
 
     void reload() {
         clearCache();
@@ -30,6 +28,10 @@ public:
 
     template<typename T>
     static T *sGetDataHandler(const QString &filePath);
+    template<typename T>
+    static qsptr<T> sGetCreateDataHandler(const QString &filePath);
+    template<typename T>
+    static qsptr<T> sCreateDataHandler(const QString &filePath);
 signals:
     void pathChanged(const QString& path, bool missing);
     void sourceChanged();
@@ -50,15 +52,25 @@ T *FileDataCacheHandler::sGetDataHandler(const QString &filePath) {
         }
     }
     return nullptr;
+}
+
+template<typename T>
+qsptr<T> FileDataCacheHandler::sCreateDataHandler(const QString &filePath) {
     const auto handler = SPtrCreateTemplated(T)();
-    sAddDataHandler(handler);
     try {
         handler->setFilePath(filePath);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
-        sRemoveDataHandler(handler);
         return nullptr;
     }
-    return handler.get();
+    return handler;
 }
+
+template<typename T>
+qsptr<T> FileDataCacheHandler::sGetCreateDataHandler(const QString &filePath) {
+    const auto get = sGetDataHandler<T>(filePath);
+    if(get) return GetAsSPtrTemplated(get, T);
+    return sCreateDataHandler<T>(filePath);
+}
+
 #endif // FILEDATACACHEHANDLER_H

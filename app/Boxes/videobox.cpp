@@ -82,22 +82,23 @@ void VideoBox::setFilePath(const QString &path) {
     if(mSrcFramesCache) {
         const auto videoSrc = GetAsPtr(mSrcFramesCache, VideoFrameHandler);
         const auto oldDataHandler = videoSrc->getDataHandler();
-        disconnect(oldDataHandler, &VideoFrameCacheHandler::pathChanged,
+        disconnect(oldDataHandler, &VideoDataHandler::pathChanged,
                    this, &VideoBox::animationDataChanged);
-        disconnect(oldDataHandler, &VideoFrameCacheHandler::frameCountUpdated,
+        disconnect(oldDataHandler, &VideoDataHandler::frameCountUpdated,
                    this, &VideoBox::updateDurationRectangleAnimationRange);
     }
     mSrcFramesCache.reset();
 
-    const auto newDataHandler = FileSourcesCache::
-            getHandlerForFilePath<VideoFrameCacheHandler>(mSrcFilePath);
+    VideoFileHandler::sGetFileHandler<VideoFileHandler>(mSrcFilePath);
+    const auto newDataHandler = VideoDataHandler::
+            sGetDataHandler<VideoDataHandler>(mSrcFilePath);
     if(newDataHandler) {
         mSrcFramesCache = SPtrCreate(VideoFrameHandler)(newDataHandler);
         getAnimationDurationRect()->setRasterCacheHandler(
                     &newDataHandler->getCacheHandler());
-        connect(newDataHandler, &VideoFrameCacheHandler::pathChanged,
+        connect(newDataHandler, &VideoDataHandler::pathChanged,
                 this, &VideoBox::animationDataChanged);
-        connect(newDataHandler, &VideoFrameCacheHandler::frameCountUpdated,
+        connect(newDataHandler, &VideoDataHandler::frameCountUpdated,
                 this, &VideoBox::updateDurationRectangleAnimationRange);
     } else {
         getAnimationDurationRect()->setRasterCacheHandler(nullptr);

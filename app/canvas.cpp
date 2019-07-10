@@ -434,10 +434,10 @@ ImageBox *Canvas::createImageBox(const QString &path) {
 }
 
 #include "Boxes/imagesequencebox.h"
-ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QStringList &paths) {
+ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QString &folderPath) {
     const auto aniBox = SPtrCreate(ImageSequenceBox)();
     aniBox->planCenterPivotPosition();
-    aniBox->setListOfFrames(paths);
+    aniBox->setFolderPath(folderPath);
     mCurrentContainer->addContainedBox(aniBox);
     return aniBox.get();
 }

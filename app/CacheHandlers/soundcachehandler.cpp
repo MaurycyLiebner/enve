@@ -23,7 +23,7 @@ SoundReaderForMerger *SoundHandler::addSecondReader(const int secondId) {
     return reader.get();
 }
 
-void SoundCacheHandler::afterSourceChanged() {
+void SoundDataHandler::afterSourceChanged() {
     for(const auto& handler : mSoundHandlers) {
         handler->afterSourceChanged();
     }

@@ -1039,7 +1039,7 @@ void MainWindow::clearAll() {
 //    }
 //    mClipboardContainers.clear();
     replaceClipboard(nullptr);
-    FileSourcesCache::clearAll();
+    FileCacheHandler::sClear();
     //mBoxListWidget->clearAll();
 }
 
@@ -1161,11 +1161,11 @@ void MainWindow::linkFile() {
 
 void MainWindow::importImageSequence() {
     disableEventFilter();
-    QStringList importPaths = QFileDialog::getOpenFileNames(this,
-        "Import Image Sequence", "", "Images (*.png *.jpg)");
+    const auto folder = QFileDialog::getExistingDirectory(
+                this, "Import Image Sequence", "");
     enableEventFilter();
-    if(!importPaths.isEmpty()) {
-        mDocument.fActiveScene->createAnimationBoxForPaths(importPaths);
+    if(!folder.isEmpty()) {
+        mDocument.fActiveScene->createAnimationBoxForPaths(folder);
     }
     queScheduledTasksAndUpdate();
 }
