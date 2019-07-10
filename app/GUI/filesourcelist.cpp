@@ -197,17 +197,15 @@ void FileSourceListVisibleWidget::removeCacheHandlerFromList(
 
 void FileSourceListVisibleWidget::showContextMenu(const QPoint &globalPos) {
     QMenu menu;
-    menu.addAction("reload");
-    if(mSelectedList.count() == 1) {
-        menu.addAction("replace...");
-    }
-    QAction *selected_action = menu.exec(globalPos);
-    if(selected_action != nullptr) {
-        if(selected_action->text() == "reload") {
+    menu.addAction("Reload");
+    if(mSelectedList.count() == 1) menu.addAction("Replace...");
+    const auto selected_action = menu.exec(globalPos);
+    if(selected_action) {
+        if(selected_action->text() == "Reload") {
             for(const auto& abs : mSelectedList) {
-                abs->fTarget->reload();
+                abs->fTarget->reloadAction();
             }
-        } else if(selected_action->text() == "replace...") {
+        } else if(selected_action->text() == "Replace...") {
             mSelectedList.first()->fTarget->replace();
         }
 

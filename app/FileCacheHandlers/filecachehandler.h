@@ -9,9 +9,14 @@ protected:
     FileCacheHandler();
 
     virtual void afterPathSet(const QString& path) = 0;
-public:
     virtual void reload() = 0;
+public:
     virtual void replace() = 0;
+
+    void reloadAction() {
+        reload();
+        emit reloaded();
+    }
 
     const QString& path() const { return mPath; }
     bool fileMissing() const { return mFileMissing; }
@@ -22,13 +27,17 @@ public:
     static void sClear() { sFileHandlers.clear(); }
 signals:
     void pathChanged(const QString& newPath);
-//    void reloaded();
+    void reloaded();
 protected:
     void setPath(const QString& path) {
+        if(mPath == path) return;
         mPath = path;
         afterPathSet(path);
+        emit pathChanged(path);
     }
 private:
+    static void sAddToWidgets(FileCacheHandler* const fh);
+
     static QList<qsptr<FileCacheHandler>> sFileHandlers;
     QString mPath; // Usually filename
     bool mFileMissing = false;
@@ -47,6 +56,8 @@ T *FileCacheHandler::sGetFileHandler(const QString &filePath) {
         return nullptr;
     }
     sFileHandlers.append(fh);
+    sAddToWidgets(fh.get());
+
     return fh.get();
 }
 

@@ -105,6 +105,16 @@ public:
     int getCacheListCount() {
         return mCacheList.count();
     }
+
+    static void sAddToWidgets(FileCacheHandler * const fh) {
+        for(const auto wid : FileSourceListVisibleWidget::sWidgets)
+            wid->addCacheHandlerToList(fh);
+    }
+
+    static void sRemoveFromWidgets(FileCacheHandler * const fh) {
+        for(const auto wid : FileSourceListVisibleWidget::sWidgets)
+            wid->removeCacheHandlerFromList(fh);
+    }
 protected:
     static QList<FileSourceListVisibleWidget*> sWidgets;
 
