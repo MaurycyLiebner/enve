@@ -195,20 +195,15 @@ void BoundingBoxRenderData::updateGlobalFromRelBoundingRect() {
     }
     fGlobalBoundingRect.adjust(-fEffectsMargin.left(), -fEffectsMargin.top(),
                                fEffectsMargin.right(), fEffectsMargin.bottom());
-    if(fMaxBoundsEnabled) {
-        const auto maxBounds = fResolutionScale.mapRect(fMaxBoundsRect);
-        fGlobalBoundingRect = fGlobalBoundingRect.intersected(maxBounds);
-    }
+    const auto maxBounds = fResolutionScale.mapRect(fMaxBoundsRect);
+    fGlobalBoundingRect = fGlobalBoundingRect.intersected(maxBounds);
     fixupGlobalBoundingRect();
 }
 
 void BoundingBoxRenderData::fixupGlobalBoundingRect() {
-    const QPointF roundTL(qRound(fGlobalBoundingRect.left()),
-                          qRound(fGlobalBoundingRect.top()));
-    const QPointF transF = fGlobalBoundingRect.topLeft() - roundTL;
-    fGlobalBoundingRect.translate(-transF);
-    fDrawPos = {qRound(fGlobalBoundingRect.left()),
-                qRound(fGlobalBoundingRect.top())};
+    fDrawPos = QPoint(qRound(fGlobalBoundingRect.left()),
+                      qRound(fGlobalBoundingRect.top()));
+    fGlobalBoundingRect.setTopLeft(fDrawPos);
 }
 
 RenderDataCustomizerFunctor::RenderDataCustomizerFunctor() {}

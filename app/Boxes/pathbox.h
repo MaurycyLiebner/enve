@@ -55,8 +55,7 @@ protected:
 
                 SkPath pathT;
                 QMatrix trans;
-                trans.translate(-fGlobalBoundingRect.left(),
-                                -fGlobalBoundingRect.top());
+                trans.translate(-fDrawPos.x(), -fDrawPos.y());
                 trans = fScaledTransform*trans;
                 fPath.transform(toSkMatrix(trans), &pathT);
 

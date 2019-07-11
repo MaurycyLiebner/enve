@@ -415,7 +415,6 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
 
                 stateT.fTargetRenderData =
                         GetAsSPtr(renderData, BoundingBoxRenderData);
-                renderData->fMaxBoundsEnabled = false;
                 renderData->fParentIsTarget = false;
                 data.particleStates << stateT;
                 renderData->addDependent(particleData.get());

@@ -22,8 +22,8 @@ protected:
     virtual void drawSk(SkCanvas * const canvas) = 0;
     virtual void setupRenderData() {}
     virtual void transformRenderCanvas(SkCanvas& canvas) const {
-        canvas.translate(toSkScalar(-fGlobalBoundingRect.left()),
-                         toSkScalar(-fGlobalBoundingRect.top()));
+        canvas.translate(toSkScalar(-fDrawPos.x()),
+                         toSkScalar(-fDrawPos.y()));
         canvas.concat(toSkMatrix(fScaledTransform));
     }
     virtual void copyFrom(BoundingBoxRenderData *src);
@@ -87,7 +87,6 @@ public:
     QPoint fDrawPos = {0, 0};
     SkBlendMode fBlendMode = SkBlendMode::kSrcOver;
     QRectF fMaxBoundsRect;
-    bool fMaxBoundsEnabled = true;
 
     bool fParentIsTarget = true;
     bool fRefInParent = false;

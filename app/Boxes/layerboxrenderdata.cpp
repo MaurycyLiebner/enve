@@ -6,8 +6,8 @@ ContainerBoxRenderData::ContainerBoxRenderData(BoundingBox * const parentBoxT) :
 }
 
 void ContainerBoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {
-    canvas.translate(toSkScalar(-fGlobalBoundingRect.left()),
-                     toSkScalar(-fGlobalBoundingRect.top()));
+    canvas.translate(toSkScalar(-fDrawPos.x()),
+                     toSkScalar(-fDrawPos.y()));
     canvas.concat(toSkMatrix(fResolutionScale));
 }
 
