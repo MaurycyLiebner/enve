@@ -8,7 +8,7 @@ protected:
     void afterPathSet(const QString& folderPath);
     void reload();
 public:
-    void replace();
+    void replace(QWidget * const parent);
 
     sk_sp<SkImage> getFrameAtFrame(const int relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame);

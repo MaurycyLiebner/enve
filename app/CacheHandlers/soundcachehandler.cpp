@@ -28,3 +28,11 @@ void SoundDataHandler::afterSourceChanged() {
         handler->afterSourceChanged();
     }
 }
+
+#include <QFileDialog>
+void SoundFileHandler::replace(QWidget * const parent) {
+    const auto importPath = QFileDialog::getOpenFileName(
+                parent, "Change Source", mPath,
+                "Audio Files (*.wav *.mp3)");
+    if(!importPath.isEmpty()) setPath(importPath);
+}

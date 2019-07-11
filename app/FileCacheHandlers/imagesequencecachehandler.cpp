@@ -54,6 +54,10 @@ void ImageSequenceFileHandler::reload() {
     if(mFrameImageHandlers.isEmpty()) mFileMissing = true;
 }
 
-void ImageSequenceFileHandler::replace() {
-
+#include <QFileDialog>
+#include "GUI/mainwindow.h"
+void ImageSequenceFileHandler::replace(QWidget* const parent) {
+    const auto dir = QFileDialog::getExistingDirectory(
+                parent, "Import Image Sequence", mPath);
+    if(!dir.isEmpty()) setPath(dir);
 }

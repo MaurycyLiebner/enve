@@ -15,8 +15,6 @@ public:
     void clearCache();
     void afterSourceChanged();
 
-    void replace();
-
     const HDDCachableCacheHandler& getCacheHandler() const;
 
     void addFrameLoader(const int frameId, const stdsptr<VideoFrameLoader>& loader);
@@ -82,8 +80,7 @@ protected:
         mSoundHandler->reload();
     }
 public:
-    void replace() {}
-
+    void replace(QWidget* const parent);
 
     VideoDataHandler* getFrameHandler() const {
         return mDataHandler.get();

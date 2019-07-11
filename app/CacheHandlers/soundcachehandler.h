@@ -132,7 +132,7 @@ protected:
         mDataHandler->reload();
     }
 public:
-    void replace() {}
+    void replace(QWidget* const parent);
 private:
     qsptr<SoundDataHandler> mDataHandler;
 };

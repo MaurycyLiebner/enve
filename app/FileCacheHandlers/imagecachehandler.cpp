@@ -30,3 +30,11 @@ void ImageLoader::afterProcessing() {
 void ImageLoader::afterCanceled() {
     mTargetHandler->setImage(mImage);
 }
+
+#include <QFileDialog>
+void ImageFileHandler::replace(QWidget* const parent) {
+    const auto importPath = QFileDialog::getOpenFileName(
+                parent, "Change Source", mPath,
+                "Image Files (*.png *.jpg)");
+    if(!importPath.isEmpty()) setPath(importPath);
+}

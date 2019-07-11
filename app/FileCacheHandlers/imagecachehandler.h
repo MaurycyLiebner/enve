@@ -55,8 +55,7 @@ protected:
 
     void afterPathSet(const QString& path) {
         mFileMissing = !QFile(path).exists();
-        mDataHandler.reset();
-        if(mFileMissing) return;
+        if(mFileMissing) return mDataHandler.reset();
         const auto current = ImageDataHandler::sGetDataHandler<ImageDataHandler>(path);
         if(current) mDataHandler = GetAsSPtr(current, ImageDataHandler);
         else mDataHandler = ImageDataHandler::sCreateDataHandler<ImageDataHandler>(path);
@@ -66,7 +65,7 @@ protected:
         mDataHandler->clearCache();
     }
 public:
-    void replace() {}
+    void replace(QWidget * const parent);
 
     ImageLoader * scheduleLoad() {
         if(!mDataHandler) return nullptr;

@@ -111,10 +111,10 @@ void VideoDataHandler::clearCache() {
     mFrameLoaders.clear();
 }
 
-void VideoDataHandler::replace() {
+void VideoFileHandler::replace(QWidget* const parent) {
     const QString importPath = QFileDialog::getOpenFileName(
-                MainWindow::getInstance(),
-                "Replace Video Source " + mFilePath, "",
+                parent,
+                "Replace Video Source " + mPath, "",
                 "Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
     MainWindow::getInstance()->enableEventFilter();
     if(!importPath.isEmpty()) {
@@ -122,7 +122,7 @@ void VideoDataHandler::replace() {
         if(!file.exists()) return;
         if(hasVideoExt(importPath)) {
             try {
-                setFilePath(importPath);
+                setPath(importPath);
             } catch(const std::exception& e) {
                 gPrintExceptionCritical(e);
             }

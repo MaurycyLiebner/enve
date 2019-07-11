@@ -73,6 +73,8 @@ void VideoBox::setFilePath(const QString &path) {
         const auto oldDataHandler = videoSrc->getDataHandler();
         disconnect(mFileHandler, &VideoFileHandler::pathChanged,
                    this, &VideoBox::animationDataChanged);
+        disconnect(mFileHandler, &VideoFileHandler::reloaded,
+                   this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
         disconnect(oldDataHandler, &VideoDataHandler::frameCountUpdated,
                    this, &VideoBox::updateDurationRectangleAnimationRange);
     }
@@ -86,6 +88,8 @@ void VideoBox::setFilePath(const QString &path) {
                     &newDataHandler->getCacheHandler());
         connect(mFileHandler, &VideoFileHandler::pathChanged,
                 this, &VideoBox::animationDataChanged);
+        connect(mFileHandler, &VideoFileHandler::reloaded,
+                this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
         connect(newDataHandler, &VideoDataHandler::frameCountUpdated,
                 this, &VideoBox::updateDurationRectangleAnimationRange);
     } else {
