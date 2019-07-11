@@ -263,10 +263,9 @@ private:
 
     void processNextQuedHDDTask();
     void processNextQuedCPUTask();
-    void processNextQuedGPUTask();
+    bool processNextQuedGPUTask();
     void processNextTasks();
 
-    void tryProcessingNextQuedCPUTask();
     void tryProcessingNextQuedHDDTask();
 
     bool shouldQueMoreCPUTasks() const;

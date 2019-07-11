@@ -89,7 +89,9 @@ public:
     FillSettingsAnimator *getFillSettings() const;
     OutlineSettingsAnimator *getStrokeSettings() const;
 
+    void scheduleChildWaitingTasks();
     void scheduleWaitingTasks();
+    void queChildScheduledTasks();
     void queScheduledTasks();
 
 

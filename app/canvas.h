@@ -611,6 +611,29 @@ public:
     bool hasValidPaintTarget() const {
         return mPaintTarget.isValid();
     }
+
+    void scheduleWaitingTasks() {
+        if(mSmoothChange && mCurrentContainer) {
+            if(!mDrawnSinceQue) return;
+            mCurrentContainer->scheduleChildWaitingTasks();
+        } else ContainerBox::scheduleWaitingTasks();
+    }
+
+    void queScheduledTasks() {
+        if(mSmoothChange && mCurrentContainer) {
+            if(!mDrawnSinceQue) return;
+            mCurrentContainer->queChildScheduledTasks();
+        } else ContainerBox::queScheduledTasks();
+        mDrawnSinceQue = false;
+    }
+
+    void startSmoothChange() {
+        mSmoothChange = true;
+    }
+
+    void finishSmoothChange() {
+        mSmoothChange = false;
+    }
 private:
     void openTextEditorForTextBox(TextBox *textBox);
 
@@ -621,6 +644,8 @@ private:
     TransformMode mTransMode = MODE_NONE;
 protected:
     Document& mDocument;
+    bool mSmoothChange = false;
+    bool mDrawnSinceQue = true;
 
     stdsptr<UndoRedoStack> mUndoRedoStack;
 

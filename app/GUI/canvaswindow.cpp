@@ -880,6 +880,7 @@ void CanvasWindow::grabMouse() {
 #ifndef QT_DEBUG
     QWidget::grabMouse();
 #endif
+    if(mCurrentCanvas) mCurrentCanvas->startSmoothChange();
 }
 
 void CanvasWindow::releaseMouse() {
@@ -887,6 +888,7 @@ void CanvasWindow::releaseMouse() {
 #ifndef QT_DEBUG
     QWidget::releaseMouse();
 #endif
+    if(mCurrentCanvas) mCurrentCanvas->finishSmoothChange();
 }
 
 bool CanvasWindow::isMouseGrabber() {

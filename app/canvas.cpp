@@ -160,6 +160,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
                       const QRect& drawRect,
                       const QMatrix& viewTrans,
                       const bool mouseGrabbing) {
+    mDrawnSinceQue = true;
     SkBitmap bitmap;
     bitmap.makeShader(SkTileMode::kRepeat, SkTileMode::kRepeat);
     SkPaint paint;

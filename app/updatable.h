@@ -40,6 +40,7 @@ public:
     };
 
     virtual void processTask() = 0;
+    virtual bool gpuProcessingNeeded() const { return false; }
     virtual GpuSupport gpuSupport() const { return GPU_NO_SUPPORT; }
     bool gpuProcessingSupported() const { return gpuSupport() > GPU_NO_SUPPORT; }
     bool gpuProcessingPreferred() const { return gpuSupport() == GPU_PREFERRED; }

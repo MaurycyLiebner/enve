@@ -38,6 +38,8 @@ public:
         return fRelBoundingRect.center();
     }
 
+    bool gpuProcessingNeeded() const { return !fGPUEffects.isEmpty(); }
+
     virtual void processTaskWithGPU(QGL33c * const gl,
                                     GrContext * const grContext);
     void processTask();

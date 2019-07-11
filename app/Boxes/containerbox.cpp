@@ -265,18 +265,26 @@ void ContainerBox::filterFillPath(const qreal relFrame,
     mParentGroup->filterFillPath(parentRelFrame, srcDstPath);
 }
 
-void ContainerBox::scheduleWaitingTasks() {
+void ContainerBox::scheduleChildWaitingTasks() {
     for(const auto &child : mContainedBoxes) {
         child->scheduleWaitingTasks();
     }
+}
+
+void ContainerBox::scheduleWaitingTasks() {
+    scheduleChildWaitingTasks();
     BoundingBox::scheduleWaitingTasks();
+}
+
+void ContainerBox::queChildScheduledTasks() {
+    for(const auto &child : mContainedBoxes) {
+        child->queScheduledTasks();
+    }
 }
 
 void ContainerBox::queScheduledTasks() {
     BoundingBox::queScheduledTasks();
-    for(const auto &child : mContainedBoxes) {
-        child->queScheduledTasks();
-    }
+    queChildScheduledTasks();
 }
 
 void ContainerBox::promoteToLayer() {

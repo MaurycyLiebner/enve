@@ -68,7 +68,12 @@ void TaskScheduler::scheduleGPUTask(const stdsptr<ScheduledPostProcess> &task) {
 void TaskScheduler::queCPUTask(const stdsptr<Task>& task) {
     if(!task->isQued()) task->taskQued();
     mQuedCPUTasks.addTask(task);
-    if(task->readyToBeProcessed()) processNextQuedCPUTask();
+    if(task->readyToBeProcessed()) {
+        if(!task->gpuProcessingSupported() ||
+           !processNextQuedGPUTask()) {
+            processNextQuedCPUTask();
+        }
+    }
 }
 
 bool TaskScheduler::shouldQueMoreCPUTasks() const {
@@ -109,7 +114,7 @@ void TaskScheduler::queScheduledCPUTasks() {
     mQuedCPUTasks.endQue();
     mCPUQueing = false;
 
-    if(!mQuedCPUTasks.isEmpty()) processNextQuedCPUTask();
+    if(!mQuedCPUTasks.isEmpty()) processNextTasks();
 }
 
 void TaskScheduler::queScheduledHDDTasks() {
@@ -142,10 +147,6 @@ void TaskScheduler::switchToBackupHDDExecutor() {
 
 void TaskScheduler::tryProcessingNextQuedHDDTask() {
     if(!mHDDThreadBusy) processNextQuedHDDTask();
-}
-
-void TaskScheduler::tryProcessingNextQuedCPUTask() {
-    if(!mFreeCPUExecs.isEmpty()) processNextQuedCPUTask();
 }
 
 void TaskScheduler::afterHDDTaskFinished(
@@ -192,8 +193,8 @@ void TaskScheduler::processNextTasks() {
         callFreeThreadsForCPUTasksAvailableFunc();
 }
 
-void TaskScheduler::processNextQuedGPUTask() {
-    if(!mGpuPostProcessor.hasFinished()) return;
+bool TaskScheduler::processNextQuedGPUTask() {
+    if(!mGpuPostProcessor.hasFinished()) return false;
     const auto task = mQuedCPUTasks.takeQuedForGpuProcessing();
     if(task) {
         task->aboutToProcess();
@@ -201,8 +202,8 @@ void TaskScheduler::processNextQuedGPUTask() {
                             GetAsSPtr(task, BoundingBoxRenderData)));
     }
     const auto usageWidget = MainWindow::getInstance()->getUsageWidget();
-    if(!usageWidget) return;
     usageWidget->setGpuUsage(!mGpuPostProcessor.hasFinished());
+    return task.get();
 }
 
 void TaskScheduler::afterCPUTaskFinished(
@@ -210,7 +211,7 @@ void TaskScheduler::afterCPUTaskFinished(
         ExecController * const controller) {
     mFreeCPUExecs << static_cast<CPUExecController*>(controller);
     if(task->getState() != Task::CANCELED &&
-       task->gpuProcessingPreferred()) {
+       task->gpuProcessingNeeded()) {
         const auto sTask = GetAsSPtr(task, BoundingBoxRenderData);
         const auto gpuProcess = SPtrCreate(BoxRenderDataScheduledPostProcess)(sTask);
         scheduleGPUTask(gpuProcess);
