@@ -20,7 +20,7 @@ void RenderContainer::drawSk(SkCanvas * const canvas,
             paintT.setBlendMode(paint->getBlendMode());
             paintT.setColor(SK_ColorTRANSPARENT);
             SkPath path;
-            path.addRect(SkRect::MakeXYWH(mDrawPos.x(), mDrawPos.y(),
+            path.addRect(SkRect::MakeXYWH(mGlobalRect.x(), mGlobalRect.y(),
                                           mImageSk->width(),
                                           mImageSk->height()));
             path.toggleInverseFillType();
@@ -30,7 +30,7 @@ void RenderContainer::drawSk(SkCanvas * const canvas,
     //paint->setAntiAlias(true);
     //paint->setFilterQuality(kHigh_SkFilterQuality);
     SkiaHelpers::drawImageGPU(canvas, mImageSk,
-                              mDrawPos.x(), mDrawPos.y(), paint, grContext);
+                              mGlobalRect.x(), mGlobalRect.y(), paint, grContext);
     //canvas->drawImage(mImageSk, mDrawPos.x(), mDrawPos.y(), paint);
     canvas->restore();
 }
@@ -47,7 +47,7 @@ void RenderContainer::setSrcRenderData(BoundingBoxRenderData * const data) {
     mTransform = data->fTransform;
     mResolutionFraction = data->fResolution;
     mImageSk = data->fRenderedImage;
-    mDrawPos = data->fDrawPos;
+    mGlobalRect = data->fGlobalRect;
     mRelFrame = data->fRelFrame;
     mPaintTransform.reset();
     mPaintTransform.scale(1/mResolutionFraction, 1/mResolutionFraction);

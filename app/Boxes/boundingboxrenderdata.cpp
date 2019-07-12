@@ -10,7 +10,6 @@ BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
 }
 
 void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
-    fGlobalBoundingRect = src->fGlobalBoundingRect;
     fTransform = src->fTransform;
     fCustomRelFrame = src->fCustomRelFrame;
     fUseCustomRelFrame = src->fUseCustomRelFrame;
@@ -18,7 +17,7 @@ void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     fRelBoundingRect = src->fRelBoundingRect;
     fRenderTransform = src->fRenderTransform;
     fBlendMode = src->fBlendMode;
-    fDrawPos = src->fDrawPos;
+    fGlobalRect = src->fGlobalRect;
     fOpacity = src->fOpacity;
     fResolution = src->fResolution;
     fRenderedImage = SkiaHelpers::makeCopy(src->fRenderedImage);
@@ -57,22 +56,21 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) 
         paintT.setBlendMode(fBlendMode);
         paintT.setColor(SK_ColorTRANSPARENT);
         SkPath path;
-        path.addRect(SkRect::MakeXYWH(fDrawPos.x(), fDrawPos.y(),
+        path.addRect(SkRect::MakeXYWH(fGlobalRect.x(), fGlobalRect.y(),
                                       fRenderedImage->width(),
                                       fRenderedImage->height()));
         path.toggleInverseFillType();
         canvas->drawPath(path, paintT);
     }
-    canvas->drawImage(fRenderedImage, fDrawPos.x(), fDrawPos.y(), &paint);
+    canvas->drawImage(fRenderedImage, fGlobalRect.x(), fGlobalRect.y(), &paint);
 }
 
 void BoundingBoxRenderData::processTaskWithGPU(QGL33c * const gl,
                                                GrContext * const grContext) {
-    updateGlobalFromRelBoundingRect();
+    Q_UNUSED(gl);
+    updateGlobalRect();
     if(fOpacity < 0.001) return;
 
-    const int width = qCeil(fGlobalBoundingRect.width());
-    const int height = qCeil(fGlobalBoundingRect.height());
     //const auto info = SkiaHelpers::getPremulBGRAInfo(width, height);
 //    Texture tex;
 //    tex.gen(gl, width, height, nullptr);
@@ -81,8 +79,9 @@ void BoundingBoxRenderData::processTaskWithGPU(QGL33c * const gl,
 //    texInfo.fFormat = GR_GL_RGBA8;
 //    texInfo.fTarget = GR_GL_TEXTURE_2D;
     const auto grTex = grContext->createBackendTexture(
-                width, height, kRGBA_8888_SkColorType,
-                GrMipMapped::kNo, GrRenderable::kYes);
+                fGlobalRect.width(), fGlobalRect.height(),
+                kRGBA_8888_SkColorType, GrMipMapped::kNo,
+                GrRenderable::kYes);
 //    const auto grTex = GrBackendTexture(tex.fWidth, tex.fHeight,
 //                                        GrMipMapped::kNo, texInfo);
     const auto surf = SkSurface::MakeFromBackendTexture(
@@ -105,12 +104,11 @@ void BoundingBoxRenderData::processTaskWithGPU(QGL33c * const gl,
 }
 
 void BoundingBoxRenderData::processTask() {
-    updateGlobalFromRelBoundingRect();
+    updateGlobalRect();
     if(fOpacity < 0.001) return;
 
-    const auto info = SkiaHelpers::getPremulBGRAInfo(
-                qCeil(fGlobalBoundingRect.width()),
-                qCeil(fGlobalBoundingRect.height()));
+    const auto info = SkiaHelpers::getPremulBGRAInfo(fGlobalRect.width(),
+                                                     fGlobalRect.height());
     fBitmapTMP.allocPixels(info);
     fBitmapTMP.eraseColor(eraseColor());
 
@@ -138,7 +136,7 @@ void BoundingBoxRenderData::beforeProcessing() {
 
 void BoundingBoxRenderData::afterProcessing() {
     if(fMotionBlurTarget) {
-        fMotionBlurTarget->fOtherGlobalRects << fGlobalBoundingRect;
+        fMotionBlurTarget->fOtherGlobalRects << fGlobalRect;
     }
     if(fParentBox && fParentIsTarget) {
         fParentBox->renderDataFinished(this);
@@ -185,25 +183,28 @@ bool BoundingBoxRenderData::nullifyBeforeProcessing() {
     return fReason == BoundingBox::FRAME_CHANGE;
 }
 
-void BoundingBoxRenderData::updateGlobalFromRelBoundingRect() {
+void BoundingBoxRenderData::updateGlobalRect() {
     fResolutionScale.reset();
     fResolutionScale.scale(fResolution, fResolution);
     fScaledTransform = fTransform*fResolutionScale;
-    fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
+    QRectF globalRectF = fScaledTransform.mapRect(fRelBoundingRect);
     for(const QRectF &rectT : fOtherGlobalRects) {
-        fGlobalBoundingRect = fGlobalBoundingRect.united(rectT);
+        globalRectF = globalRectF.united(rectT);
     }
-    fGlobalBoundingRect.adjust(-fEffectsMargin.left(), -fEffectsMargin.top(),
-                               fEffectsMargin.right(), fEffectsMargin.bottom());
+    globalRectF.adjust(-fEffectsMargin.left(), -fEffectsMargin.top(),
+                       fEffectsMargin.right(), fEffectsMargin.bottom());
     const auto maxBounds = fResolutionScale.mapRect(fMaxBoundsRect);
-    fGlobalBoundingRect = fGlobalBoundingRect.intersected(maxBounds);
-    fixupGlobalBoundingRect();
+    globalRectF = globalRectF.intersected(maxBounds);
+    setGlobalRect(globalRectF);
 }
 
-void BoundingBoxRenderData::fixupGlobalBoundingRect() {
-    fDrawPos = QPoint(qRound(fGlobalBoundingRect.left()),
-                      qRound(fGlobalBoundingRect.top()));
-    fGlobalBoundingRect.setTopLeft(fDrawPos);
+void BoundingBoxRenderData::setGlobalRect(const QRectF& globalRectF) {
+    fGlobalRectF = globalRectF;
+    const QPoint pos(qFloor(globalRectF.left()),
+                     qFloor(globalRectF.top()));
+    const QSize size(qCeil(globalRectF.width()),
+                     qCeil(globalRectF.height()));
+    fGlobalRect = QRect(pos, size);
 }
 
 RenderDataCustomizerFunctor::RenderDataCustomizerFunctor() {}

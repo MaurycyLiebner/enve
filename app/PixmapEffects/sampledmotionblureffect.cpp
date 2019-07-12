@@ -156,9 +156,8 @@ void SampledMotionBlurEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
     qreal opacityT = opacityStepT*(1. - qCeil(numberSamples) + numberSamples);
     for(const auto& sample : samples) {
         qreal sampleAlpha = opacityT*opacityT*opacity;
-        QPointF drawPosF = sample->fGlobalBoundingRect.topLeft() -
-                boxData->fGlobalBoundingRect.topLeft();//QPointF(0., 0.);
-        QPoint drawPos = drawPosF.toPoint();
+        QPoint drawPos = sample->fGlobalRect.topLeft() -
+                        boxData->fGlobalRect.topLeft();
         replaceIfHigherAlpha(drawPos.x(), drawPos.y(),
                              motionBlur, sample->fRenderedImage,
                              sampleAlpha);

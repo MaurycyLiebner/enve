@@ -114,8 +114,8 @@ private:
             if(emitterData.boxDraw) {
                 canvas->save();
                 canvas->resetMatrix();
-                canvas->translate(toSkScalar(-fGlobalBoundingRect.left()),
-                                  toSkScalar(-fGlobalBoundingRect.top()));
+                canvas->translate(toSkScalar(-fGlobalRect.left()),
+                                  toSkScalar(-fGlobalRect.top()));
                 QMatrix scale;
                 scale.scale(fResolution, fResolution);
                 canvas->concat(toSkMatrix(scale));

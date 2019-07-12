@@ -5,12 +5,12 @@
 CanvasRenderData::CanvasRenderData(BoundingBox * const parentBoxT) :
     ContainerBoxRenderData(parentBoxT) {}
 
-void CanvasRenderData::updateGlobalFromRelBoundingRect() {
+void CanvasRenderData::updateGlobalRect() {
     fResolutionScale.reset();
     fResolutionScale.scale(fResolution, fResolution);
     fScaledTransform = fResolutionScale;
-    fGlobalBoundingRect = fScaledTransform.mapRect(fRelBoundingRect);
-    fixupGlobalBoundingRect();
+    const auto globalRectF = fScaledTransform.mapRect(fRelBoundingRect);
+    setGlobalRect(globalRectF);
 }
 
 void CanvasRenderData::updateRelBoundingRect() {

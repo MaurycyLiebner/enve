@@ -37,7 +37,7 @@ void BoxRenderDataScheduledPostProcess::process(
     }
     const int srcWidth = srcImage->width();
     const int srcHeight = srcImage->height();
-    const QPointF gPos = mBoxData->fGlobalBoundingRect.topLeft();
+    const QPointF gPos = mBoxData->fGlobalRect.topLeft();
 
     glViewport(0, 0, srcWidth, srcHeight);
 

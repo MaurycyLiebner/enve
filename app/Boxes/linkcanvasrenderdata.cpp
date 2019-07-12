@@ -3,18 +3,17 @@
 #include "PixmapEffects/pixmapeffect.h"
 
 void LinkCanvasRenderData::processTask() {
-    updateGlobalFromRelBoundingRect();
+    updateGlobalRect();
     if(fOpacity < 0.001) return;
 
-    const auto info = SkiaHelpers::getPremulBGRAInfo(
-                qCeil(fGlobalBoundingRect.width()),
-                qCeil(fGlobalBoundingRect.height()));
+    const auto info = SkiaHelpers::getPremulBGRAInfo(fGlobalRect.width(),
+                                                     fGlobalRect.height());
     fBitmapTMP.allocPixels(info);
     fBitmapTMP.eraseColor(SK_ColorTRANSPARENT);
 
     SkCanvas rasterCanvas(fBitmapTMP);
-    rasterCanvas.translate(toSkScalar(-fGlobalBoundingRect.left()),
-                           toSkScalar(-fGlobalBoundingRect.top()));
+    rasterCanvas.translate(toSkScalar(-fGlobalRect.left()),
+                           toSkScalar(-fGlobalRect.top()));
 
     if(fClipToCanvas) {
         rasterCanvas.save();

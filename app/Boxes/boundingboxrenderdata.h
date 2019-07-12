@@ -22,8 +22,8 @@ protected:
     virtual void drawSk(SkCanvas * const canvas) = 0;
     virtual void setupRenderData() {}
     virtual void transformRenderCanvas(SkCanvas& canvas) const {
-        canvas.translate(toSkScalar(-fDrawPos.x()),
-                         toSkScalar(-fDrawPos.y()));
+        canvas.translate(toSkScalar(-fGlobalRect.x()),
+                         toSkScalar(-fGlobalRect.y()));
         canvas.concat(toSkMatrix(fScaledTransform));
     }
     virtual void copyFrom(BoundingBoxRenderData *src);
@@ -70,10 +70,13 @@ public:
     QMatrix fRenderTransform;
 
     QRectF fRelBoundingRect;
-    QRectF fGlobalBoundingRect;
+    QRectF fGlobalRectF;
+    QRect fGlobalRect;
+
+    QMarginsF fEffectsMargin;
+
     qreal fOpacity = 1;
     qreal fResolution;
-    QMarginsF fEffectsMargin;
     int fRelFrame;
 
     // for motion blur
@@ -84,7 +87,6 @@ public:
     // for motion blur
 
     QList<stdsptr<PixmapEffectRenderData>> fRasterEffects;
-    QPoint fDrawPos = {0, 0};
     SkBlendMode fBlendMode = SkBlendMode::kSrcOver;
     QRectF fMaxBoundsRect;
 
@@ -114,9 +116,9 @@ public:
     }
     bool nullifyBeforeProcessing();
 protected:
-    virtual void updateGlobalFromRelBoundingRect();
+    virtual void updateGlobalRect();
 
-    void fixupGlobalBoundingRect();
+    void setGlobalRect(const QRectF &globalRectF);
 
     QList<stdsptr<RenderDataCustomizerFunctor>> mRenderDataCustomizerFunctors;
     bool mDelayDataSet = false;

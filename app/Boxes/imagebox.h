@@ -31,9 +31,9 @@ struct ImageRenderData : public BoundingBoxRenderData {
 private:
     void setupDirectDraw() {
         updateRelBoundingRect();
-        updateGlobalFromRelBoundingRect();
+        updateGlobalRect();
         //fRenderTransform = fScaledTransform;
-        //fRenderTransform.translate(-fDrawPos.x(), -fDrawPos.y());
+        //fRenderTransform.translate(-fGlobalRect.x(), -fGlobalRect.y());
         fRenderedImage = fImage;
     }
 

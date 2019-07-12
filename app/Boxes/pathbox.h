@@ -55,7 +55,7 @@ protected:
 
                 SkPath pathT;
                 QMatrix trans;
-                trans.translate(-fDrawPos.x(), -fDrawPos.y());
+                trans.translate(-fGlobalRect.x(), -fGlobalRect.y());
                 trans = fScaledTransform*trans;
                 fPath.transform(toSkMatrix(trans), &pathT);
 
@@ -94,12 +94,13 @@ protected:
 
                 fBitmapTMP = surf.toBitmap(iMargins);
 
-                fGlobalBoundingRect.translate(-surf.zeroTilePos() -
-                                              QPoint(iMargins.left(),
-                                                     iMargins.top()));
-                fGlobalBoundingRect.setSize(QSizeF(fBitmapTMP.width(),
-                                                   fBitmapTMP.height()));
-                fixupGlobalBoundingRect();
+                QRectF globalRectF = fGlobalRect;
+                globalRectF.translate(-surf.zeroTilePos() -
+                                      QPoint(iMargins.left(),
+                                             iMargins.top()));
+                globalRectF.setSize(QSizeF(fBitmapTMP.width(),
+                                           fBitmapTMP.height()));
+                setGlobalRect(globalRectF);
             } else {
                 paint.setShader(nullptr);
                 fStrokeSettings.applyPainterSettingsSk(&paint);

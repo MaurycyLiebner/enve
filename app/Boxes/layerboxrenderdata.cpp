@@ -6,15 +6,15 @@ ContainerBoxRenderData::ContainerBoxRenderData(BoundingBox * const parentBoxT) :
 }
 
 void ContainerBoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {
-    canvas.translate(toSkScalar(-fDrawPos.x()),
-                     toSkScalar(-fDrawPos.y()));
+    canvas.translate(toSkScalar(-fGlobalRect.x()),
+                     toSkScalar(-fGlobalRect.y()));
     canvas.concat(toSkMatrix(fResolutionScale));
 }
 
 void ContainerBoxRenderData::updateRelBoundingRect() {
     BoundingBoxRenderData::updateRelBoundingRect();
     for(const auto &child : fChildrenRenderData) {
-        fOtherGlobalRects << child->fGlobalBoundingRect;
+        fOtherGlobalRects << child->fGlobalRect;
     }
 }
 

@@ -10,7 +10,7 @@ struct CanvasRenderData : public ContainerBoxRenderData {
 
     virtual SkColor eraseColor() const { return fBgColor; }
 protected:
-    void updateGlobalFromRelBoundingRect();
+    void updateGlobalRect();
     void updateRelBoundingRect();
 };
 

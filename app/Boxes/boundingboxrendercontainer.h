@@ -45,7 +45,7 @@ protected:
     bool mExpired = false;
     int mRelFrame = 0;
     qreal mResolutionFraction;
-    QPoint mDrawPos;
+    QRect mGlobalRect;
     QMatrix mTransform;
     QMatrix mPaintTransform;
     QMatrix mRenderTransform;
