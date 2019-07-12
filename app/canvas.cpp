@@ -250,7 +250,9 @@ void Canvas::renderSk(SkCanvas * const canvas,
     }
 
     if(mPaintTarget.isValid()) {
+        canvas->save();
         mPaintTarget.draw(canvas, viewTrans, drawRect);
+        canvas->restore();
     } else {
         if(mSelecting) {
             paint.setStyle(SkPaint::kStroke_Style);

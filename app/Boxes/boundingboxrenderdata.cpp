@@ -70,6 +70,7 @@ void BoundingBoxRenderData::processTaskWithGPU(QGL33c * const gl,
     Q_UNUSED(gl);
     updateGlobalRect();
     if(fOpacity < 0.001) return;
+    if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
 
     //const auto info = SkiaHelpers::getPremulBGRAInfo(width, height);
 //    Texture tex;

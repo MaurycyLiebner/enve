@@ -35,6 +35,7 @@ private:
         //fRenderTransform = fScaledTransform;
         //fRenderTransform.translate(-fGlobalRect.x(), -fGlobalRect.y());
         fRenderedImage = fImage;
+        finishedProcessing();
     }
 
     void drawSk(SkCanvas * const canvas) {
@@ -42,8 +43,9 @@ private:
         //paint.setFilterQuality(kHigh_SkFilterQuality);
         //paint.setAntiAlias(true);
         if(fImage) canvas->drawImage(fImage,
-                                     qRound(fRelBoundingRect.x()),
-                                     qRound(fRelBoundingRect.y()), &paint);
+                                     toSkScalar(fRelBoundingRect.x()),
+                                     toSkScalar(fRelBoundingRect.y()),
+                                     &paint);
     }
 };
 

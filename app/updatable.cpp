@@ -15,7 +15,7 @@ void Task::aboutToProcess() {
 }
 
 void Task::finishedProcessing() {
-    if(mState == CANCELED) return;
+    if(mState == CANCELED || mState == FAILED) return;
     mState = FINISHED;
     afterProcessing();
     if(unhandledException()) {

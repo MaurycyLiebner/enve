@@ -20,8 +20,6 @@ DEPENDPATH += $$PWD/../core
 LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
 INCLUDEPATH += /usr/local/include/libmypaint/
 
-INCLUDEPATH += /usr/include/glib-2.0
-INCLUDEPATH += /usr/lib/x86_64-linux-gnu/glib-2.0/include
 LIBS += -lgobject-2.0 -lglib-2.0 -ljson-c
 
 INCLUDEPATH += $$SKIA_FOLDER/

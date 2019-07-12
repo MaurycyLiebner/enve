@@ -198,6 +198,10 @@ bool TaskScheduler::processNextQuedGPUTask() {
     const auto task = mQuedCPUTasks.takeQuedForGpuProcessing();
     if(task) {
         task->aboutToProcess();
+        if(task->getState() > Task::PROCESSING) {
+            processNextTasks();
+            return true;
+        }
         scheduleGPUTask(SPtrCreate(BoxRenderDataScheduledPostProcess)(
                             GetAsSPtr(task, BoundingBoxRenderData)));
     }
@@ -228,6 +232,9 @@ void TaskScheduler::processNextQuedCPUTask() {
         const auto task = mQuedCPUTasks.takeQuedForCpuProcessing();
         if(task) {
             task->aboutToProcess();
+            if(task->getState() > Task::PROCESSING) {
+                return processNextTasks();
+            }
             const auto executor = mFreeCPUExecs.takeLast();
             executor->processTask(task);
         } else break;
