@@ -32,7 +32,7 @@
 Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
                const int frameCount, const qreal fps) :
-    ContainerBox(TYPE_CANVAS), mDocument(document) {
+    ContainerBox(TYPE_CANVAS), mDocument(document), mPaintTarget(this) {
     connect(&mDocument, &Document::canvasModeSet,
             this, &Canvas::setCanvasMode);
     mMainWindow = MainWindow::getInstance();
@@ -919,13 +919,15 @@ void PaintTarget::setPaintDrawable(DrawableAutoTiledSurface * const surf) {
 void PaintTarget::setPaintBox(PaintBox * const box) {
     if(box == mPaintDrawableBox) return;
     if(mPaintDrawableBox) {
+        mPaintDrawableBox->showAfterPainting();
         QObject::disconnect(mPaintAnimSurface,
                             &AnimatedSurface::currentSurfaceChanged,
                             mCanvas, nullptr);
         afterPaintAnimSurfaceChanged();
     }
-    if(box) {
-        mPaintDrawableBox = box;
+    mPaintDrawableBox = box;
+    if(mPaintDrawableBox) {
+        mPaintDrawableBox->hideForPainting();
         mPaintAnimSurface = mPaintDrawableBox->getSurface();
         const auto setter = [this](DrawableAutoTiledSurface * const surf) {
             setPaintDrawable(surf);
@@ -935,7 +937,6 @@ void PaintTarget::setPaintBox(PaintBox * const box) {
                          mCanvas, setter);
         setPaintDrawable(mPaintAnimSurface->getCurrentSurface());
     } else {
-        mPaintDrawableBox = nullptr;
         mPaintAnimSurface = nullptr;
         mPaintDrawable = nullptr;
     }

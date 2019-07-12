@@ -30,6 +30,7 @@ struct ImageRenderData : public BoundingBoxRenderData {
     sk_sp<SkImage> fImage;
 private:
     void setupDirectDraw() {
+        fEffectsMargin = QMargins();
         updateRelBoundingRect();
         updateGlobalRect();
         //fRenderTransform = fScaledTransform;

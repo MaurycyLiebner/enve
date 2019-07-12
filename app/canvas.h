@@ -40,6 +40,8 @@ class ImageBox;
 enum CtrlsMode : short;
 
 struct PaintTarget {
+    PaintTarget(Canvas* const canvas) : mCanvas(canvas) {}
+
     void draw(SkCanvas * const canvas,
               const QMatrix& viewTrans, const QRect& drawRect);
 

@@ -39,6 +39,14 @@ public:
     AnimatedSurface * getSurface() const {
         return mSurface.get();
     }
+
+    void hideForPainting() {
+        mVisible = false;
+    }
+
+    void showAfterPainting() {
+        mVisible = true;
+    }
 private:
     qsptr<AnimatedSurface> mSurface;
 };

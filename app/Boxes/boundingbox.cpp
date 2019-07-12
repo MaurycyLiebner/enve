@@ -1291,7 +1291,7 @@ void BoundingBox::scheduleTask(const stdsptr<BoundingBoxRenderData>& task) {
 
 void BoundingBox::setVisibile(const bool visible) {
     if(mVisible == visible) return;
-    if(mSelected) removeFromSelection();
+    if(mSelected && mVisible) removeFromSelection();
     mVisible = visible;
 
     prp_afterWholeInfluenceRangeChanged();
