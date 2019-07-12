@@ -31,6 +31,7 @@ struct AutoTiledSurface {
         mAutoTilesData.swap(other.mAutoTilesData);
     }
 
+    void setPixelClamp(const QRect& pixRect, const QPoint& zeroPos);
     void loadBitmap(const SkBitmap &src);
 
     void _free() {

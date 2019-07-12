@@ -193,7 +193,7 @@ void BoundingBoxRenderData::updateGlobalRect() {
     }
     globalRectF.adjust(-fEffectsMargin.left(), -fEffectsMargin.top(),
                        fEffectsMargin.right(), fEffectsMargin.bottom());
-    const auto maxBounds = fResolutionScale.mapRect(fMaxBoundsRect);
+    const auto maxBounds = fResolutionScale.mapRect(QRectF(fMaxBoundsRect));
     globalRectF = globalRectF.intersected(maxBounds);
     setGlobalRect(globalRectF);
 }

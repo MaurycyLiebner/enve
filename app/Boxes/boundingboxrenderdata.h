@@ -72,6 +72,7 @@ public:
     QRectF fRelBoundingRect;
     QRectF fGlobalRectF;
     QRect fGlobalRect;
+    QRect fMaxBoundsRect;
 
     QMarginsF fEffectsMargin;
 
@@ -88,7 +89,6 @@ public:
 
     QList<stdsptr<PixmapEffectRenderData>> fRasterEffects;
     SkBlendMode fBlendMode = SkBlendMode::kSrcOver;
-    QRectF fMaxBoundsRect;
 
     bool fParentIsTarget = true;
     bool fRefInParent = false;

@@ -365,7 +365,10 @@ void AutoTilesData::read(QIODevice * const src) {
     }
 }
 
-void AutoTilesData::stretchToTile(const int tx, const int ty) {
+bool AutoTilesData::stretchToTile(const int tx, const int ty) {
+    if(tx > mMaxCol || tx < mMinCol) return false;
+    if(ty > mMaxRow || ty < mMinRow) return false;
+
     const int colId = tx + mZeroTileCol;
     const int rowId = ty + mZeroTileRow;
 
@@ -379,6 +382,7 @@ void AutoTilesData::stretchToTile(const int tx, const int ty) {
     } else if(colId >= mColumnCount) {
         appendColumns(qAbs(colId - mColumnCount + 1));
     }
+    return true;
 }
 
 QList<uint16_t *> AutoTilesData::newColumn() {

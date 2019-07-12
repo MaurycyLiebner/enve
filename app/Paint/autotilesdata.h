@@ -23,7 +23,7 @@ struct AutoTilesData {
 
     void reset();
 
-    void stretchToTile(const int tx, const int ty);
+    bool stretchToTile(const int tx, const int ty);
     uint16_t* getTile(const int tx, const int ty) const;
 
     int width() const;
@@ -67,6 +67,22 @@ struct AutoTilesData {
                      pixRect.height()/TILE_SIZE + heightRem);
     }
 
+    void setPixelClamp(const QRect& pixRect, const QPoint& zeroPos) {
+        const int topPixs = zeroPos.y() - pixRect.top();
+        const int topTiles = qMax(0, qCeil(qreal(topPixs)/TILE_SIZE));
+        const int leftPixs = zeroPos.x() - pixRect.left();
+        const int leftTiles = qMax(0, qCeil(qreal(leftPixs)/TILE_SIZE));
+        const int bottomPixs = pixRect.bottom() - zeroPos.y();
+        const int bottomTiles = qMax(0, qCeil(qreal(bottomPixs)/TILE_SIZE));
+        const int rightPixs = pixRect.right() - zeroPos.x();
+        const int rightTiles = qMax(0, qCeil(qreal(rightPixs)/TILE_SIZE));
+
+        mMinCol = -leftTiles;
+        mMaxCol = rightTiles;
+        mMinRow = -topTiles;
+        mMaxRow = bottomTiles;
+    }
+
     bool isEmpty() const { return mColumnCount == 0 || mRowCount == 0; }
 
     void deepCopy(const AutoTilesData &other);
@@ -88,6 +104,11 @@ private:
     void appendRows(const int count);
     void prependColumns(const int count);
     void appendColumns(const int count);
+
+    int mMinCol = -100;
+    int mMaxCol = 100;
+    int mMinRow = -100;
+    int mMaxRow = 100;
 
     int mZeroTileCol = 0;
     int mZeroTileRow = 0;

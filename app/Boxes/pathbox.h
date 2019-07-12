@@ -51,6 +51,7 @@ protected:
                     /*strokeSettings.fStrokeBrush*/) {
                 if(!fStrokeSettings.fStrokeBrush) return;
                 AutoTiledSurface surf;
+                surf.setPixelClamp(fMaxBoundsRect, fGlobalRect.topLeft());
                 surf.loadBitmap(fBitmapTMP);
 
                 SkPath pathT;
