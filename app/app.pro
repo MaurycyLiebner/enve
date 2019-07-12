@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 HOME_FOLDER = /home/ailuropoda
-LIBMYPAINT_FOLDER = $$HOME_FOLDER/.libmypaint-1.3.0
+LIBMYPAINT_FOLDER = $$HOME_FOLDER/.libmypaint-1.3.0.a
 #f06b6d5469a505bb5ce3d823a8362b5ffa5a24dc
 SKIA_FOLDER = $$HOME_FOLDER/.skia2
 
@@ -19,6 +19,10 @@ DEPENDPATH += $$PWD/../core
 
 LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
 INCLUDEPATH += /usr/local/include/libmypaint/
+
+INCLUDEPATH += /usr/include/glib-2.0
+INCLUDEPATH += /usr/lib/x86_64-linux-gnu/glib-2.0/include
+LIBS += -lgobject-2.0 -lglib-2.0 -ljson-c
 
 INCLUDEPATH += $$SKIA_FOLDER/
 
