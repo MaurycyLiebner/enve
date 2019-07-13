@@ -107,6 +107,7 @@ void BoundingBoxRenderData::processTaskWithGPU(QGL33c * const gl,
 void BoundingBoxRenderData::processTask() {
     updateGlobalRect();
     if(fOpacity < 0.001) return;
+    if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
 
     const auto info = SkiaHelpers::getPremulBGRAInfo(fGlobalRect.width(),
                                                      fGlobalRect.height());
@@ -188,24 +189,28 @@ void BoundingBoxRenderData::updateGlobalRect() {
     fResolutionScale.reset();
     fResolutionScale.scale(fResolution, fResolution);
     fScaledTransform = fTransform*fResolutionScale;
-    QRectF globalRectF = fScaledTransform.mapRect(fRelBoundingRect);
+    QRectF baseRectF = fScaledTransform.mapRect(fRelBoundingRect);
     for(const QRectF &rectT : fOtherGlobalRects) {
-        globalRectF = globalRectF.united(rectT);
+        baseRectF = baseRectF.united(rectT);
     }
-    globalRectF.adjust(-fEffectsMargin.left(), -fEffectsMargin.top(),
-                       fEffectsMargin.right(), fEffectsMargin.bottom());
-    const auto maxBounds = fResolutionScale.mapRect(QRectF(fMaxBoundsRect));
-    globalRectF = globalRectF.intersected(maxBounds);
-    setGlobalRect(globalRectF);
+    baseRectF.adjust(-fBaseMargin.left(), -fBaseMargin.top(),
+                     fBaseMargin.right(), fBaseMargin.bottom());
+    setBaseGlobalRect(baseRectF);
 }
 
-void BoundingBoxRenderData::setGlobalRect(const QRectF& globalRectF) {
-    fGlobalRectF = globalRectF;
-    const QPoint pos(qFloor(globalRectF.left()),
-                     qFloor(globalRectF.top()));
-    const QSize size(qCeil(globalRectF.width()),
-                     qCeil(globalRectF.height()));
-    fGlobalRect = QRect(pos, size);
+void BoundingBoxRenderData::setBaseGlobalRect(const QRectF& baseRectF) {
+    const QRectF maxBounds = fResolutionScale.mapRect(QRectF(fMaxBoundsRect));
+    const auto clampedBaseRect = baseRectF.intersected(maxBounds);
+    SkIRect currRect = toSkRect(clampedBaseRect).roundOut();
+    if(!fGPUEffects.isEmpty()) {
+        const QRect iMaxBounds(qFloor(maxBounds.left()), qFloor(maxBounds.top()),
+                               qCeil(maxBounds.width()), qCeil(maxBounds.height()));
+        const SkIRect skMaxBounds = toSkIRect(iMaxBounds);
+        for(const auto& effect : fGPUEffects) {
+            currRect = effect->setSrcRectUpdateDstRect(currRect, skMaxBounds);
+        }
+    }
+    fGlobalRect = toQRect(currRect);
 }
 
 RenderDataCustomizerFunctor::RenderDataCustomizerFunctor() {}

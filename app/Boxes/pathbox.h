@@ -91,17 +91,17 @@ protected:
 
                 fBitmapTMP.reset();
 
-                const auto iMargins = fEffectsMargin.toMargins();
+                QRect baseRect = fGlobalRect;
+                baseRect.translate(-surf.zeroTilePos());
+                const auto pixRect = surf.pixelBoundingRect();
+                baseRect.setSize(QSize(pixRect.width(), pixRect.height()));
+                setBaseGlobalRect(baseRect);
 
+                const QMargins iMargins(baseRect.left() - fGlobalRect.left(),
+                                        baseRect.top() - fGlobalRect.top(),
+                                        fGlobalRect.right() - baseRect.right(),
+                                        fGlobalRect.bottom() - baseRect.bottom());
                 fBitmapTMP = surf.toBitmap(iMargins);
-
-                QRectF globalRectF = fGlobalRect;
-                globalRectF.translate(-surf.zeroTilePos() -
-                                      QPoint(iMargins.left(),
-                                             iMargins.top()));
-                globalRectF.setSize(QSizeF(fBitmapTMP.width(),
-                                           fBitmapTMP.height()));
-                setGlobalRect(globalRectF);
             } else {
                 paint.setShader(nullptr);
                 fStrokeSettings.applyPainterSettingsSk(&paint);

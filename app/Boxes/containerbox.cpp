@@ -548,16 +548,14 @@ void ContainerBox::updateIfUsesProgram(
 void processChildData(BoundingBox * const child,
                       ContainerBoxRenderData * const parentData,
                       const qreal childRelFrame,
-                      const qreal absFrame,
-                      QMarginsF& childrenMargin) {
+                      const qreal absFrame) {
     if(!child->isFrameFVisibleAndInDurationRect(childRelFrame)) return;
     if(child->SWT_isGroupBox()) {
         const auto childGroup = GetAsPtr(child, ContainerBox);
         const auto descs = childGroup->getContainedBoxesList();
         for(const auto& desc : descs) {
-            processChildData(desc.get(), parentData,
-                             desc->prp_absFrameToRelFrameF(absFrame),
-                             absFrame, childrenMargin);
+            const qreal descRelFrame = desc->prp_absFrameToRelFrameF(absFrame);
+            processChildData(desc.get(), parentData, descRelFrame, absFrame);
         }
         return;
     }
@@ -573,12 +571,6 @@ void processChildData(BoundingBox * const child,
     //qDebug() << boxRenderData->fBoxStateId;
     boxRenderData->addDependent(parentData);
     parentData->fChildrenRenderData << boxRenderData;
-
-    const auto childMargin = child->getEffectsMargin(childRelFrame);
-    childrenMargin = QMarginsF(qMax(childrenMargin.left(), childMargin.left()),
-                              qMax(childrenMargin.top(), childMargin.top()),
-                              qMax(childrenMargin.right(), childMargin.right()),
-                              qMax(childrenMargin.bottom(), childMargin.bottom()));
 }
 
 stdsptr<BoundingBoxRenderData> ContainerBox::createRenderData() {
@@ -601,15 +593,11 @@ void ContainerBox::setupLayerRenderData(const qreal relFrame,
     const auto groupData = GetAsPtr(data, ContainerBoxRenderData);
     groupData->fChildrenRenderData.clear();
     groupData->fOtherGlobalRects.clear();
-    QMarginsF childrenEffectsMargin;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     for(const auto& box : mContainedBoxes) {
         const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
-        processChildData(box.data(), groupData, boxRelFrame,
-                         absFrame, childrenEffectsMargin);
+        processChildData(box.data(), groupData, boxRelFrame, absFrame);
     }
-
-    data->fEffectsMargin += childrenEffectsMargin;
 }
 
 void ContainerBox::selectAllBoxesFromBoxesGroup() {

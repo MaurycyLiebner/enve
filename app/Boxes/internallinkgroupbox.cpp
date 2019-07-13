@@ -86,11 +86,6 @@ void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
     if(linkTarget) linkTarget->BoundingBox::setupRenderData(relFrame, data);
 
     ContainerBox::setupRenderData(relFrame, data);
-    if(linkTarget) {
-        const QMarginsF targetMargin =
-                linkTarget->getEffectsMargin(relFrame);
-        data->fEffectsMargin += targetMargin*data->fResolution;
-    }
 }
 
 ContainerBox *InternalLinkGroupBox::getFinalTarget() const {

@@ -20,6 +20,9 @@ extern SkFont toSkFont(const QFont& qfont,
 
 extern SkColor toSkColor(const QColor& qcol);
 
+extern QRect toQRect(const SkIRect &rect);
+extern SkIRect toSkIRect(const QRect &rect);
+
 extern QRectF toQRectF(const SkRect &rect);
 extern SkRect toSkRect(const QRectF &rect);
 // m11 - scaleX

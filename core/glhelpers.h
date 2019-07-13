@@ -90,9 +90,9 @@ struct TextureFrameBuffer {
 
 #include <QJSEngine>
 struct GpuRenderData {
-    //! @brief Position in scene coordinates
-    GLfloat fPosX;
-    GLfloat fPosY;
+    //! @brief Pixel {0, 0} position in scene coordinates
+    GLint fPosX;
+    GLint fPosY;
 
     //! @brief Texture size
     GLuint fWidth;

@@ -10,7 +10,12 @@ void CanvasRenderData::updateGlobalRect() {
     fResolutionScale.scale(fResolution, fResolution);
     fScaledTransform = fResolutionScale;
     const auto globalRectF = fScaledTransform.mapRect(fRelBoundingRect);
-    setGlobalRect(globalRectF);
+    const QPoint pos(qFloor(globalRectF.left()),
+                     qFloor(globalRectF.top()));
+    const QSize size(qCeil(globalRectF.width()),
+                     qCeil(globalRectF.height()));
+    fGlobalRect = QRect(pos, size);
+    //setBaseGlobalRect(globalRectF);
 }
 
 void CanvasRenderData::updateRelBoundingRect() {

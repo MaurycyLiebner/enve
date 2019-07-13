@@ -399,12 +399,17 @@ public:
         return mWidth;
     }
 
-    QRect getMaxBoundsRect() const {
-        if(mClipToCanvasSize) {
-            return QRect(0, 0, mWidth, mHeight);
-        } else {
-            return QRect(-mWidth, - mHeight, 3*mWidth, 3*mHeight);
-        }
+    QRect getCanvasBounds() const {
+        return QRect(0, 0, mWidth, mHeight);
+    }
+
+    QRect getMaxBounds() const {
+        return QRect(-mWidth, - mHeight, 3*mWidth, 3*mHeight);
+    }
+
+    QRect getCurrentBounds() const {
+        if(mClipToCanvasSize) return getCanvasBounds();
+        else return getMaxBounds();
     }
 
     int getCanvasHeight() const {
@@ -509,7 +514,7 @@ public:
 
     BoundingBox *getBoxAt(const QPointF &absPos) {
         if(mClipToCanvasSize) {
-            if(!QRectF(getMaxBoundsRect()).contains(absPos)) return nullptr;
+            if(!QRectF(getCurrentBounds()).contains(absPos)) return nullptr;
         }
         return ContainerBox::getBoxAt(absPos);
     }

@@ -37,13 +37,13 @@ void BoxRenderDataScheduledPostProcess::process(
     }
     const int srcWidth = srcImage->width();
     const int srcHeight = srcImage->height();
-    const QPointF gPos = mBoxData->fGlobalRect.topLeft();
+    const QPoint gPos = mBoxData->fGlobalRect.topLeft();
 
     glViewport(0, 0, srcWidth, srcHeight);
 
     GpuRenderData renderData;
-    renderData.fPosX = static_cast<GLfloat>(gPos.x());
-    renderData.fPosY = static_cast<GLfloat>(gPos.y());
+    renderData.fPosX = static_cast<GLint>(gPos.x());
+    renderData.fPosY = static_cast<GLint>(gPos.y());
     renderData.fWidth = static_cast<GLuint>(srcWidth);
     renderData.fHeight = static_cast<GLuint>(srcHeight);
     auto& engine = renderData.fJSEngine;

@@ -47,13 +47,13 @@ ExampleGpuEffect000::ExampleGpuEffect000() :
 
 stdsptr<GPURasterEffectCaller>
         ExampleGpuEffect000::getEffectCaller(const qreal relFrame) const {
-    const SkScalar radius = toSkScalar(mRadius->getEffectiveValue(relFrame));
+    const qreal radius = mRadius->getEffectiveValue(relFrame);
     return SPtrCreate(ExampleGpuEffectCaller000)(radius);
 }
 
-QMarginsF ExampleGpuEffect000::getMarginAtRelFrame(const qreal frame) {
+QMargins ExampleGpuEffect000::getMarginAtRelFrame(const qreal frame) const {
     const qreal radius = mRadius->getEffectiveValue(frame);
-    return QMarginsF(radius, radius, radius, radius);
+    return QMargins() + qCeil(radius);
 }
 
 CustomIdentifier ExampleGpuEffect000::getIdentifier() const {
@@ -73,11 +73,8 @@ void ExampleGpuEffectCaller000::render(QGL33c * const gl,
     const SkScalar sigma = mRadius*0.3333333f;
     const auto filter = SkBlurImageFilter::Make(sigma, sigma, nullptr);
     paint.setImageFilter(filter);
-    const uint fRadius = static_cast<uint>(mRadius);
-    const SkRect rect = SkRect::MakeXYWH(fRadius, fRadius,
-                                         data.fWidth - fRadius,
-                                         data.fHeight - fRadius);
-    canvas->drawImageRect(srcTex, rect, rect, &paint,
+    const SkIRect localSrc = fSrcRect.makeOffset(-data.fPosX, -data.fPosY);
+    canvas->drawImageRect(srcTex, localSrc, SkRect::Make(localSrc), &paint,
                           SkCanvas::kFast_SrcRectConstraint);
     canvas->flush();
 }

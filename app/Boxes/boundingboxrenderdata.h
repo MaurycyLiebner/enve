@@ -70,11 +70,10 @@ public:
     QMatrix fRenderTransform;
 
     QRectF fRelBoundingRect;
-    QRectF fGlobalRectF;
     QRect fGlobalRect;
     QRect fMaxBoundsRect;
 
-    QMarginsF fEffectsMargin;
+    QMargins fBaseMargin;
 
     qreal fOpacity = 1;
     qreal fResolution;
@@ -102,7 +101,6 @@ public:
 
     void clearPixmapEffects() {
         fRasterEffects.clear();
-        fEffectsMargin = QMarginsF();
     }
 
     void appendRenderCustomizerFunctor(
@@ -118,7 +116,7 @@ public:
 protected:
     virtual void updateGlobalRect();
 
-    void setGlobalRect(const QRectF &globalRectF);
+    void setBaseGlobalRect(const QRectF &baseRectF);
 
     QList<stdsptr<RenderDataCustomizerFunctor>> mRenderDataCustomizerFunctors;
     bool mDelayDataSet = false;

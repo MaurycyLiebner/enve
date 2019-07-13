@@ -5,9 +5,11 @@
 
 class ShaderEffectCaller : public GPURasterEffectCaller {
 public:
-    ShaderEffectCaller(const ShaderEffectProgram& program,
+    ShaderEffectCaller(const QMargins& margin,
+                       const ShaderEffectProgram& program,
                        const UniformSpecifiers& uniformSpecifiers) :
-        mProgram(program), mUniformSpecifiers(uniformSpecifiers) {}
+        GPURasterEffectCaller(false, margin), mProgram(program),
+        mUniformSpecifiers(uniformSpecifiers) {}
 
     void render(QGL33c * const gl,
                 GpuRenderTools& renderTools,
@@ -60,7 +62,8 @@ public:
             const auto& uniformC = mProgram->fUniformCreators.at(i);
             uniformSpecifiers << uniformC->create(loc, prop, relFrame);
         }
-        return SPtrCreate(ShaderEffectCaller)(*mProgram, uniformSpecifiers);
+        const auto margin = getMarginAtRelFrame(relFrame);
+        return SPtrCreate(ShaderEffectCaller)(margin, *mProgram, uniformSpecifiers);
     }
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) {

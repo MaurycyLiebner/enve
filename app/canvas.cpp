@@ -197,7 +197,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         paint.setColor(SK_ColorBLACK);
         paint.setStyle(SkPaint::kStroke_Style);
         paint.setPathEffect(dashPathEffect);
-        canvas->drawRect(toSkRect(getMaxBoundsRect()), paint);
+        canvas->drawRect(toSkRect(getCurrentBounds()), paint);
     }
     const bool drawCanvas = mCurrentPreviewContainer &&
             !mCurrentPreviewContainerOutdated;

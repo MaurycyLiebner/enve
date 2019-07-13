@@ -70,11 +70,6 @@ void InternalLinkBox::setupRenderData(
     if(linkTarget) linkTarget->setupRenderData(relFrame, data);
 
     BoundingBox::setupRenderData(relFrame, data);
-    if(linkTarget) {
-        const QMarginsF targetMargin =
-                linkTarget->getEffectsMargin(relFrame);
-        data->fEffectsMargin += targetMargin*data->fResolution;
-    }
 }
 
 QRectF InternalLinkBox::getRelBoundingRect(const qreal relFrame) {

@@ -711,26 +711,23 @@ QMarginsF BoundingBox::getEffectsMargin(const qreal relFrame) {
 
 void BoundingBox::setupRenderData(const qreal relFrame,
                                   BoundingBoxRenderData * const data) {
+    const auto parentCanvas = getParentCanvas();
+    if(!parentCanvas) return;
     data->fBoxStateId = mStateId;
     data->fRelFrame = qRound(relFrame);
     data->fTransform = getTotalTransformAtRelFrameF(relFrame);
     data->fOpacity = mTransformAnimator->getOpacity(relFrame);
-    data->fResolution = getParentCanvas()->getResolutionFraction();
-    const bool effectsVisible = getParentCanvas()->getRasterEffectsVisible();
-    if(effectsVisible) {
-        data->fEffectsMargin = getEffectsMargin(relFrame)*
-                data->fResolution + 2;
-    } else {
-        data->fEffectsMargin = QMarginsF() + 2;
-    }
+    data->fResolution = parentCanvas->getResolutionFraction();
+    const bool effectsVisible = parentCanvas->getRasterEffectsVisible();
+    data->fBaseMargin = QMargins() + 2;
     data->fBlendMode = getBlendMode();
 
-    const auto parentCanvas = getParentCanvas();
-    data->fMaxBoundsRect = parentCanvas->getMaxBoundsRect();
     if(data->fOpacity > 0.001 && effectsVisible) {
         setupEffectsF(relFrame, data);
         setupGPUEffectsF(relFrame, data);
     }
+
+    data->fMaxBoundsRect = parentCanvas->getCurrentBounds();
     if(data->fParentIsTarget && !data->nullifyBeforeProcessing()) {
         nullifyCurrentRenderData(data->fRelFrame);
     }

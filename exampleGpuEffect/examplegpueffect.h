@@ -5,8 +5,9 @@
 
 class ExampleGpuEffectCaller000 : public GPURasterEffectCaller {
 public:
-    ExampleGpuEffectCaller000(const SkScalar radius) :
-        mRadius(radius) {}
+    ExampleGpuEffectCaller000(const qreal radius) :
+        GPURasterEffectCaller(true, QMargins() + qCeil(radius)),
+        mRadius(toSkScalar(radius)) {}
 
     void render(QGL33c * const gl,
                 GpuRenderTools& renderTools,
@@ -21,7 +22,8 @@ public:
 
     stdsptr<GPURasterEffectCaller>
             getEffectCaller(const qreal relFrame) const;
-    QMarginsF getMarginAtRelFrame(const qreal frame);
+    QMargins getMarginAtRelFrame(const qreal frame) const;
+    bool forceWholeBase() const { return true; }
 
     CustomIdentifier getIdentifier() const;
 private:

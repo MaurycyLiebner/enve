@@ -1,5 +1,15 @@
 #include "skqtconversions.h"
 
+QRect toQRect(const SkIRect &rect) {
+    return QRect(rect.left(), rect.top(),
+                 rect.width(), rect.height());
+}
+
+SkIRect toSkIRect(const QRect &rect) {
+    return SkIRect::MakeLTRB(rect.left(), rect.top(),
+                             rect.right(), rect.bottom());
+}
+
 QRectF toQRectF(const SkRect &rect) {
     return QRectF(toQreal(rect.x()),
                   toQreal(rect.y()),
