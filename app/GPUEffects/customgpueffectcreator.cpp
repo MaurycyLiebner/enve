@@ -4,7 +4,8 @@
 
 QList<CustomGpuEffectCreator> CustomGpuEffectCreator::sEffectCreators;
 
-void CustomGpuEffectCreator::sLoadCustomGpuEffect(const QString &libGpu) {
+void CustomGpuEffectCreator::sLoadCustomGpuEffect(QGL33c * const gl,
+                                                  const QString &libGpu) {
     QLibrary lib(libGpu);
 
     const auto creatorNewFunc = reinterpret_cast<CGpuEffectCreatorNewFunc>(
@@ -26,6 +27,11 @@ void CustomGpuEffectCreator::sLoadCustomGpuEffect(const QString &libGpu) {
     const auto supportFunc = reinterpret_cast<CGpuEffectSupport>(
                 lib.resolve("supports"));
     if(!supportFunc) RuntimeThrow("Could not resolve 'supports' symbol");
+
+    const auto iniFunc = reinterpret_cast<CGpuEffectInitialization>(
+                lib.resolve("initialize"));
+    //if(!iniFunc) RuntimeThrow("Could not resolve 'initialize' symbol");
+    if(iniFunc) iniFunc(gl);
 
     CustomGpuEffectCreator creator(creatorNewFunc, creatorFunc, nameFunc,
                                    identifierFunc, supportFunc);

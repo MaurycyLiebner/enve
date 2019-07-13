@@ -130,7 +130,7 @@ public:
 
     GLuint getSquareVAO() const { return mSquareVAO; }
 
-    //! @brief Swaps the source and the target texture if.
+    //! @brief Swaps the source and the target texture if valid.
     void swapTextures() {
         if(!validTargetFbo()) return;
         mTargetTextureFbo.swapTexture(mGL, mSrcTexture);
@@ -175,7 +175,7 @@ public:
     //! @brief Returns TextureFrameBuffer associated with the target texture.
     //! If there is no SkCanvas new SkCanvas is created.
     TextureFrameBuffer& requestTargetFbo() {
-        if(mTargetTextureFbo.fFBOId == 0)
+        if(!validTargetFbo())
             mTargetTextureFbo.gen(mGL, mSrcTexture.fWidth, mSrcTexture.fHeight);
         return mTargetTextureFbo;
     }
@@ -190,7 +190,7 @@ public:
     }
 
     bool validTargetCanvas() const { return mCanvas; }
-    bool validTargetFbo() const { return mTargetTextureFbo.fFBOId; }
+    bool validTargetFbo() const { return mTargetTextureFbo.fFBOId != 0; }
 private:
     GrBackendTexture sourceBackedTexture() {
         GrGLTextureInfo texInfo;

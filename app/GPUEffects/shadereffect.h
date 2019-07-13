@@ -15,17 +15,19 @@ public:
                 GpuRenderTools& renderTools,
                 GpuRenderData& data) {
         renderTools.requestTargetFbo().bind(gl);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glActiveTexture(GL_TEXTURE0);
-        renderTools.getSrcTexture().bind(gl);
+        gl->glClear(GL_COLOR_BUFFER_BIT);
 
         setupProgram(gl, data.fJSEngine, data.fPosX, data.fPosY);
 
+        gl->glActiveTexture(GL_TEXTURE0);
+        renderTools.getSrcTexture().bind(gl);
+
         gl->glBindVertexArray(renderTools.getSquareVAO());
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        gl->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 private:
-    void setupProgram(QGL33c * const gl, QJSEngine& engine,
+    void setupProgram(QGL33c * const gl,
+                      QJSEngine& engine,
                       const GLfloat gPosX,
                       const GLfloat gPosY) {
         gl->glUseProgram(mProgram.fId);

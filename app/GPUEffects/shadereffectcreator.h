@@ -10,8 +10,8 @@ enum PropertyType {
 struct ShaderEffectCreator : public PropertyCreator {
 protected:
     ShaderEffectCreator(const QString& grePath, const QString& name,
-                           const QList<stdsptr<PropertyCreator>>& propCs,
-                           const ShaderEffectProgram& program) :
+                        const QList<stdsptr<PropertyCreator>>& propCs,
+                        const ShaderEffectProgram& program) :
         PropertyCreator(name), fGrePath(grePath),
         fProperties(propCs), fProgram(program) {}
 public:

@@ -11,6 +11,7 @@ typedef qsptr<CustomGpuEffect> (*CGpuEffectCreatorFunc)(
 typedef QString (*CGpuEffectNameFunc)();
 typedef CustomIdentifier (*CGpuEffectIdentifierFunc)();
 typedef bool (*CGpuEffectSupport)(const CustomIdentifier&);
+typedef void (*CGpuEffectInitialization)(QGL33c * const gl);
 
 class CustomGpuEffectCreator {
     CustomGpuEffectCreator(const CGpuEffectCreatorNewFunc creatorNew,
@@ -21,7 +22,8 @@ class CustomGpuEffectCreator {
         mCreatorNew(creatorNew), mCreator(creator), mName(name),
         mIdentifier(identifier), mSupport(support) {}
 public:
-    static void sLoadCustomGpuEffect(const QString& libGpu);
+    static void sLoadCustomGpuEffect(QGL33c * const gl,
+                                     const QString& libGpu);
 
     static qsptr<CustomGpuEffect> sCreateForIdentifier(
             const CustomIdentifier &identifier) {

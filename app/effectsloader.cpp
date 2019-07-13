@@ -75,15 +75,15 @@ void EffectsLoader::iniCustomPathEffects() {
 
 #include "GPUEffects/customgpueffect.h"
 #include "GPUEffects/customgpueffectcreator.h"
-void iniCustomGpuEffect(const QString& gpu) {
+void EffectsLoader::iniCustomGpuEffect(const QString& gpu) {
     try {
-        CustomGpuEffectCreator::sLoadCustomGpuEffect(gpu);
+        CustomGpuEffectCreator::sLoadCustomGpuEffect(this, gpu);
     } catch(...) {
         RuntimeThrow("Error while loading GpuEffect from '" + gpu + "'");
     }
 }
 
-void iniIfCustomGpuEffect(const QString& gpu) {
+void EffectsLoader::iniIfCustomGpuEffect(const QString& gpu) {
     const QFileInfo fileInfo(gpu);
     if(!fileInfo.isFile()) return;
     if(!fileInfo.completeSuffix().contains("so")) return;
@@ -104,7 +104,7 @@ void EffectsLoader::iniCustomGpuEffects() {
                 new QFileSystemModel);
     newFileWatcher->setRootPath(dirPath);
     connect(newFileWatcher.get(), &QFileSystemModel::rowsInserted, this,
-    [newFileWatcher](const QModelIndex &parent, int first, int last) {
+    [this, newFileWatcher](const QModelIndex &parent, int first, int last) {
         for(int row = first; row <= last; row++) {
             const auto rowIndex = newFileWatcher->index(row, 0, parent);
             const QString path = newFileWatcher->filePath(rowIndex);

@@ -228,7 +228,7 @@ sk_sp<SkImage> Texture::toImage(QGL33c * const gl) const {
     SkBitmap btmp;
     const auto info = SkiaHelpers::getPremulBGRAInfo(fWidth, fHeight);
     btmp.allocPixels(info);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, btmp.getPixels());
+    gl->glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, btmp.getPixels());
 //    glReadPixels(0, 0, fWidth, fHeight,
 //                 GL_RGBA, GL_UNSIGNED_BYTE, btmp.getPixels());
     return SkiaHelpers::transferDataToSkImage(btmp);
