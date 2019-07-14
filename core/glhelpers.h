@@ -165,6 +165,7 @@ public:
 
             mCanvas = mSurface->getCanvas();
         }
+        mGrContext->resetContext();
         return mCanvas;
     }
 

@@ -6,7 +6,7 @@ void LinkCanvasRenderData::processTask() {
     updateGlobalRect();
     if(fOpacity < 0.001) return;
 
-    const auto info = SkiaHelpers::getPremulBGRAInfo(fGlobalRect.width(),
+    const auto info = SkiaHelpers::getPremulRGBAInfo(fGlobalRect.width(),
                                                      fGlobalRect.height());
     fBitmapTMP.allocPixels(info);
     fBitmapTMP.eraseColor(SK_ColorTRANSPARENT);

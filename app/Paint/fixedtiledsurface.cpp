@@ -72,7 +72,7 @@ bool FixedTiledSurface::resize(const int width, const int height) {
     fWidth = width;
     fRealWidth = realWidth;
     fRealHeight = realHeight;
-    const auto info = SkiaHelpers::getPremulBGRAInfo(realWidth, realHeight);
+    const auto info = SkiaHelpers::getPremulRGBAInfo(realWidth, realHeight);
     fBitmap.allocPixels(info);
     fBitmap.eraseColor(SK_ColorTRANSPARENT);
     resetNullTile();

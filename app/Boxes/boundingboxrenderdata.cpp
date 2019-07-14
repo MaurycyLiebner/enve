@@ -72,7 +72,7 @@ void BoundingBoxRenderData::processTaskWithGPU(QGL33c * const gl,
     if(fOpacity < 0.001) return;
     if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
 
-    //const auto info = SkiaHelpers::getPremulBGRAInfo(width, height);
+    //const auto info = SkiaHelpers::getPremulRGBAInfo(width, height);
 //    Texture tex;
 //    tex.gen(gl, width, height, nullptr);
 //    GrGLTextureInfo texInfo;
@@ -109,7 +109,7 @@ void BoundingBoxRenderData::processTask() {
     if(fOpacity < 0.001) return;
     if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
 
-    const auto info = SkiaHelpers::getPremulBGRAInfo(fGlobalRect.width(),
+    const auto info = SkiaHelpers::getPremulRGBAInfo(fGlobalRect.width(),
                                                      fGlobalRect.height());
     fBitmapTMP.allocPixels(info);
     fBitmapTMP.eraseColor(eraseColor());

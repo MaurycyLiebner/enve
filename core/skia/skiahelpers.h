@@ -16,7 +16,7 @@ namespace SkiaHelpers {
                       const SkScalar y,
                       SkPaint * const paint,
                       GrContext* const context);
-    SkImageInfo getPremulBGRAInfo(const int width,
+    SkImageInfo getPremulRGBAInfo(const int width,
                                   const int height);
     void saveImage(const QString& fileName,
                    const sk_sp<SkImage>& img,

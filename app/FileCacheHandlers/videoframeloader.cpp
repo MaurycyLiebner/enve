@@ -10,7 +10,7 @@ VideoFrameLoader::VideoFrameLoader(VideoFrameHandler * const cacheHandler,
 }
 
 void VideoFrameLoader::convertFrame() {
-    const auto info = SkiaHelpers::getPremulBGRAInfo(
+    const auto info = SkiaHelpers::getPremulRGBAInfo(
                 mFrameToConvert->width, mFrameToConvert->height);
     SkBitmap bitmap;
     bitmap.allocPixels(info);
@@ -22,7 +22,7 @@ void VideoFrameLoader::convertFrame() {
     uint8_t * const dstSk[] = { static_cast<uint8_t*>(addr) };
     int linesizesSk[4];
 
-    av_image_fill_linesizes(linesizesSk, AV_PIX_FMT_BGRA,
+    av_image_fill_linesizes(linesizesSk, AV_PIX_FMT_RGBA,
                             mFrameToConvert->width);
 
     sws_scale(mSwsContext, mFrameToConvert->data, mFrameToConvert->linesize,

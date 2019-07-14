@@ -29,8 +29,11 @@ void BoxRenderDataScheduledPostProcess::process(
     if(!initializeOpenGLFunctions())
         RuntimeThrow("Initializing GL functions failed.");
     auto& srcImage = mBoxData->fRenderedImage;
-    if(!srcImage) mBoxData->processTaskWithGPU(this, grContext);
-    if(!mBoxData->fRenderedImage) return;
+    if(!srcImage) {
+        grContext->resetContext();
+        mBoxData->processTaskWithGPU(this, grContext);
+    }
+    if(!srcImage) return;
     if(mBoxData->fGPUEffects.isEmpty()) {
         srcImage = srcImage->makeRasterImage();
         return;

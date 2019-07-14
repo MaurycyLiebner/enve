@@ -32,10 +32,10 @@ void SkiaHelpers::drawImageGPU(
     canvas->drawImage(texture, x, y, paint);
 };
 
-SkImageInfo SkiaHelpers::getPremulBGRAInfo(const int width,
+SkImageInfo SkiaHelpers::getPremulRGBAInfo(const int width,
                                            const int height) {
     return SkImageInfo::Make(width, height,
-                             kBGRA_8888_SkColorType,
+                             kRGBA_8888_SkColorType,
                              kPremul_SkAlphaType,
                              nullptr);
 }
@@ -90,7 +90,7 @@ sk_sp<SkImage> SkiaHelpers::readImg(QIODevice * const file) {
     file->read(rcChar(&width), sizeof(int));
     file->read(rcChar(&height), sizeof(int));
     SkBitmap btmp;
-    const auto info = SkiaHelpers::getPremulBGRAInfo(width, height);
+    const auto info = SkiaHelpers::getPremulRGBAInfo(width, height);
     btmp.allocPixels(info);
     const qint64 readBytes = width*height*4*
             static_cast<qint64>(sizeof(uchar));

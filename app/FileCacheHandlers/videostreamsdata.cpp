@@ -107,7 +107,7 @@ void VideoStreamsData::open(const char * const path) {
                                  fCodecContext->pix_fmt,
                                  fCodecContext->width,
                                  fCodecContext->height,
-                                 AV_PIX_FMT_BGRA, SWS_BICUBIC,
+                                 AV_PIX_FMT_RGBA, SWS_BICUBIC,
                                  nullptr, nullptr, nullptr);
 
     fPacket = av_packet_alloc();

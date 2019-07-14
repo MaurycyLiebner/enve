@@ -120,7 +120,7 @@ int AutoTilesData::height() const {
 }
 
 SkBitmap AutoTilesData::tileToBitmap(const int tx, const int ty) {
-    const auto info = SkiaHelpers::getPremulBGRAInfo(TILE_SIZE, TILE_SIZE);
+    const auto info = SkiaHelpers::getPremulRGBAInfo(TILE_SIZE, TILE_SIZE);
     SkBitmap dst;
     dst.allocPixels(info);
 
@@ -154,7 +154,7 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
     const int rM = qMax(0, margin.right());
     const int bM = qMax(0, margin.bottom());
 
-    const auto info = SkiaHelpers::getPremulBGRAInfo(width() + lM + rM,
+    const auto info = SkiaHelpers::getPremulRGBAInfo(width() + lM + rM,
                                                      height() + tM + bM);
     SkBitmap dst;
     dst.allocPixels(info);

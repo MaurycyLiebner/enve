@@ -39,7 +39,7 @@ protected:
                                      codecContext->pix_fmt,
                                      codecContext->width,
                                      codecContext->height,
-                                     AV_PIX_FMT_BGRA, SWS_BICUBIC,
+                                     AV_PIX_FMT_RGBA, SWS_BICUBIC,
                                      nullptr, nullptr, nullptr);
     }
 public:

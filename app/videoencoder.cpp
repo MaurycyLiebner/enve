@@ -103,7 +103,7 @@ static void addVideoStream(OutputStream * const ost,
     c->time_base       = ost->fStream->time_base;
 
     c->gop_size      = 12; /* emit one intra frame every twelve frames at most */
-    c->pix_fmt       = outSettings.videoPixelFormat;//BGRA;
+    c->pix_fmt       = outSettings.videoPixelFormat;//RGBA;
     if(c->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
         /* just for testing, we also add B-frames */
         c->max_b_frames = 2;
@@ -157,12 +157,12 @@ static AVFrame *getVideoFrame(OutputStream * const ost,
 //                      STREAM_DURATION, (AVRational) { 1, 1 }) >= 0)
 //        return nullptr;
 
-    if(c->pix_fmt != AV_PIX_FMT_BGRA) {
+    if(c->pix_fmt != AV_PIX_FMT_RGBA) {
         /* as we only generate a rgba picture, we must convert it
          * to the codec pixel format if needed */
         if(!ost->fSwsCtx) {
             ost->fSwsCtx = sws_getContext(c->width, c->height,
-                                          AV_PIX_FMT_BGRA,
+                                          AV_PIX_FMT_RGBA,
                                           c->width, c->height,
                                           c->pix_fmt, SWS_BICUBIC,
                                           nullptr, nullptr, nullptr);
@@ -174,7 +174,7 @@ static AVFrame *getVideoFrame(OutputStream * const ost,
         uint8_t * const dstSk[] = {static_cast<uint8_t*>(pixmap.writable_addr())};
         int linesizesSk[4];
 
-        av_image_fill_linesizes(linesizesSk, AV_PIX_FMT_BGRA, image->width());
+        av_image_fill_linesizes(linesizesSk, AV_PIX_FMT_RGBA, image->width());
         const int ret = av_frame_make_writable(ost->fFrame) ;
         if(ret < 0)
             AV_RuntimeThrow(ret, "Could not make AVFrame writable");
