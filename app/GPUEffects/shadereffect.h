@@ -14,6 +14,8 @@ public:
     void render(QGL33c * const gl,
                 GpuRenderTools& renderTools,
                 GpuRenderData& data) {
+        renderTools.switchToOpenGL();
+
         renderTools.requestTargetFbo().bind(gl);
         gl->glClear(GL_COLOR_BUFFER_BIT);
 

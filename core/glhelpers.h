@@ -102,13 +102,47 @@ struct GpuRenderData {
     QJSEngine fJSEngine;
 };
 
+class SwitchableContext {
+    friend class GpuPostProcessor;
+    enum class Mode {
+        OpenGL,
+        Skia
+    };
+public:
+    //! @brief In Skia mode returns the handled GrContext,
+    //! in OpenGL mode returns nullptr
+    GrContext* requestContext() const {
+        if(skiaMode()) return mContext.get();
+        return nullptr;
+    }
+
+    bool skiaMode() const { return mMode == Mode::Skia; }
+    bool openGLMode() const { return mMode == Mode::OpenGL; }
+
+    void switchToSkia() { setMode(Mode::Skia); }
+    void switchToOpenGL() { setMode(Mode::OpenGL); }
+private:
+    void setContext(const sk_sp<GrContext>& context) {
+        mContext = context;
+    }
+
+    void setMode(const Mode mode) {
+        if(mode == mMode) return;
+        mMode = mode;
+        if(skiaMode()) mContext->resetContext();
+    }
+
+    sk_sp<GrContext> mContext;
+    Mode mMode = Mode::Skia;
+};
+
 class GpuRenderTools {
 public:
     GpuRenderTools(QGL33c* const gl,
-                   GrContext* const grContext,
+                   SwitchableContext& context,
                    const sk_sp<SkImage>& img,
                    const GLuint texturedSquareVAO) :
-        mGL(gl), mGrContext(grContext), mSquareVAO(texturedSquareVAO) {
+        mGL(gl), mContext(context), mSquareVAO(texturedSquareVAO) {
         if(img->isTextureBacked()) {
             const auto grTex = img->getBackendTexture(true);
             GrGLTextureInfo texInfo;
@@ -136,53 +170,66 @@ public:
         mTargetTextureFbo.swapTexture(mGL, mSrcTexture);
     }
 
+    void switchToOpenGL() {
+        mContext.switchToOpenGL();
+    }
+
+    void switchToSkia() {
+        mContext.switchToSkia();
+    }
+
     //! @brief Returns SkCanvas associated with the target texture.
     //! If there is no SkCanvas new SkCanvas is created.
     SkCanvas* requestTargetCanvas() {
-        if(!mCanvas) {
-//            GrGLTextureInfo texInfo;
-//            texInfo.fID = mSrcTexture.fId;
-//            texInfo.fFormat = GR_GL_RGBA8;
-//            texInfo.fTarget = GR_GL_TEXTURE_2D;
-//            const auto grTex = GrBackendTexture(mSrcTexture.fWidth, mSrcTexture.fHeight,
-//                                                GrMipMapped::kNo, texInfo);
-//            mSurface = SkSurface::MakeFromBackendTexture(
-//                        mGrContext.get(),
-//                        grTex, kBottomLeft_GrSurfaceOrigin, 0,
-//                        kRGBA_8888_SkColorType, nullptr, nullptr);
+        if(mCanvas) {
+            mContext.switchToSkia();
+        } else {
+            mContext.switchToOpenGL();
             requestTargetFbo();
+
+            mContext.switchToSkia();
             GrGLFramebufferInfo fboInfo;
             fboInfo.fFBOID = mTargetTextureFbo.fFBOId;
             fboInfo.fFormat = GR_GL_RGBA8;
             const auto grFbo = GrBackendRenderTarget(mTargetTextureFbo.fWidth,
                                                      mTargetTextureFbo.fHeight,
                                                      0, 8, fboInfo);
+            const auto grContext = mContext.requestContext();
             mSurface = SkSurface::MakeFromBackendRenderTarget(
-                        mGrContext,
-                        grFbo, kBottomLeft_GrSurfaceOrigin,
+                        grContext, grFbo, kBottomLeft_GrSurfaceOrigin,
                         kRGBA_8888_SkColorType, nullptr, nullptr);
             if(!mSurface) RuntimeThrow("Failed to make SkSurface.");
 
             mCanvas = mSurface->getCanvas();
         }
-        mGrContext->resetContext();
         return mCanvas;
     }
 
     //! @brief Returned texture may be used as one wishes,
     //!  but has to be valid.
-    Texture& getSrcTexture() { return mSrcTexture; }
+    Texture& getSrcTexture() {
+        return mSrcTexture;
+    }
 
     //! @brief Returns TextureFrameBuffer associated with the target texture.
     //! If there is no SkCanvas new SkCanvas is created.
     TextureFrameBuffer& requestTargetFbo() {
+        if(!mContext.openGLMode())
+            RuntimeThrow("Requesting FBO only available in OpenGL mode."
+                         "Use SwitchableContext::switchToOpenGL "
+                         "prior to this call.");
         if(!validTargetFbo())
             mTargetTextureFbo.gen(mGL, mSrcTexture.fWidth, mSrcTexture.fHeight);
         return mTargetTextureFbo;
     }
 
     sk_sp<SkImage> requestSrcTextureImageWrapper() {
-        return SkImage::MakeFromTexture(mGrContext,
+        const auto grContext = mContext.requestContext();
+        if(!grContext) RuntimeThrow("Wrapping texture image with SkImage "
+                                    "only available in Skia mode."
+                                    "Use SwitchableContext::switchToSkia "
+                                    "prior to this call.");
+        return SkImage::MakeFromTexture(grContext,
                                         sourceBackedTexture(),
                                         kBottomLeft_GrSurfaceOrigin,
                                         kRGBA_8888_SkColorType,
@@ -203,7 +250,7 @@ private:
     }
 
     QGL33c* const mGL;
-    GrContext* const mGrContext;
+    SwitchableContext& mContext;
     const GLuint mSquareVAO;
 
     Texture mSrcTexture;

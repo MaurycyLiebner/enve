@@ -24,14 +24,14 @@ void BoxRenderDataScheduledPostProcess::afterProcessed() {
 }
 
 void BoxRenderDataScheduledPostProcess::process(
-        GrContext* const grContext,
+        SwitchableContext &context,
         const GLuint texturedSquareVAO) {
     if(!initializeOpenGLFunctions())
         RuntimeThrow("Initializing GL functions failed.");
     auto& srcImage = mBoxData->fRenderedImage;
     if(!srcImage) {
-        grContext->resetContext();
-        mBoxData->processTaskWithGPU(this, grContext);
+        context.switchToSkia();
+        mBoxData->processTaskWithGPU(this, context.requestContext());
     }
     if(!srcImage) return;
     if(mBoxData->fGPUEffects.isEmpty()) {
@@ -55,7 +55,7 @@ void BoxRenderDataScheduledPostProcess::process(
     engine.evaluate("_gPos = [" + QString::number(gPos.x()) + "," +
                     QString::number(gPos.y()) + "]");
 
-    GpuRenderTools renderTools(this, grContext,
+    GpuRenderTools renderTools(this, context,
                                srcImage, texturedSquareVAO);
     auto& effects = mBoxData->fGPUEffects;
     for(const auto& effect : mBoxData->fGPUEffects) {

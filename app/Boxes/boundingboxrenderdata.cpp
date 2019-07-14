@@ -65,9 +65,12 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) 
     canvas->drawImage(fRenderedImage, fGlobalRect.x(), fGlobalRect.y(), &paint);
 }
 
+using namespace std;
+using namespace std::chrono;
 void BoundingBoxRenderData::processTaskWithGPU(QGL33c * const gl,
                                                GrContext * const grContext) {
     Q_UNUSED(gl);
+    const auto t1 = high_resolution_clock::now();
     updateGlobalRect();
     if(fOpacity < 0.001) return;
     if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
@@ -97,6 +100,8 @@ void BoundingBoxRenderData::processTaskWithGPU(QGL33c * const gl,
     fRenderedImage = SkImage::MakeFromAdoptedTexture(grContext, grTex,
                                                      kTopLeft_GrSurfaceOrigin,
                                                      kRGBA_8888_SkColorType);
+    qDebug() << "gpu" << duration_cast<nanoseconds>(
+                    high_resolution_clock::now() - t1).count();
 //    GrGLTextureInfo info;
 //    grTex.getGLTextureInfo(&info);
 //    info.fID;
@@ -105,6 +110,8 @@ void BoundingBoxRenderData::processTaskWithGPU(QGL33c * const gl,
 }
 
 void BoundingBoxRenderData::processTask() {
+    const auto t1 = high_resolution_clock::now();
+
     updateGlobalRect();
     if(fOpacity < 0.001) return;
     if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
@@ -125,6 +132,8 @@ void BoundingBoxRenderData::processTask() {
     clearPixmapEffects();
 
     fRenderedImage = SkiaHelpers::transferDataToSkImage(fBitmapTMP);
+    qDebug() << "cpu" << duration_cast<nanoseconds>(
+                    high_resolution_clock::now() - t1).count();
 }
 
 void BoundingBoxRenderData::beforeProcessing() {
@@ -159,6 +168,15 @@ void BoundingBoxRenderData::taskQued() {
     }
     if(!mDelayDataSet) dataSet();
     Task::taskQued();
+}
+
+Task::GpuSupport BoundingBoxRenderData::gpuSupport() const {
+    if(fGPUEffects.isEmpty()) {
+        if(fParentBox && fParentBox->SWT_isLayerBox())
+            return GPU_PREFERRED;
+        return GPU_SUPPORTED;
+    }
+    return GPU_REQUIRED;
 }
 
 void BoundingBoxRenderData::scheduleTaskNow() {

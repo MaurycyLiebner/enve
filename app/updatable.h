@@ -35,6 +35,7 @@ public:
 
     enum GpuSupport {
         GPU_NO_SUPPORT,
+        GPU_SUPPORTED,
         GPU_PREFERRED,
         GPU_REQUIRED
     };

@@ -48,10 +48,7 @@ public:
     void taskQued() final;
 
     // gpu
-    GpuSupport gpuSupport() const {
-        if(fGPUEffects.isEmpty()) return GPU_PREFERRED;
-        return GPU_REQUIRED;
-    }
+    GpuSupport gpuSupport() const;
 
     QList<stdsptr<GPURasterEffectCaller>> fGPUEffects;
     // gpu
