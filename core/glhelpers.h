@@ -6,8 +6,12 @@
 
 typedef QOpenGLFunctions_3_3_Core QGL33c;
 #define BUFFER_OFFSET(i) ((void*)(i))
-
-extern void checkGlErrors(const std::string& msg = "");
+#define checkGlErrors \
+    { \
+        const GLenum glError = glGetError(); \
+        if(glError != GL_NO_ERROR) \
+            RuntimeThrow("OpenGL error " + std::to_string(glError)); \
+    }
 
 //! @brief Creates a program, compiles, and attaches associated shaders.
 extern void iniProgram(QGL33c * const gl,
@@ -215,7 +219,7 @@ public:
     //! If there is no SkCanvas new SkCanvas is created.
     TextureFrameBuffer& requestTargetFbo() {
         if(!mContext.openGLMode())
-            RuntimeThrow("Requesting FBO only available in OpenGL mode."
+            RuntimeThrow("Requesting FBO only available in OpenGL mode.\n"
                          "Use SwitchableContext::switchToOpenGL "
                          "prior to this call.");
         if(!validTargetFbo())
@@ -226,7 +230,7 @@ public:
     sk_sp<SkImage> requestSrcTextureImageWrapper() {
         const auto grContext = mContext.requestContext();
         if(!grContext) RuntimeThrow("Wrapping texture image with SkImage "
-                                    "only available in Skia mode."
+                                    "only available in Skia mode.\n"
                                     "Use SwitchableContext::switchToSkia "
                                     "prior to this call.");
         return SkImage::MakeFromTexture(grContext,

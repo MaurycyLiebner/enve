@@ -1093,9 +1093,7 @@ void anim_fast_blur(const SkBitmap &bitmap,
                 a[yi] = asum*divFInv;
             } else {
                 qreal multT = qMin(255., asum*divFInv*opacityT)/(asum*divFInv);
-                if(asum*divFInv > 255.) {
-                    qDebug() << asum*divFInv;
-                }
+
                 r[yi] = rsum*divFInv*multT;
                 g[yi] = gsum*divFInv*multT;
                 b[yi] = bsum*divFInv*multT;

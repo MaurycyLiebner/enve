@@ -35,6 +35,7 @@ struct ShaderEffectProgram {
         program.fUniformCreators = uniCs;
         program.fTexLocation = gl->glGetUniformLocation(program.fId, "texture");
         CheckInvalidLocation(program.fTexLocation, "texture");
+        gl->glUniform1i(program.fTexLocation, 0);
         return program;
     }
 };

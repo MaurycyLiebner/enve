@@ -14,12 +14,6 @@ GLuint GL_PLAIN_SQUARE_VBO;
 QString GL_TEXTURED_VERT = ":/shaders/textured.vert";
 GLuint GL_TEXTURED_SQUARE_VBO;
 
-void checkGlErrors(const std::string& msg) {
-    const GLenum glError = glGetError();
-    if(glError == GL_NO_ERROR) return;
-    RuntimeThrow("OpenGL error " + std::to_string(glError) + " " + msg);
-}
-
 void iniTexturedVShaderVBO(QGL33c * const gl) {
     float vertices[] = {
     //  positions  | texture coords
@@ -95,15 +89,13 @@ void checkCompileErrors(QGL33c * const gl,
         gl->glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if(!success) {
             gl->glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            RuntimeThrow(
-                "ERROR::PROGRAM_LINKING_ERROR of type: " +
-                        type + "\n" + infoLog);
+            RuntimeThrow("ERROR::PROGRAM_LINKING_ERROR of type: " +
+                         type + "\n" + infoLog);
         }
     }
 }
 #include <QFile>
-void iniProgram(QGL33c * const gl,
-                GLuint& program,
+void iniProgram(QGL33c * const gl, GLuint& program,
                 const QString& vShaderPath,
                 const QString& fShaderPath) {
     Q_INIT_RESOURCE(coreresources);
@@ -154,6 +146,7 @@ void iniProgram(QGL33c * const gl,
     }
 
     program = gl->glCreateProgram();
+    if(program == 0) RuntimeThrow("Error while creating program");
     gl->glAttachShader(program, vertexShader);
     gl->glAttachShader(program, fragmentShader);
     gl->glLinkProgram(program);

@@ -4,6 +4,7 @@
 #include <QFileSystemWatcher>
 #include <QFileSystemModel>
 #include "GPUEffects/shadereffectcreator.h"
+#include "settings.h"
 
 EffectsLoader::EffectsLoader() {}
 
@@ -55,7 +56,7 @@ void iniIfCustomPathEffect(const QString& path) {
 }
 
 void EffectsLoader::iniCustomPathEffects() {
-    const QString dirPath = QDir::homePath() + "/.enve/PathEffects";
+    const QString dirPath = EnveSettings::sSettingsDir() + "/PathEffects";
 //    QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
 //    while(dirIt.hasNext()) {
 //        iniIfCustomPathEffect(dirIt.next());
@@ -95,7 +96,7 @@ void EffectsLoader::iniIfCustomGpuEffect(const QString& gpu) {
 }
 
 void EffectsLoader::iniCustomGpuEffects() {
-    const QString dirPath = QDir::homePath() + "/.enve/GPURasterEffects";
+    const QString dirPath = EnveSettings::sSettingsDir() + "/GPURasterEffects";
 //    QDirIterator dirIt(dirGpu, QDirIterator::NoIteratorFlags);
 //    while(dirIt.hasNext()) {
 //        iniIfCustomGpuEffect(dirIt.next());
@@ -127,7 +128,7 @@ void EffectsLoader::reloadProgram(ShaderEffectCreator* const loaded,
 }
 
 void EffectsLoader::iniRasterEffectPrograms() {
-    const QString dirPath = QDir::homePath() + "/.enve/GPURasterEffects";
+    const QString dirPath = EnveSettings::sSettingsDir() + "/ShaderEffects";
     QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
 
     while(dirIt.hasNext()) {

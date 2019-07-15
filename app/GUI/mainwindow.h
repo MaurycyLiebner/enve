@@ -14,6 +14,7 @@
 #include "audiohandler.h"
 #include "actions.h"
 #include "layouthandler.h"
+#include "settings.h"
 class VideoEncoder;
 enum ClipboardContainerType : short;
 
@@ -207,7 +208,7 @@ private:
     }
 
     void readRecentFiles() {
-        QFile file(QDir::homePath() + "/.enve/recent");
+        QFile file(EnveSettings::sSettingsDir() + "/recent");
         if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QTextStream stream(&file);
             while(!stream.atEnd()) {
@@ -220,7 +221,7 @@ private:
     }
 
     void writeRecentFiles() {
-        QFile file(QDir::homePath() + "/.enve/recent");
+        QFile file(EnveSettings::sSettingsDir() + "/recent");
         if(file.open(QIODevice::WriteOnly | QIODevice::Text |
                      QIODevice::Truncate)) {
             QTextStream stream(&file);

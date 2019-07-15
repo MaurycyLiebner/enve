@@ -28,7 +28,7 @@
 
 #define CheckInvalidLocation(vLoc, name) \
     if(vLoc < 0) { \
-        checkGlErrors(); \
+        checkGlErrors; \
         RuntimeThrow("Invalid " name " location."); \
     }
 

@@ -6,6 +6,7 @@ class BrushCollection;
 #include <mypaint-brush.h>
 #include "brushcontexedwrapper.h"
 #include "exceptions.h"
+#include "settings.h"
 class FlowLayout;
 
 struct BrushCollectionData {
@@ -72,8 +73,7 @@ public:
 
     static int sCreateNewContext() {
         if(!sLoaded) {
-            const QString brushesDir = QDir::homePath() +
-                    "/.enve/brushes/";
+            const QString brushesDir = EnveSettings::sSettingsDir() + "/brushes";
             sLoadCollectionsFromDir(brushesDir);
             sLoaded = true;
         }

@@ -13,7 +13,9 @@ enum class GpuEffectType : short {
 
 class GPURasterEffectCaller : public StdSelfRef {
 protected:
-    GPURasterEffectCaller(const bool forceMargin, const QMargins& margin) :
+    GPURasterEffectCaller() : GPURasterEffectCaller(false, QMargins()) {}
+    GPURasterEffectCaller(const bool forceMargin,
+                          const QMargins& margin) :
         fForceMargin(forceMargin), fMargin(margin) {}
 public:
     virtual void render(QGL33c * const gl,

@@ -69,7 +69,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&mDocument, &Document::activeSceneSet,
             this, &MainWindow::updateSettingsForCurrentCanvas);
 
-    QFile customSS(QDir::homePath() + "/.enve/stylesheet.qss");
+    QFile customSS(EnveSettings::sSettingsDir() + "/stylesheet.qss");
     if(customSS.exists()) {
         if(customSS.open(QIODevice::ReadOnly | QIODevice::Text)) {
             setStyleSheet(customSS.readAll());

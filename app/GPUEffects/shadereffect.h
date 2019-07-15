@@ -37,7 +37,6 @@ private:
             uni(gl, engine);
         if(mProgram.fGPosLoc >= 0)
             gl->glUniform2f(mProgram.fGPosLoc, gPosX, gPosY);
-        gl->glUniform1i(mProgram.fTexLocation, 0);
     }
 
     const ShaderEffectProgram mProgram;
