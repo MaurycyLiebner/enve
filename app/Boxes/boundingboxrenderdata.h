@@ -40,7 +40,7 @@ public:
 
     bool gpuProcessingNeeded() const { return !fGPUEffects.isEmpty(); }
 
-    virtual void processTaskWithGPU(QGL33c * const gl,
+    virtual void processTaskWithGPU(QGL33 * const gl,
                                     GrContext * const grContext);
     void processTask();
     void beforeProcessing() final;

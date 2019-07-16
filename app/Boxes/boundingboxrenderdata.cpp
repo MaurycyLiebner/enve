@@ -65,7 +65,7 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) 
     canvas->drawImage(fRenderedImage, fGlobalRect.x(), fGlobalRect.y(), &paint);
 }
 
-void BoundingBoxRenderData::processTaskWithGPU(QGL33c * const gl,
+void BoundingBoxRenderData::processTaskWithGPU(QGL33 * const gl,
                                                GrContext * const grContext) {
     Q_UNUSED(gl);
     updateGlobalRect();

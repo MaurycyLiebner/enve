@@ -7,7 +7,7 @@
 qreal stringToDouble(const QString& str);
 int stringToInt(const QString& str);
 
-typedef std::function<void(QGL33c * const, QJSEngine&)> UniformSpecifier;
+typedef std::function<void(QGL33 * const, QJSEngine&)> UniformSpecifier;
 typedef QList<UniformSpecifier> UniformSpecifiers;
 struct UniformSpecifierCreator : public StdSelfRef {
     virtual UniformSpecifier create(const GLint& loc,

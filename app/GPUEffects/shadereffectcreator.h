@@ -49,7 +49,7 @@ public:
         return true;
     }
 
-    void reloadProgram(QGL33c * const gl, const QString& fragPath) {
+    void reloadProgram(QGL33 * const gl, const QString& fragPath) {
         if(!QFile(fragPath).exists()) return;
         ShaderEffectProgram program;
         try {
@@ -65,7 +65,7 @@ public:
 
     qsptr<Property> create() const;
 
-    GLint getUniformLocation(QGL33c * const gl, const GLuint& program) const {
+    GLint getUniformLocation(QGL33 * const gl, const GLuint& program) const {
         Q_UNUSED(gl);
         Q_UNUSED(program);
         Q_ASSERT(false);
@@ -103,7 +103,7 @@ public:
     }
 
     static stdsptr<ShaderEffectCreator> sLoadFromFile(
-            QGL33c * const gl, const QString& grePath);
+            QGL33 * const gl, const QString& grePath);
 
     static stdsptr<ShaderEffectCreator> sWithGrePath(
             const QString& grePath);

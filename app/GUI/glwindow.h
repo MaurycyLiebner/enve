@@ -13,7 +13,7 @@
 class ShaderEffectCreator;
 class ShaderEffectProgram;
 
-class GLWindow : public QOpenGLWidget, protected QGL33c {
+class GLWindow : public QOpenGLWidget, protected QGL33 {
     Q_OBJECT
 public:
     GLWindow(QWidget * const parent = nullptr);
@@ -32,10 +32,10 @@ protected:
 
     bool mRebind = false;
 
-    sk_sp<const GrGLInterface> mInterface;
+    GLuint mTextureSquareVAO = 0;
     sk_sp<GrContext> mGrContext;
     sk_sp<SkSurface> mSurface;
-    SkCanvas *mCanvas;
+    SkCanvas *mCanvas = nullptr;
 };
 
 #endif // GLWINDOW_H

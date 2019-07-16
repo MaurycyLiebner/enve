@@ -85,7 +85,7 @@ void readAnimatorCreators(
 }
 
 stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
-        QGL33c * const gl, const QString &grePath) {
+        QGL33 * const gl, const QString &grePath) {
     QFile greFile(grePath);
     if(!greFile.exists())
         RuntimeThrow("GPURasterEffect source file does not exist.");

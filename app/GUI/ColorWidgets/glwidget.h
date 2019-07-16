@@ -6,22 +6,20 @@
 #include "glhelpers.h"
 class Gradient;
 
-class GLWidget : public QOpenGLWidget, protected QGL33c {
+class GLWidget : public QOpenGLWidget, protected QGL33 {
 public:
     GLWidget(QWidget *parent);
-    ~GLWidget() {}
-
-    bool isVisible() const;
-    bool isHidden();
-    void setVisible(bool b_t);
-    void show();
-    void hide();
+    ~GLWidget() {
+        if(mPlainSquareVAO) {
+            makeCurrent();
+            glDeleteBuffers(1, &mPlainSquareVAO);
+            doneCurrent();
+        }
+    }
 private:
     void initializeGL();
-    bool mVisible = true;
 protected:
-    GLuint mPlainSquareVAO;
-    SkColor4f mBgColor;
+    GLuint mPlainSquareVAO = 0;
 };
 
 #endif // GLWIDGET_H

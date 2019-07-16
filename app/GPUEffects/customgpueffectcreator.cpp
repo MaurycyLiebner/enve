@@ -4,7 +4,7 @@
 
 QList<CustomGpuEffectCreator> CustomGpuEffectCreator::sEffectCreators;
 
-void CustomGpuEffectCreator::sLoadCustomGpuEffect(QGL33c * const gl,
+void CustomGpuEffectCreator::sLoadCustomGpuEffect(QGL33 * const gl,
                                                   const QString &libGpu) {
     QLibrary lib(libGpu);
 

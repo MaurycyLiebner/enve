@@ -11,6 +11,7 @@
 #ifndef TILE_SPIXEL_SIZE
     #define TILE_SPIXEL_SIZE 16384 //TILE_SIZE*TILE_SIZE*4
 #endif
+#include "glhelpers.h"
 
 struct AutoTilesData {
     AutoTilesData();
@@ -29,6 +30,8 @@ struct AutoTilesData {
     int width() const;
     int height() const;
 
+    SkBitmap tileToBitmap(const int tx, const int ty,
+                          QGL33 * const gl, const GLuint texVAO);
     SkBitmap tileToBitmap(const int tx, const int ty);
     SkBitmap toBitmap(const QMargins& margin = QMargins()) const;
 
@@ -96,9 +99,13 @@ struct AutoTilesData {
 
     void write(QIODevice * const dst) const;
     void read(QIODevice * const src);
+
+    static void sIntializeGpu(QGL33 * const gl);
 protected:
     uint16_t* getTileByIndex(const int colId, const int rowId) const;
 private:
+    static GLuint s16To8Program;
+
     QList<uint16_t*> newColumn();
     void prependRows(const int count);
     void appendRows(const int count);

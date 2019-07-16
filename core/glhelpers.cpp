@@ -14,7 +14,7 @@ GLuint GL_PLAIN_SQUARE_VBO;
 QString GL_TEXTURED_VERT = ":/shaders/textured.vert";
 GLuint GL_TEXTURED_SQUARE_VBO;
 
-void iniTexturedVShaderVBO(QGL33c * const gl) {
+void iniTexturedVShaderVBO(QGL33 * const gl) {
     float vertices[] = {
     //  positions  | texture coords
          1, -1, 0,   1, 0,   // bottom right
@@ -29,8 +29,9 @@ void iniTexturedVShaderVBO(QGL33c * const gl) {
                      vertices, GL_STATIC_DRAW);
 }
 
-void iniTexturedVShaderVAO(QGL33c * const gl, GLuint &VAO) {
+void iniTexturedVShaderVAO(QGL33 * const gl, GLuint &VAO) {
     gl->glGenVertexArrays(1, &VAO);
+    if(VAO == 0) RuntimeThrow("glGenVertexArrays failed");
     gl->glBindVertexArray(VAO);
 
     gl->glBindBuffer(GL_ARRAY_BUFFER, GL_TEXTURED_SQUARE_VBO);
@@ -45,7 +46,7 @@ void iniTexturedVShaderVAO(QGL33c * const gl, GLuint &VAO) {
     gl->glEnableVertexAttribArray(1);
 }
 
-void iniPlainVShaderVBO(QGL33c * const gl) {
+void iniPlainVShaderVBO(QGL33 * const gl) {
     float vertices[] = {
         // positions
          1, -1, 0,   // bottom right
@@ -60,8 +61,9 @@ void iniPlainVShaderVBO(QGL33c * const gl) {
                      vertices, GL_STATIC_DRAW);
 }
 
-void iniPlainVShaderVAO(QGL33c * const gl, GLuint &VAO) {
+void iniPlainVShaderVAO(QGL33 * const gl, GLuint &VAO) {
     gl->glGenVertexArrays(1, &VAO);
+    if(VAO == 0) RuntimeThrow("glGenVertexArrays failed");
     gl->glBindVertexArray(VAO);
 
     gl->glBindBuffer(GL_ARRAY_BUFFER, GL_PLAIN_SQUARE_VBO);
@@ -73,7 +75,7 @@ void iniPlainVShaderVAO(QGL33c * const gl, GLuint &VAO) {
 }
 
 //! @brief Checks for errors after program linking and shader compilation.
-void checkCompileErrors(QGL33c * const gl,
+void checkCompileErrors(QGL33 * const gl,
                         const GLuint& shader,
                         const std::string& type) {
     GLint success;
@@ -95,7 +97,7 @@ void checkCompileErrors(QGL33c * const gl,
     }
 }
 #include <QFile>
-void iniProgram(QGL33c * const gl, GLuint& program,
+void iniProgram(QGL33 * const gl, GLuint& program,
                 const QString& vShaderPath,
                 const QString& fShaderPath) {
     Q_INIT_RESOURCE(coreresources);
@@ -160,7 +162,7 @@ void iniProgram(QGL33c * const gl, GLuint& program,
     gl->glDeleteShader(fragmentShader);
 }
 
-Texture Texture::sCreateTextureFromImage(QGL33c * const gl,
+Texture Texture::sCreateTextureFromImage(QGL33 * const gl,
                                          const std::string &imagePath) {
     Texture tex;
     tex.gen(gl);
@@ -168,18 +170,18 @@ Texture Texture::sCreateTextureFromImage(QGL33c * const gl,
     return tex;
 }
 
-void Texture::bind(QGL33c * const gl) const {
+void Texture::bind(QGL33 * const gl) const {
     gl->glBindTexture(GL_TEXTURE_2D, fId);
 }
 
-void Texture::clear(QGL33c * const gl) {
+void Texture::clear(QGL33 * const gl) {
     if(fId) gl->glDeleteTextures(1, &fId);
     fId = 0;
     fWidth = 0;
     fHeight = 0;
 }
 
-void Texture::gen(QGL33c * const gl) {
+void Texture::gen(QGL33 * const gl) {
     gl->glGenTextures(1, &fId);
     gl->glBindTexture(GL_TEXTURE_2D, fId);
     gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -188,7 +190,7 @@ void Texture::gen(QGL33c * const gl) {
     gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
-void Texture::gen(QGL33c * const gl,
+void Texture::gen(QGL33 * const gl,
                   const int width, const int height,
                   const void * const data) {
     gen(gl);
@@ -198,7 +200,7 @@ void Texture::gen(QGL33c * const gl,
     fHeight = height;
 }
 
-bool Texture::loadImage(QGL33c * const gl, const std::string &imagePath) {
+bool Texture::loadImage(QGL33 * const gl, const std::string &imagePath) {
     int nrChannels;
     stbi_set_flip_vertically_on_load(true);
     unsigned char * const data = stbi_load(imagePath.c_str(),
@@ -216,18 +218,24 @@ bool Texture::loadImage(QGL33c * const gl, const std::string &imagePath) {
 }
 
 #include "skia/skiahelpers.h"
-sk_sp<SkImage> Texture::toImage(QGL33c * const gl) const {
+SkBitmap Texture::toBitmap(QGL33 * const gl) const {
     bind(gl);
-    SkBitmap btmp;
+    SkBitmap bitmap;
     const auto info = SkiaHelpers::getPremulRGBAInfo(fWidth, fHeight);
-    btmp.allocPixels(info);
-    gl->glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, btmp.getPixels());
+    bitmap.allocPixels(info);
+    gl->glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA,
+                      GL_UNSIGNED_BYTE, bitmap.getPixels());
 //    glReadPixels(0, 0, fWidth, fHeight,
 //                 GL_RGBA, GL_UNSIGNED_BYTE, btmp.getPixels());
-    return SkiaHelpers::transferDataToSkImage(btmp);
+    return bitmap;
 }
 
-void TextureFrameBuffer::clear(QGL33c * const gl) {
+sk_sp<SkImage> Texture::toImage(QGL33 * const gl) const {
+    auto bitmap = toBitmap(gl);
+    return SkiaHelpers::transferDataToSkImage(bitmap);
+}
+
+void TextureFrameBuffer::clear(QGL33 * const gl) {
     if(fFBOId) gl->glDeleteFramebuffers(1, &fFBOId);
     fFBOId = 0;
     fWidth = 0;
@@ -237,17 +245,17 @@ void TextureFrameBuffer::clear(QGL33c * const gl) {
     fTexture.clear(gl);
 }
 
-void TextureFrameBuffer::bind(QGL33c * const gl) {
+void TextureFrameBuffer::bind(QGL33 * const gl) {
     if(fBound) return;
     gl->glBindFramebuffer(GL_FRAMEBUFFER, fFBOId);
     fBound = true;
 }
 
-void TextureFrameBuffer::bindTexture(QGL33c * const gl) {
+void TextureFrameBuffer::bindTexture(QGL33 * const gl) {
     fTexture.bind(gl);
 }
 
-void TextureFrameBuffer::gen(QGL33c * const gl,
+void TextureFrameBuffer::gen(QGL33 * const gl,
                              const int width, const int height) {
     fWidth = width;
     fHeight = height;

@@ -12,7 +12,7 @@ struct ShaderEffectProgram {
     UniformSpecifierCreators fUniformCreators;
 
     static ShaderEffectProgram sCreateProgram(
-            QGL33c * const gl, const QString &fragPath,
+            QGL33 * const gl, const QString &fragPath,
             const QList<stdsptr<PropertyCreator>>& propCs,
             const UniformSpecifierCreators& uniCs) {
         ShaderEffectProgram program;

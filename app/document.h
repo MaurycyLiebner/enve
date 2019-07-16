@@ -22,7 +22,9 @@ class Document : public SingleWidgetTarget {
         bool operator()(const FileHandler& f1, const FileHandler& f2);
     };
 public:
-    Document() : fActions(*this) { sInstance = this; }
+    Document() : fActions(*this) {
+        sInstance = this;
+    }
 
     static Document* sInstance;
 

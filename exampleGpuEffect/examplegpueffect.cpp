@@ -60,7 +60,7 @@ CustomIdentifier ExampleGpuEffect000::getIdentifier() const {
     return { effectId(), effectName(), { 0, 0, 0 } };
 }
 
-void ExampleGpuEffectCaller000::render(QGL33c * const gl,
+void ExampleGpuEffectCaller000::render(QGL33 * const gl,
                                        GpuRenderTools &renderTools,
                                        GpuRenderData &data) {
     Q_UNUSED(gl);

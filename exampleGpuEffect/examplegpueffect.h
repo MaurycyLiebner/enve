@@ -9,7 +9,7 @@ public:
         GPURasterEffectCaller(true, QMargins() + qCeil(radius)),
         mRadius(toSkScalar(radius)) {}
 
-    void render(QGL33c * const gl,
+    void render(QGL33 * const gl,
                 GpuRenderTools& renderTools,
                 GpuRenderData& data);
 private:

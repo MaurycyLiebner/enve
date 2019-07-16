@@ -18,7 +18,7 @@ protected:
                           const QMargins& margin) :
         fForceMargin(forceMargin), fMargin(margin) {}
 public:
-    virtual void render(QGL33c * const gl,
+    virtual void render(QGL33 * const gl,
                         GpuRenderTools& renderTools,
                         GpuRenderData& data) = 0;
 

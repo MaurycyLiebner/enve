@@ -29,13 +29,13 @@ UniformSpecifier QrealAnimatorUniformSpecifierCreator::create(
     const qreal val = qa->getEffectiveValue(relFrame);
 
     if(mScript.isEmpty()) {
-        return [loc, val](QGL33c * const gl, QJSEngine&) {
+        return [loc, val](QGL33 * const gl, QJSEngine&) {
             gl->glUniform1f(loc, static_cast<GLfloat>(val));
         };
     } else {
         QString script = mScript;
         return [loc, val, script, propName](
-                QGL33c * const gl, QJSEngine& engine) {
+                QGL33 * const gl, QJSEngine& engine) {
             const QString valScript = propName + " = " + QString::number(val);
             engine.evaluate(valScript);
             const QJSValue jsVal = engine.evaluate(script);
@@ -109,13 +109,13 @@ UniformSpecifier IntAnimatorUniformSpecifierCreator::create(
     const QString propName = property->prp_getName();
 
     if(mScript.isEmpty()) {
-        return [loc, val](QGL33c * const gl, QJSEngine&) {
+        return [loc, val](QGL33 * const gl, QJSEngine&) {
             gl->glUniform1i(loc, val);
         };
     } else {
         QString script = mScript;
         return [loc, val, script, propName](
-                QGL33c * const gl, QJSEngine& engine) {
+                QGL33 * const gl, QJSEngine& engine) {
             const QString valScript = propName + " = " + QString::number(val);
             engine.evaluate(valScript);
             const QJSValue jsVal = engine.evaluate(script);

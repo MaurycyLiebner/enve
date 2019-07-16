@@ -10,7 +10,7 @@ struct PropertyCreator : public StdSelfRef {
     QString fName;
     virtual qsptr<Property> create() const = 0;
     virtual GLint getUniformLocation(
-            QGL33c * const gl, const GLuint& program) const = 0;
+            QGL33 * const gl, const GLuint& program) const = 0;
 };
 
 #endif // PROPERTYCREATOR_H

@@ -4,7 +4,7 @@
 #include "skia/skiaincludes.h"
 #include "exceptions.h"
 
-typedef QOpenGLFunctions_3_3_Core QGL33c;
+typedef QOpenGLFunctions_3_3_Core QGL33;
 #define BUFFER_OFFSET(i) ((void*)(i))
 #define checkGlErrors \
     { \
@@ -14,15 +14,15 @@ typedef QOpenGLFunctions_3_3_Core QGL33c;
     }
 
 //! @brief Creates a program, compiles, and attaches associated shaders.
-extern void iniProgram(QGL33c * const gl,
+extern void iniProgram(QGL33 * const gl,
                        GLuint& program,
                        const QString &vShaderPath,
                        const QString &fShaderPath);
 
-extern void iniTexturedVShaderVBO(QGL33c * const gl);
-extern void iniTexturedVShaderVAO(QGL33c * const gl, GLuint& VAO);
-extern void iniPlainVShaderVBO(QGL33c * const gl);
-extern void iniPlainVShaderVAO(QGL33c * const gl, GLuint& VAO);
+extern void iniTexturedVShaderVBO(QGL33 * const gl);
+extern void iniTexturedVShaderVAO(QGL33 * const gl, GLuint& VAO);
+extern void iniPlainVShaderVBO(QGL33 * const gl);
+extern void iniPlainVShaderVAO(QGL33 * const gl, GLuint& VAO);
 
 extern QString GL_PLAIN_VERT;
 extern GLuint GL_PLAIN_SQUARE_VBO;
@@ -35,18 +35,18 @@ struct Texture {
     int fWidth = 0;
     int fHeight = 0;
 
-    static Texture sCreateTextureFromImage(QGL33c * const gl,
+    static Texture sCreateTextureFromImage(QGL33 * const gl,
                                            const std::string& imagePath);
 
-    void bind(QGL33c * const gl) const;
+    void bind(QGL33 * const gl) const;
 
-    void clear(QGL33c * const gl);
+    void clear(QGL33 * const gl);
 
     //! @brief Generates and binds texture.
-    void gen(QGL33c * const gl);
+    void gen(QGL33 * const gl);
 
     //! @brief Generates, binds texture and sets data.
-    void gen(QGL33c * const gl,
+    void gen(QGL33 * const gl,
              const int fWidth, const int fHeight,
              const void * const data);
 
@@ -56,9 +56,10 @@ struct Texture {
         std::swap(fHeight, otherTexture.fHeight);
     }
 
-    sk_sp<SkImage> toImage(QGL33c * const gl) const;
+    SkBitmap toBitmap(QGL33 * const gl) const;
+    sk_sp<SkImage> toImage(QGL33 * const gl) const;
 private:
-    bool loadImage(QGL33c * const gl, const std::string& imagePath);
+    bool loadImage(QGL33 * const gl, const std::string& imagePath);
 };
 
 struct TextureFrameBuffer {
@@ -69,7 +70,7 @@ struct TextureFrameBuffer {
     bool fBound = false;
 
     //! @brief Swaps underlying texture and bind FBO
-    void swapTexture(QGL33c * const gl, Texture& otherTexture) {
+    void swapTexture(QGL33 * const gl, Texture& otherTexture) {
         fTexture.swap(otherTexture);
 
         bind(gl);
@@ -78,18 +79,23 @@ struct TextureFrameBuffer {
                                    GL_TEXTURE_2D, fTexture.fId, 0);
     }
 
-    void clear(QGL33c * const gl);
+    void clear(QGL33 * const gl);
 
-    void bind(QGL33c * const gl);
+    void bind(QGL33 * const gl);
     void unbind() { fBound = false; }
 
-    void bindTexture(QGL33c * const gl);
+    void bindTexture(QGL33 * const gl);
 
     //! @brief Generates and binds framebuffer and associated texture.
-    void gen(QGL33c * const gl, const int width, const int height);
+    void gen(QGL33 * const gl, const int width, const int height);
 
-    sk_sp<SkImage> toImage(QGL33c * const gl) const {
-        return fTexture.toImage(gl); }
+    sk_sp<SkImage> toImage(QGL33 * const gl) const {
+        return fTexture.toImage(gl);
+    }
+
+    SkBitmap toBitmap(QGL33 * const gl) const {
+        return fTexture.toBitmap(gl);
+    }
 };
 
 #include <QJSEngine>
@@ -142,7 +148,7 @@ private:
 
 class GpuRenderTools {
 public:
-    GpuRenderTools(QGL33c* const gl,
+    GpuRenderTools(QGL33* const gl,
                    SwitchableContext& context,
                    const sk_sp<SkImage>& img,
                    const GLuint texturedSquareVAO) :
@@ -253,7 +259,7 @@ private:
                                 GrMipMapped::kNo, texInfo);
     }
 
-    QGL33c* const mGL;
+    QGL33* const mGL;
     SwitchableContext& mContext;
     const GLuint mSquareVAO;
 

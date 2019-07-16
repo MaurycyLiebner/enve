@@ -70,7 +70,7 @@ bool DabTestCaller000::sInitialized = false;
 GLuint DabTestCaller000::sDataId = 0;
 GLuint DabTestCaller000::sProgramId = 0;
 
-void DabTestCaller000::sInitialize(QGL33c * const gl) {
+void DabTestCaller000::sInitialize(QGL33 * const gl) {
     try {
         iniProgram(gl, sProgramId, GL_TEXTURED_VERT,
                    "/home/ailuropoda/Dev/enve/src/dabTest/normal.frag");
@@ -94,7 +94,7 @@ void DabTestCaller000::sInitialize(QGL33c * const gl) {
     gl->glUniform1i(dabDataU, 0);
 }
 
-void DabTestCaller000::render(QGL33c * const gl,
+void DabTestCaller000::render(QGL33 * const gl,
                               GpuRenderTools &renderTools,
                               GpuRenderData &data) {
     Q_UNUSED(data);

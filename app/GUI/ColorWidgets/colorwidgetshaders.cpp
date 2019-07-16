@@ -21,7 +21,7 @@ GradientProgram GRADIENT_PROGRAM;
 BorderProgram BORDER_PROGRAM;
 DoubleBorderProgram DOUBLE_BORDER_PROGRAM;
 
-void iniColorProgram(QGL33c * const gl,
+void iniColorProgram(QGL33 * const gl,
                      ColorProgram& program,
                      const QString& vShaderPath,
                      const QString& fShaderPath) {
@@ -50,7 +50,7 @@ void iniColorProgram(QGL33c * const gl,
     }
 }
 
-void iniPlainColorProgram(QGL33c * const gl, const QString& colorShadersPath) {
+void iniPlainColorProgram(QGL33 * const gl, const QString& colorShadersPath) {
     try {
         iniProgram(gl, PLAIN_PROGRAM.fID, GL_PLAIN_VERT,
                    colorShadersPath + "plain.frag");
@@ -66,7 +66,7 @@ void iniPlainColorProgram(QGL33c * const gl, const QString& colorShadersPath) {
     }
 }
 
-void iniBorderProgram(QGL33c * const gl, const QString& colorShadersPath) {
+void iniBorderProgram(QGL33 * const gl, const QString& colorShadersPath) {
     try {
         iniProgram(gl, BORDER_PROGRAM.fID, GL_PLAIN_VERT,
                    colorShadersPath + "border.frag");
@@ -81,7 +81,7 @@ void iniBorderProgram(QGL33c * const gl, const QString& colorShadersPath) {
     }
 }
 
-void iniDoubleBorderProgram(QGL33c * const gl, const QString& colorShadersPath) {
+void iniDoubleBorderProgram(QGL33 * const gl, const QString& colorShadersPath) {
     try {
         iniProgram(gl, DOUBLE_BORDER_PROGRAM.fID, GL_PLAIN_VERT,
                    colorShadersPath + "doubleborder.frag");
@@ -106,7 +106,7 @@ void iniDoubleBorderProgram(QGL33c * const gl, const QString& colorShadersPath) 
     }
 }
 
-void iniGradientProgram(QGL33c * const gl, const QString& colorShadersPath) {
+void iniGradientProgram(QGL33 * const gl, const QString& colorShadersPath) {
     try {
         iniProgram(gl, GRADIENT_PROGRAM.fID, GL_PLAIN_VERT,
                    colorShadersPath + "gradient.frag");
@@ -124,7 +124,7 @@ void iniGradientProgram(QGL33c * const gl, const QString& colorShadersPath) {
     }
 }
 
-void iniColorPrograms(QGL33c * const gl) {
+void iniColorPrograms(QGL33 * const gl) {
     const QString colorShadersPath = ":/colorwidgetshaders/";
 
     try {

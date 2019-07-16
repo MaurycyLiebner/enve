@@ -9,7 +9,7 @@
 #include "glhelpers.h"
 #include "GPUEffects/gpueffect.h"
 
-class ScheduledPostProcess : public StdSelfRef, protected QGL33c {
+class ScheduledPostProcess : public StdSelfRef, protected QGL33 {
     friend class GpuPostProcessor;
 public:
     ScheduledPostProcess();

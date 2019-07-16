@@ -10,13 +10,11 @@ GLWindow::GLWindow(QWidget * const parent)
 }
 
 GLWindow::~GLWindow() {
-//    mGrContext->abandonContext();
-//    delete mGrContext;
-//    delete mInterface;
-//    mContext->makeCurrent(this);
-//    mSurface.reset();
-//    delete mGrContext;
-//    mContext->doneCurrent();
+    if(mTextureSquareVAO) {
+        makeCurrent();
+        glDeleteBuffers(1, &mTextureSquareVAO);
+        doneCurrent();
+    }
 }
 
 void GLWindow::bindSkia(const int w, const int h) {
@@ -46,7 +44,6 @@ void GLWindow::bindSkia(const int w, const int h) {
                                     &props);
     if(!mSurface) RuntimeThrow("Failed to wrap buffer into SkSurface.");
     mCanvas = mSurface->getCanvas();
-    mGrContext->freeGpuResources();
 }
 
 void GLWindow::resizeGL(int, int) {
@@ -80,9 +77,11 @@ void GLWindow::initialize() {
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    mInterface = GrGLMakeNativeInterface();
-    if(!mInterface) RuntimeThrow("Failed to make native interface.");
-    mGrContext = GrContext::MakeGL(mInterface);
+    iniTexturedVShaderVAO(this, mTextureSquareVAO);
+
+    const auto interface = GrGLMakeNativeInterface();
+    if(!interface) RuntimeThrow("Failed to make native interface.");
+    mGrContext = GrContext::MakeGL(interface);
     if(!mGrContext) RuntimeThrow("Failed to make GrContext.");
 
     try {

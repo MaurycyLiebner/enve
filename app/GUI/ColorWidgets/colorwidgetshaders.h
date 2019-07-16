@@ -60,6 +60,6 @@ extern GradientProgram GRADIENT_PROGRAM;
 extern BorderProgram BORDER_PROGRAM;
 extern DoubleBorderProgram DOUBLE_BORDER_PROGRAM;
 
-extern void iniColorPrograms(QGL33c * const gl);
+extern void iniColorPrograms(QGL33 * const gl);
 
 #endif // COLORWIDGETSHADERS_H

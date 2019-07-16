@@ -16,7 +16,7 @@ struct QrealAnimatorCreator : public PropertyCreator {
                     fIniVal, fMinVal, fMaxVal, fStep, fName);
     }
 
-    GLint getUniformLocation(QGL33c * const gl, const GLuint& program) const {
+    GLint getUniformLocation(QGL33 * const gl, const GLuint& program) const {
         return gl->glGetUniformLocation(program, fName.toLatin1());
     }
 private:

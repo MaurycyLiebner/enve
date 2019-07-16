@@ -9,7 +9,6 @@
 #include "Boxes/imagebox.h"
 #include "Sound/soundcomposition.h"
 #include "Boxes/textbox.h"
-#include "GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "Sound/singlesound.h"
 #include "global.h"
 #include "pointhelpers.h"
@@ -27,7 +26,6 @@
 #include "Boxes/internallinkcanvas.h"
 #include "pointtypemenu.h"
 #include "Animators/transformanimator.h"
-#include "GUI/canvaswindow.h"
 
 Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,

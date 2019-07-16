@@ -11,7 +11,7 @@ public:
         GPURasterEffectCaller(false, margin), mProgram(program),
         mUniformSpecifiers(uniformSpecifiers) {}
 
-    void render(QGL33c * const gl,
+    void render(QGL33 * const gl,
                 GpuRenderTools& renderTools,
                 GpuRenderData& data) {
         renderTools.switchToOpenGL();
@@ -28,7 +28,7 @@ public:
         gl->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 private:
-    void setupProgram(QGL33c * const gl,
+    void setupProgram(QGL33 * const gl,
                       QJSEngine& engine,
                       const GLfloat gPosX,
                       const GLfloat gPosY) {

@@ -44,12 +44,12 @@ public:
     DabTestCaller000(const Dab& dab) :
         GPURasterEffectCaller(), mDab(dab) {}
 
-    void render(QGL33c * const gl,
+    void render(QGL33 * const gl,
                 GpuRenderTools& renderTools,
                 GpuRenderData& data);
 private:
     static bool sInitialized;
-    static void sInitialize(QGL33c * const gl);
+    static void sInitialize(QGL33 * const gl);
     static GLuint sDataId;
     static GLuint sProgramId;
 
