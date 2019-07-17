@@ -35,7 +35,7 @@ ColorPickingWidget::ColorPickingWidget(QWidget * const parent)
 void ColorPickingWidget::mouseReleaseEvent(QMouseEvent *e) {
     if(e->button() == Qt::RightButton) endThis();
     emit colorSelected(mCurrentColor);
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
     endThis();
 }
 

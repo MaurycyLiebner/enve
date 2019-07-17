@@ -20,8 +20,9 @@ struct CWWidgetStackLayoutItem : public SceneWidgetStackLayoutItem {
     CWWidgetStackLayoutItem() {}
 
     void clear();
-    QWidget* create(Document &document, AudioHandler &audioHandler,
-                    QWidget * const parent, QLayout* const layout = nullptr);
+    QWidget* create(Document &document,
+                    QWidget * const parent,
+                    QLayout* const layout = nullptr);
     void write(QIODevice* const dst) const;
     void read(QIODevice* const src);
     void setTransform(const QMatrix& transform);
@@ -33,7 +34,6 @@ private:
 class CanvasWindowWrapper : public StackWidgetWrapper {
 public:
     CanvasWindowWrapper(Document * const document,
-                        AudioHandler * const audioHandler,
                         CWWidgetStackLayoutItem * const layItem,
                         QWidget * const parent = nullptr);
 

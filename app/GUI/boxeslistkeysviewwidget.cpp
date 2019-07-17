@@ -196,7 +196,7 @@ TimelineWidget::TimelineWidget(Document &document,
             this, [this](const FrameRange& range){
         const auto scene = mSceneChooser->getCurrentScene();
         if(scene) scene->anim_setAbsFrame(range.fMin);
-        MainWindow::getInstance()->queScheduledTasksAndUpdate();
+        MainWindow::getInstance()->queTasksAndUpdate();
     });
     mMainLayout->addWidget(mFrameScrollBar, 0, 1);
 
@@ -261,7 +261,7 @@ void TimelineWidget::setBoxesListWidth(const int width) {
 
 void TimelineWidget::setBoxRule(const SWT_BoxRule rule) {
     mBoxesListWidget->getVisiblePartWidget()->setCurrentRule(rule);
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void TimelineWidget::setRuleNone() {
@@ -299,7 +299,7 @@ void TimelineWidget::setRuleLocked() {
 void TimelineWidget::setTargetAll() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(&mDocument, SWT_TARGET_ALL);
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void TimelineWidget::setTargetCurrentCanvas() {
@@ -307,7 +307,7 @@ void TimelineWidget::setTargetCurrentCanvas() {
             setCurrentTarget(
                 mCurrentScene,
                 SWT_TARGET_CURRENT_CANVAS);
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void TimelineWidget::setTargetCurrentGroup() {
@@ -315,12 +315,12 @@ void TimelineWidget::setTargetCurrentGroup() {
             setCurrentTarget(
                 mCurrentScene->getCurrentGroup(),
                 SWT_TARGET_CURRENT_GROUP);
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void TimelineWidget::setCurrentType(const SWT_Type type) {
     mBoxesListWidget->getVisiblePartWidget()->setCurrentType(type);
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void TimelineWidget::setTypeAll() {
@@ -337,7 +337,7 @@ void TimelineWidget::setTypeGraphics() {
 
 void TimelineWidget::setSearchText(const QString &text) {
     mBoxesListWidget->getVisiblePartWidget()->setCurrentSearchText(text);
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void TimelineWidget::setViewedFrameRange(

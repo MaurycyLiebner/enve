@@ -47,9 +47,9 @@ void TWidgetStackLayoutItem::clear() {
     mGraph = false;
 }
 
-QWidget *TWidgetStackLayoutItem::create(Document &document, AudioHandler &audioHandler,
-                                        QWidget* const parent, QLayout * const layout) {
-    Q_UNUSED(audioHandler);
+QWidget *TWidgetStackLayoutItem::create(Document &document,
+                                        QWidget* const parent,
+                                        QLayout * const layout) {
     const auto tWrapper = new TimelineWrapper(&document, this, parent);
     if(layout) layout->addWidget(tWrapper);
     tWrapper->setScene(mScene);

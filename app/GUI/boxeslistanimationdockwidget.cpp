@@ -23,6 +23,15 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
         MainWindow *parent) :
     QWidget(parent), mDocument(document),
     mTimelineLayout(layoutH->timelineLayout()) {
+    connect(&mDocument.fRenderHandler, &RenderHandler::previewFinished,
+            this, &BoxesListAnimationDockWidget::previewFinished);
+    connect(&mDocument.fRenderHandler, &RenderHandler::previewBeingPlayed,
+            this, &BoxesListAnimationDockWidget::previewBeingPlayed);
+    connect(&mDocument.fRenderHandler, &RenderHandler::previewBeingRendered,
+            this, &BoxesListAnimationDockWidget::previewBeingRendered);
+    connect(&mDocument.fRenderHandler, &RenderHandler::previewPaused,
+            this, &BoxesListAnimationDockWidget::previewPaused);
+
     setFocusPolicy(Qt::NoFocus);
 
     mMainWindow = parent;
@@ -140,7 +149,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 
     connect(mRenderWidget, &RenderWidget::renderFromSettings,
             this, [this](RenderInstanceSettings* const settings) {
-        mDocument.fActiveSceneWidget->renderFromSettings(settings);
+        mDocument.fRenderHandler.renderFromSettings(settings);
     });
 
     mMainLayout->addWidget(mTimelineLayout);
@@ -237,30 +246,30 @@ void BoxesListAnimationDockWidget::previewPaused() {
 }
 
 void BoxesListAnimationDockWidget::resumePreview() {
-    mDocument.fActiveSceneWidget->resumePreview();
+    mDocument.fRenderHandler.resumePreview();
 }
 
 void BoxesListAnimationDockWidget::pausePreview() {
-    mDocument.fActiveSceneWidget->pausePreview();
+    mDocument.fRenderHandler.pausePreview();
 }
 
 void BoxesListAnimationDockWidget::playPreview() {
-    mDocument.fActiveSceneWidget->playPreview();
+    mDocument.fRenderHandler.playPreview();
 }
 
 void BoxesListAnimationDockWidget::renderPreview() {
-    mDocument.fActiveSceneWidget->renderPreview();
+    mDocument.fRenderHandler.renderPreview();
 }
 
 void BoxesListAnimationDockWidget::interruptPreview() {
-    mDocument.fActiveSceneWidget->interruptPreview();
+    mDocument.fRenderHandler.interruptPreview();
 }
 
 void BoxesListAnimationDockWidget::setLocalPivot(const bool bT) {
     mDocument.fLocalPivot = bT;
     for(const auto& scene : mDocument.fScenes)
         scene->updatePivot();
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void BoxesListAnimationDockWidget::setTimelineMode() {

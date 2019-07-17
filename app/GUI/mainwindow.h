@@ -111,7 +111,6 @@ public:
     void disable();
     void enable();
 
-    void previewFinished();
     void updateCanvasModeButtonsChecked();
 
     //void addBoxAwaitingUpdate(BoundingBox *box);
@@ -129,10 +128,6 @@ public:
             const ClipboardContainerType &type);
     void addCanvas(Canvas * const newCanvas);
 
-    void previewBeingPlayed();
-    void previewBeingRendered();
-    void previewPaused();
-
     FontsWidget *getFontsWidget() const {
         return mFontWidget;
     }
@@ -146,7 +141,7 @@ public:
    // void stopPreview();
     void setResolutionFractionValue(const qreal value);
 
-    void queScheduledTasksAndUpdate();
+    void queTasksAndUpdate();
     void addCanvasToRenderQue();
     void canvasNameChanged(Canvas *canvas, const QString &name);
 
@@ -308,6 +303,7 @@ private:
     QMenu *mRenderMenu;
 
     TaskScheduler mTaskScheduler;
+    stdsptr<VideoEncoder> mVideoEncoder;
     Document mDocument;
     AudioHandler mAudioHandler;
     Actions mActions;
@@ -333,8 +329,6 @@ private:
     void setupMenuBar();
 
     QList<Gradient*> mLoadedGradientsList;
-
-    stdsptr<VideoEncoder> mVideoEncoder;
 protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *obj, QEvent *e);

@@ -18,19 +18,19 @@ int KeysView::graphGetAnimatorId(GraphAnimator * const anim) {
 void KeysView::graphSetSmoothCtrlAction() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_SMOOTH);
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void KeysView::graphSetSymmetricCtrlAction() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_SYMMETRIC);
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void KeysView::graphSetCornerCtrlAction() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_CORNER);
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void KeysView::graphMakeSegmentsSmoothAction(const bool smooth) {
@@ -61,7 +61,7 @@ void KeysView::graphMakeSegmentsSmoothAction(const bool smooth) {
     }
 
     graphConstrainAnimatorCtrlsFrameValues();
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void KeysView::graphMakeSegmentsLinearAction() {
@@ -426,7 +426,7 @@ bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event) {
 
 void KeysView::graphResetValueScaleAndMinShownAction() {
     graphResetValueScaleAndMinShown();
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void KeysView::graphResetValueScaleAndMinShown() {
@@ -446,7 +446,7 @@ void KeysView::graphAddViewedAnimator(GraphAnimator * const animator) {
         graphRemoveViewedAnimator(animator);
     });
 
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void KeysView::graphRemoveViewedAnimator(GraphAnimator * const animator) {
@@ -455,13 +455,13 @@ void KeysView::graphRemoveViewedAnimator(GraphAnimator * const animator) {
     graphUpdateDimensions();
     graphResetValueScaleAndMinShown();
 
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void KeysView::graphUpdateAfterKeysChangedAndRepaint() {
     scheduleGraphUpdateAfterKeysChanged();
     
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void KeysView::scheduleGraphUpdateAfterKeysChanged() {

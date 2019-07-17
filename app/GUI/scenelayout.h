@@ -5,7 +5,7 @@
 
 class SceneLayout : public QWidget {
 public:
-    SceneLayout(Document &document, AudioHandler &audioHandler,
+    SceneLayout(Document &document,
                 QWidget* const parent = nullptr);
 
     SceneBaseStackItem *extract();
@@ -16,7 +16,6 @@ private:
     void reset();
 
     Document& mDocument;
-    AudioHandler& mAudioHandler;
 
     SceneBaseStackItem* mBaseStack = nullptr;
 };

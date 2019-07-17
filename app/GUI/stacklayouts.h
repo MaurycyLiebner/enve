@@ -23,8 +23,9 @@ struct StackLayoutItem {
     typedef std::unique_ptr<SplitStackLayoutItem> SplitPtr;
     typedef std::unique_ptr<WidgetStackLayoutItem> WidgetPtr;
     virtual ~StackLayoutItem() {}
-    virtual QWidget* create(Document &document, AudioHandler &audioHandler,
-                            QWidget* const parent, QLayout* const layout = nullptr) = 0;
+    virtual QWidget* create(Document &document,
+                            QWidget* const parent,
+                            QLayout* const layout = nullptr) = 0;
     virtual void write(QIODevice* const dst) const = 0;
     virtual void saveData() = 0;
 
@@ -147,9 +148,10 @@ struct BaseStackItem : public ParentStackLayoutItem {
         mChild->saveData();
     }
 
-    QWidget* create(Document &document, AudioHandler &audioHandler,
-                    QWidget* const parent, QLayout* const layout = nullptr) {
-        return mChild->create(document, audioHandler, parent, layout);
+    QWidget* create(Document &document,
+                    QWidget* const parent,
+                    QLayout* const layout = nullptr) {
+        return mChild->create(document, parent, layout);
     }
 
     void childClosed_k(StackLayoutItem* const child) {
@@ -204,13 +206,13 @@ struct HSplitStackItem : public SplitStackLayoutItem {
 public:
     HSplitStackItem() { mType = Type::H_SPLIT; }
 
-    QWidget* create(Document &document, AudioHandler &audioHandler,
+    QWidget* create(Document &document,
                     QWidget* const parent, QLayout* const layout = nullptr) {
         const auto split = new HWidgetStack(this, parent);
         if(layout) layout->addWidget(split);
-        split->appendWidget(mChildItems.first->create(document, audioHandler, split),
+        split->appendWidget(mChildItems.first->create(document, split),
                             1 - mSecondSizeFrac);
-        split->appendWidget(mChildItems.second->create(document, audioHandler, split),
+        split->appendWidget(mChildItems.second->create(document, split),
                             mSecondSizeFrac);
         return split;
     }
@@ -233,13 +235,14 @@ struct VSplitStackItem : public SplitStackLayoutItem {
 public:
     VSplitStackItem() { mType = Type::V_SPLIT; }
 
-    QWidget* create(Document &document, AudioHandler &audioHandler,
-                    QWidget* const parent, QLayout* const layout = nullptr) {
+    QWidget* create(Document &document,
+                    QWidget* const parent,
+                    QLayout* const layout = nullptr) {
         const auto split = new VWidgetStack(this, parent);
         if(layout) layout->addWidget(split);
-        split->appendWidget(mChildItems.first->create(document, audioHandler, split),
+        split->appendWidget(mChildItems.first->create(document, split),
                             1 - mSecondSizeFrac);
-        split->appendWidget(mChildItems.second->create(document, audioHandler, split),
+        split->appendWidget(mChildItems.second->create(document, split),
                             mSecondSizeFrac);
         return split;
     }

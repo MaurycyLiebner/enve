@@ -72,20 +72,20 @@ void ColorValueRect::paintGL() {
 
 void ColorValueRect::mouseMoveEvent(QMouseEvent *e) {
     mouseInteraction(e->x());
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
 }
 
 void ColorValueRect::mousePressEvent(QMouseEvent *e) {
     if(e->button() == Qt::RightButton) return;
     emit editingStarted(qVal());
     mouseInteraction(e->x());
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
 }
 
 void ColorValueRect::mouseReleaseEvent(QMouseEvent *) {
     mHslSaturatonTmp = -1;
     emit editingFinished(qVal());
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
 }
 
 //void ColorValueRect::wheelEvent(QWheelEvent *e)

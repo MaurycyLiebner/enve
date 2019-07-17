@@ -54,15 +54,14 @@ int MIN_WIDGET_DIM;
 int KEY_RECT_SIZE;
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), mActions(mDocument) {
+    : QMainWindow(parent), mVideoEncoder(SPtrCreate(VideoEncoder)()),
+      mDocument(mAudioHandler), mActions(mDocument) {
     sMainWindowInstance = this;
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
     KEY_RECT_SIZE = MIN_WIDGET_DIM*3/5;
     av_register_all();
     mAudioHandler.initializeAudio();
-
-    mVideoEncoder = SPtrCreate(VideoEncoder)();
 
     connect(&mDocument, &Document::evFilePathChanged,
             this, &MainWindow::updateTitle);
@@ -122,7 +121,7 @@ MainWindow::MainWindow(QWidget *parent)
     [this](ShaderEffectProgram * program) {
         for(const auto& scene : mDocument.fScenes)
             scene->updateIfUsesProgram(program);
-        queScheduledTasksAndUpdate();
+        queTasksAndUpdate();
     });
 
     mLayoutHandler = new LayoutHandler(mDocument, mAudioHandler);
@@ -238,7 +237,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     connect(&mTaskScheduler, &TaskScheduler::finishedAllQuedTasks,
-            this, &MainWindow::queScheduledTasksAndUpdate);
+            this, &MainWindow::queTasksAndUpdate);
 
     QApplication::instance()->installEventFilter(this);
 }
@@ -775,22 +774,6 @@ void MainWindow::updateCanvasModeButtonsChecked() {
     mPaintMode->setChecked(currentMode == PAINT_MODE);
 }
 
-void MainWindow::previewFinished() {
-    mBoxesListAnimationDockWidget->previewFinished();
-}
-
-void MainWindow::previewBeingPlayed() {
-    mBoxesListAnimationDockWidget->previewBeingPlayed();
-}
-
-void MainWindow::previewBeingRendered() {
-    mBoxesListAnimationDockWidget->previewBeingRendered();
-}
-
-void MainWindow::previewPaused() {
-    mBoxesListAnimationDockWidget->previewPaused();
-}
-
 //void MainWindow::stopPreview() {
 //    mPreviewInterrupted = true;
 //    if(!mRendering) {
@@ -831,7 +814,7 @@ SimpleBrushWrapper *MainWindow::getCurrentBrush() const {
     return mBrushSelectionWidget->getCurrentBrush();
 }
 
-void MainWindow::queScheduledTasksAndUpdate() {
+void MainWindow::queTasksAndUpdate() {
     if(!isEnabled()) return;
     if(mCurrentUndoRedoStack) {
         if(mCurrentUndoRedoStack->finishSet()) {
@@ -919,7 +902,7 @@ void MainWindow::enable() {
     enableEventFilter();
     delete mGrayOutWidget;
     mGrayOutWidget = nullptr;
-    queScheduledTasksAndUpdate();
+    queTasksAndUpdate();
 }
 
 void MainWindow::newFile() {
@@ -1015,7 +998,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
         } else {
             returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);
         }
-        if(event->key() != Qt::Key_Control) queScheduledTasksAndUpdate();
+        if(event->key() != Qt::Key_Control) queTasksAndUpdate();
         return returnBool;
     }
     return false;
@@ -1167,7 +1150,7 @@ void MainWindow::importImageSequence() {
     if(!folder.isEmpty()) {
         mDocument.fActiveScene->createAnimationBoxForPaths(folder);
     }
-    queScheduledTasksAndUpdate();
+    queTasksAndUpdate();
 }
 
 //void MainWindow::importVideo() {
@@ -1194,13 +1177,13 @@ void MainWindow::revert() {
 void MainWindow::undo() {
     if(!mCurrentUndoRedoStack) return;
     getUndoRedoStack()->undo();
-    queScheduledTasksAndUpdate();
+    queTasksAndUpdate();
 }
 
 void MainWindow::redo() {
     if(!mCurrentUndoRedoStack) return;
     getUndoRedoStack()->redo();
-    queScheduledTasksAndUpdate();
+    queTasksAndUpdate();
 }
 
 stdsptr<void> MainWindow::lock() {

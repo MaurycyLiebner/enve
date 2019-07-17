@@ -36,7 +36,6 @@ private:
 };
 
 CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
-                                         AudioHandler * const audioHandler,
                                          CWWidgetStackLayoutItem* const layItem,
                                          QWidget * const parent) :
     StackWidgetWrapper(
@@ -45,16 +44,14 @@ CanvasWindowWrapper::CanvasWindowWrapper(Document * const document,
             const auto rPtr = new CWWidgetStackLayoutItem();
             return std::unique_ptr<WidgetStackLayoutItem>(rPtr);
         },
-        [document, audioHandler](WidgetStackLayoutItem* const layItem,
+        [document](WidgetStackLayoutItem* const layItem,
                                  QWidget * const parent) {
             const auto cLayItem = static_cast<CWWidgetStackLayoutItem*>(layItem);
-            const auto derived = new CanvasWindowWrapper(document, audioHandler,
-                                                         cLayItem, parent);
+            const auto derived = new CanvasWindowWrapper(document, cLayItem, parent);
             return static_cast<StackWidgetWrapper*>(derived);
         },
-        [document, audioHandler](StackWidgetWrapper * toSetup) {
-            const auto window = new CanvasWindow(*document, *audioHandler,
-                                                 toSetup);
+        [document](StackWidgetWrapper * toSetup) {
+            const auto window = new CanvasWindow(*document, toSetup);
             toSetup->setCentralWidget(window);
             toSetup->setMenuBar(new CanvasWrapperMenuBar(*document, window));
         }, parent) {}
@@ -86,10 +83,9 @@ void CWWidgetStackLayoutItem::clear() {
 }
 
 QWidget* CWWidgetStackLayoutItem::create(
-        Document& document, AudioHandler& audioHandler,
+        Document& document,
         QWidget* const parent, QLayout * const layout) {
-    const auto cwWrapper = new CanvasWindowWrapper(
-                &document, &audioHandler, this, parent);
+    const auto cwWrapper = new CanvasWindowWrapper(&document, this, parent);
     if(layout) layout->addWidget(cwWrapper);
     cwWrapper->setScene(mScene);
     const auto cw = cwWrapper->getSceneWidget();

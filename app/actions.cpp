@@ -422,6 +422,6 @@ void Actions::setPaintMode() {
 }
 
 void Actions::afterAction() const {
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
     emit mActiveScene->requestUpdate();
 }

@@ -211,7 +211,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
     }
 
     mValueInput.clearAndDisableInput();
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 stdsptr<KeysClipboardContainer> KeysView::getSelectedKeysClipboardContainer() {
@@ -665,7 +665,7 @@ void KeysView::handleMouseMove(const QPoint &pos,
         updateHovered(posU);
     }
 
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
     mLastMovePos = pos;
 }
 
@@ -765,7 +765,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
     releaseMouseAndDontTrack();
 
     mValueInput.clearAndDisableInput();
-    mMainWindow->queScheduledTasksAndUpdate();
+    mMainWindow->queTasksAndUpdate();
 }
 
 void KeysView::setFramesRange(const FrameRange& range) {

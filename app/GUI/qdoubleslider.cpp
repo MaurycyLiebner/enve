@@ -272,7 +272,7 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
         if(keyEvent->key() == Qt::Key_Return ||
            keyEvent->key() == Qt::Key_Enter) {
             finishTextEditing();
-            MainWindow::getInstance()->queScheduledTasksAndUpdate();
+            MainWindow::getInstance()->queTasksAndUpdate();
         } else if((keyEvent->key() == Qt::Key_Period ||
                   keyEvent->key() == Qt::Key_Comma) && mTextEdit) {
             QString currentText = mLineEdit->text();
@@ -300,7 +300,7 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
         if(mTextEdit) {
             if(!rect().contains(mouseEvent->pos()) ) {
                 finishTextEditing();
-                MainWindow::getInstance()->queScheduledTasksAndUpdate();
+                MainWindow::getInstance()->queTasksAndUpdate();
 //                QApplication::setOverrideCursor(QApplication::widgetAt(mouseEvent->globalPos())->cursor());
 //                QApplication::restoreOverrideCursor();
             }
@@ -313,7 +313,7 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
             if(mMouseMoved) {
                 setCursor(Qt::ArrowCursor);
                 emitEditingFinished(mValue);
-                MainWindow::getInstance()->queScheduledTasksAndUpdate();
+                MainWindow::getInstance()->queTasksAndUpdate();
             } else {
                 updateLineEditFromValue();
                 mLineEdit->setCursor(Qt::IBeamCursor);
@@ -330,7 +330,7 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
             if(mMovesCount > 2) {
                 mouseMoveEvent((QMouseEvent*) event);
                 mMouseMoved = true;
-                MainWindow::getInstance()->queScheduledTasksAndUpdate();
+                MainWindow::getInstance()->queTasksAndUpdate();
             }
         }
         return !mTextEdit;

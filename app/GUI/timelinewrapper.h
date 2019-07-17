@@ -7,8 +7,9 @@ class ChangeWidthWidget;
 struct TWidgetStackLayoutItem : public SceneWidgetStackLayoutItem {
     TWidgetStackLayoutItem() {}
     void clear();
-    QWidget* create(Document &document, AudioHandler &audioHandler,
-                    QWidget * const parent, QLayout* const layout = nullptr);
+    QWidget* create(Document &document,
+                    QWidget * const parent,
+                    QLayout* const layout = nullptr);
     void write(QIODevice* const dst) const;
     void read(QIODevice* const src);
     void setGraph(const bool graph);

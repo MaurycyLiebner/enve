@@ -11,7 +11,6 @@
 #include "renderinstancesettings.h"
 #include "newcanvasdialog.h"
 #include "Sound/singlesound.h"
-#include "CacheHandlers/soundcachecontainer.h"
 #include "svgimporter.h"
 #include "filesourcescache.h"
 #include <QFileDialog>
@@ -21,38 +20,15 @@
 #include "memoryhandler.h"
 
 CanvasWindow::CanvasWindow(Document &document,
-                           AudioHandler& audioHandler,
                            QWidget * const parent) :
     GLWindow(parent), mDocument(document),
-    mActions(document.fActions), mAudioHandler(audioHandler) {
-    connect(MemoryHandler::sGetInstance(), &MemoryHandler::allMemoryUsed,
-            this, &CanvasWindow::outOfMemory);
+    mActions(document.fActions) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
     connect(&mDocument, &Document::canvasModeSet,
             this, &CanvasWindow::setCanvasMode);
 
-    mPreviewFPSTimer = new QTimer(this);
-    connect(mPreviewFPSTimer, &QTimer::timeout,
-            this, &CanvasWindow::nextPreviewFrame);
-    connect(mPreviewFPSTimer, &QTimer::timeout,
-            this, &CanvasWindow::audioPushTimerExpired);
-
     this->setAcceptDrops(true);
-
     this->setMouseTracking(true);
-
-
-    const auto vidEmitter = VideoEncoder::getVideoEncoderEmitter();
-//    connect(vidEmitter, &VideoEncoderEmitter::encodingStarted,
-//            this, &CanvasWindow::leaveOnlyInterruptionButtonsEnabled);
-    connect(vidEmitter, &VideoEncoderEmitter::encodingFinished,
-            this, &CanvasWindow::interruptOutputRendering);
-    connect(vidEmitter, &VideoEncoderEmitter::encodingInterrupted,
-            this, &CanvasWindow::interruptOutputRendering);
-    connect(vidEmitter, &VideoEncoderEmitter::encodingFailed,
-            this, &CanvasWindow::interruptOutputRendering);
-    connect(vidEmitter, &VideoEncoderEmitter::encodingStartFailed,
-            this, &CanvasWindow::interruptOutputRendering);
 }
 
 CanvasWindow::~CanvasWindow() {
@@ -82,7 +58,6 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     if(hasFocus()) mDocument.setActiveScene(mCurrentCanvas);
     if(mCurrentCanvas) {
         mDocument.addVisibleScene(mCurrentCanvas);
-        mCurrentSoundComposition = mCurrentCanvas->getSoundComposition();
         mCurrentCanvas->setIsCurrentCanvas(true);
 
         emit changeCanvasFrameRange(canvas->getFrameRange());
@@ -99,7 +74,6 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
 //            if(range.inRange(currFrame)) update();
 //        });
     } else {
-        mCurrentSoundComposition = nullptr;
         MainWindow::getInstance()->setCurrentUndoRedoStack(nullptr);
     }
 
@@ -149,10 +123,10 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
     update();
 }
 
-void CanvasWindow::queScheduledTasksAndUpdate() {
+void CanvasWindow::queTasksAndUpdate() {
     updatePivotIfNeeded();
     update();
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
 }
 
 bool CanvasWindow::hasNoCanvas() {
@@ -206,7 +180,7 @@ void CanvasWindow::mousePressEvent(QMouseEvent *event) {
                            [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
                            this));
-    queScheduledTasksAndUpdate();
+    queTasksAndUpdate();
     mPrevMousePos = pos;
     if(event->button() == Qt::LeftButton) {
         mPrevPressPos = pos;
@@ -224,7 +198,7 @@ void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
                            event, [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
                            this));
-    queScheduledTasksAndUpdate();
+    queTasksAndUpdate();
 }
 
 void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
@@ -242,7 +216,7 @@ void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
                            this));
 
     if(mDocument.fCanvasMode == PAINT_MODE) update();
-    else queScheduledTasksAndUpdate();
+    else queTasksAndUpdate();
     mPrevMousePos = pos;
 }
 
@@ -265,7 +239,7 @@ void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
                            event, [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
                            this));
-    queScheduledTasksAndUpdate();
+    queTasksAndUpdate();
 }
 
 void CanvasWindow::openSettingsWindowForCurrentCanvas() {
@@ -512,9 +486,8 @@ void CanvasWindow::closeWelcomeDialog() {
 }
 
 void CanvasWindow::changeCurrentFrameAction(const int frame) {
-    emit changeCurrentFrame(frame);
     if(mCurrentCanvas) mCurrentCanvas->anim_setAbsFrame(frame);
-    queScheduledTasksAndUpdate();
+    queTasksAndUpdate();
 }
 
 void CanvasWindow::setResolutionFraction(const qreal percent) {
@@ -522,7 +495,7 @@ void CanvasWindow::setResolutionFraction(const qreal percent) {
     mCurrentCanvas->setResolutionFraction(percent);
     mCurrentCanvas->prp_afterWholeInfluenceRangeChanged();
     mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
-    queScheduledTasksAndUpdate();
+    queTasksAndUpdate();
 }
 
 void CanvasWindow::updatePivotIfNeeded() {
@@ -540,281 +513,6 @@ ContainerBox *CanvasWindow::getCurrentGroup() {
     return mCurrentCanvas->getCurrentGroup();
 }
 
-void CanvasWindow::renderFromSettings(RenderInstanceSettings * const settings) {
-    VideoEncoder::sStartEncoding(settings);
-    if(VideoEncoder::sEncodingSuccessfulyStarted()) {
-        mSavedCurrentFrame = getCurrentFrame();
-        mSavedResolutionFraction = mCurrentCanvas->getResolutionFraction();
-
-        mCurrentRenderSettings = settings;
-        const RenderSettings &renderSettings = settings->getRenderSettings();
-        Canvas * const canvas = settings->getTargetCanvas();
-        setCurrentCanvas(canvas);
-        changeCurrentFrameAction(renderSettings.fMinFrame);
-
-        const qreal resolutionFraction = renderSettings.fResolution;
-        mMinRenderFrame = renderSettings.fMinFrame;
-        mMaxRenderFrame = renderSettings.fMaxFrame;
-
-        const auto nextFrameFunc = [this]() {
-            nextSaveOutputFrame();
-        };
-        TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
-        TaskScheduler::sSetAllTasksFinishedFunc(nextFrameFunc);
-
-        fitCanvasToSize();
-        if(!isZero6Dec(mSavedResolutionFraction - resolutionFraction)) {
-            mCurrentCanvas->setResolutionFraction(resolutionFraction);
-        }
-
-        mCurrentRenderFrame = renderSettings.fMinFrame;
-        mCurrRenderRange = {mCurrentRenderFrame, mCurrentRenderFrame};
-        mCurrentCanvas->setCurrentRenderRange(mCurrRenderRange);
-
-        mCurrentEncodeFrame = mCurrentRenderFrame;
-        mFirstEncodeSoundSecond = qRound(mCurrentRenderFrame/mCurrentCanvas->getFps());
-        mCurrentEncodeSoundSecond = mFirstEncodeSoundSecond;
-        mCurrentSoundComposition->startBlockingAtFrame(mCurrentRenderFrame);
-        mCurrentSoundComposition->scheduleFrameRange({mCurrentRenderFrame,
-                                                      mCurrentRenderFrame});
-        mCurrentCanvas->anim_setAbsFrame(mCurrentRenderFrame);
-        mCurrentCanvas->setOutputRendering(true);
-        if(TaskScheduler::sAllQuedCPUTasksFinished()) {
-            nextSaveOutputFrame();
-        }
-    }
-}
-
-void CanvasWindow::nextCurrentRenderFrame() {
-    auto& cacheHandler = mCurrentCanvas->getCacheHandler();
-    int newCurrentRenderFrame = cacheHandler.
-            firstEmptyFrameAtOrAfter(mCurrentRenderFrame + 1);
-    if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
-        const int minBlock = mCurrentRenderFrame + 1;
-        const int maxBlock = newCurrentRenderFrame - 1;
-        cacheHandler.blockConts({minBlock, maxBlock}, true);
-    }
-    const bool allDone = newCurrentRenderFrame > mMaxRenderFrame;
-    newCurrentRenderFrame = qMin(mMaxRenderFrame, newCurrentRenderFrame);
-    const FrameRange newSoundRange = {mCurrentRenderFrame, newCurrentRenderFrame};
-    mCurrentSoundComposition->scheduleFrameRange(newSoundRange);
-    mCurrentSoundComposition->blockUpToFrame(newCurrentRenderFrame);
-
-    mCurrentRenderFrame = newCurrentRenderFrame;
-    mCurrRenderRange.fMax = mCurrentRenderFrame;
-    mCurrentCanvas->setCurrentRenderRange(mCurrRenderRange);
-    if(!allDone) changeCurrentFrameAction(mCurrentRenderFrame);
-}
-
-void CanvasWindow::renderPreview() {
-    if(!mCurrentCanvas) return;
-    const auto nextFrameFunc = [this]() {
-        nextPreviewRenderFrame();
-    };
-    TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
-    TaskScheduler::sSetAllTasksFinishedFunc(nextFrameFunc);
-
-    mSavedCurrentFrame = getCurrentFrame();    
-    mCurrentRenderFrame = mSavedCurrentFrame;
-    mCurrRenderRange = {mCurrentRenderFrame, mCurrentRenderFrame};
-    mCurrentCanvas->setCurrentRenderRange(mCurrRenderRange);
-    mCurrentSoundComposition->startBlockingAtFrame(mCurrentRenderFrame);
-
-    mMaxRenderFrame = getMaxFrame();
-    setRenderingPreview(true);
-
-    MainWindow::getInstance()->previewBeingRendered();
-    if(TaskScheduler::sAllQuedCPUTasksFinished()) {
-        nextPreviewRenderFrame();
-    }
-}
-
-void CanvasWindow::interruptPreview() {
-    if(mRenderingPreview) interruptPreviewRendering();
-    else if(mPreviewing) stopPreview();
-}
-
-void CanvasWindow::outOfMemory() {
-    if(mRenderingPreview) {
-        TaskScheduler::sClearTasks();
-        playPreview();
-    }
-}
-
-void CanvasWindow::setRenderingPreview(const bool bT) {
-    mRenderingPreview = bT;
-    mCurrentCanvas->setRenderingPreview(bT);
-}
-
-void CanvasWindow::setPreviewing(const bool bT) {
-    mPreviewing = bT;
-    mCurrentCanvas->setPreviewing(bT);
-}
-
-void CanvasWindow::interruptPreviewRendering() {
-    setRenderingPreview(false);
-    TaskScheduler::sClearAllFinishedFuncs();
-    clearPreview();
-    auto& cacheHandler = mCurrentCanvas->getCacheHandler();
-    cacheHandler.blockConts({mSavedCurrentFrame + 1, mMaxRenderFrame}, false);
-    changeCurrentFrameAction(mSavedCurrentFrame);
-    MainWindow::getInstance()->previewFinished();
-}
-
-void CanvasWindow::interruptOutputRendering() {
-    mCurrentCanvas->setOutputRendering(false);
-    TaskScheduler::sClearAllFinishedFuncs();
-    clearPreview();
-    changeCurrentFrameAction(mSavedCurrentFrame);
-}
-
-void CanvasWindow::stopPreview() {
-    setPreviewing(false);
-    auto& cacheHandler = mCurrentCanvas->getCacheHandler();
-    cacheHandler.blockConts({mSavedCurrentFrame + 1, mMaxRenderFrame}, false);
-    changeCurrentFrameAction(mSavedCurrentFrame);
-    mCurrentCanvas->setCurrentPreviewContainer(mSavedCurrentFrame);
-    mPreviewFPSTimer->stop();
-    stopAudio();
-    update();
-    MainWindow::getInstance()->previewFinished();
-}
-
-void CanvasWindow::pausePreview() {
-    if(mPreviewing) {
-        mPreviewFPSTimer->stop();
-        MainWindow::getInstance()->previewPaused();
-    }
-}
-
-void CanvasWindow::resumePreview() {
-    if(mPreviewing) {
-        mPreviewFPSTimer->start();
-        MainWindow::getInstance()->previewBeingPlayed();
-    }
-}
-
-void CanvasWindow::playPreviewAfterAllTasksCompleted() {
-    if(mRenderingPreview) {
-        if(TaskScheduler::sAllTasksFinished()) {
-            playPreview();
-        } else {
-            const auto allFinishedFunc = [this]() {
-                playPreview();
-            };
-            TaskScheduler::sSetAllTasksFinishedFunc(allFinishedFunc);
-        }
-    }
-}
-
-void CanvasWindow::playPreview() {
-    if(!mCurrentCanvas) return;
-    //changeCurrentFrameAction(mSavedCurrentFrame);
-    TaskScheduler::sClearAllFinishedFuncs();
-    const int minPreviewFrame = mSavedCurrentFrame;
-    const int maxPreviewFrame = qMin(mMaxRenderFrame, mCurrentRenderFrame);
-    if(minPreviewFrame >= maxPreviewFrame) return;
-    mMaxPreviewFrame = maxPreviewFrame;
-    mCurrentPreviewFrame = minPreviewFrame;
-    mCurrentCanvas->setCurrentPreviewContainer(mCurrentPreviewFrame);
-    mCurrentCanvas->setPreviewing(true);
-
-    setRenderingPreview(false);
-    setPreviewing(true);
-
-    startAudio();
-    const int mSecInterval = qRound(1000/mCurrentCanvas->getFps());
-    mPreviewFPSTimer->setInterval(mSecInterval);
-    mPreviewFPSTimer->start();
-    MainWindow::getInstance()->previewBeingPlayed();
-    update();
-}
-
-void CanvasWindow::nextPreviewRenderFrame() {
-    if(!mRenderingPreview) return;
-    if(mCurrentRenderFrame >= mMaxRenderFrame) {
-        playPreviewAfterAllTasksCompleted();
-    } else {
-        nextCurrentRenderFrame();
-        if(TaskScheduler::sAllTasksFinished()) {
-            nextPreviewRenderFrame();
-        }
-    }
-}
-
-void CanvasWindow::clearPreview() {
-    MainWindow::getInstance()->previewFinished();
-    stopPreview();
-}
-
-void CanvasWindow::nextPreviewFrame() {
-    if(!mCurrentCanvas) return;
-    mCurrentPreviewFrame++;
-    if(mCurrentPreviewFrame > mMaxPreviewFrame) {
-        clearPreview();
-    } else {
-        mCurrentCanvas->setCurrentPreviewContainer(
-                    mCurrentPreviewFrame);
-        emit changeCurrentFrame(mCurrentPreviewFrame);
-    }
-    update();
-}
-
-void CanvasWindow::nextSaveOutputFrame() {
-    const auto& sCacheHandler = mCurrentCanvas->getSoundComposition()->getCacheHandler();
-    const qreal fps = mCurrentCanvas->getFps();
-    const int maxSec = qCeil(mMaxRenderFrame/fps);
-    while(mCurrentEncodeSoundSecond <= maxSec) {
-        const auto cont = sCacheHandler.atFrame(mCurrentEncodeSoundSecond);
-        if(!cont) break;
-        const auto sCont = GetAsSPtr(cont, SoundCacheContainer);
-        const auto samples = sCont->getSamples();
-        if(mCurrentEncodeSoundSecond == mFirstEncodeSoundSecond) {
-            const int minSample = qRound(mMinRenderFrame*SOUND_SAMPLERATE/fps);
-            const int max = samples->fSampleRange.fMax;
-            VideoEncoder::sAddCacheContainerToEncoder(
-                        SPtrCreate(Samples)(samples->mid({minSample, max})));
-        } else {
-            VideoEncoder::sAddCacheContainerToEncoder(
-                        SPtrCreate(Samples)(samples));
-        }
-        sCont->setBlocked(false);
-        mCurrentEncodeSoundSecond++;
-    }
-
-    const auto& cacheHandler = mCurrentCanvas->getCacheHandler();
-    while(mCurrentEncodeFrame <= mMaxRenderFrame) {
-        const auto cont = cacheHandler.atFrame(mCurrentEncodeFrame);
-        if(!cont) break;
-        VideoEncoder::sAddCacheContainerToEncoder(
-                    GetAsSPtr(cont, ImageCacheContainer));
-        mCurrentEncodeFrame = cont->getRangeMax() + 1;
-    }
-
-    //mCurrentCanvas->renderCurrentFrameToOutput(*mCurrentRenderSettings);
-    if(mCurrentRenderFrame >= mMaxRenderFrame) {
-        queScheduledTasksAndUpdate();
-        if(TaskScheduler::sAllTasksFinished()) {
-            TaskScheduler::sClearAllFinishedFuncs();
-            mCurrentRenderSettings = nullptr;
-            mCurrentCanvas->setOutputRendering(false);
-            changeCurrentFrameAction(mSavedCurrentFrame);
-            if(qAbs(mSavedResolutionFraction -
-                    mCurrentCanvas->getResolutionFraction()) > 0.1) {
-                mCurrentCanvas->setResolutionFraction(mSavedResolutionFraction);
-            }
-            mCurrentSoundComposition->unblockAll();
-            VideoEncoder::sFinishEncoding();
-        }
-    } else {
-        mCurrentRenderSettings->setCurrentRenderFrame(mCurrentRenderFrame);
-        nextCurrentRenderFrame();
-        if(TaskScheduler::sAllTasksFinished()) {
-            nextSaveOutputFrame();
-        }
-    }
-}
-
 int CanvasWindow::getCurrentFrame() {
     if(!mCurrentCanvas) return 0;
     return mCurrentCanvas->getCurrentFrame();
@@ -823,26 +521,6 @@ int CanvasWindow::getCurrentFrame() {
 int CanvasWindow::getMaxFrame() {
     if(!mCurrentCanvas) return 0;
     return mCurrentCanvas->getMaxFrame();
-}
-
-void CanvasWindow::startAudio() {
-    mAudioHandler.startAudio();
-    mCurrentSoundComposition->start(mCurrentPreviewFrame);
-}
-
-void CanvasWindow::stopAudio() {
-    mAudioHandler.stopAudio();
-    mCurrentSoundComposition->stop();
-}
-
-void CanvasWindow::audioPushTimerExpired() {
-    while(auto request = mAudioHandler.dataRequest()) {
-        const qint64 len = mCurrentSoundComposition->read(
-                    request.fData, request.fSize);
-        if(len <= 0) break;
-        request.fSize = int(len);
-        mAudioHandler.provideData(request);
-    }
 }
 
 void CanvasWindow::dropEvent(QDropEvent *event) {

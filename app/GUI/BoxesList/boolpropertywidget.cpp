@@ -25,7 +25,7 @@ void BoolPropertyWidget::mousePressEvent(QMouseEvent *) {
     if(mTarget) {
         mTarget->setValue(!mTarget->getValue());
     }
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
 }
 
 void BoolPropertyWidget::paintEvent(QPaintEvent *) {

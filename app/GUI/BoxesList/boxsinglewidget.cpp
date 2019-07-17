@@ -341,7 +341,7 @@ void BoxSingleWidget::setCompositionMode(const int id) {
         const auto boxTarget = GetAsPtr(target, BoundingBox);
         boxTarget->setBlendModeSk(idToBlendModeSk(id));
     }
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
 }
 
 void BoxSingleWidget::setPathCompositionMode(const int id) {
@@ -351,7 +351,7 @@ void BoxSingleWidget::setPathCompositionMode(const int id) {
         const auto pAnim = GetAsPtr(target, SmartPathAnimator);
         pAnim->setMode(static_cast<SmartPathAnimator::Mode>(id));
     }
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
 }
 
 void BoxSingleWidget::setFillType(const int id) {
@@ -361,7 +361,7 @@ void BoxSingleWidget::setFillType(const int id) {
         const auto pAnim = GetAsPtr(target, SmartPathCollection);
         pAnim->setFillType(static_cast<SkPath::FillType>(id));
     }
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
 }
 
 ColorAnimator *BoxSingleWidget::getColorTarget() const {
@@ -449,7 +449,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         connect(mPropertyComboBox,
                 qOverload<int>(&QComboBox::activated),
                 MainWindow::getInstance(),
-                &MainWindow::queScheduledTasksAndUpdate);
+                &MainWindow::queTasksAndUpdate);
     } else if(target->SWT_isIntProperty() || target->SWT_isQrealAnimator()) {
         if(target->SWT_isQrealAnimator())
             mValueSlider->setTarget(GetAsPtr(target, QrealAnimator));
@@ -788,7 +788,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
 //                                                Qt::ShiftModifier);
 //        }
     }
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
 }
 
 bool BoxSingleWidget::isTargetDisabled() {
@@ -825,7 +825,7 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
         auto boxTarget = GetAsPtr(target, BoundingBox);
         boxTarget->selectionChangeTriggered(event->modifiers() &
                                             Qt::ShiftModifier);
-        MainWindow::getInstance()->queScheduledTasksAndUpdate();
+        MainWindow::getInstance()->queTasksAndUpdate();
     } else if(target->SWT_isGraphAnimator()) {
         const auto animTarget = GetAsPtr(target, GraphAnimator);
         const auto bsvt = static_cast<BoxScrollWidgetVisiblePart*>(mParent);
@@ -836,7 +836,7 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
             } else {
                 keysView->graphAddViewedAnimator(animTarget);
             }
-            MainWindow::getInstance()->queScheduledTasksAndUpdate();
+            MainWindow::getInstance()->queTasksAndUpdate();
         }
     }
 }
@@ -847,7 +847,7 @@ void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e) {
         //mousePressEvent(e);
     } else {
         rename();
-        MainWindow::getInstance()->queScheduledTasksAndUpdate();
+        MainWindow::getInstance()->queTasksAndUpdate();
     }
 }
 
@@ -1018,7 +1018,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
 
 void BoxSingleWidget::switchContentVisibleAction() {
     mTarget->switchContentVisible();
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
     //mParent->callUpdaters();
 }
 
@@ -1032,7 +1032,7 @@ void BoxSingleWidget::switchRecordingAction() {
         aTarget = GetAsPtr(fcaTarget->getTarget(), Animator);
     }
     aTarget->anim_switchRecording();
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
     update();
 }
 
@@ -1046,13 +1046,13 @@ void BoxSingleWidget::switchBoxVisibleAction() {
     } else if(target->SWT_isPathEffect()) {
         GetAsPtr(target, PathEffect)->switchVisible();
     }
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
     update();
 }
 
 void BoxSingleWidget::switchBoxLockedAction() {
     GetAsPtr(mTarget->getTarget(), BoundingBox)->switchLocked();
-    MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    MainWindow::getInstance()->queTasksAndUpdate();
     update();
 }
 

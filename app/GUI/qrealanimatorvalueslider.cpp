@@ -248,5 +248,5 @@ void QrealAnimatorValueSlider::openContextMenu(
 
     QAction * const selectedAction = menu.exec(globalPos);
     if(!selectedAction) return;
-    else MainWindow::getInstance()->queScheduledTasksAndUpdate();
+    else MainWindow::getInstance()->queTasksAndUpdate();
 }

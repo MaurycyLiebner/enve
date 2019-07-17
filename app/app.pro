@@ -108,6 +108,7 @@ SOURCES += main.cpp\
     evfileio.cpp \
     offscreenqgl33c.cpp \
     paintsettings.cpp \
+    renderhandler.cpp \
     settings.cpp \
     svgimporter.cpp \
     Animators/coloranimator.cpp \
@@ -336,6 +337,7 @@ HEADERS  += \
     effectsloader.h \
     offscreenqgl33c.h \
     paintsettings.h \
+    renderhandler.h \
     settings.h \
     svgimporter.h \
     keypoint.h \
