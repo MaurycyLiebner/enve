@@ -250,7 +250,13 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
     if(mPaintTarget.isValid()) {
         canvas->save();
-        mPaintTarget.draw(canvas, viewTrans, drawRect);
+        mPaintTarget.draw(canvas, grContext, viewTrans, drawRect);
+        const SkIRect bRect = toSkIRect(mPaintTarget.pixelBoundingRect());
+        paint.setStyle(SkPaint::kStroke_Style);
+        paint.setColor(SK_ColorRED);
+        paint.setPathEffect(dashPathEffect);
+        canvas->drawIRect(bRect, paint);
+        paint.setPathEffect(nullptr);
         canvas->restore();
     } else {
         if(mSelecting) {
@@ -900,14 +906,16 @@ void Canvas::unblockUndoRedo() {
     mUndoRedoStack->unblockUndoRedo();
 }
 
-void PaintTarget::draw(SkCanvas * const canvas, const QMatrix& viewTrans,
+void PaintTarget::draw(SkCanvas * const canvas,
+                       GrContext* const grContext,
+                       const QMatrix& viewTrans,
                        const QRect& drawRect) {
     const auto canvasRect = viewTrans.inverted().mapRect(drawRect);
     const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
     const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
     canvas->concat(toSkMatrix(pDrawTrans));
     mPaintOnion.draw(canvas);
-    mPaintDrawable->drawOnCanvas(canvas, {0, 0}, &relDRect);
+    mPaintDrawable->drawOnCanvas(canvas, grContext, {0, 0}, &relDRect, nullptr);
 }
 
 void PaintTarget::setPaintDrawable(DrawableAutoTiledSurface * const surf) {

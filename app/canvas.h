@@ -45,7 +45,9 @@ struct PaintTarget {
     bool needsProcessing() const { return true; }
 
     void draw(SkCanvas * const canvas,
-              const QMatrix& viewTrans, const QRect& drawRect);
+              GrContext * const grContext,
+              const QMatrix& viewTrans,
+              const QRect& drawRect);
 
     void paintPress(const QPointF& pos,
                     const ulong ts, const qreal pressure,
@@ -70,6 +72,10 @@ struct PaintTarget {
 
     bool isValid() const {
         return mPaintAnimSurface;
+    }
+
+    QRect pixelBoundingRect() const {
+        return mPaintDrawable->pixelBoundingRect();
     }
 
     ulong mLastTs;

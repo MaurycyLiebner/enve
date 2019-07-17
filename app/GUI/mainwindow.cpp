@@ -54,7 +54,9 @@ int MIN_WIDGET_DIM;
 int KEY_RECT_SIZE;
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), mVideoEncoder(SPtrCreate(VideoEncoder)()),
+    : QMainWindow(parent),
+      mMemoryHandler(new MemoryHandler(this)),
+      mVideoEncoder(SPtrCreate(VideoEncoder)()),
       mDocument(mAudioHandler), mActions(mDocument) {
     connect(&mDocument.fRenderHandler, &RenderHandler::queTasksAndUpdate,
             this, &MainWindow::queTasksAndUpdate);
@@ -89,8 +91,6 @@ MainWindow::MainWindow(QWidget *parent)
 //    for(int i = 0; i < ClipboardContainerType::CCT_COUNT; i++) {
 //        mClipboardContainers << nullptr;
 //    }
-
-    mMemoryHandler = new MemoryHandler(this);
 
     //int nThreads = QThread::idealThreadCount();
 

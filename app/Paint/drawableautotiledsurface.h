@@ -67,6 +67,7 @@ public:
     }
 
     void drawOnCanvas(SkCanvas * const canvas,
+                      GrContext * const grContext,
                       const SkPoint &dst,
                       const QRect * const minPixSrc,
                       SkPaint * const paint) const;
@@ -74,18 +75,18 @@ public:
     void drawOnCanvas(SkCanvas * const canvas,
                       const SkPoint &dst,
                       const QRect * const minPixSrc) const {
-        drawOnCanvas(canvas, dst, minPixSrc, nullptr);
+        drawOnCanvas(canvas, nullptr, dst, minPixSrc, nullptr);
     }
 
     void drawOnCanvas(SkCanvas * const canvas,
                       const SkPoint &dst) const {
-        drawOnCanvas(canvas, dst, nullptr, nullptr);
+        drawOnCanvas(canvas, nullptr, dst, nullptr, nullptr);
     }
 
     void drawOnCanvas(SkCanvas * const canvas,
                       const SkPoint &dst,
                       SkPaint * const paint) const {
-        drawOnCanvas(canvas, dst, nullptr, paint);
+        drawOnCanvas(canvas, nullptr, dst, nullptr, paint);
     }
 
     const AutoTiledSurface &surface() const {
@@ -190,13 +191,13 @@ private:
         mColumnCount += count;
     }
 
-    SkImage * imageForTile(const int tx, const int ty) const {
+    sk_sp<SkImage> imageForTile(const int tx, const int ty) const {
         const auto zeroTileV = zeroTile();
         return imageForTileId(tx + zeroTileV.x(), ty + zeroTileV.y());
     }
 
-    SkImage * imageForTileId(const int colId, const int rowId) const {
-        return mImgs.at(colId).at(rowId).get();
+    sk_sp<SkImage> imageForTileId(const int colId, const int rowId) const {
+        return mImgs.at(colId).at(rowId);
     }
 
     QPoint zeroTile() const {

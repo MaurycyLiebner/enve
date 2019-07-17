@@ -10,6 +10,7 @@ DrawableAutoTiledSurface::DrawableAutoTiledSurface() :
     mImgs(mTileImgs.fImgs) {}
 
 void DrawableAutoTiledSurface::drawOnCanvas(SkCanvas * const canvas,
+                                            GrContext* const grContext,
                                             const SkPoint &dst,
                                             const QRect * const minPixSrc,
                                             SkPaint * const paint) const {
@@ -26,7 +27,10 @@ void DrawableAutoTiledSurface::drawOnCanvas(SkCanvas * const canvas,
             const auto img = imageForTile(tx, ty);
             if(!img) continue;
             const SkScalar drawY = dst.y() + ty*TILE_SIZE;
-            canvas->drawImage(img, drawX, drawY, paint);
+            if(grContext) {
+                SkiaHelpers::drawImageGPU(canvas, img, drawX, drawY,
+                                          paint, grContext);
+            } else canvas->drawImage(img, drawX, drawY, paint);
         }
     }
 }

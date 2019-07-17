@@ -10,8 +10,7 @@
 RenderHandler::RenderHandler(Document &document,
                              AudioHandler& audioHandler) :
     mDocument(document), mAudioHandler(audioHandler) {
-    connect(MemoryHandler::sGetInstance(),
-            &MemoryHandler::allMemoryUsed,
+    connect(MemoryHandler::sGetInstance(), &MemoryHandler::allMemoryUsed,
             this, &RenderHandler::outOfMemory);
 
     mPreviewFPSTimer = new QTimer(this);
