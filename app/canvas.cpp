@@ -600,6 +600,7 @@ void Canvas::copyAction() {
     target.write(rcConstChar(&nBoxes), sizeof(int));
 
     for(const auto& box : mSelectedBoxes) {
+        box->writeBoxType(&target);
         box->writeBoundingBox(&target);
     }
     target.close();
