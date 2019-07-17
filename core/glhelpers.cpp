@@ -183,6 +183,7 @@ void Texture::clear(QGL33 * const gl) {
 
 void Texture::gen(QGL33 * const gl) {
     gl->glGenTextures(1, &fId);
+    if(fId == 0) RuntimeThrow("Failed to generate texture");
     gl->glBindTexture(GL_TEXTURE_2D, fId);
     gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

@@ -122,24 +122,7 @@ private:
         updateTileRectImgs(mSurface.tileBoundingRect());
     }
 
-    void updateTileRectImgs(QRect tileRect) {
-        const QRect maxRect = mSurface.tileBoundingRect();
-        if(!maxRect.intersects(tileRect)) return;
-        tileRect = maxRect.intersected(tileRect);
-        const auto min = tileRect.topLeft();
-        const auto max = tileRect.bottomRight();
-        stretchToTileImg(min.x(), min.y());
-        stretchToTileImg(max.x(), max.y());
-        for(int tx = tileRect.left(); tx <= tileRect.right(); tx++) {
-            for(int ty = tileRect.top(); ty <= tileRect.bottom(); ty++) {
-                auto btmp = mSurface.tileToBitmap(tx, ty);
-                const auto img = SkiaHelpers::transferDataToSkImage(btmp);
-
-                const auto tileId = QPoint(tx, ty) + zeroTile();
-                mImgs[tileId.x()].replace(tileId.y(), img);
-            }
-        }
-    }
+    void updateTileRectImgs(QRect tileRect);
 
     void setTileImgs(const TileImgs& tiles) {
         mTileImgs = tiles;

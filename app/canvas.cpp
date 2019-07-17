@@ -26,6 +26,7 @@
 #include "Boxes/internallinkcanvas.h"
 #include "pointtypemenu.h"
 #include "Animators/transformanimator.h"
+#include "glhelpers.h"
 
 Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
@@ -986,7 +987,6 @@ void PaintTarget::paintMove(const QPointF& pos,
 SoundComposition *Canvas::getSoundComposition() {
     return mSoundComposition.get();
 }
-
 
 void Canvas::writeBoundingBox(QIODevice * const target) {
     ContainerBox::writeBoundingBox(target);

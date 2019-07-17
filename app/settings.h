@@ -8,7 +8,7 @@ struct EnveSettings {
 #ifdef QT_DEBUG
     QString fUserSettingsDir = QDir::homePath() + "/.enveD";
 #else
-    QString fUserSettingsFolder = QDir::homePath() + "/.enve";
+    QString fUserSettingsDir = QDir::homePath() + "/.enve";
 #endif
 
     // quality

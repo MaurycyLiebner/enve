@@ -14,10 +14,8 @@ class ShaderEffectCreator;
 class ShaderEffectProgram;
 
 class GLWindow : public QOpenGLWidget, protected QGL33 {
-    Q_OBJECT
 public:
     GLWindow(QWidget * const parent = nullptr);
-    ~GLWindow();
 protected:
     virtual void renderSk(SkCanvas * const canvas,
                           GrContext * const grContext) = 0;
@@ -31,8 +29,6 @@ protected:
     void updateFix();
 
     bool mRebind = false;
-
-    GLuint mTextureSquareVAO = 0;
     sk_sp<GrContext> mGrContext;
     sk_sp<SkSurface> mSurface;
     SkCanvas *mCanvas = nullptr;

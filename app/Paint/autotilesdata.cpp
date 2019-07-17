@@ -119,50 +119,6 @@ int AutoTilesData::height() const {
     return mRowCount*TILE_SIZE;
 }
 
-GLuint AutoTilesData::s16To8Program = 0;
-
-void AutoTilesData::sIntializeGpu(QGL33 * const gl) {
-    try {
-        const QString fragPath = "/home/ailuropoda/Dev/enve/src/app/Paint/mypaintTo8bit.frag";
-        iniProgram(gl, s16To8Program, GL_TEXTURED_VERT, fragPath);
-    } catch(...) {
-        RuntimeThrow("Could not initialize a program for AutoTilesData");
-    }
-}
-
-SkBitmap AutoTilesData::tileToBitmap(const int tx, const int ty,
-                                     QGL33 * const gl, const GLuint texVAO) {
-    const uint16_t * const srcP = getTile(tx, ty);
-
-    TextureFrameBuffer fb;
-    fb.gen(gl, TILE_SIZE, TILE_SIZE);
-
-    gl->glUseProgram(s16To8Program);
-
-    GLuint tileTex;
-    gl->glGenTextures(1, &tileTex);
-    if(!tileTex) RuntimeThrow("Failed to generate texture for "
-                              "libmypaint 16bit to 8 bit conversion.");
-    gl->glActiveTexture(GL_TEXTURE0);
-    gl->glBindTexture(GL_TEXTURE_2D, tileTex);
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16UI,
-                     TILE_SIZE, TILE_SIZE, 0,
-                     GL_RGBA, GL_UNSIGNED_SHORT, srcP);
-
-    gl->glBindVertexArray(texVAO);
-    gl->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    const auto bitmap = fb.toBitmap(gl);
-
-    gl->glDeleteTextures(1, &tileTex);
-
-    return bitmap;
-}
-
 SkBitmap AutoTilesData::tileToBitmap(const int tx, const int ty) {
     const auto info = SkiaHelpers::getPremulRGBAInfo(TILE_SIZE, TILE_SIZE);
     SkBitmap dst;
@@ -170,6 +126,7 @@ SkBitmap AutoTilesData::tileToBitmap(const int tx, const int ty) {
 
     uint8_t * const dstP = static_cast<uint8_t*>(dst.getPixels());
     const uint16_t * const srcP = getTile(tx, ty);
+
     for(int y = 0; y < TILE_SIZE; y++) {
         uint8_t * dstLine = dstP + y*dst.width()*4;
         const uint16_t * srcLine = srcP + y*TILE_SIZE*4;
@@ -185,6 +142,7 @@ SkBitmap AutoTilesData::tileToBitmap(const int tx, const int ty) {
             *dstLine++ = (a * 255 + (1<<15)/2) / (1<<15);
         }
     }
+
     return dst;
 }
 

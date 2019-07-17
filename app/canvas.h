@@ -42,6 +42,8 @@ enum CtrlsMode : short;
 struct PaintTarget {
     PaintTarget(Canvas* const canvas) : mCanvas(canvas) {}
 
+    bool needsProcessing() const { return true; }
+
     void draw(SkCanvas * const canvas,
               const QMatrix& viewTrans, const QRect& drawRect);
 

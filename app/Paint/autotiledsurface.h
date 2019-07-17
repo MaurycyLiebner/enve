@@ -81,11 +81,6 @@ struct AutoTiledSurface {
         return mAutoTilesData.tileToBitmap(tx, ty);
     }
 
-    SkBitmap tileToBitmap(const int tx, const int ty,
-                          QGL33 * const gl, const GLuint texVAO) {
-        return mAutoTilesData.tileToBitmap(tx, ty, gl, texVAO);
-    }
-
     SkBitmap toBitmap(const QMargins& margin = QMargins()) const {
         return mAutoTilesData.toBitmap(margin);
     }

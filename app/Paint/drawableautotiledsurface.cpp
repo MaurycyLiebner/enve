@@ -31,6 +31,29 @@ void DrawableAutoTiledSurface::drawOnCanvas(SkCanvas * const canvas,
     }
 }
 
+using namespace std;
+using namespace std::chrono;
+void DrawableAutoTiledSurface::updateTileRectImgs(QRect tileRect) {
+    const QRect maxRect = mSurface.tileBoundingRect();
+    if(!maxRect.intersects(tileRect)) return;
+    tileRect = maxRect.intersected(tileRect);
+    const auto min = tileRect.topLeft();
+    const auto max = tileRect.bottomRight();
+    stretchToTileImg(min.x(), min.y());
+    stretchToTileImg(max.x(), max.y());
+    const int n = tileRect.width()*tileRect.height();
+    #pragma omp parallel for collapse(2) if(n > 4)
+    for(int tx = tileRect.left(); tx <= tileRect.right(); tx++) {
+        for(int ty = tileRect.top(); ty <= tileRect.bottom(); ty++) {
+            auto btmp = mSurface.tileToBitmap(tx, ty);
+            const auto img = SkiaHelpers::transferDataToSkImage(btmp);
+
+            const auto tileId = QPoint(tx, ty) + zeroTile();
+            mImgs[tileId.x()].replace(tileId.y(), img);
+        }
+    }
+}
+
 class TilesTmpFileDataSaver : public TmpFileDataSaver {
     friend class StdSelfRef;
 public:

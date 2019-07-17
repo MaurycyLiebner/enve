@@ -9,14 +9,6 @@ GLWindow::GLWindow(QWidget * const parent)
     setUpdateBehavior(QOpenGLWidget::NoPartialUpdate);
 }
 
-GLWindow::~GLWindow() {
-    if(mTextureSquareVAO) {
-        makeCurrent();
-        glDeleteBuffers(1, &mTextureSquareVAO);
-        doneCurrent();
-    }
-}
-
 void GLWindow::bindSkia(const int w, const int h) {
     GrGLFramebufferInfo fbInfo;
     fbInfo.fFBOID = context()->defaultFramebufferObject();//buffer;
@@ -76,8 +68,6 @@ void GLWindow::initialize() {
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    iniTexturedVShaderVAO(this, mTextureSquareVAO);
 
     const auto interface = GrGLMakeNativeInterface();
     if(!interface) RuntimeThrow("Failed to make native interface.");
