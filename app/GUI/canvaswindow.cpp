@@ -61,7 +61,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         mCurrentCanvas->setIsCurrentCanvas(true);
 
         emit changeCanvasFrameRange(canvas->getFrameRange());
-        changeCurrentFrameAction(getCurrentFrame());
+        queTasksAndUpdate();
         connect(mCurrentCanvas, &Canvas::requestCanvasMode,
                 this, &CanvasWindow::setCanvasMode);
         connect(mCurrentCanvas, &Canvas::requestUpdate,
@@ -483,11 +483,6 @@ void CanvasWindow::closeWelcomeDialog() {
     resize(mWelcomeDialog->size());
     mWelcomeDialog = nullptr;
     mWindow->setCentralWidget(this);
-}
-
-void CanvasWindow::changeCurrentFrameAction(const int frame) {
-    if(mCurrentCanvas) mCurrentCanvas->anim_setAbsFrame(frame);
-    queTasksAndUpdate();
 }
 
 void CanvasWindow::setResolutionFraction(const qreal percent) {

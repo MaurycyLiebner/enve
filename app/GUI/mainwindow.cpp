@@ -56,6 +56,8 @@ int KEY_RECT_SIZE;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), mVideoEncoder(SPtrCreate(VideoEncoder)()),
       mDocument(mAudioHandler), mActions(mDocument) {
+    connect(&mDocument.fRenderHandler, &RenderHandler::queTasksAndUpdate,
+            this, &MainWindow::queTasksAndUpdate);
     sMainWindowInstance = this;
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;

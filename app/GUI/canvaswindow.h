@@ -98,8 +98,6 @@ private:
     void setCanvasMode(const CanvasMode mode);
     void updatePaintModeCursor();
 
-    void changeCurrentFrameAction(const int frame);
-
     QWidget * mWelcomeDialog = nullptr;
 
     Document& mDocument;
