@@ -3,11 +3,13 @@
 
 #include <QLabel>
 #include <QThread>
+#include <QStatusBar>
 
-class UsageWidget : public QLabel {
-    Q_OBJECT
+class HardwareUsageWidget;
+
+class UsageWidget : public QStatusBar {
 public:
-    explicit UsageWidget(QWidget *parent = nullptr);
+    explicit UsageWidget(QWidget * const parent = nullptr);
     void setThreadsUsage(const int threads);
     void setThreadsTotal(const int threads);
     void setHddUsage(const bool used);
@@ -15,14 +17,11 @@ public:
     void setRamUsage(const qreal thisGB);
     void setTotalRam(const qreal totalRamGB);
 private:
-    void updateDisplayedText();
-
-    int mThreadsUsage = 0;
-    int mThreadsTotal = 0;
-    bool mGpuUsage = false;
-    bool mHddUsage = false;
-    qreal mRamUsage = 0;
-    qreal mTotalRam = 0;
+    HardwareUsageWidget* mGpuBar;
+    HardwareUsageWidget* mCpuBar;
+    HardwareUsageWidget* mHddBar;
+    HardwareUsageWidget* mRamBar;
+    QLabel* mRamLabel;
 };
 
 #endif // USAGEWIDGET_H

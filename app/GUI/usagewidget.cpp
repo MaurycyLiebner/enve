@@ -1,61 +1,111 @@
 #include "usagewidget.h"
 #include <QTimer>
 #include <QLocale>
+#include <QHBoxLayout>
+#include "global.h"
+#include <QProgressBar>
 
-UsageWidget::UsageWidget(QWidget *parent) : QLabel(parent) {
-    setAlignment(Qt::AlignRight);
-    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+class HardwareUsageWidget : public QProgressBar {
+public:
+    HardwareUsageWidget(QWidget* const parent = nullptr) :
+        QProgressBar(parent) {
+        setFixedHeight(MIN_WIDGET_DIM/2);
+        setObjectName("hardwareUsage");
+        setSizePolicy(QSizePolicy::Maximum,
+                      QSizePolicy::Maximum);
+    }
+
+    void pushValue(const int value) {
+        if(mValues.count() > 3) popValue();
+        mValues << value;
+        mValueSum += value;
+        updateValue();
+    }
+
+    void popValue() {
+        mValueSum -= mValues.takeFirst();
+        updateValue();
+    }
+
+    void popAllButLast() {
+        if(mValues.isEmpty()) return;
+        const int lastValue = mValues.last();
+        mValues.clear();
+        mValueSum = 0;
+        pushValue(lastValue);
+    }
+private:
+    void updateValue() {
+        if(mValues.isEmpty()) return setValue(0);
+        setValue(mValueSum/mValues.count());
+    }
+
+    QList<int> mValues;
+    int mValueSum;
+};
+
+UsageWidget::UsageWidget(QWidget * const parent) : QStatusBar(parent) {
+    setContentsMargins(0, 0, 0, 0);
+    const auto layout = QStatusBar::layout();
+    layout->setAlignment(Qt::AlignCenter);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    const auto gpuLabel = new QLabel("  gpu: ", this);
+    mGpuBar = new HardwareUsageWidget(this);
+    mGpuBar->setRange(0, 100);
+
+    const auto cpuLabel = new QLabel("  cpu: ", this);
+    mCpuBar = new HardwareUsageWidget(this);
+
+    const auto hddLabel = new QLabel("  hdd: ", this);
+    mHddBar = new HardwareUsageWidget(this);
+    mHddBar->setRange(0, 100);
+
+    const auto ramLabel = new QLabel("  ram: ", this);
+    mRamBar = new HardwareUsageWidget(this);
+
+    mRamLabel = new QLabel(this);
+
+    addPermanentWidget(gpuLabel);
+    addPermanentWidget(mGpuBar);
+
+    addPermanentWidget(cpuLabel);
+    addPermanentWidget(mCpuBar);
+
+    addPermanentWidget(hddLabel);
+    addPermanentWidget(mHddBar);
+
+    addPermanentWidget(ramLabel);
+    addPermanentWidget(mRamBar);
+
+    addPermanentWidget(mRamLabel);
+
     setThreadsTotal(QThread::idealThreadCount());
 }
 
 void UsageWidget::setThreadsUsage(const int threads) {
-    if(threads >= 0) {
-        mThreadsUsage = threads;
-    } else {
-        mThreadsUsage = mThreadsTotal + threads;
-    }
-    updateDisplayedText();
+    mCpuBar->pushValue(threads);
 }
 
 void UsageWidget::setThreadsTotal(const int threads) {
-    mThreadsTotal = threads;
-    updateDisplayedText();
+    mCpuBar->setRange(0, threads);
 }
 
 void UsageWidget::setGpuUsage(const bool used) {
-    mGpuUsage = used;
-    updateDisplayedText();
+    mGpuBar->pushValue(used ? 100 : 0);
 }
 
 void UsageWidget::setHddUsage(const bool used) {
-    mHddUsage = used;
-    updateDisplayedText();
+    mHddBar->pushValue(used ? 100 : 0);
 }
 
 void UsageWidget::setRamUsage(const qreal thisGB) {
-    if(thisGB >= 0) {
-        mRamUsage = thisGB;
-    } else {
-        mRamUsage = mTotalRam + thisGB;
-    }
-    updateDisplayedText();
+    mRamBar->setValue(qRound(thisGB*1000));
+    mGpuBar->popAllButLast();
+    mCpuBar->popAllButLast();
+    mHddBar->popAllButLast();
 }
 
 void UsageWidget::setTotalRam(const qreal totalRamGB) {
-    mTotalRam = totalRamGB;
-    updateDisplayedText();
-}
-
-void UsageWidget::updateDisplayedText() {
-    QLocale locale;
-    const int gpuPer = mGpuUsage ? 100 : 0;
-    const int cpuPer = qRound(mThreadsUsage*100./mThreadsTotal);
-    const int hddPer = mHddUsage ? 100 : 0;
-    const int ramPer = qRound(mRamUsage*100./mTotalRam);
-    setText("gpu: " + locale.toString(gpuPer) + "%     " +
-            "cpu: " + locale.toString(cpuPer) + "%     " +
-            "hdd: " + locale.toString(hddPer) + "%     " +
-            "ram: " + locale.toString(ramPer) + "%");
-//            locale.toString(mRamUsage, 'f', 1) + " GB / " +
-//            locale.toString(mTotalRam, 'f', 1) + " GB");
+    mRamBar->setRange(0, qRound(totalRamGB*1000));
 }

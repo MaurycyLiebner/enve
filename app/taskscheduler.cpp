@@ -240,7 +240,6 @@ void TaskScheduler::processNextQuedCPUTask() {
         } else break;
     }
     const auto usageWidget = MainWindow::getInstance()->getUsageWidget();
-    if(!usageWidget) return;
     const int cUsed = mCPUExecutors.count() - mFreeCPUExecs.count();
     usageWidget->setThreadsUsage(cUsed);
 }

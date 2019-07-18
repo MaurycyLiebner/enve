@@ -519,6 +519,16 @@ QProgressBar::chunk {
     width: 5px;
 }
 
+QProgressBar#hardwareUsage {
+    border: 0;
+    background-color: rgb(40, 40, 40);
+}
+
+QProgressBar#hardwareUsage::chunk {
+    background-color: white;
+    width: 5px;
+    margin: 0.5px;
+}
 
 QToolButton {
     padding: 1px 4px;
@@ -574,3 +584,4 @@ QToolButton#inactiveToolButton:hover {background: transparent;}
 QToolButton#inactiveToolButton:pressed {background: transparent;}
 
 QToolButton#inactiveToolButton:checked {background: transparent;}
+

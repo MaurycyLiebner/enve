@@ -79,6 +79,7 @@ SOURCES += main.cpp\
     GUI/timelinewrapper.cpp \
     GUI/welcomedialog.cpp \
     GUI/widgetstack.cpp \
+    Paint/painttarget.cpp \
     PathEffects/custompatheffectcreator.cpp \
     PathEffects/dashpatheffect.cpp \
     PathEffects/linespatheffect.cpp \
@@ -311,6 +312,7 @@ HEADERS  += \
     GUI/timelinewrapper.h \
     GUI/welcomedialog.h \
     GUI/widgetstack.h \
+    Paint/painttarget.h \
     PathEffects/custompatheffectcreator.h \
     PathEffects/dashpatheffect.h \
     PathEffects/linespatheffect.h \

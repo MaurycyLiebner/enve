@@ -73,5 +73,5 @@ void MemoryHandler::memoryChecked(const int memKb, const int totMemKb) {
     const auto usageWidget = MainWindow::getInstance()->getUsageWidget();
     if(!usageWidget) return;
     usageWidget->setTotalRam(totMemKb/1000000.);
-    usageWidget->setRamUsage(-memKb/1000000.);
+    usageWidget->setRamUsage((totMemKb - memKb)/1000000.);
 }

@@ -562,17 +562,14 @@ ClipboardContainer *MainWindow::getClipboardContainer(
 
 #include <QSpacerItem>
 void MainWindow::setupStatusBar() {
-    mStatusBar = new QStatusBar(this);
-    mStatusBar->setStyleSheet("QStatusBar { border-top: 1px solid black; }");
-    setStatusBar(mStatusBar);
-    mUsageWidget = new UsageWidget(mStatusBar);
-    mStatusBar->addWidget(mUsageWidget);
+    mUsageWidget = new UsageWidget(this);
+    mUsageWidget->setStyleSheet("QStatusBar { border-top: 1px solid black; }");
+    setStatusBar(mUsageWidget);
 }
 
 void MainWindow::setupToolBar() {
     mToolBar = new QToolBar("Toolbar", this);
     mToolBar->setMovable(false);
-
 
     mToolBar->setIconSize(QSize(24, 24));
 
