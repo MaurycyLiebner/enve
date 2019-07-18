@@ -46,21 +46,11 @@ public:
 
     void updateColorAnimator();
 
-    void emitStrokeBrushChanged();
-    void emitStrokeBrushWidthCurveChanged();
-    void emitStrokeBrushTimeCurveChanged();
-    void emitStrokeBrushSpacingCurveChanged();
-    void emitStrokeBrushPressureCurveChanged();
-
-    void emitStrokeWidthChanged();
-    void emitStrokeWidthChangedTMP();
     void emitCapStyleChanged();
     void emitJoinStyleChanged();
 private:
     void setLinearGradientFill();
     void setRadialGradientFill();
-
-    void setStrokeWidth(const qreal width);
 
     void colorTypeSet(const PaintType &type);
     void setFillTarget();
@@ -135,11 +125,6 @@ private:
     SkPaint::Cap mCurrentCapStyle;
     SkPaint::Join mCurrentJoinStyle;
     qreal mCurrentStrokeWidth;
-    SimpleBrushWrapper* mCurrentStrokeBrush = nullptr;
-    qCubicSegment1D mCurrentStrokeBrushWidthCurve;
-    qCubicSegment1D mCurrentStrokeBrushTimeCurve;
-    qCubicSegment1D mCurrentStrokeBrushPressureCurve;
-    qCubicSegment1D mCurrentStrokeBrushSpacingCurve;
 
     //
 

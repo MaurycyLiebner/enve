@@ -76,12 +76,11 @@ public:
 
     void setStrokeCapStyle(const SkPaint::Cap capStyle);
     void setStrokeJoinStyle(const SkPaint::Join joinStyle);
-    void setStrokeWidth(const qreal strokeWidth);
+    void strokeWidthAction(const QrealAction &action);
 
     void setOutlineCompositionMode(
             const QPainter::CompositionMode &compositionMode);
 
-    void startSelectedStrokeWidthTransform();
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
 

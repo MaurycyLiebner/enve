@@ -6,11 +6,10 @@
 #include "colorhelpers.h"
 #include "skia/skiaincludes.h"
 
-class qCubicSegment1D;
-class SimpleBrushWrapper;
 class PaintSettingsApplier;
 class Document;
 class Canvas;
+class QrealAction;
 
 class Actions : public QObject {
 public:
@@ -52,8 +51,6 @@ public:
     void makeSegmentLine() const;
     void makeSegmentCurve() const;
 
-    void startSelectedStrokeWidthTransform() const;
-
     void deleteAction() const;
     void copyAction() const;
     void pasteAction() const;
@@ -73,17 +70,7 @@ public:
     void strokeCapStyleChanged(const SkPaint::Cap capStyle) const;
     void strokeJoinStyleChanged(const SkPaint::Join joinStyle) const;
 
-    void strokeBrushChanged(SimpleBrushWrapper * const brush) const;
-    void strokeBrushWidthCurveChanged(
-            const qCubicSegment1D& curve) const;
-    void strokeBrushTimeCurveChanged(
-            const qCubicSegment1D& curve) const;
-    void strokeBrushSpacingCurveChanged(
-            const qCubicSegment1D& curve) const;
-    void strokeBrushPressureCurveChanged(
-            const qCubicSegment1D& curve) const;
-
-    void strokeWidthChanged(const qreal strokeWidth) const;
+    void strokeWidthAction(const QrealAction& action) const;
 
     void applyPaintSettingToSelected(
             const PaintSettingsApplier &setting) const;

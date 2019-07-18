@@ -101,16 +101,9 @@ void ContainerBox::setStrokeJoinStyle(const SkPaint::Join joinStyle) {
     }
 }
 
-void ContainerBox::setStrokeWidth(const qreal strokeWidth) {
-    for(const auto& box : mContainedBoxes) {
-        box->setStrokeWidth(strokeWidth);
-    }
-}
-
-void ContainerBox::startSelectedStrokeWidthTransform() {
-    for(const auto& box : mContainedBoxes) {
-        box->startSelectedStrokeWidthTransform();
-    }
+void ContainerBox::strokeWidthAction(const QrealAction& action) {
+    for(const auto& box : mContainedBoxes)
+        box->strokeWidthAction(action);
 }
 
 void ContainerBox::startSelectedStrokeColorTransform() {

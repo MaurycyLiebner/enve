@@ -170,12 +170,6 @@ void Actions::makeSegmentCurve() const {
     afterAction();
 }
 
-void Actions::startSelectedStrokeWidthTransform() const {
-    if(!mActiveScene) return;
-    mActiveScene->startSelectedStrokeWidthTransform();
-    afterAction();
-}
-
 void Actions::deleteAction() const {
     if(!mActiveScene) return;
     mActiveScene->deleteAction();
@@ -252,43 +246,9 @@ void Actions::strokeJoinStyleChanged(const SkPaint::Join joinStyle) const {
     afterAction();
 }
 
-void Actions::strokeBrushChanged(SimpleBrushWrapper * const brush) const {
+void Actions::strokeWidthAction(const QrealAction &action) const {
     if(!mActiveScene) return;
-    mActiveScene->setSelectedStrokeBrush(brush);
-    afterAction();
-}
-
-void Actions::strokeBrushWidthCurveChanged(
-        const qCubicSegment1D& curve) const {
-    if(!mActiveScene) return;
-    mActiveScene->setSelectedStrokeBrushWidthCurve(curve);
-    afterAction();
-}
-
-void Actions::strokeBrushTimeCurveChanged(
-        const qCubicSegment1D& curve) const {
-    if(!mActiveScene) return;
-    mActiveScene->setSelectedStrokeBrushTimeCurve(curve);
-    afterAction();
-}
-
-void Actions::strokeBrushSpacingCurveChanged(
-        const qCubicSegment1D& curve) const {
-    if(!mActiveScene) return;
-    mActiveScene->setSelectedStrokeBrushSpacingCurve(curve);
-    afterAction();
-}
-
-void Actions::strokeBrushPressureCurveChanged(
-        const qCubicSegment1D& curve) const {
-    if(!mActiveScene) return;
-    mActiveScene->setSelectedStrokeBrushPressureCurve(curve);
-    afterAction();
-}
-
-void Actions::strokeWidthChanged(const qreal strokeWidth) const {
-    if(!mActiveScene) return;
-    mActiveScene->setSelectedStrokeWidth(strokeWidth);
+    mActiveScene->strokeWidthAction(action);
     afterAction();
 }
 

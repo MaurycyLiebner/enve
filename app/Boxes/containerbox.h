@@ -55,7 +55,8 @@ public:
     void removeFillPathEffect(const qsptr<PathEffect>& effect);
     void removeOutlinePathEffect(const qsptr<PathEffect>& effect);
 
-    void startSelectedStrokeWidthTransform();
+    void strokeWidthAction(const QrealAction& action);
+
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
     void applyPaintSetting(const PaintSettingsApplier &setting);
@@ -64,28 +65,7 @@ public:
 
     void setStrokeCapStyle(const SkPaint::Cap capStyle);
     void setStrokeJoinStyle(const SkPaint::Join joinStyle);
-    void setStrokeWidth(const qreal strokeWidth);
-    void setStrokeBrush(SimpleBrushWrapper * const brush) {
-        for(const auto& box : mContainedBoxes) {
-            box->setStrokeBrush(brush);
-        }
-    }
-    void setStrokeBrushWidthCurve(const qCubicSegment1D& curve) {
-        for(const auto& box : mContainedBoxes)
-            box->setStrokeBrushWidthCurve(curve);
-    }
-    void setStrokeBrushTimeCurve(const qCubicSegment1D& curve) {
-        for(const auto& box : mContainedBoxes)
-            box->setStrokeBrushTimeCurve(curve);
-    }
-    void setStrokeBrushPressureCurve(const qCubicSegment1D& curve) {
-        for(const auto& box : mContainedBoxes)
-            box->setStrokeBrushPressureCurve(curve);
-    }
-    void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve) {
-        for(const auto& box : mContainedBoxes)
-            box->setStrokeBrushSpacingCurve(curve);
-    }
+
     FillSettingsAnimator *getFillSettings() const;
     OutlineSettingsAnimator *getStrokeSettings() const;
 

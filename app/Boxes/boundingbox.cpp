@@ -353,12 +353,6 @@ void BoundingBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
 void BoundingBox::setStrokeJoinStyle(const SkPaint::Join joinStyle) {
     Q_UNUSED(joinStyle); }
 
-void BoundingBox::setStrokeWidth(const qreal strokeWidth) {
-    Q_UNUSED(strokeWidth);
-}
-
-void BoundingBox::startSelectedStrokeWidthTransform() {}
-
 void BoundingBox::startSelectedStrokeColorTransform() {}
 
 void BoundingBox::startSelectedFillColorTransform() {}

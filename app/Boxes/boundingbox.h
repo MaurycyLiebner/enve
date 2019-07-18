@@ -11,6 +11,7 @@
 #include "MovablePoints/segment.h"
 class Canvas;
 
+class QrealAction;
 class MovablePoint;
 
 class PathEffect;
@@ -150,29 +151,10 @@ public:
 
     virtual void setStrokeCapStyle(const SkPaint::Cap capStyle);
     virtual void setStrokeJoinStyle(const SkPaint::Join joinStyle);
-    virtual void setStrokeWidth(const qreal strokeWidth);
 
-    virtual void setStrokeBrush(SimpleBrushWrapper * const brush) {
-        Q_UNUSED(brush);
-    }
-    virtual void setStrokeBrushWidthCurve(
-            const qCubicSegment1D& curve) {
-        Q_UNUSED(curve);
-    }
-    virtual void setStrokeBrushTimeCurve(
-            const qCubicSegment1D& curve) {
-        Q_UNUSED(curve);
-    }
-    virtual void setStrokeBrushPressureCurve(
-            const qCubicSegment1D& curve) {
-        Q_UNUSED(curve);
-    }
-    virtual void setStrokeBrushSpacingCurve(
-            const qCubicSegment1D& curve) {
-        Q_UNUSED(curve);
-    }
+    virtual void strokeWidthAction(const QrealAction& action)
+    { Q_UNUSED(action); }
 
-    virtual void startSelectedStrokeWidthTransform();
     virtual void startSelectedStrokeColorTransform();
     virtual void startSelectedFillColorTransform();
 

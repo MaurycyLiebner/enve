@@ -18,6 +18,7 @@ public:
     void writeProperty(QIODevice * const dst) const;
     void readProperty(QIODevice * const src);
 public:
+    void strokeWidthAction(const QrealAction& action);
     void setCurrentStrokeWidth(const qreal newWidth);
     void setCapStyle(const SkPaint::Cap capStyle);
     void setJoinStyle(const SkPaint::Join joinStyle);

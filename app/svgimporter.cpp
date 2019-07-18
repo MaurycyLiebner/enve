@@ -2068,7 +2068,7 @@ void StrokeSvgAttributes::setOutlineCompositionMode(const QPainter::CompositionM
 }
 
 void StrokeSvgAttributes::apply(BoundingBox *box, const qreal scale) const {
-    box->setStrokeWidth(mLineWidth*scale);
+    box->strokeWidthAction(QrealAction::sMakeSet(mLineWidth*scale));
     FillSvgAttributes::apply(box, PaintSetting::OUTLINE);
     //box->setStrokePaintType(mPaintType, mColor, mGradient);
 }

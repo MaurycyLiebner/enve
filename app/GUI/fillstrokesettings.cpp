@@ -145,11 +145,19 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
 
     strokeJoinCapLay->addLayout(mCapStyleLayout);
 
+    const auto actions = &mDocument.fActions;
+    connect(mLineWidthSpin, &QrealAnimatorValueSlider::editingStarted,
+            actions, [actions]() {
+        actions->strokeWidthAction(QrealAction::sMakeStart());
+    });
     connect(mLineWidthSpin, &QrealAnimatorValueSlider::valueChanged,
-            this, &FillStrokeSettingsWidget::setStrokeWidth);
-
+            actions, [actions](const qreal value) {
+        actions->strokeWidthAction(QrealAction::sMakeSet(value));
+    });
     connect(mLineWidthSpin, &QrealAnimatorValueSlider::editingFinished,
-            this, &FillStrokeSettingsWidget::emitStrokeWidthChanged);
+            actions, [actions]() {
+        actions->strokeWidthAction(QrealAction::sMakeFinish());
+    });
 
     mStrokeSettingsLayout->addWidget(mStrokeJoinCapWidget);
     mStrokeSettingsWidget->setLayout(mStrokeSettingsLayout);
@@ -300,12 +308,6 @@ void FillStrokeSettingsWidget::setCurrentPaintType(
     else setGradientPaintType();
 }
 
-void FillStrokeSettingsWidget::setStrokeWidth(const qreal width) {
-    //startTransform(SLOT(emitStrokeWidthChanged()));
-    mCurrentStrokeWidth = width;
-    emitStrokeWidthChangedTMP();
-}
-
 void FillStrokeSettingsWidget::updateCurrentSettings() {
     const auto scene = mDocument.fActiveScene;
     if(scene) {
@@ -322,18 +324,12 @@ void FillStrokeSettingsWidget::updateCurrentSettings() {
 void FillStrokeSettingsWidget::setCurrentSettings(
         PaintSettingsAnimator *fillPaintSettings,
         OutlineSettingsAnimator *strokePaintSettings) {
-    disconnect(mLineWidthSpin, &QrealAnimatorValueSlider::valueChanged,
-               this, &FillStrokeSettingsWidget::setStrokeWidth);
-
     setFillValuesFromFillSettings(fillPaintSettings);
     setStrokeValuesFromStrokeSettings(strokePaintSettings);
     //mLineWidthSpin->setValue(strokePaintSettings->getCurrentStrokeWidth());
 
     if(mTarget == PaintSetting::FILL) setFillTarget();
     else setStrokeTarget();
-
-    connect(mLineWidthSpin, &QrealAnimatorValueSlider::valueChanged,
-            this, &FillStrokeSettingsWidget::setStrokeWidth);
 }
 
 GradientWidget *FillStrokeSettingsWidget::getGradientWidget() {
@@ -495,41 +491,6 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
         mCurrentStrokeColorAnimator = nullptr;
         mLineWidthSpin->clearTarget();
     }
-}
-
-void FillStrokeSettingsWidget::emitStrokeBrushChanged() {
-    const auto scene = mDocument.fActiveScene;
-    if(scene) scene->setSelectedStrokeBrush(mCurrentStrokeBrush);
-}
-
-void FillStrokeSettingsWidget::emitStrokeBrushWidthCurveChanged() {
-    const auto scene = mDocument.fActiveScene;
-    if(scene) scene->setSelectedStrokeBrushWidthCurve(mCurrentStrokeBrushWidthCurve);
-}
-
-void FillStrokeSettingsWidget::emitStrokeBrushTimeCurveChanged() {
-    const auto scene = mDocument.fActiveScene;
-    if(scene) scene->setSelectedStrokeBrushTimeCurve(mCurrentStrokeBrushTimeCurve);
-}
-
-void FillStrokeSettingsWidget::emitStrokeBrushSpacingCurveChanged() {
-    const auto scene = mDocument.fActiveScene;
-    if(scene) scene->setSelectedStrokeBrushSpacingCurve(mCurrentStrokeBrushSpacingCurve);
-}
-
-void FillStrokeSettingsWidget::emitStrokeBrushPressureCurveChanged() {
-    const auto scene = mDocument.fActiveScene;
-    if(scene) scene->setSelectedStrokeBrushPressureCurve(mCurrentStrokeBrushPressureCurve);
-}
-
-void FillStrokeSettingsWidget::emitStrokeWidthChanged() {
-    const auto scene = mDocument.fActiveScene;
-    if(scene) scene->setSelectedStrokeWidth(mCurrentStrokeWidth);
-}
-
-void FillStrokeSettingsWidget::emitStrokeWidthChangedTMP() {
-    const auto scene = mDocument.fActiveScene;
-    if(scene) scene->setSelectedStrokeWidth(mCurrentStrokeWidth);
 }
 
 void FillStrokeSettingsWidget::emitCapStyleChanged() {

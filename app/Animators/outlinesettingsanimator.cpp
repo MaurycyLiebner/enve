@@ -37,6 +37,10 @@ void OutlineSettingsAnimator::readProperty(QIODevice * const src) {
               sizeof(QPainter::CompositionMode));
 }
 
+void OutlineSettingsAnimator::strokeWidthAction(const QrealAction& action) {
+    action.apply(mLineWidth.get());
+}
+
 void OutlineSettingsAnimator::setCurrentStrokeWidth(const qreal newWidth) {
     mLineWidth->setCurrentBaseValue(newWidth);
 }

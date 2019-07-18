@@ -199,51 +199,9 @@ void Canvas::setSelectedJoinStyle(const SkPaint::Join joinStyle) {
     }
 }
 
-void Canvas::setSelectedStrokeWidth(const qreal strokeWidth) {
-    for(const auto &box : mSelectedBoxes) {
-        box->setStrokeWidth(strokeWidth);
-    }
-}
-
-void Canvas::setSelectedStrokeBrush(SimpleBrushWrapper * const brush) {
-    for(const auto &box : mSelectedBoxes) {
-        box->setStrokeBrush(brush);
-    }
-}
-
-void Canvas::setSelectedStrokeBrushWidthCurve(
-        const qCubicSegment1D& curve) {
-    for(const auto &box : mSelectedBoxes) {
-        box->setStrokeBrushWidthCurve(curve);
-    }
-}
-
-
-void Canvas::setSelectedStrokeBrushTimeCurve(
-        const qCubicSegment1D& curve) {
-    for(const auto &box : mSelectedBoxes) {
-        box->setStrokeBrushTimeCurve(curve);
-    }
-}
-
-void Canvas::setSelectedStrokeBrushSpacingCurve(
-        const qCubicSegment1D& curve) {
-    for(const auto &box : mSelectedBoxes) {
-        box->setStrokeBrushSpacingCurve(curve);
-    }
-}
-
-void Canvas::setSelectedStrokeBrushPressureCurve(
-        const qCubicSegment1D& curve) {
-    for(const auto &box : mSelectedBoxes) {
-        box->setStrokeBrushPressureCurve(curve);
-    }
-}
-
-void Canvas::startSelectedStrokeWidthTransform() {
-    for(const auto &box : mSelectedBoxes) {
-        box->startSelectedStrokeWidthTransform();
-    }
+void Canvas::strokeWidthAction(const QrealAction& action) {
+    for(const auto &box : mSelectedBoxes)
+        box->strokeWidthAction(action);
 }
 
 void Canvas::startSelectedStrokeColorTransform() {

@@ -134,4 +134,26 @@ signals:
     void valueChangedSignal(qreal);
 };
 
+class QrealAction {
+    enum Type { START, SET, FINISH };
+    QrealAction(const qreal value, const Type type) :
+        mValue(value), mType(type) {}
+public:
+    void apply(QrealAnimator* const target) const {
+        if(mType == START) target->prp_startTransform();
+        else if(mType == SET) target->setCurrentBaseValue(mValue);
+        else if(mType == FINISH) target->prp_finishTransform();
+    }
+
+    static QrealAction sMakeStart()
+    { return QrealAction{0., START}; }
+    static QrealAction sMakeSet(const qreal value)
+    { return QrealAction{value, SET}; }
+    static QrealAction sMakeFinish()
+    { return QrealAction{0., FINISH}; }
+private:
+    qreal mValue;
+    Type mType;
+};
+
 #endif // VALUEANIMATORS_H

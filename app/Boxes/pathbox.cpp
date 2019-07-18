@@ -294,11 +294,6 @@ void PathBox::setStrokeJoinStyle(const SkPaint::Join joinStyle) {
     planScheduleUpdate(Animator::USER_CHANGE);
 }
 
-void PathBox::setStrokeWidth(const qreal strokeWidth) {
-    mStrokeSettings->setCurrentStrokeWidth(strokeWidth);
-    //scheduleOutlinePathUpdate();
-}
-
 void PathBox::setOutlineCompositionMode(
         const QPainter::CompositionMode &compositionMode) {
     mStrokeSettings->setOutlineCompositionMode(compositionMode);
@@ -306,8 +301,8 @@ void PathBox::setOutlineCompositionMode(
     planScheduleUpdate(Animator::USER_CHANGE);
 }
 
-void PathBox::startSelectedStrokeWidthTransform() {
-    mStrokeSettings->getStrokeWidthAnimator()->prp_startTransform();
+void PathBox::strokeWidthAction(const QrealAction& action) {
+    mStrokeSettings->strokeWidthAction(action);
 }
 
 void PathBox::startSelectedStrokeColorTransform() {
