@@ -68,20 +68,11 @@ struct AutoTilesData {
                      pixRect.height()/TILE_SIZE + heightRem);
     }
 
-    void setPixelClamp(const QRect& pixRect, const QPoint& zeroPos) {
-        const int topPixs = zeroPos.y() - pixRect.top();
-        const int topTiles = qMax(0, qCeil(qreal(topPixs)/TILE_SIZE));
-        const int leftPixs = zeroPos.x() - pixRect.left();
-        const int leftTiles = qMax(0, qCeil(qreal(leftPixs)/TILE_SIZE));
-        const int bottomPixs = pixRect.bottom() - zeroPos.y();
-        const int bottomTiles = qMax(0, qCeil(qreal(bottomPixs)/TILE_SIZE));
-        const int rightPixs = pixRect.right() - zeroPos.x();
-        const int rightTiles = qMax(0, qCeil(qreal(rightPixs)/TILE_SIZE));
-
-        mMinCol = -leftTiles;
-        mMaxCol = rightTiles;
-        mMinRow = -topTiles;
-        mMaxRow = bottomTiles;
+    void setPixelClamp(const QRect& pixRect) {
+        mMinCol = qFloor(qreal(pixRect.left())/TILE_SIZE);
+        mMaxCol = qCeil(qreal(pixRect.right())/TILE_SIZE);
+        mMinRow = qFloor(qreal(pixRect.top())/TILE_SIZE);
+        mMaxRow = qCeil(qreal(pixRect.bottom())/TILE_SIZE);
     }
 
     bool isEmpty() const { return mColumnCount == 0 || mRowCount == 0; }

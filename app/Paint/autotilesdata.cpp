@@ -358,6 +358,14 @@ bool AutoTilesData::stretchToTile(const int tx, const int ty) {
     if(tx > mMaxCol || tx < mMinCol) return false;
     if(ty > mMaxRow || ty < mMinRow) return false;
 
+    if(mColumns.isEmpty()) {
+        mZeroTileCol = -tx;
+        mZeroTileRow = -ty;
+        appendRows(1);
+        appendColumns(1);
+        return true;
+    }
+
     const int colId = tx + mZeroTileCol;
     const int rowId = ty + mZeroTileRow;
 

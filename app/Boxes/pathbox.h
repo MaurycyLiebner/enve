@@ -43,71 +43,12 @@ protected:
 
         if(!fFillPath.isEmpty()) {
             fPaintSettings.applyPainterSettingsSk(&paint);
-
             canvas->drawPath(fFillPath, paint);
         }
         if(!fOutlinePath.isEmpty()) {
-            if(fStrokeSettings.fPaintType == PaintType::BRUSHPAINT
-                    /*strokeSettings.fStrokeBrush*/) {
-                if(!fStrokeSettings.fStrokeBrush) return;
-                AutoTiledSurface surf;
-                surf.setPixelClamp(fMaxBoundsRect, fGlobalRect.topLeft());
-                surf.loadBitmap(fBitmapTMP);
-
-                SkPath pathT;
-                QMatrix trans;
-                trans.translate(-fGlobalRect.x(), -fGlobalRect.y());
-                trans = fScaledTransform*trans;
-                fPath.transform(toSkMatrix(trans), &pathT);
-
-//                const auto fillBrush = fStrokeSettings.fStrokeBrush->getBrush();
-//                auto fillWidthCurve = fStrokeSettings.fWidthCurve*fResolution;
-
-//                auto fillBrushSet = BrushStrokeSet::lineFillStrokesForSkPath(
-//                            pathT, fStrokeSettings.fTimeCurve,
-//                            fStrokeSettings.fPressureCurve,
-//                            fillWidthCurve, fStrokeSettings.fSpacingCurve,
-//                            0, 40*fResolution);
-//                for(auto& set : fillBrushSet)
-//                    surf.execute(fillBrush, set);
-
-                const auto strokeBrush = fStrokeSettings.fStrokeBrush->getBrush();
-                auto strokeWidthCurve = fStrokeSettings.fWidthCurve*fResolution;
-                auto strokeBrushSet = BrushStrokeSet::outlineStrokesForSkPath(
-                            pathT,
-                            fStrokeSettings.fTimeCurve,
-                            fStrokeSettings.fPressureCurve,
-                            strokeWidthCurve, fStrokeSettings.fSpacingCurve, 5, 5);
-                QColor col = fStrokeSettings.fPaintColor;
-                col.setRgbF(col.blueF(), col.greenF(),
-                            col.redF(), col.alphaF());
-                fStrokeSettings.fStrokeBrush->setColor(
-                            toSkScalar(col.hueF()),
-                            toSkScalar(col.saturationF()),
-                            toSkScalar(col.valueF()));
-                //const auto brush = fStrokeSettings.fStrokeBrush->getBrush();
-                for(auto& set : strokeBrushSet)
-                    surf.execute(strokeBrush, set);
-
-                fBitmapTMP.reset();
-
-                QRect baseRect = fGlobalRect;
-                baseRect.translate(-surf.zeroTilePos());
-                const auto pixRect = surf.pixelBoundingRect();
-                baseRect.setSize(QSize(pixRect.width(), pixRect.height()));
-                setBaseGlobalRect(baseRect);
-
-                const QMargins iMargins(baseRect.left() - fGlobalRect.left(),
-                                        baseRect.top() - fGlobalRect.top(),
-                                        fGlobalRect.right() - baseRect.right(),
-                                        fGlobalRect.bottom() - baseRect.bottom());
-                fBitmapTMP = surf.toBitmap(iMargins);
-            } else {
-                paint.setShader(nullptr);
-                fStrokeSettings.applyPainterSettingsSk(&paint);
-
-                canvas->drawPath(fOutlinePath, paint);
-            }
+            paint.setShader(nullptr);
+            fStrokeSettings.applyPainterSettingsSk(&paint);
+            canvas->drawPath(fOutlinePath, paint);
         }
     }
 };
@@ -136,12 +77,6 @@ public:
     void setStrokeCapStyle(const SkPaint::Cap capStyle);
     void setStrokeJoinStyle(const SkPaint::Join joinStyle);
     void setStrokeWidth(const qreal strokeWidth);
-
-    void setStrokeBrush(SimpleBrushWrapper * const brush);
-    void setStrokeBrushWidthCurve(const qCubicSegment1D& curve);
-    void setStrokeBrushTimeCurve(const qCubicSegment1D& curve);
-    void setStrokeBrushPressureCurve(const qCubicSegment1D& curve);
-    void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve);
 
     void setOutlineCompositionMode(
             const QPainter::CompositionMode &compositionMode);

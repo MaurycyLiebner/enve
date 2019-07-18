@@ -109,22 +109,23 @@ void BoundingBoxRenderData::processTask() {
     if(fOpacity < 0.001) return;
     if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
 
+    SkBitmap bitmap;
     const auto info = SkiaHelpers::getPremulRGBAInfo(fGlobalRect.width(),
                                                      fGlobalRect.height());
-    fBitmapTMP.allocPixels(info);
-    fBitmapTMP.eraseColor(eraseColor());
+    bitmap.allocPixels(info);
+    bitmap.eraseColor(eraseColor());
 
-    SkCanvas canvas(fBitmapTMP);
+    SkCanvas canvas(bitmap);
     transformRenderCanvas(canvas);
 
     drawSk(&canvas);
 
     for(const auto& effect : fRasterEffects) {
-        effect->applyEffectsSk(fBitmapTMP, fResolution);
+        effect->applyEffectsSk(bitmap, fResolution);
     }
     clearPixmapEffects();
 
-    fRenderedImage = SkiaHelpers::transferDataToSkImage(fBitmapTMP);
+    fRenderedImage = SkiaHelpers::transferDataToSkImage(bitmap);
 }
 
 void BoundingBoxRenderData::beforeProcessing() {

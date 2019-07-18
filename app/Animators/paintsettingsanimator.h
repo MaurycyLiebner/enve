@@ -116,11 +116,6 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
             QPainter::CompositionMode_Source;
 
     qreal fOutlineWidth;
-    stdsptr<SimpleBrushWrapper> fStrokeBrush;
-    qCubicSegment1D fTimeCurve;
-    qCubicSegment1D fPressureCurve;
-    qCubicSegment1D fWidthCurve;
-    qCubicSegment1D fSpacingCurve;
 };
 
 #endif // PAINTSETTINGSANIMATOR_H

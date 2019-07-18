@@ -8,10 +8,11 @@ void LinkCanvasRenderData::processTask() {
 
     const auto info = SkiaHelpers::getPremulRGBAInfo(fGlobalRect.width(),
                                                      fGlobalRect.height());
-    fBitmapTMP.allocPixels(info);
-    fBitmapTMP.eraseColor(SK_ColorTRANSPARENT);
+    SkBitmap bitmap;
+    bitmap.allocPixels(info);
+    bitmap.eraseColor(SK_ColorTRANSPARENT);
 
-    SkCanvas rasterCanvas(fBitmapTMP);
+    SkCanvas rasterCanvas(bitmap);
     rasterCanvas.translate(toSkScalar(-fGlobalRect.left()),
                            toSkScalar(-fGlobalRect.top()));
 
@@ -43,10 +44,10 @@ void LinkCanvasRenderData::processTask() {
 
     if(!fRasterEffects.isEmpty()) {
         for(const auto& effect : fRasterEffects) {
-            effect->applyEffectsSk(fBitmapTMP, fResolution);
+            effect->applyEffectsSk(bitmap, fResolution);
         }
         clearPixmapEffects();
     }
 
-    fRenderedImage = SkiaHelpers::transferDataToSkImage(fBitmapTMP);
+    fRenderedImage = SkiaHelpers::transferDataToSkImage(bitmap);
 }

@@ -90,7 +90,6 @@ public:
     bool fRefInParent = false;
     qptr<BoundingBox> fParentBox;
     sk_sp<SkImage> fRenderedImage;
-    SkBitmap fBitmapTMP;
 
     void drawRenderedImageForParent(SkCanvas * const canvas);
 

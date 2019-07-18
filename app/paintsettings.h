@@ -4,8 +4,7 @@
 enum PaintType : short {
     NOPAINT,
     FLATPAINT,
-    GRADIENTPAINT,
-    BRUSHPAINT
+    GRADIENTPAINT
 };
 
 enum ColorMode : short;

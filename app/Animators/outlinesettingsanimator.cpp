@@ -22,7 +22,6 @@ OutlineSettingsAnimator::OutlineSettingsAnimator(
 void OutlineSettingsAnimator::writeProperty(QIODevice * const dst) const {
     PaintSettingsAnimator::writeProperty(dst);
     mLineWidth->writeProperty(dst);
-    mBrushSettings->writeProperty(dst);
     dst->write(rcConstChar(&mCapStyle), sizeof(SkPaint::Cap));
     dst->write(rcConstChar(&mJoinStyle), sizeof(SkPaint::Join));
     dst->write(rcConstChar(&mOutlineCompositionMode),
@@ -32,18 +31,10 @@ void OutlineSettingsAnimator::writeProperty(QIODevice * const dst) const {
 void OutlineSettingsAnimator::readProperty(QIODevice * const src) {
     PaintSettingsAnimator::readProperty(src);
     mLineWidth->readProperty(src);
-    mBrushSettings->readProperty(src);
     src->read(rcChar(&mCapStyle), sizeof(SkPaint::Cap));
     src->read(rcChar(&mJoinStyle), sizeof(SkPaint::Join));
     src->read(rcChar(&mOutlineCompositionMode),
               sizeof(QPainter::CompositionMode));
-}
-
-void OutlineSettingsAnimator::showHideChildrenBeforeChaningPaintType(
-        const PaintType &newPaintType) {
-    PaintSettingsAnimator::showHideChildrenBeforeChaningPaintType(newPaintType);
-    if(getPaintType() == BRUSHPAINT) ca_removeChildAnimator(mBrushSettings);
-    if(newPaintType == BRUSHPAINT) ca_addChildAnimator(mBrushSettings);
 }
 
 void OutlineSettingsAnimator::setCurrentStrokeWidth(const qreal newWidth) {

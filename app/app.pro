@@ -238,7 +238,6 @@ SOURCES += main.cpp\
     Animators/qrealanimatorcreator.cpp \
     Animators/gpueffectanimators.cpp \
     GPUEffects/gpupostprocessor.cpp \
-    Paint/fixedtiledsurface.cpp \
     GUI/segment1deditor.cpp \
     GUI/namedcontainer.cpp \
     Animators/qcubicsegment1danimator.cpp \
@@ -470,7 +469,6 @@ HEADERS  += \
     Animators/intanimatorcreator.h \
     Animators/gpueffectanimators.h \
     GPUEffects/gpupostprocessor.h \
-    Paint/fixedtiledsurface.h \
     GUI/segment1deditor.h \
     GUI/namedcontainer.h \
     Animators/qcubicsegment1danimator.h \

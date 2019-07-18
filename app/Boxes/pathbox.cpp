@@ -227,26 +227,7 @@ void PathBox::setupRenderData(const qreal relFrame,
     UpdateStrokeSettings &strokeSettings = pathData->fStrokeSettings;
     const auto widthAnimator = mStrokeSettings->getStrokeWidthAnimator();
     strokeSettings.fOutlineWidth = widthAnimator->getEffectiveValue(relFrame);
-    const auto brushSettings = mStrokeSettings->getBrushSettings();
-    if(brushSettings) {
-        auto brush = brushSettings->getBrush();
-        if(brush) {
-            strokeSettings.fStrokeBrush = brush->createDuplicate();
-            strokeSettings.fTimeCurve =
-                    brushSettings->getTimeAnimator()->
-                        getValueAtRelFrame(relFrame);
 
-            strokeSettings.fWidthCurve =
-                    brushSettings->getWidthAnimator()->
-                        getValueAtRelFrame(relFrame)*strokeSettings.fOutlineWidth;
-            strokeSettings.fPressureCurve =
-                    brushSettings->getPressureAnimator()->
-                        getValueAtRelFrame(relFrame);
-            strokeSettings.fSpacingCurve =
-                    brushSettings->getSpacingAnimator()->
-                        getValueAtRelFrame(relFrame);
-        }
-    }
     strokeSettings.fPaintColor = mStrokeSettings->
             getColor(relFrame);
     strokeSettings.fPaintType = mStrokeSettings->getPaintType();
@@ -316,28 +297,6 @@ void PathBox::setStrokeJoinStyle(const SkPaint::Join joinStyle) {
 void PathBox::setStrokeWidth(const qreal strokeWidth) {
     mStrokeSettings->setCurrentStrokeWidth(strokeWidth);
     //scheduleOutlinePathUpdate();
-}
-
-void PathBox::setStrokeBrush(SimpleBrushWrapper * const brush) {
-    mStrokeSettings->setStrokeBrush(brush);
-    prp_afterWholeInfluenceRangeChanged();
-    planScheduleUpdate(Animator::USER_CHANGE);
-}
-
-void PathBox::setStrokeBrushWidthCurve(const qCubicSegment1D &curve) {
-    mStrokeSettings->setStrokeBrushWidthCurve(curve);
-}
-
-void PathBox::setStrokeBrushTimeCurve(const qCubicSegment1D &curve) {
-    mStrokeSettings->setStrokeBrushTimeCurve(curve);
-}
-
-void PathBox::setStrokeBrushPressureCurve(const qCubicSegment1D &curve) {
-    mStrokeSettings->setStrokeBrushPressureCurve(curve);
-}
-
-void PathBox::setStrokeBrushSpacingCurve(const qCubicSegment1D &curve) {
-    mStrokeSettings->setStrokeBrushSpacingCurve(curve);
 }
 
 void PathBox::setOutlineCompositionMode(
@@ -440,22 +399,9 @@ void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
     } else {
         const PaintType paintType = strokeSettings->getPaintType();
         mStrokeSettings->setPaintType(paintType);
-        if(paintType == FLATPAINT || paintType == BRUSHPAINT) {
+        if(paintType == FLATPAINT) {
             mStrokeSettings->getColorAnimator()->qra_setCurrentValue(
                         strokeSettings->getColor());
-            if(paintType == BRUSHPAINT) {
-                const auto srcBrushSettings = strokeSettings->getBrushSettings();
-                const auto dstBrushSettings = mStrokeSettings->getBrushSettings();
-                dstBrushSettings->setBrush(srcBrushSettings->getBrush());
-                dstBrushSettings->setStrokeBrushWidthCurve(
-                            srcBrushSettings->getWidthAnimator()->getCurrentValue());
-                dstBrushSettings->setStrokeBrushPressureCurve(
-                            srcBrushSettings->getPressureAnimator()->getCurrentValue());
-                dstBrushSettings->setStrokeBrushSpacingCurve(
-                            srcBrushSettings->getSpacingAnimator()->getCurrentValue());
-                dstBrushSettings->setStrokeBrushTimeCurve(
-                            srcBrushSettings->getTimeAnimator()->getCurrentValue());
-            }
         } else if(paintType == GRADIENTPAINT) {
             mStrokeSettings->setGradient(
                         strokeSettings->getGradient());

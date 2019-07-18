@@ -1,5 +1,5 @@
-﻿#ifndef FIXEDTILEDSURFACE_H
-#define FIXEDTILEDSURFACE_H
+﻿#ifndef AUTOTILEDSURFACE_H
+#define AUTOTILEDSURFACE_H
 
 #include <mypaint-config.h>
 #include <mypaint-glib-compat.h>
@@ -22,7 +22,6 @@ struct AutoTiledSurface {
 
     ~AutoTiledSurface();
 
-
     void deepCopy(const AutoTiledSurface& other) {
         mAutoTilesData.deepCopy(other.mAutoTilesData);
     }
@@ -31,7 +30,7 @@ struct AutoTiledSurface {
         mAutoTilesData.swap(other.mAutoTilesData);
     }
 
-    void setPixelClamp(const QRect& pixRect, const QPoint& zeroPos);
+    void setPixelClamp(const QRect& pixRect);
     void loadBitmap(const SkBitmap &src);
 
     void _free() {
@@ -113,4 +112,4 @@ protected:
     AutoTilesData mAutoTilesData;
 };
 
-#endif // FIXEDTILEDSURFACE_H
+#endif // AUTOTILEDSURFACE_H

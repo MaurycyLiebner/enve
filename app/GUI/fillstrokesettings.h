@@ -45,7 +45,6 @@ public:
     void setStrokeValuesFromStrokeSettings(OutlineSettingsAnimator *settings);
 
     void updateColorAnimator();
-    void setCurrentBrushSettings(BrushSettingsAnimator * const brushSettings);
 
     void emitStrokeBrushChanged();
     void emitStrokeBrushWidthCurveChanged();
@@ -61,11 +60,6 @@ private:
     void setLinearGradientFill();
     void setRadialGradientFill();
 
-    void setStrokeBrush(SimpleBrushWrapper * const brush);
-    void setBrushTimeCurve(const qCubicSegment1D& seg);
-    void setBrushWidthCurve(const qCubicSegment1D& seg);
-    void setBrushPressureCurve(const qCubicSegment1D& seg);
-    void setBrushSpacingCurve(const qCubicSegment1D& seg);
     void setStrokeWidth(const qreal width);
 
     void colorTypeSet(const PaintType &type);
@@ -84,7 +78,6 @@ private:
     void setRoundCapStyle();
 
     void setGradientFill();
-    void setBrushFill();
     void setFlatFill();
     void setNoneFill();
 
@@ -150,7 +143,6 @@ private:
 
     //
 
-    void setBrushPaintType();
     void setNoPaintType();
     void setFlatPaintType();
     void setGradientPaintType();
@@ -165,7 +157,6 @@ private:
     QPushButton *mFillNoneButton = nullptr;
     QPushButton *mFillFlatButton = nullptr;
     QPushButton *mFillGradientButton = nullptr;
-    QPushButton *mFillBrushButton = nullptr;
 
     QWidget *mStrokeSettingsWidget;
     QWidget* mStrokeJoinCapWidget;
@@ -195,14 +186,6 @@ private:
     QWidget *mGradientTypeWidget;
 
     QWidget *mFillAndStrokeWidget;
-
-    BrushSelectionWidget* mBrushSelectionWidget;
-
-    QWidget* mBrushSettingsWidget;
-    Segment1DEditor* mBrushWidthCurveEditor;
-    Segment1DEditor* mBrushPressureCurveEditor;
-    Segment1DEditor* mBrushSpacingCurveEditor;
-    Segment1DEditor* mBrushTimeCurveEditor;
 };
 
 #endif // FILLSTROKESETTINGS_H

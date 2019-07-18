@@ -40,8 +40,8 @@ AutoTiledSurface::~AutoTiledSurface() {
     _free();
 }
 
-void AutoTiledSurface::setPixelClamp(const QRect &pixRect, const QPoint &zeroPos) {
-    mAutoTilesData.setPixelClamp(pixRect, zeroPos);
+void AutoTiledSurface::setPixelClamp(const QRect &pixRect) {
+    mAutoTilesData.setPixelClamp(pixRect);
 }
 
 void AutoTiledSurface::loadBitmap(const SkBitmap& src) {
