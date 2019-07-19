@@ -48,7 +48,6 @@ TARGET = enve
 TEMPLATE = app
 
 SOURCES += main.cpp\
-    Animators/brushsettingsanimator.cpp \
     Animators/outlinesettingsanimator.cpp \
     Animators/paintsettingsanimator.cpp \
     Boxes/containerbox.cpp \
@@ -279,7 +278,6 @@ SOURCES += main.cpp\
     Paint/animatedsurface.cpp
 
 HEADERS  += \
-    Animators/brushsettingsanimator.h \
     Animators/outlinesettingsanimator.h \
     Animators/paintsettingsanimator.h \
     Boxes/containerbox.h \

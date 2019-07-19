@@ -6,7 +6,6 @@
 #include "colorhelpers.h"
 #include "skia/skiaincludes.h"
 #include "smartPointers/sharedpointerdefs.h"
-#include "brushsettingsanimator.h"
 #include "Animators/gradient.h"
 #include "Animators/staticcomplexanimator.h"
 #include "paintsettings.h"

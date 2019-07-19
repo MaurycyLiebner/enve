@@ -14,8 +14,6 @@
 #include <QHBoxLayout>
 #include "Animators/coloranimator.h"
 #include "Animators/paintsettingsanimator.h"
-#include "Animators/brushsettingsanimator.h"
-#include "GUI/BrushWidgets/brushselectionwidget.h"
 #include "paintsettingsapplier.h"
 class GradientWidget;
 class MainWindow;

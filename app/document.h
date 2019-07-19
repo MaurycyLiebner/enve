@@ -95,10 +95,7 @@ public:
 
     void setBrushColor(const QColor &color) {
         fBrushColor = color;
-        fBrushColor.setBlueF(color.redF());
-        fBrushColor.setRedF(color.blueF());
-        if(!fBrush) return;
-        fBrush->setColor(fBrushColor);
+        if(fBrush) fBrush->setColor(fBrushColor);
     }
 
     void incBrushRadius() {

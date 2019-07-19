@@ -2,8 +2,6 @@
 #define PAINTSETTINGSAPPLIER_H
 #include "smartPointers/sharedpointerdefs.h"
 #include "colorsetting.h"
-#include "Segments/qcubicsegment1d.h"
-#include "GUI/BrushWidgets/brushwidget.h"
 #include <QPainter>
 #include "Boxes/pathbox.h"
 #include "Animators/gradient.h"
