@@ -170,9 +170,6 @@ public:
 
     void undo();
     void redo();
-
-signals:
-    void updateAll();
 protected:
     void lockFinished();
 private:

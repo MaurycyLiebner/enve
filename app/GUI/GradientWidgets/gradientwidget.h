@@ -51,7 +51,6 @@ public:
 signals:
     void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);
-    void gradientSettingsChanged();
 private:
     void updateAll();
 

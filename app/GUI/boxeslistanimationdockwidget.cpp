@@ -141,10 +141,10 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 
     mRenderWidget = new RenderWidget(this);
 
-    connect(&mDocument, &Document::activeSceneWidgetSet,
-            this, [this](CanvasWindow* const sceneWidget) {
-        mPlayButton->setEnabled(sceneWidget);
-        mStopButton->setEnabled(sceneWidget);
+    connect(&mDocument, &Document::activeSceneSet,
+            this, [this](Canvas* const scene) {
+        mPlayButton->setEnabled(scene);
+        mStopButton->setEnabled(scene);
     });
 
     connect(mRenderWidget, &RenderWidget::renderFromSettings,

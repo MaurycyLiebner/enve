@@ -5,9 +5,7 @@
 class GradientWidget;
 class DisplayedGradientsWidget;
 
-class GradientsListWidget : public ScrollArea
-{
-    Q_OBJECT
+class GradientsListWidget : public ScrollArea {
 public:
     explicit GradientsListWidget(GradientWidget *gradientWidget,
                                  QWidget *parent = nullptr);
@@ -19,9 +17,6 @@ public:
 protected:
     void scrollContentsBy(int dx, int dy);
     DisplayedGradientsWidget *mDisplayedGradients;
-signals:
-
-public slots:
 };
 
 #endif // GRADIENTSLISTWIDGET_H

@@ -7,7 +7,6 @@ class Gradient;
 class GradientWidget;
 
 class DisplayedGradientsWidget : public GLWidget {
-    Q_OBJECT
 public:
     explicit DisplayedGradientsWidget(GradientWidget *gradientWidget,
                                       QWidget *parent = nullptr);
@@ -16,8 +15,8 @@ public:
     void setTop(const int top);
     void updateTopGradientId();
     void setNumberGradients(const int n);
+protected:
     void paintGL();
-
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -31,9 +30,6 @@ protected:
     int mNumberVisibleGradients = 6;
 
     GradientWidget *mGradientWidget;
-signals:
-
-public slots:
 };
 
 #endif // DISPLACYEDGRADIENTSWIDGET_H

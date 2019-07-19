@@ -7,19 +7,11 @@
 #include "GUI/mainwindow.h"
 #include "global.h"
 
-QList<MinimalScrollWidgetVisiblePart*>
-MinimalScrollWidgetVisiblePart::mAllInstances;
-
 MinimalScrollWidgetVisiblePart::MinimalScrollWidgetVisiblePart(
         MinimalScrollWidget * const parent) :
     QWidget(parent) {
     Q_ASSERT(parent);
     mParentWidget = parent;
-    addInstance(this);
-}
-
-MinimalScrollWidgetVisiblePart::~MinimalScrollWidgetVisiblePart() {
-    removeInstance(this);
 }
 
 void MinimalScrollWidgetVisiblePart::setVisibleTop(const int top) {
@@ -40,28 +32,9 @@ void MinimalScrollWidgetVisiblePart::updateWidgetsWidth() {
 }
 
 void MinimalScrollWidgetVisiblePart::callUpdaters() {
-    if(mVisibleWidgetsContentUpdateScheduled ||
-       mParentHeightUpdateScheduled) {
-        updateParentHeightIfNeeded();
-        updateVisibleWidgetsContentIfNeeded();
-    }
+    updateParentHeightIfNeeded();
+    updateVisibleWidgetsContentIfNeeded();
     update();
-}
-
-void MinimalScrollWidgetVisiblePart::callAllInstanceUpdaters() {
-    for(MinimalScrollWidgetVisiblePart *instance : mAllInstances) {
-        instance->callUpdaters();
-    }
-}
-
-void MinimalScrollWidgetVisiblePart::addInstance(
-        MinimalScrollWidgetVisiblePart *instance) {
-    mAllInstances.append(instance);
-}
-
-void MinimalScrollWidgetVisiblePart::removeInstance(
-        MinimalScrollWidgetVisiblePart *instance) {
-    mAllInstances.removeOne(instance);
 }
 
 void MinimalScrollWidgetVisiblePart::scheduleContentUpdate() {
@@ -69,8 +42,24 @@ void MinimalScrollWidgetVisiblePart::scheduleContentUpdate() {
     planScheduleUpdateVisibleWidgetsContent();
 }
 
+bool MinimalScrollWidgetVisiblePart::event(QEvent *event) {
+    if(event->type() == QEvent::User) {
+        mEventSent = false;
+        callUpdaters();
+        return true;
+    } else return QWidget::event(event);
+}
+#include <QApplication>
+void MinimalScrollWidgetVisiblePart::postEvent() {
+    if(mEventSent) return;
+    QApplication::postEvent(this, new QEvent(QEvent::User));
+    mEventSent = true;
+}
+
 void MinimalScrollWidgetVisiblePart::planScheduleUpdateVisibleWidgetsContent() {
+    if(mVisibleWidgetsContentUpdateScheduled) return;
     mVisibleWidgetsContentUpdateScheduled = true;
+    postEvent();
 }
 
 void MinimalScrollWidgetVisiblePart::updateVisibleWidgetsContentIfNeeded() {
@@ -81,7 +70,9 @@ void MinimalScrollWidgetVisiblePart::updateVisibleWidgetsContentIfNeeded() {
 }
 
 void MinimalScrollWidgetVisiblePart::planScheduleUpdateParentHeight() {
+    if(mParentHeightUpdateScheduled) return;
     mParentHeightUpdateScheduled = true;
+    postEvent();
 }
 
 void MinimalScrollWidgetVisiblePart::updateParentHeightIfNeeded() {

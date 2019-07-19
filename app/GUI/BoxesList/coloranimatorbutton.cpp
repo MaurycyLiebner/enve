@@ -66,8 +66,6 @@ void ColorAnimatorButton::openColorSettingsDialog() {
 
     if(mColorTarget) {
         colorWidget->setTarget(mColorTarget);
-        connect(MainWindow::getInstance(), &MainWindow::updateAll,
-                dialog, qOverload<>(&QDialog::update));
     } else {
         colorWidget->setCurrentColor(mColor);
         connect(colorWidget, &ColorSettingsWidget::colorSettingSignal,

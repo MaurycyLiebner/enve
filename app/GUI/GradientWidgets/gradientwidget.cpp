@@ -25,13 +25,17 @@ GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
 
     mMainWindow = mainWindow;  
 
-    connect(mMainWindow, &MainWindow::updateAll,
-            this, &GradientWidget::updateAll);
-
     connect(Document::sInstance, &Document::gradientCreated,
-            this, &GradientWidget::updateNumberOfGradients);
-    connect(Document::sInstance, qOverload<int>(&Document::gradientRemoved),
-            this, &GradientWidget::updateNumberOfGradients);
+            this, [this](Gradient* const gradient) {
+        connect(gradient, &Gradient::prp_absFrameRangeChanged,
+                this, &GradientWidget::updateAll);
+        updateNumberOfGradients();
+    });
+    connect(Document::sInstance, &Document::gradientRemoved,
+            this, [this](Gradient* const gradient) {
+        disconnect(gradient, nullptr, this, nullptr);
+        updateNumberOfGradients();
+    });
 //    newGradient();
 //    newGradient(Color(1.f, 1.f, 0.f), Color(0.f, 1.f, 1.f, 0.5f));
 //    newGradient(Color(1.f, 0.f, 0.f), Color(0.f, 1.f, 0.f));
@@ -46,6 +50,10 @@ void GradientWidget::updateAll() {
 void GradientWidget::setCurrentColorId(const int id) {
     if(mCurrentColor) disconnect(mCurrentColor, nullptr, this, nullptr);
     mCurrentColorId = id;
+    if(!mCurrentGradient) {
+        mCurrentColor = nullptr;
+        return;
+    }
     mCurrentColor = mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
     connect(mCurrentColor, &QObject::destroyed, this, [this]() {
         setCurrentColorId(0);
@@ -55,7 +63,8 @@ void GradientWidget::setCurrentColorId(const int id) {
 }
 
 void GradientWidget::updateNumberOfGradients() {
-    mGradientsListWidget->setNumberGradients(Document::sInstance->fGradients.count());
+    mGradientsListWidget->setNumberGradients(
+                Document::sInstance->fGradients.count());
 }
 
 void GradientWidget::clearAll() {
@@ -125,13 +134,11 @@ void GradientWidget::colorRightPress(const int x, const QPoint &point) {
                 }
                 startGradientTransform();
                 setCurrentColorId(0);
-                emit gradientSettingsChanged();
                 finishGradientTransform();
                 updateAll();
             } else if(selected_action->text() == "Add Color") {
                 startGradientTransform();
                 mCurrentGradient->addColor(QColor(0, 0, 0));
-                emit gradientSettingsChanged();
                 finishGradientTransform();
                 updateAll();
             }
@@ -160,7 +167,6 @@ void GradientWidget::moveColor(const int x) {
             startGradientTransform();
             mCurrentGradient->swapColors(mCurrentColorId, colorId);
             setCurrentColorId(colorId);
-            emit gradientSettingsChanged();
             finishGradientTransform();
             updateAll();
             mMainWindow->queTasksAndUpdate();

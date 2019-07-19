@@ -1,6 +1,7 @@
 #include "document.h"
 #include "FileCacheHandlers/filecachehandler.h"
 #include "canvas.h"
+
 Document* Document::sInstance = nullptr;
 
 bool Document::FileCompare::operator()(const FileHandler &f1,
@@ -89,11 +90,6 @@ void Document::decActiveSceneFrame() {
     setActiveSceneFrame(getActiveSceneFrame() - 1);
 }
 
-void Document::setActiveSceneWidget(CanvasWindow * const sceneWidget) {
-    fActiveSceneWidget = sceneWidget;
-    emit activeSceneWidgetSet(sceneWidget);
-}
-
 Gradient *Document::createNewGradient() {
     const auto grad = SPtrCreate(Gradient)();
     fGradients.append(grad);
@@ -122,7 +118,6 @@ bool Document::removeGradient(const int id) {
     if(id < 0 || id >= fGradients.count()) return false;
     const auto grad = fGradients.takeAt(id);
     emit gradientRemoved(grad.data());
-    emit gradientRemoved(id);
     return true;
 }
 

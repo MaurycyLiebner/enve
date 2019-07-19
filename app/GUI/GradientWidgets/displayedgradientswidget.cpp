@@ -47,13 +47,13 @@ void DisplayedGradientsWidget::paintGL() {
         Gradient *gradient = mGradientWidget->getGradientAt(i);
         int nColors = gradient->getColorCount();
         QColor lastColor = gradient->getColorAt(0);
-        qreal xT = 0.;
-        qreal xInc = static_cast<qreal>(width())/(nColors - 1);
+        int xT = 0;
+        const float xInc = static_cast<float>(width())/(nColors - 1);
         glUniform2f(GRADIENT_PROGRAM.fMeshSizeLoc,
                     MIN_WIDGET_DIM/(3.f*xInc), 1.f/3);
         for(int j = 1; j < nColors; j++) {
             QColor currentColor = gradient->getColorAt(j);
-            glViewport(qRound(xT), yInverted, qRound(xInc), MIN_WIDGET_DIM);
+            glViewport(xT, yInverted, qRound(xInc), MIN_WIDGET_DIM);
 
             glUniform4f(GRADIENT_PROGRAM.fRGBAColor1Loc,
                         lastColor.redF(), lastColor.greenF(),
@@ -77,7 +77,7 @@ void DisplayedGradientsWidget::paintGL() {
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
                 glUseProgram(GRADIENT_PROGRAM.fID);
             }
-            xT = qRound(xT) + xInc;
+            xT += qRound(xInc);
             lastColor = currentColor;
         }
         if(i == mHoveredGradientId || i == mContextMenuGradientId) {

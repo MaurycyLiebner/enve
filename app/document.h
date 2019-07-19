@@ -13,7 +13,6 @@
 class Gradient;
 class FileDataCacheHandler;
 class Canvas;
-class CanvasWindow;
 enum CanvasMode : short;
 
 class Document : public SingleWidgetTarget {
@@ -57,8 +56,6 @@ public:
     std::map<Canvas*, int> fVisibleScenes;
     Canvas* fActiveScene = nullptr;
 
-    CanvasWindow* fActiveSceneWidget = nullptr;
-
     void setPath(const QString& path) {
         fEvFile = path;
         emit evFilePathChanged(fEvFile);
@@ -79,8 +76,6 @@ public:
     void setActiveSceneFrame(const int frame);
     void incActiveSceneFrame();
     void decActiveSceneFrame();
-
-    void setActiveSceneWidget(CanvasWindow* const sceneWidget);
 
     Gradient * createNewGradient();
     Gradient * duplicateGradient(const int id);
@@ -134,14 +129,11 @@ signals:
     void activeSceneBoxSelectionChanged();
 
     void activeSceneFrameSet(int);
-
-    void activeSceneWidgetSet(CanvasWindow*);
 //
     void selectedPaintSettingsChanged();
 //
     void gradientCreated(Gradient*);
     void gradientRemoved(Gradient*);
-    void gradientRemoved(int);
 //
     void evFilePathChanged(QString);
 };

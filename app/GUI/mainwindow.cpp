@@ -784,7 +784,7 @@ void MainWindow::updateCanvasModeButtonsChecked() {
 //}
 
 void MainWindow::setResolutionFractionValue(const qreal value) {
-    mDocument.fActiveSceneWidget->setResolutionFraction(value);
+    mDocument.fActiveScene->setResolutionFraction(value);
 }
 
 UndoRedoStack *MainWindow::getUndoRedoStack() {
@@ -814,7 +814,7 @@ SimpleBrushWrapper *MainWindow::getCurrentBrush() const {
 }
 
 void MainWindow::queTasksAndUpdate() {
-    if(!isEnabled()) return;
+//    if(!isEnabled()) return;
     if(mCurrentUndoRedoStack) {
         if(mCurrentUndoRedoStack->finishSet()) {
             setFileChangedSinceSaving(true);
@@ -822,13 +822,6 @@ void MainWindow::queTasksAndUpdate() {
     }
 
     mTaskScheduler.queTasks();
-
-    ScrollWidgetVisiblePart::callAllInstanceUpdaters();
-    mObjectSettingsWidget->update();
-    //mKeysView->repaint();
-    mBoxesListAnimationDockWidget->update();
-    mFillStrokeSettings->update();
-    emit updateAll();
 
     if(mCurrentUndoRedoStack) {
         mCurrentUndoRedoStack->startNewSet();

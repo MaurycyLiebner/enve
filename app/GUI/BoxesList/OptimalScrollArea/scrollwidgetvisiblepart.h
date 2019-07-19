@@ -19,7 +19,6 @@ public:
 
     virtual QWidget *createNewSingleWidget();
     void updateVisibleWidgetsContent();
-    void callUpdaters();
 
     void setMainAbstraction(SWT_Abstraction *abs);
     void setCurrentRule(const SWT_BoxRule &rule);

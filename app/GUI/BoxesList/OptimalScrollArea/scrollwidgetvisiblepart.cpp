@@ -15,15 +15,6 @@ ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(ScrollWidget * const parent) :
     setupUpdateFuncs();
 }
 
-void ScrollWidgetVisiblePart::callUpdaters() {
-    if(mVisibleWidgetsContentUpdateScheduled ||
-       mParentHeightUpdateScheduled) {
-        updateParentHeightIfNeeded();
-        updateVisibleWidgetsContentIfNeeded();
-    }
-    update();
-}
-
 void ScrollWidgetVisiblePart::setCurrentRule(
         const SWT_BoxRule &rule) {
     mCurrentRulesCollection.fRule = rule;

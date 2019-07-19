@@ -83,14 +83,12 @@ public:
     void mouseDoubleClickEvent(QMouseEvent *event);
 protected:
     void KFT_setFocusToWidget() {
-        mDocument.setActiveSceneWidget(this);
         if(mCurrentCanvas) mDocument.setActiveScene(mCurrentCanvas);
         setFocus();
         update();
     }
 
     void KFT_clearFocus() {
-        mDocument.setActiveSceneWidget(nullptr);
         clearFocus();
         update();
     }

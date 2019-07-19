@@ -5,10 +5,8 @@ class SingleWidget;
 #include <QWidget>
 
 class MinimalScrollWidgetVisiblePart : public QWidget {
-    Q_OBJECT
 public:
     MinimalScrollWidgetVisiblePart(MinimalScrollWidget * const parent);
-    virtual ~MinimalScrollWidgetVisiblePart();
 
     void setVisibleTop(const int top);
     void setVisibleHeight(const int height);
@@ -27,18 +25,12 @@ public:
     virtual QWidget *createNewSingleWidget() = 0;
     void updateWidgetsWidth();
 
-    virtual void callUpdaters();
-
-    static void callAllInstanceUpdaters();
-    static void addInstance(MinimalScrollWidgetVisiblePart *instance);
-    static void removeInstance(MinimalScrollWidgetVisiblePart *instance);
+    void callUpdaters();
 
     void scheduleContentUpdate();
 protected:
-    static QList<MinimalScrollWidgetVisiblePart*> mAllInstances;
-
-    bool mVisibleWidgetsContentUpdateScheduled = false;
-    bool mParentHeightUpdateScheduled = false;
+    void postEvent();
+    bool event(QEvent* event);
 
     MinimalScrollWidget *mParentWidget;
 
@@ -46,6 +38,10 @@ protected:
 
     int mVisibleTop = 0;
     int mVisibleHeight = 0;
+private:
+    bool mEventSent = false;
+    bool mVisibleWidgetsContentUpdateScheduled = false;
+    bool mParentHeightUpdateScheduled = false;
 };
 
 #endif // MINIMALSCROLLWIDGETVISIBLEPART_H
