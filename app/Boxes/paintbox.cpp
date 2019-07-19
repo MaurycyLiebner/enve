@@ -4,7 +4,7 @@
 #include "Animators/transformanimator.h"
 
 PaintBox::PaintBox() : BoundingBox(TYPE_PAINT) {
-    setName("Paint Box");
+    prp_setName("Paint Box");
     mSurface = SPtrCreate(AnimatedSurface)();
     ca_addChildAnimator(mSurface);
 }

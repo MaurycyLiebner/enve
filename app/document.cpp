@@ -9,6 +9,47 @@ bool Document::FileCompare::operator()(const FileHandler &f1,
     return f1->getFilePath() < f2->getFilePath();
 }
 
+Document::Document(AudioHandler &audioHandler) :
+    fActions(*this), fRenderHandler(*this, audioHandler) {
+    sInstance = this;
+    connect(&fRenderHandler, &RenderHandler::queTasksAndUpdate,
+            this, &Document::actionFinished);
+    connect(&fTaskScheduler, &TaskScheduler::finishedAllQuedTasks,
+            this, &Document::actionFinished);
+}
+
+void Document::actionFinished() {
+    fTaskScheduler.queTasks();
+
+    if(fActiveScene) {
+        if(fActiveScene->newUndoRedoSet())
+            emit documentChanged();
+        emit fActiveScene->requestUpdate();
+    }
+}
+
+void Document::replaceClipboard(const stdsptr<ClipboardContainer> &container) {
+    fClipboardContainer = container;
+}
+
+ClipboardContainer *Document::getClipboardContainer(
+        const ClipboardContainerType &type) {
+    if(!fClipboardContainer) return nullptr;
+    if(type == fClipboardContainer->getType())
+        return fClipboardContainer.get();
+    return nullptr;
+}
+
+PropertyClipboardContainer* Document::getPropertyClipboardContainer() {
+    auto contT = getClipboardContainer(CCT_PROPERTY);
+    return static_cast<PropertyClipboardContainer*>(contT);
+}
+
+BoxesClipboardContainer* Document::getBoxesClipboardContainer() {
+    auto contT = getClipboardContainer(CCT_BOXES);
+    return static_cast<BoxesClipboardContainer*>(contT);
+}
+
 void Document::setCanvasMode(const CanvasMode mode) {
     fCanvasMode = mode;
     emit canvasModeSet(mode);
@@ -55,15 +96,16 @@ void Document::setActiveScene(Canvas * const scene) {
     }
     fActiveScene = scene;
     if(fActiveScene) {
-        connect(fActiveScene, &Canvas::boxSelectionChanged,
-                this, &Document::activeSceneBoxSelectionChanged);
+        connect(fActiveScene, &Canvas::currentBoxChanged,
+                this, &Document::currentBoxChanged);
         connect(fActiveScene, &Canvas::selectedPaintSettingsChanged,
                 this, &Document::selectedPaintSettingsChanged);
         connect(fActiveScene, &Canvas::destroyed,
                 this, &Document::clearActiveScene);
+        emit currentBoxChanged(fActiveScene->getCurrentBox());
+        emit selectedPaintSettingsChanged();
     }
     emit activeSceneSet(scene);
-    emit activeSceneBoxSelectionChanged();
 }
 
 void Document::clearActiveScene() {
@@ -125,6 +167,7 @@ void Document::clear() {
     const int nScenes = fScenes.count();
     for(int i = 0; i < nScenes; i++)
         removeScene(0);
+    replaceClipboard(nullptr);
 }
 
 void Document::SWT_setupAbstraction(SWT_Abstraction * const abstraction,

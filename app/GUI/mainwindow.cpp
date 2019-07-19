@@ -58,8 +58,6 @@ MainWindow::MainWindow(QWidget *parent)
       mMemoryHandler(new MemoryHandler(this)),
       mVideoEncoder(SPtrCreate(VideoEncoder)()),
       mDocument(mAudioHandler), mActions(mDocument) {
-    connect(&mDocument.fRenderHandler, &RenderHandler::queTasksAndUpdate,
-            this, &MainWindow::actionFinished);
     sMainWindowInstance = this;
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
@@ -69,8 +67,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(&mDocument, &Document::evFilePathChanged,
             this, &MainWindow::updateTitle);
+    connect(&mDocument, &Document::documentChanged,
+            this, [this]() {
+        setFileChangedSinceSaving(true);
+    });
     connect(&mDocument, &Document::activeSceneSet,
             this, &MainWindow::updateSettingsForCurrentCanvas);
+
+    connect(&mDocument, &Document::currentBoxChanged,
+            this, &MainWindow::setCurrentBox);
 
     QFile customSS(EnveSettings::sSettingsDir() + "/stylesheet.qss");
     if(customSS.exists()) {
@@ -123,7 +128,7 @@ MainWindow::MainWindow(QWidget *parent)
     [this](ShaderEffectProgram * program) {
         for(const auto& scene : mDocument.fScenes)
             scene->updateIfUsesProgram(program);
-        actionFinished();
+        mDocument.actionFinished();
     });
 
     mLayoutHandler = new LayoutHandler(mDocument, mAudioHandler);
@@ -207,10 +212,10 @@ MainWindow::MainWindow(QWidget *parent)
 //                mBoxListWidget->getVisiblePartWidget());
 
 //    Canvas *canvas = new Canvas(mFillStrokeSettings, mCanvasWindow);
-//    canvas->setName("Canvas 0");
+//    canvas->prp_setName("Canvas 0");
 //    mCanvasWindow->addCanvasToListAndSetAsCurrent(canvas);
 //    mCanvas = mCanvasWindow->getCurrentCanvas();
-//    mCurrentCanvasComboBox->addItem(mCanvas->getName());
+//    mCurrentCanvasComboBox->addItem(mCanvas->prp_getName());
 
     setCentralWidget(mLayoutHandler->sceneLayout());
 
@@ -233,13 +238,11 @@ MainWindow::MainWindow(QWidget *parent)
     mEventFilterDisabled = false;
 
     try {
-        mTaskScheduler.initializeGPU();
+        mDocument.fTaskScheduler.initializeGPU();
     } catch(const std::exception& e) {
         gPrintExceptionFatal(e);
     }
 
-    connect(&mTaskScheduler, &TaskScheduler::finishedAllQuedTasks,
-            this, &MainWindow::actionFinished);
 
     QApplication::instance()->installEventFilter(this);
 }
@@ -247,7 +250,6 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() {
 //    mtaskExecutorThread->terminate();
 //    mtaskExecutorThread->quit();
-    replaceClipboard(nullptr);
     BoxSingleWidget::clearStaticPixmaps();
 }
 
@@ -547,19 +549,6 @@ void MainWindow::updateSettingsForCurrentCanvas(Canvas* const scene) {
 //    mBrushSettingsWidget->setCurrentBrush(canvas->getCurrentBrush());
 }
 
-void MainWindow::replaceClipboard(const stdsptr<ClipboardContainer>& container) {
-    mClipboardContainer = container;
-}
-
-ClipboardContainer *MainWindow::getClipboardContainer(
-        const ClipboardContainerType &type) {
-    if(!mClipboardContainer) return nullptr;
-    if(type == mClipboardContainer->getType()) {
-        return mClipboardContainer.get();
-    }
-    return nullptr;
-}
-
 #include <QSpacerItem>
 void MainWindow::setupStatusBar() {
     mUsageWidget = new UsageWidget(this);
@@ -787,7 +776,7 @@ void MainWindow::setResolutionFractionValue(const qreal value) {
     mDocument.fActiveScene->setResolutionFraction(value);
 }
 
-void MainWindow::setFileChangedSinceSaving(bool changed) {
+void MainWindow::setFileChangedSinceSaving(const bool changed) {
     if(changed == mChangedSinceSaving) return;
     mChangedSinceSaving = changed;
     updateTitle();
@@ -809,22 +798,6 @@ SimpleBrushWrapper *MainWindow::getCurrentBrush() const {
     return mBrushSelectionWidget->getCurrentBrush();
 }
 
-void MainWindow::actionFinished() {
-    if(mCurrentUndoRedoStack) {
-        if(mCurrentUndoRedoStack->finishSet()) {
-            setFileChangedSinceSaving(true);
-        }
-    }
-
-    mTaskScheduler.queTasks();
-
-    if(mCurrentUndoRedoStack) {
-        mCurrentUndoRedoStack->startNewSet();
-    }
-
-    if(mDocument.fActiveScene)
-        emit mDocument.fActiveScene->requestUpdate();
-}
 #include "Boxes/textbox.h"
 void MainWindow::setCurrentBox(BoundingBox *box) {
     if(!box) {
@@ -889,7 +862,7 @@ void MainWindow::enable() {
     enableEventFilter();
     delete mGrayOutWidget;
     mGrayOutWidget = nullptr;
-    actionFinished();
+    mDocument.actionFinished();
 }
 
 void MainWindow::newFile() {
@@ -985,7 +958,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
         } else {
             returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);
         }
-        if(event->key() != Qt::Key_Control) actionFinished();
+        if(event->key() != Qt::Key_Control) mDocument.actionFinished();
         return returnBool;
     }
     return false;
@@ -1008,7 +981,6 @@ void MainWindow::clearAll() {
 //        delete cont;
 //    }
 //    mClipboardContainers.clear();
-    replaceClipboard(nullptr);
     FileCacheHandler::sClear();
     //mBoxListWidget->clearAll();
 }
@@ -1137,7 +1109,7 @@ void MainWindow::importImageSequence() {
     if(!folder.isEmpty()) {
         mDocument.fActiveScene->createAnimationBoxForPaths(folder);
     }
-    actionFinished();
+    mDocument.actionFinished();
 }
 
 //void MainWindow::importVideo() {

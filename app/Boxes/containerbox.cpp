@@ -285,7 +285,7 @@ void ContainerBox::promoteToLayer() {
     if(prp_mName.contains("Group")) {
         auto newName  = prp_mName;
         newName.replace("Group", "Layer");
-        setName(newName);
+        prp_setName(newName);
     }
     mEffectsAnimators->SWT_enable();
     mGPUEffectsAnimators->SWT_enable();
@@ -301,7 +301,7 @@ void ContainerBox::demoteToGroup() {
     if(prp_mName.contains("Layer")) {
         auto newName  = prp_mName;
         newName.replace("Layer", "Group");
-        setName(newName);
+        prp_setName(newName);
     }
     mEffectsAnimators->SWT_disable();
     mGPUEffectsAnimators->SWT_disable();

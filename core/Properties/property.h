@@ -228,12 +228,13 @@ signals:
     void prp_addingKey(Key*);
     void prp_replaceWith(const qsptr<Property>&, const qsptr<Property>&);
     void prp_prependWith(Property*, const qsptr<Property>&);
+    void prp_nameChanged(const QString&);
 protected:
     bool prp_mOwnUpdater = false;
     bool mDrawOnCanvas = false;
     int prp_mParentFrameShift = 0;
     stdsptr<PropertyUpdater> prp_mUpdater;
-    QString prp_mName = "";
+    QString prp_mName;
     stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;
     qptr<Property> mParent_k;
     stdsptr<PointsHandler> mPointsHandler;

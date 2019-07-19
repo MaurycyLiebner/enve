@@ -24,7 +24,7 @@ void BoxTargetWidget::dropEvent(QDropEvent *event) {
         mProperty->setTarget(targetT);
         mDragging = false;
         update();
-        MainWindow::getInstance()->actionFinished();
+        Document::sInstance->actionFinished();
     }
 }
 
@@ -97,7 +97,7 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
             } else {
                 mProperty->setTarget(nullptr);
             }
-            MainWindow::getInstance()->actionFinished();
+            Document::sInstance->actionFinished();
         } else {
 
         }
@@ -125,7 +125,7 @@ void BoxTargetWidget::paintEvent(QPaintEvent *) {
         if(!target) {
             p.drawText(rect(), Qt::AlignCenter, "-none-");
         } else {
-            p.drawText(rect(), Qt::AlignCenter, target->getName());
+            p.drawText(rect(), Qt::AlignCenter, target->prp_getName());
         }
     }
 

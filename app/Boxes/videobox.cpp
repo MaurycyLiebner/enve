@@ -13,7 +13,7 @@ extern "C" {
 #include "filesourcescache.h"
 
 VideoBox::VideoBox() : AnimationBox(TYPE_VIDEO) {
-    setName("Video");
+    prp_setName("Video");
     const auto flar = GetAsSPtr(mDurationRectangle,
                                 FixedLenAnimationRect);
     mSound = SPtrCreate(SingleSound)(flar);

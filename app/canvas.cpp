@@ -4,7 +4,6 @@
 #include <QDebug>
 #include <QApplication>
 #include "undoredo.h"
-#include "GUI/mainwindow.h"
 #include "MovablePoints/pathpivot.h"
 #include "Boxes/imagebox.h"
 #include "Sound/soundcomposition.h"
@@ -34,7 +33,6 @@ Canvas::Canvas(Document &document,
     ContainerBox(TYPE_CANVAS), mDocument(document), mPaintTarget(this) {
     connect(&mDocument, &Document::canvasModeSet,
             this, &Canvas::setCanvasMode);
-    mMainWindow = MainWindow::getInstance();
     std::function<bool(int)> changeFrameFunc =
     [this](const int undoRedoFrame) {
         if(mDocument.fActiveScene != this) return false;
@@ -46,9 +44,7 @@ Canvas::Canvas(Document &document,
     };
     mUndoRedoStack = SPtrCreate(UndoRedoStack)(changeFrameFunc);
     mFps = fps;
-    connect(this, &Canvas::nameChanged, this, [this]() {
-        emit canvasNameChanged(this, prp_mName);
-    });
+
     mBackgroundColor->qra_setCurrentValue(QColor(75, 75, 75));
     ca_addChildAnimator(mBackgroundColor);
     mBackgroundColor->prp_setInheritedUpdater(
@@ -599,7 +595,7 @@ void Canvas::deleteAction() {
 
 void Canvas::copyAction() {
     const auto container = SPtrCreate(BoxesClipboardContainer)();
-    mMainWindow->replaceClipboard(container);
+    Document::sInstance->replaceClipboard(container);
     QBuffer target(container->getBytesArray());
     target.open(QIODevice::WriteOnly);
     const int nBoxes = mSelectedBoxes.count();
@@ -617,7 +613,7 @@ void Canvas::copyAction() {
 void Canvas::pasteAction() {
     const auto container =
             static_cast<BoxesClipboardContainer*>(
-            mMainWindow->getClipboardContainer(CCT_BOXES));
+            Document::sInstance->getClipboardContainer(CCT_BOXES));
     if(!container) return;
     clearBoxesSelection();
     container->pasteTo(mCurrentContainer);
@@ -896,6 +892,12 @@ void Canvas::finishMaxFramePosTransformForAllSelected() {
 void Canvas::moveMaxFrameForAllSelected(const int dFrame) {
     for(const auto& box : mSelectedBoxes)
         box->moveMaxFrame(dFrame);
+}
+
+bool Canvas::newUndoRedoSet() {
+    const bool ret = mUndoRedoStack->finishSet();
+    mUndoRedoStack->startNewSet();
+    return ret;
 }
 
 void Canvas::undo() {

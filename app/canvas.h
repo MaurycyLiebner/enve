@@ -33,7 +33,6 @@ class Brush;
 class UndoRedoStack;
 class ExternalLinkBox;
 struct ShaderEffectCreator;
-class CanvasWindow;
 class SingleSound;
 class VideoBox;
 class ImageBox;
@@ -252,6 +251,8 @@ public:
     void removeSelectedPointsAndClearList();
     void removeSelectedBoxesAndClearList();
 
+    BoundingBox* getCurrentBox() const { return mCurrentBox; }
+    void setCurrentBox(BoundingBox* const box);
     void addBoxToSelection(BoundingBox * const box);
     void removeBoxFromSelection(BoundingBox * const box);
     void clearBoxesSelection();
@@ -400,11 +401,10 @@ protected:
     void handleRightButtonMousePress(const MouseEvent &e);
     void handleLeftButtonMousePress(const MouseEvent &e);
 signals:
-    void canvasNameChanged(Canvas *, QString);
     void requestCanvasMode(CanvasMode);
     void requestUpdate();
     void newFrameRange(FrameRange);
-    void boxSelectionChanged();
+    void currentBoxChanged(BoundingBox*);
     void selectedPaintSettingsChanged();
     void currentFrameChanged(int);
     void currentContainerSet(ContainerBox*);
@@ -541,6 +541,8 @@ public:
     void finishMaxFramePosTransformForAllSelected();
     void moveMaxFrameForAllSelected(const int dFrame);
 
+    bool newUndoRedoSet();
+
     void undo();
     void redo();
 
@@ -630,8 +632,7 @@ protected:
 
     qreal mResolutionFraction;
 
-    MainWindow *mMainWindow;
-
+    qptr<BoundingBox> mCurrentBox;
     qptr<Circle> mCurrentCircle;
     qptr<Rectangle> mCurrentRectangle;
     qptr<TextBox> mCurrentTextBox;

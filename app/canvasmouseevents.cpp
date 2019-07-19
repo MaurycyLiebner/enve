@@ -138,7 +138,7 @@ void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
                    mCurrentMode == MOVE_POINT) &&
                   boxAt->SWT_isTextBox()) {
             e.fReleaseMouse();
-            GetAsPtr(boxAt, TextBox)->openTextEditor(mMainWindow);
+            GetAsPtr(boxAt, TextBox)->openTextEditor(e.fWidget);
         } else if(mCurrentMode == MOVE_BOX &&
                   boxAt->SWT_isSmartVectorPath()) {
             emit requestCanvasMode(MOVE_POINT);

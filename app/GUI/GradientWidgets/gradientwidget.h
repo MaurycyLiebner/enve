@@ -9,7 +9,7 @@
 class GradientWidget : public QWidget {
     Q_OBJECT
 public:
-    GradientWidget(QWidget *parent, MainWindow *mainWindow);
+    GradientWidget(QWidget * const parent);
 
     void setCurrentGradient(Gradient *gradient,
                             const bool emitChange = true);
@@ -63,7 +63,6 @@ private:
     int mQuorterHeight = 32;
     int mScrollItemHeight;
 
-    MainWindow *mMainWindow;
     Gradient *mCurrentGradient = nullptr;
     ColorAnimator *mCurrentColor = nullptr;
     int mCurrentColorId = 0;

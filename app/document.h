@@ -9,6 +9,8 @@
 #include "GUI/BrushWidgets/simplebrushwrapper.h"
 #include "actions.h"
 #include "renderhandler.h"
+#include "taskscheduler.h"
+#include "clipboardcontainer.h"
 
 class Gradient;
 class FileDataCacheHandler;
@@ -22,15 +24,14 @@ class Document : public SingleWidgetTarget {
         bool operator()(const FileHandler& f1, const FileHandler& f2);
     };
 public:
-    Document(AudioHandler& audioHandler) :
-        fActions(*this), fRenderHandler(*this, audioHandler) {
-        sInstance = this;
-    }
+    Document(AudioHandler& audioHandler);
 
     static Document* sInstance;
 
     Actions fActions;
     RenderHandler fRenderHandler;
+
+    stdsptr<ClipboardContainer> fClipboardContainer;
 
     QString fEvFile;
 
@@ -44,6 +45,10 @@ public:
     // all in document
     QList<qsptr<Gradient>> fGradients;
 
+    QString fFontFamily;
+    QString fFontStyle;
+    qreal fFontSize;
+
     FillSettings fFill;
     StrokeSettings fStroke;
 
@@ -55,6 +60,16 @@ public:
     QList<qsptr<Canvas>> fScenes;
     std::map<Canvas*, int> fVisibleScenes;
     Canvas* fActiveScene = nullptr;
+    qptr<BoundingBox> fCurrentBox;
+
+    TaskScheduler fTaskScheduler;
+
+    void actionFinished();
+
+    void replaceClipboard(const stdsptr<ClipboardContainer>& container);
+    ClipboardContainer *getClipboardContainer(const ClipboardContainerType &type);
+    PropertyClipboardContainer* getPropertyClipboardContainer();
+    BoxesClipboardContainer* getBoxesClipboardContainer();
 
     void setPath(const QString& path) {
         fEvFile = path;
@@ -126,9 +141,10 @@ signals:
     void sceneRemoved(int);
 //
     void activeSceneSet(Canvas*);
-    void activeSceneBoxSelectionChanged();
 
     void activeSceneFrameSet(int);
+//
+    void currentBoxChanged(BoundingBox*);
 //
     void selectedPaintSettingsChanged();
 //
@@ -136,6 +152,7 @@ signals:
     void gradientRemoved(Gradient*);
 //
     void evFilePathChanged(QString);
+    void documentChanged();
 };
 
 #endif // DOCUMENT_H

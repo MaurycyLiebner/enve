@@ -8,9 +8,8 @@
 #include "MovablePoints/pointshandler.h"
 #include "PathEffects/patheffectanimators.h"
 
-Circle::Circle() :
-    PathBox(TYPE_CIRCLE) {
-    setName("Circle");
+Circle::Circle() : PathBox(TYPE_CIRCLE) {
+    prp_setName("Circle");
 
     setPointsHandler(SPtrCreate(PointsHandler)());
 

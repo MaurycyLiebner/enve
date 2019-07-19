@@ -17,7 +17,6 @@
 KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
                    QWidget *parent) :
     QWidget(parent) {
-    mMainWindow = MainWindow::getInstance();
     mBoxesListVisible = boxesListVisible;
     mBoxesListVisible->setKeysView(this);
 
@@ -42,6 +41,10 @@ void KeysView::setCurrentScene(Canvas * const scene) {
                 [this](ContainerBox* const container) {
             mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
                         container, SWT_TARGET_CURRENT_GROUP);
+        });
+        connect(scene, &Canvas::requestUpdate, this, [this]() {
+            update();
+            mBoxesListVisible->update();
         });
     }
 }
@@ -211,7 +214,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
     }
 
     mValueInput.clearAndDisableInput();
-    mMainWindow->actionFinished();
+    Document::sInstance->actionFinished();
 }
 
 stdsptr<KeysClipboardContainer> KeysView::getSelectedKeysClipboardContainer() {
@@ -243,7 +246,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_V) {
         if(event->isAutoRepeat()) return false;
-        auto cont = mMainWindow->getClipboardContainer(CCT_KEYS);
+        auto cont = Document::sInstance->getClipboardContainer(CCT_KEYS);
         const auto container = GetAsPtr(cont, KeysClipboardContainer);
         if(!container) return false;
         container->paste(mCurrentScene->getCurrentFrame(), this, true, true);
@@ -252,7 +255,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
            event->key() == Qt::Key_C) {
             if(event->isAutoRepeat()) return false;
             auto container = getSelectedKeysClipboardContainer();
-            mMainWindow->replaceClipboard(container);
+            Document::sInstance->replaceClipboard(container);
         } else if(event->key() == Qt::Key_S) {
             if(!mMovingKeys) {
                 mValueInput.setupScale();
@@ -665,7 +668,7 @@ void KeysView::handleMouseMove(const QPoint &pos,
         updateHovered(posU);
     }
 
-    mMainWindow->actionFinished();
+    Document::sInstance->actionFinished();
     mLastMovePos = pos;
 }
 
@@ -725,7 +728,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                 mSelecting = false;
             } else if(mMovingKeys) {
                 if(mFirstMove && mLastPressedKey) {
-                    if(!mMainWindow->isShiftPressed()) {
+                    if(!(QApplication::keyboardModifiers() & Qt::ShiftModifier)) {
                         clearKeySelection();
                         addKeyToSelection(mLastPressedKey);
                     }
@@ -765,7 +768,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
     releaseMouseAndDontTrack();
 
     mValueInput.clearAndDisableInput();
-    mMainWindow->actionFinished();
+    Document::sInstance->actionFinished();
 }
 
 void KeysView::setFramesRange(const FrameRange& range) {

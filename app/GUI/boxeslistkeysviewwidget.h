@@ -89,7 +89,6 @@ private:
     ScrollArea *mBoxesListScrollArea;
     BoxScrollWidget *mBoxesListWidget;
     KeysView *mKeysView;
-    MainWindow *mMainWindow;
     AnimationDockWidget *mAnimationDockWidget;
 };
 

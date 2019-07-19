@@ -394,6 +394,6 @@ void Actions::setPaintMode() {
 }
 
 void Actions::afterAction() const {
-    MainWindow::getInstance()->actionFinished();
+    Document::sInstance->actionFinished();
     emit mActiveScene->requestUpdate();
 }

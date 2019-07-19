@@ -69,16 +69,6 @@ public:
 
 //    void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = nullptr;
 
-    static PropertyClipboardContainer* getPropertyClipboardContainer() {
-        auto contT = getInstance()->getClipboardContainer(CCT_PROPERTY);
-        return static_cast<PropertyClipboardContainer*>(contT);
-    }
-
-    static BoxesClipboardContainer* getBoxesClipboardContainer() {
-        auto contT = getInstance()->getClipboardContainer(CCT_BOXES);
-        return static_cast<BoxesClipboardContainer*>(contT);
-    }
-
     static MainWindow *getInstance();
 
     static bool isShiftPressed();
@@ -93,7 +83,7 @@ public:
     void loadEVFile(const QString &path);
     void clearAll();
     void updateTitle();
-    void setFileChangedSinceSaving(bool changed);
+    void setFileChangedSinceSaving(const bool changed);
     void disableEventFilter();
     void enableEventFilter();
 
@@ -113,9 +103,6 @@ public:
 
     void updateSettingsForCurrentCanvas(Canvas * const scene);
 
-    void replaceClipboard(const stdsptr<ClipboardContainer> &container);
-    ClipboardContainer *getClipboardContainer(
-            const ClipboardContainerType &type);
     void addCanvas(Canvas * const newCanvas);
 
     FontsWidget *getFontsWidget() const {
@@ -131,9 +118,7 @@ public:
    // void stopPreview();
     void setResolutionFractionValue(const qreal value);
 
-    void actionFinished();
     void addCanvasToRenderQue();
-    void canvasNameChanged(Canvas *canvas, const QString &name);
 
     const QStringList& getRecentFiles() const {
         return mRecentFiles;
@@ -212,7 +197,6 @@ private:
 
     QStringList mRecentFiles;
 
-    stdsptr<ClipboardContainer> mClipboardContainer;
 //    bool mRendering = false;
 
 //    bool mCancelLastBoxUpdate = false;

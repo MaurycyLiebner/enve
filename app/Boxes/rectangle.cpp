@@ -7,7 +7,7 @@
 #include "Animators/gpueffectanimators.h"
 
 Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
-    setName("Rectangle");
+    prp_setName("Rectangle");
 
     setPointsHandler(SPtrCreate(PointsHandler)());
 

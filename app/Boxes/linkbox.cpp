@@ -9,7 +9,7 @@
 
 ExternalLinkBox::ExternalLinkBox() : ContainerBox(TYPE_LAYER) {
     mType = TYPE_EXTERNAL_LINK;
-    setName("Link Empty");
+    prp_setName("Link Empty");
 }
 
 void ExternalLinkBox::reload() {
@@ -28,7 +28,7 @@ void ExternalLinkBox::changeSrc(QWidget* dialogParent) {
 
 void ExternalLinkBox::setSrc(const QString &src) {
     mSrc = src;
-    setName("Link " + src);
+    prp_setName("Link " + src);
     reload();
 }
 

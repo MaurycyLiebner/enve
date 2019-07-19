@@ -7,7 +7,7 @@
 #include "GUI/GradientWidgets/displayedgradientswidget.h"
 #include "Animators/gradient.h"
 
-GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
+GradientWidget::GradientWidget(QWidget * const parent) :
     QWidget(parent) {
     setFixedHeight(qRound((3 + mNumberVisibleGradients + 0.5)*MIN_WIDGET_DIM));
     mMainLayout = new QVBoxLayout(this);
@@ -23,7 +23,6 @@ GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
 
     mScrollItemHeight = MIN_WIDGET_DIM;
 
-    mMainWindow = mainWindow;  
 
     connect(Document::sInstance, &Document::gradientCreated,
             this, [this](Gradient* const gradient) {
@@ -142,7 +141,7 @@ void GradientWidget::colorRightPress(const int x, const QPoint &point) {
                 finishGradientTransform();
                 updateAll();
             }
-            mMainWindow->actionFinished();
+            Document::sInstance->actionFinished();
         } else {
 
         }
@@ -169,7 +168,7 @@ void GradientWidget::moveColor(const int x) {
             setCurrentColorId(colorId);
             finishGradientTransform();
             updateAll();
-            mMainWindow->actionFinished();
+            Document::sInstance->actionFinished();
         }
     }
 }
@@ -182,7 +181,7 @@ void GradientWidget::updateAfterFrameChanged(const int absFrame) {
 void GradientWidget::gradientLeftPressed(const int gradId) {
     if(gradId >= Document::sInstance->fGradients.count() || gradId < 0) return;
     setCurrentGradient(gradId);
-    MainWindow::getInstance()->actionFinished();
+    Document::sInstance->actionFinished();
 }
 
 void GradientWidget::gradientContextMenuReq(const int gradId,
@@ -206,7 +205,7 @@ void GradientWidget::gradientContextMenuReq(const int gradId,
             newGrad->addColor(Qt::white);
             setCurrentGradient(newGrad);
         }
-        mMainWindow->actionFinished();
+        Document::sInstance->actionFinished();
     } else {
 
     }

@@ -24,7 +24,7 @@ public:
 
     void setValueSliderVisibile(bool valueSliderVisible);
     void setNameVisible(bool nameVisible);
-    void setName(QString name);
+    void setName(const QString& name);
     void setNumberDecimals(int decimals);
 
     void setValueNoUpdate(const qreal value);

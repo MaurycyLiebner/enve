@@ -83,7 +83,7 @@ void Canvas::addSelectedBoxesActions(QMenu * const qMenu) {
 #include "GUI/newcanvasdialog.h"
 void Canvas::addActionsToMenu(QMenu * const menu) {
     const BoxesClipboardContainer * const clipboard =
-            MainWindow::getBoxesClipboardContainer();
+            mDocument.getBoxesClipboardContainer();
     if(clipboard) {
         QAction * const pasteAct = menu->addAction("Paste", this,
                                                   &Canvas::pasteAction);
@@ -98,7 +98,7 @@ void Canvas::addActionsToMenu(QMenu * const menu) {
             newLink->centerPivotPosition();
         };
         QAction * const action = linkCanvasMenu->addAction(
-                    canvas->getName(), this, slot);
+                    canvas->prp_getName(), this, slot);
         if(canvas == this) {
             action->setEnabled(false);
             action->setVisible(false);
@@ -348,12 +348,9 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
         const auto newPath = SPtrCreate(TextBox)();
         newPath->planCenterPivotPosition();
-        const FontsWidget * const fonstWidget =
-                mMainWindow->getFontsWidget();
-        newPath->setSelectedFontFamilyAndStyle(
-                    fonstWidget->getCurrentFontFamily(),
-                    fonstWidget->getCurrentFontStyle());
-        newPath->setSelectedFontSize(fonstWidget->getCurrentFontSize());
+        newPath->setSelectedFontFamilyAndStyle(mDocument.fFontFamily,
+                                               mDocument.fFontStyle);
+        newPath->setSelectedFontSize(mDocument.fFontSize);
         mCurrentContainer->addContainedBox(newPath);
         newPath->setAbsolutePos(e.fPos);
 
@@ -553,7 +550,7 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
         //mCanvasWindow->setCanvasMode(MOVE_PATH);
     } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
         if(mCurrentTextBox) {
-            mCurrentTextBox->openTextEditor(mMainWindow);
+            mCurrentTextBox->openTextEditor(e.fWidget);
         }
     }
     mValueInput.clearAndDisableInput();

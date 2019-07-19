@@ -126,7 +126,7 @@ RenderInstanceSettings::RenderInstanceSettings(Canvas* canvas) {
 }
 
 const QString &RenderInstanceSettings::getName() {
-    return mTargetCanvas->getName();
+    return mTargetCanvas->prp_getName();
 }
 
 void RenderInstanceSettings::setOutputDestination(

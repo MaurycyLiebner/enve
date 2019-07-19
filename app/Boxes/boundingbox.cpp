@@ -83,7 +83,7 @@ void BoundingBox::writeBoundingBox(QIODevice * const dst) {
 
 void BoundingBox::readBoundingBox(QIODevice * const src) {
     StaticComplexAnimator::readProperty(src);
-    setName(gReadString(src));
+    prp_setName(gReadString(src));
     src->read(rcChar(&mReadId), sizeof(int));
     src->read(rcChar(&mVisible), sizeof(bool));
     src->read(rcChar(&mLocked), sizeof(bool));
@@ -421,9 +421,19 @@ QPointF BoundingBox::getPivotAbsPos() {
     return mTransformAnimator->getPivotAbs();
 }
 
-void BoundingBox::select() {
-    mSelected = true;
+void BoundingBox::setSelected(const bool select) {
+    if(mSelected == select) return;
+    mSelected = select;
     SWT_scheduleContentUpdate(SWT_BR_SELECTED);
+    emit selectionChanged(select);
+}
+
+void BoundingBox::select() {
+    setSelected(true);
+}
+
+void BoundingBox::deselect() {
+    setSelected(false);
 }
 
 void BoundingBox::updateRelBoundingRectFromRenderData(
@@ -513,12 +523,6 @@ stdsptr<BoundingBoxRenderData> BoundingBox::getCurrentRenderData(const int relFr
 
 void BoundingBox::nullifyCurrentRenderData(const int relFrame) {
     mCurrentRenderDataHandler.removeItemAtRelFrame(relFrame);
-}
-
-void BoundingBox::deselect() {
-    mSelected = false;
-
-    SWT_scheduleContentUpdate(SWT_BR_SELECTED);
 }
 
 bool BoundingBox::isContainedIn(const QRectF &absRect) const {
@@ -1076,17 +1080,6 @@ void BoundingBox::removePathEffect(const qsptr<PathEffect> &) {}
 void BoundingBox::removeFillPathEffect(const qsptr<PathEffect> &) {}
 
 void BoundingBox::removeOutlinePathEffect(const qsptr<PathEffect> &) {}
-
-void BoundingBox::setName(const QString &name) {
-    if(name == prp_mName) return;
-    prp_mName = name;
-
-    emit nameChanged(name);
-}
-
-const QString &BoundingBox::getName() const {
-    return prp_mName;
-}
 
 bool BoundingBox::isVisibleAndInVisibleDurationRect() const {
     return isFrameInDurationRect(anim_getCurrentRelFrame()) && mVisible;

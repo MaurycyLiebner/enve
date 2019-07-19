@@ -43,10 +43,10 @@ public:
             getLinkTarget()->removeLinkingBox(this);
         }
         if(!linkTarget) {
-            setName("empty link");
+            prp_setName("empty link");
             mBoxTarget->setTarget(nullptr);
         } else {
-            setName(linkTarget->getName() + " link");
+            prp_setName(linkTarget->prp_getName() + " link");
             mBoxTarget->setTarget(linkTarget);
             linkTarget->addLinkingBox(this);
             connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,

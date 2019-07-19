@@ -89,7 +89,9 @@ qreal Property::prp_relFrameToAbsFrameF(const qreal relFrame) const {
 }
 
 void Property::prp_setName(const QString &newName) {
+    if(newName == prp_mName) return;
     prp_mName = newName;
+    emit prp_nameChanged(newName);
 }
 
 void Property::prp_setUpdater(const stdsptr<PropertyUpdater>& updater) {

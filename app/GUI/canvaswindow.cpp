@@ -29,11 +29,13 @@ CanvasWindow::CanvasWindow(Document &document,
 
     this->setAcceptDrops(true);
     this->setMouseTracking(true);
+
+    KFT_setFocus();
 }
 
 CanvasWindow::~CanvasWindow() {
     setCurrentCanvas(nullptr);
-    KFT_clearFocus();
+    if(KFT_hasFocus()) KFT_setCurrentTarget(nullptr);
 }
 
 Canvas *CanvasWindow::getCurrentCanvas() {
@@ -55,7 +57,7 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         mDocument.removeVisibleScene(mCurrentCanvas);
     }
     mCurrentCanvas = canvas;
-    if(hasFocus()) mDocument.setActiveScene(mCurrentCanvas);
+    if(KFT_hasFocus()) mDocument.setActiveScene(mCurrentCanvas);
     if(mCurrentCanvas) {
         mDocument.addVisibleScene(mCurrentCanvas);
         mCurrentCanvas->setIsCurrentCanvas(true);
@@ -122,7 +124,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
 void CanvasWindow::queTasksAndUpdate() {
     updatePivotIfNeeded();
     update();
-    MainWindow::getInstance()->actionFinished();
+    Document::sInstance->actionFinished();
 }
 
 bool CanvasWindow::hasNoCanvas() {
@@ -131,7 +133,7 @@ bool CanvasWindow::hasNoCanvas() {
 
 void CanvasWindow::renameCurrentCanvas(const QString &newName) {
     if(!mCurrentCanvas) return;
-    mCurrentCanvas->setName(newName);
+    mCurrentCanvas->prp_setName(newName);
 }
 
 #include "glhelpers.h"
@@ -145,7 +147,7 @@ void CanvasWindow::renderSk(SkCanvas * const canvas,
         canvas->restore();
     }
 
-    if(hasFocus()) {
+    if(KFT_hasFocus()) {
         SkPaint paint;
         paint.setColor(SK_ColorRED);
         paint.setStrokeWidth(4);
@@ -166,7 +168,7 @@ void CanvasWindow::tabletEvent(QTabletEvent *e) {
 }
 
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
-    if(!hasFocus()) KFT_setFocus();
+    if(!KFT_hasFocus()) KFT_setFocus();
     if(!mCurrentCanvas || mBlockInput) return;
     if(mMouseGrabber && event->button() == Qt::LeftButton) return;
     const auto pos = mapToCanvasCoord(event->pos());
@@ -534,7 +536,7 @@ void CanvasWindow::dropEvent(QDropEvent *event) {
 void CanvasWindow::dragEnterEvent(QDragEnterEvent *event) {
     if(event->mimeData()->hasUrls()) {
         event->acceptProposedAction();
-        if(!hasFocus()) KFT_setFocus();
+        if(!KFT_hasFocus()) KFT_setFocus();
     }
 }
 

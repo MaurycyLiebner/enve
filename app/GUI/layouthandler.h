@@ -9,7 +9,7 @@ struct LayoutData {
     }
 
     LayoutData(Canvas* const scene) :
-        fName(scene->getName()), fScene(scene) {
+        fName(scene->prp_getName()), fScene(scene) {
         reset();
     }
 
@@ -155,9 +155,9 @@ private:
     void newForScene(Canvas* const scene) {
         mLayouts.insert(mLayouts.begin() + mNumberLayouts,
                         LayoutData(scene));
-        mComboBox->insertItem(mNumberLayouts, scene->getName());
+        mComboBox->insertItem(mNumberLayouts, scene->prp_getName());
         if(mCurrentId >= mNumberLayouts) mCurrentId++;
-        connect(scene, &Canvas::nameChanged, this, [this, scene]() {
+        connect(scene, &Canvas::prp_nameChanged, this, [this, scene]() {
             sceneRenamed(scene);
         });
     }
@@ -180,7 +180,7 @@ private:
     }
 
     void sceneRenamed(const Canvas* const scene) {
-        rename(sceneId(scene), scene->getName());
+        rename(sceneId(scene), scene->prp_getName());
     }
 
     void removeForScene(const Canvas* const scene) {

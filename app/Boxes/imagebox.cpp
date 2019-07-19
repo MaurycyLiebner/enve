@@ -6,7 +6,7 @@
 #include "FileCacheHandlers/imagecachehandler.h"
 
 ImageBox::ImageBox() : BoundingBox(TYPE_IMAGE) {
-    setName("Image");
+    prp_setName("Image");
 }
 
 ImageBox::ImageBox(const QString &filePath) : ImageBox() {

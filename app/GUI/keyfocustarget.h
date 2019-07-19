@@ -8,7 +8,7 @@ public:
     KeyFocusTarget();
     virtual ~KeyFocusTarget();
 
-    virtual bool KFT_hasFocus() {
+    bool KFT_hasFocus() {
         return KFT_mCurrentTarget == this;
     }
 

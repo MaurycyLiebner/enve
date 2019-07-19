@@ -4,7 +4,7 @@
 
 CanvasSettingsDialog::CanvasSettingsDialog(Canvas * const canvas,
                                            QWidget * const parent) :
-    CanvasSettingsDialog(canvas->getName(),
+    CanvasSettingsDialog(canvas->prp_getName(),
                          canvas->getCanvasWidth(),
                          canvas->getCanvasHeight(),
                          canvas->getFrameRange(),
@@ -127,7 +127,7 @@ qreal CanvasSettingsDialog::getFps() const {
 
 void CanvasSettingsDialog::applySettingsToCanvas(Canvas * const canvas) const {
     if(!canvas) return;
-    canvas->setName(getCanvasName());
+    canvas->prp_setName(getCanvasName());
     canvas->setCanvasSize(getCanvasWidth(), getCanvasHeight());
     canvas->setFps(getFps());
     canvas->setFrameRange(getFrameRange());

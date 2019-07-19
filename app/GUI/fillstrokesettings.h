@@ -29,7 +29,7 @@ class FillStrokeSettingsWidget : public QTabWidget {
     Q_OBJECT
 public:
     explicit FillStrokeSettingsWidget(Document& document,
-                                      MainWindow *parent = nullptr);
+                                      QWidget * const parent = nullptr);
 
     void setCurrentSettings(PaintSettingsAnimator *fillPaintSettings,
                             OutlineSettingsAnimator *strokePaintSettings);

@@ -12,7 +12,7 @@
 #include "paintsettingsapplier.h"
 
 ParticleBox::ParticleBox() : BoundingBox(TYPE_PARTICLES) {
-    setName("Particle Box");
+    prp_setName("Particle Box");
     mTopLeftAnimator = SPtrCreate(QPointFAnimator)("top left");
     mTopLeftPoint = SPtrCreate(AnimatedPoint)(
                 mTopLeftAnimator.data(),
@@ -245,7 +245,7 @@ ParticleEmitter::ParticleEmitter() :
                 mPos.get(),
                 getTransformAnimator(),
                 TYPE_PATH_POINT);
-    //mPos->setName("pos");
+    //mPos->prp_setName("pos");
     //mPos.setCurrentValue(QPointF(0., 0.));
 
     mColorAnimator->qra_setCurrentValue(QColor(0, 0, 0));

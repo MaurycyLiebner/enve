@@ -18,19 +18,19 @@ int KeysView::graphGetAnimatorId(GraphAnimator * const anim) {
 void KeysView::graphSetSmoothCtrlAction() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_SMOOTH);
-    mMainWindow->actionFinished();
+    Document::sInstance->actionFinished();
 }
 
 void KeysView::graphSetSymmetricCtrlAction() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_SYMMETRIC);
-    mMainWindow->actionFinished();
+    Document::sInstance->actionFinished();
 }
 
 void KeysView::graphSetCornerCtrlAction() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_CORNER);
-    mMainWindow->actionFinished();
+    Document::sInstance->actionFinished();
 }
 
 void KeysView::graphMakeSegmentsSmoothAction(const bool smooth) {
@@ -61,7 +61,7 @@ void KeysView::graphMakeSegmentsSmoothAction(const bool smooth) {
     }
 
     graphConstrainAnimatorCtrlsFrameValues();
-    mMainWindow->actionFinished();
+    Document::sInstance->actionFinished();
 }
 
 void KeysView::graphMakeSegmentsLinearAction() {
@@ -266,7 +266,7 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
         mSelectionRect.setBottomRight({frame, value});
         mSelectionRect.setTopLeft({frame, value});
     } else if(pressedPoint->isKeyPoint()) {
-        if(mMainWindow->isShiftPressed()) {
+        if(QApplication::keyboardModifiers() & Qt::ShiftModifier) {
             if(parentKey->isSelected()) {
                 removeKeyFromSelection(parentKey);
             } else {
@@ -296,7 +296,7 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
 
 void KeysView::gMouseRelease() {
     if(mSelecting) {
-        if(!mMainWindow->isShiftPressed())
+        if(!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
             clearKeySelection();
 
         QList<GraphKey*> keysList;
@@ -426,7 +426,7 @@ bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event) {
 
 void KeysView::graphResetValueScaleAndMinShownAction() {
     graphResetValueScaleAndMinShown();
-    mMainWindow->actionFinished();
+    Document::sInstance->actionFinished();
 }
 
 void KeysView::graphResetValueScaleAndMinShown() {
@@ -446,7 +446,7 @@ void KeysView::graphAddViewedAnimator(GraphAnimator * const animator) {
         graphRemoveViewedAnimator(animator);
     });
 
-    mMainWindow->actionFinished();
+    Document::sInstance->actionFinished();
 }
 
 void KeysView::graphRemoveViewedAnimator(GraphAnimator * const animator) {
@@ -455,13 +455,13 @@ void KeysView::graphRemoveViewedAnimator(GraphAnimator * const animator) {
     graphUpdateDimensions();
     graphResetValueScaleAndMinShown();
 
-    mMainWindow->actionFinished();
+    Document::sInstance->actionFinished();
 }
 
 void KeysView::graphUpdateAfterKeysChangedAndRepaint() {
     scheduleGraphUpdateAfterKeysChanged();
     
-    mMainWindow->actionFinished();
+    Document::sInstance->actionFinished();
 }
 
 void KeysView::scheduleGraphUpdateAfterKeysChanged() {

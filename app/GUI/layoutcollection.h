@@ -9,7 +9,7 @@ struct SceneBaseStackItem : public BaseStackItem {
 protected:
     SceneBaseStackItem(std::unique_ptr<SceneWidgetStackLayoutItem>&& cwwItem,
                        Canvas* const scene = nullptr) : mScene(scene) {
-        if(scene) setName(scene->getName());
+        if(scene) setName(scene->prp_getName());
         cwwItem->setScene(scene);
         setChild(std::move(cwwItem));
     }

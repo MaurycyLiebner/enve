@@ -17,7 +17,7 @@
 
 SmartVectorPath::SmartVectorPath() :
     PathBox(BoundingBoxType::TYPE_VECTOR_PATH) {
-    setName("Path");
+    prp_setName("Path");
     mPathAnimator = SPtrCreate(SmartPathCollection)();
     const auto updater = SPtrCreate(NodePointUpdater)(this);
     mPathAnimator->prp_setOwnUpdater(updater);

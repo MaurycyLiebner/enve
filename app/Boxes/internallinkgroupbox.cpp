@@ -123,7 +123,7 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
         removeAllContainedBoxes();
     }
     if(linkTarget) {
-        setName(linkTarget->getName() + " link");
+        prp_setName(linkTarget->prp_getName() + " link");
         mBoxTarget->setTarget(linkTarget);
         linkTarget->addLinkingBox(this);
         connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
@@ -135,7 +135,7 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
             addContainedBox(newLink);
         }
     } else {
-        setName("empty link");
+        prp_setName("empty link");
         mBoxTarget->setTarget(nullptr);
     }
     planScheduleUpdate(Animator::USER_CHANGE);

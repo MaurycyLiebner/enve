@@ -345,6 +345,12 @@ void Canvas::removeSelectedBoxesAndClearList() {
     }
     clearBoxesSelectionList(); schedulePivotUpdate();
 }
+
+void Canvas::setCurrentBox(BoundingBox* const box) {
+    mCurrentBox = box;
+    emit currentBoxChanged(box);
+}
+
 #include "Boxes/paintbox.h"
 void Canvas::addBoxToSelection(BoundingBox * const box) {
     if(box->isSelected()) return;
@@ -357,12 +363,11 @@ void Canvas::addBoxToSelection(BoundingBox * const box) {
 
     sortSelectedBoxesAsc();
     //setCurrentFillStrokeSettingsFromBox(box);
-    mMainWindow->setCurrentBox(box);
+    setCurrentBox(box);
 
     if(mCurrentMode == PAINT_MODE) {
         if(box->SWT_isPaintBox()) mPaintTarget.setPaintBox(GetAsPtr(box, PaintBox));
     }
-    emit boxSelectionChanged();
     emit selectedPaintSettingsChanged();
 }
 
@@ -376,11 +381,10 @@ void Canvas::removeBoxFromSelection(BoundingBox * const box) {
     schedulePivotUpdate();
     if(mCurrentMode == PAINT_MODE) updatePaintBox();
     if(mSelectedBoxes.isEmpty()) {
-        mMainWindow->setCurrentBox(nullptr);
+        setCurrentBox(nullptr);
     } else {
-        mMainWindow->setCurrentBox(mSelectedBoxes.last());
+        setCurrentBox(mSelectedBoxes.last());
     }
-    emit boxSelectionChanged();
     emit selectedPaintSettingsChanged();
 }
 
@@ -389,7 +393,7 @@ void Canvas::clearBoxesSelection() {
         box->deselect();
     clearBoxesSelectionList();
     schedulePivotUpdate();
-    mMainWindow->setCurrentBox(nullptr);
+    setCurrentBox(nullptr);
 //    if(mLastPressedBox) {
 //        mLastPressedBox->deselect();
 //        mLastPressedBox = nullptr;
@@ -399,7 +403,6 @@ void Canvas::clearBoxesSelection() {
 void Canvas::clearBoxesSelectionList() {
     if(mCurrentMode == PAINT_MODE) mPaintTarget.setPaintBox(nullptr);
     mSelectedBoxes.clear();
-    emit boxSelectionChanged();
     emit selectedPaintSettingsChanged();
 }
 

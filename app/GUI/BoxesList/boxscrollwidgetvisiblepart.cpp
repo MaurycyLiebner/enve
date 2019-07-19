@@ -239,7 +239,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
     if(mCurrentlyDragged.isValid() && mDropTarget.isValid()) {
         if(mDropTarget.drop(mCurrentlyDragged)) {
             planScheduleUpdateVisibleWidgetsContent();
-            MainWindow::getInstance()->actionFinished();
+            Document::sInstance->actionFinished();
         } else update();
     }
     mDragging = false;

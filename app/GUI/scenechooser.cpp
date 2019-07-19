@@ -35,12 +35,12 @@ SceneChooser::SceneChooser(Document& document, const bool active,
 void SceneChooser::addScene(Canvas * const scene) {
     if(!scene) return;
     if(isEmpty()) setEnabled(true);
-    const auto act = addAction(scene->getName());
+    const auto act = addAction(scene->prp_getName());
     act->setCheckable(true);
     connect(act, &QAction::triggered, this,
             [this, scene, act]() { setCurrentScene(scene, act); });
-    connect(scene, &Canvas::canvasNameChanged, act,
-            [this, act](Canvas* const scene, const QString& name) {
+    connect(scene, &Canvas::prp_nameChanged, act,
+            [this, scene, act](const QString& name) {
         if(scene == mCurrentScene) setTitle(name);
         act->setText(name);
     });
@@ -83,7 +83,7 @@ void SceneChooser::setCurrentScene(Canvas * const scene, QAction * const act) {
             currAct->setEnabled(true);
         }
     }
-    setTitle(scene ? scene->getName() : "none");
+    setTitle(scene ? scene->prp_getName() : "none");
     mCurrentScene = scene;
     emit currentChanged(mCurrentScene);
 }

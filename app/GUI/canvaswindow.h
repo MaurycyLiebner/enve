@@ -89,6 +89,7 @@ protected:
     }
 
     void KFT_clearFocus() {
+        if(mCurrentCanvas) mDocument.setActiveScene(nullptr);
         clearFocus();
         update();
     }
@@ -109,7 +110,6 @@ private:
 
     bool mBlockInput = false;
     bool mMouseGrabber = false;
-    bool mHasFocus = false;
 
     qsptr<WindowSingleWidgetTarget> mWindowSWTTarget;
 

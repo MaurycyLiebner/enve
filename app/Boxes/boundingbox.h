@@ -284,8 +284,7 @@ public:
     void setPivotAbsPos(const QPointF &absPos);
     void setPivotRelPos(const QPointF &relPos);
 
-    void setName(const QString &name);
-    const QString &getName() const;
+    void setSelected(const bool select);
     void select();
     void deselect();
     bool isSelected() const;
@@ -464,9 +463,9 @@ private:
     void cancelWaitingTasks();
     void afterTotalTransformChanged(const UpdateReason &reason);
 signals:
-    void nameChanged(QString);
     void globalPivotInfluenced();
     void fillStrokeSettingsChanged();
+    void selectionChanged(bool);
 };
 
 

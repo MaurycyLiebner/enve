@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QPointer>
+#include <QApplication>
 #include "keyfocustarget.h"
 #include "smartPointers/sharedpointerdefs.h"
 #include "framerange.h"
@@ -187,7 +188,6 @@ private:
     bool mMovingRect = false;
     bool mPressedCtrlPoint = false;
 
-    MainWindow *mMainWindow;
     Canvas* mCurrentScene = nullptr;
     QList<Animator*> mSelectedKeysAnimators;
     QList<GraphAnimator*> mGraphAnimators;

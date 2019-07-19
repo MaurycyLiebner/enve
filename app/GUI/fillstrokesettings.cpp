@@ -15,14 +15,12 @@
 #include "Animators/gradient.h"
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
-                                                   MainWindow *parent) :
+                                                   QWidget * const parent) :
     QTabWidget(parent), mDocument(document) {
     connect(&mDocument, &Document::selectedPaintSettingsChanged,
             this, &FillStrokeSettingsWidget::updateCurrentSettings);
     //setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    mMainWindow = parent;
-
-    mGradientWidget = new GradientWidget(this, mMainWindow);
+    mGradientWidget = new GradientWidget(this);
     mStrokeSettingsWidget = new QWidget(this);
     mColorsSettingsWidget = new ColorSettingsWidget(this);
 

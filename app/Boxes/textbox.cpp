@@ -12,7 +12,7 @@
 #include "Animators/outlinesettingsanimator.h"
 
 TextBox::TextBox() : PathBox(TYPE_TEXT) {
-    setName("text");
+    prp_setName("text");
 
     mFillSettings->setPaintType(PaintType::FLATPAINT);
     mFillSettings->setCurrentColor(QColor(0, 0, 0));
@@ -34,7 +34,7 @@ void TextBox::openTextEditor(QWidget* dialogParent) {
     bool ok;
     const QString text =
             QInputDialog::getMultiLineText(
-                dialogParent, getName() + " text",
+                dialogParent, prp_getName() + " text",
                 "Text:", mText->getCurrentValue(), &ok);
     if(ok) mText->setCurrentValue(text);
 }

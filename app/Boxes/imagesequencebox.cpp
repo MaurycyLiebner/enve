@@ -5,7 +5,7 @@
 #include <QFileDialog>
 
 ImageSequenceBox::ImageSequenceBox() : AnimationBox(TYPE_IMAGESQUENCE) {
-    setName("Image Sequence");
+    prp_setName("Image Sequence");
 }
 
 void ImageSequenceBox::setFolderPath(const QString &folderPath) {

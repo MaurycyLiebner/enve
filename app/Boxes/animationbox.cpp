@@ -9,7 +9,7 @@
 #include "Animators/gpueffectanimators.h"
 
 AnimationBox::AnimationBox(const BoundingBoxType& type) : BoundingBox(type) {
-    setName("Animation");
+    prp_setName("Animation");
 
     setDurationRectangle(SPtrCreate(FixedLenAnimationRect)(this));
     mFrameAnimator = SPtrCreate(IntAnimator)("frame");
@@ -192,7 +192,7 @@ void AnimationBox::addActionsToMenu(BoxTypeMenu * const menu) {
     [this, widget](AnimationBox * box) {
         bool ok = false;
         const int stretch = QInputDialog::getInt(widget,
-                                                 "Stretch " + box->getName(),
+                                                 "Stretch " + box->prp_getName(),
                                                  "Stretch:",
                                                  qRound(getStretch()*100),
                                                  -1000, 1000, 1, &ok);
