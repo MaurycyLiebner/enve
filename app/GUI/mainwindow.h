@@ -80,16 +80,6 @@ public:
     }
 
     static MainWindow *getInstance();
-    static void addUndoRedo(const stdsptr<UndoRedo>& uR) {
-        UndoRedoStack *stack = MainWindow::getInstance()->getUndoRedoStack();
-        if(!stack) return;
-        stack->addUndoRedo(uR);
-    }
-
-    void setCurrentUndoRedoStack(UndoRedoStack *stack) {
-        mCurrentUndoRedoStack = stack;
-    }
-    UndoRedoStack *getUndoRedoStack();
 
     static bool isShiftPressed();
     static bool isCtrlPressed();
@@ -141,7 +131,7 @@ public:
    // void stopPreview();
     void setResolutionFractionValue(const qreal value);
 
-    void queTasksAndUpdate();
+    void actionFinished();
     void addCanvasToRenderQue();
     void canvasNameChanged(Canvas *canvas, const QString &name);
 
@@ -167,9 +157,6 @@ public:
     void importFile();
     //void importVideo();
     void revert();
-
-    void undo();
-    void redo();
 protected:
     void lockFinished();
 private:

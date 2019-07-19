@@ -269,7 +269,7 @@ void BoxesListAnimationDockWidget::setLocalPivot(const bool bT) {
     mDocument.fLocalPivot = bT;
     for(const auto& scene : mDocument.fScenes)
         scene->updatePivot();
-    mMainWindow->queTasksAndUpdate();
+    mMainWindow->actionFinished();
 }
 
 void BoxesListAnimationDockWidget::setTimelineMode() {

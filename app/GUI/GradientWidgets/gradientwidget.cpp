@@ -142,7 +142,7 @@ void GradientWidget::colorRightPress(const int x, const QPoint &point) {
                 finishGradientTransform();
                 updateAll();
             }
-            mMainWindow->queTasksAndUpdate();
+            mMainWindow->actionFinished();
         } else {
 
         }
@@ -169,7 +169,7 @@ void GradientWidget::moveColor(const int x) {
             setCurrentColorId(colorId);
             finishGradientTransform();
             updateAll();
-            mMainWindow->queTasksAndUpdate();
+            mMainWindow->actionFinished();
         }
     }
 }
@@ -182,7 +182,7 @@ void GradientWidget::updateAfterFrameChanged(const int absFrame) {
 void GradientWidget::gradientLeftPressed(const int gradId) {
     if(gradId >= Document::sInstance->fGradients.count() || gradId < 0) return;
     setCurrentGradient(gradId);
-    MainWindow::getInstance()->queTasksAndUpdate();
+    MainWindow::getInstance()->actionFinished();
 }
 
 void GradientWidget::gradientContextMenuReq(const int gradId,
@@ -206,7 +206,7 @@ void GradientWidget::gradientContextMenuReq(const int gradId,
             newGrad->addColor(Qt::white);
             setCurrentGradient(newGrad);
         }
-        mMainWindow->queTasksAndUpdate();
+        mMainWindow->actionFinished();
     } else {
 
     }

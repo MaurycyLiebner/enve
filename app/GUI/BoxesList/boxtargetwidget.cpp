@@ -24,7 +24,7 @@ void BoxTargetWidget::dropEvent(QDropEvent *event) {
         mProperty->setTarget(targetT);
         mDragging = false;
         update();
-        MainWindow::getInstance()->queTasksAndUpdate();
+        MainWindow::getInstance()->actionFinished();
     }
 }
 
@@ -97,7 +97,7 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
             } else {
                 mProperty->setTarget(nullptr);
             }
-            MainWindow::getInstance()->queTasksAndUpdate();
+            MainWindow::getInstance()->actionFinished();
         } else {
 
         }

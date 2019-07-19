@@ -66,15 +66,11 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
                 this, &CanvasWindow::setCanvasMode);
         connect(mCurrentCanvas, &Canvas::requestUpdate,
                 this, qOverload<>(&CanvasWindow::update));
-        MainWindow::getInstance()->setCurrentUndoRedoStack(
-                    mCurrentCanvas->getUndoRedoStack());
 //        connect(mCurrentCanvas, &Canvas::prp_absFrameRangeChanged,
 //                this, [this](const FrameRange& range) {
 //            const int currFrame = mCurrentCanvas->anim_getCurrentAbsFrame();
 //            if(range.inRange(currFrame)) update();
 //        });
-    } else {
-        MainWindow::getInstance()->setCurrentUndoRedoStack(nullptr);
     }
 
 //    if(!mCurrentCanvas) openWelcomeDialog();
@@ -126,7 +122,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
 void CanvasWindow::queTasksAndUpdate() {
     updatePivotIfNeeded();
     update();
-    MainWindow::getInstance()->queTasksAndUpdate();
+    MainWindow::getInstance()->actionFinished();
 }
 
 bool CanvasWindow::hasNoCanvas() {

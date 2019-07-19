@@ -15,6 +15,9 @@ class Actions : public QObject {
 public:
     Actions(Document& document);
 
+    void undoAction() const;
+    void redoAction() const;
+
     void raiseAction() const;
     void lowerAction() const;
     void raiseToTopAction() const;

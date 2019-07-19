@@ -541,9 +541,8 @@ public:
     void finishMaxFramePosTransformForAllSelected();
     void moveMaxFrameForAllSelected(const int dFrame);
 
-    UndoRedoStack *getUndoRedoStack() {
-        return mUndoRedoStack.get();
-    }
+    void undo();
+    void redo();
 
     void blockUndoRedo();
     void unblockUndoRedo();

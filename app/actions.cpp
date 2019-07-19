@@ -7,6 +7,18 @@
 Actions::Actions(Document &document) : mDocument(document),
     mActiveScene(mDocument.fActiveScene) {}
 
+void Actions::undoAction() const {
+    if(!mActiveScene) return;
+    mActiveScene->undo();
+    afterAction();
+}
+
+void Actions::redoAction() const {
+    if(!mActiveScene) return;
+    mActiveScene->redo();
+    afterAction();
+}
+
 void Actions::raiseAction() const {
     if(!mActiveScene) return;
     mActiveScene->raiseSelectedBoxes();
@@ -382,6 +394,6 @@ void Actions::setPaintMode() {
 }
 
 void Actions::afterAction() const {
-    MainWindow::getInstance()->queTasksAndUpdate();
+    MainWindow::getInstance()->actionFinished();
     emit mActiveScene->requestUpdate();
 }

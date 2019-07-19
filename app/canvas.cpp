@@ -898,6 +898,14 @@ void Canvas::moveMaxFrameForAllSelected(const int dFrame) {
         box->moveMaxFrame(dFrame);
 }
 
+void Canvas::undo() {
+    mUndoRedoStack->undo();
+}
+
+void Canvas::redo() {
+    mUndoRedoStack->redo();
+}
+
 void Canvas::blockUndoRedo() {
     mUndoRedoStack->blockUndoRedo();
 }

@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
       mVideoEncoder(SPtrCreate(VideoEncoder)()),
       mDocument(mAudioHandler), mActions(mDocument) {
     connect(&mDocument.fRenderHandler, &RenderHandler::queTasksAndUpdate,
-            this, &MainWindow::queTasksAndUpdate);
+            this, &MainWindow::actionFinished);
     sMainWindowInstance = this;
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
@@ -123,7 +123,7 @@ MainWindow::MainWindow(QWidget *parent)
     [this](ShaderEffectProgram * program) {
         for(const auto& scene : mDocument.fScenes)
             scene->updateIfUsesProgram(program);
-        queTasksAndUpdate();
+        actionFinished();
     });
 
     mLayoutHandler = new LayoutHandler(mDocument, mAudioHandler);
@@ -239,7 +239,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     connect(&mTaskScheduler, &TaskScheduler::finishedAllQuedTasks,
-            this, &MainWindow::queTasksAndUpdate);
+            this, &MainWindow::actionFinished);
 
     QApplication::instance()->installEventFilter(this);
 }
@@ -292,10 +292,10 @@ void MainWindow::setupMenuBar() {
     mEditMenu = mMenuBar->addMenu("Edit");
 
     mEditMenu->addAction("Undo",
-                         this, &MainWindow::undo,
+                         &mActions, &Actions::undoAction,
                          Qt::CTRL + Qt::Key_Z);
     mEditMenu->addAction("Redo",
-                         this, &MainWindow::redo,
+                         &mActions, &Actions::redoAction,
                          Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
     mEditMenu->addAction("Undo History...");
     mEditMenu->addSeparator();
@@ -787,10 +787,6 @@ void MainWindow::setResolutionFractionValue(const qreal value) {
     mDocument.fActiveScene->setResolutionFraction(value);
 }
 
-UndoRedoStack *MainWindow::getUndoRedoStack() {
-    return mCurrentUndoRedoStack;
-}
-
 void MainWindow::setFileChangedSinceSaving(bool changed) {
     if(changed == mChangedSinceSaving) return;
     mChangedSinceSaving = changed;
@@ -813,8 +809,7 @@ SimpleBrushWrapper *MainWindow::getCurrentBrush() const {
     return mBrushSelectionWidget->getCurrentBrush();
 }
 
-void MainWindow::queTasksAndUpdate() {
-//    if(!isEnabled()) return;
+void MainWindow::actionFinished() {
     if(mCurrentUndoRedoStack) {
         if(mCurrentUndoRedoStack->finishSet()) {
             setFileChangedSinceSaving(true);
@@ -894,7 +889,7 @@ void MainWindow::enable() {
     enableEventFilter();
     delete mGrayOutWidget;
     mGrayOutWidget = nullptr;
-    queTasksAndUpdate();
+    actionFinished();
 }
 
 void MainWindow::newFile() {
@@ -990,7 +985,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
         } else {
             returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);
         }
-        if(event->key() != Qt::Key_Control) queTasksAndUpdate();
+        if(event->key() != Qt::Key_Control) actionFinished();
         return returnBool;
     }
     return false;
@@ -1142,7 +1137,7 @@ void MainWindow::importImageSequence() {
     if(!folder.isEmpty()) {
         mDocument.fActiveScene->createAnimationBoxForPaths(folder);
     }
-    queTasksAndUpdate();
+    actionFinished();
 }
 
 //void MainWindow::importVideo() {
@@ -1164,18 +1159,6 @@ void MainWindow::revert() {
         gPrintExceptionCritical(e);
     }
     setFileChangedSinceSaving(false);
-}
-
-void MainWindow::undo() {
-    if(!mCurrentUndoRedoStack) return;
-    getUndoRedoStack()->undo();
-    queTasksAndUpdate();
-}
-
-void MainWindow::redo() {
-    if(!mCurrentUndoRedoStack) return;
-    getUndoRedoStack()->redo();
-    queTasksAndUpdate();
 }
 
 stdsptr<void> MainWindow::lock() {
