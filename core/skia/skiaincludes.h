@@ -41,9 +41,9 @@
 
 #include <QtGui/qopengl.h>
 
-#include "AddInclude/SkStroke.h"
-#include "AddInclude/SkGeometry.h"
-#include "AddInclude/SkPointPriv.h"
+#include "src/core/SkPointPriv.h"
+#include "src/core/SkStroke.h"
+#include "src/core/SkGeometry.h"
 
 #define foreach Q_FOREACH
 

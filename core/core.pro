@@ -74,9 +74,6 @@ SOURCES += \
     skia/skimagecopy.cpp \
     skia/skimagegpudraw.cpp \
     skia/skqtconversions.cpp \
-    skia/AddInclude/SkGeometry.cpp \
-    skia/AddInclude/SkStroke.cpp \
-    skia/AddInclude/SkStrokerPriv.cpp \
     pointhelpers.cpp \
     simplemath.cpp \
     Animators/qrealpoint.cpp \
@@ -175,13 +172,6 @@ HEADERS += \
     skia/skimagecopy.h \
     skia/skimagegpudraw.h \
     skia/skqtconversions.h \
-    skia/AddInclude/SkGeometry.h \
-    skia/AddInclude/SkNx.h \
-    skia/AddInclude/SkPaintDefaults.h \
-    skia/AddInclude/SkPathPriv.h \
-    skia/AddInclude/SkPointPriv.h \
-    skia/AddInclude/SkStroke.h \
-    skia/AddInclude/SkStrokerPriv.h \
     pointhelpers.h \
     simplemath.h \
     Animators/qrealpoint.h \
