@@ -1,6 +1,7 @@
 #include "conicsegment.h"
 #include "quadsegment.h"
 #include "qcubicsegment2d.h"
+#include "skia/skiaincludes.h"
 #include <QList>
 
 //template<typename T, typename Tw>

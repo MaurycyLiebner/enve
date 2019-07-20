@@ -1,7 +1,7 @@
 #ifndef ANIMATORT_H
 #define ANIMATORT_H
-#include "Animators/animator.h"
-#include "Animators/key.h"
+#include "animator.h"
+#include "key.h"
 #include "basicreadwrite.h"
 #include "differsinterpolate.h"
 #include "keyt.h"

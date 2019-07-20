@@ -9,8 +9,7 @@
 #  define EXAMPLEPATHEFFECTSHARED_EXPORT Q_DECL_IMPORT
 #endif
 
-#include "PathEffects/custompatheffect.h"
-#include "smartPointers/selfref.h"
+#include "enveCore/PathEffects/custompatheffect.h"
 
 extern "C" {
 

@@ -1,8 +1,8 @@
 #ifndef TRANSFORMANIMATOR_H
 #define TRANSFORMANIMATOR_H
 #include <QMatrix>
-#include "Animators/staticcomplexanimator.h"
-#include "skia/skiaincludes.h"
+#include "staticcomplexanimator.h"
+#include "../skia/skiaincludes.h"
 
 class TransformUpdater;
 class BoxPathPoint;

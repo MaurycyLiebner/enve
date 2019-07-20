@@ -19,8 +19,8 @@ SkBitmap SkiaHelpers::makeCopy(const SkBitmap& btmp) {
 void SkiaHelpers::drawImageGPU(
         SkCanvas* const canvas,
         const sk_sp<SkImage>& image,
-        const SkScalar x,
-        const SkScalar y,
+        const float x,
+        const float y,
         SkPaint * const paint,
         GrContext* const context) {
     if(!image) return;
@@ -100,25 +100,25 @@ sk_sp<SkImage> SkiaHelpers::readImg(QIODevice * const file) {
 
 void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
                                      const SkPath &path,
-                                     const SkScalar invScale) {
+                                     const float invScale) {
     drawOutlineOverlay(canvas, path, invScale, false, 0);
 }
 
 void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
                                      const SkPath &path,
-                                     const SkScalar invScale,
+                                     const float invScale,
                                      const SkMatrix& transform) {
     drawOutlineOverlay(canvas, path, invScale, transform, false, 0);
 }
 
 void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
                                      const SkPath &path,
-                                     const SkScalar invScale,
+                                     const float invScale,
                                      const bool dashes,
-                                     const SkScalar intervalSize) {
+                                     const float intervalSize) {
     SkPaint paint;
     if(dashes) {
-        const SkScalar intervals[2] = {intervalSize*invScale,
+        const float intervals[2] = {intervalSize*invScale,
                                        intervalSize*invScale};
         paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
     }
@@ -134,10 +134,10 @@ void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
 
 void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
                                      const SkPath &path,
-                                     const SkScalar invScale,
+                                     const float invScale,
                                      const SkMatrix& transform,
                                      const bool dashes,
-                                     const SkScalar intervalSize) {
+                                     const float intervalSize) {
     SkPath mappedPath = path;
     mappedPath.transform(transform);
     drawOutlineOverlay(canvas, mappedPath, invScale,

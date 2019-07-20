@@ -205,7 +205,7 @@ void drawCtrlPtLine(SkCanvas * const canvas,
                     const QPointF& qCtrlAbsPos,
                     const QPointF& qAbsPos,
                     const SkPoint& skAbsPos,
-                    const SkScalar invScale) {
+                    const float invScale) {
     if(pointToLen(qCtrlAbsPos - qAbsPos) > 1) {
         const SkPoint skCtrlAbsPos = toSkPoint(qCtrlAbsPos);
         SkPaint paint;
@@ -224,7 +224,7 @@ void drawCtrlPtLine(SkCanvas * const canvas,
 void SmartNodePoint::drawSk(
         SkCanvas * const canvas,
         const CanvasMode mode,
-        const SkScalar invScale,
+        const float invScale,
         const bool keyOnCurrent) {
     const QPointF qAbsPos = getAbsolutePos();
     const SkPoint skAbsPos = toSkPoint(qAbsPos);

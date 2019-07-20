@@ -13,8 +13,8 @@ struct ParticleState {
     ParticleState() {}
 
     ParticleState(const SkPoint &posT,
-                  const SkScalar scaleT,
-                  const SkScalar sizeT,
+                  const float scaleT,
+                  const float sizeT,
                   const unsigned char &opacityT,
                   const SkPath &path) {
         fPos = posT;
@@ -26,8 +26,8 @@ struct ParticleState {
 
     static ParticleState interpolate(const ParticleState &state1,
                                      const ParticleState &state2,
-                                     const SkScalar weight2) {
-        SkScalar weight1 = 1.f - weight2;
+                                     const float weight2) {
+        float weight1 = 1.f - weight2;
         SkPath pathT;
         if(state2.fLinePath.isEmpty()) {
             pathT = state1.fLinePath;
@@ -61,8 +61,8 @@ struct ParticleState {
             if(imageT.get() == nullptr) return;
             //paintT.setAntiAlias(true);
             //paintT.setFilterQuality(kHigh_SkFilterQuality);
-            SkScalar drawX = fPos.x() - imageT->width()*0.5f;
-            SkScalar drawY = fPos.y() - imageT->height()*0.5f;
+            float drawX = fPos.x() - imageT->width()*0.5f;
+            float drawY = fPos.y() - imageT->height()*0.5f;
             canvas->drawImage(imageT, drawX, drawY, &paintT);
         }
     }
@@ -70,7 +70,7 @@ struct ParticleState {
     stdsptr<BoundingBoxRenderData> fTargetRenderData;
     SkPath fLinePath;
     SkPoint fPos;
-    SkScalar fSize;
+    float fSize;
     unsigned char fOpacity;
 };
 
@@ -137,31 +137,31 @@ public:
                             const int nFrames,
                             const SkPoint &iniPos,
                             const SkPoint &iniVel,
-                            const SkScalar partSize);
+                            const float partSize);
     void generatePathNextFrame(const int frame,
-                               const SkScalar velocityVar,
-                               const SkScalar velocityVarPeriod,
+                               const float velocityVar,
+                               const float velocityVarPeriod,
                                const SkPoint &acc,
-                               const SkScalar finalScale,
-                               const SkScalar finalOpacity,
-                               const SkScalar decayFrames,
-                               const SkScalar length);
+                               const float finalScale,
+                               const float finalOpacity,
+                               const float decayFrames,
+                               const float length);
 
     bool isVisibleAtFrame(const int frame);
     ParticleState getParticleStateAtFrame(const int frame);
     bool getParticleStateAtFrameF(const qreal frame, ParticleState &state);
 private:
-    SkScalar mSize;
+    float mSize;
     SkPoint mPrevVelocityVar;
     SkPoint mNextVelocityVar;
-    SkScalar mPrevVelocityDuration;
+    float mPrevVelocityDuration;
 
     int mFirstFrame;
     int mNumberFrames;
     ParticleState *mParticleStates = nullptr;
 
-    SkScalar mLastScale;
-    SkScalar mLastOpacity;
+    float mLastScale;
+    float mLastOpacity;
     SkPoint mLastPos;
     SkPoint mLastVel;
 };

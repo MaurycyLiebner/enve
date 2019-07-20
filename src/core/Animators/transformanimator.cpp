@@ -2,7 +2,7 @@
 #include "PropertyUpdaters/transformupdater.h"
 #include "qrealanimator.h"
 #include "transformanimator.h"
-#include "Animators/qpointfanimator.h"
+#include "qpointfanimator.h"
 #include "MovablePoints/animatedpoint.h"
 #include "skia/skqtconversions.h"
 

@@ -9,6 +9,12 @@ BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
     fParentBox = parentBoxT;
 }
 
+void BoundingBoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {
+    canvas.translate(toSkScalar(-fGlobalRect.x()),
+                     toSkScalar(-fGlobalRect.y()));
+    canvas.concat(toSkMatrix(fScaledTransform));
+}
+
 void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     fTransform = src->fTransform;
     fCustomRelFrame = src->fCustomRelFrame;
@@ -41,7 +47,7 @@ void BoundingBoxRenderData::updateRelBoundingRect() {
 
 void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {
     if(fOpacity < 0.001) return;
-    const SkScalar invScale = toSkScalar(1/fResolution);
+    const float invScale = toSkScalar(1/fResolution);
     canvas->scale(invScale, invScale);
     canvas->concat(toSkMatrix(fRenderTransform));
     SkPaint paint;

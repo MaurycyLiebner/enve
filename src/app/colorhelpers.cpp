@@ -5,19 +5,17 @@
 #include "glhelpers.h"
 
 
-bool shouldValPointerBeLightHSV(const GLfloat h,
-                                const GLfloat s,
-                                const GLfloat v) {
+bool shouldValPointerBeLightHSV(const float h, const float s, const float v) {
     if(v < 0.6f) return true;
     return h > 0.55f && (s > 0.5f || v < 0.7f);
 }
 
-bool shouldValPointerBeLightHSL(GLfloat h, GLfloat s, GLfloat l) {
+bool shouldValPointerBeLightHSL(float h, float s, float l) {
     hsl_to_hsv(h, s, l);
     return shouldValPointerBeLightHSV(h, s, l);
 }
 
-bool shouldValPointerBeLightRGB(GLfloat r, GLfloat g, GLfloat b) {
+bool shouldValPointerBeLightRGB(float r, float g, float b) {
     rgb_to_hsv_float(r, g, b);
     return shouldValPointerBeLightHSV(r, g, b);
 }

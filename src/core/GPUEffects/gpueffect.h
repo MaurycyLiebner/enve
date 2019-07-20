@@ -1,7 +1,7 @@
 #ifndef GPURASTEREFFECT_H
 #define GPURASTEREFFECT_H
-#include "Animators/staticcomplexanimator.h"
-#include "glhelpers.h"
+#include "../Animators/staticcomplexanimator.h"
+#include "../glhelpers.h"
 
 enum class GpuEffectType : short {
     BLUR,

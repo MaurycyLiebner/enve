@@ -2,10 +2,10 @@
 #define PROPERTY_H
 class UndoRedo;
 class MainWindow;
-#include "singlewidgettarget.h"
-#include "framerange.h"
-#include "MovablePoints/pointshandler.h"
-#include "basicreadwrite.h"
+#include "../singlewidgettarget.h"
+#include "../framerange.h"
+#include "../MovablePoints/pointshandler.h"
+#include "../basicreadwrite.h"
 
 class ComplexAnimator;
 class Key;
@@ -98,7 +98,7 @@ public:
 
     virtual void drawCanvasControls(SkCanvas * const canvas,
                                     const CanvasMode mode,
-                                    const SkScalar invScale);
+                                    const float invScale);
 
     virtual void addActionsToMenu(PropertyTypeMenu * const menu) {
         Q_UNUSED(menu);

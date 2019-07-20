@@ -13,7 +13,7 @@ protected:
 public:
     void drawCanvasControls(SkCanvas * const canvas,
                             const CanvasMode mode,
-                            const SkScalar invScale) {
+                            const float invScale) {
         if(mode != CanvasMode::MOVE_POINT) return;
         const auto trans = getTransformAnimator();
         if(!trans) return;

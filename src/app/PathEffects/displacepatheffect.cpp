@@ -54,9 +54,9 @@ void DisplacePathEffect::apply(const qreal relFrame,
 
     dst->reset();
 
-    const SkScalar maxDev = toSkScalar(qMaxDev);
-    const SkScalar segLen = toSkScalar(qSegLen);
-    const SkScalar smooth = toSkScalar(qSmooth);
+    const float maxDev = toSkScalar(qMaxDev);
+    const float segLen = toSkScalar(qSegLen);
+    const float smooth = toSkScalar(qSmooth);
 
     if(mLengthBased->getValue()) {
         gAtomicDisplaceFilterPath(baseSeed, dst, src, maxDev, segLen, smooth);

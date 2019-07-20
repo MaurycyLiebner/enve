@@ -42,7 +42,7 @@ public:
     struct OnionSkin {
         struct Skin {
             DrawableAutoTiledSurface* fSurface;
-            SkScalar fWeight;
+            float fWeight;
 
             SkRect boundingRect() const {
                 return toSkRect(fSurface->pixelBoundingRect());
@@ -68,8 +68,8 @@ public:
             void draw(SkCanvas * const canvas) {
                 for(const auto& skin : fSkins) {
                     SkPaint paint;
-                    const SkScalar rgbMax = qMax(fColor.fR, qMax(fColor.fG, fColor.fB));
-                    const SkScalar colM[20] = {
+                    const float rgbMax = qMax(fColor.fR, qMax(fColor.fG, fColor.fB));
+                    const float colM[20] = {
                         1 - rgbMax, 0, 0, fColor.fR, 0,
                         0, 1 - rgbMax, 0, fColor.fG, 0,
                         0, 0, 1 - rgbMax, fColor.fB, 0,

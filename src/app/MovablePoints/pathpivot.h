@@ -13,11 +13,11 @@ protected:
     PathPivot(const Canvas* const parent);
 public:
     void drawSk(SkCanvas * const canvas, const CanvasMode mode,
-                const SkScalar invScale, const bool keyOnCurrent);
+                const float invScale, const bool keyOnCurrent);
     void drawTransforming(SkCanvas * const canvas,
                           const CanvasMode mode,
-                          const SkScalar invScale,
-                          const SkScalar interval);
+                          const float invScale,
+                          const float interval);
     bool isVisible(const CanvasMode mode) const;
 
     void setMousePos(const QPointF& pos) { mMousePos = pos; }

@@ -1,8 +1,9 @@
 #ifndef CUBICLIST_H
 #define CUBICLIST_H
-#include "Segments/qcubicsegment2d.h"
+#include "qcubicsegment2d.h"
 #include <QList>
-#include "simplemath.h"
+#include "../simplemath.h"
+#include "../skia/skiaincludes.h"
 
 struct CubicList {
     CubicList();

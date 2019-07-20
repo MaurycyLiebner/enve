@@ -9,8 +9,7 @@
 #  define DABTESTSHARED_EXPORT Q_DECL_IMPORT
 #endif
 
-#include "GPUEffects/customgpueffect.h"
-#include "smartPointers/selfref.h"
+#include "enveCore/GPUEffects/customgpueffect.h"
 
 extern "C" {
 

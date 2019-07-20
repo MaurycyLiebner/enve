@@ -6,17 +6,18 @@
 
 QT += core qml
 
-QMAKE_RPATHDIR += ../core/
-LIBS += -L$$OUT_PWD/../core/ -lenvecore
-INCLUDEPATH += $$PWD/../core
-DEPENDPATH += $$PWD/../core
+ENVE_FOLDER = $$PWD/../../
 
-HOME_FOLDER = /home/ailuropoda
-SKIA_FOLDER = $$HOME_FOLDER/.skia2
-INCLUDEPATH += $$SKIA_FOLDER/
+INCLUDEPATH += $$ENVE_FOLDER/include/
+DEPENDPATH += $$ENVE_FOLDER/include/
+
+INCLUDEPATH += $$ENVE_FOLDER/third_party/skia/
+DEPENDPATH += $$ENVE_FOLDER/third_party/skia/
 
 CONFIG(debug, debug|release) {
+    ENVE_CORE_OUT = $$ENVE_FOLDER/build/Debug/src/core
 } else {
+    ENVE_CORE_OUT = $$ENVE_FOLDER/build/Release/src/core
     QMAKE_CFLAGS -= -O2
     QMAKE_CFLAGS -= -O1
     QMAKE_CXXFLAGS -= -O2
@@ -25,6 +26,8 @@ CONFIG(debug, debug|release) {
     QMAKE_LFLAGS = -m64 -O3
     QMAKE_CXXFLAGS = -m64 -O3
 }
+
+LIBS += -L$$ENVE_CORE_OUT -lenvecore
 
 TARGET = dabTest
 TEMPLATE = lib

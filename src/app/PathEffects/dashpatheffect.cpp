@@ -16,7 +16,7 @@ void DashPathEffect::apply(const qreal relFrame,
                            const SkPath &src,
                            SkPath * const dst) {
     const auto width = toSkScalar(mSize->getEffectiveValue(relFrame));
-    const SkScalar intervals[] = { width, width };
+    const float intervals[] = { width, width };
     SkStrokeRec rec(SkStrokeRec::kHairline_InitStyle);
     SkRect cullRec = src.getBounds();
     dst->reset();

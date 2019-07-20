@@ -433,7 +433,7 @@ void gGetSmoothAbsCtrlsForPtBetween(
         const SkPoint &currP,
         const SkPoint &nextP,
         SkPoint &c1, SkPoint &c2,
-        const SkScalar smoothness) {
+        const float smoothness) {
 //    SkPoint sLastP = prevP - currP;
 //    sLastP.setLength(1);
 //    SkPoint sNextP = nextP - currP;
@@ -444,7 +444,7 @@ void gGetSmoothAbsCtrlsForPtBetween(
 
     const SkPoint vectP = (nextP - prevP)*0.5f*smoothness;
 
-    const SkScalar prevDist = (currP - prevP).length()*0.5f;
+    const float prevDist = (currP - prevP).length()*0.5f;
     SkPoint prevVectP = vectP;
     prevVectP.negate();
     if(prevVectP.length() > prevDist) {
@@ -452,7 +452,7 @@ void gGetSmoothAbsCtrlsForPtBetween(
     }
     c1 = currP + prevVectP;
 
-    const SkScalar nextDist = (currP - nextP).length()*0.5f;
+    const float nextDist = (currP - nextP).length()*0.5f;
     SkPoint nextVectP = vectP;
     if(nextVectP.length() > nextDist) {
         nextVectP.setLength(nextDist);
@@ -475,13 +475,13 @@ void gGetMaxSmoothAbsCtrlsForPtBetween(
 
     if(vectP.dot(lastP - currP) > 0) vectP.negate();
 
-    const SkScalar nextDist = (currP - nextP).length()*0.5f;
+    const float nextDist = (currP - nextP).length()*0.5f;
     vectP.setLength(nextDist);
 
     c2 = currP + vectP;
 
     vectP.negate();
-    const SkScalar lastDist = (currP - lastP).length()*0.5f;
+    const float lastDist = (currP - lastP).length()*0.5f;
     vectP.setLength(lastDist);
     c1 = currP + vectP;
 }
@@ -541,7 +541,7 @@ void gSmoothyAbsCtrlsForPtBetween(const SkPoint &lastP,
                                   const SkPoint &currP,
                                   const SkPoint &nextP,
                                   SkPoint &c1, SkPoint &c2,
-                                  SkScalar smoothness) {
+                                  float smoothness) {
     smoothyAbsCtrlsForPtBetween(lastP, currP, nextP, c1, c2, smoothness);
 }
 
@@ -708,7 +708,7 @@ void gForEverySegmentInPath(
 
 static void Perterb(SkPoint * const p,
                     const SkVector& tangent,
-                    const SkScalar scale) {
+                    const float scale) {
     SkVector normal = tangent;
     SkPointPriv::RotateCCW(&normal);
     normal.setLength(scale);
@@ -761,7 +761,7 @@ SkPoint randPt(const qreal baseSeed, const float dev) {
 void gAtomicDisplaceFilterPath(const qreal baseSeed,
                                SkPath* const dst,
                                const SkPath& src,
-                               const SkScalar maxDev) {
+                               const float maxDev) {
     dst->reset();
 
     uint32_t seedContourInc = 0;
@@ -815,7 +815,7 @@ void gSpatialDisplaceFilterPath(const qreal baseSeed,
                                 const qreal gridSize,
                                 SkPath* const dst,
                                 const SkPath& src,
-                                const SkScalar maxDev) {
+                                const float maxDev) {
     dst->reset();
 
     SkPath::Iter iter(src, false);
@@ -844,9 +844,9 @@ void gSpatialDisplaceFilterPath(const qreal baseSeed,
             return;
         }
 
-        SkScalar randX = toSkScalar(RandomGrid::sGetRandomValue(
+        float randX = toSkScalar(RandomGrid::sGetRandomValue(
                     -1, 1, baseSeed, gridSize, toQPointF(targetPt)));
-        SkScalar randY = toSkScalar(RandomGrid::sGetRandomValue(
+        float randY = toSkScalar(RandomGrid::sGetRandomValue(
                     -1, 1, baseSeed + 100, gridSize, toQPointF(targetPt)));
 
         const auto disp = SkPoint::Make(randX*maxDev, randY*maxDev);
@@ -881,18 +881,18 @@ template <typename GenDispDataOp>
 void displaceClosedPath(const qreal baseSeed,
                         SkPathMeasure &meas,
                         SkPath* const dst,
-                        const SkScalar segLen,
-                        const SkScalar maxDev,
-                        const SkScalar smoothness,
+                        const float segLen,
+                        const float maxDev,
+                        const float smoothness,
                         GenDispDataOp genDispDataOp) {
     const bool zeroSmooth = smoothness < 0.001f;
-    const SkScalar length = meas.getLength();
+    const float length = meas.getLength();
 
     const int nTot = SkScalarCeilToInt(length / segLen);
     if(nTot < 2) return;
 
-    const SkScalar remLen = length - (nTot - 1)*segLen;
-    const SkScalar endPtFrac = remLen/segLen;
+    const float remLen = length - (nTot - 1)*segLen;
+    const float endPtFrac = remLen/segLen;
     QVector<SkPoint> pts(nTot);
     QVector<SkPoint> cPts(zeroSmooth ? 1 : nTot*2);
 
@@ -994,11 +994,11 @@ void genSpatialClosedDisplData(const qreal baseSeed,
                                QVector<SkPoint>& pts,
                                QVector<SkPoint>& cPts,
                                SkPathMeasure &meas,
-                               const SkScalar segLen,
-                               const SkScalar maxDev,
-                               const SkScalar smoothness) {
+                               const float segLen,
+                               const float maxDev,
+                               const float smoothness) {
     const bool zeroSmooth = smoothness < 0.001f;
-    SkScalar dist = 0;
+    float dist = 0;
     for(int i = 0; i < nTot; i++) {
         auto& pt = pts[i];
         if(i == nTot - 1) pt = pts[0];
@@ -1024,19 +1024,19 @@ void genSpatialClosedDisplData(const qreal baseSeed,
 
 void genSpatialOpenedDisplData(const qreal baseSeed,
                                const qreal gridSize,
-                               const SkScalar halfLength,
-                               const SkScalar endPtFrac,
+                               const float halfLength,
+                               const float endPtFrac,
                                const int nSide,
                                const int nTot,
                                QVector<SkPoint>& pts,
                                QVector<SkPoint>& cPts,
                                SkPathMeasure &meas,
-                               const SkScalar segLen,
-                               const SkScalar maxDev,
-                               const SkScalar smoothness) {
+                               const float segLen,
+                               const float maxDev,
+                               const float smoothness) {
      const bool zeroSmooth = smoothness < 0.001f;
-     SkScalar rand1 = 0;
-     SkScalar randNTotM2 = 0;
+     float rand1 = 0;
+     float randNTotM2 = 0;
      const int middleId = nSide;
      for(int i = 0; i <= nSide; i++) {
          for(int j = -1; j < 2 && (i != 0 || j == -1); j += 2) {
@@ -1046,7 +1046,7 @@ void genSpatialOpenedDisplData(const qreal baseSeed,
              if(meas.getPosTan(halfLength + j*i*segLen, &pt, &v)) {
                  const qreal qRand = RandomGrid::sGetRandomValue(
                              -1, 1, baseSeed, gridSize, toQPointF(pt));
-                 SkScalar rand = toSkScalar(qRand);
+                 float rand = toSkScalar(qRand);
                  if(ptId == 1) rand1 = rand;
                  else if(ptId == nTot - 2) randNTotM2 = rand;
                  else if(ptId == 0) rand = rand*endPtFrac + rand1*(1 - endPtFrac);
@@ -1070,11 +1070,11 @@ void genAtomicClosedDisplData(const qreal baseSeed,
                               QVector<SkPoint>& pts,
                               QVector<SkPoint>& cPts,
                               SkPathMeasure &meas,
-                              const SkScalar segLen,
-                              const SkScalar maxDev,
-                              const SkScalar smoothness) {
+                              const float segLen,
+                              const float maxDev,
+                              const float smoothness) {
     const bool zeroSmooth = smoothness < 0.001f;
-    SkScalar dist = 0;
+    float dist = 0;
     for(int i = 0; i < nTot; i++) {
         auto& pt = pts[i];
         if(i == nTot - 1) pt = pts[0];
@@ -1097,19 +1097,19 @@ void genAtomicClosedDisplData(const qreal baseSeed,
 }
 
 void genAtomicOpenedDisplData(const qreal baseSeed,
-                              const SkScalar halfLength,
-                              const SkScalar endPtFrac,
+                              const float halfLength,
+                              const float endPtFrac,
                               const int nSide,
                               const int nTot,
                               QVector<SkPoint>& pts,
                               QVector<SkPoint>& cPts,
                               SkPathMeasure &meas,
-                              const SkScalar segLen,
-                              const SkScalar maxDev,
-                              const SkScalar smoothness) {
+                              const float segLen,
+                              const float maxDev,
+                              const float smoothness) {
     const bool zeroSmooth = smoothness < 0.001f;
-    SkScalar rand1 = 0;
-    SkScalar randNTotM2 = 0;
+    float rand1 = 0;
+    float randNTotM2 = 0;
     const int middleId = nSide;
     for(int i = 0; i <= nSide; i++) {
         for(int j = -1; j < 2 && (i != 0 || j == -1); j += 2) {
@@ -1117,7 +1117,7 @@ void genAtomicOpenedDisplData(const qreal baseSeed,
             auto& pt = pts[ptId];
             SkVector v;
             if(meas.getPosTan(halfLength + j*i*segLen, &pt, &v)) {
-                SkScalar randV = randFloat(baseSeed + i);
+                float randV = randFloat(baseSeed + i);
                 if(ptId == 1) rand1 = randV;
                 else if(ptId == nTot - 2) randNTotM2 = randV;
                 else if(ptId == 0) randV = randV*endPtFrac + rand1*(1 - endPtFrac);
@@ -1140,20 +1140,20 @@ template <typename GenDispDataOp>
 void displaceOpenedPath(const qreal baseSeed,
                         SkPathMeasure &meas,
                         SkPath* const dst,
-                        const SkScalar segLen,
-                        const SkScalar maxDev,
-                        const SkScalar smoothness,
+                        const float segLen,
+                        const float maxDev,
+                        const float smoothness,
                         GenDispDataOp genDispDataOp) {
     const bool zeroSmooth = smoothness < 0.001f;
-    const SkScalar length = meas.getLength();
-    const SkScalar halfLength = length * 0.5f;
+    const float length = meas.getLength();
+    const float halfLength = length * 0.5f;
 
     const int nSide = SkScalarCeilToInt(halfLength / segLen);
     const int nTot = nSide + 1 + nSide;
     if(nTot < 2) return;
 
-    const SkScalar remLen = halfLength - (nSide - 1)*segLen;
-    const SkScalar endPtFrac = remLen/segLen;
+    const float remLen = halfLength - (nSide - 1)*segLen;
+    const float endPtFrac = remLen/segLen;
 
     QVector<SkPoint> pts(nTot);
     QVector<SkPoint> cPts(zeroSmooth ? 1 : nTot*2);
@@ -1193,9 +1193,9 @@ bool gSpatialDisplaceFilterPath(const qreal baseSeed,
                                 const qreal gridSize,
                                 SkPath* const dst,
                                 const SkPath& src,
-                                const SkScalar maxDev,
-                                const SkScalar segLen,
-                                const SkScalar smoothness) {
+                                const float maxDev,
+                                const float segLen,
+                                const float smoothness) {
     if(segLen < .5f) return false;
     dst->reset();
 
@@ -1208,9 +1208,9 @@ bool gSpatialDisplaceFilterPath(const qreal baseSeed,
                            QVector<SkPoint>& pts,
                            QVector<SkPoint>& cPts,
                            SkPathMeasure &meas,
-                           const SkScalar segLen,
-                           const SkScalar maxDev,
-                           const SkScalar smoothness) {
+                           const float segLen,
+                           const float maxDev,
+                           const float smoothness) {
                 genSpatialClosedDisplData(baseSeed, gridSize,
                                           nTot, pts, cPts, meas,
                                           segLen, maxDev, smoothness);
@@ -1220,16 +1220,16 @@ bool gSpatialDisplaceFilterPath(const qreal baseSeed,
         } else {
             const auto op = [gridSize](
                            const qreal baseSeed,
-                           const SkScalar halfLength,
-                           const SkScalar endPtFrac,
+                           const float halfLength,
+                           const float endPtFrac,
                            const int nSide,
                            const int nTot,
                            QVector<SkPoint>& pts,
                            QVector<SkPoint>& cPts,
                            SkPathMeasure &meas,
-                           const SkScalar segLen,
-                           const SkScalar maxDev,
-                           const SkScalar smoothness) {
+                           const float segLen,
+                           const float maxDev,
+                           const float smoothness) {
                 genSpatialOpenedDisplData(baseSeed, gridSize,
                                           halfLength, endPtFrac, nSide,
                                           nTot, pts, cPts, meas,
@@ -1245,9 +1245,9 @@ bool gSpatialDisplaceFilterPath(const qreal baseSeed,
 bool gAtomicDisplaceFilterPath(const qreal baseSeed,
                                SkPath* const dst,
                                const SkPath& src,
-                               const SkScalar maxDev,
-                               const SkScalar segLen,
-                               const SkScalar smoothness) {
+                               const float maxDev,
+                               const float segLen,
+                               const float smoothness) {
     if(segLen < .5f) return false;
     dst->reset();
 

@@ -162,13 +162,13 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
     int nStops = stops.count();
     SkPoint gradPoints[nStops];
     SkColor gradColors[nStops];
-    SkScalar gradPos[nStops];
-    const SkScalar xInc = static_cast<SkScalar>(finalStop.x() - start.x());
-    const SkScalar yInc = static_cast<SkScalar>(finalStop.y() - start.y());
-    SkScalar currX = static_cast<SkScalar>(start.x());
-    SkScalar currY = static_cast<SkScalar>(start.y());
-    SkScalar currT = 0;
-    const SkScalar tInc = 1.f/(nStops - 1);
+    float gradPos[nStops];
+    const float xInc = static_cast<float>(finalStop.x() - start.x());
+    const float yInc = static_cast<float>(finalStop.y() - start.y());
+    float currX = static_cast<float>(start.x());
+    float currY = static_cast<float>(start.y());
+    float currT = 0;
+    const float tInc = 1.f/(nStops - 1);
 
     for(int i = 0; i < nStops; i++) {
         const QGradientStop &stopT = stops.at(i);

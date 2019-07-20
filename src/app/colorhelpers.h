@@ -24,11 +24,11 @@ enum CVR_TYPE : short {
     CVR_NONE
 };
 
-extern bool shouldValPointerBeLightHSV(const GLfloat h,
-                                       const GLfloat s,
-                                       const GLfloat v);
-extern bool shouldValPointerBeLightHSL(GLfloat h, GLfloat s, GLfloat l);
-extern bool shouldValPointerBeLightRGB(GLfloat r, GLfloat g, GLfloat b);
+extern bool shouldValPointerBeLightHSV(const float h,
+                                       const float s,
+                                       const float v);
+extern bool shouldValPointerBeLightHSL(float h, float s, float l);
+extern bool shouldValPointerBeLightRGB(float r, float g, float b);
 
 extern void rgb_to_hsv_float (float &r_ /*h*/, float &g_ /*s*/, float &b_ /*v*/);
 extern void hsv_to_rgb_float (float &h_, float &s_, float &v_);

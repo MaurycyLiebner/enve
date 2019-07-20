@@ -139,7 +139,7 @@ public:
                               SkPaint * const paint,
                               GrContext* const grContext);
     virtual void drawHoveredSk(SkCanvas *canvas,
-                               const SkScalar invScale);
+                               const float invScale);
 
     virtual const SkPath &getRelBoundingRectPath();
     virtual QRectF getRelBoundingRect(const qreal relFrame);
@@ -224,7 +224,7 @@ public:
     void prp_afterChangedAbsRange(const FrameRange &range);
     void drawAllCanvasControls(SkCanvas * const canvas,
                                const CanvasMode mode,
-                               const SkScalar invScale);
+                               const float invScale);
 
     FrameRange prp_relInfluenceRange() const;
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
@@ -249,7 +249,7 @@ public:
     NormalSegment getNormalSegment(const QPointF &absPos,
                                    const qreal invScale) const;
     void drawBoundingRect(SkCanvas * const canvas,
-                         const SkScalar invScale);
+                         const float invScale);
 
     void selectAllCanvasPts(QList<MovablePoint *> &selection,
                             const CanvasMode mode);
@@ -321,7 +321,7 @@ public:
     QRectF getRelBoundingRect() const;
     void drawHoveredPathSk(SkCanvas *canvas,
                            const SkPath &path,
-                           const SkScalar invScale);
+                           const float invScale);
 
     void setGPUEffectsEnabled(const bool enable);
     bool getGPUEffectsEnabled() const;

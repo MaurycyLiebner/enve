@@ -12,7 +12,7 @@ BlurEffect::BlurEffect() : PixmapEffect("blur", EFFECT_BLUR) {
 
 void BlurEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                           const qreal scale) {
-    const SkScalar sigma = toSkScalar(fBlurRadius*0.3333*scale);
+    const float sigma = toSkScalar(fBlurRadius*0.3333*scale);
     const auto src = SkiaHelpers::makeCopy(bitmap);
     SkCanvas canvas(bitmap);
     canvas.clear(SK_ColorTRANSPARENT);

@@ -1,6 +1,7 @@
 #include "key.h"
 #include "qrealpoint.h"
-#include "Animators/animator.h"
+#include "animator.h"
+#include "pointhelpers.h"
 
 Key::Key(Animator * const parentAnimator) :
     Key(0, parentAnimator) {}

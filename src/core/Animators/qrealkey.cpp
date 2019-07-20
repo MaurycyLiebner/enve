@@ -1,7 +1,7 @@
-#include "Animators/qrealkey.h"
-#include "Animators/qrealanimator.h"
-#include "Animators/complexanimator.h"
-#include "Animators/qrealpoint.h"
+#include "qrealkey.h"
+#include "qrealanimator.h"
+#include "complexanimator.h"
+#include "qrealpoint.h"
 
 QrealKey::QrealKey(const qreal value, const int frame,
                    QrealAnimator * const parentAnimator) :

@@ -81,9 +81,9 @@ void Circle::setRadius(const qreal radius) {
 bool Circle::SWT_isCircle() const { return true; }
 
 SkPath Circle::getPathAtRelFrameF(const qreal relFrame) {
-    const SkScalar xRadius = static_cast<SkScalar>(
+    const float xRadius = static_cast<float>(
                 mHorizontalRadiusAnimator->getEffectiveXValue(relFrame));
-    const SkScalar yRadius = static_cast<SkScalar>(
+    const float yRadius = static_cast<float>(
                 mVerticalRadiusAnimator->getEffectiveYValue(relFrame));
     SkRect rect = SkRect::MakeXYWH(-xRadius, -yRadius, 2*xRadius, 2*yRadius);
     const QPointF center = mCenterAnimator->getEffectiveValue();

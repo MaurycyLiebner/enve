@@ -22,11 +22,11 @@ void DrawableAutoTiledSurface::drawOnCanvas(SkCanvas * const canvas,
         tileRect = tileSrc.intersected(maxRect);
     } else tileRect = maxRect;
     for(int tx = tileRect.left(); tx <= tileRect.right(); tx++) {
-        const SkScalar drawX = dst.x() + tx*TILE_SIZE;
+        const float drawX = dst.x() + tx*TILE_SIZE;
         for(int ty = tileRect.top(); ty <= tileRect.bottom(); ty++) {
             const auto img = imageForTile(tx, ty);
             if(!img) continue;
-            const SkScalar drawY = dst.y() + ty*TILE_SIZE;
+            const float drawY = dst.y() + ty*TILE_SIZE;
             if(grContext) {
                 SkiaHelpers::drawImageGPU(canvas, img, drawX, drawY,
                                           paint, grContext);

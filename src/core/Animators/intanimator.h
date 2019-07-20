@@ -1,6 +1,6 @@
 #ifndef INTANIMATOR_H
 #define INTANIMATOR_H
-#include "Animators/qrealanimator.h"
+#include "qrealanimator.h"
 
 class IntAnimator : public QrealAnimator {
     friend class SelfRef;

@@ -1,7 +1,7 @@
 #ifndef QREALKEY_H
 #define QREALKEY_H
-#include "Animators/graphkey.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "graphkey.h"
+#include "../smartPointers/sharedpointerdefs.h"
 
 class QPainter;
 class ComplexAnimator;

@@ -1,4 +1,4 @@
-#include "Animators/complexanimator.h"
+#include "complexanimator.h"
 #include <QPainter>
 
 ComplexAnimator::ComplexAnimator(const QString &name) : Animator(name) {}

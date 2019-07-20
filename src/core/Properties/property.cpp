@@ -9,7 +9,7 @@ Property::Property(const QString& name) :
 
 void Property::drawCanvasControls(SkCanvas * const canvas,
                                   const CanvasMode mode,
-                                  const SkScalar invScale) {
+                                  const float invScale) {
     if(mPointsHandler) {
         bool key;
         if(SWT_isAnimator()) {

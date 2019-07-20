@@ -1,11 +1,11 @@
 ﻿#ifndef SMARTPATHANIMATOR_H
 #define SMARTPATHANIMATOR_H
-#include "Animators/interpolationanimatort.h"
+#include "../interpolationanimatort.h"
 #include "differsinterpolate.h"
 #include "basicreadwrite.h"
 #include "smartpathkey.h"
-#include "MovablePoints/segment.h"
-#include "skia/skiahelpers.h"
+#include "../../MovablePoints/segment.h"
+#include "../../skia/skiahelpers.h"
 
 class SmartPathAnimator : public GraphAnimator {
     friend class SelfRef;
@@ -25,7 +25,7 @@ public:
 
     void drawCanvasControls(SkCanvas * const canvas,
                             const CanvasMode mode,
-                            const SkScalar invScale) {
+                            const float invScale) {
         SkiaHelpers::drawOutlineOverlay(canvas, mCurrentPath, invScale,
                                         toSkMatrix(getTransform()));
         Property::drawCanvasControls(canvas, mode, invScale);

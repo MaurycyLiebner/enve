@@ -170,11 +170,11 @@ void switchSkQ(const SkPoint &skPos, QPointF &qPos) {
     qPos = toQPointF(skPos);
 }
 
-void switchSkQ(const qreal q, SkScalar &sk) {
+void switchSkQ(const qreal q, float &sk) {
     sk = toSkScalar(q);
 }
 
-void switchSkQ(const SkScalar sk, qreal &q) {
+void switchSkQ(const float sk, qreal &q) {
     q = toQreal(sk);
 }
 #include <QFont>

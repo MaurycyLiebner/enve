@@ -60,7 +60,7 @@ void gSolidify(const qreal widthT,
     SkStroke strokerSk;
     strokerSk.setJoin(SkPaint::kRound_Join);
     strokerSk.setCap(SkPaint::kRound_Cap);
-    strokerSk.setWidth(static_cast<SkScalar>(aWidth2));
+    strokerSk.setWidth(static_cast<float>(aWidth2));
 
     SkPath src2 = gPathToPolyline(src);
     SkPath outline;

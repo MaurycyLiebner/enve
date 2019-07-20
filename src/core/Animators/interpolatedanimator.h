@@ -1,6 +1,6 @@
 #ifndef INTERPOLATEDANIMATOR_H
 #define INTERPOLATEDANIMATOR_H
-#include "Animators/animatort.h"
+#include "animatort.h"
 
 template <typename T>
 class InterpolatedAnimator : public AnimatorT<T> {

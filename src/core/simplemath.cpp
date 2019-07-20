@@ -1,4 +1,5 @@
 #include "simplemath.h"
+#include "skia/skqtconversions.h"
 
 qreal signedSquare(const qreal val) {
     return val*val*SIGN(val);
@@ -15,8 +16,8 @@ qreal gRandF(const qreal fMin, const qreal fMax) {
     return fMin + f * (fMax - fMin);
 }
 
-SkScalar gSkRandF(const SkScalar fMin, const SkScalar fMax) {
-    SkScalar f = static_cast<SkScalar>(qrand())/RAND_MAX;
+float gSkRandF(const float fMin, const float fMax) {
+    float f = static_cast<float>(qrand())/RAND_MAX;
     return fMin + f * (fMax - fMin);
 }
 
@@ -24,7 +25,7 @@ qreal pointToLen(QPointF point) {
     return qSqrt(point.x()*point.x() + point.y()*point.y());
 }
 
-SkScalar pointToLen(SkPoint point) {
+float pointToLen(const SkPoint &point) {
     return SkScalarSqrt(point.x()*point.x() + point.y()*point.y());
 }
 
@@ -93,7 +94,7 @@ bool isZero2Dec(const qreal val) {
     return qAbs(val) < 0.01;
 }
 
-bool isZero2Dec(const SkScalar val) {
+bool isZero2Dec(const float val) {
     return qAbs(val) < 0.01f;
 }
 

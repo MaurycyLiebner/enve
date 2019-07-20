@@ -14,13 +14,13 @@ void GradientPoint::setColor(const QColor &fillColor) {
 }
 
 void GradientPoint::drawSk(SkCanvas * const canvas, const CanvasMode mode,
-                           const SkScalar invScale, const bool keyOnCurrent) {
+                           const float invScale, const bool keyOnCurrent) {
     Q_UNUSED(mode);
 
     const SkPoint absPos = toSkPoint(getAbsolutePos());
     canvas->save();
 
-    const SkScalar scaledRadius = toSkScalar(getRadius())*invScale;
+    const float scaledRadius = toSkScalar(getRadius())*invScale;
 
     SkPaint paint;
     paint.setAntiAlias(true);

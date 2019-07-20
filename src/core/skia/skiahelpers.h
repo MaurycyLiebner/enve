@@ -12,8 +12,8 @@ namespace SkiaHelpers {
 
     void drawImageGPU(SkCanvas* const canvas,
                       const sk_sp<SkImage>& image,
-                      const SkScalar x,
-                      const SkScalar y,
+                      const float x,
+                      const float y,
                       SkPaint * const paint,
                       GrContext* const context);
     SkImageInfo getPremulRGBAInfo(const int width,
@@ -31,25 +31,25 @@ namespace SkiaHelpers {
 
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,
-                            const SkScalar invScale);
+                            const float invScale);
 
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,
-                            const SkScalar invScale,
+                            const float invScale,
                             const SkMatrix& transform);
 
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,
-                            const SkScalar invScale,
+                            const float invScale,
                             const bool dashes,
-                            const SkScalar intervalSize);
+                            const float intervalSize);
 
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,
-                            const SkScalar invScale,
+                            const float invScale,
                             const SkMatrix& transform,
                             const bool dashes,
-                            const SkScalar intervalSize);
+                            const float intervalSize);
 
     void forceLink();
 }

@@ -1,8 +1,8 @@
 #ifndef QREALSNAPSHOT_H
 #define QREALSNAPSHOT_H
 class QrealKey;
-#include "pointhelpers.h"
-#include "framerange.h"
+#include "../pointhelpers.h"
+#include "../framerange.h"
 
 class QrealSnapshot {
     friend class Iterator;

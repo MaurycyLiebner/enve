@@ -1,6 +1,6 @@
 #ifndef BOOLPROPERTY_H
 #define BOOLPROPERTY_H
-#include "Properties/property.h"
+#include "property.h"
 
 class BoolProperty : public Property {
     friend class SelfRef;
@@ -17,7 +17,7 @@ private:
     bool mValue = false;
 };
 
-#include "Animators/staticcomplexanimator.h"
+#include "../Animators/staticcomplexanimator.h"
 class BoolPropertyContainer : public StaticComplexAnimator {
     friend class SelfRef;
 protected:

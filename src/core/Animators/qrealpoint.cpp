@@ -1,5 +1,5 @@
 #include "qrealpoint.h"
-#include "Animators/graphkey.h"
+#include "graphkey.h"
 
 QrealPoint::QrealPoint(const QrealPointType& type,
                        GraphKey * const parentKey,

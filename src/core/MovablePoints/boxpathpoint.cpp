@@ -27,7 +27,7 @@ void BoxPathPoint::finishTransform() {
 }
 
 void BoxPathPoint::drawSk(SkCanvas * const canvas, const CanvasMode mode,
-                          const SkScalar invScale, const bool keyOnCurrent) {
+                          const float invScale, const bool keyOnCurrent) {
     Q_UNUSED(mode);
     Q_UNUSED(keyOnCurrent);
     const SkPoint absPos = toSkPoint(getAbsolutePos());
@@ -41,7 +41,7 @@ void BoxPathPoint::drawSk(SkCanvas * const canvas, const CanvasMode mode,
     SkPaint paint;
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
-    const SkScalar scaledHalfRadius = toSkScalar(getRadius()*0.5)*invScale;
+    const float scaledHalfRadius = toSkScalar(getRadius()*0.5)*invScale;
     canvas->drawLine(-scaledHalfRadius, 0, scaledHalfRadius, 0, paint);
     canvas->drawLine(0, -scaledHalfRadius, 0, scaledHalfRadius, paint);
     canvas->restore();

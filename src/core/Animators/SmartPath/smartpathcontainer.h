@@ -1,13 +1,13 @@
 #ifndef SMARTPATHCONTAINER_H
 #define SMARTPATHCONTAINER_H
-#include "simplemath.h"
-#include "skia/skiaincludes.h"
-#include "exceptions.h"
-#include "pointhelpers.h"
+#include "../../simplemath.h"
+#include "../../skia/skiaincludes.h"
+#include "../../exceptions.h"
+#include "../../pointhelpers.h"
 #include "nodelist.h"
 #include "nodepointvalues.h"
-#include "framerange.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "../../framerange.h"
+#include "../../smartPointers/sharedpointerdefs.h"
 
 class SmartPath {
 public:

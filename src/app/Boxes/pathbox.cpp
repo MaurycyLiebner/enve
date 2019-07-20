@@ -408,7 +408,7 @@ void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
     }
 }
 
-void PathBox::drawHoveredSk(SkCanvas *canvas, const SkScalar invScale) {
+void PathBox::drawHoveredSk(SkCanvas *canvas, const float invScale) {
     drawHoveredPathSk(canvas, mPathSk, invScale);
 }
 

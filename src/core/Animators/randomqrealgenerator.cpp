@@ -1,10 +1,10 @@
 #include "randomqrealgenerator.h"
 #include "pointhelpers.h"
 #include "qrealanimator.h"
-#include "Animators/qrealkey.h"
+#include "qrealkey.h"
 #include "pointhelpers.h"
 #include "Properties/comboboxproperty.h"
-#include "Animators/intanimator.h"
+#include "intanimator.h"
 
 RandomQrealGenerator::RandomQrealGenerator() :
     QrealValueEffect("noise") {

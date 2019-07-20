@@ -1,7 +1,7 @@
 #ifndef POINTSHANDLER_H
 #define POINTSHANDLER_H
 #include "movablepoint.h"
-#include "smartPointers/stdselfref.h"
+#include "../smartPointers/stdselfref.h"
 class BoxTransformAnimator;
 enum CanvasMode : short;
 
@@ -52,7 +52,7 @@ public:
     }
 
     void drawPoints(SkCanvas * const canvas,
-                    const SkScalar invScale,
+                    const float invScale,
                     const bool keyOnCurrentFrame,
                     const CanvasMode mode) const {
         for(int i = mPts.count() - 1; i >= 0; i--) {

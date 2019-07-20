@@ -2,7 +2,7 @@
 #define STDSELFREF_H
 #include <QtCore>
 #include <memory>
-#include "exceptions.h"
+#include "../exceptions.h"
 template <class T>
 class StdPointer;
 template <class T> using stdsptr = std::shared_ptr<T>;

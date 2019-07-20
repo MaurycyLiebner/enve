@@ -1,5 +1,6 @@
 #include "rastereffects.h"
 #include "colorhelpers.h"
+#include "skia/skiaincludes.h"
 #include <QColor>
 
 #include <cmath>

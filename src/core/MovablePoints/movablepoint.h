@@ -3,9 +3,10 @@
 #include <QPointF>
 #include <QRectF>
 #include <QPainter>
-#include "skia/skiaincludes.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "../smartPointers/sharedpointerdefs.h"
 
+class SkCanvas;
+class SkPoint;
 class BoundingBox;
 class NodePoint;
 class BasicTransformAnimator;
@@ -44,7 +45,7 @@ public:
 
     virtual void drawSk(SkCanvas * const canvas,
                         const CanvasMode mode,
-                        const SkScalar invScale,
+                        const float invScale,
                         const bool keyOnCurrent);
 
     virtual void remove() {}
@@ -102,7 +103,7 @@ public:
     qreal getRadius();
 
     void drawHovered(SkCanvas * const canvas,
-                     const SkScalar invScale);
+                     const float invScale);
 
     QPointF mapRelativeToAbsolute(const QPointF &relPos) const;
     QPointF mapAbsoluteToRelative(const QPointF &absPos) const;
@@ -129,8 +130,8 @@ public:
 protected:
     void drawOnAbsPosSk(SkCanvas * const canvas,
                         const SkPoint &absPos,
-                        const SkScalar invScale,
-                        const SkColor &fillColor,
+                        const float invScale,
+                        const float &fillColor,
                         const bool keyOnCurrent = false);
 private:
     bool mSelectionEnabled = true;

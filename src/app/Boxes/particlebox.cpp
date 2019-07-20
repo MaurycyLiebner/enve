@@ -129,7 +129,7 @@ void Particle::initializeParticle(const int firstFrame,
                                   const int nFrames,
                                   const SkPoint &iniPos,
                                   const SkPoint &iniVel,
-                                  const SkScalar partSize) {
+                                  const float partSize) {
     mSize = partSize;
     mPrevVelocityVar = SkPoint::Make(0., 0.);
     mNextVelocityVar = SkPoint::Make(0., 0.);
@@ -149,13 +149,13 @@ void Particle::initializeParticle(const int firstFrame,
 }
 
 void Particle::generatePathNextFrame(const int frame,
-                                     const SkScalar velocityVar,
-                                     const SkScalar velocityVarPeriod,
+                                     const float velocityVar,
+                                     const float velocityVarPeriod,
                                      const SkPoint &acc,
-                                     const SkScalar finalScale,
-                                     const SkScalar finalOpacity,
-                                     const SkScalar decayFrames,
-                                     const SkScalar length) {
+                                     const float finalScale,
+                                     const float finalOpacity,
+                                     const float decayFrames,
+                                     const float length) {
     if(mPrevVelocityDuration > velocityVarPeriod) {
         mPrevVelocityVar = mNextVelocityVar;
         mNextVelocityVar = SkPoint::Make(gRandF(-velocityVar, velocityVar),
@@ -166,7 +166,7 @@ void Particle::generatePathNextFrame(const int frame,
     int arrayId = frame - mFirstFrame;
 
     if(arrayId == 0) {
-        SkScalar iniTime = gRandF(0., 1.);
+        float iniTime = gRandF(0., 1.);
         mLastPos += mLastVel*iniTime;
         mLastVel += acc*iniTime;
     }
@@ -178,14 +178,14 @@ void Particle::generatePathNextFrame(const int frame,
     }
 
     SkPath linePath;
-    SkScalar currLen = 0.;
+    float currLen = 0.;
     int currId = arrayId - 1;
     SkPoint lastPos = mLastPos;
     linePath.moveTo(lastPos);
     while(currId > -1) {
         SkPoint currPos = mParticleStates[currId].fPos;
-        SkScalar lenInc = pointToLen(lastPos - currPos);
-        SkScalar newLen = currLen + lenInc;
+        float lenInc = pointToLen(lastPos - currPos);
+        float newLen = currLen + lenInc;
         if(newLen > length) {
             linePath.lineTo(lastPos + (currPos - lastPos)*
                             (length - currLen)*(1./lenInc));
@@ -205,7 +205,7 @@ void Particle::generatePathNextFrame(const int frame,
                           qMax(0, qMin(255, qRound(mLastOpacity*255))),
                           linePath);
 
-    SkScalar perPrevVelVar = (velocityVarPeriod - mPrevVelocityDuration)/
+    float perPrevVelVar = (velocityVarPeriod - mPrevVelocityDuration)/
                             velocityVarPeriod;
     mLastPos += mLastVel + mPrevVelocityVar*perPrevVelVar +
                     mNextVelocityVar*(1.f - perPrevVelVar);

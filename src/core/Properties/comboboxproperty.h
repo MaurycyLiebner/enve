@@ -1,6 +1,6 @@
 #ifndef COMBOBOXPROPERTY_H
 #define COMBOBOXPROPERTY_H
-#include "Properties/property.h"
+#include "property.h"
 class ComboBoxProperty : public Property {
     Q_OBJECT
     friend class SelfRef;

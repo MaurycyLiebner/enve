@@ -1,6 +1,9 @@
 #ifndef GRAPHKEY_H
 #define GRAPHKEY_H
 #include "key.h"
+#include "../basicreadwrite.h"
+#include "../pointhelpers.h"
+
 enum QrealPointType : short;
 class QrealPoint;
 
@@ -58,7 +61,6 @@ public:
     }
 };
 
-#include "basicreadwrite.h"
 class ClampedPoint {
     ClampedValue mX;
     ClampedValue mY;

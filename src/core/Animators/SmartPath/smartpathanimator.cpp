@@ -1,5 +1,5 @@
 #include "smartpathanimator.h"
-#include "../qrealpoint.h"
+#include "Animators/qrealpoint.h"
 #include "smartpathcollection.h"
 #include "MovablePoints/pathpointshandler.h"
 

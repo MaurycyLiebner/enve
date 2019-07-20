@@ -1,5 +1,5 @@
-#include "Animators/qpointfanimator.h"
-#include "Animators/qrealanimator.h"
+#include "qpointfanimator.h"
+#include "qrealanimator.h"
 
 QPointFAnimator::QPointFAnimator(const QString &name) :
     StaticComplexAnimator(name) {

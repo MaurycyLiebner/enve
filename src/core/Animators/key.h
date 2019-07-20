@@ -1,7 +1,6 @@
 #ifndef KEY_H
 #define KEY_H
-#include "smartPointers/sharedpointerdefs.h"
-#include "pointhelpers.h"
+#include "../smartPointers/sharedpointerdefs.h"
 
 #include <QtCore>
 class QPainter;

@@ -1,6 +1,6 @@
 ﻿#ifndef COMPLEXANIMATOR_H
 #define COMPLEXANIMATOR_H
-#include "Animators/animator.h"
+#include "animator.h"
 #include "key.h"
 
 class ComplexKey;

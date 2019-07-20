@@ -1,6 +1,6 @@
 #ifndef QPOINTFANIMATOR_H
 #define QPOINTFANIMATOR_H
-#include "Animators/staticcomplexanimator.h"
+#include "staticcomplexanimator.h"
 #include "skia/skiaincludes.h"
 
 class QPointFAnimator : public StaticComplexAnimator {

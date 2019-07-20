@@ -12,10 +12,12 @@ SKIA_FOLDER = $$HOME_FOLDER/.skia2
 QT += multimedia core gui svg opengl sql qml xml concurrent #widgets-private # gui-private core-private
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc -ljson-c
 
-QMAKE_RPATHDIR += ../core/
+ENVE_FOLDER = $$PWD/../../
+
+INCLUDEPATH += ../core
+DEPENDPATH += ../core
+
 LIBS += -L$$OUT_PWD/../core/ -lenvecore
-INCLUDEPATH += $$PWD/../core
-DEPENDPATH += $$PWD/../core
 
 LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
 INCLUDEPATH += /usr/local/include/libmypaint/

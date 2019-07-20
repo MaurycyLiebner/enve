@@ -21,11 +21,7 @@ protected:
 
     virtual void drawSk(SkCanvas * const canvas) = 0;
     virtual void setupRenderData() {}
-    virtual void transformRenderCanvas(SkCanvas& canvas) const {
-        canvas.translate(toSkScalar(-fGlobalRect.x()),
-                         toSkScalar(-fGlobalRect.y()));
-        canvas.concat(toSkMatrix(fScaledTransform));
-    }
+    virtual void transformRenderCanvas(SkCanvas& canvas) const;
     virtual void copyFrom(BoundingBoxRenderData *src);
     virtual void updateRelBoundingRect();
 

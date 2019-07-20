@@ -94,7 +94,7 @@ extern void gSmoothyAbsCtrlsForPtBetween(
 extern void gSmoothyAbsCtrlsForPtBetween(
         const SkPoint &lastP, const SkPoint &currP,
         const SkPoint &nextP, SkPoint &c1, SkPoint &c2,
-        SkScalar smoothness);
+        float smoothness);
 
 extern SkPath gPathToPolyline(const SkPath& path);
 extern void gForEverySegmentInPath(
@@ -109,33 +109,33 @@ extern void gGetSmoothAbsCtrlsForPtBetween(const SkPoint &prevP,
                                            const SkPoint &currP,
                                            const SkPoint &nextP,
                                            SkPoint &c1, SkPoint &c2,
-                                           const SkScalar smoothLen);
+                                           const float smoothLen);
 
 extern void gAtomicDisplaceFilterPath(const qreal baseSeed,
                                       SkPath* const dst,
                                       const SkPath& src,
-                                      const SkScalar maxDev);
+                                      const float maxDev);
 
 extern bool gAtomicDisplaceFilterPath(const qreal baseSeed,
                                       SkPath * const dst,
                                       const SkPath& src,
-                                      const SkScalar maxDev,
-                                      const SkScalar segLen,
-                                      const SkScalar smoothness);
+                                      const float maxDev,
+                                      const float segLen,
+                                      const float smoothness);
 
 extern void gSpatialDisplaceFilterPath(const qreal baseSeed,
                                        const qreal gridSize,
                                        SkPath* const dst,
                                        const SkPath& src,
-                                       const SkScalar maxDev);
+                                       const float maxDev);
 
 extern bool gSpatialDisplaceFilterPath(const qreal baseSeed,
                                        const qreal gridSize,
                                        SkPath* const dst,
                                        const SkPath& src,
-                                       const SkScalar maxDev,
-                                       const SkScalar segLen,
-                                       const SkScalar smoothness);
+                                       const float maxDev,
+                                       const float segLen,
+                                       const float smoothness);
 
 qreal gMapTToFragment(const qreal minAbsT,
                       const qreal maxAbsT,

@@ -1,6 +1,7 @@
 #ifndef COLORSETTING_H
 #define COLORSETTING_H
 class ColorAnimator;
+#include <QColor>
 #include "colorhelpers.h"
 #include "smartPointers/sharedpointerdefs.h"
 enum ColorSettingType : short {

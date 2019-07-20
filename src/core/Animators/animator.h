@@ -2,7 +2,7 @@
 #define ANIMATOR_H
 
 class QIODevice;
-#include "Properties/property.h"
+#include "../Properties/property.h"
 #include "key.h"
 
 class ComplexAnimator;

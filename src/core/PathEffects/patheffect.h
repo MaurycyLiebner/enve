@@ -1,8 +1,8 @@
 #ifndef PATHEFFECT_H
 #define PATHEFFECT_H
-#include "Animators/complexanimator.h"
-#include "skia/skiaincludes.h"
-#include "Animators/staticcomplexanimator.h"
+#include "../Animators/complexanimator.h"
+#include "../skia/skiaincludes.h"
+#include "../Animators/staticcomplexanimator.h"
 class BoolProperty;
 class PathBox;
 class BoundingBox;

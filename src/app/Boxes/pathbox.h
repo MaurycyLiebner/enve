@@ -94,7 +94,7 @@ public:
 
     bool relPointInsidePath(const QPointF &relPos) const;
 
-    void drawHoveredSk(SkCanvas *canvas, const SkScalar invScale);
+    void drawHoveredSk(SkCanvas *canvas, const float invScale);
 
     void applyPaintSetting(const PaintSettingsApplier &setting);
 

@@ -1,7 +1,7 @@
 #ifndef QREALPOINT_H
 #define QREALPOINT_H
 #include <QPainter>
-#include "smartPointers/sharedpointerdefs.h"
+#include "../smartPointers/sharedpointerdefs.h"
 
 class GraphKey;
 

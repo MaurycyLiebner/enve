@@ -1,9 +1,9 @@
 #ifndef SMARTPATHCOLLECTION_H
 #define SMARTPATHCOLLECTION_H
 #include <QList>
-#include "Animators/dynamiccomplexanimator.h"
-#include "Animators/SmartPath/smartpathanimator.h"
-#include "MovablePoints/segment.h"
+#include "../dynamiccomplexanimator.h"
+#include "smartpathanimator.h"
+#include "../../MovablePoints/segment.h"
 
 class SmartPathAnimator;
 class SmartNodePoint;

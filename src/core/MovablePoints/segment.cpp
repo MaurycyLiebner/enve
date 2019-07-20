@@ -132,7 +132,7 @@ void NormalSegment::generateSkPath() {
 }
 
 void NormalSegment::drawHoveredSk(SkCanvas * const canvas,
-                            const SkScalar invScale) {
+                            const float invScale) {
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setColor(SK_ColorBLACK);

@@ -38,7 +38,7 @@ bool supports(const CustomIdentifier &identifier) {
     return identifier.fVersion == effectVersion();
 }
 
-#include "Animators/qrealanimator.h"
+#include "enveCore/Animators/qrealanimator.h"
 ExamplePathEffect000::ExamplePathEffect000() :
     CustomPathEffect(effectName().toLower()) {
     mInfluence = SPtrCreate(QrealAnimator)(0, 0, 1, 0.1, "influence");
@@ -52,8 +52,8 @@ CustomIdentifier ExamplePathEffect000::getIdentifier() const {
 void ExamplePathEffect000::apply(const qreal relFrame,
                                  const SkPath &src,
                                  SkPath * const dst) {
-    const SkScalar infl = toSkScalar(mInfluence->getEffectiveValue(relFrame));
-    const SkScalar invInf = 1 - infl;
+    const float infl = toSkScalar(mInfluence->getEffectiveValue(relFrame));
+    const float invInf = 1 - infl;
     dst->reset();
 
     SkPath::Iter iter(src, false);

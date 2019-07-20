@@ -140,8 +140,8 @@ void drawTransparencyMesh(SkCanvas * const canvas,
     bitmap.setPixels(pixels);
 
     SkMatrix matr;
-    const SkScalar scale = canvas->getTotalMatrix().getMinScale();
-    const SkScalar dim = MIN_WIDGET_DIM*0.5f / (scale > 1.f ? 1.f : scale);
+    const float scale = canvas->getTotalMatrix().getMinScale();
+    const float dim = MIN_WIDGET_DIM*0.5f / (scale > 1.f ? 1.f : scale);
     matr.setScale(dim, dim);
     const auto shader = bitmap.makeShader(SkTileMode::kRepeat,
                                           SkTileMode::kRepeat, &matr);
@@ -162,15 +162,15 @@ void Canvas::renderSk(SkCanvas * const canvas,
     paint.setStyle(SkPaint::kFill_Style);
     const SkRect canvasRect = SkRect::MakeWH(mWidth, mHeight);
     const qreal qInvZoom = 1/viewTrans.m11();
-    const SkScalar invZoom = toSkScalar(qInvZoom);
+    const float invZoom = toSkScalar(qInvZoom);
     const SkMatrix skViewTrans = toSkMatrix(viewTrans);
     const QColor bgColor = mBackgroundColor->getColor();
-    const SkScalar intervals[2] = {MIN_WIDGET_DIM*0.25f*invZoom,
+    const float intervals[2] = {MIN_WIDGET_DIM*0.25f*invZoom,
                                    MIN_WIDGET_DIM*0.25f*invZoom};
     const auto dashPathEffect = SkDashPathEffect::Make(intervals, 2, 0);
 
     canvas->concat(skViewTrans);
-    const SkScalar reversedRes = toSkScalar(1/mResolutionFraction);
+    const float reversedRes = toSkScalar(1/mResolutionFraction);
     if(isPreviewingOrRendering()) {
         if(mCurrentPreviewContainer) {
             canvas->clear(SK_ColorBLACK);

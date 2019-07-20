@@ -26,7 +26,7 @@
 #define pow3(val) (val*val*val)
 
 #include <QtCore>
-#include "skia/skqtconversions.h"
+class SkPoint;
 
 extern qreal signedSquare(const qreal val);
 
@@ -55,7 +55,7 @@ extern bool isOne4Dec(const float val);
 extern bool isOne6Dec(const float val);
 
 extern bool isZero2Dec(const qreal val);
-extern bool isZero2Dec(const SkScalar val);
+extern bool isZero2Dec(const float val);
 
 extern bool isZero1Dec(qreal val);
 
@@ -111,14 +111,14 @@ float clamp(const float val, const T1 &min, const T2 &max) {
 extern int clamp(const int val, const int min, const int max);
 
 extern qreal gRandF(const qreal fMin = 0, const qreal fMax = 1);
-extern SkScalar gSkRandF(const SkScalar fMin = 0, const SkScalar fMax = 1);
+extern float gSkRandF(const float fMin = 0, const float fMax = 1);
 extern QPointF symmetricToPos(const QPointF &toMirror,
                               const QPointF &mirrorCenter);
 extern QPointF symmetricToPosNewLen(const QPointF& toMirror,
                                     const QPointF& mirrorCenter,
                                     const qreal newLen);
 extern qreal pointToLen(QPointF point);
-extern SkScalar pointToLen(SkPoint point);
+extern float pointToLen(const SkPoint& point);
 extern QPointF scalePointToNewLen(const QPointF &point,
                                   const qreal newLen);
 extern QPointF gRotPt(const QPointF& pt, const qreal deg);

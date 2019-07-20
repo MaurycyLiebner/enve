@@ -38,7 +38,8 @@ bool supports(const CustomIdentifier &identifier) {
     return identifier.fVersion == effectVersion();
 }
 
-#include "Animators/qrealanimator.h"
+#include "enveCore/Animators/qrealanimator.h"
+
 DabTest000::DabTest000() :
     CustomGpuEffect(effectName().toLower()) {
     mRadius = SPtrCreate(QrealAnimator)(0.5, 0, 1, 0.1, "radius");

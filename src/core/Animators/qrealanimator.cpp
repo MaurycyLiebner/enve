@@ -1,9 +1,9 @@
-#include "Animators/qrealanimator.h"
+#include "qrealanimator.h"
 #include <QMenu>
-#include "Animators/qrealpoint.h"
-#include "Animators/qrealkey.h"
+#include "qrealpoint.h"
+#include "qrealkey.h"
 #include "randomqrealgenerator.h"
-#include "Animators/fakecomplexanimator.h"
+#include "fakecomplexanimator.h"
 
 QrealAnimator::QrealAnimator(const qreal iniVal,
                              const qreal minVal,

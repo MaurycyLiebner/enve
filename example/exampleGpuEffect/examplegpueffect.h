@@ -7,13 +7,13 @@ class ExampleGpuEffectCaller000 : public GPURasterEffectCaller {
 public:
     ExampleGpuEffectCaller000(const qreal radius) :
         GPURasterEffectCaller(true, QMargins() + qCeil(radius)),
-        mRadius(toSkScalar(radius)) {}
+        mRadius(static_cast<float>(radius)) {}
 
     void render(QGL33 * const gl,
                 GpuRenderTools& renderTools,
                 GpuRenderData& data);
 private:
-    const SkScalar mRadius;
+    const float mRadius;
 };
 
 class ExampleGpuEffect000 : public CustomGpuEffect {

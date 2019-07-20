@@ -61,7 +61,7 @@ public:
     void generateSkPath();
 
     void drawHoveredSk(SkCanvas * const canvas,
-                       const SkScalar invScale);
+                       const float invScale);
 
     SmartNodePoint *getFirstNode() const;
     SmartNodePoint *getLastNode() const;

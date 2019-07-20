@@ -14,7 +14,7 @@ protected:
 public:
     void drawCanvasControls(SkCanvas *const canvas,
                             const CanvasMode mode,
-                            const SkScalar invScale);
+                            const float invScale);
 
     void enable();
     void disable();

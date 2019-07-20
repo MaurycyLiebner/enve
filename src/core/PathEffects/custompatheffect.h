@@ -1,7 +1,7 @@
 #ifndef CUSTOMPATHEFFECT_H
 #define CUSTOMPATHEFFECT_H
 #include "patheffect.h"
-#include "customidentifier.h"
+#include "../customidentifier.h"
 
 class CustomPathEffect : public PathEffect {
 protected:

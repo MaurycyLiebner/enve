@@ -49,7 +49,7 @@ stdsptr<PixmapEffectRenderData> ShadowEffect::getPixmapEffectRenderDataForRelFra
 
 void ShadowEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                                             const qreal scale) {
-    const SkScalar sigma = toSkScalar(fBlurRadius*0.3333*scale);
+    const float sigma = toSkScalar(fBlurRadius*0.3333*scale);
     const auto src = SkiaHelpers::makeCopy(bitmap);
     SkCanvas canvas(bitmap);
     canvas.clear(SK_ColorTRANSPARENT);
@@ -60,7 +60,7 @@ void ShadowEffectRenderData::applyEffectsSk(const SkBitmap &bitmap,
                 SkDropShadowImageFilter::kDrawShadowAndForeground_ShadowMode,
                 nullptr);
     paint.setImageFilter(filter);
-    const SkScalar opacityM[20] = {
+    const float opacityM[20] = {
         1, 0, 0, 0, 0,
         0, 1, 0, 0, 0,
         0, 0, 1, 0, 0,

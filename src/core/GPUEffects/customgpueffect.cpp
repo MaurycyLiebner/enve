@@ -1,4 +1,4 @@
-#include "customgpueffect.h"
+#include "GPUEffects/customgpueffect.h"
 #include "basicreadwrite.h"
 
 CustomGpuEffect::CustomGpuEffect(const QString &name) :

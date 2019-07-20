@@ -1,7 +1,7 @@
 #ifndef CUSTOMGPUEFFECT_H
 #define CUSTOMGPUEFFECT_H
 #include "gpueffect.h"
-#include "customidentifier.h"
+#include "../customidentifier.h"
 
 class CustomGpuEffect : public GpuEffect {
 protected:

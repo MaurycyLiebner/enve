@@ -1,6 +1,6 @@
 #ifndef STEPPEDANIMATOR_H
 #define STEPPEDANIMATOR_H
-#include "Animators/animatort.h"
+#include "animatort.h"
 
 template <typename T>
 class SteppedAnimator : public AnimatorT<T> {

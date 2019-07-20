@@ -1,6 +1,6 @@
 #ifndef VALUEANIMATORS_H
 #define VALUEANIMATORS_H
-#include "Animators/graphanimator.h"
+#include "graphanimator.h"
 #include "qrealsnapshot.h"
 class QrealKey;
 class QrealPoint;

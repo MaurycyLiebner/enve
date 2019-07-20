@@ -180,13 +180,13 @@ void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
     transferData(mGPUEffectsAnimators, targetBox->mGPUEffectsAnimators);
 }
 
-void BoundingBox::drawHoveredSk(SkCanvas *canvas, const SkScalar invScale) {
+void BoundingBox::drawHoveredSk(SkCanvas *canvas, const float invScale) {
     drawHoveredPathSk(canvas, mSkRelBoundingRectPath, invScale);
 }
 
 void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
                                     const SkPath &path,
-                                    const SkScalar invScale) {
+                                    const float invScale) {
     canvas->save();
     SkPath mappedPath = path;
     mappedPath.transform(toSkMatrix(
@@ -256,7 +256,7 @@ void BoundingBox::updateAllBoxes(const UpdateReason &reason) {
 
 void BoundingBox::drawAllCanvasControls(SkCanvas * const canvas,
                                         const CanvasMode mode,
-                                        const SkScalar invScale) {
+                                        const float invScale) {
     for(const auto& prop : mCanvasProps)
         prop->drawCanvasControls(canvas, mode, invScale);
 }
@@ -547,7 +547,7 @@ OutlineSettingsAnimator *BoundingBox::getStrokeSettings() const {
 }
 
 void BoundingBox::drawBoundingRect(SkCanvas * const canvas,
-                                   const SkScalar invScale) {
+                                   const float invScale) {
     SkiaHelpers::drawOutlineOverlay(canvas, mSkRelBoundingRectPath,
                                     invScale, toSkMatrix(getTotalTransform()),
                                     true, MIN_WIDGET_DIM*0.25f);

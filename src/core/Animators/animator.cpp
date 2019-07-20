@@ -1,7 +1,7 @@
 #include "animator.h"
 
 #include <QPainter>
-#include "Animators/complexanimator.h"
+#include "complexanimator.h"
 #include "key.h"
 #include "fakecomplexanimator.h"
 #include "PropertyUpdaters/propertyupdater.h"

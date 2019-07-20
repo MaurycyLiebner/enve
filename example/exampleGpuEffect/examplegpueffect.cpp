@@ -38,7 +38,7 @@ bool supports(const CustomIdentifier &identifier) {
     return identifier.fVersion == effectVersion();
 }
 
-#include "Animators/qrealanimator.h"
+#include "enveCore/Animators/qrealanimator.h"
 ExampleGpuEffect000::ExampleGpuEffect000() :
     CustomGpuEffect(effectName().toLower()) {
     mRadius = SPtrCreate(QrealAnimator)(10, 0, 999.999, 1, "radius");
@@ -70,7 +70,7 @@ void ExampleGpuEffectCaller000::render(QGL33 * const gl,
 
     canvas->clear(SK_ColorTRANSPARENT);
     SkPaint paint;
-    const SkScalar sigma = mRadius*0.3333333f;
+    const float sigma = mRadius*0.3333333f;
     const auto filter = SkBlurImageFilter::Make(sigma, sigma, nullptr);
     paint.setImageFilter(filter);
     const SkIRect localSrc = fSrcRect.makeOffset(-data.fPosX, -data.fPosY);

@@ -19,7 +19,7 @@ public:
 
     void drawSk(SkCanvas * const canvas,
                 const CanvasMode mode,
-                const SkScalar invScale,
+                const float invScale,
                 const bool keyOnCurrent);
 };
 

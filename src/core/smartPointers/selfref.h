@@ -3,7 +3,7 @@
 #include <QPointer>
 #include <QSharedPointer>
 #include <QObject>
-#include "exceptions.h"
+#include "../exceptions.h"
 
 template <class T> using qsptr = QSharedPointer<T>;
 template <class T> using qptr = QPointer<T>;

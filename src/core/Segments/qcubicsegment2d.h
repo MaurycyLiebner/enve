@@ -1,9 +1,9 @@
 #ifndef QCUBICSEGMENT2D_H
 #define QCUBICSEGMENT2D_H
-#include <skia/skiaincludes.h>
+#include "../skia/skqtconversions.h"
 #include <QPointF>
 #include <QPainterPath>
-#include "simplemath.h"
+#include "../simplemath.h"
 typedef std::pair<qreal, qreal> qrealPair;
 struct qCubicSegment1D;
 
@@ -53,11 +53,9 @@ struct qCubicSegment2D {
         return qCubicSegment2D(p0, p0 + 2*(c - p0)/3, p1 + 2*(c - p1)/3, p1);
     }
 
-    SkPath toSkPath() const {
-        SkPath path;
+    void toSkPath(SkPath& path) const {
         path.moveTo(toSkPoint(mP0));
         path.cubicTo(toSkPoint(mC1), toSkPoint(mC2), toSkPoint(mP3));
-        return path;
     }
 
     QRectF ptsBoundingRect() const {

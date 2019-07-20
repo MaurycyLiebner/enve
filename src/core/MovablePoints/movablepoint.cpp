@@ -20,14 +20,14 @@ const QPointF &MovablePoint::getSavedRelPos() const {
 }
 
 void MovablePoint::drawHovered(SkCanvas * const canvas,
-                               const SkScalar invScale) {
+                               const float invScale) {
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setStrokeWidth(2*invScale);
     paint.setColor(SK_ColorRED);
     canvas->drawCircle(toSkPoint(getAbsolutePos()),
-                       static_cast<SkScalar>(mRadius)*invScale, paint);
+                       static_cast<float>(mRadius)*invScale, paint);
     //pen.setCosmetic(true);
     //p->setPen(pen);
 //    drawCosmeticEllipse(p, getAbsolutePos(),
@@ -53,13 +53,12 @@ QPointF MovablePoint::getAbsolutePos() const {
     return mapRelativeToAbsolute(getRelativePos());
 }
 
-void MovablePoint::drawOnAbsPosSk(
-        SkCanvas * const canvas,
+void MovablePoint::drawOnAbsPosSk(SkCanvas * const canvas,
         const SkPoint &absPos,
-        const SkScalar invScale,
-        const SkColor& fillColor,
+        const float invScale,
+        const float &fillColor,
         const bool keyOnCurrent) {
-    const SkScalar scaledRadius = static_cast<SkScalar>(mRadius)*invScale;
+    const float scaledRadius = static_cast<float>(mRadius)*invScale;
 
     SkPaint paint;
     paint.setAntiAlias(true);
@@ -74,7 +73,7 @@ void MovablePoint::drawOnAbsPosSk(
     canvas->drawCircle(absPos, scaledRadius, paint);
 
     if(keyOnCurrent) {
-        const SkScalar halfRadius = scaledRadius*0.5f;
+        const float halfRadius = scaledRadius*0.5f;
 
         paint.setColor(SK_ColorRED);
         paint.setStyle(SkPaint::kFill_Style);
@@ -88,7 +87,7 @@ void MovablePoint::drawOnAbsPosSk(
 }
 
 void MovablePoint::drawSk(SkCanvas * const canvas, const CanvasMode mode,
-                          const SkScalar invScale, const bool keyOnCurrent) {
+                          const float invScale, const bool keyOnCurrent) {
     Q_UNUSED(mode);
     Q_UNUSED(keyOnCurrent);
     const SkColor fillCol = mSelected ?

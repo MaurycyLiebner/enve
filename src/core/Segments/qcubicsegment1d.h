@@ -1,9 +1,8 @@
 #ifndef QCUBICSEGMENT1D_H
 #define QCUBICSEGMENT1D_H
-#include <skia/skiaincludes.h>
 #include <QPointF>
 #include <QPainterPath>
-#include "simplemath.h"
+#include "../simplemath.h"
 typedef std::pair<qreal, qreal> qrealPair;
 
 struct qCubicSegment1D {

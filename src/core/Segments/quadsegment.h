@@ -1,7 +1,7 @@
 #ifndef QUADSEGMENT_H
 #define QUADSEGMENT_H
-#include <skia/skiaincludes.h>
 #include <QPointF>
+class SkPoint;
 template <typename T>
 struct CubicSegment;
 
@@ -26,7 +26,7 @@ struct QuadSegment {
 };
 
 typedef QuadSegment<qreal> qQuadSegment1D;
-typedef QuadSegment<SkScalar> SkQuadSegment1D;
+typedef QuadSegment<float> SkQuadSegment1D;
 typedef QuadSegment<QPointF> qQuadSegment2D;
 typedef QuadSegment<SkPoint> SkQuadSegment2D;
 
