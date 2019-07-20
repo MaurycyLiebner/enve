@@ -1,0 +1,6 @@
+build/
+third_party/
+include/third_party
+
+*.creator.user*
+*.pro.user*
