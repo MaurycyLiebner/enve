@@ -6,6 +6,7 @@
 #include "fakecomplexanimator.h"
 #include "PropertyUpdaters/propertyupdater.h"
 #include "qrealpoint.h"
+#include "simplemath.h"
 
 Animator::Animator(const QString& name) : Property(name), anim_mKeys(this) {}
 

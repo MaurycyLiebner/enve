@@ -12,9 +12,11 @@ qCubicSegment2D::qCubicSegment2D(const qCubicSegment1D &xSeg,
     mP3 = QPointF(xSeg.c1(), ySeg.c1());
 }
 
-void qCubicSegment2D::toSkPath(SkPath &path) const {
+SkPath qCubicSegment2D::toSkPath() const {
+    SkPath path;
     path.moveTo(toSkPoint(mP0));
     path.cubicTo(toSkPoint(mC1), toSkPoint(mC2), toSkPoint(mP3));
+    return path;
 }
 
 qCubicSegment1D qCubicSegment2D::xSeg() const {

@@ -639,19 +639,22 @@ void loadCircle(const QDomElement &pathElement,
     const QString rYstr = pathElement.attribute("ry");
 
     qsptr<Circle> circle;
+    double rX, rY;
     if(!rStr.isEmpty()) {
-        circle = SPtrCreate(Circle)();
-        circle->setRadius(rStr.toDouble());
+        rX = rStr.toDouble();
+        rY = rX;
     } else if(!rXstr.isEmpty() && !rYstr.isEmpty()) {
-        circle = SPtrCreate(Circle)();
-        circle->setHorizontalRadius(rXstr.toDouble());
-        circle->setVerticalRadius(rYstr.toDouble());
+        rX = rXstr.toDouble();
+        rY = rYstr.toDouble();
     } else if(!rXstr.isEmpty() || !rYstr.isEmpty()) {
-        circle = SPtrCreate(Circle)();
-        const qreal rad = rXstr.isEmpty() ? rYstr.toDouble() : rXstr.toDouble();
-        circle->setHorizontalRadius(rad);
-        circle->setVerticalRadius(rad);
+        const qreal rXY = rXstr.isEmpty() ? rYstr.toDouble() : rXstr.toDouble();
+        rX = rXY;
+        rY = rXY;
     } else return;
+    if(isZero4Dec(rX) || isZero4Dec(rY)) return;
+    circle = SPtrCreate(Circle)();
+    circle->setHorizontalRadius(rX);
+    circle->setVerticalRadius(rY);
     circle->planCenterPivotPosition();
 
     circle->moveByRel(QPointF(cXstr.toDouble(), cYstr.toDouble()));
@@ -674,9 +677,9 @@ void loadRect(const QDomElement &pathElement,
     const auto rect = SPtrCreate(Rectangle)();
     rect->planCenterPivotPosition();
 
-    rect->moveByRel(QPointF(xStr.toDouble(), yStr.toDouble()));
-    rect->setTopLeftPos(QPointF(0, 0));
-    rect->setBottomRightPos(QPointF(wStr.toDouble(), hStr.toDouble()));
+    const auto topLeft = QPointF(xStr.toDouble(), yStr.toDouble());
+    rect->setTopLeftPos(topLeft);
+    rect->setBottomRightPos(topLeft + QPointF(wStr.toDouble(), hStr.toDouble()));
     if(rYstr.isEmpty()) {
         rect->setYRadius(rXstr.toDouble());
         rect->setXRadius(rXstr.toDouble());
@@ -718,8 +721,7 @@ bool extractTranslation(const QString& str, QMatrix& target) {
     if(rx1.exactMatch(str)) {
         rx1.indexIn(str);
         const QStringList capturedTxt = rx1.capturedTexts();
-        target.translate(capturedTxt.at(1).toDouble(),
-                         capturedTxt.at(1).toDouble());
+        target.translate(capturedTxt.at(1).toDouble(), 0);
         return true;
     }
 
@@ -887,7 +889,9 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
         } else { // if(tagName == "polyline") {
             loadPolyline(element, parentGroup, attributes);
         }
-    } else {
+    } else if(tagName == "g" || tagName == "text" ||
+              tagName == "circle" || tagName == "ellipse" ||
+              tagName == "rect" || tagName == "tspan") {
         BoxSvgAttributes attributes;
         attributes.setParent(parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
@@ -1196,6 +1200,11 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
 
 
     const QString matrixStr = element.attribute("transform");
+//    const QString transCenterX = element.attribute("inkscape:transform-center-x");
+//    const QString transCenterY = element.attribute("inkscape:transform-center-y");
+//    QPointF transCenter;
+//    if(!transCenterX.isEmpty()) transCenter.setX(toDouble(transCenterX));
+//    if(!transCenterY.isEmpty()) transCenter.setY(toDouble(transCenterY));
     if(!matrixStr.isEmpty()) {
         mRelTransform = getMatrixFromString(matrixStr)*mRelTransform;
     }
@@ -1223,7 +1232,8 @@ void BoxSvgAttributes::decomposeTransformMatrix() {
     // Apply the QR-like decomposition.
     if(!isZero4Dec(m11) || !isZero4Dec(m21)) {
         const qreal r = sqrt(m11 * m11 + m21 * m21);
-        const qreal rotRad = m21 > 0 ? acos(m11 / r) : -acos(m11 / r);
+        //const qreal rotRad = m21 > 0 ? acos(m11 / r) : -acos(m11 / r);
+        const qreal rotRad = m21 > 0 ? -acos(m11 / r) : acos(m11 / r);
         mRot = rotRad*180/PI;
         mScaleX = r;
         mScaleY = delta/r;
