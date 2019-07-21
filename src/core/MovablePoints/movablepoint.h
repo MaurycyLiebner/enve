@@ -4,9 +4,8 @@
 #include <QRectF>
 #include <QPainter>
 #include "../smartPointers/sharedpointerdefs.h"
+#include "../skia/skiaincludes.h"
 
-class SkCanvas;
-class SkPoint;
 class BoundingBox;
 class NodePoint;
 class BasicTransformAnimator;
@@ -131,7 +130,7 @@ protected:
     void drawOnAbsPosSk(SkCanvas * const canvas,
                         const SkPoint &absPos,
                         const float invScale,
-                        const float &fillColor,
+                        const SkColor &fillColor,
                         const bool keyOnCurrent = false);
 private:
     bool mSelectionEnabled = true;

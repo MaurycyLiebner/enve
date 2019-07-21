@@ -56,7 +56,7 @@ QPointF MovablePoint::getAbsolutePos() const {
 void MovablePoint::drawOnAbsPosSk(SkCanvas * const canvas,
         const SkPoint &absPos,
         const float invScale,
-        const float &fillColor,
+        const SkColor &fillColor,
         const bool keyOnCurrent) {
     const float scaledRadius = static_cast<float>(mRadius)*invScale;
 
