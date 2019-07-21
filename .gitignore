@@ -1,6 +1,7 @@
 build/
-third_party/
-include/third_party
+third_party/*
+!third_party/skia.tar.xz
+!third_party/libmypaint.tar.xz
 
 *.creator.user*
 *.pro.user*

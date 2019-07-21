@@ -4,10 +4,6 @@
 #
 #-------------------------------------------------
 
-HOME_FOLDER = /home/ailuropoda
-#f06b6d5469a505bb5ce3d823a8362b5ffa5a24dc
-SKIA_FOLDER = $$HOME_FOLDER/.skia2
-
 #QT       -= gui
 QT += opengl qml
 TARGET = envecore
@@ -26,12 +22,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-ENVE_FOLDER = $$PWD/../../
+ENVE_FOLDER = $$PWD/../..
+SKIA_FOLDER = $$ENVE_FOLDER/third_party/skia
+#LIBMYPAINT_FOLDER = $$ENVE_FOLDER/third_party/libmypaint-1.3.0
 
-INCLUDEPATH += $$ENVE_FOLDER/include/
-DEPENDPATH += $$ENVE_FOLDER/include/
-
-INCLUDEPATH += $$SKIA_FOLDER/
+INCLUDEPATH += $$SKIA_FOLDER
 
 CONFIG(debug, debug|release) {
     LIBS += -L$$SKIA_FOLDER/out/Debug

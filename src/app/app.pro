@@ -4,15 +4,12 @@
 #
 #-------------------------------------------------
 
-HOME_FOLDER = /home/ailuropoda
-LIBMYPAINT_FOLDER = $$HOME_FOLDER/.libmypaint-1.3.0.a
-#f06b6d5469a505bb5ce3d823a8362b5ffa5a24dc
-SKIA_FOLDER = $$HOME_FOLDER/.skia2
-
 QT += multimedia core gui svg opengl sql qml xml concurrent #widgets-private # gui-private core-private
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc -ljson-c
 
-ENVE_FOLDER = $$PWD/../../
+ENVE_FOLDER = $$PWD/../..
+SKIA_FOLDER = $$ENVE_FOLDER/third_party/skia
+LIBMYPAINT_FOLDER = $$ENVE_FOLDER/third_party/libmypaint-1.3.0
 
 INCLUDEPATH += ../core
 DEPENDPATH += ../core
@@ -20,11 +17,11 @@ DEPENDPATH += ../core
 LIBS += -L$$OUT_PWD/../core/ -lenvecore
 
 LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
-INCLUDEPATH += /usr/local/include/libmypaint/
+INCLUDEPATH += $$LIBMYPAINT_FOLDER/include
 
 LIBS += -lgobject-2.0 -lglib-2.0 -ljson-c
 
-INCLUDEPATH += $$SKIA_FOLDER/
+INCLUDEPATH += $$SKIA_FOLDER
 
 CONFIG(debug, debug|release) {
     LIBS += -L$$SKIA_FOLDER/out/Debug

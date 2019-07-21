@@ -650,7 +650,7 @@ void gForEverySegmentInPath(
         const SkPath& path,
         const std::function<void(const SkPath&)>& func) {
     SkPoint lastMovePos;
-    SkPoint lastPos;
+    SkPoint lastPos{0, 0};
     SkPath::Iter iter(path, false);
     for(;;) {
         SkPoint pts[4];

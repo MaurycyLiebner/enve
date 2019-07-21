@@ -31,7 +31,7 @@
 #include "include/effects/SkBlurImageFilter.h"
 #include "include/effects/SkDropShadowImageFilter.h"
 
-#include "src/gpu/gl/GrGLUtil.h"
+#include "src/gpu/gl/GrGLDefines.h"
 
 #include "include/gpu/gl/GrGLTypes.h"
 #include "include/gpu/gl/GrGLFunctions.h"

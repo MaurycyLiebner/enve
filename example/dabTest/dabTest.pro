@@ -6,13 +6,13 @@
 
 QT += core qml
 
-ENVE_FOLDER = $$PWD/../../
+ENVE_FOLDER = $$PWD/../..
 
-INCLUDEPATH += $$ENVE_FOLDER/include/
-DEPENDPATH += $$ENVE_FOLDER/include/
+INCLUDEPATH += $$ENVE_FOLDER/include
+DEPENDPATH += $$ENVE_FOLDER/include
 
-INCLUDEPATH += $$ENVE_FOLDER/third_party/skia/
-DEPENDPATH += $$ENVE_FOLDER/third_party/skia/
+INCLUDEPATH += $$ENVE_FOLDER/third_party/skia
+DEPENDPATH += $$ENVE_FOLDER/third_party/skia
 
 CONFIG(debug, debug|release) {
     ENVE_CORE_OUT = $$ENVE_FOLDER/build/Debug/src/core
