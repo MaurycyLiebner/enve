@@ -1,0 +1,1 @@
+#include "../../../src/core/Animators/staticcomplexanimator.h"

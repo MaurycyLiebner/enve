@@ -1,0 +1,1 @@
+#include "../../../src/core/GPUEffects/customgpueffect.h"

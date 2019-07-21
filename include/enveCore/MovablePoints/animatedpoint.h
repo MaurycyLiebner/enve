@@ -1,0 +1,1 @@
+#include "../../../src/core/MovablePoints/animatedpoint.h"
