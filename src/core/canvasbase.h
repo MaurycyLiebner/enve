@@ -6,6 +6,7 @@ class Property;
 class BoundingBox;
 
 #include "MovablePoints/movablepoint.h"
+#include "conncontext.h"
 
 class CanvasBase {
 protected:
@@ -74,7 +75,7 @@ protected:
     QList<MovablePoint*> mSelectedPoints_d;
     stdptr<MovablePoint> mPressedPoint;
 
-    QList<BoundingBox*> mSelectedBoxes;
+    ConnContextObjList<BoundingBox*> mSelectedBoxes;
 };
 
 #endif // CANVASBASE_H

@@ -641,15 +641,12 @@ void Canvas::invertSelectionAction() {
     if(mCurrentMode == MOVE_POINT) {
         QList<MovablePoint*> selectedPts = mSelectedPoints_d;
         selectAllPointsAction();
-        for(const auto& pt : selectedPts) {
-            removePointFromSelection(pt);
-        }
+        for(const auto& pt : selectedPts) removePointFromSelection(pt);
     } else {//if(mCurrentMode == MOVE_PATH) {
-        QList<BoundingBox*> boxes = mSelectedBoxes;
+        QList<BoundingBox*> boxes;
+        mSelectedBoxes.getObjList(boxes);
         selectAllBoxesFromBoxesGroup();
-        for(const auto& box : boxes) {
-            box->removeFromSelection();
-        }
+        for(const auto& box : boxes) removeBoxFromSelection(box);
     }
 }
 

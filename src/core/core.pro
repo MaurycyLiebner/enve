@@ -49,6 +49,7 @@ SOURCES += \
     GPUEffects/customgpueffect.cpp \
     GPUEffects/gpueffect.cpp \
     PathEffects/custompatheffect.cpp \
+    conncontext.cpp \
     randomgrid.cpp \
     smartPointers/stdpointer.cpp \
     smartPointers/selfref.cpp \
@@ -141,6 +142,7 @@ HEADERS += \
     GPUEffects/customgpueffect.h \
     GPUEffects/gpueffect.h \
     PathEffects/custompatheffect.h \
+    conncontext.h \
     core_global.h \
     customidentifier.h \
     randomgrid.h \

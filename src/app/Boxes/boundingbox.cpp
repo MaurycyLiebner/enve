@@ -373,11 +373,16 @@ bool BoundingBox::diffsIncludingInherited(
 
 void BoundingBox::setParentGroup(ContainerBox * const parent) {
     if(parent == mParentGroup) return;
+    prp_afterWholeInfluenceRangeChanged();
     mParentGroup = parent;
     mParent_k = parent;
-    if(!mParentGroup) return;
-    anim_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
-    setParentTransform(parent->getTransformAnimator());
+    if(mParentGroup) {
+        anim_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
+        setParentTransform(parent->getTransformAnimator());
+    } else {
+        setParentTransform(nullptr);
+    }
+    emit parentChanged(parent);
 }
 
 void BoundingBox::setParentTransform(BasicTransformAnimator *parent) {
@@ -1275,7 +1280,6 @@ void BoundingBox::scheduleTask(const stdsptr<BoundingBoxRenderData>& task) {
 
 void BoundingBox::setVisibile(const bool visible) {
     if(mVisible == visible) return;
-    if(mSelected && mVisible) removeFromSelection();
     mVisible = visible;
 
     prp_afterWholeInfluenceRangeChanged();
@@ -1286,6 +1290,7 @@ void BoundingBox::setVisibile(const bool visible) {
         if(box->isParentLinkBox())
             box->setVisibile(visible);
     }
+    emit visibilityChanged(visible);
 }
 
 void BoundingBox::switchVisible() {
@@ -1405,13 +1410,6 @@ bool BoundingBox::SWT_visibleOnlyIfParentDescendant() const {
 void BoundingBox::removeFromParent_k() {
     if(!mParentGroup) return;
     mParentGroup->removeContainedBox_k(ref<BoundingBox>());
-}
-
-void BoundingBox::removeFromSelection() {
-    if(mSelected) {
-        Canvas* const parentCanvas = getParentCanvas();
-        parentCanvas->removeBoxFromSelection(this);
-    }
 }
 
 QMimeData *BoundingBox::SWT_createMimeData() {

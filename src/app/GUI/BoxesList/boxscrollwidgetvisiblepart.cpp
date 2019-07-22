@@ -442,7 +442,7 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
         int boxTargetId = targetGroup->abstractionIdToBoxId(fTargetId) + 1;
         if(currentDraggedParent != targetGroup) {
             currentDraggedParent->removeContainedBox_k(draggedBox);
-            targetGroup->addContainedBoxToListAt(boxTargetId, draggedBox);
+            targetGroup->insertContainedBox(boxTargetId, draggedBox);
         } else {
             const int targetBoxId = targetGroup->abstractionIdToBoxId(fTargetId) + 1;
             if(targetBoxId == draggedBox->getZIndex() ||

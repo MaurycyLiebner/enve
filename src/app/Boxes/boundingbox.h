@@ -288,7 +288,6 @@ public:
     void select();
     void deselect();
     bool isSelected() const;
-    void removeFromSelection();
     void selectionChangeTriggered(const bool shiftPressed);
     void hide();
     void show();
@@ -466,6 +465,8 @@ signals:
     void globalPivotInfluenced();
     void fillStrokeSettingsChanged();
     void selectionChanged(bool);
+    void visibilityChanged(bool);
+    void parentChanged(ContainerBox*);
 };
 
 

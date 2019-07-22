@@ -136,7 +136,7 @@ void ContainerBox::setStrokeColorMode(const ColorMode colorMode) {
     }
 }
 
-const QList<qsptr<BoundingBox> > &ContainerBox::getContainedBoxesList() const {
+const ConnContextObjList<qsptr<BoundingBox>> &ContainerBox::getContainedBoxes() const {
     return mContainedBoxes;
 }
 
@@ -545,7 +545,7 @@ void processChildData(BoundingBox * const child,
     if(!child->isFrameFVisibleAndInDurationRect(childRelFrame)) return;
     if(child->SWT_isGroupBox()) {
         const auto childGroup = GetAsPtr(child, ContainerBox);
-        const auto descs = childGroup->getContainedBoxesList();
+        const auto& descs = childGroup->getContainedBoxes();
         for(const auto& desc : descs) {
             const qreal descRelFrame = desc->prp_absFrameToRelFrameF(absFrame);
             processChildData(desc.get(), parentData, descRelFrame, absFrame);
@@ -661,35 +661,31 @@ void ContainerBox::addContainedBoxesToSelection(const QRectF &rect) {
 }
 
 void ContainerBox::addContainedBox(const qsptr<BoundingBox>& child) {
-    //child->setParent(this);
-    addContainedBoxToListAt(mContainedBoxes.count(), child);
+    insertContainedBox(mContainedBoxes.count(), child);
 }
 
-void ContainerBox::addContainedBoxToListAt(
-        const int index,
-        const qsptr<BoundingBox>& child) {
-    mContainedBoxes.insert(index, GetAsSPtr(child, BoundingBox));
+void ContainerBox::insertContainedBox(const int index,
+                                      const qsptr<BoundingBox>& child) {
     child->setParentGroup(this);
-    connect(child.data(), &BoundingBox::prp_absFrameRangeChanged,
-            this, &BoundingBox::prp_afterChangedAbsRange);
+    auto& connCtx = mContainedBoxes.insertObj(index, child);
+    connCtx << connect(child.data(), &BoundingBox::prp_absFrameRangeChanged,
+                       this, &BoundingBox::prp_afterChangedAbsRange);
     updateContainedBoxIds(index);
 
-    //SWT_addChild(child);
-    SWT_addChildAt(
-                child.get(), boxIdToAbstractionId(index));
+    SWT_addChildAt(child.get(), boxIdToAbstractionId(index));
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());
 
     child->prp_afterWholeInfluenceRangeChanged();
 
     for(const auto& box : mLinkingBoxes) {
-        auto internalLinkGroup = GetAsSPtr(box, InternalLinkGroupBox);
-        internalLinkGroup->addContainedBoxToListAt(
+        auto internalLinkGroup = GetAsPtr(box, InternalLinkGroupBox);
+        internalLinkGroup->insertContainedBox(
                     index, child->createLinkForLinkGroup());
     }
 }
 
 void ContainerBox::updateContainedBoxIds(const int firstId) {
-    updateContainedBoxIds(firstId, mContainedBoxes.length() - 1);
+    updateContainedBoxIds(firstId, mContainedBoxes.count() - 1);
 }
 
 void ContainerBox::updateContainedBoxIds(const int firstId,
@@ -702,14 +698,14 @@ void ContainerBox::updateContainedBoxIds(const int firstId,
 
 void ContainerBox::removeAllContainedBoxes() {
     while(mContainedBoxes.count() > 0) {
-        removeContainedBox(mContainedBoxes.takeLast());
+        removeContainedBox(mContainedBoxes.takeObjLast());
     }
 }
 
 void ContainerBox::removeContainedBoxFromList(const int id) {
-    auto box = mContainedBoxes.takeAt(id);
+    const auto box = mContainedBoxes.takeObjAt(id);
     if(box->SWT_isContainerBox()) {
-        auto group = GetAsPtr(box, ContainerBox);
+        const auto group = GetAsPtr(box, ContainerBox);
         if(group->isCurrentGroup()) {
             const auto parentCanvas = getParentCanvas();
             if(parentCanvas) {
@@ -718,14 +714,9 @@ void ContainerBox::removeContainedBoxFromList(const int id) {
         }
     }
 
-    box->prp_afterWholeInfluenceRangeChanged();
-    if(box->isSelected()) box->removeFromSelection();
-    disconnect(box.data(), nullptr, this, nullptr);
-
-    updateContainedBoxIds(id);
-
     SWT_removeChild(box.get());
     box->setParentGroup(nullptr);
+    updateContainedBoxIds(id);
 
     for(const auto& box : mLinkingBoxes) {
         const auto internalLinkGroup = GetAsSPtr(box, InternalLinkGroupBox);
@@ -745,14 +736,13 @@ bool ContainerBox::replaceContainedBox(const qsptr<BoundingBox> &replaced,
     const int id = getContainedBoxIndex(replaced.get());
     if(id == -1) return false;
     removeContainedBox(replaced);
-    addContainedBoxToListAt(id, replacer);
+    insertContainedBox(id, replacer);
     return true;
 }
 
 void ContainerBox::removeContainedBox(const qsptr<BoundingBox>& child) {
     const int index = getContainedBoxIndex(child.get());
     if(index < 0) return;
-    child->removeFromSelection();
     removeContainedBoxFromList(index);
     //child->setParent(nullptr);
 }
@@ -785,7 +775,7 @@ void ContainerBox::decreaseContainedBoxZInList(BoundingBox * const child) {
 void ContainerBox::bringContainedBoxToEndList(BoundingBox * const child) {
     const int index = getContainedBoxIndex(child);
     if(index == mContainedBoxes.count() - 1) return;
-    moveContainedBoxInList(child, index, mContainedBoxes.length() - 1);
+    moveContainedBoxInList(child, index, mContainedBoxes.count() - 1);
 }
 
 void ContainerBox::bringContainedBoxToFrontList(BoundingBox * const child) {
@@ -802,8 +792,8 @@ void ContainerBox::moveContainedBoxInList(BoundingBox * const child,
 }
 
 void ContainerBox::moveContainedBoxInList(BoundingBox * const child,
-                                        const int from, const int to) {
-    mContainedBoxes.move(from, to);
+                                          const int from, const int to) {
+    mContainedBoxes.moveObj(from, to);
     updateContainedBoxIds(qMin(from, to), qMax(from, to));
     SWT_moveChildTo(child, boxIdToAbstractionId(to));
     planScheduleUpdate(Animator::USER_CHANGE);

@@ -66,7 +66,7 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
         if(!parentBox) return;
         const auto srcGroup = parentBox->getParentGroup();
         if(!srcGroup) return;
-        const auto& boxesT = srcGroup->getContainedBoxesList();
+        const auto& boxesT = srcGroup->getContainedBoxes();
         QMenu menu(this);
 
 

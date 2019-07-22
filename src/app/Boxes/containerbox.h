@@ -1,6 +1,7 @@
 #ifndef CONTAINERBOX_H
 #define CONTAINERBOX_H
 #include "boundingbox.h"
+#include "conncontext.h"
 class PathBox;
 class PathEffectAnimators;
 
@@ -81,7 +82,7 @@ public:
     void promoteToLayer();
     void demoteToGroup();
 
-    const QList<qsptr<BoundingBox>> &getContainedBoxesList() const;
+    const ConnContextObjList<qsptr<BoundingBox>> &getContainedBoxes() const;
 
     //    bool anim_nextRelFrameWithKey(const int relFrame,
     //                                 int &nextRelFrame);
@@ -121,7 +122,7 @@ public:
     bool replaceContainedBox(const qsptr<BoundingBox>& replaced,
                              const qsptr<BoundingBox>& replacer);
     void addContainedBox(const qsptr<BoundingBox> &child);
-    void addContainedBoxToListAt(const int index,
+    void insertContainedBox(const int index,
                                  const qsptr<BoundingBox> &child);
     void updateContainedBoxIds(const int firstId);
     void updateContainedBoxIds(const int firstId,
@@ -168,7 +169,7 @@ protected:
 
     bool mIsCurrentGroup = false;
     bool mIsDescendantCurrentGroup = false;
-    QList<qsptr<BoundingBox>> mContainedBoxes;
+    ConnContextObjList<qsptr<BoundingBox>> mContainedBoxes;
 
     qsptr<PathEffectAnimators> mPathEffectsAnimators;
     qsptr<PathEffectAnimators> mFillPathEffectsAnimators;

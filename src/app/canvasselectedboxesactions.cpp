@@ -314,10 +314,9 @@ void Canvas::scaleSelectedBy(const qreal scaleXBy,
 QPointF Canvas::getSelectedBoxesAbsPivotPos() {
     if(mSelectedBoxes.isEmpty()) return QPointF(0, 0);
     QPointF posSum(0, 0);
-    const int count = mSelectedBoxes.length();
-    for(const auto &box : mSelectedBoxes) {
+    const int count = mSelectedBoxes.count();
+    for(const auto &box : mSelectedBoxes)
         posSum += box->getPivotAbsPos();
-    }
     return posSum/count;
 }
 
@@ -354,12 +353,22 @@ void Canvas::setCurrentBox(BoundingBox* const box) {
 #include "Boxes/paintbox.h"
 void Canvas::addBoxToSelection(BoundingBox * const box) {
     if(box->isSelected()) return;
-    connect(box, &BoundingBox::globalPivotInfluenced,
-            this, &Canvas::schedulePivotUpdate);
-    connect(box, &BoundingBox::fillStrokeSettingsChanged,
-            this, &Canvas::selectedPaintSettingsChanged);
+    auto& connCtx = mSelectedBoxes.addObj(box);
+    connCtx << connect(box, &BoundingBox::globalPivotInfluenced,
+                       this, &Canvas::schedulePivotUpdate);
+    connCtx << connect(box, &BoundingBox::fillStrokeSettingsChanged,
+                       this, &Canvas::selectedPaintSettingsChanged);
+    connCtx << connect(box, &BoundingBox::visibilityChanged,
+                       this, [this, box](const bool visible) {
+        if(!visible) removeBoxFromSelection(box);
+    });
+    connCtx << connect(box, &BoundingBox::parentChanged,
+                       this, [this, box](const bool visible) {
+        if(!visible) removeBoxFromSelection(box);
+    });
+
     box->select();
-    mSelectedBoxes.append(box); schedulePivotUpdate();
+    schedulePivotUpdate();
 
     sortSelectedBoxesAsc();
     //setCurrentFillStrokeSettingsFromBox(box);
@@ -372,12 +381,9 @@ void Canvas::addBoxToSelection(BoundingBox * const box) {
 }
 
 void Canvas::removeBoxFromSelection(BoundingBox * const box) {
-    disconnect(box, &BoundingBox::globalPivotInfluenced,
-               this, &Canvas::schedulePivotUpdate);
-    disconnect(box, &BoundingBox::fillStrokeSettingsChanged,
-               this, &Canvas::selectedPaintSettingsChanged);
+    if(!box->isSelected()) return;
+    mSelectedBoxes.removeObj(box);
     box->deselect();
-    mSelectedBoxes.removeOne(box);
     schedulePivotUpdate();
     if(mCurrentMode == PAINT_MODE) updatePaintBox();
     if(mSelectedBoxes.isEmpty()) {
