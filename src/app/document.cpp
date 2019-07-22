@@ -23,11 +23,16 @@ void Document::actionFinished() {
     SimpleTask::sProcessAll();
     fTaskScheduler.queTasks();
 
-    if(fActiveScene) {
-        if(fActiveScene->newUndoRedoSet())
+    for(const auto& scene : fVisibleScenes) {
+        if(scene.first->newUndoRedoSet())
             emit documentChanged();
-        emit fActiveScene->requestUpdate();
+        emit scene.first->requestUpdate();
     }
+//    if(fActiveScene) {
+//        if(fActiveScene->newUndoRedoSet())
+//            emit documentChanged();
+//        emit fActiveScene->requestUpdate();
+//    }
 }
 
 void Document::replaceClipboard(const stdsptr<ClipboardContainer> &container) {
