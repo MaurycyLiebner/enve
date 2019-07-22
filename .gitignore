@@ -1,4 +1,7 @@
-build/
+build/*
+!build/AppDir
+build/AppDir/usr/lib/*
+
 third_party/*
 !third_party/skia.tar.xz
 !third_party/libmypaint.tar.xz
