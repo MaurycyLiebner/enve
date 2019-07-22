@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=enve
+Exec=AppRun
+Icon=enve
+Comment=Create 2D Animations
+Terminal=false
+Type=Application
+Categories=Graphics;
