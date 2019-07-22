@@ -4,7 +4,11 @@
 #include "MovablePoints/pathpointshandler.h"
 
 SmartPathAnimator::SmartPathAnimator() :
-    GraphAnimator("path") {
+    GraphAnimator("path"),
+    startPathChange([this]() { startPathChangeExec(); }),
+    pathChanged([this]() { pathChangedExec(); }),
+    cancelPathChange([this]() { cancelPathChangeExec(); }),
+    finishPathChange([this]() { finishPathChangeExec(); }) {
     setPointsHandler(SPtrCreate(PathPointsHandler)(this));
 }
 

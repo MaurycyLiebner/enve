@@ -6,6 +6,7 @@
 #include "smartpathkey.h"
 #include "../../MovablePoints/segment.h"
 #include "../../skia/skiahelpers.h"
+#include "simpletask.h"
 
 class SmartPathAnimator : public GraphAnimator {
     friend class SelfRef;
@@ -142,14 +143,16 @@ public:
         }
     }
 
-    void startPathChange() {
+    SimpleTaskScheduler startPathChange;
+    void startPathChangeExec() {
         if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
             anim_saveCurrentValueAsKey();
         }
         mPathBeingChanged_d->save();
     }
 
-    void pathChanged() {
+    SimpleTaskScheduler pathChanged;
+    void pathChangedExec() {
         const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
         if(spk) {
             anim_updateAfterChangedKey(spk);
@@ -158,7 +161,8 @@ public:
         }
     }
 
-    void cancelPathChange() {
+    SimpleTaskScheduler cancelPathChange;
+    void cancelPathChangeExec() {
         mPathBeingChanged_d->restore();
         const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
         if(spk) {
@@ -168,8 +172,9 @@ public:
         }
     }
 
-    void finishPathChange() {
-        pathChanged();
+    SimpleTaskScheduler finishPathChange;
+    void finishPathChangeExec() {
+        //pathChanged();
     }
 
     void actionRemoveNode(const int nodeId, const bool approx) {
@@ -395,7 +400,7 @@ private:
             if(&result == &mBaseValue) return;
             result = mBaseValue;
         }
-    }
+    }    
 
     bool mPathUpToDate = true;
     SkPath mCurrentPath;

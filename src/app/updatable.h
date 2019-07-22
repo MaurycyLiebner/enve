@@ -18,6 +18,8 @@ protected:
     virtual void afterProcessing() {}
     virtual void afterCanceled() {}
 public:
+    ~Task() { cancelDependent(); }
+
     struct Dependent {
         std::function<void()> fFinished;
         std::function<void()> fCanceled;
@@ -42,17 +44,16 @@ public:
 
     virtual void processTask() = 0;
     virtual bool gpuProcessingNeeded() const { return false; }
+    virtual void taskQued() { mState = QUED; }
+
     virtual GpuSupport gpuSupport() const { return GPU_NO_SUPPORT; }
     bool gpuProcessingSupported() const { return gpuSupport() > GPU_NO_SUPPORT; }
     bool gpuProcessingPreferred() const { return gpuSupport() == GPU_PREFERRED; }
     bool gpuProcessingOnly() const { return gpuSupport() == GPU_REQUIRED; }
-    virtual void taskQued() { mState = QUED; }
 
     bool scheduleTask();
     bool isQued() { return mState == QUED; }
     bool isScheduled() { return mState == SCHEDULED; }
-
-    ~Task() { cancelDependent(); }
 
     bool isActive() { return mState != CREATED && mState != FINISHED; }
 

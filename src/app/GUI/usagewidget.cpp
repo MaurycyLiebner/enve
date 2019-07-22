@@ -41,7 +41,7 @@ private:
     }
 
     QList<int> mValues;
-    int mValueSum;
+    int mValueSum = 0;
 };
 
 UsageWidget::UsageWidget(QWidget * const parent) : QStatusBar(parent) {

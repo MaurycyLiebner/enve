@@ -51,6 +51,7 @@ SOURCES += \
     PathEffects/custompatheffect.cpp \
     conncontext.cpp \
     randomgrid.cpp \
+    simpletask.cpp \
     smartPointers/stdpointer.cpp \
     smartPointers/selfref.cpp \
     smartPointers/stdselfref.cpp \
@@ -147,6 +148,7 @@ HEADERS += \
     customidentifier.h \
     randomgrid.h \
     rangemap.h \
+    simpletask.h \
     smartPointers/stdpointer.h \
     smartPointers/selfref.h \
     smartPointers/stdselfref.h \

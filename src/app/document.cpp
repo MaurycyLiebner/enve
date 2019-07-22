@@ -1,6 +1,7 @@
 #include "document.h"
 #include "FileCacheHandlers/filecachehandler.h"
 #include "canvas.h"
+#include "simpletask.h"
 
 Document* Document::sInstance = nullptr;
 
@@ -19,6 +20,7 @@ Document::Document(AudioHandler &audioHandler) :
 }
 
 void Document::actionFinished() {
+    SimpleTask::sProcessAll();
     fTaskScheduler.queTasks();
 
     if(fActiveScene) {
