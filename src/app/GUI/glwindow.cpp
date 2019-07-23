@@ -36,6 +36,7 @@ void GLWindow::bindSkia(const int w, const int h) {
                                     &props);
     if(!mSurface) RuntimeThrow("Failed to wrap buffer into SkSurface.");
     mCanvas = mSurface->getCanvas();
+    mGrContext->resetContext();
 }
 
 void GLWindow::resizeGL(int, int) {
