@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=enve
-Exec=AppRun
+Exec=enve
 Icon=enve
 Comment=Create 2D Animations
 Terminal=false
