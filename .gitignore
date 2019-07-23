@@ -1,6 +1,8 @@
 build/*
 !build/AppDir
+build/AppDir/usr/bin/*
 build/AppDir/usr/lib/*
+!.gitkeep
 
 third_party/*
 !third_party/skia.tar.xz

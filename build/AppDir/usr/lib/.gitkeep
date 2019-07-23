@@ -1,0 +1,12 @@
+Put all 'build/Release/src/app/enve' dependencies into this folder.
+
+Example:
+First make sure you copied 'build/Release/src/app/enve' into 'build/AppDir/usr/bin'.
+
+Open terminal in 'build/AppDir/usr' and execute:
+ldd bin/enve
+Make sure no dependencies are missing, by checking for 'not found'.
+
+Open terminal in 'build/AppDir/usr' and execute:
+ldd bin/enve | grep "=> /" | awk '{print $3}' | xargs -I '{}' cp -v '{}' lib/
+Now all dependecies should be in 'build/AppDir/usr/lib' folder.
