@@ -1,7 +1,5 @@
 #include "glhelpers.h"
 #include "exceptions.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 
 #include <string>
 #include <fstream>
@@ -162,14 +160,6 @@ void iniProgram(QGL33 * const gl, GLuint& program,
     gl->glDeleteShader(fragmentShader);
 }
 
-Texture Texture::sCreateTextureFromImage(QGL33 * const gl,
-                                         const std::string &imagePath) {
-    Texture tex;
-    tex.gen(gl);
-    tex.loadImage(gl, imagePath);
-    return tex;
-}
-
 void Texture::bind(QGL33 * const gl) const {
     gl->glBindTexture(GL_TEXTURE_2D, fId);
 }
@@ -199,23 +189,6 @@ void Texture::gen(QGL33 * const gl,
                      0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     fWidth = width;
     fHeight = height;
-}
-
-bool Texture::loadImage(QGL33 * const gl, const std::string &imagePath) {
-    int nrChannels;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char * const data = stbi_load(imagePath.c_str(),
-                                           &fWidth, &fHeight,
-                                           &nrChannels, 0);
-    if(data) {
-        gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fWidth, fHeight,
-                         0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        //gl->glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        RuntimeThrow("Failed to load texture" + imagePath);
-    }
-    stbi_image_free(data);
-    return true;
 }
 
 #include "skia/skiahelpers.h"

@@ -35,9 +35,6 @@ struct Texture {
     int fWidth = 0;
     int fHeight = 0;
 
-    static Texture sCreateTextureFromImage(QGL33 * const gl,
-                                           const std::string& imagePath);
-
     void bind(QGL33 * const gl) const;
 
     void clear(QGL33 * const gl);
@@ -58,8 +55,6 @@ struct Texture {
 
     SkBitmap toBitmap(QGL33 * const gl) const;
     sk_sp<SkImage> toImage(QGL33 * const gl) const;
-private:
-    bool loadImage(QGL33 * const gl, const std::string& imagePath);
 };
 
 struct TextureFrameBuffer {
