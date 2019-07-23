@@ -1,0 +1,36 @@
+___________________________skia___________________________
+
+--------------------------hints--------------------------
+
+You can get ninja from 'github.com/ninja-build/ninja/releases'.
+Do not use 'sudo apt-get install ninja', it is not the ninja you need.
+
+Before running [2] make sure to install git.
+For Ubuntu: sudo apt-get install git
+
+Older versions of g++ may fail while compiling ([5] and [7]).
+For Ubuntu 16.04:
+|sudo add-apt-repository -y ppa:jonathonf/gcc
+|sudo apt-get update
+|sudo apt-get install g++-7
+|[5] and [7] will use /usr/bin/g++ by default,
+|you can for ex. replace /usr/bin/g++ with a link to /usr/bin/g++-7
+
+In [5] and [7] replace '2' with number of threads you want to use,
+note that linking can use lots of memory,
+you can use all your threads for compiling (up until [~3000/x]),
+then Ctrl+C to interrupt, and start again with low thread count.
+
+-------------------------commands-------------------------
+[0] tar xf skia.tar.xz
+[1] cd skia
+[2] python tools/git-sync-deps
+[3] tools/install_dependencies.sh
+
+### Only if you need debug build of enve
+# [4] bin/gn gen out/Debug --args='extra_cflags=["-Wno-error"]'
+# [5] ninja -C out/Debug -j 2
+###
+
+[6] bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"]'
+[7] ninja -C out/Release -j 2

@@ -1,12 +1,20 @@
 build/*
 !build/AppDir
+!build/buildInstructions
 build/AppDir/usr/bin/*
 build/AppDir/usr/lib/*
+!build/AppDir/usr/lib/neededLibs
+!build/Debug
+!build/Release
+build/Debug/*
+build/Release/*
 !.gitkeep
 
 third_party/*
 !third_party/skia.tar.xz
 !third_party/libmypaint.tar.xz
+!third_party/skiaInstructions
+!third_party/libmypaintInstructions
 
 *.creator.user*
 *.pro.user*
