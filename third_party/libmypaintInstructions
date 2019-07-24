@@ -2,7 +2,7 @@ ________________________libmypaint________________________
 
 --------------------------hints---------------------------
 Dependencies:
-sudo apt-get install libjson-c-dev intltool
+sudo apt-get install libjson-c-dev intltool pkg-config
 
 -------------------------commands-------------------------
 [0] tar xf libmypaint.tar.xz

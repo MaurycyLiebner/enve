@@ -1,3 +1,4 @@
+Example (versions might differ):
 libaom.so.0
 libavcodec.so
 libavcodec.so.58
@@ -64,6 +65,7 @@ libva.so.1
 libva.so.1.3904.0
 libva-x11.so.1
 libva-x11.so.1.3904.0
+libvdpau.so.1
 libvpx.so.3
 libvpx.so.3.0
 libvpx.so.3.0.0

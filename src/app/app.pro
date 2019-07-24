@@ -14,7 +14,7 @@ LIBMYPAINT_FOLDER = $$ENVE_FOLDER/third_party/libmypaint-1.3.0
 INCLUDEPATH += ../core
 DEPENDPATH += ../core
 
-LIBS += -L$$OUT_PWD/../core/ -lenvecore
+LIBS += -L$$OUT_PWD/../core -lenvecore
 
 LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
 INCLUDEPATH += $$LIBMYPAINT_FOLDER/include

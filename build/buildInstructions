@@ -4,10 +4,12 @@ Install dependencies (look below).
 Build enve in 'build/Release' and 'build/Debug'.
 
 You can use linuxdeployqt to create AppImage.
-There is already aPPdir structure prepared for you 'build/AppDir'.
+There is already AppDir structure prepared for you 'build/AppDir'.
 Put 'build/Release/src/app/enve' into '/home/ailuropoda/.enve/build/AppDir/usr/bin'.
 Put 'build/Release/src/core/libenvecore*.so*' into '/home/ailuropoda/.enve/build/AppDir/usr/lib'.
-Put all libsw*.so and libav*.so files in '/home/ailuropoda/.enve/build/AppDir/usr/lib'.
+Put all required libraries (*.so files) into 'build/AppDir/usr/lib'.
+You sould not copy all dependencies 
+Check 'build/AppDir/usr/lib/neededLibs' for example list of libraries.
 
 Dependencies:
 Install libsw*-dev and libav*-dev (tested with versions 3.4.6 and 4.1.3)
