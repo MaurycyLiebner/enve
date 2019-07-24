@@ -3,7 +3,7 @@ build/*
 !build/buildInstructions
 build/AppDir/usr/bin/*
 build/AppDir/usr/lib/*
-!build/AppDir/usr/lib/neededLibs
+build/AppDir/usr/optional/*
 !build/Debug
 !build/Release
 build/Debug/*

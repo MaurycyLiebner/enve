@@ -8,16 +8,13 @@ Do not use 'sudo apt-get install ninja', it is not the ninja you need.
 Before running [2] make sure to install git.
 For Ubuntu: sudo apt-get install git
 
-Older versions (< 6) of g++ will fail while compiling ([5] and [7]).
+Older versions of g++ (< 6) will fail while compiling ([5] and [7]).
 ## For Ubuntu 16.04:
-# OPTION 1 (LLVM)
-# sudo apt-get install clang
-# In [4] and [6] add cc="clang" cxx="clang++" to --args
-# OPTION 2 (GCC)
 # sudo add-apt-repository -y ppa:jonathonf/gcc
 # sudo apt-get update
 # sudo apt-get install g++-7
 # In [4] and [6] add cc="gcc-7" cxx="g++-7" to --args
+# sudo add-apt-repository --remove ppa:jonathonf/gcc
 ##
 
 In [5] and [7] replace '1' with number of threads you want to use.
@@ -33,5 +30,5 @@ In [5] and [7] replace '1' with number of threads you want to use.
 # [5] ninja -C out/Debug -j 1
 ###
 
-[6] bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] target_os="linux" target_cpu="x64" skia_use_system_expat=false skia_use_system_freetype2=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false'
+[6] bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] target_os="linux" target_cpu="x64" skia_use_system_expat=false skia_use_system_freetype2=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false skia_use_system_harfbuzz=false'
 [7] ninja -C out/Release -j 1
