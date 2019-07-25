@@ -1,5 +1,5 @@
 #include "memoryhandler.h"
-#include "Boxes/boundingboxrendercontainer.h"
+#include "Boxes/boxrendercontainer.h"
 #include <gperftools/malloc_extension.h>
 #include <malloc.h>
 #include "GUI/mainwindow.h"

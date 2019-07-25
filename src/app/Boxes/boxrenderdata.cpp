@@ -1,21 +1,19 @@
-#include "boundingboxrenderdata.h"
+#include "boxrenderdata.h"
 #include "boundingbox.h"
-#include "PixmapEffects/rastereffects.h"
-#include "GPUEffects/gpupostprocessor.h"
 #include "skia/skiahelpers.h"
 #include "PixmapEffects/pixmapeffect.h"
 
-BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
+BoxRenderData::BoxRenderData(BoundingBox *parentBoxT) {
     fParentBox = parentBoxT;
 }
 
-void BoundingBoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {
+void BoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {
     canvas.translate(toSkScalar(-fGlobalRect.x()),
                      toSkScalar(-fGlobalRect.y()));
     canvas.concat(toSkMatrix(fScaledTransform));
 }
 
-void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
+void BoxRenderData::copyFrom(BoxRenderData *src) {
     fTransform = src->fTransform;
     fCustomRelFrame = src->fCustomRelFrame;
     fUseCustomRelFrame = src->fUseCustomRelFrame;
@@ -33,19 +31,19 @@ void BoundingBoxRenderData::copyFrom(BoundingBoxRenderData *src) {
     fCopied = true;
 }
 
-stdsptr<BoundingBoxRenderData> BoundingBoxRenderData::makeCopy() {
+stdsptr<BoxRenderData> BoxRenderData::makeCopy() {
     if(!fParentBox) return nullptr;
-    stdsptr<BoundingBoxRenderData> copy = fParentBox->createRenderData();
+    stdsptr<BoxRenderData> copy = fParentBox->createRenderData();
     copy->copyFrom(this);
     return copy;
 }
 
-void BoundingBoxRenderData::updateRelBoundingRect() {
+void BoxRenderData::updateRelBoundingRect() {
     if(!fParentBox) return;
     fRelBoundingRect = fParentBox->getRelBoundingRect(fRelFrame);
 }
 
-void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {
+void BoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {
     if(fOpacity < 0.001) return;
     const float invScale = toSkScalar(1/fResolution);
     canvas->scale(invScale, invScale);
@@ -71,12 +69,16 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) 
     canvas->drawImage(fRenderedImage, fGlobalRect.x(), fGlobalRect.y(), &paint);
 }
 
-void BoundingBoxRenderData::processTaskWithGPU(QGL33 * const gl,
-                                               GrContext * const grContext) {
-    Q_UNUSED(gl);
+void BoxRenderData::processGPU(QGL33 * const gl,
+                               SwitchableContext &context) {
+    if(mStep == Step::EFFECTS)
+        return mEffectsRenderer.processGpu(gl, context, this);
     updateGlobalRect();
     if(fOpacity < 0.001) return;
     if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
+
+    context.switchToSkia();
+    const auto grContext = context.requestContext();
 
     //const auto info = SkiaHelpers::getPremulRGBAInfo(width, height);
 //    Texture tex;
@@ -103,6 +105,10 @@ void BoundingBoxRenderData::processTaskWithGPU(QGL33 * const gl,
     fRenderedImage = SkImage::MakeFromAdoptedTexture(grContext, grTex,
                                                      kTopLeft_GrSurfaceOrigin,
                                                      kRGBA_8888_SkColorType);
+    if(mEffectsRenderer.isEmpty() ||
+       mEffectsRenderer.nextHardwareSupport() == HardwareSupport::CPU_ONLY)
+        fRenderedImage = fRenderedImage->makeRasterImage();
+    else mEffectsRenderer.processGpu(gl, context, this);
 //    GrGLTextureInfo info;
 //    grTex.getGLTextureInfo(&info);
 //    info.fID;
@@ -110,7 +116,9 @@ void BoundingBoxRenderData::processTaskWithGPU(QGL33 * const gl,
 //    tex.clear(gl);
 }
 
-void BoundingBoxRenderData::processTask() {
+void BoxRenderData::process() {
+    if(mStep == Step::EFFECTS)
+        return mEffectsRenderer.processCpu(this);
     updateGlobalRect();
     if(fOpacity < 0.001) return;
     if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
@@ -126,15 +134,10 @@ void BoundingBoxRenderData::processTask() {
 
     drawSk(&canvas);
 
-    for(const auto& effect : fRasterEffects) {
-        effect->applyEffectsSk(bitmap, fResolution);
-    }
-    clearPixmapEffects();
-
     fRenderedImage = SkiaHelpers::transferDataToSkImage(bitmap);
 }
 
-void BoundingBoxRenderData::beforeProcessing() {
+void BoxRenderData::beforeProcessing() {
     setupRenderData();
     if(!mDataSet) dataSet();
 
@@ -143,7 +146,7 @@ void BoundingBoxRenderData::beforeProcessing() {
         fParentBox->nullifyCurrentRenderData(fRelFrame);
 }
 
-void BoundingBoxRenderData::afterProcessing() {
+void BoxRenderData::afterProcessing() {
     if(fMotionBlurTarget) {
         fMotionBlurTarget->fOtherGlobalRects << fGlobalRect;
     }
@@ -152,8 +155,8 @@ void BoundingBoxRenderData::afterProcessing() {
     }
 }
 
-void BoundingBoxRenderData::taskQued() {
-    mDataSet = false;
+void BoxRenderData::afterQued() {
+    if(mDataSet) return;
     if(fParentBox) {
         if(fUseCustomRelFrame) {
             fParentBox->setupRenderData(fCustomRelFrame, this);
@@ -165,28 +168,31 @@ void BoundingBoxRenderData::taskQued() {
         }
     }
     if(!mDelayDataSet) dataSet();
-    Task::taskQued();
 }
 
-Task::GpuSupport BoundingBoxRenderData::gpuSupport() const {
-    if(fGPUEffects.isEmpty()) {
-        if(fParentBox && fParentBox->SWT_isLayerBox())
-            return GPU_PREFERRED;
-        return GPU_SUPPORTED;
+HardwareSupport BoxRenderData::hardwareSupport() const {
+    if(mStep == Step::EFFECTS) {
+        return mEffectsRenderer.nextHardwareSupport();
+    } else {
+        if(mEffectsRenderer.isEmpty()) {
+            if(fParentBox && fParentBox->SWT_isLayerBox())
+                return HardwareSupport::GPU_PREFFERED;
+            return HardwareSupport::CPU_PREFFERED;
+        }
+        return HardwareSupport::GPU_ONLY;
     }
-    return GPU_REQUIRED;
 }
 
-void BoundingBoxRenderData::scheduleTaskNow() {
-    if(fParentBox) fParentBox->scheduleTask(ref<BoundingBoxRenderData>());
+void BoxRenderData::scheduleTaskNow() {
+    if(fParentBox) fParentBox->scheduleTask(ref<BoxRenderData>());
 }
 
-void BoundingBoxRenderData::afterCanceled() {
+void BoxRenderData::afterCanceled() {
     if(fRefInParent && fParentBox)
         fParentBox->nullifyCurrentRenderData(fRelFrame);
 }
 
-void BoundingBoxRenderData::dataSet() {
+void BoxRenderData::dataSet() {
     if(mDataSet) return;
     mDataSet = true;
     if(!fRelBoundingRectSet) {
@@ -197,11 +203,11 @@ void BoundingBoxRenderData::dataSet() {
     fParentBox->updateCurrentPreviewDataFromRenderData(this);
 }
 
-bool BoundingBoxRenderData::nullifyBeforeProcessing() {
+bool BoxRenderData::nullifyBeforeProcessing() {
     return fReason == BoundingBox::FRAME_CHANGE;
 }
 
-void BoundingBoxRenderData::updateGlobalRect() {
+void BoxRenderData::updateGlobalRect() {
     fResolutionScale.reset();
     fResolutionScale.scale(fResolution, fResolution);
     fScaledTransform = fTransform*fResolutionScale;
@@ -214,24 +220,22 @@ void BoundingBoxRenderData::updateGlobalRect() {
     setBaseGlobalRect(baseRectF);
 }
 
-void BoundingBoxRenderData::setBaseGlobalRect(const QRectF& baseRectF) {
+void BoxRenderData::setBaseGlobalRect(const QRectF& baseRectF) {
     const QRectF maxBounds = fResolutionScale.mapRect(QRectF(fMaxBoundsRect));
     const auto clampedBaseRect = baseRectF.intersected(maxBounds);
     SkIRect currRect = toSkRect(clampedBaseRect).roundOut();
-    if(!fGPUEffects.isEmpty()) {
+    if(!mEffectsRenderer.isEmpty()) {
         const QRect iMaxBounds(qFloor(maxBounds.left()), qFloor(maxBounds.top()),
                                qCeil(maxBounds.width()), qCeil(maxBounds.height()));
         const SkIRect skMaxBounds = toSkIRect(iMaxBounds);
-        for(const auto& effect : fGPUEffects) {
-            currRect = effect->setSrcRectUpdateDstRect(currRect, skMaxBounds);
-        }
+        mEffectsRenderer.setBaseGlobalRect(currRect, skMaxBounds);
     }
     fGlobalRect = toQRect(currRect);
 }
 
 RenderDataCustomizerFunctor::RenderDataCustomizerFunctor() {}
 
-void RenderDataCustomizerFunctor::operator()(BoundingBoxRenderData * const data) {
+void RenderDataCustomizerFunctor::operator()(BoxRenderData * const data) {
     customize(data);
 }
 
@@ -242,7 +246,7 @@ ReplaceTransformDisplacementCustomizer::ReplaceTransformDisplacementCustomizer(
 }
 
 void ReplaceTransformDisplacementCustomizer::customize(
-        BoundingBoxRenderData * const data) {
+        BoxRenderData * const data) {
     QMatrix transformT = data->fTransform;
     data->fTransform.setMatrix(transformT.m11(), transformT.m12(),
                                transformT.m21(), transformT.m22(),
@@ -255,7 +259,7 @@ MultiplyTransformCustomizer::MultiplyTransformCustomizer(
     mOpacity = opacity;
 }
 
-void MultiplyTransformCustomizer::customize(BoundingBoxRenderData * const data) {
+void MultiplyTransformCustomizer::customize(BoxRenderData * const data) {
     data->fTransform = mTransform*data->fTransform;
     data->fOpacity *= mOpacity;
 }
@@ -264,6 +268,6 @@ MultiplyOpacityCustomizer::MultiplyOpacityCustomizer(const qreal opacity) {
     mOpacity = opacity;
 }
 
-void MultiplyOpacityCustomizer::customize(BoundingBoxRenderData * const data) {
+void MultiplyOpacityCustomizer::customize(BoxRenderData * const data) {
     data->fOpacity *= mOpacity;
 }

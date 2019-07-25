@@ -49,7 +49,7 @@ DabTest000::DabTest000() :
     ca_addChildAnimator(mHardness);
 }
 
-stdsptr<GPURasterEffectCaller>
+stdsptr<RasterEffectCaller>
         DabTest000::getEffectCaller(const qreal relFrame) const {
     const qreal radius = mRadius->getEffectiveValue(relFrame);
     const qreal hardness = mHardness->getEffectiveValue(relFrame);
@@ -95,7 +95,7 @@ void DabTestCaller000::sInitialize(QGL33 * const gl) {
     gl->glUniform1i(dabDataU, 0);
 }
 
-void DabTestCaller000::render(QGL33 * const gl,
+void DabTestCaller000::processGpu(QGL33 * const gl,
                               GpuRenderTools &renderTools,
                               GpuRenderData &data) {
     Q_UNUSED(data);

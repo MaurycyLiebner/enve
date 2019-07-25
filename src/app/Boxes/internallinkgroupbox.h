@@ -26,7 +26,7 @@ public:
 
     bool isFrameInDurationRect(const int relFrame) const;
 
-    stdsptr<BoundingBoxRenderData> createRenderData();
+    stdsptr<BoxRenderData> createRenderData();
     QRectF getRelBoundingRect(const qreal relFrame);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
@@ -41,14 +41,14 @@ public:
     }
 
     void setupEffectsF(const qreal relFrame,
-                       BoundingBoxRenderData * const data);
+                       BoxRenderData * const data);
 
     QMarginsF getEffectsMargin(const qreal relFrame);
 
     const SkBlendMode &getBlendMode();
 
     void setupRenderData(const qreal relFrame,
-                         BoundingBoxRenderData * const data);
+                         BoxRenderData * const data);
 
     int prp_getRelFrameShift() const;
 

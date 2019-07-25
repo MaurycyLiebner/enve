@@ -135,7 +135,7 @@ class VideoEncoder : public HDDTask {
 protected:
     VideoEncoder();
 public:
-    void processTask();
+    void process();
     void beforeProcessing();
     void afterProcessing();
 

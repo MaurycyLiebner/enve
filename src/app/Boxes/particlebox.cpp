@@ -402,7 +402,7 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
             if(particle->isVisibleAtFrame(relFrame)) {
                 ParticleState stateT;
                 if(!particle->getParticleStateAtFrameF(relFrame, stateT)) continue;
-                stdsptr<BoundingBoxRenderData> renderData = targetT->createRenderData();
+                stdsptr<BoxRenderData> renderData = targetT->createRenderData();
                 QMatrix multMatr = QMatrix(stateT.fSize, 0.,
                                            0., stateT.fSize,
                                            0., 0.)*particleData->fTransform;
@@ -414,7 +414,7 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
                                 stateT.fPos.x(), stateT.fPos.y()));
 
                 stateT.fTargetRenderData =
-                        GetAsSPtr(renderData, BoundingBoxRenderData);
+                        GetAsSPtr(renderData, BoxRenderData);
                 renderData->fParentIsTarget = false;
                 data.particleStates << stateT;
                 renderData->addDependent(particleData.get());

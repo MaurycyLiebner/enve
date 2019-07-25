@@ -3,7 +3,7 @@
 #include "PixmapEffects/pixmapeffect.h"
 #include "skia/skqtconversions.h"
 
-void LinkCanvasRenderData::processTask() {
+void LinkCanvasRenderData::process() {
     updateGlobalRect();
     if(fOpacity < 0.001) return;
 
@@ -42,13 +42,6 @@ void LinkCanvasRenderData::processTask() {
         rasterCanvas.restore();
     }
     rasterCanvas.flush();
-
-    if(!fRasterEffects.isEmpty()) {
-        for(const auto& effect : fRasterEffects) {
-            effect->applyEffectsSk(bitmap, fResolution);
-        }
-        clearPixmapEffects();
-    }
 
     fRenderedImage = SkiaHelpers::transferDataToSkImage(bitmap);
 }

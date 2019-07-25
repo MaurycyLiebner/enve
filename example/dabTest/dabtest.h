@@ -39,14 +39,23 @@ struct Dab {
     float fSeg2Slope = -fHardness/(1.f - fHardness); // 15
 };
 
-class DabTestCaller000 : public GPURasterEffectCaller {
+class DabTestCaller000 : public RasterEffectCaller {
 public:
     DabTestCaller000(const Dab& dab) :
-        GPURasterEffectCaller(), mDab(dab) {}
+        RasterEffectCaller(), mDab(dab) {}
 
-    void render(QGL33 * const gl,
+    void processGpu(QGL33 * const gl,
                 GpuRenderTools& renderTools,
                 GpuRenderData& data);
+    void processCpu(CpuRenderTools& renderTools,
+                    CpuRenderData& data) {
+        Q_UNUSED(renderTools);
+        Q_UNUSED(data);
+    }
+
+    HardwareSupport hardwareSupport() const {
+        return HardwareSupport::GPU_ONLY;
+    }
 private:
     static bool sInitialized;
     static void sInitialize(QGL33 * const gl);
@@ -60,7 +69,7 @@ class DabTest000 : public CustomGpuEffect {
 public:
     DabTest000();
 
-    stdsptr<GPURasterEffectCaller>
+    stdsptr<RasterEffectCaller>
             getEffectCaller(const qreal relFrame) const;
 
     CustomIdentifier getIdentifier() const;

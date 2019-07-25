@@ -1,5 +1,5 @@
 #include "taskscheduler.h"
-#include "Boxes/boundingboxrenderdata.h"
+#include "Boxes/boxrenderdata.h"
 #include "GPUEffects/gpupostprocessor.h"
 #include "canvas.h"
 #include "taskexecutor.h"
@@ -61,7 +61,7 @@ void TaskScheduler::scheduleHDDTask(const stdsptr<Task>& task) {
     mScheduledHDDTasks << task;
 }
 
-void TaskScheduler::scheduleGPUTask(const stdsptr<ScheduledPostProcess> &task) {
+void TaskScheduler::scheduleGPUTask(const stdsptr<Task> &task) {
     mGpuPostProcessor.addToProcess(task);
 }
 
@@ -69,7 +69,7 @@ void TaskScheduler::queCPUTask(const stdsptr<Task>& task) {
     if(!task->isQued()) task->taskQued();
     mQuedCPUTasks.addTask(task);
     if(task->readyToBeProcessed()) {
-        if(!task->gpuProcessingSupported() ||
+        if(!task->gpuSupported() ||
            !processNextQuedGPUTask()) {
             processNextQuedCPUTask();
         }
@@ -202,8 +202,7 @@ bool TaskScheduler::processNextQuedGPUTask() {
             processNextTasks();
             return true;
         }
-        scheduleGPUTask(SPtrCreate(BoxRenderDataScheduledPostProcess)(
-                            GetAsSPtr(task, BoundingBoxRenderData)));
+        scheduleGPUTask(task);
     }
     const auto usageWidget = MainWindow::getInstance()->getUsageWidget();
     usageWidget->setGpuUsage(!mGpuPostProcessor.hasFinished());
@@ -214,11 +213,10 @@ void TaskScheduler::afterCPUTaskFinished(
         const stdsptr<Task>& task,
         ExecController * const controller) {
     mFreeCPUExecs << static_cast<CPUExecController*>(controller);
-    if(task->getState() != Task::CANCELED &&
-       task->gpuProcessingNeeded()) {
-        const auto sTask = GetAsSPtr(task, BoundingBoxRenderData);
-        const auto gpuProcess = SPtrCreate(BoxRenderDataScheduledPostProcess)(sTask);
-        scheduleGPUTask(gpuProcess);
+    if(task->getState() == Task::CANCELED) {
+    } if(task->nextStep()) {
+        queCPUTask(task);
+        scheduleGPUTask(task);
     } else {
         task->finishedProcessing();
     }

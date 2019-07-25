@@ -23,7 +23,7 @@ public:
 
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal relFrame, BoundingBoxRenderData* );
+            const qreal relFrame, BoxRenderData* );
 private:
     qsptr<QrealAnimator> mBlurRadius;
 };

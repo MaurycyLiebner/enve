@@ -27,7 +27,7 @@ protected:
     void afterProcessing();
     void afterCanceled();
 public:
-    void processTask() {
+    void process() {
         readFrame();
     }
 protected:

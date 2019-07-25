@@ -9,7 +9,7 @@ InternalLinkCanvas::InternalLinkCanvas(ContainerBox * const linkTarget) :
 }
 
 void InternalLinkCanvas::setupRenderData(
-        const qreal relFrame, BoundingBoxRenderData * const data) {
+        const qreal relFrame, BoxRenderData * const data) {
     InternalLinkGroupBox::setupRenderData(relFrame, data);
 
     ContainerBox* finalTarget = getFinalTarget();
@@ -40,7 +40,7 @@ qsptr<BoundingBox> InternalLinkCanvas::createLinkForLinkGroup() {
     }
 }
 
-stdsptr<BoundingBoxRenderData> InternalLinkCanvas::createRenderData() {
+stdsptr<BoxRenderData> InternalLinkCanvas::createRenderData() {
     return SPtrCreate(LinkCanvasRenderData)(this);
 }
 

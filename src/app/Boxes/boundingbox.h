@@ -2,7 +2,7 @@
 #define BOUNDINGBOX_H
 
 #include "Animators/staticcomplexanimator.h"
-#include "boundingboxrendercontainer.h"
+#include "boxrendercontainer.h"
 #include "skia/skiaincludes.h"
 #include "renderdatahandler.h"
 #include "smartPointers/sharedpointerdefs.h"
@@ -182,12 +182,12 @@ public:
 
     virtual void addActionsToMenu(BoxTypeMenu * const menu);
 
-    virtual stdsptr<BoundingBoxRenderData> createRenderData();
+    virtual stdsptr<BoxRenderData> createRenderData();
     virtual void setupRenderData(const qreal relFrame,
-                                 BoundingBoxRenderData * const data);
-    virtual void renderDataFinished(BoundingBoxRenderData *renderData);
+                                 BoxRenderData * const data);
+    virtual void renderDataFinished(BoxRenderData *renderData);
     virtual void updateCurrentPreviewDataFromRenderData(
-            BoundingBoxRenderData* renderData);
+            BoxRenderData* renderData);
 
     virtual QMarginsF getEffectsMargin(const qreal relFrame);
 
@@ -209,9 +209,9 @@ public:
     virtual void readBoundingBox(QIODevice * const src);
 
     virtual void setupEffectsF(const qreal relFrame,
-                               BoundingBoxRenderData * const data);
+                               BoxRenderData * const data);
     virtual void setupGPUEffectsF(const qreal relFrame,
-                                  BoundingBoxRenderData * const data);
+                                  BoxRenderData * const data);
     virtual const SkBlendMode &getBlendMode();
 
     bool SWT_isBoundingBox() const;
@@ -372,13 +372,13 @@ public:
             const int relFrame1, const int relFrame2) const;
 
     bool hasCurrentRenderData(const int relFrame) const;
-    stdsptr<BoundingBoxRenderData> getCurrentRenderData(const int relFrame) const;
-    BoundingBoxRenderData *updateCurrentRenderData(const int relFrame,
+    stdsptr<BoxRenderData> getCurrentRenderData(const int relFrame) const;
+    BoxRenderData *updateCurrentRenderData(const int relFrame,
                                                    const UpdateReason &reason);
     void nullifyCurrentRenderData(const int relFrame);
     void updateDrawRenderContainerTransform();
 
-    void scheduleTask(const stdsptr<BoundingBoxRenderData> &task);
+    void scheduleTask(const stdsptr<BoxRenderData> &task);
 
     void addLinkingBox(BoundingBox *box);
     void removeLinkingBox(BoundingBox *box);
@@ -452,12 +452,12 @@ protected:
     bool mCenterPivotPlanned = false;
     bool mSchedulePlanned = false;
     UpdateReason mPlannedReason;
-    QList<stdsptr<BoundingBoxRenderData>> mScheduledTasks;
+    QList<stdsptr<BoxRenderData>> mScheduledTasks;
     QList<qptr<Property>> mCanvasProps;
 private:
     void scheduleUpdate();
     void updateRelBoundingRectFromRenderData(
-            BoundingBoxRenderData * const renderData);
+            BoxRenderData * const renderData);
     FrameRange getVisibleAbsFrameRange() const;
     void cancelWaitingTasks();
     void afterTotalTransformChanged(const UpdateReason &reason);

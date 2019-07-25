@@ -566,12 +566,12 @@ void processChildData(BoundingBox * const child,
     parentData->fChildrenRenderData << boxRenderData;
 }
 
-stdsptr<BoundingBoxRenderData> ContainerBox::createRenderData() {
+stdsptr<BoxRenderData> ContainerBox::createRenderData() {
     return SPtrCreate(ContainerBoxRenderData)(this);
 }
 
 void ContainerBox::setupRenderData(const qreal relFrame,
-                                   BoundingBoxRenderData * const data) {
+                                   BoxRenderData * const data) {
     if(SWT_isGroupBox()) {
         data->fOpacity = 0;
         if(data->fParentIsTarget && !data->nullifyBeforeProcessing()) {
@@ -581,7 +581,7 @@ void ContainerBox::setupRenderData(const qreal relFrame,
 }
 
 void ContainerBox::setupLayerRenderData(const qreal relFrame,
-                                        BoundingBoxRenderData * const data) {
+                                        BoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     const auto groupData = GetAsPtr(data, ContainerBoxRenderData);
     groupData->fChildrenRenderData.clear();

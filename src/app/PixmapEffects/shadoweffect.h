@@ -25,7 +25,7 @@ public:
     QMarginsF getMarginAtRelFrame(const qreal relFrame);
 
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal relFrame, BoundingBoxRenderData*);
+            const qreal relFrame, BoxRenderData*);
 protected:
     ShadowEffect();
 private:

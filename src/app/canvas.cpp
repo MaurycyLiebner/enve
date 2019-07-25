@@ -295,7 +295,7 @@ void Canvas::setFrameRange(const FrameRange &range) {
     emit newFrameRange(range);
 }
 
-stdsptr<BoundingBoxRenderData> Canvas::createRenderData() {
+stdsptr<BoxRenderData> Canvas::createRenderData() {
     return SPtrCreate(CanvasRenderData)(this);
 }
 
@@ -369,7 +369,7 @@ FrameRange Canvas::prp_getIdenticalRelRange(const int relFrame) const {
     return groupRange;//*canvasRange;
 }
 
-void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
+void Canvas::renderDataFinished(BoxRenderData *renderData) {
     if(renderData->fBoxStateId < mLastStateId) return;
     mLastStateId = renderData->fBoxStateId;
     const auto range = prp_getIdenticalRelRange(renderData->fRelFrame);

@@ -2,9 +2,9 @@
 #define SKIAHELPERS_H
 
 #include "skiaincludes.h"
-#include "exceptions.h"
+#include "../exceptions.h"
 #include <QIODevice>
-#include "castmacros.h"
+#include "../castmacros.h"
 
 namespace SkiaHelpers {
     sk_sp<SkImage> makeCopy(const sk_sp<SkImage>& img);

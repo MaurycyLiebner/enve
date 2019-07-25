@@ -18,7 +18,7 @@ class CirclesEffect : public PixmapEffect {
     friend class SelfRef;
 public:
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal relFrame, BoundingBoxRenderData*);
+            const qreal relFrame, BoxRenderData*);
 protected:
     CirclesEffect(qreal circlesRadius = 5.,
                   qreal circlesDistance = 5.);

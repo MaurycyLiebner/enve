@@ -39,8 +39,8 @@ public:
     bool SWT_isAnimationBox() const { return true; }
     void addActionsToMenu(BoxTypeMenu * const menu);
     void setupRenderData(const qreal relFrame,
-                         BoundingBoxRenderData * const data);
-    stdsptr<BoundingBoxRenderData> createRenderData();
+                         BoxRenderData * const data);
+    stdsptr<BoxRenderData> createRenderData();
     void setParentGroup(ContainerBox * const parent);
     bool shouldPlanScheduleUpdate();
 

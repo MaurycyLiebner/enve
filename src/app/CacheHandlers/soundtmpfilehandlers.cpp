@@ -8,7 +8,7 @@ SoundContainerTmpFileDataLoader::SoundContainerTmpFileDataLoader(
     mTmpFile = file;
 }
 
-void SoundContainerTmpFileDataLoader::processTask() {
+void SoundContainerTmpFileDataLoader::process() {
     if(mTmpFile->open()) {
         SampleRange sampleRange;
         mTmpFile->read(rcChar(&sampleRange), sizeof(SampleRange));
@@ -32,7 +32,7 @@ SoundContainerTmpFileDataSaver::SoundContainerTmpFileDataSaver(
     mSamples = samples;
 }
 
-void SoundContainerTmpFileDataSaver::processTask() {
+void SoundContainerTmpFileDataSaver::process() {
     // mSavingFailed = true; return; // NO TMP FILES !!!
     mTmpFile = qsptr<QTemporaryFile>(new QTemporaryFile());
     if(mTmpFile->open()) {

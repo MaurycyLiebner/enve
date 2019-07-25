@@ -10,7 +10,7 @@ protected:
     ImageLoader(const QString &filePath,
                 ImageDataHandler * const handler);
 public:
-    void processTask();
+    void process();
     void afterProcessing();
     void afterCanceled();
 private:

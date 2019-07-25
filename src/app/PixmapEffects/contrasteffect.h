@@ -20,7 +20,7 @@ protected:
     ContrastEffect(const qreal contrast = 0);
 public:
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal relFrame, BoundingBoxRenderData*);
+            const qreal relFrame, BoxRenderData*);
 private:
     qsptr<QrealAnimator> mContrastAnimator;
 };

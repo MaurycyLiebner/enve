@@ -3,6 +3,8 @@
 #include <QList>
 #include <QEventLoop>
 #include "smartPointers/sharedpointerdefs.h"
+#include "glhelpers.h"
+#include "skia/skiaincludes.h"
 class HDDExecController;
 
 class Que;
@@ -10,10 +12,12 @@ class Que;
 class Task : public StdSelfRef {
     friend class TaskScheduler;
     friend class Que;
+    template <typename T> friend class TaskCollection;
 protected:
     Task() {}
 
     virtual void scheduleTaskNow() = 0;
+    virtual void afterQued() {}
     virtual void beforeProcessing() {}
     virtual void afterProcessing() {}
     virtual void afterCanceled() {}
@@ -35,21 +39,25 @@ public:
         FAILED
     };
 
-    enum GpuSupport {
-        GPU_NO_SUPPORT,
-        GPU_SUPPORTED,
-        GPU_PREFERRED,
-        GPU_REQUIRED
-    };
+    virtual HardwareSupport hardwareSupport() const = 0;
+    virtual void processGPU(QGL33 * const gl,
+                            SwitchableContext &context) = 0;
+    virtual void process() = 0;
 
-    virtual void processTask() = 0;
-    virtual bool gpuProcessingNeeded() const { return false; }
-    virtual void taskQued() { mState = QUED; }
+    virtual bool nextStep() { return false; }
 
-    virtual GpuSupport gpuSupport() const { return GPU_NO_SUPPORT; }
-    bool gpuProcessingSupported() const { return gpuSupport() > GPU_NO_SUPPORT; }
-    bool gpuProcessingPreferred() const { return gpuSupport() == GPU_PREFERRED; }
-    bool gpuProcessingOnly() const { return gpuSupport() == GPU_REQUIRED; }
+    bool cpuSupported() const { return hardwareSupport() != HardwareSupport::GPU_ONLY; }
+    bool cpuPreferred() const { return hardwareSupport() == HardwareSupport::CPU_PREFFERED; }
+    bool cpuOnly() const { return hardwareSupport() == HardwareSupport::CPU_ONLY; }
+
+    bool gpuSupported() const { return hardwareSupport() != HardwareSupport::CPU_ONLY; }
+    bool gpuPreferred() const { return hardwareSupport() == HardwareSupport::GPU_PREFFERED; }
+    bool gpuOnly() const { return hardwareSupport() == HardwareSupport::GPU_ONLY; }
+
+    void taskQued() {
+        mState = QUED;
+        afterQued();
+    }
 
     bool scheduleTask();
     bool isQued() { return mState == QUED; }
@@ -106,12 +114,32 @@ private:
 
 class CPUTask : public Task {
     friend class StdSelfRef;
+public:
+    HardwareSupport hardwareSupport() const {
+        return HardwareSupport::CPU_ONLY;
+    }
+
+    void processGPU(QGL33 * const gl,
+                    SwitchableContext &context) {
+        Q_UNUSED(gl);
+        Q_UNUSED(context);
+    }
 protected:
     void scheduleTaskNow() final;
 };
 
 class HDDTask : public Task {
     friend class StdSelfRef;
+public:
+    HardwareSupport hardwareSupport() const {
+        return HardwareSupport::CPU_ONLY;
+    }
+
+    void processGPU(QGL33 * const gl,
+                    SwitchableContext &context) {
+        Q_UNUSED(gl);
+        Q_UNUSED(context);
+    }
 protected:
     void scheduleTaskNow();
     void HDDPartFinished();
@@ -123,95 +151,23 @@ private:
     HDDExecController * mController = nullptr;
 };
 
-class StdSPtrDisposer : public CPUTask {
+template <typename T>
+class SPtrDisposer : public CPUTask {
     friend class StdSelfRef;
 protected:
-    StdSPtrDisposer(const stdsptr<void>& ptr) : mPtr(ptr) {}
+    SPtrDisposer(const T& ptr) : mPtr(ptr) {}
 public:
     void beforeProcessing() final {}
-    void processTask() final { mPtr.reset(); }
+    void process() final { mPtr.reset(); }
+    static Task* sDispose(const T& ptr) {
+        const auto disposer = SPtrCreateTemplated(SPtrDisposer<T>)(ptr);
+        if(disposer->scheduleTask()) return disposer.get();
+        return nullptr;
+    }
 protected:
     void afterProcessing() final {}
 private:
-    stdsptr<void> mPtr;
-};
-#include "skia/skiaincludes.h"
-class SkImageSPtrDisposer : public CPUTask {
-    friend class StdSelfRef;
-protected:
-    SkImageSPtrDisposer(const sk_sp<SkImage>& ptr) : mPtr(ptr) {}
-public:
-    void beforeProcessing() final {}
-    void processTask() final { mPtr.reset(); }
-protected:
-    void afterProcessing() final {}
-private:
-    sk_sp<SkImage> mPtr;
-};
-
-class QSPtrDisposer : public CPUTask {
-    friend class StdSelfRef;
-protected:
-    QSPtrDisposer(const qsptr<QObject>& ptr) : mPtr(ptr) {}
-public:
-    void beforeProcessing() final {}
-    void processTask() final { mPtr.reset(); }
-protected:
-    void afterProcessing() final {}
-private:
-    qsptr<QObject> mPtr;
-};
-
-class CustomCPUTask : public CPUTask {
-    friend class StdSelfRef;
-protected:
-    CustomCPUTask(const std::function<void(void)>& before,
-                  const std::function<void(void)>& run,
-                  const std::function<void(void)>& after) :
-        mBefore(before), mRun(run), mAfter(after) {}
-public:
-    void beforeProcessing() final {
-        if(mBefore) mBefore();
-    }
-
-    void processTask() final {
-        if(mRun) mRun();
-    }
-
-protected:
-    void afterProcessing() final {
-        if(mAfter) mAfter();
-    }
-private:
-    const std::function<void(void)> mBefore;
-    const std::function<void(void)> mRun;
-    const std::function<void(void)> mAfter;
-};
-
-class CustomHDDTask : public HDDTask {
-    friend class StdSelfRef;
-public:
-    void beforeProcessing() final {
-        if(mBefore) mBefore();
-    }
-
-    void processTask() final {
-        if(mRun) mRun();
-    }
-
-protected:
-    void afterProcessing() final {
-        if(mAfter) mAfter();
-    }
-
-    CustomHDDTask(const std::function<void(void)>& before,
-                  const std::function<void(void)>& run,
-                  const std::function<void(void)>& after) :
-        mBefore(before), mRun(run), mAfter(after) {}
-private:
-    const std::function<void(void)> mBefore;
-    const std::function<void(void)> mRun;
-    const std::function<void(void)> mAfter;
+    T mPtr;
 };
 
 #endif // UPDATABLE_H

@@ -17,7 +17,7 @@ class SwirlEffect : public PixmapEffect {
     friend class SelfRef;
 public:
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal relFrame, BoundingBoxRenderData*);
+            const qreal relFrame, BoxRenderData*);
 protected:
     SwirlEffect(qreal degrees = 45.);
 private:

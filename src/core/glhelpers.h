@@ -44,7 +44,11 @@ struct Texture {
 
     //! @brief Generates, binds texture and sets data.
     void gen(QGL33 * const gl,
-             const int fWidth, const int fHeight,
+             const int width, const int height,
+             const void * const data);
+
+    void set(QGL33 * const gl,
+             const int width, const int height,
              const void * const data);
 
     void swap(Texture& otherTexture) {
@@ -53,8 +57,8 @@ struct Texture {
         std::swap(fHeight, otherTexture.fHeight);
     }
 
-    SkBitmap toBitmap(QGL33 * const gl) const;
-    sk_sp<SkImage> toImage(QGL33 * const gl) const;
+    SkBitmap bitmapSnapshot(QGL33 * const gl) const;
+    sk_sp<SkImage> imageSnapshot(QGL33 * const gl) const;
 };
 
 struct TextureFrameBuffer {
@@ -85,24 +89,33 @@ struct TextureFrameBuffer {
     void gen(QGL33 * const gl, const int width, const int height);
 
     sk_sp<SkImage> toImage(QGL33 * const gl) const {
-        return fTexture.toImage(gl);
+        return fTexture.imageSnapshot(gl);
     }
 
     SkBitmap toBitmap(QGL33 * const gl) const {
-        return fTexture.toBitmap(gl);
+        return fTexture.bitmapSnapshot(gl);
     }
 };
 
-#include <QJSEngine>
-struct GpuRenderData {
+enum class HardwareSupport : short {
+    CPU_ONLY,
+    CPU_PREFFERED,
+    GPU_PREFFERED,
+    GPU_ONLY
+};
+
+struct CpuRenderData {
     //! @brief Pixel {0, 0} position in scene coordinates
-    GLint fPosX;
-    GLint fPosY;
+    int fPosX;
+    int fPosY;
 
     //! @brief Texture size
-    GLuint fWidth;
-    GLuint fHeight;
+    uint fWidth;
+    uint fHeight;
+};
 
+#include <QJSEngine>
+struct GpuRenderData : public CpuRenderData {
     //! @brief Used for shader based effects
     QJSEngine fJSEngine;
 };
@@ -126,9 +139,13 @@ public:
 
     void switchToSkia() { setMode(Mode::Skia); }
     void switchToOpenGL() { setMode(Mode::OpenGL); }
+
+    GLuint textureSquareVAO() const { return mTexturedSquareVAO; }
 private:
-    void setContext(const sk_sp<GrContext>& context) {
+    void setContext(const sk_sp<GrContext>& context,
+                    const GLuint textureSquareVAO) {
         mContext = context;
+        mTexturedSquareVAO = textureSquareVAO;
     }
 
     void setMode(const Mode mode) {
@@ -139,15 +156,32 @@ private:
 
     sk_sp<GrContext> mContext;
     Mode mMode = Mode::Skia;
+    GLuint mTexturedSquareVAO;
+};
+#include "skia/skiahelpers.h"
+class CpuRenderTools {
+public:
+    CpuRenderTools(const sk_sp<SkImage>& srcImg) : fSrcDstImg(srcImg) {}
+
+    const sk_sp<SkImage> fSrcDstImg;
+
+    sk_sp<SkImage> requestBackupImg() {
+        if(fBackupImg) return fBackupImg;
+        SkBitmap bitmap;
+        bitmap.allocPixels(fBackupImg->imageInfo());
+        fBackupImg = SkiaHelpers::transferDataToSkImage(bitmap);
+        return fBackupImg;
+    }
+private:
+    sk_sp<SkImage> fBackupImg;
 };
 
 class GpuRenderTools {
 public:
     GpuRenderTools(QGL33* const gl,
                    SwitchableContext& context,
-                   const sk_sp<SkImage>& img,
-                   const GLuint texturedSquareVAO) :
-        mGL(gl), mContext(context), mSquareVAO(texturedSquareVAO) {
+                   const sk_sp<SkImage>& img) :
+        mGL(gl), mContext(context) {
         if(img->isTextureBacked()) {
             const auto grTex = img->getBackendTexture(true);
             GrGLTextureInfo texInfo;
@@ -167,7 +201,7 @@ public:
         mSrcTexture.clear(mGL);
     }
 
-    GLuint getSquareVAO() const { return mSquareVAO; }
+    GLuint getSquareVAO() const { return mContext.textureSquareVAO(); }
 
     //! @brief Swaps the source and the target texture if valid.
     void swapTextures() {
@@ -256,7 +290,6 @@ private:
 
     QGL33* const mGL;
     SwitchableContext& mContext;
-    const GLuint mSquareVAO;
 
     Texture mSrcTexture;
     TextureFrameBuffer mTargetTextureFbo;

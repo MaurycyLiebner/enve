@@ -9,11 +9,11 @@ protected:
     InternalLinkCanvas(ContainerBox * const linkTarget);
 public:
     void setupRenderData(const qreal relFrame,
-                         BoundingBoxRenderData * const data);
+                         BoxRenderData * const data);
 
     qsptr<BoundingBox> createLinkForLinkGroup();
 
-    stdsptr<BoundingBoxRenderData> createRenderData();
+    stdsptr<BoxRenderData> createRenderData();
 
     bool relPointInsidePath(const QPointF &relPos) const;
     void anim_setAbsFrame(const int frame);

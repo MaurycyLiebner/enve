@@ -9,7 +9,7 @@ OilEffect::OilEffect() : PixmapEffect("oil", EFFECT_OIL) {
 }
 
 stdsptr<PixmapEffectRenderData> OilEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoxRenderData*) {
     auto renderData = SPtrCreate(OilEffectRenderData)();
     renderData->radius = mRadiusAnimator->getEffectiveValue(relFrame);
     return GetAsSPtr(renderData, PixmapEffectRenderData);

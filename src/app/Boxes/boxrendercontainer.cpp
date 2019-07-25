@@ -1,4 +1,4 @@
-#include "boundingboxrendercontainer.h"
+#include "boxrendercontainer.h"
 #include "boundingbox.h"
 #include <QElapsedTimer>
 #include "memoryhandler.h"
@@ -43,7 +43,7 @@ void RenderContainer::updatePaintTransformGivenNewTotalTransform(
     mPaintTransform = mRenderTransform*mPaintTransform;
 }
 
-void RenderContainer::setSrcRenderData(BoundingBoxRenderData * const data) {
+void RenderContainer::setSrcRenderData(BoxRenderData * const data) {
     mTransform = data->fTransform;
     mResolutionFraction = data->fResolution;
     mImageSk = data->fRenderedImage;
@@ -53,5 +53,5 @@ void RenderContainer::setSrcRenderData(BoundingBoxRenderData * const data) {
     mPaintTransform.scale(1/mResolutionFraction, 1/mResolutionFraction);
     mRenderTransform = data->fRenderTransform;
     mPaintTransform = mRenderTransform*mPaintTransform;
-    mSrcRenderData = GetAsSPtr(data, BoundingBoxRenderData);
+    mSrcRenderData = GetAsSPtr(data, BoxRenderData);
 }

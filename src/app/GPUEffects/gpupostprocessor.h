@@ -8,52 +8,7 @@
 #include "skia/skiaincludes.h"
 #include "glhelpers.h"
 #include "GPUEffects/gpueffect.h"
-
-class ScheduledPostProcess : public StdSelfRef, protected QGL33 {
-    friend class GpuPostProcessor;
-public:
-    ScheduledPostProcess();
-protected:
-    virtual void afterProcessed() {}
-    virtual void process(SwitchableContext& context,
-                         const GLuint texturedSquareVAO) = 0;
-private:
-    bool unhandledException() const {
-        return static_cast<bool>(mUpdateException);
-    }
-
-    void finishedProcessing() {
-        afterProcessed();
-        if(unhandledException()) {
-            gPrintExceptionCritical(handleException());
-        }
-    }
-
-    void setException(const std::exception_ptr& exception) {
-        mUpdateException = exception;
-    }
-
-    std::exception_ptr handleException() {
-        std::exception_ptr exc;
-        mUpdateException.swap(exc);
-        return exc;
-    }
-
-    std::exception_ptr mUpdateException;
-};
-
-class BoundingBoxRenderData;
-class BoxRenderDataScheduledPostProcess : public ScheduledPostProcess {
-public:
-    BoxRenderDataScheduledPostProcess(
-            const stdsptr<BoundingBoxRenderData> &boxData);
-protected:
-    void afterProcessed();
-    void process(SwitchableContext& context,
-                 const GLuint texturedSquareVAO);
-private:
-    const stdsptr<BoundingBoxRenderData> mBoxData;
-};
+#include "updatable.h"
 
 #include <QOpenGLFramebufferObject>
 #include "exceptions.h"
@@ -64,8 +19,9 @@ public:
     void initialize();
 
     //! @brief Adds a new task and starts processing it if is not busy.
-    void addToProcess(const stdsptr<ScheduledPostProcess>& scheduled) {
+    void addToProcess(const stdsptr<Task>& scheduled) {
         //scheduled->afterProcessed(); return;
+        Q_ASSERT(scheduled->gpuSupported());
         mScheduledProcesses << scheduled;
         handleScheduledProcesses();
     }
@@ -90,17 +46,7 @@ public:
 signals:
     void processedAll();
 private:
-    void afterProcessed() {
-        if(unhandledException())
-            gPrintExceptionCritical(handleException());
-        mFinished = true;
-        for(const auto& process : _mHandledProcesses) {
-            process->finishedProcessing();
-        }
-        _mHandledProcesses.clear();
-        handleScheduledProcesses();
-        if(mFinished) emit processedAll();
-    }
+    void afterProcessed();
 protected:
     void run() override {
         try {
@@ -122,10 +68,10 @@ protected:
             if(!mInterface) RuntimeThrow("Failed to make native interface.");
             const auto grContext = GrContext::MakeGL(mInterface);
             if(!grContext) RuntimeThrow("Failed to make GrContext.");
-            mGrContext.setContext(grContext);
-
-            iniTexturedVShaderVAO(this, _mTextureSquareVAO);
+            GLuint textureSquareVAO;
+            iniTexturedVShaderVAO(this, textureSquareVAO);
             mInitialized = true;
+            mContext.setContext(grContext, textureSquareVAO);
 
             glEnable(GL_BLEND);
             glDisable(GL_DEPTH_TEST);
@@ -134,7 +80,7 @@ protected:
 
         for(const auto& scheduled : _mHandledProcesses) {
             try {
-                scheduled->process(mGrContext, _mTextureSquareVAO);
+                scheduled->processGPU(this, mContext);
             } catch(...) {
                 scheduled->setException(std::current_exception());
             }
@@ -155,13 +101,13 @@ protected:
     }
 
     sk_sp<const GrGLInterface> mInterface;
-    SwitchableContext mGrContext;
+    SwitchableContext mContext;
     std::exception_ptr mProcessException;
     bool mFinished = true;
     bool mInitialized = false;
     GLuint _mTextureSquareVAO;
-    QList<stdsptr<ScheduledPostProcess>> _mHandledProcesses;
-    QList<stdsptr<ScheduledPostProcess>> mScheduledProcesses;
+    QList<stdsptr<Task>> _mHandledProcesses;
+    QList<stdsptr<Task>> mScheduledProcesses;
     //QOpenGLFramebufferObject* mFrameBuffer = nullptr;
 };
 

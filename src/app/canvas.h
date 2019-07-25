@@ -375,10 +375,10 @@ public:
         return mBackgroundColor.get();
     }
 
-    stdsptr<BoundingBoxRenderData> createRenderData();
+    stdsptr<BoxRenderData> createRenderData();
 
     void setupRenderData(const qreal relFrame,
-                         BoundingBoxRenderData * const data) {
+                         BoxRenderData * const data) {
         ContainerBox::setupRenderData(relFrame, data);
         auto canvasData = GetAsPtr(data, CanvasRenderData);
         canvasData->fBgColor = toSkColor(mBackgroundColor->getColor());
@@ -496,7 +496,7 @@ public:
         return mCurrentPreviewContainerOutdated;
     }
 
-    void renderDataFinished(BoundingBoxRenderData *renderData);
+    void renderDataFinished(BoxRenderData *renderData);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
     QRectF getRelBoundingRect(const qreal );

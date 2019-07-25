@@ -218,7 +218,7 @@ void AnimationBox::readBoundingBox(QIODevice * const target) {
 }
 
 void AnimationBox::setupRenderData(const qreal relFrame,
-                                   BoundingBoxRenderData * const data) {
+                                   BoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     const auto imageData = GetAsPtr(data, AnimationBoxRenderData);
     const int animationFrame = getAnimationFrameForRelFrame(relFrame);
@@ -228,7 +228,7 @@ void AnimationBox::setupRenderData(const qreal relFrame,
     else imageData->fImage = mSrcFramesCache->getFrameCopyAtFrame(animationFrame);
 }
 
-stdsptr<BoundingBoxRenderData> AnimationBox::createRenderData() {
+stdsptr<BoxRenderData> AnimationBox::createRenderData() {
     return SPtrCreate(AnimationBoxRenderData)(mSrcFramesCache.get(), this);
 }
 

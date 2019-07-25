@@ -11,16 +11,23 @@ enum class GpuEffectType : short {
     TYPE_COUNT
 };
 
-class GPURasterEffectCaller : public StdSelfRef {
+class RasterEffectCaller : public StdSelfRef {
 protected:
-    GPURasterEffectCaller() : GPURasterEffectCaller(false, QMargins()) {}
-    GPURasterEffectCaller(const bool forceMargin,
-                          const QMargins& margin) :
+    RasterEffectCaller() : RasterEffectCaller(false, QMargins()) {}
+    RasterEffectCaller(const bool forceMargin,
+                       const QMargins& margin) :
         fForceMargin(forceMargin), fMargin(margin) {}
+
 public:
-    virtual void render(QGL33 * const gl,
-                        GpuRenderTools& renderTools,
-                        GpuRenderData& data) = 0;
+    virtual void processGpu(QGL33 * const gl,
+                            GpuRenderTools& renderTools,
+                            GpuRenderData& data) = 0;
+    virtual void processCpu(CpuRenderTools& renderTools,
+                            CpuRenderData& data) = 0;
+
+    virtual HardwareSupport hardwareSupport() const = 0;
+    bool gpuOnly() const { return hardwareSupport() == HardwareSupport::GPU_ONLY; }
+    bool cpuOnly() const { return hardwareSupport() == HardwareSupport::CPU_ONLY; }
 
     SkIRect setSrcRectUpdateDstRect(const SkIRect& srcRect,
                                     const SkIRect& clampRect) {
@@ -49,14 +56,15 @@ protected:
     SkIRect fSrcRect;
     SkIRect fDstRect;
 };
-
+enum class HardwareSupport : short;
 class GpuEffect : public StaticComplexAnimator {
     friend class SelfRef;
 protected:
     GpuEffect(const QString &name, const GpuEffectType type);
 public:
-    virtual stdsptr<GPURasterEffectCaller>
+    virtual stdsptr<RasterEffectCaller>
         getEffectCaller(const qreal relFrame) const = 0;
+
     virtual QMargins getMarginAtRelFrame(const qreal frame) const {
         Q_UNUSED(frame);
         return QMargins();

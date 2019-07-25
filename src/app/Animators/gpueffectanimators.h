@@ -6,7 +6,7 @@
 #include "GPUEffects/shadereffect.h"
 
 class BoundingBox;
-struct BoundingBoxRenderData;
+struct BoxRenderData;
 qsptr<GpuEffect> readIdCreateGPURasterEffect(QIODevice * const src);
 typedef DynamicComplexAnimator<
     GpuEffect, &GpuEffect::writeIdentifier,
@@ -22,7 +22,7 @@ public:
     bool hasEffects();
     QMarginsF getEffectsMargin(const qreal relFrame) const;
     void addEffects(const qreal relFrame,
-                    BoundingBoxRenderData * const data);
+                    BoxRenderData * const data);
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program);
     //void readPixmapEffect(QIODevice *target);

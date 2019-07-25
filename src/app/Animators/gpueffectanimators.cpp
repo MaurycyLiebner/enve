@@ -20,14 +20,14 @@ QMarginsF GPUEffectAnimators::getEffectsMargin(const qreal relFrame) const {
 }
 
 void GPUEffectAnimators::addEffects(const qreal relFrame,
-                                    BoundingBoxRenderData * const data) {
+                                    BoxRenderData * const data) {
     for(const auto& effect : ca_mChildAnimators) {
         auto pixmapEffect = GetAsPtr(effect, ShaderEffect);
         if(pixmapEffect->isVisible()) {
             const auto effectRenderData =
                     pixmapEffect->getEffectCaller(relFrame);
             if(!effectRenderData) continue;
-            data->fGPUEffects.append(effectRenderData);
+            data->addEffect(effectRenderData);
         }
     }
 }

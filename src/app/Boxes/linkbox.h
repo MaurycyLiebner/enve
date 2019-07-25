@@ -64,9 +64,9 @@ public:
 
     qsptr<BoundingBox> createLinkForLinkGroup();
 
-    stdsptr<BoundingBoxRenderData> createRenderData();
+    stdsptr<BoxRenderData> createRenderData();
     void setupRenderData(const qreal relFrame,
-                         BoundingBoxRenderData * const data);
+                         BoxRenderData * const data);
     const SkBlendMode &getBlendMode() {
         if(isParentLink()) return getLinkTarget()->getBlendMode();
         return BoundingBox::getBlendMode();

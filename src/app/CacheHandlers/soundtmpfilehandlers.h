@@ -9,7 +9,7 @@ class SoundCacheContainer;
 class SoundContainerTmpFileDataLoader : public HDDTask {
     friend class StdSelfRef;
 public:
-    void processTask();
+    void process();
 
     void afterProcessing();
 protected:
@@ -24,7 +24,7 @@ protected:
 class SoundContainerTmpFileDataSaver : public HDDTask {
     friend class StdSelfRef;
 public:
-    void processTask();
+    void process();
 
     void afterProcessing();
 protected:

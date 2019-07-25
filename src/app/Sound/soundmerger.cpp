@@ -24,7 +24,7 @@ void mergeData(const float * const & src,
     }
 }
 
-void SoundMerger::processTask() {
+void SoundMerger::process() {
     mSamples = SPtrCreate(Samples)(mSampleRange);
     const auto& dst = mSamples->fData;
     const int dstSamples = mSamples->fSampleRange.span();

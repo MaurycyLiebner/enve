@@ -3,15 +3,24 @@
 
 #include "examplegpueffect_global.h"
 
-class ExampleGpuEffectCaller000 : public GPURasterEffectCaller {
+class ExampleGpuEffectCaller000 : public RasterEffectCaller {
 public:
     ExampleGpuEffectCaller000(const qreal radius) :
-        GPURasterEffectCaller(true, QMargins() + qCeil(radius)),
+        RasterEffectCaller(true, QMargins() + qCeil(radius)),
         mRadius(static_cast<float>(radius)) {}
 
-    void render(QGL33 * const gl,
-                GpuRenderTools& renderTools,
-                GpuRenderData& data);
+    void processGpu(QGL33 * const gl,
+                    GpuRenderTools& renderTools,
+                    GpuRenderData& data);
+    void processCpu(CpuRenderTools& renderTools,
+                    CpuRenderData& data) {
+        Q_UNUSED(renderTools);
+        Q_UNUSED(data);
+    }
+
+    HardwareSupport hardwareSupport() const {
+        return HardwareSupport::GPU_ONLY;
+    }
 private:
     const float mRadius;
 };
@@ -20,7 +29,7 @@ class ExampleGpuEffect000 : public CustomGpuEffect {
 public:
     ExampleGpuEffect000();
 
-    stdsptr<GPURasterEffectCaller>
+    stdsptr<RasterEffectCaller>
             getEffectCaller(const qreal relFrame) const;
     QMargins getMarginAtRelFrame(const qreal frame) const;
     bool forceWholeBase() const { return true; }

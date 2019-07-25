@@ -12,7 +12,7 @@ SwirlEffect::SwirlEffect(qreal degrees) :
 }
 
 stdsptr<PixmapEffectRenderData> SwirlEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoxRenderData*) {
     auto renderData = SPtrCreate(SwirlEffectRenderData)();
     renderData->degrees =
             mDegreesAnimator->getEffectiveValue(relFrame);

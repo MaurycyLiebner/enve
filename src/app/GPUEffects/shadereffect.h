@@ -2,18 +2,19 @@
 #define SHADEREFFECT_H
 #include "GPUEffects/gpueffect.h"
 #include "shadereffectcreator.h"
+#include "updatable.h"
 
-class ShaderEffectCaller : public GPURasterEffectCaller {
+class ShaderEffectCaller : public RasterEffectCaller {
 public:
     ShaderEffectCaller(const QMargins& margin,
                        const ShaderEffectProgram& program,
                        const UniformSpecifiers& uniformSpecifiers) :
-        GPURasterEffectCaller(false, margin), mProgram(program),
+        RasterEffectCaller(false, margin), mProgram(program),
         mUniformSpecifiers(uniformSpecifiers) {}
 
-    void render(QGL33 * const gl,
-                GpuRenderTools& renderTools,
-                GpuRenderData& data) {
+    void processGpu(QGL33 * const gl,
+                    GpuRenderTools& renderTools,
+                    GpuRenderData& data) {
         renderTools.switchToOpenGL();
 
         renderTools.requestTargetFbo().bind(gl);
@@ -26,6 +27,16 @@ public:
 
         gl->glBindVertexArray(renderTools.getSquareVAO());
         gl->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+
+    HardwareSupport hardwareSupport() const {
+        return HardwareSupport::GPU_ONLY;
+    }
+
+    void processCpu(CpuRenderTools& renderTools,
+                    CpuRenderData& data) {
+        Q_UNUSED(renderTools);
+        Q_UNUSED(data);
     }
 private:
     void setupProgram(QGL33 * const gl,
@@ -56,7 +67,7 @@ public:
 
     bool isVisible() const { return true; }
 
-    stdsptr<GPURasterEffectCaller> getEffectCaller(const qreal relFrame) const {
+    stdsptr<RasterEffectCaller> getEffectCaller(const qreal relFrame) const {
         UniformSpecifiers uniformSpecifiers;
         const int argsCount = mProgram->fArgumentLocs.count();
         for(int i = 0; i < argsCount; i++) {

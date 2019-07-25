@@ -50,7 +50,7 @@ public:
         }
         cleanUp();
     }
-    void processTask();
+    void process();
 private:
     void cleanUp() {
         if(mFrameToConvert) {

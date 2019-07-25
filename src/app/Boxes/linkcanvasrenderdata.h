@@ -14,6 +14,6 @@ protected:
     LinkCanvasRenderData(BoundingBox * const parentBoxT) :
         CanvasRenderData(parentBoxT) {}
 
-    void processTask();
+    void process();
 };
 #endif // LINKCANVASRENDERDATA_H

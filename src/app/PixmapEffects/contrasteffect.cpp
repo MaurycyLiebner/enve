@@ -14,7 +14,7 @@ ContrastEffect::ContrastEffect(const qreal contrast) :
 }
 
 stdsptr<PixmapEffectRenderData> ContrastEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoxRenderData*) {
     auto renderData = SPtrCreate(ContrastEffectRenderData)();
     renderData->contrast =
             mContrastAnimator->getEffectiveValue(relFrame);

@@ -58,14 +58,14 @@ qsptr<BoundingBox> InternalLinkBox::createLinkForLinkGroup() {
     return SPtrCreate(InternalLinkBox)(this);
 }
 
-stdsptr<BoundingBoxRenderData> InternalLinkBox::createRenderData() {
+stdsptr<BoxRenderData> InternalLinkBox::createRenderData() {
     const auto renderData = getLinkTarget()->createRenderData();
     renderData->fParentBox = this;
     return renderData;
 }
 
 void InternalLinkBox::setupRenderData(
-        const qreal relFrame, BoundingBoxRenderData * const data) {
+        const qreal relFrame, BoxRenderData * const data) {
     const auto linkTarget = getLinkTarget();
     if(linkTarget) linkTarget->setupRenderData(relFrame, data);
 

@@ -2,7 +2,7 @@
 
 void TaskExecutor::processTask(Task* task) {
     try {
-        task->processTask();
+        task->process();
     } catch(...) {
         task->setException(std::current_exception());
     }

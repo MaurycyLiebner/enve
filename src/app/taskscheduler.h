@@ -26,8 +26,8 @@ protected:
                                    mGpuOnly.count(); }
     bool allDone() const { return countQued() == 0; }
     void addTask(const stdsptr<Task>& task) {
-        if(task->gpuProcessingOnly()) mGpuOnly << task;
-        else if(task->gpuProcessingPreferred()) mGpuPreffered << task;
+        if(task->gpuOnly()) mGpuOnly << task;
+        else if(task->gpuPreferred()) mGpuPreffered << task;
         else mQued << task;
     }
 
@@ -55,7 +55,7 @@ protected:
         for(int i = 0; i < mQued.count(); i++) {
             const auto& task = mQued.at(i);
             if(task->readyToBeProcessed() &&
-               task->gpuProcessingSupported()) return mQued.takeAt(i);
+               task->gpuSupported()) return mQued.takeAt(i);
         }
         return nullptr;
     }
@@ -177,7 +177,7 @@ public:
 
     void scheduleCPUTask(const stdsptr<Task> &task);
     void scheduleHDDTask(const stdsptr<Task> &task);
-    void scheduleGPUTask(const stdsptr<ScheduledPostProcess>& task);
+    void scheduleGPUTask(const stdsptr<Task>& task);
 
     void clearTasks() {
         for(const auto& cpuTask : mScheduledCPUTasks)

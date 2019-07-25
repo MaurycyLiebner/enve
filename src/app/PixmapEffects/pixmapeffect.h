@@ -6,7 +6,7 @@
 #include <QPointF>
 class EffectAnimators;
 class QIODevice;
-class BoundingBoxRenderData;
+struct BoxRenderData;
 
 struct PixmapEffectRenderData : public StdSelfRef {
     virtual void applyEffectsSk(const SkBitmap &bitmap,
@@ -41,7 +41,7 @@ protected:
     PixmapEffect(const QString& name, const PixmapEffectType type);
 public:
     virtual stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal relFrame, BoundingBoxRenderData * const data) = 0;
+            const qreal relFrame, BoxRenderData * const data) = 0;
     virtual QMarginsF getMarginAtRelFrame(const qreal relFrame);
 
     bool SWT_isPixmapEffect() const;

@@ -1,6 +1,6 @@
 #include "videoencoder.h"
 #include <QByteArray>
-#include "Boxes/boundingboxrendercontainer.h"
+#include "Boxes/boxrendercontainer.h"
 #include "canvas.h"
 
 #define AV_RuntimeThrow(errId, message) \
@@ -632,7 +632,7 @@ void VideoEncoder::clearContainers() {
     mSoundIterator.clear();
 }
 
-void VideoEncoder::processTask() {
+void VideoEncoder::process() {
     bool encodeVideoT = !_mContainers.isEmpty(); // local encode
     bool encodeAudioT = mSoundIterator.hasValue(); // local encode
     while((mEncodeVideo && encodeVideoT) || (mEncodeAudio && encodeAudioT)) {

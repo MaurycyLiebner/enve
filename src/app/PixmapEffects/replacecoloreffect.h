@@ -29,7 +29,7 @@ protected:
     ReplaceColorEffect();
 public:
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal relFrame, BoundingBoxRenderData*);
+            const qreal relFrame, BoxRenderData*);
 private:
     qsptr<ColorAnimator> mFromColor;
     qsptr<ColorAnimator> mToColor;

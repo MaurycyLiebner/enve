@@ -45,7 +45,7 @@ ExampleGpuEffect000::ExampleGpuEffect000() :
     ca_addChildAnimator(mRadius);
 }
 
-stdsptr<GPURasterEffectCaller>
+stdsptr<RasterEffectCaller>
         ExampleGpuEffect000::getEffectCaller(const qreal relFrame) const {
     const qreal radius = mRadius->getEffectiveValue(relFrame);
     return SPtrCreate(ExampleGpuEffectCaller000)(radius);
@@ -60,7 +60,7 @@ CustomIdentifier ExampleGpuEffect000::getIdentifier() const {
     return { effectId(), effectName(), { 0, 0, 0 } };
 }
 
-void ExampleGpuEffectCaller000::render(QGL33 * const gl,
+void ExampleGpuEffectCaller000::processGpu(QGL33 * const gl,
                                        GpuRenderTools &renderTools,
                                        GpuRenderData &data) {
     Q_UNUSED(gl);

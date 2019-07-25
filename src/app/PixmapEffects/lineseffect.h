@@ -19,7 +19,7 @@ class LinesEffect : public PixmapEffect {
     friend class SelfRef;
 public:
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal relFrame, BoundingBoxRenderData*);
+            const qreal relFrame, BoxRenderData*);
 protected:
     LinesEffect(qreal linesWidth = 5,
                 qreal linesDistance = 5);

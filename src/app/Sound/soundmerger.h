@@ -31,7 +31,7 @@ protected:
             mComposition->secondFinished(mSecondId, mSamples);
     }
 public:
-    void processTask();
+    void process();
 
     void addSoundToMerge(const SingleSoundData& data) {
         mSounds << data;

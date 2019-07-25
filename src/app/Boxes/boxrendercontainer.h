@@ -1,5 +1,5 @@
-#ifndef BOUNDINGBOXRENDERCONTAINER_H
-#define BOUNDINGBOXRENDERCONTAINER_H
+#ifndef RENDERCONTAINER_H
+#define RENDERCONTAINER_H
 class BoundingBox;
 #include "smartPointers/sharedpointerdefs.h"
 #include "skia/skqtconversions.h"
@@ -12,7 +12,7 @@ class BoundingBox;
 class Canvas;
 
 class HDDCachableCacheHandler;
-struct BoundingBoxRenderData;
+struct BoxRenderData;
 
 class RenderContainer {
 public:
@@ -25,12 +25,12 @@ public:
     void updatePaintTransformGivenNewTotalTransform(
             const QMatrix &totalTransform);
 
-    void setSrcRenderData(BoundingBoxRenderData * const data);
+    void setSrcRenderData(BoxRenderData * const data);
     int getRelFrame() const {
         return mRelFrame;
     }
 
-    BoundingBoxRenderData *getSrcRenderData() const {
+    BoxRenderData *getSrcRenderData() const {
         return mSrcRenderData.get();
     }
 
@@ -49,8 +49,8 @@ protected:
     QMatrix mTransform;
     QMatrix mPaintTransform;
     QMatrix mRenderTransform;
-    stdsptr<BoundingBoxRenderData> mSrcRenderData;
+    stdsptr<BoxRenderData> mSrcRenderData;
     sk_sp<SkImage> mImageSk;
 };
 
-#endif // BOUNDINGBOXRENDERCONTAINER_H
+#endif // RENDERCONTAINER_H

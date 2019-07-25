@@ -128,7 +128,7 @@ void PathBox::setParentGroup(ContainerBox * const parent) {
 }
 
 void PathBox::setupRenderData(const qreal relFrame,
-                              BoundingBoxRenderData * const data) {
+                              BoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
 
     bool currentEditPathCompatible = false;
@@ -547,7 +547,7 @@ QRectF PathBox::getRelBoundingRect(const qreal relFrame) {
 }
 
 void PathBox::updateCurrentPreviewDataFromRenderData(
-        BoundingBoxRenderData* renderData) {
+        BoxRenderData* renderData) {
     auto pathRenderData = GetAsPtr(renderData, PathBoxRenderData);
     mCurrentPathsFrame = renderData->fRelFrame;
     mEditPathSk = pathRenderData->fEditPath;

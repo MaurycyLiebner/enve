@@ -12,7 +12,7 @@ protected:
 
     virtual void writeToFile(QIODevice * const file) = 0;
 public:
-    void processTask() {
+    void process() {
         mTmpFile = qsptr<QTemporaryFile>(new QTemporaryFile());
         if(mTmpFile->open()) {
             writeToFile(mTmpFile.get());
@@ -33,7 +33,7 @@ protected:
 
     virtual void readFromFile(QIODevice * const file) = 0;
 public:
-    void processTask() {
+    void process() {
         if(mTmpFile->open()) {
             readFromFile(mTmpFile.get());
             mTmpFile->close();
@@ -51,7 +51,7 @@ protected:
     TmpFileDataDeleter(const qsptr<QTemporaryFile> &file) :
         mTmpFile(file) {}
 public:
-    void processTask() {
+    void process() {
         mTmpFile.reset();
     }
 private:

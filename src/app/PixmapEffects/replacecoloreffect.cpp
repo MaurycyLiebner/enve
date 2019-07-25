@@ -19,7 +19,7 @@ ReplaceColorEffect::ReplaceColorEffect() :
 }
 
 stdsptr<PixmapEffectRenderData> ReplaceColorEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoxRenderData*) {
     auto renderData = SPtrCreate(ReplaceColorEffectRenderData)();
     QColor fromColor = mFromColor->getColor(relFrame);
     QColor toColor = mToColor->getColor(relFrame);

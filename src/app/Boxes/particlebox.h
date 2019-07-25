@@ -67,7 +67,7 @@ struct ParticleState {
         }
     }
 
-    stdsptr<BoundingBoxRenderData> fTargetRenderData;
+    stdsptr<BoxRenderData> fTargetRenderData;
     SkPath fLinePath;
     SkPoint fPos;
     float fSize;
@@ -93,14 +93,14 @@ struct EmitterData {
     QList<ParticleState> particleStates;
 };
 
-struct ParticleBoxRenderData : public BoundingBoxRenderData {
+struct ParticleBoxRenderData : public BoxRenderData {
     ParticleBoxRenderData(BoundingBox *parentBoxT) :
-        BoundingBoxRenderData(parentBoxT) {
+        BoxRenderData(parentBoxT) {
 
     }
 
     void updateRelBoundingRect() {
-        BoundingBoxRenderData::updateRelBoundingRect();
+        BoxRenderData::updateRelBoundingRect();
         fClipRect = toSkRect(fRelBoundingRect);
     }
 
@@ -268,12 +268,12 @@ public:
 
     bool SWT_isParticleBox() const;
 
-    stdsptr<BoundingBoxRenderData> createRenderData() {
+    stdsptr<BoxRenderData> createRenderData() {
         return SPtrCreate(ParticleBoxRenderData)(this);
     }
 
     void setupRenderData(const qreal relFrame,
-                         BoundingBoxRenderData * const data) {
+                         BoxRenderData * const data) {
         BoundingBox::setupRenderData(relFrame, data);
         auto particleData = GetAsSPtr(data, ParticleBoxRenderData);
         particleData->fEmittersData.clear();

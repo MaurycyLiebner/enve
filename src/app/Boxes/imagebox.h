@@ -5,9 +5,9 @@
 #include "FileCacheHandlers/imagecachehandler.h"
 class FileDataCacheHandler;
 
-struct ImageRenderData : public BoundingBoxRenderData {
+struct ImageRenderData : public BoxRenderData {
     ImageRenderData(BoundingBox * const parentBoxT) :
-        BoundingBoxRenderData(parentBoxT) {
+        BoxRenderData(parentBoxT) {
         mDelayDataSet = true;
     }
 
@@ -21,10 +21,7 @@ struct ImageRenderData : public BoundingBoxRenderData {
 
     void setupRenderData() final {
         if(!fImage) loadImageFromHandler();
-        if(fRasterEffects.isEmpty() &&
-           fGPUEffects.isEmpty()) {
-            setupDirectDraw();
-        }
+        if(!hasEffects()) setupDirectDraw();
     }
 
     sk_sp<SkImage> fImage;
@@ -54,7 +51,6 @@ struct ImageBoxRenderData : public ImageRenderData {
     ImageBoxRenderData(ImageFileHandler * const cacheHandler,
                        BoundingBox * const parentBoxT) :
         ImageRenderData(parentBoxT) {
-        mDelayDataSet = true;
         fSrcCacheHandler = cacheHandler;
     }
 
@@ -73,8 +69,8 @@ public:
     void addActionsToMenu(BoxTypeMenu * const menu);
 
     void setupRenderData(const qreal relFrame,
-                         BoundingBoxRenderData * const data);
-    stdsptr<BoundingBoxRenderData> createRenderData();
+                         BoxRenderData * const data);
+    stdsptr<BoxRenderData> createRenderData();
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
 

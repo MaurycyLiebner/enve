@@ -2,7 +2,7 @@
 #include "skia/skqtconversions.h"
 
 ContainerBoxRenderData::ContainerBoxRenderData(BoundingBox * const parentBoxT) :
-    BoundingBoxRenderData(parentBoxT) {
+    BoxRenderData(parentBoxT) {
     mDelayDataSet = true;
 }
 
@@ -13,7 +13,7 @@ void ContainerBoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {
 }
 
 void ContainerBoxRenderData::updateRelBoundingRect() {
-    BoundingBoxRenderData::updateRelBoundingRect();
+    BoxRenderData::updateRelBoundingRect();
     for(const auto &child : fChildrenRenderData) {
         fOtherGlobalRects << child->fGlobalRect;
     }

@@ -49,7 +49,10 @@ TEMPLATE = app
 SOURCES += main.cpp\
     Animators/outlinesettingsanimator.cpp \
     Animators/paintsettingsanimator.cpp \
+    Boxes/boxrendercontainer.cpp \
+    Boxes/boxrenderdata.cpp \
     Boxes/containerbox.cpp \
+    Boxes/effectsrenderer.cpp \
     Boxes/layerboxrenderdata.cpp \
     Boxes/patheffectsmenu.cpp \
     CacheHandlers/hddcachablerangecont.cpp \
@@ -139,7 +142,6 @@ SOURCES += main.cpp\
     Boxes/videobox.cpp \
     Sound/singlesound.cpp \
     Sound/soundcomposition.cpp \
-    Boxes/boundingboxrendercontainer.cpp \
     GUI/BoxesList/boolpropertywidget.cpp \
     Boxes/imagesequencebox.cpp \
     memorychecker.cpp \
@@ -171,7 +173,6 @@ SOURCES += main.cpp\
     GUI/RenderWidgets/outputsettingsprofilesdialog.cpp \
     GUI/RenderWidgets/outputsettingsdisplaywidget.cpp \
     Boxes/renderdatahandler.cpp \
-    Boxes/boundingboxrenderdata.cpp \
     PathEffects/displacepatheffect.cpp \
     PathEffects/duplicatepatheffect.cpp \
     PathEffects/solidifypatheffect.cpp \
@@ -279,7 +280,10 @@ SOURCES += main.cpp\
 HEADERS  += \
     Animators/outlinesettingsanimator.h \
     Animators/paintsettingsanimator.h \
+    Boxes/boxrendercontainer.h \
+    Boxes/boxrenderdata.h \
     Boxes/containerbox.h \
+    Boxes/effectsrenderer.h \
     Boxes/layerboxrenderdata.h \
     Boxes/patheffectsmenu.h \
     CacheHandlers/hddcachablecont.h \
@@ -366,7 +370,6 @@ HEADERS  += \
     Boxes/videobox.h \
     Sound/singlesound.h \
     Sound/soundcomposition.h \
-    Boxes/boundingboxrendercontainer.h \
     GUI/BoxesList/boolpropertywidget.h \
     Boxes/imagesequencebox.h \
     memorychecker.h \
@@ -399,7 +402,6 @@ HEADERS  += \
     GUI/RenderWidgets/outputsettingsprofilesdialog.h \
     GUI/RenderWidgets/outputsettingsdisplaywidget.h \
     Boxes/renderdatahandler.h \
-    Boxes/boundingboxrenderdata.h \
     PathEffects/displacepatheffect.h \
     PathEffects/duplicatepatheffect.h \
     PathEffects/solidifypatheffect.h \

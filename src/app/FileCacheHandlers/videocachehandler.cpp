@@ -1,5 +1,5 @@
 #include "videocachehandler.h"
-#include "Boxes/boundingboxrendercontainer.h"
+#include "Boxes/boxrendercontainer.h"
 #include "Boxes/videobox.h"
 
 #include <QFileDialog>

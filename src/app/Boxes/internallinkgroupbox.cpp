@@ -58,7 +58,7 @@ QMatrix InternalLinkGroupBox::getRelativeTransformAtRelFrameF(
 }
 
 void InternalLinkGroupBox::setupEffectsF(const qreal relFrame,
-                                         BoundingBoxRenderData * const data) {
+                                         BoxRenderData * const data) {
     if(isParentLink() && getLinkTarget()) {
         getLinkTarget()->setupEffectsF(relFrame, data);
     } else {
@@ -81,7 +81,7 @@ const SkBlendMode &InternalLinkGroupBox::getBlendMode() {
 }
 
 void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
-                                           BoundingBoxRenderData * const data) {
+                                           BoxRenderData * const data) {
     const auto linkTarget = getLinkTarget();
     if(linkTarget) linkTarget->BoundingBox::setupRenderData(relFrame, data);
 
@@ -172,7 +172,7 @@ bool InternalLinkGroupBox::isFrameInDurationRect(const int relFrame) const {
             getLinkTarget()->isFrameInDurationRect(relFrame);
 }
 
-stdsptr<BoundingBoxRenderData> InternalLinkGroupBox::createRenderData() {
+stdsptr<BoxRenderData> InternalLinkGroupBox::createRenderData() {
     if(!getLinkTarget()) return nullptr;
     auto renderData = getLinkTarget()->createRenderData();
     renderData->fParentBox = this;

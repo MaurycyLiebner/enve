@@ -14,7 +14,7 @@ BrightnessEffect::BrightnessEffect(const qreal brightness) :
 }
 
 stdsptr<PixmapEffectRenderData> BrightnessEffect::getPixmapEffectRenderDataForRelFrameF(
-        const qreal relFrame, BoundingBoxRenderData*) {
+        const qreal relFrame, BoxRenderData*) {
     auto renderData =
             SPtrCreate(BrightnessEffectRenderData)();
     renderData->brightness =

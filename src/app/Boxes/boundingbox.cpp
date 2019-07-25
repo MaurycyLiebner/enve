@@ -442,7 +442,7 @@ void BoundingBox::deselect() {
 }
 
 void BoundingBox::updateRelBoundingRectFromRenderData(
-        BoundingBoxRenderData * const renderData) {
+        BoxRenderData * const renderData) {
     mRelBoundingRect = renderData->fRelBoundingRect;
     mRelBoundingRectSk = toSkRect(mRelBoundingRect);
     mSkRelBoundingRectPath.reset();
@@ -455,7 +455,7 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
 }
 
 void BoundingBox::updateCurrentPreviewDataFromRenderData(
-        BoundingBoxRenderData* renderData) {
+        BoxRenderData* renderData) {
     updateRelBoundingRectFromRenderData(renderData);
 }
 
@@ -489,10 +489,10 @@ void BoundingBox::scheduleUpdate() {
     currentRenderData->scheduleTask();
 }
 
-BoundingBoxRenderData *BoundingBox::updateCurrentRenderData(
+BoxRenderData *BoundingBox::updateCurrentRenderData(
         const int relFrame, const UpdateReason& reason) {
     const auto renderData = createRenderData();
-    if(!renderData) RuntimeThrow("Failed to create BoundingBoxRenderData instance");
+    if(!renderData) RuntimeThrow("Failed to create BoxRenderData instance");
     renderData->fRelFrame = relFrame;
     renderData->fReason = reason;
     mCurrentRenderDataHandler.addItemAtRelFrame(renderData);
@@ -509,11 +509,11 @@ bool BoundingBox::hasCurrentRenderData(const int relFrame) const {
     return !diffsIncludingInherited(drawData->fRelFrame, relFrame);
 }
 
-stdsptr<BoundingBoxRenderData> BoundingBox::getCurrentRenderData(const int relFrame) const {
+stdsptr<BoxRenderData> BoundingBox::getCurrentRenderData(const int relFrame) const {
     const auto currentRenderData =
             mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
     if(currentRenderData)
-        return GetAsSPtr(currentRenderData, BoundingBoxRenderData);
+        return GetAsSPtr(currentRenderData, BoxRenderData);
     if(mDrawRenderContainer.isExpired()) return nullptr;
     const auto drawData = mDrawRenderContainer.getSrcRenderData();
     if(!drawData) return nullptr;
@@ -713,7 +713,7 @@ QMarginsF BoundingBox::getEffectsMargin(const qreal relFrame) {
 }
 
 void BoundingBox::setupRenderData(const qreal relFrame,
-                                  BoundingBoxRenderData * const data) {
+                                  BoxRenderData * const data) {
     const auto parentCanvas = getParentCanvas();
     if(!parentCanvas) return;
     data->fBoxStateId = mStateId;
@@ -736,15 +736,15 @@ void BoundingBox::setupRenderData(const qreal relFrame,
     }
 }
 
-stdsptr<BoundingBoxRenderData> BoundingBox::createRenderData() { return nullptr; }
+stdsptr<BoxRenderData> BoundingBox::createRenderData() { return nullptr; }
 
 void BoundingBox::setupEffectsF(const qreal relFrame,
-                                BoundingBoxRenderData * const data) {
+                                BoxRenderData * const data) {
     mEffectsAnimators->addEffects(relFrame, data);
 }
 
 void BoundingBox::setupGPUEffectsF(const qreal relFrame,
-                                   BoundingBoxRenderData * const data) {
+                                   BoxRenderData * const data) {
     mGPUEffectsAnimators->addEffects(relFrame, data);
 }
 
@@ -1274,7 +1274,7 @@ void BoundingBox::selectAllCanvasPts(QList<MovablePoint*> &selection,
     }
 }
 
-void BoundingBox::scheduleTask(const stdsptr<BoundingBoxRenderData>& task) {
+void BoundingBox::scheduleTask(const stdsptr<BoxRenderData>& task) {
     mScheduledTasks << task;
 }
 
@@ -1416,7 +1416,7 @@ QMimeData *BoundingBox::SWT_createMimeData() {
     return new BoundingBoxMimeData(this);
 }
 
-void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
+void BoundingBox::renderDataFinished(BoxRenderData *renderData) {
     auto currentRenderData = mDrawRenderContainer.getSrcRenderData();
     bool newerSate = true;
     bool closerFrame = true;

@@ -20,7 +20,7 @@ class ColorizeEffect : public PixmapEffect {
     friend class SelfRef;
 public:
     stdsptr<PixmapEffectRenderData> getPixmapEffectRenderDataForRelFrameF(
-            const qreal relFrame, BoundingBoxRenderData*);
+            const qreal relFrame, BoxRenderData*);
 protected:
     ColorizeEffect();
 private:

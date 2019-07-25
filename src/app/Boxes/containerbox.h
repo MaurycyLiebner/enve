@@ -18,9 +18,9 @@ public:
                       GrContext * const grContext);
 
     qsptr<BoundingBox> createLink();
-    stdsptr<BoundingBoxRenderData> createRenderData();
+    stdsptr<BoxRenderData> createRenderData();
     void setupRenderData(const qreal relFrame,
-                         BoundingBoxRenderData * const data);
+                         BoxRenderData * const data);
 
     virtual BoundingBox *getBoxAt(const QPointF &absPos);
 
@@ -177,7 +177,7 @@ protected:
     qsptr<PathEffectAnimators> mOutlinePathEffectsAnimators;
 private:
     void setupLayerRenderData(const qreal relFrame,
-                              BoundingBoxRenderData * const data);
+                              BoxRenderData * const data);
     void iniPathEffects();
 };
 

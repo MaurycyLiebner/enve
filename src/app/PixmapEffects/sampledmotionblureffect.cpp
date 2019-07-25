@@ -24,7 +24,7 @@ SampledMotionBlurEffect::SampledMotionBlurEffect(BoundingBox * const box) :
 
 stdsptr<PixmapEffectRenderData> SampledMotionBlurEffect::
 getPixmapEffectRenderDataForRelFrameF(const qreal relFrame,
-                                     BoundingBoxRenderData * const data) {
+                                     BoxRenderData * const data) {
     if(!data->fParentIsTarget) return nullptr;
     auto renderData = SPtrCreate(SampledMotionBlurEffectRenderData)();
     renderData->opacity =

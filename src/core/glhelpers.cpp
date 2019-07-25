@@ -185,14 +185,26 @@ void Texture::gen(QGL33 * const gl,
                   const int width, const int height,
                   const void * const data) {
     gen(gl);
-    gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
-                     0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    fWidth = width;
-    fHeight = height;
+    set(gl, width, height, data);
+}
+
+void Texture::set(QGL33 * const gl,
+                  const int width, const int height,
+                  const void * const data) {
+    if(width <= 0 || height <= 0) RuntimeThrow("Invalid texture size");
+    if(fWidth == width && fHeight == height && data) {
+        gl->glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
+                            GL_RGBA, GL_UNSIGNED_BYTE, data);
+    } else {
+        gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+                         0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        fWidth = width;
+        fHeight = height;
+    }
 }
 
 #include "skia/skiahelpers.h"
-SkBitmap Texture::toBitmap(QGL33 * const gl) const {
+SkBitmap Texture::bitmapSnapshot(QGL33 * const gl) const {
     bind(gl);
     SkBitmap bitmap;
     const auto info = SkiaHelpers::getPremulRGBAInfo(fWidth, fHeight);
@@ -204,8 +216,8 @@ SkBitmap Texture::toBitmap(QGL33 * const gl) const {
     return bitmap;
 }
 
-sk_sp<SkImage> Texture::toImage(QGL33 * const gl) const {
-    auto bitmap = toBitmap(gl);
+sk_sp<SkImage> Texture::imageSnapshot(QGL33 * const gl) const {
+    auto bitmap = bitmapSnapshot(gl);
     return SkiaHelpers::transferDataToSkImage(bitmap);
 }
 

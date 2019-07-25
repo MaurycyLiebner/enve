@@ -15,9 +15,9 @@ class SkStroke;
 class PathEffectAnimators;
 class PathEffect;
 
-struct PathBoxRenderData : public BoundingBoxRenderData {
+struct PathBoxRenderData : public BoxRenderData {
     PathBoxRenderData(BoundingBox * const parentBoxT) :
-        BoundingBoxRenderData(parentBoxT) {}
+        BoxRenderData(parentBoxT) {}
 
     SkPath fEditPath;
     SkPath fPath;
@@ -104,12 +104,12 @@ public:
     bool SWT_isPathBox() const { return true; }
 
     void setupRenderData(const qreal relFrame,
-                         BoundingBoxRenderData * const data);
-    stdsptr<BoundingBoxRenderData> createRenderData() {
+                         BoxRenderData * const data);
+    stdsptr<BoxRenderData> createRenderData() {
         return SPtrCreate(PathBoxRenderData)(this);
     }
     void updateCurrentPreviewDataFromRenderData(
-            BoundingBoxRenderData *renderData);
+            BoxRenderData *renderData);
 
     void duplicateStrokeSettingsFrom(
             OutlineSettingsAnimator * const strokeSettings);
