@@ -685,7 +685,7 @@ void VideoEncoder::process() {
 }
 
 
-void VideoEncoder::beforeProcessing() {
+void VideoEncoder::beforeProcessing(const Hardware) {
     _mCurrentContainerId = 0;
     _mContainers.swap(mNextContainers);
     for(const auto& sound : mNextSoundConts)

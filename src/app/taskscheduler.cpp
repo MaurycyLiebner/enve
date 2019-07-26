@@ -170,7 +170,7 @@ void TaskScheduler::processNextQuedHDDTask() {
         for(int i = 0; i < mQuedHDDTasks.count(); i++) {
             const auto task = mQuedHDDTasks.at(i);
             if(task->readyToBeProcessed()) {
-                task->aboutToProcess();
+                task->aboutToProcess(Hardware::HDD);
                 const auto hddTask = dynamic_cast<HDDTask*>(task.get());
                 if(hddTask) hddTask->setController(mHDDExecutor);
                 mQuedHDDTasks.removeAt(i--);
@@ -197,7 +197,7 @@ bool TaskScheduler::processNextQuedGPUTask() {
     if(!mGpuPostProcessor.hasFinished()) return false;
     const auto task = mQuedCPUTasks.takeQuedForGpuProcessing();
     if(task) {
-        task->aboutToProcess();
+        task->aboutToProcess(Hardware::GPU);
         if(task->getState() > Task::PROCESSING) {
             processNextTasks();
             return true;
@@ -225,7 +225,7 @@ void TaskScheduler::processNextQuedCPUTask() {
     while(!mFreeCPUExecs.isEmpty() && !mQuedCPUTasks.isEmpty()) {
         const auto task = mQuedCPUTasks.takeQuedForCpuProcessing();
         if(task) {
-            task->aboutToProcess();
+            task->aboutToProcess(Hardware::CPU);
             if(task->getState() > Task::PROCESSING) {
                 return processNextTasks();
             }

@@ -97,10 +97,18 @@ void ExampleGpuEffectCaller000::processCpu(CpuRenderTools &renderTools,
     renderTools.requestBackupBitmap().extractSubset(&tile, data.fTexTile);
     SkCanvas canvas(tile);
     canvas.clear(SK_ColorTRANSPARENT);
-    SkBitmap tileSrc;
+
     const int radCeil = static_cast<int>(ceil(mRadius));
-    const auto srcRect = data.fTexTile.makeOutset(radCeil, radCeil);
-    renderTools.fSrcDst.extractSubset(&tileSrc, srcRect);
-    canvas.drawBitmap(tileSrc, -radCeil, -radCeil, &paint);
+    const auto& srcBtmp = renderTools.fSrcDst;
+    const auto& texTile = data.fTexTile;
+    auto srcRect = texTile.makeOutset(radCeil, radCeil);
+    if(srcRect.intersect(srcRect, srcBtmp.bounds())) {
+        SkBitmap tileSrc;
+        srcBtmp.extractSubset(&tileSrc, srcRect);
+        canvas.drawBitmap(tileSrc,
+                          srcRect.left() - texTile.left(),
+                          srcRect.top() - texTile.top(), &paint);
+    }
+
     renderTools.swap();
 }

@@ -104,6 +104,10 @@ enum class HardwareSupport : short {
     GPU_ONLY
 };
 
+enum class Hardware : short {
+    CPU, GPU, HDD
+};
+
 struct CpuRenderData {
     //! @brief Tile rect in texture coordinates
     SkIRect fTexTile;

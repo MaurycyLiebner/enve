@@ -9,9 +9,9 @@ bool Task::scheduleTask() {
     return true;
 }
 
-void Task::aboutToProcess() {
+void Task::aboutToProcess(const Hardware hw) {
     mState = PROCESSING;
-    beforeProcessing();
+    beforeProcessing(hw);
 }
 
 void Task::finishedProcessing() {

@@ -18,7 +18,7 @@ protected:
 
     virtual void scheduleTaskNow() = 0;
     virtual void afterQued() {}
-    virtual void beforeProcessing() {}
+    virtual void beforeProcessing(const Hardware) {}
     virtual void afterProcessing() {}
     virtual void afterCanceled() {}
 public:
@@ -36,7 +36,8 @@ public:
         PROCESSING,
         FINISHED,
         CANCELED,
-        FAILED
+        FAILED,
+        WAITING
     };
 
     virtual HardwareSupport hardwareSupport() const = 0;
@@ -65,7 +66,7 @@ public:
 
     bool isActive() { return mState != CREATED && mState != FINISHED; }
 
-    void aboutToProcess();
+    void aboutToProcess(const Hardware hw);
     void finishedProcessing();
     bool readyToBeProcessed();
 
@@ -159,7 +160,7 @@ protected:
                   const std::function<void(void)>& after) :
         mBefore(before), mRun(run), mAfter(after) {}
 
-    void beforeProcessing() final {
+    void beforeProcessing(const Hardware) final {
         if(mBefore) mBefore();
     }
 
@@ -180,7 +181,7 @@ class SPtrDisposer : public CPUTask {
 protected:
     SPtrDisposer(const T& ptr) : mPtr(ptr) {}
 public:
-    void beforeProcessing() final {}
+    void beforeProcessing(const Hardware) final {}
     void process() final { mPtr.reset(); }
     static Task* sDispose(const T& ptr) {
         const auto disposer = SPtrCreateTemplated(SPtrDisposer<T>)(ptr);

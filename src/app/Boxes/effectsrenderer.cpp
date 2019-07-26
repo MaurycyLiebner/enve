@@ -38,15 +38,21 @@ void EffectsRenderer::processGpu(QGL33 * const gl,
     boxData->fRenderedImage = renderTools.getSrcTexture().imageSnapshot(gl);
 }
 
+#include "effectsubtaskspawner.h"
 void EffectsRenderer::processCpu(BoxRenderData * const boxData) {
+    Q_ASSERT(!mEffects.isEmpty());
+    const auto& effect = mEffects.first();
+
+    Q_ASSERT(!effect->gpuOnly());
+    EffectSubTaskSpawner::sSpawn(effect,
+                                 GetAsSPtr(boxData, BoxRenderData));
+    mEffects.removeFirst();
+    return;
     auto& srcImage = boxData->fRenderedImage;
     const int srcWidth = srcImage->width();
     const int srcHeight = srcImage->height();
     const QPoint gPos = boxData->fGlobalRect.topLeft();
     srcImage = srcImage->makeRasterImage();
-    Q_ASSERT(!mEffects.isEmpty());
-    const auto& effect = mEffects.first();
-    Q_ASSERT(!effect->gpuOnly());
     CpuRenderData renderData;
     renderData.fPosX = static_cast<int>(gPos.x());
     renderData.fPosY = static_cast<int>(gPos.y());

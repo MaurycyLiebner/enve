@@ -137,7 +137,14 @@ void BoxRenderData::process() {
     fRenderedImage = SkiaHelpers::transferDataToSkImage(bitmap);
 }
 
-void BoxRenderData::beforeProcessing() {
+void BoxRenderData::beforeProcessing(const Hardware hw) {
+    if(mStep == Step::EFFECTS) {
+        if(hw == Hardware::CPU) {
+            mState = WAITING;
+            mEffectsRenderer.processCpu(this);
+        }
+        return;
+    }
     setupRenderData();
     if(!mDataSet) dataSet();
 

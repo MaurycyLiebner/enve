@@ -30,7 +30,7 @@ protected:
 
     void scheduleTaskNow() final;
     void afterCanceled();
-    void beforeProcessing() final;
+    void beforeProcessing(const Hardware hw) final;
     void afterProcessing() final;
     void afterQued() final;
 
@@ -41,6 +41,7 @@ public:
     }
 
     bool nextStep() {
+        if(mState == WAITING) mState = PROCESSING;
         const bool result = !mEffectsRenderer.isEmpty();
         if(result) mStep = Step::EFFECTS;
         return result;

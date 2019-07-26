@@ -136,7 +136,7 @@ protected:
     VideoEncoder();
 public:
     void process();
-    void beforeProcessing();
+    void beforeProcessing(const Hardware);
     void afterProcessing();
 
     void startNewEncoding(RenderInstanceSettings * const settings) {

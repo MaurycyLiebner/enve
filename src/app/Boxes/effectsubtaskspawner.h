@@ -8,12 +8,14 @@ class RasterEffectCaller;
 
 class EffectSubTaskSpawner {
 public:
+    static void sSpawn(const stdsptr<RasterEffectCaller>& effect,
+                       const stdsptr<BoxRenderData>& data);
+private:
     EffectSubTaskSpawner(const stdsptr<RasterEffectCaller>& effect,
                          const stdsptr<BoxRenderData>& data);
 
+    void decRemaining_k();
     void spawn();
-private:
-    void decRemaining();
 
     const stdsptr<RasterEffectCaller> mEffectCaller;
     const stdsptr<BoxRenderData> mData;
