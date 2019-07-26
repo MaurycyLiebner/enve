@@ -161,19 +161,24 @@ private:
 #include "skia/skiahelpers.h"
 class CpuRenderTools {
 public:
-    CpuRenderTools(const sk_sp<SkImage>& srcImg) : fSrcDstImg(srcImg) {}
+    CpuRenderTools(const SkBitmap& srcBtmp) : fSrcDst(srcBtmp) {}
 
-    const sk_sp<SkImage> fSrcDstImg;
+    const SkBitmap fSrcDst;
 
-    sk_sp<SkImage> requestBackupImg() {
-        if(fBackupImg) return fBackupImg;
-        SkBitmap bitmap;
-        bitmap.allocPixels(fBackupImg->imageInfo());
-        fBackupImg = SkiaHelpers::transferDataToSkImage(bitmap);
-        return fBackupImg;
+    bool hasBackupBitmap() const { return !fBackupBtmp.isNull(); }
+
+    SkBitmap requestBackupBitmap() {
+        if(fBackupBtmp.isNull())
+            fBackupBtmp.allocPixels(fSrcDst.info());
+        return fBackupBtmp;
+    }
+
+    void swap() {
+        if(fBackupBtmp.isNull()) return;
+        fBackupBtmp.swap(*const_cast<SkBitmap*>(&fSrcDst));
     }
 private:
-    sk_sp<SkImage> fBackupImg;
+    SkBitmap fBackupBtmp;
 };
 
 class GpuRenderTools {

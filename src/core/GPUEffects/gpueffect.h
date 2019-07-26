@@ -21,17 +21,26 @@ protected:
 public:
     virtual void processGpu(QGL33 * const gl,
                             GpuRenderTools& renderTools,
-                            GpuRenderData& data) = 0;
+                            GpuRenderData& data) {
+        Q_UNUSED(gl);
+        Q_UNUSED(renderTools);
+        Q_UNUSED(data);
+    }
+
     virtual void processCpu(CpuRenderTools& renderTools,
-                            CpuRenderData& data) = 0;
+                            CpuRenderData& data) {
+        Q_UNUSED(renderTools);
+        Q_UNUSED(data);
+    }
 
     virtual HardwareSupport hardwareSupport() const = 0;
     bool gpuOnly() const { return hardwareSupport() == HardwareSupport::GPU_ONLY; }
     bool cpuOnly() const { return hardwareSupport() == HardwareSupport::CPU_ONLY; }
 
     SkIRect setSrcRectUpdateDstRect(const SkIRect& srcRect,
-                                    const SkIRect& clampRect) {
-        if(fForceMargin) {
+                                    const SkIRect& clampRect,
+                                    const bool canIgnoreClamp) {
+        if(fForceMargin && canIgnoreClamp) {
             fDstRect = SkIRect::MakeLTRB(srcRect.left() - fMargin.left(),
                                          srcRect.top() - fMargin.top(),
                                          srcRect.right() + fMargin.right(),

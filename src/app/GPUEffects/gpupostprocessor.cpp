@@ -18,10 +18,10 @@ void GpuPostProcessor::afterProcessed() {
     if(unhandledException())
         gPrintExceptionCritical(handleException());
     mFinished = true;
-    for(const auto& process : _mHandledProcesses) {
-        if(process->nextStep()) {
-            TaskScheduler::sGetInstance()->queCPUTask(process);
-        } else process->finishedProcessing();
+    for(const auto& task : _mHandledProcesses) {
+        if(task->nextStep()) {
+            TaskScheduler::sGetInstance()->scheduleCPUTask(task);
+        } else task->finishedProcessing();
     }
     _mHandledProcesses.clear();
     handleScheduledProcesses();

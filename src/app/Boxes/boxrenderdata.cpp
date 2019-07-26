@@ -174,12 +174,9 @@ HardwareSupport BoxRenderData::hardwareSupport() const {
     if(mStep == Step::EFFECTS) {
         return mEffectsRenderer.nextHardwareSupport();
     } else {
-        if(mEffectsRenderer.isEmpty()) {
-            if(fParentBox && fParentBox->SWT_isLayerBox())
-                return HardwareSupport::GPU_PREFFERED;
-            return HardwareSupport::CPU_PREFFERED;
-        }
-        return HardwareSupport::GPU_ONLY;
+        if(fParentBox && fParentBox->SWT_isLayerBox())
+            return HardwareSupport::GPU_PREFFERED;
+        return HardwareSupport::CPU_PREFFERED;
     }
 }
 

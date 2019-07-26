@@ -37,8 +37,7 @@ CONFIG(debug, debug|release) {
 }
 
 QMAKE_CXXFLAGS += -fopenmp
-LIBS += -lskia -lpthread -lfreetype -lpng -ldl -lSDL2 -lSDL2_image \
-        -lSDL2_ttf -lfontconfig -fopenmp# -lX11
+LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp# -lX11
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

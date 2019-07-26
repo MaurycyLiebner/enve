@@ -46,8 +46,9 @@ ExampleGpuEffect000::ExampleGpuEffect000() :
 }
 
 stdsptr<RasterEffectCaller>
-        ExampleGpuEffect000::getEffectCaller(const qreal relFrame) const {
+ExampleGpuEffect000::getEffectCaller(const qreal relFrame) const {
     const qreal radius = mRadius->getEffectiveValue(relFrame);
+    if(isZero4Dec(radius)) return nullptr;
     return SPtrCreate(ExampleGpuEffectCaller000)(radius);
 }
 
@@ -61,8 +62,8 @@ CustomIdentifier ExampleGpuEffect000::getIdentifier() const {
 }
 
 void ExampleGpuEffectCaller000::processGpu(QGL33 * const gl,
-                                       GpuRenderTools &renderTools,
-                                       GpuRenderData &data) {
+                                           GpuRenderTools &renderTools,
+                                           GpuRenderData &data) {
     Q_UNUSED(gl);
     Q_UNUSED(data);
     const auto canvas = renderTools.requestTargetCanvas();
@@ -77,4 +78,19 @@ void ExampleGpuEffectCaller000::processGpu(QGL33 * const gl,
     canvas->drawImageRect(srcTex, localSrc, SkRect::Make(localSrc), &paint,
                           SkCanvas::kFast_SrcRectConstraint);
     canvas->flush();
+}
+
+void ExampleGpuEffectCaller000::processCpu(CpuRenderTools &renderTools,
+                                           CpuRenderData &data) {
+    SkCanvas canvas(renderTools.requestBackupBitmap());
+    canvas.clear(SK_ColorTRANSPARENT);
+    SkPaint paint;
+    const float sigma = mRadius*0.3333333f;
+    const auto filter = SkBlurImageFilter::Make(sigma, sigma, nullptr);
+    paint.setImageFilter(filter);
+    const SkIRect localSrc = fSrcRect.makeOffset(-data.fPosX, -data.fPosY);
+    canvas.drawBitmapRect(renderTools.fSrcDst,
+                          localSrc, SkRect::Make(localSrc), &paint,
+                          SkCanvas::kFast_SrcRectConstraint);
+    renderTools.swap();
 }

@@ -151,6 +151,29 @@ private:
     HDDExecController * mController = nullptr;
 };
 
+class CustomCPUTask : public CPUTask {
+    friend class StdSelfRef;
+protected:
+    CustomCPUTask(const std::function<void(void)>& before,
+                  const std::function<void(void)>& run,
+                  const std::function<void(void)>& after) :
+        mBefore(before), mRun(run), mAfter(after) {}
+
+    void beforeProcessing() final {
+        if(mBefore) mBefore();
+    }
+
+    void afterProcessing() final {
+        if(mAfter) mAfter();
+    }
+
+    void process() final { if(mRun) mRun(); }
+private:
+    const std::function<void(void)> mBefore;
+    const std::function<void(void)> mRun;
+    const std::function<void(void)> mAfter;
+};
+
 template <typename T>
 class SPtrDisposer : public CPUTask {
     friend class StdSelfRef;

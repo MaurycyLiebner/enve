@@ -13,13 +13,10 @@ public:
                     GpuRenderTools& renderTools,
                     GpuRenderData& data);
     void processCpu(CpuRenderTools& renderTools,
-                    CpuRenderData& data) {
-        Q_UNUSED(renderTools);
-        Q_UNUSED(data);
-    }
+                    CpuRenderData& data);
 
     HardwareSupport hardwareSupport() const {
-        return HardwareSupport::GPU_ONLY;
+        return HardwareSupport::GPU_PREFFERED;
     }
 private:
     const float mRadius;

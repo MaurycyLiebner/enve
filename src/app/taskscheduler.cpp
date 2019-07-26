@@ -215,8 +215,7 @@ void TaskScheduler::afterCPUTaskFinished(
     mFreeCPUExecs << static_cast<CPUExecController*>(controller);
     if(task->getState() == Task::CANCELED) {
     } if(task->nextStep()) {
-        queCPUTask(task);
-        scheduleGPUTask(task);
+        scheduleCPUTask(task);
     } else {
         task->finishedProcessing();
     }

@@ -43,7 +43,7 @@ void EffectsRenderer::processCpu(BoxRenderData * const boxData) {
     const int srcWidth = srcImage->width();
     const int srcHeight = srcImage->height();
     const QPoint gPos = boxData->fGlobalRect.topLeft();
-    srcImage->makeRasterImage();
+    srcImage = srcImage->makeRasterImage();
     Q_ASSERT(!mEffects.isEmpty());
     const auto& effect = mEffects.first();
     Q_ASSERT(!effect->gpuOnly());
@@ -52,15 +52,24 @@ void EffectsRenderer::processCpu(BoxRenderData * const boxData) {
     renderData.fPosY = static_cast<int>(gPos.y());
     renderData.fWidth = static_cast<uint>(srcWidth);
     renderData.fHeight = static_cast<uint>(srcHeight);
-    CpuRenderTools renderTools(srcImage);
+    SkPixmap pixmap;
+    srcImage->peekPixels(&pixmap);
+    SkBitmap bitmap;
+    bitmap.installPixels(pixmap);
+    CpuRenderTools renderTools(bitmap);
     effect->processCpu(renderTools, renderData);
+    if(renderTools.hasBackupBitmap()) {
+        srcImage = SkiaHelpers::transferDataToSkImage(
+                    *const_cast<SkBitmap*>(&renderTools.fSrcDst));
+    }
     mEffects.removeFirst();
 }
 
 void EffectsRenderer::setBaseGlobalRect(SkIRect &currRect,
                                         const SkIRect &skMaxBounds) const {
     for(const auto& effect : mEffects) {
-        currRect = effect->setSrcRectUpdateDstRect(currRect, skMaxBounds);
+        currRect = effect->setSrcRectUpdateDstRect(
+                    currRect, skMaxBounds, true);
     }
 }
 
