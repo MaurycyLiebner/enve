@@ -118,7 +118,7 @@ void BoxRenderData::processGPU(QGL33 * const gl,
 
 void BoxRenderData::process() {
     if(mStep == Step::EFFECTS)
-        return mEffectsRenderer.processCpu(this);
+        return;// mEffectsRenderer.processCpu(this);
     updateGlobalRect();
     if(fOpacity < 0.001) return;
     if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;

@@ -61,36 +61,46 @@ CustomIdentifier ExampleGpuEffect000::getIdentifier() const {
     return { effectId(), effectName(), { 0, 0, 0 } };
 }
 
+using namespace std;
+using namespace std::chrono;
+
 void ExampleGpuEffectCaller000::processGpu(QGL33 * const gl,
                                            GpuRenderTools &renderTools,
                                            GpuRenderData &data) {
     Q_UNUSED(gl);
     Q_UNUSED(data);
-    const auto canvas = renderTools.requestTargetCanvas();
-    const auto srcTex = renderTools.requestSrcTextureImageWrapper();
 
-    canvas->clear(SK_ColorTRANSPARENT);
-    SkPaint paint;
     const float sigma = mRadius*0.3333333f;
     const auto filter = SkBlurImageFilter::Make(sigma, sigma, nullptr);
+
+    SkPaint paint;
     paint.setImageFilter(filter);
-    const SkIRect localSrc = fSrcRect.makeOffset(-data.fPosX, -data.fPosY);
-    canvas->drawImageRect(srcTex, localSrc, SkRect::Make(localSrc), &paint,
-                          SkCanvas::kFast_SrcRectConstraint);
+
+    const auto canvas = renderTools.requestTargetCanvas();
+    canvas->clear(SK_ColorTRANSPARENT);
+    const auto srcTex = renderTools.requestSrcTextureImageWrapper();
+    canvas->drawImage(srcTex, 0, 0, &paint);
     canvas->flush();
 }
 
 void ExampleGpuEffectCaller000::processCpu(CpuRenderTools &renderTools,
-                                           CpuRenderData &data) {
-    SkCanvas canvas(renderTools.requestBackupBitmap());
-    canvas.clear(SK_ColorTRANSPARENT);
-    SkPaint paint;
+                                           const CpuRenderData &data) {
+    Q_UNUSED(data);
+
     const float sigma = mRadius*0.3333333f;
     const auto filter = SkBlurImageFilter::Make(sigma, sigma, nullptr);
+
+    SkPaint paint;
     paint.setImageFilter(filter);
-    const SkIRect localSrc = fSrcRect.makeOffset(-data.fPosX, -data.fPosY);
-    canvas.drawBitmapRect(renderTools.fSrcDst,
-                          localSrc, SkRect::Make(localSrc), &paint,
-                          SkCanvas::kFast_SrcRectConstraint);
+
+    SkBitmap tile;
+    renderTools.requestBackupBitmap().extractSubset(&tile, data.fTexTile);
+    SkCanvas canvas(tile);
+    canvas.clear(SK_ColorTRANSPARENT);
+    SkBitmap tileSrc;
+    const int radCeil = static_cast<int>(ceil(mRadius));
+    const auto srcRect = data.fTexTile.makeOutset(radCeil, radCeil);
+    renderTools.fSrcDst.extractSubset(&tileSrc, srcRect);
+    canvas.drawBitmap(tileSrc, -radCeil, -radCeil, &paint);
     renderTools.swap();
 }

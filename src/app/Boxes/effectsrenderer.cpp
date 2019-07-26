@@ -68,8 +68,8 @@ void EffectsRenderer::processCpu(BoxRenderData * const boxData) {
 void EffectsRenderer::setBaseGlobalRect(SkIRect &currRect,
                                         const SkIRect &skMaxBounds) const {
     for(const auto& effect : mEffects) {
-        currRect = effect->setSrcRectUpdateDstRect(
-                    currRect, skMaxBounds, true);
+        effect->setSrcRect(currRect, skMaxBounds, true);
+        currRect = effect->getDstRect();
     }
 }
 

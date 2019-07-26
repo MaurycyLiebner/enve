@@ -28,7 +28,7 @@ public:
     }
 
     virtual void processCpu(CpuRenderTools& renderTools,
-                            CpuRenderData& data) {
+                            const CpuRenderData& data) {
         Q_UNUSED(renderTools);
         Q_UNUSED(data);
     }
@@ -37,15 +37,15 @@ public:
     bool gpuOnly() const { return hardwareSupport() == HardwareSupport::GPU_ONLY; }
     bool cpuOnly() const { return hardwareSupport() == HardwareSupport::CPU_ONLY; }
 
-    SkIRect setSrcRectUpdateDstRect(const SkIRect& srcRect,
-                                    const SkIRect& clampRect,
-                                    const bool canIgnoreClamp) {
+    void setSrcRect(const SkIRect& srcRect,
+                    const SkIRect& clampRect,
+                    const bool canIgnoreClamp) {
         if(fForceMargin && canIgnoreClamp) {
-            fDstRect = SkIRect::MakeLTRB(srcRect.left() - fMargin.left(),
+            fSrcRect = SkIRect::MakeLTRB(srcRect.left() - fMargin.left(),
                                          srcRect.top() - fMargin.top(),
                                          srcRect.right() + fMargin.right(),
                                          srcRect.bottom() + fMargin.bottom());
-            fSrcRect = fDstRect;
+            fDstRect = fSrcRect;
         } else {
             fSrcRect = srcRect;
             fDstRect = SkIRect::MakeLTRB(
@@ -54,8 +54,6 @@ public:
                         qMin(srcRect.right() + fMargin.right(), clampRect.right()),
                         qMin(srcRect.bottom() + fMargin.bottom(), clampRect.bottom()));
         }
-
-        return fDstRect;
     }
 
     const SkIRect& getDstRect() const { return  fDstRect; }
@@ -65,6 +63,7 @@ protected:
     SkIRect fSrcRect;
     SkIRect fDstRect;
 };
+
 enum class HardwareSupport : short;
 class GpuEffect : public StaticComplexAnimator {
     friend class SelfRef;

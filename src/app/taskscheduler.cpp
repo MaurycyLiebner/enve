@@ -213,12 +213,9 @@ void TaskScheduler::afterCPUTaskFinished(
         const stdsptr<Task>& task,
         ExecController * const controller) {
     mFreeCPUExecs << static_cast<CPUExecController*>(controller);
-    if(task->getState() == Task::CANCELED) {
-    } if(task->nextStep()) {
-        scheduleCPUTask(task);
-    } else {
-        task->finishedProcessing();
-    }
+    if(task->getState() == Task::CANCELED) {}
+    else if(task->nextStep()) scheduleCPUTask(task);
+    else task->finishedProcessing();
     processNextTasks();
     if(!CPUTasksBeingProcessed()) queTasks();
     callAllTasksFinishedFunc();

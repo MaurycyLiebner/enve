@@ -52,6 +52,7 @@ SOURCES += main.cpp\
     Boxes/boxrenderdata.cpp \
     Boxes/containerbox.cpp \
     Boxes/effectsrenderer.cpp \
+    Boxes/effectsubtaskspawner.cpp \
     Boxes/layerboxrenderdata.cpp \
     Boxes/patheffectsmenu.cpp \
     CacheHandlers/hddcachablerangecont.cpp \
@@ -283,6 +284,7 @@ HEADERS  += \
     Boxes/boxrenderdata.h \
     Boxes/containerbox.h \
     Boxes/effectsrenderer.h \
+    Boxes/effectsubtaskspawner.h \
     Boxes/layerboxrenderdata.h \
     Boxes/patheffectsmenu.h \
     CacheHandlers/hddcachablecont.h \

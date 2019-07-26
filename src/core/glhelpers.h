@@ -105,6 +105,9 @@ enum class HardwareSupport : short {
 };
 
 struct CpuRenderData {
+    //! @brief Tile rect in texture coordinates
+    SkIRect fTexTile;
+
     //! @brief Pixel {0, 0} position in scene coordinates
     int fPosX;
     int fPosY;
@@ -162,6 +165,12 @@ private:
 class CpuRenderTools {
 public:
     CpuRenderTools(const SkBitmap& srcBtmp) : fSrcDst(srcBtmp) {}
+    CpuRenderTools(const SkBitmap& srcBtmp,
+                   const SkBitmap& backupBtmp) :
+        fSrcDst(srcBtmp), fBackupBtmp(backupBtmp) {
+        Q_ASSERT(srcBtmp.width() == backupBtmp.width() &&
+                 srcBtmp.height() == backupBtmp.height());
+    }
 
     const SkBitmap fSrcDst;
 

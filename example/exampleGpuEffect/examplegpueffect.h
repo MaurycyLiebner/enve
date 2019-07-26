@@ -13,7 +13,7 @@ public:
                     GpuRenderTools& renderTools,
                     GpuRenderData& data);
     void processCpu(CpuRenderTools& renderTools,
-                    CpuRenderData& data);
+                    const CpuRenderData &data);
 
     HardwareSupport hardwareSupport() const {
         return HardwareSupport::GPU_PREFFERED;

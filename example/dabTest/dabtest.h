@@ -48,7 +48,7 @@ public:
                 GpuRenderTools& renderTools,
                 GpuRenderData& data);
     void processCpu(CpuRenderTools& renderTools,
-                    CpuRenderData& data) {
+                    const CpuRenderData& data) {
         Q_UNUSED(renderTools);
         Q_UNUSED(data);
     }
