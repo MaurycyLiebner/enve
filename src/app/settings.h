@@ -4,6 +4,9 @@
 #include "skia/skiaincludes.h"
 
 struct EnveSettings {
+private:
+    EnveSettings() {}
+public:
     // general
 #ifdef QT_DEBUG
     QString fUserSettingsDir = QDir::homePath() + "/.enveD";
@@ -17,8 +20,10 @@ struct EnveSettings {
     SkFilterQuality fViewFilter = SkFilterQuality::kNone_SkFilterQuality;
 
     // performance settings
-    int fRamUsageMBCap = 0; // <= 0 - no cap
     int fCpuThreadsCap = 0; // <= 0 - use all available threads
+
+    long fRamBytesCap = 0; // <= 0 - cap at 80 %
+
     bool fGpuAcceleration = true;
 
     bool fHddCache = true;
@@ -37,7 +42,10 @@ struct EnveSettings {
     int fAutoQuickSaveMin = 0; // <= 0 - disabled
     AutosaveTarget fQuickSaveTarget = AutosaveTarget::same_folder;
 
-    static QString sSettingsDir();
+    // accessors
+    static long sRamBytesCap();
+    static int sCpuThreadsCapped();
+    static const QString& sSettingsDir();
     static EnveSettings sSettings;
 };
 

@@ -18,7 +18,7 @@ MemoryHandler::MemoryHandler(QObject * const parent) : QObject(parent) {
     qRegisterMetaType<MemoryState>();
     connect(mMemoryChecker, &MemoryChecker::handleMemoryState,
             this, &MemoryHandler::freeMemory);
-    connect(mMemoryChecker, &MemoryChecker::memoryChecked,
+    connect(mMemoryChecker, &MemoryChecker::memoryCheckedKB,
             this, &MemoryHandler::memoryChecked);
 
     mTimer = new QTimer(this);
@@ -49,7 +49,7 @@ void MemoryHandler::containerUpdated(CacheContainer * const cont) {
 }
 
 void MemoryHandler::freeMemory(const MemoryState &state,
-                               const unsigned long long &minFreeBytes) {
+                               const long &minFreeBytes) {
     if(state != mCurrentMemoryState) {
         if(state == NORMAL_MEMORY_STATE) {
             mTimer->setInterval(1000);
@@ -59,8 +59,8 @@ void MemoryHandler::freeMemory(const MemoryState &state,
         mCurrentMemoryState = state;
     }
 
-    long long memToFree = static_cast<long long>(minFreeBytes);
-    if(memToFree <= 0) return;
+    if(minFreeBytes <= 0) return;
+    long memToFree = minFreeBytes;
     while(memToFree > 0 && !mContainers.isEmpty()) {
         const auto cont = mContainers.takeFirst();
         memToFree -= cont->free_RAM_k();

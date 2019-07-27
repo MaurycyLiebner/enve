@@ -2,7 +2,7 @@
 #include <QApplication>
 #include <QSurfaceFormat>
 #include <QProcess>
-#include "Animators/SmartPath/smartpathcontainer.h"
+#include "hardwareinfo.h"
 
 void setDefaultFormat() {
     QSurfaceFormat format;
@@ -20,6 +20,8 @@ int main(int argc, char *argv[]) {
     setDefaultFormat();
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QApplication a(argc, argv);
+
+    HardwareInfo::sUpdateInfo();
 
     MainWindow w;
 //#ifdef QT_DEBUG

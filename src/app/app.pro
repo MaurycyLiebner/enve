@@ -108,6 +108,7 @@ SOURCES += main.cpp\
     documentrw.cpp \
     effectsloader.cpp \
     evfileio.cpp \
+    hardwareinfo.cpp \
     offscreenqgl33c.cpp \
     paintsettings.cpp \
     renderhandler.cpp \
@@ -338,6 +339,7 @@ HEADERS  += \
     GUI/ColorWidgets/glwidget.h \
     document.h \
     effectsloader.h \
+    hardwareinfo.h \
     offscreenqgl33c.h \
     paintsettings.h \
     renderhandler.h \

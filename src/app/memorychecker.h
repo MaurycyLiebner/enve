@@ -11,7 +11,6 @@ enum MemoryState {
     CRITICAL_MEMORY_STATE = 30
 };
 
-extern unsigned long long getFreeRam();
 class MemoryChecker : public QObject {
     Q_OBJECT
 public:
@@ -20,19 +19,18 @@ public:
 
     void checkMemory();
 private:
-    void setCurrentMemoryState(const MemoryState &state);
+    static long sGetFreeBytes();
+    static char sLine[256];
 
-    MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;
+    MemoryState mLastMemoryState = NORMAL_MEMORY_STATE;
 
-    unsigned long long mTotalRam = 0;
-    unsigned long long mLowFreeRam = 0;
-    unsigned long long mVeryLowFreeRam = 0;
-    QTimer *mTimer;
+    long mLowFreeBytes = 0;
+    long mVeryLowFreeBytes = 0;
 
     static MemoryChecker *mInstance;
 signals:
-    void memoryChecked(int, int);
-    void handleMemoryState(MemoryState, unsigned long long);
+    void memoryCheckedKB(int, int);
+    void handleMemoryState(MemoryState, long bytesToFree);
 };
 
 #endif // MEMORYCHECKER_H
