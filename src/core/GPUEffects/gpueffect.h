@@ -19,6 +19,8 @@ protected:
         fForceMargin(forceMargin), fMargin(margin) {}
 
 public:
+    virtual HardwareSupport hardwareSupport() const = 0;
+
     virtual void processGpu(QGL33 * const gl,
                             GpuRenderTools& renderTools,
                             GpuRenderData& data) {
@@ -33,7 +35,10 @@ public:
         Q_UNUSED(data);
     }
 
-    virtual HardwareSupport hardwareSupport() const = 0;
+    virtual int cpuThreads(const int available, const int area) const {
+        return qMin(area/(150*150) + 1, available);
+    }
+
     bool gpuOnly() const { return hardwareSupport() == HardwareSupport::GPU_ONLY; }
     bool cpuOnly() const { return hardwareSupport() == HardwareSupport::CPU_ONLY; }
 

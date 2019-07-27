@@ -44,30 +44,7 @@ void EffectsRenderer::processCpu(BoxRenderData * const boxData) {
     const auto& effect = mEffects.first();
 
     Q_ASSERT(!effect->gpuOnly());
-    EffectSubTaskSpawner::sSpawn(effect,
-                                 GetAsSPtr(boxData, BoxRenderData));
-    mEffects.removeFirst();
-    return;
-    auto& srcImage = boxData->fRenderedImage;
-    const int srcWidth = srcImage->width();
-    const int srcHeight = srcImage->height();
-    const QPoint gPos = boxData->fGlobalRect.topLeft();
-    srcImage = srcImage->makeRasterImage();
-    CpuRenderData renderData;
-    renderData.fPosX = static_cast<int>(gPos.x());
-    renderData.fPosY = static_cast<int>(gPos.y());
-    renderData.fWidth = static_cast<uint>(srcWidth);
-    renderData.fHeight = static_cast<uint>(srcHeight);
-    SkPixmap pixmap;
-    srcImage->peekPixels(&pixmap);
-    SkBitmap bitmap;
-    bitmap.installPixels(pixmap);
-    CpuRenderTools renderTools(bitmap);
-    effect->processCpu(renderTools, renderData);
-    if(renderTools.hasBackupBitmap()) {
-        srcImage = SkiaHelpers::transferDataToSkImage(
-                    *const_cast<SkBitmap*>(&renderTools.fSrcDst));
-    }
+    EffectSubTaskSpawner::sSpawn(effect, GetAsSPtr(boxData, BoxRenderData));
     mEffects.removeFirst();
 }
 
