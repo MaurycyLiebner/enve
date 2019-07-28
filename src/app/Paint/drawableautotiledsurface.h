@@ -9,7 +9,7 @@ struct TileImgs {
     int fColumnCount = 0;
     int fZeroTileRow = 0;
     int fZeroTileCol = 0;
-    QList<QList<sk_sp<SkImage>>> fImgs;
+    QList<QList<SkBitmap>> fImgs;
 
     void deepCopy(const TileImgs& src) {
         fRowCount = src.fRowCount;
@@ -18,7 +18,7 @@ struct TileImgs {
         fZeroTileCol = src.fZeroTileCol;
         fImgs.clear();
         for(const auto& srcList : src.fImgs) {
-            fImgs << QList<sk_sp<SkImage>>();
+            fImgs << QList<SkBitmap>();
             auto& list = fImgs.last();
             for(const auto& srcImg : srcList) {
                 list << SkiaHelpers::makeCopy(srcImg);
@@ -39,7 +39,7 @@ struct TileImgs {
 
 class DrawableAutoTiledSurface : public HDDCachablePersistent {
     friend class StdSelfRef;
-    typedef QList<QList<sk_sp<SkImage>>> Tiles;
+    typedef QList<QList<SkBitmap>> Tiles;
 protected:
     DrawableAutoTiledSurface();
     DrawableAutoTiledSurface(const DrawableAutoTiledSurface& other) = delete;
@@ -67,7 +67,6 @@ public:
     }
 
     void drawOnCanvas(SkCanvas * const canvas,
-                      GrContext * const grContext,
                       const SkPoint &dst,
                       const QRect * const minPixSrc,
                       SkPaint * const paint) const;
@@ -75,18 +74,18 @@ public:
     void drawOnCanvas(SkCanvas * const canvas,
                       const SkPoint &dst,
                       const QRect * const minPixSrc) const {
-        drawOnCanvas(canvas, nullptr, dst, minPixSrc, nullptr);
+        drawOnCanvas(canvas, dst, minPixSrc, nullptr);
     }
 
     void drawOnCanvas(SkCanvas * const canvas,
                       const SkPoint &dst) const {
-        drawOnCanvas(canvas, nullptr, dst, nullptr, nullptr);
+        drawOnCanvas(canvas, dst, nullptr, nullptr);
     }
 
     void drawOnCanvas(SkCanvas * const canvas,
                       const SkPoint &dst,
                       SkPaint * const paint) const {
-        drawOnCanvas(canvas, nullptr, dst, nullptr, paint);
+        drawOnCanvas(canvas, dst, nullptr, paint);
     }
 
     const AutoTiledSurface &surface() const {
@@ -149,10 +148,10 @@ private:
         }
     }
 
-    QList<sk_sp<SkImage>> newImgColumn() {
-        QList<sk_sp<SkImage>> col;
+    QList<SkBitmap> newImgColumn() {
+        QList<SkBitmap> col;
         for(int j = 0; j < mRowCount; j++) {
-            col.append(sk_sp<SkImage>());
+            col.append(SkBitmap());
         }
         return col;
     }
@@ -160,7 +159,7 @@ private:
     void prependImgRows(const int count) {
         for(auto& col : mImgs) {
             for(int i = 0; i < count; i++) {
-                col.prepend(sk_sp<SkImage>());
+                col.prepend(SkBitmap());
             }
         }
         mRowCount += count;
@@ -170,7 +169,7 @@ private:
     void appendImgRows(const int count) {
         for(auto& col : mImgs) {
             for(int i = 0; i < count; i++) {
-                col.append(sk_sp<SkImage>());
+                col.append(SkBitmap());
             }
         }
         mRowCount += count;
@@ -191,12 +190,12 @@ private:
         mColumnCount += count;
     }
 
-    sk_sp<SkImage> imageForTile(const int tx, const int ty) const {
+    SkBitmap imageForTile(const int tx, const int ty) const {
         const auto zeroTileV = zeroTile();
         return imageForTileId(tx + zeroTileV.x(), ty + zeroTileV.y());
     }
 
-    sk_sp<SkImage> imageForTileId(const int colId, const int rowId) const {
+    SkBitmap imageForTileId(const int colId, const int rowId) const {
         return mImgs.at(colId).at(rowId);
     }
 

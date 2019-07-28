@@ -30,6 +30,7 @@ struct AutoTilesData {
     int width() const;
     int height() const;
 
+    void tileToBitmap(const int tx, const int ty, SkBitmap& bitmap);
     SkBitmap tileToBitmap(const int tx, const int ty);
     SkBitmap toBitmap(const QMargins& margin = QMargins()) const;
 

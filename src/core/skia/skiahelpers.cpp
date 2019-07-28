@@ -76,6 +76,15 @@ void SkiaHelpers::writeImg(const sk_sp<SkImage> &img,
             RuntimeThrow("Could not peek image pixels");
         }
     }
+    writePixmap(pix, file);
+}
+
+sk_sp<SkImage> SkiaHelpers::readImg(QIODevice * const file) {
+    auto btmp = readBitmap(file);
+    return SkiaHelpers::transferDataToSkImage(btmp);
+}
+
+void SkiaHelpers::writePixmap(const SkPixmap &pix, QIODevice * const file) {
     const int width = pix.width();
     const int height = pix.height();
     file->write(rcConstChar(&width), sizeof(int));
@@ -85,7 +94,7 @@ void SkiaHelpers::writeImg(const sk_sp<SkImage> &img,
     file->write(rcConstChar(pix.writable_addr()), writeBytes);
 }
 
-sk_sp<SkImage> SkiaHelpers::readImg(QIODevice * const file) {
+SkBitmap SkiaHelpers::readBitmap(QIODevice * const file) {
     int width, height;
     file->read(rcChar(&width), sizeof(int));
     file->read(rcChar(&height), sizeof(int));
@@ -95,7 +104,11 @@ sk_sp<SkImage> SkiaHelpers::readImg(QIODevice * const file) {
     const qint64 readBytes = width*height*4*
             static_cast<qint64>(sizeof(uchar));
     file->read(scChar(btmp.getPixels()), readBytes);
-    return SkiaHelpers::transferDataToSkImage(btmp);
+    return btmp;
+}
+
+void SkiaHelpers::writeBitmap(const SkBitmap& bitmap, QIODevice * const file) {
+    writePixmap(bitmap.pixmap(), file);
 }
 
 void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,

@@ -12,7 +12,6 @@ struct PaintTarget {
     bool needsProcessing() const { return true; }
 
     void draw(SkCanvas * const canvas,
-              GrContext * const grContext,
               const QMatrix& viewTrans,
               const QRect& drawRect);
 

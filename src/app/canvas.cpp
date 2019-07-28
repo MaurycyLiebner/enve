@@ -246,7 +246,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
     if(mPaintTarget.isValid()) {
         canvas->save();
-        mPaintTarget.draw(canvas, grContext, viewTrans, drawRect);
+        mPaintTarget.draw(canvas, viewTrans, drawRect);
         const SkIRect bRect = toSkIRect(mPaintTarget.pixelBoundingRect());
         paint.setStyle(SkPaint::kStroke_Style);
         paint.setColor(SK_ColorRED);

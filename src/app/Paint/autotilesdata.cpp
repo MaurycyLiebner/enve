@@ -119,16 +119,15 @@ int AutoTilesData::height() const {
     return mRowCount*TILE_SIZE;
 }
 
-SkBitmap AutoTilesData::tileToBitmap(const int tx, const int ty) {
-    const auto info = SkiaHelpers::getPremulRGBAInfo(TILE_SIZE, TILE_SIZE);
-    SkBitmap dst;
-    dst.allocPixels(info);
-
-    uint8_t * const dstP = static_cast<uint8_t*>(dst.getPixels());
+void AutoTilesData::tileToBitmap(const int tx, const int ty, SkBitmap &bitmap) {
+    Q_ASSERT(bitmap.width() == TILE_SIZE);
+    Q_ASSERT(bitmap.height() == TILE_SIZE);
+    uint8_t * const dstP = static_cast<uint8_t*>(bitmap.getPixels());
+    Q_ASSERT(dstP);
     const uint16_t * const srcP = getTile(tx, ty);
 
     for(int y = 0; y < TILE_SIZE; y++) {
-        uint8_t * dstLine = dstP + y*dst.width()*4;
+        uint8_t * dstLine = dstP + y*bitmap.width()*4;
         const uint16_t * srcLine = srcP + y*TILE_SIZE*4;
         for(int x = 0; x < TILE_SIZE; x++) {
             const uint32_t r = *srcLine++;
@@ -142,8 +141,14 @@ SkBitmap AutoTilesData::tileToBitmap(const int tx, const int ty) {
             *dstLine++ = (a * 255 + (1<<15)/2) / (1<<15);
         }
     }
+}
 
-    return dst;
+SkBitmap AutoTilesData::tileToBitmap(const int tx, const int ty) {
+    const auto info = SkiaHelpers::getPremulRGBAInfo(TILE_SIZE, TILE_SIZE);
+    SkBitmap bitmap;
+    bitmap.allocPixels(info);
+    tileToBitmap(tx, ty, bitmap);
+    return bitmap;
 }
 
 SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {

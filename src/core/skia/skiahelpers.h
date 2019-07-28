@@ -26,8 +26,12 @@ namespace SkiaHelpers {
     sk_sp<SkImage> transferDataToSkImage(SkBitmap& bitmap);
 
     void writeImg(const sk_sp<SkImage>& img, QIODevice * const file);
-
     sk_sp<SkImage> readImg(QIODevice * const file);
+
+    SkBitmap readBitmap(QIODevice * const file);
+    void writeBitmap(const SkBitmap& bitmap, QIODevice * const file);
+
+    void writePixmap(const SkPixmap& pix, QIODevice * const file);
 
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,

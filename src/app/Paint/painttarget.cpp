@@ -2,7 +2,6 @@
 #include "canvas.h"
 
 void PaintTarget::draw(SkCanvas * const canvas,
-                       GrContext* const grContext,
                        const QMatrix& viewTrans,
                        const QRect& drawRect) {
     const auto canvasRect = viewTrans.inverted().mapRect(drawRect);
@@ -10,7 +9,7 @@ void PaintTarget::draw(SkCanvas * const canvas,
     const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
     canvas->concat(toSkMatrix(pDrawTrans));
     mPaintOnion.draw(canvas);
-    mPaintDrawable->drawOnCanvas(canvas, grContext, {0, 0}, &relDRect, nullptr);
+    mPaintDrawable->drawOnCanvas(canvas, {0, 0}, &relDRect, nullptr);
 }
 
 void PaintTarget::setPaintDrawable(DrawableAutoTiledSurface * const surf) {

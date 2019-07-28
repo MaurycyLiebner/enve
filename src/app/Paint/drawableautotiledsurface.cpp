@@ -10,7 +10,6 @@ DrawableAutoTiledSurface::DrawableAutoTiledSurface() :
     mImgs(mTileImgs.fImgs) {}
 
 void DrawableAutoTiledSurface::drawOnCanvas(SkCanvas * const canvas,
-                                            GrContext* const grContext,
                                             const SkPoint &dst,
                                             const QRect * const minPixSrc,
                                             SkPaint * const paint) const {
@@ -25,18 +24,13 @@ void DrawableAutoTiledSurface::drawOnCanvas(SkCanvas * const canvas,
         const float drawX = dst.x() + tx*TILE_SIZE;
         for(int ty = tileRect.top(); ty <= tileRect.bottom(); ty++) {
             const auto img = imageForTile(tx, ty);
-            if(!img) continue;
+            if(img.isNull()) continue;
             const float drawY = dst.y() + ty*TILE_SIZE;
-            if(grContext) {
-                SkiaHelpers::drawImageGPU(canvas, img, drawX, drawY,
-                                          paint, grContext);
-            } else canvas->drawImage(img, drawX, drawY, paint);
+            canvas->drawBitmap(img, drawX, drawY, paint);
         }
     }
 }
 
-using namespace std;
-using namespace std::chrono;
 void DrawableAutoTiledSurface::updateTileRectImgs(QRect tileRect) {
     const QRect maxRect = mSurface.tileBoundingRect();
     if(!maxRect.intersects(tileRect)) return;
@@ -49,11 +43,14 @@ void DrawableAutoTiledSurface::updateTileRectImgs(QRect tileRect) {
     #pragma omp parallel for collapse(2) if(n > 4)
     for(int tx = tileRect.left(); tx <= tileRect.right(); tx++) {
         for(int ty = tileRect.top(); ty <= tileRect.bottom(); ty++) {
-            auto btmp = mSurface.tileToBitmap(tx, ty);
-            const auto img = SkiaHelpers::transferDataToSkImage(btmp);
-
             const auto tileId = QPoint(tx, ty) + zeroTile();
-            mImgs[tileId.x()].replace(tileId.y(), img);
+            SkBitmap& img = mImgs[tileId.x()][tileId.y()];
+            if(img.isNull()) {
+                img = mSurface.tileToBitmap(tx, ty);
+            } else {
+                mSurface.tileToBitmap(tx, ty, img);
+                img.notifyPixelsChanged();
+            }
         }
     }
 }
@@ -74,7 +71,7 @@ protected:
         file->write(rcConstChar(&mImages.fZeroTileCol), sizeof(int));
         for(const auto& col : mImages.fImgs) {
             for(const auto& tile : col)
-                SkiaHelpers::writeImg(tile, file);
+                SkiaHelpers::writeBitmap(tile, file);
         }
     }
 
@@ -101,10 +98,10 @@ protected:
         file->read(rcChar(&mTileImgs.fZeroTileRow), sizeof(int));
         file->read(rcChar(&mTileImgs.fZeroTileCol), sizeof(int));
         for(int i = 0; i < mTileImgs.fColumnCount; i++) {
-            mTileImgs.fImgs.append(QList<sk_sp<SkImage>>());
+            mTileImgs.fImgs.append(QList<SkBitmap>());
             auto& col = mTileImgs.fImgs.last();
             for(int j = 0; j < mTileImgs.fZeroTileRow; j++)
-                col.append(SkiaHelpers::readImg(file));
+                col.append(SkiaHelpers::readBitmap(file));
         }
     }
     void afterProcessing() {
