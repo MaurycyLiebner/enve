@@ -59,24 +59,31 @@ CubicList CubicList::getFragment(const qreal minLenFrac,
 CubicList CubicList::getFragmentUnbound(const qreal minLenFrac,
                                         const qreal maxLenFrac) {
     if(minLenFrac > maxLenFrac) return CubicList();
-    const qreal shiftToPos = -floor4Dec(minLenFrac);
-    const qreal posMinLenFrac = minLenFrac + shiftToPos; // always between 0 and 1
-    const qreal posMaxLenFrac = maxLenFrac + shiftToPos;
+    const qreal shiftToPos = floor4Dec(minLenFrac);
+    const qreal posMinLenFrac = minLenFrac - shiftToPos; // always between 0 and 1
+    const qreal posMaxLenFrac = maxLenFrac - shiftToPos;
     QList<qCubicSegment2D> fragSegs;
     if(isInteger4Dec(posMinLenFrac) && isInteger4Dec(posMaxLenFrac)) {
-        const int nFull = qRound(posMaxLenFrac - posMinLenFrac);
+        const int nFull = qRound(qAbs(posMaxLenFrac - posMinLenFrac));
         for(int i = 0; i < nFull; i++) fragSegs << mSegments;
         return fragSegs;
     }
+    const qreal minRel = posMinLenFrac - qFloor(posMinLenFrac);
+    const qreal maxRel = posMaxLenFrac - qFloor(posMaxLenFrac);
+    const int nFull = qFloor(posMaxLenFrac - posMinLenFrac - maxRel - 1 + minRel);
+
+    if(nFull <= 0 && qFloor(posMinLenFrac) == qFloor(posMaxLenFrac)) {
+        return getFragment(minRel, maxRel).getSegments();
+    }
 
     if(!isInteger4Dec(posMinLenFrac)) {
-        fragSegs << getFragment(qCeil(posMinLenFrac) - posMinLenFrac, 1).getSegments();
+        fragSegs << getFragment(minRel, 1).getSegments();
     }
-    const int nFull = qFloor(posMaxLenFrac - posMinLenFrac);
+
     for(int i = 0; i < nFull; i++) fragSegs << mSegments;
 
     if(!isInteger4Dec(posMaxLenFrac)) {
-        fragSegs << getFragment(0, posMaxLenFrac - qFloor(posMaxLenFrac)).getSegments();
+        fragSegs << getFragment(0, maxRel).getSegments();
     }
     return fragSegs;
 }
