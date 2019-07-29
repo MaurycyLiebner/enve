@@ -22,9 +22,8 @@ VideoBox::VideoBox() : AnimationBox(TYPE_VIDEO) {
 }
 
 VideoBox::~VideoBox() {
-    auto parentCanvas = getParentCanvas();
-    if(parentCanvas && mSound) {
-        parentCanvas->getSoundComposition()->removeSound(mSound);
+    if(mParentScene && mSound) {
+        mParentScene->getSoundComposition()->removeSound(mSound);
     }
 }
 
@@ -39,18 +38,12 @@ void VideoBox::readBoundingBox(QIODevice * const target) {
 }
 
 void VideoBox::setParentGroup(ContainerBox * const parent) {
-    if(mParentGroup && mSound) {
-        const auto parentCanvas = getParentCanvas();
-        if(parentCanvas) {
-            parentCanvas->getSoundComposition()->removeSound(mSound);
-        }
+    if(mParentGroup && mSound && mParentScene) {
+        mParentScene->getSoundComposition()->removeSound(mSound);
     }
     AnimationBox::setParentGroup(parent);
-    if(mParentGroup && mSound) {
-        const auto parentCanvas = getParentCanvas();
-        if(parentCanvas) {
-            getParentCanvas()->getSoundComposition()->addSound(mSound);
-        }
+    if(mParentGroup && mSound && mParentScene) {
+        mParentScene->getSoundComposition()->addSound(mSound);
     }
 }
 
@@ -114,17 +107,15 @@ void VideoBox::soundDataChanged() {
     const auto soundHandler = mFileHandler->getSoundHandler();
     if(soundHandler) {
         if(!mSound->SWT_isVisible()) {
-            const auto parentCanvas = getParentCanvas();
-            if(parentCanvas) {
-                parentCanvas->getSoundComposition()->addSound(mSound);
+            if(mParentScene) {
+                mParentScene->getSoundComposition()->addSound(mSound);
             }
         }
         mDurationRectangle->setSoundCacheHandler(&soundHandler->getCacheHandler());
     } else {
         if(mSound->SWT_isVisible()) {
-            const auto parentCanvas = getParentCanvas();
-            if(parentCanvas) {
-                parentCanvas->getSoundComposition()->removeSound(mSound);
+            if(mParentScene) {
+                mParentScene->getSoundComposition()->removeSound(mSound);
             }
         }
         mDurationRectangle->setSoundCacheHandler(nullptr);

@@ -17,7 +17,7 @@ void InternalLinkCanvas::setupRenderData(
     const auto canvasTarget = GetAsPtr(finalTarget, Canvas);
     canvasData->fBgColor = toSkColor(canvasTarget->getBgColorAnimator()->
             getColor(relFrame));
-    //qreal res = getParentCanvas()->getResolutionFraction();
+    //qreal res = mParentScene->getResolutionFraction();
     canvasData->fCanvasHeight = canvasTarget->getCanvasHeight();//*res;
     canvasData->fCanvasWidth = canvasTarget->getCanvasWidth();//*res;
     if(mParentGroup->SWT_isLinkBox()) {

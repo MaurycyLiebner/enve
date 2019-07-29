@@ -226,13 +226,14 @@ void BoxRenderData::updateGlobalRect() {
 
 void BoxRenderData::setBaseGlobalRect(const QRectF& baseRectF) {
     const QRectF maxBounds = fResolutionScale.mapRect(QRectF(fMaxBoundsRect));
+    const auto unclampedBaseRect = toSkRect(baseRectF).roundOut();
     const auto clampedBaseRect = baseRectF.intersected(maxBounds);
     SkIRect currRect = toSkRect(clampedBaseRect).roundOut();
     if(!mEffectsRenderer.isEmpty()) {
         const QRect iMaxBounds(qFloor(maxBounds.left()), qFloor(maxBounds.top()),
                                qCeil(maxBounds.width()), qCeil(maxBounds.height()));
         const SkIRect skMaxBounds = toSkIRect(iMaxBounds);
-        mEffectsRenderer.setBaseGlobalRect(currRect, skMaxBounds);
+        mEffectsRenderer.setBaseGlobalRect(currRect, unclampedBaseRect, skMaxBounds);
     }
     fGlobalRect = toQRect(currRect);
 }

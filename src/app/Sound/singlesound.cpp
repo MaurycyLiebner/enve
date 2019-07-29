@@ -185,7 +185,7 @@ qreal SingleSound::getCanvasFPS() const {
     if(!parentCanvas) {
         const auto box = getFirstAncestor<BoundingBox>();
         if(!box) return 1;
-        parentCanvas = box->getParentCanvas();
+        parentCanvas = box->getParentScene();
         if(!parentCanvas) return 1;
     }
     return parentCanvas->getFps();

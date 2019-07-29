@@ -9,10 +9,8 @@ protected:
     Rectangle();
 public:
     void moveSizePointByAbs(const QPointF &absTrans);
-    void startAllPointsTransform();
 
     MovablePoint *getBottomRightPoint();
-    void finishAllPointsTransform();
 
     bool SWT_isRectangle() const { return true; }
     SkPath getPathAtRelFrameF(const qreal relFrame);

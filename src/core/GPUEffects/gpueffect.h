@@ -10,6 +10,8 @@ enum class GpuEffectType : short {
     CUSTOM_SHADER, // xml, GLSL
     TYPE_COUNT
 };
+#define qMax3(a, b, c) qMax(a, qMax(b, c))
+#define qMin3(a, b, c) qMin(a, qMin(b, c))
 
 class RasterEffectCaller : public StdSelfRef {
 protected:
@@ -43,21 +45,29 @@ public:
     bool cpuOnly() const { return hardwareSupport() == HardwareSupport::CPU_ONLY; }
 
     void setSrcRect(const SkIRect& srcRect,
-                    const SkIRect& clampRect,
-                    const bool canIgnoreClamp) {
-        if(fForceMargin && canIgnoreClamp) {
-            fSrcRect = SkIRect::MakeLTRB(srcRect.left() - fMargin.left(),
-                                         srcRect.top() - fMargin.top(),
-                                         srcRect.right() + fMargin.right(),
-                                         srcRect.bottom() + fMargin.bottom());
+                    const SkIRect& baseRect,
+                    const SkIRect& clampRect) {
+        if(fForceMargin) {
+            fSrcRect = SkIRect::MakeLTRB(qMax(srcRect.left() - fMargin.left(),
+                                              baseRect.left()),
+                                         qMax(srcRect.top() - fMargin.top(),
+                                              baseRect.top()),
+                                         qMin(srcRect.right() + fMargin.right(),
+                                              baseRect.right()),
+                                         qMin(srcRect.bottom() + fMargin.bottom(),
+                                              baseRect.bottom()));
             fDstRect = fSrcRect;
         } else {
             fSrcRect = srcRect;
             fDstRect = SkIRect::MakeLTRB(
-                        qMax(srcRect.left() - fMargin.left(), clampRect.left()),
-                        qMax(srcRect.top() - fMargin.top(), clampRect.top()),
-                        qMin(srcRect.right() + fMargin.right(), clampRect.right()),
-                        qMin(srcRect.bottom() + fMargin.bottom(), clampRect.bottom()));
+                        qMax3(srcRect.left() - fMargin.left(),
+                              clampRect.left(), baseRect.left()),
+                        qMax3(srcRect.top() - fMargin.top(),
+                              clampRect.top(), baseRect.top()),
+                        qMin3(srcRect.right() + fMargin.right(),
+                              clampRect.right(), baseRect.right()),
+                        qMin3(srcRect.bottom() + fMargin.bottom(),
+                              clampRect.bottom(), baseRect.bottom()));
         }
     }
 
@@ -82,7 +92,7 @@ public:
         Q_UNUSED(frame);
         return QMargins();
     }
-    virtual bool forceWholeBase() const { return false; }
+    virtual bool forceMargin() const { return false; }
     virtual void writeIdentifier(QIODevice * const dst) const;
 
     bool SWT_isGpuEffect() const { return true; }

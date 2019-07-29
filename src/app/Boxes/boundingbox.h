@@ -101,23 +101,20 @@ public:
     virtual SmartVectorPath *objectToVectorPathBox();
     virtual SmartVectorPath *strokeToVectorPathBox();
 
-    virtual void moveByRel(const QPointF &trans);
-    virtual void moveByAbs(const QPointF &trans);
-    virtual void rotateBy(const qreal rot);
-    virtual void scale(const qreal scaleBy);
-    virtual void scale(const qreal scaleXBy, const qreal scaleYBy);
-    virtual void saveTransformPivotAbsPos(const QPointF &absPivot);
+    void moveByRel(const QPointF &trans);
+    void moveByAbs(const QPointF &trans);
+    void rotateBy(const qreal rot);
+    void scale(const qreal scaleBy);
+    void scale(const qreal scaleXBy, const qreal scaleYBy);
+    void saveTransformPivotAbsPos(const QPointF &absPivot);
 
-    virtual void startPosTransform();
-    virtual void startRotTransform();
-    virtual void startScaleTransform();
+    void startPosTransform();
+    void startRotTransform();
+    void startScaleTransform();
 
-    virtual void startTransform();
-    virtual void finishTransform();
+    void startTransform();
+    void finishTransform();
     void cancelTransform();
-
-    virtual void startAllPointsTransform();
-    virtual void finishAllPointsTransform();
 
     virtual void centerPivotPosition();
     virtual QPointF getRelCenterPosition();
@@ -164,8 +161,6 @@ public:
     virtual QMatrix getRelativeTransformAtRelFrameF(const qreal relFrame);
     virtual QMatrix getTotalTransformAtRelFrameF(const qreal relFrame);
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
-
-    virtual Canvas *getParentCanvas();
 
     virtual void applyPaintSetting(const PaintSettingsApplier &setting);
 
@@ -240,6 +235,8 @@ public:
                               const int rowHeight);
 
     void ca_childAnimatorIsRecordingChanged();
+
+    Canvas* getParentScene() const { return mParentScene; }
 
     QMatrix getTotalTransform() const;
 
@@ -434,6 +431,7 @@ protected:
     SkRect mRelBoundingRectSk;
     SkPath mSkRelBoundingRectPath;
 
+    Canvas* mParentScene = nullptr;
     qptr<ContainerBox> mParentGroup;
     qptr<BasicTransformAnimator> mParentTransform;
 
@@ -467,6 +465,7 @@ signals:
     void selectionChanged(bool);
     void visibilityChanged(bool);
     void parentChanged(ContainerBox*);
+    void ancestorChanged();
 };
 
 

@@ -29,7 +29,6 @@ protected:
 public:
     bool SWT_isCircle() const;
 
-    void startAllPointsTransform();
     SkPath getPathAtRelFrameF(const qreal relFrame);
 
     bool differenceInEditPathBetweenFrames(

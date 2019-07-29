@@ -51,11 +51,6 @@ Circle::Circle() : PathBox(TYPE_CIRCLE) {
     prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
 }
 
-void Circle::startAllPointsTransform() {
-    mVerticalRadiusPoint->startTransform();
-    mHorizontalRadiusPoint->startTransform();
-}
-
 void Circle::moveRadiusesByAbs(const QPointF &absTrans) {
     mVerticalRadiusPoint->moveByAbs(absTrans);
     mHorizontalRadiusPoint->moveByAbs(absTrans);

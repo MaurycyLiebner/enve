@@ -24,6 +24,7 @@ public:
 
     virtual BoundingBox *getBoxAt(const QPointF &absPos);
 
+    bool unboundChildren() const;
     void anim_setAbsFrame(const int frame);
 
     BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);

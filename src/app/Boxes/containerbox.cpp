@@ -596,14 +596,14 @@ void ContainerBox::setupLayerRenderData(const qreal relFrame,
 void ContainerBox::selectAllBoxesFromBoxesGroup() {
     for(const auto& box : mContainedBoxes) {
         if(box->isSelected()) continue;
-        getParentCanvas()->addBoxToSelection(box.get());
+        mParentScene->addBoxToSelection(box.get());
     }
 }
 
 void ContainerBox::deselectAllBoxesFromBoxesGroup() {
     for(const auto& box : mContainedBoxes) {
         if(box->isSelected()) {
-            getParentCanvas()->removeBoxFromSelection(box.get());
+            mParentScene->removeBoxFromSelection(box.get());
         }
     }
 }
@@ -640,6 +640,16 @@ BoundingBox *ContainerBox::getBoxAt(const QPointF &absPos) {
     return boxAtPos;
 }
 
+bool ContainerBox::unboundChildren() const {
+    if(mParentGroup) {
+        if(ContainerBox::SWT_isGroupBox())
+            return mParentGroup->unboundChildren();
+        return mGPUEffectsAnimators->effectUnbound() ||
+               mParentGroup->unboundChildren();
+    }
+    return false;
+}
+
 void ContainerBox::anim_setAbsFrame(const int frame) {
     BoundingBox::anim_setAbsFrame(frame);
 
@@ -654,7 +664,7 @@ void ContainerBox::addContainedBoxesToSelection(const QRectF &rect) {
         if(box->isVisibleAndUnlocked() &&
                 box->isVisibleAndInVisibleDurationRect()) {
             if(box->isContainedIn(rect)) {
-                getParentCanvas()->addBoxToSelection(box.get());
+                mParentScene->addBoxToSelection(box.get());
             }
         }
     }
@@ -706,11 +716,8 @@ void ContainerBox::removeContainedBoxFromList(const int id) {
     const auto box = mContainedBoxes.takeObjAt(id);
     if(box->SWT_isContainerBox()) {
         const auto group = GetAsPtr(box, ContainerBox);
-        if(group->isCurrentGroup()) {
-            const auto parentCanvas = getParentCanvas();
-            if(parentCanvas) {
-                parentCanvas->setCurrentGroupParentAsCurrentGroup();
-            }
+        if(group->isCurrentGroup() && mParentScene) {
+            mParentScene->setCurrentGroupParentAsCurrentGroup();
         }
     }
 

@@ -29,7 +29,7 @@ public:
     stdsptr<RasterEffectCaller>
             getEffectCaller(const qreal relFrame) const;
     QMargins getMarginAtRelFrame(const qreal frame) const;
-    bool forceWholeBase() const { return true; }
+    bool forceMargin() const { return true; }
 
     CustomIdentifier getIdentifier() const;
 private:

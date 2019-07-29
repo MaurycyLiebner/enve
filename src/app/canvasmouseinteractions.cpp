@@ -329,7 +329,6 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
         newPath->planCenterPivotPosition();
         mCurrentContainer->addContainedBox(newPath);
         newPath->setAbsolutePos(e.fPos);
-        //newPath->startAllPointsTransform();
         clearBoxesSelection();
         addBoxToSelection(newPath.get());
 
@@ -340,7 +339,6 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
         newPath->planCenterPivotPosition();
         mCurrentContainer->addContainedBox(newPath);
         newPath->setAbsolutePos(e.fPos);
-        //newPath->startAllPointsTransform();
         clearBoxesSelection();
         addBoxToSelection(newPath.get());
 

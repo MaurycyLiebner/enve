@@ -8,15 +8,25 @@ GPUEffectAnimators::GPUEffectAnimators(BoundingBox * const parentBox) :
     makeHiddenWhenEmpty();
 }
 
-QMarginsF GPUEffectAnimators::getEffectsMargin(const qreal relFrame) const {
-    QMarginsF newMargin;
+QMargins GPUEffectAnimators::getEffectsMargin(const qreal relFrame) const {
+    QMargins newMargin;
     for(const auto& effect : ca_mChildAnimators) {
-        auto pixmapEffect = GetAsPtr(effect.get(), ShaderEffect);
+        auto pixmapEffect = GetAsPtr(effect.get(), GpuEffect);
         if(pixmapEffect->isVisible()) {
             newMargin += pixmapEffect->getMarginAtRelFrame(relFrame);
         }
     }
     return newMargin;
+}
+
+bool GPUEffectAnimators::effectUnbound() const {
+    for(const auto& effect : ca_mChildAnimators) {
+        auto gpuEffect = GetAsPtr(effect.get(), GpuEffect);
+        if(gpuEffect->isVisible() && gpuEffect->forceMargin()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void GPUEffectAnimators::addEffects(const qreal relFrame,

@@ -260,7 +260,6 @@ public:
     bool relPointInsidePath(const QPointF &relPos) const;
 
     void addEmitter(const qsptr<ParticleEmitter> &emitter);
-    void startAllPointsTransform();
 
     void applyPaintSetting(const PaintSettingsApplier &setting);
     MovablePoint *getBottomRightPoint();

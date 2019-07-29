@@ -59,6 +59,9 @@ BoundingBox::BoundingBox(const BoundingBoxType type) :
     connect(mTransformAnimator.get(),
             &BoxTransformAnimator::totalTransformChanged,
             this, &BoundingBox::afterTotalTransformChanged);
+    connect(this, &BoundingBox::ancestorChanged, this, [this]() {
+        mParentScene = mParentGroup ? mParentGroup->mParentScene : nullptr;
+    });
 }
 
 BoundingBox::~BoundingBox() {
@@ -243,11 +246,6 @@ bool BoundingBox::isAncestor(const BoundingBox * const box) const {
     return false;
 }
 
-Canvas *BoundingBox::getParentCanvas() {
-    if(!mParentGroup) return nullptr;
-    return mParentGroup->getParentCanvas();
-}
-
 bool BoundingBox::SWT_isBoundingBox() const { return true; }
 
 void BoundingBox::updateAllBoxes(const UpdateReason &reason) {
@@ -343,10 +341,6 @@ void BoundingBox::anim_setAbsFrame(const int frame) {
     }
 }
 
-void BoundingBox::startAllPointsTransform() {}
-
-void BoundingBox::finishAllPointsTransform() {}
-
 void BoundingBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
     Q_UNUSED(capStyle); }
 
@@ -373,16 +367,23 @@ bool BoundingBox::diffsIncludingInherited(
 
 void BoundingBox::setParentGroup(ContainerBox * const parent) {
     if(parent == mParentGroup) return;
+    if(mParentGroup) {
+        disconnect(mParentGroup.data(), &BoundingBox::ancestorChanged,
+                   this, &BoundingBox::ancestorChanged);
+    }
     prp_afterWholeInfluenceRangeChanged();
     mParentGroup = parent;
     mParent_k = parent;
     if(mParentGroup) {
         anim_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
         setParentTransform(parent->getTransformAnimator());
+        connect(mParentGroup.data(), &BoundingBox::ancestorChanged,
+                this, &BoundingBox::ancestorChanged);
     } else {
         setParentTransform(nullptr);
     }
     emit parentChanged(parent);
+    emit ancestorChanged();
 }
 
 void BoundingBox::setParentTransform(BasicTransformAnimator *parent) {
@@ -474,8 +475,7 @@ void BoundingBox::planScheduleUpdate(const UpdateReason& reason) {
     mSchedulePlanned = true;
     mPlannedReason = reason;
 
-    const auto parentCanvas = getParentCanvas();
-    if(parentCanvas && parentCanvas->isPreviewingOrRendering()) {
+    if(mParentScene && mParentScene->isPreviewingOrRendering()) {
         scheduleUpdate();
     }
 }
@@ -714,14 +714,13 @@ QMarginsF BoundingBox::getEffectsMargin(const qreal relFrame) {
 
 void BoundingBox::setupRenderData(const qreal relFrame,
                                   BoxRenderData * const data) {
-    const auto parentCanvas = getParentCanvas();
-    if(!parentCanvas) return;
+    if(!mParentScene) return;
     data->fBoxStateId = mStateId;
     data->fRelFrame = qRound(relFrame);
     data->fTransform = getTotalTransformAtRelFrameF(relFrame);
     data->fOpacity = mTransformAnimator->getOpacity(relFrame);
-    data->fResolution = parentCanvas->getResolutionFraction();
-    const bool effectsVisible = parentCanvas->getRasterEffectsVisible();
+    data->fResolution = mParentScene->getResolutionFraction();
+    const bool effectsVisible = mParentScene->getRasterEffectsVisible();
     data->fBaseMargin = QMargins() + 2;
     data->fBlendMode = getBlendMode();
 
@@ -730,7 +729,11 @@ void BoundingBox::setupRenderData(const qreal relFrame,
         setupGPUEffectsF(relFrame, data);
     }
 
-    data->fMaxBoundsRect = parentCanvas->getCurrentBounds();
+    bool unbound = false;
+    if(mParentGroup) unbound = mParentGroup->unboundChildren();
+    if(unbound) data->fMaxBoundsRect = mParentScene->getMaxBounds();
+    else data->fMaxBoundsRect = mParentScene->getCurrentBounds();
+
     if(data->fParentIsTarget && !data->nullifyBeforeProcessing()) {
         nullifyCurrentRenderData(data->fRelFrame);
     }
@@ -911,16 +914,16 @@ SmartVectorPath *BoundingBox::objectToVectorPathBox() { return nullptr; }
 SmartVectorPath *BoundingBox::strokeToVectorPathBox() { return nullptr; }
 
 void BoundingBox::selectionChangeTriggered(const bool shiftPressed) {
-    const auto parentCanvas = getParentCanvas();
+    Q_ASSERT(mParentScene);
     if(shiftPressed) {
         if(mSelected) {
-            parentCanvas->removeBoxFromSelection(this);
+            mParentScene->removeBoxFromSelection(this);
         } else {
-            parentCanvas->addBoxToSelection(this);
+            mParentScene->addBoxToSelection(this);
         }
     } else {
-        parentCanvas->clearBoxesSelection();
-        parentCanvas->addBoxToSelection(this);
+        mParentScene->clearBoxesSelection();
+        mParentScene->addBoxToSelection(this);
     }
 }
 
@@ -959,10 +962,7 @@ bool BoundingBox::hasDurationRectangle() const {
 void BoundingBox::createDurationRectangle() {
     const auto durRect = SPtrCreate(DurationRectangle)(this);
 //    durRect->setMinFrame(0);
-//    const auto parentCanvas = getParentCanvas();
-//    if(parentCanvas) {
-//        durRect->setFramesDuration(getParentCanvas()->getFrameCount());
-//    }
+//    if(mParentScene) durRect->setFramesDuration(mParentScene->getFrameCount());
     durRect->setMinFrame(anim_getCurrentRelFrame() - 5);
     durRect->setFramesDuration(10);
     setDurationRectangle(durRect);
@@ -1061,8 +1061,7 @@ void BoundingBox::drawTimelineControls(QPainter * const p,
         p->translate(prp_getParentFrameShift()*pixelsPerFrame, 0);
         const int width = qCeil(absFrameRange.span()*pixelsPerFrame);
         const QRect drawRect(0, 0, width, rowHeight);
-        const auto parentCanvas = getParentCanvas();
-        const qreal fps = parentCanvas ? parentCanvas->getFps() : 1;
+        const qreal fps = mParentScene ? mParentScene->getFps() : 1;
         mDurationRectangle->draw(p, drawRect, fps,
                                  pixelsPerFrame, absFrameRange);
         p->restore();
@@ -1335,7 +1334,7 @@ void BoundingBox::unlock() {
 
 void BoundingBox::setLocked(const bool bt) {
     if(bt == mLocked) return;
-    if(mSelected) getParentCanvas()->removeBoxFromSelection(this);
+    if(mParentScene && mSelected) mParentScene->removeBoxFromSelection(this);
     mLocked = bt;
     SWT_scheduleContentUpdate(SWT_BR_LOCKED);
     SWT_scheduleContentUpdate(SWT_BR_UNLOCKED);

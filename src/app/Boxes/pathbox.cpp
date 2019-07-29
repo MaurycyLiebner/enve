@@ -129,6 +129,7 @@ void PathBox::setParentGroup(ContainerBox * const parent) {
 
 void PathBox::setupRenderData(const qreal relFrame,
                               BoxRenderData * const data) {
+    if(!mParentScene) return;
     BoundingBox::setupRenderData(relFrame, data);
 
     bool currentEditPathCompatible = false;
@@ -165,7 +166,7 @@ void PathBox::setupRenderData(const qreal relFrame,
         pathData->fPath = mPathSk;
     } else {
         pathData->fPath = pathData->fEditPath;
-        if(getParentCanvas()->getPathEffectsVisible()) {
+        if(mParentScene->getPathEffectsVisible()) {
             mPathEffectsAnimators->apply(relFrame, &pathData->fPath);
             const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
             const qreal parentRelFrame =
@@ -189,7 +190,7 @@ void PathBox::setupRenderData(const qreal relFrame,
             mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
             strokerSk.strokePath(outlineBase, &outline);
         }
-        if(getParentCanvas()->getPathEffectsVisible()) {
+        if(mParentScene->getPathEffectsVisible()) {
             mOutlinePathEffectsAnimators->apply(relFrame, &outline);
             mParentGroup->filterOutlinePath(relFrame, &outline);
         }

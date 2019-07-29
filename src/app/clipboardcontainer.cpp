@@ -34,7 +34,7 @@ void BoxesClipboardContainer::pasteTo(ContainerBox* const parent) {
     target.close();
     BoundingBox::sClearReadBoxes();
     const int newCount = parent->getContainedBoxesCount();
-    const auto parentCanvas = parent->getParentCanvas();
+    const auto parentCanvas = parent->getParentScene();
     if(parentCanvas) {
         const auto& list = parent->getContainedBoxes();
         for(int i = oldCount; i < newCount; i++) {

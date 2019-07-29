@@ -57,7 +57,8 @@ public:
     void apply(BoundingBox * const box,
                const PaintSetting::Target& target) const;
 protected:
-    QColor mColor = QColor(0, 0, 0);
+    qreal mOpacity = 1;
+    QColor mColor;
     PaintType mPaintType = FLATPAINT;//NOPAINT;
     Gradient *mGradient = nullptr;
     QPointF mGradientP1;

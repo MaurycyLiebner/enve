@@ -307,10 +307,6 @@ public:
     void setPreviewing(const bool bT);
     void setOutputRendering(const bool bT);
 
-    Canvas *getParentCanvas() {
-        return this;
-    }
-
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool parentSatisfies,
                              const bool parentMainTarget) const;
@@ -357,7 +353,7 @@ public:
     }
 
     QRect getMaxBounds() const {
-        return QRect(-mWidth, - mHeight, 3*mWidth, 3*mHeight);
+        return QRect(-mWidth/2, - mHeight/2, 2*mWidth, 2*mHeight);
     }
 
     QRect getCurrentBounds() const {
@@ -466,7 +462,8 @@ public:
 
     BoundingBox *getBoxAt(const QPointF &absPos) {
         if(mClipToCanvasSize) {
-            if(!QRectF(getCurrentBounds()).contains(absPos)) return nullptr;
+            const auto bRect = Canvas::getCurrentBounds();
+            if(!QRectF(bRect).contains(absPos)) return nullptr;
         }
         return ContainerBox::getBoxAt(absPos);
     }

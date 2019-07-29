@@ -726,7 +726,7 @@ bool extractTranslation(const QString& str, QMatrix& target) {
     }
 
     const QRegExp rx2("translate\\("
-                      "\\s*(-?\\d+(\\.\\d*)?),"
+                      "\\s*(-?\\d+(\\.\\d*)?)[,|\\s+]"
                       "\\s*(-?\\d+(\\.\\d*)?)"
                       "\\)", Qt::CaseInsensitive);
     if(rx2.exactMatch(str)) {
@@ -754,7 +754,7 @@ bool extractScale(const QString& str, QMatrix& target) {
     }
 
     const QRegExp rx2("scale\\("
-                      "\\s*(-?\\d+(\\.\\d*)?),"
+                      "\\s*(-?\\d+(\\.\\d*)?)[,|\\s+]"
                       "\\s*(-?\\d+(\\.\\d*)?)"
                       "\\)", Qt::CaseInsensitive);
     if(rx2.exactMatch(str)) {
@@ -783,22 +783,22 @@ bool extractRotate(const QString& str, QMatrix& target) {
 
 bool extractWholeMatrix(const QString& str, QMatrix& target) {
     const QRegExp rx("matrix\\("
-                     "\\s*(-?\\d+(\\.\\d*)?),"
-                     "\\s*(-?\\d+(\\.\\d*)?),"
-                     "\\s*(-?\\d+(\\.\\d*)?),"
-                     "\\s*(-?\\d+(\\.\\d*)?),"
-                     "\\s*(-?\\d+(\\.\\d*)?),"
-                     "\\s*(-?\\d+(\\.\\d*)?)"
+                     "\\s*(-?[\\.|\\d]+)[,|\\s+]"
+                     "\\s*(-?[\\.|\\d]+)[,|\\s+]"
+                     "\\s*(-?[\\.|\\d]+)[,|\\s+]"
+                     "\\s*(-?[\\.|\\d]+)[,|\\s+]"
+                     "\\s*(-?[\\.|\\d]+)[,|\\s+]"
+                     "\\s*(-?[\\.|\\d]+)"
                      "\\)", Qt::CaseInsensitive);
     if(rx.exactMatch(str)) {
         rx.indexIn(str);
         const QStringList capturedTxt = rx.capturedTexts();
         target.setMatrix(capturedTxt.at(1).toDouble(),
+                         capturedTxt.at(2).toDouble(),
                          capturedTxt.at(3).toDouble(),
+                         capturedTxt.at(4).toDouble(),
                          capturedTxt.at(5).toDouble(),
-                         capturedTxt.at(7).toDouble(),
-                         capturedTxt.at(9).toDouble(),
-                         capturedTxt.at(11).toDouble());
+                         capturedTxt.at(6).toDouble());
         return true;
     }
     return false;
@@ -1195,9 +1195,14 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
     const QString fillAttributesStr = element.attribute("fill");
     if(!fillAttributesStr.isEmpty()) setFillAttribute(fillAttributesStr);
 
+    const QString fillOp = element.attribute("fill-opacity");
+    if(!fillOp.isEmpty()) mFillAttributes.setColorOpacity(toDouble(fillOp));
+
     const QString strokeAttributesStr = element.attribute("stroke");
     if(!strokeAttributesStr.isEmpty()) setStrokeAttribute(strokeAttributesStr);
 
+    const QString strokeOp = element.attribute("stroke-opacity");
+    if(!strokeOp.isEmpty()) mFillAttributes.setColorOpacity(toDouble(strokeOp));
 
     const QString matrixStr = element.attribute("transform");
 //    const QString transCenterX = element.attribute("inkscape:transform-center-x");
@@ -1999,11 +2004,13 @@ bool parsePathDataFast(const QStringRef &dataStr, VectorPath *path)
 
 void FillSvgAttributes::setColor(const QColor &val) {
     mColor = val;
+    mColor.setAlphaF(val.alphaF()*mOpacity);
     setPaintType(FLATPAINT);
 }
 
 void FillSvgAttributes::setColorOpacity(const qreal opacity) {
     mColor.setAlphaF(opacity);
+    mOpacity = opacity;
 }
 
 void FillSvgAttributes::setPaintType(const PaintType &type) {

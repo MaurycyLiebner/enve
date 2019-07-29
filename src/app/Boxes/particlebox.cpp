@@ -113,12 +113,6 @@ void ParticleBox::applyPaintSetting(const PaintSettingsApplier &setting) {
 //    }
 }
 
-void ParticleBox::startAllPointsTransform() {
-    mBottomRightPoint->startTransform();
-    mTopLeftPoint->startTransform();
-    startTransform();
-}
-
 MovablePoint *ParticleBox::getBottomRightPoint() {
     return mBottomRightPoint.get();
 }

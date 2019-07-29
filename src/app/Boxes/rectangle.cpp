@@ -47,18 +47,6 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
 }
 
-void Rectangle::startAllPointsTransform() {
-    mTopLeftPoint->startTransform();
-    mBottomRightPoint->startTransform();
-    startTransform();
-}
-
-void Rectangle::finishAllPointsTransform() {
-    mTopLeftPoint->finishTransform();
-    mBottomRightPoint->finishTransform();
-    finishTransform();
-}
-
 SkPath Rectangle::getPathAtRelFrameF(const qreal relFrame) {
     SkPath path;
     const SkPoint topLeft =
