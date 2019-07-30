@@ -22,6 +22,7 @@
 #include "Animators/effectanimators.h"
 #include "PixmapEffects/pixmapeffect.h"
 #include "Boxes/pathbox.h"
+#include "canvas.h"
 
 #include "Animators/SmartPath/smartpathcollection.h"
 
@@ -56,8 +57,8 @@ bool BoxSingleWidget::sStaticPixmapsLoaded = false;
 #include <QMenu>
 #include <QInputDialog>
 
-BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
-    SingleWidget(parent) {
+BoxSingleWidget::BoxSingleWidget(BoxScrollWidgetVisiblePart * const parent) :
+    SingleWidget(parent), mParent(parent) {
     mMainLayout = new QHBoxLayout(this);
     setLayout(mMainLayout);
     mMainLayout->setSpacing(0);
@@ -542,98 +543,15 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
         setSelected(true);
         QMenu menu(this);
 
-        if(target->SWT_isBoundingBox()) {
-            const auto boxTarget = GetAsPtr(target, BoundingBox);
-            menu.addAction("Rename", [this]() {
-                rename();
-            });
-            if(!target->SWT_isParticleBox() &&
-               !target->SWT_isAnimationBox()) {
-                QAction * const durRectAct = menu.addAction("Visibility Range",
-                                                            [boxTarget]() {
-                    if(boxTarget->hasDurationRectangle()) {
-                        boxTarget->setDurationRectangle(nullptr);
-                    } else {
-                        boxTarget->createDurationRectangle();
-                    }
-                });
-                durRectAct->setCheckable(true);
-                durRectAct->setChecked(boxTarget->hasDurationRectangle());
-            }
-            const auto durRect = boxTarget->getDurationRectangle();
-            if(durRect) {
-                menu.addAction("Visibility Range Settings...",
-                               [this, durRect]() {
-                    durRect->openDurationSettingsDialog(this);
-                });
-            }
-            menu.addSeparator();
-
-            const auto effMenu = menu.addMenu("Effects");
-
-            if(target->SWT_isPathBox()) {
-                const auto pathTarget = GetAsPtr(target, PathBox);
-                QAction * const pEffects = effMenu->addAction("Path Effects",
-                                                              [pathTarget]() {
-                    pathTarget->setPathEffectsEnabled(
-                                !pathTarget->getPathEffectsEnabled());
-                });
-                pEffects->setCheckable(true);
-                pEffects->setChecked(pathTarget->getPathEffectsEnabled());
-
-                QAction * const fEffects = effMenu->addAction("Fill Effects",
-                                                              [pathTarget]() {
-                    pathTarget->setFillEffectsEnabled(
-                                !pathTarget->getFillEffectsEnabled());
-                });
-                fEffects->setCheckable(true);
-                fEffects->setChecked(pathTarget->getFillEffectsEnabled());
-
-                QAction * const oEffects = effMenu->addAction("Outline Effects",
-                                                              [pathTarget]() {
-                    pathTarget->setOutlineEffectsEnabled(
-                                !pathTarget->getOutlineEffectsEnabled());
-                });
-                oEffects->setCheckable(true);
-                oEffects->setChecked(pathTarget->getOutlineEffectsEnabled());
-            }
-
-            QAction * const rEffects = effMenu->addAction("Raster Effects",
-                                                          [boxTarget]() {
-                boxTarget->setRasterEffectsEnabled(
-                            !boxTarget->getRasterEffectsEnabled());
-            });
-            rEffects->setCheckable(true);
-            rEffects->setChecked(boxTarget->getRasterEffectsEnabled());
-
-            QAction * const gpuEffects = effMenu->addAction("GPU Effects",
-                                                           [boxTarget]() {
-                boxTarget->setGPUEffectsEnabled(
-                            !boxTarget->getGPUEffectsEnabled());
-            });
-            gpuEffects->setCheckable(true);
-            gpuEffects->setChecked(boxTarget->getRasterEffectsEnabled());
-        }
         if(target->SWT_isProperty()) {
+            const auto pTarget = static_cast<Property*>(target);
+            PropertyMenu pMenu(&menu, mParent->currentScene(), MainWindow::getInstance());
+            pTarget->setupTreeViewMenu(&pMenu);
             auto clipboard = Document::sInstance->getPropertyClipboardContainer();
             menu.addAction("Copy", [target]() {
-                if(target->SWT_isBoundingBox()) {
-                    auto container = SPtrCreate(BoxesClipboardContainer)();
-                    QBuffer targetT(container->getBytesArray());
-                    targetT.open(QIODevice::WriteOnly);
-                    int nBoxes = 1;
-                    targetT.write(rcChar(&nBoxes), sizeof(int));
-                    auto boxTarget = GetAsPtr(target, BoundingBox);
-                    boxTarget->writeBoundingBox(&targetT);
-                    targetT.close();
-
-                    Document::sInstance->replaceClipboard(container);
-                } else {
-                    auto container = SPtrCreate(PropertyClipboardContainer)();
-                    container->setProperty(GetAsPtr(target, Property));
-                    Document::sInstance->replaceClipboard(container);
-                }
-                BoundingBox::sClearWriteBoxes();
+                auto container = SPtrCreate(PropertyClipboardContainer)();
+                container->setProperty(GetAsPtr(target, Property));
+                Document::sInstance->replaceClipboard(container);
             });
             if(clipboard) {
                 if(target->SWT_isBoundingBox()) {
@@ -846,26 +764,9 @@ void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e) {
     if(e->modifiers() & Qt::ShiftModifier) {
         //mousePressEvent(e);
     } else {
-        rename();
         Document::sInstance->actionFinished();
     }
 }
-
-void BoxSingleWidget::rename() {
-    const auto target = mTarget->getTarget();
-    if(target->SWT_isBoundingBox()) {
-        const auto boxTarget = GetAsPtr(target, BoundingBox);
-        bool ok;
-        const QString text = QInputDialog::getText(this, tr("New name dialog"),
-                                             tr("Name:"), QLineEdit::Normal,
-                                             boxTarget->prp_getName(), &ok);
-        if(ok) {
-            boxTarget->prp_setName(text);
-            boxTarget->SWT_scheduleSearchContentUpdate();
-        }
-    }
-}
-
 void BoxSingleWidget::drawKeys(QPainter * const p,
                                const qreal pixelsPerFrame,
                                const FrameRange &viewedFrames) {

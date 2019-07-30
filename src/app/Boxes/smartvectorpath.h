@@ -20,7 +20,7 @@ protected:
 public:
     bool SWT_isSmartVectorPath() const { return true; }
 
-    void addActionsToMenu(BoxTypeMenu * const menu);
+    void setupCanvasMenu(PropertyMenu * const menu);
 
     SkPath getPathAtRelFrameF(const qreal relFrame);
 

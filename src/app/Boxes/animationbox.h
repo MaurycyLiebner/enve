@@ -37,7 +37,7 @@ public:
 
 
     bool SWT_isAnimationBox() const { return true; }
-    void addActionsToMenu(BoxTypeMenu * const menu);
+    void setupCanvasMenu(PropertyMenu * const menu);
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data);
     stdsptr<BoxRenderData> createRenderData();

@@ -15,7 +15,7 @@ public:
 
     void writeProperty(QIODevice * const dst) const;
     void readProperty(QIODevice * const src);
-    void addActionsToMenu(PropertyTypeMenu * const menu);
+    void setupTreeViewMenu(PropertyMenu * const menu);
 
     void qra_setCurrentValue(const QColor &qcolorValue);
 

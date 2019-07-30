@@ -35,14 +35,14 @@ public:
     }
 
     template <typename U>
-    static void sAddToMenu(BoxTypeMenu * const menu,
+    static void sAddToMenu(PropertyMenu * const menu,
                            const U &adder) {
         for(const auto& creator : sEffectCreators)
             sAddToMenu(menu, creator, adder);
     }
 private:
     template <typename U>
-    static void sAddToMenu(BoxTypeMenu * const menu,
+    static void sAddToMenu(PropertyMenu * const menu,
                            const CustomGpuEffectCreator& creator,
                            const U &adder) {
         menu->addPlainAction<BoundingBox>(creator.mName(),

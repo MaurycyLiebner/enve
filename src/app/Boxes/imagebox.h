@@ -66,7 +66,7 @@ protected:
     ImageBox(const QString &filePath);
 public:
     bool SWT_isImageBox() const { return true; }
-    void addActionsToMenu(BoxTypeMenu * const menu);
+    void setupCanvasMenu(PropertyMenu * const menu);
 
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data);

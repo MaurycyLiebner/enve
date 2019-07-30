@@ -50,22 +50,22 @@ void ImageBox::reload() {
 }
 
 #include "typemenu.h"
-void ImageBox::addActionsToMenu(BoxTypeMenu * const menu) {
+void ImageBox::setupCanvasMenu(PropertyMenu * const menu) {
     const auto widget = menu->getParentWidget();
 
-    const BoxTypeMenu::PlainOp<ImageBox> reloadOp =
+    const PropertyMenu::PlainSelectedOp<ImageBox> reloadOp =
     [](ImageBox * box) {
         box->reload();
     };
     menu->addPlainAction("Reload", reloadOp);
 
-    const BoxTypeMenu::PlainOp<ImageBox> setSrcOp =
+    const PropertyMenu::PlainSelectedOp<ImageBox> setSrcOp =
     [widget](ImageBox * box) {
         box->changeSourceFile(widget);
     };
     menu->addPlainAction("Set Source File...", setSrcOp);
 
-    BoundingBox::addActionsToMenu(menu);
+    BoundingBox::setupCanvasMenu(menu);
 }
 
 void ImageBox::changeSourceFile(QWidget * const dialogParent) {

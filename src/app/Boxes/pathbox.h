@@ -178,6 +178,7 @@ public:
     void setOutlinePathOutdated() {
         mCurrentOutlinePathOutdated = true;
     }
+    void setupCanvasMenu(PropertyMenu * const menu);
 protected:
     bool mOutlineAffectedByScale = true;
     bool mCurrentPathsOutdated = true;

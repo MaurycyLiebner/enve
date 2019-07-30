@@ -34,7 +34,7 @@ public:
                          BoxRenderData * const data);
     stdsptr<BoxRenderData> createRenderData();
 
-    void addActionsToMenu(BoxTypeMenu * const menu);
+    void setupCanvasMenu(PropertyMenu * const menu);
 
     AnimatedSurface * getSurface() const {
         return mSurface.get();

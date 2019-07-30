@@ -202,36 +202,24 @@ void ColorAnimator::setCurrentAlphaValue(const qreal alpha) {
     mAlphaAnimator->setCurrentBaseValue(alpha);
 }
 
-void ColorAnimator::addActionsToMenu(PropertyTypeMenu * const menu) {
+void ColorAnimator::setupTreeViewMenu(PropertyMenu * const menu) {
     const auto colorModeMenu = menu->addMenu("Color Mode");
 
-    QAction *rgbAction = new QAction("RGB");
-    rgbAction->setCheckable(true);
-    rgbAction->setChecked(mColorMode == RGBMODE);
-
-    QAction *hsvAction = new QAction("HSV");
-    hsvAction->setCheckable(true);
-    hsvAction->setChecked(mColorMode == HSVMODE);
-
-    QAction *hslAction = new QAction("HSL");
-    hslAction->setCheckable(true);
-    hslAction->setChecked(mColorMode == HSLMODE);
-
-    const PropertyTypeMenu::CheckOp<ColorAnimator> rgbOp =
+    const PropertyMenu::CheckSelectedOp<ColorAnimator> rgbOp =
     [](ColorAnimator * anim, bool checked) {
         Q_UNUSED(checked);
         anim->setColorMode(RGBMODE);
     };
     colorModeMenu->addCheckableAction("RGB", mColorMode == RGBMODE, rgbOp);
 
-    const PropertyTypeMenu::CheckOp<ColorAnimator> hsvOp =
+    const PropertyMenu::CheckSelectedOp<ColorAnimator> hsvOp =
     [](ColorAnimator * anim, bool checked) {
         Q_UNUSED(checked);
         anim->setColorMode(RGBMODE);
     };
     colorModeMenu->addCheckableAction("HSV", mColorMode == HSVMODE, hsvOp);
 
-    const PropertyTypeMenu::CheckOp<ColorAnimator> hslOp =
+    const PropertyMenu::CheckSelectedOp<ColorAnimator> hslOp =
     [](ColorAnimator * anim, bool checked) {
         Q_UNUSED(checked);
         anim->setColorMode(RGBMODE);

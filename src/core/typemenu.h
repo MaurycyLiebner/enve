@@ -15,68 +15,97 @@ class TypeMenu {
     friend class Canvas;
     using TTypeMenu = TypeMenu<Type>;
 public:
-    template <class T> using PlainOp = std::function<void(T*)>;
-    template <class T> using CheckOp = std::function<void(T*, bool)>;
-    template <class T> using AllOp = std::function<void(QList<T*>)>;
+    using PlainTriggeredOp = std::function<void()>;
+    using CheckTriggeredOp = std::function<void(bool)>;
+    template <class T> using PlainSelectedOp = std::function<void(T*)>;
+    template <class T> using CheckSelectedOp = std::function<void(T*, bool)>;
+    template <class T> using AllOp = std::function<void(const QList<T*>&)>;
 
     TypeMenu(QMenu * const targetMenu,
              CanvasBase * const targetCanvas,
              QWidget * const parent) :
-        mTargetMenu(targetMenu),
+        mQMenu(targetMenu),
         mTargetCanvas(targetCanvas),
         mParentWidget(parent) {}
 
-    template <class T>
+    QAction* addSection(const QString& name) {
+        return mQMenu->addSection(name);
+    }
+
     QAction* addCheckableAction(const QString& text, const bool checked,
-                                const CheckOp<T>& op) {
-        QAction * const qAction = mTargetMenu->addAction(text);
+                                const CheckTriggeredOp& op) {
+        QAction * const qAction = mQMenu->addAction(text);
         qAction->setCheckable(true);
         qAction->setChecked(checked);
-        const PlainOp<T> plainOp = [op, checked](T* pt) {
+        QObject::connect(qAction, &QAction::triggered, op);
+        return qAction;
+    }
+
+    template <class T>
+    QAction* addCheckableAction(const QString& text, const bool checked,
+                                const CheckSelectedOp<T>& op) {
+        QAction * const qAction = mQMenu->addAction(text);
+        qAction->setCheckable(true);
+        qAction->setChecked(checked);
+        const PlainSelectedOp<T> plainOp = [op, checked](T* pt) {
             op(pt, !checked);
         };
         connectAction(qAction, plainOp);
         return qAction;
     }
 
+    QAction* addPlainAction(const QString& text, const PlainTriggeredOp& op) {
+        QAction * const qAction = mQMenu->addAction(text);
+        QObject::connect(qAction, &QAction::triggered, op);
+        return qAction;
+    }
+
     template <class T>
-    QAction* addPlainAction(const QString& text, const PlainOp<T>& op) {
-        QAction * const qAction = mTargetMenu->addAction(text);
+    QAction* addPlainAction(const QString& text, const PlainSelectedOp<T>& op) {
+        QAction * const qAction = mQMenu->addAction(text);
         connectAction(qAction, op);
         return qAction;
     }
 
     template <class T>
-    QAction* addAllAction(const QString& text, const AllOp<T>& op) {
-        QAction * const qAction = mTargetMenu->addAction(text);
-        connectAllAction(qAction, op);
+    QAction* addPlainAction(const QString& text, const AllOp<T>& op) {
+        QAction * const qAction = mQMenu->addAction(text);
+        connectAction(qAction, op);
         return qAction;
     }
 
     TTypeMenu * addMenu(const QString& title) {
-        QMenu * const qMenu = mTargetMenu->addMenu(title);
+        QMenu * const qMenu = mQMenu->addMenu(title);
         const auto child = std::make_shared<TTypeMenu>(qMenu, mTargetCanvas,
                                                        mParentWidget);
         mChildMenus.append(child);
         return child.get();
     }
 
-    void addSeparator() {
-        mTargetMenu->addSeparator();
+    QAction* addSeparator() {
+        return mQMenu->addSeparator();
     }
 
     bool isEmpty() {
-        return mTargetMenu->isEmpty();
+        return mQMenu->isEmpty();
     }
 
     void clear() {
-        mTargetMenu->clear();
+        mQMenu->clear();
         mChildMenus.clear();
         mTypeIndex.clear();
     }
 
     QWidget* getParentWidget() const {
         return mParentWidget;
+    }
+
+    void addSharedMenu(const QString& name) {
+        mSharedMenus << name;
+    }
+
+    bool hasSharedMenu(const QString& name) const {
+        return mSharedMenus.contains(name);
     }
 protected:
     void addedActionsForType(Type * const obj) {
@@ -118,7 +147,7 @@ private:
     }
 
     template <class T>
-    void connectAction(QAction * const qAction, const PlainOp<T>& op) {
+    void connectAction(QAction * const qAction, const PlainSelectedOp<T>& op) {
         connectAction(static_cast<T*>(nullptr), qAction, op);
     }
 
@@ -127,15 +156,16 @@ private:
         connectAction(static_cast<T*>(nullptr), qAction, op);
     }
 
-    QMenu * const mTargetMenu;
+    QMenu * const mQMenu;
     CanvasBase * const mTargetCanvas;
     QWidget * const mParentWidget;
 
     QList<stdsptr<TTypeMenu>> mChildMenus;
     QList<std::type_index> mTypeIndex;
+    QStringList mSharedMenus;
 };
 
-typedef TypeMenu<BoundingBox> BoxTypeMenu;
-typedef  TypeMenu<Property> PropertyTypeMenu;
+typedef TypeMenu<MovablePoint> PointTypeMenu;
+typedef TypeMenu<Property> PropertyMenu;
 
 #endif // TYPEMENU_H

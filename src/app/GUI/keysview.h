@@ -34,6 +34,7 @@ public:
                       QWidget *parent = nullptr);
 
     void setCurrentScene(Canvas* const scene);
+    Canvas* currentScene() const { return mCurrentScene; }
 
     void setGraphViewed(const bool bT);
 

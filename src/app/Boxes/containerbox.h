@@ -40,7 +40,7 @@ public:
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool parentSatisfies,
                              const bool parentMainTarget) const;
-    void addActionsToMenu(BoxTypeMenu * const menu);
+    void setupCanvasMenu(PropertyMenu * const menu);
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
     FrameRange getFirstAndLastIdenticalForMotionBlur(

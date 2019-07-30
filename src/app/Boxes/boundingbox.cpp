@@ -62,6 +62,8 @@ BoundingBox::BoundingBox(const BoundingBoxType type) :
     connect(this, &BoundingBox::ancestorChanged, this, [this]() {
         mParentScene = mParentGroup ? mParentGroup->mParentScene : nullptr;
     });
+    connect(this, &Property::prp_nameChanged, this,
+            &SingleWidgetTarget::SWT_scheduleSearchContentUpdate);
 }
 
 BoundingBox::~BoundingBox() {
@@ -614,48 +616,47 @@ QRectF BoundingBox::getRelBoundingRect(const qreal relFrame) {
 #include "PixmapEffects/pixmapeffectsinclude.h"
 template <typename T>
 void addEffectAction(const QString& text,
-                     BoxTypeMenu * const menu) {
-    const BoxTypeMenu::PlainOp<BoundingBox> op = [](BoundingBox * box) {
+                     PropertyMenu * const menu) {
+    const PropertyMenu::PlainSelectedOp<BoundingBox> op = [](BoundingBox * box) {
         box->addEffect<T>();
     };
     menu->addPlainAction(text, op);
 }
 
 #include "patheffectsmenu.h"
-void BoundingBox::addActionsToMenu(BoxTypeMenu * const menu) {
+void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
+    menu->addSection("Box");
+
+    const PropertyMenu::AllOp<BoundingBox> copyOp =
+    [](const QList<BoundingBox*>& boxes) {
+        auto container = SPtrCreate(BoxesClipboardContainer)();
+        QBuffer targetT(container->getBytesArray());
+        targetT.open(QIODevice::WriteOnly);
+        const int nBoxes = boxes.count();
+        targetT.write(rcConstChar(&nBoxes), sizeof(int));
+        for(const auto& box : boxes)
+            box->writeBoundingBox(&targetT);
+        targetT.close();
+
+        Document::sInstance->replaceClipboard(container);
+        BoundingBox::sClearWriteBoxes();
+    };
+
+    menu->addPlainAction("Copy", copyOp);
+
+    const auto gpuEffectsMenu = menu->addMenu("Raster Effects");
+    CustomGpuEffectCreator::sAddToMenu(gpuEffectsMenu, &BoundingBox::addGPUEffect);
+    if(!gpuEffectsMenu->isEmpty()) gpuEffectsMenu->addSeparator();
+    for(const auto& creator : ShaderEffectCreator::sEffectCreators) {
+        const PropertyMenu::PlainSelectedOp<BoundingBox> op =
+        [creator](BoundingBox * box) {
+            const auto effect = GetAsSPtr(creator->create(), ShaderEffect);
+            box->addGPUEffect(effect);
+        };
+        gpuEffectsMenu->addPlainAction(creator->fName, op);
+    }
+
     menu->addSeparator();
-
-//    if(SWT_isPathBox() || SWT_isContainerBox()) {
-        PathEffectsMenu::addPathEffectsToActionMenu(menu);
-//    }
-
-    menu->addSeparator();
-
-//    if(!SWT_isGroupBox()) {
-        const auto effectsMenu = menu->addMenu("Effects");
-        addEffectAction<BlurEffect>("Blur", effectsMenu);
-        addEffectAction<SampledMotionBlurEffect>("Motion Blur", effectsMenu);
-        addEffectAction<ShadowEffect>("Shadow", effectsMenu);
-        addEffectAction<DesaturateEffect>("Desaturate", effectsMenu);
-        addEffectAction<ColorizeEffect>("Colorize", effectsMenu);
-        addEffectAction<ContrastEffect>("Contrast", effectsMenu);
-        addEffectAction<BrightnessEffect>("Brightness", effectsMenu);
-        addEffectAction<ReplaceColorEffect>("Replace Color", effectsMenu);
-
-        const auto gpuEffectsMenu = menu->addMenu("GPU Effects");
-        CustomGpuEffectCreator::sAddToMenu(gpuEffectsMenu, &BoundingBox::addGPUEffect);
-        if(!gpuEffectsMenu->isEmpty()) gpuEffectsMenu->addSeparator();
-        for(const auto& creator : ShaderEffectCreator::sEffectCreators) {
-            const BoxTypeMenu::PlainOp<BoundingBox> op =
-            [creator](BoundingBox * box) {
-                const auto effect = GetAsSPtr(creator->create(), ShaderEffect);
-                box->addGPUEffect(effect);
-            };
-            gpuEffectsMenu->addPlainAction(creator->fName, op);
-        }
-
-        menu->addSeparator();
-//    }
 }
 
 
@@ -993,6 +994,7 @@ int BoundingBox::prp_getRelFrameShift() const {
 void BoundingBox::setDurationRectangle(
         const qsptr<DurationRectangle>& durationRect) {
     if(durationRect == mDurationRectangle) return;
+    Q_ASSERT(!mDurationRectangleLocked);
     if(mDurationRectangle) {
         disconnect(mDurationRectangle.data(), nullptr, this, nullptr);
     }
@@ -1084,6 +1086,37 @@ void BoundingBox::removePathEffect(const qsptr<PathEffect> &) {}
 void BoundingBox::removeFillPathEffect(const qsptr<PathEffect> &) {}
 
 void BoundingBox::removeOutlinePathEffect(const qsptr<PathEffect> &) {}
+
+#include <QInputDialog>
+void BoundingBox::setupTreeViewMenu(PropertyMenu * const menu) {
+    const auto parentWidget = menu->getParentWidget();
+    menu->addPlainAction("Rename", [this, parentWidget]() {
+        bool ok;
+        const QString text = QInputDialog::getText(parentWidget, tr("New name dialog"),
+                                                   tr("Name:"), QLineEdit::Normal,
+                                                   prp_getName(), &ok);
+        if(ok) prp_setName(text);
+    });
+
+    const PropertyMenu::CheckSelectedOp<BoundingBox> visRangeOp =
+    [](BoundingBox* const box, const bool checked) {
+        if(box->mDurationRectangleLocked) return;
+        const bool hasDur = box->hasDurationRectangle();
+        if(hasDur == checked) return;
+        if(checked) box->createDurationRectangle();
+        else box->setDurationRectangle(nullptr);
+    };
+
+    menu->addCheckableAction("Visibility Range",
+                             hasDurationRectangle(),
+                             visRangeOp);
+    menu->addPlainAction("Visibility Range Settings...",
+                         [this, parentWidget]() {
+        mDurationRectangle->openDurationSettingsDialog(parentWidget);
+    })->setEnabled(mDurationRectangle);
+
+    setupCanvasMenu(menu->addMenu("Actions"));
+}
 
 bool BoundingBox::isVisibleAndInVisibleDurationRect() const {
     return isFrameInDurationRect(anim_getCurrentRelFrame()) && mVisible;

@@ -88,10 +88,10 @@ qreal textLineX(const Qt::Alignment &alignment,
     }
 }
 
-void TextBox::addActionsToMenu(BoxTypeMenu * const menu) {
-    PathBox::addActionsToMenu(menu);
+void TextBox::setupCanvasMenu(PropertyMenu * const menu) {
+    PathBox::setupCanvasMenu(menu);
     const auto widget = menu->getParentWidget();
-    BoxTypeMenu::PlainOp<TextBox> op = [widget](TextBox * box) {
+    PropertyMenu::PlainSelectedOp<TextBox> op = [widget](TextBox * box) {
         box->openTextEditor(widget);
     };
     menu->addPlainAction("Set Text...", op);

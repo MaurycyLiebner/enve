@@ -26,15 +26,15 @@ SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
 
 #include <QInputDialog>
 #include "typemenu.h"
-void SingleSound::addActionsToMenu(PropertyTypeMenu * const menu) {
-    const BoxTypeMenu::CheckOp<SingleSound> enableOp =
+void SingleSound::setupTreeViewMenu(PropertyMenu * const menu) {
+    const PropertyMenu::CheckSelectedOp<SingleSound> enableOp =
             [](SingleSound * sound, bool enable) {
         sound->setEnabled(enable);
     };
     menu->addCheckableAction("Enabled", isEnabled(), enableOp);
     if(videoSound()) return;
     const auto widget = menu->getParentWidget();
-    const BoxTypeMenu::PlainOp<SingleSound> stretchOp =
+    const PropertyMenu::PlainSelectedOp<SingleSound> stretchOp =
             [this, widget](SingleSound * sound) {
         bool ok = false;
         const int stretch = QInputDialog::getInt(widget,

@@ -23,9 +23,9 @@ stdsptr<BoxRenderData> PaintBox::createRenderData() {
 
 #include <QFileDialog>
 #include "typemenu.h"
-void PaintBox::addActionsToMenu(BoxTypeMenu * const menu) {
+void PaintBox::setupCanvasMenu(PropertyMenu * const menu) {
     const auto widget = menu->getParentWidget();
-    BoxTypeMenu::PlainOp<PaintBox> op = [widget](PaintBox * box) {
+    PropertyMenu::PlainSelectedOp<PaintBox> op = [widget](PaintBox * box) {
         const QString importPath = QFileDialog::getOpenFileName(
                                         widget,
                                         "Load From Image", "",
@@ -39,5 +39,5 @@ void PaintBox::addActionsToMenu(BoxTypeMenu * const menu) {
     };
     menu->addPlainAction("Load From Image", op);
 
-    BoundingBox::addActionsToMenu(menu);
+    BoundingBox::setupCanvasMenu(menu);
 }

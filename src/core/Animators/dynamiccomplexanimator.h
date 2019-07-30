@@ -32,7 +32,7 @@ public:
         for(int i = 0; i < nProps; i++) {
             const auto prop = TReadTypeAndCreate(src);
             prop->readProperty(src);
-            ca_addChildAnimator(prop);
+            addChild(prop);
         }
     }
 

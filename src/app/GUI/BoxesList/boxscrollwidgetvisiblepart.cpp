@@ -95,6 +95,10 @@ DurationRectangleMovable *BoxScrollWidgetVisiblePart::getRectangleMovableAtPos(
     return nullptr;
 }
 
+Canvas *BoxScrollWidgetVisiblePart::currentScene() const {
+    return mKeysView->currentScene();
+}
+
 void BoxScrollWidgetVisiblePart::getKeysInRect(
         QRectF selectionRect,
         const qreal pixelsPerFrame,

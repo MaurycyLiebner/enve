@@ -60,7 +60,7 @@ typedef PropertyMimeData<BoundingBox,
 
 class BoundingBox;
 template<typename T> class TypeMenu;
-typedef TypeMenu<BoundingBox> BoxTypeMenu;
+typedef TypeMenu<Property> PropertyMenu;
 
 class BoundingBox : public StaticComplexAnimator {
     Q_OBJECT
@@ -175,7 +175,8 @@ public:
     virtual void removeFillPathEffect(const qsptr<PathEffect>&);
     virtual void removeOutlinePathEffect(const qsptr<PathEffect>&);
 
-    virtual void addActionsToMenu(BoxTypeMenu * const menu);
+    void setupTreeViewMenu(PropertyMenu * const menu) final;
+    virtual void setupCanvasMenu(PropertyMenu * const menu);
 
     virtual stdsptr<BoxRenderData> createRenderData();
     virtual void setupRenderData(const qreal relFrame,
@@ -441,6 +442,7 @@ protected:
     RenderDataHandler mCurrentRenderDataHandler;
     RenderContainer mDrawRenderContainer;
 
+    bool mDurationRectangleLocked = false;
     qsptr<DurationRectangle> mDurationRectangle;
     const qsptr<BoxTransformAnimator> mTransformAnimator;
 

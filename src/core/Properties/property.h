@@ -71,7 +71,7 @@ private:
 
 class Property;
 template<typename T> class TypeMenu;
-typedef TypeMenu<Property> PropertyTypeMenu;
+typedef TypeMenu<Property> PropertyMenu;
 
 class Property : public SingleWidgetTarget {
     Q_OBJECT
@@ -100,7 +100,7 @@ public:
                                     const CanvasMode mode,
                                     const float invScale);
 
-    virtual void addActionsToMenu(PropertyTypeMenu * const menu) {
+    virtual void setupTreeViewMenu(PropertyMenu * const menu) {
         Q_UNUSED(menu);
     }
 

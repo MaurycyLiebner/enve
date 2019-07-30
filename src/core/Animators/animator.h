@@ -235,7 +235,7 @@ public:
                               const FrameRange &absFrameRange,
                               const int rowHeight);
 
-    void addActionsToMenu(PropertyTypeMenu * const menu);
+    void setupTreeViewMenu(PropertyMenu * const menu);
 
     void prp_startDragging();
     void prp_afterChangedAbsRange(const FrameRange &range);

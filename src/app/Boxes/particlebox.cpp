@@ -34,6 +34,7 @@ ParticleBox::ParticleBox() : BoundingBox(TYPE_PARTICLES) {
 
     const auto durRect = SPtrCreate(DurationRectangle)(this);
     setDurationRectangle(durRect);
+    mDurationRectangleLocked = true;
     durRect->setMaxFrame(200);
     durRect->setMinFrame(-10);
 

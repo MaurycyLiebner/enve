@@ -2,7 +2,7 @@
 
 template <typename T, typename U>
 void PathEffectsMenu::addPathEffectActionToMenu(
-        const QString& text, BoxTypeMenu * const menu,
+        const QString& text, PropertyMenu * const menu,
         const U& adder) {
     menu->addPlainAction<BoundingBox>(text, [adder](BoundingBox * box) {
         (box->*adder)(SPtrCreateTemplated(T)());
@@ -12,7 +12,7 @@ void PathEffectsMenu::addPathEffectActionToMenu(
 #include "PathEffects/custompatheffectcreator.h"
 template <typename U>
 void PathEffectsMenu::addPathEffectsActionToMenu(
-        BoxTypeMenu * const menu, const U &adder) {
+        PropertyMenu * const menu, const U &adder) {
     addPathEffectActionToMenu<DisplacePathEffect>(
                 "Displace", menu, adder);
     addPathEffectActionToMenu<SpatialDisplacePathEffect>(
@@ -36,7 +36,11 @@ void PathEffectsMenu::addPathEffectsActionToMenu(
     CustomPathEffectCreator::sAddToMenu(menu, adder);
 }
 
-void PathEffectsMenu::addPathEffectsToActionMenu(BoxTypeMenu * const menu) {
+void PathEffectsMenu::addPathEffectsToActionMenu(PropertyMenu * const menu) {
+    if(menu->hasSharedMenu("Path Effects")) return;
+    menu->addSharedMenu("Path Effects");
+    menu->addSection("Path Effects");
+
     const auto pathEffectsMenu = menu->addMenu("Path Effects");
     addPathEffectsActionToMenu(pathEffectsMenu,
                                &BoundingBox::addPathEffect);

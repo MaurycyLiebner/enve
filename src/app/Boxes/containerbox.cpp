@@ -281,6 +281,7 @@ void ContainerBox::queScheduledTasks() {
 }
 
 void ContainerBox::promoteToLayer() {
+    if(!SWT_isGroupBox()) return;
     if(!SWT_isLinkBox()) mType = TYPE_LAYER;
     if(prp_mName.contains("Group")) {
         auto newName  = prp_mName;
@@ -297,6 +298,7 @@ void ContainerBox::promoteToLayer() {
 }
 
 void ContainerBox::demoteToGroup() {
+    if(!SWT_isLayerBox()) return;
     if(!SWT_isLinkBox()) mType = TYPE_GROUP;
     if(prp_mName.contains("Layer")) {
         auto newName  = prp_mName;
@@ -477,8 +479,12 @@ void ContainerBox::ungroup_k() {
     removeFromParent_k();
 }
 
-#include "typemenu.h"
-void ContainerBox::addActionsToMenu(BoxTypeMenu * const menu) {
+#include "patheffectsmenu.h"
+void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
+    PathEffectsMenu::addPathEffectsToActionMenu(menu);
+
+    menu->addSection("Layer & Group");
+
     const auto ungroupAction = menu->addPlainAction<ContainerBox>(
                 "Ungroup", [](ContainerBox * box) {
         box->ungroup_k();
@@ -495,9 +501,9 @@ void ContainerBox::addActionsToMenu(BoxTypeMenu * const menu) {
     menu->addPlainAction<ContainerBox>("Demote to Group",
                                        [](ContainerBox * box) {
         box->demoteToGroup();
-    })->setEnabled(!SWT_isGroupBox());
+    })->setDisabled(SWT_isGroupBox());
 
-    BoundingBox::addActionsToMenu(menu);
+    BoundingBox::setupCanvasMenu(menu);
 }
 
 void ContainerBox::drawPixmapSk(SkCanvas * const canvas,

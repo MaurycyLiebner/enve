@@ -10,9 +10,9 @@ class BoxSingleWidget;
 class DurationRectangleMovable;
 class Key;
 class KeysView;
+class Canvas;
 
 class BoxScrollWidgetVisiblePart : public ScrollWidgetVisiblePart {
-    Q_OBJECT
 public:
     explicit BoxScrollWidgetVisiblePart(ScrollWidget * const parent);
 
@@ -40,9 +40,11 @@ public:
                                         const int pressY,
                                         const qreal pixelsPerFrame,
                                         const int minViewedFrame);
-    KeysView *getKeysView() {
+    KeysView *getKeysView() const {
         return mKeysView;
     }
+
+    Canvas* currentScene() const;
 
     void setKeysView(KeysView *keysView) {
         mKeysView = keysView;

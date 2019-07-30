@@ -96,30 +96,30 @@ void SmartNodePoint::remove() {
 void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {
     if(isNormal()) {
         if(!isEndPoint()) {
-            PointTypeMenu::PlainOp<SmartNodePoint> op = [](SmartNodePoint * pt) {
+            PointTypeMenu::PlainSelectedOp<SmartNodePoint> op = [](SmartNodePoint * pt) {
                 pt->actionDemoteToDissolved(false);
             };
             menu->addPlainAction("Demote to dissolved", op);
-            PointTypeMenu::PlainOp<SmartNodePoint> opApprox = [](SmartNodePoint * pt) {
+            PointTypeMenu::PlainSelectedOp<SmartNodePoint> opApprox = [](SmartNodePoint * pt) {
                 pt->actionDemoteToDissolved(true);
             };
             menu->addPlainAction("Demote to dissolved approx.", opApprox);
             menu->addSeparator();
         }
-        PointTypeMenu::PlainOp<SmartNodePoint> op = [](SmartNodePoint * pt) {
+        PointTypeMenu::PlainSelectedOp<SmartNodePoint> op = [](SmartNodePoint * pt) {
             pt->actionRemove(false);
         };
         menu->addPlainAction("Remove", op);
-        PointTypeMenu::PlainOp<SmartNodePoint> opApprox = [](SmartNodePoint * pt) {
+        PointTypeMenu::PlainSelectedOp<SmartNodePoint> opApprox = [](SmartNodePoint * pt) {
             pt->actionRemove(true);
         };
         menu->addPlainAction("Remove approx.", opApprox);
     } else { //if(isDissolved()) {
-        PointTypeMenu::PlainOp<SmartNodePoint> op = [](SmartNodePoint * pt) {
+        PointTypeMenu::PlainSelectedOp<SmartNodePoint> op = [](SmartNodePoint * pt) {
             pt->actionPromoteToNormal();
         };
         menu->addPlainAction("Promote to normal", op);
-        PointTypeMenu::PlainOp<SmartNodePoint> rOp = [](SmartNodePoint * pt) {
+        PointTypeMenu::PlainSelectedOp<SmartNodePoint> rOp = [](SmartNodePoint * pt) {
             pt->actionRemove(false);
         };
         menu->addPlainAction("Remove", rOp);

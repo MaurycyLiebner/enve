@@ -70,10 +70,10 @@ void Canvas::addSelectedBoxesActions(QMenu * const qMenu) {
     });
     groupAction->setShortcut(Qt::CTRL + Qt::Key_G);
 
-    BoxTypeMenu menu(qMenu, this, qMenu->parentWidget());
+    PropertyMenu menu(qMenu, this, qMenu->parentWidget());
     for(const auto& box : mSelectedBoxes) {
         if(menu.hasActionsForType(box)) continue;
-        box->addActionsToMenu(&menu);
+        box->setupCanvasMenu(&menu);
         menu.addedActionsForType(box);
     }
 }
@@ -81,7 +81,7 @@ void Canvas::addSelectedBoxesActions(QMenu * const qMenu) {
 #include <QInputDialog>
 #include "PathEffects/patheffect.h"
 #include "GUI/newcanvasdialog.h"
-void Canvas::addActionsToMenu(QMenu * const menu) {
+void Canvas::setupCanvasMenu(QMenu * const menu) {
     const BoxesClipboardContainer * const clipboard =
             mDocument.getBoxesClipboardContainer();
     if(clipboard) {
@@ -260,7 +260,7 @@ void Canvas::handleRightButtonMousePress(const MouseEvent& e) {
             clearPointsSelection();
             clearBoxesSelection();
             QMenu menu(e.fWidget);
-            addActionsToMenu(&menu);
+            setupCanvasMenu(&menu);
             menu.exec(e.fGlobalPos);
         }
     }

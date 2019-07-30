@@ -512,17 +512,17 @@ void Animator::drawTimelineControls(QPainter * const p,
 }
 
 #include "typemenu.h"
-void Animator::addActionsToMenu(PropertyTypeMenu * const menu) {
-    const PropertyTypeMenu::PlainOp<Animator> eOp = [](Animator*) {};
+void Animator::setupTreeViewMenu(PropertyMenu * const menu) {
+    const PropertyMenu::PlainSelectedOp<Animator> eOp = [](Animator*) {};
     if(anim_getKeyOnCurrentFrame()) {
         menu->addPlainAction("Add Key", eOp)->setDisabled(true);
-        const PropertyTypeMenu::PlainOp<Animator> op =
+        const PropertyMenu::PlainSelectedOp<Animator> op =
         [](Animator * animTarget) {
             animTarget->anim_deleteCurrentKey();
         };
         menu->addPlainAction("Delete Key", op);
     } else {
-        const PropertyTypeMenu::PlainOp<Animator> op =
+        const PropertyMenu::PlainSelectedOp<Animator> op =
         [](Animator * animTarget) {
             animTarget->anim_saveCurrentValueAsKey();
         };

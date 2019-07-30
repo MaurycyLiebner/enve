@@ -16,7 +16,7 @@ protected:
 public:
     bool SWT_isSingleSound() const { return true; }
 
-    void addActionsToMenu(PropertyTypeMenu * const menu);
+    void setupTreeViewMenu(PropertyMenu * const menu);
 
     DurationRectangleMovable *anim_getTimelineMovable(
             const int relX, const int minViewedFrame,

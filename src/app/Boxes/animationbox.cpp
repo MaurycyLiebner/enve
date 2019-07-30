@@ -12,6 +12,8 @@ AnimationBox::AnimationBox(const BoundingBoxType& type) : BoundingBox(type) {
     prp_setName("Animation");
 
     setDurationRectangle(SPtrCreate(FixedLenAnimationRect)(this));
+    mDurationRectangleLocked = true;
+
     mFrameAnimator = SPtrCreate(IntAnimator)("frame");
     ca_prependChildAnimator(mGPUEffectsAnimators.get(), mFrameAnimator);
 }
@@ -165,22 +167,22 @@ FrameRange AnimationBox::prp_getIdenticalRelRange(const int relFrame) const {
 //}
 #include "typemenu.h"
 #include <QInputDialog>
-void AnimationBox::addActionsToMenu(BoxTypeMenu * const menu) {
+void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
     const auto widget = menu->getParentWidget();
 
-    const BoxTypeMenu::PlainOp<AnimationBox> reloadOp =
+    const PropertyMenu::PlainSelectedOp<AnimationBox> reloadOp =
     [](AnimationBox * box) {
         box->reload();
     };
     menu->addPlainAction("Reload", reloadOp);
 
-    const BoxTypeMenu::PlainOp<AnimationBox> setSrcOp =
+    const PropertyMenu::PlainSelectedOp<AnimationBox> setSrcOp =
     [widget](AnimationBox * box) {
         box->changeSourceFile(widget);
     };
     menu->addPlainAction("Set Source File...", setSrcOp);
 
-    const BoxTypeMenu::CheckOp<AnimationBox> remapOp =
+    const PropertyMenu::CheckSelectedOp<AnimationBox> remapOp =
     [](AnimationBox * box, bool checked) {
         if(checked) box->enableFrameRemappingAction();
         else box->disableFrameRemapping();
@@ -188,7 +190,7 @@ void AnimationBox::addActionsToMenu(BoxTypeMenu * const menu) {
     menu->addCheckableAction("Frame Remapping",
                              mFrameRemappingEnabled, remapOp);
 
-    const BoxTypeMenu::PlainOp<AnimationBox> stretchOp =
+    const PropertyMenu::PlainSelectedOp<AnimationBox> stretchOp =
     [this, widget](AnimationBox * box) {
         bool ok = false;
         const int stretch = QInputDialog::getInt(widget,
@@ -201,7 +203,7 @@ void AnimationBox::addActionsToMenu(BoxTypeMenu * const menu) {
     };
     menu->addPlainAction("Stretch...", stretchOp);
 
-    BoundingBox::addActionsToMenu(menu);
+    BoundingBox::setupCanvasMenu(menu);
 }
 
 void AnimationBox::writeBoundingBox(QIODevice * const target) {

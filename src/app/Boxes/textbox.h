@@ -9,7 +9,7 @@ public:
     TextBox();
 
     bool SWT_isTextBox() const { return true; }
-    void addActionsToMenu(BoxTypeMenu * const menu);
+    void setupCanvasMenu(PropertyMenu * const menu);
     SkPath getPathAtRelFrameF(const qreal relFrame);
 
     void writeBoundingBox(QIODevice * const target);

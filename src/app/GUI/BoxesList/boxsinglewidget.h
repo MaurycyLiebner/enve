@@ -21,10 +21,11 @@ class BoolPropertyWidget;
 class ComboBoxProperty;
 class ColorAnimator;
 class ColorAnimatorButton;
+class BoxScrollWidgetVisiblePart;
 
 class BoxSingleWidget : public SingleWidget {
 public:
-    explicit BoxSingleWidget(ScrollWidgetVisiblePart *parent = nullptr);
+    explicit BoxSingleWidget(BoxScrollWidgetVisiblePart * const parent);
 
     void setTargetAbstraction(SWT_Abstraction *abs);
 
@@ -43,7 +44,6 @@ public:
     static void loadStaticPixmaps();
     static void clearStaticPixmaps();
 
-    void rename();
     void drawKeys(QPainter * const p,
                   const qreal pixelsPerFrame,
                   const FrameRange &viewedFrames);
@@ -99,6 +99,8 @@ private:
     void setPathCompositionMode(const int id);
     void setFillType(const int id);
     ColorAnimator* getColorTarget() const;
+
+    BoxScrollWidgetVisiblePart* const mParent;
 
     QPoint mDragStartPos;
 
