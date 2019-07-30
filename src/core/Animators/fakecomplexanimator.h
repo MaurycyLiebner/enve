@@ -26,9 +26,9 @@ public:
 
     bool SWT_isFakeComplexAnimator() const;
 
-    using ComplexAnimator::ca_addChildAnimator;
-    using ComplexAnimator::ca_insertChildAnimator;
-    using ComplexAnimator::ca_removeChildAnimator;
+    using ComplexAnimator::ca_addChild;
+    using ComplexAnimator::ca_insertChild;
+    using ComplexAnimator::ca_removeChild;
     using ComplexAnimator::ca_takeChildAt;
     using ComplexAnimator::ca_prependChildAnimator;
     using ComplexAnimator::ca_replaceChildAnimator;

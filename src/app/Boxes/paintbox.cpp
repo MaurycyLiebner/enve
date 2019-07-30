@@ -6,7 +6,7 @@
 PaintBox::PaintBox() : BoundingBox(TYPE_PAINT) {
     prp_setName("Paint Box");
     mSurface = SPtrCreate(AnimatedSurface)();
-    ca_addChildAnimator(mSurface);
+    ca_addChild(mSurface);
 }
 
 void PaintBox::setupRenderData(

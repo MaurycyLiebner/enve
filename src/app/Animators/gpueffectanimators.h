@@ -21,14 +21,17 @@ public:
     BoundingBox *getParentBox() { return mParentBox_k; }
     bool hasEffects();
     QMargins getEffectsMargin(const qreal relFrame) const;
-    bool effectUnbound() const;
+    bool unbound() const;
 
     void addEffects(const qreal relFrame,
                     BoxRenderData * const data);
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program);
-    //void readPixmapEffect(QIODevice *target);
+    //void readRasterEffect(QIODevice *target);
 private:
+    void updateUnbound();
+
+    bool mUnbound = false;
     BoundingBox * const mParentBox_k;
 };
 

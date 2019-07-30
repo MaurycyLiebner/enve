@@ -8,16 +8,16 @@ void ComplexAnimator::ca_prependChildAnimator(Property *childAnimator,
     if(!prependWith) return;
     const int id = getChildPropertyIndex(childAnimator);
     if(id == -1) return;
-    ca_insertChildAnimator(prependWith, id);
+    ca_insertChild(prependWith, id);
 }
 
 void ComplexAnimator::ca_replaceChildAnimator(const qsptr<Property>& childAnimator,
                                               const qsptr<Property> &replaceWith) {
     const int id = getChildPropertyIndex(childAnimator.get());
     if(id == -1) return;
-    ca_removeChildAnimator(childAnimator);
+    ca_removeChild(childAnimator);
     if(!replaceWith) return;
-    ca_insertChildAnimator(replaceWith, id);
+    ca_insertChild(replaceWith, id);
 }
 
 int ComplexAnimator::ca_getNumberOfChildren() const {
@@ -62,28 +62,28 @@ bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 
 bool ComplexAnimator::SWT_isComplexAnimator() const { return true; }
 
-void ComplexAnimator::ca_insertChildAnimator(const qsptr<Property>& childProperty,
-                                             const int id) {
+void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
+                                     const int id) {
     if(mHiddenEmpty && !hasChildAnimators()) {
         SWT_setEnabled(true);
         SWT_setVisible(true);
     }
-    if(ca_mChildAnimators.contains(childProperty))
-        ca_removeChildAnimator(childProperty);
-    ca_mChildAnimators.insert(id, childProperty);
-    childProperty->setParent(this);
-    childProperty->prp_setInheritedUpdater(prp_mUpdater);
-    childProperty->prp_setParentFrameShift(prp_getFrameShift());
-    if(childProperty->drawsOnCanvas() ||
-       childProperty->SWT_isComplexAnimator()) {
+    if(ca_mChildAnimators.contains(child))
+        ca_removeChild(child);
+    ca_mChildAnimators.insert(id, child);
+    child->setParent(this);
+    child->prp_setInheritedUpdater(prp_mUpdater);
+    child->prp_setParentFrameShift(prp_getFrameShift());
+    if(child->drawsOnCanvas() ||
+       child->SWT_isComplexAnimator()) {
         updateCanvasProps();
     }
 
     const bool changeInfluence = !(SWT_isBoundingBox() &&
-                                   childProperty->SWT_isSingleSound());
+                                   child->SWT_isSingleSound());
 
-    if(childProperty->SWT_isAnimator()) {
-        const auto childAnimator = GetAsPtr(childProperty, Animator);
+    if(child->SWT_isAnimator()) {
+        const auto childAnimator = GetAsPtr(child, Animator);
         connect(childAnimator, &Animator::anim_isRecordingChanged,
                 this, &ComplexAnimator::ca_childAnimatorIsRecordingChanged);
         connect(childAnimator, &Animator::prp_addingKey,
@@ -95,21 +95,23 @@ void ComplexAnimator::ca_insertChildAnimator(const qsptr<Property>& childPropert
         childAnimator->anim_setAbsFrame(anim_getCurrentAbsFrame());
     }
     if(changeInfluence){
-        connect(childProperty.data(), &Property::prp_absFrameRangeChanged,
+        connect(child.data(), &Property::prp_absFrameRangeChanged,
                 this, &ComplexAnimator::prp_afterChangedAbsRange);
     }
-    connect(childProperty.data(), &Property::prp_replaceWith,
+    connect(child.data(), &Property::prp_replaceWith,
             this, &ComplexAnimator::ca_replaceChildAnimator);
-    connect(childProperty.data(), &Property::prp_prependWith,
+    connect(child.data(), &Property::prp_prependWith,
             this, &ComplexAnimator::ca_prependChildAnimator);
 
-    childProperty->SWT_setAncestorDisabled(SWT_isDisabled());
-    SWT_addChildAt(childProperty.get(), id);
+    child->SWT_setAncestorDisabled(SWT_isDisabled());
+    SWT_addChildAt(child.get(), id);
     if(changeInfluence) {
-        const auto childRange = childProperty->prp_absInfluenceRange();
+        const auto childRange = child->prp_absInfluenceRange();
         const auto changedRange = childRange*prp_absInfluenceRange();
         prp_afterChangedAbsRange(changedRange);
     }
+
+    emit childAdded(child.get());
 }
 
 int ComplexAnimator::getChildPropertyIndex(Property * const child) {
@@ -159,24 +161,24 @@ void ComplexAnimator::ca_moveChildInList(Property* child,
     prp_afterWholeInfluenceRangeChanged();
 }
 
-void ComplexAnimator::ca_removeChildAnimator(
-        const qsptr<Property>& removeAnimator) {
+void ComplexAnimator::ca_removeChild(
+        const qsptr<Property> child) {
     const bool changeInfluence = !(SWT_isBoundingBox() &&
-                                   removeAnimator->SWT_isSingleSound());
-    const auto childRange = removeAnimator->prp_absInfluenceRange();
-    removeAnimator->prp_setInheritedUpdater(nullptr);
-    if(removeAnimator->SWT_isAnimator()) {
-        const auto aRemove = GetAsPtr(removeAnimator, Animator);
+                                   child->SWT_isSingleSound());
+    const auto childRange = child->prp_absInfluenceRange();
+    child->prp_setInheritedUpdater(nullptr);
+    if(child->SWT_isAnimator()) {
+        const auto aRemove = GetAsPtr(child, Animator);
         aRemove->anim_removeAllKeysFromComplexAnimator(this);
     }
-    disconnect(removeAnimator.get(), nullptr, this, nullptr);
+    disconnect(child.get(), nullptr, this, nullptr);
 
-    SWT_removeChild(removeAnimator.get());
+    SWT_removeChild(child.get());
 
-    removeAnimator->setParent(nullptr);
-    ca_mChildAnimators.removeAt(getChildPropertyIndex(removeAnimator.get()));
-    if(removeAnimator->drawsOnCanvas() ||
-       removeAnimator->SWT_isComplexAnimator()) {
+    child->setParent(nullptr);
+    ca_mChildAnimators.removeAt(getChildPropertyIndex(child.get()));
+    if(child->drawsOnCanvas() ||
+       child->SWT_isComplexAnimator()) {
         updateCanvasProps();
     }
     ca_childAnimatorIsRecordingChanged();
@@ -190,11 +192,13 @@ void ComplexAnimator::ca_removeChildAnimator(
         SWT_setEnabled(false);
         SWT_setVisible(false);
     }
+
+    emit childRemoved(child.get());
 }
 
 void ComplexAnimator::ca_removeAllChildAnimators() {
     for(int i = ca_mChildAnimators.count() - 1; i >= 0; i--)
-        ca_removeChildAnimator(qsptr<Property>(ca_mChildAnimators.at(i)));
+        ca_removeChild(qsptr<Property>(ca_mChildAnimators.at(i)));
 }
 
 Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {

@@ -535,6 +535,7 @@ void MainWindow::addCanvasToRenderQue() {
 }
 
 void MainWindow::updateSettingsForCurrentCanvas(Canvas* const scene) {
+    mObjectSettingsWidget->setCurrentScene(scene);
     if(!scene) {
         mObjectSettingsWidget->setMainTarget(nullptr);
         //mBrushSettingsWidget->setCurrentBrush(nullptr);

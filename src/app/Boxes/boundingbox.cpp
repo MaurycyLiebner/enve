@@ -9,8 +9,6 @@
 #include "MovablePoints/movablepoint.h"
 #include "PropertyUpdaters/pixmapeffectupdater.h"
 #include "taskscheduler.h"
-#include "PixmapEffects/pixmapeffect.h"
-#include "Animators/effectanimators.h"
 #include "Animators/gpueffectanimators.h"
 #include "Animators/transformanimator.h"
 #include "GPUEffects/gpueffect.h"
@@ -20,6 +18,8 @@
 #include "PropertyUpdaters/boxpathpointupdater.h"
 #include "Animators/qpointfanimator.h"
 #include "MovablePoints/pathpointshandler.h"
+#include "typemenu.h"
+#include "patheffectsmenu.h"
 
 SkFilterQuality BoundingBox::sDisplayFiltering = kLow_SkFilterQuality;
 int BoundingBox::sNextDocumentId;
@@ -35,10 +35,9 @@ BoundingBox::BoundingBox(const BoundingBoxType type) :
     StaticComplexAnimator("box"),
     mDocumentId(sNextDocumentId++), mType(type),
     mTransformAnimator(SPtrCreate(BoxTransformAnimator)()),
-    mEffectsAnimators(SPtrCreate(EffectAnimators)(this)),
     mGPUEffectsAnimators(SPtrCreate(GPUEffectAnimators)(this)) {
     sDocumentBoxes << this;
-    ca_addChildAnimator(mTransformAnimator);
+    ca_addChild(mTransformAnimator);
     mTransformAnimator->prp_setOwnUpdater(
                 SPtrCreate(TransformUpdater)(mTransformAnimator.get()));
     const auto pivotAnim = mTransformAnimator->getPivotAnimator();
@@ -46,14 +45,9 @@ BoundingBox::BoundingBox(const BoundingBoxType type) :
                 mTransformAnimator.get(), this);
     pivotAnim->prp_setOwnUpdater(pivotUpdater);
 
-    mEffectsAnimators->prp_setOwnUpdater(
-                SPtrCreate(PixmapEffectUpdater)(this));
-    ca_addChildAnimator(mEffectsAnimators);
-    mEffectsAnimators->SWT_hide();
-
     mGPUEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(PixmapEffectUpdater)(this));
-    ca_addChildAnimator(mGPUEffectsAnimators);
+    ca_addChild(mGPUEffectsAnimators);
     mGPUEffectsAnimators->SWT_hide();
 
     connect(mTransformAnimator.get(),
@@ -142,7 +136,7 @@ qsptr<BoundingBox> BoundingBox::createLinkForLinkGroup() {
 }
 
 void BoundingBox::clearRasterEffects() {
-    mEffectsAnimators->ca_removeAllChildAnimators();
+    mGPUEffectsAnimators->ca_removeAllChildAnimators();
 }
 
 void BoundingBox::setFont(const QFont &) {}
@@ -181,7 +175,6 @@ void transferData(const T& from, const T& to) {
 
 void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
     transferData(mTransformAnimator, targetBox->mTransformAnimator);
-    transferData(mEffectsAnimators, targetBox->mEffectsAnimators);
     transferData(mGPUEffectsAnimators, targetBox->mGPUEffectsAnimators);
 }
 
@@ -209,24 +202,14 @@ void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
     canvas->restore();
 }
 
-void BoundingBox::setGPUEffectsEnabled(const bool enable) {
+void BoundingBox::setRasterEffectsEnabled(const bool enable) {
     mGPUEffectsAnimators->SWT_setEnabled(enable);
     mGPUEffectsAnimators->SWT_setVisible(
                 mGPUEffectsAnimators->hasChildAnimators() || enable);
 }
 
-bool BoundingBox::getGPUEffectsEnabled() const {
-    return mGPUEffectsAnimators->SWT_isEnabled();
-}
-
-void BoundingBox::setRasterEffectsEnabled(const bool enable) {
-    mEffectsAnimators->SWT_setEnabled(enable);
-    mEffectsAnimators->SWT_setVisible(
-                mEffectsAnimators->hasChildAnimators() || enable);
-}
-
 bool BoundingBox::getRasterEffectsEnabled() const {
-    return mEffectsAnimators->SWT_isEnabled();
+    return mGPUEffectsAnimators->SWT_isEnabled();
 }
 
 void BoundingBox::applyPaintSetting(const PaintSettingsApplier &setting) {
@@ -612,8 +595,6 @@ QRectF BoundingBox::getRelBoundingRect(const qreal relFrame) {
     return getRelBoundingRect();
 }
 
-#include "typemenu.h"
-#include "PixmapEffects/pixmapeffectsinclude.h"
 template <typename T>
 void addEffectAction(const QString& text,
                      PropertyMenu * const menu) {
@@ -623,26 +604,48 @@ void addEffectAction(const QString& text,
     menu->addPlainAction(text, op);
 }
 
-#include "patheffectsmenu.h"
 void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
+    Q_ASSERT(mParentScene);
+    const auto parentScene = mParentScene;
+
     menu->addSection("Box");
 
-    const PropertyMenu::AllOp<BoundingBox> copyOp =
-    [](const QList<BoundingBox*>& boxes) {
-        auto container = SPtrCreate(BoxesClipboardContainer)();
-        QBuffer targetT(container->getBytesArray());
-        targetT.open(QIODevice::WriteOnly);
-        const int nBoxes = boxes.count();
-        targetT.write(rcConstChar(&nBoxes), sizeof(int));
-        for(const auto& box : boxes)
-            box->writeBoundingBox(&targetT);
-        targetT.close();
+    menu->addPlainAction("Create Link", [parentScene]() {
+        parentScene->createLinkBoxForSelected();
+    });
+    menu->addPlainAction("Center Pivot", [parentScene]() {
+        parentScene->centerPivotForSelected();
+    });
 
-        Document::sInstance->replaceClipboard(container);
-        BoundingBox::sClearWriteBoxes();
-    };
+    menu->addSeparator();
 
-    menu->addPlainAction("Copy", copyOp);
+    menu->addPlainAction("Copy", [parentScene]() {
+        parentScene->copyAction();
+    })->setShortcut(Qt::CTRL + Qt::Key_C);
+
+    menu->addPlainAction("Cut", [parentScene]() {
+        parentScene->cutAction();
+    })->setShortcut(Qt::CTRL + Qt::Key_X);
+
+    menu->addPlainAction("Duplicate", [parentScene]() {
+        parentScene->duplicateSelectedBoxes();
+    })->setShortcut(Qt::CTRL + Qt::Key_D);
+
+    menu->addPlainAction("Delete", [parentScene]() {
+        parentScene->removeSelectedBoxesAndClearList();
+    })->setShortcut(Qt::Key_Delete);
+
+    menu->addSeparator();
+
+    menu->addPlainAction("Group", [parentScene]() {
+        parentScene->groupSelectedBoxes();
+    })->setShortcut(Qt::CTRL + Qt::Key_G);
+
+    menu->addPlainAction("Ungroup", [parentScene]() {
+        parentScene->ungroupSelectedBoxes();
+    })->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
+
+    menu->addSeparator();
 
     const auto gpuEffectsMenu = menu->addMenu("Raster Effects");
     CustomGpuEffectCreator::sAddToMenu(gpuEffectsMenu, &BoundingBox::addGPUEffect);
@@ -709,8 +712,7 @@ void BoundingBox::finishTransform() {
 }
 
 QMarginsF BoundingBox::getEffectsMargin(const qreal relFrame) {
-    return mEffectsAnimators->getEffectsMargin(relFrame) +
-            mGPUEffectsAnimators->getEffectsMargin(relFrame);
+    return mGPUEffectsAnimators->getEffectsMargin(relFrame);
 }
 
 void BoundingBox::setupRenderData(const qreal relFrame,
@@ -726,7 +728,6 @@ void BoundingBox::setupRenderData(const qreal relFrame,
     data->fBlendMode = getBlendMode();
 
     if(data->fOpacity > 0.001 && effectsVisible) {
-        setupEffectsF(relFrame, data);
         setupGPUEffectsF(relFrame, data);
     }
 
@@ -741,11 +742,6 @@ void BoundingBox::setupRenderData(const qreal relFrame,
 }
 
 stdsptr<BoxRenderData> BoundingBox::createRenderData() { return nullptr; }
-
-void BoundingBox::setupEffectsF(const qreal relFrame,
-                                BoxRenderData * const data) {
-    mEffectsAnimators->addEffects(relFrame, data);
-}
 
 void BoundingBox::setupGPUEffectsF(const qreal relFrame,
                                    BoxRenderData * const data) {
@@ -762,10 +758,6 @@ void BoundingBox::removeLinkingBox(BoundingBox *box) {
 
 const QList<qptr<BoundingBox>> &BoundingBox::getLinkingBoxes() const {
     return mLinkingBoxes;
-}
-
-EffectAnimators *BoundingBox::getEffectsAnimators() {
-    return mEffectsAnimators.data();
 }
 
 void BoundingBox::incReasonsNotToApplyUglyTransform() {
@@ -938,14 +930,6 @@ void BoundingBox::addGPUEffect(const qsptr<GpuEffect>& rasterEffect) {
 
 void BoundingBox::removeGPUEffect(const qsptr<GpuEffect> &effect) {
     mGPUEffectsAnimators->removeChild(effect);
-}
-
-void BoundingBox::addEffect(const qsptr<PixmapEffect>& effect) {
-    mEffectsAnimators->addChild(effect);
-}
-
-void BoundingBox::removeEffect(const qsptr<PixmapEffect>& effect) {
-    mEffectsAnimators->removeChild(effect);
 }
 
 //int BoundingBox::prp_getParentFrameShift() const {
@@ -1445,7 +1429,7 @@ void BoundingBox::removeFromParent_k() {
 }
 
 QMimeData *BoundingBox::SWT_createMimeData() {
-    return new BoundingBoxMimeData(this);
+    return new eMimeData(QList<BoundingBox*>() << this);
 }
 
 void BoundingBox::renderDataFinished(BoxRenderData *renderData) {

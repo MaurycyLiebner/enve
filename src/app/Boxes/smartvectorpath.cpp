@@ -9,7 +9,6 @@
 #include "PropertyUpdaters/nodepointupdater.h"
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "Animators/gradientpoints.h"
-#include "Animators/effectanimators.h"
 #include "Animators/transformanimator.h"
 #include "MovablePoints/segment.h"
 #include "Animators/SmartPath/smartpathanimator.h"

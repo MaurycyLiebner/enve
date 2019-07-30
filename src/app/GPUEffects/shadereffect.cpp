@@ -8,7 +8,7 @@ ShaderEffect::ShaderEffect(const QString& name,
     GpuEffect(name, GpuEffectType::CUSTOM_SHADER),
     mProgram(program), mCreator(creator) {
     for(const auto& propC : props)
-        ca_addChildAnimator(propC->create());
+        ca_addChild(propC->create());
 }
 
 void ShaderEffect::writeIdentifier(QIODevice * const dst) const {

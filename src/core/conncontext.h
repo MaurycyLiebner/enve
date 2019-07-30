@@ -69,12 +69,12 @@ public:
         return obj;
     }
 
-    void getObjList(QList<T>& dst) const { dst = *this; }
-
     void clear() {
         QList<T>::clear();
         mCCtxs.clear();
     }
+
+    const QList<T>& getList() const { return *this; }
 
     using QList<T>::begin;
     using QList<T>::end;

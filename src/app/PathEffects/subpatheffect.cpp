@@ -14,8 +14,8 @@ SubPathEffect::SubPathEffect() :
     mMax->setValueRange(-999, 999);
     mMax->setCurrentBaseValue(100);
 
-    ca_addChildAnimator(mMin);
-    ca_addChildAnimator(mMax);
+    ca_addChild(mMin);
+    ca_addChild(mMax);
 }
 
 void SubPathEffect::apply(const qreal relFrame, const SkPath &src,

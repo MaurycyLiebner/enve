@@ -15,7 +15,6 @@
 #include "Boxes/paintbox.h"
 #include "GUI/fontswidget.h"
 #include "PathEffects/patheffectsinclude.h"
-#include "PixmapEffects/pixmapeffectsinclude.h"
 #include <QFileDialog>
 #include "GUI/paintboxsettingsdialog.h"
 #include "GUI/customfpsdialog.h"
@@ -32,58 +31,12 @@ void Canvas::handleMovePathMousePressEvent(const MouseEvent& e) {
     }
 }
 
-void Canvas::addSelectedBoxesActions(QMenu * const qMenu) {
-    qMenu->addSeparator();
-    qMenu->addAction("Create Link", [this]() {
-        for(const auto& box : mSelectedBoxes)
-            mCurrentContainer->addContainedBox(box->createLink());
-    });
-    qMenu->addAction("Center Pivot", [this]() {
-        centerPivotForSelected();
-    });
-    qMenu->addSeparator();
-
-    QAction * const copyAction = qMenu->addAction("Copy", [this]() {
-        this->copyAction();
-    });
-    copyAction->setShortcut(Qt::CTRL + Qt::Key_C);
-
-    QAction * const cutAction = qMenu->addAction("Cut", [this]() {
-        this->cutAction();
-    });
-    cutAction->setShortcut(Qt::CTRL + Qt::Key_X);
-
-    QAction * const duplicateAction = qMenu->addAction("Duplicate", [this]() {
-        this->duplicateSelectedBoxes();
-    });
-    duplicateAction->setShortcut(Qt::CTRL + Qt::Key_D);
-
-    QAction * const deleteAction = qMenu->addAction("Delete", [this]() {
-        this->removeSelectedBoxesAndClearList();
-    });
-    deleteAction->setShortcut(Qt::Key_Delete);
-
-    qMenu->addSeparator();
-
-    QAction * const groupAction = qMenu->addAction("Group", [this]() {
-        this->groupSelectedBoxes();
-    });
-    groupAction->setShortcut(Qt::CTRL + Qt::Key_G);
-
-    PropertyMenu menu(qMenu, this, qMenu->parentWidget());
-    for(const auto& box : mSelectedBoxes) {
-        if(menu.hasActionsForType(box)) continue;
-        box->setupCanvasMenu(&menu);
-        menu.addedActionsForType(box);
-    }
-}
-
 #include <QInputDialog>
 #include "PathEffects/patheffect.h"
 #include "GUI/newcanvasdialog.h"
-void Canvas::setupCanvasMenu(QMenu * const menu) {
-    const BoxesClipboardContainer * const clipboard =
-            mDocument.getBoxesClipboardContainer();
+void Canvas::addActionsToMenu(QMenu *const menu) {
+    const BoxesClipboard * const clipboard =
+            mDocument.getBoxesClipboard();
     if(clipboard) {
         QAction * const pasteAct = menu->addAction("Paste", this,
                                                   &Canvas::pasteAction);
@@ -104,39 +57,6 @@ void Canvas::setupCanvasMenu(QMenu * const menu) {
             action->setVisible(false);
         }
     }
-
-    QMenu * const effectsMenu = menu->addMenu("Effects");
-    effectsMenu->addAction("Blur", [this]() {
-        addEffect<BlurEffect>();
-    });
-
-    effectsMenu->addAction("Motion Blur", [this]() {
-        addEffect<SampledMotionBlurEffect>();
-    });
-
-    effectsMenu->addAction("Shadow", [this]() {
-        addEffect<ShadowEffect>();
-    });
-
-    effectsMenu->addAction("Desaturate", [this]() {
-        addEffect<DesaturateEffect>();
-    });
-
-    effectsMenu->addAction("Colorize", [this]() {
-        addEffect<ColorizeEffect>();
-    });
-
-    effectsMenu->addAction("Contrast", [this]() {
-        addEffect<ContrastEffect>();
-    });
-
-    effectsMenu->addAction("Brightness", [this]() {
-        addEffect<BrightnessEffect>();
-    });
-
-    effectsMenu->addAction("Replace Color", [this]() {
-        addEffect<ReplaceColorEffect>();
-    });
 
     QMenu * const pathEffectsMenu = menu->addMenu("Path Effects");
     pathEffectsMenu->addAction("Displace Effect", [this]() {
@@ -254,13 +174,18 @@ void Canvas::handleRightButtonMousePress(const MouseEvent& e) {
             }
 
             QMenu qMenu(e.fWidget);
-            addSelectedBoxesActions(&qMenu);
+            PropertyMenu menu(&qMenu, this, e.fWidget);
+            for(const auto& box : mSelectedBoxes) {
+                if(menu.hasActionsForType(box)) continue;
+                box->setupCanvasMenu(&menu);
+                menu.addedActionsForType(box);
+            }
             qMenu.exec(e.fGlobalPos);
         } else {
             clearPointsSelection();
             clearBoxesSelection();
             QMenu menu(e.fWidget);
-            setupCanvasMenu(&menu);
+            addActionsToMenu(&menu);
             menu.exec(e.fGlobalPos);
         }
     }

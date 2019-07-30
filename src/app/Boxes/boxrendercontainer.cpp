@@ -1,9 +1,5 @@
 #include "boxrendercontainer.h"
-#include "boundingbox.h"
-#include <QElapsedTimer>
-#include "memoryhandler.h"
-#include "GUI/mainwindow.h"
-#include "canvas.h"
+#include "boxrenderdata.h"
 #include "skia/skiahelpers.h"
 
 void RenderContainer::drawSk(SkCanvas * const canvas,

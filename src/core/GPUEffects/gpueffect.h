@@ -1,6 +1,6 @@
 #ifndef GPURASTEREFFECT_H
 #define GPURASTEREFFECT_H
-#include "../Animators/staticcomplexanimator.h"
+#include "../Animators/eeffect.h"
 #include "../glhelpers.h"
 
 enum class GpuEffectType : short {
@@ -80,8 +80,9 @@ protected:
 };
 
 enum class HardwareSupport : short;
-class GpuEffect : public StaticComplexAnimator {
+class GpuEffect : public eEffect {
     friend class SelfRef;
+    Q_OBJECT
 protected:
     GpuEffect(const QString &name, const GpuEffectType type);
 public:
@@ -93,11 +94,9 @@ public:
         return QMargins();
     }
     virtual bool forceMargin() const { return false; }
-    virtual void writeIdentifier(QIODevice * const dst) const;
+    void writeIdentifier(QIODevice * const dst) const;
 
     bool SWT_isGpuEffect() const { return true; }
-
-    bool isVisible() const { return true; }
 private:
     const GpuEffectType mType;
 };

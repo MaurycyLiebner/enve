@@ -4,11 +4,12 @@
 #include "key.h"
 
 class ComplexKey;
-class KeysClipboardContainer;
+class KeysClipboard;
 class QrealAnimator;
 
 class ComplexAnimator : public Animator {
     friend class SelfRef;
+    Q_OBJECT
 protected:
     ComplexAnimator(const QString& name);
     void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
@@ -103,23 +104,22 @@ public:
 
     void ca_addDescendantsKey(Key * const key);
     void ca_removeDescendantsKey(Key * const key);
+signals:
+    void childAdded(Property*);
+    void childRemoved(Property*);
 protected:
-    void ca_addChildAnimator(const qsptr<Property> &childAnimator) {
-        ca_insertChildAnimator(childAnimator, ca_getNumberOfChildren());
+    void ca_addChild(const qsptr<Property> &childAnimator) {
+        ca_insertChild(childAnimator, ca_getNumberOfChildren());
     }
-    void ca_insertChildAnimator(const qsptr<Property> &childAnimator,
+    void ca_insertChild(const qsptr<Property> &child,
                                 const int id);
-    void ca_removeChildAnimator(const qsptr<Property> &removeAnimator);
+    void ca_removeChild(const qsptr<Property> child);
 
     template <typename T = Property>
     qsptr<T> ca_takeChildAt(const int i) {
-        if(i < 0 || i >= ca_getNumberOfChildren())
-            RuntimeThrow("Index outside of range");
-        if(mHiddenEmpty && ca_getNumberOfChildren() == 1) {
-            SWT_setEnabled(false);
-            SWT_setVisible(false);
-        }
-        return GetAsSPtrTemplated(ca_mChildAnimators.takeAt(i), T);
+        const auto result = ca_mChildAnimators.at(i);
+        ca_removeChild(result);
+        return GetAsSPtrTemplated(result, T);
     }
 
     void ca_prependChildAnimator(Property *childAnimator,

@@ -15,7 +15,7 @@ OutlineSettingsAnimator::OutlineSettingsAnimator(
     PaintSettingsAnimator("outline", grdPts, parent,
                           color, paintType, gradient) {
 
-    ca_addChildAnimator(mLineWidth);
+    ca_addChild(mLineWidth);
     mLineWidth->prp_setOwnUpdater(SPtrCreate(StrokeWidthUpdater)(parent));
 }
 

@@ -7,7 +7,7 @@ DashPathEffect::DashPathEffect() :
     mSize->setValueRange(0.1, 9999.999);
     mSize->setCurrentBaseValue(5);
 
-    ca_addChildAnimator(mSize);
+    ca_addChild(mSize);
 
     setPropertyForGUI(mSize.get());
 }

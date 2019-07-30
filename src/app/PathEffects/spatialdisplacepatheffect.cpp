@@ -19,12 +19,12 @@ SpatialDisplacePathEffect::SpatialDisplacePathEffect() :
     mMaxDev->setValueRange(0, 1000);
     mMaxDev->setCurrentBaseValue(20);
 
-    ca_addChildAnimator(mSeed);
-    ca_addChildAnimator(mMaxDev);
-    ca_addChildAnimator(mLengthBased);
+    ca_addChild(mSeed);
+    ca_addChild(mMaxDev);
+    ca_addChild(mLengthBased);
 
-    mLengthBased->ca_addChildAnimator(mSegLength);
-    mLengthBased->ca_addChildAnimator(mSmoothness);
+    mLengthBased->ca_addChild(mSegLength);
+    mLengthBased->ca_addChild(mSmoothness);
     mLengthBased->setValue(false);
 }
 

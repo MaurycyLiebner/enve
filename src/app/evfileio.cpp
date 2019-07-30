@@ -3,8 +3,6 @@
 #include "Animators/randomqrealgenerator.h"
 #include "Animators/qpointfanimator.h"
 #include "Animators/coloranimator.h"
-#include "Animators/effectanimators.h"
-#include "PixmapEffects/pixmapeffect.h"
 #include "Animators/qstringanimator.h"
 #include "Animators/transformanimator.h"
 #include "Animators/paintsettingsanimator.h"
@@ -37,7 +35,6 @@
 #include "GUI/GradientWidgets/gradientwidget.h"
 #include <QMessageBox>
 #include "PathEffects/patheffectsinclude.h"
-#include "PixmapEffects/pixmapeffectsinclude.h"
 #include "basicreadwrite.h"
 #include "Boxes/internallinkcanvas.h"
 #include "Boxes/smartvectorpath.h"

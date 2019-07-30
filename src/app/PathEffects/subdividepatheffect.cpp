@@ -4,7 +4,7 @@
 SubdividePathEffect::SubdividePathEffect() :
     PathEffect("subdivide effect", PathEffectType::SUBDIVIDE) {
     mCount = SPtrCreate(IntAnimator)(1, 0, 9, 1, "count");
-    ca_addChildAnimator(mCount);
+    ca_addChild(mCount);
 }
 
 void SubdividePathEffect::apply(const qreal relFrame,

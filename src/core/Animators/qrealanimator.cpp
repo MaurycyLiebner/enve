@@ -165,16 +165,16 @@ qreal QrealAnimator::getBaseValueAtAbsFrame(const qreal frame) const {
 void QrealAnimator::setGenerator(const qsptr<RandomQrealGenerator>& generator) {
     if(generator == mRandomGenerator.data()) return;
     if(!generator) {
-        mFakeComplexAnimator->ca_removeChildAnimator(mRandomGenerator);
+        mFakeComplexAnimator->ca_removeChild(mRandomGenerator);
         disableFakeComplexAnimatrIfNotNeeded();
     } else {
         if(mRandomGenerator.isNull()) {
             enableFakeComplexAnimator();
         } else {
-            mFakeComplexAnimator->ca_removeChildAnimator(mRandomGenerator);
+            mFakeComplexAnimator->ca_removeChild(mRandomGenerator);
         }
 
-        mFakeComplexAnimator->ca_addChildAnimator(generator);
+        mFakeComplexAnimator->ca_addChild(generator);
     }
     if(!generator) {
         mRandomGenerator.reset();

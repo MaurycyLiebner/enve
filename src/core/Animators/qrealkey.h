@@ -9,7 +9,7 @@ class ComplexAnimator;
 class ComplexKey;
 
 class QrealAnimator;
-class KeysClipboardContainer;
+class KeysClipboard;
 
 class QrealKey : public GraphKey {
     friend class StdSelfRef;

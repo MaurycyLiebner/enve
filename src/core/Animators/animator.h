@@ -237,7 +237,6 @@ public:
 
     void setupTreeViewMenu(PropertyMenu * const menu);
 
-    void prp_startDragging();
     void prp_afterChangedAbsRange(const FrameRange &range);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 public:

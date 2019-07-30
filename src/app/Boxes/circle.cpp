@@ -4,7 +4,6 @@
 #include "Animators/gradientpoints.h"
 #include "PropertyUpdaters/nodepointupdater.h"
 #include "Animators/transformanimator.h"
-#include "Animators/effectanimators.h"
 #include "MovablePoints/pointshandler.h"
 #include "PathEffects/patheffectanimators.h"
 

@@ -17,10 +17,9 @@ void BoxTargetWidget::setTargetProperty(BoxTargetProperty *property) {
 }
 
 void BoxTargetWidget::dropEvent(QDropEvent *event) {
-    if(BoundingBoxMimeData::hasFormat(event->mimeData())) {
-        auto boxMimeData = static_cast<
-                const BoundingBoxMimeData*>(event->mimeData());
-        BoundingBox *targetT = boxMimeData->getTarget();
+    if(eMimeData::sHasType<BoundingBox>(event->mimeData())) {
+        auto boxMimeData = static_cast<const eMimeData*>(event->mimeData());
+        BoundingBox *targetT = boxMimeData->getObjects<BoundingBox>().first();
         mProperty->setTarget(targetT);
         mDragging = false;
         update();
@@ -29,10 +28,9 @@ void BoxTargetWidget::dropEvent(QDropEvent *event) {
 }
 
 void BoxTargetWidget::dragEnterEvent(QDragEnterEvent *event) {
-    if(BoundingBoxMimeData::hasFormat(event->mimeData())) {
-        auto boxMimeData = static_cast<
-                const BoundingBoxMimeData*>(event->mimeData());
-        BoundingBox *targetT = boxMimeData->getTarget();
+    if(eMimeData::sHasType<BoundingBox>(event->mimeData())) {
+        auto boxMimeData = static_cast<const eMimeData*>(event->mimeData());
+        BoundingBox *targetT = boxMimeData->getObjects<BoundingBox>().first();
         const auto tester = [](Property * prop) {
             return prop->SWT_isBoundingBox();
         };

@@ -27,46 +27,56 @@ enum CanvasMode : short {
     PAINT_MODE
 };
 
-//! @brief Use only as base class for PropertyMimeData.
-class InternalMimeData : public QMimeData {
+class eDraggedObjects {
 public:
-    enum Type : short {
-        PIXMAP_EFFECT,
-        PATH_EFFECT,
-        BOUNDING_BOX
-    };
-
-    InternalMimeData(const Type& type) : mType(type) {}
-
-    bool hasType(const Type& type) const {
-        return type == mType;
+    template <typename T>
+    eDraggedObjects(const QList<T*>& objs) :
+        mMetaObj(T::staticMetaObject) {
+        for(const auto& obj : objs) mObjects << obj;
     }
-protected:
-    bool hasFormat(const QString &mimetype) const {
-        if(mimetype == "av_internal_format") return true;
+
+    template <typename T>
+    bool hasType() const {
+        return &mMetaObj == &T::staticMetaObject;
+    }
+
+    template <typename T>
+    QList<T*> getObjects() const {
+        if(!hasType<T>()) RuntimeThrow("Incompatible type");
+        QList<T*> result;
+        for(const auto& obj : mObjects) {
+            const auto ObjT = qobject_cast<T*>(obj);
+            if(ObjT) result << ObjT;
+        }
+        return result;
+    }
+
+    bool hasObject(QObject* const obj) const {
+        for(const auto& iObj : mObjects) {
+            if(iObj == obj) return true;
+        }
         return false;
     }
 private:
-    const Type mType;
+    const QMetaObject& mMetaObj;
+    QList<QObject*> mObjects;
 };
 
-template <class T, InternalMimeData::Type type>
-class PropertyMimeData : public InternalMimeData {
+class eMimeData : public QMimeData, public eDraggedObjects {
 public:
-    PropertyMimeData(T *target) :
-        InternalMimeData(type), mTarget(target) {}
+    template <typename T>
+    eMimeData(const QList<T*>& objs) : eDraggedObjects(objs) {}
 
-    T *getTarget() const {
-        return mTarget;
+    template <typename T>
+    static bool sHasType(const QMimeData* const data) {
+        if(!data->hasFormat("eMimeData")) return false;
+        return static_cast<const eMimeData*>(data)->hasType<T>();
     }
-
-    static bool hasFormat(const QMimeData * const data) {
-        if(!data->hasFormat("av_internal_format")) return false;
-        auto internalData = static_cast<const InternalMimeData*>(data);
-        return internalData->hasType(type);
+protected:
+    bool hasFormat(const QString &mimetype) const {
+        if(mimetype == "eMimeData") return true;
+        return false;
     }
-private:
-    const QPointer<T> mTarget;
 };
 
 class Property;
@@ -100,9 +110,7 @@ public:
                                     const CanvasMode mode,
                                     const float invScale);
 
-    virtual void setupTreeViewMenu(PropertyMenu * const menu) {
-        Q_UNUSED(menu);
-    }
+    virtual void setupTreeViewMenu(PropertyMenu * const menu);
 
     virtual int prp_getFrameShift() const;
     virtual int prp_getParentFrameShift() const;
@@ -114,8 +122,6 @@ public:
     virtual void prp_finishTransform() {}
 
     virtual QString prp_getValueText() { return ""; }
-
-    virtual void prp_startDragging() {}
 
     virtual void prp_setTransformed(const bool bT) { Q_UNUSED(bT); }
 

@@ -4,7 +4,6 @@
 #include "canvas.h"
 #include "GUI/Timeline/durationrectangle.h"
 #include "Animators/transformanimator.h"
-#include "PixmapEffects/pixmapeffect.h"
 #include "skia/skiahelpers.h"
 
 ExternalLinkBox::ExternalLinkBox() : ContainerBox(TYPE_LAYER) {

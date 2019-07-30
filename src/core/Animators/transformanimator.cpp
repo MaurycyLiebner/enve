@@ -18,9 +18,9 @@ BasicTransformAnimator::BasicTransformAnimator() :
     mRotAnimator = SPtrCreate(QrealAnimator)("rot");
     mRotAnimator->setCurrentBaseValue(0);
 
-    ca_addChildAnimator(mPosAnimator);
-    ca_addChildAnimator(mRotAnimator);
-    ca_addChildAnimator(mScaleAnimator);
+    ca_addChild(mPosAnimator);
+    ca_addChild(mRotAnimator);
+    ca_addChild(mScaleAnimator);
 }
 
 void BasicTransformAnimator::resetScale() {
@@ -295,9 +295,9 @@ BoxTransformAnimator::BoxTransformAnimator() {
     mOpacityAnimator->setCurrentBaseValue(100);
     mOpacityAnimator->graphFixMinMaxValues();
 
-    ca_addChildAnimator(mShearAnimator);
-    ca_addChildAnimator(mPivotAnimator);
-    ca_addChildAnimator(mOpacityAnimator);
+    ca_addChild(mShearAnimator);
+    ca_addChild(mPivotAnimator);
+    ca_addChild(mOpacityAnimator);
 
     setPointsHandler(SPtrCreate(PointsHandler)());
     const auto pivotPt = SPtrCreate(BoxPathPoint)(mPivotAnimator.get(), this);

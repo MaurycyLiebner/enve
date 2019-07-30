@@ -6,10 +6,10 @@ DuplicatePathEffect::DuplicatePathEffect() :
     PathEffect("duplicate effect", PathEffectType::DUPLICATE) {
     mTranslation = SPtrCreate(QPointFAnimator)("translation");
     mTranslation->setBaseValue(QPointF(10, 10));
-    ca_addChildAnimator(mTranslation);
+    ca_addChild(mTranslation);
 
     mCount = SPtrCreate(IntAnimator)(1, 0, 25, 1, "count");
-    ca_addChildAnimator(mCount);
+    ca_addChild(mCount);
 }
 
 void DuplicatePathEffect::apply(const qreal relFrame,

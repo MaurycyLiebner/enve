@@ -3,10 +3,11 @@
 
 #include "OptimalScrollArea/scrollwidget.h"
 #include "GUI/keyfocustarget.h"
-class BoxScrollWidgetVisiblePart;
+class BoxScroller;
 class ScrollArea;
 class WindowSingleWidgetTarget;
 class Document;
+class Canvas;
 
 class BoxScrollWidget : public ScrollWidget {
     Q_OBJECT
@@ -14,7 +15,8 @@ public:
     explicit BoxScrollWidget(Document& document,
                              ScrollArea * const parent = nullptr);
     ~BoxScrollWidget();
-    BoxScrollWidgetVisiblePart *getVisiblePartWidget();
+    BoxScroller *getVisiblePartWidget();
+    void setCurrentScene(Canvas* const scene);
     //    void updateAbstraction();
 protected:
     stdptr<SWT_Abstraction> mCoreAbs;

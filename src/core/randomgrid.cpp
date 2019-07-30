@@ -4,8 +4,8 @@ RandomGrid::RandomGrid() : StaticComplexAnimator("randomness grid") {
     mSeed = SPtrCreate(QrealAnimator)(qrand() % 9999, 0, 9999, 1, "smooth seed");
     mGridSize = SPtrCreate(QrealAnimator)(100, 1, 9999, 1, "grid size");
 
-    ca_addChildAnimator(mSeed);
-    ca_addChildAnimator(mGridSize);
+    ca_addChild(mSeed);
+    ca_addChild(mGridSize);
 }
 
 qreal RandomGrid::getBaseSeed(const qreal relFrame) const {

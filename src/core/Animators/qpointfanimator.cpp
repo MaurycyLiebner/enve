@@ -5,8 +5,8 @@ QPointFAnimator::QPointFAnimator(const QString &name) :
     StaticComplexAnimator(name) {
     mXAnimator = SPtrCreate(QrealAnimator)("x");
     mYAnimator = SPtrCreate(QrealAnimator)("y");
-    ca_addChildAnimator(mXAnimator);
-    ca_addChildAnimator(mYAnimator);
+    ca_addChild(mXAnimator);
+    ca_addChild(mYAnimator);
 }
 
 QPointF QPointFAnimator::getBaseValue() const {

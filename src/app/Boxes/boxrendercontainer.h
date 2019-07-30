@@ -1,17 +1,11 @@
 #ifndef RENDERCONTAINER_H
 #define RENDERCONTAINER_H
-class BoundingBox;
 #include "smartPointers/sharedpointerdefs.h"
 #include "skia/skqtconversions.h"
 #include "skia/skiaincludes.h"
-#include <QDebug>
 #include "smartPointers/sharedpointerdefs.h"
-#include "updatable.h"
 #include "framerange.h"
-#include "CacheHandlers/imagecachecontainer.h"
-class Canvas;
 
-class HDDCachableCacheHandler;
 struct BoxRenderData;
 
 class RenderContainer {

@@ -6,8 +6,8 @@ LinesPathEffect::LinesPathEffect() :
     mAngle = SPtrCreate(QrealAnimator)(0, -9999, 9999, 1, "angle");
     mDistance = SPtrCreate(QrealAnimator)(10, 1, 9999, 1, "distance");
 
-    ca_addChildAnimator(mAngle);
-    ca_addChildAnimator(mDistance);
+    ca_addChild(mAngle);
+    ca_addChild(mDistance);
 }
 
 void LinesPathEffect::apply(const qreal relFrame, const SkPath &src,

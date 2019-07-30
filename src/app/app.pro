@@ -122,12 +122,10 @@ SOURCES += main.cpp\
     Boxes/imagebox.cpp \
     Boxes/pathbox.cpp \
     Boxes/boundingbox.cpp \
-    Animators/effectanimators.cpp \
     Boxes/animationbox.cpp \
     pathoperations.cpp \
     Boxes/linkbox.cpp \
     Boxes/boxpainthandler.cpp \
-    PixmapEffects/pixmapeffect.cpp \
     Boxes/particlebox.cpp \
     GUI/BoxesList/OptimalScrollArea/scrollarea.cpp \
     GUI/BoxesList/OptimalScrollArea/scrollwidget.cpp \
@@ -177,19 +175,6 @@ SOURCES += main.cpp\
     PathEffects/displacepatheffect.cpp \
     PathEffects/duplicatepatheffect.cpp \
     PathEffects/solidifypatheffect.cpp \
-    PixmapEffects/blureffect.cpp \
-    PixmapEffects/shadoweffect.cpp \
-    PixmapEffects/lineseffect.cpp \
-    PixmapEffects/circleseffect.cpp \
-    PixmapEffects/swirleffect.cpp \
-    PixmapEffects/oileffect.cpp \
-    PixmapEffects/implodeeffect.cpp \
-    PixmapEffects/desaturateeffect.cpp \
-    PixmapEffects/colorizeeffect.cpp \
-    PixmapEffects/replacecoloreffect.cpp \
-    PixmapEffects/contrasteffect.cpp \
-    PixmapEffects/brightnesseffect.cpp \
-    PixmapEffects/sampledmotionblureffect.cpp \
     GUI/boxeslistkeysviewwidget.cpp \
     GUI/boxeslistanimationdockwidget.cpp \
     GUI/actionbutton.cpp \
@@ -230,7 +215,6 @@ SOURCES += main.cpp\
     PropertyUpdaters/particlesupdater.cpp \
     PropertyUpdaters/gradientpointsupdater.cpp \
     PropertyUpdaters/groupallpathsupdater.cpp \
-    PixmapEffects/rastereffects.cpp \
     GUI/ColorWidgets/colorwidgetshaders.cpp \
     taskexecutor.cpp \
     taskscheduler.cpp \
@@ -354,12 +338,10 @@ HEADERS  += \
     Boxes/pathbox.h \
     Boxes/rectangle.h \
     Boxes/textbox.h \
-    Animators/effectanimators.h \
     Boxes/animationbox.h \
     pathoperations.h \
     Boxes/linkbox.h \
     Boxes/boxpainthandler.h \
-    PixmapEffects/pixmapeffect.h \
     Boxes/particlebox.h \
     GUI/BoxesList/OptimalScrollArea/scrollarea.h \
     GUI/BoxesList/OptimalScrollArea/scrollwidget.h \
@@ -408,21 +390,7 @@ HEADERS  += \
     PathEffects/displacepatheffect.h \
     PathEffects/duplicatepatheffect.h \
     PathEffects/solidifypatheffect.h \
-    PixmapEffects/blureffect.h \
-    PixmapEffects/shadoweffect.h \
-    PixmapEffects/lineseffect.h \
-    PixmapEffects/circleseffect.h \
-    PixmapEffects/swirleffect.h \
-    PixmapEffects/oileffect.h \
-    PixmapEffects/implodeeffect.h \
-    PixmapEffects/desaturateeffect.h \
-    PixmapEffects/colorizeeffect.h \
-    PixmapEffects/replacecoloreffect.h \
-    PixmapEffects/contrasteffect.h \
-    PixmapEffects/brightnesseffect.h \
-    PixmapEffects/sampledmotionblureffect.h \
     PathEffects/patheffectsinclude.h \
-    PixmapEffects/pixmapeffectsinclude.h \
     GUI/actionbutton.h \
     GUI/animationdockwidget.h \
     GUI/animationwidgetscrollbar.h \
@@ -462,7 +430,6 @@ HEADERS  += \
     PropertyUpdaters/particlesupdater.h \
     PropertyUpdaters/gradientpointsupdater.h \
     PropertyUpdaters/groupallpathsupdater.h \
-    PixmapEffects/rastereffects.h \
     GUI/ColorWidgets/colorwidgetshaders.h \
     taskexecutor.h \
     taskscheduler.h \

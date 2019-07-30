@@ -3,6 +3,7 @@
 #include "PropertyUpdaters/propertyupdater.h"
 #include "undoredo.h"
 #include "Animators/transformanimator.h"
+#include "typemenu.h"
 
 Property::Property(const QString& name) :
     prp_mName(name) {}
@@ -18,6 +19,14 @@ void Property::drawCanvasControls(SkCanvas * const canvas,
         } else key = false;
         mPointsHandler->drawPoints(canvas, invScale, key, mode);
     }
+}
+
+void Property::setupTreeViewMenu(PropertyMenu * const menu) {
+    //auto clipboard = Document::sInstance->getPropertyClipboard();
+    menu->addPlainAction("Copy", [this]() {
+        //const auto container = SPtrCreate(PropertyClipboard)(this);
+        //Document::sInstance->replaceClipboard(container);
+    });
 }
 
 void Property::prp_afterChangedAbsRange(const FrameRange &range) {

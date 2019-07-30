@@ -6,7 +6,6 @@
 #include "updatable.h"
 #include "Animators/animator.h"
 #include <QMatrix>
-struct PixmapEffectRenderData;
 class BoundingBox;
 class ShaderProgramCallerBase;
 #include "smartPointers/sharedpointerdefs.h"

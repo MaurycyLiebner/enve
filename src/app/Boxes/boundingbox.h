@@ -19,10 +19,8 @@ class DurationRectangleMovable;
 class FillSettingsAnimator;
 class OutlineSettingsAnimator;
 class PaintSettingsApplier;
-class EffectAnimators;
 class GPUEffectAnimators;
 class ShaderEffectProgram;
-class PixmapEffect;
 class BoxTransformAnimator;
 class BasicTransformAnimator;
 
@@ -54,9 +52,6 @@ enum BoundingBoxType {
     TYPE_PAINT,
     TYPE_GROUP
 };
-
-typedef PropertyMimeData<BoundingBox,
-    InternalMimeData::BOUNDING_BOX> BoundingBoxMimeData;
 
 class BoundingBox;
 template<typename T> class TypeMenu;
@@ -204,8 +199,6 @@ public:
     virtual void writeBoundingBox(QIODevice * const dst);
     virtual void readBoundingBox(QIODevice * const src);
 
-    virtual void setupEffectsF(const qreal relFrame,
-                               BoxRenderData * const data);
     virtual void setupGPUEffectsF(const qreal relFrame,
                                   BoxRenderData * const data);
     virtual const SkBlendMode &getBlendMode();
@@ -320,9 +313,6 @@ public:
                            const SkPath &path,
                            const float invScale);
 
-    void setGPUEffectsEnabled(const bool enable);
-    bool getGPUEffectsEnabled() const;
-
     void setRasterEffectsEnabled(const bool enable);
     bool getRasterEffectsEnabled() const;
 
@@ -331,8 +321,6 @@ public:
         addEffect(SPtrCreateTemplated(T)());
     }
 
-    void addEffect(const qsptr<PixmapEffect> &effect);
-    void removeEffect(const qsptr<PixmapEffect> &effect);
     void clearRasterEffects();
 
     void addGPUEffect(const qsptr<GpuEffect> &rasterEffect);
@@ -382,7 +370,6 @@ public:
     void removeLinkingBox(BoundingBox *box);
     const QList<qptr<BoundingBox>> &getLinkingBoxes() const;
 
-    EffectAnimators *getEffectsAnimators();
 
     void incReasonsNotToApplyUglyTransform();
     void decReasonsNotToApplyUglyTransform();
@@ -446,7 +433,6 @@ protected:
     qsptr<DurationRectangle> mDurationRectangle;
     const qsptr<BoxTransformAnimator> mTransformAnimator;
 
-    const qsptr<EffectAnimators> mEffectsAnimators;
     const qsptr<GPUEffectAnimators> mGPUEffectsAnimators;
 
     bool mCenterPivotPlanned = false;

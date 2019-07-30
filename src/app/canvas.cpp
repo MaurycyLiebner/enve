@@ -18,14 +18,12 @@
 #include "renderinstancesettings.h"
 #include "videoencoder.h"
 #include "PropertyUpdaters/displayedfillstrokesettingsupdater.h"
-#include "Animators/effectanimators.h"
-#include "PixmapEffects/pixmapeffect.h"
-#include "PixmapEffects/rastereffects.h"
 #include "MovablePoints/smartnodepoint.h"
 #include "Boxes/internallinkcanvas.h"
 #include "pointtypemenu.h"
 #include "Animators/transformanimator.h"
 #include "glhelpers.h"
+#include "CacheHandlers/imagecachecontainer.h"
 
 Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
@@ -48,12 +46,12 @@ Canvas::Canvas(Document &document,
     mFps = fps;
 
     mBackgroundColor->qra_setCurrentValue(QColor(75, 75, 75));
-    ca_addChildAnimator(mBackgroundColor);
+    ca_addChild(mBackgroundColor);
     mBackgroundColor->prp_setInheritedUpdater(
                 SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
     mSoundComposition = qsptr<SoundComposition>::create(this);
     auto soundsAnimatorContainer = mSoundComposition->getSoundsAnimatorContainer();
-    ca_addChildAnimator(GetAsSPtr(soundsAnimatorContainer, Property));
+    ca_addChild(GetAsSPtr(soundsAnimatorContainer, Property));
 
     mRange = {0, frameCount};
 
@@ -596,26 +594,12 @@ void Canvas::deleteAction() {
 }
 
 void Canvas::copyAction() {
-    const auto container = SPtrCreate(BoxesClipboardContainer)();
+    const auto container = SPtrCreate(BoxesClipboard)(mSelectedBoxes.getList());
     Document::sInstance->replaceClipboard(container);
-    QBuffer target(container->getBytesArray());
-    target.open(QIODevice::WriteOnly);
-    const int nBoxes = mSelectedBoxes.count();
-    target.write(rcConstChar(&nBoxes), sizeof(int));
-
-    for(const auto& box : mSelectedBoxes) {
-        box->writeBoxType(&target);
-        box->writeBoundingBox(&target);
-    }
-    target.close();
-
-    BoundingBox::sClearWriteBoxes();
 }
 
 void Canvas::pasteAction() {
-    const auto container =
-            static_cast<BoxesClipboardContainer*>(
-            Document::sInstance->getClipboardContainer(CCT_BOXES));
+    const auto container = Document::sInstance->getBoxesClipboard();
     if(!container) return;
     clearBoxesSelection();
     container->pasteTo(mCurrentContainer);
@@ -645,8 +629,7 @@ void Canvas::invertSelectionAction() {
         selectAllPointsAction();
         for(const auto& pt : selectedPts) removePointFromSelection(pt);
     } else {//if(mCurrentMode == MOVE_PATH) {
-        QList<BoundingBox*> boxes;
-        mSelectedBoxes.getObjList(boxes);
+        QList<BoundingBox*> boxes = mSelectedBoxes.getList();
         selectAllBoxesFromBoxesGroup();
         for(const auto& box : boxes) removeBoxFromSelection(box);
     }

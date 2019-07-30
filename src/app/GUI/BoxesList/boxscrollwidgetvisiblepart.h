@@ -12,9 +12,9 @@ class Key;
 class KeysView;
 class Canvas;
 
-class BoxScrollWidgetVisiblePart : public ScrollWidgetVisiblePart {
+class BoxScroller : public ScrollWidgetVisiblePart {
 public:
-    explicit BoxScrollWidgetVisiblePart(ScrollWidget * const parent);
+    explicit BoxScroller(ScrollWidget * const parent);
 
     QWidget *createNewSingleWidget();
     void paintEvent(QPaintEvent *);
@@ -44,7 +44,13 @@ public:
         return mKeysView;
     }
 
-    Canvas* currentScene() const;
+    Canvas* currentScene() const {
+        return mCurrentScene;
+    }
+
+    void setCurrentScene(Canvas* const scene) {
+        mCurrentScene = scene;
+    }
 
     void setKeysView(KeysView *keysView) {
         mKeysView = keysView;
@@ -58,6 +64,7 @@ protected:
     void dragMoveEvent(QDragMoveEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
 private:
+    Canvas* mCurrentScene = nullptr;
     bool mDragging = false;
 
     QLine mCurrentDragLine;
@@ -68,7 +75,7 @@ private:
     struct Dragged {
         SWT_Abstraction * fPtr;
         enum Type { BOX,
-                    RASTER_EFFECT, RASTER_GPU_EFFECT, PATH_EFFECT,
+                    RASTER_EFFECT, PATH_EFFECT,
                     NONE } fType;
 
         bool isValid() const {

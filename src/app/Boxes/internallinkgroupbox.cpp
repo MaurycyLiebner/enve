@@ -57,12 +57,12 @@ QMatrix InternalLinkGroupBox::getRelativeTransformAtRelFrameF(
     }
 }
 
-void InternalLinkGroupBox::setupEffectsF(const qreal relFrame,
+void InternalLinkGroupBox::setupGPUEffectsF(const qreal relFrame,
                                          BoxRenderData * const data) {
     if(isParentLink() && getLinkTarget()) {
-        getLinkTarget()->setupEffectsF(relFrame, data);
+        getLinkTarget()->setupGPUEffectsF(relFrame, data);
     } else {
-        BoundingBox::setupEffectsF(relFrame, data);
+        BoundingBox::setupGPUEffectsF(relFrame, data);
     }
 }
 

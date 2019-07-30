@@ -8,7 +8,6 @@
 #include "canvas.h"
 #include "PropertyUpdaters/nodepointupdater.h"
 #include "PropertyUpdaters/gradientpointsupdater.h"
-#include "Animators/effectanimators.h"
 #include "Animators/transformanimator.h"
 #include "paintsettingsapplier.h"
 #include "Animators/gradient.h"
@@ -41,14 +40,6 @@ PathBox::PathBox(const BoundingBoxType &type) :
     mOutlinePathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(NodePointUpdater)(this));
 
-//    mPathEffectsAnimators->prp_setName("path effects");
-//    mPathEffectsAnimators->prp_setOwnUpdater(
-//                SPtrCreate(PixmapEffectUpdater)(this));
-
-//    mOutlinePathEffectsAnimators->prp_setName("outline path effects");
-//    mOutlinePathEffectsAnimators->prp_setOwnUpdater(
-//                SPtrCreate(PixmapEffectUpdater)(this));
-
     mStrokeGradientPoints = SPtrCreate(GradientPoints)(this);
     mStrokeGradientPoints->prp_setOwnUpdater(
                 SPtrCreate(GradientPointsUpdater)(false, this));
@@ -61,18 +52,16 @@ PathBox::PathBox(const BoundingBoxType &type) :
                 mFillGradientPoints.data(), this);
     mStrokeSettings = SPtrCreate(OutlineSettingsAnimator)(
                 mStrokeGradientPoints.data(), this);
-    ca_addChildAnimator(mFillSettings);
-    ca_addChildAnimator(mStrokeSettings);
+    ca_addChild(mFillSettings);
+    ca_addChild(mStrokeSettings);
 
-    ca_addChildAnimator(mPathEffectsAnimators);
-    ca_addChildAnimator(mFillPathEffectsAnimators);
-    ca_addChildAnimator(mOutlineBasePathEffectsAnimators);
-    ca_addChildAnimator(mOutlinePathEffectsAnimators);
+    ca_addChild(mPathEffectsAnimators);
+    ca_addChild(mFillPathEffectsAnimators);
+    ca_addChild(mOutlineBasePathEffectsAnimators);
+    ca_addChild(mOutlinePathEffectsAnimators);
 
     ca_moveChildBelow(mGPUEffectsAnimators.data(),
                       mOutlinePathEffectsAnimators.data());
-    ca_moveChildBelow(mEffectsAnimators.data(),
-                      mGPUEffectsAnimators.data());
 }
 
 PathBox::~PathBox() {
@@ -587,6 +576,6 @@ OutlineSettingsAnimator *PathBox::getStrokeSettings() const {
 
 #include "patheffectsmenu.h"
 void PathBox::setupCanvasMenu(PropertyMenu * const menu) {
-    PathEffectsMenu::addPathEffectsToActionMenu(menu);
     BoundingBox::setupCanvasMenu(menu);
+    PathEffectsMenu::addPathEffectsToActionMenu(menu);
 }

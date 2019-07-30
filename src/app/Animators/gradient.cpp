@@ -60,7 +60,7 @@ void Gradient::addColorToList(const QColor &color) {
 void Gradient::addColorToList(const qsptr<ColorAnimator>& newColorAnimator) {
     mColors << newColorAnimator;
 
-    ca_addChildAnimator(newColorAnimator);
+    ca_addChild(newColorAnimator);
 }
 
 QColor Gradient::getColorAt(const int id) {
@@ -104,7 +104,7 @@ void Gradient::removeColor(const int id) {
 }
 
 void Gradient::removeColor(const qsptr<ColorAnimator>& color) {
-    ca_removeChildAnimator(color);
+    ca_removeChild(color);
     mColors.removeOne(color);
     updateQGradientStops(Animator::USER_CHANGE);
     prp_afterWholeInfluenceRangeChanged();

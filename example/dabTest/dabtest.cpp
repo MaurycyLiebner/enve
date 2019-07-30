@@ -43,10 +43,10 @@ bool supports(const CustomIdentifier &identifier) {
 DabTest000::DabTest000() :
     CustomGpuEffect(effectName().toLower()) {
     mRadius = SPtrCreate(QrealAnimator)(0.5, 0, 1, 0.1, "radius");
-    ca_addChildAnimator(mRadius);
+    ca_addChild(mRadius);
 
     mHardness = SPtrCreate(QrealAnimator)(1, 0, 1, 0.1, "hardness");
-    ca_addChildAnimator(mHardness);
+    ca_addChild(mHardness);
 }
 
 stdsptr<RasterEffectCaller>

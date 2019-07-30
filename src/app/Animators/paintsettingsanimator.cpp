@@ -61,14 +61,14 @@ void PaintSettingsAnimator::readProperty(QIODevice * const src) {
 void PaintSettingsAnimator::setGradientVar(Gradient* const grad) {
     if(grad == mGradient) return;
     if(mGradient) {
-        ca_removeChildAnimator(GetAsSPtr(mGradient, Gradient));
-        ca_removeChildAnimator(GetAsSPtr(mGradientPoints, GradientPoints));
+        ca_removeChild(GetAsSPtr(mGradient, Gradient));
+        ca_removeChild(GetAsSPtr(mGradientPoints, GradientPoints));
         mGradient->removePath(mTarget_k);
     }
     mGradient = grad;
     if(mGradient) {
-        ca_addChildAnimator(GetAsSPtr(grad, Gradient));
-        ca_addChildAnimator(GetAsSPtr(mGradientPoints, GradientPoints));
+        ca_addChild(GetAsSPtr(grad, Gradient));
+        ca_addChild(GetAsSPtr(mGradientPoints, GradientPoints));
         mGradient->addPath(mTarget_k);
     }
 
@@ -104,9 +104,9 @@ void PaintSettingsAnimator::setCurrentColor(const QColor &color) {
 void PaintSettingsAnimator::showHideChildrenBeforeChaningPaintType(
         const PaintType &newPaintType) {
     if(mPaintType == FLATPAINT)
-        ca_removeChildAnimator(mColor);
+        ca_removeChild(mColor);
     if(newPaintType == FLATPAINT)
-        ca_addChildAnimator(mColor);
+        ca_addChild(mColor);
 }
 
 void PaintSettingsAnimator::setPaintType(const PaintType &paintType) {

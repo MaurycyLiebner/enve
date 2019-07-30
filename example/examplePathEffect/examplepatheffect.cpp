@@ -42,7 +42,7 @@ bool supports(const CustomIdentifier &identifier) {
 ExamplePathEffect000::ExamplePathEffect000() :
     CustomPathEffect(effectName().toLower()) {
     mInfluence = SPtrCreate(QrealAnimator)(0, 0, 1, 0.1, "influence");
-    ca_addChildAnimator(mInfluence);
+    ca_addChild(mInfluence);
 }
 
 CustomIdentifier ExamplePathEffect000::getIdentifier() const {

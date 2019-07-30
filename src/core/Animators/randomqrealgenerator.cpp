@@ -9,18 +9,18 @@
 RandomQrealGenerator::RandomQrealGenerator() :
     QrealValueEffect("noise") {
     mTime = SPtrCreate(QrealAnimator)(0, 0, 9999, 1, "time");
-    ca_addChildAnimator(mTime);
+    ca_addChild(mTime);
     mSmoothness = QrealAnimator::sCreate0to1Animator("smoothness");
-    ca_addChildAnimator(mSmoothness);
+    ca_addChild(mSmoothness);
     mMaxDev = SPtrCreate(QrealAnimator)(0, 0, 999, 1, "amplitude");
-    ca_addChildAnimator(mMaxDev);
+    ca_addChild(mMaxDev);
     mType = SPtrCreate(ComboBoxProperty)("type",
                 QStringList() << "add" << "subtract" << "overlay");
     mType->setCurrentValue(2);
-    ca_addChildAnimator(mType);
+    ca_addChild(mType);
 
     mSeedAssist = IntAnimator::sCreateSeed();
-    ca_addChildAnimator(mSeedAssist);
+    ca_addChild(mSeedAssist);
 }
 
 void RandomQrealGenerator::anim_setAbsFrame(const int frame) {

@@ -62,10 +62,8 @@ protected:
 
     template<class T>
     inline std::shared_ptr<T> ref() const {
-        if(mThisWeak.expired())
-            RuntimeThrow("Not initialized, or already deleting");
-        return std::static_pointer_cast<T>(
-                    std::shared_ptr<StdSelfRef>(mThisWeak));
+        if(mThisWeak.expired()) RuntimeThrow("Not initialized, or already deleting");
+        return std::static_pointer_cast<T>(std::shared_ptr<StdSelfRef>(mThisWeak));
     }
 
     template<class T>
@@ -76,8 +74,8 @@ protected:
 
     template<class T>
     std::shared_ptr<T> iniRef() {
-        Q_ASSERT_X(mThisWeak.expired(), "StdSelfRef::iniRef", "reinitialization");
-        std::shared_ptr<T> thisRef = std::shared_ptr<T>(static_cast<T*>(this));
+        if(!mThisWeak.expired()) RuntimeThrow("Shared pointer reinitialization");
+         std::shared_ptr<T> thisRef = std::shared_ptr<T>(static_cast<T*>(this));
         this->mThisWeak = std::static_pointer_cast<StdSelfRef>(thisRef);
         return thisRef;
     }

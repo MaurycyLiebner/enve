@@ -140,8 +140,6 @@ void Animator::anim_switchRecording() {
 
 bool Animator::anim_isDescendantRecording() const { return anim_mIsRecording; }
 
-void Animator::prp_startDragging() {}
-
 struct KeyPair {
     KeyPair(Key * const key1, Key * const key2) :
         fKey1(key1), fKey2(key2) {}

@@ -8,7 +8,7 @@ SolidifyPathEffect::SolidifyPathEffect() :
     mDisplacement->setValueRange(-999.999, 999.999);
     mDisplacement->setCurrentBaseValue(5);
 
-    ca_addChildAnimator(mDisplacement);
+    ca_addChild(mDisplacement);
 
     setPropertyForGUI(mDisplacement.get());
 }

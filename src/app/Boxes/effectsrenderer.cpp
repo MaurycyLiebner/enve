@@ -1,5 +1,4 @@
 #include "effectsrenderer.h"
-#include "PixmapEffects/rastereffects.h"
 #include "GPUEffects/gpupostprocessor.h"
 #include "boxrenderdata.h"
 

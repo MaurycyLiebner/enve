@@ -19,10 +19,10 @@ class GraphAnimator;
 class QrealPoint;
 class Canvas;
 class MainWindow;
-class BoxScrollWidgetVisiblePart;
+class BoxScroller;
 class AnimationDockWidget;
 class DurationRectangleMovable;
-class KeysClipboardContainer;
+class KeysClipboard;
 class Animator;
 #include "valueinput.h"
 enum CtrlsMode : short;
@@ -30,7 +30,7 @@ enum CtrlsMode : short;
 class KeysView : public QWidget, public KeyFocusTarget {
     Q_OBJECT
 public:
-    explicit KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
+    explicit KeysView(BoxScroller *boxesListVisible,
                       QWidget *parent = nullptr);
 
     void setCurrentScene(Canvas* const scene);
@@ -147,7 +147,7 @@ private:
     void sortSelectedKeys();
     void clearHoveredKey();
 
-    stdsptr<KeysClipboardContainer> getSelectedKeysClipboardContainer();
+    stdsptr<KeysClipboard> getSelectedKeysClipboardContainer();
 
     QTimer *mScrollTimer;
 
@@ -170,7 +170,7 @@ private:
     int mViewedTop = 0;
     int mViewedBottom = 0;
 
-    BoxScrollWidgetVisiblePart *mBoxesListVisible;
+    BoxScroller *mBoxesListVisible;
     QRectF mSelectionRect;
     bool mSelecting = false;
     bool mGraphViewed = false;

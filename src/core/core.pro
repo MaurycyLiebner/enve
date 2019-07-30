@@ -44,6 +44,7 @@ CONFIG(debug, debug|release) {
 LIBS += -lskia
 
 SOURCES += \
+    Animators/eeffect.cpp \
     Animators/qrealsnapshot.cpp \
     Animators/staticcomplexanimator.cpp \
     GPUEffects/customgpueffect.cpp \
@@ -138,6 +139,7 @@ SOURCES += \
 
 HEADERS += \
     Animators/dynamiccomplexanimator.h \
+    Animators/eeffect.h \
     Animators/qrealsnapshot.h \
     Animators/staticcomplexanimator.h \
     GPUEffects/customgpueffect.h \

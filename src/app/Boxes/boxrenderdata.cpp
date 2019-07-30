@@ -1,7 +1,6 @@
 #include "boxrenderdata.h"
 #include "boundingbox.h"
 #include "skia/skiahelpers.h"
-#include "PixmapEffects/pixmapeffect.h"
 
 BoxRenderData::BoxRenderData(BoundingBox *parentBoxT) {
     fParentBox = parentBoxT;

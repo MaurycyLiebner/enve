@@ -7,7 +7,6 @@
 #include <QComboBox>
 #include <QPushButton>
 #include "undoredo.h"
-#include "clipboardcontainer.h"
 #include "taskscheduler.h"
 #include "effectsloader.h"
 #include "document.h"
@@ -16,9 +15,7 @@
 #include "layouthandler.h"
 #include "settings.h"
 class VideoEncoder;
-enum ClipboardContainerType : short;
 
-class ClipboardContainer;
 class ActionButton;
 class BoxesList;
 class FontsWidget;

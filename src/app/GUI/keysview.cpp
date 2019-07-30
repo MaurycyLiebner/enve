@@ -14,7 +14,7 @@
 #include "clipboardcontainer.h"
 #include "Animators/qrealpoint.h"
 
-KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
+KeysView::KeysView(BoxScroller *boxesListVisible,
                    QWidget *parent) :
     QWidget(parent) {
     mBoxesListVisible = boxesListVisible;
@@ -217,9 +217,9 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
     Document::sInstance->actionFinished();
 }
 
-stdsptr<KeysClipboardContainer> KeysView::getSelectedKeysClipboardContainer() {
-    stdsptr<KeysClipboardContainer> container =
-            SPtrCreate(KeysClipboardContainer)();
+stdsptr<KeysClipboard> KeysView::getSelectedKeysClipboardContainer() {
+    stdsptr<KeysClipboard> container =
+            SPtrCreate(KeysClipboard)();
     for(const auto& anim : mSelectedKeysAnimators) {
         QByteArray keyData;
         QBuffer target(&keyData);
@@ -246,8 +246,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_V) {
         if(event->isAutoRepeat()) return false;
-        auto cont = Document::sInstance->getClipboardContainer(CCT_KEYS);
-        const auto container = GetAsPtr(cont, KeysClipboardContainer);
+        const auto container = Document::sInstance->getKeysClipboard();
         if(!container) return false;
         container->paste(mCurrentScene->getCurrentFrame(), this, true, true);
     } else if(!mSelectedKeysAnimators.isEmpty()) {
@@ -491,7 +490,7 @@ void KeysView::scrollRight() {
         mSelectionRect.setBottomRight(mSelectionRect.bottomRight() +
                                       QPointF(inc, 0));
     } else if(mMovingKeys) {
-        mLastPressPos.setX(mLastPressPos.x() - inc*mPixelsPerFrame);
+        mLastPressPos.setX(mLastPressPos.x() - qRound(inc*mPixelsPerFrame));
         handleMouseMove(mLastMovePos, QApplication::mouseButtons());
     }
     update();
@@ -507,7 +506,7 @@ void KeysView::scrollLeft() {
         mSelectionRect.setBottomRight(mSelectionRect.bottomRight() -
                                       QPointF(inc, 0));
     } else if(mMovingKeys) {
-        mLastPressPos.setX(mLastPressPos.x() + qFloor(inc*mPixelsPerFrame));
+        mLastPressPos.setX(mLastPressPos.x() + qRound(inc*mPixelsPerFrame));
         handleMouseMove(mLastMovePos, QApplication::mouseButtons());
     }
     update();

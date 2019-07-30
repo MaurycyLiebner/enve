@@ -1,6 +1,5 @@
 #include "canvasrenderdata.h"
 #include "skia/skiahelpers.h"
-#include "PixmapEffects/pixmapeffect.h"
 
 CanvasRenderData::CanvasRenderData(BoundingBox * const parentBoxT) :
     ContainerBoxRenderData(parentBoxT) {}

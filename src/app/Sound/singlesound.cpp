@@ -21,7 +21,7 @@ SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
             this, &SingleSound::updateAfterDurationRectangleShifted);
     mDurationRectangle->setSoundCacheHandler(getCacheHandler());
 
-    ca_addChildAnimator(mVolumeAnimator);
+    ca_addChild(mVolumeAnimator);
 }
 
 #include <QInputDialog>

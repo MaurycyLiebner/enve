@@ -244,7 +244,7 @@ ParticleEmitter::ParticleEmitter() :
     //mPos.setCurrentValue(QPointF(0., 0.));
 
     mColorAnimator->qra_setCurrentValue(QColor(0, 0, 0));
-    ca_addChildAnimator(mColorAnimator);
+    ca_addChild(mColorAnimator);
 
     mWidth->setValueRange(0., 6000.);
     mWidth->setCurrentBaseValue(0.);
@@ -297,34 +297,34 @@ ParticleEmitter::ParticleEmitter() :
     mParticlesOpacityDecay->setValueRange(0., 1.);
     mParticlesOpacityDecay->setCurrentBaseValue(0.);
 
-    ca_addChildAnimator(mPos);
-    ca_addChildAnimator(mWidth);
+    ca_addChild(mPos);
+    ca_addChild(mWidth);
 
-    ca_addChildAnimator(mSrcVelInfl);
+    ca_addChild(mSrcVelInfl);
 
-    ca_addChildAnimator(mIniVelocity);
-    ca_addChildAnimator(mIniVelocityVar);
+    ca_addChild(mIniVelocity);
+    ca_addChild(mIniVelocityVar);
 
-    ca_addChildAnimator(mIniVelocityAngle);
-    ca_addChildAnimator(mIniVelocityAngleVar);
+    ca_addChild(mIniVelocityAngle);
+    ca_addChild(mIniVelocityAngleVar);
 
-    ca_addChildAnimator(mAcceleration);
+    ca_addChild(mAcceleration);
 
-    ca_addChildAnimator(mParticlesPerSecond);
-    ca_addChildAnimator(mParticlesFrameLifetime);
+    ca_addChild(mParticlesPerSecond);
+    ca_addChild(mParticlesFrameLifetime);
 
-    ca_addChildAnimator(mVelocityRandomVar);
-    ca_addChildAnimator(mVelocityRandomVarPeriod);
+    ca_addChild(mVelocityRandomVar);
+    ca_addChild(mVelocityRandomVarPeriod);
 
-    ca_addChildAnimator(mParticleSize);
-    ca_addChildAnimator(mParticleSizeVar);
+    ca_addChild(mParticleSize);
+    ca_addChild(mParticleSizeVar);
 
-    ca_addChildAnimator(mParticleLength);
+    ca_addChild(mParticleLength);
 
-    ca_addChildAnimator(mParticlesDecayFrames);
-    ca_addChildAnimator(mParticlesSizeDecay);
-    ca_addChildAnimator(mParticlesOpacityDecay);
-    ca_addChildAnimator(mBoxTargetProperty);
+    ca_addChild(mParticlesDecayFrames);
+    ca_addChild(mParticlesSizeDecay);
+    ca_addChild(mParticlesOpacityDecay);
+    ca_addChild(mBoxTargetProperty);
 
     prp_setOwnUpdater(SPtrCreate(ParticlesUpdater)(this));
 

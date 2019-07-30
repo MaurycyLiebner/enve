@@ -1,9 +1,9 @@
 #include "videocachehandler.h"
 #include "Boxes/boxrendercontainer.h"
 #include "Boxes/videobox.h"
+#include "CacheHandlers/imagecachecontainer.h"
 
 #include <QFileDialog>
-#include "GUI/mainwindow.h"
 #include "filesourcescache.h"
 
 #include "videoframeloader.h"
@@ -116,7 +116,6 @@ void VideoFileHandler::replace(QWidget* const parent) {
                 parent,
                 "Replace Video Source " + mPath, "",
                 "Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
-    MainWindow::getInstance()->enableEventFilter();
     if(!importPath.isEmpty()) {
         const QFile file(importPath);
         if(!file.exists()) return;

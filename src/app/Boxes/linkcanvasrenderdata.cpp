@@ -1,6 +1,5 @@
 #include "linkcanvasrenderdata.h"
 #include "skia/skiahelpers.h"
-#include "PixmapEffects/pixmapeffect.h"
 #include "skia/skqtconversions.h"
 
 void LinkCanvasRenderData::process() {

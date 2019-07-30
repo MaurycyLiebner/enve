@@ -30,11 +30,15 @@ BoxScrollWidget::~BoxScrollWidget() {
 //    updateHeight();
 //}
 
-BoxScrollWidgetVisiblePart *BoxScrollWidget::getVisiblePartWidget() {
-    return (BoxScrollWidgetVisiblePart*)mVisiblePartWidget;
+BoxScroller *BoxScrollWidget::getVisiblePartWidget() {
+    return static_cast<BoxScroller*>(mVisiblePartWidget);
+}
+
+void BoxScrollWidget::setCurrentScene(Canvas * const scene) {
+    getVisiblePartWidget()->setCurrentScene(scene);
 }
 
 void BoxScrollWidget::createVisiblePartWidget() {
-    mVisiblePartWidget = new BoxScrollWidgetVisiblePart(this);
+    mVisiblePartWidget = new BoxScroller(this);
     mMinimalVisiblePartWidget = mVisiblePartWidget;
 }

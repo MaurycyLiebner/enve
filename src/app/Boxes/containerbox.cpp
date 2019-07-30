@@ -8,7 +8,6 @@
 #include "PropertyUpdaters/groupallpathsupdater.h"
 #include "textbox.h"
 #include "Animators/gpueffectanimators.h"
-#include "Animators/effectanimators.h"
 
 ContainerBox::ContainerBox(const BoundingBoxType &type) :
     BoundingBox(type) {
@@ -21,28 +20,28 @@ void ContainerBox::iniPathEffects() {
     mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(GroupAllPathsUpdater)(this));
-    ca_addChildAnimator(mPathEffectsAnimators);
+    ca_addChild(mPathEffectsAnimators);
 
     mFillPathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)();
     mFillPathEffectsAnimators->prp_setName("fill effects");
     mFillPathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(GroupAllPathsUpdater)(this));
-    ca_addChildAnimator(mFillPathEffectsAnimators);
+    ca_addChild(mFillPathEffectsAnimators);
 
     mOutlineBasePathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)();
     mOutlineBasePathEffectsAnimators->prp_setName("outline base effects");
     mOutlineBasePathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(GroupAllPathsUpdater)(this));
-    ca_addChildAnimator(mOutlineBasePathEffectsAnimators);
+    ca_addChild(mOutlineBasePathEffectsAnimators);
 
     mOutlinePathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
     mOutlinePathEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(GroupAllPathsUpdater)(this));
-    ca_addChildAnimator(mOutlinePathEffectsAnimators);
+    ca_addChild(mOutlinePathEffectsAnimators);
 }
 
 
@@ -288,7 +287,6 @@ void ContainerBox::promoteToLayer() {
         newName.replace("Group", "Layer");
         prp_setName(newName);
     }
-    mEffectsAnimators->SWT_enable();
     mGPUEffectsAnimators->SWT_enable();
     prp_afterWholeInfluenceRangeChanged();
 
@@ -305,7 +303,6 @@ void ContainerBox::demoteToGroup() {
         newName.replace("Layer", "Group");
         prp_setName(newName);
     }
-    mEffectsAnimators->SWT_disable();
     mGPUEffectsAnimators->SWT_disable();
     prp_afterWholeInfluenceRangeChanged();
 
@@ -481,8 +478,6 @@ void ContainerBox::ungroup_k() {
 
 #include "patheffectsmenu.h"
 void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
-    PathEffectsMenu::addPathEffectsToActionMenu(menu);
-
     menu->addSection("Layer & Group");
 
     const auto ungroupAction = menu->addPlainAction<ContainerBox>(
@@ -504,6 +499,7 @@ void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
     })->setDisabled(SWT_isGroupBox());
 
     BoundingBox::setupCanvasMenu(menu);
+    PathEffectsMenu::addPathEffectsToActionMenu(menu);
 }
 
 void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
@@ -650,7 +646,7 @@ bool ContainerBox::unboundChildren() const {
     if(mParentGroup) {
         if(ContainerBox::SWT_isGroupBox())
             return mParentGroup->unboundChildren();
-        return mGPUEffectsAnimators->effectUnbound() ||
+        return mGPUEffectsAnimators->unbound() ||
                mParentGroup->unboundChildren();
     }
     return false;

@@ -2,7 +2,6 @@
 #include "GUI/mainwindow.h"
 #include "MovablePoints/pathpivot.h"
 #include "PathEffects/patheffectsinclude.h"
-#include "PixmapEffects/pixmapeffectsinclude.h"
 #include "Boxes/smartvectorpath.h"
 #include "Animators/SmartPath/smartpathcollection.h"
 
@@ -528,27 +527,13 @@ void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
 
 #include "Boxes/linkbox.h"
 void Canvas::createLinkBoxForSelected() {
-    for(const auto& selectedBox : mSelectedBoxes) {
+    for(const auto& selectedBox : mSelectedBoxes)
         mCurrentContainer->addContainedBox(selectedBox->createLink());
-    }
 }
 
 #include "clipboardcontainer.h"
 void Canvas::duplicateSelectedBoxes() {
-    stdsptr<BoxesClipboardContainer> container =
-            SPtrCreate(BoxesClipboardContainer)();
-    QBuffer target(container->getBytesArray());
-    target.open(QIODevice::WriteOnly);
-    const int nBoxes = mSelectedBoxes.count();
-    target.write(rcConstChar(&nBoxes), sizeof(int));
-
-    for(const auto &box : mSelectedBoxes) {
-        box->writeBoxType(&target);
-        box->writeBoundingBox(&target);
-    }
-    target.close();
-    BoundingBox::sClearWriteBoxes();
-
+    const auto container = SPtrCreate(BoxesClipboard)(mSelectedBoxes.getList());
     clearBoxesSelection();
     container->pasteTo(mCurrentContainer);
 }

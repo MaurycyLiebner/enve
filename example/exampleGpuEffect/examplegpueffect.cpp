@@ -42,7 +42,7 @@ bool supports(const CustomIdentifier &identifier) {
 ExampleGpuEffect000::ExampleGpuEffect000() :
     CustomGpuEffect(effectName().toLower()) {
     mRadius = SPtrCreate(QrealAnimator)(10, 0, 999.999, 1, "radius");
-    ca_addChildAnimator(mRadius);
+    ca_addChild(mRadius);
 }
 
 stdsptr<RasterEffectCaller>

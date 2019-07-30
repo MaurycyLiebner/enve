@@ -40,8 +40,8 @@ public:
         }
     }
 
-    void setupEffectsF(const qreal relFrame,
-                       BoxRenderData * const data);
+    void setupGPUEffectsF(const qreal relFrame,
+                          BoxRenderData * const data);
 
     QMarginsF getEffectsMargin(const qreal relFrame);
 

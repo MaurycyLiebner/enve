@@ -1,6 +1,7 @@
 #include "videoencoder.h"
 #include <QByteArray>
 #include "Boxes/boxrendercontainer.h"
+#include "CacheHandlers/imagecachecontainer.h"
 #include "canvas.h"
 
 #define AV_RuntimeThrow(errId, message) \
@@ -21,8 +22,7 @@ VideoEncoder::VideoEncoder() {
     mVideoEncoderInstance = this;
 }
 
-void VideoEncoder::addContainer(
-        const stdsptr<ImageCacheContainer>& cont) {
+void VideoEncoder::addContainer(const stdsptr<ImageCacheContainer>& cont) {
     if(!cont) return;
     cont->setBlocked(true);
     mNextContainers.append(cont);

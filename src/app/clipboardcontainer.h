@@ -2,7 +2,10 @@
 #define CLIPBOARDCONTAINER_H
 #include <QList>
 #include <QWeakPointer>
+#include <typeindex>
+
 #include "smartPointers/sharedpointerdefs.h"
+#include "basicreadwrite.h"
 class QrealAnimator;
 class BoundingBox;
 class ContainerBox;
@@ -13,39 +16,36 @@ class Property;
 
 typedef QPair<qptr<Animator>, QByteArray> AnimatorKeyDataPair;
 
-enum  ClipboardContainerType : short {
-    CCT_BOXES,
-    CCT_KEYS,
-    CCT_PROPERTY,
-    CCT_COUNT
+enum class ClipboardType : short {
+    boxes,
+    keys,
+    property,
+    dynamic_properties
 };
 
-class ClipboardContainer : public StdSelfRef {
+class Clipboard : public StdSelfRef {
 public:
-    ClipboardContainer(const ClipboardContainerType &type);
-    virtual ~ClipboardContainer();
+    Clipboard(const ClipboardType &type);
 
-    ClipboardContainerType getType();
-    QByteArray *getBytesArray();
-private:
+    ClipboardType getType();
+protected:
     QByteArray mData;
-    ClipboardContainerType mType;
+private:
+    ClipboardType mType;
 };
 
-class BoxesClipboardContainer : public ClipboardContainer {
+class BoxesClipboard : public Clipboard {
     friend class StdSelfRef;
+protected:
+    BoxesClipboard(const QList<BoundingBox*> &src);
 public:
     void pasteTo(ContainerBox * const parent);
-protected:
-    BoxesClipboardContainer();
-private:
-    QList<qptr<BoundingBox>> mBoxesList;
 };
 
-class KeysClipboardContainer : public ClipboardContainer {
+class KeysClipboard : public Clipboard {
     friend class StdSelfRef;
 public:
-    ~KeysClipboardContainer();
+    ~KeysClipboard();
 
     void paste(const int pasteFrame,
                KeysView * const keysView,
@@ -54,54 +54,68 @@ public:
 
     void addTargetAnimator(Animator *anim, const QByteArray& keyData);
 protected:
-    KeysClipboardContainer();
+    KeysClipboard();
 private:
     QList<AnimatorKeyDataPair> mAnimatorData;
 };
 
-class PropertyClipboardContainer : public ClipboardContainer {
+
+class PropertyClipboard : public Clipboard {
     friend class StdSelfRef;
-public:
-    ~PropertyClipboardContainer();
-
-    void paste(Property *targetProperty);
-    void clearAndPaste(Property *targetProperty);
-
-    bool propertyCompatible(Property *target);
-    void setProperty(Property *property);
-
-    bool isPathEffect() {
-        return mPathEffect;
-    }
-
-    bool isPixmapEffect() {
-        return mPixmapEffect;
-    }
-
-    bool isPathEffectAnimators() {
-        return mPathEffectAnimators;
-    }
-
-    bool isPixmapEffectAnimators() {
-        return mPixmapEffectAnimators;
-    }
 protected:
-    PropertyClipboardContainer();
+    PropertyClipboard(const Property * const source);
+public:
+    bool paste(Property * const target);
+
+    template<typename T>
+    bool hasType() {
+        return mContentType == std::type_index(typeid(T));
+    }
+
+    template<typename T>
+    bool compatibleTarget(T* const obj) const {
+        return mContentType == std::type_index(typeid(obj));
+    }
 private:
-    bool mQrealAnimator = false;
-    bool mQPointFAnimator = false;
-    bool mQStringAnimator = false;
-    bool mPathAnimator = false;
-    bool mAnimatedSurface = false;
-    bool mComplexAnimator = false;
-    bool mPathEffectAnimators = false;
-    bool mPixmapEffectAnimators = false;
-    bool mPathEffect = false;
-    bool mPixmapEffect = false;
-    bool mVectorPathAnimator = false;
-    bool mBoxTargetProperty = false;
-    QString mPropertyName;
-    QPointer<BoundingBox> mTargetBox;
+    const std::type_index mContentType;
+};
+
+template <typename T>
+class DynamicComplexAnimatorBase;
+
+class DynamicPropsClipboard : public Clipboard {
+    friend class StdSelfRef;
+protected:
+    template<typename T>
+    DynamicPropsClipboard(const QList<T*>& source) :
+        Clipboard(ClipboardType::dynamic_properties),
+        mContentBaseType(std::type_index(typeid(T))) {
+        QBuffer dst(&mData);
+        dst.open(QIODevice::WriteOnly);
+        const int count = source.count();
+        dst.write(rcConstChar(&count), sizeof(int));
+        for(const auto& src : source)
+            src->writeProperty(&dst);
+        dst.close();
+    }
+public:
+    template<typename T>
+    bool paste(DynamicComplexAnimatorBase<T> * const target) {
+        if(!compatibleTarget(target)) return false;
+        QBuffer src(&mData);
+        src.open(QIODevice::ReadOnly);
+        target->readProperty(&src);
+        src.close();
+        return true;
+    }
+
+    template<typename T>
+    bool compatibleTarget(DynamicComplexAnimatorBase<T> * const obj) {
+        Q_UNUSED(obj);
+        return mContentBaseType == std::type_index(typeid(T));
+    }
+private:
+    const std::type_index mContentBaseType;
 };
 
 #endif // CLIPBOARDCONTAINER_H

@@ -477,7 +477,6 @@ public:
 
     bool SWT_isCanvas() const { return true; }
 
-    void addSelectedBoxesActions(QMenu * const qMenu);
     void addActionsToMenu(QMenu* const menu);
 
     void deleteAction();

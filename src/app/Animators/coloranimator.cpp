@@ -5,10 +5,10 @@
 ColorAnimator::ColorAnimator(const QString &name) : StaticComplexAnimator(name) {
     setColorMode(RGBMODE);
 
-    ca_addChildAnimator(mVal1Animator);
-    ca_addChildAnimator(mVal2Animator);
-    ca_addChildAnimator(mVal3Animator);
-    ca_addChildAnimator(mAlphaAnimator);
+    ca_addChild(mVal1Animator);
+    ca_addChild(mVal2Animator);
+    ca_addChild(mVal3Animator);
+    ca_addChild(mAlphaAnimator);
 }
 
 void ColorAnimator::writeProperty(QIODevice * const dst) const {

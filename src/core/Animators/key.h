@@ -7,11 +7,11 @@ class QPainter;
 class KeyCloner;
 class Animator;
 
-class KeysClipboardContainer;
+class KeysClipboard;
 
 class Key : public StdSelfRef {
     friend class Animator;
-    friend class KeysClipboardContainer;
+    friend class KeysClipboard;
 public:
     Key(Animator * const parentAnimator);
     Key(const int frame, Animator * const parentAnimator);

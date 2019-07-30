@@ -22,7 +22,7 @@ private:
     //    using ComplexAnimator::ca_prependChildAnimator;
 
     using ComplexAnimator::ca_removeAllChildAnimators;
-    using ComplexAnimator::ca_removeChildAnimator;
+    using ComplexAnimator::ca_removeChild;
     using ComplexAnimator::ca_replaceChildAnimator;
     using ComplexAnimator::ca_takeChildAt;
 };

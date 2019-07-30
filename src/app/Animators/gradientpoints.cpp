@@ -9,12 +9,12 @@ GradientPoints::GradientPoints(PathBox * const parent) :
     setPointsHandler(SPtrCreate(PointsHandler)());
 
     mStartAnimator = SPtrCreate(QPointFAnimator)("point1");
-    ca_addChildAnimator(mStartAnimator);
+    ca_addChild(mStartAnimator);
     mStartPoint = SPtrCreate(GradientPoint)(mStartAnimator.get(), mParent_k);
     mPointsHandler->appendPt(mStartPoint);
 
     mEndAnimator = SPtrCreate(QPointFAnimator)("point2");
-    ca_addChildAnimator(mEndAnimator);
+    ca_addChild(mEndAnimator);
 
     mEndPoint = SPtrCreate(GradientPoint)(mEndAnimator.get(), mParent_k);
     mPointsHandler->appendPt(mEndPoint);

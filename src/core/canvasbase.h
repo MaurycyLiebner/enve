@@ -13,7 +13,7 @@ protected:
     CanvasBase();
 public:
     template <class T = BoundingBox>
-    void execOpOnSelectedBoxes(const std::function<void(QList<T*>)> &op) {
+    void execOpOnSelectedBoxes(const std::function<void(const QList<T*>&)> &op) {
         QList<T*> all;
         for(const auto& box : mSelectedBoxes) {
             const auto boxT = dynamic_cast<T*>(box);
@@ -31,7 +31,7 @@ public:
     }
 
     template <class T = MovablePoint>
-    void execOpOnSelectedPoints(const std::function<void(QList<T*>)> &op) {
+    void execOpOnSelectedPoints(const std::function<void(const QList<T*>&)> &op) {
         QList<T*> all;
         for(const auto& pt : mSelectedPoints_d) {
             const auto ptT = dynamic_cast<T*>(pt);
@@ -67,7 +67,7 @@ public:
     }
 
     template <class T = Property>
-    void execOpOnSelectedProperties(const std::function<void(QList<T*>)> &op) {
+    void execOpOnSelectedProperties(const std::function<void(const QList<T*>&)> &op) {
 
     }
 

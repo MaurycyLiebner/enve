@@ -17,7 +17,7 @@ VideoBox::VideoBox() : AnimationBox(TYPE_VIDEO) {
     const auto flar = GetAsSPtr(mDurationRectangle,
                                 FixedLenAnimationRect);
     mSound = SPtrCreate(SingleSound)(flar);
-    ca_addChildAnimator(mSound);
+    ca_addChild(mSound);
     mSound->SWT_hide();
 }
 

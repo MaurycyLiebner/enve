@@ -21,11 +21,11 @@ class BoolPropertyWidget;
 class ComboBoxProperty;
 class ColorAnimator;
 class ColorAnimatorButton;
-class BoxScrollWidgetVisiblePart;
+class BoxScroller;
 
 class BoxSingleWidget : public SingleWidget {
 public:
-    explicit BoxSingleWidget(BoxScrollWidgetVisiblePart * const parent);
+    explicit BoxSingleWidget(BoxScroller * const parent);
 
     void setTargetAbstraction(SWT_Abstraction *abs);
 
@@ -100,7 +100,7 @@ private:
     void setFillType(const int id);
     ColorAnimator* getColorTarget() const;
 
-    BoxScrollWidgetVisiblePart* const mParent;
+    BoxScroller* const mParent;
 
     QPoint mDragStartPos;
 

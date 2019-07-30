@@ -11,22 +11,20 @@
 #include "global.h"
 #include "singlewidgetabstraction.h"
 #include "GUI/keysview.h"
-#include "PixmapEffects/pixmapeffect.h"
-#include "Animators/effectanimators.h"
 #include "Animators/gpueffectanimators.h"
 
-BoxScrollWidgetVisiblePart::BoxScrollWidgetVisiblePart(
+BoxScroller::BoxScroller(
         ScrollWidget * const parent) :
     ScrollWidgetVisiblePart(parent) {
     setAcceptDrops(true);
     mScrollTimer = new QTimer(this);
 }
 
-QWidget *BoxScrollWidgetVisiblePart::createNewSingleWidget() {
+QWidget *BoxScroller::createNewSingleWidget() {
     return new BoxSingleWidget(this);
 }
 
-void BoxScrollWidgetVisiblePart::paintEvent(QPaintEvent *) {
+void BoxScroller::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
 //    p.fillRect(rect(), Qt::red);
@@ -47,7 +45,7 @@ void BoxScrollWidgetVisiblePart::paintEvent(QPaintEvent *) {
     p.end();
 }
 
-void BoxScrollWidgetVisiblePart::drawKeys(QPainter * const p,
+void BoxScroller::drawKeys(QPainter * const p,
                                           const qreal pixelsPerFrame,
                                           const FrameRange &viewedFrameRange) {
     p->save();
@@ -62,7 +60,7 @@ void BoxScrollWidgetVisiblePart::drawKeys(QPainter * const p,
     p->restore();
 }
 
-Key *BoxScrollWidgetVisiblePart::getKeyAtPos(
+Key *BoxScroller::getKeyAtPos(
         const int pressX, const int pressY,
         const qreal pixelsPerFrame,
         const int minViewedFrame) {
@@ -79,7 +77,7 @@ Key *BoxScrollWidgetVisiblePart::getKeyAtPos(
     return nullptr;
 }
 
-DurationRectangleMovable *BoxScrollWidgetVisiblePart::getRectangleMovableAtPos(
+DurationRectangleMovable *BoxScroller::getRectangleMovableAtPos(
         const int pressX,
         const int pressY,
         const qreal pixelsPerFrame,
@@ -95,11 +93,7 @@ DurationRectangleMovable *BoxScrollWidgetVisiblePart::getRectangleMovableAtPos(
     return nullptr;
 }
 
-Canvas *BoxScrollWidgetVisiblePart::currentScene() const {
-    return mKeysView->currentScene();
-}
-
-void BoxScrollWidgetVisiblePart::getKeysInRect(
+void BoxScroller::getKeysInRect(
         QRectF selectionRect,
         const qreal pixelsPerFrame,
         QList<Key *>& listKeys) {
@@ -128,18 +122,18 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
     }
 }
 
-int BoxScrollWidgetVisiblePart::getIdAtPos(const int yPos) const {
+int BoxScroller::getIdAtPos(const int yPos) const {
     return yPos / MIN_WIDGET_DIM;
 }
 
-BoxSingleWidget * BoxScrollWidgetVisiblePart::getBSWAtPos(const int yPos) const {
+BoxSingleWidget * BoxScroller::getBSWAtPos(const int yPos) const {
     const int idAtYPos = getIdAtPos(yPos);
     if(idAtYPos < 0) return nullptr;
     if(idAtYPos >= mSingleWidgets.count()) return nullptr;
     return static_cast<BoxSingleWidget*>(mSingleWidgets.at(idAtYPos));
 }
 
-BoxSingleWidget * BoxScrollWidgetVisiblePart::getLastVisibleBSW() const {
+BoxSingleWidget * BoxScroller::getLastVisibleBSW() const {
     for(int i = mSingleWidgets.count() - 1; i >= 0; i--) {
         const auto bsw = mSingleWidgets.at(i);
         if(bsw->isVisible()) return static_cast<BoxSingleWidget*>(bsw);
@@ -147,9 +141,7 @@ BoxSingleWidget * BoxScrollWidgetVisiblePart::getLastVisibleBSW() const {
     return nullptr;
 }
 
-#define DropTarget_ BoxScrollWidgetVisiblePart::DropTarget
-DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
-        const int yPos) const {
+BoxScroller::DropTarget BoxScroller::getClosestDropTarget(const int yPos) const {
     BoxSingleWidget * targetBSW = nullptr;
     DropTypes supportedDropTypes = DROP_NONE;
     targetBSW = getBSWAtPos(yPos);
@@ -227,7 +219,7 @@ DropTarget_ BoxScrollWidgetVisiblePart::getClosestDropTarget(
     return {nullptr , DROP_NONE};
 }
 
-void BoxScrollWidgetVisiblePart::stopScrolling() {
+void BoxScroller::stopScrolling() {
     if(mScrollTimer->isActive()) {
         mScrollTimer->disconnect();
         mScrollTimer->stop();
@@ -235,7 +227,7 @@ void BoxScrollWidgetVisiblePart::stopScrolling() {
 }
 #include "PathEffects/patheffect.h"
 #include "PathEffects/patheffectanimators.h"
-void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
+void BoxScroller::dropEvent(QDropEvent *event) {
     stopScrolling();
     updateDraggedFromMimeData(event->mimeData());
     mLastDragMoveY = event->pos().y();
@@ -251,7 +243,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(QDropEvent *event) {
     mDropTarget.reset();
 }
 
-void BoxScrollWidgetVisiblePart::dragEnterEvent(QDragEnterEvent *event) {
+void BoxScroller::dragEnterEvent(QDragEnterEvent *event) {
     const auto mimeData = event->mimeData();
     mLastDragMoveY = event->pos().y();
     updateDraggedFromMimeData(mimeData);
@@ -261,7 +253,7 @@ void BoxScrollWidgetVisiblePart::dragEnterEvent(QDragEnterEvent *event) {
     update();
 }
 
-void BoxScrollWidgetVisiblePart::dragLeaveEvent(QDragLeaveEvent *event) {
+void BoxScroller::dragLeaveEvent(QDragLeaveEvent *event) {
     mCurrentlyDragged.reset();
     mDropTarget.reset();
     mDragging = false;
@@ -280,20 +272,20 @@ void BoxScrollWidgetVisiblePart::dragLeaveEvent(QDragLeaveEvent *event) {
 }
 
 #include <QDebug>
-void BoxScrollWidgetVisiblePart::dragMoveEvent(QDragMoveEvent *event) {
+void BoxScroller::dragMoveEvent(QDragMoveEvent *event) {
     event->acceptProposedAction();
     const int yPos = event->pos().y();
 
     if(yPos < 30) {
         if(!mScrollTimer->isActive()) {
             connect(mScrollTimer, &QTimer::timeout,
-                    this, &BoxScrollWidgetVisiblePart::scrollUp);
+                    this, &BoxScroller::scrollUp);
             mScrollTimer->start(300);
         }
     } else if(yPos > height() - 30) {
         if(!mScrollTimer->isActive()) {
             connect(mScrollTimer, &QTimer::timeout,
-                    this, &BoxScrollWidgetVisiblePart::scrollDown);
+                    this, &BoxScroller::scrollDown);
             mScrollTimer->start(300);
         }
     } else {
@@ -306,7 +298,7 @@ void BoxScrollWidgetVisiblePart::dragMoveEvent(QDragMoveEvent *event) {
     update();
 }
 
-bool BoxScrollWidgetVisiblePart::droppingSupported(
+bool BoxScroller::droppingSupported(
         const SWT_Abstraction * const targetAbs,
         const int idInTarget) const {
     if(!targetAbs) return false;
@@ -323,8 +315,6 @@ bool BoxScrollWidgetVisiblePart::droppingSupported(
         if(idInTarget < targetGroup->ca_getNumberOfChildren()) return false;
         if(targetGroup->isAncestor(draggedBox)) return false;
     } else if(mCurrentlyDragged.fType == Dragged::RASTER_EFFECT) {
-        if(!targetSWT->SWT_isPixmapEffectAnimators()) return false;
-    } else if(mCurrentlyDragged.fType == Dragged::RASTER_GPU_EFFECT) {
         if(!targetSWT->SWT_isRasterGPUEffectAnimators()) return false;
     } else if(mCurrentlyDragged.fType == Dragged::PATH_EFFECT) {
         if(!targetSWT->SWT_isPathEffectAnimators()) return false;
@@ -333,8 +323,7 @@ bool BoxScrollWidgetVisiblePart::droppingSupported(
     return true;
 }
 
-#define DropTypes_ BoxScrollWidgetVisiblePart::DropTypes
-DropTypes_ BoxScrollWidgetVisiblePart::dropOnSWTSupported(
+BoxScroller::DropTypes BoxScroller::dropOnSWTSupported(
         SingleWidgetTarget const * const swtUnderMouse) const {
     if(!swtUnderMouse) return DropType::DROP_NONE;
     const auto absUnderMouse = swtUnderMouse->SWT_getAbstractionForWidget(mId);
@@ -358,7 +347,7 @@ DropTypes_ BoxScrollWidgetVisiblePart::dropOnSWTSupported(
            (dropBelow ? DropType::DROP_BELOW : DropType::DROP_NONE);
 }
 
-DropTypes_ BoxScrollWidgetVisiblePart::dropOnBSWSupported(
+BoxScroller::DropTypes BoxScroller::dropOnBSWSupported(
         BoxSingleWidget const * const bswUnderMouse) const {
     if(!bswUnderMouse) return DropType::DROP_NONE;
     if(bswUnderMouse->isHidden()) return DropType::DROP_NONE;
@@ -366,7 +355,7 @@ DropTypes_ BoxScrollWidgetVisiblePart::dropOnBSWSupported(
     return dropOnSWTSupported(swtUnderMouse);
 }
 
-void BoxScrollWidgetVisiblePart::updateDragLine() {
+void BoxScroller::updateDragLine() {
     mDragging = false;
     if(!mDropTarget.isValid()) return;
     int i = -1;
@@ -393,38 +382,40 @@ void BoxScrollWidgetVisiblePart::updateDragLine() {
     }
 }
 
-void BoxScrollWidgetVisiblePart::updateDropTarget() {
+void BoxScroller::updateDropTarget() {
     mDropTarget = getClosestDropTarget(mLastDragMoveY);
     updateDragLine();
 }
 
-void BoxScrollWidgetVisiblePart::scrollUp() {
+void BoxScroller::scrollUp() {
     mParentWidget->scrollParentAreaBy(-MIN_WIDGET_DIM);
     updateDropTarget();
     update();
 }
 
-void BoxScrollWidgetVisiblePart::scrollDown() {
+void BoxScroller::scrollDown() {
     mParentWidget->scrollParentAreaBy(MIN_WIDGET_DIM);
     updateDropTarget();
     update();
 }
 
-void BoxScrollWidgetVisiblePart::updateDraggedFromMimeData(
+void BoxScroller::updateDraggedFromMimeData(
         const QMimeData * const mimeData) {
+    if(!mimeData->hasFormat("enveInternalFormat")) {
+        mCurrentlyDragged = Dragged{nullptr, Dragged::NONE};
+        return;
+    }
+    const auto emimeData = static_cast<const eMimeData*>(mimeData);
     const SingleWidgetTarget * swt = nullptr;
     Dragged::Type type = Dragged::NONE;
-    if(BoundingBoxMimeData::hasFormat(mimeData)) {
-        auto bbMimeData = static_cast<const BoundingBoxMimeData*>(mimeData);
-        swt = bbMimeData->getTarget();
+    if(emimeData->hasType<BoundingBox>()) {
+        swt = emimeData->getObjects<BoundingBox>().first();
         type = Dragged::BOX;
-    } else if(PixmapEffectMimeData::hasFormat(mimeData)) {
-        auto peMimeData = static_cast<const PixmapEffectMimeData*>(mimeData);
-        swt = peMimeData->getTarget();
+    } else if(emimeData->hasType<GpuEffect>()) {
+        swt = emimeData->getObjects<GpuEffect>().first();
         type = Dragged::RASTER_EFFECT;
-    } else if(PathEffectMimeData::hasFormat(mimeData)) {
-        auto peMimeData = static_cast<const PathEffectMimeData*>(mimeData);
-        swt = peMimeData->getTarget();
+    } else if(emimeData->hasType<PathEffect>()) {
+        swt = emimeData->getObjects<PathEffect>().first();
         type = Dragged::PATH_EFFECT;
     }
 
@@ -433,8 +424,8 @@ void BoxScrollWidgetVisiblePart::updateDraggedFromMimeData(
                               Dragged{nullptr, Dragged::NONE};
 }
 
-bool BoxScrollWidgetVisiblePart::DropTarget::drop(
-        const BoxScrollWidgetVisiblePart::Dragged &dragged) {
+bool BoxScroller::DropTarget::drop(
+        const BoxScroller::Dragged &dragged) {
     if(!isValid() || !dragged.isValid()) return false;
     const auto draggedAbs = dragged.fPtr;
     const auto draggedSWT = draggedAbs->getTarget();
@@ -457,21 +448,6 @@ bool BoxScrollWidgetVisiblePart::DropTarget::drop(
                         draggedBox.get(), boxTargetId);
         }
     } else if(dragged.fType == Dragged::RASTER_EFFECT) {
-        const auto draggedEffect = GetAsSPtr(draggedSWT, PixmapEffect);
-        auto targetParent = static_cast<EffectAnimators*>(targetSWT);
-        auto currentParent = draggedEffect->getParent<EffectAnimators>();
-        if(currentParent != targetParent) {
-            targetParent->getParentBox()->addEffect(draggedEffect);
-            currentParent->getParentBox()->removeEffect(draggedEffect);
-        } else {
-            if(fTargetId == draggedAbs->getIdInParent() ||
-               fTargetId == draggedAbs->getIdInParent() + 1) return false;
-            int targetId = fTargetId;
-            if(draggedAbs->getIdInParent() < fTargetId) targetId--;
-            currentParent->ca_moveChildInList(draggedEffect.get(), fTargetId);
-        }
-        targetParent->prp_afterWholeInfluenceRangeChanged();
-    } else if(dragged.fType == Dragged::RASTER_GPU_EFFECT) {
         const auto draggedEffect = GetAsSPtr(draggedSWT, ShaderEffect);
         auto targetParent = static_cast<GPUEffectAnimators*>(targetSWT);
         auto currentParent = draggedEffect->getParent<GPUEffectAnimators>();

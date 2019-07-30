@@ -31,7 +31,7 @@ public:
     Actions fActions;
     RenderHandler fRenderHandler;
 
-    stdsptr<ClipboardContainer> fClipboardContainer;
+    stdsptr<Clipboard> fClipboardContainer;
 
     QString fEvFile;
 
@@ -66,10 +66,11 @@ public:
 
     void actionFinished();
 
-    void replaceClipboard(const stdsptr<ClipboardContainer>& container);
-    ClipboardContainer *getClipboardContainer(const ClipboardContainerType &type);
-    PropertyClipboardContainer* getPropertyClipboardContainer();
-    BoxesClipboardContainer* getBoxesClipboardContainer();
+    void replaceClipboard(const stdsptr<Clipboard>& container);
+    DynamicPropsClipboard* getDynamicPropsClipboard() const;
+    PropertyClipboard* getPropertyClipboard() const;
+    KeysClipboard* getKeysClipboard() const;
+    BoxesClipboard* getBoxesClipboard() const;
 
     void setPath(const QString& path) {
         fEvFile = path;
@@ -127,6 +128,8 @@ public:
                               const UpdateFuncs &updateFuncs,
                               const int visiblePartWidgetId);
 private:
+    Clipboard *getClipboard(const ClipboardType &type) const;
+
     void clearGradientRWIds() const;
     void writeGradients(QIODevice * const dst) const;
     void writeScenes(QIODevice * const dst) const;

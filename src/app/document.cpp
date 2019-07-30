@@ -35,26 +35,35 @@ void Document::actionFinished() {
 //    }
 }
 
-void Document::replaceClipboard(const stdsptr<ClipboardContainer> &container) {
+void Document::replaceClipboard(const stdsptr<Clipboard> &container) {
     fClipboardContainer = container;
 }
 
-ClipboardContainer *Document::getClipboardContainer(
-        const ClipboardContainerType &type) {
+Clipboard *Document::getClipboard(const ClipboardType &type) const {
     if(!fClipboardContainer) return nullptr;
     if(type == fClipboardContainer->getType())
         return fClipboardContainer.get();
     return nullptr;
 }
 
-PropertyClipboardContainer* Document::getPropertyClipboardContainer() {
-    auto contT = getClipboardContainer(CCT_PROPERTY);
-    return static_cast<PropertyClipboardContainer*>(contT);
+DynamicPropsClipboard* Document::getDynamicPropsClipboard() const {
+    auto contT = getClipboard(ClipboardType::dynamic_properties);
+    return static_cast<DynamicPropsClipboard*>(contT);
 }
 
-BoxesClipboardContainer* Document::getBoxesClipboardContainer() {
-    auto contT = getClipboardContainer(CCT_BOXES);
-    return static_cast<BoxesClipboardContainer*>(contT);
+PropertyClipboard* Document::getPropertyClipboard() const {
+    auto contT = getClipboard(ClipboardType::property);
+    return static_cast<PropertyClipboard*>(contT);
+}
+
+KeysClipboard* Document::getKeysClipboard() const {
+    auto contT = getClipboard(ClipboardType::keys);
+    return static_cast<KeysClipboard*>(contT);
+}
+
+BoxesClipboard* Document::getBoxesClipboard() const {
+    auto contT = getClipboard(ClipboardType::boxes);
+    return static_cast<BoxesClipboard*>(contT);
 }
 
 void Document::setCanvasMode(const CanvasMode mode) {

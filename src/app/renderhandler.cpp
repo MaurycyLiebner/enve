@@ -5,6 +5,7 @@
 #include "canvas.h"
 #include "Sound/soundcomposition.h"
 #include "CacheHandlers/soundcachecontainer.h"
+#include "CacheHandlers/imagecachecontainer.h"
 #include "document.h"
 
 RenderHandler::RenderHandler(Document &document,

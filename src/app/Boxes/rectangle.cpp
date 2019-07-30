@@ -28,8 +28,8 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     //mTopLeftPoint->setBottomRightPoint(mBottomRightPoint);
     //mBottomRightPoint->setRadiusPoint(mRadiusPoint);
 
-    ca_addChildAnimator(mTopLeftAnimator);
-    ca_addChildAnimator(mBottomRightAnimator);
+    ca_addChild(mTopLeftAnimator);
+    ca_addChild(mBottomRightAnimator);
 
     ca_prependChildAnimator(mTopLeftAnimator.get(), mGPUEffectsAnimators);
     ca_prependChildAnimator(mBottomRightAnimator.get(), mGPUEffectsAnimators);
@@ -41,7 +41,7 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
                 mRadiusAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
 
-    ca_addChildAnimator(mRadiusAnimator);
+    ca_addChild(mRadiusAnimator);
     ca_prependChildAnimator(mRadiusAnimator.get(), mGPUEffectsAnimators);
 
     prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
