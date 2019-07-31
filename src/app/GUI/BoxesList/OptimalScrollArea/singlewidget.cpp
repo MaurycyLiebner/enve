@@ -1,7 +1,7 @@
 #include "singlewidget.h"
 #include "singlewidgetabstraction.h"
 #include "scrollwidgetvisiblepart.h"
-#include "global.h"
+#include "GUI/global.h"
 
 SingleWidget::SingleWidget(ScrollWidgetVisiblePart *parent) :
     QWidget(parent) {

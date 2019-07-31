@@ -12,7 +12,7 @@
 #include "GUI/RenderWidgets/renderwidget.h"
 #include "boxeslistkeysviewwidget.h"
 #include "animationwidgetscrollbar.h"
-#include "global.h"
+#include "GUI/global.h"
 #include "renderinstancesettings.h"
 #include "document.h"
 #include "layouthandler.h"
@@ -23,13 +23,13 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
         MainWindow *parent) :
     QWidget(parent), mDocument(document),
     mTimelineLayout(layoutH->timelineLayout()) {
-    connect(&mDocument.fRenderHandler, &RenderHandler::previewFinished,
+    connect(RenderHandler::sInstance, &RenderHandler::previewFinished,
             this, &BoxesListAnimationDockWidget::previewFinished);
-    connect(&mDocument.fRenderHandler, &RenderHandler::previewBeingPlayed,
+    connect(RenderHandler::sInstance, &RenderHandler::previewBeingPlayed,
             this, &BoxesListAnimationDockWidget::previewBeingPlayed);
-    connect(&mDocument.fRenderHandler, &RenderHandler::previewBeingRendered,
+    connect(RenderHandler::sInstance, &RenderHandler::previewBeingRendered,
             this, &BoxesListAnimationDockWidget::previewBeingRendered);
-    connect(&mDocument.fRenderHandler, &RenderHandler::previewPaused,
+    connect(RenderHandler::sInstance, &RenderHandler::previewPaused,
             this, &BoxesListAnimationDockWidget::previewPaused);
 
     setFocusPolicy(Qt::NoFocus);
@@ -148,8 +148,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     });
 
     connect(mRenderWidget, &RenderWidget::renderFromSettings,
-            this, [this](RenderInstanceSettings* const settings) {
-        mDocument.fRenderHandler.renderFromSettings(settings);
+            this, [](RenderInstanceSettings* const settings) {
+        RenderHandler::sInstance->renderFromSettings(settings);
     });
 
     mMainLayout->addWidget(mTimelineLayout);
@@ -246,23 +246,23 @@ void BoxesListAnimationDockWidget::previewPaused() {
 }
 
 void BoxesListAnimationDockWidget::resumePreview() {
-    mDocument.fRenderHandler.resumePreview();
+    RenderHandler::sInstance->resumePreview();
 }
 
 void BoxesListAnimationDockWidget::pausePreview() {
-    mDocument.fRenderHandler.pausePreview();
+    RenderHandler::sInstance->pausePreview();
 }
 
 void BoxesListAnimationDockWidget::playPreview() {
-    mDocument.fRenderHandler.playPreview();
+    RenderHandler::sInstance->playPreview();
 }
 
 void BoxesListAnimationDockWidget::renderPreview() {
-    mDocument.fRenderHandler.renderPreview();
+    RenderHandler::sInstance->renderPreview();
 }
 
 void BoxesListAnimationDockWidget::interruptPreview() {
-    mDocument.fRenderHandler.interruptPreview();
+    RenderHandler::sInstance->interruptPreview();
 }
 
 void BoxesListAnimationDockWidget::setLocalPivot(const bool bT) {

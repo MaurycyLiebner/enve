@@ -10,7 +10,7 @@
 #include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
 #include "canvaswindow.h"
 #include "animationdockwidget.h"
-#include "global.h"
+#include "GUI/global.h"
 #include "canvas.h"
 #include "scenechooser.h"
 #include "changewidthwidget.h"

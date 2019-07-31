@@ -8,7 +8,7 @@
 #include "Boxes/boundingbox.h"
 #include "Boxes/containerbox.h"
 #include "GUI/mainwindow.h"
-#include "global.h"
+#include "GUI/global.h"
 #include "singlewidgetabstraction.h"
 #include "GUI/keysview.h"
 #include "Animators/gpueffectanimators.h"

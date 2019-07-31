@@ -6,10 +6,11 @@
 #include <QMetaType>
 #include "GUI/usagewidget.h"
 
-MemoryHandler *MemoryHandler::sInstance;
+MemoryHandler *MemoryHandler::sInstance = nullptr;
 Q_DECLARE_METATYPE(MemoryState)
 
 MemoryHandler::MemoryHandler(QObject * const parent) : QObject(parent) {
+    Q_ASSERT(!sInstance);
     sInstance = this;
 
     mMemoryChekerThread = new QThread(this);
@@ -35,19 +36,6 @@ MemoryHandler::~MemoryHandler() {
     delete mMemoryChecker;
 }
 
-void MemoryHandler::addContainer(CacheContainer * const cont) {
-    mContainers << cont;
-}
-
-void MemoryHandler::removeContainer(CacheContainer * const cont) {
-    mContainers.removeOne(cont);
-}
-
-void MemoryHandler::containerUpdated(CacheContainer * const cont) {
-    removeContainer(cont);
-    addContainer(cont);
-}
-
 void MemoryHandler::freeMemory(const MemoryState &state,
                                const long &minFreeBytes) {
     if(state != mCurrentMemoryState) {
@@ -61,8 +49,8 @@ void MemoryHandler::freeMemory(const MemoryState &state,
 
     if(minFreeBytes <= 0) return;
     long memToFree = minFreeBytes;
-    while(memToFree > 0 && !mContainers.isEmpty()) {
-        const auto cont = mContainers.takeFirst();
+    while(memToFree > 0 && !mDataHandler.isEmpty()) {
+        const auto cont = mDataHandler.takeFirst();
         memToFree -= cont->free_RAM_k();
     }
     if(memToFree > 0 || state > LOW_MEMORY_STATE) emit allMemoryUsed();

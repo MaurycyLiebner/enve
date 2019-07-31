@@ -6,6 +6,7 @@
 #include "GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h"
 #include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 #include "GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h"
+#include "fileshandler.h"
 class FileSourceListVisibleWidget;
 struct FileCacheHandlerAbstraction {
     FileCacheHandlerAbstraction(
@@ -65,7 +66,6 @@ public:
 class FileSourceListVisibleWidget : public MinimalScrollWidgetVisiblePart {
 public:
     FileSourceListVisibleWidget(MinimalScrollWidget *parent = nullptr);
-    ~FileSourceListVisibleWidget();
 
     void updateVisibleWidgetsContent();
 
@@ -102,19 +102,7 @@ public:
     int getCacheListCount() {
         return mCacheList.count();
     }
-
-    static void sAddToWidgets(FileCacheHandler * const fh) {
-        for(const auto wid : FileSourceListVisibleWidget::sWidgets)
-            wid->addCacheHandlerToList(fh);
-    }
-
-    static void sRemoveFromWidgets(FileCacheHandler * const fh) {
-        for(const auto wid : FileSourceListVisibleWidget::sWidgets)
-            wid->removeCacheHandlerFromList(fh);
-    }
 protected:
-    static QList<FileSourceListVisibleWidget*> sWidgets;
-
     QList<FileCacheHandlerAbstraction*> mSelectedList;
     QList<stdsptr<FileCacheHandlerAbstraction>> mCacheList;
     void paintEvent(QPaintEvent *);

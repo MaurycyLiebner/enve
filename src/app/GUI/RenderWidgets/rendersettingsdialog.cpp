@@ -1,6 +1,6 @@
 #include "rendersettingsdialog.h"
 #include "GUI/mainwindow.h"
-#include "global.h"
+#include "GUI/global.h"
 
 RenderSettingsDialog::RenderSettingsDialog(const OutputSettings &settings,
                                            QWidget *parent) :

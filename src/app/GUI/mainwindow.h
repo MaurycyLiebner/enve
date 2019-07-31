@@ -7,13 +7,15 @@
 #include <QComboBox>
 #include <QPushButton>
 #include "undoredo.h"
-#include "taskscheduler.h"
+#include "Tasks/taskscheduler.h"
 #include "effectsloader.h"
 #include "document.h"
 #include "audiohandler.h"
 #include "actions.h"
 #include "layouthandler.h"
 #include "settings.h"
+#include "renderhandler.h"
+#include "fileshandler.h"
 class VideoEncoder;
 
 class ActionButton;
@@ -267,11 +269,15 @@ private:
     QMenu *mPanelsMenu;
     QMenu *mRenderMenu;
 
-    TaskScheduler mTaskScheduler;
     stdsptr<VideoEncoder> mVideoEncoder;
+
+    TaskScheduler mTaskScheduler;
+    FilesHandler mFilesHandler;
     Document mDocument;
-    AudioHandler mAudioHandler;
     Actions mActions;
+    AudioHandler mAudioHandler;
+    RenderHandler mRenderHandler;
+
     LayoutHandler *mLayoutHandler = nullptr;
     EffectsLoader *mEffectsLoader;
     stdptr<UndoRedoStack> mCurrentUndoRedoStack;

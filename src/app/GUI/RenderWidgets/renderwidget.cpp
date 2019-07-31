@@ -1,6 +1,6 @@
 #include "renderwidget.h"
 #include "canvas.h"
-#include "global.h"
+#include "GUI/global.h"
 #include "renderinstancewidget.h"
 #include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 #include "videoencoder.h"

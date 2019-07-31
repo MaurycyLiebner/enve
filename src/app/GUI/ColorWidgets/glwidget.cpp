@@ -1,6 +1,6 @@
 #include "glwidget.h"
 #include "colorhelpers.h"
-#include "global.h"
+#include "GUI/global.h"
 #include "Animators/paintsettingsanimator.h"
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent) {

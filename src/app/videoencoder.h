@@ -3,7 +3,7 @@
 #include <QString>
 #include <QList>
 #include "skia/skiaincludes.h"
-#include "updatable.h"
+#include "Tasks/updatable.h"
 #include "renderinstancesettings.h"
 #include "framerange.h"
 #include "CacheHandlers/samples.h"

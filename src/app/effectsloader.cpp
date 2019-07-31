@@ -3,7 +3,7 @@
 #include "GPUEffects/gpueffect.h"
 #include <QFileSystemWatcher>
 #include <QFileSystemModel>
-#include "GPUEffects/shadereffectcreator.h"
+#include "ShaderEffects/shadereffectcreator.h"
 #include "settings.h"
 
 EffectsLoader::EffectsLoader() {}
@@ -75,7 +75,7 @@ void EffectsLoader::iniCustomPathEffects() {
 }
 
 #include "GPUEffects/customgpueffect.h"
-#include "GPUEffects/customgpueffectcreator.h"
+#include "ShaderEffects/customgpueffectcreator.h"
 void EffectsLoader::iniCustomGpuEffect(const QString& gpu) {
     try {
         CustomGpuEffectCreator::sLoadCustomGpuEffect(this, gpu);

@@ -5,7 +5,7 @@
 #include "scrollwidget.h"
 #include "singlewidgettarget.h"
 #include "GUI/mainwindow.h"
-#include "global.h"
+#include "GUI/global.h"
 
 int ScrollWidgetVisiblePart::mNextId = 0;
 

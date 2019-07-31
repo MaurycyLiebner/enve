@@ -23,7 +23,7 @@ class QrealAnimatorValueSlider;
 class ActionButton;
 class Segment1DEditor;
 class QDockWidget;
-class ColorSettingApplier;
+class ColorSetting;
 
 class FillStrokeSettingsWidget : public QTabWidget {
     Q_OBJECT
@@ -70,8 +70,7 @@ private:
     void setNoneFill();
 
     void setColorAnimatorTarget(ColorAnimator *animator);
-    void colorSettingReceived(const ColorSettingApplier &colorSetting);
-    void setCurrentColorMode(const ColorMode mode);
+    void colorSettingReceived(const ColorSetting &colorSetting);
 private:
     void updateCurrentSettings();
     void applyGradient();

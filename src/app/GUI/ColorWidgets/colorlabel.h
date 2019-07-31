@@ -14,10 +14,10 @@ public:
 signals:
 
 public slots:
-    void setAlpha(GLfloat alpha_t);
+    void setAlpha(const qreal alpha_t);
 private:
     void paintGL();
-    GLfloat mAlpha = 1.f;
+    qreal mAlpha = 1;
 };
 
 #endif // COLORLABEL_H

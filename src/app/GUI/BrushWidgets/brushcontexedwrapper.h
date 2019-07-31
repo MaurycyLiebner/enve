@@ -1,6 +1,6 @@
 #ifndef BRUSHCONTEXEDWRAPPER_H
 #define BRUSHCONTEXEDWRAPPER_H
-#include "simplebrushwrapper.h"
+#include "Paint/simplebrushwrapper.h"
 #include <QImage>
 struct BrushData {
     QString fName;

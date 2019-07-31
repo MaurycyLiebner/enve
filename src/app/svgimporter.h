@@ -2,7 +2,6 @@
 #define SVGIMPORTER_H
 #include <QDebug>
 #include <QtXml/QDomDocument>
-#include "GUI/fillstrokesettings.h"
 #include <QtMath>
 #include "paintsettingsapplier.h"
 class VectorPath;

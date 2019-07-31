@@ -1,6 +1,6 @@
 #include "currentgradientwidget.h"
 #include "GUI/GradientWidgets/gradientwidget.h"
-#include "global.h"
+#include "GUI/global.h"
 #include "GUI/ColorWidgets/colorwidgetshaders.h"
 #include "Animators/gradient.h"
 

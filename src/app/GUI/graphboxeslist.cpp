@@ -4,7 +4,7 @@
 #include "qrealpointvaluedialog.h"
 #include "keysview.h"
 #include "Animators/qrealpoint.h"
-#include "global.h"
+#include "GUI/global.h"
 #include "Animators/qrealkey.h"
 
 QColor KeysView::sGetAnimatorColor(const int i) {

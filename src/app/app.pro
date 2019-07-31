@@ -4,8 +4,8 @@
 #
 #-------------------------------------------------
 
-QT += multimedia core gui svg opengl sql qml xml concurrent #widgets-private # gui-private core-private
-LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc -ljson-c
+QT += multimedia core gui svg opengl sql qml xml concurrent
+LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc
 
 ENVE_FOLDER = $$PWD/../..
 SKIA_FOLDER = $$ENVE_FOLDER/third_party/skia
@@ -16,10 +16,8 @@ DEPENDPATH += ../core
 
 LIBS += -L$$OUT_PWD/../core -lenvecore
 
-LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint
 INCLUDEPATH += $$LIBMYPAINT_FOLDER/include
-
-LIBS += -lgobject-2.0 -lglib-2.0 -ljson-c
+LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint -lgobject-2.0 -lglib-2.0 -ljson-c
 
 INCLUDEPATH += $$SKIA_FOLDER
 
@@ -39,38 +37,17 @@ CONFIG(debug, debug|release) {
 QMAKE_CXXFLAGS += -fopenmp
 LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp# -lX11
 
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = enve
 TEMPLATE = app
 
 SOURCES += main.cpp\
-    Animators/outlinesettingsanimator.cpp \
-    Animators/paintsettingsanimator.cpp \
-    Boxes/boxrendercontainer.cpp \
-    Boxes/boxrenderdata.cpp \
-    Boxes/containerbox.cpp \
-    Boxes/effectsrenderer.cpp \
-    Boxes/effectsubtaskspawner.cpp \
-    Boxes/layerboxrenderdata.cpp \
-    Boxes/patheffectsmenu.cpp \
-    CacheHandlers/hddcachablerangecont.cpp \
-    FileCacheHandlers/audiostreamsdata.cpp \
-    FileCacheHandlers/filedatacachehandler.cpp \
-    FileCacheHandlers/soundreader.cpp \
-    GPUEffects/customgpueffectcreator.cpp \
-    GPUEffects/shadereffect.cpp \
-    GPUEffects/shadereffectcreator.cpp \
-    GPUEffects/shadereffectprogram.cpp \
-    GPUEffects/uniformspecifiercreator.cpp \
-    GUI/Timeline/animationrect.cpp \
-    GUI/Timeline/durationrectangle.cpp \
-    GUI/Timeline/fixedlenanimationrect.cpp \
     GUI/audiohandler.cpp \
     GUI/canvaswindowevents.cpp \
     GUI/canvaswindowwrapper.cpp \
     GUI/changewidthwidget.cpp \
+    GUI/ewidgetsimpl.cpp \
     GUI/layoutcollection.cpp \
     GUI/layouthandler.cpp \
     GUI/scenechooser.cpp \
@@ -80,22 +57,9 @@ SOURCES += main.cpp\
     GUI/timelinewrapper.cpp \
     GUI/welcomedialog.cpp \
     GUI/widgetstack.cpp \
-    Paint/painttarget.cpp \
-    PathEffects/custompatheffectcreator.cpp \
-    PathEffects/dashpatheffect.cpp \
-    PathEffects/linespatheffect.cpp \
-    PathEffects/spatialdisplacepatheffect.cpp \
-    PathEffects/subdividepatheffect.cpp \
-    PathEffects/subpatheffect.cpp \
-    PathEffects/zigzagpatheffect.cpp \
-    Sound/soundmerger.cpp \
-    actions.cpp \
-    canvas.cpp \
-    canvasmouseinteractions.cpp \
     GUI/ColorWidgets/colorlabel.cpp \
     GUI/ColorWidgets/colorsettingswidget.cpp \
     GUI/ColorWidgets/colorvaluerect.cpp \
-    GUI/ColorWidgets/colorvaluespin.cpp \
     GUI/ColorWidgets/colorwidget.cpp \
     GUI/ColorWidgets/h_wheel_sv_triangle.cpp \
     GUI/ColorWidgets/colorpickingwidget.cpp \
@@ -104,29 +68,12 @@ SOURCES += main.cpp\
     GUI/ColorWidgets/savedcolorwidgets.cpp \
     GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
-    document.cpp \
-    documentrw.cpp \
     effectsloader.cpp \
     evfileio.cpp \
     hardwareinfo.cpp \
-    offscreenqgl33c.cpp \
-    paintsettings.cpp \
     renderhandler.cpp \
     settings.cpp \
     svgimporter.cpp \
-    Animators/coloranimator.cpp \
-    Animators/qstringanimator.cpp \
-    Boxes/circle.cpp \
-    Boxes/textbox.cpp \
-    Boxes/rectangle.cpp \
-    Boxes/imagebox.cpp \
-    Boxes/pathbox.cpp \
-    Boxes/boundingbox.cpp \
-    Boxes/animationbox.cpp \
-    pathoperations.cpp \
-    Boxes/linkbox.cpp \
-    Boxes/boxpainthandler.cpp \
-    Boxes/particlebox.cpp \
     GUI/BoxesList/OptimalScrollArea/scrollarea.cpp \
     GUI/BoxesList/OptimalScrollArea/scrollwidget.cpp \
     GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.cpp \
@@ -134,15 +81,7 @@ SOURCES += main.cpp\
     GUI/BoxesList/boxsinglewidget.cpp \
     GUI/BoxesList/boxscrollwidgetvisiblepart.cpp \
     GUI/BoxesList/boxscrollwidget.cpp \
-    GUI/BoxesList/boxeslistactionbutton.cpp \
-    canvasselectedpointsactions.cpp \
-    canvasselectedboxesactions.cpp \
-    clipboardcontainer.cpp \
-    Boxes/videobox.cpp \
-    Sound/singlesound.cpp \
-    Sound/soundcomposition.cpp \
     GUI/BoxesList/boolpropertywidget.cpp \
-    Boxes/imagesequencebox.cpp \
     memorychecker.cpp \
     memoryhandler.cpp \
     outputgenerator.cpp \
@@ -152,17 +91,11 @@ SOURCES += main.cpp\
     GUI/GradientWidgets/gradientslistwidget.cpp \
     GUI/GradientWidgets/displayedgradientswidget.cpp \
     GUI/GradientWidgets/currentgradientwidget.cpp \
-    filesourcescache.cpp \
     GUI/RenderWidgets/closablecontainer.cpp \
     GUI/RenderWidgets/renderdestinationdialog.cpp \
-    PathEffects/patheffectanimators.cpp \
-    GUI/BoxesList/coloranimatorbutton.cpp \
-    updatable.cpp \
     GUI/BoxesList/boxtargetwidget.cpp \
-    Properties/boxtargetproperty.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
-    Boxes/paintbox.cpp \
     GUI/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
     GUI/BoxesList/boxscrollarea.cpp \
@@ -171,10 +104,6 @@ SOURCES += main.cpp\
     GUI/RenderWidgets/rendersettingsdialog.cpp \
     GUI/RenderWidgets/outputsettingsprofilesdialog.cpp \
     GUI/RenderWidgets/outputsettingsdisplaywidget.cpp \
-    Boxes/renderdatahandler.cpp \
-    PathEffects/displacepatheffect.cpp \
-    PathEffects/duplicatepatheffect.cpp \
-    PathEffects/solidifypatheffect.cpp \
     GUI/boxeslistkeysviewwidget.cpp \
     GUI/boxeslistanimationdockwidget.cpp \
     GUI/actionbutton.cpp \
@@ -184,12 +113,9 @@ SOURCES += main.cpp\
     GUI/graphboxeslist.cpp \
     GUI/keysview.cpp \
     GUI/mainwindow.cpp \
-    GUI/newcanvasdialog.cpp \
     GUI/noshortcutaction.cpp \
     GUI/keyfocustarget.cpp \
     GUI/usagewidget.cpp \
-    GUI/valueinput.cpp \
-    GUI/twocolumnlayout.cpp \
     GUI/qrealpointvaluedialog.cpp \
     GUI/renderoutputwidget.cpp \
     GUI/qdoubleslider.cpp \
@@ -198,97 +124,22 @@ SOURCES += main.cpp\
     GUI/fontswidget.cpp \
     GUI/filesourcelist.cpp \
     GUI/customfpsdialog.cpp \
-    GUI/durationrectsettingsdialog.cpp \
     GUI/fillstrokesettings.cpp \
     GUI/BrushWidgets/arraywidget.cpp \
     GUI/BrushWidgets/brushselectionwidget.cpp \
     GUI/BrushWidgets/flowlayout.cpp \
-    Animators/gradientpoints.cpp \
-    MovablePoints/gradientpoint.cpp \
-    MovablePoints/pathpivot.cpp \
-    PropertyUpdaters/nodepointupdater.cpp \
-    PropertyUpdaters/gradientupdater.cpp \
-    PropertyUpdaters/strokewidthupdater.cpp \
-    PropertyUpdaters/displayedfillstrokesettingsupdater.cpp \
-    PropertyUpdaters/pixmapeffectupdater.cpp \
-    PropertyUpdaters/animationboxframeupdater.cpp \
-    PropertyUpdaters/particlesupdater.cpp \
-    PropertyUpdaters/gradientpointsupdater.cpp \
-    PropertyUpdaters/groupallpathsupdater.cpp \
     GUI/ColorWidgets/colorwidgetshaders.cpp \
-    taskexecutor.cpp \
-    taskscheduler.cpp \
-    colorhelpers.cpp \
-    Animators/qrealanimatorcreator.cpp \
-    Animators/gpueffectanimators.cpp \
-    GPUEffects/gpupostprocessor.cpp \
     GUI/segment1deditor.cpp \
     GUI/namedcontainer.cpp \
     Animators/qcubicsegment1danimator.cpp \
-    Paint/autotiledsurface.cpp \
-    Paint/brushstroke.cpp \
-    Paint/colorconversions.cpp \
-    Paint/autotilesdata.cpp \
-    FileCacheHandlers/filecachehandler.cpp \
-    FileCacheHandlers/imagecachehandler.cpp \
-    FileCacheHandlers/imagesequencecachehandler.cpp \
-    FileCacheHandlers/animationcachehandler.cpp \
-    FileCacheHandlers/videocachehandler.cpp \
-    CacheHandlers/minimalcachecontainer.cpp \
-    CacheHandlers/imagecachecontainer.cpp \
-    CacheHandlers/tmpfilehandlers.cpp \
-    CacheHandlers/soundcachecontainer.cpp \
-    CacheHandlers/soundtmpfilehandlers.cpp \
-    CacheHandlers/hddcachablecachehandler.cpp \
-    CacheHandlers/soundcachehandler.cpp \
-    canvasmouseevents.cpp \
-    canvashandlesmartpath.cpp \
-    Boxes/smartvectorpath.cpp \
-    paintsettingsapplier.cpp \
-    colorsetting.cpp \
-    Animators/gradient.cpp \
-    GUI/BrushWidgets/simplebrushwrapper.cpp \
     GUI/BrushWidgets/brushcontexedwrapper.cpp \
-    GUI/BrushWidgets/brushwidget.cpp \
-    Boxes/waitingforboxload.cpp \
-    Boxes/canvasrenderdata.cpp \
-    Boxes/linkcanvasrenderdata.cpp \
-    Boxes/internallinkcanvas.cpp \
-    Boxes/internallinkgroupbox.cpp \
-    PathEffects/sumpatheffect.cpp \
-    PropertyUpdaters/boxpathpointupdater.cpp \
-    Paint/drawableautotiledsurface.cpp \
-    FileCacheHandlers/videoframeloader.cpp \
-    FileCacheHandlers/videostreamsdata.cpp \
-    Paint/animatedsurface.cpp
+    GUI/BrushWidgets/brushwidget.cpp
 
 HEADERS  += \
-    Animators/outlinesettingsanimator.h \
-    Animators/paintsettingsanimator.h \
-    Boxes/boxrendercontainer.h \
-    Boxes/boxrenderdata.h \
-    Boxes/containerbox.h \
-    Boxes/effectsrenderer.h \
-    Boxes/effectsubtaskspawner.h \
-    Boxes/layerboxrenderdata.h \
-    Boxes/patheffectsmenu.h \
-    CacheHandlers/hddcachablecont.h \
-    CacheHandlers/hddcachablerangecont.h \
-    CacheHandlers/samples.h \
-    FileCacheHandlers/audiostreamsdata.h \
-    FileCacheHandlers/filedatacachehandler.h \
-    FileCacheHandlers/soundreader.h \
-    GPUEffects/customgpueffectcreator.h \
-    GPUEffects/shadereffect.h \
-    GPUEffects/shadereffectcreator.h \
-    GPUEffects/shadereffectprogram.h \
-    GPUEffects/uniformspecifiercreator.h \
-    GUI/Timeline/animationrect.h \
-    GUI/Timeline/durationrectangle.h \
-    GUI/Timeline/fixedlenanimationrect.h \
     GUI/audiohandler.h \
     GUI/canvaswindowwrapper.h \
     GUI/changewidthwidget.h \
+    GUI/ewidgetsimpl.h \
     GUI/layoutcollection.h \
     GUI/layouthandler.h \
     GUI/scenechooser.h \
@@ -298,21 +149,9 @@ HEADERS  += \
     GUI/timelinewrapper.h \
     GUI/welcomedialog.h \
     GUI/widgetstack.h \
-    Paint/painttarget.h \
-    PathEffects/custompatheffectcreator.h \
-    PathEffects/dashpatheffect.h \
-    PathEffects/linespatheffect.h \
-    PathEffects/spatialdisplacepatheffect.h \
-    PathEffects/subdividepatheffect.h \
-    PathEffects/subpatheffect.h \
-    PathEffects/zigzagpatheffect.h \
-    Sound/soundmerger.h \
-    actions.h \
-    canvas.h \
     GUI/ColorWidgets/colorlabel.h \
     GUI/ColorWidgets/colorsettingswidget.h \
     GUI/ColorWidgets/colorvaluerect.h \
-    GUI/ColorWidgets/colorvaluespin.h \
     GUI/ColorWidgets/colorwidget.h \
     GUI/ColorWidgets/h_wheel_sv_triangle.h \
     GUI/ColorWidgets/colorpickingwidget.h \
@@ -321,28 +160,12 @@ HEADERS  += \
     GUI/ColorWidgets/savedcolorwidgets.h \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
-    document.h \
     effectsloader.h \
     hardwareinfo.h \
-    offscreenqgl33c.h \
-    paintsettings.h \
     renderhandler.h \
     settings.h \
     svgimporter.h \
     keypoint.h \
-    Animators/qstringanimator.h \
-    Animators/coloranimator.h \
-    Boxes/circle.h \
-    Boxes/boundingbox.h \
-    Boxes/imagebox.h \
-    Boxes/pathbox.h \
-    Boxes/rectangle.h \
-    Boxes/textbox.h \
-    Boxes/animationbox.h \
-    pathoperations.h \
-    Boxes/linkbox.h \
-    Boxes/boxpainthandler.h \
-    Boxes/particlebox.h \
     GUI/BoxesList/OptimalScrollArea/scrollarea.h \
     GUI/BoxesList/OptimalScrollArea/scrollwidget.h \
     GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h \
@@ -350,13 +173,7 @@ HEADERS  += \
     GUI/BoxesList/boxsinglewidget.h \
     GUI/BoxesList/boxscrollwidgetvisiblepart.h \
     GUI/BoxesList/boxscrollwidget.h \
-    GUI/BoxesList/boxeslistactionbutton.h \
-    clipboardcontainer.h \
-    Boxes/videobox.h \
-    Sound/singlesound.h \
-    Sound/soundcomposition.h \
     GUI/BoxesList/boolpropertywidget.h \
-    Boxes/imagesequencebox.h \
     memorychecker.h \
     memoryhandler.h \
     outputgenerator.h \
@@ -366,18 +183,11 @@ HEADERS  += \
     GUI/GradientWidgets/gradientslistwidget.h \
     GUI/GradientWidgets/displayedgradientswidget.h \
     GUI/GradientWidgets/currentgradientwidget.h \
-    filesourcescache.h \
-    global.h \
     GUI/RenderWidgets/closablecontainer.h \
     GUI/RenderWidgets/renderdestinationdialog.h \
-    PathEffects/patheffectanimators.h \
-    GUI/BoxesList/coloranimatorbutton.h \
-    updatable.h \
     GUI/BoxesList/boxtargetwidget.h \
-    Properties/boxtargetproperty.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h \
-    Boxes/paintbox.h \
     GUI/paintboxsettingsdialog.h \
     execdelegator.h \
     GUI/BoxesList/boxscrollarea.h \
@@ -386,11 +196,6 @@ HEADERS  += \
     GUI/RenderWidgets/rendersettingsdialog.h \
     GUI/RenderWidgets/outputsettingsprofilesdialog.h \
     GUI/RenderWidgets/outputsettingsdisplaywidget.h \
-    Boxes/renderdatahandler.h \
-    PathEffects/displacepatheffect.h \
-    PathEffects/duplicatepatheffect.h \
-    PathEffects/solidifypatheffect.h \
-    PathEffects/patheffectsinclude.h \
     GUI/actionbutton.h \
     GUI/animationdockwidget.h \
     GUI/animationwidgetscrollbar.h \
@@ -398,19 +203,15 @@ HEADERS  += \
     GUI/boxeslistkeysviewwidget.h \
     GUI/canvaswindow.h \
     GUI/customfpsdialog.h \
-    GUI/durationrectsettingsdialog.h \
     GUI/filesourcelist.h \
     GUI/fillstrokesettings.h \
     GUI/fontswidget.h \
     GUI/keyfocustarget.h \
     GUI/keysview.h \
     GUI/mainwindow.h \
-    GUI/newcanvasdialog.h \
     GUI/qdoubleslider.h \
     GUI/qrealanimatorvalueslider.h \
-    GUI/twocolumnlayout.h \
     GUI/usagewidget.h \
-    GUI/valueinput.h \
     GUI/glwindow.h \
     GUI/noshortcutaction.h \
     GUI/qrealpointvaluedialog.h \
@@ -418,64 +219,13 @@ HEADERS  += \
     GUI/BrushWidgets/arraywidget.h \
     GUI/BrushWidgets/brushselectionwidget.h \
     GUI/BrushWidgets/flowlayout.h \
-    Animators/gradientpoints.h \
-    MovablePoints/pathpivot.h \
-    MovablePoints/gradientpoint.h \
-    PropertyUpdaters/nodepointupdater.h \
-    PropertyUpdaters/gradientupdater.h \
-    PropertyUpdaters/strokewidthupdater.h \
-    PropertyUpdaters/displayedfillstrokesettingsupdater.h \
-    PropertyUpdaters/pixmapeffectupdater.h \
-    PropertyUpdaters/animationboxframeupdater.h \
-    PropertyUpdaters/particlesupdater.h \
-    PropertyUpdaters/gradientpointsupdater.h \
-    PropertyUpdaters/groupallpathsupdater.h \
     GUI/ColorWidgets/colorwidgetshaders.h \
-    taskexecutor.h \
-    taskscheduler.h \
-    colorhelpers.h \
-    Animators/qrealanimatorcreator.h \
-    Animators/intanimatorcreator.h \
-    Animators/gpueffectanimators.h \
-    GPUEffects/gpupostprocessor.h \
     GUI/segment1deditor.h \
     GUI/namedcontainer.h \
     Animators/qcubicsegment1danimator.h \
-    Paint/autotiledsurface.h \
-    Paint/brushstroke.h \
-    Paint/colorconversions.h \
-    Paint/autotilesdata.h \
-    FileCacheHandlers/filecachehandler.h \
-    FileCacheHandlers/imagecachehandler.h \
-    FileCacheHandlers/imagesequencecachehandler.h \
-    FileCacheHandlers/animationcachehandler.h \
-    FileCacheHandlers/videocachehandler.h \
-    CacheHandlers/minimalcachecontainer.h \
-    CacheHandlers/imagecachecontainer.h \
-    CacheHandlers/tmpfilehandlers.h \
-    CacheHandlers/soundcachecontainer.h \
-    CacheHandlers/soundtmpfilehandlers.h \
-    CacheHandlers/hddcachablecachehandler.h \
-    CacheHandlers/soundcachehandler.h \
-    Boxes/smartvectorpath.h \
-    paintsettingsapplier.h \
-    colorsetting.h \
-    Animators/gradient.h \
-    GUI/BrushWidgets/simplebrushwrapper.h \
     GUI/BrushWidgets/brushcontexedwrapper.h \
     GUI/BrushWidgets/brushwidget.h \
-    Boxes/waitingforboxload.h \
-    Boxes/canvasrenderdata.h \
-    Boxes/linkcanvasrenderdata.h \
-    Boxes/internallinkcanvas.h \
-    Boxes/internallinkgroupbox.h \
-    PathEffects/sumpatheffect.h \
-    boxtypemenu.h \
-    PropertyUpdaters/boxpathpointupdater.h \
-    Paint/drawableautotiledsurface.h \
-    FileCacheHandlers/videoframeloader.h \
-    FileCacheHandlers/videostreamsdata.h \
-    Paint/animatedsurface.h
+    boxtypemenu.h
 
 RESOURCES += \
     resources.qrc

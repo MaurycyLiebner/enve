@@ -168,9 +168,6 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     connect(mColorsSettingsWidget, &ColorSettingsWidget::colorSettingSignal,
             this, &FillStrokeSettingsWidget::colorSettingReceived);
 
-    connect(mColorsSettingsWidget, &ColorSettingsWidget::colorModeChanged,
-            this, &FillStrokeSettingsWidget::setCurrentColorMode);
-
     mGradientTypeLayout = new QHBoxLayout();
     mGradientTypeLayout->setSpacing(0);
     mLinearGradientButton = new QPushButton(
@@ -259,20 +256,6 @@ void FillStrokeSettingsWidget::updateColorAnimator() {
         }
     } else if(getCurrentPaintTypeVal() == GRADIENTPAINT) {
         setColorAnimatorTarget(mGradientWidget->getColorAnimator());
-    }
-}
-
-void FillStrokeSettingsWidget::setCurrentColorMode(const ColorMode mode) {
-    if(mTarget == PaintSetting::FILL) {
-        if(mCurrentFillPaintType == FLATPAINT) {
-            const auto scene = mDocument.fActiveScene;
-            if(scene) scene->setSelectedFillColorMode(mode);
-        }
-    } else {
-        if(mCurrentStrokePaintType == FLATPAINT) {
-            const auto scene = mDocument.fActiveScene;
-            if(scene) scene->setSelectedStrokeColorMode(mode);
-        }
     }
 }
 
@@ -367,7 +350,10 @@ void FillStrokeSettingsWidget::colorTypeSet(const PaintType &type) {
     }
     PaintSettingsApplier paintSetting;
     if(currentPaintType == FLATPAINT) {
-        paintSetting << std::make_shared<ColorPaintSetting>(mTarget, ColorSettingApplier());
+//        const auto colorSetting = mColorsSettingsWidget->getColorSetting(ColorSettingType::apply,
+//                                                                         ColorParameter::all);
+//        paintSetting << std::make_shared<ColorPaintSetting>(
+//                            mTarget, colorSetting);
     } else if(currentPaintType == GRADIENTPAINT) {
         paintSetting << std::make_shared<GradientPaintSetting>(mTarget, currentGradient);
         paintSetting << std::make_shared<GradientTypePaintSetting>(mTarget, currentGradientType);
@@ -378,7 +364,7 @@ void FillStrokeSettingsWidget::colorTypeSet(const PaintType &type) {
 }
 
 void FillStrokeSettingsWidget::colorSettingReceived(
-        const ColorSettingApplier &colorSetting) {
+        const ColorSetting &colorSetting) {
     PaintSettingsApplier paintSetting;
     paintSetting << std::make_shared<ColorPaintSetting>(mTarget, colorSetting);
     const auto scene = mDocument.fActiveScene;

@@ -2,7 +2,7 @@
 #define MEMORYHANDLER_H
 #include <QThread>
 #include "memorychecker.h"
-class CacheContainer;
+#include "memorydatahandler.h"
 
 class MemoryHandler : public QObject {
     Q_OBJECT
@@ -10,25 +10,19 @@ public:
     explicit MemoryHandler(QObject * const parent = nullptr);
     ~MemoryHandler();
 
-    void addContainer(CacheContainer * const cont);
-    void removeContainer(CacheContainer * const cont);
-    void containerUpdated(CacheContainer * const cont);
-
-    static MemoryHandler *sGetInstance() { return sInstance; }
+    static MemoryHandler *sInstance;
 signals:
     void allMemoryUsed();
     void memoryFreed();
-public slots:
-    void freeMemory(const MemoryState &state,
-                    const long &minFreeBytes);
-    void memoryChecked(const int memKb, const int totMemKb);
 private:
+    void freeMemory(const MemoryState &state, const long &minFreeBytes);
+    void memoryChecked(const int memKb, const int totMemKb);
+
+    MemoryDataHandler mDataHandler;
     MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;
-    static MemoryHandler *sInstance;
     QTimer *mTimer;
     QThread *mMemoryChekerThread;
     MemoryChecker *mMemoryChecker;
-    QList<CacheContainer*> mContainers;
 };
 
 #endif // MEMORYHANDLER_H

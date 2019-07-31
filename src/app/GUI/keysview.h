@@ -24,7 +24,7 @@ class AnimationDockWidget;
 class DurationRectangleMovable;
 class KeysClipboard;
 class Animator;
-#include "valueinput.h"
+#include "GUI/valueinput.h"
 enum CtrlsMode : short;
 
 class KeysView : public QWidget, public KeyFocusTarget {

@@ -1,17 +1,18 @@
 #ifndef RENDERDATAHANDLER_H
 #define RENDERDATAHANDLER_H
-#include "boundingboxrenderdata.h"
+#include "boxrenderdata.h"
+#include <map>
 
 class RenderDataHandler {
 public:
-    bool removeItem(const stdsptr<BoundingBoxRenderData> &item);
-    bool removeItemAtRelFrame(const int& frame);
-    BoundingBoxRenderData *getItemAtRelFrame(const int &frame);
-    void addItemAtRelFrame(const stdsptr<BoundingBoxRenderData> &item);
+    void clear() { mFrameToData.clear(); }
+
+    bool removeItem(const stdsptr<BoxRenderData> &item);
+    bool removeItemAtRelFrame(const int frame);
+    BoxRenderData *getItemAtRelFrame(const int frame) const;
+    void addItemAtRelFrame(const stdsptr<BoxRenderData> &item);
 protected:
-    int getItemInsertIdAtRelFrame(const int &relFrame);
-    bool getItemIdAtRelFrame(const int &relFrame, int *id);
-    QList<stdsptr<BoundingBoxRenderData> > mItems;
+    std::map<int, stdsptr<BoxRenderData>> mFrameToData;
 };
 
 #endif // RENDERDATAHANDLER_H

@@ -2,7 +2,8 @@
 #include <QTimer>
 #include <QLocale>
 #include <QHBoxLayout>
-#include "global.h"
+#include "GUI/global.h"
+#include "Tasks/taskscheduler.h"
 #include <QProgressBar>
 
 class HardwareUsageWidget : public QProgressBar {
@@ -81,6 +82,13 @@ UsageWidget::UsageWidget(QWidget * const parent) : QStatusBar(parent) {
     addPermanentWidget(mRamLabel);
 
     setThreadsTotal(QThread::idealThreadCount());
+
+    connect(TaskScheduler::sInstance, &TaskScheduler::hddUsageChanged,
+            this, &UsageWidget::setHddUsage);
+    connect(TaskScheduler::sInstance, &TaskScheduler::gpuUsageChanged,
+            this, &UsageWidget::setGpuUsage);
+    connect(TaskScheduler::sInstance, &TaskScheduler::cpuUsageChanged,
+            this, &UsageWidget::setThreadsUsage);
 }
 
 void UsageWidget::setThreadsUsage(const int threads) {

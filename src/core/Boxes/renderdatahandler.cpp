@@ -1,85 +1,24 @@
 #include "renderdatahandler.h"
 
-bool RenderDataHandler::removeItem(const stdsptr<BoundingBoxRenderData>& item) {
-    return removeItemAtRelFrame(item->relFrame);
+bool RenderDataHandler::removeItem(const stdsptr<BoxRenderData>& item) {
+    return removeItemAtRelFrame(item->fRelFrame);
 }
 
-bool RenderDataHandler::removeItemAtRelFrame(const int &frame) {
-    int id;
-    if(getItemIdAtRelFrame(frame, &id)) {
-        mItems.removeAt(id);
-        return true;
-    }
-    return false;
+bool RenderDataHandler::removeItemAtRelFrame(const int frame) {
+    return mFrameToData.erase(frame);
 }
 
-BoundingBoxRenderData *RenderDataHandler::getItemAtRelFrame(const int &frame) {
-    int id;
-    if(getItemIdAtRelFrame(frame, &id)) {
-        return mItems.at(id).get();
-    }
-    return nullptr;
+BoxRenderData *RenderDataHandler::getItemAtRelFrame(const int frame) const {
+    const auto it = mFrameToData.find(frame);
+    if(it == mFrameToData.end()) return nullptr;
+    return it->second.get();
 }
 
-void RenderDataHandler::addItemAtRelFrame(const stdsptr<BoundingBoxRenderData>& item) {
-    int itemId = getItemInsertIdAtRelFrame(item->relFrame);
-    mItems.insert(itemId, item);
-}
-
-int RenderDataHandler::getItemInsertIdAtRelFrame(const int &relFrame) {
-    int minId = 0;
-    int maxId = mItems.count();
-
-    while(minId < maxId) {
-        int guess = (minId + maxId)/2;
-        stdsptr<BoundingBoxRenderData> item = mItems.at(guess);
-        int contFrame = item->relFrame;
-        Q_ASSERT(contFrame != relFrame);
-        if(contFrame > relFrame) {
-            if(guess == maxId) {
-                return minId;
-            }
-            maxId = guess;
-        } else if(contFrame < relFrame) {
-            if(guess == minId) {
-                return maxId;
-            }
-            minId = guess;
-        }
-    }
-    return 0;
-}
-
-bool RenderDataHandler::getItemIdAtRelFrame(const int &relFrame, int *id) {
-    int minId = 0;
-    int maxId = mItems.count() - 1;
-
-    while(minId <= maxId) {
-        int guess = (minId + maxId)/2;
-        stdsptr<BoundingBoxRenderData> item = mItems.at(guess);
-        if(item->relFrame == relFrame) {
-            *id = guess;
-            return true;
-        }
-        int contFrame = item->relFrame;
-        if(contFrame > relFrame) {
-            if(maxId == guess) {
-                *id = minId;
-                return mItems.at(minId)->relFrame == relFrame;
-            } else {
-                maxId = guess;
-            }
-        } else if(contFrame < relFrame) {
-            if(minId == guess) {
-                *id = maxId;
-                return mItems.at(maxId)->relFrame == relFrame;
-            } else {
-                minId = guess;
-            }
-        } else {
-            *id = guess;
-            return true;
-        }
-    }
-    return false;
+void RenderDataHandler::addItemAtRelFrame(
+        const stdsptr<BoxRenderData>& item) {
+    const auto ret = mFrameToData.insert({item->fRelFrame, item});
+    if(!ret.second)
+        RuntimeThrow("Item already present at rel frame" +
+                     QString::number(item->fRelFrame));
+    item->fRefInParent = true;
 }

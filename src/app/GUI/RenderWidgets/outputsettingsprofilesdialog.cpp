@@ -2,7 +2,7 @@
 #include "GUI/mainwindow.h"
 #include "rendersettingsdialog.h"
 #include "outputsettingsdisplaywidget.h"
-#include "global.h"
+#include "GUI/global.h"
 QList<stdsptr<OutputSettingsProfile>> OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES;
 
 OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(

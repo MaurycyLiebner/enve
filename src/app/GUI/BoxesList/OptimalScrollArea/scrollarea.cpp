@@ -32,7 +32,7 @@ void ScrollArea::resizeEvent(QResizeEvent *e) {
     }
     QScrollArea::resizeEvent(e);
 }
-#include "global.h"
+#include "GUI/global.h"
 void ScrollArea::callWheelEvent(QWheelEvent *event) {
     if(event->delta() > 0) {
         scrollBy(0, -MIN_WIDGET_DIM);

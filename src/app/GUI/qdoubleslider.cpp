@@ -3,7 +3,7 @@
 #include <QKeyEvent>
 #include "pointhelpers.h"
 #include "mainwindow.h"
-#include "global.h"
+#include "GUI/global.h"
 
 QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
                              const qreal prefferedStep,

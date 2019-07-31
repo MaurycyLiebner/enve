@@ -1,17 +1,22 @@
 #include "renderhandler.h"
 #include "videoencoder.h"
 #include "memoryhandler.h"
-#include "taskscheduler.h"
+#include "Tasks/taskscheduler.h"
 #include "canvas.h"
 #include "Sound/soundcomposition.h"
 #include "CacheHandlers/soundcachecontainer.h"
 #include "CacheHandlers/imagecachecontainer.h"
 #include "document.h"
 
+RenderHandler* RenderHandler::sInstance = nullptr;
+
 RenderHandler::RenderHandler(Document &document,
                              AudioHandler& audioHandler) :
     mDocument(document), mAudioHandler(audioHandler) {
-    connect(MemoryHandler::sGetInstance(), &MemoryHandler::allMemoryUsed,
+    sInstance = this;
+    connect(this, &RenderHandler::queTasksAndUpdate,
+            &mDocument, &Document::actionFinished);
+    connect(MemoryHandler::sInstance, &MemoryHandler::allMemoryUsed,
             this, &RenderHandler::outOfMemory);
 
     mPreviewFPSTimer = new QTimer(this);

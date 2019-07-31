@@ -1,6 +1,6 @@
 #include "canvaswindow.h"
 #include "canvas.h"
-#include "global.h"
+#include "GUI/global.h"
 
 QPointF CanvasWindow::mapToCanvasCoord(const QPointF& windowCoord) {
     return mViewTransform.inverted().map(windowCoord);

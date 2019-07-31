@@ -26,7 +26,7 @@
 #include "Boxes/paintbox.h"
 //#include "GUI/BrushWidgets/brushsettingswidget.h"
 #include "canvas.h"
-#include "GUI/Timeline/durationrectangle.h"
+#include "Timeline/durationrectangle.h"
 #include "Animators/gradientpoints.h"
 #include "MovablePoints/gradientpoint.h"
 #include "Animators/qrealkey.h"

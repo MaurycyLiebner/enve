@@ -4,7 +4,7 @@
 #include "singlewidgetabstraction.h"
 #include "singlewidgettarget.h"
 #include "scrollarea.h"
-#include "global.h"
+#include "GUI/global.h"
 
 ScrollWidget::ScrollWidget(ScrollArea * const parent) :
     MinimalScrollWidget(parent) {

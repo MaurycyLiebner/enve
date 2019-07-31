@@ -1,5 +1,5 @@
 #include "changewidthwidget.h"
-#include "global.h"
+#include "GUI/global.h"
 #include "simplemath.h"
 
 #include <QMouseEvent>

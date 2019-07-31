@@ -1,5 +1,5 @@
 #include "filesourcelist.h"
-#include "global.h"
+#include "GUI/global.h"
 #include <QPainter>
 #include <QScrollBar>
 #include <QMenu>
@@ -115,11 +115,12 @@ void FileSourceListScrollWidget::createVisiblePartWidget() {
     mMinimalVisiblePartWidget = new FileSourceListVisibleWidget(this);
 }
 
-QList<FileSourceListVisibleWidget*> FileSourceListVisibleWidget::sWidgets;
-
 FileSourceListVisibleWidget::FileSourceListVisibleWidget(MinimalScrollWidget *parent) :
     MinimalScrollWidgetVisiblePart(parent) {
-    sWidgets.append(this);
+    connect(FilesHandler::sInstance, &FilesHandler::addedCacheHandler,
+            this, &FileSourceListVisibleWidget::addCacheHandlerToList);
+    connect(FilesHandler::sInstance, &FilesHandler::removedCacheHandler,
+            this, &FileSourceListVisibleWidget::removeCacheHandlerFromList);
 }
 
 void FileSourceListVisibleWidget::paintEvent(QPaintEvent *) {
@@ -140,10 +141,6 @@ void FileSourceListVisibleWidget::paintEvent(QPaintEvent *) {
 //    }
 
     p.end();
-}
-
-FileSourceListVisibleWidget::~FileSourceListVisibleWidget() {
-    sWidgets.removeOne(this);
 }
 
 void FileSourceListVisibleWidget::updateVisibleWidgetsContent() {

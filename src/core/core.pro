@@ -4,8 +4,9 @@
 #
 #-------------------------------------------------
 
-#QT       -= gui
-QT += opengl qml
+QT += opengl multimedia qml xml
+LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample
+
 TARGET = envecore
 TEMPLATE = lib
 
@@ -24,14 +25,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 ENVE_FOLDER = $$PWD/../..
 SKIA_FOLDER = $$ENVE_FOLDER/third_party/skia
-#LIBMYPAINT_FOLDER = $$ENVE_FOLDER/third_party/libmypaint-1.3.0
+LIBMYPAINT_FOLDER = $$ENVE_FOLDER/third_party/libmypaint-1.3.0
 
 INCLUDEPATH += $$SKIA_FOLDER
 
+INCLUDEPATH += $$LIBMYPAINT_FOLDER/include
+LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint -lgobject-2.0 -lglib-2.0 -ljson-c
+
 CONFIG(debug, debug|release) {
-    LIBS += -L$$SKIA_FOLDER/out/Debug
+    LIBS += -L$$SKIA_FOLDER/out/Debug -lskia
 } else {
-    LIBS += -L$$SKIA_FOLDER/out/Release
+    LIBS += -L$$SKIA_FOLDER/out/Release -lskia
     QMAKE_CFLAGS -= -O2
     QMAKE_CFLAGS -= -O1
     QMAKE_CXXFLAGS -= -O2
@@ -41,16 +45,142 @@ CONFIG(debug, debug|release) {
     QMAKE_CXXFLAGS = -m64 -O3
 }
 
-LIBS += -lskia
+QMAKE_CXXFLAGS += -fopenmp
+LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 
 SOURCES += \
+    Animators/coloranimator.cpp \
     Animators/eeffect.cpp \
+    Animators/gpueffectanimators.cpp \
+    Animators/gradient.cpp \
+    Animators/gradientpoints.cpp \
+    Animators/outlinesettingsanimator.cpp \
+    Animators/paintsettingsanimator.cpp \
     Animators/qrealsnapshot.cpp \
+    Animators/qstringanimator.cpp \
     Animators/staticcomplexanimator.cpp \
+    Boxes/animationbox.cpp \
+    Boxes/boundingbox.cpp \
+    Boxes/boxrendercontainer.cpp \
+    Boxes/boxrenderdata.cpp \
+    Boxes/canvasrenderdata.cpp \
+    Boxes/circle.cpp \
+    Boxes/containerbox.cpp \
+    Boxes/effectsrenderer.cpp \
+    Boxes/effectsubtaskspawner.cpp \
+    Boxes/imagebox.cpp \
+    Boxes/imagesequencebox.cpp \
+    Boxes/internallinkcanvas.cpp \
+    Boxes/internallinkgroupbox.cpp \
+    Boxes/layerboxrenderdata.cpp \
+    Boxes/linkbox.cpp \
+    Boxes/linkcanvasrenderdata.cpp \
+    Boxes/paintbox.cpp \
+    Boxes/particlebox.cpp \
+    Boxes/pathbox.cpp \
+    Boxes/patheffectsmenu.cpp \
+    Boxes/rectangle.cpp \
+    Boxes/renderdatahandler.cpp \
+    Boxes/smartvectorpath.cpp \
+    Boxes/textbox.cpp \
+    Boxes/videobox.cpp \
+    Boxes/waitingforboxload.cpp \
+    CacheHandlers/hddcachablecachehandler.cpp \
+    CacheHandlers/hddcachablerangecont.cpp \
+    CacheHandlers/imagecachecontainer.cpp \
+    CacheHandlers/minimalcachecontainer.cpp \
+    CacheHandlers/soundcachecontainer.cpp \
+    CacheHandlers/soundcachehandler.cpp \
+    CacheHandlers/soundtmpfilehandlers.cpp \
+    CacheHandlers/tmpfilehandlers.cpp \
+    FileCacheHandlers/animationcachehandler.cpp \
+    FileCacheHandlers/audiostreamsdata.cpp \
+    FileCacheHandlers/filecachehandler.cpp \
+    FileCacheHandlers/filedatacachehandler.cpp \
+    FileCacheHandlers/imagecachehandler.cpp \
+    FileCacheHandlers/imagesequencecachehandler.cpp \
+    FileCacheHandlers/soundreader.cpp \
+    FileCacheHandlers/videocachehandler.cpp \
+    FileCacheHandlers/videoframeloader.cpp \
+    FileCacheHandlers/videostreamsdata.cpp \
     GPUEffects/customgpueffect.cpp \
     GPUEffects/gpueffect.cpp \
+    GUI/boxeslistactionbutton.cpp \
+    GUI/coloranimatorbutton.cpp \
+    GUI/durationrectsettingsdialog.cpp \
+    GUI/ewidgets.cpp \
+    GUI/newcanvasdialog.cpp \
+    GUI/twocolumnlayout.cpp \
+    GUI/valueinput.cpp \
+    MovablePoints/gradientpoint.cpp \
+    MovablePoints/pathpivot.cpp \
+    Paint/animatedsurface.cpp \
+    Paint/autotiledsurface.cpp \
+    Paint/autotilesdata.cpp \
+    Paint/brushstroke.cpp \
+    Paint/colorconversions.cpp \
+    Paint/drawableautotiledsurface.cpp \
+    Paint/painttarget.cpp \
+    Paint/simplebrushwrapper.cpp \
     PathEffects/custompatheffect.cpp \
+    PathEffects/custompatheffectcreator.cpp \
+    PathEffects/dashpatheffect.cpp \
+    PathEffects/displacepatheffect.cpp \
+    PathEffects/duplicatepatheffect.cpp \
+    PathEffects/linespatheffect.cpp \
+    PathEffects/patheffectanimators.cpp \
+    PathEffects/solidifypatheffect.cpp \
+    PathEffects/spatialdisplacepatheffect.cpp \
+    PathEffects/subdividepatheffect.cpp \
+    PathEffects/subpatheffect.cpp \
+    PathEffects/sumpatheffect.cpp \
+    PathEffects/zigzagpatheffect.cpp \
+    Properties/boxtargetproperty.cpp \
+    PropertyUpdaters/animationboxframeupdater.cpp \
+    PropertyUpdaters/boxpathpointupdater.cpp \
+    PropertyUpdaters/displayedfillstrokesettingsupdater.cpp \
+    PropertyUpdaters/gradientpointsupdater.cpp \
+    PropertyUpdaters/gradientupdater.cpp \
+    PropertyUpdaters/groupallpathsupdater.cpp \
+    PropertyUpdaters/nodepointupdater.cpp \
+    PropertyUpdaters/particlesupdater.cpp \
+    PropertyUpdaters/pixmapeffectupdater.cpp \
+    PropertyUpdaters/strokewidthupdater.cpp \
+    ShaderEffects/customgpueffectcreator.cpp \
+    ShaderEffects/shadereffect.cpp \
+    ShaderEffects/shadereffectcreator.cpp \
+    ShaderEffects/shadereffectprogram.cpp \
+    ShaderEffects/uniformspecifiercreator.cpp \
+    Sound/singlesound.cpp \
+    Sound/soundcomposition.cpp \
+    Sound/soundmerger.cpp \
+    Tasks/gpupostprocessor.cpp \
+    Tasks/offscreenqgl33c.cpp \
+    Tasks/taskexecutor.cpp \
+    Tasks/taskscheduler.cpp \
+    Tasks/updatable.cpp \
+    Timeline/animationrect.cpp \
+    Timeline/durationrectangle.cpp \
+    Timeline/fixedlenanimationrect.cpp \
+    actions.cpp \
+    canvas.cpp \
+    canvashandlesmartpath.cpp \
+    canvasmouseevents.cpp \
+    canvasmouseinteractions.cpp \
+    canvasselectedboxesactions.cpp \
+    canvasselectedpointsactions.cpp \
+    clipboardcontainer.cpp \
+    colorhelpers.cpp \
+    colorsetting.cpp \
     conncontext.cpp \
+    document.cpp \
+    documentrw.cpp \
+    fileshandler.cpp \
+    filesourcescache.cpp \
+    memorydatahandler.cpp \
+    paintsettings.cpp \
+    paintsettingsapplier.cpp \
+    pathoperations.cpp \
     randomgrid.cpp \
     simpletask.cpp \
     smartPointers/stdpointer.cpp \
@@ -71,7 +201,6 @@ SOURCES += \
     PropertyUpdaters/transformupdater.cpp \
     PropertyUpdaters/smartnodepointupdater.cpp \
     undoredo.cpp \
-    Properties/propertycreator.cpp \
     exceptions.cpp \
     glhelpers.cpp \
     skia/skimagecopy.cpp \
@@ -138,16 +267,139 @@ SOURCES += \
     MovablePoints/brushpolypoint.cpp
 
 HEADERS += \
+    Animators/coloranimator.h \
     Animators/dynamiccomplexanimator.h \
     Animators/eeffect.h \
+    Animators/gpueffectanimators.h \
+    Animators/gradient.h \
+    Animators/gradientpoints.h \
+    Animators/outlinesettingsanimator.h \
+    Animators/paintsettingsanimator.h \
     Animators/qrealsnapshot.h \
+    Animators/qstringanimator.h \
     Animators/staticcomplexanimator.h \
+    Boxes/animationbox.h \
+    Boxes/boundingbox.h \
+    Boxes/boxrendercontainer.h \
+    Boxes/boxrenderdata.h \
+    Boxes/canvasrenderdata.h \
+    Boxes/circle.h \
+    Boxes/containerbox.h \
+    Boxes/effectsrenderer.h \
+    Boxes/effectsubtaskspawner.h \
+    Boxes/imagebox.h \
+    Boxes/imagesequencebox.h \
+    Boxes/internallinkcanvas.h \
+    Boxes/internallinkgroupbox.h \
+    Boxes/layerboxrenderdata.h \
+    Boxes/linkbox.h \
+    Boxes/linkcanvasrenderdata.h \
+    Boxes/paintbox.h \
+    Boxes/particlebox.h \
+    Boxes/pathbox.h \
+    Boxes/patheffectsmenu.h \
+    Boxes/rectangle.h \
+    Boxes/renderdatahandler.h \
+    Boxes/smartvectorpath.h \
+    Boxes/textbox.h \
+    Boxes/videobox.h \
+    Boxes/waitingforboxload.h \
+    CacheHandlers/hddcachablecachehandler.h \
+    CacheHandlers/hddcachablecont.h \
+    CacheHandlers/hddcachablerangecont.h \
+    CacheHandlers/imagecachecontainer.h \
+    CacheHandlers/minimalcachecontainer.h \
+    CacheHandlers/samples.h \
+    CacheHandlers/soundcachecontainer.h \
+    CacheHandlers/soundcachehandler.h \
+    CacheHandlers/soundtmpfilehandlers.h \
+    CacheHandlers/tmpfilehandlers.h \
+    FileCacheHandlers/animationcachehandler.h \
+    FileCacheHandlers/audiostreamsdata.h \
+    FileCacheHandlers/filecachehandler.h \
+    FileCacheHandlers/filedatacachehandler.h \
+    FileCacheHandlers/imagecachehandler.h \
+    FileCacheHandlers/imagesequencecachehandler.h \
+    FileCacheHandlers/soundreader.h \
+    FileCacheHandlers/videocachehandler.h \
+    FileCacheHandlers/videoframeloader.h \
+    FileCacheHandlers/videostreamsdata.h \
     GPUEffects/customgpueffect.h \
     GPUEffects/gpueffect.h \
+    GUI/boxeslistactionbutton.h \
+    GUI/coloranimatorbutton.h \
+    GUI/durationrectsettingsdialog.h \
+    GUI/ewidgets.h \
+    GUI/global.h \
+    GUI/newcanvasdialog.h \
+    GUI/twocolumnlayout.h \
+    GUI/valueinput.h \
+    MovablePoints/gradientpoint.h \
+    MovablePoints/pathpivot.h \
+    Paint/animatedsurface.h \
+    Paint/autotiledsurface.h \
+    Paint/autotilesdata.h \
+    Paint/brushstroke.h \
+    Paint/colorconversions.h \
+    Paint/drawableautotiledsurface.h \
+    Paint/painttarget.h \
+    Paint/simplebrushwrapper.h \
     PathEffects/custompatheffect.h \
+    PathEffects/custompatheffectcreator.h \
+    PathEffects/dashpatheffect.h \
+    PathEffects/displacepatheffect.h \
+    PathEffects/duplicatepatheffect.h \
+    PathEffects/linespatheffect.h \
+    PathEffects/patheffectanimators.h \
+    PathEffects/patheffectsinclude.h \
+    PathEffects/solidifypatheffect.h \
+    PathEffects/spatialdisplacepatheffect.h \
+    PathEffects/subdividepatheffect.h \
+    PathEffects/subpatheffect.h \
+    PathEffects/sumpatheffect.h \
+    PathEffects/zigzagpatheffect.h \
+    Properties/boxtargetproperty.h \
+    PropertyUpdaters/animationboxframeupdater.h \
+    PropertyUpdaters/boxpathpointupdater.h \
+    PropertyUpdaters/displayedfillstrokesettingsupdater.h \
+    PropertyUpdaters/gradientpointsupdater.h \
+    PropertyUpdaters/gradientupdater.h \
+    PropertyUpdaters/groupallpathsupdater.h \
+    PropertyUpdaters/nodepointupdater.h \
+    PropertyUpdaters/particlesupdater.h \
+    PropertyUpdaters/pixmapeffectupdater.h \
+    PropertyUpdaters/strokewidthupdater.h \
+    ShaderEffects/customgpueffectcreator.h \
+    ShaderEffects/shadereffect.h \
+    ShaderEffects/shadereffectcreator.h \
+    ShaderEffects/shadereffectprogram.h \
+    ShaderEffects/uniformspecifiercreator.h \
+    Sound/singlesound.h \
+    Sound/soundcomposition.h \
+    Sound/soundmerger.h \
+    Tasks/gpupostprocessor.h \
+    Tasks/offscreenqgl33c.h \
+    Tasks/taskexecutor.h \
+    Tasks/taskscheduler.h \
+    Tasks/updatable.h \
+    Timeline/animationrect.h \
+    Timeline/durationrectangle.h \
+    Timeline/fixedlenanimationrect.h \
+    actions.h \
+    canvas.h \
+    clipboardcontainer.h \
+    colorhelpers.h \
+    colorsetting.h \
     conncontext.h \
     core_global.h \
     customidentifier.h \
+    document.h \
+    fileshandler.h \
+    filesourcescache.h \
+    memorydatahandler.h \
+    paintsettings.h \
+    paintsettingsapplier.h \
+    pathoperations.h \
     randomgrid.h \
     rangemap.h \
     simpletask.h \
@@ -170,7 +422,7 @@ HEADERS += \
     PropertyUpdaters/transformupdater.h \
     PropertyUpdaters/smartnodepointupdater.h \
     undoredo.h \
-    Properties/propertycreator.h \
+    ShaderEffects/propertycreator.h \
     exceptions.h \
     glhelpers.h \
     skia/skiadefines.h \

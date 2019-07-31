@@ -1,16 +1,16 @@
 #ifndef COLORVALUERECT_H
 #define COLORVALUERECT_H
 #include "colorwidget.h"
+#include "colorwidgetshaders.h"
 
 class ColorValueRect : public ColorWidget {
     Q_OBJECT
 public:
-    ColorValueRect(const CVR_TYPE type_t, QWidget *parent = nullptr);
-    void updateVal();
+    ColorValueRect(const ColorProgram &program,
+                   QWidget * const parent = nullptr);
+
     void setDisplayedValue(const qreal val_t);
-    qreal qVal() const {
-        return static_cast<qreal>(mVal);
-    }
+    qreal value() const { return mVal; }
 private:
     void paintGL();
     void mouseMoveEvent(QMouseEvent *e);
@@ -22,12 +22,12 @@ private:
     void setColorParameterFromVal();
     void setValueAndEmitValueChanged(const qreal valT);
 signals:
-    void valChanged(qreal);
+    void valueChanged(qreal);
     void editingFinished(qreal);
     void editingStarted(qreal);
 private:
-    CVR_TYPE mType;
-    GLfloat mVal = 0;
+    const ColorProgram& mGLProgram;
+    qreal mVal = 0;
 };
 
 #endif // COLORVALUERECT_H

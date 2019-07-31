@@ -7,7 +7,7 @@
 #include <QBoxLayout>
 #include <QMainWindow>
 
-#include "global.h"
+#include "GUI/global.h"
 
 #define STACK_TMPL_DEFS \
     int (QWidget::*DimGetter)() const, void (*DimSetter)(QWidget*, int), \

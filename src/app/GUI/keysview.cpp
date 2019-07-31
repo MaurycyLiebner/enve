@@ -6,10 +6,10 @@
 #include "mainwindow.h"
 #include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
 #include "Timeline/durationrectangle.h"
-#include "global.h"
+#include "GUI/global.h"
 #include "pointhelpers.h"
 #include "canvaswindow.h"
-#include "durationrectsettingsdialog.h"
+#include "GUI/durationrectsettingsdialog.h"
 #include <QApplication>
 #include "clipboardcontainer.h"
 #include "Animators/qrealpoint.h"
@@ -248,7 +248,9 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
         if(event->isAutoRepeat()) return false;
         const auto container = Document::sInstance->getKeysClipboard();
         if(!container) return false;
-        container->paste(mCurrentScene->getCurrentFrame(), this, true, true);
+        clearKeySelection();
+        container->paste(mCurrentScene->getCurrentFrame(), true,
+                         [this](Key* key) { addKeyToSelection(key); });
     } else if(!mSelectedKeysAnimators.isEmpty()) {
         if(event->modifiers() & Qt::ControlModifier &&
            event->key() == Qt::Key_C) {
@@ -282,7 +284,9 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                     lowestKey = animLowest;
                 }
             }
-            container->paste(lowestKey, this, false, true);
+            clearKeySelection();
+            container->paste(lowestKey, false,
+                             [this](Key* key) { addKeyToSelection(key); });
 
             mValueInput.setupMove();
             mMovingKeys = true;
@@ -292,7 +296,9 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
         } else if(event->modifiers() & Qt::CTRL &&
                   event->key() == Qt::Key_D) {
             auto container = getSelectedKeysClipboardContainer();
-            container->paste(mCurrentScene->getCurrentFrame(), this, true, true);
+            clearKeySelection();
+            container->paste(mCurrentScene->getCurrentFrame(), true,
+                             [this](Key* key) { addKeyToSelection(key); });
          } else if(event->key() == Qt::Key_Delete) {
             if(mGraphViewed) {
                 graphDeletePressed();

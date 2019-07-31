@@ -2,7 +2,7 @@
 #include <QPainter>
 #include <QMenu>
 #include <QAction>
-#include "global.h"
+#include "GUI/global.h"
 
 SavedColorButton::SavedColorButton(const QColor &colorT,
                                    QWidget *parent) :

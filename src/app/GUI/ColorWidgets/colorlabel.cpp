@@ -14,7 +14,7 @@ void ColorLabel::mousePressEvent(QMouseEvent *e) {
     Q_UNUSED(e);
 }
 
-void ColorLabel::setAlpha(GLfloat alpha_t) {
+void ColorLabel::setAlpha(const qreal alpha_t) {
     mAlpha = alpha_t;
     update();
 }
@@ -30,7 +30,8 @@ void ColorLabel::paintGL() {
 
     int halfWidth = width()/2;
     glViewport(0, 0, halfWidth, height());
-    glUniform4f(PLAIN_PROGRAM.fRGBAColorLoc, r, g, b, mAlpha);
+    glUniform4f(PLAIN_PROGRAM.fRGBAColorLoc, r, g, b,
+                static_cast<float>(mAlpha));
     glUniform2f(PLAIN_PROGRAM.fMeshSizeLoc, height()/(1.5f*width()), 1.f/3);
     glBindVertexArray(mPlainSquareVAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

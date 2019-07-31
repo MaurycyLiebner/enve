@@ -1,6 +1,6 @@
 #include "colorwidget.h"
 #include "colorhelpers.h"
-#include "global.h"
+#include "GUI/global.h"
 
 ColorWidget::ColorWidget(QWidget *parent) : GLWidget(parent) {
 

@@ -1,7 +1,7 @@
 #include "animationdockwidget.h"
 #include <QStyleOption>
 #include <QPainter>
-#include "global.h"
+#include "GUI/global.h"
 #include "keysview.h"
 #include "actionbutton.h"
 

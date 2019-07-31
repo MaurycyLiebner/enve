@@ -1,13 +1,11 @@
 ﻿#include "svgimporter.h"
 #include "Boxes/containerbox.h"
 #include "canvas.h"
-#include "GUI/ColorWidgets/colorvaluerect.h"
 #include "colorhelpers.h"
 #include "pointhelpers.h"
 #include "Boxes/circle.h"
 #include "Boxes/rectangle.h"
 #include "Boxes/textbox.h"
-#include "GUI/mainwindow.h"
 #include "Animators/transformanimator.h"
 #include "paintsettingsapplier.h"
 #include "Boxes/smartvectorpath.h"
@@ -2040,10 +2038,10 @@ void FillSvgAttributes::apply(BoundingBox * const box,
     if(!box->SWT_isPathBox()) return;
     const auto pathBox = GetAsPtr(box, PathBox);
     if(mPaintType == FLATPAINT) {
-        ColorSettingApplier colorSetting(RGBMODE, CVR_ALL,
+        ColorSetting colorSetting(ColorMode::rgb, ColorParameter::all,
                                   mColor.redF(), mColor.greenF(),
                                   mColor.blueF(), mColor.alphaF(),
-                                  CST_CHANGE);
+                                  ColorSettingType::change);
         ColorPaintSetting(target, colorSetting).apply(pathBox);
     } else if(mPaintType == GRADIENTPAINT) {
         GradientPaintSetting(target, mGradient).apply(pathBox);

@@ -1,5 +1,5 @@
 #include "outputsettingsdisplaywidget.h"
-#include "global.h"
+#include "GUI/global.h"
 
 OutputSettingsDisplayWidget::OutputSettingsDisplayWidget(QWidget *parent) :
     QWidget(parent) {

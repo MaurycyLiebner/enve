@@ -24,17 +24,18 @@ public:
 
     QColor getCurrentQColor();
     void setCurrentColor(const QColor &color);
+    void setCurrentColor(const qreal h_t, const qreal s_t,
+                         const qreal v_t, const qreal a_t = 1);
     void hideAlphaControlers();
-    ColorSettingApplier getColorSetting(const ColorSettingType &type) const;
+
+    void setTarget(ColorAnimator * const target);
+
+    ColorSetting getColorSetting(const ColorSettingType type,
+                                        const ColorParameter parameter) const;
 signals:
-    void colorSettingSignal(const ColorSettingApplier&);
-    void colorModeChanged(const ColorMode);
-public slots:
-    void setCurrentColor(const qreal h_t,
-                         const qreal s_t,
-                         const qreal v_t,
-                         const qreal a_t = 1.);
-    void setTarget(ColorAnimator *target);
+    void colorSettingSignal(const ColorSetting&);
+private:
+
     void emitColorChangedSignal();
     void emitEditingFinishedSignal();
     void emitEditingStartedSignal();
@@ -53,7 +54,7 @@ public slots:
     void emitEditingStartedAlpha();
 
     void emitFullColorChangedSignal();
-private slots:
+
     void moveAlphaWidgetToTab(const int tabId);
 
     void startColorPicking();
@@ -71,7 +72,7 @@ private slots:
     void setColorMode(const int colorMode);
     void refreshColorAnimatorTarget();
     void nullifyAnimator();
-private:
+
     void connectSignalsAndSlots();
     void connectColorWidgetSignalToSlot(ColorWidget *slot_obj,
                                         const char *slot,
@@ -94,7 +95,7 @@ private:
         const qreal lightness);
 
     bool mBlockColorSettings = false;
-    CVR_TYPE mLastTriggeredCVR;
+    ColorParameter mLastTriggered;
 
     ColorAnimator *mTargetAnimator = nullptr;
 

@@ -4,7 +4,7 @@
 #include "singlewidgetabstraction.h"
 #include "singlewidgettarget.h"
 #include "scrollarea.h"
-#include "global.h"
+#include "GUI/global.h"
 
 MinimalScrollWidget::MinimalScrollWidget(ScrollArea * const parent) :
     QWidget(parent) {

@@ -5,7 +5,7 @@
 #include "GUI/ColorWidgets/colorpickingwidget.h"
 #include "colorhelpers.h"
 #include "colorlabel.h"
-#include "global.h"
+#include "GUI/global.h"
 #include "GUI/actionbutton.h"
 
 void moveAndResizeValueRect(const int rect_x_t,
@@ -85,8 +85,8 @@ void ColorSettingsWidget::setCurrentColor(const qreal h_t,
 }
 
 void ColorSettingsWidget::setCurrentColor(const QColor &color) {
-    setCurrentColor(color.hueF(), color.saturationF(), color.valueF(),
-                    color.alphaF());
+    setCurrentColor(color.hueF(), color.saturationF(),
+                    color.valueF(), color.alphaF());
 }
 
 void ColorSettingsWidget::hideAlphaControlers() {
@@ -107,10 +107,8 @@ void ColorSettingsWidget::nullifyAnimator() {
     setTarget(nullptr);
 }
 
-void ColorSettingsWidget::setTarget(ColorAnimator *target) {
-    if(mTargetAnimator) {
-        disconnect(mTargetAnimator, nullptr, this, nullptr);
-    }
+void ColorSettingsWidget::setTarget(ColorAnimator * const target) {
+    if(mTargetAnimator) disconnect(mTargetAnimator, nullptr, this, nullptr);
     mTargetAnimator = target;
     rSpin->clearTarget();
     gSpin->clearTarget();
@@ -124,21 +122,17 @@ void ColorSettingsWidget::setTarget(ColorAnimator *target) {
         aSpin->clearTarget();
     }
     if(target) {
-        disconnect(mColorModeCombo, SIGNAL(currentIndexChanged(int)),
-                this, SLOT(setColorMode(int)));
-        mColorModeCombo->setCurrentIndex(target->getColorMode());
-        connect(mColorModeCombo, SIGNAL(currentIndexChanged(int)),
-                this, SLOT(setColorMode(int)));
+        mColorModeCombo->setCurrentIndex(int(target->getColorMode()));
         if(!mAlphaHidden) {
             aSpin->setTarget(target->getAlphaAnimator());
         }
-        if(target->getColorMode() == RGBMODE) {
+        if(target->getColorMode() == ColorMode::rgb) {
             rSpin->setTarget(target->getVal1Animator());
             gSpin->setTarget(target->getVal2Animator());
             bSpin->setTarget(target->getVal3Animator());
 
             updateValuesFromRGB();
-        } else if(target->getColorMode() == HSLMODE) {
+        } else if(target->getColorMode() == ColorMode::hsl) {
             hSpin->setTarget(target->getVal1Animator());
             hslSSpin->setTarget(target->getVal2Animator());
             lSpin->setTarget(target->getVal3Animator());
@@ -153,119 +147,125 @@ void ColorSettingsWidget::setTarget(ColorAnimator *target) {
         }
 
         updateAlphaFromSpin();
-        connect(target, SIGNAL(colorModeChanged(ColorMode)),
-                this, SLOT(refreshColorAnimatorTarget()));
+        connect(target, &ColorAnimator::colorModeChanged,
+                this, &ColorSettingsWidget::refreshColorAnimatorTarget);
         connect(target, &QObject::destroyed,
                 this, &ColorSettingsWidget::nullifyAnimator);
     }
 }
 
-ColorSettingApplier ColorSettingsWidget::getColorSetting(
-        const ColorSettingType& type) const {
+ColorSetting ColorSettingsWidget::getColorSetting(
+        const ColorSettingType type,
+        const ColorParameter parameter) const {
     const int tabId = mTabWidget->currentIndex();
     qreal alphaVal = 1;
     if(!mAlphaHidden) alphaVal = aSpin->value();
     if(tabId == 0) {
-        return ColorSettingApplier(
-                    RGBMODE, mLastTriggeredCVR,
+        return ColorSetting(
+                    ColorMode::rgb, parameter,
                     rSpin->value(),
                     gSpin->value(),
                     bSpin->value(),
                     alphaVal,
                     type, mTargetAnimator);
     } else if(tabId == 1) {
-        return ColorSettingApplier(
-                    HSVMODE, mLastTriggeredCVR,
+        return ColorSetting(
+                    ColorMode::hsv, parameter,
                     hSpin->value(),
                     hsvSSpin->value(),
                     vSpin->value(),
                     alphaVal,
                     type, mTargetAnimator);
-    } else if(tabId == 2) {
-        return ColorSettingApplier(
-                    HSLMODE, mLastTriggeredCVR,
+    } else { //if(tabId == 2) {
+        return ColorSetting(
+                    ColorMode::hsl, parameter,
                     hSpin->value(),
                     hslSSpin->value(),
                     lSpin->value(),
                     alphaVal,
                     type, mTargetAnimator);
     }
-    return ColorSettingApplier();
 }
 
 void ColorSettingsWidget::emitColorChangedSignal() {
-    emit colorSettingSignal(getColorSetting(CST_CHANGE));
+    const auto colorSetting = getColorSetting(ColorSettingType::change,
+                                              mLastTriggered);
+    emit colorSettingSignal(colorSetting);
 }
 
 void ColorSettingsWidget::emitEditingFinishedSignal() {
-    int tabId = mTabWidget->currentIndex();
+    const int tabId = mTabWidget->currentIndex();
     if(mTargetAnimator) {
-        if(mTargetAnimator->getColorMode() != tabId) {
+        if(mTargetAnimator->getColorMode() != static_cast<ColorMode>(tabId)) {
             mTargetAnimator->prp_finishTransform();
         }
     }
-    emit colorSettingSignal(getColorSetting(CST_FINISH));
+    const auto colorSetting = getColorSetting(ColorSettingType::finish,
+                                              mLastTriggered);
+    emit colorSettingSignal(colorSetting);
 }
 
 void ColorSettingsWidget::emitEditingStartedSignal() {
     int tabId = mTabWidget->currentIndex();
     if(mTargetAnimator) {
-        if(mTargetAnimator->getColorMode() != tabId) {
+        if(mTargetAnimator->getColorMode() != static_cast<ColorMode>(tabId)) {
             mTargetAnimator->startVal1Transform();
             mTargetAnimator->startVal2Transform();
             mTargetAnimator->startVal3Transform();
         }
     }
-    emit colorSettingSignal(getColorSetting(CST_START));
+    const auto colorSetting = getColorSetting(ColorSettingType::start,
+                                              mLastTriggered);
+    emit colorSettingSignal(colorSetting);
 }
 
 void ColorSettingsWidget::emitEditingStartedRed() {
-    mLastTriggeredCVR = CVR_RED;
+    mLastTriggered = ColorParameter::red;
     emitEditingStartedSignal();
 }
 
 void ColorSettingsWidget::emitEditingStartedGreen() {
-    mLastTriggeredCVR = CVR_GREEN;
+    mLastTriggered = ColorParameter::green;
     emitEditingStartedSignal();
 }
 
 void ColorSettingsWidget::emitEditingStartedBlue() {
-    mLastTriggeredCVR = CVR_BLUE;
+    mLastTriggered = ColorParameter::blue;
     emitEditingStartedSignal();
 }
 
 void ColorSettingsWidget::emitEditingStartedHue() {
-    mLastTriggeredCVR = CVR_HUE;
+    mLastTriggered = ColorParameter::hue;
     emitEditingStartedSignal();
 }
 
 void ColorSettingsWidget::emitEditingStartedHSVSaturation() {
-    mLastTriggeredCVR = CVR_HSVSATURATION;
+    mLastTriggered = ColorParameter::hsvSaturaton;
     emitEditingStartedSignal();
 }
 
 void ColorSettingsWidget::emitEditingStartedValue() {
-    mLastTriggeredCVR = CVR_VALUE;
+    mLastTriggered = ColorParameter::value;
     emitEditingStartedSignal();
 }
 
 void ColorSettingsWidget::emitEditingStartedHSLSaturation() {
-    mLastTriggeredCVR = CVR_HSLSATURATION;
+    mLastTriggered = ColorParameter::hslSaturation;
     emitEditingStartedSignal();
 }
 
 void ColorSettingsWidget::emitEditingStartedLightness() {
-    mLastTriggeredCVR = CVR_LIGHTNESS;
+    mLastTriggered = ColorParameter::lightness;
     emitEditingStartedSignal();
 }
 
 void ColorSettingsWidget::emitEditingStartedAlpha() {
-    mLastTriggeredCVR = CVR_ALPHA;
+    mLastTriggered = ColorParameter::alpha;
     emitEditingStartedSignal();
 }
 
 void ColorSettingsWidget::emitFullColorChangedSignal() {
-    mLastTriggeredCVR = CVR_ALL;
+    mLastTriggered = ColorParameter::all;
     if(mTargetAnimator) mTargetAnimator->prp_startTransform();
     updateValuesFromHSV();
     updateAlphaFromSpin();
@@ -348,17 +348,17 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
 
     int LABEL_WIDTH = MIN_WIDGET_DIM;
 
-    r_rect = new ColorValueRect(CVR_RED, this);
+    r_rect = new ColorValueRect(RED_PROGRAM, this);
     rLabel->setFixedWidth(LABEL_WIDTH);
     rLayout->addWidget(rLabel);
     rLayout->addWidget(r_rect);
     rLayout->addWidget(rSpin);
-    g_rect = new ColorValueRect(CVR_GREEN, this);
+    g_rect = new ColorValueRect(GREEN_PROGRAM, this);
     gLabel->setFixedWidth(LABEL_WIDTH);
     gLayout->addWidget(gLabel);
     gLayout->addWidget(g_rect);
     gLayout->addWidget(gSpin);
-    b_rect = new ColorValueRect(CVR_BLUE, this);
+    b_rect = new ColorValueRect(BLUE_PROGRAM, this);
     bLabel->setFixedWidth(LABEL_WIDTH);
     bLayout->addWidget(bLabel);
     bLayout->addWidget(b_rect);
@@ -369,17 +369,17 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mRGBLayout->addLayout(bLayout);
     mRGBWidget->setLayout(mRGBLayout);
 
-    h_rect = new ColorValueRect(CVR_HUE, this);
+    h_rect = new ColorValueRect(HUE_PROGRAM, this);
     hLabel->setFixedWidth(LABEL_WIDTH);
     hLayout->addWidget(hLabel);
     hLayout->addWidget(h_rect);
     hLayout->addWidget(hSpin);
-    hsv_s_rect = new ColorValueRect(CVR_HSVSATURATION, this);
+    hsv_s_rect = new ColorValueRect(HSV_SATURATION_PROGRAM, this);
     hsvSLabel->setFixedWidth(LABEL_WIDTH);
     hsvSLayout->addWidget(hsvSLabel);
     hsvSLayout->addWidget(hsv_s_rect);
     hsvSLayout->addWidget(hsvSSpin);
-    v_rect = new ColorValueRect(CVR_VALUE, this);
+    v_rect = new ColorValueRect(VALUE_PROGRAM, this);
     vLabel->setFixedWidth(LABEL_WIDTH);
     vLayout->addWidget(vLabel);
     vLayout->addWidget(v_rect);
@@ -390,12 +390,12 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mHSVLayout->addLayout(vLayout);
     mHSVWidget->setLayout(mHSVLayout);
 
-    hsl_s_rect = new ColorValueRect(CVR_HSLSATURATION, this);
+    hsl_s_rect = new ColorValueRect(HSL_SATURATION_PROGRAM, this);
     hslSLabel->setFixedWidth(LABEL_WIDTH);
     hslSLayout->addWidget(hslSLabel);
     hslSLayout->addWidget(hsl_s_rect);
     hslSLayout->addWidget(hslSSpin);
-    l_rect = new ColorValueRect(CVR_LIGHTNESS, this);
+    l_rect = new ColorValueRect(LIGHTNESS_PROGRAM, this);
     lLabel->setFixedWidth(LABEL_WIDTH);
     lLayout->addWidget(lLabel);
     lLayout->addWidget(l_rect);
@@ -405,7 +405,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mHSLLayout->addLayout(lLayout);
     mHSLWidget->setLayout(mHSLLayout);
 
-    aRect = new ColorValueRect(CVR_ALPHA, this);
+    aRect = new ColorValueRect(ALPHA_PROGRAM, this);
     aLabel->setFixedWidth(LABEL_WIDTH);
     aLayout->addWidget(aLabel);
     aLayout->addWidget(aRect);
@@ -414,8 +414,8 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
 
     mPickingButton = new ActionButton(":/icons/draw_dropper.png",
                                      "", this);
-    connect(mPickingButton, SIGNAL(released()),
-            this, SLOT(startColorPicking()));
+    connect(mPickingButton, &ActionButton::released,
+            this, &ColorSettingsWidget::startColorPicking);
     mColorLabelLayout->addWidget(mColorLabel);
     mColorLabelLayout->addWidget(mPickingButton);
     mWidgetsLayout->addLayout(mColorLabelLayout);
@@ -432,13 +432,13 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mColorModeCombo->addItem("RGB");
     mColorModeCombo->addItem("HSV");
     mColorModeCombo->addItem("HSL");
-    connect(mColorModeCombo, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(setColorMode(int)));
+    connect(mColorModeCombo, qOverload<int>(&QComboBox::activated),
+            this, &ColorSettingsWidget::setColorMode);
 
     mWidgetsLayout->addLayout(mColorModeLayout);
 
-    connect(mTabWidget, SIGNAL(currentChanged(int)),
-            SLOT(moveAlphaWidgetToTab(int)));
+    connect(mTabWidget, &QTabWidget::currentChanged,
+            this, &ColorSettingsWidget::moveAlphaWidgetToTab);
 
     connect(rSpin, &QrealAnimatorValueSlider::valueChanged,
             this, &ColorSettingsWidget::setValuesFromRGB);
@@ -558,23 +558,23 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     connect(aRect, &ColorValueRect::editingFinished,
             aSpin, &QrealAnimatorValueSlider::emitEditingFinished);
 
-    connect(r_rect, &ColorValueRect::valChanged,
+    connect(r_rect, &ColorValueRect::valueChanged,
             rSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
-    connect(g_rect, &ColorValueRect::valChanged,
+    connect(g_rect, &ColorValueRect::valueChanged,
             gSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
-    connect(b_rect, &ColorValueRect::valChanged,
+    connect(b_rect, &ColorValueRect::valueChanged,
             bSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
-    connect(h_rect, &ColorValueRect::valChanged,
+    connect(h_rect, &ColorValueRect::valueChanged,
             hSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
-    connect(hsv_s_rect, &ColorValueRect::valChanged,
+    connect(hsv_s_rect, &ColorValueRect::valueChanged,
             hsvSSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
-    connect(v_rect, &ColorValueRect::valChanged,
+    connect(v_rect, &ColorValueRect::valueChanged,
             vSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
-    connect(hsl_s_rect, &ColorValueRect::valChanged,
+    connect(hsl_s_rect, &ColorValueRect::valueChanged,
             hslSSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
-    connect(l_rect, &ColorValueRect::valChanged,
+    connect(l_rect, &ColorValueRect::valueChanged,
             lSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
-    connect(aRect, &ColorValueRect::valChanged,
+    connect(aRect, &ColorValueRect::valueChanged,
             aSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
 
 
@@ -756,7 +756,9 @@ void ColorSettingsWidget::setColorMode(const int colorMode) {
     if(mTargetAnimator) {
         mTargetAnimator->setColorMode(static_cast<ColorMode>(colorMode));
     }
-    emit colorModeChanged(static_cast<ColorMode>(colorMode));
+    const auto colorSetting = getColorSetting(ColorSettingType::apply,
+                                              ColorParameter::colorMode);
+    emit colorSettingSignal(colorSetting);
     Document::sInstance->actionFinished();
 }
 

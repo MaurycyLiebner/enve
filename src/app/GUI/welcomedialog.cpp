@@ -5,7 +5,7 @@
 #include <QFontMetrics>
 #include <QDir>
 
-#include "global.h"
+#include "GUI/global.h"
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
 
 WelcomeDialog::WelcomeDialog(const QStringList &recentPaths,

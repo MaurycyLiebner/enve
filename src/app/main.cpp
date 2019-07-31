@@ -3,6 +3,7 @@
 #include <QSurfaceFormat>
 #include <QProcess>
 #include "hardwareinfo.h"
+#include "GUI/ewidgetsimpl.h"
 
 void setDefaultFormat() {
     QSurfaceFormat format;
@@ -20,16 +21,16 @@ int main(int argc, char *argv[]) {
     setDefaultFormat();
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QApplication a(argc, argv);
+    //#ifdef QT_DEBUG
+    //    const qint64 pId = QCoreApplication::applicationPid();
+    //    QProcess * const process = new QProcess(&w);
+    //    process->start("prlimit --data=3000000000 --pid " + QString::number(pId));
+    //#endif
 
     HardwareInfo::sUpdateInfo();
+    eWidgetsImpl widImpl;
 
     MainWindow w;
-//#ifdef QT_DEBUG
-//    const qint64 pId = QCoreApplication::applicationPid();
-//    QProcess * const process = new QProcess(&w);
-//    process->start("prlimit --data=3000000000 --pid " + QString::number(pId));
-//#endif
-
     w.show();
 
     try {

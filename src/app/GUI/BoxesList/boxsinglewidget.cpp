@@ -39,12 +39,11 @@ QPixmap* BoxSingleWidget::ANIMATOR_NOT_RECORDING;
 QPixmap* BoxSingleWidget::ANIMATOR_DESCENDANT_RECORDING;
 bool BoxSingleWidget::sStaticPixmapsLoaded = false;
 
-#include "global.h"
+#include "GUI/global.h"
 #include "GUI/mainwindow.h"
 #include "clipboardcontainer.h"
-#include "GUI/Timeline/durationrectangle.h"
-#include "boxeslistactionbutton.h"
-#include "coloranimatorbutton.h"
+#include "Timeline/durationrectangle.h"
+#include "GUI/coloranimatorbutton.h"
 #include "canvas.h"
 #include "PathEffects/patheffect.h"
 #include "PathEffects/patheffectanimators.h"

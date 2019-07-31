@@ -1,7 +1,7 @@
 #include "animationwidgetscrollbar.h"
 #include <QMouseEvent>
 #include <QPainter>
-#include "global.h"
+#include "GUI/global.h"
 #include "colorhelpers.h"
 
 FrameScrollBar::FrameScrollBar(const int minSpan,

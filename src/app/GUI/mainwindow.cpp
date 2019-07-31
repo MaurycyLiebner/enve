@@ -11,7 +11,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "boxeslistanimationdockwidget.h"
-#include "taskexecutor.h"
+#include "Tasks/taskexecutor.h"
 #include "qdoubleslider.h"
 #include "svgimporter.h"
 #include "canvaswindow.h"
@@ -22,7 +22,7 @@
 #include "GUI/RenderWidgets/renderwidget.h"
 #include "actionbutton.h"
 #include "fontswidget.h"
-#include "global.h"
+#include "GUI/global.h"
 #include "filesourcescache.h"
 #include "filesourcelist.h"
 #include "videoencoder.h"
@@ -38,7 +38,7 @@
 #include "scenelayout.h"
 #include "GUI/GradientWidgets/gradientwidget.h"
 #include "GUI/newcanvasdialog.h"
-#include "GPUEffects/shadereffectprogram.h"
+#include "ShaderEffects/shadereffectprogram.h"
 extern "C" {
     #include <libavformat/avformat.h>
 }
@@ -57,7 +57,9 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       mMemoryHandler(new MemoryHandler(this)),
       mVideoEncoder(SPtrCreate(VideoEncoder)()),
-      mDocument(mAudioHandler), mActions(mDocument) {
+      mDocument(mTaskScheduler),
+      mActions(mDocument),
+      mRenderHandler(mDocument, mAudioHandler) {
     sMainWindowInstance = this;
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
@@ -238,7 +240,7 @@ MainWindow::MainWindow(QWidget *parent)
     mEventFilterDisabled = false;
 
     try {
-        mDocument.fTaskScheduler.initializeGPU();
+        TaskScheduler::sInstance->initializeGPU();
     } catch(const std::exception& e) {
         gPrintExceptionFatal(e);
     }
@@ -982,7 +984,7 @@ void MainWindow::clearAll() {
 //        delete cont;
 //    }
 //    mClipboardContainers.clear();
-    FileCacheHandler::sClear();
+    FilesHandler::sInstance->clear();
     //mBoxListWidget->clearAll();
 }
 

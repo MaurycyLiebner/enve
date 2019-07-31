@@ -12,7 +12,7 @@ class Document;
 class RenderHandler : public QObject {
     Q_OBJECT
 public:
-    RenderHandler(Document& document,
+    RenderHandler(Document &document,
                   AudioHandler &audioHandler);
 
     void interruptPreview();
@@ -26,6 +26,8 @@ public:
     void resumePreview();
     void renderPreview();
     void renderFromSettings(RenderInstanceSettings * const settings);
+
+    static RenderHandler* sInstance;
 signals:
     void previewBeingRendered();
     void previewPaused();

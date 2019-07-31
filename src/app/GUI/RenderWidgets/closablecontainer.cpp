@@ -1,5 +1,5 @@
 #include "closablecontainer.h"
-#include "global.h"
+#include "GUI/global.h"
 #include <QCheckBox>
 
 ClosableContainer::ClosableContainer(QWidget *parent) : QWidget(parent) {

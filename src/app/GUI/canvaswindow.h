@@ -6,11 +6,11 @@
 #include "singlewidgettarget.h"
 #include "keyfocustarget.h"
 #include "smartPointers/sharedpointerdefs.h"
-#include "GPUEffects/gpupostprocessor.h"
+#include "Tasks/gpupostprocessor.h"
 #include "canvas.h"
 class Brush;
 class WindowSingleWidgetTarget;
-enum ColorMode : short;
+enum class ColorMode : short;
 enum CanvasMode : short;
 class Gradient;
 class BoundingBox;

@@ -1,5 +1,5 @@
 #include "renderinstancewidget.h"
-#include "global.h"
+#include "GUI/global.h"
 #include <QFileDialog>
 #include <QMenu>
 #include "rendersettingsdialog.h"

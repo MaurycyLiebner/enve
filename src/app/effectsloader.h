@@ -1,6 +1,6 @@
 #ifndef EFFECTSLOADER_H
 #define EFFECTSLOADER_H
-#include "offscreenqgl33c.h"
+#include "Tasks/offscreenqgl33c.h"
 
 class ShaderEffectProgram;
 class ShaderEffectCreator;
