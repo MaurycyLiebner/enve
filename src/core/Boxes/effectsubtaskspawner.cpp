@@ -2,7 +2,8 @@
 #include "boxrenderdata.h"
 #include "Tasks/taskscheduler.h"
 #include "skia/skiaincludes.h"
-#include "GPUEffects/gpueffect.h"
+#include "RasterEffects/rastereffect.h"
+#include "RasterEffects/rastereffectcaller.h"
 
 class EffectSubTaskSpawner_priv {
 public:

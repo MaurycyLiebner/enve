@@ -1,5 +1,5 @@
-#ifndef GPURASTEREFFECTPROGRAM_H
-#define GPURASTEREFFECTPROGRAM_H
+#ifndef SHADEREFFECTPROGRAM_H
+#define SHADEREFFECTPROGRAM_H
 #include "uniformspecifiercreator.h"
 
 typedef QList<stdsptr<UniformSpecifierCreator>> UniformSpecifierCreators;
@@ -19,7 +19,7 @@ struct ShaderEffectProgram {
         try {
             iniProgram(gl, program.fId, GL_TEXTURED_VERT, fragPath);
         } catch(...) {
-            RuntimeThrow("Could not initialize a program for GPURasterEffect");
+            RuntimeThrow("Could not initialize a program for ShaderEffectProgram");
         }
 
         for(const auto& propC : propCs) {
@@ -40,4 +40,4 @@ struct ShaderEffectProgram {
     }
 };
 
-#endif // GPURASTEREFFECTPROGRAM_H
+#endif // SHADEREFFECTPROGRAM_H

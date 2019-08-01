@@ -18,9 +18,8 @@ protected:
 public:
     int getByteCount();
 
-    void drawSk(SkCanvas * const canvas, GrContext* const grContext);
-    void drawSk(SkCanvas * const canvas, GrContext* const grContext,
-                SkPaint &paint);
+    void drawSk(SkCanvas * const canvas);
+    void drawSk(SkCanvas * const canvas, SkPaint &paint);
 
     sk_sp<SkImage> getImageSk();
 

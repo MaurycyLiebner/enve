@@ -7,7 +7,7 @@
 #include "smartPointers/stdselfref.h"
 #include "skia/skiaincludes.h"
 #include "glhelpers.h"
-#include "GPUEffects/gpueffect.h"
+#include "RasterEffects/rastereffect.h"
 #include "Tasks/updatable.h"
 
 #include <QOpenGLFramebufferObject>
@@ -80,7 +80,7 @@ protected:
 
         for(const auto& scheduled : _mHandledProcesses) {
             try {
-                scheduled->processGPU(this, mContext);
+                scheduled->processGpu(this, mContext);
             } catch(...) {
                 scheduled->setException(std::current_exception());
             }

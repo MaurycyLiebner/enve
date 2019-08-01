@@ -1,22 +1,22 @@
-#include "gpueffectanimators.h"
-#include "GPUEffects/gpueffect.h"
+#include "rastereffectanimators.h"
+#include "RasterEffects/rastereffect.h"
 #include "Boxes/boundingbox.h"
 #include <QDebug>
 
-GPUEffectAnimators::GPUEffectAnimators(BoundingBox * const parentBox) :
-    GPUEffectAnimatorsBase("gpu effects"), mParentBox_k(parentBox) {
+RasterEffectAnimators::RasterEffectAnimators(BoundingBox * const parentBox) :
+    RasterEffectAnimatorsBase("raster effects"), mParentBox_k(parentBox) {
     makeHiddenWhenEmpty();
 
     connect(this, &ComplexAnimator::childAdded,
-            this, &GPUEffectAnimators::updateUnbound);
+            this, &RasterEffectAnimators::updateUnbound);
     connect(this, &ComplexAnimator::childRemoved,
-            this, &GPUEffectAnimators::updateUnbound);
+            this, &RasterEffectAnimators::updateUnbound);
 }
 
-QMargins GPUEffectAnimators::getEffectsMargin(const qreal relFrame) const {
+QMargins RasterEffectAnimators::getEffectsMargin(const qreal relFrame) const {
     QMargins newMargin;
     for(const auto& effect : ca_mChildAnimators) {
-        auto rasterEffect = GetAsPtr(effect.get(), GpuEffect);
+        auto rasterEffect = GetAsPtr(effect.get(), RasterEffect);
         if(rasterEffect->isVisible()) {
             newMargin += rasterEffect->getMarginAtRelFrame(relFrame);
         }
@@ -24,10 +24,10 @@ QMargins GPUEffectAnimators::getEffectsMargin(const qreal relFrame) const {
     return newMargin;
 }
 
-void GPUEffectAnimators::updateUnbound() {
+void RasterEffectAnimators::updateUnbound() {
     for(const auto& effect : ca_mChildAnimators) {
-        auto gpuEffect = GetAsPtr(effect.get(), GpuEffect);
-        if(gpuEffect->isVisible() && gpuEffect->forceMargin()) {
+        auto rasterEffect = GetAsPtr(effect.get(), RasterEffect);
+        if(/*rasterEffect->isVisible() && */rasterEffect->forceMargin()) {
             mUnbound = true;
             return;
         }
@@ -35,12 +35,12 @@ void GPUEffectAnimators::updateUnbound() {
     mUnbound = false;
 }
 
-bool GPUEffectAnimators::unbound() const {
+bool RasterEffectAnimators::unbound() const {
     return mUnbound;
 }
 
-void GPUEffectAnimators::addEffects(const qreal relFrame,
-                                    BoxRenderData * const data) {
+void RasterEffectAnimators::addEffects(const qreal relFrame,
+                                       BoxRenderData * const data) {
     for(const auto& effect : ca_mChildAnimators) {
         auto rasterEffect = GetAsPtr(effect, ShaderEffect);
         if(rasterEffect->isVisible()) {
@@ -52,19 +52,23 @@ void GPUEffectAnimators::addEffects(const qreal relFrame,
     }
 }
 
-void GPUEffectAnimators::updateIfUsesProgram(
+void RasterEffectAnimators::updateIfUsesProgram(
         const ShaderEffectProgram * const program) {
     for(const auto& effect : ca_mChildAnimators) {
-        if(!effect->SWT_isShaderEffect()) continue;
-        const auto rasterEffect = GetAsPtr(effect.get(), ShaderEffect);
-        rasterEffect->updateIfUsesProgram(program);
+        const auto shaderEffect = dynamic_cast<ShaderEffect*>(effect.get());
+        if(!shaderEffect) continue;
+        shaderEffect->updateIfUsesProgram(program);
     }
+}
+
+bool RasterEffectAnimators::hasEffects() {
+    return !ca_mChildAnimators.isEmpty();
 }
 
 qsptr<ShaderEffect> readIdCreateShaderEffect(QIODevice * const src) {
     const auto id = ShaderEffectCreator::sReadIdentifier(src);
     const auto best = ShaderEffectCreator::sGetBestCompatibleEffects(id);
-    if(best.isEmpty()) RuntimeThrow("No compatible GPU effect found for " + id.fName);
+    if(best.isEmpty()) RuntimeThrow("No compatible ShaderEffect found for " + id.fName);
     qsptr<ShaderEffect> effect;
     if(best.count() == 1) {
         const auto bestCreator = best.first();
@@ -76,25 +80,21 @@ qsptr<ShaderEffect> readIdCreateShaderEffect(QIODevice * const src) {
 }
 
 #include "customidentifier.h"
-qsptr<GpuEffect> readIdCreateGPURasterEffect(QIODevice * const src) {
-    GpuEffectType type;
-    src->read(rcChar(&type), sizeof(GpuEffectType));
+#include "RasterEffects/customrastereffectcreator.h"
+qsptr<RasterEffect> readIdCreateRasterEffect(QIODevice * const src) {
+    RasterEffectType type;
+    src->read(rcChar(&type), sizeof(RasterEffectType));
     switch(type) {
-        case(GpuEffectType::BLUR):
+        case(RasterEffectType::BLUR):
             return nullptr;
-        case(GpuEffectType::SHADOW):
+        case(RasterEffectType::SHADOW):
             return nullptr;
-        case(GpuEffectType::CUSTOM): {
+        case(RasterEffectType::CUSTOM): {
             const auto id = CustomIdentifier::sRead(src);
-            return nullptr;
-            //return CustomGpuEffectCreator::sCreateForIdentifier(id);
-        } case(GpuEffectType::CUSTOM_SHADER):
+            return CustomRasterEffectCreator::sCreateForIdentifier(id);
+        } case(RasterEffectType::CUSTOM_SHADER):
             return readIdCreateShaderEffect(src);
-        default: RuntimeThrow("Invalid gpu effect type '" +
+        default: RuntimeThrow("Invalid RasterEffect type '" +
                               QString::number(int(type)) + "'");
     }
-}
-
-bool GPUEffectAnimators::hasEffects() {
-    return !ca_mChildAnimators.isEmpty();
 }

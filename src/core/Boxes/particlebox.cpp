@@ -7,7 +7,7 @@
 #include "PropertyUpdaters/particlesupdater.h"
 #include "Animators/paintsettingsanimator.h"
 #include "Animators/transformanimator.h"
-#include "Animators/gpueffectanimators.h"
+#include "Animators/rastereffectanimators.h"
 #include "paintsettingsapplier.h"
 
 ParticleBox::ParticleBox() : BoundingBox(TYPE_PARTICLES) {
@@ -28,8 +28,8 @@ ParticleBox::ParticleBox() : BoundingBox(TYPE_PARTICLES) {
     mBottomRightAnimator->prp_setInheritedUpdater(
                 SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
 
-    ca_prependChildAnimator(mTopLeftAnimator.data(), mGPUEffectsAnimators);
-    ca_prependChildAnimator(mBottomRightAnimator.data(), mGPUEffectsAnimators);
+    ca_prependChildAnimator(mTopLeftAnimator.data(), mRasterEffectsAnimators);
+    ca_prependChildAnimator(mBottomRightAnimator.data(), mRasterEffectsAnimators);
 
     const auto durRect = SPtrCreate(DurationRectangle)(this);
     setDurationRectangle(durRect);

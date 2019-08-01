@@ -40,7 +40,7 @@
 #include "Boxes/smartvectorpath.h"
 #include "Sound/singlesound.h"
 #include "Sound/soundcomposition.h"
-#include "Animators/gpueffectanimators.h"
+#include "Animators/rastereffectanimators.h"
 
 
 void FixedLenAnimationRect::writeDurationRectangle(QIODevice *target) {

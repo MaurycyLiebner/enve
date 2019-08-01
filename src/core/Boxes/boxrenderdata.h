@@ -46,7 +46,7 @@ public:
         return result;
     }
 
-    void processGPU(QGL33 * const gl,
+    void processGpu(QGL33 * const gl,
                     SwitchableContext &context);
     void process();
 

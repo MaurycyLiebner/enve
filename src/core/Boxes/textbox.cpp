@@ -5,7 +5,7 @@
 #include "Animators/gradientpoints.h"
 #include "Animators/qstringanimator.h"
 #include "PropertyUpdaters/nodepointupdater.h"
-#include "Animators/gpueffectanimators.h"
+#include "Animators/rastereffectanimators.h"
 #include "typemenu.h"
 #include "Animators/transformanimator.h"
 #include "Animators/outlinesettingsanimator.h"
@@ -18,11 +18,11 @@ TextBox::TextBox() : PathBox(TYPE_TEXT) {
     mStrokeSettings->setPaintType(PaintType::NOPAINT);
 
     mText = SPtrCreate(QStringAnimator)("text");
-    ca_prependChildAnimator(mGPUEffectsAnimators.data(), mText);
+    ca_prependChildAnimator(mRasterEffectsAnimators.data(), mText);
     mText->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
 
     mLinesDist = SPtrCreate(QrealAnimator)(100, 0, 100, 1, "line dist");
-    ca_prependChildAnimator(mGPUEffectsAnimators.data(), mLinesDist);
+    ca_prependChildAnimator(mRasterEffectsAnimators.data(), mLinesDist);
     mLinesDist->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
 }
 

@@ -6,9 +6,9 @@
 QList<stdsptr<ShaderEffectCreator>> ShaderEffectCreator::sEffectCreators;
 
 qsptr<Property> ShaderEffectCreator::create() const {
-    auto rasterEffect = SPtrCreate(ShaderEffect)(
+    auto shaderEffect = SPtrCreate(ShaderEffect)(
                 fName, this, &fProgram, fProperties);
-    return std::move(rasterEffect);
+    return std::move(shaderEffect);
 }
 
 qreal attrToDouble(const QDomElement &elem,
@@ -88,25 +88,25 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
         QGL33 * const gl, const QString &grePath) {
     QFile greFile(grePath);
     if(!greFile.exists())
-        RuntimeThrow("GPURasterEffect source file does not exist.");
+        RuntimeThrow("ShaderEffect source file does not exist.");
     const QFileInfo info(greFile);
     const QString fragPath = info.path() + "/" + info.completeBaseName() + ".frag";
     const QFile fragFile(fragPath);
     if(!fragFile.exists())
-        RuntimeThrow("GPURasterEffect shader file (" +
+        RuntimeThrow("ShaderEffect shader file (" +
                      fragPath + ") does not exist.");
     if(!greFile.open(QIODevice::ReadOnly))
-        RuntimeThrow("GPURasterEffect source file could not be opened.");
+        RuntimeThrow("ShaderEffect source file could not be opened.");
     QDomDocument document;
     QString errMsg;
     if(!document.setContent(&greFile, &errMsg))
-        RuntimeThrow("Error while parsing GPURasterEffect source:\n" + errMsg);
+        RuntimeThrow("Error while parsing ShaderEffect source:\n" + errMsg);
     greFile.close();
 
     QDomElement root = document.firstChildElement();
-    if(root.tagName() != "GPURasterEffect")
+    if(root.tagName() != "ShaderEffect")
         RuntimeThrow("Unrecogized root " + root.tagName() +
-                     "in GPURasterEffect source.");
+                     " in ShaderEffect source.");
     const QString effectName = root.attribute("name");
 
     QList<stdsptr<PropertyCreator>> propCs;
@@ -135,14 +135,14 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
         program = ShaderEffectProgram::sCreateProgram(
                     gl, fragPath, propCs, uniCs);
     } catch(...) {
-        RuntimeThrow("Could not create a program for GPURasterEffect '" +
+        RuntimeThrow("Could not create a program for ShaderEffect '" +
                      effectName + "'");
     }
-    auto rasterEffectCreator =
+    const auto shaderEffectCreator =
             SPtrCreate(ShaderEffectCreator)(grePath, effectName, propCs, program);
-    sEffectCreators << rasterEffectCreator;
+    sEffectCreators << shaderEffectCreator;
 
-    return rasterEffectCreator;
+    return shaderEffectCreator;
 }
 
 stdsptr<ShaderEffectCreator>

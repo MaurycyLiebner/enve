@@ -10,12 +10,6 @@ namespace SkiaHelpers {
     sk_sp<SkImage> makeCopy(const sk_sp<SkImage>& img);
     SkBitmap makeCopy(const SkBitmap& btmp);
 
-    void drawImageGPU(SkCanvas* const canvas,
-                      const sk_sp<SkImage>& image,
-                      const float x,
-                      const float y,
-                      SkPaint * const paint,
-                      GrContext* const context);
     SkImageInfo getPremulRGBAInfo(const int width,
                                   const int height);
     void saveImage(const QString& fileName,

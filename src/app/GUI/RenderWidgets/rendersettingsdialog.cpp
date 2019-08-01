@@ -38,7 +38,7 @@ RenderSettingsDialog::RenderSettingsDialog(const OutputSettings &settings,
         "*.aiff")
     };
 
-    setStyleSheet(MainWindow::getInstance()->styleSheet());
+    setStyleSheet(MainWindow::sGetInstance()->styleSheet());
     mInitialSettings = settings;
 
     mMainLayout = new QVBoxLayout(this);

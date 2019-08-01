@@ -40,7 +40,7 @@ public:
         }
     }
 
-    void setupGPUEffectsF(const qreal relFrame,
+    void setupRasterEffectsF(const qreal relFrame,
                           BoxRenderData * const data);
 
     QMarginsF getEffectsMargin(const qreal relFrame);

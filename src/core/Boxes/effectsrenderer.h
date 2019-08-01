@@ -20,7 +20,7 @@ public:
 
     bool isEmpty() const { return mEffects.isEmpty(); }
 
-    void setBaseGlobalRect(SkIRect& currRect, const SkIRect &baseRect,
+    void setBaseGlobalRect(SkIRect& currRect,
                            const SkIRect& skMaxBounds) const;
 
     HardwareSupport nextHardwareSupport() const;

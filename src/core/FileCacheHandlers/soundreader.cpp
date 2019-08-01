@@ -107,16 +107,14 @@ void SoundReader::readFrame() {
 
         if(currentDstSample + decodedFrame->nb_samples >= mSecondId*SOUND_SAMPLERATE) {
             // resample frames
-            float *buffer;
+            uint8_t* buffer = nullptr;
             const int bufferSamples = qCeil(decodedFrame->nb_samples*dstSamplesPerSrc);
-            const int res = av_samples_alloc((uint8_t**)&buffer, nullptr, 1,
+            const int res = av_samples_alloc(&buffer, nullptr, 1,
                                              bufferSamples, AV_SAMPLE_FMT_FLT, 0);
             if(res < 0) RuntimeThrow("Resampling output buffer alloc failed");
 
             const int nDstSamples =
-                    swr_convert(swrContext,
-                                (uint8_t**)(&buffer),
-                                bufferSamples,
+                    swr_convert(swrContext, &buffer, bufferSamples,
                                 (const uint8_t**)decodedFrame->data,
                                 decodedFrame->nb_samples);
             if(nSamples < 0) RuntimeThrow("Resampling failed");
@@ -130,7 +128,7 @@ void SoundReader::readFrame() {
                 const ulong newAudioDataSize = static_cast<ulong>(newNSamples) * sizeof(float);
                 void * const audioDataMem = realloc(audioData, newAudioDataSize);
                 audioData = static_cast<float*>(audioDataMem);
-                const float * const src = buffer + firstRelSample;
+                const auto src = reinterpret_cast<float*>(buffer) + firstRelSample;
                 float * const dst = audioData + nSamples;
                 memcpy(dst, src, static_cast<ulong>(nSamplesInRange) * sizeof(float));
                 nSamples = newNSamples;
@@ -138,7 +136,7 @@ void SoundReader::readFrame() {
                 else audioDataRange += neededSampleRange;
             }
 
-            av_freep(&(reinterpret_cast<uint8_t**>(&buffer))[0]);
+            av_freep(&buffer);
             firstFrame = false;
 
             currentDstSample += nDstSamples;

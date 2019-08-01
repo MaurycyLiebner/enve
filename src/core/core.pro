@@ -51,13 +51,13 @@ LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 SOURCES += \
     Animators/coloranimator.cpp \
     Animators/eeffect.cpp \
-    Animators/gpueffectanimators.cpp \
     Animators/gradient.cpp \
     Animators/gradientpoints.cpp \
     Animators/outlinesettingsanimator.cpp \
     Animators/paintsettingsanimator.cpp \
     Animators/qrealsnapshot.cpp \
     Animators/qstringanimator.cpp \
+    Animators/rastereffectanimators.cpp \
     Animators/staticcomplexanimator.cpp \
     Boxes/animationbox.cpp \
     Boxes/boundingbox.cpp \
@@ -103,8 +103,6 @@ SOURCES += \
     FileCacheHandlers/videocachehandler.cpp \
     FileCacheHandlers/videoframeloader.cpp \
     FileCacheHandlers/videostreamsdata.cpp \
-    GPUEffects/customgpueffect.cpp \
-    GPUEffects/gpueffect.cpp \
     GUI/boxeslistactionbutton.cpp \
     GUI/coloranimatorbutton.cpp \
     GUI/durationrectsettingsdialog.cpp \
@@ -146,8 +144,12 @@ SOURCES += \
     PropertyUpdaters/particlesupdater.cpp \
     PropertyUpdaters/pixmapeffectupdater.cpp \
     PropertyUpdaters/strokewidthupdater.cpp \
-    ShaderEffects/customgpueffectcreator.cpp \
+    RasterEffects/customrastereffect.cpp \
+    RasterEffects/rastereffect.cpp \
+    RasterEffects/customrastereffectcreator.cpp \
+    RasterEffects/rastereffectcaller.cpp \
     ShaderEffects/shadereffect.cpp \
+    ShaderEffects/shadereffectcaller.cpp \
     ShaderEffects/shadereffectcreator.cpp \
     ShaderEffects/shadereffectprogram.cpp \
     ShaderEffects/uniformspecifiercreator.cpp \
@@ -177,6 +179,7 @@ SOURCES += \
     documentrw.cpp \
     fileshandler.cpp \
     filesourcescache.cpp \
+    importhandler.cpp \
     memorydatahandler.cpp \
     paintsettings.cpp \
     paintsettingsapplier.cpp \
@@ -204,7 +207,6 @@ SOURCES += \
     exceptions.cpp \
     glhelpers.cpp \
     skia/skimagecopy.cpp \
-    skia/skimagegpudraw.cpp \
     skia/skqtconversions.cpp \
     pointhelpers.cpp \
     simplemath.cpp \
@@ -270,13 +272,13 @@ HEADERS += \
     Animators/coloranimator.h \
     Animators/dynamiccomplexanimator.h \
     Animators/eeffect.h \
-    Animators/gpueffectanimators.h \
     Animators/gradient.h \
     Animators/gradientpoints.h \
     Animators/outlinesettingsanimator.h \
     Animators/paintsettingsanimator.h \
     Animators/qrealsnapshot.h \
     Animators/qstringanimator.h \
+    Animators/rastereffectanimators.h \
     Animators/staticcomplexanimator.h \
     Boxes/animationbox.h \
     Boxes/boundingbox.h \
@@ -324,8 +326,6 @@ HEADERS += \
     FileCacheHandlers/videocachehandler.h \
     FileCacheHandlers/videoframeloader.h \
     FileCacheHandlers/videostreamsdata.h \
-    GPUEffects/customgpueffect.h \
-    GPUEffects/gpueffect.h \
     GUI/boxeslistactionbutton.h \
     GUI/coloranimatorbutton.h \
     GUI/durationrectsettingsdialog.h \
@@ -369,8 +369,12 @@ HEADERS += \
     PropertyUpdaters/particlesupdater.h \
     PropertyUpdaters/pixmapeffectupdater.h \
     PropertyUpdaters/strokewidthupdater.h \
-    ShaderEffects/customgpueffectcreator.h \
+    RasterEffects/customrastereffect.h \
+    RasterEffects/rastereffect.h \
+    RasterEffects/customrastereffectcreator.h \
+    RasterEffects/rastereffectcaller.h \
     ShaderEffects/shadereffect.h \
+    ShaderEffects/shadereffectcaller.h \
     ShaderEffects/shadereffectcreator.h \
     ShaderEffects/shadereffectprogram.h \
     ShaderEffects/uniformspecifiercreator.h \
@@ -396,6 +400,7 @@ HEADERS += \
     document.h \
     fileshandler.h \
     filesourcescache.h \
+    importhandler.h \
     memorydatahandler.h \
     paintsettings.h \
     paintsettingsapplier.h \
@@ -428,7 +433,6 @@ HEADERS += \
     skia/skiadefines.h \
     skia/skiaincludes.h \
     skia/skimagecopy.h \
-    skia/skimagegpudraw.h \
     skia/skqtconversions.h \
     pointhelpers.h \
     simplemath.h \

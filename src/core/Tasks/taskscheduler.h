@@ -172,7 +172,7 @@ public:
         sInstance->clearTasks();
     }
 
-    void initializeGPU();
+    void initializeGpu();
 
     void queTasks();
     void queCPUTask(const stdsptr<Task> &task);

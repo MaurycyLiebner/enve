@@ -1,12 +1,12 @@
-#ifndef DABTEST_GLOBAL_H
-#define DABTEST_GLOBAL_H
+#ifndef EXAMPLERASTEREFFECT_GLOBAL_H
+#define EXAMPLERASTEREFFECT_GLOBAL_H
 
 #include <QtCore/qglobal.h>
 
-#if defined(DabTest_LIBRARY)
-#  define DABTESTSHARED_EXPORT Q_DECL_EXPORT
+#if defined(EXAMPLERasterEffect_LIBRARY)
+#  define EXAMPLERASTEREFFECTSHARED_EXPORT Q_DECL_EXPORT
 #else
-#  define DABTESTSHARED_EXPORT Q_DECL_IMPORT
+#  define EXAMPLERASTEREFFECTSHARED_EXPORT Q_DECL_IMPORT
 #endif
 
 #include "enveCore/RasterEffects/customrastereffect.h"
@@ -14,20 +14,21 @@
 
 extern "C" {
 
-DABTESTSHARED_EXPORT
+EXAMPLERASTEREFFECTSHARED_EXPORT
     qsptr<CustomRasterEffect> createNewestVersionEffect();
 
-DABTESTSHARED_EXPORT
+EXAMPLERASTEREFFECTSHARED_EXPORT
     qsptr<CustomRasterEffect> createEffect(
         const CustomIdentifier &identifier);
 
-DABTESTSHARED_EXPORT
+EXAMPLERASTEREFFECTSHARED_EXPORT
     QString effectName();
 
-DABTESTSHARED_EXPORT
+EXAMPLERASTEREFFECTSHARED_EXPORT
     CustomIdentifier effectIdentifier();
 
-DABTESTSHARED_EXPORT
+EXAMPLERASTEREFFECTSHARED_EXPORT
     bool supports(const CustomIdentifier &identifier);
+
 }
-#endif // DABTEST_GLOBAL_H
+#endif // EXAMPLERASTEREFFECT_GLOBAL_H

@@ -117,8 +117,7 @@ private:
 
     //void paintEvent(QPaintEvent *);
 
-    void renderSk(SkCanvas * const canvas,
-                  GrContext * const grContext);
+    void renderSk(SkCanvas * const canvas);
     void tabletEvent(QTabletEvent *e);
 
     bool handleCanvasModeChangeKeyPress(QKeyEvent *event);

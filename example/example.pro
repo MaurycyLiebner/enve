@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
 
 SUBDIRS = dabTest \
-          exampleGpuEffect \
+          exampleRasterEffect \
           examplePathEffect

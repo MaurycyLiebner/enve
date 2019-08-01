@@ -1,16 +1,16 @@
-#include "examplegpueffect.h"
+#include "examplerastereffect.h"
 
-qsptr<CustomGpuEffect> createNewestVersionEffect() {
+qsptr<CustomRasterEffect> createNewestVersionEffect() {
     // Use default, most up to date, version
-    return SPtrCreate(ExampleGpuEffect000)();
+    return SPtrCreate(ExampleRasterEffect000)();
 }
 
-qsptr<CustomGpuEffect> createEffect(
+qsptr<CustomRasterEffect> createEffect(
         const CustomIdentifier &identifier) {
     Q_UNUSED(identifier);
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
-    return SPtrCreate(ExampleGpuEffect000)();
+    return SPtrCreate(ExampleRasterEffect000)();
 }
 
 // Returned value must be unique, lets enve distinguish effects
@@ -39,32 +39,32 @@ bool supports(const CustomIdentifier &identifier) {
 }
 
 #include "enveCore/Animators/qrealanimator.h"
-ExampleGpuEffect000::ExampleGpuEffect000() :
-    CustomGpuEffect(effectName().toLower()) {
+ExampleRasterEffect000::ExampleRasterEffect000() :
+    CustomRasterEffect(effectName().toLower()) {
     mRadius = SPtrCreate(QrealAnimator)(10, 0, 999.999, 1, "radius");
     ca_addChild(mRadius);
 }
 
 stdsptr<RasterEffectCaller>
-ExampleGpuEffect000::getEffectCaller(const qreal relFrame) const {
+ExampleRasterEffect000::getEffectCaller(const qreal relFrame) const {
     const qreal radius = mRadius->getEffectiveValue(relFrame);
     if(isZero4Dec(radius)) return nullptr;
-    return SPtrCreate(ExampleGpuEffectCaller000)(radius);
+    return SPtrCreate(ExampleRasterEffectCaller000)(radius);
 }
 
-QMargins ExampleGpuEffect000::getMarginAtRelFrame(const qreal frame) const {
+QMargins ExampleRasterEffect000::getMarginAtRelFrame(const qreal frame) const {
     const qreal radius = mRadius->getEffectiveValue(frame);
     return QMargins() + qCeil(radius);
 }
 
-CustomIdentifier ExampleGpuEffect000::getIdentifier() const {
+CustomIdentifier ExampleRasterEffect000::getIdentifier() const {
     return { effectId(), effectName(), { 0, 0, 0 } };
 }
 
 using namespace std;
 using namespace std::chrono;
 
-void ExampleGpuEffectCaller000::processGpu(QGL33 * const gl,
+void ExampleRasterEffectCaller000::processGpu(QGL33 * const gl,
                                            GpuRenderTools &renderTools,
                                            GpuRenderData &data) {
     Q_UNUSED(gl);
@@ -83,7 +83,7 @@ void ExampleGpuEffectCaller000::processGpu(QGL33 * const gl,
     canvas->flush();
 }
 
-void ExampleGpuEffectCaller000::processCpu(CpuRenderTools &renderTools,
+void ExampleRasterEffectCaller000::processCpu(CpuRenderTools &renderTools,
                                            const CpuRenderData &data) {
     Q_UNUSED(data);
 

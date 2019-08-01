@@ -334,7 +334,6 @@ public:
     void scheduleEffectsMarginUpdate() {}
 
     void renderSk(SkCanvas * const canvas,
-                  GrContext * const grContext,
                   const QRect &drawRect,
                   const QMatrix &viewTrans,
                   const bool mouseGrabbing);

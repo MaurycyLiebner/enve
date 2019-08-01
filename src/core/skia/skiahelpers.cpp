@@ -16,22 +16,6 @@ SkBitmap SkiaHelpers::makeCopy(const SkBitmap& btmp) {
     return result;
 }
 
-void SkiaHelpers::drawImageGPU(
-        SkCanvas* const canvas,
-        const sk_sp<SkImage>& image,
-        const float x,
-        const float y,
-        SkPaint * const paint,
-        GrContext* const context) {
-    if(!image) return;
-    if(!context) RuntimeThrow("Invalid draw request");
-    const auto mipMap = (paint && paint->getFilterQuality() > kLow_SkFilterQuality) ?
-            GrMipMapped::kYes : GrMipMapped::kNo;
-    sk_sp<SkImage> texture(image->makeTextureImage(context, nullptr, mipMap));
-    if(!texture) RuntimeThrow("Failed to make texture image");
-    canvas->drawImage(texture, x, y, paint);
-};
-
 SkImageInfo SkiaHelpers::getPremulRGBAInfo(const int width,
                                            const int height) {
     return SkImageInfo::Make(width, height,

@@ -18,13 +18,13 @@ private:
     void reloadProgram(ShaderEffectCreator * const loaded,
                        const QString& fragPath);
     void iniSingleRasterEffectProgram(const QString &grePath);
-    void iniRasterEffectProgramExec(const QString &grePath);
+    void iniShaderEffectProgramExec(const QString &grePath);
 
     void iniCustomPathEffects();
-    void iniCustomGpuEffects();
+    void iniCustomRasterEffects();
 
-    void iniCustomGpuEffect(const QString &gpu);
-    void iniIfCustomGpuEffect(const QString &gpu);
+    void iniCustomRasterEffect(const QString &gpu);
+    void iniIfCustomRasterEffect(const QString &gpu);
 
     QStringList mLoadedGREPaths;
     GLuint mPlainSquareVAO;

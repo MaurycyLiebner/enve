@@ -37,6 +37,8 @@ public:
 
     void writeIdentifier(QIODevice * const dst) const;
 
+    void setupTreeViewMenu(PropertyMenu * const menu);
+
     PathEffectType getEffectType();
 protected:
     const PathEffectType mPathEffectType;

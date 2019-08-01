@@ -23,7 +23,7 @@ MemoryChecker::MemoryChecker(QObject * const parent) : QObject(parent) {
 char MemoryChecker::sLine[256];
 
 long MemoryChecker::sGetFreeBytes() {
-    size_t unmappedB;
+    size_t unmappedB = 0;
     MallocExtension::instance()->GetNumericProperty(
                 "tcmalloc.pageheap_unmapped_bytes", &unmappedB);
 

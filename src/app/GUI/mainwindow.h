@@ -68,7 +68,7 @@ public:
 
 //    void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = nullptr;
 
-    static MainWindow *getInstance();
+    static MainWindow *sGetInstance();
 
     static bool isShiftPressed();
     static bool isCtrlPressed();
@@ -155,7 +155,7 @@ private:
         MainWindow * const mWindow;
     };
     stdptr<Lock> mLock;
-    static MainWindow *sMainWindowInstance;
+    static MainWindow *sInstance;
     MemoryHandler *mMemoryHandler;
 
     void updateRecentMenu();

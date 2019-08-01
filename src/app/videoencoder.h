@@ -83,7 +83,7 @@ private:
 
     float mZero = 0;
     float * mCurrentSample = &mZero;
-    float * mEndSample;
+    float * mEndSample = &mZero;
     QList<stdsptr<Samples>> mSamples;
 };
 

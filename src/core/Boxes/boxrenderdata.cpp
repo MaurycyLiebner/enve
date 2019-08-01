@@ -68,7 +68,7 @@ void BoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {
     canvas->drawImage(fRenderedImage, fGlobalRect.x(), fGlobalRect.y(), &paint);
 }
 
-void BoxRenderData::processGPU(QGL33 * const gl,
+void BoxRenderData::processGpu(QGL33 * const gl,
                                SwitchableContext &context) {
     if(mStep == Step::EFFECTS)
         return mEffectsRenderer.processGpu(gl, context, this);
@@ -225,14 +225,13 @@ void BoxRenderData::updateGlobalRect() {
 
 void BoxRenderData::setBaseGlobalRect(const QRectF& baseRectF) {
     const QRectF maxBounds = fResolutionScale.mapRect(QRectF(fMaxBoundsRect));
-    const auto unclampedBaseRect = toSkRect(baseRectF).roundOut();
     const auto clampedBaseRect = baseRectF.intersected(maxBounds);
     SkIRect currRect = toSkRect(clampedBaseRect).roundOut();
     if(!mEffectsRenderer.isEmpty()) {
         const QRect iMaxBounds(qFloor(maxBounds.left()), qFloor(maxBounds.top()),
                                qCeil(maxBounds.width()), qCeil(maxBounds.height()));
         const SkIRect skMaxBounds = toSkIRect(iMaxBounds);
-        mEffectsRenderer.setBaseGlobalRect(currRect, unclampedBaseRect, skMaxBounds);
+        mEffectsRenderer.setBaseGlobalRect(currRect, skMaxBounds);
     }
     fGlobalRect = toQRect(currRect);
 }

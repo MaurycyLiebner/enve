@@ -1,5 +1,5 @@
-#ifndef GPURASTEREFFECTCREATOR_H
-#define GPURASTEREFFECTCREATOR_H
+#ifndef SHADEREFFECTCREATOR_H
+#define SHADEREFFECTCREATOR_H
 #include "shadereffectprogram.h"
 
 enum PropertyType {
@@ -128,4 +128,4 @@ public:
     static QList<stdsptr<ShaderEffectCreator>> sEffectCreators;
 };
 
-#endif // GPURASTEREFFECTCREATOR_H
+#endif // SHADEREFFECTCREATOR_H

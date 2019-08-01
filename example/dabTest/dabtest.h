@@ -65,7 +65,7 @@ private:
     const Dab mDab;
 };
 
-class DabTest000 : public CustomGpuEffect {
+class DabTest000 : public CustomRasterEffect {
 public:
     DabTest000();
 

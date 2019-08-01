@@ -148,7 +148,6 @@ void drawTransparencyMesh(SkCanvas * const canvas,
 }
 
 void Canvas::renderSk(SkCanvas * const canvas,
-                      GrContext* const grContext,
                       const QRect& drawRect,
                       const QMatrix& viewTrans,
                       const bool mouseGrabbing) {
@@ -175,7 +174,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
             if(bgColor.alpha() != 255)
                 drawTransparencyMesh(canvas, canvasRect);
             canvas->scale(reversedRes, reversedRes);
-            mCurrentPreviewContainer->drawSk(canvas, grContext);
+            mCurrentPreviewContainer->drawSk(canvas);
             canvas->restore();
         }
         return;
@@ -208,13 +207,13 @@ void Canvas::renderSk(SkCanvas * const canvas,
         canvas->saveLayer(nullptr, nullptr);
         for(const auto& box : mContainedBoxes) {
             if(box->isVisibleAndInVisibleDurationRect())
-                box->drawPixmapSk(canvas, grContext);
+                box->drawPixmapSk(canvas);
         }
         canvas->restore();
     } else if(drawCanvas) {
         canvas->save();
         canvas->scale(reversedRes, reversedRes);
-        mCurrentPreviewContainer->drawSk(canvas, grContext);
+        mCurrentPreviewContainer->drawSk(canvas);
         canvas->restore();
     }
 

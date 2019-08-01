@@ -17,8 +17,7 @@ class GLWindow : public QOpenGLWidget, protected QGL33 {
 public:
     GLWindow(QWidget * const parent = nullptr);
 protected:
-    virtual void renderSk(SkCanvas * const canvas,
-                          GrContext * const grContext) = 0;
+    virtual void renderSk(SkCanvas * const canvas) = 0;
     void resizeGL(int, int) final;
     void initializeGL() final;
     void paintGL() final;

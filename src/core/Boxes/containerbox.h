@@ -14,8 +14,7 @@ public:
     bool SWT_isGroupBox() const { return mType == TYPE_GROUP; }
     bool SWT_isLayerBox() const { return !SWT_isGroupBox(); }
 
-    void drawPixmapSk(SkCanvas * const canvas,
-                      GrContext * const grContext);
+    void drawPixmapSk(SkCanvas * const canvas);
 
     qsptr<BoundingBox> createLink();
     stdsptr<BoxRenderData> createRenderData();

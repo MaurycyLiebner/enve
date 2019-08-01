@@ -41,7 +41,7 @@ TaskScheduler::~TaskScheduler() {
     }
 }
 
-void TaskScheduler::initializeGPU() {
+void TaskScheduler::initializeGpu() {
     try {
         mGpuPostProcessor.initialize();
     } catch(...) {

@@ -19,7 +19,7 @@ class DurationRectangleMovable;
 class FillSettingsAnimator;
 class OutlineSettingsAnimator;
 class PaintSettingsApplier;
-class GPUEffectAnimators;
+class RasterEffectAnimators;
 class ShaderEffectProgram;
 class BoxTransformAnimator;
 class BasicTransformAnimator;
@@ -29,7 +29,7 @@ class SmartVectorPath;
 class DurationRectangle;
 struct ContainerBoxRenderData;
 class ShaderEffect;
-class GpuEffect;
+class RasterEffect;
 enum CanvasMode : short;
 
 class SimpleBrushWrapper;
@@ -125,11 +125,9 @@ public:
     virtual void setSelectedFontFamilyAndStyle(const QString &,
                                                const QString &);
 
+    virtual void drawPixmapSk(SkCanvas * const canvas);
     virtual void drawPixmapSk(SkCanvas * const canvas,
-                              GrContext* const grContext);
-    virtual void drawPixmapSk(SkCanvas * const canvas,
-                              SkPaint * const paint,
-                              GrContext* const grContext);
+                              SkPaint * const paint);
     virtual void drawHoveredSk(SkCanvas *canvas,
                                const float invScale);
 
@@ -196,7 +194,7 @@ public:
     virtual void writeBoundingBox(QIODevice * const dst);
     virtual void readBoundingBox(QIODevice * const src);
 
-    virtual void setupGPUEffectsF(const qreal relFrame,
+    virtual void setupRasterEffectsF(const qreal relFrame,
                                   BoxRenderData * const data);
     virtual const SkBlendMode &getBlendMode();
 
@@ -320,8 +318,8 @@ public:
 
     void clearRasterEffects();
 
-    void addGPUEffect(const qsptr<GpuEffect> &rasterEffect);
-    void removeGPUEffect(const qsptr<GpuEffect> &effect);
+    void addRasterEffect(const qsptr<RasterEffect> &rasterEffect);
+    void removeRasterEffect(const qsptr<RasterEffect> &effect);
 
     void setBlendModeSk(const SkBlendMode &blendMode);
 
@@ -430,7 +428,7 @@ protected:
     qsptr<DurationRectangle> mDurationRectangle;
     const qsptr<BoxTransformAnimator> mTransformAnimator;
 
-    const qsptr<GPUEffectAnimators> mGPUEffectsAnimators;
+    const qsptr<RasterEffectAnimators> mRasterEffectsAnimators;
 
     bool mCenterPivotPlanned = false;
     bool mSchedulePlanned = false;

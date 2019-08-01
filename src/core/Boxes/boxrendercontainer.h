@@ -12,9 +12,7 @@ class RenderContainer {
 public:
     RenderContainer() {}
 
-    void drawSk(SkCanvas * const canvas,
-                SkPaint * const paint,
-                GrContext* const grContext);
+    void drawSk(SkCanvas * const canvas, SkPaint * const paint);
 
     void updatePaintTransformGivenNewTotalTransform(
             const QMatrix &totalTransform);

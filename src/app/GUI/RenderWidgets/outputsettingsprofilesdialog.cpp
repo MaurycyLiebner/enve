@@ -10,7 +10,7 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
         QWidget *parent) :
  QDialog(parent) {
     setWindowTitle("Output Settings Profile");
-    setStyleSheet(MainWindow::getInstance()->styleSheet());
+    setStyleSheet(MainWindow::sGetInstance()->styleSheet());
     mCurrentSettings = currentSettings;
 
     mMainLayout = new QVBoxLayout(this);

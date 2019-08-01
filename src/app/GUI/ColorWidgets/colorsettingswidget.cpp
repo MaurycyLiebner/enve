@@ -325,7 +325,7 @@ void ColorSettingsWidget::moveAlphaWidgetToTab(const int tabId) {
 }
 
 void ColorSettingsWidget::startColorPicking() {
-    const auto wid = new ColorPickingWidget(MainWindow::getInstance());
+    const auto wid = new ColorPickingWidget(MainWindow::sGetInstance());
     connect(wid, &ColorPickingWidget::colorSelected,
             [this](const QColor & color) {
         setCurrentColor(color);

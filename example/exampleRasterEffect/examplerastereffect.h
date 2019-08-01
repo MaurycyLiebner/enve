@@ -1,11 +1,11 @@
-#ifndef EXAMPLEGPUEFFECT_H
-#define EXAMPLEGPUEFFECT_H
+#ifndef EXAMPLERASTEREFFECT_H
+#define EXAMPLERASTEREFFECT_H
 
-#include "examplegpueffect_global.h"
+#include "examplerastereffect_global.h"
 
-class ExampleGpuEffectCaller000 : public RasterEffectCaller {
+class ExampleRasterEffectCaller000 : public RasterEffectCaller {
 public:
-    ExampleGpuEffectCaller000(const qreal radius) :
+    ExampleRasterEffectCaller000(const qreal radius) :
         RasterEffectCaller(true, QMargins() + qCeil(radius)),
         mRadius(static_cast<float>(radius)) {}
 
@@ -22,9 +22,9 @@ private:
     const float mRadius;
 };
 
-class ExampleGpuEffect000 : public CustomGpuEffect {
+class ExampleRasterEffect000 : public CustomRasterEffect {
 public:
-    ExampleGpuEffect000();
+    ExampleRasterEffect000();
 
     stdsptr<RasterEffectCaller>
             getEffectCaller(const qreal relFrame) const;
@@ -36,4 +36,4 @@ private:
     qsptr<QrealAnimator> mRadius;
 };
 
-#endif // EXAMPLEGPUEFFECT_H
+#endif // EXAMPLERASTEREFFECT_H

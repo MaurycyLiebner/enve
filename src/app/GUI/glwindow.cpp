@@ -93,7 +93,7 @@ void GLWindow::paintGL() {
     }
     // cleared by Canvas
     // glClear(GL_COLOR_BUFFER_BIT);
-    renderSk(mCanvas, mGrContext.get());
+    renderSk(mCanvas);
     mCanvas->flush();
 }
 

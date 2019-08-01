@@ -1,22 +1,22 @@
-#ifndef GPUEFFECTANIMATORS_H
-#define GPUEFFECTANIMATORS_H
+#ifndef RasterEffectANIMATORS_H
+#define RasterEffectANIMATORS_H
 #include "Animators/dynamiccomplexanimator.h"
 #include "smartPointers/sharedpointerdefs.h"
-#include "GPUEffects/gpueffect.h"
+#include "RasterEffects/rastereffect.h"
 #include "ShaderEffects/shadereffect.h"
 
 class BoundingBox;
 struct BoxRenderData;
-qsptr<GpuEffect> readIdCreateGPURasterEffect(QIODevice * const src);
+qsptr<RasterEffect> readIdCreateRasterEffect(QIODevice * const src);
 typedef DynamicComplexAnimator<
-    GpuEffect, &GpuEffect::writeIdentifier,
-    &readIdCreateGPURasterEffect> GPUEffectAnimatorsBase;
-class GPUEffectAnimators : public GPUEffectAnimatorsBase {
+    RasterEffect, &RasterEffect::writeIdentifier,
+    &readIdCreateRasterEffect> RasterEffectAnimatorsBase;
+class RasterEffectAnimators : public RasterEffectAnimatorsBase {
     friend class SelfRef;
 protected:
-    GPUEffectAnimators(BoundingBox * const parentBox);
+    RasterEffectAnimators(BoundingBox * const parentBox);
 public:
-    bool SWT_isRasterGPUEffectAnimators() const { return true; }
+    bool SWT_isRasterEffectAnimators() const { return true; }
 
     BoundingBox *getParentBox() { return mParentBox_k; }
     bool hasEffects();
@@ -35,4 +35,4 @@ private:
     BoundingBox * const mParentBox_k;
 };
 
-#endif // GPUEFFECTANIMATORS_H
+#endif // RasterEffectANIMATORS_H

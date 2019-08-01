@@ -7,6 +7,7 @@ public:
     eEffect(const QString &name);
 
     virtual void writeIdentifier(QIODevice * const dst) const = 0;
+
     void writeProperty(QIODevice * const dst) const;
     void readProperty(QIODevice * const src);
 

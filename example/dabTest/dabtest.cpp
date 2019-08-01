@@ -1,11 +1,11 @@
 #include "dabtest.h"
 
-qsptr<CustomGpuEffect> createNewestVersionEffect() {
+qsptr<CustomRasterEffect> createNewestVersionEffect() {
     // Use default, most up to date, version
     return SPtrCreate(DabTest000)();
 }
 
-qsptr<CustomGpuEffect> createEffect(
+qsptr<CustomRasterEffect> createEffect(
         const CustomIdentifier &identifier) {
     Q_UNUSED(identifier);
     // Choose version based on identifier
@@ -41,7 +41,7 @@ bool supports(const CustomIdentifier &identifier) {
 #include "enveCore/Animators/qrealanimator.h"
 
 DabTest000::DabTest000() :
-    CustomGpuEffect(effectName().toLower()) {
+    CustomRasterEffect(effectName().toLower()) {
     mRadius = SPtrCreate(QrealAnimator)(0.5, 0, 1, 0.1, "radius");
     ca_addChild(mRadius);
 
@@ -76,7 +76,7 @@ void DabTestCaller000::sInitialize(QGL33 * const gl) {
         iniProgram(gl, sProgramId, GL_TEXTURED_VERT,
                    "/home/ailuropoda/Dev/enve/src/dabTest/normal.frag");
     } catch(...) {
-        RuntimeThrow("Could not initialize a program for GPURasterEffect");
+        RuntimeThrow("Could not initialize a program for DabTestCaller000");
     }
 
     gl->glGenTextures(1, &sDataId);

@@ -10,7 +10,7 @@
 #include "Animators/transformanimator.h"
 #include "paintsettingsapplier.h"
 #include "Animators/gradient.h"
-#include "Animators/gpueffectanimators.h"
+#include "Animators/rastereffectanimators.h"
 #include "Animators/outlinesettingsanimator.h"
 
 PathBox::PathBox(const BoundingBoxType &type) :
@@ -59,7 +59,7 @@ PathBox::PathBox(const BoundingBoxType &type) :
     ca_addChild(mOutlineBasePathEffectsAnimators);
     ca_addChild(mOutlinePathEffectsAnimators);
 
-    ca_moveChildBelow(mGPUEffectsAnimators.data(),
+    ca_moveChildBelow(mRasterEffectsAnimators.data(),
                       mOutlinePathEffectsAnimators.data());
 }
 

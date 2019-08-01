@@ -13,7 +13,7 @@
 #include "Boxes/paintbox.h"
 #include "PathEffects/patheffectsinclude.h"
 #include <QFileDialog>
-#include "GPUEffects/gpueffect.h"
+#include "RasterEffects/rastereffect.h"
 #include "MovablePoints/smartnodepoint.h"
 #include "pointtypemenu.h"
 #include "Boxes/containerbox.h"

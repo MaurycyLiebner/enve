@@ -4,6 +4,7 @@
 #include <QProcess>
 #include "hardwareinfo.h"
 #include "GUI/ewidgetsimpl.h"
+#include "importhandler.h"
 
 void setDefaultFormat() {
     QSurfaceFormat format;
@@ -29,6 +30,7 @@ int main(int argc, char *argv[]) {
 
     HardwareInfo::sUpdateInfo();
     eWidgetsImpl widImpl;
+    ImportHandler importHandler;
 
     MainWindow w;
     w.show();

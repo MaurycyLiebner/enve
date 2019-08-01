@@ -7,7 +7,7 @@
 #include "PathEffects/patheffect.h"
 #include "PropertyUpdaters/groupallpathsupdater.h"
 #include "textbox.h"
-#include "Animators/gpueffectanimators.h"
+#include "Animators/rastereffectanimators.h"
 
 ContainerBox::ContainerBox(const BoundingBoxType &type) :
     BoundingBox(type) {
@@ -275,7 +275,7 @@ void ContainerBox::promoteToLayer() {
         newName.replace("Group", "Layer");
         prp_setName(newName);
     }
-    mGPUEffectsAnimators->SWT_enable();
+    mRasterEffectsAnimators->SWT_enable();
     prp_afterWholeInfluenceRangeChanged();
 
     for(const auto& box : mLinkingBoxes) {
@@ -291,7 +291,7 @@ void ContainerBox::demoteToGroup() {
         newName.replace("Layer", "Group");
         prp_setName(newName);
     }
-    mGPUEffectsAnimators->SWT_disable();
+    mRasterEffectsAnimators->SWT_disable();
     prp_afterWholeInfluenceRangeChanged();
 
     for(const auto& box : mLinkingBoxes) {
@@ -490,12 +490,11 @@ void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
     PathEffectsMenu::addPathEffectsToActionMenu(menu);
 }
 
-void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
-                                GrContext* const grContext) {
+void ContainerBox::drawPixmapSk(SkCanvas * const canvas) {
     if(SWT_isGroupBox()) {
         for(const auto& box : mContainedBoxes) {
             if(box->isVisibleAndInVisibleDurationRect())
-                box->drawPixmapSk(canvas, grContext);
+                box->drawPixmapSk(canvas);
         }
     } else {
         if(mIsDescendantCurrentGroup) {
@@ -506,11 +505,11 @@ void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
             canvas->saveLayer(nullptr, &paint);
             for(const auto& box : mContainedBoxes) {
                 if(box->isVisibleAndInVisibleDurationRect())
-                    box->drawPixmapSk(canvas, grContext);
+                    box->drawPixmapSk(canvas);
             }
             canvas->restore();
         } else {
-            BoundingBox::drawPixmapSk(canvas, grContext);
+            BoundingBox::drawPixmapSk(canvas);
         }
     }
 }
@@ -634,7 +633,7 @@ bool ContainerBox::unboundChildren() const {
     if(mParentGroup) {
         if(ContainerBox::SWT_isGroupBox())
             return mParentGroup->unboundChildren();
-        return mGPUEffectsAnimators->unbound() ||
+        return mRasterEffectsAnimators->unbound() ||
                mParentGroup->unboundChildren();
     }
     return false;

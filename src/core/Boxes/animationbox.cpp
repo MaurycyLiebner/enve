@@ -5,7 +5,7 @@
 #include "imagebox.h"
 #include "undoredo.h"
 #include "Animators/qrealkey.h"
-#include "Animators/gpueffectanimators.h"
+#include "Animators/rastereffectanimators.h"
 
 AnimationBox::AnimationBox(const BoundingBoxType& type) : BoundingBox(type) {
     prp_setName("Animation");
@@ -14,7 +14,7 @@ AnimationBox::AnimationBox(const BoundingBoxType& type) : BoundingBox(type) {
     mDurationRectangleLocked = true;
 
     mFrameAnimator = SPtrCreate(IntAnimator)("frame");
-    ca_prependChildAnimator(mGPUEffectsAnimators.get(), mFrameAnimator);
+    ca_prependChildAnimator(mRasterEffectsAnimators.get(), mFrameAnimator);
 }
 
 FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() const {

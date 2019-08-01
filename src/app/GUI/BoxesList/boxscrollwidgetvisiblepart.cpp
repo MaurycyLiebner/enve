@@ -11,7 +11,7 @@
 #include "GUI/global.h"
 #include "singlewidgetabstraction.h"
 #include "GUI/keysview.h"
-#include "Animators/gpueffectanimators.h"
+#include "Animators/rastereffectanimators.h"
 
 BoxScroller::BoxScroller(
         ScrollWidget * const parent) :
@@ -315,7 +315,7 @@ bool BoxScroller::droppingSupported(
         if(idInTarget < targetGroup->ca_getNumberOfChildren()) return false;
         if(targetGroup->isAncestor(draggedBox)) return false;
     } else if(mCurrentlyDragged.fType == Dragged::RASTER_EFFECT) {
-        if(!targetSWT->SWT_isRasterGPUEffectAnimators()) return false;
+        if(!targetSWT->SWT_isRasterEffectAnimators()) return false;
     } else if(mCurrentlyDragged.fType == Dragged::PATH_EFFECT) {
         if(!targetSWT->SWT_isPathEffectAnimators()) return false;
     } else return false;
@@ -411,8 +411,8 @@ void BoxScroller::updateDraggedFromMimeData(
     if(emimeData->hasType<BoundingBox>()) {
         swt = emimeData->getObjects<BoundingBox>().first();
         type = Dragged::BOX;
-    } else if(emimeData->hasType<GpuEffect>()) {
-        swt = emimeData->getObjects<GpuEffect>().first();
+    } else if(emimeData->hasType<RasterEffect>()) {
+        swt = emimeData->getObjects<RasterEffect>().first();
         type = Dragged::RASTER_EFFECT;
     } else if(emimeData->hasType<PathEffect>()) {
         swt = emimeData->getObjects<PathEffect>().first();
@@ -449,11 +449,11 @@ bool BoxScroller::DropTarget::drop(
         }
     } else if(dragged.fType == Dragged::RASTER_EFFECT) {
         const auto draggedEffect = GetAsSPtr(draggedSWT, ShaderEffect);
-        auto targetParent = static_cast<GPUEffectAnimators*>(targetSWT);
-        auto currentParent = draggedEffect->getParent<GPUEffectAnimators>();
+        auto targetParent = static_cast<RasterEffectAnimators*>(targetSWT);
+        auto currentParent = draggedEffect->getParent<RasterEffectAnimators>();
         if(currentParent != targetParent) {
-            targetParent->getParentBox()->addGPUEffect(draggedEffect);
-            currentParent->getParentBox()->removeGPUEffect(draggedEffect);
+            targetParent->getParentBox()->addRasterEffect(draggedEffect);
+            currentParent->getParentBox()->removeRasterEffect(draggedEffect);
         } else {
             if(fTargetId == draggedAbs->getIdInParent() ||
                fTargetId == draggedAbs->getIdInParent() + 1) return false;

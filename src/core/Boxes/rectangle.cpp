@@ -4,7 +4,7 @@
 #include "MovablePoints/animatedpoint.h"
 #include "PropertyUpdaters/nodepointupdater.h"
 #include "Animators/transformanimator.h"
-#include "Animators/gpueffectanimators.h"
+#include "Animators/rastereffectanimators.h"
 
 Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     prp_setName("Rectangle");
@@ -31,8 +31,8 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     ca_addChild(mTopLeftAnimator);
     ca_addChild(mBottomRightAnimator);
 
-    ca_prependChildAnimator(mTopLeftAnimator.get(), mGPUEffectsAnimators);
-    ca_prependChildAnimator(mBottomRightAnimator.get(), mGPUEffectsAnimators);
+    ca_prependChildAnimator(mTopLeftAnimator.get(), mRasterEffectsAnimators);
+    ca_prependChildAnimator(mBottomRightAnimator.get(), mRasterEffectsAnimators);
 
     mRadiusAnimator = SPtrCreate(QPointFAnimator)("round radius");
     mRadiusAnimator->setValuesRange(0, 9999);
@@ -42,7 +42,7 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
                 TYPE_PATH_POINT);
 
     ca_addChild(mRadiusAnimator);
-    ca_prependChildAnimator(mRadiusAnimator.get(), mGPUEffectsAnimators);
+    ca_prependChildAnimator(mRadiusAnimator.get(), mRasterEffectsAnimators);
 
     prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
 }

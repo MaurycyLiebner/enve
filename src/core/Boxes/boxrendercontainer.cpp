@@ -2,9 +2,7 @@
 #include "boxrenderdata.h"
 #include "skia/skiahelpers.h"
 
-void RenderContainer::drawSk(SkCanvas * const canvas,
-                             SkPaint * const paint,
-                             GrContext * const grContext) {
+void RenderContainer::drawSk(SkCanvas * const canvas, SkPaint * const paint) {
     if(!mSrcRenderData) return;
     canvas->save();
     canvas->concat(toSkMatrix(mPaintTransform));
@@ -25,9 +23,7 @@ void RenderContainer::drawSk(SkCanvas * const canvas,
     }
     //paint->setAntiAlias(true);
     //paint->setFilterQuality(kHigh_SkFilterQuality);
-    SkiaHelpers::drawImageGPU(canvas, mImageSk,
-                              mGlobalRect.x(), mGlobalRect.y(), paint, grContext);
-    //canvas->drawImage(mImageSk, mDrawPos.x(), mDrawPos.y(), paint);
+    canvas->drawImage(mImageSk, mGlobalRect.x(), mGlobalRect.y(), paint);
     canvas->restore();
 }
 

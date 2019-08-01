@@ -9,10 +9,10 @@
 #include "MovablePoints/movablepoint.h"
 #include "PropertyUpdaters/pixmapeffectupdater.h"
 #include "Tasks/taskscheduler.h"
-#include "Animators/gpueffectanimators.h"
+#include "Animators/rastereffectanimators.h"
 #include "Animators/transformanimator.h"
-#include "GPUEffects/gpueffect.h"
-#include "ShaderEffects/customgpueffectcreator.h"
+#include "RasterEffects/rastereffect.h"
+#include "RasterEffects/customrastereffectcreator.h"
 #include "linkbox.h"
 #include "PropertyUpdaters/transformupdater.h"
 #include "PropertyUpdaters/boxpathpointupdater.h"
@@ -35,7 +35,7 @@ BoundingBox::BoundingBox(const BoundingBoxType type) :
     StaticComplexAnimator("box"),
     mDocumentId(sNextDocumentId++), mType(type),
     mTransformAnimator(SPtrCreate(BoxTransformAnimator)()),
-    mGPUEffectsAnimators(SPtrCreate(GPUEffectAnimators)(this)) {
+    mRasterEffectsAnimators(SPtrCreate(RasterEffectAnimators)(this)) {
     sDocumentBoxes << this;
     ca_addChild(mTransformAnimator);
     mTransformAnimator->prp_setOwnUpdater(
@@ -45,10 +45,10 @@ BoundingBox::BoundingBox(const BoundingBoxType type) :
                 mTransformAnimator.get(), this);
     pivotAnim->prp_setOwnUpdater(pivotUpdater);
 
-    mGPUEffectsAnimators->prp_setOwnUpdater(
+    mRasterEffectsAnimators->prp_setOwnUpdater(
                 SPtrCreate(PixmapEffectUpdater)(this));
-    ca_addChild(mGPUEffectsAnimators);
-    mGPUEffectsAnimators->SWT_hide();
+    ca_addChild(mRasterEffectsAnimators);
+    mRasterEffectsAnimators->SWT_hide();
 
     connect(mTransformAnimator.get(),
             &BoxTransformAnimator::totalTransformChanged,
@@ -136,7 +136,7 @@ qsptr<BoundingBox> BoundingBox::createLinkForLinkGroup() {
 }
 
 void BoundingBox::clearRasterEffects() {
-    mGPUEffectsAnimators->ca_removeAllChildAnimators();
+    mRasterEffectsAnimators->ca_removeAllChildAnimators();
 }
 
 void BoundingBox::setFont(const QFont &) {}
@@ -160,7 +160,7 @@ void BoundingBox::planCenterPivotPosition() {
 
 void BoundingBox::updateIfUsesProgram(
         const ShaderEffectProgram * const program) const {
-    mGPUEffectsAnimators->updateIfUsesProgram(program);
+    mRasterEffectsAnimators->updateIfUsesProgram(program);
 }
 
 template <typename T>
@@ -175,7 +175,7 @@ void transferData(const T& from, const T& to) {
 
 void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
     transferData(mTransformAnimator, targetBox->mTransformAnimator);
-    transferData(mGPUEffectsAnimators, targetBox->mGPUEffectsAnimators);
+    transferData(mRasterEffectsAnimators, targetBox->mRasterEffectsAnimators);
 }
 
 void BoundingBox::drawHoveredSk(SkCanvas *canvas, const float invScale) {
@@ -203,13 +203,13 @@ void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
 }
 
 void BoundingBox::setRasterEffectsEnabled(const bool enable) {
-    mGPUEffectsAnimators->SWT_setEnabled(enable);
-    mGPUEffectsAnimators->SWT_setVisible(
-                mGPUEffectsAnimators->hasChildAnimators() || enable);
+    mRasterEffectsAnimators->SWT_setEnabled(enable);
+    mRasterEffectsAnimators->SWT_setVisible(
+                mRasterEffectsAnimators->hasChildAnimators() || enable);
 }
 
 bool BoundingBox::getRasterEffectsEnabled() const {
-    return mGPUEffectsAnimators->SWT_isEnabled();
+    return mRasterEffectsAnimators->SWT_isEnabled();
 }
 
 void BoundingBox::applyPaintSetting(const PaintSettingsApplier &setting) {
@@ -268,23 +268,21 @@ NormalSegment BoundingBox::getNormalSegment(const QPointF &absPos,
     return NormalSegment();
 }
 
-void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
-                               GrContext * const grContext) {
+void BoundingBox::drawPixmapSk(SkCanvas * const canvas) {
     if(mTransformAnimator->getOpacity() < 0.001) return;
     SkPaint paint;
     const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
     paint.setAlpha(static_cast<U8CPU>(intAlpha));
     paint.setBlendMode(mBlendModeSk);
     paint.setFilterQuality(BoundingBox::sDisplayFiltering);
-    drawPixmapSk(canvas, &paint, grContext);
+    drawPixmapSk(canvas, &paint);
 }
 
 void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
-                               SkPaint * const paint,
-                               GrContext* const grContext) {
+                               SkPaint * const paint) {
     if(mTransformAnimator->getOpacity() < 0.001) return;
     paint->setFilterQuality(BoundingBox::sDisplayFiltering);
-    mDrawRenderContainer.drawSk(canvas, paint, grContext);
+    mDrawRenderContainer.drawSk(canvas, paint);
 }
 
 void BoundingBox::setBlendModeSk(const SkBlendMode &blendMode) {
@@ -639,16 +637,16 @@ void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
 
     menu->addSeparator();
 
-    const auto gpuEffectsMenu = menu->addMenu("Raster Effects");
-    CustomGpuEffectCreator::sAddToMenu(gpuEffectsMenu, &BoundingBox::addGPUEffect);
-    if(!gpuEffectsMenu->isEmpty()) gpuEffectsMenu->addSeparator();
+    const auto RasterEffectsMenu = menu->addMenu("Raster Effects");
+    CustomRasterEffectCreator::sAddToMenu(RasterEffectsMenu, &BoundingBox::addRasterEffect);
+    if(!RasterEffectsMenu->isEmpty()) RasterEffectsMenu->addSeparator();
     for(const auto& creator : ShaderEffectCreator::sEffectCreators) {
         const PropertyMenu::PlainSelectedOp<BoundingBox> op =
         [creator](BoundingBox * box) {
             const auto effect = GetAsSPtr(creator->create(), ShaderEffect);
-            box->addGPUEffect(effect);
+            box->addRasterEffect(effect);
         };
-        gpuEffectsMenu->addPlainAction(creator->fName, op);
+        RasterEffectsMenu->addPlainAction(creator->fName, op);
     }
 
     menu->addSeparator();
@@ -704,7 +702,7 @@ void BoundingBox::finishTransform() {
 }
 
 QMarginsF BoundingBox::getEffectsMargin(const qreal relFrame) {
-    return mGPUEffectsAnimators->getEffectsMargin(relFrame);
+    return mRasterEffectsAnimators->getEffectsMargin(relFrame);
 }
 
 void BoundingBox::setupRenderData(const qreal relFrame,
@@ -720,7 +718,7 @@ void BoundingBox::setupRenderData(const qreal relFrame,
     data->fBlendMode = getBlendMode();
 
     if(data->fOpacity > 0.001 && effectsVisible) {
-        setupGPUEffectsF(relFrame, data);
+        setupRasterEffectsF(relFrame, data);
     }
 
     bool unbound = false;
@@ -735,9 +733,9 @@ void BoundingBox::setupRenderData(const qreal relFrame,
 
 stdsptr<BoxRenderData> BoundingBox::createRenderData() { return nullptr; }
 
-void BoundingBox::setupGPUEffectsF(const qreal relFrame,
+void BoundingBox::setupRasterEffectsF(const qreal relFrame,
                                    BoxRenderData * const data) {
-    mGPUEffectsAnimators->addEffects(relFrame, data);
+    mRasterEffectsAnimators->addEffects(relFrame, data);
 }
 
 void BoundingBox::addLinkingBox(BoundingBox *box) {
@@ -916,12 +914,12 @@ bool BoundingBox::isAnimated() const {
     return anim_isDescendantRecording();
 }
 
-void BoundingBox::addGPUEffect(const qsptr<GpuEffect>& rasterEffect) {
-    mGPUEffectsAnimators->addChild(rasterEffect);
+void BoundingBox::addRasterEffect(const qsptr<RasterEffect>& rasterEffect) {
+    mRasterEffectsAnimators->addChild(rasterEffect);
 }
 
-void BoundingBox::removeGPUEffect(const qsptr<GpuEffect> &effect) {
-    mGPUEffectsAnimators->removeChild(effect);
+void BoundingBox::removeRasterEffect(const qsptr<RasterEffect> &effect) {
+    mRasterEffectsAnimators->removeChild(effect);
 }
 
 //int BoundingBox::prp_getParentFrameShift() const {

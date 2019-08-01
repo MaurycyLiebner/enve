@@ -1,6 +1,7 @@
 #include "effectsrenderer.h"
 #include "Tasks/gpupostprocessor.h"
 #include "boxrenderdata.h"
+#include "RasterEffects/rastereffectcaller.h"
 
 void EffectsRenderer::processGpu(QGL33 * const gl,
                                  SwitchableContext &context,
@@ -48,11 +49,14 @@ void EffectsRenderer::processCpu(BoxRenderData * const boxData) {
 }
 
 void EffectsRenderer::setBaseGlobalRect(SkIRect &currRect,
-                                        const SkIRect &baseRect,
                                         const SkIRect &skMaxBounds) const {
     for(const auto& effect : mEffects) {
-        effect->setSrcRect(currRect, baseRect, skMaxBounds);
-        currRect = effect->getDstRect();
+        effect->setSrcRect(currRect, skMaxBounds);
+        const auto dstRect = effect->getDstRect();
+        currRect = SkIRect::MakeLTRB(qMin(dstRect.left(), currRect.left()),
+                                     qMin(dstRect.top(), currRect.top()),
+                                     qMax(dstRect.right(), currRect.right()),
+                                     qMax(dstRect.bottom(), currRect.bottom()));
     }
 }
 

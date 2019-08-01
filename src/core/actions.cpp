@@ -302,6 +302,7 @@ void Actions::setPathEffectsVisible(const bool bT) {
 //#include "svgimporter.h"
 #include "Boxes/videobox.h"
 #include "Boxes/imagebox.h"
+#include "importhandler.h"
 
 void Actions::importFile(const QString &path,
                          const QPointF &relDropPos) {
@@ -317,17 +318,18 @@ void Actions::importFile(const QString &path,
     } else {
         qsptr<BoundingBox> importedBox;
         mActiveScene->blockUndoRedo();
-        if(isVectorExt(extension)) {
-            //importedBox = loadSVGFile(path);
-        } else if(isImageExt(extension)) {
+        if(isImageExt(extension)) {
             mActiveScene->createImageBox(path);
         } else if(isVideoExt(extension)) {
             mActiveScene->createVideoForPath(path);
-        } else if(isEvExt(extension)) {
-            //MainWindow::getInstance()->loadEVFile(path);
         } else {
-            mActiveScene->unblockUndoRedo();
-            RuntimeThrow("Unrecognized file extension " + path + ".");
+            try {
+                importedBox = ImportHandler::sInstance->import(path);
+            } catch(const std::exception& e) {
+                mActiveScene->unblockUndoRedo();
+                gPrintExceptionCritical(e);
+                return;
+            }
         }
         mActiveScene->unblockUndoRedo();
 

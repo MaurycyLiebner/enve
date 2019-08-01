@@ -84,7 +84,6 @@ SOURCES += main.cpp\
     GUI/BoxesList/boolpropertywidget.cpp \
     memorychecker.cpp \
     memoryhandler.cpp \
-    outputgenerator.cpp \
     GUI/RenderWidgets/renderwidget.cpp \
     GUI/RenderWidgets/renderinstancewidget.cpp \
     renderinstancesettings.cpp \
@@ -176,7 +175,6 @@ HEADERS  += \
     GUI/BoxesList/boolpropertywidget.h \
     memorychecker.h \
     memoryhandler.h \
-    outputgenerator.h \
     GUI/RenderWidgets/renderwidget.h \
     GUI/RenderWidgets/renderinstancewidget.h \
     renderinstancesettings.h \

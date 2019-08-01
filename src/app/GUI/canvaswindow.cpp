@@ -112,7 +112,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
     } else {
         setCursor(QCursor(QPixmap(":/cursors/cursor-pen.xpm"), 4, 4) );
     }
-    MainWindow::getInstance()->updateCanvasModeButtonsChecked();
+    MainWindow::sGetInstance()->updateCanvasModeButtonsChecked();
     if(!mCurrentCanvas) return;
     if(mMouseGrabber) {
         mCurrentCanvas->cancelCurrentTransform();
@@ -138,11 +138,10 @@ void CanvasWindow::renameCurrentCanvas(const QString &newName) {
 
 #include "glhelpers.h"
 
-void CanvasWindow::renderSk(SkCanvas * const canvas,
-                            GrContext* const grContext) {
+void CanvasWindow::renderSk(SkCanvas * const canvas) {
     if(mCurrentCanvas) {
         canvas->save();
-        mCurrentCanvas->renderSk(canvas, grContext, rect(),
+        mCurrentCanvas->renderSk(canvas, rect(),
                                  mViewTransform, mMouseGrabber);
         canvas->restore();
     }
@@ -462,11 +461,11 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
 void CanvasWindow::openWelcomeDialog() {
     return;
     if(mWelcomeDialog) return;
-    const auto mWindow = MainWindow::getInstance();
+    const auto mWindow = MainWindow::sGetInstance();
     mWelcomeDialog = new WelcomeDialog(mWindow->getRecentFiles(),
                                        [this]() { CanvasSettingsDialog::sNewCanvasDialog(mDocument, this); },
-                                       []() { MainWindow::getInstance()->openFile(); },
-                                       [](QString path) { MainWindow::getInstance()->openFile(path); },
+                                       []() { MainWindow::sGetInstance()->openFile(); },
+                                       [](QString path) { MainWindow::sGetInstance()->openFile(path); },
                                        mWindow);
     mWelcomeDialog->resize(size());
     mWindow->takeCentralWidget();
@@ -477,7 +476,7 @@ void CanvasWindow::closeWelcomeDialog() {
     return;
     if(!mWelcomeDialog) return;
 
-    const auto mWindow = MainWindow::getInstance();
+    const auto mWindow = MainWindow::sGetInstance();
     resize(mWelcomeDialog->size());
     mWelcomeDialog = nullptr;
     mWindow->setCentralWidget(this);

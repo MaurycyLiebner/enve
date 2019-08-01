@@ -119,8 +119,8 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
             if(GetAsPtr(target, BoundingBox)->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
             } else return BoxSingleWidget::INVISIBLE_PIXMAP;
-        } else if(target->SWT_isGpuEffect()) {
-            if(GetAsPtr(target, GpuEffect)->isVisible()) {
+        } else if(target->SWT_isRasterEffect()) {
+            if(GetAsPtr(target, RasterEffect)->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
             } else return BoxSingleWidget::INVISIBLE_PIXMAP;
         } else if(target->SWT_isPathEffect()) {
@@ -392,7 +392,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mRecordButton->setVisible(target->SWT_isAnimator());
     mVisibleButton->setVisible(target->SWT_isBoundingBox() ||
                                target->SWT_isPathEffect() ||
-                               target->SWT_isGpuEffect());
+                               target->SWT_isRasterEffect());
     mLockedButton->setVisible(target->SWT_isBoundingBox());
     mRecordButton->show();
 
@@ -542,7 +542,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
 
         if(target->SWT_isProperty()) {
             const auto pTarget = static_cast<Property*>(target);
-            PropertyMenu pMenu(&menu, mParent->currentScene(), MainWindow::getInstance());
+            PropertyMenu pMenu(&menu, mParent->currentScene(), MainWindow::sGetInstance());
             pTarget->setupTreeViewMenu(&pMenu);
 
 //            const auto container = SPtrCreate(PropertyClipboard)(this);
@@ -632,7 +632,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             if(target->SWT_isBoundingBox()) {
             } else if(target->SWT_isAnimator()) {
                 menu.addSeparator();
-                if(target->SWT_isGpuEffect() || target->SWT_isPathEffect()) {
+                if(target->SWT_isRasterEffect() || target->SWT_isPathEffect()) {
                     menu.addSeparator();
 //                    menu.addAction("Delete Effect", [target]() {
 //                        if(target->SWT_isPixmapEffect()) {
@@ -702,7 +702,7 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
     setSelected(true);
     drag->setMimeData(mimeData);
 
-    drag->installEventFilter(MainWindow::getInstance());
+    drag->installEventFilter(MainWindow::sGetInstance());
     drag->exec(Qt::CopyAction | Qt::MoveAction);
 }
 
@@ -914,8 +914,8 @@ void BoxSingleWidget::switchBoxVisibleAction() {
     if(!target) return;
     if(target->SWT_isBoundingBox()) {
         GetAsPtr(target, BoundingBox)->switchVisible();
-    } else if(target->SWT_isGpuEffect()) {
-        GetAsPtr(target, GpuEffect)->switchVisible();
+    } else if(target->SWT_isRasterEffect()) {
+        GetAsPtr(target, RasterEffect)->switchVisible();
     } else if(target->SWT_isPathEffect()) {
         GetAsPtr(target, PathEffect)->switchVisible();
     }

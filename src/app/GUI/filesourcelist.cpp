@@ -39,7 +39,7 @@ void FileSourceWidget::mouseMoveEvent(QMouseEvent *event) {
                       QUrl::fromLocalFile(mTargetCache->getName()));
     drag->setMimeData(mimeData);
 
-    drag->installEventFilter(MainWindow::getInstance());
+    drag->installEventFilter(MainWindow::sGetInstance());
     drag->exec(Qt::CopyAction | Qt::MoveAction);
 }
 
@@ -192,7 +192,7 @@ void FileSourceListVisibleWidget::showContextMenu(const QPoint &globalPos) {
                 abs->fTarget->reloadAction();
             }
         } else if(selected_action->text() == "Replace...") {
-            mSelectedList.first()->fTarget->replace(MainWindow::getInstance());
+            mSelectedList.first()->fTarget->replace(MainWindow::sGetInstance());
         }
 
         Document::sInstance->actionFinished();

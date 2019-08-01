@@ -41,7 +41,7 @@ public:
     };
 
     virtual HardwareSupport hardwareSupport() const = 0;
-    virtual void processGPU(QGL33 * const gl,
+    virtual void processGpu(QGL33 * const gl,
                             SwitchableContext &context) = 0;
     virtual void process() = 0;
 
@@ -120,7 +120,7 @@ public:
         return HardwareSupport::CPU_ONLY;
     }
 
-    void processGPU(QGL33 * const gl,
+    void processGpu(QGL33 * const gl,
                     SwitchableContext &context) {
         Q_UNUSED(gl);
         Q_UNUSED(context);
@@ -136,7 +136,7 @@ public:
         return HardwareSupport::CPU_ONLY;
     }
 
-    void processGPU(QGL33 * const gl,
+    void processGpu(QGL33 * const gl,
                     SwitchableContext &context) {
         Q_UNUSED(gl);
         Q_UNUSED(context);

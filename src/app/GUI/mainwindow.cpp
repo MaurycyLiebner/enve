@@ -39,11 +39,12 @@
 #include "GUI/GradientWidgets/gradientwidget.h"
 #include "GUI/newcanvasdialog.h"
 #include "ShaderEffects/shadereffectprogram.h"
+#include "importhandler.h"
 extern "C" {
     #include <libavformat/avformat.h>
 }
 
-MainWindow *MainWindow::sMainWindowInstance;
+MainWindow *MainWindow::sInstance = nullptr;
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
     processKeyEvent(event);
@@ -53,6 +54,29 @@ int FONT_HEIGHT;
 int MIN_WIDGET_DIM;
 int KEY_RECT_SIZE;
 
+class evImporter : public eImporter {
+public:
+    bool supports(const QFileInfo& fileInfo) const {
+        return fileInfo.suffix() == "ev";
+    }
+
+    qsptr<BoundingBox> import(const QFileInfo& fileInfo) const {
+        MainWindow::sGetInstance()->loadEVFile(fileInfo.absoluteFilePath());
+        return nullptr;
+    }
+};
+
+class eSvgImporter : public eImporter {
+public:
+    bool supports(const QFileInfo& fileInfo) const {
+        return fileInfo.suffix() == "svg";
+    }
+
+    qsptr<BoundingBox> import(const QFileInfo& fileInfo) const {
+        return loadSVGFile(fileInfo.absoluteFilePath());
+    }
+};
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       mMemoryHandler(new MemoryHandler(this)),
@@ -60,12 +84,16 @@ MainWindow::MainWindow(QWidget *parent)
       mDocument(mTaskScheduler),
       mActions(mDocument),
       mRenderHandler(mDocument, mAudioHandler) {
-    sMainWindowInstance = this;
+    Q_ASSERT(!sInstance);
+    sInstance = this;
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
     KEY_RECT_SIZE = MIN_WIDGET_DIM*3/5;
     av_register_all();
     mAudioHandler.initializeAudio();
+
+    ImportHandler::sInstance->addImporter<evImporter>();
+    ImportHandler::sInstance->addImporter<eSvgImporter>();
 
     connect(&mDocument, &Document::evFilePathChanged,
             this, &MainWindow::updateTitle);
@@ -240,7 +268,7 @@ MainWindow::MainWindow(QWidget *parent)
     mEventFilterDisabled = false;
 
     try {
-        TaskScheduler::sInstance->initializeGPU();
+        TaskScheduler::sInstance->initializeGpu();
     } catch(const std::exception& e) {
         gPrintExceptionFatal(e);
     }
@@ -747,8 +775,8 @@ void MainWindow::connectToolBarActions() {
             &mActions, &Actions::setFontFamilyAndStyle);
 }
 
-MainWindow *MainWindow::getInstance() {
-    return sMainWindowInstance;
+MainWindow *MainWindow::sGetInstance() {
+    return sInstance;
 }
 
 void MainWindow::updateCanvasModeButtonsChecked() {

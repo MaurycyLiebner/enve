@@ -44,17 +44,15 @@ void ImageCacheContainer::setDataLoadedFromTmpFile(const sk_sp<SkImage> &img) {
     afterDataLoadedFromTmpFile();
 }
 
-void ImageCacheContainer::drawSk(SkCanvas * const canvas,
-                                 GrContext * const grContext) {
+void ImageCacheContainer::drawSk(SkCanvas * const canvas) {
     SkPaint paint;
-    drawSk(canvas, grContext, paint);
+    drawSk(canvas, paint);
 }
 
 void ImageCacheContainer::drawSk(SkCanvas * const canvas,
-                                 GrContext * const grContext,
                                  SkPaint& paint) {
     paint.setFilterQuality(BoundingBox::sDisplayFiltering);
-    SkiaHelpers::drawImageGPU(canvas, mImageSk, 0, 0, &paint, grContext);
+    canvas->drawImage(mImageSk, 0, 0, &paint);
 }
 
 int ImageCacheContainer::clearMemory() {

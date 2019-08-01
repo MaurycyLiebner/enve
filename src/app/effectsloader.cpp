@@ -1,6 +1,6 @@
 #include "effectsloader.h"
 #include "GUI/ColorWidgets/colorwidgetshaders.h"
-#include "GPUEffects/gpueffect.h"
+#include "RasterEffects/rastereffect.h"
 #include <QFileSystemWatcher>
 #include <QFileSystemModel>
 #include "ShaderEffects/shadereffectcreator.h"
@@ -31,7 +31,7 @@ void EffectsLoader::initialize() {
     }
 
     iniCustomPathEffects();
-    iniCustomGpuEffects();
+    iniCustomRasterEffects();
 }
 
 #include "PathEffects/custompatheffect.h"
@@ -74,32 +74,32 @@ void EffectsLoader::iniCustomPathEffects() {
     });
 }
 
-#include "GPUEffects/customgpueffect.h"
-#include "ShaderEffects/customgpueffectcreator.h"
-void EffectsLoader::iniCustomGpuEffect(const QString& gpu) {
+#include "RasterEffects/customrastereffect.h"
+#include "RasterEffects/customrastereffectcreator.h"
+void EffectsLoader::iniCustomRasterEffect(const QString& gpu) {
     try {
-        CustomGpuEffectCreator::sLoadCustomGpuEffect(this, gpu);
+        CustomRasterEffectCreator::sLoadCustomRasterEffect(this, gpu);
     } catch(...) {
-        RuntimeThrow("Error while loading GpuEffect from '" + gpu + "'");
+        RuntimeThrow("Error while loading RasterEffect from '" + gpu + "'");
     }
 }
 
-void EffectsLoader::iniIfCustomGpuEffect(const QString& gpu) {
+void EffectsLoader::iniIfCustomRasterEffect(const QString& gpu) {
     const QFileInfo fileInfo(gpu);
     if(!fileInfo.isFile()) return;
     if(!fileInfo.completeSuffix().contains("so")) return;
     try {
-        iniCustomGpuEffect(gpu);
+        iniCustomRasterEffect(gpu);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
     }
 }
 
-void EffectsLoader::iniCustomGpuEffects() {
-    const QString dirPath = EnveSettings::sSettingsDir() + "/GPURasterEffects";
+void EffectsLoader::iniCustomRasterEffects() {
+    const QString dirPath = EnveSettings::sSettingsDir() + "/RasterEffects";
 //    QDirIterator dirIt(dirGpu, QDirIterator::NoIteratorFlags);
 //    while(dirIt.hasNext()) {
-//        iniIfCustomGpuEffect(dirIt.next());
+//        iniIfCustomRasterEffect(dirIt.next());
 //    }
     const auto newFileWatcher = QSharedPointer<QFileSystemModel>(
                 new QFileSystemModel);
@@ -109,7 +109,7 @@ void EffectsLoader::iniCustomGpuEffects() {
         for(int row = first; row <= last; row++) {
             const auto rowIndex = newFileWatcher->index(row, 0, parent);
             const QString path = newFileWatcher->filePath(rowIndex);
-            iniIfCustomGpuEffect(path);
+            iniIfCustomRasterEffect(path);
         }
     });
 }
@@ -137,7 +137,7 @@ void EffectsLoader::iniRasterEffectPrograms() {
         if(!fileInfo.isFile()) continue;
         if(fileInfo.suffix() != "gre") continue;
         try {
-            iniRasterEffectProgramExec(path);
+            iniShaderEffectProgramExec(path);
         } catch(const std::exception& e) {
             gPrintExceptionCritical(e);
         }
@@ -179,7 +179,7 @@ void EffectsLoader::iniRasterEffectPrograms() {
 void EffectsLoader::iniSingleRasterEffectProgram(const QString& grePath) {
     try {
         makeCurrent();
-        iniRasterEffectProgramExec(grePath);
+        iniShaderEffectProgramExec(grePath);
         doneCurrent();
     } catch(const std::exception& e) {
         doneCurrent();
@@ -187,7 +187,7 @@ void EffectsLoader::iniSingleRasterEffectProgram(const QString& grePath) {
     }
 }
 
-void EffectsLoader::iniRasterEffectProgramExec(const QString& grePath) {
+void EffectsLoader::iniShaderEffectProgramExec(const QString& grePath) {
     if(!QFile(grePath).exists()) return;
     const QFileInfo fileInfo(grePath);
     const QString fragPath = fileInfo.path() + "/" +
@@ -213,6 +213,6 @@ void EffectsLoader::iniRasterEffectProgramExec(const QString& grePath) {
                 this, [this, grePath]() {
             iniSingleRasterEffectProgram(grePath);
         });
-        RuntimeThrow("Error while loading GPURasterEffect from '" + grePath + "'");
+        RuntimeThrow("Error while loading ShaderEffect from '" + grePath + "'");
     }
 }
