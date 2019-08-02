@@ -373,6 +373,8 @@ HEADERS += \
     RasterEffects/rastereffect.h \
     RasterEffects/customrastereffectcreator.h \
     RasterEffects/rastereffectcaller.h \
+    ShaderEffects/intanimatorcreator.h \
+    ShaderEffects/qrealanimatorcreator.h \
     ShaderEffects/shadereffect.h \
     ShaderEffects/shadereffectcaller.h \
     ShaderEffects/shadereffectcreator.h \

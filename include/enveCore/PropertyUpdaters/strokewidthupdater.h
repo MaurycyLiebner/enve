@@ -1,0 +1,1 @@
+#include "../../../src/core/PropertyUpdaters/strokewidthupdater.h"
