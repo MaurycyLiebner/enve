@@ -8,6 +8,33 @@ protected:
     DynamicComplexAnimatorBase(const QString &name) :
         ComplexAnimator(name) {}
 public:
+    bool SWT_dropSupport(const QMimeData* const data) {
+        return eMimeData::sHasType<T>(data);
+    }
+
+    bool SWT_dropIntoSupport(const int index, const QMimeData* const data) {
+        Q_UNUSED(index);
+        return eMimeData::sHasType<T>(data);
+    }
+
+    bool SWT_drop(const QMimeData* const data) {
+        return SWT_dropInto(0, data);
+    }
+
+    bool SWT_dropInto(const int index, const QMimeData* const data) {
+        const auto eData = static_cast<const eMimeData*>(data);
+        const auto bData = static_cast<const eDraggedObjects*>(eData);
+        for(int i = 0; i < bData->count(); i++) {
+            const auto iObj = bData->getObject<T>(i);
+            insertChild(iObj->template ref<T>(), index + i);
+        }
+        return true;
+    }
+
+    void insertChild(const qsptr<T>& child, const int index) {
+        ca_insertChild(child, index);
+    }
+
     void addChild(const qsptr<T>& child) {
         ca_addChild(child);
     }
@@ -16,16 +43,15 @@ public:
         ca_removeChild(child);
     }
 
-    qsptr<T> takeChildAt(const int id) {
-        return GetAsSPtrTemplated(ca_takeChildAt(id), T);
+    qsptr<T> takeChildAt(const int index) {
+        return GetAsSPtrTemplated(ca_takeChildAt(index), T);
     }
 
     void prependChild(T * const oldChild, const qsptr<T>& newChild) {
         ca_prependChildAnimator(oldChild, newChild);
     }
 
-    void replaceChild(const qsptr<T>& oldChild,
-                      const qsptr<T> &newChild) {
+    void replaceChild(const qsptr<T>& oldChild, const qsptr<T> &newChild) {
         ca_replaceChildAnimator(oldChild, newChild);
     }
 

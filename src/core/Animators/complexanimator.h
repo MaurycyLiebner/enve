@@ -111,8 +111,7 @@ protected:
     void ca_addChild(const qsptr<Property> &childAnimator) {
         ca_insertChild(childAnimator, ca_getNumberOfChildren());
     }
-    void ca_insertChild(const qsptr<Property> &child,
-                                const int id);
+    void ca_insertChild(const qsptr<Property> &child, const int id);
     void ca_removeChild(const qsptr<Property> child);
 
     template <typename T = Property>

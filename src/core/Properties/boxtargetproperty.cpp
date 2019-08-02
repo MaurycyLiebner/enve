@@ -16,6 +16,21 @@ void BoxTargetProperty::setTarget(BoundingBox* const box) {
     emit targetSet(box);
 }
 
+bool BoxTargetProperty::SWT_dropSupport(const QMimeData * const data) {
+    if(!eMimeData::sHasType<BoundingBox>(data)) return false;
+    const auto eData = static_cast<const eMimeData*>(data);
+    const auto bData = static_cast<const eDraggedObjects*>(eData);
+    return bData->count() == 1;
+}
+
+bool BoxTargetProperty::SWT_drop(const QMimeData * const data) {
+    const auto eData = static_cast<const eMimeData*>(data);
+    const auto bData = static_cast<const eDraggedObjects*>(eData);
+    const auto obj = bData->getObject<BoundingBox>(0);
+    setTarget(obj);
+    return true;
+}
+
 void BoxTargetProperty::writeProperty(QIODevice * const target) const {
     const auto targetBox = mTarget_d.data();
     int targetWriteId = -1;

@@ -50,6 +50,13 @@ public:
     static inline QSharedPointer<T> createSPtr(Args && ...arguments) {
         return (new T(arguments...))->template iniRef<T>();
     }
+
+    template<class T>
+    inline QSharedPointer<T> ref() {
+        if(mThisWeak.isNull())
+            RuntimeThrow("Not initialized, or already deleting");
+        return qSharedPointerCast<T>(mThisWeak);
+    }
 protected:
     static void *operator new (size_t sz) {
         return std::malloc(sz);
@@ -61,13 +68,6 @@ protected:
         QSharedPointer<T> thisRef = QSharedPointer<T>(static_cast<T*>(this));
         this->mThisWeak = qSharedPointerCast<SelfRef>(thisRef).toWeakRef();
         return thisRef;
-    }
-
-    template<class T>
-    inline QSharedPointer<T> ref() {
-        if(mThisWeak.isNull())
-            RuntimeThrow("Not initialized, or already deleting");
-        return qSharedPointerCast<T>(mThisWeak);
     }
 
     template<class T>

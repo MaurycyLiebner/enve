@@ -15,6 +15,10 @@ public:
     BoundingBox *getTarget() const;
     void setTarget(BoundingBox * const box);
 
+    bool SWT_dropSupport(const QMimeData* const data);
+
+    bool SWT_drop(const QMimeData* const data);
+
     bool SWT_isBoxTargetProperty() const { return true; }
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice * const src);

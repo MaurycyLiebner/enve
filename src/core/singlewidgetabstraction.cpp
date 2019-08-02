@@ -41,28 +41,27 @@ bool SWT_Abstraction::setAbstractions(
     return false;
 }
 
-int SWT_Abstraction::getHeight(
-        const SWT_RulesCollection &rules,
-        const bool parentSatisfiesRule,
-        const bool parentMainTarget,
-        const int swtHeight) {
-    int height = 0;
+int SWT_Abstraction::updateHeight(const SWT_RulesCollection &rules,
+                                  const bool parentSatisfiesRule,
+                                  const bool parentMainTarget,
+                                  const int swtHeight) {
+    mHeight = 0;
     if(mTarget_k->SWT_isVisible()) {
         const bool satisfiesRule = mTarget_k->SWT_isVisible() &&
                 mTarget_k->SWT_shouldBeVisible(rules, parentSatisfiesRule,
                                              parentMainTarget);
         if(satisfiesRule && !mIsMainTarget) {
-            height += swtHeight;
+            mHeight += swtHeight;
         }
         const bool childrenVisible = (satisfiesRule && mContentVisible) ||
                                      mIsMainTarget;
         for(const auto& abs : mChildren) {
-            height += abs->getHeight(rules, childrenVisible,
-                                     mIsMainTarget, swtHeight);
+            mHeight += abs->updateHeight(rules, childrenVisible,
+                                        mIsMainTarget, swtHeight);
         }
     }
 
-    return height;
+    return mHeight;
 }
 
 void SWT_Abstraction::addChildAbstraction(

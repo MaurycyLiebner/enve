@@ -205,10 +205,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
             canvas->drawRect(canvasRect, paint);
         }
         canvas->saveLayer(nullptr, nullptr);
-        for(const auto& box : mContainedBoxes) {
-            if(box->isVisibleAndInVisibleDurationRect())
-                box->drawPixmapSk(canvas);
-        }
+        drawContained(canvas);
         canvas->restore();
     } else if(drawCanvas) {
         canvas->save();

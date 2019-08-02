@@ -356,7 +356,7 @@ void Canvas::addBoxToSelection(BoundingBox * const box) {
     box->select();
     schedulePivotUpdate();
 
-    sortSelectedBoxesAsc();
+    sortSelectedBoxesDesc();
     //setCurrentFillStrokeSettingsFromBox(box);
     setCurrentBox(box);
 

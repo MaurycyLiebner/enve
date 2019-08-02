@@ -14,6 +14,39 @@ ContainerBox::ContainerBox(const BoundingBoxType &type) :
     iniPathEffects();
 }
 
+bool ContainerBox::SWT_dropSupport(const QMimeData * const data) {
+    return BoundingBox::SWT_dropSupport(data) ||
+           mPathEffectsAnimators->SWT_dropSupport(data) ||
+           eMimeData::sHasType<BoundingBox>(data);
+}
+
+bool ContainerBox::SWT_dropIntoSupport(const int index, const QMimeData * const data) {
+    if(eMimeData::sHasType<BoundingBox>(data)) {
+        return index >= ca_getNumberOfChildren();
+    }
+    return false;
+}
+
+bool ContainerBox::SWT_drop(const QMimeData * const data) {
+    if(BoundingBox::SWT_drop(data)) return true;
+    if(mPathEffectsAnimators->SWT_dropSupport(data))
+        return mPathEffectsAnimators->SWT_drop(data);
+    if(eMimeData::sHasType<BoundingBox>(data))
+        return SWT_dropInto(ca_getNumberOfChildren(), data);
+    return false;
+}
+
+bool ContainerBox::SWT_dropInto(const int index, const QMimeData * const data) {
+    const auto eData = static_cast<const eMimeData*>(data);
+    const auto bData = static_cast<const eDraggedObjects*>(eData);
+    for(int i = 0; i < bData->count(); i++) {
+        const auto iObj = bData->getObject<BoundingBox>(i);
+        insertContainedBox(index + i - ca_getNumberOfChildren(),
+                           iObj->ref<BoundingBox>());
+    }
+    return true;
+}
+
 void ContainerBox::iniPathEffects() {
     mPathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)();
@@ -43,40 +76,6 @@ void ContainerBox::iniPathEffects() {
                 SPtrCreate(GroupAllPathsUpdater)(this));
     ca_addChild(mOutlinePathEffectsAnimators);
 }
-
-
-//bool BoxesGroup::anim_nextRelFrameWithKey(const int relFrame,
-//                                         int &nextRelFrame) {
-//    int thisMinNextFrame = BoundingBox::anim_nextRelFrameWithKey(relFrame);
-//    return thisMinNextFrame;
-//    int minNextAbsFrame = FrameRange::EMAX;
-//    for(const auto& box : mContainedBoxes) {
-//        int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
-//        int boxNext = box->anim_nextRelFrameWithKey(boxRelFrame);
-//        int absNext = box->prp_relFrameToAbsFrame(boxNext);
-//        if(minNextAbsFrame > absNext) {
-//            minNextAbsFrame = absNext;
-//        }
-//    }
-
-//    return qMin(prp_absFrameToRelFrame(minNextAbsFrame), thisMinNextFrame);
-//}
-
-//int BoxesGroup::anim_prevRelFrameWithKey(const int relFrame,
-//                                        int &prevRelFrame) {
-//    int thisMaxPrevFrame = BoundingBox::anim_nextRelFrameWithKey(relFrame);
-//    return thisMaxPrevFrame;
-//    int maxPrevAbsFrame = FrameRange::EMIN;
-//    for(const auto& box : mContainedBoxes) {
-//        int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
-//        int boxPrev = box->anim_prevRelFrameWithKey(boxRelFrame);
-//        int absPrev = box->prp_relFrameToAbsFrame(boxPrev);
-//        if(maxPrevAbsFrame < absPrev) {
-//            maxPrevAbsFrame = absPrev;
-//        }
-//    }
-//    return qMax(maxPrevAbsFrame, thisMaxPrevFrame);
-//}
 
 FillSettingsAnimator *ContainerBox::getFillSettings() const {
     if(mContainedBoxes.isEmpty()) return nullptr;
@@ -189,7 +188,7 @@ void ContainerBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
     updateAllChildPathBoxes(Animator::USER_CHANGE);
 }
 
-void ContainerBox::updateAllChildPathBoxes(const Animator::UpdateReason &reason) {
+void ContainerBox::updateAllChildPathBoxes(const UpdateReason reason) {
     for(const auto& box : mContainedBoxes) {
         if(box->SWT_isPathBox()) {
             GetAsPtr(box, PathBox)->setPathsOutdated();
@@ -201,8 +200,8 @@ void ContainerBox::updateAllChildPathBoxes(const Animator::UpdateReason &reason)
 }
 
 void ContainerBox::applyPathEffects(const qreal relFrame,
-                                  SkPath * const srcDstPath,
-                                  BoundingBox * const box) {
+                                    SkPath * const srcDstPath,
+                                    BoundingBox * const box) {
     if(mParentGroup) {
         const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
         const qreal parentRelFrame =
@@ -210,15 +209,10 @@ void ContainerBox::applyPathEffects(const qreal relFrame,
         mParentGroup->applyPathEffects(parentRelFrame, srcDstPath, box);
     }
     mPathEffectsAnimators->apply(relFrame, srcDstPath);
-
-//    if(!mParentGroup) return;
-//    qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
-//                prp_relFrameToAbsFrameF(relFrame));
-//    mParentGroup->apply(parentRelFrame, srcDstPath, box);
 }
 
-void ContainerBox::filterOutlineBasePath(
-        const qreal relFrame, SkPath * const srcDstPath) {
+void ContainerBox::filterOutlineBasePath(const qreal relFrame,
+                                         SkPath * const srcDstPath) {
     mOutlineBasePathEffectsAnimators->apply(relFrame, srcDstPath);
     if(!mParentGroup) return;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
@@ -228,7 +222,7 @@ void ContainerBox::filterOutlineBasePath(
 }
 
 void ContainerBox::filterOutlinePath(const qreal relFrame,
-                                   SkPath * const srcDstPath) {
+                                     SkPath * const srcDstPath) {
     mOutlinePathEffectsAnimators->apply(relFrame, srcDstPath);
     if(!mParentGroup) return;
     const qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
@@ -237,7 +231,7 @@ void ContainerBox::filterOutlinePath(const qreal relFrame,
 }
 
 void ContainerBox::filterFillPath(const qreal relFrame,
-                                SkPath * const srcDstPath) {
+                                  SkPath * const srcDstPath) {
     mFillPathEffectsAnimators->apply(relFrame, srcDstPath);
     if(!mParentGroup) return;
     const qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
@@ -444,8 +438,7 @@ void ContainerBox::setDescendantCurrentGroup(const bool bT) {
 
 BoundingBox *ContainerBox::getBoxAtFromAllDescendents(const QPointF &absPos) {
     BoundingBox* boxAtPos = nullptr;
-    for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
-        const auto& box = mContainedBoxes.at(i);
+    for(const auto& box : mContainedBoxes) {
         if(box->isVisibleAndUnlocked() &&
             box->isVisibleAndInVisibleDurationRect()) {
             boxAtPos = box->getBoxAtFromAllDescendents(absPos);
@@ -490,28 +483,25 @@ void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
     PathEffectsMenu::addPathEffectsToActionMenu(menu);
 }
 
-void ContainerBox::drawPixmapSk(SkCanvas * const canvas) {
-    if(SWT_isGroupBox()) {
-        for(const auto& box : mContainedBoxes) {
-            if(box->isVisibleAndInVisibleDurationRect())
-                box->drawPixmapSk(canvas);
-        }
-    } else {
-        if(mIsDescendantCurrentGroup) {
-            SkPaint paint;
-            const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
-            paint.setAlpha(static_cast<U8CPU>(intAlpha));
-            paint.setBlendMode(mBlendModeSk);
-            canvas->saveLayer(nullptr, &paint);
-            for(const auto& box : mContainedBoxes) {
-                if(box->isVisibleAndInVisibleDurationRect())
-                    box->drawPixmapSk(canvas);
-            }
-            canvas->restore();
-        } else {
-            BoundingBox::drawPixmapSk(canvas);
-        }
+void ContainerBox::drawContained(SkCanvas * const canvas) {
+    for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
+        const auto& box = mContainedBoxes.at(i);
+        if(box->isVisibleAndInVisibleDurationRect())
+            box->drawPixmapSk(canvas);
     }
+}
+
+void ContainerBox::drawPixmapSk(SkCanvas * const canvas) {
+    if(SWT_isGroupBox()) return drawContained(canvas);
+    if(mIsDescendantCurrentGroup) {
+        SkPaint paint;
+        const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
+        paint.setAlpha(static_cast<U8CPU>(intAlpha));
+        paint.setBlendMode(mBlendModeSk);
+        canvas->saveLayer(nullptr, &paint);
+        drawContained(canvas);
+        canvas->restore();
+    } else BoundingBox::drawPixmapSk(canvas);
 }
 
 qsptr<BoundingBox> ContainerBox::createLink() {
@@ -576,9 +566,10 @@ void ContainerBox::setupLayerRenderData(const qreal relFrame,
     groupData->fChildrenRenderData.clear();
     groupData->fOtherGlobalRects.clear();
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-    for(const auto& box : mContainedBoxes) {
+    for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
+        const auto& box = mContainedBoxes.at(i);
         const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
-        processChildData(box.data(), groupData, boxRelFrame, absFrame);
+        processChildData(box.get(), groupData, boxRelFrame, absFrame);
     }
 }
 
@@ -616,10 +607,9 @@ bool ContainerBox::diffsAffectingContainedBoxes(
 BoundingBox *ContainerBox::getBoxAt(const QPointF &absPos) {
     BoundingBox* boxAtPos = nullptr;
 
-    for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
-        const auto& box = mContainedBoxes.at(i);
+    for(const auto& box : mContainedBoxes) {
         if(box->isVisibleAndUnlocked() &&
-            box->isVisibleAndInVisibleDurationRect()) {
+           box->isVisibleAndInVisibleDurationRect()) {
             if(box->absPointInsidePath(absPos)) {
                 boxAtPos = box.get();
                 break;
@@ -660,18 +650,24 @@ void ContainerBox::addContainedBoxesToSelection(const QRectF &rect) {
 }
 
 void ContainerBox::addContainedBox(const qsptr<BoundingBox>& child) {
-    insertContainedBox(mContainedBoxes.count(), child);
+    insertContainedBox(0, child);
 }
 
-void ContainerBox::insertContainedBox(const int index,
+void ContainerBox::insertContainedBox(const int id,
                                       const qsptr<BoundingBox>& child) {
+    if(child->getParentGroup() == this) {
+        const int cId = mContainedBoxes.indexOf(child);
+        moveContainedBoxInList(child.get(), cId, (cId < id ? id - 1 : id));
+        return;
+    }
+    child->removeFromParent_k();
+    auto& connCtx = mContainedBoxes.insertObj(id, child);
     child->setParentGroup(this);
-    auto& connCtx = mContainedBoxes.insertObj(index, child);
     connCtx << connect(child.data(), &BoundingBox::prp_absFrameRangeChanged,
                        this, &BoundingBox::prp_afterChangedAbsRange);
-    updateContainedBoxIds(index);
+    updateContainedBoxIds(id);
 
-    SWT_addChildAt(child.get(), boxIdToAbstractionId(index));
+    SWT_addChildAt(child.get(), boxIdToAbstractionId(id));
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());
 
     child->prp_afterWholeInfluenceRangeChanged();
@@ -679,7 +675,7 @@ void ContainerBox::insertContainedBox(const int index,
     for(const auto& box : mLinkingBoxes) {
         auto internalLinkGroup = GetAsPtr(box, InternalLinkGroupBox);
         internalLinkGroup->insertContainedBox(
-                    index, child->createLinkForLinkGroup());
+                    id, child->createLinkForLinkGroup());
     }
 }
 
@@ -687,13 +683,11 @@ void ContainerBox::updateContainedBoxIds(const int firstId) {
     updateContainedBoxIds(firstId, mContainedBoxes.count() - 1);
 }
 
-void ContainerBox::updateContainedBoxIds(const int firstId,
-                                       const int lastId) {
+void ContainerBox::updateContainedBoxIds(const int firstId, const int lastId) {
     for(int i = firstId; i <= lastId; i++) {
         mContainedBoxes.at(i)->setZListIndex(i);
     }
 }
-
 
 void ContainerBox::removeAllContainedBoxes() {
     while(mContainedBoxes.count() > 0) {
@@ -780,8 +774,7 @@ void ContainerBox::bringContainedBoxToFrontList(BoundingBox * const child) {
     moveContainedBoxInList(child, index, 0);
 }
 
-void ContainerBox::moveContainedBoxInList(BoundingBox * const child,
-                                        const int to) {
+void ContainerBox::moveContainedBoxInList(BoundingBox * const child, const int to) {
     const int from = getContainedBoxIndex(child);
     if(from == -1) return;
     moveContainedBoxInList(child, from, to);
@@ -789,46 +782,41 @@ void ContainerBox::moveContainedBoxInList(BoundingBox * const child,
 
 void ContainerBox::moveContainedBoxInList(BoundingBox * const child,
                                           const int from, const int to) {
-    mContainedBoxes.moveObj(from, to);
-    updateContainedBoxIds(qMin(from, to), qMax(from, to));
-    SWT_moveChildTo(child, boxIdToAbstractionId(to));
+    const int boundTo = qBound(0, to, mContainedBoxes.count() - 1);
+    mContainedBoxes.moveObj(from, boundTo);
+    updateContainedBoxIds(qMin(from, boundTo), qMax(from, boundTo));
+    SWT_moveChildTo(child, boxIdToAbstractionId(boundTo));
     planScheduleUpdate(Animator::USER_CHANGE);
 
     prp_afterWholeInfluenceRangeChanged();
 }
 
 void ContainerBox::moveContainedBoxBelow(BoundingBox * const boxToMove,
-                                       BoundingBox * const below) {
+                                         BoundingBox * const below) {
     const int indexFrom = getContainedBoxIndex(boxToMove);
     int indexTo = getContainedBoxIndex(below);
-    if(indexFrom > indexTo) {
-        indexTo++;
-    }
+    if(indexFrom > indexTo) indexTo++;
     moveContainedBoxInList(boxToMove, indexFrom, indexTo);
 }
 
 void ContainerBox::moveContainedBoxAbove(BoundingBox * const boxToMove,
-                                       BoundingBox * const above) {
+                                         BoundingBox * const above) {
     const int indexFrom = getContainedBoxIndex(boxToMove);
     int indexTo = getContainedBoxIndex(above);
-    if(indexFrom < indexTo) {
-        indexTo--;
-    }
+    if(indexFrom < indexTo) indexTo--;
     moveContainedBoxInList(boxToMove, indexFrom, indexTo);
 }
 
 #include "singlewidgetabstraction.h"
-void ContainerBox::SWT_setupAbstraction(
-        SWT_Abstraction* abstraction,
-        const UpdateFuncs &updateFuncs,
-        const int visiblePartWidgetId) {
+void ContainerBox::SWT_setupAbstraction(SWT_Abstraction* abstraction,
+                                        const UpdateFuncs &updateFuncs,
+                                        const int visiblePartWidgetId) {
     BoundingBox::SWT_setupAbstraction(abstraction, updateFuncs,
-                                             visiblePartWidgetId);
+                                      visiblePartWidgetId);
 
-    for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
-        const auto &child = mContainedBoxes.at(i);
-        auto abs = child->SWT_abstractionForWidget(updateFuncs,
-                                                              visiblePartWidgetId);
+    for(const auto& box : mContainedBoxes) {
+        auto abs = box->SWT_abstractionForWidget(updateFuncs,
+                                                 visiblePartWidgetId);
         abstraction->addChildAbstraction(abs);
     }
 }
@@ -850,7 +838,7 @@ bool ContainerBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 
 void ContainerBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
-    int nChildBoxes = mContainedBoxes.count();
+    const int nChildBoxes = mContainedBoxes.count();
     target->write(rcConstChar(&nChildBoxes), sizeof(int));
     for(const auto &child : mContainedBoxes) {
         child->writeBoxType(target);

@@ -76,6 +76,7 @@ public:
 
     const QList<T>& getList() const { return *this; }
 
+    using QList<T>::indexOf;
     using QList<T>::begin;
     using QList<T>::end;
     using QList<T>::cbegin;

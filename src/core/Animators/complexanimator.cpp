@@ -64,12 +64,16 @@ bool ComplexAnimator::SWT_isComplexAnimator() const { return true; }
 
 void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
                                      const int id) {
+    const int cId = ca_mChildAnimators.indexOf(child);
+    if(cId != -1) {
+        return ca_moveChildInList(child.get(), (cId < id ? id - 1 : id));
+    }
+
     if(mHiddenEmpty && !hasChildAnimators()) {
         SWT_setEnabled(true);
         SWT_setVisible(true);
     }
-    if(ca_mChildAnimators.contains(child))
-        ca_removeChild(child);
+
     ca_mChildAnimators.insert(id, child);
     child->setParent(this);
     child->prp_setInheritedUpdater(prp_mUpdater);
@@ -147,8 +151,7 @@ void ComplexAnimator::ca_moveChildBelow(Property *move, Property *below) {
     ca_moveChildInList(move, indexFrom, indexTo);
 }
 
-void ComplexAnimator::ca_moveChildInList(Property* child,
-                                         const int to) {
+void ComplexAnimator::ca_moveChildInList(Property* child, const int to) {
     const int from = getChildPropertyIndex(child);
     if(from == -1) return;
     ca_moveChildInList(child, from, to);
@@ -156,8 +159,10 @@ void ComplexAnimator::ca_moveChildInList(Property* child,
 
 void ComplexAnimator::ca_moveChildInList(Property* child,
                                          const int from, const int to) {
-    ca_mChildAnimators.move(from, to);
-    SWT_moveChildTo(child, to);
+    if(from == to) return;
+    const auto boundTo = qBound(0, to, ca_mChildAnimators.count() - 1);
+    ca_mChildAnimators.move(from, boundTo);
+    SWT_moveChildTo(child, boundTo);
     prp_afterWholeInfluenceRangeChanged();
 }
 

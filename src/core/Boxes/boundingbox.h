@@ -203,6 +203,9 @@ public:
                              const bool parentSatisfies,
                              const bool parentMainTarget) const;
     bool SWT_visibleOnlyIfParentDescendant() const;
+
+    bool SWT_dropSupport(const QMimeData* const data);
+    bool SWT_drop(const QMimeData* const data);
     QMimeData *SWT_createMimeData();
 
     void prp_afterChangedAbsRange(const FrameRange &range);

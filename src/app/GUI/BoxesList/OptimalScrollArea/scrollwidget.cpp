@@ -42,14 +42,11 @@ void ScrollWidget::setMainTarget(SingleWidgetTarget *target) {
 }
 
 void ScrollWidget::updateHeight() {
-    if(!mMainAbstraction) {
-        hide();
-        return;
-    }
-    mContentHeight = mMainAbstraction->getHeight(
+    if(!mMainAbstraction) return hide();
+    mContentHeight = mMainAbstraction->updateHeight(
                 mVisiblePartWidget->getCurrentRulesCollection(),
                 false, false, MIN_WIDGET_DIM) + MIN_WIDGET_DIM/2;
-    int parentHeight = mParentScrollArea->height();
+    const int parentHeight = mParentScrollArea->height();
     setFixedHeight(qMax(mContentHeight, parentHeight));
     if(isHidden()) show();
 }

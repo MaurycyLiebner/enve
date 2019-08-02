@@ -72,6 +72,30 @@ public:
         return nullptr;
     }
 
+    virtual bool SWT_dropSupport(const QMimeData* const data) {
+        Q_UNUSED(data);
+        return false;
+    }
+
+    virtual bool SWT_drop(const QMimeData* const data) {
+        Q_UNUSED(data);
+        return false;
+    }
+
+    virtual bool SWT_dropIntoSupport(const int index,
+                                     const QMimeData* const data) {
+        Q_UNUSED(index);
+        Q_UNUSED(data);
+        return false;
+    }
+
+    virtual bool SWT_dropInto(const int index,
+                              const QMimeData* const data) {
+        Q_UNUSED(index);
+        Q_UNUSED(data);
+        return false;
+    }
+
     virtual void SWT_setChildrenAncestorDisabled(const bool bT) {
         Q_UNUSED(bT);
     }

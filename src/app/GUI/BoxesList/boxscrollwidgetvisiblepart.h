@@ -55,72 +55,47 @@ public:
     void setKeysView(KeysView *keysView) {
         mKeysView = keysView;
     }
-    BoxSingleWidget *getBSWAtPos(const int yPos) const;
-    int getIdAtPos(const int yPos) const;
-    BoxSingleWidget *getLastVisibleBSW() const;
 protected:
     void dropEvent(QDropEvent *event);
     void dragLeaveEvent(QDragLeaveEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
 private:
-    Canvas* mCurrentScene = nullptr;
-    bool mDragging = false;
-
-    QLine mCurrentDragLine;
-    int mLastDragMoveY;
-
-    QTimer *mScrollTimer = nullptr;
-    KeysView *mKeysView = nullptr;
-    struct Dragged {
-        SWT_Abstraction * fPtr;
-        enum Type { BOX,
-                    RASTER_EFFECT, PATH_EFFECT,
-                    NONE } fType;
-
-        bool isValid() const {
-            return fType != NONE && fPtr;
-        }
-
-        void reset() {
-            fPtr = nullptr;
-            fType = NONE;
-        }
-
+    enum class DropType {
+        none, on, into
     };
-    Dragged mCurrentlyDragged;
+
     struct DropTarget {
         SWT_Abstraction * fTargetParent;
         int fTargetId;
-
-        bool drop(const Dragged& dragged);
+        DropType fDropType;
 
         bool isValid() const {
-            return fTargetId != -1 && fTargetParent;
+            return fTargetParent && fDropType != DropType::none;
         }
 
         void reset() {
             fTargetParent = nullptr;
-            fTargetId = -1;
+            fDropType = DropType::none;
         }
     };
+
+    DropTarget getClosestDropTarget(const int yPos);
+
+    bool tryDropIntoAbs(SWT_Abstraction * const abs,
+                        const int idInAbs, DropTarget &dropTarget);
+
+    Canvas* mCurrentScene = nullptr;
+
+    QRect mCurrentDragRect;
+    int mLastDragMoveY;
+
+    QTimer *mScrollTimer = nullptr;
+    KeysView *mKeysView = nullptr;
+
+    const QMimeData* mCurrentMimeData = nullptr;
+
     DropTarget mDropTarget;
-
-    enum DropType {
-        DROP_NONE = 0,
-        DROP_ABOVE = 1,
-        DROP_INTO = 2,
-        DROP_BELOW = 4
-    };
-    typedef int DropTypes;
-    DropTypes dropOnSWTSupported(SingleWidgetTarget const * const swtUnderMouse) const;
-    DropTypes dropOnBSWSupported(const BoxSingleWidget * const bswUnderMouse) const;
-    DropTarget getClosestDropTarget(const int yPos) const;
-
-    void updateDraggedFromMimeData(const QMimeData * const mimeData);
-    bool droppingSupported(const SWT_Abstraction * const targetAbs,
-                           const int idInTarget) const;
-    void updateDragLine();
 };
 
 #endif // BOXSCROLLWIDGETVISIBLEPART_H

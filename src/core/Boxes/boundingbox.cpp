@@ -774,19 +774,19 @@ void BoundingBox::cancelTransform() {
 }
 
 void BoundingBox::moveUp() {
-    mParentGroup->increaseContainedBoxZInList(this);
-}
-
-void BoundingBox::moveDown() {
     mParentGroup->decreaseContainedBoxZInList(this);
 }
 
+void BoundingBox::moveDown() {
+    mParentGroup->increaseContainedBoxZInList(this);
+}
+
 void BoundingBox::bringToFront() {
-    mParentGroup->bringContainedBoxToEndList(this);
+    mParentGroup->bringContainedBoxToFrontList(this);
 }
 
 void BoundingBox::bringToEnd() {
-    mParentGroup->bringContainedBoxToFrontList(this);
+    mParentGroup->bringContainedBoxToEndList(this);
 }
 
 void BoundingBox::setZListIndex(const int z) {
@@ -1416,6 +1416,16 @@ bool BoundingBox::SWT_visibleOnlyIfParentDescendant() const {
 void BoundingBox::removeFromParent_k() {
     if(!mParentGroup) return;
     mParentGroup->removeContainedBox_k(ref<BoundingBox>());
+}
+
+bool BoundingBox::SWT_dropSupport(const QMimeData * const data) {
+    return mRasterEffectsAnimators->SWT_dropSupport(data);
+}
+
+bool BoundingBox::SWT_drop(const QMimeData * const data) {
+    if(mRasterEffectsAnimators->SWT_dropSupport(data))
+        return mRasterEffectsAnimators->SWT_drop(data);
+    return false;
 }
 
 QMimeData *BoundingBox::SWT_createMimeData() {

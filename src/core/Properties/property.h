@@ -51,6 +51,13 @@ public:
         return result;
     }
 
+    template <typename T>
+    T* getObject(const int index) const {
+        return qobject_cast<T*>(mObjects.at(index));
+    }
+
+    int count() const { return mObjects.count(); }
+
     bool hasObject(QObject* const obj) const {
         for(const auto& iObj : mObjects) {
             if(iObj == obj) return true;

@@ -11,6 +11,7 @@ class HDDCachableCacheHandler;
 
 class SingleSound : public StaticComplexAnimator {
     friend class SelfRef;
+    Q_OBJECT
 protected:
     SingleSound(const qsptr<FixedLenAnimationRect> &durRect = nullptr);
 public:

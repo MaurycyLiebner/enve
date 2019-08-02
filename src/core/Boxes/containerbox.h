@@ -14,12 +14,17 @@ public:
     bool SWT_isGroupBox() const { return mType == TYPE_GROUP; }
     bool SWT_isLayerBox() const { return !SWT_isGroupBox(); }
 
+    bool SWT_dropSupport(const QMimeData* const data);
+    bool SWT_dropIntoSupport(const int index, const QMimeData* const data);
+    bool SWT_drop(const QMimeData* const data);
+    bool SWT_dropInto(const int index, const QMimeData* const data);
+
+    void drawContained(SkCanvas * const canvas);
     void drawPixmapSk(SkCanvas * const canvas);
 
     qsptr<BoundingBox> createLink();
     stdsptr<BoxRenderData> createRenderData();
-    void setupRenderData(const qreal relFrame,
-                         BoxRenderData * const data);
+    void setupRenderData(const qreal relFrame, BoxRenderData * const data);
 
     virtual BoundingBox *getBoxAt(const QPointF &absPos);
 
@@ -82,18 +87,13 @@ public:
 
     const ConnContextObjList<qsptr<BoundingBox>> &getContainedBoxes() const;
 
-    //    bool anim_nextRelFrameWithKey(const int relFrame,
-    //                                 int &nextRelFrame);
-    //    bool anim_prevRelFrameWithKey(const int relFrame,
-    //                                 int &prevRelFrame);
-
     bool differenceInPathEffectsBetweenFrames(const int relFrame1,
                                               const int relFrame2) const;
     bool differenceInFillPathEffectsBetweenFrames(const int relFrame1,
                                                   const int relFrame2) const;
     bool differenceInOutlinePathEffectsBetweenFrames(const int relFrame1,
                                                      const int relFrame2) const;
-    void updateAllChildPathBoxes(const UpdateReason &reason);
+    void updateAllChildPathBoxes(const UpdateReason reason);
 
     void applyPathEffects(const qreal relFrame,
                           SkPath * const srcDstPath,
@@ -120,8 +120,7 @@ public:
     bool replaceContainedBox(const qsptr<BoundingBox>& replaced,
                              const qsptr<BoundingBox>& replacer);
     void addContainedBox(const qsptr<BoundingBox> &child);
-    void insertContainedBox(const int index,
-                                 const qsptr<BoundingBox> &child);
+    void insertContainedBox(const int id, const qsptr<BoundingBox> &child);
     void updateContainedBoxIds(const int firstId);
     void updateContainedBoxIds(const int firstId,
                               const int lastId);
@@ -148,20 +147,16 @@ public:
     void readChildBoxes(QIODevice *target);
 
     int abstractionIdToBoxId(const int absId) const {
-        if(absId < ca_getNumberOfChildren()) return -1;
-        const int revId = absId - ca_getNumberOfChildren();
-        return mContainedBoxes.count() - revId - 1;
+        return absId - ca_getNumberOfChildren();
     }
 
     int boxIdToAbstractionId(const int boxId) const {
-        const int revId = mContainedBoxes.count() - boxId - 1;
-        return revId + ca_getNumberOfChildren();
+        return boxId + ca_getNumberOfChildren();
     }
     int getContainedBoxesCount() const;
     void removeAllContainedBoxes();
 
-    void updateIfUsesProgram(
-            const ShaderEffectProgram * const program) const final;
+    void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
 protected:
     void removeContainedBox(const qsptr<BoundingBox> &child);
 

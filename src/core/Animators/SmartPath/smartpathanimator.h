@@ -10,6 +10,7 @@
 
 class SmartPathAnimator : public GraphAnimator {
     friend class SelfRef;
+    Q_OBJECT
 protected:
     SmartPathAnimator();
     SmartPathAnimator(const SkPath& path);
