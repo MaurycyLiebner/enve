@@ -15,6 +15,10 @@ void SingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     else if(isHidden()) show();
 }
 
+SWT_Abstraction *SingleWidget::getTargetAbstraction() {
+    return mTarget;
+}
+
 SingleWidgetTarget *SingleWidget::getTarget() const {
     if(mTarget) return mTarget->getTarget();
     return nullptr;

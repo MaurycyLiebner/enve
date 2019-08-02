@@ -2,6 +2,7 @@
 #define SINGLEWIDGET_H
 
 #include <QWidget>
+#include "smartPointers/stdpointer.h"
 class SWT_Abstraction;
 class ScrollWidgetVisiblePart;
 class SingleWidgetTarget;
@@ -11,12 +12,10 @@ class SingleWidget : public QWidget {
 public:
     SingleWidget(ScrollWidgetVisiblePart *parent = nullptr);
     virtual void setTargetAbstraction(SWT_Abstraction *abs);
-    SWT_Abstraction *getTargetAbstraction() {
-        return mTarget;
-    }
+    SWT_Abstraction *getTargetAbstraction();
     SingleWidgetTarget *getTarget() const;
 protected:
-    SWT_Abstraction *mTarget;
+    stdptr<SWT_Abstraction> mTarget;
     ScrollWidgetVisiblePart *mParent;
 };
 
