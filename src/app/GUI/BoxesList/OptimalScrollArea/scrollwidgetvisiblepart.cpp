@@ -112,6 +112,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
                 mCurrentRulesCollection,
                 true, false);
 
+    mNVisible = currentWidgetId;
     for(int i = currentWidgetId; i < mSingleWidgets.count(); i++) {
         mSingleWidgets.at(i)->hide();
     }

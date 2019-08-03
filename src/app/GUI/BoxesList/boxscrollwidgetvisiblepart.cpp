@@ -124,7 +124,7 @@ bool BoxScroller::tryDropIntoAbs(SWT_Abstraction* const abs,
                                  DropTarget& dropTarget) {
     if(!abs) return false;
     const auto target = abs->getTarget();
-    const int id = qBound(0, idInAbs, abs->getChildrenCount());
+    const int id = qBound(0, idInAbs, abs->childrenCount());
     if(!target->SWT_dropIntoSupport(id, mCurrentMimeData)) return false;
     dropTarget = DropTarget{abs, id, DropType::into};
     return true;
@@ -132,16 +132,25 @@ bool BoxScroller::tryDropIntoAbs(SWT_Abstraction* const abs,
 
 BoxScroller::DropTarget BoxScroller::getClosestDropTarget(const int yPos) {
     const int idAtPos = yPos / MIN_WIDGET_DIM;
-    bool dropOn = false;
-    {
-        const qreal posFrac = qreal(yPos)/MIN_WIDGET_DIM;
-        if(qAbs(qRound(posFrac) - posFrac) > 0.333) dropOn = true;
-    }
     DropTarget target;
     if(idAtPos >= 0 && idAtPos < mSingleWidgets.count()) {
         const auto bsw = static_cast<BoxSingleWidget*>(mSingleWidgets.at(idAtPos));
-        if(!bsw->isHidden() && bsw->getTargetAbstraction()) {
+        if(bsw->isHidden()) {
+            const int nChildren = mMainAbstraction->childrenCount();
+            if(tryDropIntoAbs(mMainAbstraction, nChildren, target)) {
+                mCurrentDragRect = QRect(0, mNVisible*MIN_WIDGET_DIM, width(), 1);
+                return target;
+            }
+        } else if(bsw->getTargetAbstraction()) {
             const auto abs = bsw->getTargetAbstraction();
+            const bool above = yPos % MIN_WIDGET_DIM < MIN_WIDGET_DIM*0.5;
+            bool dropOn = false;
+            {
+                const qreal posFrac = qreal(yPos)/MIN_WIDGET_DIM;
+                if(qAbs(qRound(posFrac) - posFrac) > 0.333) dropOn = true;
+                if(!above && abs->contentVisible() &&
+                   abs->childrenCount() > 0) dropOn = true;
+            }
             for(const bool iDropOn : {dropOn, !dropOn}) {
                 if(iDropOn) {
                     if(abs->getTarget()->SWT_dropSupport(mCurrentMimeData)) {
@@ -151,11 +160,10 @@ BoxScroller::DropTarget BoxScroller::getClosestDropTarget(const int yPos) {
                 } else {
                     const auto parentAbs = abs->getParent();
                     if(parentAbs) {
-                        const bool above = yPos % MIN_WIDGET_DIM < MIN_WIDGET_DIM*0.5;
                         const int id = abs->getIdInParent() + (above ? 0 : 1);
                         if(tryDropIntoAbs(parentAbs, id, target)) {
                             const int y = bsw->y() + (above ? 0 : abs->getHeight());
-                            mCurrentDragRect = QRect(bsw->x(), y,  width(), 0);
+                            mCurrentDragRect = QRect(bsw->x(), y,  width(), 1);
                             return target;
                         }
                     }
@@ -167,12 +175,16 @@ BoxScroller::DropTarget BoxScroller::getClosestDropTarget(const int yPos) {
         const auto bsw = static_cast<BoxSingleWidget*>(mSingleWidgets.at(i));
         if(!bsw->isHidden() && bsw->getTargetAbstraction()) {
             const auto abs = bsw->getTargetAbstraction();
+            if(abs->getTarget()->SWT_dropSupport(mCurrentMimeData)) {
+                mCurrentDragRect = bsw->rect().translated(bsw->pos());
+                return {abs, 0, DropType::on};
+            }
             const auto parentAbs = abs->getParent();
             if(parentAbs) {
                 const int id = abs->getIdInParent() + 1;
                 if(tryDropIntoAbs(parentAbs, id, target)) {
                     const int y = bsw->y() + abs->getHeight();
-                    mCurrentDragRect = QRect(bsw->x(), y, width(), 0);
+                    mCurrentDragRect = QRect(bsw->x(), y, width(), 1);
                     return target;
                 }
             }
@@ -186,7 +198,7 @@ BoxScroller::DropTarget BoxScroller::getClosestDropTarget(const int yPos) {
             if(tryDropIntoAbs(abs, 0, target)) {
                 mCurrentDragRect = QRect(bsw->x() + MIN_WIDGET_DIM,
                                          bsw->y() + MIN_WIDGET_DIM,
-                                         width(), 0);
+                                         width(), 1);
                 return target;
             }
         }

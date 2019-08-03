@@ -83,7 +83,7 @@ public:
         return mIdInParent;
     }
 
-    int getChildrenCount() const {
+    int childrenCount() const {
         return mChildren.count();
     }
 
