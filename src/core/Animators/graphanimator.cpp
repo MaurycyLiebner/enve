@@ -11,7 +11,7 @@ GraphAnimator::GraphAnimator(const QString& name) : Animator(name) {
     graph_updateKeysPath({FrameRange::EMIN, FrameRange::EMAX});
 }
 
-void GraphAnimator::graph_setCtrlsModeForSelectedKeys(const CtrlsMode &mode) {
+void GraphAnimator::graph_setCtrlsModeForSelectedKeys(const CtrlsMode mode) {
     for(const auto& key : anim_mSelectedKeys) {
         GetAsGK(key)->setCtrlsMode(mode);
         anim_updateAfterChangedKey(key);

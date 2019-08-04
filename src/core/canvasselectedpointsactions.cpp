@@ -81,7 +81,7 @@ void Canvas::mergePoints() {
     }
 }
 
-void Canvas::setPointCtrlsMode(const CtrlsMode& mode) {
+void Canvas::setPointCtrlsMode(const CtrlsMode mode) {
     for(const auto& point : mSelectedPoints_d) {
         if(point->isSmartNodePoint()) {
             auto asNodePt = GetAsPtr(point, SmartNodePoint);

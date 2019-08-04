@@ -68,7 +68,7 @@ public:
     void gMouseRelease();
     void graphMousePress(const QPointF &pressPos);
     void graphMiddleRelease();
-    void graphSetCtrlsModeForSelected(const CtrlsMode &mode);
+    void graphSetCtrlsModeForSelected(const CtrlsMode mode);
     void graphDeletePressed();
     void graphResetValueScaleAndMinShown();
     void scheduleGraphUpdateAfterKeysChanged();

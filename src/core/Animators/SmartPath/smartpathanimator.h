@@ -190,7 +190,7 @@ public:
     }
 
     int actionAddNewAtEnd(const QPointF &relPos) {
-        return actionAddNewAtEnd({false, false, CTRLS_SYMMETRIC,
+        return actionAddNewAtEnd({false, false, CTRLS_CORNER,
                                   relPos, relPos, relPos});
     }
 
@@ -371,6 +371,24 @@ public:
     }
 
     void pastePath(const int frame, SmartPath path) {
+        if(!anim_isRecording()) {
+            mBaseValue = path;
+            return prp_afterWholeInfluenceRangeChanged();
+        }
+        const bool pasteClosed = path.isClosed();
+        const bool baseClosed = mBaseValue.isClosed();
+
+        if(pasteClosed != baseClosed) {
+            if(pasteClosed) path.actionOpen();
+            else {
+                for(const auto &key : anim_mKeys) {
+                    const auto spKey = GetAsPtr(key, SmartPathKey);
+                    auto& sp = spKey->getValue();
+                    sp.actionOpen();
+                }
+            }
+        }
+
         const int pasteNodes = path.getNodeCount();
         const int baseNodes = mBaseValue.getNodeCount();
         const int addNodes = pasteNodes - baseNodes;
@@ -391,7 +409,8 @@ public:
             anim_appendKey(newKey);
             key = newKey.get();
         }
-        if(addNodes == 0) anim_updateAfterChangedKey(key);
+        if(addNodes == 0 && pasteClosed == baseClosed)
+            anim_updateAfterChangedKey(key);
         else prp_afterWholeInfluenceRangeChanged();
     }
 protected:

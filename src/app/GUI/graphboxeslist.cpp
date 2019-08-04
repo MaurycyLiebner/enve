@@ -334,7 +334,7 @@ void KeysView::graphConstrainAnimatorCtrlsFrameValues() {
     }
 }
 
-void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode &mode) {
+void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode mode) {
     if(mSelectedKeysAnimators.isEmpty()) return;
 
     for(const auto& anim : mGraphAnimators) {

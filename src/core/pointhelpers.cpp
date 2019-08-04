@@ -82,11 +82,16 @@ void gGetCtrlsSymmetricPos(const QPointF& startPos,
                            const QPointF& endPos,
                            QPointF &newStartPos,
                            QPointF &newEndPos) {
-    const QPointF symStartPos = symmetricToPos(endPos, centerPos);
-    const qreal len1 = pointToLen(symStartPos);
-    const qreal len2 = pointToLen(startPos);
+    const QPointF symEndPos = symmetricToPos(endPos, centerPos);
+    const qreal len1 = pointToLen(symEndPos - centerPos);
+    const qreal len2 = pointToLen(startPos - centerPos);
     const qreal lenSum = len1 + len2;
-    newStartPos = (symStartPos*len1 + startPos*len2)/lenSum;
+    if(isZero4Dec(lenSum)) {
+        newStartPos = centerPos;
+        newEndPos = centerPos;
+        return;
+    }
+    newStartPos = (symEndPos*len1 + startPos*len2)/lenSum;
     newEndPos = symmetricToPos(newStartPos, centerPos);
 }
 
@@ -96,9 +101,14 @@ void gGetCtrlsSmoothPos(const QPointF& startPos,
                         QPointF &newStartPos,
                         QPointF &newEndPos) {
     const QPointF symEndPos = symmetricToPos(endPos, centerPos);
-    const qreal len1 = pointToLen(symEndPos);
-    const qreal len2 = pointToLen(startPos);
+    const qreal len1 = pointToLen(endPos - centerPos);
+    const qreal len2 = pointToLen(startPos - centerPos);
     const qreal lenSum = len1 + len2;
+    if(isZero4Dec(lenSum)) {
+        newStartPos = centerPos;
+        newEndPos = centerPos;
+        return;
+    }
     const QPointF point1Rel = endPos - centerPos;
     const QPointF point2Rel = startPos - centerPos;
     const QPointF newStartDirection =

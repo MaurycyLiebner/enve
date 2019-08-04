@@ -78,7 +78,7 @@ public:
     void setSeparateNodePoint(const bool separateNodePoint);
     bool isSeparateNodePoint();
 
-    void setCtrlsMode(const CtrlsMode &mode);
+    void setCtrlsMode(const CtrlsMode mode);
     void moveC2ToAbsPos(const QPointF &c2);
     void moveC0ToAbsPos(const QPointF &c0);
     void moveC2ToRelPos(const QPointF &c2);

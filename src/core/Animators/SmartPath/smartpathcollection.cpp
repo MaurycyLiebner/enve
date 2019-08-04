@@ -5,6 +5,13 @@
 SmartPathCollection::SmartPathCollection() :
     SmartPathCollectionBase("paths") {}
 
+SmartNodePoint *SmartPathCollection::createNewSubPathAtRelPos(const QPointF &relPos) {
+    const auto newPath = createNewPath();
+    const auto handler = GetAsPtr(newPath->getPointsHandler(),
+                                  PathPointsHandler);
+    return handler->addFirstNode(relPos);
+}
+
 SmartNodePoint *SmartPathCollection::createNewSubPathAtPos(const QPointF &absPos) {
     const auto newPath = createNewPath();
     const auto handler = GetAsPtr(newPath->getPointsHandler(),

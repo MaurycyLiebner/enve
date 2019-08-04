@@ -15,6 +15,8 @@ public:
     SmartPath(const SkPath& path);
     SmartPath(const NodeList& path);
 
+    void actionOpen();
+
     void actionRemoveNode(const int nodeId, const bool approx);
 
     int actionAddFirstNode(const QPointF& c0,
@@ -89,7 +91,7 @@ public:
         node->setC2(c2);
     }
 
-    void actionSetNormalNodeCtrlsMode(const int nodeId, const CtrlsMode& mode) {
+    void actionSetNormalNodeCtrlsMode(const int nodeId, const CtrlsMode mode) {
         Node * const node = mNodesList.at(nodeId);
         if(!node->isNormal()) return;
         mNodesList.setNodeCtrlsMode(node, mode);

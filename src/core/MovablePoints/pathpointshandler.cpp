@@ -45,7 +45,7 @@ void PathPointsHandler::updateAllPoints() {
 }
 
 void PathPointsHandler::setCtrlsMode(const int nodeId,
-                                     const CtrlsMode &mode) {
+                                     const CtrlsMode mode) {
     blockAllPointsUpdate();
     mTargetAnimator->beforeBinaryPathChange();
     targetPath()->actionSetNormalNodeCtrlsMode(nodeId, mode);

@@ -24,21 +24,21 @@ public:
         return mNodes.count();
     }
 
-    void setNodeType(const int nodeId, const Node::NodeType& type) const {
+    void setNodeType(const int nodeId, const Node::NodeType type) const {
         if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodeType(mNodes[nodeId], type);
     }
 
-    void setNodeType(Node * const node, const Node::NodeType& type) const {
+    void setNodeType(Node * const node, const Node::NodeType type) const {
         node->setType(type);
     }
 
-    void setNodeCtrlsMode(const int nodeId, const CtrlsMode& ctrlsMode) {
+    void setNodeCtrlsMode(const int nodeId, const CtrlsMode ctrlsMode) {
         if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodeCtrlsMode(mNodes[nodeId], ctrlsMode);
     }
 
-    void setNodeCtrlsMode(Node * const node, const CtrlsMode& ctrlsMode) {
+    void setNodeCtrlsMode(Node * const node, const CtrlsMode ctrlsMode) {
         node->setCtrlsMode(ctrlsMode);
     }
 

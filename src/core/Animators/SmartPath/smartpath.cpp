@@ -6,6 +6,11 @@ SmartPath::SmartPath(const SkPath &path) {
 
 SmartPath::SmartPath(const NodeList &path) : mNodesList(path) {}
 
+void SmartPath::actionOpen() {
+    if(!isClosed()) return;
+    mNodesList.splitNodeAndDisconnect(getNodeCount() - 1);
+}
+
 void SmartPath::actionRemoveNode(const int nodeId, const bool approx) {
     mNodesList.removeNode(nodeId, approx);
 }

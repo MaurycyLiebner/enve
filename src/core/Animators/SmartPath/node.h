@@ -50,9 +50,9 @@ struct Node {
         mC0 = data.fC0;
         mP1 = data.fP1;
         mC2 = data.fC2;
-        setC0Enabled(data.fC0Enabled);
-        setC2Enabled(data.fC2Enabled);
-        setCtrlsMode(data.fCtrlsMode);
+        mC0Enabled = data.fC0Enabled;
+        mC2Enabled = data.fC0Enabled;
+        mCtrlsMode = data.fCtrlsMode;
     }
 
     static Node sInterpolateNormal(const Node &node1, const Node &node2,
@@ -115,11 +115,11 @@ protected:
         mId = nodeId;
     }
 
-    void setType(const NodeType& type) {
+    void setType(const NodeType type) {
         mType = type;
     }
 
-    void setCtrlsMode(const CtrlsMode& ctrlsMode) {
+    void setCtrlsMode(const CtrlsMode ctrlsMode) {
         mCtrlsMode = ctrlsMode;
         if(ctrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
             gGetCtrlsSymmetricPos(mC0, mP1, mC2, mC0, mC2);

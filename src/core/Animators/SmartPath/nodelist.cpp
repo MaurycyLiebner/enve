@@ -284,14 +284,12 @@ void gCubicTo(const Node& prevNode, const Node& nextNode,
         result.cubicTo(toSkPoint(first.c1()),
                        toSkPoint(first.c2()),
                        toSkPoint(first.p3()));
-        //qDebug() << "Cubic to:" << first.p1();
         seg = div.second;
         lastT = t;
     }
     result.cubicTo(toSkPoint(seg.c1()),
                    toSkPoint(seg.c2()),
                    toSkPoint(seg.p3()));
-    //qDebug() << "Cubic to:" << seg.p1();
     dissolvedTs.clear();
 }
 

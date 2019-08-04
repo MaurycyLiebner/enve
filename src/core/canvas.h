@@ -139,7 +139,7 @@ public:
     void setCanvasMode(const CanvasMode mode);
     void startSelectionAtPoint(const QPointF &pos);
     void moveSecondSelectionPoint(const QPointF &pos);
-    void setPointCtrlsMode(const CtrlsMode& mode);
+    void setPointCtrlsMode(const CtrlsMode mode);
     void setCurrentBoxesGroup(ContainerBox * const group);
 
     void updatePivot();

@@ -13,6 +13,7 @@ void Canvas::setCurrentSmartEndPoint(SmartNodePoint * const point) {
 }
 #include "MovablePoints/pathpointshandler.h"
 #include "Animators/SmartPath/smartpathcollection.h"
+#include "Animators/transformanimator.h"
 
 void Canvas::handleAddSmartPointMousePress(const MouseEvent &e) {
     if(mLastEndPoint ? mLastEndPoint->isHidden(mCurrentMode) : false) {
@@ -32,14 +33,14 @@ void Canvas::handleAddSmartPointMousePress(const MouseEvent &e) {
         mCurrentContainer->addContainedBox(newPath);
         clearBoxesSelection();
         addBoxToSelection(newPath.get());
+        const auto relPos = newPath->mapAbsPosToRel(e.fPos);
+        newPath->getBoxTransformAnimator()->setPosition(relPos.x(), relPos.y());
         const auto newHandler = newPath->getPathAnimator();
-        const auto node = newHandler->createNewSubPathAtPos(
-                    e.fPos);
+        const auto node = newHandler->createNewSubPathAtRelPos({0, 0});
         setCurrentSmartEndPoint(node);
     } else {
         if(!nodePointUnderMouse) {
-            const auto newPoint =
-                    mLastEndPoint->actionAddPointAbsPos(e.fPos);
+            const auto newPoint = mLastEndPoint->actionAddPointAbsPos(e.fPos);
             //newPoint->startTransform();
             setCurrentSmartEndPoint(newPoint);
         } else if(!mLastEndPoint) {
@@ -65,24 +66,16 @@ void Canvas::handleAddSmartPointMouseMove(const MouseEvent &e) {
     if(mFirstMouseMove) mLastEndPoint->startTransform();
     if(mLastEndPoint->hasNextNormalPoint() &&
        mLastEndPoint->hasPrevNormalPoint()) {
-        if(mLastEndPoint->getCtrlsMode() != CtrlsMode::CTRLS_CORNER) {
-            mLastEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
-        }
-        if(mLastEndPoint->isSeparateNodePoint()) {
-            mLastEndPoint->moveC0ToAbsPos(e.fPos);
-        } else {
-            mLastEndPoint->moveC2ToAbsPos(e.fPos);
-        }
+        mLastEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+        mLastEndPoint->setC0Enabled(true);
+        mLastEndPoint->moveC0ToAbsPos(e.fPos);
     } else {
         if(!mLastEndPoint->hasNextNormalPoint() &&
-           !mLastEndPoint->hasPrevNormalPoint()) {
-            if(mLastEndPoint->getCtrlsMode() != CtrlsMode::CTRLS_CORNER) {
-                mLastEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
-            }
+           !mLastEndPoint->hasPrevNormalPoint()) {            
+            mLastEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+            mLastEndPoint->setC2Enabled(true);
         } else {
-            if(mLastEndPoint->getCtrlsMode() != CtrlsMode::CTRLS_SYMMETRIC) {
-                mLastEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
-            }
+            mLastEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
         }
         if(mLastEndPoint->hasNextNormalPoint()) {
             mLastEndPoint->moveC0ToAbsPos(e.fPos);

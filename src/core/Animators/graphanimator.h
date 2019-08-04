@@ -58,7 +58,7 @@ public:
     void graph_changeSelectedKeysFrameAndValueStart(const QPointF &frameVal);
     void graph_changeSelectedKeysFrameAndValue(const QPointF& frameVal);
     void graph_enableCtrlPtsForSelected();
-    void graph_setCtrlsModeForSelectedKeys(const CtrlsMode &mode);
+    void graph_setCtrlsModeForSelectedKeys(const CtrlsMode mode);
     void graph_getSelectedSegments(QList<QList<GraphKey*>> &segments);
 
     void graph_startSelectedKeysTransform();

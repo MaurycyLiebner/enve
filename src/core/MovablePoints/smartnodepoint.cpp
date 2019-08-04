@@ -239,20 +239,26 @@ void SmartNodePoint::drawSk(
            (mode == CanvasMode::ADD_POINT && isSelected())) {
             SkPaint paint;
             paint.setAntiAlias(true);
-            if(mC2Pt->isVisible(mode) || mode == CanvasMode::ADD_POINT) {
+            if(mC2Pt->isVisible(mode)) {
                 drawCtrlPtLine(canvas, mC2Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
                 mC2Pt->drawSk(canvas, mode, invScale, keyOnCurrent);
+            } else if(mode == CanvasMode::ADD_POINT) {
+                drawCtrlPtLine(canvas, mC2Pt->getAbsolutePos(),
+                               qAbsPos, skAbsPos, invScale);
             }
         }
         if((mode == CanvasMode::MOVE_POINT && isPrevNormalSelected()) ||
            (mode == CanvasMode::ADD_POINT && isSelected())) {
             SkPaint paint;
             paint.setAntiAlias(true);
-            if(mC0Pt->isVisible(mode) || mode == CanvasMode::ADD_POINT) {
+            if(mC0Pt->isVisible(mode)) {
                 drawCtrlPtLine(canvas, mC0Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
                 mC0Pt->drawSk(canvas, mode, invScale, keyOnCurrent);
+            } else if(mode == CanvasMode::ADD_POINT) {
+                drawCtrlPtLine(canvas, mC0Pt->getAbsolutePos(),
+                               qAbsPos, skAbsPos, invScale);
             }
         }
     } else if(getType() == Node::DISSOLVED) {
@@ -371,7 +377,7 @@ bool SmartNodePoint::isSeparateNodePoint() {
     return mSeparateNodePoint;
 }
 
-void SmartNodePoint::setCtrlsMode(const CtrlsMode &mode) {
+void SmartNodePoint::setCtrlsMode(const CtrlsMode mode) {
     if(getCtrlsMode() == mode) return;
     currentPath()->actionSetNormalNodeCtrlsMode(getNodeId(), mode);
     updateFromNodeData();

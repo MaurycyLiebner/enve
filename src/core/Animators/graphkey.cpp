@@ -68,7 +68,7 @@ void GraphKey::updateCtrlFromCtrl(const QrealPointType &type) {
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
-void GraphKey::setCtrlsMode(const CtrlsMode &mode) {
+void GraphKey::setCtrlsMode(const CtrlsMode mode) {
     mCtrlsMode = mode;
     const QPointF pos(mRelFrame, getValueForGraph());
     QPointF startPos(getStartFrame(), getStartValue());
@@ -87,7 +87,7 @@ void GraphKey::setCtrlsMode(const CtrlsMode &mode) {
     setEndValueForGraph(endPos.y());
 }
 
-const CtrlsMode &GraphKey::getCtrlsMode() const {
+CtrlsMode GraphKey::getCtrlsMode() const {
     return mCtrlsMode;
 }
 

@@ -30,7 +30,7 @@ public:
     }
 
     // actions on NORMAL
-    void setCtrlsMode(const int nodeId, const CtrlsMode& mode);
+    void setCtrlsMode(const int nodeId, const CtrlsMode mode);
     void removeNode(const int nodeId, const bool approx);
     SmartNodePoint *addNewAtEnd(const QPointF &relPos);
     SmartNodePoint *addFirstNode(const QPointF &relPos);

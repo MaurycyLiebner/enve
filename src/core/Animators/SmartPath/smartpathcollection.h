@@ -22,6 +22,7 @@ public:
         return newPath.get();
     }
 
+    SmartNodePoint * createNewSubPathAtRelPos(const QPointF &relPos);
     SmartNodePoint * createNewSubPathAtPos(const QPointF &absPos);
 
     void moveAllFrom(SmartPathCollection * const from) {
