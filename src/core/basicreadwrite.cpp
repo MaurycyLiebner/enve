@@ -52,7 +52,7 @@ bool gWrite(QIODevice *dst, const qCubicSegment1D &value) {
     return dst->write(rcConstChar(&value), sizeof(qCubicSegment1D)) > 0;
 }
 
-#include "Animators/SmartPath/smartpathcontainer.h"
+#include "Animators/SmartPath/smartpath.h"
 bool gRead(QIODevice *src, SmartPath &value) {
     return value.read(src);
 }

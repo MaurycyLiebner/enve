@@ -1,5 +1,5 @@
-#ifndef SMARTPATHCONTAINER_H
-#define SMARTPATHCONTAINER_H
+#ifndef SMARTPATH_H
+#define SMARTPATH_H
 #include "../../simplemath.h"
 #include "../../skia/skiaincludes.h"
 #include "../../exceptions.h"
@@ -11,7 +11,9 @@
 
 class SmartPath {
 public:
-    SmartPath();
+    SmartPath() = default;
+    SmartPath(const SkPath& path);
+    SmartPath(const NodeList& path);
 
     void actionRemoveNode(const int nodeId, const bool approx);
 
@@ -194,22 +196,21 @@ public:
         return mNodesList.count();
     }
 
-    void assign(const NodeList& src) {
-        mNodesList = src;
-    }
-
-    void assign(NodeList&& src) {
-        mNodesList = std::move(src);
+    void addDissolvedNodes(const int add) {
+        Q_ASSERT(getNodeCount() >= 2);
+        const int n0 = getNodeCount() - 2;
+        const int n1 = n0 + 1;
+        for(int i = 0; i < add; i++)
+            actionInsertNodeBetween(n0, n1, 0.5);
     }
 
     static void sInterpolate(const SmartPath &path1,
                              const SmartPath &path2,
                              const qreal path2Weight,
                              SmartPath& target) {
-        target.assign(NodeList::sInterpolate(
-                      path1.getNodesRef(),
-                      path2.getNodesRef(),
-                      path2Weight));
+        target = NodeList::sInterpolate(path1.getNodesRef(),
+                                        path2.getNodesRef(),
+                                        path2Weight);
     }
 
     bool hasDetached() const {
@@ -247,4 +248,4 @@ private:
     NodeList mLastDetached;
 };
 
-#endif // SMARTPATHCONTAINER_H
+#endif // SMARTPATH_H

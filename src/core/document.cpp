@@ -37,7 +37,7 @@ void Document::replaceClipboard(const stdsptr<Clipboard> &container) {
     fClipboardContainer = container;
 }
 
-Clipboard *Document::getClipboard(const ClipboardType &type) const {
+Clipboard *Document::getClipboard(const ClipboardType type) const {
     if(!fClipboardContainer) return nullptr;
     if(type == fClipboardContainer->getType())
         return fClipboardContainer.get();
@@ -45,7 +45,7 @@ Clipboard *Document::getClipboard(const ClipboardType &type) const {
 }
 
 DynamicPropsClipboard* Document::getDynamicPropsClipboard() const {
-    auto contT = getClipboard(ClipboardType::dynamic_properties);
+    auto contT = getClipboard(ClipboardType::dynamicProperties);
     return static_cast<DynamicPropsClipboard*>(contT);
 }
 
@@ -62,6 +62,11 @@ KeysClipboard* Document::getKeysClipboard() const {
 BoxesClipboard* Document::getBoxesClipboard() const {
     auto contT = getClipboard(ClipboardType::boxes);
     return static_cast<BoxesClipboard*>(contT);
+}
+
+SmartPathClipboard* Document::getSmartPathClipboard() const {
+    auto contT = getClipboard(ClipboardType::smartPath);
+    return static_cast<SmartPathClipboard*>(contT);
 }
 
 void Document::setCanvasMode(const CanvasMode mode) {

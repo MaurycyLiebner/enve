@@ -1,6 +1,6 @@
 #ifndef PATHPOINTSHANDLER_H
 #define PATHPOINTSHANDLER_H
-#include "Animators/SmartPath/smartpathcontainer.h"
+#include "Animators/SmartPath/smartpath.h"
 #include "smartnodepoint.h"
 #include "pointshandler.h"
 class Canvas;

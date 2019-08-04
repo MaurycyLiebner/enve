@@ -1,6 +1,10 @@
-﻿#include "smartpathcontainer.h"
+﻿#include "smartpath.h"
 
-SmartPath::SmartPath() : mNodesList() {}
+SmartPath::SmartPath(const SkPath &path) {
+    setPath(path);
+}
+
+SmartPath::SmartPath(const NodeList &path) : mNodesList(path) {}
 
 void SmartPath::actionRemoveNode(const int nodeId, const bool approx) {
     mNodesList.removeNode(nodeId, approx);

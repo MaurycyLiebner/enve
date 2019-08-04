@@ -67,6 +67,7 @@ public:
     PropertyClipboard* getPropertyClipboard() const;
     KeysClipboard* getKeysClipboard() const;
     BoxesClipboard* getBoxesClipboard() const;
+    SmartPathClipboard* getSmartPathClipboard() const;
 
     void setPath(const QString& path) {
         fEvFile = path;
@@ -124,7 +125,7 @@ public:
                               const UpdateFuncs &updateFuncs,
                               const int visiblePartWidgetId);
 private:
-    Clipboard *getClipboard(const ClipboardType &type) const;
+    Clipboard *getClipboard(const ClipboardType type) const;
 
     void clearGradientRWIds() const;
     void writeGradients(QIODevice * const dst) const;

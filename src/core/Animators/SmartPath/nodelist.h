@@ -8,23 +8,9 @@ class SkPath;
 class NodeList {
     friend class SmartPath;
 protected:
-    NodeList() {}
+    NodeList() = default;
 public:
-    NodeList(NodeList&& other) : mNodes(std::move(other.mNodes)),
-        mClosed(other.mClosed) {}
     NodeList(ListOfNodes&& other) : mNodes(std::move(other)) {}
-
-    NodeList& operator=(const NodeList& other) {
-        mNodes = other.mNodes;
-        mClosed = other.mClosed;
-        return *this;
-    }
-
-    NodeList& operator=(NodeList&& other) {
-        mNodes = std::move(other.mNodes);
-        mClosed = other.mClosed;
-        return *this;
-    }
 
     Node* operator[](const int i) const {
         return mNodes[i];

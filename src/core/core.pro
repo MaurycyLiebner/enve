@@ -49,6 +49,7 @@ QMAKE_CXXFLAGS += -fopenmp
 LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 
 SOURCES += \
+    Animators/SmartPath/smartpath.cpp \
     Animators/coloranimator.cpp \
     Animators/eeffect.cpp \
     Animators/gradient.cpp \
@@ -236,7 +237,6 @@ SOURCES += \
     Animators/SmartPath/node.cpp \
     Animators/SmartPath/nodelist.cpp \
     Animators/SmartPath/smartpathanimator.cpp \
-    Animators/SmartPath/smartpathcontainer.cpp \
     Animators/interpolationanimatort.cpp \
     nodepointvalues.cpp \
     Animators/SmartPath/smartpathcollection.cpp \
@@ -269,6 +269,7 @@ SOURCES += \
     MovablePoints/brushpolypoint.cpp
 
 HEADERS += \
+    Animators/SmartPath/smartpath.h \
     Animators/coloranimator.h \
     Animators/dynamiccomplexanimator.h \
     Animators/eeffect.h \
@@ -465,7 +466,6 @@ HEADERS += \
     Animators/SmartPath/node.h \
     Animators/SmartPath/nodelist.h \
     Animators/SmartPath/smartpathanimator.h \
-    Animators/SmartPath/smartpathcontainer.h \
     Animators/interpolationanimatort.h \
     nodepointvalues.h \
     Animators/SmartPath/smartpathcollection.h \

@@ -5,6 +5,7 @@
 #include <typeindex>
 #include "smartPointers/sharedpointerdefs.h"
 #include "basicreadwrite.h"
+#include "Animators/SmartPath/smartpath.h"
 class QrealAnimator;
 class BoundingBox;
 class ContainerBox;
@@ -15,21 +16,32 @@ class Property;
 typedef QPair<qptr<Animator>, QByteArray> AnimatorKeyDataPair;
 
 enum class ClipboardType : short {
+    misc,
     boxes,
     keys,
     property,
-    dynamic_properties
+    dynamicProperties,
+    smartPath
 };
 
 class Clipboard : public StdSelfRef {
 public:
-    Clipboard(const ClipboardType &type);
-
-    ClipboardType getType();
+    Clipboard(const ClipboardType type);
+    ClipboardType getType() const;
 protected:
     QByteArray mData;
 private:
-    ClipboardType mType;
+    const ClipboardType mType;
+};
+
+class SmartPathClipboard : public Clipboard {
+public:
+    SmartPathClipboard(const SmartPath& path) :
+        Clipboard(ClipboardType::smartPath), mPath(path) {}
+
+    const SmartPath& path() const { return mPath; }
+private:
+    SmartPath mPath;
 };
 
 class BoxesClipboard : public Clipboard {
@@ -42,15 +54,13 @@ public:
 
 class KeysClipboard : public Clipboard {
     friend class StdSelfRef;
+protected:
+    KeysClipboard();
 public:
-    ~KeysClipboard();
-
     void paste(const int pasteFrame, const bool merge,
                const std::function<void(Key*)> &selectAction = nullptr);
 
     void addTargetAnimator(Animator *anim, const QByteArray& keyData);
-protected:
-    KeysClipboard();
 private:
     QList<AnimatorKeyDataPair> mAnimatorData;
 };
@@ -84,7 +94,7 @@ class DynamicPropsClipboard : public Clipboard {
 protected:
     template<typename T>
     DynamicPropsClipboard(const QList<T*>& source) :
-        Clipboard(ClipboardType::dynamic_properties),
+        Clipboard(ClipboardType::dynamicProperties),
         mContentBaseType(std::type_index(typeid(T))) {
         QBuffer dst(&mData);
         dst.open(QIODevice::WriteOnly);

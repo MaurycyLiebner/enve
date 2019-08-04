@@ -25,6 +25,8 @@ public:
 
     bool SWT_isSmartPathAnimator() const { return true; }
 
+    void setupTreeViewMenu(PropertyMenu * const menu);
+
     void drawCanvasControls(SkCanvas * const canvas,
                             const CanvasMode mode,
                             const float invScale) {
@@ -325,15 +327,13 @@ public:
     qsptr<SmartPathAnimator> createFromDetached() {
         if(!hasDetached()) return nullptr;
         const auto baseDetached = mBaseValue.getAndClearLastDetached();
-        SmartPath baseSmartPath;
-        baseSmartPath.assign(baseDetached);
+        SmartPath baseSmartPath(baseDetached);
         const auto newAnim = SPtrCreate(SmartPathAnimator)(baseSmartPath);
         for(const auto &key : anim_mKeys) {
             const auto spKey = GetAsPtr(key, SmartPathKey);
             auto& sp = spKey->getValue();
             const auto keyDetached = sp.getAndClearLastDetached();
-            SmartPath keySmartPath;
-            keySmartPath.assign(keyDetached);
+            SmartPath keySmartPath(keyDetached);
             const auto newKey = SPtrCreate(SmartPathKey)(
                         keySmartPath, key->getRelFrame(), newAnim.get());
             newAnim->anim_appendKey(newKey);
@@ -365,6 +365,35 @@ public:
     }
 
     Mode getMode() const { return mMode; }
+
+    void pastePath(const SmartPath& path) {
+        return pastePath(anim_getCurrentRelFrame(), path);
+    }
+
+    void pastePath(const int frame, SmartPath path) {
+        const int pasteNodes = path.getNodeCount();
+        const int baseNodes = mBaseValue.getNodeCount();
+        const int addNodes = pasteNodes - baseNodes;
+
+        if(addNodes > 0) {
+            for(const auto &key : anim_mKeys) {
+                const auto spKey = GetAsPtr(key, SmartPathKey);
+                auto& sp = spKey->getValue();
+                sp.addDissolvedNodes(addNodes);
+            }
+        } else if(addNodes < 0) {
+            path.addDissolvedNodes(-addNodes);
+        }
+        auto key = anim_getKeyAtRelFrame<SmartPathKey>(frame);
+        if(key) key->assignValue(path);
+        else {
+            const auto newKey = SPtrCreate(SmartPathKey)(path, frame, this);
+            anim_appendKey(newKey);
+            key = newKey.get();
+        }
+        if(addNodes == 0) anim_updateAfterChangedKey(key);
+        else prp_afterWholeInfluenceRangeChanged();
+    }
 protected:
     SmartPath& getBaseValue() {
         return mBaseValue;

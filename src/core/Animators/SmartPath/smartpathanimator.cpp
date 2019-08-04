@@ -26,6 +26,23 @@ SmartPathAnimator::SmartPathAnimator(const SmartPath &baseValue) :
     updateAllPoints();
 }
 
+#include "typemenu.h"
+#include "document.h"
+void SmartPathAnimator::setupTreeViewMenu(PropertyMenu * const menu) {
+    const auto spClipboard = Document::sInstance->getSmartPathClipboard();
+//    if(spClipboard) {
+        menu->addPlainAction("Paste Path", [this, spClipboard]() {
+            pastePath(spClipboard->path());
+        })->setEnabled(spClipboard);
+//    }
+    menu->addPlainAction("Copy Path", [this] {
+        const auto spClipboard = SPtrCreate(SmartPathClipboard)(mBaseValue);
+        Document::sInstance->replaceClipboard(spClipboard);
+    });
+    menu->addSeparator();
+    Animator::setupTreeViewMenu(menu);
+}
+
 void SmartPathAnimator::readProperty(QIODevice * const src) {
     readKeys(src);
     gRead(src, mBaseValue);

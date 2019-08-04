@@ -71,32 +71,28 @@ SkPaint::Join QJoinToSkJoin(const Qt::PenJoinStyle &join) {
 SkPath toSkPath(const QPainterPath &qPath) {
     SkPath path;
     bool firstOther = false;
+    SkPoint movePt;
     SkPoint endPt;
     SkPoint startPt;
-    for(int i = 0; i < qPath.elementCount(); i++) {
+    const int iMax = qPath.elementCount() - 1;
+    for(int i = 0; i <= iMax; i++) {
         const QPainterPath::Element &elem = qPath.elementAt(i);
-
+        const SkPoint toPt{toSkScalar(elem.x), toSkScalar(elem.y)};
         if(elem.isMoveTo()) { // move
-            path.moveTo(toSkScalar(elem.x),
-                        toSkScalar(elem.y));
+            movePt = toPt;
+            path.moveTo(movePt);
         } else if(elem.isLineTo()) { // line
-            path.lineTo(toSkScalar(elem.x),
-                        toSkScalar(elem.y));
+            path.lineTo(toPt);
         } else if(elem.isCurveTo()) { // curve
-            endPt = SkPoint::Make(toSkScalar(elem.x),
-                                  toSkScalar(elem.y));
+            endPt = toPt;
             firstOther = true;
         } else { // other
-            if(firstOther) {
-                startPt = SkPoint::Make(toSkScalar(elem.x),
-                                        toSkScalar(elem.y));
-            } else {
-                path.cubicTo(endPt, startPt,
-                             SkPoint::Make(toSkScalar(elem.x),
-                                           toSkScalar(elem.y)));
-            }
+            if(firstOther) startPt = toPt;
+            else path.cubicTo(endPt, startPt, toPt);
             firstOther = !firstOther;
         }
+        if(i == iMax && SkPoint::Distance(movePt, toPt) < 0.001f)
+            path.close();
     }
     return path;
 }

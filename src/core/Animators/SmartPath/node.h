@@ -152,11 +152,9 @@ private:
 #include "smartPointers/stdselfref.h"
 class ListOfNodes {
 public:
-    ListOfNodes() {}
+    ListOfNodes() = default;
     ListOfNodes(ListOfNodes&& other) : mList(std::move(other.mList)) {}
-    ListOfNodes(const ListOfNodes& other) {
-        deepCopyFrom(other);
-    }
+    ListOfNodes(const ListOfNodes& other) { deepCopyFrom(other); }
 
     ListOfNodes& operator=(const ListOfNodes& other) {
         deepCopyFrom(other);

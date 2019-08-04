@@ -3,7 +3,7 @@
 #include "MovablePoints/nonanimatedmovablepoint.h"
 #include "nodepointvalues.h"
 #include "segment.h"
-#include "Animators/SmartPath/smartpathcontainer.h"
+#include "Animators/SmartPath/smartpath.h"
 #include "Properties/property.h"
 class UndoRedoStack;
 class SkCanvas;

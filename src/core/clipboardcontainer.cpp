@@ -7,13 +7,9 @@
 #include "Properties/boxtargetproperty.h"
 #include "castmacros.h"
 
-Clipboard::Clipboard(const ClipboardType &type) {
-    mType = type;
-}
+Clipboard::Clipboard(const ClipboardType type) : mType(type) {}
 
-ClipboardType Clipboard::getType() {
-    return mType;
-}
+ClipboardType Clipboard::getType() const { return mType; }
 
 BoxesClipboard::BoxesClipboard(const QList<BoundingBox*> &src) :
     Clipboard(ClipboardType::boxes) {
@@ -50,14 +46,7 @@ void BoxesClipboard::pasteTo(ContainerBox* const parent) {
     }
 }
 
-KeysClipboard::KeysClipboard() :
-    Clipboard(ClipboardType::keys) {
-
-}
-
-KeysClipboard::~KeysClipboard() {
-
-}
+KeysClipboard::KeysClipboard() : Clipboard(ClipboardType::keys) {}
 
 void KeysClipboard::paste(const int pasteFrame, const bool merge,
                           const std::function<void(Key*)>& selectAction) {

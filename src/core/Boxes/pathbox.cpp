@@ -405,16 +405,22 @@ void PathBox::applyPaintSetting(const PaintSettingsApplier &setting) {
     setting.apply(this);
 }
 
-void PathBox::copyPathBoxDataTo(PathBox * const targetBox) {
+template <typename B, typename T>
+void writeReadMember(B* const from, B* const to, const T member) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
-    PathBox::writeBoundingBox(&buffer);
-    BoundingBox::sClearWriteBoxes();
-
-    targetBox->PathBox::readBoundingBox(&buffer);
+    (from->*member)->writeProperty(&buffer);
+    buffer.seek(0);
+    (to->*member)->readProperty(&buffer);
     buffer.close();
+}
 
-    BoundingBox::sClearReadBoxes();
+void PathBox::copyPathBoxDataTo(PathBox * const targetBox) {
+    writeReadMember(this, targetBox, &PathBox::mTransformAnimator);
+    writeReadMember(this, targetBox, &PathBox::mFillSettings);
+    writeReadMember(this, targetBox, &PathBox::mStrokeSettings);
+    writeReadMember(this, targetBox, &PathBox::mPathEffectsAnimators);
+    writeReadMember(this, targetBox, &PathBox::mRasterEffectsAnimators);
 }
 
 bool PathBox::differenceInPathBetweenFrames(const int frame1, const int frame2) const {
@@ -460,13 +466,14 @@ bool PathBox::differenceInFillPathBetweenFrames(const int frame1, const int fram
 SmartVectorPath *PathBox::objectToVectorPathBox() {
     if(SWT_isSmartVectorPath()) return nullptr;
     auto newPath = SPtrCreate(SmartVectorPath)();
+
     if(SWT_isCircle()) {
-        QPainterPath pathT;
-        const auto circleT = GetAsPtr(this, Circle);
-        pathT.addEllipse(QPointF(0, 0),
-                         circleT->getCurrentXRadius(),
-                         circleT->getCurrentYRadius());
-        newPath->loadSkPath(toSkPath(pathT));
+        QPainterPath path;
+        const auto circle = GetAsPtr(this, Circle);
+        path.addEllipse(circle->getRelCenterPosition(),
+                        circle->getCurrentXRadius(),
+                        circle->getCurrentYRadius());
+        newPath->loadSkPath(toSkPath(path));
     } else {
         newPath->loadSkPath(mEditPathSk);
     }
