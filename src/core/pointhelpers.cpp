@@ -77,6 +77,23 @@ qreal gTFromX(const qCubicSegment1D &seg,
     return guessT;
 }
 
+bool gIsSymmetric(const QPointF &startPos,
+                  const QPointF &centerPos,
+                  const QPointF &endPos,
+                  const qreal threshold) {
+    const auto sC0 = symmetricToPos(startPos, centerPos);
+    return pointToLen(sC0 - endPos) < threshold;
+}
+
+bool gIsSmooth(const QPointF &startPos,
+               const QPointF &centerPos,
+               const QPointF &endPos,
+               const qreal threshold) {
+    const auto sC0 = symmetricToPosNewLen(startPos, centerPos,
+                                          pointToLen(endPos - centerPos));
+    return pointToLen(sC0 - endPos) < threshold;
+}
+
 void gGetCtrlsSymmetricPos(const QPointF& startPos,
                            const QPointF& centerPos,
                            const QPointF& endPos,

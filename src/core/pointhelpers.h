@@ -46,6 +46,16 @@ extern qreal gSolveForP2(const qreal p0, const qreal p1,
                          const qreal p3, const qreal t,
                          const qreal value);
 
+extern bool gIsSymmetric(const QPointF& startPos,
+                         const QPointF& centerPos,
+                         const QPointF& endPos,
+                         const qreal threshold = 0.01);
+
+extern bool gIsSmooth(const QPointF& startPos,
+                      const QPointF& centerPos,
+                      const QPointF& endPos,
+                      const qreal threshold = 0.01);
+
 extern void gGetCtrlsSymmetricPos(const QPointF& startPos,
                                   const QPointF& centerPos,
                                   const QPointF& endPos,

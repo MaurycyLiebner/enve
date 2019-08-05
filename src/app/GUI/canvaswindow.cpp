@@ -428,7 +428,12 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                      [this]() { releaseMouse(); },
                      [this]() { grabMouse(); },
                      this);
+    if(isMouseGrabber() && event->type() == QEvent::KeyRelease) {
+        mCurrentCanvas->handleModifierChange(e);
+        return false;
+    }
     if(isMouseGrabber()) {
+        if(mCurrentCanvas->handleModifierChange(e)) return false;
         if(mCurrentCanvas->handleTransormationInputKeyEvent(e)) return true;
     }
     if(mCurrentCanvas->handlePaintModeKeyPress(e)) return true;

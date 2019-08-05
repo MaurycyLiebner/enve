@@ -232,6 +232,7 @@ stdsptr<KeysClipboard> KeysView::getSelectedKeysClipboardContainer() {
 }
 
 bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
+    if(event->type() == QEvent::KeyRelease) return false;
     bool inputHandled = false;
     if(mMovingKeys) {
         if(mValueInput.handleTransormationInputKeyEvent(event->key())) {

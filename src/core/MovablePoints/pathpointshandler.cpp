@@ -157,3 +157,17 @@ void PathPointsHandler::removeSegment(const NormalSegment &segment) {
         spColl->addChild(newAnim);
     }
 }
+
+SmartNodePoint *PathPointsHandler::getClosestNode(
+        const QPointF &absPos, const qreal &maxDist) const {
+    SmartNodePoint* result = nullptr;
+    qreal minDist = maxDist;
+    for(int i = 0; i < count(); i++) {
+        const auto sNode = getPointWithId<SmartNodePoint>(i);
+        const qreal dist = pointToLen(sNode->getAbsolutePos() - absPos);
+        if(dist > minDist) continue;
+        minDist = dist;
+        result = sNode;
+    }
+    return result;
+}

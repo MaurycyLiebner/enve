@@ -1,4 +1,4 @@
-#ifndef SMARTCTRLPOINT_H
+﻿#ifndef SMARTCTRLPOINT_H
 #define SMARTCTRLPOINT_H
 #include "MovablePoints/nonanimatedmovablepoint.h"
 class SmartNodePoint;
@@ -21,6 +21,8 @@ public:
 
     bool isVisible(const CanvasMode mode) const;
     void scale(const qreal sx, const qreal sy);
+
+    bool enabled() const;
 
     void setOtherCtrlPt(SmartCtrlPoint * const ctrlPt);
 private:

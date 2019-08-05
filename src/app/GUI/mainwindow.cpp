@@ -274,7 +274,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
 
-    QApplication::instance()->installEventFilter(this);
+    installEventFilter(this);
 }
 
 MainWindow::~MainWindow() {
@@ -968,6 +968,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
               return processKeyEvent(keyEvent);
         }
     } else if(type == QEvent::KeyRelease) {
+        const auto keyEvent = static_cast<QKeyEvent*>(e);
+        if(processKeyEvent(keyEvent)) return true;
         //finishUndoRedoSet();
     } else if(type == QEvent::MouseButtonRelease) {
         //finishUndoRedoSet();
@@ -976,9 +978,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
 }
 
 void MainWindow::closeEvent(QCloseEvent *e) {
-    if(!closeProject()) {
-        e->ignore();
-    }
+    if(!closeProject()) e->ignore();
 }
 
 bool MainWindow::processKeyEvent(QKeyEvent *event) {

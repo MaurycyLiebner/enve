@@ -32,6 +32,12 @@ void SmartCtrlPoint::scale(const qreal sx, const qreal sy) {
     setRelativePos(mat.map(savedValue) + mParentPoint_k->getRelativePos());
 }
 
+bool SmartCtrlPoint::enabled() const {
+    if(mCtrlType == C0) return mParentPoint_k->getC0Enabled();
+    // if(mCtrlType == C2)
+    else return mParentPoint_k->getC2Enabled();
+}
+
 void SmartCtrlPoint::startTransform() {
     NonAnimatedMovablePoint::startTransform();
     if(mParentPoint_k->getCtrlsMode() != CTRLS_CORNER) {

@@ -488,6 +488,7 @@ QPointF Canvas::getMoveByValueForEvent(const MouseEvent &e) {
 #include <QApplication>
 #include "MovablePoints/smartctrlpoint.h"
 #include "MovablePoints/pathpointshandler.h"
+#include "Boxes/smartvectorpath.h"
 void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
     if(mRotPivot->isSelected()) {
         if(mFirstMouseMove) mRotPivot->startTransform();
@@ -502,22 +503,60 @@ void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
     } else {
         if(mPressedPoint) {
             addPointToSelection(mPressedPoint);
-
-            const auto keyMods = QApplication::queryKeyboardModifiers();
-            const bool ctrlPressed = keyMods.testFlag(Qt::ControlModifier);
-            if(ctrlPressed && mPressedPoint->isSmartNodePoint()) {
-                const auto nodePt = GetAsPtr(mPressedPoint,
-                                             SmartNodePoint);
-                if(nodePt->isDissolved()) {
-                    const int selId = nodePt->moveToClosestSegment(e.fPos);
-                    const auto handler = nodePt->getHandler();
-                    const auto dissPt = handler->getPointWithId<SmartNodePoint>(selId);
-                    if(nodePt->getNodeId() != selId) {
-                        removePointFromSelection(nodePt);
-                        addPointToSelection(dissPt);
+            const auto mods = QGuiApplication::queryKeyboardModifiers();
+            if(mPressedPoint->isSmartNodePoint()) {
+                if(mods & Qt::ControlModifier) {
+                    const auto nodePt = GetAsPtr(mPressedPoint, SmartNodePoint);
+                    if(nodePt->isDissolved()) {
+                        const int selId = nodePt->moveToClosestSegment(e.fPos);
+                        const auto handler = nodePt->getHandler();
+                        const auto dissPt = handler->getPointWithId<SmartNodePoint>(selId);
+                        if(nodePt->getNodeId() != selId) {
+                            removePointFromSelection(nodePt);
+                            addPointToSelection(dissPt);
+                        }
+                        mPressedPoint = dissPt;
+                        return;
                     }
-                    mPressedPoint = dissPt;
-                    return;
+                } else if(mods & Qt::ShiftModifier) {
+                    const auto nodePt = GetAsPtr(mPressedPoint, SmartNodePoint);
+                    const auto nodePtAnim = nodePt->getTargetAnimator();
+                    if(nodePt->isNormal()) {
+                        SmartNodePoint* closestNode = nullptr;
+                        qreal minDist = 10/e.fScale;
+                        for(const auto& sBox : mSelectedBoxes) {
+                            if(!sBox->SWT_isSmartVectorPath()) continue;
+                            const auto sPatBox = GetAsPtr(sBox, SmartVectorPath);
+                            const auto sAnim = sPatBox->getPathAnimator();
+                            for(int i = 0; i < sAnim->ca_getNumberOfChildren(); i++) {
+                                const auto sPath = sAnim->getChild(i);
+                                if(sPath == nodePtAnim) continue;
+                                const auto sHandler = static_cast<PathPointsHandler*>(sPath->getPointsHandler());
+                                const auto node = sHandler->getClosestNode(e.fPos, minDist);
+                                if(node) {
+                                    closestNode = node;
+                                    minDist = pointToLen(closestNode->getAbsolutePos() - e.fPos);
+                                }
+                            }
+                        }
+                        if(closestNode) {
+                            const bool reverse = mods & Qt::ALT;
+
+                            const auto sC0 = reverse ? closestNode->getC2Pt() : closestNode->getC0Pt();
+                            const auto sC2 = reverse ? closestNode->getC0Pt() : closestNode->getC2Pt();
+
+                            nodePt->setCtrlsMode(closestNode->getCtrlsMode());
+                            nodePt->setC0Enabled(sC0->enabled());
+                            nodePt->setC2Enabled(sC2->enabled());
+                            nodePt->setAbsolutePos(closestNode->getAbsolutePos());
+                            nodePt->getC0Pt()->setAbsolutePos(sC0->getAbsolutePos());
+                            nodePt->getC2Pt()->setAbsolutePos(sC2->getAbsolutePos());
+                        } else {
+                            if(mFirstMouseMove) mPressedPoint->startTransform();
+                            mPressedPoint->moveByAbs(getMoveByValueForEvent(e));
+                        }
+                        return;
+                    }
                 }
             }
 

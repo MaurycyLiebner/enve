@@ -43,6 +43,10 @@ public:
         ca_removeChild(child);
     }
 
+    T* getChild(const int index) const {
+        return ca_getChildAt<T>(index);
+    }
+
     qsptr<T> takeChildAt(const int index) {
         return GetAsSPtrTemplated(ca_takeChildAt(index), T);
     }

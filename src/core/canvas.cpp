@@ -219,10 +219,11 @@ void Canvas::renderSk(SkCanvas * const canvas,
     if(!mCurrentContainer->SWT_isCanvas())
         mCurrentContainer->drawBoundingRect(canvas, invZoom);
     if(!mPaintTarget.isValid()) {
-        for(const auto& box : mSelectedBoxes) {
+        for(int i = mSelectedBoxes.count() - 1; i >= 0; i--) {
+            const auto& iBox = mSelectedBoxes.at(i);
             canvas->save();
-            box->drawBoundingRect(canvas, invZoom);
-            box->drawAllCanvasControls(canvas, mCurrentMode, invZoom);
+            iBox->drawBoundingRect(canvas, invZoom);
+            iBox->drawAllCanvasControls(canvas, mCurrentMode, invZoom);
             canvas->restore();
         }
     }
@@ -554,10 +555,21 @@ bool Canvas::handlePaintModeKeyPress(const KeyEvent &e) {
     return true;
 }
 
+bool Canvas::handleModifierChange(const KeyEvent &e) {
+    if(mCurrentMode == CanvasMode::MOVE_POINT) {
+        if(e.fKey == Qt::Key_Alt ||
+           e.fKey == Qt::Key_Shift ||
+           e.fKey == Qt::Key_Meta) {
+            handleMovePointMouseMove(e);
+            return true;
+        }
+    }
+    return false;
+}
+
 bool Canvas::handleTransormationInputKeyEvent(const KeyEvent &e) {
     if(mValueInput.handleTransormationInputKeyEvent(e.fKey)) {
-        if(mTransMode == MODE_ROTATE)
-            mValueInput.setupRotate();
+        if(mTransMode == MODE_ROTATE) mValueInput.setupRotate();
         updateTransformation(e);
     } else if(e.fKey == Qt::Key_Escape) {
         cancelCurrentTransform();
@@ -571,10 +583,7 @@ bool Canvas::handleTransormationInputKeyEvent(const KeyEvent &e) {
     } else if(e.fKey == Qt::Key_Y) {
         mValueInput.switchYOnlyMode();
         updateTransformation(e);
-    } else {
-        return false;
-    }
-
+    } else return false;
     return true;
 }
 

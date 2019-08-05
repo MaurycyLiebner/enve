@@ -74,6 +74,8 @@ public:
         return getPointWithId<SmartNodePoint>(normalId);
     }
 
+    SmartNodePoint* getClosestNode(const QPointF& absPos, const qreal& maxDist) const;
+
     void updateAllPoints();
 
     const SmartPathAnimator * getAnimator() {

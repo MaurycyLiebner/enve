@@ -88,7 +88,6 @@ public:
     QPointF fLastPressPos;
     bool fMouseGrabbing;
     qreal fScale;
-    CanvasMode fMode;
     QPoint fGlobalPos;
     Qt::MouseButton fButton;
     Qt::MouseButtons fButtons;
@@ -114,8 +113,10 @@ struct KeyEvent : public MouseEvent {
       MouseEvent(pos, lastPos, lastPressPos, mouseGrabbing,
                  scale, globalPos, Qt::NoButton,
                  buttons, e->modifiers(), e->timestamp(),
-                 releaseMouse, grabMouse, widget), fKey(e->key()) {}
+                 releaseMouse, grabMouse, widget),
+                 fType(e->type()), fKey(e->key()) {}
 
+    QEvent::Type fType;
     int fKey;
 };
 
@@ -553,6 +554,7 @@ public:
     void selectAllBoxesAction();
     void selectAllPointsAction();
     bool handlePaintModeKeyPress(const KeyEvent &e);
+    bool handleModifierChange(const KeyEvent &e);
     bool handleTransormationInputKeyEvent(const KeyEvent &e);
 
     void setCurrentGroupParentAsCurrentGroup();
