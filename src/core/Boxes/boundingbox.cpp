@@ -648,8 +648,6 @@ void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
         };
         RasterEffectsMenu->addPlainAction(creator->fName, op);
     }
-
-    menu->addSeparator();
 }
 
 

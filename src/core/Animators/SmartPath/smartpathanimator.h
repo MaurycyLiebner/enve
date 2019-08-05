@@ -392,7 +392,6 @@ public:
         const int pasteNodes = path.getNodeCount();
         const int baseNodes = mBaseValue.getNodeCount();
         const int addNodes = pasteNodes - baseNodes;
-
         if(addNodes > 0) {
             for(const auto &key : anim_mKeys) {
                 const auto spKey = GetAsPtr(key, SmartPathKey);
@@ -402,6 +401,7 @@ public:
         } else if(addNodes < 0) {
             path.addDissolvedNodes(-addNodes);
         }
+
         auto key = anim_getKeyAtRelFrame<SmartPathKey>(frame);
         if(key) key->assignValue(path);
         else {
@@ -409,9 +409,7 @@ public:
             anim_appendKey(newKey);
             key = newKey.get();
         }
-        if(addNodes == 0 && pasteClosed == baseClosed)
-            anim_updateAfterChangedKey(key);
-        else prp_afterWholeInfluenceRangeChanged();
+        anim_updateAfterChangedKey(key);
     }
 protected:
     SmartPath& getBaseValue() {

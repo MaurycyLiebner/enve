@@ -109,11 +109,11 @@ public:
     }
 protected:
     void addedActionsForType(Type * const obj) {
-        mTypeIndex.append(std::type_index(typeid(obj)));
+        mTypeIndex.append(std::type_index(typeid(*obj)));
     }
 
     bool hasActionsForType(Type * const obj) const {
-        return mTypeIndex.contains(std::type_index(typeid(obj)));
+        return mTypeIndex.contains(std::type_index(typeid(*obj)));
     }
 private:
     template <typename U>

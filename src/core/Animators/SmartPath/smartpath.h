@@ -198,6 +198,10 @@ public:
         return mNodesList.count();
     }
 
+    int normalNodeCount() const {
+        return mNodesList.normalCount();
+    }
+
     void addDissolvedNodes(const int add) {
         Q_ASSERT(getNodeCount() >= 2);
         const int n0 = getNodeCount() - 2;

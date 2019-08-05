@@ -511,22 +511,19 @@ void Animator::drawTimelineControls(QPainter * const p,
 
 #include "typemenu.h"
 void Animator::setupTreeViewMenu(PropertyMenu * const menu) {
-    const PropertyMenu::PlainSelectedOp<Animator> eOp = [](Animator*) {};
-    if(anim_getKeyOnCurrentFrame()) {
-        menu->addPlainAction("Add Key", eOp)->setDisabled(true);
-        const PropertyMenu::PlainSelectedOp<Animator> op =
-        [](Animator * animTarget) {
-            animTarget->anim_deleteCurrentKey();
-        };
-        menu->addPlainAction("Delete Key", op);
-    } else {
-        const PropertyMenu::PlainSelectedOp<Animator> op =
-        [](Animator * animTarget) {
-            animTarget->anim_saveCurrentValueAsKey();
-        };
-        menu->addPlainAction("Add Key", op);
-        menu->addPlainAction("Delete Key", eOp)->setDisabled(true);
-    }
+    Property::setupTreeViewMenu(menu);
+    menu->addSeparator();
+    const PropertyMenu::PlainSelectedOp<Animator> aOp =
+    [](Animator * animTarget) {
+        animTarget->anim_saveCurrentValueAsKey();
+    };
+    menu->addPlainAction("Add Key", aOp)->setDisabled(anim_getKeyOnCurrentFrame());
+
+    const PropertyMenu::PlainSelectedOp<Animator> dOp =
+    [](Animator * animTarget) {
+        animTarget->anim_deleteCurrentKey();
+    };
+    menu->addPlainAction("Delete Key", dOp)->setEnabled(anim_getKeyOnCurrentFrame());
 }
 
 bool Animator::hasSelectedKeys() const {

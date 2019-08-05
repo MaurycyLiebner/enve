@@ -98,7 +98,7 @@ void KeysClipboard::addTargetAnimator(
 
 PropertyClipboard::PropertyClipboard(const Property* const source) :
     Clipboard(ClipboardType::property),
-    mContentType(std::type_index(typeid(source))) {
+    mContentType(std::type_index(typeid(*source))) {
     QBuffer dst(&mData);
     dst.open(QIODevice::WriteOnly);
     source->writeProperty(&dst);

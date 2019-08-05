@@ -24,6 +24,14 @@ public:
         return mNodes.count();
     }
 
+    int normalCount() const {
+        int result = 0;
+        for(const auto& node : mNodes) {
+            if(node->isNormal()) result++;
+        }
+        return result;
+    }
+
     void setNodeType(const int nodeId, const Node::NodeType type) const {
         if(nodeId < 0 || nodeId >= mNodes.count()) return;
         setNodeType(mNodes[nodeId], type);

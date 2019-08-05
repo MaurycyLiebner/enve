@@ -4,6 +4,7 @@
 #include "undoredo.h"
 #include "Animators/transformanimator.h"
 #include "typemenu.h"
+#include "document.h"
 
 Property::Property(const QString& name) :
     prp_mName(name) {}
@@ -22,10 +23,14 @@ void Property::drawCanvasControls(SkCanvas * const canvas,
 }
 
 void Property::setupTreeViewMenu(PropertyMenu * const menu) {
-    //auto clipboard = Document::sInstance->getPropertyClipboard();
+    const auto clipboard = Document::sInstance->getPropertyClipboard();
+    const bool compat = clipboard && clipboard->compatibleTarget(this);
+    menu->addPlainAction("Paste", [this, clipboard]() {
+        clipboard->paste(this);
+    })->setEnabled(compat);
     menu->addPlainAction("Copy", [this]() {
-        //const auto container = SPtrCreate(PropertyClipboard)(this);
-        //Document::sInstance->replaceClipboard(container);
+        const auto clipboard = SPtrCreate(PropertyClipboard)(this);
+        Document::sInstance->replaceClipboard(clipboard);
     });
 }
 

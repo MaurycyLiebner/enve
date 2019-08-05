@@ -20,7 +20,8 @@ qsptr<BoundingBox> ImportHandler::import(const QString &path) const {
             try {
                 return importer->import(info);
             } catch(...) {
-                RuntimeThrow("Importer " + typeid(importer.get()).name() + " failed.");
+                const auto imp = importer.get();
+                RuntimeThrow("Importer " + typeid(*imp).name() + " failed.");
             }
         }
     }

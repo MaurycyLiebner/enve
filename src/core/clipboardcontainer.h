@@ -80,7 +80,7 @@ public:
 
     template<typename T>
     bool compatibleTarget(T* const obj) const {
-        return mContentType == std::type_index(typeid(obj));
+        return mContentType == std::type_index(typeid(*obj));
     }
 private:
     const std::type_index mContentType;
