@@ -47,6 +47,7 @@ SOURCES += main.cpp\
     GUI/canvaswindowevents.cpp \
     GUI/canvaswindowwrapper.cpp \
     GUI/changewidthwidget.cpp \
+    GUI/ekeyfilter.cpp \
     GUI/ewidgetsimpl.cpp \
     GUI/layoutcollection.cpp \
     GUI/layouthandler.cpp \
@@ -138,6 +139,7 @@ HEADERS  += \
     GUI/audiohandler.h \
     GUI/canvaswindowwrapper.h \
     GUI/changewidthwidget.h \
+    GUI/ekeyfilter.h \
     GUI/ewidgetsimpl.h \
     GUI/layoutcollection.h \
     GUI/layouthandler.h \

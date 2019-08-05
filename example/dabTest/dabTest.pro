@@ -59,3 +59,6 @@ unix {
 
 DISTFILES += \
     normal.frag
+
+RESOURCES += \
+    resources.qrc

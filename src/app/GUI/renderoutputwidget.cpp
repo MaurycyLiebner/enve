@@ -2,22 +2,22 @@
 #include <QFileDialog>
 #include <QLineEdit>
 
-RenderOutputWidget::RenderOutputWidget(const qreal canvasWidth,
-                                       const qreal canvasHeight,
+RenderOutputWidget::RenderOutputWidget(const int canvasWidth,
+                                       const int canvasHeight,
                                        QWidget *parent) : QDialog(parent) {
     mCanvasWidth = canvasWidth;
     mCanvasHeight = canvasHeight;
 
     mPathLayout = new QHBoxLayout();
-    mPathLabel = new QLabel("/home/ailuropoda/tmp", this);
+    mPathLabel = new QLabel(QDir::homePath(), this);
     mPathLayout->addWidget(mPathLabel);
     mSelectPathButton = new QPushButton("...", this);
     mPathLayout->addWidget(mSelectPathButton);
     mRenderButton = new QPushButton("Render", this);
-    connect(mSelectPathButton, SIGNAL(pressed()),
-            this, SLOT(chooseDir()));
-    connect(mRenderButton, SIGNAL(pressed()),
-            this, SLOT(emitRender()) );
+    connect(mSelectPathButton, &QPushButton::pressed,
+            this, &RenderOutputWidget::chooseDir);
+    connect(mRenderButton, &QPushButton::pressed,
+            this, &RenderOutputWidget::emitRender);
     mMainLayout = new QVBoxLayout(this);
     setLayout(mMainLayout);
 
@@ -71,21 +71,21 @@ qreal RenderOutputWidget::getCurrentResolution() {
 }
 
 void RenderOutputWidget::connectSignals() {
-    connect(mHeightSpinBox, SIGNAL(valueChanged(int)),
-            this, SLOT(updateSizeBoxesFromHeight()));
-    connect(mWidthSpinBox, SIGNAL(valueChanged(int)),
-            this, SLOT(updateSizeBoxesFromWidth()));
-    connect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(updateSizeBoxesFromResolution()));
+    connect(mHeightSpinBox, qOverload<int>(&QSpinBox::valueChanged),
+            this, &RenderOutputWidget::updateSizeBoxesFromHeight);
+    connect(mWidthSpinBox, qOverload<int>(&QSpinBox::valueChanged),
+            this, &RenderOutputWidget::updateSizeBoxesFromWidth);
+    connect(mResolutionComboBox, &QComboBox::currentTextChanged,
+            this, &RenderOutputWidget::updateSizeBoxesFromResolution);
 }
 
 void RenderOutputWidget::disconnectSignals() {
-    disconnect(mHeightSpinBox, SIGNAL(valueChanged(int)),
-               this, SLOT(updateSizeBoxesFromHeight()));
-    disconnect(mWidthSpinBox, SIGNAL(valueChanged(int)),
-               this, SLOT(updateSizeBoxesFromWidth()));
-    disconnect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
-               this, SLOT(updateSizeBoxesFromResolution()));
+    disconnect(mHeightSpinBox, qOverload<int>(&QSpinBox::valueChanged),
+               this, &RenderOutputWidget::updateSizeBoxesFromHeight);
+    disconnect(mWidthSpinBox, qOverload<int>(&QSpinBox::valueChanged),
+               this, &RenderOutputWidget::updateSizeBoxesFromWidth);
+    disconnect(mResolutionComboBox, &QComboBox::currentTextChanged,
+               this, &RenderOutputWidget::updateSizeBoxesFromResolution);
 }
 
 void RenderOutputWidget::emitRender() {
@@ -108,8 +108,8 @@ void RenderOutputWidget::updateSizeBoxesFromHeight() {
     disconnectSignals();
     mCurrentResolutionFrac = mHeightSpinBox->value()/mCanvasHeight;
     mResolutionComboBox->setCurrentText(
-                QString::number((int)(mCurrentResolutionFrac*100)) + " %");
-    mWidthSpinBox->setValue(mCurrentResolutionFrac*mCanvasWidth);
+                QString::number(qRound(mCurrentResolutionFrac*100)) + " %");
+    mWidthSpinBox->setValue(qRound(mCurrentResolutionFrac*mCanvasWidth));
     connectSignals();
 }
 
@@ -117,8 +117,8 @@ void RenderOutputWidget::updateSizeBoxesFromWidth() {
     disconnectSignals();
     mCurrentResolutionFrac = mWidthSpinBox->value()/mCanvasWidth;
     mResolutionComboBox->setCurrentText(
-                QString::number((int)(mCurrentResolutionFrac*100)) + " %");
-    mHeightSpinBox->setValue(mCurrentResolutionFrac*mCanvasHeight);
+                QString::number(qRound(mCurrentResolutionFrac*100)) + " %");
+    mHeightSpinBox->setValue(qRound(mCurrentResolutionFrac*mCanvasHeight));
     connectSignals();
 }
 
@@ -126,7 +126,7 @@ void RenderOutputWidget::updateSizeBoxesFromResolution() {
     disconnectSignals();
     mCurrentResolutionFrac =
             mResolutionComboBox->currentText().remove(" %").toDouble()*0.01;
-    mWidthSpinBox->setValue(mCurrentResolutionFrac*mCanvasWidth);
-    mHeightSpinBox->setValue(mCurrentResolutionFrac*mCanvasHeight);
+    mWidthSpinBox->setValue(qRound(mCurrentResolutionFrac*mCanvasWidth));
+    mHeightSpinBox->setValue(qRound(mCurrentResolutionFrac*mCanvasHeight));
     connectSignals();
 }

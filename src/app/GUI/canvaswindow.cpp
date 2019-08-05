@@ -27,15 +27,14 @@ CanvasWindow::CanvasWindow(Document &document,
     connect(&mDocument, &Document::canvasModeSet,
             this, &CanvasWindow::setCanvasMode);
 
-    this->setAcceptDrops(true);
-    this->setMouseTracking(true);
+    setAcceptDrops(true);
+    setMouseTracking(true);
 
     KFT_setFocus();
 }
 
 CanvasWindow::~CanvasWindow() {
     setCurrentCanvas(nullptr);
-    if(KFT_hasFocus()) KFT_setCurrentTarget(nullptr);
 }
 
 Canvas *CanvasWindow::getCurrentCanvas() {
@@ -167,7 +166,7 @@ void CanvasWindow::tabletEvent(QTabletEvent *e) {
 }
 
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
-    if(!KFT_hasFocus()) KFT_setFocus();
+    KFT_setFocus();
     if(!mCurrentCanvas || mBlockInput) return;
     if(mMouseGrabber && event->button() == Qt::LeftButton) return;
     const auto pos = mapToCanvasCoord(event->pos());
@@ -539,8 +538,8 @@ void CanvasWindow::dropEvent(QDropEvent *event) {
 
 void CanvasWindow::dragEnterEvent(QDragEnterEvent *event) {
     if(event->mimeData()->hasUrls()) {
-        event->acceptProposedAction();
-        if(!KFT_hasFocus()) KFT_setFocus();
+       event->acceptProposedAction();
+        KFT_setFocus();
     }
 }
 

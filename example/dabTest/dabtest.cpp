@@ -42,7 +42,7 @@ bool supports(const CustomIdentifier &identifier) {
 
 DabTest000::DabTest000() :
     CustomRasterEffect(effectName().toLower()) {
-    mRadius = SPtrCreate(QrealAnimator)(0.5, 0, 1, 0.1, "radius");
+    mRadius = SPtrCreate(QrealAnimator)(0.5, 0, 0.5, 0.1, "radius");
     ca_addChild(mRadius);
 
     mHardness = SPtrCreate(QrealAnimator)(1, 0, 1, 0.1, "hardness");
@@ -74,7 +74,7 @@ GLuint DabTestCaller000::sProgramId = 0;
 void DabTestCaller000::sInitialize(QGL33 * const gl) {
     try {
         iniProgram(gl, sProgramId, GL_TEXTURED_VERT,
-                   "/home/ailuropoda/Dev/enve/src/dabTest/normal.frag");
+                   ":/shaders/normal.frag");
     } catch(...) {
         RuntimeThrow("Could not initialize a program for DabTestCaller000");
     }

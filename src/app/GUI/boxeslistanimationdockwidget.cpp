@@ -61,7 +61,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mResolutionComboBox->setEditable(true);
     mResolutionComboBox->lineEdit()->setInputMask("D00 %");
     mResolutionComboBox->setCurrentText("100 %");
-    mResolutionComboBox->setProperty("forceHandleEvent", QVariant(true));
+    MainWindow::sGetInstance()->installNumericFilter(mResolutionComboBox);
     mResolutionComboBox->setInsertPolicy(QComboBox::NoInsert);
     mResolutionComboBox->setSizePolicy(QSizePolicy::Maximum,
                                        QSizePolicy::Maximum);

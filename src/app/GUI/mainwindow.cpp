@@ -614,13 +614,21 @@ void MainWindow::setupToolBar() {
     mAddPointMode->setCheckable(":/icons/draw_pen_checked.png");
     mToolBar->addWidget(mAddPointMode);
 
+    mPaintMode = new ActionButton(
+                ":/icons/paint_mode.png",
+                "F4", this);
+    mPaintMode->setCheckable(
+                ":/icons/paint_mode_checked.png");
+    mToolBar->addWidget(mPaintMode);
+
+    mToolBar->addSeparator();
+
     mPickPaintSettingsMode = new ActionButton(
                 ":/icons/draw_dropper.png",
-                "F4", this);
+                "F5", this);
     mPickPaintSettingsMode->setCheckable(":/icons/draw_dropper_checked.png");
     mToolBar->addWidget(mPickPaintSettingsMode);
 
-    mToolBar->addSeparator();
 
     mCircleMode = new ActionButton(
                 ":/icons/draw_arc.png",
@@ -654,13 +662,6 @@ void MainWindow::setupToolBar() {
     mParticleEmitterMode->setCheckable(
                 ":/icons/draw_particle_emitter_checked.png");
     mToolBar->addWidget(mParticleEmitterMode);
-
-    mPaintMode = new ActionButton(
-                ":/icons/paint_mode.png",
-                "F11", this);
-    mPaintMode->setCheckable(
-                ":/icons/paint_mode_checked.png");
-    mToolBar->addWidget(mPaintMode);
 
     //mToolBar->addSeparator();
     mToolBar->widgetForAction(mToolBar->addAction("     "))->
@@ -804,6 +805,7 @@ void MainWindow::updateCanvasModeButtonsChecked() {
 //}
 
 void MainWindow::setResolutionFractionValue(const qreal value) {
+    if(!mDocument.fActiveScene) return;
     mDocument.fActiveScene->setResolutionFraction(value);
 }
 
@@ -811,18 +813,6 @@ void MainWindow::setFileChangedSinceSaving(const bool changed) {
     if(changed == mChangedSinceSaving) return;
     mChangedSinceSaving = changed;
     updateTitle();
-}
-
-bool MainWindow::isShiftPressed() {
-    return QApplication::keyboardModifiers() & Qt::ShiftModifier;
-}
-
-bool MainWindow::isCtrlPressed() {
-    return QApplication::keyboardModifiers() & Qt::ControlModifier;
-}
-
-bool MainWindow::isAltPressed() {
-    return QApplication::keyboardModifiers() & Qt::AltModifier;
 }
 
 SimpleBrushWrapper *MainWindow::getCurrentBrush() const {
@@ -909,9 +899,10 @@ bool handleCanvasModeKeyPress(Document& document, const int key) {
     } else if(key == Qt::Key_F2) {
         document.setCanvasMode(CanvasMode::MOVE_POINT);
     } else if(key == Qt::Key_F3) {
-            //setCanvasMode(CanvasMode::ADD_POINT);
         document.setCanvasMode(CanvasMode::ADD_POINT);
-    } else if(key == Qt::Key_F4) {
+    }  else if(key == Qt::Key_F4) {
+        document.setCanvasMode(CanvasMode::PAINT_MODE);
+    } else if(key == Qt::Key_F5) {
         document.setCanvasMode(CanvasMode::PICK_PAINT_SETTINGS);
     } else if(key == Qt::Key_F6) {
         document.setCanvasMode(CanvasMode::ADD_CIRCLE);
@@ -923,22 +914,16 @@ bool handleCanvasModeKeyPress(Document& document, const int key) {
         document.setCanvasMode(CanvasMode::ADD_PARTICLE_BOX);
     } else if(key == Qt::Key_F10) {
         document.setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
-    } else if(key == Qt::Key_F11) {
-        document.setCanvasMode(CanvasMode::PAINT_MODE);
     } else return false;
+    KeyFocusTarget::KFT_sSetRandomTarget();
     return true;
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
     if(mLock) if(dynamic_cast<QInputEvent*>(e)) return true;
-    if(mEventFilterDisabled) {
-        return QMainWindow::eventFilter(obj, e);
-    }
+    if(mEventFilterDisabled) return QMainWindow::eventFilter(obj, e);
     const auto type = e->type();
     const auto focusWidget = QApplication::focusWidget();
-    if(focusWidget) {
-        if(focusWidget->property("forceHandleEvent").isValid()) return false;
-    }
     if(type == QEvent::KeyPress) {
         const auto keyEvent = static_cast<QKeyEvent*>(e);
         if(keyEvent->key() == Qt::Key_Delete && focusWidget) {
@@ -953,10 +938,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
         const auto keyEvent = static_cast<QKeyEvent*>(e);
         const int key = keyEvent->key();
         if(handleCanvasModeKeyPress(mDocument, key)) return true;
-        if(isShiftPressed() && key == Qt::Key_D) {
+        if(keyEvent->modifiers() & Qt::SHIFT && key == Qt::Key_D) {
             return processKeyEvent(keyEvent);
         }
-        if(isCtrlPressed()) {
+        if(keyEvent->modifiers() & Qt::CTRL) {
             if(key == Qt::Key_C || key == Qt::Key_V ||
                key == Qt::Key_X || key == Qt::Key_D //||
 /*                key == Qt::Key_Up ||

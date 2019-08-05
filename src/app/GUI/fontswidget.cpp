@@ -1,4 +1,7 @@
 #include "fontswidget.h"
+
+#include "mainwindow.h"
+
 #include <QLineEdit>
 #include <QIntValidator>
 #include <QLabel>
@@ -16,7 +19,7 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
                 "QLineEdit:focus {"
                     "background: rgb(255, 255, 255);"
                 "}");
-    mFontSizeCombo->setProperty("forceHandleEvent", QVariant(true));
+    MainWindow::sGetInstance()->installNumericFilter(mFontSizeCombo);
     mFontSizeCombo->setValidator(new QIntValidator(0, 999, mFontSizeCombo));
 
     mFontFamilyCombo->addItems(mFontDatabase.families());

@@ -101,8 +101,7 @@ bool ValueInput::handleTransormationInputKeyEvent(const int key) {
     } else if(key == Qt::Key_9) {
         mInputText += "9";
         updateInputValue();
-    } else if(key == Qt::Key_Period ||
-              key == Qt::Key_Comma) {
+    } else if(key == Qt::Key_Period || key == Qt::Key_Comma) {
         if(!mInputText.contains(".")) {
             mInputText += ".";
             updateInputValue();

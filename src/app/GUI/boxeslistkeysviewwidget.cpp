@@ -113,7 +113,7 @@ TimelineWidget::TimelineWidget(Document &document,
     mSearchLine = new QLineEdit("", mBoxesListMenuBar);
     mSearchLine->setMinimumHeight(0);
     mSearchLine->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-    mSearchLine->setProperty("forceHandleEvent", QVariant(true));
+    MainWindow::sGetInstance()->installLineFilter(mSearchLine);
     mSearchLine->setStyleSheet("background-color: white;"
                                "color: black;"
                                "border-radius: 0;"
@@ -124,6 +124,7 @@ TimelineWidget::TimelineWidget(Document &document,
                                "margin: 0;");
     connect(mSearchLine, &QLineEdit::textChanged,
             this, &TimelineWidget::setSearchText);
+    mSearchLine->setFocusPolicy(Qt::ClickFocus);
 
     mMenuLayout->addWidget(mBoxesListMenuBar);
     mMenuLayout->addWidget(mSearchLine);

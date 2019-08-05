@@ -11,16 +11,16 @@
 class RenderOutputWidget : public QDialog {
     Q_OBJECT
 public:
-    explicit RenderOutputWidget(const qreal canvasWidth,
-                                const qreal canvasHeight,
+    explicit RenderOutputWidget(const int canvasWidth,
+                                const int canvasHeight,
                                 QWidget *parent = nullptr);
 
 private:
     qreal mCurrentResolutionFrac = 1.;
     qreal getCurrentResolution();
 
-    qreal mCanvasWidth;
-    qreal mCanvasHeight;
+    int mCanvasWidth;
+    int mCanvasHeight;
 
     QHBoxLayout *mPathLayout;
     QLabel *mPathLabel;

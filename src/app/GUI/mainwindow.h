@@ -16,6 +16,8 @@
 #include "settings.h"
 #include "renderhandler.h"
 #include "fileshandler.h"
+#include "ekeyfilter.h"
+
 class VideoEncoder;
 
 class ActionButton;
@@ -27,19 +29,14 @@ class ColorSettingsWidget;
 class FillStrokeSettingsWidget;
 class BoxesListAnimationDockWidget;
 class BrushSelectionWidget;
-class Canvas;
 class CanvasWindow;
 class MemoryHandler;
-class Task;
 
 class ObjectSettingsWidget;
 class BoxScrollWidget;
 class ScrollWidget;
 class ScrollArea;
-class Brush;
 class UsageWidget;
-class Gradient;
-class SimpleBrushWrapper;
 //class SoundComposition;
 
 const QString MENU_STYLESHEET =
@@ -69,10 +66,6 @@ public:
 //    void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = nullptr;
 
     static MainWindow *sGetInstance();
-
-    static bool isShiftPressed();
-    static bool isCtrlPressed();
-    static bool isAltPressed();
 
     AnimationDockWidget *getAnimationDockWidget();
     BoxScrollWidget *getObjectSettingsList();
@@ -123,6 +116,16 @@ public:
         return mRecentFiles;
     }
     stdsptr<void> lock();
+
+    bool processKeyEvent(QKeyEvent *event);
+
+    void installNumericFilter(QObject* const object) {
+        object->installEventFilter(mNumericFilter);
+    }
+
+    void installLineFilter(QObject* const object) {
+        object->installEventFilter(mLineFilter);
+    }
 public:
     //void saveOutput(QString renderDest);
     //void renderOutput();
@@ -144,6 +147,9 @@ public:
 protected:
     void lockFinished();
 private:
+    eKeyFilter* mNumericFilter = eKeyFilter::sCreateNumberFilter(this);
+    eKeyFilter* mLineFilter = eKeyFilter::sCreateLineFilter(this);
+
     friend class Lock;
     class Lock : public StdSelfRef {
         friend class StdSelfRef;
@@ -282,7 +288,6 @@ private:
     EffectsLoader *mEffectsLoader;
     stdptr<UndoRedoStack> mCurrentUndoRedoStack;
 
-    bool processKeyEvent(QKeyEvent *event);
     FillStrokeSettingsWidget *mFillStrokeSettings;
 
     bool mChangedSinceSaving = false;
