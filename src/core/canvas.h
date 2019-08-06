@@ -486,14 +486,13 @@ public:
     void selectAllAction();
     void clearSelectionAction();
     void rotateSelectedBoxesStartAndFinish(const qreal rotBy);
-    bool shouldPlanScheduleUpdate() {
+    bool shouldScheduleUpdate() {
         return mCurrentPreviewContainerOutdated;
     }
 
     void renderDataFinished(BoxRenderData *renderData);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
-    QRectF getRelBoundingRect(const qreal );
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
     bool anim_prevRelFrameWithKey(const int relFrame, int &prevRelFrame);
@@ -567,27 +566,12 @@ public:
         return mPaintTarget.isValid();
     }
 
-    void scheduleWaitingTasks() {
-        if(mSmoothChange && mCurrentContainer) {
-            if(!mDrawnSinceQue) return;
-            mCurrentContainer->scheduleChildWaitingTasks();
-        } else ContainerBox::scheduleWaitingTasks();
-    }
-
     void queScheduledTasks() {
-        if(mSmoothChange && mCurrentContainer) {
+        if(Actions::sInstance->smoothChange() && mCurrentContainer) {
             if(!mDrawnSinceQue) return;
             mCurrentContainer->queChildScheduledTasks();
         } else ContainerBox::queScheduledTasks();
         mDrawnSinceQue = false;
-    }
-
-    void startSmoothChange() {
-        mSmoothChange = true;
-    }
-
-    void finishSmoothChange() {
-        mSmoothChange = false;
     }
 private:
     void openTextEditorForTextBox(TextBox *textBox);

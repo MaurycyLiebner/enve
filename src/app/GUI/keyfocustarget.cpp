@@ -21,23 +21,39 @@ KeyFocusTarget * KeyFocusTarget::KFT_getCurrentTarget() {
     return KeyFocusTarget::KFT_mCurrentTarget;
 }
 
-#include <QDebug>
 bool KeyFocusTarget::KFT_handleKeyEvent(QKeyEvent *e) {
+    const auto func = e->type() == QEvent::KeyRelease ?
+                &KeyFocusTarget::KFT_keyReleaseEvent :
+                &KeyFocusTarget::KFT_keyPressEvent;
+
     if(KFT_mCurrentTarget) {
-        if(KFT_mCurrentTarget->KFT_handleKeyEventForTarget(e)) {
+        if((KFT_mCurrentTarget->*func)(e)) {
             KFT_mCurrentTarget->KFT_setFocus();
             return true;
         }
     }
     for(const auto target : KFT_mAllTargets) {
         if(target == KFT_mCurrentTarget) continue;
-        if(target->KFT_handleKeyEventForTarget(e)) {
+        if((target->*func)(e)) {
             target->KFT_setFocus();
             return true;
         }
     }
 
     return false;
+}
+
+void KeyFocusTarget::KFT_sTab() {
+    if(KFT_mAllTargets.isEmpty()) return;
+    const auto lastTarget = KFT_mCurrentTarget ? KFT_mCurrentTarget :
+                                                 KFT_mLastTarget;
+    if(lastTarget) {
+        int index = KFT_mAllTargets.indexOf(lastTarget) + 1;
+        if(index >= KFT_mAllTargets.count()) index = 0;
+        KFT_mAllTargets.at(index)->KFT_setFocus();
+    } else {
+        KFT_mAllTargets.first()->KFT_setFocus();
+    }
 }
 
 void KeyFocusTarget::KFT_sSetRandomTarget() {

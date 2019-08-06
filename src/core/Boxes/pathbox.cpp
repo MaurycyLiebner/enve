@@ -13,7 +13,7 @@
 #include "Animators/rastereffectanimators.h"
 #include "Animators/outlinesettingsanimator.h"
 
-PathBox::PathBox(const BoundingBoxType &type) :
+PathBox::PathBox(const BoundingBoxType type) :
     BoundingBox(type) {
     mPathEffectsAnimators =
             SPtrCreate(PathEffectAnimators)();
@@ -196,7 +196,7 @@ void PathBox::setupRenderData(const qreal relFrame,
 
     if(currentOutlinePathCompatible && currentFillPathCompatible) {
         data->fRelBoundingRectSet = true;
-        data->fRelBoundingRect = mRelBoundingRect;
+        data->fRelBoundingRect = mRelRect;
     }
 
     UpdatePaintSettings &fillSettings = pathData->fPaintSettings;
@@ -261,14 +261,14 @@ void PathBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
 
 void PathBox::resetStrokeGradientPointsPos() {
     mStrokeGradientPoints->anim_setRecording(false);
-    mStrokeGradientPoints->setPositions(mRelBoundingRect.topLeft(),
-                                        mRelBoundingRect.bottomRight());
+    mStrokeGradientPoints->setPositions(mRelRect.topLeft(),
+                                        mRelRect.bottomRight());
 }
 
 void PathBox::resetFillGradientPointsPos() {
     mFillGradientPoints->anim_setRecording(false);
-    mFillGradientPoints->setPositions(mRelBoundingRect.topLeft(),
-                                      mRelBoundingRect.bottomRight());
+    mFillGradientPoints->setPositions(mRelRect.topLeft(),
+                                      mRelRect.bottomRight());
 }
 
 void PathBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
@@ -519,19 +519,6 @@ void PathBox::updateStrokeDrawGradient() {
 void PathBox::updateDrawGradients() {
     updateFillDrawGradient();
     updateStrokeDrawGradient();
-}
-
-QRectF PathBox::getRelBoundingRect(const qreal relFrame) {
-    const SkPath path = getPathAtRelFrameF(relFrame);
-    SkPath outline;
-    if(mStrokeSettings->nonZeroLineWidth()) {
-        SkStroke strokerSk;
-        mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
-        strokerSk.strokePath(path, &outline);
-    }
-    mOutlinePathEffectsAnimators->apply(relFrame, &outline);
-    outline.addPath(path);
-    return toQRectF(outline.computeTightBounds());
 }
 
 void PathBox::updateCurrentPreviewDataFromRenderData(

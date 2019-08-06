@@ -13,10 +13,16 @@ void ContainerBoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {
 }
 
 void ContainerBoxRenderData::updateRelBoundingRect() {
-    BoxRenderData::updateRelBoundingRect();
+    SkPath boundingPaths;
     for(const auto &child : fChildrenRenderData) {
+        SkPath childPath;
+        childPath.addRect(toSkRect(child->fRelBoundingRect));
+        childPath.transform(toSkMatrix(child->fRelTransform));
+        boundingPaths.addPath(childPath);
+
         fOtherGlobalRects << child->fGlobalRect;
     }
+    fRelBoundingRect = toQRectF(boundingPaths.computeTightBounds());
 }
 
 void ContainerBoxRenderData::drawSk(SkCanvas * const canvas) {

@@ -2,21 +2,21 @@
 #include "Tasks/taskscheduler.h"
 #include "taskexecutor.h"
 
-bool Task::scheduleTask() {
-    if(mState == SCHEDULED) return false;
-    mState = SCHEDULED;
+bool eTask::scheduleTask() {
+    if(mState == eTaskState::scheduled) return false;
+    mState = eTaskState::scheduled;
     scheduleTaskNow();
     return true;
 }
 
-void Task::aboutToProcess(const Hardware hw) {
-    mState = PROCESSING;
+void eTask::aboutToProcess(const Hardware hw) {
+    mState = eTaskState::processing;
     beforeProcessing(hw);
 }
 
-void Task::finishedProcessing() {
-    if(mState == CANCELED || mState == FAILED) return;
-    mState = FINISHED;
+void eTask::finishedProcessing() {
+    if(mState == eTaskState::canceled || mState == eTaskState::failed) return;
+    mState = eTaskState::finished;
     afterProcessing();
     if(unhandledException()) {
         gPrintExceptionCritical(handleException());
@@ -26,38 +26,38 @@ void Task::finishedProcessing() {
     }
 }
 
-bool Task::readyToBeProcessed() {
+bool eTask::readyToBeProcessed() {
     return mNDependancies == 0;
 }
 
-void Task::addDependent(Task * const updatable) {
+void eTask::addDependent(eTask * const updatable) {
     if(!updatable) return;
-    if(mState != FINISHED) {
+    if(mState != eTaskState::finished) {
         if(mDependent.contains(updatable)) return;
         mDependent << updatable;
         updatable->incDependencies();
     }
 }
 
-void Task::addDependent(const Dependent &func) {
-    if(mState == FINISHED) {
+void eTask::addDependent(const Dependent &func) {
+    if(mState == eTaskState::finished) {
         if(func.fFinished) func.fFinished();
-    } else if(mState == CANCELED) {
+    } else if(mState == eTaskState::canceled) {
         if(func.fCanceled) func.fCanceled();
     } else mDependentF << func;
 }
 
-bool Task::finished() { return mState == FINISHED; }
+bool eTask::finished() { return mState == eTaskState::finished; }
 
-void Task::decDependencies() {
+void eTask::decDependencies() {
     mNDependancies--;
 }
 
-void Task::incDependencies() {
+void eTask::incDependencies() {
     mNDependancies++;
 }
 
-void Task::tellDependentThatFinished() {
+void eTask::tellDependentThatFinished() {
     for(const auto& dependent : mDependent) {
         if(dependent) dependent->decDependencies();
     }
@@ -68,7 +68,7 @@ void Task::tellDependentThatFinished() {
     mDependentF.clear();
 }
 
-void Task::cancelDependent() {
+void eTask::cancelDependent() {
     for(const auto& dependent : mDependent) {
         if(dependent) dependent->cancel();
     }
@@ -80,11 +80,11 @@ void Task::cancelDependent() {
 }
 
 void CPUTask::scheduleTaskNow() {
-    TaskScheduler::sGetInstance()->scheduleCPUTask(ref<Task>());
+    TaskScheduler::sGetInstance()->scheduleCPUTask(ref<eTask>());
 }
 
 void HDDTask::scheduleTaskNow() {
-    TaskScheduler::sGetInstance()->scheduleHDDTask(ref<Task>());
+    TaskScheduler::sGetInstance()->scheduleHDDTask(ref<eTask>());
 }
 
 void HDDTask::HDDPartFinished() {

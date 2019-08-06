@@ -46,7 +46,7 @@ public:
     void removePath(PathBox * const path);
     bool affectsPaths();
 
-    void updateQGradientStops(const UpdateReason &reason);
+    void updateQGradientStops(const UpdateReason reason);
 
     void addColorToList(const QColor &color);
     QColor getColorAt(const int id);

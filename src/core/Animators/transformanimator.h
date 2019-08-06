@@ -17,8 +17,8 @@ protected:
 public:
     virtual void reset();
     virtual QMatrix getCurrentTransform();
-    virtual QMatrix getRelativeTransform(const qreal relFrame);
-    virtual QMatrix getTotalTransformAtRelFrameF(const qreal relFrame);
+    virtual QMatrix getRelativeTransformAtFrame(const qreal relFrame);
+    virtual QMatrix getTotalTransformAtFrame(const qreal relFrame);
 
     bool SWT_isBasicTransformAnimator() const;
 
@@ -80,7 +80,7 @@ public:
     void rotateRelativeToSavedValue(const qreal rotRel,
                                     const QPointF &pivot);
 
-    void updateRelativeTransform(const UpdateReason &reason);
+    void updateRelativeTransform(const UpdateReason reason);
     const QMatrix &getTotalTransform() const;
     const QMatrix &getRelativeTransform() const;
 
@@ -92,7 +92,7 @@ public:
     QPointFAnimator *getScaleAnimator();
     QrealAnimator *getRotAnimator();
 
-    void updateTotalTransform(const UpdateReason &reason);
+    void updateTotalTransform(const UpdateReason reason);
 protected:
     QList<qsptr<BasicTransformAnimator>> mChildBoxes;
 
@@ -105,7 +105,7 @@ protected:
     qsptr<QPointFAnimator> mScaleAnimator;
     qsptr<QrealAnimator> mRotAnimator;
 signals:
-    void totalTransformChanged(const UpdateReason &);
+    void totalTransformChanged(const UpdateReason );
 };
 
 class BoxTransformAnimator : public BasicTransformAnimator {
@@ -115,7 +115,7 @@ protected:
 public:
     void reset();
     QMatrix getCurrentTransform();
-    QMatrix getRelativeTransform(const qreal relFrame);
+    QMatrix getRelativeTransformAtFrame(const qreal relFrame);
 
     bool SWT_isBoxTransformAnimator() const { return true; }
 

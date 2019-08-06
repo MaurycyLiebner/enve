@@ -92,39 +92,29 @@ void FrameScrollBar::paintEvent(QPaintEvent *) {
 
     p.setPen(Qt::white);
 
-    int divInc = 3;
-    int frameInc = 5000;
-    while(frameInc && dFrame/frameInc < 3) {
-        if(divInc == 3) {
-            divInc = 0;
-            frameInc *= 4;
-            frameInc /= 10;
-        } else {
-            frameInc /= 2;
-        }
-        divInc++;
-    }
-    const qreal inc = frameInc*pixPerFrame;
+    const qreal inc = mDrawFrameInc*pixPerFrame;
 
-    const int minMod = minFrame%frameInc;
+    const int minMod = minFrame%mDrawFrameInc;
     qreal xL = (-minMod + (mRange ? 0. : 0.5))*pixPerFrame + x0;
     int currentFrame = minFrame - minMod;
+
     if(!mRange) {
-        while(xL < 70) {
-            currentFrame += frameInc;
-            xL += inc;
-        }
+        const int nEmpty = qCeil((70 - xL)/inc);
+        currentFrame += nEmpty*mDrawFrameInc;
+        xL += nEmpty*inc;
     }
 
     const qreal threeFourthsHeight = height()*0.75;
     const qreal maxX = width() + MIN_WIDGET_DIM;
     while(xL < maxX) {
+        if(!mRange) {
+            p.drawLine(QPointF(xL, threeFourthsHeight + 2),
+                       QPointF(xL, height()));
+        }
         p.drawText(QRectF(xL - inc, 0, 2*inc, height()),
                    Qt::AlignCenter, QString::number(currentFrame));
-        p.drawLine(QPointF(xL, threeFourthsHeight + 2),
-                   QPointF(xL, height()));
         xL += inc;
-        currentFrame += frameInc;
+        currentFrame += mDrawFrameInc;
     }
 
     p.setPen(QPen(Qt::white, 1));
@@ -177,7 +167,7 @@ void FrameScrollBar::wheelEvent(QWheelEvent *event) {
         }
     }
 
-    emitChange();
+    emitTriggeredChange();
     update();
 }
 
@@ -194,6 +184,7 @@ bool FrameScrollBar::setFirstViewedFrame(const int firstFrame) {
         mFirstViewedFrame = firstFrame;
         return true;
     }
+
 }
 #include <QMenu>
 void FrameScrollBar::mousePressEvent(QMouseEvent *event) {
@@ -229,9 +220,9 @@ void FrameScrollBar::mousePressEvent(QMouseEvent *event) {
     mPressed = true;
     mLastMousePressFrame = posToFrame(event->x() );
     if(mLastMousePressFrame < mFirstViewedFrame ||
-            mLastMousePressFrame > mFirstViewedFrame + mViewedFramesSpan) {
+       mLastMousePressFrame > mFirstViewedFrame + mViewedFramesSpan) {
         setFirstViewedFrame(qRound(mLastMousePressFrame - mViewedFramesSpan/2.));
-        emitChange();
+        emitTriggeredChange();
     }
     mSavedFirstFrame = mFirstViewedFrame;
     update();
@@ -241,7 +232,7 @@ void FrameScrollBar::mouseMoveEvent(QMouseEvent *event) {
     qreal newFrame = posToFrame(event->x() );
     int moveFrame = qRound(newFrame - mLastMousePressFrame);
     if(setFirstViewedFrame(mSavedFirstFrame + moveFrame)) {
-        emitChange();
+        emitTriggeredChange();
         update();
     }
 }
@@ -253,15 +244,30 @@ void FrameScrollBar::mouseReleaseEvent(QMouseEvent *) {
 
 void FrameScrollBar::setDisplayedFrameRange(const FrameRange& range) {
     mFrameRange = range;
+
+    const int dFrame = mFrameRange.fMax - mFrameRange.fMin + (mRange ? 0 : 1);
+    int divInc = 3;
+    mDrawFrameInc = 5000;
+    while(mDrawFrameInc && dFrame/mDrawFrameInc < 3) {
+        if(divInc == 3) {
+            divInc = 0;
+            mDrawFrameInc *= 4;
+            mDrawFrameInc /= 10;
+        } else {
+            mDrawFrameInc /= 2;
+        }
+        divInc++;
+    }
+
     mMaxSpan = range.span() - 1;
-    setViewedFrameRange({mFirstViewedFrame,
-                         mFirstViewedFrame + mViewedFramesSpan});
+    setViewedFrameRange({mFirstViewedFrame, mFirstViewedFrame + mViewedFramesSpan});
 }
 
 void FrameScrollBar::setViewedFrameRange(const FrameRange& range) {
     setFirstViewedFrame(range.fMin);
     setFramesSpan(range.span() - 1);
     update();
+    emitChange();
 }
 
 void FrameScrollBar::setCanvasFrameRange(const FrameRange &range) {
@@ -270,7 +276,11 @@ void FrameScrollBar::setCanvasFrameRange(const FrameRange &range) {
 }
 
 void FrameScrollBar::emitChange() {
-    emit viewedFrameRangeChanged(getViewedRange());
+    emit frameRangeChange(getViewedRange());
+}
+
+void FrameScrollBar::emitTriggeredChange() {
+    emit triggeredFrameRangeChange(getViewedRange());
 }
 
 FrameRange FrameScrollBar::getViewedRange() const {

@@ -98,14 +98,14 @@ struct TextureFrameBuffer {
 };
 
 enum class HardwareSupport : short {
-    CPU_ONLY,
-    CPU_PREFFERED,
-    GPU_PREFFERED,
-    GPU_ONLY
+    cpuOnly,
+    cpuPreffered,
+    gpuPreffered,
+    gpuOnly
 };
 
 enum class Hardware : short {
-    CPU, GPU, HDD
+    cpu, gpu, hdd
 };
 
 struct CpuRenderData {

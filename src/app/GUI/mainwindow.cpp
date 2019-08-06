@@ -259,7 +259,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     showMaximized();
 
-    this->setMouseTracking(true);
+    setMouseTracking(true);
     centralWidget()->setMouseTracking(true);
 
     readRecentFiles();
@@ -272,7 +272,6 @@ MainWindow::MainWindow(QWidget *parent)
     } catch(const std::exception& e) {
         gPrintExceptionFatal(e);
     }
-
 
     installEventFilter(this);
 }
@@ -379,8 +378,8 @@ void MainWindow::setupMenuBar() {
                            &mActions, &Actions::raiseToTopAction,
                            Qt::Key_Home);
     mObjectMenu->addAction("Lower to Bottom",
-                           &mActions, &Actions::lowerToBottomAction)->
-            setShortcut(Qt::Key_End);
+                           &mActions, &Actions::lowerToBottomAction,
+                           Qt::Key_End);
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Rotate 90° CW",
                            &mActions, &Actions::rotate90CWAction);
@@ -406,29 +405,29 @@ void MainWindow::setupMenuBar() {
                          &Actions::strokeToPathAction);
     mPathMenu->addSeparator();
     mPathMenu->addAction("Union", &mActions,
-                         &Actions::pathsUnionAction)->
-            setShortcut(Qt::CTRL + Qt::Key_Plus);
+                         &Actions::pathsUnionAction,
+                         Qt::CTRL + Qt::Key_Plus);
     mPathMenu->addAction("Difference", &mActions,
-                         &Actions::pathsDifferenceAction)->
-            setShortcut(Qt::CTRL + Qt::Key_Minus);
+                         &Actions::pathsDifferenceAction,
+                         Qt::CTRL + Qt::Key_Minus);
     mPathMenu->addAction("Intersection", &mActions,
-                         &Actions::pathsIntersectionAction)->
-            setShortcut(Qt::CTRL + Qt::Key_Asterisk);
+                         &Actions::pathsIntersectionAction,
+                         Qt::CTRL + Qt::Key_Asterisk);
     mPathMenu->addAction("Exclusion", &mActions,
-                         &Actions::pathsExclusionAction)->
-            setShortcut(Qt::CTRL + Qt::Key_AsciiCircum);
+                         &Actions::pathsExclusionAction,
+                         Qt::CTRL + Qt::Key_AsciiCircum);
     mPathMenu->addAction("Division", &mActions,
-                         &Actions::pathsDivisionAction)->
-            setShortcut(Qt::CTRL + Qt::Key_Slash);
+                         &Actions::pathsDivisionAction,
+                         Qt::CTRL + Qt::Key_Slash);
 //    mPathMenu->addAction("Cut Path", mCanvas,
 //                         &Actions::pathsCutAction);
     mPathMenu->addSeparator();
     mPathMenu->addAction("Combine", &mActions,
-                         &Actions::pathsCombineAction)->
-            setShortcut(Qt::CTRL + Qt::Key_K);
+                         &Actions::pathsCombineAction,
+                         Qt::CTRL + Qt::Key_K);
     mPathMenu->addAction("Break Apart", &mActions,
-                         &Actions::pathsBreakApartAction)->
-            setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_K);
+                         &Actions::pathsBreakApartAction,
+                         Qt::CTRL + Qt::SHIFT + Qt::Key_K);
 
 //    mEffectsMenu = mMenuBar->addMenu("Effects");
 
@@ -937,15 +936,17 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
     } else if(type == QEvent::ShortcutOverride) {
         const auto keyEvent = static_cast<QKeyEvent*>(e);
         const int key = keyEvent->key();
+        if(key == Qt::Key_Tab) {
+            KeyFocusTarget::KFT_sTab();
+            return true;
+        }
         if(handleCanvasModeKeyPress(mDocument, key)) return true;
         if(keyEvent->modifiers() & Qt::SHIFT && key == Qt::Key_D) {
             return processKeyEvent(keyEvent);
         }
         if(keyEvent->modifiers() & Qt::CTRL) {
             if(key == Qt::Key_C || key == Qt::Key_V ||
-               key == Qt::Key_X || key == Qt::Key_D //||
-/*                key == Qt::Key_Up ||
-                key == Qt::Key_Down*/) {
+               key == Qt::Key_X || key == Qt::Key_D) {
                 return processKeyEvent(keyEvent);
             }
         } else if(key == Qt::Key_A || key == Qt::Key_I ||
@@ -969,7 +970,8 @@ void MainWindow::closeEvent(QCloseEvent *e) {
 bool MainWindow::processKeyEvent(QKeyEvent *event) {
     if(isActiveWindow()) {
         bool returnBool = false;
-        if(mBoxesListAnimationDockWidget->processKeyEvent(event)) {
+        if(event->type() == QEvent::KeyPress &&
+           mBoxesListAnimationDockWidget->processKeyPress(event)) {
             returnBool = true;
         } else {
             returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);

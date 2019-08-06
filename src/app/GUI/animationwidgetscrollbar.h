@@ -15,7 +15,6 @@ public:
                             const bool range,
                             const bool clamp,
                             QWidget *parent = nullptr);
-    void emitChange();
     bool setFirstViewedFrame(const int firstFrame);
     void setFramesSpan(int newSpan);
 
@@ -43,8 +42,12 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *);
 signals:
-    void viewedFrameRangeChanged(FrameRange);
+    void triggeredFrameRangeChange(FrameRange);
+    void frameRangeChange(FrameRange);
 private:
+    void emitChange();
+    void emitTriggeredChange();
+
     bool mClamp;
     bool mDisplayTime = false;
     bool mRange;
@@ -54,6 +57,8 @@ private:
 
     int mFirstViewedFrame = 0;
     int mViewedFramesSpan = 50;
+
+    int mDrawFrameInc = 20;
 
     FrameRange mFrameRange{0, 200};
 

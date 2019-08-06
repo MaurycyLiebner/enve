@@ -7,7 +7,7 @@
 #include "Animators/qrealkey.h"
 #include "Animators/rastereffectanimators.h"
 
-AnimationBox::AnimationBox(const BoundingBoxType& type) : BoundingBox(type) {
+AnimationBox::AnimationBox(const BoundingBoxType type) : BoundingBox(type) {
     prp_setName("Animation");
 
     setDurationRectangle(SPtrCreate(FixedLenAnimationRect)(this));
@@ -53,9 +53,9 @@ void AnimationBox::setParentGroup(ContainerBox * const parent) {
     updateDurationRectangleAnimationRange();
 }
 
-bool AnimationBox::shouldPlanScheduleUpdate() {
+bool AnimationBox::shouldScheduleUpdate() {
     if(!mSrcFramesCache) return false;
-    return BoundingBox::shouldPlanScheduleUpdate();
+    return BoundingBox::shouldScheduleUpdate();
 }
 
 int AnimationBox::getAnimationFrameForRelFrame(const qreal relFrame) {

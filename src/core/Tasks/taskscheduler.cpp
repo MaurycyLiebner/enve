@@ -54,20 +54,20 @@ void TaskScheduler::initializeGpu() {
             this, &TaskScheduler::callAllTasksFinishedFunc);
 }
 
-void TaskScheduler::scheduleCPUTask(const stdsptr<Task>& task) {
+void TaskScheduler::scheduleCPUTask(const stdsptr<eTask>& task) {
     mScheduledCPUTasks << task;
 }
 
-void TaskScheduler::scheduleHDDTask(const stdsptr<Task>& task) {
+void TaskScheduler::scheduleHDDTask(const stdsptr<eTask>& task) {
     mScheduledHDDTasks << task;
 }
 
-void TaskScheduler::scheduleGPUTask(const stdsptr<Task> &task) {
+void TaskScheduler::scheduleGPUTask(const stdsptr<eTask> &task) {
     mGpuPostProcessor.addToProcess(task);
 }
 
-void TaskScheduler::queCPUTask(const stdsptr<Task>& task) {
-    if(!task->isQued()) task->taskQued();
+void TaskScheduler::queCPUTask(const stdsptr<eTask>& task) {
+    task->taskQued();
     mQuedCPUTasks.addTask(task);
     if(task->readyToBeProcessed()) {
         if(!task->gpuSupported() ||
@@ -107,7 +107,6 @@ void TaskScheduler::queScheduledCPUTasks() {
     mQuedCPUTasks.beginQue();
     for(const auto& it : Document::sInstance->fVisibleScenes) {
         const auto scene = it.first;
-        scene->scheduleWaitingTasks();
         scene->queScheduledTasks();
     }
     while(!mScheduledCPUTasks.isEmpty())
@@ -151,7 +150,7 @@ void TaskScheduler::tryProcessingNextQuedHDDTask() {
 }
 
 void TaskScheduler::afterHDDTaskFinished(
-        const stdsptr<Task>& finishedTask,
+        const stdsptr<eTask>& finishedTask,
         ExecController * const controller) {
     if(controller == mHDDExecutor)
         mHDDThreadBusy = false;
@@ -170,7 +169,7 @@ void TaskScheduler::processNextQuedHDDTask() {
         for(int i = 0; i < mQuedHDDTasks.count(); i++) {
             const auto task = mQuedHDDTasks.at(i);
             if(task->readyToBeProcessed()) {
-                task->aboutToProcess(Hardware::HDD);
+                task->aboutToProcess(Hardware::hdd);
                 const auto hddTask = dynamic_cast<HDDTask*>(task.get());
                 if(hddTask) hddTask->setController(mHDDExecutor);
                 mQuedHDDTasks.removeAt(i--);
@@ -196,8 +195,8 @@ bool TaskScheduler::processNextQuedGPUTask() {
     if(!mGpuPostProcessor.hasFinished()) return false;
     const auto task = mQuedCPUTasks.takeQuedForGpuProcessing();
     if(task) {
-        task->aboutToProcess(Hardware::GPU);
-        if(task->getState() > Task::PROCESSING) {
+        task->aboutToProcess(Hardware::gpu);
+        if(task->getState() > eTaskState::processing) {
             processNextTasks();
             return true;
         }
@@ -208,10 +207,10 @@ bool TaskScheduler::processNextQuedGPUTask() {
 }
 
 void TaskScheduler::afterCPUTaskFinished(
-        const stdsptr<Task>& task,
+        const stdsptr<eTask>& task,
         ExecController * const controller) {
     mFreeCPUExecs << static_cast<CPUExecController*>(controller);
-    if(task->getState() == Task::CANCELED) {}
+    if(task->getState() == eTaskState::canceled) {}
     else if(task->nextStep()) scheduleCPUTask(task);
     else task->finishedProcessing();
     processNextTasks();
@@ -223,8 +222,8 @@ void TaskScheduler::processNextQuedCPUTask() {
     while(!mFreeCPUExecs.isEmpty() && !mQuedCPUTasks.isEmpty()) {
         const auto task = mQuedCPUTasks.takeQuedForCpuProcessing();
         if(task) {
-            task->aboutToProcess(Hardware::CPU);
-            if(task->getState() > Task::PROCESSING) {
+            task->aboutToProcess(Hardware::cpu);
+            if(task->getState() > eTaskState::processing) {
                 return processNextTasks();
             }
             const auto executor = mFreeCPUExecs.takeLast();

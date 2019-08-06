@@ -1,6 +1,6 @@
 #include "taskexecutor.h"
 
-void TaskExecutor::processTask(Task* task) {
+void TaskExecutor::processTask(eTask* task) {
     try {
         task->process();
     } catch(...) {

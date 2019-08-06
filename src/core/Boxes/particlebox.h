@@ -100,7 +100,7 @@ struct ParticleBoxRenderData : public BoxRenderData {
     }
 
     void updateRelBoundingRect() {
-        BoxRenderData::updateRelBoundingRect();
+        RuntimeThrow("do later");
         fClipRect = toSkRect(fRelBoundingRect);
     }
 
@@ -282,8 +282,6 @@ public:
                                               relFrame, particleData);
         }
     }
-
-    QRectF getRelBoundingRect(const qreal relFrame);
 
     void removeEmitter(const qsptr<ParticleEmitter> &emitter);
 

@@ -22,7 +22,7 @@ struct AnimationBoxRenderData : public ImageRenderData {
 class AnimationBox : public BoundingBox {
     friend class SelfRef;
 protected:
-    AnimationBox(const BoundingBoxType &type);
+    AnimationBox(const BoundingBoxType type);
 public:
     virtual void changeSourceFile(QWidget * const dialogParent) = 0;
     virtual void animationDataChanged();
@@ -42,7 +42,7 @@ public:
                          BoxRenderData * const data);
     stdsptr<BoxRenderData> createRenderData();
     void setParentGroup(ContainerBox * const parent);
-    bool shouldPlanScheduleUpdate();
+    bool shouldScheduleUpdate();
 
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);

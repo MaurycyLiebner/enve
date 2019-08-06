@@ -70,10 +70,6 @@ Canvas::Canvas(Document &document,
     //setCanvasMode(MOVE_PATH);
 }
 
-QRectF Canvas::getRelBoundingRect(const qreal) {
-    return QRectF(0, 0, mWidth, mHeight);
-}
-
 qreal Canvas::getResolutionFraction() {
     return mResolutionFraction;
 }

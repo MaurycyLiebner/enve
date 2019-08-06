@@ -151,7 +151,7 @@ QGradientStops Gradient::getQGradientStopsAtAbsFrame(const qreal absFrame) {
     return stops;
 }
 
-void Gradient::updateQGradientStops(const Animator::UpdateReason& reason) {
+void Gradient::updateQGradientStops(const Animator::UpdateReason reason) {
     mQGradientStops.clear();
     const qreal inc = 1./(mColors.length() - 1);
     qreal cPos = 0;

@@ -22,7 +22,7 @@ void ShaderEffectCaller::processGpu(QGL33 * const gl,
 }
 
 HardwareSupport ShaderEffectCaller::hardwareSupport() const {
-    return HardwareSupport::GPU_ONLY;
+    return HardwareSupport::gpuOnly;
 }
 
 void ShaderEffectCaller::setupProgram(QGL33 * const gl, QJSEngine &engine,

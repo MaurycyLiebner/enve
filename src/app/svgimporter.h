@@ -91,10 +91,6 @@ protected:
 
 class BoxSvgAttributes {
 public:
-    BoxSvgAttributes() {}
-
-    virtual ~BoxSvgAttributes() {}
-
     void setParent(const BoxSvgAttributes &parent);
 
     const Qt::FillRule &getFillRule() const;
@@ -134,87 +130,21 @@ protected:
     TextSvgAttributes mTextAttributes;
 };
 
-struct NormalNodeData;
-class SvgNormalNode {
-public:
-    SvgNormalNode(const QPointF &p1);
-
-    void setC0(const QPointF &c0);
-    void setP1(const QPointF& p1) {
-        mP1 = p1;
-    }
-    void setC2(const QPointF &c2);
-
-    CtrlsMode getCtrlsMode() const;
-    QPointF c0() const;
-    QPointF p1() const;
-    QPointF c2() const;
-
-    bool getC0Enabled() const;
-    bool getC2Enabled() const;
-
-    void applyTransfromation(const QMatrix &transformation);
-
-    NormalNodeData toNormalNodeData() const;
-private:
-    void guessCtrlsMode();
-
-    bool mC0Enabled = false;
-    bool mC2Enabled = false;
-    CtrlsMode mCtrlsMode = CTRLS_CORNER;
-    QPointF mC0;
-    QPointF mP1;
-    QPointF mC2;
-};
-
 class PathAnimator;
 class VectorPathAnimator;
 class SmartPathAnimator;
-class SvgSeparatePath {
-public:
-    SvgSeparatePath() {}
-
-    void apply(SmartPathAnimator * const path);
-
-    void closePath();
-
-    void moveTo(const QPointF &e);
-    void lineTo(const QPointF &e);
-    void cubicTo(const QPointF &c1, const QPointF &c2, const QPointF &e);
-    void quadTo(const QPointF &c, const QPointF &e);
-    void pathArc(qreal rX, qreal rY,
-                 const qreal xAxisRotation,
-                 const int largeArcFlag, const int sweepFlag,
-                 const qreal x, const qreal y,
-                 const qreal curX, const qreal curY);
-
-    void applyTransfromation(const QMatrix &transformation);
-private:
-    void pathArcSegment(const qreal xc, const qreal yc,
-                        const qreal th0, const qreal th1,
-                        const qreal rx, const qreal ry,
-                        const qreal xAxisRotation);
-
-    void addPoint(const SvgNormalNode &point);
-
-    bool mClosedPath = false;
-    SvgNormalNode * mLastPoint = nullptr;
-    QList<SvgNormalNode> mPoints;
-};
 
 class SmartVectorPath;
 class VectorPathSvgAttributes : public BoxSvgAttributes {
 public:
-    VectorPathSvgAttributes() {}
-
-    SvgSeparatePath *newSeparatePath() {
-        auto lastPath = std::make_shared<SvgSeparatePath>();
-        mSvgSeparatePaths << lastPath;
-        return lastPath.get();
+    SkPath& newPath() {
+        mSeparatePaths << SkPath();
+        return mSeparatePaths.last();
     }
+
     void apply(SmartVectorPath * const path);
 protected:
-    QList<stdsptr<SvgSeparatePath>> mSvgSeparatePaths;
+    QList<SkPath> mSeparatePaths;
 };
 
 

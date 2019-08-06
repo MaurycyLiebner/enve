@@ -295,7 +295,7 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
     } else if(event->type() == QEvent::MouseButtonPress) {
         mMouseMoved = false;
         mMovesCount = 0;
-        QMouseEvent *mouseEvent = (QMouseEvent*) event;
+        const auto mouseEvent = static_cast<QMouseEvent*>(event);
         if(mTextEdit) {
             if(!rect().contains(mouseEvent->pos()) ) {
                 finishTextEditing();
@@ -304,11 +304,13 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
 //                QApplication::restoreOverrideCursor();
             }
         } else {
+            Actions::sInstance->startSmoothChange();
             mousePressEvent(mouseEvent);
         }
         return !mTextEdit;
     } else if(event->type() == QEvent::MouseButtonRelease) {
         if(!mTextEdit) {
+            Actions::sInstance->finishSmoothChange();
             if(mMouseMoved) {
                 setCursor(Qt::ArrowCursor);
                 emitEditingFinished(mValue);
@@ -327,7 +329,7 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
         if(!mTextEdit) {
             mMovesCount++;
             if(mMovesCount > 2) {
-                mouseMoveEvent((QMouseEvent*) event);
+                mouseMoveEvent(static_cast<QMouseEvent*>(event));
                 mMouseMoved = true;
                 Document::sInstance->actionFinished();
             }

@@ -2,7 +2,7 @@
 #define ANIMATIONCACHEHANDLER_H
 #include "smartPointers/selfref.h"
 #include "skia/skiahelpers.h"
-class Task;
+class eTask;
 
 class AnimationFrameHandler : public SelfRef {
 protected:
@@ -10,7 +10,7 @@ protected:
 public:
     virtual sk_sp<SkImage> getFrameAtFrame(const int relFrame) = 0;
     virtual sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame) = 0;
-    virtual Task* scheduleFrameLoad(const int frame) = 0;
+    virtual eTask* scheduleFrameLoad(const int frame) = 0;
     virtual int getFrameCount() const = 0;
     virtual void reload() = 0;
 

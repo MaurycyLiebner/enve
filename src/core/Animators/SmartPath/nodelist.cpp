@@ -346,7 +346,7 @@ void NodeList::setPath(const SkPath &path) {
             case SkPath::kMove_Verb: {
                 if(firstNode) return;
                 const QPointF qPt = toQPointF(pts[0]);
-                firstNode = appendAndGetNode(Node(qPt, qPt, qPt));
+                firstNode = appendAndGetNode(Node(qPt));
                 prevNode = firstNode;
             }
                 break;
@@ -360,7 +360,7 @@ void NodeList::setPath(const SkPath &path) {
                     firstNode->setC0Enabled(false);
                     firstNode->mC0 = firstNode->mP1;
                 } else {
-                    prevNode = appendAndGetNode(Node(qPt, qPt, qPt));
+                    prevNode = appendAndGetNode(Node(qPt));
                 }
             }
                 break;
@@ -386,6 +386,8 @@ void NodeList::setPath(const SkPath &path) {
 
                 prevNode->setC2Enabled(true);
                 prevNode->mC2 = c0Pt;
+                prevNode->disableUnnecessaryCtrls();
+                prevNode->guessCtrlsMode();
 
                 if(iter.peek() == SkPath::kClose_Verb && quadsCount == 0) {
                     firstNode->setC0Enabled(true);

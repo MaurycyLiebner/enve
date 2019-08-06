@@ -19,7 +19,7 @@ public:
     void initialize();
 
     //! @brief Adds a new task and starts processing it if is not busy.
-    void addToProcess(const stdsptr<Task>& scheduled) {
+    void addToProcess(const stdsptr<eTask>& scheduled) {
         //scheduled->afterProcessed(); return;
         Q_ASSERT(scheduled->gpuSupported());
         mScheduledProcesses << scheduled;
@@ -106,8 +106,8 @@ protected:
     bool mFinished = true;
     bool mInitialized = false;
     GLuint _mTextureSquareVAO;
-    QList<stdsptr<Task>> _mHandledProcesses;
-    QList<stdsptr<Task>> mScheduledProcesses;
+    QList<stdsptr<eTask>> _mHandledProcesses;
+    QList<stdsptr<eTask>> mScheduledProcesses;
     //QOpenGLFramebufferObject* mFrameBuffer = nullptr;
 };
 

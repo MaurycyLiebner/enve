@@ -27,8 +27,6 @@ public:
 
     static Document* sInstance;
 
-    Actions fActions;
-
     stdsptr<Clipboard> fClipboardContainer;
 
     QString fEvFile;

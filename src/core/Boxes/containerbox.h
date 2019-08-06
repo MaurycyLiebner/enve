@@ -8,7 +8,7 @@ class PathEffectAnimators;
 class ContainerBox : public BoundingBox {
     friend class SelfRef;
 protected:
-    ContainerBox(const BoundingBoxType &type);
+    ContainerBox(const BoundingBoxType type);
 public:
     bool SWT_isContainerBox() const { return true; }
     bool SWT_isGroupBox() const { return mType == TYPE_GROUP; }
@@ -33,9 +33,7 @@ public:
 
     BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
     void anim_scaleTime(const int pivotAbsFrame, const qreal scale);
-    void updateAllBoxes(const UpdateReason &reason);
-
-    QRectF getRelBoundingRect(const qreal relFrame);
+    void updateAllBoxes(const UpdateReason reason);
 
     bool relPointInsidePath(const QPointF &relPos) const;
     void SWT_setupAbstraction(SWT_Abstraction *abstraction,
@@ -73,11 +71,10 @@ public:
     FillSettingsAnimator *getFillSettings() const;
     OutlineSettingsAnimator *getStrokeSettings() const;
 
-    void scheduleChildWaitingTasks();
-    void scheduleWaitingTasks();
+    bool shouldScheduleUpdate() { return !SWT_isGroupBox(); }
+
     void queChildScheduledTasks();
     void queScheduledTasks();
-
 
     void writeBoundingBox(QIODevice * const target);
     void readBoundingBox(QIODevice * const target);
@@ -157,6 +154,9 @@ public:
     void removeAllContainedBoxes();
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
+private:
+    void iniPathEffects();
+    void updateRelBoundingRect();
 protected:
     void removeContainedBox(const qsptr<BoundingBox> &child);
 
@@ -168,10 +168,6 @@ protected:
     qsptr<PathEffectAnimators> mFillPathEffectsAnimators;
     qsptr<PathEffectAnimators> mOutlineBasePathEffectsAnimators;
     qsptr<PathEffectAnimators> mOutlinePathEffectsAnimators;
-private:
-    void setupLayerRenderData(const qreal relFrame,
-                              BoxRenderData * const data);
-    void iniPathEffects();
 };
 
 #endif // CONTAINERBOX_H

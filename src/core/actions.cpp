@@ -3,9 +3,13 @@
 #include "canvas.h"
 #include "Paint/simplebrushwrapper.h"
 #include "paintsettingsapplier.h"
+Actions* Actions::sInstance = nullptr;
 
 Actions::Actions(Document &document) : mDocument(document),
-    mActiveScene(mDocument.fActiveScene) {}
+    mActiveScene(mDocument.fActiveScene) {
+    Q_ASSERT(!sInstance);
+    sInstance = this;
+}
 
 void Actions::undoAction() const {
     if(!mActiveScene) return;
@@ -386,5 +390,4 @@ void Actions::setPaintMode() {
 
 void Actions::afterAction() const {
     Document::sInstance->actionFinished();
-    emit mActiveScene->requestUpdate();
 }

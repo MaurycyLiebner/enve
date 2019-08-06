@@ -13,9 +13,8 @@ void BoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {
 }
 
 void BoxRenderData::copyFrom(BoxRenderData *src) {
+    fRelTransform = src->fRelTransform;
     fTransform = src->fTransform;
-    fCustomRelFrame = src->fCustomRelFrame;
-    fUseCustomRelFrame = src->fUseCustomRelFrame;
     fRelFrame = src->fRelFrame;
     fRelBoundingRect = src->fRelBoundingRect;
     fRenderTransform = src->fRenderTransform;
@@ -25,9 +24,8 @@ void BoxRenderData::copyFrom(BoxRenderData *src) {
     fResolution = src->fResolution;
     fRenderedImage = SkiaHelpers::makeCopy(src->fRenderedImage);
     fBoxStateId = src->fBoxStateId;
-    mState = FINISHED;
+    mState = eTaskState::finished;
     fRelBoundingRectSet = true;
-    fCopied = true;
 }
 
 stdsptr<BoxRenderData> BoxRenderData::makeCopy() {
@@ -35,11 +33,6 @@ stdsptr<BoxRenderData> BoxRenderData::makeCopy() {
     stdsptr<BoxRenderData> copy = fParentBox->createRenderData();
     copy->copyFrom(this);
     return copy;
-}
-
-void BoxRenderData::updateRelBoundingRect() {
-    if(!fParentBox) return;
-    fRelBoundingRect = fParentBox->getRelBoundingRect(fRelFrame);
 }
 
 void BoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {
@@ -79,19 +72,10 @@ void BoxRenderData::processGpu(QGL33 * const gl,
     context.switchToSkia();
     const auto grContext = context.requestContext();
 
-    //const auto info = SkiaHelpers::getPremulRGBAInfo(width, height);
-//    Texture tex;
-//    tex.gen(gl, width, height, nullptr);
-//    GrGLTextureInfo texInfo;
-//    texInfo.fID = tex.fId;
-//    texInfo.fFormat = GR_GL_RGBA8;
-//    texInfo.fTarget = GR_GL_TEXTURE_2D;
     const auto grTex = grContext->createBackendTexture(
                 fGlobalRect.width(), fGlobalRect.height(),
                 kRGBA_8888_SkColorType, GrMipMapped::kNo,
                 GrRenderable::kYes);
-//    const auto grTex = GrBackendTexture(tex.fWidth, tex.fHeight,
-//                                        GrMipMapped::kNo, texInfo);
     const auto surf = SkSurface::MakeFromBackendTexture(
                 grContext, grTex, kTopLeft_GrSurfaceOrigin, 0,
                 kRGBA_8888_SkColorType, nullptr, nullptr);
@@ -105,19 +89,13 @@ void BoxRenderData::processGpu(QGL33 * const gl,
                                                      kTopLeft_GrSurfaceOrigin,
                                                      kRGBA_8888_SkColorType);
     if(mEffectsRenderer.isEmpty() ||
-       mEffectsRenderer.nextHardwareSupport() == HardwareSupport::CPU_ONLY)
+       mEffectsRenderer.nextHardwareSupport() == HardwareSupport::cpuOnly)
         fRenderedImage = fRenderedImage->makeRasterImage();
     else mEffectsRenderer.processGpu(gl, context, this);
-//    GrGLTextureInfo info;
-//    grTex.getGLTextureInfo(&info);
-//    info.fID;
-//    fRenderedImage = tex.toImage(gl);
-//    tex.clear(gl);
 }
 
 void BoxRenderData::process() {
-    if(mStep == Step::EFFECTS)
-        return;// mEffectsRenderer.processCpu(this);
+    if(mStep == Step::EFFECTS) return;
     updateGlobalRect();
     if(fOpacity < 0.001) return;
     if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
@@ -138,18 +116,14 @@ void BoxRenderData::process() {
 
 void BoxRenderData::beforeProcessing(const Hardware hw) {
     if(mStep == Step::EFFECTS) {
-        if(hw == Hardware::CPU) {
-            mState = WAITING;
+        if(hw == Hardware::cpu) {
+            mState = eTaskState::waiting;
             mEffectsRenderer.processCpu(this);
         }
         return;
     }
     setupRenderData();
     if(!mDataSet) dataSet();
-
-    if(!fParentBox || !fParentIsTarget) return;
-    if(nullifyBeforeProcessing())
-        fParentBox->nullifyCurrentRenderData(fRelFrame);
 }
 
 void BoxRenderData::afterProcessing() {
@@ -163,16 +137,7 @@ void BoxRenderData::afterProcessing() {
 
 void BoxRenderData::afterQued() {
     if(mDataSet) return;
-    if(fParentBox) {
-        if(fUseCustomRelFrame) {
-            fParentBox->setupRenderData(fCustomRelFrame, this);
-        } else {
-            fParentBox->setupRenderData(fRelFrame, this);
-        }
-        for(const auto& customizer : mRenderDataCustomizerFunctors) {
-            (*customizer)(this);
-        }
-    }
+    if(fParentBox) fParentBox->setupRenderData(fRelFrame, this);
     if(!mDelayDataSet) dataSet();
 }
 
@@ -181,18 +146,13 @@ HardwareSupport BoxRenderData::hardwareSupport() const {
         return mEffectsRenderer.nextHardwareSupport();
     } else {
         if(fParentBox && fParentBox->SWT_isLayerBox())
-            return HardwareSupport::GPU_PREFFERED;
-        return HardwareSupport::CPU_PREFFERED;
+            return HardwareSupport::gpuPreffered;
+        return HardwareSupport::cpuPreffered;
     }
 }
 
 void BoxRenderData::scheduleTaskNow() {
     if(fParentBox) fParentBox->scheduleTask(ref<BoxRenderData>());
-}
-
-void BoxRenderData::afterCanceled() {
-    if(fRefInParent && fParentBox)
-        fParentBox->nullifyCurrentRenderData(fRelFrame);
 }
 
 void BoxRenderData::dataSet() {
@@ -204,10 +164,6 @@ void BoxRenderData::dataSet() {
     }
     if(!fParentBox || !fParentIsTarget) return;
     fParentBox->updateCurrentPreviewDataFromRenderData(this);
-}
-
-bool BoxRenderData::nullifyBeforeProcessing() {
-    return fReason == BoundingBox::FRAME_CHANGE;
 }
 
 void BoxRenderData::updateGlobalRect() {
@@ -234,43 +190,4 @@ void BoxRenderData::setBaseGlobalRect(const QRectF& baseRectF) {
         mEffectsRenderer.setBaseGlobalRect(currRect, skMaxBounds);
     }
     fGlobalRect = toQRect(currRect);
-}
-
-RenderDataCustomizerFunctor::RenderDataCustomizerFunctor() {}
-
-void RenderDataCustomizerFunctor::operator()(BoxRenderData * const data) {
-    customize(data);
-}
-
-ReplaceTransformDisplacementCustomizer::ReplaceTransformDisplacementCustomizer(
-        const qreal dx, const qreal dy) {
-    mDx = dx;
-    mDy = dy;
-}
-
-void ReplaceTransformDisplacementCustomizer::customize(
-        BoxRenderData * const data) {
-    QMatrix transformT = data->fTransform;
-    data->fTransform.setMatrix(transformT.m11(), transformT.m12(),
-                               transformT.m21(), transformT.m22(),
-                               mDx, mDy);
-}
-
-MultiplyTransformCustomizer::MultiplyTransformCustomizer(
-        const QMatrix &transform, const qreal opacity) {
-    mTransform = transform;
-    mOpacity = opacity;
-}
-
-void MultiplyTransformCustomizer::customize(BoxRenderData * const data) {
-    data->fTransform = mTransform*data->fTransform;
-    data->fOpacity *= mOpacity;
-}
-
-MultiplyOpacityCustomizer::MultiplyOpacityCustomizer(const qreal opacity) {
-    mOpacity = opacity;
-}
-
-void MultiplyOpacityCustomizer::customize(BoxRenderData * const data) {
-    data->fOpacity *= mOpacity;
 }

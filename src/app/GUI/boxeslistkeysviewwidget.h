@@ -22,6 +22,7 @@ class Document;
 class Canvas;
 class SceneChooser;
 class StackWrapperCornerMenu;
+class BoxScroller;
 
 enum SWT_Type : short;
 enum SWT_BoxRule : short;
@@ -88,6 +89,7 @@ private:
     QLineEdit *mSearchLine;
     ScrollArea *mBoxesListScrollArea;
     BoxScrollWidget *mBoxesListWidget;
+    BoxScroller *mBoxesListVisible;
     KeysView *mKeysView;
     AnimationDockWidget *mAnimationDockWidget;
 };

@@ -55,7 +55,7 @@ protected:
 class PathBox : public BoundingBox {
     friend class SelfRef;
 protected:
-    PathBox(const BoundingBoxType &type);
+    PathBox(const BoundingBoxType type);
     void getMotionBlurProperties(QList<Property*> &list) const;
 public:
     ~PathBox();
@@ -85,8 +85,6 @@ public:
 
     OutlineSettingsAnimator *getStrokeSettings() const;
     FillSettingsAnimator *getFillSettings() const;
-
-    QRectF getRelBoundingRect(const qreal relFrame);
 
     SmartVectorPath *objectToVectorPathBox();
     SmartVectorPath *strokeToVectorPathBox();

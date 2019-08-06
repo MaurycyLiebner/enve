@@ -27,16 +27,15 @@ public:
     bool isFrameInDurationRect(const int relFrame) const;
 
     stdsptr<BoxRenderData> createRenderData();
-    QRectF getRelBoundingRect(const qreal relFrame);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
-    QMatrix getRelativeTransformAtRelFrameF(const qreal relFrame);
-    QMatrix getTotalTransformAtRelFrameF(const qreal relFrame) {
+    QMatrix getRelativeTransformAtFrame(const qreal relFrame);
+    QMatrix getTotalTransformAtFrame(const qreal relFrame) {
         if(isParentLink()) {
-            return getRelativeTransformAtRelFrameF(relFrame)*
-                    mParentGroup->getTotalTransformAtRelFrameF(relFrame);
+            return getRelativeTransformAtFrame(relFrame)*
+                    mParentGroup->getTotalTransformAtFrame(relFrame);
         } else {
-            return BoundingBox::getTotalTransformAtRelFrameF(relFrame);
+            return BoundingBox::getTotalTransformAtFrame(relFrame);
         }
     }
 

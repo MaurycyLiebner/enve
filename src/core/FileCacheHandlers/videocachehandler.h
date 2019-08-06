@@ -21,7 +21,7 @@ public:
     VideoFrameLoader * getFrameLoader(const int frame) const;
     void removeFrameLoader(const int frame);
     void frameLoaderFinished(const int frame, const sk_sp<SkImage>& image);
-    Task* scheduleFrameHddCacheLoad(const int frame);
+    eTask* scheduleFrameHddCacheLoad(const int frame);
     sk_sp<SkImage> getFrameAtFrame(const int relFrame) const;
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame) const;
     int getFrameCount() const;
@@ -44,7 +44,7 @@ protected:
 public:
     sk_sp<SkImage> getFrameAtFrame(const int relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame);
-    Task *scheduleFrameLoad(const int frame);
+    eTask *scheduleFrameLoad(const int frame);
     int getFrameCount() const;
     void reload();
 

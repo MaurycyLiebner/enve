@@ -3,7 +3,7 @@
 #include "hddcachablecont.h"
 #include "tmpfilehandlers.h"
 #include "framerange.h"
-class Task;
+class eTask;
 class HDDCachableCacheHandler;
 
 class HDDCachableRangeCont : public HDDCachable {

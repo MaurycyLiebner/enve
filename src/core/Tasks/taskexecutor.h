@@ -9,9 +9,9 @@ class TaskExecutor : public QObject {
     Q_OBJECT
 public:
     explicit TaskExecutor() {}
-    void processTask(Task* task);
+    void processTask(eTask* task);
 signals:
-    void finishedTask(Task*);
+    void finishedTask(eTask*);
 };
 
 class HDDTaskExecutor : public TaskExecutor {
@@ -37,7 +37,7 @@ protected:
         mExecutorThread->start();
     }
 public:
-    void processTask(const stdsptr<Task>& task) {
+    void processTask(const stdsptr<eTask>& task) {
         if(mCurrentTask) RuntimeThrow("Previous task did not finish yet");
         mCurrentTask = task;
         emit processTaskSignal(task.get());
@@ -57,18 +57,18 @@ public:
 //        }
     }
 signals:
-    void processTaskSignal(Task*);
-    void finishedTaskSignal(stdsptr<Task>, ExecController*);
+    void processTaskSignal(eTask*);
+    void finishedTaskSignal(stdsptr<eTask>, ExecController*);
 protected:
     TaskExecutor * const mExecutor;
 private:
     void finishedTask() {
-        stdsptr<Task> task;
+        stdsptr<eTask> task;
         task.swap(mCurrentTask);
         emit finishedTaskSignal(task, this);
     }
 
-    stdsptr<Task> mCurrentTask;
+    stdsptr<eTask> mCurrentTask;
     QThread * const mExecutorThread;
 };
 

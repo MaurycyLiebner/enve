@@ -16,7 +16,7 @@ public:
                     const CpuRenderData &data);
 
     HardwareSupport hardwareSupport() const {
-        return HardwareSupport::GPU_PREFFERED;
+        return HardwareSupport::gpuPreffered;
     }
 private:
     const float mRadius;

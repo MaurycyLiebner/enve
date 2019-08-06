@@ -13,13 +13,22 @@ public:
     }
 
     static bool KFT_handleKeyEvent(QKeyEvent *e);
-    virtual bool KFT_handleKeyEventForTarget(QKeyEvent *e) = 0;
+    virtual bool KFT_keyPressEvent(QKeyEvent *e) {
+        Q_UNUSED(e);
+        return false;
+    }
+
+    virtual bool KFT_keyReleaseEvent(QKeyEvent *e) {
+        Q_UNUSED(e);
+        return false;
+    }
 
     void KFT_setFocus() {
         KFT_setCurrentTarget(this);
         KFT_setFocusToWidget();
     }
 
+    static void KFT_sTab();
     static void KFT_sSetRandomTarget();
     static void KFT_sSetLastTarget();
     static KeyFocusTarget *KFT_getCurrentTarget();

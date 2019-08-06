@@ -79,24 +79,23 @@ public:
         return margin;
     }
 
-    QRectF getRelBoundingRect(const qreal relFrame);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
-    QMatrix getRelativeTransformAtRelFrameF(const qreal relFrame) {
+    QMatrix getRelativeTransformAtFrame(const qreal relFrame) {
         if(mParentGroup ? mParentGroup->SWT_isLinkBox() : false) {
-            return getLinkTarget()->getRelativeTransformAtRelFrameF(relFrame);
+            return getLinkTarget()->getRelativeTransformAtFrame(relFrame);
         } else {
-            return BoundingBox::getRelativeTransformAtRelFrameF(relFrame);
+            return BoundingBox::getRelativeTransformAtFrame(relFrame);
         }
     }
 
-    QMatrix getTotalTransformAtRelFrameF(const qreal relFrame) {
+    QMatrix getTotalTransformAtFrame(const qreal relFrame) {
         if(isParentLink()) {
             const auto linkTarget = getLinkTarget();
-            return linkTarget->getRelativeTransformAtRelFrameF(relFrame)*
-                    mParentGroup->getTotalTransformAtRelFrameF(relFrame);
+            return linkTarget->getRelativeTransformAtFrame(relFrame)*
+                    mParentGroup->getTotalTransformAtFrame(relFrame);
         } else {
-            return BoundingBox::getTotalTransformAtRelFrameF(relFrame);
+            return BoundingBox::getTotalTransformAtFrame(relFrame);
         }
     }
 

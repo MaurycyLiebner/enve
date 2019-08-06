@@ -26,13 +26,13 @@ void VideoEncoder::addContainer(const stdsptr<ImageCacheContainer>& cont) {
     if(!cont) return;
     cont->setBlocked(true);
     mNextContainers.append(cont);
-    if(getState() < QUED || getState() > PROCESSING) scheduleTask();
+    if(getState() < eTaskState::qued || getState() > eTaskState::processing) scheduleTask();
 }
 
 void VideoEncoder::addContainer(const stdsptr<Samples>& cont) {
     if(!cont) return;
     mNextSoundConts.append(cont);
-    if(getState() < QUED || getState() > PROCESSING) scheduleTask();
+    if(getState() < eTaskState::qued || getState() > eTaskState::processing) scheduleTask();
 }
 
 static AVFrame *allocPicture(enum AVPixelFormat pix_fmt,

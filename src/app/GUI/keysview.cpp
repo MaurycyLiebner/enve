@@ -20,33 +20,12 @@ KeysView::KeysView(BoxScroller *boxesListVisible,
     mBoxesListVisible = boxesListVisible;
     mBoxesListVisible->setKeysView(this);
 
-    setFocusPolicy(Qt::StrongFocus);
     setMouseTracking(true);
     mScrollTimer = new QTimer(this);
 }
 
 void KeysView::setCurrentScene(Canvas * const scene) {
-    if(mCurrentScene) disconnect(mCurrentScene, nullptr, this, nullptr);
     mCurrentScene = scene;
-    const auto rules = mBoxesListVisible->getCurrentRulesCollection();
-    if(rules.fTarget == SWT_TARGET_CURRENT_CANVAS) {
-        mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
-                    scene, SWT_TARGET_CURRENT_CANVAS);
-    } else if(rules.fTarget == SWT_TARGET_CURRENT_GROUP) {
-        mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
-                    scene->getCurrentGroup(), SWT_TARGET_CURRENT_GROUP);
-    }
-    if(scene) {
-        connect(scene, &Canvas::currentContainerSet, this,
-                [this](ContainerBox* const container) {
-            mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
-                        container, SWT_TARGET_CURRENT_GROUP);
-        });
-        connect(scene, &Canvas::requestUpdate, this, [this]() {
-            update();
-            mBoxesListVisible->update();
-        });
-    }
 }
 
 void KeysView::setGraphViewed(const bool bT) {
@@ -231,8 +210,7 @@ stdsptr<KeysClipboard> KeysView::getSelectedKeysClipboardContainer() {
     return container;
 }
 
-bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
-    if(event->type() == QEvent::KeyRelease) return false;
+bool KeysView::KFT_keyPressEvent(QKeyEvent *event) {
     bool inputHandled = false;
     if(mMovingKeys) {
         if(mValueInput.handleTransormationInputKeyEvent(event->key())) {
@@ -322,39 +300,15 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     return true;
 }
 
-void KeysView::focusInEvent(QFocusEvent *) {
-    KeyFocusTarget::KFT_setCurrentTarget(this);
-}
-
 #include "GUI/BoxesList/boxsinglewidget.h"
 
 void KeysView::paintEvent(QPaintEvent *) {
-    if(!mCurrentScene) return;
     QPainter p(this);
 
     if(mGraphViewed) p.fillRect(rect(), QColor(60, 60, 60));
     else p.fillRect(rect(), QColor(60, 60, 60));
 
     if(mPixelsPerFrame < 0.001) return;
-
-//    QRect rect1(0, 0, 10, height());
-//    QLinearGradient gradient1(QPoint(rect1.left(), 0),
-//                              QPoint(rect1.right(), 0));
-//    gradient1.setColorAt(0, QColor(30, 30, 30));
-//    gradient1.setColorAt(1, QColor(60, 60, 60));
-
-//    QRect rect2(width() - 30, 0, 30, height());
-//    QLinearGradient gradient2(QPoint(rect2.left(), 0),
-//                              QPoint(rect2.right(), 0));
-//    gradient2.setColorAt(0, QColor(60, 60, 60));
-//    gradient2.setColorAt(1, QColor(30, 30, 30));
-
-//    p.fillRect(rect1, gradient1);
-//    p.fillRect(rect2, gradient2);
-//    p.fillRect(0, 0, 10, height(), QColor(30, 30, 30));
-//    p.fillRect(width() - 30, 0, 30, height(), QColor(30, 30, 30));
-
-
     if(!mGraphViewed) {    
         int currY = MIN_WIDGET_DIM;
         p.setPen(QPen(QColor(40, 40, 40), 1));
@@ -373,13 +327,9 @@ void KeysView::paintEvent(QPaintEvent *) {
         if(mult5) iInc *= 5;
         else iInc *= 2;
     }
-    int minFrame = mMinViewedFrame;//mMainWindow->getMinFrame();
+    int minFrame = mMinViewedFrame;
     int maxFrame = mMaxViewedFrame;
-//    if(mGraphViewed) {
-//        while(xT + minFrame*mPixelsPerFrame < 38.) {
-//            minFrame++;
-//        }
-//    }
+
     minFrame += ceil((-xT)/mPixelsPerFrame);
     minFrame = minFrame - minFrame%iInc - 1;
     maxFrame += floor((width() - 40 - xT)/mPixelsPerFrame) - maxFrame%iInc;
@@ -388,12 +338,14 @@ void KeysView::paintEvent(QPaintEvent *) {
         p.drawLine(QPointF(xTT, 0), QPointF(xTT, height()));
     }
 
-    if(mCurrentScene->getCurrentFrame() <= maxFrame &&
-       mCurrentScene->getCurrentFrame() >= minFrame) {
-        xT = (mCurrentScene->getCurrentFrame() - mMinViewedFrame)*mPixelsPerFrame +
-                mPixelsPerFrame*0.5;
-        p.setPen(QPen(Qt::darkGray, 2));
-        p.drawLine(QPointF(xT, 0), QPointF(xT, height()));
+    if(mCurrentScene) {
+        if(mCurrentScene->getCurrentFrame() <= maxFrame &&
+           mCurrentScene->getCurrentFrame() >= minFrame) {
+            xT = (mCurrentScene->getCurrentFrame() - mMinViewedFrame)*mPixelsPerFrame +
+                    mPixelsPerFrame*0.5;
+            p.setPen(QPen(Qt::darkGray, 2));
+            p.drawLine(QPointF(xT, 0), QPointF(xT, height()));
+        }
     }
 
     p.setPen(QPen(Qt::black, 1));
@@ -432,6 +384,17 @@ void KeysView::paintEvent(QPaintEvent *) {
     }
 
     p.end();
+}
+
+void KeysView::KFT_setFocusToWidget() {
+    if(mCurrentScene) Document::sInstance->setActiveScene(mCurrentScene);
+    setFocus();
+    update();
+}
+
+void KeysView::KFT_clearFocus() {
+    clearFocus();
+    update();
 }
 
 void KeysView::updateHovered(const QPoint &posU) {

@@ -25,13 +25,13 @@ protected:
                                    mGpuPreffered.count() +
                                    mGpuOnly.count(); }
     bool allDone() const { return countQued() == 0; }
-    void addTask(const stdsptr<Task>& task) {
+    void addTask(const stdsptr<eTask>& task) {
         if(task->gpuOnly()) mGpuOnly << task;
         else if(task->gpuPreferred()) mGpuPreffered << task;
         else mQued << task;
     }
 
-    stdsptr<Task> takeQuedForCpuProcessing() {
+    stdsptr<eTask> takeQuedForCpuProcessing() {
         for(int i = 0; i < mQued.count(); i++) {
             const auto& task = mQued.at(i);
             if(task->readyToBeProcessed()) return mQued.takeAt(i);
@@ -43,7 +43,7 @@ protected:
         return nullptr;
     }
 
-    stdsptr<Task> takeQuedForGpuProcessing() {
+    stdsptr<eTask> takeQuedForGpuProcessing() {
         for(int i = 0; i < mGpuOnly.count(); i++) {
             const auto& task = mGpuOnly.at(i);
             if(task->readyToBeProcessed()) return mGpuOnly.takeAt(i);
@@ -60,9 +60,9 @@ protected:
         return nullptr;
     }
 private:
-    QList<stdsptr<Task>> mGpuOnly;
-    QList<stdsptr<Task>> mGpuPreffered;
-    QList<stdsptr<Task>> mQued;
+    QList<stdsptr<eTask>> mGpuOnly;
+    QList<stdsptr<eTask>> mGpuPreffered;
+    QList<stdsptr<eTask>> mQued;
 };
 
 class QueHandler {
@@ -75,7 +75,7 @@ public:
         mCurrentQue = nullptr;
     }
 
-    stdsptr<Task> takeQuedForGpuProcessing() {
+    stdsptr<eTask> takeQuedForGpuProcessing() {
         int queId = 0;
         for(const auto& que : mQues) {
             const auto task = que->takeQuedForGpuProcessing();
@@ -88,7 +88,7 @@ public:
         return nullptr;
     }
 
-    stdsptr<Task> takeQuedForCpuProcessing() {
+    stdsptr<eTask> takeQuedForCpuProcessing() {
         int queId = 0;
         for(const auto& que : mQues) {
             const auto task = que->takeQuedForCpuProcessing();
@@ -107,7 +107,7 @@ public:
         mCurrentQue = mQues.last().get();
     }
 
-    void addTask(const stdsptr<Task>& task) {
+    void addTask(const stdsptr<eTask>& task) {
         if(!mCurrentQue) RuntimeThrow("Cannot add task when there is no active que.");
         mCurrentQue->addTask(task);
     }
@@ -175,11 +175,11 @@ public:
     void initializeGpu();
 
     void queTasks();
-    void queCPUTask(const stdsptr<Task> &task);
+    void queCPUTask(const stdsptr<eTask> &task);
 
-    void scheduleCPUTask(const stdsptr<Task> &task);
-    void scheduleHDDTask(const stdsptr<Task> &task);
-    void scheduleGPUTask(const stdsptr<Task>& task);
+    void scheduleCPUTask(const stdsptr<eTask> &task);
+    void scheduleHDDTask(const stdsptr<eTask> &task);
+    void scheduleGPUTask(const stdsptr<eTask>& task);
 
     void clearTasks() {
         for(const auto& cpuTask : mScheduledCPUTasks)
@@ -203,10 +203,10 @@ public:
 
     void switchToBackupHDDExecutor();
 
-    void afterHDDTaskFinished(const stdsptr<Task>& finishedTask,
+    void afterHDDTaskFinished(const stdsptr<eTask>& finishedTask,
                               ExecController * const controller);
 
-    void afterCPUTaskFinished(const stdsptr<Task>& task,
+    void afterCPUTaskFinished(const stdsptr<eTask>& task,
                               ExecController * const controller);
 
     void setFreeThreadsForCPUTasksAvailableFunc(
@@ -294,9 +294,9 @@ private:
     bool mCPUQueing = false;
     QueHandler mQuedCPUTasks;
 
-    QList<stdsptr<Task>> mScheduledCPUTasks;
-    QList<stdsptr<Task>> mScheduledHDDTasks;
-    QList<stdsptr<Task>> mQuedHDDTasks;
+    QList<stdsptr<eTask>> mScheduledCPUTasks;
+    QList<stdsptr<eTask>> mScheduledHDDTasks;
+    QList<stdsptr<eTask>> mQuedHDDTasks;
 
     HDDExecController *createNewBackupHDDExecutor();
 

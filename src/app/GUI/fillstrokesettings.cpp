@@ -143,7 +143,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
 
     strokeJoinCapLay->addLayout(mCapStyleLayout);
 
-    const auto actions = &mDocument.fActions;
+    const auto actions = Actions::sInstance;
     connect(mLineWidthSpin, &QrealAnimatorValueSlider::editingStarted,
             actions, [actions]() {
         actions->strokeWidthAction(QrealAction::sMakeStart());

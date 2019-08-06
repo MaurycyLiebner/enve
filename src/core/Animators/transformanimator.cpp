@@ -149,8 +149,7 @@ QMatrix BasicTransformAnimator::getCurrentTransform() {
     return matrix;
 }
 
-QMatrix BasicTransformAnimator::getRelativeTransform(
-                                    const qreal relFrame) {
+QMatrix BasicTransformAnimator::getRelativeTransformAtFrame(const qreal relFrame) {
     QMatrix matrix;
     matrix.translate(mPosAnimator->getEffectiveXValue(relFrame),
                      mPosAnimator->getEffectiveYValue(relFrame));
@@ -190,12 +189,12 @@ void BasicTransformAnimator::rotateRelativeToSavedValue(const qreal rotRel,
     mPosAnimator->setBaseValue(QPointF(matrix.dx(), matrix.dy()));
 }
 
-void BasicTransformAnimator::updateRelativeTransform(const UpdateReason &reason) {
+void BasicTransformAnimator::updateRelativeTransform(const UpdateReason reason) {
     mRelTransform = getCurrentTransform();
     updateTotalTransform(reason);
 }
 
-void BasicTransformAnimator::updateTotalTransform(const UpdateReason &reason) {
+void BasicTransformAnimator::updateTotalTransform(const UpdateReason reason) {
     if(mParentTransform.isNull()) {
         mTotalTransform = mRelTransform;
     } else {
@@ -251,7 +250,7 @@ QMatrix BasicTransformAnimator::getParentTotalTransformAtRelFrame(
         const qreal parentRelFrame =
                 mParentTransform->prp_absFrameToRelFrameF(absFrame);
         return mParentTransform->
-                getTotalTransformAtRelFrameF(parentRelFrame);
+                getTotalTransformAtFrame(parentRelFrame);
     }
 }
 
@@ -267,17 +266,16 @@ QrealAnimator *BasicTransformAnimator::getRotAnimator() {
     return mRotAnimator.get();
 }
 
-QMatrix BasicTransformAnimator::getTotalTransformAtRelFrameF(
+QMatrix BasicTransformAnimator::getTotalTransformAtFrame(
         const qreal relFrame) {
     if(mParentTransform) {
         const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
         const qreal parentRelFrame =
                 mParentTransform->prp_absFrameToRelFrameF(absFrame);
-        return getRelativeTransform(relFrame)*
-                mParentTransform->
-                    getTotalTransformAtRelFrameF(parentRelFrame);
+        return getRelativeTransformAtFrame(relFrame)*
+                mParentTransform->getTotalTransformAtFrame(parentRelFrame);
     } else {
-        return getRelativeTransform(relFrame);
+        return getRelativeTransformAtFrame(relFrame);
     }
 }
 
@@ -423,7 +421,7 @@ QMatrix BoxTransformAnimator::getCurrentTransform() {
     return matrix;
 }
 
-QMatrix BoxTransformAnimator::getRelativeTransform(const qreal relFrame) {
+QMatrix BoxTransformAnimator::getRelativeTransformAtFrame(const qreal relFrame) {
     const qreal pivotX = mPivotAnimator->getEffectiveXValue(relFrame);
     const qreal pivotY = mPivotAnimator->getEffectiveYValue(relFrame);
     QMatrix matrix;

@@ -10,7 +10,7 @@ bool Document::FileCompare::operator()(const FileHandler &f1,
     return f1->getFilePath() < f2->getFilePath();
 }
 
-Document::Document(TaskScheduler& taskScheduler) : fActions(*this) {
+Document::Document(TaskScheduler& taskScheduler) {
     Q_ASSERT(!sInstance);
     sInstance = this;
     connect(&taskScheduler, &TaskScheduler::finishedAllQuedTasks,

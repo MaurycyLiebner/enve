@@ -168,53 +168,48 @@ static qreal toDouble(const QString &str, bool *ok = nullptr) {
 //}
 
 static void parseNumbersArray(const QChar *&str,
-                              QVarLengthArray<qreal, 8> &points) {
-    while (str->isSpace())
-        ++str;
-    while (isDigit(str->unicode()) ||
-           *str == QLatin1Char('-') || *str == QLatin1Char('+') ||
-           *str == QLatin1Char('.')) {
+                              QVarLengthArray<float, 8> &points) {
+    while(str->isSpace()) str++;
+    while(isDigit(str->unicode()) ||
+          *str == QLatin1Char('-') || *str == QLatin1Char('+') ||
+          *str == QLatin1Char('.')) {
 
-        points.append(toDouble(str));
+        points.append(toSkScalar(toDouble(str)));
 
-        while (str->isSpace())
-            ++str;
-        if(*str == QLatin1Char(','))
-            ++str;
+        while(str->isSpace()) str++;
+        if(*str == QLatin1Char(',')) str++;
 
         //eat the rest of space
-        while (str->isSpace())
-            ++str;
+        while(str->isSpace()) str++;
     }
 }
 
 bool parsePathDataFast(const QString &dataStr,
                        VectorPathSvgAttributes &attributes) {
-    qreal x0 = 0, y0 = 0;              // starting point
-    qreal x = 0, y = 0;                // current point
+    float x0 = 0, y0 = 0;              // starting point
+    float x = 0, y = 0;                // current point
     char lastMode = 0;
-    QPointF ctrlPt;
+    SkPoint ctrlPt;
     const QChar *str = dataStr.constData();
     const QChar *end = str + dataStr.size();
 
-    SvgSeparatePath *lastPath = nullptr;
-    while (str != end) {
-        while (str->isSpace())
-            ++str;
+    SkPath *lastPath = nullptr;
+    while(str != end) {
+        while(str->isSpace()) str++;
         QChar pathElem = *str;
         ++str;
         QChar endc = *end;
         *const_cast<QChar *>(end) = 0; // parseNumbersArray requires 0-termination that QStringRef cannot guarantee
-        QVarLengthArray<qreal, 8> arg;
+        QVarLengthArray<float, 8> arg;
         parseNumbersArray(str, arg);
         *const_cast<QChar *>(end) = endc;
         if(pathElem == QLatin1Char('z') || pathElem == QLatin1Char('Z'))
             arg.append(0);//dummy
-        const qreal *num = arg.constData();
+        const float *num = arg.constData();
         int count = arg.count();
         while (count > 0) {
-            qreal offsetX = x;        // correction offsets
-            qreal offsetY = y;        // for relative commands
+            float offsetX = x;        // correction offsets
+            float offsetY = y;        // for relative commands
             switch (pathElem.unicode()) {
             case 'm': {
                 if(count < 2) {
@@ -226,13 +221,10 @@ bool parsePathDataFast(const QString &dataStr,
                 y = y0 = num[1] + offsetY;
                 num += 2;
                 count -= 2;
-                lastPath = attributes.newSeparatePath();
-                lastPath->moveTo(QPointF(x0, y0));
+                lastPath = &attributes.newPath();
+                lastPath->moveTo({x0, y0});
 
-                 // As per 1.2  spec 8.3.2 The "moveto" commands
-                 // If a 'moveto' is followed by multiple pairs of coordinates without explicit commands,
-                 // the subsequent pairs shall be treated as implicit 'lineto' commands.
-                 pathElem = QLatin1Char('l');
+                pathElem = QLatin1Char('l');
             }
                 break;
             case 'M': {
@@ -245,12 +237,9 @@ bool parsePathDataFast(const QString &dataStr,
                 y = y0 = num[1];
                 num += 2;
                 count -= 2;
-                lastPath = attributes.newSeparatePath();
-                lastPath->moveTo(QPointF(x0, y0));
+                lastPath = &attributes.newPath();
+                lastPath->moveTo({x0, y0});
 
-                // As per 1.2  spec 8.3.2 The "moveto" commands
-                // If a 'moveto' is followed by multiple pairs of coordinates without explicit commands,
-                // the subsequent pairs shall be treated as implicit 'lineto' commands.
                 pathElem = QLatin1Char('L');
             }
                 break;
@@ -260,7 +249,7 @@ bool parsePathDataFast(const QString &dataStr,
                 y = y0;
                 count--; // skip dummy
                 num++;
-                lastPath->closePath();
+                lastPath->close();
             }
                 break;
             case 'l': {
@@ -273,7 +262,7 @@ bool parsePathDataFast(const QString &dataStr,
                 y = num[1] + offsetY;
                 num += 2;
                 count -= 2;
-                lastPath->lineTo(QPointF(x, y));
+                lastPath->lineTo({x, y});
             }
                 break;
             case 'L': {
@@ -286,35 +275,35 @@ bool parsePathDataFast(const QString &dataStr,
                 y = num[1];
                 num += 2;
                 count -= 2;
-                lastPath->lineTo(QPointF(x, y));
+                lastPath->lineTo({x, y});
             }
                 break;
             case 'h': {
                 x = num[0] + offsetX;
                 num++;
                 count--;
-                lastPath->lineTo(QPointF(x, y));
+                lastPath->lineTo({x, y});
             }
                 break;
             case 'H': {
                 x = num[0];
                 num++;
                 count--;
-                lastPath->lineTo(QPointF(x, y));
+                lastPath->lineTo({x, y});
             }
                 break;
             case 'v': {
                 y = num[0] + offsetY;
                 num++;
                 count--;
-                lastPath->lineTo(QPointF(x, y));
+                lastPath->lineTo({x, y});
             }
                 break;
             case 'V': {
                 y = num[0];
                 num++;
                 count--;
-                lastPath->lineTo(QPointF(x, y));
+                lastPath->lineTo({x, y});
             }
                 break;
             case 'c': {
@@ -323,9 +312,9 @@ bool parsePathDataFast(const QString &dataStr,
                     count = 0;
                     break;
                 }
-                QPointF c1(num[0] + offsetX, num[1] + offsetY);
-                QPointF c2(num[2] + offsetX, num[3] + offsetY);
-                QPointF e(num[4] + offsetX, num[5] + offsetY);
+                SkPoint c1{num[0] + offsetX, num[1] + offsetY};
+                SkPoint c2{num[2] + offsetX, num[3] + offsetY};
+                SkPoint e{num[4] + offsetX, num[5] + offsetY};
                 num += 6;
                 count -= 6;
                 lastPath->cubicTo(c1, c2, e);
@@ -341,9 +330,9 @@ bool parsePathDataFast(const QString &dataStr,
                     count = 0;
                     break;
                 }
-                QPointF c1(num[0], num[1]);
-                QPointF c2(num[2], num[3]);
-                QPointF e(num[4], num[5]);
+                SkPoint c1{num[0], num[1]};
+                SkPoint c2{num[2], num[3]};
+                SkPoint e{num[4], num[5]};
                 num += 6;
                 count -= 6;
                 lastPath->cubicTo(c1, c2, e);
@@ -359,14 +348,13 @@ bool parsePathDataFast(const QString &dataStr,
                     count = 0;
                     break;
                 }
-                QPointF c1;
+                SkPoint c1;
                 if(lastMode == 'c' || lastMode == 'C' ||
                     lastMode == 's' || lastMode == 'S')
-                    c1 = QPointF(2*x-ctrlPt.x(), 2*y-ctrlPt.y());
-                else
-                    c1 = QPointF(x, y);
-                QPointF c2(num[0] + offsetX, num[1] + offsetY);
-                QPointF e(num[2] + offsetX, num[3] + offsetY);
+                    c1 = {2*x-ctrlPt.x(), 2*y-ctrlPt.y()};
+                else c1 = {x, y};
+                SkPoint c2{num[0] + offsetX, num[1] + offsetY};
+                SkPoint e{num[2] + offsetX, num[3] + offsetY};
                 num += 4;
                 count -= 4;
                 lastPath->cubicTo(c1, c2, e);
@@ -382,14 +370,13 @@ bool parsePathDataFast(const QString &dataStr,
                     count = 0;
                     break;
                 }
-                QPointF c1;
+                SkPoint c1;
                 if(lastMode == 'c' || lastMode == 'C' ||
-                    lastMode == 's' || lastMode == 'S')
-                    c1 = QPointF(2*x-ctrlPt.x(), 2*y-ctrlPt.y());
-                else
-                    c1 = QPointF(x, y);
-                QPointF c2(num[0], num[1]);
-                QPointF e(num[2], num[3]);
+                   lastMode == 's' || lastMode == 'S')
+                    c1 = {2*x - ctrlPt.x(), 2*y - ctrlPt.y()};
+                else c1 = {x, y};
+                SkPoint c2{num[0], num[1]};
+                SkPoint e{num[2], num[3]};
                 num += 4;
                 count -= 4;
                 lastPath->cubicTo(c1, c2, e);
@@ -405,8 +392,8 @@ bool parsePathDataFast(const QString &dataStr,
                     count = 0;
                     break;
                 }
-                QPointF c(num[0] + offsetX, num[1] + offsetY);
-                QPointF e(num[2] + offsetX, num[3] + offsetY);
+                SkPoint c{num[0] + offsetX, num[1] + offsetY};
+                SkPoint e{num[2] + offsetX, num[3] + offsetY};
                 num += 4;
                 count -= 4;
                 lastPath->quadTo(c, e);
@@ -422,8 +409,8 @@ bool parsePathDataFast(const QString &dataStr,
                     count = 0;
                     break;
                 }
-                QPointF c(num[0], num[1]);
-                QPointF e(num[2], num[3]);
+                SkPoint c{num[0], num[1]};
+                SkPoint e{num[2], num[3]};
                 num += 4;
                 count -= 4;
                 lastPath->quadTo(c, e);
@@ -439,15 +426,14 @@ bool parsePathDataFast(const QString &dataStr,
                     count = 0;
                     break;
                 }
-                QPointF e(num[0] + offsetX, num[1] + offsetY);
+                SkPoint e{num[0] + offsetX, num[1] + offsetY};
                 num += 2;
                 count -= 2;
-                QPointF c;
+                SkPoint c;
                 if(lastMode == 'q' || lastMode == 'Q' ||
-                    lastMode == 't' || lastMode == 'T')
-                    c = QPointF(2*x-ctrlPt.x(), 2*y-ctrlPt.y());
-                else
-                    c = QPointF(x, y);
+                   lastMode == 't' || lastMode == 'T')
+                    c = {2*x - ctrlPt.x(), 2*y - ctrlPt.y()};
+                else c = {x, y};
                 lastPath->quadTo(c, e);
 
                 ctrlPt = c;
@@ -461,15 +447,15 @@ bool parsePathDataFast(const QString &dataStr,
                     count = 0;
                     break;
                 }
-                QPointF e(num[0], num[1]);
+                SkPoint e{num[0], num[1]};
                 num += 2;
                 count -= 2;
-                QPointF c;
+                SkPoint c;
                 if(lastMode == 'q' || lastMode == 'Q' ||
                     lastMode == 't' || lastMode == 'T')
-                    c = QPointF(2*x-ctrlPt.x(), 2*y-ctrlPt.y());
+                    c = {2*x - ctrlPt.x(), 2*y - ctrlPt.y()};
                 else
-                    c = QPointF(x, y);
+                    c = {x, y};
                 lastPath->quadTo(c, e);
 
                 ctrlPt = c;
@@ -483,18 +469,16 @@ bool parsePathDataFast(const QString &dataStr,
                     count = 0;
                     break;
                 }
-                qreal rx = (*num++);
-                qreal ry = (*num++);
-                qreal xAxisRotation = (*num++);
-                qreal largeArcFlag  = (*num++);
-                qreal sweepFlag = (*num++);
-                qreal ex = (*num++) + offsetX;
-                qreal ey = (*num++) + offsetY;
+                float rx = (*num++);
+                float ry = (*num++);
+                float xAxisRotation = (*num++);
+                auto largeArcFlag  = SkPath::ArcSize(*num++);
+                auto sweepFlag = SkPath::Direction(*num++);
+                float ex = (*num++) + offsetX;
+                float ey = (*num++) + offsetY;
                 count -= 7;
-                qreal curx = x;
-                qreal cury = y;
-                lastPath->pathArc(rx, ry, xAxisRotation, int(largeArcFlag),
-                                  int(sweepFlag), ex, ey, curx, cury);
+                lastPath->arcTo(rx, ry, xAxisRotation, largeArcFlag,
+                                sweepFlag, ex, ey);
 
                 x = ex;
                 y = ey;
@@ -506,18 +490,16 @@ bool parsePathDataFast(const QString &dataStr,
                     count = 0;
                     break;
                 }
-                qreal rx = (*num++);
-                qreal ry = (*num++);
-                qreal xAxisRotation = (*num++);
-                qreal largeArcFlag  = (*num++);
-                qreal sweepFlag = (*num++);
-                qreal ex = (*num++);
-                qreal ey = (*num++);
+                float rx = (*num++);
+                float ry = (*num++);
+                float xAxisRotation = (*num++);
+                auto largeArcFlag  = SkPath::ArcSize(*num++);
+                auto sweepFlag = SkPath::Direction(*num++);
+                float ex = (*num++);
+                float ey = (*num++);
                 count -= 7;
-                qreal curx = x;
-                qreal cury = y;
-                lastPath->pathArc(rx, ry, xAxisRotation, int(largeArcFlag),
-                                  int(sweepFlag), ex, ey, curx, cury);
+                lastPath->arcTo(rx, ry, xAxisRotation, largeArcFlag,
+                                sweepFlag, ex, ey);
 
                 x = ex;
                 y = ey;
@@ -535,21 +517,21 @@ bool parsePathDataFast(const QString &dataStr,
 
 bool parsePolylineDataFast(const QString &dataStr,
                            VectorPathSvgAttributes &attributes) {
-    qreal x0 = 0, y0 = 0;              // starting point
-    qreal x = 0, y = 0;                // current point
+    float x0 = 0, y0 = 0;              // starting point
+    float x = 0, y = 0;                // current point
     const QChar *str = dataStr.constData();
     const QChar *end = str + dataStr.size();
 
-    SvgSeparatePath *lastPath = nullptr;
+    SkPath *lastPath = nullptr;
     while (str != end) {
         while (str->isSpace())
             ++str;
         QChar endc = *end;
         *const_cast<QChar *>(end) = 0; // parseNumbersArray requires 0-termination that QStringRef cannot guarantee
-        QVarLengthArray<qreal, 8> arg;
+        QVarLengthArray<float, 8> arg;
         parseNumbersArray(str, arg);
         *const_cast<QChar *>(end) = endc;
-        const qreal *num = arg.constData();
+        const float *num = arg.constData();
         int count = arg.count();
         bool first = true;
         while (count > 0) {
@@ -559,20 +541,20 @@ bool parsePolylineDataFast(const QString &dataStr,
             num++;
             count -= 2;
             if(count < 0) {
-                if(qAbs(x - x0) < 0.001 &&
-                   qAbs(y - y0) < 0.001) {
-                    lastPath->closePath();
+                if(qAbs(x - x0) < 0.001f &&
+                   qAbs(y - y0) < 0.001f) {
+                    lastPath->close();
                     return true;
                 }
             }
             if(first) {
                 x0 = x;
                 y0 = y;
-                lastPath = attributes.newSeparatePath();
-                lastPath->moveTo(QPointF(x0, y0));
+                lastPath = &attributes.newPath();
+                lastPath->moveTo({x0, y0});
                 first = false;
             } else {
-                lastPath->lineTo(QPointF(x, y));
+                lastPath->lineTo({x, y});
             }
         }
     }
@@ -711,10 +693,12 @@ void loadText(const QDomElement &pathElement,
     parentGroup->addContainedBox(textBox);
 }
 
+#define eNUMERIC_SVG "\\s*(-?[\\.|\\d]+)"
+
 
 bool extractTranslation(const QString& str, QMatrix& target) {
     const QRegExp rx1("translate\\("
-                      "\\s*(-?\\d+(\\.\\d*)?)"
+                      eNUMERIC_SVG
                       "\\)", Qt::CaseInsensitive);
     if(rx1.exactMatch(str)) {
         rx1.indexIn(str);
@@ -724,14 +708,14 @@ bool extractTranslation(const QString& str, QMatrix& target) {
     }
 
     const QRegExp rx2("translate\\("
-                      "\\s*(-?\\d+(\\.\\d*)?)[,|\\s+]"
-                      "\\s*(-?\\d+(\\.\\d*)?)"
+                      eNUMERIC_SVG"[,|\\s+]?"
+                      eNUMERIC_SVG
                       "\\)", Qt::CaseInsensitive);
     if(rx2.exactMatch(str)) {
         rx2.indexIn(str);
         const QStringList capturedTxt = rx2.capturedTexts();
         target.translate(capturedTxt.at(1).toDouble(),
-                         capturedTxt.at(3).toDouble());
+                         capturedTxt.at(2).toDouble());
         return true;
     }
 
@@ -741,25 +725,25 @@ bool extractTranslation(const QString& str, QMatrix& target) {
 
 bool extractScale(const QString& str, QMatrix& target) {
     const QRegExp rx1("scale\\("
-                      "\\s*(-?\\d+(\\.\\d*)?)"
+                      eNUMERIC_SVG
                       "\\)", Qt::CaseInsensitive);
     if(rx1.exactMatch(str)) {
         rx1.indexIn(str);
         const QStringList capturedTxt = rx1.capturedTexts();
-        target.scale(capturedTxt.at(1).toDouble(),
-                     capturedTxt.at(1).toDouble());
+        const qreal scale = capturedTxt.at(1).toDouble();
+        target.scale(scale, scale);
         return true;
     }
 
     const QRegExp rx2("scale\\("
-                      "\\s*(-?\\d+(\\.\\d*)?)[,|\\s+]"
-                      "\\s*(-?\\d+(\\.\\d*)?)"
+                      eNUMERIC_SVG"[,|\\s+]?"
+                      eNUMERIC_SVG
                       "\\)", Qt::CaseInsensitive);
     if(rx2.exactMatch(str)) {
         rx2.indexIn(str);
         const QStringList capturedTxt = rx2.capturedTexts();
         target.scale(capturedTxt.at(1).toDouble(),
-                     capturedTxt.at(3).toDouble());
+                     capturedTxt.at(2).toDouble());
         return true;
     }
 
@@ -768,7 +752,7 @@ bool extractScale(const QString& str, QMatrix& target) {
 
 bool extractRotate(const QString& str, QMatrix& target) {
     const QRegExp rx5("rotate\\("
-                      "\\s*(-?\\d+(\\.\\d*)?)"
+                      eNUMERIC_SVG
                       "\\)", Qt::CaseInsensitive);
     if(rx5.exactMatch(str)) {
         rx5.indexIn(str);
@@ -781,12 +765,12 @@ bool extractRotate(const QString& str, QMatrix& target) {
 
 bool extractWholeMatrix(const QString& str, QMatrix& target) {
     const QRegExp rx("matrix\\("
-                     "\\s*(-?[\\.|\\d]+)[,|\\s+]"
-                     "\\s*(-?[\\.|\\d]+)[,|\\s+]"
-                     "\\s*(-?[\\.|\\d]+)[,|\\s+]"
-                     "\\s*(-?[\\.|\\d]+)[,|\\s+]"
-                     "\\s*(-?[\\.|\\d]+)[,|\\s+]"
-                     "\\s*(-?[\\.|\\d]+)"
+                     eNUMERIC_SVG"[,|\\s+]?"
+                     eNUMERIC_SVG"[,|\\s+]?"
+                     eNUMERIC_SVG"[,|\\s+]?"
+                     eNUMERIC_SVG"[,|\\s+]?"
+                     eNUMERIC_SVG"[,|\\s+]?"
+                     eNUMERIC_SVG
                      "\\)", Qt::CaseInsensitive);
     if(rx.exactMatch(str)) {
         rx.indexIn(str);
@@ -1260,744 +1244,8 @@ void BoxSvgAttributes::decomposeTransformMatrix() {
 
     mDx = mRelTransform.dx();
     mDy = mRelTransform.dy();
-
-//    mDx = mRelTransform.dx();
-//    mDy = mRelTransform.dy();
-
-//    const qreal sxAbs = qSqrt(m11*m11 + m21*m21);
-//    const qreal syAbs = qSqrt(m12*m12 + m22*m22);
-//    mScaleX = m11 > 0 ? sxAbs : -sxAbs;
-//    mScaleY = m22 > 0 ? syAbs : -syAbs;
-
-//    const qreal nM12oM11 = -m12/m11;
-//    const qreal m21oM22 = m21/m22;
-//    const bool hasShear = !isZero4Dec(nM12oM11 - m21oM22);
-
-//    if(hasShear) {
-//        mHasRemTrans = true;
-
-//        return;
-//    }
-
-//    mRot = atan2(-m12, m11)*180/PI;
 }
 
-/*
-
-#define QT_INHERIT QLatin1String(qt_inherit_text)
-
-typedef BoundingBox *(*FactoryMethod)(BoxesGroup *, const QXmlStreamAttributes &, QSvgHandler *);
-
-
-bool QSvgHandler::startElement(const QString &localName,
-                               const QXmlStreamAttributes &attributes)
-{
-    QSvgNode *node = 0;
-
-    pushColorCopy();
-
-    const QStringRef xmlSpace(attributes.value(QLatin1String("xml:space")));
-    if(xmlSpace.isNull()) {
-        // This element has no xml:space attribute.
-        m_whitespaceMode.push(m_whitespaceMode.isEmpty() ? QSvgText::Default : m_whitespaceMode.top());
-    } else if(xmlSpace == QLatin1String("preserve")) {
-        m_whitespaceMode.push(QSvgText::Preserve);
-    } else if(xmlSpace == QLatin1String("default")) {
-        m_whitespaceMode.push(QSvgText::Default);
-    } else {
-        qWarning() << QString::fromLatin1("\"%1\" is an invalid value for attribute xml:space. "
-                                          "Valid values are \"preserve\" and \"default\".").arg(xmlSpace.toString());
-        m_whitespaceMode.push(QSvgText::Default);
-    }
-
-    if(!m_doc && localName != QLatin1String("svg"))
-        return false;
-
-    if(FactoryMethod method = findGroupFactory(localName)) {
-        //group
-        node = method(m_doc ? m_nodes.top() : 0, attributes, this);
-        Q_ASSERT(node);
-        if(!m_doc) {
-            Q_ASSERT(node->type() == QSvgNode::DOC);
-            m_doc = static_cast<QSvgTinyDocument*>(node);
-        } else {
-            switch (m_nodes.top()->type()) {
-            case QSvgNode::DOC:
-            case QSvgNode::G:
-            case QSvgNode::DEFS:
-            case QSvgNode::SWITCH:
-            {
-                QSvgStructureNode *group =
-                    static_cast<QSvgStructureNode*>(m_nodes.top());
-                group->addChild(node, someId(attributes));
-            }
-                break;
-            default:
-                break;
-            }
-        }
-        parseCoreNode(node, attributes);
-#ifndef QT_NO_CSSPARSER
-        cssStyleLookup(node, this, m_selector);
-#endif
-        parseStyle(node, attributes, this);
-    } else if(FactoryMethod method = findGraphicsFactory(localName)) {
-        //rendering element
-        Q_ASSERT(!m_nodes.isEmpty());
-        node = method(m_nodes.top(), attributes, this);
-        if(node) {
-            switch (m_nodes.top()->type()) {
-            case QSvgNode::DOC:
-            case QSvgNode::G:
-            case QSvgNode::DEFS:
-            case QSvgNode::SWITCH:
-            {
-                QSvgStructureNode *group =
-                    static_cast<QSvgStructureNode*>(m_nodes.top());
-                group->addChild(node, someId(attributes));
-            }
-                break;
-            case QSvgNode::TEXT:
-            case QSvgNode::TEXTAREA:
-                if(node->type() == QSvgNode::TSPAN) {
-                    static_cast<QSvgText *>(m_nodes.top())->addTspan(static_cast<QSvgTspan *>(node));
-                } else {
-                    qWarning("\'text\' or \'textArea\' element contains invalid element type.");
-                    delete node;
-                    node = 0;
-                }
-                break;
-            default:
-                qWarning("Could not add child element to parent element because the types are incorrect.");
-                delete node;
-                node = 0;
-                break;
-            }
-
-            if(node) {
-                parseCoreNode(node, attributes);
-#ifndef QT_NO_CSSPARSER
-                cssStyleLookup(node, this, m_selector);
-#endif
-                parseStyle(node, attributes, this);
-                if(node->type() == QSvgNode::TEXT || node->type() == QSvgNode::TEXTAREA) {
-                    static_cast<QSvgText *>(node)->setWhitespaceMode(m_whitespaceMode.top());
-                } else if(node->type() == QSvgNode::TSPAN) {
-                    static_cast<QSvgTspan *>(node)->setWhitespaceMode(m_whitespaceMode.top());
-                }
-            }
-        }
-    } else if(ParseMethod method = findUtilFactory(localName)) {
-        Q_ASSERT(!m_nodes.isEmpty());
-        if(!method(m_nodes.top(), attributes, this)) {
-            qWarning("Problem parsing %s", qPrintable(localName));
-        }
-    } else if(StyleFactoryMethod method = findStyleFactoryMethod(localName)) {
-        QSvgStyleProperty *prop = method(m_nodes.top(), attributes, this);
-        if(prop) {
-            m_style = prop;
-            m_nodes.top()->appendStyleProperty(prop, someId(attributes));
-        } else {
-            qWarning("Could not parse node: %s", qPrintable(localName));
-        }
-    } else if(StyleParseMethod method = findStyleUtilFactoryMethod(localName)) {
-        if(m_style) {
-            if(!method(m_style, attributes, this)) {
-                qWarning("Problem parsing %s", qPrintable(localName));
-            }
-        }
-    } else {
-        //qWarning()<<"Skipping unknown element!"<<namespaceURI<<"::"<<localName;
-        m_skipNodes.push(Unknown);
-        return true;
-    }
-
-    if(node) {
-        m_nodes.push(node);
-        m_skipNodes.push(Graphics);
-    } else {
-        //qDebug()<<"Skipping "<<localName;
-        m_skipNodes.push(Style);
-    }
-    return true;
-}
-
-
-static FactoryMethod findGraphicsFactory(const QString &name)
-{
-    if(name.isEmpty())
-        return 0;
-
-    QStringRef ref(&name, 1, name.length() - 1);
-    switch (name.at(0).unicode()) {
-    case 'a':
-        if(ref == QLatin1String("nimation")) return createAnimationNode;
-        break;
-    case 'c':
-        if(ref == QLatin1String("ircle")) return createCircleNode;
-        break;
-    case 'e':
-        if(ref == QLatin1String("llipse")) return createEllipseNode;
-        break;
-    case 'i':
-        if(ref == QLatin1String("mage")) return createImageNode;
-        break;
-    case 'l':
-        if(ref == QLatin1String("ine")) return createLineNode;
-        break;
-    case 'p':
-        if(ref == QLatin1String("ath")) return createPathNode;
-        if(ref == QLatin1String("olygon")) return createPolygonNode;
-        if(ref == QLatin1String("olyline")) return createPolylineNode;
-        break;
-    case 'r':
-        if(ref == QLatin1String("ect")) return createRectNode;
-        break;
-    case 't':
-        if(ref == QLatin1String("ext")) return createTextNode;
-        if(ref == QLatin1String("extArea")) return createTextAreaNode;
-        if(ref == QLatin1String("span")) return createTspanNode;
-        break;
-    case 'u':
-        if(ref == QLatin1String("se")) return createUseNode;
-        break;
-    case 'v':
-        if(ref == QLatin1String("ideo")) return createVideoNode;
-        break;
-    default:
-        break;
-    }
-    return 0;
-}
-
-
-BoundingBox *createPathNode(BoxesGroup *parent,
-                                const QXmlStreamAttributes &attributes)
-{
-    QStringRef data = attributes.value(QLatin1String("d"));
-
-    VectorPath *newPath = new VectorPath(parent);
-    parsePathDataFast(data, newPath);
-    return newPath;
-}
-
-QVector<qreal> parsePercentageList(const QChar *&str)
-{
-    QVector<qreal> points;
-    if(!str)
-        return points;
-
-    while (str->isSpace())
-        ++str;
-    while ((*str >= QLatin1Char('0') && *str <= QLatin1Char('9')) ||
-           *str == QLatin1Char('-') || *str == QLatin1Char('+') ||
-           *str == QLatin1Char('.')) {
-
-        points.append(toDouble(str));
-
-        while (str->isSpace())
-            ++str;
-        if(*str == QLatin1Char('%'))
-            ++str;
-        while (str->isSpace())
-            ++str;
-        if(*str == QLatin1Char(','))
-            ++str;
-
-        //eat the rest of space
-        while (str->isSpace())
-            ++str;
-    }
-
-    return points;
-}
-
-bool resolveColor(const QStringRef &colorStr, QColor &color, QSvgHandler *handler)
-{
-    QStringRef colorStrTr = trimRef(colorStr);
-    if(colorStrTr.isEmpty())
-        return false;
-
-    switch(colorStrTr.at(0).unicode()) {
-
-        case '#':
-            {
-                // #rrggbb is very very common, so let's tackle it here
-                // rather than falling back to QColor
-                QRgb rgb;
-                bool ok = qsvg_get_hex_rgb(colorStrTr.unicode(), colorStrTr.length(), &rgb);
-                if(ok)
-                    color.setRgb(rgb);
-                return ok;
-            }
-            break;
-
-        case 'r':
-            {
-                // starts with "rgb(", ends with ")" and consists of at least 7 characters "rgb(,,)"
-                if(colorStrTr.length() >= 7 && colorStrTr.at(colorStrTr.length() - 1) == QLatin1Char(')')
-                    && QStringRef(colorStrTr.string(), colorStrTr.position(), 4) == QLatin1String("rgb(")) {
-                    const QChar *s = colorStrTr.constData() + 4;
-                    QVector<qreal> compo = parseNumbersList(s);
-                    //1 means that it failed after reaching non-parsable
-                    //character which is going to be "%"
-                    if(compo.size() == 1) {
-                        s = colorStrTr.constData() + 4;
-                        compo = parsePercentageList(s);
-                        for(int i = 0; i < compo.size(); ++i)
-                            compo[i] *= (qreal)2.55;
-                    }
-
-                    if(compo.size() == 3) {
-                        color = QColor(int(compo[0]),
-                                       int(compo[1]),
-                                       int(compo[2]));
-                        return true;
-                    }
-                    return false;
-                }
-            }
-            break;
-
-        case 'c':
-            if(colorStrTr == QLatin1String("currentColor")) {
-                color = handler->currentColor();
-                return true;
-            }
-            break;
-        case 'i':
-            if(colorStrTr == QT_INHERIT)
-                return false;
-            break;
-        default:
-            break;
-    }
-
-    color = QColor(colorStrTr.toString());
-    return color.isValid();
-}
-
-bool constructColor(const QStringRef &colorStr, const QStringRef &opacity,
-                           QColor &color, QSvgHandler *handler)
-{
-    if(!resolveColor(colorStr, color, handler))
-        return false;
-    if(!opacity.isEmpty()) {
-        bool ok = true;
-        qreal op = qMin(qreal(1.0), qMax(qreal(0.0), toDouble(opacity, &ok)));
-        if(!ok)
-            op = 1.0;
-        color.setAlphaF(op);
-    }
-    return true;
-}
-
-QColor parseColor(const QSvgAttributes &attributes,
-                       QSvgHandler *handler)
-{
-    QColor color;
-    if(constructColor(attributes.color, attributes.colorOpacity, color, handler)) {
-        handler->popColor();
-        handler->pushColor(color);
-    }
-    return color;
-}
-
-bool parsePathDataFast(const QStringRef &dataStr, VectorPath *path)
-{
-    qreal x0 = 0, y0 = 0;              // starting point
-    qreal x = 0, y = 0;                // current point
-    char lastMode = 0;
-    QPointF ctrlPt;
-    const QChar *str = dataStr.constData();
-    const QChar *end = str + dataStr.size();
-
-    NodePoint *firstPointAfterM = nullptr;
-    NodePoint *lastAddedPoint = nullptr;
-    while (str != end) {
-        while (str->isSpace())
-            ++str;
-        QChar pathElem = *str;
-        ++str;
-        QChar endc = *end;
-        *const_cast<QChar *>(end) = 0; // parseNumbersArray requires 0-termination that QStringRef cannot guarantee
-        QVarLengthArray<qreal, 8> arg;
-        parseNumbersArray(str, arg);
-        *const_cast<QChar *>(end) = endc;
-        if(pathElem == QLatin1Char('z') || pathElem == QLatin1Char('Z'))
-            arg.append(0);//dummy
-        const qreal *num = arg.constData();
-        int count = arg.count();
-        while (count > 0) {
-            qreal offsetX = x;        // correction offsets
-            qreal offsetY = y;        // for relative commands
-            if(!firstPointAfterM) {
-                firstPointAfterM = lastAddedPoint;
-            }
-            switch (pathElem.unicode()) {
-            case 'm': {
-                firstPointAfterM = nullptr;
-                lastAddedPoint = nullptr;
-                if(count < 2) {
-                    num++;
-                    count--;
-                    break;
-                }
-                x = x0 = num[0] + offsetX;
-                y = y0 = num[1] + offsetY;
-                num += 2;
-                count -= 2;
-                //path.moveTo(x0, y0);
-
-                 // As per 1.2  spec 8.3.2 The "moveto" commands
-                 // If a 'moveto' is followed by multiple pairs of coordinates without explicit commands,
-                 // the subsequent pairs shall be treated as implicit 'lineto' commands.
-                 pathElem = QLatin1Char('l');
-            }
-                break;
-            case 'M': {
-                firstPointAfterM = nullptr;
-                lastAddedPoint = nullptr;
-                if(count < 2) {
-                    num++;
-                    count--;
-                    break;
-                }
-                x = x0 = num[0];
-                y = y0 = num[1];
-                num += 2;
-                count -= 2;
-                //path.moveTo(x0, y0);
-
-                // As per 1.2  spec 8.3.2 The "moveto" commands
-                // If a 'moveto' is followed by multiple pairs of coordinates without explicit commands,
-                // the subsequent pairs shall be treated as implicit 'lineto' commands.
-                pathElem = QLatin1Char('L');
-            }
-                break;
-            case 'z':
-            case 'Z': {
-                x = x0;
-                y = y0;
-                count--; // skip dummy
-                num++;
-                if(firstPointAfterM != nullptr && lastAddedPoint != nullptr) {
-                    firstPointAfterM->connectToPoint(lastAddedPoint);
-                    firstPointAfterM = nullptr;
-                    lastAddedPoint = nullptr;
-                }
-            }
-                break;
-            case 'l': {
-                if(count < 2) {
-                    num++;
-                    count--;
-                    break;
-                }
-                x = num[0] + offsetX;
-                y = num[1] + offsetY;
-                num += 2;
-                count -= 2;
-                //path.lineTo(x, y);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), 0, 0, lastAddedPoint);
-                // !!!
-            }
-                break;
-            case 'L': {
-                if(count < 2) {
-                    num++;
-                    count--;
-                    break;
-                }
-                x = num[0];
-                y = num[1];
-                num += 2;
-                count -= 2;
-                //path.lineTo(x, y);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), 0, 0, lastAddedPoint);
-                // !!!
-            }
-                break;
-            case 'h': {
-                x = num[0] + offsetX;
-                num++;
-                count--;
-                //path.lineTo(x, y);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), 0, 0, lastAddedPoint);
-                // !!!
-            }
-                break;
-            case 'H': {
-                x = num[0];
-                num++;
-                count--;
-                //path.lineTo(x, y);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), 0, 0, lastAddedPoint);
-                // !!!
-            }
-                break;
-            case 'v': {
-                y = num[0] + offsetY;
-                num++;
-                count--;
-                //path.lineTo(x, y);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), 0, 0, lastAddedPoint);
-                // !!!
-            }
-                break;
-            case 'V': {
-                y = num[0];
-                num++;
-                count--;
-                //path.lineTo(x, y);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), 0, 0, lastAddedPoint);
-                // !!!
-            }
-                break;
-            case 'c': {
-                if(count < 6) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                QPointF c1(num[0] + offsetX, num[1] + offsetY);
-                QPointF c2(num[2] + offsetX, num[3] + offsetY);
-                QPointF e(num[4] + offsetX, num[5] + offsetY);
-                num += 6;
-                count -= 6;
-                //path.cubicTo(c1, c2, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c2, c1, lastAddedPoint);
-                // !!!
-                ctrlPt = c2;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 'C': {
-                if(count < 6) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                QPointF c1(num[0], num[1]);
-                QPointF c2(num[2], num[3]);
-                QPointF e(num[4], num[5]);
-                num += 6;
-                count -= 6;
-                //path.cubicTo(c1, c2, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c2, c1, lastAddedPoint);
-                // !!!
-                ctrlPt = c2;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 's': {
-                if(count < 4) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                QPointF c1;
-                if(lastMode == 'c' || lastMode == 'C' ||
-                    lastMode == 's' || lastMode == 'S')
-                    c1 = QPointF(2*x-ctrlPt.x(), 2*y-ctrlPt.y());
-                else
-                    c1 = QPointF(x, y);
-                QPointF c2(num[0] + offsetX, num[1] + offsetY);
-                QPointF e(num[2] + offsetX, num[3] + offsetY);
-                num += 4;
-                count -= 4;
-                //path.cubicTo(c1, c2, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c2, c1, lastAddedPoint);
-                // !!!
-                ctrlPt = c2;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 'S': {
-                if(count < 4) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                QPointF c1;
-                if(lastMode == 'c' || lastMode == 'C' ||
-                    lastMode == 's' || lastMode == 'S')
-                    c1 = QPointF(2*x-ctrlPt.x(), 2*y-ctrlPt.y());
-                else
-                    c1 = QPointF(x, y);
-                QPointF c2(num[0], num[1]);
-                QPointF e(num[2], num[3]);
-                num += 4;
-                count -= 4;
-                //path.cubicTo(c1, c2, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c2, c1, lastAddedPoint);
-                // !!!
-                ctrlPt = c2;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 'q': {
-                if(count < 4) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                QPointF c(num[0] + offsetX, num[1] + offsetY);
-                QPointF e(num[2] + offsetX, num[3] + offsetY);
-                num += 4;
-                count -= 4;
-                //path.quadTo(c, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c,
-                                                      QPointF(0.f, 0.f),
-                                                      lastAddedPoint);
-                // !!!
-                ctrlPt = c;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 'Q': {
-                if(count < 4) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                QPointF c(num[0], num[1]);
-                QPointF e(num[2], num[3]);
-                num += 4;
-                count -= 4;
-                //path.quadTo(c, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c,
-                                                      QPointF(0.f, 0.f),
-                                                      lastAddedPoint);
-                // !!!
-                ctrlPt = c;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 't': {
-                if(count < 2) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                QPointF e(num[0] + offsetX, num[1] + offsetY);
-                num += 2;
-                count -= 2;
-                QPointF c;
-                if(lastMode == 'q' || lastMode == 'Q' ||
-                    lastMode == 't' || lastMode == 'T')
-                    c = QPointF(2*x-ctrlPt.x(), 2*y-ctrlPt.y());
-                else
-                    c = QPointF(x, y);
-                //path.quadTo(c, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c,
-                                                      QPointF(0.f, 0.f),
-                                                      lastAddedPoint);
-                // !!!
-                ctrlPt = c;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 'T': {
-                if(count < 2) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                QPointF e(num[0], num[1]);
-                num += 2;
-                count -= 2;
-                QPointF c;
-                if(lastMode == 'q' || lastMode == 'Q' ||
-                    lastMode == 't' || lastMode == 'T')
-                    c = QPointF(2*x-ctrlPt.x(), 2*y-ctrlPt.y());
-                else
-                    c = QPointF(x, y);
-                //path.quadTo(c, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c,
-                                                      QPointF(0.f, 0.f),
-                                                      lastAddedPoint);
-                // !!!
-                ctrlPt = c;
-                x = e.x();
-                y = e.y();
-                break;
-            }
-            case 'a': {
-                if(count < 7) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                qreal rx = (*num++);
-                qreal ry = (*num++);
-                qreal xAxisRotation = (*num++);
-                qreal largeArcFlag  = (*num++);
-                qreal sweepFlag = (*num++);
-                qreal ex = (*num++) + offsetX;
-                qreal ey = (*num++) + offsetY;
-                count -= 7;
-                qreal curx = x;
-                qreal cury = y;
-                //pathArc(path, rx, ry, xAxisRotation, int(largeArcFlag),
-                //        int(sweepFlag), ex, ey, curx, cury);
-
-                x = ex;
-                y = ey;
-            }
-                break;
-            case 'A': {
-                if(count < 7) {
-                    num += count;
-                    count = 0;
-                    break;
-                }
-                qreal rx = (*num++);
-                qreal ry = (*num++);
-                qreal xAxisRotation = (*num++);
-                qreal largeArcFlag  = (*num++);
-                qreal sweepFlag = (*num++);
-                qreal ex = (*num++);
-                qreal ey = (*num++);
-                count -= 7;
-                qreal curx = x;
-                qreal cury = y;
-                //pathArc(path, rx, ry, xAxisRotation, int(largeArcFlag),
-                //        int(sweepFlag), ex, ey, curx, cury);
-
-                x = ex;
-                y = ey;
-            }
-                break;
-            default:
-                return false;
-            }
-            lastMode = pathElem.toLatin1();
-        }
-    }
-    return true;
-}*/
 #include "Animators/paintsettingsanimator.h"
 
 void FillSvgAttributes::setColor(const QColor &val) {
@@ -2115,166 +1363,17 @@ void BoxSvgAttributes::apply(BoundingBox *box) const {
 
 void VectorPathSvgAttributes::apply(SmartVectorPath * const path) {
     SmartPathCollection* const pathAnimator = path->getPathAnimator();
-    for(const auto& separatePath : mSvgSeparatePaths) {
-        const auto singlePath = SPtrCreate(SmartPathAnimator)();
-        separatePath->apply(singlePath.get());
+//    for(const auto& separatePath : mSvgSeparatePaths) {
+//        const auto singlePath = SPtrCreate(SmartPathAnimator)();
+//        separatePath->apply(singlePath.get());
+//        pathAnimator->addChild(singlePath);
+//    }
+    for(const auto& separatePath : mSeparatePaths) {
+        const auto singlePath = SPtrCreate(SmartPathAnimator)(separatePath);
         pathAnimator->addChild(singlePath);
     }
 
     BoxSvgAttributes::apply(path);
-}
-
-void SvgSeparatePath::apply(SmartPathAnimator * const path) {
-    for(const auto& point : mPoints) {
-        path->actionAddNewAtEnd(point.toNormalNodeData());
-    }
-    if(mClosedPath) path->actionClose();
-}
-
-void SvgSeparatePath::closePath() {
-    auto& firstPt = mPoints.first();
-    const qreal distBetweenEndPts = pointToLen(mLastPoint->p1() -
-                                               firstPt.p1());
-    if(mLastPoint->getC0Enabled() && distBetweenEndPts < 0.1) {
-        firstPt.setC0(mLastPoint->c0());
-        mPoints.removeLast();
-        mLastPoint = &mPoints.last();
-    }
-
-    mClosedPath = true;
-}
-
-void SvgSeparatePath::moveTo(const QPointF &e) {
-    addPoint(SvgNormalNode(e));
-}
-
-void SvgSeparatePath::cubicTo(const QPointF &c1,
-                              const QPointF &c2,
-                              const QPointF &e) {
-    mLastPoint->setC2(c1);
-    SvgNormalNode newPt(e);
-    newPt.setC0(c2);
-    addPoint(newPt);
-}
-
-void SvgSeparatePath::lineTo(const QPointF &e) {
-    addPoint(SvgNormalNode(e));
-}
-
-void SvgSeparatePath::quadTo(const QPointF &c, const QPointF &e) {
-    const QPointF prev = mLastPoint->p1();
-    const QPointF c1((prev.x() + 2*c.x()) / 3, (prev.y() + 2*c.y()) / 3);
-    const QPointF c2((e.x() + 2*c.x()) / 3, (e.y() + 2*c.y()) / 3);
-    cubicTo(c1, c2, e);
-}
-
-void SvgSeparatePath::applyTransfromation(const QMatrix &transformation) {
-    for(auto& point : mPoints) {
-        point.applyTransfromation(transformation);
-    }
-}
-
-void SvgSeparatePath::pathArc(qreal rX, qreal rY,
-                              const qreal xAxisRotation,
-                              const int largeArcFlag, const int sweepFlag,
-                              const qreal x, const qreal y,
-                              const qreal curX, const qreal curY) {
-    rX = qAbs(rX);
-    rY = qAbs(rY);
-
-    const qreal sin_th = qSin(xAxisRotation * (M_PI / 180));
-    const qreal cos_th = qCos(xAxisRotation * (M_PI / 180));
-
-    const qreal dx = (curX - x) / 2;
-    const qreal dy = (curY - y) / 2;
-    const qreal dx1 =  cos_th * dx + sin_th * dy;
-    const qreal dy1 = -sin_th * dx + cos_th * dy;
-    const qreal Pr1 = rX * rX;
-    const qreal Pr2 = rY * rY;
-    const qreal Px = dx1 * dx1;
-    const qreal Py = dy1 * dy1;
-    /* Spec : check if radii are large enough */
-    const qreal check = Px / Pr1 + Py / Pr2;
-    if(check > 1) {
-        rX = rX * qSqrt(check);
-        rY = rY * qSqrt(check);
-    }
-
-    const qreal a00 =  cos_th / rX;
-    const qreal a01 =  sin_th / rX;
-    const qreal a10 = -sin_th / rY;
-    const qreal a11 =  cos_th / rY;
-    const qreal x0 = a00 * curX + a01 * curY;
-    const qreal y0 = a10 * curX + a11 * curY;
-    const qreal x1 = a00 * x + a01 * y;
-    const qreal y1 = a10 * x + a11 * y;
-    /* (x0, y0) is current point in transformed coordinate space.
-           (x1, y1) is new point in transformed coordinate space.
-
-           The arc fits a unit-radius circle in this space.
-        */
-    const qreal d = (x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0);
-    qreal sfactor_sq = 1 / d - 0.25;
-    if(sfactor_sq < 0) sfactor_sq = 0;
-    qreal sfactor = qSqrt(sfactor_sq);
-    if(sweepFlag == largeArcFlag) sfactor = -sfactor;
-    const qreal xc = 0.5 * (x0 + x1) - sfactor * (y1 - y0);
-    const qreal yc = 0.5 * (y0 + y1) + sfactor * (x1 - x0);
-    /* (xc, yc) is center of the circle. */
-
-    const qreal th0 = qAtan2(y0 - yc, x0 - xc);
-    const qreal th1 = qAtan2(y1 - yc, x1 - xc);
-
-    qreal th_arc = th1 - th0;
-    if(th_arc < 0 && sweepFlag)
-        th_arc += 2 * M_PI;
-    else if(th_arc > 0 && !sweepFlag)
-        th_arc -= 2 * M_PI;
-
-    const int n_segs = qCeil(qAbs(th_arc / (M_PI * 0.5 + 0.001)));
-
-    for(int i = 0; i < n_segs; i++) {
-        pathArcSegment(xc, yc,
-                       th0 + i * th_arc / n_segs,
-                       th0 + (i + 1) * th_arc / n_segs,
-                       rX, rY, xAxisRotation);
-    }
-}
-
-void SvgSeparatePath::pathArcSegment(const qreal xc, const qreal yc,
-                                     const qreal th0, const qreal th1,
-                                     const qreal rx, const qreal ry,
-                                     const qreal xAxisRotation) {
-    const qreal sinTh = qSin(xAxisRotation * (M_PI / 180));
-    const qreal cosTh = qCos(xAxisRotation * (M_PI / 180));
-
-    const qreal a00 =  cosTh * rx;
-    const qreal a01 = -sinTh * ry;
-    const qreal a10 =  sinTh * rx;
-    const qreal a11 =  cosTh * ry;
-
-    const qreal thHalf = 0.5 * (th1 - th0);
-    const qreal sinThHalf05 = qSin(thHalf * 0.5);
-    const qreal t = 8 * sinThHalf05 * sinThHalf05 / qSin(thHalf) / 3;
-    const qreal cosTh0 = qCos(th0);
-    const qreal cosTh1 = qCos(th1);
-    const qreal sinTh0 = qSin(th0);
-    const qreal sinTh1 = qSin(th1);
-    const qreal x1 = xc + cosTh0 - t * sinTh0;
-    const qreal y1 = yc + sinTh0 + t * cosTh0;
-    const qreal x3 = xc + cosTh1;
-    const qreal y3 = yc + sinTh1;
-    const qreal x2 = x3 + t * sinTh1;
-    const qreal y2 = y3 - t * cosTh1;
-
-    cubicTo(QPointF(a00 * x1 + a01 * y1, a10 * x1 + a11 * y1),
-            QPointF(a00 * x2 + a01 * y2, a10 * x2 + a11 * y2),
-            QPointF(a00 * x3 + a01 * y3, a10 * x3 + a11 * y3));
-}
-
-void SvgSeparatePath::addPoint(const SvgNormalNode &point) {
-    mPoints << point;
-    mLastPoint = &mPoints.last();
 }
 
 void TextSvgAttributes::setFontFamily(const QString &family) {
@@ -2295,72 +1394,4 @@ void TextSvgAttributes::setFontWeight(const int weight) {
 
 void TextSvgAttributes::setFontAlignment(const Qt::Alignment &alignment) {
     mAlignment = alignment;
-}
-
-SvgNormalNode::SvgNormalNode(const QPointF& p1) {
-    mC0 = p1;
-    mP1 = p1;
-    mC2 = p1;
-}
-
-void SvgNormalNode::guessCtrlsMode() {
-    if(!mC0Enabled || !mC2Enabled) {
-        mCtrlsMode = CTRLS_CORNER;
-        return;
-    }
-    const QLineF startLine(mC0, mP1);
-    const QLineF endLine(mP1, mC2);
-    qreal angle = startLine.angleTo(endLine);
-    while(angle > 90) angle -= 180;
-    if(isZero1Dec(angle)) {
-        const qreal lenDiff = startLine.length() - endLine.length();
-        if(isZero1Dec(lenDiff)) mCtrlsMode = CTRLS_SYMMETRIC;
-        else mCtrlsMode = CTRLS_SMOOTH;
-    } else mCtrlsMode = CTRLS_CORNER;
-}
-
-void SvgNormalNode::setC0(const QPointF &c0) {
-    mC0 = c0;
-    mC0Enabled = !isZero1Dec(pointToLen(mC0 - mP1));
-    if(mC0Enabled && mC2Enabled) guessCtrlsMode();
-}
-
-void SvgNormalNode::setC2(const QPointF &c2) {
-    mC2 = c2;
-    mC2Enabled = !isZero1Dec(pointToLen(mC2 - mP1));
-    if(mC0Enabled && mC2Enabled) guessCtrlsMode();
-}
-
-CtrlsMode SvgNormalNode::getCtrlsMode() const {
-    return mCtrlsMode;
-}
-
-QPointF SvgNormalNode::p1() const {
-    return mP1;
-}
-
-QPointF SvgNormalNode::c0() const {
-    return mC0;
-}
-
-QPointF SvgNormalNode::c2() const {
-    return mC2;
-}
-
-bool SvgNormalNode::getC0Enabled() const {
-    return mC0Enabled;
-}
-
-bool SvgNormalNode::getC2Enabled() const {
-    return mC2Enabled;
-}
-
-void SvgNormalNode::applyTransfromation(const QMatrix &transformation) {
-    mC0 = transformation.map(mC0);
-    mP1 = transformation.map(mP1);
-    mC2 = transformation.map(mC2);
-}
-
-NormalNodeData SvgNormalNode::toNormalNodeData() const {
-    return { mC0Enabled, mC2Enabled, mCtrlsMode, mC0, mP1, mC2 };
 }

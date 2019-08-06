@@ -52,12 +52,14 @@ void ColorValueRect::mouseMoveEvent(QMouseEvent *e) {
 
 void ColorValueRect::mousePressEvent(QMouseEvent *e) {
     if(e->button() == Qt::RightButton) return;
+    Actions::sInstance->startSmoothChange();
     emit editingStarted(value());
     mouseInteraction(e->x());
     Document::sInstance->actionFinished();
 }
 
 void ColorValueRect::mouseReleaseEvent(QMouseEvent *) {
+    Actions::sInstance->finishSmoothChange();
     mHslSaturatonTmp = -1;
     emit editingFinished(value());
     Document::sInstance->actionFinished();

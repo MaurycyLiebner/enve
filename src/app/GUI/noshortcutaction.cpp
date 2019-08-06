@@ -1,5 +1,7 @@
 #include "noshortcutaction.h"
+#include <QEvent>
 
 bool NoShortcutAction::event(QEvent *e) {
-    return QObject::event(e);
+    if(e->type() == QEvent::Shortcut) return true;
+    else return QAction::event(e);
 }

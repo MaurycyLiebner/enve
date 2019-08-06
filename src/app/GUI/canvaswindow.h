@@ -19,7 +19,7 @@ class TaskExecutor;
 class SoundComposition;
 class PaintSettingsApplier;
 class RenderInstanceSettings;
-class Task;
+class eTask;
 class ImageBox;
 class SingleSound;
 class VideoBox;
@@ -48,7 +48,8 @@ public:
     bool hasNoCanvas();
 
     void queTasksAndUpdate();
-    bool KFT_handleKeyEventForTarget(QKeyEvent *event);
+    bool KFT_keyReleaseEvent(QKeyEvent *event);
+    bool KFT_keyPressEvent(QKeyEvent *event);
 
     void setResolutionFraction(const qreal percent);
     void updatePivotIfNeeded();
@@ -89,7 +90,6 @@ protected:
     }
 
     void KFT_clearFocus() {
-        if(mCurrentCanvas) mDocument.setActiveScene(nullptr);
         clearFocus();
         update();
     }

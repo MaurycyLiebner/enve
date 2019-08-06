@@ -9,7 +9,7 @@
 #include "textbox.h"
 #include "Animators/rastereffectanimators.h"
 
-ContainerBox::ContainerBox(const BoundingBoxType &type) :
+ContainerBox::ContainerBox(const BoundingBoxType type) :
     BoundingBox(type) {
     iniPathEffects();
 }
@@ -239,26 +239,15 @@ void ContainerBox::filterFillPath(const qreal relFrame,
     mParentGroup->filterFillPath(parentRelFrame, srcDstPath);
 }
 
-void ContainerBox::scheduleChildWaitingTasks() {
-    for(const auto &child : mContainedBoxes) {
-        child->scheduleWaitingTasks();
-    }
-}
-
-void ContainerBox::scheduleWaitingTasks() {
-    scheduleChildWaitingTasks();
-    BoundingBox::scheduleWaitingTasks();
-}
-
 void ContainerBox::queChildScheduledTasks() {
-    for(const auto &child : mContainedBoxes) {
+    for(const auto &child : mContainedBoxes)
         child->queScheduledTasks();
-    }
 }
 
 void ContainerBox::queScheduledTasks() {
-    BoundingBox::queScheduledTasks();
     queChildScheduledTasks();
+    if(mSchedulePlanned && SWT_isGroupBox()) updateRelBoundingRect();
+    BoundingBox::queScheduledTasks();
 }
 
 void ContainerBox::promoteToLayer() {
@@ -293,7 +282,7 @@ void ContainerBox::demoteToGroup() {
     }
 }
 
-void ContainerBox::updateAllBoxes(const UpdateReason &reason) {
+void ContainerBox::updateAllBoxes(const UpdateReason reason) {
     for(const auto &child : mContainedBoxes) {
         child->updateAllBoxes(reason);
     }
@@ -318,24 +307,21 @@ void ContainerBox::shiftAll(const int shift) {
     }
 }
 
-QRectF ContainerBox::getRelBoundingRect(const qreal relFrame) {
+void ContainerBox::updateRelBoundingRect() {
     SkPath boundingPaths;
-    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     for(const auto &child : mContainedBoxes) {
-        const qreal childRelFrame = child->prp_absFrameToRelFrameF(absFrame);
-        if(child->isVisibleAndInDurationRect(qRound(childRelFrame))) {
+        if(child->isVisibleAndInVisibleDurationRect()) {
             SkPath childPath;
-            const auto childRel = child->getRelBoundingRect(childRelFrame);
+            const auto childRel = child->getRelBoundingRect();
             childPath.addRect(toSkRect(childRel));
 
-            const auto childRelTrans =
-                    child->getRelativeTransformAtRelFrameF(childRelFrame);
+            const auto childRelTrans = child->getRelativeTransformAtCurrentFrame();
             childPath.transform(toSkMatrix(childRelTrans));
 
             boundingPaths.addPath(childPath);
         }
     }
-    return toQRectF(boundingPaths.computeTightBounds());
+    setRelBoundingRect(toQRectF(boundingPaths.computeTightBounds()));
 }
 
 
@@ -395,7 +381,7 @@ FrameRange ContainerBox::getFirstAndLastIdenticalForMotionBlur(
 
 
 bool ContainerBox::relPointInsidePath(const QPointF &relPos) const {
-    if(mRelBoundingRect.contains(relPos)) {
+    if(mRelRect.contains(relPos)) {
         const QPointF absPos = mapRelPosToAbs(relPos);
         for(const auto& box : mContainedBoxes) {
             if(box->absPointInsidePath(absPos)) {
@@ -525,22 +511,20 @@ void processChildData(BoundingBox * const child,
     if(child->SWT_isGroupBox()) {
         const auto childGroup = GetAsPtr(child, ContainerBox);
         const auto& descs = childGroup->getContainedBoxes();
-        for(const auto& desc : descs) {
+        for(int i = descs.count() - 1; i >= 0; i--) {
+            const auto& desc = descs.at(i);
             const qreal descRelFrame = desc->prp_absFrameToRelFrameF(absFrame);
             processChildData(desc.get(), parentData, descRelFrame, absFrame);
         }
         return;
     }
-    auto boxRenderData = child->getCurrentRenderData(qRound(childRelFrame));
+    auto boxRenderData = child->getCurrentRenderData(childRelFrame);
     if(!boxRenderData) {
         boxRenderData = child->createRenderData();
         boxRenderData->fReason = parentData->fReason;
-        //boxRenderData->parentIsTarget = false;
-        boxRenderData->fUseCustomRelFrame = true;
-        boxRenderData->fCustomRelFrame = childRelFrame;
-        boxRenderData->scheduleTask();
+        boxRenderData->fRelFrame = childRelFrame;
+        TaskScheduler::sGetInstance()->queCPUTask(boxRenderData);
     }
-    //qDebug() << boxRenderData->fBoxStateId;
     boxRenderData->addDependent(parentData);
     parentData->fChildrenRenderData << boxRenderData;
 }
@@ -551,16 +535,6 @@ stdsptr<BoxRenderData> ContainerBox::createRenderData() {
 
 void ContainerBox::setupRenderData(const qreal relFrame,
                                    BoxRenderData * const data) {
-    if(SWT_isGroupBox()) {
-        data->fOpacity = 0;
-        if(data->fParentIsTarget && !data->nullifyBeforeProcessing()) {
-            nullifyCurrentRenderData(data->fRelFrame);
-        }
-    } else setupLayerRenderData(relFrame, data);
-}
-
-void ContainerBox::setupLayerRenderData(const qreal relFrame,
-                                        BoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
     const auto groupData = GetAsPtr(data, ContainerBoxRenderData);
     groupData->fChildrenRenderData.clear();

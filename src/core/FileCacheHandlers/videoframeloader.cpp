@@ -157,9 +157,9 @@ void VideoFrameLoader::afterCanceled() {
 
 void VideoFrameLoader::scheduleTaskNow() {
     if(mFrameToConvert) {
-        TaskScheduler::sGetInstance()->scheduleCPUTask(ref<Task>());
+        TaskScheduler::sGetInstance()->scheduleCPUTask(ref<eTask>());
     } else {
-        TaskScheduler::sGetInstance()->scheduleHDDTask(ref<Task>());
+        TaskScheduler::sGetInstance()->scheduleHDDTask(ref<eTask>());
     }
 }
 

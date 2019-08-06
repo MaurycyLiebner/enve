@@ -33,7 +33,7 @@ sk_sp<SkImage> ImageSequenceFileHandler::getFrameAtOrBeforeFrame(
     return cacheHandler->getImage();
 }
 
-Task *ImageSequenceFileHandler::scheduleFrameLoad(const int frame) {
+eTask *ImageSequenceFileHandler::scheduleFrameLoad(const int frame) {
     if(mFrameImageHandlers.isEmpty()) return nullptr;
     const auto& imageHandler = mFrameImageHandlers.at(frame);
     if(imageHandler->hasImage()) return nullptr;

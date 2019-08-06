@@ -12,7 +12,7 @@ class ShaderProgramCallerBase;
 #include "effectsrenderer.h"
 
 class RenderDataCustomizerFunctor;
-struct BoxRenderData : public Task {
+struct BoxRenderData : public eTask {
     friend class StdSelfRef;
 protected:
     enum class Step { BOX_IMAGE, EFFECTS };
@@ -23,12 +23,13 @@ protected:
     virtual void setupRenderData() {}
     virtual void transformRenderCanvas(SkCanvas& canvas) const;
     virtual void copyFrom(BoxRenderData *src);
-    virtual void updateRelBoundingRect();
+    virtual void updateRelBoundingRect() = 0;
+    virtual void updateGlobalRect();
 
     HardwareSupport hardwareSupport() const;
 
     void scheduleTaskNow() final;
-    void afterCanceled();
+    void afterCanceled() {}
     void beforeProcessing(const Hardware hw) final;
     void afterProcessing() final;
     void afterQued() final;
@@ -40,21 +41,16 @@ public:
     }
 
     bool nextStep() {
-        if(mState == WAITING) mState = PROCESSING;
+        if(mState == eTaskState::waiting) mState = eTaskState::processing;
         const bool result = !mEffectsRenderer.isEmpty();
         if(result) mStep = Step::EFFECTS;
         return result;
     }
 
-    void processGpu(QGL33 * const gl,
-                    SwitchableContext &context);
+    void processGpu(QGL33 * const gl, SwitchableContext &context);
     void process();
 
-
     stdsptr<BoxRenderData> makeCopy();
-
-    bool fCopied = false;
-    bool fRelBoundingRectSet = false;
 
     Animator::UpdateReason fReason;
 
@@ -62,30 +58,29 @@ public:
 
     QMatrix fResolutionScale;
     QMatrix fScaledTransform;
+    QMatrix fRelTransform;
     QMatrix fTransform;
     QMatrix fRenderTransform;
 
+    bool fRelBoundingRectSet = false;
     QRectF fRelBoundingRect;
     QRect fGlobalRect;
+    QList<QRectF> fOtherGlobalRects;
     QRect fMaxBoundsRect;
 
     QMargins fBaseMargin;
 
     qreal fOpacity = 1;
     qreal fResolution;
-    int fRelFrame;
+    qreal fRelFrame;
 
     // for motion blur
-    bool fUseCustomRelFrame = false;
-    qreal fCustomRelFrame;
-    QList<QRectF> fOtherGlobalRects;
     stdptr<BoxRenderData> fMotionBlurTarget;
     // for motion blur
 
     SkBlendMode fBlendMode = SkBlendMode::kSrcOver;
 
     bool fParentIsTarget = true;
-    bool fRefInParent = false;
     qptr<BoundingBox> fParentBox;
     sk_sp<SkImage> fRenderedImage;
 
@@ -93,69 +88,19 @@ public:
 
     void dataSet();
 
-    void appendRenderCustomizerFunctor(
-            const stdsptr<RenderDataCustomizerFunctor>& customizer) {
-        mRenderDataCustomizerFunctors.append(customizer);
-    }
-
-    void prependRenderCustomizerFunctor(
-            const stdsptr<RenderDataCustomizerFunctor>& customizer) {
-        mRenderDataCustomizerFunctors.prepend(customizer);
-    }
-    bool nullifyBeforeProcessing();
-
     void addEffect(const stdsptr<RasterEffectCaller>& effect) {
         mEffectsRenderer.add(effect);
     }
 protected:
-    virtual void updateGlobalRect();
     bool hasEffects() const { return !mEffectsRenderer.isEmpty(); }
 
     void setBaseGlobalRect(const QRectF &baseRectF);
 
-    QList<stdsptr<RenderDataCustomizerFunctor>> mRenderDataCustomizerFunctors;
     bool mDelayDataSet = false;
     bool mDataSet = false;
 private:
     Step mStep = Step::BOX_IMAGE;
     EffectsRenderer mEffectsRenderer;
-};
-
-class RenderDataCustomizerFunctor : public StdSelfRef {
-public:
-    RenderDataCustomizerFunctor();
-    virtual void customize(BoxRenderData * const data) = 0;
-    void operator()(BoxRenderData * const data);
-};
-
-class ReplaceTransformDisplacementCustomizer : public RenderDataCustomizerFunctor {
-public:
-    ReplaceTransformDisplacementCustomizer(const qreal dx,
-                                           const qreal dy);
-
-    void customize(BoxRenderData * const data);
-protected:
-    qreal mDx, mDy;
-};
-
-class MultiplyTransformCustomizer : public RenderDataCustomizerFunctor {
-public:
-    MultiplyTransformCustomizer(const QMatrix &transform,
-                                const qreal opacity = 1);
-
-    void customize(BoxRenderData * const data);
-protected:
-    QMatrix mTransform;
-    qreal mOpacity = 1;
-};
-
-class MultiplyOpacityCustomizer : public RenderDataCustomizerFunctor {
-public:
-    MultiplyOpacityCustomizer(const qreal opacity);
-
-    void customize(BoxRenderData * const data);
-protected:
-    qreal mOpacity;
 };
 
 #endif // BOXRENDERDATA_H

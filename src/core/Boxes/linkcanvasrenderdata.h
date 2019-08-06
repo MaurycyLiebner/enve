@@ -2,18 +2,25 @@
 #define LINKCANVASRENDERDATA_H
 #include "canvasrenderdata.h"
 struct LinkCanvasRenderData : public CanvasRenderData {
-    friend class StdSelfRef;
+    LinkCanvasRenderData(BoundingBox * const parentBoxT) :
+        CanvasRenderData(parentBoxT) {}
 
+    bool fClipToCanvas = false;
+protected:
     void updateRelBoundingRect() {
         if(fClipToCanvas) CanvasRenderData::updateRelBoundingRect();
         else ContainerBoxRenderData::updateRelBoundingRect();
     }
 
-    bool fClipToCanvas = false;
-protected:
-    LinkCanvasRenderData(BoundingBox * const parentBoxT) :
-        CanvasRenderData(parentBoxT) {}
+    void updateGlobalRect() {
+        if(fClipToCanvas) CanvasRenderData::updateGlobalRect();
+        else ContainerBoxRenderData::updateGlobalRect();
+    }
 
-    void process();
+    SkColor eraseColor() const {
+        if(fClipToCanvas) return fBgColor;
+        else return SK_ColorTRANSPARENT;
+    }
 };
+
 #endif // LINKCANVASRENDERDATA_H

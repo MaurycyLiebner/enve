@@ -39,10 +39,10 @@ void gApplyOperation(const qreal relFrame,
     }
     const auto srcBoxTrans = srcBox->getTransformAnimator();
     const QMatrix pathBoxMatrix = srcBoxTrans->
-            getTotalTransformAtRelFrameF(pathBoxRelFrame);
+            getTotalTransformAtFrame(pathBoxRelFrame);
     const auto dstBoxTrans = dstBox->getTransformAnimator();
     const QMatrix parentBoxMatrix = dstBoxTrans->
-            getTotalTransformAtRelFrameF(relFrame);
+            getTotalTransformAtFrame(relFrame);
     boxPath.transform(toSkMatrix(pathBoxMatrix*parentBoxMatrix.inverted()));
     if(!Op(src, boxPath, op, dst)) RuntimeThrow("Operation Failed.");
 }

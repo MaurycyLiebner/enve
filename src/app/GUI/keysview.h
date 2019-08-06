@@ -80,21 +80,17 @@ public:
     void mouseReleaseEvent(QMouseEvent *e);
     void graphRemoveViewedAnimator(GraphAnimator * const animator);
     void clearHoveredMovable();
-    bool KFT_handleKeyEventForTarget(QKeyEvent *event);
+    bool KFT_keyPressEvent(QKeyEvent *event);
     void handleMouseMove(const QPoint &pos,
                          const Qt::MouseButtons &buttons);
 protected:
     ValueInput mValueInput;
 
     QPoint mLastMovePos;
-    void focusInEvent(QFocusEvent *);
 
     void resizeEvent(QResizeEvent *e);
-
     void wheelEvent(QWheelEvent *e);
-
     void mousePressEvent(QMouseEvent *e);
-
     void paintEvent(QPaintEvent *);
 
     void leaveEvent(QEvent *) {
@@ -102,15 +98,8 @@ protected:
         update();
     }
 protected:
-    void KFT_setFocusToWidget() {
-        setFocus();
-        update();
-    }
-
-    void KFT_clearFocus() {
-        clearFocus();
-        update();
-    }
+    void KFT_setFocusToWidget();
+    void KFT_clearFocus();
 signals:
     void changedViewedFrames(FrameRange);
     void wheelEventSignal(QWheelEvent*);

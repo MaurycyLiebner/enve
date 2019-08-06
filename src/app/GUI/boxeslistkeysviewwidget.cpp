@@ -136,16 +136,16 @@ TimelineWidget::TimelineWidget(Document &document,
     mBoxesListScrollArea = new ScrollArea(this);
 
     mBoxesListWidget = new BoxScrollWidget(mDocument, mBoxesListScrollArea);
-    auto visiblePartWidget = mBoxesListWidget->getVisiblePartWidget();
-    visiblePartWidget->setCurrentRule(SWT_BR_ALL);
-    visiblePartWidget->setCurrentTarget(nullptr, SWT_TARGET_CURRENT_CANVAS);
+    mBoxesListVisible = mBoxesListWidget->getVisiblePartWidget();
+    mBoxesListVisible->setCurrentRule(SWT_BR_ALL);
+    mBoxesListVisible->setCurrentTarget(nullptr, SWT_TARGET_CURRENT_CANVAS);
 
     mBoxesListScrollArea->setWidget(mBoxesListWidget);
     mMainLayout->addWidget(mMenuWidget, 0, 0);
     mMainLayout->addWidget(mBoxesListScrollArea, 1, 0);
 
     mKeysViewLayout = new QVBoxLayout();
-    mKeysView = new KeysView(mBoxesListWidget->getVisiblePartWidget(), this);
+    mKeysView = new KeysView(mBoxesListVisible, this);
     mKeysViewLayout->addWidget(mKeysView);
     mAnimationDockWidget = new AnimationDockWidget(this, mKeysView);
     mAnimationDockWidget->hide();
@@ -176,6 +176,8 @@ TimelineWidget::TimelineWidget(Document &document,
             this, &TimelineWidget::moveSlider);
     connect(mKeysView, &KeysView::wheelEventSignal,
             mBoxesListScrollArea, &ScrollArea::callWheelEvent);
+    connect(mKeysView, &KeysView::changedViewedFrames,
+             this, &TimelineWidget::setViewedFrameRange);
 
     connect(mSceneChooser, &SceneChooser::currentChanged,
             this, &TimelineWidget::setCurrentScene);
@@ -184,14 +186,13 @@ TimelineWidget::TimelineWidget(Document &document,
 
     setLayout(mMainLayout);
 
-    mFrameScrollBar = new FrameScrollBar(1, 1, 0,
-                                         false, false, this);
+    mFrameScrollBar = new FrameScrollBar(1, 1, 0, false, false, this);
     mFrameScrollBar->setSizePolicy(QSizePolicy::Minimum,
                                    QSizePolicy::Preferred);
 //    connect(MemoryHandler::sGetInstance(), &MemoryHandler::memoryFreed,
 //            frameScrollBar,
 //            qOverload<>(&FrameScrollBar::update));
-    connect(mFrameScrollBar, &FrameScrollBar::viewedFrameRangeChanged,
+    connect(mFrameScrollBar, &FrameScrollBar::triggeredFrameRangeChange,
             this, [this](const FrameRange& range){
         const auto scene = mSceneChooser->getCurrentScene();
         if(scene) scene->anim_setAbsFrame(range.fMin);
@@ -202,7 +203,7 @@ TimelineWidget::TimelineWidget(Document &document,
     mFrameRangeScrollBar = new FrameScrollBar(20, 200, MIN_WIDGET_DIM*2/3,
                                               true, true, this);
 
-    connect(mFrameRangeScrollBar, &FrameScrollBar::viewedFrameRangeChanged,
+    connect(mFrameRangeScrollBar, &FrameScrollBar::triggeredFrameRangeChange,
             this, &TimelineWidget::setViewedFrameRange);
     mKeysViewLayout->addWidget(mFrameRangeScrollBar);
     mSceneChooser->setCurrentScene(mDocument.fActiveScene);
@@ -230,10 +231,35 @@ void TimelineWidget::setCurrentScene(Canvas * const scene) {
     mBoxesListWidget->setCurrentScene(scene);
     mKeysView->setCurrentScene(scene);
     if(scene) {
+        setCanvasFrameRange(scene->getFrameRange());
+        mFrameScrollBar->setFirstViewedFrame(scene->getCurrentFrame());
+        mFrameRangeScrollBar->setFirstViewedFrame(scene->getCurrentFrame());
+        setViewedFrameRange(mFrameRangeScrollBar->getViewedRange());
+
         connect(scene, &Canvas::currentFrameChanged,
                 mFrameScrollBar, &FrameScrollBar::setFirstViewedFrame);
         connect(scene, &Canvas::newFrameRange,
                 this, &TimelineWidget::setCanvasFrameRange);
+
+
+        const auto rules = mBoxesListVisible->getCurrentRulesCollection();
+        if(rules.fTarget == SWT_TARGET_CURRENT_CANVAS) {
+            mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
+                        scene, SWT_TARGET_CURRENT_CANVAS);
+        } else if(rules.fTarget == SWT_TARGET_CURRENT_GROUP) {
+            mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
+                        scene->getCurrentGroup(), SWT_TARGET_CURRENT_GROUP);
+        }
+        connect(scene, &Canvas::currentContainerSet, this,
+                [this](ContainerBox* const container) {
+            mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
+                        container, SWT_TARGET_CURRENT_GROUP);
+        });
+        connect(scene, &Canvas::requestUpdate, this, [this]() {
+            mFrameScrollBar->update();
+            mBoxesListVisible->update();
+            update();
+        });
     }
 }
 
@@ -340,8 +366,7 @@ void TimelineWidget::setSearchText(const QString &text) {
     Document::sInstance->actionFinished();
 }
 
-void TimelineWidget::setViewedFrameRange(
-        const FrameRange& range) {
+void TimelineWidget::setViewedFrameRange(const FrameRange& range) {
     mFrameRangeScrollBar->setViewedFrameRange(range);
     mFrameScrollBar->setDisplayedFrameRange(range);
     mKeysView->setFramesRange(range);

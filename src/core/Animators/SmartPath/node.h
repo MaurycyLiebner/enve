@@ -21,9 +21,14 @@ struct Node {
 
     Node() { mType = NONE; }
 
-    Node(const NormalNodeData& data) {
+    Node(const QPointF& p1) {
+        mC0 = p1;
+        mP1 = p1;
+        mC2 = p1;
         mType = NORMAL;
-        setNormalData(data);
+        mCtrlsMode = CtrlsMode::CTRLS_CORNER;
+        mC0Enabled = false;
+        mC2Enabled = false;
     }
 
     Node(const QPointF& c0, const QPointF& p1, const QPointF& c2) {
@@ -31,6 +36,14 @@ struct Node {
         mP1 = p1;
         mC2 = c2;
         mType = NORMAL;
+
+        guessCtrlsMode();
+        disableUnnecessaryCtrls();
+    }
+
+    Node(const NormalNodeData& data) {
+        mType = NORMAL;
+        setNormalData(data);
     }
 
     Node(const qreal t) {
@@ -42,16 +55,14 @@ struct Node {
 
     bool isDissolved() const { return mType == DISSOLVED; }
 
-    int getNodeId() const {
-        return mId;
-    }
+    int getNodeId() const { return mId; }
 
     void setNormalData(const NormalNodeData& data) {
         mC0 = data.fC0;
         mP1 = data.fP1;
         mC2 = data.fC2;
         mC0Enabled = data.fC0Enabled;
-        mC2Enabled = data.fC0Enabled;
+        mC2Enabled = data.fC2Enabled;
         mCtrlsMode = data.fCtrlsMode;
     }
 
@@ -66,34 +77,20 @@ struct Node {
         return mP1;
     }
 
-    QPointF p1() const {
-        return mP1;
-    }
+    QPointF p1() const { return mP1; }
 
     QPointF c2() const {
         if(mC2Enabled) return mC2;
         return mP1;
     }
 
-    qreal t() const {
-        return mT;
-    }
+    qreal t() const { return mT; }
 
-    void setC0(const QPointF& c0) {
-        mC0 = c0;
-    }
+    void setC0(const QPointF& c0) { mC0 = c0; }
+    void setC2(const QPointF& c2) { mC2 = c2; }
+    void setP1(const QPointF& p1) { mP1 = p1; }
 
-    void setC2(const QPointF& c2) {
-        mC2 = c2;
-    }
-
-    void setP1(const QPointF& p1) {
-        mP1 = p1;
-    }
-
-    void setT(const qreal t) {
-        mT = t;
-    }
+    void setT(const qreal t) { mT = t; }
 
     NodeType getType() const { return mType; }
     CtrlsMode getCtrlsMode() const { return mCtrlsMode; }
@@ -109,6 +106,25 @@ struct Node {
         mC0 = transform.map(mC0);
         mP1 = transform.map(mP1);
         mC2 = transform.map(mC2);
+    }
+
+    void disableUnnecessaryCtrls() {
+        if(isZero2Dec(pointToLen(mC0 - mP1))) setC0Enabled(false);
+        if(isZero2Dec(pointToLen(mC2 - mP1))) setC2Enabled(false);
+    }
+
+    void guessCtrlsMode() {
+        if(isZero2Dec(pointToLen(mC0 - mP1)) ||
+           isZero2Dec(pointToLen(mC2 - mP1)) ||
+           !mC0Enabled || !mC2Enabled) {
+            mCtrlsMode = CtrlsMode::CTRLS_CORNER;
+            return;
+        }
+        if(gIsSymmetric(mC0, mP1, mC2))
+            mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
+        else if(gIsSmooth(mC0, mP1, mC2))
+                    mCtrlsMode = CtrlsMode::CTRLS_SMOOTH;
+        else mCtrlsMode = CtrlsMode::CTRLS_CORNER;
     }
 protected:
     void setNodeId(const int nodeId) {
@@ -141,7 +157,7 @@ private:
     bool mC0Enabled = true;
     bool mC2Enabled = true;
     NodeType mType;
-    CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
+    CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_CORNER;
     int mId = -1;
     //! @brief T value for segment defined by previous and next normal node
     qreal mT;

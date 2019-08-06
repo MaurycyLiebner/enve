@@ -48,12 +48,12 @@ FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(
     return range*targetRange;
 }
 
-QMatrix InternalLinkGroupBox::getRelativeTransformAtRelFrameF(
+QMatrix InternalLinkGroupBox::getRelativeTransformAtFrame(
         const qreal relFrame) {
     if(isParentLink() && getLinkTarget()) {
-        return getLinkTarget()->getRelativeTransformAtRelFrameF(relFrame);
+        return getLinkTarget()->getRelativeTransformAtFrame(relFrame);
     } else {
-        return BoundingBox::getRelativeTransformAtRelFrameF(relFrame);
+        return BoundingBox::getRelativeTransformAtFrame(relFrame);
     }
 }
 
@@ -177,9 +177,4 @@ stdsptr<BoxRenderData> InternalLinkGroupBox::createRenderData() {
     auto renderData = getLinkTarget()->createRenderData();
     renderData->fParentBox = this;
     return renderData;
-}
-
-QRectF InternalLinkGroupBox::getRelBoundingRect(const qreal relFrame) {
-    if(!getLinkTarget()) return QRectF();
-    return getLinkTarget()->getRelBoundingRect(relFrame);
 }

@@ -98,7 +98,7 @@ void EffectSubTaskSpawner_priv::spawn() {
 
 void EffectSubTaskSpawner_priv::decRemaining_k() {
     if(--mRemaining > 0) return;
-    if(mData->getState() != Task::CANCELED) {
+    if(mData->getState() != eTaskState::canceled) {
         mData->fRenderedImage = SkiaHelpers::transferDataToSkImage(mDstBitmap);
         if(mData->nextStep()) {
             TaskScheduler::sGetInstance()->scheduleCPUTask(mData);

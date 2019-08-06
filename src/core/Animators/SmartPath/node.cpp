@@ -24,15 +24,15 @@ Node Node::sInterpolateNormal(const Node &node1, const Node &node2,
     const CtrlsMode node1Ctrls = node1.getCtrlsMode();
     const CtrlsMode node2Ctrls = node2.getCtrlsMode();
     if(node1Ctrls == node2Ctrls) {
-        result.setCtrlsMode(node1.getCtrlsMode());
+        result.mCtrlsMode = node1Ctrls;
     } else if(node1Ctrls == CtrlsMode::CTRLS_CORNER ||
               node2Ctrls == CtrlsMode::CTRLS_CORNER) {
-        result.setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+        result.mCtrlsMode = CtrlsMode::CTRLS_CORNER;
     } else if(node1Ctrls == CtrlsMode::CTRLS_SMOOTH ||
               node2Ctrls == CtrlsMode::CTRLS_SMOOTH) {
-        result.setCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+        result.mCtrlsMode = CtrlsMode::CTRLS_SMOOTH;
     } else {
-        result.setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+        result.mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
     }
     return result;
 }

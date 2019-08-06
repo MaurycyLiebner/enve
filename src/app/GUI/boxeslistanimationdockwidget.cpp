@@ -178,7 +178,7 @@ RenderWidget *BoxesListAnimationDockWidget::getRenderWidget() {
     return mRenderWidget;
 }
 
-bool BoxesListAnimationDockWidget::processKeyEvent(QKeyEvent *event) {
+bool BoxesListAnimationDockWidget::processKeyPress(QKeyEvent *event) {
     const int key = event->key();
     const auto mods = event->modifiers();
     if(key == Qt::Key_Right && !(mods & Qt::ControlModifier)) {

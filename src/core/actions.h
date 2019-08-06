@@ -15,6 +15,8 @@ class Actions : public QObject {
 public:
     Actions(Document& document);
 
+    static Actions* sInstance;
+
     void undoAction() const;
     void redoAction() const;
 
@@ -98,9 +100,14 @@ public:
     void setParticleBoxMode();
     void setParticleEmitterMode();
     void setPaintMode();
+
+    bool smoothChange() const { return mSmoothChange; }
+    void startSmoothChange() { mSmoothChange = true; }
+    void finishSmoothChange() { mSmoothChange = false; }
 private:
     void afterAction() const;
 
+    bool mSmoothChange = false;
     Document& mDocument;
     Canvas* const & mActiveScene;
 };

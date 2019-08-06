@@ -54,7 +54,7 @@ void ParticleBox::anim_setAbsFrame(const int frame) {
 }
 
 bool ParticleBox::relPointInsidePath(const QPointF &relPos) const {
-    if(mRelBoundingRect.contains(relPos.x(), relPos.y())) {
+    if(mRelRect.contains(relPos.x(), relPos.y())) {
         /*if(mEmitters.isEmpty()) */return true;
 //        for(const auto& emitter : mEmitters) {
 //            if(emitter->relPointInsidePath(relPos)) {
@@ -91,11 +91,6 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
 }
 
 bool ParticleBox::SWT_isParticleBox() const { return true; }
-
-QRectF ParticleBox::getRelBoundingRect(const qreal relFrame) {
-    return QRectF(mTopLeftAnimator->getEffectiveValue(relFrame),
-                  mBottomRightAnimator->getEffectiveValue(relFrame));
-}
 
 void ParticleBox::updateAfterDurationRectangleRangeChanged() {
     const int minFrame = mDurationRectangle->getMinFrameAsRelFrame();
@@ -400,15 +395,8 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
                 QMatrix multMatr = QMatrix(stateT.fSize, 0.,
                                            0., stateT.fSize,
                                            0., 0.)*particleData->fTransform;
-                renderData->appendRenderCustomizerFunctor(
-                            SPtrCreate(MultiplyTransformCustomizer)(
-                                multMatr, stateT.fOpacity/255.));
-                renderData->appendRenderCustomizerFunctor(
-                            SPtrCreate(ReplaceTransformDisplacementCustomizer)(
-                                stateT.fPos.x(), stateT.fPos.y()));
 
-                stateT.fTargetRenderData =
-                        GetAsSPtr(renderData, BoxRenderData);
+                stateT.fTargetRenderData = GetAsSPtr(renderData, BoxRenderData);
                 renderData->fParentIsTarget = false;
                 data.particleStates << stateT;
                 renderData->addDependent(particleData.get());

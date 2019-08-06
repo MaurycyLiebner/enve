@@ -22,7 +22,7 @@
 CanvasWindow::CanvasWindow(Document &document,
                            QWidget * const parent) :
     GLWindow(parent), mDocument(document),
-    mActions(document.fActions) {
+    mActions(*Actions::sInstance) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
     connect(&mDocument, &Document::canvasModeSet,
             this, &CanvasWindow::setCanvasMode);
@@ -415,8 +415,26 @@ bool CanvasWindow::handleShiftKeysKeyPress(QKeyEvent* event) {
     }
     return true;
 }
+
 #include <QApplication>
-bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
+
+bool CanvasWindow::KFT_keyReleaseEvent(QKeyEvent *event) {
+    if(!mCurrentCanvas) return false;
+    if(mCurrentCanvas->isPreviewingOrRendering()) return false;
+    if(!isMouseGrabber()) return false;
+    const QPoint globalPos = QCursor::pos();
+    const auto pos = mapToCanvasCoord(mapFromGlobal(globalPos));
+    const KeyEvent e(pos, mPrevMousePos, mPrevPressPos, mMouseGrabber,
+                     mViewTransform.m11(), globalPos,
+                     QApplication::mouseButtons(), event,
+                     [this]() { releaseMouse(); },
+                     [this]() { grabMouse(); },
+                     this);
+    mCurrentCanvas->handleModifierChange(e);
+    return true;
+}
+
+bool CanvasWindow::KFT_keyPressEvent(QKeyEvent *event) {
     if(!mCurrentCanvas) return false;
     if(mCurrentCanvas->isPreviewingOrRendering()) return false;
     const QPoint globalPos = QCursor::pos();
@@ -427,10 +445,6 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                      [this]() { releaseMouse(); },
                      [this]() { grabMouse(); },
                      this);
-    if(isMouseGrabber() && event->type() == QEvent::KeyRelease) {
-        mCurrentCanvas->handleModifierChange(e);
-        return false;
-    }
     if(isMouseGrabber()) {
         if(mCurrentCanvas->handleModifierChange(e)) return false;
         if(mCurrentCanvas->handleTransormationInputKeyEvent(e)) return true;
@@ -554,7 +568,7 @@ void CanvasWindow::grabMouse() {
 #ifndef QT_DEBUG
     QWidget::grabMouse();
 #endif
-    if(mCurrentCanvas) mCurrentCanvas->startSmoothChange();
+    Actions::sInstance->startSmoothChange();
 }
 
 void CanvasWindow::releaseMouse() {
@@ -562,7 +576,7 @@ void CanvasWindow::releaseMouse() {
 #ifndef QT_DEBUG
     QWidget::releaseMouse();
 #endif
-    if(mCurrentCanvas) mCurrentCanvas->finishSmoothChange();
+    Actions::sInstance->finishSmoothChange();
 }
 
 bool CanvasWindow::isMouseGrabber() {

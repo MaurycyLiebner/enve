@@ -12,7 +12,7 @@ public:
 
     sk_sp<SkImage> getFrameAtFrame(const int relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame);
-    Task* scheduleFrameLoad(const int frame);
+    eTask* scheduleFrameLoad(const int frame);
     int getFrameCount() const { return mFrameImageHandlers.count(); }
 private:
     QString mFolderPath;
@@ -34,7 +34,7 @@ public:
         if(!mFileHandler) return nullptr;
         return mFileHandler->getFrameAtOrBeforeFrame(relFrame);
     }
-    Task* scheduleFrameLoad(const int frame) {
+    eTask* scheduleFrameLoad(const int frame) {
         if(!mFileHandler) return nullptr;
         return mFileHandler->scheduleFrameLoad(frame);
     }

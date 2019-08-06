@@ -65,6 +65,8 @@ protected:
 public:
     ~BoundingBox();
 
+    virtual stdsptr<BoxRenderData> createRenderData() = 0;
+
     static BoundingBox *sGetBoxByDocumentId(const int documentId);
 
     static void sClearWriteBoxes();
@@ -120,10 +122,19 @@ public:
 
     virtual bool relPointInsidePath(const QPointF &relPos) const;
 
-    virtual void setFont(const QFont &);
-    virtual void setSelectedFontSize(const qreal );
-    virtual void setSelectedFontFamilyAndStyle(const QString &,
-                                               const QString &);
+    virtual void setFont(const QFont &font) {
+        Q_UNUSED(font);
+    }
+
+    virtual void setSelectedFontSize(const qreal fontSize) {
+        Q_UNUSED(fontSize);
+    }
+
+    virtual void setSelectedFontFamilyAndStyle(const QString &family,
+                                               const QString &style) {
+        Q_UNUSED(family);
+        Q_UNUSED(style);
+    }
 
     virtual void drawPixmapSk(SkCanvas * const canvas);
     virtual void drawPixmapSk(SkCanvas * const canvas,
@@ -132,7 +143,6 @@ public:
                                const float invScale);
 
     virtual const SkPath &getRelBoundingRectPath();
-    virtual QRectF getRelBoundingRect(const qreal relFrame);
 
     virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
 
@@ -148,11 +158,11 @@ public:
     virtual void startSelectedStrokeColorTransform();
     virtual void startSelectedFillColorTransform();
 
-    virtual void updateAllBoxes(const UpdateReason &reason);
+    virtual void updateAllBoxes(const UpdateReason reason);
 
     virtual QMatrix getRelativeTransformAtCurrentFrame();
-    virtual QMatrix getRelativeTransformAtRelFrameF(const qreal relFrame);
-    virtual QMatrix getTotalTransformAtRelFrameF(const qreal relFrame);
+    virtual QMatrix getRelativeTransformAtFrame(const qreal relFrame);
+    virtual QMatrix getTotalTransformAtFrame(const qreal relFrame);
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
 
     virtual void applyPaintSetting(const PaintSettingsApplier &setting);
@@ -168,7 +178,6 @@ public:
     void setupTreeViewMenu(PropertyMenu * const menu) final;
     virtual void setupCanvasMenu(PropertyMenu * const menu);
 
-    virtual stdsptr<BoxRenderData> createRenderData();
     virtual void setupRenderData(const qreal relFrame,
                                  BoxRenderData * const data);
     virtual void renderDataFinished(BoxRenderData *renderData);
@@ -184,8 +193,7 @@ public:
     virtual FrameRange getFirstAndLastIdenticalForMotionBlur(
             const int relFrame, const bool takeAncestorsIntoAccount = true);
 
-    virtual bool shouldPlanScheduleUpdate() { return true; }
-    virtual void scheduleWaitingTasks();
+    virtual bool shouldScheduleUpdate() { return true; }
     virtual void queScheduledTasks();
 
     void writeBoxType(QIODevice * const dst) const;
@@ -238,7 +246,7 @@ public:
     NormalSegment getNormalSegment(const QPointF &absPos,
                                    const qreal invScale) const;
     void drawBoundingRect(SkCanvas * const canvas,
-                         const float invScale);
+                          const float invScale);
 
     void selectAllCanvasPts(QList<MovablePoint *> &selection,
                             const CanvasMode mode);
@@ -352,14 +360,14 @@ public:
     DurationRectangle *getDurationRectangle();
     bool isVisibleAndInDurationRect(const int relFrame) const;
     bool isFrameFVisibleAndInDurationRect(const qreal relFrame) const;
-    bool diffsIncludingInherited(
-            const int relFrame1, const int relFrame2) const;
+    bool diffsIncludingInherited(const int relFrame1, const int relFrame2) const;
+    bool diffsIncludingInherited(const qreal relFrame1, const qreal relFrame2) const;
 
-    bool hasCurrentRenderData(const int relFrame) const;
-    stdsptr<BoxRenderData> getCurrentRenderData(const int relFrame) const;
-    BoxRenderData *updateCurrentRenderData(const int relFrame,
-                                                   const UpdateReason &reason);
-    void nullifyCurrentRenderData(const int relFrame);
+    bool hasCurrentRenderData(const qreal relFrame) const;
+    stdsptr<BoxRenderData> getCurrentRenderData(const qreal relFrame) const;
+    BoxRenderData *updateCurrentRenderData(const qreal relFrame,
+                                           const UpdateReason reason);
+
     void updateDrawRenderContainerTransform();
 
     void scheduleTask(const stdsptr<BoxRenderData> &task);
@@ -372,12 +380,12 @@ public:
     void incReasonsNotToApplyUglyTransform();
     void decReasonsNotToApplyUglyTransform();
 
-    const BoundingBoxType &getBoxType() const;
+    BoundingBoxType getBoxType() const;
 
     void requestGlobalPivotUpdateIfSelected();
     void requestGlobalFillStrokeUpdateIfSelected();
 
-    void planScheduleUpdate(const UpdateReason &reason);
+    void planScheduleUpdate(const UpdateReason reason);
 
     void updateAfterDurationRectangleShifted(const int dFrame);
     void updateAfterDurationMinFrameChangedBy(const int by);
@@ -388,6 +396,8 @@ public:
     virtual void updateIfUsesProgram(
             const ShaderEffectProgram * const program) const;
 protected:
+    void setRelBoundingRect(const QRectF& relRect);
+
     void updateCanvasProps() {
         mCanvasProps.clear();
         ca_execOnDescendants([this](Property * prop) {
@@ -413,8 +423,8 @@ protected:
 
     QPointF mSavedTransformPivot;
 
-    QRectF mRelBoundingRect;
-    SkRect mRelBoundingRectSk;
+    QRectF mRelRect;
+    SkRect mRelRectSk;
     SkPath mSkRelBoundingRectPath;
 
     Canvas* mParentScene = nullptr;
@@ -440,11 +450,9 @@ protected:
     QList<qptr<Property>> mCanvasProps;
 private:
     void scheduleUpdate();
-    void updateRelBoundingRectFromRenderData(
-            BoxRenderData * const renderData);
     FrameRange getVisibleAbsFrameRange() const;
     void cancelWaitingTasks();
-    void afterTotalTransformChanged(const UpdateReason &reason);
+    void afterTotalTransformChanged(const UpdateReason reason);
 signals:
     void globalPivotInfluenced();
     void fillStrokeSettingsChanged();

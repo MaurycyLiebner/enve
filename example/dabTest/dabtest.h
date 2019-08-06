@@ -54,7 +54,7 @@ public:
     }
 
     HardwareSupport hardwareSupport() const {
-        return HardwareSupport::GPU_ONLY;
+        return HardwareSupport::gpuOnly;
     }
 private:
     static bool sInitialized;

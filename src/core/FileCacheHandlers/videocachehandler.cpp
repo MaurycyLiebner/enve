@@ -76,7 +76,7 @@ void VideoFrameHandler::openVideoStream() {
     mDataHandler->setFrameCount(mVideoStreamsData->fFrameCount);
 }
 
-Task* VideoFrameHandler::scheduleFrameLoad(const int frame) {
+eTask* VideoFrameHandler::scheduleFrameLoad(const int frame) {
     if(frame < 0 || frame >= getFrameCount())
         RuntimeThrow("Frame outside of range " + std::to_string(frame));
     const auto currLoader = getFrameLoader(frame);
@@ -169,7 +169,7 @@ void VideoDataHandler::frameLoaderFinished(const int frame,
     }
 }
 
-Task *VideoDataHandler::scheduleFrameHddCacheLoad(const int frame) {
+eTask *VideoDataHandler::scheduleFrameHddCacheLoad(const int frame) {
     const auto contAtFrame = mFramesCache.atFrame<ImageCacheContainer>(frame);
     if(contAtFrame) return contAtFrame->scheduleLoadFromTmpFile();
     return nullptr;

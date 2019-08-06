@@ -71,9 +71,9 @@ SkPaint::Join QJoinToSkJoin(const Qt::PenJoinStyle &join) {
 SkPath toSkPath(const QPainterPath &qPath) {
     SkPath path;
     bool firstOther = false;
-    SkPoint movePt;
-    SkPoint endPt;
-    SkPoint startPt;
+    SkPoint movePt{0, 0};
+    SkPoint endPt{0, 0};
+    SkPoint startPt{0, 0};
     const int iMax = qPath.elementCount() - 1;
     for(int i = 0; i <= iMax; i++) {
         const QPainterPath::Element &elem = qPath.elementAt(i);

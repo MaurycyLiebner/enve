@@ -7,14 +7,23 @@
 #include "skia/skiaincludes.h"
 class HDDExecController;
 
-class Que;
+enum class eTaskState {
+    created,
+    scheduled,
+    qued,
+    processing,
+    finished,
+    canceled,
+    failed,
+    waiting
+};
 
-class Task : public StdSelfRef {
+class eTask : public StdSelfRef {
     friend class TaskScheduler;
     friend class Que;
     template <typename T> friend class TaskCollection;
 protected:
-    Task() {}
+    eTask() {}
 
     virtual void scheduleTaskNow() = 0;
     virtual void afterQued() {}
@@ -22,22 +31,11 @@ protected:
     virtual void afterProcessing() {}
     virtual void afterCanceled() {}
 public:
-    ~Task() { cancelDependent(); }
+    ~eTask() { cancelDependent(); }
 
     struct Dependent {
         std::function<void()> fFinished;
         std::function<void()> fCanceled;
-    };
-
-    enum State : char {
-        CREATED,
-        SCHEDULED,
-        QUED,
-        PROCESSING,
-        FINISHED,
-        CANCELED,
-        FAILED,
-        WAITING
     };
 
     virtual HardwareSupport hardwareSupport() const = 0;
@@ -47,30 +45,31 @@ public:
 
     virtual bool nextStep() { return false; }
 
-    bool cpuSupported() const { return hardwareSupport() != HardwareSupport::GPU_ONLY; }
-    bool cpuPreferred() const { return hardwareSupport() == HardwareSupport::CPU_PREFFERED; }
-    bool cpuOnly() const { return hardwareSupport() == HardwareSupport::CPU_ONLY; }
+    bool cpuSupported() const { return hardwareSupport() != HardwareSupport::gpuOnly; }
+    bool cpuPreferred() const { return hardwareSupport() == HardwareSupport::cpuPreffered; }
+    bool cpuOnly() const { return hardwareSupport() == HardwareSupport::cpuOnly; }
 
-    bool gpuSupported() const { return hardwareSupport() != HardwareSupport::CPU_ONLY; }
-    bool gpuPreferred() const { return hardwareSupport() == HardwareSupport::GPU_PREFFERED; }
-    bool gpuOnly() const { return hardwareSupport() == HardwareSupport::GPU_ONLY; }
+    bool gpuSupported() const { return hardwareSupport() != HardwareSupport::cpuOnly; }
+    bool gpuPreferred() const { return hardwareSupport() == HardwareSupport::gpuPreffered; }
+    bool gpuOnly() const { return hardwareSupport() == HardwareSupport::gpuOnly; }
 
     void taskQued() {
-        mState = QUED;
+        mState = eTaskState::qued;
         afterQued();
     }
 
     bool scheduleTask();
-    bool isQued() { return mState == QUED; }
-    bool isScheduled() { return mState == SCHEDULED; }
+    bool isQued() { return mState == eTaskState::qued; }
+    bool isScheduled() { return mState == eTaskState::scheduled; }
 
-    bool isActive() { return mState != CREATED && mState != FINISHED; }
+    bool isActive() { return mState != eTaskState::created &&
+                             mState != eTaskState::finished; }
 
     void aboutToProcess(const Hardware hw);
     void finishedProcessing();
     bool readyToBeProcessed();
 
-    void addDependent(Task * const updatable);
+    void addDependent(eTask * const updatable);
     void addDependent(const Dependent& func);
 
     bool finished();
@@ -79,12 +78,12 @@ public:
     void incDependencies();
 
     void cancel() {
-        mState = CANCELED;
+        mState = eTaskState::canceled;
         cancelDependent();
         afterCanceled();
     }
 
-    State getState() const {
+    eTaskState getState() const {
         return mState;
     }
 
@@ -102,22 +101,22 @@ public:
         return exc;
     }
 protected:
-    State mState = CREATED;
+    eTaskState mState = eTaskState::created;
 private:
     void tellDependentThatFinished();
     void cancelDependent();
 
     int mNDependancies = 0;
-    QList<stdptr<Task>> mDependent;
+    QList<stdptr<eTask>> mDependent;
     QList<Dependent> mDependentF;
     std::exception_ptr mUpdateException;
 };
 
-class CPUTask : public Task {
+class CPUTask : public eTask {
     friend class StdSelfRef;
 public:
     HardwareSupport hardwareSupport() const {
-        return HardwareSupport::CPU_ONLY;
+        return HardwareSupport::cpuOnly;
     }
 
     void processGpu(QGL33 * const gl,
@@ -129,11 +128,11 @@ protected:
     void scheduleTaskNow() final;
 };
 
-class HDDTask : public Task {
+class HDDTask : public eTask {
     friend class StdSelfRef;
 public:
     HardwareSupport hardwareSupport() const {
-        return HardwareSupport::CPU_ONLY;
+        return HardwareSupport::cpuOnly;
     }
 
     void processGpu(QGL33 * const gl,
@@ -183,7 +182,7 @@ protected:
 public:
     void beforeProcessing(const Hardware) final {}
     void process() final { mPtr.reset(); }
-    static Task* sDispose(const T& ptr) {
+    static eTask* sDispose(const T& ptr) {
         const auto disposer = SPtrCreateTemplated(SPtrDisposer<T>)(ptr);
         if(disposer->scheduleTask()) return disposer.get();
         return nullptr;

@@ -34,7 +34,7 @@ public:
     explicit BoxesListAnimationDockWidget(Document &document,
                                           LayoutHandler* const layoutH,
                                           MainWindow *parent);
-    bool processKeyEvent(QKeyEvent *event);
+    bool processKeyPress(QKeyEvent *event);
     void previewFinished();
     void previewBeingPlayed();
     void previewBeingRendered();
