@@ -1,14 +1,41 @@
 #include "shadereffectcreator.h"
 #include "exceptions.h"
 #include "shadereffect.h"
+#include "shadervaluehandler.h"
 #include <QDomDocument>
 
 QList<stdsptr<ShaderEffectCreator>> ShaderEffectCreator::sEffectCreators;
 
-qsptr<Property> ShaderEffectCreator::create() const {
+qsptr<ShaderEffect> ShaderEffectCreator::create() const {
     auto shaderEffect = enve::make_shared<ShaderEffect>(
                 fName, this, &fProgram, fProperties);
-    return std::move(shaderEffect);
+    return shaderEffect;
+}
+
+qreal stringToDouble(const QString &str) {
+    if(str.isEmpty()) RuntimeThrow("Can not convert an empty string to double");
+    bool ok;
+    qreal val = str.toDouble(&ok);
+    if(!ok) RuntimeThrow("Can not convert '" + str + "' to double");
+    return val;
+}
+
+int stringToInt(const QString &str) {
+    if(str.isEmpty()) RuntimeThrow("Can not convert an empty string to int");
+    bool ok;
+    int val = str.toInt(&ok);
+    if(!ok) RuntimeThrow("Can not convert '" + str + "' to int");
+    return val;
+}
+
+int stringToBool(const QString &str) {
+    if(str.isEmpty()) RuntimeThrow("Can not convert an empty string to bool");
+    const auto simpl = str.simplified();
+    bool result;
+    if(simpl == "true") result = true;
+    else if(simpl == "false") result = false;
+    else RuntimeThrow("Can not convert '" + str + "' to bool");
+    return result;
 }
 
 qreal attrToDouble(const QDomElement &elem,
@@ -35,10 +62,21 @@ int attrToInt(const QDomElement &elem,
     }
 }
 
-void readAnimatorCreators(
-        const QDomElement &elem,
-        stdsptr<PropertyCreator>& propC,
-        stdsptr<UniformSpecifierCreator>& uniC) {
+bool attrToBool(const QDomElement &elem,
+                const QString& elemName,
+                const QString& attr,
+                const QString& def) {
+    try {
+        const QString valS = elem.attribute(attr, def);
+        const bool val = stringToBool(valS);
+        return val;
+    } catch(...) {
+        RuntimeThrow("Invalid " + attr + " value for " + elemName + ".");
+    }
+}
+void readAnimatorCreators(const QDomElement &elem,
+                         stdsptr<ShaderPropertyCreator>& propC,
+                         stdsptr<UniformSpecifierCreator>& uniC) {
     const QString name = elem.attribute("name");
     if(name.isEmpty()) RuntimeThrow("Animator name not defined.");
     const QRegExp rx("[A-Za-z0-9_]*");
@@ -53,12 +91,12 @@ void readAnimatorCreators(
             const qreal maxVal = attrToDouble(elem, name, "max");
             const qreal iniVal = attrToDouble(elem, name, "ini");
             const qreal stepVal = attrToDouble(elem, name, "step");
-            const QString script = elem.attribute("glValue");
+            const bool glValue = attrToBool(elem, name, "glValue", "false");
 
-            QrealAnimatorUniformSpecifierCreator::sTestScript(script, name);
             propC = enve::make_shared<QrealAnimatorCreator>(
-                        iniVal, minVal, maxVal, stepVal, name);
-            uniC = enve::make_shared<QrealAnimatorUniformSpecifierCreator>(script);
+                        iniVal, minVal, maxVal, stepVal, glValue, name);
+            uniC = enve::make_shared<UniformSpecifierCreator>(
+                        ShaderPropertyType::qrealAnimator, glValue);
         } catch(...) {
             RuntimeThrow("Error while parsing Animator '" + name +
                          "' of type " + type + ".");
@@ -69,12 +107,12 @@ void readAnimatorCreators(
             const int maxVal = attrToInt(elem, name, "max");
             const int iniVal = attrToInt(elem, name, "ini");
             const int stepVal = attrToInt(elem, name, "step");
-            const QString script = elem.attribute("glValue");
+            const bool glValue = attrToBool(elem, name, "glValue", "false");
 
-            IntAnimatorUniformSpecifierCreator::sTestScript(script, name);
             propC = enve::make_shared<IntAnimatorCreator>(
-                        iniVal, minVal, maxVal, stepVal, name);
-            uniC = enve::make_shared<IntAnimatorUniformSpecifierCreator>(script);
+                        iniVal, minVal, maxVal, stepVal, glValue, name);
+            uniC = enve::make_shared<UniformSpecifierCreator>(
+                        ShaderPropertyType::intAnimator, glValue);
         } catch(...) {
             RuntimeThrow("Error while parsing Animator '" + name +
                          "' of type " + type + ".");
@@ -109,18 +147,18 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
                      " in ShaderEffect source.");
     const QString effectName = root.attribute("name");
 
-    QList<stdsptr<PropertyCreator>> propCs;
+    QList<stdsptr<ShaderPropertyCreator>> propCs;
     UniformSpecifierCreators uniCs;
-    QDomNodeList animatorNodes = root.elementsByTagName("Animator");
+    const QDomNodeList animatorNodes = root.elementsByTagName("Animator");
     for(int i = 0; i < animatorNodes.count(); i++) {
-        QDomNode animNode = animatorNodes.at(i);
+        const QDomNode& animNode = animatorNodes.at(i);
         if(!animNode.isElement()) {
             RuntimeThrow("Animator node " + QString::number(i) +
                          " is not an Element.");
         }
         QDomElement animEle = animNode.toElement();
         try {
-            stdsptr<PropertyCreator> propC;
+            stdsptr<ShaderPropertyCreator> propC;
             stdsptr<UniformSpecifierCreator> uniC;
             readAnimatorCreators(animEle, propC, uniC);
             propCs << propC;
@@ -130,16 +168,50 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
         }
     }
 
+    QList<stdsptr<ShaderValueHandler>> values;
+    const QDomNodeList valueNodes = root.elementsByTagName("Value");
+    for(int i = 0; i < valueNodes.count(); i++) {
+        const QDomNode& valNode = valueNodes.at(i);
+        if(!valNode.isElement()) {
+            RuntimeThrow("Value node " + QString::number(i) +
+                         " is not an Element.");
+        }
+        QDomElement valEle = valNode.toElement();
+        try {
+            const QString name = valEle.attribute("name");
+            if(name.isEmpty()) RuntimeThrow("Value name not defined.");
+            const auto typeStr = valEle.attribute("type");
+            if(typeStr.isEmpty()) RuntimeThrow("Value '" + name + "' type not defined.");
+            GLValueType type;
+            if(typeStr == "float") type = GLValueType::Float;
+            else if(typeStr == "vec2") type = GLValueType::Vec2;
+            else if(typeStr == "vec3") type = GLValueType::Vec3;
+            else if(typeStr == "vec4") type = GLValueType::Vec4;
+            else if(typeStr == "int") type = GLValueType::Int;
+            else if(typeStr == "ivec2") type = GLValueType::iVec2;
+            else if(typeStr == "ivec3") type = GLValueType::iVec3;
+            else if(typeStr == "ivec4") type = GLValueType::iVec4;
+
+            const QString script = valEle.attribute("value");
+            if(typeStr.isEmpty()) RuntimeThrow("Value '" + name + "' value not defined.");
+
+            const bool glValue = attrToBool(valEle, name, "glValue", "false");
+            values << enve::make_shared<ShaderValueHandler>(name, glValue, type, script);
+        } catch(...) {
+            RuntimeThrow("Value " + QString::number(i) + " is invalid.");
+        }
+    }
+
     ShaderEffectProgram program;
     try {
         program = ShaderEffectProgram::sCreateProgram(
-                    gl, fragPath, propCs, uniCs);
+                    gl, fragPath, propCs, uniCs, values);
     } catch(...) {
         RuntimeThrow("Could not create a program for ShaderEffect '" +
                      effectName + "'");
     }
-    const auto shaderEffectCreator =
-            enve::make_shared<ShaderEffectCreator>(grePath, effectName, propCs, program);
+    const auto shaderEffectCreator = enve::make_shared<ShaderEffectCreator>(
+                grePath, effectName, propCs, program);
     sEffectCreators << shaderEffectCreator;
 
     return shaderEffectCreator;

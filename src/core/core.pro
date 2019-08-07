@@ -153,6 +153,7 @@ SOURCES += \
     ShaderEffects/shadereffectcaller.cpp \
     ShaderEffects/shadereffectcreator.cpp \
     ShaderEffects/shadereffectprogram.cpp \
+    ShaderEffects/shadervaluehandler.cpp \
     ShaderEffects/uniformspecifiercreator.cpp \
     Sound/singlesound.cpp \
     Sound/soundcomposition.cpp \
@@ -379,6 +380,8 @@ HEADERS += \
     ShaderEffects/shadereffectcaller.h \
     ShaderEffects/shadereffectcreator.h \
     ShaderEffects/shadereffectprogram.h \
+    ShaderEffects/shaderpropertycreator.h \
+    ShaderEffects/shadervaluehandler.h \
     ShaderEffects/uniformspecifiercreator.h \
     Sound/singlesound.h \
     Sound/soundcomposition.h \
@@ -430,7 +433,6 @@ HEADERS += \
     PropertyUpdaters/transformupdater.h \
     PropertyUpdaters/smartnodepointupdater.h \
     undoredo.h \
-    ShaderEffects/propertycreator.h \
     exceptions.h \
     glhelpers.h \
     skia/skiadefines.h \

@@ -1,34 +1,27 @@
 #ifndef INTANIMATORCREATOR_H
 #define INTANIMATORCREATOR_H
 #include "Animators/intanimator.h"
-#include "propertycreator.h"
+#include "shaderpropertycreator.h"
 #include "glhelpers.h"
 
-struct IntAnimatorCreator : public PropertyCreator {
+struct IntAnimatorCreator : public ShaderPropertyCreator {
     e_OBJECT
-    int fIniVal;
-    int fMinVal;
-    int fMaxVal;
-    int fStep;
+    IntAnimatorCreator(const int iniVal, const int minVal,
+                       const int maxVal, const int step,
+                       const bool glValue,
+                       const QString& name) :
+        ShaderPropertyCreator(glValue, name),
+        fIniVal(iniVal), fMinVal(minVal),
+        fMaxVal(maxVal), fStep(step) {}
+
+    const int fIniVal;
+    const int fMinVal;
+    const int fMaxVal;
+    const int fStep;
 
     qsptr<Property> create() const {
         return enve::make_shared<IntAnimator>(
                     fIniVal, fMinVal, fMaxVal, fStep, fName);
-    }
-
-    GLint getUniformLocation(QGL33 * const gl, const GLuint& program) const {
-        return gl->glGetUniformLocation(program, fName.toLatin1());
-    }
-private:
-    IntAnimatorCreator(const int iniVal,
-                       const int minVal,
-                       const int maxVal,
-                       const int prefferdStep,
-                       const QString& name) : PropertyCreator(name) {
-        fIniVal = iniVal;
-        fMinVal = minVal;
-        fMaxVal = maxVal;
-        fStep = prefferdStep;
     }
 };
 #endif // INTANIMATORCREATOR_H

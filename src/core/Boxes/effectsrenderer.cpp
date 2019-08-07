@@ -21,7 +21,7 @@ void EffectsRenderer::processGpu(QGL33 * const gl,
     renderData.fWidth = static_cast<uint>(srcWidth);
     renderData.fHeight = static_cast<uint>(srcHeight);
     auto& engine = renderData.fJSEngine;
-    engine.evaluate("_texSize = [" + QString::number(srcWidth) + "," +
+    engine.evaluate("eTexSize = [" + QString::number(srcWidth) + "," +
                     QString::number(srcHeight) + "]");
     engine.evaluate("_gPos = [" + QString::number(gPos.x()) + "," +
                     QString::number(gPos.y()) + "]");

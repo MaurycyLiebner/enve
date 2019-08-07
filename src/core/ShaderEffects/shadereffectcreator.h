@@ -7,13 +7,15 @@ enum PropertyType {
     PTYPE_INT
 };
 
-struct ShaderEffectCreator : public PropertyCreator {
+class ShaderEffect;
+
+struct ShaderEffectCreator : public StdSelfRef {
     e_OBJECT
 public:
     ShaderEffectCreator(const QString& grePath, const QString& name,
-                        const QList<stdsptr<PropertyCreator>>& propCs,
+                        const QList<stdsptr<ShaderPropertyCreator>>& propCs,
                         const ShaderEffectProgram& program) :
-        PropertyCreator(name), fGrePath(grePath),
+        fName(name), fGrePath(grePath),
         fProperties(propCs), fProgram(program) {}
 
     struct Identifier {
@@ -26,8 +28,9 @@ public:
         const QList<PropertyType> fTypes;
     };
 
+    const QString fName;
     const QString fGrePath;
-    const QList<stdsptr<PropertyCreator>> fProperties;
+    const QList<stdsptr<ShaderPropertyCreator>> fProperties;
     ShaderEffectProgram fProgram;
 
     bool compatible(const QList<PropertyType>& props) const {
@@ -54,7 +57,8 @@ public:
         try {
             program = ShaderEffectProgram::sCreateProgram(
                         gl, fragPath, fProperties,
-                        fProgram.fUniformCreators);
+                        fProgram.fPropUniCreators,
+                        fProgram.fValueHandlers);
         } catch(...) {
             RuntimeThrow("Failed to load a new version of '" + fragPath + "'");
         }
@@ -62,14 +66,7 @@ public:
         fProgram = program;
     }
 
-    qsptr<Property> create() const;
-
-    GLint getUniformLocation(QGL33 * const gl, const GLuint& program) const {
-        Q_UNUSED(gl);
-        Q_UNUSED(program);
-        Q_ASSERT(false);
-        return 0;
-    }
+    qsptr<ShaderEffect> create() const;
 
     void writeIdentifier(QIODevice * const dst) const {
         gWrite(dst, fName);

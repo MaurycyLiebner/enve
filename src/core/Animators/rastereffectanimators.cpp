@@ -72,7 +72,7 @@ qsptr<ShaderEffect> readIdCreateShaderEffect(QIODevice * const src) {
     qsptr<ShaderEffect> effect;
     if(best.count() == 1) {
         const auto bestCreator = best.first();
-        effect = qSharedPointerCast<ShaderEffect>(bestCreator->create());
+        effect = bestCreator->create();
     } else {
         // exec ask dialog
     }

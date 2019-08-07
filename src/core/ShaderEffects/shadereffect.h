@@ -9,7 +9,7 @@ class ShaderEffect : public RasterEffect {
     ShaderEffect(const QString &name,
                  const ShaderEffectCreator * const creator,
                  const ShaderEffectProgram * const program,
-                 const QList<stdsptr<PropertyCreator>>& props);
+                 const QList<stdsptr<ShaderPropertyCreator>>& props);
 public:
     void writeIdentifier(QIODevice * const dst) const;
 
