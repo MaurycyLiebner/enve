@@ -55,23 +55,23 @@ void Canvas::addActionsToMenu(QMenu *const menu) {
 
     QMenu * const pathEffectsMenu = menu->addMenu("Path Effects");
     pathEffectsMenu->addAction("Displace Effect", [this]() {
-        addPathEffect(SPtrCreate(DisplacePathEffect)());
+        addPathEffect(enve::make_shared<DisplacePathEffect>());
     });
 
     pathEffectsMenu->addAction("Duplicate Effect", [this]() {
-        addPathEffect(SPtrCreate(DuplicatePathEffect)());
+        addPathEffect(enve::make_shared<DuplicatePathEffect>());
     });
 
     pathEffectsMenu->addAction("Sub-Path Effect", [this]() {
-        addPathEffect(SPtrCreate(SubPathEffect)());
+        addPathEffect(enve::make_shared<SubPathEffect>());
     });
 
     pathEffectsMenu->addAction("Solidify Effect", [this]() {
-        addPathEffect(SPtrCreate(SolidifyPathEffect)());
+        addPathEffect(enve::make_shared<SolidifyPathEffect>());
     });
 
     pathEffectsMenu->addAction("Sum Effect", [this]() {
-        addPathEffect(SPtrCreate(SumPathEffect)());
+        addPathEffect(enve::make_shared<SumPathEffect>());
     });
 //    pathEffectsMenu->addAction("Operation Effect");
 //    pathEffectsMenu->addAction("Group Sum Effect");
@@ -79,42 +79,42 @@ void Canvas::addActionsToMenu(QMenu *const menu) {
     QMenu * const fillPathEffectsMenu = menu->addMenu("Fill Effects");
 
     fillPathEffectsMenu->addAction("Displace Effect", [this]() {
-        addFillPathEffect(SPtrCreate(DisplacePathEffect)());
+        addFillPathEffect(enve::make_shared<DisplacePathEffect>());
     });
 
     fillPathEffectsMenu->addAction("Duplicate Effect", [this]() {
-        addFillPathEffect(SPtrCreate(DuplicatePathEffect)());
+        addFillPathEffect(enve::make_shared<DuplicatePathEffect>());
     });
 
     fillPathEffectsMenu->addAction("Solidify Effect", [this]() {
-        addFillPathEffect(SPtrCreate(SolidifyPathEffect)());
+        addFillPathEffect(enve::make_shared<SolidifyPathEffect>());
     });
 
     fillPathEffectsMenu->addAction("Sum Effect", [this]() {
-        addFillPathEffect(SPtrCreate(SumPathEffect)());
+        addFillPathEffect(enve::make_shared<SumPathEffect>());
     });
 //    fillPathEffectsMenu->addAction("Operation Effect");
 
     QMenu * const outlinePathEffectsMenu = menu->addMenu("Outline Effects");
 
     outlinePathEffectsMenu->addAction("Displace Effect", [this]() {
-        addOutlinePathEffect(SPtrCreate(DisplacePathEffect)());
+        addOutlinePathEffect(enve::make_shared<DisplacePathEffect>());
     });
 
     outlinePathEffectsMenu->addAction("Duplicate Effect", [this]() {
-        addOutlinePathEffect(SPtrCreate(DuplicatePathEffect)());
+        addOutlinePathEffect(enve::make_shared<DuplicatePathEffect>());
     });
 
     pathEffectsMenu->addAction("Sub-Path Effect", [this]() {
-        addOutlinePathEffect(SPtrCreate(SubPathEffect)());
+        addOutlinePathEffect(enve::make_shared<SubPathEffect>());
     });
 
     outlinePathEffectsMenu->addAction("Solidify Effect", [this]() {
-        addOutlinePathEffect(SPtrCreate(SolidifyPathEffect)());
+        addOutlinePathEffect(enve::make_shared<SolidifyPathEffect>());
     });
 
     outlinePathEffectsMenu->addAction("Sum Effect", [this]() {
-        addOutlinePathEffect(SPtrCreate(SumPathEffect)());
+        addOutlinePathEffect(enve::make_shared<SumPathEffect>());
     });
 //    outlinePathEffectsMenu->addAction("Operation Effect");
 
@@ -245,7 +245,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     } else if(mCurrentMode == CanvasMode::PICK_PAINT_SETTINGS) {
         mPressedBox = getBoxAtFromAllDescendents(e.fPos);
     } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
-        const auto newPath = SPtrCreate(Circle)();
+        const auto newPath = enve::make_shared<Circle>();
         newPath->planCenterPivotPosition();
         mCurrentContainer->addContainedBox(newPath);
         newPath->setAbsolutePos(e.fPos);
@@ -255,7 +255,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
         mCurrentCircle = newPath.get();
 
     } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
-        const auto newPath = SPtrCreate(Rectangle)();
+        const auto newPath = enve::make_shared<Rectangle>();
         newPath->planCenterPivotPosition();
         mCurrentContainer->addContainedBox(newPath);
         newPath->setAbsolutePos(e.fPos);
@@ -264,7 +264,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
 
         mCurrentRectangle = newPath.get();
     } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
-        const auto newPath = SPtrCreate(TextBox)();
+        const auto newPath = enve::make_shared<TextBox>();
         newPath->planCenterPivotPosition();
         newPath->setSelectedFontFamilyAndStyle(mDocument.fFontFamily,
                                                mDocument.fFontStyle);
@@ -278,7 +278,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
         addBoxToSelection(newPath.get());
     } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
         //setCanvasMode(CanvasMode::MOVE_POINT);
-        const auto partBox = SPtrCreate(ParticleBox)();
+        const auto partBox = enve::make_shared<ParticleBox>();
         mCurrentContainer->addContainedBox(partBox);
         partBox->setAbsolutePos(e.fPos);
         clearBoxesSelection();
@@ -289,7 +289,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
         for(const auto& box : mSelectedBoxes) {
             if(box->SWT_isParticleBox()) {
                 if(box->absPointInsidePath(e.fPos)) {
-                    const auto particleBox = GetAsPtr(box, ParticleBox);
+                    const auto particleBox = static_cast<ParticleBox*>(box);
                     particleBox->addEmitterAtAbsPos(e.fPos);
                     break;
                 }
@@ -437,10 +437,10 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
         handleAddSmartPointMouseRelease(e);
     } else if(mCurrentMode == PICK_PAINT_SETTINGS) {
         if(mPressedBox) {
-            const auto srcPathBox = GetAsPtr(mPressedBox, PathBox);
+            const auto srcPathBox = static_cast<PathBox*>(mPressedBox.data());
             for(const auto& box : mSelectedBoxes) {
                 if(box->SWT_isPathBox()) {
-                    const auto pathBox = GetAsPtr(box, PathBox);
+                    const auto pathBox = static_cast<PathBox*>(box);
                     if(e.ctrlMod()) {
                         if(e.shiftMod()) {
                             pathBox->duplicateStrokeSettingsFrom(
@@ -506,7 +506,7 @@ void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
             const auto mods = QGuiApplication::queryKeyboardModifiers();
             if(mPressedPoint->isSmartNodePoint()) {
                 if(mods & Qt::ControlModifier) {
-                    const auto nodePt = GetAsPtr(mPressedPoint, SmartNodePoint);
+                    const auto nodePt = static_cast<SmartNodePoint*>(mPressedPoint.data());
                     if(nodePt->isDissolved()) {
                         const int selId = nodePt->moveToClosestSegment(e.fPos);
                         const auto handler = nodePt->getHandler();
@@ -519,14 +519,14 @@ void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
                         return;
                     }
                 } else if(mods & Qt::ShiftModifier) {
-                    const auto nodePt = GetAsPtr(mPressedPoint, SmartNodePoint);
+                    const auto nodePt = static_cast<SmartNodePoint*>(mPressedPoint.data());
                     const auto nodePtAnim = nodePt->getTargetAnimator();
                     if(nodePt->isNormal()) {
                         SmartNodePoint* closestNode = nullptr;
                         qreal minDist = 10/e.fScale;
                         for(const auto& sBox : mSelectedBoxes) {
                             if(!sBox->SWT_isSmartVectorPath()) continue;
-                            const auto sPatBox = GetAsPtr(sBox, SmartVectorPath);
+                            const auto sPatBox = static_cast<SmartVectorPath*>(sBox);
                             const auto sAnim = sPatBox->getPathAnimator();
                             for(int i = 0; i < sAnim->ca_getNumberOfChildren(); i++) {
                                 const auto sPath = sAnim->getChild(i);

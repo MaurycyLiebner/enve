@@ -53,7 +53,7 @@ void SoundComposition::secondFinished(const int secondId,
                                       const stdsptr<Samples> &samples) {
     mProcessingSeconds.removeOne(secondId);
     if(!samples) return;
-    const auto sCont = SPtrCreate(SoundCacheContainer)(
+    const auto sCont = enve::make_shared<SoundCacheContainer>(
                 samples, iValueRange{secondId, secondId}, &mSecondsCache);
     mSecondsCache.add(sCont);
     if(mBlockRange.inRange(secondId)) sCont->setBlocked(true);
@@ -102,7 +102,7 @@ SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
     mProcessingSeconds.append(secondId);
     const SampleRange sampleRange = {secondId*SOUND_SAMPLERATE,
                                      (secondId + 1)*SOUND_SAMPLERATE - 1};
-    const auto task = SPtrCreate(SoundMerger)(secondId, sampleRange, this);
+    const auto task = enve::make_shared<SoundMerger>(secondId, sampleRange, this);
     for(const auto &sound : mSounds) {
         if(!sound->isEnabled()) continue;
         const auto secs = sound->absSecondToRelSeconds(secondId);
@@ -113,7 +113,7 @@ SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
                                        sound->absSampleRange(),
                                        sound->getVolumeSnap(),
                                        sound->getStretch(),
-                                       SPtrCreate(Samples)(samples)});
+                                       enve::make_shared<Samples>(samples)});
             } else {
                 const auto reader = sound->getSecondReader(i);
                 if(!reader) continue;
@@ -183,6 +183,6 @@ void SoundComposition::readSounds(QIODevice * const target) {
     const int soundCount = mSoundsContainer->ca_getNumberOfChildren();
     for(int i = oldSoundCount; i < soundCount; i++) {
         const auto iSound = mSoundsContainer->ca_getChildAt<SingleSound>(i);
-        addSoundAnimator(GetAsSPtr(iSound, SingleSound));
+        addSoundAnimator(iSound->ref<SingleSound>());
     }
 }

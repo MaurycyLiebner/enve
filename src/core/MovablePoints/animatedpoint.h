@@ -16,7 +16,7 @@ class PropertyUpdater;
 class QPointFAnimator;
 
 class AnimatedPoint : public MovablePoint {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     AnimatedPoint(QPointFAnimator * const associatedAnimator,
                   const MovablePointType &type);

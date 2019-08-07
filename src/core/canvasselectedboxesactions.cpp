@@ -6,10 +6,10 @@
 
 void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.isEmpty()) return;
-    const auto newGroup = SPtrCreate(ContainerBox)(TYPE_GROUP);
+    const auto newGroup = enve::make_shared<ContainerBox>(TYPE_GROUP);
     mCurrentContainer->addContainedBox(newGroup);
     for(int i = mSelectedBoxes.count() - 1; i >= 0; i--) {
-        const auto boxSP = GetAsSPtr(mSelectedBoxes.at(i), BoundingBox);
+        const auto boxSP = mSelectedBoxes.at(i)->ref<BoundingBox>();
         boxSP->removeFromParent_k();
         newGroup->addContainedBox(boxSP);
     }
@@ -68,7 +68,7 @@ bool Canvas::anim_prevRelFrameWithKey(const int relFrame,
 void Canvas::shiftAllPointsForAllKeys(const int by) {
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isSmartVectorPath()) {
-//            const auto svp = GetAsPtr(box, SmartVectorPath);
+//            const auto svp = static_cast<SmartVectorPath*>(box);
 //            svp->shiftAllPointsForAllKeys(by);
         }
     }
@@ -77,7 +77,7 @@ void Canvas::shiftAllPointsForAllKeys(const int by) {
 void Canvas::revertAllPointsForAllKeys() {
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isSmartVectorPath()) {
-            //GetAsPtr(box, SmartVectorPath)->revertAllPointsForAllKeys();
+            //static_cast<SmartVectorPath*>(box)->revertAllPointsForAllKeys();
         }
     }
 }
@@ -85,7 +85,7 @@ void Canvas::revertAllPointsForAllKeys() {
 void Canvas::shiftAllPoints(const int by) {
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isSmartVectorPath()) {
-            //GetAsPtr(box, SmartVectorPath)->shiftAllPoints(by);
+            //static_cast<SmartVectorPath*>(box)->shiftAllPoints(by);
         }
     }
 }
@@ -93,7 +93,7 @@ void Canvas::shiftAllPoints(const int by) {
 void Canvas::revertAllPoints() {
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isSmartVectorPath()) {
-            //GetAsPtr(box, SmartVectorPath)->revertAllPoints();
+            //static_cast<SmartVectorPath*>(box)->revertAllPoints();
         }
     }
 }
@@ -313,7 +313,7 @@ bool Canvas::isBoxSelectionEmpty() const {
 void Canvas::ungroupSelectedBoxes() {
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isContainerBox()) {
-            GetAsPtr(box, ContainerBox)->ungroup_k();
+            static_cast<ContainerBox*>(box)->ungroup_k();
         }
     }
 }
@@ -361,7 +361,7 @@ void Canvas::addBoxToSelection(BoundingBox * const box) {
     setCurrentBox(box);
 
     if(mCurrentMode == PAINT_MODE) {
-        if(box->SWT_isPaintBox()) mPaintTarget.setPaintBox(GetAsPtr(box, PaintBox));
+        if(box->SWT_isPaintBox()) mPaintTarget.setPaintBox(static_cast<PaintBox*>(box));
     }
     emit selectedPaintSettingsChanged();
 }
@@ -520,20 +520,20 @@ void Canvas::createLinkBoxForSelected() {
 
 #include "clipboardcontainer.h"
 void Canvas::duplicateSelectedBoxes() {
-    const auto container = SPtrCreate(BoxesClipboard)(mSelectedBoxes.getList());
+    const auto container = enve::make_shared<BoxesClipboard>(mSelectedBoxes.getList());
     clearBoxesSelection();
     container->pasteTo(mCurrentContainer);
 }
 
 SmartVectorPath *Canvas::getPathResultingFromOperation(
         const SkPathOp& pathOp) {
-    auto newPath = SPtrCreate(SmartVectorPath)();
+    auto newPath = enve::make_shared<SmartVectorPath>();
     newPath->planCenterPivotPosition();
     SkOpBuilder builder;
     bool first = true;
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isPathBox()) {
-            SkPath boxPath = GetAsPtr(box, PathBox)->getRelativePath();
+            SkPath boxPath = static_cast<PathBox*>(box)->getRelativePath();
             const QMatrix boxTrans = box->getRelativeTransformAtCurrentFrame();
             boxPath.transform(toSkMatrix(boxTrans));
             if(first) {
@@ -596,7 +596,7 @@ void Canvas::selectedPathsBreakApart() {
     QList<qsptr<SmartVectorPath>> created;
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isSmartVectorPath()) {
-            const auto path = GetAsPtr(box, SmartVectorPath);
+            const auto path = static_cast<SmartVectorPath*>(box);
             created << path->breakPathsApart_k();
         }
     }
@@ -619,12 +619,12 @@ void Canvas::selectedPathsCombine() {
     SmartVectorPath *firstVectorPath = nullptr;
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isSmartVectorPath()) {
-            firstVectorPath = GetAsPtr(box, SmartVectorPath);
+            firstVectorPath = static_cast<SmartVectorPath*>(box);
             break;
         }
     }
     if(!firstVectorPath) {
-        const auto newPath = SPtrCreate(SmartVectorPath)();
+        const auto newPath = enve::make_shared<SmartVectorPath>();
         newPath->planCenterPivotPosition();
         mCurrentContainer->addContainedBox(newPath);
         firstVectorPath = newPath.get();
@@ -635,7 +635,7 @@ void Canvas::selectedPathsCombine() {
     for(const auto &box : mSelectedBoxes) {
         if(box == firstVectorPath) continue;
         if(box->SWT_isSmartVectorPath()) {
-            const auto boxPath = GetAsPtr(box, SmartVectorPath);
+            const auto boxPath = static_cast<SmartVectorPath*>(box);
             const QMatrix relTransf = boxPath->getTotalTransform()*
                     firstTranf.inverted();
             const auto srcVP = boxPath->getPathAnimator();

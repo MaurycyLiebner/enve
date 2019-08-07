@@ -16,7 +16,7 @@ void SoundHandler::secondReaderFinished(
 SoundReaderForMerger *SoundHandler::addSecondReader(const int secondId) {
     const SampleRange& range = {secondId*SOUND_SAMPLERATE,
                                 (secondId + 1)*SOUND_SAMPLERATE - 1};
-    const auto reader = SPtrCreate(SoundReaderForMerger)(
+    const auto reader = enve::make_shared<SoundReaderForMerger>(
                 this, mAudioStreamsData, secondId, range);
     mDataHandler->addSecondReader(secondId, reader);
     reader->scheduleTask();

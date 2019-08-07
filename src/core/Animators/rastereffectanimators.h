@@ -1,7 +1,7 @@
 #ifndef RasterEffectANIMATORS_H
 #define RasterEffectANIMATORS_H
 #include "Animators/dynamiccomplexanimator.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "RasterEffects/rastereffect.h"
 #include "ShaderEffects/shadereffect.h"
 
@@ -12,7 +12,7 @@ typedef DynamicComplexAnimator<
     RasterEffect, &RasterEffect::writeIdentifier,
     &readIdCreateRasterEffect> RasterEffectAnimatorsBase;
 class RasterEffectAnimators : public RasterEffectAnimatorsBase {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     RasterEffectAnimators(BoundingBox * const parentBox);
 public:

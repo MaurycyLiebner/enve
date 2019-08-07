@@ -16,7 +16,7 @@ class SoundHandler;
 struct AudioStreamsData;
 
 class SoundReader : public HDDTask {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     SoundReader(SoundHandler * const cacheHandler,
                 const stdsptr<AudioStreamsData>& openedAudio,
@@ -46,7 +46,7 @@ private:
 
 #include "Sound/soundmerger.h"
 class SoundReaderForMerger : public SoundReader {
-    friend class StdSelfRef;
+    e_OBJECT
     struct SingleSound {
         int fSampleShift;
         SampleRange fSamplesRange;

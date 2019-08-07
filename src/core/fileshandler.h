@@ -1,7 +1,7 @@
 #ifndef FILESHANDLER_H
 #define FILESHANDLER_H
 #include <QObject>
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "FileCacheHandlers/filecachehandler.h"
 
 class FilesHandler : public QObject {
@@ -31,7 +31,7 @@ T *FilesHandler::getFileHandler(const QString &filePath) {
     for(const auto& fh : mFileHandlers) {
         if(filePath == fh->path()) return static_cast<T*>(fh.get());
     }
-    const auto fh = SPtrCreateTemplated(T)();
+    const auto fh = enve::make_shared<T>();
     try {
         fh->setPath(filePath);
     } catch(const std::exception& e) {

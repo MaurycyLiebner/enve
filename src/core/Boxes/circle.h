@@ -5,7 +5,7 @@
 enum CanvasMode : short;
 
 class CircleRadiusPoint : public AnimatedPoint {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     CircleRadiusPoint(QPointFAnimator * const associatedAnimator,
                       BasicTransformAnimator * const parent,
@@ -23,7 +23,7 @@ private:
 #include "Boxes/pathbox.h"
 
 class Circle : public PathBox {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     Circle();
 public:

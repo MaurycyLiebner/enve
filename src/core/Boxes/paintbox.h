@@ -8,7 +8,8 @@ class AnimatedPoint;
 class SimpleBrushWrapper;
 
 struct PaintBoxRenderData : public ImageRenderData {
-    friend class StdSelfRef;
+    e_OBJECT
+public:
     PaintBoxRenderData(BoundingBox * const parentBoxT) :
         ImageRenderData(parentBoxT) {}
 
@@ -25,7 +26,7 @@ struct PaintBoxRenderData : public ImageRenderData {
 };
 
 class PaintBox : public BoundingBox {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     PaintBox();
 public:

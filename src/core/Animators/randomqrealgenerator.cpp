@@ -8,13 +8,13 @@
 
 RandomQrealGenerator::RandomQrealGenerator() :
     QrealValueEffect("noise") {
-    mTime = SPtrCreate(QrealAnimator)(0, 0, 9999, 1, "time");
+    mTime = enve::make_shared<QrealAnimator>(0, 0, 9999, 1, "time");
     ca_addChild(mTime);
     mSmoothness = QrealAnimator::sCreate0to1Animator("smoothness");
     ca_addChild(mSmoothness);
-    mMaxDev = SPtrCreate(QrealAnimator)(0, 0, 999, 1, "amplitude");
+    mMaxDev = enve::make_shared<QrealAnimator>(0, 0, 999, 1, "amplitude");
     ca_addChild(mMaxDev);
-    mType = SPtrCreate(ComboBoxProperty)("type",
+    mType = enve::make_shared<ComboBoxProperty>("type",
                 QStringList() << "add" << "subtract" << "overlay");
     mType->setCurrentValue(2);
     ca_addChild(mType);

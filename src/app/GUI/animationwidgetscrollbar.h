@@ -2,7 +2,7 @@
 #define ANIMATiONWIDGETSCROLLBAR_H
 
 #include <QWidget>
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "canvas.h"
 class HDDCachableCacheHandler;
 

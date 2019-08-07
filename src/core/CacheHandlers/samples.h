@@ -1,11 +1,11 @@
 #ifndef SAMPLES_H
 #define SAMPLES_H
 #include "smartPointers/stdselfref.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "framerange.h"
 
 struct Samples : public StdSelfRef {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     Samples(const SampleRange& range) :
         fData(new float[static_cast<size_t>(range.span())]),
@@ -37,7 +37,7 @@ public:
         memcpy(data, fData + (range.fMin - fSampleRange.fMin),
                static_cast<size_t>(range.span())*sizeof(float));
 
-        return SPtrCreate(Samples)(data, range);
+        return enve::make_shared<Samples>(data, range);
     }
 };
 

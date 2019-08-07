@@ -3,8 +3,8 @@
 
 QPointFAnimator::QPointFAnimator(const QString &name) :
     StaticComplexAnimator(name) {
-    mXAnimator = SPtrCreate(QrealAnimator)("x");
-    mYAnimator = SPtrCreate(QrealAnimator)("y");
+    mXAnimator = enve::make_shared<QrealAnimator>("x");
+    mYAnimator = enve::make_shared<QrealAnimator>("y");
     ca_addChild(mXAnimator);
     ca_addChild(mYAnimator);
 }

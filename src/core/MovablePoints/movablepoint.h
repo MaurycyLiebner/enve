@@ -3,7 +3,7 @@
 #include <QPointF>
 #include <QRectF>
 #include <QPainter>
-#include "../smartPointers/sharedpointerdefs.h"
+#include "../smartPointers/ememory.h"
 #include "../skia/skiaincludes.h"
 
 class BoundingBox;
@@ -24,7 +24,7 @@ template<typename T> class TypeMenu;
 typedef TypeMenu<MovablePoint> PointTypeMenu;
 
 class MovablePoint : public StdSelfRef {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     MovablePoint(const MovablePointType &type);
     MovablePoint(BasicTransformAnimator * const trans,

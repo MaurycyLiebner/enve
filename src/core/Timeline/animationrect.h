@@ -3,7 +3,7 @@
 #include "durationrectangle.h"
 
 class AnimationRect : public DurationRectangle {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     AnimationRect(Property * const childProp) :
         DurationRectangle(childProp) {}

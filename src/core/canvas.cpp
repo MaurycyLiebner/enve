@@ -28,7 +28,6 @@ Canvas::Canvas(Document &document,
                const int frameCount, const qreal fps) :
     ContainerBox(TYPE_CANVAS), mDocument(document), mPaintTarget(this) {
     mParentScene = this;
-
     connect(&mDocument, &Document::canvasModeSet,
             this, &Canvas::setCanvasMode);
     std::function<bool(int)> changeFrameFunc =
@@ -40,16 +39,16 @@ Canvas::Canvas(Document &document,
         }
         return false;
     };
-    mUndoRedoStack = SPtrCreate(UndoRedoStack)(changeFrameFunc);
+    mUndoRedoStack = enve::make_shared<UndoRedoStack>(changeFrameFunc);
     mFps = fps;
 
     mBackgroundColor->qra_setCurrentValue(QColor(75, 75, 75));
     ca_addChild(mBackgroundColor);
     mBackgroundColor->prp_setInheritedUpdater(
-                SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
+                enve::make_shared<DisplayedFillStrokeSettingsUpdater>(this));
     mSoundComposition = qsptr<SoundComposition>::create(this);
     auto soundsAnimatorContainer = mSoundComposition->getSoundsAnimatorContainer();
-    ca_addChild(GetAsSPtr(soundsAnimatorContainer, Property));
+    ca_addChild(soundsAnimatorContainer->ref<Property>());
 
     mRange = {0, frameCount};
 
@@ -61,7 +60,7 @@ Canvas::Canvas(Document &document,
     mCurrentContainer = this;
     mIsCurrentGroup = true;
 
-    mRotPivot = SPtrCreate(PathPivot)(this);
+    mRotPivot = enve::make_shared<PathPivot>(this);
 
     mTransformAnimator->SWT_hide();
 
@@ -286,7 +285,7 @@ void Canvas::setFrameRange(const FrameRange &range) {
 }
 
 stdsptr<BoxRenderData> Canvas::createRenderData() {
-    return SPtrCreate(CanvasRenderData)(this);
+    return enve::make_shared<CanvasRenderData>(this);
 }
 
 QSize Canvas::getCanvasSize() {
@@ -316,7 +315,7 @@ void Canvas::setOutputRendering(const bool bT) {
 
 void Canvas::setCurrentPreviewContainer(const int relFrame) {
     auto cont = mCacheHandler.atFrame(relFrame);
-    setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
+    setCurrentPreviewContainer(cont->ref<ImageCacheContainer>());
 }
 
 void Canvas::setCurrentPreviewContainer(const stdsptr<ImageCacheContainer>& cont) {
@@ -368,7 +367,7 @@ void Canvas::renderDataFinished(BoxRenderData *renderData) {
         cont->replaceImageSk(renderData->fRenderedImage);
         cont->setRange(range);
     } else {
-        const auto sCont = SPtrCreate(ImageCacheContainer)(
+        const auto sCont = enve::make_shared<ImageCacheContainer>(
                     renderData->fRenderedImage, range, &mCacheHandler);
         mCacheHandler.add(sCont);
         cont = sCont.get();
@@ -397,7 +396,7 @@ void Canvas::renderDataFinished(BoxRenderData *renderData) {
             const bool outdated = !currentState || !currentFrame;
             mDrawRenderContainer.setExpired(outdated);
             mCurrentPreviewContainerOutdated = outdated;
-            setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
+            setCurrentPreviewContainer(cont->ref<ImageCacheContainer>());
         } else if(mRenderingPreview &&
                   mCurrRenderRange.inRange(renderData->fRelFrame)) {
             cont->setBlocked(true);
@@ -417,11 +416,11 @@ void Canvas::prp_afterChangedAbsRange(const FrameRange &range) {
 }
 
 qsptr<BoundingBox> Canvas::createLink() {
-    return SPtrCreate(InternalLinkCanvas)(this);
+    return enve::make_shared<InternalLinkCanvas>(this);
 }
 
 ImageBox *Canvas::createImageBox(const QString &path) {
-    const auto img = SPtrCreate(ImageBox)(path);
+    const auto img = enve::make_shared<ImageBox>(path);
     img->planCenterPivotPosition();
     mCurrentContainer->addContainedBox(img);
     return img.get();
@@ -429,7 +428,7 @@ ImageBox *Canvas::createImageBox(const QString &path) {
 
 #include "Boxes/imagesequencebox.h"
 ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QString &folderPath) {
-    const auto aniBox = SPtrCreate(ImageSequenceBox)();
+    const auto aniBox = enve::make_shared<ImageSequenceBox>();
     aniBox->planCenterPivotPosition();
     aniBox->setFolderPath(folderPath);
     mCurrentContainer->addContainedBox(aniBox);
@@ -438,7 +437,7 @@ ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QString &folderPath) 
 
 #include "Boxes/videobox.h"
 VideoBox* Canvas::createVideoForPath(const QString &path) {
-    const auto vidBox = SPtrCreate(VideoBox)();
+    const auto vidBox = enve::make_shared<VideoBox>();
     vidBox->planCenterPivotPosition();
     vidBox->setFilePath(path);
     mCurrentContainer->addContainedBox(vidBox);
@@ -447,14 +446,14 @@ VideoBox* Canvas::createVideoForPath(const QString &path) {
 
 #include "Boxes/linkbox.h"
 ExternalLinkBox* Canvas::createLinkToFileWithPath(const QString &path) {
-    const auto extLinkBox = SPtrCreate(ExternalLinkBox)();
+    const auto extLinkBox = enve::make_shared<ExternalLinkBox>();
     extLinkBox->setSrc(path);
     mCurrentContainer->addContainedBox(extLinkBox);
     return extLinkBox.get();
 }
 
 SingleSound* Canvas::createSoundForPath(const QString &path) {
-    const auto singleSound = SPtrCreate(SingleSound)();
+    const auto singleSound = enve::make_shared<SingleSound>();
     getSoundComposition()->addSoundAnimator(singleSound);
     singleSound->setFilePath(path);
     return singleSound.get();
@@ -537,7 +536,7 @@ void Canvas::updatePaintBox() {
     for(int i = mSelectedBoxes.count() - 1; i >= 0; i--) {
         const auto& iBox = mSelectedBoxes.at(i);
         if(iBox->SWT_isPaintBox()) {
-            mPaintTarget.setPaintBox(GetAsPtr(iBox, PaintBox));
+            mPaintTarget.setPaintBox(static_cast<PaintBox*>(iBox));
             break;
         }
     }
@@ -592,7 +591,7 @@ void Canvas::deleteAction() {
 }
 
 void Canvas::copyAction() {
-    const auto container = SPtrCreate(BoxesClipboard)(mSelectedBoxes.getList());
+    const auto container = enve::make_shared<BoxesClipboard>(mSelectedBoxes.getList());
     Document::sInstance->replaceClipboard(container);
 }
 
@@ -643,9 +642,9 @@ void Canvas::anim_setAbsFrame(const int frame) {
     const auto cont = mCacheHandler.atFrame<ImageCacheContainer>(newRelFrame);
     if(cont) {
         if(cont->storesDataInMemory()) { // !!!
-            setCurrentPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
+            setCurrentPreviewContainer(cont->ref<ImageCacheContainer>());
         } else {// !!!
-            setLoadingPreviewContainer(GetAsSPtr(cont, ImageCacheContainer));
+            setLoadingPreviewContainer(cont->ref<ImageCacheContainer>());
         }// !!!
         mCurrentPreviewContainerOutdated = !cont->storesDataInMemory();
     } else {

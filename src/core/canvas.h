@@ -121,10 +121,10 @@ struct KeyEvent : public MouseEvent {
 };
 
 class Canvas : public ContainerBox, public CanvasBase {
-    Q_OBJECT
-    friend class SelfRef;
     friend class CanvasWindow;
-protected:
+    Q_OBJECT
+    e_OBJECT
+public:
     explicit Canvas(Document& document,
                     const int canvasWidth = 1920,
                     const int canvasHeight = 1080,
@@ -376,7 +376,7 @@ public:
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data) {
         ContainerBox::setupRenderData(relFrame, data);
-        auto canvasData = GetAsPtr(data, CanvasRenderData);
+        auto canvasData = static_cast<CanvasRenderData*>(data);
         canvasData->fBgColor = toSkColor(mBackgroundColor->getColor());
         canvasData->fCanvasHeight = mHeight;
         canvasData->fCanvasWidth = mWidth;
@@ -596,7 +596,7 @@ protected:
     uint mLastStateId = 0;
     HDDCachableCacheHandler mCacheHandler;
 
-    qsptr<ColorAnimator> mBackgroundColor = SPtrCreate(ColorAnimator)();
+    qsptr<ColorAnimator> mBackgroundColor = enve::make_shared<ColorAnimator>();
 
     SmartVectorPath *getPathResultingFromOperation(const SkPathOp &pathOp);
 

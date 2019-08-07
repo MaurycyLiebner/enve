@@ -8,7 +8,7 @@
 #include <QMimeData>
 #include <QComboBox>
 #include "skia/skiaincludes.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "framerange.h"
 #include "Animators/SmartPath/smartpathanimator.h"
 class QrealAnimatorValueSlider;

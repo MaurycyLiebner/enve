@@ -44,7 +44,7 @@ VideoFrameLoader *VideoFrameHandler::getFrameLoader(const int frame) {
 }
 
 VideoFrameLoader *VideoFrameHandler::addFrameLoader(const int frameId) {
-    const auto loader = SPtrCreate(VideoFrameLoader)(
+    const auto loader = enve::make_shared<VideoFrameLoader>(
                     this, mVideoStreamsData, frameId);
     mDataHandler->addFrameLoader(frameId, loader);
     for(const auto& nFrame : mNeededFrames) {
@@ -59,7 +59,7 @@ VideoFrameLoader *VideoFrameHandler::addFrameLoader(const int frameId) {
 
 VideoFrameLoader *VideoFrameHandler::addFrameLoader(const int frameId,
                                                     AVFrame * const frame) {
-    const auto loader = SPtrCreate(VideoFrameLoader)(
+    const auto loader = enve::make_shared<VideoFrameLoader>(
                     this, mVideoStreamsData, frameId, frame);
     mDataHandler->addFrameLoader(frameId, loader);
     return loader.get();
@@ -161,7 +161,7 @@ void VideoDataHandler::removeFrameLoader(const int frame) {
 void VideoDataHandler::frameLoaderFinished(const int frame,
                                                  const sk_sp<SkImage> &image) {
     if(image) {
-        mFramesCache.add(SPtrCreate(ImageCacheContainer)(
+        mFramesCache.add(enve::make_shared<ImageCacheContainer>(
                              image, FrameRange{frame, frame}, &mFramesCache));
     } else {
         mFrameCount = frame;

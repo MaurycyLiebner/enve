@@ -5,7 +5,7 @@
 #include "Tasks/updatable.h"
 
 class ShaderEffect : public RasterEffect {
-    friend class SelfRef;
+    e_OBJECT
     ShaderEffect(const QString &name,
                  const ShaderEffectCreator * const creator,
                  const ShaderEffectProgram * const program,

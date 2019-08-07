@@ -146,7 +146,7 @@ void OutputSettingsProfilesDialog::deleteCurrentProfile() {
 void OutputSettingsProfilesDialog::duplicateCurrentProfile() {
     OutputSettingsProfile *currentProfile = getCurrentProfile();
     if(!currentProfile) return;
-    auto newProfile = SPtrCreate(OutputSettingsProfile)();
+    auto newProfile = enve::make_shared<OutputSettingsProfile>();
     newProfile->setSettings(currentProfile->getSettings());
     newProfile->setName(currentProfile->getName() + "1");
     OUTPUT_SETTINGS_PROFILES.append(newProfile);
@@ -158,7 +158,7 @@ void OutputSettingsProfilesDialog::createAndEditNewProfile() {
     RenderSettingsDialog *dialog = new RenderSettingsDialog(OutputSettings(),
                                                             this);
     if(dialog->exec()) {
-        auto newProfile = SPtrCreate(OutputSettingsProfile)();
+        auto newProfile = enve::make_shared<OutputSettingsProfile>();
         OUTPUT_SETTINGS_PROFILES.append(newProfile);
         mProfilesComboBox->addItem(newProfile->getName());
         mProfilesComboBox->setCurrentIndex(mProfilesComboBox->count() - 1);

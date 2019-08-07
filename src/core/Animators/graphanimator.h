@@ -1,7 +1,7 @@
 #ifndef GRAPHANIMATOR_H
 #define GRAPHANIMATOR_H
 #include "animator.h"
-#define GetAsGK(key) GetAsPtr(key, GraphKey)
+#define GetAsGK(key) static_cast<GraphKey*>(key)
 class GraphKey;
 enum QrealPointType : short;
 class GraphAnimator : public Animator {

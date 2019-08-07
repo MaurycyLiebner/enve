@@ -3,7 +3,7 @@
 
 #include <set>
 
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "singlewidgettarget.h"
 #include "paintsettings.h"
 #include "Paint/simplebrushwrapper.h"

@@ -197,57 +197,57 @@ private:
     QList<Particle*> mNotFinishedParticles;
 
     qsptr<ColorAnimator> mColorAnimator =
-            SPtrCreate(ColorAnimator)();
+            enve::make_shared<ColorAnimator>();
 
     qsptr<QPointFAnimator> mPos =
-            SPtrCreate(QPointFAnimator)("position");
+            enve::make_shared<QPointFAnimator>("position");
 
     stdsptr<AnimatedPoint> mPosPoint;
 
     qsptr<QrealAnimator> mWidth =
-            SPtrCreate(QrealAnimator)("width");
+            enve::make_shared<QrealAnimator>("width");
 
     qsptr<QrealAnimator> mSrcVelInfl =
-            SPtrCreate(QrealAnimator)("source velocity influence");
+            enve::make_shared<QrealAnimator>("source velocity influence");
 
     qsptr<QrealAnimator> mIniVelocity =
-            SPtrCreate(QrealAnimator)("initial velocity");
+            enve::make_shared<QrealAnimator>("initial velocity");
     qsptr<QrealAnimator> mIniVelocityVar =
-            SPtrCreate(QrealAnimator)("initial velocity variation");
+            enve::make_shared<QrealAnimator>("initial velocity variation");
     qsptr<QrealAnimator> mIniVelocityAngle =
-            SPtrCreate(QrealAnimator)("initial velocity angle");
+            enve::make_shared<QrealAnimator>("initial velocity angle");
     qsptr<QrealAnimator> mIniVelocityAngleVar =
-            SPtrCreate(QrealAnimator)("initial velocity angle variation");
+            enve::make_shared<QrealAnimator>("initial velocity angle variation");
     qsptr<QPointFAnimator> mAcceleration =
-            SPtrCreate(QPointFAnimator)("acceleration");
+            enve::make_shared<QPointFAnimator>("acceleration");
 
     qsptr<QrealAnimator> mParticlesPerSecond =
-            SPtrCreate(QrealAnimator)("particles per second");
+            enve::make_shared<QrealAnimator>("particles per second");
     qsptr<QrealAnimator> mParticlesFrameLifetime =
-            SPtrCreate(QrealAnimator)("particle lifetime");
+            enve::make_shared<QrealAnimator>("particle lifetime");
 
     qsptr<QrealAnimator> mVelocityRandomVar =
-            SPtrCreate(QrealAnimator)("velocity random variation");
+            enve::make_shared<QrealAnimator>("velocity random variation");
     qsptr<QrealAnimator> mVelocityRandomVarPeriod =
-            SPtrCreate(QrealAnimator)("velocity variation period");
+            enve::make_shared<QrealAnimator>("velocity variation period");
 
     qsptr<QrealAnimator> mParticleSize =
-            SPtrCreate(QrealAnimator)("particle size");
+            enve::make_shared<QrealAnimator>("particle size");
     qsptr<QrealAnimator> mParticleSizeVar =
-            SPtrCreate(QrealAnimator)("particle size variation");
+            enve::make_shared<QrealAnimator>("particle size variation");
 
     qsptr<QrealAnimator> mParticleLength =
-            SPtrCreate(QrealAnimator)("particle length");
+            enve::make_shared<QrealAnimator>("particle length");
 
     qsptr<QrealAnimator> mParticlesDecayFrames =
-            SPtrCreate(QrealAnimator)("decay frames");
+            enve::make_shared<QrealAnimator>("decay frames");
     qsptr<QrealAnimator> mParticlesSizeDecay =
-            SPtrCreate(QrealAnimator)("final scale");
+            enve::make_shared<QrealAnimator>("final scale");
     qsptr<QrealAnimator> mParticlesOpacityDecay =
-            SPtrCreate(QrealAnimator)("final opacity");
+            enve::make_shared<QrealAnimator>("final opacity");
 
     qsptr<BoxTargetProperty> mBoxTargetProperty =
-            SPtrCreate(BoxTargetProperty)("source");
+            enve::make_shared<BoxTargetProperty>("source");
 };
 
 class ParticleBox : public BoundingBox {
@@ -268,13 +268,13 @@ public:
     bool SWT_isParticleBox() const;
 
     stdsptr<BoxRenderData> createRenderData() {
-        return SPtrCreate(ParticleBoxRenderData)(this);
+        return enve::make_shared<ParticleBoxRenderData>(this);
     }
 
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data) {
         BoundingBox::setupRenderData(relFrame, data);
-        auto particleData = GetAsSPtr(data, ParticleBoxRenderData);
+        auto particleData = data->ref<ParticleBoxRenderData>();
         particleData->fEmittersData.clear();
         for(const auto& emitter : mEmitters) {
             emitter->generateParticlesIfNeeded();

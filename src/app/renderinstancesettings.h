@@ -12,7 +12,7 @@ extern "C" {
     #include <libavutil/mathematics.h>
     #include <libavutil/opt.h>
 }
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 
 struct RenderSettings {
     qreal fResolution = 1;
@@ -48,7 +48,7 @@ struct OutputSettings {
 };
 
 class OutputSettingsProfile : public StdSelfRef {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     const QString &getName() const {
         return mName;

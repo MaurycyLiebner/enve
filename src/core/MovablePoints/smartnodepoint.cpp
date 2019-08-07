@@ -15,8 +15,8 @@ SmartNodePoint::SmartNodePoint(PathPointsHandler * const handler,
     mHandler_k(handler), mParentAnimator(parentAnimator) {
     setRadius(6.5);
 
-    mC0Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C0);
-    mC2Pt = SPtrCreate(SmartCtrlPoint)(this, SmartCtrlPoint::C2);
+    mC0Pt = enve::make_shared<SmartCtrlPoint>(this, SmartCtrlPoint::C0);
+    mC2Pt = enve::make_shared<SmartCtrlPoint>(this, SmartCtrlPoint::C2);
 
     mC0Pt->setOtherCtrlPt(mC2Pt.get());
     mC2Pt->setOtherCtrlPt(mC0Pt.get());

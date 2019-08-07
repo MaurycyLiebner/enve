@@ -5,20 +5,19 @@
 
 PaintBox::PaintBox() : BoundingBox(TYPE_PAINT) {
     prp_setName("Paint Box");
-    mSurface = SPtrCreate(AnimatedSurface)();
+    mSurface = enve::make_shared<AnimatedSurface>();
     ca_addChild(mSurface);
 }
 
 void PaintBox::setupRenderData(
         const qreal relFrame, BoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
-    auto paintData = GetAsSPtr(data, PaintBoxRenderData);
-    paintData->fSurface = GetAsSPtr(mSurface->getSurface(qFloor(relFrame)),
-                                    DrawableAutoTiledSurface);
+    auto paintData = data->ref<PaintBoxRenderData>();
+    paintData->fSurface = enve::shared(mSurface->getSurface(qFloor(relFrame)));
 }
 
 stdsptr<BoxRenderData> PaintBox::createRenderData() {
-    return SPtrCreate(PaintBoxRenderData)(this);
+    return enve::make_shared<PaintBoxRenderData>(this);
 }
 
 #include <QFileDialog>

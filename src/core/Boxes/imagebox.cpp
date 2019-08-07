@@ -77,7 +77,7 @@ void ImageBox::changeSourceFile(QWidget * const dialogParent) {
 void ImageBox::setupRenderData(const qreal relFrame,
                                BoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
-    const auto imgData = GetAsPtr(data, ImageBoxRenderData);
+    const auto imgData = static_cast<ImageBoxRenderData*>(data);
     if(mImgCacheHandler->hasImage()) {
         imgData->fImage = mImgCacheHandler->getImageCopy();
     } else {
@@ -87,7 +87,7 @@ void ImageBox::setupRenderData(const qreal relFrame,
 }
 
 stdsptr<BoxRenderData> ImageBox::createRenderData() {
-    return SPtrCreate(ImageBoxRenderData)(mImgCacheHandler, this);
+    return enve::make_shared<ImageBoxRenderData>(mImgCacheHandler, this);
 }
 
 void ImageBoxRenderData::loadImageFromHandler() {

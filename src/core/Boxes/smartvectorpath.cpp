@@ -16,8 +16,8 @@
 SmartVectorPath::SmartVectorPath() :
     PathBox(BoundingBoxType::TYPE_VECTOR_PATH) {
     prp_setName("Path");
-    mPathAnimator = SPtrCreate(SmartPathCollection)();
-    const auto updater = SPtrCreate(NodePointUpdater)(this);
+    mPathAnimator = enve::make_shared<SmartPathCollection>();
+    const auto updater = enve::make_shared<NodePointUpdater>(this);
     mPathAnimator->prp_setOwnUpdater(updater);
     ca_prependChildAnimator(mPathEffectsAnimators.data(),
                             mPathAnimator);
@@ -70,7 +70,7 @@ QList<qsptr<SmartVectorPath>> SmartVectorPath::breakPathsApart_k() {
     if(iMax < 1) return result;
     for(int i = iMax; i >= 0; i--) {
         const auto srcPath = mPathAnimator->takeChildAt(i);
-        const auto newPath = SPtrCreate(SmartVectorPath)();
+        const auto newPath = enve::make_shared<SmartVectorPath>();
         copyPathBoxDataTo(newPath.get());
         newPath->getPathAnimator()->addChild(srcPath);
         result.append(newPath);

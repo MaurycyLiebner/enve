@@ -6,7 +6,7 @@
 QList<stdsptr<ShaderEffectCreator>> ShaderEffectCreator::sEffectCreators;
 
 qsptr<Property> ShaderEffectCreator::create() const {
-    auto shaderEffect = SPtrCreate(ShaderEffect)(
+    auto shaderEffect = enve::make_shared<ShaderEffect>(
                 fName, this, &fProgram, fProperties);
     return std::move(shaderEffect);
 }
@@ -56,9 +56,9 @@ void readAnimatorCreators(
             const QString script = elem.attribute("glValue");
 
             QrealAnimatorUniformSpecifierCreator::sTestScript(script, name);
-            propC = SPtrCreate(QrealAnimatorCreator)(
+            propC = enve::make_shared<QrealAnimatorCreator>(
                         iniVal, minVal, maxVal, stepVal, name);
-            uniC = SPtrCreate(QrealAnimatorUniformSpecifierCreator)(script);
+            uniC = enve::make_shared<QrealAnimatorUniformSpecifierCreator>(script);
         } catch(...) {
             RuntimeThrow("Error while parsing Animator '" + name +
                          "' of type " + type + ".");
@@ -72,9 +72,9 @@ void readAnimatorCreators(
             const QString script = elem.attribute("glValue");
 
             IntAnimatorUniformSpecifierCreator::sTestScript(script, name);
-            propC = SPtrCreate(IntAnimatorCreator)(
+            propC = enve::make_shared<IntAnimatorCreator>(
                         iniVal, minVal, maxVal, stepVal, name);
-            uniC = SPtrCreate(IntAnimatorUniformSpecifierCreator)(script);
+            uniC = enve::make_shared<IntAnimatorUniformSpecifierCreator>(script);
         } catch(...) {
             RuntimeThrow("Error while parsing Animator '" + name +
                          "' of type " + type + ".");
@@ -139,7 +139,7 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
                      effectName + "'");
     }
     const auto shaderEffectCreator =
-            SPtrCreate(ShaderEffectCreator)(grePath, effectName, propCs, program);
+            enve::make_shared<ShaderEffectCreator>(grePath, effectName, propCs, program);
     sEffectCreators << shaderEffectCreator;
 
     return shaderEffectCreator;

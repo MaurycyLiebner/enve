@@ -25,7 +25,7 @@ void QrealAnimator::writeProperty(QIODevice * const dst) const {
 }
 
 stdsptr<Key> QrealAnimator::createKey() {
-    return SPtrCreate(QrealKey)(this);
+    return enve::make_shared<QrealKey>(this);
 }
 
 void QrealAnimator::readProperty(QIODevice * const src) {
@@ -95,7 +95,7 @@ QrealSnapshot QrealAnimator::makeSnapshot(
         const qreal valueMultiplier) const {
     QrealSnapshot snapshot(mCurrentBaseValue, frameMultiplier, valueMultiplier);
     for(const auto& key : anim_mKeys) {
-        const auto qaKey = GetAsPtr(key, QrealKey);
+        const auto qaKey = static_cast<QrealKey*>(key);
         snapshot.appendKey(qaKey);
     }
     return snapshot;
@@ -125,7 +125,7 @@ void QrealAnimator::setValueRange(const qreal minVal, const qreal maxVal) {
 
 void QrealAnimator::incAllValues(const qreal valInc) {
     for(const auto &key : anim_mKeys) {
-        GetAsPtr(key, QrealKey)->incValue(valInc);
+        static_cast<QrealKey*>(key)->incValue(valInc);
     }
     incCurrentBaseValue(valInc);
 }
@@ -179,7 +179,7 @@ void QrealAnimator::setGenerator(const qsptr<RandomQrealGenerator>& generator) {
     if(!generator) {
         mRandomGenerator.reset();
     } else {
-        mRandomGenerator = GetAsSPtr(generator, RandomQrealGenerator);
+        mRandomGenerator = generator->ref<RandomQrealGenerator>();
     }
 
     prp_afterWholeInfluenceRangeChanged();
@@ -274,7 +274,7 @@ void QrealAnimator::saveValueToKey(const int frame, const qreal value) {
     if(keyAtFrame) {
         keyAtFrame->setValue(value);
     } else {
-        const auto newKey = SPtrCreate(QrealKey)(value, frame, this);
+        const auto newKey = enve::make_shared<QrealKey>(value, frame, this);
         anim_appendKey(newKey);
     }
 }
@@ -287,7 +287,7 @@ void QrealAnimator::anim_setAbsFrame(const int frame) {
 
 void QrealAnimator::anim_saveCurrentValueAsKey() {
     if(anim_getKeyOnCurrentFrame()) return;
-    const auto newKey = SPtrCreate(QrealKey)(mCurrentBaseValue,
+    const auto newKey = enve::make_shared<QrealKey>(mCurrentBaseValue,
                                              anim_getCurrentRelFrame(),
                                              this);
     anim_appendKey(newKey);
@@ -296,7 +296,7 @@ void QrealAnimator::anim_saveCurrentValueAsKey() {
 void QrealAnimator::anim_addKeyAtRelFrame(const int relFrame) {
     if(anim_getKeyAtRelFrame(relFrame)) return;
     const qreal value = getBaseValue(relFrame);
-    const auto newKey = SPtrCreate(QrealKey)(value, relFrame, this);
+    const auto newKey = enve::make_shared<QrealKey>(value, relFrame, this);
     anim_appendKey(newKey);
 }
 
@@ -306,7 +306,7 @@ void QrealAnimator::anim_removeAllKeys() {
 
     const auto keys = anim_mKeys;
     for(const auto& key : keys) {
-        anim_removeKey(GetAsSPtr(key, Key));
+        anim_removeKey(key->ref<Key>());
     }
     setCurrentBaseValue(currentValue);
 }
@@ -351,7 +351,7 @@ qValueRange QrealAnimator::graph_getMinAndMaxValues() const {
     qreal minVal = TEN_MIL;
     qreal maxVal = -TEN_MIL;
     for(const auto &key : anim_mKeys) {
-        const auto qaKey = GetAsPtr(key, QrealKey);
+        const auto qaKey = static_cast<QrealKey*>(key);
         const qreal keyVal = qaKey->getValue();
         const qreal startVal = qaKey->getStartValue();
         const qreal endVal = qaKey->getEndValue();
@@ -371,7 +371,7 @@ qValueRange QrealAnimator::graph_getMinAndMaxValuesBetweenFrames(
     qreal minVal = TEN_MIL;
     qreal maxVal = -TEN_MIL;
     for(const auto &key : anim_mKeys) {
-        const auto qaKey = GetAsPtr(key, QrealKey);
+        const auto qaKey = static_cast<QrealKey*>(key);
         const int keyFrame = key->getAbsFrame();
         if(keyFrame > endFrame || keyFrame < startFrame) continue;
         if(first) first = false;

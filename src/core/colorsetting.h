@@ -3,7 +3,7 @@
 class ColorAnimator;
 #include <QColor>
 #include "colorhelpers.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 enum class ColorSettingType : short {
     start, change, finish, apply
 };

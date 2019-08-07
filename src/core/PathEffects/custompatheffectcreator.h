@@ -1,7 +1,7 @@
 #ifndef CUSTOMPATHEFFECTCREATOR_H
 #define CUSTOMPATHEFFECTCREATOR_H
 #include <QList>
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "typemenu.h"
 #include "PathEffects/custompatheffect.h"
 
@@ -46,7 +46,7 @@ private:
         menu->addPlainAction<BoundingBox>(creator.mName(),
         [adder, creator](BoundingBox * box) {
             const auto cEffect = creator.mCreatorNew();
-            (box->*adder)(GetAsSPtr(cEffect, PathEffect));
+            (box->*adder)(qSharedPointerCast<PathEffect>(cEffect));
         });
     }
     static QList<CustomPathEffectCreator> sEffectCreators;

@@ -6,7 +6,7 @@
 #include "Animators/qrealpoint.h"
 class AnimatedSurface;
 class ASKey : public Key {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     ASKey(AnimatedSurface * const parent);
     ASKey(const int frame, AnimatedSurface * const parent);
@@ -31,11 +31,10 @@ public:
 private:
     const stdsptr<DrawableAutoTiledSurface> mValue;
 };
-using namespace std;
-using namespace std::chrono;
+
 class AnimatedSurface : public Animator {
     Q_OBJECT
-    friend class SelfRef;
+    e_OBJECT
     //typedef InterpolationKeyT<AutoTiledSurface> ASKey;
 protected:
     AnimatedSurface();
@@ -165,7 +164,7 @@ public:
     }
 
     stdsptr<Key> createKey() {
-        return SPtrCreate(ASKey)(this);
+        return enve::make_shared<ASKey>(this);
     }
 
     void readProperty(QIODevice * const src) {
@@ -190,12 +189,12 @@ public:
         stdsptr<ASKey> newKey;
         if(prevNextKey.first) {
             const auto& value = prevNextKey.first->dSurface();
-            newKey = SPtrCreate(ASKey)(value, relFrame, this);
+            newKey = enve::make_shared<ASKey>(value, relFrame, this);
         } else if(prevNextKey.second) {
             const auto& value = prevNextKey.second->dSurface();
-            newKey = SPtrCreate(ASKey)(value, relFrame, this);
+            newKey = enve::make_shared<ASKey>(value, relFrame, this);
         } else {
-            newKey = SPtrCreate(ASKey)(*mBaseValue.get(), relFrame, this);
+            newKey = enve::make_shared<ASKey>(*mBaseValue.get(), relFrame, this);
         }
         anim_appendKey(newKey);
     }
@@ -239,8 +238,8 @@ public:
 
     void newEmptyFrame(const int relFrame) {
         const auto currKey = anim_getKeyAtRelFrame<ASKey>(relFrame);
-        if(currKey) anim_removeKey(GetAsSPtr(currKey, ASKey));
-        const auto newKey = SPtrCreate(ASKey)(relFrame, this);
+        if(currKey) anim_removeKey(currKey->ref<ASKey>());
+        const auto newKey = enve::make_shared<ASKey>(relFrame, this);
         anim_appendKey(newKey);
     }
 signals:

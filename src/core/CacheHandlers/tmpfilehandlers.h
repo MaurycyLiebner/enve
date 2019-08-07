@@ -6,7 +6,7 @@
 class ImageCacheContainer;
 
 class TmpFileDataSaver : public HDDTask {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     TmpFileDataSaver() {}
 
@@ -26,7 +26,7 @@ protected:
 };
 
 class TmpFileDataLoader : public HDDTask {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     TmpFileDataLoader(const qsptr<QTemporaryFile> &file) :
         mTmpFile(file) {}
@@ -46,7 +46,7 @@ private:
 };
 
 class TmpFileDataDeleter : public HDDTask {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     TmpFileDataDeleter(const qsptr<QTemporaryFile> &file) :
         mTmpFile(file) {}
@@ -59,7 +59,7 @@ private:
 };
 
 class ImgTmpFileDataSaver : public TmpFileDataSaver {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     typedef std::function<void(qsptr<QTemporaryFile>)> Func;
 protected:
@@ -77,7 +77,7 @@ private:
 };
 
 class ImgTmpFileDataLoader : public TmpFileDataLoader {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     typedef std::function<void(sk_sp<SkImage>)> Func;
 protected:

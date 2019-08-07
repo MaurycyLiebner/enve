@@ -5,7 +5,7 @@ class IntAnimator;
 class BoolPropertyContainer;
 
 class DisplacePathEffect : public PathEffect {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     DisplacePathEffect();
 public:

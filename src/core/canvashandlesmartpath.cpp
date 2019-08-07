@@ -21,14 +21,14 @@ void Canvas::handleAddSmartPointMousePress(const MouseEvent &e) {
     }
     qptr<BoundingBox> test;
 
-    auto nodePointUnderMouse = GetAsPtr(mPressedPoint, SmartNodePoint);
+    auto nodePointUnderMouse = static_cast<SmartNodePoint*>(mPressedPoint.data());
     if(nodePointUnderMouse ? !nodePointUnderMouse->isEndPoint() : false) {
         nodePointUnderMouse = nullptr;
     }
     if(nodePointUnderMouse == mLastEndPoint &&
             nodePointUnderMouse) return;
     if(!mLastEndPoint && !nodePointUnderMouse) {
-        const auto newPath = SPtrCreate(SmartVectorPath)();
+        const auto newPath = enve::make_shared<SmartVectorPath>();
         newPath->planCenterPivotPosition();
         mCurrentContainer->addContainedBox(newPath);
         clearBoxesSelection();

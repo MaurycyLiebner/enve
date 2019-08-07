@@ -2,7 +2,7 @@
 
 qsptr<CustomPathEffect> createNewestVersionEffect() {
     // Use default, most up to date, version
-    return SPtrCreate(ExamplePathEffect000)();
+    return enve::make_shared<ExamplePathEffect000>();
 }
 
 qsptr<CustomPathEffect> createEffect(
@@ -10,7 +10,7 @@ qsptr<CustomPathEffect> createEffect(
     Q_UNUSED(identifier);
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
-    return SPtrCreate(ExamplePathEffect000)();
+    return enve::make_shared<ExamplePathEffect000>();
 }
 
 // Returned value must be unique, lets enve distinguish effects
@@ -41,7 +41,7 @@ bool supports(const CustomIdentifier &identifier) {
 #include "enveCore/Animators/qrealanimator.h"
 ExamplePathEffect000::ExamplePathEffect000() :
     CustomPathEffect(effectName().toLower()) {
-    mInfluence = SPtrCreate(QrealAnimator)(0, 0, 1, 0.1, "influence");
+    mInfluence = enve::make_shared<QrealAnimator>(0, 0, 1, 0.1, "influence");
     ca_addChild(mInfluence);
 }
 

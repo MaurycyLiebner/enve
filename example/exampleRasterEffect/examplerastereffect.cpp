@@ -2,7 +2,7 @@
 
 qsptr<CustomRasterEffect> createNewestVersionEffect() {
     // Use default, most up to date, version
-    return SPtrCreate(ExampleRasterEffect000)();
+    return enve::make_shared<ExampleRasterEffect000>();
 }
 
 qsptr<CustomRasterEffect> createEffect(
@@ -10,7 +10,7 @@ qsptr<CustomRasterEffect> createEffect(
     Q_UNUSED(identifier);
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
-    return SPtrCreate(ExampleRasterEffect000)();
+    return enve::make_shared<ExampleRasterEffect000>();
 }
 
 // Returned value must be unique, lets enve distinguish effects
@@ -41,7 +41,7 @@ bool supports(const CustomIdentifier &identifier) {
 #include "enveCore/Animators/qrealanimator.h"
 ExampleRasterEffect000::ExampleRasterEffect000() :
     CustomRasterEffect(effectName().toLower()) {
-    mRadius = SPtrCreate(QrealAnimator)(10, 0, 999.999, 1, "radius");
+    mRadius = enve::make_shared<QrealAnimator>(10, 0, 999.999, 1, "radius");
     ca_addChild(mRadius);
 }
 
@@ -49,7 +49,7 @@ stdsptr<RasterEffectCaller>
 ExampleRasterEffect000::getEffectCaller(const qreal relFrame) const {
     const qreal radius = mRadius->getEffectiveValue(relFrame);
     if(isZero4Dec(radius)) return nullptr;
-    return SPtrCreate(ExampleRasterEffectCaller000)(radius);
+    return enve::make_shared<ExampleRasterEffectCaller000>(radius);
 }
 
 QMargins ExampleRasterEffect000::getMarginAtRelFrame(const qreal frame) const {
@@ -60,9 +60,6 @@ QMargins ExampleRasterEffect000::getMarginAtRelFrame(const qreal frame) const {
 CustomIdentifier ExampleRasterEffect000::getIdentifier() const {
     return { effectId(), effectName(), { 0, 0, 0 } };
 }
-
-using namespace std;
-using namespace std::chrono;
 
 void ExampleRasterEffectCaller000::processGpu(QGL33 * const gl,
                                            GpuRenderTools &renderTools,

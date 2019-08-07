@@ -69,12 +69,12 @@ stdsptr<HDDTask> ImageCacheContainer::createTmpFileDataSaver() {
     const ImgTmpFileDataSaver::Func func = [this](qsptr<QTemporaryFile> tmpFile) {
         setDataSavedToTmpFile(tmpFile);
     };
-    return SPtrCreate(ImgTmpFileDataSaver)(mImageSk, func);
+    return enve::make_shared<ImgTmpFileDataSaver>(mImageSk, func);
 }
 
 stdsptr<HDDTask> ImageCacheContainer::createTmpFileDataLoader() {
     const ImgTmpFileDataLoader::Func func = [this](sk_sp<SkImage> img) {
         setDataLoadedFromTmpFile(img);
     };
-    return SPtrCreate(ImgTmpFileDataLoader)(mTmpFile, func);
+    return enve::make_shared<ImgTmpFileDataLoader>(mTmpFile, func);
 }

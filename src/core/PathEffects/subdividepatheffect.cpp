@@ -3,7 +3,7 @@
 
 SubdividePathEffect::SubdividePathEffect() :
     PathEffect("subdivide effect", PathEffectType::SUBDIVIDE) {
-    mCount = SPtrCreate(IntAnimator)(1, 0, 9, 1, "count");
+    mCount = enve::make_shared<IntAnimator>(1, 0, 9, 1, "count");
     ca_addChild(mCount);
 }
 

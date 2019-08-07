@@ -6,7 +6,7 @@ class BoxTransformAnimator;
 enum CanvasMode : short;
 
 class PointsHandler : public StdSelfRef {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     PointsHandler();
 public:

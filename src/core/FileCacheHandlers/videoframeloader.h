@@ -14,7 +14,7 @@ extern "C" {
 
 struct VideoStreamsData;
 class VideoFrameLoader : public HDDTask {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     VideoFrameLoader(VideoFrameHandler * const cacheHandler,
                      const stdsptr<VideoStreamsData>& openedVideo,

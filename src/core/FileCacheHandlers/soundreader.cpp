@@ -147,7 +147,7 @@ void SoundReader::readFrame() {
         av_frame_unref(decodedFrame);
     }
     av_frame_unref(decodedFrame);
-    mSamples = SPtrCreate(Samples)(audioData, audioDataRange);
+    mSamples = enve::make_shared<Samples>(audioData, audioDataRange);
 }
 
 #include "Sound/soundmerger.h"
@@ -157,7 +157,7 @@ void SoundReaderForMerger::afterProcessing() {
         for(const auto& ss : mSSAbsRanges) {
             merger->addSoundToMerge({ss.fSampleShift, ss.fSamplesRange,
                                      ss.fVolume, ss.fSpeed,
-                                     SPtrCreate(Samples)(getSamples())});
+                                     enve::make_shared<Samples>(getSamples())});
         }
     }
     SoundReader::afterProcessing();

@@ -9,7 +9,7 @@ enum class GradientType : short { LINEAR, RADIAL };
 
 class Gradient : public ComplexAnimator {
     Q_OBJECT
-    friend class SelfRef;
+    e_OBJECT
 protected:
     Gradient();
     Gradient(const QColor &color1, const QColor &color2);

@@ -11,7 +11,7 @@ struct BrushData {
 
 class BrushContexedWrapper : public SelfRef {
     Q_OBJECT
-    friend class SelfRef;
+    e_OBJECT
 public:
     void setSelected(const bool selected) {
         if(selected == mSelected) return;

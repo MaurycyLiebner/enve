@@ -1,6 +1,6 @@
 #ifndef PROPERTYUPDATER_H
 #define PROPERTYUPDATER_H
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 
 class PropertyUpdater : public StdSelfRef {
 public:

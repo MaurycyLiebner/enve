@@ -9,7 +9,7 @@ SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
     StaticComplexAnimator("sound") {
     mOwnDurationRectangle = !durRect;
     if(mOwnDurationRectangle) {
-        mDurationRectangle = SPtrCreate(FixedLenAnimationRect)(this);
+        mDurationRectangle = enve::make_shared<FixedLenAnimationRect>(this);
         mDurationRectangle->setBindToAnimationFrameRange();
         connect(mDurationRectangle.get(), &DurationRectangle::posChanged,
                 this, &SingleSound::anim_updateAfterShifted);
@@ -207,7 +207,7 @@ void SingleSound::setFilePath(const QString &path) {
 
 void SingleSound::setSoundDataHandler(SoundDataHandler* const newDataHandler) {
     mCacheHandler.reset();
-    if(newDataHandler) mCacheHandler = SPtrCreate(SoundHandler)(newDataHandler);
+    if(newDataHandler) mCacheHandler = enve::make_shared<SoundHandler>(newDataHandler);
     mDurationRectangle->setSoundCacheHandler(getCacheHandler());
     updateDurationRectLength();
 }

@@ -3,7 +3,7 @@
 #include "property.h"
 
 class BoolProperty : public Property {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     BoolProperty(const QString& name);
 public:
@@ -19,7 +19,7 @@ private:
 
 #include "../Animators/staticcomplexanimator.h"
 class BoolPropertyContainer : public StaticComplexAnimator {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     BoolPropertyContainer(const QString& name);
 public:

@@ -16,7 +16,7 @@ RasterEffectAnimators::RasterEffectAnimators(BoundingBox * const parentBox) :
 QMargins RasterEffectAnimators::getEffectsMargin(const qreal relFrame) const {
     QMargins newMargin;
     for(const auto& effect : ca_mChildAnimators) {
-        auto rasterEffect = GetAsPtr(effect.get(), RasterEffect);
+        auto rasterEffect = static_cast<RasterEffect*>(effect.get());
         if(rasterEffect->isVisible()) {
             newMargin += rasterEffect->getMarginAtRelFrame(relFrame);
         }
@@ -26,7 +26,7 @@ QMargins RasterEffectAnimators::getEffectsMargin(const qreal relFrame) const {
 
 void RasterEffectAnimators::updateUnbound() {
     for(const auto& effect : ca_mChildAnimators) {
-        auto rasterEffect = GetAsPtr(effect.get(), RasterEffect);
+        auto rasterEffect = static_cast<RasterEffect*>(effect.get());
         if(/*rasterEffect->isVisible() && */rasterEffect->forceMargin()) {
             mUnbound = true;
             return;
@@ -42,7 +42,7 @@ bool RasterEffectAnimators::unbound() const {
 void RasterEffectAnimators::addEffects(const qreal relFrame,
                                        BoxRenderData * const data) {
     for(const auto& effect : ca_mChildAnimators) {
-        auto rasterEffect = GetAsPtr(effect, ShaderEffect);
+        auto rasterEffect = static_cast<ShaderEffect*>(effect.get());
         if(rasterEffect->isVisible()) {
             const auto effectRenderData =
                     rasterEffect->getEffectCaller(relFrame);
@@ -72,7 +72,7 @@ qsptr<ShaderEffect> readIdCreateShaderEffect(QIODevice * const src) {
     qsptr<ShaderEffect> effect;
     if(best.count() == 1) {
         const auto bestCreator = best.first();
-        effect = GetAsSPtr(bestCreator->create(), ShaderEffect);
+        effect = qSharedPointerCast<ShaderEffect>(bestCreator->create());
     } else {
         // exec ask dialog
     }

@@ -54,7 +54,7 @@ void Document::read(QIODevice * const src) {
 //    int currentCanvasId;
 //    src->read(rcChar(&currentCanvasId), sizeof(int));
 //    auto currentCanvas = BoundingBox::sGetBoxByReadId(currentCanvasId);
-    //    setCurrentCanvas(GetAsPtr(currentCanvas, Canvas));
+    //    setCurrentCanvas(static_cast<Canvas*>(currentCanvas));
 }
 
 Gradient *Document::getGradientWithRWId(const int rwId) {

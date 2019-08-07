@@ -10,7 +10,7 @@ class SoundDataHandler;
 class HDDCachableCacheHandler;
 
 class SingleSound : public StaticComplexAnimator {
-    friend class SelfRef;
+    e_OBJECT
     Q_OBJECT
 protected:
     SingleSound(const qsptr<FixedLenAnimationRect> &durRect = nullptr);
@@ -90,7 +90,7 @@ private:
     qsptr<FixedLenAnimationRect> mDurationRectangle;
 
     qsptr<QrealAnimator> mVolumeAnimator =
-            SPtrCreate(QrealAnimator)(100, 0, 200, 1, "volume");
+            enve::make_shared<QrealAnimator>(100, 0, 200, 1, "volume");
 };
 
 #endif // SINGLESOUND_H

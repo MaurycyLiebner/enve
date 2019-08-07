@@ -9,7 +9,7 @@ SmartPathAnimator::SmartPathAnimator() :
     pathChanged([this]() { pathChangedExec(); }),
     cancelPathChange([this]() { cancelPathChangeExec(); }),
     finishPathChange([this]() { finishPathChangeExec(); }) {
-    setPointsHandler(SPtrCreate(PathPointsHandler)(this));
+    setPointsHandler(enve::make_shared<PathPointsHandler>(this));
 }
 
 SmartPathAnimator::SmartPathAnimator(const SkPath &path) :
@@ -36,7 +36,7 @@ void SmartPathAnimator::setupTreeViewMenu(PropertyMenu * const menu) {
         })->setEnabled(spClipboard);
 //    }
     menu->addPlainAction("Copy Path", [this] {
-        const auto spClipboard = SPtrCreate(SmartPathClipboard)(mBaseValue);
+        const auto spClipboard = enve::make_shared<SmartPathClipboard>(mBaseValue);
         Document::sInstance->replaceClipboard(spClipboard);
     });
     menu->addSeparator();
@@ -66,7 +66,7 @@ void SmartPathAnimator::graph_getValueConstraints(
 void SmartPathAnimator::actionDisconnectNodes(const int node1Id,
                                               const int node2Id) {
     for(const auto &key : anim_mKeys) {
-        const auto spKey = GetAsPtr(key, SmartPathKey);
+        const auto spKey = static_cast<SmartPathKey*>(key);
         auto& keyPath = spKey->getValue();
         keyPath.actionDisconnectNodes(node1Id, node2Id);
     }
@@ -76,6 +76,6 @@ void SmartPathAnimator::actionDisconnectNodes(const int node1Id,
 
 void SmartPathAnimator::updateAllPoints() {
     const auto handler = getPointsHandler();
-    const auto pathHandler = GetAsPtr(handler, PathPointsHandler);
+    const auto pathHandler = static_cast<PathPointsHandler*>(handler);
     pathHandler->updateAllPoints();
 }

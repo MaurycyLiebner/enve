@@ -7,7 +7,7 @@ void Canvas::connectPoints() {
     QList<SmartNodePoint*> selectedEndPts;
     for(const auto& point : mSelectedPoints_d) {
         if(point->isSmartNodePoint()) {
-            auto asNodePt = GetAsPtr(point, SmartNodePoint);
+            auto asNodePt = static_cast<SmartNodePoint*>(point);
             if(asNodePt->isEndPoint()) {
                 selectedEndPts.append(asNodePt);
             }
@@ -36,7 +36,7 @@ void Canvas::connectPoints() {
 void Canvas::disconnectPoints() {
     for(const auto& point : mSelectedPoints_d) {
         if(point->isSmartNodePoint()) {
-            auto asNodePt = GetAsPtr(point, SmartNodePoint);
+            auto asNodePt = static_cast<SmartNodePoint*>(point);
             const auto nextPoint = asNodePt->getNextPoint();
             if(!nextPoint) continue;
             if(nextPoint->isSelected()) {
@@ -52,7 +52,7 @@ void Canvas::mergePoints() {
     QList<SmartNodePoint*> selectedNodePoints;
     for(const auto& point : mSelectedPoints_d) {
         if(point->isSmartNodePoint()) {
-            const auto asNodePt = GetAsPtr(point, SmartNodePoint);
+            const auto asNodePt = static_cast<SmartNodePoint*>(point);
             selectedNodePoints.append(asNodePt);
         }
     }
@@ -84,7 +84,7 @@ void Canvas::mergePoints() {
 void Canvas::setPointCtrlsMode(const CtrlsMode mode) {
     for(const auto& point : mSelectedPoints_d) {
         if(point->isSmartNodePoint()) {
-            auto asNodePt = GetAsPtr(point, SmartNodePoint);
+            auto asNodePt = static_cast<SmartNodePoint*>(point);
             asNodePt->setCtrlsMode(mode);
         }
     }
@@ -94,7 +94,7 @@ void Canvas::makeSelectedPointsSegmentsCurves() {
     QList<SmartNodePoint*> selectedSNodePoints;
     for(const auto& point : mSelectedPoints_d) {
         if(point->isSmartNodePoint()) {
-            const auto asNodePt = GetAsPtr(point, SmartNodePoint);
+            const auto asNodePt = static_cast<SmartNodePoint*>(point);
             selectedSNodePoints.append(asNodePt);
         }
     }
@@ -112,7 +112,7 @@ void Canvas::makeSelectedPointsSegmentsLines() {
     QList<SmartNodePoint*> selectedSNodePoints;
     for(const auto& point : mSelectedPoints_d) {
         if(point->isSmartNodePoint()) {
-            auto asNodePt = GetAsPtr(point, SmartNodePoint);
+            auto asNodePt = static_cast<SmartNodePoint*>(point);
             selectedSNodePoints.append(asNodePt);
         }
     }

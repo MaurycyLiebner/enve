@@ -3,7 +3,7 @@
 #include <QtCore>
 #include <QPainter>
 #include <QObject>
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "framerange.h"
 class Property;
 class HDDCachableCacheHandler;

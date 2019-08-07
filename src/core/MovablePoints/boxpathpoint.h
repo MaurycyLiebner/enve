@@ -3,7 +3,7 @@
 #include "animatedpoint.h"
 class BoxTransformAnimator;
 class BoxPathPoint : public AnimatedPoint {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     BoxPathPoint(QPointFAnimator * const associatedAnimator,
                  BoxTransformAnimator * const boxTrans);

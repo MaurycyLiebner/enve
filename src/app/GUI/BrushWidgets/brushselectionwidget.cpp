@@ -62,7 +62,7 @@ void loadBrushFromFile(const QString &path,
 
     const QFileInfo fileInfo(dataFile);
     const auto brushName = fileInfo.baseName();
-    auto brushWrapper = SPtrCreate(SimpleBrushWrapper)(
+    auto brushWrapper = enve::make_shared<SimpleBrushWrapper>(
                 coll.fName, brushName,
                 brush, wholeFile);
     coll.fBrushes.append({ brushName, brushWrapper,

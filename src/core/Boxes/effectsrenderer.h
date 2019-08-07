@@ -1,6 +1,6 @@
 #ifndef EFFECTSRENDERER_H
 #define EFFECTSRENDERER_H
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "glhelpers.h"
 #include "Tasks/updatable.h"
 

@@ -3,7 +3,7 @@
 #include "complexanimator.h"
 
 class FakeComplexAnimator : public ComplexAnimator {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     FakeComplexAnimator(const QString& name, Property *target);
 public:

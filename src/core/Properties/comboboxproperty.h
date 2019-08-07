@@ -3,7 +3,7 @@
 #include "property.h"
 class ComboBoxProperty : public Property {
     Q_OBJECT
-    friend class SelfRef;
+    e_OBJECT
 protected:
     ComboBoxProperty(const QString& name,
                      const QStringList &list);

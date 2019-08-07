@@ -4,7 +4,7 @@
 #include "smartpath.h"
 
 class SmartPathKey : public InterpolationKeyT<SmartPath> {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     SmartPathKey(const SmartPath& value, const int relFrame,
                  Animator * const parentAnimator);

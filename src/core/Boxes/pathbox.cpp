@@ -16,40 +16,40 @@
 PathBox::PathBox(const BoundingBoxType type) :
     BoundingBox(type) {
     mPathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)();
+            enve::make_shared<PathEffectAnimators>();
     mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setOwnUpdater(
-                SPtrCreate(NodePointUpdater)(this));
+                enve::make_shared<NodePointUpdater>(this));
 
     mFillPathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)();
+            enve::make_shared<PathEffectAnimators>();
     mFillPathEffectsAnimators->prp_setName("fill effects");
     mFillPathEffectsAnimators->prp_setOwnUpdater(
-                SPtrCreate(NodePointUpdater)(this));
+                enve::make_shared<NodePointUpdater>(this));
 
     mOutlineBasePathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)();
+            enve::make_shared<PathEffectAnimators>();
     mOutlineBasePathEffectsAnimators->prp_setName("outline base effects");
     mOutlineBasePathEffectsAnimators->prp_setOwnUpdater(
-                SPtrCreate(NodePointUpdater)(this));
+                enve::make_shared<NodePointUpdater>(this));
 
     mOutlinePathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)();
+            enve::make_shared<PathEffectAnimators>();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
     mOutlinePathEffectsAnimators->prp_setOwnUpdater(
-                SPtrCreate(NodePointUpdater)(this));
+                enve::make_shared<NodePointUpdater>(this));
 
-    mStrokeGradientPoints = SPtrCreate(GradientPoints)(this);
+    mStrokeGradientPoints = enve::make_shared<GradientPoints>(this);
     mStrokeGradientPoints->prp_setOwnUpdater(
-                SPtrCreate(GradientPointsUpdater)(false, this));
+                enve::make_shared<GradientPointsUpdater>(false, this));
 
-    mFillGradientPoints = SPtrCreate(GradientPoints)(this);
+    mFillGradientPoints = enve::make_shared<GradientPoints>(this);
     mFillGradientPoints->prp_setOwnUpdater(
-                SPtrCreate(GradientPointsUpdater)(true, this));
+                enve::make_shared<GradientPointsUpdater>(true, this));
 
-    mFillSettings = SPtrCreate(FillSettingsAnimator)(
+    mFillSettings = enve::make_shared<FillSettingsAnimator>(
                 mFillGradientPoints.data(), this);
-    mStrokeSettings = SPtrCreate(OutlineSettingsAnimator)(
+    mStrokeSettings = enve::make_shared<OutlineSettingsAnimator>(
                 mStrokeGradientPoints.data(), this);
     ca_addChild(mFillSettings);
     ca_addChild(mStrokeSettings);
@@ -144,7 +144,7 @@ void PathBox::setupRenderData(const qreal relFrame,
         }
     }
 
-    const auto pathData = GetAsPtr(data, PathBoxRenderData);
+    const auto pathData = static_cast<PathBoxRenderData*>(data);
     if(currentEditPathCompatible) {
         pathData->fEditPath = mEditPathSk;
     } else {
@@ -465,11 +465,11 @@ bool PathBox::differenceInFillPathBetweenFrames(const int frame1, const int fram
 
 SmartVectorPath *PathBox::objectToVectorPathBox() {
     if(SWT_isSmartVectorPath()) return nullptr;
-    auto newPath = SPtrCreate(SmartVectorPath)();
+    auto newPath = enve::make_shared<SmartVectorPath>();
 
     if(SWT_isCircle()) {
         QPainterPath path;
-        const auto circle = GetAsPtr(this, Circle);
+        const auto circle = static_cast<Circle*>(this);
         path.addEllipse(circle->getRelCenterPosition(),
                         circle->getCurrentXRadius(),
                         circle->getCurrentYRadius());
@@ -484,7 +484,7 @@ SmartVectorPath *PathBox::objectToVectorPathBox() {
 
 SmartVectorPath *PathBox::strokeToVectorPathBox() {
     if(mOutlinePathSk.isEmpty()) return nullptr;
-    const auto newPath = SPtrCreate(SmartVectorPath)();
+    const auto newPath = enve::make_shared<SmartVectorPath>();
     newPath->loadSkPath(mOutlinePathSk);
     copyPathBoxDataTo(newPath.get());
     mParentGroup->addContainedBox(newPath);
@@ -523,7 +523,7 @@ void PathBox::updateDrawGradients() {
 
 void PathBox::updateCurrentPreviewDataFromRenderData(
         BoxRenderData* renderData) {
-    auto pathRenderData = GetAsPtr(renderData, PathBoxRenderData);
+    auto pathRenderData = static_cast<PathBoxRenderData*>(renderData);
     mCurrentPathsFrame = renderData->fRelFrame;
     mEditPathSk = pathRenderData->fEditPath;
     mPathSk = pathRenderData->fPath;

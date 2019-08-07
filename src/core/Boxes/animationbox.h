@@ -20,7 +20,7 @@ struct AnimationBoxRenderData : public ImageRenderData {
 };
 
 class AnimationBox : public BoundingBox {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     AnimationBox(const BoundingBoxType type);
 public:

@@ -80,7 +80,7 @@ public:
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       mMemoryHandler(new MemoryHandler(this)),
-      mVideoEncoder(SPtrCreate(VideoEncoder)()),
+      mVideoEncoder(enve::make_shared<VideoEncoder>()),
       mDocument(mTaskScheduler),
       mActions(mDocument),
       mRenderHandler(mDocument, mAudioHandler) {
@@ -826,7 +826,7 @@ void MainWindow::setCurrentBox(BoundingBox *box) {
         mFillStrokeSettings->setCurrentSettings(box->getFillSettings(),
                                                 box->getStrokeSettings());
         if(box->SWT_isTextBox()) {
-            TextBox *txtBox = GetAsPtr(box, TextBox);
+            TextBox *txtBox = static_cast<TextBox*>(box);
             mFontWidget->setCurrentSettings(txtBox->getFontSize(),
                                             txtBox->getFontFamily(),
                                             txtBox->getFontStyle());
@@ -1152,9 +1152,9 @@ void MainWindow::revert() {
 }
 
 stdsptr<void> MainWindow::lock() {
-    if(mLock) return GetAsSPtr(mLock, Lock);
+    if(mLock) return mLock->ref<Lock>();
     setEnabled(false);
-    const auto newLock = SPtrCreate(Lock)(this);
+    const auto newLock = enve::make_shared<Lock>(this);
     mLock = newLock.get();
     QApplication::setOverrideCursor(Qt::WaitCursor);
     return newLock;

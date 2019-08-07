@@ -15,7 +15,7 @@ void FakeComplexAnimator::drawTimelineControls(QPainter * const p,
                                                const FrameRange &absFrameRange,
                                                const int rowHeight) {
     if(mTarget->SWT_isAnimator()) {
-        const auto aTarget = GetAsPtr(mTarget, Animator);
+        const auto aTarget = static_cast<Animator*>(mTarget);
         aTarget->drawTimelineControls(p, pixelsPerFrame,
                                       absFrameRange, rowHeight);
     }
@@ -32,7 +32,7 @@ Key *FakeComplexAnimator::anim_getKeyAtPos(const qreal relX,
                                                 keyRectSize);
     if(key) return key;
     if(!mTarget->SWT_isAnimator()) return nullptr;
-    const auto aTarget = GetAsPtr(mTarget, Animator);
+    const auto aTarget = static_cast<Animator*>(mTarget);
     return aTarget->anim_getKeyAtPos(relX, minViewedFrame,
                                      pixelsPerFrame, keyRectSize);
 }
@@ -42,7 +42,7 @@ void FakeComplexAnimator::anim_getKeysInRect(const QRectF &selectionRect,
                                             QList<Key *> &keysList,
                                             const int keyRectSize) {
     if(mTarget->SWT_isAnimator()) {
-        const auto aTarget = GetAsPtr(mTarget, Animator);
+        const auto aTarget = static_cast<Animator*>(mTarget);
         aTarget->anim_getKeysInRect(selectionRect, pixelsPerFrame,
                                    keysList, keyRectSize);
     }

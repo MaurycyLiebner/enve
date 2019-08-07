@@ -4,7 +4,7 @@
 class AnimatedPoint;
 class QPointFAnimator;
 class Rectangle : public PathBox {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     Rectangle();
 public:

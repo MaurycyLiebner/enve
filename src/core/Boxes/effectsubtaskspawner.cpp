@@ -40,7 +40,7 @@ void EffectSubTaskSpawner_priv::splitSpawn(CpuRenderData& data,
     if(nSplits == 0) return;
     if(nSplits == 1) {
         data.fTexTile = rect;
-        const auto subTask = SPtrCreate(CustomCPUTask)(nullptr,
+        const auto subTask = enve::make_shared<CustomCPUTask>(nullptr,
             [this, data]() {
                 CpuRenderTools tools(mSrcBitmap, mDstBitmap);
                 mEffectCaller->processCpu(tools, data);

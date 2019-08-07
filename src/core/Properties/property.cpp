@@ -15,7 +15,7 @@ void Property::drawCanvasControls(SkCanvas * const canvas,
     if(mPointsHandler) {
         bool key;
         if(SWT_isAnimator()) {
-            const auto asAnim = GetAsPtr(this, Animator);
+            const auto asAnim = static_cast<Animator*>(this);
             key = asAnim->anim_getKeyOnCurrentFrame();
         } else key = false;
         mPointsHandler->drawPoints(canvas, invScale, key, mode);
@@ -29,7 +29,7 @@ void Property::setupTreeViewMenu(PropertyMenu * const menu) {
         clipboard->paste(this);
     })->setEnabled(compat);
     menu->addPlainAction("Copy", [this]() {
-        const auto clipboard = SPtrCreate(PropertyClipboard)(this);
+        const auto clipboard = enve::make_shared<PropertyClipboard>(this);
         Document::sInstance->replaceClipboard(clipboard);
     });
 }

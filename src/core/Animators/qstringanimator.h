@@ -5,7 +5,7 @@
 typedef KeyT<QString> QStringKey;
 
 class QStringAnimator : public SteppedAnimator<QString> {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     QStringAnimator(const QString& name);
 public:

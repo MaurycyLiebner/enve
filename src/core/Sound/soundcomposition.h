@@ -69,7 +69,7 @@ private:
     const Canvas * const mParent;
     qint64 mPos;
     typedef DynamicComplexAnimator<SingleSound> ContType;
-    qsptr<ContType> mSoundsContainer = SPtrCreate(ContType)("sounds");
+    qsptr<ContType> mSoundsContainer = enve::make_shared<ContType>("sounds");
     QList<qsptr<SingleSound>> mSounds;
     HDDCachableCacheHandler mSecondsCache;
 };

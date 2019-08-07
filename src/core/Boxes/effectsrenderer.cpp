@@ -44,7 +44,7 @@ void EffectsRenderer::processCpu(BoxRenderData * const boxData) {
     const auto& effect = mEffects.first();
 
     Q_ASSERT(!effect->gpuOnly());
-    EffectSubTaskSpawner::sSpawn(effect, GetAsSPtr(boxData, BoxRenderData));
+    EffectSubTaskSpawner::sSpawn(effect, boxData->ref<BoxRenderData>());
     mEffects.removeFirst();
 }
 

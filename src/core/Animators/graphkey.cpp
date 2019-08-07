@@ -8,9 +8,9 @@ GraphKey::GraphKey(const int frame,
     mRelFrame = frame;
     setStartFrameVar(mRelFrame - 5);
     setEndFrameVar(mRelFrame + 5);
-    mGraphPoint = SPtrCreate(QrealPoint)(KEY_POINT, this, 6);
-    mStartPoint = SPtrCreate(QrealPoint)(START_POINT, this, 4);
-    mEndPoint = SPtrCreate(QrealPoint)(END_POINT, this, 4);
+    mGraphPoint = enve::make_shared<QrealPoint>(KEY_POINT, this, 6);
+    mStartPoint = enve::make_shared<QrealPoint>(START_POINT, this, 4);
+    mEndPoint = enve::make_shared<QrealPoint>(END_POINT, this, 4);
 }
 
 GraphKey::GraphKey(Animator * const parentAnimator) :

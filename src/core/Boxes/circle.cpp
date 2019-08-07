@@ -10,44 +10,44 @@
 Circle::Circle() : PathBox(TYPE_CIRCLE) {
     prp_setName("Circle");
 
-    setPointsHandler(SPtrCreate(PointsHandler)());
+    setPointsHandler(enve::make_shared<PointsHandler>());
 
-    mCenterAnimator = SPtrCreate(QPointFAnimator)("center");
-    mCenterPoint = SPtrCreate(AnimatedPoint)(mCenterAnimator.get(),
+    mCenterAnimator = enve::make_shared<QPointFAnimator>("center");
+    mCenterPoint = enve::make_shared<AnimatedPoint>(mCenterAnimator.get(),
                                              mTransformAnimator.get(),
                                              TYPE_PATH_POINT);
     mPointsHandler->appendPt(mCenterPoint);
 
     mCenterPoint->disableSelection();
     mCenterPoint->setRelativePos(QPointF(0, 0));
-    mCenterAnimator->prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
+    mCenterAnimator->prp_setInheritedUpdater(enve::make_shared<NodePointUpdater>(this));
     ca_prependChildAnimator(mPathEffectsAnimators.data(),
                             mCenterAnimator);
 
     mHorizontalRadiusAnimator =
-            SPtrCreate(QPointFAnimator)("horizontal radius");
-    mHorizontalRadiusPoint = SPtrCreate(CircleRadiusPoint)(
+            enve::make_shared<QPointFAnimator>("horizontal radius");
+    mHorizontalRadiusPoint = enve::make_shared<CircleRadiusPoint>(
                 mHorizontalRadiusAnimator.get(), mTransformAnimator.get(),
                 mCenterPoint.get(), TYPE_PATH_POINT, false);
     mPointsHandler->appendPt(mHorizontalRadiusPoint);
     mHorizontalRadiusPoint->setRelativePos(QPointF(10, 0));
     const auto hXAnimator = mHorizontalRadiusAnimator->getXAnimator();
     ca_prependChildAnimator(mPathEffectsAnimators.data(),
-                            GetAsSPtr(hXAnimator, QrealAnimator));
+                            hXAnimator->ref<QrealAnimator>());
     hXAnimator->prp_setName("horizontal radius");
 
     mVerticalRadiusAnimator =
-            SPtrCreate(QPointFAnimator)("vertical radius");
-    mVerticalRadiusPoint = SPtrCreate(CircleRadiusPoint)(
+            enve::make_shared<QPointFAnimator>("vertical radius");
+    mVerticalRadiusPoint = enve::make_shared<CircleRadiusPoint>(
                 mVerticalRadiusAnimator.get(), mTransformAnimator.get(),
                 mCenterPoint.get(), TYPE_PATH_POINT, true);
     mPointsHandler->appendPt(mVerticalRadiusPoint);
     mVerticalRadiusPoint->setRelativePos(QPointF(0, 10));
     const auto vYAnimator = mVerticalRadiusAnimator->getYAnimator();
     ca_prependChildAnimator(mPathEffectsAnimators.data(),
-                            GetAsSPtr(vYAnimator, QrealAnimator));
+                            vYAnimator->ref<QrealAnimator>());
     vYAnimator->prp_setName("vertical radius");
-    prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
+    prp_setInheritedUpdater(enve::make_shared<NodePointUpdater>(this));
 }
 
 void Circle::moveRadiusesByAbs(const QPointF &absTrans) {

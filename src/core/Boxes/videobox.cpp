@@ -14,9 +14,8 @@ extern "C" {
 
 VideoBox::VideoBox() : AnimationBox(TYPE_VIDEO) {
     prp_setName("Video");
-    const auto flar = GetAsSPtr(mDurationRectangle,
-                                FixedLenAnimationRect);
-    mSound = SPtrCreate(SingleSound)(flar);
+    const auto flar = mDurationRectangle->ref<FixedLenAnimationRect>();
+    mSound = enve::make_shared<SingleSound>(flar);
     ca_addChild(mSound);
     mSound->SWT_hide();
 }
@@ -62,7 +61,7 @@ void VideoBox::setStretch(const qreal stretch) {
 
 void VideoBox::setFilePath(const QString &path) {
     if(mSrcFramesCache) {
-        const auto videoSrc = GetAsPtr(mSrcFramesCache, VideoFrameHandler);
+        const auto videoSrc = static_cast<VideoFrameHandler*>(mSrcFramesCache.get());
         const auto oldDataHandler = videoSrc->getDataHandler();
         disconnect(mFileHandler, &VideoFileHandler::pathChanged,
                    this, &VideoBox::animationDataChanged);
@@ -76,7 +75,7 @@ void VideoBox::setFilePath(const QString &path) {
     mFileHandler = FilesHandler::sInstance->getFileHandler<VideoFileHandler>(path);
     const auto newDataHandler = mFileHandler->getFrameHandler();
     if(newDataHandler) {
-        mSrcFramesCache = SPtrCreate(VideoFrameHandler)(newDataHandler);
+        mSrcFramesCache = enve::make_shared<VideoFrameHandler>(newDataHandler);
         getAnimationDurationRect()->setRasterCacheHandler(
                     &newDataHandler->getCacheHandler());
         connect(mFileHandler, &VideoFileHandler::pathChanged,

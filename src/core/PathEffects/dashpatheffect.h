@@ -3,7 +3,7 @@
 #include "PathEffects/patheffect.h"
 
 class DashPathEffect : public PathEffect {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     DashPathEffect();
 public:

@@ -4,7 +4,7 @@
 
 SolidifyPathEffect::SolidifyPathEffect() :
     PathEffect("solidify effect", PathEffectType::SOLIDIFY) {
-    mDisplacement = SPtrCreate(QrealAnimator)("displacement");
+    mDisplacement = enve::make_shared<QrealAnimator>("displacement");
     mDisplacement->setValueRange(-999.999, 999.999);
     mDisplacement->setCurrentBaseValue(5);
 

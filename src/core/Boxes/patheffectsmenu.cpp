@@ -5,7 +5,7 @@ void PathEffectsMenu::addPathEffectActionToMenu(
         const QString& text, PropertyMenu * const menu,
         const U& adder) {
     menu->addPlainAction<BoundingBox>(text, [adder](BoundingBox * box) {
-        (box->*adder)(SPtrCreateTemplated(T)());
+        (box->*adder)(enve::make_shared<T>());
     });
 }
 

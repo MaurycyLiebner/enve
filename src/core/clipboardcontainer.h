@@ -3,7 +3,7 @@
 #include <QList>
 #include <QWeakPointer>
 #include <typeindex>
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "basicreadwrite.h"
 #include "Animators/SmartPath/smartpath.h"
 class QrealAnimator;
@@ -45,7 +45,7 @@ private:
 };
 
 class BoxesClipboard : public Clipboard {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     BoxesClipboard(const QList<BoundingBox*> &src);
 public:
@@ -53,7 +53,7 @@ public:
 };
 
 class KeysClipboard : public Clipboard {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     KeysClipboard();
 public:
@@ -67,7 +67,7 @@ private:
 
 
 class PropertyClipboard : public Clipboard {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     PropertyClipboard(const Property * const source);
 public:
@@ -90,7 +90,7 @@ template <typename T>
 class DynamicComplexAnimatorBase;
 
 class DynamicPropsClipboard : public Clipboard {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     template<typename T>
     DynamicPropsClipboard(const QList<T*>& source) :

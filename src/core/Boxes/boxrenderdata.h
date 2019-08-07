@@ -8,12 +8,12 @@
 #include <QMatrix>
 class BoundingBox;
 class ShaderProgramCallerBase;
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "effectsrenderer.h"
 
 class RenderDataCustomizerFunctor;
 struct BoxRenderData : public eTask {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     enum class Step { BOX_IMAGE, EFFECTS };
 

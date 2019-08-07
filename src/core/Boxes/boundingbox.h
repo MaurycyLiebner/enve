@@ -5,7 +5,7 @@
 #include "boxrendercontainer.h"
 #include "skia/skiaincludes.h"
 #include "renderdatahandler.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "colorhelpers.h"
 #include "waitingforboxload.h"
 #include "MovablePoints/segment.h"
@@ -59,7 +59,7 @@ typedef TypeMenu<Property> PropertyMenu;
 
 class BoundingBox : public StaticComplexAnimator {
     Q_OBJECT
-    friend class SelfRef;
+    e_OBJECT
 protected:
     BoundingBox(const BoundingBoxType type);
 public:
@@ -324,7 +324,7 @@ public:
 
     template <class T>
     void addEffect() {
-        addEffect(SPtrCreateTemplated(T)());
+        addEffect(enve::make_shared<T>());
     }
 
     void clearRasterEffects();
@@ -374,7 +374,7 @@ public:
 
     void addLinkingBox(BoundingBox *box);
     void removeLinkingBox(BoundingBox *box);
-    const QList<qptr<BoundingBox>> &getLinkingBoxes() const;
+    const QList<BoundingBox*> &getLinkingBoxes() const;
 
 
     void incReasonsNotToApplyUglyTransform();
@@ -431,8 +431,7 @@ protected:
     qptr<ContainerBox> mParentGroup;
     qptr<BasicTransformAnimator> mParentTransform;
 
-    QList<qptr<BoundingBox>> mChildBoxes;
-    QList<qptr<BoundingBox>> mLinkingBoxes;
+    QList<BoundingBox*> mLinkingBoxes;
 
     RenderDataHandler mCurrentRenderDataHandler;
     RenderContainer mDrawRenderContainer;

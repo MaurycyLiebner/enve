@@ -45,5 +45,5 @@ void RenderContainer::setSrcRenderData(BoxRenderData * const data) {
     mPaintTransform.scale(1/mResolutionFraction, 1/mResolutionFraction);
     mRenderTransform = data->fRenderTransform;
     mPaintTransform = mRenderTransform*mPaintTransform;
-    mSrcRenderData = GetAsSPtr(data, BoxRenderData);
+    mSrcRenderData = data->ref<BoxRenderData>();
 }

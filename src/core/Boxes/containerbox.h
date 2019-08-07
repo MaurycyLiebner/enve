@@ -6,7 +6,7 @@ class PathBox;
 class PathEffectAnimators;
 
 class ContainerBox : public BoundingBox {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     ContainerBox(const BoundingBoxType type);
 public:

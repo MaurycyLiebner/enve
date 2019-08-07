@@ -188,7 +188,6 @@ SOURCES += \
     randomgrid.cpp \
     simpletask.cpp \
     smartPointers/stdpointer.cpp \
-    smartPointers/selfref.cpp \
     smartPointers/stdselfref.cpp \
     singlewidgettarget.cpp \
     singlewidgetabstraction.cpp \
@@ -411,10 +410,11 @@ HEADERS += \
     randomgrid.h \
     rangemap.h \
     simpletask.h \
+    smartPointers/ememory.h \
+    smartPointers/eobject.h \
     smartPointers/stdpointer.h \
     smartPointers/selfref.h \
     smartPointers/stdselfref.h \
-    smartPointers/sharedpointerdefs.h \
     singlewidgettarget.h \
     singlewidgetabstraction.h \
     Properties/property.h \

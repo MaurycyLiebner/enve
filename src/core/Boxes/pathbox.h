@@ -53,7 +53,7 @@ protected:
 };
 
 class PathBox : public BoundingBox {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     PathBox(const BoundingBoxType type);
     void getMotionBlurProperties(QList<Property*> &list) const;
@@ -100,7 +100,7 @@ public:
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data);
     stdsptr<BoxRenderData> createRenderData() {
-        return SPtrCreate(PathBoxRenderData)(this);
+        return enve::make_shared<PathBoxRenderData>(this);
     }
     void updateCurrentPreviewDataFromRenderData(
             BoxRenderData *renderData);

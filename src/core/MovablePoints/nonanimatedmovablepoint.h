@@ -3,7 +3,7 @@
 #include "movablepoint.h"
 
 class NonAnimatedMovablePoint : public MovablePoint {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     NonAnimatedMovablePoint(const MovablePointType &type);
     NonAnimatedMovablePoint(BasicTransformAnimator * const trans,

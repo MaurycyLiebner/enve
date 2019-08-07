@@ -3,7 +3,7 @@
 
 #include <QMenu>
 #include <typeindex>
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "canvasbase.h"
 
 class Property;

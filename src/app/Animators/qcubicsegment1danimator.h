@@ -6,14 +6,15 @@
 class qCubicSegment1DAnimator;
 
 class qCubicSegment1DAnimator : public InterpolationAnimatorT<qCubicSegment1D> {
-    friend class SelfRef;
+    e_OBJECT
     Q_OBJECT
 public:
+    qCubicSegment1DAnimator(const QString &name);
+
     bool SWT_isQCubicSegment1DAnimator() const { return true; }
 signals:
     void currentValueChanged(qCubicSegment1D);
 protected:
-    qCubicSegment1DAnimator(const QString &name);
     void afterValueChanged() {
         emit currentValueChanged(mCurrentValue);
     }

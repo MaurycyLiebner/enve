@@ -4,7 +4,7 @@
 class BasicTransformAnimator;
 
 class TransformUpdater : public PropertyUpdater {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     TransformUpdater(BasicTransformAnimator * const target);
 public:

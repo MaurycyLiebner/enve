@@ -49,7 +49,7 @@ FakeComplexAnimator *Animator::getFakeComplexAnimator() {
 void Animator::enableFakeComplexAnimator() {
     if(!mFakeComplexAnimator.isNull()) return;
     SWT_hide();
-    mFakeComplexAnimator = SPtrCreate(FakeComplexAnimator)(prp_mName, this);
+    mFakeComplexAnimator = enve::make_shared<FakeComplexAnimator>(prp_mName, this);
     emit prp_prependWith(this, mFakeComplexAnimator);
 }
 
@@ -298,7 +298,7 @@ void Animator::removeKeyWithoutDeselecting(const stdsptr<Key>& keyToRemove) {
 }
 
 void Animator::anim_moveKeyToRelFrame(Key * const key, const int newFrame) {
-    const auto keySPtr = GetAsSPtr(key, Key);
+    const auto keySPtr = key->ref<Key>();
     removeKeyWithoutDeselecting(keySPtr);
     key->setRelFrame(newFrame);
     anim_appendKey(keySPtr);
@@ -381,7 +381,7 @@ bool Animator::anim_isRecording() {
 void Animator::anim_removeAllKeys() {
     if(anim_mKeys.isEmpty()) return;
     const auto keys = anim_mKeys;
-    for(const auto& key : keys) anim_removeKey(GetAsSPtr(key, Key));
+    for(const auto& key : keys) anim_removeKey(key->ref<Key>());
 }
 
 void Animator::anim_setKeyOnCurrentFrame(Key* const key) {
@@ -619,11 +619,11 @@ void OverlappingKeys::merge() {
     if(!target) target = mKeys.last().get();
 
     if(mAnimator->SWT_isComplexAnimator()) {
-        const auto cTarget = GetAsPtr(target, ComplexKey);
+        const auto cTarget = static_cast<ComplexKey*>(target);
         for(int i = 0; i < mKeys.count(); i++) {
             const auto& iKey = mKeys.at(i);
             if(iKey.get() == target) continue;
-            const auto cKey = GetAsSPtr(iKey, ComplexKey);
+            const auto cKey = iKey->ref<ComplexKey>();
             cKey->moveAllKeysTo(cTarget);
             mAnimator->anim_removeKey(iKey);
             i--;

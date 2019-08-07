@@ -7,24 +7,24 @@ SmartPathCollection::SmartPathCollection() :
 
 SmartNodePoint *SmartPathCollection::createNewSubPathAtRelPos(const QPointF &relPos) {
     const auto newPath = createNewPath();
-    const auto handler = GetAsPtr(newPath->getPointsHandler(),
-                                  PathPointsHandler);
-    return handler->addFirstNode(relPos);
+    const auto handler = newPath->getPointsHandler();
+    const auto pathHandler = static_cast<PathPointsHandler*>(handler);
+    return pathHandler->addFirstNode(relPos);
 }
 
 SmartNodePoint *SmartPathCollection::createNewSubPathAtPos(const QPointF &absPos) {
     const auto newPath = createNewPath();
-    const auto handler = GetAsPtr(newPath->getPointsHandler(),
-                                  PathPointsHandler);
+    const auto handler = newPath->getPointsHandler();
+    const auto pathHandler = static_cast<PathPointsHandler*>(handler);
     const auto trans = handler->transform();
     const auto relPos = trans ? trans->mapAbsPosToRel(absPos) : absPos;
-    return handler->addFirstNode(relPos);
+    return pathHandler->addFirstNode(relPos);
 }
 
 SkPath SmartPathCollection::getPathAtRelFrame(const qreal relFrame) const {
     SkPath result;
     for(const auto& child : ca_mChildAnimators) {
-        const auto path = GetAsPtr(child, SmartPathAnimator);
+        const auto path = static_cast<SmartPathAnimator*>(child.get());
         const auto mode = path->getMode();
         if(mode == SmartPathAnimator::NORMAL)
             result.addPath(path->getPathAtRelFrame(relFrame));

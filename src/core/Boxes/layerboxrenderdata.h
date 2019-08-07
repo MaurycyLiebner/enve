@@ -3,11 +3,11 @@
 #include "boxrenderdata.h"
 
 struct ContainerBoxRenderData : public BoxRenderData {
-    friend class StdSelfRef;
+    e_OBJECT
+public:
     QList<stdsptr<BoxRenderData>> fChildrenRenderData;
-protected:
     ContainerBoxRenderData(BoundingBox * const parentBoxT);
-
+protected:
     void drawSk(SkCanvas * const canvas);
     void transformRenderCanvas(SkCanvas& canvas) const final;
     void updateRelBoundingRect();

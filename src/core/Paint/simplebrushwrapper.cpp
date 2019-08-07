@@ -20,7 +20,7 @@ stdsptr<SimpleBrushWrapper> SimpleBrushWrapper::createDuplicate() {
         mypaint_brush_unref(brush);
         return nullptr;
     }
-    return SPtrCreate(SimpleBrushWrapper)(
+    return enve::make_shared<SimpleBrushWrapper>(
                 mCollectionName, mBrushName,
                 brush, mWholeFile);
 }

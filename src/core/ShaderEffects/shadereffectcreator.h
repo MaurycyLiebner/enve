@@ -8,14 +8,13 @@ enum PropertyType {
 };
 
 struct ShaderEffectCreator : public PropertyCreator {
-protected:
+    e_OBJECT
+public:
     ShaderEffectCreator(const QString& grePath, const QString& name,
                         const QList<stdsptr<PropertyCreator>>& propCs,
                         const ShaderEffectProgram& program) :
         PropertyCreator(name), fGrePath(grePath),
         fProperties(propCs), fProgram(program) {}
-public:
-    friend class StdSelfRef;
 
     struct Identifier {
         Identifier(const QString& grePath, const QString& name,

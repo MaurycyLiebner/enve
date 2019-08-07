@@ -56,7 +56,7 @@ void DrawableAutoTiledSurface::updateTileRecBitmaps(QRect tileRect) {
 }
 
 class TilesTmpFileDataSaver : public TmpFileDataSaver {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     typedef std::function<void(const qsptr<QTemporaryFile>&)> Func;
 protected:
@@ -85,7 +85,7 @@ private:
 };
 
 class TilesTmpFileDataLoader : public TmpFileDataLoader {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     typedef std::function<void(const TileBitmaps&)> Func;
 protected:
@@ -119,7 +119,7 @@ stdsptr<HDDTask> DrawableAutoTiledSurface::createTmpFileDataSaver() {
             [this](const qsptr<QTemporaryFile>& tmpFile) {
         setDataSavedToTmpFile(tmpFile);
     };
-    return SPtrCreate(TilesTmpFileDataSaver)(mTileBitmaps, func);
+    return enve::make_shared<TilesTmpFileDataSaver>(mTileBitmaps, func);
 }
 
 stdsptr<HDDTask> DrawableAutoTiledSurface::createTmpFileDataLoader() {
@@ -127,5 +127,5 @@ stdsptr<HDDTask> DrawableAutoTiledSurface::createTmpFileDataLoader() {
             [this](const TileBitmaps& tiles) {
         setTileBitmaps(tiles);
     };
-    return SPtrCreate(TilesTmpFileDataLoader)(mTmpFile, func);
+    return enve::make_shared<TilesTmpFileDataLoader>(mTmpFile, func);
 }

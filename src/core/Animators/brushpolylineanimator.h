@@ -6,7 +6,7 @@
 #include "transformanimator.h"
 
 class BrushPolylineAnimator : public GraphAnimator {
-    friend class SelfRef;
+    e_OBJECT
     typedef InterpolationKeyT<BrushPolyline> BKey;
 protected:
     BrushPolylineAnimator();
@@ -40,7 +40,7 @@ public:
 
     void anim_saveCurrentValueAsKey() {
         if(anim_getKeyOnCurrentFrame()) return;
-        const auto newKey = SPtrCreate(BKey)(
+        const auto newKey = enve::make_shared<BKey>(
                     mBaseValue, anim_getCurrentRelFrame(), this);
         anim_appendKey(newKey);
     }

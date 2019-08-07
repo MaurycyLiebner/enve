@@ -4,7 +4,7 @@
 class IntAnimator;
 
 class SubdividePathEffect : public PathEffect {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     SubdividePathEffect();
 public:

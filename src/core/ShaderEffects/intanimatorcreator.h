@@ -5,14 +5,14 @@
 #include "glhelpers.h"
 
 struct IntAnimatorCreator : public PropertyCreator {
-    friend class StdSelfRef;
+    e_OBJECT
     int fIniVal;
     int fMinVal;
     int fMaxVal;
     int fStep;
 
     qsptr<Property> create() const {
-        return SPtrCreate(IntAnimator)(
+        return enve::make_shared<IntAnimator>(
                     fIniVal, fMinVal, fMaxVal, fStep, fName);
     }
 

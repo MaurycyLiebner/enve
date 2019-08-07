@@ -5,7 +5,7 @@
 #include "Tasks/updatable.h"
 class ImageDataHandler;
 class ImageLoader : public HDDTask {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     ImageLoader(const QString &filePath,
                 ImageDataHandler * const handler);
@@ -20,7 +20,7 @@ private:
 };
 
 class ImageDataHandler : public FileDataCacheHandler {
-    friend class SelfRef;
+    e_OBJECT
     friend class ImageLoader;
 protected:
     ImageDataHandler();
@@ -49,7 +49,7 @@ private:
 };
 
 class ImageFileHandler : public FileCacheHandler {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     ImageFileHandler() {}
 
@@ -57,7 +57,7 @@ protected:
         mFileMissing = !QFile(path).exists();
         if(mFileMissing) return mDataHandler.reset();
         const auto current = ImageDataHandler::sGetDataHandler<ImageDataHandler>(path);
-        if(current) mDataHandler = GetAsSPtr(current, ImageDataHandler);
+        if(current) mDataHandler = current->ref<ImageDataHandler>();
         else mDataHandler = ImageDataHandler::sCreateDataHandler<ImageDataHandler>(path);
     }
 

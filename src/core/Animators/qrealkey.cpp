@@ -85,7 +85,7 @@ void QrealKey::cancelValueTransform() {
 
 bool QrealKey::differsFromKey(Key *key) const {
     if(key == this) return false;
-    stdsptr<QrealKey> qa_key = GetAsSPtr(key, QrealKey);
+    stdsptr<QrealKey> qa_key = key->ref<QrealKey>();
     if(isZero4Dec(qa_key->getValue() - mValue)) {
         if(key->getRelFrame() > mRelFrame) {
             if(qa_key->getStartEnabledForGraph() || mEndEnabled) return true;

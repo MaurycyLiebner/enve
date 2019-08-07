@@ -1,9 +1,9 @@
 #ifndef RENDERCONTAINER_H
 #define RENDERCONTAINER_H
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "skia/skqtconversions.h"
 #include "skia/skiaincludes.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "framerange.h"
 
 struct BoxRenderData;

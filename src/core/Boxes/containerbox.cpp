@@ -11,6 +11,8 @@
 
 ContainerBox::ContainerBox(const BoundingBoxType type) :
     BoundingBox(type) {
+    if(type == BoundingBoxType::TYPE_GROUP) prp_setName("Group");
+    else if(type == BoundingBoxType::TYPE_LAYER) prp_setName("Layer");
     iniPathEffects();
 }
 
@@ -49,31 +51,31 @@ bool ContainerBox::SWT_dropInto(const int index, const QMimeData * const data) {
 
 void ContainerBox::iniPathEffects() {
     mPathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)();
+            enve::make_shared<PathEffectAnimators>();
     mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setOwnUpdater(
-                SPtrCreate(GroupAllPathsUpdater)(this));
+                enve::make_shared<GroupAllPathsUpdater>(this));
     ca_addChild(mPathEffectsAnimators);
 
     mFillPathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)();
+            enve::make_shared<PathEffectAnimators>();
     mFillPathEffectsAnimators->prp_setName("fill effects");
     mFillPathEffectsAnimators->prp_setOwnUpdater(
-                SPtrCreate(GroupAllPathsUpdater)(this));
+                enve::make_shared<GroupAllPathsUpdater>(this));
     ca_addChild(mFillPathEffectsAnimators);
 
     mOutlineBasePathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)();
+            enve::make_shared<PathEffectAnimators>();
     mOutlineBasePathEffectsAnimators->prp_setName("outline base effects");
     mOutlineBasePathEffectsAnimators->prp_setOwnUpdater(
-                SPtrCreate(GroupAllPathsUpdater)(this));
+                enve::make_shared<GroupAllPathsUpdater>(this));
     ca_addChild(mOutlineBasePathEffectsAnimators);
 
     mOutlinePathEffectsAnimators =
-            SPtrCreate(PathEffectAnimators)();
+            enve::make_shared<PathEffectAnimators>();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
     mOutlinePathEffectsAnimators->prp_setOwnUpdater(
-                SPtrCreate(GroupAllPathsUpdater)(this));
+                enve::make_shared<GroupAllPathsUpdater>(this));
     ca_addChild(mOutlinePathEffectsAnimators);
 }
 
@@ -191,10 +193,10 @@ void ContainerBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
 void ContainerBox::updateAllChildPathBoxes(const UpdateReason reason) {
     for(const auto& box : mContainedBoxes) {
         if(box->SWT_isPathBox()) {
-            GetAsPtr(box, PathBox)->setPathsOutdated();
+            static_cast<PathBox*>(box.get())->setPathsOutdated();
             box->planScheduleUpdate(reason);
         } else if(box->SWT_isContainerBox()) {
-            GetAsPtr(box, ContainerBox)->updateAllChildPathBoxes(reason);
+            static_cast<ContainerBox*>(box.get())->updateAllChildPathBoxes(reason);
         }
     }
 }
@@ -262,7 +264,7 @@ void ContainerBox::promoteToLayer() {
     prp_afterWholeInfluenceRangeChanged();
 
     for(const auto& box : mLinkingBoxes) {
-        GetAsPtr(box, ContainerBox)->promoteToLayer();
+        static_cast<ContainerBox*>(box)->promoteToLayer();
     }
 }
 
@@ -278,7 +280,7 @@ void ContainerBox::demoteToGroup() {
     prp_afterWholeInfluenceRangeChanged();
 
     for(const auto& box : mLinkingBoxes) {
-        GetAsPtr(box, ContainerBox)->demoteToGroup();
+        static_cast<ContainerBox*>(box)->demoteToGroup();
     }
 }
 
@@ -491,7 +493,7 @@ void ContainerBox::drawPixmapSk(SkCanvas * const canvas) {
 }
 
 qsptr<BoundingBox> ContainerBox::createLink() {
-    return SPtrCreate(InternalLinkGroupBox)(this);
+    return enve::make_shared<InternalLinkGroupBox>(this);
 }
 
 void ContainerBox::updateIfUsesProgram(
@@ -509,7 +511,7 @@ void processChildData(BoundingBox * const child,
                       const qreal absFrame) {
     if(!child->isFrameFVisibleAndInDurationRect(childRelFrame)) return;
     if(child->SWT_isGroupBox()) {
-        const auto childGroup = GetAsPtr(child, ContainerBox);
+        const auto childGroup = static_cast<ContainerBox*>(child);
         const auto& descs = childGroup->getContainedBoxes();
         for(int i = descs.count() - 1; i >= 0; i--) {
             const auto& desc = descs.at(i);
@@ -530,13 +532,13 @@ void processChildData(BoundingBox * const child,
 }
 
 stdsptr<BoxRenderData> ContainerBox::createRenderData() {
-    return SPtrCreate(ContainerBoxRenderData)(this);
+    return enve::make_shared<ContainerBoxRenderData>(this);
 }
 
 void ContainerBox::setupRenderData(const qreal relFrame,
                                    BoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
-    const auto groupData = GetAsPtr(data, ContainerBoxRenderData);
+    const auto groupData = static_cast<ContainerBoxRenderData*>(data);
     groupData->fChildrenRenderData.clear();
     groupData->fOtherGlobalRects.clear();
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
@@ -647,7 +649,7 @@ void ContainerBox::insertContainedBox(const int id,
     child->prp_afterWholeInfluenceRangeChanged();
 
     for(const auto& box : mLinkingBoxes) {
-        auto internalLinkGroup = GetAsPtr(box, InternalLinkGroupBox);
+        auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
         internalLinkGroup->insertContainedBox(
                     id, child->createLinkForLinkGroup());
     }
@@ -672,7 +674,7 @@ void ContainerBox::removeAllContainedBoxes() {
 void ContainerBox::removeContainedBoxFromList(const int id) {
     const auto box = mContainedBoxes.takeObjAt(id);
     if(box->SWT_isContainerBox()) {
-        const auto group = GetAsPtr(box, ContainerBox);
+        const auto group = static_cast<ContainerBox*>(box.get());
         if(group->isCurrentGroup() && mParentScene) {
             mParentScene->setCurrentGroupParentAsCurrentGroup();
         }
@@ -683,7 +685,7 @@ void ContainerBox::removeContainedBoxFromList(const int id) {
     updateContainedBoxIds(id);
 
     for(const auto& box : mLinkingBoxes) {
-        const auto internalLinkGroup = GetAsSPtr(box, InternalLinkGroupBox);
+        const auto internalLinkGroup = box->ref<InternalLinkGroupBox>();
         internalLinkGroup->removeContainedBoxFromList(id);
     }
 }
@@ -839,35 +841,35 @@ void ContainerBox::readChildBoxes(QIODevice *target) {
         qsptr<BoundingBox> box;
         const auto boxType = BoundingBox::sReadBoxType(target);
         if(boxType == TYPE_VECTOR_PATH) {
-            box = SPtrCreate(SmartVectorPath)();
+            box = enve::make_shared<SmartVectorPath>();
         } else if(boxType == TYPE_IMAGE) {
-            box = SPtrCreate(ImageBox)();
+            box = enve::make_shared<ImageBox>();
         } else if(boxType == TYPE_TEXT) {
-            box = SPtrCreate(TextBox)();
+            box = enve::make_shared<TextBox>();
         } else if(boxType == TYPE_VIDEO) {
-            box = SPtrCreate(VideoBox)();
+            box = enve::make_shared<VideoBox>();
         } else if(boxType == TYPE_PARTICLES) {
-            box = SPtrCreate(ParticleBox)();
+            box = enve::make_shared<ParticleBox>();
         } else if(boxType == TYPE_RECTANGLE) {
-            box = SPtrCreate(Rectangle)();
+            box = enve::make_shared<Rectangle>();
         } else if(boxType == TYPE_CIRCLE) {
-            box = SPtrCreate(Circle)();
+            box = enve::make_shared<Circle>();
         } else if(boxType == TYPE_LAYER) {
-            box = SPtrCreate(ContainerBox)(TYPE_LAYER);
+            box = enve::make_shared<ContainerBox>(TYPE_LAYER);
         } else if(boxType == TYPE_GROUP) {
-            box = SPtrCreate(ContainerBox)(TYPE_GROUP);
+            box = enve::make_shared<ContainerBox>(TYPE_GROUP);
         } else if(boxType == TYPE_PAINT) {
-            box = SPtrCreate(PaintBox)();
+            box = enve::make_shared<PaintBox>();
         } else if(boxType == TYPE_IMAGESQUENCE) {
-            box = SPtrCreate(ImageSequenceBox)();
+            box = enve::make_shared<ImageSequenceBox>();
         } else if(boxType == TYPE_INTERNAL_LINK) {
-            box = SPtrCreate(InternalLinkBox)(nullptr);
+            box = enve::make_shared<InternalLinkBox>(nullptr);
         } else if(boxType == TYPE_INTERNAL_LINK_GROUP) {
-            box = SPtrCreate(InternalLinkGroupBox)(nullptr);
+            box = enve::make_shared<InternalLinkGroupBox>(nullptr);
         } else if(boxType == TYPE_EXTERNAL_LINK) {
-            box = SPtrCreate(ExternalLinkBox)();
+            box = enve::make_shared<ExternalLinkBox>();
         } else if(boxType == TYPE_INTERNAL_LINK_CANVAS) {
-            box = SPtrCreate(InternalLinkCanvas)(nullptr);
+            box = enve::make_shared<InternalLinkCanvas>(nullptr);
         } else {
             RuntimeThrow("Invalid box type '" + std::to_string(boxType) + "'");
         }

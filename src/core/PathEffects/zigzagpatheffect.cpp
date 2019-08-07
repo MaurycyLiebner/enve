@@ -3,8 +3,8 @@
 
 ZigZagPathEffect::ZigZagPathEffect() :
     PathEffect("zigzag effect", PathEffectType::ZIGZAG) {
-    mAngle = SPtrCreate(QrealAnimator)(0, -9999, 9999, 1, "angle");
-    mDistance = SPtrCreate(QrealAnimator)(10, 1, 9999, 1, "distance");
+    mAngle = enve::make_shared<QrealAnimator>(0, -9999, 9999, 1, "angle");
+    mDistance = enve::make_shared<QrealAnimator>(10, 1, 9999, 1, "distance");
 
     ca_addChild(mAngle);
     ca_addChild(mDistance);

@@ -2,7 +2,7 @@
 #define SUBPATHEFFECT_H
 #include "PathEffects/patheffect.h"
 class SubPathEffect : public PathEffect {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     SubPathEffect();
 public:

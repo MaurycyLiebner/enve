@@ -13,11 +13,11 @@ SoundCacheContainer::SoundCacheContainer(const stdsptr<Samples>& samples,
 }
 
 stdsptr<HDDTask> SoundCacheContainer::createTmpFileDataSaver() {
-    return SPtrCreate(SoundContainerTmpFileDataSaver)(mSamples, this);
+    return enve::make_shared<SoundContainerTmpFileDataSaver>(mSamples, this);
 }
 
 stdsptr<HDDTask> SoundCacheContainer::createTmpFileDataLoader() {
-    return SPtrCreate(SoundContainerTmpFileDataLoader)(mTmpFile, this);
+    return enve::make_shared<SoundContainerTmpFileDataLoader>(mTmpFile, this);
 }
 
 int SoundCacheContainer::clearMemory() {

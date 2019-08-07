@@ -34,7 +34,7 @@ bool UndoRedoStack::addSet() {
 
 void UndoRedoStack::addToSet(const stdsptr<UndoRedo>& undoRedo) {
     if(!mCurrentSet) {
-        mCurrentSet = SPtrCreate(UndoRedoSet)(mCurrentAbsFrame);
+        mCurrentSet = enve::make_shared<UndoRedoSet>(mCurrentAbsFrame);
     }
     mCurrentSet->addUndoRedo(undoRedo);
 }

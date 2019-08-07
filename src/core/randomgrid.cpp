@@ -1,8 +1,8 @@
 #include "randomgrid.h"
 
 RandomGrid::RandomGrid() : StaticComplexAnimator("randomness grid") {
-    mSeed = SPtrCreate(QrealAnimator)(qrand() % 9999, 0, 9999, 1, "smooth seed");
-    mGridSize = SPtrCreate(QrealAnimator)(100, 1, 9999, 1, "grid size");
+    mSeed = enve::make_shared<QrealAnimator>(qrand() % 9999, 0, 9999, 1, "smooth seed");
+    mGridSize = enve::make_shared<QrealAnimator>(100, 1, 9999, 1, "grid size");
 
     ca_addChild(mSeed);
     ca_addChild(mGridSize);

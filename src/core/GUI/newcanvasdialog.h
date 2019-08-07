@@ -6,7 +6,7 @@
 #include <QSpinBox>
 #include <QLineEdit>
 #include <QLabel>
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "framerange.h"
 
 class Document;

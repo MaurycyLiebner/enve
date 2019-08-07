@@ -4,7 +4,7 @@
 
 template <typename T>
 class KeyT : public BasedKeyT<Key, T> {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     KeyT(const T &value, const int relFrame,
          Animator * const parentAnimator = nullptr) :

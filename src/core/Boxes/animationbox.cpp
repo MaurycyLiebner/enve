@@ -10,15 +10,15 @@
 AnimationBox::AnimationBox(const BoundingBoxType type) : BoundingBox(type) {
     prp_setName("Animation");
 
-    setDurationRectangle(SPtrCreate(FixedLenAnimationRect)(this));
+    setDurationRectangle(enve::make_shared<FixedLenAnimationRect>(this));
     mDurationRectangleLocked = true;
 
-    mFrameAnimator = SPtrCreate(IntAnimator)("frame");
+    mFrameAnimator = enve::make_shared<IntAnimator>("frame");
     ca_prependChildAnimator(mRasterEffectsAnimators.get(), mFrameAnimator);
 }
 
 FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() const {
-    return GetAsPtr(mDurationRectangle, FixedLenAnimationRect);
+    return static_cast<FixedLenAnimationRect*>(mDurationRectangle.get());
 }
 
 void AnimationBox::updateDurationRectangleAnimationRange() {
@@ -87,12 +87,12 @@ void AnimationBox::enableFrameRemappingAction() {
     const int animStartRelFrame =
                 getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
     if(frameCount > 1) {
-        const auto firstFrameKey = SPtrCreate(QrealKey)(0, animStartRelFrame,
+        const auto firstFrameKey = enve::make_shared<QrealKey>(0, animStartRelFrame,
                                                         mFrameAnimator.get());
         mFrameAnimator->anim_appendKey(firstFrameKey);
         const int value = frameCount - 1;
         const int frame = animStartRelFrame + frameCount - 1;
-        const auto lastFrameKey = SPtrCreate(QrealKey)(value, frame,
+        const auto lastFrameKey = enve::make_shared<QrealKey>(value, frame,
                                                        mFrameAnimator.get());
         mFrameAnimator->anim_appendKey(lastFrameKey);
     } else {
@@ -221,7 +221,7 @@ void AnimationBox::readBoundingBox(QIODevice * const target) {
 void AnimationBox::setupRenderData(const qreal relFrame,
                                    BoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
-    const auto imageData = GetAsPtr(data, AnimationBoxRenderData);
+    const auto imageData = static_cast<AnimationBoxRenderData*>(data);
     const int animationFrame = getAnimationFrameForRelFrame(relFrame);
     imageData->fAnimationFrame = animationFrame;
     const auto upd = mSrcFramesCache->scheduleFrameLoad(animationFrame);
@@ -230,7 +230,7 @@ void AnimationBox::setupRenderData(const qreal relFrame,
 }
 
 stdsptr<BoxRenderData> AnimationBox::createRenderData() {
-    return SPtrCreate(AnimationBoxRenderData)(mSrcFramesCache.get(), this);
+    return enve::make_shared<AnimationBoxRenderData>(mSrcFramesCache.get(), this);
 }
 
 void AnimationBoxRenderData::loadImageFromHandler() {

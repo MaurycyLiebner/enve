@@ -14,7 +14,7 @@ enum CanvasMode : short;
 enum CtrlsMode : short;
 
 class SmartNodePoint : public NonAnimatedMovablePoint {
-    friend class StdSelfRef;
+    e_OBJECT
     friend class NormalSegment;
 protected:
     SmartNodePoint(PathPointsHandler * const handler,

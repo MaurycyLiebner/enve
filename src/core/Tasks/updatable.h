@@ -2,7 +2,7 @@
 #define UPDATABLE_H
 #include <QList>
 #include <QEventLoop>
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "glhelpers.h"
 #include "skia/skiaincludes.h"
 class HDDExecController;
@@ -113,7 +113,7 @@ private:
 };
 
 class CPUTask : public eTask {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     HardwareSupport hardwareSupport() const {
         return HardwareSupport::cpuOnly;
@@ -129,7 +129,7 @@ protected:
 };
 
 class HDDTask : public eTask {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     HardwareSupport hardwareSupport() const {
         return HardwareSupport::cpuOnly;
@@ -152,7 +152,7 @@ private:
 };
 
 class CustomCPUTask : public CPUTask {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     CustomCPUTask(const std::function<void(void)>& before,
                   const std::function<void(void)>& run,
@@ -176,14 +176,14 @@ private:
 
 template <typename T>
 class SPtrDisposer : public CPUTask {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     SPtrDisposer(const T& ptr) : mPtr(ptr) {}
 public:
     void beforeProcessing(const Hardware) final {}
     void process() final { mPtr.reset(); }
     static eTask* sDispose(const T& ptr) {
-        const auto disposer = SPtrCreateTemplated(SPtrDisposer<T>)(ptr);
+        const auto disposer = enve::make_shared<SPtrDisposer<T>>(ptr);
         if(disposer->scheduleTask()) return disposer.get();
         return nullptr;
     }

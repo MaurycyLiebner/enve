@@ -48,7 +48,7 @@ bool DurationRectangleMovable::isHovered() {
 void DurationRectangleMovable::pressed(const bool shiftPressed) {
     if(!mChildProperty) return;
     if(mChildProperty->SWT_isBoundingBox()) {
-        const auto box = GetAsPtr(mChildProperty, BoundingBox);
+        const auto box = static_cast<BoundingBox*>(mChildProperty);
         box->selectionChangeTriggered(shiftPressed);
     }
 }
@@ -56,7 +56,7 @@ void DurationRectangleMovable::pressed(const bool shiftPressed) {
 bool DurationRectangleMovable::isSelected() {
     if(mChildProperty) {
         if(mChildProperty->SWT_isBoundingBox()) {
-            const auto box = GetAsPtr(mChildProperty, BoundingBox);
+            const auto box = static_cast<BoundingBox*>(mChildProperty);
             return box->isSelected();
         }
     }

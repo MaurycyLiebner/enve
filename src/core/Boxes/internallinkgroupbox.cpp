@@ -91,7 +91,7 @@ void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
 ContainerBox *InternalLinkGroupBox::getFinalTarget() const {
     if(!getLinkTarget()) return nullptr;
     if(getLinkTarget()->SWT_isLinkBox()) {
-        return GetAsPtr(getLinkTarget(), InternalLinkGroupBox)->getFinalTarget();
+        return static_cast<InternalLinkGroupBox*>(getLinkTarget())->getFinalTarget();
     }
     return getLinkTarget();
 }
@@ -112,7 +112,7 @@ bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) const {
 
 void InternalLinkGroupBox::setTargetSlot(BoundingBox * const target) {
     if(target->SWT_isLayerBox())
-        setLinkTarget(GetAsPtr(target, ContainerBox));
+        setLinkTarget(static_cast<ContainerBox*>(target));
 }
 
 void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
@@ -149,7 +149,7 @@ QPointF InternalLinkGroupBox::getRelCenterPosition() {
 }
 
 ContainerBox *InternalLinkGroupBox::getLinkTarget() const {
-    return GetAsPtr(mBoxTarget->getTarget(), ContainerBox);
+    return static_cast<ContainerBox*>(mBoxTarget->getTarget());
 }
 
 qsptr<BoundingBox> InternalLinkGroupBox::createLink() {
@@ -162,7 +162,7 @@ qsptr<BoundingBox> InternalLinkGroupBox::createLinkForLinkGroup() {
     if(isParentLink()) {
         return getLinkTarget()->createLinkForLinkGroup();
     } else {
-        return SPtrCreate(InternalLinkGroupBox)(this);
+        return enve::make_shared<InternalLinkGroupBox>(this);
     }
 }
 

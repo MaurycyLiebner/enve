@@ -12,26 +12,26 @@
 
 ParticleBox::ParticleBox() : BoundingBox(TYPE_PARTICLES) {
     prp_setName("Particle Box");
-    mTopLeftAnimator = SPtrCreate(QPointFAnimator)("top left");
-    mTopLeftPoint = SPtrCreate(AnimatedPoint)(
+    mTopLeftAnimator = enve::make_shared<QPointFAnimator>("top left");
+    mTopLeftPoint = enve::make_shared<AnimatedPoint>(
                 mTopLeftAnimator.data(),
                 mTransformAnimator.data(),
                 TYPE_PATH_POINT);
     mTopLeftAnimator->prp_setInheritedUpdater(
-                SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
+                enve::make_shared<DisplayedFillStrokeSettingsUpdater>(this));
 
-    mBottomRightAnimator = SPtrCreate(QPointFAnimator)("bottom right");
-    mBottomRightPoint = SPtrCreate(AnimatedPoint)(
+    mBottomRightAnimator = enve::make_shared<QPointFAnimator>("bottom right");
+    mBottomRightPoint = enve::make_shared<AnimatedPoint>(
                 mBottomRightAnimator.data(),
                 mTransformAnimator.data(),
                 TYPE_PATH_POINT);
     mBottomRightAnimator->prp_setInheritedUpdater(
-                SPtrCreate(DisplayedFillStrokeSettingsUpdater)(this));
+                enve::make_shared<DisplayedFillStrokeSettingsUpdater>(this));
 
     ca_prependChildAnimator(mTopLeftAnimator.data(), mRasterEffectsAnimators);
     ca_prependChildAnimator(mBottomRightAnimator.data(), mRasterEffectsAnimators);
 
-    const auto durRect = SPtrCreate(DurationRectangle)(this);
+    const auto durRect = enve::make_shared<DurationRectangle>(this);
     setDurationRectangle(durRect);
     mDurationRectangleLocked = true;
     durRect->setMaxFrame(200);
@@ -85,7 +85,7 @@ FrameRange ParticleBox::prp_getIdenticalRelRange(const int relFrame) const {
 }
 
 void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
-    const auto emitter = SPtrCreate(ParticleEmitter)();
+    const auto emitter = enve::make_shared<ParticleEmitter>();
     emitter->getPosPoint()->setRelativePos(mapAbsPosToRel(absPos));
     addEmitter(emitter);
 }
@@ -230,7 +230,7 @@ bool Particle::getParticleStateAtFrameF(const qreal frame,
 
 ParticleEmitter::ParticleEmitter() :
     StaticComplexAnimator("particle emitter") {
-    mPosPoint = SPtrCreate(AnimatedPoint)(
+    mPosPoint = enve::make_shared<AnimatedPoint>(
                 mPos.get(),
                 getTransformAnimator(),
                 TYPE_PATH_POINT);
@@ -320,7 +320,7 @@ ParticleEmitter::ParticleEmitter() :
     ca_addChild(mParticlesOpacityDecay);
     ca_addChild(mBoxTargetProperty);
 
-    prp_setOwnUpdater(SPtrCreate(ParticlesUpdater)(this));
+    prp_setOwnUpdater(enve::make_shared<ParticlesUpdater>(this));
 
     scheduleGenerateParticles();
 }
@@ -396,7 +396,7 @@ EmitterData ParticleEmitter::getEmitterDataAtRelFrameF(
                                            0., stateT.fSize,
                                            0., 0.)*particleData->fTransform;
 
-                stateT.fTargetRenderData = GetAsSPtr(renderData, BoxRenderData);
+                stateT.fTargetRenderData = renderData->ref<BoxRenderData>();
                 renderData->fParentIsTarget = false;
                 data.particleStates << stateT;
                 renderData->addDependent(particleData.get());

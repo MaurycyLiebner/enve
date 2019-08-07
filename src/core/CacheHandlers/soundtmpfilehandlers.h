@@ -7,7 +7,7 @@
 #include "skia/skiaincludes.h"
 class SoundCacheContainer;
 class SoundContainerTmpFileDataLoader : public HDDTask {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     void process();
 
@@ -22,7 +22,7 @@ protected:
 };
 
 class SoundContainerTmpFileDataSaver : public HDDTask {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     void process();
 

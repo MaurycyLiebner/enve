@@ -4,7 +4,7 @@
 #include "skia/skiaincludes.h"
 
 class QPointFAnimator : public StaticComplexAnimator {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     QPointFAnimator(const QString& name);
 public:

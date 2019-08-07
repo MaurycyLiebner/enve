@@ -5,7 +5,7 @@
 
 template <uchar PROPS>
 class PolylineAnimator : public GraphAnimatorT<Polyline<PROPS>> {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     PolylineAnimator() : GraphAnimatorT<Polyline<PROPS>>("polyline") {}
 public:

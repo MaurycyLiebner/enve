@@ -74,7 +74,7 @@ public:
             const auto currKey = this->template anim_getKeyOnCurrentFrame<K>();
             return currKey->setValue(mCurrentValue);
         }
-        auto newKey = SPtrCreateTemplated(K)(
+        auto newKey = enve::make_shared<K>(
                     mCurrentValue, this->anim_getCurrentRelFrame(), this);
         this->anim_appendKey(newKey);
     }
@@ -82,7 +82,7 @@ public:
     void anim_addKeyAtRelFrame(const int relFrame) {
         if(this->anim_getKeyAtRelFrame(relFrame)) return;
         const T value = getValueAtRelFrame(relFrame);
-        const auto newKey = SPtrCreateTemplated(K)(value, relFrame, this);
+        const auto newKey = enve::make_shared<K>(value, relFrame, this);
         this->anim_appendKey(newKey);
     }
 
@@ -100,7 +100,7 @@ public:
     }
 
     stdsptr<Key> createKey() {
-        return SPtrCreateTemplated(K)(this);
+        return enve::make_shared<K>(this);
     }
 protected:
     virtual T getValueAtRelFrameK(const qreal frame,

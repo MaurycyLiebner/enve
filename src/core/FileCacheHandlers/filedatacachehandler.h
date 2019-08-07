@@ -1,7 +1,7 @@
 #ifndef FILEDATACACHEHANDLER_H
 #define FILEDATACACHEHANDLER_H
 #include "smartPointers/selfref.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 
 class FileDataCacheHandler : public SelfRef {
     Q_OBJECT
@@ -55,7 +55,7 @@ T *FileDataCacheHandler::sGetDataHandler(const QString &filePath) {
 
 template<typename T>
 qsptr<T> FileDataCacheHandler::sCreateDataHandler(const QString &filePath) {
-    const auto handler = SPtrCreateTemplated(T)();
+    const auto handler = enve::make_shared<T>();
     try {
         handler->setFilePath(filePath);
     } catch(const std::exception& e) {
@@ -68,7 +68,7 @@ qsptr<T> FileDataCacheHandler::sCreateDataHandler(const QString &filePath) {
 template<typename T>
 qsptr<T> FileDataCacheHandler::sGetCreateDataHandler(const QString &filePath) {
     const auto get = sGetDataHandler<T>(filePath);
-    if(get) return GetAsSPtrTemplated(get, T);
+    if(get) return get->template ref<T>();
     return sCreateDataHandler<T>(filePath);
 }
 

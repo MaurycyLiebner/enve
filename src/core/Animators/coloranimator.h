@@ -7,7 +7,7 @@
 
 class ColorAnimator : public StaticComplexAnimator {
     Q_OBJECT
-    friend class SelfRef;
+    e_OBJECT
 protected:
     ColorAnimator(const QString& name = "color");
 public:

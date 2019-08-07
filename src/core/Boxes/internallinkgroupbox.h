@@ -4,7 +4,7 @@
 #include "Properties/boxtargetproperty.h"
 
 class InternalLinkGroupBox : public ContainerBox {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     InternalLinkGroupBox(ContainerBox * const linkTarget);
 public:
@@ -63,7 +63,7 @@ protected:
     }
 
     qsptr<BoxTargetProperty> mBoxTarget =
-            SPtrCreate(BoxTargetProperty)("link target");
+            enve::make_shared<BoxTargetProperty>("link target");
 };
 
 #endif // INTERNALLINKGROUPBOX_H

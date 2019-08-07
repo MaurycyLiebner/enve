@@ -1,7 +1,7 @@
 #ifndef QREALANIMATORVALUESLIDER_H
 #define QREALANIMATORVALUESLIDER_H
 #include "qdoubleslider.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 class IntProperty;
 class QrealAnimator;
 class Property;

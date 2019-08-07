@@ -2,7 +2,7 @@
 #define RENDERHANDLER_H
 #include "framerange.h"
 #include "GUI/audiohandler.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 
 class Canvas;
 class RenderInstanceSettings;

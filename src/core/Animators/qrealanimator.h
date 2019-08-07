@@ -8,7 +8,7 @@ class RandomQrealGenerator;
 
 class QrealAnimator :  public GraphAnimator {
     Q_OBJECT
-    friend class SelfRef;
+    e_OBJECT
 protected:
     QrealAnimator(const QString& name);
     QrealAnimator(const qreal iniVal,
@@ -108,7 +108,7 @@ public:
     bool hasNoise();
 
     static auto sCreate0to1Animator(const QString& name) {
-        auto anim = SPtrCreate(QrealAnimator)(0, 0, 1, 0.01, name);
+        auto anim = enve::make_shared<QrealAnimator>(0, 0, 1, 0.01, name);
         anim->graphFixMinMaxValues();
         return anim;
     }

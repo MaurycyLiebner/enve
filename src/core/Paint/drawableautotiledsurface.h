@@ -38,7 +38,7 @@ struct TileBitmaps {
 };
 
 class DrawableAutoTiledSurface : public HDDCachablePersistent {
-    friend class StdSelfRef;
+    e_OBJECT
     typedef QList<QList<SkBitmap>> Tiles;
 protected:
     DrawableAutoTiledSurface();

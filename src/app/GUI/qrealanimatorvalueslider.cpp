@@ -56,7 +56,7 @@ QrealAnimator* QrealAnimatorValueSlider::getQPointFAnimatorSibling() {
     if(mTarget->SWT_isQrealAnimator()) {
         const auto parent = mTarget->getParent();
         if(parent && parent->SWT_isQPointFAnimator()) {
-            const auto qPA = GetAsPtr(parent, QPointFAnimator);
+            const auto qPA = static_cast<QPointFAnimator*>(parent);
             const bool thisX = qPA->getXAnimator() == mTarget;
             return thisX ? qPA->getYAnimator() :
                            qPA->getXAnimator();
@@ -101,9 +101,11 @@ bool QrealAnimatorValueSlider::eventFilter(QObject *obj, QEvent *event) {
 void QrealAnimatorValueSlider::emitValueChanged(qreal value) {
     if(mTarget) {
         if(mTarget->SWT_isQrealAnimator()) {
-            GetAsPtr(mTarget, QrealAnimator)->setCurrentBaseValue(value);
+            const auto da = static_cast<QrealAnimator*>(mTarget.data());
+            da->setCurrentBaseValue(value);
         } else if(mTarget->SWT_isIntProperty()) {
-            GetAsPtr(mTarget, IntProperty)->setCurrentValue(qRound(value));
+            const auto iProp = static_cast<IntProperty*>(mTarget.data());
+            iProp->setCurrentValue(qRound(value));
         }
     }
     QDoubleSlider::emitValueChanged(value);
@@ -113,9 +115,11 @@ void QrealAnimatorValueSlider::setValueExternal(qreal value) {
     if(mTarget) {
         mBlockAnimatorSignals = true;
         if(mTarget->SWT_isQrealAnimator()) {
-            GetAsPtr(mTarget, QrealAnimator)->setCurrentBaseValue(value);
+            const auto da = static_cast<QrealAnimator*>(mTarget.data());
+            da->setCurrentBaseValue(value);
         } else if(mTarget->SWT_isIntProperty()) {
-            GetAsPtr(mTarget, IntProperty)->setCurrentValue(qRound(value));
+            const auto iProp = static_cast<IntProperty*>(mTarget.data());
+            iProp->setCurrentValue(qRound(value));
         }
         mBlockAnimatorSignals = false;
     }
@@ -149,7 +153,7 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
         bool rec = false;
         bool key = false;
         if(mTarget->SWT_isAnimator()) {
-            const auto aTarget = GetAsPtr(mTarget, Animator);
+            const auto aTarget = static_cast<Animator*>(mTarget.data());
             rec = aTarget->anim_isRecording();
             key = aTarget->anim_getKeyOnCurrentFrame();
         }
@@ -225,7 +229,7 @@ void QrealAnimatorValueSlider::openContextMenu(
         const QPoint &globalPos) {
     if(!mTarget) return;
     if(!mTarget->SWT_isAnimator()) return;
-    const auto aTarget = GetAsPtr(mTarget, Animator);
+    const auto aTarget = static_cast<Animator*>(mTarget.data());
     QMenu menu(this);
 
     if(aTarget->anim_getKeyOnCurrentFrame()) {

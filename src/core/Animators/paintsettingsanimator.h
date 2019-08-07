@@ -5,7 +5,7 @@
 #include "coloranimator.h"
 #include "colorhelpers.h"
 #include "skia/skiaincludes.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "Animators/gradient.h"
 #include "Animators/staticcomplexanimator.h"
 #include "paintsettings.h"
@@ -60,12 +60,12 @@ private:
 
     PathBox * const mTarget_k;
     qptr<GradientPoints> mGradientPoints;
-    qsptr<ColorAnimator> mColor = SPtrCreate(ColorAnimator)();
+    qsptr<ColorAnimator> mColor = enve::make_shared<ColorAnimator>();
     qptr<Gradient> mGradient;
 };
 
 class FillSettingsAnimator : public PaintSettingsAnimator {
-    friend class SelfRef;
+    e_OBJECT
 public:
     bool SWT_isFillSettingsAnimator() const { return true; }
 protected:

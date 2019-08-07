@@ -87,7 +87,7 @@ void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
                                    child->SWT_isSingleSound());
 
     if(child->SWT_isAnimator()) {
-        const auto childAnimator = GetAsPtr(child, Animator);
+        const auto childAnimator = static_cast<Animator*>(child.get());
         connect(childAnimator, &Animator::anim_isRecordingChanged,
                 this, &ComplexAnimator::ca_childAnimatorIsRecordingChanged);
         connect(childAnimator, &Animator::prp_addingKey,
@@ -127,7 +127,7 @@ int ComplexAnimator::getChildPropertyIndex(Property * const child) {
 
 void ComplexAnimator::ca_updateDescendatKeyFrame(Key* key) {
     for(const auto& ckey : anim_mKeys) {
-        const auto complexKey = GetAsSPtr(ckey, ComplexKey);
+        const auto complexKey = ckey->ref<ComplexKey>();
         if(complexKey->hasKey(key)) {
             complexKey->removeAnimatorKey(key);
             if(complexKey->isEmpty()) anim_removeKey(complexKey);
@@ -173,7 +173,7 @@ void ComplexAnimator::ca_removeChild(
     const auto childRange = child->prp_absInfluenceRange();
     child->prp_setInheritedUpdater(nullptr);
     if(child->SWT_isAnimator()) {
-        const auto aRemove = GetAsPtr(child, Animator);
+        const auto aRemove = static_cast<Animator*>(child.get());
         aRemove->anim_removeAllKeysFromComplexAnimator(this);
     }
     disconnect(child.get(), nullptr, this, nullptr);
@@ -207,13 +207,12 @@ void ComplexAnimator::ca_removeAllChildAnimators() {
 }
 
 Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
-    for(const auto &property : ca_mChildAnimators) {
-        if(property->prp_getName() == name) {
-            return property.get();
-        } else if(property->SWT_isComplexAnimator()) {
-            const auto propT = GetAsPtr(property, ComplexAnimator)->
-                    ca_getFirstDescendantWithName(name);
-            if(propT) return propT;
+    for(const auto &prop : ca_mChildAnimators) {
+        if(prop->prp_getName() == name) return prop.get();
+        else if(prop->SWT_isComplexAnimator()) {
+            const auto ca = static_cast<ComplexAnimator*>(prop.get());
+            const auto desc = ca->ca_getFirstDescendantWithName(name);
+            if(desc) return desc;
         }
     }
     return nullptr;
@@ -265,7 +264,8 @@ void ComplexAnimator::anim_setAbsFrame(const int frame) {
 
     for(const auto &property : ca_mChildAnimators) {
         if(!property->SWT_isAnimator()) continue;
-        GetAsPtr(property, Animator)->anim_setAbsFrame(frame);
+        const auto anim = static_cast<Animator*>(property.get());
+        anim->anim_setAbsFrame(frame);
     }
 }
 
@@ -289,33 +289,35 @@ QString ComplexAnimator::prp_getValueText() {
 
 void ComplexAnimator::anim_saveCurrentValueAsKey() {
     for(const auto &property : ca_mChildAnimators) {
-        if(property->SWT_isAnimator())
-            GetAsPtr(property, Animator)->anim_saveCurrentValueAsKey();
+        if(!property->SWT_isAnimator()) continue;
+        const auto anim = static_cast<Animator*>(property.get());
+        anim->anim_saveCurrentValueAsKey();
     }
 }
 
 void ComplexAnimator::anim_setRecording(const bool rec) {
     for(const auto &property : ca_mChildAnimators) {
         if(!property->SWT_isAnimator()) continue;
-        GetAsPtr(property, Animator)->anim_setRecording(rec);
+        const auto anim = static_cast<Animator*>(property.get());
+        anim->anim_setRecording(rec);
     }
     anim_setRecordingValue(rec);
 }
 
 void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
     bool rec = true;
-    bool childRecordingT = false;
+    bool childRec = false;
     for(const auto &property : ca_mChildAnimators) {
         if(!property->SWT_isAnimator()) continue;
-        const auto animator = GetAsPtr(property, Animator);
-        const bool isChildRec = animator->anim_isRecording();
-        const bool isChildDescRec = animator->anim_isDescendantRecording();
-        if(isChildDescRec) childRecordingT = true;
+        const auto anim = static_cast<Animator*>(property.get());
+        const bool isChildRec = anim->anim_isRecording();
+        const bool isChildDescRec = anim->anim_isDescendantRecording();
+        if(isChildDescRec) childRec = true;
         if(!isChildRec) rec = false;
     }
-    rec = rec && childRecordingT;
-    if(childRecordingT != ca_mChildAnimatorRecording) {
-        ca_mChildAnimatorRecording = childRecordingT;
+    rec = rec && childRec;
+    if(childRec != ca_mChildAnimatorRecording) {
+        ca_mChildAnimatorRecording = childRec;
         if(rec == anim_isRecording()) emit anim_isRecordingChanged();
     }
     if(rec != anim_isRecording()) {
@@ -326,7 +328,7 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
 void ComplexAnimator::ca_addDescendantsKey(Key * const key) {
     auto collection = anim_getKeyAtAbsFrame<ComplexKey>(key->getAbsFrame());
     if(!collection) {
-        auto newCollection = SPtrCreate(ComplexKey)(key->getAbsFrame(), this);
+        auto newCollection = enve::make_shared<ComplexKey>(key->getAbsFrame(), this);
         collection = newCollection.get();
         anim_appendKey(newCollection);
     }
@@ -338,7 +340,7 @@ void ComplexAnimator::ca_removeDescendantsKey(Key * const key) {
     if(!collection) return;
     collection->removeAnimatorKey(key);
     if(collection->isEmpty())
-        anim_removeKey(GetAsSPtr(collection, ComplexKey));
+        anim_removeKey(collection->ref<ComplexKey>());
 }
 
 ComplexKey::ComplexKey(const int absFrame,
@@ -424,7 +426,7 @@ bool ComplexKey::hasKey(Key *key) const {
 }
 
 bool ComplexKey::differsFromKey(Key *otherKey) const {
-    const auto otherComplexKey = GetAsPtr(otherKey, ComplexKey);
+    const auto otherComplexKey = static_cast<ComplexKey*>(otherKey);
     if(getChildKeysCount() == otherComplexKey->getChildKeysCount()) {
         for(const auto& key : mKeys) {
             if(otherComplexKey->hasSameKey(key)) continue;

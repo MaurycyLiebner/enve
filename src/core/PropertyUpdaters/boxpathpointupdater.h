@@ -6,7 +6,7 @@ class BoxPathPoint;
 class BoundingBox;
 
 class BoxPathPointUpdater : public TransformUpdater {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     BoxPathPointUpdater(BasicTransformAnimator * const transAnim,
                         BoundingBox * const targetBox);

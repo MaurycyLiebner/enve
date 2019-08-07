@@ -20,7 +20,7 @@ private:
 };
 
 class ImageSequenceCacheHandler : public AnimationFrameHandler {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     ImageSequenceCacheHandler();
 public:

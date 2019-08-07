@@ -3,17 +3,16 @@
 #include <mypaint-brush.h>
 #include <QColor>
 #include "pointhelpers.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 
 class SimpleBrushWrapper : public StdSelfRef {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
-    virtual ~SimpleBrushWrapper();
+    ~SimpleBrushWrapper();
 
     stdsptr<SimpleBrushWrapper> createDuplicate();
-    MyPaintBrush * getBrush() const {
-        return mBrush;
-    }
+
+    MyPaintBrush * getBrush() const { return mBrush; }
 
     QColor getColor() const {
         const float h = getBaseValue(MYPAINT_BRUSH_SETTING_COLOR_H);

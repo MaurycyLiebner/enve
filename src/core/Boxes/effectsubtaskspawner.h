@@ -1,6 +1,6 @@
 #ifndef EFFECTSUBTASKSPAWNER_H
 #define EFFECTSUBTASKSPAWNER_H
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 
 struct BoxRenderData;
 class RasterEffectCaller;

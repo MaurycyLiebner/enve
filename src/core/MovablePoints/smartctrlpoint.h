@@ -3,7 +3,7 @@
 #include "MovablePoints/nonanimatedmovablepoint.h"
 class SmartNodePoint;
 class SmartCtrlPoint : public NonAnimatedMovablePoint {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     enum Type : char { C0, C2 };
 protected:

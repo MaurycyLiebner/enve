@@ -3,7 +3,7 @@
 #include "animationbox.h"
 
 class ImageSequenceBox : public AnimationBox {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     ImageSequenceBox();
 public:

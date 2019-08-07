@@ -1,14 +1,14 @@
 #ifndef PATHPIVOT_H
 #define PATHPIVOT_H
 #include "MovablePoints/nonanimatedmovablepoint.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 
 class Canvas;
 
 enum CanvasMode : short;
 
 class PathPivot : public NonAnimatedMovablePoint {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     PathPivot(const Canvas* const parent);
 public:

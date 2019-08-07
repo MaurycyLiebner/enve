@@ -4,7 +4,7 @@
 SWT_Abstraction* SingleWidgetTarget::SWT_createAbstraction(
         const UpdateFuncs& updateFuncs,
         const int visiblePartWidgetId) {
-    const auto abs = SPtrCreate(SWT_Abstraction)(
+    const auto abs = enve::make_shared<SWT_Abstraction>(
                 this, updateFuncs, visiblePartWidgetId);
     SWT_setupAbstraction(abs.get(), updateFuncs, visiblePartWidgetId);
     SWT_mAllAbstractions[visiblePartWidgetId] = abs;

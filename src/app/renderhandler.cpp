@@ -276,16 +276,16 @@ void RenderHandler::nextSaveOutputFrame() {
     while(mCurrentEncodeSoundSecond <= maxSec) {
         const auto cont = sCacheHandler.atFrame(mCurrentEncodeSoundSecond);
         if(!cont) break;
-        const auto sCont = GetAsSPtr(cont, SoundCacheContainer);
+        const auto sCont = cont->ref<SoundCacheContainer>();
         const auto samples = sCont->getSamples();
         if(mCurrentEncodeSoundSecond == mFirstEncodeSoundSecond) {
             const int minSample = qRound(mMinRenderFrame*SOUND_SAMPLERATE/fps);
             const int max = samples->fSampleRange.fMax;
             VideoEncoder::sAddCacheContainerToEncoder(
-                        SPtrCreate(Samples)(samples->mid({minSample, max})));
+                        enve::make_shared<Samples>(samples->mid({minSample, max})));
         } else {
             VideoEncoder::sAddCacheContainerToEncoder(
-                        SPtrCreate(Samples)(samples));
+                        enve::make_shared<Samples>(samples));
         }
         sCont->setBlocked(false);
         mCurrentEncodeSoundSecond++;
@@ -296,7 +296,7 @@ void RenderHandler::nextSaveOutputFrame() {
         const auto cont = cacheHandler.atFrame(mCurrentEncodeFrame);
         if(!cont) break;
         VideoEncoder::sAddCacheContainerToEncoder(
-                    GetAsSPtr(cont, ImageCacheContainer));
+                    cont->ref<ImageCacheContainer>());
         mCurrentEncodeFrame = cont->getRangeMax() + 1;
     }
 

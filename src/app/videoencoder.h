@@ -30,7 +30,7 @@ public:
 //        const float fTincr2 = static_cast<float>(tincr / 44100);
 //        for(int i = 0; i < 10; i++) {
 //            const auto data = new float[44100];
-//            const auto samples = SPtrCreate(Samples)(data, SampleRange{0, 44099});
+//            const auto samples = enve::make_shared<Samples>(data, SampleRange{0, 44099});
 //            float * q = samples->fData;
 //            for(int j = 0; j < 44100; j++) {
 //                *(q++) = sin(fT);
@@ -131,7 +131,7 @@ signals:
 //};
 
 class VideoEncoder : public HDDTask {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     VideoEncoder();
 public:

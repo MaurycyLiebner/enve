@@ -14,7 +14,7 @@ enum CanvasMode : short;
 class SmartVectorPathEdge;
 
 class SmartVectorPath : public PathBox {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     SmartVectorPath();
 public:

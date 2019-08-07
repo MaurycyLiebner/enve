@@ -3,7 +3,7 @@
 #include "PathEffects/patheffect.h"
 
 class SolidifyPathEffect : public PathEffect {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     SolidifyPathEffect();
 public:

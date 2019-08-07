@@ -4,7 +4,7 @@
 #include "Properties/boolproperty.h"
 
 class InternalLinkCanvas : public InternalLinkGroupBox {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     InternalLinkCanvas(ContainerBox * const linkTarget);
 public:
@@ -21,7 +21,7 @@ public:
     bool clipToCanvas();
 private:
     qsptr<BoolProperty> mClipToCanvas =
-            SPtrCreate(BoolProperty)("clip");
+            enve::make_shared<BoolProperty>("clip");
 };
 
 #endif // INTERNALLINKCANVAS_H

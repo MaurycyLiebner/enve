@@ -3,7 +3,7 @@
 #include "paintsettingsanimator.h"
 
 class OutlineSettingsAnimator : public PaintSettingsAnimator {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     OutlineSettingsAnimator(GradientPoints * const grdPts,
                             PathBox * const parent);
@@ -48,6 +48,6 @@ private:
     QPainter::CompositionMode mOutlineCompositionMode =
             QPainter::CompositionMode_Source;
     qsptr<QrealAnimator> mLineWidth =
-            SPtrCreate(QrealAnimator)(1, 0, 999, 1, "thickness");
+            enve::make_shared<QrealAnimator>(1, 0, 999, 1, "thickness");
 };
 #endif // OUTLINESETTINGSANIMATOR_H

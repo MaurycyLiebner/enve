@@ -8,7 +8,7 @@
 class SingleSound;
 
 class VideoBox : public AnimationBox {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     VideoBox();
 public:

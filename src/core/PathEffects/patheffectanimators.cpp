@@ -22,10 +22,10 @@ void PathEffectAnimators::apply(const qreal relFrame,
                                 SkPath * const srcDstPath) {
     SkPath dstPath = *srcDstPath;
     for(const auto& effect : ca_mChildAnimators) {
-        const auto& effectT = GetAsPtr(effect, PathEffect);
-        if(!effectT->isVisible()) continue;
+        const auto pEffect = static_cast<PathEffect*>(effect.get());
+        if(!pEffect->isVisible()) continue;
         const SkPath srcPath = dstPath;
-        effectT->apply(relFrame, srcPath, &dstPath);
+        pEffect->apply(relFrame, srcPath, &dstPath);
     }
     *srcDstPath = dstPath;
 }
@@ -42,25 +42,25 @@ qsptr<PathEffect> readIdCreatePathEffect(QIODevice * const src) {
     src->read(rcChar(&type), sizeof(PathEffectType));
     switch(type) {
         case(PathEffectType::DISPLACE):
-            return SPtrCreate(DisplacePathEffect)();
+            return enve::make_shared<DisplacePathEffect>();
         case(PathEffectType::DASH):
-            return SPtrCreate(DashPathEffect)();
+            return enve::make_shared<DashPathEffect>();
         case(PathEffectType::DUPLICATE):
-            return SPtrCreate(DuplicatePathEffect)();
+            return enve::make_shared<DuplicatePathEffect>();
         case(PathEffectType::SOLIDIFY):
-            return SPtrCreate(SolidifyPathEffect)();
+            return enve::make_shared<SolidifyPathEffect>();
         case(PathEffectType::SUM):
-            return SPtrCreate(SumPathEffect)();
+            return enve::make_shared<SumPathEffect>();
         case(PathEffectType::SUB):
-            return SPtrCreate(SubPathEffect)();
+            return enve::make_shared<SubPathEffect>();
         case(PathEffectType::LINES):
-            return SPtrCreate(LinesPathEffect)();
+            return enve::make_shared<LinesPathEffect>();
         case(PathEffectType::ZIGZAG):
-            return SPtrCreate(ZigZagPathEffect)();
+            return enve::make_shared<ZigZagPathEffect>();
         case(PathEffectType::SPATIAL_DISPLACE):
-            return SPtrCreate(SpatialDisplacePathEffect)();
+            return enve::make_shared<SpatialDisplacePathEffect>();
         case(PathEffectType::SUBDIVIDE):
-            return SPtrCreate(SubdividePathEffect)();
+            return enve::make_shared<SubdividePathEffect>();
         case(PathEffectType::CUSTOM): {
             const auto id = CustomIdentifier::sRead(src);
             return CustomPathEffectCreator::sCreateForIdentifier(id);

@@ -1,7 +1,7 @@
 #ifndef CUSTOMRasterEffectCREATOR_H
 #define CUSTOMRasterEffectCREATOR_H
 #include <QList>
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "typemenu.h"
 #include "RasterEffects/customrastereffect.h"
 
@@ -48,7 +48,7 @@ private:
         menu->addPlainAction<BoundingBox>(creator.mName(),
         [adder, creator](BoundingBox * box) {
             const auto cEffect = creator.mCreatorNew();
-            (box->*adder)(GetAsSPtr(cEffect, RasterEffect));
+            (box->*adder)(qSharedPointerCast<RasterEffect>(cEffect));
         });
     }
     static QList<CustomRasterEffectCreator> sEffectCreators;

@@ -6,17 +6,17 @@
 GradientPoints::GradientPoints(PathBox * const parent) :
     StaticComplexAnimator("gradient points"), mParent_k(parent) {
 
-    setPointsHandler(SPtrCreate(PointsHandler)());
+    setPointsHandler(enve::make_shared<PointsHandler>());
 
-    mStartAnimator = SPtrCreate(QPointFAnimator)("point1");
+    mStartAnimator = enve::make_shared<QPointFAnimator>("point1");
     ca_addChild(mStartAnimator);
-    mStartPoint = SPtrCreate(GradientPoint)(mStartAnimator.get(), mParent_k);
+    mStartPoint = enve::make_shared<GradientPoint>(mStartAnimator.get(), mParent_k);
     mPointsHandler->appendPt(mStartPoint);
 
-    mEndAnimator = SPtrCreate(QPointFAnimator)("point2");
+    mEndAnimator = enve::make_shared<QPointFAnimator>("point2");
     ca_addChild(mEndAnimator);
 
-    mEndPoint = SPtrCreate(GradientPoint)(mEndAnimator.get(), mParent_k);
+    mEndPoint = enve::make_shared<GradientPoint>(mEndAnimator.get(), mParent_k);
     mPointsHandler->appendPt(mEndPoint);
 
     mEnabled = false;

@@ -37,7 +37,7 @@ private:
 };
 
 class VideoFrameHandler : public AnimationFrameHandler {
-    friend class SelfRef;
+    e_OBJECT
     friend class VideoFrameLoader;
 protected:
     VideoFrameHandler(VideoDataHandler* const cacheHandler);
@@ -70,7 +70,7 @@ private:
 };
 #include "CacheHandlers/soundcachehandler.h"
 class VideoFileHandler : public FileCacheHandler {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     VideoFileHandler() {}
     void afterPathSet(const QString& path);

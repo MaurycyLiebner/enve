@@ -16,7 +16,7 @@ struct ColorSettings {
 
 class Gradient;
 enum class GradientType : short;
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 struct GradientSettings {
     GradientType fType;
     qptr<Gradient> fGradient;

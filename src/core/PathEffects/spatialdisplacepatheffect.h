@@ -6,7 +6,7 @@ class RandomGrid;
 class BoolPropertyContainer;
 
 class SpatialDisplacePathEffect : public PathEffect {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     SpatialDisplacePathEffect();
 public:

@@ -5,14 +5,14 @@
 #include "glhelpers.h"
 
 struct QrealAnimatorCreator : public PropertyCreator {
-    friend class StdSelfRef;
+    e_OBJECT
     qreal fIniVal;
     qreal fMinVal;
     qreal fMaxVal;
     qreal fStep;
 
     qsptr<Property> create() const {
-        return SPtrCreate(QrealAnimator)(
+        return enve::make_shared<QrealAnimator>(
                     fIniVal, fMinVal, fMaxVal, fStep, fName);
     }
 

@@ -6,11 +6,11 @@
 
 SubPathEffect::SubPathEffect() :
     PathEffect("sub-path effect", PathEffectType::SUB) {
-    mMin = SPtrCreate(QrealAnimator)("min length");
+    mMin = enve::make_shared<QrealAnimator>("min length");
     mMin->setValueRange(-999, 999);
     mMin->setCurrentBaseValue(0);
 
-    mMax = SPtrCreate(QrealAnimator)("max length");
+    mMax = enve::make_shared<QrealAnimator>("max length");
     mMax->setValueRange(-999, 999);
     mMax->setCurrentBaseValue(100);
 

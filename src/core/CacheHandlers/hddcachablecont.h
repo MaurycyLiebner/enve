@@ -25,7 +25,7 @@ public:
     eTask* scheduleDeleteTmpFile() {
         if(!mTmpFile) return nullptr;
         const auto updatable =
-                SPtrCreate(TmpFileDataDeleter)(mTmpFile);
+                enve::make_shared<TmpFileDataDeleter>(mTmpFile);
         mTmpFile.reset();
         updatable->scheduleTask();
         return updatable.get();

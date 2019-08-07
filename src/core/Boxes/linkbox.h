@@ -5,7 +5,7 @@
 #include "Properties/boolproperty.h"
 
 class ExternalLinkBox : public ContainerBox {
-    friend class SelfRef;
+    e_OBJECT
 public:
     void reload();
 
@@ -18,7 +18,7 @@ private:
 };
 
 class InternalLinkBox : public BoundingBox {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     InternalLinkBox(BoundingBox * const linkTarget);
 public:
@@ -111,7 +111,7 @@ protected:
     }
 
     qsptr<BoxTargetProperty> mBoxTarget =
-            SPtrCreate(BoxTargetProperty)("link target");
+            enve::make_shared<BoxTargetProperty>("link target");
 };
 
 #endif // LINKBOX_H

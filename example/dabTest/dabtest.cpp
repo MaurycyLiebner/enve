@@ -2,7 +2,7 @@
 
 qsptr<CustomRasterEffect> createNewestVersionEffect() {
     // Use default, most up to date, version
-    return SPtrCreate(DabTest000)();
+    return enve::make_shared<DabTest000>();
 }
 
 qsptr<CustomRasterEffect> createEffect(
@@ -10,7 +10,7 @@ qsptr<CustomRasterEffect> createEffect(
     Q_UNUSED(identifier);
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
-    return SPtrCreate(DabTest000)();
+    return enve::make_shared<DabTest000>();
 }
 
 // Returned value must be unique, lets enve distinguish effects
@@ -42,10 +42,10 @@ bool supports(const CustomIdentifier &identifier) {
 
 DabTest000::DabTest000() :
     CustomRasterEffect(effectName().toLower()) {
-    mRadius = SPtrCreate(QrealAnimator)(0.5, 0, 0.5, 0.1, "radius");
+    mRadius = enve::make_shared<QrealAnimator>(0.5, 0, 0.5, 0.1, "radius");
     ca_addChild(mRadius);
 
-    mHardness = SPtrCreate(QrealAnimator)(1, 0, 1, 0.1, "hardness");
+    mHardness = enve::make_shared<QrealAnimator>(1, 0, 1, 0.1, "hardness");
     ca_addChild(mHardness);
 }
 
@@ -60,7 +60,7 @@ stdsptr<RasterEffectCaller>
     dab.fSeg1Slope = -(1.f/dab.fHardness - 1.f);
     dab.fSeg2Offset = dab.fHardness/(1.f - dab.fHardness);
     dab.fSeg2Slope = -dab.fHardness/(1.f - dab.fHardness);
-    return SPtrCreate(DabTestCaller000)(dab);
+    return enve::make_shared<DabTestCaller000>(dab);
 }
 
 CustomIdentifier DabTest000::getIdentifier() const {

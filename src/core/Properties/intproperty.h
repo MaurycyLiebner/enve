@@ -4,7 +4,7 @@
 
 class IntProperty : public Property {
     Q_OBJECT
-    friend class SelfRef;
+    e_OBJECT
 protected:
     IntProperty(const QString& name);
 public:

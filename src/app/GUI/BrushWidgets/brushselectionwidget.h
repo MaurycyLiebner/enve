@@ -18,7 +18,7 @@ struct BrushContexedCollection {
     BrushContexedCollection(const BrushCollectionData& raw) {
         fName = raw.fName;
         for(const auto& brushRaw : raw.fBrushes) {
-            fBrushes << SPtrCreate(BrushContexedWrapper)(brushRaw);
+            fBrushes << enve::make_shared<BrushContexedWrapper>(brushRaw);
         }
     }
     QString fName;

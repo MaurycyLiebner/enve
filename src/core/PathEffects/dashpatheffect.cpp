@@ -3,7 +3,7 @@
 
 DashPathEffect::DashPathEffect() :
     PathEffect("dash effect", PathEffectType::DASH) {
-    mSize = SPtrCreate(QrealAnimator)("size");
+    mSize = enve::make_shared<QrealAnimator>("size");
     mSize->setValueRange(0.1, 9999.999);
     mSize->setCurrentBaseValue(5);
 

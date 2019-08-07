@@ -15,7 +15,7 @@
 #include <QLineEdit>
 #include <QWidgetAction>
 #include <QToolBar>
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "framerange.h"
 #include "scenelayout.h"
 class FrameScrollBar;

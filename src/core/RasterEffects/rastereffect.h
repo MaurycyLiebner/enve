@@ -15,7 +15,7 @@ enum class RasterEffectType : short {
 
 enum class HardwareSupport : short;
 class RasterEffect : public eEffect {
-    friend class SelfRef;
+    e_OBJECT
     Q_OBJECT
 protected:
     RasterEffect(const QString &name, const RasterEffectType type);

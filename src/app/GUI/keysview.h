@@ -5,7 +5,7 @@
 #include <QPointer>
 #include <QApplication>
 #include "keyfocustarget.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "framerange.h"
 
 const QList<QColor> ANIMATOR_COLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),

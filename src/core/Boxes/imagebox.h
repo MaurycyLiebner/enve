@@ -59,7 +59,7 @@ struct ImageBoxRenderData : public ImageRenderData {
 };
 
 class ImageBox : public BoundingBox {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     ImageBox();
     ImageBox(const QString &filePath);

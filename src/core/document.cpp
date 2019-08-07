@@ -75,7 +75,7 @@ void Document::setCanvasMode(const CanvasMode mode) {
 }
 
 Canvas *Document::createNewScene() {
-    const auto newScene = SPtrCreate(Canvas)(*this);
+    const auto newScene = enve::make_shared<Canvas>(*this);
     fScenes.append(newScene);
     SWT_addChild(newScene.get());
     emit sceneCreated(newScene.get());
@@ -152,7 +152,7 @@ void Document::decActiveSceneFrame() {
 }
 
 Gradient *Document::createNewGradient() {
-    const auto grad = SPtrCreate(Gradient)();
+    const auto grad = enve::make_shared<Gradient>();
     fGradients.append(grad);
     emit gradientCreated(grad.get());
     return grad.get();

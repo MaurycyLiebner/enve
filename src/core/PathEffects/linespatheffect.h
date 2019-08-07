@@ -3,7 +3,7 @@
 #include "PathEffects/patheffect.h"
 
 class LinesPathEffect : public PathEffect {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     LinesPathEffect();
 public:

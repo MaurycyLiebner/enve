@@ -3,7 +3,7 @@
 #include "PathEffects/patheffect.h"
 
 class SumPathEffect : public PathEffect {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     SumPathEffect();
 public:

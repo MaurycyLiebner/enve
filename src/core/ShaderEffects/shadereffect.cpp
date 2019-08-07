@@ -27,5 +27,5 @@ stdsptr<RasterEffectCaller> ShaderEffect::getEffectCaller(const qreal relFrame) 
         uniformSpecifiers << uniformC->create(loc, prop, relFrame);
     }
     const auto margin = getMarginAtRelFrame(relFrame);
-    return SPtrCreate(ShaderEffectCaller)(margin, *mProgram, uniformSpecifiers);
+    return enve::make_shared<ShaderEffectCaller>(margin, *mProgram, uniformSpecifiers);
 }

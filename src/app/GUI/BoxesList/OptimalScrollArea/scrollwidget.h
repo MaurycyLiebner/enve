@@ -5,7 +5,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include "minimalscrollwidget.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 class SingleWidget;
 class ScrollWidgetVisiblePart;
 class SWT_Abstraction;

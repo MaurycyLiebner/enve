@@ -4,7 +4,7 @@
 #include "CacheHandlers/samples.h"
 
 class SoundCacheContainer : public HDDCachableRangeCont {
-    friend class StdSelfRef;
+    e_OBJECT
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
 protected:
     SoundCacheContainer(const iValueRange &second,

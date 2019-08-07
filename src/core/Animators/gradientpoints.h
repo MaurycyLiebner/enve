@@ -8,7 +8,7 @@ class QPointFAnimator;
 #include "skia/skiaincludes.h"
 
 class GradientPoints : public StaticComplexAnimator {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     GradientPoints(PathBox * const parent);
 public:

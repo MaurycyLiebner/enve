@@ -4,7 +4,7 @@
 #include "Boxes/pathbox.h"
 
 Gradient::Gradient() : ComplexAnimator("gradient") {
-    prp_setOwnUpdater(SPtrCreate(GradientUpdater)(this));
+    prp_setOwnUpdater(enve::make_shared<GradientUpdater>(this));
 }
 
 Gradient::Gradient(const QColor &color1, const QColor &color2) :
@@ -36,7 +36,7 @@ void Gradient::readProperty(QIODevice * const src) {
     int nColors;
     src->read(rcChar(&nColors), sizeof(int));
     for(int i = 0; i < nColors; i++) {
-        const auto colorAnim = SPtrCreate(ColorAnimator)();
+        const auto colorAnim = enve::make_shared<ColorAnimator>();
         colorAnim->readProperty(src);
         addColorToList(colorAnim);
     }
@@ -52,7 +52,7 @@ void Gradient::prp_startTransform() {
 }
 
 void Gradient::addColorToList(const QColor &color) {
-    auto newColorAnimator = SPtrCreate(ColorAnimator)();
+    auto newColorAnimator = enve::make_shared<ColorAnimator>();
     newColorAnimator->qra_setCurrentValue(color);
     addColorToList(newColorAnimator);
 }

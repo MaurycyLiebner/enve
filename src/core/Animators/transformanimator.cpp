@@ -8,14 +8,14 @@
 
 BasicTransformAnimator::BasicTransformAnimator() :
     StaticComplexAnimator("transformation") {
-    mPosAnimator = SPtrCreate(QPointFAnimator)("pos");
+    mPosAnimator = enve::make_shared<QPointFAnimator>("pos");
     mPosAnimator->setBaseValue(QPointF(0, 0));
 
-    mScaleAnimator = SPtrCreate(QPointFAnimator)("scale");
+    mScaleAnimator = enve::make_shared<QPointFAnimator>("scale");
     mScaleAnimator->setBaseValue(QPointF(1, 1));
     mScaleAnimator->setPrefferedValueStep(0.05);
 
-    mRotAnimator = SPtrCreate(QrealAnimator)("rot");
+    mRotAnimator = enve::make_shared<QrealAnimator>("rot");
     mRotAnimator->setCurrentBaseValue(0);
 
     ca_addChild(mPosAnimator);
@@ -280,14 +280,14 @@ QMatrix BasicTransformAnimator::getTotalTransformAtFrame(
 }
 
 BoxTransformAnimator::BoxTransformAnimator() {
-    mShearAnimator = SPtrCreate(QPointFAnimator)("shear");
+    mShearAnimator = enve::make_shared<QPointFAnimator>("shear");
     mShearAnimator->setBaseValue(QPointF(0, 0));
     mShearAnimator->setValuesRange(-1, 1);
 
-    mPivotAnimator = SPtrCreate(QPointFAnimator)("pivot");
+    mPivotAnimator = enve::make_shared<QPointFAnimator>("pivot");
     mPivotAnimator->setBaseValue(QPointF(0, 0));
 
-    mOpacityAnimator = SPtrCreate(QrealAnimator)("opacity");
+    mOpacityAnimator = enve::make_shared<QrealAnimator>("opacity");
     mOpacityAnimator->setValueRange(0, 100);
     mOpacityAnimator->setPrefferedValueStep(5);
     mOpacityAnimator->setCurrentBaseValue(100);
@@ -297,8 +297,8 @@ BoxTransformAnimator::BoxTransformAnimator() {
     ca_addChild(mPivotAnimator);
     ca_addChild(mOpacityAnimator);
 
-    setPointsHandler(SPtrCreate(PointsHandler)());
-    const auto pivotPt = SPtrCreate(BoxPathPoint)(mPivotAnimator.get(), this);
+    setPointsHandler(enve::make_shared<PointsHandler>());
+    const auto pivotPt = enve::make_shared<BoxPathPoint>(mPivotAnimator.get(), this);
     mPointsHandler->appendPt(pivotPt);
 }
 

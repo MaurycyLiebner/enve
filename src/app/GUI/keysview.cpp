@@ -185,7 +185,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                 menu.addAction("Settings...");
                 const auto selectedAction = menu.exec(e->globalPos());
                 if(selectedAction) {
-                    const auto durRect = GetAsPtr(movable, DurationRectangle);
+                    const auto durRect = static_cast<DurationRectangle*>(movable);
                     durRect->openDurationSettingsDialog(this);
                 }
             }
@@ -198,7 +198,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
 
 stdsptr<KeysClipboard> KeysView::getSelectedKeysClipboardContainer() {
     stdsptr<KeysClipboard> container =
-            SPtrCreate(KeysClipboard)();
+            enve::make_shared<KeysClipboard>();
     for(const auto& anim : mSelectedKeysAnimators) {
         QByteArray keyData;
         QBuffer target(&keyData);

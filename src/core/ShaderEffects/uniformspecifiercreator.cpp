@@ -24,7 +24,7 @@ UniformSpecifier QrealAnimatorUniformSpecifierCreator::create(
         const GLint &loc,
         Property * const property,
         const qreal relFrame) const {
-    const auto qa = GetAsPtr(property, QrealAnimator);
+    const auto qa = static_cast<QrealAnimator*>(property);
     const QString propName = property->prp_getName();
     const qreal val = qa->getEffectiveValue(relFrame);
 
@@ -104,7 +104,7 @@ UniformSpecifier IntAnimatorUniformSpecifierCreator::create(
         const GLint &loc,
         Property * const property,
         const qreal relFrame) const {
-    const auto ia = GetAsPtr(property, IntAnimator);
+    const auto ia = static_cast<IntAnimator*>(property);
     const int val = ia->getEffectiveIntValue(relFrame);
     const QString propName = property->prp_getName();
 

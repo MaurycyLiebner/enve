@@ -112,7 +112,7 @@ void BoxScroller::getKeysInRect(
     for(const auto& abs : abstractions) {
         const auto target = abs->getTarget();
         if(target->SWT_isAnimator()) {
-            const auto anim_target = GetAsPtr(target, Animator);
+            const auto anim_target = static_cast<Animator*>(target);
             anim_target->anim_getKeysInRect(selectionRect, pixelsPerFrame,
                                             listKeys, KEY_RECT_SIZE);
         }

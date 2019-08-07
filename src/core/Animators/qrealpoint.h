@@ -1,7 +1,7 @@
 #ifndef QREALPOINT_H
 #define QREALPOINT_H
 #include <QPainter>
-#include "../smartPointers/sharedpointerdefs.h"
+#include "../smartPointers/ememory.h"
 
 class GraphKey;
 
@@ -12,7 +12,7 @@ enum QrealPointType : short {
 };
 
 class QrealPoint : public StdSelfRef {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     ~QrealPoint() {}
 

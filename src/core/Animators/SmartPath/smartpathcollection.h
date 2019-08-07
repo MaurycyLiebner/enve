@@ -9,7 +9,7 @@ class SmartPathAnimator;
 class SmartNodePoint;
 typedef DynamicComplexAnimator<SmartPathAnimator> SmartPathCollectionBase;
 class SmartPathCollection : public SmartPathCollectionBase {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     SmartPathCollection();
 public:
@@ -17,7 +17,7 @@ public:
 
     template<typename... Args>
     SmartPathAnimator *createNewPath(Args && ...arguments) {
-        const auto newPath = SPtrCreate(SmartPathAnimator)(arguments...);
+        const auto newPath = enve::make_shared<SmartPathAnimator>(arguments...);
         addChild(newPath);
         return newPath.get();
     }

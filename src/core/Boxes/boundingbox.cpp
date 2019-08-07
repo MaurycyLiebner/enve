@@ -34,19 +34,19 @@ QList<BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 BoundingBox::BoundingBox(const BoundingBoxType type) :
     StaticComplexAnimator("box"),
     mDocumentId(sNextDocumentId++), mType(type),
-    mTransformAnimator(SPtrCreate(BoxTransformAnimator)()),
-    mRasterEffectsAnimators(SPtrCreate(RasterEffectAnimators)(this)) {
+    mTransformAnimator(enve::make_shared<BoxTransformAnimator>()),
+    mRasterEffectsAnimators(enve::make_shared<RasterEffectAnimators>(this)) {
     sDocumentBoxes << this;
     ca_addChild(mTransformAnimator);
     mTransformAnimator->prp_setOwnUpdater(
-                SPtrCreate(TransformUpdater)(mTransformAnimator.get()));
+                enve::make_shared<TransformUpdater>(mTransformAnimator.get()));
     const auto pivotAnim = mTransformAnimator->getPivotAnimator();
-    const auto pivotUpdater = SPtrCreate(BoxPathPointUpdater)(
+    const auto pivotUpdater = enve::make_shared<BoxPathPointUpdater>(
                 mTransformAnimator.get(), this);
     pivotAnim->prp_setOwnUpdater(pivotUpdater);
 
     mRasterEffectsAnimators->prp_setOwnUpdater(
-                SPtrCreate(PixmapEffectUpdater)(this));
+                enve::make_shared<PixmapEffectUpdater>(this));
     ca_addChild(mRasterEffectsAnimators);
     mRasterEffectsAnimators->SWT_hide();
 
@@ -123,7 +123,7 @@ void BoundingBox::ca_childAnimatorIsRecordingChanged() {
 }
 
 qsptr<BoundingBox> BoundingBox::createLink() {
-    auto linkBox = SPtrCreate(InternalLinkBox)(this);
+    auto linkBox = enve::make_shared<InternalLinkBox>(this);
     copyBoundingBoxDataTo(linkBox.get());
     return std::move(linkBox);
 }
@@ -487,7 +487,7 @@ stdsptr<BoxRenderData> BoundingBox::getCurrentRenderData(const qreal relFrame) c
     const auto currentRenderData =
             mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
     if(currentRenderData)
-        return GetAsSPtr(currentRenderData, BoxRenderData);
+        return currentRenderData->ref<BoxRenderData>();
     if(mDrawRenderContainer.isExpired()) return nullptr;
     const auto drawData = mDrawRenderContainer.getSrcRenderData();
     if(!drawData) return nullptr;
@@ -632,13 +632,12 @@ void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
     for(const auto& creator : ShaderEffectCreator::sEffectCreators) {
         const PropertyMenu::PlainSelectedOp<BoundingBox> op =
         [creator](BoundingBox * box) {
-            const auto effect = GetAsSPtr(creator->create(), ShaderEffect);
-            box->addRasterEffect(effect);
+            const auto effect = creator->create();
+            box->addRasterEffect(qSharedPointerCast<RasterEffect>(effect));
         };
         RasterEffectsMenu->addPlainAction(creator->fName, op);
     }
 }
-
 
 void BoundingBox::moveByAbs(const QPointF &trans) {
     mTransformAnimator->moveByAbs(trans);
@@ -722,7 +721,7 @@ void BoundingBox::removeLinkingBox(BoundingBox *box) {
     mLinkingBoxes.removeOne(box);
 }
 
-const QList<qptr<BoundingBox>> &BoundingBox::getLinkingBoxes() const {
+const QList<BoundingBox*> &BoundingBox::getLinkingBoxes() const {
     return mLinkingBoxes;
 }
 
@@ -911,7 +910,7 @@ bool BoundingBox::hasDurationRectangle() const {
 }
 
 void BoundingBox::createDurationRectangle() {
-    const auto durRect = SPtrCreate(DurationRectangle)(this);
+    const auto durRect = enve::make_shared<DurationRectangle>(this);
 //    durRect->setMinFrame(0);
 //    if(mParentScene) durRect->setFramesDuration(mParentScene->getFrameCount());
     durRect->setMinFrame(anim_getCurrentRelFrame() - 5);

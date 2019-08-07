@@ -3,7 +3,7 @@
 #include "intanimator.h"
 
 class BoolAnimator : public IntAnimator {
-    friend class SelfRef;
+    e_OBJECT
 public:
     bool getCurrentBoolValue();
     void setCurrentBoolValue(const bool bT);

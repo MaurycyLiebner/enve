@@ -5,7 +5,7 @@
 class Canvas;
 
 class ImageCacheContainer : public HDDCachableRangeCont {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     ImageCacheContainer(const FrameRange& range,
                         HDDCachableCacheHandler * const parent);

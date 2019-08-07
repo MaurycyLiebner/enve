@@ -5,7 +5,7 @@
 
 template <uchar PROPS>
 class PolylinePointBase : public MovablePoint {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     PolylinePointBase(const int id, Polyline<PROPS> * poly) :
         MovablePoint(TYPE_PATH_POINT), mId(id), mPoly(poly) {}

@@ -30,7 +30,7 @@ PaintSettingsAnimator::PaintSettingsAnimator(
     setGradientVar(gradientT);
     setGradientPoints(grdPts);
 
-    prp_setOwnUpdater(SPtrCreate(DisplayedFillStrokeSettingsUpdater)(parent));
+    prp_setOwnUpdater(enve::make_shared<DisplayedFillStrokeSettingsUpdater>(parent));
 }
 
 void PaintSettingsAnimator::writeProperty(QIODevice * const dst) const {
@@ -59,14 +59,14 @@ void PaintSettingsAnimator::readProperty(QIODevice * const src) {
 void PaintSettingsAnimator::setGradientVar(Gradient* const grad) {
     if(grad == mGradient) return;
     if(mGradient) {
-        ca_removeChild(GetAsSPtr(mGradient, Gradient));
-        ca_removeChild(GetAsSPtr(mGradientPoints, GradientPoints));
+        ca_removeChild(mGradient->ref<Gradient>());
+        ca_removeChild(mGradientPoints->ref<GradientPoints>());
         mGradient->removePath(mTarget_k);
     }
     mGradient = grad;
     if(mGradient) {
-        ca_addChild(GetAsSPtr(grad, Gradient));
-        ca_addChild(GetAsSPtr(mGradientPoints, GradientPoints));
+        ca_addChild(grad->ref<Gradient>());
+        ca_addChild(mGradientPoints->ref<GradientPoints>());
         mGradient->addPath(mTarget_k);
     }
 

@@ -8,7 +8,7 @@ ImageSequenceBox::ImageSequenceBox() : AnimationBox(TYPE_IMAGESQUENCE) {
 }
 
 void ImageSequenceBox::setFolderPath(const QString &folderPath) {
-    const auto iscHandler = SPtrCreate(ImageSequenceCacheHandler)();
+    const auto iscHandler = enve::make_shared<ImageSequenceCacheHandler>();
     iscHandler->setFolderPath(folderPath);
     mSrcFramesCache = iscHandler;
 

@@ -4,7 +4,7 @@
 #include "Animators/intanimator.h"
 
 class RandomGrid : public StaticComplexAnimator {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     RandomGrid();
 public:

@@ -5,7 +5,7 @@ class IntAnimator;
 class QPointFAnimator;
 
 class DuplicatePathEffect : public PathEffect {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     DuplicatePathEffect();
 public:

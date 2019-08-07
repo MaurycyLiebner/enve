@@ -16,7 +16,7 @@ OutlineSettingsAnimator::OutlineSettingsAnimator(
                           color, paintType, gradient) {
 
     ca_addChild(mLineWidth);
-    mLineWidth->prp_setOwnUpdater(SPtrCreate(StrokeWidthUpdater)(parent));
+    mLineWidth->prp_setOwnUpdater(enve::make_shared<StrokeWidthUpdater>(parent));
 }
 
 void OutlineSettingsAnimator::writeProperty(QIODevice * const dst) const {

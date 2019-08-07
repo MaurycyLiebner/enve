@@ -109,7 +109,7 @@ signals:
 };
 
 class BoxTransformAnimator : public BasicTransformAnimator {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     BoxTransformAnimator();
 public:

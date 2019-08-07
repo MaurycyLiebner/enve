@@ -10,7 +10,7 @@ class SingleSound;
 
 class SoundDataHandler : public FileDataCacheHandler {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     void clearCache() {}
     void afterSourceChanged();
@@ -46,7 +46,7 @@ public:
 
     void secondReaderFinished(const int secondId,
                              const stdsptr<Samples>& samples) {
-        mSecondsCache.add(SPtrCreate(SoundCacheContainer)(
+        mSecondsCache.add(enve::make_shared<SoundCacheContainer>(
                               samples, iValueRange{secondId, secondId},
                               &mSecondsCache));
     }
@@ -59,7 +59,7 @@ private:
 
 class SoundHandler : public StdSelfRef {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     SoundHandler(SoundDataHandler* const dataHandler) :
         mDataHandler(dataHandler) {
@@ -115,7 +115,7 @@ private:
 };
 
 class SoundFileHandler : public FileCacheHandler {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     SoundFileHandler() {}
 
@@ -124,7 +124,7 @@ protected:
         mDataHandler.reset();
         if(mFileMissing) return;
         const auto current = SoundDataHandler::sGetDataHandler<SoundDataHandler>(path);
-        if(current) mDataHandler = GetAsSPtr(current, SoundDataHandler);
+        if(current) mDataHandler = current->ref<SoundDataHandler>();
         else mDataHandler = SoundDataHandler::sCreateDataHandler<SoundDataHandler>(path);
     }
 

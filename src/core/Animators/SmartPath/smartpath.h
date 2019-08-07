@@ -7,7 +7,7 @@
 #include "nodelist.h"
 #include "nodepointvalues.h"
 #include "../../framerange.h"
-#include "../../smartPointers/sharedpointerdefs.h"
+#include "../../smartPointers/ememory.h"
 
 class SmartPath {
 public:

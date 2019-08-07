@@ -6,7 +6,7 @@ class IntAnimator;
 class ComboBoxProperty;
 
 class RandomQrealGenerator : public QrealValueEffect {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     RandomQrealGenerator();
 public:

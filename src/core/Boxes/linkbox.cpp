@@ -53,7 +53,7 @@ qsptr<BoundingBox> InternalLinkBox::createLink() {
 }
 
 qsptr<BoundingBox> InternalLinkBox::createLinkForLinkGroup() {
-    return SPtrCreate(InternalLinkBox)(this);
+    return enve::make_shared<InternalLinkBox>(this);
 }
 
 stdsptr<BoxRenderData> InternalLinkBox::createRenderData() {

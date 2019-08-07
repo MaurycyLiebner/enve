@@ -1,6 +1,6 @@
 #ifndef PAINTSETTINGSAPPLIER_H
 #define PAINTSETTINGSAPPLIER_H
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "colorsetting.h"
 #include <QPainter>
 #include "Boxes/pathbox.h"

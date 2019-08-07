@@ -1,7 +1,7 @@
 #ifndef FILECACHEHANDLER_H
 #define FILECACHEHANDLER_H
 #include "filedatacachehandler.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 
 class FileCacheHandler : public SelfRef {
     friend class FilesHandler;

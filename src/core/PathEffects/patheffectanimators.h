@@ -12,7 +12,7 @@ typedef DynamicComplexAnimator<PathEffect,
         &PathEffect::writeIdentifier,
         &readIdCreatePathEffect> PathEffectAnimatorsBase;
 class PathEffectAnimators : public PathEffectAnimatorsBase {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     PathEffectAnimators();
 public:

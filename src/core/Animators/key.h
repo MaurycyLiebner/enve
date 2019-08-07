@@ -1,6 +1,6 @@
 #ifndef KEY_H
 #define KEY_H
-#include "../smartPointers/sharedpointerdefs.h"
+#include "../smartPointers/ememory.h"
 
 #include <QtCore>
 class QPainter;

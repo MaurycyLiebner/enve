@@ -3,7 +3,7 @@
 #include "PathEffects/patheffect.h"
 
 class ZigZagPathEffect : public PathEffect {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     ZigZagPathEffect();
 public:

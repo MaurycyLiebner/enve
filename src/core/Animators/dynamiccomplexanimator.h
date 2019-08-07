@@ -48,7 +48,7 @@ public:
     }
 
     qsptr<T> takeChildAt(const int index) {
-        return GetAsSPtrTemplated(ca_takeChildAt(index), T);
+        return ca_takeChildAt(index)->template ref<T>();
     }
 
     void prependChild(T * const oldChild, const qsptr<T>& newChild) {
@@ -73,14 +73,14 @@ private:
 template <class T>
 qsptr<T> TCreateOnly(QIODevice * const src) {
     Q_UNUSED(src);
-    return SPtrCreateTemplated(T)();
+    return enve::make_shared<T>();
 }
 
 template <class T,
           void (T::*TWriteType)(QIODevice * const dst) const = nullptr,
           qsptr<T> (*TReadTypeAndCreate)(QIODevice * const src) = &TCreateOnly<T>>
 class DynamicComplexAnimator : public DynamicComplexAnimatorBase<T> {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     DynamicComplexAnimator(const QString &name) :
         DynamicComplexAnimatorBase<T>(name) {}

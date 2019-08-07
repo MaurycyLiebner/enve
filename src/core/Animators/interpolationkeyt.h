@@ -4,7 +4,7 @@
 
 template <typename T>
 class InterpolationKeyT : public GraphKeyT<T> {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     qreal getValueForGraph() const {
         return this->mRelFrame;

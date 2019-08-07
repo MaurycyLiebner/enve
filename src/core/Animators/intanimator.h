@@ -3,7 +3,7 @@
 #include "qrealanimator.h"
 
 class IntAnimator : public QrealAnimator {
-    friend class SelfRef;
+    e_OBJECT
 protected:
     IntAnimator(const QString& name);
     IntAnimator(const int iniVal,
@@ -21,7 +21,7 @@ public:
     int getEffectiveIntValue(const qreal relFrame) const;
 
     static qsptr<IntAnimator> sCreateSeed() {
-        const auto result = SPtrCreate(IntAnimator)("seed");
+        const auto result = enve::make_shared<IntAnimator>("seed");
         result->setIntValueRange(0, 9999);
         result->setCurrentIntValue(qrand() % 9999);
         return result;

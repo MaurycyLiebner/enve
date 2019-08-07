@@ -5,7 +5,7 @@
 
 template <typename T>
 class GraphKeyT : public BasedKeyT<GraphKey, T> {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     GraphKeyT(const T &value, const int relFrame,
               Animator * const parentAnimator) :

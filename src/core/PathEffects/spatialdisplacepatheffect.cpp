@@ -7,11 +7,11 @@
 SpatialDisplacePathEffect::SpatialDisplacePathEffect() :
     PathEffect("spatial displace effect",
                PathEffectType::SPATIAL_DISPLACE) {
-    mSegLength = SPtrCreate(QrealAnimator)("segment length");
-    mMaxDev = SPtrCreate(QrealAnimator)("max deviation");
+    mSegLength = enve::make_shared<QrealAnimator>("segment length");
+    mMaxDev = enve::make_shared<QrealAnimator>("max deviation");
     mSmoothness = QrealAnimator::sCreate0to1Animator("smoothness");
-    mLengthBased = SPtrCreate(BoolPropertyContainer)("length inc");
-    mSeed = SPtrCreate(RandomGrid)();
+    mLengthBased = enve::make_shared<BoolPropertyContainer>("length inc");
+    mSeed = enve::make_shared<RandomGrid>();
 
     mSegLength->setValueRange(1, 1000);
     mSegLength->setCurrentBaseValue(20);

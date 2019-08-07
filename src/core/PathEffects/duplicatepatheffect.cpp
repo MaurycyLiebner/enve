@@ -4,11 +4,11 @@
 
 DuplicatePathEffect::DuplicatePathEffect() :
     PathEffect("duplicate effect", PathEffectType::DUPLICATE) {
-    mTranslation = SPtrCreate(QPointFAnimator)("translation");
+    mTranslation = enve::make_shared<QPointFAnimator>("translation");
     mTranslation->setBaseValue(QPointF(10, 10));
     ca_addChild(mTranslation);
 
-    mCount = SPtrCreate(IntAnimator)(1, 0, 25, 1, "count");
+    mCount = enve::make_shared<IntAnimator>(1, 0, 25, 1, "count");
     ca_addChild(mCount);
 }
 

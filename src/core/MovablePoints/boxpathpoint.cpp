@@ -11,18 +11,18 @@ BoxPathPoint::BoxPathPoint(QPointFAnimator * const associatedAnimator,
 }
 
 void BoxPathPoint::setRelativePos(const QPointF &relPos) {
-    const auto bTrans = GetAsPtr(getTransform(), BoxTransformAnimator);
+    const auto bTrans = static_cast<BoxTransformAnimator*>(getTransform());
     bTrans->setPivotFixedTransform(relPos);
 }
 
 void BoxPathPoint::startTransform() {
     MovablePoint::startTransform();
-    const auto bTrans = GetAsPtr(getTransform(), BoxTransformAnimator);
+    const auto bTrans = static_cast<BoxTransformAnimator*>(getTransform());
     bTrans->startPivotTransform();
 }
 
 void BoxPathPoint::finishTransform() {
-    const auto bTrans = GetAsPtr(getTransform(), BoxTransformAnimator);
+    const auto bTrans = static_cast<BoxTransformAnimator*>(getTransform());
     bTrans->finishPivotTransform();
 }
 

@@ -1,7 +1,7 @@
 ﻿#ifndef SINGLEWIDGETABSTRACTION_H
 #define SINGLEWIDGETABSTRACTION_H
 
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 class SingleWidgetTarget;
 
 enum SWT_BoxRule : short;

@@ -6,12 +6,12 @@
 PathPointsHandler::PathPointsHandler(
         SmartPathAnimator * const targetAnimator) :
     mTargetAnimator(targetAnimator) {
-    const auto updater = SPtrCreate(SmartNodePointUpdater)(this);
+    const auto updater = enve::make_shared<SmartNodePointUpdater>(this);
     mTargetAnimator->prp_setOwnUpdater(updater);
 }
 
 SmartNodePoint *PathPointsHandler::createNewNodePoint(const int nodeId) {
-    const auto newPt = SPtrCreate(SmartNodePoint)(this, mTargetAnimator);
+    const auto newPt = enve::make_shared<SmartNodePoint>(this, mTargetAnimator);
     insertPt(nodeId, newPt);
     return newPt.get();
 }

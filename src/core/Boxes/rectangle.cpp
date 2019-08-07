@@ -9,17 +9,17 @@
 Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     prp_setName("Rectangle");
 
-    setPointsHandler(SPtrCreate(PointsHandler)());
+    setPointsHandler(enve::make_shared<PointsHandler>());
 
-    mTopLeftAnimator = SPtrCreate(QPointFAnimator)("top left");
-    mTopLeftPoint = SPtrCreate(AnimatedPoint)(
+    mTopLeftAnimator = enve::make_shared<QPointFAnimator>("top left");
+    mTopLeftPoint = enve::make_shared<AnimatedPoint>(
                 mTopLeftAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
     mPointsHandler->appendPt(mTopLeftPoint);
     mTopLeftPoint->setRelativePos(QPointF(0, 0));
 
-    mBottomRightAnimator = SPtrCreate(QPointFAnimator)("bottom right");
-    mBottomRightPoint = SPtrCreate(AnimatedPoint)(
+    mBottomRightAnimator = enve::make_shared<QPointFAnimator>("bottom right");
+    mBottomRightPoint = enve::make_shared<AnimatedPoint>(
                 mBottomRightAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
     mPointsHandler->appendPt(mBottomRightPoint);
@@ -34,17 +34,17 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     ca_prependChildAnimator(mTopLeftAnimator.get(), mRasterEffectsAnimators);
     ca_prependChildAnimator(mBottomRightAnimator.get(), mRasterEffectsAnimators);
 
-    mRadiusAnimator = SPtrCreate(QPointFAnimator)("round radius");
+    mRadiusAnimator = enve::make_shared<QPointFAnimator>("round radius");
     mRadiusAnimator->setValuesRange(0, 9999);
 
-    mRadiusPoint = SPtrCreate(AnimatedPoint)(
+    mRadiusPoint = enve::make_shared<AnimatedPoint>(
                 mRadiusAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
 
     ca_addChild(mRadiusAnimator);
     ca_prependChildAnimator(mRadiusAnimator.get(), mRasterEffectsAnimators);
 
-    prp_setInheritedUpdater(SPtrCreate(NodePointUpdater)(this));
+    prp_setInheritedUpdater(enve::make_shared<NodePointUpdater>(this));
 }
 
 SkPath Rectangle::getPathAtRelFrameF(const qreal relFrame) {

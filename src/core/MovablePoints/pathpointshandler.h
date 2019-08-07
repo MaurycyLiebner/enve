@@ -7,7 +7,7 @@ class Canvas;
 class SmartPathCollectionHandler;
 
 class PathPointsHandler : public PointsHandler {
-    friend class StdSelfRef;
+    e_OBJECT
 protected:
     PathPointsHandler(SmartPathAnimator * const targetAnimator);
 public:

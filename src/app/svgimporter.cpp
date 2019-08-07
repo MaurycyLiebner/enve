@@ -567,14 +567,13 @@ qsptr<ContainerBox> loadBoxesGroup(const QDomElement &groupElement,
     const QDomNodeList allRootChildNodes = groupElement.childNodes();
     qsptr<ContainerBox> boxesGroup;
     const bool hasTransform = attributes.hasTransform();
-    if(allRootChildNodes.count() > 1 ||
-       hasTransform || parentGroup == nullptr) {
-        boxesGroup = SPtrCreate(ContainerBox)(TYPE_GROUP);
+    if(allRootChildNodes.count() > 1 || hasTransform || !parentGroup) {
+        boxesGroup = enve::make_shared<ContainerBox>(TYPE_GROUP);
         boxesGroup->planCenterPivotPosition();
         attributes.apply(boxesGroup.get());
         if(parentGroup) parentGroup->addContainedBox(boxesGroup);
     } else {
-        boxesGroup = GetAsSPtr(parentGroup, ContainerBox);
+        boxesGroup = parentGroup->ref<ContainerBox>();
     }
 
     for(int i = 0; i < allRootChildNodes.count(); i++) {
@@ -589,7 +588,7 @@ qsptr<ContainerBox> loadBoxesGroup(const QDomElement &groupElement,
 void loadVectorPath(const QDomElement &pathElement,
                     ContainerBox *parentGroup,
                     VectorPathSvgAttributes& attributes) {
-    const auto vectorPath = SPtrCreate(SmartVectorPath)();
+    const auto vectorPath = enve::make_shared<SmartVectorPath>();
     vectorPath->planCenterPivotPosition();
     const QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
@@ -600,7 +599,7 @@ void loadVectorPath(const QDomElement &pathElement,
 void loadPolyline(const QDomElement &pathElement,
                   ContainerBox *parentGroup,
                   VectorPathSvgAttributes &attributes) {
-    auto vectorPath = SPtrCreate(SmartVectorPath)();
+    auto vectorPath = enve::make_shared<SmartVectorPath>();
     vectorPath->planCenterPivotPosition();
     const QString pathStr = pathElement.attribute("points");
     parsePolylineDataFast(pathStr, attributes);
@@ -632,7 +631,7 @@ void loadCircle(const QDomElement &pathElement,
         rY = rXY;
     } else return;
     if(isZero4Dec(rX) || isZero4Dec(rY)) return;
-    circle = SPtrCreate(Circle)();
+    circle = enve::make_shared<Circle>();
     circle->setHorizontalRadius(rX);
     circle->setVerticalRadius(rY);
     circle->planCenterPivotPosition();
@@ -654,7 +653,7 @@ void loadRect(const QDomElement &pathElement,
     const QString rYstr = pathElement.attribute("ry");
     const QString rXstr = pathElement.attribute("rx");
 
-    const auto rect = SPtrCreate(Rectangle)();
+    const auto rect = enve::make_shared<Rectangle>();
     rect->planCenterPivotPosition();
 
     const auto topLeft = QPointF(xStr.toDouble(), yStr.toDouble());
@@ -683,7 +682,7 @@ void loadText(const QDomElement &pathElement,
     const QString xStr = pathElement.attribute("x");
     const QString yStr = pathElement.attribute("y");
 
-    const auto textBox = SPtrCreate(TextBox)();
+    const auto textBox = enve::make_shared<TextBox>();
     textBox->planCenterPivotPosition();
 
     textBox->moveByRel(QPointF(xStr.toDouble(), yStr.toDouble()));
@@ -1284,7 +1283,7 @@ void FillSvgAttributes::apply(BoundingBox *box) const {
 void FillSvgAttributes::apply(BoundingBox * const box,
                               const PaintSetting::Target& target) const {
     if(!box->SWT_isPathBox()) return;
-    const auto pathBox = GetAsPtr(box, PathBox);
+    const auto pathBox = static_cast<PathBox*>(box);
     if(mPaintType == FLATPAINT) {
         ColorSetting colorSetting(ColorMode::rgb, ColorParameter::all,
                                   mColor.redF(), mColor.greenF(),
@@ -1338,7 +1337,7 @@ void StrokeSvgAttributes::apply(BoundingBox *box, const qreal scale) const {
 
 void BoxSvgAttributes::apply(BoundingBox *box) const {
     if(box->SWT_isPathBox()) {
-        const auto path = GetAsPtr(box, PathBox);
+        const auto path = static_cast<PathBox*>(box);
         const qreal m11 = mRelTransform.m11();
         const qreal m12 = mRelTransform.m12();
         const qreal m21 = mRelTransform.m21();
@@ -1349,7 +1348,7 @@ void BoxSvgAttributes::apply(BoundingBox *box) const {
         mStrokeAttributes.apply(path, (sxAbs + syAbs)*0.5);
         mFillAttributes.apply(path);
         if(box->SWT_isTextBox()) {
-            const auto text = GetAsPtr(box, TextBox);
+            const auto text = static_cast<TextBox*>(box);
             text->setFont(mTextAttributes.getFont());
         }
     }
@@ -1364,12 +1363,12 @@ void BoxSvgAttributes::apply(BoundingBox *box) const {
 void VectorPathSvgAttributes::apply(SmartVectorPath * const path) {
     SmartPathCollection* const pathAnimator = path->getPathAnimator();
 //    for(const auto& separatePath : mSvgSeparatePaths) {
-//        const auto singlePath = SPtrCreate(SmartPathAnimator)();
+//        const auto singlePath = enve::make_shared<SmartPathAnimator>();
 //        separatePath->apply(singlePath.get());
 //        pathAnimator->addChild(singlePath);
 //    }
     for(const auto& separatePath : mSeparatePaths) {
-        const auto singlePath = SPtrCreate(SmartPathAnimator)(separatePath);
+        const auto singlePath = enve::make_shared<SmartPathAnimator>(separatePath);
         pathAnimator->addChild(singlePath);
     }
 

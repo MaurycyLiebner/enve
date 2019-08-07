@@ -8,7 +8,7 @@ class KeysClipboard;
 class QrealAnimator;
 
 class ComplexAnimator : public Animator {
-    friend class SelfRef;
+    e_OBJECT
     Q_OBJECT
 protected:
     ComplexAnimator(const QString& name);
@@ -52,7 +52,7 @@ public:
     void anim_addKeyAtRelFrame(const int relFrame) {
         for(const auto &property : ca_mChildAnimators) {
             if(property->SWT_isAnimator()) {
-                GetAsPtr(property, Animator)->anim_addKeyAtRelFrame(relFrame);
+                static_cast<Animator*>(property.get())->anim_addKeyAtRelFrame(relFrame);
             }
         }
     }
@@ -89,7 +89,7 @@ public:
         for(const auto& child : ca_mChildAnimators) {
             op(child.get());
             if(child->SWT_isComplexAnimator()) {
-                GetAsPtr(child, ComplexAnimator)->ca_execOnDescendants(op);
+                static_cast<ComplexAnimator*>(child.get())->ca_execOnDescendants(op);
             }
         }
     }
@@ -118,7 +118,7 @@ protected:
     qsptr<T> ca_takeChildAt(const int i) {
         const auto result = ca_mChildAnimators.at(i);
         ca_removeChild(result);
-        return GetAsSPtrTemplated(result, T);
+        return result->ref<T>();
     }
 
     void ca_prependChildAnimator(Property *childAnimator,
@@ -143,7 +143,7 @@ private:
 };
 
 class ComplexKey : public Key {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     void deleteKey();
     bool isDescendantSelected() const;

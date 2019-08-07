@@ -13,15 +13,15 @@ void InternalLinkCanvas::setupRenderData(
     InternalLinkGroupBox::setupRenderData(relFrame, data);
 
     ContainerBox* finalTarget = getFinalTarget();
-    auto canvasData = GetAsSPtr(data, LinkCanvasRenderData);
-    const auto canvasTarget = GetAsPtr(finalTarget, Canvas);
+    auto canvasData = data->ref<LinkCanvasRenderData>();
+    const auto canvasTarget = static_cast<Canvas*>(finalTarget);
     canvasData->fBgColor = toSkColor(canvasTarget->getBgColorAnimator()->
             getColor(relFrame));
     //qreal res = mParentScene->getResolutionFraction();
     canvasData->fCanvasHeight = canvasTarget->getCanvasHeight();//*res;
     canvasData->fCanvasWidth = canvasTarget->getCanvasWidth();//*res;
     if(mParentGroup->SWT_isLinkBox()) {
-        const auto ilc = GetAsPtr(getLinkTarget(), InternalLinkCanvas);
+        const auto ilc = static_cast<InternalLinkCanvas*>(getLinkTarget());
         canvasData->fClipToCanvas = ilc->clipToCanvas();
     } else {
         canvasData->fClipToCanvas = mClipToCanvas->getValue();
@@ -36,12 +36,12 @@ qsptr<BoundingBox> InternalLinkCanvas::createLinkForLinkGroup() {
     if(isParentLink()) {
         return getLinkTarget()->createLinkForLinkGroup();
     } else {
-        return SPtrCreate(InternalLinkCanvas)(this);
+        return enve::make_shared<InternalLinkCanvas>(this);
     }
 }
 
 stdsptr<BoxRenderData> InternalLinkCanvas::createRenderData() {
-    return SPtrCreate(LinkCanvasRenderData)(this);
+    return enve::make_shared<LinkCanvasRenderData>(this);
 }
 
 bool InternalLinkCanvas::relPointInsidePath(const QPointF &relPos) const {
@@ -51,7 +51,7 @@ bool InternalLinkCanvas::relPointInsidePath(const QPointF &relPos) const {
 
 void InternalLinkCanvas::anim_setAbsFrame(const int frame) {
     InternalLinkGroupBox::anim_setAbsFrame(frame);
-    const auto canvasTarget = GetAsPtr(getFinalTarget(), Canvas);
+    const auto canvasTarget = static_cast<Canvas*>(getFinalTarget());
     if(!canvasTarget) return;
     canvasTarget->anim_setAbsFrame(anim_getCurrentRelFrame());
 }

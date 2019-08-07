@@ -4,7 +4,7 @@
 class PathBox;
 
 class GradientPoint : public AnimatedPoint {
-    friend class StdSelfRef;
+    e_OBJECT
 public:
     void setColor(const QColor &fillColor);
     void drawSk(SkCanvas * const canvas,

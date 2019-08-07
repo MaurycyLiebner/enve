@@ -5,7 +5,7 @@
 #include "glwindow.h"
 #include "singlewidgettarget.h"
 #include "keyfocustarget.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "Tasks/gpupostprocessor.h"
 #include "canvas.h"
 class Brush;

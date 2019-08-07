@@ -152,7 +152,7 @@ private:
 
     friend class Lock;
     class Lock : public StdSelfRef {
-        friend class StdSelfRef;
+        e_OBJECT
     protected:
         Lock(MainWindow * const window) : mWindow(window) {}
     public:

@@ -7,7 +7,7 @@
 template <typename T, typename K = InterpolationKeyT<T>>
 class InterpolationAnimatorT :
         public BasedAnimatorT<GraphAnimator, K, T> {
-    friend class SelfRef;
+    e_OBJECT
 public:
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType &type,

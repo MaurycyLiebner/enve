@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include <QtMath>
 #include <memory>
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "singlewidgettarget.h"
 class ScrollWidget;
 class SingleWidgetTarget;

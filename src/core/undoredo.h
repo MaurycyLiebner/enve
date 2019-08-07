@@ -2,7 +2,7 @@
 #define UNDOREDO_H
 
 #include <QList>
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 #include "framerange.h"
 
 class UndoRedo : public StdSelfRef {

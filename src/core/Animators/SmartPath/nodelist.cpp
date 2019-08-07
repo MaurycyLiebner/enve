@@ -2,7 +2,7 @@
 #include "skia/skiaincludes.h"
 #include "pointhelpers.h"
 #include "exceptions.h"
-#include "smartPointers/sharedpointerdefs.h"
+#include "smartPointers/ememory.h"
 
 qCubicSegment2D gSegmentFromNodes(const Node& prevNode,
                                   const Node& nextNode) {
