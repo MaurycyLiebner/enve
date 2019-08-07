@@ -176,7 +176,7 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
             RuntimeThrow("Value node " + QString::number(i) +
                          " is not an Element.");
         }
-        QDomElement valEle = valNode.toElement();
+        const QDomElement valEle = valNode.toElement();
         try {
             const QString name = valEle.attribute("name");
             if(name.isEmpty()) RuntimeThrow("Value name not defined.");
@@ -201,11 +201,20 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
             RuntimeThrow("Value " + QString::number(i) + " is invalid.");
         }
     }
+    const QDomNodeList marginNode = root.elementsByTagName("Margin");
+    QString marginScript;
+    if(marginNode.count() == 1) {
+        const QDomNode& marNode = marginNode.at(0);
+        if(!marNode.isElement()) RuntimeThrow("Margin node is not an Element.");
+        const QDomElement marEle = marNode.toElement();
+        marginScript = marEle.attribute("value");
+    } else if(marginNode.count() > 1) RuntimeThrow("Multiple 'Margin' definitions");
+
 
     ShaderEffectProgram program;
     try {
         program = ShaderEffectProgram::sCreateProgram(
-                    gl, fragPath, propCs, uniCs, values);
+                    gl, fragPath, marginScript, propCs, uniCs, values);
     } catch(...) {
         RuntimeThrow("Could not create a program for ShaderEffect '" +
                      effectName + "'");

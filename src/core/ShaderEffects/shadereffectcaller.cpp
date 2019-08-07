@@ -1,6 +1,8 @@
 #include "shadereffectcaller.h"
 
-ShaderEffectCaller::ShaderEffectCaller(const QMargins &margin, const ShaderEffectProgram &program, const UniformSpecifiers &uniformSpecifiers) :
+ShaderEffectCaller::ShaderEffectCaller(const QMargins &margin,
+                                       const ShaderEffectProgram &program,
+                                       const UniformSpecifiers &uniformSpecifiers) :
     RasterEffectCaller(false, margin), mProgram(program),
     mUniformSpecifiers(uniformSpecifiers) {}
 

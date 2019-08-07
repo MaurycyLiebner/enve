@@ -23,10 +23,6 @@ public:
     virtual stdsptr<RasterEffectCaller>
         getEffectCaller(const qreal relFrame) const = 0;
 
-    virtual QMargins getMarginAtRelFrame(const qreal frame) const {
-        Q_UNUSED(frame);
-        return QMargins();
-    }
     virtual bool forceMargin() const { return false; }
 
     void writeIdentifier(QIODevice * const dst) const;

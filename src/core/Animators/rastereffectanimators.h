@@ -20,7 +20,6 @@ public:
 
     BoundingBox *getParentBox() { return mParentBox_k; }
     bool hasEffects();
-    QMargins getEffectsMargin(const qreal relFrame) const;
     bool unbound() const;
 
     void addEffects(const qreal relFrame,

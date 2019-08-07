@@ -184,8 +184,6 @@ public:
     virtual void updateCurrentPreviewDataFromRenderData(
             BoxRenderData* renderData);
 
-    virtual QMarginsF getEffectsMargin(const qreal relFrame);
-
     virtual bool isFrameInDurationRect(const int relFrame) const;
     virtual bool isFrameFInDurationRect(const qreal relFrame) const;
     virtual void shiftAll(const int shift);

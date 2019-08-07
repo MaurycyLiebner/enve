@@ -66,13 +66,6 @@ void InternalLinkGroupBox::setupRasterEffectsF(const qreal relFrame,
     }
 }
 
-QMarginsF InternalLinkGroupBox::getEffectsMargin(const qreal relFrame) {
-    if(isParentLink() && getLinkTarget()) {
-        return getLinkTarget()->getEffectsMargin(relFrame);
-    }
-    return ContainerBox::getEffectsMargin(relFrame);
-}
-
 const SkBlendMode &InternalLinkGroupBox::getBlendMode() {
     if(isParentLink() && getLinkTarget()) {
         return getLinkTarget()->getBlendMode();

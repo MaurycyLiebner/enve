@@ -52,11 +52,6 @@ ExampleRasterEffect000::getEffectCaller(const qreal relFrame) const {
     return enve::make_shared<ExampleRasterEffectCaller000>(radius);
 }
 
-QMargins ExampleRasterEffect000::getMarginAtRelFrame(const qreal frame) const {
-    const qreal radius = mRadius->getEffectiveValue(frame);
-    return QMargins() + qCeil(radius);
-}
-
 CustomIdentifier ExampleRasterEffect000::getIdentifier() const {
     return { effectId(), effectName(), { 0, 0, 0 } };
 }

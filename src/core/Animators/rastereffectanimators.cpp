@@ -13,17 +13,6 @@ RasterEffectAnimators::RasterEffectAnimators(BoundingBox * const parentBox) :
             this, &RasterEffectAnimators::updateUnbound);
 }
 
-QMargins RasterEffectAnimators::getEffectsMargin(const qreal relFrame) const {
-    QMargins newMargin;
-    for(const auto& effect : ca_mChildAnimators) {
-        auto rasterEffect = static_cast<RasterEffect*>(effect.get());
-        if(rasterEffect->isVisible()) {
-            newMargin += rasterEffect->getMarginAtRelFrame(relFrame);
-        }
-    }
-    return newMargin;
-}
-
 void RasterEffectAnimators::updateUnbound() {
     for(const auto& effect : ca_mChildAnimators) {
         auto rasterEffect = static_cast<RasterEffect*>(effect.get());
@@ -44,8 +33,7 @@ void RasterEffectAnimators::addEffects(const qreal relFrame,
     for(const auto& effect : ca_mChildAnimators) {
         auto rasterEffect = static_cast<ShaderEffect*>(effect.get());
         if(rasterEffect->isVisible()) {
-            const auto effectRenderData =
-                    rasterEffect->getEffectCaller(relFrame);
+            const auto effectRenderData = rasterEffect->getEffectCaller(relFrame);
             if(!effectRenderData) continue;
             data->addEffect(effectRenderData);
         }

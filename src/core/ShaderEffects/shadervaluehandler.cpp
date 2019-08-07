@@ -49,3 +49,7 @@ UniformSpecifier ShaderValueHandler::create(const GLint loc) const {
         };
     } else RuntimeThrow("Unsupported type for " + name);
 }
+
+void ShaderValueHandler::evaluate(QJSEngine &engine) const {
+    engine.evaluate(fName + " = " + mScript);
+}

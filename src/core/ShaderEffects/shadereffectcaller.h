@@ -4,6 +4,7 @@
 #include "shadereffectprogram.h"
 
 class ShaderEffectCaller : public RasterEffectCaller {
+    e_OBJECT
 public:
     ShaderEffectCaller(const QMargins& margin,
                        const ShaderEffectProgram& program,

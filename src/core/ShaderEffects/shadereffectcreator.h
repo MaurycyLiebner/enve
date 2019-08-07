@@ -56,7 +56,8 @@ public:
         ShaderEffectProgram program;
         try {
             program = ShaderEffectProgram::sCreateProgram(
-                        gl, fragPath, fProperties,
+                        gl, fragPath,
+                        fProgram.fMarginScript, fProperties,
                         fProgram.fPropUniCreators,
                         fProgram.fValueHandlers);
         } catch(...) {

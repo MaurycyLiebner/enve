@@ -681,10 +681,6 @@ void BoundingBox::finishTransform() {
     //updateTotalTransform();
 }
 
-QMarginsF BoundingBox::getEffectsMargin(const qreal relFrame) {
-    return mRasterEffectsAnimators->getEffectsMargin(relFrame);
-}
-
 void BoundingBox::setupRenderData(const qreal relFrame,
                                   BoxRenderData * const data) {
     if(!mParentScene) return;

@@ -57,3 +57,17 @@ UniformSpecifier UniformSpecifierCreator::create(const GLint loc,
         return intAnimatorCreate(mGLValue, loc, property, relFrame);
     else RuntimeThrow("Unsupported type");
 }
+
+void UniformSpecifierCreator::evaluate(QJSEngine &engine,
+                                       Property * const property,
+                                       const qreal relFrame) const {
+    if(mType == ShaderPropertyType::qrealAnimator) {
+        const auto qa = static_cast<QrealAnimator*>(property);
+        const qreal val = qa->getEffectiveValue(relFrame);
+        engine.evaluate(property->prp_getName() + " = " + QString::number(val));
+    } else if(mType == ShaderPropertyType::intAnimator) {
+        const auto ia = static_cast<IntAnimator*>(property);
+        const int val = ia->getEffectiveIntValue(relFrame);
+        engine.evaluate(property->prp_getName() + " = " + QString::number(val));
+    } else RuntimeThrow("Unsupported type");
+}

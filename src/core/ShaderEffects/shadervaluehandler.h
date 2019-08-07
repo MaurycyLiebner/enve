@@ -20,6 +20,7 @@ public:
                        const QString& script);
 
     UniformSpecifier create(const GLint loc) const;
+    void evaluate(QJSEngine& engine) const;
 
     const QString fName;
     const bool fGLValue;

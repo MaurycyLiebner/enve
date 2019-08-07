@@ -19,6 +19,9 @@ struct UniformSpecifierCreator : public StdSelfRef {
     UniformSpecifier create(const GLint loc,
                             Property * const property,
                             const qreal relFrame) const;
+    void evaluate(QJSEngine& engine,
+                  Property * const property,
+                  const qreal relFrame) const;
 private:
     const ShaderPropertyType mType;
     const bool mGLValue;

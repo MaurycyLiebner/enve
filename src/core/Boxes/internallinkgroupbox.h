@@ -42,8 +42,6 @@ public:
     void setupRasterEffectsF(const qreal relFrame,
                           BoxRenderData * const data);
 
-    QMarginsF getEffectsMargin(const qreal relFrame);
-
     const SkBlendMode &getBlendMode();
 
     void setupRenderData(const qreal relFrame,

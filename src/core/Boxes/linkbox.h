@@ -72,13 +72,6 @@ public:
         return BoundingBox::getBlendMode();
     }
 
-    QMarginsF getEffectsMargin(const qreal relFrame) {
-        QMarginsF margin;
-        margin += getLinkTarget()->getEffectsMargin(relFrame);
-        margin += BoundingBox::getEffectsMargin(relFrame);
-        return margin;
-    }
-
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
     QMatrix getRelativeTransformAtFrame(const qreal relFrame) {

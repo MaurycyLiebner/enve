@@ -26,9 +26,7 @@ class ExampleRasterEffect000 : public CustomRasterEffect {
 public:
     ExampleRasterEffect000();
 
-    stdsptr<RasterEffectCaller>
-            getEffectCaller(const qreal relFrame) const;
-    QMargins getMarginAtRelFrame(const qreal frame) const;
+    stdsptr<RasterEffectCaller> getEffectCaller(const qreal relFrame) const;
     bool forceMargin() const { return true; }
 
     CustomIdentifier getIdentifier() const;

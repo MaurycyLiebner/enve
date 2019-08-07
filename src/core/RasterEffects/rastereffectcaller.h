@@ -9,10 +9,11 @@ enum class HardwareSupport : short;
 #define qMin3(a, b, c) qMin(a, qMin(b, c))
 
 class RasterEffectCaller : public StdSelfRef {
-protected:
+    e_OBJECT
+public:
     RasterEffectCaller() : RasterEffectCaller(false, QMargins()) {}
     RasterEffectCaller(const bool forceMargin, const QMargins& margin);
-public:
+
     virtual HardwareSupport hardwareSupport() const = 0;
 
     virtual void processGpu(QGL33 * const gl,
