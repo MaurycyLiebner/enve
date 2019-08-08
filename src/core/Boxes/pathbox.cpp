@@ -13,7 +13,7 @@
 #include "Animators/rastereffectanimators.h"
 #include "Animators/outlinesettingsanimator.h"
 
-PathBox::PathBox(const BoundingBoxType type) :
+PathBox::PathBox(const eBoxType type) :
     BoundingBox(type) {
     mPathEffectsAnimators =
             enve::make_shared<PathEffectAnimators>();

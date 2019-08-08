@@ -20,11 +20,12 @@ private:
     void iniSingleRasterEffectProgram(const QString &grePath);
     void iniShaderEffectProgramExec(const QString &grePath);
 
+    void iniCustomBoxes();
     void iniCustomPathEffects();
     void iniCustomRasterEffects();
 
-    void iniCustomRasterEffect(const QString &gpu);
-    void iniIfCustomRasterEffect(const QString &gpu);
+    void iniCustomRasterEffect(const QString &soPath);
+    void iniIfCustomRasterEffect(const QString &path);
 
     QStringList mLoadedGREPaths;
     GLuint mPlainSquareVAO;

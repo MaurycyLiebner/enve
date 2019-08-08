@@ -19,7 +19,7 @@ BoxesClipboard::BoxesClipboard(const QList<BoundingBox*> &src) :
     dst.write(rcConstChar(&nBoxes), sizeof(int));
 
     for(const auto& box : src) {
-        box->writeBoxType(&dst);
+        box->writeIdentifier(&dst);
         box->writeBoundingBox(&dst);
     }
     dst.close();

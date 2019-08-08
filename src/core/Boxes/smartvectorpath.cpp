@@ -14,7 +14,7 @@
 #include "PathEffects/patheffectanimators.h"
 
 SmartVectorPath::SmartVectorPath() :
-    PathBox(BoundingBoxType::TYPE_VECTOR_PATH) {
+    PathBox(eBoxType::TYPE_VECTOR_PATH) {
     prp_setName("Path");
     mPathAnimator = enve::make_shared<SmartPathCollection>();
     const auto updater = enve::make_shared<NodePointUpdater>(this);

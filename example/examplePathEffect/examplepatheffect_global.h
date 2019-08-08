@@ -14,20 +14,20 @@
 extern "C" {
 
 EXAMPLEPATHEFFECTSHARED_EXPORT
-    qsptr<CustomPathEffect> createNewestVersionEffect();
+    qsptr<CustomPathEffect> eCreateNewestVersion();
 
 EXAMPLEPATHEFFECTSHARED_EXPORT
-    qsptr<CustomPathEffect> createEffect(
+    qsptr<CustomPathEffect> eCreate(
         const CustomIdentifier &identifier);
 
 EXAMPLEPATHEFFECTSHARED_EXPORT
-    QString effectName();
+    QString eName();
 
 EXAMPLEPATHEFFECTSHARED_EXPORT
-    CustomIdentifier effectIdentifier();
+    CustomIdentifier eIdentifier();
 
 EXAMPLEPATHEFFECTSHARED_EXPORT
-    bool supports(const CustomIdentifier &identifier);
+    bool eSupports(const CustomIdentifier &identifier);
 
 }
 #endif // EXAMPLEPATHEFFECT_GLOBAL_H

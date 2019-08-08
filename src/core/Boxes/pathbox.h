@@ -55,7 +55,7 @@ protected:
 class PathBox : public BoundingBox {
     e_OBJECT
 protected:
-    PathBox(const BoundingBoxType type);
+    PathBox(const eBoxType type);
     void getMotionBlurProperties(QList<Property*> &list) const;
 public:
     ~PathBox();

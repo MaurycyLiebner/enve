@@ -1,11 +1,11 @@
 #include "examplerastereffect.h"
 
-qsptr<CustomRasterEffect> createNewestVersionEffect() {
+qsptr<CustomRasterEffect> eCreateNewestVersion() {
     // Use default, most up to date, version
     return enve::make_shared<ExampleRasterEffect000>();
 }
 
-qsptr<CustomRasterEffect> createEffect(
+qsptr<CustomRasterEffect> eCreate(
         const CustomIdentifier &identifier) {
     Q_UNUSED(identifier);
     // Choose version based on identifier
@@ -19,7 +19,7 @@ QString effectId() {
 }
 
 // Name of your effect used in UI
-QString effectName() {
+QString eName() {
     return "Example";
 }
 
@@ -28,19 +28,19 @@ CustomIdentifier::Version effectVersion() {
     return { 0, 0, 0 };
 }
 
-CustomIdentifier effectIdentifier() {
-    return { effectId(), effectName(), effectVersion() };
+CustomIdentifier eIdentifier() {
+    return { effectId(), eName(), effectVersion() };
 }
 
-bool supports(const CustomIdentifier &identifier) {
+bool eSupports(const CustomIdentifier &identifier) {
     if(identifier.fEffectId != effectId()) return false;
-    if(identifier.fEffectName != effectName()) return false;
+    if(identifier.fEffectName != eName()) return false;
     return identifier.fVersion == effectVersion();
 }
 
 #include "enveCore/Animators/qrealanimator.h"
 ExampleRasterEffect000::ExampleRasterEffect000() :
-    CustomRasterEffect(effectName().toLower()) {
+    CustomRasterEffect(eName().toLower()) {
     mRadius = enve::make_shared<QrealAnimator>(10, 0, 999.999, 1, "radius");
     ca_addChild(mRadius);
 }
@@ -53,7 +53,7 @@ ExampleRasterEffect000::getEffectCaller(const qreal relFrame) const {
 }
 
 CustomIdentifier ExampleRasterEffect000::getIdentifier() const {
-    return { effectId(), effectName(), { 0, 0, 0 } };
+    return { effectId(), eName(), { 0, 0, 0 } };
 }
 
 void ExampleRasterEffectCaller000::processGpu(QGL33 * const gl,

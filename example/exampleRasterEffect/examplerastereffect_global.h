@@ -3,7 +3,7 @@
 
 #include <QtCore/qglobal.h>
 
-#if defined(EXAMPLERasterEffect_LIBRARY)
+#if defined(EXAMPLERASTEREFFECT_LIBRARY)
 #  define EXAMPLERASTEREFFECTSHARED_EXPORT Q_DECL_EXPORT
 #else
 #  define EXAMPLERASTEREFFECTSHARED_EXPORT Q_DECL_IMPORT
@@ -15,20 +15,19 @@
 extern "C" {
 
 EXAMPLERASTEREFFECTSHARED_EXPORT
-    qsptr<CustomRasterEffect> createNewestVersionEffect();
+    qsptr<CustomRasterEffect> eCreateNewestVersion();
 
 EXAMPLERASTEREFFECTSHARED_EXPORT
-    qsptr<CustomRasterEffect> createEffect(
-        const CustomIdentifier &identifier);
+    qsptr<CustomRasterEffect> eCreate(const CustomIdentifier &identifier);
 
 EXAMPLERASTEREFFECTSHARED_EXPORT
-    QString effectName();
+    QString eName();
 
 EXAMPLERASTEREFFECTSHARED_EXPORT
-    CustomIdentifier effectIdentifier();
+    CustomIdentifier eIdentifier();
 
 EXAMPLERASTEREFFECTSHARED_EXPORT
-    bool supports(const CustomIdentifier &identifier);
+    bool eSupports(const CustomIdentifier &identifier);
 
 }
 #endif // EXAMPLERASTEREFFECT_GLOBAL_H

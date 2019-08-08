@@ -31,7 +31,7 @@ QList<WaitingForBoxLoad> BoundingBox::sFunctionsWaitingForBoxRead;
 int BoundingBox::sNextWriteId;
 QList<BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 
-BoundingBox::BoundingBox(const BoundingBoxType type) :
+BoundingBox::BoundingBox(const eBoxType type) :
     StaticComplexAnimator("box"),
     mDocumentId(sNextDocumentId++), mType(type),
     mTransformAnimator(enve::make_shared<BoxTransformAnimator>()),
@@ -779,7 +779,7 @@ void BoundingBox::updateDrawRenderContainerTransform() {
     }
 }
 
-BoundingBoxType BoundingBox::getBoxType() const { return mType; }
+eBoxType BoundingBox::getBoxType() const { return mType; }
 
 void BoundingBox::startDurationRectPosTransform() {
     if(hasDurationRectangle()) {
@@ -1154,14 +1154,8 @@ void BoundingBox::queScheduledTasks() {
     mCurrentRenderDataHandler.clear();
 }
 
-void BoundingBox::writeBoxType(QIODevice * const dst) const {
-    dst->write(rcConstChar(&mType), sizeof(BoundingBoxType));
-}
-
-BoundingBoxType BoundingBox::sReadBoxType(QIODevice * const src) {
-    BoundingBoxType type;
-    src->read(rcChar(&type), sizeof(BoundingBoxType));
-    return type;
+void BoundingBox::writeIdentifier(QIODevice * const dst) const {
+    dst->write(rcConstChar(&mType), sizeof(eBoxType));
 }
 
 int BoundingBox::getReadId() const {

@@ -67,6 +67,7 @@ SOURCES += \
     Boxes/canvasrenderdata.cpp \
     Boxes/circle.cpp \
     Boxes/containerbox.cpp \
+    Boxes/ecustombox.cpp \
     Boxes/effectsrenderer.cpp \
     Boxes/effectsubtaskspawner.cpp \
     Boxes/imagebox.cpp \
@@ -122,7 +123,6 @@ SOURCES += \
     Paint/painttarget.cpp \
     Paint/simplebrushwrapper.cpp \
     PathEffects/custompatheffect.cpp \
-    PathEffects/custompatheffectcreator.cpp \
     PathEffects/dashpatheffect.cpp \
     PathEffects/displacepatheffect.cpp \
     PathEffects/duplicatepatheffect.cpp \
@@ -147,7 +147,6 @@ SOURCES += \
     PropertyUpdaters/strokewidthupdater.cpp \
     RasterEffects/customrastereffect.cpp \
     RasterEffects/rastereffect.cpp \
-    RasterEffects/customrastereffectcreator.cpp \
     RasterEffects/rastereffectcaller.cpp \
     ShaderEffects/shadereffect.cpp \
     ShaderEffects/shadereffectcaller.cpp \
@@ -288,6 +287,8 @@ HEADERS += \
     Boxes/canvasrenderdata.h \
     Boxes/circle.h \
     Boxes/containerbox.h \
+    Boxes/customboxcreator.h \
+    Boxes/ecustombox.h \
     Boxes/effectsrenderer.h \
     Boxes/effectsubtaskspawner.h \
     Boxes/imagebox.h \
@@ -401,6 +402,7 @@ HEADERS += \
     colorsetting.h \
     conncontext.h \
     core_global.h \
+    customhandler.h \
     customidentifier.h \
     document.h \
     fileshandler.h \

@@ -3,7 +3,7 @@
 
 #include <QtCore/qglobal.h>
 
-#if defined(DabTest_LIBRARY)
+#if defined(DABTEST_LIBRARY)
 #  define DABTESTSHARED_EXPORT Q_DECL_EXPORT
 #else
 #  define DABTESTSHARED_EXPORT Q_DECL_IMPORT
@@ -15,19 +15,19 @@
 extern "C" {
 
 DABTESTSHARED_EXPORT
-    qsptr<CustomRasterEffect> createNewestVersionEffect();
+    qsptr<CustomRasterEffect> eCreateNewestVersion();
 
 DABTESTSHARED_EXPORT
-    qsptr<CustomRasterEffect> createEffect(
+    qsptr<CustomRasterEffect> eCreate(
         const CustomIdentifier &identifier);
 
 DABTESTSHARED_EXPORT
-    QString effectName();
+    QString eName();
 
 DABTESTSHARED_EXPORT
-    CustomIdentifier effectIdentifier();
+    CustomIdentifier eIdentifier();
 
 DABTESTSHARED_EXPORT
-    bool supports(const CustomIdentifier &identifier);
+    bool eSupports(const CustomIdentifier &identifier);
 }
 #endif // DABTEST_GLOBAL_H

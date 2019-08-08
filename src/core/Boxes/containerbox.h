@@ -8,7 +8,7 @@ class PathEffectAnimators;
 class ContainerBox : public BoundingBox {
     e_OBJECT
 protected:
-    ContainerBox(const BoundingBoxType type);
+    ContainerBox(const eBoxType type);
 public:
     bool SWT_isContainerBox() const { return true; }
     bool SWT_isGroupBox() const { return mType == TYPE_GROUP; }
@@ -141,7 +141,7 @@ public:
     void setDescendantCurrentGroup(const bool bT);
     bool isDescendantCurrentGroup() const;
 
-    void readChildBoxes(QIODevice *target);
+    void readChildBoxes(QIODevice * const src);
 
     int abstractionIdToBoxId(const int absId) const {
         return absId - ca_getNumberOfChildren();

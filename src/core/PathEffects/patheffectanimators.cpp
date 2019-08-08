@@ -64,8 +64,7 @@ qsptr<PathEffect> readIdCreatePathEffect(QIODevice * const src) {
         case(PathEffectType::CUSTOM): {
             const auto id = CustomIdentifier::sRead(src);
             return CustomPathEffectCreator::sCreateForIdentifier(id);
-        }
-        default: RuntimeThrow("Invalid path effect type '" +
-                              QString::number(int(type)) + "'");
+        } default: RuntimeThrow("Invalid path effect type '" +
+                                QString::number(int(type)) + "'");
     }
 }

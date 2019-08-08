@@ -9,10 +9,10 @@
 #include "textbox.h"
 #include "Animators/rastereffectanimators.h"
 
-ContainerBox::ContainerBox(const BoundingBoxType type) :
+ContainerBox::ContainerBox(const eBoxType type) :
     BoundingBox(type) {
-    if(type == BoundingBoxType::TYPE_GROUP) prp_setName("Group");
-    else if(type == BoundingBoxType::TYPE_LAYER) prp_setName("Layer");
+    if(type == eBoxType::TYPE_GROUP) prp_setName("Group");
+    else if(type == eBoxType::TYPE_LAYER) prp_setName("Layer");
     iniPathEffects();
 }
 
@@ -817,7 +817,7 @@ void ContainerBox::writeBoundingBox(QIODevice * const target) {
     const int nChildBoxes = mContainedBoxes.count();
     target->write(rcConstChar(&nChildBoxes), sizeof(int));
     for(const auto &child : mContainedBoxes) {
-        child->writeBoxType(target);
+        child->writeIdentifier(target);
         child->writeBoundingBox(target);
     }
 }
@@ -833,48 +833,55 @@ void ContainerBox::writeBoundingBox(QIODevice * const target) {
 #include "imagesequencebox.h"
 #include "internallinkcanvas.h"
 #include "linkbox.h"
+#include "customboxcreator.h"
 
-void ContainerBox::readChildBoxes(QIODevice *target) {
+qsptr<BoundingBox> readIdCreateBox(QIODevice * const src) {
+    eBoxType type;
+    src->read(rcChar(&type), sizeof(eBoxType));
+    switch(type) {
+        case(eBoxType::TYPE_VECTOR_PATH):
+            return enve::make_shared<SmartVectorPath>();
+        case(eBoxType::TYPE_IMAGE):
+            return enve::make_shared<ImageBox>();
+        case(eBoxType::TYPE_TEXT):
+            return enve::make_shared<TextBox>();
+        case(eBoxType::TYPE_VIDEO):
+            return enve::make_shared<VideoBox>();
+        case(eBoxType::TYPE_PARTICLES):
+            return enve::make_shared<ParticleBox>();
+        case(eBoxType::TYPE_RECTANGLE):
+            return enve::make_shared<Rectangle>();
+        case(eBoxType::TYPE_CIRCLE):
+            return enve::make_shared<Circle>();
+        case(eBoxType::TYPE_LAYER):
+            return enve::make_shared<ContainerBox>(TYPE_LAYER);
+        case(eBoxType::TYPE_GROUP):
+            return enve::make_shared<ContainerBox>(TYPE_GROUP);
+        case(eBoxType::TYPE_PAINT):
+            return enve::make_shared<PaintBox>();
+        case(eBoxType::TYPE_IMAGESQUENCE):
+            return enve::make_shared<ImageSequenceBox>();
+        case(eBoxType::TYPE_INTERNAL_LINK):
+            return enve::make_shared<InternalLinkBox>(nullptr);
+        case(eBoxType::TYPE_INTERNAL_LINK_GROUP):
+            return enve::make_shared<InternalLinkGroupBox>(nullptr);
+        case(eBoxType::TYPE_EXTERNAL_LINK):
+            return enve::make_shared<ExternalLinkBox>();
+        case(eBoxType::TYPE_INTERNAL_LINK_CANVAS):
+            return enve::make_shared<InternalLinkCanvas>(nullptr);
+        case(eBoxType::TYPE_CUSTOM): {
+            const auto id = CustomIdentifier::sRead(src);
+            return CustomBoxCreator::sCreateForIdentifier(id);
+        } default: RuntimeThrow("Invalid box type '" + std::to_string(type) + "'");
+    }
+}
+
+void ContainerBox::readChildBoxes(QIODevice * const src) {
     int nChildBoxes;
-    target->read(rcChar(&nChildBoxes), sizeof(int));
+    src->read(rcChar(&nChildBoxes), sizeof(int));
     for(int i = 0; i < nChildBoxes; i++) {
-        qsptr<BoundingBox> box;
-        const auto boxType = BoundingBox::sReadBoxType(target);
-        if(boxType == TYPE_VECTOR_PATH) {
-            box = enve::make_shared<SmartVectorPath>();
-        } else if(boxType == TYPE_IMAGE) {
-            box = enve::make_shared<ImageBox>();
-        } else if(boxType == TYPE_TEXT) {
-            box = enve::make_shared<TextBox>();
-        } else if(boxType == TYPE_VIDEO) {
-            box = enve::make_shared<VideoBox>();
-        } else if(boxType == TYPE_PARTICLES) {
-            box = enve::make_shared<ParticleBox>();
-        } else if(boxType == TYPE_RECTANGLE) {
-            box = enve::make_shared<Rectangle>();
-        } else if(boxType == TYPE_CIRCLE) {
-            box = enve::make_shared<Circle>();
-        } else if(boxType == TYPE_LAYER) {
-            box = enve::make_shared<ContainerBox>(TYPE_LAYER);
-        } else if(boxType == TYPE_GROUP) {
-            box = enve::make_shared<ContainerBox>(TYPE_GROUP);
-        } else if(boxType == TYPE_PAINT) {
-            box = enve::make_shared<PaintBox>();
-        } else if(boxType == TYPE_IMAGESQUENCE) {
-            box = enve::make_shared<ImageSequenceBox>();
-        } else if(boxType == TYPE_INTERNAL_LINK) {
-            box = enve::make_shared<InternalLinkBox>(nullptr);
-        } else if(boxType == TYPE_INTERNAL_LINK_GROUP) {
-            box = enve::make_shared<InternalLinkGroupBox>(nullptr);
-        } else if(boxType == TYPE_EXTERNAL_LINK) {
-            box = enve::make_shared<ExternalLinkBox>();
-        } else if(boxType == TYPE_INTERNAL_LINK_CANVAS) {
-            box = enve::make_shared<InternalLinkCanvas>(nullptr);
-        } else {
-            RuntimeThrow("Invalid box type '" + std::to_string(boxType) + "'");
-        }
-
-        box->readBoundingBox(target);
+        const auto box = readIdCreateBox(src);
+        box->readBoundingBox(src);
         addContainedBox(box);
     }
 }

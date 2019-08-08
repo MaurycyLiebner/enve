@@ -34,7 +34,7 @@ enum CanvasMode : short;
 
 class SimpleBrushWrapper;
 
-enum BoundingBoxType {
+enum eBoxType {
     TYPE_VECTOR_PATH,
     TYPE_CIRCLE,
     TYPE_IMAGE,
@@ -50,7 +50,8 @@ enum BoundingBoxType {
     TYPE_VIDEO,
     TYPE_IMAGESQUENCE,
     TYPE_PAINT,
-    TYPE_GROUP
+    TYPE_GROUP,
+    TYPE_CUSTOM
 };
 
 class BoundingBox;
@@ -61,7 +62,7 @@ class BoundingBox : public StaticComplexAnimator {
     Q_OBJECT
     e_OBJECT
 protected:
-    BoundingBox(const BoundingBoxType type);
+    BoundingBox(const eBoxType type);
 public:
     ~BoundingBox();
 
@@ -194,8 +195,7 @@ public:
     virtual bool shouldScheduleUpdate() { return true; }
     virtual void queScheduledTasks();
 
-    void writeBoxType(QIODevice * const dst) const;
-    static BoundingBoxType sReadBoxType(QIODevice * const src);
+    virtual void writeIdentifier(QIODevice * const dst) const;
 
     virtual void writeBoundingBox(QIODevice * const dst);
     virtual void readBoundingBox(QIODevice * const src);
@@ -378,7 +378,7 @@ public:
     void incReasonsNotToApplyUglyTransform();
     void decReasonsNotToApplyUglyTransform();
 
-    BoundingBoxType getBoxType() const;
+    eBoxType getBoxType() const;
 
     void requestGlobalPivotUpdateIfSelected();
     void requestGlobalFillStrokeUpdateIfSelected();
@@ -416,7 +416,7 @@ protected:
     int mWriteId = -1;
     const int mDocumentId;
 
-    BoundingBoxType mType;
+    eBoxType mType;
     SkBlendMode mBlendModeSk = SkBlendMode::kSrcOver;
 
     QPointF mSavedTransformPivot;

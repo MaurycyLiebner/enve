@@ -7,7 +7,7 @@
 #include "Animators/qrealkey.h"
 #include "Animators/rastereffectanimators.h"
 
-AnimationBox::AnimationBox(const BoundingBoxType type) : BoundingBox(type) {
+AnimationBox::AnimationBox(const eBoxType type) : BoundingBox(type) {
     prp_setName("Animation");
 
     setDurationRectangle(enve::make_shared<FixedLenAnimationRect>(this));

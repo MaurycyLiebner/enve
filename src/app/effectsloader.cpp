@@ -32,13 +32,57 @@ void EffectsLoader::initialize() {
 
     iniCustomPathEffects();
     iniCustomRasterEffects();
+    iniCustomBoxes();
+}
+
+#include "Boxes/ecustombox.h"
+#include "Boxes/customboxcreator.h"
+void iniCustomBox(const QString& path) {
+    try {
+        CustomBoxCreator::sLoadCustom(path);
+    } catch(...) {
+        RuntimeThrow("Error while loading Box from '" + path + "'");
+    }
+}
+
+void iniIfCustomBox(const QString& path) {
+    const QFileInfo fileInfo(path);
+    if(!fileInfo.isFile()) return;
+    if(!fileInfo.completeSuffix().contains("so")) return;
+    try {
+        iniCustomBox(path);
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
+}
+
+void EffectsLoader::iniCustomBoxes() {
+    QDir(EnveSettings::sSettingsDir()).mkdir("Boxes");
+    const QString dirPath = EnveSettings::sSettingsDir() + "/Boxes";
+    QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
+    while(dirIt.hasNext()) iniIfCustomBox(dirIt.next());
+
+    const auto newFileWatcher = QSharedPointer<QFileSystemModel>(
+                new QFileSystemModel);
+    newFileWatcher->setRootPath(dirPath);
+    connect(newFileWatcher.get(), &QFileSystemModel::directoryLoaded,
+            this, [this, newFileWatcher]() {
+        connect(newFileWatcher.get(), &QFileSystemModel::rowsInserted, this,
+        [newFileWatcher](const QModelIndex &parent, int first, int last) {
+            for(int row = first; row <= last; row++) {
+                const auto rowIndex = newFileWatcher->index(row, 0, parent);
+                const QString path = newFileWatcher->filePath(rowIndex);
+                iniIfCustomBox(path);
+            }
+        });
+    });
 }
 
 #include "PathEffects/custompatheffect.h"
 #include "PathEffects/custompatheffectcreator.h"
 void iniCustomPathEffect(const QString& path) {
     try {
-        CustomPathEffectCreator::sLoadCustomPathEffect(path);
+        CustomPathEffectCreator::sLoadCustom(path);
     } catch(...) {
         RuntimeThrow("Error while loading PathEffect from '" + path + "'");
     }
@@ -79,20 +123,20 @@ void EffectsLoader::iniCustomPathEffects() {
 
 #include "RasterEffects/customrastereffect.h"
 #include "RasterEffects/customrastereffectcreator.h"
-void EffectsLoader::iniCustomRasterEffect(const QString& gpu) {
+void EffectsLoader::iniCustomRasterEffect(const QString& soPath) {
     try {
-        CustomRasterEffectCreator::sLoadCustomRasterEffect(this, gpu);
+        CustomRasterEffectCreator::sLoadCustom(soPath);
     } catch(...) {
-        RuntimeThrow("Error while loading RasterEffect from '" + gpu + "'");
+        RuntimeThrow("Error while loading RasterEffect from '" + soPath + "'");
     }
 }
 
-void EffectsLoader::iniIfCustomRasterEffect(const QString& gpu) {
-    const QFileInfo fileInfo(gpu);
+void EffectsLoader::iniIfCustomRasterEffect(const QString& path) {
+    const QFileInfo fileInfo(path);
     if(!fileInfo.isFile()) return;
     if(!fileInfo.completeSuffix().contains("so")) return;
     try {
-        iniCustomRasterEffect(gpu);
+        iniCustomRasterEffect(path);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
     }

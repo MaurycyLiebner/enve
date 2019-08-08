@@ -1,11 +1,11 @@
 #include "dabtest.h"
 
-qsptr<CustomRasterEffect> createNewestVersionEffect() {
+qsptr<CustomRasterEffect> eCreateNewestVersion() {
     // Use default, most up to date, version
     return enve::make_shared<DabTest000>();
 }
 
-qsptr<CustomRasterEffect> createEffect(
+qsptr<CustomRasterEffect> eCreate(
         const CustomIdentifier &identifier) {
     Q_UNUSED(identifier);
     // Choose version based on identifier
@@ -19,7 +19,7 @@ QString effectId() {
 }
 
 // Name of your effect used in UI
-QString effectName() {
+QString eName() {
     return "Dab Test";
 }
 
@@ -28,20 +28,20 @@ CustomIdentifier::Version effectVersion() {
     return { 0, 0, 0 };
 }
 
-CustomIdentifier effectIdentifier() {
-    return { effectId(), effectName(), effectVersion() };
+CustomIdentifier eIdentifier() {
+    return { effectId(), eName(), effectVersion() };
 }
 
-bool supports(const CustomIdentifier &identifier) {
+bool eSupports(const CustomIdentifier &identifier) {
     if(identifier.fEffectId != effectId()) return false;
-    if(identifier.fEffectName != effectName()) return false;
+    if(identifier.fEffectName != eName()) return false;
     return identifier.fVersion == effectVersion();
 }
 
 #include "enveCore/Animators/qrealanimator.h"
 
 DabTest000::DabTest000() :
-    CustomRasterEffect(effectName().toLower()) {
+    CustomRasterEffect(eName().toLower()) {
     mRadius = enve::make_shared<QrealAnimator>(0.5, 0, 0.5, 0.1, "radius");
     ca_addChild(mRadius);
 
@@ -64,7 +64,7 @@ stdsptr<RasterEffectCaller>
 }
 
 CustomIdentifier DabTest000::getIdentifier() const {
-    return { effectId(), effectName(), { 0, 0, 0 } };
+    return { effectId(), eName(), { 0, 0, 0 } };
 }
 
 bool DabTestCaller000::sInitialized = false;

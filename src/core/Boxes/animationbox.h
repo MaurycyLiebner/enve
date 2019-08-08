@@ -22,7 +22,7 @@ struct AnimationBoxRenderData : public ImageRenderData {
 class AnimationBox : public BoundingBox {
     e_OBJECT
 protected:
-    AnimationBox(const BoundingBoxType type);
+    AnimationBox(const eBoxType type);
 public:
     virtual void changeSourceFile(QWidget * const dialogParent) = 0;
     virtual void animationDataChanged();
