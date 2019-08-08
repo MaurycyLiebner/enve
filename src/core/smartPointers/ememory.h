@@ -23,6 +23,15 @@ namespace enve {
 
         return obj->template ref<T>();
     }
+
+    template <class T, class B>
+    inline auto shared(const B& obj) -> decltype(obj->template ref<T>()) {
+        static_assert(std::is_base_of<StdSelfRef, T>::value ||
+                      std::is_base_of<SelfRef, T>::value,
+                      "enve::shared can only be used with StdSelfRef and SelfRef derived classes");
+        if(obj) return obj->template ref<T>();
+        return nullptr;
+    }
 }
 
 #endif // EMEMORY_H

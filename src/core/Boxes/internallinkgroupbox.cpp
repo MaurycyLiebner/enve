@@ -117,10 +117,15 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
     }
     if(linkTarget) {
         prp_setName(linkTarget->prp_getName() + " link");
+        connect(linkTarget, &Property::prp_nameChanged,
+                this, &Property::prp_setName);
         mBoxTarget->setTarget(linkTarget);
         linkTarget->addLinkingBox(this);
         connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
-                this, &BoundingBox::prp_afterChangedRelRange);
+                this, [this, linkTarget](const FrameRange& targetAbs) {
+            const auto relRange = linkTarget->prp_absRangeToRelRange(targetAbs);
+            prp_afterChangedRelRange(relRange);
+        });
 
         const auto &boxesList = linkTarget->getContainedBoxes();
         for(const auto& child : boxesList) {

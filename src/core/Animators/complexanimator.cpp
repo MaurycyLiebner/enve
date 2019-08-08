@@ -127,10 +127,10 @@ int ComplexAnimator::getChildPropertyIndex(Property * const child) {
 
 void ComplexAnimator::ca_updateDescendatKeyFrame(Key* key) {
     for(const auto& ckey : anim_mKeys) {
-        const auto complexKey = ckey->ref<ComplexKey>();
+        const auto complexKey = static_cast<ComplexKey*>(ckey);
         if(complexKey->hasKey(key)) {
             complexKey->removeAnimatorKey(key);
-            if(complexKey->isEmpty()) anim_removeKey(complexKey);
+            if(complexKey->isEmpty()) anim_removeKey(complexKey->ref<ComplexKey>());
             ca_addDescendantsKey(key);
             break;
         }
@@ -339,8 +339,7 @@ void ComplexAnimator::ca_removeDescendantsKey(Key * const key) {
     const auto collection = anim_getKeyAtRelFrame<ComplexKey>(key->getRelFrame());
     if(!collection) return;
     collection->removeAnimatorKey(key);
-    if(collection->isEmpty())
-        anim_removeKey(collection->ref<ComplexKey>());
+    if(collection->isEmpty()) anim_removeKey(collection->ref<ComplexKey>());
 }
 
 ComplexKey::ComplexKey(const int absFrame,

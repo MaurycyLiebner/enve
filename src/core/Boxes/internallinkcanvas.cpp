@@ -13,7 +13,7 @@ void InternalLinkCanvas::setupRenderData(
     InternalLinkGroupBox::setupRenderData(relFrame, data);
 
     ContainerBox* finalTarget = getFinalTarget();
-    auto canvasData = data->ref<LinkCanvasRenderData>();
+    auto canvasData = static_cast<LinkCanvasRenderData*>(data);
     const auto canvasTarget = static_cast<Canvas*>(finalTarget);
     canvasData->fBgColor = toSkColor(canvasTarget->getBgColorAnimator()->
             getColor(relFrame));

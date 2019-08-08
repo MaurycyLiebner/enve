@@ -562,8 +562,8 @@ bool parsePolylineDataFast(const QString &dataStr,
 }
 
 qsptr<ContainerBox> loadBoxesGroup(const QDomElement &groupElement,
-                           ContainerBox *parentGroup,
-                           const BoxSvgAttributes &attributes) {
+                                   ContainerBox *parentGroup,
+                                   const BoxSvgAttributes &attributes) {
     const QDomNodeList allRootChildNodes = groupElement.childNodes();
     qsptr<ContainerBox> boxesGroup;
     const bool hasTransform = attributes.hasTransform();

@@ -315,7 +315,7 @@ void Canvas::setOutputRendering(const bool bT) {
 
 void Canvas::setCurrentPreviewContainer(const int relFrame) {
     auto cont = mCacheHandler.atFrame(relFrame);
-    setCurrentPreviewContainer(cont->ref<ImageCacheContainer>());
+    setCurrentPreviewContainer(enve::shared<ImageCacheContainer>(cont));
 }
 
 void Canvas::setCurrentPreviewContainer(const stdsptr<ImageCacheContainer>& cont) {

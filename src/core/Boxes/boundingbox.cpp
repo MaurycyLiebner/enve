@@ -110,7 +110,7 @@ BoundingBox *BoundingBox::sGetBoxByDocumentId(const int documentId) {
 void BoundingBox::prp_afterChangedAbsRange(const FrameRange &range) {
     const auto visRange = getVisibleAbsFrameRange();
     const auto croppedRange = visRange*range;
-    Property::prp_afterChangedAbsRange(croppedRange);
+    Animator::prp_afterChangedAbsRange(croppedRange);
     if(croppedRange.inRange(anim_getCurrentAbsFrame())) {
         planScheduleUpdate(Animator::USER_CHANGE);
     }
@@ -486,8 +486,7 @@ bool BoundingBox::hasCurrentRenderData(const qreal relFrame) const {
 stdsptr<BoxRenderData> BoundingBox::getCurrentRenderData(const qreal relFrame) const {
     const auto currentRenderData =
             mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
-    if(currentRenderData)
-        return currentRenderData->ref<BoxRenderData>();
+    if(currentRenderData) return currentRenderData->ref<BoxRenderData>();
     if(mDrawRenderContainer.isExpired()) return nullptr;
     const auto drawData = mDrawRenderContainer.getSrcRenderData();
     if(!drawData) return nullptr;
@@ -964,7 +963,7 @@ void BoundingBox::updateAfterDurationRectangleShifted(const int dFrame) {
     prp_afterFrameShiftChanged();
     const auto newRange = getVisibleAbsFrameRange();
     const auto oldRange = newRange.shifted(-dFrame);
-    Property::prp_afterChangedAbsRange(newRange + oldRange);
+    Animator::prp_afterChangedAbsRange(newRange + oldRange);
     const int absFrame = anim_getCurrentAbsFrame();
     anim_setAbsFrame(absFrame);
 }
@@ -976,7 +975,7 @@ void BoundingBox::updateAfterDurationMinFrameChangedBy(const int by) {
 
     const int min = qMin(newMin, oldMin);
     const int max = qMax(newMin, oldMin);
-    Property::prp_afterChangedAbsRange({min, max});
+    Animator::prp_afterChangedAbsRange({min, max});
 }
 
 void BoundingBox::updateAfterDurationMaxFrameChangedBy(const int by) {
@@ -986,7 +985,7 @@ void BoundingBox::updateAfterDurationMaxFrameChangedBy(const int by) {
 
     const int min = qMin(newMax, oldMax);
     const int max = qMax(newMax, oldMax);
-    Property::prp_afterChangedAbsRange({min, max});
+    Animator::prp_afterChangedAbsRange({min, max});
 }
 
 void BoundingBox::updateAfterDurationRectangleRangeChanged() {}

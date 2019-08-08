@@ -9,10 +9,9 @@ PaintBox::PaintBox() : BoundingBox(TYPE_PAINT) {
     ca_addChild(mSurface);
 }
 
-void PaintBox::setupRenderData(
-        const qreal relFrame, BoxRenderData * const data) {
+void PaintBox::setupRenderData(const qreal relFrame, BoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
-    auto paintData = data->ref<PaintBoxRenderData>();
+    auto paintData = static_cast<PaintBoxRenderData*>(data);
     paintData->fSurface = enve::shared(mSurface->getSurface(qFloor(relFrame)));
 }
 
