@@ -58,20 +58,22 @@ void iniIfCustomPathEffect(const QString& path) {
 void EffectsLoader::iniCustomPathEffects() {
     QDir(EnveSettings::sSettingsDir()).mkdir("PathEffects");
     const QString dirPath = EnveSettings::sSettingsDir() + "/PathEffects";
-//    QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
-//    while(dirIt.hasNext()) {
-//        iniIfCustomPathEffect(dirIt.next());
-//    }
+    QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
+    while(dirIt.hasNext()) iniIfCustomPathEffect(dirIt.next());
+
     const auto newFileWatcher = QSharedPointer<QFileSystemModel>(
                 new QFileSystemModel);
     newFileWatcher->setRootPath(dirPath);
-    connect(newFileWatcher.get(), &QFileSystemModel::rowsInserted, this,
-    [newFileWatcher](const QModelIndex &parent, int first, int last) {
-        for(int row = first; row <= last; row++) {
-            const auto rowIndex = newFileWatcher->index(row, 0, parent);
-            const QString path = newFileWatcher->filePath(rowIndex);
-            iniIfCustomPathEffect(path);
-        }
+    connect(newFileWatcher.get(), &QFileSystemModel::directoryLoaded,
+            this, [this, newFileWatcher]() {
+        connect(newFileWatcher.get(), &QFileSystemModel::rowsInserted, this,
+        [newFileWatcher](const QModelIndex &parent, int first, int last) {
+            for(int row = first; row <= last; row++) {
+                const auto rowIndex = newFileWatcher->index(row, 0, parent);
+                const QString path = newFileWatcher->filePath(rowIndex);
+                iniIfCustomPathEffect(path);
+            }
+        });
     });
 }
 
@@ -99,20 +101,21 @@ void EffectsLoader::iniIfCustomRasterEffect(const QString& gpu) {
 void EffectsLoader::iniCustomRasterEffects() {
     QDir(EnveSettings::sSettingsDir()).mkdir("RasterEffects");
     const QString dirPath = EnveSettings::sSettingsDir() + "/RasterEffects";
-//    QDirIterator dirIt(dirGpu, QDirIterator::NoIteratorFlags);
-//    while(dirIt.hasNext()) {
-//        iniIfCustomRasterEffect(dirIt.next());
-//    }
-    const auto newFileWatcher = QSharedPointer<QFileSystemModel>(
-                new QFileSystemModel);
+    QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
+    while(dirIt.hasNext()) iniIfCustomRasterEffect(dirIt.next());
+
+    const auto newFileWatcher = QSharedPointer<QFileSystemModel>(new QFileSystemModel);
     newFileWatcher->setRootPath(dirPath);
-    connect(newFileWatcher.get(), &QFileSystemModel::rowsInserted, this,
-    [this, newFileWatcher](const QModelIndex &parent, int first, int last) {
-        for(int row = first; row <= last; row++) {
-            const auto rowIndex = newFileWatcher->index(row, 0, parent);
-            const QString path = newFileWatcher->filePath(rowIndex);
-            iniIfCustomRasterEffect(path);
-        }
+    connect(newFileWatcher.get(), &QFileSystemModel::directoryLoaded,
+            this, [this, newFileWatcher]() {
+        connect(newFileWatcher.get(), &QFileSystemModel::rowsInserted, this,
+        [this, newFileWatcher](const QModelIndex &parent, int first, int last) {
+            for(int row = first; row <= last; row++) {
+                const auto rowIndex = newFileWatcher->index(row, 0, parent);
+                const QString path = newFileWatcher->filePath(rowIndex);
+                iniIfCustomRasterEffect(path);
+            }
+        });
     });
 }
 
