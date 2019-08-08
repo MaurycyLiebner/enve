@@ -56,10 +56,11 @@ int main(int argc, char *argv[]) {
     AudioHandler audioHandler;
     audioHandler.initializeAudio();
 
-    const auto videoEncoder = enve::make_shared<VideoEncoder>();
-    RenderHandler renderHandler(document, audioHandler, *videoEncoder);
-
     MemoryHandler memoryHandler;
+
+    const auto videoEncoder = enve::make_shared<VideoEncoder>();
+    RenderHandler renderHandler(document, audioHandler,
+                                *videoEncoder, memoryHandler);
 
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;

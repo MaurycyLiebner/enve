@@ -12,7 +12,8 @@ RenderHandler* RenderHandler::sInstance = nullptr;
 
 RenderHandler::RenderHandler(Document &document,
                              AudioHandler& audioHandler,
-                             VideoEncoder& videoEncoder) :
+                             VideoEncoder& videoEncoder,
+                             MemoryHandler& memoryHandler) :
     mDocument(document),
     mAudioHandler(audioHandler),
     mVideoEncoder(videoEncoder) {
@@ -21,7 +22,7 @@ RenderHandler::RenderHandler(Document &document,
 
     connect(this, &RenderHandler::queTasksAndUpdate,
             &mDocument, &Document::actionFinished);
-    connect(MemoryHandler::sInstance, &MemoryHandler::allMemoryUsed,
+    connect(&memoryHandler, &MemoryHandler::allMemoryUsed,
             this, &RenderHandler::outOfMemory);
 
     mPreviewFPSTimer = new QTimer(this);

@@ -9,13 +9,15 @@ class RenderInstanceSettings;
 class SoundComposition;
 class Document;
 class VideoEncoder;
+class MemoryHandler;
 
 class RenderHandler : public QObject {
     Q_OBJECT
 public:
     RenderHandler(Document &document,
                   AudioHandler &audioHandler,
-                  VideoEncoder &videoEncoder);
+                  VideoEncoder &videoEncoder,
+                  MemoryHandler &memoryHandler);
 
     void interruptPreview();
     void outOfMemory();
