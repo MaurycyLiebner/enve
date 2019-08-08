@@ -56,6 +56,7 @@ void iniIfCustomPathEffect(const QString& path) {
 }
 
 void EffectsLoader::iniCustomPathEffects() {
+    QDir(EnveSettings::sSettingsDir()).mkdir("PathEffects");
     const QString dirPath = EnveSettings::sSettingsDir() + "/PathEffects";
 //    QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
 //    while(dirIt.hasNext()) {
@@ -96,6 +97,7 @@ void EffectsLoader::iniIfCustomRasterEffect(const QString& gpu) {
 }
 
 void EffectsLoader::iniCustomRasterEffects() {
+    QDir(EnveSettings::sSettingsDir()).mkdir("RasterEffects");
     const QString dirPath = EnveSettings::sSettingsDir() + "/RasterEffects";
 //    QDirIterator dirIt(dirGpu, QDirIterator::NoIteratorFlags);
 //    while(dirIt.hasNext()) {
@@ -128,6 +130,7 @@ void EffectsLoader::reloadProgram(ShaderEffectCreator* const loaded,
 }
 
 void EffectsLoader::iniRasterEffectPrograms() {
+    QDir(EnveSettings::sSettingsDir()).mkdir("ShaderEffects");
     const QString dirPath = EnveSettings::sSettingsDir() + "/ShaderEffects";
     QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
 

@@ -40,9 +40,6 @@
 #include "GUI/newcanvasdialog.h"
 #include "ShaderEffects/shadereffectprogram.h"
 #include "importhandler.h"
-extern "C" {
-    #include <libavformat/avformat.h>
-}
 
 MainWindow *MainWindow::sInstance = nullptr;
 
@@ -77,20 +74,18 @@ public:
     }
 };
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(Document& document,
+                       Actions& actions,
+                       AudioHandler& audioHandler,
+                       RenderHandler& renderHandler,
+                       QWidget * const parent)
     : QMainWindow(parent),
-      mMemoryHandler(new MemoryHandler(this)),
-      mVideoEncoder(enve::make_shared<VideoEncoder>()),
-      mDocument(mTaskScheduler),
-      mActions(mDocument),
-      mRenderHandler(mDocument, mAudioHandler) {
+      mDocument(document),
+      mActions(actions),
+      mAudioHandler(audioHandler),
+      mRenderHandler(renderHandler) {
     Q_ASSERT(!sInstance);
     sInstance = this;
-    FONT_HEIGHT = QApplication::fontMetrics().height();
-    MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
-    KEY_RECT_SIZE = MIN_WIDGET_DIM*3/5;
-    av_register_all();
-    mAudioHandler.initializeAudio();
 
     ImportHandler::sInstance->addImporter<evImporter>();
     ImportHandler::sInstance->addImporter<eSvgImporter>();
@@ -151,15 +146,6 @@ MainWindow::MainWindow(QWidget *parent)
     mBottomDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
     mBottomDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
-
-    mEffectsLoader = new EffectsLoader;
-    mEffectsLoader->initialize();
-    connect(mEffectsLoader, &EffectsLoader::programChanged, this,
-    [this](ShaderEffectProgram * program) {
-        for(const auto& scene : mDocument.fScenes)
-            scene->updateIfUsesProgram(program);
-        mDocument.actionFinished();
-    });
 
     mLayoutHandler = new LayoutHandler(mDocument, mAudioHandler);
     mBoxesListAnimationDockWidget =
@@ -987,7 +973,7 @@ bool MainWindow::isEnabled() {
 }
 
 void MainWindow::clearAll() {
-    mTaskScheduler.clearTasks();
+    TaskScheduler::sInstance->clearTasks();
     setFileChangedSinceSaving(false);
     mObjectSettingsWidget->setMainTarget(nullptr);
 

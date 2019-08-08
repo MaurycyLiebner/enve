@@ -139,8 +139,8 @@ public:
     void beforeProcessing(const Hardware);
     void afterProcessing();
 
-    void startNewEncoding(RenderInstanceSettings * const settings) {
-        if(!mCurrentlyEncoding) startEncoding(settings);
+    bool startNewEncoding(RenderInstanceSettings * const settings) {
+        return startEncoding(settings);
     }
 
     void interruptCurrentEncoding() {
@@ -157,11 +157,10 @@ public:
     void addContainer(const stdsptr<ImageCacheContainer> &cont);
     void addContainer(const stdsptr<Samples> &cont);
 
-    static VideoEncoder *mVideoEncoderInstance;
-    static VideoEncoderEmitter *getVideoEncoderEmitter();
+    static VideoEncoder *sInstance;
 
     static void sInterruptEncoding();
-    static void sStartEncoding(RenderInstanceSettings *settings);
+    static bool sStartEncoding(RenderInstanceSettings *settings);
     static void sAddCacheContainerToEncoder(const stdsptr<ImageCacheContainer> &cont);
     static void sAddCacheContainerToEncoder(const stdsptr<Samples> &cont);
     static void sFinishEncoding();
@@ -180,7 +179,7 @@ protected:
     void interrupEncoding();
     void finishEncodingSuccess();
     void finishEncodingNow();
-    void startEncoding(RenderInstanceSettings * const settings);
+    bool startEncoding(RenderInstanceSettings * const settings);
     void startEncodingNow();
 
     bool mEncodingSuccesfull = false;

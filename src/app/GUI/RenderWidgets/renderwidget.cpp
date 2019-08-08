@@ -60,7 +60,7 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
 
     mMainLayout->addWidget(mScrollArea);
 
-    VideoEncoderEmitter *vidEmitter = VideoEncoder::getVideoEncoderEmitter();
+    const auto vidEmitter = VideoEncoder::sInstance->getEmitter();
     connect(vidEmitter, &VideoEncoderEmitter::encodingStarted,
             this, &RenderWidget::leaveOnlyInterruptionButtonsEnabled);
 

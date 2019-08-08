@@ -11,9 +11,14 @@
 RenderHandler* RenderHandler::sInstance = nullptr;
 
 RenderHandler::RenderHandler(Document &document,
-                             AudioHandler& audioHandler) :
-    mDocument(document), mAudioHandler(audioHandler) {
+                             AudioHandler& audioHandler,
+                             VideoEncoder& videoEncoder) :
+    mDocument(document),
+    mAudioHandler(audioHandler),
+    mVideoEncoder(videoEncoder) {
+    Q_ASSERT(!sInstance);
     sInstance = this;
+
     connect(this, &RenderHandler::queTasksAndUpdate,
             &mDocument, &Document::actionFinished);
     connect(MemoryHandler::sInstance, &MemoryHandler::allMemoryUsed,
@@ -25,7 +30,7 @@ RenderHandler::RenderHandler(Document &document,
     connect(mPreviewFPSTimer, &QTimer::timeout,
             this, &RenderHandler::audioPushTimerExpired);
 
-    const auto vidEmitter = VideoEncoder::getVideoEncoderEmitter();
+    const auto vidEmitter = videoEncoder.getEmitter();
 //    connect(vidEmitter, &VideoEncoderEmitter::encodingStarted,
 //            this, &SceneWindow::leaveOnlyInterruptionButtonsEnabled);
     connect(vidEmitter, &VideoEncoderEmitter::encodingFinished,
@@ -39,14 +44,13 @@ RenderHandler::RenderHandler(Document &document,
 }
 
 void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) {
-    VideoEncoder::sStartEncoding(settings);
-    if(VideoEncoder::sEncodingSuccessfulyStarted()) {
+    if(VideoEncoder::sStartEncoding(settings)) {
+        setCurrentScene(settings->getTargetCanvas());
         mSavedCurrentFrame = mCurrentScene->getCurrentFrame();
         mSavedResolutionFraction = mCurrentScene->getResolutionFraction();
 
         mCurrentRenderSettings = settings;
         const RenderSettings &renderSettings = settings->getRenderSettings();
-        setCurrentScene(settings->getTargetCanvas());
         setFrameAction(renderSettings.fMinFrame);
 
         const qreal resolutionFraction = renderSettings.fResolution;
@@ -171,7 +175,7 @@ void RenderHandler::interruptPreviewRendering() {
 }
 
 void RenderHandler::interruptOutputRendering() {
-    mCurrentScene->setOutputRendering(false);
+    if(mCurrentScene) mCurrentScene->setOutputRendering(false);
     TaskScheduler::sClearAllFinishedFuncs();
     clearPreview();
     setFrameAction(mSavedCurrentFrame);

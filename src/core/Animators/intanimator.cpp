@@ -9,7 +9,9 @@ IntAnimator::IntAnimator(const int iniVal,
                          const int maxVal,
                          const int prefferdStep,
                          const QString &name) :
-    QrealAnimator(iniVal, minVal, maxVal, prefferdStep, name) {}
+    QrealAnimator(iniVal, minVal, maxVal, prefferdStep, name) {
+     setNumberDecimals(0);
+}
 
 int IntAnimator::getCurrentIntValue() const {
     return qRound(getCurrentBaseValue());

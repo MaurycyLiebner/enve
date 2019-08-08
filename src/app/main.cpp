@@ -5,6 +5,13 @@
 #include "hardwareinfo.h"
 #include "GUI/ewidgetsimpl.h"
 #include "importhandler.h"
+#include "effectsloader.h"
+#include "memoryhandler.h"
+#include "ShaderEffects/shadereffectprogram.h"
+#include "videoencoder.h"
+extern "C" {
+    #include <libavformat/avformat.h>
+}
 
 void setDefaultFormat() {
     QSurfaceFormat format;
@@ -29,10 +36,36 @@ int main(int argc, char *argv[]) {
     //#endif
 
     HardwareInfo::sUpdateInfo();
+
     eWidgetsImpl widImpl;
     ImportHandler importHandler;
+    TaskScheduler taskScheduler;
+    Document document(taskScheduler);
+    Actions actions(document);
 
-    MainWindow w;
+    EffectsLoader effectsLoader;
+    effectsLoader.initialize();
+    QObject::connect(&effectsLoader, &EffectsLoader::programChanged,
+    [&document](ShaderEffectProgram * program) {
+        for(const auto& scene : document.fScenes)
+            scene->updateIfUsesProgram(program);
+        document.actionFinished();
+    });
+
+    av_register_all();
+    AudioHandler audioHandler;
+    audioHandler.initializeAudio();
+
+    const auto videoEncoder = enve::make_shared<VideoEncoder>();
+    RenderHandler renderHandler(document, audioHandler, *videoEncoder);
+
+    MemoryHandler memoryHandler;
+
+    FONT_HEIGHT = QApplication::fontMetrics().height();
+    MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
+    KEY_RECT_SIZE = MIN_WIDGET_DIM*3/5;
+
+    MainWindow w(document, actions, audioHandler, renderHandler);
     w.show();
 
     try {

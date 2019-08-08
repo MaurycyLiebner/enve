@@ -60,7 +60,10 @@ const QString MENU_STYLESHEET =
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(Document &document, Actions &actions,
+               AudioHandler &audioHandler,
+               RenderHandler &renderHandler,
+               QWidget * const parent = nullptr);
     ~MainWindow();
 
 //    void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = nullptr;
@@ -162,7 +165,6 @@ private:
     };
     stdptr<Lock> mLock;
     static MainWindow *sInstance;
-    MemoryHandler *mMemoryHandler;
 
     void updateRecentMenu();
 
@@ -275,17 +277,13 @@ private:
     QMenu *mPanelsMenu;
     QMenu *mRenderMenu;
 
-    stdsptr<VideoEncoder> mVideoEncoder;
-
-    TaskScheduler mTaskScheduler;
     FilesHandler mFilesHandler;
-    Document mDocument;
-    Actions mActions;
-    AudioHandler mAudioHandler;
-    RenderHandler mRenderHandler;
+    Document& mDocument;
+    Actions& mActions;
+    AudioHandler& mAudioHandler;
+    RenderHandler& mRenderHandler;
 
     LayoutHandler *mLayoutHandler = nullptr;
-    EffectsLoader *mEffectsLoader;
     stdptr<UndoRedoStack> mCurrentUndoRedoStack;
 
     FillStrokeSettingsWidget *mFillStrokeSettings;

@@ -6,6 +6,8 @@ class AudioHandler : public QObject {
 public:
     AudioHandler();
 
+    static AudioHandler* sInstance;
+
     struct DataRequest {
         char* fData;
         int fSize;

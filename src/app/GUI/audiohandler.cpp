@@ -1,7 +1,11 @@
 #include "audiohandler.h"
 #include "Sound/soundcomposition.h"
+AudioHandler* AudioHandler::sInstance = nullptr;
 
-AudioHandler::AudioHandler() {}
+AudioHandler::AudioHandler() {
+    Q_ASSERT(!sInstance);
+    sInstance = this;
+}
 
 const int BufferSize = 32768;
 

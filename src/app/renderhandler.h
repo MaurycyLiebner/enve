@@ -8,12 +8,14 @@ class Canvas;
 class RenderInstanceSettings;
 class SoundComposition;
 class Document;
+class VideoEncoder;
 
 class RenderHandler : public QObject {
     Q_OBJECT
 public:
     RenderHandler(Document &document,
-                  AudioHandler &audioHandler);
+                  AudioHandler &audioHandler,
+                  VideoEncoder &videoEncoder);
 
     void interruptPreview();
     void outOfMemory();
@@ -58,6 +60,7 @@ private:
 
     // AUDIO
     AudioHandler& mAudioHandler;
+    VideoEncoder& mVideoEncoder;
     qptr<SoundComposition> mCurrentSoundComposition;
     // AUDIO
 

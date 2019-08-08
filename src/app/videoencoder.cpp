@@ -16,10 +16,11 @@
     } \
 }
 
-VideoEncoder *VideoEncoder::mVideoEncoderInstance = nullptr;
+VideoEncoder *VideoEncoder::sInstance = nullptr;
 
 VideoEncoder::VideoEncoder() {
-    mVideoEncoderInstance = this;
+    Q_ASSERT(!sInstance);
+    sInstance = this;
 }
 
 void VideoEncoder::addContainer(const stdsptr<ImageCacheContainer>& cont) {
@@ -509,8 +510,8 @@ void VideoEncoder::startEncodingNow() {
     if(whRet < 0) AV_RuntimeThrow(whRet, "Could not write header to " + mPathByteArray.data());
 }
 
-void VideoEncoder::startEncoding(RenderInstanceSettings * const settings) {
-    if(mCurrentlyEncoding) return;
+bool VideoEncoder::startEncoding(RenderInstanceSettings * const settings) {
+    if(mCurrentlyEncoding) return false;
     mRenderInstanceSettings = settings;
     mRenderInstanceSettings->renderingAboutToStart();
     mOutputSettings = mRenderInstanceSettings->getOutputRenderSettings();
@@ -527,11 +528,13 @@ void VideoEncoder::startEncoding(RenderInstanceSettings * const settings) {
         mRenderInstanceSettings->setCurrentState(
                     RenderInstanceSettings::RENDERING);
         mEmitter.encodingStarted();
+        return true;
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
         mRenderInstanceSettings->setCurrentState(
                     RenderInstanceSettings::ERROR, e.what());
         mEmitter.encodingStartFailed();
+        return false;
     }
 }
 
@@ -726,32 +729,28 @@ void VideoEncoder::afterProcessing() {
     else if(!mNextContainers.isEmpty()) scheduleTask();
 }
 
-VideoEncoderEmitter *VideoEncoder::getVideoEncoderEmitter() {
-    return mVideoEncoderInstance->getEmitter();
-}
-
 void VideoEncoder::sFinishEncoding() {
-    mVideoEncoderInstance->finishCurrentEncoding();
+    sInstance->finishCurrentEncoding();
 }
 
 bool VideoEncoder::sEncodingSuccessfulyStarted() {
-    return mVideoEncoderInstance->getCurrentlyEncoding();
+    return sInstance->getCurrentlyEncoding();
 }
 
 void VideoEncoder::sInterruptEncoding() {
-    mVideoEncoderInstance->interruptCurrentEncoding();
+    sInstance->interruptCurrentEncoding();
 }
 
-void VideoEncoder::sStartEncoding(RenderInstanceSettings *settings) {
-    mVideoEncoderInstance->startNewEncoding(settings);
+bool VideoEncoder::sStartEncoding(RenderInstanceSettings *settings) {
+    return sInstance->startNewEncoding(settings);
 }
 
 void VideoEncoder::sAddCacheContainerToEncoder(
         const stdsptr<ImageCacheContainer> &cont) {
-    mVideoEncoderInstance->addContainer(cont);
+    sInstance->addContainer(cont);
 }
 
 void VideoEncoder::sAddCacheContainerToEncoder(
         const stdsptr<Samples> &cont) {
-    mVideoEncoderInstance->addContainer(cont);
+    sInstance->addContainer(cont);
 }

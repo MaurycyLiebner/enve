@@ -40,7 +40,7 @@ ShaderEffectProgram ShaderEffectProgram::sCreateProgram(
     }
     program.fValueHandlers = values;
 
-    program.fGPosLoc = gl->glGetUniformLocation(program.fId, "_gPos");
+    program.fGPosLoc = gl->glGetUniformLocation(program.fId, "eGlobalPos");
     program.fTexLocation = gl->glGetUniformLocation(program.fId, "texture");
     if(program.fTexLocation < 0) {
         gl->glDeleteProgram(program.fId);
