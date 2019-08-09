@@ -360,7 +360,7 @@ void Canvas::addBoxToSelection(BoundingBox * const box) {
     //setCurrentFillStrokeSettingsFromBox(box);
     setCurrentBox(box);
 
-    if(mCurrentMode == PAINT_MODE) {
+    if(mCurrentMode == CanvasMode::paint) {
         if(box->SWT_isPaintBox()) mPaintTarget.setPaintBox(static_cast<PaintBox*>(box));
     }
     emit selectedPaintSettingsChanged();
@@ -371,7 +371,7 @@ void Canvas::removeBoxFromSelection(BoundingBox * const box) {
     mSelectedBoxes.removeObj(box);
     box->deselect();
     schedulePivotUpdate();
-    if(mCurrentMode == PAINT_MODE) updatePaintBox();
+    if(mCurrentMode == CanvasMode::paint) updatePaintBox();
     if(mSelectedBoxes.isEmpty()) {
         setCurrentBox(nullptr);
     } else {
@@ -393,7 +393,7 @@ void Canvas::clearBoxesSelection() {
 }
 
 void Canvas::clearBoxesSelectionList() {
-    if(mCurrentMode == PAINT_MODE) mPaintTarget.setPaintBox(nullptr);
+    if(mCurrentMode == CanvasMode::paint) mPaintTarget.setPaintBox(nullptr);
     mSelectedBoxes.clear();
     emit selectedPaintSettingsChanged();
 }
@@ -463,8 +463,8 @@ void Canvas::deselectAllBoxes() {
 MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
                                        const CanvasMode mode,
                                        const qreal invScale) {
-    if(mode == MOVE_POINT || mode == ADD_POINT ||
-       mode == ADD_POINT ||  mode == MOVE_BOX) {
+    if(mode == CanvasMode::pointTransform || mode == CanvasMode::pathCreate ||
+       mode == CanvasMode::pathCreate ||  mode == CanvasMode::boxTransform) {
         if(mRotPivot->isPointAtAbsPos(absPos, mode, invScale)) {
             return mRotPivot.get();
         }

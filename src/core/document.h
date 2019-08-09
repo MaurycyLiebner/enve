@@ -14,7 +14,7 @@
 class Gradient;
 class FileDataCacheHandler;
 class Canvas;
-enum CanvasMode : short;
+enum class CanvasMode : short;
 
 class Document : public SingleWidgetTarget {
     Q_OBJECT

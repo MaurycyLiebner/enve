@@ -2,7 +2,7 @@
 #define CIRCLE_H
 #include "MovablePoints/animatedpoint.h"
 
-enum CanvasMode : short;
+enum class CanvasMode : short;
 
 class CircleRadiusPoint : public AnimatedPoint {
     e_OBJECT

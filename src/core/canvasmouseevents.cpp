@@ -19,7 +19,7 @@ void Canvas::newPaintBox(const QPointF &pos) {
 void Canvas::mousePressEvent(const MouseEvent &e) {
     if(isPreviewingOrRendering()) return;
     if(e.fMouseGrabbing && e.fButton == Qt::LeftButton) return;
-    if(mCurrentMode == PAINT_MODE) {
+    if(mCurrentMode == CanvasMode::paint) {
         if(mStylusDrawing) return;
         if(e.fButton == Qt::LeftButton) {
             if(!mPaintTarget.isValid())
@@ -50,7 +50,7 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
         return;
     }
 
-    if(mCurrentMode == PAINT_MODE && leftPressed)  {
+    if(mCurrentMode == CanvasMode::paint && leftPressed)  {
         mPaintTarget.paintMove(e.fPos, e.fTimestamp, 1,
                                0, 0, mDocument.fBrush);
         return;
@@ -60,34 +60,34 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
             return;
         }
         if(mFirstMouseMove && leftPressed) {
-            if((mCurrentMode == CanvasMode::MOVE_POINT &&
+            if((mCurrentMode == CanvasMode::pointTransform &&
                 !mPressedPoint && !mCurrentNormalSegment.isValid()) ||
-               (mCurrentMode == CanvasMode::MOVE_BOX &&
+               (mCurrentMode == CanvasMode::boxTransform &&
                 !mPressedBox && !mPressedPoint)) {
                 startSelectionAtPoint(e.fPos);
             }
         }
         if(mSelecting) {
             moveSecondSelectionPoint(e.fPos);
-        } else if(mCurrentMode == CanvasMode::MOVE_POINT ||
-                  mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
+        } else if(mCurrentMode == CanvasMode::pointTransform ||
+                  mCurrentMode == CanvasMode::particleBoxCreate) {
             handleMovePointMouseMove(e);
-        } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
+        } else if(mCurrentMode == CanvasMode::boxTransform) {
             if(mPressedPoint) {
                 handleMovePointMouseMove(e);
             } else {
                 handleMovePathMouseMove(e);
             }
-        } else if(mCurrentMode == CanvasMode::ADD_POINT) {
+        } else if(mCurrentMode == CanvasMode::pathCreate) {
             handleAddSmartPointMouseMove(e);
-        } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
+        } else if(mCurrentMode == CanvasMode::circleCreate) {
             if(e.shiftMod()) {
                 const qreal lenR = pointToLen(e.fPos - e.fLastPressPos);
                 mCurrentCircle->moveRadiusesByAbs({lenR, lenR});
             } else {
                 mCurrentCircle->moveRadiusesByAbs(e.fPos - e.fLastPressPos);
             }
-        } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
+        } else if(mCurrentMode == CanvasMode::rectCreate) {
             if(e.shiftMod()) {
                 const QPointF trans = e.fPos - e.fLastPressPos;
                 const qreal valF = qMax(trans.x(), trans.y());
@@ -107,7 +107,7 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
     if(isPreviewingOrRendering()) return;
     if(e.fButton != Qt::LeftButton) return;
     schedulePivotUpdate();
-    if(mCurrentMode == PAINT_MODE) return;
+    if(mCurrentMode == CanvasMode::paint) return;
     if(mValueInput.inputEnabled()) mFirstMouseMove = false;
 
     handleLeftMouseRelease(e);
@@ -132,21 +132,21 @@ void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
         if(boxAt->SWT_isContainerBox()) {
             setCurrentBoxesGroup(static_cast<ContainerBox*>(boxAt));
             updateHovered(e);
-        } else if((mCurrentMode == MOVE_BOX ||
-                   mCurrentMode == MOVE_POINT) &&
+        } else if((mCurrentMode == CanvasMode::boxTransform ||
+                   mCurrentMode == CanvasMode::pointTransform) &&
                   boxAt->SWT_isTextBox()) {
             e.fReleaseMouse();
             static_cast<TextBox*>(boxAt)->openTextEditor(e.fWidget);
-        } else if(mCurrentMode == MOVE_BOX &&
+        } else if(mCurrentMode == CanvasMode::boxTransform &&
                   boxAt->SWT_isSmartVectorPath()) {
-            emit requestCanvasMode(MOVE_POINT);
+            emit requestCanvasMode(CanvasMode::pointTransform);
         }
     }
 }
 
 void Canvas::tabletEvent(const QTabletEvent * const e,
                          const QPointF &pos) {
-    if(mCurrentMode != PAINT_MODE) return;
+    if(mCurrentMode != CanvasMode::paint) return;
     const auto type = e->type();
     if(type == QEvent::TabletRelease ||
        e->buttons() & Qt::MiddleButton) {

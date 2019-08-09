@@ -7,9 +7,8 @@ class QPainter;
 class SkCanvas;
 class QKeyEvent;
 
-enum TransformMode : char {
-    MODE_MOVE, MODE_SCALE, MODE_ROTATE, MODE_NONE
-};
+enum class TransformMode { move, scale, rotate, none };
+enum class DirectionMode { x, y, xy };
 
 class ValueInput {
 public:
@@ -20,14 +19,14 @@ public:
 
     qreal getValue() const { return mInputValue; }
     QPointF getPtValue() const {
-        if(mTransMode == MODE_ROTATE ||
-               mXYMode == MODE_XY)
+        if(mTransMode == TransformMode::rotate ||
+               mXYMode == DirectionMode::xy)
             return {mInputValue, mInputValue};
-        if(mTransMode == MODE_SCALE) {
-            if(mXYMode == MODE_X) return {mInputValue, 1};
+        if(mTransMode == TransformMode::scale) {
+            if(mXYMode == DirectionMode::x) return {mInputValue, 1};
             else return {1, mInputValue};
         } else { //if(mTransMode == MODE_MOVE) {
-            if(mXYMode == MODE_X) return {mInputValue, 0};
+            if(mXYMode == DirectionMode::x) return {mInputValue, 0};
             else return {0, mInputValue};
         }
     }
@@ -39,48 +38,48 @@ public:
     bool inputEnabled() const { return mInputEnabled; }
 
     void setupRotate() {
-        mTransMode = MODE_ROTATE;
+        mTransMode = TransformMode::rotate;
         setDisplayedValue(0);
     }
 
     void setupScale() {
-        mTransMode = MODE_SCALE;
+        mTransMode = TransformMode::scale;
         setDisplayedValue(1);
     }
 
     void setupMove() {
-        mTransMode = MODE_MOVE;
+        mTransMode = TransformMode::move;
         setDisplayedValue(0);
     }
 
     void setXOnlyMode() {
-        mXYMode = MODE_X;
+        mXYMode = DirectionMode::x;
     }
 
     void setYOnlyMode() {
-        mXYMode = MODE_Y;
+        mXYMode = DirectionMode::y;
     }
 
     void setXYMode() {
-        mXYMode = MODE_XY;
+        mXYMode = DirectionMode::xy;
     }
 
     void switchXOnlyMode() {
-        if(mXYMode == MODE_X) setXYMode();
+        if(mXYMode == DirectionMode::x) setXYMode();
         else setXOnlyMode();
     }
 
     void switchYOnlyMode() {
-        if(mXYMode == MODE_Y) setXYMode();
+        if(mXYMode == DirectionMode::y) setXYMode();
         else setYOnlyMode();
     }
 
     bool xOnlyMode() const {
-        return mXYMode == MODE_X;
+        return mXYMode == DirectionMode::x;
     }
 
     bool yOnlyMode() const {
-        return mXYMode == MODE_Y;
+        return mXYMode == DirectionMode::y;
     }
 
     void setDisplayedValue(const qreal value) {
@@ -101,7 +100,7 @@ protected:
         QString transStr;
         if(mInputEnabled) {
             transStr = getNameWithXY() + ": " + mInputText + "|";
-        } else if(mTransMode == MODE_ROTATE) {
+        } else if(mTransMode == TransformMode::rotate) {
             const auto xVal = QLocale().toString(mDisplayValue.x(), 'f', 3);
             transStr = getName() + ": " + xVal;
         } else if(xOnlyMode()) {
@@ -119,9 +118,9 @@ protected:
     }
 
     QString getName() const {
-        if(mTransMode == MODE_MOVE) {
+        if(mTransMode == TransformMode::move) {
             return "move";
-        } else if(mTransMode == MODE_SCALE) {
+        } else if(mTransMode == TransformMode::scale) {
             return "scale";
         } else { // if(mTransMode == MODE_ROTATE) {
             return "rotate";
@@ -130,21 +129,21 @@ protected:
 
     QString getNameWithXY() const {
         if(mForce1D) return getName();
-        if(mTransMode == MODE_MOVE) {
-            if(mXYMode == MODE_XY) return "move x, y";
-            else if(mXYMode == MODE_X) return "move x";
+        if(mTransMode == TransformMode::move) {
+            if(mXYMode == DirectionMode::xy) return "move x, y";
+            else if(mXYMode == DirectionMode::x) return "move x";
             else /*if(mXYMode == MODE_Y)*/ return "move y";
-        } else if(mTransMode == MODE_SCALE) {
-            if(mXYMode == MODE_XY) return "scale x, y";
-            else if(mXYMode == MODE_X) return "scale x";
+        } else if(mTransMode == TransformMode::scale) {
+            if(mXYMode == DirectionMode::xy) return "scale x, y";
+            else if(mXYMode == DirectionMode::x) return "scale x";
             else /*if(mXYMode == MODE_Y)*/ return "scale y";
         } else { // if(mTransMode == MODE_ROTATE) {
             return "rotate";
         }
     }
 
-    TransformMode mTransMode = MODE_MOVE;
-    enum { MODE_X, MODE_Y, MODE_XY } mXYMode = MODE_XY;
+    TransformMode mTransMode = TransformMode::move;
+    DirectionMode mXYMode = DirectionMode::xy;
     QString mInputText;
     qreal mInputValue = 0;
     QPointF mDisplayValue;

@@ -580,7 +580,7 @@ private:
     void rotateSelected(const MouseEvent &e);
     qreal mLastDRot = 0;
     int mRotHalfCycles = 0;
-    TransformMode mTransMode = MODE_NONE;
+    TransformMode mTransMode = TransformMode::none;
 protected:
     Document& mDocument;
     bool mSmoothChange = false;
@@ -659,7 +659,7 @@ protected:
 //    bool mMoving = false;
 
     QRectF mSelectionRect;
-    CanvasMode mCurrentMode = MOVE_BOX;
+    CanvasMode mCurrentMode = CanvasMode::boxTransform;
 
     void handleMovePointMousePressEvent(const MouseEvent& e);
     void handleMovePointMouseMove(const MouseEvent& e);

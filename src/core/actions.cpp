@@ -349,43 +349,43 @@ void Actions::importFile(const QString &path,
 }
 
 void Actions::setMovePathMode() {
-    mDocument.setCanvasMode(MOVE_BOX);
+    mDocument.setCanvasMode(CanvasMode::boxTransform);
 }
 
 void Actions::setMovePointMode() {
-    mDocument.setCanvasMode(MOVE_POINT);
+    mDocument.setCanvasMode(CanvasMode::pointTransform);
 }
 
 void Actions::setAddPointMode() {
-    mDocument.setCanvasMode(ADD_POINT);
+    mDocument.setCanvasMode(CanvasMode::pathCreate);
 }
 
 void Actions::setRectangleMode() {
-    mDocument.setCanvasMode(ADD_RECTANGLE);
+    mDocument.setCanvasMode(CanvasMode::rectCreate);
 }
 
 void Actions::setPickPaintSettingsMode() {
-    mDocument.setCanvasMode(PICK_PAINT_SETTINGS);
+    mDocument.setCanvasMode(CanvasMode::pickFillStroke);
 }
 
 void Actions::setCircleMode() {
-    mDocument.setCanvasMode(ADD_CIRCLE);
+    mDocument.setCanvasMode(CanvasMode::circleCreate);
 }
 
 void Actions::setTextMode() {
-    mDocument.setCanvasMode(ADD_TEXT);
+    mDocument.setCanvasMode(CanvasMode::textCreate);
 }
 
 void Actions::setParticleBoxMode() {
-    mDocument.setCanvasMode(ADD_PARTICLE_BOX);
+    mDocument.setCanvasMode(CanvasMode::particleBoxCreate);
 }
 
 void Actions::setParticleEmitterMode() {
-    mDocument.setCanvasMode(ADD_PARTICLE_EMITTER);
+    mDocument.setCanvasMode(CanvasMode::particleEmitterCreate);
 }
 
 void Actions::setPaintMode() {
-    mDocument.setCanvasMode(PAINT_MODE);
+    mDocument.setCanvasMode(CanvasMode::paint);
 }
 
 void Actions::afterAction() const {

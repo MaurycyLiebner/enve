@@ -9,7 +9,7 @@ class NodePoint;
 class ContainerBox;
 class PathAnimator;
 
-enum CanvasMode : short;
+enum class CanvasMode : short;
 
 class SmartVectorPathEdge;
 

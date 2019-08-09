@@ -14,7 +14,7 @@ public:
     void drawCanvasControls(SkCanvas * const canvas,
                             const CanvasMode mode,
                             const float invScale) {
-        if(mode != CanvasMode::MOVE_POINT) return;
+        if(mode != CanvasMode::pointTransform) return;
         const auto trans = getTransformAnimator();
         if(!trans) return;
         const auto begin = mPathBeingChanged_d->begin();

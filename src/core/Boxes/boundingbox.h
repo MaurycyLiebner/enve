@@ -30,7 +30,7 @@ class DurationRectangle;
 struct ContainerBoxRenderData;
 class ShaderEffect;
 class RasterEffect;
-enum CanvasMode : short;
+enum class CanvasMode : short;
 
 class SimpleBrushWrapper;
 

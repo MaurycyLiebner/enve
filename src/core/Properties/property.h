@@ -14,17 +14,17 @@ class PropertyUpdater;
 class UndoRedoStack;
 class BasicTransformAnimator;
 class BoxTransformAnimator;
-enum CanvasMode : short {
-    MOVE_BOX,
-    MOVE_POINT,
-    ADD_POINT,
-    PICK_PAINT_SETTINGS,
-    ADD_CIRCLE,
-    ADD_RECTANGLE,
-    ADD_TEXT,
-    ADD_PARTICLE_BOX,
-    ADD_PARTICLE_EMITTER,
-    PAINT_MODE
+enum class CanvasMode : short {
+    boxTransform,
+    pointTransform,
+    pathCreate,
+    paint,
+    pickFillStroke,
+    circleCreate,
+    rectCreate,
+    textCreate,
+    particleBoxCreate,
+    particleEmitterCreate
 };
 
 class eDraggedObjects {

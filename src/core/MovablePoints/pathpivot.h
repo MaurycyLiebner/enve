@@ -5,7 +5,7 @@
 
 class Canvas;
 
-enum CanvasMode : short;
+enum class CanvasMode : short;
 
 class PathPivot : public NonAnimatedMovablePoint {
     e_OBJECT

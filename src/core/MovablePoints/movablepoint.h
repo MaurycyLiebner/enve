@@ -9,7 +9,7 @@
 class BoundingBox;
 class NodePoint;
 class BasicTransformAnimator;
-enum CanvasMode : short;
+enum class CanvasMode : short;
 class PropertyUpdater;
 
 enum MovablePointType : short {

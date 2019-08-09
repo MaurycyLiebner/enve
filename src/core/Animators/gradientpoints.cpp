@@ -39,7 +39,7 @@ void GradientPoints::disable() {
 void GradientPoints::drawCanvasControls(SkCanvas * const canvas,
                                         const CanvasMode mode,
                                         const float invScale) {
-    if(mode != CanvasMode::MOVE_POINT) return;
+    if(mode != CanvasMode::pointTransform) return;
     if(mEnabled) {
         const SkPoint startPos = toSkPoint(mStartPoint->getAbsolutePos());
         const SkPoint endPos = toSkPoint(mEndPoint->getAbsolutePos());

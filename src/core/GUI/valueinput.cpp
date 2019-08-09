@@ -46,7 +46,7 @@ void ValueInput::draw(QPainter *p, const int y) {
 }
 
 void ValueInput::clearAndDisableInput() {
-    mXYMode = MODE_XY;
+    mXYMode = DirectionMode::xy;
     mInputEnabled = false;
     mInputText = "";
 }

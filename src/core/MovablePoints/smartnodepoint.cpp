@@ -129,13 +129,13 @@ void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {
 MovablePoint *SmartNodePoint::getPointAtAbsPos(const QPointF &absPos,
                                                const CanvasMode mode,
                                                const qreal invScale) {
-    if(mode == CanvasMode::MOVE_POINT) {
+    if(mode == CanvasMode::pointTransform) {
         if(mC0Pt->isPointAtAbsPos(absPos, mode, invScale)) {
             return mC0Pt.get();
         } else if(mC2Pt->isPointAtAbsPos(absPos, mode, invScale)) {
             return mC2Pt.get();
         }
-    } else if(!isEndPoint() || mode != CanvasMode::ADD_POINT) {
+    } else if(!isEndPoint() || mode != CanvasMode::pathCreate) {
         return nullptr;
     }
     return MovablePoint::getPointAtAbsPos(absPos, mode, invScale);
@@ -235,28 +235,28 @@ void SmartNodePoint::drawSk(
                     SkColorSetRGB(170, 240, 255);
         drawOnAbsPosSk(canvas, skAbsPos, invScale, fillCol, keyOnCurrent);
 
-        if((mode == CanvasMode::MOVE_POINT && isNextNormalSelected()) ||
-           (mode == CanvasMode::ADD_POINT && isSelected())) {
+        if((mode == CanvasMode::pointTransform && isNextNormalSelected()) ||
+           (mode == CanvasMode::pathCreate && isSelected())) {
             SkPaint paint;
             paint.setAntiAlias(true);
             if(mC2Pt->isVisible(mode)) {
                 drawCtrlPtLine(canvas, mC2Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
                 mC2Pt->drawSk(canvas, mode, invScale, keyOnCurrent);
-            } else if(mode == CanvasMode::ADD_POINT) {
+            } else if(mode == CanvasMode::pathCreate) {
                 drawCtrlPtLine(canvas, mC2Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
             }
         }
-        if((mode == CanvasMode::MOVE_POINT && isPrevNormalSelected()) ||
-           (mode == CanvasMode::ADD_POINT && isSelected())) {
+        if((mode == CanvasMode::pointTransform && isPrevNormalSelected()) ||
+           (mode == CanvasMode::pathCreate && isSelected())) {
             SkPaint paint;
             paint.setAntiAlias(true);
             if(mC0Pt->isVisible(mode)) {
                 drawCtrlPtLine(canvas, mC0Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
                 mC0Pt->drawSk(canvas, mode, invScale, keyOnCurrent);
-            } else if(mode == CanvasMode::ADD_POINT) {
+            } else if(mode == CanvasMode::pathCreate) {
                 drawCtrlPtLine(canvas, mC0Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
             }

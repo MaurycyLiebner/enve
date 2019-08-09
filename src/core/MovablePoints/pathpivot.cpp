@@ -53,7 +53,7 @@ void PathPivot::drawTransforming(SkCanvas * const canvas,
 
 bool PathPivot::isVisible(const CanvasMode mode) const {
     if(mCanvas->getPivotLocal()) return false;
-    if(mode == MOVE_POINT) return !mCanvas->isPointSelectionEmpty();
-    else if(mode == MOVE_BOX) return !mCanvas->isBoxSelectionEmpty();
+    if(mode == CanvasMode::pointTransform) return !mCanvas->isPointSelectionEmpty();
+    else if(mode == CanvasMode::boxTransform) return !mCanvas->isBoxSelectionEmpty();
     return false;
 }

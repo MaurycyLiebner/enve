@@ -3,7 +3,7 @@
 #include "movablepoint.h"
 #include "../smartPointers/stdselfref.h"
 class BoxTransformAnimator;
-enum CanvasMode : short;
+enum class CanvasMode : short;
 
 class PointsHandler : public StdSelfRef {
     e_OBJECT

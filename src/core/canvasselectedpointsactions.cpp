@@ -199,7 +199,7 @@ void Canvas::clearPointsSelection() {
     }
 
     mSelectedPoints_d.clear();
-    if(mCurrentMode == MOVE_POINT) schedulePivotUpdate();
+    if(mCurrentMode == CanvasMode::pointTransform) schedulePivotUpdate();
 //    if(mLastPressedPoint) {
 //        mLastPressedPoint->deselect();
 //        mLastPressedPoint = nullptr;

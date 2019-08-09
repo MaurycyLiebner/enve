@@ -98,7 +98,7 @@ void MovablePoint::drawSk(SkCanvas * const canvas, const CanvasMode mode,
 }
 
 bool MovablePoint::isVisible(const CanvasMode mode) const {
-    return mode == CanvasMode::MOVE_POINT;
+    return mode == CanvasMode::pointTransform;
 }
 
 BasicTransformAnimator *MovablePoint::getTransform() {

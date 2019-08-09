@@ -715,7 +715,7 @@ void MainWindow::setupToolBar() {
 
     addToolBar(mToolBar);
 
-    mDocument.setCanvasMode(CanvasMode::MOVE_BOX);
+    mDocument.setCanvasMode(CanvasMode::boxTransform);
 }
 
 void MainWindow::connectToolBarActions() {
@@ -767,16 +767,16 @@ MainWindow *MainWindow::sGetInstance() {
 
 void MainWindow::updateCanvasModeButtonsChecked() {
     const CanvasMode currentMode = mDocument.fCanvasMode;
-    mMovePathMode->setChecked(currentMode == MOVE_BOX);
-    mMovePointMode->setChecked(currentMode == MOVE_POINT);
-    mAddPointMode->setChecked(currentMode == ADD_POINT);
-    mPickPaintSettingsMode->setChecked(currentMode == PICK_PAINT_SETTINGS);
-    mCircleMode->setChecked(currentMode == ADD_CIRCLE);
-    mRectangleMode->setChecked(currentMode == ADD_RECTANGLE);
-    mTextMode->setChecked(currentMode == ADD_TEXT);
-    mParticleBoxMode->setChecked(currentMode == ADD_PARTICLE_BOX);
-    mParticleEmitterMode->setChecked(currentMode == ADD_PARTICLE_EMITTER);
-    mPaintMode->setChecked(currentMode == PAINT_MODE);
+    mMovePathMode->setChecked(currentMode == CanvasMode::boxTransform);
+    mMovePointMode->setChecked(currentMode == CanvasMode::pointTransform);
+    mAddPointMode->setChecked(currentMode == CanvasMode::pathCreate);
+    mPickPaintSettingsMode->setChecked(currentMode == CanvasMode::pickFillStroke);
+    mCircleMode->setChecked(currentMode == CanvasMode::circleCreate);
+    mRectangleMode->setChecked(currentMode == CanvasMode::rectCreate);
+    mTextMode->setChecked(currentMode == CanvasMode::textCreate);
+    mParticleBoxMode->setChecked(currentMode == CanvasMode::particleBoxCreate);
+    mParticleEmitterMode->setChecked(currentMode == CanvasMode::particleEmitterCreate);
+    mPaintMode->setChecked(currentMode == CanvasMode::paint);
 }
 
 //void MainWindow::stopPreview() {
@@ -880,25 +880,25 @@ void MainWindow::newFile() {
 
 bool handleCanvasModeKeyPress(Document& document, const int key) {
     if(key == Qt::Key_F1) {
-        document.setCanvasMode(CanvasMode::MOVE_BOX);
+        document.setCanvasMode(CanvasMode::boxTransform);
     } else if(key == Qt::Key_F2) {
-        document.setCanvasMode(CanvasMode::MOVE_POINT);
+        document.setCanvasMode(CanvasMode::pointTransform);
     } else if(key == Qt::Key_F3) {
-        document.setCanvasMode(CanvasMode::ADD_POINT);
+        document.setCanvasMode(CanvasMode::pathCreate);
     }  else if(key == Qt::Key_F4) {
-        document.setCanvasMode(CanvasMode::PAINT_MODE);
+        document.setCanvasMode(CanvasMode::paint);
     } else if(key == Qt::Key_F5) {
-        document.setCanvasMode(CanvasMode::PICK_PAINT_SETTINGS);
+        document.setCanvasMode(CanvasMode::pickFillStroke);
     } else if(key == Qt::Key_F6) {
-        document.setCanvasMode(CanvasMode::ADD_CIRCLE);
+        document.setCanvasMode(CanvasMode::circleCreate);
     } else if(key == Qt::Key_F7) {
-        document.setCanvasMode(CanvasMode::ADD_RECTANGLE);
+        document.setCanvasMode(CanvasMode::rectCreate);
     } else if(key == Qt::Key_F8) {
-        document.setCanvasMode(CanvasMode::ADD_TEXT);
+        document.setCanvasMode(CanvasMode::textCreate);
     } else if(key == Qt::Key_F9) {
-        document.setCanvasMode(CanvasMode::ADD_PARTICLE_BOX);
+        document.setCanvasMode(CanvasMode::particleBoxCreate);
     } else if(key == Qt::Key_F10) {
-        document.setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
+        document.setCanvasMode(CanvasMode::particleEmitterCreate);
     } else return false;
     KeyFocusTarget::KFT_sSetRandomTarget();
     return true;

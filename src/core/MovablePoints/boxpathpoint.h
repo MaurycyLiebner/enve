@@ -14,7 +14,7 @@ public:
     void finishTransform();
 
     bool isVisible(const CanvasMode mode) const {
-        return mode == MOVE_BOX;
+        return mode == CanvasMode::boxTransform;
     }
 
     void drawSk(SkCanvas * const canvas,

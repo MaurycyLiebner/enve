@@ -11,7 +11,7 @@
 class Brush;
 class WindowSingleWidgetTarget;
 enum class ColorMode : short;
-enum CanvasMode : short;
+enum class CanvasMode : short;
 class Gradient;
 class BoundingBox;
 class ContainerBox;

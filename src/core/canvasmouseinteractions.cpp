@@ -232,19 +232,19 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     if(mRotPivot->isPointAtAbsPos(e.fPos, mCurrentMode, invScale)) {
         return mRotPivot->select();
     }
-    if(mCurrentMode == CanvasMode::MOVE_BOX) {
+    if(mCurrentMode == CanvasMode::boxTransform) {
         if(mHoveredPoint_d) {
             handleMovePointMousePressEvent(e);
         } else {
             handleMovePathMousePressEvent(e);
         }
-    } else if(mCurrentMode == CanvasMode::ADD_POINT) {
+    } else if(mCurrentMode == CanvasMode::pathCreate) {
         handleAddSmartPointMousePress(e);
-    } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
+    } else if(mCurrentMode == CanvasMode::pointTransform) {
         handleMovePointMousePressEvent(e);
-    } else if(mCurrentMode == CanvasMode::PICK_PAINT_SETTINGS) {
+    } else if(mCurrentMode == CanvasMode::pickFillStroke) {
         mPressedBox = getBoxAtFromAllDescendents(e.fPos);
-    } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
+    } else if(mCurrentMode == CanvasMode::circleCreate) {
         const auto newPath = enve::make_shared<Circle>();
         newPath->planCenterPivotPosition();
         mCurrentContainer->addContainedBox(newPath);
@@ -254,7 +254,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
 
         mCurrentCircle = newPath.get();
 
-    } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
+    } else if(mCurrentMode == CanvasMode::rectCreate) {
         const auto newPath = enve::make_shared<Rectangle>();
         newPath->planCenterPivotPosition();
         mCurrentContainer->addContainedBox(newPath);
@@ -263,7 +263,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
         addBoxToSelection(newPath.get());
 
         mCurrentRectangle = newPath.get();
-    } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
+    } else if(mCurrentMode == CanvasMode::textCreate) {
         const auto newPath = enve::make_shared<TextBox>();
         newPath->planCenterPivotPosition();
         newPath->setSelectedFontFamilyAndStyle(mDocument.fFontFamily,
@@ -276,7 +276,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
 
         clearBoxesSelection();
         addBoxToSelection(newPath.get());
-    } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
+    } else if(mCurrentMode == CanvasMode::particleBoxCreate) {
         //setCanvasMode(CanvasMode::MOVE_POINT);
         const auto partBox = enve::make_shared<ParticleBox>();
         mCurrentContainer->addContainedBox(partBox);
@@ -285,7 +285,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
         addBoxToSelection(partBox.get());
 
         mPressedPoint = partBox->getBottomRightPoint();
-    } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_EMITTER) {
+    } else if(mCurrentMode == CanvasMode::particleEmitterCreate) {
         for(const auto& box : mSelectedBoxes) {
             if(box->SWT_isParticleBox()) {
                 if(box->absPointInsidePath(e.fPos)) {
@@ -299,33 +299,33 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
 }
 
 void Canvas::cancelCurrentTransform() {
-    if(mCurrentMode == CanvasMode::MOVE_POINT) {
+    if(mCurrentMode == CanvasMode::pointTransform) {
         if(mCurrentNormalSegment.isValid()) {
             mCurrentNormalSegment.cancelPassThroughTransform();
         } else {
             cancelSelectedPointsTransform();
         }
-    } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
+    } else if(mCurrentMode == CanvasMode::boxTransform) {
         if(mRotPivot->isSelected()) {
             mRotPivot->cancelTransform();
         } else {
             cancelSelectedBoxesTransform();
         }
-    } else if(mCurrentMode == CanvasMode::ADD_POINT) {
+    } else if(mCurrentMode == CanvasMode::pathCreate) {
 
-    } else if(mCurrentMode == PICK_PAINT_SETTINGS) {
+    } else if(mCurrentMode == CanvasMode::pickFillStroke) {
         //mCanvasWindow->setCanvasMode(MOVE_PATH);
     }
     mValueInput.clearAndDisableInput();
-    mTransMode = MODE_NONE;
+    mTransMode = TransformMode::none;
 }
 
 void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
     if(mRotPivot->isSelected()) {
         mRotPivot->deselect();
-    } else if(mTransMode == MODE_ROTATE || mTransMode == MODE_SCALE) {
+    } else if(mTransMode == TransformMode::rotate || mTransMode == TransformMode::scale) {
         finishSelectedPointsTransform();
-        mTransMode = MODE_NONE;
+        mTransMode = TransformMode::none;
     } else if(mSelecting) {
         mSelecting = false;
         if(!e.shiftMod()) clearPointsSelection();
@@ -388,7 +388,7 @@ void Canvas::handleMovePathMouseRelease(const MouseEvent &e) {
     if(mRotPivot->isSelected()) {
         if(!mFirstMouseMove) mRotPivot->finishTransform();
         mRotPivot->deselect();
-    } else if(mTransMode == MODE_ROTATE || mTransMode == MODE_SCALE) {
+    } else if(mTransMode == TransformMode::rotate || mTransMode == TransformMode::scale) {
         finishSelectedBoxesTransform();
     } else if(mFirstMouseMove) {
         mSelecting = false;
@@ -420,22 +420,22 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
         return;
     }
     if(mDoubleClick) return;
-    if(mCurrentMode == CanvasMode::MOVE_POINT ||
-       mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
+    if(mCurrentMode == CanvasMode::pointTransform ||
+       mCurrentMode == CanvasMode::particleBoxCreate) {
         handleMovePointMouseRelease(e);
-        if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
-            emit requestCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
+        if(mCurrentMode == CanvasMode::particleBoxCreate) {
+            emit requestCanvasMode(CanvasMode::particleEmitterCreate);
         }
-    } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
+    } else if(mCurrentMode == CanvasMode::boxTransform) {
         if(!mPressedPoint) {
             handleMovePathMouseRelease(e);
         } else {
             handleMovePointMouseRelease(e);
             clearPointsSelection();
         }
-    } else if(mCurrentMode == CanvasMode::ADD_POINT) {
+    } else if(mCurrentMode == CanvasMode::pathCreate) {
         handleAddSmartPointMouseRelease(e);
-    } else if(mCurrentMode == PICK_PAINT_SETTINGS) {
+    } else if(mCurrentMode == CanvasMode::pickFillStroke) {
         if(mPressedBox) {
             const auto srcPathBox = static_cast<PathBox*>(mPressedBox.data());
             for(const auto& box : mSelectedBoxes) {
@@ -466,13 +466,13 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
             }
         }
         //mCanvasWindow->setCanvasMode(MOVE_PATH);
-    } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
+    } else if(mCurrentMode == CanvasMode::textCreate) {
         if(mCurrentTextBox) {
             mCurrentTextBox->openTextEditor(e.fWidget);
         }
     }
     mValueInput.clearAndDisableInput();
-    mTransMode = MODE_NONE;
+    mTransMode = TransformMode::none;
 }
 
 QPointF Canvas::getMoveByValueForEvent(const MouseEvent &e) {
@@ -493,9 +493,9 @@ void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
     if(mRotPivot->isSelected()) {
         if(mFirstMouseMove) mRotPivot->startTransform();
         mRotPivot->moveByAbs(getMoveByValueForEvent(e));
-    } else if(mTransMode == MODE_SCALE) {
+    } else if(mTransMode == TransformMode::scale) {
         scaleSelected(e);
-    } else if(mTransMode == MODE_ROTATE) {
+    } else if(mTransMode == TransformMode::rotate) {
         rotateSelected(e);
     } else if(mCurrentNormalSegment.isValid()) {
         if(mFirstMouseMove) mCurrentNormalSegment.startPassThroughTransform();
@@ -594,7 +594,7 @@ void Canvas::scaleSelected(const MouseEvent& e) {
         scaleY = scaleBy;
     }
 
-    if(mCurrentMode == CanvasMode::MOVE_BOX) {
+    if(mCurrentMode == CanvasMode::boxTransform) {
         scaleSelectedBy(scaleX, scaleY, absPos, mFirstMouseMove);
     } else {
         scaleSelectedPointsBy(scaleX, scaleY, absPos, mFirstMouseMove);
@@ -625,7 +625,7 @@ void Canvas::rotateSelected(const MouseEvent& e) {
         rot = d_rot + mRotHalfCycles*180;
     }
 
-    if(mCurrentMode == CanvasMode::MOVE_BOX) {
+    if(mCurrentMode == CanvasMode::boxTransform) {
         rotateSelectedBy(rot, absPos, mFirstMouseMove);
     } else {
         rotateSelectedPointsBy(rot, absPos, mFirstMouseMove);
@@ -640,9 +640,9 @@ void Canvas::handleMovePathMouseMove(const MouseEvent& e) {
     if(mRotPivot->isSelected()) {
         if(mFirstMouseMove) mRotPivot->startTransform();
         mRotPivot->moveByAbs(getMoveByValueForEvent(e));
-    } else if(mTransMode == MODE_SCALE) {
+    } else if(mTransMode == TransformMode::scale) {
         scaleSelected(e);
-    } else if(mTransMode == MODE_ROTATE) {
+    } else if(mTransMode == TransformMode::rotate) {
         rotateSelected(e);
     } else {
         if(mPressedBox) {
@@ -658,15 +658,15 @@ void Canvas::handleMovePathMouseMove(const MouseEvent& e) {
 void Canvas::updateTransformation(const KeyEvent &e) {
     if(mSelecting) {
         moveSecondSelectionPoint(e.fPos);
-    } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
+    } else if(mCurrentMode == CanvasMode::pointTransform) {
         handleMovePointMouseMove(e);
-    } else if(mCurrentMode == CanvasMode::MOVE_BOX) {
+    } else if(mCurrentMode == CanvasMode::boxTransform) {
         if(!mPressedPoint) {
             handleMovePathMouseMove(e);
         } else {
             handleMovePointMouseMove(e);
         }
-    } else if(mCurrentMode == CanvasMode::ADD_POINT) {
+    } else if(mCurrentMode == CanvasMode::pathCreate) {
         handleAddSmartPointMouseMove(e);
     }
 }

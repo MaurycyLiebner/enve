@@ -93,20 +93,20 @@ void CanvasWindow::updatePaintModeCursor() {
 }
 
 void CanvasWindow::setCanvasMode(const CanvasMode mode) {
-    if(mode == MOVE_BOX) {
+    if(mode == CanvasMode::boxTransform) {
         setCursor(QCursor(Qt::ArrowCursor) );
-    } else if(mode == MOVE_POINT) {
+    } else if(mode == CanvasMode::pointTransform) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-node.xpm"), 0, 0) );
-    } else if(mode == PICK_PAINT_SETTINGS) {
+    } else if(mode == CanvasMode::pickFillStroke) {
         setCursor(QCursor(QPixmap(":/cursors/cursor_color_picker.png"), 2, 20) );
-    } else if(mode == ADD_CIRCLE) {
+    } else if(mode == CanvasMode::circleCreate) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-ellipse.xpm"), 4, 4) );
-    } else if(mode == ADD_RECTANGLE ||
-              mode == ADD_PARTICLE_BOX) {
+    } else if(mode == CanvasMode::rectCreate ||
+              mode == CanvasMode::particleBoxCreate) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-rect.xpm"), 4, 4) );
-    } else if(mode == ADD_TEXT) {
+    } else if(mode == CanvasMode::textCreate) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-text.xpm"), 4, 4) );
-    } else if(mode == PAINT_MODE) {
+    } else if(mode == CanvasMode::paint) {
         updatePaintModeCursor();
     } else {
         setCursor(QCursor(QPixmap(":/cursors/cursor-pen.xpm"), 4, 4) );
@@ -156,7 +156,7 @@ void CanvasWindow::renderSk(SkCanvas * const canvas) {
 
 void CanvasWindow::tabletEvent(QTabletEvent *e) {
     if(!mCurrentCanvas) return;
-    if(mDocument.fCanvasMode != PAINT_MODE) return;
+    if(mDocument.fCanvasMode != CanvasMode::paint) return;
     const QPoint globalPos = mapToGlobal(QPoint(0, 0));
     const qreal x = e->hiResGlobalX() - globalPos.x();
     const qreal y = e->hiResGlobalY() - globalPos.y();
@@ -180,7 +180,7 @@ void CanvasWindow::mousePressEvent(QMouseEvent *event) {
     mPrevMousePos = pos;
     if(event->button() == Qt::LeftButton) {
         mPrevPressPos = pos;
-        if(mDocument.fCanvasMode == PAINT_MODE && !mValidPaintTarget)
+        if(mDocument.fCanvasMode == CanvasMode::paint && !mValidPaintTarget)
             updatePaintModeCursor();
     }
 }
@@ -211,7 +211,7 @@ void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
                            [this]() { grabMouse(); },
                            this));
 
-    if(mDocument.fCanvasMode == PAINT_MODE) update();
+    if(mDocument.fCanvasMode == CanvasMode::paint) update();
     else queTasksAndUpdate();
     mPrevMousePos = pos;
 }
@@ -374,13 +374,13 @@ bool CanvasWindow::handleSelectAllKeyPress(QKeyEvent* event) {
     if(event->key() == Qt::Key_A && !isMouseGrabber()) {
         bool altPressed = event->modifiers() & Qt::AltModifier;
         auto currentMode = mDocument.fCanvasMode;
-        if(currentMode == MOVE_BOX) {
+        if(currentMode == CanvasMode::boxTransform) {
             if(altPressed) {
                mCurrentCanvas->deselectAllBoxesAction();
            } else {
                mCurrentCanvas->selectAllBoxesAction();
            }
-        } else if(currentMode == MOVE_POINT) {
+        } else if(currentMode == CanvasMode::pointTransform) {
             if(altPressed) {
                 mCurrentCanvas->clearPointsSelection();
             } else {

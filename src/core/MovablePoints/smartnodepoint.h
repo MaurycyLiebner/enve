@@ -10,7 +10,7 @@ class SkCanvas;
 class SmartCtrlPoint;
 class SmartPathAnimator;
 
-enum CanvasMode : short;
+enum class CanvasMode : short;
 enum CtrlsMode : short;
 
 class SmartNodePoint : public NonAnimatedMovablePoint {
@@ -35,8 +35,8 @@ public:
     void canvasContextMenu(PointTypeMenu * const menu);
 
     bool isVisible(const CanvasMode mode) const {
-        if(mode == CanvasMode::MOVE_POINT) return true;
-        else if(mode == CanvasMode::ADD_POINT)
+        if(mode == CanvasMode::pointTransform) return true;
+        else if(mode == CanvasMode::pathCreate)
             return isEndPoint() || isSelected();
         return false;
     }
