@@ -61,8 +61,10 @@ TimelineWidget::TimelineWidget(Document &document,
     mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     mCornerMenuBar->setStyleSheet("QMenuBar::item { padding: 1px 0px; }");
 
+    const auto iconsDir = EnveSettings::sIconsDir();
+
     QMenu * const settingsMenu = mCornerMenuBar->addMenu(
-                QIcon(":/icons/settings_dots.png"), "Settings");
+                QIcon(iconsDir + "/settings_dots.png"), "Settings");
     QMenu * const objectsMenu = settingsMenu->addMenu("State");
     objectsMenu->addAction("All", this,
                            &TimelineWidget::setRuleNone);
@@ -97,7 +99,7 @@ TimelineWidget::TimelineWidget(Document &document,
 
     //QMenu *viewMenu = mBoxesListMenuBar->addMenu("View");
     mGraphAct = mCornerMenuBar->addAction("Graph");
-    mGraphAct->setIcon(QIcon(":/icons/graphDisabled.png"));
+    mGraphAct->setIcon(QIcon(iconsDir + "/graphDisabled.png"));
     mGraphAct->setCheckable(true);
     connect(mGraphAct, &QAction::toggled,
             this, &TimelineWidget::setGraphEnabled);
@@ -266,8 +268,9 @@ void TimelineWidget::setCurrentScene(Canvas * const scene) {
 void TimelineWidget::setGraphEnabled(const bool enabled) {
     mKeysView->setGraphViewed(enabled);
     mAnimationDockWidget->setVisible(enabled);
-    if(enabled) mGraphAct->setIcon(QIcon(":/icons/graphEnabled.png"));
-    else mGraphAct->setIcon(QIcon(":/icons/graphDisabled.png"));
+    const auto iconsDir = EnveSettings::sIconsDir();
+    if(enabled) mGraphAct->setIcon(QIcon(iconsDir + "/graphEnabled.png"));
+    else mGraphAct->setIcon(QIcon(iconsDir + "/graphDisabled.png"));
 }
 
 void TimelineWidget::moveSlider(int val) {

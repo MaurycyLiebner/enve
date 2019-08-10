@@ -3,7 +3,6 @@
 #include "qrealpoint.h"
 #include "qrealkey.h"
 #include "randomqrealgenerator.h"
-#include "fakecomplexanimator.h"
 
 QrealAnimator::QrealAnimator(const qreal iniVal,
                              const qreal minVal,
@@ -164,18 +163,7 @@ qreal QrealAnimator::getBaseValueAtAbsFrame(const qreal frame) const {
 
 void QrealAnimator::setGenerator(const qsptr<RandomQrealGenerator>& generator) {
     if(generator == mRandomGenerator.data()) return;
-    if(!generator) {
-        mFakeComplexAnimator->ca_removeChild(mRandomGenerator);
-        disableFakeComplexAnimatrIfNotNeeded();
-    } else {
-        if(mRandomGenerator.isNull()) {
-            enableFakeComplexAnimator();
-        } else {
-            mFakeComplexAnimator->ca_removeChild(mRandomGenerator);
-        }
 
-        mFakeComplexAnimator->ca_addChild(generator);
-    }
     if(!generator) {
         mRandomGenerator.reset();
     } else {

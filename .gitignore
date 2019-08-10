@@ -18,3 +18,5 @@ third_party/*
 
 *.creator.user*
 *.pro.user*
+
+*qmake*

@@ -4,6 +4,7 @@
 #include "GUI/global.h"
 #include "keysview.h"
 #include "actionbutton.h"
+#include "settings.h"
 
 AnimationDockWidget::AnimationDockWidget(QWidget *parent,
                                          KeysView *keysView) :
@@ -12,74 +13,34 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
 
     setIconSize(QSize(qRound(1.25*MIN_WIDGET_DIM),
                       qRound(1.25*MIN_WIDGET_DIM)));
-    mLineButton = new ActionButton(
-                ":/icons/node_line.png",
-                "MAKE SEGMENT LINE", this);
+
+    const QString iconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+
+    mLineButton = new ActionButton(iconsDir + "/segmentLine.png",
+                                   "MAKE SEGMENT LINE", this);
     connect(mLineButton, &ActionButton::pressed,
             keysView, &KeysView::graphMakeSegmentsLinearAction);
 
-    mCurveButton = new ActionButton(
-                ":/icons/node_curve.png",
-                "MAKE SEGMENT CURVE", this);
+    mCurveButton = new ActionButton(iconsDir + "/segmentCurve.png",
+                                    "MAKE SEGMENT CURVE", this);
     connect(mCurveButton, &ActionButton::pressed,
             keysView, qOverload<>(&KeysView::graphMakeSegmentsSmoothAction));
 
-    mSymmetricButton = new ActionButton(
-                ":/icons/node_symmetric.png",
-                "", this);
+    mSymmetricButton = new ActionButton(iconsDir + "/nodeSymmetric.png", "", this);
     connect(mSymmetricButton, &ActionButton::pressed,
             keysView, &KeysView::graphSetSymmetricCtrlAction);
 
-    mSmoothButton = new ActionButton(
-                ":/icons/node_smooth.png",
-                "", this);
+    mSmoothButton = new ActionButton(iconsDir + "/nodeSmooth.png", "", this);
     connect(mSmoothButton, &ActionButton::pressed,
             keysView, &KeysView::graphSetSmoothCtrlAction);
 
-    mCornerButton = new ActionButton(
-                ":/icons/node_cusp.png",
-                "", this);
+    mCornerButton = new ActionButton(iconsDir + "/nodeCorner.png", "", this);
     connect(mCornerButton, &ActionButton::pressed,
             keysView, &KeysView::graphSetCornerCtrlAction);
 
-    mFitToHeightButton = new ActionButton(
-                ":/icons/zoom.png",
-                "", this);
+    mFitToHeightButton = new ActionButton(iconsDir + "/zoom.png", "", this);
     connect(mFitToHeightButton, &ActionButton::pressed,
             keysView, &KeysView::graphResetValueScaleAndMinShownAction);
-
-//    mTwoSideCtrlButton = new ActionButton(
-//                ":/icons/two_side_ctrl_white.png",
-//                "", this);
-// //    mTwoSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
-// //                                     QSizePolicy::Maximum);
-//    connect(mTwoSideCtrlButton, &ActionButton::pressed,
-//            keysView, &KeysView::graphSetTwoSideCtrlForSelected()) );
-
-//    mLeftSideCtrlButton = new ActionButton(
-//                ":/icons/left_side_ctrl_white.png",
-//                "", this);
-// //    mLeftSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
-// //                                       QSizePolicy::Maximum);
-//    connect(mLeftSideCtrlButton, &ActionButton::pressed,
-//            keysView, &KeysView::graphSetLeftSideCtrlForSelected()) );
-
-//    mRightSideCtrlButton = new ActionButton(
-//                ":/icons/right_side_ctrl_white.png",
-//                "", this);
-// //    mRightSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
-// //                                        QSizePolicy::Maximum);
-//    connect(mRightSideCtrlButton, &ActionButton::pressed,
-//            keysView, &KeysView::graphSetRightSideCtrlForSelected()) );
-
-//    mNoSideCtrlButton = new ActionButton(
-//                ":/icons/no_side_ctrl_white.png",
-//                "", this);
-// //    mNoSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
-// //                                     QSizePolicy::Maximum);
-//    connect(mNoSideCtrlButton, &ActionButton::pressed,
-//            keysView, &KeysView::graphSetNoSideCtrlForSelected()) );
-
 
     addWidget(mLineButton);
     addWidget(mCurveButton);

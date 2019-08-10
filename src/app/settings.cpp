@@ -17,3 +17,8 @@ long EnveSettings::sRamBytesCap() {
 const QString &EnveSettings::sSettingsDir() {
     return sSettings.fUserSettingsDir;
 }
+
+#include "GUI/global.h"
+QString EnveSettings::sIconsDir() {
+    return sSettingsDir() + "/icons/" + QString::number(MIN_WIDGET_DIM);
+}

@@ -72,6 +72,7 @@ SOURCES += main.cpp\
     effectsloader.cpp \
     evfileio.cpp \
     hardwareinfo.cpp \
+    iconloader.cpp \
     renderhandler.cpp \
     settings.cpp \
     svgimporter.cpp \
@@ -163,6 +164,7 @@ HEADERS  += \
     GUI/ColorWidgets/glwidget.h \
     effectsloader.h \
     hardwareinfo.h \
+    iconloader.h \
     renderhandler.h \
     settings.h \
     svgimporter.h \
@@ -227,76 +229,19 @@ HEADERS  += \
     GUI/BrushWidgets/brushwidget.h \
     boxtypemenu.h
 
-RESOURCES += \
-    resources.qrc
+RESOURCES += resources.qrc
 
-DISTFILES += \
-    stylesheet.qss \
-    pixmaps/crosshair_closed.png \
-    pixmaps/cursor_add.png \
-    pixmaps/cursor_arrow.png \
-    pixmaps/cursor_arrow_forbidden.png \
-    pixmaps/cursor_crosshair_open.png \
-    pixmaps/cursor_crosshair_precise_open.png \
-    pixmaps/cursor_forbidden_everywhere.png \
-    pixmaps/cursor_hand_closed.png \
-    pixmaps/cursor_hand_open.png \
-    pixmaps/cursor_move_n_s.png \
-    pixmaps/cursor_move_ne_sw.png \
-    pixmaps/cursor_move_nw_se.png \
-    pixmaps/cursor_move_w_e.png \
-    pixmaps/cursor_pencil.png \
-    pixmaps/cursor_remove.png \
-    pixmaps/layer_duplicate.png \
-    pixmaps/layers.png \
-    pixmaps/plus.png \
-    project/base_screen.png \
-    pixmaps/icons/tango_icons.svg \
-    project/base_screen.svg \
-    pixmaps/cursor-3dbox.xpm \
-    pixmaps/cursor-adj-a.xpm \
-    pixmaps/cursor-adj-h.xpm \
-    pixmaps/cursor-adj-l.xpm \
-    pixmaps/cursor-adj-s.xpm \
-    pixmaps/cursor-arc.xpm \
-    pixmaps/cursor-arrow.xpm \
-    pixmaps/cursor-attract.xpm \
-    pixmaps/cursor-calligraphy.xpm \
-    pixmaps/cursor-color.xpm \
-    pixmaps/cursor-connector.xpm \
-    pixmaps/cursor-crosshairs.xpm \
-    pixmaps/cursor-dropper-f.xpm \
-    pixmaps/cursor-dropper-s.xpm \
-    pixmaps/cursor-eraser.xpm \
-    pixmaps/cursor-gradient-add.xpm \
-    pixmaps/cursor-gradient.xpm \
-    pixmaps/cursor-measure.xpm \
-    pixmaps/cursor-node-d.xpm \
-    pixmaps/cursor-node-m.xpm \
-    pixmaps/cursor-paintbucket.xpm \
-    pixmaps/cursor-pencil.xpm \
-    pixmaps/cursor-push.xpm \
-    pixmaps/cursor-repel.xpm \
-    pixmaps/cursor-roughen.xpm \
-    pixmaps/cursor-select-d.xpm \
-    pixmaps/cursor-select-m.xpm \
-    pixmaps/cursor-spiral.xpm \
-    pixmaps/cursor-spray-move.xpm \
-    pixmaps/cursor-spray.xpm \
-    pixmaps/cursor-star.xpm \
-    pixmaps/cursor-text-insert.xpm \
-    pixmaps/cursor-thicken.xpm \
-    pixmaps/cursor-thin.xpm \
-    pixmaps/cursor-tweak-less.xpm \
-    pixmaps/cursor-tweak-more.xpm \
-    pixmaps/cursor-tweak-move-in.xpm \
-    pixmaps/cursor-tweak-move-jitter.xpm \
-    pixmaps/cursor-tweak-move-out.xpm \
-    pixmaps/cursor-tweak-move.xpm \
-    pixmaps/cursor-tweak-rotate-clockwise.xpm \
-    pixmaps/cursor-tweak-rotate-counterclockwise.xpm \
-    pixmaps/cursor-tweak-scale-down.xpm \
-    pixmaps/cursor-tweak-scale-up.xpm \
-    pixmaps/cursor-zoom-out.xpm \
-    pixmaps/cursor-zoom.xpm \
-    pixmaps/handles.xpm
+toolbarButtonsBg.files = $$files(icons/toolbarButtons/*)
+RESOURCES += toolbarButtonsBg
+
+toolbarButtonsPlain.files = $$files(icons/toolbarButtons/plain/*)
+RESOURCES += toolbarButtonsPlain
+
+toolbarButtonsCheckable.files = $$files(icons/toolbarButtons/checkable/*)
+RESOURCES += toolbarButtonsCheckable
+
+noInterpolation.files = $$files(icons/noInterpolation/*)
+RESOURCES += noInterpolation
+
+plain.files = $$files(icons/*)
+RESOURCES += plain

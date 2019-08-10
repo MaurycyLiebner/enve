@@ -55,7 +55,7 @@ QComboBox:disabled {
 QComboBox::drop-down {
     margin: -1 -1 -1 -1;
     background-color: rgb(50, 50, 50);
-    width: 15px;
+    width: 1em;
 
     border: 1px solid black;
     border-left-width: 1px;
@@ -148,14 +148,6 @@ QComboBox QScrollBar {
     background-color: rgb(170, 170, 170);
 }
 
-QComboBox::down-arrow {
-    image: url(:/icons/down-arrow.png);
-}
-/*        QComboBox:editable {
-            padding: 0px 5px 0px 5px;
-            border-top-left-radius: 0px;
-            border-bottom-left-radius: 0px;
-        }*/
 QComboBox:focus {
     color: black;
     background-color: rgb(255, 255, 255);
@@ -265,7 +257,6 @@ QPushButton#dialogButton {
 QPushButton#iconButton {
     background: transparent;
     border: 0;
-    min-width: 0px;
 }
 
 QPushButton#addCanvasButton {
@@ -433,13 +424,11 @@ QComboBox QScrollBar {
 QScrollBar::sub-line {
     border: 0;
     background-color: transparent;
-    image: url(:/icons/up-arrow.png);
 }
 
 QScrollBar::add-line {
     border: 0;
     background-color: transparent;
-    image: url(:/icons/down-arrow.png);
 }
 
 QScrollBar::add-line:hover, QScrollBar::sub-line:hover {

@@ -22,8 +22,7 @@ void Canvas::mousePressEvent(const MouseEvent &e) {
     if(mCurrentMode == CanvasMode::paint) {
         if(mStylusDrawing) return;
         if(e.fButton == Qt::LeftButton) {
-            if(!mPaintTarget.isValid())
-                newPaintBox(e.fPos);
+            if(!mPaintTarget.isValid()) newPaintBox(e.fPos);
             mPaintTarget.paintPress(e.fPos, e.fTimestamp, 0.5,
                                     0, 0, mDocument.fBrush);
         }
@@ -155,8 +154,7 @@ void Canvas::tabletEvent(const QTabletEvent * const e,
         if(e->button() == Qt::RightButton) return;
         if(e->button() == Qt::LeftButton) {
             mStylusDrawing = true;
-            if(!mPaintTarget.isValid())
-                newPaintBox(pos);
+            if(!mPaintTarget.isValid()) newPaintBox(pos);
             mPaintTarget.paintPress(pos, e->timestamp(), e->pressure(),
                                     e->xTilt(), e->yTilt(),
                                     mDocument.fBrush);

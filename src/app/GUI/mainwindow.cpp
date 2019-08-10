@@ -47,10 +47,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     processKeyEvent(event);
 }
 
-int FONT_HEIGHT;
-int MIN_WIDGET_DIM;
-int KEY_RECT_SIZE;
-
 class evImporter : public eImporter {
 public:
     bool supports(const QFileInfo& fileInfo) const {
@@ -102,6 +98,14 @@ MainWindow::MainWindow(Document& document,
     connect(&mDocument, &Document::currentBoxChanged,
             this, &MainWindow::setCurrentBox);
 
+    const auto iconDir = EnveSettings::sIconsDir();
+    const auto downArr = iconDir + "/down-arrow.png";
+    const auto upArr = iconDir + "/up-arrow.png";
+    const QString iconSS =
+            "QComboBox::down-arrow { image: url(" + downArr + "); }" +
+            "QScrollBar::sub-line { image: url(" + upArr + "); }" +
+            "QScrollBar::add-line { image: url(" + downArr + "); }";
+
     QFile customSS(EnveSettings::sSettingsDir() + "/stylesheet.qss");
     if(customSS.exists()) {
         if(customSS.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -111,7 +115,7 @@ MainWindow::MainWindow(Document& document,
     } else {
         QFile file(":/styles/stylesheet.qss");
         if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            setStyleSheet(file.readAll());
+            setStyleSheet(file.readAll() + iconSS);
             file.close();
         }
     }
@@ -580,72 +584,51 @@ void MainWindow::setupToolBar() {
 
     mToolBar->addSeparator();
 
-    mMovePathMode = new ActionButton(
-                ":/icons/draw_select.png",
-                "F1", this);
-    mMovePathMode->setCheckable(":/icons/draw_select_checked.png");
-    mMovePathMode->setChecked(true);
-    mToolBar->addWidget(mMovePathMode);
+    const QString iconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
 
-    mMovePointMode = new ActionButton(
-                ":/icons/draw_node.png",
-                "F2", this);
-    mMovePointMode->setCheckable(":/icons/draw_node_checked.png");
-    mToolBar->addWidget(mMovePointMode);
+    mBoxTransformMode = new ActionButton(iconsDir + "/boxTransformUnchecked.png", "F1", this);
+    mBoxTransformMode->setCheckable(iconsDir + "/boxTransformChecked.png");
+    mBoxTransformMode->setChecked(true);
+    mToolBar->addWidget(mBoxTransformMode);
 
-    mAddPointMode = new ActionButton(
-                ":/icons/draw_pen.png",
-                "F3", this);
-    mAddPointMode->setCheckable(":/icons/draw_pen_checked.png");
+    mPointTransformMode = new ActionButton(iconsDir + "/pointTransformUnchecked.png", "F2", this);
+    mPointTransformMode->setCheckable(iconsDir + "/pointTransformChecked.png");
+    mToolBar->addWidget(mPointTransformMode);
+
+    mAddPointMode = new ActionButton(iconsDir + "/pathCreateUnchecked.png", "F3", this);
+    mAddPointMode->setCheckable(iconsDir +  "/pathCreateChecked.png");
     mToolBar->addWidget(mAddPointMode);
 
-    mPaintMode = new ActionButton(
-                ":/icons/paint_mode.png",
-                "F4", this);
-    mPaintMode->setCheckable(
-                ":/icons/paint_mode_checked.png");
+    mPaintMode = new ActionButton(iconsDir + "/paintUnchecked.png", "F4", this);
+    mPaintMode->setCheckable(iconsDir + "/paintChecked.png");
     mToolBar->addWidget(mPaintMode);
 
     mToolBar->addSeparator();
 
-    mPickPaintSettingsMode = new ActionButton(
-                ":/icons/draw_dropper.png",
-                "F5", this);
-    mPickPaintSettingsMode->setCheckable(":/icons/draw_dropper_checked.png");
+    mPickPaintSettingsMode = new ActionButton(iconsDir + "/pickUnchecked.png", "F5", this);
+    mPickPaintSettingsMode->setCheckable(iconsDir + "/pickChecked.png");
     mToolBar->addWidget(mPickPaintSettingsMode);
 
-
-    mCircleMode = new ActionButton(
-                ":/icons/draw_arc.png",
-                "F6", this);
-    mCircleMode->setCheckable(":/icons/draw_arc_checked.png");
+    mCircleMode = new ActionButton(iconsDir + "/circleCreateUnchecked.png", "F6", this);
+    mCircleMode->setCheckable(iconsDir + "/circleCreateChecked.png");
     mToolBar->addWidget(mCircleMode);
 
-    mRectangleMode = new ActionButton(
-                ":/icons/draw_rect.png",
-                "F7", this);
-    mRectangleMode->setCheckable(":/icons/draw_rect_checked.png");
+    mRectangleMode = new ActionButton(iconsDir + "/rectCreateUnchecked.png", "F7", this);
+    mRectangleMode->setCheckable(iconsDir + "/rectCreateChecked.png");
     mToolBar->addWidget(mRectangleMode);
 
-    mTextMode = new ActionButton(
-                ":/icons/draw_text.png",
-                "F8", this);
-    mTextMode->setCheckable(":/icons/draw_text_checked.png");
+    mTextMode = new ActionButton(iconsDir + "/textCreateUnchecked.png", "F8", this);
+    mTextMode->setCheckable(iconsDir + "/textCreateChecked.png");
     mToolBar->addWidget(mTextMode);
 
     mToolBar->addSeparator();
 
-    mParticleBoxMode = new ActionButton(
-                ":/icons/draw_particle_box.png",
-                "F9", this);
-    mParticleBoxMode->setCheckable(":/icons/draw_particle_box_checked.png");
+    mParticleBoxMode = new ActionButton(iconsDir + "/particleBoxCreateUnchecked.png", "F9", this);
+    mParticleBoxMode->setCheckable(iconsDir + "/particleBoxCreateChecked.png");
     mToolBar->addWidget(mParticleBoxMode);
 
-    mParticleEmitterMode = new ActionButton(
-                ":/icons/draw_particle_emitter.png",
-                "F10", this);
-    mParticleEmitterMode->setCheckable(
-                ":/icons/draw_particle_emitter_checked.png");
+    mParticleEmitterMode = new ActionButton(iconsDir + "/particleEmitterCreateUnchecked.png", "F10", this);
+    mParticleEmitterMode->setCheckable(iconsDir + "/particleEmitterCreateChecked.png");
     mToolBar->addWidget(mParticleEmitterMode);
 
     //mToolBar->addSeparator();
@@ -653,49 +636,41 @@ void MainWindow::setupToolBar() {
             setObjectName("inactiveToolButton");
     //mToolBar->addSeparator();
 
-    mActionConnectPoints = new ActionButton(
-                ":/icons/node_join_segment.png",
-                "CONNECT POINTS", this);
+    mActionConnectPoints = new ActionButton(iconsDir + "/nodeConnect.png",
+                                            "CONNECT POINTS", this);
     mToolBar->addWidget(mActionConnectPoints);
 
-    mActionDisconnectPoints = new ActionButton(
-                ":/icons/node_delete_segment.png",
-                "DISCONNECT POINTS", this);
+    mActionDisconnectPoints = new ActionButton(iconsDir + "/nodeDisconnect.png",
+                                               "DISCONNECT POINTS", this);
     mToolBar->addWidget(mActionDisconnectPoints);
 
-    mActionMergePoints = new ActionButton(
-                ":/icons/node_join.png",
-                "MERGE POINTS", this);
+    mActionMergePoints = new ActionButton(iconsDir + "/nodeMerge.png",
+                                          "MERGE POINTS", this);
     mToolBar->addWidget(mActionMergePoints);
 //
     mToolBar->addSeparator();
 
-    mActionSymmetricPointCtrls = new ActionButton(
-                ":/icons/node_symmetric.png",
-                "SYMMETRIC POINTS", this);
+    mActionSymmetricPointCtrls = new ActionButton(iconsDir + "/nodeSymmetric.png",
+                                                  "SYMMETRIC POINTS", this);
     mToolBar->addWidget(mActionSymmetricPointCtrls);
 
-    mActionSmoothPointCtrls = new ActionButton(
-                ":/icons/node_smooth.png",
-                "SMOOTH POINTS", this);
+    mActionSmoothPointCtrls = new ActionButton(iconsDir + "/nodeSmooth.png",
+                                               "SMOOTH POINTS", this);
     mToolBar->addWidget(mActionSmoothPointCtrls);
 
-    mActionCornerPointCtrls = new ActionButton(
-                ":/icons/node_cusp.png",
-                "CORNER POINTS", this);
+    mActionCornerPointCtrls = new ActionButton(iconsDir + "/nodeCorner.png",
+                                               "CORNER POINTS", this);
     mToolBar->addWidget(mActionCornerPointCtrls);
 
 //
     mToolBar->addSeparator();
 
-    mActionLine = new ActionButton(
-                ":/icons/node_line.png",
-                "MAKE SEGMENT LINE", this);
+    mActionLine = new ActionButton(iconsDir + "/segmentLine.png",
+                                   "MAKE SEGMENT LINE", this);
     mToolBar->addWidget(mActionLine);
 
-    mActionCurve = new ActionButton(
-                ":/icons/node_curve.png",
-                "MAKE SEGMENT CURVE", this);
+    mActionCurve = new ActionButton(iconsDir + "/segmentCurve.png",
+                                    "MAKE SEGMENT CURVE", this);
     mToolBar->addWidget(mActionCurve);
 
     //mToolBar->addSeparator();
@@ -719,9 +694,9 @@ void MainWindow::setupToolBar() {
 }
 
 void MainWindow::connectToolBarActions() {
-    connect(mMovePathMode, &ActionButton::pressed,
+    connect(mBoxTransformMode, &ActionButton::pressed,
             &mActions, &Actions::setMovePathMode);
-    connect(mMovePointMode, &ActionButton::pressed,
+    connect(mPointTransformMode, &ActionButton::pressed,
             &mActions, &Actions::setMovePointMode);
     connect(mAddPointMode, &ActionButton::pressed,
             &mActions, &Actions::setAddPointMode);
@@ -767,8 +742,8 @@ MainWindow *MainWindow::sGetInstance() {
 
 void MainWindow::updateCanvasModeButtonsChecked() {
     const CanvasMode currentMode = mDocument.fCanvasMode;
-    mMovePathMode->setChecked(currentMode == CanvasMode::boxTransform);
-    mMovePointMode->setChecked(currentMode == CanvasMode::pointTransform);
+    mBoxTransformMode->setChecked(currentMode == CanvasMode::boxTransform);
+    mPointTransformMode->setChecked(currentMode == CanvasMode::pointTransform);
     mAddPointMode->setChecked(currentMode == CanvasMode::pathCreate);
     mPickPaintSettingsMode->setChecked(currentMode == CanvasMode::pickFillStroke);
     mCircleMode->setChecked(currentMode == CanvasMode::circleCreate);

@@ -41,18 +41,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mMainLayout->setSpacing(0);
     mMainLayout->setMargin(0);
 
-//    mAnimationDockWidget = new AnimationDockWidget(mBoxesListWidget,
-//                                                   mKeysView);
-//    mKeysView->setAnimationDockWidget(mAnimationDockWidget);
-
-//    mGoToPreviousKeyButton = new QPushButton(
-//                QIcon(":/icons/prev_key.png"), "", this);
-//    mGoToPreviousKeyButton->setSizePolicy(QSizePolicy::Maximum,
-//                                          QSizePolicy::Maximum);
-//    mGoToNextKeyButton = new QPushButton(
-//                QIcon(":/icons/next_key.png"), "", this);
-//    mGoToNextKeyButton->setSizePolicy(QSizePolicy::Maximum,
-//                                      QSizePolicy::Maximum);
     mResolutionComboBox = new QComboBox(this);
     mResolutionComboBox->addItem("100 %");
     mResolutionComboBox->addItem("75 %");
@@ -68,20 +56,17 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     connect(mResolutionComboBox, &QComboBox::currentTextChanged,
             this, &BoxesListAnimationDockWidget::setResolutionFractionText);
 
-    mPlayButton = new ActionButton(
-                ":/icons/renderPreviewButton.png",
-                "render preview", this);
-    mStopButton = new ActionButton(
-                ":/icons/stopPreviewButton.png",
-                "stop preview", this);
+    const QString iconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+
+    mPlayButton = new ActionButton(iconsDir + "/play.png", "render preview", this);
+    mStopButton = new ActionButton(iconsDir + "/stop.png", "stop preview", this);
     connect(mStopButton, &ActionButton::pressed,
             this, &BoxesListAnimationDockWidget::interruptPreview);
 
-    mLocalPivot = new ActionButton(
-                ":/icons/globalPivot.png",
-                "", this);
+    mLocalPivot = new ActionButton(iconsDir + "/pivotGlobal.png",
+                                  "pivot global/local", this);
     mLocalPivot->setToolTip("P");
-    mLocalPivot->setCheckable(":/icons/localPivot.png");
+    mLocalPivot->setCheckable(iconsDir + "/pivotLocal.png");
     mLocalPivot->setChecked(mDocument.fLocalPivot);
     connect(mLocalPivot, &ActionButton::toggled,
             this, &BoxesListAnimationDockWidget::setLocalPivot);
@@ -211,7 +196,8 @@ bool BoxesListAnimationDockWidget::processKeyPress(QKeyEvent *event) {
 void BoxesListAnimationDockWidget::previewFinished() {
     //setPlaying(false);
     mStopButton->setDisabled(true);
-    mPlayButton->setIcon(":/icons/renderPreviewButton.png");
+    const QString modeIconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+    mPlayButton->setIcon(modeIconsDir + "/play.png");
     mPlayButton->setToolTip("render preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
@@ -220,7 +206,8 @@ void BoxesListAnimationDockWidget::previewFinished() {
 
 void BoxesListAnimationDockWidget::previewBeingPlayed() {
     mStopButton->setDisabled(false);
-    mPlayButton->setIcon(":/icons/pausePreviewButton.png");
+    const QString modeIconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+    mPlayButton->setIcon(modeIconsDir + "/pause.png");
     mPlayButton->setToolTip("pause preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
@@ -229,7 +216,8 @@ void BoxesListAnimationDockWidget::previewBeingPlayed() {
 
 void BoxesListAnimationDockWidget::previewBeingRendered() {
     mStopButton->setDisabled(false);
-    mPlayButton->setIcon(":/icons/playPreviewButton.png");
+    const QString modeIconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+    mPlayButton->setIcon(modeIconsDir + "/play.png");
     mPlayButton->setToolTip("play preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
@@ -238,7 +226,8 @@ void BoxesListAnimationDockWidget::previewBeingRendered() {
 
 void BoxesListAnimationDockWidget::previewPaused() {
     mStopButton->setDisabled(false);
-    mPlayButton->setIcon(":/icons/playPreviewButton.png");
+    const QString modeIconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+    mPlayButton->setIcon(modeIconsDir + "/play.png");
     mPlayButton->setToolTip("resume preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,

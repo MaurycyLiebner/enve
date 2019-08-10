@@ -46,6 +46,7 @@ public:
     static long sRamBytesCap();
     static int sCpuThreadsCapped();
     static const QString& sSettingsDir();
+    static QString sIconsDir();
     static EnveSettings sSettings;
 };
 

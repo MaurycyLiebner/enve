@@ -3,6 +3,7 @@
 
 extern int FONT_HEIGHT;
 extern int MIN_WIDGET_DIM;
+extern int BUTTON_DIM;
 extern int KEY_RECT_SIZE;
 
 #endif // GLOBAL_H

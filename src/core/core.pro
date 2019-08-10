@@ -197,7 +197,6 @@ SOURCES += \
     Animators/complexanimator.cpp \
     Animators/animator.cpp \
     Animators/intanimator.cpp \
-    Animators/fakecomplexanimator.cpp \
     Animators/key.cpp \
     Animators/boolanimator.cpp \
     PropertyUpdaters/propertyupdater.cpp \
@@ -427,7 +426,6 @@ HEADERS += \
     Properties/intproperty.h \
     Animators/key.h \
     Animators/complexanimator.h \
-    Animators/fakecomplexanimator.h \
     Animators/animator.h \
     Animators/intanimator.h \
     Animators/boolanimator.h \

@@ -9,9 +9,15 @@
 #include "memoryhandler.h"
 #include "ShaderEffects/shadereffectprogram.h"
 #include "videoencoder.h"
+#include "iconloader.h"
 extern "C" {
     #include <libavformat/avformat.h>
 }
+
+int FONT_HEIGHT;
+int MIN_WIDGET_DIM;
+int BUTTON_DIM;
+int KEY_RECT_SIZE;
 
 void setDefaultFormat() {
     QSurfaceFormat format;
@@ -64,10 +70,20 @@ int main(int argc, char *argv[]) {
 
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
+    BUTTON_DIM = qRound(MIN_WIDGET_DIM*1.1);
     KEY_RECT_SIZE = MIN_WIDGET_DIM*3/5;
+
+    IconLoader::generateAll(MIN_WIDGET_DIM, BUTTON_DIM);
 
     MainWindow w(document, actions, audioHandler, renderHandler);
     w.show();
+    if(argc > 1) {
+        try {
+            w.loadEVFile(argv[1]);
+        } catch(const std::exception& e) {
+            gPrintExceptionCritical(e);
+        }
+    }
 
     try {
         return a.exec();

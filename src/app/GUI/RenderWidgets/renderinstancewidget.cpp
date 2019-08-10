@@ -5,6 +5,7 @@
 #include "rendersettingsdialog.h"
 #include "outputsettingsprofilesdialog.h"
 #include "outputsettingsdisplaywidget.h"
+#include "settings.h"
 
 RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     ClosableContainer(parent) {
@@ -23,7 +24,7 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
 
     addContentWidget(contWid);
 
-    ClosableContainer *renderSettings = new ClosableContainer();
+    const auto renderSettings = new ClosableContainer();
 
     QWidget *renderSettingsLabelWidget = new QWidget();
     renderSettingsLabelWidget->setObjectName("darkWidget");
@@ -39,12 +40,11 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     renderSettingsLayout->addWidget(renderSettingsLabel);
     renderSettingsLayout->addSpacing(MIN_WIDGET_DIM);
 
-    QPushButton *renderSettingsButton = new QPushButton("Settings");
+    const auto renderSettingsButton = new QPushButton("Settings");
     renderSettingsButton->setObjectName("renderSettings");
-    renderSettingsButton->setSizePolicy(QSizePolicy::Maximum,
-                                        QSizePolicy::Minimum);
-    connect(renderSettingsButton, SIGNAL(pressed()),
-            this, SLOT(openRenderSettingsDialog()));
+    renderSettingsButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
+    connect(renderSettingsButton, &QPushButton::pressed,
+            this, &RenderInstanceWidget::openRenderSettingsDialog);
     renderSettingsLayout->addWidget(renderSettingsButton);
 
     renderSettingsLabelWidget->setLayout(renderSettingsLayout);
@@ -72,19 +72,18 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     outputSettingsLayout->addSpacing(MIN_WIDGET_DIM);
 
     mOutputSettingsProfilesButton = new OutputProfilesListButton(this);
-    connect(mOutputSettingsProfilesButton,
-            SIGNAL(profileSelected(OutputSettingsProfile*)),
-            this,
-            SLOT(outputSettingsProfileSelected(OutputSettingsProfile*)) );
+    connect(mOutputSettingsProfilesButton, &OutputProfilesListButton::profileSelected,
+            this, &RenderInstanceWidget::outputSettingsProfileSelected);
     mOutputSettingsProfilesButton->setObjectName("renderSettings");
-    mOutputSettingsProfilesButton->setFixedWidth(MIN_WIDGET_DIM);
+    mOutputSettingsProfilesButton->setFixedSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM);
+    mOutputSettingsProfilesButton->setIconSize(QSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM));
 
     mOutputSettingsButton = new QPushButton("Settings");
     mOutputSettingsButton->setObjectName("renderSettings");
     mOutputSettingsButton->setSizePolicy(QSizePolicy::Maximum,
-                                        QSizePolicy::Minimum);
-    connect(mOutputSettingsButton, SIGNAL(pressed()),
-            this, SLOT(openOutputSettingsDialog()));
+                                         QSizePolicy::Minimum);
+    connect(mOutputSettingsButton, &QPushButton::pressed,
+            this, &RenderInstanceWidget::openOutputSettingsDialog);
     outputSettingsLayout->addWidget(mOutputSettingsProfilesButton);
     outputSettingsLayout->addWidget(mOutputSettingsButton);
 
@@ -101,8 +100,8 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     mOutputDestinationButton->setObjectName("renderSettings");
     mOutputDestinationButton->setSizePolicy(QSizePolicy::Maximum,
                                             QSizePolicy::Minimum);
-    connect(mOutputDestinationButton, SIGNAL(pressed()),
-            this, SLOT(openOutputDestinationDialog()));
+    connect(mOutputDestinationButton, &QPushButton::pressed,
+            this, &RenderInstanceWidget::openOutputDestinationDialog);
     outputSettingsLayout->addWidget(mOutputDestinationButton);
 
 
@@ -271,18 +270,19 @@ void RenderInstanceWidget::openRenderSettingsDialog() {
 
 }
 
+#include "settings.h"
 OutputProfilesListButton::OutputProfilesListButton(RenderInstanceWidget *parent) :
     QPushButton(parent) {
     mParentWidget = parent;
-    setIcon(QIcon(":/icons/down-arrow.png"));
+    setIcon(QIcon(EnveSettings::sIconsDir() + "/down-arrow.png"));
 }
 
 void OutputProfilesListButton::mousePressEvent(QMouseEvent *e) {
     if(e->button() == Qt::LeftButton) {
         QMenu menu;
         int i = 0;
-        foreach(const auto& profile,
-                OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES) {
+        for(const auto& profile :
+            OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES) {
             QAction *actionT = new QAction(profile->getName());
             actionT->setData(QVariant(i));
             menu.addAction(actionT);

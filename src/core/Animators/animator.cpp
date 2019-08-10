@@ -3,7 +3,6 @@
 #include <QPainter>
 #include "complexanimator.h"
 #include "key.h"
-#include "fakecomplexanimator.h"
 #include "PropertyUpdaters/propertyupdater.h"
 #include "qrealpoint.h"
 #include "simplemath.h"
@@ -36,36 +35,6 @@ bool Animator::anim_prevRelFrameWithKey(const int relFrame,
     if(!key) return false;
     prevRelFrame = key->getRelFrame();
     return true;
-}
-
-bool Animator::hasFakeComplexAnimator() {
-    return !mFakeComplexAnimator.isNull();
-}
-
-FakeComplexAnimator *Animator::getFakeComplexAnimator() {
-    return mFakeComplexAnimator.data();
-}
-
-void Animator::enableFakeComplexAnimator() {
-    if(!mFakeComplexAnimator.isNull()) return;
-    SWT_hide();
-    mFakeComplexAnimator = enve::make_shared<FakeComplexAnimator>(prp_mName, this);
-    emit prp_prependWith(this, mFakeComplexAnimator);
-}
-
-void Animator::disableFakeComplexAnimator() {
-    if(mFakeComplexAnimator.isNull()) return;
-    SWT_show();
-    emit mFakeComplexAnimator->prp_replaceWith(mFakeComplexAnimator,
-                                               nullptr);
-    mFakeComplexAnimator.reset();
-}
-
-void Animator::disableFakeComplexAnimatrIfNotNeeded() {
-    if(mFakeComplexAnimator.isNull()) return;
-    if(mFakeComplexAnimator->ca_getNumberOfChildren() == 0) {
-        disableFakeComplexAnimator();
-    }
 }
 
 int Animator::anim_getPrevKeyRelFrame(const Key * const key) const {

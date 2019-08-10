@@ -173,7 +173,10 @@ SmartCtrlPoint *SmartNodePoint::getC0Pt() {
 }
 
 void SmartNodePoint::updateCtrlPtPos(SmartCtrlPoint * const pointToUpdate) {
-    const auto otherPt = pointToUpdate == mC0Pt.get() ? mC2Pt : mC0Pt;
+    const auto otherPt = pointToUpdate == mC0Pt.get() ? mC2Pt.get() : mC0Pt.get();
+    if(otherPt == mC0Pt.get() && !getC0Enabled()) return;
+    if(otherPt == mC2Pt.get() && !getC2Enabled()) return;
+
     const QPointF relPos = otherPt->getRelativePos();
     QPointF newPos;
     if(getCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC) {

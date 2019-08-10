@@ -28,12 +28,12 @@
 
 QPixmap* BoxSingleWidget::VISIBLE_PIXMAP;
 QPixmap* BoxSingleWidget::INVISIBLE_PIXMAP;
-QPixmap* BoxSingleWidget::HIDE_CHILDREN;
-QPixmap* BoxSingleWidget::SHOW_CHILDREN;
-QPixmap* BoxSingleWidget::LOCKED_PIXMAP;
-QPixmap* BoxSingleWidget::UNLOCKED_PIXMAP;
+QPixmap* BoxSingleWidget::BOX_CHILDREN_VISIBLE;
+QPixmap* BoxSingleWidget::BOX_CHILDREN_HIDDEN;
 QPixmap* BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE;
 QPixmap* BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN;
+QPixmap* BoxSingleWidget::LOCKED_PIXMAP;
+QPixmap* BoxSingleWidget::UNLOCKED_PIXMAP;
 QPixmap* BoxSingleWidget::ANIMATOR_RECORDING;
 QPixmap* BoxSingleWidget::ANIMATOR_NOT_RECORDING;
 QPixmap* BoxSingleWidget::ANIMATOR_DESCENDANT_RECORDING;
@@ -47,7 +47,6 @@ bool BoxSingleWidget::sStaticPixmapsLoaded = false;
 #include "canvas.h"
 #include "PathEffects/patheffect.h"
 #include "PathEffects/patheffectanimators.h"
-#include "Animators/fakecomplexanimator.h"
 
 #include <QApplication>
 #include <QDrag>
@@ -96,14 +95,12 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
         const auto target = mTarget->getTarget();
         if(target->SWT_isBoundingBox()) {
             if(mTarget->contentVisible()) {
-                return BoxSingleWidget::HIDE_CHILDREN;
-            } else return BoxSingleWidget::SHOW_CHILDREN;
+                return BoxSingleWidget::BOX_CHILDREN_VISIBLE;
+            } else return BoxSingleWidget::BOX_CHILDREN_HIDDEN;
         } else {
             if(mTarget->contentVisible()) {
                 return BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE;
-            } else {
-                return BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN;
-            }
+            } else return BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN;
         }
     });
 
@@ -386,9 +383,6 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     auto target = abs->getTarget();
 
     mContentButton->setVisible(target->SWT_isComplexAnimator());
-    if(target->SWT_isFakeComplexAnimator()) {
-        target = static_cast<FakeComplexAnimator*>(target)->getTarget();
-    }
     mRecordButton->setVisible(target->SWT_isAnimator());
     mVisibleButton->setVisible(target->SWT_isBoundingBox() ||
                                target->SWT_isPathEffect() ||
@@ -496,22 +490,18 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
 
 void BoxSingleWidget::loadStaticPixmaps() {
     if(sStaticPixmapsLoaded) return;
-    VISIBLE_PIXMAP = new QPixmap(":/icons/visible.png");
-    INVISIBLE_PIXMAP = new QPixmap(":/icons/hidden.png");
-    HIDE_CHILDREN = new QPixmap(":/icons/list_hide_children.png");
-    SHOW_CHILDREN = new QPixmap(":/icons/list_show_children.png");
-    LOCKED_PIXMAP = new QPixmap(":/icons/lock_locked.png");
-    UNLOCKED_PIXMAP = new QPixmap(":/icons/lock_unlocked.png");
-    ANIMATOR_CHILDREN_VISIBLE = new QPixmap(
-                ":/icons/animator_children_visible.png");
-    ANIMATOR_CHILDREN_HIDDEN = new QPixmap(
-                ":/icons/animator_children_hidden.png");
-    ANIMATOR_RECORDING = new QPixmap(
-                ":/icons/recording.png");
-    ANIMATOR_NOT_RECORDING = new QPixmap(
-                ":/icons/not_recording.png");
-    ANIMATOR_DESCENDANT_RECORDING = new QPixmap(
-                ":/icons/desc_recording.png");
+    const auto iconsDir = EnveSettings::sIconsDir();
+    VISIBLE_PIXMAP = new QPixmap(iconsDir + "/visible.png");
+    INVISIBLE_PIXMAP = new QPixmap(iconsDir + "/hidden.png");
+    BOX_CHILDREN_VISIBLE = new QPixmap(iconsDir + "/childrenVisible.png");
+    BOX_CHILDREN_HIDDEN = new QPixmap(iconsDir + "/childrenHidden.png");
+    ANIMATOR_CHILDREN_VISIBLE = new QPixmap(iconsDir + "/childrenVisibleSmall.png");
+    ANIMATOR_CHILDREN_HIDDEN = new QPixmap(iconsDir + "/childrenHiddenSmall.png");
+    LOCKED_PIXMAP = new QPixmap(iconsDir + "/locked.png");
+    UNLOCKED_PIXMAP = new QPixmap(iconsDir + "/unlocked.png");
+    ANIMATOR_RECORDING = new QPixmap(iconsDir + "/recording.png");
+    ANIMATOR_NOT_RECORDING = new QPixmap(iconsDir + "/notRecording.png");
+    ANIMATOR_DESCENDANT_RECORDING = new QPixmap(iconsDir + "/childRecording.png");
     sStaticPixmapsLoaded = true;
 }
 
@@ -519,12 +509,12 @@ void BoxSingleWidget::clearStaticPixmaps() {
     if(!sStaticPixmapsLoaded) return;
     delete VISIBLE_PIXMAP;
     delete INVISIBLE_PIXMAP;
-    delete HIDE_CHILDREN;
-    delete SHOW_CHILDREN;
-    delete LOCKED_PIXMAP;
-    delete UNLOCKED_PIXMAP;
+    delete BOX_CHILDREN_VISIBLE;
+    delete BOX_CHILDREN_HIDDEN;
     delete ANIMATOR_CHILDREN_VISIBLE;
     delete ANIMATOR_CHILDREN_HIDDEN;
+    delete LOCKED_PIXMAP;
+    delete UNLOCKED_PIXMAP;
     delete ANIMATOR_RECORDING;
     delete ANIMATOR_NOT_RECORDING;
     delete ANIMATOR_DESCENDANT_RECORDING;
@@ -533,149 +523,25 @@ void BoxSingleWidget::clearStaticPixmaps() {
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     if(isTargetDisabled()) return;
     SingleWidgetTarget *target = mTarget->getTarget();
-    if(target->SWT_isFakeComplexAnimator()) {
-        target = static_cast<FakeComplexAnimator*>(target)->getTarget();
-    }
     if(event->button() == Qt::RightButton) {
         setSelected(true);
         QMenu menu(this);
 
         if(target->SWT_isProperty()) {
+            if(target->SWT_isBoundingBox()) {
+                const auto box = static_cast<BoundingBox*>(target);
+                const bool shiftPressed = event->modifiers() & Qt::ShiftModifier;
+                if(!box->isSelected()) box->selectionChangeTriggered(shiftPressed);
+            }
             const auto pTarget = static_cast<Property*>(target);
             PropertyMenu pMenu(&menu, mParent->currentScene(), MainWindow::sGetInstance());
             pTarget->setupTreeViewMenu(&pMenu);
-
-//            const auto container = enve::make_shared<PropertyClipboard>(this);
-//            if(clipboard) {
-//                if(target->SWT_isBoundingBox()) {
-//                    if(target->SWT_isContainerBox() && !target->SWT_isLinkBox()) {
-//                        const auto boxClip = Document::sInstance->getBoxesClipboard();
-//                        if(boxClip) {
-//                            menu.addAction("Paste Boxes", [target, boxClip]() {
-//                                boxClip->pasteTo(static_cast<ContainerBox*>(target));
-//                            });
-//                        }
-//                    }
-//                    if(clipboard->isPathEffect() ||
-//                        clipboard->isPathEffectAnimators()) {
-//                        QMenu * const pasteMenu = menu.addMenu("Paste");
-//                        pasteMenu->addAction("Paste Path Effect",
-//                                             [target, clipboard]() {
-//                            auto targetPathBox = static_cast<PathBox*>(target);
-//                            clipboard->paste(targetPathBox->getPathEffectsAnimators());
-//                        });
-
-//                        pasteMenu->addAction("Paste Outline Path Effect",
-//                                             [target, clipboard]() {
-//                            auto targetPathBox = static_cast<PathBox*>(target);
-//                            clipboard->paste(targetPathBox->getOutlinePathEffectsAnimators());
-//                        });
-
-//                        pasteMenu->addAction("Paste Fill Path Effect",
-//                                             [target, clipboard]() {
-//                            auto targetPathBox = static_cast<PathBox*>(target);
-//                            clipboard->paste(targetPathBox->getFillPathEffectsAnimators());
-//                        });
-
-//                        QMenu * const clearAndPasteMenu = menu.addMenu("Clear and Paste");
-
-//                        clearAndPasteMenu->addAction("Clear and Paste Path Effect",
-//                                                     [target, clipboard]() {
-//                            auto targetPathBox = static_cast<PathBox*>(target);
-//                            clipboard->clearAndPaste(targetPathBox->getPathEffectsAnimators());
-//                        });
-
-//                        clearAndPasteMenu->addAction("Clear and Paste Outline Path Effect",
-//                                                     [target, clipboard]() {
-//                            auto targetPathBox = static_cast<PathBox*>(target);
-//                            clipboard->clearAndPaste(targetPathBox->getOutlinePathEffectsAnimators());
-//                        });
-
-//                        clearAndPasteMenu->addAction("Clear and Paste Fill Path Effect",
-//                                                     [target, clipboard]() {
-//                            auto targetPathBox = static_cast<PathBox*>(target);
-//                            clipboard->clearAndPaste(targetPathBox->getFillPathEffectsAnimators());
-//                        });
-//                    } else if(clipboard->isPixmapEffect() ||
-//                              clipboard->isPixmapEffectAnimators()) {
-//                        menu.addAction("Paste Raster Effect",
-//                                       [target, clipboard]() {
-//                            auto boxTarget = static_cast<BoundingBox*>(target);
-//                            clipboard->paste(boxTarget->getEffectsAnimators());
-//                        });
-
-//                        menu.addAction("Clear and Paste Raster Effect",
-//                                       [target, clipboard]() {
-//                            auto boxTarget = static_cast<BoundingBox*>(target);
-//                            clipboard->clearAndPaste(boxTarget->getEffectsAnimators());
-//                        });
-//                    }
-//                } else {
-//                    const auto prop = static_cast<Property*>(target);
-//                    if(clipboard->compatibleTarget(prop)) {
-//                        menu.addAction("Paste", [prop, clipboard]() {
-//                            clipboard->paste(prop);
-//                        });
-//                        if(prop->SWT_isAnimator()) {
-//                            menu.addAction("Clear and Paste", [prop, clipboard]() {
-//                                clipboard->paste(prop);
-//                            });
-//                        }
-//                    } else {
-//                        menu.addAction("Paste")->setDisabled(true);
-//                        if(prop->SWT_isAnimator()) {
-//                            menu.addAction("Clear and Paste")->setDisabled(true);
-//                        }
-//                    }
-//                }
-//            }
-            if(target->SWT_isBoundingBox()) {
-            } else if(target->SWT_isAnimator()) {
-                menu.addSeparator();
-                if(target->SWT_isRasterEffect() || target->SWT_isPathEffect()) {
-                    menu.addSeparator();
-//                    menu.addAction("Delete Effect", [target]() {
-//                        if(target->SWT_isPixmapEffect()) {
-//                            auto effectTarget = target->ref<PixmapEffect>();
-//                            const auto parent =
-//                                    effectTarget->getParent<EffectAnimators>();
-//                            parent->removeChild(effectTarget);
-//                        } else {
-//                            auto effectTarget = target->ref<PathEffect>();
-//                            const auto parentAnimators =
-//                                    effectTarget->getParent<PathEffectAnimators>();
-//                            parentAnimators->removeChild(effectTarget);
-//                        }
-//                    });
-                } else if(target->SWT_isQrealAnimator()) {
-                    const auto qrealTarget = static_cast<QrealAnimator*>(target);
-                    if(qrealTarget->hasNoise()) {
-                        menu.addSeparator();
-                        menu.addAction("Remove Noise", [qrealTarget]() {
-                            qrealTarget->setGenerator(nullptr);
-                        });
-                    } else {
-                        menu.addSeparator();
-                        menu.addAction("Add Noise", [qrealTarget]() {
-                            const auto randGen = enve::make_shared<RandomQrealGenerator>();
-                            const auto updater = enve::shared(qrealTarget->prp_getUpdater());
-                            randGen->prp_setOwnUpdater(updater);
-                            qrealTarget->setGenerator(randGen);
-                        });
-                    }
-                }
-            }
         }
         menu.exec(event->globalPos());
         setSelected(false);
     } else {
+        mDragPressPos = event->pos().x() > mFillWidget->x();
         mDragStartPos = event->pos();
-//        if(type == SWT_BoundingBox ||
-//           type == SWT_BoxesGroup) {
-//            BoundingBox *bb_target = (BoundingBox*)target;
-//            bb_target->selectionChangeTriggered(event->modifiers() &
-//                                                Qt::ShiftModifier);
-//        }
     }
     Document::sInstance->actionFinished();
 }
@@ -686,12 +552,11 @@ bool BoxSingleWidget::isTargetDisabled() {
 }
 
 void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
+    if(!mDragPressPos) return;
     if(!(event->buttons() & Qt::LeftButton)) return;
     if(isTargetDisabled()) return;
-    if((event->pos() - mDragStartPos).manhattanLength()
-         < QApplication::startDragDistance()) {
-        return;
-    }
+    const auto dist = (event->pos() - mDragStartPos).manhattanLength();
+    if(dist < QApplication::startDragDistance()) return;
     const auto drag = new QDrag(this);
     connect(drag, &QDrag::destroyed,
             this, &BoxSingleWidget::clearSelected);
@@ -734,9 +599,7 @@ void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e) {
     if(isTargetDisabled()) return;
     if(e->modifiers() & Qt::ShiftModifier) {
         //mousePressEvent(e);
-    } else {
-        Document::sInstance->actionFinished();
-    }
+    } else Document::sInstance->actionFinished();
 }
 void BoxSingleWidget::drawKeys(QPainter * const p,
                                const qreal pixelsPerFrame,
@@ -797,10 +660,7 @@ void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
 int BoxSingleWidget::getOptimalNameRightX() {
     if(!mTarget) return 0;
     auto target = mTarget->getTarget();
-    bool fakeComplexAnimator = target->SWT_isFakeComplexAnimator();
-    if(fakeComplexAnimator) {
-        target = static_cast<FakeComplexAnimator*>(target)->getTarget();
-    }
+
     QFontMetrics fm = QFontMetrics(QFont());
     QString name;
     if(target->SWT_isProperty()) {
@@ -811,9 +671,7 @@ int BoxSingleWidget::getOptimalNameRightX() {
     if(target->SWT_isBoundingBox()) {
         nameX += MIN_WIDGET_DIM/4;
     } else if(target->SWT_isQrealAnimator()) {
-        if(!fakeComplexAnimator) {
-            nameX += MIN_WIDGET_DIM;
-        }
+        nameX += MIN_WIDGET_DIM;
     } else if(target->SWT_isBoxTargetProperty()) {
         nameX += 2*MIN_WIDGET_DIM;
     } else {//if(target->SWT_isBoolProperty()) {
@@ -826,13 +684,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(!mTarget) return;
     QPainter p(this);
     auto target = mTarget->getTarget();
-    if(target->SWT_isDisabled()) {
-        p.setOpacity(.5);
-    }
-    bool fakeComplexAnimator = target->SWT_isFakeComplexAnimator();
-    if(fakeComplexAnimator) {
-        target = static_cast<FakeComplexAnimator*>(target)->getTarget();
-    }
+    if(target->SWT_isDisabled()) p.setOpacity(.5);
 
     int nameX = mFillWidget->x();
     QString name;
@@ -861,13 +713,12 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                 if(id >= 0) {
                     const auto color = keysView->sGetAnimatorColor(id);
                     p.fillRect(nameX + MIN_WIDGET_DIM/4, MIN_WIDGET_DIM/4,
-                               MIN_WIDGET_DIM/2, MIN_WIDGET_DIM/2,
-                               color);
+                               MIN_WIDGET_DIM/2, MIN_WIDGET_DIM/2, color);
                 }
             }
         }
         name = propTarget->prp_getName();
-        if(!fakeComplexAnimator) nameX += MIN_WIDGET_DIM;
+        nameX += MIN_WIDGET_DIM;
 
         p.setPen(Qt::white);
     } else { //if(target->SWT_isComplexAnimator()) {
@@ -877,9 +728,8 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         p.setPen(Qt::white);
     }
 
-    p.drawText(QRect(nameX, 0, width() - nameX -
-                     MIN_WIDGET_DIM, MIN_WIDGET_DIM),
-               name, QTextOption(Qt::AlignVCenter));
+    const QRect textRect(nameX, 0, width() - nameX - MIN_WIDGET_DIM, MIN_WIDGET_DIM);
+    p.drawText(textRect, name, QTextOption(Qt::AlignVCenter));
     if(mSelected) {
         p.setBrush(Qt::NoBrush);
         p.setPen(QPen(Qt::lightGray));
@@ -899,10 +749,6 @@ void BoxSingleWidget::switchRecordingAction() {
     if(!target) return;
     if(!target->SWT_isAnimator()) return;
     auto aTarget = static_cast<Animator*>(target);
-    if(aTarget->SWT_isFakeComplexAnimator()) {
-        const auto fcaTarget = static_cast<FakeComplexAnimator*>(aTarget);
-        aTarget = static_cast<Animator*>(fcaTarget->getTarget());
-    }
     aTarget->anim_switchRecording();
     Document::sInstance->actionFinished();
     update();
@@ -957,33 +803,24 @@ void BoxSingleWidget::clearColorButton() {
 void BoxSingleWidget::updatePathCompositionBoxVisible() {
     if(!mTarget) return;
     if(mPathBlendModeVisible) {
-        if(width() > 15*MIN_WIDGET_DIM) {
-            mPathBlendModeCombo->show();
-        } else {
-            mPathBlendModeCombo->hide();
-        }
+        if(width() > 15*MIN_WIDGET_DIM) mPathBlendModeCombo->show();
+        else mPathBlendModeCombo->hide();
     }
 }
 
 void BoxSingleWidget::updateCompositionBoxVisible() {
     if(!mTarget) return;
     if(mBlendModeVisible) {
-        if(width() > 15*MIN_WIDGET_DIM) {
-            mBlendModeCombo->show();
-        } else {
-            mBlendModeCombo->hide();
-        }
+        if(width() > 15*MIN_WIDGET_DIM) mBlendModeCombo->show();
+        else mBlendModeCombo->hide();
     }
 }
 
 void BoxSingleWidget::updateFillTypeBoxVisible() {
     if(!mTarget) return;
     if(mFillTypeVisible) {
-        if(width() > 15*MIN_WIDGET_DIM) {
-            mFillTypeCombo->show();
-        } else {
-            mFillTypeCombo->hide();
-        }
+        if(width() > 15*MIN_WIDGET_DIM) mFillTypeCombo->show();
+        else mFillTypeCombo->hide();
     }
 }
 

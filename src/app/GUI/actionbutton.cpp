@@ -1,4 +1,5 @@
 #include "actionbutton.h"
+#include "GUI/global.h"
 #include <QPainter>
 
 ActionButton::ActionButton(const QString &notCheckedPix,
@@ -7,7 +8,7 @@ ActionButton::ActionButton(const QString &notCheckedPix,
     QWidget(parent) {
     setFocusPolicy(Qt::NoFocus);
     setToolTip(toolTip);
-    setFixedSize(24, 24);
+    setFixedSize(BUTTON_DIM, BUTTON_DIM);
     setIcon(notCheckedPix);
 }
 

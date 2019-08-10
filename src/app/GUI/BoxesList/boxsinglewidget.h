@@ -31,12 +31,12 @@ public:
 
     static QPixmap* VISIBLE_PIXMAP;
     static QPixmap* INVISIBLE_PIXMAP;
-    static QPixmap* HIDE_CHILDREN;
-    static QPixmap* SHOW_CHILDREN;
-    static QPixmap* LOCKED_PIXMAP;
-    static QPixmap* UNLOCKED_PIXMAP;
+    static QPixmap* BOX_CHILDREN_VISIBLE;
+    static QPixmap* BOX_CHILDREN_HIDDEN;
     static QPixmap* ANIMATOR_CHILDREN_VISIBLE;
     static QPixmap* ANIMATOR_CHILDREN_HIDDEN;
+    static QPixmap* LOCKED_PIXMAP;
+    static QPixmap* UNLOCKED_PIXMAP;
     static QPixmap* ANIMATOR_RECORDING;
     static QPixmap* ANIMATOR_NOT_RECORDING;
     static QPixmap* ANIMATOR_DESCENDANT_RECORDING;
@@ -102,6 +102,7 @@ private:
 
     BoxScroller* const mParent;
 
+    bool mDragPressPos = false;
     QPoint mDragStartPos;
 
     PixmapActionButton *mRecordButton;

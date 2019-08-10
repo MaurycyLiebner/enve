@@ -411,9 +411,8 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     aLayout->addWidget(aRect);
     aLayout->addWidget(aSpin);
 
-
-    mPickingButton = new ActionButton(":/icons/draw_dropper.png",
-                                     "", this);
+    const QString iconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+    mPickingButton = new ActionButton(iconsDir + "/pickUnchecked.png", "", this);
     connect(mPickingButton, &ActionButton::released,
             this, &ColorSettingsWidget::startColorPicking);
     mColorLabelLayout->addWidget(mColorLabel);

@@ -25,13 +25,12 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mColorsSettingsWidget = new ColorSettingsWidget(this);
 
     mTargetLayout->setSpacing(0);
-    mFillTargetButton = new QPushButton(
-                QIcon(":/icons/properties_fill.png"),
-                "Fill", this);
+    const auto iconsDir = EnveSettings::sIconsDir();
+    mFillTargetButton = new QPushButton(QIcon(iconsDir + "/properties_fill.png"),
+                                        "Fill", this);
     mFillTargetButton->setObjectName("leftButton");
-    mStrokeTargetButton = new QPushButton(
-                QIcon(":/icons/properties_stroke_paint.png"),
-                "Stroke", this);
+    mStrokeTargetButton = new QPushButton(QIcon(iconsDir + "/properties_stroke_paint.png"),
+                                          "Stroke", this);
     mStrokeTargetButton->setObjectName("rightButton");
     mFillAndStrokeWidget = new QWidget(this);
     mFillAndStrokeWidget->setLayout(mMainLayout);
@@ -39,23 +38,20 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
 
     mColorTypeLayout = new QHBoxLayout();
     mColorTypeLayout->setSpacing(0);
-    mFillNoneButton = new QPushButton(
-                QIcon(":/icons/fill_none.png"),
-                "None", this);
+    mFillNoneButton = new QPushButton(QIcon(iconsDir + "/fill_none.png"),
+                                      "None", this);
     mFillNoneButton->setCheckable(true);
     mFillNoneButton->setObjectName("leftButton");
     connect(mFillNoneButton, &QPushButton::released,
             this, &FillStrokeSettingsWidget::setNoneFill);
-    mFillFlatButton = new QPushButton(
-                QIcon(":/icons/fill_flat.png"),
-                "Flat", this);
+    mFillFlatButton = new QPushButton(QIcon(iconsDir + "/fill_flat.png"),
+                                      "Flat", this);
     mFillFlatButton->setCheckable(true);
     mFillFlatButton->setObjectName("middleButton");
     connect(mFillFlatButton, &QPushButton::released,
             this, &FillStrokeSettingsWidget::setFlatFill);
-    mFillGradientButton = new QPushButton(
-                QIcon(":/icons/fill_gradient.png"),
-                "Gradient", this);
+    mFillGradientButton = new QPushButton(QIcon(iconsDir + "/fill_gradient.png"),
+                                          "Gradient", this);
     mFillGradientButton->setCheckable(true);
     mFillGradientButton->setObjectName("rightButton");
     connect(mFillGradientButton, &QPushButton::released,
@@ -73,8 +69,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mTargetLayout->addWidget(mStrokeTargetButton);
 
     //mLineWidthSpin = new QDoubleSpinBox(this);
-    mLineWidthSpin = new QrealAnimatorValueSlider("line width",
-                                                  0., 1000., 1., this);
+    mLineWidthSpin = new QrealAnimatorValueSlider("line width", 0., 1000., 1., this);
     mLineWidthSpin->setNameVisible(false);
     //mLineWidthSpin->setValueSliderVisibile(false);
     //mLineWidthSpin->setRange(0.0, 1000.0);
@@ -86,14 +81,11 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mStrokeSettingsLayout->addLayout(mLineWidthLayout);
 
     mJoinStyleLayout->setSpacing(0);
-    mBevelJoinStyleButton = new QPushButton(QIcon(":/icons/join_bevel.png"),
-                                            "", this);
+    mBevelJoinStyleButton = new QPushButton(QIcon(iconsDir + "/joinBevel.png"), "", this);
     mBevelJoinStyleButton->setObjectName("leftButton");
-    mMiterJointStyleButton = new QPushButton(QIcon(":/icons/join_miter.png"),
-                                             "", this);
+    mMiterJointStyleButton = new QPushButton(QIcon(iconsDir + "/joinMiter.png"), "", this);
     mMiterJointStyleButton->setObjectName("middleButton");
-    mRoundJoinStyleButton = new QPushButton(QIcon(":/icons/join_round.png"),
-                                            "", this);
+    mRoundJoinStyleButton = new QPushButton(QIcon(iconsDir + "/joinRound.png"), "", this);
     mRoundJoinStyleButton->setObjectName("rightButton");
 
     mBevelJoinStyleButton->setCheckable(true);
@@ -117,13 +109,13 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     strokeJoinCapLay->addLayout(mJoinStyleLayout);
 
     mCapStyleLayout->setSpacing(0);
-    mFlatCapStyleButton = new QPushButton(QIcon(":/icons/cap_flat.png"),
+    mFlatCapStyleButton = new QPushButton(QIcon(iconsDir + "/capFlat.png"),
                                           "", this);
     mFlatCapStyleButton->setObjectName("leftButton");
-    mSquareCapStyleButton = new QPushButton(QIcon(":/icons/cap_square.png"),
+    mSquareCapStyleButton = new QPushButton(QIcon(iconsDir + "/capSquare.png"),
                                             "", this);
     mSquareCapStyleButton->setObjectName("middleButton");
-    mRoundCapStyleButton = new QPushButton(QIcon(":/icons/cap_round.png"),
+    mRoundCapStyleButton = new QPushButton(QIcon(iconsDir + "/capRound.png"),
                                            "", this);
     mRoundCapStyleButton->setObjectName("rightButton");
     mFlatCapStyleButton->setCheckable(true);
@@ -170,17 +162,15 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
 
     mGradientTypeLayout = new QHBoxLayout();
     mGradientTypeLayout->setSpacing(0);
-    mLinearGradientButton = new QPushButton(
-                QIcon(":/icons/fill_gradient.png"),
-                "Linear", this);
+    mLinearGradientButton = new QPushButton(QIcon(iconsDir + "/fill_gradient.png"),
+                                            "Linear", this);
     mLinearGradientButton->setCheckable(true);
     mLinearGradientButton->setObjectName("leftButton");
     connect(mLinearGradientButton, &QPushButton::released,
             this, &FillStrokeSettingsWidget::setLinearGradientFill);
 
-    mRadialGradientButton = new QPushButton(
-                QIcon(":/icons/fill_gradient_radial.png"),
-                "Radial", this);
+    mRadialGradientButton = new QPushButton(QIcon(iconsDir + "/fill_gradient_radial.png"),
+                                            "Radial", this);
     mRadialGradientButton->setCheckable(true);
     mRadialGradientButton->setObjectName("rightButton");
     connect(mRadialGradientButton, &QPushButton::released,

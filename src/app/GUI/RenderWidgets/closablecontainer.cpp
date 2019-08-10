@@ -1,18 +1,18 @@
 #include "closablecontainer.h"
 #include "GUI/global.h"
+#include "settings.h"
 #include <QCheckBox>
 
 ClosableContainer::ClosableContainer(QWidget *parent) : QWidget(parent) {
     setLayout(mMainLayout);
-    mContentArrow = new QPushButton(QIcon(":/icons/list_show_children.png"),
-                                    "",
-                                    this);
+    const auto iconPath = EnveSettings::sIconsDir() + "/right-arrrow.png";
+    mContentArrow = new QPushButton(QIcon(iconPath), "", this);
     mContentArrow->setObjectName("iconButton");
     mContentArrow->setCheckable(true);
-    mContentArrow->setIconSize(QSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM));
     mContentArrow->setFixedSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM);
-    connect(mContentArrow, SIGNAL(toggled(bool)),
-            this, SLOT(setContentVisible(bool)));
+    mContentArrow->setIconSize(QSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM));
+    connect(mContentArrow, &QPushButton::toggled,
+            this, &ClosableContainer::setContentVisible);
 
     mMainLayout->addWidget(mContentArrow, Qt::AlignTop);
     mMainLayout->addLayout(mContLayout);
@@ -57,11 +57,9 @@ bool ClosableContainer::isChecked() {
 
 void ClosableContainer::setContentVisible(const bool bT) {
     if(bT) {
-        mContentArrow->setIcon(QIcon(":/icons/list_hide_children.png"));
+        mContentArrow->setIcon(QIcon(EnveSettings::sIconsDir() + "/down-arrow.png"));
     } else {
-        mContentArrow->setIcon(QIcon(":/icons/list_show_children.png"));
+        mContentArrow->setIcon(QIcon(EnveSettings::sIconsDir() + "/right-arrow.png"));
     }
-    for(QWidget *widget : mContWidgets) {
-        widget->setVisible(bT);
-    }
+    for(const auto widget : mContWidgets) widget->setVisible(bT);
 }

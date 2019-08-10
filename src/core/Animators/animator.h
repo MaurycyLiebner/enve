@@ -11,7 +11,6 @@ class ComplexKey;
 class QrealPoint;
 class QPainter;
 class DurationRectangleMovable;
-class FakeComplexAnimator;
 enum CtrlsMode : short;
 
 class OverlappingKeys {
@@ -297,14 +296,6 @@ public:
     void anim_moveKeyToRelFrame(Key * const key, const int newFrame);
     void anim_shiftAllKeys(const int shift);
 
-    bool hasFakeComplexAnimator();
-
-    FakeComplexAnimator *getFakeComplexAnimator();
-
-    void enableFakeComplexAnimator();
-
-    void disableFakeComplexAnimator();
-    void disableFakeComplexAnimatrIfNotNeeded();
     int anim_getPrevKeyRelFrame(const int relFrame) const;
     int anim_getNextKeyRelFrame(const int relFrame) const;
     bool hasSelectedKeys() const;
@@ -354,7 +345,6 @@ protected:
 
     OverlappingKeyList anim_mKeys;
     QList<Key*> anim_mSelectedKeys;
-    qsptr<FakeComplexAnimator> mFakeComplexAnimator;
 private:
     void anim_drawKey(QPainter * const p, Key * const key,
                       const qreal pixelsPerFrame,

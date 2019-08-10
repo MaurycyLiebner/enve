@@ -110,7 +110,6 @@ public:
     virtual bool SWT_isBoolAnimator() const { return false; }
     virtual bool SWT_isColorAnimator() const { return false; }
     virtual bool SWT_isComplexAnimator() const { return false; }
-    virtual bool SWT_isFakeComplexAnimator() const { return false; }
     virtual bool SWT_isRasterEffectAnimators() const { return false; }
     virtual bool SWT_isPathEffectAnimators() const { return false; }
     virtual bool SWT_isRasterEffect() const { return false; }

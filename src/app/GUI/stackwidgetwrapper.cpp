@@ -97,13 +97,15 @@ StackWrapperMenu::StackWrapperMenu() {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 }
 
+#include "settings.h"
 StackWrapperCornerMenu::StackWrapperCornerMenu(StackWidgetWrapper * const target) {
+    const auto iconsDir = EnveSettings::sIconsDir();
     mSplitV = addAction("split v");
-    mSplitV->setIcon(QIcon(":/icons/split_v.png"));
+    mSplitV->setIcon(QIcon(iconsDir + "/split_v.png"));
     mSplitH = addAction("split h");
-    mSplitH->setIcon(QIcon(":/icons/split_h.png"));
+    mSplitH->setIcon(QIcon(iconsDir + "/split_h.png"));
     mClose = addAction("x");
-    mClose->setIcon(QIcon(":/icons/close.png"));
+    mClose->setIcon(QIcon(iconsDir + "/close.png"));
 
     connect(mSplitV, &QAction::triggered,
             target, &StackWidgetWrapper::splitV);

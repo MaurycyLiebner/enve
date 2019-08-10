@@ -223,8 +223,8 @@ private:
     UsageWidget* mUsageWidget = nullptr;
     QToolBar *mToolBar;
 
-    ActionButton *mMovePathMode;
-    ActionButton *mMovePointMode;
+    ActionButton *mBoxTransformMode;
+    ActionButton *mPointTransformMode;
     ActionButton *mAddPointMode;
     ActionButton *mPickPaintSettingsMode;
 
