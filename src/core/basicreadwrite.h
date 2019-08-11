@@ -48,7 +48,4 @@ extern bool gWrite(QIODevice* dst, const qCubicSegment1D& value);
 
 extern bool gRead(QIODevice* src, SmartPath& value);
 extern bool gWrite(QIODevice* dst, const SmartPath& value);
-
-extern bool gRead(QIODevice* src, BrushPolyline& value);
-extern bool gWrite(QIODevice* dst, const BrushPolyline& value);
 #endif // BASICREADWRITE_H

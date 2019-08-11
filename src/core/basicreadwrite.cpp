@@ -60,12 +60,3 @@ bool gRead(QIODevice *src, SmartPath &value) {
 bool gWrite(QIODevice *dst, const SmartPath &value) {
     return value.write(dst);
 }
-
-#include "brushpolyline.h"
-bool gRead(QIODevice *src, BrushPolyline &value) {
-    return value.read(src);
-}
-
-bool gWrite(QIODevice *dst, const BrushPolyline &value) {
-    return value.write(dst);
-}

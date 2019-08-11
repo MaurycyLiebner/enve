@@ -242,7 +242,6 @@ SOURCES += \
     Animators/interpolationkeyt.cpp \
     Properties/boolproperty.cpp \
     PathEffects/patheffect.cpp \
-    Animators/polylineanimator.cpp \
     Animators/transformanimator.cpp \
     Animators/qrealanimator.cpp \
     Animators/qrealkey.cpp \
@@ -259,12 +258,7 @@ SOURCES += \
     MovablePoints/pointshandler.cpp \
     MovablePoints/pathpointshandler.cpp \
     canvasbase.cpp \
-    typemenu.cpp \
-    polyline.cpp \
-    brushpolyline.cpp \
-    Animators/brushpolylineanimator.cpp \
-    MovablePoints/polylinepoint.cpp \
-    MovablePoints/brushpolypoint.cpp
+    typemenu.cpp
 
 HEADERS += \
     Animators/SmartPath/smartpath.h \
@@ -475,7 +469,6 @@ HEADERS += \
     Animators/interpolationkeyt.h \
     Properties/boolproperty.h \
     PathEffects/patheffect.h \
-    Animators/polylineanimator.h \
     Animators/transformanimator.h \
     Animators/qrealanimator.h \
     Animators/qrealkey.h \
@@ -493,12 +486,7 @@ HEADERS += \
     MovablePoints/pathpointshandler.h \
     canvasbase.h \
     typemenu.h \
-    pointtypemenu.h \
-    polyline.h \
-    brushpolyline.h \
-    Animators/brushpolylineanimator.h \
-    MovablePoints/polylinepoint.h \
-    MovablePoints/brushpolypoint.h
+    pointtypemenu.h
 
 unix {
     target.path = /usr/lib
