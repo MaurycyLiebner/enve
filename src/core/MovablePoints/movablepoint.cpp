@@ -87,9 +87,11 @@ void MovablePoint::drawOnAbsPosSk(SkCanvas * const canvas,
 }
 
 void MovablePoint::drawSk(SkCanvas * const canvas, const CanvasMode mode,
-                          const float invScale, const bool keyOnCurrent) {
+                          const float invScale, const bool keyOnCurrent,
+                          const bool ctrlPressed) {
     Q_UNUSED(mode);
     Q_UNUSED(keyOnCurrent);
+    Q_UNUSED(ctrlPressed);
     const SkColor fillCol = mSelected ?
                 SkColorSetRGB(255, 0, 0) :
                 SkColorSetRGB(255, 175, 175);

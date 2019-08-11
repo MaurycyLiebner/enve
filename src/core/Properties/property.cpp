@@ -11,14 +11,15 @@ Property::Property(const QString& name) :
 
 void Property::drawCanvasControls(SkCanvas * const canvas,
                                   const CanvasMode mode,
-                                  const float invScale) {
+                                  const float invScale,
+                                  const bool ctrlPressed) {
     if(mPointsHandler) {
         bool key;
         if(SWT_isAnimator()) {
             const auto asAnim = static_cast<Animator*>(this);
             key = asAnim->anim_getKeyOnCurrentFrame();
         } else key = false;
-        mPointsHandler->drawPoints(canvas, invScale, key, mode);
+        mPointsHandler->drawPoints(canvas, invScale, key, mode, ctrlPressed);
     }
 }
 

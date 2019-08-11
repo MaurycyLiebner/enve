@@ -115,7 +115,8 @@ public:
 
     virtual void drawCanvasControls(SkCanvas * const canvas,
                                     const CanvasMode mode,
-                                    const float invScale);
+                                    const float invScale,
+                                    const bool ctrlPressed);
 
     virtual void setupTreeViewMenu(PropertyMenu * const menu);
 

@@ -44,7 +44,8 @@ public:
     void drawSk(SkCanvas * const canvas,
                 const CanvasMode mode,
                 const float invScale,
-                const bool keyOnCurrent);
+                const bool keyOnCurrent,
+                const bool ctrlPressed);
     void setTransform(BasicTransformAnimator * const trans);
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode mode,

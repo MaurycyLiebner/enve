@@ -54,11 +54,13 @@ public:
     void drawPoints(SkCanvas * const canvas,
                     const float invScale,
                     const bool keyOnCurrentFrame,
-                    const CanvasMode mode) const {
+                    const CanvasMode mode,
+                    const bool ctrlPressed) const {
         for(int i = mPts.count() - 1; i >= 0; i--) {
             const auto& pt = mPts.at(i);
             if(pt->isVisible(mode))
-                pt->drawSk(canvas, mode, invScale, keyOnCurrentFrame);
+                pt->drawSk(canvas, mode, invScale,
+                           keyOnCurrentFrame, ctrlPressed);
         }
     }
 

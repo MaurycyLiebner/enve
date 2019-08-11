@@ -148,7 +148,7 @@ void SmartPath::actionConnectNodes(const int node1Id, const int node2Id) {
     if((node1Id == 0 && node2Id == mNodesList.count() - 1) ||
        (node2Id == 0 && node1Id == mNodesList.count() - 1)) {
         mNodesList.setClosed(true);
-    } else RuntimeThrow("Only first and last node can be connected");
+    } else return;
 }
 
 void SmartPath::actionMergeNodes(const int node1Id, const int node2Id) {

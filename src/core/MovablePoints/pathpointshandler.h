@@ -95,16 +95,9 @@ private:
     SmartNodePoint* createNewNodePoint(const int nodeId);
     SmartNodePoint* createAndAssignNewNodePoint(const int nodeId);
     SmartPath* targetPath() const;
-    void blockAllPointsUpdate() {
-        mBlockAllPointsUpdate = true;
-    }
-    void unblockAllPointsUpdate() {
-        mBlockAllPointsUpdate = false;
-    }
 
     SmartPathAnimator * const mTargetAnimator;
     bool mKeyOnCurrentFrame = false;
-    bool mBlockAllPointsUpdate = false;
 };
 
 #endif // PATHPOINTSHANDLER_H

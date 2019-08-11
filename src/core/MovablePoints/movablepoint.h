@@ -45,7 +45,8 @@ public:
     virtual void drawSk(SkCanvas * const canvas,
                         const CanvasMode mode,
                         const float invScale,
-                        const bool keyOnCurrent);
+                        const bool keyOnCurrent,
+                        const bool ctrlPressed);
 
     virtual void remove() {}
     virtual bool isVisible(const CanvasMode mode) const;

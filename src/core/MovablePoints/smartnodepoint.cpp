@@ -174,9 +174,6 @@ SmartCtrlPoint *SmartNodePoint::getC0Pt() {
 
 void SmartNodePoint::updateCtrlPtPos(SmartCtrlPoint * const pointToUpdate) {
     const auto otherPt = pointToUpdate == mC0Pt.get() ? mC2Pt.get() : mC0Pt.get();
-    if(otherPt == mC0Pt.get() && !getC0Enabled()) return;
-    if(otherPt == mC2Pt.get() && !getC2Enabled()) return;
-
     const QPointF relPos = otherPt->getRelativePos();
     QPointF newPos;
     if(getCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC) {
@@ -223,12 +220,13 @@ void drawCtrlPtLine(SkCanvas * const canvas,
         canvas->drawLine(skAbsPos, skCtrlAbsPos, paint);
     }
 }
+#include "GUI/global.h"
 
-void SmartNodePoint::drawSk(
-        SkCanvas * const canvas,
-        const CanvasMode mode,
-        const float invScale,
-        const bool keyOnCurrent) {
+void SmartNodePoint::drawSk(SkCanvas * const canvas,
+                            const CanvasMode mode,
+                            const float invScale,
+                            const bool keyOnCurrent,
+                            const bool ctrlPressed) {
     const QPointF qAbsPos = getAbsolutePos();
     const SkPoint skAbsPos = toSkPoint(qAbsPos);
 
@@ -245,7 +243,7 @@ void SmartNodePoint::drawSk(
             if(mC2Pt->isVisible(mode)) {
                 drawCtrlPtLine(canvas, mC2Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
-                mC2Pt->drawSk(canvas, mode, invScale, keyOnCurrent);
+                mC2Pt->drawSk(canvas, mode, invScale, keyOnCurrent, ctrlPressed);
             } else if(mode == CanvasMode::pathCreate) {
                 drawCtrlPtLine(canvas, mC2Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
@@ -258,7 +256,7 @@ void SmartNodePoint::drawSk(
             if(mC0Pt->isVisible(mode)) {
                 drawCtrlPtLine(canvas, mC0Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
-                mC0Pt->drawSk(canvas, mode, invScale, keyOnCurrent);
+                mC0Pt->drawSk(canvas, mode, invScale, keyOnCurrent, ctrlPressed);
             } else if(mode == CanvasMode::pathCreate) {
                 drawCtrlPtLine(canvas, mC0Pt->getAbsolutePos(),
                                qAbsPos, skAbsPos, invScale);
@@ -271,32 +269,33 @@ void SmartNodePoint::drawSk(
         drawOnAbsPosSk(canvas, skAbsPos, invScale, fillCol, keyOnCurrent);
     }
 
-//    if(MainWindow::isCtrlPressed()) {
-//        SkPaint paint;
-//        paint.setAntiAlias(true);
-//        paint.setColor(SK_ColorBLACK);
-//        paint.setStyle(SkPaint::kFill_Style);
+    if(ctrlPressed) {
+        SkPaint paint;
+        paint.setAntiAlias(true);
 
-//        SkFont font;
-//        font.setSize(FONT_HEIGHT*invScale);
-//        const auto fontStyle = SkFontStyle(SkFontStyle::kBold_Weight,
-//                                           SkFontStyle::kNormal_Width,
-//                                           SkFontStyle::kUpright_Slant);
-//        font.setTypeface(SkTypeface::MakeFromName(nullptr, fontStyle));
-//        const auto nodeIdStr = QString::number(getNodeId());
-//        const ulong sizeT = static_cast<ulong>(nodeIdStr.size());
-//        const auto cStr = nodeIdStr.toStdString().c_str();
-//        SkRect bounds;
-//        font.measureText(cStr,
-//                         sizeT*sizeof(char),
-//                         SkTextEncoding::kUTF8,
-//                         &bounds);
+        SkFont font;
+        font.setSize(FONT_HEIGHT*invScale);
+        const auto fontStyle = SkFontStyle(SkFontStyle::kBold_Weight,
+                                           SkFontStyle::kNormal_Width,
+                                           SkFontStyle::kUpright_Slant);
+        font.setTypeface(SkTypeface::MakeFromName(nullptr, fontStyle));
+        const auto nodeIdStr = QString::number(getNodeId());
+        const ulong sizeT = static_cast<ulong>(nodeIdStr.size());
+        const auto cStr = nodeIdStr.toStdString().c_str();
+        SkRect bounds;
+        font.measureText(cStr, sizeT*sizeof(char), SkTextEncoding::kUTF8, &bounds);
 
-//        canvas->drawString(cStr,
-//                           skAbsPos.x() + bounds.width()*0.5f,
-//                           skAbsPos.y() + bounds.height()*0.5f,
-//                           font, paint);
-//    }
+        const float x = skAbsPos.x() - bounds.width()*0.5f - 1;
+        const float y = skAbsPos.y() + bounds.height()*0.5f;
+
+        paint.setStyle(SkPaint::kFill_Style);
+        paint.setColor(SK_ColorBLACK);
+        canvas->drawString(cStr, x, y, font, paint);
+
+        paint.setStyle(SkPaint::kStroke_Style);
+        paint.setColor(SK_ColorWHITE);
+        canvas->drawString(cStr, x, y, font, paint);
+    }
 }
 
 void SmartNodePoint::setTransform(BasicTransformAnimator * const trans) {
@@ -516,8 +515,7 @@ void SmartNodePoint::c0Moved(const QPointF &c0) {
                                              mC2Pt->getRelativePos());
     }
 
-    if(mPrevNormalPoint)
-        mPrevNormalPoint->afterNextNodeC0P1Changed();
+    if(mPrevNormalPoint) mPrevNormalPoint->afterNextNodeC0P1Changed();
     mParentAnimator->pathChanged();
 }
 

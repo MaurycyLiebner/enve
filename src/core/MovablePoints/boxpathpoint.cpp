@@ -27,9 +27,11 @@ void BoxPathPoint::finishTransform() {
 }
 
 void BoxPathPoint::drawSk(SkCanvas * const canvas, const CanvasMode mode,
-                          const float invScale, const bool keyOnCurrent) {
+                          const float invScale, const bool keyOnCurrent,
+                          const bool ctrlPressed) {
     Q_UNUSED(mode);
     Q_UNUSED(keyOnCurrent);
+    Q_UNUSED(ctrlPressed);
     const SkPoint absPos = toSkPoint(getAbsolutePos());
     const SkColor fillCol = isSelected() ?
                 SkColorSetRGB(255, 255, 0) :

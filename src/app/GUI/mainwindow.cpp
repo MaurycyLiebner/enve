@@ -937,7 +937,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
         } else {
             returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);
         }
-        if(event->key() != Qt::Key_Control) mDocument.actionFinished();
+        mDocument.actionFinished();
         return returnBool;
     }
     return false;

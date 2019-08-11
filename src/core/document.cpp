@@ -26,11 +26,6 @@ void Document::actionFinished() {
             emit documentChanged();
         emit scene.first->requestUpdate();
     }
-//    if(fActiveScene) {
-//        if(fActiveScene->newUndoRedoSet())
-//            emit documentChanged();
-//        emit fActiveScene->requestUpdate();
-//    }
 }
 
 void Document::replaceClipboard(const stdsptr<Clipboard> &container) {

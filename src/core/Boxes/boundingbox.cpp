@@ -224,9 +224,10 @@ void BoundingBox::updateAllBoxes(const UpdateReason reason) {
 
 void BoundingBox::drawAllCanvasControls(SkCanvas * const canvas,
                                         const CanvasMode mode,
-                                        const float invScale) {
+                                        const float invScale,
+                                        const bool ctrlPressed) {
     for(const auto& prop : mCanvasProps)
-        prop->drawCanvasControls(canvas, mode, invScale);
+        prop->drawCanvasControls(canvas, mode, invScale, ctrlPressed);
 }
 
 FrameRange BoundingBox::prp_relInfluenceRange() const {

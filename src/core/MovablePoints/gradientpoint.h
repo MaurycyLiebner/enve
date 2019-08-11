@@ -10,7 +10,8 @@ public:
     void drawSk(SkCanvas * const canvas,
                 const CanvasMode mode,
                 const float invScale,
-                const bool keyOnCurrent);
+                const bool keyOnCurrent,
+                const bool ctrlPressed);
 protected:
     GradientPoint(QPointFAnimator* const associatedAnimator,
                   PathBox * const parent);

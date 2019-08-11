@@ -217,7 +217,8 @@ public:
     void prp_afterChangedAbsRange(const FrameRange &range);
     void drawAllCanvasControls(SkCanvas * const canvas,
                                const CanvasMode mode,
-                               const float invScale);
+                               const float invScale,
+                               const bool ctrlPressed);
 
     FrameRange prp_relInfluenceRange() const;
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;

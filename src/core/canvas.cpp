@@ -214,22 +214,24 @@ void Canvas::renderSk(SkCanvas * const canvas,
     if(!mCurrentContainer->SWT_isCanvas())
         mCurrentContainer->drawBoundingRect(canvas, invZoom);
     if(!mPaintTarget.isValid()) {
+        const bool ctrlPressed = QApplication::queryKeyboardModifiers() & Qt::CTRL;
         for(int i = mSelectedBoxes.count() - 1; i >= 0; i--) {
             const auto& iBox = mSelectedBoxes.at(i);
             canvas->save();
             iBox->drawBoundingRect(canvas, invZoom);
-            iBox->drawAllCanvasControls(canvas, mCurrentMode, invZoom);
+            iBox->drawAllCanvasControls(canvas, mCurrentMode, invZoom, ctrlPressed);
             canvas->restore();
         }
     }
 
     if(mCurrentMode == CanvasMode::boxTransform ||
        mCurrentMode == CanvasMode::pointTransform) {
-        if(mTransMode == TransformMode::rotate || mTransMode == TransformMode::scale) {
+        if(mTransMode == TransformMode::rotate ||
+           mTransMode == TransformMode::scale) {
             mRotPivot->drawTransforming(canvas, mCurrentMode, invZoom,
                                         MIN_WIDGET_DIM*0.25f*invZoom);
         } else if(!mouseGrabbing || mRotPivot->isSelected()) {
-            mRotPivot->drawSk(canvas, mCurrentMode, invZoom, false);
+            mRotPivot->drawSk(canvas, mCurrentMode, invZoom, false, false);
         }
     }
 
@@ -557,7 +559,7 @@ bool Canvas::handleModifierChange(const KeyEvent &e) {
            e.fKey == Qt::Key_Meta) {
             handleMovePointMouseMove(e);
             return true;
-        }
+        } else if(e.fKey == Qt::Key_Control) return true;
     }
     return false;
 }

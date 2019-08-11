@@ -36,7 +36,6 @@ void PathPointsHandler::updatePoint(SmartNodePoint * const pt, const int nodeId)
 }
 
 void PathPointsHandler::updateAllPoints() {
-    if(mBlockAllPointsUpdate) return;
     const int newCount = targetPath()->getNodeCount();
     while(newCount < count()) removeLast();
     for(int i = 0; i < count(); i++) getPointWithId<SmartNodePoint>(i)->clear();
@@ -46,12 +45,10 @@ void PathPointsHandler::updateAllPoints() {
 
 void PathPointsHandler::setCtrlsMode(const int nodeId,
                                      const CtrlsMode mode) {
-    blockAllPointsUpdate();
     mTargetAnimator->beforeBinaryPathChange();
     targetPath()->actionSetNormalNodeCtrlsMode(nodeId, mode);
     updatePoint(nodeId);
     mTargetAnimator->pathChanged();
-    unblockAllPointsUpdate();
 }
 
 void PathPointsHandler::removeNode(const int nodeId,
@@ -60,24 +57,18 @@ void PathPointsHandler::removeNode(const int nodeId,
 }
 
 SmartNodePoint* PathPointsHandler::addFirstNode(const QPointF &relPos) {
-    blockAllPointsUpdate();
     const int id = mTargetAnimator->actionAddFirstNode(relPos);
-    unblockAllPointsUpdate();
     return createAndAssignNewNodePoint(id);
 }
 
 SmartNodePoint* PathPointsHandler::addNewAtEnd(const QPointF &relPos) {
-    blockAllPointsUpdate();
     const int id = mTargetAnimator->actionAddNewAtEnd(relPos);
-    unblockAllPointsUpdate();
     return createAndAssignNewNodePoint(id);
 }
 
 void PathPointsHandler::promoteToNormal(const int nodeId) {
-    blockAllPointsUpdate();
     mTargetAnimator->beforeBinaryPathChange();
     targetPath()->actionPromoteDissolvedNodeToNormal(nodeId);
-    unblockAllPointsUpdate();
     mTargetAnimator->pathChanged();
 
     const int prevNormalId = targetPath()->prevNormalId(nodeId);
@@ -88,10 +79,8 @@ void PathPointsHandler::promoteToNormal(const int nodeId) {
 
 void PathPointsHandler::demoteToDissolved(const int nodeId,
                                           const bool approx) {
-    blockAllPointsUpdate();
     mTargetAnimator->beforeBinaryPathChange();
     targetPath()->actionDemoteToDissolved(nodeId, approx);
-    unblockAllPointsUpdate();
     mTargetAnimator->pathChanged();
 
     const int prevNormalId = targetPath()->prevNormalId(nodeId);

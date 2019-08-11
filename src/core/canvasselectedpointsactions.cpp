@@ -178,7 +178,7 @@ void Canvas::removePointFromSelection(MovablePoint * const point) {
 
 void Canvas::removeSelectedPointsAndClearList() {
     if(mPressedPoint && mPressedPoint->isCtrlPoint()) {
-        mPressedPoint->cancelTransform();
+        mPressedPoint->finishTransform();
         mPressedPoint->deselect();
         mPressedPoint->remove();
         mSelectedPoints_d.removeOne(mPressedPoint);

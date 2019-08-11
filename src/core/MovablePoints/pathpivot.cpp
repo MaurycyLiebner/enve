@@ -13,8 +13,10 @@ PathPivot::PathPivot(const Canvas * const parent) :
 void PathPivot::drawSk(SkCanvas * const canvas,
                        const CanvasMode mode,
                        const float invScale,
-                       const bool keyOnCurrent) {
+                       const bool keyOnCurrent,
+                       const bool ctrlPressed) {
     Q_UNUSED(keyOnCurrent);
+    Q_UNUSED(ctrlPressed);
     const SkPoint absPos = toSkPoint(getAbsolutePos());
     if(isVisible(mode)) {
         const SkColor fillCol = isSelected() ?
@@ -39,7 +41,7 @@ void PathPivot::drawTransforming(SkCanvas * const canvas,
                                  const CanvasMode mode,
                                  const float invScale,
                                  const float interval) {
-    drawSk(canvas, mode, invScale, false);
+    drawSk(canvas, mode, invScale, false, false);
     SkPaint paint;
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);

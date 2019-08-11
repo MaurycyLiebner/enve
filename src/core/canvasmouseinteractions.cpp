@@ -323,7 +323,8 @@ void Canvas::cancelCurrentTransform() {
 void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
     if(mRotPivot->isSelected()) {
         mRotPivot->deselect();
-    } else if(mTransMode == TransformMode::rotate || mTransMode == TransformMode::scale) {
+    } else if(mTransMode == TransformMode::rotate ||
+              mTransMode == TransformMode::scale) {
         finishSelectedPointsTransform();
         mTransMode = TransformMode::none;
     } else if(mSelecting) {
@@ -333,7 +334,9 @@ void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
         selectAndAddContainedPointsToSelection(mSelectionRect);
     } else if(mFirstMouseMove) {
         if(mPressedPoint) {
-            if(e.shiftMod()) {
+            if(mPressedPoint->isCtrlPoint()) {
+                removePointFromSelection(mPressedPoint);
+            } else if(e.shiftMod()) {
                 if(mPressedPoint->isSelected()) {
                     removePointFromSelection(mPressedPoint);
                 } else {

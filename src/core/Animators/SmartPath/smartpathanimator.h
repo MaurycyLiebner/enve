@@ -29,10 +29,11 @@ public:
 
     void drawCanvasControls(SkCanvas * const canvas,
                             const CanvasMode mode,
-                            const float invScale) {
+                            const float invScale,
+                            const bool ctrlPressed) {
         SkiaHelpers::drawOutlineOverlay(canvas, mCurrentPath, invScale,
                                         toSkMatrix(getTransform()));
-        Property::drawCanvasControls(canvas, mode, invScale);
+        Property::drawCanvasControls(canvas, mode, invScale, ctrlPressed);
     }
 
     void prp_afterChangedAbsRange(const FrameRange &range) {
@@ -148,6 +149,8 @@ public:
 
     SimpleTaskScheduler startPathChange;
     void startPathChangeExec() {
+        if(mPathChanged) return;
+        mPathChanged = true;
         if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
             anim_saveCurrentValueAsKey();
         }
@@ -157,27 +160,24 @@ public:
     SimpleTaskScheduler pathChanged;
     void pathChangedExec() {
         const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
-        if(spk) {
-            anim_updateAfterChangedKey(spk);
-        } else {
-            prp_afterWholeInfluenceRangeChanged();
-        }
+        if(spk) anim_updateAfterChangedKey(spk);
+        else prp_afterWholeInfluenceRangeChanged();
     }
 
     SimpleTaskScheduler cancelPathChange;
     void cancelPathChangeExec() {
+        if(!mPathChanged) return;
+        mPathChanged = false;
         mPathBeingChanged_d->restore();
         const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
-        if(spk) {
-            anim_updateAfterChangedKey(spk);
-        } else {
-            prp_afterWholeInfluenceRangeChanged();
-        }
+        if(spk) anim_updateAfterChangedKey(spk);
+        else prp_afterWholeInfluenceRangeChanged();
     }
 
     SimpleTaskScheduler finishPathChange;
     void finishPathChangeExec() {
-        //pathChanged();
+        if(!mPathChanged) return;
+        mPathChanged = false;
     }
 
     void actionRemoveNode(const int nodeId, const bool approx) {
@@ -449,6 +449,7 @@ private:
         }
     }    
 
+    bool mPathChanged = false;
     bool mPathUpToDate = true;
     SkPath mCurrentPath;
     SmartPath mBaseValue;
