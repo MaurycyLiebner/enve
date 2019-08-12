@@ -826,7 +826,6 @@ void ContainerBox::writeBoundingBox(QIODevice * const target) {
 #include "imagebox.h"
 #include "textbox.h"
 #include "videobox.h"
-#include "particlebox.h"
 #include "rectangle.h"
 #include "circle.h"
 #include "paintbox.h"
@@ -847,8 +846,6 @@ qsptr<BoundingBox> readIdCreateBox(QIODevice * const src) {
             return enve::make_shared<TextBox>();
         case(eBoxType::TYPE_VIDEO):
             return enve::make_shared<VideoBox>();
-        case(eBoxType::TYPE_PARTICLES):
-            return enve::make_shared<ParticleBox>();
         case(eBoxType::TYPE_RECTANGLE):
             return enve::make_shared<Rectangle>();
         case(eBoxType::TYPE_CIRCLE):

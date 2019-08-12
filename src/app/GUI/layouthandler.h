@@ -54,7 +54,7 @@ public:
         return mTimelineLayout;
     }
 
-    void clear() {}
+    void clear();
 
     void write(QIODevice* const dst) const {
         dst->write(rcConstChar(&mNumberLayouts), sizeof(int));

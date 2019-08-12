@@ -56,6 +56,11 @@ LayoutHandler::LayoutHandler(Document& document,
             this, &LayoutHandler::removeForScene);
 }
 
+void LayoutHandler::clear() {
+    mSceneLayout->setCurrent(nullptr);
+    mTimelineLayout->setCurrent(nullptr);
+}
+
 void LayoutHandler::saveCurrent() {
     if(mCurrentId == -1) return;
     mSceneLayout->saveData();

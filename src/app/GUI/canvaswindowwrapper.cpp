@@ -82,11 +82,14 @@ void CWWidgetStackLayoutItem::clear() {
     mTransform.reset();
 }
 
-QWidget* CWWidgetStackLayoutItem::create(
-        Document& document,
-        QWidget* const parent, QLayout * const layout) {
+QWidget* CWWidgetStackLayoutItem::create(Document& document,
+                                         QWidget* const parent,
+                                         QLayout* const layout) {
     const auto cwWrapper = new CanvasWindowWrapper(&document, this, parent);
-    if(layout) layout->addWidget(cwWrapper);
+    if(layout) {
+        cwWrapper->disableClose();
+        layout->addWidget(cwWrapper);
+    }
     cwWrapper->setScene(mScene);
     const auto cw = cwWrapper->getSceneWidget();
     if(mTransformSet) cw->setViewTransform(mTransform);

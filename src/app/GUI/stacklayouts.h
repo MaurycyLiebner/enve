@@ -207,7 +207,8 @@ public:
     HSplitStackItem() { mType = Type::H_SPLIT; }
 
     QWidget* create(Document &document,
-                    QWidget* const parent, QLayout* const layout = nullptr) {
+                    QWidget* const parent,
+                    QLayout* const layout = nullptr) {
         const auto split = new HWidgetStack(this, parent);
         if(layout) layout->addWidget(split);
         split->appendWidget(mChildItems.first->create(document, split),

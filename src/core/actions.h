@@ -97,8 +97,6 @@ public:
     void setRectangleMode();
     void setCircleMode();
     void setTextMode();
-    void setParticleBoxMode();
-    void setParticleEmitterMode();
     void setPaintMode();
 
     bool smoothChange() const { return mSmoothChange; }

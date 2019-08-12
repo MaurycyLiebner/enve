@@ -41,8 +41,6 @@ public:
     void unblockAutomaticSizeFit();
     void setViewTransform(const QMatrix& transform) {
         mViewTransform = transform; }
-    void openWelcomeDialog();
-    void closeWelcomeDialog();
 
     void setCurrentCanvas(Canvas * const canvas);
     bool hasNoCanvas();
@@ -96,8 +94,6 @@ protected:
 private:
     void setCanvasMode(const CanvasMode mode);
     void updatePaintModeCursor();
-
-    QWidget * mWelcomeDialog = nullptr;
 
     Document& mDocument;
     Actions& mActions;

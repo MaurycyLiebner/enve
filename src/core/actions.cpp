@@ -376,14 +376,6 @@ void Actions::setTextMode() {
     mDocument.setCanvasMode(CanvasMode::textCreate);
 }
 
-void Actions::setParticleBoxMode() {
-    mDocument.setCanvasMode(CanvasMode::particleBoxCreate);
-}
-
-void Actions::setParticleEmitterMode() {
-    mDocument.setCanvasMode(CanvasMode::particleEmitterCreate);
-}
-
 void Actions::setPaintMode() {
     mDocument.setCanvasMode(CanvasMode::paint);
 }

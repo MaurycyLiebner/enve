@@ -46,6 +46,11 @@ int main(int argc, char *argv[]) {
     eWidgetsImpl widImpl;
     ImportHandler importHandler;
     TaskScheduler taskScheduler;
+    try {
+        taskScheduler.initializeGpu();
+    } catch(const std::exception& e) {
+        gPrintExceptionFatal(e);
+    }
     Document document(taskScheduler);
     Actions actions(document);
 

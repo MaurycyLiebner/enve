@@ -20,7 +20,6 @@
 #include "Boxes/imagebox.h"
 #include "Boxes/videobox.h"
 #include "Boxes/textbox.h"
-#include "Boxes/particlebox.h"
 #include "Boxes/imagesequencebox.h"
 #include "Boxes/linkbox.h"
 #include "Boxes/paintbox.h"

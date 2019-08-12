@@ -23,7 +23,6 @@ class AnimatedSurface;
 class PaintBox;
 class TextBox;
 class Circle;
-class ParticleBox;
 class Rectangle;
 class PathPivot;
 class SoundComposition;
@@ -615,7 +614,6 @@ protected:
     qptr<Circle> mCurrentCircle;
     qptr<Rectangle> mCurrentRectangle;
     qptr<TextBox> mCurrentTextBox;
-    qptr<ParticleBox> mCurrentParticleBox;
     qptr<ContainerBox> mCurrentContainer;
 
     stdptr<MovablePoint> mHoveredPoint_d;

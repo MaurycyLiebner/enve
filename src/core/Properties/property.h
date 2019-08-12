@@ -22,9 +22,7 @@ enum class CanvasMode : short {
     pickFillStroke,
     circleCreate,
     rectCreate,
-    textCreate,
-    particleBoxCreate,
-    particleEmitterCreate
+    textCreate
 };
 
 class eDraggedObjects {

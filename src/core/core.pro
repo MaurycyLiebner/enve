@@ -78,7 +78,6 @@ SOURCES += \
     Boxes/linkbox.cpp \
     Boxes/linkcanvasrenderdata.cpp \
     Boxes/paintbox.cpp \
-    Boxes/particlebox.cpp \
     Boxes/pathbox.cpp \
     Boxes/patheffectsmenu.cpp \
     Boxes/rectangle.cpp \
@@ -142,7 +141,6 @@ SOURCES += \
     PropertyUpdaters/gradientupdater.cpp \
     PropertyUpdaters/groupallpathsupdater.cpp \
     PropertyUpdaters/nodepointupdater.cpp \
-    PropertyUpdaters/particlesupdater.cpp \
     PropertyUpdaters/pixmapeffectupdater.cpp \
     PropertyUpdaters/strokewidthupdater.cpp \
     RasterEffects/customrastereffect.cpp \
@@ -292,7 +290,6 @@ HEADERS += \
     Boxes/linkbox.h \
     Boxes/linkcanvasrenderdata.h \
     Boxes/paintbox.h \
-    Boxes/particlebox.h \
     Boxes/pathbox.h \
     Boxes/patheffectsmenu.h \
     Boxes/rectangle.h \
@@ -361,7 +358,6 @@ HEADERS += \
     PropertyUpdaters/gradientupdater.h \
     PropertyUpdaters/groupallpathsupdater.h \
     PropertyUpdaters/nodepointupdater.h \
-    PropertyUpdaters/particlesupdater.h \
     PropertyUpdaters/pixmapeffectupdater.h \
     PropertyUpdaters/strokewidthupdater.h \
     RasterEffects/customrastereffect.h \

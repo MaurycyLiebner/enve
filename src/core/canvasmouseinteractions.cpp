@@ -8,7 +8,6 @@
 #include "Boxes/textbox.h"
 #include "Boxes/linkbox.h"
 #include "pointhelpers.h"
-#include "Boxes/particlebox.h"
 #include "clipboardcontainer.h"
 #include "Boxes/paintbox.h"
 #include "PathEffects/patheffectsinclude.h"
@@ -276,25 +275,6 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
 
         clearBoxesSelection();
         addBoxToSelection(newPath.get());
-    } else if(mCurrentMode == CanvasMode::particleBoxCreate) {
-        //setCanvasMode(CanvasMode::MOVE_POINT);
-        const auto partBox = enve::make_shared<ParticleBox>();
-        mCurrentContainer->addContainedBox(partBox);
-        partBox->setAbsolutePos(e.fPos);
-        clearBoxesSelection();
-        addBoxToSelection(partBox.get());
-
-        mPressedPoint = partBox->getBottomRightPoint();
-    } else if(mCurrentMode == CanvasMode::particleEmitterCreate) {
-        for(const auto& box : mSelectedBoxes) {
-            if(box->SWT_isParticleBox()) {
-                if(box->absPointInsidePath(e.fPos)) {
-                    const auto particleBox = static_cast<ParticleBox*>(box);
-                    particleBox->addEmitterAtAbsPos(e.fPos);
-                    break;
-                }
-            }
-        }
     }
 }
 
@@ -423,12 +403,8 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
         return;
     }
     if(mDoubleClick) return;
-    if(mCurrentMode == CanvasMode::pointTransform ||
-       mCurrentMode == CanvasMode::particleBoxCreate) {
+    if(mCurrentMode == CanvasMode::pointTransform) {
         handleMovePointMouseRelease(e);
-        if(mCurrentMode == CanvasMode::particleBoxCreate) {
-            emit requestCanvasMode(CanvasMode::particleEmitterCreate);
-        }
     } else if(mCurrentMode == CanvasMode::boxTransform) {
         if(!mPressedPoint) {
             handleMovePathMouseRelease(e);

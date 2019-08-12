@@ -101,8 +101,7 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
         setCursor(QCursor(QPixmap(":/cursors/cursor_color_picker.png"), 2, 20) );
     } else if(mode == CanvasMode::circleCreate) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-ellipse.xpm"), 4, 4) );
-    } else if(mode == CanvasMode::rectCreate ||
-              mode == CanvasMode::particleBoxCreate) {
+    } else if(mode == CanvasMode::rectCreate) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-rect.xpm"), 4, 4) );
     } else if(mode == CanvasMode::textCreate) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-text.xpm"), 4, 4) );
@@ -111,7 +110,6 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
     } else {
         setCursor(QCursor(QPixmap(":/cursors/cursor-pen.xpm"), 4, 4) );
     }
-    MainWindow::sGetInstance()->updateCanvasModeButtonsChecked();
     if(!mCurrentCanvas) return;
     if(mMouseGrabber) {
         mCurrentCanvas->cancelCurrentTransform();
@@ -473,31 +471,6 @@ bool CanvasWindow::KFT_keyPressEvent(QKeyEvent *event) {
     } else return false;
 
     return true;
-}
-
-#include "welcomedialog.h"
-void CanvasWindow::openWelcomeDialog() {
-    return;
-    if(mWelcomeDialog) return;
-    const auto mWindow = MainWindow::sGetInstance();
-    mWelcomeDialog = new WelcomeDialog(mWindow->getRecentFiles(),
-                                       [this]() { CanvasSettingsDialog::sNewCanvasDialog(mDocument, this); },
-                                       []() { MainWindow::sGetInstance()->openFile(); },
-                                       [](QString path) { MainWindow::sGetInstance()->openFile(path); },
-                                       mWindow);
-    mWelcomeDialog->resize(size());
-    mWindow->takeCentralWidget();
-    mWindow->setCentralWidget(mWelcomeDialog);
-}
-
-void CanvasWindow::closeWelcomeDialog() {
-    return;
-    if(!mWelcomeDialog) return;
-
-    const auto mWindow = MainWindow::sGetInstance();
-    resize(mWelcomeDialog->size());
-    mWelcomeDialog = nullptr;
-    mWindow->setCentralWidget(this);
 }
 
 void CanvasWindow::setResolutionFraction(const qreal percent) {

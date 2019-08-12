@@ -68,8 +68,7 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
         }
         if(mSelecting) {
             moveSecondSelectionPoint(e.fPos);
-        } else if(mCurrentMode == CanvasMode::pointTransform ||
-                  mCurrentMode == CanvasMode::particleBoxCreate) {
+        } else if(mCurrentMode == CanvasMode::pointTransform) {
             handleMovePointMouseMove(e);
         } else if(mCurrentMode == CanvasMode::boxTransform) {
             if(mPressedPoint) {

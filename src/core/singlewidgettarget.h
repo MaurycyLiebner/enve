@@ -138,7 +138,6 @@ public:
     virtual bool SWT_isImageBox() const { return false; }
     virtual bool SWT_isImageSequenceBox() const { return false; }
     virtual bool SWT_isLinkBox() const { return false; }
-    virtual bool SWT_isParticleBox() const { return false; }
     virtual bool SWT_isPathBox() const { return false; }
     virtual bool SWT_isRectangle() const { return false; }
     virtual bool SWT_isTextBox() const { return false; }

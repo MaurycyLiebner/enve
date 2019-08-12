@@ -150,6 +150,11 @@ public:
 protected:
     void lockFinished();
 private:
+    QWidget * mWelcomeDialog = nullptr;
+
+    void openWelcomeDialog();
+    void closeWelcomeDialog();
+
     eKeyFilter* mNumericFilter = eKeyFilter::sCreateNumberFilter(this);
     eKeyFilter* mLineFilter = eKeyFilter::sCreateLineFilter(this);
 
@@ -232,9 +237,6 @@ private:
 //
     ActionButton *mRectangleMode;
     ActionButton *mTextMode;
-    ActionButton *mParticleBoxMode;
-    ActionButton *mParticleEmitterMode;
-
     ActionButton *mPaintMode;
 //
     ActionButton *mActionConnectPoints;

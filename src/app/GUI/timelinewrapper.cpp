@@ -51,7 +51,10 @@ QWidget *TWidgetStackLayoutItem::create(Document &document,
                                         QWidget* const parent,
                                         QLayout * const layout) {
     const auto tWrapper = new TimelineWrapper(&document, this, parent);
-    if(layout) layout->addWidget(tWrapper);
+    if(layout) {
+        tWrapper->disableClose();
+        layout->addWidget(tWrapper);
+    }
     tWrapper->setScene(mScene);
     const auto tw = tWrapper->getTimelineWidget();
     if(mGraph) tw->setGraphEnabled(mGraph);

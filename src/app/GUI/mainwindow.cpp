@@ -94,9 +94,12 @@ MainWindow::MainWindow(Document& document,
     });
     connect(&mDocument, &Document::activeSceneSet,
             this, &MainWindow::updateSettingsForCurrentCanvas);
-
     connect(&mDocument, &Document::currentBoxChanged,
             this, &MainWindow::setCurrentBox);
+    connect(&mDocument, &Document::canvasModeSet,
+            this, &MainWindow::updateCanvasModeButtonsChecked);
+    connect(&mDocument, &Document::sceneCreated,
+            this, &MainWindow::closeWelcomeDialog);
 
     const auto iconDir = EnveSettings::sIconsDir();
     const auto downArr = iconDir + "/down-arrow.png";
@@ -237,7 +240,7 @@ MainWindow::MainWindow(Document& document,
 //    mCanvas = mCanvasWindow->getCurrentCanvas();
 //    mCurrentCanvasComboBox->addItem(mCanvas->prp_getName());
 
-    setCentralWidget(mLayoutHandler->sceneLayout());
+//    setCentralWidget(mLayoutHandler->sceneLayout());
 
     setupToolBar();
     setupStatusBar();
@@ -247,23 +250,18 @@ MainWindow::MainWindow(Document& document,
 
     //setCentralWidget(mCanvasWindow->getCanvasWidget());
 
-    showMaximized();
-
-    setMouseTracking(true);
-    centralWidget()->setMouseTracking(true);
+//    setMouseTracking(true);
+//    centralWidget()->setMouseTracking(true);
 
     readRecentFiles();
     updateRecentMenu();
 
     mEventFilterDisabled = false;
 
-    try {
-        TaskScheduler::sInstance->initializeGpu();
-    } catch(const std::exception& e) {
-        gPrintExceptionFatal(e);
-    }
-
     installEventFilter(this);
+
+    openWelcomeDialog();
+    showMaximized();
 }
 
 MainWindow::~MainWindow() {
@@ -547,6 +545,25 @@ void MainWindow::setupMenuBar() {
 
 }
 
+
+#include "welcomedialog.h"
+void MainWindow::openWelcomeDialog() {
+    if(mWelcomeDialog) return;
+    mWelcomeDialog = new WelcomeDialog(getRecentFiles(),
+       [this]() { CanvasSettingsDialog::sNewCanvasDialog(mDocument, this); },
+       []() { MainWindow::sGetInstance()->openFile(); },
+       [](QString path) { MainWindow::sGetInstance()->openFile(path); },
+       this);
+    takeCentralWidget();
+    setCentralWidget(mWelcomeDialog);
+}
+
+void MainWindow::closeWelcomeDialog() {
+    if(!mWelcomeDialog) return;
+    mWelcomeDialog = nullptr;
+    setCentralWidget(mLayoutHandler->sceneLayout());
+}
+
 void MainWindow::addCanvasToRenderQue() {
     if(!mDocument.fActiveScene) return;
     mBoxesListAnimationDockWidget->getRenderWidget()->
@@ -622,14 +639,6 @@ void MainWindow::setupToolBar() {
     mToolBar->addWidget(mTextMode);
 
     mToolBar->addSeparator();
-
-    mParticleBoxMode = new ActionButton(iconsDir + "/particleBoxCreateUnchecked.png", "F9", this);
-    mParticleBoxMode->setCheckable(iconsDir + "/particleBoxCreateChecked.png");
-    mToolBar->addWidget(mParticleBoxMode);
-
-    mParticleEmitterMode = new ActionButton(iconsDir + "/particleEmitterCreateUnchecked.png", "F10", this);
-    mParticleEmitterMode->setCheckable(iconsDir + "/particleEmitterCreateChecked.png");
-    mToolBar->addWidget(mParticleEmitterMode);
 
     //mToolBar->addSeparator();
     mToolBar->widgetForAction(mToolBar->addAction("     "))->
@@ -708,10 +717,6 @@ void MainWindow::connectToolBarActions() {
             &mActions, &Actions::setRectangleMode);
     connect(mTextMode, &ActionButton::pressed,
             &mActions, &Actions::setTextMode);
-    connect(mParticleBoxMode, &ActionButton::pressed,
-            &mActions, &Actions::setParticleBoxMode);
-    connect(mParticleEmitterMode, &ActionButton::pressed,
-            &mActions, &Actions::setParticleEmitterMode);
     connect(mPaintMode, &ActionButton::pressed,
             &mActions, &Actions::setPaintMode);
     connect(mActionConnectPoints, &ActionButton::pressed,
@@ -749,8 +754,6 @@ void MainWindow::updateCanvasModeButtonsChecked() {
     mCircleMode->setChecked(currentMode == CanvasMode::circleCreate);
     mRectangleMode->setChecked(currentMode == CanvasMode::rectCreate);
     mTextMode->setChecked(currentMode == CanvasMode::textCreate);
-    mParticleBoxMode->setChecked(currentMode == CanvasMode::particleBoxCreate);
-    mParticleEmitterMode->setChecked(currentMode == CanvasMode::particleEmitterCreate);
     mPaintMode->setChecked(currentMode == CanvasMode::paint);
 }
 
@@ -870,10 +873,6 @@ bool handleCanvasModeKeyPress(Document& document, const int key) {
         document.setCanvasMode(CanvasMode::rectCreate);
     } else if(key == Qt::Key_F8) {
         document.setCanvasMode(CanvasMode::textCreate);
-    } else if(key == Qt::Key_F9) {
-        document.setCanvasMode(CanvasMode::particleBoxCreate);
-    } else if(key == Qt::Key_F10) {
-        document.setCanvasMode(CanvasMode::particleEmitterCreate);
     } else return false;
     KeyFocusTarget::KFT_sSetRandomTarget();
     return true;
@@ -962,6 +961,7 @@ void MainWindow::clearAll() {
 //    mClipboardContainers.clear();
     FilesHandler::sInstance->clear();
     //mBoxListWidget->clearAll();
+    openWelcomeDialog();
 }
 
 void MainWindow::updateTitle() {
