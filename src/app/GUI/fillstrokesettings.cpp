@@ -1,6 +1,5 @@
 ﻿#include "fillstrokesettings.h"
 #include "GUI/GradientWidgets/gradientwidget.h"
-#include "mainwindow.h"
 #include "undoredo.h"
 #include "canvas.h"
 #include "qrealanimatorvalueslider.h"
@@ -13,6 +12,7 @@
 #include <QDockWidget>
 #include "paintsettingsapplier.h"
 #include "Animators/gradient.h"
+#include "settings.h"
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
                                                    QWidget * const parent) :

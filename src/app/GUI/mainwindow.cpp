@@ -142,7 +142,7 @@ MainWindow::MainWindow(Document& document,
     mFillStrokeSettingsDock->setFeatures(QDockWidget::DockWidgetMovable |
                                          QDockWidget::DockWidgetFloatable);
     addDockWidget(Qt::RightDockWidgetArea, mFillStrokeSettingsDock);
-    mFillStrokeSettingsDock->setMinimumWidth(MIN_WIDGET_DIM*10);
+    mFillStrokeSettingsDock->setMinimumWidth(MIN_WIDGET_DIM*12);
     mFillStrokeSettingsDock->setMaximumWidth(MIN_WIDGET_DIM*20);
 
     mBottomDock = new QDockWidget("Timeline", this);
