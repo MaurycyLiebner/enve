@@ -6,15 +6,13 @@
 #include "PathEffects/patheffectanimators.h"
 #include "canvas.h"
 #include "PropertyUpdaters/nodepointupdater.h"
-#include "PropertyUpdaters/gradientpointsupdater.h"
 #include "Animators/transformanimator.h"
 #include "paintsettingsapplier.h"
 #include "Animators/gradient.h"
 #include "Animators/rastereffectanimators.h"
 #include "Animators/outlinesettingsanimator.h"
 
-PathBox::PathBox(const eBoxType type) :
-    BoundingBox(type) {
+PathBox::PathBox(const eBoxType type) : BoundingBox(type) {
     mPathEffectsAnimators =
             enve::make_shared<PathEffectAnimators>();
     mPathEffectsAnimators->prp_setName("path effects");
@@ -40,12 +38,7 @@ PathBox::PathBox(const eBoxType type) :
                 enve::make_shared<NodePointUpdater>(this));
 
     mStrokeGradientPoints = enve::make_shared<GradientPoints>(this);
-    mStrokeGradientPoints->prp_setOwnUpdater(
-                enve::make_shared<GradientPointsUpdater>(false, this));
-
     mFillGradientPoints = enve::make_shared<GradientPoints>(this);
-    mFillGradientPoints->prp_setOwnUpdater(
-                enve::make_shared<GradientPointsUpdater>(true, this));
 
     mFillSettings = enve::make_shared<FillSettingsAnimator>(
                 mFillGradientPoints.data(), this);
@@ -61,13 +54,6 @@ PathBox::PathBox(const eBoxType type) :
 
     ca_moveChildBelow(mRasterEffectsAnimators.data(),
                       mOutlinePathEffectsAnimators.data());
-}
-
-PathBox::~PathBox() {
-    if(mFillSettings->getGradient())
-        mFillSettings->getGradient()->removePath(this);
-    if(mStrokeSettings->getGradient())
-        mStrokeSettings->getGradient()->removePath(this);
 }
 
 void PathBox::setPathEffectsEnabled(const bool enable) {
@@ -126,20 +112,15 @@ void PathBox::setupRenderData(const qreal relFrame,
     bool currentFillPathCompatible = false;
 
     if(!mCurrentPathsOutdated) {
-        currentEditPathCompatible =
-                !differenceInEditPathBetweenFrames(
-                    data->fRelFrame, mCurrentPathsFrame);
+        const int prevFrame = qFloor(qMin(data->fRelFrame, mCurrentPathsFrame));
+        const int nextFrame = qCeil(qMax(data->fRelFrame, mCurrentPathsFrame));
+
+        currentEditPathCompatible = !differenceInEditPathBetweenFrames(prevFrame, nextFrame);
         if(currentEditPathCompatible) {
-            currentPathCompatible =
-                    !differenceInPathBetweenFrames(
-                        data->fRelFrame, mCurrentPathsFrame);
+            currentPathCompatible = !differenceInPathBetweenFrames(prevFrame, nextFrame);
             if(currentPathCompatible && !mCurrentOutlinePathOutdated) {
-                currentOutlinePathCompatible =
-                        !differenceInOutlinePathBetweenFrames(
-                            data->fRelFrame, mCurrentPathsFrame);
-                currentFillPathCompatible =
-                        !differenceInFillPathBetweenFrames(
-                            data->fRelFrame, mCurrentPathsFrame);
+                currentOutlinePathCompatible = !differenceInOutlinePathBetweenFrames(prevFrame, nextFrame);
+                currentFillPathCompatible = !differenceInFillPathBetweenFrames(prevFrame, nextFrame);
             }
         }
     }
@@ -160,7 +141,7 @@ void PathBox::setupRenderData(const qreal relFrame,
             const qreal parentRelFrame =
                     mParentGroup->prp_absFrameToRelFrameF(absFrame);
             mParentGroup->applyPathEffects(parentRelFrame, &pathData->fPath,
-                                                data->fParentBox);
+                                           data->fParentBox);
         }
     }
 
@@ -225,9 +206,9 @@ void PathBox::setupRenderData(const qreal relFrame,
         strokeSettings.updateGradient(
                     strokeGrad->getQGradientStopsAtAbsFrame(
                         prp_relFrameToAbsFrameF(relFrame)),
-                    mStrokeGradientPoints->getStartPointAtRelFrameF(relFrame),
-                    mStrokeGradientPoints->getEndPointAtRelFrameF(relFrame),
-                    mStrokeSettings->getGradientType());
+                        mStrokeGradientPoints->getStartPointAtRelFrameF(relFrame),
+                        mStrokeGradientPoints->getEndPointAtRelFrameF(relFrame),
+                        mStrokeSettings->getGradientType());
     }
 }
 
@@ -261,33 +242,31 @@ void PathBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
 
 void PathBox::resetStrokeGradientPointsPos() {
     mStrokeGradientPoints->anim_setRecording(false);
-    mStrokeGradientPoints->setPositions(mRelRect.topLeft(),
-                                        mRelRect.bottomRight());
+    mStrokeGradientPoints->setPositions(mRelRect.topLeft(), mRelRect.bottomRight());
 }
 
 void PathBox::resetFillGradientPointsPos() {
     mFillGradientPoints->anim_setRecording(false);
-    mFillGradientPoints->setPositions(mRelRect.topLeft(),
-                                      mRelRect.bottomRight());
+    mFillGradientPoints->setPositions(mRelRect.topLeft(), mRelRect.bottomRight());
 }
 
 void PathBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
     mStrokeSettings->setCapStyle(capStyle);
     prp_afterWholeInfluenceRangeChanged();
-    planScheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(UpdateReason::userChange);
 }
 
 void PathBox::setStrokeJoinStyle(const SkPaint::Join joinStyle) {
     mStrokeSettings->setJoinStyle(joinStyle);
     prp_afterWholeInfluenceRangeChanged();
-    planScheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(UpdateReason::userChange);
 }
 
 void PathBox::setOutlineCompositionMode(
         const QPainter::CompositionMode &compositionMode) {
     mStrokeSettings->setOutlineCompositionMode(compositionMode);
     prp_afterWholeInfluenceRangeChanged();
-    planScheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(UpdateReason::userChange);
 }
 
 void PathBox::strokeWidthAction(const QrealAction& action) {
@@ -548,7 +527,7 @@ bool PathBox::relPointInsidePath(const QPointF &relPos) const {
 
 void PathBox::setOutlineAffectedByScale(const bool bT) {
     mOutlineAffectedByScale = bT;
-    planScheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(UpdateReason::userChange);
 }
 
 FillSettingsAnimator *PathBox::getFillSettings() const {

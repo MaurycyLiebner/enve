@@ -112,7 +112,7 @@ void BoundingBox::prp_afterChangedAbsRange(const FrameRange &range) {
     const auto croppedRange = visRange*range;
     Animator::prp_afterChangedAbsRange(croppedRange);
     if(croppedRange.inRange(anim_getCurrentAbsFrame())) {
-        planScheduleUpdate(Animator::USER_CHANGE);
+        planScheduleUpdate(UpdateReason::userChange);
     }
 }
 
@@ -239,8 +239,8 @@ FrameRange BoundingBox::prp_relInfluenceRange() const {
 MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPos,
                                             const CanvasMode mode,
                                             const qreal invScale) const {
-
-    for(const auto& prop : mCanvasProps) {
+    for(int i = mCanvasProps.count() - 1; i >= 0; i--) {
+        const auto& prop = mCanvasProps.at(i);
         const auto handler = prop->getPointsHandler();
         if(!handler) continue;
         const auto pt = handler->getPointAtAbsPos(absPos, mode, invScale);
@@ -251,7 +251,8 @@ MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPos,
 
 NormalSegment BoundingBox::getNormalSegment(const QPointF &absPos,
                                             const qreal invScale) const {
-    for(const auto& prop : mCanvasProps) {
+    for(int i = mCanvasProps.count() - 1; i >= 0; i--) {
+        const auto& prop = mCanvasProps.at(i);
         const auto handler = prop->getPointsHandler();
         if(!handler) continue;
         const auto pathHandler = dynamic_cast<PathPointsHandler*>(handler);
@@ -306,7 +307,7 @@ void BoundingBox::anim_setAbsFrame(const int frame) {
     const int newRelFrame = anim_getCurrentRelFrame();
 
     if(prp_differencesBetweenRelFrames(oldRelFrame, newRelFrame)) {
-        planScheduleUpdate(Animator::FRAME_CHANGE);
+        planScheduleUpdate(UpdateReason::frameChange);
     }
 }
 
@@ -336,7 +337,9 @@ bool BoundingBox::diffsIncludingInherited(
 
 bool BoundingBox::diffsIncludingInherited(const qreal relFrame1,
                                           const qreal relFrame2) const {
-    return diffsIncludingInherited(qFloor(relFrame1), qCeil(relFrame2));
+    const int prevFrame = qFloor(qMin(relFrame1, relFrame2));
+    const int nextFrame = qCeil(qMax(relFrame1, relFrame2));
+    return diffsIncludingInherited(prevFrame, nextFrame);
 }
 
 void BoundingBox::setParentGroup(ContainerBox * const parent) {
@@ -435,10 +438,9 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 
 void BoundingBox::planScheduleUpdate(const UpdateReason reason) {
     if(!isVisibleAndInVisibleDurationRect()) return;
-    if(mParentGroup) {
-        mParentGroup->planScheduleUpdate(qMin(reason, CHILD_USER_CHANGE));
-    } else if(!SWT_isCanvas()) return;
-    if(reason != UpdateReason::FRAME_CHANGE) mStateId++;
+    if(mParentGroup) mParentGroup->planScheduleUpdate(qMin(reason, reason));
+    else if(!SWT_isCanvas()) return;
+    if(reason != UpdateReason::frameChange) mStateId++;
     mDrawRenderContainer.setExpired(true);
     if(mSchedulePlanned) {
         mPlannedReason = qMax(reason, mPlannedReason);
@@ -575,8 +577,7 @@ QRectF BoundingBox::getRelBoundingRect() const {
 }
 
 template <typename T>
-void addEffectAction(const QString& text,
-                     PropertyMenu * const menu) {
+void addEffectAction(const QString& text, PropertyMenu * const menu) {
     const PropertyMenu::PlainSelectedOp<BoundingBox> op = [](BoundingBox * box) {
         box->addEffect<T>();
     };
@@ -1254,8 +1255,7 @@ void BoundingBox::setVisibile(const bool visible) {
     SWT_scheduleContentUpdate(SWT_BR_VISIBLE);
     SWT_scheduleContentUpdate(SWT_BR_HIDDEN);
     for(const auto& box : mLinkingBoxes) {
-        if(box->isParentLinkBox())
-            box->setVisibile(visible);
+        if(box->isParentLinkBox()) box->setVisibile(visible);
     }
     emit visibilityChanged(visible);
 }

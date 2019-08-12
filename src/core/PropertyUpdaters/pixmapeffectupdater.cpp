@@ -6,11 +6,11 @@ PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target) {
 }
 
 void PixmapEffectUpdater::update() {
-    mTarget->planScheduleUpdate(Animator::USER_CHANGE);
+    mTarget->planScheduleUpdate(UpdateReason::userChange);
 }
 
 void PixmapEffectUpdater::frameChangeUpdate() {
-    mTarget->planScheduleUpdate(Animator::FRAME_CHANGE);
+    mTarget->planScheduleUpdate(UpdateReason::frameChange);
 }
 
 void PixmapEffectUpdater::finishedChange() {

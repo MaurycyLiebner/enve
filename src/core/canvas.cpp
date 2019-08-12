@@ -413,7 +413,7 @@ void Canvas::prp_afterChangedAbsRange(const FrameRange &range) {
     mCacheHandler.remove({minId, maxId});
     if(!mCacheHandler.atFrame(anim_getCurrentRelFrame())) {
         mCurrentPreviewContainerOutdated = true;
-        planScheduleUpdate(Animator::USER_CHANGE);
+        planScheduleUpdate(UpdateReason::userChange);
     }
 }
 
@@ -655,7 +655,7 @@ void Canvas::anim_setAbsFrame(const int frame) {
         if(difference) {
             mCurrentPreviewContainerOutdated = true;
         }
-        if(difference) planScheduleUpdate(Animator::FRAME_CHANGE);
+        if(difference) planScheduleUpdate(UpdateReason::frameChange);
     }
 
     for(const auto &box : mContainedBoxes)

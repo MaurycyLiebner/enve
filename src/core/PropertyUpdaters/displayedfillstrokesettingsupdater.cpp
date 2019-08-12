@@ -7,11 +7,11 @@ DisplayedFillStrokeSettingsUpdater(BoundingBox *path) {
 }
 
 void DisplayedFillStrokeSettingsUpdater::update() {
-    mTarget->planScheduleUpdate(Animator::USER_CHANGE);
+    mTarget->planScheduleUpdate(UpdateReason::userChange);
 }
 
 void DisplayedFillStrokeSettingsUpdater::frameChangeUpdate() {
-    mTarget->planScheduleUpdate(Animator::FRAME_CHANGE);
+    mTarget->planScheduleUpdate(UpdateReason::frameChange);
 }
 
 void DisplayedFillStrokeSettingsUpdater::finishedChange() {

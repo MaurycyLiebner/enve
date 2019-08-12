@@ -58,8 +58,6 @@ protected:
     PathBox(const eBoxType type);
     void getMotionBlurProperties(QList<Property*> &list) const;
 public:
-    ~PathBox();
-
     virtual bool differenceInEditPathBetweenFrames(
             const int frame1, const int frame2) const = 0;
     virtual SkPath getPathAtRelFrameF(const qreal relFrame) = 0;
@@ -178,7 +176,7 @@ protected:
     bool mCurrentPathsOutdated = true;
     bool mCurrentOutlinePathOutdated = true;
 
-    int mCurrentPathsFrame = 0;
+    qreal mCurrentPathsFrame = 0;
 
     SkPath mEditPathSk;
     SkPath mPathSk;

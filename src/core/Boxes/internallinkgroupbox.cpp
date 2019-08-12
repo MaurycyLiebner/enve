@@ -136,7 +136,7 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
         prp_setName("empty link");
         mBoxTarget->setTarget(nullptr);
     }
-    planScheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(UpdateReason::userChange);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
             this, &InternalLinkGroupBox::setTargetSlot);
 }

@@ -157,37 +157,37 @@ bool ContainerBox::differenceInPathEffectsBetweenFrames(const int relFrame1,
 
 void ContainerBox::addPathEffect(const qsptr<PathEffect>& effect) {
     mPathEffectsAnimators->addChild(effect);
-    updateAllChildPathBoxes(Animator::USER_CHANGE);
+    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void ContainerBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
     mFillPathEffectsAnimators->addChild(effect);
-    updateAllChildPathBoxes(Animator::USER_CHANGE);
+    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void ContainerBox::addOutlineBasePathEffect(const qsptr<PathEffect>& effect) {
     mOutlineBasePathEffectsAnimators->addChild(effect);
-    updateAllChildPathBoxes(Animator::USER_CHANGE);
+    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void ContainerBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
     mOutlinePathEffectsAnimators->addChild(effect);
-    updateAllChildPathBoxes(Animator::USER_CHANGE);
+    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void ContainerBox::removePathEffect(const qsptr<PathEffect>& effect) {
     mPathEffectsAnimators->removeChild(effect);
-    updateAllChildPathBoxes(Animator::USER_CHANGE);
+    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void ContainerBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
     mFillPathEffectsAnimators->removeChild(effect);
-    updateAllChildPathBoxes(Animator::USER_CHANGE);
+    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void ContainerBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
     mOutlinePathEffectsAnimators->removeChild(effect);
-    updateAllChildPathBoxes(Animator::USER_CHANGE);
+    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void ContainerBox::updateAllChildPathBoxes(const UpdateReason reason) {
@@ -419,7 +419,7 @@ bool ContainerBox::isDescendantCurrentGroup() const {
 
 void ContainerBox::setDescendantCurrentGroup(const bool bT) {
     mIsDescendantCurrentGroup = bT;
-    if(!bT) planScheduleUpdate(Animator::USER_CHANGE);
+    if(!bT) planScheduleUpdate(UpdateReason::userChange);
     if(!mParentGroup) return;
     mParentGroup->setDescendantCurrentGroup(bT);
 }
@@ -762,7 +762,7 @@ void ContainerBox::moveContainedBoxInList(BoundingBox * const child,
     mContainedBoxes.moveObj(from, boundTo);
     updateContainedBoxIds(qMin(from, boundTo), qMax(from, boundTo));
     SWT_moveChildTo(child, boxIdToAbstractionId(boundTo));
-    planScheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(UpdateReason::userChange);
 
     prp_afterWholeInfluenceRangeChanged();
 }

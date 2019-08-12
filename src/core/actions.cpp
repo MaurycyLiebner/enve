@@ -284,21 +284,21 @@ void Actions::updateAfterFrameChanged(const int currentFrame) const {
 void Actions::setClipToCanvas(const bool bT) {
     if(!mActiveScene) return;
     mActiveScene->setClipToCanvas(bT);
-    mActiveScene->updateAllBoxes(Animator::USER_CHANGE);
+    mActiveScene->updateAllBoxes(UpdateReason::userChange);
     afterAction();
 }
 
 void Actions::setRasterEffectsVisible(const bool bT) {
     if(!mActiveScene) return;
     mActiveScene->setRasterEffectsVisible(bT);
-    mActiveScene->updateAllBoxes(Animator::USER_CHANGE);
+    mActiveScene->updateAllBoxes(UpdateReason::userChange);
     afterAction();
 }
 
 void Actions::setPathEffectsVisible(const bool bT) {
     if(!mActiveScene) return;
     mActiveScene->setPathEffectsVisible(bT);
-    mActiveScene->updateAllBoxes(Animator::USER_CHANGE);
+    mActiveScene->updateAllBoxes(UpdateReason::userChange);
     afterAction();
 }
 

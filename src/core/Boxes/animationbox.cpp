@@ -100,7 +100,7 @@ void AnimationBox::enableFrameRemappingAction() {
     }
     enableFrameRemapping();
     prp_afterWholeInfluenceRangeChanged();
-    planScheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(UpdateReason::userChange);
     updateDurationRectangleAnimationRange();
 }
 
@@ -117,7 +117,7 @@ void AnimationBox::disableFrameRemapping() {
     mFrameAnimator->anim_setRecordingValue(false);
     mFrameAnimator->SWT_hide();
     prp_afterWholeInfluenceRangeChanged();
-    planScheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(UpdateReason::userChange);
     updateDurationRectangleAnimationRange();
 }
 
@@ -134,7 +134,7 @@ void AnimationBox::anim_setAbsFrame(const int frame) {
     //if(!mWaitingForSchedulerToBeProcessed) {
         //planScheduleUpdate();
     //} else {
-        planScheduleUpdate(Animator::FRAME_CHANGE);
+        planScheduleUpdate(UpdateReason::frameChange);
     //}
 }
 

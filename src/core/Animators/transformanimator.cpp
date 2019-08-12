@@ -221,7 +221,7 @@ void BasicTransformAnimator::setParentTransformAnimator(
     mParentTransform = parent;
     if(parent) connect(parent, &BasicTransformAnimator::totalTransformChanged,
                        this, &BasicTransformAnimator::updateTotalTransform);
-    updateTotalTransform(Animator::USER_CHANGE);
+    updateTotalTransform(UpdateReason::userChange);
 }
 
 bool BasicTransformAnimator::SWT_isBasicTransformAnimator() const { return true; }

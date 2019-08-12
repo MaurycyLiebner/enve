@@ -40,7 +40,7 @@ void Gradient::readProperty(QIODevice * const src) {
         colorAnim->readProperty(src);
         addColorToList(colorAnim);
     }
-    updateQGradientStops(UpdateReason::USER_CHANGE);
+    updateQGradientStops(UpdateReason::userChange);
 }
 
 bool Gradient::isEmpty() const {
@@ -95,7 +95,7 @@ void Gradient::swapColors(const int id1, const int id2) {
     ca_swapChildAnimators(mColors.at(id1).get(),
                           mColors.at(id2).get());
     mColors.swap(id1, id2);
-    updateQGradientStops(Animator::USER_CHANGE);
+    updateQGradientStops(UpdateReason::userChange);
     prp_afterWholeInfluenceRangeChanged();
 }
 
@@ -106,32 +106,20 @@ void Gradient::removeColor(const int id) {
 void Gradient::removeColor(const qsptr<ColorAnimator>& color) {
     ca_removeChild(color);
     mColors.removeOne(color);
-    updateQGradientStops(Animator::USER_CHANGE);
+    updateQGradientStops(UpdateReason::userChange);
     prp_afterWholeInfluenceRangeChanged();
 }
 
 void Gradient::addColor(const QColor &color) {
     addColorToList(color);
-    updateQGradientStops(Animator::USER_CHANGE);
+    updateQGradientStops(UpdateReason::userChange);
     prp_afterWholeInfluenceRangeChanged();
 }
 
 void Gradient::replaceColor(const int id, const QColor &color) {
     mColors.at(id)->qra_setCurrentValue(color);
-    updateQGradientStops(Animator::USER_CHANGE);
+    updateQGradientStops(UpdateReason::userChange);
     prp_afterWholeInfluenceRangeChanged();
-}
-
-void Gradient::addPath(PathBox * const path) {
-    mAffectedPaths << path;
-}
-
-void Gradient::removePath(PathBox * const path) {
-    mAffectedPaths.removeOne(path);
-}
-
-bool Gradient::affectsPaths() {
-    return !mAffectedPaths.isEmpty();
 }
 
 void Gradient::startColorIdTransform(const int id) {
@@ -151,7 +139,7 @@ QGradientStops Gradient::getQGradientStopsAtAbsFrame(const qreal absFrame) {
     return stops;
 }
 
-void Gradient::updateQGradientStops(const Animator::UpdateReason reason) {
+void Gradient::updateQGradientStops(const UpdateReason reason) {
     mQGradientStops.clear();
     const qreal inc = 1./(mColors.length() - 1);
     qreal cPos = 0;
@@ -160,10 +148,8 @@ void Gradient::updateQGradientStops(const Animator::UpdateReason reason) {
                                     mColors.at(i)->getColor()) );
         cPos += inc;
     }
-    for(const auto& path : mAffectedPaths) {
-        path->updateDrawGradients();
-        path->planScheduleUpdate(reason);
-    }
+
+    emit changed();
 }
 
 int Gradient::getReadWriteId() {

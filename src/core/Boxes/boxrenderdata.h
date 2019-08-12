@@ -52,7 +52,7 @@ public:
 
     stdsptr<BoxRenderData> makeCopy();
 
-    Animator::UpdateReason fReason;
+    UpdateReason fReason;
 
     uint fBoxStateId = 0;
 

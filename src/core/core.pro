@@ -137,7 +137,6 @@ SOURCES += \
     PropertyUpdaters/animationboxframeupdater.cpp \
     PropertyUpdaters/boxpathpointupdater.cpp \
     PropertyUpdaters/displayedfillstrokesettingsupdater.cpp \
-    PropertyUpdaters/gradientpointsupdater.cpp \
     PropertyUpdaters/gradientupdater.cpp \
     PropertyUpdaters/groupallpathsupdater.cpp \
     PropertyUpdaters/nodepointupdater.cpp \
@@ -354,7 +353,6 @@ HEADERS += \
     PropertyUpdaters/animationboxframeupdater.h \
     PropertyUpdaters/boxpathpointupdater.h \
     PropertyUpdaters/displayedfillstrokesettingsupdater.h \
-    PropertyUpdaters/gradientpointsupdater.h \
     PropertyUpdaters/gradientupdater.h \
     PropertyUpdaters/groupallpathsupdater.h \
     PropertyUpdaters/nodepointupdater.h \

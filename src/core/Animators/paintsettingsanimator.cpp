@@ -61,14 +61,20 @@ void PaintSettingsAnimator::setGradientVar(Gradient* const grad) {
     if(mGradient) {
         ca_removeChild(mGradient->ref<Gradient>());
         ca_removeChild(mGradientPoints->ref<GradientPoints>());
-        mGradient->removePath(mTarget_k);
+        disconnect(mGradient, &Gradient::changed, this, nullptr);
     }
-    mGradient = grad;
-    if(mGradient) {
+    if(grad) {
         ca_addChild(grad->ref<Gradient>());
         ca_addChild(mGradientPoints->ref<GradientPoints>());
-        mGradient->addPath(mTarget_k);
+        connect(grad, &Gradient::changed,
+                this, [this]() { mTarget_k->updateDrawGradients(); });
+        if(grad && !mGradient) {
+            if(mTarget_k->getFillSettings() == this)
+                mTarget_k->resetFillGradientPointsPos();
+            else mTarget_k->resetFillGradientPointsPos();
+        }
     }
+    mGradient = grad;
 
     prp_callFinishUpdater();
 }

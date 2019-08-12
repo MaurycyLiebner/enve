@@ -42,8 +42,6 @@ public:
     void removeColor(const qsptr<ColorAnimator> &color);
     void addColor(const QColor &color);
     void replaceColor(const int id, const QColor &color);
-    void addPath(PathBox * const path);
-    void removePath(PathBox * const path);
     bool affectsPaths();
 
     void updateQGradientStops(const UpdateReason reason);
@@ -64,6 +62,8 @@ public:
     bool isEmpty() const;
 
     QGradientStops getQGradientStopsAtAbsFrame(const qreal absFrame);
+signals:
+    void changed();
 private:
     void writeProperty(QIODevice * const dst) const;
     void readProperty(QIODevice * const src);
@@ -71,7 +71,6 @@ private:
     int mReadWriteId = -1;
     QGradientStops mQGradientStops;
     QList<qsptr<ColorAnimator>> mColors;
-    QList<qptr<PathBox>> mAffectedPaths;
     qptr<ColorAnimator> mCurrentColor;
 };
 

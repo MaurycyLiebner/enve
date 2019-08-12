@@ -5,9 +5,9 @@ GroupAllPathsUpdater::GroupAllPathsUpdater(
         ContainerBox * const boxesGroup) : mTarget(boxesGroup) {}
 
 void GroupAllPathsUpdater::update() {
-    mTarget->updateAllChildPathBoxes(Animator::USER_CHANGE);
+    mTarget->updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void GroupAllPathsUpdater::frameChangeUpdate() {
-    mTarget->updateAllChildPathBoxes(Animator::FRAME_CHANGE);
+    mTarget->updateAllChildPathBoxes(UpdateReason::frameChange);
 }

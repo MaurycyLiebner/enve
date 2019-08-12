@@ -676,7 +676,7 @@ void gForEverySegmentInPath(
 void gForEverySegmentInPath(
         const SkPath& path,
         const std::function<void(const SkPath&)>& func) {
-    SkPoint lastMovePos;
+    SkPoint lastMovePos{0, 0};
     SkPoint lastPos{0, 0};
     SkPath::Iter iter(path, false);
     for(;;) {
@@ -850,7 +850,7 @@ void gSpatialDisplaceFilterPath(const qreal baseSeed,
     SkPoint prevDisp{0, 0};
     for(;;) {
         const auto verb = iter.next(pts, true, true);
-        SkPoint targetPt;
+        SkPoint targetPt{0, 0};
         switch(verb) {
         case SkPath::kLine_Verb: {
            targetPt = pts[1];
@@ -871,9 +871,9 @@ void gSpatialDisplaceFilterPath(const qreal baseSeed,
             return;
         }
 
-        float randX = toSkScalar(RandomGrid::sGetRandomValue(
+        const float randX = toSkScalar(RandomGrid::sGetRandomValue(
                     -1, 1, baseSeed, gridSize, toQPointF(targetPt)));
-        float randY = toSkScalar(RandomGrid::sGetRandomValue(
+        const float randY = toSkScalar(RandomGrid::sGetRandomValue(
                     -1, 1, baseSeed + 100, gridSize, toQPointF(targetPt)));
 
         const auto disp = SkPoint::Make(randX*maxDev, randY*maxDev);

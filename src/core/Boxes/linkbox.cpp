@@ -13,7 +13,7 @@ ExternalLinkBox::ExternalLinkBox() : ContainerBox(TYPE_LAYER) {
 void ExternalLinkBox::reload() {
 
 
-    planScheduleUpdate(Animator::USER_CHANGE);
+    planScheduleUpdate(UpdateReason::userChange);
 }
 
 void ExternalLinkBox::changeSrc(QWidget* dialogParent) {

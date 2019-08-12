@@ -477,7 +477,7 @@ void CanvasWindow::setResolutionFraction(const qreal percent) {
     if(!mCurrentCanvas) return;
     mCurrentCanvas->setResolutionFraction(percent);
     mCurrentCanvas->prp_afterWholeInfluenceRangeChanged();
-    mCurrentCanvas->updateAllBoxes(Animator::USER_CHANGE);
+    mCurrentCanvas->updateAllBoxes(UpdateReason::userChange);
     queTasksAndUpdate();
 }
 

@@ -181,6 +181,11 @@ private:
     QList<OverlappingKeys> mList;
 };
 
+enum class UpdateReason {
+    frameChange,
+    userChange
+};
+
 class Animator : public Property {
     Q_OBJECT
     friend class OverlappingKeys;
@@ -191,12 +196,6 @@ protected:
         Q_UNUSED(key);
     }
 public:
-    enum UpdateReason {
-        FRAME_CHANGE,
-        CHILD_USER_CHANGE,
-        USER_CHANGE
-    };
-
     virtual void anim_addKeyAtRelFrame(const int relFrame) = 0;
     virtual void anim_saveCurrentValueAsKey() = 0;
     virtual stdsptr<Key> createKey() = 0;
