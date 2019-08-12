@@ -1,0 +1,4 @@
+<ShaderEffect name="dots">
+	<Animator name="dotDistance" type="float" glValue="true" min="0." max="999." step="1" ini="8"/>
+	<Animator name="dotRadius" type="float" glValue="true" min="0." max="999." step="1" ini="8"/>
+</ShaderEffect>
