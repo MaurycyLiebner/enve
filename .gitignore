@@ -10,6 +10,13 @@ build/Debug/*
 build/Release/*
 !.gitkeep
 
+/ShaderEffects
+/PathEffects
+/RasterEffects
+/Boxes
+/icons
+/recent
+
 third_party/*
 !third_party/skia.tar.xz
 !third_party/libmypaint.tar.xz
@@ -18,5 +25,7 @@ third_party/*
 
 *.creator.user*
 *.pro.user*
+
+*.so*
 
 *qmake*
