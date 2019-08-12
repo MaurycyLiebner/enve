@@ -34,7 +34,7 @@ public:
     void setCurrentSettings(PaintSettingsAnimator *fillPaintSettings,
                             OutlineSettingsAnimator *strokePaintSettings);
     void updateAfterTargetChanged();
-    void setCurrentPaintType(const PaintType &paintType);
+    void setCurrentPaintType(const PaintType paintType);
 
     GradientWidget *getGradientWidget();
 
@@ -47,27 +47,27 @@ public:
     void emitCapStyleChanged();
     void emitJoinStyleChanged();
 private:
-    void setLinearGradientFill();
-    void setRadialGradientFill();
+    void setLinearGradientAction();
+    void setRadialGradientAction();
 
-    void colorTypeSet(const PaintType &type);
+    void colorTypeSet(const PaintType type);
     void setFillTarget();
     void setStrokeTarget();
 
-    void setGradient(Gradient* gradient);
-    void setGradientType(const GradientType &type);
+    void setGradientAction(Gradient* gradient);
+    void setGradientType(const GradientType type);
 
-    void setBevelJoinStyle();
-    void setMiterJoinStyle();
-    void setRoundJoinStyle();
+    void setBevelJoinStyleAction();
+    void setMiterJoinStyleAction();
+    void setRoundJoinStyleAction();
 
-    void setFlatCapStyle();
-    void setSquareCapStyle();
-    void setRoundCapStyle();
+    void setFlatCapStyleAction();
+    void setSquareCapStyleAction();
+    void setRoundCapStyleAction();
 
-    void setGradientFill();
-    void setFlatFill();
-    void setNoneFill();
+    void setGradientFillAction();
+    void setFlatFillAction();
+    void setNoneFillAction();
 
     void setColorAnimatorTarget(ColorAnimator *animator);
     void colorSettingReceived(const ColorSetting &colorSetting);
@@ -86,7 +86,7 @@ private:
 
     PaintType getCurrentPaintTypeVal();
 
-    void setCurrentPaintTypeVal(const PaintType& paintType);
+    void setCurrentPaintTypeVal(const PaintType paintType);
 
     QColor getColorVal();
 
@@ -94,13 +94,13 @@ private:
 
     Gradient *getCurrentGradientVal();
 
-    const GradientType &getCurrentGradientTypeVal() {
+    const GradientType getCurrentGradientTypeVal() {
         if(mTarget == PaintSetting::FILL) return mCurrentFillGradientType;
         else return mCurrentStrokeGradientType;
     }
 
     void setCurrentGradientVal(Gradient *gradient);
-    void setCurrentGradientTypeVal(const GradientType &type);
+    void setCurrentGradientTypeVal(const GradientType type);
 
     Document& mDocument;
     MainWindow *mMainWindow;

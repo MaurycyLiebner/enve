@@ -26,21 +26,21 @@ protected:
             GradientPoints * const grdPts,
             PathBox * const parent,
             const QColor &colorT,
-            const PaintType &paintTypeT,
+            const PaintType paintTypeT,
             Gradient * const gradientT = nullptr);
 
     virtual void showHideChildrenBeforeChaningPaintType(
-            const PaintType &newPaintType);
+            const PaintType newPaintType);
 public:
     void writeProperty(QIODevice * const dst) const;
     void readProperty(QIODevice * const src);
 
     QColor getColor() const;
-    const PaintType &getPaintType() const;
+    const PaintType getPaintType() const;
     Gradient *getGradient() const;
     void setGradient(Gradient *gradient);
     void setCurrentColor(const QColor &color);
-    void setPaintType(const PaintType &paintType);
+    void setPaintType(const PaintType paintType);
     ColorAnimator *getColorAnimator();
     void setGradientPoints(GradientPoints * const gradientPoints);
     void setGradientPointsPos(const QPointF& pt1, const QPointF& pt2);
@@ -49,7 +49,7 @@ public:
     void setGradientVar(Gradient * const grad);
     QColor getColor(const qreal relFrame) const;
     GradientType getGradientType() { return mGradientType; }
-    void setGradientType(const GradientType &type) {
+    void setGradientType(const GradientType type) {
         if(mGradientType == type) return;
         mGradientType = type;
         prp_callFinishUpdater();
@@ -77,7 +77,7 @@ protected:
     FillSettingsAnimator(GradientPoints * const grdPts,
                          PathBox * const parent,
                          const QColor &color,
-                         const PaintType &paintType,
+                         const PaintType paintType,
                          Gradient * const gradient = nullptr) :
         PaintSettingsAnimator("fill", grdPts, parent, color,
                               paintType, gradient) {}
@@ -85,7 +85,7 @@ protected:
 
 struct UpdatePaintSettings {
     UpdatePaintSettings(const QColor &paintColorT,
-                        const PaintType &paintTypeT);
+                        const PaintType paintTypeT);
     UpdatePaintSettings();
 
     virtual ~UpdatePaintSettings();
@@ -95,7 +95,7 @@ struct UpdatePaintSettings {
     void updateGradient(const QGradientStops &stops,
                         const QPointF &start,
                         const QPointF &finalStop,
-                        const GradientType &gradientType);
+                        const GradientType gradientType);
     PaintType fPaintType;
     QColor fPaintColor;
     sk_sp<SkShader> fGradient;
@@ -105,7 +105,7 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
     UpdateStrokeSettings(
             const qreal width,
             const QColor &paintColorT,
-            const PaintType &paintTypeT,
+            const PaintType paintTypeT,
             const QPainter::CompositionMode &outlineCompositionModeT);
     UpdateStrokeSettings();
 

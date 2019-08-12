@@ -43,19 +43,19 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mFillNoneButton->setCheckable(true);
     mFillNoneButton->setObjectName("leftButton");
     connect(mFillNoneButton, &QPushButton::released,
-            this, &FillStrokeSettingsWidget::setNoneFill);
+            this, &FillStrokeSettingsWidget::setNoneFillAction);
     mFillFlatButton = new QPushButton(QIcon(iconsDir + "/fill_flat.png"),
                                       "Flat", this);
     mFillFlatButton->setCheckable(true);
     mFillFlatButton->setObjectName("middleButton");
     connect(mFillFlatButton, &QPushButton::released,
-            this, &FillStrokeSettingsWidget::setFlatFill);
+            this, &FillStrokeSettingsWidget::setFlatFillAction);
     mFillGradientButton = new QPushButton(QIcon(iconsDir + "/fill_gradient.png"),
                                           "Gradient", this);
     mFillGradientButton->setCheckable(true);
     mFillGradientButton->setObjectName("rightButton");
     connect(mFillGradientButton, &QPushButton::released,
-            this, &FillStrokeSettingsWidget::setGradientFill);
+            this, &FillStrokeSettingsWidget::setGradientFillAction);
 
     mColorTypeLayout->addWidget(mFillNoneButton);
     mColorTypeLayout->addWidget(mFillFlatButton);
@@ -92,11 +92,11 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mMiterJointStyleButton->setCheckable(true);
     mRoundJoinStyleButton->setCheckable(true);
     connect(mBevelJoinStyleButton, &QPushButton::released,
-            this, &FillStrokeSettingsWidget::setBevelJoinStyle);
+            this, &FillStrokeSettingsWidget::setBevelJoinStyleAction);
     connect(mMiterJointStyleButton, &QPushButton::released,
-            this, &FillStrokeSettingsWidget::setMiterJoinStyle);
+            this, &FillStrokeSettingsWidget::setMiterJoinStyleAction);
     connect(mRoundJoinStyleButton, &QPushButton::released,
-            this, &FillStrokeSettingsWidget::setRoundJoinStyle);
+            this, &FillStrokeSettingsWidget::setRoundJoinStyleAction);
 
     mJoinStyleLayout->addWidget(new QLabel("Join:", this));
     mJoinStyleLayout->addWidget(mBevelJoinStyleButton);
@@ -122,11 +122,11 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mSquareCapStyleButton->setCheckable(true);
     mRoundCapStyleButton->setCheckable(true);
     connect(mFlatCapStyleButton, &QPushButton::released,
-            this, &FillStrokeSettingsWidget::setFlatCapStyle);
+            this, &FillStrokeSettingsWidget::setFlatCapStyleAction);
     connect(mSquareCapStyleButton, &QPushButton::released,
-            this, &FillStrokeSettingsWidget::setSquareCapStyle);
+            this, &FillStrokeSettingsWidget::setSquareCapStyleAction);
     connect(mRoundCapStyleButton, &QPushButton::released,
-            this, &FillStrokeSettingsWidget::setRoundCapStyle);
+            this, &FillStrokeSettingsWidget::setRoundCapStyleAction);
 
     mCapStyleLayout->addWidget(new QLabel("Cap:", this));
     mCapStyleLayout->addWidget(mFlatCapStyleButton);
@@ -167,14 +167,14 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mLinearGradientButton->setCheckable(true);
     mLinearGradientButton->setObjectName("leftButton");
     connect(mLinearGradientButton, &QPushButton::released,
-            this, &FillStrokeSettingsWidget::setLinearGradientFill);
+            this, &FillStrokeSettingsWidget::setLinearGradientAction);
 
     mRadialGradientButton = new QPushButton(QIcon(iconsDir + "/fill_gradient_radial.png"),
                                             "Radial", this);
     mRadialGradientButton->setCheckable(true);
     mRadialGradientButton->setObjectName("rightButton");
     connect(mRadialGradientButton, &QPushButton::released,
-            this, &FillStrokeSettingsWidget::setRadialGradientFill);
+            this, &FillStrokeSettingsWidget::setRadialGradientAction);
 
     mGradientTypeLayout->addWidget(mLinearGradientButton);
     mGradientTypeLayout->addWidget(mRadialGradientButton);
@@ -203,36 +203,41 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     setJoinStyle(SkPaint::kRound_Join);
 }
 
-void FillStrokeSettingsWidget::setLinearGradientFill() {
+void FillStrokeSettingsWidget::setLinearGradientAction() {
     setGradientType(GradientType::LINEAR);
+    mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setRadialGradientFill() {
+void FillStrokeSettingsWidget::setRadialGradientAction() {
     setGradientType(GradientType::RADIAL);
+    mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setGradientFill() {
+void FillStrokeSettingsWidget::setGradientFillAction() {
     if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->show();
     mFillGradientButton->setChecked(true);
     mFillFlatButton->setChecked(false);
     mFillNoneButton->setChecked(false);
     colorTypeSet(GRADIENTPAINT);
+    mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setFlatFill() {
+void FillStrokeSettingsWidget::setFlatFillAction() {
     if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->show();
     mFillGradientButton->setChecked(false);
     mFillFlatButton->setChecked(true);
     mFillNoneButton->setChecked(false);
     colorTypeSet(FLATPAINT);
+    mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setNoneFill() {
+void FillStrokeSettingsWidget::setNoneFillAction() {
     if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->show();
     mFillGradientButton->setChecked(false);
     mFillFlatButton->setChecked(false);
     mFillNoneButton->setChecked(true);
     colorTypeSet(NOPAINT);
+    mDocument.actionFinished();
 }
 
 void FillStrokeSettingsWidget::updateColorAnimator() {
@@ -273,7 +278,7 @@ void FillStrokeSettingsWidget::updateAfterTargetChanged() {
 }
 
 void FillStrokeSettingsWidget::setCurrentPaintType(
-        const PaintType &paintType) {
+        const PaintType paintType) {
     if(paintType == NOPAINT) setNoPaintType();
     else if(paintType == FLATPAINT) setFlatPaintType();
     else setGradientPaintType();
@@ -311,7 +316,7 @@ void FillStrokeSettingsWidget::clearAll() {
     mGradientWidget->clearAll();
 }
 
-void FillStrokeSettingsWidget::colorTypeSet(const PaintType &type) {
+void FillStrokeSettingsWidget::colorTypeSet(const PaintType type) {
     if(type == NOPAINT) {
         setNoPaintType();
     } else if(type == FLATPAINT) {
@@ -369,7 +374,7 @@ void FillStrokeSettingsWidget::connectGradient() {
             &ColorSettingsWidget::setTarget);
     connect(mGradientWidget,
             &GradientWidget::currentGradientChanged,
-            this, &FillStrokeSettingsWidget::setGradient);
+            this, &FillStrokeSettingsWidget::setGradientAction);
 }
 
 void FillStrokeSettingsWidget::disconnectGradient() {
@@ -378,7 +383,7 @@ void FillStrokeSettingsWidget::disconnectGradient() {
                mColorsSettingsWidget,
                &ColorSettingsWidget::setTarget);
     disconnect(mGradientWidget, &GradientWidget::currentGradientChanged,
-               this, &FillStrokeSettingsWidget::setGradient);
+               this, &FillStrokeSettingsWidget::setGradientAction);
 }
 
 void FillStrokeSettingsWidget::setColorAnimatorTarget(
@@ -405,7 +410,7 @@ PaintType FillStrokeSettingsWidget::getCurrentPaintTypeVal() {
     else return mCurrentStrokePaintType;
 }
 
-void FillStrokeSettingsWidget::setCurrentPaintTypeVal(const PaintType& paintType) {
+void FillStrokeSettingsWidget::setCurrentPaintTypeVal(const PaintType paintType) {
     if(mTarget == PaintSetting::FILL) mCurrentFillPaintType = paintType;
     else mCurrentStrokePaintType = paintType;
 }
@@ -431,7 +436,7 @@ void FillStrokeSettingsWidget::setCurrentGradientVal(Gradient *gradient) {
 }
 
 void FillStrokeSettingsWidget::setCurrentGradientTypeVal(
-                                const GradientType &type) {
+                                const GradientType type) {
     if(mTarget == PaintSetting::FILL) mCurrentFillGradientType = type;
     else mCurrentStrokeGradientType = type;
 }
@@ -496,46 +501,53 @@ void FillStrokeSettingsWidget::applyGradient() {
     if(scene) scene->applyPaintSettingToSelected(applier);
 }
 
-void FillStrokeSettingsWidget::setGradient(Gradient *gradient) {
+void FillStrokeSettingsWidget::setGradientAction(Gradient *gradient) {
     setCurrentGradientVal(gradient);
     applyGradient();
+    mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setGradientType(const GradientType &type) {
+void FillStrokeSettingsWidget::setGradientType(const GradientType type) {
     setCurrentGradientTypeVal(type);
     mLinearGradientButton->setChecked(type == GradientType::LINEAR);
     mRadialGradientButton->setChecked(type == GradientType::RADIAL);
     applyGradient();
 }
 
-void FillStrokeSettingsWidget::setBevelJoinStyle() {
+void FillStrokeSettingsWidget::setBevelJoinStyleAction() {
     setJoinStyle(SkPaint::kBevel_Join);
     emitJoinStyleChanged();
+    mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setMiterJoinStyle() {
+void FillStrokeSettingsWidget::setMiterJoinStyleAction() {
     setJoinStyle(SkPaint::kMiter_Join);
     emitJoinStyleChanged();
+    mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setRoundJoinStyle() {
+void FillStrokeSettingsWidget::setRoundJoinStyleAction() {
     setJoinStyle(SkPaint::kRound_Join);
     emitJoinStyleChanged();
+    mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setFlatCapStyle() {
+void FillStrokeSettingsWidget::setFlatCapStyleAction() {
     setCapStyle(SkPaint::kButt_Cap);
     emitCapStyleChanged();
+    mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setSquareCapStyle() {
+void FillStrokeSettingsWidget::setSquareCapStyleAction() {
     setCapStyle(SkPaint::kSquare_Cap);
     emitCapStyleChanged();
+    mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setRoundCapStyle() {
+void FillStrokeSettingsWidget::setRoundCapStyleAction() {
     setCapStyle(SkPaint::kRound_Cap);
     emitCapStyleChanged();
+    mDocument.actionFinished();
 }
 
 void FillStrokeSettingsWidget::setFillTarget() {

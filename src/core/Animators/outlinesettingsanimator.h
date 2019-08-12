@@ -11,7 +11,7 @@ protected:
     OutlineSettingsAnimator(GradientPoints* const grdPts,
                             PathBox * const parent,
                             const QColor &color,
-                            const PaintType &paintType,
+                            const PaintType paintType,
                             Gradient* const gradient = nullptr);
 public:
     bool SWT_isStrokeSettings() const { return true; }

@@ -21,7 +21,7 @@ PaintSettingsAnimator::PaintSettingsAnimator(
         GradientPoints * const grdPts,
         PathBox * const parent,
         const QColor &colorT,
-        const PaintType &paintTypeT,
+        const PaintType paintTypeT,
         Gradient* const gradientT) :
     ComplexAnimator(name), mTarget_k(parent) {
     mColor->qra_setCurrentValue(colorT);
@@ -87,7 +87,7 @@ QColor PaintSettingsAnimator::getColor(const qreal relFrame) const {
     return mColor->getColor(relFrame);
 }
 
-const PaintType& PaintSettingsAnimator::getPaintType() const {
+const PaintType PaintSettingsAnimator::getPaintType() const {
     return mPaintType;
 }
 
@@ -106,14 +106,14 @@ void PaintSettingsAnimator::setCurrentColor(const QColor &color) {
 }
 
 void PaintSettingsAnimator::showHideChildrenBeforeChaningPaintType(
-        const PaintType &newPaintType) {
+        const PaintType newPaintType) {
     if(mPaintType == FLATPAINT)
         ca_removeChild(mColor);
     if(newPaintType == FLATPAINT)
         ca_addChild(mColor);
 }
 
-void PaintSettingsAnimator::setPaintType(const PaintType &paintType) {
+void PaintSettingsAnimator::setPaintType(const PaintType paintType) {
     if(paintType == mPaintType) return;
 
     showHideChildrenBeforeChaningPaintType(paintType);
@@ -138,7 +138,7 @@ void PaintSettingsAnimator::setGradientPointsPos(const QPointF &pt1, const QPoin
 }
 
 UpdatePaintSettings::UpdatePaintSettings(const QColor &paintColorT,
-                                         const PaintType &paintTypeT) {
+                                         const PaintType paintTypeT) {
     fPaintColor = paintColorT;
     fPaintType = paintTypeT;
 }
@@ -162,7 +162,7 @@ void UpdatePaintSettings::applyPainterSettingsSk(SkPaint *paint) {
 void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
                                          const QPointF &start,
                                          const QPointF &finalStop,
-                                         const GradientType &gradientType) {
+                                         const GradientType gradientType) {
     int nStops = stops.count();
     SkPoint gradPoints[nStops];
     SkColor gradColors[nStops];
@@ -201,7 +201,7 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
 
 UpdateStrokeSettings::UpdateStrokeSettings(const qreal width,
                    const QColor &paintColorT,
-                   const PaintType &paintTypeT,
+                   const PaintType paintTypeT,
                    const QPainter::CompositionMode &outlineCompositionModeT) :
     UpdatePaintSettings(paintColorT, paintTypeT), fOutlineWidth(width) {
     fOutlineCompositionMode = outlineCompositionModeT;

@@ -1258,7 +1258,7 @@ void FillSvgAttributes::setColorOpacity(const qreal opacity) {
     mOpacity = opacity;
 }
 
-void FillSvgAttributes::setPaintType(const PaintType &type) {
+void FillSvgAttributes::setPaintType(const PaintType type) {
     mPaintType = type;
 }
 

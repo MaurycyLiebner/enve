@@ -44,7 +44,7 @@ public:
 
     void setColorOpacity(const qreal opacity);
 
-    void setPaintType(const PaintType &type);
+    void setPaintType(const PaintType type);
 
     void setGradient(const SvgGradient& gradient);
 

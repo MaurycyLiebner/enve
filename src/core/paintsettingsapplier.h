@@ -76,7 +76,7 @@ private:
 class GradientTypePaintSetting : public PaintSetting {
 public:
     GradientTypePaintSetting(const Target& target,
-                             const GradientType& type) :
+                             const GradientType type) :
         PaintSetting(target), mGradientType(type) {}
 protected:
     void applyToPS(PaintSettingsAnimator * const target) const {
@@ -89,7 +89,7 @@ private:
 class PaintTypePaintSetting : public PaintSetting {
 public:
     PaintTypePaintSetting(const Target& target,
-                          const PaintType& type) :
+                          const PaintType type) :
         PaintSetting(target), mPaintType(type) {}
 protected:
     void applyToPS(PaintSettingsAnimator * const target) const {
