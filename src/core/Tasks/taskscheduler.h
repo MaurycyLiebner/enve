@@ -26,8 +26,9 @@ protected:
                                    mGpuOnly.count(); }
     bool allDone() const { return countQued() == 0; }
     void addTask(const stdsptr<eTask>& task) {
-        if(task->gpuOnly()) mGpuOnly << task;
-        else if(task->gpuPreferred()) mGpuPreffered << task;
+        const auto hwSupport = task->hardwareSupport();
+        if(hwSupport == HardwareSupport::gpuOnly) mGpuOnly << task;
+        else if(hwSupport == HardwareSupport::gpuPreffered) mGpuPreffered << task;
         else mQued << task;
     }
 
@@ -54,8 +55,9 @@ protected:
         }
         for(int i = 0; i < mQued.count(); i++) {
             const auto& task = mQued.at(i);
-            if(task->readyToBeProcessed() &&
-               task->gpuSupported()) return mQued.takeAt(i);
+            if(!task->readyToBeProcessed()) continue;
+            if(task->hardwareSupport() == HardwareSupport::cpuOnly) continue;
+            return mQued.takeAt(i);
         }
         return nullptr;
     }

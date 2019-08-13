@@ -87,7 +87,7 @@ QColor PaintSettingsAnimator::getColor(const qreal relFrame) const {
     return mColor->getColor(relFrame);
 }
 
-const PaintType PaintSettingsAnimator::getPaintType() const {
+PaintType PaintSettingsAnimator::getPaintType() const {
     return mPaintType;
 }
 

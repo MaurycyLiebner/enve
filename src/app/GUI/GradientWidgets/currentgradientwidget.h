@@ -11,7 +11,6 @@ public:
                                    QWidget *parent = nullptr);
 
     void paintGL();
-
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);

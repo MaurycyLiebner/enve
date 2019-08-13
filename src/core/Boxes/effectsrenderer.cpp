@@ -29,7 +29,7 @@ void EffectsRenderer::processGpu(QGL33 * const gl,
     GpuRenderTools renderTools(gl, context, srcImage);
     while(!mEffects.isEmpty()) {
         const auto& effect = mEffects.first();
-        if(effect->cpuOnly()) break;
+        if(effect->hardwareSupport() == HardwareSupport::cpuOnly) break;
         effect->processGpu(gl, renderTools, renderData);
         renderTools.swapTextures();
         mEffects.removeFirst();
@@ -43,7 +43,7 @@ void EffectsRenderer::processCpu(BoxRenderData * const boxData) {
     Q_ASSERT(!mEffects.isEmpty());
     const auto& effect = mEffects.first();
 
-    Q_ASSERT(!effect->gpuOnly());
+    Q_ASSERT(effect->hardwareSupport() != HardwareSupport::gpuOnly);
     EffectSubTaskSpawner::sSpawn(effect, boxData->ref<BoxRenderData>());
     mEffects.removeFirst();
 }

@@ -11,7 +11,6 @@ ColorValueRect::ColorValueRect(const ColorProgram& program,
     ColorWidget(parent), mGLProgram(program) {}
 
 void ColorValueRect::paintGL() {
-    glClearColor(1, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(mGLProgram.fID);

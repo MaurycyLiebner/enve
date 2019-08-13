@@ -36,7 +36,7 @@ public:
     void readProperty(QIODevice * const src);
 
     QColor getColor() const;
-    const PaintType getPaintType() const;
+    PaintType getPaintType() const;
     Gradient *getGradient() const;
     void setGradient(Gradient *gradient);
     void setCurrentColor(const QColor &color);

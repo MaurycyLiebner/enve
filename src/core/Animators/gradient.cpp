@@ -140,6 +140,7 @@ QGradientStops Gradient::getQGradientStopsAtAbsFrame(const qreal absFrame) {
 }
 
 void Gradient::updateQGradientStops(const UpdateReason reason) {
+    Q_UNUSED(reason);
     mQGradientStops.clear();
     const qreal inc = 1./(mColors.length() - 1);
     qreal cPos = 0;

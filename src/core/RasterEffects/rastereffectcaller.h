@@ -25,11 +25,6 @@ public:
 
     virtual int cpuThreads(const int available, const int area) const;
 
-    bool gpuOnly() const
-    { return hardwareSupport() == HardwareSupport::gpuOnly; }
-    bool cpuOnly() const
-    { return hardwareSupport() == HardwareSupport::cpuOnly; }
-
     void setSrcRect(const SkIRect& srcRect, const SkIRect& clampRect);
 
     const SkIRect& getDstRect() const { return  fDstRect; }

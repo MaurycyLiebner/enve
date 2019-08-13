@@ -37,7 +37,6 @@ void DisplayedGradientsWidget::paintGL() {
     int nGradients = mGradientWidget->getGradientsCount();
     int visibleGradients = qMin(nGradients, mNumberVisibleGradients);
     int yT = mDisplayedTop;
-    glClearColor(0.f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(GRADIENT_PROGRAM.fID);
     glBindVertexArray(mPlainSquareVAO);

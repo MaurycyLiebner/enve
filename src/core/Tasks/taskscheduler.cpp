@@ -70,7 +70,7 @@ void TaskScheduler::queCPUTask(const stdsptr<eTask>& task) {
     task->taskQued();
     mQuedCPUTasks.addTask(task);
     if(task->readyToBeProcessed()) {
-        if(!task->gpuSupported() ||
+        if(task->hardwareSupport() == HardwareSupport::cpuOnly ||
            !processNextQuedGPUTask()) {
             processNextQuedCPUTask();
         }

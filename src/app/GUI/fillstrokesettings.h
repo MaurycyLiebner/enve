@@ -94,7 +94,7 @@ private:
 
     Gradient *getCurrentGradientVal();
 
-    const GradientType getCurrentGradientTypeVal() {
+    GradientType getCurrentGradientTypeVal() const {
         if(mTarget == PaintSetting::FILL) return mCurrentFillGradientType;
         else return mCurrentStrokeGradientType;
     }

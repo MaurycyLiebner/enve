@@ -13,7 +13,7 @@ void GLWidget::initializeGL() {
     if(!initializeOpenGLFunctions())
         RuntimeThrow("Initializing GL functions failed.");
 
-    glClearColor(0.235f, 0.235f, 0.235f, 1.f);
+    glClearColor(0, 0, 0, 1);
     //Set blending
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);

@@ -20,7 +20,6 @@ void ColorLabel::setAlpha(const qreal alpha_t) {
 }
 
 void ColorLabel::paintGL() {
-    glClearColor(1.f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(PLAIN_PROGRAM.fID);
     float r = mHue;

@@ -247,6 +247,7 @@ void TextureFrameBuffer::gen(QGL33 * const gl,
     fHeight = height;
     gl->glGenFramebuffers(1, &fFBOId);
     bind(gl);
+    gl->glClearColor(0, 0, 0, 0);
     // create a color attachment texture
     fTexture.gen(gl, width, height, nullptr);
     gl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,

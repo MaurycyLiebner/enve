@@ -45,14 +45,6 @@ public:
 
     virtual bool nextStep() { return false; }
 
-    bool cpuSupported() const { return hardwareSupport() != HardwareSupport::gpuOnly; }
-    bool cpuPreferred() const { return hardwareSupport() == HardwareSupport::cpuPreffered; }
-    bool cpuOnly() const { return hardwareSupport() == HardwareSupport::cpuOnly; }
-
-    bool gpuSupported() const { return hardwareSupport() != HardwareSupport::cpuOnly; }
-    bool gpuPreferred() const { return hardwareSupport() == HardwareSupport::gpuPreffered; }
-    bool gpuOnly() const { return hardwareSupport() == HardwareSupport::gpuOnly; }
-
     void taskQued() {
         mState = eTaskState::qued;
         afterQued();

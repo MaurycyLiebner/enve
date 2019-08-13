@@ -21,7 +21,7 @@ public:
     //! @brief Adds a new task and starts processing it if is not busy.
     void addToProcess(const stdsptr<eTask>& scheduled) {
         //scheduled->afterProcessed(); return;
-        Q_ASSERT(scheduled->gpuSupported());
+        Q_ASSERT(scheduled->hardwareSupport() != HardwareSupport::cpuOnly);
         mScheduledProcesses << scheduled;
         handleScheduledProcesses();
     }
@@ -73,6 +73,7 @@ protected:
             mInitialized = true;
             mContext.setContext(grContext, textureSquareVAO);
 
+            glClearColor(0, 0, 0, 0);
             glEnable(GL_BLEND);
             glDisable(GL_DEPTH_TEST);
             glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
