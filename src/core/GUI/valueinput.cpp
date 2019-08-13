@@ -2,13 +2,15 @@
 
 #include <QPainter>
 #include <QApplication>
+#include <QDesktopWidget>
 
 #include "skia/skiaincludes.h"
 #include "skia/skqtconversions.h"
 #include "GUI/global.h"
 
 ValueInput::ValueInput() {
-
+    const int dpi = QApplication::desktop()->logicalDpiX();
+    mFont = toSkFont(QApplication::font(), dpi, 72);
 }
 
 void ValueInput::draw(SkCanvas *canvas, const int y) {
@@ -25,12 +27,11 @@ void ValueInput::draw(SkCanvas *canvas, const int y) {
     paint.setColor(SK_ColorBLACK);
     paint.setStyle(SkPaint::kStrokeAndFill_Style);
     paint.setStrokeWidth(.1f);
-    const SkFont font = toSkFont(QApplication::font(), 96, 72);
 
     canvas->drawString(transStr.toStdString().c_str(),
            inputRect.x() + MIN_WIDGET_DIM*0.5f,
            inputRect.y() + inputRect.height()*0.5f + FONT_HEIGHT*0.2f,
-           font, paint);
+           mFont, paint);
 }
 
 void ValueInput::draw(QPainter *p, const int y) {

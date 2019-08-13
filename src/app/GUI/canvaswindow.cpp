@@ -210,7 +210,8 @@ void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
                            this));
 
     if(mDocument.fCanvasMode == CanvasMode::paint) update();
-    else queTasksAndUpdate();
+    else if(isMouseGrabber()) queTasksAndUpdate();
+    else update();
     mPrevMousePos = pos;
 }
 

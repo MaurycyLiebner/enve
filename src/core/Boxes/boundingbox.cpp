@@ -459,6 +459,7 @@ void BoundingBox::scheduleUpdate() {
     mSchedulePlanned = false;
     if(!shouldScheduleUpdate()) return;
     const int relFrame = anim_getCurrentRelFrame();
+    if(hasCurrentRenderData(relFrame)) return;
     const auto currentRenderData = updateCurrentRenderData(relFrame, mPlannedReason);
     if(currentRenderData) currentRenderData->scheduleTask();
 }
@@ -1153,7 +1154,6 @@ void BoundingBox::queScheduledTasks() {
     for(const auto& task : mScheduledTasks)
         taskScheduler->queCPUTask(task);
     mScheduledTasks.clear();
-    mCurrentRenderDataHandler.clear();
 }
 
 void BoundingBox::writeIdentifier(QIODevice * const dst) const {

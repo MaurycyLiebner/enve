@@ -37,8 +37,6 @@ signals:
     void previewPaused();
     void previewBeingPlayed();
     void previewFinished();
-
-    void queTasksAndUpdate();
 private:
     void setFrameAction(const int frame);
     void setCurrentScene(Canvas * const scene);

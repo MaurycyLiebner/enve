@@ -3,6 +3,9 @@
 #include <QString>
 #include <QPointF>
 #include <QLocale>
+
+#include "skia/skiaincludes.h"
+
 class QPainter;
 class SkCanvas;
 class QKeyEvent;
@@ -142,6 +145,7 @@ protected:
         }
     }
 
+    SkFont mFont;
     TransformMode mTransMode = TransformMode::move;
     DirectionMode mXYMode = DirectionMode::xy;
     QString mInputText;

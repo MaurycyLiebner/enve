@@ -391,8 +391,9 @@ public:
 
     void planCenterPivotPosition();
 
-    virtual void updateIfUsesProgram(
-            const ShaderEffectProgram * const program) const;
+    void clearRenderData() { mCurrentRenderDataHandler.clear(); }
+
+    virtual void updateIfUsesProgram(const ShaderEffectProgram * const program) const;
 protected:
     void setRelBoundingRect(const QRectF& relRect);
 

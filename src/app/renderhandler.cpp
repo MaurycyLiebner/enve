@@ -20,8 +20,6 @@ RenderHandler::RenderHandler(Document &document,
     Q_ASSERT(!sInstance);
     sInstance = this;
 
-    connect(this, &RenderHandler::queTasksAndUpdate,
-            &mDocument, &Document::actionFinished);
     connect(&memoryHandler, &MemoryHandler::allMemoryUsed,
             this, &RenderHandler::outOfMemory);
 
@@ -89,13 +87,12 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
 
 void RenderHandler::setFrameAction(const int frame) {
     if(mCurrentScene) mCurrentScene->anim_setAbsFrame(frame);
-    emit queTasksAndUpdate();
+    mDocument.actionFinished();
 }
 
 void RenderHandler::setCurrentScene(Canvas * const scene) {
     mCurrentScene = scene;
-    mCurrentSoundComposition = scene ?
-                scene->getSoundComposition() : nullptr;
+    mCurrentSoundComposition = scene ? scene->getSoundComposition() : nullptr;
 }
 
 void RenderHandler::nextCurrentRenderFrame() {
@@ -267,11 +264,10 @@ void RenderHandler::nextPreviewFrame() {
     if(mCurrentPreviewFrame > mMaxPreviewFrame) {
         clearPreview();
     } else {
-        mCurrentScene->setCurrentPreviewContainer(
-                    mCurrentPreviewFrame);
-        setFrameAction(mCurrentPreviewFrame);
+        mCurrentScene->setCurrentPreviewContainer(mCurrentPreviewFrame);
+        emit mCurrentScene->currentFrameChanged(mCurrentPreviewFrame);
     }
-   emit mCurrentScene->requestUpdate();
+    emit mCurrentScene->requestUpdate();
 }
 
 void RenderHandler::nextSaveOutputFrame() {
@@ -307,7 +303,7 @@ void RenderHandler::nextSaveOutputFrame() {
 
     //mCurrentScene->renderCurrentFrameToOutput(*mCurrentRenderSettings);
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
-        queTasksAndUpdate();
+        mDocument.actionFinished();
         if(TaskScheduler::sAllTasksFinished()) {
             TaskScheduler::sClearAllFinishedFuncs();
             mCurrentRenderSettings = nullptr;

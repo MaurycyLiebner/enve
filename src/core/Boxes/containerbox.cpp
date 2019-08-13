@@ -250,6 +250,8 @@ void ContainerBox::queScheduledTasks() {
     queChildScheduledTasks();
     if(mSchedulePlanned && SWT_isGroupBox()) updateRelBoundingRect();
     BoundingBox::queScheduledTasks();
+    for(const auto &child : mContainedBoxes) child->clearRenderData();
+    clearRenderData();
 }
 
 void ContainerBox::promoteToLayer() {
