@@ -1136,8 +1136,7 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
     }
     if(!mParentGroup || takeAncestorsIntoAccount) return range;
     if(range.isUnary()) return range;
-    int parentRel = mParentGroup->prp_absFrameToRelFrame(
-                prp_relFrameToAbsFrame(relFrame));
+    const int parentRel = mParentGroup->prp_absFrameToRelFrame(prp_relFrameToAbsFrame(relFrame));
     auto parentRange = mParentGroup->BoundingBox::getFirstAndLastIdenticalForMotionBlur(parentRel);
 
     return range*parentRange;

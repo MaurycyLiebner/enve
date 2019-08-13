@@ -569,7 +569,6 @@ public:
         if(Actions::sInstance->smoothChange() && mCurrentContainer) {
             if(!mDrawnSinceQue) return;
             mCurrentContainer->queChildScheduledTasks();
-            for(const auto &child : mContainedBoxes) child->clearRenderData();
         } else ContainerBox::queScheduledTasks();
         mDrawnSinceQue = false;
     }

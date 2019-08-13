@@ -391,7 +391,7 @@ public:
 
     void planCenterPivotPosition();
 
-    void clearRenderData() { mCurrentRenderDataHandler.clear(); }
+    virtual void clearRenderData() { mCurrentRenderDataHandler.clear(); }
 
     virtual void updateIfUsesProgram(const ShaderEffectProgram * const program) const;
 protected:
