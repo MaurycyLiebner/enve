@@ -816,7 +816,8 @@ void ContainerBox::writeBoundingBox(QIODevice * const target) {
     BoundingBox::writeBoundingBox(target);
     const int nChildBoxes = mContainedBoxes.count();
     target->write(rcConstChar(&nChildBoxes), sizeof(int));
-    for(const auto &child : mContainedBoxes) {
+    for(int i = nChildBoxes - 1; i >= 0; i--) {
+        const auto &child = mContainedBoxes.at(i);
         child->writeIdentifier(target);
         child->writeBoundingBox(target);
     }
