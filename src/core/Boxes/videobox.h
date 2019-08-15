@@ -14,7 +14,6 @@ protected:
 public:
     ~VideoBox();
 
-    void setParentGroup(ContainerBox * const parent);
     void animationDataChanged();
     void soundDataChanged();
 

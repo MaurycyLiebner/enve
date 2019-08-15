@@ -113,7 +113,7 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
     if(getLinkTarget()) {
         disconnect(getLinkTarget(), nullptr, this, nullptr);
         getLinkTarget()->removeLinkingBox(this);
-        removeAllContainedBoxes();
+        removeAllContained();
     }
     if(linkTarget) {
         prp_setName(linkTarget->prp_getName() + " link");
@@ -130,7 +130,7 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
         const auto &boxesList = linkTarget->getContainedBoxes();
         for(const auto& child : boxesList) {
             const auto newLink = child->createLinkForLinkGroup();
-            addContainedBox(newLink);
+            addContained(newLink);
         }
     } else {
         prp_setName("empty link");

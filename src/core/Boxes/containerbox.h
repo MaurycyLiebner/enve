@@ -83,7 +83,7 @@ public:
     void promoteToLayer();
     void demoteToGroup();
 
-    const ConnContextObjList<qsptr<BoundingBox>> &getContainedBoxes() const;
+    const QList<BoundingBox *> &getContainedBoxes() const;
 
     bool differenceInPathEffectsBetweenFrames(const int relFrame1,
                                               const int relFrame2) const;
@@ -115,30 +115,31 @@ public:
     void ungroup_k();
 
     bool isCurrentGroup() const;
-    bool replaceContainedBox(const qsptr<BoundingBox>& replaced,
-                             const qsptr<BoundingBox>& replacer);
-    void addContainedBox(const qsptr<BoundingBox> &child);
-    void insertContainedBox(const int id, const qsptr<BoundingBox> &child);
-    void updateContainedBoxIds(const int firstId);
-    void updateContainedBoxIds(const int firstId,
-                              const int lastId);
-    int getContainedBoxIndex(BoundingBox * const child);
-    qsptr<BoundingBox> takeContainedBox_k(const int id);
-    void removeContainedBox_k(const qsptr<BoundingBox> &child);
-    void increaseContainedBoxZInList(BoundingBox * const child);
-    void decreaseContainedBoxZInList(BoundingBox * const child);
-    void bringContainedBoxToEndList(BoundingBox * const child);
-    void bringContainedBoxToFrontList(BoundingBox * const child);
-    void moveContainedBoxInList(BoundingBox * const child, const int to);
-    void moveContainedBoxInList(BoundingBox * const child,
-                                const int from,
-                                const int to);
-    void moveContainedBoxBelow(BoundingBox * const boxToMove,
-                               BoundingBox * const below);
-    void moveContainedBoxAbove(BoundingBox * const boxToMove,
-                               BoundingBox * const above);
 
-    void removeContainedBoxFromList(const int id);
+    void updateContainedBoxes();
+    bool replaceContained(const qsptr<eBoxOrSound>& replaced,
+                             const qsptr<eBoxOrSound>& replacer);
+    void addContained(const qsptr<eBoxOrSound> &child);
+    void insertContained(const int id, const qsptr<eBoxOrSound> &child);
+    void updateContainedIds(const int firstId);
+    void updateContainedIds(const int firstId,
+                              const int lastId);
+    int getContainedIndex(eBoxOrSound * const child);
+    qsptr<eBoxOrSound> takeContained_k(const int id);
+    void removeContained_k(const qsptr<eBoxOrSound> &child);
+    void increaseContainedZInList(eBoxOrSound * const child);
+    void decreaseContainedZInList(eBoxOrSound * const child);
+    void bringContainedToEndList(eBoxOrSound * const child);
+    void bringContainedToFrontList(eBoxOrSound * const child);
+    void moveContainedInList(eBoxOrSound * const child, const int to);
+    void moveContainedInList(eBoxOrSound * const child,
+                                const int from, const int to);
+    void moveContainedBelow(eBoxOrSound * const boxToMove,
+                               eBoxOrSound * const below);
+    void moveContainedAbove(eBoxOrSound * const boxToMove,
+                               eBoxOrSound * const above);
+
+    void removeContainedFromList(const int id);
     void setDescendantCurrentGroup(const bool bT);
     bool isDescendantCurrentGroup() const;
 
@@ -148,22 +149,23 @@ public:
         return absId - ca_getNumberOfChildren();
     }
 
-    int boxIdToAbstractionId(const int boxId) const {
-        return boxId + ca_getNumberOfChildren();
+    int containedIdToAbstractionId(const int contId) const {
+        return contId + ca_getNumberOfChildren();
     }
     int getContainedBoxesCount() const;
-    void removeAllContainedBoxes();
+    void removeAllContained();
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
 private:
     void iniPathEffects();
     void updateRelBoundingRect();
 protected:
-    void removeContainedBox(const qsptr<BoundingBox> &child);
+    void removeContained(const qsptr<eBoxOrSound> &child);
 
     bool mIsCurrentGroup = false;
     bool mIsDescendantCurrentGroup = false;
-    ConnContextObjList<qsptr<BoundingBox>> mContainedBoxes;
+    QList<BoundingBox*> mContainedBoxes;
+    ConnContextObjList<qsptr<eBoxOrSound>> mContained;
 
     qsptr<PathEffectAnimators> mPathEffectsAnimators;
     qsptr<PathEffectAnimators> mFillPathEffectsAnimators;

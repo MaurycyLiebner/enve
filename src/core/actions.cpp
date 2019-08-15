@@ -339,7 +339,7 @@ void Actions::importFile(const QString &path,
 
         if(importedBox) {
             importedBox->planCenterPivotPosition();
-            mActiveScene->getCurrentGroup()->addContainedBox(importedBox);
+            mActiveScene->getCurrentGroup()->addContained(importedBox);
             importedBox->startPosTransform();
             importedBox->moveByAbs(relDropPos);
             importedBox->finishTransform();

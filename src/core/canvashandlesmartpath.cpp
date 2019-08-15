@@ -30,7 +30,7 @@ void Canvas::handleAddSmartPointMousePress(const MouseEvent &e) {
     if(!mLastEndPoint && !nodePointUnderMouse) {
         const auto newPath = enve::make_shared<SmartVectorPath>();
         newPath->planCenterPivotPosition();
-        mCurrentContainer->addContainedBox(newPath);
+        mCurrentContainer->addContained(newPath);
         clearBoxesSelection();
         addBoxToSelection(newPath.get());
         const auto relPos = newPath->mapAbsPosToRel(e.fPos);

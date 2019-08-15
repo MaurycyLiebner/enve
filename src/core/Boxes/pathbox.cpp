@@ -13,6 +13,9 @@
 #include "Animators/outlinesettingsanimator.h"
 
 PathBox::PathBox(const eBoxType type) : BoundingBox(type) {
+    connect(this, &eBoxOrSound::parentChanged,
+            this, &PathBox::setPathsOutdated);
+
     mPathEffectsAnimators =
             enve::make_shared<PathEffectAnimators>();
     mPathEffectsAnimators->prp_setName("path effects");
@@ -94,11 +97,6 @@ void PathBox::setOutlineEffectsEnabled(const bool enable) {
 
 bool PathBox::getOutlineEffectsEnabled() const {
     return mOutlinePathEffectsAnimators->SWT_isEnabled();
-}
-
-void PathBox::setParentGroup(ContainerBox * const parent) {
-    setPathsOutdated();
-    BoundingBox::setParentGroup(parent);
 }
 
 void PathBox::setupRenderData(const qreal relFrame,
@@ -457,7 +455,7 @@ SmartVectorPath *PathBox::objectToVectorPathBox() {
         newPath->loadSkPath(mEditPathSk);
     }
     copyPathBoxDataTo(newPath.get());
-    mParentGroup->addContainedBox(newPath);
+    mParentGroup->addContained(newPath);
     return newPath.get();
 }
 
@@ -466,7 +464,7 @@ SmartVectorPath *PathBox::strokeToVectorPathBox() {
     const auto newPath = enve::make_shared<SmartVectorPath>();
     newPath->loadSkPath(mOutlinePathSk);
     copyPathBoxDataTo(newPath.get());
-    mParentGroup->addContainedBox(newPath);
+    mParentGroup->addContained(newPath);
     return newPath.get();
 }
 

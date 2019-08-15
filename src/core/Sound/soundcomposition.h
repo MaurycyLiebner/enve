@@ -31,16 +31,8 @@ public:
     qint64 readData(char *data, qint64 maxLen);
     qint64 writeData(const char *data, qint64 len);
 
-    void writeSounds(QIODevice * const target) const;
-
-    void readSounds(QIODevice * const target);
-
     void addSound(const qsptr<SingleSound> &sound);
     void removeSound(const qsptr<SingleSound> &sound);
-
-    ComplexAnimator *getSoundsAnimatorContainer();
-    void addSoundAnimator(const qsptr<SingleSound> &sound);
-    void removeSoundAnimator(const qsptr<SingleSound> &sound);
 
     void secondFinished(const int secondId,
                         const stdsptr<Samples>& samples);

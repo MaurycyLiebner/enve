@@ -571,7 +571,7 @@ qsptr<ContainerBox> loadBoxesGroup(const QDomElement &groupElement,
         boxesGroup = enve::make_shared<ContainerBox>(TYPE_GROUP);
         boxesGroup->planCenterPivotPosition();
         attributes.apply(boxesGroup.get());
-        if(parentGroup) parentGroup->addContainedBox(boxesGroup);
+        if(parentGroup) parentGroup->addContained(boxesGroup);
     } else {
         boxesGroup = parentGroup->ref<ContainerBox>();
     }
@@ -593,7 +593,7 @@ void loadVectorPath(const QDomElement &pathElement,
     const QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
     attributes.apply(vectorPath.get());
-    parentGroup->addContainedBox(vectorPath);
+    parentGroup->addContained(vectorPath);
 }
 
 void loadPolyline(const QDomElement &pathElement,
@@ -604,7 +604,7 @@ void loadPolyline(const QDomElement &pathElement,
     const QString pathStr = pathElement.attribute("points");
     parsePolylineDataFast(pathStr, attributes);
     attributes.apply(vectorPath.get());
-    parentGroup->addContainedBox(vectorPath);
+    parentGroup->addContained(vectorPath);
 }
 
 void loadCircle(const QDomElement &pathElement,
@@ -639,7 +639,7 @@ void loadCircle(const QDomElement &pathElement,
     circle->moveByRel(QPointF(cXstr.toDouble(), cYstr.toDouble()));
 
     attributes.apply(circle.data());
-    parentGroup->addContainedBox(circle);
+    parentGroup->addContained(circle);
 }
 
 void loadRect(const QDomElement &pathElement,
@@ -671,7 +671,7 @@ void loadRect(const QDomElement &pathElement,
     }
 
     attributes.apply(rect.data());
-    parentGroup->addContainedBox(rect);
+    parentGroup->addContained(rect);
 }
 
 
@@ -689,7 +689,7 @@ void loadText(const QDomElement &pathElement,
     textBox->setCurrentValue(pathElement.text());
 
     attributes.apply(textBox.data());
-    parentGroup->addContainedBox(textBox);
+    parentGroup->addContained(textBox);
 }
 
 #define eNUMERIC_SVG "\\s*(-?[\\.|\\d]+)"
@@ -937,7 +937,8 @@ qsptr<BoundingBox> loadSVGFile(const QString &filename) {
                 const auto result = loadBoxesGroup(rootElement, nullptr, attributes);
                 gGradients.clear();
                 if(result->getContainedBoxesCount() == 1) {
-                    return result->takeContainedBox_k(0);
+                    return qSharedPointerCast<BoundingBox>(
+                                result->takeContained_k(0));
                 } else if(result->getContainedBoxesCount() == 0) {
                     return nullptr;
                 }

@@ -78,10 +78,10 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
         }
         for(const auto& boxT : boxesT) {
             i++;
-            if(boxT.data() == parentBox) continue;
+            if(boxT == parentBox) continue;
             QAction *act2 = menu.addAction(boxT->prp_getName());
             act2->setProperty("targetBoxPtr", i);
-            if(currentTarget == boxT.data()) {
+            if(currentTarget == boxT) {
                 act2->setCheckable(true);
                 act2->setChecked(true);
                 act2->setDisabled(true);
@@ -91,7 +91,7 @@ void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
         if(selected_action != nullptr) {
             QVariant varT = selected_action->property("targetBoxPtr");
             if(varT.isValid()) {
-                mProperty->setTarget(boxesT.at(varT.toInt()).data());
+                mProperty->setTarget(boxesT.at(varT.toInt()));
             } else {
                 mProperty->setTarget(nullptr);
             }

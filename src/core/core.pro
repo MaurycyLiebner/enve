@@ -51,6 +51,7 @@ LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 SOURCES += \
     Animators/SmartPath/smartpath.cpp \
     Animators/coloranimator.cpp \
+    Animators/eboxorsound.cpp \
     Animators/eeffect.cpp \
     Animators/gradient.cpp \
     Animators/gradientpoints.cpp \
@@ -261,6 +262,7 @@ HEADERS += \
     Animators/SmartPath/smartpath.h \
     Animators/coloranimator.h \
     Animators/dynamiccomplexanimator.h \
+    Animators/eboxorsound.h \
     Animators/eeffect.h \
     Animators/gradient.h \
     Animators/gradientpoints.h \

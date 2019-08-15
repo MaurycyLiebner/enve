@@ -36,16 +36,6 @@ void VideoBox::readBoundingBox(QIODevice * const target) {
 
 }
 
-void VideoBox::setParentGroup(ContainerBox * const parent) {
-    if(mParentGroup && mSound && mParentScene) {
-        mParentScene->getSoundComposition()->removeSound(mSound);
-    }
-    AnimationBox::setParentGroup(parent);
-    if(mParentGroup && mSound && mParentScene) {
-        mParentScene->getSoundComposition()->addSound(mSound);
-    }
-}
-
 #include <QFileDialog>
 void VideoBox::changeSourceFile(QWidget * const dialogParent) {
     const QString path = QFileDialog::getOpenFileName(

@@ -41,7 +41,6 @@ public:
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data);
     stdsptr<BoxRenderData> createRenderData();
-    void setParentGroup(ContainerBox * const parent);
     bool shouldScheduleUpdate();
 
     void writeBoundingBox(QIODevice * const target);

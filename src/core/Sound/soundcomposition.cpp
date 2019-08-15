@@ -7,11 +7,7 @@
 #include "FileCacheHandlers/soundreader.h"
 
 SoundComposition::SoundComposition(Canvas * const parent) :
-    QIODevice(parent), mParent(parent) {
-    connect(mSoundsContainer.get(),
-            &Property::prp_absFrameRangeChanged,
-            this, &SoundComposition::frameRangeChanged);
-}
+    QIODevice(parent), mParent(parent) {}
 
 void SoundComposition::start(const int startFrame) {
     mPos = qRound(startFrame/mParent->getFps()*SOUND_SAMPLERATE);
@@ -24,29 +20,17 @@ void SoundComposition::stop() {
 }
 
 void SoundComposition::addSound(const qsptr<SingleSound>& sound) {
-    connect(sound.get(),
-            &Property::prp_absFrameRangeChanged,
+    connect(sound.get(), &Property::prp_absFrameRangeChanged,
             this, &SoundComposition::frameRangeChanged);
     mSounds.append(sound);
     frameRangeChanged(sound->prp_absInfluenceRange());
 }
 
 void SoundComposition::removeSound(const qsptr<SingleSound>& sound) {
-    disconnect(sound.get(),
-               &Property::prp_absFrameRangeChanged,
+    disconnect(sound.get(), &Property::prp_absFrameRangeChanged,
                this, &SoundComposition::frameRangeChanged);
     mSounds.removeOne(sound);
     frameRangeChanged(sound->prp_absInfluenceRange());
-}
-
-void SoundComposition::addSoundAnimator(const qsptr<SingleSound>& sound) {
-    addSound(sound);
-    mSoundsContainer->addChild(sound);
-}
-
-void SoundComposition::removeSoundAnimator(const qsptr<SingleSound>& sound) {
-    if(mSounds.removeOne(sound))
-        mSoundsContainer->removeChild(sound);
 }
 
 void SoundComposition::secondFinished(const int secondId,
@@ -103,8 +87,10 @@ SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
     const SampleRange sampleRange = {secondId*SOUND_SAMPLERATE,
                                      (secondId + 1)*SOUND_SAMPLERATE - 1};
     const auto task = enve::make_shared<SoundMerger>(secondId, sampleRange, this);
+    int nS = 0;
     for(const auto &sound : mSounds) {
-        if(!sound->isEnabled()) continue;
+        if(!sound->isEnabled() || !sound->isVisible()) continue;
+        nS++;
         const auto secs = sound->absSecondToRelSeconds(secondId);
         for(int i = secs.fMin; i <= secs.fMax; i++) {
             const auto samples = sound->getSamplesForSecond(i);
@@ -126,6 +112,7 @@ SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
             }
         }
     }
+    if(nS == 0) return nullptr;
     task->scheduleTask();
     return task.get();
 }
@@ -133,10 +120,6 @@ SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
 void SoundComposition::frameRangeChanged(const FrameRange &range) {
     const qreal fps = mParent->getFps();
     secondRangeChanged({qFloor(range.fMin/fps), qCeil(range.fMax/fps)});
-}
-
-ComplexAnimator *SoundComposition::getSoundsAnimatorContainer() {
-    return mSoundsContainer.get();
 }
 
 qint64 SoundComposition::readData(char *data, qint64 maxLen) {
@@ -170,19 +153,4 @@ qint64 SoundComposition::writeData(const char *data, qint64 len) {
     Q_UNUSED(len);
 
     return 0;
-}
-
-#include "basicreadwrite.h"
-void SoundComposition::writeSounds(QIODevice * const target) const {
-    mSoundsContainer->writeProperty(target);
-}
-
-void SoundComposition::readSounds(QIODevice * const target) {
-    const int oldSoundCount = mSoundsContainer->ca_getNumberOfChildren();
-    mSoundsContainer->readProperty(target);
-    const int soundCount = mSoundsContainer->ca_getNumberOfChildren();
-    for(int i = oldSoundCount; i < soundCount; i++) {
-        const auto iSound = mSoundsContainer->ca_getChildAt<SingleSound>(i);
-        addSoundAnimator(iSound->ref<SingleSound>());
-    }
 }

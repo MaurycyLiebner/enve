@@ -1,6 +1,6 @@
 ﻿#ifndef SINGLESOUND_H
 #define SINGLESOUND_H
-#include "Animators/staticcomplexanimator.h"
+#include "Animators/eboxorsound.h"
 #include "Animators/qrealanimator.h"
 class FixedLenAnimationRect;
 class SoundHandler;
@@ -9,7 +9,7 @@ class SoundReaderForMerger;
 class SoundDataHandler;
 class HDDCachableCacheHandler;
 
-class SingleSound : public StaticComplexAnimator {
+class SingleSound : public eBoxOrSound {
     e_OBJECT
     Q_OBJECT
 protected:
@@ -19,28 +19,16 @@ public:
 
     void setupTreeViewMenu(PropertyMenu * const menu);
 
-    DurationRectangleMovable *anim_getTimelineMovable(
-            const int relX, const int minViewedFrame,
-            const qreal pixelsPerFrame);
-    void drawTimelineControls(QPainter * const p,
-                              const qreal pixelsPerFrame,
-                              const FrameRange &absFrameRange,
-                              const int rowHeight);
-
     int prp_getRelFrameShift() const;
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool parentSatisfies,
                              const bool parentMainTarget) const;
 
-    FrameRange prp_relInfluenceRange() const;
-
     void writeProperty(QIODevice * const target) const;
     void readProperty(QIODevice * const target);
 
     void setFilePath(const QString &path);
-
-    FixedLenAnimationRect *getDurationRect() const;
 
     qreal getVolumeAtRelFrame(const qreal relFrame) const {
         return mVolumeAnimator->getEffectiveValue(relFrame);
@@ -81,13 +69,11 @@ private:
     void updateDurationRectLength();
 
     qreal getCanvasFPS() const;
-    void updateAfterDurationRectangleShifted();
-    bool mOwnDurationRectangle;
+    const bool mOwnDurationRectangle;
 
     bool mEnabled = true;
     qreal mStretch = 1;
     stdsptr<SoundHandler> mCacheHandler;
-    qsptr<FixedLenAnimationRect> mDurationRectangle;
 
     qsptr<QrealAnimator> mVolumeAnimator =
             enve::make_shared<QrealAnimator>(100, 0, 200, 1, "volume");

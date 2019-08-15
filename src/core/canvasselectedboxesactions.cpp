@@ -7,11 +7,11 @@
 void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.isEmpty()) return;
     const auto newGroup = enve::make_shared<ContainerBox>(TYPE_GROUP);
-    mCurrentContainer->addContainedBox(newGroup);
+    mCurrentContainer->addContained(newGroup);
     for(int i = mSelectedBoxes.count() - 1; i >= 0; i--) {
         const auto boxSP = mSelectedBoxes.at(i)->ref<BoundingBox>();
         boxSP->removeFromParent_k();
-        newGroup->addContainedBox(boxSP);
+        newGroup->addContained(boxSP);
     }
     clearBoxesSelectionList();
     newGroup->planCenterPivotPosition();
@@ -372,17 +372,13 @@ void Canvas::removeBoxFromSelection(BoundingBox * const box) {
     box->deselect();
     schedulePivotUpdate();
     if(mCurrentMode == CanvasMode::paint) updatePaintBox();
-    if(mSelectedBoxes.isEmpty()) {
-        setCurrentBox(nullptr);
-    } else {
-        setCurrentBox(mSelectedBoxes.last());
-    }
+    if(mSelectedBoxes.isEmpty()) setCurrentBox(nullptr);
+    else setCurrentBox(mSelectedBoxes.last());
     emit selectedPaintSettingsChanged();
 }
 
 void Canvas::clearBoxesSelection() {
-    for(const auto &box : mSelectedBoxes)
-        box->deselect();
+    for(const auto &box : mSelectedBoxes) box->deselect();
     clearBoxesSelectionList();
     schedulePivotUpdate();
     setCurrentBox(nullptr);
@@ -515,7 +511,7 @@ void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
 #include "Boxes/linkbox.h"
 void Canvas::createLinkBoxForSelected() {
     for(const auto& selectedBox : mSelectedBoxes)
-        mCurrentContainer->addContainedBox(selectedBox->createLink());
+        mCurrentContainer->addContained(selectedBox->createLink());
 }
 
 #include "clipboardcontainer.h"
@@ -547,7 +543,7 @@ SmartVectorPath *Canvas::getPathResultingFromOperation(
     SkPath resultPath;
     builder.resolve(&resultPath);
     //newPath->loadPathFromSkPath(resultPath);
-    mCurrentContainer->addContainedBox(newPath);
+    mCurrentContainer->addContained(newPath);
     return newPath.get();
 }
 
@@ -601,7 +597,7 @@ void Canvas::selectedPathsBreakApart() {
         }
     }
     for(const auto& path : created) {
-        mCurrentContainer->addContainedBox(path);
+        mCurrentContainer->addContained(path);
         addBoxToSelection(path.get());
     }
 }
@@ -626,7 +622,7 @@ void Canvas::selectedPathsCombine() {
     if(!firstVectorPath) {
         const auto newPath = enve::make_shared<SmartVectorPath>();
         newPath->planCenterPivotPosition();
-        mCurrentContainer->addContainedBox(newPath);
+        mCurrentContainer->addContained(newPath);
         firstVectorPath = newPath.get();
     }
 

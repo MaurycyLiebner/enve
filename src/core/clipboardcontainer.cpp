@@ -41,7 +41,7 @@ void BoxesClipboard::pasteTo(ContainerBox* const parent) {
         const auto& list = parent->getContainedBoxes();
         for(int i = oldCount; i < newCount; i++) {
             const auto& box = list.at(i);
-            parentCanvas->addBoxToSelection(box.get());
+            parentCanvas->addBoxToSelection(box);
         }
     }
 }

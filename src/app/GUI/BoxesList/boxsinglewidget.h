@@ -37,6 +37,8 @@ public:
     static QPixmap* ANIMATOR_CHILDREN_HIDDEN;
     static QPixmap* LOCKED_PIXMAP;
     static QPixmap* UNLOCKED_PIXMAP;
+    static QPixmap* MUTED_PIXMAP;
+    static QPixmap* UNMUTED_PIXMAP;
     static QPixmap* ANIMATOR_RECORDING;
     static QPixmap* ANIMATOR_NOT_RECORDING;
     static QPixmap* ANIMATOR_DESCENDANT_RECORDING;

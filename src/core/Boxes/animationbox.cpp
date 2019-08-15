@@ -8,6 +8,9 @@
 #include "Animators/rastereffectanimators.h"
 
 AnimationBox::AnimationBox(const eBoxType type) : BoundingBox(type) {
+    connect(this, &eBoxOrSound::parentChanged,
+            this, &AnimationBox::updateDurationRectangleAnimationRange);
+
     prp_setName("Animation");
 
     setDurationRectangle(enve::make_shared<FixedLenAnimationRect>(this));
@@ -46,11 +49,6 @@ void AnimationBox::animationDataChanged() {
         mFrameAnimator->setIntValueRange(0, frameCount - 1);
     }
     prp_afterWholeInfluenceRangeChanged();
-}
-
-void AnimationBox::setParentGroup(ContainerBox * const parent) {
-    BoundingBox::setParentGroup(parent);
-    updateDurationRectangleAnimationRange();
 }
 
 bool AnimationBox::shouldScheduleUpdate() {

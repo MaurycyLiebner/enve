@@ -34,6 +34,8 @@ QPixmap* BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE;
 QPixmap* BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN;
 QPixmap* BoxSingleWidget::LOCKED_PIXMAP;
 QPixmap* BoxSingleWidget::UNLOCKED_PIXMAP;
+QPixmap* BoxSingleWidget::MUTED_PIXMAP;
+QPixmap* BoxSingleWidget::UNMUTED_PIXMAP;
 QPixmap* BoxSingleWidget::ANIMATOR_RECORDING;
 QPixmap* BoxSingleWidget::ANIMATOR_NOT_RECORDING;
 QPixmap* BoxSingleWidget::ANIMATOR_DESCENDANT_RECORDING;
@@ -47,6 +49,7 @@ bool BoxSingleWidget::sStaticPixmapsLoaded = false;
 #include "canvas.h"
 #include "PathEffects/patheffect.h"
 #include "PathEffects/patheffectanimators.h"
+#include "Sound/singlesound.h"
 
 #include <QApplication>
 #include <QDrag>
@@ -93,7 +96,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mContentButton->setPixmapChooser([this]() {
         if(!mTarget) return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(target->SWT_isBoundingBox()) {
+        if(target->SWT_isBoundingBox() || target->SWT_isSingleSound()) {
             if(mTarget->contentVisible()) {
                 return BoxSingleWidget::BOX_CHILDREN_VISIBLE;
             } else return BoxSingleWidget::BOX_CHILDREN_HIDDEN;
@@ -116,6 +119,10 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
             if(static_cast<BoundingBox*>(target)->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
             } else return BoxSingleWidget::INVISIBLE_PIXMAP;
+        } else if(target->SWT_isSingleSound()) {
+            if(static_cast<SingleSound*>(target)->isVisible()) {
+                return BoxSingleWidget::UNMUTED_PIXMAP;
+            } else return BoxSingleWidget::MUTED_PIXMAP;
         } else if(target->SWT_isRasterEffect()) {
             if(static_cast<RasterEffect*>(target)->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
@@ -385,10 +392,10 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mContentButton->setVisible(target->SWT_isComplexAnimator());
     mRecordButton->setVisible(target->SWT_isAnimator());
     mVisibleButton->setVisible(target->SWT_isBoundingBox() ||
+                               target->SWT_isSingleSound() ||
                                target->SWT_isPathEffect() ||
                                target->SWT_isRasterEffect());
     mLockedButton->setVisible(target->SWT_isBoundingBox());
-    mRecordButton->show();
 
     mFillTypeCombo->hide();
     mBlendModeCombo->hide();
@@ -414,6 +421,8 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
             blendModeToIntSk(boxPtr->getBlendMode()));
         mBlendModeCombo->setEnabled(!target->SWT_isGroupBox());
         updateCompositionBoxVisible();
+    } else if(target->SWT_isSingleSound()) {
+        mRecordButton->hide();
     } else if(target->SWT_isBoolProperty()) {
         mCheckBox->show();
         mCheckBox->setTarget(static_cast<BoolProperty*>(target));
@@ -499,6 +508,8 @@ void BoxSingleWidget::loadStaticPixmaps() {
     ANIMATOR_CHILDREN_HIDDEN = new QPixmap(iconsDir + "/childrenHiddenSmall.png");
     LOCKED_PIXMAP = new QPixmap(iconsDir + "/locked.png");
     UNLOCKED_PIXMAP = new QPixmap(iconsDir + "/unlocked.png");
+    MUTED_PIXMAP = new QPixmap(iconsDir + "/muted.png");
+    UNMUTED_PIXMAP = new QPixmap(iconsDir + "/unmuted.png");
     ANIMATOR_RECORDING = new QPixmap(iconsDir + "/recording.png");
     ANIMATOR_NOT_RECORDING = new QPixmap(iconsDir + "/notRecording.png");
     ANIMATOR_DESCENDANT_RECORDING = new QPixmap(iconsDir + "/childRecording.png");
@@ -515,6 +526,8 @@ void BoxSingleWidget::clearStaticPixmaps() {
     delete ANIMATOR_CHILDREN_HIDDEN;
     delete LOCKED_PIXMAP;
     delete UNLOCKED_PIXMAP;
+    delete MUTED_PIXMAP;
+    delete UNMUTED_PIXMAP;
     delete ANIMATOR_RECORDING;
     delete ANIMATOR_NOT_RECORDING;
     delete ANIMATOR_DESCENDANT_RECORDING;
@@ -688,16 +701,19 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
 
     int nameX = mFillWidget->x();
     QString name;
-    if(target->SWT_isBoundingBox()) {
-        const auto bb_target = static_cast<BoundingBox*>(target);
+    if(target->SWT_isBoundingBox() || target->SWT_isSingleSound()) {
+        const auto bsTarget = static_cast<eBoxOrSound*>(target);
 
         nameX += MIN_WIDGET_DIM/4;
-        name = bb_target->prp_getName();
+        name = bsTarget->prp_getName();
 
-        p.fillRect(rect(), QColor(0, 0, 0, 50));
+        const bool ss = target->SWT_isSingleSound();
+        if(ss) p.fillRect(rect(), QColor(0, 125, 255, 50));
+        else   p.fillRect(rect(), QColor(0, 0, 0, 50));
 
-        if(bb_target->isSelected()) {
-            p.fillRect(mFillWidget->geometry(), QColor(180, 180, 180));
+        if(bsTarget->isSelected()) {
+            if(ss) p.fillRect(mFillWidget->geometry(), QColor(125, 200, 255));
+            else   p.fillRect(mFillWidget->geometry(), QColor(180, 180, 180));
             p.setPen(Qt::black);
         } else {
             p.setPen(Qt::white);
@@ -757,8 +773,8 @@ void BoxSingleWidget::switchRecordingAction() {
 void BoxSingleWidget::switchBoxVisibleAction() {
     const auto target = mTarget->getTarget();
     if(!target) return;
-    if(target->SWT_isBoundingBox()) {
-        static_cast<BoundingBox*>(target)->switchVisible();
+    if(target->SWT_isBoundingBox() || target->SWT_isSingleSound()) {
+        static_cast<eBoxOrSound*>(target)->switchVisible();
     } else if(target->SWT_isRasterEffect()) {
         static_cast<RasterEffect*>(target)->switchVisible();
     } else if(target->SWT_isPathEffect()) {

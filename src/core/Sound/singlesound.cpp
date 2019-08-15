@@ -4,21 +4,25 @@
 #include "filesourcescache.h"
 #include "CacheHandlers/soundcachehandler.h"
 #include "fileshandler.h"
+#include "../canvas.h"
 
 SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
-    StaticComplexAnimator("sound") {
-    mOwnDurationRectangle = !durRect;
+    eBoxOrSound("sound"), mOwnDurationRectangle(!durRect) {
+    connect(this, &eBoxOrSound::aboutToChangeAncestor, this, [this]() {
+        if(!mParentScene) return;
+        mParentScene->getSoundComposition()->removeSound(ref<SingleSound>());
+    });
+    connect(this, &eBoxOrSound::ancestorChanged, this, [this]() {
+        if(!mParentScene) return;
+        mParentScene->getSoundComposition()->addSound(ref<SingleSound>());
+        updateDurationRectLength();
+    });
     if(mOwnDurationRectangle) {
-        mDurationRectangle = enve::make_shared<FixedLenAnimationRect>(this);
-        mDurationRectangle->setBindToAnimationFrameRange();
-        connect(mDurationRectangle.get(), &DurationRectangle::posChanged,
-                this, &SingleSound::anim_updateAfterShifted);
-    } else mDurationRectangle = durRect;
+        const auto flaRect = enve::make_shared<FixedLenAnimationRect>(this);
+        flaRect->setBindToAnimationFrameRange();
+        setDurationRectangle(flaRect);
+    } else setDurationRectangle(durRect);
 
-    connect(mDurationRectangle.get(), &DurationRectangle::rangeChanged,
-            this, &SingleSound::prp_afterWholeInfluenceRangeChanged);
-    connect(mDurationRectangle.get(), &DurationRectangle::posChanged,
-            this, &SingleSound::updateAfterDurationRectangleShifted);
     mDurationRectangle->setSoundCacheHandler(getCacheHandler());
 
     ca_addChild(mVolumeAnimator);
@@ -48,42 +52,6 @@ void SingleSound::setupTreeViewMenu(PropertyMenu * const menu) {
     menu->addPlainAction("Stretch...", stretchOp);
 }
 
-DurationRectangleMovable *SingleSound::anim_getTimelineMovable(
-        const int relX, const int minViewedFrame,
-        const qreal pixelsPerFrame) {
-    if(!mDurationRectangle) return nullptr;
-    return mDurationRectangle->getMovableAt(relX, pixelsPerFrame,
-                                            minViewedFrame);
-}
-
-void SingleSound::drawTimelineControls(QPainter * const p,
-                                       const qreal pixelsPerFrame,
-                                       const FrameRange &absFrameRange,
-                                       const int rowHeight) {
-    //    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
-    //    int startDFrame = mDurationRectangle.getMinAnimationFrame() - startFrame;
-//    int frameWidth = ceil(mListOfFrames.count()/qAbs(timeScale));
-//    p->fillRect(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5, drawY,
-//                frameWidth*pixelsPerFrame - pixelsPerFrame,
-//                BOX_HEIGHT, QColor(0, 0, 255, 125));
-    if(mDurationRectangle) {
-        p->save();
-        if(mOwnDurationRectangle)
-            p->translate(prp_getParentFrameShift()*pixelsPerFrame, 0);
-        const int width = qFloor(absFrameRange.span()*pixelsPerFrame);
-        const QRect drawRect(0, 0, width, rowHeight);
-        mDurationRectangle->draw(p, drawRect, getCanvasFPS(),
-                                 pixelsPerFrame, absFrameRange);
-        p->restore();
-    }
-    ComplexAnimator::drawTimelineControls(p, pixelsPerFrame,
-                                          absFrameRange, rowHeight);
-}
-
-FixedLenAnimationRect *SingleSound::getDurationRect() const {
-    return mDurationRectangle.get();
-}
-
 SoundReaderForMerger *SingleSound::getSecondReader(const int relSecondId) {
     const int maxSec = mCacheHandler->durationSec() - 1;
     if(relSecondId < 0 || relSecondId > maxSec) return nullptr;
@@ -105,7 +73,7 @@ int SingleSound::getSampleShift() const{
 
 SampleRange SingleSound::relSampleRange() const {
     const qreal fps = getCanvasFPS();
-    const auto durRect = getDurationRect();
+    const auto durRect = getDurationRectangle();
     const auto relFrameRange = durRect->getRelFrameRange();
     const auto qRelFrameRange = qValueRange{qreal(relFrameRange.fMin),
                                             qreal(relFrameRange.fMax)};
@@ -115,7 +83,7 @@ SampleRange SingleSound::relSampleRange() const {
 
 SampleRange SingleSound::absSampleRange() const {
     const qreal fps = getCanvasFPS();
-    const auto durRect = getDurationRect();
+    const auto durRect = getDurationRectangle();
     const auto absFrameRange = durRect->getAbsFrameRange();
     const auto qAbsFrameRange = qValueRange{qreal(absFrameRange.fMin),
                                             qreal(absFrameRange.fMax)};
@@ -176,7 +144,9 @@ void SingleSound::updateDurationRectLength() {
         const int secs = mCacheHandler ? mCacheHandler->durationSec() : 0;
         const qreal fps = getCanvasFPS();
         const int frames = qCeil(qAbs(secs*fps*mStretch));
-        mDurationRectangle->setAnimationFrameDuration(frames);
+        const auto flaRect = static_cast<FixedLenAnimationRect*>(
+                    mDurationRectangle.get());
+        flaRect->setAnimationFrameDuration(frames);
     }
 }
 
@@ -191,18 +161,13 @@ qreal SingleSound::getCanvasFPS() const {
     return parentCanvas->getFps();
 }
 
-void SingleSound::updateAfterDurationRectangleShifted() {
-    prp_afterFrameShiftChanged();
-    anim_setAbsFrame(anim_getCurrentAbsFrame());
-    prp_afterWholeInfluenceRangeChanged();
-}
-
 void SingleSound::setFilePath(const QString &path) {
     FilesHandler::sInstance->getFileHandler<SoundFileHandler>(path);
     if(videoSound()) RuntimeThrow("Setting file path for video sound");
     const auto newDataHandler = FileDataCacheHandler::
             sGetDataHandler<SoundDataHandler>(path);
     setSoundDataHandler(newDataHandler);
+    prp_setName(QFileInfo(path).fileName());
 }
 
 void SingleSound::setSoundDataHandler(SoundDataHandler* const newDataHandler) {
@@ -221,15 +186,12 @@ int SingleSound::prp_getRelFrameShift() const {
 bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                       const bool parentSatisfies,
                                       const bool parentMainTarget) const {
+    Q_UNUSED(parentMainTarget);
+    if(rules.fRule == SWT_BR_VISIBLE && !mVisible) return false;
+    if(rules.fRule == SWT_BR_SELECTED && !mSelected) return false;
     if(rules.fType == SWT_TYPE_SOUND) return true;
     if(rules.fType == SWT_TYPE_GRAPHICS) return false;
-    return SingleWidgetTarget::SWT_shouldBeVisible(rules,
-                                                   parentSatisfies,
-                                                   parentMainTarget);
-}
-
-FrameRange SingleSound::prp_relInfluenceRange() const {
-    return mDurationRectangle->getAbsFrameRange();
+    return parentSatisfies;
 }
 
 #include "basicreadwrite.h"

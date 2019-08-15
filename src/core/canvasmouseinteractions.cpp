@@ -41,7 +41,7 @@ void Canvas::addActionsToMenu(QMenu *const menu) {
     for(const auto& canvas : mDocument.fScenes) {
         const auto slot = [this, canvas]() {
             auto newLink = canvas->createLink();
-            mCurrentContainer->addContainedBox(newLink);
+            mCurrentContainer->addContained(newLink);
             newLink->centerPivotPosition();
         };
         QAction * const action = linkCanvasMenu->addAction(
@@ -246,7 +246,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     } else if(mCurrentMode == CanvasMode::circleCreate) {
         const auto newPath = enve::make_shared<Circle>();
         newPath->planCenterPivotPosition();
-        mCurrentContainer->addContainedBox(newPath);
+        mCurrentContainer->addContained(newPath);
         newPath->setAbsolutePos(e.fPos);
         clearBoxesSelection();
         addBoxToSelection(newPath.get());
@@ -256,7 +256,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     } else if(mCurrentMode == CanvasMode::rectCreate) {
         const auto newPath = enve::make_shared<Rectangle>();
         newPath->planCenterPivotPosition();
-        mCurrentContainer->addContainedBox(newPath);
+        mCurrentContainer->addContained(newPath);
         newPath->setAbsolutePos(e.fPos);
         clearBoxesSelection();
         addBoxToSelection(newPath.get());
@@ -268,7 +268,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
         newPath->setSelectedFontFamilyAndStyle(mDocument.fFontFamily,
                                                mDocument.fFontStyle);
         newPath->setSelectedFontSize(mDocument.fFontSize);
-        mCurrentContainer->addContainedBox(newPath);
+        mCurrentContainer->addContained(newPath);
         newPath->setAbsolutePos(e.fPos);
 
         mCurrentTextBox = newPath.get();

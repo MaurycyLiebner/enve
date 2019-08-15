@@ -47,8 +47,6 @@ Canvas::Canvas(Document &document,
     mBackgroundColor->prp_setInheritedUpdater(
                 enve::make_shared<DisplayedFillStrokeSettingsUpdater>(this));
     mSoundComposition = qsptr<SoundComposition>::create(this);
-    auto soundsAnimatorContainer = mSoundComposition->getSoundsAnimatorContainer();
-    ca_addChild(soundsAnimatorContainer->ref<Property>());
 
     mRange = {0, frameCount};
 
@@ -424,7 +422,7 @@ qsptr<BoundingBox> Canvas::createLink() {
 ImageBox *Canvas::createImageBox(const QString &path) {
     const auto img = enve::make_shared<ImageBox>(path);
     img->planCenterPivotPosition();
-    mCurrentContainer->addContainedBox(img);
+    mCurrentContainer->addContained(img);
     return img.get();
 }
 
@@ -433,7 +431,7 @@ ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QString &folderPath) 
     const auto aniBox = enve::make_shared<ImageSequenceBox>();
     aniBox->planCenterPivotPosition();
     aniBox->setFolderPath(folderPath);
-    mCurrentContainer->addContainedBox(aniBox);
+    mCurrentContainer->addContained(aniBox);
     return aniBox.get();
 }
 
@@ -442,7 +440,7 @@ VideoBox* Canvas::createVideoForPath(const QString &path) {
     const auto vidBox = enve::make_shared<VideoBox>();
     vidBox->planCenterPivotPosition();
     vidBox->setFilePath(path);
-    mCurrentContainer->addContainedBox(vidBox);
+    mCurrentContainer->addContained(vidBox);
     return vidBox.get();
 }
 
@@ -450,14 +448,14 @@ VideoBox* Canvas::createVideoForPath(const QString &path) {
 ExternalLinkBox* Canvas::createLinkToFileWithPath(const QString &path) {
     const auto extLinkBox = enve::make_shared<ExternalLinkBox>();
     extLinkBox->setSrc(path);
-    mCurrentContainer->addContainedBox(extLinkBox);
+    mCurrentContainer->addContained(extLinkBox);
     return extLinkBox.get();
 }
 
 SingleSound* Canvas::createSoundForPath(const QString &path) {
     const auto singleSound = enve::make_shared<SingleSound>();
-    getSoundComposition()->addSoundAnimator(singleSound);
     singleSound->setFilePath(path);
+    mCurrentContainer->addContained(singleSound);
     return singleSound.get();
 }
 
@@ -760,14 +758,12 @@ void Canvas::selectAllPointsAction() {
 
 void Canvas::selectOnlyLastPressedBox() {
     clearBoxesSelection();
-    if(mPressedBox)
-        addBoxToSelection(mPressedBox);
+    if(mPressedBox) addBoxToSelection(mPressedBox);
 }
 
 void Canvas::selectOnlyLastPressedPoint() {
     clearPointsSelection();
-    if(mPressedPoint)
-        addPointToSelection(mPressedPoint);
+    if(mPressedPoint) addPointToSelection(mPressedPoint);
 }
 
 //void Canvas::updateAfterFrameChanged(const int currentFrame) {
@@ -910,7 +906,6 @@ void Canvas::writeBoundingBox(QIODevice * const target) {
     target->write(rcConstChar(&mHeight), sizeof(int));
     target->write(rcConstChar(&mFps), sizeof(qreal));
     target->write(rcConstChar(&mRange), sizeof(FrameRange));
-    mSoundComposition->writeSounds(target);
 }
 
 void Canvas::readBoundingBox(QIODevice * const target) {
@@ -923,5 +918,4 @@ void Canvas::readBoundingBox(QIODevice * const target) {
     target->read(rcChar(&mFps), sizeof(qreal));
     target->read(rcChar(&mRange), sizeof(FrameRange));
     anim_setAbsFrame(currFrame);
-    mSoundComposition->readSounds(target);
 }

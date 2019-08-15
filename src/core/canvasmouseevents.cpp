@@ -9,7 +9,7 @@
 void Canvas::newPaintBox(const QPointF &pos) {
     const auto paintBox = enve::make_shared<PaintBox>();
     paintBox->planCenterPivotPosition();
-    mCurrentContainer->addContainedBox(paintBox);
+    mCurrentContainer->addContained(paintBox);
     paintBox->setAbsolutePos(pos);
     clearBoxesSelection();
     clearPointsSelection();

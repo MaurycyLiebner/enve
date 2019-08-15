@@ -61,7 +61,6 @@ public:
     virtual bool differenceInEditPathBetweenFrames(
             const int frame1, const int frame2) const = 0;
     virtual SkPath getPathAtRelFrameF(const qreal relFrame) = 0;
-    void setParentGroup(ContainerBox * const parent);
 
     void addPathEffect(const qsptr<PathEffect> &effect);
     void addFillPathEffect(const qsptr<PathEffect> &effect);
