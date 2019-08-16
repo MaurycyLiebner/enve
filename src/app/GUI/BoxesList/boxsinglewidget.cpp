@@ -119,7 +119,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
             if(static_cast<BoundingBox*>(target)->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
             } else return BoxSingleWidget::INVISIBLE_PIXMAP;
-        } else if(target->SWT_isSingleSound()) {
+        } else if(target->SWT_isSound()) {
             if(static_cast<SingleSound*>(target)->isVisible()) {
                 return BoxSingleWidget::UNMUTED_PIXMAP;
             } else return BoxSingleWidget::MUTED_PIXMAP;
@@ -392,7 +392,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mContentButton->setVisible(target->SWT_isComplexAnimator());
     mRecordButton->setVisible(target->SWT_isAnimator());
     mVisibleButton->setVisible(target->SWT_isBoundingBox() ||
-                               target->SWT_isSingleSound() ||
+                               target->SWT_isSound() ||
                                target->SWT_isPathEffect() ||
                                target->SWT_isRasterEffect());
     mLockedButton->setVisible(target->SWT_isBoundingBox());
@@ -773,7 +773,7 @@ void BoxSingleWidget::switchRecordingAction() {
 void BoxSingleWidget::switchBoxVisibleAction() {
     const auto target = mTarget->getTarget();
     if(!target) return;
-    if(target->SWT_isBoundingBox() || target->SWT_isSingleSound()) {
+    if(target->SWT_isBoundingBox() || target->SWT_isSound()) {
         static_cast<eBoxOrSound*>(target)->switchVisible();
     } else if(target->SWT_isRasterEffect()) {
         static_cast<RasterEffect*>(target)->switchVisible();

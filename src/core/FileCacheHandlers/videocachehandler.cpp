@@ -159,7 +159,7 @@ void VideoDataHandler::removeFrameLoader(const int frame) {
 }
 
 void VideoDataHandler::frameLoaderFinished(const int frame,
-                                                 const sk_sp<SkImage> &image) {
+                                           const sk_sp<SkImage> &image) {
     if(image) {
         mFramesCache.add(enve::make_shared<ImageCacheContainer>(
                              image, FrameRange{frame, frame}, &mFramesCache));
@@ -191,29 +191,27 @@ int VideoDataHandler::getFrameCount() const { return mFrameCount; }
 
 void VideoDataHandler::setFrameCount(const int count) { mFrameCount = count; }
 
-
 bool hasSound(const char* path) {
     // get format from audio file
-    AVFormatContext* format = avformat_alloc_context();
+    auto format = avformat_alloc_context();
     if(avformat_open_input(&format, path, nullptr, nullptr) != 0) {
+        avformat_close_input(&format);
         RuntimeThrow("Could not open file " + path);
     }
     if(avformat_find_stream_info(format, nullptr) < 0) {
+        avformat_close_input(&format);
         RuntimeThrow("Could not retrieve stream info from file " + path);
     }
 
-    // Find the index of the first audio stream
     for(uint i = 0; i < format->nb_streams; i++) {
-        AVStream *streamT = format->streams[i];
-        const AVMediaType &mediaType = streamT->codecpar->codec_type;
-        if(mediaType == AVMEDIA_TYPE_AUDIO) {
+        if(format->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            avformat_close_input(&format);
             return true;
         }
     }
 
-    avformat_free_context(format);
+    avformat_close_input(&format);
 
-    // success
     return false;
 }
 

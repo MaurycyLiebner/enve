@@ -18,8 +18,7 @@ bool SWT_Abstraction::setAbstractions(
         const bool parentMainTarget) { // returns whether should abort
     if(!mTarget_k->SWT_isVisible()) return false;
     if(currY > maxY) return true;
-    const bool satisfiesRule = mTarget_k->SWT_isVisible() &&
-            mTarget_k->SWT_shouldBeVisible(
+    const bool satisfiesRule = mTarget_k->SWT_shouldBeVisible(
                 rules, parentSatisfiesRule, parentMainTarget);
     if(currY > minY && satisfiesRule && !mIsMainTarget) {
         setAbsFunc(this, currX);
@@ -47,17 +46,15 @@ int SWT_Abstraction::updateHeight(const SWT_RulesCollection &rules,
                                   const int swtHeight) {
     mHeight = 0;
     if(mTarget_k->SWT_isVisible()) {
-        const bool satisfiesRule = mTarget_k->SWT_isVisible() &&
-                mTarget_k->SWT_shouldBeVisible(rules, parentSatisfiesRule,
-                                             parentMainTarget);
-        if(satisfiesRule && !mIsMainTarget) {
+        const bool satisfiesRule = mTarget_k->SWT_shouldBeVisible(
+                    rules, parentSatisfiesRule, parentMainTarget);
+        if(satisfiesRule && !mIsMainTarget)
             mHeight += swtHeight;
-        }
         const bool childrenVisible = (satisfiesRule && mContentVisible) ||
                                      mIsMainTarget;
         for(const auto& abs : mChildren) {
             mHeight += abs->updateHeight(rules, childrenVisible,
-                                        mIsMainTarget, swtHeight);
+                                         mIsMainTarget, swtHeight);
         }
     }
 

@@ -598,10 +598,6 @@ void VideoEncoder::finishEncodingNow() {
     if(mHaveVideo) flushStream(&mVideoStream, mFormatContext);
     if(mHaveAudio) flushStream(&mAudioStream, mFormatContext);
 
-    /* Write the trailer, if any. The trailer must be written before you
-     * close the CodecContexts open when you wrote the header; otherwise
-     * av_write_trailer() may try to use memory that was freed on
-     * av_codec_close(). */
     if(mEncodingSuccesfull) av_write_trailer(mFormatContext);
 
     /* Close each codec. */
@@ -617,6 +613,7 @@ void VideoEncoder::finishEncodingNow() {
     }
     if(mFormatContext) {
         avformat_free_context(mFormatContext);
+        mFormatContext = nullptr;
     }
 
     mEncodeAudio = false;

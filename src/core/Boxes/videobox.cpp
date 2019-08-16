@@ -18,12 +18,9 @@ VideoBox::VideoBox() : AnimationBox(TYPE_VIDEO) {
     mSound = enve::make_shared<SingleSound>(flar);
     ca_addChild(mSound);
     mSound->SWT_hide();
-}
 
-VideoBox::~VideoBox() {
-    if(mParentScene && mSound) {
-        mParentScene->getSoundComposition()->removeSound(mSound);
-    }
+    connect(this, &eBoxOrSound::parentChanged,
+            mSound.get(), &eBoxOrSound::setParentGroup);
 }
 
 void VideoBox::writeBoundingBox(QIODevice * const target) {

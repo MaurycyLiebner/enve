@@ -21,20 +21,18 @@ void VideoStreamsData::open(const QString &path) {
 void VideoStreamsData::close() {
     fOpened = false;
 
-    if(fFormatContext) avformat_close_input(&fFormatContext);
+    if(fDecodedFrame) av_frame_free(&fDecodedFrame);
     if(fPacket) av_packet_free(&fPacket);
     if(fSwsContext) sws_freeContext(fSwsContext);
-    if(fCodecContext) avcodec_close(fCodecContext);
-    if(fDecodedFrame) av_frame_free(&fDecodedFrame);
-    if(fFormatContext) avformat_free_context(fFormatContext);
+    fSwsContext = nullptr;
+    if(fCodecContext) {
+        avcodec_close(fCodecContext);
+        avcodec_free_context(&fCodecContext);
+    }
+    if(fFormatContext) avformat_close_input(&fFormatContext);
 
-    fFormatContext = nullptr;
     fVideoStreamIndex = -1;
     fVideoStream = nullptr;
-    fPacket = nullptr;
-    fDecodedFrame = nullptr;
-    fCodecContext = nullptr;
-    fSwsContext = nullptr;
 }
 
 void VideoStreamsData::open() {
@@ -117,7 +115,5 @@ void VideoStreamsData::open(const char * const path) {
 
     fOpened = true;
 
-    if(hasAudio) {
-        fAudioData = AudioStreamsData::sOpen(fPath, fFormatContext);
-    }
+    if(hasAudio) fAudioData = AudioStreamsData::sOpen(fPath);
 }

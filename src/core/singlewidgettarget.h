@@ -153,6 +153,7 @@ public:
     virtual bool SWT_isIntProperty() const { return false; }
     // Sound
     virtual bool SWT_isSingleSound() const { return false; }
+    virtual bool SWT_isSound() const { return false; }
 
     void SWT_addChild(SingleWidgetTarget * const child);
     void SWT_addChildAt(SingleWidgetTarget * const child, const int id);

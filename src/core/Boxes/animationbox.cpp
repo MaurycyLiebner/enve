@@ -18,6 +18,7 @@ AnimationBox::AnimationBox(const eBoxType type) : BoundingBox(type) {
 
     mFrameAnimator = enve::make_shared<IntAnimator>("frame");
     ca_prependChildAnimator(mRasterEffectsAnimators.get(), mFrameAnimator);
+    mFrameAnimator->SWT_hide();
 }
 
 FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() const {

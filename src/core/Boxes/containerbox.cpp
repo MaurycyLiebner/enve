@@ -622,9 +622,8 @@ void ContainerBox::anim_setAbsFrame(const int frame) {
     BoundingBox::anim_setAbsFrame(frame);
 
     updateDrawRenderContainerTransform();
-    for(const auto& box : mContainedBoxes) {
-        box->anim_setAbsFrame(frame);
-    }
+    for(const auto& cont : mContained)
+        cont->anim_setAbsFrame(frame);
 }
 
 void ContainerBox::addContainedBoxesToSelection(const QRectF &rect) {

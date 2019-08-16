@@ -40,20 +40,17 @@ void AudioStreamsData::open(const QString &path) {
 void AudioStreamsData::close() {
     fOpened = false;
 
-    if(fFormatContext) avformat_close_input(&fFormatContext);
+    if(fDecodedFrame) av_frame_free(&fDecodedFrame);
     if(fPacket) av_packet_free(&fPacket);
     if(fSwrContext) swr_free(&fSwrContext);
-    if(fCodecContext) avcodec_close(fCodecContext);
-    if(fDecodedFrame) av_frame_free(&fDecodedFrame);
-    if(fFormatContext) avformat_free_context(fFormatContext);
+    if(fCodecContext) {
+        avcodec_close(fCodecContext);
+        avcodec_free_context(&fCodecContext);
+    }
+    if(fFormatContext) avformat_close_input(&fFormatContext);
 
-    fFormatContext = nullptr;
     fAudioStreamIndex = -1;
     fAudioStream = nullptr;
-    fPacket = nullptr;
-    fDecodedFrame = nullptr;
-    fCodecContext = nullptr;
-    fSwrContext = nullptr;
 }
 
 void AudioStreamsData::open() {

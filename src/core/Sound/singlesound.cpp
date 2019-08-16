@@ -186,12 +186,16 @@ int SingleSound::prp_getRelFrameShift() const {
 bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                       const bool parentSatisfies,
                                       const bool parentMainTarget) const {
-    Q_UNUSED(parentMainTarget);
-    if(rules.fRule == SWT_BR_VISIBLE && !mVisible) return false;
-    if(rules.fRule == SWT_BR_SELECTED && !mSelected) return false;
-    if(rules.fType == SWT_TYPE_SOUND) return true;
-    if(rules.fType == SWT_TYPE_GRAPHICS) return false;
-    return parentSatisfies;
+    if(mOwnDurationRectangle) {
+        if(rules.fRule == SWT_BR_VISIBLE && !mVisible) return false;
+        if(rules.fRule == SWT_BR_SELECTED && !mSelected) return false;
+        if(rules.fType == SWT_TYPE_SOUND) return true;
+        if(rules.fType == SWT_TYPE_GRAPHICS) return false;
+        return parentSatisfies;
+    } else {
+        return StaticComplexAnimator::SWT_shouldBeVisible(
+                    rules, parentSatisfies, parentMainTarget);
+    }
 }
 
 #include "basicreadwrite.h"

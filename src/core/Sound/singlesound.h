@@ -15,11 +15,17 @@ class SingleSound : public eBoxOrSound {
 protected:
     SingleSound(const qsptr<FixedLenAnimationRect> &durRect = nullptr);
 public:
-    bool SWT_isSingleSound() const { return true; }
+    bool SWT_isSound() const { return true; }
+    bool SWT_isSingleSound() const { return mOwnDurationRectangle; }
 
     void setupTreeViewMenu(PropertyMenu * const menu);
 
     int prp_getRelFrameShift() const;
+
+    QMimeData *SWT_createMimeData() {
+        if(!mOwnDurationRectangle) return nullptr;
+        return eBoxOrSound::SWT_createMimeData();
+    }
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool parentSatisfies,

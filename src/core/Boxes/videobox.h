@@ -12,8 +12,6 @@ class VideoBox : public AnimationBox {
 protected:
     VideoBox();
 public:
-    ~VideoBox();
-
     void animationDataChanged();
     void soundDataChanged();
 

@@ -84,7 +84,7 @@ void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
     }
 
     const bool changeInfluence = !(SWT_isBoundingBox() &&
-                                   child->SWT_isSingleSound());
+                                   child->SWT_isSound());
 
     if(child->SWT_isAnimator()) {
         const auto childAnimator = static_cast<Animator*>(child.get());
@@ -166,10 +166,9 @@ void ComplexAnimator::ca_moveChildInList(Property* child,
     prp_afterWholeInfluenceRangeChanged();
 }
 
-void ComplexAnimator::ca_removeChild(
-        const qsptr<Property> child) {
+void ComplexAnimator::ca_removeChild(const qsptr<Property> child) {
     const bool changeInfluence = !(SWT_isBoundingBox() &&
-                                   child->SWT_isSingleSound());
+                                   child->SWT_isSound());
     const auto childRange = child->prp_absInfluenceRange();
     child->prp_setInheritedUpdater(nullptr);
     if(child->SWT_isAnimator()) {
