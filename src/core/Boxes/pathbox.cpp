@@ -442,18 +442,8 @@ bool PathBox::differenceInFillPathBetweenFrames(const int frame1, const int fram
 
 SmartVectorPath *PathBox::objectToVectorPathBox() {
     if(SWT_isSmartVectorPath()) return nullptr;
-    auto newPath = enve::make_shared<SmartVectorPath>();
-
-    if(SWT_isCircle()) {
-        QPainterPath path;
-        const auto circle = static_cast<Circle*>(this);
-        path.addEllipse(circle->getRelCenterPosition(),
-                        circle->getCurrentXRadius(),
-                        circle->getCurrentYRadius());
-        newPath->loadSkPath(toSkPath(path));
-    } else {
-        newPath->loadSkPath(mEditPathSk);
-    }
+    const auto newPath = enve::make_shared<SmartVectorPath>();
+    newPath->loadSkPath(mEditPathSk);
     copyPathBoxDataTo(newPath.get());
     mParentGroup->addContained(newPath);
     return newPath.get();

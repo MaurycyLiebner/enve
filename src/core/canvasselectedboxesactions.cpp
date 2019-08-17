@@ -115,9 +115,8 @@ void Canvas::flipSelectedBoxesVertically() {
 }
 
 void Canvas::convertSelectedBoxesToPath() {
-    for(const auto &box : mSelectedBoxes) {
+    for(const auto &box : mSelectedBoxes)
         box->objectToVectorPathBox();
-    }
 }
 
 void Canvas::convertSelectedPathStrokesToPath() {

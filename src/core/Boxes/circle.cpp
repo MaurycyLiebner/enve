@@ -75,15 +75,30 @@ void Circle::setRadius(const qreal radius) {
 bool Circle::SWT_isCircle() const { return true; }
 
 SkPath Circle::getPathAtRelFrameF(const qreal relFrame) {
-    const float xRadius = static_cast<float>(
-                mHorizontalRadiusAnimator->getEffectiveXValue(relFrame));
-    const float yRadius = static_cast<float>(
-                mVerticalRadiusAnimator->getEffectiveYValue(relFrame));
-    SkRect rect = SkRect::MakeXYWH(-xRadius, -yRadius, 2*xRadius, 2*yRadius);
     const QPointF center = mCenterAnimator->getEffectiveValue();
-    rect.offset(toSkPoint(center));
+    const qreal xRad = mHorizontalRadiusAnimator->getEffectiveXValue(relFrame);
+    const qreal yRad = mVerticalRadiusAnimator->getEffectiveYValue(relFrame);
     SkPath path;
-    path.addOval(rect);
+    const auto p0 = center + QPointF(0, -yRad);
+    const auto p1 = center + QPointF(xRad, 0);
+    const auto p2 = center + QPointF(0, yRad);
+    const auto p3 = center + QPointF(-xRad, 0);
+    const qreal c = 0.551915024494;
+
+    path.moveTo(toSkPoint(p0));
+    path.cubicTo(toSkPoint(p0 + QPointF(c*xRad, 0)),
+                 toSkPoint(p1 + QPointF(0, -c*yRad)),
+                 toSkPoint(p1));
+    path.cubicTo(toSkPoint(p1 + QPointF(0, c*yRad)),
+                 toSkPoint(p2 + QPointF(c*xRad, 0)),
+                 toSkPoint(p2));
+    path.cubicTo(toSkPoint(p2 + QPointF(-c*xRad, 0)),
+                 toSkPoint(p3 + QPointF(0, c*yRad)),
+                 toSkPoint(p3));
+    path.cubicTo(toSkPoint(p3 + QPointF(0, -c*yRad)),
+                 toSkPoint(p0 + QPointF(-c*xRad, 0)),
+                 toSkPoint(p0));
+    path.close();
     return path;
 }
 
