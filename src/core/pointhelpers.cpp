@@ -1108,7 +1108,7 @@ void genAtomicClosedDisplData(const qreal baseSeed,
         else {
             SkVector v;
             if(meas.getPosTan(dist += segLen, &pt, &v)) {
-                Perterb(&pt, v, randFloat(baseSeed + i) * maxDev);
+                Perterb(&pt, v, randFloat(baseSeed + i*100) * maxDev);
             }
         }
         if(i > 1 && !zeroSmooth) {
@@ -1144,7 +1144,7 @@ void genAtomicOpenedDisplData(const qreal baseSeed,
             auto& pt = pts[ptId];
             SkVector v;
             if(meas.getPosTan(halfLength + j*i*segLen, &pt, &v)) {
-                float randV = randFloat(baseSeed + i);
+                float randV = randFloat(baseSeed + i*100);
                 if(ptId == 1) rand1 = randV;
                 else if(ptId == nTot - 2) randNTotM2 = randV;
                 else if(ptId == 0) randV = randV*endPtFrac + rand1*(1 - endPtFrac);
