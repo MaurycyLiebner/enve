@@ -29,6 +29,9 @@ public:
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
     int prp_getRelFrameShift() const;
 
+    void writeProperty(QIODevice* const dst) const;
+    void readProperty(QIODevice* const src);
+
     DurationRectangleMovable *anim_getTimelineMovable(
             const int relX, const int minViewedFrame,
             const qreal pixelsPerFrame);

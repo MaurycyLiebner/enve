@@ -25,12 +25,14 @@ VideoBox::VideoBox() : AnimationBox(TYPE_VIDEO) {
 
 void VideoBox::writeBoundingBox(QIODevice * const target) {
     AnimationBox::writeBoundingBox(target);
-
+    gWrite(target, mFileHandler->path());
 }
 
 void VideoBox::readBoundingBox(QIODevice * const target) {
     AnimationBox::readBoundingBox(target);
-
+    QString path;
+    gRead(target, path);
+    setFilePath(path);
 }
 
 #include <QFileDialog>

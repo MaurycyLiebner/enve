@@ -34,6 +34,9 @@ private:
     QIODevice* const mDst;
 };
 
+extern void gWritePos(QIODevice * const dst);
+extern void gReadPos(QIODevice * const src, const QString &msg = "");
+
 extern QString gReadString(QIODevice * src);
 extern bool gReadBool(QIODevice * src);
 

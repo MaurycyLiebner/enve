@@ -60,3 +60,17 @@ bool gRead(QIODevice *src, SmartPath &value) {
 bool gWrite(QIODevice *dst, const SmartPath &value) {
     return value.write(dst);
 }
+
+void gWritePos(QIODevice * const dst) {
+    const qint64 pos = dst->pos();
+    dst->write(rcConstChar(&pos), sizeof(qint64));
+}
+
+void gReadPos(QIODevice * const src, const QString& msg) {
+    const qint64 sPos = src->pos();
+    qint64 pos;
+    src->read(rcChar(&pos), sizeof(qint64));
+    if(pos != sPos)
+        RuntimeThrow("The read QIODevice::pos does not match"
+                     " the written QIODevice::pos.\n" + msg);
+}

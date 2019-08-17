@@ -77,8 +77,11 @@ public:
     void clearRenderData();
     void queScheduledTasks();
 
-    void writeBoundingBox(QIODevice * const target);
-    void readBoundingBox(QIODevice * const target);
+    void writeAllContained(QIODevice * const dst);
+    void writeBoundingBox(QIODevice * const dst);
+    void readContained(QIODevice * const src);
+    void readAllContained(QIODevice * const src);
+    void readBoundingBox(QIODevice * const src);
 
     void promoteToLayer();
     void demoteToGroup();
@@ -142,8 +145,6 @@ public:
     void removeContainedFromList(const int id);
     void setDescendantCurrentGroup(const bool bT);
     bool isDescendantCurrentGroup() const;
-
-    void readChildBoxes(QIODevice * const src);
 
     int abstractionIdToBoxId(const int absId) const {
         return absId - ca_getNumberOfChildren();

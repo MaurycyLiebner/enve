@@ -32,7 +32,7 @@ void BoxesClipboard::pasteTo(ContainerBox* const parent) {
     const int oldCount = parent->getContainedBoxesCount();
     QBuffer src(&mData);
     src.open(QIODevice::ReadOnly);
-    parent->readChildBoxes(&src);
+    parent->readContained(&src);
     src.close();
     BoundingBox::sClearReadBoxes();
     const int newCount = parent->getContainedBoxesCount();

@@ -15,12 +15,15 @@ void Document::writeGradients(QIODevice * const dst) const {
 void Document::writeScenes(QIODevice * const dst) const {
     const int nScenes = fScenes.count();
     dst->write(rcConstChar(&nScenes), sizeof(int));
-    for(const auto &scene : fScenes)
+    for(const auto &scene : fScenes) {
         scene->writeBoundingBox(dst);
+        gWritePos(dst);
+    }
 }
 
 void Document::write(QIODevice * const dst) const {
     writeGradients(dst);
+    gWritePos(dst);
     writeScenes(dst);
     clearGradientRWIds();
 
@@ -34,8 +37,9 @@ void Document::write(QIODevice * const dst) const {
 void Document::readGradients(QIODevice * const src) {
     int nGrads;
     src->read(rcChar(&nGrads), sizeof(int));
-    for(const auto &grad : fGradients)
-        grad->read(src);
+    for(int i = 0; i < nGrads; i++) {
+        createNewGradient()->read(src);
+    }
 }
 
 void Document::readScenes(QIODevice * const src) {
@@ -44,11 +48,13 @@ void Document::readScenes(QIODevice * const src) {
     for(int i = 0; i < nScenes; i++) {
         const auto canvas = createNewScene();
         canvas->readBoundingBox(src);
+        gReadPos(src);
     }
 }
 
 void Document::read(QIODevice * const src) {
     readGradients(src);
+    gReadPos(src);
     readScenes(src);
     clearGradientRWIds();
 //    int currentCanvasId;

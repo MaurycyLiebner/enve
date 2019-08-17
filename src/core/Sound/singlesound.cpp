@@ -22,6 +22,7 @@ SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
         flaRect->setBindToAnimationFrameRange();
         setDurationRectangle(flaRect);
     } else setDurationRectangle(durRect);
+    mDurationRectangleLocked = true;
 
     mDurationRectangle->setSoundCacheHandler(getCacheHandler());
 
@@ -199,15 +200,16 @@ bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 }
 
 #include "basicreadwrite.h"
-void SingleSound::writeProperty(QIODevice * const target) const {
-    StaticComplexAnimator::writeProperty(target);
+void SingleSound::writeProperty(QIODevice * const dst) const {
+    if(videoSound()) return StaticComplexAnimator::writeProperty(dst);
+    eBoxOrSound::writeProperty(dst);
     const auto filePath = mCacheHandler ? mCacheHandler->getFilePath() : "";
-    gWrite(target, filePath);
-    mDurationRectangle->writeDurationRectangle(target);
+    gWrite(dst, filePath);
 }
 
-void SingleSound::readProperty(QIODevice * const target) {
-    StaticComplexAnimator::readProperty(target);
-    const QString filePath = gReadString(target);
-    mDurationRectangle->readDurationRectangle(target);
+void SingleSound::readProperty(QIODevice * const src) {
+    if(videoSound()) return StaticComplexAnimator::readProperty(src);
+    eBoxOrSound::readProperty(src);
+    const QString filePath = gReadString(src);
+    if(!filePath.isEmpty()) setFilePath(filePath);
 }

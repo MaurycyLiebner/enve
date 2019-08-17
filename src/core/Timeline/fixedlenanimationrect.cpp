@@ -98,3 +98,19 @@ void FixedLenAnimationRect::changeFramePosBy(const int change) {
     if(mBoundToAnimation) bindToAnimationFrameRange();
     DurationRectangleMovable::changeFramePosBy(change);
 }
+
+void FixedLenAnimationRect::writeDurationRectangle(QIODevice *target) {
+    target->write(rcConstChar(&mBoundToAnimation), sizeof(bool));
+    target->write(rcConstChar(&mSetMaxFrameAtLeastOnce), sizeof(bool));
+    target->write(rcConstChar(&mMinAnimationFrame), sizeof(int));
+    target->write(rcConstChar(&mMaxAnimationFrame), sizeof(int));
+    DurationRectangle::writeDurationRectangle(target);
+}
+
+void FixedLenAnimationRect::readDurationRectangle(QIODevice *target) {
+    target->read(rcChar(&mBoundToAnimation), sizeof(bool));
+    target->read(rcChar(&mSetMaxFrameAtLeastOnce), sizeof(bool));
+    target->read(rcChar(&mMinAnimationFrame), sizeof(int));
+    target->read(rcChar(&mMaxAnimationFrame), sizeof(int));
+    DurationRectangle::readDurationRectangle(target);
+}

@@ -41,27 +41,6 @@
 #include "Sound/soundcomposition.h"
 #include "Animators/rastereffectanimators.h"
 
-
-void FixedLenAnimationRect::writeDurationRectangle(QIODevice *target) {
-    DurationRectangle::writeDurationRectangle(target);
-    target->write(rcConstChar(&mBoundToAnimation), sizeof(bool));
-    target->write(rcConstChar(&mSetMaxFrameAtLeastOnce), sizeof(bool));
-    target->write(rcConstChar(&mMinAnimationFrame), sizeof(int));
-    target->write(rcConstChar(&mMaxAnimationFrame), sizeof(int));
-}
-
-void FixedLenAnimationRect::readDurationRectangle(QIODevice *target) {
-    DurationRectangle::readDurationRectangle(target);
-    int minFrame;
-    int maxFrame;
-    target->read(rcChar(&mBoundToAnimation), sizeof(bool));
-    target->read(rcChar(&mSetMaxFrameAtLeastOnce), sizeof(bool));
-    target->read(rcChar(&minFrame), sizeof(int));
-    target->read(rcChar(&maxFrame), sizeof(int));
-    setMinAnimationFrame(minFrame);
-    setMaxAnimationFrame(maxFrame);
-}
-
 class FileFooter {
 public:
     static bool sWrite(QIODevice * const target) {
@@ -107,11 +86,13 @@ void MainWindow::loadEVFile(const QString &path) {
         RuntimeThrow("Could not open file " + path);
 
     try {
-        if(!FileFooter::sCompatible(&file)) {
+        if(!FileFooter::sCompatible(&file))
             RuntimeThrow("Incompatible or incomplete data");
-        }
+        gReadPos(&file, "Error reading footer");
         mDocument.read(&file);
+        gReadPos(&file, "Error reading Document");
         mLayoutHandler->read(&file);
+        gReadPos(&file, "Error reading Layout");
     } catch(...) {
         file.close();
         RuntimeThrow("Error while reading from file " + path);
@@ -130,8 +111,11 @@ void MainWindow::saveToFile(const QString &path) {
         RuntimeThrow("Could not open file for writing " + path + ".");
 
     try {
+        gWritePos(&file);
         mDocument.write(&file);
+        gWritePos(&file);
         mLayoutHandler->write(&file);
+        gWritePos(&file);
 
         FileFooter::sWrite(&file);
     } catch(...) {
