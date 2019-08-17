@@ -5,8 +5,9 @@
 
 class ExampleRasterEffectCaller000 : public RasterEffectCaller {
 public:
-    ExampleRasterEffectCaller000(const qreal radius) :
-        RasterEffectCaller(true, QMargins() + qCeil(radius)),
+    ExampleRasterEffectCaller000(const HardwareSupport hwSupport,
+                                 const qreal radius) :
+        RasterEffectCaller(hwSupport, true, QMargins() + qCeil(radius)),
         mRadius(static_cast<float>(radius)) {}
 
     void processGpu(QGL33 * const gl,
@@ -14,10 +15,6 @@ public:
                     GpuRenderData& data);
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData &data);
-
-    HardwareSupport hardwareSupport() const {
-        return HardwareSupport::gpuPreffered;
-    }
 private:
     const float mRadius;
 };

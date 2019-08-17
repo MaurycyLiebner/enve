@@ -5,16 +5,16 @@
 
 enum class HardwareSupport : short;
 
-#define qMax3(a, b, c) qMax(a, qMax(b, c))
-#define qMin3(a, b, c) qMin(a, qMin(b, c))
-
 class RasterEffectCaller : public StdSelfRef {
     e_OBJECT
 public:
-    RasterEffectCaller() : RasterEffectCaller(false, QMargins()) {}
-    RasterEffectCaller(const bool forceMargin, const QMargins& margin);
+    RasterEffectCaller(const HardwareSupport hwSupport);
+    RasterEffectCaller(const HardwareSupport hwSupport,
+                       const bool forceMargin, const QMargins& margin);
 
-    virtual HardwareSupport hardwareSupport() const = 0;
+    HardwareSupport hardwareSupport() const {
+        return fHwSupport;
+    }
 
     virtual void processGpu(QGL33 * const gl,
                             GpuRenderTools& renderTools,
@@ -25,11 +25,17 @@ public:
 
     virtual int cpuThreads(const int available, const int area) const;
 
+    bool interchangeable() const {
+        return fHwSupport != HardwareSupport::cpuOnly &&
+               fHwSupport != HardwareSupport::gpuOnly;
+    }
+
     void setSrcRect(const SkIRect& srcRect, const SkIRect& clampRect);
 
     const SkIRect& getDstRect() const { return  fDstRect; }
 protected:
     const bool fForceMargin;
+    const HardwareSupport fHwSupport;
     const QMargins fMargin;
     SkIRect fSrcRect;
     SkIRect fDstRect;

@@ -39,6 +39,10 @@ QPixmap* BoxSingleWidget::UNMUTED_PIXMAP;
 QPixmap* BoxSingleWidget::ANIMATOR_RECORDING;
 QPixmap* BoxSingleWidget::ANIMATOR_NOT_RECORDING;
 QPixmap* BoxSingleWidget::ANIMATOR_DESCENDANT_RECORDING;
+QPixmap* BoxSingleWidget::C_PIXMAP;
+QPixmap* BoxSingleWidget::G_PIXMAP;
+QPixmap* BoxSingleWidget::CG_PIXMAP;
+
 bool BoxSingleWidget::sStaticPixmapsLoaded = false;
 
 #include "GUI/global.h"
@@ -151,6 +155,30 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mMainLayout->addWidget(mLockedButton);
     connect(mLockedButton, &BoxesListActionButton::pressed,
             this, &BoxSingleWidget::switchBoxLockedAction);
+
+    mHwSupportButton = new PixmapActionButton(this);
+    mHwSupportButton->setPixmapChooser([this]() {
+        if(!mTarget) return static_cast<QPixmap*>(nullptr);
+        const auto target = mTarget->getTarget();
+        if(target->SWT_isRasterEffect()) {
+            const auto rEff = static_cast<RasterEffect*>(target);
+            if(rEff->instanceHwSupport() == HardwareSupport::cpuOnly) {
+                return BoxSingleWidget::C_PIXMAP;
+            } else if(rEff->instanceHwSupport() == HardwareSupport::gpuOnly) {
+                return BoxSingleWidget::G_PIXMAP;
+            } else return BoxSingleWidget::CG_PIXMAP;
+        } else return static_cast<QPixmap*>(nullptr);
+    });
+
+    mMainLayout->addWidget(mHwSupportButton);
+    connect(mHwSupportButton, &BoxesListActionButton::pressed, this, [this]() {
+        if(!mTarget) return;
+        const auto target = mTarget->getTarget();
+        if(!target->SWT_isRasterEffect()) return;
+        const auto rEff = static_cast<RasterEffect*>(target);
+        rEff->switchInstanceHwSupport();
+        Document::sInstance->actionFinished();
+    });
 
     mFillWidget = new QWidget(this);
     mMainLayout->addWidget(mFillWidget);
@@ -396,6 +424,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                                target->SWT_isPathEffect() ||
                                target->SWT_isRasterEffect());
     mLockedButton->setVisible(target->SWT_isBoundingBox());
+    mHwSupportButton->setVisible(target->SWT_isRasterEffect());
 
     mFillTypeCombo->hide();
     mBlendModeCombo->hide();
@@ -513,6 +542,9 @@ void BoxSingleWidget::loadStaticPixmaps() {
     ANIMATOR_RECORDING = new QPixmap(iconsDir + "/recording.png");
     ANIMATOR_NOT_RECORDING = new QPixmap(iconsDir + "/notRecording.png");
     ANIMATOR_DESCENDANT_RECORDING = new QPixmap(iconsDir + "/childRecording.png");
+    C_PIXMAP = new QPixmap(iconsDir + "/c.png");
+    G_PIXMAP = new QPixmap(iconsDir + "/g.png");
+    CG_PIXMAP = new QPixmap(iconsDir + "/cg.png");
     sStaticPixmapsLoaded = true;
 }
 

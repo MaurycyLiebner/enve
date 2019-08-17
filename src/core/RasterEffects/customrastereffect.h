@@ -5,7 +5,9 @@
 
 class CustomRasterEffect : public RasterEffect {
 protected:
-    CustomRasterEffect(const QString& name);
+    CustomRasterEffect(const QString& name,
+                       const HardwareSupport hwSupport,
+                       const bool hwInterchangeable);
 public:
     virtual CustomIdentifier getIdentifier() const = 0;
 private:

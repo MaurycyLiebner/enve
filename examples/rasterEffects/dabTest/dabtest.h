@@ -42,7 +42,7 @@ struct Dab {
 class DabTestCaller000 : public RasterEffectCaller {
 public:
     DabTestCaller000(const Dab& dab) :
-        RasterEffectCaller(), mDab(dab) {}
+        RasterEffectCaller(HardwareSupport::gpuOnly), mDab(dab) {}
 
     void processGpu(QGL33 * const gl,
                 GpuRenderTools& renderTools,
@@ -51,10 +51,6 @@ public:
                     const CpuRenderData& data) {
         Q_UNUSED(renderTools);
         Q_UNUSED(data);
-    }
-
-    HardwareSupport hardwareSupport() const {
-        return HardwareSupport::gpuOnly;
     }
 private:
     static bool sInitialized;

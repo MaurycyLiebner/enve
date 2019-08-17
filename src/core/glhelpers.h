@@ -129,10 +129,7 @@ struct GpuRenderData : public CpuRenderData {
 
 class SwitchableContext {
     friend class GpuPostProcessor;
-    enum class Mode {
-        OpenGL,
-        Skia
-    };
+    enum class Mode { OpenGL, Skia };
 public:
     //! @brief In Skia mode returns the handled GrContext,
     //! in OpenGL mode returns nullptr

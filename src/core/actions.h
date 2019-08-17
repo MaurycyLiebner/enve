@@ -101,7 +101,7 @@ public:
 
     bool smoothChange() const { return mSmoothChange; }
     void startSmoothChange() { mSmoothChange = true; }
-    void finishSmoothChange() { mSmoothChange = false; }
+    void finishSmoothChange();
 private:
     void afterAction() const;
 

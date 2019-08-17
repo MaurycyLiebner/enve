@@ -189,7 +189,7 @@ bool parsePathDataFast(const QString &dataStr,
     float x0 = 0, y0 = 0;              // starting point
     float x = 0, y = 0;                // current point
     char lastMode = 0;
-    SkPoint ctrlPt;
+    SkPoint ctrlPt{0, 0};
     const QChar *str = dataStr.constData();
     const QChar *end = str + dataStr.size();
 

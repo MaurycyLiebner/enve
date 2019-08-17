@@ -6,7 +6,8 @@ ShaderEffect::ShaderEffect(const QString& name,
                            const ShaderEffectCreator * const creator,
                            const ShaderEffectProgram * const program,
                            const QList<stdsptr<ShaderPropertyCreator>> &props) :
-    RasterEffect(name, RasterEffectType::CUSTOM_SHADER),
+    RasterEffect(name, HardwareSupport::gpuOnly, false,
+                 RasterEffectType::CUSTOM_SHADER),
     mProgram(program), mCreator(creator) {
     for(const auto& propC : props)
         ca_addChild(propC->create());

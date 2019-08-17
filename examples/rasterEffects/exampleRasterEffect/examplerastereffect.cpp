@@ -40,7 +40,7 @@ bool eSupports(const CustomIdentifier &identifier) {
 
 #include "enveCore/Animators/qrealanimator.h"
 ExampleRasterEffect000::ExampleRasterEffect000() :
-    CustomRasterEffect(eName().toLower()) {
+    CustomRasterEffect(eName().toLower(), HardwareSupport::gpuPreffered, false) {
     mRadius = enve::make_shared<QrealAnimator>(10, 0, 999.999, 1, "radius");
     ca_addChild(mRadius);
 }
@@ -49,7 +49,8 @@ stdsptr<RasterEffectCaller>
 ExampleRasterEffect000::getEffectCaller(const qreal relFrame) const {
     const qreal radius = mRadius->getEffectiveValue(relFrame);
     if(isZero4Dec(radius)) return nullptr;
-    return enve::make_shared<ExampleRasterEffectCaller000>(radius);
+    return enve::make_shared<ExampleRasterEffectCaller000>(
+                instanceHwSupport(), radius);
 }
 
 CustomIdentifier ExampleRasterEffect000::getIdentifier() const {

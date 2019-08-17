@@ -10,8 +10,6 @@ public:
                        const ShaderEffectProgram& program,
                        const UniformSpecifiers& uniformSpecifiers);
 
-    HardwareSupport hardwareSupport() const;
-
     void processGpu(QGL33 * const gl,
                     GpuRenderTools& renderTools,
                     GpuRenderData& data);

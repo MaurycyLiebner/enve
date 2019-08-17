@@ -41,7 +41,7 @@ bool eSupports(const CustomIdentifier &identifier) {
 #include "enveCore/Animators/qrealanimator.h"
 
 DabTest000::DabTest000() :
-    CustomRasterEffect(eName().toLower()) {
+    CustomRasterEffect(eName().toLower(), HardwareSupport::gpuOnly, false) {
     mRadius = enve::make_shared<QrealAnimator>(0.5, 0, 0.5, 0.1, "radius");
     ca_addChild(mRadius);
 
@@ -49,8 +49,7 @@ DabTest000::DabTest000() :
     ca_addChild(mHardness);
 }
 
-stdsptr<RasterEffectCaller>
-        DabTest000::getEffectCaller(const qreal relFrame) const {
+stdsptr<RasterEffectCaller> DabTest000::getEffectCaller(const qreal relFrame) const {
     const qreal radius = mRadius->getEffectiveValue(relFrame);
     const qreal hardness = mHardness->getEffectiveValue(relFrame);
 

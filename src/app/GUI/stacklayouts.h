@@ -280,6 +280,7 @@ StackLayoutItem::UniPtr ParentStackLayoutItem::sReadChild(
         wid->read(src);
         return UniPtr(wid);
     } else Q_ASSERT(false);
+    return nullptr;
 }
 
 #endif // STACKLAYOUTS_H

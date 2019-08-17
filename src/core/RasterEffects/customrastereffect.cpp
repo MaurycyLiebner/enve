@@ -1,8 +1,11 @@
 #include "RasterEffects/customrastereffect.h"
 #include "basicreadwrite.h"
 
-CustomRasterEffect::CustomRasterEffect(const QString &name) :
-    RasterEffect(name, RasterEffectType::CUSTOM) {}
+CustomRasterEffect::CustomRasterEffect(const QString &name,
+                                       const HardwareSupport hwSupport,
+                                       const bool hwInterchangeable) :
+    RasterEffect(name, hwSupport, hwInterchangeable,
+                 RasterEffectType::CUSTOM) {}
 
 void CustomRasterEffect::writeIdentifier(QIODevice * const dst) const {
     RasterEffect::writeIdentifier(dst);

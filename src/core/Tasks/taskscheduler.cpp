@@ -52,6 +52,10 @@ void TaskScheduler::initializeGpu() {
             this, &TaskScheduler::processNextTasks);
     connect(&mGpuPostProcessor, &GpuPostProcessor::processedAll,
             this, &TaskScheduler::callAllTasksFinishedFunc);
+    connect(&mGpuPostProcessor, &GpuPostProcessor::processedAll,
+            this, [this]() {
+        if(!CPUTasksBeingProcessed()) queTasks();
+    });
 }
 
 void TaskScheduler::scheduleCPUTask(const stdsptr<eTask>& task) {

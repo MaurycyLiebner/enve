@@ -42,6 +42,9 @@ public:
     static QPixmap* ANIMATOR_RECORDING;
     static QPixmap* ANIMATOR_NOT_RECORDING;
     static QPixmap* ANIMATOR_DESCENDANT_RECORDING;
+    static QPixmap* C_PIXMAP;
+    static QPixmap* G_PIXMAP;
+    static QPixmap* CG_PIXMAP;
     static bool sStaticPixmapsLoaded;
     static void loadStaticPixmaps();
     static void clearStaticPixmaps();
@@ -111,6 +114,7 @@ private:
     PixmapActionButton *mContentButton;
     PixmapActionButton *mVisibleButton;
     PixmapActionButton *mLockedButton;
+    PixmapActionButton *mHwSupportButton;
     ColorAnimatorButton *mColorButton;
     BoxTargetWidget *mBoxTargetWidget;
 

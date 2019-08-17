@@ -122,14 +122,11 @@ MainWindow::MainWindow(Document& document,
             file.close();
         }
     }
-    //setMouseTracking(true);
     BoxSingleWidget::loadStaticPixmaps();
 
 //    for(int i = 0; i < ClipboardContainerType::CCT_COUNT; i++) {
 //        mClipboardContainers << nullptr;
 //    }
-
-    //int nThreads = QThread::idealThreadCount();
 
     mDocument.setPath("");
 
@@ -230,28 +227,11 @@ MainWindow::MainWindow(Document& document,
     leftDock2Label->setAlignment(Qt::AlignCenter);
     mLeftDock2->setTitleBarWidget(leftDock2Label);
 
-
-//    mCanvasWindow->SWT_getAbstractionForWidget(
-//                mBoxListWidget->getVisiblePartWidget());
-
-//    Canvas *canvas = new Canvas(mFillStrokeSettings, mCanvasWindow);
-//    canvas->prp_setName("Canvas 0");
-//    mCanvasWindow->addCanvasToListAndSetAsCurrent(canvas);
-//    mCanvas = mCanvasWindow->getCurrentCanvas();
-//    mCurrentCanvasComboBox->addItem(mCanvas->prp_getName());
-
-//    setCentralWidget(mLayoutHandler->sceneLayout());
-
     setupToolBar();
     setupStatusBar();
     setupMenuBar();
 
     connectToolBarActions();
-
-    //setCentralWidget(mCanvasWindow->getCanvasWidget());
-
-//    setMouseTracking(true);
-//    centralWidget()->setMouseTracking(true);
 
     readRecentFiles();
     updateRecentMenu();

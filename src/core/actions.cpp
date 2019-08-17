@@ -380,6 +380,11 @@ void Actions::setPaintMode() {
     mDocument.setCanvasMode(CanvasMode::paint);
 }
 
+void Actions::finishSmoothChange() {
+    mSmoothChange = false;
+//    mDocument.actionFinished();
+}
+
 void Actions::afterAction() const {
     Document::sInstance->actionFinished();
 }

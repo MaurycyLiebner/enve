@@ -1,9 +1,13 @@
 #include "rastereffectcaller.h"
 
 
-RasterEffectCaller::RasterEffectCaller(const bool forceMargin,
+RasterEffectCaller::RasterEffectCaller(const HardwareSupport hwSupport,
+                                       const bool forceMargin,
                                        const QMargins &margin) :
-    fForceMargin(forceMargin), fMargin(margin) {}
+    fForceMargin(forceMargin), fHwSupport(hwSupport), fMargin(margin) {}
+
+RasterEffectCaller::RasterEffectCaller(const HardwareSupport hwSupport) :
+    RasterEffectCaller(hwSupport, false, QMargins()) {}
 
 void RasterEffectCaller::processGpu(QGL33 * const gl,
                                     GpuRenderTools &renderTools,
