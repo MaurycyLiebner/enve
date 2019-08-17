@@ -90,8 +90,6 @@ protected:
     void clearAndHideValueAnimators();
     void updateValueSlidersForQPointFAnimator();
 private:
-    void clearColorButton();
-
     void clearSelected() {
         setSelected(false);
     }

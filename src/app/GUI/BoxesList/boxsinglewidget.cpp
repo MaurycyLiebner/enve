@@ -418,7 +418,9 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     auto target = abs->getTarget();
 
     mContentButton->setVisible(target->SWT_isComplexAnimator());
-    mRecordButton->setVisible(target->SWT_isAnimator());
+    mRecordButton->setVisible(target->SWT_isAnimator() &&
+                              !target->SWT_isBoundingBox() &&
+                              !target->SWT_isSingleSound());
     mVisibleButton->setVisible(target->SWT_isBoundingBox() ||
                                target->SWT_isSound() ||
                                target->SWT_isPathEffect() ||
@@ -426,37 +428,35 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mLockedButton->setVisible(target->SWT_isBoundingBox());
     mHwSupportButton->setVisible(target->SWT_isRasterEffect());
 
-    mFillTypeCombo->hide();
-    mBlendModeCombo->hide();
-    mPathBlendModeCombo->hide();
-    mPropertyComboBox->hide();
+    mBoxTargetWidget->setVisible(target->SWT_isBoxTargetProperty());
+    mCheckBox->setVisible(target->SWT_isBoolProperty() ||
+                          target->SWT_isBoolPropertyContainer());
+
+    mPropertyComboBox->setVisible(target->SWT_isComboBoxProperty());
 
     mPathBlendModeVisible = false;
     mBlendModeVisible = false;
     mFillTypeVisible = false;
 
-    mBoxTargetWidget->hide();
-    mCheckBox->hide();
+    mColorButton->setColorTarget(nullptr);
+    mValueSlider->clearTarget();
+    mSecondValueSlider->clearTarget();
 
-    clearColorButton();
-    clearAndHideValueAnimators();
+    bool valueSliderVisible = false;
+    bool secondValueSliderVisible = false;
+    bool colorButtonVisible = false;
 
     if(target->SWT_isBoundingBox()) {
-        mRecordButton->hide();
         const auto boxPtr = static_cast<BoundingBox*>(target);
 
         mBlendModeVisible = true;
         mBlendModeCombo->setCurrentIndex(
             blendModeToIntSk(boxPtr->getBlendMode()));
         mBlendModeCombo->setEnabled(!target->SWT_isGroupBox());
-        updateCompositionBoxVisible();
     } else if(target->SWT_isSingleSound()) {
-        mRecordButton->hide();
     } else if(target->SWT_isBoolProperty()) {
-        mCheckBox->show();
         mCheckBox->setTarget(static_cast<BoolProperty*>(target));
     } else if(target->SWT_isBoolPropertyContainer()) {
-        mCheckBox->show();
         mCheckBox->setTarget(static_cast<BoolPropertyContainer*>(target));
     } else if(target->SWT_isComboBoxProperty()) {
         disconnect(mPropertyComboBox, nullptr, nullptr, nullptr);
@@ -470,7 +470,6 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         mPropertyComboBox->addItems(comboBoxProperty->getValueNames());
         mPropertyComboBox->setCurrentIndex(
                     comboBoxProperty->getCurrentValue());
-        mPropertyComboBox->show();
         connect(mPropertyComboBox,
                 qOverload<int>(&QComboBox::activated),
                 comboBoxProperty, &ComboBoxProperty::setCurrentValue);
@@ -484,46 +483,52 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         if(target->SWT_isQrealAnimator())
             mValueSlider->setTarget(static_cast<QrealAnimator*>(target));
         else mValueSlider->setTarget(static_cast<IntProperty*>(target));
-        mValueSlider->show();
+        valueSliderVisible = true;
         mValueSlider->setNeighbouringSliderToTheRight(false);
     } else if(target->SWT_isComplexAnimator()) {
         if(target->SWT_isColorAnimator()) {
+            colorButtonVisible = true;
             mColorButton->setColorTarget(static_cast<ColorAnimator*>(target));
-            mColorButton->show();
         } else if(target->SWT_isSmartPathCollection()) {
             const auto coll = static_cast<SmartPathCollection*>(target);
             mFillTypeVisible = true;
             mFillTypeCombo->setCurrentIndex(coll->getFillType());
-            updateFillTypeBoxVisible();
         }
         if(target->SWT_isComplexAnimator() && !abs->contentVisible()) {
             if(target->SWT_isQPointFAnimator()) {
                 updateValueSlidersForQPointFAnimator();
+                valueSliderVisible = mValueSlider->isVisible();
+                secondValueSliderVisible = mSecondValueSlider->isVisible();
             } else {
                 const auto ca_target = static_cast<ComplexAnimator*>(target);
                 Property * const guiProp = ca_target->getPropertyForGUI();
                 if(guiProp) {
                     if(guiProp->SWT_isQrealAnimator()) {
+                        valueSliderVisible = true;
                         mValueSlider->setTarget(static_cast<QrealAnimator*>(guiProp));
-                        mValueSlider->show();
                         mValueSlider->setNeighbouringSliderToTheRight(false);
-                        mSecondValueSlider->hide();
                         mSecondValueSlider->clearTarget();
                     } else if(guiProp->SWT_isColorAnimator()) {
                         mColorButton->setColorTarget(static_cast<ColorAnimator*>(guiProp));
-                        mColorButton->show();
+                        colorButtonVisible = true;
                     }
                 }
             }
         }
     } else if(target->SWT_isBoxTargetProperty()) {
-        mBoxTargetWidget->show();
         mBoxTargetWidget->setTargetProperty(
                     static_cast<BoxTargetProperty*>(target));
     } else if(target->SWT_isSmartPathAnimator()) {
         mPathBlendModeVisible = true;
-        updatePathCompositionBoxVisible();
     }
+
+    mValueSlider->setVisible(valueSliderVisible);
+    mSecondValueSlider->setVisible(secondValueSliderVisible);
+    mColorButton->setVisible(colorButtonVisible);
+
+    updateCompositionBoxVisible();
+    updatePathCompositionBoxVisible();
+    updateFillTypeBoxVisible();
 }
 
 void BoxSingleWidget::loadStaticPixmaps() {
@@ -843,33 +848,25 @@ void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
     }
 }
 
-void BoxSingleWidget::clearColorButton() {
-    mColorButton->setColorTarget(nullptr);
-    mColorButton->hide();
-}
-
 void BoxSingleWidget::updatePathCompositionBoxVisible() {
     if(!mTarget) return;
-    if(mPathBlendModeVisible) {
-        if(width() > 15*MIN_WIDGET_DIM) mPathBlendModeCombo->show();
-        else mPathBlendModeCombo->hide();
-    }
+    if(mPathBlendModeVisible && width() > 15*MIN_WIDGET_DIM) {
+        mPathBlendModeCombo->show();
+    } else mPathBlendModeCombo->hide();
 }
 
 void BoxSingleWidget::updateCompositionBoxVisible() {
     if(!mTarget) return;
-    if(mBlendModeVisible) {
-        if(width() > 15*MIN_WIDGET_DIM) mBlendModeCombo->show();
-        else mBlendModeCombo->hide();
-    }
+    if(mBlendModeVisible && width() > 15*MIN_WIDGET_DIM) {
+        mBlendModeCombo->show();
+    } else mBlendModeCombo->hide();
 }
 
 void BoxSingleWidget::updateFillTypeBoxVisible() {
     if(!mTarget) return;
-    if(mFillTypeVisible) {
-        if(width() > 15*MIN_WIDGET_DIM) mFillTypeCombo->show();
-        else mFillTypeCombo->hide();
-    }
+    if(mFillTypeVisible && width() > 15*MIN_WIDGET_DIM) {
+        mFillTypeCombo->show();
+    } else mFillTypeCombo->hide();
 }
 
 void BoxSingleWidget::resizeEvent(QResizeEvent *) {
