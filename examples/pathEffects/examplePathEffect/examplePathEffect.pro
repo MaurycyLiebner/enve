@@ -6,7 +6,7 @@
 
 QT += core
 
-ENVE_FOLDER = $$PWD/../..
+ENVE_FOLDER = $$PWD/../../..
 
 INCLUDEPATH += $$ENVE_FOLDER/include
 DEPENDPATH += $$ENVE_FOLDER/include
