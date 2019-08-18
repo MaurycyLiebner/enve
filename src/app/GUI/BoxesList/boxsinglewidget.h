@@ -63,8 +63,8 @@ public:
                         const qreal pixelsPerFrame,
                         const int minViewedFrame);
 
-    void setSelected(const bool bT) {
-        mSelected = bT;
+    void setSelected(const bool selected) {
+        mSelected = selected;
         update();
     }
     bool isTargetDisabled();

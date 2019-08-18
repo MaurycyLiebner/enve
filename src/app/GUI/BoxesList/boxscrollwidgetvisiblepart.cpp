@@ -35,7 +35,7 @@ void BoxScroller::paintEvent(QPaintEvent *) {
         currY += MIN_WIDGET_DIM;
     }
 
-    if(mCurrentMimeData) {
+    if(mDropTarget.isValid()) {
         p.setPen(QPen(Qt::white, 2));
         p.drawRect(mCurrentDragRect);
     }

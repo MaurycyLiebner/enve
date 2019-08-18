@@ -437,6 +437,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mPathBlendModeVisible = false;
     mBlendModeVisible = false;
     mFillTypeVisible = false;
+    mSelected = false;
 
     mColorButton->setColorTarget(nullptr);
     mValueSlider->clearTarget();
@@ -608,6 +609,14 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
     const auto dist = (event->pos() - mDragStartPos).manhattanLength();
     if(dist < QApplication::startDragDistance()) return;
     const auto drag = new QDrag(this);
+    {
+        const auto prop = static_cast<Property*>(mTarget->getTarget());
+        const QString name = prop->prp_getName();
+        const int nameWidth = QApplication::fontMetrics().width(name);
+        QPixmap pixmap(mFillWidget->x() + nameWidth + MIN_WIDGET_DIM, height());
+        render(&pixmap);
+        drag->setPixmap(pixmap);
+    }
     connect(drag, &QDrag::destroyed,
             this, &BoxSingleWidget::clearSelected);
 
@@ -738,12 +747,11 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(target->SWT_isDisabled()) p.setOpacity(.5);
 
     int nameX = mFillWidget->x();
-    QString name;
+    const QString name = static_cast<Property*>(target)->prp_getName();
     if(target->SWT_isBoundingBox() || target->SWT_isSingleSound()) {
         const auto bsTarget = static_cast<eBoxOrSound*>(target);
 
         nameX += MIN_WIDGET_DIM/4;
-        name = bsTarget->prp_getName();
 
         const bool ss = target->SWT_isSingleSound();
         if(ss) p.fillRect(rect(), QColor(0, 125, 255, 50));
@@ -757,7 +765,6 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             p.setPen(Qt::white);
         }
     } else if(!target->SWT_isComplexAnimator()) {
-        const auto propTarget = static_cast<Property*>(target);
         if(target->SWT_isGraphAnimator()) {
             const auto graphAnim = static_cast<GraphAnimator*>(target);
             const auto bswvp = static_cast<BoxScroller*>(mParent);
@@ -771,14 +778,10 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                 }
             }
         }
-        name = propTarget->prp_getName();
         nameX += MIN_WIDGET_DIM;
 
         p.setPen(Qt::white);
     } else { //if(target->SWT_isComplexAnimator()) {
-        ComplexAnimator *caTarget = static_cast<ComplexAnimator*>(target);
-        name = caTarget->prp_getName();
-
         p.setPen(Qt::white);
     }
 
