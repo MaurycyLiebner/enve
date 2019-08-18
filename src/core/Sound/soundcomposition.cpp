@@ -70,8 +70,7 @@ void SoundComposition::scheduleFrameRange(const FrameRange &range) {
     const qreal fps = mParent->getFps();
     const int minSec = qFloor((range.fMin + 1)/fps);
     const int maxSec = qFloor((range.fMax + 1)/fps);
-    for(int i = minSec; i <= maxSec; i++)
-        scheduleSecond(i);
+    for(int i = minSec; i <= maxSec; i++) scheduleSecond(i);
 }
 
 SoundMerger *SoundComposition::scheduleFrame(const int frameId) {
@@ -89,17 +88,14 @@ SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
     const qreal fps = mParent->getFps();
 
     const auto task = enve::make_shared<SoundMerger>(secondId, sampleRange, this);
-    int nS = 0;
     for(const auto &sound : mSounds) {
         if(!sound->isEnabled() || !sound->isVisible()) continue;
         const auto enabledFrameRange = sound->prp_absInfluenceRange();
         const iValueRange enabledSecRange{qFloor(enabledFrameRange.fMin/fps),
-                                          qCeil(enabledFrameRange.fMax/fps)};
+                                          qFloor(enabledFrameRange.fMax/fps)};
         if(!enabledSecRange.inRange(secondId)) continue;
-        nS++;
         const auto secs = sound->absSecondToRelSeconds(secondId);
         for(int i = secs.fMin; i <= secs.fMax; i++) {
-            if(!enabledSecRange.inRange(i)) continue;
             const auto samples = sound->getSamplesForSecond(i);
             if(samples) {
                 task->addSoundToMerge({sound->getSampleShift(),
@@ -119,7 +115,6 @@ SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
             }
         }
     }
-    if(nS == 0) return nullptr;
     task->scheduleTask();
     return task.get();
 }

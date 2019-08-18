@@ -8,7 +8,9 @@ TimelineMovable::TimelineMovable(const Type type, Property &parentProp) :
     mType(type), mParentProperty(parentProp) {}
 
 void TimelineMovable::setValue(const int value) {
+    const int oldValue = mValue;
     mValue = qMin(mClampMax, qMax(mClampMin, value));
+    emit valueChanged(oldValue, mValue);
 }
 
 int TimelineMovable::getValue() const {
@@ -26,8 +28,6 @@ TimelineMovable *TimelineMovable::getMovableAt(
 
 void TimelineMovable::changeFramePosBy(const int change) {
     setValue(mValue + change);
-    emit posChanged(mValue);
-    emit posChangedBy(change);
 }
 
 void TimelineMovable::setHovered(const bool hovered) {
@@ -50,30 +50,26 @@ DurationRectangle::DurationRectangle(Property &parentProp) :
     TimelineMovable(DURATION_RECT, parentProp),
     mMinFrame(MIN_FRAME, parentProp),
     mMaxFrame(MAX_FRAME, parentProp) {
+    connect(this, &TimelineMovable::valueChanged,
+            this, &DurationRectangle::shiftChanged);
 
     setClamp(-1000000, 1000000);
     mMinFrame.setClamp(-1000000, 1000000);
     mMaxFrame.setClamp(-1000000, 1000000);
 
-    connect(&mMinFrame, &TimelineMovable::posChanged,
-            &mMaxFrame, &TimelineMovable::setClampMin);
-    connect(&mMaxFrame, &TimelineMovable::posChanged,
-            &mMinFrame, &TimelineMovable::setClampMax);
+    connect(&mMinFrame, &TimelineMovable::valueChanged,
+            this, [this](const int, const int to) {
+        mMaxFrame.setClampMin(to);
+    });
+    connect(&mMaxFrame, &TimelineMovable::valueChanged,
+            this, [this](const int, const int to) {
+        mMinFrame.setClampMax(to);
+    });
 
-    connect(&mMinFrame, &TimelineMovable::posChanged,
-            this, &DurationRectangle::rangeChanged);
-    connect(&mMaxFrame, &TimelineMovable::posChanged,
-            this, &DurationRectangle::rangeChanged);
-
-    connect(&mMinFrame, &TimelineMovable::finishedTransform,
-            this, &DurationRectangle::finishedRangeChange);
-    connect(&mMaxFrame, &TimelineMovable::finishedTransform,
-            this, &DurationRectangle::finishedRangeChange);
-
-    connect(&mMinFrame, &TimelineMovable::posChangedBy,
-            this, &DurationRectangle::minFrameChangedBy);
-    connect(&mMaxFrame, &TimelineMovable::posChangedBy,
-            this, &DurationRectangle::maxFrameChangedBy);
+    connect(&mMinFrame, &TimelineMovable::valueChanged,
+            this, &DurationRectangle::minFrameChanged);
+    connect(&mMaxFrame, &TimelineMovable::valueChanged,
+            this, &DurationRectangle::maxFrameChanged);
 }
 
 void DurationRectangle::pressed(const bool shiftPressed) {

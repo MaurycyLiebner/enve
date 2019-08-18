@@ -61,9 +61,6 @@ public:
     DurationRectangle *getDurationRectangle() const;
     bool isVisibleAndInDurationRect(const int relFrame) const;
     bool isFrameFVisibleAndInDurationRect(const qreal relFrame) const;
-    void updateAfterDurationRectangleShifted(const int dFrame);
-    void updateAfterDurationMinFrameChangedBy(const int by);
-    void updateAfterDurationMaxFrameChangedBy(const int by);
 
     void setSelected(const bool select);
     void select();

@@ -117,7 +117,6 @@ void eBoxOrSound::readProperty(QIODevice * const src) {
     if(hasDurRect) {
         if(!mDurationRectangle) createDurationRectangle();
         mDurationRectangle->readDurationRectangle(src);
-        updateAfterDurationRectangleShifted(0);
         anim_shiftAllKeys(prp_getTotalFrameShift());
     }
 }
@@ -155,18 +154,36 @@ void eBoxOrSound::setDurationRectangle(
     if(mDurationRectangle) {
         disconnect(mDurationRectangle.data(), nullptr, this, nullptr);
     }
+    const FrameRange oldRange = mDurationRectangle ?
+                mDurationRectangle->getAbsFrameRange() :
+                FrameRange{FrameRange::EMIN, FrameRange::EMAX};
+    const FrameRange newRange = durationRect ?
+                durationRect->getAbsFrameRange() :
+                FrameRange{FrameRange::EMIN, FrameRange::EMAX};
     const auto oldDurRect = mDurationRectangle;
     mDurationRectangle = durationRect;
-    updateAfterDurationRectangleShifted(0);
+    prp_afterChangedAbsRange(oldRange + newRange, false);
     if(!mDurationRectangle) return shiftAll(oldDurRect->getRelShift());
 
-    connect(mDurationRectangle.data(), &DurationRectangle::posChangedBy,
-            this, &eBoxOrSound::updateAfterDurationRectangleShifted);
+    connect(mDurationRectangle.data(), &DurationRectangle::shiftChanged,
+            this, [this](const int oldShift, const int newShift) {
+        const auto newRange = prp_absInfluenceRange();
+        const auto oldRange = newRange.shifted(oldShift - newShift);
+        prp_afterFrameShiftChanged(oldRange, newRange);
+    });
 
-    connect(mDurationRectangle.data(), &DurationRectangle::minFrameChangedBy,
-            this, &eBoxOrSound::updateAfterDurationMinFrameChangedBy);
-    connect(mDurationRectangle.data(), &DurationRectangle::maxFrameChangedBy,
-            this, &eBoxOrSound::updateAfterDurationMaxFrameChangedBy);
+    connect(mDurationRectangle.data(), &DurationRectangle::minFrameChanged,
+            this, [this](const int oldMin, const int newMin) {
+        const int min = qMin(newMin, oldMin);
+        const int max = qMax(newMin, oldMin);
+        prp_afterChangedAbsRange({min, max}, false);
+    });
+    connect(mDurationRectangle.data(), &DurationRectangle::maxFrameChanged,
+            this, [this](const int oldMax, const int newMax) {
+        const int min = qMin(newMax, oldMax);
+        const int max = qMax(newMax, oldMax);
+        prp_afterChangedAbsRange({min, max}, false);
+    });
 }
 
 bool eBoxOrSound::isVisibleAndInVisibleDurationRect() const {
@@ -252,33 +269,6 @@ void eBoxOrSound::createDurationRectangle() {
     durRect->setMinRelFrame(anim_getCurrentRelFrame() - 5);
     durRect->setFramesDuration(10);
     setDurationRectangle(durRect);
-}
-
-
-void eBoxOrSound::updateAfterDurationRectangleShifted(const int dFrame) {
-    const auto newRange = prp_absInfluenceRange();
-    const auto oldRange = newRange.shifted(-dFrame);
-    prp_afterFrameShiftChanged(oldRange, newRange);
-}
-
-void eBoxOrSound::updateAfterDurationMinFrameChangedBy(const int by) {
-    const auto newRange = prp_absInfluenceRange();
-    const int newMin = newRange.fMin;
-    const int oldMin = newRange.fMin - by;
-
-    const int min = qMin(newMin, oldMin);
-    const int max = qMax(newMin, oldMin);
-    prp_afterChangedAbsRange({min, max}, false);
-}
-
-void eBoxOrSound::updateAfterDurationMaxFrameChangedBy(const int by) {
-    const auto newRange = prp_absInfluenceRange();
-    const int newMax = newRange.fMax;
-    const int oldMax = newRange.fMax - by;
-
-    const int min = qMin(newMax, oldMax);
-    const int max = qMax(newMax, oldMax);
-    prp_afterChangedAbsRange({min, max}, false);
 }
 
 void eBoxOrSound::setSelected(const bool select) {

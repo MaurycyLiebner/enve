@@ -207,6 +207,8 @@ void RenderHandler::resumePreview() {
 
 void RenderHandler::playPreviewAfterAllTasksCompleted() {
     if(mRenderingPreview) {
+        TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nullptr);
+        Document::sInstance->actionFinished();
         if(TaskScheduler::sAllTasksFinished()) {
             playPreview();
         } else {

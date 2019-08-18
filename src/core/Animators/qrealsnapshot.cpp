@@ -16,7 +16,7 @@ qreal QrealSnapshot::getValue(const qreal relFrame) const {
 
     getPrevAndNextKey(relFrame, prevKey, nextKey);
 
-    if(prevKey && nextKey) {
+    if(prevKey && nextKey && prevKey != nextKey) {
         const qCubicSegment2D seg{{qreal(prevKey->fFrame), prevKey->fValue},
                                   {prevKey->fC1Frame, prevKey->fC1Value},
                                   {nextKey->fC0Frame, nextKey->fC0Value},
@@ -65,6 +65,7 @@ void QrealSnapshot::getPrevAndNextKeyId(const qreal relFrame,
     }
     if(maxId - minId == 0) {
         prevKey = minId;
+        nextKey = minId;
         return;
     } else if(maxId - minId == 1) {
         const auto minKey = &mKeys[minId];
@@ -83,6 +84,7 @@ void QrealSnapshot::getPrevAndNextKeyId(const qreal relFrame,
         return;
     }
     prevKey = guessId;
+    nextKey = guessId;
     return;
 }
 

@@ -21,7 +21,6 @@ void FixedLenAnimationRect::bindToAnimationFrameRange() {
         setMaxRelFrame(getMaxAnimRelFrame());
     }
     mMaxFrame.setClampMax(getMaxAnimRelFrame());
-    emit rangeChanged();
 }
 
 void FixedLenAnimationRect::setBindToAnimationFrameRange() {

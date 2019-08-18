@@ -628,10 +628,11 @@ void Canvas::invertSelectionAction() {
 
 void Canvas::anim_setAbsFrame(const int frame) {
     if(frame == anim_getCurrentAbsFrame()) return;
-    ContainerBox::anim_setAbsFrame(frame);
-    mPaintTarget.afterPaintAnimSurfaceChanged();
     const int oldRelFrame = anim_getCurrentRelFrame();
+    ContainerBox::anim_setAbsFrame(frame);
     const int newRelFrame = anim_getCurrentRelFrame();
+
+    mPaintTarget.afterPaintAnimSurfaceChanged();
 
     const auto cont = mCacheHandler.atFrame<ImageCacheContainer>(newRelFrame);
     if(cont) {

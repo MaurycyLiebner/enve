@@ -56,8 +56,7 @@ public:
     void setClampMin(const int min);
     void setClampMax(const int max);
 signals:
-    void posChangedBy(int);
-    void posChanged(int);
+    void valueChanged(const int from, const int to);
     void finishedTransform();
 protected:
     const Type mType;
@@ -184,19 +183,16 @@ public:
         mSoundCacheHandler = handler;
     }
 
-    void setRelShift(const int shift) {
-        setValue(shift);
-    }
+    void setRelShift(const int shift) { setValue(shift); }
 
     int getRelShift() const { return getValue(); }
 private:
     using TimelineMovable::setValue;
     using TimelineMovable::getValue;
 signals:
-    void minFrameChangedBy(int);
-    void maxFrameChangedBy(int);
-    void rangeChanged();
-    void finishedRangeChange();
+    void minFrameChanged(const int from, const int to);
+    void maxFrameChanged(const int from, const int to);
+    void shiftChanged(const int from, const int to);
 protected:
     const HDDCachableCacheHandler * mRasterCacheHandler = nullptr;
     const HDDCachableCacheHandler * mSoundCacheHandler = nullptr;
