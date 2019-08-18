@@ -7,7 +7,7 @@
 #include "../canvas.h"
 
 SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
-    eBoxOrSound("sound"), mOwnDurationRectangle(!durRect) {
+    eBoxOrSound("sound"), mIndependent(!durRect) {
     connect(this, &eBoxOrSound::aboutToChangeAncestor, this, [this]() {
         if(!mParentScene) return;
         mParentScene->getSoundComposition()->removeSound(ref<SingleSound>());
@@ -17,7 +17,7 @@ SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
         mParentScene->getSoundComposition()->addSound(ref<SingleSound>());
         updateDurationRectLength();
     });
-    if(mOwnDurationRectangle) {
+    if(mIndependent) {
         const auto flaRect = enve::make_shared<FixedLenAnimationRect>(*this);
         flaRect->setBindToAnimationFrameRange();
         setDurationRectangle(flaRect);
@@ -141,7 +141,7 @@ QrealSnapshot SingleSound::getVolumeSnap() const {
 }
 
 void SingleSound::updateDurationRectLength() {
-    if(mOwnDurationRectangle && mCacheHandler && mParentScene) {
+    if(mIndependent && mCacheHandler && mParentScene) {
         const int secs = mCacheHandler ? mCacheHandler->durationSec() : 0;
         const qreal fps = getCanvasFPS();
         const int frames = qCeil(qAbs(secs*fps*mStretch));
@@ -179,14 +179,14 @@ void SingleSound::setSoundDataHandler(SoundDataHandler* const newDataHandler) {
 }
 
 int SingleSound::prp_getRelFrameShift() const {
-    if(mOwnDurationRectangle) return eBoxOrSound::prp_getRelFrameShift();
+    if(mIndependent) return eBoxOrSound::prp_getRelFrameShift();
     return 0;
 }
 
 bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                       const bool parentSatisfies,
                                       const bool parentMainTarget) const {
-    if(mOwnDurationRectangle) {
+    if(mIndependent) {
         if(rules.fRule == SWT_BR_VISIBLE && !mVisible) return false;
         if(rules.fRule == SWT_BR_SELECTED && !mSelected) return false;
         if(rules.fType == SWT_TYPE_SOUND) return true;

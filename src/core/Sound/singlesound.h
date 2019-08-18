@@ -16,14 +16,14 @@ protected:
     SingleSound(const qsptr<FixedLenAnimationRect> &durRect = nullptr);
 public:
     bool SWT_isSound() const { return true; }
-    bool SWT_isSingleSound() const { return mOwnDurationRectangle; }
+    bool SWT_isSingleSound() const { return mIndependent; }
 
     void setupTreeViewMenu(PropertyMenu * const menu);
 
     int prp_getRelFrameShift() const;
 
     QMimeData *SWT_createMimeData() {
-        if(!mOwnDurationRectangle) return nullptr;
+        if(!mIndependent) return nullptr;
         return eBoxOrSound::SWT_createMimeData();
     }
 
@@ -52,7 +52,7 @@ public:
     const HDDCachableCacheHandler* getCacheHandler() const;
 
     bool videoSound() const {
-        return !mOwnDurationRectangle;
+        return !mIndependent;
     }
 
     void setStretch(const qreal stretch);
@@ -75,7 +75,7 @@ private:
     void updateDurationRectLength();
 
     qreal getCanvasFPS() const;
-    const bool mOwnDurationRectangle;
+    const bool mIndependent;
 
     bool mEnabled = true;
     qreal mStretch = 1;

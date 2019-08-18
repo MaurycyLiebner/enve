@@ -86,13 +86,20 @@ SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
     mProcessingSeconds.append(secondId);
     const SampleRange sampleRange = {secondId*SOUND_SAMPLERATE,
                                      (secondId + 1)*SOUND_SAMPLERATE - 1};
+    const qreal fps = mParent->getFps();
+
     const auto task = enve::make_shared<SoundMerger>(secondId, sampleRange, this);
     int nS = 0;
     for(const auto &sound : mSounds) {
         if(!sound->isEnabled() || !sound->isVisible()) continue;
+        const auto enabledFrameRange = sound->prp_absInfluenceRange();
+        const iValueRange enabledSecRange{qFloor(enabledFrameRange.fMin/fps),
+                                          qCeil(enabledFrameRange.fMax/fps)};
+        if(!enabledSecRange.inRange(secondId)) continue;
         nS++;
         const auto secs = sound->absSecondToRelSeconds(secondId);
         for(int i = secs.fMin; i <= secs.fMax; i++) {
+            if(!enabledSecRange.inRange(i)) continue;
             const auto samples = sound->getSamplesForSecond(i);
             if(samples) {
                 task->addSoundToMerge({sound->getSampleShift(),
@@ -125,7 +132,7 @@ void SoundComposition::frameRangeChanged(const FrameRange &range) {
 qint64 SoundComposition::readData(char *data, qint64 maxLen) {
     qint64 total = 0;
     const SampleRange readSamples{static_cast<int>(mPos),
-                                  static_cast<int>(mPos + maxLen/sizeof(float))};
+                                  static_cast<int>(mPos + maxLen/qint64(sizeof(float)))};
     while(maxLen > total) {
         const int secondId = static_cast<int>(mPos/SOUND_SAMPLERATE);
         const auto cont = mSecondsCache.atFrame<SoundCacheContainer>(secondId);
@@ -137,10 +144,8 @@ qint64 SoundComposition::readData(char *data, qint64 maxLen) {
         const SampleRange contRelRange =
                 samplesToRead.shifted(-contSampleRange.fMin);
         const int nSamples = contRelRange.span();
-        const qint64 chunk = qMin(maxLen - total,
-                                  static_cast<qint64>(nSamples*sizeof(float)));
-        memcpy(data + total, secondData + contRelRange.fMin,
-               static_cast<size_t>(chunk));
+        const qint64 chunk = qMin(maxLen - total, nSamples*qint64(sizeof(float)));
+        memcpy(data + total, secondData + contRelRange.fMin, static_cast<size_t>(chunk));
         mPos += nSamples;
         total += chunk;
     }
