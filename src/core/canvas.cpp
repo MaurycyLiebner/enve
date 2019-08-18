@@ -628,9 +628,9 @@ void Canvas::invertSelectionAction() {
 
 void Canvas::anim_setAbsFrame(const int frame) {
     if(frame == anim_getCurrentAbsFrame()) return;
+    ContainerBox::anim_setAbsFrame(frame);
     mPaintTarget.afterPaintAnimSurfaceChanged();
     const int oldRelFrame = anim_getCurrentRelFrame();
-    ComplexAnimator::anim_setAbsFrame(frame);
     const int newRelFrame = anim_getCurrentRelFrame();
 
     const auto cont = mCacheHandler.atFrame<ImageCacheContainer>(newRelFrame);
@@ -650,8 +650,6 @@ void Canvas::anim_setAbsFrame(const int frame) {
         if(difference) planScheduleUpdate(UpdateReason::frameChange);
     }
 
-    for(const auto &box : mContainedBoxes)
-        box->anim_setAbsFrame(frame);
     mUndoRedoStack->setFrame(frame);
 
     if(mCurrentMode == CanvasMode::paint)
