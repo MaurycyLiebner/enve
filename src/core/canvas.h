@@ -130,7 +130,8 @@ public:
                     const int frameCount = 200,
                     const qreal fps = 24);
 public:
-    void prp_afterChangedAbsRange(const FrameRange &range);
+    void prp_afterChangedAbsRange(const FrameRange &range,
+                                  const bool clip = true);
 
     void selectOnlyLastPressedBox();
     void selectOnlyLastPressedPoint();

@@ -2,6 +2,7 @@
 #include "hddcachablecachehandler.h"
 
 void HDDCachableRangeCont::noDataLeft_k() {
+    if(!mParentCacheHandler_k) return;
     const auto thisRef = ref<HDDCachableRangeCont>();
     mParentCacheHandler_k->remove(thisRef);
 }

@@ -5,13 +5,13 @@
 class AnimationRect : public DurationRectangle {
     e_OBJECT
 protected:
-    AnimationRect(Property * const childProp) :
-        DurationRectangle(childProp) {}
-    virtual void setMinAnimationFrame(const int minAnimationFrame) = 0;
-    virtual void setMaxAnimationFrame(const int maxAnimationFrame) = 0;
+    AnimationRect(Property& parentProp) :
+        DurationRectangle(parentProp) {}
+    virtual void setMinAnimRelFrame(const int min) = 0;
+    virtual void setMaxAnimRelFrame(const int max) = 0;
 public:
-    virtual int getMinAnimationFrame() const = 0;
-    virtual int getMaxAnimationFrame() const = 0;
+    virtual int getMinAnimRelFrame() const = 0;
+    virtual int getMaxAnimRelFrame() const = 0;
 
     bool hasAnimationFrameRange() { return true; }
 
@@ -21,16 +21,12 @@ public:
               const qreal pixelsPerFrame,
               const FrameRange &absFrameRange);
 
-    FrameRange getAnimationRange() const {
-        return { getMinAnimationFrameAsRelFrame(),
-                 getMaxAnimationFrameAsRelFrame()};
+    FrameRange getAnimRelRange() const {
+        return { getMinAnimRelFrame(), getMaxAnimRelFrame()};
     }
 
-    int getMaxAnimationFrameAsRelFrame() const;
-    int getMinAnimationFrameAsRelFrame() const;
-
-    int getMaxAnimationFrameAsAbsFrame() const;
-    int getMinAnimationFrameAsAbsFrame() const;
+    int getMinAnimAbsFrame() const;
+    int getMaxAnimAbsFrame() const;
 
     void setAnimationFrameDuration(const int frameDuration);
 

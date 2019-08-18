@@ -36,10 +36,11 @@ public:
         Property::drawCanvasControls(canvas, mode, invScale, ctrlPressed);
     }
 
-    void prp_afterChangedAbsRange(const FrameRange &range) {
+    void prp_afterChangedAbsRange(const FrameRange &range,
+                                  const bool clip = true) {
         if(range.inRange(anim_getCurrentAbsFrame()))
             updateBaseValue();
-        GraphAnimator::prp_afterChangedAbsRange(range);
+        GraphAnimator::prp_afterChangedAbsRange(range, clip);
     }
 
     void anim_setAbsFrame(const int frame) {

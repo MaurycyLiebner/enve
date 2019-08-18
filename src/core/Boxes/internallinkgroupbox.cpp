@@ -36,9 +36,9 @@ FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(
         if(isFrameInDurationRect(relFrame)) {
             range *= BoundingBox::prp_getIdenticalRelRange(relFrame);
         } else {
-            if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
+            if(relFrame > mDurationRectangle->getMaxRelFrame()) {
                 range = mDurationRectangle->getRelFrameRangeToTheRight();
-            } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
+            } else if(relFrame < mDurationRectangle->getMinRelFrame()) {
                 range = mDurationRectangle->getRelFrameRangeToTheLeft();
             }
         }

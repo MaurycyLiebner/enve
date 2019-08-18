@@ -28,11 +28,16 @@ public:
     FrameRange prp_relInfluenceRange() const;
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
     int prp_getRelFrameShift() const;
+    void prp_afterChangedAbsRange(const FrameRange &range,
+                                  const bool clip = true) {
+        const auto croppedRange = clip ? prp_absInfluenceRange()*range : range;
+        StaticComplexAnimator::prp_afterChangedAbsRange(croppedRange);
+    }
 
     void writeProperty(QIODevice* const dst) const;
     void readProperty(QIODevice* const src);
 
-    DurationRectangleMovable *anim_getTimelineMovable(
+    TimelineMovable *anim_getTimelineMovable(
             const int relX, const int minViewedFrame,
             const qreal pixelsPerFrame);
     void drawTimelineControls(QPainter * const p,
@@ -87,8 +92,6 @@ public:
     void setZListIndex(const int z) { mZListIndex = z; }
     int getZIndex() const { return mZListIndex; }
 protected:
-    FrameRange getVisibleAbsFrameRange() const;
-
     bool mSelected = false;
     bool mInVisibleRange = true;
     bool mVisible = true;

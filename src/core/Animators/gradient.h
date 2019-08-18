@@ -16,8 +16,8 @@ protected:
 public:
     bool SWT_isGradient() const { return true; }
     void prp_startTransform();
-    void prp_setParentFrameShift(const int shift,
-                                 ComplexAnimator* parentAnimator = nullptr) {
+    void prp_setInheritedFrameShift(const int shift,
+                                    ComplexAnimator* parentAnimator) {
         Q_UNUSED(shift);
         if(!parentAnimator) return;
         for(const auto &key : anim_mKeys) {
@@ -25,11 +25,11 @@ public:
         }
     }
 
-    int prp_getFrameShift() const {
+    int prp_getTotalFrameShift() const {
         return 0;
     }
 
-    int prp_getParentFrameShift() const {
+    int prp_getInheritedFrameShift() const {
         return 0;
     }
 

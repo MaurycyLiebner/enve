@@ -35,9 +35,10 @@ void Property::setupTreeViewMenu(PropertyMenu * const menu) {
     });
 }
 
-void Property::prp_afterChangedAbsRange(const FrameRange &range) {
+void Property::prp_afterChangedAbsRange(const FrameRange &range,
+                                        const bool clip) {
     prp_callUpdater();
-    emit prp_absFrameRangeChanged(range);
+    emit prp_absFrameRangeChanged(range, clip);
 }
 
 void Property::prp_afterWholeInfluenceRangeChanged() {
@@ -48,19 +49,21 @@ const QString &Property::prp_getName() const {
     return prp_mName;
 }
 
-int Property::prp_getFrameShift() const {
-    return prp_getRelFrameShift() + prp_getParentFrameShift();
+int Property::prp_getTotalFrameShift() const {
+    return prp_getRelFrameShift() + prp_getInheritedFrameShift();
 }
 
-int Property::prp_getParentFrameShift() const {
-    return prp_mParentFrameShift;
+int Property::prp_getInheritedFrameShift() const {
+    return prp_mInheritedFrameShift;
 }
 
-void Property::prp_setParentFrameShift(const int shift,
-                                       ComplexAnimator *parentAnimator) {
+void Property::prp_setInheritedFrameShift(const int shift,
+                                          ComplexAnimator *parentAnimator) {
     Q_UNUSED(parentAnimator);
-    prp_mParentFrameShift = shift;
-    prp_afterFrameShiftChanged();
+    const auto oldRange = prp_absInfluenceRange();
+    prp_mInheritedFrameShift = shift;
+    const auto newRange = prp_absInfluenceRange();
+    prp_afterFrameShiftChanged(oldRange, newRange);
 }
 
 QMatrix Property::getTransform() const {
@@ -71,7 +74,7 @@ QMatrix Property::getTransform() const {
 
 FrameRange Property::prp_relRangeToAbsRange(const FrameRange& range) const {
     return {prp_relFrameToAbsFrame(range.fMin),
-                prp_relFrameToAbsFrame(range.fMax)};
+            prp_relFrameToAbsFrame(range.fMax)};
 }
 
 FrameRange Property::prp_absRangeToRelRange(const FrameRange& range) const {
@@ -82,25 +85,25 @@ FrameRange Property::prp_absRangeToRelRange(const FrameRange& range) const {
 int Property::prp_absFrameToRelFrame(const int absFrame) const {
     if(absFrame == FrameRange::EMIN) return FrameRange::EMIN;
     if(absFrame == FrameRange::EMAX) return FrameRange::EMAX;
-    return absFrame - prp_getFrameShift();
+    return absFrame - prp_getTotalFrameShift();
 }
 
 qreal Property::prp_absFrameToRelFrameF(const qreal absFrame) const {
     if(qRound(absFrame) == FrameRange::EMIN) return FrameRange::EMIN;
     if(qRound(absFrame) == FrameRange::EMAX) return FrameRange::EMAX;
-    return absFrame - prp_getFrameShift();
+    return absFrame - prp_getTotalFrameShift();
 }
 
 int Property::prp_relFrameToAbsFrame(const int relFrame) const {
     if(relFrame == FrameRange::EMIN) return FrameRange::EMIN;
     if(relFrame == FrameRange::EMAX) return FrameRange::EMAX;
-    return relFrame + prp_getFrameShift();
+    return relFrame + prp_getTotalFrameShift();
 }
 
 qreal Property::prp_relFrameToAbsFrameF(const qreal relFrame) const {
     if(qRound(relFrame) == FrameRange::EMIN) return FrameRange::EMIN;
     if(qRound(relFrame) == FrameRange::EMAX) return FrameRange::EMAX;
-    return relFrame + prp_getFrameShift();
+    return relFrame + prp_getTotalFrameShift();
 }
 
 void Property::prp_setName(const QString &newName) {

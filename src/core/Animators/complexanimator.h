@@ -42,7 +42,8 @@ public:
     void prp_setTransformed(const bool bT);
     QString prp_getValueText();
 
-    void prp_afterFrameShiftChanged();
+    void prp_afterFrameShiftChanged(const FrameRange& oldAbsRange,
+                                    const FrameRange& newAbsRange);
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
     void anim_saveCurrentValueAsKey();

@@ -77,7 +77,7 @@ void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
     ca_mChildAnimators.insert(id, child);
     child->setParent(this);
     child->prp_setInheritedUpdater(prp_mUpdater);
-    child->prp_setParentFrameShift(prp_getFrameShift());
+    child->prp_setInheritedFrameShift(prp_getTotalFrameShift(), this);
     if(child->drawsOnCanvas() ||
        child->SWT_isComplexAnimator()) {
         updateCanvasProps();
@@ -90,9 +90,9 @@ void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
         const auto childAnimator = static_cast<Animator*>(child.get());
         connect(childAnimator, &Animator::anim_isRecordingChanged,
                 this, &ComplexAnimator::ca_childAnimatorIsRecordingChanged);
-        connect(childAnimator, &Animator::prp_addingKey,
+        connect(childAnimator, &Animator::anim_addingKey,
                 this, &ComplexAnimator::ca_addDescendantsKey);
-        connect(childAnimator, &Animator::prp_removingKey,
+        connect(childAnimator, &Animator::anim_removingKey,
                 this, &ComplexAnimator::ca_removeDescendantsKey);
         childAnimator->anim_addAllKeysToComplexAnimator(this);
         ca_childAnimatorIsRecordingChanged();
@@ -239,10 +239,12 @@ void ComplexAnimator::prp_setTransformed(const bool bT) {
         property->prp_setTransformed(bT);
 }
 
-void ComplexAnimator::prp_afterFrameShiftChanged() {
-    const int thisShift = prp_getFrameShift();
+void ComplexAnimator::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
+                                                 const FrameRange &newAbsRange) {
+    Animator::prp_afterFrameShiftChanged(oldAbsRange, newAbsRange);
+    const int thisShift = prp_getTotalFrameShift();
     for(const auto &property : ca_mChildAnimators)
-        property->prp_setParentFrameShift(thisShift, this);
+        property->prp_setInheritedFrameShift(thisShift, this);
 }
 
 void ComplexAnimator::ca_changeChildAnimatorZ(const int oldIndex,

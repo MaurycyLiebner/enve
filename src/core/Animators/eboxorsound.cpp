@@ -50,14 +50,14 @@ bool eBoxOrSound::isAncestor(const BoundingBox * const box) const {
 
 bool eBoxOrSound::isFrameInDurationRect(const int relFrame) const {
     if(!mDurationRectangle) return true;
-    return relFrame <= mDurationRectangle->getMaxFrameAsRelFrame() &&
-            relFrame >= mDurationRectangle->getMinFrameAsRelFrame();
+    return relFrame <= mDurationRectangle->getMaxRelFrame() &&
+            relFrame >= mDurationRectangle->getMinRelFrame();
 }
 
 bool eBoxOrSound::isFrameFInDurationRect(const qreal relFrame) const {
     if(!mDurationRectangle) return true;
-    return qCeil(relFrame) <= mDurationRectangle->getMaxFrameAsRelFrame() &&
-           qFloor(relFrame) >= mDurationRectangle->getMinFrameAsRelFrame();
+    return qCeil(relFrame) <= mDurationRectangle->getMaxRelFrame() &&
+           qFloor(relFrame) >= mDurationRectangle->getMinRelFrame();
 }
 
 void eBoxOrSound::shiftAll(const int shift) {
@@ -70,8 +70,7 @@ QMimeData *eBoxOrSound::SWT_createMimeData() {
 }
 
 FrameRange eBoxOrSound::prp_relInfluenceRange() const {
-    if(mDurationRectangle)
-        return mDurationRectangle->getAbsFrameRange();
+    if(mDurationRectangle) return mDurationRectangle->getRelFrameRange();
     return ComplexAnimator::prp_relInfluenceRange();
 }
 
@@ -81,11 +80,11 @@ FrameRange eBoxOrSound::prp_getIdenticalRelRange(const int relFrame) const {
         if(mDurationRectangle) {
             const auto dRange = mDurationRectangle->getRelFrameRange();
             if(relFrame > dRange.fMax) {
-                return {mDurationRectangle->getMaxFrameAsRelFrame() + 1,
+                return {mDurationRectangle->getMaxRelFrame() + 1,
                             FrameRange::EMAX};
             } else if(relFrame < dRange.fMin) {
                 return {FrameRange::EMIN,
-                        mDurationRectangle->getMinFrameAsRelFrame() - 1};
+                        mDurationRectangle->getMinRelFrame() - 1};
             } else return cRange*dRange;
         }
         return cRange;
@@ -95,7 +94,7 @@ FrameRange eBoxOrSound::prp_getIdenticalRelRange(const int relFrame) const {
 
 int eBoxOrSound::prp_getRelFrameShift() const {
     if(!mDurationRectangle) return 0;
-    return mDurationRectangle->getFrameShift();
+    return mDurationRectangle->getRelShift();
 }
 
 void eBoxOrSound::writeProperty(QIODevice * const dst) const {
@@ -119,11 +118,11 @@ void eBoxOrSound::readProperty(QIODevice * const src) {
         if(!mDurationRectangle) createDurationRectangle();
         mDurationRectangle->readDurationRectangle(src);
         updateAfterDurationRectangleShifted(0);
-        anim_shiftAllKeys(prp_getFrameShift());
+        anim_shiftAllKeys(prp_getTotalFrameShift());
     }
 }
 
-DurationRectangleMovable *eBoxOrSound::anim_getTimelineMovable(
+TimelineMovable *eBoxOrSound::anim_getTimelineMovable(
         const int relX, const int minViewedFrame,
         const qreal pixelsPerFrame) {
     if(!mDurationRectangle) return nullptr;
@@ -159,8 +158,7 @@ void eBoxOrSound::setDurationRectangle(
     const auto oldDurRect = mDurationRectangle;
     mDurationRectangle = durationRect;
     updateAfterDurationRectangleShifted(0);
-    if(!mDurationRectangle)
-        return shiftAll(oldDurRect->getFrameShift());
+    if(!mDurationRectangle) return shiftAll(oldDurRect->getRelShift());
 
     connect(mDurationRectangle.data(), &DurationRectangle::posChangedBy,
             this, &eBoxOrSound::updateAfterDurationRectangleShifted);
@@ -248,47 +246,39 @@ DurationRectangle *eBoxOrSound::getDurationRectangle() const {
 }
 
 void eBoxOrSound::createDurationRectangle() {
-    const auto durRect = enve::make_shared<DurationRectangle>(this);
+    const auto durRect = enve::make_shared<DurationRectangle>(*this);
 //    durRect->setMinFrame(0);
 //    if(mParentScene) durRect->setFramesDuration(mParentScene->getFrameCount());
-    durRect->setMinFrame(anim_getCurrentRelFrame() - 5);
+    durRect->setMinRelFrame(anim_getCurrentRelFrame() - 5);
     durRect->setFramesDuration(10);
     setDurationRectangle(durRect);
 }
 
 
 void eBoxOrSound::updateAfterDurationRectangleShifted(const int dFrame) {
-    prp_afterFrameShiftChanged();
-    const auto newRange = getVisibleAbsFrameRange();
+    const auto newRange = prp_absInfluenceRange();
     const auto oldRange = newRange.shifted(-dFrame);
-    Animator::prp_afterChangedAbsRange(newRange + oldRange);
-    const int absFrame = anim_getCurrentAbsFrame();
-    anim_setAbsFrame(absFrame);
+    prp_afterFrameShiftChanged(oldRange, newRange);
 }
 
 void eBoxOrSound::updateAfterDurationMinFrameChangedBy(const int by) {
-    const auto newRange = getVisibleAbsFrameRange();
+    const auto newRange = prp_absInfluenceRange();
     const int newMin = newRange.fMin;
     const int oldMin = newRange.fMin - by;
 
     const int min = qMin(newMin, oldMin);
     const int max = qMax(newMin, oldMin);
-    Animator::prp_afterChangedAbsRange({min, max});
+    prp_afterChangedAbsRange({min, max}, false);
 }
 
 void eBoxOrSound::updateAfterDurationMaxFrameChangedBy(const int by) {
-    const auto newRange = getVisibleAbsFrameRange();
+    const auto newRange = prp_absInfluenceRange();
     const int newMax = newRange.fMax;
     const int oldMax = newRange.fMax - by;
 
     const int min = qMin(newMax, oldMax);
     const int max = qMax(newMax, oldMax);
-    Animator::prp_afterChangedAbsRange({min, max});
-}
-
-FrameRange eBoxOrSound::getVisibleAbsFrameRange() const {
-    if(!mDurationRectangle) return {FrameRange::EMIN, FrameRange::EMAX};
-    return mDurationRectangle->getAbsFrameRange();
+    prp_afterChangedAbsRange({min, max}, false);
 }
 
 void eBoxOrSound::setSelected(const bool select) {

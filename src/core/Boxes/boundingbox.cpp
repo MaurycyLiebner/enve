@@ -94,10 +94,9 @@ BoundingBox *BoundingBox::sGetBoxByDocumentId(const int documentId) {
     return nullptr;
 }
 
-void BoundingBox::prp_afterChangedAbsRange(const FrameRange &range) {
-    const auto visRange = getVisibleAbsFrameRange();
-    const auto croppedRange = visRange*range;
-    Animator::prp_afterChangedAbsRange(croppedRange);
+void BoundingBox::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) {
+    const auto croppedRange = clip ? prp_absInfluenceRange()*range : range;
+    StaticComplexAnimator::prp_afterChangedAbsRange(croppedRange, clip);
     if(croppedRange.inRange(anim_getCurrentAbsFrame())) {
         planScheduleUpdate(UpdateReason::userChange);
     }
@@ -813,9 +812,9 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
 
             range *= mDurationRectangle->getRelFrameRange();
         } else {
-            if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
+            if(relFrame > mDurationRectangle->getMaxRelFrame()) {
                 return mDurationRectangle->getAbsFrameRangeToTheRight();
-            } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
+            } else if(relFrame < mDurationRectangle->getMinRelFrame()) {
                 return mDurationRectangle->getAbsFrameRangeToTheLeft();
             }
         }

@@ -29,8 +29,9 @@ public:
 
     bool SWT_isGraphAnimator() const { return true; }
 
-    void prp_afterChangedAbsRange(const FrameRange& range) {
-        Animator::prp_afterChangedAbsRange(range);
+    void prp_afterChangedAbsRange(const FrameRange& range,
+                                  const bool clip = true) {
+        Animator::prp_afterChangedAbsRange(range, clip);
         graph_updateKeysPath(prp_absRangeToRelRange(range));
     }
     void graph_constrainCtrlsFrameValues();

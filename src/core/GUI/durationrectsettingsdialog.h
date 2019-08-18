@@ -10,47 +10,42 @@ class QVBoxLayout;
 class TwoColumnLayout;
 
 class DurationRectSettingsDialog : public QDialog {
-    Q_OBJECT
 public:
-    DurationRectSettingsDialog(const DurationRectangle::Type &type,
-                               const int minFrame,
-                               const int maxFrame,
-                               const int firstAnimationFrame,
-                               QWidget *parent = nullptr);
-    DurationRectSettingsDialog(const DurationRectangle::Type &type,
+    DurationRectSettingsDialog(const int shift,
                                const int minFrame,
                                const int maxFrame,
                                QWidget *parent = nullptr);
 
-    int getMinFrame() {
+    int getMinFrame() const {
         return mMinFrameSpinBox->value();
     }
 
-    int getMaxFrame() {
+    int getMaxFrame() const {
         return mMaxFrameSpinBox->value();
     }
 
-    int getFirstAnimationFrame() {
-        if(!mFirstAnimationFrameSpinBox) return 0;
-        return mFirstAnimationFrameSpinBox->value();
+    int getShift() const {
+        return mShiftSpinBox->value();
     }
 protected:
-    DurationRectangle::Type mType;
     QVBoxLayout *mMainLayout;
     TwoColumnLayout *mTwoColumnLayout;
+
+    QLabel *mShiftLabel;
+    QSpinBox *mShiftSpinBox;
+
     QLabel *mMinFrameLabel;
     QSpinBox *mMinFrameSpinBox;
+
     QLabel *mMaxFrameLabel;
     QSpinBox *mMaxFrameSpinBox;
+
     QLabel *mFirstAnimationFrameLabel;
     QSpinBox *mFirstAnimationFrameSpinBox = nullptr;
 
     QHBoxLayout *mButtonsLayout;
     QPushButton *mOkButton;
     QPushButton *mCancelButton;
-protected slots:
-    void setMaxFrameSpinBoxMinFrame(const int frame);
-    void setMinFrameSpinBoxMaxFrame(const int frame);
 };
 
 #endif // DURATIONRECTSETTINGSDIALOG_H

@@ -179,9 +179,9 @@ bool Document::removeGradient(const int id) {
 
 void Document::clear() {
     const int nScenes = fScenes.count();
-    for(int i = 0; i < nScenes; i++)
-        removeScene(0);
+    for(int i = 0; i < nScenes; i++) removeScene(0);
     replaceClipboard(nullptr);
+    fGradients.clear();
 }
 
 void Document::SWT_setupAbstraction(SWT_Abstraction * const abstraction,

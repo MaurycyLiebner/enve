@@ -360,20 +360,18 @@ FrameRange Canvas::prp_getIdenticalRelRange(const int relFrame) const {
 
 void Canvas::renderDataFinished(BoxRenderData *renderData) {
     if(renderData->fBoxStateId < mLastStateId) return;
+    const int relFrame = qRound(renderData->fRelFrame);
     mLastStateId = renderData->fBoxStateId;
-    const auto range = prp_getIdenticalRelRange(renderData->fRelFrame);
-    auto cont = mCacheHandler.atFrame<ImageCacheContainer>(range.fMin);
-    if(cont) {
-        cont->replaceImageSk(renderData->fRenderedImage);
-        cont->setRange(range);
-    } else {
-        const auto sCont = enve::make_shared<ImageCacheContainer>(
-                    renderData->fRenderedImage, range, &mCacheHandler);
-        mCacheHandler.add(sCont);
-        cont = sCont.get();
-    }
+    const bool currentState = renderData->fBoxStateId == mStateId;
+
+    const auto range = prp_getIdenticalRelRange(relFrame);
+    const auto cont = enve::make_shared<ImageCacheContainer>(
+                renderData->fRenderedImage, range,
+                currentState ? &mCacheHandler : nullptr);
+    if(currentState) mCacheHandler.add(cont);
+
     if((mPreviewing || mRenderingOutput) &&
-       mCurrRenderRange.inRange(renderData->fRelFrame)) {
+       mCurrRenderRange.inRange(relFrame)) {
         cont->setBlocked(true);
     } else {
         auto currentRenderData = mDrawRenderContainer.getSrcRenderData();
@@ -381,31 +379,27 @@ void Canvas::renderDataFinished(BoxRenderData *renderData) {
         bool closerFrame = true;
         if(currentRenderData) {
             newerSate = currentRenderData->fBoxStateId < renderData->fBoxStateId;
-            const int finishedFrameDist =
-                    qAbs(anim_getCurrentRelFrame() - renderData->fRelFrame);
-            const int oldFrameDist =
-                    qAbs(anim_getCurrentRelFrame() - currentRenderData->fRelFrame);
+            const int finishedFrameDist = qAbs(anim_getCurrentRelFrame() -
+                                               relFrame);
+            const int oldFrameDist = qAbs(anim_getCurrentRelFrame() -
+                                          qRound(currentRenderData->fRelFrame));
             closerFrame = finishedFrameDist < oldFrameDist;
         }
         if(newerSate || closerFrame) {
             mDrawRenderContainer.setSrcRenderData(renderData);
-            const bool currentState =
-                    renderData->fBoxStateId == mStateId;
-            const bool currentFrame =
-                    renderData->fRelFrame == anim_getCurrentRelFrame();
+            const bool currentFrame = relFrame == anim_getCurrentRelFrame();
             const bool outdated = !currentState || !currentFrame;
             mDrawRenderContainer.setExpired(outdated);
             mCurrentPreviewContainerOutdated = outdated;
-            setCurrentPreviewContainer(cont->ref<ImageCacheContainer>());
-        } else if(mRenderingPreview &&
-                  mCurrRenderRange.inRange(renderData->fRelFrame)) {
+            setCurrentPreviewContainer(cont);
+        } else if(mRenderingPreview && mCurrRenderRange.inRange(relFrame)) {
             cont->setBlocked(true);
         }
     }
 }
 
-void Canvas::prp_afterChangedAbsRange(const FrameRange &range) {
-    Property::prp_afterChangedAbsRange(range);
+void Canvas::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) {
+    Property::prp_afterChangedAbsRange(range, clip);
     const int minId = prp_getIdenticalRelRange(range.fMin).fMin;
     const int maxId = prp_getIdenticalRelRange(range.fMax).fMax;
     mCacheHandler.remove({minId, maxId});

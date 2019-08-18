@@ -13,7 +13,7 @@ AnimationBox::AnimationBox(const eBoxType type) : BoundingBox(type) {
 
     prp_setName("Animation");
 
-    setDurationRectangle(enve::make_shared<FixedLenAnimationRect>(this));
+    setDurationRectangle(enve::make_shared<FixedLenAnimationRect>(*this));
     mDurationRectangleLocked = true;
 
     mFrameAnimator = enve::make_shared<IntAnimator>("frame");
@@ -60,7 +60,7 @@ bool AnimationBox::shouldScheduleUpdate() {
 int AnimationBox::getAnimationFrameForRelFrame(const qreal relFrame) {
     const int lastFrameId = mSrcFramesCache->getFrameCount() - 1;
     const int animStartRelFrame =
-                getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
+                getAnimationDurationRect()->getMinAnimRelFrame();
     int pixId;
     if(mFrameRemappingEnabled) {
         pixId = mFrameAnimator->getBaseIntValue(relFrame);
@@ -84,7 +84,7 @@ void AnimationBox::enableFrameRemappingAction() {
     const int frameCount = mSrcFramesCache->getFrameCount();
     mFrameAnimator->setIntValueRange(0, frameCount - 1);
     const int animStartRelFrame =
-                getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
+                getAnimationDurationRect()->getMinAnimRelFrame();
     if(frameCount > 1) {
         const auto firstFrameKey = enve::make_shared<QrealKey>(0, animStartRelFrame,
                                                         mFrameAnimator.get());
@@ -140,7 +140,7 @@ void AnimationBox::anim_setAbsFrame(const int frame) {
 FrameRange AnimationBox::prp_getIdenticalRelRange(const int relFrame) const {
     if(isVisibleAndInDurationRect(relFrame) && !mFrameRemappingEnabled) {
         const auto animDur = getAnimationDurationRect();
-        const auto animRange = animDur->getAnimationRange();
+        const auto animRange = animDur->getAnimRelRange();
         if(animRange.inRange(relFrame))
             return {relFrame, relFrame};
         else if(relFrame > animRange.fMax) {

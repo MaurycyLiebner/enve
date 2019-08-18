@@ -7,7 +7,7 @@
 #include "framerange.h"
 
 class BoxSingleWidget;
-class DurationRectangleMovable;
+class TimelineMovable;
 class Key;
 class KeysView;
 class Canvas;
@@ -35,7 +35,7 @@ public:
     void scrollUp();
     void scrollDown();
 
-    DurationRectangleMovable *getRectangleMovableAtPos(
+    TimelineMovable *getRectangleMovableAtPos(
                                         const int pressX,
                                         const int pressY,
                                         const qreal pixelsPerFrame,

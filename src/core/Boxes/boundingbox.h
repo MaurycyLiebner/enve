@@ -15,7 +15,7 @@ class QrealAction;
 class MovablePoint;
 
 class PathEffect;
-class DurationRectangleMovable;
+class TimelineMovable;
 class FillSettingsAnimator;
 class OutlineSettingsAnimator;
 class PaintSettingsApplier;
@@ -205,7 +205,8 @@ public:
     bool SWT_dropSupport(const QMimeData* const data);
     bool SWT_drop(const QMimeData* const data);
 
-    void prp_afterChangedAbsRange(const FrameRange &range);
+    void prp_afterChangedAbsRange(const FrameRange &range,
+                                  const bool clip = true);
     void drawAllCanvasControls(SkCanvas * const canvas,
                                const CanvasMode mode,
                                const float invScale,

@@ -48,7 +48,8 @@ public:
     FrameRange getFirstAndLastIdenticalForMotionBlur(
             const int relFrame, const bool takeAncestorsIntoAccount = true);
 
-    void prp_afterFrameShiftChanged();
+    void prp_afterFrameShiftChanged(const FrameRange& oldAbsRange,
+                                    const FrameRange& newAbsRange);
     void shiftAll(const int shift);
 
     void addPathEffect(const qsptr<PathEffect>& effect);

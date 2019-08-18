@@ -51,7 +51,7 @@ void BoxScroller::drawKeys(QPainter * const p,
     for(const auto& container : mSingleWidgets) {
         const auto bsw = static_cast<BoxSingleWidget*>(container);
         p->save();
-        bsw->drawKeys(p, pixelsPerFrame, viewedFrameRange);
+        bsw->drawTimelineControls(p, pixelsPerFrame, viewedFrameRange);
         p->restore();
         p->translate(0, container->height());
     }
@@ -74,7 +74,7 @@ Key *BoxScroller::getKeyAtPos(const int pressX, const int pressY,
     return nullptr;
 }
 
-DurationRectangleMovable *BoxScroller::getRectangleMovableAtPos(
+TimelineMovable *BoxScroller::getRectangleMovableAtPos(
         const int pressX,
         const int pressY,
         const qreal pixelsPerFrame,

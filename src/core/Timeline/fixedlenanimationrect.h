@@ -4,35 +4,31 @@
 
 class FixedLenAnimationRect : public AnimationRect {
 public:
-    FixedLenAnimationRect(Property *childProp) : AnimationRect(childProp) {
-        mType = FIXED_LEN_ANIMATION_LEN;
-    }
+    FixedLenAnimationRect(Property& parentProp) :
+        AnimationRect(parentProp) {}
 
-    int getMinAnimationFrame() const;
-    int getMaxAnimationFrame() const;
+    int getMinAnimRelFrame() const;
+    int getMaxAnimRelFrame() const;
 
-    void changeFramePosBy(const int change);
     void writeDurationRectangle(QIODevice *target);
     void readDurationRectangle(QIODevice *target);
 
-    void openDurationSettingsDialog(QWidget *parent = nullptr);
-
     void setFirstAnimationFrame(const int minAnimationFrame) {
         const int animDur = mMaxAnimationFrame - mMinAnimationFrame;
-        setMinAnimationFrame(minAnimationFrame);
-        setMaxAnimationFrame(minAnimationFrame + animDur);
+        setMinAnimRelFrame(minAnimationFrame);
+        setMaxAnimRelFrame(minAnimationFrame + animDur);
     }
 
     void bindToAnimationFrameRange();
     void setBindToAnimationFrameRange();
 protected:
-    void setMinAnimationFrame(const int minAnimationFrame);
-    void setMaxAnimationFrame(const int maxAnimationFrame);
+    void setMinAnimRelFrame(const int min);
+    void setMaxAnimRelFrame(const int max);
 
     bool mBoundToAnimation = false;
     bool mSetMaxFrameAtLeastOnce = false;
     int mMinAnimationFrame = 0;
-    int mMaxAnimationFrame = 100;
+    int mMaxAnimationFrame = 0;
 };
 
 #endif // FIXEDLENANIMATIONRECT_H

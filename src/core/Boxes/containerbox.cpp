@@ -296,11 +296,12 @@ void ContainerBox::updateAllBoxes(const UpdateReason reason) {
     planScheduleUpdate(reason);
 }
 
-void ContainerBox::prp_afterFrameShiftChanged() {
-    ComplexAnimator::prp_afterFrameShiftChanged();
-    const int thisShift = prp_getFrameShift();
+void ContainerBox::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
+                                              const FrameRange &newAbsRange) {
+    ComplexAnimator::prp_afterFrameShiftChanged(oldAbsRange, newAbsRange);
+    const int thisShift = prp_getTotalFrameShift();
     for(const auto &child : mContainedBoxes)
-        child->prp_setParentFrameShift(thisShift, this);
+        child->prp_setInheritedFrameShift(thisShift, this);
 }
 
 void ContainerBox::shiftAll(const int shift) {
@@ -371,9 +372,9 @@ FrameRange ContainerBox::getFirstAndLastIdenticalForMotionBlur(
                 range *= mDurationRectangle->getRelFrameRange();
             }
         } else {
-            if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
+            if(relFrame > mDurationRectangle->getMaxRelFrame()) {
                 range = mDurationRectangle->getRelFrameRangeToTheRight();
-            } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
+            } else if(relFrame < mDurationRectangle->getMinRelFrame()) {
                 range = mDurationRectangle->getRelFrameRangeToTheLeft();
             }
         }
@@ -652,22 +653,21 @@ void ContainerBox::insertContained(const int id,
     auto& connCtx = mContained.insertObj(id, child);
     updateContainedBoxes();
     child->setParentGroup(this);
-    connCtx << connect(child.data(), &Property::prp_absFrameRangeChanged,
-                       this, &Property::prp_afterChangedAbsRange);
+
     updateContainedIds(id);
-
     SWT_addChildAt(child.get(), containedIdToAbstractionId(id));
-    child->anim_setAbsFrame(anim_getCurrentAbsFrame());
-
-    child->prp_afterWholeInfluenceRangeChanged();
 
     if(child->SWT_isBoundingBox()) {
+        connCtx << connect(child.data(), &Property::prp_absFrameRangeChanged,
+                           this, &Property::prp_afterChangedAbsRange);
         const auto cBox = static_cast<BoundingBox*>(child.get());
         for(const auto& box : mLinkingBoxes) {
             const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
             internalLinkGroup->insertContained(id, cBox->createLinkForLinkGroup());
         }
     }
+    child->anim_setAbsFrame(anim_getCurrentAbsFrame());
+    child->prp_afterWholeInfluenceRangeChanged();
 }
 
 void ContainerBox::updateContainedIds(const int firstId) {

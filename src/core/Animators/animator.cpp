@@ -63,9 +63,9 @@ int Animator::anim_getNextKeyRelFrame(const int relFrame) const {
     return nextKey->getRelFrame();
 }
 
-void Animator::prp_afterChangedAbsRange(const FrameRange &range) {
+void Animator::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) {
     if(range.inRange(anim_mCurrentAbsFrame)) prp_callUpdater();
-    emit prp_absFrameRangeChanged(range);
+    emit prp_absFrameRangeChanged(range, clip);
 }
 
 void Animator::anim_updateAfterChangedKey(Key * const key) {
@@ -84,12 +84,11 @@ void Animator::anim_updateAfterChangedKey(Key * const key) {
 void Animator::anim_setAbsFrame(const int frame) {
     anim_mCurrentAbsFrame = frame;
     anim_updateRelFrame();
-    anim_updateKeyOnCurrrentFrame();
-    //anim_callFrameChangeUpdater();
 }
 
 void Animator::anim_updateRelFrame() {
-    anim_mCurrentRelFrame = anim_mCurrentAbsFrame - prp_getFrameShift();
+    anim_mCurrentRelFrame = anim_mCurrentAbsFrame - prp_getTotalFrameShift();
+    anim_updateKeyOnCurrrentFrame();
 }
 
 void Animator::anim_setRecording(const bool rec) {
@@ -223,8 +222,8 @@ void Animator::anim_callFrameChangeUpdater() {
 
 void Animator::anim_updateAfterShifted() {
     for(const auto &key : anim_mKeys) {
-        emit prp_removingKey(key);
-        emit prp_addingKey(key);
+        emit anim_removingKey(key);
+        emit anim_addingKey(key);
     }
 }
 
@@ -232,7 +231,7 @@ void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
     const bool isComplex = SWT_isComplexAnimator();
     if(!isComplex) anim_setRecordingValue(true);
     anim_mKeys.add(newKey);
-    emit prp_addingKey(newKey.get());
+    emit anim_addingKey(newKey.get());
     if(newKey->getRelFrame() == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(newKey.get());
     if(!isComplex) anim_updateAfterChangedKey(newKey.get());
@@ -250,7 +249,7 @@ void Animator::removeKeyWithoutDeselecting(const stdsptr<Key>& keyToRemove) {
 
     const int rFrame = keyPtr->getRelFrame();
 
-    emit prp_removingKey(keyPtr);
+    emit anim_removingKey(keyPtr);
     if(rFrame == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(nullptr);
 
@@ -274,11 +273,11 @@ void Animator::anim_moveKeyToRelFrame(Key * const key, const int newFrame) {
 }
 
 void Animator::anim_updateKeyOnCurrrentFrame() {
-    const auto key = anim_getKeyAtAbsFrame(anim_mCurrentAbsFrame);
+    const auto key = anim_getKeyAtRelFrame(anim_mCurrentRelFrame);
     anim_setKeyOnCurrentFrame(key);
 }
 
-DurationRectangleMovable *Animator::anim_getTimelineMovable(
+TimelineMovable *Animator::anim_getTimelineMovable(
         const int relX, const int minViewedFrame, const qreal pixelsPerFrame) {
     Q_UNUSED(relX);
     Q_UNUSED(minViewedFrame);
@@ -287,21 +286,18 @@ DurationRectangleMovable *Animator::anim_getTimelineMovable(
 }
 
 Key *Animator::anim_getKeyAtPos(const qreal relX,
-                               const int minViewedFrame,
-                               const qreal pixelsPerFrame,
-                               const int keyRectSize) {
-    const qreal relFrame = relX/pixelsPerFrame - 0.5 - prp_getFrameShift();
+                                const int minViewedFrame,
+                                const qreal pixelsPerFrame,
+                                const int keyRectSize) {
+    const qreal timelineRelFrame = relX/pixelsPerFrame - 0.5;
     const qreal absX = relX + minViewedFrame*pixelsPerFrame;
-    const qreal absFrame = relFrame + minViewedFrame;
+    const qreal absFrame = timelineRelFrame + minViewedFrame;
     qreal keySize = keyRectSize;
-    if(SWT_isComplexAnimator()) {
-        keySize *= 0.75;
-    }
+    if(SWT_isComplexAnimator()) keySize *= 0.75;
     if(pixelsPerFrame > keySize) {
-        int relFrameInt = qRound(relFrame);
-        const qreal distToFrame =
-                qAbs((relFrameInt + 0.5)*pixelsPerFrame - relX);
-        if(2*distToFrame > keySize) return nullptr;
+        const int relFrameInt = qRound(timelineRelFrame);
+        const qreal distToFrame = (relFrameInt + 0.5)*pixelsPerFrame - relX;
+        if(qAbs(2*distToFrame) > keySize) return nullptr;
     }
     //if(pressFrame < 0) pressFrame -= 1.;
     const qreal keyRectFramesSpan = 0.5*keySize/pixelsPerFrame;
@@ -467,7 +463,7 @@ void Animator::drawTimelineControls(QPainter * const p,
                                     const qreal pixelsPerFrame,
                                     const FrameRange &absFrameRange,
                                     const int rowHeight) {
-    p->translate(prp_getFrameShift()*pixelsPerFrame, 0);
+    p->translate(prp_getTotalFrameShift()*pixelsPerFrame, 0);
     const auto relRange = prp_absRangeToRelRange(absFrameRange);
     const auto idRange = frameRangeToKeyIdRange(relRange);
     for(int i = idRange.fMin; i <= idRange.fMax; i++) {
@@ -493,6 +489,12 @@ void Animator::setupTreeViewMenu(PropertyMenu * const menu) {
         animTarget->anim_deleteCurrentKey();
     };
     menu->addPlainAction("Delete Key", dOp)->setEnabled(anim_getKeyOnCurrentFrame());
+}
+
+void Animator::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
+                                          const FrameRange &newAbsRange) {
+    anim_updateRelFrame();
+    Property::prp_afterFrameShiftChanged(oldAbsRange, newAbsRange);
 }
 
 bool Animator::hasSelectedKeys() const {

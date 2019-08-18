@@ -18,7 +18,7 @@ SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
         updateDurationRectLength();
     });
     if(mOwnDurationRectangle) {
-        const auto flaRect = enve::make_shared<FixedLenAnimationRect>(this);
+        const auto flaRect = enve::make_shared<FixedLenAnimationRect>(*this);
         flaRect->setBindToAnimationFrameRange();
         setDurationRectangle(flaRect);
     } else setDurationRectangle(durRect);
@@ -69,7 +69,7 @@ stdsptr<Samples> SingleSound::getSamplesForSecond(const int relSecondId) {
 
 int SingleSound::getSampleShift() const{
     const qreal fps = getCanvasFPS();
-    return qRound(prp_getFrameShift()*(SOUND_SAMPLERATE/fps));
+    return qRound(prp_getTotalFrameShift()*(SOUND_SAMPLERATE/fps));
 }
 
 SampleRange SingleSound::relSampleRange() const {
@@ -141,7 +141,7 @@ QrealSnapshot SingleSound::getVolumeSnap() const {
 }
 
 void SingleSound::updateDurationRectLength() {
-    if(mOwnDurationRectangle) {
+    if(mOwnDurationRectangle && mCacheHandler && mParentScene) {
         const int secs = mCacheHandler ? mCacheHandler->durationSec() : 0;
         const qreal fps = getCanvasFPS();
         const int frames = qCeil(qAbs(secs*fps*mStretch));
@@ -179,8 +179,7 @@ void SingleSound::setSoundDataHandler(SoundDataHandler* const newDataHandler) {
 }
 
 int SingleSound::prp_getRelFrameShift() const {
-    if(mOwnDurationRectangle)
-        return mDurationRectangle->getFrameShift();
+    if(mOwnDurationRectangle) return eBoxOrSound::prp_getRelFrameShift();
     return 0;
 }
 

@@ -21,7 +21,7 @@ class Canvas;
 class MainWindow;
 class BoxScroller;
 class AnimationDockWidget;
-class DurationRectangleMovable;
+class TimelineMovable;
 class KeysClipboard;
 class Animator;
 #include "GUI/valueinput.h"
@@ -142,7 +142,7 @@ private:
 
     void updateHovered(const QPoint &posU);
 
-    QPointer<DurationRectangleMovable> mHoveredMovable;
+    QPointer<TimelineMovable> mHoveredMovable;
     stdptr<Key> mHoveredKey;
 
     void grabMouseAndTrack() {
@@ -168,7 +168,7 @@ private:
 
     bool mGraphUpdateAfterKeysChangedNeeded = false;
 
-    QPointer<DurationRectangleMovable> mLastPressedMovable;
+    QPointer<TimelineMovable> mLastPressedMovable;
     Key *mLastPressedKey = nullptr;
     bool mFirstMove = false;
     int mMoveDFrame = 0;
@@ -176,6 +176,7 @@ private:
     bool mMovingKeys = false;
     bool mScalingKeys = false;
     bool mMovingRect = false;
+    bool mMoveAllSelected = false;
     bool mPressedCtrlPoint = false;
 
     Canvas* mCurrentScene = nullptr;

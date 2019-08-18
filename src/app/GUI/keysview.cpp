@@ -137,6 +137,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                     mSelectionRect.setTopLeft(xFramePos);
                     mSelectionRect.setBottomRight(xFramePos);
                 } else {
+                    mLastPressedMovable->pressed(e->modifiers() & Qt::SHIFT);
                     mMovingRect = true;
                 }
             } else {
@@ -579,13 +580,12 @@ void KeysView::handleMouseMove(const QPoint &pos,
             } else if(mMovingRect) {
                 if(mFirstMove) {
                     if(mLastPressedMovable) {
-                        if(!mLastPressedMovable->isSelected()) {
-                            mLastPressedMovable->pressed(
-                                        QApplication::keyboardModifiers() & Qt::SHIFT);
-                        }
-
-                        const auto childProp = mLastPressedMovable->getChildProperty();
-                        if(childProp->SWT_isBoundingBox()) {
+                        const auto childProp = mLastPressedMovable->getParentProperty();
+                        const bool shiftPressed = QApplication::keyboardModifiers() & Qt::SHIFT;
+                        mMoveAllSelected = shiftPressed &&
+                                (childProp->SWT_isBoundingBox() ||
+                                 childProp->SWT_isSingleSound());
+                        if(mMoveAllSelected) {
                             if(mLastPressedMovable->isDurationRect()) {
                                 mCurrentScene->startDurationRectPosTransformForAllSelected();
                             } else if(mLastPressedMovable->isMaxFrame()) {
@@ -593,6 +593,8 @@ void KeysView::handleMouseMove(const QPoint &pos,
                             } else if(mLastPressedMovable->isMinFrame()) {
                                 mCurrentScene->startMinFramePosTransformForAllSelected();
                             }
+                            const auto ebs = static_cast<eBoxOrSound*>(childProp);
+                            if(!ebs->isSelected()) mLastPressedMovable->startPosTransform();
                         } else {
                             mLastPressedMovable->startPosTransform();
                         }
@@ -602,8 +604,8 @@ void KeysView::handleMouseMove(const QPoint &pos,
                 if(dDFrame != 0) {
                     mMoveDFrame = dFrame;
                     if(mLastPressedMovable) {
-                        const auto childProp = mLastPressedMovable->getChildProperty();
-                        if(childProp->SWT_isBoundingBox()) {
+                        const auto childProp = mLastPressedMovable->getParentProperty();
+                        if(mMoveAllSelected) {
                             if(mLastPressedMovable->isDurationRect()) {
                                 mCurrentScene->moveDurationRectForAllSelected(dDFrame);
                             } else if(mLastPressedMovable->isMaxFrame()) {
@@ -611,6 +613,8 @@ void KeysView::handleMouseMove(const QPoint &pos,
                             } else if(mLastPressedMovable->isMinFrame()) {
                                 mCurrentScene->moveMinFrameForAllSelected(dDFrame);
                             }
+                            const auto ebs = static_cast<eBoxOrSound*>(childProp);
+                            if(!ebs->isSelected()) mLastPressedMovable->changeFramePosBy(dDFrame);
                         } else {
                             mLastPressedMovable->changeFramePosBy(dDFrame);
                         }
@@ -625,10 +629,9 @@ void KeysView::handleMouseMove(const QPoint &pos,
                     graphGetValueAndFrameFromPos(posU, value, frame);
                     mSelectionRect.setBottomRight({frame, value});
                 } else {
-                    const qreal posUXFrame = posU.x()/mPixelsPerFrame +
-                            mMinViewedFrame;
-                    mSelectionRect.setBottomRight(
-                                QPointF(posUXFrame, posU.y() + mViewedTop));
+                    const qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
+                    const QPointF br(posUXFrame, posU.y() + mViewedTop);
+                    mSelectionRect.setBottomRight(br);
                 }
             }
             mFirstMove = false;
@@ -711,14 +714,11 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                 mScalingKeys = false;
             } else if(mMovingRect) {
                 if(mFirstMove) {
-                    if(mLastPressedMovable) {
-                        mLastPressedMovable->pressed(e->modifiers() & Qt::SHIFT);
-                    }
                 } else {
                     mMoveDFrame = 0;
                     mMovingRect = false;
-                    const auto childProp = mLastPressedMovable->getChildProperty();
-                    if(childProp->SWT_isBoundingBox()) {
+                    const auto childProp = mLastPressedMovable->getParentProperty();
+                    if(mMoveAllSelected) {
                         if(mLastPressedMovable->isDurationRect()) {
                             mCurrentScene->finishDurationRectPosTransformForAllSelected();
                         } else if(mLastPressedMovable->isMinFrame()) {
@@ -726,6 +726,8 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                         } else if(mLastPressedMovable->isMaxFrame()) {
                             mCurrentScene->finishMaxFramePosTransformForAllSelected();
                         }
+                        const auto ebs = static_cast<eBoxOrSound*>(childProp);
+                        if(!ebs->isSelected()) mLastPressedMovable->finishPosTransform();
                     } else {
                         mLastPressedMovable->finishPosTransform();
                     }

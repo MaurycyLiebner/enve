@@ -5,100 +5,105 @@
 #include <QObject>
 #include "smartPointers/ememory.h"
 #include "framerange.h"
+#include "Properties/property.h"
 class Property;
 class HDDCachableCacheHandler;
 
-class DurationRectangleMovable : public SelfRef {
+class TimelineMovable : public SelfRef {
     Q_OBJECT
 public:
     enum Type {
         MIN_FRAME,
         MAX_FRAME,
-        DURATION_RECT,
-        VARYING_LEN_ANIMATION_RECT,
-        FIXED_LEN_ANIMATION_LEN,
-        NOT_SPECIFIED
+        DURATION_RECT
     };
-    DurationRectangleMovable(const Type type);
-    DurationRectangleMovable() {}
+    TimelineMovable(const Type type, Property& parentProp);
 
-    void setFramePos(const int framePos);
+    virtual void pressed(const bool shiftPressed) {
+        Q_UNUSED(shiftPressed);
+    }
 
-    int getFramePos() const;
+    virtual Qt::CursorShape getHoverCursorShape() {
+        return Qt::ArrowCursor;
+    }
 
-    virtual DurationRectangleMovable *getMovableAt(
-                      const int pressX,
-                      const qreal pixelsPerFrame,
-                      const int minViewedFrame);
+    virtual TimelineMovable *getMovableAt(
+            const int pressX, const qreal pixelsPerFrame,
+            const int minViewedFrame);
 
-    virtual void changeFramePosBy(const int change);
+    void setValue(const int value);
+    int getValue() const;
 
-    void changeFramePosByWithoutSignal(const int change);
+    void changeFramePosBy(const int change);
 
     void setHovered(const bool hovered);
     bool isHovered();
-    virtual Qt::CursorShape getHoverCursorShape() {
-        return Qt::SplitHCursor;
-    }
-
-    void pressed(const bool shiftPressed);
-
-    void setChildProperty(Property * const childProp) {
-        mChildProperty = childProp;
-    }
 
     void startPosTransform() {}
     void finishPosTransform() {}
 
-    bool isSelected();
+    bool isDurationRect() { return mType == DURATION_RECT; }
+    bool isMinFrame() { return mType == MIN_FRAME; }
+    bool isMaxFrame() { return mType == MAX_FRAME; }
 
-    bool isDurationRect() {
-        return mType == DURATION_RECT ||
-               mType == VARYING_LEN_ANIMATION_RECT ||
-               mType == FIXED_LEN_ANIMATION_LEN;
-    }
-    bool isMinFrame() {
-        return mType == MIN_FRAME;
-    }
+    Property* getParentProperty() const { return &mParentProperty; }
 
-    bool isMaxFrame() {
-        return mType == MAX_FRAME;
+    void setClamp(const int min, const int max) {
+        setClampMin(min);
+        setClampMax(max);
     }
 
-    void setType(const Type type) {
-        mType = type;
-    }
-
-    const Type &getType() {
-        return mType;
-    }
-
-    Property * getChildProperty() {
-        return mChildProperty;
-    }
-
-    void setMinPos(const int minPos);
-    void setMaxPos(const int maxPos);
+    void setClampMin(const int min);
+    void setClampMax(const int max);
 signals:
     void posChangedBy(int);
     void posChanged(int);
     void finishedTransform();
 protected:
+    const Type mType;
+    Property& mParentProperty;
+
     bool mHovered = false;
-    Type mType = NOT_SPECIFIED;
-    int mMinPos = 0;
-    int mMaxPos = 0;
-    int mFramePos = 0;
-    Property *mChildProperty = nullptr;
+    int mClampMin = 0;
+    int mClampMax = 0;
+    int mValue = 0;
 };
 
-class DurationRectangle : public DurationRectangleMovable {
+class DurationMinMax : public TimelineMovable {
+public:
+    DurationMinMax(const Type type, Property& parentProp) :
+        TimelineMovable(type, parentProp) {}
+
+    Qt::CursorShape getHoverCursorShape() {
+        return Qt::SplitHCursor;
+    }
+
+    void setRelFrame(const int relFrame) {
+        setValue(relFrame);
+    }
+
+    int getRelFrame() const {
+        return getValue();
+    }
+
+    void setAbsFrame(const int absFrame) {
+        const int relFrame = mParentProperty.prp_absFrameToRelFrame(absFrame);
+        setRelFrame(relFrame);
+    }
+
+    int getAbsFrame() const {
+        const int absFrame = mParentProperty.prp_relFrameToAbsFrame(getRelFrame());
+        return absFrame;
+    }
+private:
+    using TimelineMovable::setValue;
+    using TimelineMovable::getValue;
+};
+
+class DurationRectangle : public TimelineMovable {
     Q_OBJECT
 public:
-    DurationRectangle(Property * const childProp);
-
-    virtual void setMinFrame(const int minFrame);
-    virtual void setMaxFrame(const int maxFrame);
+    DurationRectangle(Property &parentProp);
 
     virtual void draw(QPainter * const p,
                       const QRect &drawRect,
@@ -106,65 +111,67 @@ public:
                       const qreal pixelsPerFrame,
                       const FrameRange &absFrameRange);
 
-    virtual DurationRectangleMovable *getMovableAt(
+    virtual TimelineMovable *getMovableAt(
                       const int pressX,
                       const qreal pixelsPerFrame,
                       const int minViewedFrame);
     virtual bool hasAnimationFrameRange() { return false; }
     virtual void writeDurationRectangle(QIODevice *dst);
     virtual void readDurationRectangle(QIODevice *src);
-    virtual void openDurationSettingsDialog(QWidget *parent = nullptr);
 
-    void changeFramePosBy(const int change);
+    void openDurationSettingsDialog(QWidget *parent = nullptr);
+
+    void pressed(const bool shiftPressed);
 
     Qt::CursorShape getHoverCursorShape() {
         return Qt::OpenHandCursor;
     }
 
-    int getFrameShift() {
-        return getFramePos();
-    }
+    bool isSelected();
 
     void setFramesDuration(const int duration);
-
     int getFrameDuration() const;
 
-    int getMinFrame() const;
-    int getMaxFrame() const;
+    void setMinRelFrame(const int minFrame);
+    void setMaxRelFrame(const int maxFrame);
 
-    int getMinFrameAsRelFrame() const;
-    int getMaxFrameAsRelFrame() const;
+    void setMinAbsFrame(const int minFrame);
+    void setMaxAbsFrame(const int maxFrame);
+
+    int getMinRelFrame() const;
+    int getMaxRelFrame() const;
+
+    int getMinAbsFrame() const;
+    int getMaxAbsFrame() const;
 
     FrameRange getRelFrameRange() const{
-        return {getMinFrameAsRelFrame(), getMaxFrameAsRelFrame()};
+        return {getMinRelFrame(), getMaxRelFrame()};
     }
 
     FrameRange getRelFrameRangeToTheRight() {
-        return {getMaxFrameAsRelFrame() + 1, FrameRange::EMAX};
+        return {getMaxRelFrame() + 1, FrameRange::EMAX};
     }
 
     FrameRange getRelFrameRangeToTheLeft() {
-        return {FrameRange::EMIN, getMinFrameAsRelFrame() - 1};
+        return {FrameRange::EMIN, getMinRelFrame() - 1};
     }
 
-    int getMinFrameAsAbsFrame() const;
-    int getMaxFrameAsAbsFrame() const;
-
     FrameRange getAbsFrameRange() const{
-        return {getMinFrameAsAbsFrame(), getMaxFrameAsAbsFrame()};
+        return {getMinAbsFrame(), getMaxAbsFrame()};
     }
 
     FrameRange getAbsFrameRangeToTheRight() {
-        return {getMaxFrameAsAbsFrame() + 1, FrameRange::EMAX};
+        return {getMaxAbsFrame() + 1, FrameRange::EMAX};
     }
 
     FrameRange getAbsFrameRangeToTheLeft() {
-        return {FrameRange::EMIN, getMinFrameAsAbsFrame() - 1};
+        return {FrameRange::EMIN, getMinAbsFrame() - 1};
     }
 
     void moveMinFrame(const int change);
     void finishMinFramePosTransform();
     void startMinFramePosTransform();
+
     void moveMaxFrame(const int change);
     void finishMaxFramePosTransform();
     void startMaxFramePosTransform();
@@ -176,6 +183,15 @@ public:
     void setSoundCacheHandler(const HDDCachableCacheHandler * const handler) {
         mSoundCacheHandler = handler;
     }
+
+    void setRelShift(const int shift) {
+        setValue(shift);
+    }
+
+    int getRelShift() const { return getValue(); }
+private:
+    using TimelineMovable::setValue;
+    using TimelineMovable::getValue;
 signals:
     void minFrameChangedBy(int);
     void maxFrameChangedBy(int);
@@ -184,8 +200,8 @@ signals:
 protected:
     const HDDCachableCacheHandler * mRasterCacheHandler = nullptr;
     const HDDCachableCacheHandler * mSoundCacheHandler = nullptr;
-    DurationRectangleMovable mMinFrame;
-    DurationRectangleMovable mMaxFrame;
+    DurationMinMax mMinFrame;
+    DurationMinMax mMaxFrame;
 };
 
 #endif // DURATIONRECTANGLE_H

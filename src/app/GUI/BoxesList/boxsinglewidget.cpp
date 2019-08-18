@@ -651,7 +651,8 @@ void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e) {
         //mousePressEvent(e);
     } else Document::sInstance->actionFinished();
 }
-void BoxSingleWidget::drawKeys(QPainter * const p,
+
+void BoxSingleWidget::drawTimelineControls(QPainter * const p,
                                const qreal pixelsPerFrame,
                                const FrameRange &viewedFrames) {
     if(isHidden()) return;
@@ -671,14 +672,14 @@ Key* BoxSingleWidget::getKeyAtPos(const int pressX,
     if(target->SWT_isAnimator()) {
         const auto anim_target = static_cast<Animator*>(target);
         return anim_target->anim_getKeyAtPos(pressX,
-                                            minViewedFrame,
-                                            pixelsPerFrame,
-                                            KEY_RECT_SIZE);
+                                             minViewedFrame,
+                                             pixelsPerFrame,
+                                             KEY_RECT_SIZE);
     }
     return nullptr;
 }
 
-DurationRectangleMovable* BoxSingleWidget::getRectangleMovableAtPos(
+TimelineMovable* BoxSingleWidget::getRectangleMovableAtPos(
                             const int pressX,
                             const qreal pixelsPerFrame,
                             const int minViewedFrame) {
@@ -709,7 +710,7 @@ void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
 
 int BoxSingleWidget::getOptimalNameRightX() {
     if(!mTarget) return 0;
-    auto target = mTarget->getTarget();
+    const auto target = mTarget->getTarget();
 
     QFontMetrics fm = QFontMetrics(QFont());
     QString name;

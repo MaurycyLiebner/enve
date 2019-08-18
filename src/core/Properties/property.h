@@ -118,8 +118,8 @@ public:
 
     virtual void setupTreeViewMenu(PropertyMenu * const menu);
 
-    virtual int prp_getFrameShift() const;
-    virtual int prp_getParentFrameShift() const;
+    virtual int prp_getTotalFrameShift() const;
+    virtual int prp_getInheritedFrameShift() const;
 
     virtual void prp_cancelTransform() {}
 
@@ -131,9 +131,13 @@ public:
 
     virtual void prp_setTransformed(const bool bT) { Q_UNUSED(bT); }
 
-    virtual void prp_setParentFrameShift(const int shift,
-                                         ComplexAnimator* parentAnimator = nullptr);
-    virtual void prp_afterFrameShiftChanged() {}
+    virtual void prp_setInheritedFrameShift(const int shift,
+                                            ComplexAnimator* parentAnimator);
+    virtual void prp_afterFrameShiftChanged(const FrameRange& oldAbsRange,
+                                            const FrameRange& newAbsRange) {
+        prp_afterChangedAbsRange(newAbsRange + oldAbsRange, false);
+    }
+
     virtual FrameRange prp_getIdenticalRelRange(const int relFrame) const {
         Q_UNUSED(relFrame);
         return {FrameRange::EMIN, FrameRange::EMAX};
@@ -152,7 +156,8 @@ public:
         return nullptr;
     }
 
-    virtual void prp_afterChangedAbsRange(const FrameRange &range);
+    virtual void prp_afterChangedAbsRange(const FrameRange &range,
+                                          const bool clip = true);
 protected:
     virtual void prp_setUpdater(const stdsptr<PropertyUpdater>& updater);
 public:
@@ -162,9 +167,10 @@ public:
 
     void prp_afterWholeInfluenceRangeChanged();
 
-    void prp_afterChangedRelRange(const FrameRange &range) {
+    void prp_afterChangedRelRange(const FrameRange &range,
+                                  const bool clip = true) {
         const auto absRange = prp_relRangeToAbsRange(range);
-        prp_afterChangedAbsRange(absRange);
+        prp_afterChangedAbsRange(absRange, clip);
     }
 
     FrameRange prp_relRangeToAbsRange(const FrameRange &range) const;
@@ -235,16 +241,15 @@ protected:
     void enabledDrawingOnCanvas();
     void setPointsHandler(const stdsptr<PointsHandler>& handler);
 signals:
-    void prp_absFrameRangeChanged(const FrameRange &range);
-    void prp_removingKey(Key*);
-    void prp_addingKey(Key*);
+    void prp_absFrameRangeChanged(const FrameRange &range,
+                                  const bool clip);
     void prp_replaceWith(const qsptr<Property>&, const qsptr<Property>&);
     void prp_prependWith(Property*, const qsptr<Property>&);
     void prp_nameChanged(const QString&);
 protected:
     bool prp_mOwnUpdater = false;
     bool mDrawOnCanvas = false;
-    int prp_mParentFrameShift = 0;
+    int prp_mInheritedFrameShift = 0;
     stdsptr<PropertyUpdater> prp_mUpdater;
     QString prp_mName;
     stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;

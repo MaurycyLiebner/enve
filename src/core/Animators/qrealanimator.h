@@ -23,10 +23,11 @@ public:
     void prp_cancelTransform();
     QString prp_getValueText();
     void prp_setTransformed(const bool bT) { mTransformed = bT; }
-    void prp_afterChangedAbsRange(const FrameRange& range) {
+    void prp_afterChangedAbsRange(const FrameRange& range,
+                                  const bool clip = true) {
         if(range.inRange(anim_getCurrentAbsFrame()))
             updateBaseValueFromCurrentFrame();
-        GraphAnimator::prp_afterChangedAbsRange(range);
+        GraphAnimator::prp_afterChangedAbsRange(range, clip);
     }
 
     void anim_setAbsFrame(const int frame);

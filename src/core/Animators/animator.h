@@ -10,7 +10,7 @@ class Key;
 class ComplexKey;
 class QrealPoint;
 class QPainter;
-class DurationRectangleMovable;
+class TimelineMovable;
 enum CtrlsMode : short;
 
 class OverlappingKeys {
@@ -208,13 +208,13 @@ public:
     virtual bool anim_nextRelFrameWithKey(const int relFrame,
                                           int &nextRelFrame);
     virtual Key *anim_getKeyAtPos(const qreal relX,
-                                 const int minViewedFrame,
-                                 const qreal pixelsPerFrame,
-                                 const int keyRectSize);
+                                  const int minViewedFrame,
+                                  const qreal pixelsPerFrame,
+                                  const int keyRectSize);
     virtual void anim_setAbsFrame(const int frame);
     virtual bool anim_isDescendantRecording() const;
 
-    virtual DurationRectangleMovable *anim_getTimelineMovable(
+    virtual TimelineMovable *anim_getTimelineMovable(
                                            const int relX,
                                            const int minViewedFrame,
                                            const qreal pixelsPerFrame);
@@ -235,7 +235,10 @@ public:
 
     void setupTreeViewMenu(PropertyMenu * const menu);
 
-    void prp_afterChangedAbsRange(const FrameRange &range);
+    void prp_afterFrameShiftChanged(const FrameRange& oldAbsRange,
+                                    const FrameRange& newAbsRange);
+    void prp_afterChangedAbsRange(const FrameRange &range,
+                                  const bool clip = true);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 public:
     void anim_appendKey(const stdsptr<Key> &newKey);
@@ -356,6 +359,8 @@ private:
     int anim_mCurrentRelFrame = 0;
 signals:
     void anim_isRecordingChanged();
+    void anim_removingKey(Key*);
+    void anim_addingKey(Key*);
 private:
     void removeKeyWithoutDeselecting(const stdsptr<Key> &keyToRemove);
     void anim_updateKeyOnCurrrentFrame();

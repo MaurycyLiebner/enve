@@ -4,149 +4,136 @@
 #include "Boxes/boundingbox.h"
 #include "GUI/durationrectsettingsdialog.h"
 
-DurationRectangleMovable::DurationRectangleMovable(const Type type) {
-    mType = type;
+TimelineMovable::TimelineMovable(const Type type, Property &parentProp) :
+    mType(type), mParentProperty(parentProp) {}
+
+void TimelineMovable::setValue(const int value) {
+    mValue = qMin(mClampMax, qMax(mClampMin, value));
 }
 
-void DurationRectangleMovable::setFramePos(const int framePos) {
-    mFramePos = qMin(mMaxPos, qMax(mMinPos, framePos));
+int TimelineMovable::getValue() const {
+    return mValue;
 }
 
-int DurationRectangleMovable::getFramePos() const {
-    return mFramePos;
-}
-
-DurationRectangleMovable *DurationRectangleMovable::getMovableAt(
-                                const int pressX,
-                                const qreal pixelsPerFrame,
-                                const int minViewedFrame) {
+TimelineMovable *TimelineMovable::getMovableAt(
+        const int pressX, const qreal pixelsPerFrame,
+        const int minViewedFrame) {
     const int pressedDFrame = qRound(minViewedFrame + pressX/pixelsPerFrame);
-    const int thisDFrame = mFramePos - minViewedFrame;
+    const int thisDFrame = mValue - minViewedFrame;
     if(thisDFrame == pressedDFrame) return this;
     return nullptr;
 }
 
-void DurationRectangleMovable::changeFramePosBy(const int change) {
-    changeFramePosByWithoutSignal(change);
-    emit posChanged(mFramePos);
+void TimelineMovable::changeFramePosBy(const int change) {
+    setValue(mValue + change);
+    emit posChanged(mValue);
     emit posChangedBy(change);
 }
 
-void DurationRectangleMovable::changeFramePosByWithoutSignal(
-                                const int change) {
-    setFramePos(mFramePos + change);
-}
-
-void DurationRectangleMovable::setHovered(const bool hovered) {
+void TimelineMovable::setHovered(const bool hovered) {
     mHovered = hovered;
 }
 
-bool DurationRectangleMovable::isHovered() {
+bool TimelineMovable::isHovered() {
     return mHovered;
 }
 
-void DurationRectangleMovable::pressed(const bool shiftPressed) {
-    if(!mChildProperty) return;
-    if(mChildProperty->SWT_isBoundingBox()) {
-        const auto box = static_cast<BoundingBox*>(mChildProperty);
-        box->selectionChangeTriggered(shiftPressed);
-    }
+void TimelineMovable::setClampMax(const int max) {
+    mClampMax = max;
 }
 
-bool DurationRectangleMovable::isSelected() {
-    if(mChildProperty) {
-        if(mChildProperty->SWT_isBoundingBox()) {
-            const auto box = static_cast<BoundingBox*>(mChildProperty);
-            return box->isSelected();
-        }
+void TimelineMovable::setClampMin(const int min) {
+    mClampMin = min;
+}
+
+DurationRectangle::DurationRectangle(Property &parentProp) :
+    TimelineMovable(DURATION_RECT, parentProp),
+    mMinFrame(MIN_FRAME, parentProp),
+    mMaxFrame(MAX_FRAME, parentProp) {
+
+    setClamp(-1000000, 1000000);
+    mMinFrame.setClamp(-1000000, 1000000);
+    mMaxFrame.setClamp(-1000000, 1000000);
+
+    connect(&mMinFrame, &TimelineMovable::posChanged,
+            &mMaxFrame, &TimelineMovable::setClampMin);
+    connect(&mMaxFrame, &TimelineMovable::posChanged,
+            &mMinFrame, &TimelineMovable::setClampMax);
+
+    connect(&mMinFrame, &TimelineMovable::posChanged,
+            this, &DurationRectangle::rangeChanged);
+    connect(&mMaxFrame, &TimelineMovable::posChanged,
+            this, &DurationRectangle::rangeChanged);
+
+    connect(&mMinFrame, &TimelineMovable::finishedTransform,
+            this, &DurationRectangle::finishedRangeChange);
+    connect(&mMaxFrame, &TimelineMovable::finishedTransform,
+            this, &DurationRectangle::finishedRangeChange);
+
+    connect(&mMinFrame, &TimelineMovable::posChangedBy,
+            this, &DurationRectangle::minFrameChangedBy);
+    connect(&mMaxFrame, &TimelineMovable::posChangedBy,
+            this, &DurationRectangle::maxFrameChangedBy);
+}
+
+void DurationRectangle::pressed(const bool shiftPressed) {
+    Q_UNUSED(shiftPressed);
+//    if(mParentProperty.SWT_isBoundingBox() ||
+//       mParentProperty.SWT_isSingleSound()) {
+//        const auto cont = static_cast<eBoxOrSound*>(&mParentProperty);
+//        cont->selectionChangeTriggered(shiftPressed);
+//    }
+}
+
+bool DurationRectangle::isSelected() {
+    if(mParentProperty.SWT_isBoundingBox() ||
+       mParentProperty.SWT_isSingleSound()) {
+        const auto cont = static_cast<eBoxOrSound*>(&mParentProperty);
+        return cont->isSelected();
     }
     return false;
 }
 
-void DurationRectangleMovable::setMaxPos(const int maxPos) {
-    mMaxPos = maxPos - 1;
-}
-
-void DurationRectangleMovable::setMinPos(const int minPos) {
-    mMinPos = minPos + 1;
-}
-
-DurationRectangle::DurationRectangle(Property * const childProp) :
-    DurationRectangleMovable(DURATION_RECT) {
-    mChildProperty = childProp;
-
-    mMinFrame.setChildProperty(childProp);
-    mMaxFrame.setChildProperty(childProp);
-    setMinPos(-1000000);
-    setMaxPos(1000000);
-    mMinFrame.setType(MIN_FRAME);
-    mMaxFrame.setType(MAX_FRAME);
-    mMinFrame.setMaxPos(1000000);
-    mMinFrame.setMinPos(-1000000);
-    mMaxFrame.setMinPos(-1000000);
-    mMaxFrame.setMaxPos(1000000);
-    connect(&mMinFrame, &DurationRectangleMovable::posChanged,
-            &mMaxFrame, &DurationRectangleMovable::setMinPos);
-    connect(&mMaxFrame, &DurationRectangleMovable::posChanged,
-            &mMinFrame, &DurationRectangleMovable::setMaxPos);
-
-    connect(&mMinFrame, &DurationRectangleMovable::posChanged,
-            this, &DurationRectangle::rangeChanged);
-    connect(&mMaxFrame, &DurationRectangleMovable::posChanged,
-            this, &DurationRectangle::rangeChanged);
-
-    connect(&mMinFrame, &DurationRectangleMovable::finishedTransform,
-            this, &DurationRectangle::finishedRangeChange);
-    connect(&mMaxFrame, &DurationRectangleMovable::finishedTransform,
-            this, &DurationRectangle::finishedRangeChange);
-
-    connect(&mMinFrame, &DurationRectangleMovable::posChangedBy,
-            this, &DurationRectangle::minFrameChangedBy);
-    connect(&mMaxFrame, &DurationRectangleMovable::posChangedBy,
-            this, &DurationRectangle::maxFrameChangedBy);
-}
-
 void DurationRectangle::setFramesDuration(const int duration) {
-    mMaxFrame.setFramePos(getMinFrame() + duration - 1);
+    mMaxFrame.setRelFrame(getMinRelFrame() + duration - 1);
 }
 
-void DurationRectangle::setMinFrame(const int minFrame) {
-    mMinFrame.setFramePos(minFrame);
+void DurationRectangle::setMinRelFrame(const int minFrame) {
+    mMinFrame.setRelFrame(minFrame);
 }
 
-void DurationRectangle::setMaxFrame(const int maxFrame) {
-    mMaxFrame.setFramePos(maxFrame);
+void DurationRectangle::setMaxRelFrame(const int maxFrame) {
+    mMaxFrame.setRelFrame(maxFrame);
+}
+
+void DurationRectangle::setMinAbsFrame(const int minFrame) {
+    mMinFrame.setAbsFrame(minFrame);
+}
+
+void DurationRectangle::setMaxAbsFrame(const int maxFrame) {
+    mMaxFrame.setAbsFrame(maxFrame);
 }
 
 int DurationRectangle::getFrameDuration() const {
-    return mMaxFrame.getFramePos() - mMinFrame.getFramePos() + 1;
+    return mMaxFrame.getRelFrame() - mMinFrame.getRelFrame() + 1;
 }
 
-int DurationRectangle::getMinFrame() const {
-    return mMinFrame.getFramePos();
+int DurationRectangle::getMinRelFrame() const {
+    return mMinFrame.getRelFrame();
 }
 
-int DurationRectangle::getMaxFrame() const {
-    return mMaxFrame.getFramePos();
+int DurationRectangle::getMaxRelFrame() const {
+    return mMaxFrame.getRelFrame();
 }
 
-int DurationRectangle::getMinFrameAsRelFrame() const {
-    return getMinFrame() - mFramePos;
+int DurationRectangle::getMinAbsFrame() const {
+    return mMinFrame.getAbsFrame();
 }
 
-int DurationRectangle::getMaxFrameAsRelFrame() const {
-    return getMaxFrame() - mFramePos;
+int DurationRectangle::getMaxAbsFrame() const {
+    return mMaxFrame.getAbsFrame();
 }
 
-int DurationRectangle::getMinFrameAsAbsFrame() const {
-    return mChildProperty->prp_relFrameToAbsFrame(
-                getMinFrameAsRelFrame());
-}
-
-int DurationRectangle::getMaxFrameAsAbsFrame() const {
-    return mChildProperty->prp_relFrameToAbsFrame(
-                getMaxFrameAsRelFrame());
-}
 #include "Boxes/animationbox.h"
 #include "Sound/singlesound.h"
 void DurationRectangle::draw(QPainter * const p,
@@ -154,23 +141,19 @@ void DurationRectangle::draw(QPainter * const p,
                              const qreal fps,
                              const qreal pixelsPerFrame,
                              const FrameRange &absFrameRange) {
-    const int firstRelDrawFrame = qMax(absFrameRange.fMin,
-                                       getMinFrameAsAbsFrame()) -
-            absFrameRange.fMin;
-    const int lastRelDrawFrame = qMin(absFrameRange.fMax,
-                                      getMaxFrameAsAbsFrame()) -
-            absFrameRange.fMin;
+    const int clampedMin = qMax(absFrameRange.fMin, getMinAbsFrame());
+    const int firstRelDrawFrame = clampedMin - absFrameRange.fMin;
+    const int clampedMax = qMin(absFrameRange.fMax, getMaxAbsFrame());
+    const int lastRelDrawFrame = clampedMax - absFrameRange.fMin;
     const int drawFrameSpan = lastRelDrawFrame - firstRelDrawFrame + 1;
 
     if(drawFrameSpan < 1) return;
 
-    const QRect durRect(qFloor(firstRelDrawFrame*pixelsPerFrame),
-                        drawRect.y(),
-                        qCeil(drawFrameSpan*pixelsPerFrame),
-                        drawRect.height());
+    const QRect durRect(qFloor(firstRelDrawFrame*pixelsPerFrame), drawRect.y(),
+                        qCeil(drawFrameSpan*pixelsPerFrame), drawRect.height());
 
-    const int rectStartFrame = absFrameRange.fMin - mFramePos;
-    const int rectEndFrame = absFrameRange.fMax - mFramePos;
+    const int rectStartFrame = absFrameRange.fMin - mValue;
+    const int rectEndFrame = absFrameRange.fMax - mValue;
     if(mRasterCacheHandler && mSoundCacheHandler) {
         const int soundHeight = drawRect.height()/3;
         const int rasterHeight = drawRect.height() - soundHeight;
@@ -216,24 +199,15 @@ void DurationRectangle::draw(QPainter * const p,
     //p->drawRect(drawRect);
 }
 
-DurationRectangleMovable *DurationRectangle::getMovableAt(
-                                          const int pressX,
-                                          const qreal pixelsPerFrame,
-                                          const int minViewedFrame) {
-    const qreal startX = (getMinFrame() - minViewedFrame)*pixelsPerFrame;
-    const qreal endX = (getMaxFrame() - minViewedFrame + 1)*pixelsPerFrame;
+TimelineMovable *DurationRectangle::getMovableAt(
+        const int pressX, const qreal pixelsPerFrame,
+        const int minViewedFrame) {
+    const qreal startX = (getMinAbsFrame() - minViewedFrame)*pixelsPerFrame;
+    const qreal endX = (getMaxAbsFrame() - minViewedFrame + 1)*pixelsPerFrame;
     if(qAbs(pressX - startX) < 5) return &mMinFrame;
     else if(qAbs(pressX - endX) < 5) return &mMaxFrame;
     else if(pressX > startX && pressX < endX) return this;
     return nullptr;
-}
-
-void DurationRectangle::changeFramePosBy(const int change) {
-    mMinFrame.changeFramePosByWithoutSignal(change);
-    mMaxFrame.setMinPos(getMinFrame());
-    mMaxFrame.changeFramePosByWithoutSignal(change);
-    mMinFrame.setMaxPos(getMaxFrame());
-    DurationRectangleMovable::changeFramePosBy(change);
 }
 
 void DurationRectangle::startMinFramePosTransform() {
@@ -253,28 +227,24 @@ void DurationRectangle::startMaxFramePosTransform() {
 }
 
 void DurationRectangle::openDurationSettingsDialog(QWidget *parent) {
-    const int oldMinFrame = getMinFrame();
-    const int oldMaxFrame = getMaxFrame();
-
-    DurationRectSettingsDialog dialog(mType, getMinFrame(),
-                                      getMaxFrame(), parent);
+    DurationRectSettingsDialog dialog(getRelShift(),
+                                      getMinRelFrame(),
+                                      getMaxRelFrame(),
+                                      parent);
     if(dialog.exec()) {
-        setMinFrame(dialog.getMinFrame());
-        setMaxFrame(dialog.getMaxFrame());
-    }
+        if(getRelShift() == dialog.getShift() &&
+           getMinRelFrame() == dialog.getMinFrame() &&
+           getMaxRelFrame() == dialog.getMaxFrame()) {
+            return;
+        }
 
-    if(dialog.result() == QDialog::Accepted) {
-        const int newMinFrame = getMinFrame();
-        const int newMaxFrame = getMaxFrame();
+        const auto oldRelRange = getRelFrameRange();
+        setMinRelFrame(dialog.getMinFrame());
+        setMaxRelFrame(dialog.getMaxFrame());
+        setRelShift(dialog.getShift());
+        const auto newRelRange = getRelFrameRange();
 
-        const int minMinFrame = qMin(oldMinFrame, newMinFrame);
-        const int maxMinFrame = qMax(oldMinFrame, newMinFrame);
-        const int minMaxFrame = qMin(oldMaxFrame, newMaxFrame);
-        const int maxMaxFrame = qMax(oldMaxFrame, newMaxFrame);
-        mChildProperty->prp_afterChangedRelRange(
-                                {minMinFrame, maxMinFrame});
-        mChildProperty->prp_afterChangedRelRange(
-                                {minMaxFrame, maxMaxFrame});
+        mParentProperty.prp_afterChangedRelRange(oldRelRange + newRelRange);
     }
 }
 
@@ -287,9 +257,9 @@ void DurationRectangle::moveMaxFrame(const int change) {
 }
 
 void DurationRectangle::writeDurationRectangle(QIODevice *dst) {
-    const int minFrame = getMinFrame();
-    const int maxFrame = getMaxFrame();
-    const int framePos = getFramePos();
+    const int minFrame = getMinRelFrame();
+    const int maxFrame = getMaxRelFrame();
+    const int framePos = getValue();
     dst->write(rcConstChar(&minFrame), sizeof(int));
     dst->write(rcConstChar(&maxFrame), sizeof(int));
     dst->write(rcConstChar(&framePos), sizeof(int));
@@ -302,8 +272,7 @@ void DurationRectangle::readDurationRectangle(QIODevice *src) {
     src->read(rcChar(&minFrame), sizeof(int));
     src->read(rcChar(&maxFrame), sizeof(int));
     src->read(rcChar(&framePos), sizeof(int));
-    setMinFrame(minFrame);
-    setMaxFrame(maxFrame);
-    setFramePos(framePos);
+    setMinRelFrame(minFrame);
+    setMaxRelFrame(maxFrame);
+    setValue(framePos);
 }
-

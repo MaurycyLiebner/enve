@@ -12,7 +12,7 @@
 #include "framerange.h"
 #include "Animators/SmartPath/smartpathanimator.h"
 class QrealAnimatorValueSlider;
-class DurationRectangleMovable;
+class TimelineMovable;
 class Key;
 class BoxTargetWidget;
 class BoxesListActionButton;
@@ -49,7 +49,7 @@ public:
     static void loadStaticPixmaps();
     static void clearStaticPixmaps();
 
-    void drawKeys(QPainter * const p,
+    void drawTimelineControls(QPainter * const p,
                   const qreal pixelsPerFrame,
                   const FrameRange &viewedFrames);
     Key *getKeyAtPos(const int pressX,
@@ -58,7 +58,7 @@ public:
     void getKeysInRect(const QRectF &selectionRect,
                        const qreal pixelsPerFrame,
                        QList<Key *> &listKeys);
-    DurationRectangleMovable *getRectangleMovableAtPos(
+    TimelineMovable *getRectangleMovableAtPos(
                         const int pressX,
                         const qreal pixelsPerFrame,
                         const int minViewedFrame);
