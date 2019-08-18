@@ -640,7 +640,8 @@ void KeysView::handleMouseMove(const QPoint &pos,
         updateHovered(posU);
     }
 
-    Document::sInstance->actionFinished();
+    if(mIsMouseGrabbing) Document::sInstance->actionFinished();
+    else update();
     mLastMovePos = pos;
 }
 
