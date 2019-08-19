@@ -4,7 +4,7 @@
 #include <QFileSystemWatcher>
 #include <QFileSystemModel>
 #include "ShaderEffects/shadereffectcreator.h"
-#include "settings.h"
+#include "esettings.h"
 
 EffectsLoader::EffectsLoader() {}
 
@@ -57,8 +57,8 @@ void iniIfCustomBox(const QString& path) {
 }
 
 void EffectsLoader::iniCustomBoxes() {
-    QDir(EnveSettings::sSettingsDir()).mkdir("Boxes");
-    const QString dirPath = EnveSettings::sSettingsDir() + "/Boxes";
+    QDir(eSettings::sSettingsDir()).mkdir("Boxes");
+    const QString dirPath = eSettings::sSettingsDir() + "/Boxes";
     QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
     while(dirIt.hasNext()) iniIfCustomBox(dirIt.next());
 
@@ -100,8 +100,8 @@ void iniIfCustomPathEffect(const QString& path) {
 }
 
 void EffectsLoader::iniCustomPathEffects() {
-    QDir(EnveSettings::sSettingsDir()).mkdir("PathEffects");
-    const QString dirPath = EnveSettings::sSettingsDir() + "/PathEffects";
+    QDir(eSettings::sSettingsDir()).mkdir("PathEffects");
+    const QString dirPath = eSettings::sSettingsDir() + "/PathEffects";
     QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
     while(dirIt.hasNext()) iniIfCustomPathEffect(dirIt.next());
 
@@ -143,8 +143,8 @@ void EffectsLoader::iniIfCustomRasterEffect(const QString& path) {
 }
 
 void EffectsLoader::iniCustomRasterEffects() {
-    QDir(EnveSettings::sSettingsDir()).mkdir("RasterEffects");
-    const QString dirPath = EnveSettings::sSettingsDir() + "/RasterEffects";
+    QDir(eSettings::sSettingsDir()).mkdir("RasterEffects");
+    const QString dirPath = eSettings::sSettingsDir() + "/RasterEffects";
     QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
     while(dirIt.hasNext()) iniIfCustomRasterEffect(dirIt.next());
 
@@ -177,8 +177,8 @@ void EffectsLoader::reloadProgram(ShaderEffectCreator* const loaded,
 }
 
 void EffectsLoader::iniRasterEffectPrograms() {
-    QDir(EnveSettings::sSettingsDir()).mkdir("ShaderEffects");
-    const QString dirPath = EnveSettings::sSettingsDir() + "/ShaderEffects";
+    QDir(eSettings::sSettingsDir()).mkdir("ShaderEffects");
+    const QString dirPath = eSettings::sSettingsDir() + "/ShaderEffects";
     QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
 
     while(dirIt.hasNext()) {

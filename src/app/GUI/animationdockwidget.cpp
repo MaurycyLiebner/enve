@@ -4,7 +4,7 @@
 #include "GUI/global.h"
 #include "keysview.h"
 #include "actionbutton.h"
-#include "settings.h"
+#include "esettings.h"
 
 AnimationDockWidget::AnimationDockWidget(QWidget *parent,
                                          KeysView *keysView) :
@@ -14,7 +14,7 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     setIconSize(QSize(qRound(1.25*MIN_WIDGET_DIM),
                       qRound(1.25*MIN_WIDGET_DIM)));
 
-    const QString iconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+    const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
 
     mLineButton = new ActionButton(iconsDir + "/segmentLine.png",
                                    "MAKE SEGMENT LINE", this);

@@ -13,7 +13,7 @@
 #include "audiohandler.h"
 #include "actions.h"
 #include "layouthandler.h"
-#include "settings.h"
+#include "esettings.h"
 #include "renderhandler.h"
 #include "fileshandler.h"
 #include "ekeyfilter.h"
@@ -184,7 +184,7 @@ private:
     }
 
     void readRecentFiles() {
-        QFile file(EnveSettings::sSettingsDir() + "/recent");
+        QFile file(eSettings::sSettingsDir() + "/recent");
         if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QTextStream stream(&file);
             while(!stream.atEnd()) {
@@ -197,7 +197,7 @@ private:
     }
 
     void writeRecentFiles() {
-        QFile file(EnveSettings::sSettingsDir() + "/recent");
+        QFile file(eSettings::sSettingsDir() + "/recent");
         if(file.open(QIODevice::WriteOnly | QIODevice::Text |
                      QIODevice::Truncate)) {
             QTextStream stream(&file);

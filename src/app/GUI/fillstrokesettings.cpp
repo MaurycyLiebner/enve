@@ -12,7 +12,7 @@
 #include <QDockWidget>
 #include "paintsettingsapplier.h"
 #include "Animators/gradient.h"
-#include "settings.h"
+#include "esettings.h"
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
                                                    QWidget * const parent) :
@@ -25,7 +25,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mColorsSettingsWidget = new ColorSettingsWidget(this);
 
     mTargetLayout->setSpacing(0);
-    const auto iconsDir = EnveSettings::sIconsDir();
+    const auto iconsDir = eSettings::sIconsDir();
     mFillTargetButton = new QPushButton(QIcon(iconsDir + "/properties_fill.png"),
                                         "Fill", this);
     mFillTargetButton->setObjectName("leftButton");

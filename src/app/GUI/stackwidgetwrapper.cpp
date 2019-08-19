@@ -97,9 +97,9 @@ StackWrapperMenu::StackWrapperMenu() {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 }
 
-#include "settings.h"
+#include "esettings.h"
 StackWrapperCornerMenu::StackWrapperCornerMenu(StackWidgetWrapper * const target) {
-    const auto iconsDir = EnveSettings::sIconsDir();
+    const auto iconsDir = eSettings::sIconsDir();
     mSplitV = addAction("split v");
     mSplitV->setIcon(QIcon(iconsDir + "/split_v.png"));
     mSplitH = addAction("split h");

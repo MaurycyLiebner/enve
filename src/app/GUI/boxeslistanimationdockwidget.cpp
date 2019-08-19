@@ -56,7 +56,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     connect(mResolutionComboBox, &QComboBox::currentTextChanged,
             this, &BoxesListAnimationDockWidget::setResolutionFractionText);
 
-    const QString iconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+    const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
 
     mPlayButton = new ActionButton(iconsDir + "/play.png", "render preview", this);
     mStopButton = new ActionButton(iconsDir + "/stop.png", "stop preview", this);
@@ -196,7 +196,7 @@ bool BoxesListAnimationDockWidget::processKeyPress(QKeyEvent *event) {
 void BoxesListAnimationDockWidget::previewFinished() {
     //setPlaying(false);
     mStopButton->setDisabled(true);
-    const QString modeIconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+    const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
     mPlayButton->setIcon(modeIconsDir + "/play.png");
     mPlayButton->setToolTip("render preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
@@ -206,7 +206,7 @@ void BoxesListAnimationDockWidget::previewFinished() {
 
 void BoxesListAnimationDockWidget::previewBeingPlayed() {
     mStopButton->setDisabled(false);
-    const QString modeIconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+    const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
     mPlayButton->setIcon(modeIconsDir + "/pause.png");
     mPlayButton->setToolTip("pause preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
@@ -216,7 +216,7 @@ void BoxesListAnimationDockWidget::previewBeingPlayed() {
 
 void BoxesListAnimationDockWidget::previewBeingRendered() {
     mStopButton->setDisabled(false);
-    const QString modeIconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+    const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
     mPlayButton->setIcon(modeIconsDir + "/play.png");
     mPlayButton->setToolTip("play preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
@@ -226,7 +226,7 @@ void BoxesListAnimationDockWidget::previewBeingRendered() {
 
 void BoxesListAnimationDockWidget::previewPaused() {
     mStopButton->setDisabled(false);
-    const QString modeIconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+    const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
     mPlayButton->setIcon(modeIconsDir + "/play.png");
     mPlayButton->setToolTip("resume preview");
     disconnect(mPlayButton, nullptr, this, nullptr);

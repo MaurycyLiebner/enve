@@ -1,11 +1,11 @@
 #include "closablecontainer.h"
 #include "GUI/global.h"
-#include "settings.h"
+#include "esettings.h"
 #include <QCheckBox>
 
 ClosableContainer::ClosableContainer(QWidget *parent) : QWidget(parent) {
     setLayout(mMainLayout);
-    const auto iconPath = EnveSettings::sIconsDir() + "/right-arrrow.png";
+    const auto iconPath = eSettings::sIconsDir() + "/right-arrrow.png";
     mContentArrow = new QPushButton(QIcon(iconPath), "", this);
     mContentArrow->setObjectName("iconButton");
     mContentArrow->setCheckable(true);
@@ -57,9 +57,9 @@ bool ClosableContainer::isChecked() {
 
 void ClosableContainer::setContentVisible(const bool bT) {
     if(bT) {
-        mContentArrow->setIcon(QIcon(EnveSettings::sIconsDir() + "/down-arrow.png"));
+        mContentArrow->setIcon(QIcon(eSettings::sIconsDir() + "/down-arrow.png"));
     } else {
-        mContentArrow->setIcon(QIcon(EnveSettings::sIconsDir() + "/right-arrow.png"));
+        mContentArrow->setIcon(QIcon(eSettings::sIconsDir() + "/right-arrow.png"));
     }
     for(const auto widget : mContWidgets) widget->setVisible(bT);
 }

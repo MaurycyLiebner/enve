@@ -4,7 +4,7 @@
 #include <QSvgRenderer>
 #include <QPainter>
 
-#include "settings.h"
+#include "esettings.h"
 #include "exceptions.h"
 
 void renderSvg(const QString& svgPath, QImage& image) {
@@ -49,7 +49,7 @@ bool generate(const QString& svgPath,
 void generateButtons(const int minWidgetDim, const int buttonDim) {
     const QSize buttonSize(buttonDim, buttonDim);
 
-    const QDir eDir(EnveSettings::sSettingsDir());
+    const QDir eDir(eSettings::sSettingsDir());
     const QString mkPath = "icons/" + QString::number(minWidgetDim) + "/toolbarButtons";
     if(!eDir.mkpath(mkPath)) RuntimeThrow("Failed to mkpath '" + mkPath + "'");
 
@@ -61,7 +61,7 @@ void generateButtons(const int minWidgetDim, const int buttonDim) {
     checkedBase.fill(Qt::transparent);
     renderSvg(":/icons/toolbarButtons/checkedBg", checkedBase);
 
-    const QString dir = EnveSettings::sSettingsDir() + "/" + mkPath;
+    const QString dir = eSettings::sSettingsDir() + "/" + mkPath;
     QDirIterator checkableIt(":/icons/toolbarButtons/checkable");
     while(checkableIt.hasNext()) {
         const auto path = checkableIt.next();
@@ -89,8 +89,8 @@ void generateButtons(const int minWidgetDim, const int buttonDim) {
 }
 
 void IconLoader::generateAll(const int minWidgetDim, const int buttonDim) {
-    const QDir eDir(EnveSettings::sSettingsDir());
-    QDir iconsDir(EnveSettings::sSettingsDir() + "/icons");
+    const QDir eDir(eSettings::sSettingsDir());
+    QDir iconsDir(eSettings::sSettingsDir() + "/icons");
 #ifdef QT_DEBUG
     iconsDir.removeRecursively();
 #endif

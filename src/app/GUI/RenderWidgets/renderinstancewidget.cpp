@@ -5,7 +5,7 @@
 #include "rendersettingsdialog.h"
 #include "outputsettingsprofilesdialog.h"
 #include "outputsettingsdisplaywidget.h"
-#include "settings.h"
+#include "esettings.h"
 
 RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     ClosableContainer(parent) {
@@ -270,11 +270,11 @@ void RenderInstanceWidget::openRenderSettingsDialog() {
 
 }
 
-#include "settings.h"
+#include "esettings.h"
 OutputProfilesListButton::OutputProfilesListButton(RenderInstanceWidget *parent) :
     QPushButton(parent) {
     mParentWidget = parent;
-    setIcon(QIcon(EnveSettings::sIconsDir() + "/down-arrow.png"));
+    setIcon(QIcon(eSettings::sIconsDir() + "/down-arrow.png"));
 }
 
 void OutputProfilesListButton::mousePressEvent(QMouseEvent *e) {

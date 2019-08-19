@@ -534,7 +534,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
 
 void BoxSingleWidget::loadStaticPixmaps() {
     if(sStaticPixmapsLoaded) return;
-    const auto iconsDir = EnveSettings::sIconsDir();
+    const auto iconsDir = eSettings::sIconsDir();
     VISIBLE_PIXMAP = new QPixmap(iconsDir + "/visible.png");
     INVISIBLE_PIXMAP = new QPixmap(iconsDir + "/hidden.png");
     BOX_CHILDREN_VISIBLE = new QPixmap(iconsDir + "/childrenVisible.png");

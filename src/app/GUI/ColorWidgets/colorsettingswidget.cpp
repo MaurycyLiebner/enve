@@ -411,7 +411,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     aLayout->addWidget(aRect);
     aLayout->addWidget(aSpin);
 
-    const QString iconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+    const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
     mPickingButton = new ActionButton(iconsDir + "/pickUnchecked.png", "", this);
     connect(mPickingButton, &ActionButton::released,
             this, &ColorSettingsWidget::startColorPicking);

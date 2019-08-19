@@ -70,11 +70,11 @@ SOURCES += main.cpp\
     GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
     effectsloader.cpp \
+    esettings.cpp \
     evfileio.cpp \
     hardwareinfo.cpp \
     iconloader.cpp \
     renderhandler.cpp \
-    settings.cpp \
     svgimporter.cpp \
     GUI/BoxesList/OptimalScrollArea/scrollarea.cpp \
     GUI/BoxesList/OptimalScrollArea/scrollwidget.cpp \
@@ -163,10 +163,10 @@ HEADERS  += \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
     effectsloader.h \
+    esettings.h \
     hardwareinfo.h \
     iconloader.h \
     renderhandler.h \
-    settings.h \
     svgimporter.h \
     keypoint.h \
     GUI/BoxesList/OptimalScrollArea/scrollarea.h \

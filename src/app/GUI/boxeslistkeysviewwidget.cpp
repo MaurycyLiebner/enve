@@ -61,7 +61,7 @@ TimelineWidget::TimelineWidget(Document &document,
     mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     mCornerMenuBar->setStyleSheet("QMenuBar::item { padding: 1px 0px; }");
 
-    const auto iconsDir = EnveSettings::sIconsDir();
+    const auto iconsDir = eSettings::sIconsDir();
 
     QMenu * const settingsMenu = mCornerMenuBar->addMenu(
                 QIcon(iconsDir + "/settings_dots.png"), "Settings");
@@ -268,7 +268,7 @@ void TimelineWidget::setCurrentScene(Canvas * const scene) {
 void TimelineWidget::setGraphEnabled(const bool enabled) {
     mKeysView->setGraphViewed(enabled);
     mAnimationDockWidget->setVisible(enabled);
-    const auto iconsDir = EnveSettings::sIconsDir();
+    const auto iconsDir = eSettings::sIconsDir();
     if(enabled) mGraphAct->setIcon(QIcon(iconsDir + "/graphEnabled.png"));
     else mGraphAct->setIcon(QIcon(iconsDir + "/graphDisabled.png"));
 }

@@ -101,7 +101,7 @@ MainWindow::MainWindow(Document& document,
     connect(&mDocument, &Document::sceneCreated,
             this, &MainWindow::closeWelcomeDialog);
 
-    const auto iconDir = EnveSettings::sIconsDir();
+    const auto iconDir = eSettings::sIconsDir();
     const auto downArr = iconDir + "/down-arrow.png";
     const auto upArr = iconDir + "/up-arrow.png";
     const QString iconSS =
@@ -109,7 +109,7 @@ MainWindow::MainWindow(Document& document,
             "QScrollBar::sub-line { image: url(" + upArr + "); }" +
             "QScrollBar::add-line { image: url(" + downArr + "); }";
 
-    QFile customSS(EnveSettings::sSettingsDir() + "/stylesheet.qss");
+    QFile customSS(eSettings::sSettingsDir() + "/stylesheet.qss");
     if(customSS.exists()) {
         if(customSS.open(QIODevice::ReadOnly | QIODevice::Text)) {
             setStyleSheet(customSS.readAll());
@@ -581,7 +581,7 @@ void MainWindow::setupToolBar() {
 
     mToolBar->addSeparator();
 
-    const QString iconsDir = EnveSettings::sIconsDir() + "/toolbarButtons";
+    const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
 
     mBoxTransformMode = new ActionButton(iconsDir + "/boxTransformUnchecked.png", "F1", this);
     mBoxTransformMode->setCheckable(iconsDir + "/boxTransformChecked.png");

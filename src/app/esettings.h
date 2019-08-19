@@ -3,9 +3,9 @@
 #include <QtCore>
 #include "skia/skiaincludes.h"
 
-struct EnveSettings {
+struct eSettings {
 private:
-    EnveSettings() {}
+    eSettings() {}
 public:
     // general
 #ifdef QT_DEBUG
@@ -15,9 +15,9 @@ public:
 #endif
 
     // quality
-    SkFilterQuality fEnveFilter = SkFilterQuality::kNone_SkFilterQuality;
-    SkFilterQuality fOutputFilter = SkFilterQuality::kHigh_SkFilterQuality;
-    SkFilterQuality fViewFilter = SkFilterQuality::kNone_SkFilterQuality;
+    SkFilterQuality fEnveRenderFilter = SkFilterQuality::kNone_SkFilterQuality;
+    SkFilterQuality fOutputRenderFilter = SkFilterQuality::kHigh_SkFilterQuality;
+    SkFilterQuality fDisplayFilter = SkFilterQuality::kNone_SkFilterQuality;
 
     // performance settings
     int fCpuThreadsCap = 0; // <= 0 - use all available threads
@@ -47,7 +47,7 @@ public:
     static int sCpuThreadsCapped();
     static const QString& sSettingsDir();
     static QString sIconsDir();
-    static EnveSettings sSettings;
+    static eSettings sSettings;
 };
 
 #endif // SETTINGS_H
