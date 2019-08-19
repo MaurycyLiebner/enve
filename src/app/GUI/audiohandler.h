@@ -26,7 +26,7 @@ public:
     }
 
     void provideData(const DataRequest& request) {
-        if(!request) return;
+        if(!request || !mAudioIOOutput) return;
         mAudioIOOutput->write(request.fData, request.fSize);
     }
 
@@ -36,8 +36,8 @@ public:
     void setVolume(const int value);
 private:
     QAudioDeviceInfo mAudioDevice;
-    QAudioOutput *mAudioOutput;
-    QIODevice *mAudioIOOutput; // not owned
+    QAudioOutput *mAudioOutput = nullptr;
+    QIODevice *mAudioIOOutput = nullptr; // not owned
     QAudioFormat mAudioFormat;
 
     QByteArray mAudioBuffer;

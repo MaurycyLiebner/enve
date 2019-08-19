@@ -16,7 +16,7 @@ void SoundContainerTmpFileDataLoader::process() {
         float * data = new float[size];
         mTmpFile->read(rcChar(data),
                        static_cast<qint64>(size*sizeof(float)));
-        mSamples = enve::make_shared<Samples>(data, sampleRange);
+//        mSamples = enve::make_shared<Samples>(data, sampleRange);
 
         mTmpFile->close();
     }

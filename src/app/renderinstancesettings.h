@@ -26,7 +26,7 @@ struct RenderSettings {
 };
 
 struct OutputSettings {
-    static const QStringList SAMPLE_FORMATS_NAMES;
+    static const std::map<int, QString> SAMPLE_FORMATS_NAMES;
     static QString getChannelsLayoutNameStatic(const uint64_t &layout);
 
     AVOutputFormat *outputFormat = nullptr;

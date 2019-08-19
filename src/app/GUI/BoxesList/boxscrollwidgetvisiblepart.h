@@ -95,7 +95,7 @@ private:
 
     const QMimeData* mCurrentMimeData = nullptr;
 
-    DropTarget mDropTarget;
+    DropTarget mDropTarget{nullptr, 0, DropType::none};
 };
 
 #endif // BOXSCROLLWIDGETVISIBLEPART_H

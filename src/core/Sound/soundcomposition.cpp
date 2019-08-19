@@ -10,7 +10,7 @@ SoundComposition::SoundComposition(Canvas * const parent) :
     QIODevice(parent), mParent(parent) {}
 
 void SoundComposition::start(const int startFrame) {
-    mPos = qRound(startFrame/mParent->getFps()*SOUND_SAMPLERATE);
+    mPos = qRound(startFrame/mParent->getFps());
     open(QIODevice::ReadOnly);
 }
 
@@ -83,8 +83,9 @@ SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
     if(mProcessingSeconds.contains(secondId)) return nullptr;
     if(mSecondsCache.atFrame(secondId)) return nullptr;
     mProcessingSeconds.append(secondId);
-    const SampleRange sampleRange = {secondId*SOUND_SAMPLERATE,
-                                     (secondId + 1)*SOUND_SAMPLERATE - 1};
+    const int sampleRate = mSettings.fSampleRate;
+    const SampleRange sampleRange = {secondId*sampleRate,
+                                     (secondId + 1)*sampleRate - 1};
     const qreal fps = mParent->getFps();
 
     const auto task = enve::make_shared<SoundMerger>(secondId, sampleRange, this);
@@ -125,22 +126,28 @@ void SoundComposition::frameRangeChanged(const FrameRange &range) {
 }
 
 qint64 SoundComposition::readData(char *data, qint64 maxLen) {
+    const int sampleRate = mSettings.fSampleRate;
+    const int bytesPerSample = mSettings.bytesPerSample();
+    const int nChannels = mSettings.channelCount();
+    const int bytesPerSampleFrame = nChannels * bytesPerSample;
+
     qint64 total = 0;
     const SampleRange readSamples{static_cast<int>(mPos),
-                                  static_cast<int>(mPos + maxLen/qint64(sizeof(float)))};
+                                  static_cast<int>(mPos + maxLen/bytesPerSampleFrame)};
     while(maxLen > total) {
-        const int secondId = static_cast<int>(mPos/SOUND_SAMPLERATE);
+        const int secondId = static_cast<int>(mPos/sampleRate);
         const auto cont = mSecondsCache.atFrame<SoundCacheContainer>(secondId);
         if(!cont) break;
-        const auto contSampleRange = cont->getSamples()->fSampleRange;
-        const auto secondData = cont->getSamplesData();
+        const auto samples = cont->getSamples();
+        const auto contSampleRange = samples->fSampleRange;
+        const auto secondData = samples->fData;
         if(!secondData) break;
         const SampleRange samplesToRead = readSamples*contSampleRange;
-        const SampleRange contRelRange =
-                samplesToRead.shifted(-contSampleRange.fMin);
-        const int nSamples = contRelRange.span();
-        const qint64 chunk = qMin(maxLen - total, nSamples*qint64(sizeof(float)));
-        memcpy(data + total, secondData + contRelRange.fMin, static_cast<size_t>(chunk));
+        const SampleRange contRelRange = samplesToRead.shifted(-contSampleRange.fMin);
+        const qint64 nSamples = contRelRange.span();
+        const qint64 chunk = qMin(maxLen - total, nSamples*bytesPerSampleFrame);
+        const auto src = secondData[0] + contRelRange.fMin*bytesPerSampleFrame;
+        memcpy(data + total, src, static_cast<size_t>(chunk));
         mPos += nSamples;
         total += chunk;
     }

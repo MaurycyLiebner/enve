@@ -42,7 +42,8 @@ public:
         }
         setAudioSampleRateText(QString::number(settings.audioSampleRate) + " Hz");
         int formatId = settings.audioSampleFormat;
-        if(formatId < 0 || formatId >= OutputSettings::SAMPLE_FORMATS_NAMES.count()) {
+        if(OutputSettings::SAMPLE_FORMATS_NAMES.find(formatId) ==
+           OutputSettings::SAMPLE_FORMATS_NAMES.end()) {
             setAudioSampleFormatText("-");
         } else {
             setAudioSampleFormatText(OutputSettings::SAMPLE_FORMATS_NAMES.at(formatId));

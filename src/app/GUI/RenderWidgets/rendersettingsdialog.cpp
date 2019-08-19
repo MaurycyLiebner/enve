@@ -380,7 +380,13 @@ void RenderSettingsDialog::updateAvailableSampleFormats() {
     if(!sampleFormats) return;
     while(*sampleFormats != -1) {
         mSampleFormatsList << *sampleFormats;
-        QString formatName = OutputSettings::SAMPLE_FORMATS_NAMES.at(*sampleFormats);
+        QString formatName;
+        const auto it = OutputSettings::SAMPLE_FORMATS_NAMES.find(*sampleFormats);
+        if(it == OutputSettings::SAMPLE_FORMATS_NAMES.end()) {
+            formatName = "unrecognized";
+        } else {
+            formatName = it->second;
+        }
         mSampleFormatsComboBox->addItem(formatName);
         if(formatName == currentFormatName) {
             mSampleFormatsComboBox->setCurrentText(formatName);

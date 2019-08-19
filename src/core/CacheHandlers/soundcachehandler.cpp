@@ -14,8 +14,8 @@ void SoundHandler::secondReaderFinished(
 }
 
 SoundReaderForMerger *SoundHandler::addSecondReader(const int secondId) {
-    const SampleRange& range = {secondId*SOUND_SAMPLERATE,
-                                (secondId + 1)*SOUND_SAMPLERATE - 1};
+    const int sampleRate = eSoundSettings::sSampleRate();
+    const SampleRange range = {secondId*sampleRate, (secondId + 1)*sampleRate - 1};
     const auto reader = enve::make_shared<SoundReaderForMerger>(
                 this, mAudioStreamsData, secondId, range);
     mDataHandler->addSecondReader(secondId, reader);

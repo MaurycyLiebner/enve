@@ -4,6 +4,7 @@
 #include "CacheHandlers/samples.h"
 #include "soundcomposition.h"
 #include "Animators/qrealanimator.h"
+#include "esoundsettings.h"
 extern "C" {
     #include <libavutil/opt.h>
     #include <libswresample/swresample.h>
@@ -22,7 +23,7 @@ protected:
     SoundMerger(const int secondId, const SampleRange& sampleRange,
                 SoundComposition* const composition) :
         mSecondId(secondId), mSampleRange(sampleRange),
-        mComposition(composition) {
+        mComposition(composition), mSettings(eSoundSettings::sData()) {
 
     }
 
@@ -39,9 +40,10 @@ public:
 private:
     const int mSecondId;
     const SampleRange mSampleRange;
+    const qptr<SoundComposition> mComposition;
+    const eSoundSettingsData mSettings;
     stdsptr<Samples> mSamples;
     QList<SingleSoundData> mSounds;
-    const qptr<SoundComposition> mComposition;
 };
 
 #endif // SOUNDMERGER_H

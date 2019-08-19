@@ -3,8 +3,7 @@
 #include <QtCore>
 #include "skia/skiaincludes.h"
 
-struct eSettings {
-private:
+class eSettings {
     eSettings() {}
 public:
     // general

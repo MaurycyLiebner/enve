@@ -7,56 +7,60 @@
 #include "renderinstancesettings.h"
 #include "framerange.h"
 #include "CacheHandlers/samples.h"
+#include "Sound/esoundsettings.h"
 extern "C" {
     #include <libavcodec/avcodec.h>
     #include <libavformat/avformat.h>
     #include <libswscale/swscale.h>
     #include <libavutil/imgutils.h>
-    #include <libavresample/avresample.h>
+    #include <libswresample/swresample.h>
     #include <libavutil/channel_layout.h>
     #include <libavutil/mathematics.h>
     #include <libavutil/opt.h>
 }
 class ImageCacheContainer;
 
-
 class SoundIterator {
 public:
-    SoundIterator() {
-//        float fT = 0;
-//        const qreal tincr = 2 * M_PI * 110 / 44100;
-//        float fTincr = static_cast<float>(tincr);
-//        /* increment frequency by 110 Hz per second */
-//        const float fTincr2 = static_cast<float>(tincr / 44100);
-//        for(int i = 0; i < 10; i++) {
-//            const auto data = new float[44100];
-//            const auto samples = enve::make_shared<Samples>(data, SampleRange{0, 44099});
-//            float * q = samples->fData;
-//            for(int j = 0; j < 44100; j++) {
-//                *(q++) = sin(fT);
-//                fT += fTincr;
-//                fTincr += fTincr2;
-//            }
-//            mSamples << samples;
-//        }
-//        updateCurrent();
-    }
+    SoundIterator() {}
 
     bool hasValue() const {
         return !mSamples.isEmpty();
     }
 
-    bool next() {
-        if(mSamples.isEmpty()) return false;
-        if(++mCurrentSample == mEndSample) {
-            mSamples.removeFirst();
-            if(!updateCurrent()) return false;
+    void fillFrame(AVFrame* const frame) {
+        Q_ASSERT(frame->channel_layout == mCurrentSamples->fChannelLayout);
+        Q_ASSERT(frame->format == mCurrentSamples->fFormat);
+        Q_ASSERT(frame->sample_rate == mCurrentSamples->fSampleRate);
+        const int nChannels = static_cast<int>(mCurrentSamples->fNChannels);
+        if(mCurrentSamples->fPlanar) {
+            for(int i = 0; i < frame->nb_samples; i++) {
+                for(int j = 0; j < nChannels; j++) {
+                    frame->data[j][i] = mCurrentData[j][mCurrentSample];
+                }
+                if(mCurrentSample++ >= mEndSample) {
+                    if(!next()) return;
+                }
+            }
+        } else {
+            for(int i = 0; i < frame->nb_samples; i++) {
+                for(int j = 0; j < nChannels; j++) {
+                    const int dstId = i*nChannels + j;
+                    const int srcId = mCurrentSample*nChannels + j;
+                    frame->data[0][dstId] = mCurrentData[0][srcId];
+                }
+                if(mCurrentSample++ >= mEndSample) {
+                    if(!next()) return;
+                }
+            }
         }
-        return true;
     }
 
-    float value() const {
-        return *mCurrentSample;
+    bool next() {
+        if(mSamples.isEmpty()) return false;
+        mSamples.removeFirst();
+        if(!updateCurrent()) return false;
+        return true;
     }
 
     void add(const stdsptr<Samples>& sound) {
@@ -72,32 +76,38 @@ public:
 private:
     bool updateCurrent() {
         if(mSamples.isEmpty()) {
-            mCurrentSample = &mZero;
+            mCurrentSamples = nullptr;
+            mCurrentData = nullptr;
+            mCurrentSample = 0;
+            mEndSample = 0;
             return false;
         }
-        const auto& currSamples = mSamples.first();
-        mCurrentSample = currSamples->fData;
-        mEndSample = currSamples->fData + currSamples->fSampleRange.span();
+        mCurrentSamples = mSamples.first().get();
+        mCurrentData = mCurrentSamples->fData;
+        const auto samplesRange = mCurrentSamples->fSampleRange;
+        mCurrentSample = 0;
+        mEndSample = samplesRange.fMax - samplesRange.fMin;
         return true;
     }
 
-    float mZero = 0;
-    float * mCurrentSample = &mZero;
-    float * mEndSample = &mZero;
+    int mCurrentSample = 0;
+    int mEndSample = 0;
+    uchar** mCurrentData = nullptr;
+    Samples* mCurrentSamples = nullptr;
     QList<stdsptr<Samples>> mSamples;
 };
 
 typedef struct OutputStream {
     // pts of the next frame that will be generated
     int64_t fNextPts;
-    float fT, fTincr, fTincr2;
 
     AVStream *fStream = nullptr;
     AVCodecContext *fCodec = nullptr;
-    AVFrame *fFrame = nullptr;
-    AVFrame *fTmpFrame = nullptr;
+    int fFrameNbSamples = 0;
+    AVFrame *fDstFrame = nullptr;
+    AVFrame *fSrcFrame = nullptr;
     struct SwsContext *fSwsCtx = nullptr;
-    AVAudioResampleContext *fAvr = nullptr;
+    struct SwrContext *fSwrCtx = nullptr;
 } OutputStream;
 
 class VideoEncoderEmitter : public QObject {
@@ -186,6 +196,7 @@ protected:
     bool mEncodingFinished = false;
     bool mInterruptEncoding = false;
 
+    eSoundSettingsData mInSoundSettings;
     OutputStream mVideoStream;
     OutputStream mAudioStream;
     AVFormatContext *mFormatContext = nullptr;

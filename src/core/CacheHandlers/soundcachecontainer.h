@@ -20,11 +20,6 @@ public:
 
     stdsptr<Samples> getSamples() { return mSamples; }
 
-    float * getSamplesData() {
-        if(!mSamples) return nullptr;
-        return mSamples->fData;
-    }
-
     void setDataLoadedFromTmpFile(const stdsptr<Samples> &samples) {
         replaceSamples(samples);
         afterDataLoadedFromTmpFile();

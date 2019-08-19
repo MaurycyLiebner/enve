@@ -3,6 +3,7 @@
 #include "Tasks/updatable.h"
 #include "CacheHandlers/samples.h"
 #include "framerange.h"
+#include "../Sound/esoundsettings.h"
 extern "C" {
     #include <libavutil/opt.h>
     #include <libavcodec/avcodec.h>
@@ -22,14 +23,14 @@ protected:
                 const stdsptr<AudioStreamsData>& openedAudio,
                 const int secondId, const SampleRange& sampleRange) :
         mCacheHandler(cacheHandler), mOpenedAudio(openedAudio),
-        mSecondId(secondId), mSampleRange(sampleRange) {}
+        mSecondId(secondId), mSampleRange(sampleRange),
+        mSettings(eSoundSettings::sData()) {}
 
+    void beforeProcessing(const Hardware);
     void afterProcessing();
     void afterCanceled();
 public:
-    void process() {
-        readFrame();
-    }
+    void process() { readFrame(); }
 protected:
     const stdsptr<Samples>& getSamples() const {
         return mSamples;
@@ -41,6 +42,7 @@ private:
     const stdsptr<AudioStreamsData> mOpenedAudio;
     const int mSecondId;
     const SampleRange mSampleRange;
+    const eSoundSettingsData mSettings;
     stdsptr<Samples> mSamples;
 };
 

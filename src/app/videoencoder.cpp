@@ -60,8 +60,8 @@ static void openVideo(AVCodec * const codec, OutputStream * const ost) {
     if(ret < 0) AV_RuntimeThrow(ret, "Could not open codec");
 
     /* Allocate the encoded raw picture. */
-    ost->fFrame = allocPicture(c->pix_fmt, c->width, c->height);
-    if(!ost->fFrame) RuntimeThrow("Could not allocate picture");
+    ost->fDstFrame = allocPicture(c->pix_fmt, c->width, c->height);
+    if(!ost->fDstFrame) RuntimeThrow("Could not allocate picture");
 
     /* copy the stream parameters to the muxer */
     ret = avcodec_parameters_from_context(ost->fStream->codecpar, c);
@@ -176,24 +176,24 @@ static AVFrame *getVideoFrame(OutputStream * const ost,
         int linesizesSk[4];
 
         av_image_fill_linesizes(linesizesSk, AV_PIX_FMT_RGBA, image->width());
-        const int ret = av_frame_make_writable(ost->fFrame) ;
+        const int ret = av_frame_make_writable(ost->fDstFrame) ;
         if(ret < 0)
             AV_RuntimeThrow(ret, "Could not make AVFrame writable");
 
         sws_scale(ost->fSwsCtx, dstSk,
-                  linesizesSk, 0, c->height, ost->fFrame->data,
-                  ost->fFrame->linesize);
+                  linesizesSk, 0, c->height, ost->fDstFrame->data,
+                  ost->fDstFrame->linesize);
     } else {
         try {
-            copyImageToFrame(ost->fFrame, image, c->width, c->height);
+            copyImageToFrame(ost->fDstFrame, image, c->width, c->height);
         } catch(...) {
             RuntimeThrow("Failed to copy image to frame");
         }
     }
 
-    ost->fFrame->pts = ost->fNextPts++;
+    ost->fDstFrame->pts = ost->fNextPts++;
 
-    return ost->fFrame;
+    return ost->fDstFrame;
 }
 
 static void writeVideoFrame(AVFormatContext * const oc,
@@ -239,7 +239,8 @@ static void writeVideoFrame(AVFormatContext * const oc,
 
 static void addAudioStream(OutputStream * const ost,
                            AVFormatContext * const oc,
-                           const OutputSettings &settings) {
+                           const OutputSettings &settings,
+                           const eSoundSettingsData& inSound) {
     AVCodec * const codec = settings.audioCodec;
 
 //    /* find the audio encoder */
@@ -262,6 +263,7 @@ static void addAudioStream(OutputStream * const ost,
     c->channel_layout = settings.audioChannelsLayout;
     c->channels       = av_get_channel_layout_nb_channels(c->channel_layout);
     c->bit_rate       = settings.audioBitrate;
+    c->time_base      = { 1, c->sample_rate };
 
     ost->fStream->time_base = { 1, c->sample_rate };
 
@@ -274,22 +276,26 @@ static void addAudioStream(OutputStream * const ost,
      * if the encoder supports the generated format directly -- the price is
      * some extra data copying;
      */
-    ost->fAvr = avresample_alloc_context();
-    if(!ost->fAvr) RuntimeThrow("Error allocating the resampling context");
 
-    av_opt_set_int(ost->fAvr, "in_sample_fmt",      AV_SAMPLE_FMT_FLT,   0);
-    av_opt_set_int(ost->fAvr, "in_sample_rate",     44100,               0);
-    av_opt_set_int(ost->fAvr, "in_channel_layout",  AV_CH_LAYOUT_MONO, 0);
-    av_opt_set_int(ost->fAvr, "out_sample_fmt",     c->sample_fmt,       0);
-    av_opt_set_int(ost->fAvr, "out_sample_rate",    c->sample_rate,      0);
-    av_opt_set_int(ost->fAvr, "out_channel_layout", c->channel_layout,   0);
-
-    const int ret = avresample_open(ost->fAvr);
-    if(ret < 0) AV_RuntimeThrow(ret, "Error opening the resampling context");
+    if(ost->fSwrCtx) swr_free(&ost->fSwrCtx);
+    ost->fSwrCtx = swr_alloc();
+    if(!ost->fSwrCtx) RuntimeThrow("Error allocating the resampling context");
+    av_opt_set_int(ost->fSwrCtx, "in_channel_count",  inSound.channelCount(), 0);
+    av_opt_set_int(ost->fSwrCtx, "out_channel_count", c->channels, 0);
+    av_opt_set_int(ost->fSwrCtx, "in_channel_layout",  inSound.fChannelLayout, 0);
+    av_opt_set_int(ost->fSwrCtx, "out_channel_layout", c->channel_layout, 0);
+    av_opt_set_int(ost->fSwrCtx, "in_sample_rate", inSound.fSampleRate, 0);
+    av_opt_set_int(ost->fSwrCtx, "out_sample_rate", c->sample_rate, 0);
+    av_opt_set_sample_fmt(ost->fSwrCtx, "in_sample_fmt", inSound.fSampleFormat, 0);
+    av_opt_set_sample_fmt(ost->fSwrCtx, "out_sample_fmt", c->sample_fmt,  0);
+    swr_init(ost->fSwrCtx);
+    if(!swr_is_initialized(ost->fSwrCtx)) {
+        RuntimeThrow("Resampler has not been properly initialized");
+    }
 }
 
 static AVFrame *allocAudioFrame(enum AVSampleFormat sample_fmt,
-                                const uint64_t&  channel_layout,
+                                const uint64_t& channel_layout,
                                 const int sample_rate,
                                 const int nb_samples) {
     AVFrame * const frame = av_frame_alloc();
@@ -298,6 +304,7 @@ static AVFrame *allocAudioFrame(enum AVSampleFormat sample_fmt,
 
     frame->format = sample_fmt;
     frame->channel_layout = channel_layout;
+    frame->channels = av_get_channel_layout_nb_channels(channel_layout);
     frame->sample_rate = sample_rate;
     frame->nb_samples = nb_samples;
 
@@ -309,7 +316,8 @@ static AVFrame *allocAudioFrame(enum AVSampleFormat sample_fmt,
     return frame;
 }
 
-static void openAudio(AVCodec * const codec, OutputStream * const ost) {
+static void openAudio(AVCodec * const codec, OutputStream * const ost,
+                      const eSoundSettingsData& inSound) {
     AVCodecContext * const c = ost->fCodec;
 
     /* open it */
@@ -318,40 +326,24 @@ static void openAudio(AVCodec * const codec, OutputStream * const ost) {
     if(ret < 0) AV_RuntimeThrow(ret, "Could not open codec");
 
     ost->fNextPts = 0;
-    /* init signal generator */
-    ost->fT = 0;
-    const qreal tincr = 2 * M_PI * 110. / c->sample_rate;
-    ost->fTincr = static_cast<float>(tincr);
-    /* increment frequency by 110 Hz per second */
-    ost->fTincr2 = static_cast<float>(tincr / c->sample_rate);
 
     const bool varFS = c->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE;
     const int nb_samples = varFS ? 10000 : c->frame_size;
+    ost->fFrameNbSamples = nb_samples;
 
-    ost->fFrame = allocAudioFrame(c->sample_fmt, c->channel_layout,
-                                  c->sample_rate, nb_samples);
-    if(!ost->fFrame) RuntimeThrow("Could not alloc audio frame");
+    ost->fDstFrame = allocAudioFrame(c->sample_fmt, c->channel_layout,
+                                     c->sample_rate, nb_samples);
+    if(!ost->fDstFrame) RuntimeThrow("Could not alloc audio frame");
 
-    ost->fTmpFrame = allocAudioFrame(AV_SAMPLE_FMT_FLT, AV_CH_LAYOUT_MONO,
-                                     44100, nb_samples); // !!!
-    if(!ost->fTmpFrame) RuntimeThrow("Could not alloc temporary audio frame");
+    ost->fSrcFrame = allocAudioFrame(inSound.fSampleFormat,
+                                     inSound.fChannelLayout,
+                                     inSound.fSampleRate,
+                                     nb_samples);
+    if(!ost->fSrcFrame) RuntimeThrow("Could not alloc temporary audio frame");
 
     /* copy the stream parameters to the muxer */
     const int parRet = avcodec_parameters_from_context(ost->fStream->codecpar, c);
     if(parRet < 0) AV_RuntimeThrow(parRet, "Could not copy the stream parameters");
-}
-
-static AVFrame *getAudioFrame(OutputStream * const ost,
-                              SoundIterator &iterator) {
-    AVFrame * const frame = ost->fTmpFrame;
-    auto q = reinterpret_cast<float*>(frame->data[0]);
-
-    for(int j = 0; j < frame->nb_samples; j++) {
-        *q++ = iterator.value();
-        iterator.next();
-    }
-
-    return frame;
 }
 
 /* if a frame is provided, send it to the encoder, otherwise flush the encoder;
@@ -389,54 +381,22 @@ static void processAudioStream(AVFormatContext * const oc,
                                OutputStream * const ost,
                                SoundIterator &iterator,
                                bool * const audioEnabled) {
-    AVFrame * const frame = getAudioFrame(ost, iterator);
-    bool gotOutput = frame;
+    iterator.fillFrame(ost->fSrcFrame);
+    bool gotOutput = ost->fSrcFrame;
 
-    /* feed the data to lavr */
-    if(frame) {
-        const int ret = avresample_convert(ost->fAvr, nullptr, 0, 0,
-                                 frame->extended_data, frame->linesize[0],
-                                 frame->nb_samples);
-        if(ret < 0) AV_RuntimeThrow(ret, "Error feeding audio data to the resampler");
-    }
+    const int nb_samples =
+            swr_convert(ost->fSwrCtx, ost->fDstFrame->data, ost->fFrameNbSamples,
+                        const_cast<const uint8_t**>(ost->fSrcFrame->data),
+                        ost->fSrcFrame->nb_samples);
+    ost->fDstFrame->nb_samples = nb_samples;
+    ost->fDstFrame->pts = ost->fNextPts;
 
-    while((frame && avresample_available(ost->fAvr) >= ost->fFrame->nb_samples) ||
-          (!frame && avresample_get_out_samples(ost->fAvr, 0))) {
-        /* when we pass a frame to the encoder, it may keep a reference to it
-         * internally;
-         * make sure we do not overwrite it here
-         */
-        const int makeWRet = av_frame_make_writable(ost->fFrame);
-        if(makeWRet < 0) AV_RuntimeThrow(makeWRet, "Error making AVFrame writable");
+    ost->fNextPts += ost->fDstFrame->nb_samples;
 
-        /* the difference between the two avresample calls here is that the
-         * first one just reads the already converted data that is buffered in
-         * the lavr output buffer, while the second one also flushes the
-         * resampler */
-        int sample;
-        if(frame) {
-            sample = avresample_read(ost->fAvr, ost->fFrame->extended_data,
-                                     ost->fFrame->nb_samples);
-        } else {
-            sample = avresample_convert(ost->fAvr, ost->fFrame->extended_data,
-                                        ost->fFrame->linesize[0], ost->fFrame->nb_samples,
-                                        nullptr, 0, 0);
-        }
-
-        if(sample < 0) RuntimeThrow("Error while resampling");
-        else if(frame && sample != ost->fFrame->nb_samples)
-            RuntimeThrow("Too few samples returned from resampler");
-
-        ost->fFrame->nb_samples = sample;
-
-        ost->fFrame->pts = ost->fNextPts;
-        ost->fNextPts += ost->fFrame->nb_samples;
-
-        try {
-            encodeAudioFrame(oc, ost, ost->fFrame, &gotOutput);
-        } catch(...) {
-            RuntimeThrow("Error while encoding audio frame");
-        }
+    try {
+        encodeAudioFrame(oc, ost, ost->fDstFrame, &gotOutput);
+    } catch(...) {
+        RuntimeThrow("Error while encoding audio frame");
     }
 
     *audioEnabled = gotOutput;
@@ -474,7 +434,8 @@ void VideoEncoder::startEncodingNow() {
     if(mOutputFormat->audio_codec != AV_CODEC_ID_NONE &&
        mOutputSettings.audioEnabled) {
         try {
-            addAudioStream(&mAudioStream, mFormatContext, mOutputSettings);
+            addAudioStream(&mAudioStream, mFormatContext, mOutputSettings,
+                           mInSoundSettings);
         } catch (...) {
             RuntimeThrow("Error adding audio stream");
         }
@@ -492,7 +453,8 @@ void VideoEncoder::startEncodingNow() {
     }
     if(mHaveAudio) {
         try {
-            openAudio(mOutputSettings.audioCodec, &mAudioStream);
+            openAudio(mOutputSettings.audioCodec, &mAudioStream,
+                      mInSoundSettings);
         } catch (...) {
             RuntimeThrow("Error opening audio stream");
         }
@@ -517,7 +479,10 @@ bool VideoEncoder::startEncoding(RenderInstanceSettings * const settings) {
     mOutputSettings = mRenderInstanceSettings->getOutputRenderSettings();
     mRenderSettings = mRenderInstanceSettings->getRenderSettings();
     mPathByteArray = mRenderInstanceSettings->getOutputDestination().toLatin1();
-    // get format from audio file
+
+    // !!! set internal audio settings to match
+    // !!! that of RenderInstanceSettings
+    mInSoundSettings = eSoundSettings::sData();
 
     mOutputFormat = mOutputSettings.outputFormat;
     mSoundIterator = SoundIterator();
@@ -585,10 +550,10 @@ static void closeStream(OutputStream * const ost) {
         avcodec_close(ost->fCodec);
         avcodec_free_context(&ost->fCodec);
     }
-    if(ost->fFrame) av_frame_free(&ost->fFrame);
-    if(ost->fTmpFrame) av_frame_free(&ost->fTmpFrame);
+    if(ost->fDstFrame) av_frame_free(&ost->fDstFrame);
+    if(ost->fSrcFrame) av_frame_free(&ost->fSrcFrame);
     if(ost->fSwsCtx) sws_freeContext(ost->fSwsCtx);
-    if(ost->fAvr) avresample_free(&ost->fAvr);
+    if(ost->fSwrCtx) swr_free(&ost->fSwrCtx);
     *ost = OutputStream();
 }
 

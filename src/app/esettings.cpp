@@ -1,5 +1,6 @@
 #include "esettings.h"
 #include "hardwareinfo.h"
+
 eSettings eSettings::sSettings;
 
 int eSettings::sCpuThreadsCapped() {

@@ -9,6 +9,32 @@ stdsptr<const AudioStreamsData> AudioStreamsData::sOpen(
     return result;
 }
 
+void AudioStreamsData::updateSwrContext() {
+    if(mLocked) {
+        mUpdateSwrPlanned = true;
+        return;
+    }
+    mUpdateSwrPlanned = false;
+
+    const auto audCodecPars = fAudioStream->codecpar;
+    const auto sampleFormat = static_cast<AVSampleFormat>(audCodecPars->format);
+
+    if(fSwrContext) swr_free(&fSwrContext);
+    fSwrContext = swr_alloc();
+    av_opt_set_int(fSwrContext, "in_channel_count",  audCodecPars->channels, 0);
+    av_opt_set_int(fSwrContext, "out_channel_count", eSoundSettings::sChannelCount(), 0);
+    av_opt_set_int(fSwrContext, "in_channel_layout",  audCodecPars->channel_layout, 0);
+    av_opt_set_int(fSwrContext, "out_channel_layout", eSoundSettings::sChannelLayout(), 0);
+    av_opt_set_int(fSwrContext, "in_sample_rate", audCodecPars->sample_rate, 0);
+    av_opt_set_int(fSwrContext, "out_sample_rate", eSoundSettings::sSampleRate(), 0);
+    av_opt_set_sample_fmt(fSwrContext, "in_sample_fmt", sampleFormat, 0);
+    av_opt_set_sample_fmt(fSwrContext, "out_sample_fmt", eSoundSettings::sSampleFormat(),  0);
+    swr_init(fSwrContext);
+    if(!swr_is_initialized(fSwrContext)) {
+        RuntimeThrow("Resampler has not been properly initialized");
+    }
+}
+
 stdsptr<AudioStreamsData> AudioStreamsData::sOpen(const QString &path) {
     const auto result = std::shared_ptr<AudioStreamsData>(
                 new AudioStreamsData, AudioStreamsData::sDestroy);
@@ -111,21 +137,8 @@ void AudioStreamsData::open(AVFormatContext * const formatContext) {
     if(avcodec_open2(fCodecContext, audCodec, nullptr) < 0) {
         RuntimeThrow("Failed to open codec");
     }
-    const auto sampleFormat = static_cast<AVSampleFormat>(audCodecPars->format);
 
-    fSwrContext = swr_alloc();
-    av_opt_set_int(fSwrContext, "in_channel_count",  audCodecPars->channels, 0);
-    av_opt_set_int(fSwrContext, "out_channel_count", 1, 0);
-    av_opt_set_int(fSwrContext, "in_channel_layout",  audCodecPars->channel_layout, 0);
-    av_opt_set_int(fSwrContext, "out_channel_layout", AV_CH_LAYOUT_MONO, 0);
-    av_opt_set_int(fSwrContext, "in_sample_rate", audCodecPars->sample_rate, 0);
-    av_opt_set_int(fSwrContext, "out_sample_rate", SOUND_SAMPLERATE, 0);
-    av_opt_set_sample_fmt(fSwrContext, "in_sample_fmt", sampleFormat, 0);
-    av_opt_set_sample_fmt(fSwrContext, "out_sample_fmt", AV_SAMPLE_FMT_FLT,  0);
-    swr_init(fSwrContext);
-    if(!swr_is_initialized(fSwrContext)) {
-        RuntimeThrow("Resampler has not been properly initialized");
-    }
+    updateSwrContext();
 
     fPacket = av_packet_alloc();
     if(!fPacket) RuntimeThrow("Error allocating AVPacket");

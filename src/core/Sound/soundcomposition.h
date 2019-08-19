@@ -5,6 +5,7 @@
 #include "CacheHandlers/hddcachablecachehandler.h"
 #include "CacheHandlers/samples.h"
 #include "singlesound.h"
+#include "esoundsettings.h"
 #include <math.h>
 
 #include <QAudioOutput>
@@ -19,7 +20,6 @@
 #include <QTimer>
 class Canvas;
 class SoundMerger;
-const int SOUND_SAMPLERATE = 44100;
 
 class SoundComposition : public QIODevice {
 public:
@@ -56,6 +56,7 @@ private:
         mSecondsCache.remove(range);
     }
 
+    eSoundSettingsData mSettings;
     iValueRange mBlockRange{0, -1};
     QList<int> mProcessingSeconds;
     const Canvas * const mParent;

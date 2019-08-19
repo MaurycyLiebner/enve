@@ -41,6 +41,7 @@ private:
     void setFrameAction(const int frame);
     void setCurrentScene(Canvas * const scene);
 
+    void finishEncoding();
     void playPreviewAfterAllTasksCompleted();
 
     void nextSaveOutputFrame();

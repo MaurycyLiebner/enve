@@ -19,6 +19,19 @@ protected:
             const QString& path,
             AVFormatContext * const formatContext);
 public:
+    bool lock() {
+        if(mLocked) return false;
+        mLocked = true;
+        return true;
+    }
+
+    bool unlock() {
+        if(!mLocked) return false;
+        mLocked = false;
+        if(mUpdateSwrPlanned) updateSwrContext();
+        return true;
+    }
+
     QString fPath;
     bool fOpened = false;
     int fDurationSec = 0;
@@ -31,6 +44,8 @@ public:
     struct SwrContext * fSwrContext = nullptr;
     int fLastDstSample = 0;
 
+    void updateSwrContext();
+
     static stdsptr<AudioStreamsData> sOpen(const QString& path);
 private:
     void open(const QString& path, AVFormatContext * const formatContext);
@@ -40,6 +55,9 @@ private:
     void open(AVFormatContext * const formatContext);
 
     void close();
+
+    bool mLocked = false;
+    bool mUpdateSwrPlanned = false;
 };
 
 #endif // AUDIOSTREAMSDATA_H

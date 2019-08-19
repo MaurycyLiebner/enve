@@ -1,23 +1,21 @@
 #include "renderinstancesettings.h"
 #include "canvas.h"
-const QStringList OutputSettings::SAMPLE_FORMATS_NAMES = {
-    "8 bits unsigned",
-    "16 bits signed",
-    "32 bits signed",
-    "32 bits float",
-    "64 bits double",
-    "8 bits unsigned, planar",
-    "16 bits signed, planar",
-    "32 bits signed, planar",
-    "32 bits float, planar",
-    "64 bits double, planar",
-    "64 bits signed",
-    "64 bits signed, planar",
-    ""
+const std::map<int, QString> OutputSettings::SAMPLE_FORMATS_NAMES = {
+    {AV_SAMPLE_FMT_U8, "8 bits unsigned"},
+    {AV_SAMPLE_FMT_S16, "16 bits signed"},
+    {AV_SAMPLE_FMT_S32, "32 bits signed"},
+    {AV_SAMPLE_FMT_FLT, "32 bits float"},
+    {AV_SAMPLE_FMT_DBL, "64 bits double"},
+    {AV_SAMPLE_FMT_U8P, "8 bits unsigned, planar"},
+    {AV_SAMPLE_FMT_S16P, "16 bits signed, planar"},
+    {AV_SAMPLE_FMT_S32P, "32 bits signed, planar"},
+    {AV_SAMPLE_FMT_FLTP, "32 bits float, planar"},
+    {AV_SAMPLE_FMT_DBLP, "64 bits double, planar"},
+    {AV_SAMPLE_FMT_S64, "64 bits signed"},
+    {AV_SAMPLE_FMT_S64P, "64 bits signed, planar"}
 };
 
-QString OutputSettings::getChannelsLayoutNameStatic(
-        const uint64_t &layout) {
+QString OutputSettings::getChannelsLayoutNameStatic(const uint64_t &layout) {
     if(layout == AV_CH_LAYOUT_MONO) {
         return "Mono";
     } else if(layout == AV_CH_LAYOUT_STEREO) {

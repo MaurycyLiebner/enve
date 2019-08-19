@@ -79,6 +79,7 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
                                                       mCurrentRenderFrame});
         mCurrentScene->anim_setAbsFrame(mCurrentRenderFrame);
         mCurrentScene->setOutputRendering(true);
+        nextCurrentRenderFrame();
         if(TaskScheduler::sAllQuedCPUTasksFinished()) {
             nextSaveOutputFrame();
         }
@@ -212,10 +213,9 @@ void RenderHandler::playPreviewAfterAllTasksCompleted() {
         if(TaskScheduler::sAllTasksFinished()) {
             playPreview();
         } else {
-            const auto allFinishedFunc = [this]() {
+            TaskScheduler::sSetAllTasksFinishedFunc([this]() {
                 playPreview();
-            };
-            TaskScheduler::sSetAllTasksFinishedFunc(allFinishedFunc);
+            });
         }
     }
 }
@@ -272,20 +272,33 @@ void RenderHandler::nextPreviewFrame() {
     emit mCurrentScene->requestUpdate();
 }
 
+void RenderHandler::finishEncoding() {
+    TaskScheduler::sClearAllFinishedFuncs();
+    mCurrentRenderSettings = nullptr;
+    mCurrentScene->setOutputRendering(false);
+    setFrameAction(mSavedCurrentFrame);
+    if(!isZero4Dec(mSavedResolutionFraction - mCurrentScene->getResolutionFraction())) {
+        mCurrentScene->setResolutionFraction(mSavedResolutionFraction);
+    }
+    mCurrentSoundComposition->unblockAll();
+    VideoEncoder::sFinishEncoding();
+}
+
 void RenderHandler::nextSaveOutputFrame() {
-    const auto& sCacheHandler = mCurrentScene->getSoundComposition()->getCacheHandler();
+    const auto& sCacheHandler = mCurrentSoundComposition->getCacheHandler();
     const qreal fps = mCurrentScene->getFps();
-    const int maxSec = qCeil(mMaxRenderFrame/fps);
+    const int maxSec = qFloor(mMaxRenderFrame/fps);
+    const int sampleRate = eSoundSettings::sSampleRate();
     while(mCurrentEncodeSoundSecond <= maxSec) {
         const auto cont = sCacheHandler.atFrame(mCurrentEncodeSoundSecond);
         if(!cont) break;
         const auto sCont = cont->ref<SoundCacheContainer>();
         const auto samples = sCont->getSamples();
         if(mCurrentEncodeSoundSecond == mFirstEncodeSoundSecond) {
-            const int minSample = qRound(mMinRenderFrame*SOUND_SAMPLERATE/fps);
+            const int minSample = qRound(mMinRenderFrame*sampleRate/fps);
             const int max = samples->fSampleRange.fMax;
             VideoEncoder::sAddCacheContainerToEncoder(
-                        enve::make_shared<Samples>(samples->mid({minSample, max})));
+                        samples->mid({minSample, max}));
         } else {
             VideoEncoder::sAddCacheContainerToEncoder(
                         enve::make_shared<Samples>(samples));
@@ -305,18 +318,15 @@ void RenderHandler::nextSaveOutputFrame() {
 
     //mCurrentScene->renderCurrentFrameToOutput(*mCurrentRenderSettings);
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
-        mDocument.actionFinished();
+        if(mCurrentEncodeSoundSecond <= maxSec) return;
+        TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nullptr);
+        Document::sInstance->actionFinished();
         if(TaskScheduler::sAllTasksFinished()) {
-            TaskScheduler::sClearAllFinishedFuncs();
-            mCurrentRenderSettings = nullptr;
-            mCurrentScene->setOutputRendering(false);
-            setFrameAction(mSavedCurrentFrame);
-            if(qAbs(mSavedResolutionFraction -
-                    mCurrentScene->getResolutionFraction()) > 0.1) {
-                mCurrentScene->setResolutionFraction(mSavedResolutionFraction);
-            }
-            mCurrentSoundComposition->unblockAll();
-            VideoEncoder::sFinishEncoding();
+            finishEncoding();
+        } else {
+            TaskScheduler::sSetAllTasksFinishedFunc([this]() {
+                finishEncoding();
+            });
         }
     } else {
         mCurrentRenderSettings->setCurrentRenderFrame(mCurrentRenderFrame);

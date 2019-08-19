@@ -69,7 +69,7 @@ stdsptr<Samples> SingleSound::getSamplesForSecond(const int relSecondId) {
 
 int SingleSound::getSampleShift() const{
     const qreal fps = getCanvasFPS();
-    return qRound(prp_getTotalFrameShift()*(SOUND_SAMPLERATE/fps));
+    return qRound(prp_getTotalFrameShift()*(eSoundSettings::sSampleRate()/fps));
 }
 
 SampleRange SingleSound::relSampleRange() const {
@@ -78,7 +78,7 @@ SampleRange SingleSound::relSampleRange() const {
     const auto relFrameRange = durRect->getRelFrameRange();
     const auto qRelFrameRange = qValueRange{qreal(relFrameRange.fMin),
                                             qreal(relFrameRange.fMax)};
-    const auto qSampleRange = qRelFrameRange*(SOUND_SAMPLERATE/fps);
+    const auto qSampleRange = qRelFrameRange*(eSoundSettings::sSampleRate()/fps);
     return {qFloor(qSampleRange.fMin), qCeil(qSampleRange.fMax)};
 }
 
@@ -88,7 +88,7 @@ SampleRange SingleSound::absSampleRange() const {
     const auto absFrameRange = durRect->getAbsFrameRange();
     const auto qAbsFrameRange = qValueRange{qreal(absFrameRange.fMin),
                                             qreal(absFrameRange.fMax)};
-    const auto qSampleRange = qAbsFrameRange*(SOUND_SAMPLERATE/fps);
+    const auto qSampleRange = qAbsFrameRange*(eSoundSettings::sSampleRate()/fps);
     return {qFloor(qSampleRange.fMin), qCeil(qSampleRange.fMax)};
 }
 
@@ -137,7 +137,7 @@ void SingleSound::setStretch(const qreal stretch) {
 
 QrealSnapshot SingleSound::getVolumeSnap() const {
     return mVolumeAnimator->makeSnapshot(
-                SOUND_SAMPLERATE/getCanvasFPS(), 0.01);
+                eSoundSettings::sSampleRate()/getCanvasFPS(), 0.01);
 }
 
 void SingleSound::updateDurationRectLength() {
