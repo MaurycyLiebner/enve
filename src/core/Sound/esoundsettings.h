@@ -10,7 +10,7 @@ extern "C" {
 struct eSoundSettingsData {
     int fSampleRate = 44100;
     AVSampleFormat fSampleFormat = AV_SAMPLE_FMT_FLT;
-    uint64_t fChannelLayout = AV_CH_LAYOUT_STEREO;
+    uint64_t fChannelLayout = AV_CH_LAYOUT_MONO;
 
     bool planarFormat() const {
         return av_sample_fmt_is_planar(fSampleFormat);
@@ -26,64 +26,34 @@ struct eSoundSettingsData {
 };
 
 class eSoundSettings : public QObject, private eSoundSettingsData {
+    Q_OBJECT
+
     eSoundSettings();
+    eSoundSettingsData mSaved;
 public:
     static eSoundSettings sSettings;
 
-    static int sSampleRate() {
-        return sSettings.fSampleRate;
-    }
+    static int sSampleRate();
+    static AVSampleFormat sSampleFormat();
+    static uint64_t sChannelLayout();
+    static bool sPlanarFormat();
+    static int sChannelCount();
+    static int sBytesPerSample();
+    static eSoundSettingsData sData();
 
-    static AVSampleFormat sSampleFormat() {
-        return sSettings.fSampleFormat;
-    }
+    static void sSetSampleRate(const int sampleRate);
+    static void sSetSampleFormat(const AVSampleFormat format);
+    static void sSetChannelLayout(const uint64_t layout);
 
-    static uint64_t sChannelLayout() {
-        return sSettings.fChannelLayout;
-    }
+    static void sSave();
+    static void sRestore();
 
-    static bool sPlanarFormat() {
-        return sSettings.planarFormat();
-    }
+    void save();
+    void restore();
 
-    static int sChannelCount() {
-        return sSettings.channelCount();
-    }
-
-    static int sBytesPerSample() {
-        return sSettings.bytesPerSample();
-    }
-
-    static eSoundSettingsData sData() {
-        return sSettings;
-    }
-
-    static void sSetSampleRate(const int sampleRate) {
-        sSettings.setSampleRate(sampleRate);
-    }
-
-    static void sSetSampleFormat(const AVSampleFormat format) {
-        sSettings.setSampleFormat(format);
-    }
-
-    static void sSetChannelLayout(const uint64_t layout) {
-        sSettings.setChannelLayout(layout);
-    }
-
-    void setSampleRate(const int sampleRate) {
-        fSampleRate = sampleRate;
-        emit settingsChanged();
-    }
-
-    void setSampleFormat(const AVSampleFormat format) {
-        fSampleFormat = format;
-        emit settingsChanged();
-    }
-
-    void setChannelLayout(const uint64_t layout) {
-        fChannelLayout = layout;
-        emit settingsChanged();
-    }
+    void setSampleRate(const int sampleRate);
+    void setSampleFormat(const AVSampleFormat format);
+    void setChannelLayout(const uint64_t layout);
 signals:
     void settingsChanged();
 };

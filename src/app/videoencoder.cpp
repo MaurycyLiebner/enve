@@ -36,6 +36,11 @@ void VideoEncoder::addContainer(const stdsptr<Samples>& cont) {
     if(getState() < eTaskState::qued || getState() > eTaskState::processing) scheduleTask();
 }
 
+void VideoEncoder::allAudioProvided() {
+    mAllAudioProvided = true;
+    if(getState() < eTaskState::qued || getState() > eTaskState::processing) scheduleTask();
+}
+
 static AVFrame *allocPicture(enum AVPixelFormat pix_fmt,
                              const int width, const int height) {
     AVFrame * const picture = av_frame_alloc();
@@ -292,6 +297,19 @@ static void addAudioStream(OutputStream * const ost,
     if(!swr_is_initialized(ost->fSwrCtx)) {
         RuntimeThrow("Resampler has not been properly initialized");
     }
+
+#ifdef QT_DEBUG
+    qDebug() << "name" << "src" << "output";
+    qDebug() << "channels" << inSound.channelCount() <<
+                              c->channels;
+    qDebug() << "channel layout" << inSound.fChannelLayout <<
+                                    c->channel_layout;
+    qDebug() << "sample rate" << inSound.fSampleRate <<
+                                 c->sample_rate;
+    qDebug() << "sample format" << av_get_sample_fmt_name(inSound.fSampleFormat) <<
+                                   av_get_sample_fmt_name(c->sample_fmt);
+    qDebug() << "bitrate" << settings.audioBitrate;
+#endif
 }
 
 static AVFrame *allocAudioFrame(enum AVSampleFormat sample_fmt,
@@ -329,7 +347,6 @@ static void openAudio(AVCodec * const codec, OutputStream * const ost,
 
     const bool varFS = c->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE;
     const int nb_samples = varFS ? 10000 : c->frame_size;
-    ost->fFrameNbSamples = nb_samples;
 
     ost->fDstFrame = allocAudioFrame(c->sample_fmt, c->channel_layout,
                                      c->sample_rate, nb_samples);
@@ -384,17 +401,21 @@ static void processAudioStream(AVFormatContext * const oc,
     iterator.fillFrame(ost->fSrcFrame);
     bool gotOutput = ost->fSrcFrame;
 
-    const int nb_samples =
-            swr_convert(ost->fSwrCtx, ost->fDstFrame->data, ost->fFrameNbSamples,
-                        const_cast<const uint8_t**>(ost->fSrcFrame->data),
-                        ost->fSrcFrame->nb_samples);
-    ost->fDstFrame->nb_samples = nb_samples;
-    ost->fDstFrame->pts = ost->fNextPts;
+//    const int nb_samples =
+//            swr_convert(ost->fSwrCtx,
+//                        ost->fDstFrame->data, ost->fDstFrame->nb_samples,
+//                        const_cast<const uint8_t**>(ost->fSrcFrame->data),
+//                        ost->fSrcFrame->nb_samples);
+//    ost->fDstFrame->nb_samples = nb_samples;
+//    ost->fDstFrame->pts = ost->fNextPts;
 
-    ost->fNextPts += ost->fDstFrame->nb_samples;
+//    ost->fNextPts += ost->fDstFrame->nb_samples;
+
+    ost->fSrcFrame->pts = ost->fNextPts;
+    ost->fNextPts += ost->fSrcFrame->nb_samples;
 
     try {
-        encodeAudioFrame(oc, ost, ost->fDstFrame, &gotOutput);
+        encodeAudioFrame(oc, ost, ost->fSrcFrame, &gotOutput);
     } catch(...) {
         RuntimeThrow("Error while encoding audio frame");
     }
@@ -413,10 +434,11 @@ void VideoEncoder::startEncodingNow() {
     mFormatContext = avformat_alloc_context();
     if(!mFormatContext) RuntimeThrow("Error allocating AVFormatContext");
 
-    mFormatContext->oformat = mOutputFormat;
+    mFormatContext->oformat = const_cast<AVOutputFormat*>(mOutputFormat);
 
     _mCurrentContainerFrame = 0;
     // add streams
+    mAllAudioProvided = false;
     mHaveVideo = false;
     mHaveAudio = false;
     mEncodeVideo = false;
@@ -433,6 +455,11 @@ void VideoEncoder::startEncodingNow() {
     }
     if(mOutputFormat->audio_codec != AV_CODEC_ID_NONE &&
        mOutputSettings.audioEnabled) {
+        eSoundSettings::sSave();
+        eSoundSettings::sSetSampleRate(mOutputSettings.audioSampleRate);
+        eSoundSettings::sSetSampleFormat(mOutputSettings.audioSampleFormat);
+        eSoundSettings::sSetChannelLayout(mOutputSettings.audioChannelsLayout);
+        mInSoundSettings = eSoundSettings::sData();
         try {
             addAudioStream(&mAudioStream, mFormatContext, mOutputSettings,
                            mInSoundSettings);
@@ -479,10 +506,6 @@ bool VideoEncoder::startEncoding(RenderInstanceSettings * const settings) {
     mOutputSettings = mRenderInstanceSettings->getOutputRenderSettings();
     mRenderSettings = mRenderInstanceSettings->getRenderSettings();
     mPathByteArray = mRenderInstanceSettings->getOutputDestination().toLatin1();
-
-    // !!! set internal audio settings to match
-    // !!! that of RenderInstanceSettings
-    mInSoundSettings = eSoundSettings::sData();
 
     mOutputFormat = mOutputSettings.outputFormat;
     mSoundIterator = SoundIterator();
@@ -588,6 +611,8 @@ void VideoEncoder::finishEncodingNow() {
     mNextContainers.clear();
     mNextSoundConts.clear();
     clearContainers();
+
+    eSoundSettings::sRestore();
 }
 
 void VideoEncoder::clearContainers() {
@@ -599,7 +624,8 @@ void VideoEncoder::clearContainers() {
 
 void VideoEncoder::process() {
     bool encodeVideoT = !_mContainers.isEmpty(); // local encode
-    bool encodeAudioT = mSoundIterator.hasValue(); // local encode
+    bool encodeAudioT = _mAllAudioProvided ? mSoundIterator.hasValue() :
+                                             mSoundIterator.hasSamples(mAudioStream.fSrcFrame->nb_samples); // local encode
     while((mEncodeVideo && encodeVideoT) || (mEncodeAudio && encodeAudioT)) {
         bool videoAligned = true;
         if(mEncodeVideo && mEncodeAudio) {
@@ -643,7 +669,8 @@ void VideoEncoder::process() {
             } catch(...) {
                 RuntimeThrow("Failed to process audio stream");
             }
-            encodeAudioT = mSoundIterator.hasValue();
+            encodeAudioT = _mAllAudioProvided ? mSoundIterator.hasValue() :
+                                                mSoundIterator.hasSamples(mAudioStream.fSrcFrame->nb_samples);
         }
         if(!encodeVideo && !encodeAudio) break;
     }
@@ -652,6 +679,7 @@ void VideoEncoder::process() {
 
 void VideoEncoder::beforeProcessing(const Hardware) {
     _mCurrentContainerId = 0;
+    _mAllAudioProvided = mAllAudioProvided;
     _mContainers.swap(mNextContainers);
     for(const auto& sound : mNextSoundConts)
         mSoundIterator.add(sound);
@@ -715,4 +743,8 @@ void VideoEncoder::sAddCacheContainerToEncoder(
 void VideoEncoder::sAddCacheContainerToEncoder(
         const stdsptr<Samples> &cont) {
     sInstance->addContainer(cont);
+}
+
+void VideoEncoder::sAllAudioProvided() {
+    sInstance->allAudioProvided();
 }

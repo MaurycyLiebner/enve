@@ -55,6 +55,8 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
         const qreal resolutionFraction = renderSettings.fResolution;
         mMinRenderFrame = renderSettings.fMinFrame;
         mMaxRenderFrame = renderSettings.fMaxFrame;
+        const qreal fps = mCurrentScene->getFps();
+        mMaxSoundSec = qFloor(mMaxRenderFrame/fps);
 
         const auto nextFrameFunc = [this]() {
             nextSaveOutputFrame();
@@ -72,8 +74,10 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
         mCurrentScene->setCurrentRenderRange(mCurrRenderRange);
 
         mCurrentEncodeFrame = mCurrentRenderFrame;
-        mFirstEncodeSoundSecond = qRound(mCurrentRenderFrame/mCurrentScene->getFps());
+        mFirstEncodeSoundSecond = qRound(mCurrentRenderFrame/fps);
         mCurrentEncodeSoundSecond = mFirstEncodeSoundSecond;
+        if(!settings->getOutputRenderSettings().audioEnabled)
+            mMaxSoundSec = mCurrentEncodeSoundSecond - 1;
         mCurrentSoundComposition->startBlockingAtFrame(mCurrentRenderFrame);
         mCurrentSoundComposition->scheduleFrameRange({mCurrentRenderFrame,
                                                       mCurrentRenderFrame});
@@ -287,9 +291,8 @@ void RenderHandler::finishEncoding() {
 void RenderHandler::nextSaveOutputFrame() {
     const auto& sCacheHandler = mCurrentSoundComposition->getCacheHandler();
     const qreal fps = mCurrentScene->getFps();
-    const int maxSec = qFloor(mMaxRenderFrame/fps);
     const int sampleRate = eSoundSettings::sSampleRate();
-    while(mCurrentEncodeSoundSecond <= maxSec) {
+    while(mCurrentEncodeSoundSecond <= mMaxSoundSec) {
         const auto cont = sCacheHandler.atFrame(mCurrentEncodeSoundSecond);
         if(!cont) break;
         const auto sCont = cont->ref<SoundCacheContainer>();
@@ -306,6 +309,7 @@ void RenderHandler::nextSaveOutputFrame() {
         sCont->setBlocked(false);
         mCurrentEncodeSoundSecond++;
     }
+    if(mCurrentEncodeSoundSecond > mMaxSoundSec) VideoEncoder::sAllAudioProvided();
 
     const auto& cacheHandler = mCurrentScene->getCacheHandler();
     while(mCurrentEncodeFrame <= mMaxRenderFrame) {
@@ -318,7 +322,7 @@ void RenderHandler::nextSaveOutputFrame() {
 
     //mCurrentScene->renderCurrentFrameToOutput(*mCurrentRenderSettings);
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
-        if(mCurrentEncodeSoundSecond <= maxSec) return;
+        if(mCurrentEncodeSoundSecond <= mMaxSoundSec) return;
         TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nullptr);
         Document::sInstance->actionFinished();
         if(TaskScheduler::sAllTasksFinished()) {

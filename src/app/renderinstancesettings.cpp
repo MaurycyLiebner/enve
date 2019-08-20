@@ -187,7 +187,7 @@ void RenderInstanceSettings::setCurrentState(
     mState = state;
     if(mState == ERROR) mRenderError = text;
     //if(mState == FINISHED) QSound::play(":/");
-    emit stateChanged();
+    emit stateChanged(mState);
 }
 
 const QString &RenderInstanceSettings::getRenderError() const {

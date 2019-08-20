@@ -20,7 +20,6 @@ bool generate(const QString& svgPath,
     if(QFile(pngPath).exists()) return false;
 
     QSvgRenderer renderer(svgPath);
-    const auto vBox = renderer.viewBox();
     const auto defSize = renderer.defaultSize();
     QImage image(qRound(scale*defSize.width()),
                  qRound(scale*defSize.height()),

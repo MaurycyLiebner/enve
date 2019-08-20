@@ -28,6 +28,16 @@ public:
         return !mSamples.isEmpty();
     }
 
+    bool hasSamples(const int samples) const {
+        int rem = samples - (mEndSample - mCurrentSample);
+        if(rem <= 0) return true;
+        for(int i = 1 ; i < mSamples.count(); i++) {
+            rem -= mSamples.at(i)->fSampleRange.span();
+            if(rem <= 0) return true;
+        }
+        return false;
+    }
+
     void fillFrame(AVFrame* const frame) {
         Q_ASSERT(frame->channel_layout == mCurrentSamples->fChannelLayout);
         Q_ASSERT(frame->format == mCurrentSamples->fFormat);
@@ -39,7 +49,10 @@ public:
                     frame->data[j][i] = mCurrentData[j][mCurrentSample];
                 }
                 if(mCurrentSample++ >= mEndSample) {
-                    if(!next()) return;
+                    if(!next()) {
+                        frame->nb_samples = i + 1;
+                        return;
+                    }
                 }
             }
         } else {
@@ -50,7 +63,10 @@ public:
                     frame->data[0][dstId] = mCurrentData[0][srcId];
                 }
                 if(mCurrentSample++ >= mEndSample) {
-                    if(!next()) return;
+                    if(!next()) {
+                        frame->nb_samples = i + 1;
+                        return;
+                    }
                 }
             }
         }
@@ -64,9 +80,8 @@ public:
     }
 
     void add(const stdsptr<Samples>& sound) {
-        const bool update = !hasValue();
         mSamples << sound;
-        if(update) updateCurrent();
+        if(mSamples.count() == 1) updateCurrent();
     }
 
     void clear() {
@@ -103,7 +118,6 @@ typedef struct OutputStream {
 
     AVStream *fStream = nullptr;
     AVCodecContext *fCodec = nullptr;
-    int fFrameNbSamples = 0;
     AVFrame *fDstFrame = nullptr;
     AVFrame *fSrcFrame = nullptr;
     struct SwsContext *fSwsCtx = nullptr;
@@ -166,6 +180,7 @@ public:
 
     void addContainer(const stdsptr<ImageCacheContainer> &cont);
     void addContainer(const stdsptr<Samples> &cont);
+    void allAudioProvided();
 
     static VideoEncoder *sInstance;
 
@@ -173,6 +188,7 @@ public:
     static bool sStartEncoding(RenderInstanceSettings *settings);
     static void sAddCacheContainerToEncoder(const stdsptr<ImageCacheContainer> &cont);
     static void sAddCacheContainerToEncoder(const stdsptr<Samples> &cont);
+    static void sAllAudioProvided();
     static void sFinishEncoding();
     static bool sEncodingSuccessfulyStarted();
 
@@ -200,7 +216,7 @@ protected:
     OutputStream mVideoStream;
     OutputStream mAudioStream;
     AVFormatContext *mFormatContext = nullptr;
-    AVOutputFormat *mOutputFormat = nullptr;
+    const AVOutputFormat *mOutputFormat = nullptr;
     bool mCurrentlyEncoding = false;
     QList<stdsptr<ImageCacheContainer>> mNextContainers;
     QList<stdsptr<Samples>> mNextSoundConts;
@@ -213,7 +229,9 @@ protected:
     bool mHaveAudio = false;
     bool mEncodeVideo = false;
     bool mEncodeAudio = false;
+    bool mAllAudioProvided = false;
 
+    bool _mAllAudioProvided = false;
     int _mCurrentContainerId = 0;
     int _mCurrentContainerFrame = 0; // some containers will add multiple frames
     FrameRange _mRenderRange;

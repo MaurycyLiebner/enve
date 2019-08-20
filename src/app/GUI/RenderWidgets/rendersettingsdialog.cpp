@@ -170,7 +170,7 @@ void RenderSettingsDialog::updateAvailablePixelFormats() {
 }
 
 void RenderSettingsDialog::addVideoCodec(const AVCodecID &codecId,
-                                         AVOutputFormat *outputFormat,
+                                         const AVOutputFormat *outputFormat,
                                          const QString &currentCodecName) {
     AVCodec *currentCodec = avcodec_find_encoder(codecId);
     if(!currentCodec) return;
@@ -187,7 +187,7 @@ void RenderSettingsDialog::addVideoCodec(const AVCodecID &codecId,
 }
 
 void RenderSettingsDialog::addAudioCodec(const AVCodecID &codecId,
-                                         AVOutputFormat *outputFormat,
+                                         const AVOutputFormat *outputFormat,
                                          const QString &currentCodecName) {
     AVCodec * const currentCodec = avcodec_find_encoder(codecId);
     if(!currentCodec) return;
@@ -214,24 +214,26 @@ void RenderSettingsDialog::updateAvailableVideoCodecs() {
     mVideoCodecsList.clear();
     if(mOutputFormatsComboBox->count() == 0) return;
     const int outputFormatId = mOutputFormatsComboBox->currentIndex();
-    AVOutputFormat * const outputFormat =
+    const AVOutputFormat * const outputFormat =
             mOutputFormatsList.at(outputFormatId);
     if(!outputFormat) return;
 
     if(mShowAllFormatsAndCodecs) {
-        AVCodec *currentCodec = nullptr;
-        do {
-            currentCodec = av_codec_next(currentCodec);
-            if(!currentCodec) break;
-            if(currentCodec->type != AVMEDIA_TYPE_VIDEO) continue;
-            if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) {
-                continue;
-            }
-            if(currentCodec->pix_fmts == nullptr) continue;
-            addVideoCodec(currentCodec->id,
-                          outputFormat,
-                          currentCodecName);
-        } while(currentCodec != nullptr);
+        const AVCodec *currentCodec = nullptr;
+        void *i = nullptr;
+        while((currentCodec = av_codec_iterate(&i))) {
+          if(av_codec_is_encoder(currentCodec)) {
+              if(!currentCodec) break;
+              if(currentCodec->type != AVMEDIA_TYPE_VIDEO) continue;
+              if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) {
+                  continue;
+              }
+              if(currentCodec->pix_fmts == nullptr) continue;
+              addVideoCodec(currentCodec->id,
+                            outputFormat,
+                            currentCodecName);
+          }
+        }
     } else {
         const FormatCodecs currFormatT =
                 mSupportedFormats.at(outputFormatId);
@@ -260,23 +262,25 @@ void RenderSettingsDialog::updateAvailableAudioCodecs() {
     mAudioCodecsList.clear();
     if(mOutputFormatsComboBox->count() == 0) return;
     const int outputFormatId = mOutputFormatsComboBox->currentIndex();
-    AVOutputFormat * const outputFormat =
+    const  AVOutputFormat * const outputFormat =
             mOutputFormatsList.at(outputFormatId);
     if(!outputFormat) return;
     if(mShowAllFormatsAndCodecs) {
-        AVCodec *currentCodec = nullptr;
-        do {
-            currentCodec = av_codec_next(currentCodec);
-            if(!currentCodec) break;
-            if(currentCodec->type != AVMEDIA_TYPE_AUDIO) continue;
-            if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) {
-                continue;
+        const AVCodec *currentCodec = nullptr;
+        void *i = nullptr;
+        while((currentCodec = av_codec_iterate(&i))) {
+            if(av_codec_is_encoder(currentCodec)) {
+                if(!currentCodec) break;
+                if(currentCodec->type != AVMEDIA_TYPE_AUDIO) continue;
+                if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) {
+                    continue;
+                }
+                if(currentCodec->sample_fmts == nullptr) continue;
+                addAudioCodec(currentCodec->id,
+                              outputFormat,
+                              currentCodecName);
             }
-            if(currentCodec->sample_fmts == nullptr) continue;
-            addAudioCodec(currentCodec->id,
-                          outputFormat,
-                          currentCodecName);
-        } while(currentCodec != nullptr);
+        }
     } else {
         const FormatCodecs currFormatT =
                 mSupportedFormats.at(outputFormatId);
@@ -309,9 +313,9 @@ void RenderSettingsDialog::updateAvailableOutputFormats() {
     mOutputFormatsList.clear();
 
     if(mShowAllFormatsAndCodecs) {
-        AVOutputFormat *currentFormat = nullptr;
-        do {
-            currentFormat = av_oformat_next(currentFormat);
+        const AVOutputFormat *currentFormat = nullptr;
+        void *i = nullptr;
+        while((currentFormat = av_muxer_iterate(&i))) {
             if(!currentFormat) break;
             //if(!currentFormat->codec_tag || !currentFormat->codec_tag[0]) continue;
 //            int supportedCodecs = 0;
@@ -333,10 +337,10 @@ void RenderSettingsDialog::updateAvailableOutputFormats() {
             if(formatName == currentFormatName) {
                 mOutputFormatsComboBox->setCurrentText(formatName);
             }
-        } while(currentFormat != nullptr);
+        }
     } else {
         for(const FormatCodecs &formatT : mSupportedFormats) {
-            AVOutputFormat *currentFormat = formatT.mFormat;
+            const auto currentFormat = formatT.mFormat;
             if(!currentFormat) break;
             //if(!currentFormat->codec_tag || !currentFormat->codec_tag[0]) continue;
 //            int supportedCodecs = 0;
@@ -472,7 +476,7 @@ void RenderSettingsDialog::updateAvailableAudioChannelLayouts() {
 }
 
 void RenderSettingsDialog::restoreInitialSettings() {
-    AVOutputFormat *currentOutputFormat = mInitialSettings.outputFormat;
+    const auto currentOutputFormat = mInitialSettings.outputFormat;
     if(!currentOutputFormat) {
         mOutputFormatsComboBox->setCurrentIndex(0);
     } else {
@@ -561,7 +565,7 @@ void RenderSettingsDialog::restoreInitialSettings() {
         if(channLayStr == "-") {
             mAudioChannelLayoutsComboBox->setCurrentIndex(0);
         } else {
-            mAudioBitrateComboBox->setCurrentText(channLayStr);
+            mAudioChannelLayoutsComboBox->setCurrentText(channLayStr);
         }
     }
 

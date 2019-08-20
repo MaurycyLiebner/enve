@@ -2,13 +2,11 @@
 #define AUDIOSTREAMSDATA_H
 #include "soundreader.h"
 
-struct AudioStreamsData {
+struct AudioStreamsData : public QObject {
 private:
-    explicit AudioStreamsData() {}
+    explicit AudioStreamsData();
 
-    ~AudioStreamsData() {
-        if(fOpened) close();
-    }
+    ~AudioStreamsData();
 
     static void sDestroy(AudioStreamsData * const p) {
         delete p;

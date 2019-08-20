@@ -20,7 +20,7 @@ public:
                      const QList<AVCodecID> &audioCodec,
                      const char *name);
 
-        AVOutputFormat *mFormat = nullptr;
+        const AVOutputFormat *mFormat = nullptr;
         QList<AVCodecID> mVidCodecs;
         QList<AVCodecID> mAudioCodecs;
     };
@@ -29,7 +29,7 @@ public:
     OutputSettings getSettings() {
         OutputSettings settings = mInitialSettings;
 
-        AVOutputFormat *currentOutputFormat = nullptr;
+        const AVOutputFormat *currentOutputFormat = nullptr;
         if(mVideoCodecsComboBox->count() > 0) {
             int formatId = mOutputFormatsComboBox->currentIndex();
             currentOutputFormat = mOutputFormatsList.at(formatId);
@@ -50,7 +50,7 @@ public:
             currentPixelFormat = mPixelFormatsList.at(formatId);
         }
         settings.videoPixelFormat = currentPixelFormat;
-        settings.videoBitrate = mBitrateSpinBox->value()*1000000;
+        settings.videoBitrate = qRound(mBitrateSpinBox->value()*1000000);
 
         settings.audioEnabled = mAudioGroupBox->isChecked();
         AVCodec *currentAudioCodec = nullptr;
@@ -115,7 +115,7 @@ protected:
     bool mShowAllFormatsAndCodecs = false;
     QList<AVPixelFormat> mPixelFormatsList;
     QList<AVCodec*> mVideoCodecsList;
-    QList<AVOutputFormat*> mOutputFormatsList;
+    QList<const AVOutputFormat*> mOutputFormatsList;
     QList<AVCodec*> mAudioCodecsList;
     QList<int> mSampleRatesList;
     QList<AVSampleFormat> mSampleFormatsList;
@@ -160,10 +160,10 @@ protected:
     QPushButton *mCancelButton = nullptr;
     QPushButton *mResetButton = nullptr;
     void addVideoCodec(const AVCodecID &codecId,
-                       AVOutputFormat *outputFormat,
+                       const AVOutputFormat *outputFormat,
                        const QString &currentCodecName);
     void addAudioCodec(const AVCodecID &codecId,
-                       AVOutputFormat *outputFormat,
+                       const AVOutputFormat *outputFormat,
                        const QString &currentCodecName);
 };
 

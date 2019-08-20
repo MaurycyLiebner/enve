@@ -110,8 +110,8 @@ void SoundReader::readFrame() {
 
         // calculate PTS:
         if(firstFrame) {
-            int64_t pts = av_frame_get_best_effort_timestamp(decodedFrame);
-            pts = av_rescale_q(pts, audioStream->time_base, AV_TIME_BASE_Q);
+            int64_t pts = decodedFrame->best_effort_timestamp;
+            pts = av_rescale_q(pts, audioStream->time_base, {1, AV_TIME_BASE});
             currentDstSample = static_cast<int>(pts*dstSampleRate/1000000);
             if(currentDstSample > firstSample) {
                 if(seekTry > 3) {
@@ -130,8 +130,9 @@ void SoundReader::readFrame() {
             // resample frames
             uchar** buffer = nullptr;
             const int bufferSamples = qCeil(decodedFrame->nb_samples*dstSamplesPerSrc);
+            int linesize;
             const int res = av_samples_alloc_array_and_samples(
-                        &buffer, nullptr, dstChCount,
+                        &buffer, &linesize, dstChCount,
                         bufferSamples, dstSampleFormat, 0);
             if(res < 0) RuntimeThrow("Resampling output buffer alloc failed");
 
@@ -139,7 +140,7 @@ void SoundReader::readFrame() {
                     swr_convert(swrContext, buffer, bufferSamples,
                                 const_cast<const uint8_t**>(decodedFrame->data),
                                 decodedFrame->nb_samples);
-            if(nSamples < 0) RuntimeThrow("Resampling failed");
+            if(nDstSamples < 0) RuntimeThrow("Resampling failed");
             // append resampled frames to data
             const SampleRange frameSampleRange{currentDstSample, currentDstSample + nDstSamples - 1};
             const SampleRange neededSampleRange = mSampleRange*frameSampleRange;
@@ -173,6 +174,7 @@ void SoundReader::readFrame() {
                 else audioDataRange += neededSampleRange;
             }
 
+            if(buffer) av_freep(&buffer[0]);
             av_freep(&buffer);
             firstFrame = false;
 

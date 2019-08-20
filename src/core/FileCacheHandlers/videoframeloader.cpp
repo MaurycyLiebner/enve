@@ -36,8 +36,8 @@ void VideoFrameLoader::convertFrame() {
 int frameId(AVFrame * const decodedFrame,
             AVStream * const videoStream,
             const qreal fps) {
-    int64_t pts = av_frame_get_best_effort_timestamp(decodedFrame);
-    pts = av_rescale_q(pts, videoStream->time_base, AV_TIME_BASE_Q);
+    int64_t pts = decodedFrame->best_effort_timestamp;
+    pts = av_rescale_q(pts, videoStream->time_base, {1, AV_TIME_BASE});
     const qreal frameApprox = pts/1000000.*fps;
     const int frameRound = qRound(frameApprox);
     if(frameRound - frameApprox > 0.4) return frameRound - 1;

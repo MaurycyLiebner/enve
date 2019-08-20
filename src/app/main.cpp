@@ -63,7 +63,6 @@ int main(int argc, char *argv[]) {
         document.actionFinished();
     });
 
-    av_register_all();
     AudioHandler audioHandler;
     audioHandler.initializeAudio();
 

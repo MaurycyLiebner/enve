@@ -7,7 +7,13 @@
 #include "FileCacheHandlers/soundreader.h"
 
 SoundComposition::SoundComposition(Canvas * const parent) :
-    QIODevice(parent), mParent(parent) {}
+    QIODevice(parent), mParent(parent) {
+    connect(&eSoundSettings::sSettings, &eSoundSettings::settingsChanged,
+            this, [this]() {
+        mSettings = eSoundSettings::sData();
+        mSecondsCache.clear();
+    });
+}
 
 void SoundComposition::start(const int startFrame) {
     mPos = qRound(startFrame/mParent->getFps());

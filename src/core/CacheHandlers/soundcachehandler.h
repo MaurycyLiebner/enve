@@ -12,7 +12,11 @@ class SoundDataHandler : public FileDataCacheHandler {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
     e_OBJECT
 public:
-    void clearCache() {}
+    SoundDataHandler();
+
+    void clearCache() {
+        mSecondsCache.clear();
+    }
     void afterSourceChanged();
 
     const HDDCachableCacheHandler& getCacheHandler() const {

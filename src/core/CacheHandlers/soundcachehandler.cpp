@@ -2,6 +2,13 @@
 #include "FileCacheHandlers/soundreader.h"
 #include "Sound/singlesound.h"
 
+SoundDataHandler::SoundDataHandler() {
+    connect(&eSoundSettings::sSettings, &eSoundSettings::settingsChanged,
+            this, [this]() {
+        mSecondsCache.clear();
+    });
+}
+
 stdsptr<Samples> SoundHandler::getSamplesForSecond(const int secondId) {
     return mDataHandler->getSamplesForSecond(secondId);
 }

@@ -79,6 +79,7 @@ private:
 
     int mCurrentEncodeFrame;
     int mCurrentEncodeSoundSecond;
+    int mMaxSoundSec;
     int mFirstEncodeSoundSecond;
 
     FrameRange mCurrRenderRange;

@@ -29,7 +29,7 @@ struct OutputSettings {
     static const std::map<int, QString> SAMPLE_FORMATS_NAMES;
     static QString getChannelsLayoutNameStatic(const uint64_t &layout);
 
-    AVOutputFormat *outputFormat = nullptr;
+    const AVOutputFormat *outputFormat = nullptr;
 
     bool videoEnabled = false;
     bool audioEnabled = false;
@@ -106,7 +106,7 @@ public:
     void setOutputSettingsProfile(OutputSettingsProfile *profile);
     OutputSettingsProfile *getOutputSettingsProfile();
 signals:
-    void stateChanged();
+    void stateChanged(const RenderState state);
     void renderFrameChanged(const int frame);
 private:
     RenderState mState = NONE;

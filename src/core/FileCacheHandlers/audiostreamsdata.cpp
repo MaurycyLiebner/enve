@@ -1,6 +1,17 @@
 #include "audiostreamsdata.h"
 #include "Sound/soundcomposition.h"
 
+AudioStreamsData::AudioStreamsData() {
+    connect(&eSoundSettings::sSettings, &eSoundSettings::settingsChanged,
+            this, [this]() {
+        updateSwrContext();
+    });
+}
+
+AudioStreamsData::~AudioStreamsData() {
+    if(fOpened) close();
+}
+
 stdsptr<const AudioStreamsData> AudioStreamsData::sOpen(
         const QString &path, AVFormatContext * const formatContext) {
     const auto result = std::shared_ptr<AudioStreamsData>(

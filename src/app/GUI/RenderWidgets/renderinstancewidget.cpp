@@ -144,6 +144,7 @@ void RenderInstanceWidget::updateFromSettings() {
                         "</font>";
     } else if(renderState == RenderInstanceSettings::FINISHED) {
         nameLabelTxt += "<font color='green'>finished</font>";
+        mCheckBox->setChecked(false);
     } else if(renderState == RenderInstanceSettings::RENDERING) {
         nameLabelTxt += "rendering...";
     } else if(renderState == RenderInstanceSettings::WAITING) {
@@ -162,7 +163,7 @@ void RenderInstanceWidget::updateFromSettings() {
     OutputSettingsProfile *outputProfile = mSettings->getOutputSettingsProfile();
     QString outputTxt;
     if(!outputProfile) {
-        AVOutputFormat *formatT = outputSettings.outputFormat;
+        const auto formatT = outputSettings.outputFormat;
         if(formatT) {
             outputTxt = "Custom " + QString(formatT->long_name);
         } else {
@@ -188,7 +189,7 @@ void RenderInstanceWidget::openOutputSettingsDialog() {
         mSettings->setOutputSettingsProfile(nullptr);
         OutputSettings outputSettings = dialog->getSettings();
         mSettings->setOutputRenderSettings(outputSettings);
-        AVOutputFormat *outputFormat = outputSettings.outputFormat;
+        const auto outputFormat = outputSettings.outputFormat;
         if(!outputFormat) {
             mOutputSettingsButton->setText("Settings");
         } else {
@@ -207,7 +208,7 @@ void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
         outputDst = QDir::homePath() + "/untitled";
     }
     const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
-    AVOutputFormat *format = outputSettings.outputFormat;
+    const auto format = outputSettings.outputFormat;
     if(!format) return;
     QString tmpStr = QString(format->extensions);
     QStringList supportedExt = tmpStr.split(",");
@@ -249,9 +250,9 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     QString supportedExts;
     QString selectedExt;
     const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
-    AVOutputFormat *format = outputSettings.outputFormat;
+    const auto format = outputSettings.outputFormat;
     if(format) {
-        QString tmpStr = QString(format->extensions);
+        QString tmpStr(format->extensions);
         selectedExt = "." + tmpStr.split(",").first();
         tmpStr.replace(",", " *.");
         supportedExts = "Output File (*." + tmpStr + ")";

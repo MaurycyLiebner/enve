@@ -1,5 +1,33 @@
 #include "soundmerger.h"
 
+void mergePlanarData(float const * const * const src,
+                     const SampleRange& srcRange,
+                     float ** const dst,
+                     const SampleRange& dstRange,
+                     const int nSamples,
+                     QrealSnapshot::Iterator volIt,
+                     const int nChannels) {
+    int dstId = dstRange.fMin;
+    int srcId = srcRange.fMin;
+    if(volIt.staticValue()) {
+        const float vol = static_cast<float>(volIt.getValueAndProgress(1));
+        for(int i = 0; i < nSamples; i++) {
+            for(int j = 0; j < nChannels; j++) {
+                dst[j][dstId] += src[j][srcId]*vol;
+            }
+            dstId++; srcId++;
+        }
+    } else {
+        for(int i = 0; i < nSamples; i++) {
+            const float vol = static_cast<float>(volIt.getValueAndProgress(1));
+            for(int j = 0; j < nChannels; j++) {
+                dst[j][dstId] += src[j][srcId]*vol;
+            }
+            dstId++; srcId++;
+        }
+    }
+}
+
 void mergeInterleavedData(const float* const src,
                           const SampleRange& srcRange,
                           float * const dst,
@@ -39,6 +67,10 @@ void mergeData(uchar const * const * const src,
         mergeInterleavedData(reinterpret_cast<const float*>(src[0]), srcRange,
                              reinterpret_cast<float*>(dst[0]), dstRange,
                              nSamples, volIt, nChannels);
+    } else if(format == AV_SAMPLE_FMT_FLTP) {
+        mergePlanarData(reinterpret_cast<float const * const *>(src), srcRange,
+                        reinterpret_cast<float**>(dst), dstRange,
+                        nSamples, volIt, nChannels);
     } else RuntimeThrow("Unsupported format " + av_get_sample_fmt_name(format));
 }
 
@@ -110,6 +142,7 @@ void SoundMerger::process() {
             if(nSamples < 0) RuntimeThrow("Resampling failed");
             mergeData(buffer, srcNeededRelRange, dst, dstRelRange,
                       nSamples, volIt, mSettings.fSampleFormat, nChannels);
+            if(buffer) av_freep(&buffer[0]);
             av_freep(&buffer);
         }
     }
