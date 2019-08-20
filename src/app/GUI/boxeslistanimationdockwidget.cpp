@@ -266,8 +266,8 @@ void BoxesListAnimationDockWidget::setTimelineMode() {
     mRenderAction->setDisabled(false);
 
     mRenderAction->setChecked(false);
-    mTimelineLayout->show();
     mRenderWidget->hide();
+    mTimelineLayout->show();
 }
 
 void BoxesListAnimationDockWidget::setRenderMode() {
@@ -275,8 +275,8 @@ void BoxesListAnimationDockWidget::setRenderMode() {
     mRenderAction->setDisabled(true);
 
     mTimelineAction->setChecked(false);
-    mRenderWidget->show();
     mTimelineLayout->hide();
+    mRenderWidget->show();
 }
 
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(

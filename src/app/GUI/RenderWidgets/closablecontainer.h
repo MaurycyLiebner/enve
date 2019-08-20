@@ -6,7 +6,6 @@
 class QCheckBox;
 
 class ClosableContainer : public QWidget {
-    Q_OBJECT
 public:
     explicit ClosableContainer(QWidget *parent = nullptr);
 
@@ -15,17 +14,17 @@ public:
     void setCheckable(const bool check);
     void setChecked(const bool check);
     bool isChecked();
+
+    void setContentVisible(const bool visible);
 protected:
     QCheckBox *mCheckBox = nullptr;
     QHBoxLayout *mMainLayout = new QHBoxLayout();
-    QVBoxLayout *mContLayout = new QVBoxLayout();
+    QVBoxLayout *mVLayout = new QVBoxLayout();
     QWidget *mLabelWidget = nullptr;
+    QWidget* mContWidget = new QWidget(this);
+    QVBoxLayout *mContLayout = new QVBoxLayout();
     QList<QWidget*> mContWidgets;
     QPushButton *mContentArrow = new QPushButton();
-signals:
-
-public slots:
-    void setContentVisible(const bool bT);
 };
 
 #endif // CLOSABLECONTAINER_H

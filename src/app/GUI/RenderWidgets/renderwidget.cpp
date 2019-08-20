@@ -29,8 +29,8 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
     mStartRenderButton = new QPushButton("Render", this);
     mButtonsLayout->addWidget(mStartRenderButton, Qt::AlignRight);
     mStartRenderButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    connect(mStartRenderButton, SIGNAL(pressed()),
-            this, SLOT(render()));
+    connect(mStartRenderButton, &QPushButton::pressed,
+            this, qOverload<>(&RenderWidget::render));
 
     mPauseRenderButton = new QPushButton("Pause", this);
     mButtonsLayout->addWidget(mPauseRenderButton, Qt::AlignRight);
@@ -40,20 +40,18 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
     mStopRenderButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     mButtonsLayout->addWidget(mStopRenderButton, Qt::AlignRight);
     mButtonsLayout->addSpacing(MIN_WIDGET_DIM/2);
-    connect(mStopRenderButton, SIGNAL(pressed()),
-            this, SLOT(stopRendering()));
+    connect(mStopRenderButton, &QPushButton::pressed,
+            this, &RenderWidget::stopRendering);
 
     mMainLayout->addLayout(mButtonsLayout);
 
     mContWidget = new QWidget(this);
     mContLayout = new QVBoxLayout(mContWidget);
-    mContLayout->setMargin(0);
-    mContWidget->setLayout(mContLayout);
     mContLayout->setAlignment(Qt::AlignTop);
+    mContLayout->setMargin(0);
+    mContLayout->setSpacing(0);
+    mContWidget->setLayout(mContLayout);
     mScrollArea = new ScrollArea(this);
-    mScrollArea->setStyleSheet("QScrollArea {"
-                                   "border: 1px solid black;"
-                               "}");
     mScrollArea->setWidget(mContWidget);
     mScrollArea->setWidgetResizable(true);
     mScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -109,6 +107,8 @@ void RenderWidget::render(RenderInstanceSettings *settings) {
     mRenderProgressBar->setValue(renderSettings.fMinFrame);
     mCurrentRenderedSettings = settings;
     emit renderFromSettings(settings);
+    connect(settings, &RenderInstanceSettings::renderFrameChanged,
+            this, &RenderWidget::setRenderedFrame);
 }
 
 void RenderWidget::leaveOnlyInterruptionButtonsEnabled() {
@@ -157,6 +157,12 @@ void RenderWidget::stopRendering() {
     disableButtons();
     clearAwaitingRender();
     VideoEncoder::sInterruptEncoding();
+    if(mCurrentRenderedSettings) {
+        disconnect(mCurrentRenderedSettings,
+                   &RenderInstanceSettings::renderFrameChanged,
+                   this, &RenderWidget::setRenderedFrame);
+        mCurrentRenderedSettings = nullptr;
+    }
 }
 
 void RenderWidget::clearAwaitingRender() {

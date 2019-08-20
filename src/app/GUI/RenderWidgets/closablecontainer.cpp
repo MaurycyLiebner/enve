@@ -4,9 +4,9 @@
 #include <QCheckBox>
 
 ClosableContainer::ClosableContainer(QWidget *parent) : QWidget(parent) {
+    mMainLayout->setAlignment(Qt::AlignTop);
     setLayout(mMainLayout);
-    const auto iconPath = eSettings::sIconsDir() + "/right-arrrow.png";
-    mContentArrow = new QPushButton(QIcon(iconPath), "", this);
+    mContentArrow = new QPushButton("", this);
     mContentArrow->setObjectName("iconButton");
     mContentArrow->setCheckable(true);
     mContentArrow->setFixedSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM);
@@ -14,29 +14,34 @@ ClosableContainer::ClosableContainer(QWidget *parent) : QWidget(parent) {
     connect(mContentArrow, &QPushButton::toggled,
             this, &ClosableContainer::setContentVisible);
 
-    mMainLayout->addWidget(mContentArrow, Qt::AlignTop);
-    mMainLayout->addLayout(mContLayout);
-    mMainLayout->setAlignment(mContentArrow, Qt::AlignTop);
+    mMainLayout->addWidget(mContentArrow, 0, Qt::AlignTop);
+    mMainLayout->addLayout(mVLayout);
+    mVLayout->setAlignment(Qt::AlignTop);
+    mVLayout->addWidget(mContWidget);
+    mContWidget->setLayout(mContLayout);
+    mContLayout->setAlignment(Qt::AlignTop);
+    mVLayout->setSpacing(0);
+    mVLayout->setMargin(0);
+    setContentVisible(false);
 }
 
 void ClosableContainer::setLabelWidget(QWidget *widget) {
+    if(mLabelWidget) delete mLabelWidget;
     mLabelWidget = widget;
-    mContLayout->insertWidget(0, widget);
+    if(widget) mVLayout->insertWidget(0, widget);
 }
 
 void ClosableContainer::addContentWidget(QWidget *widget) {
     mContWidgets << widget;
-    mContLayout->insertWidget(mContLayout->count(), widget);
-    widget->setVisible(mContentArrow->isChecked());
+    mContLayout->addWidget(widget);
 }
 
 void ClosableContainer::setCheckable(const bool check) {
-    if(check == (mCheckBox != nullptr)) return;
+    if(check == bool(mCheckBox)) return;
     if(check) {
         mCheckBox = new QCheckBox(this);
         mCheckBox->setFixedSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM);
-        mMainLayout->insertWidget(0, mCheckBox, Qt::AlignTop);
-        mMainLayout->setAlignment(mCheckBox, Qt::AlignTop);
+        mMainLayout->insertWidget(0, mCheckBox, 0, Qt::AlignTop);
         mCheckBox->setChecked(true);
     } else {
         delete mCheckBox;
@@ -55,11 +60,10 @@ bool ClosableContainer::isChecked() {
     return mCheckBox->isChecked();
 }
 
-void ClosableContainer::setContentVisible(const bool bT) {
-    if(bT) {
-        mContentArrow->setIcon(QIcon(eSettings::sIconsDir() + "/down-arrow.png"));
-    } else {
-        mContentArrow->setIcon(QIcon(eSettings::sIconsDir() + "/right-arrow.png"));
-    }
-    for(const auto widget : mContWidgets) widget->setVisible(bT);
+void ClosableContainer::setContentVisible(const bool visible) {
+    QString iconPath = eSettings::sIconsDir();
+    if(visible) iconPath += "/down-arrow.png";
+    else iconPath += "/right-arrow.png";
+    mContentArrow->setIcon(QIcon(iconPath));
+    mContWidget->setVisible(visible);
 }

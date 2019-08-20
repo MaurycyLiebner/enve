@@ -107,6 +107,7 @@ public:
     OutputSettingsProfile *getOutputSettingsProfile();
 signals:
     void stateChanged();
+    void renderFrameChanged(const int frame);
 private:
     RenderState mState = NONE;
     int mCurrentRenderFrame = 0;
@@ -114,7 +115,7 @@ private:
     QString mOutputDestination;
     QString mRenderError;
 
-    stdptr<OutputSettingsProfile>mOutputSettingsProfile;
+    stdptr<OutputSettingsProfile> mOutputSettingsProfile;
 
     qptr<Canvas> mTargetCanvas;
 

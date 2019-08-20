@@ -147,6 +147,7 @@ Canvas *RenderInstanceSettings::getTargetCanvas() {
 void RenderInstanceSettings::setCurrentRenderFrame(
         const int currentRenderFrame) {
     mCurrentRenderFrame = currentRenderFrame;
+    emit renderFrameChanged(currentRenderFrame);
 }
 
 int RenderInstanceSettings::currentRenderFrame() {
