@@ -43,28 +43,43 @@ public:
         Q_ASSERT(frame->format == mCurrentSamples->fFormat);
         Q_ASSERT(frame->sample_rate == mCurrentSamples->fSampleRate);
         const int nChannels = static_cast<int>(mCurrentSamples->fNChannels);
+        const uint sampleSize = mCurrentSamples->fSampleSize;
+        int remaining = frame->nb_samples;
+        int frameSample = 0;
         if(mCurrentSamples->fPlanar) {
-            for(int i = 0; i < frame->nb_samples; i++) {
+            while(remaining > 0) {
+                const int cpySamples = qMin(remaining,
+                                            mEndSample - mCurrentSample + 1);
+                const uint cpyBytes = uint(cpySamples)*sampleSize;
                 for(int j = 0; j < nChannels; j++) {
-                    frame->data[j][i] = mCurrentData[j][mCurrentSample];
+                    memcpy(frame->data[j] + frameSample*sampleSize,
+                           mCurrentData[j] + uint(mCurrentSample)*sampleSize, cpyBytes);
                 }
-                if(mCurrentSample++ >= mEndSample) {
+
+                remaining -= cpySamples;
+                mCurrentSample += cpySamples;
+                frameSample += cpySamples;
+                if(mCurrentSample > mEndSample) {
                     if(!next()) {
-                        frame->nb_samples = i + 1;
+                        frame->nb_samples = frameSample;
                         return;
                     }
                 }
             }
         } else {
-            for(int i = 0; i < frame->nb_samples; i++) {
-                for(int j = 0; j < nChannels; j++) {
-                    const int dstId = i*nChannels + j;
-                    const int srcId = mCurrentSample*nChannels + j;
-                    frame->data[0][dstId] = mCurrentData[0][srcId];
-                }
-                if(mCurrentSample++ >= mEndSample) {
+            while(remaining > 0) {
+                const int cpySamples = qMin(remaining,
+                                            mEndSample - mCurrentSample + 1)*nChannels;
+                const uint cpyBytes = uint(cpySamples)*sampleSize;
+                memcpy(frame->data[0] + frameSample*sampleSize*nChannels,
+                        mCurrentData[0] + uint(mCurrentSample)*sampleSize*nChannels, cpyBytes);
+
+                remaining -= cpySamples;
+                mCurrentSample += cpySamples;
+                frameSample += cpySamples;
+                if(mCurrentSample > mEndSample) {
                     if(!next()) {
-                        frame->nb_samples = i + 1;
+                        frame->nb_samples = frameSample;
                         return;
                     }
                 }
