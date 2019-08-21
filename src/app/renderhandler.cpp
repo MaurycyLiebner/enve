@@ -118,7 +118,8 @@ void RenderHandler::nextCurrentRenderFrame() {
     mCurrentRenderFrame = newCurrentRenderFrame;
     mCurrRenderRange.fMax = mCurrentRenderFrame;
     mCurrentScene->setCurrentRenderRange(mCurrRenderRange);
-    if(!allDone) setFrameAction(mCurrentRenderFrame);
+    if(allDone) Document::sInstance->actionFinished();
+    else setFrameAction(mCurrentRenderFrame);
 }
 
 void RenderHandler::renderPreview() {

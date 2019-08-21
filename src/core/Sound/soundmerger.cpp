@@ -1,5 +1,133 @@
 #include "soundmerger.h"
 
+template <typename T>
+void mergePlanarDataUnsigned(T const * const * const src,
+                             const SampleRange& srcRange,
+                             T ** const dst,
+                             const SampleRange& dstRange,
+                             const int nSamples,
+                             QrealSnapshot::Iterator volIt,
+                             const int nChannels) {
+    int dstId = dstRange.fMin;
+    int srcId = srcRange.fMin;
+    const qreal min = std::numeric_limits<T>::min();
+    const qreal max = std::numeric_limits<T>::max();
+    const qreal shift = max/2;
+    if(volIt.staticValue()) {
+        const qreal vol = volIt.getValueAndProgress(1);
+        for(int i = 0; i < nSamples; i++) {
+            for(int j = 0; j < nChannels; j++) {
+                auto& dstP = dst[j][dstId];
+                dstP = T(qBound(min, round(dstP + (src[j][srcId] - shift)*vol + shift), max));
+            }
+            dstId++; srcId++;
+        }
+    } else {
+        for(int i = 0; i < nSamples; i++) {
+            const qreal vol = volIt.getValueAndProgress(1);
+            for(int j = 0; j < nChannels; j++) {
+                auto& dstP = dst[j][dstId];
+                dstP = T(qBound(min, round(dstP + (src[j][srcId] - shift)*vol + shift), max));
+            }
+            dstId++; srcId++;
+        }
+    }
+}
+
+template <typename T>
+void mergeInterleavedDataUnsigned(const T* const src,
+                                  const SampleRange& srcRange,
+                                  T * const dst,
+                                  const SampleRange& dstRange,
+                                  const int nSamples,
+                                  QrealSnapshot::Iterator volIt,
+                                  const int nChannels) {
+    int dstId = dstRange.fMin*nChannels;
+    int srcId = srcRange.fMin*nChannels;
+    const qreal min = std::numeric_limits<T>::min();
+    const qreal max = std::numeric_limits<T>::max();
+    const qreal shift = max/2;
+    if(volIt.staticValue()) {
+        const qreal vol = volIt.getValueAndProgress(1);
+        for(int i = 0; i < nSamples; i++) {
+            for(int j = 0; j < nChannels; j++) {
+                auto& dstP = dst[dstId++];
+                dstP = T(qBound(min, round(dstP + (src[srcId++] - shift)*vol + shift), max));
+            }
+        }
+    } else {
+        for(int i = 0; i < nSamples; i++) {
+            const qreal vol = volIt.getValueAndProgress(1);
+            for(int j = 0; j < nChannels; j++) {
+                auto& dstP = dst[dstId++];
+                dstP = T(qBound(min, round(dstP + (src[srcId++] - shift)*vol + shift), max));
+            }
+        }
+    }
+}
+
+template <typename T>
+void mergePlanarDataSigned(T const * const * const src,
+                           const SampleRange& srcRange,
+                           T ** const dst,
+                           const SampleRange& dstRange,
+                           const int nSamples,
+                           QrealSnapshot::Iterator volIt,
+                           const int nChannels) {
+    int dstId = dstRange.fMin;
+    int srcId = srcRange.fMin;
+    const qreal min = std::numeric_limits<T>::min();
+    const qreal max = std::numeric_limits<T>::max();
+    if(volIt.staticValue()) {
+        const qreal vol = volIt.getValueAndProgress(1);
+        for(int i = 0; i < nSamples; i++) {
+            for(int j = 0; j < nChannels; j++) {
+                dst[j][dstId] = T(qBound(min, round(dst[j][dstId] + src[j][srcId]*vol), max));
+            }
+            dstId++; srcId++;
+        }
+    } else {
+        for(int i = 0; i < nSamples; i++) {
+            const qreal vol = volIt.getValueAndProgress(1);
+            for(int j = 0; j < nChannels; j++) {
+                dst[j][dstId] = T(qBound(min, round(dst[j][dstId] + src[j][srcId]*vol), max));
+            }
+            dstId++; srcId++;
+        }
+    }
+}
+
+template <typename T>
+void mergeInterleavedDataSigned(const T* const src,
+                                const SampleRange& srcRange,
+                                T * const dst,
+                                const SampleRange& dstRange,
+                                const int nSamples,
+                                QrealSnapshot::Iterator volIt,
+                                const int nChannels) {
+    int dstId = dstRange.fMin*nChannels;
+    int srcId = srcRange.fMin*nChannels;
+    const qreal min = std::numeric_limits<T>::min();
+    const qreal max = std::numeric_limits<T>::max();
+    if(volIt.staticValue()) {
+        const qreal vol = volIt.getValueAndProgress(1);
+        for(int i = 0; i < nSamples; i++) {
+            for(int j = 0; j < nChannels; j++) {
+                auto& dstP = dst[dstId++];
+                dstP = T(qBound(min, round(dstP + src[srcId++]*vol), max));
+            }
+        }
+    } else {
+        for(int i = 0; i < nSamples; i++) {
+            const qreal vol = volIt.getValueAndProgress(1);
+            for(int j = 0; j < nChannels; j++) {
+                auto& dstP = dst[dstId++];
+                dstP = T(qBound(min, round(dstP + src[srcId++]*vol), max));
+            }
+        }
+    }
+}
+
 void mergePlanarData(float const * const * const src,
                      const SampleRange& srcRange,
                      float ** const dst,
@@ -54,6 +182,61 @@ void mergeInterleavedData(const float* const src,
     }
 }
 
+
+void mergePlanarData(qreal const * const * const src,
+                     const SampleRange& srcRange,
+                     qreal ** const dst,
+                     const SampleRange& dstRange,
+                     const int nSamples,
+                     QrealSnapshot::Iterator volIt,
+                     const int nChannels) {
+    int dstId = dstRange.fMin;
+    int srcId = srcRange.fMin;
+    if(volIt.staticValue()) {
+        const qreal vol = volIt.getValueAndProgress(1);
+        for(int i = 0; i < nSamples; i++) {
+            for(int j = 0; j < nChannels; j++) {
+                dst[j][dstId] += src[j][srcId]*vol;
+            }
+            dstId++; srcId++;
+        }
+    } else {
+        for(int i = 0; i < nSamples; i++) {
+            const qreal vol = volIt.getValueAndProgress(1);
+            for(int j = 0; j < nChannels; j++) {
+                dst[j][dstId] += src[j][srcId]*vol;
+            }
+            dstId++; srcId++;
+        }
+    }
+}
+
+void mergeInterleavedData(const qreal* const src,
+                          const SampleRange& srcRange,
+                          qreal * const dst,
+                          const SampleRange& dstRange,
+                          const int nSamples,
+                          QrealSnapshot::Iterator volIt,
+                          const int nChannels) {
+    int dstId = dstRange.fMin*nChannels;
+    int srcId = srcRange.fMin*nChannels;
+    if(volIt.staticValue()) {
+        const qreal vol = volIt.getValueAndProgress(1);
+        for(int i = 0; i < nSamples; i++) {
+            for(int j = 0; j < nChannels; j++) {
+                dst[dstId++] += src[srcId++]*vol;
+            }
+        }
+    } else {
+        for(int i = 0; i < nSamples; i++) {
+            const qreal vol = volIt.getValueAndProgress(1);
+            for(int j = 0; j < nChannels; j++) {
+                dst[dstId++] += src[srcId++]*vol;
+            }
+        }
+    }
+}
+
 void mergeData(uchar const * const * const src,
                const SampleRange& srcRange,
                uchar ** const dst,
@@ -71,6 +254,46 @@ void mergeData(uchar const * const * const src,
         mergePlanarData(reinterpret_cast<float const * const *>(src), srcRange,
                         reinterpret_cast<float**>(dst), dstRange,
                         nSamples, volIt, nChannels);
+    } else if(format == AV_SAMPLE_FMT_DBL) {
+        mergeInterleavedData(reinterpret_cast<const qreal*>(src[0]), srcRange,
+                             reinterpret_cast<qreal*>(dst[0]), dstRange,
+                             nSamples, volIt, nChannels);
+    } else if(format == AV_SAMPLE_FMT_DBLP) {
+        mergePlanarData(reinterpret_cast<qreal const * const *>(src), srcRange,
+                        reinterpret_cast<qreal**>(dst), dstRange,
+                        nSamples, volIt, nChannels);
+    } else if(format == AV_SAMPLE_FMT_U8) {
+        mergeInterleavedDataUnsigned(reinterpret_cast<const quint8*>(src[0]), srcRange,
+                                     reinterpret_cast<quint8*>(dst[0]), dstRange,
+                                     nSamples, volIt, nChannels);
+    } else if(format == AV_SAMPLE_FMT_U8P) {
+        mergePlanarDataUnsigned(reinterpret_cast<quint8 const * const *>(src), srcRange,
+                                reinterpret_cast<quint8**>(dst), dstRange,
+                                nSamples, volIt, nChannels);
+    } else if(format == AV_SAMPLE_FMT_S16) {
+        mergeInterleavedDataSigned(reinterpret_cast<const qint16*>(src[0]), srcRange,
+                                   reinterpret_cast<qint16*>(dst[0]), dstRange,
+                                   nSamples, volIt, nChannels);
+    } else if(format == AV_SAMPLE_FMT_S16P) {
+        mergePlanarDataSigned(reinterpret_cast<qint16 const * const *>(src), srcRange,
+                              reinterpret_cast<qint16**>(dst), dstRange,
+                              nSamples, volIt, nChannels);
+    } else if(format == AV_SAMPLE_FMT_S32) {
+        mergeInterleavedDataSigned(reinterpret_cast<const qint32*>(src[0]), srcRange,
+                                   reinterpret_cast<qint32*>(dst[0]), dstRange,
+                                   nSamples, volIt, nChannels);
+    } else if(format == AV_SAMPLE_FMT_S32P) {
+        mergePlanarDataSigned(reinterpret_cast<qint32 const * const *>(src), srcRange,
+                              reinterpret_cast<qint32**>(dst), dstRange,
+                              nSamples, volIt, nChannels);
+    } else if(format == AV_SAMPLE_FMT_S64) {
+        mergeInterleavedDataSigned(reinterpret_cast<const qint64*>(src[0]), srcRange,
+                                   reinterpret_cast<qint64*>(dst[0]), dstRange,
+                                   nSamples, volIt, nChannels);
+    } else if(format == AV_SAMPLE_FMT_S64P) {
+        mergePlanarDataSigned(reinterpret_cast<qint64 const * const *>(src), srcRange,
+                              reinterpret_cast<qint64**>(dst), dstRange,
+                              nSamples, volIt, nChannels);
     } else RuntimeThrow("Unsupported format " + av_get_sample_fmt_name(format));
 }
 
