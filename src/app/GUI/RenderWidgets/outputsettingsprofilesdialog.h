@@ -4,25 +4,36 @@
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QStatusBar>
 #include "renderinstancesettings.h"
 class OutputSettingsDisplayWidget;
 class OutputSettingsProfilesDialog : public QDialog {
-    Q_OBJECT
 public:
     OutputSettingsProfilesDialog(const OutputSettings &currentSettings,
                                  QWidget *parent = nullptr);
 
     OutputSettingsProfile *getCurrentProfile() {
-        if(OUTPUT_SETTINGS_PROFILES.isEmpty()) return nullptr;
-        int indexT = mProfilesComboBox->currentIndex();
-        if(indexT < 0) return nullptr;
-        if(indexT >= OUTPUT_SETTINGS_PROFILES.count()) return nullptr;
-        return OUTPUT_SETTINGS_PROFILES.at(indexT).get();
+        if(sOutputProfiles.isEmpty()) return nullptr;
+        const int index = mProfilesComboBox->currentIndex();
+        if(index < 0) return nullptr;
+        if(index >= sOutputProfiles.count()) return nullptr;
+        return sOutputProfiles.at(index).get();
     }
 
-    static QList<stdsptr<OutputSettingsProfile>> OUTPUT_SETTINGS_PROFILES;
+    static QList<stdsptr<OutputSettingsProfile>> sOutputProfiles;
+    static bool sOutputProfilesLoaded;
 protected:
-    QVBoxLayout *mMainLayout;
+    void updateButtonsEnabled();
+    void currentProfileChanged();
+
+    void setCurrentProfileName(const QString &name);
+    void deleteCurrentProfile();
+    void duplicateCurrentProfile();
+    void createAndEditNewProfile();
+    void editCurrentProfile();
+    void saveCurrentProfile();
+
+    QVBoxLayout *mInnerLayout;
 
     QHBoxLayout *mProfileLayout;
     QLabel *mProfileLabel;
@@ -32,6 +43,7 @@ protected:
     QPushButton *mNewProfileButton;
     QPushButton *mDuplicateProfileButton;
     QPushButton *mEditProfileButton;
+    QPushButton *mSaveProfileButton;
     QPushButton *mDeleteProfileButton;
 
     OutputSettingsDisplayWidget *mOutputSettingsDisplayWidget = nullptr;
@@ -40,17 +52,9 @@ protected:
     QPushButton *mOkButton = nullptr;
     QPushButton *mCancelButton = nullptr;
 
+    QStatusBar* mStatusBar;
+
     OutputSettings mCurrentSettings;
-
-    void updateButtonsEnabled();
-protected slots:
-    void currentProfileChanged();
-
-    void setCurrentProfileName(const QString &name);
-    void deleteCurrentProfile();
-    void duplicateCurrentProfile();
-    void createAndEditNewProfile();
-    void editCurrentProfile();
 };
 
 #endif // OUTPUTSETTINGSPROFILESDIALOG_H

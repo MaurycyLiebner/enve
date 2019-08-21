@@ -74,6 +74,7 @@ SOURCES += main.cpp\
     evfileio.cpp \
     hardwareinfo.cpp \
     iconloader.cpp \
+    outputsettings.cpp \
     renderhandler.cpp \
     svgimporter.cpp \
     GUI/BoxesList/OptimalScrollArea/scrollarea.cpp \
@@ -166,6 +167,7 @@ HEADERS  += \
     esettings.h \
     hardwareinfo.h \
     iconloader.h \
+    outputsettings.h \
     renderhandler.h \
     svgimporter.h \
     keypoint.h \

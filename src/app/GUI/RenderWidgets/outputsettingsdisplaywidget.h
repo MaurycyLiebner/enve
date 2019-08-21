@@ -50,7 +50,7 @@ public:
         }
         setAudioBitrateText(QString::number(settings.audioBitrate/1000) + " kbps");
 
-        const auto channLay = OutputSettings::getChannelsLayoutNameStatic(
+        const auto channLay = OutputSettings::sGetChannelsLayoutName(
                     settings.audioChannelsLayout);
         setAudioChannelLayoutText(channLay);
     }

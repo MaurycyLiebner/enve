@@ -9,6 +9,26 @@
 
 RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     ClosableContainer(parent) {
+    if(!OutputSettingsProfilesDialog::sOutputProfilesLoaded) {
+        OutputSettingsProfilesDialog::sOutputProfilesLoaded = true;
+        QDir(eSettings::sSettingsDir()).mkdir("OutputProfiles");
+        const QString dirPath = eSettings::sSettingsDir() + "/OutputProfiles";
+        QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
+        while(dirIt.hasNext()) {
+            const auto path = dirIt.next();
+            const QFileInfo fileInfo(path);
+            if(!fileInfo.isFile()) continue;
+            if(!fileInfo.completeSuffix().contains("eProf")) continue;
+            const auto profile = enve::make_shared<OutputSettingsProfile>();
+            try {
+                profile->load(path);
+            } catch(const std::exception& e) {
+                gPrintExceptionCritical(e);
+            }
+            OutputSettingsProfilesDialog::sOutputProfiles << profile;
+        }
+    }
+
     setCheckable(true);
     setObjectName("darkWidget");
     mNameLabel = new QLabel(this);
@@ -285,13 +305,13 @@ void OutputProfilesListButton::mousePressEvent(QMouseEvent *e) {
         QMenu menu;
         int i = 0;
         for(const auto& profile :
-            OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES) {
+            OutputSettingsProfilesDialog::sOutputProfiles) {
             QAction *actionT = new QAction(profile->getName());
             actionT->setData(QVariant(i));
             menu.addAction(actionT);
             i++;
         }
-        if(OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES.isEmpty()) {
+        if(OutputSettingsProfilesDialog::sOutputProfiles.isEmpty()) {
             menu.addAction("No profiles")->setEnabled(false);
         }
         menu.addSeparator();
@@ -315,7 +335,7 @@ void OutputProfilesListButton::mousePressEvent(QMouseEvent *e) {
             } else {
                 OutputSettingsProfile *profileT =
                         OutputSettingsProfilesDialog::
-                        OUTPUT_SETTINGS_PROFILES.at(profileId).get();
+                        sOutputProfiles.at(profileId).get();
                 emit profileSelected(profileT);
             }
         }

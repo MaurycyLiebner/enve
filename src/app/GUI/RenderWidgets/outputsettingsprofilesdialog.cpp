@@ -3,7 +3,8 @@
 #include "rendersettingsdialog.h"
 #include "outputsettingsdisplaywidget.h"
 #include "GUI/global.h"
-QList<stdsptr<OutputSettingsProfile>> OutputSettingsProfilesDialog::OUTPUT_SETTINGS_PROFILES;
+QList<stdsptr<OutputSettingsProfile>> OutputSettingsProfilesDialog::sOutputProfiles;
+bool OutputSettingsProfilesDialog::sOutputProfilesLoaded = false;
 
 OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
         const OutputSettings &currentSettings,
@@ -13,8 +14,10 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
     setStyleSheet(MainWindow::sGetInstance()->styleSheet());
     mCurrentSettings = currentSettings;
 
-    mMainLayout = new QVBoxLayout(this);
-    setLayout(mMainLayout);
+    const auto mainLayout = new QVBoxLayout(this);
+    setLayout(mainLayout);
+
+    mInnerLayout = new QVBoxLayout();
 
     mProfileLayout = new QHBoxLayout();
     mProfileLabel = new QLabel("Profile:", this);
@@ -26,32 +29,34 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
 
     mProfileButtonsLayout = new QHBoxLayout();
     mNewProfileButton = new QPushButton("New...", this);
-    mNewProfileButton->setSizePolicy(QSizePolicy::Fixed,
-                                     QSizePolicy::Fixed);
+    mNewProfileButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(mNewProfileButton, &QPushButton::released,
             this, &OutputSettingsProfilesDialog::createAndEditNewProfile);
     mDuplicateProfileButton = new QPushButton("Duplicate", this);
-    mDuplicateProfileButton->setSizePolicy(QSizePolicy::Fixed,
-                                           QSizePolicy::Fixed);
+    mDuplicateProfileButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(mDuplicateProfileButton, &QPushButton::released,
             this, &OutputSettingsProfilesDialog::duplicateCurrentProfile);
     mEditProfileButton = new QPushButton("Edit...", this);
-    mEditProfileButton->setSizePolicy(QSizePolicy::Fixed,
-                                      QSizePolicy::Fixed);
+    mEditProfileButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(mEditProfileButton, &QPushButton::released,
             this, &OutputSettingsProfilesDialog::editCurrentProfile);
+    mSaveProfileButton = new QPushButton("Save", this);
+    mSaveProfileButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    connect(mSaveProfileButton, &QPushButton::released,
+            this, &OutputSettingsProfilesDialog::saveCurrentProfile);
     mDeleteProfileButton = new QPushButton("Delete", this);
-    mDeleteProfileButton->setSizePolicy(QSizePolicy::Fixed,
-                                        QSizePolicy::Fixed);
+    mDeleteProfileButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(mDeleteProfileButton, &QPushButton::released,
             this, &OutputSettingsProfilesDialog::deleteCurrentProfile);
     mProfileButtonsLayout->addWidget(mNewProfileButton);
     mProfileButtonsLayout->addWidget(mDuplicateProfileButton);
     mProfileButtonsLayout->addWidget(mEditProfileButton);
+    mProfileButtonsLayout->addWidget(mSaveProfileButton);
     mProfileButtonsLayout->addWidget(mDeleteProfileButton);
     mNewProfileButton->setObjectName("dialogButton");
     mDuplicateProfileButton->setObjectName("dialogButton");
     mEditProfileButton->setObjectName("dialogButton");
+    mSaveProfileButton->setObjectName("dialogButton");
     mDeleteProfileButton->setObjectName("dialogButton");
     mProfileButtonsLayout->setAlignment(Qt::AlignHCenter);
 
@@ -66,10 +71,8 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
     mOkButton->setObjectName("dialogButton");
     mCancelButton->setObjectName("dialogButton");
 
-    mOkButton->setSizePolicy(QSizePolicy::Fixed,
-                             QSizePolicy::Minimum);
-    mCancelButton->setSizePolicy(QSizePolicy::Fixed,
-                                 QSizePolicy::Minimum);
+    mOkButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    mCancelButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(mOkButton, &QPushButton::released,
             this, &QDialog::accept);
     connect(mCancelButton, &QPushButton::released,
@@ -78,12 +81,17 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
     mButtonsLayout->addWidget(mCancelButton);
     mButtonsLayout->addWidget(mOkButton);
     mButtonsLayout->setAlignment(Qt::AlignRight);
-    mMainLayout->addLayout(mProfileLayout);
-    mMainLayout->addLayout(mProfileButtonsLayout);
-    mMainLayout->addWidget(mOutputSettingsDisplayWidget);
-    mMainLayout->addLayout(mButtonsLayout);
+    mInnerLayout->setAlignment(Qt::AlignTop);
+    mInnerLayout->addLayout(mProfileLayout);
+    mInnerLayout->addLayout(mProfileButtonsLayout);
+    mInnerLayout->addWidget(mOutputSettingsDisplayWidget);
+    mInnerLayout->addStretch(1);
+    mInnerLayout->addLayout(mButtonsLayout);
+    mainLayout->addLayout(mInnerLayout);
+    mStatusBar = new QStatusBar(this);
+    mainLayout->addWidget(mStatusBar);
 
-    for(const auto& profile : OUTPUT_SETTINGS_PROFILES) {
+    for(const auto& profile : sOutputProfiles) {
         mProfilesComboBox->addItem(profile->getName());
     }
 
@@ -93,24 +101,27 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
     if(mProfilesComboBox->count() == 0) {
         mProfilesComboBox->setDisabled(true);
     }
-    connect(mProfilesComboBox, SIGNAL(editTextChanged(QString)),
-            this, SLOT(setCurrentProfileName(QString)));
-    connect(mProfilesComboBox, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(currentProfileChanged()));
+    connect(mProfilesComboBox, &QComboBox::editTextChanged,
+            this, &OutputSettingsProfilesDialog::setCurrentProfileName);
+    connect(mProfilesComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &OutputSettingsProfilesDialog::currentProfileChanged);
 
     currentProfileChanged();
+    layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 void OutputSettingsProfilesDialog::updateButtonsEnabled() {
-    if(OUTPUT_SETTINGS_PROFILES.isEmpty()) {
+    if(sOutputProfiles.isEmpty()) {
         mDuplicateProfileButton->setDisabled(true);
         mEditProfileButton->setDisabled(true);
         mDeleteProfileButton->setDisabled(true);
+        mSaveProfileButton->setDisabled(true);
         mProfilesComboBox->setDisabled(true);
     } else {
         mDuplicateProfileButton->setEnabled(true);
         mEditProfileButton->setEnabled(true);
         mDeleteProfileButton->setEnabled(true);
+        mSaveProfileButton->setEnabled(true);
         mProfilesComboBox->setEnabled(true);
     }
 }
@@ -129,16 +140,15 @@ void OutputSettingsProfilesDialog::setCurrentProfileName(const QString &name) {
     OutputSettingsProfile *currentProfile = getCurrentProfile();
     if(!currentProfile) return;
     currentProfile->setName(name);
-    mProfilesComboBox->setItemText(mProfilesComboBox->currentIndex(),
-                                   name);
+    mProfilesComboBox->setItemText(mProfilesComboBox->currentIndex(), name);
 }
 
 void OutputSettingsProfilesDialog::deleteCurrentProfile() {
     OutputSettingsProfile *currentProfile = getCurrentProfile();
     if(!currentProfile) return;
-    int currentId = mProfilesComboBox->currentIndex();
+    const int currentId = mProfilesComboBox->currentIndex();
     mProfilesComboBox->removeItem(currentId);
-    OUTPUT_SETTINGS_PROFILES.removeAt(currentId);
+    sOutputProfiles.takeAt(currentId)->removeFile();
     updateButtonsEnabled();
     currentProfileChanged();
 }
@@ -148,38 +158,45 @@ void OutputSettingsProfilesDialog::duplicateCurrentProfile() {
     if(!currentProfile) return;
     auto newProfile = enve::make_shared<OutputSettingsProfile>();
     newProfile->setSettings(currentProfile->getSettings());
-    newProfile->setName(currentProfile->getName() + "1");
-    OUTPUT_SETTINGS_PROFILES.append(newProfile);
+    newProfile->setName(currentProfile->getName() + " copy");
+    sOutputProfiles.append(newProfile);
     mProfilesComboBox->addItem(newProfile->getName());
     mProfilesComboBox->setCurrentIndex(mProfilesComboBox->count() - 1);
 }
 
 void OutputSettingsProfilesDialog::createAndEditNewProfile() {
-    RenderSettingsDialog *dialog = new RenderSettingsDialog(OutputSettings(),
-                                                            this);
+    RenderSettingsDialog *dialog = new RenderSettingsDialog(OutputSettings(), this);
     if(dialog->exec()) {
         auto newProfile = enve::make_shared<OutputSettingsProfile>();
-        OUTPUT_SETTINGS_PROFILES.append(newProfile);
+        sOutputProfiles.append(newProfile);
         mProfilesComboBox->addItem(newProfile->getName());
         mProfilesComboBox->setCurrentIndex(mProfilesComboBox->count() - 1);
         updateButtonsEnabled();
-        OutputSettings outputSettings = dialog->getSettings();
-        newProfile->setSettings(outputSettings);
+        newProfile->setSettings(dialog->getSettings());
         currentProfileChanged();
     }
     delete dialog;
 }
 
 void OutputSettingsProfilesDialog::editCurrentProfile() {
-    OutputSettingsProfile *currentProfile = getCurrentProfile();
+    const auto currentProfile = getCurrentProfile();
     if(!currentProfile) return;
     const OutputSettings &outputSettings = currentProfile->getSettings();
-    RenderSettingsDialog *dialog = new RenderSettingsDialog(outputSettings,
-                                                            this);
+    const auto dialog = new RenderSettingsDialog(outputSettings, this);
     if(dialog->exec()) {
-        OutputSettings outputSettings = dialog->getSettings();
-        currentProfile->setSettings(outputSettings);
+        currentProfile->setSettings(dialog->getSettings());
         currentProfileChanged();
     }
     delete dialog;
+}
+
+void OutputSettingsProfilesDialog::saveCurrentProfile() {
+    const auto profile = getCurrentProfile();
+    if(!profile) return;
+    try {
+        profile->save();
+        mStatusBar->showMessage("Saved to '" + profile->path() + "'", 2000);
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
 }

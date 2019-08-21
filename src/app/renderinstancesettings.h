@@ -1,18 +1,9 @@
 #ifndef RENDERINSTANCESETTINGS_H
 #define RENDERINSTANCESETTINGS_H
-#include <QString>
 class Canvas;
-extern "C" {
-    #include <libavcodec/avcodec.h>
-    #include <libavformat/avformat.h>
-    #include <libswscale/swscale.h>
-    #include <libavutil/imgutils.h>
-    #include <libavresample/avresample.h>
-    #include <libavutil/channel_layout.h>
-    #include <libavutil/mathematics.h>
-    #include <libavutil/opt.h>
-}
+#include "outputsettings.h"
 #include "smartPointers/ememory.h"
+#include "esettings.h"
 
 struct RenderSettings {
     qreal fResolution = 1;
@@ -23,53 +14,6 @@ struct RenderSettings {
 
     int fMinFrame = 0;
     int fMaxFrame = 0;
-};
-
-struct OutputSettings {
-    static const std::map<int, QString> SAMPLE_FORMATS_NAMES;
-    static QString getChannelsLayoutNameStatic(const uint64_t &layout);
-
-    const AVOutputFormat *outputFormat = nullptr;
-
-    bool videoEnabled = false;
-    bool audioEnabled = false;
-
-    AVPixelFormat videoPixelFormat = AV_PIX_FMT_NONE;
-    AVSampleFormat audioSampleFormat = AV_SAMPLE_FMT_NONE;
-
-    int videoBitrate = 0;
-    int audioSampleRate = 0;
-    int audioBitrate = 0;
-
-    uint64_t audioChannelsLayout = 0;
-
-    AVCodec *videoCodec = nullptr;
-    AVCodec *audioCodec = nullptr;
-};
-
-class OutputSettingsProfile : public StdSelfRef {
-    e_OBJECT
-public:
-    const QString &getName() const {
-        return mName;
-    }
-
-    void setName(const QString &name) {
-        mName = name;
-    }
-
-    const OutputSettings &getSettings() const {
-        return mSettings;
-    }
-
-    void setSettings(const OutputSettings &settings) {
-        mSettings = settings;
-    }
-protected:
-    OutputSettingsProfile() {}
-
-    QString mName = "Untitled";
-    OutputSettings mSettings;
 };
 
 class RenderInstanceSettings : public QObject {

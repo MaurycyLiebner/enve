@@ -69,15 +69,13 @@ public:
 
         int currentSampleRate = 0;
         if(mSampleRateComboBox->count() > 0) {
-            const int sampleRateId = mSampleRateComboBox->currentIndex();
-            currentSampleRate = mSampleRatesList.at(sampleRateId);
+            currentSampleRate = mSampleRateComboBox->currentData().toInt();
         }
         settings.audioSampleRate = currentSampleRate;
 
         int currentAudioBitrate = 0;
         if(mAudioBitrateComboBox->count() > 0) {
-            const int bitrateId = mAudioBitrateComboBox->currentIndex();
-            currentAudioBitrate = mAudioBitrateList.at(bitrateId);
+            currentAudioBitrate = mAudioBitrateComboBox->currentData().toInt();
         }
         settings.audioBitrate = currentAudioBitrate;
 
@@ -117,9 +115,7 @@ protected:
     QList<AVCodec*> mVideoCodecsList;
     QList<const AVOutputFormat*> mOutputFormatsList;
     QList<AVCodec*> mAudioCodecsList;
-    QList<int> mSampleRatesList;
     QList<AVSampleFormat> mSampleFormatsList;
-    QList<int> mAudioBitrateList;
     QList<uint64_t> mAudioChannelLayoutsList;
 
     OutputSettings mInitialSettings;
