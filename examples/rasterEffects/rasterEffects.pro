@@ -1,5 +1,6 @@
 TEMPLATE = subdirs
 
 SUBDIRS = \
-	eblur \
+	eBlur \
+	eShadow \
 	dabTest

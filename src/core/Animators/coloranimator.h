@@ -1,9 +1,9 @@
 #ifndef COLORANIMATOR_H
 #define COLORANIMATOR_H
 
-#include "Animators/staticcomplexanimator.h"
-#include "colorhelpers.h"
-#include "Animators/qrealanimator.h"
+#include "staticcomplexanimator.h"
+#include "../colorhelpers.h"
+#include "qrealanimator.h"
 
 class ColorAnimator : public StaticComplexAnimator {
     Q_OBJECT
