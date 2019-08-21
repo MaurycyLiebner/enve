@@ -193,6 +193,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
         }
     }
 
+    grabMouseAndTrack();
     mValueInput.clearAndDisableInput();
     Document::sInstance->actionFinished();
 }
