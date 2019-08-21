@@ -10,7 +10,7 @@ extern "C" {
 struct eSoundSettingsData {
     int fSampleRate = 44100;
     AVSampleFormat fSampleFormat = AV_SAMPLE_FMT_FLT;
-    uint64_t fChannelLayout = AV_CH_LAYOUT_MONO;
+    uint64_t fChannelLayout = AV_CH_LAYOUT_STEREO;
 
     bool planarFormat() const {
         return av_sample_fmt_is_planar(fSampleFormat);
@@ -22,6 +22,12 @@ struct eSoundSettingsData {
 
     int bytesPerSample() const {
         return av_get_bytes_per_sample(fSampleFormat);
+    }
+
+    bool operator==(const eSoundSettingsData &other) {
+        return fSampleRate == other.fSampleRate &&
+               fSampleFormat == other.fSampleFormat &&
+               fChannelLayout == other.fChannelLayout;
     }
 };
 
@@ -51,9 +57,12 @@ public:
     void save();
     void restore();
 
+    void setAll(const eSoundSettingsData& data);
     void setSampleRate(const int sampleRate);
     void setSampleFormat(const AVSampleFormat format);
     void setChannelLayout(const uint64_t layout);
+private:
+    using eSoundSettingsData::operator=;
 signals:
     void settingsChanged();
 };

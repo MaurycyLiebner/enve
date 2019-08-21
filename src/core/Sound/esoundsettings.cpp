@@ -57,21 +57,29 @@ void eSoundSettings::save() {
 }
 
 void eSoundSettings::restore() {
-    eSoundSettingsData::operator=(mSaved);
+    setAll(mSaved);
+}
+
+void eSoundSettings::setAll(const eSoundSettings::eSoundSettingsData &data) {
+    if(eSoundSettingsData::operator==(data)) return;
+    eSoundSettingsData::operator=(data);
     emit settingsChanged();
 }
 
 void eSoundSettings::setSampleRate(const int sampleRate) {
+    if(sampleRate == fSampleRate) return;
     fSampleRate = sampleRate;
     emit settingsChanged();
 }
 
 void eSoundSettings::setSampleFormat(const AVSampleFormat format) {
+    if(format == fSampleFormat) return;
     fSampleFormat = format;
     emit settingsChanged();
 }
 
 void eSoundSettings::setChannelLayout(const uint64_t layout) {
+    if(layout == fChannelLayout) return;
     fChannelLayout = layout;
     emit settingsChanged();
 }
