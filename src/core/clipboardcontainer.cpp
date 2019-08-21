@@ -18,9 +18,12 @@ BoxesClipboard::BoxesClipboard(const QList<BoundingBox*> &src) :
     const int nBoxes = src.count();
     dst.write(rcConstChar(&nBoxes), sizeof(int));
 
+    const bool isBox = true;
     for(const auto& box : src) {
+        dst.write(rcConstChar(&isBox), sizeof(bool));
         box->writeIdentifier(&dst);
         box->writeBoundingBox(&dst);
+        gWritePos(&dst);
     }
     dst.close();
 
@@ -32,7 +35,11 @@ void BoxesClipboard::pasteTo(ContainerBox* const parent) {
     const int oldCount = parent->getContainedBoxesCount();
     QBuffer src(&mData);
     src.open(QIODevice::ReadOnly);
-    parent->readContained(&src);
+    try {
+        parent->readAllContained(&src);
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
     src.close();
     BoundingBox::sClearReadBoxes();
     const int newCount = parent->getContainedBoxesCount();
