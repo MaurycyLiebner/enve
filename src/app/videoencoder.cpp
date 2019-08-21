@@ -423,7 +423,9 @@ static void processAudioStream(AVFormatContext * const oc,
     *audioEnabled = gotOutput;
 }
 
+#include "Sound/soundcomposition.h"
 void VideoEncoder::startEncodingNow() {
+    Q_ASSERT(mRenderInstanceSettings);
     if(!mOutputFormat) {
         mOutputFormat = av_guess_format(nullptr, mPathByteArray.data(), nullptr);
         if(!mOutputFormat) {
@@ -431,6 +433,7 @@ void VideoEncoder::startEncodingNow() {
                          "Could not guess AVOutputFormat from file extension");
         }
     }
+    const auto scene = mRenderInstanceSettings->getTargetCanvas();
     mFormatContext = avformat_alloc_context();
     if(!mFormatContext) RuntimeThrow("Error allocating AVFormatContext");
 
@@ -453,8 +456,9 @@ void VideoEncoder::startEncodingNow() {
         mHaveVideo = true;
         mEncodeVideo = true;
     }
+    const auto soundComp = scene->getSoundComposition();
     if(mOutputFormat->audio_codec != AV_CODEC_ID_NONE &&
-       mOutputSettings.audioEnabled) {
+       mOutputSettings.audioEnabled && soundComp->hasAnySounds()) {
         eSoundSettings::sSave();
         eSoundSettings::sSetSampleRate(mOutputSettings.audioSampleRate);
         eSoundSettings::sSetSampleFormat(mOutputSettings.audioSampleFormat);

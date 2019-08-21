@@ -47,6 +47,8 @@ public:
     HDDCachableCacheHandler& getCacheHandler() {
         return mSecondsCache;
     }
+
+    bool hasAnySounds() const { return !mSounds.isEmpty(); }
 private:
     SoundMerger * scheduleSecond(const int secondId);
 
