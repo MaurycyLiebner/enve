@@ -1,8 +1,8 @@
-#include "examplerastereffect.h"
+#include "eblur.h"
 
 qsptr<CustomRasterEffect> eCreateNewestVersion() {
     // Use default, most up to date, version
-    return enve::make_shared<ExampleRasterEffect000>();
+    return enve::make_shared<eBlur>();
 }
 
 qsptr<CustomRasterEffect> eCreate(
@@ -10,7 +10,7 @@ qsptr<CustomRasterEffect> eCreate(
     Q_UNUSED(identifier);
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
-    return enve::make_shared<ExampleRasterEffect000>();
+    return enve::make_shared<eBlur>();
 }
 
 // Returned value must be unique, lets enve distinguish effects
@@ -20,7 +20,7 @@ QString effectId() {
 
 // Name of your effect used in UI
 QString eName() {
-    return "Example";
+    return "eBlur";
 }
 
 // here specify your effect's most up to date version
@@ -39,25 +39,25 @@ bool eSupports(const CustomIdentifier &identifier) {
 }
 
 #include "enveCore/Animators/qrealanimator.h"
-ExampleRasterEffect000::ExampleRasterEffect000() :
+eBlur::eBlur() :
     CustomRasterEffect(eName().toLower(), HardwareSupport::gpuPreffered, false) {
     mRadius = enve::make_shared<QrealAnimator>(10, 0, 999.999, 1, "radius");
     ca_addChild(mRadius);
 }
 
 stdsptr<RasterEffectCaller>
-ExampleRasterEffect000::getEffectCaller(const qreal relFrame) const {
+eBlur::getEffectCaller(const qreal relFrame) const {
     const qreal radius = mRadius->getEffectiveValue(relFrame);
     if(isZero4Dec(radius)) return nullptr;
-    return enve::make_shared<ExampleRasterEffectCaller000>(
+    return enve::make_shared<eBlurCaller>(
                 instanceHwSupport(), radius);
 }
 
-CustomIdentifier ExampleRasterEffect000::getIdentifier() const {
+CustomIdentifier eBlur::getIdentifier() const {
     return { effectId(), eName(), { 0, 0, 0 } };
 }
 
-void ExampleRasterEffectCaller000::processGpu(QGL33 * const gl,
+void eBlurCaller::processGpu(QGL33 * const gl,
                                            GpuRenderTools &renderTools,
                                            GpuRenderData &data) {
     Q_UNUSED(gl);
@@ -76,7 +76,7 @@ void ExampleRasterEffectCaller000::processGpu(QGL33 * const gl,
     canvas->flush();
 }
 
-void ExampleRasterEffectCaller000::processCpu(CpuRenderTools &renderTools,
+void eBlurCaller::processCpu(CpuRenderTools &renderTools,
                                            const CpuRenderData &data) {
     Q_UNUSED(data);
 

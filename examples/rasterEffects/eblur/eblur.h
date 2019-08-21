@@ -1,11 +1,11 @@
-#ifndef EXAMPLERASTEREFFECT_H
-#define EXAMPLERASTEREFFECT_H
+#ifndef EBLUR_H
+#define EBLUR_H
 
-#include "examplerastereffect_global.h"
+#include "eblur_global.h"
 
-class ExampleRasterEffectCaller000 : public RasterEffectCaller {
+class eBlurCaller : public RasterEffectCaller {
 public:
-    ExampleRasterEffectCaller000(const HardwareSupport hwSupport,
+    eBlurCaller(const HardwareSupport hwSupport,
                                  const qreal radius) :
         RasterEffectCaller(hwSupport, true, QMargins() + qCeil(radius)),
         mRadius(static_cast<float>(radius)) {}
@@ -19,9 +19,9 @@ private:
     const float mRadius;
 };
 
-class ExampleRasterEffect000 : public CustomRasterEffect {
+class eBlur : public CustomRasterEffect {
 public:
-    ExampleRasterEffect000();
+    eBlur();
 
     stdsptr<RasterEffectCaller> getEffectCaller(const qreal relFrame) const;
     bool forceMargin() const { return true; }
@@ -31,4 +31,4 @@ private:
     qsptr<QrealAnimator> mRadius;
 };
 
-#endif // EXAMPLERASTEREFFECT_H
+#endif // EBLUR_H
