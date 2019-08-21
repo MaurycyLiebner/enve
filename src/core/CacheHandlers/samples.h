@@ -80,12 +80,28 @@ public:
     }
 
     void zeroAll() {
-        const auto bytes = static_cast<ulong>(fSampleRange.span())*fSampleSize;
-        if(fPlanar) {
-            for(uint i = 0; i < fNChannels; i++)
-                memset(fData[i], 0, bytes);
+        const uint nSamples = uint(fSampleRange.span());
+        if(fFormat == AV_SAMPLE_FMT_U8) {
+            const uchar val = 127;
+            uint iMax = nSamples*fNChannels;
+            for(uint i = 0; i < iMax; i++) {
+                fData[0][i] = val;
+            }
+        } else if(fFormat == AV_SAMPLE_FMT_U8P) {
+            const uchar val = 127;
+            for(uint i = 0; i < nSamples; i++) {
+                for(uint j = 0; j < fNChannels; j++) {
+                    fData[j][i] = val;
+                }
+            }
         } else {
-            memset(fData[0], 0, bytes * fNChannels);
+            const auto bytes = static_cast<ulong>(nSamples)*fSampleSize;
+            if(fPlanar) {
+                for(uint i = 0; i < fNChannels; i++)
+                    memset(fData[i], 0, bytes);
+            } else {
+                memset(fData[0], 0, bytes * fNChannels);
+            }
         }
     }
 
