@@ -75,7 +75,6 @@ public:
     bool shouldScheduleUpdate() { return !SWT_isGroupBox(); }
 
     void queChildScheduledTasks();
-    void clearRenderData();
     void queScheduledTasks();
 
     void writeAllContained(QIODevice * const dst);

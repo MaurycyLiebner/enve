@@ -112,7 +112,6 @@ void TaskScheduler::queScheduledCPUTasks() {
     for(const auto& it : Document::sInstance->fVisibleScenes) {
         const auto scene = it.first;
         scene->queScheduledTasks();
-        scene->clearRenderData();
     }
     while(!mScheduledCPUTasks.isEmpty())
         queCPUTask(mScheduledCPUTasks.takeLast());

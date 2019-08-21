@@ -373,7 +373,10 @@ void BoundingBox::planScheduleUpdate(const UpdateReason reason) {
     if(!isVisibleAndInVisibleDurationRect()) return;
     if(mParentGroup) mParentGroup->planScheduleUpdate(qMin(reason, reason));
     else if(!SWT_isCanvas()) return;
-    if(reason != UpdateReason::frameChange) mStateId++;
+    if(reason != UpdateReason::frameChange) {
+        mStateId++;
+        mRenderDataHandler.clear();
+    }
     mDrawRenderContainer.setExpired(true);
     if(mSchedulePlanned) {
         mPlannedReason = qMax(reason, mPlannedReason);
@@ -406,13 +409,13 @@ BoxRenderData *BoundingBox::updateCurrentRenderData(const qreal relFrame,
     }
     renderData->fRelFrame = relFrame;
     renderData->fReason = reason;
-    mCurrentRenderDataHandler.addItemAtRelFrame(renderData);
+    mRenderDataHandler.addItemAtRelFrame(renderData);
     return renderData.get();
 }
 
 bool BoundingBox::hasCurrentRenderData(const qreal relFrame) const {
     const auto currentRenderData =
-            mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
+            mRenderDataHandler.getItemAtRelFrame(relFrame);
     if(currentRenderData) return true;
     if(mDrawRenderContainer.isExpired()) return false;
     const auto drawData = mDrawRenderContainer.getSrcRenderData();
@@ -422,7 +425,7 @@ bool BoundingBox::hasCurrentRenderData(const qreal relFrame) const {
 
 stdsptr<BoxRenderData> BoundingBox::getCurrentRenderData(const qreal relFrame) const {
     const auto currentRenderData =
-            mCurrentRenderDataHandler.getItemAtRelFrame(relFrame);
+            mRenderDataHandler.getItemAtRelFrame(relFrame);
     if(currentRenderData) return currentRenderData->ref<BoxRenderData>();
     if(mDrawRenderContainer.isExpired()) return nullptr;
     const auto drawData = mDrawRenderContainer.getSrcRenderData();
@@ -1013,13 +1016,16 @@ bool BoundingBox::SWT_drop(const QMimeData * const data) {
 }
 
 void BoundingBox::renderDataFinished(BoxRenderData *renderData) {
+    const qreal relFrame = renderData->fRelFrame;
+    if(renderData->fBoxStateId == mStateId)
+        mRenderDataHandler.removeItemAtRelFrame(relFrame);
     auto currentRenderData = mDrawRenderContainer.getSrcRenderData();
     bool newerSate = true;
     bool closerFrame = true;
     if(currentRenderData) {
         newerSate = currentRenderData->fBoxStateId < renderData->fBoxStateId;
         const qreal finishedFrameDist =
-                qAbs(anim_getCurrentRelFrame() - renderData->fRelFrame);
+                qAbs(anim_getCurrentRelFrame() - relFrame);
         const qreal oldFrameDist =
                 qAbs(anim_getCurrentRelFrame() - currentRenderData->fRelFrame);
         closerFrame = finishedFrameDist < oldFrameDist;
@@ -1027,7 +1033,7 @@ void BoundingBox::renderDataFinished(BoxRenderData *renderData) {
     if(newerSate || closerFrame) {
         mDrawRenderContainer.setSrcRenderData(renderData);
         const bool currentState = renderData->fBoxStateId == mStateId;
-        const bool currentFrame = isZero4Dec(renderData->fRelFrame - anim_getCurrentRelFrame());
+        const bool currentFrame = isZero4Dec(relFrame - anim_getCurrentRelFrame());
         const bool expired = !currentState || !currentFrame;
         mDrawRenderContainer.setExpired(expired);
         if(expired) updateDrawRenderContainerTransform();

@@ -246,11 +246,6 @@ void ContainerBox::queChildScheduledTasks() {
         child->queScheduledTasks();
 }
 
-void ContainerBox::clearRenderData() {
-    for(const auto &child : mContainedBoxes) child->clearRenderData();
-    BoundingBox::clearRenderData();
-}
-
 void ContainerBox::queScheduledTasks() {
     queChildScheduledTasks();
     if(mSchedulePlanned && SWT_isGroupBox()) updateRelBoundingRect();

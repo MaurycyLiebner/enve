@@ -324,8 +324,6 @@ public:
 
     void planCenterPivotPosition();
 
-    virtual void clearRenderData() { mCurrentRenderDataHandler.clear(); }
-
     virtual void updateIfUsesProgram(const ShaderEffectProgram * const program) const;
 protected:
     void setRelBoundingRect(const QRectF& relRect);
@@ -358,7 +356,7 @@ protected:
 
     QList<BoundingBox*> mLinkingBoxes;
 
-    RenderDataHandler mCurrentRenderDataHandler;
+    RenderDataHandler mRenderDataHandler;
     RenderContainer mDrawRenderContainer;
 
     const qsptr<BoxTransformAnimator> mTransformAnimator;

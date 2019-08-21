@@ -359,10 +359,11 @@ FrameRange Canvas::prp_getIdenticalRelRange(const int relFrame) const {
 }
 
 void Canvas::renderDataFinished(BoxRenderData *renderData) {
-    if(renderData->fBoxStateId < mLastStateId) return;
+    const bool currentState = renderData->fBoxStateId == mStateId;
+    if(currentState) mRenderDataHandler.removeItemAtRelFrame(renderData->fRelFrame);
+    else if(renderData->fBoxStateId < mLastStateId) return;
     const int relFrame = qRound(renderData->fRelFrame);
     mLastStateId = renderData->fBoxStateId;
-    const bool currentState = renderData->fBoxStateId == mStateId;
 
     const auto range = prp_getIdenticalRelRange(relFrame);
     const auto cont = enve::make_shared<ImageCacheContainer>(
