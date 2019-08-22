@@ -1,37 +1,52 @@
 #include "rastereffectanimators.h"
 #include "RasterEffects/rastereffect.h"
 #include "Boxes/boundingbox.h"
-#include <QDebug>
+#include "Boxes/containerbox.h"
 
 RasterEffectAnimators::RasterEffectAnimators(BoundingBox * const parentBox) :
     RasterEffectAnimatorsBase("raster effects"), mParentBox_k(parentBox) {
     makeHiddenWhenEmpty();
 
     connect(this, &ComplexAnimator::childAdded,
-            this, &RasterEffectAnimators::updateUnbound);
+            this, &RasterEffectAnimators::updateMaxForcedMargin);
     connect(this, &ComplexAnimator::childRemoved,
-            this, &RasterEffectAnimators::updateUnbound);
+            this, &RasterEffectAnimators::updateMaxForcedMargin);
 }
 
-void RasterEffectAnimators::updateUnbound() {
+void RasterEffectAnimators::updateMaxForcedMargin() {
+    QMargins newMargins;
     for(const auto& effect : ca_mChildAnimators) {
-        auto rasterEffect = static_cast<RasterEffect*>(effect.get());
-        if(/*rasterEffect->isVisible() && */rasterEffect->forceMargin()) {
-            mUnbound = true;
-            return;
-        }
+        const auto rasterEffect = static_cast<RasterEffect*>(effect.get());
+        if(!rasterEffect->forceMargin()) continue;
+        const auto reMargin = rasterEffect->getMargin();
+        newMargins.setTop(qMax(newMargins.top(), reMargin.top()));
+        newMargins.setLeft(qMax(newMargins.left(), reMargin.left()));
+        newMargins.setBottom(qMax(newMargins.bottom(), reMargin.bottom()));
+        newMargins.setRight(qMax(newMargins.right(), reMargin.right()));
     }
-    mUnbound = false;
-}
+    newMargins.setTop(qCeil(newMargins.top()*0.1)*10);
+    newMargins.setLeft(qCeil(newMargins.left()*0.1)*10);
+    newMargins.setBottom(qCeil(newMargins.bottom()*0.1)*10);
+    newMargins.setRight(qCeil(newMargins.right()*0.1)*10);
 
-bool RasterEffectAnimators::unbound() const {
-    return mUnbound;
+    const bool changed =
+            newMargins.top() > mMaxForcedMargin.top() ||
+            newMargins.left() > mMaxForcedMargin.left() ||
+            newMargins.bottom() > mMaxForcedMargin.bottom() ||
+            newMargins.right() > mMaxForcedMargin.right();
+
+    mMaxForcedMargin = newMargins;
+
+    if(changed && mParentBox_k->SWT_isLayerBox()) {
+        const auto cont = static_cast<ContainerBox*>(mParentBox_k);
+        cont->forcedMarginMeaningfulChange();
+    }
 }
 
 void RasterEffectAnimators::addEffects(const qreal relFrame,
                                        BoxRenderData * const data) {
     for(const auto& effect : ca_mChildAnimators) {
-        auto rasterEffect = static_cast<ShaderEffect*>(effect.get());
+        auto rasterEffect = static_cast<RasterEffect*>(effect.get());
         if(rasterEffect->isVisible()) {
             const auto effectRenderData = rasterEffect->getEffectCaller(relFrame);
             if(!effectRenderData) continue;
@@ -79,7 +94,9 @@ qsptr<RasterEffect> readIdCreateRasterEffect(QIODevice * const src) {
             return nullptr;
         case(RasterEffectType::CUSTOM): {
             const auto id = CustomIdentifier::sRead(src);
-            return CustomRasterEffectCreator::sCreateForIdentifier(id);
+            const auto eff = CustomRasterEffectCreator::sCreateForIdentifier(id);
+            if(eff) return eff;
+            RuntimeThrow("Unrecogized CustomRasterEffect identifier " + id.toString());
         } case(RasterEffectType::CUSTOM_SHADER):
             return readIdCreateShaderEffect(src);
         default: RuntimeThrow("Invalid RasterEffect type '" +

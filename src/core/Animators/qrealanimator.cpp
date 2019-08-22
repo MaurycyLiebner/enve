@@ -227,7 +227,7 @@ qreal QrealAnimator::getCurrentBaseValue() const {
     return mCurrentBaseValue;
 }
 
-qreal QrealAnimator::getCurrentEffectiveValue() const {
+qreal QrealAnimator::getEffectiveValue() const {
     if(mRandomGenerator.isNull()) return mCurrentBaseValue;
     const qreal val = mCurrentBaseValue +
             mRandomGenerator->getDevAtRelFrame(anim_getCurrentRelFrame());

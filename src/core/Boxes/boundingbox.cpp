@@ -253,12 +253,12 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
     mDrawRenderContainer.drawSk(canvas, paint);
 }
 
-void BoundingBox::setBlendModeSk(const SkBlendMode &blendMode) {
+void BoundingBox::setBlendModeSk(const SkBlendMode blendMode) {
     mBlendModeSk = blendMode;
     prp_afterWholeInfluenceRangeChanged();
 }
 
-const SkBlendMode &BoundingBox::getBlendMode() {
+SkBlendMode BoundingBox::getBlendMode() {
     return mBlendModeSk;
 }
 
@@ -371,7 +371,7 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 
 void BoundingBox::planScheduleUpdate(const UpdateReason reason) {
     if(!isVisibleAndInVisibleDurationRect()) return;
-    if(mParentGroup) mParentGroup->planScheduleUpdate(qMin(reason, reason));
+    if(mParentGroup) mParentGroup->planScheduleUpdate(reason);
     else if(!SWT_isCanvas()) return;
     if(reason != UpdateReason::frameChange) {
         mStateId++;
@@ -636,9 +636,7 @@ void BoundingBox::setupRenderData(const qreal relFrame,
         setupRasterEffectsF(relFrame, data);
     }
 
-    bool unbound = false;
-    if(mParentGroup) unbound = mParentGroup->unboundChildren();
-    if(unbound) data->fMaxBoundsRect = mParentScene->getMaxBounds();
+    if(mParentGroup) data->fMaxBoundsRect = mParentGroup->currentGlobalBounds();
     else data->fMaxBoundsRect = mParentScene->getCurrentBounds();
 }
 

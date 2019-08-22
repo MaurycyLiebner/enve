@@ -20,15 +20,19 @@ public:
 
     BoundingBox *getParentBox() { return mParentBox_k; }
     bool hasEffects();
-    bool unbound() const;
 
     void addEffects(const qreal relFrame,
                     BoxRenderData * const data);
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program);
     //void readRasterEffect(QIODevice *target);
+    const QMargins& getMaxForcedMargin() const {
+        return mMaxForcedMargin;
+    }
 private:
-    void updateUnbound();
+    void updateMaxForcedMargin();
+
+    QMargins mMaxForcedMargin;
 
     bool mUnbound = false;
     BoundingBox * const mParentBox_k;

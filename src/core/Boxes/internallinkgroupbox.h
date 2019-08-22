@@ -42,7 +42,7 @@ public:
     void setupRasterEffectsF(const qreal relFrame,
                           BoxRenderData * const data);
 
-    const SkBlendMode &getBlendMode();
+    SkBlendMode getBlendMode();
 
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data);

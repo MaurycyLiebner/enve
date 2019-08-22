@@ -332,7 +332,7 @@ SkBlendMode idToBlendModeSk(const int id) {
     }
 }
 
-int blendModeToIntSk(const SkBlendMode &mode) {
+int blendModeToIntSk(const SkBlendMode mode) {
     switch(mode) {
         case SkBlendMode::kSrcOver: return 0;
         case SkBlendMode::kDstOver: return 1;

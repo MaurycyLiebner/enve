@@ -15,8 +15,8 @@ QPointF QPointFAnimator::getBaseValue() const {
 }
 
 QPointF QPointFAnimator::getEffectiveValue() const {
-    return QPointF(mXAnimator->getCurrentEffectiveValue(),
-                   mYAnimator->getCurrentEffectiveValue());
+    return QPointF(mXAnimator->getEffectiveValue(),
+                   mYAnimator->getEffectiveValue());
 }
 
 QPointF QPointFAnimator::getBaseValueAtAbsFrame(const qreal frame) const {
@@ -48,11 +48,11 @@ bool QPointFAnimator::getBeingTransformed() {
 }
 
 qreal QPointFAnimator::getEffectiveXValue() {
-    return mXAnimator->getCurrentEffectiveValue();
+    return mXAnimator->getEffectiveValue();
 }
 
 qreal QPointFAnimator::getEffectiveYValue() {
-    return mYAnimator->getCurrentEffectiveValue();
+    return mYAnimator->getEffectiveValue();
 }
 
 qreal QPointFAnimator::getEffectiveXValue(const qreal relFrame) {

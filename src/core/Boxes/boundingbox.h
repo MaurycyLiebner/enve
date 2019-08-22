@@ -194,7 +194,7 @@ public:
 
     virtual void setupRasterEffectsF(const qreal relFrame,
                                   BoxRenderData * const data);
-    virtual const SkBlendMode &getBlendMode();
+    virtual SkBlendMode getBlendMode();
 
     bool SWT_isBoundingBox() const;
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
@@ -286,7 +286,7 @@ public:
     void addRasterEffect(const qsptr<RasterEffect> &rasterEffect);
     void removeRasterEffect(const qsptr<RasterEffect> &effect);
 
-    void setBlendModeSk(const SkBlendMode &blendMode);
+    void setBlendModeSk(const SkBlendMode blendMode);
 
     QPointF mapRelPosToAbs(const QPointF &relPos) const;
 

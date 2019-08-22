@@ -8,6 +8,12 @@ struct CustomIdentifier {
         uint fMinor;
         uint fPatch;
 
+        QString toString() const {
+            return QString::number(fMajor) + "." +
+                   QString::number(fMinor) + "." +
+                   QString::number(fPatch);
+        }
+
         bool operator==(const Version& other) const {
             return fMajor == other.fMajor &&
                    fMinor == other.fMinor &&
@@ -30,6 +36,10 @@ struct CustomIdentifier {
     QString fEffectId;
     QString fEffectName;
     Version fVersion;
+
+    QString toString() const {
+        return fEffectId + " " + fEffectName + " " + fVersion.toString();
+    }
 
     void write(QIODevice * const dst) const {
         gWrite(dst, fEffectId);

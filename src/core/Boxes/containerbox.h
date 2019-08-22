@@ -28,7 +28,6 @@ public:
 
     virtual BoundingBox *getBoxAt(const QPointF &absPos);
 
-    bool unboundChildren() const;
     void anim_setAbsFrame(const int frame);
 
     BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
@@ -95,6 +94,9 @@ public:
     bool differenceInOutlinePathEffectsBetweenFrames(const int relFrame1,
                                                      const int relFrame2) const;
     void updateAllChildPathBoxes(const UpdateReason reason);
+
+    void forcedMarginMeaningfulChange();
+    QRect currentGlobalBounds() const;
 
     void applyPathEffects(const qreal relFrame,
                           SkPath * const srcDstPath,
@@ -163,6 +165,8 @@ private:
 protected:
     void removeContained(const qsptr<eBoxOrSound> &child);
 
+    QMargins mForcedMargin;
+    
     bool mIsCurrentGroup = false;
     bool mIsDescendantCurrentGroup = false;
     QList<BoundingBox*> mContainedBoxes;

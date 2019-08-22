@@ -6,9 +6,7 @@
 class eBlurCaller : public RasterEffectCaller {
 public:
     eBlurCaller(const HardwareSupport hwSupport,
-                                 const qreal radius) :
-        RasterEffectCaller(hwSupport, true, QMargins() + qCeil(radius)),
-        mRadius(static_cast<float>(radius)) {}
+                const qreal radius);
 
     void processGpu(QGL33 * const gl,
                     GpuRenderTools& renderTools,
@@ -24,6 +22,7 @@ public:
     eBlur();
 
     stdsptr<RasterEffectCaller> getEffectCaller(const qreal relFrame) const;
+    QMargins getMargin() const;
     bool forceMargin() const { return true; }
 
     CustomIdentifier getIdentifier() const;

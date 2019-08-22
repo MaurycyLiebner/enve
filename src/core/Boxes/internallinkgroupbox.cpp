@@ -66,7 +66,7 @@ void InternalLinkGroupBox::setupRasterEffectsF(const qreal relFrame,
     }
 }
 
-const SkBlendMode &InternalLinkGroupBox::getBlendMode() {
+SkBlendMode InternalLinkGroupBox::getBlendMode() {
     if(isParentLink() && getLinkTarget()) {
         return getLinkTarget()->getBlendMode();
     }

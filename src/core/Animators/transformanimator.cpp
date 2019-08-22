@@ -98,7 +98,7 @@ qreal BasicTransformAnimator::dy() {
 }
 
 qreal BasicTransformAnimator::rot() {
-    return mRotAnimator->getCurrentEffectiveValue();
+    return mRotAnimator->getEffectiveValue();
 }
 
 qreal BasicTransformAnimator::xScale() {
@@ -143,7 +143,7 @@ QMatrix BasicTransformAnimator::getCurrentTransform() {
     matrix.translate(mPosAnimator->getEffectiveXValue(),
                      mPosAnimator->getEffectiveYValue());
 
-    matrix.rotate(mRotAnimator->getCurrentEffectiveValue());
+    matrix.rotate(mRotAnimator->getEffectiveValue());
     matrix.scale(mScaleAnimator->getEffectiveXValue(),
                  mScaleAnimator->getEffectiveYValue());
     return matrix;
@@ -231,9 +231,9 @@ void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal sx,
                                                       const QPointF &pivot) {
     QMatrix matrix;
     matrix.translate(pivot.x(), pivot.y());
-    matrix.rotate(mRotAnimator->getCurrentEffectiveValue());
+    matrix.rotate(mRotAnimator->getEffectiveValue());
     matrix.scale(sx, sy);
-    matrix.rotate(-mRotAnimator->getCurrentEffectiveValue());
+    matrix.rotate(-mRotAnimator->getEffectiveValue());
     matrix.translate(-pivot.x() + mPosAnimator->getSavedXValue(),
                      -pivot.y() + mPosAnimator->getSavedYValue());
 
@@ -342,7 +342,7 @@ void BoxTransformAnimator::setPivotFixedTransform(
     futureMatrix.translate(point.x() + mPosAnimator->getEffectiveXValue(),
                            point.y() + mPosAnimator->getEffectiveYValue());
 
-    futureMatrix.rotate(mRotAnimator->getCurrentEffectiveValue());
+    futureMatrix.rotate(mRotAnimator->getEffectiveValue());
     futureMatrix.scale(mScaleAnimator->getEffectiveXValue(),
                        mScaleAnimator->getEffectiveYValue());
     futureMatrix.shear(mShearAnimator->getEffectiveXValue(),
@@ -411,7 +411,7 @@ QMatrix BoxTransformAnimator::getCurrentTransform() {
     matrix.translate(pivotX + mPosAnimator->getEffectiveXValue(),
                      pivotY + mPosAnimator->getEffectiveYValue());
 
-    matrix.rotate(mRotAnimator->getCurrentEffectiveValue());
+    matrix.rotate(mRotAnimator->getEffectiveValue());
     matrix.scale(mScaleAnimator->getEffectiveXValue(),
                  mScaleAnimator->getEffectiveYValue());
     matrix.shear(mShearAnimator->getEffectiveXValue(),

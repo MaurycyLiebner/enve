@@ -201,6 +201,31 @@ void ContainerBox::updateAllChildPathBoxes(const UpdateReason reason) {
     }
 }
 
+void ContainerBox::forcedMarginMeaningfulChange() {
+    const auto thisMargin = mRasterEffectsAnimators->getMaxForcedMargin();
+    const auto inheritedMargin =
+            mParentGroup ? mParentGroup->mForcedMargin : QMargins();
+    mForcedMargin.setTop(qMax(inheritedMargin.top(), thisMargin.top()));
+    mForcedMargin.setLeft(qMax(inheritedMargin.left(), thisMargin.left()));
+    mForcedMargin.setBottom(qMax(inheritedMargin.bottom(), thisMargin.bottom()));
+    mForcedMargin.setRight(qMax(inheritedMargin.right(), thisMargin.right()));
+    for(const auto& box : mContainedBoxes) {
+        if(box->SWT_isContainerBox()) {
+            const auto cont = static_cast<ContainerBox*>(box);
+            cont->forcedMarginMeaningfulChange();
+        } else box->planScheduleUpdate(UpdateReason::userChange);
+    }
+}
+
+QRect ContainerBox::currentGlobalBounds() const {
+    if(!mParentScene) return QRect();
+    const auto sceneBounds = mParentScene->getCurrentBounds();
+    return sceneBounds.adjusted(-mForcedMargin.left(),
+                                -mForcedMargin.top(),
+                                mForcedMargin.right(),
+                                mForcedMargin.bottom());
+}
+
 void ContainerBox::applyPathEffects(const qreal relFrame,
                                     SkPath * const srcDstPath,
                                     BoundingBox * const box) {
@@ -602,16 +627,6 @@ BoundingBox *ContainerBox::getBoxAt(const QPointF &absPos) {
         }
     }
     return boxAtPos;
-}
-
-bool ContainerBox::unboundChildren() const {
-    if(mParentGroup) {
-        if(ContainerBox::SWT_isGroupBox())
-            return mParentGroup->unboundChildren();
-        return mRasterEffectsAnimators->unbound() ||
-               mParentGroup->unboundChildren();
-    }
-    return false;
 }
 
 void ContainerBox::anim_setAbsFrame(const int frame) {

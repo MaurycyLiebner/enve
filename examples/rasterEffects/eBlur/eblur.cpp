@@ -43,23 +43,37 @@ eBlur::eBlur() :
     CustomRasterEffect(eName().toLower(), HardwareSupport::gpuPreffered, false) {
     mRadius = enve::make_shared<QrealAnimator>(10, 0, 999.999, 1, "radius");
     ca_addChild(mRadius);
+    connect(mRadius.get(), &QrealAnimator::valueChangedSignal,
+            this, &CustomRasterEffect::forcedMarginChanged);
 }
 
 stdsptr<RasterEffectCaller>
 eBlur::getEffectCaller(const qreal relFrame) const {
     const qreal radius = mRadius->getEffectiveValue(relFrame);
     if(isZero4Dec(radius)) return nullptr;
-    return enve::make_shared<eBlurCaller>(
-                instanceHwSupport(), radius);
+    return enve::make_shared<eBlurCaller>(instanceHwSupport(), radius);
+}
+
+QMargins radiusToMargin(const qreal radius) {
+    return QMargins() + qCeil(radius);
+}
+
+QMargins eBlur::getMargin() const {
+    return radiusToMargin(mRadius->getEffectiveValue());
 }
 
 CustomIdentifier eBlur::getIdentifier() const {
     return { effectId(), eName(), { 0, 0, 0 } };
 }
 
+eBlurCaller::eBlurCaller(const HardwareSupport hwSupport,
+                         const qreal radius) :
+    RasterEffectCaller(hwSupport, true, radiusToMargin(radius)),
+    mRadius(static_cast<float>(radius)) {}
+
 void eBlurCaller::processGpu(QGL33 * const gl,
-                                           GpuRenderTools &renderTools,
-                                           GpuRenderData &data) {
+                             GpuRenderTools &renderTools,
+                             GpuRenderData &data) {
     Q_UNUSED(gl);
     Q_UNUSED(data);
 
@@ -77,7 +91,7 @@ void eBlurCaller::processGpu(QGL33 * const gl,
 }
 
 void eBlurCaller::processCpu(CpuRenderTools &renderTools,
-                                           const CpuRenderData &data) {
+                             const CpuRenderData &data) {
     Q_UNUSED(data);
 
     const float sigma = mRadius*0.3333333f;

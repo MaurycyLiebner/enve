@@ -46,10 +46,10 @@ void ColorAnimator::qra_setCurrentValue(const QColor &colorValue) {
 }
 
 QColor ColorAnimator::getColor() const {
-    qreal val1 = mVal1Animator->getCurrentEffectiveValue();
-    qreal val2 = mVal2Animator->getCurrentEffectiveValue();
-    qreal val3 = mVal3Animator->getCurrentEffectiveValue();
-    qreal alpha = mAlphaAnimator->getCurrentEffectiveValue();
+    qreal val1 = mVal1Animator->getEffectiveValue();
+    qreal val2 = mVal2Animator->getEffectiveValue();
+    qreal val3 = mVal3Animator->getEffectiveValue();
+    qreal alpha = mAlphaAnimator->getEffectiveValue();
 
     QColor color;
     if(mColorMode == ColorMode::rgb) {

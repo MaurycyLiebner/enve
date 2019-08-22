@@ -77,7 +77,7 @@ public:
     void multCurrentBaseValue(const qreal mult);
 
     qreal getCurrentBaseValue() const;
-    qreal getCurrentEffectiveValue() const;
+    qreal getEffectiveValue() const;
     qreal getBaseValue(const qreal relFrame) const;
     qreal getBaseValueAtAbsFrame(const qreal frame) const;
     qreal getEffectiveValue(const qreal relFrame) const;

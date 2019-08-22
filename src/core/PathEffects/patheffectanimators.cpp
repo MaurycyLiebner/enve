@@ -63,7 +63,9 @@ qsptr<PathEffect> readIdCreatePathEffect(QIODevice * const src) {
             return enve::make_shared<SubdividePathEffect>();
         case(PathEffectType::CUSTOM): {
             const auto id = CustomIdentifier::sRead(src);
-            return CustomPathEffectCreator::sCreateForIdentifier(id);
+            const auto eff = CustomPathEffectCreator::sCreateForIdentifier(id);
+            if(eff) return eff;
+            RuntimeThrow("Unrecogized CustomPathEffect identifier " + id.toString());
         } default: RuntimeThrow("Invalid path effect type '" +
                                 QString::number(int(type)) + "'");
     }

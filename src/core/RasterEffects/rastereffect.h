@@ -25,6 +25,7 @@ public:
     virtual stdsptr<RasterEffectCaller> getEffectCaller(const qreal relFrame) const = 0;
 
     virtual bool forceMargin() const { return false; }
+    virtual QMargins getMargin() const { return QMargins(); }
 
     void writeIdentifier(QIODevice * const dst) const;
 
@@ -49,6 +50,8 @@ public:
         } else mInstHwSupport = HardwareSupport::gpuOnly;
         if(!mHwInterchangeable) prp_afterWholeInfluenceRangeChanged();
     }
+signals:
+    void forcedMarginChanged();
 private:
     const RasterEffectType mType;
     const HardwareSupport mTypeHwSupport;
