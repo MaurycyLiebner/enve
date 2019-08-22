@@ -29,8 +29,6 @@ public:
     QString getCurrentValue();
 
     void openTextEditor(QWidget* dialogParent);
-//    QRectF getTextRect();
-    void setPathText(bool pathText);
 
     void setTextAlignment(const Qt::Alignment &alignment) {
         mAlignment = alignment;

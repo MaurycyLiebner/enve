@@ -49,7 +49,8 @@ void FontsWidget::updateStylesFromCurrentFamily(const QString &family) {
     const QString currentStyle = getCurrentFontStyle();
 
     mFontStyleCombo->clear();
-    const QStringList styles = mFontDatabase.styles(family);
+    QStringList styles = mFontDatabase.styles(family);
+    if(styles.isEmpty()) styles << "Regular";
     mFontStyleCombo->addItems(styles);
 
     if(styles.contains(currentStyle)) {
@@ -78,8 +79,9 @@ void FontsWidget::updateSizesFromCurrentFamilyAndStyles() {
     const QString currentSize = mFontSizeCombo->currentText();
 
     mFontSizeCombo->clear();
-    const QList<int> sizes = mFontDatabase.smoothSizes(getCurrentFontFamily(),
+    QList<int> sizes = mFontDatabase.smoothSizes(getCurrentFontFamily(),
                                                        getCurrentFontStyle());
+    if(sizes.isEmpty()) sizes = mFontDatabase.standardSizes();
     for(const int size : sizes) {
         mFontSizeCombo->addItem(QString::number(size));
     }

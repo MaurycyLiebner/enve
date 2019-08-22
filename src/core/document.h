@@ -41,9 +41,9 @@ public:
     // all in document
     QList<qsptr<Gradient>> fGradients;
 
-    QString fFontFamily;
-    QString fFontStyle;
-    qreal fFontSize;
+    QString fFontFamily = "Arial";
+    QString fFontStyle = "Regular";
+    qreal fFontSize = 72;
 
     FillSettings fFill;
     StrokeSettings fStroke;

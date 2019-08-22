@@ -128,12 +128,15 @@ void Actions::pathsBreakApartAction() const {
 void Actions::setFontFamilyAndStyle(const QString& family,
                                     const QString& style) const {
     if(!mActiveScene) return;
+    mDocument.fFontFamily = family;
+    mDocument.fFontStyle = style;
     mActiveScene->setSelectedFontFamilyAndStyle(family, style);
     afterAction();
 }
 
 void Actions::setFontSize(const qreal size) const {
     if(!mActiveScene) return;
+    mDocument.fFontSize = size;
     mActiveScene->setSelectedFontSize(size);
     afterAction();
 }
