@@ -29,8 +29,8 @@ private:
         fBaseMargin = QMargins();
         updateRelBoundingRect();
         updateGlobalRect();
-        //fRenderTransform = fScaledTransform;
-        //fRenderTransform.translate(-fGlobalRect.x(), -fGlobalRect.y());
+        fRenderTransform = fScaledTransform;
+        fRenderTransform.translate(-fGlobalRect.x(), -fGlobalRect.y());
         fRenderedImage = fImage;
         finishedProcessing();
     }
