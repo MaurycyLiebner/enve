@@ -74,12 +74,12 @@ public:
         return enve::make_shared<SmartPathKey>(this);
     }
 
-    void writeProperty(QIODevice * const target) const {
-        writeKeys(target);
-        gWrite(target, mBaseValue);
+    void writeProperty(eWriteStream& dst) const {
+        writeKeys(dst);
+        dst << mBaseValue;
     }
 
-    void readProperty(QIODevice * const src);
+    void readProperty(eReadStream& src);
 
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType &type,

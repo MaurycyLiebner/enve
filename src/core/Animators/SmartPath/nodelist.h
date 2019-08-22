@@ -152,8 +152,8 @@ public:
         mNodes.applyTransform(transform);
     }
 
-    bool read(QIODevice * const src);
-    bool write(QIODevice * const dst) const;
+    bool read(eReadStream& src);
+    bool write(eWriteStream &dst) const;
 protected:
     void appendShallowCopyFrom(NodeList&& other) {
         mNodes.appendNodes(std::move(other.mNodes));

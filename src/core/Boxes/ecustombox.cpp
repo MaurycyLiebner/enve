@@ -5,7 +5,7 @@ eCustomBox::eCustomBox(const QString& name) :
     prp_setName(name);
 }
 
-void eCustomBox::writeIdentifier(QIODevice * const dst) const {
+void eCustomBox::writeIdentifier(eWriteStream& dst) const {
     BoundingBox::writeIdentifier(dst);
     getIdentifier().write(dst);
 }

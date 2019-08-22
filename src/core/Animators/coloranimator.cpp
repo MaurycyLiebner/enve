@@ -11,14 +11,14 @@ ColorAnimator::ColorAnimator(const QString &name) : StaticComplexAnimator(name) 
     ca_addChild(mAlphaAnimator);
 }
 
-void ColorAnimator::writeProperty(QIODevice * const dst) const {
+void ColorAnimator::writeProperty(eWriteStream& dst) const {
     StaticComplexAnimator::writeProperty(dst);
-    dst->write(rcConstChar(&mColorMode), sizeof(ColorMode));
+    dst.write(rcConstChar(&mColorMode), sizeof(ColorMode));
 }
 
-void ColorAnimator::readProperty(QIODevice * const src) {
+void ColorAnimator::readProperty(eReadStream& src) {
     StaticComplexAnimator::readProperty(src);
-    src->read(rcChar(&mColorMode), sizeof(ColorMode));
+    src.read(rcChar(&mColorMode), sizeof(ColorMode));
     setColorMode(mColorMode);
 }
 

@@ -33,8 +33,8 @@ public:
         return 0;
     }
 
-    void write(const int id, QIODevice * const dst);
-    int read(QIODevice * const src);
+    void write(const int id, eWriteStream &dst);
+    int read(eReadStream &src);
     int getReadWriteId();
     void clearReadWriteId();
 
@@ -65,8 +65,8 @@ public:
 signals:
     void changed();
 private:
-    void writeProperty(QIODevice * const dst) const;
-    void readProperty(QIODevice * const src);
+    void writeProperty(eWriteStream& dst) const;
+    void readProperty(eReadStream& src);
 
     int mReadWriteId = -1;
     QGradientStops mQGradientStops;

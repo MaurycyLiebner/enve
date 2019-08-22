@@ -44,26 +44,26 @@ void QrealKey::setValue(const qreal value) {
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
-void QrealKey::writeKey(QIODevice * const dst) {
+void QrealKey::writeKey(eWriteStream& dst) {
     Key::writeKey(dst);
-    dst->write(rcConstChar(&mValue), sizeof(qreal));
+    dst << mValue;
 
-    dst->write(rcConstChar(&mStartEnabled), sizeof(bool));
-    dst->write(rcConstChar(&mStartPt), sizeof(ClampedPoint));
+    dst << mStartEnabled;
+    dst.write(rcConstChar(&mStartPt), sizeof(ClampedPoint));
 
-    dst->write(rcConstChar(&mEndEnabled), sizeof(bool));
-    dst->write(rcConstChar(&mEndPt), sizeof(ClampedPoint));
+    dst << mEndEnabled;
+    dst.write(rcConstChar(&mEndPt), sizeof(ClampedPoint));
 }
 
-void QrealKey::readKey(QIODevice * const src) {
+void QrealKey::readKey(eReadStream& src) {
     Key::readKey(src);
-    src->read(rcChar(&mValue), sizeof(qreal));
+    src >> mValue;
 
-    src->read(rcChar(&mStartEnabled), sizeof(bool));
-    src->read(rcChar(&mStartPt), sizeof(ClampedPoint));
+    src >> mStartEnabled;
+    src.read(rcChar(&mStartPt), sizeof(ClampedPoint));
 
-    src->read(rcChar(&mEndEnabled), sizeof(bool));
-    src->read(rcChar(&mEndPt), sizeof(ClampedPoint));
+    src >> mEndEnabled;
+    src.read(rcChar(&mEndPt), sizeof(ClampedPoint));
 }
 
 void QrealKey::finishValueTransform() {

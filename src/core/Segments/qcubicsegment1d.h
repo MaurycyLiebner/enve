@@ -3,6 +3,7 @@
 #include <QPointF>
 #include <QPainterPath>
 #include "../simplemath.h"
+#include "../basicreadwrite.h"
 typedef std::pair<qreal, qreal> qrealPair;
 
 struct qCubicSegment1D {
@@ -114,5 +115,8 @@ private:
     qreal mC2;
     qreal mP1;
 };
+
+eWriteStream& operator<<(eWriteStream& dst, const qCubicSegment1D& seg);
+eReadStream& operator>>(eReadStream& src, qCubicSegment1D& seg);
 
 #endif // QCUBICSEGMENT1D_H

@@ -41,17 +41,17 @@ struct CustomIdentifier {
         return fEffectId + " " + fEffectName + " " + fVersion.toString();
     }
 
-    void write(QIODevice * const dst) const {
-        gWrite(dst, fEffectId);
-        gWrite(dst, fEffectName);
-        dst->write(rcConstChar(&fVersion), sizeof(Version));
+    void write(eWriteStream& dst) const {
+        dst << fEffectId;
+        dst << fEffectName;
+        dst.write(&fVersion, sizeof(Version));
     }
 
-    static CustomIdentifier sRead(QIODevice * const src) {
+    static CustomIdentifier sRead(eReadStream& src) {
         CustomIdentifier id;
-        id.fEffectId = gReadString(src);
-        id.fEffectName = gReadString(src);
-        src->read(rcChar(&id.fVersion), sizeof(Version));
+        src >> id.fEffectId;
+        src >> id.fEffectName;
+        src.read(&id.fVersion, sizeof(Version));
         return id;
     }
 };

@@ -13,12 +13,12 @@ Key::Key(const int frame, Animator * const parentAnimator) :
 
 bool Key::isSelected() const { return mIsSelected; }
 
-void Key::writeKey(QIODevice * const dst) {
-    dst->write(rcConstChar(&mRelFrame), sizeof(int));
+void Key::writeKey(eWriteStream& dst) {
+    dst << mRelFrame;
 }
 
-void Key::readKey(QIODevice * const src) {
-    src->read(rcChar(&mRelFrame), sizeof(int));
+void Key::readKey(eReadStream& src) {
+    src >> mRelFrame;
 }
 
 void Key::removeFromAnimator() {

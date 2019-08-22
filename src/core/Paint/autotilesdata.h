@@ -87,8 +87,8 @@ struct AutoTilesData {
         std::swap(mRowCount, other.mRowCount);
     }
 
-    void write(QIODevice * const dst) const;
-    void read(QIODevice * const src);
+    void write(eWriteStream &dst) const;
+    void read(eReadStream& src);
 protected:
     uint16_t* getTileByIndex(const int colId, const int rowId) const;
 private:

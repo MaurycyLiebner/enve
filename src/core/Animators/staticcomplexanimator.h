@@ -6,12 +6,12 @@ class StaticComplexAnimator : public ComplexAnimator {
 public:
     StaticComplexAnimator(const QString &name);
 
-    void writeProperty(QIODevice * const dst) const {
+    void writeProperty(eWriteStream& dst) const {
         for(const auto& prop : ca_mChildAnimators)
             prop->writeProperty(dst);
     }
 
-    void readProperty(QIODevice * const src) {
+    void readProperty(eReadStream& src) {
         for(const auto& prop : ca_mChildAnimators)
             prop->readProperty(src);
     }

@@ -31,7 +31,7 @@ bool BoxTargetProperty::SWT_drop(const QMimeData * const data) {
     return true;
 }
 
-void BoxTargetProperty::writeProperty(QIODevice * const target) const {
+void BoxTargetProperty::writeProperty(eWriteStream& dst) const {
     const auto targetBox = mTarget_d.data();
     int targetWriteId = -1;
     int targetDocumentId = -1;
@@ -41,15 +41,15 @@ void BoxTargetProperty::writeProperty(QIODevice * const target) const {
         targetWriteId = targetBox->getWriteId();
         targetDocumentId = targetBox->getDocumentId();
     }
-    target->write(rcConstChar(&targetWriteId), sizeof(int));
-    target->write(rcConstChar(&targetDocumentId), sizeof(int));
+    dst << targetWriteId;
+    dst << targetDocumentId;
 }
 
-void BoxTargetProperty::readProperty(QIODevice * const src) {
+void BoxTargetProperty::readProperty(eReadStream& src) {
     int targetReadId;
-    src->read(rcChar(&targetReadId), sizeof(int));
+    src >> targetReadId;
     int targetDocumentId;
-    src->read(rcChar(&targetDocumentId), sizeof(int));
+    src >> targetDocumentId;
     const auto targetBox = BoundingBox::sGetBoxByReadId(targetReadId);
     if(!targetBox && targetReadId >= 0) {
         QPointer<BoxTargetProperty> thisPtr = this;

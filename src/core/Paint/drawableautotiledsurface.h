@@ -109,12 +109,12 @@ public:
         return pixelBoundingRect().height();
     }
 
-    void write(QIODevice *target) {
-        mSurface.write(target);
+    void write(eWriteStream& dst) {
+        mSurface.write(dst);
     }
 
-    void read(QIODevice *target) {
-        mSurface.read(target);
+    void read(eReadStream& src) {
+        mSurface.read(src);
         updateTileBitmaps();
     }
 private:

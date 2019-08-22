@@ -252,22 +252,19 @@ void DurationRectangle::moveMaxFrame(const int change) {
     mMaxFrame.changeFramePosBy(change);
 }
 
-void DurationRectangle::writeDurationRectangle(QIODevice *dst) {
-    const int minFrame = getMinRelFrame();
-    const int maxFrame = getMaxRelFrame();
-    const int framePos = getValue();
-    dst->write(rcConstChar(&minFrame), sizeof(int));
-    dst->write(rcConstChar(&maxFrame), sizeof(int));
-    dst->write(rcConstChar(&framePos), sizeof(int));
+void DurationRectangle::writeDurationRectangle(eWriteStream &dst) {
+    dst << getMinRelFrame();
+    dst << getMaxRelFrame();
+    dst << getValue();
 }
 
-void DurationRectangle::readDurationRectangle(QIODevice *src) {
+void DurationRectangle::readDurationRectangle(eReadStream& src) {
     int minFrame;
     int maxFrame;
     int framePos;
-    src->read(rcChar(&minFrame), sizeof(int));
-    src->read(rcChar(&maxFrame), sizeof(int));
-    src->read(rcChar(&framePos), sizeof(int));
+    src >> minFrame;
+    src >> maxFrame;
+    src >> framePos;
     setMinRelFrame(minFrame);
     setMaxRelFrame(maxFrame);
     setValue(framePos);

@@ -88,14 +88,14 @@ public:
 
     //FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
-    void writeProperty(QIODevice * const dst) const {
+    void writeProperty(eWriteStream& dst) const {
         this->writeKeys(dst);
-        gWrite(dst, mCurrentValue);
+        dst << mCurrentValue;
     }
 
-    void readProperty(QIODevice * const src) {
+    void readProperty(eReadStream& src) {
         this->readKeys(src);
-        gRead(src, mCurrentValue);
+        src >> mCurrentValue;
         afterValueChanged();
     }
 

@@ -23,15 +23,14 @@ VideoBox::VideoBox() : AnimationBox(TYPE_VIDEO) {
             mSound.get(), &eBoxOrSound::setParentGroup);
 }
 
-void VideoBox::writeBoundingBox(QIODevice * const target) {
-    AnimationBox::writeBoundingBox(target);
-    gWrite(target, mFileHandler->path());
+void VideoBox::writeBoundingBox(eWriteStream& dst) {
+    AnimationBox::writeBoundingBox(dst);
+    dst << mFileHandler->path();
 }
 
-void VideoBox::readBoundingBox(QIODevice * const target) {
-    AnimationBox::readBoundingBox(target);
-    QString path;
-    gRead(target, path);
+void VideoBox::readBoundingBox(eReadStream& src) {
+    AnimationBox::readBoundingBox(src);
+    QString path; src >> path;
     setFilePath(path);
 }
 

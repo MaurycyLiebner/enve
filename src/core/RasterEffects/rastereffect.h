@@ -27,7 +27,7 @@ public:
     virtual bool forceMargin() const { return false; }
     virtual QMargins getMargin() const { return QMargins(); }
 
-    void writeIdentifier(QIODevice * const dst) const;
+    void writeIdentifier(eWriteStream& dst) const;
 
     void setupTreeViewMenu(PropertyMenu * const menu);
 

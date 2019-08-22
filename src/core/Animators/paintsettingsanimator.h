@@ -32,8 +32,8 @@ protected:
     virtual void showHideChildrenBeforeChaningPaintType(
             const PaintType newPaintType);
 public:
-    void writeProperty(QIODevice * const dst) const;
-    void readProperty(QIODevice * const src);
+    void writeProperty(eWriteStream& dst) const;
+    void readProperty(eReadStream& src);
 
     QColor getColor() const;
     PaintType getPaintType() const;

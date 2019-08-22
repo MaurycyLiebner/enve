@@ -33,23 +33,23 @@ PaintSettingsAnimator::PaintSettingsAnimator(
     prp_setOwnUpdater(enve::make_shared<DisplayedFillStrokeSettingsUpdater>(parent));
 }
 
-void PaintSettingsAnimator::writeProperty(QIODevice * const dst) const {
+void PaintSettingsAnimator::writeProperty(eWriteStream& dst) const {
     mGradientPoints->writeProperty(dst);
     mColor->writeProperty(dst);
-    dst->write(rcConstChar(&mPaintType), sizeof(PaintType));
-    dst->write(rcConstChar(&mGradientType), sizeof(bool));
+    dst.write(rcConstChar(&mPaintType), sizeof(PaintType));
+    dst.write(rcConstChar(&mGradientType), sizeof(GradientType));
     const int gradId = mGradient ? mGradient->getReadWriteId() : -1;
-    dst->write(rcConstChar(&gradId), sizeof(int));
+    dst << gradId;
 }
 
-void PaintSettingsAnimator::readProperty(QIODevice * const src) {
+void PaintSettingsAnimator::readProperty(eReadStream& src) {
     mGradientPoints->readProperty(src);
     mColor->readProperty(src);
     PaintType paintType;
-    src->read(rcChar(&paintType), sizeof(PaintType));
+    src.read(rcChar(&paintType), sizeof(PaintType));
     int gradId;
-    src->read(rcChar(&mGradientType), sizeof(bool));
-    src->read(rcChar(&gradId), sizeof(int));
+    src.read(rcChar(&mGradientType), sizeof(GradientType));
+    src >> gradId;
     if(gradId != -1) {
         mGradient = Document::sInstance->getGradientWithRWId(gradId);
     }

@@ -166,3 +166,13 @@ void SmartPath::setPath(const SkPath &path) {
 qValueRange SmartPath::dissolvedTRange(const int nodeId) {
     return {mNodesList.prevT(nodeId), mNodesList.nextT(nodeId)};
 }
+
+eWriteStream &operator<<(eWriteStream &dst, const SmartPath &path) {
+    path.write(dst);
+    return dst;
+}
+
+eReadStream &operator>>(eReadStream &src, SmartPath &path) {
+    path.read(src);
+    return src;
+}

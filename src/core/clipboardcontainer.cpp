@@ -13,19 +13,20 @@ ClipboardType Clipboard::getType() const { return mType; }
 
 BoxesClipboard::BoxesClipboard(const QList<BoundingBox*> &src) :
     Clipboard(ClipboardType::boxes) {
-    QBuffer dst(&mData);
-    dst.open(QIODevice::WriteOnly);
+    QBuffer buffer(&mData);
+    buffer.open(QIODevice::WriteOnly);
+    eWriteStream writeStream(&buffer);
     const int nBoxes = src.count();
-    dst.write(rcConstChar(&nBoxes), sizeof(int));
+    writeStream << nBoxes;
 
     const bool isBox = true;
     for(const auto& box : src) {
-        dst.write(rcConstChar(&isBox), sizeof(bool));
-        box->writeIdentifier(&dst);
-        box->writeBoundingBox(&dst);
-        gWritePos(&dst);
+        writeStream << isBox;
+        box->writeIdentifier(writeStream);
+        box->writeBoundingBox(writeStream);
+        writeStream.writeCheckpoint();
     }
-    dst.close();
+    buffer.close();
 
     BoundingBox::sClearWriteBoxes();
 }
@@ -33,14 +34,15 @@ BoxesClipboard::BoxesClipboard(const QList<BoundingBox*> &src) :
 #include "canvas.h"
 void BoxesClipboard::pasteTo(ContainerBox* const parent) {
     const int oldCount = parent->getContainedBoxesCount();
-    QBuffer src(&mData);
-    src.open(QIODevice::ReadOnly);
+    QBuffer buffer(&mData);
+    buffer.open(QIODevice::ReadOnly);
+    eReadStream readStream(&buffer);
     try {
-        parent->readAllContained(&src);
+        parent->readAllContained(readStream);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
     }
-    src.close();
+    buffer.close();
     BoundingBox::sClearReadBoxes();
     const int newCount = parent->getContainedBoxesCount();
     const auto parentCanvas = parent->getParentScene();
@@ -65,18 +67,18 @@ void KeysClipboard::paste(const int pasteFrame, const bool merge,
         Animator *animator = animData.first;
         if(!animator) continue;
         QList<stdsptr<Key>> keys;
-        int nKeys;
-        QBuffer dst(const_cast<QByteArray*>(&animData.second));
-        dst.open(QIODevice::ReadOnly);
-        dst.read(rcChar(&nKeys), sizeof(int));
+        QBuffer buffer(const_cast<QByteArray*>(&animData.second));
+        buffer.open(QIODevice::ReadOnly);
+        eReadStream readStream(&buffer);
+        int nKeys; readStream >> nKeys;
         for(int i = 0; i < nKeys; i++) {
             const auto keyT = animator->createKey();
-            keyT->readKey(&dst);
+            keyT->readKey(readStream);
             if(keyT->getAbsFrame() < firstKeyFrame)
                 firstKeyFrame = keyT->getAbsFrame();
             keys << keyT;
         }
-        dst.close();
+        buffer.close();
 
         animatorKeys << keys;
     }
@@ -106,17 +108,19 @@ void KeysClipboard::addTargetAnimator(
 PropertyClipboard::PropertyClipboard(const Property* const source) :
     Clipboard(ClipboardType::property),
     mContentType(std::type_index(typeid(*source))) {
-    QBuffer dst(&mData);
-    dst.open(QIODevice::WriteOnly);
-    source->writeProperty(&dst);
-    dst.close();
+    QBuffer buffer(&mData);
+    buffer.open(QIODevice::WriteOnly);
+    eWriteStream writeStream(&buffer);
+    source->writeProperty(writeStream);
+    buffer.close();
 }
 
 bool PropertyClipboard::paste(Property * const target) {
     if(!compatibleTarget(target)) return false;
-    QBuffer src(&mData);
-    src.open(QIODevice::ReadOnly);
-    target->readProperty(&src);
-    src.close();
+    QBuffer buffer(&mData);
+    buffer.open(QIODevice::ReadOnly);
+    eReadStream readStream(&buffer);
+    target->readProperty(readStream);
+    buffer.close();
     return true;
 }

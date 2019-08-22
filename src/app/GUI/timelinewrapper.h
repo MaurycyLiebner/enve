@@ -10,8 +10,8 @@ struct TWidgetStackLayoutItem : public SceneWidgetStackLayoutItem {
     QWidget* create(Document &document,
                     QWidget * const parent,
                     QLayout* const layout = nullptr);
-    void write(QIODevice* const dst) const;
-    void read(QIODevice* const src);
+    void write(eWriteStream &dst) const;
+    void read(eReadStream& src);
     void setGraph(const bool graph);
 private:
     bool mGraph = false;

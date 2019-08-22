@@ -35,7 +35,7 @@ public:
 
     QMimeData *SWT_createMimeData() final;
 
-    void writeIdentifier(QIODevice * const dst) const;
+    void writeIdentifier(eWriteStream &dst) const;
 
     void setupTreeViewMenu(PropertyMenu * const menu);
 

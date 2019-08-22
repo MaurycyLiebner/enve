@@ -16,12 +16,12 @@ InternalLinkGroupBox::~InternalLinkGroupBox() {
     setLinkTarget(nullptr);
 }
 
-void InternalLinkGroupBox::writeBoundingBox(QIODevice * const target) {
-    BoundingBox::writeBoundingBox(target);
+void InternalLinkGroupBox::writeBoundingBox(eWriteStream& dst) {
+    BoundingBox::writeBoundingBox(dst);
 }
 
-void InternalLinkGroupBox::readBoundingBox(QIODevice * const target) {
-    BoundingBox::readBoundingBox(target);
+void InternalLinkGroupBox::readBoundingBox(eReadStream& src) {
+    BoundingBox::readBoundingBox(src);
 }
 
 //bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) {

@@ -15,7 +15,7 @@ protected:
     }
 
     template <typename WidgetT>
-    void readSceneBaseStackItem(QIODevice* const src) {
+    void readSceneBaseStackItem(eReadStream& src) {
         readBaseStackItem<WidgetT>(src);
     }
 public:
@@ -32,7 +32,7 @@ struct TSceneBaseStackItem : public SceneBaseStackItem {
     TSceneBaseStackItem(Canvas* const scene = nullptr) :
         SceneBaseStackItem(std::make_unique<TWidgetStackLayoutItem>(), scene) {}
 
-    void read(QIODevice* const src) {
+    void read(eReadStream& src) {
         readSceneBaseStackItem<TWidgetStackLayoutItem>(src);
     }
 };
@@ -41,7 +41,7 @@ struct CWSceneBaseStackItem : public SceneBaseStackItem {
     CWSceneBaseStackItem(Canvas* const scene = nullptr) :
         SceneBaseStackItem(std::make_unique<CWWidgetStackLayoutItem>(), scene) {}
 
-    void read(QIODevice* const src) {
+    void read(eReadStream& src) {
         readSceneBaseStackItem<CWWidgetStackLayoutItem>(src);
     }
 };

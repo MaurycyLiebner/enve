@@ -18,20 +18,19 @@ QrealAnimator::QrealAnimator(const qreal iniVal,
 
 QrealAnimator::QrealAnimator(const QString &name) : GraphAnimator(name) {}
 
-void QrealAnimator::writeProperty(QIODevice * const dst) const {
+void QrealAnimator::writeProperty(eWriteStream& dst) const {
     writeKeys(dst);
-    dst->write(rcConstChar(&mCurrentBaseValue), sizeof(qreal));
+    dst << mCurrentBaseValue;
 }
 
 stdsptr<Key> QrealAnimator::createKey() {
     return enve::make_shared<QrealKey>(this);
 }
 
-void QrealAnimator::readProperty(QIODevice * const src) {
+void QrealAnimator::readProperty(eReadStream& src) {
     readKeys(src);
 
-    qreal val;
-    src->read(rcChar(&val), sizeof(qreal));
+    qreal val; src >> val;
     setCurrentBaseValue(val);
 }
 

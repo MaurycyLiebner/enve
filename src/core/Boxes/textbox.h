@@ -12,8 +12,8 @@ public:
     void setupCanvasMenu(PropertyMenu * const menu);
     SkPath getPathAtRelFrameF(const qreal relFrame);
 
-    void writeBoundingBox(QIODevice * const target);
-    void readBoundingBox(QIODevice * const target);
+    void writeBoundingBox(eWriteStream& dst);
+    void readBoundingBox(eReadStream& src);
 
     bool differenceInEditPathBetweenFrames(
                 const int frame1, const int frame2) const;

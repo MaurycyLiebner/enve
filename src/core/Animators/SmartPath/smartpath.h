@@ -233,11 +233,11 @@ public:
         mNodesList.applyTransform(transform);
     }
 
-    bool read(QIODevice * const src) {
+    bool read(eReadStream& src) {
         return mNodesList.read(src);
     }
 
-    bool write(QIODevice * const dst) const {
+    bool write(eWriteStream& dst) const {
         return mNodesList.write(dst);
     }
 protected:
@@ -253,5 +253,8 @@ private:
 
     NodeList mLastDetached;
 };
+
+eWriteStream& operator<<(eWriteStream& dst, const SmartPath& path);
+eReadStream& operator>>(eReadStream& src, SmartPath& path);
 
 #endif // SMARTPATH_H

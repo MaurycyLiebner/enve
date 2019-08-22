@@ -204,15 +204,15 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
     BoundingBox::setupCanvasMenu(menu);
 }
 
-void AnimationBox::writeBoundingBox(QIODevice * const target) {
-    BoundingBox::writeBoundingBox(target);
-    target->write(rcConstChar(&mFrameRemappingEnabled), sizeof(bool));
+void AnimationBox::writeBoundingBox(eWriteStream& dst) {
+    BoundingBox::writeBoundingBox(dst);
+    dst << mFrameRemappingEnabled;
 }
 
-void AnimationBox::readBoundingBox(QIODevice * const target) {
-    BoundingBox::readBoundingBox(target);
+void AnimationBox::readBoundingBox(eReadStream& src) {
+    BoundingBox::readBoundingBox(src);
     bool frameRemapping;
-    target->read(rcChar(&frameRemapping), sizeof(bool));
+    src >> frameRemapping;
     if(frameRemapping) enableFrameRemapping();
     else disableFrameRemapping();
 }

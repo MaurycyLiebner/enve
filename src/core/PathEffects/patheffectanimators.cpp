@@ -30,16 +30,16 @@ void PathEffectAnimators::apply(const qreal relFrame,
     *srcDstPath = dstPath;
 }
 
-void PathEffectAnimators::readPathEffect(QIODevice * const src) {
+void PathEffectAnimators::readPathEffect(eReadStream& src) {
     const auto pathEffect = readIdCreatePathEffect(src);
     pathEffect->readProperty(src);
     addChild(pathEffect);
 }
 
 #include "patheffectsinclude.h"
-qsptr<PathEffect> readIdCreatePathEffect(QIODevice * const src) {
+qsptr<PathEffect> readIdCreatePathEffect(eReadStream &src) {
     PathEffectType type;
-    src->read(rcChar(&type), sizeof(PathEffectType));
+    src.read(rcChar(&type), sizeof(PathEffectType));
     switch(type) {
         case(PathEffectType::DISPLACE):
             return enve::make_shared<DisplacePathEffect>();

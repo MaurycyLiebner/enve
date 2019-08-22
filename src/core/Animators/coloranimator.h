@@ -13,8 +13,8 @@ protected:
 public:
     bool SWT_isColorAnimator() const { return true; }
 
-    void writeProperty(QIODevice * const dst) const;
-    void readProperty(QIODevice * const src);
+    void writeProperty(eWriteStream& dst) const;
+    void readProperty(eReadStream& src);
     void setupTreeViewMenu(PropertyMenu * const menu);
 
     void qra_setCurrentValue(const QColor &qcolorValue);

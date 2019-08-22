@@ -46,18 +46,18 @@ void FixedLenAnimationRect::setMaxAnimRelFrame(const int max) {
     if(mBoundToAnimation) bindToAnimationFrameRange();
 }
 
-void FixedLenAnimationRect::writeDurationRectangle(QIODevice *target) {
-    target->write(rcConstChar(&mBoundToAnimation), sizeof(bool));
-    target->write(rcConstChar(&mSetMaxFrameAtLeastOnce), sizeof(bool));
-    target->write(rcConstChar(&mMinAnimationFrame), sizeof(int));
-    target->write(rcConstChar(&mMaxAnimationFrame), sizeof(int));
-    DurationRectangle::writeDurationRectangle(target);
+void FixedLenAnimationRect::writeDurationRectangle(eWriteStream &dst) {
+    dst << mBoundToAnimation;
+    dst << mSetMaxFrameAtLeastOnce;
+    dst << mMinAnimationFrame;
+    dst << mMaxAnimationFrame;
+    DurationRectangle::writeDurationRectangle(dst);
 }
 
-void FixedLenAnimationRect::readDurationRectangle(QIODevice *target) {
-    target->read(rcChar(&mBoundToAnimation), sizeof(bool));
-    target->read(rcChar(&mSetMaxFrameAtLeastOnce), sizeof(bool));
-    target->read(rcChar(&mMinAnimationFrame), sizeof(int));
-    target->read(rcChar(&mMaxAnimationFrame), sizeof(int));
-    DurationRectangle::readDurationRectangle(target);
+void FixedLenAnimationRect::readDurationRectangle(eReadStream& src) {
+    src >> mBoundToAnimation;
+    src >> mSetMaxFrameAtLeastOnce;
+    src >> mMinAnimationFrame;
+    src >> mMaxAnimationFrame;
+    DurationRectangle::readDurationRectangle(src);
 }

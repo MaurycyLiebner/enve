@@ -12,12 +12,12 @@ void BoolProperty::setValue(const bool value) {
     prp_afterWholeInfluenceRangeChanged();
 }
 
-void BoolProperty::writeProperty(QIODevice * const dst) const {
-    dst->write(rcConstChar(&mValue), sizeof(bool));
+void BoolProperty::writeProperty(eWriteStream& dst) const {
+    dst << mValue;
 }
 
-void BoolProperty::readProperty(QIODevice * const src) {
-    src->read(rcChar(&mValue), sizeof(bool));
+void BoolProperty::readProperty(eReadStream& src) {
+    src >> mValue;
 }
 
 BoolPropertyContainer::BoolPropertyContainer(const QString &name) :
@@ -38,14 +38,14 @@ void BoolPropertyContainer::setValue(const bool value) {
 }
 
 
-void BoolPropertyContainer::writeProperty(QIODevice * const dst) const {
-    dst->write(rcConstChar(&mValue), sizeof(bool));
+void BoolPropertyContainer::writeProperty(eWriteStream& dst) const {
+    dst << mValue;
     StaticComplexAnimator::writeProperty(dst);
 }
 
-void BoolPropertyContainer::readProperty(QIODevice * const src) {
+void BoolPropertyContainer::readProperty(eReadStream& src) {
     bool value;
-    src->read(rcChar(&value), sizeof(bool));
+    src >> value;
     setValue(value);
     StaticComplexAnimator::readProperty(src);
 }

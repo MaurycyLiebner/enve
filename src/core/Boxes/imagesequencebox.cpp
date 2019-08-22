@@ -21,12 +21,12 @@ void ImageSequenceBox::changeSourceFile(QWidget * const dialogParent) {
     if(!dir.isEmpty()) setFolderPath(dir);
 }
 
-void ImageSequenceBox::writeBoundingBox(QIODevice * const target) {
-    AnimationBox::writeBoundingBox(target);
+void ImageSequenceBox::writeBoundingBox(eWriteStream& dst) {
+    AnimationBox::writeBoundingBox(dst);
 
 }
 
-void ImageSequenceBox::readBoundingBox(QIODevice * const target) {
-    AnimationBox::readBoundingBox(target);
+void ImageSequenceBox::readBoundingBox(eReadStream& src) {
+    AnimationBox::readBoundingBox(src);
 ;
 }

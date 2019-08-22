@@ -71,23 +71,23 @@ private:
 };
 
 template <class T>
-qsptr<T> TCreateOnly(QIODevice * const src) {
+qsptr<T> TCreateOnly(eReadStream& src) {
     Q_UNUSED(src);
     return enve::make_shared<T>();
 }
 
 template <class T,
-          void (T::*TWriteType)(QIODevice * const dst) const = nullptr,
-          qsptr<T> (*TReadTypeAndCreate)(QIODevice * const src) = &TCreateOnly<T>>
+          void (T::*TWriteType)(eWriteStream& dst) const = nullptr,
+          qsptr<T> (*TReadTypeAndCreate)(eReadStream& src) = &TCreateOnly<T>>
 class DynamicComplexAnimator : public DynamicComplexAnimatorBase<T> {
     e_OBJECT
 protected:
     DynamicComplexAnimator(const QString &name) :
         DynamicComplexAnimatorBase<T>(name) {}
 public:
-    void writeProperty(QIODevice * const dst) const {
+    void writeProperty(eWriteStream& dst) const {
         const int nProps = this->ca_mChildAnimators.count();
-        dst->write(rcConstChar(&nProps), sizeof(int));
+        dst << nProps;
         for(const auto& prop : this->ca_mChildAnimators) {
             const auto TProp = static_cast<T*>(prop.get());
             if(TWriteType) (TProp->*TWriteType)(dst);
@@ -95,9 +95,9 @@ public:
         }
     }
 
-    void readProperty(QIODevice * const src) {
+    void readProperty(eReadStream& src) {
         int nProps;
-        src->read(rcChar(&nProps), sizeof(int));
+        src >> nProps;
         for(int i = 0; i < nProps; i++) {
             const auto prop = TReadTypeAndCreate(src);
             prop->readProperty(src);

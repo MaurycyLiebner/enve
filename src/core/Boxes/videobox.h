@@ -18,8 +18,8 @@ public:
     bool SWT_isVideoBox() const { return true; }
     void changeSourceFile(QWidget * const dialogParent);
 
-    void writeBoundingBox(QIODevice * const target);
-    void readBoundingBox(QIODevice * const target);
+    void writeBoundingBox(eWriteStream& dst);
+    void readBoundingBox(eReadStream& src);
 
     void setStretch(const qreal stretch);
 

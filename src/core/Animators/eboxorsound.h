@@ -34,8 +34,8 @@ public:
         StaticComplexAnimator::prp_afterChangedAbsRange(croppedRange);
     }
 
-    void writeProperty(QIODevice* const dst) const;
-    void readProperty(QIODevice* const src);
+    void writeProperty(eWriteStream& dst) const;
+    void readProperty(eReadStream& src);
 
     TimelineMovable *anim_getTimelineMovable(
             const int relX, const int minViewedFrame,

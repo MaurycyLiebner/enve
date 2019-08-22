@@ -7,7 +7,7 @@ CustomRasterEffect::CustomRasterEffect(const QString &name,
     RasterEffect(name, hwSupport, hwInterchangeable,
                  RasterEffectType::CUSTOM) {}
 
-void CustomRasterEffect::writeIdentifier(QIODevice * const dst) const {
+void CustomRasterEffect::writeIdentifier(eWriteStream& dst) const {
     RasterEffect::writeIdentifier(dst);
     getIdentifier().write(dst);
 }

@@ -305,7 +305,7 @@ public:
     void addKeyToSelected(Key * const key);
     void removeKeyFromSelected(Key * const key);
 
-    void writeSelectedKeys(QIODevice * const dst);
+    void writeSelectedKeys(eWriteStream &dst);
 
     void deselectAllKeys();
     void selectAllKeys();
@@ -334,8 +334,8 @@ public:
     void anim_coordinateKeysWith(Animator * const other);
     void anim_addKeysWhereOtherHasKeys(const Animator * const other);
 protected:
-    void readKeys(QIODevice * const src);
-    void writeKeys(QIODevice *target) const;
+    void readKeys(eReadStream &src);
+    void writeKeys(eWriteStream& dst) const;
 
     IdRange frameRangeToKeyIdRange(const FrameRange& relRange) const {
         int min = anim_getPrevKeyId(relRange.fMin + 1);

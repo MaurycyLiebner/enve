@@ -43,8 +43,8 @@ public:
     stdsptr<BoxRenderData> createRenderData();
     bool shouldScheduleUpdate();
 
-    void writeBoundingBox(QIODevice * const target);
-    void readBoundingBox(QIODevice * const target);
+    void writeBoundingBox(eWriteStream& dst);
+    void readBoundingBox(eReadStream& src);
 
     FixedLenAnimationRect *getAnimationDurationRect() const;
     void updateDurationRectangleAnimationRange();

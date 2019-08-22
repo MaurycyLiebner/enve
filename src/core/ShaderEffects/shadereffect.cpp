@@ -13,7 +13,7 @@ ShaderEffect::ShaderEffect(const QString& name,
         ca_addChild(propC->create());
 }
 
-void ShaderEffect::writeIdentifier(QIODevice * const dst) const {
+void ShaderEffect::writeIdentifier(eWriteStream& dst) const {
     RasterEffect::writeIdentifier(dst);
     mCreator->writeIdentifier(dst);
 }

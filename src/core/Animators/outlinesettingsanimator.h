@@ -15,8 +15,8 @@ protected:
                             Gradient* const gradient = nullptr);
 public:
     bool SWT_isStrokeSettings() const { return true; }
-    void writeProperty(QIODevice * const dst) const;
-    void readProperty(QIODevice * const src);
+    void writeProperty(eWriteStream& dst) const;
+    void readProperty(eReadStream& src);
 public:
     void strokeWidthAction(const QrealAction& action);
     void setCurrentStrokeWidth(const qreal newWidth);

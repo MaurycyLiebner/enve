@@ -10,8 +10,8 @@ public:
     int getMinAnimRelFrame() const;
     int getMaxAnimRelFrame() const;
 
-    void writeDurationRectangle(QIODevice *target);
-    void readDurationRectangle(QIODevice *target);
+    void writeDurationRectangle(eWriteStream& dst);
+    void readDurationRectangle(eReadStream &src);
 
     void setFirstAnimationFrame(const int minAnimationFrame) {
         const int animDur = mMaxAnimationFrame - mMinAnimationFrame;

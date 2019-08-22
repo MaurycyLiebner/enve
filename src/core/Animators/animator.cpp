@@ -180,9 +180,8 @@ void Animator::anim_addKeysWhereOtherHasKeys(const Animator * const other) {
     }
 }
 #include "basicreadwrite.h"
-void Animator::readKeys(QIODevice * const src) {
-    int nKeys;
-    src->read(rcChar(&nKeys), sizeof(int));
+void Animator::readKeys(eReadStream& src) {
+    int nKeys; src >> nKeys;
     if(nKeys < 0 || nKeys > 10000)
         RuntimeThrow("Invalid key count " + std::to_string(nKeys));
     for(int i = 0; i < nKeys; i++) {
@@ -192,19 +191,16 @@ void Animator::readKeys(QIODevice * const src) {
     }
 }
 
-void Animator::writeSelectedKeys(QIODevice * const dst) {
+void Animator::writeSelectedKeys(eWriteStream &dst) {
     const int nKeys = anim_mSelectedKeys.count();
-    dst->write(rcConstChar(&nKeys), sizeof(int));
-    for(const auto& key : anim_mSelectedKeys)
-        key->writeKey(dst);
+    dst << nKeys;
+    for(const auto& key : anim_mSelectedKeys) key->writeKey(dst);
 }
 
-void Animator::writeKeys(QIODevice *target) const {
+void Animator::writeKeys(eWriteStream &dst) const {
     const int nKeys = anim_mKeys.count();
-    target->write(rcConstChar(&nKeys), sizeof(int));
-    for(const auto &key : anim_mKeys) {
-        key->writeKey(target);
-    }
+    dst << nKeys;
+    for(const auto &key : anim_mKeys) key->writeKey(dst);
 }
 
 void Animator::anim_coordinateKeysWith(Animator * const other) {

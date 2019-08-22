@@ -315,8 +315,12 @@ void PathBox::duplicateFillSettingsFrom(
     } else {
         QBuffer buffer;
         buffer.open(QIODevice::ReadWrite);
-        fillSettings->writeProperty(&buffer);
-        if(buffer.reset()) mFillSettings->readProperty(&buffer);
+        eWriteStream writeStream(&buffer);
+        fillSettings->writeProperty(writeStream);
+        if(buffer.reset()) {
+            eReadStream readStream(&buffer);
+            mFillSettings->readProperty(readStream);
+        }
         buffer.close();
     }
 }
@@ -328,8 +332,12 @@ void PathBox::duplicateStrokeSettingsFrom(
     } else {
         QBuffer buffer;
         buffer.open(QIODevice::ReadWrite);
-        strokeSettings->writeProperty(&buffer);
-        if(buffer.reset()) mStrokeSettings->readProperty(&buffer);
+        eWriteStream writeStream(&buffer);
+        strokeSettings->writeProperty(writeStream);
+        if(buffer.reset()) {
+            eReadStream readStream(&buffer);
+            mStrokeSettings->readProperty(readStream);
+        }
         buffer.close();
     }
 }
@@ -386,9 +394,11 @@ template <typename B, typename T>
 void writeReadMember(B* const from, B* const to, const T member) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
-    (from->*member)->writeProperty(&buffer);
+    eWriteStream writeStream(&buffer);
+    (from->*member)->writeProperty(writeStream);
     buffer.seek(0);
-    (to->*member)->readProperty(&buffer);
+    eReadStream readStream(&buffer);
+    (to->*member)->readProperty(readStream);
     buffer.close();
 }
 

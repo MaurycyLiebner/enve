@@ -12,15 +12,14 @@ ImageBox::ImageBox(const QString &filePath) : ImageBox() {
     setFilePath(filePath);
 }
 
-void ImageBox::writeBoundingBox(QIODevice * const target) {
-    BoundingBox::writeBoundingBox(target);
-    gWrite(target, mImageFilePath);
+void ImageBox::writeBoundingBox(eWriteStream& dst) {
+    BoundingBox::writeBoundingBox(dst);
+    dst << mImageFilePath;
 }
 
-void ImageBox::readBoundingBox(QIODevice * const target) {
-    BoundingBox::readBoundingBox(target);
-    QString path;
-    gRead(target, path);
+void ImageBox::readBoundingBox(eReadStream& src) {
+    BoundingBox::readBoundingBox(src);
+    QString path; src >> path;
     setFilePath(path);
 }
 

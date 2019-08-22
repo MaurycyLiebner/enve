@@ -26,11 +26,11 @@ struct StackLayoutItem {
     virtual QWidget* create(Document &document,
                             QWidget* const parent,
                             QLayout* const layout = nullptr) = 0;
-    virtual void write(QIODevice* const dst) const = 0;
+    virtual void write(eWriteStream& dst) const = 0;
     virtual void saveData() = 0;
 
-    void writeType(QIODevice* const dst) const {
-        dst->write(rcConstChar(&mType), sizeof(Type));
+    void writeType(eWriteStream& dst) const {
+        dst.write(rcConstChar(&mType), sizeof(Type));
     }
 
     void setParent(ParentStackLayoutItem* const parent) {
@@ -47,21 +47,21 @@ struct ParentStackLayoutItem : public StackLayoutItem {
                                 UniPtr&& to) = 0;
 protected:
     template <typename WidgetT>
-    static UniPtr sReadChild(QIODevice* const src);
+    static UniPtr sReadChild(eReadStream& src);
     static void sWriteChild(StackLayoutItem* const child,
-                            QIODevice* const dst);
+                            eWriteStream &dst);
 };
 
 struct SplitStackLayoutItem : public ParentStackLayoutItem {
-    void write(QIODevice* const dst) const {
-        dst->write(rcConstChar(&mSecondSizeFrac), sizeof(qreal));
+    void write(eWriteStream& dst) const {
+        dst << mSecondSizeFrac;
         sWriteChild(mChildItems.first.get(), dst);
         sWriteChild(mChildItems.second.get(), dst);
     }
 
     template <typename WidgetT>
-    void read(QIODevice* const src) {
-        src->read(rcChar(&mSecondSizeFrac), sizeof(qreal));
+    void read(eReadStream& src) {
+        src >> mSecondSizeFrac;
         auto child1 = sReadChild<WidgetT>(src);
         auto child2 = sReadChild<WidgetT>(src);
         setChildren(std::move(child1), std::move(child2));
@@ -121,7 +121,7 @@ struct WidgetStackLayoutItem : public SplittableStackItem {
     WidgetStackLayoutItem() { mType = Type::WIDGET; }
 
     virtual void clear() = 0;
-    virtual void read(QIODevice* const src) = 0;
+    virtual void read(eReadStream& src) = 0;
 
     void setCurrent(StackWidgetWrapper* const current) {
         mCurrent = current;
@@ -185,14 +185,14 @@ struct BaseStackItem : public ParentStackLayoutItem {
         return mName;
     }
 
-    void write(QIODevice* const dst) const {
-        gWrite(dst, mName);
+    void write(eWriteStream& dst) const {
+        dst << mName;
         ParentStackLayoutItem::sWriteChild(mChild.get(), dst);
     }
 protected:
     template <typename WidgetT>
-    void readBaseStackItem(QIODevice* const src) {
-        const QString name = gReadString(src);
+    void readBaseStackItem(eReadStream& src) {
+        QString name; src >> name;
         setName(name);
         auto child = ParentStackLayoutItem::sReadChild<WidgetT>(src);
         setChild(std::move(child));
@@ -263,10 +263,9 @@ private:
 };
 
 template <typename WidgetT>
-StackLayoutItem::UniPtr ParentStackLayoutItem::sReadChild(
-        QIODevice * const src) {
+StackLayoutItem::UniPtr ParentStackLayoutItem::sReadChild(eReadStream& src) {
     Type type;
-    src->read(rcChar(&type), sizeof(Type));
+    src.read(rcChar(&type), sizeof(Type));
     if(type == Type::H_SPLIT) {
         const auto hSplit = new HSplitStackItem;
         hSplit->read<WidgetT>(src);

@@ -16,8 +16,8 @@ public:
         return finalTarget->SWT_isGroupBox();
     }
 
-    void writeBoundingBox(QIODevice * const target);
-    void readBoundingBox(QIODevice * const target);
+    void writeBoundingBox(eWriteStream& dst);
+    void readBoundingBox(eReadStream& src);
     //bool relPointInsidePath(const QPointF &relPos);
     QPointF getRelCenterPosition();
 

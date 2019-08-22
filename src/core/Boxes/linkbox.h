@@ -28,12 +28,12 @@ public:
 
     bool SWT_isLinkBox() const { return true; }
 
-    void writeBoundingBox(QIODevice * const target) {
-        BoundingBox::writeBoundingBox(target);
+    void writeBoundingBox(eWriteStream& dst) {
+        BoundingBox::writeBoundingBox(dst);
     }
 
-    void readBoundingBox(QIODevice * const target) {
-        BoundingBox::readBoundingBox(target);
+    void readBoundingBox(eReadStream& src) {
+        BoundingBox::readBoundingBox(src);
     }
 
     void setLinkTarget(BoundingBox * const linkTarget) {

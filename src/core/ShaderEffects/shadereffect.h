@@ -11,7 +11,7 @@ class ShaderEffect : public RasterEffect {
                  const ShaderEffectProgram * const program,
                  const QList<stdsptr<ShaderPropertyCreator>>& props);
 public:
-    void writeIdentifier(QIODevice * const dst) const;
+    void writeIdentifier(eWriteStream &dst) const;
 
     stdsptr<RasterEffectCaller> getEffectCaller(const qreal relFrame) const;
 

@@ -6,10 +6,10 @@ class eEffect : public StaticComplexAnimator {
 public:
     eEffect(const QString &name);
 
-    virtual void writeIdentifier(QIODevice * const dst) const = 0;
+    virtual void writeIdentifier(eWriteStream& dst) const = 0;
 
-    void writeProperty(QIODevice * const dst) const;
-    void readProperty(QIODevice * const src);
+    void writeProperty(eWriteStream& dst) const;
+    void readProperty(eReadStream& src);
 
     void switchVisible();
     void setVisible(const bool visible);

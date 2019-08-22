@@ -31,8 +31,8 @@ public:
                              const bool parentSatisfies,
                              const bool parentMainTarget) const;
 
-    void writeProperty(QIODevice * const dst) const;
-    void readProperty(QIODevice * const src);
+    void writeProperty(eWriteStream& dst) const;
+    void readProperty(eReadStream& src);
 
     void setFilePath(const QString &path);
 

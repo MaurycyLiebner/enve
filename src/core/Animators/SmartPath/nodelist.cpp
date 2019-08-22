@@ -33,26 +33,26 @@ void NodeList::updateDissolvedNodePosition(const int nodeId,
     node->mP1 = normalSeg.posAtT(node->mT);
 }
 
-bool NodeList::read(QIODevice * const src) {
+bool NodeList::read(eReadStream& src) {
     int nNodes;
-    src->read(rcChar(&nNodes), sizeof(int));
+    src >> nNodes;
     mNodes.clear();
     for(int i = 0; i < nNodes; i++) {
         Node node;
-        src->read(rcChar(&node), sizeof(Node));
+        src.read(&node, sizeof(Node));
         mNodes.append(node);
     }
-    src->read(rcChar(&mClosed), sizeof(bool));
+    src >> mClosed;
     return true;
 }
 
-bool NodeList::write(QIODevice * const dst) const {
+bool NodeList::write(eWriteStream& dst) const {
     const int nNodes = mNodes.count();
-    dst->write(rcConstChar(&nNodes), sizeof(int));
+    dst << nNodes;
     for(const auto& node : mNodes) {
-        dst->write(rcConstChar(node.get()), sizeof(Node));
+        dst.write(node.get(), sizeof(Node));
     }
-    dst->write(rcConstChar(&mClosed), sizeof(bool));
+    dst << mClosed;
     return true;
 }
 

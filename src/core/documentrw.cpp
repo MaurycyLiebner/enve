@@ -4,26 +4,26 @@
 #include "Animators/gradient.h"
 #include "canvas.h"
 
-void Document::writeGradients(QIODevice * const dst) const {
+void Document::writeGradients(eWriteStream &dst) const {
     const int nGrads = fGradients.count();
-    dst->write(rcConstChar(&nGrads), sizeof(int));
+    dst.write(&nGrads, sizeof(int));
     int id = 0;
     for(const auto &grad : fGradients)
         grad->write(id++, dst);
 }
 
-void Document::writeScenes(QIODevice * const dst) const {
+void Document::writeScenes(eWriteStream &dst) const {
     const int nScenes = fScenes.count();
-    dst->write(rcConstChar(&nScenes), sizeof(int));
+    dst.write(rcConstChar(&nScenes), sizeof(int));
     for(const auto &scene : fScenes) {
         scene->writeBoundingBox(dst);
-        gWritePos(dst);
+        dst.writeCheckpoint();
     }
 }
 
-void Document::write(QIODevice * const dst) const {
+void Document::write(eWriteStream& dst) const {
     writeGradients(dst);
-    gWritePos(dst);
+    dst.writeCheckpoint();
     writeScenes(dst);
     clearGradientRWIds();
 
@@ -34,27 +34,27 @@ void Document::write(QIODevice * const dst) const {
 //    target->write(rcConstChar(&currentCanvasId), sizeof(int));
 }
 
-void Document::readGradients(QIODevice * const src) {
+void Document::readGradients(eReadStream& src) {
     int nGrads;
-    src->read(rcChar(&nGrads), sizeof(int));
+    src.read(&nGrads, sizeof(int));
     for(int i = 0; i < nGrads; i++) {
         createNewGradient()->read(src);
     }
 }
 
-void Document::readScenes(QIODevice * const src) {
+void Document::readScenes(eReadStream& src) {
     int nScenes;
-    src->read(rcChar(&nScenes), sizeof(int));
+    src.read(&nScenes, sizeof(int));
     for(int i = 0; i < nScenes; i++) {
         const auto canvas = createNewScene();
         canvas->readBoundingBox(src);
-        gReadPos(src);
+        src.readCheckpoint("Error reading scene");
     }
 }
 
-void Document::read(QIODevice * const src) {
+void Document::read(eReadStream& src) {
     readGradients(src);
-    gReadPos(src);
+    src.readCheckpoint("Error reading gradients");
     readScenes(src);
     clearGradientRWIds();
 //    int currentCanvasId;

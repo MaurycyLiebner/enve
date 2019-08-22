@@ -7,7 +7,7 @@
 
 class BoundingBox;
 struct BoxRenderData;
-qsptr<RasterEffect> readIdCreateRasterEffect(QIODevice * const src);
+qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream& src);
 typedef DynamicComplexAnimator<
     RasterEffect, &RasterEffect::writeIdentifier,
     &readIdCreateRasterEffect> RasterEffectAnimatorsBase;

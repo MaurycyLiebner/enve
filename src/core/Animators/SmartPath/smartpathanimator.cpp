@@ -43,9 +43,9 @@ void SmartPathAnimator::setupTreeViewMenu(PropertyMenu * const menu) {
     Animator::setupTreeViewMenu(menu);
 }
 
-void SmartPathAnimator::readProperty(QIODevice * const src) {
+void SmartPathAnimator::readProperty(eReadStream& src) {
     readKeys(src);
-    gRead(src, mBaseValue);
+    src >> mBaseValue;
     prp_afterWholeInfluenceRangeChanged();
     updateAllPoints();
 }

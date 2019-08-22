@@ -38,12 +38,12 @@ void IntProperty::prp_finishTransform() {
 
 bool IntProperty::SWT_isIntProperty() const { return true; }
 
-void IntProperty::writeProperty(QIODevice * const dst) const {
-    dst->write(rcConstChar(&mValue), sizeof(int));
+void IntProperty::writeProperty(eWriteStream& dst) const {
+    dst << mValue;
 }
 
-void IntProperty::readProperty(QIODevice * const src) {
-    src->read(rcChar(&mValue), sizeof(int));
+void IntProperty::readProperty(eReadStream& src) {
+    src >> mValue;
 }
 
 int IntProperty::getValue() {

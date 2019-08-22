@@ -493,8 +493,8 @@ public:
     void renderDataFinished(BoxRenderData *renderData);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
-    void writeBoundingBox(QIODevice * const target);
-    void readBoundingBox(QIODevice * const target);
+    void writeBoundingBox(eWriteStream& dst);
+    void readBoundingBox(eReadStream& src);
     bool anim_prevRelFrameWithKey(const int relFrame, int &prevRelFrame);
     bool anim_nextRelFrameWithKey(const int relFrame, int &nextRelFrame);
 

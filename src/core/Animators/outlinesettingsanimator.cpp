@@ -19,22 +19,20 @@ OutlineSettingsAnimator::OutlineSettingsAnimator(
     mLineWidth->prp_setOwnUpdater(enve::make_shared<StrokeWidthUpdater>(parent));
 }
 
-void OutlineSettingsAnimator::writeProperty(QIODevice * const dst) const {
+void OutlineSettingsAnimator::writeProperty(eWriteStream& dst) const {
     PaintSettingsAnimator::writeProperty(dst);
     mLineWidth->writeProperty(dst);
-    dst->write(rcConstChar(&mCapStyle), sizeof(SkPaint::Cap));
-    dst->write(rcConstChar(&mJoinStyle), sizeof(SkPaint::Join));
-    dst->write(rcConstChar(&mOutlineCompositionMode),
-               sizeof(QPainter::CompositionMode));
+    dst.write(&mCapStyle, sizeof(SkPaint::Cap));
+    dst.write(&mJoinStyle, sizeof(SkPaint::Join));
+    dst.write(&mOutlineCompositionMode, sizeof(QPainter::CompositionMode));
 }
 
-void OutlineSettingsAnimator::readProperty(QIODevice * const src) {
+void OutlineSettingsAnimator::readProperty(eReadStream& src) {
     PaintSettingsAnimator::readProperty(src);
     mLineWidth->readProperty(src);
-    src->read(rcChar(&mCapStyle), sizeof(SkPaint::Cap));
-    src->read(rcChar(&mJoinStyle), sizeof(SkPaint::Join));
-    src->read(rcChar(&mOutlineCompositionMode),
-              sizeof(QPainter::CompositionMode));
+    src.read(&mCapStyle, sizeof(SkPaint::Cap));
+    src.read(&mJoinStyle, sizeof(SkPaint::Join));
+    src.read(&mOutlineCompositionMode, sizeof(QPainter::CompositionMode));
 }
 
 void OutlineSettingsAnimator::strokeWidthAction(const QrealAction& action) {

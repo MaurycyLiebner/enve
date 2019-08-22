@@ -1,7 +1,8 @@
 #ifndef BASEDKEYT_H
 #define BASEDKEYT_H
 #include "key.h"
-#include "differsinterpolate.h"
+#include "../differsinterpolate.h"
+#include "../basicreadwrite.h"
 
 template <typename B, typename T>
 class BasedKeyT : public B {
@@ -18,14 +19,14 @@ public:
         if(!this->mParentAnimator) return;
         this->mParentAnimator->anim_updateAfterChangedKey(this);
     }
-    void writeKey(QIODevice *target) {
-        B::writeKey(target);
-        gWrite(target, mValue);
+    void writeKey(eWriteStream& dst) {
+        B::writeKey(dst);
+        dst << mValue;
     }
 
-    void readKey(QIODevice *target) {
-        B::readKey(target);
-        gRead(target, mValue);
+    void readKey(eReadStream& src) {
+        B::readKey(src);
+        src >> mValue;
     }
 protected:
     BasedKeyT(const T &value, const int relFrame,

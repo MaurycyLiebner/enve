@@ -116,8 +116,8 @@ public:
 //
     void clear();
 //
-    void write(QIODevice * const dst) const;
-    void read(QIODevice * const src);
+    void write(eWriteStream &dst) const;
+    void read(eReadStream &src);
 
     void SWT_setupAbstraction(SWT_Abstraction * const abstraction,
                               const UpdateFuncs &updateFuncs,
@@ -126,11 +126,11 @@ private:
     Clipboard *getClipboard(const ClipboardType type) const;
 
     void clearGradientRWIds() const;
-    void writeGradients(QIODevice * const dst) const;
-    void writeScenes(QIODevice * const dst) const;
+    void writeGradients(eWriteStream &dst) const;
+    void writeScenes(eWriteStream &dst) const;
 
-    void readGradients(QIODevice * const src);
-    void readScenes(QIODevice * const src);
+    void readGradients(eReadStream &src);
+    void readScenes(eReadStream &src);
 signals:
     void canvasModeSet(CanvasMode);
 

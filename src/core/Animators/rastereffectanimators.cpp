@@ -68,7 +68,7 @@ bool RasterEffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();
 }
 
-qsptr<ShaderEffect> readIdCreateShaderEffect(QIODevice * const src) {
+qsptr<ShaderEffect> readIdCreateShaderEffect(eReadStream& src) {
     const auto id = ShaderEffectCreator::sReadIdentifier(src);
     const auto best = ShaderEffectCreator::sGetBestCompatibleEffects(id);
     if(best.isEmpty()) RuntimeThrow("No compatible ShaderEffect found for " + id.fName);
@@ -84,9 +84,9 @@ qsptr<ShaderEffect> readIdCreateShaderEffect(QIODevice * const src) {
 
 #include "customidentifier.h"
 #include "RasterEffects/customrastereffectcreator.h"
-qsptr<RasterEffect> readIdCreateRasterEffect(QIODevice * const src) {
+qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream &src) {
     RasterEffectType type;
-    src->read(rcChar(&type), sizeof(RasterEffectType));
+    src.read(rcChar(&type), sizeof(RasterEffectType));
     switch(type) {
         case(RasterEffectType::BLUR):
             return nullptr;

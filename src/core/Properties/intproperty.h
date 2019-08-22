@@ -10,8 +10,8 @@ protected:
 public:
     bool SWT_isIntProperty() const;
 
-    void writeProperty(QIODevice * const dst) const;
-    void readProperty(QIODevice * const src);
+    void writeProperty(eWriteStream& dst) const;
+    void readProperty(eReadStream& src);
     void prp_startTransform();
     void prp_finishTransform();
 

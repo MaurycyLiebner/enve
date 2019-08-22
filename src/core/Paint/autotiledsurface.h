@@ -102,12 +102,12 @@ struct AutoTiledSurface {
 
     bool isEmpty() const { return mAutoTilesData.isEmpty(); }
 
-    void write(QIODevice *target) {
-        mAutoTilesData.write(target);
+    void write(eWriteStream& dst) {
+        mAutoTilesData.write(dst);
     }
 
-    void read(QIODevice *target) {
-        mAutoTilesData.read(target);
+    void read(eReadStream& src) {
+        mAutoTilesData.read(src);
     }
 protected:
     MyPaintTiledSurface fParent;

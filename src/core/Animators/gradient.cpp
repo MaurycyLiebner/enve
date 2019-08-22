@@ -13,28 +13,28 @@ Gradient::Gradient(const QColor &color1, const QColor &color2) :
     addColorToList(color2);
 }
 
-void Gradient::write(const int id, QIODevice * const dst) {
+void Gradient::write(const int id, eWriteStream& dst) {
     mReadWriteId = id;
-    dst->write(rcConstChar(&id), sizeof(int));
+    dst << id;
     writeProperty(dst);
 }
 
-int Gradient::read(QIODevice * const src) {
-    src->read(rcChar(&mReadWriteId), sizeof(int));
+int Gradient::read(eReadStream& src) {
+    src >> mReadWriteId;
     readProperty(src);
     return mReadWriteId;
 }
 
-void Gradient::writeProperty(QIODevice * const dst) const {
+void Gradient::writeProperty(eWriteStream& dst) const {
     const int nColors = mColors.count();
-    dst->write(rcConstChar(&nColors), sizeof(int));
+    dst << nColors;
     for(const auto& color : mColors)
         color->writeProperty(dst);
 }
 
-void Gradient::readProperty(QIODevice * const src) {
+void Gradient::readProperty(eReadStream& src) {
     int nColors;
-    src->read(rcChar(&nColors), sizeof(int));
+    src >> nColors;
     for(int i = 0; i < nColors; i++) {
         const auto colorAnim = enve::make_shared<ColorAnimator>();
         colorAnim->readProperty(src);

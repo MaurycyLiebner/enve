@@ -270,3 +270,13 @@ void qCubicSegment1D::updateLength() {
     path.cubicTo(c1(), 0, c2(), 0, p1(), 0);
     fLength = path.length();
 }
+
+eWriteStream &operator<<(eWriteStream &dst, const qCubicSegment1D &seg) {
+    dst.write(&seg, sizeof(qCubicSegment1D));
+    return dst;
+}
+
+eReadStream &operator>>(eReadStream &src, qCubicSegment1D &seg) {
+    src.read(&seg, sizeof(qCubicSegment1D));
+    return src;
+}

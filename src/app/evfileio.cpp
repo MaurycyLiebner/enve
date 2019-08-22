@@ -41,58 +41,21 @@
 #include "Sound/soundcomposition.h"
 #include "Animators/rastereffectanimators.h"
 
-class FileFooter {
-public:
-    static bool sWrite(QIODevice * const target) {
-        return target->write(rcConstChar(sEVFormat), sizeof(char[15])) &&
-               target->write(rcConstChar(sAppName), sizeof(char[15])) &&
-               target->write(rcConstChar(sAppVersion), sizeof(char[15]));
-    }
-
-    static bool sCompatible(QIODevice *target) {
-        const qint64 savedPos = target->pos();
-        const qint64 pos = target->size() -
-                static_cast<qint64>(3*sizeof(char[15]));
-        if(!target->seek(pos)) RuntimeThrow("Failed to seek to FileFooter");
-
-        char format[15];
-        target->read(rcChar(format), sizeof(char[15]));
-        if(std::strcmp(format, sEVFormat)) return false;
-
-//        char appVersion[15];
-//        target->read(rcChar(appVersion), sizeof(char[15]));
-
-//        char appName[15];
-//        target->read(rcChar(appName), sizeof(char[15]));
-
-        if(!target->seek(savedPos))
-            RuntimeThrow("Could not restore current position for QIODevice.");
-        return true;
-    }
-private:
-    static char sEVFormat[15];
-    static char sAppName[15];
-    static char sAppVersion[15];
-};
-
-char FileFooter::sEVFormat[15] = "enve ev";
-char FileFooter::sAppName[15] = "enve";
-char FileFooter::sAppVersion[15] = "0.5";
-
 void MainWindow::loadEVFile(const QString &path) {
     QFile file(path);
     if(!file.exists()) RuntimeThrow("File does not exist " + path);
     if(!file.open(QIODevice::ReadOnly))
         RuntimeThrow("Could not open file " + path);
+    eReadStream readStream(&file);
 
     try {
         if(!FileFooter::sCompatible(&file))
             RuntimeThrow("Incompatible or incomplete data");
-        gReadPos(&file, "Error reading footer");
-        mDocument.read(&file);
-        gReadPos(&file, "Error reading Document");
-        mLayoutHandler->read(&file);
-        gReadPos(&file, "Error reading Layout");
+        readStream.readCheckpoint("File beginning pos mismatch");
+        mDocument.read(readStream);
+        readStream.readCheckpoint("Error reading Document");
+        mLayoutHandler->read(readStream);
+        readStream.readCheckpoint("Error reading Layout");
     } catch(...) {
         file.close();
         RuntimeThrow("Error while reading from file " + path);
@@ -109,14 +72,17 @@ void MainWindow::saveToFile(const QString &path) {
 
     if(!file.open(QIODevice::WriteOnly))
         RuntimeThrow("Could not open file for writing " + path + ".");
+    eWriteStream writeStream(&file);
 
     try {
-        gWritePos(&file);
-        mDocument.write(&file);
-        gWritePos(&file);
-        mLayoutHandler->write(&file);
-        gWritePos(&file);
+        writeStream.writeCheckpoint();
+        mDocument.write(writeStream);
+        writeStream.writeCheckpoint();
+        mLayoutHandler->write(writeStream);
+        writeStream.writeCheckpoint();
 
+        const qint64 tableSize = file.write(writeStream.futureData());
+        file.write(rcConstChar(&tableSize), sizeof(qint64));
         FileFooter::sWrite(&file);
     } catch(...) {
         file.close();

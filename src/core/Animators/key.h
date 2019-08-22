@@ -1,6 +1,7 @@
 #ifndef KEY_H
 #define KEY_H
 #include "../smartPointers/ememory.h"
+#include "../basicreadwrite.h"
 
 #include <QtCore>
 class QPainter;
@@ -27,8 +28,8 @@ public:
     }
 
     virtual bool differsFromKey(Key* key) const = 0;
-    virtual void writeKey(QIODevice * const dst);
-    virtual void readKey(QIODevice * const src);
+    virtual void writeKey(eWriteStream &dst);
+    virtual void readKey(eReadStream &src);
 
 
     virtual void cancelFrameTransform();

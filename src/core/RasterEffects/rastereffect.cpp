@@ -20,8 +20,8 @@ RasterEffect::RasterEffect(const QString &name,
     } else Q_ASSERT(false);
 }
 
-void RasterEffect::writeIdentifier(QIODevice * const dst) const {
-    dst->write(rcConstChar(&mType), sizeof(RasterEffectType));
+void RasterEffect::writeIdentifier(eWriteStream &dst) const {
+    dst.write(&mType, sizeof(RasterEffectType));
 }
 
 void RasterEffect::setupTreeViewMenu(PropertyMenu * const menu) {

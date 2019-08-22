@@ -11,7 +11,7 @@ protected:
 public:
     virtual CustomIdentifier getIdentifier() const = 0;
 private:
-    void writeIdentifier(QIODevice * const dst) const final;
+    void writeIdentifier(eWriteStream &dst) const final;
 };
 
 #endif // CUSTOMRASTEREFFECT_H

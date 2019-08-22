@@ -199,16 +199,17 @@ bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 }
 
 #include "basicreadwrite.h"
-void SingleSound::writeProperty(QIODevice * const dst) const {
+void SingleSound::writeProperty(eWriteStream& dst) const {
     if(videoSound()) return StaticComplexAnimator::writeProperty(dst);
     eBoxOrSound::writeProperty(dst);
     const auto filePath = mCacheHandler ? mCacheHandler->getFilePath() : "";
-    gWrite(dst, filePath);
+    dst << filePath;
 }
 
-void SingleSound::readProperty(QIODevice * const src) {
+void SingleSound::readProperty(eReadStream& src) {
     if(videoSound()) return StaticComplexAnimator::readProperty(src);
     eBoxOrSound::readProperty(src);
-    const QString filePath = gReadString(src);
+    QString filePath;
+    src >> filePath;
     if(!filePath.isEmpty()) setFilePath(filePath);
 }

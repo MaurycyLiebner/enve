@@ -70,8 +70,8 @@ public:
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data);
     stdsptr<BoxRenderData> createRenderData();
-    void writeBoundingBox(QIODevice * const target);
-    void readBoundingBox(QIODevice * const target);
+    void writeBoundingBox(eWriteStream& dst);
+    void readBoundingBox(eReadStream& src);
 
     void changeSourceFile(QWidget * const dialogParent);
     void setFilePath(const QString &path);

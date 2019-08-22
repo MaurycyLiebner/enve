@@ -159,8 +159,12 @@ Gradient *Document::duplicateGradient(const int id) {
     const auto newGrad = createNewGradient();
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
-    from->write(-1, &buffer);
-    if(buffer.reset()) newGrad->read(&buffer);
+    eWriteStream writeStream(&buffer);
+    from->write(-1, writeStream);
+    if(buffer.reset()) {
+        eReadStream readStream(&buffer);
+        newGrad->read(readStream);
+    }
     buffer.close();
     return newGrad;
 }
@@ -178,6 +182,7 @@ bool Document::removeGradient(const int id) {
 }
 
 void Document::clear() {
+    setPath("");
     const int nScenes = fScenes.count();
     for(int i = 0; i < nScenes; i++) removeScene(0);
     replaceClipboard(nullptr);

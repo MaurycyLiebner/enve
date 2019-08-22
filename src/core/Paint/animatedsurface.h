@@ -17,12 +17,12 @@ public:
         return key != this;
     }
 
-    void writeKey(QIODevice * const dst) {
+    void writeKey(eWriteStream& dst) {
         Key::writeKey(dst);
         mValue->write(dst);
     }
 
-    void readKey(QIODevice * const src) {
+    void readKey(eReadStream& src) {
         Key::readKey(src);
         mValue->read(src);
     }
@@ -167,16 +167,16 @@ public:
         return enve::make_shared<ASKey>(this);
     }
 
-    void readProperty(QIODevice * const src) {
+    void readProperty(eReadStream& src) {
         Animator::readProperty(src);
         readKeys(src);
         mBaseValue->read(src);
     }
 
-    void writeProperty(QIODevice * const target) const {
-        Animator::writeProperty(target);
-        writeKeys(target);
-        mBaseValue->write(target);
+    void writeProperty(eWriteStream& dst) const {
+        Animator::writeProperty(dst);
+        writeKeys(dst);
+        mBaseValue->write(dst);
     }
 
     void anim_saveCurrentValueAsKey() {

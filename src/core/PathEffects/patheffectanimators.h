@@ -6,7 +6,7 @@
 class PathBox;
 class BoundingBox;
 
-qsptr<PathEffect> readIdCreatePathEffect(QIODevice * const src);
+qsptr<PathEffect> readIdCreatePathEffect(eReadStream& src);
 
 typedef DynamicComplexAnimator<PathEffect,
         &PathEffect::writeIdentifier,
@@ -20,7 +20,7 @@ public:
 
     bool hasEffects();
     void apply(const qreal relFrame, SkPath * const srcDstPath);
-    void readPathEffect(QIODevice * const target);
+    void readPathEffect(eReadStream &target);
 private:
 };
 

@@ -832,13 +832,13 @@ bool ContainerBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     return bbVisible;
 }
 
-void ContainerBox::writeAllContained(QIODevice * const dst) {
+void ContainerBox::writeAllContained(eWriteStream& dst) {
     const int nCont = mContained.count();
-    dst->write(rcConstChar(&nCont), sizeof(int));
+    dst << nCont;
     for(int i = nCont - 1; i >= 0; i--) {
         const auto &child = mContained.at(i);
         const bool isBox = child->SWT_isBoundingBox();
-        dst->write(rcConstChar(&isBox), sizeof(bool));
+        dst << isBox;
         if(isBox) {
             const auto box = static_cast<BoundingBox*>(child.get());
             box->writeIdentifier(dst);
@@ -847,13 +847,13 @@ void ContainerBox::writeAllContained(QIODevice * const dst) {
             Q_ASSERT(child->SWT_isSingleSound());
             child->writeProperty(dst);
         }
-        gWritePos(dst);
+        dst.writeCheckpoint();
     }
 }
 
-void ContainerBox::writeBoundingBox(QIODevice * const dst) {
+void ContainerBox::writeBoundingBox(eWriteStream& dst) {
     BoundingBox::writeBoundingBox(dst);
-    gWritePos(dst);
+    dst.writeCheckpoint();
     writeAllContained(dst);
 }
 
@@ -869,9 +869,9 @@ void ContainerBox::writeBoundingBox(QIODevice * const dst) {
 #include "linkbox.h"
 #include "customboxcreator.h"
 
-qsptr<BoundingBox> readIdCreateBox(QIODevice * const src) {
+qsptr<BoundingBox> readIdCreateBox(eReadStream& src) {
     eBoxType type;
-    src->read(rcChar(&type), sizeof(eBoxType));
+    src.read(rcChar(&type), sizeof(eBoxType));
     switch(type) {
         case(eBoxType::TYPE_VECTOR_PATH):
             return enve::make_shared<SmartVectorPath>();
@@ -908,9 +908,9 @@ qsptr<BoundingBox> readIdCreateBox(QIODevice * const src) {
     }
 }
 
-void ContainerBox::readContained(QIODevice * const src) {
+void ContainerBox::readContained(eReadStream& src) {
     bool isBox;
-    src->read(rcChar(&isBox), sizeof(bool));
+    src >> isBox;
     if(isBox) {
         const auto box = readIdCreateBox(src);
         box->readBoundingBox(src);
@@ -920,12 +920,12 @@ void ContainerBox::readContained(QIODevice * const src) {
         sound->readProperty(src);
         addContained(sound);
     }
-    gReadPos(src);
+    src.readCheckpoint("Error reading contained");
 }
 
-void ContainerBox::readAllContained(QIODevice * const src) {
+void ContainerBox::readAllContained(eReadStream& src) {
     int nCont;
-    src->read(rcChar(&nCont), sizeof(int));
+    src >> nCont;
     for(int i = 0; i < nCont; i++) {
         try {
             readContained(src);
@@ -935,8 +935,8 @@ void ContainerBox::readAllContained(QIODevice * const src) {
     }
 }
 
-void ContainerBox::readBoundingBox(QIODevice * const src) {
+void ContainerBox::readBoundingBox(eReadStream& src) {
     BoundingBox::readBoundingBox(src);
-    gReadPos(src, "Error reading ContainerBox basic properties");
+    src.readCheckpoint("Error reading ContainerBox basic properties");
     readAllContained(src);
 }

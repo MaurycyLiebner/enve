@@ -6,10 +6,10 @@ ComboBoxProperty::ComboBoxProperty(const QString &name,
     mValueNames = list;
 }
 
-void ComboBoxProperty::writeProperty(QIODevice * const target) const {
-    target->write(rcConstChar(&mCurrentValue), sizeof(int));
+void ComboBoxProperty::writeProperty(eWriteStream& dst) const {
+    dst << mCurrentValue;
 }
 
-void ComboBoxProperty::readProperty(QIODevice * const src) {
-    src->read(rcChar(&mCurrentValue), sizeof(int));
+void ComboBoxProperty::readProperty(eReadStream& src) {
+    src >> mCurrentValue;
 }

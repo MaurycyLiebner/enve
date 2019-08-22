@@ -9,8 +9,8 @@ class AudioHandler;
 
 struct SceneWidgetStackLayoutItem : public WidgetStackLayoutItem {
     void clear();
-    void write(QIODevice* const dst) const;
-    void read(QIODevice* const src);
+    void write(eWriteStream& dst) const;
+    void read(eReadStream& src);
     void setScene(Canvas* const scene);
 protected:
     Canvas* mScene = nullptr;
@@ -23,8 +23,8 @@ struct CWWidgetStackLayoutItem : public SceneWidgetStackLayoutItem {
     QWidget* create(Document &document,
                     QWidget * const parent,
                     QLayout* const layout = nullptr);
-    void write(QIODevice* const dst) const;
-    void read(QIODevice* const src);
+    void write(eWriteStream& dst) const;
+    void read(eReadStream& src);
     void setTransform(const QMatrix& transform);
 private:
     bool mTransformSet = false;

@@ -187,10 +187,10 @@ public:
     virtual bool shouldScheduleUpdate() { return true; }
     virtual void queScheduledTasks();
 
-    virtual void writeIdentifier(QIODevice * const dst) const;
+    virtual void writeIdentifier(eWriteStream& dst) const;
 
-    virtual void writeBoundingBox(QIODevice * const dst);
-    virtual void readBoundingBox(QIODevice * const src);
+    virtual void writeBoundingBox(eWriteStream& dst);
+    virtual void readBoundingBox(eReadStream& src);
 
     virtual void setupRasterEffectsF(const qreal relFrame,
                                   BoxRenderData * const data);

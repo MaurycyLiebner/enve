@@ -18,8 +18,8 @@ HSplitStackItem* SplittableStackItem::splitH(WidgetPtr &&other) {
     return split<HSplitStackItem>(std::move(other));
 }
 
-void ParentStackLayoutItem::sWriteChild(
-        StackLayoutItem * const child, QIODevice * const dst) {
+void ParentStackLayoutItem::sWriteChild(StackLayoutItem * const child,
+                                        eWriteStream& dst) {
     child->writeType(dst);
     child->write(dst);
 }

@@ -61,14 +61,14 @@ QWidget *TWidgetStackLayoutItem::create(Document &document,
     return tWrapper;
 }
 
-void TWidgetStackLayoutItem::write(QIODevice * const dst) const {
+void TWidgetStackLayoutItem::write(eWriteStream& dst) const {
     SceneWidgetStackLayoutItem::write(dst);
-    dst->write(rcConstChar(&mGraph), sizeof(bool));
+    dst << mGraph;
 }
 
-void TWidgetStackLayoutItem::read(QIODevice * const src) {
+void TWidgetStackLayoutItem::read(eReadStream &src) {
     SceneWidgetStackLayoutItem::read(src);
-    src->read(rcChar(&mGraph), sizeof(bool));
+    src >> mGraph;
 }
 
 void TWidgetStackLayoutItem::setGraph(const bool graph) {

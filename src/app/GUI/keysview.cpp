@@ -203,10 +203,11 @@ stdsptr<KeysClipboard> KeysView::getSelectedKeysClipboardContainer() {
             enve::make_shared<KeysClipboard>();
     for(const auto& anim : mSelectedKeysAnimators) {
         QByteArray keyData;
-        QBuffer target(&keyData);
-        target.open(QIODevice::WriteOnly);
-        anim->writeSelectedKeys(&target);
-        target.close();
+        QBuffer buffer(&keyData);
+        buffer.open(QIODevice::WriteOnly);
+        eWriteStream writeStream(&buffer);
+        anim->writeSelectedKeys(writeStream);
+        buffer.close();
         container->addTargetAnimator(anim, keyData);
     }
     return container;

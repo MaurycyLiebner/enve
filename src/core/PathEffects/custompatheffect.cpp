@@ -4,7 +4,7 @@
 CustomPathEffect::CustomPathEffect(const QString &name) :
     PathEffect(name, PathEffectType::CUSTOM) {}
 
-void CustomPathEffect::writeIdentifier(QIODevice * const dst) const {
+void CustomPathEffect::writeIdentifier(eWriteStream &dst) const {
     PathEffect::writeIdentifier(dst);
     getIdentifier().write(dst);
 }

@@ -891,25 +891,25 @@ SoundComposition *Canvas::getSoundComposition() {
     return mSoundComposition.get();
 }
 
-void Canvas::writeBoundingBox(QIODevice * const target) {
-    ContainerBox::writeBoundingBox(target);
+void Canvas::writeBoundingBox(eWriteStream& dst) {
+    ContainerBox::writeBoundingBox(dst);
     const int currFrame = getCurrentFrame();
-    target->write(rcConstChar(&currFrame), sizeof(int));
-    target->write(rcConstChar(&mClipToCanvasSize), sizeof(bool));
-    target->write(rcConstChar(&mWidth), sizeof(int));
-    target->write(rcConstChar(&mHeight), sizeof(int));
-    target->write(rcConstChar(&mFps), sizeof(qreal));
-    target->write(rcConstChar(&mRange), sizeof(FrameRange));
+    dst << currFrame;
+    dst << mClipToCanvasSize;
+    dst << mWidth;
+    dst << mHeight;
+    dst << mFps;
+    dst.write(rcConstChar(&mRange), sizeof(FrameRange));
 }
 
-void Canvas::readBoundingBox(QIODevice * const target) {
-    ContainerBox::readBoundingBox(target);
+void Canvas::readBoundingBox(eReadStream& src) {
+    ContainerBox::readBoundingBox(src);
     int currFrame;
-    target->read(rcChar(&currFrame), sizeof(int));
-    target->read(rcChar(&mClipToCanvasSize), sizeof(bool));
-    target->read(rcChar(&mWidth), sizeof(int));
-    target->read(rcChar(&mHeight), sizeof(int));
-    target->read(rcChar(&mFps), sizeof(qreal));
-    target->read(rcChar(&mRange), sizeof(FrameRange));
+    src >> currFrame;
+    src >> mClipToCanvasSize;
+    src >> mWidth;
+    src >> mHeight;
+    src >> mFps;
+    src.read(rcChar(&mRange), sizeof(FrameRange));
     anim_setAbsFrame(currFrame);
 }

@@ -11,8 +11,8 @@ PathEffect::PathEffect(const QString &name,
                        const PathEffectType type) :
     eEffect(name), mPathEffectType(type) {}
 
-void PathEffect::writeIdentifier(QIODevice * const dst) const {
-    dst->write(rcConstChar(&mPathEffectType), sizeof(PathEffectType));
+void PathEffect::writeIdentifier(eWriteStream& dst) const {
+    dst.write(&mPathEffectType, sizeof(PathEffectType));
 }
 
 void PathEffect::setupTreeViewMenu(PropertyMenu * const menu) {

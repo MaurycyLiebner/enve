@@ -76,11 +76,11 @@ public:
     void queChildScheduledTasks();
     void queScheduledTasks();
 
-    void writeAllContained(QIODevice * const dst);
-    void writeBoundingBox(QIODevice * const dst);
-    void readContained(QIODevice * const src);
-    void readAllContained(QIODevice * const src);
-    void readBoundingBox(QIODevice * const src);
+    void writeAllContained(eWriteStream &dst);
+    void writeBoundingBox(eWriteStream& dst);
+    void readContained(eReadStream &src);
+    void readAllContained(eReadStream &src);
+    void readBoundingBox(eReadStream& src);
 
     void promoteToLayer();
     void demoteToGroup();

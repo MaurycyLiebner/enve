@@ -20,14 +20,14 @@ struct LayoutData {
 
     }
 
-    void write(QIODevice* const dst) const {
-        gWrite(dst, fName);
+    void write(eWriteStream& dst) const {
+        dst << fName;
         fCanvas->write(dst);
         fTimeline->write(dst);
     }
 
-    void read(QIODevice* const src) {
-        fName = gReadString(src);
+    void read(eReadStream& src) {
+        src >> fName;
         fCanvas->read(src);
         fTimeline->read(src);
     }
@@ -56,34 +56,31 @@ public:
 
     void clear();
 
-    void write(QIODevice* const dst) const {
-        dst->write(rcConstChar(&mNumberLayouts), sizeof(int));
+    void write(eWriteStream& dst) const {
+        dst << mNumberLayouts;
         for(int i = mNumberLayouts - 1; i >= 0; i--) {
             mLayouts.at(uint(i)).write(dst);
         }
         const int nScenes = int(mLayouts.size()) - mNumberLayouts;
-        dst->write(rcConstChar(&nScenes), sizeof(int));
+        dst << nScenes;
         for(int i = 0; i < nScenes; i++) {
             mLayouts.at(uint(i + mNumberLayouts)).write(dst);
         }
-        dst->write(rcConstChar(&mCurrentId), sizeof(int));
+        dst << mCurrentId;
     }
 
-    void read(QIODevice* const src) {
+    void read(eReadStream& src) {
         setCurrent(-1);
 
-        int nLays;
-        src->read(rcChar(&nLays), sizeof(int));
+        int nLays; src >> nLays;
         for(int i = 0; i < nLays; i++) {
             newLayout().read(src);
         }
-        int nScenes;
-        src->read(rcChar(&nScenes), sizeof(int));
+        int nScenes; src >> nScenes;
         for(int i = 0; i < nScenes; i++) {
             mLayouts.at(uint(i + mNumberLayouts)).read(src);
         }
-        int relCurrentId;
-        src->read(rcChar(&relCurrentId), sizeof(int));
+        int relCurrentId; src >> relCurrentId;
         if(relCurrentId == -1) return;
         const int absId = relCurrentId < nLays ? relCurrentId :
                                                  mNumberLayouts - nLays + relCurrentId;

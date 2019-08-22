@@ -143,11 +143,11 @@ public:
         return {FrameRange::EMIN, FrameRange::EMAX};
     }
 
-    virtual void readProperty(QIODevice * const src) {
+    virtual void readProperty(eReadStream& src) {
         Q_UNUSED(src);
     }
 
-    virtual void writeProperty(QIODevice * const dst) const {
+    virtual void writeProperty(eWriteStream& dst) const {
         Q_UNUSED(dst);
     }
 

@@ -3,15 +3,14 @@
 eEffect::eEffect(const QString &name) :
     StaticComplexAnimator(name) {}
 
-void eEffect::writeProperty(QIODevice * const dst) const {
+void eEffect::writeProperty(eWriteStream& dst) const {
     StaticComplexAnimator::writeProperty(dst);
-    dst->write(rcConstChar(&mVisible), sizeof(bool));
+    dst << mVisible;
 }
 
-void eEffect::readProperty(QIODevice * const src) {
+void eEffect::readProperty(eReadStream& src) {
     StaticComplexAnimator::readProperty(src);
-    bool visible;
-    src->read(rcChar(&visible), sizeof(bool));
+    bool visible; src >> visible;
     setVisible(visible);
 }
 

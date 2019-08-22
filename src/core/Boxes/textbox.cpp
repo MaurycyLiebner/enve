@@ -143,26 +143,23 @@ bool TextBox::differenceInEditPathBetweenFrames(
 }
 
 
-void TextBox::writeBoundingBox(QIODevice * const target) {
-    PathBox::writeBoundingBox(target);
-    target->write(rcConstChar(&mAlignment), sizeof(Qt::Alignment));
-    const qreal fontSize = mFont.pointSizeF();
-    const QString fontFamily = mFont.family();
-    const QString fontStyle = mFont.styleName();
-    target->write(rcConstChar(&fontSize), sizeof(qreal));
-    gWrite(target, fontFamily);
-    gWrite(target, fontStyle);
+void TextBox::writeBoundingBox(eWriteStream& dst) {
+    PathBox::writeBoundingBox(dst);
+    dst.write(&mAlignment, sizeof(Qt::Alignment));
+    dst << mFont.pointSizeF();
+    dst << mFont.family();
+    dst << mFont.styleName();
 }
 
-void TextBox::readBoundingBox(QIODevice * const target) {
-    PathBox::readBoundingBox(target);
-    target->read(rcChar(&mAlignment), sizeof(Qt::Alignment));
+void TextBox::readBoundingBox(eReadStream& src) {
+    PathBox::readBoundingBox(src);
+    src.read(rcChar(&mAlignment), sizeof(Qt::Alignment));
     qreal fontSize;
     QString fontFamily;
     QString fontStyle;
-    target->read(rcChar(&fontSize), sizeof(qreal));
-    gRead(target, fontFamily);
-    gRead(target, fontStyle);
+    src >> fontSize;
+    src >> fontFamily;
+    src >> fontStyle;
     mFont.setPointSizeF(fontSize);
     mFont.setFamily(fontFamily);
     mFont.setStyleName(fontStyle);

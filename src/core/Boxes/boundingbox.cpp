@@ -70,19 +70,21 @@ BoundingBox::~BoundingBox() {
     sDocumentBoxes.removeOne(this);
 }
 
-void BoundingBox::writeBoundingBox(QIODevice * const dst) {
+void BoundingBox::writeBoundingBox(eWriteStream& dst) {
     if(mWriteId < 0) assignWriteId();
     eBoxOrSound::writeProperty(dst);
-    gWrite(dst, prp_mName);
-    dst->write(rcConstChar(&mWriteId), sizeof(int));
-    dst->write(rcConstChar(&mBlendModeSk), sizeof(SkBlendMode));
+    dst << prp_mName;
+    dst << mWriteId;
+    dst.write(rcConstChar(&mBlendModeSk), sizeof(SkBlendMode));
 }
 
-void BoundingBox::readBoundingBox(QIODevice * const src) {
+void BoundingBox::readBoundingBox(eReadStream& src) {
     eBoxOrSound::readProperty(src);
-    prp_setName(gReadString(src));
-    src->read(rcChar(&mReadId), sizeof(int));
-    src->read(rcChar(&mBlendModeSk), sizeof(SkBlendMode));
+    QString name;
+    src >> name;
+    prp_setName(name);
+    src >> mReadId;
+    src.read(&mBlendModeSk, sizeof(SkBlendMode));
 
     BoundingBox::sAddReadBox(this);
 }
@@ -146,9 +148,11 @@ template <typename T>
 void transferData(const T& from, const T& to) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
-    from->writeProperty(&buffer);
+    eWriteStream writeStream(&buffer);
+    from->writeProperty(writeStream);
     buffer.reset();
-    to->readProperty(&buffer);
+    eReadStream readStream(&buffer);
+    to->readProperty(readStream);
     buffer.close();
 }
 
@@ -843,8 +847,8 @@ void BoundingBox::queScheduledTasks() {
     mScheduledTasks.clear();
 }
 
-void BoundingBox::writeIdentifier(QIODevice * const dst) const {
-    dst->write(rcConstChar(&mType), sizeof(eBoxType));
+void BoundingBox::writeIdentifier(eWriteStream &dst) const {
+    dst.write(&mType, sizeof(eBoxType));
 }
 
 int BoundingBox::getReadId() const {

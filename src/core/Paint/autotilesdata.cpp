@@ -320,40 +320,38 @@ bool AutoTilesData::drawOnPixmap(SkPixmap &dst,
     return true;
 }
 
-void AutoTilesData::write(QIODevice * const dst) const {
-    dst->write(rcConstChar(&mZeroTileCol), sizeof(int));
-    dst->write(rcConstChar(&mZeroTileRow), sizeof(int));
-    dst->write(rcConstChar(&mColumnCount), sizeof(int));
-    dst->write(rcConstChar(&mRowCount), sizeof(int));
+void AutoTilesData::write(eWriteStream& dst) const {
+    dst << mZeroTileCol;
+    dst << mZeroTileRow;
+    dst << mColumnCount;
+    dst << mRowCount;
     const int nCols = mColumns.count();
-    dst->write(rcConstChar(&nCols), sizeof(int));
+    dst << nCols;
     const int nRows = mColumns.isEmpty() ? 0 : mColumns.first().count();
-    dst->write(rcConstChar(&nRows), sizeof(int));
+    dst << nRows;
     for(const auto& col : mColumns) {
         for(const auto& row : col) {
-            dst->write(rcConstChar(row),
-                       TILE_SPIXEL_SIZE*sizeof(uint16_t));
+            dst.write(rcConstChar(row), TILE_SPIXEL_SIZE*sizeof(uint16_t));
         }
     }
 }
 
-void AutoTilesData::read(QIODevice * const src) {
+void AutoTilesData::read(eReadStream &src) {
     reset();
-    src->read(rcChar(&mZeroTileCol), sizeof(int));
-    src->read(rcChar(&mZeroTileRow), sizeof(int));
-    src->read(rcChar(&mColumnCount), sizeof(int));
-    src->read(rcChar(&mRowCount), sizeof(int));
+    src >> mZeroTileCol;
+    src >>mZeroTileRow;
+    src >> mColumnCount;
+    src >> mRowCount;
     int nCols;
-    src->read(rcChar(&nCols), sizeof(int));
+    src >> nCols;
     int nRows;
-    src->read(rcChar(&nRows), sizeof(int));
+    src >> nRows;
     for(int col = 0; col < nCols; col++) {
         mColumns << QList<uint16_t*>();
         QList<uint16_t*>& column = mColumns.last();
         for(int row = 0; row < nRows; row++) {
             const auto tile = allocateTile(TILE_SPIXEL_SIZE);
-            src->read(rcChar(tile),
-                      TILE_SPIXEL_SIZE*sizeof(uint16_t));
+            src.read(rcChar(tile), TILE_SPIXEL_SIZE*sizeof(uint16_t));
             column << tile;
         }
     }

@@ -97,23 +97,23 @@ int eBoxOrSound::prp_getRelFrameShift() const {
     return mDurationRectangle->getRelShift();
 }
 
-void eBoxOrSound::writeProperty(QIODevice * const dst) const {
+void eBoxOrSound::writeProperty(eWriteStream& dst) const {
     StaticComplexAnimator::writeProperty(dst);
-    dst->write(rcConstChar(&mVisible), sizeof(bool));
-    dst->write(rcConstChar(&mLocked), sizeof(bool));
+    dst << mVisible;
+    dst << mLocked;
 
     const bool hasDurRect = mDurationRectangle;
-    dst->write(rcConstChar(&hasDurRect), sizeof(bool));
+    dst << hasDurRect;
     if(hasDurRect) mDurationRectangle->writeDurationRectangle(dst);
 }
 
-void eBoxOrSound::readProperty(QIODevice * const src) {
+void eBoxOrSound::readProperty(eReadStream& src) {
     StaticComplexAnimator::readProperty(src);
-    src->read(rcChar(&mVisible), sizeof(bool));
-    src->read(rcChar(&mLocked), sizeof(bool));
+    src >> mVisible;
+    src >> mLocked;
 
     bool hasDurRect;
-    src->read(rcChar(&hasDurRect), sizeof(bool));
+    src >> hasDurRect;
     if(hasDurRect) {
         if(!mDurationRectangle) createDurationRectangle();
         mDurationRectangle->readDurationRectangle(src);

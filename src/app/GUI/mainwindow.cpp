@@ -1018,7 +1018,6 @@ void MainWindow::saveBackup() {
 
 bool MainWindow::closeProject() {
     if(askForSaving()) {
-        mDocument.setPath("");
         clearAll();
         return true;
     }

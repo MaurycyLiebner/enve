@@ -69,11 +69,11 @@ public:
 
     qsptr<ShaderEffect> create() const;
 
-    void writeIdentifier(QIODevice * const dst) const {
-        gWrite(dst, fName);
-        gWrite(dst, fGrePath);
+    void writeIdentifier(eWriteStream& dst) const {
+        dst << fName;
+        dst << fGrePath;
         const int nChildren = fProperties.count();
-        dst->write(rcConstChar(&nChildren), sizeof(int));
+        dst << nChildren;
         for(const auto& anim : fProperties) {
             PropertyType type;
             if(dynamic_cast<QrealAnimatorCreator*>(anim.get())) {
@@ -81,19 +81,18 @@ public:
             } else if(dynamic_cast<IntAnimatorCreator*>(anim.get())) {
                 type = PTYPE_INT;
             } else RuntimeThrow("Only QrealAnimator and IntAnimator supported");
-            dst->write(rcConstChar(&type), sizeof(PropertyType));
+            dst.write(rcConstChar(&type), sizeof(PropertyType));
         }
     }
 
-    static Identifier sReadIdentifier(QIODevice * const src) {
-        const QString name = gReadString(src);
-        const QString grePath = gReadString(src);
+    static Identifier sReadIdentifier(eReadStream& src) {
+        QString name; src >> name;
+        QString grePath; src >> grePath;
         QList<PropertyType> props;
-        int nChildren;
-        src->read(rcChar(&nChildren), sizeof(int));
+        int nChildren; src >> nChildren;
         for(int i = 0; i < nChildren; i++) {
             PropertyType type;
-            src->read(rcChar(&type), sizeof(PropertyType));
+            src.read(&type, sizeof(PropertyType));
             props << type;
         }
         return Identifier(grePath, name, props);
