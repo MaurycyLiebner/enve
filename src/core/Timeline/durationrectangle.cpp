@@ -7,10 +7,15 @@
 TimelineMovable::TimelineMovable(const Type type, Property &parentProp) :
     mType(type), mParentProperty(parentProp) {}
 
-void TimelineMovable::setValue(const int value) {
+
+void TimelineMovable::setValueUnClamped(const int value) {
     const int oldValue = mValue;
-    mValue = qMin(mClampMax, qMax(mClampMin, value));
+    mValue = value;
     emit valueChanged(oldValue, mValue);
+}
+
+void TimelineMovable::setValue(const int value) {
+    setValueUnClamped(qMin(mClampMax, qMax(mClampMin, value)));
 }
 
 int TimelineMovable::getValue() const {
@@ -235,8 +240,8 @@ void DurationRectangle::openDurationSettingsDialog(QWidget *parent) {
         }
 
         const auto oldRelRange = getRelFrameRange();
-        setMinRelFrame(dialog.getMinFrame());
-        setMaxRelFrame(dialog.getMaxFrame());
+        mMinFrame.setValueUnClamped(dialog.getMinFrame());
+        mMaxFrame.setValueUnClamped(dialog.getMaxFrame());
         setRelShift(dialog.getShift());
         const auto newRelRange = getRelFrameRange();
 
@@ -255,17 +260,17 @@ void DurationRectangle::moveMaxFrame(const int change) {
 void DurationRectangle::writeDurationRectangle(eWriteStream &dst) {
     dst << getMinRelFrame();
     dst << getMaxRelFrame();
-    dst << getValue();
+    dst << getRelShift();
 }
 
 void DurationRectangle::readDurationRectangle(eReadStream& src) {
     int minFrame;
     int maxFrame;
-    int framePos;
+    int shift;
     src >> minFrame;
     src >> maxFrame;
-    src >> framePos;
-    setMinRelFrame(minFrame);
-    setMaxRelFrame(maxFrame);
-    setValue(framePos);
+    src >> shift;
+    mMinFrame.setValueUnClamped(minFrame);
+    mMaxFrame.setValueUnClamped(maxFrame);
+    setRelShift(shift);
 }

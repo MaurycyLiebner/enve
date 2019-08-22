@@ -31,6 +31,7 @@ public:
             const int pressX, const qreal pixelsPerFrame,
             const int minViewedFrame);
 
+    void setValueUnClamped(const int value);
     void setValue(const int value);
     int getValue() const;
 
