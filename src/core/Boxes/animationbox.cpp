@@ -158,11 +158,6 @@ FrameRange AnimationBox::prp_getIdenticalRelRange(const int relFrame) const {
     return BoundingBox::prp_getIdenticalRelRange(relFrame);
 }
 
-//void AnimationBox::drawSk(SkCanvas * const canvas) {
-//    SkPaint paint;
-//    //paint.setFilterQuality(kHigh_SkFilterQuality);
-//    canvas->drawImage(mUpdateAnimationImageSk, 0, 0, &paint);
-//}
 #include "typemenu.h"
 #include <QInputDialog>
 void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {

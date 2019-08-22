@@ -6,6 +6,8 @@
 
 class eImporter {
 public:
+    virtual ~eImporter();
+
     virtual bool supports(const QFileInfo& fileInfo) const = 0;
     //! @brief Can return nullptr.
     virtual qsptr<BoundingBox> import(const QFileInfo& fileInfo) const = 0;

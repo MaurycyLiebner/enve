@@ -7,22 +7,21 @@ void RenderContainer::drawSk(SkCanvas * const canvas, SkPaint * const paint) {
     canvas->save();
     canvas->concat(toSkMatrix(mPaintTransform));
     if(paint) {
-        if(paint->getBlendMode() == SkBlendMode::kDstIn ||
-           paint->getBlendMode() == SkBlendMode::kSrcIn ||
-           paint->getBlendMode() == SkBlendMode::kDstATop) {
-            SkPaint paintT;
-            paintT.setBlendMode(paint->getBlendMode());
-            paintT.setColor(SK_ColorTRANSPARENT);
+        const auto blendMode = paint->getBlendMode();
+        if(blendMode == SkBlendMode::kDstIn ||
+           blendMode == SkBlendMode::kSrcIn ||
+           blendMode == SkBlendMode::kDstATop) {
+            SkPaint bPaint;
+            bPaint.setBlendMode(paint->getBlendMode());
+            bPaint.setColor(SK_ColorTRANSPARENT);
             SkPath path;
             path.addRect(SkRect::MakeXYWH(mGlobalRect.x(), mGlobalRect.y(),
                                           mImageSk->width(),
                                           mImageSk->height()));
             path.toggleInverseFillType();
-            canvas->drawPath(path, paintT);
+            canvas->drawPath(path, bPaint);
         }
     }
-    //paint->setAntiAlias(true);
-    //paint->setFilterQuality(kHigh_SkFilterQuality);
     canvas->drawImage(mImageSk, mGlobalRect.x(), mGlobalRect.y(), paint);
     canvas->restore();
 }

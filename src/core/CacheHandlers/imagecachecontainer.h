@@ -18,8 +18,8 @@ protected:
 public:
     int getByteCount();
 
-    void drawSk(SkCanvas * const canvas);
-    void drawSk(SkCanvas * const canvas, SkPaint &paint);
+    void drawSk(SkCanvas * const canvas,
+                const SkFilterQuality filter);
 
     sk_sp<SkImage> getImageSk();
 

@@ -4,6 +4,8 @@
 
 ImportHandler* ImportHandler::sInstance = nullptr;
 
+eImporter::~eImporter() {}
+
 ImportHandler::ImportHandler() {
     Q_ASSERT(!sInstance);
     sInstance = this;

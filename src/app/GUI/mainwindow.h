@@ -254,6 +254,7 @@ private:
     QAction *mLowQuality;
     QAction *mMediumQuality;
     QAction *mHighQuality;
+    QAction *mDynamicQuality;
 
     QAction *mClipViewToCanvas;
     QAction *mRasterEffectsVisible;

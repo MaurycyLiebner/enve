@@ -79,6 +79,9 @@ public:
     // for motion blur
 
     SkBlendMode fBlendMode = SkBlendMode::kSrcOver;
+    const SkFilterQuality fFilterQuality;
+    bool fAntiAlias = false;
+    bool fUseRenderTransform = false;
 
     bool fParentIsTarget = true;
     qptr<BoundingBox> fParentBox;

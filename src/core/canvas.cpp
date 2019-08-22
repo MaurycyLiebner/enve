@@ -140,6 +140,7 @@ void drawTransparencyMesh(SkCanvas * const canvas,
     canvas->drawRect(drawRect, paint);
 }
 
+#include "efiltersettings.h"
 void Canvas::renderSk(SkCanvas * const canvas,
                       const QRect& drawRect,
                       const QMatrix& viewTrans,
@@ -150,6 +151,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
     SkPaint paint;
     paint.setStyle(SkPaint::kFill_Style);
     const SkRect canvasRect = SkRect::MakeWH(mWidth, mHeight);
+    const qreal zoom = viewTrans.m11();
+    const auto filter = eFilterSettings::sDisplay(zoom, mResolutionFraction);
     const qreal qInvZoom = 1/viewTrans.m11();
     const float invZoom = toSkScalar(qInvZoom);
     const SkMatrix skViewTrans = toSkMatrix(viewTrans);
@@ -167,7 +170,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
             if(bgColor.alpha() != 255)
                 drawTransparencyMesh(canvas, canvasRect);
             canvas->scale(reversedRes, reversedRes);
-            mCurrentPreviewContainer->drawSk(canvas);
+            mCurrentPreviewContainer->drawSk(canvas, filter);
             canvas->restore();
         }
         return;
@@ -198,12 +201,12 @@ void Canvas::renderSk(SkCanvas * const canvas,
             canvas->drawRect(canvasRect, paint);
         }
         canvas->saveLayer(nullptr, nullptr);
-        drawContained(canvas);
+        drawContained(canvas, filter);
         canvas->restore();
     } else if(drawCanvas) {
         canvas->save();
         canvas->scale(reversedRes, reversedRes);
-        mCurrentPreviewContainer->drawSk(canvas);
+        mCurrentPreviewContainer->drawSk(canvas, filter);
         canvas->restore();
     }
 

@@ -177,6 +177,7 @@ SOURCES += \
     conncontext.cpp \
     document.cpp \
     documentrw.cpp \
+    efiltersettings.cpp \
     fileshandler.cpp \
     filesourcescache.cpp \
     importhandler.cpp \
@@ -396,6 +397,7 @@ HEADERS += \
     customhandler.h \
     customidentifier.h \
     document.h \
+    efiltersettings.h \
     fileshandler.h \
     filesourcescache.h \
     importhandler.h \

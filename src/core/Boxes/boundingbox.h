@@ -75,8 +75,6 @@ public:
     static BoundingBox *sGetBoxByReadId(const int readId);
     static void sClearReadBoxes();
     static void sAddWaitingForBoxLoad(const WaitingForBoxLoad& func);
-
-    static SkFilterQuality sDisplayFiltering;
 private:
     static int sNextDocumentId;
     static QList<BoundingBox*> sDocumentBoxes;
@@ -133,9 +131,8 @@ public:
         Q_UNUSED(style);
     }
 
-    virtual void drawPixmapSk(SkCanvas * const canvas);
     virtual void drawPixmapSk(SkCanvas * const canvas,
-                              SkPaint * const paint);
+                              const SkFilterQuality filter);
     virtual void drawHoveredSk(SkCanvas *canvas,
                                const float invScale);
 

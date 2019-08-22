@@ -31,14 +31,16 @@ private:
         updateGlobalRect();
         fRenderTransform = fScaledTransform;
         fRenderTransform.translate(-fGlobalRect.x(), -fGlobalRect.y());
+        fUseRenderTransform = true;
         fRenderedImage = fImage;
+        fAntiAlias = true;
         finishedProcessing();
     }
 
     void drawSk(SkCanvas * const canvas) {
         SkPaint paint;
-        //paint.setFilterQuality(kHigh_SkFilterQuality);
-        //paint.setAntiAlias(true);
+        if(fFilterQuality > kNone_SkFilterQuality) paint.setAntiAlias(true);
+        paint.setFilterQuality(fFilterQuality);
         if(fImage) canvas->drawImage(fImage,
                                      toSkScalar(fRelBoundingRect.x()),
                                      toSkScalar(fRelBoundingRect.y()),

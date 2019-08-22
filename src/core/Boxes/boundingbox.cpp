@@ -21,7 +21,6 @@
 #include "typemenu.h"
 #include "patheffectsmenu.h"
 
-SkFilterQuality BoundingBox::sDisplayFiltering = kLow_SkFilterQuality;
 int BoundingBox::sNextDocumentId;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
 
@@ -240,21 +239,16 @@ NormalSegment BoundingBox::getNormalSegment(const QPointF &absPos,
     return NormalSegment();
 }
 
-void BoundingBox::drawPixmapSk(SkCanvas * const canvas) {
+#include "efiltersettings.h"
+void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
+                               const SkFilterQuality filter) {
     if(mTransformAnimator->getOpacity() < 0.001) return;
     SkPaint paint;
     const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
     paint.setAlpha(static_cast<U8CPU>(intAlpha));
     paint.setBlendMode(mBlendModeSk);
-    paint.setFilterQuality(BoundingBox::sDisplayFiltering);
-    drawPixmapSk(canvas, &paint);
-}
-
-void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
-                               SkPaint * const paint) {
-    if(mTransformAnimator->getOpacity() < 0.001) return;
-    paint->setFilterQuality(BoundingBox::sDisplayFiltering);
-    mDrawRenderContainer.drawSk(canvas, paint);
+    paint.setFilterQuality(filter);
+    mDrawRenderContainer.drawSk(canvas, &paint);
 }
 
 void BoundingBox::setBlendModeSk(const SkBlendMode blendMode) {

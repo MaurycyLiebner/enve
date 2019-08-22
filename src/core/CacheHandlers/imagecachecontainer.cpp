@@ -44,14 +44,11 @@ void ImageCacheContainer::setDataLoadedFromTmpFile(const sk_sp<SkImage> &img) {
     afterDataLoadedFromTmpFile();
 }
 
-void ImageCacheContainer::drawSk(SkCanvas * const canvas) {
-    SkPaint paint;
-    drawSk(canvas, paint);
-}
-
+#include "efiltersettings.h"
 void ImageCacheContainer::drawSk(SkCanvas * const canvas,
-                                 SkPaint& paint) {
-    paint.setFilterQuality(BoundingBox::sDisplayFiltering);
+                                 const SkFilterQuality filter) {
+    SkPaint paint;
+    paint.setFilterQuality(filter);
     canvas->drawImage(mImageSk, 0, 0, &paint);
 }
 

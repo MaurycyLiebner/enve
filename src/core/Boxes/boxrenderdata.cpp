@@ -1,8 +1,10 @@
 #include "boxrenderdata.h"
 #include "boundingbox.h"
 #include "skia/skiahelpers.h"
+#include "efiltersettings.h"
 
-BoxRenderData::BoxRenderData(BoundingBox *parentBoxT) {
+BoxRenderData::BoxRenderData(BoundingBox *parentBoxT) :
+    fFilterQuality(eFilterSettings::sRender()) {
     fParentBox = parentBoxT;
 }
 
@@ -18,6 +20,8 @@ void BoxRenderData::copyFrom(BoxRenderData *src) {
     fRelFrame = src->fRelFrame;
     fRelBoundingRect = src->fRelBoundingRect;
     fRenderTransform = src->fRenderTransform;
+    fAntiAlias = src->fAntiAlias;
+    fUseRenderTransform = src->fUseRenderTransform;
     fBlendMode = src->fBlendMode;
     fGlobalRect = src->fGlobalRect;
     fOpacity = src->fOpacity;
@@ -37,27 +41,25 @@ stdsptr<BoxRenderData> BoxRenderData::makeCopy() {
 
 void BoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {
     if(fOpacity < 0.001) return;
-    const float invScale = toSkScalar(1/fResolution);
-    canvas->scale(invScale, invScale);
-    canvas->concat(toSkMatrix(fRenderTransform));
-    SkPaint paint;
-    paint.setAlpha(static_cast<U8CPU>(qRound(fOpacity*2.55)));
-    paint.setBlendMode(fBlendMode);
-    //paint.setAntiAlias(true);
-    //paint.setFilterQuality(kHigh_SkFilterQuality);
+    if(fUseRenderTransform) canvas->concat(toSkMatrix(fRenderTransform));
     if(fBlendMode == SkBlendMode::kDstIn ||
        fBlendMode == SkBlendMode::kSrcIn ||
        fBlendMode == SkBlendMode::kDstATop) {
-        SkPaint paintT;
-        paintT.setBlendMode(fBlendMode);
-        paintT.setColor(SK_ColorTRANSPARENT);
+        SkPaint bPaint;
+        bPaint.setBlendMode(fBlendMode);
+        bPaint.setColor(SK_ColorTRANSPARENT);
         SkPath path;
         path.addRect(SkRect::MakeXYWH(fGlobalRect.x(), fGlobalRect.y(),
                                       fRenderedImage->width(),
                                       fRenderedImage->height()));
         path.toggleInverseFillType();
-        canvas->drawPath(path, paintT);
+        canvas->drawPath(path, bPaint);
     }
+    SkPaint paint;
+    paint.setAlpha(static_cast<U8CPU>(qRound(fOpacity*2.55)));
+    paint.setBlendMode(fBlendMode);
+    paint.setAntiAlias(fAntiAlias);
+    if(fUseRenderTransform) paint.setFilterQuality(fFilterQuality);
     canvas->drawImage(fRenderedImage, fGlobalRect.x(), fGlobalRect.y(), &paint);
 }
 

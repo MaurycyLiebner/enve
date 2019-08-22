@@ -2,6 +2,7 @@
 #define SETTINGS_H
 #include <QtCore>
 #include "skia/skiaincludes.h"
+#include "efiltersettings.h"
 
 class eSettings {
     eSettings() {}
@@ -14,9 +15,7 @@ public:
 #endif
 
     // quality
-    SkFilterQuality fEnveRenderFilter = SkFilterQuality::kNone_SkFilterQuality;
-    SkFilterQuality fOutputRenderFilter = SkFilterQuality::kHigh_SkFilterQuality;
-    SkFilterQuality fDisplayFilter = SkFilterQuality::kNone_SkFilterQuality;
+    eFilterSettings fFilterSettings;
 
     // performance settings
     int fCpuThreadsCap = 0; // <= 0 - use all available threads

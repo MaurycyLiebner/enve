@@ -505,25 +505,27 @@ void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
     PathEffectsMenu::addPathEffectsToActionMenu(menu);
 }
 
-void ContainerBox::drawContained(SkCanvas * const canvas) {
+void ContainerBox::drawContained(SkCanvas * const canvas,
+                                 const SkFilterQuality filter) {
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
         const auto& box = mContainedBoxes.at(i);
         if(box->isVisibleAndInVisibleDurationRect())
-            box->drawPixmapSk(canvas);
+            box->drawPixmapSk(canvas, filter);
     }
 }
 
-void ContainerBox::drawPixmapSk(SkCanvas * const canvas) {
-    if(SWT_isGroupBox()) return drawContained(canvas);
+void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
+                                const SkFilterQuality filter) {
+    if(SWT_isGroupBox()) return drawContained(canvas, filter);
     if(mIsDescendantCurrentGroup) {
         SkPaint paint;
         const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
         paint.setAlpha(static_cast<U8CPU>(intAlpha));
         paint.setBlendMode(mBlendModeSk);
         canvas->saveLayer(nullptr, &paint);
-        drawContained(canvas);
+        drawContained(canvas, filter);
         canvas->restore();
-    } else BoundingBox::drawPixmapSk(canvas);
+    } else BoundingBox::drawPixmapSk(canvas, filter);
 }
 
 qsptr<BoundingBox> ContainerBox::createLink() {

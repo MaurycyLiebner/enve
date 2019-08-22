@@ -251,6 +251,7 @@ MainWindow::~MainWindow() {
 }
 
 #include "noshortcutaction.h"
+#include "efiltersettings.h"
 void MainWindow::setupMenuBar() {
     mMenuBar = new QMenuBar(this);
 
@@ -411,48 +412,68 @@ void MainWindow::setupMenuBar() {
     const auto filteringMenu = mViewMenu->addMenu("Filtering");
 
     mNoneQuality = filteringMenu->addAction("None", [this]() {
-        BoundingBox::sDisplayFiltering = kNone_SkFilterQuality;
+        eFilterSettings::sSetDisplayFilter(kNone_SkFilterQuality);
         centralWidget()->update();
 
         mLowQuality->setChecked(false);
         mMediumQuality->setChecked(false);
         mHighQuality->setChecked(false);
+        mDynamicQuality->setChecked(false);
     });
     mNoneQuality->setCheckable(true);
-    mNoneQuality->setChecked(BoundingBox::sDisplayFiltering == kNone_SkFilterQuality);
+    mNoneQuality->setChecked(eFilterSettings::sDisplay() == kNone_SkFilterQuality &&
+                             !eFilterSettings::sSmartDisplat());
 
     mLowQuality = filteringMenu->addAction("Low", [this]() {
-        BoundingBox::sDisplayFiltering = kLow_SkFilterQuality;
+        eFilterSettings::sSetDisplayFilter(kLow_SkFilterQuality);
         centralWidget()->update();
 
         mNoneQuality->setChecked(false);
         mMediumQuality->setChecked(false);
         mHighQuality->setChecked(false);
+        mDynamicQuality->setChecked(false);
     });
     mLowQuality->setCheckable(true);
-    mLowQuality->setChecked(BoundingBox::sDisplayFiltering == kLow_SkFilterQuality);
+    mLowQuality->setChecked(eFilterSettings::sDisplay() == kLow_SkFilterQuality &&
+                            !eFilterSettings::sSmartDisplat());
 
     mMediumQuality = filteringMenu->addAction("Medium", [this]() {
-        BoundingBox::sDisplayFiltering = kMedium_SkFilterQuality;
+        eFilterSettings::sSetDisplayFilter(kMedium_SkFilterQuality);
         centralWidget()->update();
 
         mNoneQuality->setChecked(false);
         mLowQuality->setChecked(false);
         mHighQuality->setChecked(false);
+        mDynamicQuality->setChecked(false);
     });
     mMediumQuality->setCheckable(true);
-    mMediumQuality->setChecked(BoundingBox::sDisplayFiltering == kMedium_SkFilterQuality);
+    mMediumQuality->setChecked(eFilterSettings::sDisplay() == kMedium_SkFilterQuality &&
+                               !eFilterSettings::sSmartDisplat());
 
     mHighQuality = filteringMenu->addAction("High", [this]() {
-        BoundingBox::sDisplayFiltering = kHigh_SkFilterQuality;
+        eFilterSettings::sSetDisplayFilter(kHigh_SkFilterQuality);
         centralWidget()->update();
 
         mNoneQuality->setChecked(false);
         mLowQuality->setChecked(false);
         mMediumQuality->setChecked(false);
+        mDynamicQuality->setChecked(false);
     });
     mHighQuality->setCheckable(true);
-    mHighQuality->setChecked(BoundingBox::sDisplayFiltering == kHigh_SkFilterQuality);
+    mHighQuality->setChecked(eFilterSettings::sDisplay() == kHigh_SkFilterQuality &&
+                             !eFilterSettings::sSmartDisplat());
+
+    mDynamicQuality = filteringMenu->addAction("Dynamic", [this]() {
+        eFilterSettings::sSetSmartDisplay(true);
+        centralWidget()->update();
+
+        mLowQuality->setChecked(false);
+        mMediumQuality->setChecked(false);
+        mHighQuality->setChecked(false);
+        mNoneQuality->setChecked(false);
+    });
+    mDynamicQuality->setCheckable(true);
+    mDynamicQuality->setChecked(eFilterSettings::sSmartDisplat());
 
     mClipViewToCanvas = mViewMenu->addAction("Clip To Canvas");
     mClipViewToCanvas->setCheckable(true);

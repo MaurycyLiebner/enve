@@ -19,8 +19,10 @@ public:
     bool SWT_drop(const QMimeData* const data);
     bool SWT_dropInto(const int index, const QMimeData* const data);
 
-    void drawContained(SkCanvas * const canvas);
-    void drawPixmapSk(SkCanvas * const canvas);
+    void drawContained(SkCanvas * const canvas,
+                       const SkFilterQuality filter);
+    void drawPixmapSk(SkCanvas * const canvas,
+                      const SkFilterQuality filter);
 
     qsptr<BoundingBox> createLink();
     stdsptr<BoxRenderData> createRenderData();
