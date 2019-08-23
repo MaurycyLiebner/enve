@@ -197,11 +197,10 @@ void BasicTransformAnimator::updateRelativeTransform(const UpdateReason reason) 
 }
 
 void BasicTransformAnimator::updateTotalTransform(const UpdateReason reason) {
-    if(mParentTransform.isNull()) {
-        mTotalTransform = mRelTransform;
+    if(mParentTransform) {
+        mTotalTransform = mRelTransform*mParentTransform->getTotalTransform();
     } else {
-        mTotalTransform = mRelTransform *
-                             mParentTransform->getTotalTransform();
+        mTotalTransform = mRelTransform;
     }
     emit totalTransformChanged(reason);
 }

@@ -175,6 +175,12 @@ public:
         prp_afterChangedAbsRange(absRange, clip);
     }
 
+    inline void prp_afterChangedCurrent(const UpdateReason reason) {
+        emit prp_currentFrameChanged(reason, QPrivateSignal());
+        if(reason == UpdateReason::frameChange && mParent_k)
+            mParent_k->prp_afterChangedCurrent(reason);
+    }
+
     FrameRange prp_relRangeToAbsRange(const FrameRange &range) const;
     FrameRange prp_absRangeToRelRange(const FrameRange &range) const;
     int prp_absFrameToRelFrame(const int absFrame) const;
@@ -235,7 +241,7 @@ protected:
     void setPointsHandler(const stdsptr<PointsHandler>& handler);
 signals:
     void prp_finishedChange();
-    void prp_currentFrameChanged(const UpdateReason reason);
+    void prp_currentFrameChanged(const UpdateReason reason, QPrivateSignal);
     void prp_absFrameRangeChanged(const FrameRange &range,
                                   const bool clip);
     void prp_replaceWith(const qsptr<Property>&, const qsptr<Property>&);

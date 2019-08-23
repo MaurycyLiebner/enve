@@ -24,7 +24,7 @@ public:
             const T newVal = getValueAtRelFrame(this->anim_getCurrentRelFrame());
             if(gDiffers(newVal, mCurrentValue)) {
                 mCurrentValue = newVal;
-                emit this->prp_currentFrameChanged(UpdateReason::frameChange);
+                this->prp_afterChangedCurrent(UpdateReason::frameChange);
             }
             afterValueChanged();
         }

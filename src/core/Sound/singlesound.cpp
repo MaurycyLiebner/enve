@@ -152,14 +152,8 @@ void SingleSound::updateDurationRectLength() {
 }
 
 qreal SingleSound::getCanvasFPS() const {
-    auto parentCanvas = getFirstAncestor<Canvas>();
-    if(!parentCanvas) {
-        const auto box = getFirstAncestor<BoundingBox>();
-        if(!box) return 1;
-        parentCanvas = box->getParentScene();
-        if(!parentCanvas) return 1;
-    }
-    return parentCanvas->getFps();
+    if(!mParentScene) return 1;
+    return mParentScene->getFps();
 }
 
 void SingleSound::setFilePath(const QString &path) {

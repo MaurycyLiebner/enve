@@ -26,7 +26,7 @@ RandomQrealGenerator::RandomQrealGenerator() :
 void RandomQrealGenerator::anim_setAbsFrame(const int frame) {
     ComplexAnimator::anim_setAbsFrame(frame);
     if(mMaxDev->getEffectiveValue() < 0.001) return;
-    emit prp_currentFrameChanged(UpdateReason::frameChange);
+    prp_afterChangedCurrent(UpdateReason::frameChange);
 }
 
 FrameRange RandomQrealGenerator::prp_getIdenticalRelRange(const int relFrame) const {

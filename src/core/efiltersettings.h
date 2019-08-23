@@ -43,7 +43,7 @@ public:
     static SkFilterQuality sDisplay(const qreal zoom,
                                     const qreal resolution) {
         if(sInstance->mSmartDisplay) {
-            const qreal scale = zoom*resolution;
+            const qreal scale = zoom/resolution;
             if(isOne4Dec(scale)) return kNone_SkFilterQuality;
             else if(scale > 2.5) return kNone_SkFilterQuality;
             else if(scale < 0.5) return kMedium_SkFilterQuality;

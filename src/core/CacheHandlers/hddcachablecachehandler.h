@@ -20,8 +20,8 @@ public:
     }
 
     void add(const stdsptr<Cont>& cont) {
-        const auto ret = mConts.insert({cont->getRange(), cont});
-        if(!ret.second) RuntimeThrow("Range already occupied by a different element");
+        /*const auto ret = */mConts.insert({cont->getRange(), cont});
+        //if(!ret.second) RuntimeThrow("Range already occupied by a different element");
     }
 
     void clear() {

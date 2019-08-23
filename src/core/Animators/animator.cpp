@@ -64,7 +64,7 @@ int Animator::anim_getNextKeyRelFrame(const int relFrame) const {
 
 void Animator::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) {
     if(range.inRange(anim_mCurrentAbsFrame))
-        emit prp_currentFrameChanged(UpdateReason::userChange);
+        prp_afterChangedCurrent(UpdateReason::userChange);
     emit prp_absFrameRangeChanged(range, clip);
 }
 

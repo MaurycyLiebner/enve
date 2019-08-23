@@ -51,7 +51,7 @@ public:
                     anim_getCurrentRelFrame(), lastRelFrame);
         if(diff) {
             updateBaseValue();
-            emit prp_currentFrameChanged(UpdateReason::frameChange);
+            prp_afterChangedCurrent(UpdateReason::frameChange);
         }
     }
 

@@ -36,7 +36,7 @@ void Property::setupTreeViewMenu(PropertyMenu * const menu) {
 
 void Property::prp_afterChangedAbsRange(const FrameRange &range,
                                         const bool clip) {
-    emit prp_currentFrameChanged(UpdateReason::userChange);
+    prp_afterChangedCurrent(UpdateReason::userChange);
     emit prp_absFrameRangeChanged(range, clip);
 }
 

@@ -269,7 +269,7 @@ void QrealAnimator::saveValueToKey(const int frame, const qreal value) {
 void QrealAnimator::anim_setAbsFrame(const int frame) {
     Animator::anim_setAbsFrame(frame);
     const bool changed = updateBaseValueFromCurrentFrame();
-    if(changed) emit prp_currentFrameChanged(UpdateReason::frameChange);
+    if(changed) prp_afterChangedCurrent(UpdateReason::frameChange);
 }
 
 void QrealAnimator::anim_saveCurrentValueAsKey() {

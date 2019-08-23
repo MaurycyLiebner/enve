@@ -24,7 +24,6 @@ void eBoxOrSound::setParentGroup(ContainerBox * const parent) {
     }
     prp_afterWholeInfluenceRangeChanged();
     mParentGroup = parent;
-    mParent_k = parent;
     if(mParentGroup) {
         anim_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
         connect(mParentGroup, &eBoxOrSound::aboutToChangeAncestor,
