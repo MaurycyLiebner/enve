@@ -17,7 +17,7 @@ struct SingleSoundData {
     stdsptr<Samples> fSamples;
 };
 
-class SoundMerger : public CPUTask {
+class SoundMerger : public eCpuTask {
     e_OBJECT
 protected:
     SoundMerger(const int secondId, const SampleRange& sampleRange,

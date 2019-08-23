@@ -157,16 +157,16 @@ void VideoFrameLoader::afterCanceled() {
 
 void VideoFrameLoader::scheduleTaskNow() {
     if(mFrameToConvert) {
-        TaskScheduler::sGetInstance()->scheduleCPUTask(ref<eTask>());
+        TaskScheduler::sGetInstance()->scheduleCpuTask(ref<eTask>());
     } else {
-        TaskScheduler::sGetInstance()->scheduleHDDTask(ref<eTask>());
+        TaskScheduler::sGetInstance()->scheduleHddTask(ref<eTask>());
     }
 }
 
 void VideoFrameLoader::process() {
     if(!mFrameToConvert) readFrame();
     if(mFrameToConvert) {
-        HDDPartFinished();
+        HddPartFinished();
         convertFrame();
     }
 }

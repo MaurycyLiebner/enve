@@ -15,13 +15,15 @@ void eTask::aboutToProcess(const Hardware hw) {
 }
 
 void eTask::finishedProcessing() {
-    if(mState == eTaskState::canceled || mState == eTaskState::failed) return;
     mState = eTaskState::finished;
-    afterProcessing();
-    if(unhandledException()) {
+    if(mCancel) {
+        mCancel = false;
+        cancel();
+    } else if(unhandledException()) {
         gPrintExceptionCritical(handleException());
-        cancelDependent();
+        cancel();
     } else {
+        afterProcessing();
         tellDependentThatFinished();
     }
 }
@@ -79,14 +81,14 @@ void eTask::cancelDependent() {
     mDependentF.clear();
 }
 
-void CPUTask::scheduleTaskNow() {
-    TaskScheduler::sGetInstance()->scheduleCPUTask(ref<eTask>());
+void eCpuTask::scheduleTaskNow() {
+    TaskScheduler::sGetInstance()->scheduleCpuTask(ref<eTask>());
 }
 
-void HDDTask::scheduleTaskNow() {
-    TaskScheduler::sGetInstance()->scheduleHDDTask(ref<eTask>());
+void eHddTask::scheduleTaskNow() {
+    TaskScheduler::sGetInstance()->scheduleHddTask(ref<eTask>());
 }
 
-void HDDTask::HDDPartFinished() {
-    if(mController) emit mController->HDDPartFinished();
+void eHddTask::HddPartFinished() {
+    if(mController) emit mController->HddPartFinished();
 }

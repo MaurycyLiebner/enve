@@ -28,6 +28,7 @@ class PathPivot;
 class SoundComposition;
 class SkCanvas;
 class ImageSequenceBox;
+class SceneFrameContainer;
 class Brush;
 class UndoRedoStack;
 class ExternalLinkBox;
@@ -439,16 +440,15 @@ public:
     int getMaxFrame();
 
     //void updatePixmaps();
-    HDDCachableCacheHandler& getCacheHandler() {
-        return mCacheHandler;
+    HddCachableCacheHandler& getSceneFramesHandler() {
+        return mSceneFramesHandler;
     }
 
-    HDDCachableCacheHandler& getSoundCacheHandler();
+    HddCachableCacheHandler& getSoundCacheHandler();
 
-    void setCurrentPreviewContainer(const int relFrame);
-    void setCurrentPreviewContainer(const stdsptr<ImageCacheContainer> &cont);
-    void setLoadingPreviewContainer(
-            const stdsptr<ImageCacheContainer> &cont);
+    void setSceneFrame(const int relFrame);
+    void setSceneFrame(const stdsptr<SceneFrameContainer> &cont);
+    void setLoadingSceneFrame(const stdsptr<SceneFrameContainer> &cont);
 
     void setRenderingPreview(const bool bT);
 
@@ -487,7 +487,7 @@ public:
     void clearSelectionAction();
     void rotateSelectedBoxesStartAndFinish(const qreal rotBy);
     bool shouldScheduleUpdate() {
-        return mCurrentPreviewContainerOutdated;
+        return mSceneFrameOutdated;
     }
 
     void renderDataFinished(BoxRenderData *renderData);
@@ -566,11 +566,11 @@ public:
         return mPaintTarget.isValid();
     }
 
-    void queScheduledTasks() {
+    void scheduleUpdate() {
         if(Actions::sInstance->smoothChange() && mCurrentContainer) {
             if(!mDrawnSinceQue) return;
-            mCurrentContainer->queChildScheduledTasks();
-        } else ContainerBox::queScheduledTasks();
+            mCurrentContainer->scheduleChildrenUpdate();
+        } else ContainerBox::scheduleUpdate();
         mDrawnSinceQue = false;
     }
 private:
@@ -583,7 +583,6 @@ private:
     TransformMode mTransMode = TransformMode::none;
 protected:
     Document& mDocument;
-    bool mSmoothChange = false;
     bool mDrawnSinceQue = true;
 
     stdsptr<UndoRedoStack> mUndoRedoStack;
@@ -594,7 +593,7 @@ protected:
     bool mStylusDrawing = false;
 
     uint mLastStateId = 0;
-    HDDCachableCacheHandler mCacheHandler;
+    HddCachableCacheHandler mSceneFramesHandler;
 
     qsptr<ColorAnimator> mBackgroundColor = enve::make_shared<ColorAnimator>();
 
@@ -636,9 +635,9 @@ protected:
     bool mRenderingOutput = false;
     FrameRange mCurrRenderRange;
 
-    bool mCurrentPreviewContainerOutdated = false;
-    stdsptr<ImageCacheContainer> mCurrentPreviewContainer;
-    stdsptr<ImageCacheContainer> mLoadingPreviewContainer;
+    bool mSceneFrameOutdated = false;
+    stdsptr<SceneFrameContainer> mSceneFrame;
+    stdsptr<SceneFrameContainer> mLoadingSceneFrame;
 
     bool mClipToCanvasSize = false;
     bool mRasterEffectsVisible = true;

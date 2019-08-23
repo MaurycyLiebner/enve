@@ -37,7 +37,7 @@ struct TileBitmaps {
     }
 };
 
-class DrawableAutoTiledSurface : public HDDCachablePersistent {
+class DrawableAutoTiledSurface : public HddCachablePersistent {
     e_OBJECT
     typedef QList<QList<SkBitmap>> Tiles;
 protected:
@@ -45,9 +45,9 @@ protected:
     DrawableAutoTiledSurface(const DrawableAutoTiledSurface& other) = delete;
     DrawableAutoTiledSurface& operator=(const DrawableAutoTiledSurface& other) = delete;
 
-    stdsptr<HDDTask> createTmpFileDataSaver();
+    stdsptr<eHddTask> createTmpFileDataSaver();
 
-    stdsptr<HDDTask> createTmpFileDataLoader();
+    stdsptr<eHddTask> createTmpFileDataLoader();
 
     int getByteCount() {
         const int spixels = mColumnCount*mRowCount*TILE_SPIXEL_SIZE;

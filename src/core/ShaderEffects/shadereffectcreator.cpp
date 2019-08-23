@@ -182,7 +182,7 @@ stdsptr<ShaderEffectCreator> ShaderEffectCreator::sLoadFromFile(
             if(name.isEmpty()) RuntimeThrow("Value name not defined.");
             const auto typeStr = valEle.attribute("type");
             if(typeStr.isEmpty()) RuntimeThrow("Value '" + name + "' type not defined.");
-            GLValueType type;
+            GLValueType type{GLValueType::Float};
             if(typeStr == "float") type = GLValueType::Float;
             else if(typeStr == "vec2") type = GLValueType::Vec2;
             else if(typeStr == "vec3") type = GLValueType::Vec3;

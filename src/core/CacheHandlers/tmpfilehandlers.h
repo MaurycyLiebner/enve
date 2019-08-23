@@ -5,7 +5,7 @@
 #include "skia/skiaincludes.h"
 class ImageCacheContainer;
 
-class TmpFileDataSaver : public HDDTask {
+class TmpFileDataSaver : public eHddTask {
     e_OBJECT
 protected:
     TmpFileDataSaver() {}
@@ -25,7 +25,7 @@ protected:
     qsptr<QTemporaryFile> mTmpFile;
 };
 
-class TmpFileDataLoader : public HDDTask {
+class TmpFileDataLoader : public eHddTask {
     e_OBJECT
 protected:
     TmpFileDataLoader(const qsptr<QTemporaryFile> &file) :
@@ -45,7 +45,7 @@ private:
     const qsptr<QTemporaryFile> mTmpFile;
 };
 
-class TmpFileDataDeleter : public HDDTask {
+class TmpFileDataDeleter : public eHddTask {
     e_OBJECT
 protected:
     TmpFileDataDeleter(const qsptr<QTemporaryFile> &file) :

@@ -33,18 +33,14 @@ public:
     //! @brief Starts processing scheduled tasks if is not busy.
     void handleScheduledProcesses() {
         if(mScheduledProcesses.isEmpty()) return;
-        if(!mFinished) return;
-        mFinished = false;
+        if(!mAllDone) return;
+        mAllDone = false;
         _mHandledProcesses << mScheduledProcesses.takeFirst();
         start();
     }
 
     //! @brief Returns true if nothing is waiting/being processed.
-    bool hasFinished() const {
-        return mFinished;
-    }
-signals:
-    void processedAll();
+    bool allDone() const { return mAllDone; }
 private:
     void afterProcessed();
 protected:
@@ -104,7 +100,7 @@ protected:
     sk_sp<const GrGLInterface> mInterface;
     SwitchableContext mContext;
     std::exception_ptr mProcessException;
-    bool mFinished = true;
+    bool mAllDone = true;
     bool mInitialized = false;
     GLuint _mTextureSquareVAO;
     QList<stdsptr<eTask>> _mHandledProcesses;

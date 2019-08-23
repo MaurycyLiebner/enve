@@ -14,12 +14,12 @@ signals:
     void finishedTask(eTask*);
 };
 
-class HDDTaskExecutor : public TaskExecutor {
+class HddTaskExecutor : public TaskExecutor {
     Q_OBJECT
 public:
-    explicit HDDTaskExecutor() {}
+    explicit HddTaskExecutor() {}
 signals:
-    void HDDPartFinished();
+    void HddPartFinished();
 };
 
 class ExecController : public QObject {
@@ -72,23 +72,23 @@ private:
     QThread * const mExecutorThread;
 };
 
-class CPUExecController : public ExecController {
+class CpuExecController : public ExecController {
 public:
-    CPUExecController(QObject * const parent = nullptr) :
+    CpuExecController(QObject * const parent = nullptr) :
         ExecController(new TaskExecutor, parent) {}
 };
 
-class HDDExecController : public ExecController {
+class HddExecController : public ExecController {
     Q_OBJECT
 public:
-    HDDExecController(QObject * const parent = nullptr) :
-        ExecController(new HDDTaskExecutor, parent) {
-        connect(static_cast<HDDTaskExecutor*>(mExecutor),
-                &HDDTaskExecutor::HDDPartFinished,
-                this, &HDDExecController::HDDPartFinished);
+    HddExecController(QObject * const parent = nullptr) :
+        ExecController(new HddTaskExecutor, parent) {
+        connect(static_cast<HddTaskExecutor*>(mExecutor),
+                &HddTaskExecutor::HddPartFinished,
+                this, &HddExecController::HddPartFinished);
     }
 signals:
-    void HDDPartFinished();
+    void HddPartFinished();
 };
 
 #endif // TASKEXECUTOR_H

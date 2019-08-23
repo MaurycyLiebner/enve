@@ -20,7 +20,7 @@
 #include "pointtypemenu.h"
 #include "Animators/transformanimator.h"
 #include "glhelpers.h"
-#include "CacheHandlers/imagecachecontainer.h"
+#include "CacheHandlers/sceneframecontainer.h"
 
 Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
@@ -145,8 +145,6 @@ void Canvas::renderSk(SkCanvas * const canvas,
                       const QMatrix& viewTrans,
                       const bool mouseGrabbing) {
     mDrawnSinceQue = true;
-    SkBitmap bitmap;
-    bitmap.makeShader(SkTileMode::kRepeat, SkTileMode::kRepeat);
     SkPaint paint;
     paint.setStyle(SkPaint::kFill_Style);
     const SkRect canvasRect = SkRect::MakeWH(mWidth, mHeight);
@@ -157,19 +155,19 @@ void Canvas::renderSk(SkCanvas * const canvas,
     const SkMatrix skViewTrans = toSkMatrix(viewTrans);
     const QColor bgColor = mBackgroundColor->getColor();
     const float intervals[2] = {MIN_WIDGET_DIM*0.25f*invZoom,
-                                   MIN_WIDGET_DIM*0.25f*invZoom};
+                                MIN_WIDGET_DIM*0.25f*invZoom};
     const auto dashPathEffect = SkDashPathEffect::Make(intervals, 2, 0);
 
     canvas->concat(skViewTrans);
     const float reversedRes = toSkScalar(1/mResolutionFraction);
     if(isPreviewingOrRendering()) {
-        if(mCurrentPreviewContainer) {
+        if(mSceneFrame) {
             canvas->clear(SK_ColorBLACK);
             canvas->save();
             if(bgColor.alpha() != 255)
                 drawTransparencyMesh(canvas, canvasRect);
             canvas->scale(reversedRes, reversedRes);
-            mCurrentPreviewContainer->drawSk(canvas, filter);
+            mSceneFrame->drawSk(canvas, filter);
             canvas->restore();
         }
         return;
@@ -185,8 +183,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         paint.setPathEffect(dashPathEffect);
         canvas->drawRect(toSkRect(getCurrentBounds()), paint);
     }
-    const bool drawCanvas = mCurrentPreviewContainer &&
-            !mCurrentPreviewContainerOutdated;
+    const bool drawCanvas = mSceneFrame && mSceneFrame->fBoxState == mStateId;
     if(bgColor.alpha() != 255)
         drawTransparencyMesh(canvas, canvasRect);
 
@@ -205,7 +202,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
     } else if(drawCanvas) {
         canvas->save();
         canvas->scale(reversedRes, reversedRes);
-        mCurrentPreviewContainer->drawSk(canvas, filter);
+        mSceneFrame->drawSk(canvas, filter);
         canvas->restore();
     }
 
@@ -315,43 +312,40 @@ void Canvas::setOutputRendering(const bool bT) {
     mRenderingOutput = bT;
 }
 
-void Canvas::setCurrentPreviewContainer(const int relFrame) {
-    auto cont = mCacheHandler.atFrame(relFrame);
-    setCurrentPreviewContainer(enve::shared<ImageCacheContainer>(cont));
+void Canvas::setSceneFrame(const int relFrame) {
+    auto cont = mSceneFramesHandler.atFrame(relFrame);
+    setSceneFrame(enve::shared<SceneFrameContainer>(cont));
 }
 
-void Canvas::setCurrentPreviewContainer(const stdsptr<ImageCacheContainer>& cont) {
-    setLoadingPreviewContainer(nullptr);
-    if(cont == mCurrentPreviewContainer) return emit requestUpdate();
-    if(mCurrentPreviewContainer) {
+void Canvas::setSceneFrame(const stdsptr<SceneFrameContainer>& cont) {
+    setLoadingSceneFrame(nullptr);
+    if(cont == mSceneFrame) return emit requestUpdate();
+    if(mSceneFrame) {
         if(!mRenderingPreview)
-            mCurrentPreviewContainer->setBlocked(false);
+            mSceneFrame->setBlocked(false);
     }
 
-    mCurrentPreviewContainer = cont;
+    mSceneFrame = cont;
     if(cont) cont->setBlocked(true);
     emit requestUpdate();
 }
 
-void Canvas::setLoadingPreviewContainer(
-        const stdsptr<ImageCacheContainer>& cont) {
-    if(cont == mLoadingPreviewContainer) return;
-    if(mLoadingPreviewContainer.get()) {
-        mLoadingPreviewContainer->setLoadTargetCanvas(nullptr);
+void Canvas::setLoadingSceneFrame(const stdsptr<SceneFrameContainer>& cont) {
+    if(cont == mLoadingSceneFrame) return;
+    if(mLoadingSceneFrame.get()) {
         if(!mRenderingPreview || mRenderingOutput) {
-            mLoadingPreviewContainer->setBlocked(false);
+            mLoadingSceneFrame->setBlocked(false);
         }
     }
     if(!cont) {
-        mLoadingPreviewContainer.reset();
+        mLoadingSceneFrame.reset();
         return;
     }
-    mLoadingPreviewContainer = cont;
-    cont->setLoadTargetCanvas(this);
+    mLoadingSceneFrame = cont;
     if(!cont->storesDataInMemory()) {
         cont->scheduleLoadFromTmpFile();
     }
-    mLoadingPreviewContainer->setBlocked(true);
+    mLoadingSceneFrame->setBlocked(true);
 }
 
 FrameRange Canvas::prp_getIdenticalRelRange(const int relFrame) const {
@@ -368,33 +362,28 @@ void Canvas::renderDataFinished(BoxRenderData *renderData) {
     mLastStateId = renderData->fBoxStateId;
 
     const auto range = prp_getIdenticalRelRange(relFrame);
-    const auto cont = enve::make_shared<ImageCacheContainer>(
-                renderData->fRenderedImage, range,
-                currentState ? &mCacheHandler : nullptr);
-    if(currentState) mCacheHandler.add(cont);
+    const auto cont = enve::make_shared<SceneFrameContainer>(
+                this, renderData, range,
+                currentState ? &mSceneFramesHandler : nullptr);
+    if(currentState) mSceneFramesHandler.add(cont);
 
     if((mPreviewing || mRenderingOutput) &&
        mCurrRenderRange.inRange(relFrame)) {
         cont->setBlocked(true);
     } else {
-        auto currentRenderData = mDrawRenderContainer.getSrcRenderData();
         bool newerSate = true;
         bool closerFrame = true;
-        if(currentRenderData) {
-            newerSate = currentRenderData->fBoxStateId < renderData->fBoxStateId;
-            const int finishedFrameDist = qAbs(anim_getCurrentRelFrame() -
-                                               relFrame);
-            const int oldFrameDist = qAbs(anim_getCurrentRelFrame() -
-                                          qRound(currentRenderData->fRelFrame));
+        if(mSceneFrame) {
+            newerSate = mSceneFrame->fBoxState < renderData->fBoxStateId;
+            const int cRelFrame = anim_getCurrentRelFrame();
+            const int finishedFrameDist = qAbs(cRelFrame - relFrame);
+            const int cRenderDataFrame = mSceneFrame->getRangeMin();
+            const int oldFrameDist = qAbs(cRelFrame - cRenderDataFrame);
             closerFrame = finishedFrameDist < oldFrameDist;
         }
         if(newerSate || closerFrame) {
-            mDrawRenderContainer.setSrcRenderData(renderData);
-            const bool currentFrame = relFrame == anim_getCurrentRelFrame();
-            const bool outdated = !currentState || !currentFrame;
-            mDrawRenderContainer.setExpired(outdated);
-            mCurrentPreviewContainerOutdated = outdated;
-            setCurrentPreviewContainer(cont);
+            mSceneFrameOutdated = !currentState;
+            setSceneFrame(cont);
         } else if(mRenderingPreview && mCurrRenderRange.inRange(relFrame)) {
             cont->setBlocked(true);
         }
@@ -405,9 +394,9 @@ void Canvas::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) 
     Property::prp_afterChangedAbsRange(range, clip);
     const int minId = prp_getIdenticalRelRange(range.fMin).fMin;
     const int maxId = prp_getIdenticalRelRange(range.fMax).fMax;
-    mCacheHandler.remove({minId, maxId});
-    if(!mCacheHandler.atFrame(anim_getCurrentRelFrame())) {
-        mCurrentPreviewContainerOutdated = true;
+    mSceneFramesHandler.remove({minId, maxId});
+    if(!mSceneFramesHandler.atFrame(anim_getCurrentRelFrame())) {
+        mSceneFrameOutdated = true;
         planScheduleUpdate(UpdateReason::userChange);
     }
 }
@@ -631,33 +620,27 @@ void Canvas::invertSelectionAction() {
 
 void Canvas::anim_setAbsFrame(const int frame) {
     if(frame == anim_getCurrentAbsFrame()) return;
-    const int oldRelFrame = anim_getCurrentRelFrame();
     ContainerBox::anim_setAbsFrame(frame);
     const int newRelFrame = anim_getCurrentRelFrame();
 
     mPaintTarget.afterPaintAnimSurfaceChanged();
 
-    const auto cont = mCacheHandler.atFrame<ImageCacheContainer>(newRelFrame);
+    const auto cont = mSceneFramesHandler.atFrame<SceneFrameContainer>(newRelFrame);
     if(cont) {
-        if(cont->storesDataInMemory()) { // !!!
-            setCurrentPreviewContainer(cont->ref<ImageCacheContainer>());
-        } else {// !!!
-            setLoadingPreviewContainer(cont->ref<ImageCacheContainer>());
-        }// !!!
-        mCurrentPreviewContainerOutdated = !cont->storesDataInMemory();
-    } else {
-        const bool difference =
-                prp_differencesBetweenRelFrames(oldRelFrame, newRelFrame);
-        if(difference) {
-            mCurrentPreviewContainerOutdated = true;
+        if(cont->storesDataInMemory()) {
+            setSceneFrame(cont->ref<SceneFrameContainer>());
+        } else {
+            setLoadingSceneFrame(cont->ref<SceneFrameContainer>());
         }
-        if(difference) planScheduleUpdate(UpdateReason::frameChange);
+        mSceneFrameOutdated = !cont->storesDataInMemory();
+    } else {
+        mSceneFrameOutdated = true;
+        planScheduleUpdate(UpdateReason::frameChange);
     }
 
     mUndoRedoStack->setFrame(frame);
 
-    if(mCurrentMode == CanvasMode::paint)
-        mPaintTarget.setupOnionSkin();
+    if(mCurrentMode == CanvasMode::paint) mPaintTarget.setupOnionSkin();
     emit currentFrameChanged(frame);
 
     schedulePivotUpdate();
@@ -820,7 +803,7 @@ int Canvas::getMaxFrame() {
     return mRange.fMax;
 }
 
-HDDCachableCacheHandler &Canvas::getSoundCacheHandler() {
+HddCachableCacheHandler &Canvas::getSoundCacheHandler() {
     return mSoundComposition->getCacheHandler();
 }
 

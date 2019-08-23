@@ -5,7 +5,7 @@
 #include "smartPointers/ememory.h"
 #include "glhelpers.h"
 #include "skia/skiaincludes.h"
-class HDDExecController;
+class HddExecController;
 
 enum class eTaskState {
     created,
@@ -14,7 +14,6 @@ enum class eTaskState {
     processing,
     finished,
     canceled,
-    failed,
     waiting
 };
 
@@ -69,7 +68,13 @@ public:
     void decDependencies();
     void incDependencies();
 
+    bool waitingToCancel() const { return mCancel; }
+
     void cancel() {
+        if(mState == eTaskState::processing) {
+            mCancel = true;
+            return;
+        }
         mState = eTaskState::canceled;
         cancelDependent();
         afterCanceled();
@@ -98,21 +103,22 @@ private:
     void tellDependentThatFinished();
     void cancelDependent();
 
+    bool mCancel = false;
     int mNDependancies = 0;
     QList<stdptr<eTask>> mDependent;
     QList<Dependent> mDependentF;
     std::exception_ptr mUpdateException;
 };
 
-class CPUTask : public eTask {
+class eCpuTask : public eTask {
     e_OBJECT
 public:
-    HardwareSupport hardwareSupport() const {
+    HardwareSupport hardwareSupport() const final {
         return HardwareSupport::cpuOnly;
     }
 
     void processGpu(QGL33 * const gl,
-                    SwitchableContext &context) {
+                    SwitchableContext &context) final {
         Q_UNUSED(gl);
         Q_UNUSED(context);
     }
@@ -120,7 +126,7 @@ protected:
     void scheduleTaskNow() final;
 };
 
-class HDDTask : public eTask {
+class eHddTask : public eTask {
     e_OBJECT
 public:
     HardwareSupport hardwareSupport() const {
@@ -134,19 +140,19 @@ public:
     }
 protected:
     void scheduleTaskNow();
-    void HDDPartFinished();
+    void HddPartFinished();
 public:
-    void setController(HDDExecController * const contr) {
+    void setController(HddExecController * const contr) {
         mController = contr;
     }
 private:
-    HDDExecController * mController = nullptr;
+    HddExecController * mController = nullptr;
 };
 
-class CustomCPUTask : public CPUTask {
+class eCustomCpuTask : public eCpuTask {
     e_OBJECT
 protected:
-    CustomCPUTask(const std::function<void(void)>& before,
+    eCustomCpuTask(const std::function<void(void)>& before,
                   const std::function<void(void)>& run,
                   const std::function<void(void)>& after) :
         mBefore(before), mRun(run), mAfter(after) {}
@@ -167,7 +173,7 @@ private:
 };
 
 template <typename T>
-class SPtrDisposer : public CPUTask {
+class SPtrDisposer : public eCpuTask {
     e_OBJECT
 protected:
     SPtrDisposer(const T& ptr) : mPtr(ptr) {}

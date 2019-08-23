@@ -35,7 +35,7 @@ VideoDataHandler *VideoFrameHandler::getDataHandler() const {
     return mDataHandler;
 }
 
-const HDDCachableCacheHandler &VideoFrameHandler::getCacheHandler() const {
+const HddCachableCacheHandler &VideoFrameHandler::getCacheHandler() const {
     return mDataHandler->getCacheHandler();
 }
 
@@ -135,7 +135,7 @@ void VideoDataHandler::afterSourceChanged() {
     }
 }
 
-const HDDCachableCacheHandler &VideoDataHandler::getCacheHandler() const {
+const HddCachableCacheHandler &VideoDataHandler::getCacheHandler() const {
     return mFramesCache;
 }
 

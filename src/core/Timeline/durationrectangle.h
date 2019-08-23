@@ -7,7 +7,7 @@
 #include "framerange.h"
 #include "Properties/property.h"
 class Property;
-class HDDCachableCacheHandler;
+class HddCachableCacheHandler;
 
 class TimelineMovable : public SelfRef {
     Q_OBJECT
@@ -176,11 +176,11 @@ public:
     void finishMaxFramePosTransform();
     void startMaxFramePosTransform();
 
-    void setRasterCacheHandler(const HDDCachableCacheHandler * const handler) {
+    void setRasterCacheHandler(const HddCachableCacheHandler * const handler) {
         mRasterCacheHandler = handler;
     }
 
-    void setSoundCacheHandler(const HDDCachableCacheHandler * const handler) {
+    void setSoundCacheHandler(const HddCachableCacheHandler * const handler) {
         mSoundCacheHandler = handler;
     }
 
@@ -195,8 +195,8 @@ signals:
     void maxFrameChanged(const int from, const int to);
     void shiftChanged(const int from, const int to);
 protected:
-    const HDDCachableCacheHandler * mRasterCacheHandler = nullptr;
-    const HDDCachableCacheHandler * mSoundCacheHandler = nullptr;
+    const HddCachableCacheHandler * mRasterCacheHandler = nullptr;
+    const HddCachableCacheHandler * mSoundCacheHandler = nullptr;
     DurationMinMax mMinFrame;
     DurationMinMax mMaxFrame;
 };

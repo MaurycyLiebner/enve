@@ -266,15 +266,15 @@ void ContainerBox::filterFillPath(const qreal relFrame,
     mParentGroup->filterFillPath(parentRelFrame, srcDstPath);
 }
 
-void ContainerBox::queChildScheduledTasks() {
+void ContainerBox::scheduleChildrenUpdate() {
     for(const auto &child : mContainedBoxes)
-        child->queScheduledTasks();
+        child->scheduleUpdate();
 }
 
-void ContainerBox::queScheduledTasks() {
-    queChildScheduledTasks();
+void ContainerBox::scheduleUpdate() {
+    scheduleChildrenUpdate();
     if(mSchedulePlanned && SWT_isGroupBox()) updateRelBoundingRect();
-    BoundingBox::queScheduledTasks();
+    BoundingBox::scheduleUpdate();
 }
 
 void ContainerBox::promoteToLayer() {
@@ -561,7 +561,7 @@ void processChildData(BoundingBox * const child,
         boxRenderData = child->createRenderData();
         boxRenderData->fReason = parentData->fReason;
         boxRenderData->fRelFrame = childRelFrame;
-        TaskScheduler::sGetInstance()->queCPUTask(boxRenderData);
+        boxRenderData->scheduleTask();
     }
     boxRenderData->addDependent(parentData);
     parentData->fChildrenRenderData << boxRenderData;

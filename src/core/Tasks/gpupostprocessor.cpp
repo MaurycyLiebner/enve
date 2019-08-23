@@ -17,13 +17,13 @@ void GpuPostProcessor::initialize() {
 void GpuPostProcessor::afterProcessed() {
     if(unhandledException())
         gPrintExceptionCritical(handleException());
-    mFinished = true;
+    mAllDone = true;
     for(const auto& task : _mHandledProcesses) {
-        if(task->nextStep()) {
-            TaskScheduler::sGetInstance()->scheduleCPUTask(task);
-        } else task->finishedProcessing();
+        const bool nextStep = !task->waitingToCancel() && task->nextStep();
+        if(nextStep) TaskScheduler::sGetInstance()->queCpuTaskFastTrack(task);
+        else task->finishedProcessing();
     }
     _mHandledProcesses.clear();
     handleScheduledProcesses();
-    if(mFinished) emit processedAll();
+    TaskScheduler::sGetInstance()->afterCpuGpuTaskFinished();
 }

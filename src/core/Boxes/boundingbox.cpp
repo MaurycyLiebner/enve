@@ -394,8 +394,7 @@ BoxRenderData *BoundingBox::updateCurrentRenderData(const qreal relFrame,
                                                     const UpdateReason reason) {
     const auto renderData = createRenderData();
     if(!renderData) {
-        auto& tRef = *this;
-        RuntimeThrow(typeid(tRef).name() + "::createRenderData returned a nullptr");
+        RuntimeThrow(typeid(*this).name() + "::createRenderData returned a nullptr");
     }
     renderData->fRelFrame = relFrame;
     renderData->fReason = reason;
@@ -822,14 +821,6 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
 
 void BoundingBox::cancelWaitingTasks() {
     for(const auto &task : mScheduledTasks) task->cancel();
-    mScheduledTasks.clear();
-}
-
-void BoundingBox::queScheduledTasks() {
-    scheduleUpdate();
-    const auto taskScheduler = TaskScheduler::sGetInstance();
-    for(const auto& task : mScheduledTasks)
-        taskScheduler->queCPUTask(task);
     mScheduledTasks.clear();
 }
 

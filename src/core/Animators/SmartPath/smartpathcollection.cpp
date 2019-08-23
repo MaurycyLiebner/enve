@@ -29,7 +29,7 @@ SkPath SmartPathCollection::getPathAtRelFrame(const qreal relFrame) const {
         if(mode == SmartPathAnimator::NORMAL)
             result.addPath(path->getPathAtRelFrame(relFrame));
         else {
-            SkPathOp op;
+            SkPathOp op{SkPathOp::kUnion_SkPathOp};
             switch(mode) {
                 case(SmartPathAnimator::NORMAL):
                 case(SmartPathAnimator::ADD):

@@ -19,7 +19,7 @@ public:
     }
     void afterSourceChanged();
 
-    const HDDCachableCacheHandler& getCacheHandler() const {
+    const HddCachableCacheHandler& getCacheHandler() const {
         return mSecondsCache;
     }
 
@@ -58,7 +58,7 @@ private:
     QList<SoundHandler*> mSoundHandlers;
     QList<int> mSecondsBeingRead;
     QList<stdsptr<SoundReaderForMerger>> mSecondReaders;
-    HDDCachableCacheHandler mSecondsCache;
+    HddCachableCacheHandler mSecondsCache;
 };
 
 class SoundHandler : public StdSelfRef {
@@ -96,7 +96,7 @@ public:
     SoundDataHandler* getDataHandler() const {
         return mDataHandler;
     }
-    const HDDCachableCacheHandler& getCacheHandler() const {
+    const HddCachableCacheHandler& getCacheHandler() const {
         return mDataHandler->getCacheHandler();
     }
 

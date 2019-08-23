@@ -16,7 +16,7 @@ extern "C" {
 class SoundHandler;
 struct AudioStreamsData;
 
-class SoundReader : public HDDTask {
+class SoundReader : public eHddTask {
     e_OBJECT
 protected:
     SoundReader(SoundHandler * const cacheHandler,

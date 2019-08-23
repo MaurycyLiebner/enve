@@ -15,7 +15,7 @@ public:
     void clearCache();
     void afterSourceChanged();
 
-    const HDDCachableCacheHandler& getCacheHandler() const;
+    const HddCachableCacheHandler& getCacheHandler() const;
 
     void addFrameLoader(const int frameId, const stdsptr<VideoFrameLoader>& loader);
     VideoFrameLoader * getFrameLoader(const int frame) const;
@@ -33,7 +33,7 @@ private:
     QList<VideoFrameHandler*> mFrameHandlers;
     QList<int> mFramesBeingLoaded;
     QList<stdsptr<VideoFrameLoader>> mFrameLoaders;
-    HDDCachableCacheHandler mFramesCache;
+    HddCachableCacheHandler mFramesCache;
 };
 
 class VideoFrameHandler : public AnimationFrameHandler {
@@ -54,7 +54,7 @@ public:
     void frameLoaderCanceled(const int frameId);
 
     VideoDataHandler* getDataHandler() const;
-    const HDDCachableCacheHandler& getCacheHandler() const;
+    const HddCachableCacheHandler& getCacheHandler() const;
 protected:
     VideoFrameLoader * getFrameLoader(const int frame);
     VideoFrameLoader * addFrameLoader(const int frameId);

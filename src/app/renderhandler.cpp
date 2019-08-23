@@ -5,7 +5,7 @@
 #include "canvas.h"
 #include "Sound/soundcomposition.h"
 #include "CacheHandlers/soundcachecontainer.h"
-#include "CacheHandlers/imagecachecontainer.h"
+#include "CacheHandlers/sceneframecontainer.h"
 #include "document.h"
 
 RenderHandler* RenderHandler::sInstance = nullptr;
@@ -61,7 +61,7 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
         const auto nextFrameFunc = [this]() {
             nextSaveOutputFrame();
         };
-        TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
+        TaskScheduler::sSetFreeThreadsForCpuTasksAvailableFunc(nextFrameFunc);
         TaskScheduler::sSetAllTasksFinishedFunc(nextFrameFunc);
 
         //fitSceneToSize();
@@ -84,7 +84,7 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
         mCurrentScene->anim_setAbsFrame(mCurrentRenderFrame);
         mCurrentScene->setOutputRendering(true);
         nextCurrentRenderFrame();
-        if(TaskScheduler::sAllQuedCPUTasksFinished()) {
+        if(TaskScheduler::sAllQuedCpuTasksFinished()) {
             nextSaveOutputFrame();
         }
     }
@@ -101,7 +101,7 @@ void RenderHandler::setCurrentScene(Canvas * const scene) {
 }
 
 void RenderHandler::nextCurrentRenderFrame() {
-    auto& cacheHandler = mCurrentScene->getCacheHandler();
+    auto& cacheHandler = mCurrentScene->getSceneFramesHandler();
     int newCurrentRenderFrame = cacheHandler.
             firstEmptyFrameAtOrAfter(mCurrentRenderFrame + 1);
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
@@ -128,7 +128,7 @@ void RenderHandler::renderPreview() {
     const auto nextFrameFunc = [this]() {
         nextPreviewRenderFrame();
     };
-    TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nextFrameFunc);
+    TaskScheduler::sSetFreeThreadsForCpuTasksAvailableFunc(nextFrameFunc);
     TaskScheduler::sSetAllTasksFinishedFunc(nextFrameFunc);
 
     mSavedCurrentFrame = mCurrentScene->getCurrentFrame();
@@ -141,7 +141,7 @@ void RenderHandler::renderPreview() {
     setRenderingPreview(true);
 
     emit previewBeingRendered();
-    if(TaskScheduler::sAllQuedCPUTasksFinished()) {
+    if(TaskScheduler::sAllQuedCpuTasksFinished()) {
         nextPreviewRenderFrame();
     }
 }
@@ -172,7 +172,7 @@ void RenderHandler::interruptPreviewRendering() {
     setRenderingPreview(false);
     TaskScheduler::sClearAllFinishedFuncs();
     clearPreview();
-    auto& cacheHandler = mCurrentScene->getCacheHandler();
+    auto& cacheHandler = mCurrentScene->getSceneFramesHandler();
     cacheHandler.blockConts({mSavedCurrentFrame + 1, mMaxRenderFrame}, false);
     setFrameAction(mSavedCurrentFrame);
     emit previewFinished();
@@ -187,10 +187,10 @@ void RenderHandler::interruptOutputRendering() {
 
 void RenderHandler::stopPreview() {
     setPreviewing(false);
-    auto& cacheHandler = mCurrentScene->getCacheHandler();
+    auto& cacheHandler = mCurrentScene->getSceneFramesHandler();
     cacheHandler.blockConts({mSavedCurrentFrame + 1, mMaxRenderFrame}, false);
     setFrameAction(mSavedCurrentFrame);
-    mCurrentScene->setCurrentPreviewContainer(mSavedCurrentFrame);
+    mCurrentScene->setSceneFrame(mSavedCurrentFrame);
     mPreviewFPSTimer->stop();
     stopAudio();
     emit mCurrentScene->requestUpdate();
@@ -213,7 +213,7 @@ void RenderHandler::resumePreview() {
 
 void RenderHandler::playPreviewAfterAllTasksCompleted() {
     if(mRenderingPreview) {
-        TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nullptr);
+        TaskScheduler::sSetFreeThreadsForCpuTasksAvailableFunc(nullptr);
         Document::sInstance->actionFinished();
         if(TaskScheduler::sAllTasksFinished()) {
             playPreview();
@@ -234,7 +234,7 @@ void RenderHandler::playPreview() {
     if(minPreviewFrame >= maxPreviewFrame) return;
     mMaxPreviewFrame = maxPreviewFrame;
     mCurrentPreviewFrame = minPreviewFrame;
-    mCurrentScene->setCurrentPreviewContainer(mCurrentPreviewFrame);
+    mCurrentScene->setSceneFrame(mCurrentPreviewFrame);
     mCurrentScene->setPreviewing(true);
 
     setRenderingPreview(false);
@@ -271,7 +271,7 @@ void RenderHandler::nextPreviewFrame() {
     if(mCurrentPreviewFrame > mMaxPreviewFrame) {
         clearPreview();
     } else {
-        mCurrentScene->setCurrentPreviewContainer(mCurrentPreviewFrame);
+        mCurrentScene->setSceneFrame(mCurrentPreviewFrame);
         emit mCurrentScene->currentFrameChanged(mCurrentPreviewFrame);
     }
     emit mCurrentScene->requestUpdate();
@@ -312,19 +312,18 @@ void RenderHandler::nextSaveOutputFrame() {
     }
     if(mCurrentEncodeSoundSecond > mMaxSoundSec) VideoEncoder::sAllAudioProvided();
 
-    const auto& cacheHandler = mCurrentScene->getCacheHandler();
+    const auto& cacheHandler = mCurrentScene->getSceneFramesHandler();
     while(mCurrentEncodeFrame <= mMaxRenderFrame) {
         const auto cont = cacheHandler.atFrame(mCurrentEncodeFrame);
         if(!cont) break;
-        VideoEncoder::sAddCacheContainerToEncoder(
-                    cont->ref<ImageCacheContainer>());
+        VideoEncoder::sAddCacheContainerToEncoder(cont->ref<SceneFrameContainer>());
         mCurrentEncodeFrame = cont->getRangeMax() + 1;
     }
 
     //mCurrentScene->renderCurrentFrameToOutput(*mCurrentRenderSettings);
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
         if(mCurrentEncodeSoundSecond <= mMaxSoundSec) return;
-        TaskScheduler::sSetFreeThreadsForCPUTasksAvailableFunc(nullptr);
+        TaskScheduler::sSetFreeThreadsForCpuTasksAvailableFunc(nullptr);
         Document::sInstance->actionFinished();
         if(TaskScheduler::sAllTasksFinished()) {
             finishEncoding();

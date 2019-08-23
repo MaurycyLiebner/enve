@@ -1,11 +1,11 @@
-#ifndef HDDCACHABLECACHEHANDLER_H
-#define HDDCACHABLECACHEHANDLER_H
+#ifndef HddCACHABLECACHEHANDLER_H
+#define HddCACHABLECACHEHANDLER_H
 #include "hddcachablerangecont.h"
 #include "rangemap.h"
 
-class HDDCachableCacheHandler {
+class HddCachableCacheHandler {
 public:
-    typedef HDDCachableRangeCont Cont;
+    typedef HddCachableRangeCont Cont;
 
     void blockConts(const FrameRange &range, const bool blocked);
 
@@ -53,4 +53,4 @@ private:
     RangeMap<stdsptr<Cont>> mConts;
 };
 
-#endif // HDDCACHABLECACHEHANDLER_H
+#endif // HddCACHABLECACHEHANDLER_H

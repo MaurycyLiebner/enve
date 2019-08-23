@@ -1,7 +1,7 @@
 #include "videoencoder.h"
 #include <QByteArray>
 #include "Boxes/boxrendercontainer.h"
-#include "CacheHandlers/imagecachecontainer.h"
+#include "CacheHandlers/sceneframecontainer.h"
 #include "canvas.h"
 
 #define AV_RuntimeThrow(errId, message) \
@@ -23,7 +23,7 @@ VideoEncoder::VideoEncoder() {
     sInstance = this;
 }
 
-void VideoEncoder::addContainer(const stdsptr<ImageCacheContainer>& cont) {
+void VideoEncoder::addContainer(const stdsptr<SceneFrameContainer>& cont) {
     if(!cont) return;
     cont->setBlocked(true);
     mNextContainers.append(cont);
@@ -697,7 +697,7 @@ void VideoEncoder::afterProcessing() {
         const auto &cont = _mContainers.at(i);
         if(i == _mCurrentContainerId - 1) {
             auto currCanvas = mRenderInstanceSettings->getTargetCanvas();
-            currCanvas->setCurrentPreviewContainer(cont);
+            currCanvas->setSceneFrame(cont);
         } else {
             cont->setBlocked(false);
         }
@@ -739,8 +739,7 @@ bool VideoEncoder::sStartEncoding(RenderInstanceSettings *settings) {
     return sInstance->startNewEncoding(settings);
 }
 
-void VideoEncoder::sAddCacheContainerToEncoder(
-        const stdsptr<ImageCacheContainer> &cont) {
+void VideoEncoder::sAddCacheContainerToEncoder(const stdsptr<SceneFrameContainer> &cont) {
     sInstance->addContainer(cont);
 }
 

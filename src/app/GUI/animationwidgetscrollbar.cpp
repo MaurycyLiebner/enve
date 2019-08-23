@@ -81,7 +81,7 @@ void FrameScrollBar::paintEvent(QPaintEvent *) {
         const int soundHeight = MIN_WIDGET_DIM/3;
         const int rasterHeight = MIN_WIDGET_DIM - soundHeight;
         const QRectF rasterRect(x0, 0, w1, rasterHeight);
-        const auto& rasterCache = mCurrentCanvas->getCacheHandler();
+        const auto& rasterCache = mCurrentCanvas->getSceneFramesHandler();
         rasterCache.drawCacheOnTimeline(&p, rasterRect, minFrame, maxFrame);
 
         const qreal fps = mCurrentCanvas->getFps();

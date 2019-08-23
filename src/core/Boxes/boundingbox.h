@@ -182,7 +182,7 @@ public:
             const int relFrame, const bool takeAncestorsIntoAccount = true);
 
     virtual bool shouldScheduleUpdate() { return true; }
-    virtual void queScheduledTasks();
+    virtual void scheduleUpdate();
 
     virtual void writeIdentifier(eWriteStream& dst) const;
 
@@ -366,7 +366,6 @@ protected:
     QList<stdsptr<BoxRenderData>> mScheduledTasks;
     QList<qptr<Property>> mCanvasProps;
 private:
-    void scheduleUpdate();
     void cancelWaitingTasks();
     void afterTotalTransformChanged(const UpdateReason reason);
 signals:

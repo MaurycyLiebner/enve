@@ -6,7 +6,7 @@
 #include <QTemporaryFile>
 #include "skia/skiaincludes.h"
 class SoundCacheContainer;
-class SoundContainerTmpFileDataLoader : public HDDTask {
+class SoundContainerTmpFileDataLoader : public eHddTask {
     e_OBJECT
 public:
     void process();
@@ -21,7 +21,7 @@ protected:
     stdsptr<Samples> mSamples;
 };
 
-class SoundContainerTmpFileDataSaver : public HDDTask {
+class SoundContainerTmpFileDataSaver : public eHddTask {
     e_OBJECT
 public:
     void process();

@@ -2,10 +2,11 @@
 #include "boundingbox.h"
 #include "skia/skiahelpers.h"
 #include "efiltersettings.h"
+#include "Tasks/taskscheduler.h"
 
-BoxRenderData::BoxRenderData(BoundingBox *parentBoxT) :
+BoxRenderData::BoxRenderData(BoundingBox * const parent) :
     fFilterQuality(eFilterSettings::sRender()) {
-    fParentBox = parentBoxT;
+    fParentBox = parent;
 }
 
 void BoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {
@@ -154,7 +155,7 @@ HardwareSupport BoxRenderData::hardwareSupport() const {
 }
 
 void BoxRenderData::scheduleTaskNow() {
-    if(fParentBox) fParentBox->scheduleTask(ref<BoxRenderData>());
+    TaskScheduler::sGetInstance()->scheduleCpuTask(ref<eTask>());
 }
 
 void BoxRenderData::dataSet() {

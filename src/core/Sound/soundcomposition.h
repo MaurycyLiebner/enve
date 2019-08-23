@@ -44,7 +44,7 @@ public:
 
     void scheduleFrameRange(const FrameRange& range);
     SoundMerger * scheduleFrame(const int frameId);
-    HDDCachableCacheHandler& getCacheHandler() {
+    HddCachableCacheHandler& getCacheHandler() {
         return mSecondsCache;
     }
 
@@ -66,7 +66,7 @@ private:
     typedef DynamicComplexAnimator<SingleSound> ContType;
     qsptr<ContType> mSoundsContainer = enve::make_shared<ContType>("sounds");
     QList<qsptr<SingleSound>> mSounds;
-    HDDCachableCacheHandler mSecondsCache;
+    HddCachableCacheHandler mSecondsCache;
 };
 
 #endif // SOUNDCOMPOSITION_H

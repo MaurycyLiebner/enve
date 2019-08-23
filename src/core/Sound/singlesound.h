@@ -7,7 +7,7 @@ class SoundHandler;
 class Samples;
 class SoundReaderForMerger;
 class SoundDataHandler;
-class HDDCachableCacheHandler;
+class HddCachableCacheHandler;
 
 class SingleSound : public eBoxOrSound {
     e_OBJECT
@@ -49,7 +49,7 @@ public:
     SampleRange absSampleRange() const;
     iValueRange absSecondToRelSeconds(const int absSecond);
 
-    const HDDCachableCacheHandler* getCacheHandler() const;
+    const HddCachableCacheHandler* getCacheHandler() const;
 
     bool videoSound() const {
         return !mIndependent;

@@ -4,7 +4,7 @@
 #include <QWidget>
 #include "smartPointers/ememory.h"
 #include "canvas.h"
-class HDDCachableCacheHandler;
+class HddCachableCacheHandler;
 
 class FrameScrollBar : public QWidget {
     Q_OBJECT

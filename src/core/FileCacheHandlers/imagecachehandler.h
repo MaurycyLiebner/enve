@@ -4,7 +4,7 @@
 #include "filecachehandler.h"
 #include "Tasks/updatable.h"
 class ImageDataHandler;
-class ImageLoader : public HDDTask {
+class ImageLoader : public eHddTask {
     e_OBJECT
 protected:
     ImageLoader(const QString &filePath,

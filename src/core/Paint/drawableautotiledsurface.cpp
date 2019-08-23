@@ -114,7 +114,7 @@ private:
 };
 
 
-stdsptr<HDDTask> DrawableAutoTiledSurface::createTmpFileDataSaver() {
+stdsptr<eHddTask> DrawableAutoTiledSurface::createTmpFileDataSaver() {
     const TilesTmpFileDataSaver::Func func =
             [this](const qsptr<QTemporaryFile>& tmpFile) {
         setDataSavedToTmpFile(tmpFile);
@@ -122,7 +122,7 @@ stdsptr<HDDTask> DrawableAutoTiledSurface::createTmpFileDataSaver() {
     return enve::make_shared<TilesTmpFileDataSaver>(mTileBitmaps, func);
 }
 
-stdsptr<HDDTask> DrawableAutoTiledSurface::createTmpFileDataLoader() {
+stdsptr<eHddTask> DrawableAutoTiledSurface::createTmpFileDataLoader() {
     const TilesTmpFileDataLoader::Func func =
             [this](const TileBitmaps& tiles) {
         setTileBitmaps(tiles);

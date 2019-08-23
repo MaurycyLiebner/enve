@@ -18,7 +18,7 @@ extern "C" {
     #include <libavutil/mathematics.h>
     #include <libavutil/opt.h>
 }
-class ImageCacheContainer;
+class SceneFrameContainer;
 
 class SoundIterator {
 public:
@@ -152,7 +152,7 @@ signals:
     void encodingFailed();
 };
 
-//class FrameEncoder : public HDDTask {
+//class FrameEncoder : public HddTask {
 //protected:
 //    FrameEncoder(const stdsptr<ImageCacheContainer>& frame) {
 //        frame->setBlocked(true);
@@ -169,7 +169,7 @@ signals:
 //    const stdsptr<ImageCacheContainer> mFrame;
 //};
 
-class VideoEncoder : public HDDTask {
+class VideoEncoder : public eHddTask {
     e_OBJECT
 protected:
     VideoEncoder();
@@ -193,7 +193,7 @@ public:
         else finishEncodingSuccess();
     }
 
-    void addContainer(const stdsptr<ImageCacheContainer> &cont);
+    void addContainer(const stdsptr<SceneFrameContainer> &cont);
     void addContainer(const stdsptr<Samples> &cont);
     void allAudioProvided();
 
@@ -201,7 +201,7 @@ public:
 
     static void sInterruptEncoding();
     static bool sStartEncoding(RenderInstanceSettings *settings);
-    static void sAddCacheContainerToEncoder(const stdsptr<ImageCacheContainer> &cont);
+    static void sAddCacheContainerToEncoder(const stdsptr<SceneFrameContainer> &cont);
     static void sAddCacheContainerToEncoder(const stdsptr<Samples> &cont);
     static void sAllAudioProvided();
     static void sFinishEncoding();
@@ -233,7 +233,7 @@ protected:
     AVFormatContext *mFormatContext = nullptr;
     const AVOutputFormat *mOutputFormat = nullptr;
     bool mCurrentlyEncoding = false;
-    QList<stdsptr<ImageCacheContainer>> mNextContainers;
+    QList<stdsptr<SceneFrameContainer>> mNextContainers;
     QList<stdsptr<Samples>> mNextSoundConts;
 
     RenderSettings mRenderSettings;
@@ -251,7 +251,7 @@ protected:
     int _mCurrentContainerFrame = 0; // some containers will add multiple frames
     FrameRange _mRenderRange;
 
-    QList<stdsptr<ImageCacheContainer>> _mContainers;
+    QList<stdsptr<SceneFrameContainer>> _mContainers;
     SoundIterator mSoundIterator;
 };
 

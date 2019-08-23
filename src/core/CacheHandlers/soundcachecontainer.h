@@ -3,15 +3,15 @@
 #include "hddcachablerangecont.h"
 #include "CacheHandlers/samples.h"
 
-class SoundCacheContainer : public HDDCachableRangeCont {
+class SoundCacheContainer : public HddCachableRangeCont {
     e_OBJECT
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
 protected:
     SoundCacheContainer(const iValueRange &second,
-                        HDDCachableCacheHandler * const parent);
+                        HddCachableCacheHandler * const parent);
     SoundCacheContainer(const stdsptr<Samples>& samples,
                         const iValueRange &second,
-                        HDDCachableCacheHandler * const parent);
+                        HddCachableCacheHandler * const parent);
 public:
     int getByteCount() {
         if(!mSamples) return 0;
@@ -30,8 +30,8 @@ public:
         afterDataReplaced();
     }
 protected:
-    stdsptr<HDDTask> createTmpFileDataSaver();
-    stdsptr<HDDTask> createTmpFileDataLoader();
+    stdsptr<eHddTask> createTmpFileDataSaver();
+    stdsptr<eHddTask> createTmpFileDataLoader();
     int clearMemory();
 
     stdsptr<Samples> mSamples;

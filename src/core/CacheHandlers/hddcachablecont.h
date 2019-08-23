@@ -1,17 +1,17 @@
-#ifndef HDDCACHABLECONT_H
-#define HDDCACHABLECONT_H
+#ifndef HddCACHABLECONT_H
+#define HddCACHABLECONT_H
 #include "minimalcachecontainer.h"
 #include "tmpfilehandlers.h"
 class eTask;
 
-class HDDCachable : public CacheContainer {
+class HddCachable : public CacheContainer {
 protected:
-    HDDCachable() {}
+    HddCachable() {}
     virtual int clearMemory() = 0;
-    virtual stdsptr<HDDTask> createTmpFileDataSaver() = 0;
-    virtual stdsptr<HDDTask> createTmpFileDataLoader() = 0;
+    virtual stdsptr<eHddTask> createTmpFileDataSaver() = 0;
+    virtual stdsptr<eHddTask> createTmpFileDataLoader() = 0;
 public:
-    ~HDDCachable() {
+    ~HddCachable() {
         if(mTmpFile) scheduleDeleteTmpFile();
     }
 
@@ -79,11 +79,11 @@ private:
     stdsptr<eTask> mSavingUpdatable;
 };
 
-class HDDCachablePersistent : public HDDCachable {
+class HddCachablePersistent : public HddCachable {
 protected:
-    HDDCachablePersistent() {}
+    HddCachablePersistent() {}
 public:
     void noDataLeft_k() final {}
 };
 
-#endif // HDDCACHABLECONT_H
+#endif // HddCACHABLECONT_H

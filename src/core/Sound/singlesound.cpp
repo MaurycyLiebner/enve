@@ -101,7 +101,7 @@ iValueRange SingleSound::absSecondToRelSeconds(const int absSecond) {
     return absSecondToRelSecondsAbsStretch(absSecond);
 }
 
-const HDDCachableCacheHandler *SingleSound::getCacheHandler() const {
+const HddCachableCacheHandler *SingleSound::getCacheHandler() const {
     if(!mCacheHandler) return nullptr;
     return &mCacheHandler->getCacheHandler();
 }

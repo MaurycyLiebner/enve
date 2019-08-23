@@ -175,7 +175,7 @@ void switchSkQ(const float sk, qreal &q) {
 }
 #include <QFont>
 SkFont toSkFont(const QFont &qfont, const int qPPI, const int skPPI) {
-    SkFontStyle::Slant slant;
+    SkFontStyle::Slant slant{SkFontStyle::kUpright_Slant};
     switch(qfont.style()) {
     case QFont::StyleOblique:
         slant = SkFontStyle::kOblique_Slant;

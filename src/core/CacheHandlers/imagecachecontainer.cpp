@@ -4,12 +4,12 @@
 #include "skia/skiahelpers.h"
 
 ImageCacheContainer::ImageCacheContainer(const FrameRange &range,
-                                         HDDCachableCacheHandler * const parent) :
-    HDDCachableRangeCont(range, parent) {}
+                                         HddCachableCacheHandler * const parent) :
+    HddCachableRangeCont(range, parent) {}
 
 ImageCacheContainer::ImageCacheContainer(const sk_sp<SkImage> &img,
                                          const FrameRange &range,
-                                         HDDCachableCacheHandler * const parent) :
+                                         HddCachableCacheHandler * const parent) :
     ImageCacheContainer(range, parent) {
     replaceImageSk(img);
 }
@@ -35,12 +35,6 @@ sk_sp<SkImage> ImageCacheContainer::getImageSk() {
 
 void ImageCacheContainer::setDataLoadedFromTmpFile(const sk_sp<SkImage> &img) {
     replaceImageSk(img);
-
-    if(mTmpLoadTargetCanvas) {
-        mTmpLoadTargetCanvas->setCurrentPreviewContainer(
-                    ref<ImageCacheContainer>());
-        mTmpLoadTargetCanvas = nullptr;
-    }
     afterDataLoadedFromTmpFile();
 }
 
@@ -58,18 +52,14 @@ int ImageCacheContainer::clearMemory() {
     return bytes;
 }
 
-void ImageCacheContainer::setLoadTargetCanvas(Canvas *canvas) {
-    mTmpLoadTargetCanvas = canvas;
-}
-
-stdsptr<HDDTask> ImageCacheContainer::createTmpFileDataSaver() {
+stdsptr<eHddTask> ImageCacheContainer::createTmpFileDataSaver() {
     const ImgTmpFileDataSaver::Func func = [this](qsptr<QTemporaryFile> tmpFile) {
         setDataSavedToTmpFile(tmpFile);
     };
     return enve::make_shared<ImgTmpFileDataSaver>(mImageSk, func);
 }
 
-stdsptr<HDDTask> ImageCacheContainer::createTmpFileDataLoader() {
+stdsptr<eHddTask> ImageCacheContainer::createTmpFileDataLoader() {
     const ImgTmpFileDataLoader::Func func = [this](sk_sp<SkImage> img) {
         setDataLoadedFromTmpFile(img);
     };

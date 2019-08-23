@@ -17,7 +17,7 @@ struct BoxRenderData : public eTask {
 protected:
     enum class Step { BOX_IMAGE, EFFECTS };
 
-    BoxRenderData(BoundingBox *parentBoxT);
+    BoxRenderData(BoundingBox * const parent);
 
     virtual void drawSk(SkCanvas * const canvas) = 0;
     virtual void setupRenderData() {}

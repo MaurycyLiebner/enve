@@ -1,6 +1,6 @@
 #include "hddcachablecachehandler.h"
 
-void HDDCachableCacheHandler::blockConts(
+void HddCachableCacheHandler::blockConts(
         const FrameRange &range, const bool blocked) {
     const auto its = mConts.range(range);
     for(auto it = its.first; it != its.second; it++) {
@@ -9,7 +9,7 @@ void HDDCachableCacheHandler::blockConts(
 }
 
 #include "pointhelpers.h"
-void HDDCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
+void HddCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
                                                   const QRectF& drawRect,
                                                   const int startFrame,
                                                   const int endFrame,

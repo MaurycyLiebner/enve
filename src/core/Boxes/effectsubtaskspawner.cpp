@@ -40,12 +40,12 @@ void EffectSubTaskSpawner_priv::splitSpawn(CpuRenderData& data,
     if(nSplits == 0) return;
     if(nSplits == 1) {
         data.fTexTile = rect;
-        const auto subTask = enve::make_shared<CustomCPUTask>(nullptr,
+        const auto subTask = enve::make_shared<eCustomCpuTask>(nullptr,
             [this, data]() {
                 CpuRenderTools tools(mSrcBitmap, mDstBitmap);
                 mEffectCaller->processCpu(tools, data);
             }, [this]() { decRemaining_k(); });
-        TaskScheduler::sGetInstance()->scheduleCPUTask(subTask);
+        TaskScheduler::sGetInstance()->scheduleCpuTask(subTask);
         return;
     }
 
@@ -101,7 +101,7 @@ void EffectSubTaskSpawner_priv::decRemaining_k() {
     if(mData->getState() != eTaskState::canceled) {
         mData->fRenderedImage = SkiaHelpers::transferDataToSkImage(mDstBitmap);
         if(mData->nextStep()) {
-            TaskScheduler::sGetInstance()->scheduleCPUTask(mData);
+            TaskScheduler::sGetInstance()->queCpuTaskFastTrack(mData);
         } else mData->finishedProcessing();
     }
     delete this;

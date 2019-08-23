@@ -4,8 +4,8 @@
 #include "Tasks/updatable.h"
 #include "Tasks/gpupostprocessor.h"
 class Canvas;
-class CPUExecController;
-class HDDExecController;
+class CpuExecController;
+class HddExecController;
 class ExecController;
 
 class Que {
@@ -114,6 +114,17 @@ public:
         mCurrentQue->addTask(task);
     }
 
+    void addTaskFastTrack(const stdsptr<eTask>& task) {
+        if(mCurrentQue) {
+            addTask(task);
+        } else {
+            if(mQues.isEmpty()) beginQue();
+            else mCurrentQue = mQues.first().get();
+            addTask(task);
+            endQue();
+        }
+    }
+
     void endQue() {
         if(!mCurrentQue) return;
         if(mCurrentQue->allDone()) mQues.removeLast();
@@ -137,9 +148,9 @@ public:
     static TaskScheduler* sInstance;
 
     static TaskScheduler * sGetInstance() { return sInstance; }
-    static void sSetFreeThreadsForCPUTasksAvailableFunc(
+    static void sSetFreeThreadsForCpuTasksAvailableFunc(
             const std::function<void(void)>& func) {
-        sInstance->setFreeThreadsForCPUTasksAvailableFunc(func);
+        sInstance->setFreeThreadsForCpuTasksAvailableFunc(func);
     }
 
     static void sSetAllTasksFinishedFunc(
@@ -147,27 +158,27 @@ public:
         sInstance->setAllTasksFinishedFunc(func);
     }
     static void sClearAllFinishedFuncs() {
-        sSetFreeThreadsForCPUTasksAvailableFunc(nullptr);
+        sSetFreeThreadsForCpuTasksAvailableFunc(nullptr);
         sSetAllTasksFinishedFunc(nullptr);
     }
 
     static bool sAllTasksFinished() {
         return sInstance->allQuedTasksFinished();
     }
-    static bool sAllQuedCPUTasksFinished() {
-        return sInstance->allQuedCPUTasksFinished();
+    static bool sAllQuedCpuTasksFinished() {
+        return sInstance->allQuedCpuTasksFinished();
     }
 
-    static bool sCPUTasksBeingProcessed() {
-        return sInstance->CPUTasksBeingProcessed();
+    static bool sCpuTasksBeingProcessed() {
+        return sInstance->cpuTasksBeingProcessed();
     }
 
-    static bool sHDDTasksBeingProcessed() {
-        return sInstance->HDDTaskBeingProcessed();
+    static bool sHddTasksBeingProcessed() {
+        return sInstance->hddTaskBeingProcessed();
     }
 
-    static bool sAllQuedHDDTasksFinished() {
-        return sInstance->allQuedHDDTasksFinished();
+    static bool sAllQuedHddTasksFinished() {
+        return sInstance->allQuedHddTasksFinished();
     }
 
     static void sClearTasks() {
@@ -177,43 +188,43 @@ public:
     void initializeGpu();
 
     void queTasks();
-    void queCPUTask(const stdsptr<eTask> &task);
+    void queCpuTaskFastTrack(const stdsptr<eTask>& task);
 
-    void scheduleCPUTask(const stdsptr<eTask> &task);
-    void scheduleHDDTask(const stdsptr<eTask> &task);
-    void scheduleGPUTask(const stdsptr<eTask>& task);
+    void scheduleCpuTask(const stdsptr<eTask> &task);
+    void scheduleHddTask(const stdsptr<eTask> &task);
+    void scheduleGpuTask(const stdsptr<eTask>& task);
 
     void clearTasks() {
-        for(const auto& cpuTask : mScheduledCPUTasks)
+        for(const auto& cpuTask : mScheduledCpuTasks)
             cpuTask->cancel();
-        mScheduledCPUTasks.clear();
+        mScheduledCpuTasks.clear();
 
-        for(const auto& hddTask : mScheduledHDDTasks)
+        for(const auto& hddTask : mScheduledHddTasks)
             hddTask->cancel();
-        mScheduledHDDTasks.clear();
+        mScheduledHddTasks.clear();
 
-        mQuedCPUTasks.clear();
+        mQuedCpuTasks.clear();
 
-        for(const auto& hddTask : mQuedHDDTasks)
+        for(const auto& hddTask : mQuedHddTasks)
             hddTask->cancel();
-        mQuedHDDTasks.clear();
+        mQuedHddTasks.clear();
 
         mGpuPostProcessor.clear();
 
         callAllTasksFinishedFunc();
     }
 
-    void switchToBackupHDDExecutor();
+    void switchToBackupHddExecutor();
 
-    void afterHDDTaskFinished(const stdsptr<eTask>& finishedTask,
+    void afterHddTaskFinished(const stdsptr<eTask>& finishedTask,
                               ExecController * const controller);
 
-    void afterCPUTaskFinished(const stdsptr<eTask>& task,
+    void afterCpuTaskFinished(const stdsptr<eTask>& task,
                               ExecController * const controller);
 
-    void setFreeThreadsForCPUTasksAvailableFunc(
+    void setFreeThreadsForCpuTasksAvailableFunc(
             const std::function<void(void)>& func) {
-        mFreeThreadsForCPUTasksAvailableFunc = func;
+        mFreeThreadsForCpuTasksAvailableFunc = func;
     }
 
     void setAllTasksFinishedFunc(
@@ -222,63 +233,66 @@ public:
     }
 
     bool allQuedTasksFinished() const {
-        return allQuedCPUTasksFinished() &&
-               allQuedHDDTasksFinished() &&
-               allQuedGPUTasksFinished();
+        return allQuedCpuTasksFinished() &&
+               allQuedHddTasksFinished() &&
+               allQuedGpuTasksFinished();
     }
 
-    bool allQuedGPUTasksFinished() const {
-        return mGpuPostProcessor.hasFinished();
+    bool allQuedGpuTasksFinished() const {
+        return mGpuPostProcessor.allDone();
     }
 
-    bool allQuedCPUTasksFinished() const {
-        return !CPUTasksBeingProcessed() && mQuedCPUTasks.isEmpty();
+    bool allQuedCpuTasksFinished() const {
+        return !cpuTasksBeingProcessed() && mQuedCpuTasks.isEmpty();
     }
 
-    bool allQuedHDDTasksFinished() const {
-        return !HDDTaskBeingProcessed() && mQuedHDDTasks.isEmpty();
+    bool allQuedHddTasksFinished() const {
+        return !hddTaskBeingProcessed() && mQuedHddTasks.isEmpty();
     }
 
-    bool CPUTasksBeingProcessed() const {
-        return busyCPUThreads() > 0;
+    bool cpuTasksBeingProcessed() const {
+        return busyCpuThreads() > 0;
     }
 
-    bool HDDTaskBeingProcessed() const {
-        return busyHDDThreads() > 0;
+    bool hddTaskBeingProcessed() const {
+        return busyHddThreads() > 0;
     }
 
-    int busyHDDThreads() const {
-        const int totalThreads = mHDDExecs.count();
-        const int freeBackup = mFreeBackupHDDExecs.count();
-        const int freeMain = mHDDThreadBusy ? 0 : 1;
+    int busyHddThreads() const {
+        const int totalThreads = mHddExecs.count();
+        const int freeBackup = mFreeBackupHddExecs.count();
+        const int freeMain = mHddThreadBusy ? 0 : 1;
         return totalThreads - freeBackup - freeMain;
     }
 
-    int busyCPUThreads() const {
-        return mCPUExecutors.count() - mFreeCPUExecs.count();
+    int busyCpuThreads() const {
+        return mCpuExecutors.count() - mFreeCpuExecs.count();
     }
+
+    void afterCpuGpuTaskFinished();
 signals:
     void finishedAllQuedTasks() const;
     void hddUsageChanged(bool);
     void gpuUsageChanged(bool);
     void cpuUsageChanged(int);
 private:
-    void queScheduledCPUTasks();
-    void queScheduledHDDTasks();
+    void queCpuTask(const stdsptr<eTask> &task);
+    void queScheduledCpuTasks();
+    void queScheduledHddTasks();
 
-    void processNextQuedHDDTask();
-    void processNextQuedCPUTask();
-    bool processNextQuedGPUTask();
+    void processNextQuedHddTask();
+    void processNextQuedCpuTask();
+    bool processNextQuedGpuTask();
     void processNextTasks();
 
-    void tryProcessingNextQuedHDDTask();
+    void tryProcessingNextQuedHddTask();
 
-    bool shouldQueMoreCPUTasks() const;
-    bool shouldQueMoreHDDTasks() const;
+    bool shouldQueMoreCpuTasks() const;
+    bool shouldQueMoreHddTasks() const;
 
-    void callFreeThreadsForCPUTasksAvailableFunc() const {
-        if(mFreeThreadsForCPUTasksAvailableFunc) {
-            mFreeThreadsForCPUTasksAvailableFunc();
+    void callFreeThreadsForCpuTasksAvailableFunc() const {
+        if(mFreeThreadsForCpuTasksAvailableFunc) {
+            mFreeThreadsForCpuTasksAvailableFunc();
         }
     }
 
@@ -291,25 +305,25 @@ private:
         }
     }
 
-    bool mHDDThreadBusy = false;
+    bool mHddThreadBusy = false;
 
-    bool mCPUQueing = false;
-    QueHandler mQuedCPUTasks;
+    bool mCpuQueing = false;
+    QueHandler mQuedCpuTasks;
 
-    QList<stdsptr<eTask>> mScheduledCPUTasks;
-    QList<stdsptr<eTask>> mScheduledHDDTasks;
-    QList<stdsptr<eTask>> mQuedHDDTasks;
+    QList<stdsptr<eTask>> mScheduledCpuTasks;
+    QList<stdsptr<eTask>> mScheduledHddTasks;
+    QList<stdsptr<eTask>> mQuedHddTasks;
 
-    HDDExecController *createNewBackupHDDExecutor();
+    HddExecController *createNewBackupHddExecutor();
 
-    HDDExecController *mHDDExecutor = nullptr;
-    QList<HDDExecController*> mFreeBackupHDDExecs;
-    QList<HDDExecController*> mHDDExecs;
+    HddExecController *mHddExecutor = nullptr;
+    QList<HddExecController*> mFreeBackupHddExecs;
+    QList<HddExecController*> mHddExecs;
 
-    QList<CPUExecController*> mFreeCPUExecs;
-    QList<CPUExecController*> mCPUExecutors;
+    QList<CpuExecController*> mFreeCpuExecs;
+    QList<CpuExecController*> mCpuExecutors;
 
-    std::function<void(void)> mFreeThreadsForCPUTasksAvailableFunc;
+    std::function<void(void)> mFreeThreadsForCpuTasksAvailableFunc;
     std::function<void(void)> mAllTasksFinishedFunc;
 
     GpuPostProcessor mGpuPostProcessor;
