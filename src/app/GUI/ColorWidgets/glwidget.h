@@ -12,7 +12,7 @@ public:
     ~GLWidget() {
         if(mPlainSquareVAO) {
             makeCurrent();
-            glDeleteBuffers(1, &mPlainSquareVAO);
+            glDeleteVertexArrays(1, &mPlainSquareVAO);
             doneCurrent();
         }
     }
