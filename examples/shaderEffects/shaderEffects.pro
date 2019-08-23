@@ -1,9 +1,9 @@
 TEMPLATE = subdirs
 
 DISTFILES += \
-    brightnesscontrast.gre \
-    brightnesscontrast.frag \
-    dots.gre \
-    dots.frag \
-    explode.gre \
-    explode.frag
+    eBrightnessContrast.gre \
+    eBrightnessContrast.frag \
+    eDots.gre \
+    eDots.frag \
+    eExplode.gre \
+    eExplode.frag

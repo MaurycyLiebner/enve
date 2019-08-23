@@ -1,4 +1,4 @@
-<ShaderEffect name="explode">
+<ShaderEffect name="eExplode">
 	<Animator name="displacement" type="float" glValue="false" min="0." max="999." step="1." ini="10."/>
 	<Animator name="steps" type="int" glValue="true" min="1" max="99" step="1" ini="1"/>
 	<Animator name="directions" type="int" glValue="true" min="1" max="99" step="1" ini="6"/>
