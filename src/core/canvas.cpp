@@ -70,6 +70,8 @@ qreal Canvas::getResolutionFraction() {
 
 void Canvas::setResolutionFraction(const qreal percent) {
     mResolutionFraction = percent;
+    prp_afterWholeInfluenceRangeChanged();
+    updateAllBoxes(UpdateReason::userChange);
 }
 
 void Canvas::setCurrentGroupParentAsCurrentGroup() {

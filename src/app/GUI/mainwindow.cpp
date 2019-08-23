@@ -479,19 +479,19 @@ void MainWindow::setupMenuBar() {
     mClipViewToCanvas->setCheckable(true);
     mClipViewToCanvas->setChecked(true);
     mClipViewToCanvas->setShortcut(QKeySequence(Qt::Key_C));
-    connect(mClipViewToCanvas, &QAction::toggled,
+    connect(mClipViewToCanvas, &QAction::triggered,
             &mActions, &Actions::setClipToCanvas);
 
     mRasterEffectsVisible = mViewMenu->addAction("Raster Effects");
     mRasterEffectsVisible->setCheckable(true);
     mRasterEffectsVisible->setChecked(true);
-    connect(mRasterEffectsVisible, &QAction::toggled,
+    connect(mRasterEffectsVisible, &QAction::triggered,
             &mActions, &Actions::setRasterEffectsVisible);
 
     mPathEffectsVisible = mViewMenu->addAction("Path Effects");
     mPathEffectsVisible->setCheckable(true);
     mPathEffectsVisible->setChecked(true);
-    connect(mPathEffectsVisible, &QAction::toggled,
+    connect(mPathEffectsVisible, &QAction::triggered,
             &mActions, &Actions::setPathEffectsVisible);
 
 
@@ -575,7 +575,6 @@ void MainWindow::updateSettingsForCurrentCanvas(Canvas* const scene) {
     mObjectSettingsWidget->setCurrentScene(scene);
     if(!scene) {
         mObjectSettingsWidget->setMainTarget(nullptr);
-        //mBrushSettingsWidget->setCurrentBrush(nullptr);
         mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(nullptr);
         return;
     }
@@ -584,7 +583,6 @@ void MainWindow::updateSettingsForCurrentCanvas(Canvas* const scene) {
     mPathEffectsVisible->setChecked(scene->getPathEffectsVisible());
     mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(scene);
     mObjectSettingsWidget->setMainTarget(scene->getCurrentGroup());
-//    mBrushSettingsWidget->setCurrentBrush(canvas->getCurrentBrush());
 }
 
 #include <QSpacerItem>
@@ -771,6 +769,7 @@ void MainWindow::updateCanvasModeButtonsChecked() {
 void MainWindow::setResolutionFractionValue(const qreal value) {
     if(!mDocument.fActiveScene) return;
     mDocument.fActiveScene->setResolutionFraction(value);
+    mDocument.actionFinished();
 }
 
 void MainWindow::setFileChangedSinceSaving(const bool changed) {

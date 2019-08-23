@@ -247,7 +247,7 @@ void QrealAnimatorValueSlider::openContextMenu(
     QAction * const recAct = menu.addAction("Recording");
     recAct->setCheckable(true);
     recAct->setChecked(aTarget->anim_isRecording());
-    connect(recAct, &QAction::toggled,
+    connect(recAct, &QAction::triggered,
             aTarget, &Animator::anim_setRecording);
 
     QAction * const selectedAction = menu.exec(globalPos);
