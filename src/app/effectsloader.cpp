@@ -8,6 +8,41 @@
 
 EffectsLoader::EffectsLoader() {}
 
+EffectsLoader::~EffectsLoader() {
+    makeCurrent();
+    glDeleteBuffers(1, &GL_PLAIN_SQUARE_VBO);
+    glDeleteVertexArrays(1, &mPlainSquareVAO);
+    glDeleteBuffers(1, &GL_TEXTURED_SQUARE_VBO);
+    glDeleteVertexArrays(1, &mTexturedSquareVAO);
+
+    glUseProgram(0);
+
+    glDeleteProgram(HUE_PROGRAM.fID);
+    glDeleteProgram(HSV_SATURATION_PROGRAM.fID);
+    glDeleteProgram(VALUE_PROGRAM.fID);
+
+    glDeleteProgram(HSL_SATURATION_PROGRAM.fID);
+    glDeleteProgram(LIGHTNESS_PROGRAM.fID);
+
+    glDeleteProgram(RED_PROGRAM.fID);
+    glDeleteProgram(GREEN_PROGRAM.fID);
+    glDeleteProgram(BLUE_PROGRAM.fID);
+
+    glDeleteProgram(ALPHA_PROGRAM.fID);
+
+    glDeleteProgram(PLAIN_PROGRAM.fID);
+
+    glDeleteProgram(GRADIENT_PROGRAM.fID);
+
+    glDeleteProgram(BORDER_PROGRAM.fID);
+    glDeleteProgram(DOUBLE_BORDER_PROGRAM.fID);
+
+    for(const auto& shaderEffect : ShaderEffectCreator::sEffectCreators)
+        glDeleteProgram(shaderEffect->fProgram.fId);
+
+    doneCurrent();
+}
+
 void EffectsLoader::initialize() {
     OffscreenQGL33c::initialize();
     try {

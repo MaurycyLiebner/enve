@@ -9,6 +9,7 @@ class EffectsLoader : public QObject, protected OffscreenQGL33c {
     Q_OBJECT
 public:
     EffectsLoader();
+    ~EffectsLoader();
 
     void initialize();
 signals:
