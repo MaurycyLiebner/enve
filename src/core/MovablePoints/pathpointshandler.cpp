@@ -1,14 +1,10 @@
 #include "pathpointshandler.h"
 #include "Animators/SmartPath/smartpathanimator.h"
 #include "Animators/SmartPath/smartpathcollection.h"
-#include "PropertyUpdaters/smartnodepointupdater.h"
 
 PathPointsHandler::PathPointsHandler(
         SmartPathAnimator * const targetAnimator) :
-    mTargetAnimator(targetAnimator) {
-    const auto updater = enve::make_shared<SmartNodePointUpdater>(this);
-    mTargetAnimator->prp_setOwnUpdater(updater);
-}
+    mTargetAnimator(targetAnimator) {}
 
 SmartNodePoint *PathPointsHandler::createNewNodePoint(const int nodeId) {
     const auto newPt = enve::make_shared<SmartNodePoint>(this, mTargetAnimator);

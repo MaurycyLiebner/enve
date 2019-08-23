@@ -52,7 +52,7 @@ public:
     void setGradientType(const GradientType type) {
         if(mGradientType == type) return;
         mGradientType = type;
-        prp_callFinishUpdater();
+        prp_afterWholeInfluenceRangeChanged();
     }
 private:
     GradientType mGradientType = GradientType::LINEAR;

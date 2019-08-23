@@ -10,7 +10,6 @@ class MainWindow;
 class ComplexAnimator;
 class Key;
 class QPainter;
-class PropertyUpdater;
 class UndoRedoStack;
 class BasicTransformAnimator;
 class BoxTransformAnimator;
@@ -23,6 +22,11 @@ enum class CanvasMode : short {
     circleCreate,
     rectCreate,
     textCreate
+};
+
+enum class UpdateReason {
+    frameChange,
+    userChange
 };
 
 class eDraggedObjects {
@@ -158,8 +162,6 @@ public:
 
     virtual void prp_afterChangedAbsRange(const FrameRange &range,
                                           const bool clip = true);
-protected:
-    virtual void prp_setUpdater(const stdsptr<PropertyUpdater>& updater);
 public:
     bool SWT_isProperty() const { return true; }
 
@@ -182,9 +184,6 @@ public:
     const QString &prp_getName() const;
     void prp_setName(const QString &newName);
 
-    void prp_setOwnUpdater(const stdsptr<PropertyUpdater> &updater);
-    void prp_setInheritedUpdater(const stdsptr<PropertyUpdater> &updater);
-
     bool prp_differencesBetweenRelFrames(const int frame1,
                                          const int frame2) const {
         return !prp_getIdenticalRelRange(frame1).inRange(frame2);
@@ -196,10 +195,6 @@ public:
 
     virtual FrameRange prp_relInfluenceRange() const {
         return {FrameRange::EMIN, FrameRange::EMAX};
-    }
-
-    PropertyUpdater *prp_getUpdater() const {
-        return prp_mUpdater.get();
     }
 
     //
@@ -236,21 +231,19 @@ public:
         return mPointsHandler.get();
     }
 protected:
-    void prp_callUpdater();
-    void prp_callFinishUpdater();
     void enabledDrawingOnCanvas();
     void setPointsHandler(const stdsptr<PointsHandler>& handler);
 signals:
+    void prp_finishedChange();
+    void prp_currentFrameChanged(const UpdateReason reason);
     void prp_absFrameRangeChanged(const FrameRange &range,
                                   const bool clip);
     void prp_replaceWith(const qsptr<Property>&, const qsptr<Property>&);
     void prp_prependWith(Property*, const qsptr<Property>&);
     void prp_nameChanged(const QString&);
 protected:
-    bool prp_mOwnUpdater = false;
     bool mDrawOnCanvas = false;
     int prp_mInheritedFrameShift = 0;
-    stdsptr<PropertyUpdater> prp_mUpdater;
     QString prp_mName;
     stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;
     qptr<Property> mParent_k;

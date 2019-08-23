@@ -3,7 +3,6 @@
 #include <QPainter>
 #include "complexanimator.h"
 #include "key.h"
-#include "PropertyUpdaters/propertyupdater.h"
 #include "qrealpoint.h"
 #include "simplemath.h"
 
@@ -64,7 +63,8 @@ int Animator::anim_getNextKeyRelFrame(const int relFrame) const {
 }
 
 void Animator::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) {
-    if(range.inRange(anim_mCurrentAbsFrame)) prp_callUpdater();
+    if(range.inRange(anim_mCurrentAbsFrame))
+        emit prp_currentFrameChanged(UpdateReason::userChange);
     emit prp_absFrameRangeChanged(range, clip);
 }
 
@@ -210,10 +210,6 @@ void Animator::anim_coordinateKeysWith(Animator * const other) {
 
 void Animator::anim_deleteCurrentKey() {
     if(anim_mKeyOnCurrentFrame) anim_mKeyOnCurrentFrame->deleteKey();
-}
-
-void Animator::anim_callFrameChangeUpdater() {
-    if(prp_mUpdater) prp_mUpdater->frameChangeUpdate();
 }
 
 void Animator::anim_updateAfterShifted() {

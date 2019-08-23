@@ -1,5 +1,4 @@
 #include "MovablePoints/boxpathpoint.h"
-#include "PropertyUpdaters/transformupdater.h"
 #include "qrealanimator.h"
 #include "transformanimator.h"
 #include "qpointfanimator.h"
@@ -21,6 +20,9 @@ BasicTransformAnimator::BasicTransformAnimator() :
     ca_addChild(mPosAnimator);
     ca_addChild(mRotAnimator);
     ca_addChild(mScaleAnimator);
+
+    connect(this, &Property::prp_currentFrameChanged,
+            this, &BasicTransformAnimator::updateRelativeTransform);
 }
 
 void BasicTransformAnimator::resetScale() {

@@ -135,14 +135,6 @@ SOURCES += \
     PathEffects/sumpatheffect.cpp \
     PathEffects/zigzagpatheffect.cpp \
     Properties/boxtargetproperty.cpp \
-    PropertyUpdaters/animationboxframeupdater.cpp \
-    PropertyUpdaters/boxpathpointupdater.cpp \
-    PropertyUpdaters/displayedfillstrokesettingsupdater.cpp \
-    PropertyUpdaters/gradientupdater.cpp \
-    PropertyUpdaters/groupallpathsupdater.cpp \
-    PropertyUpdaters/nodepointupdater.cpp \
-    PropertyUpdaters/pixmapeffectupdater.cpp \
-    PropertyUpdaters/strokewidthupdater.cpp \
     RasterEffects/customrastereffect.cpp \
     RasterEffects/rastereffect.cpp \
     RasterEffects/rastereffectcaller.cpp \
@@ -199,9 +191,6 @@ SOURCES += \
     Animators/intanimator.cpp \
     Animators/key.cpp \
     Animators/boolanimator.cpp \
-    PropertyUpdaters/propertyupdater.cpp \
-    PropertyUpdaters/transformupdater.cpp \
-    PropertyUpdaters/smartnodepointupdater.cpp \
     undoredo.cpp \
     exceptions.cpp \
     glhelpers.cpp \
@@ -354,14 +343,6 @@ HEADERS += \
     PathEffects/sumpatheffect.h \
     PathEffects/zigzagpatheffect.h \
     Properties/boxtargetproperty.h \
-    PropertyUpdaters/animationboxframeupdater.h \
-    PropertyUpdaters/boxpathpointupdater.h \
-    PropertyUpdaters/displayedfillstrokesettingsupdater.h \
-    PropertyUpdaters/gradientupdater.h \
-    PropertyUpdaters/groupallpathsupdater.h \
-    PropertyUpdaters/nodepointupdater.h \
-    PropertyUpdaters/pixmapeffectupdater.h \
-    PropertyUpdaters/strokewidthupdater.h \
     RasterEffects/customrastereffect.h \
     RasterEffects/rastereffect.h \
     RasterEffects/customrastereffectcreator.h \
@@ -423,9 +404,6 @@ HEADERS += \
     Animators/animator.h \
     Animators/intanimator.h \
     Animators/boolanimator.h \
-    PropertyUpdaters/propertyupdater.h \
-    PropertyUpdaters/transformupdater.h \
-    PropertyUpdaters/smartnodepointupdater.h \
     undoredo.h \
     exceptions.h \
     glhelpers.h \

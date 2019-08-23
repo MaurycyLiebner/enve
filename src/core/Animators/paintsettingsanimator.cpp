@@ -1,7 +1,6 @@
 #include "paintsettingsanimator.h"
 #include "undoredo.h"
 #include "colorhelpers.h"
-#include "PropertyUpdaters/displayedfillstrokesettingsupdater.h"
 #include "skia/skqtconversions.h"
 #include "skia/skiaincludes.h"
 #include "Boxes/pathbox.h"
@@ -29,8 +28,6 @@ PaintSettingsAnimator::PaintSettingsAnimator(
     mPaintType = paintTypeT;
     setGradientVar(gradientT);
     setGradientPoints(grdPts);
-
-    prp_setOwnUpdater(enve::make_shared<DisplayedFillStrokeSettingsUpdater>(parent));
 }
 
 void PaintSettingsAnimator::writeProperty(eWriteStream& dst) const {
@@ -76,7 +73,7 @@ void PaintSettingsAnimator::setGradientVar(Gradient* const grad) {
     }
     mGradient = grad;
 
-    prp_callFinishUpdater();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 QColor PaintSettingsAnimator::getColor() const {
@@ -121,7 +118,7 @@ void PaintSettingsAnimator::setPaintType(const PaintType paintType) {
     mPaintType = paintType;
     mTarget_k->updateDrawGradients();
     mTarget_k->requestGlobalFillStrokeUpdateIfSelected();
-    prp_callFinishUpdater();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 ColorAnimator *PaintSettingsAnimator::getColorAnimator() {

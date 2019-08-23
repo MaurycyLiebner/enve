@@ -1,5 +1,5 @@
 #include "outlinesettingsanimator.h"
-#include "PropertyUpdaters/strokewidthupdater.h"
+#include "Boxes/pathbox.h"
 
 OutlineSettingsAnimator::OutlineSettingsAnimator(GradientPoints * const grdPts,
                                                  PathBox * const parent) :
@@ -16,7 +16,8 @@ OutlineSettingsAnimator::OutlineSettingsAnimator(
                           color, paintType, gradient) {
 
     ca_addChild(mLineWidth);
-    mLineWidth->prp_setOwnUpdater(enve::make_shared<StrokeWidthUpdater>(parent));
+    connect(mLineWidth.get(), &Property::prp_currentFrameChanged,
+            parent, &PathBox::setOutlinePathOutdated);
 }
 
 void OutlineSettingsAnimator::writeProperty(eWriteStream& dst) const {
@@ -45,12 +46,12 @@ void OutlineSettingsAnimator::setCurrentStrokeWidth(const qreal newWidth) {
 
 void OutlineSettingsAnimator::setCapStyle(const SkPaint::Cap capStyle) {
     mCapStyle = capStyle;
-    prp_callFinishUpdater();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void OutlineSettingsAnimator::setJoinStyle(const SkPaint::Join joinStyle) {
     mJoinStyle = joinStyle;
-    prp_callFinishUpdater();
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 void OutlineSettingsAnimator::setStrokerSettingsSk(SkStroke * const stroker) {

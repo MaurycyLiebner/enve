@@ -5,7 +5,6 @@
 #include "PathEffects/patheffect.h"
 #include "PathEffects/patheffectanimators.h"
 #include "canvas.h"
-#include "PropertyUpdaters/nodepointupdater.h"
 #include "Animators/transformanimator.h"
 #include "paintsettingsapplier.h"
 #include "Animators/gradient.h"
@@ -14,31 +13,37 @@
 
 PathBox::PathBox(const eBoxType type) : BoundingBox(type) {
     connect(this, &eBoxOrSound::parentChanged,
-            this, &PathBox::setPathsOutdated);
+            this, [this]() {
+        setPathsOutdated(UpdateReason::userChange);
+    });
 
-    mPathEffectsAnimators =
-            enve::make_shared<PathEffectAnimators>();
+    mPathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
     mPathEffectsAnimators->prp_setName("path effects");
-    mPathEffectsAnimators->prp_setOwnUpdater(
-                enve::make_shared<NodePointUpdater>(this));
+    connect(mPathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
+            this, [this](const UpdateReason reason) {
+        setPathsOutdated(reason);
+    });
 
-    mFillPathEffectsAnimators =
-            enve::make_shared<PathEffectAnimators>();
+    mFillPathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
     mFillPathEffectsAnimators->prp_setName("fill effects");
-    mFillPathEffectsAnimators->prp_setOwnUpdater(
-                enve::make_shared<NodePointUpdater>(this));
+    connect(mFillPathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
+            this, [this](const UpdateReason reason) {
+        setFillPathOutdated(reason);
+    });
 
-    mOutlineBasePathEffectsAnimators =
-            enve::make_shared<PathEffectAnimators>();
+    mOutlineBasePathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
     mOutlineBasePathEffectsAnimators->prp_setName("outline base effects");
-    mOutlineBasePathEffectsAnimators->prp_setOwnUpdater(
-                enve::make_shared<NodePointUpdater>(this));
+    connect(mOutlineBasePathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
+            this, [this](const UpdateReason reason) {
+        setOutlinePathOutdated(reason);
+    });
 
-    mOutlinePathEffectsAnimators =
-            enve::make_shared<PathEffectAnimators>();
+    mOutlinePathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
-    mOutlinePathEffectsAnimators->prp_setOwnUpdater(
-                enve::make_shared<NodePointUpdater>(this));
+    connect(mOutlineBasePathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
+            this, [this](const UpdateReason reason) {
+        setOutlinePathOutdated(reason);
+    });
 
     mStrokeGradientPoints = enve::make_shared<GradientPoints>(this);
     mFillGradientPoints = enve::make_shared<GradientPoints>(this);
@@ -118,6 +123,8 @@ void PathBox::setupRenderData(const qreal relFrame,
             currentPathCompatible = !differenceInPathBetweenFrames(prevFrame, nextFrame);
             if(currentPathCompatible && !mCurrentOutlinePathOutdated) {
                 currentOutlinePathCompatible = !differenceInOutlinePathBetweenFrames(prevFrame, nextFrame);
+            }
+            if(currentPathCompatible && !mCurrentFillPathOutdated) {
                 currentFillPathCompatible = !differenceInFillPathBetweenFrames(prevFrame, nextFrame);
             }
         }

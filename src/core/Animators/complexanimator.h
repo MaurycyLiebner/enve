@@ -12,7 +12,6 @@ class ComplexAnimator : public Animator {
     Q_OBJECT
 protected:
     ComplexAnimator(const QString& name);
-    void prp_setUpdater(const stdsptr<PropertyUpdater> &updater);
 public:
     stdsptr<Key> createKey() final {
         return nullptr;

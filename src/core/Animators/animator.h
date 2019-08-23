@@ -181,11 +181,6 @@ private:
     QList<OverlappingKeys> mList;
 };
 
-enum class UpdateReason {
-    frameChange,
-    userChange
-};
-
 class Animator : public Property {
     Q_OBJECT
     friend class OverlappingKeys;
@@ -280,8 +275,6 @@ public:
 
     bool anim_hasPrevKey(const Key * const key);
     bool anim_hasNextKey(const Key * const key);
-
-    void anim_callFrameChangeUpdater();
 
     void anim_addAllKeysToComplexAnimator(ComplexAnimator *target);
 

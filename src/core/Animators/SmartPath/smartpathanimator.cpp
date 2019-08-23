@@ -9,7 +9,12 @@ SmartPathAnimator::SmartPathAnimator() :
     pathChanged([this]() { pathChangedExec(); }),
     cancelPathChange([this]() { cancelPathChangeExec(); }),
     finishPathChange([this]() { finishPathChangeExec(); }) {
-    setPointsHandler(enve::make_shared<PathPointsHandler>(this));
+    const auto ptsHandler = enve::make_shared<PathPointsHandler>(this);
+    QObject::connect(this, &Property::prp_currentFrameChanged,
+                     this, [ptsHandler] {
+        ptsHandler->updateAllPoints();
+    });
+    setPointsHandler(ptsHandler);
 }
 
 SmartPathAnimator::SmartPathAnimator(const SkPath &path) :

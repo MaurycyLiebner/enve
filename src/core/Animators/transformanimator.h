@@ -105,7 +105,7 @@ protected:
     qsptr<QPointFAnimator> mScaleAnimator;
     qsptr<QrealAnimator> mRotAnimator;
 signals:
-    void totalTransformChanged(const UpdateReason );
+    void totalTransformChanged(const UpdateReason);
 };
 
 class BoxTransformAnimator : public BasicTransformAnimator {

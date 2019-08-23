@@ -7,15 +7,12 @@
 #include "skia/skqtconversions.h"
 #include "GUI/global.h"
 #include "MovablePoints/movablepoint.h"
-#include "PropertyUpdaters/pixmapeffectupdater.h"
 #include "Tasks/taskscheduler.h"
 #include "Animators/rastereffectanimators.h"
 #include "Animators/transformanimator.h"
 #include "RasterEffects/rastereffect.h"
 #include "RasterEffects/customrastereffectcreator.h"
 #include "linkbox.h"
-#include "PropertyUpdaters/transformupdater.h"
-#include "PropertyUpdaters/boxpathpointupdater.h"
 #include "Animators/qpointfanimator.h"
 #include "MovablePoints/pathpointshandler.h"
 #include "typemenu.h"
@@ -36,15 +33,10 @@ BoundingBox::BoundingBox(const eBoxType type) : eBoxOrSound("box"),
     mRasterEffectsAnimators(enve::make_shared<RasterEffectAnimators>(this)) {
     sDocumentBoxes << this;
     ca_addChild(mTransformAnimator);
-    mTransformAnimator->prp_setOwnUpdater(
-                enve::make_shared<TransformUpdater>(mTransformAnimator.get()));
     const auto pivotAnim = mTransformAnimator->getPivotAnimator();
-    const auto pivotUpdater = enve::make_shared<BoxPathPointUpdater>(
-                mTransformAnimator.get(), this);
-    pivotAnim->prp_setOwnUpdater(pivotUpdater);
+    connect(pivotAnim, &Property::prp_currentFrameChanged,
+            this, &BoundingBox::requestGlobalPivotUpdateIfSelected);
 
-    mRasterEffectsAnimators->prp_setOwnUpdater(
-                enve::make_shared<PixmapEffectUpdater>(this));
     ca_addChild(mRasterEffectsAnimators);
     mRasterEffectsAnimators->SWT_hide();
 

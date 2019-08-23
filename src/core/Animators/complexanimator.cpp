@@ -76,7 +76,6 @@ void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
 
     ca_mChildAnimators.insert(id, child);
     child->setParent(this);
-    child->prp_setInheritedUpdater(prp_mUpdater);
     child->prp_setInheritedFrameShift(prp_getTotalFrameShift(), this);
     if(child->drawsOnCanvas() ||
        child->SWT_isComplexAnimator()) {
@@ -170,7 +169,6 @@ void ComplexAnimator::ca_removeChild(const qsptr<Property> child) {
     const bool changeInfluence = !(SWT_isBoundingBox() &&
                                    child->SWT_isSound());
     const auto childRange = child->prp_absInfluenceRange();
-    child->prp_setInheritedUpdater(nullptr);
     if(child->SWT_isAnimator()) {
         const auto aRemove = static_cast<Animator*>(child.get());
         aRemove->anim_removeAllKeysFromComplexAnimator(this);
@@ -251,12 +249,6 @@ void ComplexAnimator::ca_changeChildAnimatorZ(const int oldIndex,
                                               const int newIndex) {
     ca_mChildAnimators.move(oldIndex, newIndex);
     prp_afterWholeInfluenceRangeChanged();
-}
-
-void ComplexAnimator::prp_setUpdater(const stdsptr<PropertyUpdater> &updater) {
-    Animator::prp_setUpdater(updater);
-    for(const auto &property : ca_mChildAnimators)
-        property->prp_setInheritedUpdater(updater);
 }
 
 void ComplexAnimator::anim_setAbsFrame(const int frame) {

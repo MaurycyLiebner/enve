@@ -5,7 +5,6 @@
 #include "undoredo.h"
 #include "MovablePoints/pathpivot.h"
 #include "pointhelpers.h"
-#include "PropertyUpdaters/nodepointupdater.h"
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "Animators/gradientpoints.h"
 #include "Animators/transformanimator.h"
@@ -17,8 +16,10 @@ SmartVectorPath::SmartVectorPath() :
     PathBox(eBoxType::TYPE_VECTOR_PATH) {
     prp_setName("Path");
     mPathAnimator = enve::make_shared<SmartPathCollection>();
-    const auto updater = enve::make_shared<NodePointUpdater>(this);
-    mPathAnimator->prp_setOwnUpdater(updater);
+    connect(mPathAnimator.get(), &Property::prp_currentFrameChanged,
+            this, [this](const UpdateReason reason) {
+        setPathsOutdated(reason);
+    });
     ca_prependChildAnimator(mPathEffectsAnimators.data(),
                             mPathAnimator);
 }

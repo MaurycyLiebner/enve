@@ -32,7 +32,7 @@ void IntProperty::prp_finishTransform() {
 //                                                 this) );
         mTransformed = false;
 
-        prp_callFinishUpdater();
+        emit prp_finishTransform();
     }
 }
 

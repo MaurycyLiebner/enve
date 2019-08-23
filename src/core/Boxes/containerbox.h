@@ -95,7 +95,6 @@ public:
                                                   const int relFrame2) const;
     bool differenceInOutlinePathEffectsBetweenFrames(const int relFrame1,
                                                      const int relFrame2) const;
-    void updateAllChildPathBoxes(const UpdateReason reason);
 
     void forcedMarginMeaningfulChange();
     QRect currentGlobalBounds() const;
@@ -162,6 +161,9 @@ public:
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
 private:
+    void updateAllChildPaths(const UpdateReason reason,
+                             void (PathBox::*func)(const UpdateReason));
+
     void iniPathEffects();
     void updateRelBoundingRect();
 protected:

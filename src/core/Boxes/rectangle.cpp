@@ -2,7 +2,6 @@
 #include "canvas.h"
 #include "Animators/gradientpoints.h"
 #include "MovablePoints/animatedpoint.h"
-#include "PropertyUpdaters/nodepointupdater.h"
 #include "Animators/transformanimator.h"
 #include "Animators/rastereffectanimators.h"
 
@@ -44,7 +43,15 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     ca_addChild(mRadiusAnimator);
     ca_prependChildAnimator(mRadiusAnimator.get(), mRasterEffectsAnimators);
 
-    prp_setInheritedUpdater(enve::make_shared<NodePointUpdater>(this));
+    const auto pathUpdater = [this](const UpdateReason reason) {
+        setPathsOutdated(reason);
+    };
+    connect(mTopLeftAnimator.get(), &Property::prp_currentFrameChanged,
+            this, pathUpdater);
+    connect(mBottomRightAnimator.get(), &Property::prp_currentFrameChanged,
+            this, pathUpdater);
+    connect(mRadiusAnimator.get(), &Property::prp_currentFrameChanged,
+            this, pathUpdater);
 }
 
 SkPath Rectangle::getPathAtRelFrameF(const qreal relFrame) {

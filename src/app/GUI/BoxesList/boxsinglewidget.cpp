@@ -18,7 +18,6 @@
 #include "Properties/boolproperty.h"
 #include "Properties/intproperty.h"
 #include "Animators/qpointfanimator.h"
-#include "PropertyUpdaters/propertyupdater.h"
 #include "Boxes/pathbox.h"
 #include "canvas.h"
 

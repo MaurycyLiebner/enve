@@ -1,10 +1,10 @@
 #include "gradient.h"
 #include "Animators/coloranimator.h"
-#include "PropertyUpdaters/gradientupdater.h"
 #include "Boxes/pathbox.h"
 
 Gradient::Gradient() : ComplexAnimator("gradient") {
-    prp_setOwnUpdater(enve::make_shared<GradientUpdater>(this));
+    connect(this, &Property::prp_currentFrameChanged,
+            this, &Gradient::updateQGradientStops);
 }
 
 Gradient::Gradient(const QColor &color1, const QColor &color2) :

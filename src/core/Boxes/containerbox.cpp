@@ -5,7 +5,6 @@
 #include "internallinkgroupbox.h"
 #include "PathEffects/patheffectanimators.h"
 #include "PathEffects/patheffect.h"
-#include "PropertyUpdaters/groupallpathsupdater.h"
 #include "textbox.h"
 #include "Animators/rastereffectanimators.h"
 
@@ -53,29 +52,37 @@ void ContainerBox::iniPathEffects() {
     mPathEffectsAnimators =
             enve::make_shared<PathEffectAnimators>();
     mPathEffectsAnimators->prp_setName("path effects");
-    mPathEffectsAnimators->prp_setOwnUpdater(
-                enve::make_shared<GroupAllPathsUpdater>(this));
+    connect(mPathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
+            this, [this](const UpdateReason reason) {
+         updateAllChildPaths(reason, &PathBox::setPathsOutdated);
+    });
     ca_addChild(mPathEffectsAnimators);
 
     mFillPathEffectsAnimators =
             enve::make_shared<PathEffectAnimators>();
     mFillPathEffectsAnimators->prp_setName("fill effects");
-    mFillPathEffectsAnimators->prp_setOwnUpdater(
-                enve::make_shared<GroupAllPathsUpdater>(this));
+    connect(mFillPathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
+            this, [this](const UpdateReason reason) {
+         updateAllChildPaths(reason, &PathBox::setFillPathOutdated);
+    });
     ca_addChild(mFillPathEffectsAnimators);
 
     mOutlineBasePathEffectsAnimators =
             enve::make_shared<PathEffectAnimators>();
     mOutlineBasePathEffectsAnimators->prp_setName("outline base effects");
-    mOutlineBasePathEffectsAnimators->prp_setOwnUpdater(
-                enve::make_shared<GroupAllPathsUpdater>(this));
+    connect(mOutlineBasePathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
+            this, [this](const UpdateReason reason) {
+         updateAllChildPaths(reason, &PathBox::setOutlinePathOutdated);
+    });
     ca_addChild(mOutlineBasePathEffectsAnimators);
 
     mOutlinePathEffectsAnimators =
             enve::make_shared<PathEffectAnimators>();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
-    mOutlinePathEffectsAnimators->prp_setOwnUpdater(
-                enve::make_shared<GroupAllPathsUpdater>(this));
+    connect(mOutlinePathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
+            this, [this](const UpdateReason reason) {
+         updateAllChildPaths(reason, &PathBox::setOutlinePathOutdated);
+    });
     ca_addChild(mOutlinePathEffectsAnimators);
 }
 
@@ -157,46 +164,39 @@ bool ContainerBox::differenceInPathEffectsBetweenFrames(const int relFrame1,
 
 void ContainerBox::addPathEffect(const qsptr<PathEffect>& effect) {
     mPathEffectsAnimators->addChild(effect);
-    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void ContainerBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
     mFillPathEffectsAnimators->addChild(effect);
-    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void ContainerBox::addOutlineBasePathEffect(const qsptr<PathEffect>& effect) {
     mOutlineBasePathEffectsAnimators->addChild(effect);
-    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void ContainerBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
     mOutlinePathEffectsAnimators->addChild(effect);
-    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void ContainerBox::removePathEffect(const qsptr<PathEffect>& effect) {
     mPathEffectsAnimators->removeChild(effect);
-    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void ContainerBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
     mFillPathEffectsAnimators->removeChild(effect);
-    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
 void ContainerBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
     mOutlinePathEffectsAnimators->removeChild(effect);
-    updateAllChildPathBoxes(UpdateReason::userChange);
 }
 
-void ContainerBox::updateAllChildPathBoxes(const UpdateReason reason) {
+void ContainerBox::updateAllChildPaths(const UpdateReason reason,
+                                       void (PathBox::*func)(const UpdateReason)) {
     for(const auto& box : mContainedBoxes) {
         if(box->SWT_isPathBox()) {
-            static_cast<PathBox*>(box)->setPathsOutdated();
-            box->planScheduleUpdate(reason);
+            (static_cast<PathBox*>(box)->*func)(reason);
         } else if(box->SWT_isContainerBox()) {
-            static_cast<ContainerBox*>(box)->updateAllChildPathBoxes(reason);
+            static_cast<ContainerBox*>(box)->updateAllChildPaths(reason, func);
         }
     }
 }

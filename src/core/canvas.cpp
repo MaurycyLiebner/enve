@@ -15,7 +15,6 @@
 #include "clipboardcontainer.h"
 #include "Boxes/paintbox.h"
 #include <QFile>
-#include "PropertyUpdaters/displayedfillstrokesettingsupdater.h"
 #include "MovablePoints/smartnodepoint.h"
 #include "Boxes/internallinkcanvas.h"
 #include "pointtypemenu.h"
@@ -44,8 +43,6 @@ Canvas::Canvas(Document &document,
 
     mBackgroundColor->qra_setCurrentValue(QColor(75, 75, 75));
     ca_addChild(mBackgroundColor);
-    mBackgroundColor->prp_setInheritedUpdater(
-                enve::make_shared<DisplayedFillStrokeSettingsUpdater>(this));
     mSoundComposition = qsptr<SoundComposition>::create(this);
 
     mRange = {0, frameCount};
@@ -660,6 +657,8 @@ void Canvas::anim_setAbsFrame(const int frame) {
     if(mCurrentMode == CanvasMode::paint)
         mPaintTarget.setupOnionSkin();
     emit currentFrameChanged(frame);
+
+    schedulePivotUpdate();
 }
 
 void Canvas::clearSelectionAction() {

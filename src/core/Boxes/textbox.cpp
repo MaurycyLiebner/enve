@@ -4,7 +4,6 @@
 #include "canvas.h"
 #include "Animators/gradientpoints.h"
 #include "Animators/qstringanimator.h"
-#include "PropertyUpdaters/nodepointupdater.h"
 #include "Animators/rastereffectanimators.h"
 #include "typemenu.h"
 #include "Animators/transformanimator.h"
@@ -17,13 +16,19 @@ TextBox::TextBox() : PathBox(TYPE_TEXT) {
     mFillSettings->setCurrentColor(QColor(0, 0, 0));
     mStrokeSettings->setPaintType(PaintType::NOPAINT);
 
+    const auto pathsUpdater = [this](const UpdateReason reason) {
+        setPathsOutdated(reason);
+    };
+
     mText = enve::make_shared<QStringAnimator>("text");
     ca_prependChildAnimator(mRasterEffectsAnimators.data(), mText);
-    mText->prp_setInheritedUpdater(enve::make_shared<NodePointUpdater>(this));
+    connect(mText.get(), &Property::prp_currentFrameChanged,
+            this, pathsUpdater);
 
     mLinesDist = enve::make_shared<QrealAnimator>(100, 0, 100, 1, "line dist");
     ca_prependChildAnimator(mRasterEffectsAnimators.data(), mLinesDist);
-    mLinesDist->prp_setInheritedUpdater(enve::make_shared<NodePointUpdater>(this));
+    connect(mLinesDist.get(), &Property::prp_currentFrameChanged,
+            this, pathsUpdater);
 }
 
 #include <QApplication>
@@ -40,9 +45,8 @@ void TextBox::openTextEditor(QWidget* dialogParent) {
 
 void TextBox::setFont(const QFont &font) {
     mFont = font;
-    setPathsOutdated();
     prp_afterWholeInfluenceRangeChanged();
-    planScheduleUpdate(UpdateReason::userChange);
+    setPathsOutdated(UpdateReason::userChange);
 }
 
 void TextBox::setSelectedFontSize(const qreal size) {

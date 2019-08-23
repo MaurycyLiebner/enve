@@ -159,21 +159,30 @@ public:
             const int frame1, const int frame2) const;
     bool differenceInFillPathBetweenFrames(
             const int frame1, const int frame2) const;
-    void setPathsOutdated() {
+    void setPathsOutdated(const UpdateReason reason) {
         mCurrentPathsOutdated = true;
+        planScheduleUpdate(reason);
+    }
+
+    void setOutlinePathOutdated(const UpdateReason reason) {
+        mCurrentOutlinePathOutdated = true;
+        planScheduleUpdate(reason);
+    }
+
+    void setFillPathOutdated(const UpdateReason reason) {
+        mCurrentFillPathOutdated = true;
+        planScheduleUpdate(reason);
     }
 
     void resetStrokeGradientPointsPos();
     void resetFillGradientPointsPos();
 
-    void setOutlinePathOutdated() {
-        mCurrentOutlinePathOutdated = true;
-    }
     void setupCanvasMenu(PropertyMenu * const menu);
 protected:
     bool mOutlineAffectedByScale = true;
     bool mCurrentPathsOutdated = true;
     bool mCurrentOutlinePathOutdated = true;
+    bool mCurrentFillPathOutdated = true;
 
     qreal mCurrentPathsFrame = 0;
 

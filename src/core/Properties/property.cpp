@@ -1,6 +1,5 @@
 #include "property.h"
 #include "Animators/complexanimator.h"
-#include "PropertyUpdaters/propertyupdater.h"
 #include "undoredo.h"
 #include "Animators/transformanimator.h"
 #include "typemenu.h"
@@ -37,7 +36,7 @@ void Property::setupTreeViewMenu(PropertyMenu * const menu) {
 
 void Property::prp_afterChangedAbsRange(const FrameRange &range,
                                         const bool clip) {
-    prp_callUpdater();
+    emit prp_currentFrameChanged(UpdateReason::userChange);
     emit prp_absFrameRangeChanged(range, clip);
 }
 
@@ -110,27 +109,6 @@ void Property::prp_setName(const QString &newName) {
     if(newName == prp_mName) return;
     prp_mName = newName;
     emit prp_nameChanged(newName);
-}
-
-void Property::prp_setUpdater(const stdsptr<PropertyUpdater>& updater) {
-    prp_mUpdater = updater;
-}
-
-void Property::prp_setInheritedUpdater(const stdsptr<PropertyUpdater>& updater) {
-    if(!prp_mOwnUpdater) prp_setUpdater(updater);
-}
-
-void Property::prp_setOwnUpdater(const stdsptr<PropertyUpdater>& updater) {
-    prp_setUpdater(updater);
-    prp_mOwnUpdater = true;
-}
-
-void Property::prp_callUpdater() {
-    if(prp_mUpdater) prp_mUpdater->update();
-}
-
-void Property::prp_callFinishUpdater() {
-    if(prp_mUpdater) prp_mUpdater->finishedChange();
 }
 
 void Property::enabledDrawingOnCanvas() {

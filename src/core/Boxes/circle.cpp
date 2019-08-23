@@ -2,7 +2,6 @@
 #include "canvas.h"
 #include "MovablePoints/movablepoint.h"
 #include "Animators/gradientpoints.h"
-#include "PropertyUpdaters/nodepointupdater.h"
 #include "Animators/transformanimator.h"
 #include "MovablePoints/pointshandler.h"
 #include "PathEffects/patheffectanimators.h"
@@ -20,7 +19,6 @@ Circle::Circle() : PathBox(TYPE_CIRCLE) {
 
     mCenterPoint->disableSelection();
     mCenterPoint->setRelativePos(QPointF(0, 0));
-    mCenterAnimator->prp_setInheritedUpdater(enve::make_shared<NodePointUpdater>(this));
     ca_prependChildAnimator(mPathEffectsAnimators.data(),
                             mCenterAnimator);
 
@@ -47,7 +45,16 @@ Circle::Circle() : PathBox(TYPE_CIRCLE) {
     ca_prependChildAnimator(mPathEffectsAnimators.data(),
                             vYAnimator->ref<QrealAnimator>());
     vYAnimator->prp_setName("vertical radius");
-    prp_setInheritedUpdater(enve::make_shared<NodePointUpdater>(this));
+
+    const auto pathUpdater = [this](const UpdateReason reason) {
+        setPathsOutdated(reason);
+    };
+    connect(mCenterAnimator.get(), &Property::prp_currentFrameChanged,
+            this, pathUpdater);
+    connect(vYAnimator, &Property::prp_currentFrameChanged,
+            this, pathUpdater);
+    connect(hXAnimator, &Property::prp_currentFrameChanged,
+            this, pathUpdater);
 }
 
 void Circle::moveRadiusesByAbs(const QPointF &absTrans) {
