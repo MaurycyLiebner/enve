@@ -98,7 +98,7 @@ void DabTestCaller000::processGpu(QGL33 * const gl,
                               GpuRenderTools &renderTools,
                               GpuRenderData &data) {
     Q_UNUSED(data);
-    renderTools.switchToOpenGL();
+    renderTools.switchToOpenGL(gl);
 
     if(!sInitialized) {
         sInitialize(gl);

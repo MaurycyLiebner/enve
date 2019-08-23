@@ -9,7 +9,7 @@ ShaderEffectCaller::ShaderEffectCaller(const QMargins &margin,
 void ShaderEffectCaller::processGpu(QGL33 * const gl,
                                     GpuRenderTools &renderTools,
                                     GpuRenderData &data) {
-    renderTools.switchToOpenGL();
+    renderTools.switchToOpenGL(gl);
 
     renderTools.requestTargetFbo().bind(gl);
     gl->glClear(GL_COLOR_BUFFER_BIT);

@@ -83,7 +83,7 @@ void eBlurCaller::processGpu(QGL33 * const gl,
     SkPaint paint;
     paint.setImageFilter(filter);
 
-    const auto canvas = renderTools.requestTargetCanvas();
+    const auto canvas = renderTools.requestTargetCanvas(gl);
     canvas->clear(SK_ColorTRANSPARENT);
     const auto srcTex = renderTools.requestSrcTextureImageWrapper();
     canvas->drawImage(srcTex, 0, 0, &paint);

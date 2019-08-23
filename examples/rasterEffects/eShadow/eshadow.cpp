@@ -108,7 +108,7 @@ void eShadowCaller::processGpu(QGL33 * const gl,
     Q_UNUSED(data);
 
 
-    const auto canvas = renderTools.requestTargetCanvas();
+    const auto canvas = renderTools.requestTargetCanvas(gl);
     canvas->clear(SK_ColorTRANSPARENT);
 
     const auto srcTex = renderTools.requestSrcTextureImageWrapper();

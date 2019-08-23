@@ -141,8 +141,17 @@ public:
     bool skiaMode() const { return mMode == Mode::Skia; }
     bool openGLMode() const { return mMode == Mode::OpenGL; }
 
-    void switchToSkia() { setMode(Mode::Skia); }
-    void switchToOpenGL() { setMode(Mode::OpenGL); }
+    void switchToSkia() {
+        if(mMode == Mode::Skia) return;
+        mMode = Mode::Skia;
+        mContext->resetContext();
+    }
+    void switchToOpenGL(QGL33* const gl) {
+        if(mMode == Mode::OpenGL) return;
+        mMode = Mode::OpenGL;
+        // restore blend mode
+        gl->glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    }
 
     GLuint textureSquareVAO() const { return mTexturedSquareVAO; }
 private:
@@ -150,12 +159,6 @@ private:
                     const GLuint textureSquareVAO) {
         mContext = context;
         mTexturedSquareVAO = textureSquareVAO;
-    }
-
-    void setMode(const Mode mode) {
-        if(mode == mMode) return;
-        mMode = mode;
-        if(skiaMode()) mContext->resetContext();
     }
 
     sk_sp<GrContext> mContext;
@@ -224,8 +227,8 @@ public:
         mTargetTextureFbo.swapTexture(mGL, mSrcTexture);
     }
 
-    void switchToOpenGL() {
-        mContext.switchToOpenGL();
+    void switchToOpenGL(QGL33* const gl) {
+        mContext.switchToOpenGL(gl);
     }
 
     void switchToSkia() {
@@ -234,11 +237,11 @@ public:
 
     //! @brief Returns SkCanvas associated with the target texture.
     //! If there is no SkCanvas new SkCanvas is created.
-    SkCanvas* requestTargetCanvas() {
+    SkCanvas* requestTargetCanvas(QGL33* const gl) {
         if(mCanvas) {
             mContext.switchToSkia();
         } else {
-            mContext.switchToOpenGL();
+            mContext.switchToOpenGL(gl);
             requestTargetFbo();
 
             mContext.switchToSkia();

@@ -32,7 +32,7 @@ void main(void) {
     }
     if(inDot) {
         vec4 texCol = texture2D(texture, texCoord);
-        gl_FragColor =  vec4(texCol.xyz, texCol.w*mixAlpha);
+        gl_FragColor =  vec4(mixAlpha*texCol.rgb, mixAlpha*texCol.a);
     } else {
         gl_FragColor =  vec4(0.f, 0.f, 0.f, 0.f);
     }
