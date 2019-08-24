@@ -25,7 +25,7 @@ EnveSplash* EnveSplash::sInstance = nullptr;
 EnveSplash::EnveSplash() {
     Q_ASSERT(!sInstance);
     sInstance = this;
-    mText = "Welcome to enve - an opensource 2D animations software.\n\n"
+    mText = "Welcome to enve - an opensource 2D animation software.\n\n"
             "Further development will only be possible with your support. "
             "Press 'Support' on the menu bar for more information and "
             "enter $3500 crowdfunding campaign to cover costs for "
