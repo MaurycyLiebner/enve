@@ -43,7 +43,7 @@ EffectsLoader::~EffectsLoader() {
     doneCurrent();
 }
 
-void EffectsLoader::initialize() {
+void EffectsLoader::initializeGpu() {
     OffscreenQGL33c::initialize();
     try {
         makeCurrent();
@@ -58,16 +58,11 @@ void EffectsLoader::initialize() {
             RuntimeThrow("Error initializing basic OpenGL programs.");
         }
 
-        iniRasterEffectPrograms();
         doneCurrent();
     } catch(const std::exception& e) {
         doneCurrent();
         gPrintExceptionCritical(e);
     }
-
-    iniCustomPathEffects();
-    iniCustomRasterEffects();
-    iniCustomBoxes();
 }
 
 #include "Boxes/ecustombox.h"
@@ -211,7 +206,8 @@ void EffectsLoader::reloadProgram(ShaderEffectCreator* const loaded,
     }
 }
 
-void EffectsLoader::iniRasterEffectPrograms() {
+void EffectsLoader::iniShaderEffects() {
+    makeCurrent();
     QDir(eSettings::sSettingsDir()).mkdir("ShaderEffects");
     const QString dirPath = eSettings::sSettingsDir() + "/ShaderEffects";
     QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
@@ -259,6 +255,7 @@ void EffectsLoader::iniRasterEffectPrograms() {
             }
         });
     });
+    doneCurrent();
 }
 
 void EffectsLoader::iniSingleRasterEffectProgram(const QString& grePath) {

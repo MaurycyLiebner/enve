@@ -15,6 +15,7 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
     mCurrentSettings = currentSettings;
 
     const auto mainLayout = new QVBoxLayout(this);
+    mainLayout->setSizeConstraint(QLayout::SetFixedSize);
     setLayout(mainLayout);
 
     mInnerLayout = new QVBoxLayout();
@@ -107,7 +108,6 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
             this, &OutputSettingsProfilesDialog::currentProfileChanged);
 
     currentProfileChanged();
-    layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 void OutputSettingsProfilesDialog::updateButtonsEnabled() {

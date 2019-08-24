@@ -86,7 +86,7 @@ TimelineWidget::TimelineWidget(Document &document,
     QMenu * const targetMenu = settingsMenu->addMenu("Target");
 //    targetMenu->addAction("All", this,
 //                          &BoxesListKeysViewWidget::setTargetAll);
-    targetMenu->addAction("Current Canvas", this,
+    targetMenu->addAction("Current Scene", this,
                           &TimelineWidget::setTargetCurrentCanvas);
     targetMenu->addAction("Current Group", this,
                           &TimelineWidget::setTargetCurrentGroup);

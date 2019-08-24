@@ -26,8 +26,10 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &name,
                                            ColorAnimator * const bg,
                                            QWidget * const parent) :
     QDialog(parent) {
-    setWindowTitle("Canvas Settings");
+    setWindowTitle("Scene Settings");
     mMainLayout = new QVBoxLayout(this);
+    mMainLayout->setSizeConstraint(QLayout::SetFixedSize);
+
     setLayout(mMainLayout);
 
     mNameLayout = new QHBoxLayout();

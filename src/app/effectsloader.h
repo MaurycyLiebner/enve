@@ -11,19 +11,18 @@ public:
     EffectsLoader();
     ~EffectsLoader();
 
-    void initialize();
+    void initializeGpu();
+    void iniCustomPathEffects();
+    void iniCustomRasterEffects();
+    void iniShaderEffects();
+    void iniCustomBoxes();
 signals:
     void programChanged(ShaderEffectProgram*);
 private:
-    void iniRasterEffectPrograms();
     void reloadProgram(ShaderEffectCreator * const loaded,
                        const QString& fragPath);
     void iniSingleRasterEffectProgram(const QString &grePath);
     void iniShaderEffectProgramExec(const QString &grePath);
-
-    void iniCustomBoxes();
-    void iniCustomPathEffects();
-    void iniCustomRasterEffects();
 
     void iniCustomRasterEffect(const QString &soPath);
     void iniIfCustomRasterEffect(const QString &path);

@@ -3,6 +3,8 @@
 #include <QKeyEvent>
 #include <QApplication>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QUrl>
 #include <QStatusBar>
 #include "usagewidget.h"
 #include <QToolBar>
@@ -475,7 +477,7 @@ void MainWindow::setupMenuBar() {
     mDynamicQuality->setCheckable(true);
     mDynamicQuality->setChecked(eFilterSettings::sSmartDisplat());
 
-    mClipViewToCanvas = mViewMenu->addAction("Clip To Canvas");
+    mClipViewToCanvas = mViewMenu->addAction("Clip To Scene");
     mClipViewToCanvas->setCheckable(true);
     mClipViewToCanvas->setChecked(true);
     mClipViewToCanvas->setShortcut(QKeySequence(Qt::Key_C));
@@ -540,10 +542,14 @@ void MainWindow::setupMenuBar() {
     mRenderMenu = mMenuBar->addMenu("Render");
     mRenderMenu->addAction("Render", this, &MainWindow::addCanvasToRenderQue);
 
+    mMenuBar->addAction("Support", this, []() {
+        const QString url = "https://indiegogo.com/projects/enve";
+        QDesktopServices::openUrl(QUrl(url));
+    });
+
+
     setMenuBar(mMenuBar);
     mMenuBar->setStyleSheet("QMenuBar { padding-top: 1px; }");
-//
-
 }
 
 

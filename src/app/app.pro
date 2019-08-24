@@ -48,6 +48,7 @@ SOURCES += main.cpp\
     GUI/canvaswindowwrapper.cpp \
     GUI/changewidthwidget.cpp \
     GUI/ekeyfilter.cpp \
+    GUI/envesplash.cpp \
     GUI/ewidgetsimpl.cpp \
     GUI/layoutcollection.cpp \
     GUI/layouthandler.cpp \
@@ -142,6 +143,7 @@ HEADERS  += \
     GUI/canvaswindowwrapper.h \
     GUI/changewidthwidget.h \
     GUI/ekeyfilter.h \
+    GUI/envesplash.h \
     GUI/ewidgetsimpl.h \
     GUI/layoutcollection.h \
     GUI/layouthandler.h \

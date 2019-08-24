@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 160.02584 125.73811"
+   height="125.73811mm"
+   width="160.02583mm"
+   sodipodi:docname="splash.svg"
+   inkscape:version="0.92.4 (unknown)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1918"
+     inkscape:window-height="1055"
+     id="namedview22"
+     showgrid="false"
+     inkscape:zoom="11.313708"
+     inkscape:cx="25.778422"
+     inkscape:cy="22.180951"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg8"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <defs
+     id="defs2">
+    <linearGradient
+       id="linearGradient861">
+      <stop
+         id="stop857"
+         offset="0"
+         style="stop-color:#00af99;stop-opacity:1" />
+      <stop
+         id="stop859"
+         offset="1"
+         style="stop-color:#00e192;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient
+       y2="20.327427"
+       x2="25.440773"
+       y1="45.891636"
+       x1="46.27916"
+       gradientTransform="matrix(2.8770708,0,0,2.8770708,-26.513393,-21.208325)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient1004"
+       xlink:href="#linearGradient861" />
+  </defs>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     inkscape:connector-curvature="0"
+     style="opacity:1;fill:#3c3c3c;fill-opacity:1;fill-rule:nonzero;stroke:#7d7d7d;stroke-width:0.22836083;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     d="M 0.11418042,0.11418042 V 125.62393 H 159.91165 V 0.11418042 Z"
+     id="path871"
+     sodipodi:nodetypes="ccccc" />
+  <g
+     id="g830"
+     transform="matrix(0.58988492,0,0,0.58988492,38.13943,17.918985)"
+     style="fill:#464646;fill-opacity:1;stroke:none;stroke-opacity:1">
+    <path
+       inkscape:connector-curvature="0"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:1.25;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:0px;word-spacing:0px;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#464646;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.76198816;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       d="m 12.426407,11.175983 c -19.4996101,19.434585 -29.599365,40.07178 -32.334913,63.448208 -2.735518,23.376429 2.164795,44.533859 15.8261869,63.889349 13.661399,19.3555 35.7648371,31.03779 63.2548281,32.89925 27.48997,1.86147 61.612631,-7.91108 81.893491,-21.05101 20.28085,-13.13992 25.50694,-24.83608 18.75178,-34.02063 -6.75517,-9.18456 -19.47013,-4.67018 -36.1087,4.53998 -16.63855,9.21016 -33.600501,17.0726 -55.002241,15.1184 -21.401784,-1.9542 -39.805007,-10.06184 -48.03372,-26.02 C 66.782679,109.15894 103.16633,100.6906 125.25281,85.726746 147.33935,70.76291 158.34219,55.216219 160.13886,37.7884 161.93553,20.360572 155.31238,5.1733499 142.36702,-4.8143746 129.42163,-14.802098 113.97629,-19.23903 87.528109,-19.237734 61.079949,-19.236439 31.925983,-8.2586027 12.426407,11.175983 Z M 71.918739,5.9773466 C 93.550399,5.9769437 111.08696,23.513525 111.08655,45.14518 111.08614,66.776847 93.549819,84.311977 71.918739,84.311582 50.287619,84.311187 32.752729,66.7763 32.752364,45.14518 32.751953,23.51407 50.287079,5.9777495 71.918739,5.9773466 Z"
+       id="path1002" />
+  </g>
+  <text
+     id="text895"
+     y="16.33456"
+     x="59.846775"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16.93333435px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:'FreeMono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.63978958;"
+     xml:space="preserve">enve</text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.28888893px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:'FreeMono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#a0a0a0;fill-opacity:1;stroke:none;stroke-width:0.63978958;"
+     x="112.24371"
+     y="16.224493"
+     id="text962">0.0.0</text>
+  <text
+     id="text825"
+     y="122.00786"
+     x="132.18993"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.93888903px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:'FreeMono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#a0a0a0;fill-opacity:1;stroke:none;stroke-width:0.22836083;stroke-opacity:1"
+     xml:space="preserve">24.08.19</text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.93888903px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:'FreeMono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#a0a0a0;fill-opacity:1;stroke:none;stroke-width:0.22836083;stroke-opacity:1"
+     x="3.7183163"
+     y="122.00786"
+     id="text982">Maurycy Liebner</text>
+</svg>

@@ -27,4 +27,7 @@
         <file alias="red.frag">GUI/ColorWidgets/colorwidgetshaders/red.frag</file>
         <file alias="value.frag">GUI/ColorWidgets/colorwidgetshaders/value.frag</file>
     </qresource>
+    <qresource prefix="/pixmaps">
+        <file>splash.svg</file>
+    </qresource>
 </RCC>

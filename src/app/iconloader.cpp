@@ -14,9 +14,9 @@ void renderSvg(const QString& svgPath, QImage& image) {
     renderer.render(&painter);
 }
 
-bool generate(const QString& svgPath,
-              const qreal scale,
-              const QString& pngPath) {
+bool IconLoader::generate(const QString& svgPath,
+                          const qreal scale,
+                          const QString& pngPath) {
     if(QFile(pngPath).exists()) return false;
 
     QSvgRenderer renderer(svgPath);
