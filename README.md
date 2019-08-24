@@ -49,7 +49,7 @@ Install g++-7:
 sudo add-apt-repository ppa:jonathonf/gcc
 sudo apt-get update
 sudo apt-get install g++-7
-
+```
 Download ninja, extract, and set permission for the executable:
 ```
 wget https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip
