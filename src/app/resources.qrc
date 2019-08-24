@@ -30,4 +30,7 @@
     <qresource prefix="/pixmaps">
         <file>splash.svg</file>
     </qresource>
+    <qresource prefix="/other">
+        <file>GPL3-license.txt</file>
+    </qresource>
 </RCC>

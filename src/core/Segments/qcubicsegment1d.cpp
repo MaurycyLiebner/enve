@@ -1,3 +1,19 @@
+// enve - 2D animations software
+// Copyright (C) 2016-2019 Maurycy Liebner
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "qcubicsegment1d.h"
 #include "simplemath.h"
 #include "qcubicsegment2d.h"
@@ -103,7 +119,7 @@ qreal qCubicSegment1D::minDistanceTo(const qreal p,
     qreal bestT = 0;
     qreal bestPt = p0();
     qreal minError = DBL_MAX;
-    for(qreal len = lengthAtT(minT); len < maxLen;) { // t ∈ [0., 1.]
+    for(qreal len = lengthAtT(minT); len < maxLen;) { // t ? [0., 1.]
         qreal t = tAtLength(len);
         qreal pt = valAtT(t);
         qreal dist = abs(pt - p);
@@ -222,12 +238,12 @@ qreal qCubicSegment1D::tWithSmallestValue() const {
 //    qreal totalLen1 = seg1.getLength();
 //    qreal totalLen2 = seg2.getLength();
 
-//    for(qreal len1 = 0; len1 < totalLen1;) { // t ∈ (0., 1.)
+//    for(qreal len1 = 0; len1 < totalLen1;) { // t ? (0., 1.)
 //        qreal t1 = seg1.tAtLength(len1);
 //        QPointF pt1 = seg1.posAtT(t1);
 
 //        qreal smallestDist = DBL_MAX;
-//        for(qreal len2 = 0; len2 < totalLen2;) { // t ∈ (0., 1.)
+//        for(qreal len2 = 0; len2 < totalLen2;) { // t ? (0., 1.)
 //            qreal t2 = seg2.tAtLength(len2);
 //            QPointF pt2 = seg2.posAtT(t2);
 //            qreal dist = pointToLen(pt1 - pt2);

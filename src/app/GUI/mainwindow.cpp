@@ -1,4 +1,20 @@
-﻿#include "mainwindow.h"
+// enve - 2D animations software
+// Copyright (C) 2016-2019 Maurycy Liebner
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#include "mainwindow.h"
 #include "canvas.h"
 #include <QKeyEvent>
 #include <QApplication>
@@ -42,6 +58,8 @@
 #include "GUI/newcanvasdialog.h"
 #include "ShaderEffects/shadereffectprogram.h"
 #include "importhandler.h"
+#include "envesplash.h"
+#include "envelicense.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 
@@ -352,9 +370,9 @@ void MainWindow::setupMenuBar() {
                            &mActions, &Actions::lowerToBottomAction,
                            Qt::Key_End);
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Rotate 90° CW",
+    mObjectMenu->addAction("Rotate 90? CW",
                            &mActions, &Actions::rotate90CWAction);
-    mObjectMenu->addAction("Rotate 90° CCW",
+    mObjectMenu->addAction("Rotate 90? CCW",
                            &mActions, &Actions::rotate90CCWAction);
     mObjectMenu->addAction("Flip Horizontal", &mActions,
                            &Actions::flipHorizontalAction, Qt::Key_H);
@@ -542,7 +560,18 @@ void MainWindow::setupMenuBar() {
     mRenderMenu = mMenuBar->addMenu("Render");
     mRenderMenu->addAction("Render", this, &MainWindow::addCanvasToRenderQue);
 
-    mMenuBar->addAction("Support", this, []() {
+    const auto help = mMenuBar->addMenu("Help");
+
+    help->addAction("License", this, [this]() {
+        if(EnveLicense::sInstance) {
+            delete EnveLicense::sInstance;
+        } else {
+            const auto license = new EnveLicense(this);
+            license->show();
+        }
+    });
+
+    mMenuBar->addAction("Support enve", this, []() {
         const QString url = "https://indiegogo.com/projects/enve";
         QDesktopServices::openUrl(QUrl(url));
     });

@@ -1,3 +1,19 @@
+<!-- enve - 2D animations software -->
+<!-- Copyright (C) 2016-2019 Maurycy Liebner -->
+
+<!-- This program is free software: you can redistribute it and/or modify -->
+<!-- it under the terms of the GNU General Public License as published by -->
+<!-- the Free Software Foundation, either version 3 of the License, or -->
+<!-- (at your option) any later version. -->
+
+<!-- This program is distributed in the hope that it will be useful, -->
+<!-- but WITHOUT ANY WARRANTY; without even the implied warranty of -->
+<!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the -->
+<!-- GNU General Public License for more details. -->
+
+<!-- You should have received a copy of the GNU General Public License -->
+<!-- along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
 <ShaderEffect name="eExplode">
 	<Animator name="displacement" type="float" glValue="false" min="0." max="999." step="1." ini="10."/>
 	<Animator name="steps" type="int" glValue="true" min="1" max="99" step="1" ini="1"/>
