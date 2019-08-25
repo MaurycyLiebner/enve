@@ -17,7 +17,7 @@
 #ifndef HddCACHABLERANGECONT_H
 #define HddCACHABLERANGECONT_H
 #include "hddcachablecont.h"
-#include "tmpfilehandlers.h"
+#include "tmpdeleter.h"
 #include "framerange.h"
 class eTask;
 class HddCachableCacheHandler;

@@ -20,7 +20,7 @@ void HddCachableCacheHandler::blockConts(
         const FrameRange &range, const bool blocked) {
     const auto its = mConts.range(range);
     for(auto it = its.first; it != its.second; it++) {
-        it->second->setBlocked(blocked);
+        it->second->setInUse(blocked);
     }
 }
 
@@ -66,7 +66,7 @@ void HddCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
         const bool storesInMemory = cont->storesDataInMemory();
         //if(storesInMemory != lastStoresInMemory) {
             if(storesInMemory) {
-                if(cont->blocked()) p->setBrush(QColor(255, 0, 0, 75));
+                if(cont->inUse()) p->setBrush(QColor(255, 0, 0, 75));
                 else p->setBrush(QColor(0, 255, 0, 75));
             } else {
                 p->setBrush(QColor(0, 0, 255, 75));

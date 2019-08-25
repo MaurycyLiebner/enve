@@ -62,7 +62,7 @@ void SoundComposition::secondFinished(const int secondId,
     const auto sCont = enve::make_shared<SoundCacheContainer>(
                 samples, iValueRange{secondId, secondId}, &mSecondsCache);
     mSecondsCache.add(sCont);
-    if(mBlockRange.inRange(secondId)) sCont->setBlocked(true);
+    if(mBlockRange.inRange(secondId)) sCont->setInUse(true);
 }
 
 void SoundComposition::startBlockingAtFrame(const int frame) {

@@ -21,6 +21,7 @@
 #include "../exceptions.h"
 #include <QIODevice>
 #include "../castmacros.h"
+#include "../basicreadwrite.h"
 
 namespace SkiaHelpers {
     sk_sp<SkImage> makeCopy(const sk_sp<SkImage>& img);
@@ -35,13 +36,13 @@ namespace SkiaHelpers {
 
     sk_sp<SkImage> transferDataToSkImage(SkBitmap& bitmap);
 
-    void writeImg(const sk_sp<SkImage>& img, QIODevice * const file);
-    sk_sp<SkImage> readImg(QIODevice * const file);
+    void writeImg(const sk_sp<SkImage>& img, eWriteStream &dst);
+    sk_sp<SkImage> readImg(eReadStream& src);
 
-    SkBitmap readBitmap(QIODevice * const file);
-    void writeBitmap(const SkBitmap& bitmap, QIODevice * const file);
+    SkBitmap readBitmap(eReadStream &src);
+    void writeBitmap(const SkBitmap& bitmap, eWriteStream &dst);
 
-    void writePixmap(const SkPixmap& pix, QIODevice * const file);
+    void writePixmap(const SkPixmap& pix, eWriteStream &dst);
 
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,

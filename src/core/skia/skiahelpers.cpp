@@ -69,46 +69,48 @@ sk_sp<SkImage> SkiaHelpers::transferDataToSkImage(SkBitmap &bitmap) {
 }
 
 void SkiaHelpers::writeImg(const sk_sp<SkImage> &img,
-                           QIODevice * const file) {
+                           eWriteStream& dst) {
     SkPixmap pix;
     if(!img->peekPixels(&pix)) {
         if(!img->makeRasterImage()->peekPixels(&pix)) {
             RuntimeThrow("Could not peek image pixels");
         }
     }
-    writePixmap(pix, file);
+    writePixmap(pix, dst);
 }
 
-sk_sp<SkImage> SkiaHelpers::readImg(QIODevice * const file) {
-    auto btmp = readBitmap(file);
+sk_sp<SkImage> SkiaHelpers::readImg(eReadStream &src) {
+    auto btmp = readBitmap(src);
     return SkiaHelpers::transferDataToSkImage(btmp);
 }
 
-void SkiaHelpers::writePixmap(const SkPixmap &pix, QIODevice * const file) {
+void SkiaHelpers::writePixmap(const SkPixmap &pix,
+                              eWriteStream& dst) {
     const int width = pix.width();
     const int height = pix.height();
-    file->write(rcConstChar(&width), sizeof(int));
-    file->write(rcConstChar(&height), sizeof(int));
+    dst << width;
+    dst << height;
     const qint64 writeBytes = width*height*4*
             static_cast<qint64>(sizeof(uchar));
-    file->write(rcConstChar(pix.writable_addr()), writeBytes);
+    dst.write(pix.addr(), writeBytes);
 }
 
-SkBitmap SkiaHelpers::readBitmap(QIODevice * const file) {
+SkBitmap SkiaHelpers::readBitmap(eReadStream &src) {
     int width, height;
-    file->read(rcChar(&width), sizeof(int));
-    file->read(rcChar(&height), sizeof(int));
+    src >> width;
+    src >> height;
     SkBitmap btmp;
     const auto info = SkiaHelpers::getPremulRGBAInfo(width, height);
     btmp.allocPixels(info);
     const qint64 readBytes = width*height*4*
             static_cast<qint64>(sizeof(uchar));
-    file->read(scChar(btmp.getPixels()), readBytes);
+    src.read(btmp.getPixels(), readBytes);
     return btmp;
 }
 
-void SkiaHelpers::writeBitmap(const SkBitmap& bitmap, QIODevice * const file) {
-    writePixmap(bitmap.pixmap(), file);
+void SkiaHelpers::writeBitmap(const SkBitmap& bitmap,
+                              eWriteStream& dst) {
+    writePixmap(bitmap.pixmap(), dst);
 }
 
 void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,

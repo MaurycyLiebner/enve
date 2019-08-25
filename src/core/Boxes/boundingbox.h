@@ -337,6 +337,11 @@ public:
 
     void planCenterPivotPosition();
 
+    bool visibleForCanvas() const { return mVisibleForCanvas; }
+    void setVisibleForCanvas(const bool visible) {
+        mVisibleForCanvas = visible;
+    }
+
     virtual void updateIfUsesProgram(const ShaderEffectProgram * const program) const;
 protected:
     void setRelBoundingRect(const QRectF& relRect);
@@ -376,6 +381,7 @@ protected:
 
     const qsptr<RasterEffectAnimators> mRasterEffectsAnimators;
 
+    bool mVisibleForCanvas = true;
     bool mCenterPivotPlanned = false;
     bool mSchedulePlanned = false;
     UpdateReason mPlannedReason;

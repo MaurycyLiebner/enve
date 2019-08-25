@@ -27,7 +27,9 @@ struct TileBitmaps {
     int fZeroTileCol = 0;
     QList<QList<SkBitmap>> fBitmaps;
 
-    void deepCopy(const TileBitmaps& src) {
+    TileBitmaps() {}
+
+    TileBitmaps(const TileBitmaps& src) {
         fRowCount = src.fRowCount;
         fColumnCount = src.fColumnCount;
         fZeroTileRow = src.fZeroTileRow;
@@ -42,6 +44,55 @@ struct TileBitmaps {
         }
     }
 
+    TileBitmaps(TileBitmaps &&other) {
+        swap(other);
+    }
+
+    TileBitmaps &operator=(const TileBitmaps& other) {
+        TileBitmaps tmp(other);
+        swap(tmp);
+        return *this;
+    }
+
+    TileBitmaps &operator=(TileBitmaps &&other) {
+        TileBitmaps tmp(std::move(other));
+        swap(tmp);
+        return *this;
+    }
+
+    void write(eWriteStream& dst) const {
+        dst << fRowCount;
+        dst << fColumnCount;
+        dst << fZeroTileRow;
+        dst << fZeroTileCol;
+        for(const auto& col : fBitmaps) {
+            for(const auto& tile : col) {
+                SkiaHelpers::writeBitmap(tile, dst);
+            }
+        }
+    }
+
+    void read(eReadStream& src) {
+        src >> fRowCount;
+        src >> fColumnCount;
+        src >> fZeroTileRow;
+        src >> fZeroTileCol;
+        for(int i = 0; i < fColumnCount; i++) {
+            fBitmaps.append(QList<SkBitmap>());
+            auto& col = fBitmaps.last();
+            for(int j = 0; j < fZeroTileRow; j++)
+                col.append(SkiaHelpers::readBitmap(src));
+        }
+    }
+
+    void swap(TileBitmaps& other) {
+        fBitmaps.swap(other.fBitmaps);
+        std::swap(fRowCount, other.fRowCount);
+        std::swap(fColumnCount, other.fColumnCount);
+        std::swap(fZeroTileRow, other.fZeroTileRow);
+        std::swap(fZeroTileCol, other.fZeroTileCol);
+    }
+
     bool isEmpty() const { return fBitmaps.isEmpty(); }
 
     void clear() {
@@ -53,16 +104,15 @@ struct TileBitmaps {
     }
 };
 
-class DrawableAutoTiledSurface : public HddCachablePersistent {
+class DrawableAutoTiledSurface : public HddCachable {
     e_OBJECT
     typedef QList<QList<SkBitmap>> Tiles;
-protected:
+public:
     DrawableAutoTiledSurface();
-    DrawableAutoTiledSurface(const DrawableAutoTiledSurface& other) = delete;
-    DrawableAutoTiledSurface& operator=(const DrawableAutoTiledSurface& other) = delete;
-
+    DrawableAutoTiledSurface(const DrawableAutoTiledSurface& other);
+    DrawableAutoTiledSurface& operator=(const DrawableAutoTiledSurface& other);
+protected:
     stdsptr<eHddTask> createTmpFileDataSaver();
-
     stdsptr<eHddTask> createTmpFileDataLoader();
 
     int getByteCount() {
@@ -71,17 +121,14 @@ protected:
     }
 
     int clearMemory() {
-        return 0;
-        const int bytes = getByteCount();
+        const int bytes = DrawableAutoTiledSurface::getByteCount();
         clearBitmaps();
+        scheduleSaveToTmpFile();
         return bytes;
     }
-public:
-    void deepCopy(const DrawableAutoTiledSurface& other) {
-        mSurface.deepCopy(other.mSurface);
-        mTileBitmaps.deepCopy(other.mTileBitmaps);
-    }
 
+    void noDataLeft_k() { Q_ASSERT(false); }
+public:
     void drawOnCanvas(SkCanvas * const canvas,
                       const SkPoint &dst,
                       const QRect * const minPixSrc,
@@ -133,19 +180,27 @@ public:
         mSurface.read(src);
         updateTileBitmaps();
     }
-private:
+
     void updateTileBitmaps() {
         updateTileRecBitmaps(mSurface.tileBoundingRect());
     }
 
+    void clearBitmaps() {
+        mTileBitmaps.clear();
+    }
+
+    bool hasTileBitmaps() {
+        return !mTileBitmaps.isEmpty();
+    }
+private:
     void updateTileRecBitmaps(QRect tileRect);
 
     void setTileBitmaps(const TileBitmaps& tiles) {
         mTileBitmaps = tiles;
     }
 
-    void clearBitmaps() {
-        mTileBitmaps.clear();
+    void setTileBitmaps(TileBitmaps&& tiles) {
+        mTileBitmaps = std::move(tiles);
     }
 
     void stretchBitmapsToTile(const int tx, const int ty) {

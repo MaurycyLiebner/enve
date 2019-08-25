@@ -20,6 +20,7 @@
 void PaintTarget::draw(SkCanvas * const canvas,
                        const QMatrix& viewTrans,
                        const QRect& drawRect) {
+    if(!isValid()) return;
     const auto canvasRect = viewTrans.inverted().mapRect(drawRect);
     const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
     const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
@@ -29,15 +30,24 @@ void PaintTarget::draw(SkCanvas * const canvas,
 }
 
 void PaintTarget::setPaintDrawable(DrawableAutoTiledSurface * const surf) {
+    if(mPaintDrawable) mPaintDrawable->setInUse(false);
     mPaintDrawable = surf;
+    if(mPaintDrawable) {
+        mPaintDrawable->setInUse(true);
+
+        if(mPaintDrawable->storesDataInMemory()) {
+            if(!mPaintDrawable->hasTileBitmaps())
+                mPaintDrawable->updateTileBitmaps();
+        } else mPaintDrawable->scheduleLoadFromTmpFile();
+    }
     mPaintPressedSinceUpdate = false;
-    mPaintAnimSurface->setupOnionSkinFor(20, mPaintOnion);
+    setupOnionSkin();
 }
 
 void PaintTarget::setPaintBox(PaintBox * const box) {
     if(box == mPaintDrawableBox) return;
     if(mPaintDrawableBox) {
-        mPaintDrawableBox->showAfterPainting();
+        mPaintDrawableBox->setVisibleForCanvas(true);
         QObject::disconnect(mPaintAnimSurface,
                             &AnimatedSurface::currentSurfaceChanged,
                             mCanvas, nullptr);
@@ -45,7 +55,7 @@ void PaintTarget::setPaintBox(PaintBox * const box) {
     }
     mPaintDrawableBox = box;
     if(mPaintDrawableBox) {
-        mPaintDrawableBox->hideForPainting();
+        mPaintDrawableBox->setVisibleForCanvas(false);
         mPaintAnimSurface = mPaintDrawableBox->getSurface();
         const auto setter = [this](DrawableAutoTiledSurface * const surf) {
             setPaintDrawable(surf);
@@ -101,4 +111,13 @@ void PaintTarget::paintMove(const QPointF& pos,
         mPaintDrawable->pixelRectChanged(qRoi);
     }
     mLastTs = ts;
+}
+
+void PaintTarget::afterPaintAnimSurfaceChanged() {
+    if(mPaintPressedSinceUpdate && mPaintAnimSurface) {
+        mPaintAnimSurface->prp_afterChangedRelRange(
+                    mPaintAnimSurface->prp_getIdenticalRelRange(
+                        mPaintAnimSurface->anim_getCurrentRelFrame()));
+        mPaintPressedSinceUpdate = false;
+    }
 }

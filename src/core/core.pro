@@ -88,6 +88,7 @@ SOURCES += \
     Boxes/effectsrenderer.cpp \
     Boxes/effectsubtaskspawner.cpp \
     Boxes/imagebox.cpp \
+    Boxes/imagerenderdata.cpp \
     Boxes/imagesequencebox.cpp \
     Boxes/internallinkcanvas.cpp \
     Boxes/internallinkgroupbox.cpp \
@@ -107,11 +108,14 @@ SOURCES += \
     CacheHandlers/hddcachablerangecont.cpp \
     CacheHandlers/imagecachecontainer.cpp \
     CacheHandlers/minimalcachecontainer.cpp \
+    CacheHandlers/samples.cpp \
     CacheHandlers/sceneframecontainer.cpp \
     CacheHandlers/soundcachecontainer.cpp \
     CacheHandlers/soundcachehandler.cpp \
     CacheHandlers/soundtmpfilehandlers.cpp \
-    CacheHandlers/tmpfilehandlers.cpp \
+    CacheHandlers/tmpdeleter.cpp \
+    CacheHandlers/tmploader.cpp \
+    CacheHandlers/tmpsaver.cpp \
     FileCacheHandlers/animationcachehandler.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/filecachehandler.cpp \
@@ -292,6 +296,7 @@ HEADERS += \
     Boxes/effectsrenderer.h \
     Boxes/effectsubtaskspawner.h \
     Boxes/imagebox.h \
+    Boxes/imagerenderdata.h \
     Boxes/imagesequencebox.h \
     Boxes/internallinkcanvas.h \
     Boxes/internallinkgroupbox.h \
@@ -317,7 +322,9 @@ HEADERS += \
     CacheHandlers/soundcachecontainer.h \
     CacheHandlers/soundcachehandler.h \
     CacheHandlers/soundtmpfilehandlers.h \
-    CacheHandlers/tmpfilehandlers.h \
+    CacheHandlers/tmpdeleter.h \
+    CacheHandlers/tmploader.h \
+    CacheHandlers/tmpsaver.h \
     FileCacheHandlers/animationcachehandler.h \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/filecachehandler.h \

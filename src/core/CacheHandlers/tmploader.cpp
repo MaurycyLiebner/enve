@@ -14,23 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SCENEFRAMECONTAINER_H
-#define SCENEFRAMECONTAINER_H
-#include "imagecachecontainer.h"
-class BoxRenderData;
+#include "tmploader.h"
 
-class SceneFrameContainer : public ImageCacheContainer {
-public:
-    SceneFrameContainer(Canvas * const scene,
-                        const BoxRenderData* const data,
-                        const FrameRange &range,
-                        HddCachableCacheHandler * const parent);
+TmpLoader::TmpLoader(const qsptr<QTemporaryFile> &file,
+                     HddCachable * const target) :
+    mTmpFile(file), mTarget(target) {}
 
-    const uint fBoxState;
-protected:
-    stdsptr<eHddTask> createTmpFileDataLoader();
-private:
-    const qptr<Canvas> mScene;
-};
+void TmpLoader::process() {
+    if(!mTmpFile) return;
+    if(mTmpFile->open()) {
+        eReadStream src(mTmpFile.get());
+        read(src);
+        mTmpFile->close();
+    } else {
+        RuntimeThrow("Could not open temporary file for reading.");
+    }
+}
 
-#endif // SCENEFRAMECONTAINER_H
+void TmpLoader::beforeProcessing(const Hardware) {
+    if(mTarget && !mTmpFile) mTmpFile = mTarget->getTmpFile();
+}

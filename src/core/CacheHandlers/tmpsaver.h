@@ -14,23 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SCENEFRAMECONTAINER_H
-#define SCENEFRAMECONTAINER_H
-#include "imagecachecontainer.h"
-class BoxRenderData;
+#ifndef TMPSAVER_H
+#define TMPSAVER_H
+#include "Tasks/updatable.h"
+#include <QTemporaryFile>
+#include "hddcachablecont.h"
 
-class SceneFrameContainer : public ImageCacheContainer {
+class TmpSaver : public eHddTask {
+    e_OBJECT
 public:
-    SceneFrameContainer(Canvas * const scene,
-                        const BoxRenderData* const data,
-                        const FrameRange &range,
-                        HddCachableCacheHandler * const parent);
+    TmpSaver(HddCachable * const target);
 
-    const uint fBoxState;
-protected:
-    stdsptr<eHddTask> createTmpFileDataLoader();
+    virtual void write(eWriteStream& dst) = 0;
+
+    void process();
+    void afterProcessing();
 private:
-    const qptr<Canvas> mScene;
+    const stdptr<HddCachable> mTarget;
+    bool mSavingSuccessful = false;
+    qsptr<QTemporaryFile> mTmpFile;
 };
 
-#endif // SCENEFRAMECONTAINER_H
+
+#endif // TMPSAVER_H

@@ -20,51 +20,22 @@
 
 SoundContainerTmpFileDataLoader::SoundContainerTmpFileDataLoader(
         const qsptr<QTemporaryFile> &file,
-        SoundCacheContainer *target) : mTargetCont(target) {
-    mTmpFile = file;
-}
+        SoundCacheContainer *target) :
+    TmpLoader(file, target), mTarget(target) {}
 
-void SoundContainerTmpFileDataLoader::process() {
-    if(mTmpFile->open()) {
-        SampleRange sampleRange;
-        mTmpFile->read(rcChar(&sampleRange), sizeof(SampleRange));
-        const size_t size = static_cast<size_t>(sampleRange.span());
-        float * data = new float[size];
-        mTmpFile->read(rcChar(data),
-                       static_cast<qint64>(size*sizeof(float)));
-//        mSamples = enve::make_shared<Samples>(data, sampleRange);
-
-        mTmpFile->close();
-    }
+void SoundContainerTmpFileDataLoader::read(eReadStream& src) {
+    mSamples = Samples::sRead(src);
 }
 
 void SoundContainerTmpFileDataLoader::afterProcessing() {
-    mTargetCont->setDataLoadedFromTmpFile(mSamples);
+    mTarget->setDataLoadedFromTmpFile(mSamples);
 }
 
 SoundContainerTmpFileDataSaver::SoundContainerTmpFileDataSaver(
         const stdsptr<Samples> &samples,
-        SoundCacheContainer *target) : mTargetCont(target) {
-    mSamples = samples;
-}
+        SoundCacheContainer * const target) :
+    TmpSaver(target), mSamples(samples) {}
 
-void SoundContainerTmpFileDataSaver::process() {
-    // mSavingFailed = true; return; // NO TMP FILES !!!
-    mTmpFile = qsptr<QTemporaryFile>(new QTemporaryFile());
-    if(mTmpFile->open()) {
-        mTmpFile->write(rcConstChar(&mSamples->fSampleRange),
-                        sizeof(SampleRange));
-        const size_t size = static_cast<size_t>(mSamples->fSampleRange.span());
-        mTmpFile->write(rcChar(mSamples->fData),
-                        static_cast<qint64>(size*sizeof(float)));
-
-        mTmpFile->close();
-        mSavingSuccessful = true;
-    } else {
-        mSavingSuccessful = false;
-    }
-}
-
-void SoundContainerTmpFileDataSaver::afterProcessing() {
-    if(mSavingSuccessful) mTargetCont->setDataSavedToTmpFile(mTmpFile);
+void SoundContainerTmpFileDataSaver::write(eWriteStream& dst) {
+    mSamples->write(dst);
 }

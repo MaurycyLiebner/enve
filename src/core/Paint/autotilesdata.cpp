@@ -33,8 +33,46 @@ uint16_t *newZeroedTile(const size_t& size) {
 
 AutoTilesData::AutoTilesData() {}
 
+AutoTilesData::AutoTilesData(const AutoTilesData &other) {
+    mZeroTileCol = other.mZeroTileCol;
+    mZeroTileRow = other.mZeroTileRow;
+    mColumnCount = other.mColumnCount;
+    mRowCount = other.mRowCount;
+
+    for(auto& column : other.mColumns) {
+        mColumns.append(QList<uint16_t*>());
+        QList<uint16_t*> &col = mColumns.last();
+        for(auto& srcTile : column) {
+            const auto dstTile = allocateTile(TILE_SPIXEL_SIZE);
+            uint16_t * dstP = dstTile;
+            const uint16_t * srcP = srcTile;
+            for(int sp = 0; sp < TILE_SPIXEL_SIZE; sp++) {
+                *(dstP++) = *(srcP++);
+            }
+
+            col << dstTile;
+        }
+    }
+}
+
+AutoTilesData::AutoTilesData(AutoTilesData &&other) {
+    swap(other);
+}
+
+AutoTilesData &AutoTilesData::operator=(const AutoTilesData& other) {
+    AutoTilesData tmp(other);
+    swap(tmp);
+    return *this;
+}
+
+AutoTilesData &AutoTilesData::operator=(AutoTilesData &&other) {
+    AutoTilesData tmp(std::move(other));
+    swap(tmp);
+    return *this;
+}
+
 void AutoTilesData::loadBitmap(const SkBitmap &src) {
-    reset();
+    clear();
     const int nCols = qCeil(static_cast<qreal>(src.width())/TILE_SIZE);
     const int nRows = qCeil(static_cast<qreal>(src.height())/TILE_SIZE);
     const uint8_t * const srcP = static_cast<uint8_t*>(src.getPixels());
@@ -51,7 +89,7 @@ void AutoTilesData::loadBitmap(const SkBitmap &src) {
                 tileP = iniZeroed ? newZeroedTile(TILE_SPIXEL_SIZE) :
                                     allocateTile(TILE_SPIXEL_SIZE);
             } catch(...) {
-                reset();
+                clear();
                 RuntimeThrow("Failed to load bitmap to AutoTilesData.");
             }
 
@@ -78,10 +116,10 @@ void AutoTilesData::loadBitmap(const SkBitmap &src) {
 }
 
 AutoTilesData::~AutoTilesData() {
-    reset();
+    clear();
 }
 
-void AutoTilesData::reset() {
+void AutoTilesData::clear() {
     for(const auto& col : mColumns) {
         for(const auto& row : col) {
             free(row);
@@ -103,28 +141,6 @@ uint16_t *AutoTilesData::getTileByIndex(const int colId,
     if(colId < 0 || colId >= mColumnCount ||
        rowId < 0 || rowId >= mRowCount) return nullptr;
     return mColumns.at(colId).at(rowId);
-}
-
-void AutoTilesData::deepCopy(const AutoTilesData &other) {
-    mZeroTileCol = other.mZeroTileCol;
-    mZeroTileRow = other.mZeroTileRow;
-    mColumnCount = other.mColumnCount;
-    mRowCount = other.mRowCount;
-
-    for(auto& column : other.mColumns) {
-        mColumns.append(QList<uint16_t*>());
-        QList<uint16_t*> &col = mColumns.last();
-        for(auto& srcTile : column) {
-            const auto dstTile = allocateTile(TILE_SPIXEL_SIZE);
-            uint16_t * dstP = dstTile;
-            const uint16_t * srcP = srcTile;
-            for(int sp = 0; sp < TILE_SPIXEL_SIZE; sp++) {
-                *(dstP++) = *(srcP++);
-            }
-
-            col << dstTile;
-        }
-    }
 }
 
 int AutoTilesData::width() const {
@@ -353,9 +369,9 @@ void AutoTilesData::write(eWriteStream& dst) const {
 }
 
 void AutoTilesData::read(eReadStream &src) {
-    reset();
+    clear();
     src >> mZeroTileCol;
-    src >>mZeroTileRow;
+    src >> mZeroTileRow;
     src >> mColumnCount;
     src >> mRowCount;
     int nCols;

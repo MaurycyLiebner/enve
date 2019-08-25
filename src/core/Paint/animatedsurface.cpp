@@ -18,7 +18,29 @@
 
 AnimatedSurface::AnimatedSurface() : Animator("canvas"),
     mBaseValue(enve::make_shared<DrawableAutoTiledSurface>()),
-    mCurrent_d(mBaseValue.get()) {}
+    mCurrent_d(mBaseValue.get()) {
+    connect(this, &Animator::anim_addedKey,
+            this, [this](Key* const key) {
+        if(!mUseRange.inRange(key->getRelFrame())) return;
+        const auto asKey = static_cast<ASKey*>(key);
+        const auto dSurf = asKey->dSurface();
+        if(!dSurf.storesDataInMemory())
+            asKey->dSurface().scheduleLoadFromTmpFile();
+        asKey->dSurface().setInUse(true);
+    });
+    connect(this, &Animator::anim_removedKey,
+            this, [this](Key* const key) {
+        if(!mUseRange.inRange(key->getRelFrame())) return;
+        const auto asKey = static_cast<ASKey*>(key);
+        asKey->dSurface().setInUse(false);
+    });
+}
+
+void AnimatedSurface::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) {
+    Animator::prp_afterChangedAbsRange(range, clip);
+    const auto relRange = prp_absRangeToRelRange(range);
+    mFrameImagesCache.remove(relRange);
+}
 
 ASKey::ASKey(AnimatedSurface * const parent) :
     Key(parent),
@@ -31,5 +53,5 @@ ASKey::ASKey(const int frame, AnimatedSurface * const parent) :
 ASKey::ASKey(const DrawableAutoTiledSurface &value,
              const int frame, AnimatedSurface * const parent) :
     ASKey(frame, parent) {
-    mValue->deepCopy(value);
+    *mValue.get() = value;
 }

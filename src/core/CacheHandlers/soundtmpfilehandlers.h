@@ -16,41 +16,35 @@
 
 #ifndef SOUNDTMPFILEHANDLERS_H
 #define SOUNDTMPFILEHANDLERS_H
-#include "tmpfilehandlers.h"
+#include "tmpdeleter.h"
 #include "soundcachecontainer.h"
 #include "Tasks/updatable.h"
 #include <QTemporaryFile>
 #include "skia/skiaincludes.h"
+#include "tmpsaver.h"
+#include "tmploader.h"
+
 class SoundCacheContainer;
-class SoundContainerTmpFileDataLoader : public eHddTask {
+class SoundContainerTmpFileDataLoader : public TmpLoader {
     e_OBJECT
 public:
-    void process();
-
-    void afterProcessing();
-protected:
     SoundContainerTmpFileDataLoader(const qsptr<QTemporaryFile> &file,
                                     SoundCacheContainer *target);
-
-    const stdptr<SoundCacheContainer> mTargetCont;
-    qsptr<QTemporaryFile> mTmpFile;
+    void read(eReadStream& src);
+    void afterProcessing();
+protected:
+    const stdptr<SoundCacheContainer> mTarget;
     stdsptr<Samples> mSamples;
 };
 
-class SoundContainerTmpFileDataSaver : public eHddTask {
+class SoundContainerTmpFileDataSaver : public TmpSaver {
     e_OBJECT
 public:
-    void process();
-
-    void afterProcessing();
-protected:
     SoundContainerTmpFileDataSaver(const stdsptr<Samples> &samples,
-                                   SoundCacheContainer *target);
-
-    bool mSavingSuccessful = false;
-    const stdptr<SoundCacheContainer> mTargetCont;
-    stdsptr<Samples> mSamples;
-    qsptr<QTemporaryFile> mTmpFile;
+                                   SoundCacheContainer * const target);
+    void write(eWriteStream& dst);
+private:
+    const stdsptr<Samples> mSamples;
 };
 
 #endif // SOUNDTMPFILEHANDLERS_H

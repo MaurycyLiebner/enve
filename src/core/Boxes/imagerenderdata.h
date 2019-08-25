@@ -14,23 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SCENEFRAMECONTAINER_H
-#define SCENEFRAMECONTAINER_H
-#include "imagecachecontainer.h"
-class BoxRenderData;
+#ifndef IMAGERENDERDATA_H
+#define IMAGERENDERDATA_H
+#include "Boxes/boxrenderdata.h"
 
-class SceneFrameContainer : public ImageCacheContainer {
-public:
-    SceneFrameContainer(Canvas * const scene,
-                        const BoxRenderData* const data,
-                        const FrameRange &range,
-                        HddCachableCacheHandler * const parent);
+struct ImageRenderData : public BoxRenderData {
+    ImageRenderData(BoundingBox * const parentBoxT);
 
-    const uint fBoxState;
-protected:
-    stdsptr<eHddTask> createTmpFileDataLoader();
+    virtual void loadImageFromHandler() = 0;
+
+    void updateRelBoundingRect();
+
+    void setupRenderData() final;
+
+    sk_sp<SkImage> fImage;
 private:
-    const qptr<Canvas> mScene;
+    void setupDirectDraw();
+
+    void drawSk(SkCanvas * const canvas);
 };
 
-#endif // SCENEFRAMECONTAINER_H
+#endif // IMAGERENDERDATA_H

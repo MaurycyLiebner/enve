@@ -17,7 +17,7 @@
 #ifndef HddCACHABLECONT_H
 #define HddCACHABLECONT_H
 #include "minimalcachecontainer.h"
-#include "tmpfilehandlers.h"
+#include "tmpdeleter.h"
 class eTask;
 
 class HddCachable : public CacheContainer {
@@ -34,48 +34,53 @@ public:
     int free_RAM_k() final {
         const int bytes = clearMemory();
         setDataInMemory(false);
-        if(!mTmpFile) noDataLeft_k();
+        if(!mTmpFile && !mTmpSaveTask) noDataLeft_k();
         return bytes;
     }
 
     eTask* scheduleDeleteTmpFile() {
         if(!mTmpFile) return nullptr;
         const auto updatable =
-                enve::make_shared<TmpFileDataDeleter>(mTmpFile);
+                enve::make_shared<TmpDeleter>(mTmpFile);
         mTmpFile.reset();
         updatable->scheduleTask();
         return updatable.get();
     }
 
-    eTask* saveToTmpFile() {
-        if(mSavingUpdatable || mTmpFile) return nullptr;
-        mSavingUpdatable = createTmpFileDataSaver();
-        mSavingUpdatable->scheduleTask();
-        return mSavingUpdatable.get();
+    eTask* scheduleSaveToTmpFile() {
+        if(mTmpSaveTask || mTmpFile) return nullptr;
+        mTmpSaveTask = createTmpFileDataSaver();
+        mTmpSaveTask->scheduleTask();
+        return mTmpSaveTask.get();
     }
 
     eTask* scheduleLoadFromTmpFile() {
-        if(storesDataInMemory() || !mTmpFile) return nullptr;
-        if(mLoadingUpdatable) return mLoadingUpdatable.get();
+        if(storesDataInMemory()) return nullptr;
+        if(mTmpLoadTask) return mTmpLoadTask.get();
+        if(!mTmpSaveTask && !mTmpFile) return nullptr;
 
-        mLoadingUpdatable = createTmpFileDataLoader();
-        mLoadingUpdatable->scheduleTask();
-        return mLoadingUpdatable.get();
+        mTmpLoadTask = createTmpFileDataLoader();
+        if(mTmpSaveTask)
+            mTmpSaveTask->addDependent(mTmpLoadTask.get());
+        mTmpLoadTask->scheduleTask();
+        return mTmpLoadTask.get();
     }
 
     void setDataSavedToTmpFile(const qsptr<QTemporaryFile> &tmpFile) {
-        mSavingUpdatable.reset();
+        mTmpSaveTask.reset();
         mTmpFile = tmpFile;
     }
 
     bool storesDataInMemory() const {
         return mDataInMemory;
     }
+
+    qsptr<QTemporaryFile> getTmpFile() const { return mTmpFile; }
 protected:
     void afterDataLoadedFromTmpFile() {
         setDataInMemory(true);
-        mLoadingUpdatable.reset();
-        if(!blocked()) addToMemoryManagment();
+        mTmpLoadTask.reset();
+        if(!inUse()) addToMemoryManagment();
     }
 
     void afterDataReplaced() {
@@ -91,15 +96,8 @@ protected:
     qsptr<QTemporaryFile> mTmpFile;
 private:
     bool mDataInMemory = false;
-    stdsptr<eTask> mLoadingUpdatable;
-    stdsptr<eTask> mSavingUpdatable;
-};
-
-class HddCachablePersistent : public HddCachable {
-protected:
-    HddCachablePersistent() {}
-public:
-    void noDataLeft_k() final {}
+    stdsptr<eTask> mTmpLoadTask;
+    stdsptr<eTask> mTmpSaveTask;
 };
 
 #endif // HddCACHABLECONT_H

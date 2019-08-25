@@ -368,8 +368,8 @@ private:
     int anim_mCurrentRelFrame = 0;
 signals:
     void anim_isRecordingChanged();
-    void anim_removingKey(Key*);
-    void anim_addingKey(Key*);
+    void anim_removedKey(Key*);
+    void anim_addedKey(Key*);
 private:
     void removeKeyWithoutDeselecting(const stdsptr<Key> &keyToRemove);
     void anim_updateKeyOnCurrrentFrame();

@@ -338,11 +338,11 @@ void Canvas::setSceneFrame(const stdsptr<SceneFrameContainer>& cont) {
     if(cont == mSceneFrame) return emit requestUpdate();
     if(mSceneFrame) {
         if(!mRenderingPreview)
-            mSceneFrame->setBlocked(false);
+            mSceneFrame->setInUse(false);
     }
 
     mSceneFrame = cont;
-    if(cont) cont->setBlocked(true);
+    if(cont) cont->setInUse(true);
     emit requestUpdate();
 }
 
@@ -350,7 +350,7 @@ void Canvas::setLoadingSceneFrame(const stdsptr<SceneFrameContainer>& cont) {
     if(cont == mLoadingSceneFrame) return;
     if(mLoadingSceneFrame.get()) {
         if(!mRenderingPreview || mRenderingOutput) {
-            mLoadingSceneFrame->setBlocked(false);
+            mLoadingSceneFrame->setInUse(false);
         }
     }
     if(!cont) {
@@ -361,7 +361,7 @@ void Canvas::setLoadingSceneFrame(const stdsptr<SceneFrameContainer>& cont) {
     if(!cont->storesDataInMemory()) {
         cont->scheduleLoadFromTmpFile();
     }
-    mLoadingSceneFrame->setBlocked(true);
+    mLoadingSceneFrame->setInUse(true);
 }
 
 FrameRange Canvas::prp_getIdenticalRelRange(const int relFrame) const {
@@ -385,7 +385,7 @@ void Canvas::renderDataFinished(BoxRenderData *renderData) {
 
     if((mPreviewing || mRenderingOutput) &&
        mCurrRenderRange.inRange(relFrame)) {
-        cont->setBlocked(true);
+        cont->setInUse(true);
     } else {
         bool newerSate = true;
         bool closerFrame = true;
@@ -401,16 +401,14 @@ void Canvas::renderDataFinished(BoxRenderData *renderData) {
             mSceneFrameOutdated = !currentState;
             setSceneFrame(cont);
         } else if(mRenderingPreview && mCurrRenderRange.inRange(relFrame)) {
-            cont->setBlocked(true);
+            cont->setInUse(true);
         }
     }
 }
 
 void Canvas::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) {
     Property::prp_afterChangedAbsRange(range, clip);
-    const int minId = prp_getIdenticalRelRange(range.fMin).fMin;
-    const int maxId = prp_getIdenticalRelRange(range.fMax).fMax;
-    mSceneFramesHandler.remove({minId, maxId});
+    mSceneFramesHandler.remove(range);
     if(!mSceneFramesHandler.atFrame(anim_getCurrentRelFrame())) {
         mSceneFrameOutdated = true;
         planScheduleUpdate(UpdateReason::userChange);
@@ -521,15 +519,6 @@ void Canvas::setCanvasMode(const CanvasMode mode) {
     clearLastPressedPoint();
     updatePivot();
     updatePaintBox();
-}
-
-void PaintTarget::afterPaintAnimSurfaceChanged() {
-    if(mPaintPressedSinceUpdate && mPaintAnimSurface) {
-        mPaintAnimSurface->prp_afterChangedRelRange(
-                    mPaintAnimSurface->prp_getIdenticalRelRange(
-                        mPaintAnimSurface->anim_getCurrentRelFrame()));
-        mPaintPressedSinceUpdate = false;
-    }
 }
 
 void Canvas::updatePaintBox() {

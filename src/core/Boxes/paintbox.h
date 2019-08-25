@@ -30,14 +30,16 @@ public:
         ImageRenderData(parentBoxT) {}
 
     void loadImageFromHandler() {
-        auto bitmap = fSurface->surface().toBitmap();
-        fImage = SkiaHelpers::transferDataToSkImage(bitmap);
+        if(fImage) return;
+        if(fASurface) fASurface->getFrameImage(qFloor(fRelFrame), fImage);
     }
 
     void updateRelBoundingRect() final {
-        fRelBoundingRect = fSurface->pixelBoundingRect();
+        Q_ASSERT(fSurface);
+        fRelBoundingRect = fSurface->surface().pixelBoundingRect();
     }
 
+    qptr<AnimatedSurface> fASurface;
     stdsptr<DrawableAutoTiledSurface> fSurface;
 };
 
@@ -55,14 +57,6 @@ public:
 
     AnimatedSurface * getSurface() const {
         return mSurface.get();
-    }
-
-    void hideForPainting() {
-        mVisible = false;
-    }
-
-    void showAfterPainting() {
-        mVisible = true;
     }
 private:
     qsptr<AnimatedSurface> mSurface;

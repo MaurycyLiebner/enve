@@ -250,9 +250,10 @@ NormalSegment BoundingBox::getNormalSegment(const QPointF &absPos,
 #include "efiltersettings.h"
 void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
                                const SkFilterQuality filter) {
-    if(mTransformAnimator->getOpacity() < 0.001) return;
+    const qreal opacity = mTransformAnimator->getOpacity();
+    if(isZero4Dec(opacity) || !mVisibleForCanvas) return;
     SkPaint paint;
-    const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
+    const int intAlpha = qRound(opacity*2.55);
     paint.setAlpha(static_cast<U8CPU>(intAlpha));
     paint.setBlendMode(mBlendModeSk);
     paint.setFilterQuality(filter);

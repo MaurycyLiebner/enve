@@ -23,7 +23,21 @@ DrawableAutoTiledSurface::DrawableAutoTiledSurface() :
     mColumnCount(mTileBitmaps.fColumnCount),
     mZeroTileRow(mTileBitmaps.fZeroTileRow),
     mZeroTileCol(mTileBitmaps.fZeroTileCol),
-    mBitmaps(mTileBitmaps.fBitmaps) {}
+    mBitmaps(mTileBitmaps.fBitmaps) {
+    afterDataReplaced();
+}
+
+DrawableAutoTiledSurface::DrawableAutoTiledSurface(
+        const DrawableAutoTiledSurface &other) : DrawableAutoTiledSurface() {
+    mSurface = other.mSurface;
+    mTileBitmaps = other.mTileBitmaps;
+}
+
+DrawableAutoTiledSurface &DrawableAutoTiledSurface::operator=(const DrawableAutoTiledSurface &other) {
+    mSurface = other.mSurface;
+    mTileBitmaps = other.mTileBitmaps;
+    return *this;
+}
 
 void DrawableAutoTiledSurface::drawOnCanvas(SkCanvas * const canvas,
                                             const SkPoint &dst,
@@ -71,77 +85,64 @@ void DrawableAutoTiledSurface::updateTileRecBitmaps(QRect tileRect) {
     }
 }
 
-class TilesTmpFileDataSaver : public TmpFileDataSaver {
+#include "CacheHandlers/tmploader.h"
+#include "CacheHandlers/tmpsaver.h"
+
+class SurfaceSaver : public TmpSaver {
     e_OBJECT
 public:
     typedef std::function<void(const qsptr<QTemporaryFile>&)> Func;
 protected:
-    TilesTmpFileDataSaver(const TileBitmaps &bitmaps,
-                          const Func& finishedFunc) :
-        mBitmaps(bitmaps), mFinishedFunc(finishedFunc) {}
+    SurfaceSaver(DrawableAutoTiledSurface* const target,
+                 const AutoTiledSurface &surface) :
+        TmpSaver(target), mSurface(surface) {}
+    SurfaceSaver(DrawableAutoTiledSurface* const target,
+                 AutoTiledSurface &&bitmaps) :
+        TmpSaver(target), mSurface(std::move(bitmaps)) {}
 
-    void writeToFile(QIODevice * const file) {
-        file->write(rcConstChar(&mBitmaps.fRowCount), sizeof(int));
-        file->write(rcConstChar(&mBitmaps.fColumnCount), sizeof(int));
-        file->write(rcConstChar(&mBitmaps.fZeroTileRow), sizeof(int));
-        file->write(rcConstChar(&mBitmaps.fZeroTileCol), sizeof(int));
-        for(const auto& col : mBitmaps.fBitmaps) {
-            for(const auto& tile : col) {
-                SkiaHelpers::writeBitmap(tile, file);
-            }
-        }
-    }
 
-    void afterProcessing() {
-        if(mFinishedFunc) mFinishedFunc(mTmpFile);
+    void write(eWriteStream& dst) {
+        mSurface.write(dst);
     }
 private:
-    const TileBitmaps mBitmaps;
-    const Func mFinishedFunc;
+    const AutoTiledSurface mSurface;
 };
 
-class TilesTmpFileDataLoader : public TmpFileDataLoader {
+class SurfaceLoader : public TmpLoader {
     e_OBJECT
 public:
-    typedef std::function<void(const TileBitmaps&)> Func;
+    typedef std::function<void(AutoTiledSurface&&)> Func;
 protected:
-    TilesTmpFileDataLoader(const qsptr<QTemporaryFile> &file,
-                           const Func& finishedFunc) :
-        TmpFileDataLoader(file), mFinishedFunc(finishedFunc) {}
+    SurfaceLoader(const qsptr<QTemporaryFile> &file,
+                  DrawableAutoTiledSurface* const target,
+                  const Func& finishedFunc) :
+        TmpLoader(file, target),
+        mFinishedFunc(finishedFunc) {}
 
-    void readFromFile(QIODevice * const file) {
-        file->read(rcChar(&mTileBitmaps.fRowCount), sizeof(int));
-        file->read(rcChar(&mTileBitmaps.fColumnCount), sizeof(int));
-        file->read(rcChar(&mTileBitmaps.fZeroTileRow), sizeof(int));
-        file->read(rcChar(&mTileBitmaps.fZeroTileCol), sizeof(int));
-        for(int i = 0; i < mTileBitmaps.fColumnCount; i++) {
-            mTileBitmaps.fBitmaps.append(QList<SkBitmap>());
-            auto& col = mTileBitmaps.fBitmaps.last();
-            for(int j = 0; j < mTileBitmaps.fZeroTileRow; j++)
-                col.append(SkiaHelpers::readBitmap(file));
-        }
+    void read(eReadStream& src) {
+        mSurface.read(src);
     }
     void afterProcessing() {
-        if(mFinishedFunc) mFinishedFunc(mTileBitmaps);
+        if(mFinishedFunc) mFinishedFunc(std::move(mSurface));
     }
 private:
-    TileBitmaps mTileBitmaps;
+    AutoTiledSurface mSurface;
     const Func mFinishedFunc;
 };
 
-
 stdsptr<eHddTask> DrawableAutoTiledSurface::createTmpFileDataSaver() {
-    const TilesTmpFileDataSaver::Func func =
-            [this](const qsptr<QTemporaryFile>& tmpFile) {
-        setDataSavedToTmpFile(tmpFile);
-    };
-    return enve::make_shared<TilesTmpFileDataSaver>(mTileBitmaps, func);
+    return enve::make_shared<SurfaceSaver>(this, std::move(mSurface));
 }
 
 stdsptr<eHddTask> DrawableAutoTiledSurface::createTmpFileDataLoader() {
-    const TilesTmpFileDataLoader::Func func =
-            [this](const TileBitmaps& tiles) {
-        setTileBitmaps(tiles);
+    stdptr<DrawableAutoTiledSurface> thisP = this;
+    const SurfaceLoader::Func func =
+    [thisP](AutoTiledSurface&& surface) {
+        if(thisP) {
+            thisP->mSurface = std::move(surface);
+            thisP->updateTileBitmaps();
+            thisP->afterDataLoadedFromTmpFile();
+        }
     };
-    return enve::make_shared<TilesTmpFileDataLoader>(mTmpFile, func);
+    return enve::make_shared<SurfaceLoader>(mTmpFile, this, func);
 }

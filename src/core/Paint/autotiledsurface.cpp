@@ -22,29 +22,12 @@
 #include "colorconversions.h"
 #include "autotiledsurface.h"
 
-void autoTiledSurfaceFree(MyPaintSurface *surface) {
-    const auto self = reinterpret_cast<AutoTiledSurface*>(surface);
-    self->_free();
-}
-
-void autoTiledSurfaceRequestStart(MyPaintTiledSurface *tiled_surface,
-                                  MyPaintTileRequest *request) {
-    const auto self = reinterpret_cast<AutoTiledSurface*>(tiled_surface);
-    self->_startRequest(request);
-}
-
-void autoTiledSurfaceRequestEnd(MyPaintTiledSurface *tiled_surface,
-                                MyPaintTileRequest *request) {
-    const auto self = reinterpret_cast<AutoTiledSurface*>(tiled_surface);
-    self->_endRequest(request);
-}
-
-AutoTiledSurface::AutoTiledSurface() {
-    fMyPaintSurface = &fParent.parent;
+AutoTiledSurface::AutoTiledSurface() :
+    fMyPaintSurface(&fParent.parent) {
     mypaint_tiled_surface_init(&fParent,
-                               autoTiledSurfaceRequestStart,
-                               autoTiledSurfaceRequestEnd);
-    fParent.parent.destroy = autoTiledSurfaceFree;
+                               sRequestStart,
+                               sRequestEnd);
+    fParent.parent.destroy = sFree;
 #ifdef _OPENMP
     fParent.threadsafe_tile_requests = true;
 #else
@@ -52,8 +35,28 @@ AutoTiledSurface::AutoTiledSurface() {
 #endif
 }
 
+AutoTiledSurface::AutoTiledSurface(const AutoTiledSurface &other) :
+    AutoTiledSurface() {
+    mAutoTilesData = other.mAutoTilesData;
+}
+
+AutoTiledSurface::AutoTiledSurface(AutoTiledSurface &&other) :
+    AutoTiledSurface() {
+    mAutoTilesData = std::move(other.mAutoTilesData);
+}
+
+AutoTiledSurface &AutoTiledSurface::operator=(const AutoTiledSurface &other) {
+    mAutoTilesData = other.mAutoTilesData;
+    return *this;
+}
+
+AutoTiledSurface &AutoTiledSurface::operator=(AutoTiledSurface &&other) {
+    mAutoTilesData = std::move(other.mAutoTilesData);
+    return *this;
+}
+
 AutoTiledSurface::~AutoTiledSurface() {
-    _free();
+    free();
 }
 
 void AutoTiledSurface::setPixelClamp(const QRect &pixRect) {
@@ -64,12 +67,32 @@ void AutoTiledSurface::loadBitmap(const SkBitmap& src) {
     mAutoTilesData.loadBitmap(src);
 }
 
+void AutoTiledSurface::sFree(MyPaintSurface *surface) {
+    const auto self = reinterpret_cast<AutoTiledSurface*>(surface);
+    self->free();
+}
+
+void AutoTiledSurface::sRequestStart(MyPaintTiledSurface *tiled_surface,
+                                     MyPaintTileRequest *request) {
+    const auto self = reinterpret_cast<AutoTiledSurface*>(tiled_surface);
+    self->startRequest(request);
+}
+
+void AutoTiledSurface::sRequestEnd(MyPaintTiledSurface *tiled_surface,
+                                   MyPaintTileRequest *request) {
+    const auto self = reinterpret_cast<AutoTiledSurface*>(tiled_surface);
+    self->endRequest(request);
+}
+
+void AutoTiledSurface::free() {
+    mypaint_tiled_surface_destroy(&fParent);
+}
+
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
-void AutoTiledSurface::_startRequest(MyPaintTileRequest * const request) {
-    //qDebug() << request->tx << request->ty;
+void AutoTiledSurface::startRequest(MyPaintTileRequest * const request) {
     #pragma omp critical
     {
         mAutoTilesData.stretchToTile(request->tx, request->ty);
@@ -77,6 +100,6 @@ void AutoTiledSurface::_startRequest(MyPaintTileRequest * const request) {
     }
 }
 
-void AutoTiledSurface::_endRequest(MyPaintTileRequest * const request) {
+void AutoTiledSurface::endRequest(MyPaintTileRequest * const request) {
     Q_UNUSED(request);
 }

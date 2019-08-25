@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "imagecachecontainer.h"
-#include "tmpfilehandlers.h"
+#include "tmpdeleter.h"
 #include "canvas.h"
 #include "skia/skiahelpers.h"
 
@@ -69,15 +69,12 @@ int ImageCacheContainer::clearMemory() {
 }
 
 stdsptr<eHddTask> ImageCacheContainer::createTmpFileDataSaver() {
-    const ImgTmpFileDataSaver::Func func = [this](qsptr<QTemporaryFile> tmpFile) {
-        setDataSavedToTmpFile(tmpFile);
-    };
-    return enve::make_shared<ImgTmpFileDataSaver>(mImageSk, func);
+    return enve::make_shared<ImgSaver>(this, mImageSk);
 }
 
 stdsptr<eHddTask> ImageCacheContainer::createTmpFileDataLoader() {
-    const ImgTmpFileDataLoader::Func func = [this](sk_sp<SkImage> img) {
+    const ImgLoader::Func func = [this](sk_sp<SkImage> img) {
         setDataLoadedFromTmpFile(img);
     };
-    return enve::make_shared<ImgTmpFileDataLoader>(mTmpFile, func);
+    return enve::make_shared<ImgLoader>(mTmpFile, this, func);
 }

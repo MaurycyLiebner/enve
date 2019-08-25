@@ -27,8 +27,16 @@ PaintBox::PaintBox() : BoundingBox(TYPE_PAINT) {
 
 void PaintBox::setupRenderData(const qreal relFrame, BoxRenderData * const data) {
     BoundingBox::setupRenderData(relFrame, data);
-    auto paintData = static_cast<PaintBoxRenderData*>(data);
-    paintData->fSurface = enve::shared(mSurface->getSurface(qFloor(relFrame)));
+    const auto paintData = static_cast<PaintBoxRenderData*>(data);
+    const int imgFrame = qFloor(relFrame);
+    const auto imgTask = mSurface->getFrameImage(imgFrame,
+                                                 paintData->fImage);
+    if(imgTask) imgTask->addDependent(data);
+    else {
+        qDebug() << "image set" << paintData;
+    }
+    paintData->fASurface = mSurface.get();
+    paintData->fSurface = enve::shared(mSurface->getSurface(imgFrame));
 }
 
 stdsptr<BoxRenderData> PaintBox::createRenderData() {

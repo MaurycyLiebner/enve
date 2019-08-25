@@ -24,6 +24,9 @@ extern "C" {
     #include <libavutil/channel_layout.h>
 }
 
+class eWriteStream;
+class eReadStream;
+
 struct Samples : public StdSelfRef {
     e_OBJECT
 protected:
@@ -154,6 +157,10 @@ public:
         return enve::make_shared<Samples>(data, range, fSampleRate,
                                           fFormat, fChannelLayout);
     }
+
+    void write(eWriteStream& dst) const;
+
+    static stdsptr<Samples> sRead(eReadStream& src);
 };
 
 #endif // SAMPLES_H

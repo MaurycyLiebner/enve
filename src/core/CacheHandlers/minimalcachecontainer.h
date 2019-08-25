@@ -32,10 +32,10 @@ public:
         return bytes;
     }
 
-    void setBlocked(const bool bT) {
-        if(bT == mBlocked) return;
-        mBlocked = bT;
-        if(mBlocked) removeFromMemoryManagment();
+    void setInUse(const bool inUse) {
+        if(inUse == mInUse) return;
+        mInUse = inUse;
+        if(mInUse) removeFromMemoryManagment();
         else addToMemoryManagment();
     }
 
@@ -43,8 +43,8 @@ public:
         return mHandledByMemoryHandler;
     }
 
-    bool blocked() const {
-        return mBlocked;
+    bool inUse() const {
+        return mInUse;
     }
 protected:
     void addToMemoryManagment();
@@ -52,7 +52,7 @@ protected:
     void updateInMemoryManagment();
 private:
     bool mHandledByMemoryHandler = false;
-    bool mBlocked = false;
+    bool mInUse = false;
 };
 
 #endif // MINIMALCACHECONTAINER_H

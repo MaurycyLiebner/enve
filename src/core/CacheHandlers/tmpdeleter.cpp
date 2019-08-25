@@ -14,15 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "tmpfilehandlers.h"
+#include "tmpdeleter.h"
 #include "imagecachecontainer.h"
 #include "castmacros.h"
 #include "skia/skiahelpers.h"
 
-void ImgTmpFileDataSaver::writeToFile(QIODevice * const file) {
-    SkiaHelpers::writeImg(mImage, file);
-}
+TmpDeleter::TmpDeleter(const qsptr<QTemporaryFile> &file) :
+    mTmpFile(file) {}
 
-void ImgTmpFileDataLoader::readFromFile(QIODevice * const file) {
-    mImage = SkiaHelpers::readImg(file);
-}
+void TmpDeleter::process() { mTmpFile.reset(); }

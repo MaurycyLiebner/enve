@@ -22,6 +22,7 @@
 #include <cstring>
 #include "exceptions.h"
 #include "castmacros.h"
+#include "framerange.h"
 struct qCubicSegment1D;
 class SmartPath;
 class BrushPolyline;
@@ -158,6 +159,22 @@ public:
         return *this;
     }
 
+
+    eReadStream& operator>>(uint& val) {
+        read(&val, sizeof(uint));
+        return *this;
+    }
+
+    eReadStream& operator>>(uint64_t& val) {
+        read(&val, sizeof(uint64_t));
+        return *this;
+    }
+
+    eReadStream& operator>>(iValueRange& val) {
+        read(&val, sizeof(iValueRange));
+        return *this;
+    }
+
     eReadStream& operator>>(qreal &val) {
         read(&val, sizeof(qreal));
         return *this;
@@ -215,6 +232,21 @@ public:
 
     eWriteStream& operator<<(const int val) {
         write(&val, sizeof(int));
+        return *this;
+    }
+
+    eWriteStream& operator<<(const uint val) {
+        write(&val, sizeof(uint));
+        return *this;
+    }
+
+    eWriteStream& operator<<(const uint64_t val) {
+        write(&val, sizeof(uint64_t));
+        return *this;
+    }
+
+    eWriteStream& operator<<(const iValueRange val) {
+        write(&val, sizeof(iValueRange));
         return *this;
     }
 

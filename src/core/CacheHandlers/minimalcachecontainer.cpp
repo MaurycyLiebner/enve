@@ -27,7 +27,7 @@ CacheContainer::~CacheContainer() {
 }
 
 void CacheContainer::addToMemoryManagment() {
-    if(mHandledByMemoryHandler || mBlocked) return;
+    if(mHandledByMemoryHandler || mInUse) return;
     MemoryDataHandler::sInstance->addContainer(this);
     mHandledByMemoryHandler = true;
 }

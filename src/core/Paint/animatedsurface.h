@@ -20,6 +20,8 @@
 #include "Animators/interpolationkeyt.h"
 #include "drawableautotiledsurface.h"
 #include "Animators/qrealpoint.h"
+#include "CacheHandlers/hddcachablecachehandler.h"
+#include "CacheHandlers/imagecachecontainer.h"
 class AnimatedSurface;
 class ASKey : public Key {
     e_OBJECT
@@ -55,6 +57,29 @@ class AnimatedSurface : public Animator {
 protected:
     AnimatedSurface();
 public:
+    void drawTimelineControls(QPainter * const p,
+                              const qreal pixelsPerFrame,
+                              const FrameRange &absFrameRange,
+                              const int rowHeight) {
+        const int width = qCeil(absFrameRange.span()*pixelsPerFrame);
+        const QRect drawRect(0, 0, width, rowHeight);
+        mFrameImagesCache.drawCacheOnTimeline(p, drawRect, absFrameRange.fMin,
+                                              absFrameRange.fMax);
+        Animator::drawTimelineControls(p, pixelsPerFrame,
+                                       absFrameRange,
+                                       rowHeight);
+    }
+
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const {
+        const auto at = anim_getKeyAtRelFrame(relFrame);
+        const auto neighs = anim_getPrevAndNextKey(relFrame);
+        const auto prev = at ? at : neighs.first;
+        const auto next = neighs.second;
+        const int min = prev ? prev->getRelFrame() : FrameRange::EMIN;
+        const int max = next ? next->getRelFrame() - 1 : FrameRange::EMAX;
+        return {min, max};
+    }
+
     struct OnionSkin {
         struct Skin {
             DrawableAutoTiledSurface* fSurface;
@@ -147,35 +172,73 @@ public:
         }
     };
 
+    void clearInUse() {
+        if(!mUseRange.isValid()) return;
+        const auto minId = anim_getNextKeyId(mUseRange.fMin - 1);
+        const auto maxId = anim_getPrevKeyId(mUseRange.fMax + 1);
+        if(minId == -1 || maxId == -1) return;
+        for(int i = minId; i <= maxId; i++) {
+            const auto iKey = anim_getKeyAtIndex<ASKey>(i);
+            iKey->dSurface().setInUse(false);
+        }
+        mUseRange = {1, 0};
+    }
+
+    void clearUseRange() { setUseRange({1, 0}); }
+
+    void setUseRange(const FrameRange& relRange) {
+        if(mUseRange.isValid()) {
+            const auto minId = anim_getNextKeyId(mUseRange.fMin - 1);
+            const auto maxId = anim_getPrevKeyId(mUseRange.fMax + 1);
+            if(minId == -1 || maxId == -1) return;
+            for(int i = minId; i <= maxId; i++) {
+                if(relRange.inRange(i)) continue;
+                const auto iKey = anim_getKeyAtIndex<ASKey>(i);
+                iKey->dSurface().setInUse(false);
+            }
+        }
+        mUseRange = relRange;
+        if(mUseRange.isValid()) {
+            const auto minId = anim_getNextKeyId(relRange.fMin - 1);
+            const auto maxId = anim_getPrevKeyId(relRange.fMax + 1);
+            if(minId == -1 || maxId == -1) return;
+            for(int i = minId; i <= maxId; i++) {
+                const auto iKey = anim_getKeyAtIndex<ASKey>(i);
+                auto& dSurf = iKey->dSurface();
+                dSurf.setInUse(true);
+                if(!dSurf.storesDataInMemory())
+                    dSurf.scheduleLoadFromTmpFile();
+            }
+        }
+    }
+
     void setupOnionSkinFor(const int sideRange, OnionSkin &skins) {
         setupOnionSkinFor(anim_getCurrentRelFrame(), sideRange, skins);
     }
 
     void setupOnionSkinFor(const int relFrame, const int sideRange,
+                           ASKey* key, OnionSkin::SkinsSide &side) {
+        const int dFrame = qAbs(relFrame - key->getRelFrame());
+        if(dFrame > sideRange) return;
+        const auto surf = &key->dSurface();
+        if(!surf->storesDataInMemory()) return;
+        const qreal weight = 1.*(sideRange - dFrame)/sideRange;
+        side.fSkins.append({surf, toSkScalar(weight)});
+    }
+
+    void setupOnionSkinFor(const int relFrame, const int sideRange,
                            OnionSkin &skins) {
         skins.clear();
-        ASKey * currKey = anim_getKeyAtRelFrame<ASKey>(relFrame);
-        if(!currKey) currKey = anim_getPrevKey<ASKey>(relFrame);
-        if(!currKey) currKey = anim_getNextKey<ASKey>(relFrame);
-        if(!currKey) return;
-        ASKey * prevKey = anim_getPrevKey<ASKey>(currKey);
-        while(prevKey) {
-            const auto surf = &prevKey->dSurface();
-            const int dFrame = qAbs(relFrame - prevKey->getRelFrame());
-            if(dFrame > sideRange) break;
-            const qreal weight = 1.*(sideRange - dFrame)/sideRange;
-            skins.fPrev.fSkins.append({surf, toSkScalar(weight)});
-            prevKey = anim_getPrevKey<ASKey>(prevKey);
-        }
-
-        ASKey * nextKey = anim_getNextKey<ASKey>(currKey);
-        while(nextKey) {
-            const auto surf = &nextKey->dSurface();
-            const int dFrame = qAbs(relFrame - nextKey->getRelFrame());
-            if(dFrame > sideRange) break;
-            const qreal weight = 1.*(sideRange - dFrame)/sideRange;
-            skins.fNext.fSkins.append({surf, toSkScalar(weight)});
-            nextKey = anim_getNextKey<ASKey>(nextKey);
+        const auto minId = anim_getNextKeyId(relFrame - sideRange - 1);
+        const auto maxId = anim_getPrevKeyId(relFrame + sideRange + 1);
+        if(minId == -1 || maxId == -1) return;
+        for(int i = minId; i <= maxId; i++) {
+            const auto asKey = anim_getKeyAtIndex<ASKey>(i);
+            if(asKey->getRelFrame() < relFrame)
+                setupOnionSkinFor(relFrame, sideRange, asKey, skins.fPrev);
+            else if(asKey->getRelFrame() > relFrame) {
+                setupOnionSkinFor(relFrame, sideRange, asKey, skins.fNext);
+            }
         }
     }
 
@@ -194,6 +257,8 @@ public:
         writeKeys(dst);
         mBaseValue->write(dst);
     }
+
+    void prp_afterChangedAbsRange(const FrameRange &range, const bool clip);
 
     void anim_saveCurrentValueAsKey() {
         anim_addKeyAtRelFrame(anim_getCurrentRelFrame());
@@ -258,6 +323,33 @@ public:
         const auto newKey = enve::make_shared<ASKey>(relFrame, this);
         anim_appendKey(newKey);
     }
+
+    //! If the image is available returns nullptr,
+    //! otherwise returns a task that has to finish for the image to be available,
+    //! the task may also may be nullptr if something goes wrong
+    eTask* getFrameImage(const int relFrame, sk_sp<SkImage>& img) {
+        const auto cont = mFrameImagesCache.atFrame<ImageCacheContainer>(relFrame);
+        if(cont) {
+            if(cont->storesDataInMemory()) {
+                img = SkiaHelpers::makeCopy(cont->getImageSk());
+                return nullptr;
+            }
+            return cont->scheduleLoadFromTmpFile();
+        }
+        const auto surf = getSurface(relFrame);
+        if(surf) {
+            if(!surf->storesDataInMemory())
+                return surf->scheduleLoadFromTmpFile();
+            auto bitmap = surf->surface().toBitmap();
+            img = SkiaHelpers::transferDataToSkImage(bitmap);
+            const auto imgCpy = SkiaHelpers::makeCopy(img);
+            const auto range = prp_getIdenticalRelRange(relFrame);
+            const auto newCont = enve::make_shared<ImageCacheContainer>(
+                        imgCpy, range, &mFrameImagesCache);
+            mFrameImagesCache.add(newCont);
+        }
+        return nullptr;
+    }
 signals:
     void currentSurfaceChanged(DrawableAutoTiledSurface*);
 private:
@@ -267,8 +359,11 @@ private:
         emit currentSurfaceChanged(mCurrent_d);
     }
 
+    HddCachableCacheHandler mFrameImagesCache;
+    FrameRange mUseRange{1, 0};
     const stdsptr<DrawableAutoTiledSurface> mBaseValue;
     DrawableAutoTiledSurface * mCurrent_d = nullptr;
+
 };
 
 #endif // ANIMATEDSURFACE_H

@@ -230,8 +230,8 @@ void Animator::anim_deleteCurrentKey() {
 
 void Animator::anim_updateAfterShifted() {
     for(const auto &key : anim_mKeys) {
-        emit anim_removingKey(key);
-        emit anim_addingKey(key);
+        emit anim_removedKey(key);
+        emit anim_addedKey(key);
     }
 }
 
@@ -239,7 +239,7 @@ void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
     const bool isComplex = SWT_isComplexAnimator();
     if(!isComplex) anim_setRecordingValue(true);
     anim_mKeys.add(newKey);
-    emit anim_addingKey(newKey.get());
+    emit anim_addedKey(newKey.get());
     if(newKey->getRelFrame() == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(newKey.get());
     if(!isComplex) anim_updateAfterChangedKey(newKey.get());
@@ -257,7 +257,7 @@ void Animator::removeKeyWithoutDeselecting(const stdsptr<Key>& keyToRemove) {
 
     const int rFrame = keyPtr->getRelFrame();
 
-    emit anim_removingKey(keyPtr);
+    emit anim_removedKey(keyPtr);
     if(rFrame == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(nullptr);
 

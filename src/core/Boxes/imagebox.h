@@ -19,50 +19,7 @@
 #include "Boxes/boundingbox.h"
 #include "skia/skiaincludes.h"
 #include "FileCacheHandlers/imagecachehandler.h"
-
-struct ImageRenderData : public BoxRenderData {
-    ImageRenderData(BoundingBox * const parentBoxT) :
-        BoxRenderData(parentBoxT) {
-        mDelayDataSet = true;
-    }
-
-    virtual void loadImageFromHandler() = 0;
-
-    void updateRelBoundingRect() {
-        if(fImage) fRelBoundingRect =
-                QRectF(0, 0, fImage->width(), fImage->height());
-        else fRelBoundingRect = QRectF(0, 0, 0, 0);
-    }
-
-    void setupRenderData() final {
-        if(!fImage) loadImageFromHandler();
-        if(!hasEffects()) setupDirectDraw();
-    }
-
-    sk_sp<SkImage> fImage;
-private:
-    void setupDirectDraw() {
-        fBaseMargin = QMargins();
-        updateRelBoundingRect();
-        updateGlobalRect();
-        fRenderTransform = fScaledTransform;
-        fRenderTransform.translate(-fGlobalRect.x(), -fGlobalRect.y());
-        fUseRenderTransform = true;
-        fRenderedImage = fImage;
-        fAntiAlias = true;
-        finishedProcessing();
-    }
-
-    void drawSk(SkCanvas * const canvas) {
-        SkPaint paint;
-        if(fFilterQuality > kNone_SkFilterQuality) paint.setAntiAlias(true);
-        paint.setFilterQuality(fFilterQuality);
-        if(fImage) canvas->drawImage(fImage,
-                                     toSkScalar(fRelBoundingRect.x()),
-                                     toSkScalar(fRelBoundingRect.y()),
-                                     &paint);
-    }
-};
+#include "imagerenderdata.h"
 
 struct ImageBoxRenderData : public ImageRenderData {
     ImageBoxRenderData(ImageFileHandler * const cacheHandler,

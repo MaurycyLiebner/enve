@@ -31,14 +31,17 @@
 
 struct AutoTilesData {
     AutoTilesData();
-    ~AutoTilesData();
+    AutoTilesData(const AutoTilesData& other);
+    AutoTilesData(AutoTilesData&& other);
 
-    AutoTilesData(const AutoTilesData& other) = delete;
-    AutoTilesData& operator=(const AutoTilesData& other) = delete;
+    AutoTilesData& operator=(const AutoTilesData& other);
+    AutoTilesData& operator=(AutoTilesData&& other);
+
+    ~AutoTilesData();
 
     void loadBitmap(const SkBitmap& src);
 
-    void reset();
+    void clear();
 
     bool stretchToTile(const int tx, const int ty);
     uint16_t* getTile(const int tx, const int ty) const;
@@ -94,9 +97,14 @@ struct AutoTilesData {
 
     bool isEmpty() const { return mColumnCount == 0 || mRowCount == 0; }
 
-    void deepCopy(const AutoTilesData &other);
     void swap(AutoTilesData& other) {
         mColumns.swap(other.mColumns);
+
+        std::swap(mMinCol, other.mMinCol);
+        std::swap(mMaxCol, other.mMaxCol);
+        std::swap(mMinRow, other.mMinRow);
+        std::swap(mMaxRow, other.mMaxRow);
+
         std::swap(mZeroTileCol, other.mZeroTileCol);
         std::swap(mZeroTileRow, other.mZeroTileRow);
         std::swap(mColumnCount, other.mColumnCount);

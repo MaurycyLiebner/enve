@@ -265,6 +265,7 @@ MainWindow::MainWindow(Document& document,
 }
 
 MainWindow::~MainWindow() {
+    sInstance = nullptr;
 //    mtaskExecutorThread->terminate();
 //    mtaskExecutorThread->quit();
     BoxSingleWidget::clearStaticPixmaps();

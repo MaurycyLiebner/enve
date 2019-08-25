@@ -41,10 +41,12 @@ struct PaintTarget {
                    const SimpleBrushWrapper * const brush);
 
     void newEmptyFrame() {
+        if(!isValid()) return;
         mPaintAnimSurface->newEmptyFrame();
     }
 
     void setupOnionSkin() {
+        if(!isValid()) return;
         mPaintAnimSurface->setupOnionSkinFor(20, mPaintOnion);
     }
 
@@ -57,6 +59,7 @@ struct PaintTarget {
     }
 
     QRect pixelBoundingRect() const {
+        if(!isValid()) return QRect();
         return mPaintDrawable->pixelBoundingRect();
     }
 
@@ -66,7 +69,7 @@ struct PaintTarget {
     AnimatedSurface::OnionSkin mPaintOnion;
     bool mPaintPressedSinceUpdate = false;
     DrawableAutoTiledSurface * mPaintDrawable = nullptr;
-    Canvas * mCanvas = nullptr;
+    Canvas * const mCanvas;
 };
 
 #endif // PAINTTARGET_H

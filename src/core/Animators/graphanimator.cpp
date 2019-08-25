@@ -19,7 +19,7 @@
 #include "qrealpoint.h"
 
 GraphAnimator::GraphAnimator(const QString& name) : Animator(name) {
-    connect(this, &Animator::anim_addingKey, [this](Key * key) {
+    connect(this, &Animator::anim_addedKey, [this](Key * key) {
 
         graph_constrainCtrlsFrameValues();
     });

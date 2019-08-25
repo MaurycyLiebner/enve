@@ -323,7 +323,7 @@ void RenderHandler::nextSaveOutputFrame() {
             VideoEncoder::sAddCacheContainerToEncoder(
                         enve::make_shared<Samples>(samples));
         }
-        sCont->setBlocked(false);
+        sCont->setInUse(false);
         mCurrentEncodeSoundSecond++;
     }
     if(mCurrentEncodeSoundSecond > mMaxSoundSec) VideoEncoder::sAllAudioProvided();

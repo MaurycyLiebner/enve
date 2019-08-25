@@ -33,14 +33,13 @@ struct AutoTiledSurface {
     friend struct BrushStrokeSet;
 
     AutoTiledSurface();
-    AutoTiledSurface(const AutoTiledSurface& other) = delete;
-    AutoTiledSurface& operator=(const AutoTiledSurface& other) = delete;
+    AutoTiledSurface(const AutoTiledSurface& other);
+    AutoTiledSurface(AutoTiledSurface&& other);
+
+    AutoTiledSurface& operator=(const AutoTiledSurface& other);
+    AutoTiledSurface& operator=(AutoTiledSurface&& other);
 
     ~AutoTiledSurface();
-
-    void deepCopy(const AutoTiledSurface& other) {
-        mAutoTilesData.deepCopy(other.mAutoTilesData);
-    }
 
     void swap(AutoTiledSurface& other) {
         mAutoTilesData.swap(other.mAutoTilesData);
@@ -48,12 +47,6 @@ struct AutoTiledSurface {
 
     void setPixelClamp(const QRect& pixRect);
     void loadBitmap(const SkBitmap &src);
-
-    void _free() {
-        mypaint_tiled_surface_destroy(&fParent);
-    }
-    void _startRequest(MyPaintTileRequest * const request);
-    void _endRequest(MyPaintTileRequest * const request);
 
     MyPaintRectangle paintPressEvent(MyPaintBrush * const brush,
                                      const QPointF& pos,
@@ -118,17 +111,30 @@ struct AutoTiledSurface {
 
     bool isEmpty() const { return mAutoTilesData.isEmpty(); }
 
-    void write(eWriteStream& dst) {
+    void write(eWriteStream& dst) const {
         mAutoTilesData.write(dst);
     }
 
     void read(eReadStream& src) {
         mAutoTilesData.read(src);
     }
+
+    void clear() { mAutoTilesData.clear(); }
+private:
+    static void sFree(MyPaintSurface *surface);
+
+    static void sRequestStart(MyPaintTiledSurface *tiled_surface,
+                              MyPaintTileRequest *request);
+
+    static void sRequestEnd(MyPaintTiledSurface *tiled_surface,
+                            MyPaintTileRequest *request);
+
+    void free();
+    void startRequest(MyPaintTileRequest * const request);
+    void endRequest(MyPaintTileRequest * const request);
 protected:
     MyPaintTiledSurface fParent;
-    MyPaintSurface* fMyPaintSurface = nullptr;
-
+    MyPaintSurface* const fMyPaintSurface;
     AutoTilesData mAutoTilesData;
 };
 

@@ -105,9 +105,9 @@ void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
         const auto childAnimator = static_cast<Animator*>(child.get());
         connect(childAnimator, &Animator::anim_isRecordingChanged,
                 this, &ComplexAnimator::ca_childAnimatorIsRecordingChanged);
-        connect(childAnimator, &Animator::anim_addingKey,
+        connect(childAnimator, &Animator::anim_addedKey,
                 this, &ComplexAnimator::ca_addDescendantsKey);
-        connect(childAnimator, &Animator::anim_removingKey,
+        connect(childAnimator, &Animator::anim_removedKey,
                 this, &ComplexAnimator::ca_removeDescendantsKey);
         childAnimator->anim_addAllKeysToComplexAnimator(this);
         ca_childAnimatorIsRecordingChanged();

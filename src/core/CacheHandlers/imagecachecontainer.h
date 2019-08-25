@@ -45,4 +45,44 @@ protected:
 };
 
 
+#include "CacheHandlers/tmploader.h"
+#include "CacheHandlers/tmpsaver.h"
+
+class ImgSaver : public TmpSaver {
+    e_OBJECT
+public:
+    typedef std::function<void(const qsptr<QTemporaryFile>&)> Func;
+protected:
+    ImgSaver(ImageCacheContainer* const target,
+             const sk_sp<SkImage> &image) :
+        TmpSaver(target), mImage(image) {}
+
+    void write(eWriteStream& dst) {
+        SkiaHelpers::writeImg(mImage, dst);
+    }
+private:
+    const sk_sp<SkImage> mImage;
+};
+
+class ImgLoader : public TmpLoader {
+    e_OBJECT
+public:
+    typedef std::function<void(sk_sp<SkImage> img)> Func;
+protected:
+    ImgLoader(const qsptr<QTemporaryFile> &file,
+              ImageCacheContainer* const target,
+              const Func& finishedFunc) :
+        TmpLoader(file, target), mFinishedFunc(finishedFunc) {}
+
+    void read(eReadStream& src) {
+        mImage = SkiaHelpers::readImg(src);
+    }
+    void afterProcessing() {
+        if(mFinishedFunc) mFinishedFunc(mImage);
+    }
+private:
+    sk_sp<SkImage> mImage;
+    const Func mFinishedFunc;
+};
+
 #endif // IMAGECACHECONTAINER_H
