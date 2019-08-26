@@ -64,6 +64,7 @@ int main(int argc, char *argv[]) {
     //    process->start("prlimit --data=3000000000 --pid " + QString::number(pId));
     //#endif
 
+    QDir(eSettings::sSettingsDir()).mkpath(eSettings::sIconsDir());
     try {
         const QString pngPath = eSettings::sIconsDir() + "/splash.png";
 #ifdef QT_DEBUG
