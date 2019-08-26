@@ -22,6 +22,7 @@
 #include "Animators/qrealpoint.h"
 #include "CacheHandlers/hddcachablecachehandler.h"
 #include "CacheHandlers/imagecachecontainer.h"
+#include "onionskin.h"
 class AnimatedSurface;
 class ASKey : public Key {
     e_OBJECT
@@ -79,98 +80,6 @@ public:
         const int max = next ? next->getRelFrame() - 1 : FrameRange::EMAX;
         return {min, max};
     }
-
-    struct OnionSkin {
-        struct Skin {
-            DrawableAutoTiledSurface* fSurface;
-            float fWeight;
-
-            SkIRect boundingRect() const {
-                return toSkIRect(fSurface->pixelBoundingRect());
-            }
-        };
-
-        struct SkinsSide {
-            SkColor4f fColor;
-            QList<Skin> fSkins;
-            sk_sp<SkImage> fImage;
-            SkIPoint fImageXY;
-
-            SkIRect boundingRect() const {
-                SkIRect result = SkIRect::MakeXYWH(0, 0, 0, 0);
-                bool first = true;
-                for(const auto& skin : fSkins) {
-                    if(first) {
-                        result = skin.boundingRect();
-                        first = false;
-                    } else result.join(skin.boundingRect());
-                }
-                return result;
-            }
-
-            void draw(SkCanvas * const canvas) {
-                if(fSkins.isEmpty()) return;
-                if(!fImage) setupImage(canvas->getGrContext());
-                SkPaint paint;
-                paint.setAlphaf(0.5f);
-                canvas->drawImage(fImage, fImageXY.x(), fImageXY.y(), &paint);
-            }
-
-            void clear() {
-                fSkins.clear();
-                fImage.reset();
-            }
-
-            void setupImage(GrContext* const grContext) {
-                const auto bRect = boundingRect();
-                if(bRect.width() <= 0 || bRect.height() <= 0) return;
-                fImageXY = bRect.topLeft();
-                const auto grTex = grContext->createBackendTexture(
-                            bRect.width(), bRect.height(),
-                            kRGBA_8888_SkColorType, GrMipMapped::kNo,
-                            GrRenderable::kYes);
-
-                sk_sp<SkSurface> gpuSurface = SkSurface::MakeFromBackendTexture(
-                            grContext, grTex,
-                            kTopLeft_GrSurfaceOrigin, 0,
-                            kRGBA_8888_SkColorType,
-                            nullptr, nullptr);
-                const auto texCanvas = gpuSurface->getCanvas();
-                texCanvas->clear(SK_ColorTRANSPARENT);
-                texCanvas->translate(-fImageXY.x(), -fImageXY.y());
-                for(const auto& skin : fSkins) {
-                    SkPaint paint;
-                    const float rgbMax = qMax(fColor.fR, qMax(fColor.fG, fColor.fB));
-                    const float colM[20] = {
-                        1 - rgbMax, 0, 0, fColor.fR, 0,
-                        0, 1 - rgbMax, 0, fColor.fG, 0,
-                        0, 0, 1 - rgbMax, fColor.fB, 0,
-                        0, 0, 0, fColor.fA*skin.fWeight, 0};
-                    const auto colF = SkColorFilters::Matrix(colM);
-                    paint.setColorFilter(colF);
-
-                    skin.fSurface->drawOnCanvas(texCanvas, {0, 0}, &paint);
-                }
-                texCanvas->flush();
-                fImage = SkImage::MakeFromAdoptedTexture(grContext, grTex,
-                                                         kTopLeft_GrSurfaceOrigin,
-                                                         kRGBA_8888_SkColorType);
-            }
-        };
-
-        SkinsSide fPrev{{1, 0, 0, 1}, QList<Skin>(), nullptr, {0, 0}};
-        SkinsSide fNext{{0, 0.5f, 1, 1}, QList<Skin>(), nullptr, {0, 0}};
-
-        void draw(SkCanvas * const canvas) {
-            fPrev.draw(canvas);
-            fNext.draw(canvas);
-        }
-
-        void clear() {
-            fPrev.clear();
-            fNext.clear();
-        }
-    };
 
     void clearInUse() {
         if(!mUseRange.isValid()) return;

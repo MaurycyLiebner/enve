@@ -141,6 +141,7 @@ SOURCES += \
     Paint/brushstroke.cpp \
     Paint/colorconversions.cpp \
     Paint/drawableautotiledsurface.cpp \
+    Paint/onionskin.cpp \
     Paint/painttarget.cpp \
     Paint/simplebrushwrapper.cpp \
     PathEffects/custompatheffect.cpp \
@@ -351,6 +352,7 @@ HEADERS += \
     Paint/brushstroke.h \
     Paint/colorconversions.h \
     Paint/drawableautotiledsurface.h \
+    Paint/onionskin.h \
     Paint/painttarget.h \
     Paint/simplebrushwrapper.h \
     PathEffects/custompatheffect.h \

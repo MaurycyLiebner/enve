@@ -21,6 +21,7 @@ class Canvas;
 #include "simplebrushwrapper.h"
 #include "animatedsurface.h"
 #include "Boxes/paintbox.h"
+#include "onionskin.h"
 
 struct PaintTarget {
     PaintTarget(Canvas* const canvas) : mCanvas(canvas) {}
@@ -66,7 +67,7 @@ struct PaintTarget {
     ulong mLastTs;
     qptr<PaintBox> mPaintDrawableBox;
     qptr<AnimatedSurface> mPaintAnimSurface;
-    AnimatedSurface::OnionSkin mPaintOnion;
+    OnionSkin mPaintOnion;
     bool mPaintPressedSinceUpdate = false;
     DrawableAutoTiledSurface * mPaintDrawable = nullptr;
     Canvas * const mCanvas;
