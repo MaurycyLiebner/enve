@@ -107,7 +107,7 @@ void BoundingBox::prp_afterChangedAbsRange(const FrameRange &range, const bool c
     const auto croppedRange = clip ? prp_absInfluenceRange()*range : range;
     StaticComplexAnimator::prp_afterChangedAbsRange(croppedRange, clip);
     if(croppedRange.inRange(anim_getCurrentAbsFrame())) {
-        planScheduleUpdate(UpdateReason::userChange);
+        planUpdate(UpdateReason::userChange);
     }
 }
 
@@ -209,7 +209,7 @@ void BoundingBox::applyPaintSetting(const PaintSettingsApplier &setting) {
 bool BoundingBox::SWT_isBoundingBox() const { return true; }
 
 void BoundingBox::updateAllBoxes(const UpdateReason reason) {
-    planScheduleUpdate(reason);
+    planUpdate(reason);
 }
 
 void BoundingBox::drawAllCanvasControls(SkCanvas * const canvas,
@@ -287,7 +287,7 @@ void BoundingBox::anim_setAbsFrame(const int frame) {
     const int newRelFrame = anim_getCurrentRelFrame();
 
     if(prp_differencesBetweenRelFrames(oldRelFrame, newRelFrame)) {
-        planScheduleUpdate(UpdateReason::frameChange);
+        planUpdate(UpdateReason::frameChange);
     }
 }
 
@@ -330,7 +330,7 @@ void BoundingBox::setParentTransform(BasicTransformAnimator *parent) {
 
 void BoundingBox::afterTotalTransformChanged(const UpdateReason reason) {
     updateDrawRenderContainerTransform();
-    planScheduleUpdate(reason);
+    planUpdate(reason);
     requestGlobalPivotUpdateIfSelected();
 }
 
@@ -376,45 +376,44 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
     setRelBoundingRect(renderData->fRelBoundingRect);
 }
 
-void BoundingBox::planScheduleUpdate(const UpdateReason reason) {
+void BoundingBox::planUpdate(const UpdateReason reason) {
     if(!isVisibleAndInVisibleDurationRect()) return;
-    if(mParentGroup) mParentGroup->planScheduleUpdate(reason);
+    if(mParentGroup) mParentGroup->planUpdate(reason);
     else if(!SWT_isCanvas()) return;
-    if(reason != UpdateReason::frameChange) {
+    if(reason == UpdateReason::userChange) {
         mStateId++;
         mRenderDataHandler.clear();
     }
+
     mDrawRenderContainer.setExpired(true);
-    if(mSchedulePlanned) {
+    if(mUpdatePlanned) {
         mPlannedReason = qMax(reason, mPlannedReason);
         return;
     }
-    mSchedulePlanned = true;
+
+    mUpdatePlanned = true;
     mPlannedReason = reason;
 
-    if(mParentScene && mParentScene->isPreviewingOrRendering()) {
-        scheduleUpdate();
-    }
+    if(mParentScene && mParentScene->isPreviewingOrRendering()) queTasks();
 }
 
-void BoundingBox::scheduleUpdate() {
-    if(!mSchedulePlanned) return;
-    mSchedulePlanned = false;
+void BoundingBox::queTasks() {
+    if(!mUpdatePlanned) return;
+    mUpdatePlanned = false;
     if(!shouldScheduleUpdate()) return;
     const int relFrame = anim_getCurrentRelFrame();
     if(hasCurrentRenderData(relFrame)) return;
-    const auto currentRenderData = updateCurrentRenderData(relFrame, mPlannedReason);
-    if(currentRenderData) currentRenderData->scheduleTask();
+    const auto currentRenderData = updateCurrentRenderData(relFrame);
+    setupRenderData(relFrame, currentRenderData);
+    TaskScheduler::sInstance->queCpuTask(enve::shared(currentRenderData));
 }
 
-BoxRenderData *BoundingBox::updateCurrentRenderData(const qreal relFrame,
-                                                    const UpdateReason reason) {
+BoxRenderData *BoundingBox::updateCurrentRenderData(const qreal relFrame) {
     const auto renderData = createRenderData();
     if(!renderData) {
         RuntimeThrow(typeid(*this).name() + "::createRenderData returned a nullptr");
     }
     renderData->fRelFrame = relFrame;
-    renderData->fReason = reason;
     mRenderDataHandler.addItemAtRelFrame(renderData);
     return renderData.get();
 }
@@ -628,6 +627,7 @@ void BoundingBox::finishTransform() {
 void BoundingBox::setupRenderData(const qreal relFrame,
                                   BoxRenderData * const data) {
     if(!mParentScene) return;
+
     data->fBoxStateId = mStateId;
     data->fRelFrame = qRound(relFrame);
     data->fRelTransform = getRelativeTransformAtFrame(relFrame);

@@ -582,11 +582,11 @@ public:
         return mPaintTarget.isValid();
     }
 
-    void scheduleUpdate() {
+    void queTasks() {
         if(Actions::sInstance->smoothChange() && mCurrentContainer) {
             if(!mDrawnSinceQue) return;
-            mCurrentContainer->scheduleChildrenUpdate();
-        } else ContainerBox::scheduleUpdate();
+            mCurrentContainer->queChildrenTasks();
+        } else ContainerBox::queTasks();
         mDrawnSinceQue = false;
     }
 private:

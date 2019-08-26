@@ -173,6 +173,8 @@ SOURCES += \
     Tasks/gpupostprocessor.cpp \
     Tasks/offscreenqgl33c.cpp \
     Tasks/taskexecutor.cpp \
+    Tasks/taskque.cpp \
+    Tasks/taskquehandler.cpp \
     Tasks/taskscheduler.cpp \
     Tasks/updatable.cpp \
     Timeline/animationrect.cpp \
@@ -390,6 +392,8 @@ HEADERS += \
     Tasks/gpupostprocessor.h \
     Tasks/offscreenqgl33c.h \
     Tasks/taskexecutor.h \
+    Tasks/taskque.h \
+    Tasks/taskquehandler.h \
     Tasks/taskscheduler.h \
     Tasks/updatable.h \
     Timeline/animationrect.h \

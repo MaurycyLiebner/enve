@@ -177,17 +177,17 @@ public:
             const int frame1, const int frame2) const;
     void setPathsOutdated(const UpdateReason reason) {
         mCurrentPathsOutdated = true;
-        planScheduleUpdate(reason);
+        planUpdate(reason);
     }
 
     void setOutlinePathOutdated(const UpdateReason reason) {
         mCurrentOutlinePathOutdated = true;
-        planScheduleUpdate(reason);
+        planUpdate(reason);
     }
 
     void setFillPathOutdated(const UpdateReason reason) {
         mCurrentFillPathOutdated = true;
-        planScheduleUpdate(reason);
+        planUpdate(reason);
     }
 
     void resetStrokeGradientPointsPos();

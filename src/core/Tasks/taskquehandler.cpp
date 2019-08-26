@@ -1,0 +1,90 @@
+// enve - 2D animations software
+// Copyright (C) 2016-2019 Maurycy Liebner
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#include "taskquehandler.h"
+
+int TaskQueHandler::countQues() const { return mQues.count(); }
+
+bool TaskQueHandler::isEmpty() const { return mQues.isEmpty(); }
+
+void TaskQueHandler::clear() {
+    mQues.clear();
+    mCurrentQue = nullptr;
+    mTaskCount = 0;
+}
+
+stdsptr<eTask> TaskQueHandler::takeQuedForGpuProcessing() {
+    int queId = 0;
+    for(const auto& que : mQues) {
+        const auto task = que->takeQuedForGpuProcessing();
+        if(task) {
+            if(que->allDone()) queDone(que.get(), queId);
+            mTaskCount--;
+            return task;
+        }
+        queId++;
+    }
+    return nullptr;
+}
+
+stdsptr<eTask> TaskQueHandler::takeQuedForCpuProcessing() {
+    int queId = 0;
+    for(const auto& que : mQues) {
+        const auto task = que->takeQuedForCpuProcessing();
+        if(task) {
+            if(que->allDone()) queDone(que.get(), queId);
+            mTaskCount--;
+            return task;
+        }
+        queId++;
+    }
+    return nullptr;
+}
+
+void TaskQueHandler::beginQue() {
+    if(mCurrentQue) RuntimeThrow("Previous list not ended");
+    mQues << std::make_shared<TaskQue>();
+    mCurrentQue = mQues.last().get();
+}
+
+void TaskQueHandler::addTask(const stdsptr<eTask> &task) {
+    if(!mCurrentQue) RuntimeThrow("Cannot add task when there is no active que.");
+    mCurrentQue->addTask(task);
+}
+
+void TaskQueHandler::addTaskFastTrack(const stdsptr<eTask> &task) {
+    if(mCurrentQue) {
+        addTask(task);
+    } else {
+        if(mQues.isEmpty()) beginQue();
+        else mCurrentQue = mQues.first().get();
+        addTask(task);
+        endQue();
+    }
+}
+
+void TaskQueHandler::endQue() {
+    if(!mCurrentQue) return;
+    const int count = mCurrentQue->countQued();
+    if(count == 0) mQues.removeLast();
+    else mTaskCount += count;
+    mCurrentQue = nullptr;
+}
+
+void TaskQueHandler::queDone(const TaskQue * const que, const int queId) {
+    if(que == mCurrentQue) return;
+    mQues.removeAt(queId);
+}

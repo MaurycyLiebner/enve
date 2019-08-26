@@ -40,7 +40,7 @@ TaskScheduler::TaskScheduler() {
     mHddExecs << mHddExecutor;
     connect(mHddExecutor, &ExecController::finishedTaskSignal,
             this, &TaskScheduler::afterHddTaskFinished);
-    connect(mHddExecutor, &HddExecController::HddPartFinished,
+    connect(mHddExecutor, &HddExecController::hddPartFinished,
             this, &TaskScheduler::switchToBackupHddExecutor);
 
     mFreeBackupHddExecs << createNewBackupHddExecutor();
@@ -129,7 +129,7 @@ void TaskScheduler::queScheduledCpuTasks() {
     mQuedCpuTasks.beginQue();
     for(const auto& it : Document::sInstance->fVisibleScenes) {
         const auto scene = it.first;
-        scene->scheduleUpdate();
+        scene->queTasks();
     }
     while(!mScheduledCpuTasks.isEmpty())
         queCpuTask(mScheduledCpuTasks.takeLast());
@@ -152,7 +152,7 @@ void TaskScheduler::queScheduledHddTasks() {
 
 void TaskScheduler::switchToBackupHddExecutor() {
     if(!mHddThreadBusy) return;
-    disconnect(mHddExecutor, &HddExecController::HddPartFinished,
+    disconnect(mHddExecutor, &HddExecController::hddPartFinished,
                this, &TaskScheduler::switchToBackupHddExecutor);
 
     if(mFreeBackupHddExecs.isEmpty()) {
@@ -162,7 +162,7 @@ void TaskScheduler::switchToBackupHddExecutor() {
     }
     mHddThreadBusy = false;
 
-    connect(mHddExecutor, &HddExecController::HddPartFinished,
+    connect(mHddExecutor, &HddExecController::hddPartFinished,
             this, &TaskScheduler::switchToBackupHddExecutor);
     processNextQuedHddTask();
 }
@@ -221,7 +221,13 @@ bool TaskScheduler::processNextQuedGpuTask() {
             processNextTasks();
             return true;
         }
+        const int additional = mQuedCpuTasks.taskCount()/(mCpuExecutors.count()*10);
         scheduleGpuTask(task);
+        for(int i = 0; i < additional; i++) {
+            const auto iTask = mQuedCpuTasks.takeQuedForGpuProcessing();
+            if(!iTask) break;
+            scheduleGpuTask(iTask);
+        }
     }
     emit gpuUsageChanged(!mGpuPostProcessor.allDone());
     return task.get();
@@ -243,6 +249,7 @@ void TaskScheduler::afterCpuGpuTaskFinished() {
 }
 
 void TaskScheduler::processNextQuedCpuTask() {
+    const int additional = mQuedCpuTasks.taskCount()/(mCpuExecutors.count()*4);
     while(!mFreeCpuExecs.isEmpty() && !mQuedCpuTasks.isEmpty()) {
         const auto task = mQuedCpuTasks.takeQuedForCpuProcessing();
         if(task) {
@@ -252,6 +259,11 @@ void TaskScheduler::processNextQuedCpuTask() {
             }
             const auto executor = mFreeCpuExecs.takeLast();
             executor->processTask(task);
+            for(int i = 0; i < additional; i++) {
+                const auto iTask = mQuedCpuTasks.takeQuedForCpuProcessing();
+                if(!iTask) break;
+                executor->processTask(iTask);
+            }
         } else break;
     }
 

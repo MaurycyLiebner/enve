@@ -14,20 +14,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ENVESPLASH_H
-#define ENVESPLASH_H
-#include <QSplashScreen>
+#ifndef TASKQUEHANDLER_H
+#define TASKQUEHANDLER_H
+#include "taskque.h"
 
-class EnveSplash : public QSplashScreen {
+class TaskQueHandler {
 public:
-    EnveSplash();
-protected:
-    void drawContents(QPainter* const p);
-    void mousePressEvent(QMouseEvent *);
-private:
-    QString mText;
-    QRect mTextRect;
-    QRect mMessageRect;
-};
+    int countQues() const;
+    bool isEmpty() const;
 
-#endif // ENVESPLASH_H
+    void clear();
+
+    stdsptr<eTask> takeQuedForGpuProcessing();
+    stdsptr<eTask> takeQuedForCpuProcessing();
+
+    void beginQue();
+
+    void addTask(const stdsptr<eTask>& task);
+    void addTaskFastTrack(const stdsptr<eTask>& task);
+
+    void endQue();
+
+    int taskCount() const { return mTaskCount; }
+private:
+    void queDone(const TaskQue * const que, const int queId);
+
+    int mTaskCount = 0;
+    QList<stdsptr<TaskQue>> mQues;
+    TaskQue * mCurrentQue = nullptr;
+};
+#endif // TASKQUEHANDLER_H

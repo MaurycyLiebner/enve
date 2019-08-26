@@ -105,6 +105,6 @@ void eHddTask::scheduleTaskNow() {
     TaskScheduler::sGetInstance()->scheduleHddTask(ref<eTask>());
 }
 
-void eHddTask::HddPartFinished() {
-    if(mController) emit mController->HddPartFinished();
+void eHddTask::hddPartFinished() {
+    if(mController) emit mController->hddPartFinished();
 }

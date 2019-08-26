@@ -160,7 +160,7 @@ void ContainerBox::anim_scaleTime(const int pivotAbsFrame, const qreal scale) {
 }
 
 bool ContainerBox::differenceInFillPathEffectsBetweenFrames(const int relFrame1,
-                                                          const int relFrame2) const {
+                                                            const int relFrame2) const {
     return mFillPathEffectsAnimators->prp_differencesBetweenRelFrames(relFrame1,
                                                                       relFrame2);
 }
@@ -229,7 +229,7 @@ void ContainerBox::forcedMarginMeaningfulChange() {
         if(box->SWT_isContainerBox()) {
             const auto cont = static_cast<ContainerBox*>(box);
             cont->forcedMarginMeaningfulChange();
-        } else box->planScheduleUpdate(UpdateReason::userChange);
+        } else box->planUpdate(UpdateReason::userChange);
     }
 }
 
@@ -282,15 +282,16 @@ void ContainerBox::filterFillPath(const qreal relFrame,
     mParentGroup->filterFillPath(parentRelFrame, srcDstPath);
 }
 
-void ContainerBox::scheduleChildrenUpdate() {
+void ContainerBox::queChildrenTasks() {
     for(const auto &child : mContainedBoxes)
-        child->scheduleUpdate();
+        child->queTasks();
 }
 
-void ContainerBox::scheduleUpdate() {
-    scheduleChildrenUpdate();
-    if(mSchedulePlanned && SWT_isGroupBox()) updateRelBoundingRect();
-    BoundingBox::scheduleUpdate();
+void ContainerBox::queTasks() {
+    queChildrenTasks();
+    if(mUpdatePlanned && SWT_isGroupBox())
+        updateRelBoundingRect();
+    else BoundingBox::queTasks();
 }
 
 void ContainerBox::promoteToLayer() {
@@ -329,7 +330,7 @@ void ContainerBox::updateAllBoxes(const UpdateReason reason) {
     for(const auto &child : mContainedBoxes) {
         child->updateAllBoxes(reason);
     }
-    planScheduleUpdate(reason);
+    planUpdate(reason);
 }
 
 void ContainerBox::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
@@ -469,7 +470,7 @@ bool ContainerBox::isDescendantCurrentGroup() const {
 
 void ContainerBox::setDescendantCurrentGroup(const bool bT) {
     mIsDescendantCurrentGroup = bT;
-    if(!bT) planScheduleUpdate(UpdateReason::userChange);
+    if(!bT) planUpdate(UpdateReason::userChange);
     if(!mParentGroup) return;
     mParentGroup->setDescendantCurrentGroup(bT);
 }
@@ -575,7 +576,6 @@ void processChildData(BoundingBox * const child,
     auto boxRenderData = child->getCurrentRenderData(childRelFrame);
     if(!boxRenderData) {
         boxRenderData = child->createRenderData();
-        boxRenderData->fReason = parentData->fReason;
         boxRenderData->fRelFrame = childRelFrame;
         boxRenderData->scheduleTask();
     }
@@ -805,7 +805,7 @@ void ContainerBox::moveContainedInList(eBoxOrSound * const child,
     updateContainedBoxes();
     updateContainedIds(qMin(from, boundTo), qMax(from, boundTo));
     SWT_moveChildTo(child, containedIdToAbstractionId(boundTo));
-    planScheduleUpdate(UpdateReason::userChange);
+    planUpdate(UpdateReason::userChange);
 
     prp_afterWholeInfluenceRangeChanged();
 }

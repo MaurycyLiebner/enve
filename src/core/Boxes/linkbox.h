@@ -68,7 +68,7 @@ public:
             connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
                     this, &BoundingBox::prp_afterChangedAbsRange);
         }
-        planScheduleUpdate(UpdateReason::userChange);
+        planUpdate(UpdateReason::userChange);
         connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
                 this, &InternalLinkBox::setTargetSlot);
     }

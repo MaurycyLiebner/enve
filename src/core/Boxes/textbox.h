@@ -48,7 +48,7 @@ public:
 
     void setTextAlignment(const Qt::Alignment &alignment) {
         mAlignment = alignment;
-        planScheduleUpdate(UpdateReason::userChange);
+        planUpdate(UpdateReason::userChange);
     }
 
     void setCurrentValue(const QString &text);

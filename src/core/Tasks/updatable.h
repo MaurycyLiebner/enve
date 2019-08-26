@@ -156,7 +156,7 @@ public:
     }
 protected:
     void scheduleTaskNow();
-    void HddPartFinished();
+    void hddPartFinished();
 public:
     void setController(HddExecController * const contr) {
         mController = contr;

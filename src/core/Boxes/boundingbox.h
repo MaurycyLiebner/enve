@@ -198,7 +198,7 @@ public:
             const int relFrame, const bool takeAncestorsIntoAccount = true);
 
     virtual bool shouldScheduleUpdate() { return true; }
-    virtual void scheduleUpdate();
+    virtual void queTasks();
 
     virtual void writeIdentifier(eWriteStream& dst) const;
 
@@ -313,8 +313,7 @@ public:
 
     bool hasCurrentRenderData(const qreal relFrame) const;
     stdsptr<BoxRenderData> getCurrentRenderData(const qreal relFrame) const;
-    BoxRenderData *updateCurrentRenderData(const qreal relFrame,
-                                           const UpdateReason reason);
+    BoxRenderData *updateCurrentRenderData(const qreal relFrame);
 
     void updateDrawRenderContainerTransform();
 
@@ -333,7 +332,7 @@ public:
     void requestGlobalPivotUpdateIfSelected();
     void requestGlobalFillStrokeUpdateIfSelected();
 
-    void planScheduleUpdate(const UpdateReason reason);
+    void planUpdate(const UpdateReason reason);
 
     void planCenterPivotPosition();
 
@@ -383,7 +382,7 @@ protected:
 
     bool mVisibleForCanvas = true;
     bool mCenterPivotPlanned = false;
-    bool mSchedulePlanned = false;
+    bool mUpdatePlanned = false;
     UpdateReason mPlannedReason;
     QList<stdsptr<BoxRenderData>> mScheduledTasks;
     QList<qptr<Property>> mCanvasProps;

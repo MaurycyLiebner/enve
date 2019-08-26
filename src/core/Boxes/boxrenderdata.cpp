@@ -156,7 +156,6 @@ void BoxRenderData::afterProcessing() {
 
 void BoxRenderData::afterQued() {
     if(mDataSet) return;
-    if(fParentBox) fParentBox->setupRenderData(fRelFrame, this);
     if(!mDelayDataSet) dataSet();
 }
 

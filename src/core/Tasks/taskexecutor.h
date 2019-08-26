@@ -35,7 +35,7 @@ class HddTaskExecutor : public TaskExecutor {
 public:
     explicit HddTaskExecutor() {}
 signals:
-    void HddPartFinished();
+    void hddPartFinished();
 };
 
 class ExecController : public QObject {
@@ -54,8 +54,9 @@ protected:
     }
 public:
     void processTask(const stdsptr<eTask>& task) {
-        if(mCurrentTask) RuntimeThrow("Previous task did not finish yet");
-        mCurrentTask = task;
+        //if(mCurrentTask) RuntimeThrow("Previous task did not finish yet");
+        //mCurrentTask = task;
+        mTasks << task;//
         emit processTaskSignal(task.get());
     }
 
@@ -78,13 +79,21 @@ signals:
 protected:
     TaskExecutor * const mExecutor;
 private:
-    void finishedTask() {
-        stdsptr<eTask> task;
-        task.swap(mCurrentTask);
-        emit finishedTaskSignal(task, this);
+    void finishedTask(eTask* const task) {
+        for(int i = 0; i < mTasks.count(); i++) {//
+            const auto& iTask = mTasks[i];//
+            if(task == iTask.get()) {//
+                emit finishedTaskSignal(iTask, this);//
+                mTasks.removeAt(i);//
+            }//
+        }//
+//        stdsptr<eTask> task;
+//        task.swap(mCurrentTask);
+//        emit finishedTaskSignal(task, this);
     }
 
-    stdsptr<eTask> mCurrentTask;
+    QList<stdsptr<eTask>> mTasks;
+//    stdsptr<eTask> mCurrentTask;
     QThread * const mExecutorThread;
 };
 
@@ -100,11 +109,11 @@ public:
     HddExecController(QObject * const parent = nullptr) :
         ExecController(new HddTaskExecutor, parent) {
         connect(static_cast<HddTaskExecutor*>(mExecutor),
-                &HddTaskExecutor::HddPartFinished,
-                this, &HddExecController::HddPartFinished);
+                &HddTaskExecutor::hddPartFinished,
+                this, &HddExecController::hddPartFinished);
     }
 signals:
-    void HddPartFinished();
+    void hddPartFinished();
 };
 
 #endif // TASKEXECUTOR_H

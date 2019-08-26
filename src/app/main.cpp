@@ -152,11 +152,13 @@ int main(int argc, char *argv[]) {
     }
     splash->showMessage("Done");
     app.processEvents();
-
     w.show();
-    splash->setParent(&w);
-    splash->move(splash->pos() + w.mapFromGlobal({0, 0}));
-    splash->show();
+    const bool keepSplashVisible = false;
+    if(keepSplashVisible) {
+        splash->setParent(&w);
+        splash->move(splash->pos() + w.mapFromGlobal({0, 0}));
+        splash->show();
+    } else splash->finish(&w);
 
     try {
         return app.exec();

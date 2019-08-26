@@ -274,20 +274,20 @@ void PathBox::resetFillGradientPointsPos() {
 void PathBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
     mStrokeSettings->setCapStyle(capStyle);
     prp_afterWholeInfluenceRangeChanged();
-    planScheduleUpdate(UpdateReason::userChange);
+    planUpdate(UpdateReason::userChange);
 }
 
 void PathBox::setStrokeJoinStyle(const SkPaint::Join joinStyle) {
     mStrokeSettings->setJoinStyle(joinStyle);
     prp_afterWholeInfluenceRangeChanged();
-    planScheduleUpdate(UpdateReason::userChange);
+    planUpdate(UpdateReason::userChange);
 }
 
 void PathBox::setOutlineCompositionMode(
         const QPainter::CompositionMode &compositionMode) {
     mStrokeSettings->setOutlineCompositionMode(compositionMode);
     prp_afterWholeInfluenceRangeChanged();
-    planScheduleUpdate(UpdateReason::userChange);
+    planUpdate(UpdateReason::userChange);
 }
 
 void PathBox::strokeWidthAction(const QrealAction& action) {
@@ -548,7 +548,7 @@ bool PathBox::relPointInsidePath(const QPointF &relPos) const {
 
 void PathBox::setOutlineAffectedByScale(const bool bT) {
     mOutlineAffectedByScale = bT;
-    planScheduleUpdate(UpdateReason::userChange);
+    planUpdate(UpdateReason::userChange);
 }
 
 FillSettingsAnimator *PathBox::getFillSettings() const {

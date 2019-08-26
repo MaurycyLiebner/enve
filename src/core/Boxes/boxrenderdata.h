@@ -68,8 +68,6 @@ public:
 
     stdsptr<BoxRenderData> makeCopy();
 
-    UpdateReason fReason;
-
     uint fBoxStateId = 0;
 
     QMatrix fResolutionScale;

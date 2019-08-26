@@ -411,7 +411,7 @@ void Canvas::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) 
     mSceneFramesHandler.remove(range);
     if(!mSceneFramesHandler.atFrame(anim_getCurrentRelFrame())) {
         mSceneFrameOutdated = true;
-        planScheduleUpdate(UpdateReason::userChange);
+        planUpdate(UpdateReason::userChange);
     }
 }
 
@@ -640,7 +640,7 @@ void Canvas::anim_setAbsFrame(const int frame) {
         mSceneFrameOutdated = !cont->storesDataInMemory();
     } else {
         mSceneFrameOutdated = true;
-        planScheduleUpdate(UpdateReason::frameChange);
+        planUpdate(UpdateReason::frameChange);
     }
 
     mUndoRedoStack->setFrame(frame);

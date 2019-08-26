@@ -182,7 +182,7 @@ void VideoFrameLoader::scheduleTaskNow() {
 void VideoFrameLoader::process() {
     if(!mFrameToConvert) readFrame();
     if(mFrameToConvert) {
-        HddPartFinished();
+        hddPartFinished();
         convertFrame();
     }
 }

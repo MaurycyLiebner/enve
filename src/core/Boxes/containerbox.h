@@ -91,8 +91,8 @@ public:
 
     bool shouldScheduleUpdate() { return !SWT_isGroupBox(); }
 
-    void scheduleChildrenUpdate();
-    void scheduleUpdate();
+    void queChildrenTasks();
+    void queTasks();
 
     void writeAllContained(eWriteStream &dst);
     void writeBoundingBox(eWriteStream& dst);
