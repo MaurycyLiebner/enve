@@ -30,7 +30,10 @@ void PaintTarget::draw(SkCanvas * const canvas,
 }
 
 void PaintTarget::setPaintDrawable(DrawableAutoTiledSurface * const surf) {
-    if(mPaintDrawable) mPaintDrawable->setInUse(false);
+    if(mPaintDrawable) {
+        if(mChanged) mPaintDrawable->drawingDoneForNow();
+        mPaintDrawable->setInUse(false);
+    }
     mPaintDrawable = surf;
     if(mPaintDrawable) {
         mPaintDrawable->setInUse(true);
@@ -41,6 +44,7 @@ void PaintTarget::setPaintDrawable(DrawableAutoTiledSurface * const surf) {
         } else mPaintDrawable->scheduleLoadFromTmpFile();
     }
     mPaintPressedSinceUpdate = false;
+    mChanged = false;
     setupOnionSkin();
 }
 
@@ -91,6 +95,7 @@ void PaintTarget::paintPress(const QPointF& pos,
         const QRect qRoi(roi.x, roi.y, roi.width, roi.height);
         mPaintDrawable->pixelRectChanged(qRoi);
         mLastTs = ts;
+        mChanged = true;
     }
 }
 

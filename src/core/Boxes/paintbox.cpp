@@ -32,9 +32,7 @@ void PaintBox::setupRenderData(const qreal relFrame, BoxRenderData * const data)
     const auto imgTask = mSurface->getFrameImage(imgFrame,
                                                  paintData->fImage);
     if(imgTask) imgTask->addDependent(data);
-    else {
-        qDebug() << "image set" << paintData;
-    }
+
     paintData->fASurface = mSurface.get();
     paintData->fSurface = enve::shared(mSurface->getSurface(imgFrame));
 }

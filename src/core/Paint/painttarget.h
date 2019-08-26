@@ -48,7 +48,13 @@ struct PaintTarget {
 
     void setupOnionSkin() {
         if(!isValid()) return;
-        mPaintAnimSurface->setupOnionSkinFor(20, mPaintOnion);
+        qptr<Canvas> canvasP = mCanvas;
+        stdsptr<bool> counter = std::make_shared<bool>(true);
+        const auto missingLoaded = [canvasP, counter, this]() {
+            if(!counter.unique() || !canvasP) return;
+            setupOnionSkin();
+        };
+        mPaintAnimSurface->setupOnionSkinFor(20, mPaintOnion, missingLoaded);
     }
 
     void afterPaintAnimSurfaceChanged();
@@ -70,6 +76,7 @@ struct PaintTarget {
     OnionSkin mPaintOnion;
     bool mPaintPressedSinceUpdate = false;
     DrawableAutoTiledSurface * mPaintDrawable = nullptr;
+    bool mChanged = false;
     Canvas * const mCanvas;
 };
 

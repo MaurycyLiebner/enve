@@ -121,22 +121,29 @@ public:
         }
     }
 
-    void setupOnionSkinFor(const int sideRange, OnionSkin &skins) {
-        setupOnionSkinFor(anim_getCurrentRelFrame(), sideRange, skins);
+    void setupOnionSkinFor(const int sideRange, OnionSkin &skins,
+                           const std::function<void()>& missingLoaded) {
+        setupOnionSkinFor(anim_getCurrentRelFrame(),
+                          sideRange, skins, missingLoaded);
     }
 
     void setupOnionSkinFor(const int relFrame, const int sideRange,
-                           ASKey* key, OnionSkin::SkinsSide &side) {
+                           ASKey* key, OnionSkin::SkinsSide &side,
+                           const std::function<void()>& missingLoaded) {
         const int dFrame = qAbs(relFrame - key->getRelFrame());
         if(dFrame > sideRange) return;
         const auto surf = &key->dSurface();
-        if(!surf->storesDataInMemory()) return;
+        if(!surf->storesDataInMemory()) {
+            const auto task = surf->scheduleLoadFromTmpFile();
+            if(task) task->addDependent({missingLoaded, nullptr});
+            return;
+        }
         const qreal weight = 1.*(sideRange - dFrame)/sideRange;
         side.fSkins.append({surf, toSkScalar(weight)});
     }
 
-    void setupOnionSkinFor(const int relFrame, const int sideRange,
-                           OnionSkin &skins) {
+    void setupOnionSkinFor(const int relFrame, const int sideRange, OnionSkin &skins,
+                           const std::function<void()>& missingLoaded) {
         skins.clear();
         const auto minId = anim_getNextKeyId(relFrame - sideRange - 1);
         const auto maxId = anim_getPrevKeyId(relFrame + sideRange + 1);
@@ -144,9 +151,11 @@ public:
         for(int i = minId; i <= maxId; i++) {
             const auto asKey = anim_getKeyAtIndex<ASKey>(i);
             if(asKey->getRelFrame() < relFrame)
-                setupOnionSkinFor(relFrame, sideRange, asKey, skins.fPrev);
+                setupOnionSkinFor(relFrame, sideRange, asKey,
+                                  skins.fPrev, missingLoaded);
             else if(asKey->getRelFrame() > relFrame) {
-                setupOnionSkinFor(relFrame, sideRange, asKey, skins.fNext);
+                setupOnionSkinFor(relFrame, sideRange, asKey,
+                                  skins.fNext, missingLoaded);
             }
         }
     }

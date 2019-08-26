@@ -173,11 +173,15 @@ public:
     }
 
     void write(eWriteStream& dst) {
-        mSurface.write(dst);
+        if(!storesDataInMemory()) {
+            if(!mTmpFile) RuntimeThrow("No tmp file, and no data in memory");
+            dst.writeFile(mTmpFile.get());
+        } else mSurface.write(dst);
     }
 
     void read(eReadStream& src) {
         mSurface.read(src);
+        afterDataReplaced();
         updateTileBitmaps();
     }
 
@@ -192,6 +196,8 @@ public:
     bool hasTileBitmaps() {
         return !mTileBitmaps.isEmpty();
     }
+
+    void drawingDoneForNow() { afterDataReplaced(); }
 private:
     void updateTileRecBitmaps(QRect tileRect);
 

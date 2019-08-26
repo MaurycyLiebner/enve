@@ -221,6 +221,27 @@ public:
         write(&pos, sizeof(qint64));
     }
 
+    qint64 writeFile(QFile* const file) {
+        if(!file) RuntimeThrow("No file to write");
+        const bool openRes = file->open(QIODevice::ReadOnly);
+        if(!openRes) RuntimeThrow("Could not open file");
+        const qint64 size = file->size();
+        const qint64 lineSize = 1024;
+        char line[lineSize];
+        const int nLines = static_cast<int>(size/lineSize);
+        const qint64 rem = size - nLines*lineSize;
+        for(int i = 0; i < nLines; i++) {
+            file->read(&line[0], lineSize);
+            write(&line[0], lineSize);
+        }
+        if(rem > 0) {
+            file->read(&line[0], rem);
+            write(&line[0], rem);
+        }
+        file->close();
+        return size;
+    }
+
     qint64 write(const void* const data, const qint64 len) {
         return mDst->write(reinterpret_cast<const char*>(data), len);
     }
