@@ -19,3 +19,27 @@
 char FileFooter::sEVFormat[15] = "enve ev";
 char FileFooter::sAppName[15] = "enve";
 char FileFooter::sAppVersion[15] = "0.0.0";
+
+eReadFutureTable::eReadFutureTable(QIODevice * const main) : mMain(main) {
+    const qint64 savedPos = main->pos();
+    const qint64 pos = main->size() - FileFooter::sSize() -
+            qint64(sizeof(int));
+    main->seek(pos);
+    int nFutures;
+    main->read(reinterpret_cast<char*>(&nFutures), sizeof(int));
+
+    main->seek(pos - nFutures*qint64(sizeof(eFuturePos)));
+    for(int i = 0; i < nFutures; i++) {
+        eFuturePos pos;
+        main->read(reinterpret_cast<char*>(&pos), sizeof(eFuturePos));
+        mFutures << pos;
+    }
+    main->seek(savedPos);
+}
+
+void eWriteFutureTable::write(eWriteStream &dst) {
+    for(const auto& future : mFutures) {
+        dst.write(&future, sizeof(eFuturePos));
+    }
+    dst << mFutures.count();
+}

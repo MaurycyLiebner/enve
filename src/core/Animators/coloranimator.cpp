@@ -29,12 +29,12 @@ ColorAnimator::ColorAnimator(const QString &name) : StaticComplexAnimator(name) 
 
 void ColorAnimator::writeProperty(eWriteStream& dst) const {
     StaticComplexAnimator::writeProperty(dst);
-    dst.write(rcConstChar(&mColorMode), sizeof(ColorMode));
+    dst.write(&mColorMode, sizeof(ColorMode));
 }
 
 void ColorAnimator::readProperty(eReadStream& src) {
     StaticComplexAnimator::readProperty(src);
-    src.read(rcChar(&mColorMode), sizeof(ColorMode));
+    src.read(&mColorMode, sizeof(ColorMode));
     setColorMode(mColorMode);
 }
 

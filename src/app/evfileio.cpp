@@ -97,8 +97,7 @@ void MainWindow::saveToFile(const QString &path) {
         mLayoutHandler->write(writeStream);
         writeStream.writeCheckpoint();
 
-        const qint64 tableSize = file.write(writeStream.futureData());
-        file.write(rcConstChar(&tableSize), sizeof(qint64));
+        writeStream.writeFutureTable();
         FileFooter::sWrite(&file);
     } catch(...) {
         file.close();

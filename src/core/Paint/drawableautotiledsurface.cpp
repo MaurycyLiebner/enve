@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "drawableautotiledsurface.h"
-#include "castmacros.h"
 #include "skia/skiahelpers.h"
 
 DrawableAutoTiledSurface::DrawableAutoTiledSurface() :

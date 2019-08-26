@@ -21,7 +21,6 @@
 #include <QBuffer>
 #include <cstring>
 #include "exceptions.h"
-#include "castmacros.h"
 #include "framerange.h"
 struct qCubicSegment1D;
 class SmartPath;
@@ -31,9 +30,9 @@ struct AutoTiledSurface;
 class FileFooter {
 public:
     static bool sWrite(QIODevice * const target) {
-        return target->write(rcConstChar(sEVFormat), sizeof(char[15])) &&
-               target->write(rcConstChar(sAppName), sizeof(char[15])) &&
-               target->write(rcConstChar(sAppVersion), sizeof(char[15]));
+        return target->write(reinterpret_cast<const char*>(sEVFormat), sizeof(char[15])) &&
+               target->write(reinterpret_cast<const char*>(sAppName), sizeof(char[15])) &&
+               target->write(reinterpret_cast<const char*>(sAppVersion), sizeof(char[15]));
     }
 
     static qint64 sSize() {
@@ -47,14 +46,14 @@ public:
             RuntimeThrow("Failed to seek to FileFooter");
 
         char format[15];
-        dst->read(rcChar(format), sizeof(char[15]));
+        dst->read(format, sizeof(char[15]));
         if(std::strcmp(format, sEVFormat)) return false;
 
 //        char appVersion[15];
-//        target->read(rcChar(appVersion), sizeof(char[15]));
+//        target->read(appVersion, sizeof(char[15]));
 
 //        char appName[15];
-//        target->read(rcChar(appName), sizeof(char[15]));
+//        target->read(appName, sizeof(char[15]));
 
         if(!dst->seek(savedPos))
             RuntimeThrow("Could not restore current position for QIODevice.");
@@ -73,57 +72,43 @@ struct eFuturePos {
 
 class eReadFutureTable {
     friend class eReadStream;
-    eReadFutureTable(QIODevice* const main) : mMain(main) {
-        const qint64 savedPos = main->pos();
-        const qint64 pos = main->size() - FileFooter::sSize() -
-                           qint64(sizeof(qint64));
-        main->seek(pos);
-        qint64 tableSize;
-        main->read(rcChar(&tableSize), sizeof(qint64));
-        main->seek(pos - tableSize);
-        mData = main->read(tableSize);
-        mBuffer.setBuffer(&mData);
-        main->seek(savedPos);
-    }
+    eReadFutureTable(QIODevice* const main);
 
     bool seek(const eFuturePos& pos) {
-        return mMain->seek(pos.fMain) && mBuffer.seek(pos.fFutureTable);
+        mFutureId = int(pos.fFutureTable) + 1;
+        return mMain->seek(pos.fMain);
     }
 
     eFuturePos readFuturePos() {
-        eFuturePos pos;
-        mBuffer.read(rcChar(&pos), sizeof(eFuturePos));
-        return pos;
+        return mFutures.at(mFutureId++);
     }
 private:
+    int mFutureId = 0;
+    QList<eFuturePos> mFutures;
     QIODevice* const mMain;
-    QBuffer mBuffer;
-    QByteArray mData;
 };
 
+class eWriteStream;
 class eWriteFutureTable {
     friend class eWriteStream;
     eWriteFutureTable(QIODevice * const main) :
-        mMain(main), mBuffer(&mData) {}
-public:
-    const QByteArray& data() const { return mData; }
+        mMain(main) {}
+
+    void write(eWriteStream& dst);
 
     //! @brief Returns id to be used with assignFuturePos
     int planFuturePos() {
-        const eFuturePos pos{0, 0};
-        const int id = mData.size();
-        mBuffer.write(rcConstChar(&pos), sizeof(eFuturePos));
+        const int id = mFutures.count();
+        mFutures.append({-1, -1});
         return id;
     }
 
     void assignFuturePos(const int id) {
-        eFuturePos pos{mMain->pos(), mBuffer.pos()};
-        mData.replace(id, sizeof(eFuturePos), rcConstChar(&pos));
+        mFutures.replace(id, {mMain->pos(), id});
     }
 private:
+    QList<eFuturePos> mFutures;
     QIODevice* const mMain;
-    QBuffer mBuffer;
-    QByteArray mData;
 };
 
 #include <QPointF>
@@ -141,8 +126,8 @@ public:
         const qint64 sPos = mSrc->pos();
         qint64 pos; read(&pos, sizeof(qint64));
         if(pos != sPos)
-            RuntimeThrow("The read QIODevice::pos does not match"
-                         " the written QIODevice::pos.\n" + errMsg);
+            RuntimeThrow("The QIODevice::pos '" + QString::number(sPos) + "' does not match"
+                         " the written QIODevice::pos '" + QString::number(pos) + "'.\n" + errMsg);
     }
 
     inline qint64 read(void* const data, const qint64 len) {
@@ -202,18 +187,23 @@ private:
 };
 
 class eWriteStream {
+    friend class MainWindow;
 public:
+    class FuturePosId {
+        friend class eWriteStream;
+        FuturePosId(const int id) : fId(id) {}
+        const int fId;
+    };
+
     eWriteStream(QIODevice* const dst) : mDst(dst), mFutureTable(dst) {}
 
-    const QByteArray& futureData() const { return mFutureTable.data(); }
-
     //! @brief Returns id to be used with assignFuturePos
-    int planFuturePos() {
+    FuturePosId planFuturePos() {
         return mFutureTable.planFuturePos();
     }
 
-    void assignFuturePos(const int id) {
-        mFutureTable.assignFuturePos(id);
+    void assignFuturePos(const FuturePosId id) {
+        mFutureTable.assignFuturePos(id.fId);
     }
 
     void writeCheckpoint() {
@@ -288,6 +278,10 @@ public:
         return *this;
     }
 private:
+    void writeFutureTable() {
+        mFutureTable.write(*this);
+    }
+
     QIODevice* const mDst;
     eWriteFutureTable mFutureTable;
 };

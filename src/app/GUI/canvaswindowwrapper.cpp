@@ -115,13 +115,13 @@ QWidget* CWWidgetStackLayoutItem::create(Document& document,
 
 void CWWidgetStackLayoutItem::write(eWriteStream &dst) const {
     SceneWidgetStackLayoutItem::write(dst);
-    dst.write(rcConstChar(&mTransform), sizeof(QMatrix));
+    dst.write(&mTransform, sizeof(QMatrix));
 }
 
 void CWWidgetStackLayoutItem::read(eReadStream& src) {
     SceneWidgetStackLayoutItem::read(src);
     QMatrix transform;
-    src.read(rcChar(&transform), sizeof(QMatrix));
+    src.read(&transform, sizeof(QMatrix));
     setTransform(transform);
 }
 

@@ -457,7 +457,6 @@ HEADERS += \
     Animators/steppedanimator.h \
     basicreadwrite.h \
     differsinterpolate.h \
-    castmacros.h \
     skia/skiahelpers.h \
     Animators/keyt.h \
     Animators/basedkeyt.h \

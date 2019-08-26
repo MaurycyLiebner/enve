@@ -46,7 +46,7 @@ struct StackLayoutItem {
     virtual void saveData() = 0;
 
     void writeType(eWriteStream& dst) const {
-        dst.write(rcConstChar(&mType), sizeof(Type));
+        dst.write(&mType, sizeof(Type));
     }
 
     void setParent(ParentStackLayoutItem* const parent) {
@@ -281,7 +281,7 @@ private:
 template <typename WidgetT>
 StackLayoutItem::UniPtr ParentStackLayoutItem::sReadChild(eReadStream& src) {
     Type type;
-    src.read(rcChar(&type), sizeof(Type));
+    src.read(&type, sizeof(Type));
     if(type == Type::H_SPLIT) {
         const auto hSplit = new HSplitStackItem;
         hSplit->read<WidgetT>(src);

@@ -16,7 +16,6 @@
 
 #include "tmpdeleter.h"
 #include "imagecachecontainer.h"
-#include "castmacros.h"
 #include "skia/skiahelpers.h"
 
 TmpDeleter::TmpDeleter(const qsptr<QTemporaryFile> &file) :

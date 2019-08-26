@@ -105,9 +105,11 @@ public:
         const int nProps = this->ca_mChildAnimators.count();
         dst << nProps;
         for(const auto& prop : this->ca_mChildAnimators) {
+            const auto futureId = dst.planFuturePos();
             const auto TProp = static_cast<T*>(prop.get());
             if(TWriteType) (TProp->*TWriteType)(dst);
             TProp->writeProperty(dst);
+            dst.assignFuturePos(futureId);
         }
     }
 
@@ -115,9 +117,15 @@ public:
         int nProps;
         src >> nProps;
         for(int i = 0; i < nProps; i++) {
-            const auto prop = TReadTypeAndCreate(src);
-            prop->readProperty(src);
-            this->addChild(prop);
+            const auto futurePos = src.readFuturePos();
+            try {
+                const auto prop = TReadTypeAndCreate(src);
+                prop->readProperty(src);
+                this->addChild(prop);
+            } catch(const std::exception& e) {
+                src.seek(futurePos);
+                gPrintExceptionCritical(e);
+            }
         }
     }
 };

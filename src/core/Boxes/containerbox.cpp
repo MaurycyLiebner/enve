@@ -854,6 +854,7 @@ void ContainerBox::writeAllContained(eWriteStream& dst) {
     const int nCont = mContained.count();
     dst << nCont;
     for(int i = nCont - 1; i >= 0; i--) {
+        const auto futureId = dst.planFuturePos();
         const auto &child = mContained.at(i);
         const bool isBox = child->SWT_isBoundingBox();
         dst << isBox;
@@ -865,6 +866,7 @@ void ContainerBox::writeAllContained(eWriteStream& dst) {
             Q_ASSERT(child->SWT_isSingleSound());
             child->writeProperty(dst);
         }
+        dst.assignFuturePos(futureId);
         dst.writeCheckpoint();
     }
 }
@@ -889,7 +891,7 @@ void ContainerBox::writeBoundingBox(eWriteStream& dst) {
 
 qsptr<BoundingBox> readIdCreateBox(eReadStream& src) {
     eBoxType type;
-    src.read(rcChar(&type), sizeof(eBoxType));
+    src.read(&type, sizeof(eBoxType));
     switch(type) {
         case(eBoxType::TYPE_VECTOR_PATH):
             return enve::make_shared<SmartVectorPath>();
@@ -945,10 +947,12 @@ void ContainerBox::readAllContained(eReadStream& src) {
     int nCont;
     src >> nCont;
     for(int i = 0; i < nCont; i++) {
+        const auto futurePos = src.readFuturePos();
         try {
             readContained(src);
-        } catch(...) {
-            RuntimeThrow("Error reading contained " + QString::number(i));
+        } catch(const std::exception& e) {
+            src.seek(futurePos);
+            gPrintExceptionCritical(e);
         }
     }
 }

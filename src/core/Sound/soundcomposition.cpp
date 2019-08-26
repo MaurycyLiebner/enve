@@ -16,7 +16,6 @@
 
 #include "soundcomposition.h"
 #include "singlesound.h"
-#include "castmacros.h"
 #include "canvas.h"
 #include "CacheHandlers/soundcachecontainer.h"
 #include "soundmerger.h"

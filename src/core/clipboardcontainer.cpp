@@ -21,7 +21,6 @@
 #include "PathEffects/patheffectanimators.h"
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "Properties/boxtargetproperty.h"
-#include "castmacros.h"
 
 Clipboard::Clipboard(const ClipboardType type) : mType(type) {}
 

@@ -55,7 +55,7 @@ void PathEffectAnimators::readPathEffect(eReadStream& src) {
 #include "patheffectsinclude.h"
 qsptr<PathEffect> readIdCreatePathEffect(eReadStream &src) {
     PathEffectType type;
-    src.read(rcChar(&type), sizeof(PathEffectType));
+    src.read(&type, sizeof(PathEffectType));
     switch(type) {
         case(PathEffectType::DISPLACE):
             return enve::make_shared<DisplacePathEffect>();

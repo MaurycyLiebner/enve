@@ -16,7 +16,6 @@
 
 #include "soundtmpfilehandlers.h"
 #include "soundcachecontainer.h"
-#include "castmacros.h"
 
 SoundContainerTmpFileDataLoader::SoundContainerTmpFileDataLoader(
         const qsptr<QTemporaryFile> &file,

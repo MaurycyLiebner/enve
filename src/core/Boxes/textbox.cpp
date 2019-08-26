@@ -173,7 +173,7 @@ void TextBox::writeBoundingBox(eWriteStream& dst) {
 
 void TextBox::readBoundingBox(eReadStream& src) {
     PathBox::readBoundingBox(src);
-    src.read(rcChar(&mAlignment), sizeof(Qt::Alignment));
+    src.read(&mAlignment, sizeof(Qt::Alignment));
     qreal fontSize;
     QString fontFamily;
     QString fontStyle;

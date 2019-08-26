@@ -891,7 +891,7 @@ void Canvas::writeBoundingBox(eWriteStream& dst) {
     dst << mWidth;
     dst << mHeight;
     dst << mFps;
-    dst.write(rcConstChar(&mRange), sizeof(FrameRange));
+    dst.write(&mRange, sizeof(FrameRange));
 }
 
 void Canvas::readBoundingBox(eReadStream& src) {
@@ -902,6 +902,6 @@ void Canvas::readBoundingBox(eReadStream& src) {
     src >> mWidth;
     src >> mHeight;
     src >> mFps;
-    src.read(rcChar(&mRange), sizeof(FrameRange));
+    src.read(&mRange, sizeof(FrameRange));
     anim_setAbsFrame(currFrame);
 }

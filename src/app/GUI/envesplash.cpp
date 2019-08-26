@@ -26,10 +26,10 @@ EnveSplash::EnveSplash() {
     Q_ASSERT(!sInstance);
     sInstance = this;
     mText = "Welcome to enve - an opensource 2D animation software.\n\n"
-            "Further development will only be possible with your support. "
-            "Press 'Support enve' on the menu bar for more information and "
-            "enter $3500 crowdfunding campaign to cover costs for "
-            "next 6 months of full-time development.\n\n"
+//            "Further development will only be possible with your support. "
+//            "Press 'Support enve' on the menu bar for more information and "
+//            "enter $3500 crowdfunding campaign to cover costs for "
+//            "next 6 months of full-time development.\n\n"
             "Please note that the following executable is merely "
             "a snapshot of the current state of the code. "
             "Hence numerous bugs should be expected.\n\n"

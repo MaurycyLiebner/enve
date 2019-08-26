@@ -363,7 +363,7 @@ void AutoTilesData::write(eWriteStream& dst) const {
     dst << nRows;
     for(const auto& col : mColumns) {
         for(const auto& row : col) {
-            dst.write(rcConstChar(row), TILE_SPIXEL_SIZE*sizeof(uint16_t));
+            dst.write(row, TILE_SPIXEL_SIZE*sizeof(uint16_t));
         }
     }
 }
@@ -383,7 +383,7 @@ void AutoTilesData::read(eReadStream &src) {
         QList<uint16_t*>& column = mColumns.last();
         for(int row = 0; row < nRows; row++) {
             const auto tile = allocateTile(TILE_SPIXEL_SIZE);
-            src.read(rcChar(tile), TILE_SPIXEL_SIZE*sizeof(uint16_t));
+            src.read(tile, TILE_SPIXEL_SIZE*sizeof(uint16_t));
             column << tile;
         }
     }

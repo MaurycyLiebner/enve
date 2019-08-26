@@ -30,7 +30,7 @@ void Document::writeGradients(eWriteStream &dst) const {
 
 void Document::writeScenes(eWriteStream &dst) const {
     const int nScenes = fScenes.count();
-    dst.write(rcConstChar(&nScenes), sizeof(int));
+    dst.write(&nScenes, sizeof(int));
     for(const auto &scene : fScenes) {
         scene->writeBoundingBox(dst);
         dst.writeCheckpoint();
@@ -73,10 +73,6 @@ void Document::read(eReadStream& src) {
     src.readCheckpoint("Error reading gradients");
     readScenes(src);
     clearGradientRWIds();
-//    int currentCanvasId;
-//    src->read(rcChar(&currentCanvasId), sizeof(int));
-//    auto currentCanvas = BoundingBox::sGetBoxByReadId(currentCanvasId);
-    //    setCurrentCanvas(static_cast<Canvas*>(currentCanvas));
 }
 
 Gradient *Document::getGradientWithRWId(const int rwId) {

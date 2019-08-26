@@ -102,7 +102,7 @@ qsptr<ShaderEffect> readIdCreateShaderEffect(eReadStream& src) {
 #include "RasterEffects/customrastereffectcreator.h"
 qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream &src) {
     RasterEffectType type;
-    src.read(rcChar(&type), sizeof(RasterEffectType));
+    src.read(&type, sizeof(RasterEffectType));
     switch(type) {
         case(RasterEffectType::BLUR):
             return nullptr;

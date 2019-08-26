@@ -65,10 +65,10 @@ void QrealKey::writeKey(eWriteStream& dst) {
     dst << mValue;
 
     dst << mStartEnabled;
-    dst.write(rcConstChar(&mStartPt), sizeof(ClampedPoint));
+    dst.write(&mStartPt, sizeof(ClampedPoint));
 
     dst << mEndEnabled;
-    dst.write(rcConstChar(&mEndPt), sizeof(ClampedPoint));
+    dst.write(&mEndPt, sizeof(ClampedPoint));
 }
 
 void QrealKey::readKey(eReadStream& src) {
@@ -76,10 +76,10 @@ void QrealKey::readKey(eReadStream& src) {
     src >> mValue;
 
     src >> mStartEnabled;
-    src.read(rcChar(&mStartPt), sizeof(ClampedPoint));
+    src.read(&mStartPt, sizeof(ClampedPoint));
 
     src >> mEndEnabled;
-    src.read(rcChar(&mEndPt), sizeof(ClampedPoint));
+    src.read(&mEndPt, sizeof(ClampedPoint));
 }
 
 void QrealKey::finishValueTransform() {

@@ -572,11 +572,10 @@ void MainWindow::setupMenuBar() {
         }
     });
 
-    mMenuBar->addAction("Support enve", this, []() {
-        const QString url = "https://indiegogo.com/projects/enve";
-        QDesktopServices::openUrl(QUrl(url));
-    });
-
+//    mMenuBar->addAction("Support enve", this, []() {
+//        const QString url = "https://enve.org";
+//        QDesktopServices::openUrl(QUrl(url));
+//    });
 
     setMenuBar(mMenuBar);
     mMenuBar->setStyleSheet("QMenuBar { padding-top: 1px; }");
@@ -1138,9 +1137,11 @@ void MainWindow::importImageSequence() {
 //}
 
 void MainWindow::revert() {
+    const auto path = mDocument.fEvFile;
     clearAll();
     try {
-        loadEVFile(mDocument.fEvFile);
+        loadEVFile(path);
+        mDocument.setPath(path);
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
     }

@@ -82,7 +82,7 @@ void BoundingBox::writeBoundingBox(eWriteStream& dst) {
     eBoxOrSound::writeProperty(dst);
     dst << prp_mName;
     dst << mWriteId;
-    dst.write(rcConstChar(&mBlendModeSk), sizeof(SkBlendMode));
+    dst.write(&mBlendModeSk, sizeof(SkBlendMode));
 }
 
 void BoundingBox::readBoundingBox(eReadStream& src) {

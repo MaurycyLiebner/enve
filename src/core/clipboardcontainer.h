@@ -112,22 +112,23 @@ protected:
     DynamicPropsClipboard(const QList<T*>& source) :
         Clipboard(ClipboardType::dynamicProperties),
         mContentBaseType(std::type_index(typeid(T))) {
-        QBuffer dst(&mData);
-        dst.open(QIODevice::WriteOnly);
-        const int count = source.count();
-        dst.write(rcConstChar(&count), sizeof(int));
+        QBuffer buffer(&mData);
+        buffer.open(QIODevice::WriteOnly);
+        eWriteStream dst(&buffer);
+        dst << source.count();
         for(const auto& src : source)
-            src->writeProperty(&dst);
-        dst.close();
+            src->writeProperty(dst);
+        buffer.close();
     }
 public:
     template<typename T>
     bool paste(DynamicComplexAnimatorBase<T> * const target) {
         if(!compatibleTarget(target)) return false;
-        QBuffer src(&mData);
-        src.open(QIODevice::ReadOnly);
-        target->readProperty(&src);
-        src.close();
+        QBuffer buffer(&mData);
+        buffer.open(QIODevice::ReadOnly);
+        eReadStream src(&buffer);
+        target->readProperty(src);
+        buffer.close();
         return true;
     }
 

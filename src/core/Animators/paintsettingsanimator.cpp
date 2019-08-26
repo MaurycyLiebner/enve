@@ -49,8 +49,8 @@ PaintSettingsAnimator::PaintSettingsAnimator(
 void PaintSettingsAnimator::writeProperty(eWriteStream& dst) const {
     mGradientPoints->writeProperty(dst);
     mColor->writeProperty(dst);
-    dst.write(rcConstChar(&mPaintType), sizeof(PaintType));
-    dst.write(rcConstChar(&mGradientType), sizeof(GradientType));
+    dst.write(&mPaintType, sizeof(PaintType));
+    dst.write(&mGradientType, sizeof(GradientType));
     const int gradId = mGradient ? mGradient->getReadWriteId() : -1;
     dst << gradId;
 }
@@ -59,9 +59,9 @@ void PaintSettingsAnimator::readProperty(eReadStream& src) {
     mGradientPoints->readProperty(src);
     mColor->readProperty(src);
     PaintType paintType;
-    src.read(rcChar(&paintType), sizeof(PaintType));
+    src.read(&paintType, sizeof(PaintType));
     int gradId;
-    src.read(rcChar(&mGradientType), sizeof(GradientType));
+    src.read(&mGradientType, sizeof(GradientType));
     src >> gradId;
     if(gradId != -1) {
         mGradient = Document::sInstance->getGradientWithRWId(gradId);

@@ -20,7 +20,6 @@
 #include "skiaincludes.h"
 #include "../exceptions.h"
 #include <QIODevice>
-#include "../castmacros.h"
 #include "../basicreadwrite.h"
 
 namespace SkiaHelpers {

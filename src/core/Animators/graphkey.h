@@ -84,8 +84,8 @@ public:
     ClampedPoint(const qreal x, const qreal y) : mX(x), mY(y) {}
 
     void read(QIODevice * const target) {
-        target->read(rcChar(&mX), sizeof(qreal));
-        target->read(rcChar(&mY), sizeof(qreal));
+        target->read(reinterpret_cast<char*>(&mX), sizeof(qreal));
+        target->read(reinterpret_cast<char*>(&mY), sizeof(qreal));
     }
 
     void saveXValue() {

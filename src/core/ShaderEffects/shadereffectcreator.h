@@ -97,7 +97,7 @@ public:
             } else if(dynamic_cast<IntAnimatorCreator*>(anim.get())) {
                 type = PTYPE_INT;
             } else RuntimeThrow("Only QrealAnimator and IntAnimator supported");
-            dst.write(rcConstChar(&type), sizeof(PropertyType));
+            dst.write(&type, sizeof(PropertyType));
         }
     }
 
