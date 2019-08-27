@@ -574,11 +574,7 @@ void processChildData(BoundingBox * const child,
         return;
     }
     auto boxRenderData = child->getCurrentRenderData(childRelFrame);
-    if(!boxRenderData) {
-        boxRenderData = child->createRenderData();
-        boxRenderData->fRelFrame = childRelFrame;
-        boxRenderData->scheduleTask();
-    }
+    if(!boxRenderData) boxRenderData = enve::shared(child->queRender(childRelFrame));
     boxRenderData->addDependent(parentData);
     parentData->fChildrenRenderData << boxRenderData;
 }

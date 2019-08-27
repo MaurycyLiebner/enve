@@ -99,6 +99,7 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
                                                       mCurrentRenderFrame});
         mCurrentScene->anim_setAbsFrame(mCurrentRenderFrame);
         mCurrentScene->setOutputRendering(true);
+        TaskScheduler::sInstance->setAlwaysQue(true);
         nextCurrentRenderFrame();
         if(TaskScheduler::sAllQuedCpuTasksFinished()) {
             nextSaveOutputFrame();
@@ -177,11 +178,13 @@ void RenderHandler::outOfMemory() {
 void RenderHandler::setRenderingPreview(const bool bT) {
     mRenderingPreview = bT;
     mCurrentScene->setRenderingPreview(bT);
+    TaskScheduler::sInstance->setAlwaysQue(bT);
 }
 
 void RenderHandler::setPreviewing(const bool bT) {
     mPreviewing = bT;
     mCurrentScene->setPreviewing(bT);
+    TaskScheduler::sInstance->setAlwaysQue(bT);
 }
 
 void RenderHandler::interruptPreviewRendering() {
@@ -196,6 +199,7 @@ void RenderHandler::interruptPreviewRendering() {
 
 void RenderHandler::interruptOutputRendering() {
     if(mCurrentScene) mCurrentScene->setOutputRendering(false);
+    TaskScheduler::sInstance->setAlwaysQue(false);
     TaskScheduler::sClearAllFinishedFuncs();
     clearPreview();
     setFrameAction(mSavedCurrentFrame);
@@ -297,6 +301,7 @@ void RenderHandler::finishEncoding() {
     TaskScheduler::sClearAllFinishedFuncs();
     mCurrentRenderSettings = nullptr;
     mCurrentScene->setOutputRendering(false);
+    TaskScheduler::sInstance->setAlwaysQue(false);
     setFrameAction(mSavedCurrentFrame);
     if(!isZero4Dec(mSavedResolutionFraction - mCurrentScene->getResolutionFraction())) {
         mCurrentScene->setResolutionFraction(mSavedResolutionFraction);

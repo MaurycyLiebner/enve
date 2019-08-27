@@ -199,6 +199,7 @@ public:
 
     virtual bool shouldScheduleUpdate() { return true; }
     virtual void queTasks();
+    BoxRenderData *queRender(const qreal relFrame);
 
     virtual void writeIdentifier(eWriteStream& dst) const;
 
@@ -317,8 +318,6 @@ public:
 
     void updateDrawRenderContainerTransform();
 
-    void scheduleTask(const stdsptr<BoxRenderData> &task);
-
     void addLinkingBox(BoundingBox *box);
     void removeLinkingBox(BoundingBox *box);
     const QList<BoundingBox*> &getLinkingBoxes() const;
@@ -384,7 +383,6 @@ protected:
     bool mCenterPivotPlanned = false;
     bool mUpdatePlanned = false;
     UpdateReason mPlannedReason;
-    QList<stdsptr<BoxRenderData>> mScheduledTasks;
     QList<qptr<Property>> mCanvasProps;
 private:
     void cancelWaitingTasks();

@@ -377,6 +377,7 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 }
 
 void BoundingBox::planUpdate(const UpdateReason reason) {
+    if(mUpdatePlanned && mPlannedReason == UpdateReason::userChange) return;
     if(!isVisibleAndInVisibleDurationRect()) return;
     if(mParentGroup) mParentGroup->planUpdate(reason);
     else if(!SWT_isCanvas()) return;
@@ -388,13 +389,17 @@ void BoundingBox::planUpdate(const UpdateReason reason) {
     mDrawRenderContainer.setExpired(true);
     if(mUpdatePlanned) {
         mPlannedReason = qMax(reason, mPlannedReason);
-        return;
+    } else {
+        mUpdatePlanned = true;
+        mPlannedReason = reason;
     }
+}
 
-    mUpdatePlanned = true;
-    mPlannedReason = reason;
-
-    if(mParentScene && mParentScene->isPreviewingOrRendering()) queTasks();
+BoxRenderData* BoundingBox::queRender(const qreal relFrame) {
+    const auto currentRenderData = updateCurrentRenderData(relFrame);
+    setupRenderData(relFrame, currentRenderData);
+    TaskScheduler::sInstance->queCpuTask(enve::shared(currentRenderData));
+    return currentRenderData;
 }
 
 void BoundingBox::queTasks() {
@@ -403,9 +408,7 @@ void BoundingBox::queTasks() {
     if(!shouldScheduleUpdate()) return;
     const int relFrame = anim_getCurrentRelFrame();
     if(hasCurrentRenderData(relFrame)) return;
-    const auto currentRenderData = updateCurrentRenderData(relFrame);
-    setupRenderData(relFrame, currentRenderData);
-    TaskScheduler::sInstance->queCpuTask(enve::shared(currentRenderData));
+    queRender(relFrame);
 }
 
 BoxRenderData *BoundingBox::updateCurrentRenderData(const qreal relFrame) {
@@ -419,8 +422,7 @@ BoxRenderData *BoundingBox::updateCurrentRenderData(const qreal relFrame) {
 }
 
 bool BoundingBox::hasCurrentRenderData(const qreal relFrame) const {
-    const auto currentRenderData =
-            mRenderDataHandler.getItemAtRelFrame(relFrame);
+    const auto currentRenderData = mRenderDataHandler.getItemAtRelFrame(relFrame);
     if(currentRenderData) return true;
     if(mDrawRenderContainer.isExpired()) return false;
     const auto drawData = mDrawRenderContainer.getSrcRenderData();
@@ -836,11 +838,6 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
     return range*parentRange;
 }
 
-void BoundingBox::cancelWaitingTasks() {
-    for(const auto &task : mScheduledTasks) task->cancel();
-    mScheduledTasks.clear();
-}
-
 void BoundingBox::writeIdentifier(eWriteStream &dst) const {
     dst.write(&mType, sizeof(eBoxType));
 }
@@ -925,10 +922,6 @@ void BoundingBox::selectAllCanvasPts(QList<MovablePoint*> &selection,
         if(!handler) continue;
         handler->addAllPointsToSelection(selection, mode);
     }
-}
-
-void BoundingBox::scheduleTask(const stdsptr<BoxRenderData>& task) {
-    mScheduledTasks << task;
 }
 
 bool BoundingBox::isParentLinkBox() {

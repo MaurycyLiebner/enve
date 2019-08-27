@@ -156,6 +156,10 @@ public:
     }
 
     void afterCpuGpuTaskFinished();
+
+    void setAlwaysQue(const bool alwaysQue) {
+        mAlwaysQue = alwaysQue;
+    }
 signals:
     void finishedAllQuedTasks() const;
     void hddUsageChanged(bool);
@@ -174,6 +178,7 @@ private:
 
     bool shouldQueMoreCpuTasks() const;
     bool shouldQueMoreHddTasks() const;
+    bool overflowed() const;
 
     void callFreeThreadsForCpuTasksAvailableFunc() const {
         if(mFreeThreadsForCpuTasksAvailableFunc) {
@@ -192,6 +197,7 @@ private:
 
     bool mHddThreadBusy = false;
 
+    bool mAlwaysQue = false;
     bool mCpuQueing = false;
     TaskQueHandler mQuedCpuTasks;
 

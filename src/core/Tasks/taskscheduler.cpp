@@ -99,15 +99,18 @@ void TaskScheduler::queCpuTaskFastTrack(const stdsptr<eTask>& task) {
     }
 }
 
-bool TaskScheduler::shouldQueMoreCpuTasks() const {
+bool TaskScheduler::overflowed() const {
     const int nQues = mQuedCpuTasks.countQues();
     const int maxQues = mCpuExecutors.count();
-    const bool overflowed = nQues >= maxQues;
-    return !mFreeCpuExecs.isEmpty() && !mCpuQueing && !overflowed;
+    return nQues >= maxQues;
+}
+
+bool TaskScheduler::shouldQueMoreCpuTasks() const {
+    return !mFreeCpuExecs.isEmpty() && !mCpuQueing && !overflowed();
 }
 
 bool TaskScheduler::shouldQueMoreHddTasks() const {
-    return mQuedHddTasks.count() < 2 && mHddThreadBusy;
+    return mQuedHddTasks.count() < 2 && mHddThreadBusy && !overflowed();
 }
 
 HddExecController* TaskScheduler::createNewBackupHddExecutor() {
@@ -124,7 +127,7 @@ void TaskScheduler::queTasks() {
 }
 
 void TaskScheduler::queScheduledCpuTasks() {
-    if(!shouldQueMoreCpuTasks()) return;
+    if(!mAlwaysQue && !shouldQueMoreCpuTasks()) return;
     mCpuQueing = true;
     mQuedCpuTasks.beginQue();
     for(const auto& it : Document::sInstance->fVisibleScenes) {
