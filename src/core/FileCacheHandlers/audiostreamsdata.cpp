@@ -146,8 +146,11 @@ void AudioStreamsData::open(AVFormatContext * const formatContext) {
             audCodecPars = iCodecPars;
             audCodec = avcodec_find_decoder(audCodecPars->codec_id);
             fAudioStream = iStream;
-            fDurationSec = static_cast<int>(fAudioStream->duration*
-                    fAudioStream->time_base.num/fAudioStream->time_base.den);
+            if(fAudioStream->duration == 0)
+                RuntimeThrow("Unknown stream duration");
+            const qreal mult = qreal(fAudioStream->time_base.num)/
+                                     fAudioStream->time_base.den;
+            fDurationSec = fAudioStream->duration*mult;
             break;
         }
     }

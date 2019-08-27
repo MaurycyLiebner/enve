@@ -48,7 +48,7 @@ public:
 
     QString fPath;
     bool fOpened = false;
-    int fDurationSec = 0;
+    qreal fDurationSec = 0;
     AVFormatContext *fFormatContext = nullptr;
     int fAudioStreamIndex = -1;
     AVStream * fAudioStream = nullptr;

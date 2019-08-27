@@ -29,7 +29,8 @@ void HddCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
                                                   const QRectF& drawRect,
                                                   const int startFrame,
                                                   const int endFrame,
-                                                  const qreal unit) const {
+                                                  const qreal unit,
+                                                  const int maxX) const {
     if(startFrame > endFrame) return;
     p->save();
     const qreal quStartFrame = startFrame/unit;
@@ -56,13 +57,14 @@ void HddCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
         if(afterMaxFrame < startFrame) continue;
 
         const int dFrame = minFrame - startFrame;
-        int xT = qRound(dFrame*pixelsPerFrame + drawRect.x());
+        int x = qRound(dFrame*pixelsPerFrame + drawRect.x());
 
-        int widthT = qRound(pixelsPerFrame*(afterMaxFrame - minFrame));
+        int width = qRound(pixelsPerFrame*(afterMaxFrame - minFrame));
         if(lastDrawnFrame == minFrame) {
-            widthT += xT - lastDrawX;
-            xT = lastDrawX;
+            width += x - lastDrawX;
+            x = lastDrawX;
         }
+        if(x > maxX) break;
         const bool storesInMemory = cont->storesDataInMemory();
         //if(storesInMemory != lastStoresInMemory) {
             if(storesInMemory) {
@@ -73,11 +75,10 @@ void HddCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
             }
             //lastStoresInMemory = storesInMemory;
         //}
-
-        p->drawRect(xT, qRound(drawRect.top()),
-                    widthT, qRound(drawRect.height()));
+        p->drawRect(x, qRound(drawRect.top()),
+                    qMin(maxX, x + width) - x, qRound(drawRect.height()));
         lastDrawnFrame = afterMaxFrame;
-        lastDrawX = xT + widthT;
+        lastDrawX = x + width;
     }
     p->restore();
 }

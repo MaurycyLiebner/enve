@@ -178,20 +178,24 @@ void DurationRectangle::draw(QPainter * const p,
                                drawRect.width(), rasterHeight);
         mRasterCacheHandler->drawCacheOnTimeline(p, rasterRect,
                                                  rectStartFrame,
-                                                 rectEndFrame);
+                                                 rectEndFrame,
+                                                 durRect.right());
         const QRect soundRect(drawRect.x(), drawRect.y() + rasterHeight,
                               drawRect.width(), soundHeight);
         mSoundCacheHandler->drawCacheOnTimeline(p, soundRect,
                                                 rectStartFrame,
-                                                rectEndFrame, fps);
+                                                rectEndFrame, fps,
+                                                durRect.right());
     } else if(mRasterCacheHandler) {
         mRasterCacheHandler->drawCacheOnTimeline(p, drawRect,
                                                  rectStartFrame,
-                                                 rectEndFrame);
+                                                 rectEndFrame,
+                                                 durRect.right());
     } else if(mSoundCacheHandler) {
         mSoundCacheHandler->drawCacheOnTimeline(p, drawRect,
                                                 rectStartFrame,
-                                                rectEndFrame, fps);
+                                                rectEndFrame, fps,
+                                                durRect.right());
     }
 
     QColor fillColor;

@@ -29,7 +29,8 @@ public:
                              const QRectF &drawRect,
                              const int startFrame,
                              const int endFrame,
-                             const qreal unit = 1) const;
+                             const qreal unit = 1,
+                             const int maxX = INT_MAX/2) const;
 
     int firstEmptyFrameAtOrAfter(const int frame) const {
         return mConts.firstEmptyRangeLowerBound(frame).fMin;

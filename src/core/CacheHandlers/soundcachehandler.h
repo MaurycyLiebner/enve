@@ -104,7 +104,11 @@ public:
 
     SoundReaderForMerger * addSecondReader(const int secondId);
 
-    int durationSec() const {
+    int durationSecCeil() const {
+        return qCeil(durationSec());
+    }
+
+    qreal durationSec() const {
         if(!mAudioStreamsData) return 0;
         return mAudioStreamsData->fDurationSec;
     }

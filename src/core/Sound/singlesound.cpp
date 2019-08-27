@@ -70,7 +70,7 @@ void SingleSound::setupTreeViewMenu(PropertyMenu * const menu) {
 }
 
 SoundReaderForMerger *SingleSound::getSecondReader(const int relSecondId) {
-    const int maxSec = mCacheHandler->durationSec() - 1;
+    const int maxSec = mCacheHandler->durationSecCeil() - 1;
     if(relSecondId < 0 || relSecondId > maxSec) return nullptr;
     const auto reader = mCacheHandler->getSecondReader(relSecondId);
     if(!reader) return mCacheHandler->addSecondReader(relSecondId);
@@ -111,7 +111,7 @@ SampleRange SingleSound::absSampleRange() const {
 iValueRange SingleSound::absSecondToRelSeconds(const int absSecond) {
     if(mStretch < 0) {
         const auto absStretch = absSecondToRelSecondsAbsStretch(absSecond);
-        const int secs = mCacheHandler ? mCacheHandler->durationSec() : 0;
+        const int secs = mCacheHandler ? mCacheHandler->durationSecCeil() : 0;
         return {secs - absStretch.fMax, secs - absStretch.fMin};
     }
     return absSecondToRelSecondsAbsStretch(absSecond);
@@ -158,7 +158,7 @@ QrealSnapshot SingleSound::getVolumeSnap() const {
 
 void SingleSound::updateDurationRectLength() {
     if(mIndependent && mCacheHandler && mParentScene) {
-        const int secs = mCacheHandler ? mCacheHandler->durationSec() : 0;
+        const qreal secs = mCacheHandler ? mCacheHandler->durationSec() : 0;
         const qreal fps = getCanvasFPS();
         const int frames = qCeil(qAbs(secs*fps*mStretch));
         const auto flaRect = static_cast<FixedLenAnimationRect*>(
