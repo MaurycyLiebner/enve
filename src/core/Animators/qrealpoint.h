@@ -30,10 +30,17 @@ enum QrealPointType : short {
 class QrealPoint : public StdSelfRef {
     e_OBJECT
 public:
+    QrealPoint(const QrealPointType &type,
+               GraphKey * const parentKey,
+               const qreal radius = 10);
     ~QrealPoint() {}
 
     qreal getRelFrame();
     qreal getAbsFrame();
+
+    QPointF getSavedFrameAndValue() const;
+    qreal getSavedFrame() const;
+    qreal getSavedValue() const;
 
     void setRelFrame(const qreal frame);
     void setAbsFrame(const qreal absFrame);
@@ -49,6 +56,7 @@ public:
                 const qreal pixelsPerFrame,
                 const qreal pixelsPerValue);
 
+    void moveBy(const qreal dFrame, const qreal dValue);
     void moveTo(const qreal frameT, const qreal valueT);
 
     void draw(QPainter * const p, const QColor &paintColor);
@@ -62,8 +70,8 @@ public:
     bool isEnabled();
 
     GraphKey *getParentKey();
-    void startFrameTransform();
-    void finishFrameTransform();
+    void startTransform();
+    void finishTransform();
     const QrealPointType& getType() const {
         return mType;
     }
@@ -72,9 +80,6 @@ public:
         mHovered = hovered;
     }
 private:
-    QrealPoint(const QrealPointType &type,
-               GraphKey * const parentKey,
-               const qreal radius = 10);
     bool mIsSelected = false;
     bool mHovered = false;
     QrealPointType mType;

@@ -43,12 +43,12 @@ void QrealPoint::setAbsFrame(const qreal absFrame) {
     setRelFrame(mParentKey->absFrameToRelFrameF(absFrame));
 }
 
-void QrealPoint::startFrameTransform() {
-    if(mType == KEY_POINT) return mParentKey->startFrameTransform();
+void QrealPoint::startTransform() {
+    mParentKey->startFrameAndValueTransform();
 }
 
-void QrealPoint::finishFrameTransform() {
-    if(mType == KEY_POINT) return mParentKey->finishFrameTransform();
+void QrealPoint::finishTransform() {
+    mParentKey->finishFrameAndValueTransform();
 }
 
 qreal QrealPoint::getValue() {
@@ -79,6 +79,22 @@ bool QrealPoint::isNear(const qreal frameT,
     return true;
 }
 
+void QrealPoint::moveBy(const qreal dFrame, const qreal dValue) {
+    if(mType == KEY_POINT) {
+        mParentKey->changeFrameAndValueBy({dFrame, dValue});
+    } else if(mType == START_POINT) {
+        const auto& pt = mParentKey->startPt();
+        const auto relTo = pt.getRawSavedValue();
+        mParentKey->setStartFrameVar(relTo.x() + dFrame);
+        mParentKey->setStartValueVar(relTo.y() + dValue);
+    } else if(mType == END_POINT) {
+        const auto& pt = mParentKey->endPt();
+        const auto relTo = pt.getRawSavedValue();
+        mParentKey->setEndFrameVar(relTo.x() + dFrame);
+        mParentKey->setEndValueVar(relTo.y() + dValue);
+    }
+}
+
 void QrealPoint::moveTo(const qreal frameT, const qreal valueT) {
     setAbsFrame(frameT);
     setValue(valueT);
@@ -88,6 +104,28 @@ void QrealPoint::moveTo(const qreal frameT, const qreal valueT) {
 
 qreal QrealPoint::getAbsFrame() {
     return mParentKey->relFrameToAbsFrameF(getRelFrame());
+}
+
+QPointF QrealPoint::getSavedFrameAndValue() const {
+    const QPointF keySaved(mParentKey->getRelFrame(),
+                           mParentKey->getValueForGraph());
+    if(mType == KEY_POINT) {
+        return keySaved;
+    } else if(mType == START_POINT) {
+        const auto& pt = mParentKey->startPt();
+        return pt.getClampedSavedValue(keySaved);
+    } else /*if(mType == END_POINT)*/ {
+        const auto& pt = mParentKey->endPt();
+        return pt.getClampedSavedValue(keySaved);
+    }
+}
+
+qreal QrealPoint::getSavedFrame() const {
+    return getSavedFrameAndValue().x();
+}
+
+qreal QrealPoint::getSavedValue() const {
+    return getSavedFrameAndValue().y();
 }
 
 void QrealPoint::draw(QPainter * const p, const QColor &paintColor) {

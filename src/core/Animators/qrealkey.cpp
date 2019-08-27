@@ -83,8 +83,7 @@ void QrealKey::readKey(eReadStream& src) {
 }
 
 void QrealKey::finishValueTransform() {
-    if(mParentAnimator)
-        mParentAnimator->anim_updateAfterChangedKey(this);
+
 }
 
 void QrealKey::startValueTransform() {

@@ -395,7 +395,8 @@ void KeysView::paintEvent(QPaintEvent *) {
     }
 
     p.resetTransform();
-    if(mMovingKeys) mValueInput.draw(&p, height() - MIN_WIDGET_DIM);
+    if(mMovingKeys && mValueInput.inputEnabled())
+        mValueInput.draw(&p, height() - MIN_WIDGET_DIM);
     if(hasFocus()) {
         p.setBrush(Qt::NoBrush);
         p.setPen(QPen(Qt::red, 4));
@@ -501,162 +502,164 @@ void KeysView::scrollLeft() {
     update();
 }
 
+void KeysView::handleMouseMoveScroll(const QPoint &pos) {
+    if(pos.x() < MIN_WIDGET_DIM/2) {
+        if(!mScrollTimer->isActive()) {
+            connect(mScrollTimer, &QTimer::timeout,
+                    this, &KeysView::scrollLeft);
+            mScrollTimer->start(300);
+        }
+    } else if(pos.x() > width() - MIN_WIDGET_DIM/2) {
+        if(!mScrollTimer->isActive()) {
+            connect(mScrollTimer, &QTimer::timeout,
+                    this, &KeysView::scrollRight);
+            mScrollTimer->start(300);
+        }
+    } else {
+        mScrollTimer->disconnect();
+        mScrollTimer->stop();
+    }
+}
+
 void KeysView::handleMouseMove(const QPoint &pos,
                                const Qt::MouseButtons &buttons) {
     const QPoint posU = pos + QPoint(-MIN_WIDGET_DIM/2, 0);
+    if(buttons & Qt::MiddleButton) {
+        if(mGraphViewed) graphMiddleMove(posU);
+        else middleMove(posU);
+        emit changedViewedFrames({mMinViewedFrame, mMaxViewedFrame});
+    } else if(mIsMouseGrabbing || buttons & Qt::LeftButton) {
+        handleMouseMoveScroll(pos);
+        qreal dFrame;
+        if(mValueInput.inputEnabled()) {
+            dFrame = mValueInput.getValue();
+        } else {
+            const qreal dX = posU.x() - mLastPressPos.x();
+            dFrame = dX/mPixelsPerFrame;
+            mValueInput.setDisplayedValue(dFrame);
+        }
+        if(!mPressedCtrlPoint) dFrame = round(dFrame);
+        const qreal dDFrame = dFrame - mMoveDFrame;
+        const int iDDFrame = qRound(dDFrame);
+        mMoveDFrame = dFrame;
 
-    if(mIsMouseGrabbing ||
-       (buttons & Qt::LeftButton ||
-        buttons & Qt::RightButton ||
-        buttons & Qt::MiddleButton)) {
         if(mGraphViewed && mPressedCtrlPoint && mGPressedPoint) {
+            if(mFirstMove) mGPressedPoint->startTransform();
             qreal value;
             qreal frame;
             graphGetValueAndFrameFromPos(posU, value, frame);
-            const qreal clampedFrame = clamp(frame, mMinMoveFrame, mMaxMoveFrame);
-            const qreal clamedValue = clamp(value, mMinMoveVal, mMaxMoveVal);
-            mGPressedPoint->moveTo(clampedFrame, clamedValue);
-        } else if(buttons & Qt::MiddleButton) {
-            if(mGraphViewed) graphMiddleMove(posU);
-            else middleMove(posU);
-            emit changedViewedFrames({mMinViewedFrame, mMaxViewedFrame});
-        } else {
-            if(posU.x() < -MIN_WIDGET_DIM/2) {
-                if(!mScrollTimer->isActive()) {
-                    connect(mScrollTimer, &QTimer::timeout,
-                            this, &KeysView::scrollLeft);
-                    mScrollTimer->start(300);
-                }
-            } else if(posU.x() > width() - MIN_WIDGET_DIM) {
-                if(!mScrollTimer->isActive()) {
-                    connect(mScrollTimer, &QTimer::timeout,
-                            this, &KeysView::scrollRight);
-                    mScrollTimer->start(300);
-                }
-            } else {
-                mScrollTimer->disconnect();
-                mScrollTimer->stop();
-            }
-            int dFrame;
-            if(mValueInput.inputEnabled()) {
-                dFrame = qRound(mValueInput.getValue());
-            } else {
-                const qreal dX = posU.x() - mLastPressPos.x();
-                dFrame = qRound(dX/mPixelsPerFrame);
-                mValueInput.setDisplayedValue(dFrame);
-            }
-            const int dDFrame = dFrame - mMoveDFrame;
-
-            if(mMovingKeys) {
-                if(mFirstMove) {
-                    if(mGraphViewed) {
-                        for(const auto& anim : mGraphAnimators) {
-                            anim->graph_startSelectedKeysTransform();
-                        }
-                    } else {
-                        for(const auto& anim : mSelectedKeysAnimators) {
-                            anim->startSelectedKeysTransform();
-                        }
-                    }
-                }
-                if(mScalingKeys) {
-                    qreal keysScale;
-                    if(mValueInput.inputEnabled()) {
-                        keysScale = mValueInput.getValue();
-                    } else {
-                        keysScale = 1 + (posU.x() - mLastPressPos.x())/150.;
-                        mValueInput.setDisplayedValue(keysScale);
-                    }
-                    const int absFrame = mCurrentScene->getCurrentFrame();
-                    if(mGraphViewed) {
-                        for(const auto& anim : mGraphAnimators) {
-                            anim->scaleSelectedKeysFrame(absFrame, keysScale);
-                        }
-                    } else {
-                        for(const auto& anim : mSelectedKeysAnimators) {
-                            anim->scaleSelectedKeysFrame(absFrame, keysScale);
-                        }
+            const int dY = mLastPressPos.y() - posU.y();
+            const qreal dValue = mValueInput.xOnlyMode() ? 0 : dY/mPixelsPerValUnit;
+            const qreal dFrameV = mValueInput.yOnlyMode() ? 0 : dFrame;
+            const QPointF saved = mGPressedPoint->getSavedFrameAndValue();
+            const qreal rawFrame = saved.x() + dFrameV;
+            const qreal rawValue = saved.y() + dValue;
+            mGPressedPoint->setRelFrame(qBound(mMinMoveFrame, rawFrame, mMaxMoveFrame));
+            mGPressedPoint->setValue(qBound(mMinMoveVal, rawValue, mMaxMoveVal));
+        } else if(mMovingKeys) {
+            if(mFirstMove) {
+                if(mGraphViewed) {
+                    for(const auto& anim : mGraphAnimators) {
+                        anim->graph_startSelectedKeysTransform();
                     }
                 } else {
-                    mMoveDFrame = dFrame;
-                    if(mGraphViewed) {
-                        const int dY = mLastPressPos.y() - posU.y();
-                        const qreal dValue = mValueInput.xOnlyMode() ? 0 :
-                                    dY/mPixelsPerValUnit;
-                        const qreal dFrameV = mValueInput.yOnlyMode() ?
-                                    0 : qreal(dFrame);
-                        for(const auto& anim : mGraphAnimators) {
-                            anim->graph_changeSelectedKeysFrameAndValue(
-                                            {dFrameV, dValue});
-                        }
-                    } else if(dDFrame != 0) {
-                        for(const auto& anim : mSelectedKeysAnimators) {
-                            anim->incSelectedKeysFrame(dDFrame);
-                        }
+                    for(const auto& anim : mSelectedKeysAnimators) {
+                        anim->startSelectedKeysTransform();
                     }
                 }
-            } else if(mMovingRect) {
-                if(mFirstMove) {
-                    if(mLastPressedMovable) {
-                        const auto childProp = mLastPressedMovable->getParentProperty();
-                        const bool shiftPressed = QApplication::keyboardModifiers() & Qt::SHIFT;
-                        mMoveAllSelected = shiftPressed &&
-                                (childProp->SWT_isBoundingBox() ||
-                                 childProp->SWT_isSingleSound());
-                        if(mMoveAllSelected) {
-                            if(mLastPressedMovable->isDurationRect()) {
-                                mCurrentScene->startDurationRectPosTransformForAllSelected();
-                            } else if(mLastPressedMovable->isMaxFrame()) {
-                                mCurrentScene->startMaxFramePosTransformForAllSelected();
-                            } else if(mLastPressedMovable->isMinFrame()) {
-                                mCurrentScene->startMinFramePosTransformForAllSelected();
-                            }
-                            const auto ebs = static_cast<eBoxOrSound*>(childProp);
-                            if(!ebs->isSelected()) mLastPressedMovable->startPosTransform();
-                        } else {
-                            mLastPressedMovable->startPosTransform();
-                        }
+            }
+            if(mScalingKeys) {
+                qreal keysScale;
+                if(mValueInput.inputEnabled()) {
+                    keysScale = mValueInput.getValue();
+                } else {
+                    keysScale = 1 + (posU.x() - mLastPressPos.x())/150.;
+                    mValueInput.setDisplayedValue(keysScale);
+                }
+                const int absFrame = mCurrentScene->getCurrentFrame();
+                if(mGraphViewed) {
+                    for(const auto& anim : mGraphAnimators) {
+                        anim->scaleSelectedKeysFrame(absFrame, keysScale);
+                    }
+                } else {
+                    for(const auto& anim : mSelectedKeysAnimators) {
+                        anim->scaleSelectedKeysFrame(absFrame, keysScale);
                     }
                 }
+            } else {
+                if(mGraphViewed) {
+                    const int dY = mLastPressPos.y() - posU.y();
+                    const qreal dValue = mValueInput.xOnlyMode() ? 0 :
+                                dY/mPixelsPerValUnit;
+                    const qreal dFrameV = mValueInput.yOnlyMode() ? 0 : dFrame;
+                    for(const auto& anim : mGraphAnimators) {
+                        anim->graph_changeSelectedKeysFrameAndValue(
+                                        {dFrameV, dValue});
+                    }
+                } else if(iDDFrame != 0) {
+                    for(const auto& anim : mSelectedKeysAnimators) {
+                        anim->incSelectedKeysFrame(iDDFrame);
+                    }
+                }
+            }
+        } else if(mMovingRect) {
+            if(mFirstMove) {
+                if(mLastPressedMovable) {
+                    const auto childProp = mLastPressedMovable->getParentProperty();
+                    const bool shiftPressed = QApplication::keyboardModifiers() & Qt::SHIFT;
+                    mMoveAllSelected = shiftPressed &&
+                            (childProp->SWT_isBoundingBox() ||
+                             childProp->SWT_isSingleSound());
+                    if(mMoveAllSelected) {
+                        if(mLastPressedMovable->isDurationRect()) {
+                            mCurrentScene->startDurationRectPosTransformForAllSelected();
+                        } else if(mLastPressedMovable->isMaxFrame()) {
+                            mCurrentScene->startMaxFramePosTransformForAllSelected();
+                        } else if(mLastPressedMovable->isMinFrame()) {
+                            mCurrentScene->startMinFramePosTransformForAllSelected();
+                        }
+                        const auto ebs = static_cast<eBoxOrSound*>(childProp);
+                        if(!ebs->isSelected()) mLastPressedMovable->startPosTransform();
+                    } else {
+                        mLastPressedMovable->startPosTransform();
+                    }
+                }
+            }
 
-                if(dDFrame != 0) {
-                    mMoveDFrame = dFrame;
-                    if(mLastPressedMovable) {
-                        const auto childProp = mLastPressedMovable->getParentProperty();
-                        if(mMoveAllSelected) {
-                            if(mLastPressedMovable->isDurationRect()) {
-                                mCurrentScene->moveDurationRectForAllSelected(dDFrame);
-                            } else if(mLastPressedMovable->isMaxFrame()) {
-                                mCurrentScene->moveMaxFrameForAllSelected(dDFrame);
-                            } else if(mLastPressedMovable->isMinFrame()) {
-                                mCurrentScene->moveMinFrameForAllSelected(dDFrame);
-                            }
-                            const auto ebs = static_cast<eBoxOrSound*>(childProp);
-                            if(!ebs->isSelected()) mLastPressedMovable->changeFramePosBy(dDFrame);
-                        } else {
-                            mLastPressedMovable->changeFramePosBy(dDFrame);
+            if(iDDFrame != 0) {
+                if(mLastPressedMovable) {
+                    const auto childProp = mLastPressedMovable->getParentProperty();
+                    if(mMoveAllSelected) {
+                        if(mLastPressedMovable->isDurationRect()) {
+                            mCurrentScene->moveDurationRectForAllSelected(iDDFrame);
+                        } else if(mLastPressedMovable->isMaxFrame()) {
+                            mCurrentScene->moveMaxFrameForAllSelected(iDDFrame);
+                        } else if(mLastPressedMovable->isMinFrame()) {
+                            mCurrentScene->moveMinFrameForAllSelected(iDDFrame);
                         }
+                        const auto ebs = static_cast<eBoxOrSound*>(childProp);
+                        if(!ebs->isSelected()) mLastPressedMovable->changeFramePosBy(iDDFrame);
+                    } else {
+                        mLastPressedMovable->changeFramePosBy(iDDFrame);
                     }
+                }
 //                        mLastPressedDurationRectangleMovable->changeFramePosBy(
 //                                    dDFrame);
-                }
-            } else if(mSelecting) {
-                if(mGraphViewed) {
-                    qreal value;
-                    qreal frame;
-                    graphGetValueAndFrameFromPos(posU, value, frame);
-                    mSelectionRect.setBottomRight({frame, value});
-                } else {
-                    const qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
-                    const QPointF br(posUXFrame, posU.y() + mViewedTop);
-                    mSelectionRect.setBottomRight(br);
-                }
             }
-            mFirstMove = false;
+        } else if(mSelecting) {
+            if(mGraphViewed) {
+                qreal value;
+                qreal frame;
+                graphGetValueAndFrameFromPos(posU, value, frame);
+                mSelectionRect.setBottomRight({frame, value});
+            } else {
+                const qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
+                const QPointF br(posUXFrame, posU.y() + mViewedTop);
+                mSelectionRect.setBottomRight(br);
+            }
         }
-    } else {
-        updateHovered(posU);
-    }
+        mFirstMove = false;
+    } else updateHovered(posU);
 
     if(mIsMouseGrabbing) Document::sInstance->actionFinished();
     else update();

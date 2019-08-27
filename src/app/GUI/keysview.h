@@ -97,8 +97,6 @@ public:
     void graphRemoveViewedAnimator(GraphAnimator * const animator);
     void clearHoveredMovable();
     bool KFT_keyPressEvent(QKeyEvent *event);
-    void handleMouseMove(const QPoint &pos,
-                         const Qt::MouseButtons &buttons);
 protected:
     ValueInput mValueInput;
 
@@ -146,6 +144,8 @@ public:
 private:
     void scrollRight();
     void scrollLeft();
+    void handleMouseMoveScroll(const QPoint &pos);
+    void handleMouseMove(const QPoint &pos, const Qt::MouseButtons &buttons);
     void graphConstrainAnimatorCtrlsFrameValues();
     void graphGetAnimatorsMinMaxValue(qreal &minVal, qreal &maxVal);
     void graphMakeSegmentsSmoothAction(const bool smooth);
@@ -167,6 +167,7 @@ private:
     }
 
     void releaseMouseAndDontTrack() {
+        mMovingKeys = false;
         mIsMouseGrabbing = false;
         releaseMouse();
     }
@@ -187,7 +188,7 @@ private:
     QPointer<TimelineMovable> mLastPressedMovable;
     Key *mLastPressedKey = nullptr;
     bool mFirstMove = false;
-    int mMoveDFrame = 0;
+    qreal mMoveDFrame = 0;
     QPoint mLastPressPos;
     bool mMovingKeys = false;
     bool mScalingKeys = false;

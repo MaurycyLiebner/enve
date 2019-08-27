@@ -274,6 +274,9 @@ public:
 protected:
     void setRelFrame(const int frame);
 public:
+    const ClampedPoint& startPt() const { return mStartPt; }
+    const ClampedPoint& endPt() const { return mEndPt; }
+
     qreal getEndValue() const;
     qreal getStartValue() const;
 

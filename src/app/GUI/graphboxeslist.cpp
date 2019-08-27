@@ -262,8 +262,7 @@ QrealPoint * KeysView::graphGetPointAtPos(const QPointF &pressPos) const {
 
     QrealPoint* point = nullptr;
     for(const auto& anim : mGraphAnimators) {
-        point = anim->graph_getPointAt(value, frame,
-                                       mPixelsPerFrame,
+        point = anim->graph_getPointAt(value, frame, mPixelsPerFrame,
                                        mPixelsPerValUnit);
         if(point) break;
     }
@@ -283,11 +282,8 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
         mSelectionRect.setTopLeft({frame, value});
     } else if(pressedPoint->isKeyPoint()) {
         if(QApplication::keyboardModifiers() & Qt::ShiftModifier) {
-            if(parentKey->isSelected()) {
-                removeKeyFromSelection(parentKey);
-            } else {
-                addKeyToSelection(parentKey);
-            }
+            if(parentKey->isSelected()) removeKeyFromSelection(parentKey);
+            else addKeyToSelection(parentKey);
         } else {
             if(!parentKey->isSelected()) {
                 clearKeySelection();
@@ -297,10 +293,8 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
     } else {
         mPressedCtrlPoint = true;
         auto parentKey = pressedPoint->getParentKey();
-        auto parentAnimator =
-                parentKey->getParentAnimator<GraphAnimator>();
-        parentAnimator->
-                graph_getFrameValueConstraints(
+        auto parentAnimator = parentKey->getParentAnimator<GraphAnimator>();
+        parentAnimator->graph_getFrameValueConstraints(
                     parentKey, pressedPoint->getType(),
                     mMinMoveFrame, mMaxMoveFrame,
                     mMinMoveVal, mMaxMoveVal);

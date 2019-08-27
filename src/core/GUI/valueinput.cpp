@@ -56,7 +56,7 @@ void ValueInput::draw(QPainter *p, const int y) {
     const int textWidth = QApplication::fontMetrics().width(transStr);
     const QRect inputRect(2*MIN_WIDGET_DIM, y,
                           textWidth + MIN_WIDGET_DIM, MIN_WIDGET_DIM);
-    p->fillRect(inputRect, QColor(225, 225, 225));
+    p->fillRect(inputRect, QColor(255, 255, 255, 55));
     p->drawText(qRound(inputRect.x() + MIN_WIDGET_DIM*0.5),
                 qRound(inputRect.y() + inputRect.height()*0.5 + FONT_HEIGHT*0.2),
                 transStr);
@@ -72,7 +72,6 @@ void ValueInput::updateInputValue() {
     if(mInputText.isEmpty()) {
         mInputEnabled = false;
     } else {
-        //mFirstMouseMove = false;
         mInputEnabled = true;
         if(mInputText == "-") mInputValue = -1;
         else mInputValue = mInputText.toDouble();
