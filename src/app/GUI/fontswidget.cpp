@@ -24,10 +24,14 @@
 
 FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
     mFontStyleCombo = new QComboBox(this);
+    mFontStyleCombo->setFocusPolicy(Qt::NoFocus);
     mFontFamilyCombo = new QComboBox(this);
+    mFontFamilyCombo->setFocusPolicy(Qt::NoFocus);
     mFontSizeCombo = new QComboBox(this);
+    mFontSizeCombo->setFocusPolicy(Qt::NoFocus);
     mFontSizeCombo->setEditable(true);
     mFontSizeCombo->setMinimumContentsLength(3);
+
     mFontSizeCombo->lineEdit()->setStyleSheet(
                 "QLineEdit {"
                     "background: rgb(200, 200, 200);"
