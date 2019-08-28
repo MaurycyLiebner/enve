@@ -14,11 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "examplepatheffect.h"
+#include "elinearize.h"
 
 qsptr<CustomPathEffect> eCreateNewestVersion() {
     // Use default, most up to date, version
-    return enve::make_shared<ExamplePathEffect000>();
+    return enve::make_shared<eLinearize000>();
 }
 
 qsptr<CustomPathEffect> eCreate(
@@ -26,7 +26,7 @@ qsptr<CustomPathEffect> eCreate(
     Q_UNUSED(identifier);
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
-    return enve::make_shared<ExamplePathEffect000>();
+    return enve::make_shared<eLinearize000>();
 }
 
 // Returned value must be unique, lets enve distinguish effects
@@ -36,7 +36,7 @@ QString effectId() {
 
 // Name of your effect used in UI
 QString eName() {
-    return "Example";
+    return "eLinearize";
 }
 
 // here specify your effect's most up to date version
@@ -55,19 +55,19 @@ bool eSupports(const CustomIdentifier &identifier) {
 }
 
 #include "enveCore/Animators/qrealanimator.h"
-ExamplePathEffect000::ExamplePathEffect000() :
+eLinearize000::eLinearize000() :
     CustomPathEffect(eName().toLower()) {
     mInfluence = enve::make_shared<QrealAnimator>(0, 0, 1, 0.1, "influence");
     ca_addChild(mInfluence);
 }
 
-CustomIdentifier ExamplePathEffect000::getIdentifier() const {
+CustomIdentifier eLinearize000::getIdentifier() const {
     return { effectId(), eName(), { 0, 0, 0 } };
 }
 
-void ExamplePathEffect000::apply(const qreal relFrame,
-                                 const SkPath &src,
-                                 SkPath * const dst) {
+void eLinearize000::apply(const qreal relFrame,
+                          const SkPath &src,
+                          SkPath * const dst) {
     const float infl = toSkScalar(mInfluence->getEffectiveValue(relFrame));
     const float invInf = 1 - infl;
     dst->reset();

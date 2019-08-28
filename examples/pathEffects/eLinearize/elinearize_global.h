@@ -14,36 +14,36 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EXAMPLEPATHEFFECT_GLOBAL_H
-#define EXAMPLEPATHEFFECT_GLOBAL_H
+#ifndef ELINEARIZE_GLOBAL_H
+#define ELINEARIZE_GLOBAL_H
 
 #include <QtCore/qglobal.h>
 
-#if defined(EXAMPLEPATHEFFECT_LIBRARY)
-#  define EXAMPLEPATHEFFECTSHARED_EXPORT Q_DECL_EXPORT
+#if defined(ELINEARIZE_LIBRARY)
+#  define ELINEARIZESHARED_EXPORT Q_DECL_EXPORT
 #else
-#  define EXAMPLEPATHEFFECTSHARED_EXPORT Q_DECL_IMPORT
+#  define ELINEARIZESHARED_EXPORT Q_DECL_IMPORT
 #endif
 
 #include "enveCore/PathEffects/custompatheffect.h"
 
 extern "C" {
 
-EXAMPLEPATHEFFECTSHARED_EXPORT
+ELINEARIZESHARED_EXPORT
     qsptr<CustomPathEffect> eCreateNewestVersion();
 
-EXAMPLEPATHEFFECTSHARED_EXPORT
+ELINEARIZESHARED_EXPORT
     qsptr<CustomPathEffect> eCreate(
         const CustomIdentifier &identifier);
 
-EXAMPLEPATHEFFECTSHARED_EXPORT
+ELINEARIZESHARED_EXPORT
     QString eName();
 
-EXAMPLEPATHEFFECTSHARED_EXPORT
+ELINEARIZESHARED_EXPORT
     CustomIdentifier eIdentifier();
 
-EXAMPLEPATHEFFECTSHARED_EXPORT
+ELINEARIZESHARED_EXPORT
     bool eSupports(const CustomIdentifier &identifier);
 
 }
-#endif // EXAMPLEPATHEFFECT_GLOBAL_H
+#endif // ELINEARIZE_GLOBAL_H

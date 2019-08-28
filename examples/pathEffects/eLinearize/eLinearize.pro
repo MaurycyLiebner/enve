@@ -45,10 +45,10 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$$ENVE_CORE_OUT -lenvecore
 
-TARGET = examplePathEffect
+TARGET = eLinearize
 TEMPLATE = lib
 
-DEFINES += EXAMPLEPATHEFFECT_LIBRARY
+DEFINES += ELINEARIZE_LIBRARY
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -62,8 +62,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        examplepatheffect.cpp
+        elinearize.cpp
 
 HEADERS += \
-        examplepatheffect.h \
-        examplepatheffect_global.h 
+        elinearize.h \
+        elinearize_global.h

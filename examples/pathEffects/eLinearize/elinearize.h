@@ -14,14 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EXAMPLEPATHEFFECT_H
-#define EXAMPLEPATHEFFECT_H
+#ifndef ELINEARIZE_H
+#define ELINEARIZE_H
 
-#include "examplepatheffect_global.h"
+#include "elinearize_global.h"
 
-class ExamplePathEffect000 : public CustomPathEffect {
+class eLinearize000 : public CustomPathEffect {
 public:
-    ExamplePathEffect000();
+    eLinearize000();
 
     CustomIdentifier getIdentifier() const;
 
@@ -32,4 +32,4 @@ private:
     qsptr<QrealAnimator> mInfluence;
 };
 
-#endif // EXAMPLEPATHEFFECT_H
+#endif // ELINEARIZE_H
