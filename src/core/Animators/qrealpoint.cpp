@@ -83,11 +83,13 @@ void QrealPoint::moveBy(const qreal dFrame, const qreal dValue) {
         const auto relTo = pt.getRawSavedValue();
         mParentKey->setStartFrameVar(relTo.x() + dFrame);
         mParentKey->setStartValueVar(relTo.y() + dValue);
+        mParentKey->updateCtrlFromCtrl(mType);
     } else if(mType == END_POINT) {
         const auto& pt = mParentKey->endPt();
         const auto relTo = pt.getRawSavedValue();
         mParentKey->setEndFrameVar(relTo.x() + dFrame);
         mParentKey->setEndValueVar(relTo.y() + dValue);
+        mParentKey->updateCtrlFromCtrl(mType);
     }
 }
 
@@ -122,6 +124,13 @@ qreal QrealPoint::getSavedFrame() const {
 
 qreal QrealPoint::getSavedValue() const {
     return getSavedFrameAndValue().y();
+}
+
+void QrealPoint::setFrameAndValue(const qreal relFrame, const qreal value) {
+    setRelFrame(relFrame);
+    setValue(value);
+    if(isKeyPt()) return;
+    mParentKey->updateCtrlFromCtrl(mType);
 }
 
 void QrealPoint::draw(QPainter * const p, const QColor &paintColor) {

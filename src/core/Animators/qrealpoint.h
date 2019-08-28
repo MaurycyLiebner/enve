@@ -41,6 +41,9 @@ public:
     qreal getSavedFrame() const;
     qreal getSavedValue() const;
 
+    void setFrameAndValue(const qreal relFrame,
+                          const qreal value);
+
     void setRelFrame(const qreal frame);
     void setAbsFrame(const qreal absFrame);
 
