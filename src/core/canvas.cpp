@@ -204,6 +204,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         drawTransparencyMesh(canvas, canvasRect);
 
     if(!mClipToCanvasSize || !drawCanvas) {
+        canvas->saveLayer(nullptr, nullptr);
         if(bgColor.alpha() == 255 &&
            skViewTrans.mapRect(canvasRect).contains(toSkRect(drawRect))) {
             canvas->clear(toSkColor(bgColor));
@@ -212,7 +213,6 @@ void Canvas::renderSk(SkCanvas * const canvas,
             paint.setColor(toSkColor(bgColor));
             canvas->drawRect(canvasRect, paint);
         }
-        canvas->saveLayer(nullptr, nullptr);
         drawContained(canvas, filter);
         canvas->restore();
     } else if(drawCanvas) {
