@@ -538,12 +538,13 @@ void KeysView::handleMouseMove(const QPoint &pos,
             dFrame = dX/mPixelsPerFrame;
             mValueInput.setDisplayedValue(dFrame);
         }
-        if(!mPressedCtrlPoint) dFrame = round(dFrame);
+        const bool ctrlPt = mGPressedPoint && mGPressedPoint->isCtrlPt();
+        if(!ctrlPt) dFrame = round(dFrame);
         const qreal dDFrame = dFrame - mMoveDFrame;
         const int iDDFrame = qRound(dDFrame);
         mMoveDFrame = dFrame;
 
-        if(mGraphViewed && mPressedCtrlPoint && mGPressedPoint) {
+        if(mGraphViewed && ctrlPt) {
             if(mFirstMove) mGPressedPoint->startTransform();
             qreal value;
             qreal frame;
@@ -676,10 +677,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
         mScrollTimer->stop();
     }
     if(mGraphViewed && mGPressedPoint) {
-        if(mPressedCtrlPoint) {
-            mGPressedPoint->setSelected(false);
-            mPressedCtrlPoint = false;
-        } else {
+        if(mGPressedPoint->isKeyPt()) {
             if(mFirstMove) {
                 if(!(e->modifiers() & Qt::SHIFT)) {
                     clearKeySelection();
@@ -692,6 +690,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                 }
             }
         }
+        mGPressedPoint->setSelected(false);
         mGPressedPoint = nullptr;
 
         graphConstrainAnimatorCtrlsFrameValues();

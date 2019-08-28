@@ -33,7 +33,7 @@ protected:
     GraphAnimator(const QString& name);
 public:
     virtual void graph_getValueConstraints(
-            GraphKey *key, const QrealPointType& type,
+            GraphKey *key, const QrealPointType type,
             qreal &minMoveValue, qreal &maxMoveValue) const = 0;
     virtual qValueRange graph_getMinAndMaxValues() const;
     virtual qValueRange graph_getMinAndMaxValuesBetweenFrames(
@@ -62,7 +62,7 @@ public:
                             const FrameRange &absFrameRange) const;
 
     void graph_getFrameValueConstraints(GraphKey *key,
-                                  const QrealPointType& type,
+                                  const QrealPointType type,
                                   qreal &minMoveFrame,
                                   qreal &maxMoveFrame,
                                   qreal &minMoveValue,
@@ -110,7 +110,7 @@ private:
     }
 
     void graph_getFrameConstraints(
-            GraphKey *key, const QrealPointType& type,
+            GraphKey *key, const QrealPointType type,
             qreal &minMoveFrame, qreal &maxMoveFrame) const;
 };
 

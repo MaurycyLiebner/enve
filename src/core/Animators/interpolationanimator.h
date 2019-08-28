@@ -23,7 +23,7 @@ public:
     InterpolationAnimator(const QString& name);
 
     void graph_getValueConstraints(
-            GraphKey *key, const QrealPointType& type,
+            GraphKey *key, const QrealPointType type,
             qreal &minValue, qreal &maxValue) const;
     qreal getInterpolatedFrameAtRelFrame(const qreal frame) const;
 };

@@ -105,7 +105,7 @@ void GraphAnimator::graph_drawKeysPath(QPainter * const p,
 }
 
 void GraphAnimator::graph_getFrameConstraints(
-        GraphKey *key, const QrealPointType& type,
+        GraphKey *key, const QrealPointType type,
         qreal &minMoveFrame, qreal &maxMoveFrame) const {
     if(type == QrealPointType::KEY_POINT) {
         minMoveFrame = DBL_MIN;
@@ -153,7 +153,7 @@ void GraphAnimator::graph_getFrameConstraints(
 }
 
 void GraphAnimator::graph_getFrameValueConstraints(
-        GraphKey *key, const QrealPointType& type,
+        GraphKey *key, const QrealPointType type,
         qreal &minMoveFrame, qreal &maxMoveFrame,
         qreal &minMoveValue, qreal &maxMoveValue) const {
     graph_getFrameConstraints(key, type, minMoveFrame, maxMoveFrame);

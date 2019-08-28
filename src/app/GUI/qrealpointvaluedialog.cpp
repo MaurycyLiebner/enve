@@ -30,7 +30,7 @@ QrealPointValueDialog::QrealPointValueDialog(QrealPoint *point,
     mSpinLayout->addWidget(mFrameSpinBox);
     mSpinLayout->addWidget(mValueSpinBox);
     mFrameSpinBox->setRange(0, 10000);
-    if(point->isKeyPoint()) {
+    if(point->isKeyPt()) {
         mFrameSpinBox->setDecimals(0);
     }
     mValueSpinBox->setRange(-10000, 10000);

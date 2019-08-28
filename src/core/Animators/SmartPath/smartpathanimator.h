@@ -98,7 +98,7 @@ public:
     void readProperty(eReadStream& src);
 
     void graph_getValueConstraints(
-            GraphKey *key, const QrealPointType &type,
+            GraphKey *key, const QrealPointType type,
             qreal &minValue, qreal &maxValue) const;
 
     void anim_afterKeyOnCurrentFrameChanged(Key* const key) {

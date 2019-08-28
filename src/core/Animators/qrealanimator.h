@@ -65,7 +65,7 @@ public:
     stdsptr<Key> createKey();
     void anim_saveCurrentValueAsKey();
 protected:
-    void graph_getValueConstraints(GraphKey *key, const QrealPointType& type,
+    void graph_getValueConstraints(GraphKey *key, const QrealPointType type,
                                    qreal &minMoveValue, qreal &maxMoveValue) const;
 public:
     QrealSnapshot makeSnapshot(const qreal frameMultiplier = 1,

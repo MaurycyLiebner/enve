@@ -17,7 +17,7 @@
 #include "qrealpoint.h"
 #include "graphkey.h"
 
-QrealPoint::QrealPoint(const QrealPointType& type,
+QrealPoint::QrealPoint(QrealPointType type,
                        GraphKey * const parentKey,
                        const qreal radius) {
     mRadius = radius;
@@ -68,14 +68,10 @@ bool QrealPoint::isSelected() {
     return mIsSelected;
 }
 
-bool QrealPoint::isNear(const qreal frameT,
-                        const qreal valueT,
-                        const qreal pixelsPerFrame,
-                        const qreal pixelsPerValue) {
-    const qreal value = getValue();
-    const qreal frame = getAbsFrame();
-    if(qAbs(frameT - frame)*pixelsPerFrame > mRadius) return false;
-    if(qAbs(valueT - value)*pixelsPerValue > mRadius) return false;
+bool QrealPoint::isNear(const qreal absFrame, const qreal value,
+                        const qreal pixelsPerFrame, const qreal pixelsPerValue) {
+    if(qAbs(getAbsFrame() - absFrame)*pixelsPerFrame > mRadius) return false;
+    if(qAbs(getValue() - value)*pixelsPerValue > mRadius) return false;
     return true;
 }
 
@@ -95,10 +91,10 @@ void QrealPoint::moveBy(const qreal dFrame, const qreal dValue) {
     }
 }
 
-void QrealPoint::moveTo(const qreal frameT, const qreal valueT) {
-    setAbsFrame(frameT);
-    setValue(valueT);
-    if(isKeyPoint()) return;
+void QrealPoint::moveTo(const qreal frame, const qreal value) {
+    setAbsFrame(frame);
+    setValue(value);
+    if(isKeyPt()) return;
     mParentKey->updateCtrlFromCtrl(mType);
 }
 
@@ -132,43 +128,21 @@ void QrealPoint::draw(QPainter * const p, const QColor &paintColor) {
     const QPointF center(getAbsFrame(), getValue());
 
     p->setBrush(Qt::black);
-    if(mHovered)
-        gDrawCosmeticEllipse(p, center, mRadius + 1, mRadius + 1);
-    else
-        gDrawCosmeticEllipse(p, center, mRadius, mRadius);
+    if(mHovered) gDrawCosmeticEllipse(p, center, mRadius + 1, mRadius + 1);
+    else gDrawCosmeticEllipse(p, center, mRadius, mRadius);
 
     p->setBrush(paintColor);
-    if(!isSelected()) {
-        p->setBrush(paintColor.lighter());
-    }/* else {
-        drawCosmeticEllipse(p, center,
-                            mRadius*0.5 - 1.,
-                            mRadius*0.5 - 1.);
-    }*/
+    if(!isSelected()) p->setBrush(paintColor.lighter());
+
     gDrawCosmeticEllipse(p, center, mRadius - 1, mRadius - 1);
 }
 
-void QrealPoint::setSelected(const bool bT) {
-    if(mType == KEY_POINT) {
-        Q_ASSERT(false); // key selection handled differently
-        mParentKey->setSelected(bT);
-    } else {
-        mIsSelected = bT;
-    }
+void QrealPoint::setSelected(const bool selected) {
+    mIsSelected = selected;
 }
-
-bool QrealPoint::isKeyPoint() { return mType == KEY_POINT; }
-
-bool QrealPoint::isStartPoint() { return mType == START_POINT; }
-
-bool QrealPoint::isEndPoint() { return mType == END_POINT; }
 
 bool QrealPoint::isEnabled() {
-    if(isKeyPoint()) return true;
-    if(isStartPoint()) return mParentKey->getStartEnabledForGraph();
+    if(isKeyPt()) return true;
+    if(isStartPt()) return mParentKey->getStartEnabledForGraph();
     /*if(isEndPoint())*/ return mParentKey->getEndEnabledForGraph();
-}
-
-GraphKey *QrealPoint::getParentKey() {
-    return mParentKey;
 }

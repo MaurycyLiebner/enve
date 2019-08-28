@@ -30,10 +30,9 @@ enum QrealPointType : short {
 class QrealPoint : public StdSelfRef {
     e_OBJECT
 public:
-    QrealPoint(const QrealPointType &type,
+    QrealPoint(QrealPointType type,
                GraphKey * const parentKey,
                const qreal radius = 10);
-    ~QrealPoint() {}
 
     qreal getRelFrame();
     qreal getAbsFrame();
@@ -51,34 +50,38 @@ public:
 
     bool isSelected();
 
-    bool isNear(const qreal frameT,
-                const qreal valueT,
-                const qreal pixelsPerFrame,
-                const qreal pixelsPerValue);
+    bool isNear(const qreal absFrame, const qreal value,
+                const qreal pixelsPerFrame, const qreal pixelsPerValue);
 
     void moveBy(const qreal dFrame, const qreal dValue);
-    void moveTo(const qreal frameT, const qreal valueT);
+    void moveTo(const qreal frameT, const qreal value);
 
     void draw(QPainter * const p, const QColor &paintColor);
 
-    void setSelected(const bool bT);
+    void setSelected(const bool selected);
 
-    bool isKeyPoint();
-    bool isStartPoint();
-    bool isEndPoint();
+    bool isKeyPt() const
+    { return mType == KEY_POINT; }
+    bool isStartPt() const
+    { return mType == START_POINT; }
+    bool isEndPt() const
+    { return mType == END_POINT; }
+    bool isCtrlPt() const
+    { return isEndPt() || isStartPt(); }
 
     bool isEnabled();
 
-    GraphKey *getParentKey();
+    GraphKey *getParentKey()
+    { return mParentKey; }
+
     void startTransform();
     void finishTransform();
-    const QrealPointType& getType() const {
-        return mType;
-    }
 
-    void setHovered(const bool hovered) {
-        mHovered = hovered;
-    }
+    QrealPointType getType() const
+    { return mType; }
+
+    void setHovered(const bool hovered)
+    { mHovered = hovered; }
 private:
     bool mIsSelected = false;
     bool mHovered = false;

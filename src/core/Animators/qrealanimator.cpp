@@ -51,7 +51,7 @@ void QrealAnimator::readProperty(eReadStream& src) {
 }
 
 void QrealAnimator::graph_getValueConstraints(
-        GraphKey *key, const QrealPointType &type,
+        GraphKey *key, const QrealPointType type,
         qreal &minMoveValue, qreal &maxMoveValue) const {
     Q_UNUSED(key);
     if(type == QrealPointType::END_POINT) {

@@ -54,7 +54,7 @@ QrealPoint *GraphKey::mousePress(const qreal frameT,
     return nullptr;
 }
 
-void GraphKey::updateCtrlFromCtrl(const QrealPointType &type) {
+void GraphKey::updateCtrlFromCtrl(const QrealPointType type) {
     if(mCtrlsMode == CTRLS_CORNER) return;
     QPointF fromPt;
     QPointF toPt;

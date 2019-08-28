@@ -280,7 +280,7 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
         graphGetValueAndFrameFromPos(pressPos, value, frame);
         mSelectionRect.setBottomRight({frame, value});
         mSelectionRect.setTopLeft({frame, value});
-    } else if(pressedPoint->isKeyPoint()) {
+    } else if(pressedPoint->isKeyPt()) {
         if(QApplication::keyboardModifiers() & Qt::ShiftModifier) {
             if(parentKey->isSelected()) removeKeyFromSelection(parentKey);
             else addKeyToSelection(parentKey);
@@ -291,7 +291,6 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
             }
         }
     } else {
-        mPressedCtrlPoint = true;
         auto parentKey = pressedPoint->getParentKey();
         auto parentAnimator = parentKey->getParentAnimator<GraphAnimator>();
         parentAnimator->graph_getFrameValueConstraints(
@@ -373,11 +372,11 @@ void KeysView::graphClearAnimatorSelection() {
 }
 
 void KeysView::graphDeletePressed() {
-    if(mGPressedPoint && mPressedCtrlPoint) {
+    if(mGPressedPoint && mGPressedPoint->isCtrlPt()) {
         const auto parentKey = mGPressedPoint->getParentKey();
-        if(mGPressedPoint->isEndPoint()) {
+        if(mGPressedPoint->isEndPt()) {
             parentKey->setEndEnabledForGraph(false);
-        } else if(mGPressedPoint->isStartPoint()) {
+        } else if(mGPressedPoint->isStartPt()) {
             parentKey->setStartEnabledForGraph(false);
         }
         parentKey->afterKeyChanged();
