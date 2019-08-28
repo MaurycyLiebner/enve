@@ -67,6 +67,12 @@ void MainWindow::loadEVFile(const QString &path) {
     try {
         if(!FileFooter::sCompatible(&file))
             RuntimeThrow("Incompatible or incomplete data");
+        const qint64 savedPos = file.pos();
+        const qint64 pos = file.size() - FileFooter::sSize() -
+                qint64(sizeof(int));
+        file.seek(pos);
+        readStream.readFutureTable();
+        file.seek(savedPos);
         readStream.readCheckpoint("File beginning pos mismatch");
         mDocument.read(readStream);
         readStream.readCheckpoint("Error reading Document");

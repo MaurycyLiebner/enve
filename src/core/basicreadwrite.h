@@ -82,6 +82,8 @@ class eReadFutureTable {
     eFuturePos readFuturePos() {
         return mFutures.at(mFutureId++);
     }
+
+    void read();
 private:
     int mFutureId = 0;
     QList<eFuturePos> mFutures;
@@ -115,6 +117,10 @@ private:
 class eReadStream {
 public:
     eReadStream(QIODevice* const src) : mSrc(src), mFutureTable(src) {}
+
+    void readFutureTable() {
+        mFutureTable.read();
+    }
 
     eFuturePos readFuturePos() { return mFutureTable.readFuturePos(); }
 
@@ -197,6 +203,10 @@ public:
 
     eWriteStream(QIODevice* const dst) : mDst(dst), mFutureTable(dst) {}
 
+    void writeFutureTable() {
+        mFutureTable.write(*this);
+    }
+
     //! @brief Returns id to be used with assignFuturePos
     FuturePosId planFuturePos() {
         return mFutureTable.planFuturePos();
@@ -278,10 +288,6 @@ public:
         return *this;
     }
 private:
-    void writeFutureTable() {
-        mFutureTable.write(*this);
-    }
-
     QIODevice* const mDst;
     eWriteFutureTable mFutureTable;
 };
