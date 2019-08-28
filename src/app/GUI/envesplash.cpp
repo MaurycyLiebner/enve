@@ -23,9 +23,7 @@
 EnveSplash::EnveSplash() {
     mText = "Welcome to enve - an opensource 2D animation software.\n\n"
 //            "Further development will only be possible with your support. "
-//            "Press 'Support enve' on the menu bar for more information and "
-//            "enter $4000 (15 500 PLN) crowdfunding campaign to cover costs for "
-//            "next 6 months of full-time development.\n\n"
+//            "Press 'Support enve' on the menu bar for more information.\n\n"
             "Please note that the following executable is merely "
             "a snapshot of the current state of the code. "
             "Hence numerous bugs should be expected.\n\n"
