@@ -21,8 +21,7 @@ qsptr<CustomRasterEffect> eCreateNewestVersion() {
     return enve::make_shared<eShadow>();
 }
 
-qsptr<CustomRasterEffect> eCreate(
-        const CustomIdentifier &identifier) {
+qsptr<CustomRasterEffect> eCreate(const CustomIdentifier &identifier) {
     Q_UNUSED(identifier);
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
