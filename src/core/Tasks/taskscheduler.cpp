@@ -110,7 +110,8 @@ bool TaskScheduler::shouldQueMoreCpuTasks() const {
 }
 
 bool TaskScheduler::shouldQueMoreHddTasks() const {
-    return mQuedHddTasks.count() < 2 && mHddThreadBusy && !overflowed();
+    return mQuedHddTasks.count() < 2 && !mCpuQueing &&
+            mHddThreadBusy && !overflowed();
 }
 
 HddExecController* TaskScheduler::createNewBackupHddExecutor() {
