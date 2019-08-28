@@ -179,6 +179,7 @@ void DurationRectangle::draw(QPainter * const p,
         mRasterCacheHandler->drawCacheOnTimeline(p, rasterRect,
                                                  rectStartFrame,
                                                  rectEndFrame,
+                                                 1,
                                                  durRect.right());
         const QRect soundRect(drawRect.x(), drawRect.y() + rasterHeight,
                               drawRect.width(), soundHeight);
@@ -190,6 +191,7 @@ void DurationRectangle::draw(QPainter * const p,
         mRasterCacheHandler->drawCacheOnTimeline(p, drawRect,
                                                  rectStartFrame,
                                                  rectEndFrame,
+                                                 1,
                                                  durRect.right());
     } else if(mSoundCacheHandler) {
         mSoundCacheHandler->drawCacheOnTimeline(p, drawRect,

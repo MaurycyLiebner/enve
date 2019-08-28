@@ -36,8 +36,7 @@ void HddCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
     const qreal quStartFrame = startFrame/unit;
     const int uStartFrame = isInteger4Dec(quStartFrame) ?
                 qRound(quStartFrame): qFloor(quStartFrame);
-    const qreal pixelsPerFrame = drawRect.width()/
-            (endFrame - startFrame + 1);
+    const qreal pixelsPerFrame = drawRect.width()/(endFrame - startFrame + 1);
 //    if(!isOne4Dec(unit))
 //        p->translate((uStartFrame - quStartFrame)*pixelsPerFrame, 0);
 
