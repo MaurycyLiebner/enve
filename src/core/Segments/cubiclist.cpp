@@ -86,7 +86,8 @@ CubicList CubicList::getFragmentUnbound(const qreal minLenFrac,
     }
     const qreal minRel = posMinLenFrac - qFloor(posMinLenFrac);
     const qreal maxRel = posMaxLenFrac - qFloor(posMaxLenFrac);
-    const int nFull = qFloor(posMaxLenFrac - posMinLenFrac - maxRel - 1 + minRel);
+    int nFull = qFloor(posMaxLenFrac - posMinLenFrac - maxRel + minRel - 1);
+    if(isZero4Dec(minLenFrac) && maxLenFrac > 1) nFull++;
 
     if(nFull <= 0 && qFloor(posMinLenFrac) == qFloor(posMaxLenFrac)) {
         return getFragment(minRel, maxRel).getSegments();

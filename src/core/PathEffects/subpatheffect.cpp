@@ -88,9 +88,8 @@ void SubPathEffect::apply(const qreal relFrame, const SkPath &src,
                     first = false;
                     qreal maxFrag;
                     const bool last = currLen + pathLen > maxLength;
-                    if(last) {
-                        maxFrag = maxRemLen/pathLen;
-                    } else maxFrag = 1;
+                    if(last) maxFrag = maxRemLen/pathLen;
+                    else maxFrag = 1;
                     result.addPath(path.getFragment(minRemLen/pathLen, maxFrag).toSkPath());
                     if(last) break;
                 }

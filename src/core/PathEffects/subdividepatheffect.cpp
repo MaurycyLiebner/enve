@@ -27,6 +27,7 @@ void SubdividePathEffect::apply(const qreal relFrame,
                                 const SkPath &src,
                                 SkPath * const dst) {
     const int count = mCount->getEffectiveIntValue(relFrame);
+    dst->reset();
     auto lists = CubicList::sMakeFromSkPath(src);
     for(auto & list : lists) {
         list.subdivide(count);

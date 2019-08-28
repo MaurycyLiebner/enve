@@ -95,11 +95,11 @@ struct CubicList {
         QPointF lastPos;
         QPointF firstPos;
         for(const auto& cubic : mSegments) {
-            if(first) {
+            if(first || pointToLen(cubic.p0() - lastPos) > 0.1) {
+                if(!first && isZero2Dec(pointToLen(firstPos - lastPos))) {
+                    path.close();
+                }
                 first = false;
-                firstPos = cubic.p0();
-                path.moveTo(toSkPoint(firstPos));
-            } else if(pointToLen(cubic.p0() - lastPos) > 0.1)  {
                 firstPos = cubic.p0();
                 path.moveTo(toSkPoint(firstPos));
             }
