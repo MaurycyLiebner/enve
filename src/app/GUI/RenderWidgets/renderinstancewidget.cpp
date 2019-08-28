@@ -240,9 +240,7 @@ void RenderInstanceWidget::openOutputSettingsDialog() {
 
 void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
     QString outputDst = mSettings->getOutputDestination();
-    if(outputDst.isEmpty()) {
-        outputDst = QDir::homePath() + "/untitled";
-    }
+    if(outputDst.isEmpty()) outputDst = QDir::currentPath() + "/untitled";
     const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
     const auto format = outputSettings.outputFormat;
     if(!format) return;
