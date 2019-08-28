@@ -428,6 +428,8 @@ void MainWindow::setupMenuBar() {
         CanvasSettingsDialog::sNewCanvasDialog(mDocument, this);
     });
 
+    mSceneMenu->addAction("Add to Render Que", this, &MainWindow::addCanvasToRenderQue);
+
     mViewMenu = mMenuBar->addMenu("View");
 
     const auto filteringMenu = mViewMenu->addMenu("Filtering");
@@ -496,7 +498,7 @@ void MainWindow::setupMenuBar() {
     mDynamicQuality->setCheckable(true);
     mDynamicQuality->setChecked(eFilterSettings::sSmartDisplat());
 
-    mClipViewToCanvas = mViewMenu->addAction("Clip To Scene");
+    mClipViewToCanvas = mViewMenu->addAction("Clip to Scene");
     mClipViewToCanvas->setCheckable(true);
     mClipViewToCanvas->setChecked(true);
     mClipViewToCanvas->setShortcut(QKeySequence(Qt::Key_C));
@@ -557,9 +559,6 @@ void MainWindow::setupMenuBar() {
 
     connect(mBrushSettingsDockAction, &QAction::toggled,
             mBrushSettingsDock, &QDockWidget::setVisible);
-
-    mRenderMenu = mMenuBar->addMenu("Render");
-    mRenderMenu->addAction("Render", this, &MainWindow::addCanvasToRenderQue);
 
     const auto help = mMenuBar->addMenu("Help");
 

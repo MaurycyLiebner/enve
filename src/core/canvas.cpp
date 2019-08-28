@@ -227,7 +227,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
     if(!mCurrentContainer->SWT_isCanvas())
         mCurrentContainer->drawBoundingRect(canvas, invZoom);
     if(!mPaintTarget.isValid()) {
-        const bool ctrlPressed = QApplication::queryKeyboardModifiers() & Qt::CTRL;
+        const auto mods = QApplication::queryKeyboardModifiers();
+        const bool ctrlPressed = mods & Qt::CTRL && mods & Qt::SHIFT;
         for(int i = mSelectedBoxes.count() - 1; i >= 0; i--) {
             const auto& iBox = mSelectedBoxes.at(i);
             canvas->save();

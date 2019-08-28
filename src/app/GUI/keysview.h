@@ -163,13 +163,21 @@ private:
 
     void grabMouseAndTrack() {
         mIsMouseGrabbing = true;
+#ifndef QT_DEBUG
         grabMouse();
+#endif
     }
 
     void releaseMouseAndDontTrack() {
+        mMoveDFrame = 0;
         mMovingKeys = false;
+        mScalingKeys = false;
+        mMovingRect = false;
+        mSelecting = false;
         mIsMouseGrabbing = false;
+#ifndef QT_DEBUG
         releaseMouse();
+#endif
     }
 
     bool mIsMouseGrabbing = false;

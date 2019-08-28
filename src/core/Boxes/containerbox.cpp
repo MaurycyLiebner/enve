@@ -726,6 +726,7 @@ void ContainerBox::removeContainedFromList(const int id) {
             internalLinkGroup->removeContainedFromList(id);
         }
     }
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 int ContainerBox::getContainedIndex(eBoxOrSound * const child) {

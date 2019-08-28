@@ -295,7 +295,7 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     }
     QString iniText = mSettings->getOutputDestination();
     if(iniText.isEmpty()) {
-        iniText = QDir::homePath() + "/untitled" + selectedExt;
+        iniText = QDir::currentPath() + "/untitled" + selectedExt;
     }
     QString saveAs = QFileDialog::getSaveFileName(this, "Output Destination",
                                iniText,

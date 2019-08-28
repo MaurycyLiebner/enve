@@ -186,10 +186,6 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                 }
             }
 
-            mMoveDFrame = 0;
-            mMovingKeys = false;
-            mScalingKeys = false;
-            mMovingRect = false;
             releaseMouseAndDontTrack();
         } else {
             auto movable = mBoxesListVisible->getRectangleMovableAtPos(
@@ -717,8 +713,6 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                     clearKeySelection();
                 }
                 selectKeysInSelectionRect();
-
-                mSelecting = false;
             } else if(mMovingKeys) {
                 if(mFirstMove && mLastPressedKey) {
                     if(!(QApplication::keyboardModifiers() & Qt::ShiftModifier)) {
@@ -729,15 +723,9 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                 for(const auto& anim : mSelectedKeysAnimators) {
                     anim->finishSelectedKeysTransform();
                 }
-
-                mMoveDFrame = 0;
-                mMovingKeys = false;
-                mScalingKeys = false;
             } else if(mMovingRect) {
                 if(mFirstMove) {
                 } else {
-                    mMoveDFrame = 0;
-                    mMovingRect = false;
                     const auto childProp = mLastPressedMovable->getParentProperty();
                     if(mMoveAllSelected) {
                         if(mLastPressedMovable->isDurationRect()) {

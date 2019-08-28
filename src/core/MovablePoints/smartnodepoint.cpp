@@ -291,7 +291,7 @@ void SmartNodePoint::drawSk(SkCanvas * const canvas,
 
         SkFont font;
         font.setSize(FONT_HEIGHT*invScale);
-        const auto fontStyle = SkFontStyle(SkFontStyle::kBold_Weight,
+        const auto fontStyle = SkFontStyle(SkFontStyle::kNormal_Weight,
                                            SkFontStyle::kNormal_Width,
                                            SkFontStyle::kUpright_Slant);
         font.setTypeface(SkTypeface::MakeFromName(nullptr, fontStyle));
@@ -305,11 +305,12 @@ void SmartNodePoint::drawSk(SkCanvas * const canvas,
         const float y = skAbsPos.y() + bounds.height()*0.5f;
 
         paint.setStyle(SkPaint::kFill_Style);
-        paint.setColor(SK_ColorBLACK);
-        canvas->drawString(cStr, x, y, font, paint);
-
-        paint.setStyle(SkPaint::kStroke_Style);
         paint.setColor(SK_ColorWHITE);
+        auto drawRect = bounds.makeOffset(x, y);
+        drawRect.outset(FONT_HEIGHT/4, FONT_HEIGHT/4);
+        canvas->drawRect(drawRect, paint);
+
+        paint.setColor(SK_ColorBLACK);
         canvas->drawString(cStr, x, y, font, paint);
     }
 }
