@@ -69,7 +69,7 @@ void MemoryHandler::freeMemory(const MemoryState &state,
         const auto cont = mDataHandler.takeFirst();
         memToFree -= cont->free_RAM_k();
     }
-    if(memToFree > 0 || state > LOW_MEMORY_STATE) emit allMemoryUsed();
+    if(memToFree > 0/* || state == VERY_LOW_MEMORY_STATE*/) emit allMemoryUsed();
     emit memoryFreed();
 }
 

@@ -129,8 +129,7 @@ void VideoDataHandler::clearCache() {
 
 void VideoFileHandler::replace(QWidget* const parent) {
     const QString importPath = QFileDialog::getOpenFileName(
-                parent,
-                "Replace Video Source " + mPath, "",
+                parent, "Replace Video Source " + mPath, "",
                 "Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
     if(!importPath.isEmpty()) {
         const QFile file(importPath);
