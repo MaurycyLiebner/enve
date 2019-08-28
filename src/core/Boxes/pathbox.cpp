@@ -56,7 +56,7 @@ PathBox::PathBox(const eBoxType type) : BoundingBox(type) {
 
     mOutlinePathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
-    connect(mOutlineBasePathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
+    connect(mOutlinePathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
             this, [this](const UpdateReason reason) {
         setOutlinePathOutdated(reason);
     });
@@ -413,24 +413,14 @@ void PathBox::applyPaintSetting(const PaintSettingsApplier &setting) {
     setting.apply(this);
 }
 
-template <typename B, typename T>
-void writeReadMember(B* const from, B* const to, const T member) {
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    eWriteStream writeStream(&buffer);
-    (from->*member)->writeProperty(writeStream);
-    buffer.seek(0);
-    eReadStream readStream(&buffer);
-    (to->*member)->readProperty(readStream);
-    buffer.close();
-}
-
 void PathBox::copyPathBoxDataTo(PathBox * const targetBox) {
-    writeReadMember(this, targetBox, &PathBox::mTransformAnimator);
-    writeReadMember(this, targetBox, &PathBox::mFillSettings);
-    writeReadMember(this, targetBox, &PathBox::mStrokeSettings);
-    writeReadMember(this, targetBox, &PathBox::mPathEffectsAnimators);
-    writeReadMember(this, targetBox, &PathBox::mRasterEffectsAnimators);
+    copyBoundingBoxDataTo(targetBox);
+    sWriteReadMember(this, targetBox, &PathBox::mFillSettings);
+    sWriteReadMember(this, targetBox, &PathBox::mStrokeSettings);
+    sWriteReadMember(this, targetBox, &PathBox::mPathEffectsAnimators);
+    sWriteReadMember(this, targetBox, &PathBox::mFillPathEffectsAnimators);
+    sWriteReadMember(this, targetBox, &PathBox::mOutlineBasePathEffectsAnimators);
+    sWriteReadMember(this, targetBox, &PathBox::mOutlinePathEffectsAnimators);
 }
 
 bool PathBox::differenceInPathBetweenFrames(const int frame1, const int frame2) const {

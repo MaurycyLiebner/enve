@@ -91,6 +91,9 @@ public:
     static BoundingBox *sGetBoxByReadId(const int readId);
     static void sClearReadBoxes();
     static void sAddWaitingForBoxLoad(const WaitingForBoxLoad& func);
+
+    template <typename B, typename T>
+    static void sWriteReadMember(B* const from, B* const to, const T member);
 private:
     static int sNextDocumentId;
     static QList<BoundingBox*> sDocumentBoxes;
@@ -392,5 +395,21 @@ signals:
     void fillStrokeSettingsChanged();
 };
 
+template <typename B, typename T>
+void BoundingBox::sWriteReadMember(B* const from, B* const to, const T member) {
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    eWriteStream writeStream(&buffer);
+    (from->*member)->writeProperty(writeStream);
+    const auto tablePos = buffer.pos();
+    writeStream.writeFutureTable();
+    buffer.seek(0);
+    eReadStream readStream(&buffer);
+    buffer.seek(tablePos);
+    readStream.readFutureTable();
+    buffer.seek(0);
+    (to->*member)->readProperty(readStream);
+    buffer.close();
+}
 
 #endif // BOUNDINGBOX_H

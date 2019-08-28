@@ -151,21 +151,9 @@ void BoundingBox::updateIfUsesProgram(
     mRasterEffectsAnimators->updateIfUsesProgram(program);
 }
 
-template <typename T>
-void transferData(const T& from, const T& to) {
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    eWriteStream writeStream(&buffer);
-    from->writeProperty(writeStream);
-    buffer.reset();
-    eReadStream readStream(&buffer);
-    to->readProperty(readStream);
-    buffer.close();
-}
-
 void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
-    transferData(mTransformAnimator, targetBox->mTransformAnimator);
-    transferData(mRasterEffectsAnimators, targetBox->mRasterEffectsAnimators);
+    sWriteReadMember(this, targetBox, &BoundingBox::mTransformAnimator);
+    sWriteReadMember(this, targetBox, &BoundingBox::mRasterEffectsAnimators);
 }
 
 void BoundingBox::drawHoveredSk(SkCanvas *canvas, const float invScale) {
