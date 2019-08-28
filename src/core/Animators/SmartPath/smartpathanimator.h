@@ -164,8 +164,7 @@ public:
         }
     }
 
-    SimpleTaskScheduler startPathChange;
-    void startPathChangeExec() {
+    void startPathChange() {
         if(mPathChanged) return;
         mPathChanged = true;
         if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
@@ -181,8 +180,7 @@ public:
         else prp_afterWholeInfluenceRangeChanged();
     }
 
-    SimpleTaskScheduler cancelPathChange;
-    void cancelPathChangeExec() {
+    void cancelPathChange() {
         if(!mPathChanged) return;
         mPathChanged = false;
         mPathBeingChanged_d->restore();
@@ -191,8 +189,7 @@ public:
         else prp_afterWholeInfluenceRangeChanged();
     }
 
-    SimpleTaskScheduler finishPathChange;
-    void finishPathChangeExec() {
+    void finishPathChange() {
         if(!mPathChanged) return;
         mPathChanged = false;
     }

@@ -21,10 +21,7 @@
 
 SmartPathAnimator::SmartPathAnimator() :
     GraphAnimator("path"),
-    startPathChange([this]() { startPathChangeExec(); }),
-    pathChanged([this]() { pathChangedExec(); }),
-    cancelPathChange([this]() { cancelPathChangeExec(); }),
-    finishPathChange([this]() { finishPathChangeExec(); }) {
+    pathChanged([this]() { pathChangedExec(); }) {
     const auto ptsHandler = enve::make_shared<PathPointsHandler>(this);
     QObject::connect(this, &Property::prp_currentFrameChanged,
                      this, [ptsHandler] {
