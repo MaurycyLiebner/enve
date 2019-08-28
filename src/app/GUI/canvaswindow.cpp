@@ -174,7 +174,7 @@ void CanvasWindow::tabletEvent(QTabletEvent *e) {
     const QPoint globalPos = mapToGlobal(QPoint(0, 0));
     const qreal x = e->hiResGlobalX() - globalPos.x();
     const qreal y = e->hiResGlobalY() - globalPos.y();
-    mCurrentCanvas->tabletEvent(e, QPointF(x, y));
+    mCurrentCanvas->tabletEvent(e, mapToCanvasCoord({x, y}));
     if(!mValidPaintTarget) updatePaintModeCursor();
     update();
 }

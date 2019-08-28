@@ -33,10 +33,10 @@ void Canvas::newPaintBox(const QPointF &pos) {
 }
 
 void Canvas::mousePressEvent(const MouseEvent &e) {
+    if(mStylusDrawing) return;
     if(isPreviewingOrRendering()) return;
     if(e.fMouseGrabbing && e.fButton == Qt::LeftButton) return;
     if(mCurrentMode == CanvasMode::paint) {
-        if(mStylusDrawing) return;
         if(e.fButton == Qt::LeftButton) {
             if(!mPaintTarget.isValid()) newPaintBox(e.fPos);
             mPaintTarget.paintPress(e.fPos, e.fTimestamp, 0.5,
@@ -52,6 +52,7 @@ void Canvas::mousePressEvent(const MouseEvent &e) {
 }
 
 void Canvas::mouseMoveEvent(const MouseEvent &e) {
+    if(mStylusDrawing) return;
     if(isPreviewingOrRendering()) return;
 
     const bool leftPressed = e.fButtons & Qt::LeftButton;

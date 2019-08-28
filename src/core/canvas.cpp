@@ -515,6 +515,7 @@ void Canvas::updatePivot() {
 void Canvas::setCanvasMode(const CanvasMode mode) {
     mCurrentMode = mode;
     mSelecting = false;
+    mStylusDrawing = false;
     clearPointsSelection();
     clearCurrentSmartEndPoint();
     clearLastPressedPoint();
