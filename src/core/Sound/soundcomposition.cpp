@@ -31,7 +31,7 @@ SoundComposition::SoundComposition(Canvas * const parent) :
 }
 
 void SoundComposition::start(const int startFrame) {
-    mPos = qRound(startFrame/mParent->getFps());
+    mPos = qRound(startFrame*mSettings.fSampleRate/mParent->getFps());
     open(QIODevice::ReadOnly);
 }
 
