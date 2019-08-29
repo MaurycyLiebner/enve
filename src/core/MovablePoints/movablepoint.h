@@ -46,7 +46,9 @@ protected:
     MovablePoint(BasicTransformAnimator * const trans,
                  const MovablePointType type);
 public:
-    typedef std::function<void(MovablePoint*)> Adder;
+    typedef std::function<void(MovablePoint*)> PtOp;
+
+    ~MovablePoint() { if(mRemoveFromSelection) mRemoveFromSelection(this); }
 
     virtual QPointF getRelativePos() const = 0;
     virtual void setRelativePos(const QPointF &relPos) = 0;
@@ -82,7 +84,7 @@ public:
 
     virtual void rectPointsSelection(const QRectF &absRect,
                                      const CanvasMode mode,
-                                     const Adder &adder);
+                                     const PtOp &adder);
 
     virtual void setTransform(BasicTransformAnimator * const trans);
 
@@ -100,7 +102,7 @@ public:
 
     bool isContainedInRect(const QRectF &absRect);
 
-    void setSelected(const bool selected);
+    void setSelected(const bool selected, const PtOp &deselect = nullptr);
 
     bool isSelected() const { return mSelected; }
 
@@ -151,6 +153,8 @@ protected:
                         const SkColor &fillColor,
                         const bool keyOnCurrent = false);
 private:
+    PtOp mRemoveFromSelection;
+
     bool mSelectionEnabled = true;
     bool mSelected = false;
     const MovablePointType mType;

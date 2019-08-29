@@ -62,7 +62,7 @@ MovablePoint *PointsHandler::getPointAtAbsPos(const QPointF &absPos,
     return nullptr;
 }
 
-void PointsHandler::addAllPointsToSelection(const MovablePoint::Adder& adder,
+void PointsHandler::addAllPointsToSelection(const MovablePoint::PtOp& adder,
                                             const CanvasMode mode) const {
     for(const auto& pt : mPts) {
         if(pt->isSelected() || pt->isHidden(mode)) continue;
@@ -71,7 +71,7 @@ void PointsHandler::addAllPointsToSelection(const MovablePoint::Adder& adder,
 }
 
 void PointsHandler::addInRectForSelection(const QRectF &absRect,
-                                          const MovablePoint::Adder& adder,
+                                          const MovablePoint::PtOp& adder,
                                           const CanvasMode mode) const {
     for(const auto& pt : mPts) {
         if(!pt->selectionEnabled()) continue;

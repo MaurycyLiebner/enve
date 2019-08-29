@@ -132,7 +132,7 @@ public:
 
     virtual void selectAndAddContainedPointsToList(
             const QRectF &absRect,
-            const MovablePoint::Adder& adder,
+            const MovablePoint::PtOp& adder,
             const CanvasMode mode);
 
     virtual bool relPointInsidePath(const QPointF &relPos) const;
@@ -244,7 +244,7 @@ public:
     void drawBoundingRect(SkCanvas * const canvas,
                           const float invScale);
 
-    void selectAllCanvasPts(const MovablePoint::Adder &adder,
+    void selectAllCanvasPts(const MovablePoint::PtOp &adder,
                             const CanvasMode mode);
 
     int getDocumentId() const { return mDocumentId; }

@@ -185,7 +185,10 @@ void Canvas::selectAndAddContainedPointsToSelection(const QRectF& absRect) {
 
 void Canvas::addPointToSelection(MovablePoint* const point) {
     if(point->isSelected()) return;
-    point->setSelected(true);
+    const auto ptDeselector = [this](MovablePoint* const pt) {
+        removePointFromSelection(pt);
+    };
+    point->setSelected(true, ptDeselector);
     mSelectedPoints_d.append(point);
     schedulePivotUpdate();
 }

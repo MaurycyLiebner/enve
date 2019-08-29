@@ -897,7 +897,7 @@ void BoundingBox::sClearReadBoxes() {
 
 void BoundingBox::selectAndAddContainedPointsToList(
         const QRectF &absRect,
-        const MovablePoint::Adder &adder,
+        const MovablePoint::PtOp &adder,
         const CanvasMode mode) {
     for(const auto& desc : mCanvasProps) {
         const auto handler = desc->getPointsHandler();
@@ -906,7 +906,7 @@ void BoundingBox::selectAndAddContainedPointsToList(
     }
 }
 
-void BoundingBox::selectAllCanvasPts(const MovablePoint::Adder &adder,
+void BoundingBox::selectAllCanvasPts(const MovablePoint::PtOp &adder,
                                      const CanvasMode mode) {
     for(const auto& desc : mCanvasProps) {
         const auto handler = desc->getPointsHandler();

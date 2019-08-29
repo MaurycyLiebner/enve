@@ -137,7 +137,7 @@ bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
 
 void MovablePoint::rectPointsSelection(const QRectF &absRect,
                                        const CanvasMode mode,
-                                       const Adder &adder) {
+                                       const PtOp &adder) {
     if(!selectionEnabled()) return;
     if(isHidden(mode)) return;
     if(isContainedInRect(absRect)) adder(this);
@@ -213,8 +213,9 @@ qreal MovablePoint::getRadius() {
     return mRadius;
 }
 
-void MovablePoint::setSelected(const bool selected) {
+void MovablePoint::setSelected(const bool selected, const PtOp& deselect) {
     mSelected = selected;
+    mRemoveFromSelection = deselect;
 }
 
 bool MovablePoint::isNodePoint() {

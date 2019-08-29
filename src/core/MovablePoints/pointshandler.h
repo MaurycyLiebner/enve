@@ -40,11 +40,11 @@ public:
                                    const CanvasMode mode,
                                    const qreal invScale);
 
-    void addAllPointsToSelection(const MovablePoint::Adder &adder,
+    void addAllPointsToSelection(const MovablePoint::PtOp &adder,
                                  const CanvasMode mode) const;
 
     void addInRectForSelection(const QRectF &absRect,
-                               const MovablePoint::Adder &adder,
+                               const MovablePoint::PtOp &adder,
                                const CanvasMode mode) const;
 
     void drawPoints(SkCanvas * const canvas,
