@@ -110,16 +110,13 @@ protected:
     bool mVisible = true;
     bool mLocked = false;
     int mZListIndex = 0;
-    Canvas* mParentScene = nullptr;
     ContainerBox* mParentGroup = nullptr;
 
     bool mDurationRectangleLocked = false;
     qsptr<DurationRectangle> mDurationRectangle;
 signals:
-    void aboutToChangeParent();
     void parentChanged(ContainerBox*);
     void aboutToChangeAncestor();
-    void ancestorChanged();
     void selectionChanged(bool);
     void visibilityChanged(bool);
     void lockedChanged(bool);

@@ -32,10 +32,12 @@ void PathEffect::writeIdentifier(eWriteStream& dst) const {
 }
 
 void PathEffect::setupTreeViewMenu(PropertyMenu * const menu) {
-    menu->addPlainAction("Delete Effect", [this]() {
-        const auto parent = getParent<DynamicComplexAnimatorBase<PathEffect>>();
-        parent->removeChild(ref<PathEffect>());
-    });
+    const PropertyMenu::PlainSelectedOp<PathEffect> dOp =
+    [](PathEffect* const eff) {
+        const auto parent = eff->getParent<DynamicComplexAnimatorBase<PathEffect>>();
+        parent->removeChild(eff->ref<PathEffect>());
+    };
+    menu->addPlainAction("Delete Effect(s)", dOp);
 }
 
 PathEffectType PathEffect::getEffectType() {

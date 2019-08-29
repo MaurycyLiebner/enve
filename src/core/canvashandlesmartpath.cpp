@@ -23,8 +23,8 @@ void Canvas::clearCurrentSmartEndPoint() {
 }
 
 void Canvas::setCurrentSmartEndPoint(SmartNodePoint * const point) {
-    if(mLastEndPoint) mLastEndPoint->deselect();
-    if(point) point->select();
+    if(mLastEndPoint) mLastEndPoint->setSelected(false);
+    if(point) point->setSelected(true);
     mLastEndPoint = point;
 }
 #include "MovablePoints/pathpointshandler.h"

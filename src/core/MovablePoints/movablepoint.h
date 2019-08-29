@@ -100,8 +100,25 @@ public:
 
     bool isContainedInRect(const QRectF &absRect);
 
-    void select();
-    void deselect();
+    void setSelected(const bool selected);
+
+    bool isSelected() const { return mSelected; }
+
+    bool selectionEnabled() const {
+        return mSelectionEnabled;
+    }
+
+    void enableSelection() {
+        setSelectionEnabled(true);
+    }
+
+    void disableSelection() {
+        setSelectionEnabled(false);
+    }
+
+    void setSelectionEnabled(const bool enabled) {
+        mSelectionEnabled = enabled;
+    }
 
     bool isHidden(const CanvasMode mode) const {
         return !isVisible(mode);
@@ -127,24 +144,6 @@ public:
     QPointF mapAbsoluteToRelative(const QPointF &absPos) const;
 
     const QPointF &getSavedRelPos() const;
-
-    bool isSelected() const { return mSelected; }
-
-    bool selectionEnabled() const {
-        return mSelectionEnabled;
-    }
-
-    void enableSelection() {
-        setSelectionEnabled(true);
-    }
-
-    void disableSelection() {
-        setSelectionEnabled(false);
-    }
-
-    void setSelectionEnabled(const bool enabled) {
-        mSelectionEnabled = enabled;
-    }
 protected:
     void drawOnAbsPosSk(SkCanvas * const canvas,
                         const SkPoint &absPos,
@@ -154,7 +153,6 @@ protected:
 private:
     bool mSelectionEnabled = true;
     bool mSelected = false;
-    bool mTransformStarted = false;
     const MovablePointType mType;
     qreal mRadius = 5;
     QPointF mPivot;

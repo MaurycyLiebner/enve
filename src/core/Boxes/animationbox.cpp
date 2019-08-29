@@ -200,12 +200,12 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
                              mFrameRemappingEnabled, remapOp);
 
     const PropertyMenu::PlainSelectedOp<AnimationBox> stretchOp =
-    [this, widget](AnimationBox * box) {
+    [widget](AnimationBox * box) {
         bool ok = false;
         const int stretch = QInputDialog::getInt(widget,
                                                  "Stretch " + box->prp_getName(),
                                                  "Stretch:",
-                                                 qRound(getStretch()*100),
+                                                 qRound(box->getStretch()*100),
                                                  -1000, 1000, 1, &ok);
         if(!ok) return;
         box->setStretch(stretch*0.01);

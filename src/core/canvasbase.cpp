@@ -16,6 +16,4 @@
 
 #include "canvasbase.h"
 
-CanvasBase::CanvasBase() {
-
-}
+CanvasBase::CanvasBase() : ContainerBox(TYPE_CANVAS) {}

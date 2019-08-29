@@ -17,6 +17,7 @@
 #ifndef PROPERTY_H
 #define PROPERTY_H
 class UndoRedo;
+class Canvas;
 #include "../singlewidgettarget.h"
 #include "../framerange.h"
 #include "../MovablePoints/pointshandler.h"
@@ -120,6 +121,11 @@ public:
         return 0;
     }
 
+    virtual bool prp_handlesMode(const CanvasMode mode) const {
+        Q_UNUSED(mode);
+        return false;
+    }
+
     virtual void drawTimelineControls(QPainter * const p,
                                       const qreal pixelsPerFrame,
                                       const FrameRange &absFrameRange,
@@ -181,6 +187,12 @@ public:
     bool SWT_isProperty() const { return true; }
 
     QMatrix getTransform() const;
+
+    void prp_setSelected(const bool selected) {
+        if(prp_mSelected == selected) return;
+        prp_mSelected = selected;
+        emit prp_selectionChanged(selected);
+    }
 
     void prp_afterWholeInfluenceRangeChanged();
 
@@ -251,24 +263,30 @@ public:
     PointsHandler * getPointsHandler() const {
         return mPointsHandler.get();
     }
+
+    bool prp_isSelected() const { return prp_mSelected; }
+    void prp_selectionChangeTriggered(const bool shiftPressed);
 protected:
     void enabledDrawingOnCanvas();
     void setPointsHandler(const stdsptr<PointsHandler>& handler);
 signals:
     void prp_finishedChange();
     void prp_currentFrameChanged(const UpdateReason reason, QPrivateSignal);
-    void prp_absFrameRangeChanged(const FrameRange &range,
-                                  const bool clip);
-    void prp_replaceWith(const qsptr<Property>&, const qsptr<Property>&);
-    void prp_prependWith(Property*, const qsptr<Property>&);
+    void prp_absFrameRangeChanged(const FrameRange &range, const bool clip);
     void prp_nameChanged(const QString&);
+    void prp_selectionChanged(bool);
+    void prp_parentChanged(ComplexAnimator*);
+    void prp_ancestorChanged();
 protected:
     bool mDrawOnCanvas = false;
     int prp_mInheritedFrameShift = 0;
     QString prp_mName;
     stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;
     qptr<Property> mParent_k;
+    Canvas* mParentScene = nullptr;
     stdsptr<PointsHandler> mPointsHandler;
+private:
+    bool prp_mSelected = false;
 };
 
 #endif // PROPERTY_H

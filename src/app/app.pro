@@ -119,7 +119,6 @@ SOURCES += main.cpp\
     GUI/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
     GUI/BoxesList/boxscrollarea.cpp \
-    drawpath.cpp \
     videoencoder.cpp \
     GUI/RenderWidgets/rendersettingsdialog.cpp \
     GUI/RenderWidgets/outputsettingsprofilesdialog.cpp \
@@ -215,7 +214,6 @@ HEADERS  += \
     GUI/paintboxsettingsdialog.h \
     execdelegator.h \
     GUI/BoxesList/boxscrollarea.h \
-    drawpath.h \
     videoencoder.h \
     GUI/RenderWidgets/rendersettingsdialog.h \
     GUI/RenderWidgets/outputsettingsprofilesdialog.h \

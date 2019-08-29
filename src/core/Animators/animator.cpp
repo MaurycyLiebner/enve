@@ -495,13 +495,13 @@ void Animator::setupTreeViewMenu(PropertyMenu * const menu) {
     [](Animator * animTarget) {
         animTarget->anim_saveCurrentValueAsKey();
     };
-    menu->addPlainAction("Add Key", aOp)->setDisabled(anim_getKeyOnCurrentFrame());
+    menu->addPlainAction("Add Key(s)", aOp)->setDisabled(anim_getKeyOnCurrentFrame());
 
     const PropertyMenu::PlainSelectedOp<Animator> dOp =
     [](Animator * animTarget) {
         animTarget->anim_deleteCurrentKey();
     };
-    menu->addPlainAction("Delete Key", dOp)->setEnabled(anim_getKeyOnCurrentFrame());
+    menu->addPlainAction("Delete Key(s)", dOp)->setEnabled(anim_getKeyOnCurrentFrame());
 }
 
 void Animator::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,

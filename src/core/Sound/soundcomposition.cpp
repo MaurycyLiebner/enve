@@ -111,7 +111,7 @@ SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
 
     const auto task = enve::make_shared<SoundMerger>(secondId, sampleRange, this);
     for(const auto &sound : mSounds) {
-        if(!sound->isEnabled() || !sound->isVisible()) continue;
+        if(!sound->isVisible()) continue;
         const auto enabledFrameRange = sound->prp_absInfluenceRange();
         const iValueRange enabledSecRange{qFloor(enabledFrameRange.fMin/fps),
                                           qFloor(enabledFrameRange.fMax/fps)};

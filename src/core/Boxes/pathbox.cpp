@@ -28,8 +28,7 @@
 #include "Animators/outlinesettingsanimator.h"
 
 PathBox::PathBox(const eBoxType type) : BoundingBox(type) {
-    connect(this, &eBoxOrSound::parentChanged,
-            this, [this]() {
+    connect(this, &eBoxOrSound::parentChanged, this, [this]() {
         setPathsOutdated(UpdateReason::userChange);
     });
 

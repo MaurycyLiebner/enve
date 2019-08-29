@@ -40,7 +40,7 @@ void MovablePoint::drawHovered(SkCanvas * const canvas,
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setStyle(SkPaint::kStroke_Style);
-    paint.setStrokeWidth(2*invScale);
+    paint.setStrokeWidth(1.5f*invScale);
     paint.setColor(SK_ColorRED);
     canvas->drawCircle(toSkPoint(getAbsolutePos()),
                        static_cast<float>(mRadius)*invScale, paint);
@@ -213,12 +213,8 @@ qreal MovablePoint::getRadius() {
     return mRadius;
 }
 
-void MovablePoint::select() {
-    mSelected = true;
-}
-
-void MovablePoint::deselect() {
-    mSelected = false;
+void MovablePoint::setSelected(const bool selected) {
+    mSelected = selected;
 }
 
 bool MovablePoint::isNodePoint() {

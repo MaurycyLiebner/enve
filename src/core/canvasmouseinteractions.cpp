@@ -245,7 +245,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
     mPressedPoint = getPointAtAbsPos(e.fPos, mCurrentMode, invScale);
 
     if(mRotPivot->isPointAtAbsPos(e.fPos, mCurrentMode, invScale)) {
-        return mRotPivot->select();
+        return mRotPivot->setSelected(true);
     }
     if(mCurrentMode == CanvasMode::boxTransform) {
         if(mHoveredPoint_d) {
@@ -318,7 +318,7 @@ void Canvas::cancelCurrentTransform() {
 
 void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
     if(mRotPivot->isSelected()) {
-        mRotPivot->deselect();
+        mRotPivot->setSelected(false);
     } else if(mTransMode == TransformMode::rotate ||
               mTransMode == TransformMode::scale) {
         finishSelectedPointsTransform();
@@ -386,7 +386,7 @@ void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
 void Canvas::handleMovePathMouseRelease(const MouseEvent &e) {
     if(mRotPivot->isSelected()) {
         if(!mFirstMouseMove) mRotPivot->finishTransform();
-        mRotPivot->deselect();
+        mRotPivot->setSelected(false);
     } else if(mTransMode == TransformMode::rotate || mTransMode == TransformMode::scale) {
         finishSelectedBoxesTransform();
     } else if(mFirstMouseMove) {

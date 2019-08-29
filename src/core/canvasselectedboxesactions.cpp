@@ -340,7 +340,7 @@ void Canvas::centerPivotForSelected() {
 
 void Canvas::removeSelectedBoxesAndClearList() {
     for(const auto &box : mSelectedBoxes) {
-        //box->deselect();
+        //box->setSelected(false);
         box->removeFromParent_k();
     }
     clearBoxesSelectionList(); schedulePivotUpdate();
@@ -368,7 +368,7 @@ void Canvas::addBoxToSelection(BoundingBox * const box) {
         removeBoxFromSelection(box);
     });
 
-    box->select();
+    box->setSelected(true);
     schedulePivotUpdate();
 
     sortSelectedBoxesDesc();
@@ -384,7 +384,7 @@ void Canvas::addBoxToSelection(BoundingBox * const box) {
 void Canvas::removeBoxFromSelection(BoundingBox * const box) {
     if(!box->isSelected()) return;
     mSelectedBoxes.removeObj(box);
-    box->deselect();
+    box->setSelected(false);
     schedulePivotUpdate();
     if(mCurrentMode == CanvasMode::paint) updatePaintBox();
     if(mSelectedBoxes.isEmpty()) setCurrentBox(nullptr);
@@ -393,12 +393,12 @@ void Canvas::removeBoxFromSelection(BoundingBox * const box) {
 }
 
 void Canvas::clearBoxesSelection() {
-    for(const auto &box : mSelectedBoxes) box->deselect();
+    for(const auto &box : mSelectedBoxes) box->setSelected(false);
     clearBoxesSelectionList();
     schedulePivotUpdate();
     setCurrentBox(nullptr);
 //    if(mLastPressedBox) {
-//        mLastPressedBox->deselect();
+//        mLastPressedBox->setSelected(false);
 //        mLastPressedBox = nullptr;
     //    }
 }

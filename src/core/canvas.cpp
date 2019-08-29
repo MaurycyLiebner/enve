@@ -41,7 +41,7 @@
 Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
                const int frameCount, const qreal fps) :
-    ContainerBox(TYPE_CANVAS), mDocument(document), mPaintTarget(this) {
+    mDocument(document), mPaintTarget(this) {
     mParentScene = this;
     connect(&mDocument, &Document::canvasModeSet,
             this, &Canvas::setCanvasMode);

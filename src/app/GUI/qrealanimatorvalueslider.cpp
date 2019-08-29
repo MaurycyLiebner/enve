@@ -231,7 +231,7 @@ void QrealAnimatorValueSlider::setTarget(IntProperty * const animator) {
 
         setDisplayedValue(animator->getValue());
         mTarget = animator;
-    }
+    } else update();
 }
 
 bool QrealAnimatorValueSlider::hasTarget() {
@@ -251,12 +251,10 @@ void QrealAnimatorValueSlider::openContextMenu(
     QMenu menu(this);
 
     if(aTarget->anim_getKeyOnCurrentFrame()) {
-        menu.addAction("Delete Keyframe",
-                       aTarget,
+        menu.addAction("Delete Key", aTarget,
                        &Animator::anim_deleteCurrentKey);
     } else {
-        menu.addAction("Add Keyframe",
-                       aTarget,
+        menu.addAction("Add Key", aTarget,
                        &Animator::anim_saveCurrentValueAsKey);
     }
 

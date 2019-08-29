@@ -380,14 +380,14 @@ protected:
     RenderContainer mDrawRenderContainer;
 
     const qsptr<BoxTransformAnimator> mTransformAnimator;
-
     const qsptr<RasterEffectAnimators> mRasterEffectsAnimators;
 
     bool mVisibleInScene = true;
     bool mCenterPivotPlanned = false;
     bool mUpdatePlanned = false;
     UpdateReason mPlannedReason;
-    QList<qptr<Property>> mCanvasProps;
+
+    QList<Property*> mCanvasProps;
 private:
     void cancelWaitingTasks();
     void afterTotalTransformChanged(const UpdateReason reason);

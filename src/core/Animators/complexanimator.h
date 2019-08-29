@@ -98,7 +98,34 @@ public:
 
     void ca_updateDescendatKeyFrame(Key* key);
 
-    Property *ca_getFirstDescendantWithName(const QString &name);
+    template <class T = Property>
+    T *ca_getFirstDescendant(const std::function<bool(T*)>& tester) const {
+        for(const auto &prop : ca_mChildAnimators) {
+            const auto target = dynamic_cast<T*>(prop.data());
+            if(target && tester(target)) return target;
+            else if(prop->SWT_isComplexAnimator()) {
+                const auto ca = static_cast<ComplexAnimator*>(prop.get());
+                const auto desc = ca->ca_getFirstDescendant<T>(tester);
+                if(desc) return desc;
+            }
+        }
+        return nullptr;
+    }
+
+    template <class T = Property>
+    T *ca_getFirstDescendant() const {
+        return ca_getFirstDescendant<T>([](T* const prop) {
+            Q_UNUSED(prop);
+            return true;
+        });
+    }
+
+    template <class T = Property>
+    T *ca_getFirstDescendantWithName(const QString &name) {
+        return ca_getFirstDescendant<T>([name](T* const prop) {
+            return prop->prp_getName() == name;
+        });
+    }
 
     void ca_execOnDescendants(const std::function<void(Property*)>& op) const {
         for(const auto& child : ca_mChildAnimators) {

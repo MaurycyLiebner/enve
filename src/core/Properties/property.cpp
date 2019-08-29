@@ -20,9 +20,14 @@
 #include "Animators/transformanimator.h"
 #include "typemenu.h"
 #include "document.h"
+#include "canvas.h"
 
 Property::Property(const QString& name) :
-    prp_mName(name) {}
+    prp_mName(name) {
+    connect(this, &Property::prp_ancestorChanged, this, [this]() {
+        mParentScene = mParent_k ? mParent_k->mParentScene : nullptr;
+    });
+}
 
 void Property::drawCanvasControls(SkCanvas * const canvas,
                                   const CanvasMode mode,
@@ -146,6 +151,32 @@ void Property::addUndoRedo(const stdsptr<UndoRedo>& undoRedo) {
 }
 
 void Property::setParent(ComplexAnimator * const parent) {
+    if(mParent_k == parent) return;
+    if(mParent_k) {
+        disconnect(mParent_k, &Property::prp_ancestorChanged,
+                   this, &Property::prp_ancestorChanged);
+    }
     mParent_k = parent;
+    if(parent) {
+        connect(mParent_k, &Property::prp_ancestorChanged,
+                this, &Property::prp_ancestorChanged);
+    }
     if(mPointsHandler) mPointsHandler->setTransform(getTransformAnimator());
+    emit prp_parentChanged(parent);
+    emit prp_ancestorChanged();
+}
+
+#include "Boxes/boundingbox.h"
+void Property::prp_selectionChangeTriggered(const bool shiftPressed) {
+    if(!mParentScene) return;
+    if(shiftPressed) {
+        if(prp_mSelected) {
+            mParentScene->removeFromSelectedProps(this);
+        } else {
+            mParentScene->addToSelectedProps(this);
+        }
+    } else {
+        mParentScene->clearSelectedProps();
+        mParentScene->addToSelectedProps(this);
+    }
 }

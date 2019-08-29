@@ -27,6 +27,30 @@ void PointsHandler::appendPt(const stdsptr<MovablePoint> &pt) {
     return insertPt(mPts.count(), pt);
 }
 
+void PointsHandler::remove(const stdsptr<MovablePoint> &pt) {
+    if(pt->isSelected()) removeFromSelection(pt.get());
+    mPts.removeOne(pt);
+}
+
+void PointsHandler::removeLast() {
+    remove(mPts.last());
+}
+
+void PointsHandler::clear() {
+    mPts.clear();
+    mSelectedPts.clear();
+}
+
+void PointsHandler::addToSelection(MovablePoint * const pt) {
+    mSelectedPts << pt;
+}
+
+void PointsHandler::removeFromSelection(MovablePoint * const pt) {
+    mSelectedPts.removeOne(pt);
+}
+
+void PointsHandler::clearSelection() { mSelectedPts.clear(); }
+
 MovablePoint *PointsHandler::getPointAtAbsPos(const QPointF &absPos,
                                               const CanvasMode mode,
                                               const qreal invScale) {
@@ -42,10 +66,7 @@ void PointsHandler::addAllPointsToSelection(const MovablePoint::Adder& adder,
                                             const CanvasMode mode) const {
     for(const auto& pt : mPts) {
         if(pt->isSelected() || pt->isHidden(mode)) continue;
-        if(pt->selectionEnabled()) {
-            pt->select();
-            adder(pt.get());
-        }
+        if(pt->selectionEnabled()) adder(pt.get());
     }
 }
 
@@ -71,12 +92,6 @@ void PointsHandler::drawPoints(SkCanvas * const canvas,
                        keyOnCurrentFrame, ctrlPressed);
     }
 }
-
-void PointsHandler::removeLast() { mPts.removeLast(); }
-
-void PointsHandler::removeAt(const int id) { mPts.removeAt(id); }
-
-void PointsHandler::clear() { mPts.clear(); }
 
 bool PointsHandler::isEmpty() const { return mPts.isEmpty(); }
 

@@ -52,15 +52,20 @@ QMimeData *SmartPathAnimator::SWT_createMimeData() {
 #include "document.h"
 void SmartPathAnimator::setupTreeViewMenu(PropertyMenu * const menu) {
     const auto spClipboard = Document::sInstance->getSmartPathClipboard();
-//    if(spClipboard) {
-        menu->addPlainAction("Paste Path", [this, spClipboard]() {
-            pastePath(spClipboard->path());
-        })->setEnabled(spClipboard);
-//    }
+    menu->addPlainAction("Paste Path", [this, spClipboard]() {
+        pastePath(spClipboard->path());
+    })->setEnabled(spClipboard);
     menu->addPlainAction("Copy Path", [this] {
         const auto spClipboard = enve::make_shared<SmartPathClipboard>(mBaseValue);
         Document::sInstance->replaceClipboard(spClipboard);
     });
+    menu->addSeparator();
+    const PropertyMenu::PlainSelectedOp<SmartPathAnimator> dOp =
+    [](SmartPathAnimator* const eff) {
+        const auto parent = eff->getParent<DynamicComplexAnimatorBase<SmartPathAnimator>>();
+        parent->removeChild(eff->ref<SmartPathAnimator>());
+    };
+    menu->addPlainAction("Delete Path(s)", dOp);
     menu->addSeparator();
     Animator::setupTreeViewMenu(menu);
 }

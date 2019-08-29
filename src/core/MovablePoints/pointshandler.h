@@ -27,8 +27,14 @@ protected:
     PointsHandler();
 public:
     void insertPt(const int id, const stdsptr<MovablePoint>& pt);
-
     void appendPt(const stdsptr<MovablePoint>& pt);
+    void remove(const stdsptr<MovablePoint>& pt);
+    void removeLast();
+    void clear();
+
+    void addToSelection(MovablePoint* const pt);
+    void removeFromSelection(MovablePoint* const pt);
+    void clearSelection();
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode mode,
@@ -54,10 +60,6 @@ public:
         return static_cast<T*>(mPts.at(id).get());
     }
 
-    void removeLast();
-    void removeAt(const int id);
-    void clear();
-
     bool isEmpty() const;
     int count() const;
 
@@ -68,6 +70,7 @@ public:
     void setTransform(BasicTransformAnimator * const trans);
 private:
     BasicTransformAnimator * mTrans = nullptr;
+    QList<MovablePoint*> mSelectedPts;
     QList<stdsptr<MovablePoint>> mPts;
 };
 

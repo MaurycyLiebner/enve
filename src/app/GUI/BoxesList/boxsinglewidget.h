@@ -61,6 +61,8 @@ public:
     static QPixmap* C_PIXMAP;
     static QPixmap* G_PIXMAP;
     static QPixmap* CG_PIXMAP;
+    static QPixmap* GRAPH_PROPERTY;
+
     static bool sStaticPixmapsLoaded;
     static void loadStaticPixmaps();
     static void clearStaticPixmaps();

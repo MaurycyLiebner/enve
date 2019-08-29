@@ -136,7 +136,7 @@ struct KeyEvent : public MouseEvent {
     int fKey;
 };
 
-class Canvas : public ContainerBox, public CanvasBase {
+class Canvas : public CanvasBase {
     friend class CanvasWindow;
     Q_OBJECT
     e_OBJECT

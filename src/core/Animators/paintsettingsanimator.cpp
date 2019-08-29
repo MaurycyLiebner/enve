@@ -41,7 +41,7 @@ PaintSettingsAnimator::PaintSettingsAnimator(
     ComplexAnimator(name), mTarget_k(parent) {
     mColor->qra_setCurrentValue(colorT);
     showHideChildrenBeforeChaningPaintType(paintTypeT);
-    mPaintType = paintTypeT;
+    setPaintType(paintTypeT);
     setGradientVar(gradientT);
     setGradientPoints(grdPts);
 }
@@ -120,10 +120,8 @@ void PaintSettingsAnimator::setCurrentColor(const QColor &color) {
 
 void PaintSettingsAnimator::showHideChildrenBeforeChaningPaintType(
         const PaintType newPaintType) {
-    if(mPaintType == FLATPAINT)
-        ca_removeChild(mColor);
-    if(newPaintType == FLATPAINT)
-        ca_addChild(mColor);
+    if(mPaintType == FLATPAINT) ca_removeChild(mColor);
+    if(newPaintType == FLATPAINT) ca_addChild(mColor);
 }
 
 void PaintSettingsAnimator::setPaintType(const PaintType paintType) {
@@ -135,6 +133,8 @@ void PaintSettingsAnimator::setPaintType(const PaintType paintType) {
     mTarget_k->updateDrawGradients();
     mTarget_k->requestGlobalFillStrokeUpdateIfSelected();
     prp_afterWholeInfluenceRangeChanged();
+
+    SWT_setDisabled(paintType == PaintType::NOPAINT);
 }
 
 ColorAnimator *PaintSettingsAnimator::getColorAnimator() {
@@ -176,10 +176,11 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
                                          const QPointF &start,
                                          const QPointF &finalStop,
                                          const GradientType gradientType) {
-    int nStops = stops.count();
-    SkPoint gradPoints[nStops];
-    SkColor gradColors[nStops];
-    float gradPos[nStops];
+    const int nStops = stops.count();
+    QVector<SkPoint> gradPoints(nStops);
+    QVector<SkColor> gradColors(nStops);
+    QVector<float> gradPos(nStops);
+
     const float xInc = static_cast<float>(finalStop.x() - start.x());
     const float yInc = static_cast<float>(finalStop.y() - start.y());
     float currX = static_cast<float>(start.x());
@@ -199,15 +200,16 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
         currT += tInc;
     }
     if(gradientType == GradientType::LINEAR) {
-        fGradient = SkGradientShader::MakeLinear(gradPoints, gradColors,
-                                                 gradPos, nStops,
+        fGradient = SkGradientShader::MakeLinear(gradPoints.data(),
+                                                 gradColors.data(),
+                                                 gradPos.data(), nStops,
                                                  SkTileMode::kClamp);
     } else {
         const QPointF distPt = finalStop - start;
         const qreal radius = qSqrt(pow2(distPt.x()) + pow2(distPt.y()));
         fGradient = SkGradientShader::MakeRadial(
                         toSkPoint(start), toSkScalar(radius),
-                        gradColors, gradPos,
+                        gradColors.data(), gradPos.data(),
                         nStops, SkTileMode::kClamp);
     }
 }

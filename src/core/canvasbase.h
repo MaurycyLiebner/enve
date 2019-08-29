@@ -21,11 +21,13 @@
 class Property;
 class BoundingBox;
 
+#include "Boxes/containerbox.h"
 #include "MovablePoints/movablepoint.h"
 #include "conncontext.h"
 
-class CanvasBase {
-protected:
+class CanvasBase : public ContainerBox {
+    friend class Canvas;
+private:
     CanvasBase();
 public:
     template <class T = BoundingBox>
@@ -79,19 +81,38 @@ public:
 
     template <class T = Property>
     void execOpOnSelectedProperties(const std::function<void(T*)> &op) {
-
+        for(const auto prop : mSelectedProps) {
+            const auto t = dynamic_cast<T*>(prop);
+            if(t) op(t);
+        }
     }
 
-    template <class T = Property>
-    void execOpOnSelectedProperties(const std::function<void(const QList<T*>&)> &op) {
-
+    void addToSelectedProps(Property* const prop) {
+        mSelectedProps << prop;
+        connect(prop, &Property::prp_parentChanged,
+                this, [this, prop]() { removeFromSelectedProps(prop); });
+        prop->prp_setSelected(true);
     }
 
+    void removeFromSelectedProps(Property* const prop) {
+        mSelectedProps.removeOne(prop);
+        disconnect(prop, &Property::prp_parentChanged, this, nullptr);
+        prop->prp_setSelected(false);
+    }
+
+    void clearSelectedProps() {
+        const auto selected = mSelectedProps;
+        for(const auto prop : selected) {
+            removeFromSelectedProps(prop);
+        }
+    }
 protected:
     QList<MovablePoint*> mSelectedPoints_d;
     stdptr<MovablePoint> mPressedPoint;
 
     ConnContextObjList<BoundingBox*> mSelectedBoxes;
+
+    QList<Property*> mSelectedProps;
 };
 
 #endif // CANVASBASE_H

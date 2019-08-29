@@ -21,22 +21,16 @@
 
 eBoxOrSound::eBoxOrSound(const QString &name) :
     StaticComplexAnimator(name) {
-    connect(this, &eBoxOrSound::ancestorChanged, this, [this]() {
-        mParentScene = mParentGroup ? mParentGroup->mParentScene : nullptr;
-    });
     connect(this, &Property::prp_nameChanged, this,
             &SingleWidgetTarget::SWT_scheduleSearchContentUpdate);
 }
 
 void eBoxOrSound::setParentGroup(ContainerBox * const parent) {
     if(parent == mParentGroup) return;
-    emit aboutToChangeParent();
     emit aboutToChangeAncestor();
     if(mParentGroup) {
         disconnect(mParentGroup, &eBoxOrSound::aboutToChangeAncestor,
                    this, &eBoxOrSound::aboutToChangeAncestor);
-        disconnect(mParentGroup, &eBoxOrSound::ancestorChanged,
-                   this, &eBoxOrSound::ancestorChanged);
     }
     prp_afterWholeInfluenceRangeChanged();
     mParentGroup = parent;
@@ -44,11 +38,10 @@ void eBoxOrSound::setParentGroup(ContainerBox * const parent) {
         anim_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
         connect(mParentGroup, &eBoxOrSound::aboutToChangeAncestor,
                 this, &eBoxOrSound::aboutToChangeAncestor);
-        connect(mParentGroup, &eBoxOrSound::ancestorChanged,
-                this, &eBoxOrSound::ancestorChanged);
     }
+
+    setParent(mParentGroup);
     emit parentChanged(parent);
-    emit ancestorChanged();
 }
 
 void eBoxOrSound::removeFromParent_k() {
@@ -302,7 +295,7 @@ void eBoxOrSound::deselect() {
 }
 
 void eBoxOrSound::selectionChangeTriggered(const bool shiftPressed) {
-    Q_ASSERT(mParentScene);
+    if(!mParentScene) return;
     if(!SWT_isBoundingBox()) return;
     const auto bb = static_cast<BoundingBox*>(this);
     if(shiftPressed) {

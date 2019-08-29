@@ -233,9 +233,7 @@ void QDoubleSlider::fitWidthToContent() {
 
 void QDoubleSlider::paintEvent(QPaintEvent *) {
     QPainter p(this);
-
     paint(&p);
-
     p.end();
 }
 

@@ -40,13 +40,7 @@ public:
     void setStretch(const qreal stretch);
 
     void setFilePath(const QString& path);
-
-    void enableSound() { setSoundEnabled(true); }
-    void disableSound() { setSoundEnabled(false); }
-
-    void setSoundEnabled(const bool enable);
 private:
-    bool mSoundEnabled = true;
     qsptr<SingleSound> mSound;
     qptr<VideoFileHandler> mFileHandler;
 };

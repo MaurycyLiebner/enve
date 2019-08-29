@@ -117,10 +117,6 @@ void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
         connect(child.data(), &Property::prp_absFrameRangeChanged,
                 this, &ComplexAnimator::prp_afterChangedAbsRange);
     }
-    connect(child.data(), &Property::prp_replaceWith,
-            this, &ComplexAnimator::ca_replaceChildAnimator);
-    connect(child.data(), &Property::prp_prependWith,
-            this, &ComplexAnimator::ca_prependChildAnimator);
 
     child->SWT_setAncestorDisabled(SWT_isDisabled());
     SWT_addChildAt(child.get(), id);
@@ -217,18 +213,6 @@ void ComplexAnimator::ca_removeChild(const qsptr<Property> child) {
 void ComplexAnimator::ca_removeAllChildAnimators() {
     for(int i = ca_mChildAnimators.count() - 1; i >= 0; i--)
         ca_removeChild(qsptr<Property>(ca_mChildAnimators.at(i)));
-}
-
-Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
-    for(const auto &prop : ca_mChildAnimators) {
-        if(prop->prp_getName() == name) return prop.get();
-        else if(prop->SWT_isComplexAnimator()) {
-            const auto ca = static_cast<ComplexAnimator*>(prop.get());
-            const auto desc = ca->ca_getFirstDescendantWithName(name);
-            if(desc) return desc;
-        }
-    }
-    return nullptr;
 }
 
 void ComplexAnimator::ca_swapChildAnimators(Property * const animator1,

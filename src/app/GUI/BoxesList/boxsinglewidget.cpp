@@ -57,6 +57,7 @@ QPixmap* BoxSingleWidget::ANIMATOR_DESCENDANT_RECORDING;
 QPixmap* BoxSingleWidget::C_PIXMAP;
 QPixmap* BoxSingleWidget::G_PIXMAP;
 QPixmap* BoxSingleWidget::CG_PIXMAP;
+QPixmap* BoxSingleWidget::GRAPH_PROPERTY;
 
 bool BoxSingleWidget::sStaticPixmapsLoaded = false;
 
@@ -150,6 +151,8 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
             if(static_cast<PathEffect*>(target)->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
             } else return BoxSingleWidget::INVISIBLE_PIXMAP;
+        } else if(target->SWT_isGraphAnimator()) {
+            return BoxSingleWidget::GRAPH_PROPERTY;
         } else return static_cast<QPixmap*>(nullptr);
     });
     mMainLayout->addWidget(mVisibleButton);
@@ -343,7 +346,8 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mVisibleButton->setVisible(target->SWT_isBoundingBox() ||
                                target->SWT_isSound() ||
                                target->SWT_isPathEffect() ||
-                               target->SWT_isRasterEffect());
+                               target->SWT_isRasterEffect() ||
+                               target->SWT_isGraphAnimator());
     mLockedButton->setVisible(target->SWT_isBoundingBox());
     mHwSupportButton->setVisible(target->SWT_isRasterEffect());
 
@@ -456,7 +460,8 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         const auto effTarget = static_cast<eEffect*>(target);
         connect(effTarget, &eEffect::effectVisibilityChanged,
                 this, [this]() { mVisibleButton->update(); });
-    } else if(target->SWT_isBoundingBox() || target->SWT_isSound()) {
+    }
+    if(target->SWT_isBoundingBox() || target->SWT_isSound()) {
         const auto ptr = static_cast<eBoxOrSound*>(target);
         connect(ptr, &eBoxOrSound::visibilityChanged,
                 this, [this]() { mVisibleButton->update(); });
@@ -464,6 +469,11 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                 this, qOverload<>(&QWidget::update));
         connect(ptr, &eBoxOrSound::lockedChanged,
                 this, [this]() { mLockedButton->update(); });
+    }
+    if(!target->SWT_isBoundingBox() && !target->SWT_isSingleSound()) {
+        const auto prop = static_cast<Property*>(target);
+        connect(prop, &Property::prp_selectionChanged,
+                this, qOverload<>(&QWidget::update));
     }
 
     mValueSlider->setVisible(valueSliderVisible);
@@ -494,6 +504,7 @@ void BoxSingleWidget::loadStaticPixmaps() {
     C_PIXMAP = new QPixmap(iconsDir + "/c.png");
     G_PIXMAP = new QPixmap(iconsDir + "/g.png");
     CG_PIXMAP = new QPixmap(iconsDir + "/cg.png");
+    GRAPH_PROPERTY = new QPixmap(iconsDir + "/graphProperty.png");
     sStaticPixmapsLoaded = true;
 }
 
@@ -515,19 +526,22 @@ void BoxSingleWidget::clearStaticPixmaps() {
 }
 
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
+    if(!mTarget) return;
     if(isTargetDisabled()) return;
-    SingleWidgetTarget *target = mTarget->getTarget();
+    const auto target = mTarget->getTarget();
     if(event->button() == Qt::RightButton) {
         setSelected(true);
         QMenu menu(this);
 
         if(target->SWT_isProperty()) {
+            const auto pTarget = static_cast<Property*>(target);
+            const bool shiftPressed = event->modifiers() & Qt::ShiftModifier;
             if(target->SWT_isBoundingBox()) {
                 const auto box = static_cast<BoundingBox*>(target);
-                const bool shiftPressed = event->modifiers() & Qt::ShiftModifier;
                 if(!box->isSelected()) box->selectionChangeTriggered(shiftPressed);
+            } else {
+                if(!pTarget->prp_isSelected()) pTarget->prp_selectionChangeTriggered(shiftPressed);
             }
-            const auto pTarget = static_cast<Property*>(target);
             PropertyMenu pMenu(&menu, mParent->currentScene(), MainWindow::sGetInstance());
             pTarget->setupTreeViewMenu(&pMenu);
         }
@@ -560,8 +574,7 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
         render(&pixmap);
         drag->setPixmap(pixmap);
     }
-    connect(drag, &QDrag::destroyed,
-            this, &BoxSingleWidget::clearSelected);
+    connect(drag, &QDrag::destroyed, this, &BoxSingleWidget::clearSelected);
 
     const auto mimeData = mTarget->getTarget()->SWT_createMimeData();
     if(!mimeData) return;
@@ -576,24 +589,15 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
     if(isTargetDisabled()) return;
     setSelected(false);
     if(pointToLen(event->pos() - mDragStartPos) > MIN_WIDGET_DIM/2) return;
-    SingleWidgetTarget *target = mTarget->getTarget();
+    const bool shiftPressed = event->modifiers() & Qt::ShiftModifier;
+    const auto target = mTarget->getTarget();
     if(target->SWT_isBoundingBox() && !target->SWT_isCanvas()) {
         auto boxTarget = static_cast<BoundingBox*>(target);
-        boxTarget->selectionChangeTriggered(event->modifiers() &
-                                            Qt::ShiftModifier);
+        boxTarget->selectionChangeTriggered(shiftPressed);
         Document::sInstance->actionFinished();
-    } else if(target->SWT_isGraphAnimator()) {
-        const auto animTarget = static_cast<GraphAnimator*>(target);
-        const auto bsvt = static_cast<BoxScroller*>(mParent);
-        KeysView * const keysView = bsvt->getKeysView();
-        if(keysView) {
-            if(keysView->graphGetAnimatorId(animTarget) != -1) {
-                keysView->graphRemoveViewedAnimator(animTarget);
-            } else {
-                keysView->graphAddViewedAnimator(animTarget);
-            }
-            Document::sInstance->actionFinished();
-        }
+    } else if(target->SWT_isProperty()) {
+        const auto pTarget = static_cast<Property*>(target);
+        pTarget->prp_selectionChangeTriggered(shiftPressed);
     }
 }
 
@@ -691,6 +695,12 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
 
     int nameX = mFillWidget->x();
     const QString name = static_cast<Property*>(target)->prp_getName();
+    if(!target->SWT_isBoundingBox() && !target->SWT_isSingleSound()) {
+        const auto prop = static_cast<Property*>(target);
+        if(prop->prp_isSelected()) {
+            p.fillRect(mFillWidget->geometry(), QColor(0, 0, 0, 55));
+        }
+    }
     if(target->SWT_isBoundingBox() || target->SWT_isSingleSound()) {
         const auto bsTarget = static_cast<eBoxOrSound*>(target);
 
@@ -716,12 +726,13 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                 const int id = keysView->graphGetAnimatorId(graphAnim);
                 if(id >= 0) {
                     const auto color = keysView->sGetAnimatorColor(id);
-                    p.fillRect(nameX + MIN_WIDGET_DIM/4, MIN_WIDGET_DIM/4,
-                               MIN_WIDGET_DIM/2, MIN_WIDGET_DIM/2, color);
+                    const QRect visRect(mVisibleButton->pos(),
+                                        GRAPH_PROPERTY->size());
+                    const int adj = qRound(4*qreal(GRAPH_PROPERTY->width())/20);
+                    p.fillRect(visRect.adjusted(adj, adj, -adj, -adj), color);
                 }
             }
-        }
-        nameX += MIN_WIDGET_DIM;
+        } else nameX += MIN_WIDGET_DIM;
 
         p.setPen(Qt::white);
     } else { //if(target->SWT_isComplexAnimator()) {
@@ -766,6 +777,18 @@ void BoxSingleWidget::switchBoxVisibleAction() {
         static_cast<RasterEffect*>(target)->switchVisible();
     } else if(target->SWT_isPathEffect()) {
         static_cast<PathEffect*>(target)->switchVisible();
+    } else if(target->SWT_isGraphAnimator()) {
+        const auto animTarget = static_cast<GraphAnimator*>(target);
+        const auto bsvt = static_cast<BoxScroller*>(mParent);
+        const auto keysView = bsvt->getKeysView();
+        if(keysView) {
+            if(keysView->graphGetAnimatorId(animTarget) != -1) {
+                keysView->graphRemoveViewedAnimator(animTarget);
+            } else {
+                keysView->graphAddViewedAnimator(animTarget);
+            }
+            Document::sInstance->actionFinished();
+        }
     }
     Document::sInstance->actionFinished();
     update();

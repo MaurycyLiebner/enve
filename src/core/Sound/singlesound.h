@@ -75,16 +75,6 @@ public:
     qreal getStretch() const { return mStretch; }
     QrealSnapshot getVolumeSnap() const;
 
-    bool isEnabled() const {
-        return mEnabled;
-    }
-
-    void setEnabled(const bool enable) {
-        if(enable == mEnabled) return;
-        mEnabled = enable;
-        SWT_setDisabled(!mEnabled);
-        prp_afterWholeInfluenceRangeChanged();
-    }
     void setSoundDataHandler(SoundDataHandler * const newDataHandler);
 private:
     iValueRange absSecondToRelSecondsAbsStretch(const int absSecond);
@@ -93,7 +83,6 @@ private:
     qreal getCanvasFPS() const;
     const bool mIndependent;
 
-    bool mEnabled = true;
     qreal mStretch = 1;
     stdsptr<SoundHandler> mCacheHandler;
 

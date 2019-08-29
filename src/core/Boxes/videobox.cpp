@@ -33,6 +33,7 @@ VideoBox::VideoBox() : AnimationBox(TYPE_VIDEO) {
     const auto flar = mDurationRectangle->ref<FixedLenAnimationRect>();
     mSound = enve::make_shared<SingleSound>(flar);
     ca_addChild(mSound);
+    mSound->hide();
     mSound->SWT_hide();
 
     connect(this, &eBoxOrSound::parentChanged,
@@ -95,12 +96,6 @@ void VideoBox::setFilePath(const QString &path) {
     animationDataChanged();
 }
 
-void VideoBox::setSoundEnabled(const bool enable) {
-    if(mSoundEnabled == enable) return;
-    mSoundEnabled = enable;
-    mSound->setEnabled(enable);
-}
-
 void VideoBox::animationDataChanged() {
     soundDataChanged();
     AnimationBox::animationDataChanged();
@@ -125,4 +120,5 @@ void VideoBox::soundDataChanged() {
     }
     mSound->setSoundDataHandler(soundHandler);
     mSound->SWT_setVisible(soundHandler);
+    mSound->setVisibile(soundHandler);
 }

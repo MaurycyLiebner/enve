@@ -28,7 +28,7 @@ SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
         if(!mParentScene) return;
         mParentScene->getSoundComposition()->removeSound(ref<SingleSound>());
     });
-    connect(this, &eBoxOrSound::ancestorChanged, this, [this]() {
+    connect(this, &eBoxOrSound::prp_ancestorChanged, this, [this]() {
         if(!mParentScene) return;
         mParentScene->getSoundComposition()->addSound(ref<SingleSound>());
         updateDurationRectLength();
@@ -50,9 +50,9 @@ SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
 void SingleSound::setupTreeViewMenu(PropertyMenu * const menu) {
     const PropertyMenu::CheckSelectedOp<SingleSound> enableOp =
             [](SingleSound * sound, bool enable) {
-        sound->setEnabled(enable);
+        sound->setVisibile(enable);
     };
-    menu->addCheckableAction("Enabled", isEnabled(), enableOp);
+    menu->addCheckableAction("Enabled", isVisible(), enableOp);
     if(videoSound()) return;
     const auto widget = menu->getParentWidget();
     const PropertyMenu::PlainSelectedOp<SingleSound> stretchOp =

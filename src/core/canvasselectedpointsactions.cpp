@@ -185,13 +185,13 @@ void Canvas::selectAndAddContainedPointsToSelection(const QRectF& absRect) {
 
 void Canvas::addPointToSelection(MovablePoint* const point) {
     if(point->isSelected()) return;
-    point->select();
+    point->setSelected(true);
     mSelectedPoints_d.append(point);
     schedulePivotUpdate();
 }
 
 void Canvas::removePointFromSelection(MovablePoint * const point) {
-    point->deselect();
+    point->setSelected(false);
     mSelectedPoints_d.removeOne(point);
 
     schedulePivotUpdate();
@@ -208,7 +208,7 @@ void Canvas::removeSelectedPointsAndClearList() {
 
     const auto selected = mSelectedPoints_d;
     for(const auto& point : selected) {
-        point->deselect();
+        point->setSelected(false);
         point->remove();
     }
     mSelectedPoints_d.clear(); schedulePivotUpdate();
@@ -216,13 +216,13 @@ void Canvas::removeSelectedPointsAndClearList() {
 
 void Canvas::clearPointsSelection() {
     for(const auto& point : mSelectedPoints_d) {
-        if(point) point->deselect();
+        if(point) point->setSelected(false);
     }
 
     mSelectedPoints_d.clear();
     if(mCurrentMode == CanvasMode::pointTransform) schedulePivotUpdate();
 //    if(mLastPressedPoint) {
-//        mLastPressedPoint->deselect();
+//        mLastPressedPoint->setSelected(false);
 //        mLastPressedPoint = nullptr;
 //    }
 //    setCurrentEndPoint(nullptr);
@@ -230,7 +230,7 @@ void Canvas::clearPointsSelection() {
 
 void Canvas::clearLastPressedPoint() {
     if(mPressedPoint) {
-        mPressedPoint->deselect();
+        mPressedPoint->setSelected(false);
         mPressedPoint = nullptr;
     }
 }
