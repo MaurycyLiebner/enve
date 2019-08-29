@@ -32,7 +32,7 @@ Extract skia:
 ```
 tar xf skia.tar.xz
 ```
-Enter skia directory:
+Enter the skia directory:
 ```
 cd skia
 ```
@@ -71,13 +71,13 @@ bin/gn gen out/Release --args='
 	skia_use_system_harfbuzz=false
 	cc="gcc-7" cxx="g++-7"'
 ```
-Build the release version of skia (you can use more than 2 threads):
+Build a release version of skia (you can use more than 2 threads):
 ```
 ./ninja -C out/Release -j 2
 ```
-If you want, you can also build debug version:
+If you want, you can also build a debug version:
 ```
-bin/gn gen out/Debug --args='extra_cflags=["-Wno-error"]'
+bin/gn gen out/Debug --args='extra_cflags=["-Wno-error"] cc="gcc-7" cxx="g++-7"'
 ./ninja -C out/Debug -j 2
 ```
 
@@ -119,7 +119,8 @@ Go back to the main enve directory:
 cd ../../
 ```
 
-#### ffmpeg
+#### FFmpeg
+Install libraries needed for audio/video decoding/encoding.
 ```
 sudo add-apt-repository ppa:jonathonf/ffmpeg-4
 sudo apt-get update
@@ -135,40 +136,37 @@ sudo apt-get install libgoogle-perftools-dev
 sudo apt-get install libglib2.0-dev
 ```
 Install libxkbcommon-x11-dev to run QtCreator on Ubuntu 16.04.
-Otherwise it will not execute.
+Otherwise it will not execute properly.
 ```
 sudo apt-get install libxkbcommon-x11-dev
 ```
 
 #### Qt
 
-Download Qt 5.12.4 installer:
-```
-wget http://download.qt.io/official_releases/qt/5.12/5.12.4/qt-opensource-linux-x64-5.12.4.run
-```
-Set the permisson for the installer:
-```
-chmod +x qt-opensource-linux-x64-5.12.4.run
-```
-Run the installer:
-```
-./qt-opensource-linux-x64-5.12.4.run
-```
+Go to qt.io/download to download Open Source Qt installer.
+Install Qt 5.12.4 Desktop gcc 64-bit.
 
 Install Qt in the directory of your choice (ex. ~/.Qt)
 
 ### enve itself
 
-You can either build enve through QtCreator (open enve.pro),
+You can either build enve through QtCreator (open enve.pro and setup Relase/Debug Kits),
 or by running qmake and make directly.
-For release version:
+
+By default qmake is not installed in /usr/bin.
+You will have to call it by its full path or create a symbolic link:
+```
+sudo ln -s your_Qt_dir/5.12.4/gcc_64/bin/qmake /usr/bin/qmake
+```
+
+Build a release version of enve:
 ```
 cd build/Release
 qmake ../../enve.pro
 make
 cd ..
 ```
-For debug version (if needed):
+Build a debug version of enve (if needed):
 ```
 cd Debug
 qmake CONFIG+=debug ../../enve.pro
@@ -184,29 +182,18 @@ Make sure you are in the build directory.
 
 ### Download needed tools
 
-Download AppImageKit:
+Download, rename, and change permission for AppImageKit:
 ```
 wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage
 mv appimagetool-x86_64.AppImage appimagetool.AppImage
 chmod +x appimagetool.AppImage
 ```
-Download LinuxDeployQt:
+Download, rename, and change permission for LinuxDeployQt:
 ```
 wget https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
 mv linuxdeployqt-6-x86_64.AppImage linuxdeployqt.AppImage
 chmod +x linuxdeployqt.AppImage
 ```
-Download patched AppRun binary to check libstdc++ dependencies at runtime:
-```
-wget https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/exec-x86_64.so
-mv exec-x86_64.so exec.so
-```
-```
-wget https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/AppRun-patched-x86_64
-mv AppRun-patched-x86_64 AppRun
-chmod +x AppRun
-```
-
 Copy the enve build into the AppDir:
 ```
 cp Release/src/app/enve AppDir/usr/bin/
@@ -216,12 +203,27 @@ Copy all necessary dependencies into the AppDir by using LinuxDeployQt:
 ```
 ./linuxdeployqt.AppImage AppDir/usr/share/applications/enve.desktop -appimage
 ```
-Copy libraries required to check and use libstdc++ dependencies at runtime:
+
+#### Support older systems (ex. Ubuntu 16.04)
+Download patched AppRun binary and an associated library that will link a newer version of libstdc++ on older systems:
+```
+wget https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/AppRun-patched-x86_64
+mv AppRun-patched-x86_64 AppRun
+chmod +x AppRun
+```
+```
+wget https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/exec-x86_64.so
+mv exec-x86_64.so exec.so
+```
+Copy everything required to use newer libstdc++ on older systems to your AppDir:
 ```
 mkdir AppDir/usr/optional/libstdc++
 cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 AppDir/usr/optional/libstdc++/
 cp exec.so AppDir/usr/optional
 ```
+
+#### Create AppImage
+
 Create the AppImage using AppImageTool:
 ```
 cp AppRun AppDir/
@@ -232,7 +234,7 @@ You have successfuly created your own enve AppImage!
 
 ## Authors
 
-**Maurycy Liebner** - [MaurycyLiebner](https://github.com/MaurycyLiebner)
+**Maurycy Liebner** - 2016-2019 - [MaurycyLiebner](https://github.com/MaurycyLiebner)
 
 ## License
 
