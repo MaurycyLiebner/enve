@@ -131,30 +131,37 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
     mHoveredPoint_d = mPressedPoint;
     mPressedPoint = nullptr;
 }
-
+#include "MovablePoints/smartnodepoint.h"
+#include "MovablePoints/pathpointshandler.h"
 void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
     if(e.fModifiers & Qt::ShiftModifier) return;
     mDoubleClick = true;
 
-    const auto boxAt = mCurrentContainer->getBoxAt(e.fPos);
-    if(!boxAt) {
-        if(!mHoveredPoint_d && !mHoveredNormalSegment.isValid()) {
-            if(mCurrentContainer != this) {
-                setCurrentBoxesGroup(mCurrentContainer->getParentGroup());
-            }
+    if(mHoveredPoint_d) {
+        if(mCurrentMode == CanvasMode::pointTransform &&
+           mHoveredPoint_d->isSmartNodePoint()) {
+            const auto adder = [this](MovablePoint* const pt) {
+                addPointToSelection(pt);
+            };
+            const auto node = static_cast<SmartNodePoint*>(mHoveredPoint_d.data());
+            node->getHandler()->addAllPointsToSelection(adder, mCurrentMode);
         }
-    } else {
-        if(boxAt->SWT_isContainerBox()) {
-            setCurrentBoxesGroup(static_cast<ContainerBox*>(boxAt));
+    } else if(mHoveredBox) {
+        if(mHoveredBox->SWT_isContainerBox()) {
+            setCurrentBoxesGroup(static_cast<ContainerBox*>(mHoveredBox.data()));
             updateHovered(e);
         } else if((mCurrentMode == CanvasMode::boxTransform ||
                    mCurrentMode == CanvasMode::pointTransform) &&
-                  boxAt->SWT_isTextBox()) {
+                  mHoveredBox->SWT_isTextBox()) {
             e.fReleaseMouse();
-            static_cast<TextBox*>(boxAt)->openTextEditor(e.fWidget);
+            static_cast<TextBox*>(mHoveredBox.data())->openTextEditor(e.fWidget);
         } else if(mCurrentMode == CanvasMode::boxTransform &&
-                  boxAt->SWT_isSmartVectorPath()) {
+                  mHoveredBox->SWT_isSmartVectorPath()) {
             emit requestCanvasMode(CanvasMode::pointTransform);
+        }
+    } else if(!mHoveredBox && !mHoveredPoint_d && !mHoveredNormalSegment.isValid()) {
+        if(mCurrentContainer != this) {
+            setCurrentBoxesGroup(mCurrentContainer->getParentGroup());
         }
     }
 }

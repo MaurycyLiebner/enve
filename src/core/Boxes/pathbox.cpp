@@ -172,10 +172,8 @@ void PathBox::setupRenderData(const qreal relFrame,
         SkPath outline;
         if(mStrokeSettings->nonZeroLineWidth()) {
             SkPath outlineBase = pathData->fPath;
-            mOutlineBasePathEffectsAnimators->apply(
-                        relFrame, &outlineBase);
-            mParentGroup->filterOutlineBasePath(
-                        relFrame, &outlineBase);
+            mOutlineBasePathEffectsAnimators->apply(relFrame, &outlineBase);
+            mParentGroup->filterOutlineBasePath(relFrame, &outlineBase);
             SkStroke strokerSk;
             mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
             strokerSk.strokePath(outlineBase, &outline);
@@ -192,8 +190,8 @@ void PathBox::setupRenderData(const qreal relFrame,
         pathData->fFillPath = mFillPathSk;
     } else {
         pathData->fFillPath = pathData->fPath;
-        mFillPathEffectsAnimators->apply(relFrame, &pathData->fPath);
-        mParentGroup->filterFillPath(relFrame, &pathData->fPath);
+        mFillPathEffectsAnimators->apply(relFrame, &pathData->fFillPath);
+        mParentGroup->filterFillPath(relFrame, &pathData->fFillPath);
     }
 
     if(currentOutlinePathCompatible && currentFillPathCompatible) {
@@ -521,6 +519,8 @@ void PathBox::updateCurrentPreviewDataFromRenderData(
     mFillPathSk = pathRenderData->fFillPath;
     mCurrentPathsOutdated = false;
     mCurrentOutlinePathOutdated = false;
+    mCurrentFillPathOutdated = false;
+
     BoundingBox::updateCurrentPreviewDataFromRenderData(renderData);
 }
 

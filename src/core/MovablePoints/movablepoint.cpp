@@ -19,10 +19,10 @@
 #include "pointhelpers.h"
 #include "Animators/transformanimator.h"
 
-MovablePoint::MovablePoint(const MovablePointType &type) : mType(type) {}
+MovablePoint::MovablePoint(const MovablePointType type) : mType(type) {}
 
 MovablePoint::MovablePoint(BasicTransformAnimator * const trans,
-                           const MovablePointType &type) :
+                           const MovablePointType type) :
     MovablePoint(type) {
     setTransform(trans);
 }
@@ -137,13 +137,10 @@ bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
 
 void MovablePoint::rectPointsSelection(const QRectF &absRect,
                                        const CanvasMode mode,
-                                       QList<MovablePoint*> &list) {
+                                       const Adder &adder) {
     if(!selectionEnabled()) return;
     if(isHidden(mode)) return;
-    if(isContainedInRect(absRect)) {
-        select();
-        list << this;
-    }
+    if(isContainedInRect(absRect)) adder(this);
 }
 
 bool MovablePoint::isContainedInRect(const QRectF &absRect) {
@@ -152,16 +149,13 @@ bool MovablePoint::isContainedInRect(const QRectF &absRect) {
 
 void MovablePoint::rotateRelativeToSavedPivot(const qreal rot) {
     QMatrix mat;
-    mat.translate(mPivot.x(),
-                  mPivot.y());
+    mat.translate(mPivot.x(), mPivot.y());
     mat.rotate(rot);
-    mat.translate(-mPivot.x(),
-                  -mPivot.y());
+    mat.translate(-mPivot.x(), -mPivot.y());
     moveToRel(mat.map(mSavedRelPos));
 }
 
-void MovablePoint::scaleRelativeToSavedPivot(const qreal sx,
-                                             const qreal sy) {
+void MovablePoint::scaleRelativeToSavedPivot(const qreal sx, const qreal sy) {
     QMatrix mat;
     mat.translate(mPivot.x(), mPivot.y());
     mat.scale(sx, sy);
@@ -176,22 +170,18 @@ void MovablePoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
 
 void MovablePoint::rotateBy(const qreal rot) {
     QMatrix rotMatrix;
-    rotMatrix.translate(-mPivot.x(),
-                        -mPivot.y());
+    rotMatrix.translate(-mPivot.x(), -mPivot.y());
     rotMatrix.rotate(rot);
-    rotMatrix.translate(mPivot.x(),
-                        mPivot.y());
+    rotMatrix.translate(mPivot.x(), mPivot.y());
     setRelativePos(rotMatrix.map(mSavedRelPos));
 }
 
 void MovablePoint::scale(const qreal scaleXBy,
                          const qreal scaleYBy) {
     QMatrix scaleMatrix;
-    scaleMatrix.translate(-mPivot.x(),
-                          -mPivot.y());
+    scaleMatrix.translate(-mPivot.x(), -mPivot.y());
     scaleMatrix.scale(scaleXBy, scaleYBy);
-    scaleMatrix.translate(mPivot.x(),
-                          mPivot.y());
+    scaleMatrix.translate(mPivot.x(), mPivot.y());
     setRelativePos(scaleMatrix.map(mSavedRelPos));
 }
 

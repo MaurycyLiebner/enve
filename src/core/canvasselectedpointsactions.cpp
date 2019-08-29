@@ -175,34 +175,39 @@ void Canvas::moveSelectedPointsByAbs(const QPointF &by,
 }
 
 void Canvas::selectAndAddContainedPointsToSelection(const QRectF& absRect) {
+    const auto adder = [this](MovablePoint* const pt) {
+        addPointToSelection(pt);
+    };
     for(const auto& box : mSelectedBoxes) {
-        box->selectAndAddContainedPointsToList(absRect, mSelectedPoints_d,
-                                               mCurrentMode);
+        box->selectAndAddContainedPointsToList(absRect, adder, mCurrentMode);
     }
 }
 
 void Canvas::addPointToSelection(MovablePoint* const point) {
     if(point->isSelected()) return;
     point->select();
-    mSelectedPoints_d.append(point); schedulePivotUpdate();
+    mSelectedPoints_d.append(point);
+    schedulePivotUpdate();
 }
 
 void Canvas::removePointFromSelection(MovablePoint * const point) {
     point->deselect();
-    mSelectedPoints_d.removeOne(point); schedulePivotUpdate();
+    mSelectedPoints_d.removeOne(point);
+
+    schedulePivotUpdate();
 }
 
 void Canvas::removeSelectedPointsAndClearList() {
     if(mPressedPoint && mPressedPoint->isCtrlPoint()) {
         mPressedPoint->finishTransform();
-        mPressedPoint->deselect();
+        removePointFromSelection(mPressedPoint);
         mPressedPoint->remove();
-        mSelectedPoints_d.removeOne(mPressedPoint);
         schedulePivotUpdate();
         return;
     }
 
-    for(const auto& point : mSelectedPoints_d) {
+    const auto selected = mSelectedPoints_d;
+    for(const auto& point : selected) {
         point->deselect();
         point->remove();
     }
@@ -236,7 +241,7 @@ QPointF Canvas::getSelectedPointsAbsPivotPos() {
     for(const auto& point : mSelectedPoints_d) {
         posSum += point->getAbsolutePos();
     }
-    const qreal invCount = 1./mSelectedPoints_d.length();
+    const qreal invCount = 1./mSelectedPoints_d.count();
     return posSum*invCount;
 }
 
@@ -245,7 +250,7 @@ bool Canvas::isPointSelectionEmpty() const {
 }
 
 int Canvas::getPointsSelectionCount() const {
-    return mSelectedPoints_d.length();
+    return mSelectedPoints_d.count();
 }
 
 void Canvas::rotateSelectedPointsBy(const qreal rotBy,

@@ -538,7 +538,7 @@ void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
         SkPaint paint;
         const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
         paint.setAlpha(static_cast<U8CPU>(intAlpha));
-        paint.setBlendMode(mBlendModeSk);
+        paint.setBlendMode(mBlendMode);
         canvas->saveLayer(nullptr, &paint);
         drawContained(canvas, filter);
         canvas->restore();

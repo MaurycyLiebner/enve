@@ -17,7 +17,6 @@
 #ifndef PROPERTY_H
 #define PROPERTY_H
 class UndoRedo;
-class MainWindow;
 #include "../singlewidgettarget.h"
 #include "../framerange.h"
 #include "../MovablePoints/pointshandler.h"

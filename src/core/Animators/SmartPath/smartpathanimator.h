@@ -41,6 +41,8 @@ public:
 
     bool SWT_isSmartPathAnimator() const { return true; }
 
+    QMimeData *SWT_createMimeData();
+
     void setupTreeViewMenu(PropertyMenu * const menu);
 
     void drawCanvasControls(SkCanvas * const canvas,
@@ -76,13 +78,6 @@ public:
         const auto newKey = enve::make_shared<SmartPathKey>(this);
         newKey->setRelFrame(relFrame);
         deepCopySmartPathFromRelFrame(relFrame, newKey->getValue());
-        anim_appendKey(newKey);
-    }
-
-    void anim_saveCurrentValueAsKey() {
-        if(anim_getKeyOnCurrentFrame()) return;
-        const auto newKey = enve::make_shared<SmartPathKey>(
-                    mBaseValue, anim_getCurrentRelFrame(), this);
         anim_appendKey(newKey);
     }
 
@@ -374,8 +369,10 @@ public:
     }
 
     void setMode(const Mode mode) {
+        if(mMode == mode) return;
         mMode = mode;
         prp_afterWholeInfluenceRangeChanged();
+        emit pathBlendModeChagned(mode);
     }
 
     Mode getMode() const { return mMode; }
@@ -425,6 +422,8 @@ public:
         }
         anim_updateAfterChangedKey(key);
     }
+signals:
+    void pathBlendModeChagned(Mode);
 protected:
     SmartPath& getBaseValue() {
         return mBaseValue;

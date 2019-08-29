@@ -21,9 +21,9 @@
 class NonAnimatedMovablePoint : public MovablePoint {
     e_OBJECT
 protected:
-    NonAnimatedMovablePoint(const MovablePointType &type);
+    NonAnimatedMovablePoint(const MovablePointType type);
     NonAnimatedMovablePoint(BasicTransformAnimator * const trans,
-                            const MovablePointType &type);
+                            const MovablePointType type);
 public:
     QPointF getRelativePos() const;
     void setRelativePos(const QPointF &relPos);

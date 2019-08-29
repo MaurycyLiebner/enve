@@ -309,9 +309,10 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
     } else if(event->type() == QEvent::KeyRelease) {
         return !mTextEdit;
     } else if(event->type() == QEvent::MouseButtonPress) {
+        const auto mouseEvent = static_cast<QMouseEvent*>(event);
+        if(mouseEvent->button() == Qt::RightButton) return false;
         mMouseMoved = false;
         mMovesCount = 0;
-        const auto mouseEvent = static_cast<QMouseEvent*>(event);
         if(mTextEdit) {
             if(!rect().contains(mouseEvent->pos()) ) {
                 finishTextEditing();
@@ -325,6 +326,8 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
         }
         return !mTextEdit;
     } else if(event->type() == QEvent::MouseButtonRelease) {
+        const auto mouseEvent = static_cast<QMouseEvent*>(event);
+        if(mouseEvent->button() == Qt::RightButton) return false;
         if(!mTextEdit) {
             Actions::sInstance->finishSmoothChange();
             if(mMouseMoved) {
@@ -342,6 +345,8 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
         }
         return !mTextEdit;
     } else if(event->type() == QEvent::MouseMove) {
+        const auto mouseEvent = static_cast<QMouseEvent*>(event);
+        if(!(mouseEvent->buttons() & Qt::LeftButton)) return false;
         if(!mTextEdit) {
             mMovesCount++;
             if(mMovesCount > 2) {

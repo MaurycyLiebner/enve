@@ -51,7 +51,7 @@ void PaintTarget::setPaintDrawable(DrawableAutoTiledSurface * const surf) {
 void PaintTarget::setPaintBox(PaintBox * const box) {
     if(box == mPaintDrawableBox) return;
     if(mPaintDrawableBox) {
-        mPaintDrawableBox->setVisibleForCanvas(true);
+        mPaintDrawableBox->setVisibleForScene(true);
         QObject::disconnect(mPaintAnimSurface,
                             &AnimatedSurface::currentSurfaceChanged,
                             mCanvas, nullptr);
@@ -59,7 +59,7 @@ void PaintTarget::setPaintBox(PaintBox * const box) {
     }
     mPaintDrawableBox = box;
     if(mPaintDrawableBox) {
-        mPaintDrawableBox->setVisibleForCanvas(false);
+        mPaintDrawableBox->setVisibleForScene(false);
         mPaintAnimSurface = mPaintDrawableBox->getSurface();
         const auto setter = [this](DrawableAutoTiledSurface * const surf) {
             setPaintDrawable(surf);

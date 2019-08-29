@@ -19,6 +19,7 @@
 #include "staticcomplexanimator.h"
 
 class eEffect : public StaticComplexAnimator {
+    Q_OBJECT
 public:
     eEffect(const QString &name);
 
@@ -30,6 +31,8 @@ public:
     void switchVisible();
     void setVisible(const bool visible);
     bool isVisible() const;
+signals:
+    void effectVisibilityChanged(bool);
 private:
     bool mVisible = true;
 };

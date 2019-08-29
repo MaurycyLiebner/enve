@@ -208,7 +208,6 @@ protected:
     }
 public:
     virtual void anim_addKeyAtRelFrame(const int relFrame) = 0;
-    virtual void anim_saveCurrentValueAsKey() = 0;
     virtual stdsptr<Key> createKey() = 0;
 
     virtual void anim_scaleTime(const int pivotAbsFrame,
@@ -252,6 +251,7 @@ public:
                                   const bool clip = true);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 public:
+    void anim_saveCurrentValueAsKey();
     void anim_appendKey(const stdsptr<Key> &newKey);
     void anim_removeKey(const stdsptr<Key>& keyToRemove);
     void anim_removeAllKeysFromComplexAnimator(ComplexAnimator *target);
@@ -367,6 +367,7 @@ private:
     int anim_mCurrentAbsFrame = 0;
     int anim_mCurrentRelFrame = 0;
 signals:
+    void anim_changedKeyOnCurrentFrame(Key*);
     void anim_isRecordingChanged();
     void anim_removedKey(Key*);
     void anim_addedKey(Key*);

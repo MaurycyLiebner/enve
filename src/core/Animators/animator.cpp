@@ -178,7 +178,6 @@ int Animator::anim_getNextKeyId(const int relFrame) const {
     return anim_getPrevAndNextKeyId(relFrame).second;
 }
 
-
 int Animator::anim_getKeyIndex(const Key * const key) const {
     int index = -1;
     for(int i = 0; i < anim_mKeys.count(); i++) {
@@ -358,8 +357,10 @@ void Animator::anim_removeAllKeys() {
 }
 
 void Animator::anim_setKeyOnCurrentFrame(Key* const key) {
+    if(key == anim_mKeyOnCurrentFrame) return;
     anim_mKeyOnCurrentFrame = key;
     anim_afterKeyOnCurrentFrameChanged(key);
+    emit anim_changedKeyOnCurrentFrame(key);
 }
 
 void Animator::anim_getKeysInRect(const QRectF &selectionRect,
@@ -449,6 +450,10 @@ FrameRange Animator::prp_getIdenticalRelRange(const int relFrame) const {
     }
 
     return {fId, lId};
+}
+
+void Animator::anim_saveCurrentValueAsKey() {
+    anim_addKeyAtRelFrame(anim_getCurrentRelFrame());
 }
 
 void Animator::anim_drawKey(QPainter * const p,

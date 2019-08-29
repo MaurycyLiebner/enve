@@ -25,6 +25,7 @@ class SmartPathAnimator;
 class SmartNodePoint;
 typedef DynamicComplexAnimator<SmartPathAnimator> SmartPathCollectionBase;
 class SmartPathCollection : public SmartPathCollectionBase {
+    Q_OBJECT
     e_OBJECT
 protected:
     SmartPathCollection();
@@ -54,13 +55,17 @@ public:
     void loadSkPath(const SkPath& path);
 
     void setFillType(const SkPath::FillType fillType) {
+        if(mFillType == fillType) return;
         mFillType = fillType;
         prp_afterWholeInfluenceRangeChanged();
+        emit fillTypeChanged(fillType);
     }
 
     SkPath::FillType getFillType() const {
         return mFillType;
     }
+signals:
+    void fillTypeChanged(SkPath::FillType);
 private:
     SkPath::FillType mFillType = SkPath::kWinding_FillType;
 };

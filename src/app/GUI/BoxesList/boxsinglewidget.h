@@ -132,7 +132,6 @@ private:
     ColorAnimatorButton *mColorButton;
     BoxTargetWidget *mBoxTargetWidget;
 
-    qptr<ComboBoxProperty> mLastComboBoxProperty;
     QWidget *mFillWidget;
     BoolPropertyWidget *mCheckBox;
     QHBoxLayout *mMainLayout;

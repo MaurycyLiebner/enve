@@ -35,10 +35,10 @@ class AnimatedPoint : public MovablePoint {
     e_OBJECT
 protected:
     AnimatedPoint(QPointFAnimator * const associatedAnimator,
-                  const MovablePointType &type);
+                  const MovablePointType type);
     AnimatedPoint(QPointFAnimator * const associatedAnimator,
                   BasicTransformAnimator * const trans,
-                  const MovablePointType &type);
+                  const MovablePointType type);
 public:    
     QPointF getRelativePos() const;
     void setRelativePos(const QPointF &relPos);

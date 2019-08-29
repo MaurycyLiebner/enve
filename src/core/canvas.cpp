@@ -740,8 +740,11 @@ void Canvas::deselectAllBoxesAction() {
 }
 
 void Canvas::selectAllPointsAction() {
+    const auto adder = [this](MovablePoint* const pt) {
+        addPointToSelection(pt);
+    };
     for(const auto& box : mSelectedBoxes)
-        box->selectAllCanvasPts(mSelectedPoints_d, mCurrentMode);
+        box->selectAllCanvasPts(adder, mCurrentMode);
 }
 
 void Canvas::selectOnlyLastPressedBox() {

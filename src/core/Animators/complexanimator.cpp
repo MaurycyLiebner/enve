@@ -296,14 +296,6 @@ QString ComplexAnimator::prp_getValueText() {
     return "";
 }
 
-void ComplexAnimator::anim_saveCurrentValueAsKey() {
-    for(const auto &property : ca_mChildAnimators) {
-        if(!property->SWT_isAnimator()) continue;
-        const auto anim = static_cast<Animator*>(property.get());
-        anim->anim_saveCurrentValueAsKey();
-    }
-}
-
 void ComplexAnimator::anim_setRecording(const bool rec) {
     for(const auto &property : ca_mChildAnimators) {
         if(!property->SWT_isAnimator()) continue;

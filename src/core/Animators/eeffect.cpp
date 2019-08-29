@@ -38,6 +38,7 @@ void eEffect::setVisible(const bool visible) {
     if(visible == mVisible) return;
     mVisible = visible;
     prp_afterWholeInfluenceRangeChanged();
+    emit effectVisibilityChanged(visible);
 }
 
 bool eEffect::isVisible() const {

@@ -24,8 +24,10 @@ bool BoolProperty::getValue() {
 }
 
 void BoolProperty::setValue(const bool value) {
+    if(mValue == value) return;
     mValue = value;
     prp_afterWholeInfluenceRangeChanged();
+    emit valueChanged(value);
 }
 
 void BoolProperty::writeProperty(eWriteStream& dst) const {
@@ -44,13 +46,14 @@ bool BoolPropertyContainer::getValue() {
 }
 
 void BoolPropertyContainer::setValue(const bool value) {
+    if(mValue == value) return;
     mValue = value;
     prp_afterWholeInfluenceRangeChanged();
 
     for(const auto& prop : ca_mChildAnimators) {
-        //prop->SWT_setVisible(value);
         prop->SWT_setDisabled(!value);
     }
+    emit valueChanged(value);
 }
 
 

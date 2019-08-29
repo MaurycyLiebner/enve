@@ -211,99 +211,56 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mColorButton->setContentsMargins(0, 3, 0, 3);
 
     mPropertyComboBox = new QComboBox(this);
+    connect(mPropertyComboBox, qOverload<int>(&QComboBox::activated),
+            this, [this](const int id) {
+        if(!mTarget) return;
+        const auto target = mTarget->getTarget();
+        if(!target->SWT_isComboBoxProperty()) return;
+        const auto comboBoxProperty = static_cast<ComboBoxProperty*>(target);
+        comboBoxProperty->setCurrentValue(id);
+        Document::sInstance->actionFinished();
+    });
     mMainLayout->addWidget(mPropertyComboBox);
 
     mBlendModeCombo = new QComboBox(this);
+    mBlendModeCombo->setFocusPolicy(Qt::NoFocus);
     mMainLayout->addWidget(mBlendModeCombo);
 
-//    mBlendModeCombo->addItems(QStringList() <<
-//                                    "Source Over" <<
-//                                    "Destination Over" <<
-//                                    "Clear" <<
-//                                    "Source" <<
-//                                    "Destination" <<
-//                                    "Source in" <<
-//                                    "Destination in" <<
-//                                    "Source Out" <<
-//                                    "Destination Out" <<
-//                                    "Source Atop" <<
-//                                    "Destination Atop" <<
-//                                    "Xor" <<
-//                                    "Plus" <<
-//                                    "Multiply" <<
-//                                    "Screen" <<
-//                                    "Overlay" <<
-//                                    "Darken" <<
-//                                    "Lighten" <<
-//                                    "Color Burn" <<
-//                                    "Hard Light" <<
-//                                    "Soft Light" <<
-//                                    "Difference" <<
-//                                    "Exclusion" <<
-//                                    "Source or Destination" <<
-//                                    "Source and Destination" <<
-//                                    "Source Xor Destination" <<
-//                                    "Not Source And Not Destination" <<
-//                                    "Not Source or Not Destination" <<
-//                                    "Not Source Xor Destination" <<
-//                                    "Not Source" <<
-//                                    "Not Source And Destination" <<
-//                                    "Source And Not Destination" <<
-//                                    "Not Source or Destination");
-    mBlendModeCombo->addItems(QStringList() <<
-                                    "SrcOver" <<
-                                    "DstOver" <<
-                                    "SrcIn" <<
-                                    "DstIn" <<
-                                    "SrcOut" <<
-                                    "DstOut" <<
-                                    "SrcATop" <<
-                                    "DstATop" <<
-                                    "Xor" <<
-                                    "Plus" <<
-                                    "Modulate" <<
-                                    "Screen" <<
-                                    "Overlay" <<
-                                    "Darken" <<
-                                    "Lighten" <<
-                                    "ColorDodge" <<
-                                    "ColorBurn" <<
-                                    "HardLight" <<
-                                    "SoftLight" <<
-                                    "Difference" <<
-                                    "Exclusion" <<
-                                    "Multiply" <<
-                                    "Hue" <<
-                                    "Saturation" <<
-                                    "Color" <<
-                                    "Luminosity");
-    mBlendModeCombo->insertSeparator(10);
-    mBlendModeCombo->insertSeparator(22);
+    for(int modeId = int(SkBlendMode::kSrcOver);
+        modeId <= int(SkBlendMode::kLastMode); modeId++) {
+        const auto mode = static_cast<SkBlendMode>(modeId);
+        if(mode == SkBlendMode::kSrcOut) continue;
+        if(mode == SkBlendMode::kSrcATop) continue;
+        if(mode == SkBlendMode::kDstATop) continue;
+        if(mode == SkBlendMode::kModulate) continue;
+        mBlendModeCombo->addItem(SkBlendMode_Name(mode), modeId);
+    }
+
+    mBlendModeCombo->insertSeparator(8);
+    mBlendModeCombo->insertSeparator(19);
     connect(mBlendModeCombo, qOverload<int>(&QComboBox::activated),
             this, &BoxSingleWidget::setCompositionMode);
-    mBlendModeCombo->setSizePolicy(QSizePolicy::Maximum,
-                    mBlendModeCombo->sizePolicy().horizontalPolicy());
+    mBlendModeCombo->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
 
     mPathBlendModeCombo = new QComboBox(this);
+    mPathBlendModeCombo->setFocusPolicy(Qt::NoFocus);
     mMainLayout->addWidget(mPathBlendModeCombo);
     mPathBlendModeCombo->addItems(QStringList() << "Normal" <<
                                   "Add" << "Remove" << "Remove reverse" <<
                                   "Intersect" << "Exclude" << "Divide");
     connect(mPathBlendModeCombo, qOverload<int>(&QComboBox::activated),
             this, &BoxSingleWidget::setPathCompositionMode);
-    mPathBlendModeCombo->setSizePolicy(QSizePolicy::Maximum,
-                    mPathBlendModeCombo->sizePolicy().horizontalPolicy());
+    mPathBlendModeCombo->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
 
     mFillTypeCombo = new QComboBox(this);
+    mFillTypeCombo->setFocusPolicy(Qt::NoFocus);
     mMainLayout->addWidget(mFillTypeCombo);
     mFillTypeCombo->addItems(QStringList() << "Winding" << "Even-odd");
     connect(mFillTypeCombo, qOverload<int>(&QComboBox::activated),
             this, &BoxSingleWidget::setFillType);
-    mFillTypeCombo->setSizePolicy(QSizePolicy::Maximum,
-                    mFillTypeCombo->sizePolicy().horizontalPolicy());
+    mFillTypeCombo->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
 
-    mPropertyComboBox->setSizePolicy(QSizePolicy::Maximum,
-                                     mPropertyComboBox->sizePolicy().horizontalPolicy());
+    mPropertyComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
     mBoxTargetWidget = new BoxTargetWidget(this);
     mMainLayout->addWidget(mBoxTargetWidget);
 
@@ -315,81 +272,21 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     hide();
 }
 
-SkBlendMode idToBlendModeSk(const int id) {
-    switch(id) {
-        case 0: return SkBlendMode::kSrcOver;
-        case 1: return SkBlendMode::kDstOver;
-        case 2: return SkBlendMode::kSrcIn;
-        case 3: return SkBlendMode::kDstIn;
-        case 4: return SkBlendMode::kSrcOut;
-        case 5: return SkBlendMode::kDstOut;
-        case 6: return SkBlendMode::kSrcATop;
-        case 7: return SkBlendMode::kDstATop;
-        case 8: return SkBlendMode::kXor;
-        case 9: return SkBlendMode::kPlus;
-        case 10: return SkBlendMode::kModulate;
-        case 11: return SkBlendMode::kScreen;
-        case 12: return SkBlendMode::kOverlay;
-        case 13: return SkBlendMode::kDarken;
-        case 14: return SkBlendMode::kLighten;
-        case 15: return SkBlendMode::kColorDodge;
-        case 16: return SkBlendMode::kColorBurn;
-        case 17: return SkBlendMode::kHardLight;
-        case 18: return SkBlendMode::kSoftLight;
-        case 19: return SkBlendMode::kDifference;
-        case 20: return SkBlendMode::kExclusion;
-        case 21: return SkBlendMode::kMultiply;
-        case 22: return SkBlendMode::kHue;
-        case 23: return SkBlendMode::kSaturation;
-        case 24: return SkBlendMode::kColor;
-        case 25: return SkBlendMode::kLuminosity;
-        default: return SkBlendMode::kSrcOver;
-    }
-}
-
-int blendModeToIntSk(const SkBlendMode mode) {
-    switch(mode) {
-        case SkBlendMode::kSrcOver: return 0;
-        case SkBlendMode::kDstOver: return 1;
-        case SkBlendMode::kSrcIn: return 2;
-        case SkBlendMode::kDstIn: return 3;
-        case SkBlendMode::kSrcOut: return 4;
-        case SkBlendMode::kDstOut: return 5;
-        case SkBlendMode::kSrcATop: return 6;
-        case SkBlendMode::kDstATop: return 7;
-        case SkBlendMode::kXor: return 8;
-        case SkBlendMode::kPlus: return 9;
-        case SkBlendMode::kModulate: return 10;
-        case SkBlendMode::kScreen: return 11;
-        case SkBlendMode::kOverlay: return 12;
-        case SkBlendMode::kDarken: return 13;
-        case SkBlendMode::kLighten: return 14;
-        case SkBlendMode::kColorDodge: return 15;
-        case SkBlendMode::kColorBurn: return 16;
-        case SkBlendMode::kHardLight: return 17;
-        case SkBlendMode::kSoftLight: return 18;
-        case SkBlendMode::kDifference: return 19;
-        case SkBlendMode::kExclusion: return 20;
-        case SkBlendMode::kMultiply: return 21;
-        case SkBlendMode::kHue: return 22;
-        case SkBlendMode::kSaturation: return 23;
-        case SkBlendMode::kColor: return 24;
-        case SkBlendMode::kLuminosity: return 25;
-        default: return 0;
-    }
-}
-
 void BoxSingleWidget::setCompositionMode(const int id) {
+    if(!mTarget) return;
     const auto target = mTarget->getTarget();
 
     if(target->SWT_isBoundingBox()) {
         const auto boxTarget = static_cast<BoundingBox*>(target);
-        boxTarget->setBlendModeSk(idToBlendModeSk(id));
+        const int modeId = mBlendModeCombo->itemData(id).toInt();
+        const auto mode = static_cast<SkBlendMode>(modeId);
+        boxTarget->setBlendModeSk(mode);
     }
     Document::sInstance->actionFinished();
 }
 
 void BoxSingleWidget::setPathCompositionMode(const int id) {
+    if(!mTarget) return;
     const auto target = mTarget->getTarget();
 
     if(target->SWT_isSmartPathAnimator()) {
@@ -400,6 +297,7 @@ void BoxSingleWidget::setPathCompositionMode(const int id) {
 }
 
 void BoxSingleWidget::setFillType(const int id) {
+    if(!mTarget) return;
     const auto target = mTarget->getTarget();
 
     if(target->SWT_isSmartPathCollection()) {
@@ -429,9 +327,15 @@ void BoxSingleWidget::clearAndHideValueAnimators() {
 }
 
 void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
+    if(mTarget) {
+        const auto oldTarget = mTarget->getTarget();
+        disconnect(oldTarget, nullptr, this, nullptr);
+    }
     SingleWidget::setTargetAbstraction(abs);
+    if(!abs) return;
     auto target = abs->getTarget();
-
+    connect(target, &SingleWidgetTarget::SWT_changedDisabled,
+            this, qOverload<>(&QWidget::update));
     mContentButton->setVisible(target->SWT_isComplexAnimator());
     mRecordButton->setVisible(target->SWT_isAnimator() &&
                               !target->SWT_isBoundingBox() &&
@@ -466,35 +370,32 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         const auto boxPtr = static_cast<BoundingBox*>(target);
 
         mBlendModeVisible = true;
-        mBlendModeCombo->setCurrentIndex(
-            blendModeToIntSk(boxPtr->getBlendMode()));
+        mBlendModeCombo->setCurrentText(SkBlendMode_Name(boxPtr->getBlendMode()));
         mBlendModeCombo->setEnabled(!target->SWT_isGroupBox());
+        connect(boxPtr, &BoundingBox::blendModeChanged,
+                this, [this](const SkBlendMode mode) {
+            mBlendModeCombo->setCurrentText(SkBlendMode_Name(mode));
+        });
     } else if(target->SWT_isSingleSound()) {
     } else if(target->SWT_isBoolProperty()) {
-        mCheckBox->setTarget(static_cast<BoolProperty*>(target));
+        const auto bTarget = static_cast<BoolProperty*>(target);
+        mCheckBox->setTarget(bTarget);
+        connect(bTarget, &BoolProperty::valueChanged,
+                this, [this]() { mCheckBox->update(); });
     } else if(target->SWT_isBoolPropertyContainer()) {
-        mCheckBox->setTarget(static_cast<BoolPropertyContainer*>(target));
+        const auto bTarget = static_cast<BoolPropertyContainer*>(target);
+        mCheckBox->setTarget(bTarget);
+        connect(bTarget, &BoolPropertyContainer::valueChanged,
+                this, [this]() { mCheckBox->update(); });
     } else if(target->SWT_isComboBoxProperty()) {
-        disconnect(mPropertyComboBox, nullptr, nullptr, nullptr);
-        if(mLastComboBoxProperty.data() != nullptr) {
-            disconnect(mLastComboBoxProperty.data(), nullptr,
-                       mPropertyComboBox, nullptr);
-        }
-        auto comboBoxProperty = static_cast<ComboBoxProperty*>(target);
-        mLastComboBoxProperty = comboBoxProperty;
+        const auto comboBoxProperty = static_cast<ComboBoxProperty*>(target);
         mPropertyComboBox->clear();
         mPropertyComboBox->addItems(comboBoxProperty->getValueNames());
-        mPropertyComboBox->setCurrentIndex(
-                    comboBoxProperty->getCurrentValue());
-        connect(mPropertyComboBox,
-                qOverload<int>(&QComboBox::activated),
-                comboBoxProperty, &ComboBoxProperty::setCurrentValue);
+        mPropertyComboBox->setCurrentIndex(comboBoxProperty->getCurrentValue());
         connect(comboBoxProperty, &ComboBoxProperty::valueChanged,
-                mPropertyComboBox, &QComboBox::setCurrentIndex);
-        connect(mPropertyComboBox,
-                qOverload<int>(&QComboBox::activated),
-                Document::sInstance,
-                &Document::actionFinished);
+                this, [this](const int id) {
+            mPropertyComboBox->setCurrentIndex(id);
+        });
     } else if(target->SWT_isIntProperty() || target->SWT_isQrealAnimator()) {
         if(target->SWT_isQrealAnimator())
             mValueSlider->setTarget(static_cast<QrealAnimator*>(target));
@@ -509,6 +410,10 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
             const auto coll = static_cast<SmartPathCollection*>(target);
             mFillTypeVisible = true;
             mFillTypeCombo->setCurrentIndex(coll->getFillType());
+            connect(coll, &SmartPathCollection::fillTypeChanged,
+                    this, [this](const SkPath::FillType type) {
+                mFillTypeCombo->setCurrentIndex(type);
+            });
         }
         if(target->SWT_isComplexAnimator() && !abs->contentVisible()) {
             if(target->SWT_isQPointFAnimator()) {
@@ -532,10 +437,33 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
             }
         }
     } else if(target->SWT_isBoxTargetProperty()) {
-        mBoxTargetWidget->setTargetProperty(
-                    static_cast<BoxTargetProperty*>(target));
+        mBoxTargetWidget->setTargetProperty(static_cast<BoxTargetProperty*>(target));
     } else if(target->SWT_isSmartPathAnimator()) {
+        const auto path = static_cast<SmartPathAnimator*>(target);
         mPathBlendModeVisible = true;
+        mPathBlendModeCombo->setCurrentIndex(path->getMode());
+        connect(path, &SmartPathAnimator::pathBlendModeChagned,
+                this, [this](const SmartPathAnimator::Mode mode) {
+            mPathBlendModeCombo->setCurrentIndex(mode);
+        });
+    }
+
+    if(target->SWT_isAnimator()) {
+        connect(static_cast<Animator*>(target), &Animator::anim_isRecordingChanged,
+                this, [this]() { mRecordButton->update(); });
+    }
+    if(target->SWT_isPathEffect() || target->SWT_isRasterEffect()) {
+        const auto effTarget = static_cast<eEffect*>(target);
+        connect(effTarget, &eEffect::effectVisibilityChanged,
+                this, [this]() { mVisibleButton->update(); });
+    } else if(target->SWT_isBoundingBox() || target->SWT_isSound()) {
+        const auto ptr = static_cast<eBoxOrSound*>(target);
+        connect(ptr, &eBoxOrSound::visibilityChanged,
+                this, [this]() { mVisibleButton->update(); });
+        connect(ptr, &eBoxOrSound::selectionChanged,
+                this, qOverload<>(&QWidget::update));
+        connect(ptr, &eBoxOrSound::lockedChanged,
+                this, [this]() { mLockedButton->update(); });
     }
 
     mValueSlider->setVisible(valueSliderVisible);
@@ -679,7 +607,7 @@ void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e) {
 void BoxSingleWidget::drawTimelineControls(QPainter * const p,
                                const qreal pixelsPerFrame,
                                const FrameRange &viewedFrames) {
-    if(isHidden()) return;
+    if(isHidden() || !mTarget) return;
     const auto target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
         const auto anim_target = static_cast<Animator*>(target);
@@ -691,7 +619,7 @@ void BoxSingleWidget::drawTimelineControls(QPainter * const p,
 Key* BoxSingleWidget::getKeyAtPos(const int pressX,
                                   const qreal pixelsPerFrame,
                                   const int minViewedFrame) {
-    if(isHidden()) return nullptr;
+    if(isHidden() || !mTarget) return nullptr;
     const auto target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
         const auto anim_target = static_cast<Animator*>(target);
@@ -707,7 +635,7 @@ TimelineMovable* BoxSingleWidget::getRectangleMovableAtPos(
                             const int pressX,
                             const qreal pixelsPerFrame,
                             const int minViewedFrame) {
-    if(isHidden()) return nullptr;
+    if(isHidden() || !mTarget) return nullptr;
     const auto target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
         const auto anim_target = static_cast<Animator*>(target);
@@ -722,7 +650,7 @@ TimelineMovable* BoxSingleWidget::getRectangleMovableAtPos(
 void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
                                     const qreal pixelsPerFrame,
                                     QList<Key*>& listKeys) {
-    if(isHidden()) return;
+    if(isHidden() || !mTarget) return;
     const auto target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
         const auto anim_target = static_cast<Animator*>(target);
@@ -811,12 +739,14 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
 }
 
 void BoxSingleWidget::switchContentVisibleAction() {
+    if(!mTarget) return;
     mTarget->switchContentVisible();
     Document::sInstance->actionFinished();
     //mParent->callUpdaters();
 }
 
 void BoxSingleWidget::switchRecordingAction() {
+    if(!mTarget) return;
     const auto target = mTarget->getTarget();
     if(!target) return;
     if(!target->SWT_isAnimator()) return;
@@ -827,6 +757,7 @@ void BoxSingleWidget::switchRecordingAction() {
 }
 
 void BoxSingleWidget::switchBoxVisibleAction() {
+    if(!mTarget) return;
     const auto target = mTarget->getTarget();
     if(!target) return;
     if(target->SWT_isBoundingBox() || target->SWT_isSound()) {
@@ -841,6 +772,7 @@ void BoxSingleWidget::switchBoxVisibleAction() {
 }
 
 void BoxSingleWidget::switchBoxLockedAction() {
+    if(!mTarget) return;
     static_cast<BoundingBox*>(mTarget->getTarget())->switchLocked();
     Document::sInstance->actionFinished();
     update();

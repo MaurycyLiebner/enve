@@ -19,6 +19,7 @@
 #include "property.h"
 
 class BoolProperty : public Property {
+    Q_OBJECT
     e_OBJECT
 protected:
     BoolProperty(const QString& name);
@@ -29,12 +30,15 @@ public:
     void writeProperty(eWriteStream& dst) const;
     void readProperty(eReadStream& src);
     void setValue(const bool value);
+signals:
+    void valueChanged(bool);
 private:
     bool mValue = false;
 };
 
 #include "../Animators/staticcomplexanimator.h"
 class BoolPropertyContainer : public StaticComplexAnimator {
+    Q_OBJECT
     e_OBJECT
 protected:
     BoolPropertyContainer(const QString& name);
@@ -49,6 +53,8 @@ public:
     using ComplexAnimator::ca_addChild;
     using ComplexAnimator::ca_insertChild;
     using ComplexAnimator::ca_prependChildAnimator;
+signals:
+    void valueChanged(bool);
 private:
     bool mValue = false;
 };

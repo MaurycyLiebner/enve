@@ -70,6 +70,7 @@ struct SWT_RulesCollection {
 };
 
 class SingleWidgetTarget : public SelfRef {
+    Q_OBJECT
 public:
     SingleWidgetTarget() {}
     virtual void SWT_setupAbstraction(
@@ -175,8 +176,6 @@ public:
     void SWT_addChildAt(SingleWidgetTarget * const child, const int id);
     void SWT_removeChild(SingleWidgetTarget * const child);
 
-
-
     SWT_Abstraction *SWT_createAbstraction(
             const UpdateFuncs &updateFuncs,
             const int visiblePartWidgetId);
@@ -221,7 +220,9 @@ public:
     void SWT_setVisible(const bool bT) {
         if(SWT_mVisible == bT) return;
         SWT_mVisible = bT;
-        SWT_afterContentVisibilityChanged();
+        for(const auto &swa : SWT_mAllAbstractions) {
+            swa.second->afterContentVisibilityChanged();
+        }
     }
 
     void SWT_setEnabled(const bool enabled) {
@@ -232,6 +233,7 @@ public:
         if(SWT_mDisabled == disable) return;
         SWT_mDisabled = disable;
         SWT_setChildrenAncestorDisabled(SWT_isDisabled());
+        emit SWT_changedDisabled(SWT_isDisabled());
     }
 
     void SWT_disable() {
@@ -250,12 +252,14 @@ public:
         return SWT_mDisabled || SWT_mAncestorDisabled;
     }
 
-    void SWT_setAncestorDisabled(const bool bT) {
-        SWT_mAncestorDisabled = bT;
+    void SWT_setAncestorDisabled(const bool disabled) {
+        if(SWT_mAncestorDisabled == disabled) return;
+        SWT_mAncestorDisabled = disabled;
         SWT_setChildrenAncestorDisabled(SWT_isDisabled());
+        emit SWT_changedDisabled(SWT_isDisabled());
     }
-
-    void SWT_afterContentVisibilityChanged();
+signals:
+    void SWT_changedDisabled(bool);
 private:
     bool SWT_mAncestorDisabled = false;
     bool SWT_mVisible = true;

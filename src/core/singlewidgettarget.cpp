@@ -65,9 +65,3 @@ void SingleWidgetTarget::SWT_moveChildTo(
         abs.second->moveChildTo(child, id);
     }
 }
-
-void SingleWidgetTarget::SWT_afterContentVisibilityChanged() {
-    for(const auto &swa : SWT_mAllAbstractions) {
-        swa.second->afterContentVisibilityChanged();
-    }
-}

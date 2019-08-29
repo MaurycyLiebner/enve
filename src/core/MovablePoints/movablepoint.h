@@ -42,10 +42,12 @@ typedef TypeMenu<MovablePoint> PointTypeMenu;
 class MovablePoint : public StdSelfRef {
     e_OBJECT
 protected:
-    MovablePoint(const MovablePointType &type);
+    MovablePoint(const MovablePointType type);
     MovablePoint(BasicTransformAnimator * const trans,
-                 const MovablePointType &type);
+                 const MovablePointType type);
 public:
+    typedef std::function<void(MovablePoint*)> Adder;
+
     virtual QPointF getRelativePos() const = 0;
     virtual void setRelativePos(const QPointF &relPos) = 0;
 
@@ -80,7 +82,7 @@ public:
 
     virtual void rectPointsSelection(const QRectF &absRect,
                                      const CanvasMode mode,
-                                     QList<MovablePoint*> &list);
+                                     const Adder &adder);
 
     virtual void setTransform(BasicTransformAnimator * const trans);
 

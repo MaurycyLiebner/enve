@@ -26,59 +26,26 @@ class PointsHandler : public StdSelfRef {
 protected:
     PointsHandler();
 public:
-    void insertPt(const int id, const stdsptr<MovablePoint>& pt) {
-        pt->setTransform(mTrans);
-        mPts.insert(id, pt);
-    }
+    void insertPt(const int id, const stdsptr<MovablePoint>& pt);
 
-    void appendPt(const stdsptr<MovablePoint>& pt) {
-        return insertPt(mPts.count(), pt);
-    }
+    void appendPt(const stdsptr<MovablePoint>& pt);
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode mode,
-                                   const qreal invScale) {
-        for(int i = mPts.count() - 1; i >= 0; i--) {
-            const auto& pt = mPts.at(i);
-            const auto at = pt->getPointAtAbsPos(absPos, mode, invScale);
-            if(at) return at;
-        }
-        return nullptr;
-    }
+                                   const qreal invScale);
 
-    void addAllPointsToSelection(QList<MovablePoint*> &selection,
-                                 const CanvasMode mode) {
-        for(const auto& pt : mPts) {
-            if(pt->isSelected() || pt->isHidden(mode)) continue;
-            if(pt->selectionEnabled()) {
-                pt->select();
-                selection << pt.get();
-            }
-        }
-    }
+    void addAllPointsToSelection(const MovablePoint::Adder &adder,
+                                 const CanvasMode mode) const;
 
     void addInRectForSelection(const QRectF &absRect,
-                               QList<MovablePoint*> &selection,
-                               const CanvasMode mode) const {
-        for(const auto& pt : mPts) {
-            if(!pt->selectionEnabled()) continue;
-            if(pt->isSelected() || pt->isHidden(mode)) continue;
-            pt->rectPointsSelection(absRect, mode, selection);
-        }
-    }
+                               const MovablePoint::Adder &adder,
+                               const CanvasMode mode) const;
 
     void drawPoints(SkCanvas * const canvas,
                     const float invScale,
                     const bool keyOnCurrentFrame,
                     const CanvasMode mode,
-                    const bool ctrlPressed) const {
-        for(int i = mPts.count() - 1; i >= 0; i--) {
-            const auto& pt = mPts.at(i);
-            if(pt->isVisible(mode))
-                pt->drawSk(canvas, mode, invScale,
-                           keyOnCurrentFrame, ctrlPressed);
-        }
-    }
+                    const bool ctrlPressed) const;
 
     template <class T>
     T* getPointWithId(const int id) const {
@@ -87,34 +54,18 @@ public:
         return static_cast<T*>(mPts.at(id).get());
     }
 
-    void removeLast() { mPts.removeLast(); }
-    void removeAt(const int id) { mPts.removeAt(id); }
-    void clear() { mPts.clear(); }
+    void removeLast();
+    void removeAt(const int id);
+    void clear();
 
-    bool isEmpty() const { return mPts.isEmpty(); }
-    int count() const { return mPts.count(); }
+    bool isEmpty() const;
+    int count() const;
 
-    void move(const int from, const int to) {
-        mPts.move(from, to);
-    }
+    void move(const int from, const int to);
 
-    BasicTransformAnimator * transform() const {
-        return mTrans;
-    }
+    BasicTransformAnimator * transform() const;
 
-    void setTransform(BasicTransformAnimator * const trans) {
-        if(trans == mTrans) return;
-        for(const auto& pt : mPts) pt->setTransform(trans);
-        mTrans = trans;
-    }
-//protected:
-//    QList<stdsptr<MovablePoint>>::const_iterator begin() const {
-//        return mPts.begin();
-//    }
-
-//    QList<stdsptr<MovablePoint>>::const_iterator end() const {
-//        return mPts.end();
-//    }
+    void setTransform(BasicTransformAnimator * const trans);
 private:
     BasicTransformAnimator * mTrans = nullptr;
     QList<stdsptr<MovablePoint>> mPts;

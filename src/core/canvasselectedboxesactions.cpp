@@ -364,8 +364,8 @@ void Canvas::addBoxToSelection(BoundingBox * const box) {
         if(!visible) removeBoxFromSelection(box);
     });
     connCtx << connect(box, &BoundingBox::parentChanged,
-                       this, [this, box](const bool visible) {
-        if(!visible) removeBoxFromSelection(box);
+                       this, [this, box]() {
+        removeBoxFromSelection(box);
     });
 
     box->select();

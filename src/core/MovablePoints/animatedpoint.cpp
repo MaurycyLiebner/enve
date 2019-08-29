@@ -20,13 +20,13 @@
 
 AnimatedPoint::AnimatedPoint(
         QPointFAnimator * const associatedAnimator,
-        const MovablePointType &type) :
+        const MovablePointType type) :
     MovablePoint(type),
     mAssociatedAnimator_k(associatedAnimator) {}
 
 AnimatedPoint::AnimatedPoint(QPointFAnimator * const associatedAnimator,
                              BasicTransformAnimator * const trans,
-                             const MovablePointType &type) :
+                             const MovablePointType type) :
     AnimatedPoint(associatedAnimator, type) {
     setTransform(trans);
 }

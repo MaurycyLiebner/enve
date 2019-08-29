@@ -365,15 +365,16 @@ void eBoxOrSound::unlock() {
     setLocked(false);
 }
 
-void eBoxOrSound::setLocked(const bool bt) {
-    if(bt == mLocked) return;
+void eBoxOrSound::setLocked(const bool locked) {
+    if(locked == mLocked) return;
     if(mParentScene && mSelected && SWT_isBoundingBox()) {
         const auto bb = static_cast<BoundingBox*>(this);
         mParentScene->removeBoxFromSelection(bb);
     }
-    mLocked = bt;
+    mLocked = locked;
     SWT_scheduleContentUpdate(SWT_BR_LOCKED);
     SWT_scheduleContentUpdate(SWT_BR_UNLOCKED);
+    emit lockedChanged(locked);
 }
 
 void eBoxOrSound::moveUp() {

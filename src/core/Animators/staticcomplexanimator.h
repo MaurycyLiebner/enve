@@ -33,10 +33,6 @@ public:
     }
 
 private:
-    //    using ComplexAnimator::ca_addChildAnimator;
-    //    using ComplexAnimator::ca_insertChildAnimator;
-    //    using ComplexAnimator::ca_prependChildAnimator;
-
     using ComplexAnimator::ca_removeAllChildAnimators;
     using ComplexAnimator::ca_removeChild;
     using ComplexAnimator::ca_replaceChildAnimator;

@@ -47,12 +47,14 @@ public:
         return true;
     }
 
-    void insertChild(const qsptr<T>& child, const int index) {
-        ca_insertChild(child, index);
+    void insertChild(const qsptr<T>& newChild, const int index) {
+        clearOldParent(newChild);
+        ca_insertChild(newChild, index);
     }
 
-    void addChild(const qsptr<T>& child) {
-        ca_addChild(child);
+    void addChild(const qsptr<T>& newChild) {
+        clearOldParent(newChild);
+        ca_addChild(newChild);
     }
 
     void removeChild(const qsptr<T>& child) {
@@ -68,10 +70,12 @@ public:
     }
 
     void prependChild(T * const oldChild, const qsptr<T>& newChild) {
+        clearOldParent(newChild);
         ca_prependChildAnimator(oldChild, newChild);
     }
 
     void replaceChild(const qsptr<T>& oldChild, const qsptr<T> &newChild) {
+        clearOldParent(newChild);
         ca_replaceChildAnimator(oldChild, newChild);
     }
 
@@ -84,6 +88,12 @@ private:
     using ComplexAnimator::ca_removeChild;
     using ComplexAnimator::ca_replaceChildAnimator;
     using ComplexAnimator::ca_takeChildAt;
+
+    void clearOldParent(const qsptr<T>& futureChild) {
+        const auto oldParent = futureChild->template getParent
+                <DynamicComplexAnimatorBase<T>>();
+        if(oldParent) oldParent->removeChild(futureChild);
+    }
 };
 
 template <class T>

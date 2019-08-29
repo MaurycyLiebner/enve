@@ -288,14 +288,6 @@ void QrealAnimator::anim_setAbsFrame(const int frame) {
     if(changed) prp_afterChangedCurrent(UpdateReason::frameChange);
 }
 
-void QrealAnimator::anim_saveCurrentValueAsKey() {
-    if(anim_getKeyOnCurrentFrame()) return;
-    const auto newKey = enve::make_shared<QrealKey>(mCurrentBaseValue,
-                                             anim_getCurrentRelFrame(),
-                                             this);
-    anim_appendKey(newKey);
-}
-
 void QrealAnimator::anim_addKeyAtRelFrame(const int relFrame) {
     if(anim_getKeyAtRelFrame(relFrame)) return;
     const qreal value = getBaseValue(relFrame);

@@ -61,7 +61,6 @@ public:
                                     const FrameRange& newAbsRange);
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
-    void anim_saveCurrentValueAsKey();
     bool anim_isDescendantRecording() const;
     virtual void ca_removeAllChildAnimators();
 

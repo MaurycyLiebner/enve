@@ -16,12 +16,12 @@
 
 #include "nonanimatedmovablepoint.h"
 
-NonAnimatedMovablePoint::NonAnimatedMovablePoint(const MovablePointType &type) :
+NonAnimatedMovablePoint::NonAnimatedMovablePoint(const MovablePointType type) :
     MovablePoint(type) {}
 
 NonAnimatedMovablePoint::NonAnimatedMovablePoint(
         BasicTransformAnimator * const trans,
-        const MovablePointType &type) : NonAnimatedMovablePoint(type) {
+        const MovablePointType type) : NonAnimatedMovablePoint(type) {
     setTransform(trans);
 }
 

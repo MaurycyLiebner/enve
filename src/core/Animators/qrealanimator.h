@@ -63,7 +63,6 @@ public:
     void writeProperty(eWriteStream& dst) const;
     void readProperty(eReadStream& src);
     stdsptr<Key> createKey();
-    void anim_saveCurrentValueAsKey();
 protected:
     void graph_getValueConstraints(GraphKey *key, const QrealPointType type,
                                    qreal &minMoveValue, qreal &maxMoveValue) const;

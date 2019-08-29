@@ -82,7 +82,7 @@ void BoundingBox::writeBoundingBox(eWriteStream& dst) {
     eBoxOrSound::writeProperty(dst);
     dst << prp_mName;
     dst << mWriteId;
-    dst.write(&mBlendModeSk, sizeof(SkBlendMode));
+    dst.write(&mBlendMode, sizeof(SkBlendMode));
 }
 
 void BoundingBox::readBoundingBox(eReadStream& src) {
@@ -91,7 +91,7 @@ void BoundingBox::readBoundingBox(eReadStream& src) {
     src >> name;
     prp_setName(name);
     src >> mReadId;
-    src.read(&mBlendModeSk, sizeof(SkBlendMode));
+    src.read(&mBlendMode, sizeof(SkBlendMode));
 
     BoundingBox::sAddReadBox(this);
 }
@@ -239,22 +239,24 @@ NormalSegment BoundingBox::getNormalSegment(const QPointF &absPos,
 void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
                                const SkFilterQuality filter) {
     const qreal opacity = mTransformAnimator->getOpacity();
-    if(isZero4Dec(opacity) || !mVisibleForCanvas) return;
+    if(isZero4Dec(opacity) || !mVisibleInScene) return;
     SkPaint paint;
     const int intAlpha = qRound(opacity*2.55);
     paint.setAlpha(static_cast<U8CPU>(intAlpha));
-    paint.setBlendMode(mBlendModeSk);
+    paint.setBlendMode(mBlendMode);
     paint.setFilterQuality(filter);
     mDrawRenderContainer.drawSk(canvas, &paint);
 }
 
 void BoundingBox::setBlendModeSk(const SkBlendMode blendMode) {
-    mBlendModeSk = blendMode;
+    if(mBlendMode == blendMode) return;
+    mBlendMode = blendMode;
     prp_afterWholeInfluenceRangeChanged();
+    emit blendModeChanged(blendMode);
 }
 
 SkBlendMode BoundingBox::getBlendMode() {
-    return mBlendModeSk;
+    return mBlendMode;
 }
 
 void BoundingBox::resetScale() {
@@ -894,21 +896,22 @@ void BoundingBox::sClearReadBoxes() {
 }
 
 void BoundingBox::selectAndAddContainedPointsToList(
-        const QRectF &absRect, QList<MovablePoint*> &selection,
+        const QRectF &absRect,
+        const MovablePoint::Adder &adder,
         const CanvasMode mode) {
     for(const auto& desc : mCanvasProps) {
         const auto handler = desc->getPointsHandler();
         if(!handler) continue;
-        handler->addInRectForSelection(absRect, selection, mode);
+        handler->addInRectForSelection(absRect, adder, mode);
     }
 }
 
-void BoundingBox::selectAllCanvasPts(QList<MovablePoint*> &selection,
+void BoundingBox::selectAllCanvasPts(const MovablePoint::Adder &adder,
                                      const CanvasMode mode) {
     for(const auto& desc : mCanvasProps) {
         const auto handler = desc->getPointsHandler();
         if(!handler) continue;
-        handler->addAllPointsToSelection(selection, mode);
+        handler->addAllPointsToSelection(adder, mode);
     }
 }
 
@@ -970,9 +973,8 @@ bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
         }
     }
     if(satisfies) {
-        const QString &nameSearch = rules.fSearchString;
-        if(!nameSearch.isEmpty()) {
-            satisfies = prp_mName.contains(nameSearch);
+        if(!rules.fSearchString.isEmpty()) {
+            satisfies = prp_mName.contains(rules.fSearchString);
         }
     }
     return satisfies;

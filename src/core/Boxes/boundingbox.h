@@ -131,7 +131,8 @@ public:
     virtual QPointF getRelCenterPosition();
 
     virtual void selectAndAddContainedPointsToList(
-            const QRectF &absRect, QList<MovablePoint*> &selection,
+            const QRectF &absRect,
+            const MovablePoint::Adder& adder,
             const CanvasMode mode);
 
     virtual bool relPointInsidePath(const QPointF &relPos) const;
@@ -243,7 +244,7 @@ public:
     void drawBoundingRect(SkCanvas * const canvas,
                           const float invScale);
 
-    void selectAllCanvasPts(QList<MovablePoint *> &selection,
+    void selectAllCanvasPts(const MovablePoint::Adder &adder,
                             const CanvasMode mode);
 
     int getDocumentId() const { return mDocumentId; }
@@ -338,9 +339,9 @@ public:
 
     void planCenterPivotPosition();
 
-    bool visibleForCanvas() const { return mVisibleForCanvas; }
-    void setVisibleForCanvas(const bool visible) {
-        mVisibleForCanvas = visible;
+    bool visibleForCanvas() const { return mVisibleInScene; }
+    void setVisibleForScene(const bool visible) {
+        mVisibleInScene = visible;
     }
 
     virtual void updateIfUsesProgram(const ShaderEffectProgram * const program) const;
@@ -363,7 +364,7 @@ protected:
     const int mDocumentId;
 
     eBoxType mType;
-    SkBlendMode mBlendModeSk = SkBlendMode::kSrcOver;
+    SkBlendMode mBlendMode = SkBlendMode::kSrcOver;
 
     QPointF mSavedTransformPivot;
 
@@ -382,7 +383,7 @@ protected:
 
     const qsptr<RasterEffectAnimators> mRasterEffectsAnimators;
 
-    bool mVisibleForCanvas = true;
+    bool mVisibleInScene = true;
     bool mCenterPivotPlanned = false;
     bool mUpdatePlanned = false;
     UpdateReason mPlannedReason;
@@ -393,6 +394,7 @@ private:
 signals:
     void globalPivotInfluenced();
     void fillStrokeSettingsChanged();
+    void blendModeChanged(SkBlendMode);
 };
 
 template <typename B, typename T>
@@ -401,11 +403,10 @@ void BoundingBox::sWriteReadMember(B* const from, B* const to, const T member) {
     buffer.open(QIODevice::ReadWrite);
     eWriteStream writeStream(&buffer);
     (from->*member)->writeProperty(writeStream);
-    const auto tablePos = buffer.pos();
     writeStream.writeFutureTable();
     buffer.seek(0);
     eReadStream readStream(&buffer);
-    buffer.seek(tablePos);
+    buffer.seek(buffer.size() - qint64(sizeof(int)));
     readStream.readFutureTable();
     buffer.seek(0);
     (to->*member)->readProperty(readStream);

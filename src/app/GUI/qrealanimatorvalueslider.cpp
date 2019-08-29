@@ -204,6 +204,8 @@ void QrealAnimatorValueSlider::setTarget(QrealAnimator * const animator) {
                 this, &QrealAnimatorValueSlider::setValueFromAnimator);
         connect(animator, &QrealAnimator::destroyed,
                 this, &QrealAnimatorValueSlider::nullifyAnimator);
+        connect(animator, &QrealAnimator::anim_changedKeyOnCurrentFrame,
+                this, qOverload<>(&QrealAnimatorValueSlider::update));
 
         setValueRange(animator->getMinPossibleValue(),
                       animator->getMaxPossibleValue());

@@ -178,10 +178,6 @@ public:
 
     void prp_afterChangedAbsRange(const FrameRange &range, const bool clip);
 
-    void anim_saveCurrentValueAsKey() {
-        anim_addKeyAtRelFrame(anim_getCurrentRelFrame());
-    }
-
     void anim_addKeyAtRelFrame(const int relFrame) {
         if(anim_getKeyAtRelFrame(relFrame)) return;
         const auto prevNextKey = anim_getPrevAndNextKey<ASKey>(relFrame);

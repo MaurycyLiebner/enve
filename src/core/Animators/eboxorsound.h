@@ -92,7 +92,7 @@ public:
 
     void lock();
     void unlock();
-    void setLocked(const bool bt);
+    void setLocked(const bool locked);
     void switchLocked();
     bool isLocked() const;
 
@@ -122,6 +122,7 @@ signals:
     void ancestorChanged();
     void selectionChanged(bool);
     void visibilityChanged(bool);
+    void lockedChanged(bool);
 };
 
 #endif // EBOXORSOUND_H

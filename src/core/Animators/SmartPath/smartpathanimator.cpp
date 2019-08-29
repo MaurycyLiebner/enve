@@ -44,6 +44,10 @@ SmartPathAnimator::SmartPathAnimator(const SmartPath &baseValue) :
     updateAllPoints();
 }
 
+QMimeData *SmartPathAnimator::SWT_createMimeData() {
+    return new eMimeData(QList<SmartPathAnimator*>() << this);
+}
+
 #include "typemenu.h"
 #include "document.h"
 void SmartPathAnimator::setupTreeViewMenu(PropertyMenu * const menu) {
