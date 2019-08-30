@@ -121,7 +121,6 @@ public:
     static QColor sGetAnimatorColor(const int i);
 
     void graphResetValueScaleAndMinShownAction();
-    void graphUpdateAfterKeysChangedAndRepaint();
 
     void graphUpdateAfterKeysChanged();
 

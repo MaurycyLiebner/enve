@@ -435,7 +435,7 @@ bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event) {
 
 void KeysView::graphResetValueScaleAndMinShownAction() {
     graphResetValueScaleAndMinShown();
-    Document::sInstance->actionFinished();
+    update();
 }
 
 void KeysView::graphResetValueScaleAndMinShown() {
@@ -455,7 +455,7 @@ void KeysView::graphAddViewedAnimator(GraphAnimator * const animator) {
         graphRemoveViewedAnimator(animator);
     });
 
-    Document::sInstance->actionFinished();
+    update();
 }
 
 void KeysView::graphRemoveViewedAnimator(GraphAnimator * const animator) {
@@ -463,14 +463,7 @@ void KeysView::graphRemoveViewedAnimator(GraphAnimator * const animator) {
     mGraphAnimators.removeOne(animator);
     graphUpdateDimensions();
     graphResetValueScaleAndMinShown();
-
-    Document::sInstance->actionFinished();
-}
-
-void KeysView::graphUpdateAfterKeysChangedAndRepaint() {
-    scheduleGraphUpdateAfterKeysChanged();
-    
-    Document::sInstance->actionFinished();
+    update();
 }
 
 void KeysView::scheduleGraphUpdateAfterKeysChanged() {
