@@ -44,6 +44,7 @@ public:
     virtual void animationDataChanged();
     virtual void setStretch(const qreal stretch) {
         mStretch = stretch;
+        prp_afterWholeInfluenceRangeChanged();
         updateDurationRectangleAnimationRange();
     }
 
