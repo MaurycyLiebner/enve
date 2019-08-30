@@ -239,7 +239,7 @@ void Canvas::handleLeftButtonMousePress(const MouseEvent& e) {
 
     mDoubleClick = false;
     //mMovesToSkip = 2;
-    mFirstMouseMove = true;
+    mStartTransform = true;
 
     const qreal invScale = 1/e.fScale;
     mPressedPoint = getPointAtAbsPos(e.fPos, mCurrentMode, invScale);
@@ -328,7 +328,7 @@ void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
         if(!e.shiftMod()) clearPointsSelection();
         moveSecondSelectionPoint(e.fPos);
         selectAndAddContainedPointsToSelection(mSelectionRect);
-    } else if(mFirstMouseMove) {
+    } else if(mStartTransform) {
         if(mPressedPoint) {
             if(mPressedPoint->isCtrlPoint()) {
                 removePointFromSelection(mPressedPoint);
@@ -385,11 +385,11 @@ void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
 
 void Canvas::handleMovePathMouseRelease(const MouseEvent &e) {
     if(mRotPivot->isSelected()) {
-        if(!mFirstMouseMove) mRotPivot->finishTransform();
+        if(!mStartTransform) mRotPivot->finishTransform();
         mRotPivot->setSelected(false);
     } else if(mTransMode == TransformMode::rotate || mTransMode == TransformMode::scale) {
         finishSelectedBoxesTransform();
-    } else if(mFirstMouseMove) {
+    } else if(mStartTransform) {
         mSelecting = false;
         if(e.shiftMod() && mPressedBox) {
             if(mPressedBox->isSelected()) {
@@ -412,7 +412,7 @@ void Canvas::handleMovePathMouseRelease(const MouseEvent &e) {
 void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
     if(e.fMouseGrabbing) e.fReleaseMouse();
     if(mCurrentNormalSegment.isValid()) {
-        if(!mFirstMouseMove) mCurrentNormalSegment.finishPassThroughTransform();
+        if(!mStartTransform) mCurrentNormalSegment.finishPassThroughTransform();
         mHoveredNormalSegment = mCurrentNormalSegment;
         mHoveredNormalSegment.generateSkPath();
         mCurrentNormalSegment.reset();
@@ -486,14 +486,14 @@ QPointF Canvas::getMoveByValueForEvent(const MouseEvent &e) {
 #include "Boxes/smartvectorpath.h"
 void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
     if(mRotPivot->isSelected()) {
-        if(mFirstMouseMove) mRotPivot->startTransform();
+        if(mStartTransform) mRotPivot->startTransform();
         mRotPivot->moveByAbs(getMoveByValueForEvent(e));
     } else if(mTransMode == TransformMode::scale) {
         scaleSelected(e);
     } else if(mTransMode == TransformMode::rotate) {
         rotateSelected(e);
     } else if(mCurrentNormalSegment.isValid()) {
-        if(mFirstMouseMove) mCurrentNormalSegment.startPassThroughTransform();
+        if(mStartTransform) mCurrentNormalSegment.startPassThroughTransform();
         mCurrentNormalSegment.makePassThroughAbs(e.fPos, mCurrentNormalSegmentT);
     } else {
         if(mPressedPoint) {
@@ -547,7 +547,7 @@ void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
                             nodePt->getC0Pt()->setAbsolutePos(sC0->getAbsolutePos());
                             nodePt->getC2Pt()->setAbsolutePos(sC2->getAbsolutePos());
                         } else {
-                            if(mFirstMouseMove) mPressedPoint->startTransform();
+                            if(mStartTransform) mPressedPoint->startTransform();
                             mPressedPoint->moveByAbs(getMoveByValueForEvent(e));
                         }
                         return;
@@ -556,13 +556,13 @@ void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
             }
 
             if(!mPressedPoint->selectionEnabled()) {
-                if(mFirstMouseMove) mPressedPoint->startTransform();
+                if(mStartTransform) mPressedPoint->startTransform();
                 mPressedPoint->moveByAbs(getMoveByValueForEvent(e));
                 return;
             }
         }
         moveSelectedPointsByAbs(getMoveByValueForEvent(e),
-                                mFirstMouseMove);
+                                mStartTransform);
     }
 }
 
@@ -590,9 +590,9 @@ void Canvas::scaleSelected(const MouseEvent& e) {
     }
 
     if(mCurrentMode == CanvasMode::boxTransform) {
-        scaleSelectedBy(scaleX, scaleY, absPos, mFirstMouseMove);
+        scaleSelectedBy(scaleX, scaleY, absPos, mStartTransform);
     } else {
-        scaleSelectedPointsBy(scaleX, scaleY, absPos, mFirstMouseMove);
+        scaleSelectedPointsBy(scaleX, scaleY, absPos, mStartTransform);
     }
 
     if(!mValueInput.inputEnabled())
@@ -621,9 +621,9 @@ void Canvas::rotateSelected(const MouseEvent& e) {
     }
 
     if(mCurrentMode == CanvasMode::boxTransform) {
-        rotateSelectedBy(rot, absPos, mFirstMouseMove);
+        rotateSelectedBy(rot, absPos, mStartTransform);
     } else {
-        rotateSelectedPointsBy(rot, absPos, mFirstMouseMove);
+        rotateSelectedPointsBy(rot, absPos, mStartTransform);
     }
 
     if(!mValueInput.inputEnabled())
@@ -633,7 +633,7 @@ void Canvas::rotateSelected(const MouseEvent& e) {
 
 void Canvas::handleMovePathMouseMove(const MouseEvent& e) {
     if(mRotPivot->isSelected()) {
-        if(mFirstMouseMove) mRotPivot->startTransform();
+        if(mStartTransform) mRotPivot->startTransform();
         mRotPivot->moveByAbs(getMoveByValueForEvent(e));
     } else if(mTransMode == TransformMode::scale) {
         scaleSelected(e);
@@ -646,7 +646,7 @@ void Canvas::handleMovePathMouseMove(const MouseEvent& e) {
         }
 
         const auto moveBy = getMoveByValueForEvent(e);
-        moveSelectedBoxesByAbs(moveBy, mFirstMouseMove);
+        moveSelectedBoxesByAbs(moveBy, mStartTransform);
     }
 }
 

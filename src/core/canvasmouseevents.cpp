@@ -75,7 +75,7 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
             mMovesToSkip--;
             return;
         }
-        if(mFirstMouseMove && leftPressed) {
+        if(mStartTransform && leftPressed) {
             if((mCurrentMode == CanvasMode::pointTransform &&
                 !mPressedPoint && !mCurrentNormalSegment.isValid()) ||
                (mCurrentMode == CanvasMode::boxTransform &&
@@ -112,7 +112,7 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
             }
         }
     }
-    mFirstMouseMove = false;
+    mStartTransform = false;
 
     if(!mSelecting && !e.fMouseGrabbing && leftPressed)
         e.fGrabMouse();
@@ -123,7 +123,6 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
     if(e.fButton != Qt::LeftButton) return;
     schedulePivotUpdate();
     if(mCurrentMode == CanvasMode::paint) return;
-    if(mValueInput.inputEnabled()) mFirstMouseMove = false;
 
     handleLeftMouseRelease(e);
 

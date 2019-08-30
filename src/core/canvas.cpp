@@ -558,6 +558,7 @@ bool Canvas::handleTransormationInputKeyEvent(const KeyEvent &e) {
     if(mValueInput.handleTransormationInputKeyEvent(e.fKey)) {
         if(mTransMode == TransformMode::rotate) mValueInput.setupRotate();
         updateTransformation(e);
+        mStartTransform = false;
     } else if(e.fKey == Qt::Key_Escape) {
         cancelCurrentTransform();
         e.fReleaseMouse();
@@ -691,7 +692,7 @@ bool Canvas::startRotatingAction(const KeyEvent &e) {
     mLastDRot = 0;
 
     mDoubleClick = false;
-    mFirstMouseMove = true;
+    mStartTransform = true;
     e.fGrabMouse();
     return true;
 }
@@ -710,7 +711,7 @@ bool Canvas::startScalingAction(const KeyEvent &e) {
     mRotPivot->setMousePos(e.fPos);
     mTransMode = TransformMode::scale;
     mDoubleClick = false;
-    mFirstMouseMove = true;
+    mStartTransform = true;
     e.fGrabMouse();
     return true;
 }
@@ -723,7 +724,7 @@ bool Canvas::startMovingAction(const KeyEvent &e) {
 
     mTransMode = TransformMode::move;
     mDoubleClick = false;
-    mFirstMouseMove = true;
+    mStartTransform = true;
     e.fGrabMouse();
     return true;
 }

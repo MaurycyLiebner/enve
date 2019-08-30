@@ -79,7 +79,7 @@ void Canvas::handleAddSmartPointMousePress(const MouseEvent &e) {
 
 void Canvas::handleAddSmartPointMouseMove(const MouseEvent &e) {
     if(!mLastEndPoint) return;
-    if(mFirstMouseMove) mLastEndPoint->startTransform();
+    if(mStartTransform) mLastEndPoint->startTransform();
     if(mLastEndPoint->hasNextNormalPoint() &&
        mLastEndPoint->hasPrevNormalPoint()) {
         mLastEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
@@ -104,7 +104,7 @@ void Canvas::handleAddSmartPointMouseMove(const MouseEvent &e) {
 void Canvas::handleAddSmartPointMouseRelease(const MouseEvent &e) {
     Q_UNUSED(e);
     if(mLastEndPoint) {
-        if(!mFirstMouseMove) mLastEndPoint->finishTransform();
+        if(!mStartTransform) mLastEndPoint->finishTransform();
         //mCurrentSmartEndPoint->prp_afterWholeInfluenceRangeChanged();
         if(!mLastEndPoint->isEndPoint())
             clearCurrentSmartEndPoint();

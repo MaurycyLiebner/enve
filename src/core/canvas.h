@@ -668,7 +668,7 @@ protected:
 
     bool mPivotUpdateNeeded = false;
 
-    bool mFirstMouseMove = false;
+    bool mStartTransform = false;
     bool mSelecting = false;
 //    bool mMoving = false;
 
