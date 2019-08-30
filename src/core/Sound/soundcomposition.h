@@ -53,10 +53,10 @@ public:
     void secondFinished(const int secondId,
                         const stdsptr<Samples>& samples);
 
-    void startBlockingAtFrame(const int frame);
-    void blockUpToFrame(const int frame);
+    void setMinFrameUseRange(const int frame);
+    void setMaxFrameUseRange(const int frame);
 
-    void unblockAll();
+    void clearUseRange();
 
     void scheduleFrameRange(const FrameRange& range);
     SoundMerger * scheduleFrame(const int frameId);
@@ -75,7 +75,6 @@ private:
     }
 
     eSoundSettingsData mSettings;
-    iValueRange mBlockRange{0, -1};
     QList<int> mProcessingSeconds;
     const Canvas * const mParent;
     qint64 mPos;

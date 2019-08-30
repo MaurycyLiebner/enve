@@ -618,6 +618,7 @@ void BoundingBox::finishTransform() {
 
 void BoundingBox::setupRenderData(const qreal relFrame,
                                   BoxRenderData * const data) {
+    Q_ASSERT(mParentScene);
     if(!mParentScene) return;
 
     data->fBoxStateId = mStateId;

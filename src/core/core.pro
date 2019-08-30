@@ -104,10 +104,10 @@ SOURCES += \
     Boxes/textbox.cpp \
     Boxes/videobox.cpp \
     Boxes/waitingforboxload.cpp \
+    CacheHandlers/cachecontainer.cpp \
     CacheHandlers/hddcachablecachehandler.cpp \
     CacheHandlers/hddcachablerangecont.cpp \
     CacheHandlers/imagecachecontainer.cpp \
-    CacheHandlers/minimalcachecontainer.cpp \
     CacheHandlers/samples.cpp \
     CacheHandlers/sceneframecontainer.cpp \
     CacheHandlers/soundcachecontainer.cpp \
@@ -116,6 +116,7 @@ SOURCES += \
     CacheHandlers/tmpdeleter.cpp \
     CacheHandlers/tmploader.cpp \
     CacheHandlers/tmpsaver.cpp \
+    CacheHandlers/usedrange.cpp \
     FileCacheHandlers/animationcachehandler.cpp \
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/filecachehandler.cpp \
@@ -315,11 +316,11 @@ HEADERS += \
     Boxes/textbox.h \
     Boxes/videobox.h \
     Boxes/waitingforboxload.h \
+    CacheHandlers/cachecontainer.h \
     CacheHandlers/hddcachablecachehandler.h \
     CacheHandlers/hddcachablecont.h \
     CacheHandlers/hddcachablerangecont.h \
     CacheHandlers/imagecachecontainer.h \
-    CacheHandlers/minimalcachecontainer.h \
     CacheHandlers/samples.h \
     CacheHandlers/sceneframecontainer.h \
     CacheHandlers/soundcachecontainer.h \
@@ -328,6 +329,9 @@ HEADERS += \
     CacheHandlers/tmpdeleter.h \
     CacheHandlers/tmploader.h \
     CacheHandlers/tmpsaver.h \
+    CacheHandlers/usedrange.h \
+    CacheHandlers/usepointer.h \
+    CacheHandlers/usesharedpointer.h \
     FileCacheHandlers/animationcachehandler.h \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/filecachehandler.h \

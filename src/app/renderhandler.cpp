@@ -87,14 +87,14 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
 
         mCurrentRenderFrame = renderSettings.fMinFrame;
         mCurrRenderRange = {mCurrentRenderFrame, mCurrentRenderFrame};
-        mCurrentScene->setCurrentRenderRange(mCurrRenderRange);
 
         mCurrentEncodeFrame = mCurrentRenderFrame;
         mFirstEncodeSoundSecond = qRound(mCurrentRenderFrame/fps);
         mCurrentEncodeSoundSecond = mFirstEncodeSoundSecond;
         if(!settings->getOutputRenderSettings().audioEnabled)
             mMaxSoundSec = mCurrentEncodeSoundSecond - 1;
-        mCurrentSoundComposition->startBlockingAtFrame(mCurrentRenderFrame);
+        mCurrentScene->setMinFrameUseRange(mCurrentRenderFrame);
+        mCurrentSoundComposition->setMinFrameUseRange(mCurrentRenderFrame);
         mCurrentSoundComposition->scheduleFrameRange({mCurrentRenderFrame,
                                                       mCurrentRenderFrame});
         mCurrentScene->anim_setAbsFrame(mCurrentRenderFrame);
@@ -121,20 +121,15 @@ void RenderHandler::nextCurrentRenderFrame() {
     auto& cacheHandler = mCurrentScene->getSceneFramesHandler();
     int newCurrentRenderFrame = cacheHandler.
             firstEmptyFrameAtOrAfter(mCurrentRenderFrame + 1);
-    if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
-        const int minBlock = mCurrentRenderFrame + 1;
-        const int maxBlock = newCurrentRenderFrame - 1;
-        cacheHandler.blockConts({minBlock, maxBlock}, true);
-    }
     const bool allDone = newCurrentRenderFrame > mMaxRenderFrame;
     newCurrentRenderFrame = qMin(mMaxRenderFrame, newCurrentRenderFrame);
     const FrameRange newSoundRange = {mCurrentRenderFrame, newCurrentRenderFrame};
     mCurrentSoundComposition->scheduleFrameRange(newSoundRange);
-    mCurrentSoundComposition->blockUpToFrame(newCurrentRenderFrame);
+    mCurrentSoundComposition->setMaxFrameUseRange(newCurrentRenderFrame);
+    mCurrentScene->setMaxFrameUseRange(newCurrentRenderFrame);
 
     mCurrentRenderFrame = newCurrentRenderFrame;
     mCurrRenderRange.fMax = mCurrentRenderFrame;
-    mCurrentScene->setCurrentRenderRange(mCurrRenderRange);
     if(allDone) Document::sInstance->actionFinished();
     else setFrameAction(mCurrentRenderFrame);
 }
@@ -151,8 +146,8 @@ void RenderHandler::renderPreview() {
     mSavedCurrentFrame = mCurrentScene->getCurrentFrame();
     mCurrentRenderFrame = mSavedCurrentFrame;
     mCurrRenderRange = {mCurrentRenderFrame, mCurrentRenderFrame};
-    mCurrentScene->setCurrentRenderRange(mCurrRenderRange);
-    mCurrentSoundComposition->startBlockingAtFrame(mCurrentRenderFrame);
+    mCurrentScene->setMinFrameUseRange(mCurrentRenderFrame);
+    mCurrentSoundComposition->setMinFrameUseRange(mCurrentRenderFrame);
 
     mMaxRenderFrame = mCurrentScene->getMaxFrame();
     setRenderingPreview(true);
@@ -191,10 +186,6 @@ void RenderHandler::interruptPreviewRendering() {
     setRenderingPreview(false);
     TaskScheduler::sClearAllFinishedFuncs();
     clearPreview();
-    auto& cacheHandler = mCurrentScene->getSceneFramesHandler();
-    cacheHandler.blockConts({mSavedCurrentFrame + 1, mMaxRenderFrame}, false);
-    setFrameAction(mSavedCurrentFrame);
-    emit previewFinished();
 }
 
 void RenderHandler::interruptOutputRendering() {
@@ -202,13 +193,11 @@ void RenderHandler::interruptOutputRendering() {
     TaskScheduler::sInstance->setAlwaysQue(false);
     TaskScheduler::sClearAllFinishedFuncs();
     clearPreview();
-    setFrameAction(mSavedCurrentFrame);
 }
 
 void RenderHandler::stopPreview() {
     setPreviewing(false);
-    auto& cacheHandler = mCurrentScene->getSceneFramesHandler();
-    cacheHandler.blockConts({mSavedCurrentFrame + 1, mMaxRenderFrame}, false);
+    mCurrentScene->clearUseRange();
     setFrameAction(mSavedCurrentFrame);
     mCurrentScene->setSceneFrame(mSavedCurrentFrame);
     mPreviewFPSTimer->stop();
@@ -292,6 +281,7 @@ void RenderHandler::nextPreviewFrame() {
         clearPreview();
     } else {
         mCurrentScene->setSceneFrame(mCurrentPreviewFrame);
+        mCurrentScene->setMinFrameUseRange(mCurrentPreviewFrame);
         emit mCurrentScene->currentFrameChanged(mCurrentPreviewFrame);
     }
     emit mCurrentScene->requestUpdate();
@@ -306,7 +296,7 @@ void RenderHandler::finishEncoding() {
     if(!isZero4Dec(mSavedResolutionFraction - mCurrentScene->getResolutionFraction())) {
         mCurrentScene->setResolutionFraction(mSavedResolutionFraction);
     }
-    mCurrentSoundComposition->unblockAll();
+    mCurrentSoundComposition->clearUseRange();
     VideoEncoder::sFinishEncoding();
 }
 
@@ -328,7 +318,6 @@ void RenderHandler::nextSaveOutputFrame() {
             VideoEncoder::sAddCacheContainerToEncoder(
                         enve::make_shared<Samples>(samples));
         }
-        sCont->decInUse();
         mCurrentEncodeSoundSecond++;
     }
     if(mCurrentEncodeSoundSecond > mMaxSoundSec) VideoEncoder::sAllAudioProvided();

@@ -36,7 +36,6 @@
 #include "pointtypemenu.h"
 #include "Animators/transformanimator.h"
 #include "glhelpers.h"
-#include "CacheHandlers/sceneframecontainer.h"
 
 Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
@@ -330,38 +329,23 @@ void Canvas::setOutputRendering(const bool bT) {
 }
 
 void Canvas::setSceneFrame(const int relFrame) {
-    auto cont = mSceneFramesHandler.atFrame(relFrame);
+    const auto cont = mSceneFramesHandler.atFrame(relFrame);
     setSceneFrame(enve::shared<SceneFrameContainer>(cont));
 }
 
 void Canvas::setSceneFrame(const stdsptr<SceneFrameContainer>& cont) {
     setLoadingSceneFrame(nullptr);
-    if(cont == mSceneFrame) return emit requestUpdate();
-    if(mSceneFrame && !mRenderingPreview) {
-        mSceneFrame->decInUse();
-    }
-
     mSceneFrame = cont;
-    if(cont) cont->incInUse();
     emit requestUpdate();
 }
 
 void Canvas::setLoadingSceneFrame(const stdsptr<SceneFrameContainer>& cont) {
-    if(cont == mLoadingSceneFrame) return;
-    if(mLoadingSceneFrame.get()) {
-        if(!mRenderingPreview || mRenderingOutput) {
-            mLoadingSceneFrame->decInUse();
-        }
-    }
-    if(!cont) {
-        mLoadingSceneFrame.reset();
-        return;
-    }
+    if(mLoadingSceneFrame == cont) return;
     mLoadingSceneFrame = cont;
-    if(!cont->storesDataInMemory()) {
+    if(cont) {
+        Q_ASSERT(!cont->storesDataInMemory());
         cont->scheduleLoadFromTmpFile();
     }
-    mLoadingSceneFrame->incInUse();
 }
 
 FrameRange Canvas::prp_getIdenticalRelRange(const int relFrame) const {
@@ -383,10 +367,7 @@ void Canvas::renderDataFinished(BoxRenderData *renderData) {
                 currentState ? &mSceneFramesHandler : nullptr);
     if(currentState) mSceneFramesHandler.add(cont);
 
-    if((mPreviewing || mRenderingOutput) &&
-       mCurrRenderRange.inRange(relFrame)) {
-        cont->incInUse();
-    } else {
+    if(!mPreviewing && !mRenderingOutput){
         bool newerSate = true;
         bool closerFrame = true;
         if(mSceneFrame) {
@@ -400,8 +381,6 @@ void Canvas::renderDataFinished(BoxRenderData *renderData) {
         if(newerSate || closerFrame) {
             mSceneFrameOutdated = !currentState;
             setSceneFrame(cont);
-        } else if(mRenderingPreview && mCurrRenderRange.inRange(relFrame)) {
-            cont->incInUse();
         }
     }
 }
@@ -754,17 +733,6 @@ void Canvas::selectOnlyLastPressedPoint() {
     clearPointsSelection();
     if(mPressedPoint) addPointToSelection(mPressedPoint);
 }
-
-//void Canvas::updateAfterFrameChanged(const int currentFrame) {
-//    anim_mCurrentAbsFrame = currentFrame;
-
-//    for(const auto& box : mChildBoxes) {
-//        box->anim_setAbsFrame(currentFrame);
-//    }
-
-//    BoxesGroup::anim_setAbsFrame(currentFrame);
-//    //mSoundComposition->getSoundsAnimatorContainer()->anim_setAbsFrame(currentFrame);
-//}
 
 bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                  const bool parentSatisfies,

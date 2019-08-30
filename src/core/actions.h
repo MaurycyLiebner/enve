@@ -98,7 +98,7 @@ public:
 
     void updateAfterFrameChanged(const int currentFrame) const;
 
-    void setClipToCanvas(const bool bT);
+    void setClipToCanvas(const bool clip);
 
     void setRasterEffectsVisible(const bool bT);
     void setPathEffectsVisible(const bool bT);

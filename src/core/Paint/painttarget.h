@@ -22,6 +22,7 @@ class Canvas;
 #include "animatedsurface.h"
 #include "Boxes/paintbox.h"
 #include "onionskin.h"
+#include "CacheHandlers/usepointer.h"
 
 struct PaintTarget {
     PaintTarget(Canvas* const canvas) : mCanvas(canvas) {}
@@ -77,7 +78,7 @@ struct PaintTarget {
     qptr<AnimatedSurface> mPaintAnimSurface;
     OnionSkin mPaintOnion;
     bool mPaintPressedSinceUpdate = false;
-    CacheContainer::UsePointer<DrawableAutoTiledSurface> mPaintDrawable;
+    UsePointer<DrawableAutoTiledSurface> mPaintDrawable;
     bool mChanged = false;
     Canvas * const mCanvas;
 };

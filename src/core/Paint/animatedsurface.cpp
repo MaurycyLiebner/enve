@@ -27,7 +27,7 @@ AnimatedSurface::AnimatedSurface() : Animator("canvas"),
         const auto dSurf = asKey->dSurface();
         if(!dSurf.storesDataInMemory())
             asKey->dSurface().scheduleLoadFromTmpFile();
-        asKey->dSurface().incInUse();
+        mUsed.append(&asKey->dSurface());
     });
     connect(this, &Animator::anim_removedKey,
             this, [this](Key* const key) {
@@ -37,7 +37,7 @@ AnimatedSurface::AnimatedSurface() : Animator("canvas"),
         }
         if(!mUseRange.inRange(key->getRelFrame())) return;
         const auto asKey = static_cast<ASKey*>(key);
-        asKey->dSurface().decInUse();
+        mUsed.removeOne(&asKey->dSurface());
     });
 }
 

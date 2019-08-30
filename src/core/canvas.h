@@ -34,6 +34,8 @@
 #include "Animators/outlinesettingsanimator.h"
 #include "document.h"
 #include "Paint/painttarget.h"
+#include "CacheHandlers/usesharedpointer.h"
+#include "CacheHandlers/sceneframecontainer.h"
 
 class AnimatedSurface;
 class PaintBox;
@@ -44,7 +46,6 @@ class PathPivot;
 class SoundComposition;
 class SkCanvas;
 class ImageSequenceBox;
-class SceneFrameContainer;
 class Brush;
 class UndoRedoStack;
 class ExternalLinkBox;
@@ -572,10 +573,6 @@ public:
 
     void setCurrentGroupParentAsCurrentGroup();
 
-    void setCurrentRenderRange(const FrameRange& range) {
-        mCurrRenderRange = range;
-    }
-
     bool hasValidPaintTarget() const {
         return mPaintTarget.isValid();
     }
@@ -586,6 +583,26 @@ public:
             mCurrentContainer->queChildrenTasks();
         } else ContainerBox::queTasks();
         mDrawnSinceQue = false;
+    }
+
+    void setMinFrameUseRange(const int min) {
+        mSceneFramesHandler.setMinUseRange(min);
+    }
+
+    void setMaxFrameUseRange(const int max) {
+        mSceneFramesHandler.setMaxUseRange(max);
+    }
+
+    void clearUseRange() {
+        mSceneFramesHandler.clearUseRange();
+    }
+
+    //! Used for clip to canvas, when frames are not really changed.
+    void sceneFramesUpToDate() const {
+        for(const auto& cont : mSceneFramesHandler) {
+            const auto sceneCont = static_cast<SceneFrameContainer*>(cont.second.get());
+            sceneCont->fBoxState = mStateId;
+        }
     }
 private:
     void openTextEditorForTextBox(TextBox *textBox);
@@ -646,11 +663,10 @@ protected:
     bool mPreviewing = false;
     bool mRenderingPreview = false;
     bool mRenderingOutput = false;
-    FrameRange mCurrRenderRange;
 
     bool mSceneFrameOutdated = false;
-    stdsptr<SceneFrameContainer> mSceneFrame;
-    stdsptr<SceneFrameContainer> mLoadingSceneFrame;
+    UseSharedPointer<SceneFrameContainer> mSceneFrame;
+    UseSharedPointer<SceneFrameContainer> mLoadingSceneFrame;
 
     bool mClipToCanvasSize = false;
     bool mRasterEffectsVisible = true;

@@ -22,6 +22,7 @@
 struct iValueRange {
     static int EMIN;
     static int EMAX;
+    static iValueRange INVALID;
 
     int fMin; //! @brief Inclusive range min
     int fMax; //! @brief Inclusive range max
@@ -46,6 +47,10 @@ struct iValueRange {
         return qMax(0, fMax - fMin + 1);
     }
 
+    iValueRange adjusted(const int dMin, const int dMax) {
+        return {fMin + dMin, fMax + dMax};
+    }
+
     iValueRange shifted(const int by) const {
         return {fMin + by, fMax + by};
     }
@@ -62,9 +67,24 @@ struct iValueRange {
 
     void fixOrder() {
         if(fMin <= fMax) return;
-        auto maxT = fMax;
-        fMax = fMin;
-        fMin = maxT;
+        std::swap(fMin, fMax);
+    }
+
+    static std::vector<iValueRange> sSum(const iValueRange& a,
+                                         const iValueRange& b) {
+        if(!a.isValid()) return { b };
+        if(!b.isValid()) return { a };
+        if(a.overlaps(b)) return { a + b };
+        return { a, b };
+    }
+
+    static std::vector<iValueRange> sDiff(const iValueRange& a,
+                                          const iValueRange& b) {
+        if(!a.isValid() || !b.isValid()) return { a };
+        if(a.inRange(b)) return { {a.fMin, b.fMin - 1}, {b.fMax + 1, a.fMax} };
+        const auto overlap = a*b;
+        if(overlap.isValid()) return sDiff(a, overlap);
+        else return { a };
     }
 
     bool operator<(const iValueRange& b) const {
@@ -78,29 +98,32 @@ struct iValueRange {
     }
 
     bool operator==(const iValueRange& b) const {
+        if(!isValid() && !b.isValid()) return true;
         return fMin == b.fMin && fMax == b.fMax;
     }
 
     bool operator!=(const iValueRange& b) const {
-        return fMin != b.fMin || fMax != b.fMax;
+        return !(*this == b);
     }
 
     iValueRange operator*(const iValueRange& b) const {
+        if(!isValid() || !b.isValid()) return INVALID;
         return {qMax(this->fMin, b.fMin), qMin(this->fMax, b.fMax)};
     }
 
     iValueRange& operator*=(const iValueRange& b) {
-        this->fMin = qMax(this->fMin, b.fMin);
-        this->fMax = qMin(this->fMax, b.fMax);
+        *this = *this * b;
         return *this;
     }
 
     iValueRange operator+(const iValueRange& b) const {
+        if(!isValid()) return b;
+        if(!b.isValid()) return *this;
         return {qMin(this->fMin, b.fMin), qMax(this->fMax, b.fMax)};
     }
+
     iValueRange& operator+=(const iValueRange& b) {
-        this->fMin = qMin(this->fMin, b.fMin);
-        this->fMax = qMax(this->fMax, b.fMax);
+        *this = *this + b;
         return *this;
     }
 };

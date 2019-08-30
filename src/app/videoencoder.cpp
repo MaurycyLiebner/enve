@@ -41,7 +41,6 @@ VideoEncoder::VideoEncoder() {
 
 void VideoEncoder::addContainer(const stdsptr<SceneFrameContainer>& cont) {
     if(!cont) return;
-    cont->incInUse();
     mNextContainers.append(cont);
     if(getState() < eTaskState::qued || getState() > eTaskState::processing) scheduleTask();
 }
@@ -636,8 +635,6 @@ void VideoEncoder::finishEncodingNow() {
 }
 
 void VideoEncoder::clearContainers() {
-    for(const auto &cont : _mContainers)
-        cont->decInUse();
     _mContainers.clear();
     mSoundIterator.clear();
 }
@@ -700,7 +697,13 @@ void VideoEncoder::process() {
 void VideoEncoder::beforeProcessing(const Hardware) {
     _mCurrentContainerId = 0;
     _mAllAudioProvided = mAllAudioProvided;
-    _mContainers.swap(mNextContainers);
+    if(_mContainers.isEmpty()) {
+        _mContainers.swap(mNextContainers);
+    } else {
+        for(const auto& cont : mNextContainers)
+            _mContainers.append(cont);
+        mNextContainers.clear();
+    }
     for(const auto& sound : mNextSoundConts)
         mSoundIterator.add(sound);
     mNextSoundConts.clear();
@@ -709,15 +712,13 @@ void VideoEncoder::beforeProcessing(const Hardware) {
 }
 
 void VideoEncoder::afterProcessing() {
-    for(int i = 0; i < _mCurrentContainerId; i++) {
-        const auto &cont = _mContainers.at(i);
-        if(i == _mCurrentContainerId - 1) {
-            auto currCanvas = mRenderInstanceSettings->getTargetCanvas();
-            currCanvas->setSceneFrame(cont);
-        } else {
-            cont->decInUse();
-        }
+    const auto currCanvas = mRenderInstanceSettings->getTargetCanvas();
+    if(_mCurrentContainerId != 0) {
+        const auto lastEncoded = _mContainers.at(_mCurrentContainerId - 1);
+        currCanvas->setSceneFrame(lastEncoded);
+        currCanvas->setMinFrameUseRange(lastEncoded->getRange().fMax + 1);
     }
+
     for(int i = _mContainers.count() - 1; i >= _mCurrentContainerId; i--) {
         const auto &cont = _mContainers.at(i);
         mNextContainers.prepend(cont);
@@ -726,7 +727,7 @@ void VideoEncoder::afterProcessing() {
 
     if(mInterruptEncoding) {
         mRenderInstanceSettings->setCurrentState(
-                    RenderInstanceSettings::NONE);
+                    RenderInstanceSettings::NONE, "Interrupted");
         interrupEncoding();
         mInterruptEncoding = false;
     } else if(unhandledException()) {

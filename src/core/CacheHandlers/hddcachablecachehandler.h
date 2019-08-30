@@ -18,12 +18,15 @@
 #define HddCACHABLECACHEHANDLER_H
 #include "hddcachablerangecont.h"
 #include "rangemap.h"
+#include "usepointer.h"
+#include "usedrange.h"
 
 class HddCachableCacheHandler {
+    friend class UsedRange;
 public:
     typedef HddCachableRangeCont Cont;
 
-    void blockConts(const FrameRange &range, const bool blocked);
+    HddCachableCacheHandler() : mUsedRange(this) {}
 
     void drawCacheOnTimeline(QPainter * const p,
                              const QRectF &drawRect,
@@ -37,8 +40,8 @@ public:
     }
 
     void add(const stdsptr<Cont>& cont) {
-        /*const auto ret = */mConts.insert({cont->getRange(), cont});
-        //if(!ret.second) RuntimeThrow("Range already occupied by a different element");
+        const auto ret = mConts.insert({cont->getRange(), cont});
+        if(ret.second) mUsedRange.addIfInRange(cont.get());
     }
 
     void clear() {
@@ -66,8 +69,28 @@ public:
         if(it == mConts.end()) return nullptr;
         return static_cast<T*>(it->second.get());
     }
+
+    void setUseRange(const iValueRange& range) {
+        mUsedRange.replaceRange(range);
+    }
+
+    void setMaxUseRange(const int max) {
+        mUsedRange.setRangeMax(max);
+    }
+
+    void setMinUseRange(const int min) {
+        mUsedRange.setRangeMin(min);
+    }
+
+    void clearUseRange() {
+        mUsedRange.clearRange();
+    }
+
+    auto begin() const { return mConts.begin(); }
+    auto end() const { return mConts.begin(); }
 private:
     RangeMap<stdsptr<Cont>> mConts;
+    UsedRange mUsedRange;
 };
 
 #endif // HddCACHABLECACHEHANDLER_H

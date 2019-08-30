@@ -37,7 +37,7 @@ void SoundComposition::start(const int startFrame) {
 
 void SoundComposition::stop() {
     close();
-    unblockAll();
+    clearUseRange();
 }
 
 void SoundComposition::addSound(const qsptr<SingleSound>& sound) {
@@ -61,30 +61,22 @@ void SoundComposition::secondFinished(const int secondId,
     const auto sCont = enve::make_shared<SoundCacheContainer>(
                 samples, iValueRange{secondId, secondId}, &mSecondsCache);
     mSecondsCache.add(sCont);
-    if(mBlockRange.inRange(secondId)) sCont->incInUse();
 }
 
-void SoundComposition::startBlockingAtFrame(const int frame) {
-    if(mBlockRange.isValid()) unblockAll();
+void SoundComposition::setMinFrameUseRange(const int frame) {
     const qreal fps = mParent->getFps();
     const int sec = qFloor(frame/fps);
-    mBlockRange = {sec, sec};
-    mSecondsCache.blockConts(mBlockRange, true);
+    mSecondsCache.setUseRange({sec, sec});
 }
 
-void SoundComposition::blockUpToFrame(const int frame) {
+void SoundComposition::setMaxFrameUseRange(const int frame) {
     const qreal fps = mParent->getFps();
     const int sec = qFloor(frame/fps);
-    if(sec < mBlockRange.fMax) {
-        mSecondsCache.blockConts({sec + 1, mBlockRange.fMax}, false);
-    } else mSecondsCache.blockConts({mBlockRange.fMax + 1, sec}, true);
-    mBlockRange.fMax = sec;
+    mSecondsCache.setMaxUseRange(sec);
 }
 
-void SoundComposition::unblockAll() {
-    if(mBlockRange.isValid())
-        mSecondsCache.blockConts(mBlockRange, false);
-    mBlockRange = {0, -1};
+void SoundComposition::clearUseRange() {
+    mSecondsCache.clearUseRange();
 }
 
 void SoundComposition::scheduleFrameRange(const FrameRange &range) {

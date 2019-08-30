@@ -19,6 +19,8 @@
 #include "framerange.h"
 #include "GUI/audiohandler.h"
 #include "smartPointers/ememory.h"
+#include "CacheHandlers/usepointer.h"
+#include "CacheHandlers/cachecontainer.h"
 
 class Canvas;
 class RenderInstanceSettings;
@@ -98,6 +100,7 @@ private:
     int mMaxSoundSec;
     int mFirstEncodeSoundSecond;
 
+    QList<UsePointer<CacheContainer>> mUsed;
     FrameRange mCurrRenderRange;
     int mCurrentRenderFrame;
     int mMinRenderFrame = 0;

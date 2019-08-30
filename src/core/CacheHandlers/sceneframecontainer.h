@@ -26,7 +26,7 @@ public:
                         const FrameRange &range,
                         HddCachableCacheHandler * const parent);
 
-    const uint fBoxState;
+    uint fBoxState;
 protected:
     stdsptr<eHddTask> createTmpFileDataLoader();
 private:

@@ -18,3 +18,4 @@
 
 int iValueRange::EMIN = -TEN_MIL;
 int iValueRange::EMAX = TEN_MIL;
+iValueRange iValueRange::INVALID = {1, 0};

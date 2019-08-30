@@ -82,30 +82,14 @@ public:
     }
 
     void clearInUse() {
-        if(!mUseRange.isValid()) return;
-        const auto minId = anim_getNextKeyId(mUseRange.fMin - 1);
-        const auto maxId = anim_getPrevKeyId(mUseRange.fMax + 1);
-        if(minId == -1 || maxId == -1) return;
-        for(int i = minId; i <= maxId; i++) {
-            const auto iKey = anim_getKeyAtIndex<ASKey>(i);
-            iKey->dSurface().decInUse();
-        }
+        mUsed.clear();
         mUseRange = {1, 0};
     }
 
     void clearUseRange() { setUseRange({1, 0}); }
 
     void setUseRange(const FrameRange& relRange) {
-        if(mUseRange.isValid()) {
-            const auto minId = anim_getNextKeyId(mUseRange.fMin - 1);
-            const auto maxId = anim_getPrevKeyId(mUseRange.fMax + 1);
-            if(minId == -1 || maxId == -1) return;
-            for(int i = minId; i <= maxId; i++) {
-                if(relRange.inRange(i)) continue;
-                const auto iKey = anim_getKeyAtIndex<ASKey>(i);
-                iKey->dSurface().decInUse();
-            }
-        }
+        mUsed.clear();
         mUseRange = relRange;
         if(mUseRange.isValid()) {
             const auto minId = anim_getNextKeyId(relRange.fMin - 1);
@@ -114,7 +98,7 @@ public:
             for(int i = minId; i <= maxId; i++) {
                 const auto iKey = anim_getKeyAtIndex<ASKey>(i);
                 auto& dSurf = iKey->dSurface();
-                dSurf.incInUse();
+                mUsed.append(&dSurf);
                 if(!dSurf.storesDataInMemory())
                     dSurf.scheduleLoadFromTmpFile();
             }
@@ -279,6 +263,7 @@ private:
     }
 
     HddCachableCacheHandler mFrameImagesCache;
+    QList<UsePointer<DrawableAutoTiledSurface>> mUsed;
     FrameRange mUseRange{1, 0};
     const stdsptr<DrawableAutoTiledSurface> mBaseValue;
     DrawableAutoTiledSurface * mCurrent_d = nullptr;

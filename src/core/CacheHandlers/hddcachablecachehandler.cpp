@@ -15,17 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "hddcachablecachehandler.h"
-
-void HddCachableCacheHandler::blockConts(
-        const FrameRange &range, const bool blocked) {
-    const auto its = mConts.range(range);
-    for(auto it = its.first; it != its.second; it++) {
-        if(blocked) it->second->incInUse();
-        else it->second->decInUse();
-    }
-}
-
 #include "pointhelpers.h"
+
 void HddCachableCacheHandler::drawCacheOnTimeline(QPainter * const p,
                                                   const QRectF& drawRect,
                                                   const int startFrame,

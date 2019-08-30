@@ -300,10 +300,12 @@ void Actions::updateAfterFrameChanged(const int currentFrame) const {
     afterAction();
 }
 
-void Actions::setClipToCanvas(const bool bT) {
+void Actions::setClipToCanvas(const bool clip) {
     if(!mActiveScene) return;
-    mActiveScene->setClipToCanvas(bT);
+    if(mActiveScene->clipToCanvas() == clip) return;
+    mActiveScene->setClipToCanvas(clip);
     mActiveScene->updateAllBoxes(UpdateReason::userChange);
+    mActiveScene->sceneFramesUpToDate();
     afterAction();
 }
 

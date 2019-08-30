@@ -59,17 +59,17 @@ public:
         Q_ASSERT(frame->format == mCurrentSamples->fFormat);
         Q_ASSERT(frame->sample_rate == mCurrentSamples->fSampleRate);
         const int nChannels = static_cast<int>(mCurrentSamples->fNChannels);
-        const uint sampleSize = mCurrentSamples->fSampleSize;
+        const int sampleSize = int(mCurrentSamples->fSampleSize);
         int remaining = frame->nb_samples;
         int frameSample = 0;
         if(mCurrentSamples->fPlanar) {
             while(remaining > 0) {
                 const int cpySamples = qMin(remaining,
                                             mEndSample - mCurrentSample + 1);
-                const uint cpyBytes = uint(cpySamples)*sampleSize;
+                const uint cpyBytes = static_cast<uint>(cpySamples*sampleSize);
                 for(int j = 0; j < nChannels; j++) {
                     memcpy(frame->data[j] + frameSample*sampleSize,
-                           mCurrentData[j] + uint(mCurrentSample)*sampleSize, cpyBytes);
+                           mCurrentData[j] + mCurrentSample*sampleSize, cpyBytes);
                 }
 
                 remaining -= cpySamples;
@@ -86,9 +86,9 @@ public:
             while(remaining > 0) {
                 const int cpySamples = qMin(remaining,
                                             mEndSample - mCurrentSample + 1)*nChannels;
-                const uint cpyBytes = uint(cpySamples)*sampleSize;
+                const uint cpyBytes = static_cast<uint>(cpySamples*sampleSize);
                 memcpy(frame->data[0] + frameSample*sampleSize*nChannels,
-                        mCurrentData[0] + uint(mCurrentSample)*sampleSize*nChannels, cpyBytes);
+                        mCurrentData[0] + mCurrentSample*sampleSize*nChannels, cpyBytes);
 
                 remaining -= cpySamples;
                 mCurrentSample += cpySamples;
@@ -167,23 +167,6 @@ signals:
     void encodingStartFailed();
     void encodingFailed();
 };
-
-//class FrameEncoder : public HddTask {
-//protected:
-//    FrameEncoder(const stdsptr<ImageCacheContainer>& frame) {
-//        frame->incInUse();
-//    }
-
-//    ~FrameEncoder() {
-//        mFrame->decInUse();
-//    }
-//public:
-//    void processTask() {
-
-//    }
-//private:
-//    const stdsptr<ImageCacheContainer> mFrame;
-//};
 
 class VideoEncoder : public eHddTask {
     e_OBJECT

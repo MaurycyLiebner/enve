@@ -24,13 +24,15 @@ class RangeMap : public std::map<iValueRange, T> {
     typedef typename std::map<iValueRange, T>::iterator iterator;
     typedef typename std::map<iValueRange, T>::const_iterator const_iterator;
 public:
-    //! @brief Returns iterator range [first, second)
+    //! @brief Returns iterator range { first, end }
     std::pair<iterator, iterator> range(const iValueRange &range) {
+        if(!range.isValid()) return { this->end(), this->end() };
         return {atOrAfterFrame(range.fMin), afterFrame(range.fMax)};
     }
 
-    //! @brief Returns iterator range [first, second)
+    //! @brief Returns iterator range { first, end }
     std::pair<const_iterator, const_iterator> range(const iValueRange &range) const {
+        if(!range.isValid()) return { this->end(), this->end() };
         return {atOrAfterFrame(range.fMin), afterFrame(range.fMax)};
     }
 

@@ -16,7 +16,7 @@
 
 #ifndef HddCACHABLECONT_H
 #define HddCACHABLECONT_H
-#include "minimalcachecontainer.h"
+#include "cachecontainer.h"
 #include "tmpdeleter.h"
 class eTask;
 
