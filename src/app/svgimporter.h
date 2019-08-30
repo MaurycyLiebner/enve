@@ -109,7 +109,7 @@ class BoxSvgAttributes {
 public:
     void setParent(const BoxSvgAttributes &parent);
 
-    const Qt::FillRule &getFillRule() const;
+    SkPath::FillType getFillRule() const;
     const QMatrix &getRelTransform() const;
     const FillSvgAttributes &getFillAttributes() const;
     const StrokeSvgAttributes &getStrokeAttributes() const;
@@ -125,7 +125,7 @@ public:
 protected:
     void decomposeTransformMatrix();
 
-    Qt::FillRule mFillRule = Qt::OddEvenFill;
+    SkPath::FillType mFillRule = SkPath::kEvenOdd_FillType;
 
     qreal mDx = 0;
     qreal mDy = 0;

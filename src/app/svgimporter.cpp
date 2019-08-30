@@ -977,7 +977,7 @@ void BoxSvgAttributes::setParent(const BoxSvgAttributes &parent) {
     mFillRule = parent.getFillRule();
 }
 
-const Qt::FillRule &BoxSvgAttributes::getFillRule() const {
+SkPath::FillType BoxSvgAttributes::getFillRule() const {
     return mFillRule;
 }
 
@@ -1061,9 +1061,9 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
                 setFillAttribute(value);
             } else if(name == "fill-rule") {
                 if(value == "nonzero") {
-                    mFillRule = Qt::WindingFill;
+                    mFillRule = SkPath::kWinding_FillType;
                 } else { // "evenodd"
-                    mFillRule = Qt::OddEvenFill;
+                    mFillRule = SkPath::kEvenOdd_FillType;
                 }
             } else if(name == "fill-opacity") {
                 mFillAttributes.setColorOpacity(toDouble(value));
@@ -1388,7 +1388,7 @@ void VectorPathSvgAttributes::apply(SmartVectorPath * const path) {
         const auto singlePath = enve::make_shared<SmartPathAnimator>(separatePath);
         pathAnimator->addChild(singlePath);
     }
-
+    pathAnimator->setFillType(mFillRule);
     BoxSvgAttributes::apply(path);
 }
 
