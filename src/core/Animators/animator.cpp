@@ -84,17 +84,17 @@ void Animator::prp_afterChangedAbsRange(const FrameRange &range, const bool clip
     emit prp_absFrameRangeChanged(range, clip);
 }
 
+
+
 void Animator::anim_updateAfterChangedKey(Key * const key) {
-    if(SWT_isComplexAnimator()) return;
-    if(!key) {
-        prp_afterWholeInfluenceRangeChanged();
-        return;
-    }
+    if(SWT_isComplexAnimator() || !key) return;
+    const int relFrame = key->getRelFrame();
     int prevKeyRelFrame = anim_getPrevKeyRelFrame(key);
     if(prevKeyRelFrame != FrameRange::EMIN) prevKeyRelFrame++;
     int nextKeyRelFrame = anim_getNextKeyRelFrame(key);
     if(nextKeyRelFrame != FrameRange::EMAX) nextKeyRelFrame--;
-    prp_afterChangedRelRange({prevKeyRelFrame, nextKeyRelFrame});
+    const FrameRange inflRange = {prevKeyRelFrame, nextKeyRelFrame};
+    prp_afterChangedRelRange(inflRange + prp_getIdenticalRelRange(relFrame));
 }
 
 void Animator::anim_setAbsFrame(const int frame) {
@@ -411,6 +411,7 @@ FrameRange Animator::prp_getIdenticalRelRange(const int relFrame) const {
     int fId = relFrame;
     int lId = relFrame;
 
+    int idIt = prevId;
     while(true) {
         if(!prevKey) {
             fId = FrameRange::EMIN;
@@ -421,9 +422,10 @@ FrameRange Animator::prp_getIdenticalRelRange(const int relFrame) const {
         }
         fId = prevKey->getRelFrame();
         prevPrevKey = prevKey;
-        prevKey = prevKey->getPrevKey();
+        prevKey = anim_getKeyAtIndex(--idIt);
     }
 
+    idIt = nextId;
     while(true) {
         if(!nextKey) {
             lId = FrameRange::EMAX;
@@ -434,7 +436,7 @@ FrameRange Animator::prp_getIdenticalRelRange(const int relFrame) const {
         }
         lId = nextKey->getRelFrame();
         prevNextKey = nextKey;
-        nextKey = nextKey->getNextKey();
+        nextKey = anim_getKeyAtIndex(++idIt);
     }
 
     return {fId, lId};
