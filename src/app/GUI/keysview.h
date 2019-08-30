@@ -50,7 +50,6 @@ public:
                       QWidget *parent = nullptr);
 
     void setCurrentScene(Canvas* const scene);
-    Canvas* currentScene() const { return mCurrentScene; }
 
     void setGraphViewed(const bool bT);
 
@@ -203,7 +202,7 @@ private:
     bool mMoveAllSelected = false;
     bool mPressedCtrlPoint = false;
 
-    Canvas* mCurrentScene = nullptr;
+    qptr<Canvas> mCurrentScene;
     QList<Animator*> mSelectedKeysAnimators;
     QList<GraphAnimator*> mGraphAnimators;
 

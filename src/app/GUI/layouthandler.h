@@ -205,10 +205,11 @@ private:
         if(id < mNumberLayouts) mNumberLayouts--;
         mLayouts.erase(mLayouts.begin() + id);
         mComboBox->removeItem(id);
-        if(mCurrentId == id) mCurrentId = -1;
-        else if(mCurrentId > id) mCurrentId--;
-        const int newId = qBound(0, mCurrentId, int(mLayouts.size()) - 1);
-        setCurrent(newId);
+        if(mCurrentId == id) {
+            const int newId = qMin(qMax(0, mCurrentId - 1), int(mLayouts.size()) - 1);
+            mCurrentId = -1;
+            setCurrent(newId);
+        } else if(mCurrentId > id) mCurrentId--;
     }
 
     Document& mDocument;

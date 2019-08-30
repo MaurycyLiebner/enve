@@ -347,8 +347,6 @@ public:
         return absPos;
     }
 
-    void setIsCurrentCanvas(const bool bT);
-
     void scheduleEffectsMarginUpdate() {}
 
     void renderSk(SkCanvas * const canvas,
@@ -621,7 +619,6 @@ protected:
     qsptr<SoundComposition> mSoundComposition;
 
     bool mLocalPivot = false;
-    bool mIsCurrentCanvas = true;
     FrameRange mRange{0, 200};
 
     qreal mResolutionFraction;

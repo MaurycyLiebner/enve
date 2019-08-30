@@ -799,10 +799,6 @@ bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     return false;
 }
 
-void Canvas::setIsCurrentCanvas(const bool bT) {
-    mIsCurrentCanvas = bT;
-}
-
 int Canvas::getCurrentFrame() {
     return anim_getCurrentAbsFrame();
 }

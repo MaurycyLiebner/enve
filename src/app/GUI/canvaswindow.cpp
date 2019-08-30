@@ -67,7 +67,6 @@ void CanvasWindow::setCurrentCanvas(const int id) {
 
 void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     if(mCurrentCanvas) {
-        mCurrentCanvas->setIsCurrentCanvas(false);
         disconnect(mCurrentCanvas, nullptr, this, nullptr);
         mDocument.removeVisibleScene(mCurrentCanvas);
     }
@@ -75,14 +74,14 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     if(KFT_hasFocus()) mDocument.setActiveScene(mCurrentCanvas);
     if(mCurrentCanvas) {
         mDocument.addVisibleScene(mCurrentCanvas);
-        mCurrentCanvas->setIsCurrentCanvas(true);
-
         emit changeCanvasFrameRange(canvas->getFrameRange());
         queTasksAndUpdate();
         connect(mCurrentCanvas, &Canvas::requestCanvasMode,
                 this, &CanvasWindow::setCanvasMode);
         connect(mCurrentCanvas, &Canvas::requestUpdate,
                 this, qOverload<>(&CanvasWindow::update));
+        connect(mCurrentCanvas, &Canvas::destroyed,
+                this, [this]() { setCurrentCanvas(nullptr); });
 //        connect(mCurrentCanvas, &Canvas::prp_absFrameRangeChanged,
 //                this, [this](const FrameRange& range) {
 //            const int currFrame = mCurrentCanvas->anim_getCurrentAbsFrame();
