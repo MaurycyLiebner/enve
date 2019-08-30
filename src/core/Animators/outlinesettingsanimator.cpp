@@ -17,19 +17,10 @@
 #include "outlinesettingsanimator.h"
 #include "Boxes/pathbox.h"
 
-OutlineSettingsAnimator::OutlineSettingsAnimator(GradientPoints * const grdPts,
-                                                 PathBox * const parent) :
-    OutlineSettingsAnimator(grdPts, parent, Qt::black,
-                            PaintType::FLATPAINT, nullptr) {}
-
 OutlineSettingsAnimator::OutlineSettingsAnimator(
         GradientPoints * const grdPts,
-        PathBox * const parent,
-        const QColor &color,
-        const PaintType paintType,
-        Gradient* const gradient) :
-    PaintSettingsAnimator("outline", grdPts, parent,
-                          color, paintType, gradient) {
+        PathBox * const parent) :
+    PaintSettingsAnimator("outline", grdPts, parent) {
 
     ca_addChild(mLineWidth);
     connect(mLineWidth.get(), &Property::prp_currentFrameChanged,

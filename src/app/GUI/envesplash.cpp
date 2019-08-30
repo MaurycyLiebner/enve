@@ -36,7 +36,7 @@ EnveSplash::EnveSplash() {
                          qRound(0.94*pixmap.width()), qRound(0.09*pixmap.height()));
     setPixmap(pixmap);
     setFixedSize(pixmap.width(), pixmap.height());
-    setWindowFlag(Qt::WindowStaysOnTopHint);
+//    setWindowFlag(Qt::WindowStaysOnTopHint);
 }
 
 void EnveSplash::drawContents(QPainter * const p) {

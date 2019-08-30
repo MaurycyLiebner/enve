@@ -21,14 +21,8 @@
 class OutlineSettingsAnimator : public PaintSettingsAnimator {
     e_OBJECT
 protected:
-    OutlineSettingsAnimator(GradientPoints * const grdPts,
-                            PathBox * const parent);
-
     OutlineSettingsAnimator(GradientPoints* const grdPts,
-                            PathBox * const parent,
-                            const QColor &color,
-                            const PaintType paintType,
-                            Gradient* const gradient = nullptr);
+                            PathBox * const parent);
 public:
     bool SWT_isStrokeSettings() const { return true; }
     void writeProperty(eWriteStream& dst) const;

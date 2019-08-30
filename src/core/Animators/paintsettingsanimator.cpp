@@ -24,26 +24,18 @@
 #include "gradient.h"
 #include "document.h"
 
-PaintSettingsAnimator::PaintSettingsAnimator(
-        const QString &name,
-        GradientPoints * const grdPts,
-        PathBox * const parent) :
-    PaintSettingsAnimator(name, grdPts, parent, QColor(255, 255, 255),
-                          PaintType::FLATPAINT,  nullptr) {}
+PaintSettingsAnimator::PaintSettingsAnimator(const QString &name,
+                                             GradientPoints * const grdPts,
+                                             PathBox * const parent) :
+    ComplexAnimator(name),
+    mTarget_k(parent), mGradientPoints(grdPts) {}
 
-PaintSettingsAnimator::PaintSettingsAnimator(
-        const QString& name,
-        GradientPoints * const grdPts,
-        PathBox * const parent,
-        const QColor &colorT,
-        const PaintType paintTypeT,
-        Gradient* const gradientT) :
-    ComplexAnimator(name), mTarget_k(parent) {
-    mColor->qra_setCurrentValue(colorT);
-    showHideChildrenBeforeChaningPaintType(paintTypeT);
-    setPaintType(paintTypeT);
-    setGradientVar(gradientT);
-    setGradientPoints(grdPts);
+void PaintSettingsAnimator::setup(const QColor &color,
+                                  const PaintType paintType,
+                                  Gradient* const gradient) {
+    mColor->qra_setCurrentValue(color);
+    setPaintType(paintType);
+    setGradientVar(gradient);
 }
 
 void PaintSettingsAnimator::writeProperty(eWriteStream& dst) const {
@@ -141,19 +133,16 @@ ColorAnimator *PaintSettingsAnimator::getColorAnimator() {
     return mColor.data();
 }
 
-void PaintSettingsAnimator::setGradientPoints(GradientPoints* const gradientPoints) {
-    mGradientPoints = gradientPoints;
-}
-
-void PaintSettingsAnimator::setGradientPointsPos(const QPointF &pt1, const QPointF &pt2) {
+void PaintSettingsAnimator::setGradientPointsPos(const QPointF &pt1,
+                                                 const QPointF &pt2) {
     if(!mGradientPoints) return;
     mGradientPoints->setPositions(pt1, pt2);
 }
 
-UpdatePaintSettings::UpdatePaintSettings(const QColor &paintColorT,
-                                         const PaintType paintTypeT) {
-    fPaintColor = paintColorT;
-    fPaintType = paintTypeT;
+UpdatePaintSettings::UpdatePaintSettings(const QColor &paintColor,
+                                         const PaintType paintType) {
+    fPaintColor = paintColor;
+    fPaintType = paintType;
 }
 
 UpdatePaintSettings::UpdatePaintSettings() {}

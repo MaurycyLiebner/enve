@@ -37,19 +37,15 @@ protected:
                           GradientPoints * const grdPts,
                           PathBox * const parent);
 
-    PaintSettingsAnimator(
-            const QString &name,
-            GradientPoints * const grdPts,
-            PathBox * const parent,
-            const QColor &colorT,
-            const PaintType paintTypeT,
-            Gradient * const gradientT = nullptr);
-
     virtual void showHideChildrenBeforeChaningPaintType(
             const PaintType newPaintType);
 public:
     void writeProperty(eWriteStream& dst) const;
     void readProperty(eReadStream& src);
+
+    void setup(const QColor &color,
+               const PaintType paintType,
+               Gradient * const gradient);
 
     QColor getColor() const;
     PaintType getPaintType() const;
@@ -58,7 +54,6 @@ public:
     void setCurrentColor(const QColor &color);
     void setPaintType(const PaintType paintType);
     ColorAnimator *getColorAnimator();
-    void setGradientPoints(GradientPoints * const gradientPoints);
     void setGradientPointsPos(const QPointF& pt1, const QPointF& pt2);
 
     void duplicateColorAnimatorFrom(ColorAnimator *source);
@@ -75,28 +70,19 @@ private:
     PaintType mPaintType = NOPAINT;
 
     PathBox * const mTarget_k;
-    qptr<GradientPoints> mGradientPoints;
+    GradientPoints * const mGradientPoints;
     qsptr<ColorAnimator> mColor = enve::make_shared<ColorAnimator>();
     qptr<Gradient> mGradient;
 };
 
 class FillSettingsAnimator : public PaintSettingsAnimator {
     e_OBJECT
-public:
-    bool SWT_isFillSettingsAnimator() const { return true; }
 protected:
     FillSettingsAnimator(GradientPoints * const grdPts,
                          PathBox * const parent) :
-        FillSettingsAnimator(grdPts, parent, QColor(0, 0, 0),
-                             PaintType::NOPAINT, nullptr) {}
-
-    FillSettingsAnimator(GradientPoints * const grdPts,
-                         PathBox * const parent,
-                         const QColor &color,
-                         const PaintType paintType,
-                         Gradient * const gradient = nullptr) :
-        PaintSettingsAnimator("fill", grdPts, parent, color,
-                              paintType, gradient) {}
+        PaintSettingsAnimator("fill", grdPts, parent) {}
+public:
+    bool SWT_isFillSettingsAnimator() const { return true; }
 };
 
 struct UpdatePaintSettings {
