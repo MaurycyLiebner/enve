@@ -19,31 +19,39 @@
 
 void PaintTarget::draw(SkCanvas * const canvas,
                        const QMatrix& viewTrans,
-                       const QRect& drawRect) {
+                       const QRect& drawRect,
+                       const SkFilterQuality filter) {
     if(!isValid()) return;
     const auto canvasRect = viewTrans.inverted().mapRect(drawRect);
     const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
     const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
     canvas->concat(toSkMatrix(pDrawTrans));
     mPaintOnion.draw(canvas);
-    mPaintDrawable->drawOnCanvas(canvas, {0, 0}, &relDRect, nullptr);
+    SkPaint paint;
+    paint.setFilterQuality(filter);
+    mPaintDrawable->drawOnCanvas(canvas, {0, 0}, &relDRect, &paint);
 }
 
-void PaintTarget::setPaintDrawable(DrawableAutoTiledSurface * const surf) {
+void PaintTarget::setPaintDrawable(DrawableAutoTiledSurface * const surf,
+                                   const int frame) {
     if(mPaintDrawable) {
-        if(mChanged) mPaintDrawable->drawingDoneForNow();
-        mPaintDrawable->setInUse(false);
+        if(mChanged) {
+            mPaintDrawable->drawingDoneForNow();
+            if(mPaintAnimSurface) {
+                const auto updateRange =
+                        mPaintAnimSurface->prp_getIdenticalRelRange(mLastFrame);
+                mPaintAnimSurface->prp_afterChangedRelRange(updateRange);
+            }
+        }
     }
     mPaintDrawable = surf;
+    mLastFrame = frame;
     if(mPaintDrawable) {
-        mPaintDrawable->setInUse(true);
-
         if(mPaintDrawable->storesDataInMemory()) {
             if(!mPaintDrawable->hasTileBitmaps())
                 mPaintDrawable->updateTileBitmaps();
         } else mPaintDrawable->scheduleLoadFromTmpFile();
     }
-    mPaintPressedSinceUpdate = false;
     mChanged = false;
     setupOnionSkin();
 }
@@ -55,22 +63,22 @@ void PaintTarget::setPaintBox(PaintBox * const box) {
         QObject::disconnect(mPaintAnimSurface,
                             &AnimatedSurface::currentSurfaceChanged,
                             mCanvas, nullptr);
-        afterPaintAnimSurfaceChanged();
     }
     mPaintDrawableBox = box;
     if(mPaintDrawableBox) {
         mPaintDrawableBox->setVisibleForScene(false);
         mPaintAnimSurface = mPaintDrawableBox->getSurface();
         const auto setter = [this](DrawableAutoTiledSurface * const surf) {
-            setPaintDrawable(surf);
+            setPaintDrawable(surf, mPaintAnimSurface->anim_getCurrentRelFrame());
         };
         QObject::connect(mPaintAnimSurface,
                          &AnimatedSurface::currentSurfaceChanged,
                          mCanvas, setter);
-        setPaintDrawable(mPaintAnimSurface->getCurrentSurface());
+        setPaintDrawable(mPaintAnimSurface->getCurrentSurface(),
+                         mPaintAnimSurface->anim_getCurrentRelFrame());
     } else {
+        setPaintDrawable(nullptr);
         mPaintAnimSurface = nullptr;
-        mPaintDrawable = nullptr;
     }
 }
 
@@ -85,7 +93,6 @@ void PaintTarget::paintPress(const QPointF& pos,
     }
 
     if(mPaintDrawable && brush) {
-        mPaintPressedSinceUpdate = true;
         const auto& target = mPaintDrawable->surface();
         const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
         const auto drawPos = pDrawTrans.inverted().map(pos);
@@ -116,13 +123,4 @@ void PaintTarget::paintMove(const QPointF& pos,
         mPaintDrawable->pixelRectChanged(qRoi);
     }
     mLastTs = ts;
-}
-
-void PaintTarget::afterPaintAnimSurfaceChanged() {
-    if(mPaintPressedSinceUpdate && mPaintAnimSurface) {
-        mPaintAnimSurface->prp_afterChangedRelRange(
-                    mPaintAnimSurface->prp_getIdenticalRelRange(
-                        mPaintAnimSurface->anim_getCurrentRelFrame()));
-        mPaintPressedSinceUpdate = false;
-    }
 }

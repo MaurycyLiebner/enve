@@ -30,7 +30,8 @@ struct PaintTarget {
 
     void draw(SkCanvas * const canvas,
               const QMatrix& viewTrans,
-              const QRect& drawRect);
+              const QRect& drawRect,
+              const SkFilterQuality filter);
 
     void paintPress(const QPointF& pos,
                     const ulong ts, const qreal pressure,
@@ -57,8 +58,8 @@ struct PaintTarget {
         mPaintAnimSurface->setupOnionSkinFor(20, mPaintOnion, missingLoaded);
     }
 
-    void afterPaintAnimSurfaceChanged();
-    void setPaintDrawable(DrawableAutoTiledSurface * const surf);
+    void setPaintDrawable(DrawableAutoTiledSurface * const surf,
+                          const int frame = 0);
     void setPaintBox(PaintBox * const box);
 
     bool isValid() const {
@@ -71,11 +72,12 @@ struct PaintTarget {
     }
 
     ulong mLastTs;
+    int mLastFrame = 0;
     qptr<PaintBox> mPaintDrawableBox;
     qptr<AnimatedSurface> mPaintAnimSurface;
     OnionSkin mPaintOnion;
     bool mPaintPressedSinceUpdate = false;
-    DrawableAutoTiledSurface * mPaintDrawable = nullptr;
+    CacheContainer::UsePointer<DrawableAutoTiledSurface> mPaintDrawable;
     bool mChanged = false;
     Canvas * const mCanvas;
 };

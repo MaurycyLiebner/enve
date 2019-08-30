@@ -21,18 +21,23 @@ AnimatedSurface::AnimatedSurface() : Animator("canvas"),
     mCurrent_d(mBaseValue.get()) {
     connect(this, &Animator::anim_addedKey,
             this, [this](Key* const key) {
+        updateCurrent();
         if(!mUseRange.inRange(key->getRelFrame())) return;
         const auto asKey = static_cast<ASKey*>(key);
         const auto dSurf = asKey->dSurface();
         if(!dSurf.storesDataInMemory())
             asKey->dSurface().scheduleLoadFromTmpFile();
-        asKey->dSurface().setInUse(true);
+        asKey->dSurface().incInUse();
     });
     connect(this, &Animator::anim_removedKey,
             this, [this](Key* const key) {
+        updateCurrent();
+        if(!anim_hasKeys()) {
+            *mBaseValue.get() = static_cast<ASKey*>(key)->dSurface();
+        }
         if(!mUseRange.inRange(key->getRelFrame())) return;
         const auto asKey = static_cast<ASKey*>(key);
-        asKey->dSurface().setInUse(false);
+        asKey->dSurface().decInUse();
     });
 }
 

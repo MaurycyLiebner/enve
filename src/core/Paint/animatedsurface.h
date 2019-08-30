@@ -88,7 +88,7 @@ public:
         if(minId == -1 || maxId == -1) return;
         for(int i = minId; i <= maxId; i++) {
             const auto iKey = anim_getKeyAtIndex<ASKey>(i);
-            iKey->dSurface().setInUse(false);
+            iKey->dSurface().decInUse();
         }
         mUseRange = {1, 0};
     }
@@ -103,7 +103,7 @@ public:
             for(int i = minId; i <= maxId; i++) {
                 if(relRange.inRange(i)) continue;
                 const auto iKey = anim_getKeyAtIndex<ASKey>(i);
-                iKey->dSurface().setInUse(false);
+                iKey->dSurface().decInUse();
             }
         }
         mUseRange = relRange;
@@ -114,7 +114,7 @@ public:
             for(int i = minId; i <= maxId; i++) {
                 const auto iKey = anim_getKeyAtIndex<ASKey>(i);
                 auto& dSurf = iKey->dSurface();
-                dSurf.setInUse(true);
+                dSurf.incInUse();
                 if(!dSurf.storesDataInMemory())
                     dSurf.scheduleLoadFromTmpFile();
             }
@@ -194,20 +194,9 @@ public:
         anim_appendKey(newKey);
     }
 
-    void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
-        const auto spk = static_cast<ASKey*>(key);
-        if(spk) setCurrent(&spk->dSurface());
-        else {
-            const int relFrame = anim_getCurrentRelFrame();
-            const auto prevNextKey = anim_getPrevAndNextKey<ASKey>(relFrame);
-            if(prevNextKey.first) {
-                setCurrent(&prevNextKey.first->dSurface());
-            } else if(prevNextKey.second) {
-                setCurrent(&prevNextKey.second->dSurface());
-            } else {
-                setCurrent(mBaseValue.get());
-            }
-        }
+    void anim_setAbsFrame(const int frame) {
+        Animator::anim_setAbsFrame(frame);
+        updateCurrent();
     }
 
     DrawableAutoTiledSurface * getSurface(const int relFrame) {
@@ -267,6 +256,22 @@ public:
 signals:
     void currentSurfaceChanged(DrawableAutoTiledSurface*);
 private:
+    void updateCurrent() {
+        const auto spk = anim_getKeyOnCurrentFrame<ASKey>();
+        if(spk) setCurrent(&spk->dSurface());
+        else {
+            const int relFrame = anim_getCurrentRelFrame();
+            const auto prevNextKey = anim_getPrevAndNextKey<ASKey>(relFrame);
+            if(prevNextKey.first) {
+                setCurrent(&prevNextKey.first->dSurface());
+            } else if(prevNextKey.second) {
+                setCurrent(&prevNextKey.second->dSurface());
+            } else {
+                setCurrent(mBaseValue.get());
+            }
+        }
+    }
+
     void setCurrent(DrawableAutoTiledSurface * const surf) {
         if(mCurrent_d == surf) return;
         mCurrent_d = surf;

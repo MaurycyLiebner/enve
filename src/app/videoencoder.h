@@ -171,11 +171,11 @@ signals:
 //class FrameEncoder : public HddTask {
 //protected:
 //    FrameEncoder(const stdsptr<ImageCacheContainer>& frame) {
-//        frame->setInUse(true);
+//        frame->incInUse();
 //    }
 
 //    ~FrameEncoder() {
-//        mFrame->setInUse(false);
+//        mFrame->decInUse();
 //    }
 //public:
 //    void processTask() {

@@ -22,6 +22,61 @@ class CacheContainer : public StdSelfRef {
 protected:
     CacheContainer();
 public:
+    template <typename T>
+    class UsePointer {
+    public:
+        UsePointer() {}
+
+        UsePointer(T* const ptr) {
+            setPtr(ptr);
+        }
+
+        UsePointer(const UsePointer<T>& other) {
+            setPtr(other.get());
+        }
+
+        UsePointer(UsePointer<T>&& other) {
+            mPtr = other.mPtr;
+            other.mPtr = nullptr;
+        }
+
+        ~UsePointer() { if(mPtr) mPtr->decInUse(); }
+
+        UsePointer<T> &operator=(const UsePointer<T>& other) {
+            UsePointer<T> tmp(other);
+            swap(tmp);
+            return *this;
+        }
+
+        UsePointer<T> &operator=(UsePointer<T> &&other) {
+            UsePointer<T> tmp(std::move(other));
+            swap(tmp);
+            return *this;
+        }
+
+        UsePointer<T> &operator=(T* const t) {
+            setPtr(t);
+            return *this;
+        }
+
+        T* operator->() const { return mPtr; }
+        operator bool() const { return mPtr; }
+
+        void swap(UsePointer<T>& other) {
+            std::swap(mPtr, other.mPtr);
+        }
+
+        T* get() const { return mPtr; }
+    private:
+        void setPtr(T* const t) {
+            if(mPtr) mPtr->decInUse();
+            mPtr = t;
+            if(mPtr) mPtr->incInUse();
+        }
+
+        stdptr<T> mPtr = nullptr;
+    };
+
     ~CacheContainer();
 
     virtual void noDataLeft_k() = 0;
@@ -32,27 +87,29 @@ public:
         return bytes;
     }
 
-    void setInUse(const bool inUse) {
-        if(inUse == mInUse) return;
-        mInUse = inUse;
-        if(mInUse) removeFromMemoryManagment();
-        else addToMemoryManagment();
+    void incInUse() {
+        mInUse++;
+        removeFromMemoryManagment();
+    }
+
+    void decInUse() {
+        mInUse--;
+        Q_ASSERT(mInUse >= 0);
+        if(!mInUse) addToMemoryManagment();
     }
 
     bool handledByMemoryHandler() const {
         return mHandledByMemoryHandler;
     }
 
-    bool inUse() const {
-        return mInUse;
-    }
+    bool inUse() const { return mInUse; }
 protected:
     void addToMemoryManagment();
     void removeFromMemoryManagment();
     void updateInMemoryManagment();
 private:
     bool mHandledByMemoryHandler = false;
-    bool mInUse = false;
+    int mInUse = 0;
 };
 
 #endif // MINIMALCACHECONTAINER_H

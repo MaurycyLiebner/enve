@@ -251,7 +251,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
     if(mPaintTarget.isValid()) {
         canvas->save();
-        mPaintTarget.draw(canvas, viewTrans, drawRect);
+        mPaintTarget.draw(canvas, viewTrans, drawRect, filter);
         const SkIRect bRect = toSkIRect(mPaintTarget.pixelBoundingRect());
         paint.setStyle(SkPaint::kStroke_Style);
         paint.setColor(SK_ColorRED);
@@ -337,13 +337,12 @@ void Canvas::setSceneFrame(const int relFrame) {
 void Canvas::setSceneFrame(const stdsptr<SceneFrameContainer>& cont) {
     setLoadingSceneFrame(nullptr);
     if(cont == mSceneFrame) return emit requestUpdate();
-    if(mSceneFrame) {
-        if(!mRenderingPreview)
-            mSceneFrame->setInUse(false);
+    if(mSceneFrame && !mRenderingPreview) {
+        mSceneFrame->decInUse();
     }
 
     mSceneFrame = cont;
-    if(cont) cont->setInUse(true);
+    if(cont) cont->incInUse();
     emit requestUpdate();
 }
 
@@ -351,7 +350,7 @@ void Canvas::setLoadingSceneFrame(const stdsptr<SceneFrameContainer>& cont) {
     if(cont == mLoadingSceneFrame) return;
     if(mLoadingSceneFrame.get()) {
         if(!mRenderingPreview || mRenderingOutput) {
-            mLoadingSceneFrame->setInUse(false);
+            mLoadingSceneFrame->decInUse();
         }
     }
     if(!cont) {
@@ -362,7 +361,7 @@ void Canvas::setLoadingSceneFrame(const stdsptr<SceneFrameContainer>& cont) {
     if(!cont->storesDataInMemory()) {
         cont->scheduleLoadFromTmpFile();
     }
-    mLoadingSceneFrame->setInUse(true);
+    mLoadingSceneFrame->incInUse();
 }
 
 FrameRange Canvas::prp_getIdenticalRelRange(const int relFrame) const {
@@ -386,7 +385,7 @@ void Canvas::renderDataFinished(BoxRenderData *renderData) {
 
     if((mPreviewing || mRenderingOutput) &&
        mCurrRenderRange.inRange(relFrame)) {
-        cont->setInUse(true);
+        cont->incInUse();
     } else {
         bool newerSate = true;
         bool closerFrame = true;
@@ -402,7 +401,7 @@ void Canvas::renderDataFinished(BoxRenderData *renderData) {
             mSceneFrameOutdated = !currentState;
             setSceneFrame(cont);
         } else if(mRenderingPreview && mCurrRenderRange.inRange(relFrame)) {
-            cont->setInUse(true);
+            cont->incInUse();
         }
     }
 }
@@ -629,8 +628,6 @@ void Canvas::anim_setAbsFrame(const int frame) {
     if(frame == anim_getCurrentAbsFrame()) return;
     ContainerBox::anim_setAbsFrame(frame);
     const int newRelFrame = anim_getCurrentRelFrame();
-
-    mPaintTarget.afterPaintAnimSurfaceChanged();
 
     const auto cont = mSceneFramesHandler.atFrame<SceneFrameContainer>(newRelFrame);
     if(cont) {

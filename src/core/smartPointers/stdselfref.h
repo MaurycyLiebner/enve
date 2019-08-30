@@ -23,6 +23,7 @@
 
 template <class T> class StdPointer;
 template <class T> using stdsptr = std::shared_ptr<T>;
+template <class T> using stdptr = StdPointer<T>;
 
 class StdSelfRef {
     template <class T> friend class StdPointer;

@@ -41,7 +41,7 @@ VideoEncoder::VideoEncoder() {
 
 void VideoEncoder::addContainer(const stdsptr<SceneFrameContainer>& cont) {
     if(!cont) return;
-    cont->setInUse(true);
+    cont->incInUse();
     mNextContainers.append(cont);
     if(getState() < eTaskState::qued || getState() > eTaskState::processing) scheduleTask();
 }
@@ -637,7 +637,7 @@ void VideoEncoder::finishEncodingNow() {
 
 void VideoEncoder::clearContainers() {
     for(const auto &cont : _mContainers)
-        cont->setInUse(false);
+        cont->decInUse();
     _mContainers.clear();
     mSoundIterator.clear();
 }
@@ -715,7 +715,7 @@ void VideoEncoder::afterProcessing() {
             auto currCanvas = mRenderInstanceSettings->getTargetCanvas();
             currCanvas->setSceneFrame(cont);
         } else {
-            cont->setInUse(false);
+            cont->decInUse();
         }
     }
     for(int i = _mContainers.count() - 1; i >= _mCurrentContainerId; i--) {

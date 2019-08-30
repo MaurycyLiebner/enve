@@ -238,10 +238,10 @@ void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
     const bool isComplex = SWT_isComplexAnimator();
     if(!isComplex) anim_setRecordingValue(true);
     anim_mKeys.add(newKey);
-    emit anim_addedKey(newKey.get());
     if(newKey->getRelFrame() == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(newKey.get());
     if(!isComplex) anim_updateAfterChangedKey(newKey.get());
+    emit anim_addedKey(newKey.get());
 }
 
 void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
@@ -250,26 +250,14 @@ void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
 }
 
 void Animator::removeKeyWithoutDeselecting(const stdsptr<Key>& keyToRemove) {
-    const bool isComplex = SWT_isComplexAnimator();
     Key * const keyPtr = keyToRemove.get();
+    anim_updateAfterChangedKey(keyPtr);
     anim_mKeys.remove(keyToRemove);
 
     const int rFrame = keyPtr->getRelFrame();
-
-    emit anim_removedKey(keyPtr);
     if(rFrame == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(nullptr);
-
-    if(isComplex) return;
-    const int prevKeyRelFrame = anim_getPrevKeyRelFrame(rFrame);
-    const int nextKeyRelFrame = anim_getNextKeyRelFrame(rFrame);
-    const int affectedMin = prevKeyRelFrame == FrameRange::EMIN ?
-                FrameRange::EMIN :
-                qMin(prevKeyRelFrame + 1, rFrame);
-    const int affectedMax = nextKeyRelFrame == FrameRange::EMAX ?
-                FrameRange::EMAX :
-                qMax(nextKeyRelFrame - 1, rFrame);
-    prp_afterChangedRelRange({affectedMin, affectedMax});
+    emit anim_removedKey(keyPtr);
 }
 
 void Animator::anim_moveKeyToRelFrame(Key * const key, const int newFrame) {

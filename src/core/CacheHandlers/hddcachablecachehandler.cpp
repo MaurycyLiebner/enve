@@ -20,7 +20,8 @@ void HddCachableCacheHandler::blockConts(
         const FrameRange &range, const bool blocked) {
     const auto its = mConts.range(range);
     for(auto it = its.first; it != its.second; it++) {
-        it->second->setInUse(blocked);
+        if(blocked) it->second->incInUse();
+        else it->second->decInUse();
     }
 }
 

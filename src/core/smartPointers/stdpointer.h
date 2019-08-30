@@ -77,7 +77,6 @@ public:
         rp = nullptr;
     }
 };
-template <class T> using stdptr = StdPointer<T>;
 
 template <class T> Q_DECLARE_TYPEINFO_BODY(StdPointer<T>, Q_MOVABLE_TYPE);
 
