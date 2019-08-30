@@ -152,7 +152,10 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
                 return BoxSingleWidget::VISIBLE_PIXMAP;
             } else return BoxSingleWidget::INVISIBLE_PIXMAP;
         } else if(target->SWT_isGraphAnimator()) {
-            return BoxSingleWidget::GRAPH_PROPERTY;
+            const auto bsvt = static_cast<BoxScroller*>(mParent);
+            const auto keysView = bsvt->getKeysView();
+            if(keysView) return BoxSingleWidget::GRAPH_PROPERTY;
+            return static_cast<QPixmap*>(nullptr);
         } else return static_cast<QPixmap*>(nullptr);
     });
     mMainLayout->addWidget(mVisibleButton);
@@ -664,29 +667,6 @@ void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
     }
 }
 
-int BoxSingleWidget::getOptimalNameRightX() {
-    if(!mTarget) return 0;
-    const auto target = mTarget->getTarget();
-
-    QFontMetrics fm = QFontMetrics(QFont());
-    QString name;
-    if(target->SWT_isProperty()) {
-        name = static_cast<Property*>(target)->prp_getName();
-    }
-    int nameX = mFillWidget->x();
-    //return nameX;
-    if(target->SWT_isBoundingBox()) {
-        nameX += MIN_WIDGET_DIM/4;
-    } else if(target->SWT_isQrealAnimator()) {
-        nameX += MIN_WIDGET_DIM;
-    } else if(target->SWT_isBoxTargetProperty()) {
-        nameX += 2*MIN_WIDGET_DIM;
-    } else {//if(target->SWT_isBoolProperty()) {
-        nameX += 2*MIN_WIDGET_DIM;
-    }
-    return nameX + fm.width(name);
-}
-
 void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(!mTarget) return;
     QPainter p(this);
@@ -778,10 +758,10 @@ void BoxSingleWidget::switchBoxVisibleAction() {
     } else if(target->SWT_isPathEffect()) {
         static_cast<PathEffect*>(target)->switchVisible();
     } else if(target->SWT_isGraphAnimator()) {
-        const auto animTarget = static_cast<GraphAnimator*>(target);
         const auto bsvt = static_cast<BoxScroller*>(mParent);
         const auto keysView = bsvt->getKeysView();
         if(keysView) {
+            const auto animTarget = static_cast<GraphAnimator*>(target);
             if(keysView->graphGetAnimatorId(animTarget) != -1) {
                 keysView->graphRemoveViewedAnimator(animTarget);
             } else {
@@ -803,13 +783,9 @@ void BoxSingleWidget::switchBoxLockedAction() {
 
 void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
     if(!mTarget) return;
-    SingleWidgetTarget *target = mTarget->getTarget();
-    if(!target->SWT_isQPointFAnimator() ||
-        mTarget->contentVisible()) return;
-    int nameRightX = getOptimalNameRightX();
-    int slidersWidth = mValueSlider->minimumWidth() +
-            mSecondValueSlider->minimumWidth() + MIN_WIDGET_DIM;
-    if(width() - nameRightX > slidersWidth) {
+    const auto target = mTarget->getTarget();
+    if(!target->SWT_isQPointFAnimator() || mTarget->contentVisible()) return;
+    if(width() - mFillWidget->x() > 10*MIN_WIDGET_DIM) {
         const auto pt_target = static_cast<QPointFAnimator*>(target);
         mValueSlider->setTarget(pt_target->getXAnimator());
         mValueSlider->show();
@@ -824,21 +800,21 @@ void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
 
 void BoxSingleWidget::updatePathCompositionBoxVisible() {
     if(!mTarget) return;
-    if(mPathBlendModeVisible && width() > 15*MIN_WIDGET_DIM) {
+    if(mPathBlendModeVisible && width() - mFillWidget->x() > 8*MIN_WIDGET_DIM) {
         mPathBlendModeCombo->show();
     } else mPathBlendModeCombo->hide();
 }
 
 void BoxSingleWidget::updateCompositionBoxVisible() {
     if(!mTarget) return;
-    if(mBlendModeVisible && width() > 15*MIN_WIDGET_DIM) {
+    if(mBlendModeVisible && width() - mFillWidget->x() > 10*MIN_WIDGET_DIM) {
         mBlendModeCombo->show();
     } else mBlendModeCombo->hide();
 }
 
 void BoxSingleWidget::updateFillTypeBoxVisible() {
     if(!mTarget) return;
-    if(mFillTypeVisible && width() > 15*MIN_WIDGET_DIM) {
+    if(mFillTypeVisible && width() - mFillWidget->x() > 8*MIN_WIDGET_DIM) {
         mFillTypeCombo->show();
     } else mFillTypeCombo->hide();
 }
@@ -847,4 +823,5 @@ void BoxSingleWidget::resizeEvent(QResizeEvent *) {
     updateCompositionBoxVisible();
     updatePathCompositionBoxVisible();
     updateFillTypeBoxVisible();
+    updateValueSlidersForQPointFAnimator();
 }

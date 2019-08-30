@@ -200,12 +200,12 @@ MainWindow::MainWindow(Document& document,
     addDockWidget(Qt::LeftDockWidgetArea, mBrushSettingsDock);
     mBrushSettingsDock->hide();
 
-    mLeftDock = new QDockWidget("Current Object", this);
+    mLeftDock = new QDockWidget("Selected Objects", this);
     mLeftDock->setFeatures(QDockWidget::DockWidgetMovable |
                            QDockWidget::DockWidgetFloatable);
     mLeftDock->setMinimumWidth(MIN_WIDGET_DIM*10);
     mLeftDock->setMaximumWidth(MIN_WIDGET_DIM*20);
-    const auto leftDockLabel = new QLabel("Current Object", this);
+    const auto leftDockLabel = new QLabel("Selected Objects", this);
     leftDockLabel->setObjectName("dockLabel");
     leftDockLabel->setAlignment(Qt::AlignCenter);
     mLeftDock->setTitleBarWidget(leftDockLabel);
@@ -520,7 +520,7 @@ void MainWindow::setupMenuBar() {
 
     mPanelsMenu = mViewMenu->addMenu("Docks");
 
-    mCurrentObjectDock = mPanelsMenu->addAction("Current Object");
+    mCurrentObjectDock = mPanelsMenu->addAction("Selected Objects");
     mCurrentObjectDock->setCheckable(true);
     mCurrentObjectDock->setChecked(true);
     mCurrentObjectDock->setShortcut(QKeySequence(Qt::Key_O));

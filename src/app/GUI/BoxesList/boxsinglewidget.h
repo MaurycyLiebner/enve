@@ -86,7 +86,6 @@ public:
         update();
     }
     bool isTargetDisabled();
-    int getOptimalNameRightX();
 protected:
     bool mSelected = false;
     void mousePressEvent(QMouseEvent *e);
