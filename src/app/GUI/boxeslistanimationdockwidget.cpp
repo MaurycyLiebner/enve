@@ -51,7 +51,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     setFocusPolicy(Qt::NoFocus);
 
     mMainWindow = parent;
-    setMinimumSize(10*MIN_WIDGET_DIM, 10*MIN_WIDGET_DIM);
+    setMinimumSize(10*MIN_WIDGET_DIM, 12*MIN_WIDGET_DIM);
     mMainLayout = new QVBoxLayout(this);
     setLayout(mMainLayout);
     mMainLayout->setSpacing(0);

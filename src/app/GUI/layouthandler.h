@@ -207,7 +207,7 @@ private:
         mComboBox->removeItem(id);
         if(mCurrentId == id) mCurrentId = -1;
         else if(mCurrentId > id) mCurrentId--;
-        const int newId = qMin(mCurrentId, int(mLayouts.size()) - 1);
+        const int newId = qBound(0, mCurrentId, int(mLayouts.size()) - 1);
         setCurrent(newId);
     }
 

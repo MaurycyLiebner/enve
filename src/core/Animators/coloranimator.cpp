@@ -20,7 +20,7 @@
 
 ColorAnimator::ColorAnimator(const QString &name) : StaticComplexAnimator(name) {
     setColorMode(ColorMode::rgb);
-
+    mAlphaAnimator->setCurrentBaseValue(1);
     ca_addChild(mVal1Animator);
     ca_addChild(mVal2Animator);
     ca_addChild(mVal3Animator);

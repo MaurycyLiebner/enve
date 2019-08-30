@@ -88,7 +88,7 @@ private:
     qreal mLastMousePressFrame;
 
     QColor mHandleColor = QColor(100, 100, 100);
-    Canvas* mCurrentCanvas = nullptr;
+    qptr<Canvas> mCurrentCanvas;
 };
 
 #endif // ANIMATiONWIDGETSCROLLBAR_H
