@@ -56,9 +56,15 @@ bool ContainerBox::SWT_drop(const QMimeData * const data) {
 bool ContainerBox::SWT_dropInto(const int index, const QMimeData * const data) {
     const auto eData = static_cast<const eMimeData*>(data);
     const auto bData = static_cast<const eDraggedObjects*>(eData);
+    int dropId = index;
     for(int i = 0; i < bData->count(); i++) {
         const auto iObj = bData->getObject<eBoxOrSound>(i);
-        insertContained(index + i - ca_getNumberOfChildren(),
+        if(iObj->SWT_isContainerBox()) {
+            const auto box = static_cast<BoundingBox*>(iObj);
+            if(box == this) continue;
+            if(isAncestor(box)) continue;
+        }
+        insertContained((dropId++) - ca_getNumberOfChildren(),
                         iObj->ref<eBoxOrSound>());
     }
     return true;
