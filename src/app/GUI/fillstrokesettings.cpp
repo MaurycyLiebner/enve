@@ -181,6 +181,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mLinearGradientButton = new QPushButton(QIcon(iconsDir + "/fill_gradient.png"),
                                             "Linear", this);
     mLinearGradientButton->setCheckable(true);
+    mLinearGradientButton->setChecked(true);
     mLinearGradientButton->setObjectName("leftButton");
     connect(mLinearGradientButton, &QPushButton::released,
             this, &FillStrokeSettingsWidget::setLinearGradientAction);
