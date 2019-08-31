@@ -195,6 +195,9 @@ void TaskScheduler::processNextQuedHddTask() {
             const auto task = mQuedHddTasks.at(i);
             if(task->readyToBeProcessed()) {
                 task->aboutToProcess(Hardware::hdd);
+                if(task->getState() > eTaskState::processing) {
+                    return processNextTasks();
+                }
                 const auto hddTask = dynamic_cast<eHddTask*>(task.get());
                 if(hddTask) hddTask->setController(mHddExecutor);
                 mQuedHddTasks.removeAt(i--);
@@ -230,6 +233,8 @@ bool TaskScheduler::processNextQuedGpuTask() {
         for(int i = 0; i < additional; i++) {
             const auto iTask = mQuedCpuTasks.takeQuedForGpuProcessing();
             if(!iTask) break;
+            iTask->aboutToProcess(Hardware::gpu);
+            if(iTask->getState() > eTaskState::processing) continue;
             scheduleGpuTask(iTask);
         }
     }
@@ -266,6 +271,8 @@ void TaskScheduler::processNextQuedCpuTask() {
             for(int i = 0; i < additional; i++) {
                 const auto iTask = mQuedCpuTasks.takeQuedForCpuProcessing();
                 if(!iTask) break;
+                iTask->aboutToProcess(Hardware::cpu);
+                if(iTask->getState() > eTaskState::processing) continue;
                 executor->processTask(iTask);
             }
         } else break;
