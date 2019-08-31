@@ -28,7 +28,7 @@ class RenderContainer {
 public:
     RenderContainer() {}
 
-    void drawSk(SkCanvas * const canvas, SkPaint * const paint);
+    void drawSk(SkCanvas * const canvas, SkPaint &paint);
 
     void updatePaintTransformGivenNewTotalTransform(
             const QMatrix &totalTransform);
@@ -51,6 +51,7 @@ public:
     }
 protected:
     bool mExpired = false;
+    bool mAntiAlias = false;
     int mRelFrame = 0;
     qreal mResolutionFraction;
     QRect mGlobalRect;

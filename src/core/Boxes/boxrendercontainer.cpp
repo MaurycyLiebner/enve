@@ -18,27 +18,27 @@
 #include "boxrenderdata.h"
 #include "skia/skiahelpers.h"
 
-void RenderContainer::drawSk(SkCanvas * const canvas, SkPaint * const paint) {
+void RenderContainer::drawSk(SkCanvas * const canvas,
+                             SkPaint& paint) {
     if(!mSrcRenderData) return;
     canvas->save();
     canvas->concat(toSkMatrix(mPaintTransform));
-    if(paint) {
-        const auto blendMode = paint->getBlendMode();
-        if(blendMode == SkBlendMode::kDstIn ||
-           blendMode == SkBlendMode::kSrcIn ||
-           blendMode == SkBlendMode::kDstATop) {
-            SkPaint bPaint;
-            bPaint.setBlendMode(paint->getBlendMode());
-            bPaint.setColor(SK_ColorTRANSPARENT);
-            SkPath path;
-            path.addRect(SkRect::MakeXYWH(mGlobalRect.x(), mGlobalRect.y(),
-                                          mImageSk->width(),
-                                          mImageSk->height()));
-            path.toggleInverseFillType();
-            canvas->drawPath(path, bPaint);
-        }
+    const auto blendMode = paint.getBlendMode();
+    if(blendMode == SkBlendMode::kDstIn ||
+       blendMode == SkBlendMode::kSrcIn ||
+       blendMode == SkBlendMode::kDstATop) {
+        SkPaint bPaint;
+        bPaint.setBlendMode(blendMode);
+        bPaint.setColor(SK_ColorTRANSPARENT);
+        SkPath path;
+        path.addRect(SkRect::MakeXYWH(mGlobalRect.x(), mGlobalRect.y(),
+                                      mImageSk->width(),
+                                      mImageSk->height()));
+        path.toggleInverseFillType();
+        canvas->drawPath(path, bPaint);
     }
-    canvas->drawImage(mImageSk, mGlobalRect.x(), mGlobalRect.y(), paint);
+    paint.setAntiAlias(mAntiAlias);
+    canvas->drawImage(mImageSk, mGlobalRect.x(), mGlobalRect.y(), &paint);
     canvas->restore();
 }
 
@@ -56,6 +56,7 @@ void RenderContainer::setSrcRenderData(BoxRenderData * const data) {
     mImageSk = data->fRenderedImage;
     mGlobalRect = data->fGlobalRect;
     mRelFrame = data->fRelFrame;
+    mAntiAlias = data->fAntiAlias;
     mPaintTransform.reset();
     mPaintTransform.scale(1/mResolutionFraction, 1/mResolutionFraction);
     mRenderTransform = data->fRenderTransform;

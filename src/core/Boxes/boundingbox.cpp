@@ -245,7 +245,7 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
     paint.setAlpha(static_cast<U8CPU>(intAlpha));
     paint.setBlendMode(mBlendMode);
     paint.setFilterQuality(filter);
-    mDrawRenderContainer.drawSk(canvas, &paint);
+    mDrawRenderContainer.drawSk(canvas, paint);
 }
 
 void BoundingBox::setBlendModeSk(const SkBlendMode blendMode) {
