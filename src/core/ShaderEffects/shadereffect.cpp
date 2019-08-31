@@ -34,7 +34,8 @@ void ShaderEffect::writeIdentifier(eWriteStream& dst) const {
     mCreator->writeIdentifier(dst);
 }
 
-stdsptr<RasterEffectCaller> ShaderEffect::getEffectCaller(const qreal relFrame) const {
+stdsptr<RasterEffectCaller> ShaderEffect::getEffectCaller(
+        const qreal relFrame, const qreal resolution) const {
     QJSEngine engine;
 
     UniformSpecifiers uniformSpecifiers;

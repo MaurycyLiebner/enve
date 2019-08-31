@@ -29,7 +29,8 @@ class ShaderEffect : public RasterEffect {
 public:
     void writeIdentifier(eWriteStream &dst) const;
 
-    stdsptr<RasterEffectCaller> getEffectCaller(const qreal relFrame) const;
+    stdsptr<RasterEffectCaller> getEffectCaller(
+            const qreal relFrame, const qreal resolution) const;
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) {
         if(program == mProgram)

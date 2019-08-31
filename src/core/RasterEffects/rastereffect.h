@@ -38,7 +38,8 @@ protected:
                  const bool hwInterchangeable,
                  const RasterEffectType type);
 public:
-    virtual stdsptr<RasterEffectCaller> getEffectCaller(const qreal relFrame) const = 0;
+    virtual stdsptr<RasterEffectCaller> getEffectCaller(
+            const qreal relFrame, const qreal resolution) const = 0;
 
     virtual bool forceMargin() const { return false; }
     virtual QMargins getMargin() const { return QMargins(); }

@@ -64,7 +64,8 @@ void RasterEffectAnimators::addEffects(const qreal relFrame,
     for(const auto& effect : ca_mChildAnimators) {
         auto rasterEffect = static_cast<RasterEffect*>(effect.get());
         if(rasterEffect->isVisible()) {
-            const auto effectRenderData = rasterEffect->getEffectCaller(relFrame);
+            const auto effectRenderData =
+                    rasterEffect->getEffectCaller(relFrame, data->fResolution);
             if(!effectRenderData) continue;
             data->addEffect(effectRenderData);
         }

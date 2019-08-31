@@ -81,8 +81,8 @@ class DabTest000 : public CustomRasterEffect {
 public:
     DabTest000();
 
-    stdsptr<RasterEffectCaller>
-            getEffectCaller(const qreal relFrame) const;
+    stdsptr<RasterEffectCaller> getEffectCaller(
+            const qreal relFrame, const qreal resolution) const;
 
     CustomIdentifier getIdentifier() const;
 private:

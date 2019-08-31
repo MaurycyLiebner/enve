@@ -80,10 +80,10 @@ eShadow::eShadow() :
 }
 
 stdsptr<RasterEffectCaller>
-eShadow::getEffectCaller(const qreal relFrame) const {
-    const qreal blur = mBlurRadius->getEffectiveValue(relFrame);
+eShadow::getEffectCaller(const qreal relFrame, const qreal resolution) const {
+    const qreal blur = mBlurRadius->getEffectiveValue(relFrame)*resolution;
     const QColor color = mColor->getColor(relFrame);
-    const QPointF trans = mTranslation->getEffectiveValue(relFrame);
+    const QPointF trans = mTranslation->getEffectiveValue(relFrame)*resolution;
     const qreal opacity = mOpacity->getEffectiveValue(relFrame);
 
     const int iL = qMax(0, qCeil(blur - trans.x()));

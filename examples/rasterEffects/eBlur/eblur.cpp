@@ -21,8 +21,7 @@ qsptr<CustomRasterEffect> eCreateNewestVersion() {
     return enve::make_shared<eBlur>();
 }
 
-qsptr<CustomRasterEffect> eCreate(
-        const CustomIdentifier &identifier) {
+qsptr<CustomRasterEffect> eCreate(const CustomIdentifier &identifier) {
     Q_UNUSED(identifier);
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
@@ -55,17 +54,17 @@ bool eSupports(const CustomIdentifier &identifier) {
 }
 
 #include "enveCore/Animators/qrealanimator.h"
-eBlur::eBlur() :
-    CustomRasterEffect(eName().toLower(), HardwareSupport::gpuPreffered, false) {
+eBlur::eBlur() : CustomRasterEffect(eName().toLower(),
+                                    HardwareSupport::gpuPreffered, false) {
     mRadius = enve::make_shared<QrealAnimator>(10, 0, 999.999, 1, "radius");
     ca_addChild(mRadius);
     connect(mRadius.get(), &QrealAnimator::valueChangedSignal,
             this, &CustomRasterEffect::forcedMarginChanged);
 }
 
-stdsptr<RasterEffectCaller>
-eBlur::getEffectCaller(const qreal relFrame) const {
-    const qreal radius = mRadius->getEffectiveValue(relFrame);
+stdsptr<RasterEffectCaller> eBlur::getEffectCaller(const qreal relFrame,
+                                                   const qreal resolution) const {
+    const qreal radius = mRadius->getEffectiveValue(relFrame)*resolution;
     if(isZero4Dec(radius)) return nullptr;
     return enve::make_shared<eBlurCaller>(instanceHwSupport(), radius);
 }
@@ -82,8 +81,7 @@ CustomIdentifier eBlur::getIdentifier() const {
     return { effectId(), eName(), { 0, 0, 0 } };
 }
 
-eBlurCaller::eBlurCaller(const HardwareSupport hwSupport,
-                         const qreal radius) :
+eBlurCaller::eBlurCaller(const HardwareSupport hwSupport, const qreal radius) :
     RasterEffectCaller(hwSupport, true, radiusToMargin(radius)),
     mRadius(static_cast<float>(radius)) {}
 

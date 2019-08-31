@@ -37,7 +37,8 @@ class eBlur : public CustomRasterEffect {
 public:
     eBlur();
 
-    stdsptr<RasterEffectCaller> getEffectCaller(const qreal relFrame) const;
+    stdsptr<RasterEffectCaller> getEffectCaller(const qreal relFrame,
+                                                const qreal resolution) const;
     QMargins getMargin() const;
     bool forceMargin() const { return true; }
 

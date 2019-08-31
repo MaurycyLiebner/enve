@@ -54,7 +54,8 @@ class eShadow : public CustomRasterEffect {
 public:
     eShadow();
 
-    stdsptr<RasterEffectCaller> getEffectCaller(const qreal relFrame) const;
+    stdsptr<RasterEffectCaller> getEffectCaller(
+            const qreal relFrame, const qreal resolution) const;
     bool forceMargin() const { return true; }
 
     CustomIdentifier getIdentifier() const;
