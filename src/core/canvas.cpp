@@ -62,8 +62,6 @@ Canvas::Canvas(Document &document,
 
     mRange = {0, frameCount};
 
-    mResolutionFraction = 1;
-
     mWidth = canvasWidth;
     mHeight = canvasHeight;
 

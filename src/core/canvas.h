@@ -638,7 +638,7 @@ protected:
     bool mLocalPivot = false;
     FrameRange mRange{0, 200};
 
-    qreal mResolutionFraction;
+    qreal mResolutionFraction = 0.5;
 
     qptr<BoundingBox> mCurrentBox;
     qptr<Circle> mCurrentCircle;
