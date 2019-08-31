@@ -36,11 +36,14 @@ BoxesClipboard::BoxesClipboard(const QList<BoundingBox*> &src) :
 
     const bool isBox = true;
     for(const auto& box : src) {
+        const auto future = writeStream.planFuturePos();
         writeStream << isBox;
         box->writeIdentifier(writeStream);
         box->writeBoundingBox(writeStream);
         writeStream.writeCheckpoint();
+        writeStream.assignFuturePos(future);
     }
+    writeStream.writeFutureTable();
     buffer.close();
 
     BoundingBox::sClearWriteBoxes();
@@ -52,6 +55,9 @@ void BoxesClipboard::pasteTo(ContainerBox* const parent) {
     QBuffer buffer(&mData);
     buffer.open(QIODevice::ReadOnly);
     eReadStream readStream(&buffer);
+    buffer.seek(buffer.size() - qint64(sizeof(int)));
+    readStream.readFutureTable();
+    buffer.seek(0);
     try {
         parent->readAllContained(readStream);
     } catch(const std::exception& e) {
