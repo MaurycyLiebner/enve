@@ -15,6 +15,6 @@
 <!-- along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <ShaderEffect name="eDots">
-	<Animator name="dotDistance" type="float" glValue="true" min="0." max="999." step="1" ini="8"/>
-	<Animator name="dotRadius" type="float" glValue="true" min="0." max="999." step="1" ini="8"/>
+        <Animator name="dotDistance" type="float" glValue="true" resolutionScaled="true" min="0." max="999." step="1" ini="8"/>
+        <Animator name="dotRadius" type="float" glValue="true" resolutionScaled="true" min="0." max="999." step="1" ini="8"/>
 </ShaderEffect>

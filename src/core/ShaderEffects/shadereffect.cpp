@@ -44,8 +44,8 @@ stdsptr<RasterEffectCaller> ShaderEffect::getEffectCaller(
         const GLint loc = mProgram->fPropUniLocs.at(i);
         const auto prop = ca_getChildAt(i);
         const auto& uniformC = mProgram->fPropUniCreators.at(i);
-        uniformC->evaluate(engine, prop, relFrame);
-        uniformSpecifiers << uniformC->create(loc, prop, relFrame);
+        uniformC->evaluate(engine, prop, relFrame, resolution);
+        uniformSpecifiers << uniformC->create(loc, prop, relFrame, resolution);
     }
     const int valsCount = mProgram->fValueHandlers.count();
     for(int i = 0; i < valsCount; i++) {

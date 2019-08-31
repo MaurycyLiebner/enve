@@ -20,9 +20,10 @@ UniformSpecifier qrealAnimatorCreate(
         const bool glValue,
         const GLint loc,
         Property * const property,
-        const qreal relFrame) {
+        const qreal relFrame,
+        const qreal resolution) {
     const auto qa = static_cast<QrealAnimator*>(property);
-    const qreal val = qa->getEffectiveValue(relFrame);
+    const qreal val = qa->getEffectiveValue(relFrame)*resolution;
     const QString propName = property->prp_getName();
     const QString valScript = propName + " = " + QString::number(val);
 
@@ -66,9 +67,11 @@ UniformSpecifier intAnimatorCreate(
 
 UniformSpecifier UniformSpecifierCreator::create(const GLint loc,
                                                  Property * const property,
-                                                 const qreal relFrame) const {
+                                                 const qreal relFrame,
+                                                 const qreal resolution) const {
     if(mType == ShaderPropertyType::qrealAnimator)
-        return qrealAnimatorCreate(mGLValue, loc, property, relFrame);
+        return qrealAnimatorCreate(mGLValue, loc, property, relFrame,
+                                   mResolutionScaled ? resolution : 1);
     else if(mType == ShaderPropertyType::intAnimator)
         return intAnimatorCreate(mGLValue, loc, property, relFrame);
     else RuntimeThrow("Unsupported type");
@@ -76,10 +79,12 @@ UniformSpecifier UniformSpecifierCreator::create(const GLint loc,
 
 void UniformSpecifierCreator::evaluate(QJSEngine &engine,
                                        Property * const property,
-                                       const qreal relFrame) const {
+                                       const qreal relFrame,
+                                       const qreal resolution) const {
     if(mType == ShaderPropertyType::qrealAnimator) {
         const auto qa = static_cast<QrealAnimator*>(property);
-        const qreal val = qa->getEffectiveValue(relFrame);
+        qreal val = qa->getEffectiveValue(relFrame);
+        if(mResolutionScaled) val *= resolution;
         engine.evaluate(property->prp_getName() + " = " + QString::number(val));
     } else if(mType == ShaderPropertyType::intAnimator) {
         const auto ia = static_cast<IntAnimator*>(property);

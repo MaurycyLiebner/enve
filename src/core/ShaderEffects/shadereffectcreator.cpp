@@ -108,11 +108,12 @@ void readAnimatorCreators(const QDomElement &elem,
             const qreal iniVal = attrToDouble(elem, name, "ini");
             const qreal stepVal = attrToDouble(elem, name, "step");
             const bool glValue = attrToBool(elem, name, "glValue", "false");
+            const bool resolutionScaled = attrToBool(elem, name, "resolutionScaled", "false");
 
             propC = enve::make_shared<QrealAnimatorCreator>(
                         iniVal, minVal, maxVal, stepVal, glValue, name);
             uniC = enve::make_shared<UniformSpecifierCreator>(
-                        ShaderPropertyType::qrealAnimator, glValue);
+                        ShaderPropertyType::qrealAnimator, glValue, resolutionScaled);
         } catch(...) {
             RuntimeThrow("Error while parsing Animator '" + name +
                          "' of type " + type + ".");
@@ -128,7 +129,7 @@ void readAnimatorCreators(const QDomElement &elem,
             propC = enve::make_shared<IntAnimatorCreator>(
                         iniVal, minVal, maxVal, stepVal, glValue, name);
             uniC = enve::make_shared<UniformSpecifierCreator>(
-                        ShaderPropertyType::intAnimator, glValue);
+                        ShaderPropertyType::intAnimator, glValue, false);
         } catch(...) {
             RuntimeThrow("Error while parsing Animator '" + name +
                          "' of type " + type + ".");
