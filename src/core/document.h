@@ -108,7 +108,8 @@ public:
     Gradient * duplicateGradient(const int id);
     bool removeGradient(const qsptr<Gradient>& gradient);
     bool removeGradient(const int id);
-    Gradient * getGradientWithRWId(const int rwId);
+    Gradient * getGradientWithRWId(const int rwId) const;
+    Gradient * getGradientWithDocumentId(const int id) const;
 
     void setBrush(const SimpleBrushWrapper * const brush) {
         fBrush = brush;

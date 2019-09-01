@@ -78,12 +78,12 @@ int SWT_Abstraction::updateHeight(const SWT_RulesCollection &rules,
 }
 
 void SWT_Abstraction::addChildAbstraction(
-        SWT_Abstraction * const abs) {
+        const stdsptr<SWT_Abstraction>& abs) {
     addChildAbstractionAt(abs, mChildren.count());
 }
 
 void SWT_Abstraction::addChildAbstractionAt(
-        SWT_Abstraction* const abs, const int id) {
+        const stdsptr<SWT_Abstraction>& abs, const int id) {
     mChildren.insert(id, abs);
     abs->setParent(this);
     updateChildrenIds(id, mChildren.count() - 1);
@@ -95,19 +95,18 @@ void SWT_Abstraction::addChildAbstractionAt(
 SWT_Abstraction *SWT_Abstraction::getChildAbsFor(
         const SingleWidgetTarget* const target) {
     for(const auto& abs : mChildren) {
-        if(abs->getTarget() == target) return abs;
+        if(abs->getTarget() == target) return abs.get();
     }
     return nullptr;
 }
 
 void SWT_Abstraction::removeChild(
         const SingleWidgetTarget* const target) {
-    auto childAbs = getChildAbsFor(target);
-    if(childAbs) removeChild(childAbs);
+    const auto childAbs = getChildAbsFor(target);
+    if(childAbs) removeChild(childAbs->ref<SWT_Abstraction>());
 }
 
-void SWT_Abstraction::removeChild(
-        SWT_Abstraction * const abs) {
+void SWT_Abstraction::removeChild(const stdsptr<SWT_Abstraction>& abs) {
     const int currId = abs->getIdInParent();
     mChildren.removeOne(abs);
     if(abs->getParent() == this) abs->setParent(nullptr);
@@ -149,29 +148,22 @@ void SWT_Abstraction::afterContentVisibilityChanged() {
 }
 
 void SWT_Abstraction::removeAlongWithAllChildren_k() {
-    for(const auto& child : mChildren)
-        child->removeAlongWithAllChildren_k();
-    if(mTarget_k)
-        mTarget_k->SWT_removeAbstractionForWidget(mVisiblePartWidgetId);
+    for(const auto& child : mChildren) child->removeAlongWithAllChildren_k();
+    mChildren.clear();
+    if(mTarget_k) mTarget_k->SWT_removeAbstractionForWidget(mVisiblePartWidgetId);
 }
 
-void SWT_Abstraction::addChild(
-        SingleWidgetTarget * const target) {
-    auto childAbs = target->SWT_abstractionForWidget(
-                mUpdateFuncs, mVisiblePartWidgetId);
-    addChildAbstraction(childAbs);
+void SWT_Abstraction::addChild(SingleWidgetTarget * const target) {
+    auto childAbs = target->SWT_abstractionForWidget(mUpdateFuncs, mVisiblePartWidgetId);
+    addChildAbstraction(childAbs->ref<SWT_Abstraction>());
 }
 
-void SWT_Abstraction::addChildAt(
-        SingleWidgetTarget * const target,
-        const int id) {
-    auto childAbs = target->SWT_abstractionForWidget(mUpdateFuncs,
-                                                        mVisiblePartWidgetId);
-    addChildAbstractionAt(childAbs, id);
+void SWT_Abstraction::addChildAt(SingleWidgetTarget * const target, const int id) {
+    auto childAbs = target->SWT_abstractionForWidget(mUpdateFuncs, mVisiblePartWidgetId);
+    addChildAbstractionAt(childAbs->ref<SWT_Abstraction>(), id);
 }
 
-void SWT_Abstraction::moveChildTo(
-        SingleWidgetTarget * const target, const int id) {
+void SWT_Abstraction::moveChildTo(SingleWidgetTarget * const target, const int id) {
     const auto abs = getChildAbsFor(target);
     int targetId = id;
 //    if(!abs->getTarget()->SWT_visibleOnlyIfParentDescendant()) {
@@ -187,7 +179,7 @@ void SWT_Abstraction::moveChildTo(
     int currId = -1;
     for(int i = 0; i < mChildren.count(); i++) {
         const auto& absT = mChildren.at(i);
-        if(abs == absT) {
+        if(abs == absT.get()) {
             currId = i;
             break;
         }

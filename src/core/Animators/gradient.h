@@ -33,13 +33,7 @@ public:
     bool SWT_isGradient() const { return true; }
     void prp_startTransform();
     void prp_setInheritedFrameShift(const int shift,
-                                    ComplexAnimator* parentAnimator) {
-        Q_UNUSED(shift);
-        if(!parentAnimator) return;
-        for(const auto &key : anim_mKeys) {
-            parentAnimator->ca_updateDescendatKeyFrame(key);
-        }
-    }
+                                    ComplexAnimator* parentAnimator);
 
     int prp_getTotalFrameShift() const {
         return 0;
@@ -52,6 +46,7 @@ public:
     void write(const int id, eWriteStream &dst);
     int read(eReadStream &src);
     int getReadWriteId();
+    int getDocumentId() const { return mDocumentId; }
     void clearReadWriteId();
 
     void swapColors(const int id1, const int id2);
@@ -84,6 +79,8 @@ private:
     void writeProperty(eWriteStream& dst) const;
     void readProperty(eReadStream& src);
 
+    static int sNextDocumnetId;
+    const int mDocumentId;
     int mReadWriteId = -1;
     QGradientStops mQGradientStops;
     QList<qsptr<ColorAnimator>> mColors;

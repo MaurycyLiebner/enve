@@ -18,7 +18,10 @@
 #include "Animators/coloranimator.h"
 #include "Boxes/pathbox.h"
 
-Gradient::Gradient() : ComplexAnimator("gradient") {
+int Gradient::sNextDocumnetId = 0;
+
+Gradient::Gradient() : ComplexAnimator("gradient"),
+    mDocumentId(sNextDocumnetId++) {
     connect(this, &Property::prp_currentFrameChanged,
             this, &Gradient::updateQGradientStops);
 }
@@ -65,6 +68,15 @@ bool Gradient::isEmpty() const {
 
 void Gradient::prp_startTransform() {
     //savedColors = colors;
+}
+
+void Gradient::prp_setInheritedFrameShift(const int shift,
+                                          ComplexAnimator *parentAnimator) {
+    Q_UNUSED(shift);
+    if(!parentAnimator) return;
+    for(const auto &key : anim_mKeys) {
+        parentAnimator->ca_updateDescendatKeyFrame(key);
+    }
 }
 
 void Gradient::addColorToList(const QColor &color) {

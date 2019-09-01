@@ -37,13 +37,13 @@ public:
     void updateVisibleWidgetsContent();
 
     void setMainAbstraction(SWT_Abstraction *abs);
-    void setCurrentRule(const SWT_BoxRule &rule);
+    void setCurrentRule(const SWT_BoxRule rule);
     void setCurrentTarget(SingleWidgetTarget *targetP,
                           const SWT_Target target);
     void setAlwaysShowChildren(const bool alwaysShowChildren);
     void setCurrentSearchText(const QString &text);
 
-    void scheduleContentUpdateIfIsCurrentRule(const SWT_BoxRule &rule);
+    void scheduleContentUpdateIfIsCurrentRule(const SWT_BoxRule rule);
     bool isCurrentRule(const SWT_BoxRule rule);
 
     SWT_RulesCollection getCurrentRulesCollection() {
@@ -65,7 +65,7 @@ public:
 protected:
     void setupUpdateFuncs() {
         mUpdateFuncs.fContentUpdateIfIsCurrentRule =
-                [this](const SWT_BoxRule &rule) {
+                [this](const SWT_BoxRule rule) {
             scheduleContentUpdateIfIsCurrentRule(rule);
         };
         mUpdateFuncs.fContentUpdateIfIsCurrentTarget =

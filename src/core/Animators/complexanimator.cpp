@@ -49,7 +49,7 @@ void ComplexAnimator::SWT_setupAbstraction(
     for(const auto &property : ca_mChildAnimators) {
         auto newAbs = property->SWT_createAbstraction(updateFuncs,
                                                       visiblePartWidgetId);
-        abstraction->addChildAbstraction(newAbs);
+        abstraction->addChildAbstraction(newAbs->ref<SWT_Abstraction>());
     }
 
 }

@@ -32,7 +32,7 @@ ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(ScrollWidget * const parent) :
 }
 
 void ScrollWidgetVisiblePart::setCurrentRule(
-        const SWT_BoxRule &rule) {
+        const SWT_BoxRule rule) {
     mCurrentRulesCollection.fRule = rule;
     updateParentHeight();
     updateVisibleWidgetsContent();
@@ -68,7 +68,7 @@ void ScrollWidgetVisiblePart::setCurrentSearchText(
 }
 
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(
-        const SWT_BoxRule &rule) {
+        const SWT_BoxRule rule) {
     if(isCurrentRule(rule)) {
         planScheduleUpdateParentHeight();
         planScheduleUpdateVisibleWidgetsContent();

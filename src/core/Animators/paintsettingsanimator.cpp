@@ -39,26 +39,33 @@ void PaintSettingsAnimator::setup(const QColor &color,
 }
 
 void PaintSettingsAnimator::writeProperty(eWriteStream& dst) const {
-    mGradientPoints->writeProperty(dst);
     mColor->writeProperty(dst);
     dst.write(&mPaintType, sizeof(PaintType));
     dst.write(&mGradientType, sizeof(GradientType));
-    const int gradId = mGradient ? mGradient->getReadWriteId() : -1;
-    dst << gradId;
+    const int gradRWId = mGradient ? mGradient->getReadWriteId() : -1;
+    dst << gradRWId;
+    const int gradDocId = mGradient ? mGradient->getDocumentId() : -1;
+    dst << gradDocId;
+    mGradientPoints->writeProperty(dst);
 }
 
 void PaintSettingsAnimator::readProperty(eReadStream& src) {
-    mGradientPoints->readProperty(src);
     mColor->readProperty(src);
     PaintType paintType;
     src.read(&paintType, sizeof(PaintType));
-    int gradId;
     src.read(&mGradientType, sizeof(GradientType));
-    src >> gradId;
-    if(gradId != -1) {
-        mGradient = Document::sInstance->getGradientWithRWId(gradId);
+    int gradRWId; src >> gradRWId;
+    int gradDocId; src >> gradDocId;
+    Gradient* grad = nullptr;
+    if(gradRWId != -1) {
+        grad = Document::sInstance->getGradientWithRWId(gradRWId);
     }
+    if(gradDocId != -1 && !grad) {
+        grad = Document::sInstance->getGradientWithDocumentId(gradDocId);
+    }
+    setGradientVar(grad);
     setPaintType(paintType);
+    mGradientPoints->readProperty(src);
 }
 
 void PaintSettingsAnimator::setGradientVar(Gradient* const grad) {
@@ -76,7 +83,7 @@ void PaintSettingsAnimator::setGradientVar(Gradient* const grad) {
         if(grad && !mGradient) {
             if(mTarget_k->getFillSettings() == this)
                 mTarget_k->resetFillGradientPointsPos();
-            else mTarget_k->resetFillGradientPointsPos();
+            else mTarget_k->resetStrokeGradientPointsPos();
         }
     }
     mGradient = grad;

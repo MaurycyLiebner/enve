@@ -20,6 +20,8 @@
 SWT_Abstraction* SingleWidgetTarget::SWT_createAbstraction(
         const UpdateFuncs& updateFuncs,
         const int visiblePartWidgetId) {
+    const auto curr = SWT_getAbstractionForWidget(visiblePartWidgetId);
+    if(curr) return curr;
     const auto abs = enve::make_shared<SWT_Abstraction>(
                 this, updateFuncs, visiblePartWidgetId);
     SWT_setupAbstraction(abs.get(), updateFuncs, visiblePartWidgetId);

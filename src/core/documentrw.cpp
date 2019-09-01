@@ -75,9 +75,16 @@ void Document::read(eReadStream& src) {
     clearGradientRWIds();
 }
 
-Gradient *Document::getGradientWithRWId(const int rwId) {
+Gradient *Document::getGradientWithRWId(const int rwId) const {
     for(const auto &grad : fGradients) {
         if(grad->getReadWriteId() == rwId) return grad.get();
+    }
+    return nullptr;
+}
+
+Gradient *Document::getGradientWithDocumentId(const int id) const {
+    for(const auto &grad : fGradients) {
+        if(grad->getDocumentId() == id) return grad.get();
     }
     return nullptr;
 }

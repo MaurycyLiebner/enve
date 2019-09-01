@@ -838,14 +838,14 @@ void ContainerBox::SWT_setupAbstraction(SWT_Abstraction* abstraction,
 
     for(const auto& cont : mContained) {
         auto abs = cont->SWT_abstractionForWidget(updateFuncs, visiblePartWidgetId);
-        abstraction->addChildAbstraction(abs);
+        abstraction->addChildAbstraction(abs->ref<SWT_Abstraction>());
     }
 }
 
 bool ContainerBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                        const bool parentSatisfies,
                                        const bool parentMainTarget) const {
-    const SWT_BoxRule &rule = rules.fRule;
+    const SWT_BoxRule rule = rules.fRule;
     const bool bbVisible = BoundingBox::SWT_shouldBeVisible(rules,
                                                             parentSatisfies,
                                                             parentMainTarget);

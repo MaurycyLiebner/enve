@@ -63,11 +63,11 @@ public:
 
     void addChild(SingleWidgetTarget * const target);
     void addChildAt(SingleWidgetTarget * const target, const int id);
-    void addChildAbstraction(SWT_Abstraction * const abs);
-    void addChildAbstractionAt(SWT_Abstraction * const abs, const int id);
+    void addChildAbstraction(const stdsptr<SWT_Abstraction> &abs);
+    void addChildAbstractionAt(const stdsptr<SWT_Abstraction> &abs, const int id);
 
     void removeChild(const SingleWidgetTarget * const target);
-    void removeChild(SWT_Abstraction * const abs);
+    void removeChild(const stdsptr<SWT_Abstraction> &abs);
 
     void switchContentVisible();
 
@@ -125,7 +125,7 @@ private:
     const UpdateFuncs mUpdateFuncs;
     SingleWidgetTarget * const mTarget_k;
 
-    QList<stdptr<SWT_Abstraction>> mChildren;
+    QList<stdsptr<SWT_Abstraction>> mChildren;
     int mIdInParent = -1;
     stdptr<SWT_Abstraction> mParent;
 };

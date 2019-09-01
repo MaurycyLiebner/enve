@@ -211,6 +211,6 @@ void Document::SWT_setupAbstraction(SWT_Abstraction * const abstraction,
     for(const auto& scene : fScenes) {
         auto abs = scene->SWT_abstractionForWidget(updateFuncs,
                                                    visiblePartWidgetId);
-        abstraction->addChildAbstraction(abs);
+        abstraction->addChildAbstraction(abs->ref<SWT_Abstraction>());
     }
 }

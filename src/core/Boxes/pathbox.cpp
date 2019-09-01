@@ -373,13 +373,10 @@ void PathBox::duplicateFillSettingsNotAnimatedFrom(
         const PaintType paintType = fillSettings->getPaintType();
         mFillSettings->setPaintType(paintType);
         if(paintType == FLATPAINT) {
-            mFillSettings->setCurrentColor(
-                        fillSettings->getColor());
+            mFillSettings->setCurrentColor(fillSettings->getColor());
         } else if(paintType == GRADIENTPAINT) {
-            mFillSettings->setGradient(
-                        fillSettings->getGradient());
-            mFillSettings->setGradientType(
-                        fillSettings->getGradientType());
+            mFillSettings->setGradient(fillSettings->getGradient());
+            mFillSettings->setGradientType(fillSettings->getGradientType());
         }
     }
 }
@@ -395,10 +392,8 @@ void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
             mStrokeSettings->getColorAnimator()->qra_setCurrentValue(
                         strokeSettings->getColor());
         } else if(paintType == GRADIENTPAINT) {
-            mStrokeSettings->setGradient(
-                        strokeSettings->getGradient());
-            mStrokeSettings->setGradientType(
-                        strokeSettings->getGradientType());
+            mStrokeSettings->setGradient(strokeSettings->getGradient());
+            mStrokeSettings->setGradientType(strokeSettings->getGradientType());
         }
         mStrokeSettings->getStrokeWidthAnimator()->setCurrentBaseValue(
                     strokeSettings->getCurrentStrokeWidth());
@@ -488,8 +483,8 @@ void PathBox::updateFillDrawGradient() {
     if(mFillSettings->getPaintType() == GRADIENTPAINT && gradient) {
         mFillGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
                                        gradient->getLastQGradientStopQColor());
-        if(!mFillGradientPoints->enabled()) mFillGradientPoints->enable();
-    } else if(mFillGradientPoints->enabled()) {
+        mFillGradientPoints->enable();
+    } else {
         mFillGradientPoints->disable();
     }
 }
@@ -499,9 +494,8 @@ void PathBox::updateStrokeDrawGradient() {
     if(mStrokeSettings->getPaintType() == GRADIENTPAINT && gradient) {
         mStrokeGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
                                          gradient->getLastQGradientStopQColor());
-
-        if(!mStrokeGradientPoints->enabled()) mStrokeGradientPoints->enable();
-    } else if(mStrokeGradientPoints->enabled()) {
+        mStrokeGradientPoints->enable();
+    } else {
         mStrokeGradientPoints->disable();
     }
 }
