@@ -45,11 +45,11 @@ class Canvas;
 class Document;
 class LayoutHandler;
 
-class BoxesListAnimationDockWidget : public QWidget {
+class TimelineDockWidget : public QWidget {
 public:
-    explicit BoxesListAnimationDockWidget(Document &document,
-                                          LayoutHandler* const layoutH,
-                                          MainWindow *parent);
+    explicit TimelineDockWidget(Document &document,
+                                LayoutHandler* const layoutH,
+                                MainWindow * const parent);
     bool processKeyPress(QKeyEvent *event);
     void previewFinished();
     void previewBeingPlayed();
@@ -60,15 +60,12 @@ public:
     void clearAll();
 
     RenderWidget *getRenderWidget();
-    SceneLayout* getTimelineLayout() {
-        return mTimelineLayout;
-    }
 private:
     void setResolutionFractionText(QString text);
 
     void interruptPreview();
 
-    void setLocalPivot(const bool bT);
+    void setLocalPivot(const bool local);
 
     void setTimelineMode();
     void setRenderMode();
@@ -78,17 +75,12 @@ private:
     void resumePreview();
 private:
     Document& mDocument;
-
-    SceneLayout* mTimelineLayout;
-
-    QWidget* mCentralWidget = nullptr;
+    MainWindow* const mMainWindow;
+    SceneLayout* const mTimelineLayout;
 
     QToolBar *mToolBar;
 
     QVBoxLayout *mMainLayout;
-
-    QLabel *mControlButtonsWidget;
-
     QComboBox *mResolutionComboBox;
 
     ActionButton *mPlayButton;
@@ -98,11 +90,9 @@ private:
     QAction *mTimelineAction;
     QAction *mRenderAction;
 
-    QList<TimelineWidget*> mBoxesListKeysViewWidgets;
+    QList<TimelineWidget*> mTimelineWidgets;
     RenderWidget *mRenderWidget;
     AnimationDockWidget *mAnimationDockWidget;
-
-    MainWindow *mMainWindow;
 };
 
 #endif // BOXESLISTANIMATIONDOCKWIDGET_H

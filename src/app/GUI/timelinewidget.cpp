@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "boxeslistkeysviewwidget.h"
+#include "timelinewidget.h"
 #include "animationwidgetscrollbar.h"
 #include "mainwindow.h"
-#include "boxeslistanimationdockwidget.h"
+#include "timelinedockwidget.h"
 #include "GUI/BoxesList/boxsinglewidget.h"
 #include "singlewidgetabstraction.h"
 #include "GUI/BoxesList/boxscrollwidget.h"
@@ -289,14 +289,53 @@ void TimelineWidget::setGraphEnabled(const bool enabled) {
     else mGraphAct->setIcon(QIcon(iconsDir + "/graphDisabled.png"));
 }
 
+void TimelineWidget::writeState(eWriteStream &dst) const {
+    dst << mBoxesListVisible->getId();
+
+    if(mCurrentScene) {
+        dst << mCurrentScene->getWriteId();
+        dst << mCurrentScene->getDocumentId();
+    } else {
+        dst << -1;
+        dst << -1;
+    }
+
+    dst << mSearchLine->text();
+    dst << mBoxesListScrollArea->verticalScrollBar()->sliderPosition();
+}
+
+void TimelineWidget::readState(eReadStream &src) {
+    int id; src >> id;
+
+    int sceneReadId; src >> sceneReadId;
+    int sceneDocumentId; src >> sceneDocumentId;
+
+    QString search; src >> search;
+    int sliderPos; src >> sliderPos;
+
+    mBoxesListVisible->setId(id);
+
+    BoundingBox* sceneBox = nullptr;;
+    if(sceneReadId != -1)
+        sceneBox = BoundingBox::sGetBoxByReadId(sceneReadId);
+    if(!sceneBox && sceneDocumentId != -1)
+        sceneBox = BoundingBox::sGetBoxByDocumentId(sceneDocumentId);
+
+    setCurrentScene(qobject_cast<Canvas*>(sceneBox));
+
+    mSearchLine->setText(search);
+
+    mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(sliderPos);
+    mKeysView->setViewedVerticalRange(sliderPos, sliderPos + mBoxesListScrollArea->height());
+}
+
 void TimelineWidget::moveSlider(int val) {
     int diff = val%MIN_WIDGET_DIM;
     if(diff != 0) {
         val -= diff;
         mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(val);
     }
-    mKeysView->setViewedVerticalRange(
-                val, val + mBoxesListScrollArea->height());
+    mKeysView->setViewedVerticalRange(val, val + mBoxesListScrollArea->height());
 }
 
 void TimelineWidget::setBoxesListWidth(const int width) {

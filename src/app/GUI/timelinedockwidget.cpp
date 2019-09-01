@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "boxeslistanimationdockwidget.h"
+#include "timelinedockwidget.h"
 #include "mainwindow.h"
 #include <QKeyEvent>
 #include "canvaswindow.h"
@@ -26,7 +26,7 @@
 #include "widgetstack.h"
 #include "actionbutton.h"
 #include "GUI/RenderWidgets/renderwidget.h"
-#include "boxeslistkeysviewwidget.h"
+#include "timelinewidget.h"
 #include "animationwidgetscrollbar.h"
 #include "GUI/global.h"
 #include "renderinstancesettings.h"
@@ -34,23 +34,22 @@
 #include "layouthandler.h"
 #include "memoryhandler.h"
 
-BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
-        Document& document, LayoutHandler * const layoutH,
-        MainWindow *parent) :
-    QWidget(parent), mDocument(document),
+TimelineDockWidget::TimelineDockWidget(Document& document,
+                                       LayoutHandler * const layoutH,
+                                       MainWindow * const parent) :
+    QWidget(parent), mDocument(document), mMainWindow(parent),
     mTimelineLayout(layoutH->timelineLayout()) {
     connect(RenderHandler::sInstance, &RenderHandler::previewFinished,
-            this, &BoxesListAnimationDockWidget::previewFinished);
+            this, &TimelineDockWidget::previewFinished);
     connect(RenderHandler::sInstance, &RenderHandler::previewBeingPlayed,
-            this, &BoxesListAnimationDockWidget::previewBeingPlayed);
+            this, &TimelineDockWidget::previewBeingPlayed);
     connect(RenderHandler::sInstance, &RenderHandler::previewBeingRendered,
-            this, &BoxesListAnimationDockWidget::previewBeingRendered);
+            this, &TimelineDockWidget::previewBeingRendered);
     connect(RenderHandler::sInstance, &RenderHandler::previewPaused,
-            this, &BoxesListAnimationDockWidget::previewPaused);
+            this, &TimelineDockWidget::previewPaused);
 
     setFocusPolicy(Qt::NoFocus);
 
-    mMainWindow = parent;
     setMinimumSize(10*MIN_WIDGET_DIM, 12*MIN_WIDGET_DIM);
     mMainLayout = new QVBoxLayout(this);
     setLayout(mMainLayout);
@@ -70,14 +69,14 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mResolutionComboBox->setSizePolicy(QSizePolicy::Maximum,
                                        QSizePolicy::Maximum);
     connect(mResolutionComboBox, &QComboBox::currentTextChanged,
-            this, &BoxesListAnimationDockWidget::setResolutionFractionText);
+            this, &TimelineDockWidget::setResolutionFractionText);
 
     const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
 
     mPlayButton = new ActionButton(iconsDir + "/play.png", "render preview", this);
     mStopButton = new ActionButton(iconsDir + "/stop.png", "stop preview", this);
     connect(mStopButton, &ActionButton::pressed,
-            this, &BoxesListAnimationDockWidget::interruptPreview);
+            this, &TimelineDockWidget::interruptPreview);
 
     mLocalPivot = new ActionButton(iconsDir + "/pivotGlobal.png",
                                   "pivot global/local", this);
@@ -85,13 +84,13 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mLocalPivot->setCheckable(iconsDir + "/pivotLocal.png");
     mLocalPivot->setChecked(mDocument.fLocalPivot);
     connect(mLocalPivot, &ActionButton::toggled,
-            this, &BoxesListAnimationDockWidget::setLocalPivot);
+            this, &TimelineDockWidget::setLocalPivot);
 
     mToolBar = new QToolBar(this);
     mToolBar->setMovable(false);
 
-    mToolBar->setIconSize(QSize(5*MIN_WIDGET_DIM/4,
-                                5*MIN_WIDGET_DIM/4));
+    const int iconSize = 5*MIN_WIDGET_DIM/4;
+    mToolBar->setIconSize(QSize(iconSize, iconSize));
     mToolBar->addSeparator();
 
 //    mControlButtonsLayout->addWidget(mGoToPreviousKeyButton);
@@ -124,12 +123,12 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mToolBar->addSeparator();
 
     mTimelineAction = mToolBar->addAction("Timeline", this,
-                                          &BoxesListAnimationDockWidget::setTimelineMode);
+                                          &TimelineDockWidget::setTimelineMode);
     mTimelineAction->setObjectName("customToolButton");
     mTimelineAction->setCheckable(true);
     mTimelineAction->setChecked(true);
     mRenderAction = mToolBar->addAction("Render", this,
-                                        &BoxesListAnimationDockWidget::setRenderMode);
+                                        &TimelineDockWidget::setRenderMode);
     mRenderAction->setObjectName("customToolButton");
     mRenderAction->setCheckable(true);
 
@@ -162,24 +161,24 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     //addNewBoxesListKeysViewWidget(0);
 
     connect(&mDocument, &Document::activeSceneSet,
-            this, &BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas);
+            this, &TimelineDockWidget::updateSettingsForCurrentCanvas);
 }
 
-void BoxesListAnimationDockWidget::setResolutionFractionText(QString text) {
+void TimelineDockWidget::setResolutionFractionText(QString text) {
     text = text.remove(" %");
     const qreal res = clamp(text.toDouble(), 1, 200)/100;
     mMainWindow->setResolutionFractionValue(res);
 }
 
-void BoxesListAnimationDockWidget::clearAll() {
+void TimelineDockWidget::clearAll() {
 
 }
 
-RenderWidget *BoxesListAnimationDockWidget::getRenderWidget() {
+RenderWidget *TimelineDockWidget::getRenderWidget() {
     return mRenderWidget;
 }
 
-bool BoxesListAnimationDockWidget::processKeyPress(QKeyEvent *event) {
+bool TimelineDockWidget::processKeyPress(QKeyEvent *event) {
     const int key = event->key();
     const auto mods = event->modifiers();
     if(key == Qt::Key_Right && !(mods & Qt::ControlModifier)) {
@@ -209,7 +208,7 @@ bool BoxesListAnimationDockWidget::processKeyPress(QKeyEvent *event) {
     return true;
 }
 
-void BoxesListAnimationDockWidget::previewFinished() {
+void TimelineDockWidget::previewFinished() {
     //setPlaying(false);
     mStopButton->setDisabled(true);
     const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
@@ -217,67 +216,67 @@ void BoxesListAnimationDockWidget::previewFinished() {
     mPlayButton->setToolTip("render preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
-            this, &BoxesListAnimationDockWidget::renderPreview);
+            this, &TimelineDockWidget::renderPreview);
 }
 
-void BoxesListAnimationDockWidget::previewBeingPlayed() {
+void TimelineDockWidget::previewBeingPlayed() {
     mStopButton->setDisabled(false);
     const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
     mPlayButton->setIcon(modeIconsDir + "/pause.png");
     mPlayButton->setToolTip("pause preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
-            this, &BoxesListAnimationDockWidget::pausePreview);
+            this, &TimelineDockWidget::pausePreview);
 }
 
-void BoxesListAnimationDockWidget::previewBeingRendered() {
+void TimelineDockWidget::previewBeingRendered() {
     mStopButton->setDisabled(false);
     const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
     mPlayButton->setIcon(modeIconsDir + "/play.png");
     mPlayButton->setToolTip("play preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
-            this, &BoxesListAnimationDockWidget::playPreview);
+            this, &TimelineDockWidget::playPreview);
 }
 
-void BoxesListAnimationDockWidget::previewPaused() {
+void TimelineDockWidget::previewPaused() {
     mStopButton->setDisabled(false);
     const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
     mPlayButton->setIcon(modeIconsDir + "/play.png");
     mPlayButton->setToolTip("resume preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
-            this, &BoxesListAnimationDockWidget::resumePreview);
+            this, &TimelineDockWidget::resumePreview);
 }
 
-void BoxesListAnimationDockWidget::resumePreview() {
+void TimelineDockWidget::resumePreview() {
     RenderHandler::sInstance->resumePreview();
 }
 
-void BoxesListAnimationDockWidget::pausePreview() {
+void TimelineDockWidget::pausePreview() {
     RenderHandler::sInstance->pausePreview();
 }
 
-void BoxesListAnimationDockWidget::playPreview() {
+void TimelineDockWidget::playPreview() {
     RenderHandler::sInstance->playPreview();
 }
 
-void BoxesListAnimationDockWidget::renderPreview() {
+void TimelineDockWidget::renderPreview() {
     RenderHandler::sInstance->renderPreview();
 }
 
-void BoxesListAnimationDockWidget::interruptPreview() {
+void TimelineDockWidget::interruptPreview() {
     RenderHandler::sInstance->interruptPreview();
 }
 
-void BoxesListAnimationDockWidget::setLocalPivot(const bool bT) {
-    mDocument.fLocalPivot = bT;
+void TimelineDockWidget::setLocalPivot(const bool local) {
+    mDocument.fLocalPivot = local;
     for(const auto& scene : mDocument.fScenes)
         scene->updatePivot();
     Document::sInstance->actionFinished();
 }
 
-void BoxesListAnimationDockWidget::setTimelineMode() {
+void TimelineDockWidget::setTimelineMode() {
     mTimelineAction->setDisabled(true);
     mRenderAction->setDisabled(false);
 
@@ -286,7 +285,7 @@ void BoxesListAnimationDockWidget::setTimelineMode() {
     mTimelineLayout->show();
 }
 
-void BoxesListAnimationDockWidget::setRenderMode() {
+void TimelineDockWidget::setRenderMode() {
     mTimelineAction->setDisabled(false);
     mRenderAction->setDisabled(true);
 
@@ -295,14 +294,14 @@ void BoxesListAnimationDockWidget::setRenderMode() {
     mRenderWidget->show();
 }
 
-void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
+void TimelineDockWidget::updateSettingsForCurrentCanvas(
         Canvas* const canvas) {
     if(canvas) {
         disconnect(mResolutionComboBox, &QComboBox::currentTextChanged,
-                   this, &BoxesListAnimationDockWidget::setResolutionFractionText);
+                   this, &TimelineDockWidget::setResolutionFractionText);
         mResolutionComboBox->setCurrentText(
                     QString::number(canvas->getResolutionFraction()*100) + " %");
         connect(mResolutionComboBox, &QComboBox::currentTextChanged,
-                this, &BoxesListAnimationDockWidget::setResolutionFractionText);
+                this, &TimelineDockWidget::setResolutionFractionText);
     }
 }

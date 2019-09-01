@@ -66,7 +66,8 @@ void BoxTargetProperty::readProperty(eReadStream& src) {
     src >> targetReadId;
     int targetDocumentId;
     src >> targetDocumentId;
-    const auto targetBox = BoundingBox::sGetBoxByReadId(targetReadId);
+    BoundingBox* targetBox = nullptr;
+    if(targetReadId != -1) targetBox = BoundingBox::sGetBoxByReadId(targetReadId);
     if(!targetBox && targetReadId >= 0) {
         QPointer<BoxTargetProperty> thisPtr = this;
         WaitingForBoxLoad::BoxReadFunc readFunc =

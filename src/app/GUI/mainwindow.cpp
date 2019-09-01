@@ -28,7 +28,7 @@
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "boxeslistanimationdockwidget.h"
+#include "timelinedockwidget.h"
 #include "Tasks/taskexecutor.h"
 #include "qdoubleslider.h"
 #include "svgimporter.h"
@@ -173,7 +173,7 @@ MainWindow::MainWindow(Document& document,
 
     mLayoutHandler = new LayoutHandler(mDocument, mAudioHandler);
     mBoxesListAnimationDockWidget =
-            new BoxesListAnimationDockWidget(mDocument, mLayoutHandler, this);
+            new TimelineDockWidget(mDocument, mLayoutHandler, this);
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);
 
     mBrushSettingsDock = new QDockWidget("Brush Settings", this);

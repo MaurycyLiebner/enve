@@ -59,6 +59,7 @@ public:
                                                 const SWT_Target target);
     void setCurrentType(const SWT_Type &type);
     int getId() const { return mId; }
+    void setId(const int id) { mId = id; }
     const UpdateFuncs& getUpdateFuncs() const {
         return mUpdateFuncs;
     }
@@ -86,7 +87,7 @@ protected:
 
     UpdateFuncs mUpdateFuncs;
     static int mNextId;
-    const int mId;
+    int mId;
     int mNVisible = 0;
     bool mAlwaysShowChildren = false;
     SWT_RulesCollection mCurrentRulesCollection;

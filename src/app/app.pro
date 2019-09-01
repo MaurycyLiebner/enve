@@ -73,6 +73,8 @@ SOURCES += main.cpp\
     GUI/scenelayout.cpp \
     GUI/stacklayouts.cpp \
     GUI/stackwidgetwrapper.cpp \
+    GUI/timelinedockwidget.cpp \
+    GUI/timelinewidget.cpp \
     GUI/timelinewrapper.cpp \
     GUI/welcomedialog.cpp \
     GUI/widgetstack.cpp \
@@ -123,8 +125,6 @@ SOURCES += main.cpp\
     GUI/RenderWidgets/rendersettingsdialog.cpp \
     GUI/RenderWidgets/outputsettingsprofilesdialog.cpp \
     GUI/RenderWidgets/outputsettingsdisplaywidget.cpp \
-    GUI/boxeslistkeysviewwidget.cpp \
-    GUI/boxeslistanimationdockwidget.cpp \
     GUI/actionbutton.cpp \
     GUI/animationdockwidget.cpp \
     GUI/animationwidgetscrollbar.cpp \
@@ -168,6 +168,8 @@ HEADERS  += \
     GUI/scenelayout.h \
     GUI/stacklayouts.h \
     GUI/stackwidgetwrapper.h \
+    GUI/timelinedockwidget.h \
+    GUI/timelinewidget.h \
     GUI/timelinewrapper.h \
     GUI/welcomedialog.h \
     GUI/widgetstack.h \
@@ -221,8 +223,6 @@ HEADERS  += \
     GUI/actionbutton.h \
     GUI/animationdockwidget.h \
     GUI/animationwidgetscrollbar.h \
-    GUI/boxeslistanimationdockwidget.h \
-    GUI/boxeslistkeysviewwidget.h \
     GUI/canvaswindow.h \
     GUI/customfpsdialog.h \
     GUI/filesourcelist.h \

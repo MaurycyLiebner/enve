@@ -24,11 +24,11 @@
 #include <QMenuBar>
 #include "smartPointers/stdselfref.h"
 #include "framerange.h"
+#include "basicreadwrite.h"
 
 class SWT_Abstraction;
 class FrameScrollBar;
 class KeysView;
-class BoxesListAnimationDockWidget;
 class ChangeWidthWidget;
 class MainWindow;
 class ScrollArea;
@@ -56,6 +56,9 @@ public:
     void setCurrentScene(Canvas* const scene);
     void setBoxesListWidth(const int width);
     void setGraphEnabled(const bool enabled);
+
+    void writeState(eWriteStream& dst) const;
+    void readState(eReadStream& src);
 private:
     void setViewedFrameRange(const FrameRange &range);
     void setCanvasFrameRange(const FrameRange &range);

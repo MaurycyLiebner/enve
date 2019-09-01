@@ -15,8 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "timelinewrapper.h"
-#include "boxeslistkeysviewwidget.h"
-#include "boxeslistanimationdockwidget.h"
+#include "timelinewidget.h"
+#include "timelinedockwidget.h"
 
 TimelineWrapper::TimelineWrapper(Document * const document,
                                  TWidgetStackLayoutItem* const layItem,
