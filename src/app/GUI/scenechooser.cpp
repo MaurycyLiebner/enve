@@ -54,7 +54,10 @@ void SceneChooser::addScene(Canvas * const scene) {
     const auto act = addAction(scene->prp_getName());
     act->setCheckable(true);
     connect(act, &QAction::triggered, this,
-            [this, scene, act]() { setCurrentScene(scene, act); });
+            [this, scene, act]() {
+        setCurrentScene(scene, act);
+        Document::sInstance->actionFinished();
+    });
     connect(scene, &Canvas::prp_nameChanged, act,
             [this, scene, act](const QString& name) {
         if(scene == mCurrentScene) setTitle(name);
@@ -87,6 +90,7 @@ void SceneChooser::setCurrentScene(Canvas * const scene) {
 }
 
 void SceneChooser::setCurrentScene(Canvas * const scene, QAction * const act) {
+    if(scene == mCurrentScene) return;
     if(act) {
         act->setChecked(true);
         act->setDisabled(true);

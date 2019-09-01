@@ -34,12 +34,9 @@
 #include "typemenu.h"
 #include "patheffectsmenu.h"
 
-int BoundingBox::sNextDocumentId;
+int BoundingBox::sNextDocumentId = 0;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
-
 QList<BoundingBox*> BoundingBox::sReadBoxes;
-QList<WaitingForBoxLoad> BoundingBox::sFunctionsWaitingForBoxRead;
-
 int BoundingBox::sNextWriteId;
 QList<BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 
@@ -862,19 +859,8 @@ BoundingBox *BoundingBox::sGetBoxByReadId(const int readId) {
     return nullptr;
 }
 
-void BoundingBox::sAddWaitingForBoxLoad(const WaitingForBoxLoad& func) {
-    sFunctionsWaitingForBoxRead << func;
-}
-
 void BoundingBox::sAddReadBox(BoundingBox * const box) {
     sReadBoxes << box;
-    for(int i = 0; i < sFunctionsWaitingForBoxRead.count(); i++) {
-        auto funcT = sFunctionsWaitingForBoxRead.at(i);
-        if(funcT.boxRead(box)) {
-            sFunctionsWaitingForBoxRead.removeAt(i);
-            i--;
-        }
-    }
 }
 
 void BoundingBox::sClearWriteBoxes() {
@@ -885,15 +871,14 @@ void BoundingBox::sClearWriteBoxes() {
     sBoxesWithWriteIds.clear();
 }
 
+#include "simpletask.h"
 void BoundingBox::sClearReadBoxes() {
-    for(const auto& box : sReadBoxes) {
-        box->clearReadId();
-    }
-    sReadBoxes.clear();
-    for(const auto& func : sFunctionsWaitingForBoxRead) {
-        func.boxNeverRead();
-    }
-    sFunctionsWaitingForBoxRead.clear();
+    SimpleTask::sSchedule([]() {
+        for(const auto& box : sReadBoxes) {
+            box->clearReadId();
+        }
+        sReadBoxes.clear();
+    });
 }
 
 void BoundingBox::selectAndAddContainedPointsToList(

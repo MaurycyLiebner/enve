@@ -60,22 +60,20 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     GUI/audiohandler.cpp \
+    GUI/canvasbasewrappernode.cpp \
     GUI/canvaswindowevents.cpp \
-    GUI/canvaswindowwrapper.cpp \
+    GUI/canvaswrappernode.cpp \
     GUI/changewidthwidget.cpp \
     GUI/ekeyfilter.cpp \
     GUI/envelicense.cpp \
     GUI/envesplash.cpp \
     GUI/ewidgetsimpl.cpp \
-    GUI/layoutcollection.cpp \
     GUI/layouthandler.cpp \
     GUI/scenechooser.cpp \
-    GUI/scenelayout.cpp \
-    GUI/stacklayouts.cpp \
-    GUI/stackwidgetwrapper.cpp \
+    GUI/timelinebasewrappernode.cpp \
     GUI/timelinedockwidget.cpp \
     GUI/timelinewidget.cpp \
-    GUI/timelinewrapper.cpp \
+    GUI/timelinewrappernode.cpp \
     GUI/welcomedialog.cpp \
     GUI/widgetstack.cpp \
     GUI/ColorWidgets/colorlabel.cpp \
@@ -89,6 +87,8 @@ SOURCES += main.cpp\
     GUI/ColorWidgets/savedcolorwidgets.cpp \
     GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
+    GUI/widgetwrappernode.cpp \
+    GUI/wrappernode.cpp \
     effectsloader.cpp \
     esettings.cpp \
     evfileio.cpp \
@@ -156,21 +156,19 @@ SOURCES += main.cpp\
 
 HEADERS  += \
     GUI/audiohandler.h \
-    GUI/canvaswindowwrapper.h \
+    GUI/canvasbasewrappernode.h \
+    GUI/canvaswrappernode.h \
     GUI/changewidthwidget.h \
     GUI/ekeyfilter.h \
     GUI/envelicense.h \
     GUI/envesplash.h \
     GUI/ewidgetsimpl.h \
-    GUI/layoutcollection.h \
     GUI/layouthandler.h \
     GUI/scenechooser.h \
-    GUI/scenelayout.h \
-    GUI/stacklayouts.h \
-    GUI/stackwidgetwrapper.h \
+    GUI/timelinebasewrappernode.h \
     GUI/timelinedockwidget.h \
     GUI/timelinewidget.h \
-    GUI/timelinewrapper.h \
+    GUI/timelinewrappernode.h \
     GUI/welcomedialog.h \
     GUI/widgetstack.h \
     GUI/ColorWidgets/colorlabel.h \
@@ -184,6 +182,8 @@ HEADERS  += \
     GUI/ColorWidgets/savedcolorwidgets.h \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
+    GUI/widgetwrappernode.h \
+    GUI/wrappernode.h \
     effectsloader.h \
     esettings.h \
     hardwareinfo.h \

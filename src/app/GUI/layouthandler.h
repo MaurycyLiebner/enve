@@ -17,41 +17,46 @@
 #ifndef LAYOUTHANDLER_H
 #define LAYOUTHANDLER_H
 #include <QComboBox>
-#include "scenelayout.h"
+#include "timelinebasewrappernode.h"
+#include "canvasbasewrappernode.h"
+#include "canvas.h"
+#include "audiohandler.h"
+#include <QStackedWidget>
 
 struct LayoutData {
-    LayoutData(const QString& name) : fName(name) {
-        reset();
-    }
+    LayoutData(const QString& name) : fName(name), fScene(nullptr),
+        fSceneLayout(new CanvasBaseWrapperNode),
+        fTimelineLayout(new TimelineBaseWrapperNode) {}
 
     LayoutData(Canvas* const scene) :
-        fName(scene->prp_getName()), fScene(scene) {
+        fName(scene->prp_getName()), fScene(scene),
+        fSceneLayout(new CanvasBaseWrapperNode),
+        fTimelineLayout(new TimelineBaseWrapperNode) {
         reset();
     }
 
     void reset() {
-        fCanvas = std::make_unique<CWSceneBaseStackItem>(fScene);
-        fTimeline = std::make_unique<TSceneBaseStackItem>(fScene);
-
-
+        fSceneLayout->reset(fScene);
+        fTimelineLayout->reset(fScene);
     }
 
     void write(eWriteStream& dst) const {
         dst << fName;
-        fCanvas->write(dst);
-        fTimeline->write(dst);
+        fSceneLayout->writeData(dst);
+        fTimelineLayout->writeData(dst);
     }
 
     void read(eReadStream& src) {
         src >> fName;
-        fCanvas->read(src);
-        fTimeline->read(src);
+        fSceneLayout->readData(src);
+        fTimelineLayout->readData(src);
     }
 
     QString fName;
-    std::unique_ptr<CWSceneBaseStackItem> fCanvas;
-    std::unique_ptr<TSceneBaseStackItem> fTimeline;
-    Canvas* fScene = nullptr;
+    Canvas* const fScene;
+
+    CanvasBaseWrapperNode* const fSceneLayout;
+    TimelineBaseWrapperNode* const fTimelineLayout;
 };
 
 class LayoutHandler : public QObject {
@@ -62,11 +67,11 @@ public:
         return mComboWidget;
     }
 
-    SceneLayout* sceneLayout() {
+    QStackedWidget* sceneLayout() {
         return mSceneLayout;
     }
 
-    SceneLayout* timelineLayout() {
+    QStackedWidget* timelineLayout() {
         return mTimelineLayout;
     }
 
@@ -75,12 +80,12 @@ public:
     void write(eWriteStream& dst) const {
         dst << mNumberLayouts;
         for(int i = mNumberLayouts - 1; i >= 0; i--) {
-            mLayouts.at(uint(i)).write(dst);
+            mLayouts.at(uint(i))->write(dst);
         }
         const int nScenes = int(mLayouts.size()) - mNumberLayouts;
         dst << nScenes;
         for(int i = 0; i < nScenes; i++) {
-            mLayouts.at(uint(i + mNumberLayouts)).write(dst);
+            mLayouts.at(uint(i + mNumberLayouts))->write(dst);
         }
         dst << mCurrentId;
     }
@@ -90,11 +95,11 @@ public:
 
         int nLays; src >> nLays;
         for(int i = 0; i < nLays; i++) {
-            newLayout().read(src);
+            newLayout()->read(src);
         }
         int nScenes; src >> nScenes;
         for(int i = 0; i < nScenes; i++) {
-            mLayouts.at(uint(i + mNumberLayouts)).read(src);
+            mLayouts.at(uint(i + mNumberLayouts))->read(src);
         }
         int relCurrentId; src >> relCurrentId;
         if(relCurrentId == -1) return;
@@ -104,7 +109,7 @@ public:
     }
 private:
     void rename(const int id, const QString& newName) {
-        mLayouts[uint(id)].fName = newName;
+        mLayouts[uint(id)]->fName = newName;
         mComboBox->setItemText(id, newName);
     }
 
@@ -131,33 +136,25 @@ private:
         else resetCurrentScene();
     }
 
-    void saveCurrent();
-
     void setCurrent(const int id) {
         if(id == mCurrentId) return;
-        saveCurrent();
 
         mCurrentId = id;
-        if(id == -1) {
-            mSceneLayout->setCurrent(nullptr);
-            mTimelineLayout->setCurrent(nullptr);
-            return;
-        }
-        const auto& current = mLayouts.at(uint(id));
-
         mComboBox->setCurrentIndex(id);
-        mSceneLayout->setCurrent(current.fCanvas.get());
-        mTimelineLayout->setCurrent(current.fTimeline.get());
+        mSceneLayout->setCurrentIndex(id);
+        mTimelineLayout->setCurrentIndex(id);
     }
 
-    LayoutData& newLayout() {
+    LayoutData* newLayout() {
         const QString name = "Layout " + QString::number(mNumberLayouts);
-        const auto it = mLayouts.insert(mLayouts.begin(),
-                        LayoutData(name));
+        const auto lay = std::make_shared<LayoutData>(name);
+        mSceneLayout->insertWidget(0, lay->fSceneLayout);
+        mTimelineLayout->insertWidget(0, lay->fTimelineLayout);
+        const auto it = mLayouts.insert(mLayouts.begin(), lay);
         mComboBox->insertItem(0, name);
         if(mCurrentId != -1) mCurrentId++;
         mNumberLayouts++;
-        return *it;
+        return it->get();
     }
 
     void newLayoutAction() {
@@ -166,8 +163,10 @@ private:
     }
 
     void newForScene(Canvas* const scene) {
-        mLayouts.insert(mLayouts.begin() + mNumberLayouts,
-                        LayoutData(scene));
+        const auto lay = std::make_shared<LayoutData>(scene);
+        mLayouts.insert(mLayouts.begin() + mNumberLayouts, lay);
+        mSceneLayout->insertWidget(mNumberLayouts, lay->fSceneLayout);
+        mTimelineLayout->insertWidget(mNumberLayouts, lay->fTimelineLayout);
         mComboBox->insertItem(mNumberLayouts, scene->prp_getName());
         if(mCurrentId >= mNumberLayouts) mCurrentId++;
         connect(scene, &Canvas::prp_nameChanged, this, [this, scene]() {
@@ -184,7 +183,7 @@ private:
         int id = -1;
         for(uint i = 0; i < mLayouts.size(); i++) {
             const auto& lay = mLayouts.at(i);
-            if(lay.fScene == scene) {
+            if(lay->fScene == scene) {
                 id = int(i);
                 break;
             }
@@ -217,12 +216,12 @@ private:
 
     int mCurrentId = -1;
     int mNumberLayouts = 0;
-    std::vector<LayoutData> mLayouts;
+    std::vector<stdsptr<LayoutData>> mLayouts;
 
     QWidget* mComboWidget;
     QComboBox* mComboBox;
-    SceneLayout* mSceneLayout;
-    SceneLayout* mTimelineLayout;
+    QStackedWidget* mSceneLayout;
+    QStackedWidget* mTimelineLayout;
 };
 
 #endif // LAYOUTHANDLER_H

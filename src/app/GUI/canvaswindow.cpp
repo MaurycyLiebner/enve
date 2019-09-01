@@ -66,6 +66,7 @@ void CanvasWindow::setCurrentCanvas(const int id) {
 }
 
 void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
+    if(mCurrentCanvas == canvas) return;
     if(mCurrentCanvas) {
         disconnect(mCurrentCanvas, nullptr, this, nullptr);
         mDocument.removeVisibleScene(mCurrentCanvas);
@@ -75,25 +76,15 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     if(mCurrentCanvas) {
         mDocument.addVisibleScene(mCurrentCanvas);
         emit changeCanvasFrameRange(canvas->getFrameRange());
-        queTasksAndUpdate();
+        updatePivotIfNeeded();
         connect(mCurrentCanvas, &Canvas::requestCanvasMode,
                 this, &CanvasWindow::setCanvasMode);
         connect(mCurrentCanvas, &Canvas::requestUpdate,
                 this, qOverload<>(&CanvasWindow::update));
         connect(mCurrentCanvas, &Canvas::destroyed,
                 this, [this]() { setCurrentCanvas(nullptr); });
-//        connect(mCurrentCanvas, &Canvas::prp_absFrameRangeChanged,
-//                this, [this](const FrameRange& range) {
-//            const int currFrame = mCurrentCanvas->anim_getCurrentAbsFrame();
-//            if(range.inRange(currFrame)) update();
-//        });
     }
 
-//    if(!mCurrentCanvas) openWelcomeDialog();
-//    else {
-//        closeWelcomeDialog();
-//        requestFitCanvasToSize();
-//    }
     if(mCurrentCanvas) fitCanvasToSize();
     updateFix();
 }
@@ -263,6 +254,32 @@ void CanvasWindow::openSettingsWindowForCurrentCanvas() {
     dialog->show();
 }
 
+void CanvasWindow::writeState(eWriteStream &dst) const {
+    if(mCurrentCanvas) {
+        dst << mCurrentCanvas->getWriteId();
+        dst << mCurrentCanvas->getDocumentId();
+    } else {
+        dst << -1;
+        dst << -1;
+    }
+    dst << mViewTransform;
+}
+
+void CanvasWindow::readState(eReadStream &src) {
+    int sceneReadId; src >> sceneReadId;
+    int sceneDocumentId; src >> sceneDocumentId;
+
+    BoundingBox* sceneBox = nullptr;;
+    if(sceneReadId != -1)
+        sceneBox = BoundingBox::sGetBoxByReadId(sceneReadId);
+    if(!sceneBox && sceneDocumentId != -1)
+        sceneBox = BoundingBox::sGetBoxByDocumentId(sceneDocumentId);
+
+    setCurrentCanvas(qobject_cast<Canvas*>(sceneBox));
+    src >> mViewTransform;
+    mFitToSizeBlocked = true;
+}
+
 bool CanvasWindow::handleCutCopyPasteKeyPress(QKeyEvent *event) {
     if(event->modifiers() & Qt::ControlModifier &&
             event->key() == Qt::Key_V) {
@@ -282,9 +299,7 @@ bool CanvasWindow::handleCutCopyPasteKeyPress(QKeyEvent *event) {
         mActions.cutAction();
     } else if(event->key() == Qt::Key_Delete) {
         mActions.deleteAction();
-    } else {
-        return false;
-    }
+    } else return false;
     return true;
 }
 
@@ -325,9 +340,7 @@ bool CanvasWindow::handleParentChangeKeyPress(QKeyEvent *event) {
     } else if(event->modifiers() & Qt::AltModifier &&
               event->key() == Qt::Key_P) {
         mCurrentCanvas->clearParentForSelected();
-    } else {
-        return false;
-    }
+    } else return false;
     return true;
 }
 
@@ -339,9 +352,7 @@ bool CanvasWindow::handleGroupChangeKeyPress(QKeyEvent *event) {
        } else {
            mActions.groupSelectedBoxes();
        }
-    } else {
-        return false;
-    }
+    } else return false;
     return true;
 }
 
@@ -353,9 +364,7 @@ bool CanvasWindow::handleResetTransformKeyPress(QKeyEvent *event) {
         mCurrentCanvas->resetSelectedScale();
     } else if(event->key() == Qt::Key_R && altPressed) {
         mCurrentCanvas->resetSelectedRotation();
-    } else {
-        return false;
-    }
+    } else return false;
     return true;
 }
 
@@ -367,9 +376,7 @@ bool CanvasWindow::handleRevertPathKeyPress(QKeyEvent *event) {
        } else {
            mCurrentCanvas->revertAllPoints();
        }
-    } else {
-        return false;
-    }
+    } else return false;
     return true;
 }
 
@@ -400,12 +407,8 @@ bool CanvasWindow::handleSelectAllKeyPress(QKeyEvent* event) {
             } else {
                 mCurrentCanvas->selectAllPointsAction();
             }
-        } else {
-            return false;
-        }
-    } else {
-        return false;
-    }
+        } else return false;
+    } else return false;
     return true;
 }
 
@@ -424,9 +427,7 @@ bool CanvasWindow::handleShiftKeysKeyPress(QKeyEvent* event) {
         } else {
             mCurrentCanvas->shiftAllPoints(-1);
         }
-    } else {
-        return false;
-    }
+    } else return false;
     return true;
 }
 

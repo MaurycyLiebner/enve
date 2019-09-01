@@ -46,7 +46,7 @@ enum SWT_BoxRule : short;
 class TimelineWidget : public QWidget {
 public:
     explicit TimelineWidget(Document& document,
-                            StackWrapperCornerMenu* const menu,
+                            QMenuBar * const menu,
                             QWidget *parent);
 
     Canvas* getCurrrentScene() const {

@@ -14,26 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SCENELAYOUT_H
-#define SCENELAYOUT_H
-#include <QMainWindow>
-#include "layoutcollection.h"
+#include "timelinewrappernode.h"
+#include "document.h"
 
-class SceneLayout : public QWidget {
-public:
-    SceneLayout(Document &document,
-                QWidget* const parent = nullptr);
+TimelineWrapperNode::TimelineWrapperNode(Canvas * const scene) :
+    WidgetWrapperNode([](Canvas* const scene) {
+        return new TimelineWrapperNode(scene);
+    }) {
+    mTimelineWidget = new TimelineWidget(*Document::sInstance,
+                                         cornerMenu(), this);
+    setCentralWidget(mTimelineWidget);
+    mTimelineWidget->setCurrentScene(scene);
+}
 
-    SceneBaseStackItem *extract();
-    void setCurrent(SceneBaseStackItem * const item);
-    void saveData();
-private:
-    void clearWidget();
-    void reset();
+void TimelineWrapperNode::readData(eReadStream &src) {
+    mTimelineWidget->readState(src);
+}
 
-    Document& mDocument;
-
-    SceneBaseStackItem* mBaseStack = nullptr;
-};
-
-#endif // SCENELAYOUT_H
+void TimelineWrapperNode::writeData(eWriteStream &dst) {
+    mTimelineWidget->writeState(dst);
+}

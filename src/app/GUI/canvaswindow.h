@@ -52,11 +52,10 @@ public:
                           QWidget * const parent = nullptr);
     ~CanvasWindow();
     Canvas *getCurrentCanvas();
-    const QMatrix& getViewTransform() const { return mViewTransform; }
-    void blockAutomaticSizeFit();
-    void unblockAutomaticSizeFit();
-    void setViewTransform(const QMatrix& transform) {
-        mViewTransform = transform; }
+    const QMatrix& getViewTransform() const
+    { return mViewTransform; }
+    void setViewTransform(const QMatrix& transform)
+    { mViewTransform = transform; }
 
     void setCurrentCanvas(Canvas * const canvas);
     bool hasNoCanvas();
@@ -82,6 +81,9 @@ public:
     bool isMouseGrabber();
 
     void openSettingsWindowForCurrentCanvas();
+
+    void writeState(eWriteStream& dst) const;
+    void readState(eReadStream& src);
 
     bool event(QEvent *e);
 
@@ -126,6 +128,7 @@ private:
     qsptr<WindowSingleWidgetTarget> mWindowSWTTarget;
 
     Canvas* mCurrentCanvas = nullptr;
+    bool mFitToSizeBlocked = false;
 
     //void paintEvent(QPaintEvent *);
 
@@ -154,7 +157,6 @@ public:
     void zoomView(const qreal scaleBy, const QPointF &absOrigin);
 
     void fitCanvasToSize();
-    void requestFitCanvasToSize();
     void resetTransormation();
 };
 

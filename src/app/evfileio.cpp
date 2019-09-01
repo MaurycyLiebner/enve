@@ -68,8 +68,7 @@ void MainWindow::loadEVFile(const QString &path) {
         if(!FileFooter::sCompatible(&file))
             RuntimeThrow("Incompatible or incomplete data");
         const qint64 savedPos = file.pos();
-        const qint64 pos = file.size() - FileFooter::sSize() -
-                qint64(sizeof(int));
+        const qint64 pos = file.size() - FileFooter::sSize() - qint64(sizeof(int));
         file.seek(pos);
         readStream.readFutureTable();
         file.seek(savedPos);
@@ -83,9 +82,9 @@ void MainWindow::loadEVFile(const QString &path) {
         RuntimeThrow("Error while reading from file " + path);
     }
     file.close();
+    addRecentFile(path);
 
     BoundingBox::sClearReadBoxes();
-    addRecentFile(path);
 }
 
 void MainWindow::saveToFile(const QString &path) {

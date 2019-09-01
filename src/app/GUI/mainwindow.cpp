@@ -52,8 +52,6 @@
 #include "memoryhandler.h"
 #include "GUI/BrushWidgets/brushselectionwidget.h"
 #include "Animators/gradient.h"
-#include "canvaswindowwrapper.h"
-#include "scenelayout.h"
 #include "GUI/GradientWidgets/gradientwidget.h"
 #include "GUI/newcanvasdialog.h"
 #include "ShaderEffects/shadereffectprogram.h"

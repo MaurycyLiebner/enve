@@ -15,8 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "widgetstack.h"
-#include "stackwidgetwrapper.h"
-#include "stacklayouts.h"
 
 void gMoveX(const int x, QWidget * const widget) {
     widget->move(x, 0);
@@ -34,17 +32,13 @@ void gResizeH(QWidget * const widget, const int h) {
     widget->resize(widget->width(), h);
 }
 
-VWidgetStack::VWidgetStack(VSplitStackItem * const lItem,
-                           QWidget * const parent) :
+VWidgetStack::VWidgetStack(QWidget * const parent) :
     QWidget(parent), WidgetStackBase<V_STACK_TMPL>() {
-    lItem->setCurrent(this);
     setThis(this);
 }
 
-HWidgetStack::HWidgetStack(HSplitStackItem * const lItem,
-                           QWidget * const parent) :
+HWidgetStack::HWidgetStack(QWidget * const parent) :
     QWidget(parent), WidgetStackBase<H_STACK_TMPL>() {
-    lItem->setCurrent(this);
     setThis(this);
 }
 

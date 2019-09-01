@@ -14,4 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "layoutcollection.h"
+#ifndef TIMELINEWRAPPERNODE_H
+#define TIMELINEWRAPPERNODE_H
+#include "widgetwrappernode.h"
+#include "timelinewidget.h"
+
+class TimelineWrapperNode : public WidgetWrapperNode {
+public:
+    TimelineWrapperNode(Canvas* const scene);
+
+protected:
+    void readData(eReadStream& src);
+    void writeData(eWriteStream& dst);
+private:
+    TimelineWidget* mTimelineWidget;
+};
+
+#endif // TIMELINEWRAPPERNODE_H

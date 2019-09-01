@@ -409,8 +409,7 @@ struct HSplitStackItem;
 
 class VWidgetStack : public QWidget, public WidgetStackBase<V_STACK_TMPL> {
 public:
-    VWidgetStack(VSplitStackItem* const lItem,
-                 QWidget * const parent = nullptr);
+    VWidgetStack(QWidget * const parent = nullptr);
 protected:
     void resizeEvent(QResizeEvent *) {
         updateSizesAndPositions();
@@ -419,8 +418,7 @@ protected:
 
 class HWidgetStack : public QWidget, public WidgetStackBase<H_STACK_TMPL> {
 public:
-    HWidgetStack(HSplitStackItem* const lItem,
-                 QWidget * const parent = nullptr);
+    HWidgetStack(QWidget * const parent = nullptr);
 protected:
     void resizeEvent(QResizeEvent *) {
         updateSizesAndPositions();

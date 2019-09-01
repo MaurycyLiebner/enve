@@ -20,6 +20,7 @@
 #include <QIODevice>
 #include <QBuffer>
 #include <cstring>
+#include <QMatrix>
 #include "exceptions.h"
 #include "framerange.h"
 struct qCubicSegment1D;
@@ -176,6 +177,11 @@ public:
         return *this;
     }
 
+    eReadStream& operator>>(QMatrix &val) {
+        read(&val, sizeof(QMatrix));
+        return *this;
+    }
+
     eReadStream& operator>>(QString &val) {
         uint nChars; read(&nChars, sizeof(uint));
         if(nChars == 0) val = "";
@@ -278,6 +284,11 @@ public:
 
     eWriteStream& operator<<(const QPointF& val) {
         write(&val, sizeof(QPointF));
+        return *this;
+    }
+
+    eWriteStream& operator<<(const QMatrix& val) {
+        write(&val, sizeof(QMatrix));
         return *this;
     }
 

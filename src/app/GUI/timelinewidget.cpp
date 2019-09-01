@@ -33,7 +33,7 @@
 #include <QToolButton>
 
 TimelineWidget::TimelineWidget(Document &document,
-                               StackWrapperCornerMenu * const menu,
+                               QMenuBar * const menu,
                                QWidget *parent) :
     QWidget(parent), mDocument(document) {
     mMainLayout = new QGridLayout(this);
@@ -302,6 +302,10 @@ void TimelineWidget::writeState(eWriteStream &dst) const {
 
     dst << mSearchLine->text();
     dst << mBoxesListScrollArea->verticalScrollBar()->sliderPosition();
+
+    dst << mFrameScrollBar->getFirstViewedFrame();
+    dst << mFrameRangeScrollBar->getFirstViewedFrame();
+    dst << mFrameRangeScrollBar->getLastViewedFrame();
 }
 
 void TimelineWidget::readState(eReadStream &src) {
@@ -312,6 +316,10 @@ void TimelineWidget::readState(eReadStream &src) {
 
     QString search; src >> search;
     int sliderPos; src >> sliderPos;
+
+    int frame; src >> frame;
+    int minViewedFrame; src >> minViewedFrame;
+    int maxViewedFrame; src >> maxViewedFrame;
 
     mBoxesListVisible->setId(id);
 
@@ -327,6 +335,10 @@ void TimelineWidget::readState(eReadStream &src) {
 
     mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(sliderPos);
     mKeysView->setViewedVerticalRange(sliderPos, sliderPos + mBoxesListScrollArea->height());
+
+    mFrameScrollBar->setFirstViewedFrame(frame);
+    mFrameScrollBar->setDisplayedFrameRange({minViewedFrame, maxViewedFrame});
+    mFrameRangeScrollBar->setViewedFrameRange({minViewedFrame, maxViewedFrame});
 }
 
 void TimelineWidget::moveSlider(int val) {

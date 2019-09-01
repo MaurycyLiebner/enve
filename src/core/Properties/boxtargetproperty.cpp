@@ -60,31 +60,18 @@ void BoxTargetProperty::writeProperty(eWriteStream& dst) const {
     dst << targetWriteId;
     dst << targetDocumentId;
 }
-
+#include "simpletask.h"
 void BoxTargetProperty::readProperty(eReadStream& src) {
     int targetReadId;
     src >> targetReadId;
     int targetDocumentId;
     src >> targetDocumentId;
-    BoundingBox* targetBox = nullptr;
-    if(targetReadId != -1) targetBox = BoundingBox::sGetBoxByReadId(targetReadId);
-    if(!targetBox && targetReadId >= 0) {
-        QPointer<BoxTargetProperty> thisPtr = this;
-        WaitingForBoxLoad::BoxReadFunc readFunc =
-        [thisPtr](BoundingBox* box) {
-            if(!thisPtr) return;
-            thisPtr->setTarget(box);
-        };
-        WaitingForBoxLoad::BoxNeverReadFunc neverReadFunc =
-        [thisPtr, targetDocumentId]() {
-            if(!thisPtr) return;
-            const auto box = BoundingBox::sGetBoxByDocumentId(targetDocumentId);
-            thisPtr->setTarget(box);
-        };
-        const auto func = WaitingForBoxLoad(targetReadId,
-                                            readFunc, neverReadFunc);
-        BoundingBox::sAddWaitingForBoxLoad(func);
-    } else {
-        setTarget(targetBox);
-    }
+    SimpleTask::sSchedule([this, targetReadId, targetDocumentId]() {
+        BoundingBox* targetBox = nullptr;
+        if(targetReadId != -1)
+            targetBox = BoundingBox::sGetBoxByReadId(targetReadId);
+         if(!targetBox && targetDocumentId != -1)
+             targetBox = BoundingBox::sGetBoxByDocumentId(targetDocumentId);
+         setTarget(targetBox);
+    });
 }

@@ -31,9 +31,11 @@
 #include <QLineEdit>
 #include <QWidgetAction>
 #include <QToolBar>
+#include <QStackedWidget>
 #include "smartPointers/ememory.h"
 #include "framerange.h"
-#include "scenelayout.h"
+#include "timelinebasewrappernode.h"
+
 class FrameScrollBar;
 class TimelineWidget;
 class RenderWidget;
@@ -76,7 +78,7 @@ private:
 private:
     Document& mDocument;
     MainWindow* const mMainWindow;
-    SceneLayout* const mTimelineLayout;
+    QStackedWidget* const mTimelineLayout;
 
     QToolBar *mToolBar;
 

@@ -64,7 +64,6 @@ void BoxesClipboard::pasteTo(ContainerBox* const parent) {
         gPrintExceptionCritical(e);
     }
     buffer.close();
-    BoundingBox::sClearReadBoxes();
     const int newCount = parent->getContainedBoxesCount();
     const auto parentScene = parent->getParentScene();
     if(parentScene) {
@@ -74,6 +73,7 @@ void BoxesClipboard::pasteTo(ContainerBox* const parent) {
             parentScene->addBoxToSelection(box);
         }
     }
+    BoundingBox::sClearReadBoxes();
 }
 
 KeysClipboard::KeysClipboard() : Clipboard(ClipboardType::keys) {}

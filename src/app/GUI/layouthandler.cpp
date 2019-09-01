@@ -53,8 +53,8 @@ LayoutHandler::LayoutHandler(Document& document,
     canvasComboLayout->addWidget(newLayPush);
     canvasComboLayout->addWidget(removeLayPush);
 
-    mSceneLayout = new SceneLayout(mDocument);
-    mTimelineLayout = new SceneLayout(mDocument);
+    mSceneLayout = new QStackedWidget();
+    mTimelineLayout = new QStackedWidget();
 
     connect(mComboBox, qOverload<int>(&QComboBox::activated),
             this, &LayoutHandler::setCurrent);
@@ -73,12 +73,6 @@ LayoutHandler::LayoutHandler(Document& document,
 }
 
 void LayoutHandler::clear() {
-    mSceneLayout->setCurrent(nullptr);
-    mTimelineLayout->setCurrent(nullptr);
-}
-
-void LayoutHandler::saveCurrent() {
-    if(mCurrentId == -1) return;
-    mSceneLayout->saveData();
-    mTimelineLayout->saveData();
+    for(int i = 0; i < mComboBox->count(); i++)
+        removeAt(0);
 }

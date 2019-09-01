@@ -52,6 +52,10 @@ void CanvasWindow::resizeEvent(QResizeEvent *e) {
 }
 
 void CanvasWindow::fitCanvasToSize() {
+    if(mFitToSizeBlocked) {
+        mFitToSizeBlocked = true;
+        return;
+    }
     if(!mCurrentCanvas) return;
     mViewTransform.reset();
     const auto canvasSize = mCurrentCanvas->getCanvasSize();
@@ -65,15 +69,10 @@ void CanvasWindow::fitCanvasToSize() {
     mViewTransform.scale(minScale, minScale);
 }
 
-#include <QApplication>
 #include <QEvent>
-void CanvasWindow::requestFitCanvasToSize() {
-    QApplication::postEvent(this, new QEvent(QEvent::User));
-}
 
 bool CanvasWindow::event(QEvent *e) {
-    if(e->type() == QEvent::User)
-        fitCanvasToSize();
+    if(e->type() == QEvent::ShowToParent) fitCanvasToSize();
     return QWidget::event(e);
 }
 

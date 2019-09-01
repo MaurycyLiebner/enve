@@ -99,7 +99,6 @@ private:
     static QList<BoundingBox*> sDocumentBoxes;
 
     static QList<BoundingBox*> sReadBoxes;
-    static QList<WaitingForBoxLoad> sFunctionsWaitingForBoxRead;
 
     static int sNextWriteId;
     static QList<BoundingBox*> sBoxesWithWriteIds;
