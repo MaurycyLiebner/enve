@@ -369,9 +369,9 @@ void MainWindow::setupMenuBar() {
                            &mActions, &Actions::lowerToBottomAction,
                            Qt::Key_End);
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Rotate 90? CW",
+    mObjectMenu->addAction("Rotate 90° CW",
                            &mActions, &Actions::rotate90CWAction);
-    mObjectMenu->addAction("Rotate 90? CCW",
+    mObjectMenu->addAction("Rotate 90° CCW",
                            &mActions, &Actions::rotate90CCWAction);
     mObjectMenu->addAction("Flip Horizontal", &mActions,
                            &Actions::flipHorizontalAction, Qt::Key_H);
