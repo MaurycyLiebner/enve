@@ -26,7 +26,9 @@
 struct LayoutData {
     LayoutData(const QString& name) : fName(name), fScene(nullptr),
         fSceneLayout(new CanvasBaseWrapperNode),
-        fTimelineLayout(new TimelineBaseWrapperNode) {}
+        fTimelineLayout(new TimelineBaseWrapperNode) {
+        reset();
+    }
 
     LayoutData(Canvas* const scene) :
         fName(scene->prp_getName()), fScene(scene),
@@ -204,6 +206,12 @@ private:
         if(id < mNumberLayouts) mNumberLayouts--;
         mLayouts.erase(mLayouts.begin() + id);
         mComboBox->removeItem(id);
+        const auto canvasWidget = mSceneLayout->widget(id);
+        const auto timelineWidget = mTimelineLayout->widget(id);
+        mSceneLayout->removeWidget(canvasWidget);
+        mTimelineLayout->removeWidget(timelineWidget);
+        delete canvasWidget;
+        delete timelineWidget;
         if(mCurrentId == id) {
             const int newId = qMin(qMax(0, mCurrentId - 1), int(mLayouts.size()) - 1);
             mCurrentId = -1;
