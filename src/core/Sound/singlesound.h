@@ -16,22 +16,19 @@
 
 #ifndef SINGLESOUND_H
 #define SINGLESOUND_H
-#include "Animators/eboxorsound.h"
+#include "esound.h"
 #include "Animators/qrealanimator.h"
 class FixedLenAnimationRect;
 class SoundHandler;
-class Samples;
-class SoundReaderForMerger;
 class SoundDataHandler;
 class HddCachableCacheHandler;
 
-class SingleSound : public eBoxOrSound {
+class SingleSound : public eSound {
     e_OBJECT
     Q_OBJECT
 protected:
     SingleSound(const qsptr<FixedLenAnimationRect> &durRect = nullptr);
 public:
-    bool SWT_isSound() const { return true; }
     bool SWT_isSingleSound() const { return mIndependent; }
 
     void setupTreeViewMenu(PropertyMenu * const menu);
@@ -52,18 +49,11 @@ public:
 
     void setFilePath(const QString &path);
 
-    qreal getVolumeAtRelFrame(const qreal relFrame) const {
-        return mVolumeAnimator->getEffectiveValue(relFrame);
-    }
-
     SoundReaderForMerger * getSecondReader(const int relSecondId);
 
     stdsptr<Samples> getSamplesForSecond(const int relSecondId);
 
-    int getSampleShift() const;
-    SampleRange relSampleRange() const;
-    SampleRange absSampleRange() const;
-    iValueRange absSecondToRelSeconds(const int absSecond);
+    int durationSeconds() const;
 
     const HddCachableCacheHandler* getCacheHandler() const;
 
@@ -77,10 +67,8 @@ public:
 
     void setSoundDataHandler(SoundDataHandler * const newDataHandler);
 private:
-    iValueRange absSecondToRelSecondsAbsStretch(const int absSecond);
     void updateDurationRectLength();
 
-    qreal getCanvasFPS() const;
     const bool mIndependent;
 
     qreal mStretch = 1;

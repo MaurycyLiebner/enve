@@ -23,6 +23,7 @@
 #include "PathEffects/patheffect.h"
 #include "textbox.h"
 #include "Animators/rastereffectanimators.h"
+#include "Sound/singlesound.h"
 
 ContainerBox::ContainerBox(const eBoxType type) :
     BoundingBox(type) {
@@ -675,6 +676,7 @@ void ContainerBox::addContained(const qsptr<eBoxOrSound>& child) {
     insertContained(0, child);
 }
 
+#include "Sound/esoundlink.h"
 void ContainerBox::insertContained(const int id, const qsptr<eBoxOrSound>& child) {
     if(child->getParentGroup() == this) {
         const int cId = mContained.indexOf(child);
@@ -698,8 +700,13 @@ void ContainerBox::insertContained(const int id, const qsptr<eBoxOrSound>& child
             const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
             internalLinkGroup->insertContained(id, cBox->createLinkForLinkGroup());
         }
-    } else /*if(child->SWT_isSingleSound())*/ {
-
+    } else /*if(child->SWT_isSound())*/ {
+        const auto sound = static_cast<SingleSound*>(child.get());
+        for(const auto& box : mLinkingBoxes) {
+            const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
+            const auto newLink = enve::make_shared<eSoundLink>(sound);
+            internalLinkGroup->insertContained(id, newLink);
+        }
     }
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());
     child->prp_afterWholeInfluenceRangeChanged();

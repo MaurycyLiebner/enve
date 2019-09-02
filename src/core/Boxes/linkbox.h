@@ -66,7 +66,10 @@ public:
             mBoxTarget->setTarget(linkTarget);
             linkTarget->addLinkingBox(this);
             connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
-                    this, &BoundingBox::prp_afterChangedAbsRange);
+                    this, [this, linkTarget](const FrameRange& range) {
+                const auto relRange = linkTarget->prp_absRangeToRelRange(range);
+                prp_afterChangedRelRange(relRange);
+            });
         }
         planUpdate(UpdateReason::userChange);
         connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,

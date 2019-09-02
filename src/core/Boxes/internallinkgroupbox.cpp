@@ -120,6 +120,8 @@ bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) const {
 void InternalLinkGroupBox::setTargetSlot(BoundingBox * const target) {
     setLinkTarget(dynamic_cast<ContainerBox*>(target));
 }
+#include "Sound/singlesound.h"
+#include "Sound/esoundlink.h"
 
 void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
     disconnect(mBoxTarget.data(), nullptr, this, nullptr);
@@ -147,8 +149,10 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
                 const auto box = static_cast<BoundingBox*>(child.get());
                 const auto newLink = box->createLinkForLinkGroup();
                 addContained(newLink);
-            } else /*(child->SWT_isSingleSound())*/ {
-
+            } else /*(child->SWT_isSound())*/ {
+                const auto sound = static_cast<SingleSound*>(child.get());
+                const auto newLink = enve::make_shared<eSoundLink>(sound);
+                addContained(newLink);
             }
         }
     } else {

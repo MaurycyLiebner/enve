@@ -23,14 +23,9 @@
 #include "../canvas.h"
 
 SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
-    eBoxOrSound("sound"), mIndependent(!durRect) {
-    connect(this, &eBoxOrSound::aboutToChangeAncestor, this, [this]() {
-        if(!mParentScene) return;
-        mParentScene->getSoundComposition()->removeSound(ref<SingleSound>());
-    });
+    mIndependent(!durRect) {
     connect(this, &eBoxOrSound::prp_ancestorChanged, this, [this]() {
         if(!mParentScene) return;
-        mParentScene->getSoundComposition()->addSound(ref<SingleSound>());
         updateDurationRectLength();
     });
     if(mIndependent) {
@@ -81,68 +76,15 @@ stdsptr<Samples> SingleSound::getSamplesForSecond(const int relSecondId) {
     return mCacheHandler->getSamplesForSecond(relSecondId);
 }
 
+int SingleSound::durationSeconds() const {
+    return mCacheHandler ? mCacheHandler->durationSecCeil() : 0;
+}
+
 #include "canvas.h"
-
-int SingleSound::getSampleShift() const{
-    const qreal fps = getCanvasFPS();
-    return qRound(prp_getTotalFrameShift()*(eSoundSettings::sSampleRate()/fps));
-}
-
-SampleRange SingleSound::relSampleRange() const {
-    const qreal fps = getCanvasFPS();
-    const auto durRect = getDurationRectangle();
-    const auto relFrameRange = durRect->getRelFrameRange();
-    const auto qRelFrameRange = qValueRange{qreal(relFrameRange.fMin),
-                                            qreal(relFrameRange.fMax)};
-    const auto qSampleRange = qRelFrameRange*(eSoundSettings::sSampleRate()/fps);
-    return {qFloor(qSampleRange.fMin), qCeil(qSampleRange.fMax)};
-}
-
-SampleRange SingleSound::absSampleRange() const {
-    const qreal fps = getCanvasFPS();
-    const auto durRect = getDurationRectangle();
-    const auto absFrameRange = durRect->getAbsFrameRange();
-    const auto qAbsFrameRange = qValueRange{qreal(absFrameRange.fMin),
-                                            qreal(absFrameRange.fMax)};
-    const auto qSampleRange = qAbsFrameRange*(eSoundSettings::sSampleRate()/fps);
-    return {qFloor(qSampleRange.fMin), qCeil(qSampleRange.fMax)};
-}
-
-iValueRange SingleSound::absSecondToRelSeconds(const int absSecond) {
-    if(mStretch < 0) {
-        const auto absStretch = absSecondToRelSecondsAbsStretch(absSecond);
-        const int secs = mCacheHandler ? mCacheHandler->durationSecCeil() : 0;
-        return {secs - absStretch.fMax, secs - absStretch.fMin};
-    }
-    return absSecondToRelSecondsAbsStretch(absSecond);
-}
 
 const HddCachableCacheHandler *SingleSound::getCacheHandler() const {
     if(!mCacheHandler) return nullptr;
     return &mCacheHandler->getCacheHandler();
-}
-
-iValueRange SingleSound::absSecondToRelSecondsAbsStretch(const int absSecond) {
-    const qreal fps = getCanvasFPS();
-    const qreal stretch = qAbs(mStretch);
-    const qreal speed = isZero6Dec(stretch) ? TEN_MIL : 1/stretch;
-    const qreal qFirstSecond = prp_absFrameToRelFrameF(absSecond*fps)*speed/fps;
-    if(isInteger4Dec(qFirstSecond)) {
-        const int round = qRound(qFirstSecond);
-        if(isOne4Dec(stretch) || stretch > 1) {
-            return {round, round};
-        }
-        const qreal qLast = qFirstSecond + speed - 1;
-        if(isInteger4Dec(qLast)) {
-            const int roundLast = qRound(qLast);
-            return {round, roundLast};
-        }
-        const int ceilLast = qMax(round, qCeil(qLast));
-        return {round, ceilLast};
-    }
-    const int firstSecond = qFloor(qFirstSecond);
-    const int lastSecond = qCeil(qFirstSecond + speed - 1);
-    return {firstSecond, lastSecond};
 }
 
 void SingleSound::setStretch(const qreal stretch) {
@@ -165,11 +107,6 @@ void SingleSound::updateDurationRectLength() {
                     mDurationRectangle.get());
         flaRect->setAnimationFrameDuration(frames);
     }
-}
-
-qreal SingleSound::getCanvasFPS() const {
-    if(!mParentScene) return 1;
-    return mParentScene->getFps();
 }
 
 void SingleSound::setFilePath(const QString &path) {

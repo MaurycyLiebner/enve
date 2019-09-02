@@ -167,6 +167,8 @@ SOURCES += \
     ShaderEffects/shadereffectprogram.cpp \
     ShaderEffects/shadervaluehandler.cpp \
     ShaderEffects/uniformspecifiercreator.cpp \
+    Sound/esound.cpp \
+    Sound/esoundlink.cpp \
     Sound/esoundsettings.cpp \
     Sound/singlesound.cpp \
     Sound/soundcomposition.cpp \
@@ -389,6 +391,8 @@ HEADERS += \
     ShaderEffects/shaderpropertycreator.h \
     ShaderEffects/shadervaluehandler.h \
     ShaderEffects/uniformspecifiercreator.h \
+    Sound/esound.h \
+    Sound/esoundlink.h \
     Sound/esoundsettings.h \
     Sound/singlesound.h \
     Sound/soundcomposition.h \
