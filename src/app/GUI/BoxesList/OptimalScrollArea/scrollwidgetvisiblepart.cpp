@@ -126,8 +126,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
     }
 }
 
-void ScrollWidgetVisiblePart::setMainAbstraction(
-        SWT_Abstraction* abs) {
+void ScrollWidgetVisiblePart::setMainAbstraction(SWT_Abstraction* abs) {
     mMainAbstraction = abs;
     planScheduleUpdateVisibleWidgetsContent();
 //    if(!abs) return;

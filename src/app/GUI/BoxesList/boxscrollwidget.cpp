@@ -17,7 +17,7 @@
 #include "boxscrollwidget.h"
 #include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 #include "Boxes/boundingbox.h"
-#include "boxscrollwidgetvisiblepart.h"
+#include "boxscroller.h"
 #include "GUI/canvaswindow.h"
 #include "GUI/mainwindow.h"
 #include "document.h"

@@ -20,7 +20,7 @@
 #include <QPainter>
 #include <QMenu>
 #include "mainwindow.h"
-#include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
+#include "GUI/BoxesList/boxscroller.h"
 #include "Timeline/durationrectangle.h"
 #include "GUI/global.h"
 #include "pointhelpers.h"

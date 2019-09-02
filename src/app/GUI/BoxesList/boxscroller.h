@@ -38,9 +38,9 @@ public:
                   const qreal pixelsPerFrame,
                   const FrameRange &viewedFrameRange);
     Key *getKeyAtPos(const int pressX,
-                          const int pressY,
-                          const qreal pixelsPerFrame,
-                          const int minViewedFrame);
+                     const int pressY,
+                     const qreal pixelsPerFrame,
+                     const int minViewedFrame);
     void getKeysInRect(QRectF selectionRect,
                        const qreal pixelsPerFrame,
                        QList<Key *> &listKeys);
@@ -52,10 +52,8 @@ public:
     void scrollDown();
 
     TimelineMovable *getRectangleMovableAtPos(
-                                        const int pressX,
-                                        const int pressY,
-                                        const qreal pixelsPerFrame,
-                                        const int minViewedFrame);
+            const int pressX, const int pressY,
+            const qreal pixelsPerFrame, const int minViewedFrame);
     KeysView *getKeysView() const {
         return mKeysView;
     }

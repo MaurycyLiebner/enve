@@ -59,6 +59,7 @@ TARGET = enve
 TEMPLATE = app
 
 SOURCES += main.cpp\
+    GUI/BoxesList/boxscroller.cpp \
     GUI/audiohandler.cpp \
     GUI/canvasbasewrappernode.cpp \
     GUI/canvaswindowevents.cpp \
@@ -102,7 +103,6 @@ SOURCES += main.cpp\
     GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.cpp \
     GUI/BoxesList/OptimalScrollArea/singlewidget.cpp \
     GUI/BoxesList/boxsinglewidget.cpp \
-    GUI/BoxesList/boxscrollwidgetvisiblepart.cpp \
     GUI/BoxesList/boxscrollwidget.cpp \
     GUI/BoxesList/boolpropertywidget.cpp \
     memorychecker.cpp \
@@ -155,6 +155,7 @@ SOURCES += main.cpp\
     GUI/BrushWidgets/brushwidget.cpp
 
 HEADERS  += \
+    GUI/BoxesList/boxscroller.h \
     GUI/audiohandler.h \
     GUI/canvasbasewrappernode.h \
     GUI/canvaswrappernode.h \
@@ -197,7 +198,6 @@ HEADERS  += \
     GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h \
     GUI/BoxesList/OptimalScrollArea/singlewidget.h \
     GUI/BoxesList/boxsinglewidget.h \
-    GUI/BoxesList/boxscrollwidgetvisiblepart.h \
     GUI/BoxesList/boxscrollwidget.h \
     GUI/BoxesList/boolpropertywidget.h \
     memorychecker.h \

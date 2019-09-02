@@ -22,7 +22,7 @@
 
 #include "Boxes/containerbox.h"
 #include "GUI/qrealanimatorvalueslider.h"
-#include "boxscrollwidgetvisiblepart.h"
+#include "boxscroller.h"
 #include "GUI/keysview.h"
 #include "pointhelpers.h"
 #include "GUI/BoxesList/boolpropertywidget.h"

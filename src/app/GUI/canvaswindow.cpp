@@ -18,7 +18,7 @@
 #include "canvas.h"
 #include <QComboBox>
 #include "mainwindow.h"
-#include "GUI/BoxesList/boxscrollwidgetvisiblepart.h"
+#include "GUI/BoxesList/boxscroller.h"
 #include "singlewidgetabstraction.h"
 #include "Tasks/taskexecutor.h"
 #include "renderoutputwidget.h"
