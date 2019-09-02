@@ -90,7 +90,7 @@ public:
     static void sAddReadBox(BoundingBox * const box);
     static BoundingBox *sGetBoxByReadId(const int readId);
     static void sClearReadBoxes();
-    static void sAddWaitingForBoxLoad(const WaitingForBoxLoad& func);
+    static void sForEveryReadBox(const std::function<void(BoundingBox*)>& func);
 
     template <typename B, typename T>
     static void sWriteReadMember(B* const from, B* const to, const T member);

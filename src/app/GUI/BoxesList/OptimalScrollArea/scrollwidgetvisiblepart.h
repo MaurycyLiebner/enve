@@ -27,8 +27,7 @@
 class ScrollWidget;
 class SingleWidgetTarget;
 
-class ScrollWidgetVisiblePart :
-        public MinimalScrollWidgetVisiblePart {
+class ScrollWidgetVisiblePart : public MinimalScrollWidgetVisiblePart {
     Q_OBJECT
 public:
     ScrollWidgetVisiblePart(ScrollWidget * const parent);
@@ -57,9 +56,9 @@ public:
     void scheduleContentUpdateIfSearchNotEmpty();
     void scheduleContentUpdateIfIsCurrentTarget(SingleWidgetTarget *targetP,
                                                 const SWT_Target target);
-    void setCurrentType(const SWT_Type &type);
+    void setCurrentType(const SWT_Type type);
     int getId() const { return mId; }
-    void setId(const int id) { mId = id; }
+
     const UpdateFuncs& getUpdateFuncs() const {
         return mUpdateFuncs;
     }
@@ -86,7 +85,7 @@ protected:
     }
 
     UpdateFuncs mUpdateFuncs;
-    static int mNextId;
+    static int sNextId;
     int mId;
     int mNVisible = 0;
     bool mAlwaysShowChildren = false;

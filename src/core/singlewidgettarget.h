@@ -53,7 +53,7 @@ struct SWT_RulesCollection {
     SWT_RulesCollection(const SWT_BoxRule ruleT,
                         const bool alwaysShowChildrenT,
                         const SWT_Target targetT,
-                        const SWT_Type& typeT,
+                        const SWT_Type typeT,
                         const QString &searchStringT) {
         fRule = ruleT;
         fAlwaysShowChildren = alwaysShowChildrenT;

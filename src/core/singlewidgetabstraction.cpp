@@ -153,6 +153,24 @@ void SWT_Abstraction::removeAlongWithAllChildren_k() {
     if(mTarget_k) mTarget_k->SWT_removeAbstractionForWidget(mVisiblePartWidgetId);
 }
 
+void SWT_Abstraction::read(eReadStream &src) {
+    src >> mContentVisible;
+}
+
+void SWT_Abstraction::write(eWriteStream &dst) const {
+    dst << mContentVisible;
+}
+
+void SWT_Abstraction::readAll(eReadStream &src) {
+    for(const auto& child : mChildren) child->readAll(src);
+    read(src);
+}
+
+void SWT_Abstraction::writeAll(eWriteStream &dst) const {
+    for(const auto& child : mChildren) child->writeAll(dst);
+    write(dst);
+}
+
 void SWT_Abstraction::addChild(SingleWidgetTarget * const target) {
     auto childAbs = target->SWT_abstractionForWidget(mUpdateFuncs, mVisiblePartWidgetId);
     addChildAbstraction(childAbs->ref<SWT_Abstraction>());

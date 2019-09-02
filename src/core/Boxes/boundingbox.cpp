@@ -881,6 +881,10 @@ void BoundingBox::sClearReadBoxes() {
     });
 }
 
+void BoundingBox::sForEveryReadBox(const std::function<void(BoundingBox*)> &func) {
+    for(const auto& box : sReadBoxes) func(box);
+}
+
 void BoundingBox::selectAndAddContainedPointsToList(
         const QRectF &absRect,
         const MovablePoint::PtOp &adder,

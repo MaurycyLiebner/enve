@@ -23,52 +23,47 @@
 #include "GUI/mainwindow.h"
 #include "GUI/global.h"
 
-int ScrollWidgetVisiblePart::mNextId = 0;
+int ScrollWidgetVisiblePart::sNextId = 0;
 
 ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(ScrollWidget * const parent) :
-    MinimalScrollWidgetVisiblePart(parent), mId(mNextId++) {
+    MinimalScrollWidgetVisiblePart(parent), mId(sNextId++) {
     mCurrentRulesCollection.fRule = SWT_BR_ALL;
     setupUpdateFuncs();
 }
 
-void ScrollWidgetVisiblePart::setCurrentRule(
-        const SWT_BoxRule rule) {
+void ScrollWidgetVisiblePart::setCurrentRule(const SWT_BoxRule rule) {
     mCurrentRulesCollection.fRule = rule;
     updateParentHeight();
     updateVisibleWidgetsContent();
 }
 
-void ScrollWidgetVisiblePart::setCurrentTarget(
-        SingleWidgetTarget* targetP,
-        const SWT_Target target) {
+void ScrollWidgetVisiblePart::setCurrentTarget(SingleWidgetTarget* targetP,
+                                               const SWT_Target target) {
     mCurrentRulesCollection.fTarget = target;
     static_cast<ScrollWidget*>(mParentWidget)->setMainTarget(targetP);
     updateParentHeight();
     updateVisibleWidgetsContent();
 }
 
-void ScrollWidgetVisiblePart::setCurrentType(const SWT_Type& type) {
+void ScrollWidgetVisiblePart::setCurrentType(const SWT_Type type) {
     mCurrentRulesCollection.fType = type;
     updateParentHeight();
     updateVisibleWidgetsContent();
 }
 
-void ScrollWidgetVisiblePart::setAlwaysShowChildren(
-        const bool alwaysShowChildren) {
+void ScrollWidgetVisiblePart::setAlwaysShowChildren(const bool alwaysShowChildren) {
     mCurrentRulesCollection.fAlwaysShowChildren = alwaysShowChildren;
     updateParentHeight();
     updateVisibleWidgetsContent();
 }
 
-void ScrollWidgetVisiblePart::setCurrentSearchText(
-        const QString &text) {
+void ScrollWidgetVisiblePart::setCurrentSearchText(const QString &text) {
     mCurrentRulesCollection.fSearchString = text;
     updateParentHeight();
     updateVisibleWidgetsContent();
 }
 
-void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(
-        const SWT_BoxRule rule) {
+void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(const SWT_BoxRule rule) {
     if(isCurrentRule(rule)) {
         planScheduleUpdateParentHeight();
         planScheduleUpdateVisibleWidgetsContent();
@@ -105,25 +100,22 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
 
     int currentWidgetId = 0;
     SetAbsFunc setAbsFunc = [this, &currentWidgetId](
-            SWT_Abstraction* newAbs,
-            int currX) {
+            SWT_Abstraction* newAbs, const int currX) {
         if(currentWidgetId < mSingleWidgets.count()) {
-            SingleWidget *currWidget =
-                    static_cast<SingleWidget*>(
+            const auto currWidget = static_cast<SingleWidget*>(
                         mSingleWidgets.at(currentWidgetId));
             currWidget->setTargetAbstraction(newAbs);
-            int currWx = currWidget->x();
+            const int currWx = currWidget->x();
             currWidget->move(currX, currWidget->y());
             currWidget->setFixedWidth(currWx - currX + currWidget->width());
             currentWidgetId = currentWidgetId + 1;
         }
     };
-    int currX = 0;
     int currY = MIN_WIDGET_DIM/2;
     mMainAbstraction->setAbstractions(
                 mVisibleTop,
                 mVisibleTop + mVisibleHeight + currY,
-                currY, currX, MIN_WIDGET_DIM,
+                currY, 0, MIN_WIDGET_DIM,
                 setAbsFunc,
                 mCurrentRulesCollection,
                 true, false);

@@ -18,6 +18,7 @@
 #define SINGLEWIDGETABSTRACTION_H
 
 #include "smartPointers/ememory.h"
+#include "basicreadwrite.h"
 class SingleWidgetTarget;
 
 enum SWT_BoxRule : short;
@@ -104,6 +105,12 @@ public:
     }
 
     void removeAlongWithAllChildren_k();
+
+    void read(eReadStream& src);
+    void write(eWriteStream& dst) const;
+
+    void readAll(eReadStream& src);
+    void writeAll(eWriteStream& dst) const;
 protected:
     void setParent(SWT_Abstraction * const parent) {
         mParent = parent;

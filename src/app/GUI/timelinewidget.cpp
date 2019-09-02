@@ -290,7 +290,11 @@ void TimelineWidget::setGraphEnabled(const bool enabled) {
 }
 
 void TimelineWidget::writeState(eWriteStream &dst) const {
-    dst << mBoxesListVisible->getId();
+    const int id = mBoxesListVisible->getId();
+    for(const auto& scene : mDocument.fScenes) {
+        const auto abs = scene->SWT_getAbstractionForWidget(id);
+        abs->writeAll(dst);
+    }
 
     if(mCurrentScene) {
         dst << mCurrentScene->getWriteId();
@@ -309,7 +313,13 @@ void TimelineWidget::writeState(eWriteStream &dst) const {
 }
 
 void TimelineWidget::readState(eReadStream &src) {
-    int id; src >> id;
+    const int id = mBoxesListVisible->getId();
+    BoundingBox::sForEveryReadBox([id, &src](BoundingBox* const box) {
+        if(!box->SWT_isCanvas()) return;
+        const auto scene = static_cast<Canvas*>(box);
+        const auto abs = scene->SWT_getAbstractionForWidget(id);
+        if(abs) abs->readAll(src);
+    });
 
     int sceneReadId; src >> sceneReadId;
     int sceneDocumentId; src >> sceneDocumentId;
@@ -320,8 +330,6 @@ void TimelineWidget::readState(eReadStream &src) {
     int frame; src >> frame;
     int minViewedFrame; src >> minViewedFrame;
     int maxViewedFrame; src >> maxViewedFrame;
-
-    mBoxesListVisible->setId(id);
 
     BoundingBox* sceneBox = nullptr;;
     if(sceneReadId != -1)
