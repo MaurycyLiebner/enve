@@ -165,6 +165,7 @@ void CanvasSettingsDialog::sNewCanvasDialog(Document& document,
         const auto newCanvas = docPtr->createNewScene();
         dialog->applySettingsToCanvas(newCanvas);
         dialog->close();
+        docPtr->actionFinished();
     });
 
     dialog->show();

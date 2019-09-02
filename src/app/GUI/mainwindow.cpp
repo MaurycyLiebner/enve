@@ -592,9 +592,11 @@ void MainWindow::openWelcomeDialog() {
 }
 
 void MainWindow::closeWelcomeDialog() {
-    if(!mWelcomeDialog) return;
-    mWelcomeDialog = nullptr;
-    setCentralWidget(mLayoutHandler->sceneLayout());
+    SimpleTask::sSchedule([this]() {
+        if(!mWelcomeDialog) return;
+        mWelcomeDialog = nullptr;
+        setCentralWidget(mLayoutHandler->sceneLayout());
+    });
 }
 
 void MainWindow::addCanvasToRenderQue() {
@@ -1021,6 +1023,7 @@ void MainWindow::openFile(const QString& openPath) {
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
     }
+    mDocument.actionFinished();
 }
 
 void MainWindow::saveFile() {
@@ -1143,6 +1146,7 @@ void MainWindow::revert() {
         gPrintExceptionCritical(e);
     }
     setFileChangedSinceSaving(false);
+    mDocument.actionFinished();
 }
 
 stdsptr<void> MainWindow::lock() {
