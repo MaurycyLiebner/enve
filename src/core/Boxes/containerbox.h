@@ -103,7 +103,8 @@ public:
     void promoteToLayer();
     void demoteToGroup();
 
-    const QList<BoundingBox *> &getContainedBoxes() const;
+    const QList<BoundingBox*> &getContainedBoxes() const;
+    const auto &getContained() const { return mContained; }
 
     bool differenceInPathEffectsBetweenFrames(const int relFrame1,
                                               const int relFrame2) const;
@@ -144,8 +145,7 @@ public:
     void addContained(const qsptr<eBoxOrSound> &child);
     void insertContained(const int id, const qsptr<eBoxOrSound> &child);
     void updateContainedIds(const int firstId);
-    void updateContainedIds(const int firstId,
-                              const int lastId);
+    void updateContainedIds(const int firstId, const int lastId);
     int getContainedIndex(eBoxOrSound * const child);
     qsptr<eBoxOrSound> takeContained_k(const int id);
     void removeContained_k(const qsptr<eBoxOrSound> &child);
@@ -154,12 +154,13 @@ public:
     void bringContainedToEndList(eBoxOrSound * const child);
     void bringContainedToFrontList(eBoxOrSound * const child);
     void moveContainedInList(eBoxOrSound * const child, const int to);
+    void moveContainedInList(const int from, const int to);
     void moveContainedInList(eBoxOrSound * const child,
                                 const int from, const int to);
     void moveContainedBelow(eBoxOrSound * const boxToMove,
-                               eBoxOrSound * const below);
+                            eBoxOrSound * const below);
     void moveContainedAbove(eBoxOrSound * const boxToMove,
-                               eBoxOrSound * const above);
+                            eBoxOrSound * const above);
 
     void removeContainedFromList(const int id);
     void setDescendantCurrentGroup(const bool bT);

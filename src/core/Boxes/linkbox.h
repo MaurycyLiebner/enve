@@ -76,8 +76,6 @@ public:
     bool relPointInsidePath(const QPointF &relPos) const;
     QPointF getRelCenterPosition();
 
-    qsptr<BoundingBox> createLink();
-
     qsptr<BoundingBox> createLinkForLinkGroup();
 
     stdsptr<BoxRenderData> createRenderData();

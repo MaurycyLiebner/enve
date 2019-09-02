@@ -482,6 +482,7 @@ void ContainerBox::setDescendantCurrentGroup(const bool bT) {
 }
 
 BoundingBox *ContainerBox::getBoxAtFromAllDescendents(const QPointF &absPos) {
+    if(SWT_isLinkBox()) return nullptr;
     BoundingBox* boxAtPos = nullptr;
     for(const auto& box : mContainedBoxes) {
         if(box->isVisibleAndUnlocked() &&
@@ -552,7 +553,9 @@ void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
 }
 
 qsptr<BoundingBox> ContainerBox::createLink() {
-    return enve::make_shared<InternalLinkGroupBox>(this);
+    auto linkBox = enve::make_shared<InternalLinkGroupBox>(this);
+    copyBoundingBoxDataTo(linkBox.get());
+    return std::move(linkBox);
 }
 
 void ContainerBox::updateIfUsesProgram(
@@ -672,8 +675,7 @@ void ContainerBox::addContained(const qsptr<eBoxOrSound>& child) {
     insertContained(0, child);
 }
 
-void ContainerBox::insertContained(const int id,
-                                   const qsptr<eBoxOrSound>& child) {
+void ContainerBox::insertContained(const int id, const qsptr<eBoxOrSound>& child) {
     if(child->getParentGroup() == this) {
         const int cId = mContained.indexOf(child);
         moveContainedInList(child.get(), cId, (cId < id ? id - 1 : id));
@@ -685,7 +687,8 @@ void ContainerBox::insertContained(const int id,
     child->setParentGroup(this);
 
     updateContainedIds(id);
-    SWT_addChildAt(child.get(), containedIdToAbstractionId(id));
+    if(!SWT_isLinkBox())
+        SWT_addChildAt(child.get(), containedIdToAbstractionId(id));
 
     if(child->SWT_isBoundingBox()) {
         connCtx << connect(child.data(), &Property::prp_absFrameRangeChanged,
@@ -695,6 +698,8 @@ void ContainerBox::insertContained(const int id,
             const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
             internalLinkGroup->insertContained(id, cBox->createLinkForLinkGroup());
         }
+    } else /*if(child->SWT_isSingleSound())*/ {
+
     }
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());
     child->prp_afterWholeInfluenceRangeChanged();
@@ -726,12 +731,11 @@ void ContainerBox::removeContainedFromList(const int id) {
     child->setParentGroup(nullptr);
     updateContainedIds(id);
 
-    if(child->SWT_isBoundingBox()) {
-        for(const auto& box : mLinkingBoxes) {
-            const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
-            internalLinkGroup->removeContainedFromList(id);
-        }
+    for(const auto& box : mLinkingBoxes) {
+        const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
+        internalLinkGroup->removeContainedFromList(id);
     }
+
     prp_afterWholeInfluenceRangeChanged();
 }
 
@@ -801,6 +805,11 @@ void ContainerBox::moveContainedInList(eBoxOrSound * const child, const int to) 
     moveContainedInList(child, from, to);
 }
 
+void ContainerBox::moveContainedInList(const int from, const int to) {
+    const auto child = mContained.at(from).get();
+    moveContainedInList(child, from, to);
+}
+
 void ContainerBox::moveContainedInList(eBoxOrSound * const child,
                                        const int from, const int to) {
     const int boundTo = qBound(0, to, mContained.count() - 1);
@@ -809,6 +818,12 @@ void ContainerBox::moveContainedInList(eBoxOrSound * const child,
     updateContainedIds(qMin(from, boundTo), qMax(from, boundTo));
     SWT_moveChildTo(child, containedIdToAbstractionId(boundTo));
     planUpdate(UpdateReason::userChange);
+
+
+    for(const auto& box : mLinkingBoxes) {
+        const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
+        internalLinkGroup->moveContainedInList(from, to);
+    }
 
     prp_afterWholeInfluenceRangeChanged();
 }

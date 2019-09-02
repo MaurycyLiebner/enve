@@ -146,7 +146,7 @@ void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
             node->getHandler()->addAllPointsToSelection(adder, mCurrentMode);
         }
     } else if(mHoveredBox) {
-        if(mHoveredBox->SWT_isContainerBox()) {
+        if(mHoveredBox->SWT_isContainerBox() && !mHoveredBox->SWT_isLinkBox()) {
             setCurrentBoxesGroup(static_cast<ContainerBox*>(mHoveredBox.data()));
             updateHovered(e);
         } else if((mCurrentMode == CanvasMode::boxTransform ||

@@ -32,12 +32,35 @@ public:
         return finalTarget->SWT_isGroupBox();
     }
 
+    void SWT_setupAbstraction(SWT_Abstraction* abstraction,
+                              const UpdateFuncs &updateFuncs,
+                              const int visiblePartWidgetId) {
+        BoundingBox::SWT_setupAbstraction(abstraction, updateFuncs,
+                                          visiblePartWidgetId);
+    }
+
+
+    bool SWT_dropSupport(const QMimeData * const data) {
+        return BoundingBox::SWT_dropSupport(data);
+    }
+
+    bool SWT_dropIntoSupport(const int index, const QMimeData * const data) {
+        return BoundingBox::SWT_dropIntoSupport(index, data);
+    }
+
+    bool SWT_drop(const QMimeData * const data) {
+        return BoundingBox::SWT_drop(data);
+    }
+
+    bool SWT_dropInto(const int index, const QMimeData * const data) {
+        return BoundingBox::SWT_dropInto(index, data);
+    }
+
     void writeBoundingBox(eWriteStream& dst);
     void readBoundingBox(eReadStream& src);
     //bool relPointInsidePath(const QPointF &relPos);
     QPointF getRelCenterPosition();
 
-    qsptr<BoundingBox> createLink();
     qsptr<BoundingBox> createLinkForLinkGroup();
 
     bool isFrameInDurationRect(const int relFrame) const;
@@ -56,7 +79,7 @@ public:
     }
 
     void setupRasterEffectsF(const qreal relFrame,
-                          BoxRenderData * const data);
+                             BoxRenderData * const data);
 
     SkBlendMode getBlendMode();
 

@@ -63,13 +63,11 @@ BoundingBox *InternalLinkBox::getLinkTarget() const {
     return mBoxTarget->getTarget();
 }
 
-qsptr<BoundingBox> InternalLinkBox::createLink() {
-    if(!getLinkTarget()) BoundingBox::createLink();
-    return getLinkTarget()->createLink();
-}
-
 qsptr<BoundingBox> InternalLinkBox::createLinkForLinkGroup() {
-    return enve::make_shared<InternalLinkBox>(this);
+    if(isParentLink()) {
+        Q_ASSERT(getLinkTarget());
+        return getLinkTarget()->createLinkForLinkGroup();
+    } else return BoundingBox::createLink();
 }
 
 stdsptr<BoxRenderData> InternalLinkBox::createRenderData() {

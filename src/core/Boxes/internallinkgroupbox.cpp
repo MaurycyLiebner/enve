@@ -64,8 +64,7 @@ FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(
     return range*targetRange;
 }
 
-QMatrix InternalLinkGroupBox::getRelativeTransformAtFrame(
-        const qreal relFrame) {
+QMatrix InternalLinkGroupBox::getRelativeTransformAtFrame(const qreal relFrame) {
     if(isParentLink() && getLinkTarget()) {
         return getLinkTarget()->getRelativeTransformAtFrame(relFrame);
     } else {
@@ -93,7 +92,6 @@ void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
                                            BoxRenderData * const data) {
     const auto linkTarget = getLinkTarget();
     if(linkTarget) linkTarget->BoundingBox::setupRenderData(relFrame, data);
-
     ContainerBox::setupRenderData(relFrame, data);
 }
 
@@ -120,8 +118,7 @@ bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) const {
 }
 
 void InternalLinkGroupBox::setTargetSlot(BoundingBox * const target) {
-    if(target->SWT_isLayerBox())
-        setLinkTarget(static_cast<ContainerBox*>(target));
+    setLinkTarget(dynamic_cast<ContainerBox*>(target));
 }
 
 void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
@@ -143,10 +140,16 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
             prp_afterChangedRelRange(relRange);
         });
 
-        const auto &boxesList = linkTarget->getContainedBoxes();
-        for(const auto& child : boxesList) {
-            const auto newLink = child->createLinkForLinkGroup();
-            addContained(newLink);
+        const auto &boxesList = linkTarget->getContained();
+        for(int i = boxesList.count() - 1; i >= 0; i--) {
+            const auto& child = boxesList.at(i);
+            if(child->SWT_isBoundingBox()) {
+                const auto box = static_cast<BoundingBox*>(child.get());
+                const auto newLink = box->createLinkForLinkGroup();
+                addContained(newLink);
+            } else /*(child->SWT_isSingleSound())*/ {
+
+            }
         }
     } else {
         prp_setName("empty link");
@@ -166,18 +169,11 @@ ContainerBox *InternalLinkGroupBox::getLinkTarget() const {
     return static_cast<ContainerBox*>(mBoxTarget->getTarget());
 }
 
-qsptr<BoundingBox> InternalLinkGroupBox::createLink() {
-    if(!getLinkTarget()) return createLink();
-    return getLinkTarget()->createLink();
-}
-
 qsptr<BoundingBox> InternalLinkGroupBox::createLinkForLinkGroup() {
-    if(!getLinkTarget()) return createLink();
     if(isParentLink()) {
+        Q_ASSERT(getLinkTarget());
         return getLinkTarget()->createLinkForLinkGroup();
-    } else {
-        return enve::make_shared<InternalLinkGroupBox>(this);
-    }
+    } else return ContainerBox::createLinkForLinkGroup();
 }
 
 bool InternalLinkGroupBox::isFrameInDurationRect(const int relFrame) const {
