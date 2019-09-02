@@ -73,6 +73,7 @@ void CanvasWindow::fitCanvasToSize() {
 
 bool CanvasWindow::event(QEvent *e) {
     if(e->type() == QEvent::ShowToParent) fitCanvasToSize();
+    else if(e->type() == QEvent::Show) KFT_setFocus();
     return QWidget::event(e);
 }
 

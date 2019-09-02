@@ -53,6 +53,12 @@ protected:
     virtual void KFT_setFocusToWidget() = 0;
     virtual void KFT_clearFocus() = 0;
 private:
+    bool visible() const {
+        const auto wid = dynamic_cast<const QWidget*>(this);
+        if(wid) return wid->isVisible();
+        return false;
+    }
+
     static KeyFocusTarget *KFT_mCurrentTarget;
     static KeyFocusTarget *KFT_mLastTarget;
 
