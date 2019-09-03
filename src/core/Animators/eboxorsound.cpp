@@ -88,11 +88,9 @@ FrameRange eBoxOrSound::prp_getIdenticalRelRange(const int relFrame) const {
         if(mDurationRectangle) {
             const auto dRange = mDurationRectangle->getRelFrameRange();
             if(relFrame > dRange.fMax) {
-                return {mDurationRectangle->getMaxRelFrame() + 1,
-                            FrameRange::EMAX};
+                return mDurationRectangle->getRelFrameRangeToTheRight();
             } else if(relFrame < dRange.fMin) {
-                return {FrameRange::EMIN,
-                        mDurationRectangle->getMinRelFrame() - 1};
+                return mDurationRectangle->getRelFrameRangeToTheLeft();
             } else return cRange*dRange;
         }
         return cRange;

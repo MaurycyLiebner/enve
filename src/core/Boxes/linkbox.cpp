@@ -96,18 +96,24 @@ bool InternalLinkBox::isFrameFInDurationRect(const qreal relFrame) const {
 
 FrameRange InternalLinkBox::prp_getIdenticalRelRange(const int relFrame) const {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
-    if(mVisible) {
-        if(isFrameInDurationRect(relFrame)) {
-            range *= BoundingBox::prp_getIdenticalRelRange(relFrame);
-        } else {
-            if(relFrame > mDurationRectangle->getMaxRelFrame()) {
-                range = mDurationRectangle->getRelFrameRangeToTheRight();
-            } else if(relFrame < mDurationRectangle->getMinRelFrame()) {
-                range = mDurationRectangle->getRelFrameRangeToTheLeft();
-            }
-        }
-    }
+    if(mVisible) range *= BoundingBox::prp_getIdenticalRelRange(relFrame);
+    else return range;
     auto targetRange = getLinkTarget()->prp_getIdenticalRelRange(relFrame);
-
     return range*targetRange;
+}
+
+FrameRange InternalLinkBox::prp_relInfluenceRange() const {
+    FrameRange inflRange;
+    if(mDurationRectangle) inflRange = mDurationRectangle->getRelFrameRange();
+    else inflRange = ComplexAnimator::prp_relInfluenceRange();
+    if(getLinkTarget()) {
+        return inflRange*getLinkTarget()->prp_relInfluenceRange();
+    } else return inflRange;
+}
+
+int InternalLinkBox::prp_getRelFrameShift() const {
+    if(getLinkTarget()) {
+        return getLinkTarget()->prp_getRelFrameShift() +
+                BoundingBox::prp_getRelFrameShift();
+    } else return BoundingBox::prp_getRelFrameShift();
 }

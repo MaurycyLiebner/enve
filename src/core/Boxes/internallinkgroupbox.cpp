@@ -40,30 +40,6 @@ void InternalLinkGroupBox::readBoundingBox(eReadStream& src) {
     BoundingBox::readBoundingBox(src);
 }
 
-//bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) {
-//    return mLinkTarget->relPointInsidePath(point);
-//}
-
-FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(
-        const int relFrame) const {
-    FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
-    if(!getLinkTarget()) return range;
-    if(mVisible) {
-        if(isFrameInDurationRect(relFrame)) {
-            range *= BoundingBox::prp_getIdenticalRelRange(relFrame);
-        } else {
-            if(relFrame > mDurationRectangle->getMaxRelFrame()) {
-                range = mDurationRectangle->getRelFrameRangeToTheRight();
-            } else if(relFrame < mDurationRectangle->getMinRelFrame()) {
-                range = mDurationRectangle->getRelFrameRangeToTheLeft();
-            }
-        }
-    }
-    auto targetRange = getLinkTarget()->prp_getIdenticalRelRange(relFrame);
-
-    return range*targetRange;
-}
-
 void InternalLinkGroupBox::setupRasterEffectsF(const qreal relFrame,
                                          BoxRenderData * const data) {
     if(isParentLink() && getLinkTarget()) {
@@ -95,18 +71,45 @@ ContainerBox *InternalLinkGroupBox::getFinalTarget() const {
     return getLinkTarget();
 }
 
-int InternalLinkGroupBox::prp_getRelFrameShift() const {
-    if(!getLinkTarget()) return ContainerBox::prp_getRelFrameShift();
-    if(getLinkTarget()->SWT_isLinkBox() || isParentLink()) {
-        return ContainerBox::prp_getRelFrameShift() +
-                getLinkTarget()->prp_getRelFrameShift();
-    }
-    return ContainerBox::prp_getRelFrameShift();
+bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) const {
+    if(!getLinkTarget()) return false;
+    return getLinkTarget()->relPointInsidePath(relPos);
 }
 
-bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) const {
-    if(!getFinalTarget()) return false;
-    return getFinalTarget()->relPointInsidePath(relPos);
+bool InternalLinkGroupBox::isFrameInDurationRect(const int relFrame) const {
+    if(!getLinkTarget()) return false;
+    return ContainerBox::isFrameInDurationRect(relFrame) &&
+            getLinkTarget()->isFrameInDurationRect(relFrame);
+}
+
+bool InternalLinkGroupBox::isFrameFInDurationRect(const qreal relFrame) const {
+    if(!getLinkTarget()) return false;
+    return ContainerBox::isFrameFInDurationRect(relFrame) &&
+            getLinkTarget()->isFrameFInDurationRect(relFrame);
+}
+
+FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(const int relFrame) const {
+    FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
+    if(mVisible) range *= ContainerBox::prp_getIdenticalRelRange(relFrame);
+    else return range;
+    auto targetRange = getLinkTarget()->prp_getIdenticalRelRange(relFrame);
+    return range*targetRange;
+}
+
+FrameRange InternalLinkGroupBox::prp_relInfluenceRange() const {
+    FrameRange inflRange;
+    if(mDurationRectangle) inflRange = mDurationRectangle->getRelFrameRange();
+    else inflRange = ComplexAnimator::prp_relInfluenceRange();
+    if(getLinkTarget()) {
+        return inflRange*getLinkTarget()->prp_relInfluenceRange();
+    } else return inflRange;
+}
+
+int InternalLinkGroupBox::prp_getRelFrameShift() const {
+    if(getLinkTarget()) {
+        return getLinkTarget()->prp_getRelFrameShift() +
+                ContainerBox::prp_getRelFrameShift();
+    } else return ContainerBox::prp_getRelFrameShift();
 }
 
 void InternalLinkGroupBox::setTargetSlot(BoundingBox * const target) {
@@ -169,12 +172,6 @@ QPointF InternalLinkGroupBox::getRelCenterPosition() {
 
 ContainerBox *InternalLinkGroupBox::getLinkTarget() const {
     return static_cast<ContainerBox*>(mBoxTarget->getTarget());
-}
-
-bool InternalLinkGroupBox::isFrameInDurationRect(const int relFrame) const {
-    if(!getLinkTarget()) return false;
-    return ContainerBox::isFrameInDurationRect(relFrame) &&
-            getLinkTarget()->isFrameInDurationRect(relFrame);
 }
 
 stdsptr<BoxRenderData> InternalLinkGroupBox::createRenderData() {

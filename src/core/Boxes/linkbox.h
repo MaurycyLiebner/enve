@@ -88,6 +88,8 @@ public:
     }
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
+    FrameRange prp_relInfluenceRange() const;
+    int prp_getRelFrameShift() const;
 
     QMatrix getRelativeTransformAtFrame(const qreal relFrame) {
         if(isParentLink()) {

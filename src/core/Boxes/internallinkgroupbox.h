@@ -65,6 +65,8 @@ public:
 
     stdsptr<BoxRenderData> createRenderData();
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
+    FrameRange prp_relInfluenceRange() const;
+    bool isFrameFInDurationRect(const qreal relFrame) const;
 
     QMatrix getRelativeTransformAtFrame(const qreal relFrame) {
         if(isParentLink()) {
