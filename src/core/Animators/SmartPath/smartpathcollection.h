@@ -32,6 +32,9 @@ protected:
 public:
     bool SWT_isSmartPathCollection() const { return true; }
 
+    void writeProperty(eWriteStream& dst) const;
+    void readProperty(eReadStream& src);
+
     template<typename... Args>
     SmartPathAnimator *createNewPath(Args && ...arguments) {
         const auto newPath = enve::make_shared<SmartPathAnimator>(arguments...);

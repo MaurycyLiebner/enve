@@ -21,6 +21,16 @@
 SmartPathCollection::SmartPathCollection() :
     SmartPathCollectionBase("paths") {}
 
+void SmartPathCollection::writeProperty(eWriteStream &dst) const {
+    SmartPathCollectionBase::writeProperty(dst);
+    dst.write(&mFillType, sizeof(SkPath::FillType));
+}
+
+void SmartPathCollection::readProperty(eReadStream &src) {
+    SmartPathCollectionBase::readProperty(src);
+    src.read(&mFillType, sizeof(SkPath::FillType));
+}
+
 SmartNodePoint *SmartPathCollection::createNewSubPathAtRelPos(const QPointF &relPos) {
     const auto newPath = createNewPath();
     const auto handler = newPath->getPointsHandler();
