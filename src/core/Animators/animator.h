@@ -305,7 +305,7 @@ public:
     int anim_getCurrentAbsFrame() const;
 
     void anim_moveKeyToRelFrame(Key * const key, const int newFrame);
-    void anim_shiftAllKeys(const int shift);
+    virtual void anim_shiftAllKeys(const int shift);
 
     int anim_getPrevKeyRelFrame(const int relFrame) const;
     int anim_getNextKeyRelFrame(const int relFrame) const;

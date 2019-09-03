@@ -327,6 +327,14 @@ void ComplexAnimator::ca_removeDescendantsKey(Key * const key) {
     if(collection->isEmpty()) anim_removeKey(collection->ref<ComplexKey>());
 }
 
+void ComplexAnimator::anim_shiftAllKeys(const int shift) {
+    for(const auto &property : ca_mChildAnimators) {
+        if(!property->SWT_isAnimator()) continue;
+        const auto anim = static_cast<Animator*>(property.get());
+        anim->anim_shiftAllKeys(shift);
+    }
+}
+
 ComplexKey::ComplexKey(const int absFrame,
                        ComplexAnimator * const parentAnimator) :
     Key(parentAnimator) {

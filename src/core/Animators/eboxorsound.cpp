@@ -170,7 +170,7 @@ void eBoxOrSound::setDurationRectangle(
                 FrameRange{FrameRange::EMIN, FrameRange::EMAX};
     const auto oldDurRect = mDurationRectangle;
     mDurationRectangle = durationRect;
-    prp_afterChangedAbsRange(oldRange + newRange, false);
+    prp_afterFrameShiftChanged(oldRange, newRange);
     if(!mDurationRectangle) return shiftAll(oldDurRect->getRelShift());
 
     connect(mDurationRectangle.data(), &DurationRectangle::shiftChanged,

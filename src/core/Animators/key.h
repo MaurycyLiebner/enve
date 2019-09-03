@@ -29,6 +29,7 @@ class KeysClipboard;
 class Key : public StdSelfRef {
     friend class Animator;
     friend class KeysClipboard;
+    friend class ComplexKey;
 public:
     Key(Animator * const parentAnimator);
     Key(const int frame, Animator * const parentAnimator);

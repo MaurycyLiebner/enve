@@ -31,7 +31,11 @@ void Animator::anim_scaleTime(const int pivotAbsFrame, const qreal scale) {
 }
 
 void Animator::anim_shiftAllKeys(const int shift) {
-    for(const auto &key : anim_mKeys) {
+    QList<Key*> keys;
+    for(const auto& key : anim_mKeys) {
+        keys << key;
+    }
+    for(const auto key : keys) {
         anim_moveKeyToRelFrame(key, key->getRelFrame() + shift);
     }
 }

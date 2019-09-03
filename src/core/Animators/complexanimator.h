@@ -73,6 +73,8 @@ public:
     }
 
     void anim_setRecording(const bool rec);
+    void anim_shiftAllKeys(const int shift);
+
     virtual void ca_childAnimatorIsRecordingChanged();
 
     void ca_swapChildAnimators(Property * const animator1,
