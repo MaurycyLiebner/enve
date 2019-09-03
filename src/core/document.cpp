@@ -83,6 +83,7 @@ SmartPathClipboard* Document::getSmartPathClipboard() const {
 void Document::setCanvasMode(const CanvasMode mode) {
     fCanvasMode = mode;
     emit canvasModeSet(mode);
+    actionFinished();
 }
 
 Canvas *Document::createNewScene() {
