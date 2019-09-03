@@ -83,6 +83,7 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
         //fitSceneToSize();
         if(!isZero6Dec(mSavedResolutionFraction - resolutionFraction)) {
             mCurrentScene->setResolutionFraction(resolutionFraction);
+            mDocument.actionFinished();
         }
 
         mCurrentRenderFrame = renderSettings.fMinFrame;
