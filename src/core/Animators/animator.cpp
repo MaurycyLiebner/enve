@@ -181,11 +181,9 @@ int Animator::anim_getNextKeyId(const int relFrame) const {
 }
 
 int Animator::anim_getKeyIndex(const Key * const key) const {
-    int index = -1;
-    for(int i = 0; i < anim_mKeys.count(); i++) {
-        if(anim_mKeys.atId(i) == key) index = i;
-    }
-    return index;
+    int index;
+    if(anim_mKeys.hasKey(key, &index)) return index;
+    return -1;
 }
 
 void Animator::anim_addKeysWhereOtherHasKeys(const Animator * const other) {

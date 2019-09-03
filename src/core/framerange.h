@@ -22,6 +22,7 @@
 struct iValueRange {
     static int EMIN;
     static int EMAX;
+    static iValueRange EMINMAX;
     static iValueRange INVALID;
 
     int fMin; //! @brief Inclusive range min

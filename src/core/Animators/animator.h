@@ -43,6 +43,15 @@ public:
         return 0;
     }
 
+    bool hasKey(const Key* const key) const {
+        for(const auto& iKey : mKeys) {
+            if(iKey.get() == key) return true;
+        }
+        return false;
+    }
+
+    bool hasMultiple() const { return mKeys.count() > 1; }
+
     Key * getKey() const {
         if(mKeys.isEmpty()) return nullptr;
         if(mKeys.count() == 1) return mKeys.last().get();
@@ -128,6 +137,18 @@ public:
 
     bool isEmpty() const {
         return mList.isEmpty();
+    }
+
+    bool hasKey(const Key* const key, int* idP = nullptr) const {
+        int id = idAtFrame(key->getRelFrame());
+        if(idP) *idP = id;
+        if(id < 0) return false;
+        if(id >= mList.count()) return false;
+        return mList.at(id).hasKey(key);
+    }
+
+    bool isDuplicateAtIdex(const int index) const {
+        return mList.at(index).hasMultiple();
     }
 
     void add(const stdsptr<Key>& key);
@@ -393,24 +414,7 @@ T* Animator::anim_getKeyAtIndex(const int id) const {
 
 template <class T>
 T *Animator::anim_getKeyAtRelFrame(const int frame) const {
-    if(anim_mKeys.isEmpty()) return nullptr;
-    if(frame > anim_mKeys.last()->getRelFrame()) return nullptr;
-    if(frame < anim_mKeys.first()->getRelFrame()) return nullptr;
-    int minId = 0;
-    int maxId = anim_mKeys.count() - 1;
-    while(maxId - minId > 1) {
-        const int guess = (maxId + minId)/2;
-        if(anim_mKeys.atId(guess)->getRelFrame() > frame) {
-            maxId = guess;
-        } else {
-            minId = guess;
-        }
-    }
-    T * const minIdKey = anim_getKeyAtIndex<T>(minId);
-    if(minIdKey->getRelFrame() == frame) return minIdKey;
-    T * const maxIdKey = anim_getKeyAtIndex<T>(maxId);
-    if(maxIdKey->getRelFrame() == frame) return maxIdKey;
-    return nullptr;
+    return anim_mKeys.atRelFrame<T>(frame);
 }
 
 template <class T>

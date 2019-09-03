@@ -24,9 +24,11 @@ class GraphAnimator : public Animator {
     struct GraphPath {
         operator const QPainterPath&() const { return fPath; }
 
+        void reset() { fPath = QPainterPath(); }
+        bool isEmpty() const { return fPath.isEmpty(); }
+
         QPainterPath fPath;
-        int fStartFrame;
-        int fEndFrame;
+        FrameRange fRange;
     };
 
 protected:
@@ -55,11 +57,11 @@ public:
     void graph_updateKeysPath(const FrameRange& relFrameRange);
 
     void gAddKeysInRectToList(const QRectF &frameValueRect,
-                                   QList<GraphKey*> &keys);
+                              QList<GraphKey*> &keys);
 
     void graph_drawKeysPath(QPainter * const p,
                             const QColor &paintColor,
-                            const FrameRange &absFrameRange) const;
+                            const FrameRange &absFrameRange);
 
     void graph_getFrameValueConstraints(GraphKey *key,
                                   const QrealPointType type,
@@ -91,23 +93,6 @@ private:
     IdRange graph_relFrameRangeToGraphPathIdRange(
             const FrameRange &relFrameRange) const;
 
-    int idForFrame(const int relFrame) const {
-        return idForFrame(relFrame, 0, graph_mKeyPaths.count() - 1);
-    }
-
-    int idForFrame(const int relFrame,
-                   const int min, const int max) const {
-        if(min >= max) return min;
-        const int guess = (max + min)/2;
-        const auto& path = graph_mKeyPaths.at(guess);
-        if(path.fStartFrame > relFrame) {
-            return idForFrame(relFrame, min, guess - 1);
-        } else if(path.fEndFrame < relFrame) {
-            return idForFrame(relFrame, guess + 1, max);
-        }
-        // guessFrame == relFrame
-        return guess;
-    }
 
     void graph_getFrameConstraints(
             GraphKey *key, const QrealPointType type,
