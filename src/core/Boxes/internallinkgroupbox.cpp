@@ -90,7 +90,8 @@ bool InternalLinkGroupBox::isFrameFInDurationRect(const qreal relFrame) const {
 
 FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(const int relFrame) const {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
-    if(mVisible) range *= ContainerBox::prp_getIdenticalRelRange(relFrame);
+    if(mVisible && getLinkTarget())
+        range *= ContainerBox::prp_getIdenticalRelRange(relFrame);
     else return range;
     auto targetRange = getLinkTarget()->prp_getIdenticalRelRange(relFrame);
     return range*targetRange;
