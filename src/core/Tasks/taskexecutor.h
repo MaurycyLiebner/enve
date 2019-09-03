@@ -85,6 +85,7 @@ private:
             if(task == iTask.get()) {//
                 emit finishedTaskSignal(iTask, this);//
                 mTasks.removeAt(i);//
+                break;
             }//
         }//
 //        stdsptr<eTask> task;

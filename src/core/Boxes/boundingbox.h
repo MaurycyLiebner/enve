@@ -201,7 +201,7 @@ public:
 
     virtual bool shouldScheduleUpdate() { return true; }
     virtual void queTasks();
-    BoxRenderData *queRender(const qreal relFrame);
+    stdsptr<BoxRenderData> queRender(const qreal relFrame);
 
     virtual void writeIdentifier(eWriteStream& dst) const;
 

@@ -30,8 +30,7 @@ BoxRenderData *RenderDataHandler::getItemAtRelFrame(const qreal frame) const {
     return it->second.get();
 }
 
-void RenderDataHandler::addItemAtRelFrame(
-        const stdsptr<BoxRenderData>& item) {
+void RenderDataHandler::addItemAtRelFrame(const stdsptr<BoxRenderData>& item) {
     const int key = frameToKey(item->fRelFrame);
     mFrameToData.erase(key);
     mFrameToData.insert({key, item});

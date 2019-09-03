@@ -380,11 +380,12 @@ void BoundingBox::planUpdate(const UpdateReason reason) {
     }
 }
 
-BoxRenderData* BoundingBox::queRender(const qreal relFrame) {
+stdsptr<BoxRenderData> BoundingBox::queRender(const qreal relFrame) {
     const auto currentRenderData = updateCurrentRenderData(relFrame);
     setupRenderData(relFrame, currentRenderData);
-    TaskScheduler::sInstance->queCpuTask(enve::shared(currentRenderData));
-    return currentRenderData;
+    const auto currentSPtr = enve::shared(currentRenderData);
+    TaskScheduler::sInstance->queCpuTask(currentSPtr);
+    return currentSPtr;
 }
 
 void BoundingBox::queTasks() {
