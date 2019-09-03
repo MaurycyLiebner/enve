@@ -20,6 +20,8 @@
 #include "Properties/boxtargetproperty.h"
 #include "Properties/boolproperty.h"
 
+class eSound;
+
 class ExternalLinkBox : public ContainerBox {
     e_OBJECT
 public:
@@ -52,29 +54,7 @@ public:
         BoundingBox::readBoundingBox(src);
     }
 
-    void setLinkTarget(BoundingBox * const linkTarget) {
-        disconnect(mBoxTarget.data(), nullptr, this, nullptr);
-        if(getLinkTarget()) {
-            disconnect(getLinkTarget(), nullptr, this, nullptr);
-            getLinkTarget()->removeLinkingBox(this);
-        }
-        if(!linkTarget) {
-            prp_setName("empty link");
-            mBoxTarget->setTarget(nullptr);
-        } else {
-            prp_setName(linkTarget->prp_getName() + " link");
-            mBoxTarget->setTarget(linkTarget);
-            linkTarget->addLinkingBox(this);
-            connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
-                    this, [this, linkTarget](const FrameRange& range) {
-                const auto relRange = linkTarget->prp_absRangeToRelRange(range);
-                prp_afterChangedRelRange(relRange);
-            });
-        }
-        planUpdate(UpdateReason::userChange);
-        connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
-                this, &InternalLinkBox::setTargetSlot);
-    }
+    void setLinkTarget(BoundingBox * const linkTarget);
 
     bool relPointInsidePath(const QPointF &relPos) const;
     QPointF getRelCenterPosition();
@@ -122,6 +102,8 @@ protected:
 
     qsptr<BoxTargetProperty> mBoxTarget =
             enve::make_shared<BoxTargetProperty>("link target");
+private:
+    qsptr<eSound> mSound;
 };
 
 #endif // LINKBOX_H

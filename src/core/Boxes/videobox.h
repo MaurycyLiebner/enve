@@ -39,6 +39,8 @@ public:
 
     void setStretch(const qreal stretch);
 
+    SingleSound* sound() const
+    { return mSound.get(); }
     void setFilePath(const QString& path);
 private:
     qsptr<SingleSound> mSound;

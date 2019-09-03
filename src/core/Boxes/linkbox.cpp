@@ -20,6 +20,8 @@
 #include "Timeline/durationrectangle.h"
 #include "Animators/transformanimator.h"
 #include "skia/skiahelpers.h"
+#include "videobox.h"
+#include "Sound/singlesound.h"
 
 ExternalLinkBox::ExternalLinkBox() : ContainerBox(TYPE_LAYER) {
     mType = TYPE_EXTERNAL_LINK;
@@ -50,6 +52,38 @@ InternalLinkBox::InternalLinkBox(BoundingBox * const linkTarget) :
     BoundingBox(TYPE_INTERNAL_LINK) {
     setLinkTarget(linkTarget);
     ca_prependChildAnimator(mTransformAnimator.data(), mBoxTarget);
+    connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
+            this, &InternalLinkBox::setTargetSlot);
+}
+
+void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
+    mSound.reset();
+    disconnect(mBoxTarget.data(), nullptr, this, nullptr);
+    if(getLinkTarget()) {
+        disconnect(getLinkTarget(), nullptr, this, nullptr);
+        getLinkTarget()->removeLinkingBox(this);
+    }
+    if(linkTarget) {
+        prp_setName(linkTarget->prp_getName() + " link");
+        mBoxTarget->setTarget(linkTarget);
+        linkTarget->addLinkingBox(this);
+        connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
+                this, [this, linkTarget](const FrameRange& range) {
+            const auto relRange = linkTarget->prp_absRangeToRelRange(range);
+            prp_afterChangedRelRange(relRange);
+        });
+        if(linkTarget->SWT_isVideoBox()) {
+            const auto vidBox = static_cast<VideoBox*>(linkTarget);
+            mSound = vidBox->sound()->createLink();
+            connect(this, &eBoxOrSound::parentChanged,
+                    mSound.get(), &eBoxOrSound::setParentGroup);
+            mSound->setParentGroup(mParentGroup);
+        }
+    } else {
+        prp_setName("empty link");
+        mBoxTarget->setTarget(nullptr);
+    }
+    planUpdate(UpdateReason::userChange);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
             this, &InternalLinkBox::setTargetSlot);
 }
