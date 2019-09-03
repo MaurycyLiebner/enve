@@ -26,18 +26,41 @@ void ContainerBoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {
     canvas.translate(toSkScalar(-fGlobalRect.x()),
                      toSkScalar(-fGlobalRect.y()));
 }
-
+#include "pointhelpers.h"
 void ContainerBoxRenderData::updateRelBoundingRect() {
-    SkPath boundingPaths;
+    fRelBoundingRect = QRectF();
+    const auto invTrans = fTransform.inverted();
     for(const auto &child : fChildrenRenderData) {
-        SkPath childPath;
-        childPath.addRect(toSkRect(child->fRelBoundingRect));
-        childPath.transform(toSkMatrix(child->fRelTransform));
-        boundingPaths.addPath(childPath);
+        QPointF tl = child->fRelBoundingRect.topLeft();
+        QPointF tr = child->fRelBoundingRect.topRight();
+        QPointF br = child->fRelBoundingRect.bottomRight();
+        QPointF bl = child->fRelBoundingRect.bottomLeft();
+
+        const auto trans = child->fTransform*invTrans;
+
+        tl = trans.map(tl);
+        tr = trans.map(tr);
+        br = trans.map(br);
+        bl = trans.map(bl);
+
+        if(fRelBoundingRect.isNull()) {
+            fRelBoundingRect.setTop(qMin4(tl.y(), tr.y(), br.y(), bl.y()));
+            fRelBoundingRect.setLeft(qMin4(tl.x(), tr.x(), br.x(), bl.x()));
+            fRelBoundingRect.setBottom(qMax4(tl.y(), tr.y(), br.y(), bl.y()));
+            fRelBoundingRect.setRight(qMax4(tl.x(), tr.x(), br.x(), bl.x()));
+        } else {
+            fRelBoundingRect.setTop(qMin(fRelBoundingRect.top(),
+                                         qMin4(tl.y(), tr.y(), br.y(), bl.y())));
+            fRelBoundingRect.setLeft(qMin(fRelBoundingRect.left(),
+                                          qMin4(tl.x(), tr.x(), br.x(), bl.x())));
+            fRelBoundingRect.setBottom(qMax(fRelBoundingRect.bottom(),
+                                            qMax4(tl.y(), tr.y(), br.y(), bl.y())));
+            fRelBoundingRect.setRight(qMax(fRelBoundingRect.right(),
+                                           qMax4(tl.x(), tr.x(), br.x(), bl.x())));
+        }
 
         fOtherGlobalRects << child->fGlobalRect;
     }
-    fRelBoundingRect = toQRectF(boundingPaths.computeTightBounds());
 }
 
 void ContainerBoxRenderData::drawSk(SkCanvas * const canvas) {
