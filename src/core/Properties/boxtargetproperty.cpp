@@ -26,8 +26,15 @@ BoundingBox* BoxTargetProperty::getTarget() const {
 }
 
 void BoxTargetProperty::setTarget(BoundingBox* const box) {
+    if(mTarget_d) {
+        disconnect(mTarget_d, &BoundingBox::destroyed,
+                   this, nullptr);
+    }
     mTarget_d = box;
-
+    if(box) {
+        connect(box, &BoundingBox::destroyed,
+                this, [this]() { setTarget(nullptr); });
+    }
     prp_afterWholeInfluenceRangeChanged();
     emit targetSet(box);
 }
@@ -48,18 +55,18 @@ bool BoxTargetProperty::SWT_drop(const QMimeData * const data) {
 }
 
 void BoxTargetProperty::writeProperty(eWriteStream& dst) const {
-    const auto targetBox = mTarget_d.data();
     int targetWriteId = -1;
     int targetDocumentId = -1;
 
-    if(targetBox) {
-        if(targetBox->getWriteId() < 0) targetBox->assignWriteId();
-        targetWriteId = targetBox->getWriteId();
-        targetDocumentId = targetBox->getDocumentId();
+    if(mTarget_d) {
+        if(mTarget_d->getWriteId() < 0) mTarget_d->assignWriteId();
+        targetWriteId = mTarget_d->getWriteId();
+        targetDocumentId = mTarget_d->getDocumentId();
     }
     dst << targetWriteId;
     dst << targetDocumentId;
 }
+
 #include "simpletask.h"
 void BoxTargetProperty::readProperty(eReadStream& src) {
     int targetReadId;

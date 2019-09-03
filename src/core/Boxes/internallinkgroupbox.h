@@ -61,17 +61,23 @@ public:
     //bool relPointInsidePath(const QPointF &relPos);
     QPointF getRelCenterPosition();
 
-    qsptr<BoundingBox> createLinkForLinkGroup();
-
     bool isFrameInDurationRect(const int relFrame) const;
 
     stdsptr<BoxRenderData> createRenderData();
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
-    QMatrix getRelativeTransformAtFrame(const qreal relFrame);
+    QMatrix getRelativeTransformAtFrame(const qreal relFrame) {
+        if(isParentLink()) {
+            return getLinkTarget()->getRelativeTransformAtFrame(relFrame);
+        } else {
+            return BoundingBox::getRelativeTransformAtFrame(relFrame);
+        }
+    }
+
     QMatrix getTotalTransformAtFrame(const qreal relFrame) {
         if(isParentLink()) {
-            return getRelativeTransformAtFrame(relFrame)*
+            const auto linkTarget = getLinkTarget();
+            return linkTarget->getRelativeTransformAtFrame(relFrame)*
                     mParentGroup->getTotalTransformAtFrame(relFrame);
         } else {
             return BoundingBox::getTotalTransformAtFrame(relFrame);

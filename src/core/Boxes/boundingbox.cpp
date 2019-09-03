@@ -116,14 +116,8 @@ void BoundingBox::ca_childAnimatorIsRecordingChanged() {
 
 qsptr<BoundingBox> BoundingBox::createLink() {
     auto linkBox = enve::make_shared<InternalLinkBox>(this);
-    copyBoundingBoxDataTo(linkBox.get());
+    copyTransformationTo(linkBox.get());
     return std::move(linkBox);
-}
-
-qsptr<BoundingBox> BoundingBox::createLinkForLinkGroup() {
-    qsptr<BoundingBox> box = createLink();
-    box->clearRasterEffects();
-    return box;
 }
 
 void BoundingBox::clearRasterEffects() {
@@ -148,8 +142,12 @@ void BoundingBox::updateIfUsesProgram(
     mRasterEffectsAnimators->updateIfUsesProgram(program);
 }
 
-void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
+void BoundingBox::copyTransformationTo(BoundingBox * const targetBox) {
     sWriteReadMember(this, targetBox, &BoundingBox::mTransformAnimator);
+}
+
+void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
+    copyTransformationTo(targetBox);
     sWriteReadMember(this, targetBox, &BoundingBox::mRasterEffectsAnimators);
 }
 

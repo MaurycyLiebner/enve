@@ -64,14 +64,6 @@ FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(
     return range*targetRange;
 }
 
-QMatrix InternalLinkGroupBox::getRelativeTransformAtFrame(const qreal relFrame) {
-    if(isParentLink() && getLinkTarget()) {
-        return getLinkTarget()->getRelativeTransformAtFrame(relFrame);
-    } else {
-        return BoundingBox::getRelativeTransformAtFrame(relFrame);
-    }
-}
-
 void InternalLinkGroupBox::setupRasterEffectsF(const qreal relFrame,
                                          BoxRenderData * const data) {
     if(isParentLink() && getLinkTarget()) {
@@ -142,16 +134,22 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
             prp_afterChangedRelRange(relRange);
         });
 
+        connect(linkTarget->getTransformAnimator(), &Property::prp_absFrameRangeChanged,
+                this, [this, linkTarget](const FrameRange& targetAbs) {
+            const auto relRange = linkTarget->prp_absRangeToRelRange(targetAbs);
+            mTransformAnimator->prp_afterChangedRelRange(relRange);
+        });
+
         const auto &boxesList = linkTarget->getContained();
         for(int i = boxesList.count() - 1; i >= 0; i--) {
             const auto& child = boxesList.at(i);
             if(child->SWT_isBoundingBox()) {
                 const auto box = static_cast<BoundingBox*>(child.get());
-                const auto newLink = box->createLinkForLinkGroup();
+                const auto newLink = box->createLink();
                 addContained(newLink);
             } else /*(child->SWT_isSound())*/ {
                 const auto sound = static_cast<SingleSound*>(child.get());
-                const auto newLink = enve::make_shared<eSoundLink>(sound);
+                const auto newLink = sound->createLink();
                 addContained(newLink);
             }
         }
@@ -171,13 +169,6 @@ QPointF InternalLinkGroupBox::getRelCenterPosition() {
 
 ContainerBox *InternalLinkGroupBox::getLinkTarget() const {
     return static_cast<ContainerBox*>(mBoxTarget->getTarget());
-}
-
-qsptr<BoundingBox> InternalLinkGroupBox::createLinkForLinkGroup() {
-    if(isParentLink()) {
-        Q_ASSERT(getLinkTarget());
-        return getLinkTarget()->createLinkForLinkGroup();
-    } else return ContainerBox::createLinkForLinkGroup();
 }
 
 bool InternalLinkGroupBox::isFrameInDurationRect(const int relFrame) const {

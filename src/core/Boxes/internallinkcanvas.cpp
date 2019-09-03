@@ -48,12 +48,10 @@ bool InternalLinkCanvas::clipToCanvas() {
     return mClipToCanvas->getValue();
 }
 
-qsptr<BoundingBox> InternalLinkCanvas::createLinkForLinkGroup() {
-    if(isParentLink()) {
-        return getLinkTarget()->createLinkForLinkGroup();
-    } else {
-        return enve::make_shared<InternalLinkCanvas>(this);
-    }
+qsptr<BoundingBox> InternalLinkCanvas::createLink() {
+    auto linkBox = enve::make_shared<InternalLinkCanvas>(this);
+    copyTransformationTo(linkBox.get());
+    return std::move(linkBox);
 }
 
 stdsptr<BoxRenderData> InternalLinkCanvas::createRenderData() {

@@ -27,7 +27,7 @@ public:
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data);
 
-    qsptr<BoundingBox> createLinkForLinkGroup();
+    qsptr<BoundingBox> createLink();
 
     stdsptr<BoxRenderData> createRenderData();
 

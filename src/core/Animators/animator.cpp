@@ -84,8 +84,6 @@ void Animator::prp_afterChangedAbsRange(const FrameRange &range, const bool clip
     emit prp_absFrameRangeChanged(range, clip);
 }
 
-
-
 void Animator::anim_updateAfterChangedKey(Key * const key) {
     if(SWT_isComplexAnimator() || !key) return;
     const int relFrame = key->getRelFrame();

@@ -106,7 +106,6 @@ protected:
     virtual void getMotionBlurProperties(QList<Property*> &list) const;
 public:
     virtual qsptr<BoundingBox> createLink();
-    virtual qsptr<BoundingBox> createLinkForLinkGroup();
 
     virtual SmartVectorPath *objectToVectorPathBox();
     virtual SmartVectorPath *strokeToVectorPathBox();
@@ -307,8 +306,8 @@ public:
 
     QPointF mapRelPosToAbs(const QPointF &relPos) const;
 
+    void copyTransformationTo(BoundingBox * const targetBox);
     void copyBoundingBoxDataTo(BoundingBox * const targetBox);
-
 
 //    int prp_getParentFrameShift() const;
 

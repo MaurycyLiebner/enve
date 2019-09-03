@@ -41,7 +41,7 @@ public:
 signals:
     void targetSet(BoundingBox*);
 private:
-    qptr<BoundingBox> mTarget_d;
+    BoundingBox* mTarget_d = nullptr;
 };
 
 #endif // BOXTARGETPROPERTY_H

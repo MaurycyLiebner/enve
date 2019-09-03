@@ -55,6 +55,8 @@ public:
 
     int durationSeconds() const;
 
+    qsptr<eSound> createLink();
+
     const HddCachableCacheHandler* getCacheHandler() const;
 
     bool videoSound() const {

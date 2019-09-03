@@ -555,7 +555,7 @@ void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
 
 qsptr<BoundingBox> ContainerBox::createLink() {
     auto linkBox = enve::make_shared<InternalLinkGroupBox>(this);
-    copyBoundingBoxDataTo(linkBox.get());
+    copyTransformationTo(linkBox.get());
     return std::move(linkBox);
 }
 
@@ -698,14 +698,13 @@ void ContainerBox::insertContained(const int id, const qsptr<eBoxOrSound>& child
         const auto cBox = static_cast<BoundingBox*>(child.get());
         for(const auto& box : mLinkingBoxes) {
             const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
-            internalLinkGroup->insertContained(id, cBox->createLinkForLinkGroup());
+            internalLinkGroup->insertContained(id, cBox->createLink());
         }
     } else /*if(child->SWT_isSound())*/ {
         const auto sound = static_cast<SingleSound*>(child.get());
         for(const auto& box : mLinkingBoxes) {
             const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
-            const auto newLink = enve::make_shared<eSoundLink>(sound);
-            internalLinkGroup->insertContained(id, newLink);
+            internalLinkGroup->insertContained(id, sound->createLink());
         }
     }
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());

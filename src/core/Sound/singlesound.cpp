@@ -20,6 +20,7 @@
 #include "filesourcescache.h"
 #include "CacheHandlers/soundcachehandler.h"
 #include "fileshandler.h"
+#include "esoundlink.h"
 #include "../canvas.h"
 
 SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
@@ -78,6 +79,10 @@ stdsptr<Samples> SingleSound::getSamplesForSecond(const int relSecondId) {
 
 int SingleSound::durationSeconds() const {
     return mCacheHandler ? mCacheHandler->durationSecCeil() : 0;
+}
+
+qsptr<eSound> SingleSound::createLink() {
+    return enve::make_shared<eSoundLink>(this);
 }
 
 #include "canvas.h"

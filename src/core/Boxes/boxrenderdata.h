@@ -50,7 +50,9 @@ protected:
     void afterProcessing() final;
     void afterQued() final;
 
-    virtual SkColor eraseColor() const { return SK_ColorTRANSPARENT; }
+    virtual SkColor eraseColor() const {
+        return SK_ColorTRANSPARENT;
+    }
 public:
     virtual QPointF getCenterPosition() {
         return fRelBoundingRect.center();

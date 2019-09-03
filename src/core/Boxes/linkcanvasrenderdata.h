@@ -23,6 +23,13 @@ struct LinkCanvasRenderData : public CanvasRenderData {
 
     bool fClipToCanvas = false;
 protected:
+    SkColor eraseColor() const {
+        if(fClipToCanvas) return fBgColor;
+        else return SK_ColorTRANSPARENT;
+    }
+
+    void drawSk(SkCanvas * const canvas);
+
     void updateRelBoundingRect() {
         if(fClipToCanvas) CanvasRenderData::updateRelBoundingRect();
         else ContainerBoxRenderData::updateRelBoundingRect();
@@ -31,11 +38,6 @@ protected:
     void updateGlobalRect() {
         if(fClipToCanvas) CanvasRenderData::updateGlobalRect();
         else ContainerBoxRenderData::updateGlobalRect();
-    }
-
-    SkColor eraseColor() const {
-        if(fClipToCanvas) return fBgColor;
-        else return SK_ColorTRANSPARENT;
     }
 };
 

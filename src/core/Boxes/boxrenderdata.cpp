@@ -124,7 +124,6 @@ void BoxRenderData::process() {
                                                      fGlobalRect.height());
     bitmap.allocPixels(info);
     bitmap.eraseColor(eraseColor());
-
     SkCanvas canvas(bitmap);
     transformRenderCanvas(canvas);
 

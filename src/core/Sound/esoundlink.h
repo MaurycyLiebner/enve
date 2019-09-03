@@ -6,6 +6,10 @@ class eSoundLink : public eSound {
 public:
     eSoundLink(eSound* const target);
 
+    qsptr<eSound> createLink() {
+        return enve::make_shared<eSoundLink>(mTarget);
+    }
+
     FrameRange prp_relInfluenceRange() const;
     int prp_getRelFrameShift() const;
 

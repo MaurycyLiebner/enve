@@ -16,6 +16,7 @@ public:
     virtual stdsptr<Samples> getSamplesForSecond(const int relSecondId) = 0;
     virtual SoundReaderForMerger * getSecondReader(const int relSecondId) = 0;
     virtual qreal getStretch() const = 0;
+    virtual qsptr<eSound> createLink() = 0;
 
     iValueRange absSecondToRelSeconds(const int absSecond);
     int getSampleShift() const;

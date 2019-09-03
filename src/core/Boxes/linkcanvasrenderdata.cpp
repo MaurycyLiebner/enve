@@ -18,3 +18,18 @@
 #include "skia/skiahelpers.h"
 #include "skia/skqtconversions.h"
 
+void LinkCanvasRenderData::drawSk(SkCanvas * const canvas) {
+    ContainerBoxRenderData::drawSk(canvas);
+    if(fClipToCanvas) {
+        canvas->concat(toSkMatrix(fScaledTransform));
+        SkPaint bPaint;
+        bPaint.setStyle(SkPaint::kFill_Style);
+        bPaint.setAntiAlias(true);
+        bPaint.setBlendMode(SkBlendMode::kSrc);
+        bPaint.setColor(SK_ColorTRANSPARENT);
+        SkPath path;
+        path.addRect(toSkRect(fRelBoundingRect));
+        path.toggleInverseFillType();
+        canvas->drawPath(path, bPaint);
+    }
+}

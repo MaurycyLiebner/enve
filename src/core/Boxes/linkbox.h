@@ -79,8 +79,6 @@ public:
     bool relPointInsidePath(const QPointF &relPos) const;
     QPointF getRelCenterPosition();
 
-    qsptr<BoundingBox> createLinkForLinkGroup();
-
     stdsptr<BoxRenderData> createRenderData();
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data);
@@ -92,7 +90,7 @@ public:
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
     QMatrix getRelativeTransformAtFrame(const qreal relFrame) {
-        if(mParentGroup ? mParentGroup->SWT_isLinkBox() : false) {
+        if(isParentLink()) {
             return getLinkTarget()->getRelativeTransformAtFrame(relFrame);
         } else {
             return BoundingBox::getRelativeTransformAtFrame(relFrame);
