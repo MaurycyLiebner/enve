@@ -45,6 +45,7 @@ public:
     }
 
     bool hasSamples(const int samples) const {
+        if(mSamples.isEmpty()) return false;
         int rem = samples - (mEndSample - mCurrentSample);
         if(rem <= 0) return true;
         for(int i = 1 ; i < mSamples.count(); i++) {
@@ -205,6 +206,7 @@ public:
     static void sAllAudioProvided();
     static void sFinishEncoding();
     static bool sEncodingSuccessfulyStarted();
+    static bool sEncodeAudio();
 
     VideoEncoderEmitter *getEmitter() {
         return &mEmitter;
@@ -239,8 +241,6 @@ protected:
     OutputSettings mOutputSettings;
     RenderInstanceSettings *mRenderInstanceSettings = nullptr;
     QByteArray mPathByteArray;
-    bool mHaveVideo = false;
-    bool mHaveAudio = false;
     bool mEncodeVideo = false;
     bool mEncodeAudio = false;
     bool mAllAudioProvided = false;

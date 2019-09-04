@@ -65,7 +65,7 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
         mSavedResolutionFraction = mCurrentScene->getResolutionFraction();
 
         mCurrentRenderSettings = settings;
-        const RenderSettings &renderSettings = settings->getRenderSettings();
+        const auto &renderSettings = settings->getRenderSettings();
         setFrameAction(renderSettings.fMinFrame);
 
         const qreal resolutionFraction = renderSettings.fResolution;
@@ -92,7 +92,9 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
         mCurrentEncodeFrame = mCurrentRenderFrame;
         mFirstEncodeSoundSecond = qRound(mCurrentRenderFrame/fps);
         mCurrentEncodeSoundSecond = mFirstEncodeSoundSecond;
-        if(!settings->getOutputRenderSettings().audioEnabled)
+        const auto &outputSettings = settings->getOutputRenderSettings();
+        const auto soundComp = mCurrentScene->getSoundComposition();
+        if(!VideoEncoder::sEncodeAudio())
             mMaxSoundSec = mCurrentEncodeSoundSecond - 1;
         mCurrentScene->setMinFrameUseRange(mCurrentRenderFrame);
         mCurrentSoundComposition->setMinFrameUseRange(mCurrentRenderFrame);

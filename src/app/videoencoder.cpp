@@ -457,8 +457,6 @@ void VideoEncoder::startEncodingNow() {
     _mCurrentContainerFrame = 0;
     // add streams
     mAllAudioProvided = false;
-    mHaveVideo = false;
-    mHaveAudio = false;
     mEncodeVideo = false;
     mEncodeAudio = false;
     if(mOutputSettings.videoCodec && mOutputSettings.videoEnabled) {
@@ -468,7 +466,6 @@ void VideoEncoder::startEncodingNow() {
         } catch (...) {
             RuntimeThrow("Error adding video stream");
         }
-        mHaveVideo = true;
         mEncodeVideo = true;
     }
     const auto soundComp = scene->getSoundComposition();
@@ -485,19 +482,18 @@ void VideoEncoder::startEncodingNow() {
         } catch (...) {
             RuntimeThrow("Error adding audio stream");
         }
-        mHaveAudio = true;
         mEncodeAudio = true;
     }
-    if(!mHaveAudio && !mHaveVideo) RuntimeThrow("No streams to render");
+    if(!mEncodeAudio && !mEncodeVideo) RuntimeThrow("No streams to render");
     // open streams
-    if(mHaveVideo) {
+    if(mEncodeVideo) {
         try {
             openVideo(mOutputSettings.videoCodec, &mVideoStream);
         } catch (...) {
             RuntimeThrow("Error opening video stream");
         }
     }
-    if(mHaveAudio) {
+    if(mEncodeAudio) {
         try {
             openAudio(mOutputSettings.audioCodec, &mAudioStream,
                       mInSoundSettings);
@@ -602,14 +598,14 @@ static void closeStream(OutputStream * const ost) {
 void VideoEncoder::finishEncodingNow() {
     if(!mCurrentlyEncoding) return;
 
-    if(mHaveVideo) flushStream(&mVideoStream, mFormatContext);
-    if(mHaveAudio) flushStream(&mAudioStream, mFormatContext);
+    if(mEncodeVideo) flushStream(&mVideoStream, mFormatContext);
+    if(mEncodeAudio) flushStream(&mAudioStream, mFormatContext);
 
     if(mEncodingSuccesfull) av_write_trailer(mFormatContext);
 
     /* Close each codec. */
-    if(mHaveVideo) closeStream(&mVideoStream);
-    if(mHaveAudio) closeStream(&mAudioStream);
+    if(mEncodeVideo) closeStream(&mVideoStream);
+    if(mEncodeAudio) closeStream(&mAudioStream);
 
     if(mOutputFormat) {
         if(!(mOutputFormat->flags & AVFMT_NOFILE)) {
@@ -641,8 +637,14 @@ void VideoEncoder::clearContainers() {
 
 void VideoEncoder::process() {
     bool encodeVideoT = !_mContainers.isEmpty(); // local encode
-    bool encodeAudioT = _mAllAudioProvided ? mSoundIterator.hasValue() :
-                                             mSoundIterator.hasSamples(mAudioStream.fSrcFrame->nb_samples); // local encode
+    bool encodeAudioT;
+    if(mEncodeAudio) {
+        if(_mAllAudioProvided) {
+            encodeAudioT = mSoundIterator.hasValue();
+        } else {
+            encodeAudioT = mSoundIterator.hasSamples(mAudioStream.fSrcFrame->nb_samples);
+        }
+    } else encodeAudioT = false;
     while((mEncodeVideo && encodeVideoT) || (mEncodeAudio && encodeAudioT)) {
         bool videoAligned = true;
         if(mEncodeVideo && mEncodeAudio) {
@@ -746,6 +748,10 @@ void VideoEncoder::sFinishEncoding() {
 
 bool VideoEncoder::sEncodingSuccessfulyStarted() {
     return sInstance->getCurrentlyEncoding();
+}
+
+bool VideoEncoder::sEncodeAudio() {
+    return sInstance->mEncodeAudio;
 }
 
 void VideoEncoder::sInterruptEncoding() {
