@@ -172,13 +172,13 @@ void Canvas::renderSk(SkCanvas * const canvas,
     const auto dashPathEffect = SkDashPathEffect::Make(intervals, 2, 0);
 
     canvas->concat(skViewTrans);
-    const float reversedRes = toSkScalar(1/mResolutionFraction);
     if(isPreviewingOrRendering()) {
         if(mSceneFrame) {
             canvas->clear(SK_ColorBLACK);
             canvas->save();
             if(bgColor.alpha() != 255)
                 drawTransparencyMesh(canvas, canvasRect);
+            const float reversedRes = toSkScalar(1/mSceneFrame->fResolution);
             canvas->scale(reversedRes, reversedRes);
             mSceneFrame->drawSk(canvas, filter);
             canvas->restore();
@@ -214,6 +214,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         canvas->restore();
     } else if(drawCanvas) {
         canvas->save();
+        const float reversedRes = toSkScalar(1/mSceneFrame->fResolution);
         canvas->scale(reversedRes, reversedRes);
         mSceneFrame->drawSk(canvas, filter);
         canvas->restore();

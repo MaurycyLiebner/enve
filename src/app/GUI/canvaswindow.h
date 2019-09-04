@@ -54,8 +54,6 @@ public:
     Canvas *getCurrentCanvas();
     const QMatrix& getViewTransform() const
     { return mViewTransform; }
-    void setViewTransform(const QMatrix& transform)
-    { mViewTransform = transform; }
 
     void setCurrentCanvas(Canvas * const canvas);
     bool hasNoCanvas();

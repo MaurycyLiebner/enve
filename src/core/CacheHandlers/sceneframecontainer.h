@@ -27,6 +27,7 @@ public:
                         HddCachableCacheHandler * const parent);
 
     uint fBoxState;
+    const qreal fResolution;
 protected:
     stdsptr<eHddTask> createTmpFileDataLoader();
 private:

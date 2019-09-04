@@ -24,7 +24,9 @@ SceneFrameContainer::SceneFrameContainer(
         const FrameRange &range,
         HddCachableCacheHandler * const parent) :
     ImageCacheContainer(data->fRenderedImage, range, parent),
-    fBoxState(data->fBoxStateId), mScene(scene) {}
+    fBoxState(data->fBoxStateId),
+    fResolution(data->fResolution),
+    mScene(scene) {}
 
 stdsptr<eHddTask> SceneFrameContainer::createTmpFileDataLoader() {
     const ImgLoader::Func func = [this](sk_sp<SkImage> img) {
