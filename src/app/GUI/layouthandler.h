@@ -125,7 +125,7 @@ private:
     }
 
     void resetCurrentScene() {
-        mLayouts[uint(mCurrentId)].reset();
+        mLayouts[uint(mCurrentId)]->reset();
         const int idTmp = mCurrentId;
         mCurrentId = -1;
         setCurrent(idTmp);
