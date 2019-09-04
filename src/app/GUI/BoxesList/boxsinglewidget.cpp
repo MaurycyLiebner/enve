@@ -531,6 +531,8 @@ void BoxSingleWidget::clearStaticPixmaps() {
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     if(!mTarget) return;
     if(isTargetDisabled()) return;
+    if(event->x() < mFillWidget->x() ||
+       event->x() > mFillWidget->x() + mFillWidget->width()) return;
     const auto target = mTarget->getTarget();
     if(event->button() == Qt::RightButton) {
         setSelected(true);
