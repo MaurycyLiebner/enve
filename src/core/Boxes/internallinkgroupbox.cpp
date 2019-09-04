@@ -48,10 +48,11 @@ SkBlendMode InternalLinkGroupBox::getBlendMode() {
 }
 
 void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
-                                           BoxRenderData * const data) {
+                                           BoxRenderData * const data,
+                                           Canvas* const scene) {
     const auto linkTarget = getLinkTarget();
-    if(linkTarget) linkTarget->BoundingBox::setupRenderData(relFrame, data);
-    ContainerBox::setupRenderData(relFrame, data);
+    if(linkTarget) linkTarget->BoundingBox::setupRenderData(relFrame, data, scene);
+    ContainerBox::setupRenderData(relFrame, data, scene);
 }
 
 ContainerBox *InternalLinkGroupBox::getFinalTarget() const {

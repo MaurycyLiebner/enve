@@ -50,7 +50,8 @@ protected:
 public:
     bool SWT_isPaintBox() const { return true; }
     void setupRenderData(const qreal relFrame,
-                         BoxRenderData * const data);
+                         BoxRenderData * const data,
+                         Canvas * const scene);
     stdsptr<BoxRenderData> createRenderData();
 
     void setupCanvasMenu(PropertyMenu * const menu);

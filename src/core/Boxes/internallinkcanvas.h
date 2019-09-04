@@ -25,7 +25,8 @@ protected:
     InternalLinkCanvas(ContainerBox * const linkTarget);
 public:
     void setupRenderData(const qreal relFrame,
-                         BoxRenderData * const data);
+                         BoxRenderData * const data,
+                         Canvas * const scene);
 
     qsptr<BoundingBox> createLink();
 

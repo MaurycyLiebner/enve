@@ -90,8 +90,9 @@ void ImageBox::changeSourceFile(QWidget * const dialogParent) {
 }
 
 void ImageBox::setupRenderData(const qreal relFrame,
-                               BoxRenderData * const data) {
-    BoundingBox::setupRenderData(relFrame, data);
+                               BoxRenderData * const data,
+                               Canvas* const scene) {
+    BoundingBox::setupRenderData(relFrame, data, scene);
     const auto imgData = static_cast<ImageBoxRenderData*>(data);
     if(mImgCacheHandler->hasImage()) {
         imgData->fImage = mImgCacheHandler->getImageCopy();

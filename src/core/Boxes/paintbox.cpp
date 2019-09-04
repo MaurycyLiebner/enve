@@ -25,12 +25,13 @@ PaintBox::PaintBox() : BoundingBox(TYPE_PAINT) {
     ca_addChild(mSurface);
 }
 
-void PaintBox::setupRenderData(const qreal relFrame, BoxRenderData * const data) {
-    BoundingBox::setupRenderData(relFrame, data);
+void PaintBox::setupRenderData(const qreal relFrame,
+                               BoxRenderData * const data,
+                               Canvas* const scene) {
+    BoundingBox::setupRenderData(relFrame, data, scene);
     const auto paintData = static_cast<PaintBoxRenderData*>(data);
     const int imgFrame = qFloor(relFrame);
-    const auto imgTask = mSurface->getFrameImage(imgFrame,
-                                                 paintData->fImage);
+    const auto imgTask = mSurface->getFrameImage(imgFrame, paintData->fImage);
     if(imgTask) imgTask->addDependent(data);
 
     paintData->fASurface = mSurface.get();

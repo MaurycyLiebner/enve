@@ -89,7 +89,8 @@ public:
     SkBlendMode getBlendMode();
 
     void setupRenderData(const qreal relFrame,
-                         BoxRenderData * const data);
+                         BoxRenderData * const data,
+                         Canvas * const scene);
 
     int prp_getRelFrameShift() const;
 

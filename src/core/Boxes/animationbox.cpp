@@ -229,8 +229,9 @@ void AnimationBox::readBoundingBox(eReadStream& src) {
 }
 
 void AnimationBox::setupRenderData(const qreal relFrame,
-                                   BoxRenderData * const data) {
-    BoundingBox::setupRenderData(relFrame, data);
+                                   BoxRenderData * const data,
+                                   Canvas* const scene) {
+    BoundingBox::setupRenderData(relFrame, data, scene);
     const auto imageData = static_cast<AnimationBoxRenderData*>(data);
     const int animationFrame = getAnimationFrameForRelFrame(relFrame);
     imageData->fAnimationFrame = animationFrame;

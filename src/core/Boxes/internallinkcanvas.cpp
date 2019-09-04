@@ -25,9 +25,10 @@ InternalLinkCanvas::InternalLinkCanvas(ContainerBox * const linkTarget) :
     ca_prependChildAnimator(mTransformAnimator.data(), mClipToCanvas);
 }
 
-void InternalLinkCanvas::setupRenderData(
-        const qreal relFrame, BoxRenderData * const data) {
-    InternalLinkGroupBox::setupRenderData(relFrame, data);
+void InternalLinkCanvas::setupRenderData(const qreal relFrame,
+                                         BoxRenderData * const data,
+                                         Canvas* const scene) {
+    InternalLinkGroupBox::setupRenderData(relFrame, data, scene);
 
     ContainerBox* finalTarget = getFinalTarget();
     auto canvasData = static_cast<LinkCanvasRenderData*>(data);

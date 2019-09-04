@@ -103,12 +103,12 @@ stdsptr<BoxRenderData> InternalLinkBox::createRenderData() {
     return renderData;
 }
 
-void InternalLinkBox::setupRenderData(
-        const qreal relFrame, BoxRenderData * const data) {
+void InternalLinkBox::setupRenderData(const qreal relFrame,
+                                      BoxRenderData * const data,
+                                      Canvas* const scene) {
     const auto linkTarget = getLinkTarget();
-    if(linkTarget) linkTarget->setupRenderData(relFrame, data);
-
-    BoundingBox::setupRenderData(relFrame, data);
+    if(linkTarget) linkTarget->setupRenderData(relFrame, data, scene);
+    BoundingBox::setupRenderData(relFrame, data, scene);
 }
 
 bool InternalLinkBox::relPointInsidePath(const QPointF &relPos) const {

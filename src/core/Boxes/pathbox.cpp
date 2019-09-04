@@ -123,9 +123,10 @@ bool PathBox::getOutlineEffectsEnabled() const {
 }
 
 void PathBox::setupRenderData(const qreal relFrame,
-                              BoxRenderData * const data) {
+                              BoxRenderData * const data,
+                              Canvas* const scene) {
     if(!mParentScene) return;
-    BoundingBox::setupRenderData(relFrame, data);
+    BoundingBox::setupRenderData(relFrame, data, scene);
 
     bool currentEditPathCompatible = false;
     bool currentPathCompatible = false;

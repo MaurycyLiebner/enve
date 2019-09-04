@@ -61,7 +61,8 @@ public:
 
     stdsptr<BoxRenderData> createRenderData();
     void setupRenderData(const qreal relFrame,
-                         BoxRenderData * const data);
+                         BoxRenderData * const data,
+                         Canvas * const scene);
     SkBlendMode getBlendMode() {
         if(isParentLink()) return getLinkTarget()->getBlendMode();
         return BoundingBox::getBlendMode();

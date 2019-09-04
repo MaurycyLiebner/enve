@@ -111,7 +111,8 @@ public:
     bool SWT_isPathBox() const { return true; }
 
     void setupRenderData(const qreal relFrame,
-                         BoxRenderData * const data);
+                         BoxRenderData * const data,
+                         Canvas * const scene);
     stdsptr<BoxRenderData> createRenderData() {
         return enve::make_shared<PathBoxRenderData>(this);
     }

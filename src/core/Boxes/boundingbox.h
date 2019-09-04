@@ -191,7 +191,8 @@ public:
     virtual void setupCanvasMenu(PropertyMenu * const menu);
 
     virtual void setupRenderData(const qreal relFrame,
-                                 BoxRenderData * const data);
+                                 BoxRenderData * const data,
+                                 Canvas * const scene);
     virtual void renderDataFinished(BoxRenderData *renderData);
     virtual void updateCurrentPreviewDataFromRenderData(
             BoxRenderData* renderData);

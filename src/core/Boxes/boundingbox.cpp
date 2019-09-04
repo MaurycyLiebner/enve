@@ -382,7 +382,7 @@ void BoundingBox::planUpdate(const UpdateReason reason) {
 
 stdsptr<BoxRenderData> BoundingBox::queRender(const qreal relFrame) {
     const auto currentRenderData = updateCurrentRenderData(relFrame);
-    setupRenderData(relFrame, currentRenderData);
+    setupRenderData(relFrame, currentRenderData, mParentScene);
     const auto currentSPtr = enve::shared(currentRenderData);
     TaskScheduler::sInstance->queCpuTask(currentSPtr);
     return currentSPtr;
@@ -613,17 +613,18 @@ void BoundingBox::finishTransform() {
 }
 
 void BoundingBox::setupRenderData(const qreal relFrame,
-                                  BoxRenderData * const data) {
-    Q_ASSERT(mParentScene);
-    if(!mParentScene) return;
+                                  BoxRenderData * const data,
+                                  Canvas* const scene) {
+    Q_ASSERT(scene);
+    if(!scene) return;
 
     data->fBoxStateId = mStateId;
     data->fRelFrame = qRound(relFrame);
     data->fRelTransform = getRelativeTransformAtFrame(relFrame);
     data->fTransform = getTotalTransformAtFrame(relFrame);
-    data->fResolution = mParentScene->getResolutionFraction();
+    data->fResolution = scene->getResolutionFraction();
     data->fOpacity = mTransformAnimator->getOpacity(relFrame);
-    const bool effectsVisible = mParentScene->getRasterEffectsVisible();
+    const bool effectsVisible = scene->getRasterEffectsVisible();
     data->fBaseMargin = QMargins() + 2;
     data->fBlendMode = getBlendMode();
 
@@ -632,7 +633,7 @@ void BoundingBox::setupRenderData(const qreal relFrame,
     }
 
     if(mParentGroup) data->fMaxBoundsRect = mParentGroup->currentGlobalBounds();
-    else data->fMaxBoundsRect = mParentScene->getCurrentBounds();
+    else data->fMaxBoundsRect = scene->getCurrentBounds();
 }
 
 void BoundingBox::setupRasterEffectsF(const qreal relFrame,

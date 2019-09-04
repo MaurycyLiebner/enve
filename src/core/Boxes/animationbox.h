@@ -56,7 +56,8 @@ public:
     bool SWT_isAnimationBox() const { return true; }
     void setupCanvasMenu(PropertyMenu * const menu);
     void setupRenderData(const qreal relFrame,
-                         BoxRenderData * const data);
+                         BoxRenderData * const data,
+                         Canvas * const scene);
     stdsptr<BoxRenderData> createRenderData();
     bool shouldScheduleUpdate();
 

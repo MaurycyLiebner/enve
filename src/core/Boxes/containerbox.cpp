@@ -596,8 +596,9 @@ stdsptr<BoxRenderData> ContainerBox::createRenderData() {
 }
 
 void ContainerBox::setupRenderData(const qreal relFrame,
-                                   BoxRenderData * const data) {
-    BoundingBox::setupRenderData(relFrame, data);
+                                   BoxRenderData * const data,
+                                   Canvas* const scene) {
+    BoundingBox::setupRenderData(relFrame, data, scene);
     const auto groupData = static_cast<ContainerBoxRenderData*>(data);
     groupData->fChildrenRenderData.clear();
     groupData->fOtherGlobalRects.clear();
