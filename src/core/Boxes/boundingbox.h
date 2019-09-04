@@ -208,8 +208,8 @@ public:
     virtual void writeBoundingBox(eWriteStream& dst);
     virtual void readBoundingBox(eReadStream& src);
 
-    virtual void setupRasterEffectsF(const qreal relFrame,
-                                  BoxRenderData * const data);
+    void setupRasterEffectsF(const qreal relFrame,
+                             BoxRenderData * const data);
     virtual SkBlendMode getBlendMode();
 
     bool SWT_isBoundingBox() const;

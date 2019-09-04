@@ -40,15 +40,6 @@ void InternalLinkGroupBox::readBoundingBox(eReadStream& src) {
     BoundingBox::readBoundingBox(src);
 }
 
-void InternalLinkGroupBox::setupRasterEffectsF(const qreal relFrame,
-                                         BoxRenderData * const data) {
-    if(isParentLink() && getLinkTarget()) {
-        getLinkTarget()->setupRasterEffectsF(relFrame, data);
-    } else {
-        BoundingBox::setupRasterEffectsF(relFrame, data);
-    }
-}
-
 SkBlendMode InternalLinkGroupBox::getBlendMode() {
     if(isParentLink() && getLinkTarget()) {
         return getLinkTarget()->getBlendMode();

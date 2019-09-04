@@ -86,9 +86,6 @@ public:
         }
     }
 
-    void setupRasterEffectsF(const qreal relFrame,
-                             BoxRenderData * const data);
-
     SkBlendMode getBlendMode();
 
     void setupRenderData(const qreal relFrame,
