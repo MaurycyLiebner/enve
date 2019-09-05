@@ -68,70 +68,23 @@ void Canvas::addActionsToMenu(QMenu *const menu) {
         }
     }
 
-    QMenu * const pathEffectsMenu = menu->addMenu("Path Effects");
-    pathEffectsMenu->addAction("Displace Effect", [this]() {
-        addPathEffect(enve::make_shared<DisplacePathEffect>());
+    menu->addAction("Duplicate Scene", [this]() {
+        QBuffer buffer;
+        buffer.open(QIODevice::ReadWrite);
+        eWriteStream writeStream(&buffer);
+        writeBoundingBox(writeStream);
+        writeStream.writeFutureTable();
+        buffer.seek(0);
+        eReadStream readStream(&buffer);
+        buffer.seek(buffer.size() - qint64(sizeof(int)));
+        readStream.readFutureTable();
+        buffer.seek(0);
+        const auto newScene = Document::sInstance->createNewScene();
+        newScene->readBoundingBox(readStream);
+        newScene->prp_setName(newScene->prp_getName() + " copy");
+        buffer.close();
+        BoundingBox::sClearReadBoxes();
     });
-
-    pathEffectsMenu->addAction("Duplicate Effect", [this]() {
-        addPathEffect(enve::make_shared<DuplicatePathEffect>());
-    });
-
-    pathEffectsMenu->addAction("Sub-Path Effect", [this]() {
-        addPathEffect(enve::make_shared<SubPathEffect>());
-    });
-
-    pathEffectsMenu->addAction("Solidify Effect", [this]() {
-        addPathEffect(enve::make_shared<SolidifyPathEffect>());
-    });
-
-    pathEffectsMenu->addAction("Sum Effect", [this]() {
-        addPathEffect(enve::make_shared<SumPathEffect>());
-    });
-//    pathEffectsMenu->addAction("Operation Effect");
-//    pathEffectsMenu->addAction("Group Sum Effect");
-
-    QMenu * const fillPathEffectsMenu = menu->addMenu("Fill Effects");
-
-    fillPathEffectsMenu->addAction("Displace Effect", [this]() {
-        addFillPathEffect(enve::make_shared<DisplacePathEffect>());
-    });
-
-    fillPathEffectsMenu->addAction("Duplicate Effect", [this]() {
-        addFillPathEffect(enve::make_shared<DuplicatePathEffect>());
-    });
-
-    fillPathEffectsMenu->addAction("Solidify Effect", [this]() {
-        addFillPathEffect(enve::make_shared<SolidifyPathEffect>());
-    });
-
-    fillPathEffectsMenu->addAction("Sum Effect", [this]() {
-        addFillPathEffect(enve::make_shared<SumPathEffect>());
-    });
-//    fillPathEffectsMenu->addAction("Operation Effect");
-
-    QMenu * const outlinePathEffectsMenu = menu->addMenu("Outline Effects");
-
-    outlinePathEffectsMenu->addAction("Displace Effect", [this]() {
-        addOutlinePathEffect(enve::make_shared<DisplacePathEffect>());
-    });
-
-    outlinePathEffectsMenu->addAction("Duplicate Effect", [this]() {
-        addOutlinePathEffect(enve::make_shared<DuplicatePathEffect>());
-    });
-
-    pathEffectsMenu->addAction("Sub-Path Effect", [this]() {
-        addOutlinePathEffect(enve::make_shared<SubPathEffect>());
-    });
-
-    outlinePathEffectsMenu->addAction("Solidify Effect", [this]() {
-        addOutlinePathEffect(enve::make_shared<SolidifyPathEffect>());
-    });
-
-    outlinePathEffectsMenu->addAction("Sum Effect", [this]() {
-        addOutlinePathEffect(enve::make_shared<SumPathEffect>());
-    });
-//    outlinePathEffectsMenu->addAction("Operation Effect");
 
     const auto parentWidget = menu->parentWidget();
     menu->addAction("Map to Different Fps...", [this, parentWidget]() {
