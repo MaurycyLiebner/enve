@@ -16,6 +16,7 @@
 
 #ifndef DYNAMICCOMPLEXANIMATOR_H
 #define DYNAMICCOMPLEXANIMATOR_H
+#include <QApplication>
 #include "complexanimator.h"
 
 template <class T>
@@ -24,6 +25,8 @@ protected:
     DynamicComplexAnimatorBase(const QString &name) :
         ComplexAnimator(name) {}
 public:
+    virtual qsptr<T> createDuplicate(T* const src) = 0;
+
     bool SWT_dropSupport(const QMimeData* const data) {
         return eMimeData::sHasType<T>(data);
     }
@@ -40,9 +43,11 @@ public:
     bool SWT_dropInto(const int index, const QMimeData* const data) {
         const auto eData = static_cast<const eMimeData*>(data);
         const auto bData = static_cast<const eDraggedObjects*>(eData);
+        const bool duplicate = QApplication::queryKeyboardModifiers() & Qt::CTRL;
         for(int i = 0; i < bData->count(); i++) {
             const auto iObj = bData->getObject<T>(i);
-            insertChild(iObj->template ref<T>(), index + i);
+            if(duplicate) insertChild(createDuplicate(iObj), index + i);
+            else insertChild(iObj->template ref<T>(), index + i);
         }
         return true;
     }
@@ -111,6 +116,24 @@ protected:
     DynamicComplexAnimator(const QString &name) :
         DynamicComplexAnimatorBase<T>(name) {}
 public:
+    qsptr<T> createDuplicate(T* const src) {
+        QBuffer buffer;
+        buffer.open(QIODevice::ReadWrite);
+        eWriteStream writeStream(&buffer);
+        if(TWriteType) (src->*TWriteType)(writeStream);
+        src->writeProperty(writeStream);
+        writeStream.writeFutureTable();
+        buffer.seek(0);
+        eReadStream readStream(&buffer);
+        buffer.seek(buffer.size() - qint64(sizeof(int)));
+        readStream.readFutureTable();
+        buffer.seek(0);
+        const auto duplicate = TReadTypeAndCreate(readStream);
+        duplicate->readProperty(readStream);
+        buffer.close();
+        return duplicate;
+    }
+
     void writeProperty(eWriteStream& dst) const {
         const int nProps = this->ca_mChildAnimators.count();
         dst << nProps;
