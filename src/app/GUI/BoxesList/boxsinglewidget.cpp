@@ -592,6 +592,8 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
 
 void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
     if(isTargetDisabled()) return;
+    if(event->x() < mFillWidget->x() ||
+       event->x() > mFillWidget->x() + mFillWidget->width()) return;
     setSelected(false);
     if(pointToLen(event->pos() - mDragStartPos) > MIN_WIDGET_DIM/2) return;
     const bool shiftPressed = event->modifiers() & Qt::ShiftModifier;
