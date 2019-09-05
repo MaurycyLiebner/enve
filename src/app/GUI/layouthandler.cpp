@@ -33,6 +33,7 @@ LayoutHandler::LayoutHandler(Document& document,
 
     mComboBox = new QComboBox;
     mComboBox->setMinimumContentsLength(20);
+    mComboBox->setEditable(true);
     mComboBox->setObjectName("currentLayoutComboBox");
     mComboBox->setLayoutDirection(Qt::RightToLeft);
     mComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
@@ -58,7 +59,7 @@ LayoutHandler::LayoutHandler(Document& document,
 
     connect(mComboBox, qOverload<int>(&QComboBox::activated),
             this, &LayoutHandler::setCurrent);
-    connect(mComboBox, &QComboBox::editTextChanged,
+    connect(mComboBox->lineEdit(), &QLineEdit::textEdited,
             this, &LayoutHandler::renameCurrent);
 
     connect(newLayPush, &QPushButton::pressed,

@@ -111,8 +111,10 @@ public:
     }
 private:
     void rename(const int id, const QString& newName) {
-        mLayouts[uint(id)]->fName = newName;
+        auto& layout = mLayouts[uint(id)];
+        layout->fName = newName;
         mComboBox->setItemText(id, newName);
+        if(layout->fScene) layout->fScene->prp_setName(newName);
     }
 
     void renameCurrent(const QString& newName) {
