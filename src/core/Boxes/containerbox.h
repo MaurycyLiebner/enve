@@ -16,12 +16,12 @@
 
 #ifndef CONTAINERBOX_H
 #define CONTAINERBOX_H
-#include "boundingbox.h"
+#include "boxwithpatheffects.h"
 #include "conncontext.h"
 class PathBox;
 class PathEffectAnimators;
 
-class ContainerBox : public BoundingBox {
+class ContainerBox : public BoxWithPathEffects {
     e_OBJECT
 protected:
     ContainerBox(const eBoxType type);
@@ -71,14 +71,6 @@ public:
                                     const FrameRange& newAbsRange);
     void shiftAll(const int shift);
 
-    void addPathEffect(const qsptr<PathEffect>& effect);
-    void addFillPathEffect(const qsptr<PathEffect>& effect);
-    void addOutlineBasePathEffect(const qsptr<PathEffect>& effect);
-    void addOutlinePathEffect(const qsptr<PathEffect>& effect);
-    void removePathEffect(const qsptr<PathEffect>& effect);
-    void removeFillPathEffect(const qsptr<PathEffect>& effect);
-    void removeOutlinePathEffect(const qsptr<PathEffect>& effect);
-
     void strokeWidthAction(const QrealAction& action);
 
     void startSelectedStrokeColorTransform();
@@ -108,26 +100,8 @@ public:
     const QList<BoundingBox*> &getContainedBoxes() const;
     const auto &getContained() const { return mContained; }
 
-    bool differenceInPathEffectsBetweenFrames(const int relFrame1,
-                                              const int relFrame2) const;
-    bool differenceInFillPathEffectsBetweenFrames(const int relFrame1,
-                                                  const int relFrame2) const;
-    bool differenceInOutlinePathEffectsBetweenFrames(const int relFrame1,
-                                                     const int relFrame2) const;
-
     void forcedMarginMeaningfulChange();
     QRect currentGlobalBounds() const;
-
-    void applyPathEffects(const qreal relFrame,
-                          SkPath * const srcDstPath,
-                          BoundingBox * const box);
-
-    void filterOutlineBasePath(const qreal relFrame,
-                                          SkPath * const srcDstPath);
-    void filterOutlinePath(const qreal relFrame,
-                           SkPath * const srcDstPath);
-    void filterFillPath(const qreal relFrame,
-                        SkPath * const srcDstPath);
 
     bool diffsAffectingContainedBoxes(const int relFrame1,
                                       const int relFrame2);
@@ -194,11 +168,6 @@ protected:
     bool mIsDescendantCurrentGroup = false;
     QList<BoundingBox*> mContainedBoxes;
     ConnContextObjList<qsptr<eBoxOrSound>> mContained;
-
-    qsptr<PathEffectAnimators> mPathEffectsAnimators;
-    qsptr<PathEffectAnimators> mFillPathEffectsAnimators;
-    qsptr<PathEffectAnimators> mOutlineBasePathEffectsAnimators;
-    qsptr<PathEffectAnimators> mOutlinePathEffectsAnimators;
 };
 
 #endif // CONTAINERBOX_H

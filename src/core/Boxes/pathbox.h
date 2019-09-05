@@ -19,7 +19,7 @@
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QLabel>
-#include "Boxes/boundingbox.h"
+#include "Boxes/boxwithpatheffects.h"
 #include "Animators/paintsettingsanimator.h"
 #include "canvas.h"
 #include "Paint/autotiledsurface.h"
@@ -68,23 +68,14 @@ protected:
     }
 };
 
-class PathBox : public BoundingBox {
+class PathBox : public BoxWithPathEffects {
     e_OBJECT
 protected:
     PathBox(const eBoxType type);
-    void getMotionBlurProperties(QList<Property*> &list) const;
 public:
     virtual bool differenceInEditPathBetweenFrames(
             const int frame1, const int frame2) const = 0;
     virtual SkPath getPathAtRelFrameF(const qreal relFrame) = 0;
-
-    void addPathEffect(const qsptr<PathEffect> &effect);
-    void addFillPathEffect(const qsptr<PathEffect> &effect);
-    void addOutlineBasePathEffect(const qsptr<PathEffect> &effect);
-    void addOutlinePathEffect(const qsptr<PathEffect> &effect);
-    void removePathEffect(const qsptr<PathEffect> &effect);
-    void removeFillPathEffect(const qsptr<PathEffect> &effect);
-    void removeOutlinePathEffect(const qsptr<PathEffect> &effect);
 
     void setStrokeCapStyle(const SkPaint::Cap capStyle);
     void setStrokeJoinStyle(const SkPaint::Join joinStyle);
@@ -141,41 +132,11 @@ public:
 
     SkPath getPathWithThisOnlyEffectsAtRelFrameF(const qreal relFrame);
 
-    void setPathEffectsEnabled(const bool enable);
-    bool getPathEffectsEnabled() const;
-
-    void setFillEffectsEnabled(const bool enable);
-    bool getFillEffectsEnabled() const;
-
-    void setOutlineBaseEffectsEnabled(const bool enable);
-    bool getOutlineBaseEffectsEnabled() const;
-
-    void setOutlineEffectsEnabled(const bool enable);
-    bool getOutlineEffectsEnabled() const;
-
-    PathEffectAnimators *getPathEffectsAnimators() {
-        return mPathEffectsAnimators.data();
-    }
-
-    PathEffectAnimators *getFillPathEffectsAnimators() {
-        return mFillPathEffectsAnimators.data();
-    }
-
-    PathEffectAnimators *getOutlineBasrPathEffectsAnimators() {
-        return mOutlineBasePathEffectsAnimators.data();
-    }
-
-    PathEffectAnimators *getOutlinePathEffectsAnimators() {
-        return mOutlinePathEffectsAnimators.data();
-    }
     void copyPathBoxDataTo(PathBox * const targetBox);
 
-    bool differenceInPathBetweenFrames(
-            const int frame1, const int frame2) const;
     bool differenceInOutlinePathBetweenFrames(
             const int frame1, const int frame2) const;
-    bool differenceInFillPathBetweenFrames(
-            const int frame1, const int frame2) const;
+
     void setPathsOutdated(const UpdateReason reason) {
         mCurrentPathsOutdated = true;
         planUpdate(reason);
@@ -208,10 +169,6 @@ protected:
     SkPath mFillPathSk;
     SkPath mOutlinePathSk;
 
-    qsptr<PathEffectAnimators> mPathEffectsAnimators;
-    qsptr<PathEffectAnimators> mFillPathEffectsAnimators;
-    qsptr<PathEffectAnimators> mOutlineBasePathEffectsAnimators;
-    qsptr<PathEffectAnimators> mOutlinePathEffectsAnimators;
     qsptr<GradientPoints> mFillGradientPoints;
     qsptr<GradientPoints> mStrokeGradientPoints;
 

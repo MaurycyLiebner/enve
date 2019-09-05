@@ -41,13 +41,13 @@ void RasterEffect::writeIdentifier(eWriteStream &dst) const {
 }
 
 void RasterEffect::setupTreeViewMenu(PropertyMenu * const menu) {
+    eEffect::setupTreeViewMenu(menu);
     const PropertyMenu::PlainSelectedOp<RasterEffect> dOp =
     [](RasterEffect* const eff) {
         const auto parent = eff->getParent<DynamicComplexAnimatorBase<RasterEffect>>();
         parent->removeChild(eff->ref<RasterEffect>());
     };
     menu->addPlainAction("Delete Effect(s)", dOp);
-    eEffect::setupTreeViewMenu(menu);
 }
 
 QMimeData *RasterEffect::SWT_createMimeData() {

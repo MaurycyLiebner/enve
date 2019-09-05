@@ -755,12 +755,6 @@ void BoundingBox::addOutlineBasePathEffect(const qsptr<PathEffect> &) {}
 
 void BoundingBox::addOutlinePathEffect(const qsptr<PathEffect> &) {}
 
-void BoundingBox::removePathEffect(const qsptr<PathEffect> &) {}
-
-void BoundingBox::removeFillPathEffect(const qsptr<PathEffect> &) {}
-
-void BoundingBox::removeOutlinePathEffect(const qsptr<PathEffect> &) {}
-
 #include <QInputDialog>
 void BoundingBox::setupTreeViewMenu(PropertyMenu * const menu) {
     const auto parentWidget = menu->getParentWidget();

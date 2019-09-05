@@ -27,34 +27,26 @@
 #include "Animators/rastereffectanimators.h"
 #include "Animators/outlinesettingsanimator.h"
 
-PathBox::PathBox(const eBoxType type) : BoundingBox(type) {
+PathBox::PathBox(const eBoxType type) : BoxWithPathEffects(type) {
     connect(this, &eBoxOrSound::parentChanged, this, [this]() {
         setPathsOutdated(UpdateReason::userChange);
     });
 
-    mPathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
-    mPathEffectsAnimators->prp_setName("path effects");
     connect(mPathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
             this, [this](const UpdateReason reason) {
         setPathsOutdated(reason);
     });
 
-    mFillPathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
-    mFillPathEffectsAnimators->prp_setName("fill effects");
     connect(mFillPathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
             this, [this](const UpdateReason reason) {
         setFillPathOutdated(reason);
     });
 
-    mOutlineBasePathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
-    mOutlineBasePathEffectsAnimators->prp_setName("outline base effects");
     connect(mOutlineBasePathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
             this, [this](const UpdateReason reason) {
         setOutlinePathOutdated(reason);
     });
 
-    mOutlinePathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
-    mOutlinePathEffectsAnimators->prp_setName("outline effects");
     connect(mOutlinePathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
             this, [this](const UpdateReason reason) {
         setOutlinePathOutdated(reason);
@@ -70,56 +62,13 @@ PathBox::PathBox(const eBoxType type) : BoundingBox(type) {
     mStrokeSettings->setPaintType(PaintType::FLATPAINT);
     mStrokeSettings->setCurrentColor(QColor(0, 0, 0));
 
-    ca_addChild(mFillSettings);
-    ca_addChild(mStrokeSettings);
-
-    ca_addChild(mPathEffectsAnimators);
-    ca_addChild(mFillPathEffectsAnimators);
-    ca_addChild(mOutlineBasePathEffectsAnimators);
-    ca_addChild(mOutlinePathEffectsAnimators);
+    ca_prependChildAnimator(mPathEffectsAnimators.get(),
+                            mFillSettings);
+    ca_prependChildAnimator(mPathEffectsAnimators.get(),
+                            mStrokeSettings);
 
     ca_moveChildBelow(mRasterEffectsAnimators.data(),
                       mOutlinePathEffectsAnimators.data());
-}
-
-void PathBox::setPathEffectsEnabled(const bool enable) {
-    mPathEffectsAnimators->SWT_setEnabled(enable);
-    mPathEffectsAnimators->SWT_setVisible(
-                mPathEffectsAnimators->hasChildAnimators() || enable);
-}
-
-bool PathBox::getPathEffectsEnabled() const {
-    return mPathEffectsAnimators->SWT_isEnabled();
-}
-
-void PathBox::setFillEffectsEnabled(const bool enable) {
-    mFillPathEffectsAnimators->SWT_setEnabled(enable);
-    mFillPathEffectsAnimators->SWT_setVisible(
-                mFillPathEffectsAnimators->hasChildAnimators() || enable);
-}
-
-bool PathBox::getFillEffectsEnabled() const {
-    return mFillPathEffectsAnimators->SWT_isEnabled();
-}
-
-void PathBox::setOutlineBaseEffectsEnabled(const bool enable) {
-    mOutlinePathEffectsAnimators->SWT_setEnabled(enable);
-    mOutlinePathEffectsAnimators->SWT_setVisible(
-                mOutlinePathEffectsAnimators->hasChildAnimators() || enable);
-}
-
-bool PathBox::getOutlineBaseEffectsEnabled() const {
-    return mOutlinePathEffectsAnimators->SWT_isEnabled();
-}
-
-void PathBox::setOutlineEffectsEnabled(const bool enable) {
-    mOutlinePathEffectsAnimators->SWT_setEnabled(enable);
-    mOutlinePathEffectsAnimators->SWT_setVisible(
-                mOutlinePathEffectsAnimators->hasChildAnimators() || enable);
-}
-
-bool PathBox::getOutlineEffectsEnabled() const {
-    return mOutlinePathEffectsAnimators->SWT_isEnabled();
 }
 
 void PathBox::setupRenderData(const qreal relFrame,
@@ -137,14 +86,16 @@ void PathBox::setupRenderData(const qreal relFrame,
         const int prevFrame = qFloor(qMin(data->fRelFrame, mCurrentPathsFrame));
         const int nextFrame = qCeil(qMax(data->fRelFrame, mCurrentPathsFrame));
 
-        currentEditPathCompatible = !differenceInEditPathBetweenFrames(prevFrame, nextFrame);
+        const bool sameFrame = prevFrame == nextFrame;
+
+        currentEditPathCompatible = sameFrame || !differenceInEditPathBetweenFrames(prevFrame, nextFrame);
         if(currentEditPathCompatible) {
-            currentPathCompatible = !differenceInPathBetweenFrames(prevFrame, nextFrame);
+            currentPathCompatible = sameFrame || !differenceInPathBetweenFrames(prevFrame, nextFrame);
             if(currentPathCompatible && !mCurrentOutlinePathOutdated) {
-                currentOutlinePathCompatible = !differenceInOutlinePathBetweenFrames(prevFrame, nextFrame);
+                currentOutlinePathCompatible = sameFrame || !differenceInOutlinePathBetweenFrames(prevFrame, nextFrame);
             }
             if(currentPathCompatible && !mCurrentFillPathOutdated) {
-                currentFillPathCompatible = !differenceInFillPathBetweenFrames(prevFrame, nextFrame);
+                currentFillPathCompatible = sameFrame || !differenceInFillPathBetweenFrames(prevFrame, nextFrame);
             }
         }
     }
@@ -160,12 +111,7 @@ void PathBox::setupRenderData(const qreal relFrame,
     } else {
         pathData->fPath = pathData->fEditPath;
         if(mParentScene->getPathEffectsVisible()) {
-            mPathEffectsAnimators->apply(relFrame, &pathData->fPath);
-            const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-            const qreal parentRelFrame =
-                    mParentGroup->prp_absFrameToRelFrameF(absFrame);
-            mParentGroup->applyPathEffects(parentRelFrame, &pathData->fPath,
-                                           data->fParentBox);
+            filterPath(relFrame, &pathData->fPath);
         }
     }
 
@@ -175,26 +121,22 @@ void PathBox::setupRenderData(const qreal relFrame,
         SkPath outline;
         if(mStrokeSettings->nonZeroLineWidth()) {
             SkPath outlineBase = pathData->fPath;
-            mOutlineBasePathEffectsAnimators->apply(relFrame, &outlineBase);
-            mParentGroup->filterOutlineBasePath(relFrame, &outlineBase);
+            filterOutlineBasePath(relFrame, &outlineBase);
             SkStroke strokerSk;
             mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
             strokerSk.strokePath(outlineBase, &outline);
         }
         if(mParentScene->getPathEffectsVisible()) {
-            mOutlinePathEffectsAnimators->apply(relFrame, &outline);
-            mParentGroup->filterOutlinePath(relFrame, &outline);
+            filterOutlinePath(relFrame, &outline);
         }
         pathData->fOutlinePath = outline;
-        //outline.addPath(pathData->fPath);
     }
 
     if(currentFillPathCompatible) {
         pathData->fFillPath = mFillPathSk;
     } else {
         pathData->fFillPath = pathData->fPath;
-        mFillPathEffectsAnimators->apply(relFrame, &pathData->fFillPath);
-        mParentGroup->filterFillPath(relFrame, &pathData->fFillPath);
+        filterFillPath(relFrame, &pathData->fFillPath);
     }
 
     if(currentOutlinePathCompatible && currentFillPathCompatible) {
@@ -232,34 +174,6 @@ void PathBox::setupRenderData(const qreal relFrame,
                         mStrokeGradientPoints->getEndPointAtRelFrameF(relFrame),
                         mStrokeSettings->getGradientType());
     }
-}
-
-void PathBox::addPathEffect(const qsptr<PathEffect>& effect) {
-    mPathEffectsAnimators->addChild(effect);
-}
-
-void PathBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
-    mFillPathEffectsAnimators->addChild(effect);
-}
-
-void PathBox::addOutlineBasePathEffect(const qsptr<PathEffect>& effect) {
-    mOutlineBasePathEffectsAnimators->addChild(effect);
-}
-
-void PathBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
-    mOutlinePathEffectsAnimators->addChild(effect);
-}
-
-void PathBox::removePathEffect(const qsptr<PathEffect>& effect) {
-    mPathEffectsAnimators->removeChild(effect);
-}
-
-void PathBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
-    mFillPathEffectsAnimators->removeChild(effect);
-}
-
-void PathBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
-    mOutlinePathEffectsAnimators->removeChild(effect);
 }
 
 void PathBox::resetStrokeGradientPointsPos() {
@@ -312,13 +226,6 @@ SkPath PathBox::getPathWithThisOnlyEffectsAtRelFrameF(const qreal relFrame) {
     SkPath path = getPathAtRelFrameF(relFrame);
     mPathEffectsAnimators->apply(relFrame, &path);
     return path;
-}
-
-void PathBox::getMotionBlurProperties(QList<Property*> &list) const {
-    BoundingBox::getMotionBlurProperties(list);
-    list.append(mPathEffectsAnimators.get());
-    list.append(mFillPathEffectsAnimators.get());
-    list.append(mOutlinePathEffectsAnimators.get());
 }
 
 GradientPoints *PathBox::getFillGradientPoints() {
@@ -419,41 +326,10 @@ void PathBox::copyPathBoxDataTo(PathBox * const targetBox) {
     sWriteReadMember(this, targetBox, &PathBox::mOutlinePathEffectsAnimators);
 }
 
-bool PathBox::differenceInPathBetweenFrames(const int frame1, const int frame2) const {
-    if(mPathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
-        return true;
-    if(!mParentGroup) return false;
-    const int absFrame1 = prp_relFrameToAbsFrame(frame1);
-    const int absFrame2 = prp_relFrameToAbsFrame(frame2);
-    const int pFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
-    const int pFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
-    return mParentGroup->differenceInPathEffectsBetweenFrames(pFrame1, pFrame2);
-}
-
 bool PathBox::differenceInOutlinePathBetweenFrames(const int frame1, const int frame2) const {
-    if(mStrokeSettings->getLineWidthAnimator()->
-       prp_differencesBetweenRelFrames(frame1, frame2)) return true;
-    if(mOutlineBasePathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
-        return true;
-    if(mOutlinePathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
-        return true;
-    if(!mParentGroup) return false;
-    const int absFrame1 = prp_relFrameToAbsFrame(frame1);
-    const int absFrame2 = prp_relFrameToAbsFrame(frame2);
-    const int pFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
-    const int pFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
-    return mParentGroup->differenceInOutlinePathEffectsBetweenFrames(pFrame1, pFrame2);
-}
-
-bool PathBox::differenceInFillPathBetweenFrames(const int frame1, const int frame2) const {
-    if(mFillPathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
-        return true;
-    if(!mParentGroup) return false;
-    const int absFrame1 = prp_relFrameToAbsFrame(frame1);
-    const int absFrame2 = prp_relFrameToAbsFrame(frame2);
-    const int pFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
-    const int pFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
-    return mParentGroup->differenceInFillPathEffectsBetweenFrames(pFrame1, pFrame2);
+    const auto width = mStrokeSettings->getLineWidthAnimator();
+    if(width->prp_differencesBetweenRelFrames(frame1, frame2)) return true;
+    return BoxWithPathEffects::differenceInOutlinePathBetweenFrames(frame1, frame2);
 }
 
 #include "circle.h"

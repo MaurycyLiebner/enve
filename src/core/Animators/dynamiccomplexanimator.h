@@ -18,6 +18,7 @@
 #define DYNAMICCOMPLEXANIMATOR_H
 #include <QApplication>
 #include "complexanimator.h"
+#include "typemenu.h"
 
 template <class T>
 class DynamicComplexAnimatorBase : public ComplexAnimator {
@@ -51,6 +52,18 @@ public:
         }
         return true;
     }
+
+    void setupTreeViewMenu(PropertyMenu * const menu) {
+        ComplexAnimator::setupTreeViewMenu(menu);
+        menu->addSeparator();
+
+        const PropertyMenu::PlainSelectedOp<DynamicComplexAnimatorBase<T>> dOp =
+        [](DynamicComplexAnimatorBase<T> * animTarget) {
+            animTarget->ca_removeAllChildAnimators();
+        };
+        menu->addPlainAction("Clear", dOp)->setEnabled(anim_getKeyOnCurrentFrame());
+    }
+
 
     void insertChild(const qsptr<T>& newChild, const int index) {
         clearOldParent(newChild);

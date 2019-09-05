@@ -26,15 +26,14 @@
 #include "Sound/singlesound.h"
 
 ContainerBox::ContainerBox(const eBoxType type) :
-    BoundingBox(type) {
+    BoxWithPathEffects(type) {
     if(type == eBoxType::TYPE_GROUP) prp_setName("Group");
     else if(type == eBoxType::TYPE_LAYER) prp_setName("Layer");
     iniPathEffects();
 }
 
 bool ContainerBox::SWT_dropSupport(const QMimeData * const data) {
-    return BoundingBox::SWT_dropSupport(data) ||
-           mPathEffectsAnimators->SWT_dropSupport(data) ||
+    return BoxWithPathEffects::SWT_dropSupport(data) ||
            eMimeData::sHasType<eBoxOrSound>(data);
 }
 
@@ -46,9 +45,7 @@ bool ContainerBox::SWT_dropIntoSupport(const int index, const QMimeData * const 
 }
 
 bool ContainerBox::SWT_drop(const QMimeData * const data) {
-    if(BoundingBox::SWT_drop(data)) return true;
-    if(mPathEffectsAnimators->SWT_dropSupport(data))
-        return mPathEffectsAnimators->SWT_drop(data);
+    if(BoxWithPathEffects::SWT_drop(data)) return true;
     if(eMimeData::sHasType<eBoxOrSound>(data))
         return SWT_dropInto(ca_getNumberOfChildren(), data);
     return false;
@@ -72,41 +69,25 @@ bool ContainerBox::SWT_dropInto(const int index, const QMimeData * const data) {
 }
 
 void ContainerBox::iniPathEffects() {
-    mPathEffectsAnimators =
-            enve::make_shared<PathEffectAnimators>();
-    mPathEffectsAnimators->prp_setName("path effects");
     connect(mPathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
             this, [this](const UpdateReason reason) {
          updateAllChildPaths(reason, &PathBox::setPathsOutdated);
     });
-    ca_addChild(mPathEffectsAnimators);
 
-    mFillPathEffectsAnimators =
-            enve::make_shared<PathEffectAnimators>();
-    mFillPathEffectsAnimators->prp_setName("fill effects");
     connect(mFillPathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
             this, [this](const UpdateReason reason) {
          updateAllChildPaths(reason, &PathBox::setFillPathOutdated);
     });
-    ca_addChild(mFillPathEffectsAnimators);
 
-    mOutlineBasePathEffectsAnimators =
-            enve::make_shared<PathEffectAnimators>();
-    mOutlineBasePathEffectsAnimators->prp_setName("outline base effects");
     connect(mOutlineBasePathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
             this, [this](const UpdateReason reason) {
          updateAllChildPaths(reason, &PathBox::setOutlinePathOutdated);
     });
-    ca_addChild(mOutlineBasePathEffectsAnimators);
 
-    mOutlinePathEffectsAnimators =
-            enve::make_shared<PathEffectAnimators>();
-    mOutlinePathEffectsAnimators->prp_setName("outline effects");
     connect(mOutlinePathEffectsAnimators.get(), &Property::prp_currentFrameChanged,
             this, [this](const UpdateReason reason) {
          updateAllChildPaths(reason, &PathBox::setOutlinePathOutdated);
     });
-    ca_addChild(mOutlinePathEffectsAnimators);
 }
 
 FillSettingsAnimator *ContainerBox::getFillSettings() const {
@@ -166,53 +147,6 @@ void ContainerBox::anim_scaleTime(const int pivotAbsFrame, const qreal scale) {
     }
 }
 
-bool ContainerBox::differenceInFillPathEffectsBetweenFrames(const int relFrame1,
-                                                            const int relFrame2) const {
-    return mFillPathEffectsAnimators->prp_differencesBetweenRelFrames(relFrame1,
-                                                                      relFrame2);
-}
-
-
-bool ContainerBox::differenceInOutlinePathEffectsBetweenFrames(const int relFrame1,
-                                                             const int relFrame2) const {
-    return mOutlinePathEffectsAnimators->prp_differencesBetweenRelFrames(relFrame1,
-                                                                         relFrame2);
-}
-
-bool ContainerBox::differenceInPathEffectsBetweenFrames(const int relFrame1,
-                                                      const int relFrame2) const {
-    return mPathEffectsAnimators->prp_differencesBetweenRelFrames(relFrame1,
-                                                                  relFrame2);
-}
-
-void ContainerBox::addPathEffect(const qsptr<PathEffect>& effect) {
-    mPathEffectsAnimators->addChild(effect);
-}
-
-void ContainerBox::addFillPathEffect(const qsptr<PathEffect>& effect) {
-    mFillPathEffectsAnimators->addChild(effect);
-}
-
-void ContainerBox::addOutlineBasePathEffect(const qsptr<PathEffect>& effect) {
-    mOutlineBasePathEffectsAnimators->addChild(effect);
-}
-
-void ContainerBox::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
-    mOutlinePathEffectsAnimators->addChild(effect);
-}
-
-void ContainerBox::removePathEffect(const qsptr<PathEffect>& effect) {
-    mPathEffectsAnimators->removeChild(effect);
-}
-
-void ContainerBox::removeFillPathEffect(const qsptr<PathEffect>& effect) {
-    mFillPathEffectsAnimators->removeChild(effect);
-}
-
-void ContainerBox::removeOutlinePathEffect(const qsptr<PathEffect>& effect) {
-    mOutlinePathEffectsAnimators->removeChild(effect);
-}
-
 void ContainerBox::updateAllChildPaths(const UpdateReason reason,
                                        void (PathBox::*func)(const UpdateReason)) {
     for(const auto& box : mContainedBoxes) {
@@ -247,46 +181,6 @@ QRect ContainerBox::currentGlobalBounds() const {
                                 -mForcedMargin.top(),
                                 mForcedMargin.right(),
                                 mForcedMargin.bottom());
-}
-
-void ContainerBox::applyPathEffects(const qreal relFrame,
-                                    SkPath * const srcDstPath,
-                                    BoundingBox * const box) {
-    if(mParentGroup) {
-        const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-        const qreal parentRelFrame =
-                mParentGroup->prp_absFrameToRelFrameF(absFrame);
-        mParentGroup->applyPathEffects(parentRelFrame, srcDstPath, box);
-    }
-    mPathEffectsAnimators->apply(relFrame, srcDstPath);
-}
-
-void ContainerBox::filterOutlineBasePath(const qreal relFrame,
-                                         SkPath * const srcDstPath) {
-    mOutlineBasePathEffectsAnimators->apply(relFrame, srcDstPath);
-    if(!mParentGroup) return;
-    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-    const qreal parentRelFrame =
-            mParentGroup->prp_absFrameToRelFrameF(absFrame);
-    mParentGroup->filterOutlineBasePath(parentRelFrame, srcDstPath);
-}
-
-void ContainerBox::filterOutlinePath(const qreal relFrame,
-                                     SkPath * const srcDstPath) {
-    mOutlinePathEffectsAnimators->apply(relFrame, srcDstPath);
-    if(!mParentGroup) return;
-    const qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
-                prp_relFrameToAbsFrameF(relFrame));
-    mParentGroup->filterOutlinePath(parentRelFrame, srcDstPath);
-}
-
-void ContainerBox::filterFillPath(const qreal relFrame,
-                                  SkPath * const srcDstPath) {
-    mFillPathEffectsAnimators->apply(relFrame, srcDstPath);
-    if(!mParentGroup) return;
-    const qreal parentRelFrame = mParentGroup->prp_absFrameToRelFrameF(
-                prp_relFrameToAbsFrameF(relFrame));
-    mParentGroup->filterFillPath(parentRelFrame, srcDstPath);
 }
 
 void ContainerBox::queChildrenTasks() {

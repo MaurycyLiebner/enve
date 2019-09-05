@@ -17,7 +17,10 @@
 #include "complexanimator.h"
 #include <QPainter>
 
-ComplexAnimator::ComplexAnimator(const QString &name) : Animator(name) {}
+ComplexAnimator::ComplexAnimator(const QString &name) :
+    Animator(name) {
+    SWT_setEnabled(false);
+}
 
 void ComplexAnimator::ca_prependChildAnimator(Property *childAnimator,
                                               const qsptr<Property> &prependWith) {
@@ -85,9 +88,9 @@ void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
         return ca_moveChildInList(child.get(), (cId < id ? id - 1 : id));
     }
 
-    if(mHiddenEmpty && !hasChildAnimators()) {
+    if(!hasChildAnimators()) {
         SWT_setEnabled(true);
-        SWT_setVisible(true);
+        if(mHiddenEmpty) SWT_setVisible(true);
     }
 
     ca_mChildAnimators.insert(id, child);
@@ -202,9 +205,9 @@ void ComplexAnimator::ca_removeChild(const qsptr<Property> child) {
         prp_afterChangedAbsRange(changedRange);
     }
 
-    if(mHiddenEmpty && !hasChildAnimators()) {
+    if(!hasChildAnimators()) {
         SWT_setEnabled(false);
-        SWT_setVisible(false);
+        if(mHiddenEmpty) SWT_setVisible(false);
     }
 
     emit childRemoved(child.get());

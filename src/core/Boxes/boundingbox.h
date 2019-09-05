@@ -183,11 +183,8 @@ public:
     virtual void addFillPathEffect(const qsptr<PathEffect>&);
     virtual void addOutlineBasePathEffect(const qsptr<PathEffect>&);
     virtual void addOutlinePathEffect(const qsptr<PathEffect>&);
-    virtual void removePathEffect(const qsptr<PathEffect>&);
-    virtual void removeFillPathEffect(const qsptr<PathEffect>&);
-    virtual void removeOutlinePathEffect(const qsptr<PathEffect>&);
 
-    void setupTreeViewMenu(PropertyMenu * const menu) final;
+    void setupTreeViewMenu(PropertyMenu * const menu);
     virtual void setupCanvasMenu(PropertyMenu * const menu);
 
     virtual void setupRenderData(const qreal relFrame,

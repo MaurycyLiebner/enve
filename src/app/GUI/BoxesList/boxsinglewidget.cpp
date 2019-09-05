@@ -115,6 +115,8 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mContentButton = new PixmapActionButton(this);
     mContentButton->setPixmapChooser([this]() {
         if(!mTarget) return static_cast<QPixmap*>(nullptr);
+        if(mTarget->childrenCount() == 0)
+            return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
         if(target->SWT_isBoundingBox() || target->SWT_isSingleSound()) {
             if(mTarget->contentVisible()) {

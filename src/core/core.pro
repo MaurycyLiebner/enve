@@ -81,6 +81,7 @@ SOURCES += \
     Boxes/boundingbox.cpp \
     Boxes/boxrendercontainer.cpp \
     Boxes/boxrenderdata.cpp \
+    Boxes/boxwithpatheffects.cpp \
     Boxes/canvasrenderdata.cpp \
     Boxes/circle.cpp \
     Boxes/containerbox.cpp \
@@ -294,6 +295,7 @@ HEADERS += \
     Boxes/boundingbox.h \
     Boxes/boxrendercontainer.h \
     Boxes/boxrenderdata.h \
+    Boxes/boxwithpatheffects.h \
     Boxes/canvasrenderdata.h \
     Boxes/circle.h \
     Boxes/containerbox.h \
