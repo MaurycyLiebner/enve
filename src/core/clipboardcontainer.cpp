@@ -35,11 +35,13 @@ BoxesClipboard::BoxesClipboard(const QList<BoundingBox*> &src) :
     writeStream << nBoxes;
 
     const bool isBox = true;
-    for(const auto& box : src) {
+    const int iCount = src.count();
+    for(int i = 0; i < iCount; i++) {
+        const auto& iBox = src[i];
         const auto future = writeStream.planFuturePos();
         writeStream << isBox;
-        box->writeIdentifier(writeStream);
-        box->writeBoundingBox(writeStream);
+        iBox->writeIdentifier(writeStream);
+        iBox->writeBoundingBox(writeStream);
         writeStream.writeCheckpoint();
         writeStream.assignFuturePos(future);
     }
@@ -68,7 +70,7 @@ void BoxesClipboard::pasteTo(ContainerBox* const parent) {
     const auto parentScene = parent->getParentScene();
     if(parentScene) {
         const auto& list = parent->getContainedBoxes();
-        for(int i = oldCount; i < newCount; i++) {
+        for(int i = 0; i < newCount - oldCount; i++) {
             const auto& box = list.at(i);
             parentScene->addBoxToSelection(box);
         }
