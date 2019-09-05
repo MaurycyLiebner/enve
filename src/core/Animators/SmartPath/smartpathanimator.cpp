@@ -73,8 +73,15 @@ void SmartPathAnimator::setupTreeViewMenu(PropertyMenu * const menu) {
 void SmartPathAnimator::readProperty(eReadStream& src) {
     readKeys(src);
     src >> mBaseValue;
+    src.read(&mMode, sizeof(Mode));
     prp_afterWholeInfluenceRangeChanged();
     updateAllPoints();
+}
+
+void SmartPathAnimator::writeProperty(eWriteStream &dst) const {
+    writeKeys(dst);
+    dst << mBaseValue;
+    dst.write(&mMode, sizeof(Mode));
 }
 
 void SmartPathAnimator::graph_getValueConstraints(

@@ -85,12 +85,8 @@ public:
         return enve::make_shared<SmartPathKey>(this);
     }
 
-    void writeProperty(eWriteStream& dst) const {
-        writeKeys(dst);
-        dst << mBaseValue;
-    }
-
     void readProperty(eReadStream& src);
+    void writeProperty(eWriteStream& dst) const;
 
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType type,
