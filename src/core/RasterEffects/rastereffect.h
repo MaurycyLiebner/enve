@@ -18,8 +18,7 @@
 #define RASTEREFFECT_H
 #include "../Animators/eeffect.h"
 #include "../glhelpers.h"
-
-class RasterEffectCaller;
+#include "rastereffectcaller.h"
 
 enum class RasterEffectType : short {
     BLUR,

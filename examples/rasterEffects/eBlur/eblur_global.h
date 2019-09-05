@@ -26,7 +26,6 @@
 #endif
 
 #include "enveCore/RasterEffects/customrastereffect.h"
-#include "enveCore/RasterEffects/rastereffectcaller.h"
 
 extern "C" {
 
