@@ -38,6 +38,7 @@ void PathEffect::setupTreeViewMenu(PropertyMenu * const menu) {
         parent->removeChild(eff->ref<PathEffect>());
     };
     menu->addPlainAction("Delete Effect(s)", dOp);
+    eEffect::setupTreeViewMenu(menu);
 }
 
 PathEffectType PathEffect::getEffectType() {

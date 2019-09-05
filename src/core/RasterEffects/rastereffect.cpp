@@ -47,6 +47,7 @@ void RasterEffect::setupTreeViewMenu(PropertyMenu * const menu) {
         parent->removeChild(eff->ref<RasterEffect>());
     };
     menu->addPlainAction("Delete Effect(s)", dOp);
+    eEffect::setupTreeViewMenu(menu);
 }
 
 QMimeData *RasterEffect::SWT_createMimeData() {
