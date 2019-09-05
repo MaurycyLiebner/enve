@@ -805,6 +805,7 @@ void gAtomicDisplaceFilterPath(const qreal baseSeed,
                                SkPath* const dst,
                                const SkPath& src,
                                const float maxDev) {
+    if(isZero4Dec(maxDev)) return;
     dst->reset();
 
     uint32_t seedContourInc = 0;
@@ -859,6 +860,7 @@ void gSpatialDisplaceFilterPath(const qreal baseSeed,
                                 SkPath* const dst,
                                 const SkPath& src,
                                 const float maxDev) {
+    if(isZero4Dec(maxDev)) return;
     dst->reset();
 
     SkPath::Iter iter(src, false);
@@ -1239,7 +1241,6 @@ bool gSpatialDisplaceFilterPath(const qreal baseSeed,
                                 const float maxDev,
                                 const float segLen,
                                 const float smoothness) {
-    if(segLen < .5f) return false;
     dst->reset();
 
     SkPathMeasure meas(src, false);
@@ -1291,7 +1292,6 @@ bool gAtomicDisplaceFilterPath(const qreal baseSeed,
                                const float maxDev,
                                const float segLen,
                                const float smoothness) {
-    if(segLen < .5f) return false;
     dst->reset();
 
     SkPathMeasure meas(src, false);
