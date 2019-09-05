@@ -26,28 +26,35 @@ ZigZagPathEffect::ZigZagPathEffect() :
     ca_addChild(mDistance);
 }
 
-void ZigZagPathEffect::apply(const qreal relFrame, const SkPath &src,
-                             SkPath * const dst) {
-    const qreal degAngle = mAngle->getEffectiveValue(relFrame);
-    const qreal distInc = mDistance->getEffectiveValue(relFrame);
+class ZigZagEffectCaller : public PathEffectCaller {
+public:
+    ZigZagEffectCaller(const qreal angle, const qreal dist) :
+        mAngle(angle), mDist(dist) {}
 
-    dst->reset();
-    auto segLists = CubicList::sMakeFromSkPath(src);
-    const QRectF pathBounds = toQRectF(src.getBounds());
+    void apply(SkPath& path);
+private:
+    const qreal mAngle;
+    const qreal mDist;
+};
+
+void ZigZagEffectCaller::apply(SkPath &path) {
+    auto segLists = CubicList::sMakeFromSkPath(path);
+    const QRectF pathBounds = toQRectF(path.getBounds());
+    path.reset();
     QTransform rotate;
     const QPointF pivot = pathBounds.center();
     rotate.translate(pivot.x(), pivot.y());
-    rotate.rotate(degAngle);
+    rotate.rotate(mAngle);
     rotate.translate(-pivot.x(), -pivot.y());
     const QPolygonF linesBBPolygon = rotate.map(QPolygonF(pathBounds));
     const QRectF secondBB = linesBBPolygon.boundingRect();
     const QPolygonF secondLinesBB = rotate.map(QPolygonF(secondBB));
     const QLineF firstLine(secondLinesBB.at(0), secondLinesBB.at(1));
     const QLineF sideLine(secondLinesBB.at(1), secondLinesBB.at(2));
-    const int nLines = qCeil(sideLine.length()/distInc);
-//    const QLineF transVec = QLineF::fromPolar(distInc, degAngle - 90);
+    const int nLines = qCeil(sideLine.length()/mDist);
+//    const QLineF transVec = QLineF::fromPolar(mDist, mAngle - 90);
     QLineF transVec = sideLine;
-    transVec.setLength(distInc);
+    transVec.setLength(mDist);
     const QPointF transPt(transVec.dx(), transVec.dy());
     QList<QLineF> prevLines;
     for(int i = 0; i < nLines; i++) {
@@ -69,15 +76,21 @@ void ZigZagPathEffect::apply(const qreal relFrame, const SkPath &src,
 
         if(prevLines.count() == 1 && currLines.count() == 1) {
             const auto& currLine = currLines.first();
-            dst->lineTo(toSkPoint(currLine.p1()));
-            dst->lineTo(toSkPoint(currLine.p2()));
+            path.lineTo(toSkPoint(currLine.p1()));
+            path.lineTo(toSkPoint(currLine.p2()));
         } else {
             for(const auto& line : currLines) {
-                dst->moveTo(toSkPoint(line.p1()));
-                dst->lineTo(toSkPoint(line.p2()));
+                path.moveTo(toSkPoint(line.p1()));
+                path.lineTo(toSkPoint(line.p2()));
             }
         }
 
         prevLines = currLines;
     }
+}
+
+stdsptr<PathEffectCaller> ZigZagPathEffect::getEffectCaller(const qreal relFrame) const {
+    const qreal degAngle = mAngle->getEffectiveValue(relFrame);
+    const qreal distInc = mDistance->getEffectiveValue(relFrame);
+    return enve::make_shared<ZigZagEffectCaller>(degAngle, distInc);
 }

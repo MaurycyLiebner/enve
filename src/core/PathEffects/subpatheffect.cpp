@@ -34,50 +34,49 @@ SubPathEffect::SubPathEffect() :
     ca_addChild(mMax);
 }
 
-void SubPathEffect::apply(const qreal relFrame, const SkPath &src,
-                          SkPath * const dst) {
-    const qreal minFrac = mMin->getEffectiveValue(relFrame)/100;
-    const qreal maxFrac = mMax->getEffectiveValue(relFrame)/100;
+class SubPathEffectCaller : public PathEffectCaller {
+public:
+    SubPathEffectCaller(const qreal minFrac, const qreal maxFrac) :
+        mMinFrac(minFrac), mMaxFrac(maxFrac) {}
+
+    void apply(SkPath& path);
+private:
+    const qreal mMinFrac;
+    const qreal mMaxFrac;
+};
+
+void SubPathEffectCaller::apply(SkPath &path) {
     const bool pathWise = true;
 
-    if(isZero6Dec(maxFrac - 1) && isZero6Dec(minFrac)) {
-        *dst = src;
+    if(isZero6Dec(mMaxFrac - 1) && isZero6Dec(mMinFrac)) return;
+
+    if(isZero6Dec(mMaxFrac - mMinFrac)) {
+        path.reset();
         return;
     }
 
-    if(isZero6Dec(maxFrac - minFrac)) {
-        dst->reset();
-        return;
-    }
-
-    auto paths = CubicList::sMakeFromSkPath(src);
+    auto paths = CubicList::sMakeFromSkPath(path);
+    path.reset();
 
     if(pathWise) {
-        SkPath result;
-
-        for(int i = 0; i < paths.count(); i++) {
-            auto& path = paths[i];
-            result.addPath(path.getFragmentUnbound(minFrac, maxFrac).toSkPath());
+        for(auto& iPath : paths) {
+            path.addPath(iPath.getFragmentUnbound(mMinFrac, mMaxFrac).toSkPath());
         }
-
-        *dst = result;
         return;
     } // else
 
     qreal totalLength = 0;
-    for(auto& path : paths) {
-        totalLength += path.getTotalLength();
+    for(auto& iPath : paths) {
+        totalLength += iPath.getTotalLength();
     }
-    const qreal minLength = minFrac*totalLength;
-    const qreal maxLength = maxFrac*totalLength;
+    const qreal minLength = mMinFrac*totalLength;
+    const qreal maxLength = mMaxFrac*totalLength;
 
-    SkPath result;
     qreal currLen = qFloor(minLength/totalLength)*totalLength;
     bool first = true;
     while(currLen < maxLength) {
-        for(int i = 0; i < paths.count(); i++) {
-            auto& path = paths[i];
-            const qreal pathLen = path.getTotalLength();
+        for(auto& iPath : paths) {
+            const qreal pathLen = iPath.getTotalLength();
 
             const qreal minRemLen = minLength - currLen;
             const qreal maxRemLen = maxLength - currLen;
@@ -90,19 +89,23 @@ void SubPathEffect::apply(const qreal relFrame, const SkPath &src,
                     const bool last = currLen + pathLen > maxLength;
                     if(last) maxFrag = maxRemLen/pathLen;
                     else maxFrag = 1;
-                    result.addPath(path.getFragment(minRemLen/pathLen, maxFrag).toSkPath());
+                    path.addPath(iPath.getFragment(minRemLen/pathLen, maxFrag).toSkPath());
                     if(last) break;
                 }
             } else {
                 if(currLen > maxLength) {
-                    result.addPath(path.getFragment(0, maxRemLen/pathLen).toSkPath());
+                    path.addPath(iPath.getFragment(0, maxRemLen/pathLen).toSkPath());
                     break;
                 } else {
-                    result.addPath(path.toSkPath());
+                    path.addPath(iPath.toSkPath());
                 }
             }
         }
     }
+}
 
-    *dst = result;
+stdsptr<PathEffectCaller> SubPathEffect::getEffectCaller(const qreal relFrame) const {
+    const qreal minFrac = mMin->getEffectiveValue(relFrame)/100;
+    const qreal maxFrac = mMax->getEffectiveValue(relFrame)/100;
+    return enve::make_shared<SubPathEffectCaller>(minFrac, maxFrac);
 }

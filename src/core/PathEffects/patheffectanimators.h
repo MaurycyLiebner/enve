@@ -20,7 +20,7 @@
 #include "Animators/dynamiccomplexanimator.h"
 #include "skia/skiaincludes.h"
 class PathBox;
-class BoundingBox;
+class PathEffectsTask;
 
 qsptr<PathEffect> readIdCreatePathEffect(eReadStream& src);
 
@@ -35,8 +35,10 @@ public:
     bool SWT_isPathEffectAnimators() const;
 
     bool hasEffects();
-    void apply(const qreal relFrame, SkPath * const srcDstPath);
     void readPathEffect(eReadStream &target);
+
+    void addEffects(const qreal relFrame,
+                    QList<stdsptr<PathEffectCaller>>& list) const;
 private:
 };
 

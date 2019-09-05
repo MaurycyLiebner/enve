@@ -28,13 +28,26 @@ DashPathEffect::DashPathEffect() :
     setPropertyForGUI(mSize.get());
 }
 
-void DashPathEffect::apply(const qreal relFrame,
-                           const SkPath &src,
-                           SkPath * const dst) {
-    const auto width = toSkScalar(mSize->getEffectiveValue(relFrame));
-    const float intervals[] = { width, width };
+class DashEffectCaller : public PathEffectCaller {
+public:
+    DashEffectCaller(const qreal width) :
+        mWidth(toSkScalar(width)) {}
+
+    void apply(SkPath& path);
+private:
+    const float mWidth;
+};
+
+void DashEffectCaller::apply(SkPath &path) {
+    SkPath src;
+    path.swap(src);
+    const float intervals[] = { mWidth, mWidth };
     SkStrokeRec rec(SkStrokeRec::kHairline_InitStyle);
     SkRect cullRec = src.getBounds();
-    dst->reset();
-    SkDashPathEffect::Make(intervals, 2, 0.f)->filterPath(dst, src, &rec, &cullRec);
+    SkDashPathEffect::Make(intervals, 2, 0.f)->filterPath(&path, src, &rec, &cullRec);
+}
+
+stdsptr<PathEffectCaller> DashPathEffect::getEffectCaller(const qreal relFrame) const {
+    const qreal width = mSize->getEffectiveValue(relFrame);
+    return enve::make_shared<DashEffectCaller>(width);
 }

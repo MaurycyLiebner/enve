@@ -29,9 +29,23 @@ SolidifyPathEffect::SolidifyPathEffect() :
     setPropertyForGUI(mDisplacement.get());
 }
 
-void SolidifyPathEffect::apply(const qreal relFrame,
-                               const SkPath &src,
-                               SkPath * const dst) {
-    const qreal widthT = mDisplacement->getEffectiveValue(relFrame);
-    gSolidify(widthT, src, dst);
+class SolidifyEffectCaller : public PathEffectCaller {
+public:
+    SolidifyEffectCaller(const qreal displ) :
+        mDisplacement(displ) {}
+
+    void apply(SkPath& path);
+private:
+    const qreal mDisplacement;
+};
+
+void SolidifyEffectCaller::apply(SkPath &path) {
+    SkPath src;
+    path.swap(src);
+    gSolidify(mDisplacement, src, &path);
+}
+
+stdsptr<PathEffectCaller> SolidifyPathEffect::getEffectCaller(const qreal relFrame) const {
+    const qreal displ = mDisplacement->getEffectiveValue(relFrame);
+    return enve::make_shared<SolidifyEffectCaller>(displ);
 }

@@ -28,13 +28,28 @@ DuplicatePathEffect::DuplicatePathEffect() :
     ca_addChild(mCount);
 }
 
-void DuplicatePathEffect::apply(const qreal relFrame,
-                                const SkPath &src,
-                                SkPath * const dst) {
-    *dst = src;
-    const qreal qX = mTranslation->getEffectiveXValue(relFrame);
-    const qreal qY = mTranslation->getEffectiveYValue(relFrame);
+class DuplicateEffectCaller : public PathEffectCaller {
+public:
+    DuplicateEffectCaller(const int count, const qreal dX, const qreal dY) :
+        mCount(count), mDX(toSkScalar(dX)), mDY(toSkScalar(dY)) {}
+
+    void apply(SkPath& path);
+private:
+    const int mCount;
+    const float mDX;
+    const float mDY;
+};
+
+void DuplicateEffectCaller::apply(SkPath &path) {
+    const SkPath src = path;
+    for(int i = 0; i < mCount; i++)
+        path.addPath(src, mDX, mDY);
+}
+
+
+stdsptr<PathEffectCaller> DuplicatePathEffect::getEffectCaller(const qreal relFrame) const {
     const int count = mCount->getEffectiveIntValue(relFrame);
-    for(int i = 0; i < count; i++)
-        dst->addPath(src, toSkScalar(qX), toSkScalar(qY));
+    const qreal dX = mTranslation->getEffectiveXValue(relFrame);
+    const qreal dY = mTranslation->getEffectiveYValue(relFrame);
+    return enve::make_shared<DuplicateEffectCaller>(count, dX, dY);
 }

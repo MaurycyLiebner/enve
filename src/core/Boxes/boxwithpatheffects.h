@@ -19,6 +19,8 @@
 #include "boundingbox.h"
 
 class PathEffectAnimators;
+class PathEffectsTask;
+class PathEffectCaller;
 
 class BoxWithPathEffects : public BoundingBox {
 public:
@@ -55,10 +57,14 @@ public:
     bool differenceInFillPathBetweenFrames(
             const int frame1, const int frame2) const;
 
-    void filterPath(const qreal relFrame, SkPath * const srcDstPath);
-    void filterOutlineBasePath(const qreal relFrame, SkPath * const srcDstPath);
-    void filterOutlinePath(const qreal relFrame, SkPath * const srcDstPath);
-    void filterFillPath(const qreal relFrame, SkPath * const srcDstPath);
+    void addPathEffects(const qreal relFrame,
+                        QList<stdsptr<PathEffectCaller>>& list);
+    void addFillEffects(const qreal relFrame,
+                        QList<stdsptr<PathEffectCaller>>& list);
+    void addOutlineBaseEffects(const qreal relFrame,
+                               QList<stdsptr<PathEffectCaller>>& list);
+    void addOutlineEffects(const qreal relFrame,
+                           QList<stdsptr<PathEffectCaller>>& list);
 protected:
     void getMotionBlurProperties(QList<Property*> &list) const;
 

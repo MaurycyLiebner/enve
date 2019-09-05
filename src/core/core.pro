@@ -152,6 +152,8 @@ SOURCES += \
     PathEffects/duplicatepatheffect.cpp \
     PathEffects/linespatheffect.cpp \
     PathEffects/patheffectanimators.cpp \
+    PathEffects/patheffectcaller.cpp \
+    PathEffects/patheffectstask.cpp \
     PathEffects/solidifypatheffect.cpp \
     PathEffects/spatialdisplacepatheffect.cpp \
     PathEffects/subdividepatheffect.cpp \
@@ -372,7 +374,9 @@ HEADERS += \
     PathEffects/duplicatepatheffect.h \
     PathEffects/linespatheffect.h \
     PathEffects/patheffectanimators.h \
+    PathEffects/patheffectcaller.h \
     PathEffects/patheffectsinclude.h \
+    PathEffects/patheffectstask.h \
     PathEffects/solidifypatheffect.h \
     PathEffects/spatialdisplacepatheffect.h \
     PathEffects/subdividepatheffect.h \

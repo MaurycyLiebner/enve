@@ -83,6 +83,8 @@ template <typename B, typename C>
 void CustomHandler<B, C>::sLoadCustom(const QString &libPath) {
     QLibrary lib(libPath);
 
+    if(!lib.load()) RuntimeThrow("Could not load the library");
+
     const auto creatorNewFunc = reinterpret_cast<CCreatorNewFunc>(
                 lib.resolve("eCreateNewestVersion"));
     if(!creatorNewFunc) RuntimeThrow("Could not resolve 'eCreateNewestVersion' symbol");

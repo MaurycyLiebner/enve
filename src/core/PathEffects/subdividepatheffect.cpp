@@ -23,14 +23,26 @@ SubdividePathEffect::SubdividePathEffect() :
     ca_addChild(mCount);
 }
 
-void SubdividePathEffect::apply(const qreal relFrame,
-                                const SkPath &src,
-                                SkPath * const dst) {
-    const int count = mCount->getEffectiveIntValue(relFrame);
-    dst->reset();
+class SubdivideEffectCaller : public PathEffectCaller {
+public:
+    SubdivideEffectCaller(const int count) : mCount(count) {}
+
+    void apply(SkPath& path);
+private:
+    const int mCount;
+};
+
+void SubdivideEffectCaller::apply(SkPath &path) {
+    SkPath src;
+    path.swap(src);
     auto lists = CubicList::sMakeFromSkPath(src);
     for(auto & list : lists) {
-        list.subdivide(count);
-        dst->addPath(list.toSkPath());
+        list.subdivide(mCount);
+        path.addPath(list.toSkPath());
     }
+}
+
+stdsptr<PathEffectCaller> SubdividePathEffect::getEffectCaller(const qreal relFrame) const {
+    const int count = mCount->getEffectiveIntValue(relFrame);
+    return enve::make_shared<SubdivideEffectCaller>(count);
 }

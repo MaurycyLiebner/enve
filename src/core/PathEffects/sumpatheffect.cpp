@@ -22,14 +22,25 @@ SumPathEffect::SumPathEffect() :
     PathEffect("sum effect", PathEffectType::SUM) {
 }
 
-void SumPathEffect::apply(const qreal relFrame,
-                          const SkPath &src,
-                          SkPath * const dst) {
-    Q_UNUSED(relFrame);
-    QList<SkPath> paths = gBreakApart(src);
+class SumEffectCaller : public PathEffectCaller {
+public:
+    SumEffectCaller() {}
+
+    void apply(SkPath& path);
+private:
+};
+
+void SumEffectCaller::apply(SkPath &path) {
+    QList<SkPath> paths = gBreakApart(path);
+    path.reset();
     SkOpBuilder builder;
-    for(const auto &path : paths) {
-        builder.add(path, SkPathOp::kUnion_SkPathOp);
+    for(const auto &subPath : paths) {
+        builder.add(subPath, SkPathOp::kUnion_SkPathOp);
     }
-    builder.resolve(dst);
+    builder.resolve(&path);
+}
+
+stdsptr<PathEffectCaller> SumPathEffect::getEffectCaller(const qreal relFrame) const {
+    Q_UNUSED(relFrame);
+    return enve::make_shared<SumEffectCaller>();
 }

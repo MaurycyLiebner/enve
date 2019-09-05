@@ -25,8 +25,7 @@ class DisplacePathEffect : public PathEffect {
 protected:
     DisplacePathEffect();
 public:
-    void apply(const qreal relFrame, const SkPath &src,
-               SkPath * const dst);
+    stdsptr<PathEffectCaller> getEffectCaller(const qreal relFrame) const;
 private:    
     qsptr<QrealAnimator> mSeed;
     qsptr<QrealAnimator> mMaxDev;

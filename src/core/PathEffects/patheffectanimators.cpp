@@ -34,22 +34,20 @@ bool PathEffectAnimators::SWT_isPathEffectAnimators() const {
     return true;
 }
 
-void PathEffectAnimators::apply(const qreal relFrame,
-                                SkPath * const srcDstPath) {
-    SkPath dstPath = *srcDstPath;
-    for(const auto& effect : ca_mChildAnimators) {
-        const auto pEffect = static_cast<PathEffect*>(effect.get());
-        if(!pEffect->isVisible()) continue;
-        const SkPath srcPath = dstPath;
-        pEffect->apply(relFrame, srcPath, &dstPath);
-    }
-    *srcDstPath = dstPath;
-}
-
 void PathEffectAnimators::readPathEffect(eReadStream& src) {
     const auto pathEffect = readIdCreatePathEffect(src);
     pathEffect->readProperty(src);
     addChild(pathEffect);
+}
+
+#include "patheffectstask.h"
+void PathEffectAnimators::addEffects(const qreal relFrame,
+                                     QList<stdsptr<PathEffectCaller>>& list) const {
+    for(const auto& effect : ca_mChildAnimators) {
+        const auto pEffect = static_cast<PathEffect*>(effect.get());
+        if(!pEffect->isVisible()) continue;
+        list << pEffect->getEffectCaller(relFrame);
+    }
 }
 
 #include "patheffectsinclude.h"

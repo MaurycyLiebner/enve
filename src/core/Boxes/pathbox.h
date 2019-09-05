@@ -37,7 +37,9 @@ struct PathBoxRenderData : public BoxRenderData {
     SkPath fEditPath;
     SkPath fPath;
     SkPath fFillPath;
+    SkPath fOutlineBasePath;
     SkPath fOutlinePath;
+    SkStroke fStroker;
     UpdatePaintSettings fPaintSettings;
     UpdateStrokeSettings fStrokeSettings;
 
@@ -129,8 +131,6 @@ public:
 
     GradientPoints *getFillGradientPoints();
     GradientPoints *getStrokeGradientPoints();
-
-    SkPath getPathWithThisOnlyEffectsAtRelFrameF(const qreal relFrame);
 
     void copyPathBoxDataTo(PathBox * const targetBox);
 

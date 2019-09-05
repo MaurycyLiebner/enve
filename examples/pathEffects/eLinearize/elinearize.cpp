@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "elinearize.h"
+#include "enveCore/Animators/qrealanimator.h"
 
 qsptr<CustomPathEffect> eCreateNewestVersion() {
     // Use default, most up to date, version
@@ -54,7 +55,6 @@ bool eSupports(const CustomIdentifier &identifier) {
     return identifier.fVersion == effectVersion();
 }
 
-#include "enveCore/Animators/qrealanimator.h"
 eLinearize000::eLinearize000() :
     CustomPathEffect(eName().toLower()) {
     mInfluence = enve::make_shared<QrealAnimator>(0, 0, 1, 0.1, "influence");
@@ -65,39 +65,52 @@ CustomIdentifier eLinearize000::getIdentifier() const {
     return { effectId(), eName(), { 0, 0, 0 } };
 }
 
-void eLinearize000::apply(const qreal relFrame,
-                          const SkPath &src,
-                          SkPath * const dst) {
-    const float infl = toSkScalar(mInfluence->getEffectiveValue(relFrame));
-    const float invInf = 1 - infl;
-    dst->reset();
+class eLinearize000EffectCaller : public PathEffectCaller {
+public:
+    eLinearize000EffectCaller(const qreal infl) :
+        mInfl(toSkScalar(infl)) {}
+
+    void apply(SkPath& path);
+private:
+    const float mInfl;
+};
+
+void eLinearize000EffectCaller::apply(SkPath &path) {
+    const float invInf = 1 - mInfl;
+    SkPath src;
+    path.swap(src);
 
     SkPath::Iter iter(src, false);
     SkPoint pts[4];
     for(;;) {
         switch(iter.next(pts, true, true)) {
         case SkPath::kLine_Verb: {
-            dst->lineTo(pts[1]);
+            path.lineTo(pts[1]);
         } break;
         case SkPath::kQuad_Verb: {
-            dst->quadTo(pts[1]*invInf + (pts[0] + pts[2])*0.5f*infl, pts[2]);
+            path.quadTo(pts[1]*invInf + (pts[0] + pts[2])*0.5f*mInfl, pts[2]);
         } break;
         case SkPath::kConic_Verb: {
-            dst->conicTo(pts[1]*invInf + (pts[0] + pts[2])*0.5f*infl,
+            path.conicTo(pts[1]*invInf + (pts[0] + pts[2])*0.5f*mInfl,
                          pts[2], iter.conicWeight());
         } break;
         case SkPath::kCubic_Verb: {
-            dst->cubicTo(pts[0]*infl + pts[1]*invInf,
-                         pts[3]*infl + pts[2]*invInf, pts[3]);
+            path.cubicTo(pts[0]*mInfl + pts[1]*invInf,
+                         pts[3]*mInfl + pts[2]*invInf, pts[3]);
         } break;
         case SkPath::kClose_Verb: {
-            dst->close();
+            path.close();
         } break;
         case SkPath::kMove_Verb: {
-            dst->moveTo(pts[0]);
+            path.moveTo(pts[0]);
         } break;
         case SkPath::kDone_Verb:
             return;
         }
     }
+}
+
+stdsptr<PathEffectCaller> eLinearize000::getEffectCaller(const qreal relFrame) const {
+    const qreal infl = mInfluence->getEffectiveValue(relFrame);
+    return enve::make_shared<eLinearize000EffectCaller>(infl);
 }

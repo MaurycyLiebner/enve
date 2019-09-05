@@ -23,9 +23,7 @@ class SolidifyPathEffect : public PathEffect {
 protected:
     SolidifyPathEffect();
 public:
-    void apply(const qreal relFrame,
-               const SkPath &src,
-               SkPath * const dst);
+    stdsptr<PathEffectCaller> getEffectCaller(const qreal relFrame) const;
 private:
     qsptr<QrealAnimator> mDisplacement;
 };

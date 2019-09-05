@@ -17,13 +17,13 @@
 #ifndef SUBPATHEFFECT_H
 #define SUBPATHEFFECT_H
 #include "PathEffects/patheffect.h"
+
 class SubPathEffect : public PathEffect {
     e_OBJECT
 protected:
     SubPathEffect();
 public:
-    void apply(const qreal relFrame, const SkPath &src,
-               SkPath * const dst);
+    stdsptr<PathEffectCaller> getEffectCaller(const qreal relFrame) const;
 private:
     qsptr<QrealAnimator> mMin;
     qsptr<QrealAnimator> mMax;

@@ -19,6 +19,8 @@
 #include "../Animators/eeffect.h"
 #include "../skia/skiaincludes.h"
 #include "../Animators/staticcomplexanimator.h"
+#include "patheffectcaller.h"
+class PathEffectCaller;
 class BoolProperty;
 class PathBox;
 class BoundingBox;
@@ -43,9 +45,8 @@ class PathEffect : public eEffect {
 protected:
     PathEffect(const QString& name, const PathEffectType type);
 public:
-    virtual void apply(const qreal relFrame,
-                       const SkPath &src,
-                       SkPath * const dst) = 0;
+    virtual stdsptr<PathEffectCaller>
+        getEffectCaller(const qreal relFrame) const = 0;
 
     bool SWT_isPathEffect() const;
 

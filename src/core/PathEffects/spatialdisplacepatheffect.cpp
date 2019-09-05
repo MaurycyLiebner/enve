@@ -44,30 +44,45 @@ SpatialDisplacePathEffect::SpatialDisplacePathEffect() :
     mLengthBased->setValue(false);
 }
 
-void SpatialDisplacePathEffect::apply(const qreal relFrame,
-                                      const SkPath &src,
-                                      SkPath * const dst) {
+class SpatialDisplaceEffectCaller : public PathEffectCaller {
+public:
+    SpatialDisplaceEffectCaller(const qreal baseSeed, const qreal gridSize,
+                                const qreal maxDev, const qreal segLen,
+                                const qreal smooth, const bool lengthBased) :
+        mBaseSeed(baseSeed), mGridSize(gridSize),
+        mMaxDev(toSkScalar(maxDev)), mSegLen(toSkScalar(segLen)),
+        mSmooth(toSkScalar(smooth)), mLengthBased(lengthBased) {}
+
+    void apply(SkPath& path);
+private:
+    const qreal mBaseSeed;
+    const qreal mGridSize;
+    const float mMaxDev;
+    const float mSegLen;
+    const float mSmooth;
+    const bool mLengthBased;
+};
+
+void SpatialDisplaceEffectCaller::apply(SkPath &path) {
+    SkPath src;
+    path.swap(src);
+    if(mLengthBased) {
+        gSpatialDisplaceFilterPath(mBaseSeed, mGridSize,
+                                   &path, src, mMaxDev, mSegLen, mSmooth);
+    } else {
+        gSpatialDisplaceFilterPath(mBaseSeed, mGridSize,
+                                   &path, src, mMaxDev);
+    }
+}
+
+stdsptr<PathEffectCaller> SpatialDisplacePathEffect::getEffectCaller(const qreal relFrame) const {
     const qreal baseSeed = mSeed->getBaseSeed(relFrame);
     const qreal gridSize = mSeed->getGridSize(relFrame);
-    const qreal qMaxDev = mMaxDev->getEffectiveValue(relFrame);
-    if(isZero4Dec(qMaxDev)) {
-        *dst = src;
-        return;
-    }
-    const qreal qSegLen = mSegLength->getEffectiveValue(relFrame);
-    const qreal qSmooth = mSmoothness->getEffectiveValue(relFrame);    
+    const qreal maxDev = mMaxDev->getEffectiveValue(relFrame);
+    const qreal segLen = mSegLength->getEffectiveValue(relFrame);
+    const qreal smooth = mSmoothness->getEffectiveValue(relFrame);
+    const bool lengthBased = mLengthBased->getValue();
 
-    dst->reset();
-
-    const float maxDev = toSkScalar(qMaxDev);
-    const float segLen = toSkScalar(qSegLen);
-    const float smooth = toSkScalar(qSmooth);
-
-    if(mLengthBased->getValue()) {
-        gSpatialDisplaceFilterPath(baseSeed, gridSize,
-                                   dst, src, maxDev, segLen, smooth);
-    } else {
-        gSpatialDisplaceFilterPath(baseSeed, gridSize,
-                                   dst, src, maxDev);
-    }
+    return enve::make_shared<SpatialDisplaceEffectCaller>(
+                baseSeed, gridSize, maxDev, segLen, smooth, lengthBased);
 }

@@ -26,28 +26,35 @@ LinesPathEffect::LinesPathEffect() :
     ca_addChild(mDistance);
 }
 
-void LinesPathEffect::apply(const qreal relFrame, const SkPath &src,
-                            SkPath * const dst) {
-    const qreal degAngle = mAngle->getEffectiveValue(relFrame);
-    const qreal distInc = mDistance->getEffectiveValue(relFrame);
+class LinesEffectCaller : public PathEffectCaller {
+public:
+    LinesEffectCaller(const qreal angle, const qreal dist) :
+        mAngle(angle), mDist(dist) {}
 
-    dst->reset();
-    auto segLists = CubicList::sMakeFromSkPath(src);
-    const QRectF pathBounds = toQRectF(src.getBounds());
+    void apply(SkPath& path);
+private:
+    const qreal mAngle;
+    const qreal mDist;
+};
+
+void LinesEffectCaller::apply(SkPath &path) {
+    auto segLists = CubicList::sMakeFromSkPath(path);
+    const QRectF pathBounds = toQRectF(path.getBounds());
+    path.reset();
     QTransform rotate;
     const QPointF pivot = pathBounds.center();
     rotate.translate(pivot.x(), pivot.y());
-    rotate.rotate(degAngle);
+    rotate.rotate(mAngle);
     rotate.translate(-pivot.x(), -pivot.y());
     const QPolygonF linesBBPolygon = rotate.map(QPolygonF(pathBounds));
     const QRectF secondBB = linesBBPolygon.boundingRect();
     const QPolygonF secondLinesBB = rotate.map(QPolygonF(secondBB));
     const QLineF firstLine(secondLinesBB.at(0), secondLinesBB.at(1));
     const QLineF sideLine(secondLinesBB.at(1), secondLinesBB.at(2));
-    const int nLines = qCeil(sideLine.length()/distInc);
+    const int nLines = qCeil(sideLine.length()/mDist);
 //    const QLineF transVec = QLineF::fromPolar(distInc, degAngle - 90);
     QLineF transVec = sideLine;
-    transVec.setLength(distInc);
+    transVec.setLength(mDist);
     const QPointF transPt(transVec.dx(), transVec.dy());
     for(int i = 0; i < nLines; i++) {
         const QLineF iLine = firstLine.translated(i*transPt);
@@ -63,8 +70,14 @@ void LinesPathEffect::apply(const qreal relFrame, const SkPath &src,
         QList<QLineF> currLines;
         for(int j = jMin; j <= jMax; j += 2) {
             const QLineF line(intersections.at(j), intersections.at(j + 1));
-            dst->moveTo(toSkPoint(line.p1()));
-            dst->lineTo(toSkPoint(line.p2()));
+            path.moveTo(toSkPoint(line.p1()));
+            path.lineTo(toSkPoint(line.p2()));
         }
     }
+}
+
+stdsptr<PathEffectCaller> LinesPathEffect::getEffectCaller(const qreal relFrame) const {
+    const qreal degAngle = mAngle->getEffectiveValue(relFrame);
+    const qreal distInc = mDistance->getEffectiveValue(relFrame);
+    return enve::make_shared<LinesEffectCaller>(degAngle, distInc);
 }

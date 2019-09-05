@@ -26,6 +26,7 @@
 #include "Animators/gradient.h"
 #include "Animators/rastereffectanimators.h"
 #include "Animators/outlinesettingsanimator.h"
+#include "PathEffects/patheffectstask.h"
 
 PathBox::PathBox(const eBoxType type) : BoxWithPathEffects(type) {
     connect(this, &eBoxOrSound::parentChanged, this, [this]() {
@@ -106,37 +107,55 @@ void PathBox::setupRenderData(const qreal relFrame,
     } else {
         pathData->fEditPath = getPathAtRelFrameF(relFrame);
     }
+
+    QList<stdsptr<PathEffectCaller>> pathEffects;
     if(currentPathCompatible) {
         pathData->fPath = mPathSk;
     } else {
+        if(scene->getPathEffectsVisible())
+            addPathEffects(relFrame, pathEffects);
         pathData->fPath = pathData->fEditPath;
-        if(mParentScene->getPathEffectsVisible()) {
-            filterPath(relFrame, &pathData->fPath);
-        }
     }
 
-    if(currentOutlinePathCompatible) {
-        pathData->fOutlinePath = mOutlinePathSk;
-    } else {
-        SkPath outline;
-        if(mStrokeSettings->nonZeroLineWidth()) {
-            SkPath outlineBase = pathData->fPath;
-            filterOutlineBasePath(relFrame, &outlineBase);
-            SkStroke strokerSk;
-            mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
-            strokerSk.strokePath(outlineBase, &outline);
-        }
-        if(mParentScene->getPathEffectsVisible()) {
-            filterOutlinePath(relFrame, &outline);
-        }
-        pathData->fOutlinePath = outline;
-    }
-
+    QList<stdsptr<PathEffectCaller>> fillEffects;
     if(currentFillPathCompatible) {
         pathData->fFillPath = mFillPathSk;
     } else {
-        pathData->fFillPath = pathData->fPath;
-        filterFillPath(relFrame, &pathData->fFillPath);
+        if(scene->getPathEffectsVisible()) {
+            addFillEffects(relFrame, fillEffects);
+        }
+        if(pathEffects.isEmpty() && fillEffects.isEmpty()) {
+            pathData->fFillPath = pathData->fPath;
+        }
+    }
+
+    QList<stdsptr<PathEffectCaller>> outlineBaseEffects;
+    QList<stdsptr<PathEffectCaller>> outlineEffects;
+    if(currentOutlinePathCompatible) {
+        pathData->fOutlinePath = mOutlinePathSk;
+    } else {
+        mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &pathData->fStroker);
+
+        if(scene->getPathEffectsVisible()) {
+            addOutlineBaseEffects(relFrame, outlineBaseEffects);
+            addOutlineEffects(relFrame, outlineEffects);
+        }
+
+        if(pathEffects.isEmpty() && outlineBaseEffects.isEmpty()) {
+            pathData->fOutlineBasePath = pathData->fPath;
+            pathData->fStroker.strokePath(pathData->fOutlineBasePath,
+                                          &pathData->fOutlinePath);
+        }
+    }
+
+    if(!pathEffects.isEmpty() || fillEffects.isEmpty() ||
+       !outlineBaseEffects.isEmpty() || !outlineEffects.isEmpty()) {
+        const auto pathTask = enve::make_shared<PathEffectsTask>(
+                    pathData, std::move(pathEffects), std::move(fillEffects),
+                    std::move(outlineBaseEffects), std::move(outlineEffects));
+        pathTask->addDependent(pathData);
+        TaskScheduler::sInstance->queCpuTask(pathTask);
+        pathData->delayDataSet();
     }
 
     if(currentOutlinePathCompatible && currentFillPathCompatible) {
@@ -220,12 +239,6 @@ void PathBox::startSelectedFillColorTransform() {
 
 GradientPoints *PathBox::getStrokeGradientPoints() {
     return mStrokeGradientPoints.data();
-}
-
-SkPath PathBox::getPathWithThisOnlyEffectsAtRelFrameF(const qreal relFrame) {
-    SkPath path = getPathAtRelFrameF(relFrame);
-    mPathEffectsAnimators->apply(relFrame, &path);
-    return path;
 }
 
 GradientPoints *PathBox::getFillGradientPoints() {

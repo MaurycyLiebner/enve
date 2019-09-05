@@ -58,6 +58,10 @@ public:
         return fRelBoundingRect.center();
     }
 
+    void delayDataSet() {
+        mDelayDataSet = true;
+    }
+
     bool nextStep() {
         if(mState == eTaskState::waiting) mState = eTaskState::processing;
         const bool result = !mEffectsRenderer.isEmpty();

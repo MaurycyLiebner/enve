@@ -20,49 +20,6 @@
 #include "exceptions.h"
 #include "pointhelpers.h"
 
-void gApplyOperation(const qreal relFrame,
-                     const SkPath &src,
-                     SkPath * const dst,
-                     PathBox * const srcBox,
-                     PathBox * const dstBox,
-                     const QString &operation) {
-    if(!srcBox) {
-        *dst = src;
-        return;
-    }
-    const qreal absFrame = dstBox->prp_relFrameToAbsFrameF(relFrame);
-    const qreal pathBoxRelFrame = srcBox->prp_absFrameToRelFrameF(absFrame);
-    SkPath boxPath;
-    boxPath = srcBox->getPathWithThisOnlyEffectsAtRelFrameF(pathBoxRelFrame);
-    if(src.isEmpty()) {
-        *dst = boxPath;
-        return;
-    }
-    if(boxPath.isEmpty()) {
-        *dst = src;
-        return;
-    }
-    SkPathOp op;
-    // "Union" << "Difference" << "Intersection" << "Exclusion"
-    if(operation == "Union") {
-        op = SkPathOp::kUnion_SkPathOp;
-    } else if(operation == "Difference") {
-        op = SkPathOp::kDifference_SkPathOp;
-    } else if(operation == "Intersection") {
-        op = SkPathOp::kIntersect_SkPathOp;
-    } else { // "Exclusion"
-        op = SkPathOp::kXOR_SkPathOp;
-    }
-    const auto srcBoxTrans = srcBox->getTransformAnimator();
-    const QMatrix pathBoxMatrix = srcBoxTrans->
-            getTotalTransformAtFrame(pathBoxRelFrame);
-    const auto dstBoxTrans = dstBox->getTransformAnimator();
-    const QMatrix parentBoxMatrix = dstBoxTrans->
-            getTotalTransformAtFrame(relFrame);
-    boxPath.transform(toSkMatrix(pathBoxMatrix*parentBoxMatrix.inverted()));
-    if(!Op(src, boxPath, op, dst)) RuntimeThrow("Operation Failed.");
-}
-
 void gSolidify(const qreal widthT,
                const SkPath &src,
                SkPath * const dst) {

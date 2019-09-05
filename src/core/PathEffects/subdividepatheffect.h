@@ -24,9 +24,7 @@ class SubdividePathEffect : public PathEffect {
 protected:
     SubdividePathEffect();
 public:
-    void apply(const qreal relFrame,
-               const SkPath &src,
-               SkPath * const dst);
+    stdsptr<PathEffectCaller> getEffectCaller(const qreal relFrame) const;
 private:
     qsptr<IntAnimator> mCount;
 };

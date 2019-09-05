@@ -42,41 +42,42 @@ DisplacePathEffect::DisplacePathEffect() :
     mLengthBased->setValue(false);
 }
 
-std::pair<QPointF, QPointF> posAndTanToC1C2(const PosAndTan& prev,
-                                            const PosAndTan& next,
-                                            const qreal smooth) {
-    const qreal thirdDist = 0.333*pointToLen(next.fPos - prev.fPos);
-    const auto c1Vector = scalePointToNewLen(prev.fTan, thirdDist);
-    const QPointF c1 = prev.fPos + c1Vector*smooth;
-    const auto c2Vector = scalePointToNewLen(next.fTan, thirdDist);
-    const QPointF c2 = next.fPos - c2Vector*smooth;
-    return {c1, c2};
-}
+class DisplaceEffectCaller : public PathEffectCaller {
+public:
+    DisplaceEffectCaller(const qreal baseSeed, const qreal maxDev,
+                         const qreal segLen, const qreal smooth,
+                         const bool lengthBased) :
+        mBaseSeed(baseSeed), mMaxDev(toSkScalar(maxDev)),
+        mSegLen(toSkScalar(segLen)), mSmooth(toSkScalar(smooth)),
+        mLengthBased(lengthBased) {}
 
-void perterb(PosAndTan& posAndTan, const qreal dev) {
-    posAndTan.fTan = scalePointToNewLen(posAndTan.fTan, dev);
-    const auto displ = gRotPt(posAndTan.fTan, 90);
-    posAndTan.fPos += displ;
-}
+    void apply(SkPath& path);
+private:
+    const qreal mBaseSeed;
+    const float mMaxDev;
+    const float mSegLen;
+    const float mSmooth;
+    const bool mLengthBased;
+};
 
-void DisplacePathEffect::apply(const qreal relFrame,
-                               const SkPath &src,
-                               SkPath * const dst) {
-    const qreal baseSeed = mSeed->getEffectiveValue(relFrame);
-
-    const qreal qMaxDev = mMaxDev->getEffectiveValue(relFrame);
-    const qreal qSegLen = mSegLength->getEffectiveValue(relFrame);
-    const qreal qSmooth = mSmoothness->getEffectiveValue(relFrame);    
-
-    dst->reset();
-
-    const float maxDev = toSkScalar(qMaxDev);
-    const float segLen = toSkScalar(qSegLen);
-    const float smooth = toSkScalar(qSmooth);
-
-    if(mLengthBased->getValue()) {
-        gAtomicDisplaceFilterPath(baseSeed, dst, src, maxDev, segLen, smooth);
+void DisplaceEffectCaller::apply(SkPath &path) {
+    SkPath src;
+    path.swap(src);
+    if(mLengthBased) {
+        gAtomicDisplaceFilterPath(mBaseSeed, &path, src, mMaxDev,
+                                  mSegLen, mSmooth);
     } else {
-        gAtomicDisplaceFilterPath(baseSeed, dst, src, maxDev);
+        gAtomicDisplaceFilterPath(mBaseSeed, &path, src, mMaxDev);
     }
+}
+
+stdsptr<PathEffectCaller> DisplacePathEffect::getEffectCaller(const qreal relFrame) const {
+    const qreal baseSeed = mSeed->getEffectiveValue(relFrame);
+    const qreal maxDev = mMaxDev->getEffectiveValue(relFrame);
+    const qreal segLen = mSegLength->getEffectiveValue(relFrame);
+    const qreal smooth = mSmoothness->getEffectiveValue(relFrame);
+    const bool lengthBased = mLengthBased->getValue();
+
+    return enve::make_shared<DisplaceEffectCaller>(baseSeed, maxDev, segLen,
+                                                   smooth, lengthBased);
 }
