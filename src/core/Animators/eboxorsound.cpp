@@ -123,7 +123,6 @@ void eBoxOrSound::readProperty(eReadStream& src) {
     if(hasDurRect) {
         if(!mDurationRectangle) createDurationRectangle();
         mDurationRectangle->readDurationRectangle(src);
-        anim_shiftAllKeys(-prp_getTotalFrameShift());
     }
 }
 
