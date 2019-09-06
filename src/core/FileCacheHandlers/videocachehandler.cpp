@@ -47,6 +47,11 @@ void VideoFrameHandler::frameLoaderCanceled(const int frameId) {
     removeFrameLoader(frameId);
 }
 
+void VideoFrameHandler::frameLoaderFailed(const int frameId) {
+    removeFrameLoader(frameId);
+    mDataHandler->setFrameCount(frameId);
+}
+
 VideoDataHandler *VideoFrameHandler::getDataHandler() const {
     return mDataHandler;
 }

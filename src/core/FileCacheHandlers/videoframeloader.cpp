@@ -171,6 +171,16 @@ void VideoFrameLoader::afterCanceled() {
     mCacheHandler->frameLoaderCanceled(mFrameId);
 }
 
+void VideoFrameLoader::handleException() {
+    if(!mCacheHandler) return;
+    takeException();
+    int& frame = const_cast<int&>(mFrameId);
+    if(frame <= 0) return finishedProcessing();
+    frame--;
+    mCacheHandler->mDataHandler->setFrameCount(frame);
+    scheduleTaskNow();
+}
+
 void VideoFrameLoader::scheduleTaskNow() {
     if(mFrameToConvert) {
         TaskScheduler::sGetInstance()->scheduleCpuTask(ref<eTask>());

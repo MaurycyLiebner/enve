@@ -43,6 +43,7 @@ protected:
 
     void afterProcessing();
     void afterCanceled();
+    void handleException();
 
     void scheduleTaskNow();
 

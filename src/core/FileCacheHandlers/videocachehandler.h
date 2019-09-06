@@ -68,6 +68,7 @@ public:
 
     void frameLoaderFinished(const int frame, const sk_sp<SkImage>& image);
     void frameLoaderCanceled(const int frameId);
+    void frameLoaderFailed(const int frameId);
 
     VideoDataHandler* getDataHandler() const;
     const HddCachableCacheHandler& getCacheHandler() const;
