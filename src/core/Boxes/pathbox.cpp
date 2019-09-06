@@ -148,7 +148,7 @@ void PathBox::setupRenderData(const qreal relFrame,
         }
     }
 
-    if(!pathEffects.isEmpty() || fillEffects.isEmpty() ||
+    if(!pathEffects.isEmpty() || !fillEffects.isEmpty() ||
        !outlineBaseEffects.isEmpty() || !outlineEffects.isEmpty()) {
         const auto pathTask = enve::make_shared<PathEffectsTask>(
                     pathData, std::move(pathEffects), std::move(fillEffects),
