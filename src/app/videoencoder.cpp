@@ -528,14 +528,12 @@ bool VideoEncoder::startEncoding(RenderInstanceSettings * const settings) {
         startEncodingNow();
         mCurrentlyEncoding = true;
         mEncodingFinished = false;
-        mRenderInstanceSettings->setCurrentState(
-                    RenderInstanceSettings::RENDERING);
+        mRenderInstanceSettings->setCurrentState(RenderState::rendering);
         mEmitter.encodingStarted();
         return true;
     } catch(const std::exception& e) {
         gPrintExceptionCritical(e);
-        mRenderInstanceSettings->setCurrentState(
-                    RenderInstanceSettings::ERROR, e.what());
+        mRenderInstanceSettings->setCurrentState(RenderState::error, e.what());
         mEmitter.encodingStartFailed();
         return false;
     }
@@ -547,8 +545,7 @@ void VideoEncoder::interrupEncoding() {
 }
 
 void VideoEncoder::finishEncodingSuccess() {
-    mRenderInstanceSettings->setCurrentState(
-                RenderInstanceSettings::FINISHED);
+    mRenderInstanceSettings->setCurrentState(RenderState::finished);
     mEncodingSuccesfull = true;
     finishEncodingNow();
     mEmitter.encodingFinished();
@@ -727,14 +724,12 @@ void VideoEncoder::afterProcessing() {
     _mContainers.clear();
 
     if(mInterruptEncoding) {
-        mRenderInstanceSettings->setCurrentState(
-                    RenderInstanceSettings::NONE, "Interrupted");
+        mRenderInstanceSettings->setCurrentState(RenderState::none, "Interrupted");
         interrupEncoding();
         mInterruptEncoding = false;
     } else if(unhandledException()) {
         gPrintExceptionCritical(takeException());
-        mRenderInstanceSettings->setCurrentState(
-                    RenderInstanceSettings::ERROR, "Error");
+        mRenderInstanceSettings->setCurrentState(RenderState::error, "Error");
         finishEncodingNow();
         mEmitter.encodingFailed();
     } else if(mEncodingFinished) finishEncodingSuccess();

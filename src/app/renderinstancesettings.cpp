@@ -80,11 +80,10 @@ void RenderInstanceSettings::renderingAboutToStart() {
     mRenderSettings.fVideoHeight = mTargetCanvas->getCanvasHeight();
 }
 #include <QSound>
-void RenderInstanceSettings::setCurrentState(
-        const RenderInstanceSettings::RenderState &state,
-        const QString &text) {
+void RenderInstanceSettings::setCurrentState(const RenderState &state,
+                                             const QString &text) {
     mState = state;
-    if(mState == ERROR) mRenderError = text;
+    if(mState == RenderState::error) mRenderError = text;
     //if(mState == FINISHED) QSound::play(":/");
     emit stateChanged(mState);
 }
@@ -93,23 +92,19 @@ const QString &RenderInstanceSettings::getRenderError() const {
     return mRenderError;
 }
 
-RenderInstanceSettings::RenderState RenderInstanceSettings::getCurrentState() const {
+RenderState RenderInstanceSettings::getCurrentState() const {
     return mState;
 }
 
 void RenderInstanceSettings::copySettingsFromOutputSettingsProfile() {
-    OutputSettingsProfile *profileT = mOutputSettingsProfile;
-    if(!profileT) return;
-    mOutputSettings = profileT->getSettings();
+    if(!mOutputSettingsProfile) return;
+    mOutputSettings = mOutputSettingsProfile->getSettings();
 }
 
 void RenderInstanceSettings::setOutputSettingsProfile(
         OutputSettingsProfile *profile) {
-    if(!profile) {
-        mOutputSettingsProfile.clear();
-    } else {
-        mOutputSettingsProfile = profile;
-    }
+    if(!profile) mOutputSettingsProfile.clear();
+    else mOutputSettingsProfile = profile;
     copySettingsFromOutputSettingsProfile();
 }
 

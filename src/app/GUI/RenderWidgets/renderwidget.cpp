@@ -126,6 +126,12 @@ void RenderWidget::render(RenderInstanceSettings *settings) {
     emit renderFromSettings(settings);
     connect(settings, &RenderInstanceSettings::renderFrameChanged,
             this, &RenderWidget::setRenderedFrame);
+    connect(settings, &RenderInstanceSettings::stateChanged,
+            this, [this](const RenderState state) {
+        if(state == RenderState::finished) {
+            mRenderProgressBar->setValue(mRenderProgressBar->maximum());
+        }
+    });
 }
 
 void RenderWidget::leaveOnlyInterruptionButtonsEnabled() {
@@ -160,7 +166,7 @@ void RenderWidget::render() {
             firstWid = wid;
         } else {
             mAwaitingSettings << wid;
-            wid->getSettings()->setCurrentState(RenderInstanceSettings::WAITING);
+            wid->getSettings()->setCurrentState(RenderState::waiting);
         }
     }
     if(firstWid) {
@@ -175,27 +181,23 @@ void RenderWidget::stopRendering() {
     clearAwaitingRender();
     VideoEncoder::sInterruptEncoding();
     if(mCurrentRenderedSettings) {
-        disconnect(mCurrentRenderedSettings,
-                   &RenderInstanceSettings::renderFrameChanged,
-                   this, &RenderWidget::setRenderedFrame);
+        disconnect(mCurrentRenderedSettings, nullptr, this, nullptr);
         mCurrentRenderedSettings = nullptr;
     }
 }
 
 void RenderWidget::clearAwaitingRender() {
     for(RenderInstanceWidget *wid : mAwaitingSettings) {
-        wid->getSettings()->setCurrentState(RenderInstanceSettings::NONE);
+        wid->getSettings()->setCurrentState(RenderState::none);
     }
     mAwaitingSettings.clear();
 }
 
 void RenderWidget::sendNextForRender() {
     if(mAwaitingSettings.isEmpty()) return;
-    RenderInstanceWidget *wid = mAwaitingSettings.takeFirst();
+    const auto wid = mAwaitingSettings.takeFirst();
     if(wid->isChecked()) {
         wid->setDisabled(true);
         render(wid->getSettings());
-    } else {
-        sendNextForRender();
-    }
+    } else sendNextForRender();
 }

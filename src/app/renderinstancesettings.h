@@ -32,17 +32,18 @@ struct RenderSettings {
     int fMaxFrame = 0;
 };
 
+enum class RenderState {
+    none,
+    error,
+    finished,
+    rendering,
+    paused,
+    waiting
+};
+
 class RenderInstanceSettings : public QObject {
     Q_OBJECT
 public:
-    enum RenderState {
-        NONE,
-        ERROR,
-        FINISHED,
-        RENDERING,
-        PAUSED,
-        WAITING
-    };
     RenderInstanceSettings(Canvas* canvas);
     virtual ~RenderInstanceSettings() {}
 
@@ -69,7 +70,7 @@ signals:
     void stateChanged(const RenderState state);
     void renderFrameChanged(const int frame);
 private:
-    RenderState mState = NONE;
+    RenderState mState = RenderState::none;
     int mCurrentRenderFrame = 0;
 
     QString mOutputDestination;

@@ -167,25 +167,24 @@ RenderInstanceWidget::~RenderInstanceWidget() {
 }
 
 void RenderInstanceWidget::updateFromSettings() {
-    RenderInstanceSettings::RenderState renderState =
-            mSettings->getCurrentState();
-    bool enabled = renderState != RenderInstanceSettings::PAUSED &&
-       renderState != RenderInstanceSettings::RENDERING;
+    const auto renderState = mSettings->getCurrentState();
+    bool enabled = renderState != RenderState::paused &&
+       renderState != RenderState::rendering;
     setEnabled(enabled);
     QString nameLabelTxt = "&nbsp;&nbsp;" + mSettings->getName() +
             "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-    if(renderState == RenderInstanceSettings::ERROR) {
+    if(renderState == RenderState::error) {
         nameLabelTxt += "<font color='red'>" +
                         mSettings->getRenderError() +
                         "</font>";
-    } else if(renderState == RenderInstanceSettings::FINISHED) {
+    } else if(renderState == RenderState::finished) {
         nameLabelTxt += "<font color='green'>finished</font>";
         mCheckBox->setChecked(false);
-    } else if(renderState == RenderInstanceSettings::RENDERING) {
+    } else if(renderState == RenderState::rendering) {
         nameLabelTxt += "rendering...";
-    } else if(renderState == RenderInstanceSettings::WAITING) {
+    } else if(renderState == RenderState::waiting) {
         nameLabelTxt += "waiting";
-    } else if(renderState == RenderInstanceSettings::PAUSED) {
+    } else if(renderState == RenderState::paused) {
         nameLabelTxt += "paused";
     }
     mNameLabel->setText(nameLabelTxt);
@@ -219,8 +218,7 @@ RenderInstanceSettings *RenderInstanceWidget::getSettings() {
 void RenderInstanceWidget::openOutputSettingsDialog() {
     mSettings->copySettingsFromOutputSettingsProfile();
     const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
-    RenderSettingsDialog *dialog = new RenderSettingsDialog(outputSettings,
-                                                            this);
+    const auto dialog = new RenderSettingsDialog(outputSettings, this);
     if(dialog->exec()) {
         mSettings->setOutputSettingsProfile(nullptr);
         OutputSettings outputSettings = dialog->getSettings();
