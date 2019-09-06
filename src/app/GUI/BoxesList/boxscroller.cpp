@@ -45,7 +45,7 @@ void BoxScroller::paintEvent(QPaintEvent *) {
     int currY = MIN_WIDGET_DIM;
     p.setPen(QPen(QColor(40, 40, 40), 1));
     auto parentWidgetT = static_cast<BoxScrollWidget*>(mParentWidget);
-    const int parentContHeight = parentWidgetT->getContentHeight();
+    const int parentContHeight = parentWidgetT->getContentHeight() - MIN_WIDGET_DIM;
     while(currY < parentContHeight) {
         p.drawLine(0, currY, width(), currY);
         currY += MIN_WIDGET_DIM;
