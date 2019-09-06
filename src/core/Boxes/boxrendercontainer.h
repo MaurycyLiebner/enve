@@ -33,10 +33,8 @@ public:
     void updatePaintTransformGivenNewTotalTransform(
             const QMatrix &totalTransform);
 
+    void clear();
     void setSrcRenderData(BoxRenderData * const data);
-    int getRelFrame() const {
-        return mRelFrame;
-    }
 
     BoxRenderData *getSrcRenderData() const {
         return mSrcRenderData.get();
@@ -52,7 +50,6 @@ public:
 protected:
     bool mExpired = false;
     bool mAntiAlias = false;
-    int mRelFrame = 0;
     qreal mResolutionFraction;
     QRect mGlobalRect;
     QMatrix mTransform;

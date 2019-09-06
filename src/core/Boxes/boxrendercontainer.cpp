@@ -50,12 +50,16 @@ void RenderContainer::updatePaintTransformGivenNewTotalTransform(
     mPaintTransform = mRenderTransform*mPaintTransform;
 }
 
+void RenderContainer::clear() {
+    mImageSk.reset();
+    mSrcRenderData.reset();
+}
+
 void RenderContainer::setSrcRenderData(BoxRenderData * const data) {
     mTransform = data->fTransform;
     mResolutionFraction = data->fResolution;
     mImageSk = data->fRenderedImage;
     mGlobalRect = data->fGlobalRect;
-    mRelFrame = data->fRelFrame;
     mAntiAlias = data->fAntiAlias;
     mPaintTransform.reset();
     mPaintTransform.scale(1/mResolutionFraction, 1/mResolutionFraction);
