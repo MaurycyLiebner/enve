@@ -104,8 +104,10 @@ public:
     void readData(eReadStream& src) {
         const auto newChild = sRead(src, fCreator);
         newChild->fParent = this;
-        if(fChild) layout()->replaceWidget(fChild->widget(), newChild->widget());
-        else layout()->addWidget(newChild->widget());
+        if(fChild) {
+            layout()->replaceWidget(fChild->widget(), newChild->widget());
+            delete fChild;
+        } else layout()->addWidget(newChild->widget());
         fChild = newChild;
     }
 
