@@ -104,6 +104,7 @@ void VideoFrameLoader::readFrame() {
     }
 
     while(true) {
+        const int lastFrameTmp = mOpenedVideo->fLastFrame;
         mOpenedVideo->fLastFrame = -qFloor(10*fps); // Just in case error occurs
         const int readRet = av_read_frame(formatContext, packet);
         if(readRet < 0) RuntimeThrow("Error retrieving AVPacket");
@@ -126,9 +127,27 @@ void VideoFrameLoader::readFrame() {
         }
 
         const int currFrame = frameId(decodedFrame, videoStream, fps);
+        const bool usePrevious = mFrameId > lastFrameTmp &&
+                                 currFrame > mFrameId &&
+                                 !mExcessFrames.isEmpty();
         mOpenedVideo->fLastFrame = currFrame;
         const bool reseek = currFrame > mFrameId && seekTry <= 3;
-        if(currFrame == mFrameId || (!reseek && currFrame > mFrameId)) {
+        if(usePrevious) {
+            int minPositiveDist = INT_MAX;
+            int excessId = -1;
+            for(int i = 0; i < mExcessFrames.count(); i++) {
+                const auto& excess = mExcessFrames.at(i);
+                const int dist = mFrameId - excess.first;
+                if(dist < 0 || dist > minPositiveDist) continue;
+                minPositiveDist = dist;
+                excessId = i;
+            }
+            const auto frame = excessId == -1 ?
+                        decodedFrame : mExcessFrames.takeAt(excessId).second;
+            setFrameToConvert(frame, codecContext);
+            if(frame != decodedFrame) av_frame_unref(decodedFrame);
+            break;
+        } else if(currFrame == mFrameId || (!reseek && currFrame > mFrameId)) {
             if(currFrame > mFrameId)
                 qDebug() << "frame " + QString::number(currFrame) +
                             " instead of " + QString::number(mFrameId);            
