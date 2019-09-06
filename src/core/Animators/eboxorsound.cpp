@@ -177,17 +177,17 @@ void eBoxOrSound::setDurationRectangle(
         prp_afterFrameShiftChanged(oldRange, newRange);
     });
 
-    connect(mDurationRectangle.data(), &DurationRectangle::minFrameChanged,
+    connect(mDurationRectangle.data(), &DurationRectangle::minRelFrameChanged,
             this, [this](const int oldMin, const int newMin) {
         const int min = qMin(newMin, oldMin);
         const int max = qMax(newMin, oldMin);
-        prp_afterChangedAbsRange({min, max}, false);
+        prp_afterChangedRelRange({min, max}, false);
     });
-    connect(mDurationRectangle.data(), &DurationRectangle::maxFrameChanged,
+    connect(mDurationRectangle.data(), &DurationRectangle::maxRelFrameChanged,
             this, [this](const int oldMax, const int newMax) {
         const int min = qMin(newMax, oldMax);
         const int max = qMax(newMax, oldMax);
-        prp_afterChangedAbsRange({min, max}, false);
+        prp_afterChangedRelRange({min, max}, false);
     });
 }
 

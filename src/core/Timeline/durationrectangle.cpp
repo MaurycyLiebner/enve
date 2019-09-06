@@ -88,9 +88,9 @@ DurationRectangle::DurationRectangle(Property &parentProp) :
     });
 
     connect(&mMinFrame, &TimelineMovable::valueChanged,
-            this, &DurationRectangle::minFrameChanged);
+            this, &DurationRectangle::minRelFrameChanged);
     connect(&mMaxFrame, &TimelineMovable::valueChanged,
-            this, &DurationRectangle::maxFrameChanged);
+            this, &DurationRectangle::maxRelFrameChanged);
 }
 
 void DurationRectangle::pressed(const bool shiftPressed) {

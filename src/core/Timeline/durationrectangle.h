@@ -207,8 +207,8 @@ private:
     using TimelineMovable::setValue;
     using TimelineMovable::getValue;
 signals:
-    void minFrameChanged(const int from, const int to);
-    void maxFrameChanged(const int from, const int to);
+    void minRelFrameChanged(const int from, const int to);
+    void maxRelFrameChanged(const int from, const int to);
     void shiftChanged(const int from, const int to);
 protected:
     const HddCachableCacheHandler * mRasterCacheHandler = nullptr;
