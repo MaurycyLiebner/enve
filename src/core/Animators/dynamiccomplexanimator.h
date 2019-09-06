@@ -61,7 +61,7 @@ public:
         [](DynamicComplexAnimatorBase<T> * animTarget) {
             animTarget->ca_removeAllChildAnimators();
         };
-        menu->addPlainAction("Clear", dOp)->setEnabled(anim_getKeyOnCurrentFrame());
+        menu->addPlainAction("Clear", dOp)->setEnabled(this->ca_getNumberOfChildren());
     }
 
 
