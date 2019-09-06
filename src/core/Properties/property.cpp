@@ -80,6 +80,7 @@ int Property::prp_getInheritedFrameShift() const {
 void Property::prp_setInheritedFrameShift(const int shift,
                                           ComplexAnimator *parentAnimator) {
     Q_UNUSED(parentAnimator);
+    if(prp_mInheritedFrameShift == shift) return;
     const auto oldRange = prp_absInfluenceRange();
     prp_mInheritedFrameShift = shift;
     const auto newRange = prp_absInfluenceRange();
