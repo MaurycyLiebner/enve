@@ -347,6 +347,8 @@ void TimelineWidget::readState(eReadStream &src) {
     mFrameScrollBar->setFirstViewedFrame(frame);
     mFrameScrollBar->setDisplayedFrameRange({minViewedFrame, maxViewedFrame});
     mFrameRangeScrollBar->setViewedFrameRange({minViewedFrame, maxViewedFrame});
+
+    mKeysView->setFramesRange({minViewedFrame, maxViewedFrame});
 }
 
 void TimelineWidget::moveSlider(int val) {
