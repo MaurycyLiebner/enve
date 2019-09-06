@@ -45,6 +45,7 @@ protected:
     virtual void beforeProcessing(const Hardware) {}
     virtual void afterProcessing() {}
     virtual void afterCanceled() {}
+    virtual void handleException() {}
 public:
     ~eTask() { cancelDependent(); }
 
@@ -108,7 +109,7 @@ public:
         return static_cast<bool>(mUpdateException);
     }
 
-    std::exception_ptr handleException() {
+    std::exception_ptr takeException() {
         std::exception_ptr exc;
         mUpdateException.swap(exc);
         return exc;

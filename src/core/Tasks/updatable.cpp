@@ -36,8 +36,11 @@ void eTask::finishedProcessing() {
         mCancel = false;
         cancel();
     } else if(unhandledException()) {
-        gPrintExceptionCritical(handleException());
-        cancel();
+        handleException();
+        if(unhandledException()) {
+            gPrintExceptionCritical(takeException());
+            cancel();
+        }
     } else {
         afterProcessing();
         tellDependentThatFinished();
