@@ -485,13 +485,13 @@ bool parsePathDataFast(const QString &dataStr,
                     count = 0;
                     break;
                 }
-                float rx = (*num++);
-                float ry = (*num++);
-                float xAxisRotation = (*num++);
-                auto largeArcFlag  = SkPath::ArcSize(*num++);
-                auto sweepFlag = SkPath::Direction(*num++);
-                float ex = (*num++) + offsetX;
-                float ey = (*num++) + offsetY;
+                const float rx = (*num++);
+                const float ry = (*num++);
+                const float xAxisRotation = (*num++);
+                const auto largeArcFlag  = SkPath::ArcSize(*num++);
+                const auto sweepFlag = SkPath::Direction(static_cast<int>(*num++) ? 0 : 1);
+                const float ex = (*num++) + offsetX;
+                const float ey = (*num++) + offsetY;
                 count -= 7;
                 lastPath->arcTo(rx, ry, xAxisRotation, largeArcFlag,
                                 sweepFlag, ex, ey);
@@ -506,13 +506,13 @@ bool parsePathDataFast(const QString &dataStr,
                     count = 0;
                     break;
                 }
-                float rx = (*num++);
-                float ry = (*num++);
-                float xAxisRotation = (*num++);
-                auto largeArcFlag  = SkPath::ArcSize(*num++);
-                auto sweepFlag = SkPath::Direction(*num++);
-                float ex = (*num++);
-                float ey = (*num++);
+                const float rx = (*num++);
+                const float ry = (*num++);
+                const float xAxisRotation = (*num++);
+                const auto largeArcFlag  = SkPath::ArcSize(*num++);
+                const auto sweepFlag = SkPath::Direction(static_cast<int>(*num++) ? 0 : 1);
+                const float ex = (*num++);
+                const float ey = (*num++);
                 count -= 7;
                 lastPath->arcTo(rx, ry, xAxisRotation, largeArcFlag,
                                 sweepFlag, ex, ey);
