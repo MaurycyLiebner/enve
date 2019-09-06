@@ -80,20 +80,12 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
         TaskScheduler::sSetFreeThreadsForCpuTasksAvailableFunc(nextFrameFunc);
         TaskScheduler::sSetAllTasksFinishedFunc(nextFrameFunc);
 
-        //fitSceneToSize();
-        if(!isZero6Dec(mSavedResolutionFraction - resolutionFraction)) {
-            mCurrentScene->setResolutionFraction(resolutionFraction);
-            mDocument.actionFinished();
-        }
-
         mCurrentRenderFrame = renderSettings.fMinFrame;
         mCurrRenderRange = {mCurrentRenderFrame, mCurrentRenderFrame};
 
         mCurrentEncodeFrame = mCurrentRenderFrame;
         mFirstEncodeSoundSecond = qRound(mCurrentRenderFrame/fps);
         mCurrentEncodeSoundSecond = mFirstEncodeSoundSecond;
-        const auto &outputSettings = settings->getOutputRenderSettings();
-        const auto soundComp = mCurrentScene->getSoundComposition();
         if(!VideoEncoder::sEncodeAudio())
             mMaxSoundSec = mCurrentEncodeSoundSecond - 1;
         mCurrentScene->setMinFrameUseRange(mCurrentRenderFrame);
@@ -103,9 +95,15 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
         mCurrentScene->anim_setAbsFrame(mCurrentRenderFrame);
         mCurrentScene->setOutputRendering(true);
         TaskScheduler::sInstance->setAlwaysQue(true);
-        nextCurrentRenderFrame();
-        if(TaskScheduler::sAllQuedCpuTasksFinished()) {
-            nextSaveOutputFrame();
+        //fitSceneToSize();
+        if(!isZero6Dec(mSavedResolutionFraction - resolutionFraction)) {
+            mCurrentScene->setResolutionFraction(resolutionFraction);
+            mDocument.actionFinished();
+        } else {
+            nextCurrentRenderFrame();
+            if(TaskScheduler::sAllQuedCpuTasksFinished()) {
+                nextSaveOutputFrame();
+            }
         }
     }
 }

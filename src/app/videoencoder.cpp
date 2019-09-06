@@ -636,16 +636,16 @@ void VideoEncoder::clearContainers() {
 }
 
 void VideoEncoder::process() {
-    bool encodeVideoT = !_mContainers.isEmpty(); // local encode
-    bool encodeAudioT;
+    bool hasVideo = !_mContainers.isEmpty(); // local encode
+    bool hasAudio;
     if(mEncodeAudio) {
         if(_mAllAudioProvided) {
-            encodeAudioT = mSoundIterator.hasValue();
+            hasAudio = mSoundIterator.hasValue();
         } else {
-            encodeAudioT = mSoundIterator.hasSamples(mAudioStream.fSrcFrame->nb_samples);
+            hasAudio = mSoundIterator.hasSamples(mAudioStream.fSrcFrame->nb_samples);
         }
-    } else encodeAudioT = false;
-    while((mEncodeVideo && encodeVideoT) || (mEncodeAudio && encodeAudioT)) {
+    } else hasAudio = false;
+    while((mEncodeVideo && hasVideo) || (mEncodeAudio && hasAudio)) {
         bool videoAligned = true;
         if(mEncodeVideo && mEncodeAudio) {
             videoAligned = av_compare_ts(mVideoStream.fNextPts,
@@ -653,23 +653,22 @@ void VideoEncoder::process() {
                                          mAudioStream.fNextPts,
                                          mAudioStream.fCodec->time_base) <= 0;
         }
-        const bool encodeVideo = mEncodeVideo && encodeVideoT && videoAligned;
+        const bool encodeVideo = mEncodeVideo && hasVideo && videoAligned;
         if(encodeVideo) {
             const auto cacheCont = _mContainers.at(_mCurrentContainerId);
             const auto contRage = cacheCont->getRange()*_mRenderRange;
             const int nFrames = contRage.span();
             try {
                 writeVideoFrame(mFormatContext, &mVideoStream,
-                                cacheCont->getImageSk(), &encodeVideoT);
+                                cacheCont->getImageSk(), &hasVideo);
                 avcodec_flush_buffers(mVideoStream.fCodec);
             } catch(...) {
                 RuntimeThrow("Failed to write video frame");
             }
-            _mCurrentContainerFrame++;
-            if(_mCurrentContainerFrame >= nFrames) {
+            if(++_mCurrentContainerFrame >= nFrames) {
                 _mCurrentContainerId++;
                 _mCurrentContainerFrame = 0;
-                encodeVideoT = _mCurrentContainerId < _mContainers.count();
+                hasVideo = _mCurrentContainerId < _mContainers.count();
             }
         }
         bool audioAligned = true;
@@ -679,17 +678,17 @@ void VideoEncoder::process() {
                                          mAudioStream.fNextPts,
                                          mAudioStream.fCodec->time_base) >= 0;
         }
-        const bool encodeAudio = mEncodeAudio && encodeAudioT && audioAligned;
+        const bool encodeAudio = mEncodeAudio && hasAudio && audioAligned;
         if(encodeAudio) {
             try {
                 processAudioStream(mFormatContext, &mAudioStream,
-                                   mSoundIterator, &encodeAudioT);
+                                   mSoundIterator, &hasAudio);
                 avcodec_flush_buffers(mAudioStream.fCodec);
             } catch(...) {
                 RuntimeThrow("Failed to process audio stream");
             }
-            encodeAudioT = _mAllAudioProvided ? mSoundIterator.hasValue() :
-                                                mSoundIterator.hasSamples(mAudioStream.fSrcFrame->nb_samples);
+            hasAudio = _mAllAudioProvided ? mSoundIterator.hasValue() :
+                                            mSoundIterator.hasSamples(mAudioStream.fSrcFrame->nb_samples);
         }
         if(!encodeVideo && !encodeAudio) break;
     }
@@ -733,7 +732,7 @@ void VideoEncoder::afterProcessing() {
         interrupEncoding();
         mInterruptEncoding = false;
     } else if(unhandledException()) {
-        gPrintExceptionCritical(handleException());
+        gPrintExceptionCritical(takeException());
         mRenderInstanceSettings->setCurrentState(
                     RenderInstanceSettings::ERROR, "Error");
         finishEncodingNow();
