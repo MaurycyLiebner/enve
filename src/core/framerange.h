@@ -48,12 +48,13 @@ struct iValueRange {
         return qMax(0, fMax - fMin + 1);
     }
 
-    iValueRange adjusted(const int dMin, const int dMax) {
-        return {fMin + dMin, fMax + dMax};
+    iValueRange adjusted(const int dMin, const int dMax) const {
+        return {fMin == EMIN ? EMIN : fMin + dMin,
+                fMax == EMAX ? EMAX : fMax + dMax};
     }
 
     iValueRange shifted(const int by) const {
-        return {fMin + by, fMax + by};
+        return adjusted(by, by);
     }
 
     bool overlaps(const iValueRange& b) const {

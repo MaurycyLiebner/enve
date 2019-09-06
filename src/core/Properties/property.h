@@ -160,7 +160,7 @@ public:
                                             ComplexAnimator* parentAnimator);
     virtual void prp_afterFrameShiftChanged(const FrameRange& oldAbsRange,
                                             const FrameRange& newAbsRange) {
-        prp_afterChangedAbsRange(newAbsRange + oldAbsRange, false);
+        prp_afterChangedAbsRange((newAbsRange + oldAbsRange).adjusted(-1, 1), false);
     }
 
     virtual FrameRange prp_getIdenticalRelRange(const int relFrame) const {
