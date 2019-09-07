@@ -148,7 +148,7 @@ qint64 SoundComposition::readData(char *data, qint64 maxLen) {
     const SampleRange readSamples{static_cast<int>(mPos),
                                   static_cast<int>(mPos + maxLen/bytesPerSampleFrame)};
     while(maxLen > total) {
-        const int secondId = static_cast<int>(mPos/sampleRate);
+        const int secondId = static_cast<int>(mPos/sampleRate + (mPos >= 0 ? 0 : -1));
         const auto cont = mSecondsCache.atFrame<SoundCacheContainer>(secondId);
         if(!cont) break;
         const auto samples = cont->getSamples();
