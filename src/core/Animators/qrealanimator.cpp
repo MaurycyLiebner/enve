@@ -47,7 +47,7 @@ void QrealAnimator::readProperty(eReadStream& src) {
     readKeys(src);
 
     qreal val; src >> val;
-    setCurrentBaseValue(val);
+    if(!anim_hasKeys()) setCurrentBaseValue(val);
 }
 
 void QrealAnimator::graph_getValueConstraints(
