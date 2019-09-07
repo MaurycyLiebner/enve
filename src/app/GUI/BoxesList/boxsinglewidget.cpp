@@ -543,8 +543,8 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
         if(target->SWT_isProperty()) {
             const auto pTarget = static_cast<Property*>(target);
             const bool shiftPressed = event->modifiers() & Qt::ShiftModifier;
-            if(target->SWT_isBoundingBox()) {
-                const auto box = static_cast<BoundingBox*>(target);
+            if(target->SWT_isBoundingBox() || target->SWT_isSingleSound()) {
+                const auto box = static_cast<eBoxOrSound*>(target);
                 if(!box->isSelected()) box->selectionChangeTriggered(shiftPressed);
             } else {
                 if(!pTarget->prp_isSelected()) pTarget->prp_selectionChangeTriggered(shiftPressed);
@@ -600,8 +600,8 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
     if(pointToLen(event->pos() - mDragStartPos) > MIN_WIDGET_DIM/2) return;
     const bool shiftPressed = event->modifiers() & Qt::ShiftModifier;
     const auto target = mTarget->getTarget();
-    if(target->SWT_isBoundingBox() && !target->SWT_isCanvas()) {
-        auto boxTarget = static_cast<BoundingBox*>(target);
+    if(target->SWT_isBoundingBox() || target->SWT_isSingleSound()) {
+        const auto boxTarget = static_cast<eBoxOrSound*>(target);
         boxTarget->selectionChangeTriggered(shiftPressed);
         Document::sInstance->actionFinished();
     } else if(target->SWT_isProperty()) {

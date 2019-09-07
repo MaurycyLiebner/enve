@@ -63,6 +63,11 @@ void SingleSound::setupTreeViewMenu(PropertyMenu * const menu) {
         sound->setStretch(stretch*0.01);
     };
     menu->addPlainAction("Stretch...", stretchOp);
+
+    const PropertyMenu::PlainTriggeredOp deleteOp = [this]() {
+        removeFromParent_k();
+    };
+    menu->addPlainAction("Delete", deleteOp);
 }
 
 SoundReaderForMerger *SingleSound::getSecondReader(const int relSecondId) {
