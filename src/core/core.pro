@@ -22,7 +22,7 @@
 
 QT += opengl multimedia qml xml
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample
-
+CONFIG += c++14
 TARGET = envecore
 TEMPLATE = lib
 

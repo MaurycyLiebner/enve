@@ -59,17 +59,7 @@ chmod +x ninja
 ```
 Create the release build (ninja) files:
 ```
-bin/gn gen out/Release --args='
-	is_official_build=true is_debug=false
-	extra_cflags=["-Wno-error"] target_os="linux"
-	target_cpu="x64" skia_use_system_expat=false
-	skia_use_system_freetype2=false
-	skia_use_system_libjpeg_turbo=false
-	skia_use_system_libpng=false
-	skia_use_system_libwebp=false
-	skia_use_system_zlib=false
-	skia_use_system_harfbuzz=false
-	cc="gcc-7" cxx="g++-7"'
+bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] target_os="linux" target_cpu="x64" skia_use_system_expat=false skia_use_system_freetype2=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false skia_use_system_harfbuzz=false cc="gcc-7" cxx="g++-7"'
 ```
 Build a release version of skia (you can use more than 2 threads):
 ```
@@ -101,10 +91,7 @@ cd libmypaint-1.3.0
 ```
 Set CFLAGS for better optimization:
 ```
-export CFLAGS='
-	-fopenmp -Ofast -ftree-vectorize
-	-fopt-info-vec-optimized -funsafe-math-optimizations
-	-funsafe-loop-optimizations -fPIC'
+export CFLAGS='-fopenmp -Ofast -ftree-vectorize -fopt-info-vec-optimized -funsafe-math-optimizations -funsafe-loop-optimizations -fPIC'
 ```
 Configure libmypaint:
 ```
@@ -124,9 +111,7 @@ Install libraries needed for audio/video decoding/encoding.
 ```
 sudo add-apt-repository ppa:jonathonf/ffmpeg-4
 sudo apt-get update
-sudo apt-get install libswresample-dev
-	libswscale-dev libavcodec-dev
-	libavformat-dev libavresample-dev
+sudo apt-get install libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
 ```
 
 #### Other
@@ -163,14 +148,14 @@ Build a release version of enve:
 ```
 cd build/Release
 qmake ../../enve.pro
-make
+make CC=gcc-7 CPP=g++-7 CXX=g++-7 LD=g++-7
 cd ..
 ```
 Build a debug version of enve (if needed):
 ```
 cd Debug
 qmake CONFIG+=debug ../../enve.pro
-make
+make CC=gcc-7 CPP=g++-7 CXX=g++-7 LD=g++-7
 cd ..
 ```
 Now you have successuly build enve and libenvecore along with all the examples.
@@ -182,26 +167,15 @@ Make sure you are in the build directory.
 
 ### Download needed tools
 
-Download, rename, and change permission for AppImageKit:
-```
-wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage
-mv appimagetool-x86_64.AppImage appimagetool.AppImage
-chmod +x appimagetool.AppImage
-```
-Download, rename, and change permission for LinuxDeployQt:
+Download and change permission for LinuxDeployQt:
 ```
 wget https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
-mv linuxdeployqt-6-x86_64.AppImage linuxdeployqt.AppImage
-chmod +x linuxdeployqt.AppImage
+chmod +x linuxdeployqt-6-x86_64.AppImage
 ```
 Copy the enve build into the AppDir:
 ```
 cp Release/src/app/enve AppDir/usr/bin/
 cp -av Release/src/core/*.so* AppDir/usr/lib/
-```
-Copy all necessary dependencies into the AppDir by using LinuxDeployQt:
-```
-./linuxdeployqt.AppImage AppDir/usr/share/applications/enve.desktop -appimage
 ```
 
 #### Support older systems (ex. Ubuntu 16.04)
@@ -210,31 +184,31 @@ Download patched AppRun binary and an associated library that will link a newer 
 wget https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/AppRun-patched-x86_64
 mv AppRun-patched-x86_64 AppRun
 chmod +x AppRun
+cp AppRun AppDir/
 ```
 ```
 wget https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/exec-x86_64.so
 mv exec-x86_64.so exec.so
+cp exec.so AppDir/usr/optional
 ```
-Copy everything required to use newer libstdc++ on older systems to your AppDir:
+Copy your system's version of libstdc++ to your AppDir:
 ```
 mkdir AppDir/usr/optional/libstdc++
 cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 AppDir/usr/optional/libstdc++/
-cp exec.so AppDir/usr/optional
 ```
 
 #### Create AppImage
 
-Create the AppImage using AppImageTool:
+Create the AppImage using LinuxDeployQt:
 ```
-cp AppRun AppDir/
-./appimagetool.AppImage AppDir
+./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage
 ```
 
 You have successfuly created your own enve AppImage!
 
 ## Authors
 
-**Maurycy Liebner** - 2016-2019 - [MaurycyLiebner](https://github.com/MaurycyLiebner)
+**Maurycy Liebner** - 2016 - 2019 - [MaurycyLiebner](https://github.com/MaurycyLiebner)
 
 ## License
 

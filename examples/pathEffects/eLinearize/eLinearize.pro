@@ -21,7 +21,7 @@
 #-------------------------------------------------
 
 QT += core
-
+CONFIG += c++14
 ENVE_FOLDER = $$PWD/../../..
 
 INCLUDEPATH += $$ENVE_FOLDER/include
