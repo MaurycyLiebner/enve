@@ -53,8 +53,7 @@ void BrushSelectionWidget::updateBrushes() {
     }
 }
 
-void loadBrushFromFile(const QString &path,
-                       BrushCollectionData& coll) {
+void loadBrushFromFile(const QString &path, BrushCollectionData& coll) {
     QFile dataFile(path);
     if(!dataFile.exists()) return;
     if(!dataFile.open(QIODevice::ReadOnly)) return;
@@ -85,9 +84,8 @@ void loadBrushFromFile(const QString &path,
                            icon, wholeFile });
 }
 
-void loadCollectionFromDir(
-        const QString &mainDirPath,
-        QList<BrushCollectionData> &data) {
+void loadCollectionFromDir(const QString &mainDirPath,
+                           QList<BrushCollectionData> &data) {
     BrushCollectionData collection;
     const QDir brushesDir(mainDirPath);
     collection.fName = brushesDir.dirName();
@@ -104,8 +102,7 @@ void loadCollectionFromDir(
     data << collection;
 }
 
-void BrushSelectionWidget::sLoadCollectionsFromDir(
-        const QString &mainDirPath) {
+void BrushSelectionWidget::sLoadCollectionsFromDir(const QString &mainDirPath) {
     const QDir brushesDir(mainDirPath);
     if(!brushesDir.exists()) brushesDir.mkpath(mainDirPath);
     const QDir::Filters filter = QDir::NoDotAndDotDot | QDir::AllEntries;

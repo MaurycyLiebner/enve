@@ -91,6 +91,7 @@ public:
         if(!sLoaded) {
             const QString brushesDir = eSettings::sSettingsDir() + "/brushes";
             sLoadCollectionsFromDir(brushesDir);
+            sLoadCollectionsFromDir(":/brushes");
             sLoaded = true;
         }
         const int id = sBrushContexts.count();

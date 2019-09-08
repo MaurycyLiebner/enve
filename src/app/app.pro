@@ -265,3 +265,21 @@ RESOURCES += noInterpolation
 
 plain.files = $$files(icons/*)
 RESOURCES += plain
+
+brushesClassic.files = $$files(brushes/Classic/*)
+RESOURCES += brushesClassic
+
+brushesDeevad.files = $$files(brushes/Deevad/*)
+RESOURCES += brushesDeevad
+
+brushesExperimental.files = $$files(brushes/Experimental/*)
+RESOURCES += brushesExperimental
+
+brushesKaerhon.files = $$files(brushes/Kaerhon/*)
+RESOURCES += brushesKaerhon
+
+brushesRamon.files = $$files(brushes/Ramon/*)
+RESOURCES += brushesRamon
+
+brushesTanda.files = $$files(brushes/Tanda/*)
+RESOURCES += brushesTanda
