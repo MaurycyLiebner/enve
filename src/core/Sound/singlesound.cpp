@@ -157,14 +157,22 @@ bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 
 #include "basicreadwrite.h"
 void SingleSound::writeProperty(eWriteStream& dst) const {
-    if(videoSound()) return StaticComplexAnimator::writeProperty(dst);
+    if(videoSound()) {
+        StaticComplexAnimator::writeProperty(dst);
+        dst << mVisible;
+        return;
+    }
     eBoxOrSound::writeProperty(dst);
     const auto filePath = mCacheHandler ? mCacheHandler->getFilePath() : "";
     dst << filePath;
 }
 
 void SingleSound::readProperty(eReadStream& src) {
-    if(videoSound()) return StaticComplexAnimator::readProperty(src);
+    if(videoSound()) {
+        StaticComplexAnimator::readProperty(src);
+        src >> mVisible;
+        return;
+    }
     eBoxOrSound::readProperty(src);
     QString filePath;
     src >> filePath;
