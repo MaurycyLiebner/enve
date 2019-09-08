@@ -112,11 +112,11 @@ bool BoxWithPathEffects::getFillEffectsVisible() const {
 
 void BoxWithPathEffects::setOutlineBaseEffectsEnabled(const bool enable) {
     mOutlinePathEffectsAnimators->SWT_setVisible(
-                mOutlinePathEffectsAnimators->hasChildAnimators() || enable);
+                mOutlineBasePathEffectsAnimators->hasChildAnimators() || enable);
 }
 
 bool BoxWithPathEffects::getOutlineBaseEffectsVisible() const {
-    return mOutlinePathEffectsAnimators->SWT_isVisible();
+    return mOutlineBasePathEffectsAnimators->SWT_isVisible();
 }
 
 void BoxWithPathEffects::setOutlineEffectsEnabled(const bool enable) {
