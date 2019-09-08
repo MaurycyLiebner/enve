@@ -111,7 +111,7 @@ bool BoxWithPathEffects::getFillEffectsVisible() const {
 }
 
 void BoxWithPathEffects::setOutlineBaseEffectsEnabled(const bool enable) {
-    mOutlinePathEffectsAnimators->SWT_setVisible(
+    mOutlineBasePathEffectsAnimators->SWT_setVisible(
                 mOutlineBasePathEffectsAnimators->hasChildAnimators() || enable);
 }
 
