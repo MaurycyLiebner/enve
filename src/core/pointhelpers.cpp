@@ -808,7 +808,7 @@ void gAtomicDisplaceFilterPath(const qreal baseSeed,
     if(isZero4Dec(maxDev)) return;
     dst->reset();
 
-    uint32_t seedContourInc = 0;
+    qreal seedContourInc = 0;
     SkPath::Iter iter(src, false);
     SkPath::Iter nextIter(src, false);
     SkPoint pts[4];
@@ -820,7 +820,7 @@ void gAtomicDisplaceFilterPath(const qreal baseSeed,
         const auto nextVerb = nextIter.next(pts, true, true);
         const auto verb = iter.next(pts, true, true);
         if(verb == SkPath::kMove_Verb) {
-            seedContourInc += 100;
+            seedContourInc += 1000.;
             i = 0;
         }
         const auto disp = nextVerb == SkPath::kClose_Verb ?
@@ -1296,7 +1296,7 @@ bool gAtomicDisplaceFilterPath(const qreal baseSeed,
 
     SkPathMeasure meas(src, false);
 
-    uint32_t seedContourInc = 0;
+    qreal seedContourInc = 0;
     do {
         if(meas.isClosed()) {
             displaceClosedPath(baseSeed + seedContourInc,
@@ -1308,7 +1308,7 @@ bool gAtomicDisplaceFilterPath(const qreal baseSeed,
                                genAtomicOpenedDisplData);
         }
 
-        seedContourInc += 100;
+        seedContourInc += 1000.;
     } while(meas.nextContour());
     return true;
 }
