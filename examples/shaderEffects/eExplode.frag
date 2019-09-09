@@ -18,9 +18,10 @@
 in vec2 texCoord;
 
 uniform sampler2D texture;
-uniform vec2 displacementXY;
+
 uniform int steps;
 uniform int directions;
+uniform vec2 displacementXY;
 
 const float PIx2 = 6.28318530718;
 
