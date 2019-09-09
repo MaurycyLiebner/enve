@@ -18,6 +18,7 @@
 #include "Tasks/gpupostprocessor.h"
 #include "boxrenderdata.h"
 #include "RasterEffects/rastereffectcaller.h"
+#include "gpurendertools.h"
 
 void EffectsRenderer::processGpu(QGL33 * const gl,
                                  SwitchableContext &context,
@@ -47,7 +48,6 @@ void EffectsRenderer::processGpu(QGL33 * const gl,
         const auto& effect = mEffects.first();
         if(effect->hardwareSupport() == HardwareSupport::cpuOnly) break;
         effect->processGpu(gl, renderTools, renderData);
-        renderTools.swapTextures();
         mEffects.removeFirst();
     }
 

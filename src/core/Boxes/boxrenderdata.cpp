@@ -89,7 +89,7 @@ void BoxRenderData::processGpu(QGL33 * const gl,
     if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
 
     context.switchToSkia();
-    const auto grContext = context.requestContext();
+    const auto grContext = context.grContext();
 
     const auto grTex = grContext->createBackendTexture(
                 fGlobalRect.width(), fGlobalRect.height(),

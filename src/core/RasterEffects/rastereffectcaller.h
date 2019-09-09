@@ -18,6 +18,8 @@
 #define RASTEREFFECTCALLER_H
 #include "../smartPointers/stdselfref.h"
 #include "../glhelpers.h"
+#include "../gpurendertools.h"
+#include "../cpurendertools.h"
 
 enum class HardwareSupport : short;
 

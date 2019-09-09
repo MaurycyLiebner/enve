@@ -197,11 +197,15 @@ SOURCES += \
     colorhelpers.cpp \
     colorsetting.cpp \
     conncontext.cpp \
+    cpurendertools.cpp \
     document.cpp \
     documentrw.cpp \
     efiltersettings.cpp \
+    etexture.cpp \
+    etextureframebuffer.cpp \
     fileshandler.cpp \
     filesourcescache.cpp \
+    gpurendertools.cpp \
     importhandler.cpp \
     memorydatahandler.cpp \
     paintsettings.cpp \
@@ -221,6 +225,7 @@ SOURCES += \
     Animators/intanimator.cpp \
     Animators/key.cpp \
     Animators/boolanimator.cpp \
+    switchablecontext.cpp \
     undoredo.cpp \
     exceptions.cpp \
     glhelpers.cpp \
@@ -420,12 +425,16 @@ HEADERS += \
     colorsetting.h \
     conncontext.h \
     core_global.h \
+    cpurendertools.h \
     customhandler.h \
     customidentifier.h \
     document.h \
     efiltersettings.h \
+    etexture.h \
+    etextureframebuffer.h \
     fileshandler.h \
     filesourcescache.h \
+    gpurendertools.h \
     importhandler.h \
     memorydatahandler.h \
     paintsettings.h \
@@ -449,6 +458,7 @@ HEADERS += \
     Animators/animator.h \
     Animators/intanimator.h \
     Animators/boolanimator.h \
+    switchablecontext.h \
     undoredo.h \
     exceptions.h \
     glhelpers.h \

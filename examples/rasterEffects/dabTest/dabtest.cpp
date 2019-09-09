@@ -135,4 +135,6 @@ void DabTestCaller000::processGpu(QGL33 * const gl,
 
     gl->glBindVertexArray(renderTools.getSquareVAO());
     gl->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    renderTools.swapTextures();
 }

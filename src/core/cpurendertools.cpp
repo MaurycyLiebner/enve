@@ -14,26 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#version 330 core
-in vec2 texCoord;
+#include "cpurendertools.h"
 
-uniform sampler2D texture;
-uniform vec2 displacementXY;
-uniform int steps;
-uniform int directions;
+CpuRenderTools::CpuRenderTools(const SkBitmap &srcBtmp) :
+    fSrcDst(srcBtmp) {}
 
-const float PIx2 = 6.28318530718;
+CpuRenderTools::CpuRenderTools(const SkBitmap &srcBtmp,
+                               const SkBitmap &backupBtmp) :
+    fSrcDst(srcBtmp), fBackupBtmp(backupBtmp) {
+    Q_ASSERT(srcBtmp.width() == backupBtmp.width() &&
+             srcBtmp.height() == backupBtmp.height());
+}
 
-void main(void) {
-    vec4 Color = texture2D(texture, texCoord);
-	float invStep = 1.0/float(steps);
-    for(int i = 0; i < directions; i++) {
-		float d = i*PIx2/float(directions);
-		vec2 displ = vec2(cos(d), sin(d))*displacementXY;
-        for(int j = 1; j <= steps; j++) {
-            Color += texture2D(texture, texCoord + displ*j*invStep);
-        }
-    }
-    Color /= float(steps)*float(directions) + 1.0;
-    gl_FragColor = Color;
+SkBitmap CpuRenderTools::requestBackupBitmap() {
+    if(fBackupBtmp.isNull())
+        fBackupBtmp.allocPixels(fSrcDst.info());
+    return fBackupBtmp;
+}
+
+void CpuRenderTools::swap() {
+    if(fBackupBtmp.isNull()) return;
+    fBackupBtmp.swap(*const_cast<SkBitmap*>(&fSrcDst));
 }

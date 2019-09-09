@@ -47,11 +47,12 @@ void ImageRenderData::setupDirectDraw() {
 }
 
 void ImageRenderData::drawSk(SkCanvas * const canvas) {
-    SkPaint paint;
-    if(fFilterQuality > kNone_SkFilterQuality) paint.setAntiAlias(true);
-    paint.setFilterQuality(fFilterQuality);
-    if(fImage) canvas->drawImage(fImage,
-                                 static_cast<float>(fRelBoundingRect.x()),
-                                 static_cast<float>(fRelBoundingRect.y()),
-                                 &paint);
+    const float x = static_cast<float>(fRelBoundingRect.x());
+    const float y = static_cast<float>(fRelBoundingRect.y());
+    if(fFilterQuality > kNone_SkFilterQuality) {
+        SkPaint paint;
+        paint.setAntiAlias(true);
+        paint.setFilterQuality(fFilterQuality);
+        canvas->drawImage(fImage, x, y, &paint);
+    } else if(fImage) canvas->drawImage(fImage, x, y);
 }

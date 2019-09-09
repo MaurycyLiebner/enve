@@ -123,7 +123,7 @@ void eShadowCaller::processGpu(QGL33 * const gl,
     Q_UNUSED(data);
 
 
-    const auto canvas = renderTools.requestTargetCanvas(gl);
+    const auto canvas = renderTools.requestTargetCanvas();
     canvas->clear(SK_ColorTRANSPARENT);
 
     const auto srcTex = renderTools.requestSrcTextureImageWrapper();
@@ -132,8 +132,9 @@ void eShadowCaller::processGpu(QGL33 * const gl,
     SkPaint paint;
     setupPaint(paint);
     canvas->drawImage(srcTex, 0, 0, &paint);
-
     canvas->flush();
+
+    renderTools.swapTextures();
 }
 
 void eShadowCaller::processCpu(CpuRenderTools &renderTools,

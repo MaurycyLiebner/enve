@@ -18,6 +18,7 @@
 #define SHADEREFFECTCALLER_H
 #include "RasterEffects/rastereffectcaller.h"
 #include "shadereffectprogram.h"
+#include "../gpurendertools.h"
 
 class ShaderEffectCaller : public RasterEffectCaller {
     e_OBJECT

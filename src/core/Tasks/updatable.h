@@ -21,6 +21,8 @@
 #include "smartPointers/ememory.h"
 #include "glhelpers.h"
 #include "skia/skiaincludes.h"
+#include "switchablecontext.h"
+#include "basicreadwrite.h"
 class HddExecController;
 
 enum class eTaskState {

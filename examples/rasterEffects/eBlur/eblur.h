@@ -18,6 +18,7 @@
 #define EBLUR_H
 
 #include "eblur_global.h"
+#include "enveCore/gpurendertools.h"
 
 class eBlurCaller : public RasterEffectCaller {
 public:

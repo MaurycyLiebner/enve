@@ -21,6 +21,7 @@
 #include "enveCore/skia/skqtconversions.h"
 #include "enveCore/Animators/coloranimator.h"
 #include "enveCore/Animators/qpointfanimator.h"
+#include "enveCore/gpurendertools.h"
 
 class eShadowCaller : public RasterEffectCaller {
 public:

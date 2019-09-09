@@ -18,6 +18,7 @@
 #define DABTEST_H
 
 #include "dabtest_global.h"
+#include "enveCore/gpurendertools.h"
 
 struct Dab {
     Dab(const float x, const float y,

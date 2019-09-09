@@ -37,6 +37,8 @@ void ShaderEffectCaller::processGpu(QGL33 * const gl,
 
     gl->glBindVertexArray(renderTools.getSquareVAO());
     gl->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    renderTools.swapTextures();
 }
 
 void ShaderEffectCaller::setupProgram(QGL33 * const gl, QJSEngine &engine,

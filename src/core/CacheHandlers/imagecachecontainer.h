@@ -17,6 +17,7 @@
 #ifndef IMAGECACHECONTAINER_H
 #define IMAGECACHECONTAINER_H
 #include "skia/skiaincludes.h"
+#include "skia/skiahelpers.h"
 #include "hddcachablerangecont.h"
 class Canvas;
 

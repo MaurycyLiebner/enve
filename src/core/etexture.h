@@ -14,26 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#version 330 core
-in vec2 texCoord;
+#ifndef ETEXTURE_H
+#define ETEXTURE_H
+#include "glhelpers.h"
 
-uniform sampler2D texture;
-uniform vec2 displacementXY;
-uniform int steps;
-uniform int directions;
+struct eTexture {
+    GLuint fId = 0;
+    int fWidth = 0;
+    int fHeight = 0;
+    GrBackendTexture fGrTex;
 
-const float PIx2 = 6.28318530718;
+    void bind(QGL33 * const gl) const;
 
-void main(void) {
-    vec4 Color = texture2D(texture, texCoord);
-	float invStep = 1.0/float(steps);
-    for(int i = 0; i < directions; i++) {
-		float d = i*PIx2/float(directions);
-		vec2 displ = vec2(cos(d), sin(d))*displacementXY;
-        for(int j = 1; j <= steps; j++) {
-            Color += texture2D(texture, texCoord + displ*j*invStep);
-        }
-    }
-    Color /= float(steps)*float(directions) + 1.0;
-    gl_FragColor = Color;
-}
+    void clear(GrContext* const context);
+
+    //! @brief Generates, binds texture and sets data.
+    void gen(GrContext* const context,
+             const int width, const int height);
+
+    void swap(eTexture& otherTexture);
+
+    SkBitmap bitmapSnapshot(QGL33 * const gl) const;
+    sk_sp<SkImage> imageSnapshot(QGL33 * const gl) const;
+};
+
+#endif // ETEXTURE_H

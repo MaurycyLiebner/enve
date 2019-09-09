@@ -14,26 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#version 330 core
-in vec2 texCoord;
+#ifndef CPURENDERTOOLS_H
+#define CPURENDERTOOLS_H
 
-uniform sampler2D texture;
-uniform vec2 displacementXY;
-uniform int steps;
-uniform int directions;
+#include "skia/skiahelpers.h"
+class CpuRenderTools {
+public:
+    CpuRenderTools(const SkBitmap& srcBtmp);
+    CpuRenderTools(const SkBitmap& srcBtmp,
+                   const SkBitmap& backupBtmp);
 
-const float PIx2 = 6.28318530718;
+    const SkBitmap fSrcDst;
 
-void main(void) {
-    vec4 Color = texture2D(texture, texCoord);
-	float invStep = 1.0/float(steps);
-    for(int i = 0; i < directions; i++) {
-		float d = i*PIx2/float(directions);
-		vec2 displ = vec2(cos(d), sin(d))*displacementXY;
-        for(int j = 1; j <= steps; j++) {
-            Color += texture2D(texture, texCoord + displ*j*invStep);
-        }
-    }
-    Color /= float(steps)*float(directions) + 1.0;
-    gl_FragColor = Color;
-}
+    bool hasBackupBitmap() const { return !fBackupBtmp.isNull(); }
+
+    SkBitmap requestBackupBitmap();
+
+    void swap();
+private:
+    SkBitmap fBackupBtmp;
+};
+
+#endif // CPURENDERTOOLS_H
