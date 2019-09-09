@@ -21,6 +21,8 @@
 #include "etextureframebuffer.h"
 
 class GpuRenderTools {
+    friend class SkiaRenderTools;
+    friend class OpenGLRenderTools;
 public:
     GpuRenderTools(QGL33* const gl,
                    SwitchableContext& context,
@@ -28,18 +30,21 @@ public:
 
     ~GpuRenderTools();
 
-    GLuint getSquareVAO() const;
-
     //! @brief Swaps the source and the target texture if valid.
     void swapTextures();
 
-    void switchToOpenGL(QGL33* const gl);
-
+    // Skia
     void switchToSkia();
-
     //! @brief Returns SkCanvas associated with the target texture.
     //! If there is no SkCanvas new SkCanvas is created.
     SkCanvas* requestTargetCanvas();
+    sk_sp<SkImage> requestSrcTextureImageWrapper();
+    // Skia
+
+    // OpenGL
+    void switchToOpenGL(QGL33* const gl);
+
+    GLuint getSquareVAO() const;
 
     //! @brief Returned texture may be used as one wishes,
     //!  but has to be valid.
@@ -48,8 +53,7 @@ public:
     //! @brief Returns TextureFrameBuffer associated with the target texture.
     //! If there is no SkCanvas new SkCanvas is created.
     eTextureFrameBuffer& requestTargetFbo();
-
-    sk_sp<SkImage> requestSrcTextureImageWrapper();
+    // OpenGL
 
     bool validTargetCanvas() const;
     bool validTargetFbo() const;

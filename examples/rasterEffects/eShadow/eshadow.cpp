@@ -122,7 +122,7 @@ void eShadowCaller::processGpu(QGL33 * const gl,
     Q_UNUSED(gl);
     Q_UNUSED(data);
 
-
+    renderTools.switchToSkia();
     const auto canvas = renderTools.requestTargetCanvas();
     canvas->clear(SK_ColorTRANSPARENT);
 

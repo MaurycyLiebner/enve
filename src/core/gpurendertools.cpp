@@ -54,8 +54,12 @@ void GpuRenderTools::switchToSkia() {
 }
 
 SkCanvas *GpuRenderTools::requestTargetCanvas() {
+    if(!mContext.skiaMode())
+        RuntimeThrow("Requesting target canvas is "
+                     "only available in Skia mode.\n"
+                     "Use GpuRenderTools::switchToSkia "
+                     "prior to this call.");
     if(!mCanvas) {
-        mContext.switchToSkia();
         requestTargetFbo();
         GrGLFramebufferInfo fboInfo;
         fboInfo.fFBOID = mTargetTextureFbo.fFBOId;
@@ -86,11 +90,12 @@ eTextureFrameBuffer &GpuRenderTools::requestTargetFbo() {
 }
 
 sk_sp<SkImage> GpuRenderTools::requestSrcTextureImageWrapper() {
+    if(!mContext.skiaMode())
+        RuntimeThrow("Wrapping texture image with SkImage is "
+                     "only available in Skia mode.\n"
+                     "Use GpuRenderTools::switchToSkia "
+                     "prior to this call.");
     const auto grContext = mContext.grContext();
-    if(!grContext) RuntimeThrow("Wrapping texture image with SkImage "
-                                "only available in Skia mode.\n"
-                                "Use SwitchableContext::switchToSkia "
-                                "prior to this call.");
     return SkImage::MakeFromTexture(grContext,
                                     sourceBackedTexture(),
                                     kBottomLeft_GrSurfaceOrigin,
