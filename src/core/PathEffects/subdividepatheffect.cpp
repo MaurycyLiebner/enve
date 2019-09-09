@@ -35,6 +35,7 @@ private:
 void SubdivideEffectCaller::apply(SkPath &path) {
     SkPath src;
     path.swap(src);
+    path.setFillType(src.getFillType());
     auto lists = CubicList::sMakeFromSkPath(src);
     for(auto & list : lists) {
         list.subdivide(mCount);

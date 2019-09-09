@@ -41,6 +41,7 @@ private:
 void DashEffectCaller::apply(SkPath &path) {
     SkPath src;
     path.swap(src);
+    path.setFillType(src.getFillType());
     const float intervals[] = { mWidth, mWidth };
     SkStrokeRec rec(SkStrokeRec::kHairline_InitStyle);
     SkRect cullRec = src.getBounds();

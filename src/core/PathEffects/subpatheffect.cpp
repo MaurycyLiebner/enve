@@ -56,7 +56,9 @@ void SubPathEffectCaller::apply(SkPath &path) {
     }
 
     auto paths = CubicList::sMakeFromSkPath(path);
+    const auto srcFillType = path.getFillType();
     path.reset();
+    path.setFillType(srcFillType);
 
     if(pathWise) {
         for(auto& iPath : paths) {

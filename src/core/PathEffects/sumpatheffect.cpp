@@ -32,7 +32,9 @@ private:
 
 void SumEffectCaller::apply(SkPath &path) {
     QList<SkPath> paths = gBreakApart(path);
+    const auto srcFillType = path.getFillType();
     path.reset();
+    path.setFillType(srcFillType);
     SkOpBuilder builder;
     for(const auto &subPath : paths) {
         builder.add(subPath, SkPathOp::kUnion_SkPathOp);

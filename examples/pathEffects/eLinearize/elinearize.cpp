@@ -79,6 +79,7 @@ void eLinearize000EffectCaller::apply(SkPath &path) {
     const float invInf = 1 - mInfl;
     SkPath src;
     path.swap(src);
+    path.setFillType(src.getFillType());
 
     SkPath::Iter iter(src, false);
     SkPoint pts[4];

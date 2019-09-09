@@ -34,10 +34,8 @@ PathEffectsTask::PathEffectsTask(PathBoxRenderData * const target,
 
 void PathEffectsTask::process() {
     const bool pathReady = mPathEffects.isEmpty();
-    const bool fillReady = pathReady &&
-            mFillEffects.isEmpty();
-    const bool outlineBaseReady = pathReady &&
-            mOutlineBaseEffects.isEmpty();
+    const bool fillReady = pathReady && mFillEffects.isEmpty();
+    const bool outlineBaseReady = pathReady && mOutlineBaseEffects.isEmpty();
 
     for(const auto& effect : mPathEffects) {
         effect->apply(mPath);

@@ -40,6 +40,7 @@ void gSolidify(const qreal widthT,
     strokerSk.strokePath(src2, &outline);
     SkPath result;
     Op(src2, outline, op, dst);
+    dst->setFillType(src.getFillType());
 
 //    SkOpBuilder builder;
 //    builder.add(src, SkPathOp::kUnion_SkPathOp);

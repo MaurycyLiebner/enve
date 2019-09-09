@@ -40,7 +40,9 @@ private:
 void ZigZagEffectCaller::apply(SkPath &path) {
     auto segLists = CubicList::sMakeFromSkPath(path);
     const QRectF pathBounds = toQRectF(path.getBounds());
+    const auto srcFillType = path.getFillType();
     path.reset();
+    path.setFillType(srcFillType);
     QTransform rotate;
     const QPointF pivot = pathBounds.center();
     rotate.translate(pivot.x(), pivot.y());
