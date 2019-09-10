@@ -1,6 +1,8 @@
 # enve
 
-Flexible, user expandable 2D animation software.
+Enve is a new open-source 2D animation software for Linux.
+You can use enve to create vector animations, raster animations, and even use sound and video files.
+Enve was created with flexibility and expandability in mind.
 
 ## How to build
 
