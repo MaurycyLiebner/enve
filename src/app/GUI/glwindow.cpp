@@ -20,6 +20,10 @@
 #include <QDebug>
 #include "exceptions.h"
 
+#undef foreach
+#include "src/gpu/gl/GrGLDefines.h"
+#define foreach Q_FOREACH
+
 GLWindow::GLWindow(QWidget * const parent)
     : QOpenGLWidget(parent) {
     setUpdateBehavior(QOpenGLWidget::NoPartialUpdate);

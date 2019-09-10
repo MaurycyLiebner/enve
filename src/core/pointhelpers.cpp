@@ -748,12 +748,22 @@ void gForEverySegmentInPath(
     }
 }
 
+static void RotateCCW(const SkPoint& src, SkPoint* dst) {
+    // use a tmp in case src == dst
+    const SkScalar tmp = src.fX;
+    dst->fX = src.fY;
+    dst->fY = -tmp;
+}
+
+static void RotateCCW(SkPoint* pt) {
+    RotateCCW(*pt, pt);
+}
 
 static void Perterb(SkPoint * const p,
                     const SkVector& tangent,
                     const float scale) {
     SkVector normal = tangent;
-    SkPointPriv::RotateCCW(&normal);
+    RotateCCW(&normal);
     normal.setLength(scale);
     *p += normal;
 }

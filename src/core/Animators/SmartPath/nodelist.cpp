@@ -370,6 +370,10 @@ SkPath NodeList::toSkPath() const {
     return result;
 }
 
+#undef foreach
+#include "src/core/SkGeometry.h"
+#define foreach Q_FOREACH
+
 void NodeList::setPath(const SkPath &path) {
     mNodes.clear();
     Node * firstNode = nullptr;

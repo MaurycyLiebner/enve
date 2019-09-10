@@ -47,19 +47,13 @@
 #include "include/effects/SkBlurImageFilter.h"
 #include "include/effects/SkDropShadowImageFilter.h"
 
-#include "src/gpu/gl/GrGLDefines.h"
-
 #include "include/gpu/gl/GrGLTypes.h"
 #include "include/gpu/gl/GrGLFunctions.h"
 #include "include/gpu/gl/GrGLInterface.h"
 
-#include "third_party/externals/sdl/include/SDL.h"
-
 #include <QtGui/qopengl.h>
 
-#include "src/core/SkPointPriv.h"
 #include "src/core/SkStroke.h"
-#include "src/core/SkGeometry.h"
 
 #define foreach Q_FOREACH
 

@@ -16,6 +16,10 @@
 
 #include "gpurendertools.h"
 
+#undef foreach
+#include "src/gpu/gl/GrGLDefines.h"
+#define foreach Q_FOREACH
+
 GpuRenderTools::GpuRenderTools(QGL33 * const gl,
                                SwitchableContext &context,
                                sk_sp<SkImage> img) :
