@@ -414,7 +414,6 @@ protected:
     void handleRightButtonMousePress(const MouseEvent &e);
     void handleLeftButtonMousePress(const MouseEvent &e);
 signals:
-    void requestCanvasMode(CanvasMode);
     void requestUpdate();
     void newFrameRange(FrameRange);
     void currentBoxChanged(BoundingBox*);

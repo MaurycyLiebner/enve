@@ -132,6 +132,7 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
 }
 #include "MovablePoints/smartnodepoint.h"
 #include "MovablePoints/pathpointshandler.h"
+#include "document.h"
 void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
     if(e.fModifiers & Qt::ShiftModifier) return;
     mDoubleClick = true;
@@ -156,7 +157,7 @@ void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
             static_cast<TextBox*>(mHoveredBox.data())->openTextEditor(e.fWidget);
         } else if(mCurrentMode == CanvasMode::boxTransform &&
                   mHoveredBox->SWT_isSmartVectorPath()) {
-            emit requestCanvasMode(CanvasMode::pointTransform);
+            Document::sInstance->setCanvasMode(CanvasMode::pointTransform);
         }
     } else if(!mHoveredBox && !mHoveredPoint_d && !mHoveredNormalSegment.isValid()) {
         if(mCurrentContainer != this) {

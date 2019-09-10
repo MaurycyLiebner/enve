@@ -77,8 +77,6 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
         mDocument.addVisibleScene(mCurrentCanvas);
         emit changeCanvasFrameRange(canvas->getFrameRange());
         updatePivotIfNeeded();
-        connect(mCurrentCanvas, &Canvas::requestCanvasMode,
-                this, &CanvasWindow::setCanvasMode);
         connect(mCurrentCanvas, &Canvas::requestUpdate,
                 this, qOverload<>(&CanvasWindow::update));
         connect(mCurrentCanvas, &Canvas::destroyed,
