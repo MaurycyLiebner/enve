@@ -138,6 +138,7 @@ public:
     int insertFirstNode(const Node &nodeBlueprint);
 
     void promoteDissolvedNodeToNormal(const int nodeId);
+    void promoteDissolvedNodeToNormal(Node * const node);
     void promoteDissolvedNodeToNormal(const int nodeId, Node * const node);
 
     void removeNode(const int nodeId, const bool approx);

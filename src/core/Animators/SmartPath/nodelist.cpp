@@ -157,17 +157,42 @@ void NodeList::removeNode(const int nodeId, Node * const node,
             approximateBeforeDemoteOrRemoval(0.5, node,
                                              prevNormalV, nextNormalV);
         }
+
         Node * currNode = node;
-        while(prevNode(currNode)) {
-            currNode = prevNode(currNode);
-            if(currNode->isNormal()) break;
-            if(currNode->isDissolved()) currNode->setT(currNode->t()*0.5);
+        bool hasPrevNormal = false;
+        bool hasPrevDissolved = false;
+        while((currNode = prevNode(currNode))) {
+            if(currNode->isNormal()) {
+                hasPrevNormal = true;
+                break;
+            }
+            if(currNode->isDissolved()) {
+                hasPrevDissolved = true;
+                currNode->setT(currNode->t()*0.5);
+            }
         }
         currNode = node;
-        while(nextNode(currNode)) {
-            currNode = nextNode(currNode);
-            if(currNode->isNormal()) break;
-            if(currNode->isDissolved()) currNode->setT(currNode->t()*0.5 + 0.5);
+        bool hasNextNormal = false;
+        bool hasNextDissolved = false;
+        while((currNode = nextNode(currNode))) {
+            if(currNode->isNormal()) {
+                hasNextNormal = true;
+                break;
+            }
+            if(currNode->isDissolved()) {
+                hasNextDissolved = true;
+                currNode->setT(currNode->t()*0.5 + 0.5);
+            }
+        }
+
+        if(hasPrevDissolved && !hasNextNormal) {
+            const auto pDiss = prevNode(node);
+            promoteDissolvedNodeToNormal(pDiss);
+        }
+
+        if(hasNextDissolved && !hasPrevNormal) {
+            const auto nDiss = nextNode(node);
+            promoteDissolvedNodeToNormal(nDiss);
         }
     }
     removeNodeFromList(nodeId);
@@ -248,6 +273,10 @@ void NodeList::promoteDissolvedNodeToNormal(const int nodeId,
 
 void NodeList::promoteDissolvedNodeToNormal(const int nodeId) {
     promoteDissolvedNodeToNormal(nodeId, at(nodeId));
+}
+
+void NodeList::promoteDissolvedNodeToNormal(Node * const node) {
+    promoteDissolvedNodeToNormal(node->mId, node);
 }
 
 void NodeList::splitNode(const int nodeId) {
