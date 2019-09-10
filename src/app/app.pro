@@ -20,9 +20,12 @@
 #
 #-------------------------------------------------
 
+VERSION = 0.0.0
+
 QT += multimedia core gui svg opengl sql qml xml concurrent
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc
 CONFIG += c++14
+
 ENVE_FOLDER = $$PWD/../..
 SKIA_FOLDER = $$ENVE_FOLDER/third_party/skia
 LIBMYPAINT_FOLDER = $$ENVE_FOLDER/third_party/libmypaint-1.3.0

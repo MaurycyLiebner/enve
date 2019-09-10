@@ -20,12 +20,13 @@
 #
 #-------------------------------------------------
 
+VERSION = 0.0.0
+
 QT += opengl multimedia qml xml
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample
 CONFIG += c++14
 TARGET = envecore
 TEMPLATE = lib
-
 DEFINES += CORE_LIBRARY
 
 # The following define makes your compiler emit warnings if you use
