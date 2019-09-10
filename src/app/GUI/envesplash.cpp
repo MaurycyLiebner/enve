@@ -21,12 +21,11 @@
 #include "esettings.h"
 
 EnveSplash::EnveSplash() {
-    mText = "Welcome to enve - an opensource 2D animation software.\n\n"
-//            "Further development will only be possible with your support. "
-//            "Press 'Support enve' on the menu bar for more information.\n\n"
-            "Please note that the following executable is merely "
-            "a snapshot of the current state of the code. "
-            "Hence numerous bugs should be expected.\n\n"
+    mText = "Welcome to enve - open-source 2D animation software.\n\n"
+            "Further development will only be possible with your support. "
+            "Press 'Support enve' on the menu bar for more information.\n\n"
+            "Please note that major version zero 0.x.y is for initial development; "
+            "hence numerous bugs should be expected.\n\n"
             "Remember - enve is not a video editor.";
     const auto splashPath = eSettings::sIconsDir() + "/splash.png";
     const QPixmap pixmap(splashPath);
@@ -34,17 +33,18 @@ EnveSplash::EnveSplash() {
                       qRound(0.94*pixmap.width()), qRound(0.6*pixmap.height()));
     mMessageRect = QRect(mTextRect.x(), qRound(0.84*pixmap.height()),
                          qRound(0.94*pixmap.width()), qRound(0.09*pixmap.height()));
+    mBottomRect = QRect(mTextRect.x(), qRound(0.93*pixmap.height()),
+                        qRound(0.94*pixmap.width()), qRound(0.07*pixmap.height()));
     setPixmap(pixmap);
     setFixedSize(pixmap.width(), pixmap.height());
 //    setWindowFlag(Qt::WindowStaysOnTopHint);
 }
 
 void EnveSplash::drawContents(QPainter * const p) {
-#ifdef QT_DEBUG
     p->setPen(QColor(125, 125, 125));
     p->drawRect(mTextRect);
     p->drawRect(mMessageRect);
-#endif
+
     p->setPen(Qt::white);
 
     QFont font = p->font();
@@ -56,6 +56,9 @@ void EnveSplash::drawContents(QPainter * const p) {
     p->drawText(mTextRect.adjusted(marg, marg, -marg, -marg),
                 Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, mText);
     p->drawText(mMessageRect, Qt::AlignCenter, message());
+    p->setPen(QColor(Qt::gray));
+    p->drawText(mBottomRect, Qt::AlignVCenter | Qt::AlignLeft, "Maurycy Liebner");
+    p->drawText(mBottomRect, Qt::AlignVCenter | Qt::AlignRight, "10.09.19");
 }
 
 void EnveSplash::mousePressEvent(QMouseEvent *) {

@@ -569,10 +569,10 @@ void MainWindow::setupMenuBar() {
         }
     });
 
-//    mMenuBar->addAction("Support enve", this, []() {
-//        const QString url = "https://enve.org";
-//        QDesktopServices::openUrl(QUrl(url));
-//    });
+    mMenuBar->addSeparator();
+    mMenuBar->addAction("Support enve", this, []() {
+        QDesktopServices::openUrl(QUrl("https://liberapay.com/enve/"));
+    });
 
     setMenuBar(mMenuBar);
     mMenuBar->setStyleSheet("QMenuBar { padding-top: 1px; }");

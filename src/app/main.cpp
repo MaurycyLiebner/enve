@@ -153,7 +153,8 @@ int main(int argc, char *argv[]) {
     splash->showMessage("Done");
     app.processEvents();
     w.show();
-    const bool keepSplashVisible = false;
+
+    const bool keepSplashVisible = true;
     if(keepSplashVisible) {
         splash->setParent(&w);
         splash->move(splash->pos() + w.mapFromGlobal({0, 0}));

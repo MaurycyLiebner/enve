@@ -28,6 +28,7 @@ private:
     QString mText;
     QRect mTextRect;
     QRect mMessageRect;
+    QRect mBottomRect;
 };
 
 #endif // ENVESPLASH_H
