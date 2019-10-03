@@ -50,5 +50,6 @@ Node Node::sInterpolateNormal(const Node &node1, const Node &node2,
     } else {
         result.mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
     }
+    result.setCtrlsMode(result.mCtrlsMode);
     return result;
 }
