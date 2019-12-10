@@ -16,7 +16,7 @@
 
 #include "effectsubtaskspawner.h"
 #include "boxrenderdata.h"
-#include "Tasks/taskscheduler.h"
+#include "Private/Tasks/taskscheduler.h"
 #include "skia/skiaincludes.h"
 #include "RasterEffects/rastereffect.h"
 #include "RasterEffects/rastereffectcaller.h"
@@ -61,7 +61,7 @@ void EffectSubTaskSpawner_priv::splitSpawn(CpuRenderData& data,
                 CpuRenderTools tools(mSrcBitmap, mDstBitmap);
                 mEffectCaller->processCpu(tools, data);
             }, [this]() { decRemaining_k(); });
-        TaskScheduler::sGetInstance()->scheduleCpuTask(subTask);
+        subTask->queTask();
         return;
     }
 
@@ -116,9 +116,8 @@ void EffectSubTaskSpawner_priv::decRemaining_k() {
     if(--mRemaining > 0) return;
     if(mData->getState() != eTaskState::canceled) {
         mData->fRenderedImage = SkiaHelpers::transferDataToSkImage(mDstBitmap);
-        if(mData->nextStep()) {
-            TaskScheduler::sGetInstance()->queCpuTaskFastTrack(mData);
-        } else mData->finishedProcessing();
+        if(mData->nextStep()) mData->queTask();
+        else mData->finishedProcessing();
     }
     delete this;
 }

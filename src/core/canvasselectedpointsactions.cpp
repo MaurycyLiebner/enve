@@ -18,6 +18,7 @@
 #include "MovablePoints/smartnodepoint.h"
 #include "Animators/SmartPath/smartpathanimator.h"
 #include "MovablePoints/pathpointshandler.h"
+#include "Private/document.h"
 
 void Canvas::connectPoints() {
     QList<SmartNodePoint*> selectedEndPts;

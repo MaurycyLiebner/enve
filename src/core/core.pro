@@ -161,6 +161,14 @@ SOURCES += \
     PathEffects/subpatheffect.cpp \
     PathEffects/sumpatheffect.cpp \
     PathEffects/zigzagpatheffect.cpp \
+    Private/Tasks/gpupostprocessor.cpp \
+    Private/Tasks/offscreenqgl33c.cpp \
+    Private/Tasks/taskexecutor.cpp \
+    Private/Tasks/taskque.cpp \
+    Private/Tasks/taskquehandler.cpp \
+    Private/Tasks/taskscheduler.cpp \
+    Private/document.cpp \
+    Private/documentrw.cpp \
     Properties/boxtargetproperty.cpp \
     RasterEffects/customrastereffect.cpp \
     RasterEffects/rastereffect.cpp \
@@ -177,12 +185,6 @@ SOURCES += \
     Sound/singlesound.cpp \
     Sound/soundcomposition.cpp \
     Sound/soundmerger.cpp \
-    Tasks/gpupostprocessor.cpp \
-    Tasks/offscreenqgl33c.cpp \
-    Tasks/taskexecutor.cpp \
-    Tasks/taskque.cpp \
-    Tasks/taskquehandler.cpp \
-    Tasks/taskscheduler.cpp \
     Tasks/updatable.cpp \
     Timeline/animationrect.cpp \
     Timeline/durationrectangle.cpp \
@@ -199,8 +201,6 @@ SOURCES += \
     colorsetting.cpp \
     conncontext.cpp \
     cpurendertools.cpp \
-    document.cpp \
-    documentrw.cpp \
     efiltersettings.cpp \
     etexture.cpp \
     etextureframebuffer.cpp \
@@ -389,6 +389,13 @@ HEADERS += \
     PathEffects/subpatheffect.h \
     PathEffects/sumpatheffect.h \
     PathEffects/zigzagpatheffect.h \
+    Private/Tasks/gpupostprocessor.h \
+    Private/Tasks/offscreenqgl33c.h \
+    Private/Tasks/taskexecutor.h \
+    Private/Tasks/taskque.h \
+    Private/Tasks/taskquehandler.h \
+    Private/Tasks/taskscheduler.h \
+    Private/document.h \
     Properties/boxtargetproperty.h \
     RasterEffects/customrastereffect.h \
     RasterEffects/rastereffect.h \
@@ -409,12 +416,6 @@ HEADERS += \
     Sound/singlesound.h \
     Sound/soundcomposition.h \
     Sound/soundmerger.h \
-    Tasks/gpupostprocessor.h \
-    Tasks/offscreenqgl33c.h \
-    Tasks/taskexecutor.h \
-    Tasks/taskque.h \
-    Tasks/taskquehandler.h \
-    Tasks/taskscheduler.h \
     Tasks/updatable.h \
     Timeline/animationrect.h \
     Timeline/durationrectangle.h \
@@ -429,7 +430,6 @@ HEADERS += \
     cpurendertools.h \
     customhandler.h \
     customidentifier.h \
-    document.h \
     efiltersettings.h \
     etexture.h \
     etextureframebuffer.h \

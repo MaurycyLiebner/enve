@@ -28,6 +28,7 @@
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "Animators/SmartPath/smartpathanimator.h"
 #include "MovablePoints/smartnodepoint.h"
+#include "Private/document.h"
 
 struct SvgAttribute {
     SvgAttribute(const QString &nameValueStr) {

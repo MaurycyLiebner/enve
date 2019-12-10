@@ -34,18 +34,18 @@ QAudioFormat::SampleType toQtAudioFormat(const AVSampleFormat avFormat) {
                         av_get_sample_fmt_name(avFormat));
 }
 
-void AudioHandler::initializeAudio() {
+void AudioHandler::initializeAudio(const eSoundSettingsData& soundSettings) {
     if(mAudioOutput) delete mAudioOutput;
 
     mAudioBuffer = QByteArray(BufferSize, 0);
 
     mAudioDevice = QAudioDeviceInfo::defaultOutputDevice();
-    mAudioFormat.setSampleRate(eSoundSettings::sSampleRate());
-    mAudioFormat.setChannelCount(eSoundSettings::sChannelCount());
-    mAudioFormat.setSampleSize(eSoundSettings::sBytesPerSample());
+    mAudioFormat.setSampleRate(soundSettings.fSampleRate);
+    mAudioFormat.setChannelCount(soundSettings.channelCount());
+    mAudioFormat.setSampleSize(soundSettings.bytesPerSample());
     mAudioFormat.setCodec("audio/pcm");
     mAudioFormat.setByteOrder(QAudioFormat::LittleEndian);
-    mAudioFormat.setSampleType(toQtAudioFormat(eSoundSettings::sSampleFormat()));
+    mAudioFormat.setSampleType(toQtAudioFormat(soundSettings.fSampleFormat));
 
     QAudioDeviceInfo info(mAudioDevice);
     if(!info.isFormatSupported(mAudioFormat)) {

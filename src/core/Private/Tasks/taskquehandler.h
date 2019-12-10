@@ -14,28 +14,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef TASKQUE_H
-#define TASKQUE_H
-#include "updatable.h"
+#ifndef TASKQUEHANDLER_H
+#define TASKQUEHANDLER_H
+#include "taskque.h"
 
-class TaskQue {
-    friend class TaskQueHandler;
+class TaskQueHandler {
 public:
-    explicit TaskQue();
-    TaskQue(const TaskQue&) = delete;
-    TaskQue& operator=(const TaskQue&) = delete;
+    int countQues() const;
+    bool isEmpty() const;
 
-    ~TaskQue();
-protected:
-    int countQued() const;
-    bool allDone() const;
+    void clear();
+
+    stdsptr<eTask> takeQuedForGpuProcessing();
+    stdsptr<eTask> takeQuedForCpuProcessing();
+
+    void beginQue();
+
     void addTask(const stdsptr<eTask>& task);
 
-    stdsptr<eTask> takeQuedForCpuProcessing();
-    stdsptr<eTask> takeQuedForGpuProcessing();
+    void endQue();
+
+    int taskCount() const { return mTaskCount; }
 private:
-    QList<stdsptr<eTask>> mGpuOnly;
-    QList<stdsptr<eTask>> mGpuPreffered;
-    QList<stdsptr<eTask>> mQued;
+    void queDone(const TaskQue * const que, const int queId);
+
+    int mTaskCount = 0;
+    QList<stdsptr<TaskQue>> mQues;
+    TaskQue * mCurrentQue = nullptr;
 };
-#endif // TASKQUE_H
+#endif // TASKQUEHANDLER_H

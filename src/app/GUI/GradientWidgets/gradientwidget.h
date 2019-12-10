@@ -51,13 +51,9 @@ public:
 
     void updateAfterFrameChanged(const int absFrame);
 
-    int getGradientsCount() const {
-        return Document::sInstance->fGradients.count();
-    }
+    int getGradientsCount() const;
 
-    Gradient* getGradientAt(const int id) const {
-        return Document::sInstance->fGradients.at(id).get();
-    }
+    Gradient* getGradientAt(const int id) const;
 
     int getColorId() const {
         return mCurrentColorId;

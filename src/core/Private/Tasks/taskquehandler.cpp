@@ -61,13 +61,8 @@ void TaskQueHandler::beginQue() {
 }
 
 void TaskQueHandler::addTask(const stdsptr<eTask> &task) {
-    if(!mCurrentQue) RuntimeThrow("Cannot add task when there is no active que.");
-    mCurrentQue->addTask(task);
-}
-
-void TaskQueHandler::addTaskFastTrack(const stdsptr<eTask> &task) {
     if(mCurrentQue) {
-        addTask(task);
+        mCurrentQue->addTask(task);
     } else {
         if(mQues.isEmpty()) beginQue();
         else mCurrentQue = mQues.first().get();

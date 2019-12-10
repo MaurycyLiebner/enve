@@ -20,7 +20,7 @@
 #include "boxscroller.h"
 #include "GUI/canvaswindow.h"
 #include "GUI/mainwindow.h"
-#include "document.h"
+#include "Private/document.h"
 
 BoxScrollWidget::BoxScrollWidget(Document &document,
                                  ScrollArea * const parent) :

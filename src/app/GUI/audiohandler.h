@@ -17,6 +17,7 @@
 #ifndef AUDIOHANDLER_H
 #define AUDIOHANDLER_H
 #include <QAudioOutput>
+class eSoundSettingsData;
 
 class AudioHandler : public QObject {
 public:
@@ -46,7 +47,7 @@ public:
         mAudioIOOutput->write(request.fData, request.fSize);
     }
 
-    void initializeAudio();
+    void initializeAudio(const eSoundSettingsData &soundSettings);
     void startAudio();
     void stopAudio();
     void setVolume(const int value);

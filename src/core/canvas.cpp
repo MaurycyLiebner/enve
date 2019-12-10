@@ -36,6 +36,7 @@
 #include "pointtypemenu.h"
 #include "Animators/transformanimator.h"
 #include "glhelpers.h"
+#include "Private/document.h"
 
 Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
@@ -91,6 +92,14 @@ void Canvas::setCurrentGroupParentAsCurrentGroup() {
     setCurrentBoxesGroup(mCurrentContainer->getParentGroup());
 }
 
+void Canvas::queTasks() {
+    if(Actions::sInstance->smoothChange() && mCurrentContainer) {
+        if(!mDrawnSinceQue) return;
+        mCurrentContainer->queChildrenTasks();
+    } else ContainerBox::queTasks();
+    mDrawnSinceQue = false;
+}
+
 void Canvas::setCurrentBoxesGroup(ContainerBox * const group) {
     if(mCurrentContainer) {
         mCurrentContainer->setIsCurrentGroup_k(false);
@@ -125,6 +134,10 @@ void Canvas::clearHovered() {
     mHoveredBox.clear();
     mHoveredPoint_d.clear();
     mHoveredNormalSegment.clear();
+}
+
+bool Canvas::getPivotLocal() const {
+    return mDocument.fLocalPivot;
 }
 
 void Canvas::updateHovered(const MouseEvent& e) {

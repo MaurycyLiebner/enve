@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "scenechooser.h"
-#include "document.h"
+#include "Private/document.h"
 #include "canvas.h"
 
 SceneChooser::SceneChooser(Document& document, const bool active,

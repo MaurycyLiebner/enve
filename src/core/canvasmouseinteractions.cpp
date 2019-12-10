@@ -44,9 +44,10 @@ void Canvas::handleMovePathMousePressEvent(const MouseEvent& e) {
 #include <QInputDialog>
 #include "PathEffects/patheffect.h"
 #include "GUI/newcanvasdialog.h"
+#include "Private/document.h"
+
 void Canvas::addActionsToMenu(QMenu *const menu) {
-    const BoxesClipboard * const clipboard =
-            mDocument.getBoxesClipboard();
+    const auto clipboard = mDocument.getBoxesClipboard();
     if(clipboard) {
         QAction * const pasteAct = menu->addAction("Paste", this,
                                                   &Canvas::pasteAction);

@@ -23,7 +23,7 @@
 
 SoundComposition::SoundComposition(Canvas * const parent) :
     QIODevice(parent), mParent(parent) {
-    connect(&eSoundSettings::sSettings, &eSoundSettings::settingsChanged,
+    connect(eSoundSettings::sInstance, &eSoundSettings::settingsChanged,
             this, [this]() {
         mSettings = eSoundSettings::sData();
         mSecondsCache.clear();
@@ -129,7 +129,7 @@ SoundMerger *SoundComposition::scheduleSecond(const int secondId) {
             }
         }
     }
-    task->scheduleTask();
+    task->queTask();
     return task.get();
 }
 

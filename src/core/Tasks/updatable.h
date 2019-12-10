@@ -27,7 +27,6 @@ class HddExecController;
 
 enum class eTaskState {
     created,
-    scheduled,
     qued,
     processing,
     finished,
@@ -42,7 +41,7 @@ class eTask : public StdSelfRef {
 protected:
     eTask() {}
 
-    virtual void scheduleTaskNow() = 0;
+    virtual void queTaskNow() = 0;
     virtual void afterQued() {}
     virtual void beforeProcessing(const Hardware) {}
     virtual void afterProcessing() {}
@@ -63,14 +62,8 @@ public:
 
     virtual bool nextStep() { return false; }
 
-    void taskQued() {
-        mState = eTaskState::qued;
-        afterQued();
-    }
-
-    bool scheduleTask();
+    bool queTask();
     bool isQued() { return mState == eTaskState::qued; }
-    bool isScheduled() { return mState == eTaskState::scheduled; }
 
     bool isActive() { return mState != eTaskState::created &&
                              mState != eTaskState::finished; }
@@ -142,7 +135,7 @@ public:
         Q_UNUSED(context);
     }
 protected:
-    void scheduleTaskNow() final;
+    void queTaskNow() final;
 };
 
 class eHddTask : public eTask {
@@ -158,7 +151,7 @@ public:
         Q_UNUSED(context);
     }
 protected:
-    void scheduleTaskNow();
+    void queTaskNow();
     void hddPartFinished();
 public:
     void setController(HddExecController * const contr) {

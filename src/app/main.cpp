@@ -131,8 +131,10 @@ int main(int argc, char *argv[]) {
 
     splash->showMessage("Initialize audio...");
     app.processEvents();
+
+    eSoundSettings soundSettings;
     AudioHandler audioHandler;
-    audioHandler.initializeAudio();
+    audioHandler.initializeAudio(soundSettings.sData());
 
     splash->showMessage("Initialize render handler...");
     app.processEvents();

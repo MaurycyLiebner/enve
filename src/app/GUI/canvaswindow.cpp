@@ -20,7 +20,6 @@
 #include "mainwindow.h"
 #include "GUI/BoxesList/boxscroller.h"
 #include "singlewidgetabstraction.h"
-#include "Tasks/taskexecutor.h"
 #include "renderoutputwidget.h"
 #include "Sound/soundcomposition.h"
 #include "GUI/global.h"
@@ -239,6 +238,12 @@ void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
                            [this]() { grabMouse(); },
                            this));
     queTasksAndUpdate();
+}
+
+void CanvasWindow::KFT_setFocusToWidget() {
+    if(mCurrentCanvas) mDocument.setActiveScene(mCurrentCanvas);
+    setFocus();
+    update();
 }
 
 void CanvasWindow::openSettingsWindowForCurrentCanvas() {

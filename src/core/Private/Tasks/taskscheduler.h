@@ -17,7 +17,7 @@
 #ifndef TASKSCHEDULER_H
 #define TASKSCHEDULER_H
 #include <QObject>
-#include "updatable.h"
+#include "Tasks/updatable.h"
 #include "gpupostprocessor.h"
 #include "taskquehandler.h"
 class Canvas;
@@ -73,22 +73,12 @@ public:
     void initializeGpu();
 
     void queTasks();
-    void queCpuTaskFastTrack(const stdsptr<eTask>& task);
+    void queHddTask(const stdsptr<eTask>& task);
     void queCpuTask(const stdsptr<eTask> &task);
 
-    void scheduleCpuTask(const stdsptr<eTask> &task);
-    void scheduleHddTask(const stdsptr<eTask> &task);
     void scheduleGpuTask(const stdsptr<eTask>& task);
 
     void clearTasks() {
-        for(const auto& cpuTask : mScheduledCpuTasks)
-            cpuTask->cancel();
-        mScheduledCpuTasks.clear();
-
-        for(const auto& hddTask : mScheduledHddTasks)
-            hddTask->cancel();
-        mScheduledHddTasks.clear();
-
         mQuedCpuTasks.clear();
 
         for(const auto& hddTask : mQuedHddTasks)
@@ -199,10 +189,8 @@ private:
 
     bool mAlwaysQue = false;
     bool mCpuQueing = false;
-    TaskQueHandler mQuedCpuTasks;
 
-    QList<stdsptr<eTask>> mScheduledCpuTasks;
-    QList<stdsptr<eTask>> mScheduledHddTasks;
+    TaskQueHandler mQuedCpuTasks;
     QList<stdsptr<eTask>> mQuedHddTasks;
 
     HddExecController *createNewBackupHddExecutor();

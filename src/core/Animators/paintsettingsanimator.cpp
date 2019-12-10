@@ -22,7 +22,7 @@
 #include "Boxes/pathbox.h"
 #include "gradientpoints.h"
 #include "gradient.h"
-#include "document.h"
+#include "Private/document.h"
 
 PaintSettingsAnimator::PaintSettingsAnimator(const QString &name,
                                              GradientPoints * const grdPts,

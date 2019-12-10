@@ -30,7 +30,7 @@
 #include "animationwidgetscrollbar.h"
 #include "GUI/global.h"
 #include "renderinstancesettings.h"
-#include "document.h"
+#include "Private/document.h"
 #include "layouthandler.h"
 #include "memoryhandler.h"
 

@@ -42,18 +42,18 @@ VideoEncoder::VideoEncoder() {
 void VideoEncoder::addContainer(const stdsptr<SceneFrameContainer>& cont) {
     if(!cont) return;
     mNextContainers.append(cont);
-    if(getState() < eTaskState::qued || getState() > eTaskState::processing) scheduleTask();
+    if(getState() < eTaskState::qued || getState() > eTaskState::processing) queTask();
 }
 
 void VideoEncoder::addContainer(const stdsptr<Samples>& cont) {
     if(!cont) return;
     mNextSoundConts.append(cont);
-    if(getState() < eTaskState::qued || getState() > eTaskState::processing) scheduleTask();
+    if(getState() < eTaskState::qued || getState() > eTaskState::processing) queTask();
 }
 
 void VideoEncoder::allAudioProvided() {
     mAllAudioProvided = true;
-    if(getState() < eTaskState::qued || getState() > eTaskState::processing) scheduleTask();
+    if(getState() < eTaskState::qued || getState() > eTaskState::processing) queTask();
 }
 
 static AVFrame *allocPicture(enum AVPixelFormat pix_fmt,
@@ -733,7 +733,7 @@ void VideoEncoder::afterProcessing() {
         finishEncodingNow();
         mEmitter.encodingFailed();
     } else if(mEncodingFinished) finishEncodingSuccess();
-    else if(!mNextContainers.isEmpty()) scheduleTask();
+    else if(!mNextContainers.isEmpty()) queTask();
 }
 
 void VideoEncoder::sFinishEncoding() {

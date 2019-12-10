@@ -23,7 +23,7 @@ ImageLoader *ImageDataHandler::scheduleLoad() {
     if(mImage) return nullptr;
     if(mImageLoader) return mImageLoader.get();
     mImageLoader = enve::make_shared<ImageLoader>(mFilePath, this);
-    mImageLoader->scheduleTask();
+    mImageLoader->queTask();
     return mImageLoader.get();
 }
 

@@ -18,7 +18,7 @@
 #include "Sound/soundcomposition.h"
 
 AudioStreamsData::AudioStreamsData() {
-    connect(&eSoundSettings::sSettings, &eSoundSettings::settingsChanged,
+    connect(eSoundSettings::sInstance, &eSoundSettings::settingsChanged,
             this, [this]() {
         updateSwrContext();
     });

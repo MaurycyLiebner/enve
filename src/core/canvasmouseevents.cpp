@@ -19,7 +19,7 @@
 #include "Boxes/textbox.h"
 #include "Boxes/rectangle.h"
 #include "Boxes/circle.h"
-
+#include "Private/document.h"
 #include "MovablePoints/pathpivot.h"
 
 void Canvas::newPaintBox(const QPointF &pos) {
@@ -132,7 +132,7 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
 }
 #include "MovablePoints/smartnodepoint.h"
 #include "MovablePoints/pathpointshandler.h"
-#include "document.h"
+#include "Private/document.h"
 void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
     if(e.fModifiers & Qt::ShiftModifier) return;
     mDoubleClick = true;

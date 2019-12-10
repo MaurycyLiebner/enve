@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "actions.h"
-#include "document.h"
+#include "Private/document.h"
 #include "canvas.h"
 #include "Paint/simplebrushwrapper.h"
 #include "paintsettingsapplier.h"

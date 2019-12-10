@@ -19,7 +19,7 @@
 #include <QLocale>
 #include <QHBoxLayout>
 #include "GUI/global.h"
-#include "Tasks/taskscheduler.h"
+#include "Private/Tasks/taskscheduler.h"
 #include <QProgressBar>
 
 class HardwareUsageWidget : public QProgressBar {

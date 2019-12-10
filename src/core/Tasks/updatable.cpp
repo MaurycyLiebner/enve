@@ -15,13 +15,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Tasks/updatable.h"
-#include "Tasks/taskscheduler.h"
-#include "taskexecutor.h"
+#include "Private/Tasks/taskscheduler.h"
+#include "Private/Tasks/taskexecutor.h"
 
-bool eTask::scheduleTask() {
-    if(mState == eTaskState::scheduled) return false;
-    mState = eTaskState::scheduled;
-    scheduleTaskNow();
+bool eTask::queTask() {
+    mState = eTaskState::qued;
+    afterQued();
+    queTaskNow();
     return true;
 }
 
@@ -100,12 +100,12 @@ void eTask::cancelDependent() {
     mDependentF.clear();
 }
 
-void eCpuTask::scheduleTaskNow() {
-    TaskScheduler::sGetInstance()->scheduleCpuTask(ref<eTask>());
+void eCpuTask::queTaskNow() {
+    TaskScheduler::sGetInstance()->queCpuTask(ref<eTask>());
 }
 
-void eHddTask::scheduleTaskNow() {
-    TaskScheduler::sGetInstance()->scheduleHddTask(ref<eTask>());
+void eHddTask::queTaskNow() {
+    TaskScheduler::sGetInstance()->queHddTask(ref<eTask>());
 }
 
 void eHddTask::hddPartFinished() {

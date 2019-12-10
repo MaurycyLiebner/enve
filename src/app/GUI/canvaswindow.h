@@ -22,7 +22,6 @@
 #include "singlewidgettarget.h"
 #include "keyfocustarget.h"
 #include "smartPointers/ememory.h"
-#include "Tasks/gpupostprocessor.h"
 #include "canvas.h"
 class Brush;
 class WindowSingleWidgetTarget;
@@ -31,7 +30,6 @@ enum class CanvasMode : short;
 class Gradient;
 class BoundingBox;
 class ContainerBox;
-class TaskExecutor;
 class SoundComposition;
 class PaintSettingsApplier;
 class RenderInstanceSettings;
@@ -97,11 +95,7 @@ public:
     void wheelEvent(QWheelEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
 protected:
-    void KFT_setFocusToWidget() {
-        if(mCurrentCanvas) mDocument.setActiveScene(mCurrentCanvas);
-        setFocus();
-        update();
-    }
+    void KFT_setFocusToWidget();
 
     void KFT_clearFocus() {
         clearFocus();

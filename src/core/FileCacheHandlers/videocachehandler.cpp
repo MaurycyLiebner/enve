@@ -106,7 +106,7 @@ eTask* VideoFrameHandler::scheduleFrameLoad(const int frame) {
     const auto loadTask = mDataHandler->scheduleFrameHddCacheLoad(frame);
     if(loadTask) return loadTask;
     const auto loader = addFrameLoader(frame);
-    loader->scheduleTask();
+    loader->queTask();
     return loader;
 }
 

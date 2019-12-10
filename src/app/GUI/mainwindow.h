@@ -23,9 +23,9 @@
 #include <QComboBox>
 #include <QPushButton>
 #include "undoredo.h"
-#include "Tasks/taskscheduler.h"
+#include "Private/Tasks/taskscheduler.h"
 #include "effectsloader.h"
-#include "document.h"
+#include "Private/document.h"
 #include "audiohandler.h"
 #include "actions.h"
 #include "layouthandler.h"

@@ -45,7 +45,7 @@ protected:
     void afterCanceled();
     void handleException();
 
-    void scheduleTaskNow();
+    void queTaskNow();
 
     void setFrameToConvert(AVFrame * const frame,
                            AVCodecContext * const codecContext) {

@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "timelinewrappernode.h"
-#include "document.h"
+#include "Private/document.h"
 
 TimelineWrapperNode::TimelineWrapperNode(Canvas * const scene) :
     WidgetWrapperNode([](Canvas* const scene) {

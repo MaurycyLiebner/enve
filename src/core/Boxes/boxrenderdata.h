@@ -44,11 +44,11 @@ protected:
 
     HardwareSupport hardwareSupport() const;
 
-    void scheduleTaskNow() final;
     void afterCanceled() {}
     void beforeProcessing(const Hardware hw) final;
     void afterProcessing() final;
     void afterQued() final;
+    void queTaskNow() final;
 
     virtual SkColor eraseColor() const {
         return SK_ColorTRANSPARENT;

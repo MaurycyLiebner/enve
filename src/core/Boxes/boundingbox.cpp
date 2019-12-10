@@ -23,7 +23,7 @@
 #include "skia/skqtconversions.h"
 #include "GUI/global.h"
 #include "MovablePoints/movablepoint.h"
-#include "Tasks/taskscheduler.h"
+#include "Private/Tasks/taskscheduler.h"
 #include "Animators/rastereffectanimators.h"
 #include "Animators/transformanimator.h"
 #include "RasterEffects/rastereffect.h"
@@ -384,7 +384,7 @@ stdsptr<BoxRenderData> BoundingBox::queRender(const qreal relFrame) {
     const auto currentRenderData = updateCurrentRenderData(relFrame);
     setupRenderData(relFrame, currentRenderData, mParentScene);
     const auto currentSPtr = enve::shared(currentRenderData);
-    TaskScheduler::sInstance->queCpuTask(currentSPtr);
+    currentSPtr->queTask();
     return currentSPtr;
 }
 

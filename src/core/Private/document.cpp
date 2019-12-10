@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "document.h"
+#include "Private/document.h"
 #include "FileCacheHandlers/filecachehandler.h"
 #include "canvas.h"
 #include "simpletask.h"

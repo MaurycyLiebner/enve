@@ -27,6 +27,7 @@
 #include "Animators/rastereffectanimators.h"
 #include "Animators/outlinesettingsanimator.h"
 #include "PathEffects/patheffectstask.h"
+#include "Private/Tasks/taskscheduler.h"
 
 PathBox::PathBox(const eBoxType type) : BoxWithPathEffects(type) {
     connect(this, &eBoxOrSound::parentChanged, this, [this]() {
@@ -154,8 +155,8 @@ void PathBox::setupRenderData(const qreal relFrame,
                     pathData, std::move(pathEffects), std::move(fillEffects),
                     std::move(outlineBaseEffects), std::move(outlineEffects));
         pathTask->addDependent(pathData);
-        TaskScheduler::sInstance->queCpuTask(pathTask);
         pathData->delayDataSet();
+        pathTask->queTask();
     }
 
     if(currentOutlinePathCompatible && currentFillPathCompatible) {

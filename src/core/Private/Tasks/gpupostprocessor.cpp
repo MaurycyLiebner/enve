@@ -18,7 +18,7 @@
 #include <QImage>
 #include <QOpenGLTexture>
 #include "skia/skqtconversions.h"
-#include "Tasks/taskscheduler.h"
+#include "Private/Tasks/taskscheduler.h"
 
 GpuPostProcessor::GpuPostProcessor() {
     connect(this, &QThread::finished,
@@ -36,7 +36,7 @@ void GpuPostProcessor::afterProcessed() {
     mAllDone = true;
     for(const auto& task : _mHandledProcesses) {
         const bool nextStep = !task->waitingToCancel() && task->nextStep();
-        if(nextStep) TaskScheduler::sGetInstance()->queCpuTaskFastTrack(task);
+        if(nextStep) TaskScheduler::sGetInstance()->queCpuTask(task);
         else task->finishedProcessing();
     }
     _mHandledProcesses.clear();

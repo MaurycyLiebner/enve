@@ -29,6 +29,7 @@
 #include "paintsettingsapplier.h"
 #include "Animators/gradient.h"
 #include "esettings.h"
+#include "Private/document.h"
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
                                                    QWidget * const parent) :

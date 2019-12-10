@@ -16,56 +16,59 @@
 
 #include "esoundsettings.h"
 
-eSoundSettings eSoundSettings::sSettings;
+eSoundSettings* eSoundSettings::sInstance = nullptr;
 
-eSoundSettings::eSoundSettings() {}
+eSoundSettings::eSoundSettings() {
+    Q_ASSERT(!sInstance);
+    sInstance = this;
+}
 
 int eSoundSettings::sSampleRate() {
-    return sSettings.fSampleRate;
+    return sInstance->fSampleRate;
 }
 
 AVSampleFormat eSoundSettings::sSampleFormat() {
-    return sSettings.fSampleFormat;
+    return sInstance->fSampleFormat;
 }
 
 uint64_t eSoundSettings::sChannelLayout() {
-    return sSettings.fChannelLayout;
+    return sInstance->fChannelLayout;
 }
 
 bool eSoundSettings::sPlanarFormat() {
-    return sSettings.planarFormat();
+    return sInstance->planarFormat();
 }
 
 int eSoundSettings::sChannelCount() {
-    return sSettings.channelCount();
+    return sInstance->channelCount();
 }
 
 int eSoundSettings::sBytesPerSample() {
-    return sSettings.bytesPerSample();
+    return sInstance->bytesPerSample();
 }
 
-eSoundSettingsData eSoundSettings::sData() {
-    return sSettings;
+const eSoundSettingsData& eSoundSettings::sData() {
+    return *sInstance;
 }
 
 void eSoundSettings::sSetSampleRate(const int sampleRate) {
-    sSettings.setSampleRate(sampleRate);
+    sInstance->setSampleRate(sampleRate);
 }
 
 void eSoundSettings::sSetSampleFormat(const AVSampleFormat format) {
-    sSettings.setSampleFormat(format);
+    sInstance->setSampleFormat(format);
 }
 
 void eSoundSettings::sSetChannelLayout(const uint64_t layout) {
-    sSettings.setChannelLayout(layout);
+    sInstance->setChannelLayout(layout);
 }
 
 void eSoundSettings::sSave() {
-    sSettings.save();
+    sInstance->save();
 }
 
 void eSoundSettings::sRestore() {
-    sSettings.restore();
+    sInstance->restore();
 }
 
 void eSoundSettings::save() {

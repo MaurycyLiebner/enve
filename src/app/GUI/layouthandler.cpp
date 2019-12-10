@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "layouthandler.h"
-
+#include "Private/document.h"
 #include <QPushButton>
 
 LayoutHandler::LayoutHandler(Document& document,

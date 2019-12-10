@@ -32,7 +32,6 @@
 #include "Paint/animatedsurface.h"
 #include <QAction>
 #include "Animators/outlinesettingsanimator.h"
-#include "document.h"
 #include "Paint/painttarget.h"
 #include "CacheHandlers/usesharedpointer.h"
 #include "CacheHandlers/sceneframecontainer.h"
@@ -53,6 +52,7 @@ struct ShaderEffectCreator;
 class SingleSound;
 class VideoBox;
 class ImageBox;
+class Document;
 
 enum CtrlsMode : short;
 
@@ -448,9 +448,7 @@ public:
     void clearHoveredEdge();
     void clearHovered();
 
-    bool getPivotLocal() const {
-        return mDocument.fLocalPivot;
-    }
+    bool getPivotLocal() const;
 
     int getMaxFrame();
 
@@ -577,13 +575,7 @@ public:
         return mPaintTarget.isValid();
     }
 
-    void queTasks() {
-        if(Actions::sInstance->smoothChange() && mCurrentContainer) {
-            if(!mDrawnSinceQue) return;
-            mCurrentContainer->queChildrenTasks();
-        } else ContainerBox::queTasks();
-        mDrawnSinceQue = false;
-    }
+    void queTasks();
 
     void setMinFrameUseRange(const int min) {
         mSceneFramesHandler.setMinUseRange(min);

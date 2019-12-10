@@ -29,7 +29,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "timelinedockwidget.h"
-#include "Tasks/taskexecutor.h"
+#include "Private/Tasks/taskexecutor.h"
 #include "qdoubleslider.h"
 #include "svgimporter.h"
 #include "canvaswindow.h"

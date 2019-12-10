@@ -49,7 +49,7 @@ QMimeData *SmartPathAnimator::SWT_createMimeData() {
 }
 
 #include "typemenu.h"
-#include "document.h"
+#include "Private/document.h"
 void SmartPathAnimator::setupTreeViewMenu(PropertyMenu * const menu) {
     const auto spClipboard = Document::sInstance->getSmartPathClipboard();
     menu->addPlainAction("Paste Path", [this, spClipboard]() {

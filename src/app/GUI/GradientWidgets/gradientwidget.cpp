@@ -194,6 +194,14 @@ void GradientWidget::updateAfterFrameChanged(const int absFrame) {
         gradient->anim_setAbsFrame(absFrame);
 }
 
+int GradientWidget::getGradientsCount() const {
+    return Document::sInstance->fGradients.count();
+}
+
+Gradient *GradientWidget::getGradientAt(const int id) const {
+    return Document::sInstance->fGradients.at(id).get();
+}
+
 void GradientWidget::gradientLeftPressed(const int gradId) {
     if(gradId >= Document::sInstance->fGradients.count() || gradId < 0) return;
     setCurrentGradient(gradId);

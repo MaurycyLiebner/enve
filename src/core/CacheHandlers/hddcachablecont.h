@@ -43,14 +43,14 @@ public:
         const auto updatable =
                 enve::make_shared<TmpDeleter>(mTmpFile);
         mTmpFile.reset();
-        updatable->scheduleTask();
+        updatable->queTask();
         return updatable.get();
     }
 
     eTask* scheduleSaveToTmpFile() {
         if(mTmpSaveTask || mTmpFile) return nullptr;
         mTmpSaveTask = createTmpFileDataSaver();
-        mTmpSaveTask->scheduleTask();
+        mTmpSaveTask->queTask();
         return mTmpSaveTask.get();
     }
 
@@ -62,7 +62,7 @@ public:
         mTmpLoadTask = createTmpFileDataLoader();
         if(mTmpSaveTask)
             mTmpSaveTask->addDependent(mTmpLoadTask.get());
-        mTmpLoadTask->scheduleTask();
+        mTmpLoadTask->queTask();
         return mTmpLoadTask.get();
     }
 

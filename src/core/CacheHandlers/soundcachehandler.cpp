@@ -19,7 +19,7 @@
 #include "Sound/singlesound.h"
 
 SoundDataHandler::SoundDataHandler() {
-    connect(&eSoundSettings::sSettings, &eSoundSettings::settingsChanged,
+    connect(eSoundSettings::sInstance, &eSoundSettings::settingsChanged,
             this, [this]() {
         mSecondsCache.clear();
     });
@@ -42,7 +42,7 @@ SoundReaderForMerger *SoundHandler::addSecondReader(const int secondId) {
     const auto reader = enve::make_shared<SoundReaderForMerger>(
                 this, mAudioStreamsData, secondId, range);
     mDataHandler->addSecondReader(secondId, reader);
-    reader->scheduleTask();
+    reader->queTask();
     return reader.get();
 }
 

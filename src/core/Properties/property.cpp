@@ -19,7 +19,7 @@
 #include "undoredo.h"
 #include "Animators/transformanimator.h"
 #include "typemenu.h"
-#include "document.h"
+#include "Private/document.h"
 #include "canvas.h"
 
 Property::Property(const QString& name) :

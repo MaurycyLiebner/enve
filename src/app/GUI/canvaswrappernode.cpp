@@ -16,6 +16,7 @@
 
 #include "canvaswrappernode.h"
 #include "scenechooser.h"
+#include "Private/document.h"
 
 class CanvasWrapperMenuBar : public StackWrapperMenu {
 public:

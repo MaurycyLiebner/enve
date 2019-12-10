@@ -49,11 +49,10 @@ struct eSoundSettingsData {
 
 class eSoundSettings : public QObject, private eSoundSettingsData {
     Q_OBJECT
-
-    eSoundSettings();
-    eSoundSettingsData mSaved;
 public:
-    static eSoundSettings sSettings;
+    eSoundSettings();
+
+    static eSoundSettings* sInstance;
 
     static int sSampleRate();
     static AVSampleFormat sSampleFormat();
@@ -61,7 +60,7 @@ public:
     static bool sPlanarFormat();
     static int sChannelCount();
     static int sBytesPerSample();
-    static eSoundSettingsData sData();
+    static const eSoundSettingsData &sData();
 
     static void sSetSampleRate(const int sampleRate);
     static void sSetSampleFormat(const AVSampleFormat format);
@@ -79,6 +78,7 @@ public:
     void setChannelLayout(const uint64_t layout);
 private:
     using eSoundSettingsData::operator=;
+    eSoundSettingsData mSaved;
 signals:
     void settingsChanged();
 };

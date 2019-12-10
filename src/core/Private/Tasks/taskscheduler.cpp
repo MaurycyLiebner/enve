@@ -14,11 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "Tasks/taskscheduler.h"
+#include "taskscheduler.h"
 #include "Boxes/boxrenderdata.h"
-#include "Tasks/gpupostprocessor.h"
+#include "gpupostprocessor.h"
 #include "canvas.h"
 #include "taskexecutor.h"
+#include "../document.h"
 #include <QThread>
 
 TaskScheduler *TaskScheduler::sInstance = nullptr;
@@ -65,32 +66,17 @@ void TaskScheduler::initializeGpu() {
     }
 }
 
-void TaskScheduler::scheduleCpuTask(const stdsptr<eTask>& task) {
-    mScheduledCpuTasks << task;
-}
-
-void TaskScheduler::scheduleHddTask(const stdsptr<eTask>& task) {
-    mScheduledHddTasks << task;
-}
-
 void TaskScheduler::scheduleGpuTask(const stdsptr<eTask> &task) {
     mGpuPostProcessor.addToProcess(task);
 }
 
-void TaskScheduler::queCpuTask(const stdsptr<eTask>& task) {
-    task->taskQued();
-    mQuedCpuTasks.addTask(task);
-    if(task->readyToBeProcessed()) {
-        if(task->hardwareSupport() == HardwareSupport::cpuOnly ||
-           !processNextQuedGpuTask()) {
-            processNextQuedCpuTask();
-        }
-    }
+void TaskScheduler::queHddTask(const stdsptr<eTask>& task) {
+    mQuedHddTasks << task;
+    tryProcessingNextQuedHddTask();
 }
 
-void TaskScheduler::queCpuTaskFastTrack(const stdsptr<eTask>& task) {
-    task->taskQued();
-    mQuedCpuTasks.addTaskFastTrack(task);
+void TaskScheduler::queCpuTask(const stdsptr<eTask>& task) {
+    mQuedCpuTasks.addTask(task);
     if(task->readyToBeProcessed()) {
         if(task->hardwareSupport() == HardwareSupport::cpuOnly ||
            !processNextQuedGpuTask()) {
@@ -135,8 +121,6 @@ void TaskScheduler::queScheduledCpuTasks() {
         const auto scene = it.first;
         scene->queTasks();
     }
-    while(!mScheduledCpuTasks.isEmpty())
-        queCpuTask(mScheduledCpuTasks.takeLast());
     mQuedCpuTasks.endQue();
     mCpuQueing = false;
 
@@ -145,13 +129,7 @@ void TaskScheduler::queScheduledCpuTasks() {
 
 void TaskScheduler::queScheduledHddTasks() {
     if(mHddThreadBusy) return;
-    for(int i = 0; i < mScheduledHddTasks.count(); i++) {
-        const auto task = mScheduledHddTasks.takeAt(i);
-        if(!task->isQued()) task->taskQued();
-
-        mQuedHddTasks << task;
-        tryProcessingNextQuedHddTask();
-    }
+    tryProcessingNextQuedHddTask();
 }
 
 void TaskScheduler::switchToBackupHddExecutor() {
@@ -246,7 +224,7 @@ void TaskScheduler::afterCpuTaskFinished(const stdsptr<eTask>& task,
                                          ExecController * const controller) {
     mFreeCpuExecs << static_cast<CpuExecController*>(controller);
     const bool nextStep = !task->waitingToCancel() && task->nextStep();
-    if(nextStep) queCpuTaskFastTrack(task);
+    if(nextStep) queCpuTask(task);
     else task->finishedProcessing();
     afterCpuGpuTaskFinished();
 }

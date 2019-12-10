@@ -18,7 +18,7 @@
 #include "boundingbox.h"
 #include "skia/skiahelpers.h"
 #include "efiltersettings.h"
-#include "Tasks/taskscheduler.h"
+#include "Private/Tasks/taskscheduler.h"
 
 BoxRenderData::BoxRenderData(BoundingBox * const parent) :
     fFilterQuality(eFilterSettings::sRender()) {
@@ -168,8 +168,8 @@ HardwareSupport BoxRenderData::hardwareSupport() const {
     }
 }
 
-void BoxRenderData::scheduleTaskNow() {
-    TaskScheduler::sGetInstance()->scheduleCpuTask(ref<eTask>());
+void BoxRenderData::queTaskNow() {
+    TaskScheduler::sGetInstance()->queCpuTask(ref<eTask>());
 }
 
 void BoxRenderData::dataSet() {

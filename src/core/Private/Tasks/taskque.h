@@ -14,33 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef TASKQUEHANDLER_H
-#define TASKQUEHANDLER_H
-#include "taskque.h"
+#ifndef TASKQUE_H
+#define TASKQUE_H
+#include "Tasks/updatable.h"
 
-class TaskQueHandler {
+class TaskQue {
+    friend class TaskQueHandler;
 public:
-    int countQues() const;
-    bool isEmpty() const;
+    explicit TaskQue();
+    TaskQue(const TaskQue&) = delete;
+    TaskQue& operator=(const TaskQue&) = delete;
 
-    void clear();
-
-    stdsptr<eTask> takeQuedForGpuProcessing();
-    stdsptr<eTask> takeQuedForCpuProcessing();
-
-    void beginQue();
-
+    ~TaskQue();
+protected:
+    int countQued() const;
+    bool allDone() const;
     void addTask(const stdsptr<eTask>& task);
-    void addTaskFastTrack(const stdsptr<eTask>& task);
 
-    void endQue();
-
-    int taskCount() const { return mTaskCount; }
+    stdsptr<eTask> takeQuedForCpuProcessing();
+    stdsptr<eTask> takeQuedForGpuProcessing();
 private:
-    void queDone(const TaskQue * const que, const int queId);
-
-    int mTaskCount = 0;
-    QList<stdsptr<TaskQue>> mQues;
-    TaskQue * mCurrentQue = nullptr;
+    QList<stdsptr<eTask>> mGpuOnly;
+    QList<stdsptr<eTask>> mGpuPreffered;
+    QList<stdsptr<eTask>> mQued;
 };
-#endif // TASKQUEHANDLER_H
+#endif // TASKQUE_H

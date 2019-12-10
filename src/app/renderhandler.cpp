@@ -17,12 +17,12 @@
 #include "renderhandler.h"
 #include "videoencoder.h"
 #include "memoryhandler.h"
-#include "Tasks/taskscheduler.h"
+#include "Private/Tasks/taskscheduler.h"
 #include "canvas.h"
 #include "Sound/soundcomposition.h"
 #include "CacheHandlers/soundcachecontainer.h"
 #include "CacheHandlers/sceneframecontainer.h"
-#include "document.h"
+#include "Private/document.h"
 
 RenderHandler* RenderHandler::sInstance = nullptr;
 

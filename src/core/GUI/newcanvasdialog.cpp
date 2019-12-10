@@ -154,6 +154,7 @@ void CanvasSettingsDialog::applySettingsToCanvas(Canvas * const canvas) const {
     }
 }
 
+#include "Private/document.h"
 void CanvasSettingsDialog::sNewCanvasDialog(Document& document,
                                             QWidget * const parent) {
     const QString defName = "Scene " +

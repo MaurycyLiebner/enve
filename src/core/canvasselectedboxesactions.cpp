@@ -19,6 +19,7 @@
 #include "PathEffects/patheffectsinclude.h"
 #include "Boxes/smartvectorpath.h"
 #include "Animators/SmartPath/smartpathcollection.h"
+#include "Private/document.h"
 
 void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.isEmpty()) return;
