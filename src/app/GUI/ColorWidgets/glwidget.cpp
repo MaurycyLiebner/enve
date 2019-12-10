@@ -27,7 +27,8 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent) {
 
 void GLWidget::initializeGL() {
     if(!initializeOpenGLFunctions())
-        RuntimeThrow("Initializing GL functions failed.");
+        RuntimeThrow("Initializing OpenGL 3.3 functions failed. "
+                     "Make sure your GPU supports OpenGL 3.3.");
 
     glClearColor(0, 0, 0, 1);
     //Set blending

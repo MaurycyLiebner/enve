@@ -76,7 +76,8 @@ void GLWindow::initializeGL() {
         if(context()->shareContext() != globalCtx)
             context()->setShareContext(globalCtx);
         if(!initializeOpenGLFunctions())
-            RuntimeThrow("Initializing GL functions failed.");
+            RuntimeThrow("Initializing OpenGL 3.3 functions failed. "
+                         "Make sure your GPU supports OpenGL 3.3.");
         initialize();
     } catch(const std::exception& e) {
         gPrintExceptionFatal(e);
