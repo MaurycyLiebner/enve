@@ -15,6 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #version 330 core
+layout(location = 0) out vec4 fragColor;
+
 in vec2 texCoord;
 
 uniform sampler2D texture;
@@ -36,5 +38,5 @@ void main(void) {
         }
     }
     Color /= float(steps)*float(directions) + 1.0;
-    gl_FragColor = Color;
+    fragColor = Color;
 }

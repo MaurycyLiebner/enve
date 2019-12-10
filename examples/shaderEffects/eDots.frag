@@ -15,6 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #version 330 core
+layout(location = 0) out vec4 fragColor;
+
 in vec2 texCoord;
 layout(pixel_center_integer) in vec4 gl_FragCoord;
 
@@ -48,8 +50,8 @@ void main(void) {
     }
     if(inDot) {
         vec4 texCol = texture2D(texture, texCoord);
-        gl_FragColor =  vec4(mixAlpha*texCol.rgb, mixAlpha*texCol.a);
+        fragColor =  vec4(mixAlpha*texCol.rgb, mixAlpha*texCol.a);
     } else {
-        gl_FragColor =  vec4(0.f, 0.f, 0.f, 0.f);
+        fragColor =  vec4(0.f, 0.f, 0.f, 0.f);
     }
 }

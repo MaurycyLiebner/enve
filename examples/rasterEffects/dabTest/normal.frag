@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #version 330 core
+layout(location = 0) out vec4 fragColor;
 in vec2 texCoord;
 
 uniform sampler2D dabData;
@@ -37,8 +38,8 @@ void main(void) {
     float fSeg2Offset = texelFetch(dabData, ivec2(14, 0), 0).r; // 14
     float fSeg2Slope = texelFetch(dabData, ivec2(15, 0), 0).r; // 15
 
-	float xp = texCoord.x;
-	float yp = texCoord.y;
+    float xp = texCoord.x;
+    float yp = texCoord.y;
 
     float yy = (yp - fY);
     float xx = (xp - fX);
@@ -46,12 +47,12 @@ void main(void) {
     float xxr = yy*fSinTh + xx*fCosTh;
     float rr = (yyr*yyr + xxr*xxr)/(fRadius*fRadius);
 	
-	if(rr > 1.f) {
-		gl_FragColor = vec4(0.f, 0.f, 0.f, 0.f);
-	} else {
-		float fac = (rr <= fHardness ? fSeg1Slope : fSeg2Slope);
-		float opa = (rr <= fHardness ? fSeg1Offset : fSeg2Offset) + rr*fac;
-		opa *= fAlpha;
-    	gl_FragColor = vec4(fRed*opa, fGreen*opa, fBlue*opa, opa);
-	}
+    if(rr > 1.f) {
+        fragColor = vec4(0.f, 0.f, 0.f, 0.f);
+    } else {
+        float fac = (rr <= fHardness ? fSeg1Slope : fSeg2Slope);
+        float opa = (rr <= fHardness ? fSeg1Offset : fSeg2Offset) + rr*fac;
+        opa *= fAlpha;
+        fragColor = vec4(fRed*opa, fGreen*opa, fBlue*opa, opa);
+    }
 }

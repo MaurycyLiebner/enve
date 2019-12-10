@@ -1,4 +1,5 @@
 #version 330 core
+layout(location = 0) out vec4 fragColor;
 in vec3 pos;
 
 uniform vec2 outerBorderSize;
@@ -19,7 +20,7 @@ void main(void) {
             posYFrac < 1.f - combinedBorderSize.y;
 
     if(noBorderH && noBorderV) {
-        gl_FragColor = vec4(0.f, 0.f, 0.f, 0.f);
+        fragColor = vec4(0.f, 0.f, 0.f, 0.f);
         return;
     }
 
@@ -29,8 +30,8 @@ void main(void) {
             posYFrac < 1.f - outerBorderSize.y;
 
     if(innerBorderH && innerBorderV) {
-        gl_FragColor = innerBorderColor;
+        fragColor = innerBorderColor;
         return;
     }
-    gl_FragColor = outerBorderColor;
+    fragColor = outerBorderColor;
 }

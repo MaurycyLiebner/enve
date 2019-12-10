@@ -1,4 +1,5 @@
 #version 330 core
+layout(location = 0) out vec4 fragColor;
 in vec3 pos;
 
 uniform vec2 borderSize;
@@ -12,8 +13,8 @@ void main(void) {
     bool noBorderV = posYFrac > borderSize.y && posYFrac < 1.f - borderSize.y;
 
     if(noBorderH && noBorderV) {
-        gl_FragColor = vec4(0.f, 0.f, 0.f, 0.f);
+        fragColor = vec4(0.f, 0.f, 0.f, 0.f);
         return;
     }
-    gl_FragColor = borderColor;
+    fragColor = borderColor;
 }

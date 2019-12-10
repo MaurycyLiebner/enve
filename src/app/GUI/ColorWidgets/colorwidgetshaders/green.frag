@@ -1,4 +1,5 @@
 #version 330 core
+layout(location = 0) out vec4 fragColor;
 in vec3 pos;
 
 uniform vec3 RGBColor;
@@ -11,12 +12,12 @@ void main(void) {
     float fragGreen = 0.5f*(1.f + pos.x);
     if(abs(currentValue - fragGreen) < handleWidth) {
         if(lightHandle) {
-            gl_FragColor = vec4(1.f, 1.f, 1.f, 1.f);
+            fragColor = vec4(1.f, 1.f, 1.f, 1.f);
         } else {
-            gl_FragColor = vec4(0.f, 0.f, 0.f, 1.f);
+            fragColor = vec4(0.f, 0.f, 0.f, 1.f);
         }
         return;
     }
 
-    gl_FragColor = vec4(RGBColor.x, fragGreen, RGBColor.z, 1.f);
+    fragColor = vec4(RGBColor.x, fragGreen, RGBColor.z, 1.f);
 }

@@ -1,4 +1,5 @@
 #version 330 core
+layout(location = 0) out vec4 fragColor;
 in vec3 pos;
 
 uniform vec4 RGBAColor;
@@ -15,8 +16,8 @@ void main(void) {
         } else {
             meshColor = vec3(0.4f, 0.4f, 0.4f);
         }
-        gl_FragColor = vec4(mix(meshColor, RGBAColor.rgb, RGBAColor.a), 1.f);
+        fragColor = vec4(mix(meshColor, RGBAColor.rgb, RGBAColor.a), 1.f);
         return;
     }
-    gl_FragColor = vec4(RGBAColor.rgb, 1.f);
+    fragColor = vec4(RGBAColor.rgb, 1.f);
 }
