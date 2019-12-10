@@ -74,6 +74,7 @@ SOURCES += main.cpp\
     GUI/ewidgetsimpl.cpp \
     GUI/layouthandler.cpp \
     GUI/scenechooser.cpp \
+    GUI/settingsdialog.cpp \
     GUI/timelinebasewrappernode.cpp \
     GUI/timelinedockwidget.cpp \
     GUI/timelinewidget.cpp \
@@ -94,7 +95,6 @@ SOURCES += main.cpp\
     GUI/widgetwrappernode.cpp \
     GUI/wrappernode.cpp \
     effectsloader.cpp \
-    esettings.cpp \
     evfileio.cpp \
     hardwareinfo.cpp \
     iconloader.cpp \
@@ -169,6 +169,7 @@ HEADERS  += \
     GUI/ewidgetsimpl.h \
     GUI/layouthandler.h \
     GUI/scenechooser.h \
+    GUI/settingsdialog.h \
     GUI/timelinebasewrappernode.h \
     GUI/timelinedockwidget.h \
     GUI/timelinewidget.h \
@@ -189,7 +190,6 @@ HEADERS  += \
     GUI/widgetwrappernode.h \
     GUI/wrappernode.h \
     effectsloader.h \
-    esettings.h \
     hardwareinfo.h \
     iconloader.h \
     outputsettings.h \

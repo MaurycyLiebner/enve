@@ -21,9 +21,10 @@
 #include "exceptions.h"
 #include <QOffscreenSurface>
 
-class OffscreenQGL33c : protected QGL33 {
+class OffscreenQGL33c : public QGL33 {
 public:
     OffscreenQGL33c();
+    ~OffscreenQGL33c();
 
     void initialize() {
         mOffscreenSurface = new QOffscreenSurface(nullptr, nullptr);

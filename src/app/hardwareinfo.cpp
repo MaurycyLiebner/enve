@@ -25,6 +25,8 @@ int HardwareInfo::mCpuThreads = -1;
 long HardwareInfo::mRamBytes = -1;
 int HardwareInfo::mRamKB = -1;
 
+GpuVendor HardwareInfo::mGpuVendor = GpuVendor::unrecognized;
+
 long getTotalRamBytes() {
     FILE * const meminfo = fopen("/proc/meminfo", "r");
     if(meminfo) {
@@ -43,8 +45,37 @@ long getTotalRamBytes() {
     RuntimeThrow("Failed to open /proc/meminfo");
 }
 
+#include "Private/Tasks/offscreenqgl33c.h"
+
+GpuVendor gpuVendor() {
+    OffscreenQGL33c gl;
+    gl.initialize();
+    gl.makeCurrent();
+    const QString vendor(reinterpret_cast<const char*>(gl.glGetString(GL_VENDOR)));
+    const QString renderer(reinterpret_cast<const char*>(gl.glGetString(GL_RENDERER)));
+    const QString version(reinterpret_cast<const char*>(gl.glGetString(GL_VERSION)));
+    gl.doneCurrent();
+    const auto checkVendor = [&vendor, &renderer, &version](const QString& str) {
+        return vendor.contains(str, Qt::CaseInsensitive) ||
+               renderer.contains(str, Qt::CaseInsensitive) ||
+               version.contains(str, Qt::CaseInsensitive);
+    };
+
+    if(checkVendor("nvidia")) return GpuVendor::nvidia;
+    if(checkVendor("intel")) return GpuVendor::nvidia;
+    if(checkVendor("amd") || checkVendor("ati") ||
+       checkVendor("advanced micro devices")) {
+        return GpuVendor::amd;
+    }
+    return GpuVendor::unrecognized;
+}
+
 void HardwareInfo::sUpdateInfo() {
     mCpuThreads = QThread::idealThreadCount();
     mRamBytes = getTotalRamBytes();
     mRamKB = static_cast<int>(mRamBytes/1000);
+    mGpuVendor = gpuVendor();
+    eSettings::sInstance->fRamBytes = mRamBytes;
+    eSettings::sInstance->fCpuThreads = mCpuThreads;
+    eSettings::sInstance->fGpuVendor = mGpuVendor;
 }

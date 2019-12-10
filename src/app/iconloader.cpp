@@ -20,7 +20,7 @@
 #include <QSvgRenderer>
 #include <QPainter>
 
-#include "esettings.h"
+#include "Private/esettings.h"
 #include "exceptions.h"
 
 void renderSvg(const QString& svgPath, QImage& image) {

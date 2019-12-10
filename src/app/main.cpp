@@ -19,6 +19,7 @@
 #include <QSurfaceFormat>
 #include <QProcess>
 #include "hardwareinfo.h"
+#include "Private/esettings.h"
 #include "GUI/ewidgetsimpl.h"
 #include "importhandler.h"
 #include "effectsloader.h"
@@ -64,6 +65,8 @@ int main(int argc, char *argv[]) {
     //    process->start("prlimit --data=3000000000 --pid " + QString::number(pId));
     //#endif
 
+    eSettings settings;
+    eFilterSettings filterSettings;
     QDir(eSettings::sSettingsDir()).mkpath(eSettings::sIconsDir());
     try {
         const QString pngPath = eSettings::sIconsDir() + "/splash.png";
@@ -81,6 +84,14 @@ int main(int argc, char *argv[]) {
     splash->showMessage("Update hardware info...");
     app.processEvents();
     HardwareInfo::sUpdateInfo();
+
+    splash->showMessage("Load settings...");
+    app.processEvents();
+    try {
+        settings.loadFromFile();
+    } catch(const std::exception& e) {
+        gPrintExceptionCritical(e);
+    }
 
     splash->showMessage("Generate icons...");
     app.processEvents();

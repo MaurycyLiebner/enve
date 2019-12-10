@@ -18,7 +18,7 @@
 #define WIDGETWRAPPERNODE_H
 
 #include <QMenuBar>
-#include "esettings.h"
+#include "Private/esettings.h"
 #include "wrappernode.h"
 
 class StackWrapperMenu : public QMenuBar {

@@ -20,9 +20,36 @@
 #include "skia/skiaincludes.h"
 #include "efiltersettings.h"
 
+enum class GpuVendor {
+    intel,
+    amd,
+    nvidia,
+    unrecognized
+};
+
+enum class AccPreference {
+    cpuStrongPreference,
+    cpuSoftPreference,
+    defaultPreference,
+    gpuSoftPreference,
+    gpuStrongPreference
+};
+
 class eSettings {
-    eSettings() {}
 public:
+    eSettings();
+
+    // accessors
+    static int sRamMBCap();
+    static int sCpuThreadsCapped();
+    static const QString& sSettingsDir();
+    static QString sIconsDir();
+    static eSettings* sInstance;
+
+    void loadDefaults();
+    void loadFromFile();
+    void saveToFile();
+
     // general
 #ifdef QT_DEBUG
     QString fUserSettingsDir = QDir::homePath() + "/.enveD";
@@ -30,15 +57,16 @@ public:
     QString fUserSettingsDir = QDir::homePath() + "/.enve";
 #endif
 
-    // quality
-    eFilterSettings fFilterSettings;
-
     // performance settings
+    int fCpuThreads = 0;
     int fCpuThreadsCap = 0; // <= 0 - use all available threads
 
-    long fRamBytesCap = 0; // <= 0 - cap at 80 %
+    long fRamBytes = 0;
+    int fRamMBCap = 0; // <= 0 - cap at 80 %
 
-    bool fGpuAcceleration = true;
+    GpuVendor fGpuVendor = GpuVendor::unrecognized;
+    AccPreference fAccPreference = AccPreference::defaultPreference;
+    bool fPathGpuAcc = true;
 
     bool fHddCache = true;
     QString fHddCacheFolder = ""; // "" - use system default temporary files folder
@@ -55,13 +83,6 @@ public:
     int fQuickSaveCap = 5; // <= 0 - no cap
     int fAutoQuickSaveMin = 0; // <= 0 - disabled
     AutosaveTarget fQuickSaveTarget = AutosaveTarget::same_folder;
-
-    // accessors
-    static long sRamBytesCap();
-    static int sCpuThreadsCapped();
-    static const QString& sSettingsDir();
-    static QString sIconsDir();
-    static eSettings sSettings;
 };
 
 #endif // SETTINGS_H

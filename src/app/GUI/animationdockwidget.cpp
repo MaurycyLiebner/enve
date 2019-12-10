@@ -20,7 +20,7 @@
 #include "GUI/global.h"
 #include "keysview.h"
 #include "actionbutton.h"
-#include "esettings.h"
+#include "Private/esettings.h"
 
 AnimationDockWidget::AnimationDockWidget(QWidget *parent,
                                          KeysView *keysView) :

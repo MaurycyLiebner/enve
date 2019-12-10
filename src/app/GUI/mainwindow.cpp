@@ -271,6 +271,7 @@ MainWindow::~MainWindow() {
 
 #include "noshortcutaction.h"
 #include "efiltersettings.h"
+#include "settingsdialog.h"
 void MainWindow::setupMenuBar() {
     mMenuBar = new QMenuBar(this);
 
@@ -345,6 +346,12 @@ void MainWindow::setupMenuBar() {
     mEditMenu->addAction(new NoShortcutAction("Clear Selection",
                          &mActions, &Actions::clearSelectionAction,
                          Qt::ALT + Qt::Key_A, mEditMenu));
+    mEditMenu->addSeparator();
+    mEditMenu->addAction("Settings...", [this]() {
+        const auto settDial = new SettingsDialog(this);
+        settDial->exec();
+    });
+
 
 //    mSelectSameMenu = mEditMenu->addMenu("Select Same");
 //    mSelectSameMenu->addAction("Fill and Stroke");

@@ -19,7 +19,7 @@
 class Canvas;
 #include "outputsettings.h"
 #include "smartPointers/ememory.h"
-#include "esettings.h"
+#include "Private/esettings.h"
 
 struct RenderSettings {
     qreal fResolution = 1;

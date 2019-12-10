@@ -41,7 +41,7 @@ public:
     }
 
     static void sSetSmartDisplay(const bool smart) {
-        sInstance->mSmartDisplay = smart;;
+        sInstance->mSmartDisplay = smart;
     }
 
     static SkFilterQuality sRender() {

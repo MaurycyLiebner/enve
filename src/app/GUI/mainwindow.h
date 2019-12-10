@@ -29,7 +29,7 @@
 #include "audiohandler.h"
 #include "actions.h"
 #include "layouthandler.h"
-#include "esettings.h"
+#include "Private/esettings.h"
 #include "renderhandler.h"
 #include "fileshandler.h"
 #include "ekeyfilter.h"

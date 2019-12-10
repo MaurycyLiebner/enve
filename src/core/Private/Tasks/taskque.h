@@ -36,6 +36,7 @@ protected:
 private:
     QList<stdsptr<eTask>> mGpuOnly;
     QList<stdsptr<eTask>> mGpuPreffered;
-    QList<stdsptr<eTask>> mQued;
+    QList<stdsptr<eTask>> mCpuPreffered;
+    QList<stdsptr<eTask>> mCpuOnly;
 };
 #endif // TASKQUE_H

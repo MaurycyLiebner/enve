@@ -19,3 +19,8 @@
 OffscreenQGL33c::OffscreenQGL33c() {
 
 }
+
+OffscreenQGL33c::~OffscreenQGL33c() {
+    delete mContext;
+    delete mOffscreenSurface;
+}

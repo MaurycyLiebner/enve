@@ -18,7 +18,7 @@
 
 #include <QPainter>
 
-#include "esettings.h"
+#include "Private/esettings.h"
 
 EnveSplash::EnveSplash() {
     mText = "Welcome to enve - open-source 2D animation software.\n\n"

@@ -20,7 +20,7 @@
 #include <QFileSystemWatcher>
 #include <QFileSystemModel>
 #include "ShaderEffects/shadereffectcreator.h"
-#include "esettings.h"
+#include "Private/esettings.h"
 
 EffectsLoader::EffectsLoader() {}
 

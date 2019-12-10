@@ -158,12 +158,18 @@ void BoxRenderData::afterQued() {
     if(!mDelayDataSet) dataSet();
 }
 
+#include "Private/esettings.h"
+
 HardwareSupport BoxRenderData::hardwareSupport() const {
     if(mStep == Step::EFFECTS) {
         return mEffectsRenderer.nextHardwareSupport();
     } else {
-        if(fParentBox && fParentBox->SWT_isLayerBox())
+        if(fParentBox && fParentBox->SWT_isLayerBox()) {
             return HardwareSupport::gpuPreffered;
+        } else if(!eSettings::sInstance->fPathGpuAcc &&
+                  fParentBox && fParentBox->SWT_isPathBox()) {
+            return HardwareSupport::cpuOnly;
+        }
         return HardwareSupport::cpuPreffered;
     }
 }

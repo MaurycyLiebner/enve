@@ -22,7 +22,7 @@ class BrushCollection;
 #include <mypaint-brush.h>
 #include "brushcontexedwrapper.h"
 #include "exceptions.h"
-#include "esettings.h"
+#include "Private/esettings.h"
 class FlowLayout;
 
 struct BrushCollectionData {

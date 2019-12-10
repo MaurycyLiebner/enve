@@ -15,35 +15,108 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "taskque.h"
+#include "Private/esettings.h"
 
 TaskQue::TaskQue() {}
 
 TaskQue::~TaskQue() {
-    for(const auto& cpuTask : mQued) cpuTask->cancel();
-    for(const auto& gcpuTask : mGpuPreffered) gcpuTask->cancel();
-    for(const auto& gpuTask : mGpuOnly) gpuTask->cancel();
+    for(const auto& task : mCpuOnly) task->cancel();
+    for(const auto& task : mCpuPreffered) task->cancel();
+    for(const auto& task : mGpuPreffered) task->cancel();
+    for(const auto& task : mGpuOnly) task->cancel();
 }
 
 int TaskQue::countQued() const {
-    return mQued.count() +
-           mGpuPreffered.count() +
-           mGpuOnly.count();
+    return mCpuOnly.count() + mCpuPreffered.count() +
+           mGpuPreffered.count() + mGpuOnly.count();
 }
 
 bool TaskQue::allDone() const { return countQued() == 0; }
 
 void TaskQue::addTask(const stdsptr<eTask> &task) {
     const auto hwSupport = task->hardwareSupport();
-    if(hwSupport == HardwareSupport::gpuOnly) mGpuOnly << task;
-    else if(hwSupport == HardwareSupport::gpuPreffered) mGpuPreffered << task;
-    else mQued << task;
+    switch(eSettings::sInstance->fAccPreference) {
+        case AccPreference::gpuStrongPreference:
+            switch(hwSupport) {
+                case HardwareSupport::gpuOnly:
+                case HardwareSupport::gpuPreffered:
+                case HardwareSupport::cpuPreffered:
+                    mGpuOnly << task;
+                    break;
+                case HardwareSupport::cpuOnly:
+                    mCpuOnly << task;
+                    break;
+            }
+            break;
+        case AccPreference::gpuSoftPreference:
+            switch(hwSupport) {
+                case HardwareSupport::gpuOnly:
+                case HardwareSupport::gpuPreffered:
+                    mGpuOnly << task;
+                    break;
+                case HardwareSupport::cpuPreffered:
+                    mCpuPreffered << task;
+                    break;
+                case HardwareSupport::cpuOnly:
+                    mCpuOnly << task;
+                    break;
+            }
+            break;
+        case AccPreference::defaultPreference:
+            switch(hwSupport) {
+                case HardwareSupport::gpuOnly:
+                    mGpuOnly << task;
+                    break;
+                case HardwareSupport::gpuPreffered:
+                    mGpuPreffered << task;
+                    break;
+                case HardwareSupport::cpuPreffered:
+                    mCpuPreffered << task;
+                    break;
+                case HardwareSupport::cpuOnly:
+                    mCpuOnly << task;
+                    break;
+            }
+            break;
+        case AccPreference::cpuSoftPreference:
+            switch(hwSupport) {
+                case HardwareSupport::gpuOnly:
+                    mGpuOnly << task;
+                    break;
+                case HardwareSupport::gpuPreffered:
+                    mGpuPreffered << task;
+                    break;
+                case HardwareSupport::cpuPreffered:
+                case HardwareSupport::cpuOnly:
+                    mCpuOnly << task;
+                    break;
+            }
+            break;
+        case AccPreference::cpuStrongPreference:
+            switch(hwSupport) {
+                case HardwareSupport::gpuOnly:
+                    mGpuOnly << task;
+                    break;
+                case HardwareSupport::gpuPreffered:
+                case HardwareSupport::cpuPreffered:
+                case HardwareSupport::cpuOnly:
+                    mCpuOnly << task;
+                    break;
+            }
+            break;
+    }
 }
 
 stdsptr<eTask> TaskQue::takeQuedForCpuProcessing() {
-    for(int i = 0; i < mQued.count(); i++) {
-        const auto& task = mQued.at(i);
+    for(int i = 0; i < mCpuOnly.count(); i++) {
+        const auto& task = mCpuOnly.at(i);
         if(task->readyToBeProcessed())
-            return mQued.takeAt(i);
+            return mCpuOnly.takeAt(i);
+    }
+    for(int i = 0; i < mCpuPreffered.count(); i++) {
+        const auto& task = mCpuPreffered.at(i);
+        if(task->readyToBeProcessed())
+            return mCpuPreffered.takeAt(i);
     }
     for(int i = 0; i < mGpuPreffered.count(); i++) {
         const auto& task = mGpuPreffered.at(i);
@@ -64,11 +137,11 @@ stdsptr<eTask> TaskQue::takeQuedForGpuProcessing() {
         if(task->readyToBeProcessed())
             return mGpuPreffered.takeAt(i);
     }
-    for(int i = 0; i < mQued.count(); i++) {
-        const auto& task = mQued.at(i);
+    for(int i = 0; i < mCpuPreffered.count(); i++) {
+        const auto& task = mCpuPreffered.at(i);
         if(!task->readyToBeProcessed()) continue;
         if(task->hardwareSupport() == HardwareSupport::cpuOnly) continue;
-        return mQued.takeAt(i);
+        return mCpuPreffered.takeAt(i);
     }
     return nullptr;
 }

@@ -21,7 +21,7 @@
 #include "rendersettingsdialog.h"
 #include "outputsettingsprofilesdialog.h"
 #include "outputsettingsdisplaywidget.h"
-#include "esettings.h"
+#include "Private/esettings.h"
 
 RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     ClosableContainer(parent) {
@@ -305,7 +305,7 @@ void RenderInstanceWidget::openRenderSettingsDialog() {
 
 }
 
-#include "esettings.h"
+#include "Private/esettings.h"
 OutputProfilesListButton::OutputProfilesListButton(RenderInstanceWidget *parent) :
     QPushButton(parent) {
     mParentWidget = parent;

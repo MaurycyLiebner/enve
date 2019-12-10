@@ -17,7 +17,7 @@
 #ifndef OUTPUTSETTINGS_H
 #define OUTPUTSETTINGS_H
 #include <QString>
-#include "esettings.h"
+#include "Private/esettings.h"
 #include "smartPointers/ememory.h"
 
 extern "C" {

@@ -168,6 +168,10 @@ QLabel {
     background: none;
 }
 
+QWidget:disabled {
+    color: grey;
+}
+
 QLabel#dockLabel {
     border: 0;
     border-bottom: 1px solid black;

@@ -16,7 +16,7 @@
 
 #include "closablecontainer.h"
 #include "GUI/global.h"
-#include "esettings.h"
+#include "Private/esettings.h"
 #include <QCheckBox>
 
 ClosableContainer::ClosableContainer(QWidget *parent) : QWidget(parent) {

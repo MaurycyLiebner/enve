@@ -99,6 +99,7 @@ SOURCES += \
     Boxes/linkcanvasrenderdata.cpp \
     Boxes/paintbox.cpp \
     Boxes/pathbox.cpp \
+    Boxes/pathboxrenderdata.cpp \
     Boxes/patheffectsmenu.cpp \
     Boxes/rectangle.cpp \
     Boxes/renderdatahandler.cpp \
@@ -169,6 +170,7 @@ SOURCES += \
     Private/Tasks/taskscheduler.cpp \
     Private/document.cpp \
     Private/documentrw.cpp \
+    Private/esettings.cpp \
     Properties/boxtargetproperty.cpp \
     RasterEffects/customrastereffect.cpp \
     RasterEffects/rastereffect.cpp \
@@ -321,6 +323,7 @@ HEADERS += \
     Boxes/linkcanvasrenderdata.h \
     Boxes/paintbox.h \
     Boxes/pathbox.h \
+    Boxes/pathboxrenderdata.h \
     Boxes/patheffectsmenu.h \
     Boxes/rectangle.h \
     Boxes/renderdatahandler.h \
@@ -396,6 +399,7 @@ HEADERS += \
     Private/Tasks/taskquehandler.h \
     Private/Tasks/taskscheduler.h \
     Private/document.h \
+    Private/esettings.h \
     Properties/boxtargetproperty.h \
     RasterEffects/customrastereffect.h \
     RasterEffects/rastereffect.h \

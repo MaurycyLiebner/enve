@@ -28,7 +28,7 @@
 #include <QDockWidget>
 #include "paintsettingsapplier.h"
 #include "Animators/gradient.h"
-#include "esettings.h"
+#include "Private/esettings.h"
 #include "Private/document.h"
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,

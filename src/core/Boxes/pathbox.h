@@ -23,52 +23,13 @@
 #include "Animators/paintsettingsanimator.h"
 #include "canvas.h"
 #include "Paint/autotiledsurface.h"
+#include "pathboxrenderdata.h"
 #include <mypaint-brush.h>
 class SmartVectorPath;
 class GradientPoints;
 class SkStroke;
 class PathEffectAnimators;
 class PathEffect;
-
-struct PathBoxRenderData : public BoxRenderData {
-    PathBoxRenderData(BoundingBox * const parentBoxT) :
-        BoxRenderData(parentBoxT) {}
-
-    SkPath fEditPath;
-    SkPath fPath;
-    SkPath fFillPath;
-    SkPath fOutlineBasePath;
-    SkPath fOutlinePath;
-    SkStroke fStroker;
-    UpdatePaintSettings fPaintSettings;
-    UpdateStrokeSettings fStrokeSettings;
-
-    void updateRelBoundingRect() {
-        SkPath totalPath;
-        totalPath.addPath(fFillPath);
-        totalPath.addPath(fOutlinePath);
-        fRelBoundingRect = toQRectF(totalPath.computeTightBounds());
-    }
-    QPointF getCenterPosition() {
-        return toQRectF(fEditPath.getBounds()).center();
-    }
-protected:
-    void drawSk(SkCanvas * const canvas) {
-        SkPaint paint;
-        paint.setAntiAlias(true);
-        paint.setStyle(SkPaint::kFill_Style);
-
-        if(!fFillPath.isEmpty()) {
-            fPaintSettings.applyPainterSettingsSk(&paint);
-            canvas->drawPath(fFillPath, paint);
-        }
-        if(!fOutlinePath.isEmpty()) {
-            paint.setShader(nullptr);
-            fStrokeSettings.applyPainterSettingsSk(&paint);
-            canvas->drawPath(fOutlinePath, paint);
-        }
-    }
-};
 
 class PathBox : public BoxWithPathEffects {
     e_OBJECT

@@ -16,10 +16,12 @@
 
 #ifndef HARDWAREINFO_H
 #define HARDWAREINFO_H
+#include "Private/esettings.h"
 
 class HardwareInfo {
     HardwareInfo() = delete;
 public:
+    static GpuVendor sGpuVendor();
     static void sUpdateInfo();
     static int sCpuThreads() { return mCpuThreads; }
 
@@ -30,6 +32,8 @@ private:
 
     static long mRamBytes;
     static int mRamKB;
+
+    static GpuVendor mGpuVendor;
 };
 
 #endif // HARDWAREINFO_H
