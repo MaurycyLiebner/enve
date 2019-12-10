@@ -113,6 +113,8 @@ void EffectsLoader::iniCustomBoxes() {
     newFileWatcher->setRootPath(dirPath);
     connect(newFileWatcher.get(), &QFileSystemModel::directoryLoaded,
             this, [this, newFileWatcher]() {
+        disconnect(newFileWatcher.get(), &QFileSystemModel::directoryLoaded,
+                   this, nullptr);
         connect(newFileWatcher.get(), &QFileSystemModel::rowsInserted, this,
         [newFileWatcher](const QModelIndex &parent, int first, int last) {
             for(int row = first; row <= last; row++) {
@@ -156,6 +158,8 @@ void EffectsLoader::iniCustomPathEffects() {
     newFileWatcher->setRootPath(dirPath);
     connect(newFileWatcher.get(), &QFileSystemModel::directoryLoaded,
             this, [this, newFileWatcher]() {
+        disconnect(newFileWatcher.get(), &QFileSystemModel::directoryLoaded,
+                   this, nullptr);
         connect(newFileWatcher.get(), &QFileSystemModel::rowsInserted, this,
         [newFileWatcher](const QModelIndex &parent, int first, int last) {
             for(int row = first; row <= last; row++) {
@@ -198,6 +202,8 @@ void EffectsLoader::iniCustomRasterEffects() {
     newFileWatcher->setRootPath(dirPath);
     connect(newFileWatcher.get(), &QFileSystemModel::directoryLoaded,
             this, [this, newFileWatcher]() {
+        disconnect(newFileWatcher.get(), &QFileSystemModel::directoryLoaded,
+                   this, nullptr);
         connect(newFileWatcher.get(), &QFileSystemModel::rowsInserted, this,
         [this, newFileWatcher](const QModelIndex &parent, int first, int last) {
             for(int row = first; row <= last; row++) {
@@ -245,6 +251,8 @@ void EffectsLoader::iniShaderEffects() {
     newFileWatcher->setRootPath(dirPath);
     connect(newFileWatcher.get(), &QFileSystemModel::directoryLoaded,
             this, [this, newFileWatcher]() {
+        disconnect(newFileWatcher.get(), &QFileSystemModel::directoryLoaded,
+                   this, nullptr);
         connect(newFileWatcher.get(), &QFileSystemModel::rowsInserted, this,
         [this, newFileWatcher](const QModelIndex &parent, int first, int last) {
             for(int row = first; row <= last; row++) {
