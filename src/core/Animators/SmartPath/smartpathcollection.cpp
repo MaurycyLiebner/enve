@@ -35,7 +35,7 @@ SmartNodePoint *SmartPathCollection::createNewSubPathAtRelPos(const QPointF &rel
     const auto newPath = createNewPath();
     const auto handler = newPath->getPointsHandler();
     const auto pathHandler = static_cast<PathPointsHandler*>(handler);
-    return pathHandler->addFirstNode(relPos);
+    return pathHandler->addNewAtEnd(relPos);
 }
 
 SmartNodePoint *SmartPathCollection::createNewSubPathAtPos(const QPointF &absPos) {
@@ -44,7 +44,7 @@ SmartNodePoint *SmartPathCollection::createNewSubPathAtPos(const QPointF &absPos
     const auto pathHandler = static_cast<PathPointsHandler*>(handler);
     const auto trans = handler->transform();
     const auto relPos = trans ? trans->mapAbsPosToRel(absPos) : absPos;
-    return pathHandler->addFirstNode(relPos);
+    return pathHandler->addNewAtEnd(relPos);
 }
 
 SkPath SmartPathCollection::getPathAtRelFrame(const qreal relFrame) const {

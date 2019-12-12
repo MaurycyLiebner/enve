@@ -19,6 +19,7 @@
 #include "Animators/SmartPath/smartpath.h"
 #include "smartnodepoint.h"
 #include "pointshandler.h"
+#include "simpletask.h"
 class Canvas;
 class SmartPathCollectionHandler;
 
@@ -45,11 +46,15 @@ public:
         return bestSeg;
     }
 
+    void scheduleRemoveNode(const int nodeId) {
+        mRemoveNodes << nodeId;
+        scheduleNodesRemoval();
+    }
+
     // actions on NORMAL
     void setCtrlsMode(const int nodeId, const CtrlsMode mode);
     void removeNode(const int nodeId, const bool approx);
     SmartNodePoint *addNewAtEnd(const QPointF &relPos);
-    SmartNodePoint *addFirstNode(const QPointF &relPos);
     // actions on DISSOLVED
 
     // actions on DUMMY and DISSOLVED
@@ -98,6 +103,16 @@ public:
         return mTargetAnimator;
     }
 private:
+    SimpleTaskScheduler scheduleNodesRemoval;
+
+    void flushNodesRemoval() {
+        std::sort(mRemoveNodes.begin(), mRemoveNodes.end());
+        for(auto it = mRemoveNodes.rbegin(); it != mRemoveNodes.rend(); it++) {
+            removeNode(*it, false);
+        }
+        mRemoveNodes.clear();
+    }
+
     void updatePoints(int min, int max) {
         const int lastId = count() - 1;
         min = clamp(min, 0, lastId);
@@ -114,6 +129,8 @@ private:
 
     SmartPathAnimator * const mTargetAnimator;
     bool mKeyOnCurrentFrame = false;
+
+    QList<int> mRemoveNodes;
 };
 
 #endif // PATHPOINTSHANDLER_H

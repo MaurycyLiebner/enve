@@ -106,7 +106,7 @@ void SmartNodePoint::setRelativePos(const QPointF &relPos) {
 }
 
 void SmartNodePoint::remove() {
-    actionRemove(false);
+    mHandler_k->scheduleRemoveNode(getNodeId());
 }
 
 void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {

@@ -20,6 +20,7 @@
 
 PathPointsHandler::PathPointsHandler(
         SmartPathAnimator * const targetAnimator) :
+    scheduleNodesRemoval([this]() { flushNodesRemoval(); }),
     mTargetAnimator(targetAnimator) {}
 
 SmartNodePoint *PathPointsHandler::createNewNodePoint(const int nodeId) {
@@ -63,19 +64,13 @@ void PathPointsHandler::setCtrlsMode(const int nodeId,
     mTargetAnimator->pathChanged();
 }
 
-void PathPointsHandler::removeNode(const int nodeId,
-                                   const bool approx) {
+void PathPointsHandler::removeNode(const int nodeId, const bool approx) {
     mTargetAnimator->actionRemoveNode(nodeId, approx);
-}
-
-SmartNodePoint* PathPointsHandler::addFirstNode(const QPointF &relPos) {
-    const int id = mTargetAnimator->actionAddFirstNode(relPos);
-    return createAndAssignNewNodePoint(id);
 }
 
 SmartNodePoint* PathPointsHandler::addNewAtEnd(const QPointF &relPos) {
     const int id = mTargetAnimator->actionAddNewAtEnd(relPos);
-    return createAndAssignNewNodePoint(id);
+    return getPointWithId<SmartNodePoint>(id);
 }
 
 void PathPointsHandler::promoteToNormal(const int nodeId) {
