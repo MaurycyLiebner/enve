@@ -4,6 +4,8 @@ Enve is a new open-source 2D animation software for Linux.
 You can use enve to create vector animations, raster animations, and even use sound and video files.
 Enve was created with flexibility and expandability in mind.
 
+![screenshot_1](https://user-images.githubusercontent.com/16670651/70745938-36e20900-1d25-11ea-9bdf-78d3fe402291.png)
+
 ## How to build
 
 Some of the provided terminal commands are applicable only to Ubuntu 16.04 and 18.04.
