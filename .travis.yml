@@ -1,0 +1,75 @@
+language: cpp
+dist: xenial
+compiler: g++
+sudo: required
+
+before_install:
+	- sudo add-apt-repository -y ppa:jonathonf/gcc
+	- sudo add-apt-repository -y ppa:jonathonf/ffmpeg-4
+	- sudo add-apt-repository -y ppa:beineri/opt-qt-5.12.6-xenial
+	- sudo apt-get update
+install:
+	- sudo apt-get -y install g++-7
+	- sudo apt-get -y install libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
+	- sudo apt-get -y install qt512base qt512multimedia qt512svg
+	- sudo apt-get -y install libgoogle-perftools-dev
+	- sudo apt-get -y install libglib2.0-dev
+	- sudo apt-get -y install unzip
+	- sudo apt-get -y install libjson-c-dev intltool pkg-config
+	- # skia dependencies
+	- sudo apt-get -y install build-essential freeglut3-dev libfontconfig-dev libfreetype6-dev libgif-dev libgl1-mesa-dev libglu1-mesa-dev libharfbuzz-dev libicu-dev libjpeg-dev libpng-dev libwebp-dev
+	- source /opt/qt512/bin/qt512-env.sh
+	- cd third_party
+	- tar xf skia.tar.xz
+	- cd skia
+	- python tools/git-sync-deps
+	- # sudo tools/install_dependencies.sh
+	- wget https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip
+	- unzip ninja-linux.zip
+	- chmod +x ninja
+	- bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] target_os="linux" target_cpu="x64" skia_use_system_expat=false skia_use_system_freetype2=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false skia_use_system_harfbuzz=false cc="gcc-7" cxx="g++-7"'
+	- ./ninja -C out/Release -j 2
+	- cd ..
+	- tar xf libmypaint.tar.xz
+	- cd libmypaint-1.3.0
+	- export CFLAGS='-fopenmp -Ofast -ftree-vectorize -fopt-info-vec-optimized -funsafe-math-optimizations -funsafe-loop-optimizations -fPIC'
+	- ./configure --enable-static --enable-openmp --enable-shared=false
+	- sudo make
+	- cd ../../
+before_script:
+	- cd build
+	- wget https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
+	- chmod +x linuxdeployqt-6-x86_64.AppImage
+	- wget https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/AppRun-patched-x86_64
+	- mv AppRun-patched-x86_64 AppRun
+	- chmod +x AppRun
+	- wget https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/exec-x86_64.so
+	- mv exec-x86_64.so exec.so
+	- cd Release
+script:
+	- /opt/qt512/bin/qmake ../../enve.pro
+	- make CC=gcc-7 CPP=g++-7 CXX=g++-7 LD=g++-7
+	- cd ..
+	- # Generate AppImage
+	- cp AppRun AppDir/
+	- cp exec.so AppDir/usr/optional
+	- mkdir AppDir/usr/optional/libstdc++
+	- cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 AppDir/usr/optional/libstdc++/
+	- cp Release/src/app/enve AppDir/usr/bin/
+	- cp -av Release/src/core/*.so* AppDir/usr/lib/
+	- ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage
+	- export VERSION=$(git rev-parse --short HEAD)
+	- mv ./enve-x86_64.AppImage ./enve-$VERSION-x86_64.AppImage 
+after_success:
+	- |
+      export GREP_PATH=grep;
+      curl -s -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/MaurycyLiebner/enve/commits/master -o repo.txt;
+      export REMOTE=$($GREP_PATH -Po '(?<=: \")(([a-z0-9])\w+)(?=\")' -m 1 repo.txt);
+      export LOCAL=$(git rev-parse HEAD);
+      if [[ "$REMOTE" != "$LOCAL" ]]; then echo "Build no longer current. $REMOTE vs $LOCAL - aborting upload."; exit 0; fi;
+      wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh;
+      bash upload.sh enve*.AppImage*;
+branches:
+  except:
+    - # Do not build tags that we create when we upload to GitHub Releases
+    - /^(?i:continuous)/
