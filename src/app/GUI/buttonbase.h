@@ -14,14 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "actionbutton.h"
-#include "GUI/global.h"
-#include <QPainter>
+#ifndef BUTTONBASE_H
+#define BUTTONBASE_H
 
-ActionButton::ActionButton(const QString &icon,
-                           const QString &toolTip,
-                           QWidget *parent) :
-    ButtonBase(toolTip, parent) {
-    mIcon.load(icon);
-    setCurrentIcon(mIcon);
-}
+#include <QWidget>
+
+class ButtonBase : public QWidget {
+    Q_OBJECT
+public:
+    explicit ButtonBase(const QString &toolTip,
+                        QWidget *parent = nullptr);
+    void setCurrentIcon(const QImage &icon);
+protected:
+    void mouseReleaseEvent(QMouseEvent *) final;
+    void mousePressEvent(QMouseEvent *) final;
+    void enterEvent(QEvent *) final;
+    void leaveEvent(QEvent *) final;
+
+    void paintEvent(QPaintEvent *) final;
+
+    virtual void toggle() {}
+private:
+    bool mHover = false;
+    const QImage* mCurrentIcon = nullptr;
+signals:
+    void released();
+    void pressed();
+};
+#endif // BUTTONBASE_H

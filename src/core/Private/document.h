@@ -32,6 +32,12 @@ class FileDataCacheHandler;
 class Canvas;
 enum class CanvasMode : short;
 
+enum class NodeVisiblity {
+    dissolvedAndNormal,
+    dissolvedOnly,
+    normalOnly
+};
+
 class Document : public SingleWidgetTarget {
     Q_OBJECT
     typedef stdsptr<FileDataCacheHandler> FileHandler;
@@ -47,6 +53,7 @@ public:
 
     QString fEvFile;
 
+    NodeVisiblity fNodeVisibility = NodeVisiblity::dissolvedAndNormal;
     bool fLocalPivot = true;
     CanvasMode fCanvasMode;
 

@@ -17,39 +17,16 @@
 #ifndef ACTIONBUTTON_H
 #define ACTIONBUTTON_H
 
-#include <QWidget>
+#include "buttonbase.h"
 
-class ActionButton : public QWidget
-{
+class ActionButton : public ButtonBase {
     Q_OBJECT
 public:
-    explicit ActionButton(const QString &notCheckedPix,
+    explicit ActionButton(const QString &icon,
                           const QString &toolTip,
                           QWidget *parent = nullptr);
-    void setIcon(const QString &notCheckedPix);
-    void setCheckable(const QString &checkedPix);
-    void setChecked(bool checked);
-    void toggle();
-    bool checked() { return mChecked; }
-protected:
-    void mouseReleaseEvent(QMouseEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void enterEvent(QEvent *);
-    void leaveEvent(QEvent *);
-
-    void paintEvent(QPaintEvent *);
-
-    bool mHover = false;
-    bool mChecked = false;
-    bool mCheckable = false;
-
-    QImage mCheckedPixmap;
-    QImage mNotCheckedPixmap;
-signals:
-    void released();
-    void pressed();
-    void toggled(bool);
-public slots:
+private:
+    QImage mIcon;
 };
 
 #endif // ACTIONBUTTON_H

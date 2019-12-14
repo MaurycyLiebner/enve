@@ -73,6 +73,7 @@ SOURCES += main.cpp\
     GUI/Settings/settingsdialog.cpp \
     GUI/Settings/settingswidget.cpp \
     GUI/audiohandler.cpp \
+    GUI/buttonbase.cpp \
     GUI/canvasbasewrappernode.cpp \
     GUI/canvaswindowevents.cpp \
     GUI/canvaswrappernode.cpp \
@@ -83,6 +84,7 @@ SOURCES += main.cpp\
     GUI/ewidgetsimpl.cpp \
     GUI/layouthandler.cpp \
     GUI/scenechooser.cpp \
+    GUI/switchbutton.cpp \
     GUI/timelinebasewrappernode.cpp \
     GUI/timelinedockwidget.cpp \
     GUI/timelinewidget.cpp \
@@ -171,6 +173,7 @@ HEADERS  += \
     GUI/Settings/settingsdialog.h \
     GUI/Settings/settingswidget.h \
     GUI/audiohandler.h \
+    GUI/buttonbase.h \
     GUI/canvasbasewrappernode.h \
     GUI/canvaswrappernode.h \
     GUI/changewidthwidget.h \
@@ -180,6 +183,7 @@ HEADERS  += \
     GUI/ewidgetsimpl.h \
     GUI/layouthandler.h \
     GUI/scenechooser.h \
+    GUI/switchbutton.h \
     GUI/timelinebasewrappernode.h \
     GUI/timelinedockwidget.h \
     GUI/timelinewidget.h \

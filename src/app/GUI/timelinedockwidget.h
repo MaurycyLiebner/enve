@@ -46,6 +46,7 @@ class ActionButton;
 class Canvas;
 class Document;
 class LayoutHandler;
+class SwitchButton;
 
 class TimelineDockWidget : public QWidget {
 public:
@@ -85,9 +86,10 @@ private:
     QVBoxLayout *mMainLayout;
     QComboBox *mResolutionComboBox;
 
-    ActionButton *mPlayButton;
+    SwitchButton *mPlayButton;
     ActionButton *mStopButton;
-    ActionButton *mLocalPivot;
+    SwitchButton *mLocalPivot;
+    SwitchButton *mNodeVisibility;
 
     QAction *mTimelineAction;
     QAction *mRenderAction;

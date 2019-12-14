@@ -58,6 +58,7 @@
 #include "importhandler.h"
 #include "envesplash.h"
 #include "envelicense.h"
+#include "switchbutton.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 
@@ -643,39 +644,47 @@ void MainWindow::setupToolBar() {
 
     const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
 
-    mBoxTransformMode = new ActionButton(iconsDir + "/boxTransformUnchecked.png", "F1", this);
-    mBoxTransformMode->setCheckable(iconsDir + "/boxTransformChecked.png");
-    mBoxTransformMode->setChecked(true);
+    mBoxTransformMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/boxTransformUnchecked.png",
+                iconsDir + "/boxTransformChecked.png", "F1", this);
+    mBoxTransformMode->toggle();
     mToolBar->addWidget(mBoxTransformMode);
 
-    mPointTransformMode = new ActionButton(iconsDir + "/pointTransformUnchecked.png", "F2", this);
-    mPointTransformMode->setCheckable(iconsDir + "/pointTransformChecked.png");
+    mPointTransformMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/pointTransformUnchecked.png",
+                iconsDir + "/pointTransformChecked.png", "F2", this);
     mToolBar->addWidget(mPointTransformMode);
 
-    mAddPointMode = new ActionButton(iconsDir + "/pathCreateUnchecked.png", "F3", this);
-    mAddPointMode->setCheckable(iconsDir +  "/pathCreateChecked.png");
+    mAddPointMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/pathCreateUnchecked.png",
+                iconsDir +  "/pathCreateChecked.png", "F3", this);
     mToolBar->addWidget(mAddPointMode);
 
-    mPaintMode = new ActionButton(iconsDir + "/paintUnchecked.png", "F4", this);
-    mPaintMode->setCheckable(iconsDir + "/paintChecked.png");
+    mPaintMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/paintUnchecked.png",
+                iconsDir + "/paintChecked.png", "F4", this);
     mToolBar->addWidget(mPaintMode);
 
     mToolBar->addSeparator();
 
-    mPickPaintSettingsMode = new ActionButton(iconsDir + "/pickUnchecked.png", "F5", this);
-    mPickPaintSettingsMode->setCheckable(iconsDir + "/pickChecked.png");
+    mPickPaintSettingsMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/pickUnchecked.png",
+                iconsDir + "/pickChecked.png", "F5", this);
     mToolBar->addWidget(mPickPaintSettingsMode);
 
-    mCircleMode = new ActionButton(iconsDir + "/circleCreateUnchecked.png", "F6", this);
-    mCircleMode->setCheckable(iconsDir + "/circleCreateChecked.png");
+    mCircleMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/circleCreateUnchecked.png",
+                iconsDir + "/circleCreateChecked.png", "F6", this);
     mToolBar->addWidget(mCircleMode);
 
-    mRectangleMode = new ActionButton(iconsDir + "/rectCreateUnchecked.png", "F7", this);
-    mRectangleMode->setCheckable(iconsDir + "/rectCreateChecked.png");
+    mRectangleMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/rectCreateUnchecked.png",
+                iconsDir + "/rectCreateChecked.png", "F7", this);
     mToolBar->addWidget(mRectangleMode);
 
-    mTextMode = new ActionButton(iconsDir + "/textCreateUnchecked.png", "F8", this);
-    mTextMode->setCheckable(iconsDir + "/textCreateChecked.png");
+    mTextMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/textCreateUnchecked.png",
+                iconsDir + "/textCreateChecked.png", "F8", this);
     mToolBar->addWidget(mTextMode);
 
     mToolBar->addSeparator();
@@ -787,14 +796,14 @@ MainWindow *MainWindow::sGetInstance() {
 
 void MainWindow::updateCanvasModeButtonsChecked() {
     const CanvasMode currentMode = mDocument.fCanvasMode;
-    mBoxTransformMode->setChecked(currentMode == CanvasMode::boxTransform);
-    mPointTransformMode->setChecked(currentMode == CanvasMode::pointTransform);
-    mAddPointMode->setChecked(currentMode == CanvasMode::pathCreate);
-    mPickPaintSettingsMode->setChecked(currentMode == CanvasMode::pickFillStroke);
-    mCircleMode->setChecked(currentMode == CanvasMode::circleCreate);
-    mRectangleMode->setChecked(currentMode == CanvasMode::rectCreate);
-    mTextMode->setChecked(currentMode == CanvasMode::textCreate);
-    mPaintMode->setChecked(currentMode == CanvasMode::paint);
+    mBoxTransformMode->setState(currentMode == CanvasMode::boxTransform);
+    mPointTransformMode->setState(currentMode == CanvasMode::pointTransform);
+    mAddPointMode->setState(currentMode == CanvasMode::pathCreate);
+    mPickPaintSettingsMode->setState(currentMode == CanvasMode::pickFillStroke);
+    mCircleMode->setState(currentMode == CanvasMode::circleCreate);
+    mRectangleMode->setState(currentMode == CanvasMode::rectCreate);
+    mTextMode->setState(currentMode == CanvasMode::textCreate);
+    mPaintMode->setState(currentMode == CanvasMode::paint);
 }
 
 //void MainWindow::stopPreview() {

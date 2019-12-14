@@ -33,6 +33,7 @@
 #include "Private/document.h"
 #include "layouthandler.h"
 #include "memoryhandler.h"
+#include "switchbutton.h"
 
 TimelineDockWidget::TimelineDockWidget(Document& document,
                                        LayoutHandler * const layoutH,
@@ -73,18 +74,30 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
 
     const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
 
-    mPlayButton = new ActionButton(iconsDir + "/play.png", "render preview", this);
+    mPlayButton = SwitchButton::sCreate2Switch(iconsDir + "/play.png",
+                                               iconsDir + "/pause.png",
+                                               "render preview", this);
     mStopButton = new ActionButton(iconsDir + "/stop.png", "stop preview", this);
     connect(mStopButton, &ActionButton::pressed,
             this, &TimelineDockWidget::interruptPreview);
 
-    mLocalPivot = new ActionButton(iconsDir + "/pivotGlobal.png",
-                                  "pivot global/local", this);
-    mLocalPivot->setToolTip("P");
-    mLocalPivot->setCheckable(iconsDir + "/pivotLocal.png");
-    mLocalPivot->setChecked(mDocument.fLocalPivot);
-    connect(mLocalPivot, &ActionButton::toggled,
+    mLocalPivot = SwitchButton::sCreate2Switch(iconsDir + "/pivotGlobal.png",
+                                               iconsDir + "/pivotLocal.png",
+                                               "pivot global/local [P]", this);
+    mLocalPivot->setState(mDocument.fLocalPivot);
+    connect(mLocalPivot, &SwitchButton::toggled,
             this, &TimelineDockWidget::setLocalPivot);
+
+    mNodeVisibility = new SwitchButton("Node visibility [N]", this);
+    mNodeVisibility->addState(iconsDir + "/dissolvedAndNormalNodes.png");
+    mNodeVisibility->addState(iconsDir + "/dissolvedNodesOnly.png");
+    mNodeVisibility->addState(iconsDir + "/normalNodesOnly.png");
+    connect(mNodeVisibility, &SwitchButton::toggled,
+            this, [this](const int state) {
+        mDocument.fNodeVisibility = static_cast<NodeVisiblity>(state);
+        Document::sInstance->actionFinished();
+    });
+
 
     mToolBar = new QToolBar(this);
     mToolBar->setMovable(false);
@@ -109,7 +122,8 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
 
     mToolBar->addSeparator();
     mToolBar->addWidget(mLocalPivot);
-    mLocalPivot->setFocusPolicy(Qt::NoFocus);
+    mToolBar->addSeparator();
+    mToolBar->addWidget(mNodeVisibility);
     mToolBar->addSeparator();
 
     QWidget * const spacerWidget = new QWidget(this);
@@ -202,6 +216,9 @@ bool TimelineDockWidget::processKeyPress(QKeyEvent *event) {
     } else if(key == Qt::Key_P &&
               !(mods & Qt::ControlModifier) && !(mods & Qt::AltModifier)) {
         mLocalPivot->toggle();
+    } else if(key == Qt::Key_N &&
+              !(mods & Qt::ControlModifier) && !(mods & Qt::AltModifier)) {
+        mNodeVisibility->toggle();
     } else {
         return false;
     }
@@ -212,7 +229,7 @@ void TimelineDockWidget::previewFinished() {
     //setPlaying(false);
     mStopButton->setDisabled(true);
     const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
-    mPlayButton->setIcon(modeIconsDir + "/play.png");
+    mPlayButton->setState(0);
     mPlayButton->setToolTip("render preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
@@ -222,7 +239,7 @@ void TimelineDockWidget::previewFinished() {
 void TimelineDockWidget::previewBeingPlayed() {
     mStopButton->setDisabled(false);
     const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
-    mPlayButton->setIcon(modeIconsDir + "/pause.png");
+    mPlayButton->setState(1);
     mPlayButton->setToolTip("pause preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
@@ -232,7 +249,7 @@ void TimelineDockWidget::previewBeingPlayed() {
 void TimelineDockWidget::previewBeingRendered() {
     mStopButton->setDisabled(false);
     const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
-    mPlayButton->setIcon(modeIconsDir + "/play.png");
+    mPlayButton->setState(0);
     mPlayButton->setToolTip("play preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
@@ -242,7 +259,7 @@ void TimelineDockWidget::previewBeingRendered() {
 void TimelineDockWidget::previewPaused() {
     mStopButton->setDisabled(false);
     const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
-    mPlayButton->setIcon(modeIconsDir + "/play.png");
+    mPlayButton->setState(0);
     mPlayButton->setToolTip("resume preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,

@@ -14,14 +14,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "actionbutton.h"
-#include "GUI/global.h"
-#include <QPainter>
+#ifndef SWITCHBUTTON_H
+#define SWITCHBUTTON_H
 
-ActionButton::ActionButton(const QString &icon,
-                           const QString &toolTip,
-                           QWidget *parent) :
-    ButtonBase(toolTip, parent) {
-    mIcon.load(icon);
-    setCurrentIcon(mIcon);
-}
+#include "buttonbase.h"
+
+class SwitchButton : public ButtonBase {
+    Q_OBJECT
+public:
+    SwitchButton(const QString &toolTip, QWidget *parent);
+    ~SwitchButton();
+
+    static SwitchButton* sCreate2Switch(
+            const QString &icon0, const QString &icon1,
+            const QString &toolTip, QWidget *parent);
+
+    int addState(const QString& icon);
+
+    bool setState(const int state);
+    void toggle();
+private:
+    QList<QImage*> mStates;
+    int mCurrentState = 0;
+signals:
+    void toggled(int);
+};
+
+#endif // SWITCHBUTTON_H

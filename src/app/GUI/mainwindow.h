@@ -36,6 +36,7 @@
 
 class VideoEncoder;
 
+class SwitchButton;
 class ActionButton;
 class BoxesList;
 class FontsWidget;
@@ -244,16 +245,16 @@ private:
     UsageWidget* mUsageWidget = nullptr;
     QToolBar *mToolBar;
 
-    ActionButton *mBoxTransformMode;
-    ActionButton *mPointTransformMode;
-    ActionButton *mAddPointMode;
-    ActionButton *mPickPaintSettingsMode;
+    SwitchButton *mBoxTransformMode;
+    SwitchButton *mPointTransformMode;
+    SwitchButton *mAddPointMode;
+    SwitchButton *mPickPaintSettingsMode;
 
-    ActionButton *mCircleMode;
+    SwitchButton *mCircleMode;
 //
-    ActionButton *mRectangleMode;
-    ActionButton *mTextMode;
-    ActionButton *mPaintMode;
+    SwitchButton *mRectangleMode;
+    SwitchButton *mTextMode;
+    SwitchButton *mPaintMode;
 //
     ActionButton *mActionConnectPoints;
     ActionButton *mActionDisconnectPoints;

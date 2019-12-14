@@ -50,12 +50,7 @@ public:
 
     void canvasContextMenu(PointTypeMenu * const menu);
 
-    bool isVisible(const CanvasMode mode) const {
-        if(mode == CanvasMode::pointTransform) return true;
-        else if(mode == CanvasMode::pathCreate)
-            return isEndPoint() || isSelected();
-        return false;
-    }
+    bool isVisible(const CanvasMode mode) const;
 
     void drawSk(SkCanvas * const canvas,
                 const CanvasMode mode,
