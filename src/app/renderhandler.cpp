@@ -84,7 +84,7 @@ void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) 
         mCurrRenderRange = {mCurrentRenderFrame, mCurrentRenderFrame};
 
         mCurrentEncodeFrame = mCurrentRenderFrame;
-        mFirstEncodeSoundSecond = qRound(mCurrentRenderFrame/fps);
+        mFirstEncodeSoundSecond = qFloor(mCurrentRenderFrame/fps);
         mCurrentEncodeSoundSecond = mFirstEncodeSoundSecond;
         if(!VideoEncoder::sEncodeAudio())
             mMaxSoundSec = mCurrentEncodeSoundSecond - 1;

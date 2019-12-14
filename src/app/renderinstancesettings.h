@@ -23,10 +23,15 @@ class Canvas;
 
 struct RenderSettings {
     qreal fResolution = 1;
+    qreal fBaseFps = 24;
     qreal fFps = 24;
+    qreal fFrameInc = 1;
     AVRational fTimeBase = { 1, 24 }; // inverse of fps - 1/fps
     int fVideoWidth = 0;
     int fVideoHeight = 0;
+
+    int fBaseWidth = 0;
+    int fBaseHeight = 0;
 
     int fMinFrame = 0;
     int fMaxFrame = 0;

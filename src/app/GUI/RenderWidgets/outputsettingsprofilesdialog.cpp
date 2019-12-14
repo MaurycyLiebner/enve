@@ -16,7 +16,7 @@
 
 #include "outputsettingsprofilesdialog.h"
 #include "GUI/mainwindow.h"
-#include "rendersettingsdialog.h"
+#include "outputsettingsdialog.h"
 #include "outputsettingsdisplaywidget.h"
 #include "GUI/global.h"
 QList<stdsptr<OutputSettingsProfile>> OutputSettingsProfilesDialog::sOutputProfiles;
@@ -181,7 +181,7 @@ void OutputSettingsProfilesDialog::duplicateCurrentProfile() {
 }
 
 void OutputSettingsProfilesDialog::createAndEditNewProfile() {
-    RenderSettingsDialog *dialog = new RenderSettingsDialog(OutputSettings(), this);
+    OutputSettingsDialog *dialog = new OutputSettingsDialog(OutputSettings(), this);
     if(dialog->exec()) {
         auto newProfile = enve::make_shared<OutputSettingsProfile>();
         sOutputProfiles.append(newProfile);
@@ -198,7 +198,7 @@ void OutputSettingsProfilesDialog::editCurrentProfile() {
     const auto currentProfile = getCurrentProfile();
     if(!currentProfile) return;
     const OutputSettings &outputSettings = currentProfile->getSettings();
-    const auto dialog = new RenderSettingsDialog(outputSettings, this);
+    const auto dialog = new OutputSettingsDialog(outputSettings, this);
     if(dialog->exec()) {
         currentProfile->setSettings(dialog->getSettings());
         currentProfileChanged();

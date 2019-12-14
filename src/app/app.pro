@@ -67,6 +67,8 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     GUI/BoxesList/boxscroller.cpp \
+    GUI/RenderWidgets/outputsettingsdialog.cpp \
+    GUI/RenderWidgets/rendersettingsdialog.cpp \
     GUI/Settings/performancesettingswidget.cpp \
     GUI/Settings/settingsdialog.cpp \
     GUI/Settings/settingswidget.cpp \
@@ -131,7 +133,6 @@ SOURCES += main.cpp\
     execdelegator.cpp \
     GUI/BoxesList/boxscrollarea.cpp \
     videoencoder.cpp \
-    GUI/RenderWidgets/rendersettingsdialog.cpp \
     GUI/RenderWidgets/outputsettingsprofilesdialog.cpp \
     GUI/RenderWidgets/outputsettingsdisplaywidget.cpp \
     GUI/actionbutton.cpp \
@@ -165,6 +166,8 @@ SOURCES += main.cpp\
 
 HEADERS  += \
     GUI/BoxesList/boxscroller.h \
+    GUI/RenderWidgets/outputsettingsdialog.h \
+    GUI/RenderWidgets/rendersettingsdialog.h \
     GUI/Settings/performancesettingswidget.h \
     GUI/Settings/settingsdialog.h \
     GUI/Settings/settingswidget.h \
@@ -228,7 +231,6 @@ HEADERS  += \
     execdelegator.h \
     GUI/BoxesList/boxscrollarea.h \
     videoencoder.h \
-    GUI/RenderWidgets/rendersettingsdialog.h \
     GUI/RenderWidgets/outputsettingsprofilesdialog.h \
     GUI/RenderWidgets/outputsettingsdisplaywidget.h \
     GUI/actionbutton.h \

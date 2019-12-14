@@ -52,6 +52,8 @@ private:
 
     QPushButton *mOutputDestinationButton;
 
+    QPushButton* mRenderSettingsButton;
+
     OutputProfilesListButton *mOutputSettingsProfilesButton;
     QPushButton *mOutputSettingsButton;
     QLabel *mNameLabel;

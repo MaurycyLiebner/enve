@@ -20,6 +20,12 @@
 RenderInstanceSettings::RenderInstanceSettings(Canvas* canvas) {
     setTargetCanvas(canvas);
     mRenderSettings.fMaxFrame = canvas->getMaxFrame();
+    mRenderSettings.fBaseWidth = mTargetCanvas->getCanvasWidth();
+    mRenderSettings.fBaseHeight = mTargetCanvas->getCanvasHeight();
+    mRenderSettings.fVideoWidth = mRenderSettings.fBaseWidth;
+    mRenderSettings.fVideoHeight = mRenderSettings.fBaseHeight;
+    mRenderSettings.fBaseFps = mTargetCanvas->getFps();
+    mRenderSettings.fFps = mRenderSettings.fBaseFps;
 }
 
 const QString &RenderInstanceSettings::getName() {
@@ -74,11 +80,10 @@ void RenderInstanceSettings::setRenderSettings(
 void RenderInstanceSettings::renderingAboutToStart() {
     copySettingsFromOutputSettingsProfile();
     mRenderError.clear();
-    mRenderSettings.fFps = mTargetCanvas->getFps();
     mRenderSettings.fTimeBase = { 1, qRound(mRenderSettings.fFps) };
-    mRenderSettings.fVideoWidth = mTargetCanvas->getCanvasWidth();
-    mRenderSettings.fVideoHeight = mTargetCanvas->getCanvasHeight();
+    mRenderSettings.fFrameInc = mRenderSettings.fBaseFps/mRenderSettings.fFps;
 }
+
 #include <QSound>
 void RenderInstanceSettings::setCurrentState(const RenderState &state,
                                              const QString &text) {

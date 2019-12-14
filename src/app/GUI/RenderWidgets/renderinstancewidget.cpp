@@ -18,7 +18,7 @@
 #include "GUI/global.h"
 #include <QFileDialog>
 #include <QMenu>
-#include "rendersettingsdialog.h"
+#include "outputsettingsdialog.h"
 #include "outputsettingsprofilesdialog.h"
 #include "outputsettingsdisplaywidget.h"
 #include "Private/esettings.h"
@@ -77,13 +77,13 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     renderSettingsLayout->addWidget(renderSettingsLabel);
     renderSettingsLayout->addSpacing(MIN_WIDGET_DIM);
 
-    const auto renderSettingsButton = new QPushButton("Settings");
-    renderSettingsButton->setObjectName("renderSettings");
-    renderSettingsButton->setSizePolicy(QSizePolicy::Maximum,
+    mRenderSettingsButton = new QPushButton("Settings");
+    mRenderSettingsButton->setObjectName("renderSettings");
+    mRenderSettingsButton->setSizePolicy(QSizePolicy::Maximum,
                                         QSizePolicy::Maximum);
-    connect(renderSettingsButton, &QPushButton::pressed,
+    connect(mRenderSettingsButton, &QPushButton::pressed,
             this, &RenderInstanceWidget::openRenderSettingsDialog);
-    renderSettingsLayout->addWidget(renderSettingsButton);
+    renderSettingsLayout->addWidget(mRenderSettingsButton);
 
     renderSettingsLabelWidget->setLayout(renderSettingsLayout);
     renderSettings->setLabelWidget(renderSettingsLabelWidget);
@@ -218,7 +218,7 @@ RenderInstanceSettings *RenderInstanceWidget::getSettings() {
 void RenderInstanceWidget::openOutputSettingsDialog() {
     mSettings->copySettingsFromOutputSettingsProfile();
     const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
-    const auto dialog = new RenderSettingsDialog(outputSettings, this);
+    const auto dialog = new OutputSettingsDialog(outputSettings, this);
     if(dialog->exec()) {
         mSettings->setOutputSettingsProfile(nullptr);
         OutputSettings outputSettings = dialog->getSettings();
@@ -301,8 +301,23 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     mOutputDestinationButton->setText(saveAs);
 }
 
+#include "rendersettingsdialog.h"
 void RenderInstanceWidget::openRenderSettingsDialog() {
-
+    const RenderSettings& iniRenderSettings = mSettings->getRenderSettings();
+    const auto dialog = new RenderSettingsDialog(iniRenderSettings, this);
+    if(dialog->exec()) {
+        const RenderSettings sett = dialog->getSettings();
+        mSettings->setRenderSettings(sett);
+        const QString str = QString("%1 - %2,  %3%,  %4 x %5,  %6fps").
+                                arg(sett.fMinFrame).
+                                arg(sett.fMaxFrame).
+                                arg(sett.fResolution*100).
+                                arg(sett.fVideoWidth).
+                                arg(sett.fVideoHeight).
+                                arg(sett.fFps);
+        mRenderSettingsButton->setText(str);
+    }
+    delete dialog;
 }
 
 #include "Private/esettings.h"
