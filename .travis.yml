@@ -12,14 +12,17 @@ install:
     - sudo apt-get -y install g++-7
     - sudo apt-get -y install libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
     - sudo apt-get -y install qt512base qt512multimedia qt512svg
-    - sudo apt-get -y install libgoogle-perftools-dev
+    - source /opt/qt512/bin/qt512-env.sh
     - sudo apt-get -y install libglib2.0-dev
     - sudo apt-get -y install unzip
     - sudo apt-get -y install libjson-c-dev intltool pkg-config
+    - # for gperftools
+    - sudo apt-get -y install autoconf automake libtool
+    - sudo apt-get -y install libunwind-dev
     - # skia dependencies
     - sudo apt-get -y install build-essential freeglut3-dev libfontconfig-dev libfreetype6-dev libgif-dev libgl1-mesa-dev libglu1-mesa-dev libharfbuzz-dev libicu-dev libjpeg-dev libpng-dev libwebp-dev
-    - source /opt/qt512/bin/qt512-env.sh
     - cd third_party
+    - # build skia
     - tar xf skia.tar.xz
     - cd skia
     - python tools/git-sync-deps
@@ -30,11 +33,18 @@ install:
     - bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] target_os="linux" target_cpu="x64" skia_use_system_expat=false skia_use_system_freetype2=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false skia_use_system_harfbuzz=false cc="gcc-7" cxx="g++-7"'
     - ./ninja -C out/Release -j 2
     - cd ..
+    - # build libmypaint
     - tar xf libmypaint.tar.xz
     - cd libmypaint-1.3.0
     - export CFLAGS='-fopenmp -Ofast -ftree-vectorize -fopt-info-vec-optimized -funsafe-math-optimizations -funsafe-loop-optimizations -fPIC'
     - ./configure --enable-static --enable-openmp --enable-shared=false
     - sudo make
+    - cd ..
+    - # build gperftools
+    - cd gperftools-2.7
+    - ./autogen.sh
+    - ./configure --prefix /usr
+    - make
     - cd ../../
 before_script:
     - cd build

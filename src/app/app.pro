@@ -23,12 +23,13 @@
 VERSION = 0.0.0
 
 QT += multimedia core gui svg opengl sql qml xml concurrent
-LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample -ltcmalloc
+LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample
 CONFIG += c++14
 
 ENVE_FOLDER = $$PWD/../..
 SKIA_FOLDER = $$ENVE_FOLDER/third_party/skia
 LIBMYPAINT_FOLDER = $$ENVE_FOLDER/third_party/libmypaint-1.3.0
+GPERFTOOLS_FOLDER = $$ENVE_FOLDER/third_party/gperftools-2.7
 
 INCLUDEPATH += ../core
 DEPENDPATH += ../core
@@ -37,6 +38,9 @@ LIBS += -L$$OUT_PWD/../core -lenvecore
 
 INCLUDEPATH += $$LIBMYPAINT_FOLDER/include
 LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint -lgobject-2.0 -lglib-2.0 -ljson-c
+
+INCLUDEPATH += $$GPERFTOOLS_FOLDER/include
+LIBS += -L$$GPERFTOOLS_FOLDER/.libs -ltcmalloc
 
 INCLUDEPATH += $$SKIA_FOLDER
 

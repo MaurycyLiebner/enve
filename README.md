@@ -105,6 +105,25 @@ Build libmypaint:
 ```
 sudo make
 ```
+Go back to the third_party folder:
+```
+cd ..
+```
+
+#### gperftools
+```
+sudo apt-get install autoconf automake libtool
+sudo apt-get install libunwind-dev
+```
+
+Build gperftools:
+```
+cd gperftools-2.7
+./autogen.sh
+./configure --prefix /usr
+make
+```
+
 Go back to the main enve directory:
 ```
 cd ../../
@@ -121,7 +140,6 @@ sudo apt-get install libswresample-dev libswscale-dev libavcodec-dev libavformat
 #### Other
 enve dependencies:
 ```
-sudo apt-get install libgoogle-perftools-dev
 sudo apt-get install libglib2.0-dev
 ```
 Install libxkbcommon-x11-dev to run QtCreator on Ubuntu 16.04.

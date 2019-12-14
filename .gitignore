@@ -22,6 +22,7 @@ third_party/*
 !third_party/libmypaint.tar.xz
 !third_party/skiaInstructions
 !third_party/libmypaintInstructions
+!third_party/gperftools-2.7/*
 
 *.creator.user*
 *.pro.user*
