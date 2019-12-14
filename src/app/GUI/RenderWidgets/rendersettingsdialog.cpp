@@ -29,9 +29,7 @@ RenderSettingsDialog::RenderSettingsDialog(const RenderSettings &settings,
     dimLay->addWidget(mWidthLabel);
     dimLay->addWidget(mWidthSpin);
 
-    connectDims();
-
-    addSeparator();
+    dimLay->addSpacing(MIN_WIDGET_DIM);
 
     mHeightLabel = new QLabel("Height: ");
     mHeightSpin = new QSpinBox(this);
@@ -39,6 +37,8 @@ RenderSettingsDialog::RenderSettingsDialog(const RenderSettings &settings,
     mHeightSpin->setValue(settings.fVideoHeight);
     dimLay->addWidget(mHeightLabel);
     dimLay->addWidget(mHeightSpin);
+
+    connectDims();
 
     mainLayout->addLayout(dimLay);
     addSeparator();
