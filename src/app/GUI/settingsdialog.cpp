@@ -25,22 +25,34 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
 //    cpuCapSett->addWidget(mCpuThreadsCapSpin);
 //    mainLauout->addLayout(cpuCapSett);
 
-//    QHBoxLayout* ramCapSett = new QHBoxLayout;
+    QHBoxLayout* ramCapSett = new QHBoxLayout;
 
-//    mRamBytesCapCheck = new QCheckBox("RAM MB cap", this);
-//    mRamBytesCapSpin = new QSpinBox(this);
-//    mRamBytesCapSpin->setRange(500, HardwareInfo::sRamKB()/1000);
-//    connect(mRamBytesCapCheck, &QCheckBox::toggled,
-//            mRamBytesCapSpin, &QWidget::setEnabled);
+    mRamMBCapCheck = new QCheckBox("Process RAM MB cap", this);
+    mRamMBCapSpin = new QSpinBox(this);
+    mRamMBCapSpin->setRange(250, intMB(HardwareInfo::sRamKB()).fValue);
 
-//    ramCapSett->addWidget(mRamBytesCapCheck);
-//    ramCapSett->addWidget(mRamBytesCapSpin);
-//    mainLauout->addLayout(ramCapSett);
+    mRamMBCapSlider = new QSlider(Qt::Horizontal);
+    mRamMBCapSlider->setRange(250, intMB(HardwareInfo::sRamKB()).fValue);
 
-//    const auto line0 = new QFrame();
-//    line0->setFrameShape(QFrame::HLine);
-//    line0->setFrameShadow(QFrame::Sunken);
-//    mainLauout->addWidget(line0);
+    connect(mRamMBCapCheck, &QCheckBox::toggled,
+            mRamMBCapSpin, &QWidget::setEnabled);
+    connect(mRamMBCapCheck, &QCheckBox::toggled,
+            mRamMBCapSlider, &QWidget::setEnabled);
+
+    connect(mRamMBCapSpin, qOverload<int>(&QSpinBox::valueChanged),
+            mRamMBCapSlider, &QSlider::setValue);
+    connect(mRamMBCapSlider, &QSlider::valueChanged,
+            mRamMBCapSpin, &QSpinBox::setValue);
+
+    ramCapSett->addWidget(mRamMBCapCheck);
+    ramCapSett->addWidget(mRamMBCapSpin);
+    mainLauout->addLayout(ramCapSett);
+    mainLauout->addWidget(mRamMBCapSlider);
+
+    const auto line0 = new QFrame();
+    line0->setFrameShape(QFrame::HLine);
+    line0->setFrameShadow(QFrame::Sunken);
+    mainLauout->addWidget(line0);
 
 
     mAccPreferenceLabel = new QLabel("Acceleration preference:");
@@ -117,8 +129,8 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
         eSettings& sett = *eSettings::sInstance;
 //        sett.fCpuThreadsCap = mCpuThreadsCapCheck->isChecked() ?
 //                    mCpuThreadsCapSpin->value() : 0;
-//        sett.fRamMBCap = mRamBytesCapCheck->isChecked() ?
-//                    mRamBytesCapSpin->value() : 0;
+        sett.fRamMBCap = intMB(mRamMBCapCheck->isChecked() ?
+                    mRamMBCapSpin->value() : 0);
         sett.fAccPreference = static_cast<AccPreference>(
                     mAccPreferenceSlider->value());
         sett.fPathGpuAcc = mPathGpuAccCheck->isChecked();
@@ -144,10 +156,10 @@ void SettingsDialog::updateSettings() {
 //    mCpuThreadsCapSpin->setValue(sett.fCpuThreadsCap);
 //    mCpuThreadsCapSpin->setEnabled(sett.fCpuThreadsCap > 0);
 
-//    mRamBytesCapCheck->setChecked(sett.fRamMBCap > 500);
-//    mRamBytesCapSpin->setRange(500, HardwareInfo::sRamKB()/1000);
-//    mRamBytesCapSpin->setValue(sett.fRamMBCap);
-//    mRamBytesCapSpin->setEnabled(sett.fRamMBCap > 500);
+    mRamMBCapCheck->setChecked(sett.fRamMBCap.fValue > 250);
+    mRamMBCapSpin->setValue(sett.fRamMBCap.fValue);
+    mRamMBCapSpin->setEnabled(sett.fRamMBCap.fValue > 250);
+    mRamMBCapSlider->setValue(sett.fRamMBCap.fValue);
 
     mAccPreferenceSlider->setValue(static_cast<int>(sett.fAccPreference));
     updateAccPreferenceDesc();

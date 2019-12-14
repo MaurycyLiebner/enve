@@ -18,8 +18,9 @@ private:
     QCheckBox* mCpuThreadsCapCheck = nullptr;
     QSpinBox* mCpuThreadsCapSpin = nullptr;
 
-    QCheckBox* mRamBytesCapCheck = nullptr;
-    QSpinBox* mRamBytesCapSpin = nullptr;
+    QCheckBox* mRamMBCapCheck = nullptr;
+    QSpinBox* mRamMBCapSpin = nullptr;
+    QSlider* mRamMBCapSlider = nullptr;
 
     QLabel* mAccPreferenceLabel = nullptr;
     QLabel* mAccPreferenceDescLabel = nullptr;

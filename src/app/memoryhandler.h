@@ -31,8 +31,8 @@ signals:
     void allMemoryUsed();
     void memoryFreed();
 private:
-    void freeMemory(const MemoryState &state, const long &minFreeBytes);
-    void memoryChecked(const int memKb, const int totMemKb);
+    void freeMemory(const MemoryState &state, const longB &minFreeBytes);
+    void memoryChecked(const intKB memKb, const intKB totMemKb);
 
     MemoryDataHandler mDataHandler;
     MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;

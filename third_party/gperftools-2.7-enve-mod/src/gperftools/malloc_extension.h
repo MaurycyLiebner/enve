@@ -218,6 +218,8 @@ class PERFTOOLS_DLL_DECL MallocExtension {
   // REQUIRES: property != NULL; value != NULL
   virtual bool GetNumericProperty(const char* property, size_t* value);
 
+  virtual void GetAllocatedAndUnmapped(size_t* allocated, size_t* unmapped);
+
   // Set the named "property"'s value.  Returns true if the property
   // is known and writable.  Returns false if the property is not a
   // valid property name for the current malloc implementation, or

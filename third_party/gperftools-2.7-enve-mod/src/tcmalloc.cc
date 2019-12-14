@@ -689,6 +689,18 @@ class TCMallocImplementation : public MallocExtension {
     IterateOverRanges(arg, func);
   }
 
+  virtual void GetAllocatedAndUnmapped(size_t* allocated, size_t* unmapped) {
+    TCMallocStats stats;
+    ExtractStats(&stats, NULL, NULL, NULL);
+    *allocated = stats.pageheap.system_bytes
+                 - stats.thread_bytes
+                 - stats.central_bytes
+                 - stats.transfer_bytes
+                 - stats.pageheap.free_bytes
+                 - stats.pageheap.unmapped_bytes;
+    *unmapped = stats.pageheap.unmapped_bytes;
+  }
+
   virtual bool GetNumericProperty(const char* name, size_t* value) {
     ASSERT(name != NULL);
 

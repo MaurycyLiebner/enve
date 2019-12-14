@@ -32,38 +32,48 @@ MemoryChecker *MemoryChecker::mInstance;
 MemoryChecker::MemoryChecker(QObject * const parent) : QObject(parent) {
     mInstance = this;
 
-    mVeryLowFreeBytes = 15*HardwareInfo::sRamBytes()/100;
-    mLowFreeBytes = 20*HardwareInfo::sRamBytes()/100;
+    mLowFreeKB = HardwareInfo::sRamKB();
+    mLowFreeKB.fValue *= 20; mLowFreeKB.fValue /= 100;
+    mVeryLowFreeKB = HardwareInfo::sRamKB();
+    mVeryLowFreeKB.fValue *= 15; mVeryLowFreeKB.fValue /= 100;
 }
 
 char MemoryChecker::sLine[256];
 
-long MemoryChecker::sGetFreeBytes() {
+void MemoryChecker::sGetFreeKB(intKB& procFreeKB, intKB& sysFreeKB) {
+    size_t allocatedB = 0;
     size_t unmappedB = 0;
-    MallocExtension::instance()->GetNumericProperty(
-                "tcmalloc.pageheap_unmapped_bytes", &unmappedB);
+    MallocExtension::instance()->GetAllocatedAndUnmapped(&allocatedB, &unmappedB);
+    const auto usageCap = eSettings::sInstance->fRamMBCap;
+    procFreeKB = HardwareInfo::sRamKB();
+    if(usageCap.fValue > 0) {
+        const longB enveUsedB(static_cast<long>(allocatedB));
+        procFreeKB = intKB(usageCap) - intKB(enveUsedB);
+        qDebug() << intMB(usageCap).fValue << intMB(enveUsedB).fValue;
+    }
 
     FILE * const meminfo = fopen("/proc/meminfo", "r");
     if(meminfo) {
-        ulong ramKB = 0;
+        intKB ramKB(0);
         int found = 0;
         while(fgets(sLine, sizeof(sLine), meminfo)) {
-            uint ramPartKB;
+            int ramPartKB;
             if(sscanf(sLine, "MemFree: %d kB", &ramPartKB) == 1) {
-                ramKB += ramPartKB;
+                ramKB.fValue += ramPartKB;
                 found++;
             } else if(sscanf(sLine, "Cached: %d kB", &ramPartKB) == 1) {
-                ramKB += ramPartKB;
+                ramKB.fValue += ramPartKB;
                 found++;
             } else if(sscanf(sLine, "Buffers: %d kB", &ramPartKB) == 1) {
-                ramKB += ramPartKB;
+                ramKB.fValue += ramPartKB;
                 found++;
             }
 
             if(found >= 3) {
                 fclose(meminfo);
-                return static_cast<long>(ramKB)*1000 +
-                       static_cast<long>(unmappedB);
+                const intKB unmappedKB = intKB(longB(static_cast<long>(unmappedB)));
+                sysFreeKB = ramKB + unmappedKB;
+                return;
             }
         }
         fclose(meminfo);
@@ -73,22 +83,26 @@ long MemoryChecker::sGetFreeBytes() {
 }
 
 void MemoryChecker::checkMemory() {
-    const long freeBytes = sGetFreeBytes();
+    intKB procFreeKB;
+    intKB sysFreeKB;
+    sGetFreeKB(procFreeKB, sysFreeKB);
 
-    if(freeBytes < mLowFreeBytes) {
-        const long toFree = mLowFreeBytes - freeBytes;
-        if(freeBytes < mVeryLowFreeBytes) {
-            emit handleMemoryState(VERY_LOW_MEMORY_STATE, toFree);
+    if(sysFreeKB < mLowFreeKB) {
+        const intKB toFree = mLowFreeKB - sysFreeKB;
+        if(sysFreeKB < mVeryLowFreeKB) {
+            emit handleMemoryState(VERY_LOW_MEMORY_STATE, longB(toFree));
             mLastMemoryState = VERY_LOW_MEMORY_STATE;
         } else {
-            emit handleMemoryState(LOW_MEMORY_STATE, toFree);
+            emit handleMemoryState(LOW_MEMORY_STATE, longB(toFree));
             mLastMemoryState = LOW_MEMORY_STATE;
         }
+    } else if(procFreeKB.fValue < 0) {
+        emit handleMemoryState(LOW_MEMORY_STATE, longB(-procFreeKB));
+        mLastMemoryState = LOW_MEMORY_STATE;
     } else if(mLastMemoryState != NORMAL_MEMORY_STATE) {
-        emit handleMemoryState(NORMAL_MEMORY_STATE, 0);
+        emit handleMemoryState(NORMAL_MEMORY_STATE, longB(0));
         mLastMemoryState = NORMAL_MEMORY_STATE;
     }
 
-    emit memoryCheckedKB(static_cast<int>(freeBytes/1000),
-                         HardwareInfo::sRamKB());
+    emit memoryCheckedKB(sysFreeKB, HardwareInfo::sRamKB());
 }

@@ -118,6 +118,10 @@ bool MallocExtension::GetNumericProperty(const char* property, size_t* value) {
   return false;
 }
 
+void MallocExtension::GetAllocatedAndUnmapped(size_t* allocated, size_t* unmapped) {
+  return;
+}
+
 bool MallocExtension::SetNumericProperty(const char* property, size_t value) {
   return false;
 }

@@ -19,6 +19,7 @@
 #include <QtCore>
 #include "skia/skiaincludes.h"
 #include "efiltersettings.h"
+#include "memorystructs.h"
 
 enum class GpuVendor {
     intel,
@@ -40,7 +41,7 @@ public:
     eSettings();
 
     // accessors
-    static int sRamMBCap();
+    static intMB sRamMBCap();
     static int sCpuThreadsCapped();
     static const QString& sSettingsDir();
     static QString sIconsDir();
@@ -61,8 +62,8 @@ public:
     int fCpuThreads = 0;
     int fCpuThreadsCap = 0; // <= 0 - use all available threads
 
-    long fRamBytes = 0;
-    int fRamMBCap = 0; // <= 0 - cap at 80 %
+    intKB fRamKB = intKB(0);
+    intMB fRamMBCap = intMB(0); // <= 0 - cap at 80 %
 
     GpuVendor fGpuVendor = GpuVendor::unrecognized;
     AccPreference fAccPreference = AccPreference::defaultPreference;

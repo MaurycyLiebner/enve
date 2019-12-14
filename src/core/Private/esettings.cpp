@@ -32,10 +32,11 @@ int eSettings::sCpuThreadsCapped() {
     return sInstance->fCpuThreads;
 }
 
-int eSettings::sRamMBCap() {
-    if(sInstance->fRamMBCap > 0)
-        return sInstance->fRamMBCap;
-    return static_cast<int>(sInstance->fRamBytes*8/10/1000000);
+intMB eSettings::sRamMBCap() {
+    if(sInstance->fRamMBCap.fValue > 0) return sInstance->fRamMBCap;
+    auto mbTot = intMB(sInstance->fRamKB);
+    mbTot.fValue *= 8; mbTot.fValue /= 10;
+    return mbTot;
 }
 
 const QString &eSettings::sSettingsDir() {
@@ -48,7 +49,7 @@ QString eSettings::sIconsDir() {
 
 void eSettings::loadDefaults() {
     fCpuThreadsCap = 0;
-    fRamMBCap = 0;
+    fRamMBCap = intMB(0);
     fAccPreference = AccPreference::defaultPreference;
     fPathGpuAcc = fGpuVendor != GpuVendor::nvidia;
     fHddCache = true;
@@ -80,7 +81,7 @@ void eSettings::loadFromFile() {
             if(ok) fCpuThreads = cpuThreadsCap;
         } else if(setting == "ramMBCap") {
             const int ramMBCap = value.toInt(&ok);
-            if(ok) fRamMBCap = ramMBCap;
+            if(ok) fRamMBCap = intMB(ramMBCap);
         } else if(setting == "accPreference") {
             const int accPreference = value.toInt(&ok);
             ok = accPreference >= 0 && accPreference <= 4;

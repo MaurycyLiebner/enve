@@ -19,6 +19,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include "Private/memorystructs.h"
 
 enum MemoryState {
     NORMAL_MEMORY_STATE,
@@ -35,18 +36,18 @@ public:
 
     void checkMemory();
 private:
-    static long sGetFreeBytes();
+    void sGetFreeKB(intKB& procFreeKB, intKB& sysFreeKB);
     static char sLine[256];
 
     MemoryState mLastMemoryState = NORMAL_MEMORY_STATE;
 
-    long mLowFreeBytes = 0;
-    long mVeryLowFreeBytes = 0;
+    intKB mLowFreeKB = intKB(0);
+    intKB mVeryLowFreeKB = intKB(0);
 
     static MemoryChecker *mInstance;
 signals:
-    void memoryCheckedKB(int, int);
-    void handleMemoryState(MemoryState, long bytesToFree);
+    void memoryCheckedKB(intKB, intKB);
+    void handleMemoryState(MemoryState, longB bytesToFree);
 };
 
 #endif // MEMORYCHECKER_H

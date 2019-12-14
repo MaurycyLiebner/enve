@@ -41,7 +41,7 @@ install:
     - sudo make
     - cd ..
     - # build gperftools
-    - cd gperftools-2.7
+    - cd gperftools-2.7-enve-mod
     - ./autogen.sh
     - ./configure --prefix /usr
     - make

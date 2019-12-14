@@ -171,6 +171,7 @@ SOURCES += \
     Private/document.cpp \
     Private/documentrw.cpp \
     Private/esettings.cpp \
+    Private/memorystructs.cpp \
     Properties/boxtargetproperty.cpp \
     RasterEffects/customrastereffect.cpp \
     RasterEffects/rastereffect.cpp \
@@ -400,6 +401,7 @@ HEADERS += \
     Private/Tasks/taskscheduler.h \
     Private/document.h \
     Private/esettings.h \
+    Private/memorystructs.h \
     Properties/boxtargetproperty.h \
     RasterEffects/customrastereffect.h \
     RasterEffects/rastereffect.h \

@@ -111,6 +111,7 @@ cd ..
 ```
 
 #### gperftools
+Install packages needed to build gperftools:
 ```
 sudo apt-get install autoconf automake libtool
 sudo apt-get install libunwind-dev
@@ -118,7 +119,7 @@ sudo apt-get install libunwind-dev
 
 Build gperftools:
 ```
-cd gperftools-2.7
+cd gperftools-2.7-enve-mod
 ./autogen.sh
 ./configure --prefix /usr
 make

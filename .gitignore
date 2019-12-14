@@ -16,13 +16,7 @@ build/Release/*
 /Boxes
 /icons
 /recent
-
-third_party/*
-!third_party/skia.tar.xz
-!third_party/libmypaint.tar.xz
-!third_party/skiaInstructions
-!third_party/libmypaintInstructions
-!third_party/gperftools-2.7/*
+/settings
 
 *.creator.user*
 *.pro.user*

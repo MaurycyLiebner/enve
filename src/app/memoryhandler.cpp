@@ -24,6 +24,8 @@
 
 MemoryHandler *MemoryHandler::sInstance = nullptr;
 Q_DECLARE_METATYPE(MemoryState)
+Q_DECLARE_METATYPE(longB)
+Q_DECLARE_METATYPE(intKB)
 
 MemoryHandler::MemoryHandler(QObject * const parent) : QObject(parent) {
     Q_ASSERT(!sInstance);
@@ -33,8 +35,10 @@ MemoryHandler::MemoryHandler(QObject * const parent) : QObject(parent) {
     mMemoryChecker = new MemoryChecker();
     mMemoryChecker->moveToThread(mMemoryChekerThread);
     qRegisterMetaType<MemoryState>();
+    qRegisterMetaType<longB>();
     connect(mMemoryChecker, &MemoryChecker::handleMemoryState,
             this, &MemoryHandler::freeMemory);
+    qRegisterMetaType<intKB>();
     connect(mMemoryChecker, &MemoryChecker::memoryCheckedKB,
             this, &MemoryHandler::memoryChecked);
 
@@ -53,7 +57,7 @@ MemoryHandler::~MemoryHandler() {
 }
 
 void MemoryHandler::freeMemory(const MemoryState &state,
-                               const long &minFreeBytes) {
+                               const longB &minFreeBytes) {
     if(state != mCurrentMemoryState) {
         if(state == NORMAL_MEMORY_STATE) {
             mTimer->setInterval(1000);
@@ -63,8 +67,8 @@ void MemoryHandler::freeMemory(const MemoryState &state,
         mCurrentMemoryState = state;
     }
 
-    if(minFreeBytes <= 0) return;
-    long memToFree = minFreeBytes;
+    if(minFreeBytes.fValue <= 0) return;
+    long memToFree = minFreeBytes.fValue;
     while(memToFree > 0 && !mDataHandler.isEmpty()) {
         const auto cont = mDataHandler.takeFirst();
         memToFree -= cont->free_RAM_k();
@@ -73,10 +77,10 @@ void MemoryHandler::freeMemory(const MemoryState &state,
     emit memoryFreed();
 }
 
-void MemoryHandler::memoryChecked(const int memKb, const int totMemKb) {
+void MemoryHandler::memoryChecked(const intKB memKb, const intKB totMemKb) {
     if(!MainWindow::sGetInstance()) return;
     const auto usageWidget = MainWindow::sGetInstance()->getUsageWidget();
     if(!usageWidget) return;
-    usageWidget->setTotalRam(totMemKb/1000000.);
-    usageWidget->setRamUsage((totMemKb - memKb)/1000000.);
+    usageWidget->setTotalRam(totMemKb.fValue/(1024*1024));
+    usageWidget->setRamUsage((totMemKb - memKb).fValue/(1024*1024));
 }

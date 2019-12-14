@@ -22,21 +22,20 @@
 
 int HardwareInfo::mCpuThreads = -1;
 
-long HardwareInfo::mRamBytes = -1;
-int HardwareInfo::mRamKB = -1;
+intKB HardwareInfo::mRamKB(0);
 
 GpuVendor HardwareInfo::mGpuVendor = GpuVendor::unrecognized;
 
-long getTotalRamBytes() {
+intKB getTotalRamBytes() {
     FILE * const meminfo = fopen("/proc/meminfo", "r");
     if(meminfo) {
         char line[256];
 
         while(fgets(line, sizeof(line), meminfo)) {
-            int ram;
-            if(sscanf(line, "MemTotal: %d kB", &ram) == 1) {
+            intKB memTotal(0);
+            if(sscanf(line, "MemTotal: %d kB", &memTotal.fValue) == 1) {
                 fclose(meminfo);
-                return static_cast<long>(ram)*1000;
+                return memTotal;
             }
         }
         fclose(meminfo);
@@ -72,10 +71,9 @@ GpuVendor gpuVendor() {
 
 void HardwareInfo::sUpdateInfo() {
     mCpuThreads = QThread::idealThreadCount();
-    mRamBytes = getTotalRamBytes();
-    mRamKB = static_cast<int>(mRamBytes/1000);
+    mRamKB = getTotalRamBytes();
     mGpuVendor = gpuVendor();
-    eSettings::sInstance->fRamBytes = mRamBytes;
+    eSettings::sInstance->fRamKB = mRamKB;
     eSettings::sInstance->fCpuThreads = mCpuThreads;
     eSettings::sInstance->fGpuVendor = mGpuVendor;
 }
