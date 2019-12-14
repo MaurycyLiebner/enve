@@ -5,6 +5,8 @@
 RenderSettingsDialog::RenderSettingsDialog(const RenderSettings &settings,
                                            QWidget *parent) :
     QDialog(parent), mInitialSettings(settings) {
+    setWindowTitle("Render Settings");
+
     const auto mainLayout = new QVBoxLayout(this);
     setLayout(mainLayout);
 

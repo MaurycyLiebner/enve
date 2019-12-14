@@ -21,6 +21,8 @@
 OutputSettingsDialog::OutputSettingsDialog(const OutputSettings &settings,
                                            QWidget *parent) :
     QDialog(parent), mInitialSettings(settings) {
+    setWindowTitle("Output Settings");
+
     mSupportedFormats = {
         FormatCodecs(QList<AVCodecID>() << AV_CODEC_ID_PNG << AV_CODEC_ID_TIFF << AV_CODEC_ID_MJPEG << AV_CODEC_ID_LJPEG,
                      QList<AVCodecID>(),

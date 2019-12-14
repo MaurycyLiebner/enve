@@ -125,7 +125,6 @@ SOURCES += main.cpp\
     GUI/GradientWidgets/displayedgradientswidget.cpp \
     GUI/GradientWidgets/currentgradientwidget.cpp \
     GUI/RenderWidgets/closablecontainer.cpp \
-    GUI/RenderWidgets/renderdestinationdialog.cpp \
     GUI/BoxesList/boxtargetwidget.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
@@ -223,7 +222,6 @@ HEADERS  += \
     GUI/GradientWidgets/displayedgradientswidget.h \
     GUI/GradientWidgets/currentgradientwidget.h \
     GUI/RenderWidgets/closablecontainer.h \
-    GUI/RenderWidgets/renderdestinationdialog.h \
     GUI/BoxesList/boxtargetwidget.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h \
