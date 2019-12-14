@@ -67,6 +67,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     GUI/BoxesList/boxscroller.cpp \
+    GUI/Settings/performancesettingswidget.cpp \
+    GUI/Settings/settingsdialog.cpp \
+    GUI/Settings/settingswidget.cpp \
     GUI/audiohandler.cpp \
     GUI/canvasbasewrappernode.cpp \
     GUI/canvaswindowevents.cpp \
@@ -78,7 +81,6 @@ SOURCES += main.cpp\
     GUI/ewidgetsimpl.cpp \
     GUI/layouthandler.cpp \
     GUI/scenechooser.cpp \
-    GUI/settingsdialog.cpp \
     GUI/timelinebasewrappernode.cpp \
     GUI/timelinedockwidget.cpp \
     GUI/timelinewidget.cpp \
@@ -163,6 +165,9 @@ SOURCES += main.cpp\
 
 HEADERS  += \
     GUI/BoxesList/boxscroller.h \
+    GUI/Settings/performancesettingswidget.h \
+    GUI/Settings/settingsdialog.h \
+    GUI/Settings/settingswidget.h \
     GUI/audiohandler.h \
     GUI/canvasbasewrappernode.h \
     GUI/canvaswrappernode.h \
@@ -173,7 +178,6 @@ HEADERS  += \
     GUI/ewidgetsimpl.h \
     GUI/layouthandler.h \
     GUI/scenechooser.h \
-    GUI/settingsdialog.h \
     GUI/timelinebasewrappernode.h \
     GUI/timelinedockwidget.h \
     GUI/timelinewidget.h \

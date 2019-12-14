@@ -71,7 +71,7 @@ public:
 
     bool fHddCache = true;
     QString fHddCacheFolder = ""; // "" - use system default temporary files folder
-    int fHddCacheMBCap = 0; // <= 0 - no cap
+    intMB fHddCacheMBCap = intMB(0); // <= 0 - no cap
 
     // history
     int fUndoCap = 25; // <= 0 - no cap

@@ -20,6 +20,7 @@
 #include "Tasks/updatable.h"
 #include "gpupostprocessor.h"
 #include "taskquehandler.h"
+#include "Private/esettings.h"
 class Canvas;
 class CpuExecController;
 class HddExecController;
@@ -143,6 +144,13 @@ public:
 
     int busyCpuThreads() const {
         return mCpuExecutors.count() - mFreeCpuExecs.count();
+    }
+
+    int availableCpuThreads() const {
+        const int cap = eSettings::sInstance->fCpuThreadsCap;
+        if(cap > 0) return qMin(mFreeCpuExecs.count(),
+                                cap - mCpuExecutors.count());
+        return mFreeCpuExecs.count();
     }
 
     void afterCpuGpuTaskFinished();

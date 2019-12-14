@@ -271,7 +271,7 @@ MainWindow::~MainWindow() {
 
 #include "noshortcutaction.h"
 #include "efiltersettings.h"
-#include "settingsdialog.h"
+#include "Settings/settingsdialog.h"
 void MainWindow::setupMenuBar() {
     mMenuBar = new QMenuBar(this);
 

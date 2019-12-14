@@ -92,7 +92,7 @@ bool TaskScheduler::overflowed() const {
 }
 
 bool TaskScheduler::shouldQueMoreCpuTasks() const {
-    return !mFreeCpuExecs.isEmpty() && !mCpuQueing && !overflowed();
+    return availableCpuThreads() > 0 && !mCpuQueing && !overflowed();
 }
 
 bool TaskScheduler::shouldQueMoreHddTasks() const {
@@ -237,7 +237,7 @@ void TaskScheduler::afterCpuGpuTaskFinished() {
 
 void TaskScheduler::processNextQuedCpuTask() {
     const int additional = mQuedCpuTasks.taskCount()/(mCpuExecutors.count()*4);
-    while(!mFreeCpuExecs.isEmpty() && !mQuedCpuTasks.isEmpty()) {
+    while(availableCpuThreads() > 0 && !mQuedCpuTasks.isEmpty()) {
         const auto task = mQuedCpuTasks.takeQuedForCpuProcessing();
         if(task) {
             task->aboutToProcess(Hardware::cpu);
@@ -256,6 +256,5 @@ void TaskScheduler::processNextQuedCpuTask() {
         } else break;
     }
 
-    const int cUsed = mCpuExecutors.count() - mFreeCpuExecs.count();
-    emit cpuUsageChanged(cUsed);
+    emit cpuUsageChanged(busyCpuThreads());
 }

@@ -54,7 +54,7 @@ void eSettings::loadDefaults() {
     fPathGpuAcc = fGpuVendor != GpuVendor::nvidia;
     fHddCache = true;
     fHddCacheFolder = "";
-    fHddCacheMBCap = 0;
+    fHddCacheMBCap = intMB(0);
     fUndoCap = 25;
 }
 
@@ -96,7 +96,7 @@ void eSettings::loadFromFile() {
             if(ok) fHddCache = hddCache;
         } else if(setting == "hddCacheMBCap") {
             const int hddCacheMBCap = value.toInt(&ok);
-            if(ok) fHddCacheMBCap = hddCacheMBCap;
+            if(ok) fHddCacheMBCap = intMB(hddCacheMBCap);
         } else ok = false;
 
         if(!ok) break;
@@ -114,8 +114,8 @@ void eSettings::saveToFile() {
         RuntimeThrow("Could not open \"" + settingsFile + "\" for writing");
     QTextStream textStream(&file);
 
-//    textStream << "cpuThreadsCap: " << fCpuThreadsCap << endl;
-//    textStream << "ramMBCap: " << fRamMBCap << endl;
+    textStream << "cpuThreadsCap: " << fCpuThreadsCap << endl;
+    textStream << "ramMBCap: " << fRamMBCap.fValue << endl;
 
     textStream << "accPreference: " << static_cast<int>(fAccPreference) << endl;
     textStream << "pathGpuAcc: " << (fPathGpuAcc ? "enabled" : "disabled") << endl;

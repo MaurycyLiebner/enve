@@ -1,38 +1,47 @@
-#include "settingsdialog.h"
+#include "performancesettingswidget.h"
 #include "Private/esettings.h"
-#include "hardwareinfo.h"
 #include "exceptions.h"
+#include "hardwareinfo.h"
+#include "GUI/global.h"
 
-#include <QVBoxLayout>
-#include <QPushButton>
+PerformanceSettingsWidget::PerformanceSettingsWidget(QWidget *parent) :
+    SettingsWidget(parent) {
+    QHBoxLayout* cpuCapSett = new QHBoxLayout;
 
-SettingsDialog::SettingsDialog(QWidget * const parent) :
-    QDialog(parent) {
-    setWindowTitle("Settings");
+    mCpuThreadsCapCheck = new QCheckBox("CPU threads cap", this);
+    mCpuThreadsCapLabel = new QLabel(this);
+    mCpuThreadsCapSlider = new QSlider(Qt::Horizontal);
+    mCpuThreadsCapSlider->setRange(1, HardwareInfo::sCpuThreads());
+    connect(mCpuThreadsCapCheck, &QCheckBox::toggled,
+            mCpuThreadsCapSlider, &QWidget::setEnabled);
+    connect(mCpuThreadsCapCheck, &QCheckBox::toggled,
+            mCpuThreadsCapLabel, &QWidget::setEnabled);
+    mCpuThreadsCapSlider->setEnabled(false);
+    mCpuThreadsCapLabel->setEnabled(false);
+    connect(mCpuThreadsCapSlider, &QSlider::valueChanged,
+            this, [this](const int val) {
+        const int nTot = HardwareInfo::sCpuThreads();
+        mCpuThreadsCapLabel->setText(QString("%1 / %2").arg(val).arg(nTot));
+    });
 
-    const auto mainLauout = new QVBoxLayout;
-    setLayout(mainLauout);
+    addWidget(mCpuThreadsCapCheck);
+    cpuCapSett->addWidget(mCpuThreadsCapLabel);
+    cpuCapSett->addWidget(mCpuThreadsCapSlider);
+    addLayout(cpuCapSett);
 
-//    QHBoxLayout* cpuCapSett = new QHBoxLayout;
-
-//    mCpuThreadsCapCheck = new QCheckBox("CPU threads cap", this);
-//    mCpuThreadsCapSpin = new QSpinBox(this);
-//    mCpuThreadsCapSpin->setRange(1, HardwareInfo::sCpuThreads());
-//    connect(mCpuThreadsCapCheck, &QCheckBox::toggled,
-//            mCpuThreadsCapSpin, &QWidget::setEnabled);
-
-//    cpuCapSett->addWidget(mCpuThreadsCapCheck);
-//    cpuCapSett->addWidget(mCpuThreadsCapSpin);
-//    mainLauout->addLayout(cpuCapSett);
+    addSeparator();
 
     QHBoxLayout* ramCapSett = new QHBoxLayout;
 
-    mRamMBCapCheck = new QCheckBox("Process RAM MB cap", this);
+    mRamMBCapCheck = new QCheckBox("RAM cap", this);
     mRamMBCapSpin = new QSpinBox(this);
     mRamMBCapSpin->setRange(250, intMB(HardwareInfo::sRamKB()).fValue);
+    mRamMBCapSpin->setSuffix(" MB");
+    mRamMBCapSpin->setEnabled(false);
 
     mRamMBCapSlider = new QSlider(Qt::Horizontal);
     mRamMBCapSlider->setRange(250, intMB(HardwareInfo::sRamKB()).fValue);
+    mRamMBCapSlider->setEnabled(false);
 
     connect(mRamMBCapCheck, &QCheckBox::toggled,
             mRamMBCapSpin, &QWidget::setEnabled);
@@ -46,14 +55,10 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
 
     ramCapSett->addWidget(mRamMBCapCheck);
     ramCapSett->addWidget(mRamMBCapSpin);
-    mainLauout->addLayout(ramCapSett);
-    mainLauout->addWidget(mRamMBCapSlider);
+    addLayout(ramCapSett);
+    addWidget(mRamMBCapSlider);
 
-    const auto line0 = new QFrame();
-    line0->setFrameShape(QFrame::HLine);
-    line0->setFrameShadow(QFrame::Sunken);
-    mainLauout->addWidget(line0);
-
+    addSeparator();
 
     mAccPreferenceLabel = new QLabel("Acceleration preference:");
     const auto sliderLayout = new QHBoxLayout;
@@ -67,18 +72,15 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
     mAccPreferenceDescLabel = new QLabel();
     mAccPreferenceDescLabel->setAlignment(Qt::AlignCenter);
     connect(mAccPreferenceSlider, &QSlider::valueChanged,
-            this, &SettingsDialog::updateAccPreferenceDesc);
-    mainLauout->addWidget(mAccPreferenceLabel);
-    mainLauout->addLayout(sliderLayout);
-    mainLauout->addWidget(mAccPreferenceDescLabel);
+            this, &PerformanceSettingsWidget::updateAccPreferenceDesc);
+    addWidget(mAccPreferenceLabel);
+    addLayout(sliderLayout);
+    addWidget(mAccPreferenceDescLabel);
 
-    const auto line1 = new QFrame();
-    line1->setFrameShape(QFrame::HLine);
-    line1->setFrameShadow(QFrame::Sunken);
-    mainLauout->addWidget(line1);
+    addSeparator();
 
     mPathGpuAccCheck = new QCheckBox("Path GPU acceleration", this);
-    mainLauout->addWidget(mPathGpuAccCheck);
+    addWidget(mPathGpuAccCheck);
 
 //    const auto line2 = new QFrame();
 //    line2->setFrameShape(QFrame::HLine);
@@ -104,62 +106,37 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
 //    connect(mHddCacheCheck, &QCheckBox::toggled,
 //            hddCacheSett, &QWidget::setEnabled);
 
-//    mainLauout->addWidget(hddCacheSett);
+    //    mainLauout->addWidget(hddCacheSett);
+}
 
-    const auto buttonsLayout = new QHBoxLayout;
-
-    const auto restoreButton = new QPushButton("Restore Defaults", this);
-    const auto cancelButton = new QPushButton("Cancel", this);
-    const auto applyButton = new QPushButton("Apply", this);
-    buttonsLayout->addWidget(restoreButton);
-    buttonsLayout->addStretch();
-    buttonsLayout->addWidget(cancelButton);
-    buttonsLayout->addWidget(applyButton);
-
-    mainLauout->addLayout(buttonsLayout);
-
-    connect(restoreButton, &QPushButton::released, this, [this]() {
-        eSettings::sInstance->loadDefaults();
-        updateSettings();
-    });
-
-    connect(cancelButton, &QPushButton::released, this, &QDialog::close);
-
-    connect(applyButton, &QPushButton::released, this, [this]() {
-        eSettings& sett = *eSettings::sInstance;
-//        sett.fCpuThreadsCap = mCpuThreadsCapCheck->isChecked() ?
-//                    mCpuThreadsCapSpin->value() : 0;
-        sett.fRamMBCap = intMB(mRamMBCapCheck->isChecked() ?
-                    mRamMBCapSpin->value() : 0);
-        sett.fAccPreference = static_cast<AccPreference>(
-                    mAccPreferenceSlider->value());
-        sett.fPathGpuAcc = mPathGpuAccCheck->isChecked();
+void PerformanceSettingsWidget::applySettings() {
+    eSettings& sett = *eSettings::sInstance;
+    sett.fCpuThreadsCap = mCpuThreadsCapCheck->isChecked() ?
+                mCpuThreadsCapSlider->value() : 0;
+    sett.fRamMBCap = intMB(mRamMBCapCheck->isChecked() ?
+                mRamMBCapSpin->value() : 0);
+    sett.fAccPreference = static_cast<AccPreference>(
+                mAccPreferenceSlider->value());
+    sett.fPathGpuAcc = mPathGpuAccCheck->isChecked();
 //        sett.fHddCache = mHddCacheCheck->isChecked();
 //        sett.fRamMBCap = mHddCacheMBCapCheck->isChecked() ?
 //                    mHddCacheMBCapSpin->value() : 0;
-        try {
-            sett.saveToFile();
-        } catch(const std::exception& e) {
-            gPrintExceptionCritical(e);
-        }
-        close();
-    });
-
-    updateSettings();
 }
 
-void SettingsDialog::updateSettings() {
+
+void PerformanceSettingsWidget::updateSettings() {
     eSettings& sett = *eSettings::sInstance;
+    const bool capCpu = sett.fCpuThreadsCap > 0;
+    mCpuThreadsCapCheck->setChecked(capCpu);
+    const int nThreads = capCpu ? sett.fCpuThreadsCap :
+                                  HardwareInfo::sCpuThreads();
+    mCpuThreadsCapSlider->setValue(nThreads);
 
-//    mCpuThreadsCapCheck->setChecked(sett.fCpuThreadsCap > 0);
-//    mCpuThreadsCapSpin->setRange(1, HardwareInfo::sCpuThreads());
-//    mCpuThreadsCapSpin->setValue(sett.fCpuThreadsCap);
-//    mCpuThreadsCapSpin->setEnabled(sett.fCpuThreadsCap > 0);
-
-    mRamMBCapCheck->setChecked(sett.fRamMBCap.fValue > 250);
-    mRamMBCapSpin->setValue(sett.fRamMBCap.fValue);
-    mRamMBCapSpin->setEnabled(sett.fRamMBCap.fValue > 250);
-    mRamMBCapSlider->setValue(sett.fRamMBCap.fValue);
+    const bool capRam = sett.fRamMBCap.fValue > 250;
+    mRamMBCapCheck->setChecked(capRam);
+    const int nRamMB = capRam ? sett.fRamMBCap.fValue :
+                                intMB(HardwareInfo::sRamKB()).fValue;
+    mRamMBCapSpin->setValue(nRamMB);
 
     mAccPreferenceSlider->setValue(static_cast<int>(sett.fAccPreference));
     updateAccPreferenceDesc();
@@ -172,7 +149,7 @@ void SettingsDialog::updateSettings() {
 //    mHddCacheMBCapSpin->setValue(sett.fHddCacheMBCap);
 }
 
-void SettingsDialog::updateAccPreferenceDesc() {
+void PerformanceSettingsWidget::updateAccPreferenceDesc() {
     const int value = mAccPreferenceSlider->value();
     QString toolTip;
     if(value == 0) {
@@ -182,7 +159,7 @@ void SettingsDialog::updateAccPreferenceDesc() {
         mAccPreferenceDescLabel->setText("Soft CPU preference");
         toolTip = "Use the GPU only for tasks marked as preferred for the GPU";
     } else if(value == 2) {
-        mAccPreferenceDescLabel->setText("Hardware agnostic");
+        mAccPreferenceDescLabel->setText(" Hardware agnostic (recommended) ");
         toolTip = "Adhere to the default hardware preference";
     } else if(value == 3) {
         mAccPreferenceDescLabel->setText("Soft GPU preference");

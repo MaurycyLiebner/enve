@@ -1,22 +1,24 @@
-#ifndef SETTINGSDIALOG_H
-#define SETTINGSDIALOG_H
+#ifndef PERFORMANCESETTINGSWIDGET_H
+#define PERFORMANCESETTINGSWIDGET_H
 
-#include <QDialog>
+#include "settingswidget.h"
 #include <QSpinBox>
 #include <QLabel>
 #include <QCheckBox>
 #include <QSlider>
 
-class SettingsDialog : public QDialog {
-    Q_OBJECT
+class PerformanceSettingsWidget : public SettingsWidget {
 public:
-    explicit SettingsDialog(QWidget * const parent = nullptr);
-private:
+    explicit PerformanceSettingsWidget(QWidget *parent = nullptr);
+
+    void applySettings();
     void updateSettings();
+private:
     void updateAccPreferenceDesc();
 
     QCheckBox* mCpuThreadsCapCheck = nullptr;
-    QSpinBox* mCpuThreadsCapSpin = nullptr;
+    QLabel* mCpuThreadsCapLabel = nullptr;
+    QSlider* mCpuThreadsCapSlider = nullptr;
 
     QCheckBox* mRamMBCapCheck = nullptr;
     QSpinBox* mRamMBCapSpin = nullptr;
@@ -36,4 +38,4 @@ private:
     QSpinBox* mHddCacheMBCapSpin = nullptr;
 };
 
-#endif // SETTINGSDIALOG_H
+#endif // PERFORMANCESETTINGSWIDGET_H
