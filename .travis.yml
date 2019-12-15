@@ -53,7 +53,7 @@ install:
     - # build gperftools
     - cd gperftools-2.7-enve-mod
     - ./autogen.sh
-    - ./configure --prefix /usr
+    - ./configure --prefix /usr LIBS=-lpthread
     - make
     - cd ../../
 before_script:
