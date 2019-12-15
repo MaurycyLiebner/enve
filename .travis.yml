@@ -1,30 +1,36 @@
 language: cpp
-dist: xenial
-compiler: g++
-sudo: required
+
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - sourceline: 'ppa:beineri/opt-qt-5.12.6-xenial'
+            - sourceline: 'ppa:jonathonf/ffmpeg-4'
+          packages:
+            - g++-7
+            - qt512base qt512multimedia qt512svg
+            - libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
+            - libglib2.0-dev
+            - unzip
+            - libjson-c-dev intltool pkg-config
+            - # for gperftools
+            - autoconf automake libtool libunwind-dev
+            - # skia dependencies
+            - build-essential freeglut3-dev libfontconfig-dev libfreetype6-dev
+            - libgif-dev libgl1-mesa-dev libglu1-mesa-dev libharfbuzz-dev
+            - libicu-dev libjpeg-dev libpng-dev libwebp-dev
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
 before_install:
-    - sudo add-apt-repository -y ppa:jonathonf/gcc
-    - # sudo add-apt-repository -y ppa:jonathonf/ffmpeg-4
-    - sudo add-apt-repository -y ppa:beineri/opt-qt-5.12.6-xenial
-    - sudo apt-get update
+    - eval "${MATRIX_EVAL}"
 install:
-    - sudo apt-get -y install g++-7
-    - sudo apt-get -y install build-essential curl
-    - wget https://raw.githubusercontent.com/markus-perl/ffmpeg-build-script/master/build-ffmpeg
-    - chmod +x build-ffmpeg
-    - sudo AUTOINSTALL=yes ./build-ffmpeg --build
-    - # sudo apt-get -y install libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
-    - sudo apt-get -y install qt512base qt512multimedia qt512svg
     - source /opt/qt512/bin/qt512-env.sh
-    - sudo apt-get -y install libglib2.0-dev
-    - sudo apt-get -y install unzip
-    - sudo apt-get -y install libjson-c-dev intltool pkg-config
-    - # for gperftools
-    - sudo apt-get -y install autoconf automake libtool
-    - sudo apt-get -y install libunwind-dev
     - # skia dependencies
-    - sudo apt-get -y install build-essential freeglut3-dev libfontconfig-dev libfreetype6-dev libgif-dev libgl1-mesa-dev libglu1-mesa-dev libharfbuzz-dev libicu-dev libjpeg-dev libpng-dev libwebp-dev
     - cd third_party
     - # build skia
     - tar xf skia.tar.xz
