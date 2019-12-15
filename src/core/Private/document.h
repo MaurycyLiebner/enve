@@ -22,7 +22,7 @@
 #include "smartPointers/ememory.h"
 #include "singlewidgettarget.h"
 #include "paintsettings.h"
-#include "Paint/simplebrushwrapper.h"
+#include "Paint/brushcontexedwrapper.h"
 #include "actions.h"
 #include "Tasks/taskscheduler.h"
 #include "clipboardcontainer.h"
@@ -118,24 +118,30 @@ public:
     Gradient * getGradientWithRWId(const int rwId) const;
     Gradient * getGradientWithDocumentId(const int id) const;
 
-    void setBrush(const SimpleBrushWrapper * const brush) {
-        fBrush = brush;
+    void setBrush(BrushContexedWrapper * const brush) {
+        fBrush = brush->getSimpleBrush();
         if(fBrush) fBrush->setColor(fBrushColor);
+        emit brushChanged(brush);
+        emit brushSizeChanged(fBrush ? fBrush->getBrushSize() : 0.f);
+        emit brushColorChanged(fBrush ? fBrush->getColor() : Qt::white);
     }
 
     void setBrushColor(const QColor &color) {
         fBrushColor = color;
         if(fBrush) fBrush->setColor(fBrushColor);
+        emit brushColorChanged(color);
     }
 
     void incBrushRadius() {
         if(!fBrush) return;
         fBrush->incPaintBrushSize(0.3);
+        emit brushSizeChanged(fBrush->getBrushSize());
     }
 
     void decBrushRadius() {
         if(!fBrush) return;
         fBrush->decPaintBrushSize(0.3);
+        emit brushSizeChanged(fBrush->getBrushSize());
     }
 //
     void clear();
@@ -172,6 +178,10 @@ signals:
 //
     void gradientCreated(Gradient*);
     void gradientRemoved(Gradient*);
+//
+    void brushChanged(BrushContexedWrapper* brush);
+    void brushColorChanged(QColor color);
+    void brushSizeChanged(float size);
 //
     void evFilePathChanged(QString);
     void documentChanged();

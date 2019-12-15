@@ -76,7 +76,7 @@ private:
     void setLinearGradientAction();
     void setRadialGradientAction();
 
-    void setStrokeBrush(SimpleBrushWrapper * const brush);
+    void setStrokeBrush(BrushContexedWrapper * const brush);
     void setBrushTimeCurve(const qCubicSegment1D& seg);
     void setBrushWidthCurve(const qCubicSegment1D& seg);
     void setBrushPressureCurve(const qCubicSegment1D& seg);

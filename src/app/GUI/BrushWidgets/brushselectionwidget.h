@@ -96,12 +96,12 @@ public:
         return nullptr;
     }
 signals:
-    void currentBrushChanged(SimpleBrushWrapper*);
+    void currentBrushChanged(BrushContexedWrapper*);
 private:
     void brushCWrapperSelected(BrushContexedWrapper * wrapper) {
         if(mCurrentBrushCWrapper) mCurrentBrushCWrapper->setSelected(false);
         mCurrentBrushCWrapper = wrapper;
-        emit currentBrushChanged(getCurrentBrush());
+        emit currentBrushChanged(wrapper);
     }
     static void sLoadCollectionsFromDir(const QString& mainDirPath);
 

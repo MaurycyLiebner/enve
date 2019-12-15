@@ -572,9 +572,28 @@ QToolButton:checked {
     margin-bottom: 1;
 }*/
 
-QToolButton#inactiveToolButton:hover {background: transparent;}
+QToolButton#emptyToolButton {
+    height: 1px;
+}
 
-QToolButton#inactiveToolButton:pressed {background: transparent;}
+QToolButton#inactiveToolButton:hover,
+QToolButton#emptyToolButton:hover {
+    background: transparent;
+}
 
-QToolButton#inactiveToolButton:checked {background: transparent;}
+QToolButton#inactiveToolButton:pressed,
+QToolButton#emptyToolButton:pressed {
+    background: transparent;
+}
 
+QToolButton#inactiveToolButton:checked,
+QToolButton#emptyToolButton:checked {
+    background: transparent;
+}
+
+QToolTip {
+    background: rgb(60, 60, 60);
+    color: white;
+    border: 1px solid black;
+    padding: 0.1em;
+}

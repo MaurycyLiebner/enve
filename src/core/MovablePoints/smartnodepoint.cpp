@@ -143,11 +143,12 @@ void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {
 }
 #include "Private/document.h"
 bool SmartNodePoint::isVisible(const CanvasMode mode) const {
-    const auto nodeVis = Document::sInstance->fNodeVisibility;
-    if(isNormal() && nodeVis == NodeVisiblity::dissolvedOnly) return false;
-    if(isDissolved() && nodeVis == NodeVisiblity::normalOnly) return false;
-    if(mode == CanvasMode::pointTransform) return true;
-    else if(mode == CanvasMode::pathCreate)
+    if(mode == CanvasMode::pointTransform) {
+        const auto nodeVis = Document::sInstance->fNodeVisibility;
+        if(isNormal() && nodeVis == NodeVisiblity::dissolvedOnly) return false;
+        if(isDissolved() && nodeVis == NodeVisiblity::normalOnly) return false;
+        return true;
+    } else if(mode == CanvasMode::pathCreate)
         return isEndPoint() || isSelected();
     return false;
 }

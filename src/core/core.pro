@@ -136,6 +136,7 @@ SOURCES += \
     GUI/coloranimatorbutton.cpp \
     GUI/durationrectsettingsdialog.cpp \
     GUI/ewidgets.cpp \
+    GUI/global.cpp \
     GUI/newcanvasdialog.cpp \
     GUI/twocolumnlayout.cpp \
     GUI/valueinput.cpp \

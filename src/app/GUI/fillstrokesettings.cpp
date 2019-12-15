@@ -371,8 +371,8 @@ void FillStrokeSettingsWidget::setCurrentPaintType(
 }
 
 void FillStrokeSettingsWidget::setStrokeBrush(
-        SimpleBrushWrapper * const brush) {
-    mCurrentStrokeBrush = brush;
+        BrushContexedWrapper * const brush) {
+    mCurrentStrokeBrush = brush->getSimpleBrush();
     emitStrokeBrushChanged();
     mDocument.actionFinished();
 }

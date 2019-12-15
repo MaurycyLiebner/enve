@@ -33,4 +33,8 @@
     <qresource prefix="/other">
         <file>GPL3-license.txt</file>
     </qresource>
+    <qresource prefix="/">
+        <file>icons/toolbarButtons/plain/brush-</file>
+        <file>icons/toolbarButtons/plain/brush+</file>
+    </qresource>
 </RCC>

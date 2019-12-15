@@ -646,94 +646,102 @@ void MainWindow::setupToolBar() {
 
     mBoxTransformMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/boxTransformUnchecked.png",
-                iconsDir + "/boxTransformChecked.png", "F1", this);
+                iconsDir + "/boxTransformChecked.png",
+                gSingleLineTooltip("Object Mode", "F1"), this);
     mBoxTransformMode->toggle();
     mToolBar->addWidget(mBoxTransformMode);
 
     mPointTransformMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/pointTransformUnchecked.png",
-                iconsDir + "/pointTransformChecked.png", "F2", this);
+                iconsDir + "/pointTransformChecked.png",
+                gSingleLineTooltip("Point Mode", "F2"), this);
     mToolBar->addWidget(mPointTransformMode);
 
     mAddPointMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/pathCreateUnchecked.png",
-                iconsDir +  "/pathCreateChecked.png", "F3", this);
+                iconsDir +  "/pathCreateChecked.png",
+                gSingleLineTooltip("Add Path Mode", "F3"), this);
     mToolBar->addWidget(mAddPointMode);
 
     mPaintMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/paintUnchecked.png",
-                iconsDir + "/paintChecked.png", "F4", this);
+                iconsDir + "/paintChecked.png",
+                gSingleLineTooltip("Paint Mode", "F4"), this);
     mToolBar->addWidget(mPaintMode);
 
     mToolBar->addSeparator();
 
     mPickPaintSettingsMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/pickUnchecked.png",
-                iconsDir + "/pickChecked.png", "F5", this);
+                iconsDir + "/pickChecked.png",
+                gSingleLineTooltip("Pick Mode", "F5"), this);
     mToolBar->addWidget(mPickPaintSettingsMode);
 
     mCircleMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/circleCreateUnchecked.png",
-                iconsDir + "/circleCreateChecked.png", "F6", this);
+                iconsDir + "/circleCreateChecked.png",
+                gSingleLineTooltip("Add Circle Mode", "F6"), this);
     mToolBar->addWidget(mCircleMode);
 
     mRectangleMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/rectCreateUnchecked.png",
-                iconsDir + "/rectCreateChecked.png", "F7", this);
+                iconsDir + "/rectCreateChecked.png",
+                gSingleLineTooltip("Add Rectange Mode", "F7"), this);
     mToolBar->addWidget(mRectangleMode);
 
     mTextMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/textCreateUnchecked.png",
-                iconsDir + "/textCreateChecked.png", "F8", this);
+                iconsDir + "/textCreateChecked.png",
+                gSingleLineTooltip("Add Text Mode", "F8"), this);
     mToolBar->addWidget(mTextMode);
 
-    mToolBar->addSeparator();
+//    mToolBar->addSeparator();
 
     //mToolBar->addSeparator();
     mToolBar->widgetForAction(mToolBar->addAction("     "))->
-            setObjectName("inactiveToolButton");
+            setObjectName("emptyToolButton");
     //mToolBar->addSeparator();
 
     mActionConnectPoints = new ActionButton(iconsDir + "/nodeConnect.png",
-                                            "CONNECT POINTS", this);
+                                            "Connect Nodes", this);
     mToolBar->addWidget(mActionConnectPoints);
 
     mActionDisconnectPoints = new ActionButton(iconsDir + "/nodeDisconnect.png",
-                                               "DISCONNECT POINTS", this);
+                                               "Disconnect Nodes", this);
     mToolBar->addWidget(mActionDisconnectPoints);
 
     mActionMergePoints = new ActionButton(iconsDir + "/nodeMerge.png",
-                                          "MERGE POINTS", this);
+                                          "Merge Nodes", this);
     mToolBar->addWidget(mActionMergePoints);
 //
     mToolBar->addSeparator();
 
     mActionSymmetricPointCtrls = new ActionButton(iconsDir + "/nodeSymmetric.png",
-                                                  "SYMMETRIC POINTS", this);
+                                                  "Symmetric Nodes", this);
     mToolBar->addWidget(mActionSymmetricPointCtrls);
 
     mActionSmoothPointCtrls = new ActionButton(iconsDir + "/nodeSmooth.png",
-                                               "SMOOTH POINTS", this);
+                                               "Smooth Nodes", this);
     mToolBar->addWidget(mActionSmoothPointCtrls);
 
     mActionCornerPointCtrls = new ActionButton(iconsDir + "/nodeCorner.png",
-                                               "CORNER POINTS", this);
+                                               "Corner Nodes", this);
     mToolBar->addWidget(mActionCornerPointCtrls);
 
 //
     mToolBar->addSeparator();
 
     mActionLine = new ActionButton(iconsDir + "/segmentLine.png",
-                                   "MAKE SEGMENT LINE", this);
+                                   gSingleLineTooltip("Make Segment Line"), this);
     mToolBar->addWidget(mActionLine);
 
     mActionCurve = new ActionButton(iconsDir + "/segmentCurve.png",
-                                    "MAKE SEGMENT CURVE", this);
+                                    gSingleLineTooltip("Make Segment Curve"), this);
     mToolBar->addWidget(mActionCurve);
 
     //mToolBar->addSeparator();
     mToolBar->widgetForAction(mToolBar->addAction("     "))->
-            setObjectName("inactiveToolButton");
+            setObjectName("emptyToolButton");
     //mToolBar->addSeparator();
 //
     mFontWidget = new FontsWidget(this);
@@ -741,7 +749,7 @@ void MainWindow::setupToolBar() {
 
     //mToolBar->addSeparator();
     mToolBar->widgetForAction(mToolBar->addAction("     "))->
-            setObjectName("inactiveToolButton");
+            setObjectName("emptyToolButton");
     //mToolBar->addSeparator();
 
     mToolBar->addWidget(mLayoutHandler->comboWidget());

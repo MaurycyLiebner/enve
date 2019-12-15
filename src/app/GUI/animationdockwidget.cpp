@@ -33,28 +33,32 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
 
     mLineButton = new ActionButton(iconsDir + "/segmentLine.png",
-                                   "MAKE SEGMENT LINE", this);
+                                   "Make Segment Line", this);
     connect(mLineButton, &ActionButton::pressed,
             keysView, &KeysView::graphMakeSegmentsLinearAction);
 
     mCurveButton = new ActionButton(iconsDir + "/segmentCurve.png",
-                                    "MAKE SEGMENT CURVE", this);
+                                    "Make Segment Curve", this);
     connect(mCurveButton, &ActionButton::pressed,
             keysView, qOverload<>(&KeysView::graphMakeSegmentsSmoothAction));
 
-    mSymmetricButton = new ActionButton(iconsDir + "/nodeSymmetric.png", "", this);
+    mSymmetricButton = new ActionButton(iconsDir + "/nodeSymmetric.png",
+                                        "Symmetric Nodes", this);
     connect(mSymmetricButton, &ActionButton::pressed,
             keysView, &KeysView::graphSetSymmetricCtrlAction);
 
-    mSmoothButton = new ActionButton(iconsDir + "/nodeSmooth.png", "", this);
+    mSmoothButton = new ActionButton(iconsDir + "/nodeSmooth.png",
+                                     "Smooth Nodes", this);
     connect(mSmoothButton, &ActionButton::pressed,
             keysView, &KeysView::graphSetSmoothCtrlAction);
 
-    mCornerButton = new ActionButton(iconsDir + "/nodeCorner.png", "", this);
+    mCornerButton = new ActionButton(iconsDir + "/nodeCorner.png",
+                                     "Corner Nodes", this);
     connect(mCornerButton, &ActionButton::pressed,
             keysView, &KeysView::graphSetCornerCtrlAction);
 
-    mFitToHeightButton = new ActionButton(iconsDir + "/zoom.png", "", this);
+    mFitToHeightButton = new ActionButton(iconsDir + "/zoom.png",
+                                          "Fit Vertical", this);
     connect(mFitToHeightButton, &ActionButton::pressed,
             keysView, &KeysView::graphResetValueScaleAndMinShownAction);
 

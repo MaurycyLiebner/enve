@@ -48,6 +48,8 @@ class Document;
 class LayoutHandler;
 class SwitchButton;
 
+enum class CanvasMode : short;
+
 class TimelineDockWidget : public QWidget {
 public:
     explicit TimelineDockWidget(Document &document,
@@ -76,6 +78,8 @@ private:
     void renderPreview();
     void pausePreview();
     void resumePreview();
+
+    void updateButtonsVisibility(const CanvasMode mode);
 private:
     Document& mDocument;
     MainWindow* const mMainWindow;
@@ -88,8 +92,22 @@ private:
 
     SwitchButton *mPlayButton;
     ActionButton *mStopButton;
+
+    QAction* mLocalPivotAct;
     SwitchButton *mLocalPivot;
+    QAction* mNodeVisibilityAct;
     SwitchButton *mNodeVisibility;
+
+    QAction* mBrushColorWidgetAct;
+    QLabel* mColorLabel;
+    QLabel* mBrushLabel;
+    QAction* mDecBrushSizeAct;
+    ActionButton *mDecBrushSize;
+    QAction* mBrushSizeLabelAct;
+    QLabel* mBrushSizeLabel;
+    QAction* mIncBrushSizeAct;
+    ActionButton *mIncBrushSize;
+
 
     QAction *mTimelineAction;
     QAction *mRenderAction;

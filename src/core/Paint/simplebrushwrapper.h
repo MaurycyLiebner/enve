@@ -127,6 +127,10 @@ public:
     const QString& getCollectionName() const {
         return mCollectionName;
     }
+
+    float getBrushSize() const {
+        return getBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC);
+    }
 protected:
     SimpleBrushWrapper(const QString& collName,
                        const QString& brushName,

@@ -49,6 +49,9 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     connect(RenderHandler::sInstance, &RenderHandler::previewPaused,
             this, &TimelineDockWidget::previewPaused);
 
+    connect(Document::sInstance, &Document::canvasModeSet,
+            this, &TimelineDockWidget::updateButtonsVisibility);
+
     setFocusPolicy(Qt::NoFocus);
 
     setMinimumSize(10*MIN_WIDGET_DIM, 12*MIN_WIDGET_DIM);
@@ -72,23 +75,25 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     connect(mResolutionComboBox, &QComboBox::currentTextChanged,
             this, &TimelineDockWidget::setResolutionFractionText);
 
+    const int iconSize = 5*MIN_WIDGET_DIM/4;
     const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
 
     mPlayButton = SwitchButton::sCreate2Switch(iconsDir + "/play.png",
                                                iconsDir + "/pause.png",
-                                               "render preview", this);
-    mStopButton = new ActionButton(iconsDir + "/stop.png", "stop preview", this);
+                                               "Render Preview", this);
+    mStopButton = new ActionButton(iconsDir + "/stop.png", "Stop Preview", this);
     connect(mStopButton, &ActionButton::pressed,
             this, &TimelineDockWidget::interruptPreview);
 
-    mLocalPivot = SwitchButton::sCreate2Switch(iconsDir + "/pivotGlobal.png",
-                                               iconsDir + "/pivotLocal.png",
-                                               "pivot global/local [P]", this);
+    mLocalPivot = SwitchButton::sCreate2Switch(
+                iconsDir + "/pivotGlobal.png", iconsDir + "/pivotLocal.png",
+                gSingleLineTooltip("Pivot Global / Local", "P"), this);
     mLocalPivot->setState(mDocument.fLocalPivot);
     connect(mLocalPivot, &SwitchButton::toggled,
             this, &TimelineDockWidget::setLocalPivot);
 
-    mNodeVisibility = new SwitchButton("Node visibility [N]", this);
+    mNodeVisibility = new SwitchButton(
+                gSingleLineTooltip("Node visibility", "N"), this);
     mNodeVisibility->addState(iconsDir + "/dissolvedAndNormalNodes.png");
     mNodeVisibility->addState(iconsDir + "/dissolvedNodesOnly.png");
     mNodeVisibility->addState(iconsDir + "/normalNodesOnly.png");
@@ -98,11 +103,46 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
         Document::sInstance->actionFinished();
     });
 
+    mColorLabel = new QLabel("");
+    mColorLabel->setToolTip(gSingleLineTooltip("Current Color", "E"));
+    connect(&mDocument, &Document::brushColorChanged,
+            this, [this](const QColor& color) {
+        const int dim = mToolBar->height() - 2;
+        QPixmap pix(dim, dim);
+        pix.fill(color);
+        mColorLabel->setPixmap(pix);
+    });
+    mBrushLabel = new QLabel("");
+    mBrushLabel->setToolTip(gSingleLineTooltip("Current Brush", "B"));
+    connect(&mDocument, &Document::brushChanged,
+            this, [this](BrushContexedWrapper* const brush) {
+        const auto& icon = brush->getBrushData().fIcon;
+        const int dim = mToolBar->height() - 2;
+        const auto img = icon.scaled(dim, dim, Qt::KeepAspectRatio,
+                                     Qt::SmoothTransformation);
+        mBrushLabel->setPixmap(QPixmap::fromImage(img));
+    });
+    mDecBrushSize = new ActionButton(
+                iconsDir + "/brush-.png",
+                gSingleLineTooltip("Decrease Brush Size", "Q"), this);
+    connect(mDecBrushSize, &ActionButton::pressed,
+            &mDocument, &Document::decBrushRadius);
+    mBrushSizeLabel = new QLabel("0");
+    mBrushSizeLabel->setAlignment(Qt::AlignCenter);
+    connect(&mDocument, &Document::brushSizeChanged,
+            this, [this](const float size) {
+        mBrushSizeLabel->setText(QString("%1").arg(exp(qreal(size)), 0, 'f', 2));
+    });
+    mBrushSizeLabel->setFixedWidth(2*MIN_WIDGET_DIM);
+    mIncBrushSize = new ActionButton(
+                iconsDir + "/brush+.png",
+                gSingleLineTooltip("Increase Brush Size", "W"), this);
+    connect(mIncBrushSize, &ActionButton::pressed,
+            &mDocument, &Document::incBrushRadius);
 
     mToolBar = new QToolBar(this);
     mToolBar->setMovable(false);
 
-    const int iconSize = 5*MIN_WIDGET_DIM/4;
     mToolBar->setIconSize(QSize(iconSize, iconSize));
     mToolBar->addSeparator();
 
@@ -120,12 +160,28 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mToolBar->addWidget(mPlayButton);
     mToolBar->addWidget(mStopButton);
 
-    mToolBar->addSeparator();
-    mToolBar->addWidget(mLocalPivot);
-    mToolBar->addSeparator();
-    mToolBar->addWidget(mNodeVisibility);
-    mToolBar->addSeparator();
+    mToolBar->widgetForAction(mToolBar->addAction("     "))->
+            setObjectName("emptyToolButton");
 
+    mLocalPivotAct = mToolBar->addWidget(mLocalPivot);
+    mNodeVisibilityAct = mToolBar->addWidget(mNodeVisibility);
+
+    const auto brushColorWidget = new QWidget(this);
+    brushColorWidget->setContentsMargins(0, 0, 0, 0);
+    brushColorWidget->setLayout(new QHBoxLayout);
+    brushColorWidget->layout()->setSpacing(0);
+    brushColorWidget->layout()->setContentsMargins(0, 0, 0, 0);
+    brushColorWidget->layout()->addWidget(mBrushLabel);
+    brushColorWidget->layout()->addWidget(mColorLabel);
+
+    mBrushColorWidgetAct = mToolBar->addWidget(brushColorWidget);
+    mToolBar->widgetForAction(mToolBar->addAction(""))->
+            setObjectName("emptyToolButton");
+    mDecBrushSizeAct = mToolBar->addWidget(mDecBrushSize);
+    mBrushSizeLabelAct = mToolBar->addWidget(mBrushSizeLabel);
+    mIncBrushSizeAct = mToolBar->addWidget(mIncBrushSize);
+    mBrushLabel->setStyleSheet("border: 1px solid black;");
+    mColorLabel->setStyleSheet("border: 1px solid black; padding-left: -1px;");
     QWidget * const spacerWidget = new QWidget(this);
     spacerWidget->setSizePolicy(QSizePolicy::Expanding,
                                 QSizePolicy::Minimum);
@@ -228,9 +284,8 @@ bool TimelineDockWidget::processKeyPress(QKeyEvent *event) {
 void TimelineDockWidget::previewFinished() {
     //setPlaying(false);
     mStopButton->setDisabled(true);
-    const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
     mPlayButton->setState(0);
-    mPlayButton->setToolTip("render preview");
+    mPlayButton->setToolTip("Render Preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
             this, &TimelineDockWidget::renderPreview);
@@ -238,9 +293,8 @@ void TimelineDockWidget::previewFinished() {
 
 void TimelineDockWidget::previewBeingPlayed() {
     mStopButton->setDisabled(false);
-    const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
     mPlayButton->setState(1);
-    mPlayButton->setToolTip("pause preview");
+    mPlayButton->setToolTip("Pause Preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
             this, &TimelineDockWidget::pausePreview);
@@ -248,9 +302,8 @@ void TimelineDockWidget::previewBeingPlayed() {
 
 void TimelineDockWidget::previewBeingRendered() {
     mStopButton->setDisabled(false);
-    const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
     mPlayButton->setState(0);
-    mPlayButton->setToolTip("play preview");
+    mPlayButton->setToolTip("Play Preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
             this, &TimelineDockWidget::playPreview);
@@ -258,9 +311,8 @@ void TimelineDockWidget::previewBeingRendered() {
 
 void TimelineDockWidget::previewPaused() {
     mStopButton->setDisabled(false);
-    const QString modeIconsDir = eSettings::sIconsDir() + "/toolbarButtons";
     mPlayButton->setState(0);
-    mPlayButton->setToolTip("resume preview");
+    mPlayButton->setToolTip("Resume Preview");
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
             this, &TimelineDockWidget::resumePreview);
@@ -268,6 +320,18 @@ void TimelineDockWidget::previewPaused() {
 
 void TimelineDockWidget::resumePreview() {
     RenderHandler::sInstance->resumePreview();
+}
+
+void TimelineDockWidget::updateButtonsVisibility(const CanvasMode mode) {
+    mLocalPivotAct->setVisible(mode == CanvasMode::pointTransform ||
+                               mode == CanvasMode::boxTransform);
+    mNodeVisibilityAct->setVisible(mode == CanvasMode::pointTransform);
+
+    mBrushColorWidgetAct->setVisible(mode == CanvasMode::paint);
+    mDecBrushSizeAct->setVisible(mode == CanvasMode::paint);
+    mBrushSizeLabelAct->setVisible(mode == CanvasMode::paint);
+    mIncBrushSizeAct->setVisible(mode == CanvasMode::paint);
+
 }
 
 void TimelineDockWidget::pausePreview() {
@@ -311,8 +375,7 @@ void TimelineDockWidget::setRenderMode() {
     mRenderWidget->show();
 }
 
-void TimelineDockWidget::updateSettingsForCurrentCanvas(
-        Canvas* const canvas) {
+void TimelineDockWidget::updateSettingsForCurrentCanvas(Canvas* const canvas) {
     if(canvas) {
         disconnect(mResolutionComboBox, &QComboBox::currentTextChanged,
                    this, &TimelineDockWidget::setResolutionFractionText);

@@ -14,17 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef GLOBAL_H
-#define GLOBAL_H
+#include "global.h"
 
-extern int FONT_HEIGHT;
-extern int MIN_WIDGET_DIM;
-extern int BUTTON_DIM;
-extern int KEY_RECT_SIZE;
 
-#include <QString>
+QString gSingleLineTooltip(const QString &text) {
+    return "<p style='white-space:pre'>" + text + "</p>";
+}
 
-QString gSingleLineTooltip(const QString& text);
-QString gSingleLineTooltip(const QString& text, const QString& shortcut);
-
-#endif // GLOBAL_H
+QString gSingleLineTooltip(const QString &text, const QString &shortcut) {
+    return "<p style='white-space:pre'>" + text +
+            " <font color='grey'>" + shortcut + "</font></p>";
+}

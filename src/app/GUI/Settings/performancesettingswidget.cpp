@@ -168,6 +168,6 @@ void PerformanceSettingsWidget::updateAccPreferenceDesc() {
         mAccPreferenceDescLabel->setText("Strong GPU preference");
         toolTip = "Use the CPU only for tasks not supported by the GPU";
     }
-    mAccPreferenceDescLabel->setToolTip("<p style='white-space:pre'>" + toolTip + "</p>");
-    mAccPreferenceSlider->setToolTip("<p style='white-space:pre'>" + toolTip + "</p>");
+    mAccPreferenceDescLabel->setToolTip(gSingleLineTooltip(toolTip));
+    mAccPreferenceSlider->setToolTip(gSingleLineTooltip(toolTip));
 }
