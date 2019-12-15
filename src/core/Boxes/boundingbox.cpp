@@ -276,16 +276,6 @@ void BoundingBox::anim_setAbsFrame(const int frame) {
     }
 }
 
-void BoundingBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
-    Q_UNUSED(capStyle); }
-
-void BoundingBox::setStrokeJoinStyle(const SkPaint::Join joinStyle) {
-    Q_UNUSED(joinStyle); }
-
-void BoundingBox::startSelectedStrokeColorTransform() {}
-
-void BoundingBox::startSelectedFillColorTransform() {}
-
 bool BoundingBox::diffsIncludingInherited(
         const int relFrame1, const int relFrame2) const {
     const bool diffThis = prp_differencesBetweenRelFrames(relFrame1, relFrame2);
@@ -623,6 +613,8 @@ void BoundingBox::setupRenderData(const qreal relFrame,
     data->fRelTransform = getRelativeTransformAtFrame(relFrame);
     data->fTransform = getTotalTransformAtFrame(relFrame);
     data->fResolution = scene->getResolutionFraction();
+    data->fResolutionScale.reset();
+    data->fResolutionScale.scale(data->fResolution, data->fResolution);
     data->fOpacity = mTransformAnimator->getOpacity(relFrame);
     const bool effectsVisible = scene->getRasterEffectsVisible();
     data->fBaseMargin = QMargins() + 2;
@@ -632,8 +624,13 @@ void BoundingBox::setupRenderData(const qreal relFrame,
         setupRasterEffectsF(relFrame, data);
     }
 
-    if(mParentGroup) data->fMaxBoundsRect = mParentGroup->currentGlobalBounds();
-    else data->fMaxBoundsRect = scene->getCurrentBounds();
+    {
+        QRectF maxBoundsF;
+        if(mParentGroup) maxBoundsF = QRectF(mParentGroup->currentGlobalBounds());
+        else maxBoundsF = QRectF(scene->getCurrentBounds());
+        const QRectF scaledMaxBoundsF = data->fResolutionScale.mapRect(maxBoundsF);
+        data->fMaxBoundsRect = scaledMaxBoundsF.toAlignedRect();
+    }
 }
 
 void BoundingBox::setupRasterEffectsF(const qreal relFrame,

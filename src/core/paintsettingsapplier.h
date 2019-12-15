@@ -127,6 +127,54 @@ private:
     const qreal mWidth;
 };
 
+class StrokeBrushPaintSetting : public PaintSetting {
+public:
+    StrokeBrushPaintSetting(SimpleBrushWrapper * const brush) :
+        PaintSetting(OUTLINE), mBrush(brush) {}
+protected:
+    void applyToPS(PaintSettingsAnimator * const target) const {
+        static_cast<OutlineSettingsAnimator*>(target)->setStrokeBrush(mBrush);
+    }
+private:
+    SimpleBrushWrapper * const mBrush;
+};
+
+class StrokeWidthCurvePaintSetting : public PaintSetting {
+public:
+    StrokeWidthCurvePaintSetting(const qCubicSegment1D& widthCurve) :
+        PaintSetting(OUTLINE), mWidthCurve(widthCurve) {}
+protected:
+    void applyToPS(PaintSettingsAnimator * const target) const {
+        static_cast<OutlineSettingsAnimator*>(target)->setStrokeBrushWidthCurve(mWidthCurve);
+    }
+private:
+    const qCubicSegment1D mWidthCurve;
+};
+
+class StrokePressureCurvePaintSetting : public PaintSetting {
+public:
+    StrokePressureCurvePaintSetting(const qCubicSegment1D& pressureCurve) :
+        PaintSetting(OUTLINE), mPressureCurve(pressureCurve) {}
+protected:
+    void applyToPS(PaintSettingsAnimator * const target) const {
+        static_cast<OutlineSettingsAnimator*>(target)->setStrokeBrushPressureCurve(mPressureCurve);
+    }
+private:
+    const qCubicSegment1D mPressureCurve;
+};
+
+class StrokeTimeCurvePaintSetting : public PaintSetting {
+public:
+    StrokeTimeCurvePaintSetting(const qCubicSegment1D& timeCurve) :
+        PaintSetting(OUTLINE), mTimeCurve(timeCurve) {}
+protected:
+    void applyToPS(PaintSettingsAnimator * const target) const {
+        static_cast<OutlineSettingsAnimator*>(target)->setStrokeBrushTimeCurve(mTimeCurve);
+    }
+private:
+    const qCubicSegment1D mTimeCurve;
+};
+
 class PaintSettingsApplier {
 public:
     inline PaintSettingsApplier &operator<< (const stdsptr<PaintSetting> &t)

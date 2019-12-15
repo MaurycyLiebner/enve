@@ -119,8 +119,10 @@ void PaintSettingsAnimator::setCurrentColor(const QColor &color) {
 
 void PaintSettingsAnimator::showHideChildrenBeforeChaningPaintType(
         const PaintType newPaintType) {
-    if(mPaintType == FLATPAINT) ca_removeChild(mColor);
-    if(newPaintType == FLATPAINT) ca_addChild(mColor);
+    if(mPaintType == FLATPAINT || mPaintType == BRUSHPAINT)
+        ca_removeChild(mColor);
+    if(newPaintType == FLATPAINT || newPaintType == BRUSHPAINT)
+        ca_addChild(mColor);
 }
 
 void PaintSettingsAnimator::setPaintType(const PaintType paintType) {

@@ -119,6 +119,8 @@ protected:
 
     void setBaseGlobalRect(const QRectF &baseRectF);
 
+    //! @brief For use with mypaint based outlines
+    SkBitmap mBitmap;
     bool mDelayDataSet = false;
     bool mDataSet = false;
 private:

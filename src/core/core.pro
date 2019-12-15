@@ -67,6 +67,7 @@ LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 
 SOURCES += \
     Animators/SmartPath/smartpath.cpp \
+    Animators/brushsettingsanimator.cpp \
     Animators/coloranimator.cpp \
     Animators/eboxorsound.cpp \
     Animators/eeffect.cpp \
@@ -74,6 +75,7 @@ SOURCES += \
     Animators/gradientpoints.cpp \
     Animators/outlinesettingsanimator.cpp \
     Animators/paintsettingsanimator.cpp \
+    Animators/qcubicsegment1danimator.cpp \
     Animators/qrealsnapshot.cpp \
     Animators/qstringanimator.cpp \
     Animators/rastereffectanimators.cpp \
@@ -142,6 +144,7 @@ SOURCES += \
     Paint/animatedsurface.cpp \
     Paint/autotiledsurface.cpp \
     Paint/autotilesdata.cpp \
+    Paint/brushcontexedwrapper.cpp \
     Paint/brushstroke.cpp \
     Paint/colorconversions.cpp \
     Paint/drawableautotiledsurface.cpp \
@@ -290,6 +293,7 @@ SOURCES += \
 
 HEADERS += \
     Animators/SmartPath/smartpath.h \
+    Animators/brushsettingsanimator.h \
     Animators/coloranimator.h \
     Animators/dynamiccomplexanimator.h \
     Animators/eboxorsound.h \
@@ -298,6 +302,7 @@ HEADERS += \
     Animators/gradientpoints.h \
     Animators/outlinesettingsanimator.h \
     Animators/paintsettingsanimator.h \
+    Animators/qcubicsegment1danimator.h \
     Animators/qrealsnapshot.h \
     Animators/qstringanimator.h \
     Animators/rastereffectanimators.h \
@@ -371,6 +376,7 @@ HEADERS += \
     Paint/animatedsurface.h \
     Paint/autotiledsurface.h \
     Paint/autotilesdata.h \
+    Paint/brushcontexedwrapper.h \
     Paint/brushstroke.h \
     Paint/colorconversions.h \
     Paint/drawableautotiledsurface.h \

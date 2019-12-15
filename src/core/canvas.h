@@ -228,6 +228,15 @@ public:
 
     void setSelectedCapStyle(const SkPaint::Cap capStyle);
     void setSelectedJoinStyle(const SkPaint::Join joinStyle);
+    void setSelectedStrokeBrush(SimpleBrushWrapper * const brush);
+    void setSelectedStrokeBrushWidthCurve(
+            const qCubicSegment1D& curve);
+    void setSelectedStrokeBrushTimeCurve(
+            const qCubicSegment1D& curve);
+    void setSelectedStrokeBrushPressureCurve(
+            const qCubicSegment1D& curve);
+    void setSelectedStrokeBrushSpacingCurve(
+            const qCubicSegment1D& curve);
 
     void strokeWidthAction(const QrealAction &action);
 

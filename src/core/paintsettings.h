@@ -20,7 +20,8 @@
 enum PaintType : short {
     NOPAINT,
     FLATPAINT,
-    GRADIENTPAINT
+    GRADIENTPAINT,
+    BRUSHPAINT
 };
 
 enum class ColorMode : short;
@@ -44,11 +45,22 @@ struct FillSettings {
     GradientSettings fGradient;
 };
 
+class SimpleBrushWrapper;
+#include "Segments/qcubicsegment1d.h"
+struct BrushSettings {
+    SimpleBrushWrapper* fBrush = nullptr;
+    qCubicSegment1D fWidth;
+    qCubicSegment1D fPressure;
+    qCubicSegment1D fSpacing;
+    qCubicSegment1D fTime;
+};
+
 #include "skia/skiaincludes.h"
 struct StrokeSettings : public FillSettings {
     qreal fWidth;
     SkPaint::Cap fCapStyle;
     SkPaint::Join fJoinStyle;
+    BrushSettings fBrush;
 };
 
 #endif // PAINTSETTINGS_H

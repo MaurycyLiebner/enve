@@ -161,14 +161,25 @@ public:
     virtual FillSettingsAnimator *getFillSettings() const;
     virtual OutlineSettingsAnimator *getStrokeSettings() const;
 
-    virtual void setStrokeCapStyle(const SkPaint::Cap capStyle);
-    virtual void setStrokeJoinStyle(const SkPaint::Join joinStyle);
-
+    virtual void setStrokeCapStyle(const SkPaint::Cap capStyle)
+    { Q_UNUSED(capStyle) }
+    virtual void setStrokeJoinStyle(const SkPaint::Join joinStyle)
+    { Q_UNUSED(joinStyle) }
+    virtual void setStrokeBrush(SimpleBrushWrapper * const brush)
+    { Q_UNUSED(brush) }
+    virtual void setStrokeBrushWidthCurve(const qCubicSegment1D& curve)
+    { Q_UNUSED(curve) }
+    virtual void setStrokeBrushTimeCurve(const qCubicSegment1D& curve)
+    { Q_UNUSED(curve) }
+    virtual void setStrokeBrushPressureCurve(const qCubicSegment1D& curve)
+    { Q_UNUSED(curve) }
+    virtual void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve)
+    { Q_UNUSED(curve) }
     virtual void strokeWidthAction(const QrealAction& action)
-    { Q_UNUSED(action); }
+    { Q_UNUSED(action) }
 
-    virtual void startSelectedStrokeColorTransform();
-    virtual void startSelectedFillColorTransform();
+    virtual void startSelectedStrokeColorTransform() {}
+    virtual void startSelectedFillColorTransform() {}
 
     virtual void updateAllBoxes(const UpdateReason reason);
 
@@ -196,6 +207,10 @@ public:
 
     virtual FrameRange getFirstAndLastIdenticalForMotionBlur(
             const int relFrame, const bool takeAncestorsIntoAccount = true);
+
+    virtual HardwareSupport hardwareSupport() const {
+        return HardwareSupport::cpuPreffered;
+    }
 
     virtual bool shouldScheduleUpdate() { return true; }
     virtual void queTasks();

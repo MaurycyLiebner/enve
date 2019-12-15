@@ -43,6 +43,7 @@ void BoxRenderData::copyFrom(BoxRenderData *src) {
     fGlobalRect = src->fGlobalRect;
     fOpacity = src->fOpacity;
     fResolution = src->fResolution;
+    fResolutionScale = src->fResolutionScale;
     fRenderedImage = SkiaHelpers::makeCopy(src->fRenderedImage);
     fBoxStateId = src->fBoxStateId;
     mState = eTaskState::finished;
@@ -119,17 +120,16 @@ void BoxRenderData::process() {
     if(fOpacity < 0.001) return;
     if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
 
-    SkBitmap bitmap;
     const auto info = SkiaHelpers::getPremulRGBAInfo(fGlobalRect.width(),
                                                      fGlobalRect.height());
-    bitmap.allocPixels(info);
-    bitmap.eraseColor(eraseColor());
-    SkCanvas canvas(bitmap);
+    mBitmap.allocPixels(info);
+    mBitmap.eraseColor(eraseColor());
+    SkCanvas canvas(mBitmap);
     transformRenderCanvas(canvas);
 
     drawSk(&canvas);
 
-    fRenderedImage = SkiaHelpers::transferDataToSkImage(bitmap);
+    fRenderedImage = SkiaHelpers::transferDataToSkImage(mBitmap);
 }
 
 void BoxRenderData::beforeProcessing(const Hardware hw) {
@@ -164,12 +164,7 @@ HardwareSupport BoxRenderData::hardwareSupport() const {
     if(mStep == Step::EFFECTS) {
         return mEffectsRenderer.nextHardwareSupport();
     } else {
-        if(fParentBox && fParentBox->SWT_isLayerBox()) {
-            return HardwareSupport::gpuPreffered;
-        } else if(!eSettings::sInstance->fPathGpuAcc &&
-                  fParentBox && fParentBox->SWT_isPathBox()) {
-            return HardwareSupport::cpuOnly;
-        }
+        if(fParentBox) return fParentBox->hardwareSupport();
         return HardwareSupport::cpuPreffered;
     }
 }
@@ -190,8 +185,6 @@ void BoxRenderData::dataSet() {
 }
 
 void BoxRenderData::updateGlobalRect() {
-    fResolutionScale.reset();
-    fResolutionScale.scale(fResolution, fResolution);
     fScaledTransform = fTransform*fResolutionScale;
     QRectF baseRectF = fScaledTransform.mapRect(fRelBoundingRect);
     for(const QRectF &rectT : fOtherGlobalRects) {
@@ -203,13 +196,10 @@ void BoxRenderData::updateGlobalRect() {
 }
 
 void BoxRenderData::setBaseGlobalRect(const QRectF& baseRectF) {
-    const QRectF maxBounds = fResolutionScale.mapRect(QRectF(fMaxBoundsRect));
-    const auto clampedBaseRect = baseRectF.intersected(maxBounds);
+    const auto clampedBaseRect = baseRectF.intersected(fMaxBoundsRect);
     SkIRect currRect = toSkRect(clampedBaseRect).roundOut();
     if(!mEffectsRenderer.isEmpty()) {
-        const QRect iMaxBounds(qFloor(maxBounds.left()), qFloor(maxBounds.top()),
-                               qCeil(maxBounds.width()), qCeil(maxBounds.height()));
-        const SkIRect skMaxBounds = toSkIRect(iMaxBounds);
+        const SkIRect skMaxBounds = toSkIRect(fMaxBoundsRect);
         mEffectsRenderer.setBaseGlobalRect(currRect, skMaxBounds);
     }
     fGlobalRect = toQRect(currRect);

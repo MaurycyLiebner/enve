@@ -18,7 +18,7 @@
 #define BRUSHWIDGET_H
 
 #include <QWidget>
-#include "brushcontexedwrapper.h"
+#include "Paint/brushcontexedwrapper.h"
 
 class BrushWidget : public QWidget {
     Q_OBJECT

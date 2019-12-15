@@ -1,4 +1,21 @@
+// enve - 2D animations software
+// Copyright (C) 2016-2019 Maurycy Liebner
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "pathboxrenderdata.h"
+#include "pathbox.h"
 
 PathBoxRenderData::PathBoxRenderData(BoundingBox * const parentBox) :
     BoxRenderData(parentBox) {}
@@ -25,7 +42,63 @@ void PathBoxRenderData::drawSk(SkCanvas * const canvas) {
     }
     if(!fOutlinePath.isEmpty()) {
         paint.setShader(nullptr);
-        fStrokeSettings.applyPainterSettingsSk(&paint);
-        canvas->drawPath(fOutlinePath, paint);
+        if(fStrokeSettings.fPaintType == PaintType::BRUSHPAINT) {
+            if(!fStrokeSettings.fStrokeBrush) return;
+            AutoTiledSurface surf;
+            surf.setPixelClamp(fMaxBoundsRect.translated(-fGlobalRect.topLeft()));
+            surf.loadBitmap(mBitmap);
+
+            SkPath pathT;
+            QMatrix trans;
+            trans.translate(-fGlobalRect.x(), -fGlobalRect.y());
+            trans = fScaledTransform*trans;
+            fPath.transform(toSkMatrix(trans), &pathT);
+
+        //                const auto fillBrush = fStrokeSettings.fStrokeBrush->getBrush();
+        //                auto fillWidthCurve = fStrokeSettings.fWidthCurve*fResolution;
+
+        //                auto fillBrushSet = BrushStrokeSet::lineFillStrokesForSkPath(
+        //                            pathT, fStrokeSettings.fTimeCurve,
+        //                            fStrokeSettings.fPressureCurve,
+        //                            fillWidthCurve, fStrokeSettings.fSpacingCurve,
+        //                            0, 40*fResolution);
+        //                for(auto& set : fillBrushSet)
+        //                    surf.execute(fillBrush, set);
+
+            const auto strokeBrush = fStrokeSettings.fStrokeBrush->getBrush();
+            auto strokeWidthCurve = fStrokeSettings.fWidthCurve*fResolution;
+            auto strokeBrushSet = BrushStrokeSet::outlineStrokesForSkPath(
+                        pathT,
+                        fStrokeSettings.fTimeCurve,
+                        fStrokeSettings.fPressureCurve,
+                        strokeWidthCurve, fStrokeSettings.fSpacingCurve, 5, 5);
+            QColor col = fStrokeSettings.fPaintColor;
+            col.setRgbF(col.blueF(), col.greenF(),
+                        col.redF(), col.alphaF());
+            fStrokeSettings.fStrokeBrush->setColor(
+                        toSkScalar(col.hueF()),
+                        toSkScalar(col.saturationF()),
+                        toSkScalar(col.valueF()));
+            //const auto brush = fStrokeSettings.fStrokeBrush->getBrush();
+            for(auto& set : strokeBrushSet)
+                surf.execute(strokeBrush, set);
+
+            mBitmap.reset();
+
+            QRect baseRect = fGlobalRect;
+            baseRect.translate(-surf.zeroTilePos());
+            const auto pixRect = surf.pixelBoundingRect();
+            baseRect.setSize(QSize(pixRect.width(), pixRect.height()));
+            setBaseGlobalRect(baseRect);
+
+            const QMargins iMargins(baseRect.left() - fGlobalRect.left(),
+                                    baseRect.top() - fGlobalRect.top(),
+                                    fGlobalRect.right() - baseRect.right(),
+                                    fGlobalRect.bottom() - baseRect.bottom());
+            mBitmap = surf.toBitmap(iMargins);
+        } else {
+            fStrokeSettings.applyPainterSettingsSk(&paint);
+            canvas->drawPath(fOutlinePath, paint);
+        }
     }
 }

@@ -30,6 +30,11 @@ public:
     bool SWT_isGroupBox() const { return mType == TYPE_GROUP; }
     bool SWT_isLayerBox() const { return !SWT_isGroupBox(); }
 
+    HardwareSupport hardwareSupport() const {
+        if(SWT_isLayerBox()) return HardwareSupport::gpuPreffered;
+        return BoundingBox::hardwareSupport();
+    }
+
     bool SWT_dropSupport(const QMimeData* const data);
     bool SWT_dropIntoSupport(const int index, const QMimeData* const data);
     bool SWT_drop(const QMimeData* const data);
@@ -79,6 +84,12 @@ public:
 
     void setStrokeCapStyle(const SkPaint::Cap capStyle);
     void setStrokeJoinStyle(const SkPaint::Join joinStyle);
+
+    void setStrokeBrush(SimpleBrushWrapper * const brush);
+    void setStrokeBrushWidthCurve(const qCubicSegment1D& curve);
+    void setStrokeBrushTimeCurve(const qCubicSegment1D& curve);
+    void setStrokeBrushPressureCurve(const qCubicSegment1D& curve);
+    void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve);
 
     FillSettingsAnimator *getFillSettings() const;
     OutlineSettingsAnimator *getStrokeSettings() const;

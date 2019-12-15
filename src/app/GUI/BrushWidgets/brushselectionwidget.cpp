@@ -23,7 +23,6 @@
 #include <QDockWidget>
 #include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 
-QList<BrushCollectionData> BrushSelectionWidget::sData;
 bool BrushSelectionWidget::sLoaded = false;
 QList<BrushesContext> BrushSelectionWidget::sBrushContexts;
 
@@ -111,7 +110,7 @@ void BrushSelectionWidget::sLoadCollectionsFromDir(const QString &mainDirPath) {
         if(fileInfo.isDir()) {
             const QString collName = fileInfo.fileName();
             const QString collDirPath = fileInfo.absoluteFilePath();
-            loadCollectionFromDir(collDirPath, sData);
+            loadCollectionFromDir(collDirPath, BrushCollectionData::sData);
         }
     }
 }

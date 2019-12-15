@@ -21,8 +21,6 @@ CanvasRenderData::CanvasRenderData(BoundingBox * const parentBoxT) :
     ContainerBoxRenderData(parentBoxT) {}
 
 void CanvasRenderData::updateGlobalRect() {
-    fResolutionScale.reset();
-    fResolutionScale.scale(fResolution, fResolution);
     fScaledTransform = fTransform*fResolutionScale;
     const auto globalRectF = fScaledTransform.mapRect(fRelBoundingRect);
     const QPoint pos(qFloor(globalRectF.left()),

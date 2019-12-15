@@ -201,6 +201,41 @@ void Canvas::setSelectedJoinStyle(const SkPaint::Join joinStyle) {
     }
 }
 
+void Canvas::setSelectedStrokeBrush(SimpleBrushWrapper * const brush) {
+    for(const auto &box : mSelectedBoxes) {
+        box->setStrokeBrush(brush);
+    }
+}
+
+void Canvas::setSelectedStrokeBrushWidthCurve(
+        const qCubicSegment1D& curve) {
+    for(const auto &box : mSelectedBoxes) {
+        box->setStrokeBrushWidthCurve(curve);
+    }
+}
+
+
+void Canvas::setSelectedStrokeBrushTimeCurve(
+        const qCubicSegment1D& curve) {
+    for(const auto &box : mSelectedBoxes) {
+        box->setStrokeBrushTimeCurve(curve);
+    }
+}
+
+void Canvas::setSelectedStrokeBrushSpacingCurve(
+        const qCubicSegment1D& curve) {
+    for(const auto &box : mSelectedBoxes) {
+        box->setStrokeBrushSpacingCurve(curve);
+    }
+}
+
+void Canvas::setSelectedStrokeBrushPressureCurve(
+        const qCubicSegment1D& curve) {
+    for(const auto &box : mSelectedBoxes) {
+        box->setStrokeBrushPressureCurve(curve);
+    }
+}
+
 void Canvas::strokeWidthAction(const QrealAction& action) {
     for(const auto &box : mSelectedBoxes)
         box->strokeWidthAction(action);

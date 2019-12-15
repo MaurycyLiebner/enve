@@ -40,8 +40,15 @@ public:
             const int frame1, const int frame2) const = 0;
     virtual SkPath getPathAtRelFrameF(const qreal relFrame) = 0;
 
+    HardwareSupport hardwareSupport() const;
+
     void setStrokeCapStyle(const SkPaint::Cap capStyle);
     void setStrokeJoinStyle(const SkPaint::Join joinStyle);
+    void setStrokeBrush(SimpleBrushWrapper * const brush);
+    void setStrokeBrushWidthCurve(const qCubicSegment1D& curve);
+    void setStrokeBrushTimeCurve(const qCubicSegment1D& curve);
+    void setStrokeBrushPressureCurve(const qCubicSegment1D& curve);
+    void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve);
     void strokeWidthAction(const QrealAction &action);
 
     void setOutlineCompositionMode(

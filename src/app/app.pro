@@ -161,8 +161,6 @@ SOURCES += main.cpp\
     GUI/ColorWidgets/colorwidgetshaders.cpp \
     GUI/segment1deditor.cpp \
     GUI/namedcontainer.cpp \
-    Animators/qcubicsegment1danimator.cpp \
-    GUI/BrushWidgets/brushcontexedwrapper.cpp \
     GUI/BrushWidgets/brushwidget.cpp
 
 HEADERS  += \
@@ -259,8 +257,6 @@ HEADERS  += \
     GUI/ColorWidgets/colorwidgetshaders.h \
     GUI/segment1deditor.h \
     GUI/namedcontainer.h \
-    Animators/qcubicsegment1danimator.h \
-    GUI/BrushWidgets/brushcontexedwrapper.h \
     GUI/BrushWidgets/brushwidget.h \
     boxtypemenu.h
 

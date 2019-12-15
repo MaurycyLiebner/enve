@@ -18,11 +18,29 @@
 #define BRUSHCONTEXEDWRAPPER_H
 #include "Paint/simplebrushwrapper.h"
 #include <QImage>
+
 struct BrushData {
     QString fName;
     stdsptr<SimpleBrushWrapper> fWrapper;
     QImage fIcon;
     QByteArray fWholeFile;
+};
+
+struct BrushCollectionData {
+    QString fName;
+    QList<BrushData> fBrushes;
+
+    static QList<BrushCollectionData> sData;
+    static SimpleBrushWrapper * sGetBrush(const QString& collectionName,
+                                          const QString& brushName) {
+        for(const auto& coll : sData) {
+            if(coll.fName != collectionName) continue;
+            for(const auto& brush : coll.fBrushes) {
+                if(brush.fName == brushName) return brush.fWrapper.get();
+            }
+        }
+        return nullptr;
+    }
 };
 
 class BrushContexedWrapper : public SelfRef {

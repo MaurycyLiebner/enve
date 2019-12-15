@@ -25,6 +25,7 @@
 #include "Animators/gradient.h"
 #include "Animators/staticcomplexanimator.h"
 #include "paintsettings.h"
+#include "Paint/simplebrushwrapper.h"
 
 class PathBox;
 class SkStroke;
@@ -117,6 +118,11 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
             QPainter::CompositionMode_Source;
 
     qreal fOutlineWidth;
+    stdsptr<SimpleBrushWrapper> fStrokeBrush;
+    qCubicSegment1D fTimeCurve;
+    qCubicSegment1D fPressureCurve;
+    qCubicSegment1D fWidthCurve;
+    qCubicSegment1D fSpacingCurve;
 };
 
 #endif // PAINTSETTINGSANIMATOR_H

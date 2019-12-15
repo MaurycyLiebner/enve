@@ -74,8 +74,17 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     connect(mFillGradientButton, &QPushButton::released,
             this, &FillStrokeSettingsWidget::setGradientFillAction);
 
+    mFillBrushButton = new QPushButton(
+                QIcon(iconsDir + "/fill_brush.png"),
+                "Brush", this);
+    mFillBrushButton->setCheckable(true);
+    mFillBrushButton->setObjectName("middleButton");
+    connect(mFillBrushButton, &QPushButton::released,
+            this, &FillStrokeSettingsWidget::setBrushFillAction);
+
     mColorTypeLayout->addWidget(mFillNoneButton);
     mColorTypeLayout->addWidget(mFillFlatButton);
+    mColorTypeLayout->addWidget(mFillBrushButton);
     mColorTypeLayout->addWidget(mFillGradientButton);
 
     mFillTargetButton->setCheckable(true);
@@ -200,6 +209,41 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mGradientTypeWidget->setContentsMargins(0, 0, 0, 0);
     mGradientTypeWidget->setLayout(mGradientTypeLayout);
 
+
+    const auto brushCurvesWidget = new QWidget(this);
+    mBrushWidthCurveEditor = new Segment1DEditor(0, 1, this);
+    mBrushPressureCurveEditor = new Segment1DEditor(0, 1, this);
+    mBrushSpacingCurveEditor = new Segment1DEditor(0, 50, this);
+    mBrushTimeCurveEditor = new Segment1DEditor(0, 2, this);
+    const auto brushCurvesLayout = new QVBoxLayout;
+    brushCurvesWidget->setLayout(brushCurvesLayout);
+    brushCurvesLayout->addWidget(
+                new NamedContainer("width", mBrushWidthCurveEditor, true, this));
+    brushCurvesLayout->addWidget(
+                new NamedContainer("pressure", mBrushPressureCurveEditor, true, this));
+    brushCurvesLayout->addWidget(
+                new NamedContainer("spacing", mBrushSpacingCurveEditor, true, this));
+    brushCurvesLayout->addWidget(
+                new NamedContainer("time", mBrushTimeCurveEditor, true, this));
+    const auto brushCurvesScroll = new ScrollArea(this);
+    brushCurvesScroll->setWidget(brushCurvesWidget);
+    mBrushSettingsWidget = brushCurvesScroll;
+
+    const int ctxt = BrushSelectionWidget::sCreateNewContext();
+    mBrushSelectionWidget = new BrushSelectionWidget(ctxt, this);
+
+    connect(mBrushSelectionWidget,
+            &BrushSelectionWidget::currentBrushChanged,
+            this, &FillStrokeSettingsWidget::setStrokeBrush);
+    connect(mBrushWidthCurveEditor, &Segment1DEditor::segmentEdited,
+            this, &FillStrokeSettingsWidget::setBrushWidthCurve);
+    connect(mBrushTimeCurveEditor, &Segment1DEditor::segmentEdited,
+            this, &FillStrokeSettingsWidget::setBrushTimeCurve);
+    connect(mBrushPressureCurveEditor, &Segment1DEditor::segmentEdited,
+            this, &FillStrokeSettingsWidget::setBrushPressureCurve);
+    connect(mBrushSpacingCurveEditor, &Segment1DEditor::segmentEdited,
+            this, &FillStrokeSettingsWidget::setBrushSpacingCurve);
+
     mMainLayout->addLayout(mTargetLayout);
     mMainLayout->addLayout(mColorTypeLayout);
     mMainLayout->addWidget(mGradientTypeWidget);
@@ -213,6 +257,8 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     const auto fillAndStrokeArea = new ScrollArea(this);
     fillAndStrokeArea->setWidget(mFillAndStrokeWidget);
     addTab(fillAndStrokeArea, "Fill and Stroke");
+    addTab(mBrushSelectionWidget, "Stroke Brush");
+    addTab(mBrushSettingsWidget, "Stroke Curves");
 
     mGradientTypeWidget->hide();
 
@@ -234,34 +280,47 @@ void FillStrokeSettingsWidget::setRadialGradientAction() {
 void FillStrokeSettingsWidget::setGradientFillAction() {
     if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->show();
     mFillGradientButton->setChecked(true);
+    mFillBrushButton->setChecked(false);
     mFillFlatButton->setChecked(false);
     mFillNoneButton->setChecked(false);
-    colorTypeSet(GRADIENTPAINT);
+    paintTypeSet(GRADIENTPAINT);
     mDocument.actionFinished();
+}
+
+void FillStrokeSettingsWidget::setBrushFillAction() {
+    if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->hide();
+    mFillBrushButton->setChecked(true);
+    mFillGradientButton->setChecked(false);
+    mFillFlatButton->setChecked(false);
+    mFillNoneButton->setChecked(false);
+    paintTypeSet(BRUSHPAINT);
 }
 
 void FillStrokeSettingsWidget::setFlatFillAction() {
     if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->show();
     mFillGradientButton->setChecked(false);
+    mFillBrushButton->setChecked(false);
     mFillFlatButton->setChecked(true);
     mFillNoneButton->setChecked(false);
-    colorTypeSet(FLATPAINT);
+    paintTypeSet(FLATPAINT);
     mDocument.actionFinished();
 }
 
 void FillStrokeSettingsWidget::setNoneFillAction() {
     if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->show();
     mFillGradientButton->setChecked(false);
+    mFillBrushButton->setChecked(false);
     mFillFlatButton->setChecked(false);
     mFillNoneButton->setChecked(true);
-    colorTypeSet(NOPAINT);
+    paintTypeSet(NOPAINT);
     mDocument.actionFinished();
 }
 
 void FillStrokeSettingsWidget::updateColorAnimator() {
     if(getCurrentPaintTypeVal() == NOPAINT) {
         setColorAnimatorTarget(nullptr);
-    } else if(getCurrentPaintTypeVal() == FLATPAINT) {
+    } else if(getCurrentPaintTypeVal() == FLATPAINT ||
+              getCurrentPaintTypeVal() == BRUSHPAINT) {
         if(mTarget == PaintSetting::FILL) {
             setColorAnimatorTarget(mCurrentFillColorAnimator);
         } else {
@@ -282,15 +341,23 @@ void FillStrokeSettingsWidget::updateAfterTargetChanged() {
     setCurrentPaintType(getCurrentPaintTypeVal());
     if(getCurrentPaintTypeVal() == NOPAINT) {
         mFillGradientButton->setChecked(false);
+        mFillBrushButton->setChecked(false);
         mFillFlatButton->setChecked(false);
         mFillNoneButton->setChecked(true);
     } else if(getCurrentPaintTypeVal() == FLATPAINT) {
         mFillGradientButton->setChecked(false);
+        mFillBrushButton->setChecked(false);
         mFillFlatButton->setChecked(true);
         mFillNoneButton->setChecked(false);
     } else if(getCurrentPaintTypeVal() == GRADIENTPAINT) {
         mFillGradientButton->setChecked(true);
+        mFillBrushButton->setChecked(false);
         mFillFlatButton->setChecked(false);
+        mFillNoneButton->setChecked(false);
+    } else if(getCurrentPaintTypeVal() == BRUSHPAINT) {
+        mFillGradientButton->setChecked(false);
+        mFillFlatButton->setChecked(false);
+        mFillBrushButton->setChecked(true);
         mFillNoneButton->setChecked(false);
     }
 }
@@ -299,7 +366,65 @@ void FillStrokeSettingsWidget::setCurrentPaintType(
         const PaintType paintType) {
     if(paintType == NOPAINT) setNoPaintType();
     else if(paintType == FLATPAINT) setFlatPaintType();
+    else if(paintType == BRUSHPAINT) setBrushPaintType();
     else setGradientPaintType();
+}
+
+void FillStrokeSettingsWidget::setStrokeBrush(
+        SimpleBrushWrapper * const brush) {
+    mCurrentStrokeBrush = brush;
+    emitStrokeBrushChanged();
+    mDocument.actionFinished();
+}
+
+void FillStrokeSettingsWidget::setBrushSpacingCurve(
+        const qCubicSegment1D& seg) {
+    mCurrentStrokeBrushSpacingCurve = seg;
+    emitStrokeBrushSpacingCurveChanged();
+    mDocument.actionFinished();
+}
+
+void FillStrokeSettingsWidget::setBrushPressureCurve(
+        const qCubicSegment1D& seg) {
+    mCurrentStrokeBrushPressureCurve = seg;
+    emitStrokeBrushPressureCurveChanged();
+    mDocument.actionFinished();
+}
+
+void FillStrokeSettingsWidget::setBrushWidthCurve(
+        const qCubicSegment1D& seg) {
+    mCurrentStrokeBrushWidthCurve = seg;
+    emitStrokeBrushWidthCurveChanged();
+    mDocument.actionFinished();
+}
+
+void FillStrokeSettingsWidget::setBrushTimeCurve(
+        const qCubicSegment1D& seg) {
+    mCurrentStrokeBrushTimeCurve = seg;
+    emitStrokeBrushTimeCurveChanged();
+    mDocument.actionFinished();
+}
+
+void FillStrokeSettingsWidget::setCurrentBrushSettings(
+        BrushSettingsAnimator * const brushSettings) {
+    if(brushSettings) {
+        BrushSelectionWidget::sSetCurrentBrushForContext(
+                    mBrushSelectionWidget->getContextId(),
+                    brushSettings->getBrush());
+        mBrushWidthCurveEditor->setCurrentAnimator(
+                    brushSettings->getWidthAnimator());
+        mBrushPressureCurveEditor->setCurrentAnimator(
+                    brushSettings->getPressureAnimator());
+        mBrushSpacingCurveEditor->setCurrentAnimator(
+                    brushSettings->getSpacingAnimator());
+        mBrushTimeCurveEditor->setCurrentAnimator(
+                    brushSettings->getTimeAnimator());
+    } else {
+        mBrushWidthCurveEditor->setCurrentAnimator(nullptr);
+        mBrushPressureCurveEditor->setCurrentAnimator(nullptr);
+        mBrushSpacingCurveEditor->setCurrentAnimator(nullptr);
+        mBrushTimeCurveEditor->setCurrentAnimator(nullptr);
+    }
 }
 
 void FillStrokeSettingsWidget::updateCurrentSettings() {
@@ -334,11 +459,13 @@ void FillStrokeSettingsWidget::clearAll() {
     mGradientWidget->clearAll();
 }
 
-void FillStrokeSettingsWidget::colorTypeSet(const PaintType type) {
+void FillStrokeSettingsWidget::paintTypeSet(const PaintType type) {
     if(type == NOPAINT) {
         setNoPaintType();
     } else if(type == FLATPAINT) {
         setFlatPaintType();
+    } else if(type == BRUSHPAINT) {
+        setBrushPaintType();
     } else if(type == GRADIENTPAINT) {
         if(mTarget == PaintSetting::FILL ? !mCurrentFillGradient :
                 !mCurrentStrokeGradient) {
@@ -374,6 +501,7 @@ void FillStrokeSettingsWidget::colorTypeSet(const PaintType type) {
     paintSetting << std::make_shared<PaintTypePaintSetting>(mTarget, currentPaintType);
     const auto scene = mDocument.fActiveScene;
     if(scene) scene->applyPaintSettingToSelected(paintSetting);
+    mDocument.actionFinished();
 }
 
 void FillStrokeSettingsWidget::colorSettingReceived(
@@ -479,15 +607,43 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
         mCurrentStrokeColor = settings->getColor();
         mCurrentStrokeColorAnimator = settings->getColorAnimator();
         mCurrentStrokeGradient = settings->getGradient();
+        setCurrentBrushSettings(settings->getBrushSettings());
         mCurrentStrokePaintType = settings->getPaintType();
         mCurrentStrokeWidth = settings->getCurrentStrokeWidth();
         mLineWidthSpin->setTarget(settings->getLineWidthAnimator());
         mCurrentCapStyle = settings->getCapStyle();
         mCurrentJoinStyle = settings->getJoinStyle();
     } else {
+        setCurrentBrushSettings(nullptr);
         mCurrentStrokeColorAnimator = nullptr;
         mLineWidthSpin->clearTarget();
     }
+}
+
+
+void FillStrokeSettingsWidget::emitStrokeBrushChanged() {
+    const auto scene = mDocument.fActiveScene;
+    if(scene) scene->setSelectedStrokeBrush(mCurrentStrokeBrush);
+}
+
+void FillStrokeSettingsWidget::emitStrokeBrushWidthCurveChanged() {
+    const auto scene = mDocument.fActiveScene;
+    if(scene) scene->setSelectedStrokeBrushWidthCurve(mCurrentStrokeBrushWidthCurve);
+}
+
+void FillStrokeSettingsWidget::emitStrokeBrushTimeCurveChanged() {
+    const auto scene = mDocument.fActiveScene;
+    if(scene) scene->setSelectedStrokeBrushTimeCurve(mCurrentStrokeBrushTimeCurve);
+}
+
+void FillStrokeSettingsWidget::emitStrokeBrushSpacingCurveChanged() {
+    const auto scene = mDocument.fActiveScene;
+    if(scene) scene->setSelectedStrokeBrushSpacingCurve(mCurrentStrokeBrushSpacingCurve);
+}
+
+void FillStrokeSettingsWidget::emitStrokeBrushPressureCurveChanged() {
+    const auto scene = mDocument.fActiveScene;
+    if(scene) scene->setSelectedStrokeBrushPressureCurve(mCurrentStrokeBrushPressureCurve);
 }
 
 void FillStrokeSettingsWidget::emitCapStyleChanged() {
@@ -570,6 +726,7 @@ void FillStrokeSettingsWidget::setRoundCapStyleAction() {
 
 void FillStrokeSettingsWidget::setFillTarget() {
     mTarget = PaintSetting::FILL;
+    mFillBrushButton->hide();
     mFillTargetButton->setChecked(true);
     mStrokeTargetButton->setChecked(false);
     mStrokeSettingsWidget->hide();
@@ -579,10 +736,22 @@ void FillStrokeSettingsWidget::setFillTarget() {
 
 void FillStrokeSettingsWidget::setStrokeTarget() {
     mTarget = PaintSetting::OUTLINE;
+    mFillBrushButton->show();
     mStrokeTargetButton->setChecked(true);
     mFillTargetButton->setChecked(false);
     mStrokeSettingsWidget->show();
     updateAfterTargetChanged();
+    updateColorAnimator();
+}
+
+void FillStrokeSettingsWidget::setBrushPaintType() {
+    disconnectGradient();
+    mColorsSettingsWidget->show();
+    mGradientWidget->hide();
+    mGradientTypeWidget->hide();
+    tabBar()->show();
+    if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->hide();
+    setCurrentPaintTypeVal(BRUSHPAINT);
     updateColorAnimator();
 }
 

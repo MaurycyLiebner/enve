@@ -17,6 +17,7 @@
 #ifndef OUTLINESETTINGSANIMATOR_H
 #define OUTLINESETTINGSANIMATOR_H
 #include "paintsettingsanimator.h"
+#include "Animators/brushsettingsanimator.h"
 
 class OutlineSettingsAnimator : public PaintSettingsAnimator {
     e_OBJECT
@@ -25,6 +26,9 @@ protected:
                             PathBox * const parent);
 public:
     bool SWT_isStrokeSettings() const { return true; }
+
+    void showHideChildrenBeforeChaningPaintType(const PaintType newPaintType);
+
     void writeProperty(eWriteStream& dst) const;
     void readProperty(eReadStream& src);
 public:
@@ -34,12 +38,35 @@ public:
     void setJoinStyle(const SkPaint::Join joinStyle);
     void setStrokerSettingsSk(SkStroke * const stroker);
 
+    void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve) {
+        mBrushSettings->setStrokeBrushSpacingCurve(curve);
+    }
+
+    void setStrokeBrushPressureCurve(const qCubicSegment1D& curve) {
+        mBrushSettings->setStrokeBrushPressureCurve(curve);
+    }
+
+    void setStrokeBrushTimeCurve(const qCubicSegment1D& curve) {
+        mBrushSettings->setStrokeBrushTimeCurve(curve);
+    }
+
+    void setStrokeBrushWidthCurve(const qCubicSegment1D& curve) {
+        mBrushSettings->setStrokeBrushWidthCurve(curve);
+    }
+
+    void setStrokeBrush(SimpleBrushWrapper* const brush) {
+        mBrushSettings->setBrush(brush);
+    }
+
     qreal getCurrentStrokeWidth() const;
 
     SkPaint::Cap getCapStyle() const;
     SkPaint::Join getJoinStyle() const;
 
     QrealAnimator *getStrokeWidthAnimator();
+    BrushSettingsAnimator *getBrushSettings() {
+        return mBrushSettings.get();
+    }
 
     void setOutlineCompositionMode(
             const QPainter::CompositionMode &compositionMode);
@@ -57,6 +84,8 @@ private:
     SkPaint::Join mJoinStyle = SkPaint::kRound_Join;
     QPainter::CompositionMode mOutlineCompositionMode =
             QPainter::CompositionMode_Source;
+    qsptr<BrushSettingsAnimator> mBrushSettings =
+            enve::make_shared<BrushSettingsAnimator>();
     qsptr<QrealAnimator> mLineWidth =
             enve::make_shared<QrealAnimator>(1, 0, 999, 1, "thickness");
 };

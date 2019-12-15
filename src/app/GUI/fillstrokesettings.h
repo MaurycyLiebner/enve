@@ -31,6 +31,9 @@
 #include "Animators/coloranimator.h"
 #include "Animators/paintsettingsanimator.h"
 #include "paintsettingsapplier.h"
+#include "Animators/brushsettingsanimator.h"
+#include "GUI/BrushWidgets/brushselectionwidget.h"
+
 class GradientWidget;
 class MainWindow;
 class CanvasWindow;
@@ -59,6 +62,13 @@ public:
     void setStrokeValuesFromStrokeSettings(OutlineSettingsAnimator *settings);
 
     void updateColorAnimator();
+    void setCurrentBrushSettings(BrushSettingsAnimator * const brushSettings);
+
+    void emitStrokeBrushChanged();
+    void emitStrokeBrushWidthCurveChanged();
+    void emitStrokeBrushTimeCurveChanged();
+    void emitStrokeBrushSpacingCurveChanged();
+    void emitStrokeBrushPressureCurveChanged();
 
     void emitCapStyleChanged();
     void emitJoinStyleChanged();
@@ -66,7 +76,13 @@ private:
     void setLinearGradientAction();
     void setRadialGradientAction();
 
-    void colorTypeSet(const PaintType type);
+    void setStrokeBrush(SimpleBrushWrapper * const brush);
+    void setBrushTimeCurve(const qCubicSegment1D& seg);
+    void setBrushWidthCurve(const qCubicSegment1D& seg);
+    void setBrushPressureCurve(const qCubicSegment1D& seg);
+    void setBrushSpacingCurve(const qCubicSegment1D& seg);
+
+    void paintTypeSet(const PaintType type);
     void setFillTarget();
     void setStrokeTarget();
 
@@ -82,6 +98,7 @@ private:
     void setRoundCapStyleAction();
 
     void setGradientFillAction();
+    void setBrushFillAction();
     void setFlatFillAction();
     void setNoneFillAction();
 
@@ -139,8 +156,15 @@ private:
     SkPaint::Join mCurrentJoinStyle;
     qreal mCurrentStrokeWidth;
 
+    SimpleBrushWrapper* mCurrentStrokeBrush = nullptr;
+    qCubicSegment1D mCurrentStrokeBrushWidthCurve;
+    qCubicSegment1D mCurrentStrokeBrushTimeCurve;
+    qCubicSegment1D mCurrentStrokeBrushPressureCurve;
+    qCubicSegment1D mCurrentStrokeBrushSpacingCurve;
+
     //
 
+    void setBrushPaintType();
     void setNoPaintType();
     void setFlatPaintType();
     void setGradientPaintType();
@@ -155,6 +179,7 @@ private:
     QPushButton *mFillNoneButton = nullptr;
     QPushButton *mFillFlatButton = nullptr;
     QPushButton *mFillGradientButton = nullptr;
+    QPushButton *mFillBrushButton = nullptr;
 
     QWidget *mStrokeSettingsWidget;
     QWidget* mStrokeJoinCapWidget;
@@ -184,6 +209,14 @@ private:
     QWidget *mGradientTypeWidget;
 
     QWidget *mFillAndStrokeWidget;
+
+    BrushSelectionWidget* mBrushSelectionWidget;
+
+    QWidget* mBrushSettingsWidget;
+    Segment1DEditor* mBrushWidthCurveEditor;
+    Segment1DEditor* mBrushPressureCurveEditor;
+    Segment1DEditor* mBrushSpacingCurveEditor;
+    Segment1DEditor* mBrushTimeCurveEditor;
 };
 
 #endif // FILLSTROKESETTINGS_H

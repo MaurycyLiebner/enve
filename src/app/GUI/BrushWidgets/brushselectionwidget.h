@@ -20,15 +20,10 @@
 class BrushCollection;
 #include <QTabWidget>
 #include <mypaint-brush.h>
-#include "brushcontexedwrapper.h"
 #include "exceptions.h"
 #include "Private/esettings.h"
+#include "Paint/brushcontexedwrapper.h"
 class FlowLayout;
-
-struct BrushCollectionData {
-    QString fName;
-    QList<BrushData> fBrushes;
-};
 
 struct BrushContexedCollection {
     BrushContexedCollection(const BrushCollectionData& raw) {
@@ -76,17 +71,6 @@ public:
         return mContextId;
     }
 
-    static SimpleBrushWrapper * sGetBrush(const QString& collectionName,
-                                          const QString& brushName) {
-        for(const auto& coll : sData) {
-            if(coll.fName != collectionName) continue;
-            for(const auto& brush : coll.fBrushes) {
-                if(brush.fName == brushName) return brush.fWrapper.get();
-            }
-        }
-        return nullptr;
-    }
-
     static int sCreateNewContext() {
         if(!sLoaded) {
             const QString brushesDir = eSettings::sSettingsDir() + "/brushes";
@@ -95,7 +79,7 @@ public:
             sLoaded = true;
         }
         const int id = sBrushContexts.count();
-        sBrushContexts << BrushesContext(sData);
+        sBrushContexts << BrushesContext(BrushCollectionData::sData);
         return id;
     }
 
@@ -120,7 +104,7 @@ private:
         emit currentBrushChanged(getCurrentBrush());
     }
     static void sLoadCollectionsFromDir(const QString& mainDirPath);
-    static QList<BrushCollectionData> sData;
+
     static bool sLoaded;
     static QList<BrushesContext> sBrushContexts;
 

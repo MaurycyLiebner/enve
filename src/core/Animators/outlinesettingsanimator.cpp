@@ -30,6 +30,7 @@ OutlineSettingsAnimator::OutlineSettingsAnimator(
 void OutlineSettingsAnimator::writeProperty(eWriteStream& dst) const {
     PaintSettingsAnimator::writeProperty(dst);
     mLineWidth->writeProperty(dst);
+    mBrushSettings->writeProperty(dst);
     dst.write(&mCapStyle, sizeof(SkPaint::Cap));
     dst.write(&mJoinStyle, sizeof(SkPaint::Join));
     dst.write(&mOutlineCompositionMode, sizeof(QPainter::CompositionMode));
@@ -38,9 +39,17 @@ void OutlineSettingsAnimator::writeProperty(eWriteStream& dst) const {
 void OutlineSettingsAnimator::readProperty(eReadStream& src) {
     PaintSettingsAnimator::readProperty(src);
     mLineWidth->readProperty(src);
+    mBrushSettings->readProperty(src);
     src.read(&mCapStyle, sizeof(SkPaint::Cap));
     src.read(&mJoinStyle, sizeof(SkPaint::Join));
     src.read(&mOutlineCompositionMode, sizeof(QPainter::CompositionMode));
+}
+
+void OutlineSettingsAnimator::showHideChildrenBeforeChaningPaintType(
+        const PaintType newPaintType) {
+    PaintSettingsAnimator::showHideChildrenBeforeChaningPaintType(newPaintType);
+    if(getPaintType() == BRUSHPAINT) ca_removeChild(mBrushSettings);
+    if(newPaintType == BRUSHPAINT) ca_addChild(mBrushSettings);
 }
 
 void OutlineSettingsAnimator::strokeWidthAction(const QrealAction& action) {

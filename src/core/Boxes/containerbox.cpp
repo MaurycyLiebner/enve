@@ -112,6 +112,36 @@ void ContainerBox::setStrokeJoinStyle(const SkPaint::Join joinStyle) {
     }
 }
 
+void ContainerBox::setStrokeBrush(SimpleBrushWrapper * const brush) {
+    for(const auto& box : mContainedBoxes) {
+        box->setStrokeBrush(brush);
+    }
+}
+
+void ContainerBox::setStrokeBrushWidthCurve(const qCubicSegment1D& curve) {
+    for(const auto& box : mContainedBoxes) {
+        box->setStrokeBrushWidthCurve(curve);
+    }
+}
+
+void ContainerBox::setStrokeBrushTimeCurve(const qCubicSegment1D& curve) {
+    for(const auto& box : mContainedBoxes) {
+        box->setStrokeBrushTimeCurve(curve);
+    }
+}
+
+void ContainerBox::setStrokeBrushPressureCurve(const qCubicSegment1D& curve) {
+    for(const auto& box : mContainedBoxes) {
+        box->setStrokeBrushPressureCurve(curve);
+    }
+}
+
+void ContainerBox::setStrokeBrushSpacingCurve(const qCubicSegment1D& curve) {
+    for(const auto& box : mContainedBoxes) {
+        box->setStrokeBrushSpacingCurve(curve);
+    }
+}
+
 void ContainerBox::strokeWidthAction(const QrealAction& action) {
     for(const auto& box : mContainedBoxes)
         box->strokeWidthAction(action);
