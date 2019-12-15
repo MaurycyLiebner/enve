@@ -5,12 +5,16 @@ sudo: required
 
 before_install:
     - sudo add-apt-repository -y ppa:jonathonf/gcc
-    - sudo add-apt-repository -y ppa:jonathonf/ffmpeg-4
+    - # sudo add-apt-repository -y ppa:jonathonf/ffmpeg-4
     - sudo add-apt-repository -y ppa:beineri/opt-qt-5.12.6-xenial
     - sudo apt-get update
 install:
     - sudo apt-get -y install g++-7
-    - sudo apt-get -y install libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
+    - sudo apt-get -y install build-essential curl
+    - wget https://raw.githubusercontent.com/markus-perl/ffmpeg-build-script/master/build-ffmpeg
+    - chmod +x build-ffmpeg
+    - sudo AUTOINSTALL=yes ./build-ffmpeg --build
+    - # sudo apt-get -y install libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
     - sudo apt-get -y install qt512base qt512multimedia qt512svg
     - source /opt/qt512/bin/qt512-env.sh
     - sudo apt-get -y install libglib2.0-dev
