@@ -50,7 +50,7 @@ install:
     - wget https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip
     - unzip ninja-linux.zip
     - chmod +x ninja
-    - bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] target_os="linux" target_cpu="x64" skia_use_system_expat=false skia_use_system_freetype2=false skia_use_system_libjpeg_turbo=false skia_use_system_zlib=false skia_use_system_harfbuzz=false cc="gcc-7" cxx="g++-7"'
+    - bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] target_os="linux" target_cpu="x64" skia_use_system_expat=false skia_use_system_freetype2=false skia_use_system_libjpeg_turbo=false skia_use_system_libwebp=false skia_use_system_zlib=false skia_use_system_harfbuzz=false cc="gcc-7" cxx="g++-7"'
     - ./ninja -C out/Release -j 2
     - cd ..
     - # build libmypaint
@@ -91,8 +91,6 @@ script:
     - cp -av Release/src/core/*.so* AppDir/usr/lib/
     - cp -av ../third_party/gperftools-2.7-enve-mod/.libs/libtcmalloc.so* AppDir/usr/lib/
     - ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage
-    - export VERSION=$(git rev-parse --short HEAD)
-    - mv ./enve-x86_64.AppImage ./enve-$VERSION-x86_64.AppImage 
 after_success:
     - |
       export GREP_PATH=grep;
