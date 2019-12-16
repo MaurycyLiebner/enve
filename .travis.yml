@@ -13,6 +13,7 @@ matrix:
           packages:
             - g++-7
             - qt512base qt512multimedia qt512svg
+            - libvorbisfile3
             - # libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
             - libglib2.0-dev
             - unzip
