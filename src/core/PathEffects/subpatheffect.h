@@ -25,6 +25,7 @@ protected:
 public:
     stdsptr<PathEffectCaller> getEffectCaller(const qreal relFrame) const;
 private:
+    qsptr<BoolProperty> mPathWise;
     qsptr<QrealAnimator> mMin;
     qsptr<QrealAnimator> mMax;
 };

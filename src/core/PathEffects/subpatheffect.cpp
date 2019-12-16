@@ -22,6 +22,8 @@
 
 SubPathEffect::SubPathEffect() :
     PathEffect("sub-path effect", PathEffectType::SUB) {
+    mPathWise = enve::make_shared<BoolProperty>("path-wise");
+
     mMin = enve::make_shared<QrealAnimator>("min length");
     mMin->setValueRange(-999, 999);
     mMin->setCurrentBaseValue(0);
@@ -30,24 +32,25 @@ SubPathEffect::SubPathEffect() :
     mMax->setValueRange(-999, 999);
     mMax->setCurrentBaseValue(100);
 
+    ca_addChild(mPathWise);
     ca_addChild(mMin);
     ca_addChild(mMax);
 }
 
 class SubPathEffectCaller : public PathEffectCaller {
 public:
-    SubPathEffectCaller(const qreal minFrac, const qreal maxFrac) :
-        mMinFrac(minFrac), mMaxFrac(maxFrac) {}
+    SubPathEffectCaller(const bool pathWise,
+                        const qreal minFrac, const qreal maxFrac) :
+        mPathWise(pathWise), mMinFrac(minFrac), mMaxFrac(maxFrac) {}
 
     void apply(SkPath& path);
 private:
+    const bool mPathWise;
     const qreal mMinFrac;
     const qreal mMaxFrac;
 };
 
 void SubPathEffectCaller::apply(SkPath &path) {
-    const bool pathWise = true;
-
     if(isZero6Dec(mMaxFrac - 1) && isZero6Dec(mMinFrac)) return;
 
     if(isZero6Dec(mMaxFrac - mMinFrac)) {
@@ -60,7 +63,7 @@ void SubPathEffectCaller::apply(SkPath &path) {
     path.reset();
     path.setFillType(srcFillType);
 
-    if(pathWise) {
+    if(mPathWise) {
         for(auto& iPath : paths) {
             path.addPath(iPath.getFragmentUnbound(mMinFrac, mMaxFrac).toSkPath());
         }
@@ -107,7 +110,8 @@ void SubPathEffectCaller::apply(SkPath &path) {
 }
 
 stdsptr<PathEffectCaller> SubPathEffect::getEffectCaller(const qreal relFrame) const {
+    const bool pathWise = mPathWise->getValue();
     const qreal minFrac = mMin->getEffectiveValue(relFrame)/100;
     const qreal maxFrac = mMax->getEffectiveValue(relFrame)/100;
-    return enve::make_shared<SubPathEffectCaller>(minFrac, maxFrac);
+    return enve::make_shared<SubPathEffectCaller>(pathWise, minFrac, maxFrac);
 }
