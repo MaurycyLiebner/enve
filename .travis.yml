@@ -9,11 +9,11 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
             - sourceline: 'ppa:beineri/opt-qt-5.12.6-xenial'
-            - sourceline: 'ppa:jonathonf/ffmpeg-4'
+            - # sourceline: 'ppa:jonathonf/ffmpeg-4'
           packages:
             - g++-7
             - qt512base qt512multimedia qt512svg
-            - libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
+            - # libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
             - libglib2.0-dev
             - unzip
             - libjson-c-dev intltool pkg-config
@@ -29,7 +29,12 @@ matrix:
 before_install:
     - eval "${MATRIX_EVAL}"
 install:
-    - source /opt/qt512/bin/qt512-env.sh
+    - wget https://github.com/MaurycyLiebner/enve/files/3968745/ffmpeg-dev-4.2.tar.gz
+    - tar xf ffmpeg-dev-4.2.tar.gz
+    - cd fmpeg-dev-4.2
+    - chmod +x install.py
+    - sudo python install.py
+    - cd ..
     - # skia dependencies
     - cd third_party
     - # build skia
@@ -40,7 +45,7 @@ install:
     - wget https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip
     - unzip ninja-linux.zip
     - chmod +x ninja
-    - bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] target_os="linux" target_cpu="x64" skia_use_system_expat=false skia_use_system_freetype2=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false skia_use_system_harfbuzz=false cc="gcc-7" cxx="g++-7"'
+    - bin/gn gen out/Release --args='is_official_build=true is_debug=false extra_cflags=["-Wno-error"] target_os="linux" target_cpu="x64" skia_use_system_expat=false skia_use_system_freetype2=false skia_use_system_libjpeg_turbo=false skia_use_system_zlib=false skia_use_system_harfbuzz=false cc="gcc-7" cxx="g++-7"'
     - ./ninja -C out/Release -j 2
     - cd ..
     - # build libmypaint
@@ -49,6 +54,7 @@ install:
     - export CFLAGS='-fopenmp -Ofast -ftree-vectorize -fopt-info-vec-optimized -funsafe-math-optimizations -funsafe-loop-optimizations -fPIC'
     - ./configure --enable-static --enable-openmp --enable-shared=false
     - sudo make
+    - unset CFLAGS
     - cd ..
     - # build gperftools
     - cd gperftools-2.7-enve-mod
@@ -67,8 +73,9 @@ before_script:
     - mv exec-x86_64.so exec.so
     - cd Release
 script:
-    - /opt/qt512/bin/qmake ../../enve.pro
-    - make CC=gcc-7 CPP=g++-7 CXX=g++-7 LD=g++-7
+    - source /opt/qt512/bin/qt512-env.sh
+    - qmake ../../enve.pro
+    - make -j 2 CC=gcc-7 CPP=g++-7 CXX=g++-7 LD=g++-7
     - cd ..
     - # Generate AppImage
     - cp AppRun AppDir/
@@ -77,6 +84,7 @@ script:
     - cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 AppDir/usr/optional/libstdc++/
     - cp Release/src/app/enve AppDir/usr/bin/
     - cp -av Release/src/core/*.so* AppDir/usr/lib/
+    - cp -av ../third_party/gperftools-2.7-enve-mod/.libs/libtcmalloc.so* AppDir/usr/lib/
     - ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage
     - export VERSION=$(git rev-parse --short HEAD)
     - mv ./enve-x86_64.AppImage ./enve-$VERSION-x86_64.AppImage 
