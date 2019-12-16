@@ -21,15 +21,10 @@
 void LinkCanvasRenderData::drawSk(SkCanvas * const canvas) {
     ContainerBoxRenderData::drawSk(canvas);
     if(fClipToCanvas) {
+        canvas->save();
         canvas->concat(toSkMatrix(fScaledTransform));
-        SkPaint bPaint;
-        bPaint.setStyle(SkPaint::kFill_Style);
-        bPaint.setAntiAlias(true);
-        bPaint.setBlendMode(SkBlendMode::kSrc);
-        bPaint.setColor(SK_ColorTRANSPARENT);
-        SkPath path;
-        path.addRect(toSkRect(fRelBoundingRect));
-        path.toggleInverseFillType();
-        canvas->drawPath(path, bPaint);
+        canvas->clipRect(toSkRect(fRelBoundingRect), SkClipOp::kDifference, true);
+        canvas->clear(SK_ColorTRANSPARENT);
+        canvas->restore();
     }
 }

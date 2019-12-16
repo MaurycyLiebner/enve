@@ -27,15 +27,13 @@ void RenderContainer::drawSk(SkCanvas * const canvas,
     if(blendMode == SkBlendMode::kDstIn ||
        blendMode == SkBlendMode::kSrcIn ||
        blendMode == SkBlendMode::kDstATop) {
-        SkPaint bPaint;
-        bPaint.setBlendMode(blendMode);
-        bPaint.setColor(SK_ColorTRANSPARENT);
-        SkPath path;
-        path.addRect(SkRect::MakeXYWH(mGlobalRect.x(), mGlobalRect.y(),
-                                      mImageSk->width(),
-                                      mImageSk->height()));
-        path.toggleInverseFillType();
-        canvas->drawPath(path, bPaint);
+        canvas->save();
+        auto rect = SkRect::MakeXYWH(mGlobalRect.x(), mGlobalRect.y(),
+                                     mImageSk->width(), mImageSk->height());
+        rect.inset(1, 1);
+        canvas->clipRect(rect, SkClipOp::kDifference, false);
+        canvas->clear(SK_ColorTRANSPARENT);
+        canvas->restore();
     }
     paint.setAntiAlias(mAntiAlias);
     canvas->drawImage(mImageSk, mGlobalRect.x(), mGlobalRect.y(), &paint);

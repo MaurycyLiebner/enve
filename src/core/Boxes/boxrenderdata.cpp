@@ -63,15 +63,14 @@ void BoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {
     if(fBlendMode == SkBlendMode::kDstIn ||
        fBlendMode == SkBlendMode::kSrcIn ||
        fBlendMode == SkBlendMode::kDstATop) {
-        SkPaint bPaint;
-        bPaint.setBlendMode(fBlendMode);
-        bPaint.setColor(SK_ColorTRANSPARENT);
-        SkPath path;
-        path.addRect(SkRect::MakeXYWH(fGlobalRect.x(), fGlobalRect.y(),
-                                      fRenderedImage->width(),
-                                      fRenderedImage->height()));
-        path.toggleInverseFillType();
-        canvas->drawPath(path, bPaint);
+        canvas->save();
+        auto rect = SkRect::MakeXYWH(fGlobalRect.x(), fGlobalRect.y(),
+                                     fRenderedImage->width(),
+                                     fRenderedImage->height());
+        rect.inset(1, 1);
+        canvas->clipRect(rect, SkClipOp::kDifference, false);
+        canvas->clear(SK_ColorTRANSPARENT);
+        canvas->restore();
     }
     SkPaint paint;
     paint.setAlpha(static_cast<U8CPU>(qRound(fOpacity*2.55)));
