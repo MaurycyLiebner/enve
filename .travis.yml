@@ -14,7 +14,7 @@ matrix:
             - g++-7
             - qt512base qt512multimedia qt512svg
             - # ffmpeg debs dependencies
-            - libvorbisfile3 libsoxr0
+            - libvorbisfile3 libsoxr0 libcrystalhd3 libgsm1 libmp3lame0 libopus0 libshine3 libsnappy1v5 libspeex1 libtheora0 libtwolame0
             - # libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
             - libglib2.0-dev
             - unzip
