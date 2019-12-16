@@ -16,6 +16,10 @@ Enve was created with flexibility and expandability in mind.
   <a href="https://www.youtube.com/channel/UCjvNO3xdIQs-cpgwSf0mX5Q" target="_blank">
     <img src="https://image.flaticon.com/icons/png/512/187/187209.png" alt="enve on YouTube" width="64" height="64" border="10" hspace="20"/>
   </a>
+
+  <a href="https://www.patreon.com/enve" target="_blank">
+    <img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" alt="enve on Patreon" width="64" border="10" hspace="20"/>
+  </a>
 </p>
 
 ![screenshot_1](https://user-images.githubusercontent.com/16670651/70745938-36e20900-1d25-11ea-9bdf-78d3fe402291.png)
