@@ -579,7 +579,7 @@ void MainWindow::setupMenuBar() {
 
     mMenuBar->addSeparator();
     mMenuBar->addAction("Support enve", this, []() {
-        QDesktopServices::openUrl(QUrl("https://liberapay.com/enve/"));
+        QDesktopServices::openUrl(QUrl("https://maurycyliebner.github.io/"));
     });
 
     setMenuBar(mMenuBar);
