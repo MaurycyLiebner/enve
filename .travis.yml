@@ -31,7 +31,7 @@ before_install:
 install:
     - wget https://github.com/MaurycyLiebner/enve/files/3968745/ffmpeg-dev-4.2.tar.gz
     - tar xf ffmpeg-dev-4.2.tar.gz
-    - cd fmpeg-dev-4.2
+    - cd ffmpeg-dev-4.2
     - chmod +x install.py
     - sudo python install.py
     - cd ..
