@@ -17,6 +17,7 @@ matrix:
             - libvorbisfile3 libsoxr0 libcrystalhd3 libgsm1 libmp3lame0
             - libopus0 libshine3 libsnappy1v5 libspeex1 libtheora0 libtwolame0
             - libwavpack1 libxvidcore4 libzvbi0
+            - libbluray1 libgme0 libssh-gcrypt-4
             - # libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
             - libglib2.0-dev
             - unzip
