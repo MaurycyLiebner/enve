@@ -113,6 +113,12 @@ int NodeList::insertNodeAfter(const int prevId,
     return insertId;
 }
 
+int NodeList::prependNode(const Node &nodeBlueprint) {
+    const int insertId = 0;
+    insertNodeToList(insertId, nodeBlueprint);
+    return insertId;
+}
+
 int NodeList::appendNode(const Node &nodeBlueprint) {
     const int insertId = mNodes.count();
     insertNodeToList(insertId, nodeBlueprint);

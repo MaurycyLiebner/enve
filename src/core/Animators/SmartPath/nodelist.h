@@ -213,6 +213,7 @@ protected:
 
     int insertNodeBefore(const int nextId, const Node &nodeBlueprint);
     int insertNodeAfter(const int prevId, const Node &nodeBlueprint);
+    int prependNode(const Node &nodeBlueprint);
     int appendNode(const Node &nodeBlueprint);
     Node * appendAndGetNode(const Node &nodeBlueprint) {
         return mNodes[appendNode(nodeBlueprint)];

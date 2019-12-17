@@ -43,6 +43,19 @@ int SmartPath::actionAddFirstNode(const NormalNodeData& data) {
     return insertId;
 }
 
+int SmartPath::actionPrependNode() {
+    if(mNodesList.count() == 0) RuntimeThrow("Cannot prepend new node ");
+    Node * const endNode = mNodesList.at(0);
+    if(!endNode->isNormal())
+        RuntimeThrow("Invalid node type. End nodes should always be NORMAL.");
+    const NodePointValues vals = {endNode->p1(), endNode->p1(), endNode->p1()};
+    return actionPrependNode(vals);
+}
+
+int SmartPath::actionPrependNode(const NodePointValues &values) {
+    return mNodesList.prependNode(Node(values.fC0, values.fP1, values.fC2));
+}
+
 int SmartPath::actionAppendNodeAtEndNode(const int endNodeId) {
     Node * const endNode = mNodesList.at(endNodeId);
     if(!endNode->isNormal())

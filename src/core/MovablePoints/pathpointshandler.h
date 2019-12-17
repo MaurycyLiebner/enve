@@ -54,6 +54,7 @@ public:
     // actions on NORMAL
     void setCtrlsMode(const int nodeId, const CtrlsMode mode);
     void removeNode(const int nodeId, const bool approx);
+    SmartNodePoint *addNewAtStart(const QPointF &relPos);
     SmartNodePoint *addNewAtEnd(const QPointF &relPos);
     // actions on DISSOLVED
 

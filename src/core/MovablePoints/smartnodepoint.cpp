@@ -530,7 +530,8 @@ void SmartNodePoint::actionRemove(const bool approx) {
 }
 
 SmartNodePoint* SmartNodePoint::actionAddPointRelPos(const QPointF &relPos) {
-    return mHandler_k->addNewAtEnd(relPos);
+    if(hasNextPoint()) return mHandler_k->addNewAtStart(relPos);
+    else return mHandler_k->addNewAtEnd(relPos);
 }
 
 SmartNodePoint* SmartNodePoint::actionAddPointAbsPos(const QPointF &absPos) {

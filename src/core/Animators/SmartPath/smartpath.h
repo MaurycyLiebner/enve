@@ -44,6 +44,9 @@ public:
                                const int prevNodeId,
                                const int nextNodeId);
 
+    int actionPrependNode();
+    int actionPrependNode(const NodePointValues &values);
+
     int actionAppendNodeAtEndNode(const int endNodeId);
     int actionAppendNodeAtEndNode(const NodePointValues &values);
     int actionAppendNodeAtEndNode();

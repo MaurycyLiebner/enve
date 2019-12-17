@@ -194,6 +194,26 @@ public:
         prp_afterWholeInfluenceRangeChanged();
     }
 
+
+    int actionAddNewAtStart(const QPointF &relPos) {
+        return actionAddNewAtStart({false, false, CTRLS_CORNER,
+                                    relPos, relPos, relPos});
+    }
+
+    int actionAddNewAtStart(const NormalNodeData &data) {
+        if(mBaseValue.getNodeCount() == 0)
+            return actionAddFirstNode(data);
+        beforeBinaryPathChange();
+        for(const auto &key : anim_mKeys) {
+            const auto spKey = static_cast<SmartPathKey*>(key);
+            spKey->getValue().actionPrependNode();
+        }
+        const int id = mBaseValue.actionPrependNode();
+        getCurrentlyEditedPath()->actionSetNormalNodeValues(id, data);
+        prp_afterWholeInfluenceRangeChanged();
+        return id;
+    }
+
     int actionAddNewAtEnd(const QPointF &relPos) {
         return actionAddNewAtEnd({false, false, CTRLS_CORNER,
                                   relPos, relPos, relPos});
@@ -209,21 +229,6 @@ public:
         }
         const int id = mBaseValue.actionAppendNodeAtEndNode();
         getCurrentlyEditedPath()->actionSetNormalNodeValues(id, data);
-        prp_afterWholeInfluenceRangeChanged();
-        return id;
-    }
-
-    int actionAddFirstNode(const QPointF &relPos) {
-        return actionAddFirstNode({false, false, CTRLS_SYMMETRIC,
-                                   relPos, relPos, relPos});
-    }
-
-    int actionAddFirstNode(const NormalNodeData &data) {
-        for(const auto &key : anim_mKeys) {
-            const auto spKey = static_cast<SmartPathKey*>(key);
-            spKey->getValue().actionAddFirstNode(data);
-        }
-        const int id = mBaseValue.actionAddFirstNode(data);
         prp_afterWholeInfluenceRangeChanged();
         return id;
     }
@@ -425,6 +430,21 @@ protected:
         return mBaseValue;
     }
 private:
+    int actionAddFirstNode(const QPointF &relPos) {
+        return actionAddFirstNode({false, false, CTRLS_SYMMETRIC,
+                                   relPos, relPos, relPos});
+    }
+
+    int actionAddFirstNode(const NormalNodeData &data) {
+        for(const auto &key : anim_mKeys) {
+            const auto spKey = static_cast<SmartPathKey*>(key);
+            spKey->getValue().actionAddFirstNode(data);
+        }
+        const int id = mBaseValue.actionAddFirstNode(data);
+        prp_afterWholeInfluenceRangeChanged();
+        return id;
+    }
+
     void updateBaseValue() {
         const auto prevK = anim_getPrevKey<SmartPathKey>(anim_getCurrentRelFrame());
         const auto nextK = anim_getNextKey<SmartPathKey>(anim_getCurrentRelFrame());

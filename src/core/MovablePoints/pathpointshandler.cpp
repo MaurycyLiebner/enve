@@ -68,6 +68,11 @@ void PathPointsHandler::removeNode(const int nodeId, const bool approx) {
     mTargetAnimator->actionRemoveNode(nodeId, approx);
 }
 
+SmartNodePoint* PathPointsHandler::addNewAtStart(const QPointF &relPos) {
+    const int id = mTargetAnimator->actionAddNewAtStart(relPos);
+    return getPointWithId<SmartNodePoint>(id);
+}
+
 SmartNodePoint* PathPointsHandler::addNewAtEnd(const QPointF &relPos) {
     const int id = mTargetAnimator->actionAddNewAtEnd(relPos);
     return getPointWithId<SmartNodePoint>(id);
