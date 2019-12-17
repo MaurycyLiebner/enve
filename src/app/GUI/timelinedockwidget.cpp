@@ -105,23 +105,13 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
 
     mColorLabel = new QLabel("");
     mColorLabel->setToolTip(gSingleLineTooltip("Current Color", "E"));
+
     connect(&mDocument, &Document::brushColorChanged,
-            this, [this](const QColor& color) {
-        const int dim = mToolBar->height() - 2;
-        QPixmap pix(dim, dim);
-        pix.fill(color);
-        mColorLabel->setPixmap(pix);
-    });
+            this, &TimelineDockWidget::setBrushColor);
     mBrushLabel = new QLabel("");
     mBrushLabel->setToolTip(gSingleLineTooltip("Current Brush", "B"));
     connect(&mDocument, &Document::brushChanged,
-            this, [this](BrushContexedWrapper* const brush) {
-        const auto& icon = brush->getBrushData().fIcon;
-        const int dim = mToolBar->height() - 2;
-        const auto img = icon.scaled(dim, dim, Qt::KeepAspectRatio,
-                                     Qt::SmoothTransformation);
-        mBrushLabel->setPixmap(QPixmap::fromImage(img));
-    });
+            this, &TimelineDockWidget::setBrush);
     mDecBrushSize = new ActionButton(
                 iconsDir + "/brush-.png",
                 gSingleLineTooltip("Decrease Brush Size", "Q"), this);
@@ -180,8 +170,15 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mDecBrushSizeAct = mToolBar->addWidget(mDecBrushSize);
     mBrushSizeLabelAct = mToolBar->addWidget(mBrushSizeLabel);
     mIncBrushSizeAct = mToolBar->addWidget(mIncBrushSize);
-    mBrushLabel->setStyleSheet("border: 1px solid black;");
-    mColorLabel->setStyleSheet("border: 1px solid black; padding-left: -1px;");
+    mBrushLabel->setStyleSheet("QWidget {"
+                                   "background: white;"
+                                   "border: 1px solid black;"
+                               "}");
+    mColorLabel->setStyleSheet("QWidget {"
+                                   "background: black;"
+                                   "border: 1px solid black;"
+                                   "padding-left: -1px;"
+                               "}");
     QWidget * const spacerWidget = new QWidget(this);
     spacerWidget->setSizePolicy(QSizePolicy::Expanding,
                                 QSizePolicy::Minimum);
@@ -232,6 +229,9 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
 
     connect(&mDocument, &Document::activeSceneSet,
             this, &TimelineDockWidget::updateSettingsForCurrentCanvas);
+
+    setBrush(nullptr);
+    setBrushColor(Qt::black);
 }
 
 void TimelineDockWidget::setResolutionFractionText(QString text) {
@@ -332,6 +332,27 @@ void TimelineDockWidget::updateButtonsVisibility(const CanvasMode mode) {
     mBrushSizeLabelAct->setVisible(mode == CanvasMode::paint);
     mIncBrushSizeAct->setVisible(mode == CanvasMode::paint);
 
+}
+
+void TimelineDockWidget::setBrushColor(const QColor &color) {
+    const int dim = mToolBar->height() - 2;
+    QPixmap pix(dim, dim);
+    pix.fill(color);
+    mColorLabel->setPixmap(pix);
+}
+
+void TimelineDockWidget::setBrush(BrushContexedWrapper* const brush) {
+    const int dim = mToolBar->height() - 2;
+    if(!brush) {
+        QPixmap pix(dim, dim);
+        pix.fill(Qt::white);
+        mBrushLabel->setPixmap(pix);
+        return;
+    }
+    const auto& icon = brush->getBrushData().fIcon;
+    const auto img = icon.scaled(dim, dim, Qt::KeepAspectRatio,
+                                 Qt::SmoothTransformation);
+    mBrushLabel->setPixmap(QPixmap::fromImage(img));
 }
 
 void TimelineDockWidget::pausePreview() {

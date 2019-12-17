@@ -47,6 +47,7 @@ class Canvas;
 class Document;
 class LayoutHandler;
 class SwitchButton;
+class BrushContexedWrapper;
 
 enum class CanvasMode : short;
 
@@ -81,6 +82,9 @@ private:
 
     void updateButtonsVisibility(const CanvasMode mode);
 private:
+    void setBrushColor(const QColor& color);
+    void setBrush(BrushContexedWrapper* const brush);
+
     Document& mDocument;
     MainWindow* const mMainWindow;
     QStackedWidget* const mTimelineLayout;
