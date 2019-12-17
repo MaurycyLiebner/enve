@@ -72,13 +72,10 @@ void PathBoxRenderData::drawSk(SkCanvas * const canvas) {
                         fStrokeSettings.fTimeCurve,
                         fStrokeSettings.fPressureCurve,
                         strokeWidthCurve, fStrokeSettings.fSpacingCurve, 5, 5);
-            QColor col = fStrokeSettings.fPaintColor;
-            col.setRgbF(col.blueF(), col.greenF(),
-                        col.redF(), col.alphaF());
             fStrokeSettings.fStrokeBrush->setColor(
-                        toSkScalar(col.hueF()),
-                        toSkScalar(col.saturationF()),
-                        toSkScalar(col.valueF()));
+                        toSkScalar(fStrokeSettings.fPaintColor.hueF()),
+                        toSkScalar(fStrokeSettings.fPaintColor.saturationF()),
+                        toSkScalar(fStrokeSettings.fPaintColor.valueF()));
             //const auto brush = fStrokeSettings.fStrokeBrush->getBrush();
             for(auto& set : strokeBrushSet)
                 surf.execute(strokeBrush, set);
