@@ -61,7 +61,7 @@ void EnveSplash::drawContents(QPainter * const p) {
     QString rightTxt;
 #if defined(LATEST_COMMIT_HASH) && defined(LATEST_COMMIT_DATE)
     const QString date(LATEST_COMMIT_DATE);
-    rightTxt = LATEST_COMMIT_HASH + " " + date.split(" ").first();
+    rightTxt = QString(LATEST_COMMIT_HASH) + " " + date.split(" ").first();
 #else
     rightTxt = "0.0.0";
 #endif
