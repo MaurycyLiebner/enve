@@ -58,7 +58,14 @@ void EnveSplash::drawContents(QPainter * const p) {
     p->drawText(mMessageRect, Qt::AlignCenter, message());
     p->setPen(QColor(Qt::gray));
     p->drawText(mBottomRect, Qt::AlignVCenter | Qt::AlignLeft, "Maurycy Liebner");
-    p->drawText(mBottomRect, Qt::AlignVCenter | Qt::AlignRight, "10.09.19");
+    QString rightTxt;
+#if defined(LATEST_COMMIT_HASH) && defined(LATEST_COMMIT_DATE)
+    const QString date(LATEST_COMMIT_DATE);
+    rightTxt = LATEST_COMMIT_HASH + " " + date.split(" ").first();
+#else
+    rightTxt = "0.0.0";
+#endif
+    p->drawText(mBottomRect, Qt::AlignVCenter | Qt::AlignRight, rightTxt);
 }
 
 void EnveSplash::mousePressEvent(QMouseEvent *) {
