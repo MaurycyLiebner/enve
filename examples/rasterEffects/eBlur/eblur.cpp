@@ -22,7 +22,7 @@ qsptr<CustomRasterEffect> eCreateNewestVersion() {
 }
 
 qsptr<CustomRasterEffect> eCreate(const CustomIdentifier &identifier) {
-    Q_UNUSED(identifier);
+    Q_UNUSED(identifier)
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
     return enve::make_shared<eBlur>();
@@ -88,8 +88,8 @@ eBlurCaller::eBlurCaller(const HardwareSupport hwSupport, const qreal radius) :
 void eBlurCaller::processGpu(QGL33 * const gl,
                              GpuRenderTools &renderTools,
                              GpuRenderData &data) {
-    Q_UNUSED(gl);
-    Q_UNUSED(data);
+    Q_UNUSED(gl)
+    Q_UNUSED(data)
 
     const float sigma = mRadius*0.3333333f;
     const auto filter = SkBlurImageFilter::Make(sigma, sigma, nullptr);
@@ -109,7 +109,7 @@ void eBlurCaller::processGpu(QGL33 * const gl,
 
 void eBlurCaller::processCpu(CpuRenderTools &renderTools,
                              const CpuRenderData &data) {
-    Q_UNUSED(data);
+    Q_UNUSED(data)
 
     const float sigma = mRadius*0.3333333f;
     const auto filter = SkBlurImageFilter::Make(sigma, sigma, nullptr);

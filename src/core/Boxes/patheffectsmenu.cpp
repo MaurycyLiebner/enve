@@ -17,9 +17,8 @@
 #include "patheffectsmenu.h"
 
 template <typename T, typename U>
-void PathEffectsMenu::addPathEffectActionToMenu(
-        const QString& text, PropertyMenu * const menu,
-        const U& adder) {
+void addPathEffectActionToMenu(const QString& text, PropertyMenu * const menu,
+                               const U& adder) {
     menu->addPlainAction<BoundingBox>(text, [adder](BoundingBox * box) {
         (box->*adder)(enve::make_shared<T>());
     });
@@ -27,8 +26,7 @@ void PathEffectsMenu::addPathEffectActionToMenu(
 
 #include "PathEffects/custompatheffectcreator.h"
 template <typename U>
-void PathEffectsMenu::addPathEffectsActionToMenu(
-        PropertyMenu * const menu, const U &adder) {
+void addPathEffectsActionToMenu(PropertyMenu * const menu, const U &adder) {
     addPathEffectActionToMenu<DisplacePathEffect>(
                 "Displace", menu, adder);
     addPathEffectActionToMenu<SpatialDisplacePathEffect>(

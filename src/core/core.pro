@@ -177,9 +177,11 @@ SOURCES += \
     Private/esettings.cpp \
     Private/memorystructs.cpp \
     Properties/boxtargetproperty.cpp \
+    RasterEffects/blureffect.cpp \
     RasterEffects/customrastereffect.cpp \
     RasterEffects/rastereffect.cpp \
     RasterEffects/rastereffectcaller.cpp \
+    RasterEffects/shadoweffect.cpp \
     ShaderEffects/shadereffect.cpp \
     ShaderEffects/shadereffectcaller.cpp \
     ShaderEffects/shadereffectcreator.cpp \
@@ -410,10 +412,13 @@ HEADERS += \
     Private/esettings.h \
     Private/memorystructs.h \
     Properties/boxtargetproperty.h \
+    RasterEffects/blureffect.h \
     RasterEffects/customrastereffect.h \
     RasterEffects/rastereffect.h \
     RasterEffects/customrastereffectcreator.h \
     RasterEffects/rastereffectcaller.h \
+    RasterEffects/rastereffectsinclude.h \
+    RasterEffects/shadoweffect.h \
     ShaderEffects/intanimatorcreator.h \
     ShaderEffects/qrealanimatorcreator.h \
     ShaderEffects/shadereffect.h \

@@ -33,6 +33,7 @@
 #include "MovablePoints/pathpointshandler.h"
 #include "typemenu.h"
 #include "patheffectsmenu.h"
+#include "RasterEffects/rastereffectsinclude.h"
 
 int BoundingBox::sNextDocumentId = 0;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
@@ -186,7 +187,7 @@ bool BoundingBox::getRasterEffectsEnabled() const {
 }
 
 void BoundingBox::applyPaintSetting(const PaintSettingsApplier &setting) {
-    Q_UNUSED(setting);
+    Q_UNUSED(setting)
 }
 
 bool BoundingBox::SWT_isBoundingBox() const { return true; }
@@ -497,11 +498,11 @@ QRectF BoundingBox::getRelBoundingRect() const {
 }
 
 template <typename T>
-void addEffectAction(const QString& text, PropertyMenu * const menu) {
-    const PropertyMenu::PlainSelectedOp<BoundingBox> op = [](BoundingBox * box) {
-        box->addEffect<T>();
-    };
-    menu->addPlainAction(text, op);
+void addRasterEffectActionToMenu(const QString& text,
+                                 PropertyMenu * const menu) {
+    menu->addPlainAction<BoundingBox>(text, [](BoundingBox * box) {
+        box->addRasterEffect(enve::make_shared<T>());
+    });
 }
 
 void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
@@ -547,16 +548,18 @@ void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
 
     menu->addSeparator();
 
-    const auto RasterEffectsMenu = menu->addMenu("Raster Effects");
-    CustomRasterEffectCreator::sAddToMenu(RasterEffectsMenu, &BoundingBox::addRasterEffect);
-    if(!RasterEffectsMenu->isEmpty()) RasterEffectsMenu->addSeparator();
+    const auto rasterEffectsMenu = menu->addMenu("Raster Effects");
+    addRasterEffectActionToMenu<BlurEffect>("Blur", rasterEffectsMenu);
+    addRasterEffectActionToMenu<ShadowEffect>("Shadow", rasterEffectsMenu);
+    CustomRasterEffectCreator::sAddToMenu(rasterEffectsMenu, &BoundingBox::addRasterEffect);
+    if(!rasterEffectsMenu->isEmpty()) rasterEffectsMenu->addSeparator();
     for(const auto& creator : ShaderEffectCreator::sEffectCreators) {
         const PropertyMenu::PlainSelectedOp<BoundingBox> op =
         [creator](BoundingBox * box) {
             const auto effect = creator->create();
             box->addRasterEffect(qSharedPointerCast<RasterEffect>(effect));
         };
-        RasterEffectsMenu->addPlainAction(creator->fName, op);
+        rasterEffectsMenu->addPlainAction(creator->fName, op);
     }
 }
 

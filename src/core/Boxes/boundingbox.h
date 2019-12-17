@@ -136,17 +136,17 @@ public:
     virtual bool relPointInsidePath(const QPointF &relPos) const;
 
     virtual void setFont(const QFont &font) {
-        Q_UNUSED(font);
+        Q_UNUSED(font)
     }
 
     virtual void setSelectedFontSize(const qreal fontSize) {
-        Q_UNUSED(fontSize);
+        Q_UNUSED(fontSize)
     }
 
     virtual void setSelectedFontFamilyAndStyle(const QString &family,
                                                const QString &style) {
-        Q_UNUSED(family);
-        Q_UNUSED(style);
+        Q_UNUSED(family)
+        Q_UNUSED(style)
     }
 
     virtual void drawPixmapSk(SkCanvas * const canvas,
@@ -304,11 +304,6 @@ public:
 
     void setRasterEffectsEnabled(const bool enable);
     bool getRasterEffectsEnabled() const;
-
-    template <class T>
-    void addEffect() {
-        addEffect(enve::make_shared<T>());
-    }
 
     void clearRasterEffects();
 

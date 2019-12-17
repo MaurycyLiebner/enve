@@ -21,13 +21,6 @@
 #include "boundingbox.h"
 
 namespace PathEffectsMenu {
-    template <typename T, typename U>
-    void addPathEffectActionToMenu(const QString& text,
-                                   PropertyMenu * const menu,
-                                   const U& adder);
-    template <typename U>
-    void addPathEffectsActionToMenu(PropertyMenu * const menu,
-                                    const U &adder);
     void addPathEffectsToActionMenu(PropertyMenu * const menu);
 }
 
