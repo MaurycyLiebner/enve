@@ -123,9 +123,7 @@ void Canvas::handleRightButtonMousePress(const MouseEvent& e) {
                     addPointToSelection(mPressedPoint);
                 }
                 for(const auto& pt : mSelectedPoints_d) {
-                    if(menu.hasActionsForType(pt)) continue;
                     pt->canvasContextMenu(&menu);
-                    menu.addedActionsForType(pt);
                 }
             } else {
                 mPressedPoint->canvasContextMenu(&menu);
@@ -140,9 +138,7 @@ void Canvas::handleRightButtonMousePress(const MouseEvent& e) {
             QMenu qMenu(e.fWidget);
             PropertyMenu menu(&qMenu, this, e.fWidget);
             for(const auto& box : mSelectedBoxes) {
-                if(menu.hasActionsForType(box)) continue;
                 box->setupCanvasMenu(&menu);
-                menu.addedActionsForType(box);
             }
             qMenu.exec(e.fGlobalPos);
         } else {

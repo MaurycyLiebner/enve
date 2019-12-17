@@ -110,6 +110,8 @@ void SmartNodePoint::remove() {
 }
 
 void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {
+    if(menu->hasActionsForType<SmartNodePoint>()) return;
+    menu->addedActionsForType<SmartNodePoint>();
     if(isNormal()) {
         if(!isEndPoint()) {
             PointTypeMenu::PlainSelectedOp<SmartNodePoint> op = [](SmartNodePoint * pt) {

@@ -506,6 +506,8 @@ void addRasterEffectActionToMenu(const QString& text,
 }
 
 void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<BoundingBox>()) return;
+    menu->addedActionsForType<BoundingBox>();
     Q_ASSERT(mParentScene);
     const auto parentScene = mParentScene;
 

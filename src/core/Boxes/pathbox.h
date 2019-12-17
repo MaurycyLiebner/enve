@@ -122,8 +122,6 @@ public:
 
     void resetStrokeGradientPointsPos();
     void resetFillGradientPointsPos();
-
-    void setupCanvasMenu(PropertyMenu * const menu);
 protected:
     bool mOutlineAffectedByScale = true;
     bool mCurrentPathsOutdated = true;

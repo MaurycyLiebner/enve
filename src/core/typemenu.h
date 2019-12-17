@@ -28,7 +28,6 @@ class BoundingBox;
 
 template <typename Type>
 class TypeMenu {
-    friend class Canvas;
     using TTypeMenu = TypeMenu<Type>;
 public:
     using PlainTriggeredOp = std::function<void()>;
@@ -123,13 +122,15 @@ public:
     bool hasSharedMenu(const QString& name) const {
         return mSharedMenus.contains(name);
     }
-protected:
-    void addedActionsForType(Type * const obj) {
-        mTypeIndex.append(std::type_index(typeid(*obj)));
+
+    template <typename T>
+    void addedActionsForType() {
+        mTypeIndex.append(std::type_index(typeid(T)));
     }
 
-    bool hasActionsForType(Type * const obj) const {
-        return mTypeIndex.contains(std::type_index(typeid(*obj)));
+    template <typename T>
+    bool hasActionsForType() const {
+        return mTypeIndex.contains(std::type_index(typeid(T)));
     }
 private:
     template <typename U>

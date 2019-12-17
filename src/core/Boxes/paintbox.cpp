@@ -45,6 +45,8 @@ stdsptr<BoxRenderData> PaintBox::createRenderData() {
 #include <QFileDialog>
 #include "typemenu.h"
 void PaintBox::setupCanvasMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<PaintBox>()) return;
+    menu->addedActionsForType<PaintBox>();
     const auto widget = menu->getParentWidget();
     PropertyMenu::PlainSelectedOp<PaintBox> op = [widget](PaintBox * box) {
         const QString importPath = QFileDialog::getOpenFileName(

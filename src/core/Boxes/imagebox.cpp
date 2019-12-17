@@ -65,6 +65,8 @@ void ImageBox::reload() {
 
 #include "typemenu.h"
 void ImageBox::setupCanvasMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<ImageBox>()) return;
+    menu->addedActionsForType<ImageBox>();
     const auto widget = menu->getParentWidget();
 
     const PropertyMenu::PlainSelectedOp<ImageBox> reloadOp =

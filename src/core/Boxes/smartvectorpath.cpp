@@ -55,6 +55,8 @@ SmartPathCollection *SmartVectorPath::getPathAnimator() {
 
 #include "typemenu.h"
 void SmartVectorPath::setupCanvasMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<SmartVectorPath>()) return;
+    menu->addedActionsForType<SmartVectorPath>();
     PathBox::setupCanvasMenu(menu);
     PropertyMenu::PlainSelectedOp<SmartVectorPath> op = [](SmartVectorPath * box) {
         box->applyCurrentTransformation();

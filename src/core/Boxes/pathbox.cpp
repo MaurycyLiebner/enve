@@ -486,9 +486,3 @@ FillSettingsAnimator *PathBox::getFillSettings() const {
 OutlineSettingsAnimator *PathBox::getStrokeSettings() const {
     return mStrokeSettings.data();
 }
-
-#include "patheffectsmenu.h"
-void PathBox::setupCanvasMenu(PropertyMenu * const menu) {
-    BoundingBox::setupCanvasMenu(menu);
-    PathEffectsMenu::addPathEffectsToActionMenu(menu);
-}

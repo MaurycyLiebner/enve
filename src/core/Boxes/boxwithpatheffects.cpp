@@ -38,6 +38,15 @@ BoxWithPathEffects::BoxWithPathEffects(const eBoxType type) :
     ca_addChild(mOutlinePathEffectsAnimators);
 }
 
+#include "patheffectsmenu.h"
+void BoxWithPathEffects::setupCanvasMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<BoxWithPathEffects>()) return;
+    menu->addedActionsForType<BoxWithPathEffects>();
+
+    BoundingBox::setupCanvasMenu(menu);
+    PathEffectsMenu::addPathEffectsToActionMenu(menu);
+}
+
 void BoxWithPathEffects::setupTreeViewMenu(PropertyMenu * const menu) {
     const PropertyMenu::CheckSelectedOp<BoxWithPathEffects> pathOp =
     [](BoxWithPathEffects* const box, const bool checked) {

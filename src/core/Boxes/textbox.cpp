@@ -108,6 +108,8 @@ qreal textLineX(const Qt::Alignment &alignment,
 }
 
 void TextBox::setupCanvasMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<TextBox>()) return;
+    menu->addedActionsForType<TextBox>();
     PathBox::setupCanvasMenu(menu);
     const auto widget = menu->getParentWidget();
     PropertyMenu::PlainSelectedOp<TextBox> op = [widget](TextBox * box) {

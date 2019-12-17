@@ -72,7 +72,7 @@ public:
     virtual bool isVisible(const CanvasMode mode) const;
 
     virtual void canvasContextMenu(PointTypeMenu * const menu) {
-        Q_UNUSED(menu);
+        Q_UNUSED(menu)
     }
 
     virtual MovablePoint * getPointAtAbsPos(const QPointF &absPos,

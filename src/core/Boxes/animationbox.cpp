@@ -177,6 +177,8 @@ FrameRange AnimationBox::prp_getIdenticalRelRange(const int relFrame) const {
 #include "typemenu.h"
 #include <QInputDialog>
 void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<AnimationBox>()) return;
+    menu->addedActionsForType<AnimationBox>();
     const auto widget = menu->getParentWidget();
 
     const PropertyMenu::PlainSelectedOp<AnimationBox> reloadOp =

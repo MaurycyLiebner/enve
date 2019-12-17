@@ -428,8 +428,10 @@ void ContainerBox::ungroup_k() {
     removeFromParent_k();
 }
 
-#include "patheffectsmenu.h"
 void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<ContainerBox>()) return;
+    menu->addedActionsForType<ContainerBox>();
+
     menu->addSection("Layer & Group");
 
     const auto ungroupAction = menu->addPlainAction<ContainerBox>(
@@ -450,8 +452,7 @@ void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
         box->demoteToGroup();
     })->setDisabled(SWT_isGroupBox());
 
-    BoundingBox::setupCanvasMenu(menu);
-    PathEffectsMenu::addPathEffectsToActionMenu(menu);
+    BoxWithPathEffects::setupCanvasMenu(menu);
 }
 
 void ContainerBox::drawContained(SkCanvas * const canvas,
