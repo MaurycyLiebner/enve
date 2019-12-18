@@ -42,8 +42,8 @@ private:
 
 void DuplicateEffectCaller::apply(SkPath &path) {
     const SkPath src = path;
-    for(int i = 0; i < mCount; i++)
-        path.addPath(src, mDX, mDY);
+    for(int i = 1; i <= mCount; i++)
+        path.addPath(src, i*mDX, i*mDY);
 }
 
 
