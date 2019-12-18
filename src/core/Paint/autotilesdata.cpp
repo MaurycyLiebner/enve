@@ -184,10 +184,15 @@ SkBitmap AutoTilesData::tileToBitmap(const int tx, const int ty) {
 }
 
 SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
-    const int lM = qMax(0, margin.left());
-    const int tM = qMax(0, margin.top());
-    const int rM = qMax(0, margin.right());
-    const int bM = qMax(0, margin.bottom());
+    const int lM = margin.left();
+    const int tM = margin.top();
+    const int rM = margin.right();
+    const int bM = margin.bottom();
+
+    const int lM0 = qMax(0, lM);
+    const int tM0 = qMax(0, tM);
+    const int rM0 = qMax(0, rM);
+    const int bM0 = qMax(0, bM);
 
     const auto info = SkiaHelpers::getPremulRGBAInfo(width() + lM + rM,
                                                      height() + tM + bM);
@@ -196,57 +201,63 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
 
     uint8_t * const dstP = static_cast<uint8_t*>(dst.getPixels());
 
-    if(lM != 0 || rM != 0) {
-        for(int y = 0; y < dst.height(); y++) {
-            auto lLine = dstP + y*dst.width()*4;
-            for(int x = 0; x < lM; x++) {
-                *lLine++ = 0;
-                *lLine++ = 0;
-                *lLine++ = 0;
-                *lLine++ = 0;
-            }
+//    if(tM0 > 0 || rM0 > 0) {
+//        for(int y = 0; y < dst.height(); y++) {
+//            auto lLine = dstP + y*dst.width()*4;
+//            for(int x = 0; x < tM0; x++) {
+//                *lLine++ = 0;
+//                *lLine++ = 0;
+//                *lLine++ = 0;
+//                *lLine++ = 0;
+//            }
 
-            auto rLine = dstP + ((y + 1)*dst.width() - rM)*4;
-            for(int x = 0; x < rM; x++) {
-                *rLine++ = 0;
-                *rLine++ = 0;
-                *rLine++ = 0;
-                *rLine++ = 0;
-            }
-        }
-    }
+//            auto rLine = dstP + ((y + 1)*dst.width() - rM0)*4;
+//            for(int x = 0; x < rM0; x++) {
+//                *rLine++ = 0;
+//                *rLine++ = 0;
+//                *rLine++ = 0;
+//                *rLine++ = 0;
+//            }
+//        }
+//    }
 
-    for(int y = 0; y < tM; y++) {
-        auto tLine = dstP + (y*dst.width() + lM)*4;
-        for(int x = lM; x < dst.width() - rM; x++) {
-            *tLine++ = 0;
-            *tLine++ = 0;
-            *tLine++ = 0;
-            *tLine++ = 0;
-        }
-    }
+//    for(int y = 0; y < tM0; y++) {
+//        auto tLine = dstP + (y*dst.width() + lM0)*4;
+//        for(int x = lM0; x < dst.width() - rM0; x++) {
+//            *tLine++ = 0;
+//            *tLine++ = 0;
+//            *tLine++ = 0;
+//            *tLine++ = 0;
+//        }
+//    }
 
-    for(int y = dst.height() - bM; y < dst.height(); y++) {
-        auto bLine = dstP + (y*dst.width() + lM)*4;
-        for(int x = lM; x < dst.width() - rM; x++) {
-            *bLine++ = 0;
-            *bLine++ = 0;
-            *bLine++ = 0;
-            *bLine++ = 0;
-        }
-    }
+//    for(int y = dst.height() - bM0; y < dst.height(); y++) {
+//        auto bLine = dstP + (y*dst.width() + lM0)*4;
+//        for(int x = lM0; x < dst.width() - rM0; x++) {
+//            *bLine++ = 0;
+//            *bLine++ = 0;
+//            *bLine++ = 0;
+//            *bLine++ = 0;
+//        }
+//    }
 
-    for(int col = 0; col < mColumnCount; col++) {
+    const int minY = -mZeroTileRow*TILE_SIZE + qMax(0, -tM);
+    const int minX = -mZeroTileCol*TILE_SIZE + qMax(0, -lM);
+    const int minCol = mZeroTileCol + minX/TILE_SIZE;
+    const int maxCol = mColumnCount - qMax(0, -rM/TILE_SIZE);
+    const int minRow = mZeroTileRow + minY/TILE_SIZE;
+    const int maxRow = mRowCount - qMax(0, -bM/TILE_SIZE);
+    for(int col = minCol; col < maxCol; col++) {
         const int x0 = col*TILE_SIZE + lM;
-        const int maxX = qMin(x0 + TILE_SIZE, dst.width() - rM);
-        for(int row = 0; row < mRowCount; row++) {
+        const int maxX = qMin(x0 + TILE_SIZE, dst.width() - rM0);
+        for(int row = minRow; row < maxRow; row++) {
             const uint16_t * const srcP = getTileByIndex(col, row);
             const int y0 = row*TILE_SIZE + tM;
-            const int maxY = qMin(y0 + TILE_SIZE, dst.height() - bM);
-            for(int y = y0; y < maxY; y++) {
-                uint8_t * dstLine = dstP + (y*dst.width() + x0)*4;
-                const uint16_t * srcLine = srcP + (y - y0)*TILE_SIZE*4;
-                for(int x = x0; x < maxX; x++) {
+            const int maxY = qMin(y0 + TILE_SIZE, dst.height() - bM0);
+            for(int y = qMax(minY, y0); y < maxY; y++) {
+                uint8_t * dstLine = dstP + (y*dst.width() + x0)*4 + minX - qMin(minX, x0);
+                const uint16_t * srcLine = srcP + (y - y0)*TILE_SIZE*4 + minX - qMin(minX, x0);
+                for(int x = qMax(minX, x0); x < maxX; x++) {
                     const uint32_t r = *srcLine++;
                     const uint32_t g = *srcLine++;
                     const uint32_t b = *srcLine++;
