@@ -17,13 +17,15 @@
 #version 330 core
 layout(location = 0) out vec4 fragColor;
 
+uniform float dotDistance;
+uniform float dotRadius;
+uniform float opacity;
+
 in vec2 texCoord;
 layout(pixel_center_integer) in vec4 gl_FragCoord;
 
 uniform sampler2D texture;
 uniform vec2 eGlobalPos;
-uniform float dotDistance;
-uniform float dotRadius;
 
 void main(void) {
     bool inDot;
@@ -43,15 +45,15 @@ void main(void) {
         distToEdge = abs(distToEdge);
         inDot = true;
         if(distToEdge < 1.f) {
-            mixAlpha = distToEdge;
+            mixAlpha = opacity + distToEdge*(1. - opacity);
         } else {
             mixAlpha = 1.f;
         }
     }
+    vec4 texCol = texture2D(texture, texCoord);
     if(inDot) {
-        vec4 texCol = texture2D(texture, texCoord);
         fragColor =  vec4(mixAlpha*texCol.rgb, mixAlpha*texCol.a);
     } else {
-        fragColor =  vec4(0.f, 0.f, 0.f, 0.f);
+        fragColor =  vec4(opacity*texCol.rgb, opacity*texCol.a);
     }
 }
