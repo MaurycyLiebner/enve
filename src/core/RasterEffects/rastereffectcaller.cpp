@@ -28,15 +28,15 @@ RasterEffectCaller::RasterEffectCaller(const HardwareSupport hwSupport) :
 void RasterEffectCaller::processGpu(QGL33 * const gl,
                                     GpuRenderTools &renderTools,
                                     GpuRenderData &data) {
-    Q_UNUSED(gl);
-    Q_UNUSED(renderTools);
-    Q_UNUSED(data);
+    Q_UNUSED(gl)
+    Q_UNUSED(renderTools)
+    Q_UNUSED(data)
 }
 
 void RasterEffectCaller::processCpu(CpuRenderTools &renderTools,
                                     const CpuRenderData &data) {
-    Q_UNUSED(renderTools);
-    Q_UNUSED(data);
+    Q_UNUSED(renderTools)
+    Q_UNUSED(data)
 }
 
 int RasterEffectCaller::cpuThreads(const int available,
@@ -51,10 +51,11 @@ void RasterEffectCaller::setSrcRect(const SkIRect &srcRect,
     const int sr = srcRect.right();
     const int sb = srcRect.bottom();
 
-    const int ml = fMargin.left();
-    const int mt = fMargin.top();
-    const int mr = fMargin.right();
-    const int mb = fMargin.bottom();
+    const auto margins = getMargin(srcRect);
+    const int ml = margins.left();
+    const int mt = margins.top();
+    const int mr = margins.right();
+    const int mb = margins.bottom();
 
     const int l = sl - ml;
     const int t = st - mt;

@@ -52,6 +52,11 @@ public:
 
     const SkIRect& getDstRect() const { return  fDstRect; }
 protected:
+    virtual QMargins getMargin(const SkIRect& srcRect) {
+        Q_UNUSED(srcRect)
+        return fMargin;
+    }
+
     const bool fForceMargin;
     const HardwareSupport fHwSupport;
     const QMargins fMargin;

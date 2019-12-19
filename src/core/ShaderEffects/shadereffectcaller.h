@@ -23,19 +23,25 @@
 class ShaderEffectCaller : public RasterEffectCaller {
     e_OBJECT
 public:
-    ShaderEffectCaller(const QMargins& margin,
-                       const ShaderEffectProgram& program,
-                       const UniformSpecifiers& uniformSpecifiers);
+    ShaderEffectCaller(const ShaderEffectProgram& program);
 
     void processGpu(QGL33 * const gl,
                     GpuRenderTools& renderTools,
                     GpuRenderData& data);
-private:
-    void setupProgram(QGL33 * const gl, QJSEngine& engine,
-                      const GLfloat gPosX, const GLfloat gPosY);
 
+    QJSEngine& getJSEngine()
+    { return mEngine; }
+
+    UniformSpecifiers mUniformSpecifiers;
+protected:
+    QMargins getMargin(const SkIRect &srcRect);
+private:
+    void setupProgram(QGL33 * const gl,
+                      QJSEngine& mEngine,
+                      const GpuRenderData &data);
+
+    QJSEngine mEngine;
     const ShaderEffectProgram mProgram;
-    const UniformSpecifiers mUniformSpecifiers;
 };
 
 

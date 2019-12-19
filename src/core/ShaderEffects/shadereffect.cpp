@@ -36,9 +36,10 @@ void ShaderEffect::writeIdentifier(eWriteStream& dst) const {
 
 stdsptr<RasterEffectCaller> ShaderEffect::getEffectCaller(
         const qreal relFrame, const qreal resolution) const {
-    QJSEngine engine;
+    const auto effect = enve::make_shared<ShaderEffectCaller>(*mProgram);
+    QJSEngine& engine = effect->getJSEngine();
 
-    UniformSpecifiers uniformSpecifiers;
+    UniformSpecifiers& uniformSpecifiers = effect->mUniformSpecifiers;
     const int argsCount = mProgram->fPropUniLocs.count();
     for(int i = 0; i < argsCount; i++) {
         const GLint loc = mProgram->fPropUniLocs.at(i);
@@ -54,12 +55,5 @@ stdsptr<RasterEffectCaller> ShaderEffect::getEffectCaller(
         value->evaluate(engine);
         uniformSpecifiers << value->create(loc);
     }
-    QMargins margin;
-    if(!mProgram->fMarginScript.isEmpty()) {
-        const auto jsVal = engine.evaluate(mProgram->fMarginScript);
-        if(!jsVal.isNumber()) RuntimeThrow("Invalid Margin script result type '" +
-                                           mProgram->fMarginScript + "'");
-        else margin += qCeil(jsVal.toNumber());
-    }
-    return enve::make_shared<ShaderEffectCaller>(margin, *mProgram, uniformSpecifiers);
+    return effect;
 }

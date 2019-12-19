@@ -16,11 +16,9 @@
 
 #include "shadereffectcaller.h"
 
-ShaderEffectCaller::ShaderEffectCaller(const QMargins &margin,
-                                       const ShaderEffectProgram &program,
-                                       const UniformSpecifiers &uniformSpecifiers) :
-    RasterEffectCaller(HardwareSupport::gpuOnly, false, margin),
-    mProgram(program), mUniformSpecifiers(uniformSpecifiers) {}
+ShaderEffectCaller::ShaderEffectCaller(const ShaderEffectProgram &program) :
+    RasterEffectCaller(HardwareSupport::gpuOnly, false, QMargins()),
+    mProgram(program) {}
 
 void ShaderEffectCaller::processGpu(QGL33 * const gl,
                                     GpuRenderTools &renderTools,
@@ -30,7 +28,7 @@ void ShaderEffectCaller::processGpu(QGL33 * const gl,
     renderTools.requestTargetFbo().bind(gl);
     gl->glClear(GL_COLOR_BUFFER_BIT);
 
-    setupProgram(gl, data.fJSEngine, data.fPosX, data.fPosY);
+    setupProgram(gl, data.fJSEngine, data);
 
     gl->glActiveTexture(GL_TEXTURE0);
     renderTools.getSrcTexture().bind(gl);
@@ -41,11 +39,42 @@ void ShaderEffectCaller::processGpu(QGL33 * const gl,
     renderTools.swapTextures();
 }
 
+QMargins ShaderEffectCaller::getMargin(const SkIRect &srcRect) {
+    mEngine.evaluate("eTexSize = [" + QString::number(srcRect.width()) + "," +
+                                      QString::number(srcRect.height()) + "]");
+    if(!mProgram.fMarginScript.isEmpty()) {
+        const auto jsVal = mEngine.evaluate(mProgram.fMarginScript);
+        if(jsVal.isNumber()) {
+            return QMargins() + qCeil(jsVal.toNumber());
+        } else if(jsVal.isArray()) {
+            const int len = jsVal.property("length").toInt();
+            if(len == 2) {
+                const int valX = qCeil(jsVal.property(0).toNumber());
+                const int valY = qCeil(jsVal.property(1).toNumber());
+
+                return QMargins(valX, valY, valX, valY);
+            } else if(len == 4) {
+                const int valLeft = qCeil(jsVal.property(0).toNumber());
+                const int valTop = qCeil(jsVal.property(1).toNumber());
+                const int valRight = qCeil(jsVal.property(2).toNumber());
+                const int valBottom = qCeil(jsVal.property(3).toNumber());
+
+                return QMargins(valLeft, valTop, valRight, valBottom);
+            } else {
+                RuntimeThrow("Invalid Margin script '" +
+                             mProgram.fMarginScript + "'");
+            }
+        } else RuntimeThrow("Invalid Margin script result type '" +
+                            mProgram.fMarginScript + "'");
+    }
+    return QMargins();
+}
+
 void ShaderEffectCaller::setupProgram(QGL33 * const gl, QJSEngine &engine,
-                                      const GLfloat gPosX, const GLfloat gPosY) {
+                                      const GpuRenderData &data) {
     gl->glUseProgram(mProgram.fId);
     for(const auto& uni : mUniformSpecifiers)
         uni(gl, engine);
     if(mProgram.fGPosLoc >= 0)
-        gl->glUniform2f(mProgram.fGPosLoc, gPosX, gPosY);
+        gl->glUniform2f(mProgram.fGPosLoc, data.fPosX, data.fPosY);
 }

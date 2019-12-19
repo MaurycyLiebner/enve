@@ -639,7 +639,7 @@ void BoundingBox::setupRenderData(const qreal relFrame,
 }
 
 void BoundingBox::setupRasterEffectsF(const qreal relFrame,
-                                   BoxRenderData * const data) {
+                                      BoxRenderData * const data) {
     mRasterEffectsAnimators->addEffects(relFrame, data);
 }
 
