@@ -60,7 +60,8 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mMainLayout->setSpacing(0);
     mMainLayout->setMargin(0);
 
-    mResolutionComboBox = new QComboBox(this);
+    mResolutionComboBox = new QComboBox(
+            gSingleLineTooltip("Preview resolution", ""), this);
     mResolutionComboBox->addItem("100 %");
     mResolutionComboBox->addItem("75 %");
     mResolutionComboBox->addItem("50 %");
