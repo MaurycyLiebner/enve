@@ -434,7 +434,7 @@ void MainWindow::setupMenuBar() {
         CanvasSettingsDialog::sNewCanvasDialog(mDocument, this);
     });
 
-    mSceneMenu->addAction("Add to Render Que", this, &MainWindow::addCanvasToRenderQue);
+    mSceneMenu->addAction("Add to Render Queue", this, &MainWindow::addCanvasToRenderQue);
 
     mViewMenu = mMenuBar->addMenu("View");
 

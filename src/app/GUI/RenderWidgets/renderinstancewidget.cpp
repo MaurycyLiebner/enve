@@ -236,9 +236,21 @@ void RenderInstanceWidget::openOutputSettingsDialog() {
     delete dialog;
 }
 
+#include "Private/document.h"
+
+QString renderOutputDir() {
+    const auto evFilePath = Document::sInstance->fEvFile;
+    if(evFilePath.isEmpty()) {
+        return QDir::homePath();
+    } else {
+        QFileInfo fileInfo(evFilePath);
+        return fileInfo.dir().path();
+    }
+}
+
 void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
     QString outputDst = mSettings->getOutputDestination();
-    if(outputDst.isEmpty()) outputDst = QDir::currentPath() + "/untitled";
+    if(outputDst.isEmpty()) outputDst = renderOutputDir() + "/untitled";
     const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
     const auto format = outputSettings.outputFormat;
     if(!format) return;
@@ -291,11 +303,10 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     }
     QString iniText = mSettings->getOutputDestination();
     if(iniText.isEmpty()) {
-        iniText = QDir::currentPath() + "/untitled" + selectedExt;
+        iniText = renderOutputDir() + "/untitled" + selectedExt;
     }
     QString saveAs = QFileDialog::getSaveFileName(this, "Output Destination",
-                               iniText,
-                               supportedExts);
+                                                  iniText, supportedExts);
     if(saveAs.isEmpty()) return;
     mSettings->setOutputDestination(saveAs);
     mOutputDestinationButton->setText(saveAs);
