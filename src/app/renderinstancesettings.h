@@ -50,18 +50,18 @@ class RenderInstanceSettings : public QObject {
     Q_OBJECT
 public:
     RenderInstanceSettings(Canvas* canvas);
-    virtual ~RenderInstanceSettings() {}
+    RenderInstanceSettings(const RenderInstanceSettings& src);
 
-    const QString &getName();
+    QString getName();
     void setOutputDestination(const QString &outputDestination);
     const QString &getOutputDestination() const;
     void setTargetCanvas(Canvas *canvas);
-    Canvas *getTargetCanvas();
+    Canvas *getTargetCanvas() const;
     void setCurrentRenderFrame(const int currentRenderFrame);
     int currentRenderFrame();
-    const OutputSettings &getOutputRenderSettings();
+    const OutputSettings &getOutputRenderSettings() const;
     void setOutputRenderSettings(const OutputSettings &settings);
-    const RenderSettings &getRenderSettings();
+    const RenderSettings &getRenderSettings() const;
     void setRenderSettings(const RenderSettings &settings);
     void renderingAboutToStart();
     void setCurrentState(const RenderState &state,

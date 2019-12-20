@@ -69,6 +69,7 @@ SOURCES += main.cpp\
     GUI/BoxesList/boxscroller.cpp \
     GUI/RenderWidgets/outputsettingsdialog.cpp \
     GUI/RenderWidgets/rendersettingsdialog.cpp \
+    GUI/RenderWidgets/rendersettingsdisplaywidget.cpp \
     GUI/Settings/performancesettingswidget.cpp \
     GUI/Settings/settingsdialog.cpp \
     GUI/Settings/settingswidget.cpp \
@@ -167,6 +168,7 @@ HEADERS  += \
     GUI/BoxesList/boxscroller.h \
     GUI/RenderWidgets/outputsettingsdialog.h \
     GUI/RenderWidgets/rendersettingsdialog.h \
+    GUI/RenderWidgets/rendersettingsdisplaywidget.h \
     GUI/Settings/performancesettingswidget.h \
     GUI/Settings/settingsdialog.h \
     GUI/Settings/settingswidget.h \

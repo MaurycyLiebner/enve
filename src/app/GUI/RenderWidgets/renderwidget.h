@@ -36,9 +36,13 @@ public:
     explicit RenderWidget(QWidget *parent = nullptr);
 
     void createNewRenderInstanceWidgetForCanvas(Canvas *canvas);
-    void removeRenderInstanceWidget(RenderInstanceWidget *wid);
     void setRenderedFrame(const int frame);
+
+    void clearRenderQueue();
 private:
+    void render(RenderInstanceSettings& settings);
+    void addRenderInstanceWidget(RenderInstanceWidget *wid);
+
     QVBoxLayout *mMainLayout;
     QProgressBar *mRenderProgressBar;
     QHBoxLayout *mButtonsLayout;
@@ -52,11 +56,7 @@ private:
     QList<RenderInstanceWidget*> mRenderInstanceWidgets;
     RenderInstanceSettings *mCurrentRenderedSettings = nullptr;
     QList<RenderInstanceWidget*> mAwaitingSettings;
-
-    void render(RenderInstanceSettings *settings);
-signals:
-    void renderFromSettings(RenderInstanceSettings *);
-public slots:
+public:
     void leaveOnlyInterruptionButtonsEnabled();
     void leaveOnlyStartRenderButtonEnabled();
     void disableButtons();

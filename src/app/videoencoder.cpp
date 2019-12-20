@@ -542,6 +542,8 @@ bool VideoEncoder::startEncoding(RenderInstanceSettings * const settings) {
 }
 
 void VideoEncoder::interrupEncoding() {
+    if(!mCurrentlyEncoding) return;
+    mRenderInstanceSettings->setCurrentState(RenderState::none, "Interrupted");
     finishEncodingNow();
     mEmitter.encodingInterrupted();
 }
@@ -726,7 +728,6 @@ void VideoEncoder::afterProcessing() {
     _mContainers.clear();
 
     if(mInterruptEncoding) {
-        mRenderInstanceSettings->setCurrentState(RenderState::none, "Interrupted");
         interrupEncoding();
         mInterruptEncoding = false;
     } else if(unhandledException()) {

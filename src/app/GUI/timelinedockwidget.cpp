@@ -214,11 +214,6 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
         mStopButton->setEnabled(scene);
     });
 
-    connect(mRenderWidget, &RenderWidget::renderFromSettings,
-            this, [](RenderInstanceSettings* const settings) {
-        RenderHandler::sInstance->renderFromSettings(settings);
-    });
-
     mMainLayout->addWidget(mTimelineLayout);
     mMainLayout->addWidget(mRenderWidget);
     mRenderWidget->hide();

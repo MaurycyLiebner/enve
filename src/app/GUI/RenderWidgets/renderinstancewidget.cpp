@@ -21,10 +21,28 @@
 #include "outputsettingsdialog.h"
 #include "outputsettingsprofilesdialog.h"
 #include "outputsettingsdisplaywidget.h"
+#include "rendersettingsdisplaywidget.h"
 #include "Private/esettings.h"
 
-RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
-    ClosableContainer(parent) {
+RenderInstanceWidget::RenderInstanceWidget(
+        Canvas *canvas, QWidget *parent) :
+    ClosableContainer(parent), mSettings(canvas) {
+    iniGUI();
+    connect(&mSettings, &RenderInstanceSettings::stateChanged,
+            this, &RenderInstanceWidget::updateFromSettings);
+    updateFromSettings();
+}
+
+RenderInstanceWidget::RenderInstanceWidget(const RenderInstanceSettings& sett,
+                                           QWidget *parent) :
+    ClosableContainer(parent), mSettings(sett) {
+    iniGUI();
+    connect(&mSettings, &RenderInstanceSettings::stateChanged,
+            this, &RenderInstanceWidget::updateFromSettings);
+    updateFromSettings();
+}
+
+void RenderInstanceWidget::iniGUI() {
     if(!OutputSettingsProfilesDialog::sOutputProfilesLoaded) {
         OutputSettingsProfilesDialog::sOutputProfilesLoaded = true;
         QDir(eSettings::sSettingsDir()).mkdir("OutputProfiles");
@@ -62,6 +80,8 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     addContentWidget(contWid);
 
     const auto renderSettings = new ClosableContainer();
+    mRenderSettingsDisplayWidget = new RenderSettingsDisplayWidget(this);
+    renderSettings->addContentWidget(mRenderSettingsDisplayWidget);
 
     QWidget *renderSettingsLabelWidget = new QWidget();
     renderSettingsLabelWidget->setObjectName("darkWidget");
@@ -153,29 +173,16 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     mContentLayout->setSpacing(0);
 }
 
-RenderInstanceWidget::RenderInstanceWidget(RenderInstanceSettings *settings,
-                                           QWidget *parent) :
-    RenderInstanceWidget(parent) {
-    mSettings = settings;
-    connect(mSettings, &RenderInstanceSettings::stateChanged,
-            this, &RenderInstanceWidget::updateFromSettings);
-    updateFromSettings();
-}
-
-RenderInstanceWidget::~RenderInstanceWidget() {
-    delete mSettings;
-}
-
 void RenderInstanceWidget::updateFromSettings() {
-    const auto renderState = mSettings->getCurrentState();
+    const auto renderState = mSettings.getCurrentState();
     bool enabled = renderState != RenderState::paused &&
        renderState != RenderState::rendering;
     setEnabled(enabled);
-    QString nameLabelTxt = "&nbsp;&nbsp;" + mSettings->getName() +
+    QString nameLabelTxt = "&nbsp;&nbsp;" + mSettings.getName() +
             "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
     if(renderState == RenderState::error) {
         nameLabelTxt += "<font color='red'>" +
-                        mSettings->getRenderError() +
+                        mSettings.getRenderError() +
                         "</font>";
     } else if(renderState == RenderState::finished) {
         nameLabelTxt += "<font color='green'>finished</font>";
@@ -189,13 +196,13 @@ void RenderInstanceWidget::updateFromSettings() {
     }
     mNameLabel->setText(nameLabelTxt);
 
-    QString destinationTxt = mSettings->getOutputDestination();
+    QString destinationTxt = mSettings.getOutputDestination();
     if(destinationTxt.isEmpty()) {
         destinationTxt = "Destination";
     }
     mOutputDestinationButton->setText(destinationTxt);
-    const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
-    OutputSettingsProfile *outputProfile = mSettings->getOutputSettingsProfile();
+    const OutputSettings &outputSettings = mSettings.getOutputRenderSettings();
+    OutputSettingsProfile *outputProfile = mSettings.getOutputSettingsProfile();
     QString outputTxt;
     if(!outputProfile) {
         const auto formatT = outputSettings.outputFormat;
@@ -209,20 +216,51 @@ void RenderInstanceWidget::updateFromSettings() {
     }
     mOutputSettingsButton->setText(outputTxt);
     mOutputSettingsDisplayWidget->setOutputSettings(outputSettings);
+
+    const RenderSettings &renderSettings = mSettings.getRenderSettings();
+    mRenderSettingsDisplayWidget->setRenderSettings(mSettings.getTargetCanvas(),
+                                                    renderSettings);
+    const QString str = QString("%1 - %2,  %3%,  %4 x %5,  %6fps").
+                            arg(renderSettings.fMinFrame).
+                            arg(renderSettings.fMaxFrame).
+                            arg(renderSettings.fResolution*100).
+                            arg(renderSettings.fVideoWidth).
+                            arg(renderSettings.fVideoHeight).
+                            arg(renderSettings.fFps);
+    mRenderSettingsButton->setText(str);
 }
 
-RenderInstanceSettings *RenderInstanceWidget::getSettings() {
+RenderInstanceSettings &RenderInstanceWidget::getSettings() {
     return mSettings;
 }
 
+void RenderInstanceWidget::mousePressEvent(QMouseEvent *e) {
+    if(e->button() == Qt::RightButton) {
+        QMenu menu(this);
+        menu.addAction("Duplicate");
+        const auto state = mSettings.getCurrentState();
+        const bool deletable = state != RenderState::rendering &&
+                               state != RenderState::paused;
+        menu.addAction("Delete")->setEnabled(deletable);
+        const auto act = menu.exec(e->globalPos());
+        if(act) {
+            if(act->text() == "Duplicate") {
+                emit duplicate(mSettings);
+            } else if(act->text() == "Delete") {
+                deleteLater();
+            }
+        }
+    } else return ClosableContainer::mousePressEvent(e);
+}
+
 void RenderInstanceWidget::openOutputSettingsDialog() {
-    mSettings->copySettingsFromOutputSettingsProfile();
-    const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
+    mSettings.copySettingsFromOutputSettingsProfile();
+    const OutputSettings &outputSettings = mSettings.getOutputRenderSettings();
     const auto dialog = new OutputSettingsDialog(outputSettings, this);
     if(dialog->exec()) {
-        mSettings->setOutputSettingsProfile(nullptr);
+        mSettings.setOutputSettingsProfile(nullptr);
         OutputSettings outputSettings = dialog->getSettings();
-        mSettings->setOutputRenderSettings(outputSettings);
+        mSettings.setOutputRenderSettings(outputSettings);
         const auto outputFormat = outputSettings.outputFormat;
         if(!outputFormat) {
             mOutputSettingsButton->setText("Settings");
@@ -249,9 +287,9 @@ QString renderOutputDir() {
 }
 
 void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
-    QString outputDst = mSettings->getOutputDestination();
+    QString outputDst = mSettings.getOutputDestination();
     if(outputDst.isEmpty()) outputDst = renderOutputDir() + "/untitled";
-    const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
+    const OutputSettings &outputSettings = mSettings.getOutputRenderSettings();
     const auto format = outputSettings.outputFormat;
     if(!format) return;
     QString tmpStr = QString(format->extensions);
@@ -278,14 +316,14 @@ void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
                 outputDst.remove(extId, 1 + currExt.count());
             }
             outputDst += "." + firstSupported;
-            mSettings->setOutputDestination(outputDst);
+            mSettings.setOutputDestination(outputDst);
         }
     }
     mOutputDestinationButton->setText(outputDst);
 }
 
 void RenderInstanceWidget::outputSettingsProfileSelected(OutputSettingsProfile *profile) {
-    mSettings->setOutputSettingsProfile(profile);
+    mSettings.setOutputSettingsProfile(profile);
     updateOutputDestinationFromCurrentFormat();
     updateFromSettings();
 }
@@ -293,7 +331,7 @@ void RenderInstanceWidget::outputSettingsProfileSelected(OutputSettingsProfile *
 void RenderInstanceWidget::openOutputDestinationDialog() {
     QString supportedExts;
     QString selectedExt;
-    const OutputSettings &outputSettings = mSettings->getOutputRenderSettings();
+    const OutputSettings &outputSettings = mSettings.getOutputRenderSettings();
     const auto format = outputSettings.outputFormat;
     if(format) {
         QString tmpStr(format->extensions);
@@ -301,32 +339,25 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
         tmpStr.replace(",", " *.");
         supportedExts = "Output File (*." + tmpStr + ")";
     }
-    QString iniText = mSettings->getOutputDestination();
+    QString iniText = mSettings.getOutputDestination();
     if(iniText.isEmpty()) {
         iniText = renderOutputDir() + "/untitled" + selectedExt;
     }
     QString saveAs = QFileDialog::getSaveFileName(this, "Output Destination",
                                                   iniText, supportedExts);
     if(saveAs.isEmpty()) return;
-    mSettings->setOutputDestination(saveAs);
+    mSettings.setOutputDestination(saveAs);
     mOutputDestinationButton->setText(saveAs);
 }
 
 #include "rendersettingsdialog.h"
 void RenderInstanceWidget::openRenderSettingsDialog() {
-    const RenderSettings& iniRenderSettings = mSettings->getRenderSettings();
-    const auto dialog = new RenderSettingsDialog(iniRenderSettings, this);
+    const auto dialog = new RenderSettingsDialog(mSettings, this);
     if(dialog->exec()) {
         const RenderSettings sett = dialog->getSettings();
-        mSettings->setRenderSettings(sett);
-        const QString str = QString("%1 - %2,  %3%,  %4 x %5,  %6fps").
-                                arg(sett.fMinFrame).
-                                arg(sett.fMaxFrame).
-                                arg(sett.fResolution*100).
-                                arg(sett.fVideoWidth).
-                                arg(sett.fVideoHeight).
-                                arg(sett.fFps);
-        mRenderSettingsButton->setText(str);
+        mSettings.setRenderSettings(sett);
+        mSettings.setTargetCanvas(dialog->getCurrentScene());
+        updateFromSettings();
     }
     delete dialog;
 }
@@ -362,7 +393,7 @@ void OutputProfilesListButton::mousePressEvent(QMouseEvent *e) {
             int profileId = selectedAction->data().toInt();
             if(profileId == -1) {
                 const OutputSettings &outputSettings =
-                        mParentWidget->getSettings()->getOutputRenderSettings();
+                        mParentWidget->getSettings().getOutputRenderSettings();
                 OutputSettingsProfilesDialog *profilesDialog =
                         new OutputSettingsProfilesDialog(outputSettings, this);
                 if(profilesDialog->exec()) {

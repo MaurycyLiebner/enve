@@ -25,6 +25,8 @@
 #include <QAction>
 #include <QMenu>
 class OutputSettingsDisplayWidget;
+class RenderSettingsDisplayWidget;
+
 class RenderInstanceWidget;
 class OutputProfilesListButton : public QPushButton {
     Q_OBJECT
@@ -40,14 +42,17 @@ protected:
 class RenderInstanceWidget : public ClosableContainer {
     Q_OBJECT
 public:
-    RenderInstanceWidget(QWidget *parent = nullptr);
-    RenderInstanceWidget(RenderInstanceSettings *settings,
-                         QWidget *parent = nullptr);
-    ~RenderInstanceWidget();
-
-    RenderInstanceSettings *getSettings();
+    RenderInstanceWidget(Canvas *canvas, QWidget *parent = nullptr);
+    RenderInstanceWidget(const RenderInstanceSettings& canvas,
+                         QWidget *parent);
+    RenderInstanceSettings &getSettings();
+protected:
+    void mousePressEvent(QMouseEvent* e);
 private:
+    void iniGUI();
+
     ClosableContainer *mOutputSettings;
+    RenderSettingsDisplayWidget *mRenderSettingsDisplayWidget;
     OutputSettingsDisplayWidget *mOutputSettingsDisplayWidget;
 
     QPushButton *mOutputDestinationButton;
@@ -58,12 +63,12 @@ private:
     QPushButton *mOutputSettingsButton;
     QLabel *mNameLabel;
     QVBoxLayout *mContentLayout = new QVBoxLayout();
-    RenderInstanceSettings *mSettings;
+    RenderInstanceSettings mSettings;
 signals:
-
+    void duplicate(RenderInstanceSettings&);
 protected:
     void updateOutputDestinationFromCurrentFormat();
-private slots:
+private:
     void updateFromSettings();
 
     void outputSettingsProfileSelected(OutputSettingsProfile *profile);

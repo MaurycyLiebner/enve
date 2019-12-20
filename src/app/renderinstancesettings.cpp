@@ -19,17 +19,19 @@
 
 RenderInstanceSettings::RenderInstanceSettings(Canvas* canvas) {
     setTargetCanvas(canvas);
-    mRenderSettings.fMaxFrame = canvas->getMaxFrame();
-    mRenderSettings.fBaseWidth = mTargetCanvas->getCanvasWidth();
-    mRenderSettings.fBaseHeight = mTargetCanvas->getCanvasHeight();
-    mRenderSettings.fVideoWidth = mRenderSettings.fBaseWidth;
-    mRenderSettings.fVideoHeight = mRenderSettings.fBaseHeight;
-    mRenderSettings.fBaseFps = mTargetCanvas->getFps();
-    mRenderSettings.fFps = mRenderSettings.fBaseFps;
 }
 
-const QString &RenderInstanceSettings::getName() {
-    return mTargetCanvas->prp_getName();
+RenderInstanceSettings::RenderInstanceSettings(const RenderInstanceSettings &src) :
+    QObject() {
+    setTargetCanvas(src.getTargetCanvas());
+    mOutputDestination = src.mOutputDestination;
+    mOutputSettingsProfile = src.mOutputSettingsProfile;
+    mRenderSettings = src.mRenderSettings;
+    mOutputSettings = src.mOutputSettings;
+}
+
+QString RenderInstanceSettings::getName() {
+    return mTargetCanvas ? mTargetCanvas->prp_getName() : "-none-";
 }
 
 void RenderInstanceSettings::setOutputDestination(
@@ -42,10 +44,38 @@ const QString &RenderInstanceSettings::getOutputDestination() const {
 }
 
 void RenderInstanceSettings::setTargetCanvas(Canvas *canvas) {
+    if(mTargetCanvas) disconnect(mTargetCanvas, nullptr, this, nullptr);
+    if(canvas) {
+        if(!mTargetCanvas) {
+            mRenderSettings.fMaxFrame = canvas->getMaxFrame();
+            mRenderSettings.fBaseWidth = canvas->getCanvasWidth();
+            mRenderSettings.fBaseHeight = canvas->getCanvasHeight();
+            mRenderSettings.fVideoWidth = qRound(mRenderSettings.fBaseWidth*
+                                                 mRenderSettings.fResolution);
+            mRenderSettings.fVideoHeight = qRound(mRenderSettings.fBaseHeight*
+                                                  mRenderSettings.fResolution);
+            mRenderSettings.fBaseFps = canvas->getFps();
+            mRenderSettings.fFps = mRenderSettings.fBaseFps;
+        }
+        connect(canvas, &Canvas::dimensionsChanged,
+                this, [this](const int width, const int height) {
+            mRenderSettings.fBaseWidth = width;
+            mRenderSettings.fBaseHeight = height;
+            mRenderSettings.fVideoWidth = qRound(mRenderSettings.fBaseWidth*
+                                                 mRenderSettings.fResolution);
+            mRenderSettings.fVideoHeight = qRound(mRenderSettings.fBaseHeight*
+                                                  mRenderSettings.fResolution);
+        });
+        connect(canvas, &Canvas::fpsChanged,
+                this, [this](const qreal fps) {
+            mRenderSettings.fBaseFps = fps;
+            mRenderSettings.fFps = mRenderSettings.fBaseFps;
+        });
+    }
     mTargetCanvas = canvas;
 }
 
-Canvas *RenderInstanceSettings::getTargetCanvas() {
+Canvas *RenderInstanceSettings::getTargetCanvas() const {
     return mTargetCanvas;
 }
 
@@ -59,7 +89,7 @@ int RenderInstanceSettings::currentRenderFrame() {
     return mCurrentRenderFrame;
 }
 
-const OutputSettings &RenderInstanceSettings::getOutputRenderSettings() {
+const OutputSettings &RenderInstanceSettings::getOutputRenderSettings() const {
     return mOutputSettings;
 }
 
@@ -68,7 +98,7 @@ void RenderInstanceSettings::setOutputRenderSettings(
     mOutputSettings = settings;
 }
 
-const RenderSettings &RenderInstanceSettings::getRenderSettings() {
+const RenderSettings &RenderInstanceSettings::getRenderSettings() const {
     return mRenderSettings;
 }
 

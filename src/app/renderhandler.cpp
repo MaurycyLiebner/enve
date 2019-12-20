@@ -59,8 +59,8 @@ RenderHandler::RenderHandler(Document &document,
 }
 
 void RenderHandler::renderFromSettings(RenderInstanceSettings * const settings) {
+    setCurrentScene(settings->getTargetCanvas());
     if(VideoEncoder::sStartEncoding(settings)) {
-        setCurrentScene(settings->getTargetCanvas());
         mSavedCurrentFrame = mCurrentScene->getCurrentFrame();
         mSavedResolutionFraction = mCurrentScene->getResolutionFraction();
 
@@ -173,13 +173,13 @@ void RenderHandler::outOfMemory() {
 
 void RenderHandler::setRenderingPreview(const bool bT) {
     mRenderingPreview = bT;
-    mCurrentScene->setRenderingPreview(bT);
+    if(mCurrentScene) mCurrentScene->setRenderingPreview(bT);
     TaskScheduler::sInstance->setAlwaysQue(bT);
 }
 
 void RenderHandler::setPreviewing(const bool bT) {
     mPreviewing = bT;
-    mCurrentScene->setPreviewing(bT);
+    if(mCurrentScene) mCurrentScene->setPreviewing(bT);
     TaskScheduler::sInstance->setAlwaysQue(bT);
 }
 
@@ -198,12 +198,15 @@ void RenderHandler::interruptOutputRendering() {
 
 void RenderHandler::stopPreview() {
     setPreviewing(false);
-    mCurrentScene->clearUseRange();
-    setFrameAction(mSavedCurrentFrame);
-    mCurrentScene->setSceneFrame(mSavedCurrentFrame);
+    if(mCurrentScene) {
+        mCurrentScene->clearUseRange();
+        setFrameAction(mSavedCurrentFrame);
+        mCurrentScene->setSceneFrame(mSavedCurrentFrame);
+        emit mCurrentScene->requestUpdate();
+    }
+
     mPreviewFPSTimer->stop();
     stopAudio();
-    emit mCurrentScene->requestUpdate();
     emit previewFinished();
 }
 
@@ -354,15 +357,16 @@ void RenderHandler::nextSaveOutputFrame() {
 
 void RenderHandler::startAudio() {
     mAudioHandler.startAudio();
-    mCurrentSoundComposition->start(mCurrentPreviewFrame);
+    if(mCurrentSoundComposition) mCurrentSoundComposition->start(mCurrentPreviewFrame);
 }
 
 void RenderHandler::stopAudio() {
     mAudioHandler.stopAudio();
-    mCurrentSoundComposition->stop();
+    if(mCurrentSoundComposition) mCurrentSoundComposition->stop();
 }
 
 void RenderHandler::audioPushTimerExpired() {
+    if(!mCurrentSoundComposition) return;
     while(auto request = mAudioHandler.dataRequest()) {
         const qint64 len = mCurrentSoundComposition->read(
                     request.fData, request.fSize);

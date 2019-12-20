@@ -27,59 +27,14 @@ class OutputSettingsDisplayWidget : public QWidget {
     Q_OBJECT
 public:
     explicit OutputSettingsDisplayWidget(QWidget *parent = nullptr);
-    void setOutputSettings(const OutputSettings &settings) {
-        if(!settings.outputFormat) {
-            setOutputFormatText("-");
-        } else {
-            setOutputFormatText(QString(settings.outputFormat->long_name));
-        }
-        if(!mAlwaysShowAll) {
-            setVideoLabelsVisible(settings.videoEnabled);
-        }
-        if(!settings.videoCodec) {
-            setVideoCodecText("-");
-        } else {
-            setVideoCodecText(QString(settings.videoCodec->long_name));
-        }
-        const char *pixelFormat = av_get_pix_fmt_name(settings.videoPixelFormat);
-        if(!pixelFormat) {
-            setPixelFormatText("-");
-        } else {
-            setPixelFormatText(QString(pixelFormat));
-        }
-        setVideoBitrateText(QString::number(settings.videoBitrate/1000000) + " Mbps");
-        if(!mAlwaysShowAll) {
-            setAudioLabelsVisible(settings.audioEnabled);
-        }
-        if(!settings.audioCodec) {
-            setAudioCodecText("-");
-        } else {
-            setAudioCodecText(QString(settings.audioCodec->long_name));
-        }
-        setAudioSampleRateText(QString::number(settings.audioSampleRate) + " Hz");
-        int formatId = settings.audioSampleFormat;
-        if(OutputSettings::SAMPLE_FORMATS_NAMES.find(formatId) ==
-           OutputSettings::SAMPLE_FORMATS_NAMES.end()) {
-            setAudioSampleFormatText("-");
-        } else {
-            setAudioSampleFormatText(OutputSettings::SAMPLE_FORMATS_NAMES.at(formatId));
-        }
-        setAudioBitrateText(QString::number(settings.audioBitrate/1000) + " kbps");
-
-        const auto channLay = OutputSettings::sGetChannelsLayoutName(
-                    settings.audioChannelsLayout);
-        setAudioChannelLayoutText(channLay);
-    }
+    void setOutputSettings(const OutputSettings &settings);
 
     void setAlwaysShowAll(const bool bT) {
         mAlwaysShowAll = bT;
         setVideoLabelsVisible(true);
         setAudioLabelsVisible(true);
     }
-signals:
-
-public slots:
-protected:
+private:
     void setVideoLabelsVisible(const bool bT) {
         mVideoCodecLabel->setVisible(bT);
         mVideoPixelFormatLabel->setVisible(bT);

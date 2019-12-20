@@ -365,8 +365,11 @@ public:
                   const bool mouseGrabbing);
 
     void setCanvasSize(const int width, const int height) {
+        if(width == mWidth && height == mHeight) return;
         mWidth = width;
         mHeight = height;
+        prp_afterWholeInfluenceRangeChanged();
+        emit dimensionsChanged(width, height);
     }
 
     int getCanvasWidth() const {
@@ -429,6 +432,8 @@ signals:
     void selectedPaintSettingsChanged();
     void currentFrameChanged(int);
     void currentContainerSet(ContainerBox*);
+    void dimensionsChanged(int, int);
+    void fpsChanged(qreal);
 public:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
@@ -479,7 +484,10 @@ public:
     }
 
     qreal getFps() const { return mFps; }
-    void setFps(const qreal fps) { mFps = fps; }
+    void setFps(const qreal fps) {
+        mFps = fps;
+        emit fpsChanged(fps);
+    }
 
     BoundingBox *getBoxAt(const QPointF &absPos) {
         if(mClipToCanvasSize) {

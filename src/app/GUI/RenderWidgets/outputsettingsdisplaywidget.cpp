@@ -23,15 +23,15 @@ OutputSettingsDisplayWidget::OutputSettingsDisplayWidget(QWidget *parent) :
     mMainLayout = new QVBoxLayout(this);
     setLayout(mMainLayout);
     mAudioVideoLayout = new QHBoxLayout();
-    mOutputFormatLabel = new QLabel("Format:", this);
-    mVideoCodecLabel = new QLabel("Video codec:", this);
-    mVideoPixelFormatLabel = new QLabel("Pixel format:", this);
-    mVideoBitrateLabel = new QLabel("Video bitrate:", this);
-    mAudioCodecLabel = new QLabel("Audio codec:", this);
-    mAudioSampleRateLabel = new QLabel("Audio sample rate:", this);
-    mAudioSampleFormatLabel = new QLabel("Audio sample format:", this);
-    mAudioBitrateLabel = new QLabel("Audio bitrate:", this);
-    mAudioChannelLayoutLabel = new QLabel("Audio channel layout:", this);
+    mOutputFormatLabel = new QLabel("<b>Format:</b>", this);
+    mVideoCodecLabel = new QLabel("<b>Video codec:</b>", this);
+    mVideoPixelFormatLabel = new QLabel("<b>Pixel format:</b>", this);
+    mVideoBitrateLabel = new QLabel("<b>Video bitrate:</b>", this);
+    mAudioCodecLabel = new QLabel("<b>Audio codec:</b>", this);
+    mAudioSampleRateLabel = new QLabel("<b>Audio sample rate:</b>", this);
+    mAudioSampleFormatLabel = new QLabel("<b>Audio sample format:</b>", this);
+    mAudioBitrateLabel = new QLabel("<b>Audio bitrate:</b>", this);
+    mAudioChannelLayoutLabel = new QLabel("<b>Audio channel layout:</b>", this);
 
     mOutputFormatLabel->setFixedHeight(MIN_WIDGET_DIM);
     mVideoCodecLabel->setFixedHeight(MIN_WIDGET_DIM);
@@ -67,4 +67,48 @@ OutputSettingsDisplayWidget::OutputSettingsDisplayWidget(QWidget *parent) :
 
     mMainLayout->addWidget(mOutputFormatLabel);
     mMainLayout->addLayout(mAudioVideoLayout);
+}
+
+void OutputSettingsDisplayWidget::setOutputSettings(const OutputSettings &settings) {
+    if(!settings.outputFormat) {
+        setOutputFormatText("-");
+    } else {
+        setOutputFormatText(QString(settings.outputFormat->long_name));
+    }
+    if(!mAlwaysShowAll) {
+        setVideoLabelsVisible(settings.videoEnabled);
+    }
+    if(!settings.videoCodec) {
+        setVideoCodecText("-");
+    } else {
+        setVideoCodecText(QString(settings.videoCodec->long_name));
+    }
+    const char *pixelFormat = av_get_pix_fmt_name(settings.videoPixelFormat);
+    if(!pixelFormat) {
+        setPixelFormatText("-");
+    } else {
+        setPixelFormatText(QString(pixelFormat));
+    }
+    setVideoBitrateText(QString::number(settings.videoBitrate/1000000) + " Mbps");
+    if(!mAlwaysShowAll) {
+        setAudioLabelsVisible(settings.audioEnabled);
+    }
+    if(!settings.audioCodec) {
+        setAudioCodecText("-");
+    } else {
+        setAudioCodecText(QString(settings.audioCodec->long_name));
+    }
+    setAudioSampleRateText(QString::number(settings.audioSampleRate) + " Hz");
+    int formatId = settings.audioSampleFormat;
+    if(OutputSettings::SAMPLE_FORMATS_NAMES.find(formatId) ==
+            OutputSettings::SAMPLE_FORMATS_NAMES.end()) {
+        setAudioSampleFormatText("-");
+    } else {
+        setAudioSampleFormatText(OutputSettings::SAMPLE_FORMATS_NAMES.at(formatId));
+    }
+    setAudioBitrateText(QString::number(settings.audioBitrate/1000) + " kbps");
+
+    const auto channLay = OutputSettings::sGetChannelsLayoutName(
+                settings.audioChannelsLayout);
+    setAudioChannelLayoutText(channLay);
 }

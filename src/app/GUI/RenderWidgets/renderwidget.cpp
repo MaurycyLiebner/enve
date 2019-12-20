@@ -101,15 +101,22 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
 }
 
 void RenderWidget::createNewRenderInstanceWidgetForCanvas(Canvas *canvas) {
-    RenderInstanceSettings *settings = new RenderInstanceSettings(canvas);
-    RenderInstanceWidget *wid = new RenderInstanceWidget(settings, this);
-    mContLayout->addWidget(wid);
-    mRenderInstanceWidgets << wid;
+    const auto wid = new RenderInstanceWidget(canvas, this);
+    addRenderInstanceWidget(wid);
 }
 
-void RenderWidget::removeRenderInstanceWidget(RenderInstanceWidget *wid) {
-    mRenderInstanceWidgets.removeOne(wid);
-    delete wid;
+void RenderWidget::addRenderInstanceWidget(RenderInstanceWidget *wid) {
+    mContLayout->addWidget(wid);
+    connect(wid, &RenderInstanceWidget::destroyed,
+            this, [this, wid]() {
+        mRenderInstanceWidgets.removeOne(wid);
+        mAwaitingSettings.removeOne(wid);
+    });
+    connect(wid, &RenderInstanceWidget::duplicate,
+            this, [this](RenderInstanceSettings& sett) {
+        addRenderInstanceWidget(new RenderInstanceWidget(sett, this));
+    });
+    mRenderInstanceWidgets << wid;
 }
 
 void RenderWidget::setRenderedFrame(const int frame) {
@@ -117,16 +124,23 @@ void RenderWidget::setRenderedFrame(const int frame) {
     mRenderProgressBar->setValue(frame);
 }
 
-void RenderWidget::render(RenderInstanceSettings *settings) {
-    const RenderSettings &renderSettings = settings->getRenderSettings();
+void RenderWidget::clearRenderQueue() {
+    if(mStopRenderButton->isEnabled()) stopRendering();
+    for(int i = mRenderInstanceWidgets.count() - 1; i >= 0; i--) {
+        delete mRenderInstanceWidgets.at(i);
+    }
+}
+#include "renderhandler.h"
+void RenderWidget::render(RenderInstanceSettings &settings) {
+    const RenderSettings &renderSettings = settings.getRenderSettings();
     mRenderProgressBar->setRange(renderSettings.fMinFrame,
                                  renderSettings.fMaxFrame);
     mRenderProgressBar->setValue(renderSettings.fMinFrame);
-    mCurrentRenderedSettings = settings;
-    emit renderFromSettings(settings);
-    connect(settings, &RenderInstanceSettings::renderFrameChanged,
+    mCurrentRenderedSettings = &settings;
+    RenderHandler::sInstance->renderFromSettings(&settings);
+    connect(&settings, &RenderInstanceSettings::renderFrameChanged,
             this, &RenderWidget::setRenderedFrame);
-    connect(settings, &RenderInstanceSettings::stateChanged,
+    connect(&settings, &RenderInstanceSettings::stateChanged,
             this, [this](const RenderState state) {
         if(state == RenderState::finished) {
             mRenderProgressBar->setValue(mRenderProgressBar->maximum());
@@ -159,22 +173,14 @@ void RenderWidget::enableButtons() {
 }
 
 void RenderWidget::render() {
-    RenderInstanceWidget *firstWid = nullptr;
     for(RenderInstanceWidget *wid : mRenderInstanceWidgets) {
         if(!wid->isChecked()) continue;
-        if(!firstWid) {
-            firstWid = wid;
-        } else {
-            mAwaitingSettings << wid;
-            wid->getSettings()->setCurrentState(RenderState::waiting);
-        }
+        mAwaitingSettings << wid;
+        wid->getSettings().setCurrentState(RenderState::waiting);
     }
-    if(firstWid) {
-        disableButtons();
-        firstWid->setDisabled(true);
-        render(firstWid->getSettings());
-    }
+    sendNextForRender();
 }
+
 #include "videoencoder.h"
 void RenderWidget::stopRendering() {
     disableButtons();
@@ -188,7 +194,7 @@ void RenderWidget::stopRendering() {
 
 void RenderWidget::clearAwaitingRender() {
     for(RenderInstanceWidget *wid : mAwaitingSettings) {
-        wid->getSettings()->setCurrentState(RenderState::none);
+        wid->getSettings().setCurrentState(RenderState::none);
     }
     mAwaitingSettings.clear();
 }
@@ -196,7 +202,8 @@ void RenderWidget::clearAwaitingRender() {
 void RenderWidget::sendNextForRender() {
     if(mAwaitingSettings.isEmpty()) return;
     const auto wid = mAwaitingSettings.takeFirst();
-    if(wid->isChecked()) {
+    if(wid->isChecked() && wid->getSettings().getTargetCanvas()) {
+        disableButtons();
         wid->setDisabled(true);
         render(wid->getSettings());
     } else sendNextForRender();
