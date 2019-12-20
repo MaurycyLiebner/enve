@@ -67,7 +67,7 @@ static AVFrame *allocPicture(enum AVPixelFormat pix_fmt,
 
     /* allocate the buffers for the frame data */
     const int ret = av_frame_get_buffer(picture, 32);
-    if(ret < 0) AV_RuntimeThrow(ret, "Could not allocate frame data");
+    if(ret < 0) AV_RuntimeThrow(ret, "Could not allocate frame data")
 
     return picture;
 }
@@ -77,7 +77,7 @@ static void openVideo(const AVCodec * const codec, OutputStream * const ost) {
     ost->fNextPts = 0;
     /* open the codec */
     int ret = avcodec_open2(c, codec, nullptr);
-    if(ret < 0) AV_RuntimeThrow(ret, "Could not open codec");
+    if(ret < 0) AV_RuntimeThrow(ret, "Could not open codec")
 
     /* Allocate the encoded raw picture. */
     ost->fDstFrame = allocPicture(c->pix_fmt, c->width, c->height);
@@ -85,7 +85,7 @@ static void openVideo(const AVCodec * const codec, OutputStream * const ost) {
 
     /* copy the stream parameters to the muxer */
     ret = avcodec_parameters_from_context(ost->fStream->codecpar, c);
-    if(ret < 0) AV_RuntimeThrow(ret, "Could not copy the stream parameters");
+    if(ret < 0) AV_RuntimeThrow(ret, "Could not copy the stream parameters")
 }
 
 static void addVideoStream(OutputStream * const ost,
@@ -149,7 +149,7 @@ static void copyImageToFrame(AVFrame * const pict,
      * make sure we do not overwrite it here
      */
     const int ret = av_frame_make_writable(pict);
-    if(ret < 0) AV_RuntimeThrow(ret, "Could not make AVFrame writable");
+    if(ret < 0) AV_RuntimeThrow(ret, "Could not make AVFrame writable")
 
     SkPixmap pixmap;
     skiaImg->peekPixels(&pixmap);
@@ -198,7 +198,7 @@ static AVFrame *getVideoFrame(OutputStream * const ost,
         av_image_fill_linesizes(linesizesSk, AV_PIX_FMT_RGBA, image->width());
         const int ret = av_frame_make_writable(ost->fDstFrame) ;
         if(ret < 0)
-            AV_RuntimeThrow(ret, "Could not make AVFrame writable");
+            AV_RuntimeThrow(ret, "Could not make AVFrame writable")
 
         sws_scale(ost->fSwsCtx, dstSk,
                   linesizesSk, 0, c->height, ost->fDstFrame->data,
@@ -232,7 +232,7 @@ static void writeVideoFrame(AVFormatContext * const oc,
 
     // encode the image
     const int ret = avcodec_send_frame(c, frame);
-    if(ret < 0) AV_RuntimeThrow(ret, "Error submitting a frame for encoding");
+    if(ret < 0) AV_RuntimeThrow(ret, "Error submitting a frame for encoding")
 
     while(ret >= 0) {
         AVPacket pkt;
@@ -245,12 +245,12 @@ static void writeVideoFrame(AVFormatContext * const oc,
 
             // Write the compressed frame to the media file.
             const int interRet = av_interleaved_write_frame(oc, &pkt);
-            if(interRet < 0) AV_RuntimeThrow(interRet, "Error while writing video frame");
+            if(interRet < 0) AV_RuntimeThrow(interRet, "Error while writing video frame")
         } else if(recRet == AVERROR(EAGAIN) || recRet == AVERROR_EOF) {
             *encodeVideo = ret != AVERROR_EOF;
             break;
         } else {
-            AV_RuntimeThrow(recRet, "Error encoding a video frame");
+            AV_RuntimeThrow(recRet, "Error encoding a video frame")
         }
 
         av_packet_unref(&pkt);
@@ -343,7 +343,7 @@ static AVFrame *allocAudioFrame(enum AVSampleFormat sample_fmt,
 
     if(nb_samples) {
         const int ret = av_frame_get_buffer(frame, 0);
-        if(ret < 0) AV_RuntimeThrow(ret, "Error allocating an audio buffer");
+        if(ret < 0) AV_RuntimeThrow(ret, "Error allocating an audio buffer")
     }
 
     return frame;
@@ -356,7 +356,7 @@ static void openAudio(const AVCodec * const codec, OutputStream * const ost,
     /* open it */
 
     const int ret = avcodec_open2(c, codec, nullptr);
-    if(ret < 0) AV_RuntimeThrow(ret, "Could not open codec");
+    if(ret < 0) AV_RuntimeThrow(ret, "Could not open codec")
 
     ost->fNextPts = 0;
 
@@ -375,7 +375,7 @@ static void openAudio(const AVCodec * const codec, OutputStream * const ost,
 
     /* copy the stream parameters to the muxer */
     const int parRet = avcodec_parameters_from_context(ost->fStream->codecpar, c);
-    if(parRet < 0) AV_RuntimeThrow(parRet, "Could not copy the stream parameters");
+    if(parRet < 0) AV_RuntimeThrow(parRet, "Could not copy the stream parameters")
 }
 
 /* if a frame is provided, send it to the encoder, otherwise flush the encoder;
@@ -386,7 +386,7 @@ static void encodeAudioFrame(AVFormatContext * const oc,
                              AVFrame * const frame,
                              bool * const encodeAudio) {
     const int ret = avcodec_send_frame(ost->fCodec, frame);
-    if(ret < 0) AV_RuntimeThrow(ret, "Error submitting a frame for encoding");
+    if(ret < 0) AV_RuntimeThrow(ret, "Error submitting a frame for encoding")
 
     while(true) {
         AVPacket pkt;
@@ -399,12 +399,12 @@ static void encodeAudioFrame(AVFormatContext * const oc,
 
             /* Write the compressed frame to the media file. */
             const int interRet = av_interleaved_write_frame(oc, &pkt);
-            if(interRet < 0) AV_RuntimeThrow(interRet, "Error while writing audio frame");
+            if(interRet < 0) AV_RuntimeThrow(interRet, "Error while writing audio frame")
         } else if(recRet == AVERROR(EAGAIN) || recRet == AVERROR_EOF) {
             *encodeAudio = recRet == AVERROR(EAGAIN);
             break;
         } else {
-            AV_RuntimeThrow(recRet, "Error encoding an audio frame");
+            AV_RuntimeThrow(recRet, "Error encoding an audio frame")
         }
     }
 }
@@ -507,11 +507,13 @@ void VideoEncoder::startEncodingNow() {
         const int avioRet = avio_open(&mFormatContext->pb,
                                       mPathByteArray.data(),
                                       AVIO_FLAG_WRITE);
-        if(avioRet < 0) AV_RuntimeThrow(avioRet, "Could not open " + mPathByteArray.data());
+        if(avioRet < 0) AV_RuntimeThrow(avioRet,
+                                        "Could not open " + mPathByteArray.data())
     }
 
     const int whRet = avformat_write_header(mFormatContext, nullptr);
-    if(whRet < 0) AV_RuntimeThrow(whRet, "Could not write header to " + mPathByteArray.data());
+    if(whRet < 0) AV_RuntimeThrow(whRet,
+                                  "Could not write header to " + mPathByteArray.data())
 }
 
 bool VideoEncoder::startEncoding(RenderInstanceSettings * const settings) {
