@@ -39,5 +39,6 @@
     </qresource>
     <qresource prefix="/checkbox">
         <file alias="Checkbox_checked_normal.png">pixmaps/Checkbox_checked_normal.png</file>
+        <file alias="Checkbox_checked_disabled.png">pixmaps/Checkbox_checked_disabled.png</file>
     </qresource>
 </RCC>

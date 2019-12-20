@@ -14,16 +14,27 @@ QMainWindow::separator {
     border: 1px solid white;
 }*/
 
-QCheckBox::indicator {
+QCheckBox::indicator, QGroupBox::indicator {
     border: 1px solid rgb(255, 255, 255);
     border-radius: 2px;
 }
 
-QCheckBox::indicator:checked {
+QCheckBox::indicator:checked, QGroupBox::indicator:checked {
     background: url(:/checkbox/Checkbox_checked_normal.png);
     background-position: center center;
     background-repeat: no-repeat;
     background-origin: border;
+}
+
+QCheckBox::indicator:checked:disabled, QGroupBox::indicator:checked:disabled {
+    background: url(:/checkbox/Checkbox_checked_disabled.png);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-origin: border;
+}
+
+QCheckBox::indicator:disabled, QGroupBox::indicator:disabled {
+    border: 1px solid rgb(180, 180, 180);
 }
 
 QWidget#darkWidget {
