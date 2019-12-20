@@ -72,7 +72,7 @@ static AVFrame *allocPicture(enum AVPixelFormat pix_fmt,
     return picture;
 }
 
-static void openVideo(AVCodec * const codec, OutputStream * const ost) {
+static void openVideo(const AVCodec * const codec, OutputStream * const ost) {
     AVCodecContext * const c = ost->fCodec;
     ost->fNextPts = 0;
     /* open the codec */
@@ -92,7 +92,7 @@ static void addVideoStream(OutputStream * const ost,
                            AVFormatContext * const oc,
                            const OutputSettings &outSettings,
                            const RenderSettings &renSettings) {
-    AVCodec * const codec = outSettings.videoCodec;
+    const AVCodec * const codec = outSettings.videoCodec;
 
 //    if(!codec) {
 //        /* find the video encoder */
@@ -261,7 +261,7 @@ static void addAudioStream(OutputStream * const ost,
                            AVFormatContext * const oc,
                            const OutputSettings &settings,
                            const eSoundSettingsData& inSound) {
-    AVCodec * const codec = settings.audioCodec;
+    const AVCodec * const codec = settings.audioCodec;
 
 //    /* find the audio encoder */
 //    codec = avcodec_find_encoder(codec_id);
@@ -349,7 +349,7 @@ static AVFrame *allocAudioFrame(enum AVSampleFormat sample_fmt,
     return frame;
 }
 
-static void openAudio(AVCodec * const codec, OutputStream * const ost,
+static void openAudio(const AVCodec * const codec, OutputStream * const ost,
                       const eSoundSettingsData& inSound) {
     AVCodecContext * const c = ost->fCodec;
 

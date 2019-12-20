@@ -69,7 +69,7 @@ protected:
     QList<FormatCodecs> mSupportedFormats;
     bool mShowAllFormatsAndCodecs = false;
     QList<AVPixelFormat> mPixelFormatsList;
-    QList<AVCodec*> mVideoCodecsList;
+    QList<const AVCodec*> mVideoCodecsList;
     QList<const AVOutputFormat*> mOutputFormatsList;
     QList<AVCodec*> mAudioCodecsList;
     QList<AVSampleFormat> mSampleFormatsList;
@@ -112,7 +112,7 @@ protected:
     QPushButton *mOkButton = nullptr;
     QPushButton *mCancelButton = nullptr;
     QPushButton *mResetButton = nullptr;
-    void addVideoCodec(const AVCodecID &codecId,
+    void addVideoCodec(const AVCodec * const codec,
                        const AVOutputFormat *outputFormat,
                        const QString &currentCodecName);
     void addAudioCodec(const AVCodecID &codecId,

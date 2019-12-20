@@ -174,7 +174,7 @@ OutputSettings OutputSettingsDialog::getSettings() {
     settings.outputFormat = currentOutputFormat;
 
     settings.videoEnabled = mVideoGroupBox->isChecked();
-    AVCodec *currentVideoCodec = nullptr;
+    const AVCodec *currentVideoCodec = nullptr;
     if(mVideoCodecsComboBox->count() > 0) {
         int codecId = mVideoCodecsComboBox->currentIndex();
         currentVideoCodec = mVideoCodecsList.at(codecId);
@@ -190,7 +190,7 @@ OutputSettings OutputSettingsDialog::getSettings() {
     settings.videoBitrate = qRound(mBitrateSpinBox->value()*1000000);
 
     settings.audioEnabled = mAudioGroupBox->isChecked();
-    AVCodec *currentAudioCodec = nullptr;
+    const AVCodec *currentAudioCodec = nullptr;
     if(mAudioCodecsComboBox->count() > 0) {
         const int codecId = mAudioCodecsComboBox->currentIndex();
         currentAudioCodec = mAudioCodecsList.at(codecId);
@@ -228,7 +228,7 @@ OutputSettings OutputSettingsDialog::getSettings() {
 
 void OutputSettingsDialog::updateAvailablePixelFormats() {
     const QString currentFormatName = mPixelFormatsComboBox->currentText();
-    AVCodec *currentCodec = nullptr;
+    const AVCodec *currentCodec = nullptr;
     if(mVideoCodecsComboBox->count() > 0) {
         currentCodec = mVideoCodecsList.at(mVideoCodecsComboBox->currentIndex());
     }
@@ -248,17 +248,16 @@ void OutputSettingsDialog::updateAvailablePixelFormats() {
     }
 }
 
-void OutputSettingsDialog::addVideoCodec(const AVCodecID &codecId,
+void OutputSettingsDialog::addVideoCodec(const AVCodec* const codec,
                                          const AVOutputFormat *outputFormat,
                                          const QString &currentCodecName) {
-    AVCodec *currentCodec = avcodec_find_encoder(codecId);
-    if(!currentCodec) return;
-    if(currentCodec->type != AVMEDIA_TYPE_VIDEO) return;
-    if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) return;
-    if(currentCodec->pix_fmts == nullptr) return;
-    if(avformat_query_codec(outputFormat, codecId, COMPLIENCE) == 0) return;
-    mVideoCodecsList << currentCodec;
-    const QString codecName(currentCodec->long_name);
+    if(!codec) return;
+    if(codec->type != AVMEDIA_TYPE_VIDEO) return;
+    if(codec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) return;
+    if(codec->pix_fmts == nullptr) return;
+    if(avformat_query_codec(outputFormat, codec->id, COMPLIENCE) == 0) return;
+    mVideoCodecsList << codec;
+    const QString codecName(codec->long_name);
     mVideoCodecsComboBox->addItem(codecName);
     if(codecName == currentCodecName) {
         mVideoCodecsComboBox->setCurrentText(codecName);
@@ -298,35 +297,31 @@ void OutputSettingsDialog::updateAvailableVideoCodecs() {
     if(!outputFormat) return;
 
     if(mShowAllFormatsAndCodecs) {
-        const AVCodec *currentCodec = nullptr;
+        const AVCodec *iCodec = nullptr;
         void *i = nullptr;
-        while((currentCodec = av_codec_iterate(&i))) {
-          if(av_codec_is_encoder(currentCodec)) {
-              if(!currentCodec) break;
-              if(currentCodec->type != AVMEDIA_TYPE_VIDEO) continue;
-              if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) {
+        while((iCodec = av_codec_iterate(&i))) {
+          if(av_codec_is_encoder(iCodec)) {
+              if(!iCodec) break;
+              if(iCodec->type != AVMEDIA_TYPE_VIDEO) continue;
+              if(iCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) {
                   continue;
               }
-              if(currentCodec->pix_fmts == nullptr) continue;
-              addVideoCodec(currentCodec->id,
-                            outputFormat,
-                            currentCodecName);
+              if(iCodec->pix_fmts == nullptr) continue;
+              addVideoCodec(iCodec, outputFormat, currentCodecName);
           }
         }
     } else {
         const FormatCodecs currFormatT =
                 mSupportedFormats.at(outputFormatId);
         for(const AVCodecID &codecId : currFormatT.mVidCodecs) {
-            AVCodec * const currentCodec = avcodec_find_encoder(codecId);
-            if(!currentCodec) break;
-            if(currentCodec->type != AVMEDIA_TYPE_VIDEO) continue;
-            if(currentCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) {
+            AVCodec * const iCodec = avcodec_find_encoder(codecId);
+            if(!iCodec) break;
+            if(iCodec->type != AVMEDIA_TYPE_VIDEO) continue;
+            if(iCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL) {
                 continue;
             }
-            if(currentCodec->pix_fmts == nullptr) continue;
-            addVideoCodec(currentCodec->id,
-                          outputFormat,
-                          currentCodecName);
+            if(iCodec->pix_fmts == nullptr) continue;
+            addVideoCodec(iCodec, outputFormat, currentCodecName);
         }
     }
     const bool noCodecs = mVideoCodecsComboBox->count() == 0;
@@ -587,7 +582,7 @@ void OutputSettingsDialog::restoreInitialSettings() {
         QString currentOutputFormatName = QString(currentOutputFormat->long_name);
         mOutputFormatsComboBox->setCurrentText(currentOutputFormatName);
     }
-    AVCodec *currentVideoCodec = mInitialSettings.videoCodec;
+    const AVCodec *currentVideoCodec = mInitialSettings.videoCodec;
     if(!currentVideoCodec) {
         mVideoCodecsComboBox->setCurrentIndex(0);
     } else {
@@ -611,7 +606,7 @@ void OutputSettingsDialog::restoreInitialSettings() {
     mVideoGroupBox->setChecked(mInitialSettings.videoEnabled &&
                                !noVideoCodecs);
 
-    AVCodec *currentAudioCodec = mInitialSettings.audioCodec;
+    const AVCodec *currentAudioCodec = mInitialSettings.audioCodec;
     if(!currentAudioCodec) {
         mAudioCodecsComboBox->setCurrentIndex(0);
     } else {

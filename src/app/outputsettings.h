@@ -40,12 +40,12 @@ struct OutputSettings {
     const AVOutputFormat *outputFormat = nullptr;
 
     bool videoEnabled = false;
-    AVCodec *videoCodec = nullptr;
+    const AVCodec *videoCodec = nullptr;
     AVPixelFormat videoPixelFormat = AV_PIX_FMT_NONE;
     int videoBitrate = 0;
 
     bool audioEnabled = false;
-    AVCodec *audioCodec = nullptr;
+    const AVCodec *audioCodec = nullptr;
     AVSampleFormat audioSampleFormat = AV_SAMPLE_FMT_NONE;
     uint64_t audioChannelsLayout = 0;
     int audioSampleRate = 0;
