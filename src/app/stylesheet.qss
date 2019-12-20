@@ -11,12 +11,20 @@ QMainWindow::separator {
 }
 
 /*QCheckBox {
-    color: black;
-}
+    border: 1px solid white;
+}*/
 
 QCheckBox::indicator {
-    background: none;
-}*/
+    border: 1px solid rgb(255, 255, 255);
+    border-radius: 2px;
+}
+
+QCheckBox::indicator:checked {
+    background: url(:/checkbox/Checkbox_checked_normal.png);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-origin: border;
+}
 
 QWidget#darkWidget {
     background: rgb(45, 45, 45);

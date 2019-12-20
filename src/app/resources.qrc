@@ -37,4 +37,7 @@
         <file>icons/toolbarButtons/plain/brush-</file>
         <file>icons/toolbarButtons/plain/brush+</file>
     </qresource>
+    <qresource prefix="/checkbox">
+        <file alias="Checkbox_checked_normal.png">pixmaps/Checkbox_checked_normal.png</file>
+    </qresource>
 </RCC>
