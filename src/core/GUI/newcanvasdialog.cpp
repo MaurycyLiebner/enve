@@ -98,7 +98,7 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &name,
     mFPSLayout->addWidget(mFPSSpinBox);
     mMainLayout->addLayout(mFPSLayout);
 
-    mBgColorLabel = new QLabel("Backgroud:", this);
+    mBgColorLabel = new QLabel("Background:", this);
     mBgColorButton = new ColorAnimatorButton(bg, this);
     if(!bg) mBgColorButton->setColor(Qt::white);
 
