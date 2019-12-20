@@ -25,6 +25,9 @@ class BrushWidget : public QWidget {
 public:
     explicit BrushWidget(BrushContexedWrapper * const brushCWrapper,
                          QWidget * const parent = nullptr);
+
+    BrushContexedWrapper* getBrush() const
+    { return mBrushCWrapper; }
 protected:
     void paintEvent(QPaintEvent*);
     void enterEvent(QEvent*) {
@@ -39,12 +42,12 @@ protected:
     void mousePressEvent(QMouseEvent* e);
 signals:
     void selected(BrushContexedWrapper*);
-public slots:
-    void selectionChanged(bool sel) {
+private:
+    void selectionChanged(const bool sel) {
         if(sel) emit selected(mBrushCWrapper);
         update();
     }
-private:
+
     bool isSelected() const {
         return mBrushCWrapper->selected();
     }

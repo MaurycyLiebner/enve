@@ -229,8 +229,8 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     brushCurvesScroll->setWidget(brushCurvesWidget);
     mBrushSettingsWidget = brushCurvesScroll;
 
-    const int ctxt = BrushSelectionWidget::sCreateNewContext();
-    mBrushSelectionWidget = new BrushSelectionWidget(ctxt, this);
+    const auto oCtxt = BrushSelectionWidget::sOutlineContext;
+    mBrushSelectionWidget = new BrushSelectionWidget(*oCtxt.get(), this);
 
     connect(mBrushSelectionWidget,
             &BrushSelectionWidget::currentBrushChanged,
@@ -408,9 +408,7 @@ void FillStrokeSettingsWidget::setBrushTimeCurve(
 void FillStrokeSettingsWidget::setCurrentBrushSettings(
         BrushSettingsAnimator * const brushSettings) {
     if(brushSettings) {
-        BrushSelectionWidget::sSetCurrentBrushForContext(
-                    mBrushSelectionWidget->getContextId(),
-                    brushSettings->getBrush());
+        mBrushSelectionWidget->setCurrentBrush(brushSettings->getBrush());
         mBrushWidthCurveEditor->setCurrentAnimator(
                     brushSettings->getWidthAnimator());
         mBrushPressureCurveEditor->setCurrentAnimator(

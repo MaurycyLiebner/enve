@@ -15,5 +15,18 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "brushcontexedwrapper.h"
+#include "brushescontext.h"
 
-QList<BrushCollectionData> BrushCollectionData::sData;
+void BrushContexedWrapper::bookmark() {
+    if(mBookmarked) return;
+    mBookmarked = true;
+    mContext->addBookmark(this);
+    emit bookmarkedChanged(mBookmarked);
+}
+
+void BrushContexedWrapper::unbookmark() {
+    if(!mBookmarked) return;
+    mBookmarked = false;
+    mContext->removeBookmark(this);
+    emit bookmarkedChanged(mBookmarked);
+}

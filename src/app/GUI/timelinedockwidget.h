@@ -35,6 +35,8 @@
 #include "smartPointers/ememory.h"
 #include "framerange.h"
 #include "timelinebasewrappernode.h"
+#include "triggerlabel.h"
+#include "BrushWidgets/bookmarkedbrushes.h"
 
 class FrameScrollBar;
 class TimelineWidget;
@@ -103,8 +105,8 @@ private:
     SwitchButton *mNodeVisibility;
 
     QAction* mBrushColorWidgetAct;
-    QLabel* mColorLabel;
-    QLabel* mBrushLabel;
+    TriggerLabel* mColorLabel;
+    TriggerLabel* mBrushLabel;
     QAction* mDecBrushSizeAct;
     ActionButton *mDecBrushSize;
     QAction* mBrushSizeLabelAct;
@@ -112,6 +114,7 @@ private:
     QAction* mIncBrushSizeAct;
     ActionButton *mIncBrushSize;
 
+    BookmarkedBrushes* mBookmarkedBrushes;
 
     QAction *mTimelineAction;
     QAction *mRenderAction;

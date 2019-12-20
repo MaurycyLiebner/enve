@@ -17,13 +17,17 @@
 #include "brushwidget.h"
 #include <QPainter>
 #include <QMouseEvent>
+#include <QMenu>
 
 BrushWidget::BrushWidget(BrushContexedWrapper * const brushCWrapper,
                          QWidget * const parent) :
     QWidget(parent), mBrushCWrapper(brushCWrapper) {
+    Q_ASSERT(brushCWrapper);
     setFixedSize(64, 64);
     connect(brushCWrapper, &BrushContexedWrapper::selectionChanged,
             this, &BrushWidget::selectionChanged);
+    connect(brushCWrapper, &BrushContexedWrapper::bookmarkedChanged,
+            this, qOverload<>(&BrushWidget::update));
 }
 
 void BrushWidget::paintEvent(QPaintEvent *) {
@@ -31,6 +35,13 @@ void BrushWidget::paintEvent(QPaintEvent *) {
 
     const auto& brushData = mBrushCWrapper->getBrushData();
     p.drawImage(QRect(0, 0, width(), height()), brushData.fIcon);
+
+    if(mBrushCWrapper->bookmarked()) {
+        p.setBrush(QColor(0, 175, 255));
+        p.setPen(Qt::NoPen);
+        p.drawRect(-1, 5, 15, 10);
+        p.setBrush(Qt::NoBrush);
+    }
 
     if(isSelected()) {
         if(mHovered) {
@@ -50,7 +61,18 @@ void BrushWidget::paintEvent(QPaintEvent *) {
 void BrushWidget::mousePressEvent(QMouseEvent *e) {
     const auto pressedButton = e->button();
     if(pressedButton == Qt::RightButton) {
+        QMenu menu(this);
 
+        if(mBrushCWrapper->bookmarked()) menu.addAction("Unbookmark");
+        else menu.addAction("Bookmark");
+        const auto act = menu.exec(e->globalPos());
+        if(act) {
+            if(act->text() == "Bookmark") {
+                mBrushCWrapper->bookmark();
+            } else if(act->text() == "Unbookmark") {
+                mBrushCWrapper->unbookmark();
+            }
+        }
     } else if(pressedButton == Qt::LeftButton) {
         mBrushCWrapper->setSelected(true);
     } else return;

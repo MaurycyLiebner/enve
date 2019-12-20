@@ -15,9 +15,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "brushsettingsanimator.h"
-#include "Paint/brushcontexedwrapper.h"
+#include "Paint/brushescontext.h"
 
-BrushSettingsAnimator::BrushSettingsAnimator() : StaticComplexAnimator("brush settings") {
+BrushSettingsAnimator::BrushSettingsAnimator() :
+    StaticComplexAnimator("brush settings") {
     ca_addChild(mWidthCurve);
     ca_addChild(mPressureCurve);
     ca_addChild(mSpacingCurve);

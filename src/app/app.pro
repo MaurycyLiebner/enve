@@ -67,6 +67,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     GUI/BoxesList/boxscroller.cpp \
+    GUI/BrushWidgets/bookmarkedbrushes.cpp \
     GUI/RenderWidgets/outputsettingsdialog.cpp \
     GUI/RenderWidgets/rendersettingsdialog.cpp \
     GUI/RenderWidgets/rendersettingsdisplaywidget.cpp \
@@ -90,6 +91,7 @@ SOURCES += main.cpp\
     GUI/timelinedockwidget.cpp \
     GUI/timelinewidget.cpp \
     GUI/timelinewrappernode.cpp \
+    GUI/triggerlabel.cpp \
     GUI/welcomedialog.cpp \
     GUI/widgetstack.cpp \
     GUI/ColorWidgets/colorlabel.cpp \
@@ -166,6 +168,7 @@ SOURCES += main.cpp\
 
 HEADERS  += \
     GUI/BoxesList/boxscroller.h \
+    GUI/BrushWidgets/bookmarkedbrushes.h \
     GUI/RenderWidgets/outputsettingsdialog.h \
     GUI/RenderWidgets/rendersettingsdialog.h \
     GUI/RenderWidgets/rendersettingsdisplaywidget.h \
@@ -188,6 +191,7 @@ HEADERS  += \
     GUI/timelinedockwidget.h \
     GUI/timelinewidget.h \
     GUI/timelinewrappernode.h \
+    GUI/triggerlabel.h \
     GUI/welcomedialog.h \
     GUI/widgetstack.h \
     GUI/ColorWidgets/colorlabel.h \

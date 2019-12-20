@@ -24,19 +24,19 @@
 #include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 
 bool BrushSelectionWidget::sLoaded = false;
-QList<BrushesContext> BrushSelectionWidget::sBrushContexts;
+qsptr<BrushesContext> BrushSelectionWidget::sPaintContext;
+qsptr<BrushesContext> BrushSelectionWidget::sOutlineContext;
 
-BrushSelectionWidget::BrushSelectionWidget(const int contextId,
+BrushSelectionWidget::BrushSelectionWidget(BrushesContext& context,
                                            QWidget * const parent) :
-    QTabWidget(parent), mContextId(contextId) {
+    QTabWidget(parent), mContext(context) {
     setSizePolicy(QSizePolicy::Preferred, sizePolicy().verticalPolicy());
 
     updateBrushes();
 }
 
 void BrushSelectionWidget::updateBrushes() {
-    const auto& context = sGetContext(mContextId);
-    for(const auto& coll : context.fCollections) {
+    for(const auto& coll : mContext.fCollections) {
         const auto tabScroll = new ScrollArea(this);
         const auto tabWidget = new QWidget(this);
         const auto tabWidgetLay = new FlowLayout(tabWidget, 0, 0, 0);

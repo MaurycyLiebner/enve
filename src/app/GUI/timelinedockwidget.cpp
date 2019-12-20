@@ -103,15 +103,25 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
         Document::sInstance->actionFinished();
     });
 
-    mColorLabel = new QLabel("");
+    mColorLabel = new TriggerLabel("");
     mColorLabel->setToolTip(gSingleLineTooltip("Current Color", "E"));
 
     connect(&mDocument, &Document::brushColorChanged,
             this, &TimelineDockWidget::setBrushColor);
-    mBrushLabel = new QLabel("");
+    mBrushLabel = new TriggerLabel("");
     mBrushLabel->setToolTip(gSingleLineTooltip("Current Brush", "B"));
     connect(&mDocument, &Document::brushChanged,
             this, &TimelineDockWidget::setBrush);
+    const auto paintCtxt = BrushSelectionWidget::sPaintContext.get();
+    mBookmarkedBrushes = new BookmarkedBrushes(paintCtxt, mBrushLabel);
+    mBookmarkedBrushes->hide();
+    connect(mBrushLabel, &TriggerLabel::triggered,
+            this, [this]() {
+        const auto globalPos = mBrushLabel->mapToGlobal(QPoint(0, 0));
+        mBookmarkedBrushes->move(globalPos.x(), globalPos.y() - 64);
+        mBookmarkedBrushes->setVisible(!mBookmarkedBrushes->isVisible());
+    });
+
     mDecBrushSize = new ActionButton(
                 iconsDir + "/brush-.png",
                 gSingleLineTooltip("Decrease Brush Size", "Q"), this);

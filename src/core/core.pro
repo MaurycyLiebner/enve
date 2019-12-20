@@ -146,6 +146,7 @@ SOURCES += \
     Paint/autotiledsurface.cpp \
     Paint/autotilesdata.cpp \
     Paint/brushcontexedwrapper.cpp \
+    Paint/brushescontext.cpp \
     Paint/brushstroke.cpp \
     Paint/colorconversions.cpp \
     Paint/drawableautotiledsurface.cpp \
@@ -380,6 +381,7 @@ HEADERS += \
     Paint/autotiledsurface.h \
     Paint/autotilesdata.h \
     Paint/brushcontexedwrapper.h \
+    Paint/brushescontext.h \
     Paint/brushstroke.h \
     Paint/colorconversions.h \
     Paint/drawableautotiledsurface.h \

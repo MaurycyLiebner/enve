@@ -143,6 +143,9 @@ MainWindow::MainWindow(Document& document,
     }
     BoxSingleWidget::loadStaticPixmaps();
 
+    BrushSelectionWidget::sPaintContext = BrushSelectionWidget::sCreateNewContext();
+    BrushSelectionWidget::sOutlineContext = BrushSelectionWidget::sCreateNewContext();
+
 //    for(int i = 0; i < ClipboardContainerType::CCT_COUNT; i++) {
 //        mClipboardContainers << nullptr;
 //    }
@@ -185,8 +188,8 @@ MainWindow::MainWindow(Document& document,
     brushDockLabel->setAlignment(Qt::AlignCenter);
     mBrushSettingsDock->setTitleBarWidget(brushDockLabel);
 
-    const int ctxt = BrushSelectionWidget::sCreateNewContext();
-    mBrushSelectionWidget = new BrushSelectionWidget(ctxt, this);
+    const auto pCtxt = BrushSelectionWidget::sPaintContext;
+    mBrushSelectionWidget = new BrushSelectionWidget(*pCtxt.get(), this);
     connect(mBrushSelectionWidget, &BrushSelectionWidget::currentBrushChanged,
             &mDocument, &Document::setBrush);
 //    connect(mBrushSettingsWidget,

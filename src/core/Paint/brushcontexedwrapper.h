@@ -19,28 +19,13 @@
 #include "Paint/simplebrushwrapper.h"
 #include <QImage>
 
+class BrushesContext;
+
 struct BrushData {
     QString fName;
     stdsptr<SimpleBrushWrapper> fWrapper;
     QImage fIcon;
     QByteArray fWholeFile;
-};
-
-struct BrushCollectionData {
-    QString fName;
-    QList<BrushData> fBrushes;
-
-    static QList<BrushCollectionData> sData;
-    static SimpleBrushWrapper * sGetBrush(const QString& collectionName,
-                                          const QString& brushName) {
-        for(const auto& coll : sData) {
-            if(coll.fName != collectionName) continue;
-            for(const auto& brush : coll.fBrushes) {
-                if(brush.fName == brushName) return brush.fWrapper.get();
-            }
-        }
-        return nullptr;
-    }
 };
 
 class BrushContexedWrapper : public SelfRef {
@@ -57,6 +42,10 @@ public:
         return mSelected;
     }
 
+    bool bookmarked() const {
+        return mBookmarked;
+    }
+
     const BrushData& getBrushData() const {
         return mBrushData;
     }
@@ -64,14 +53,25 @@ public:
     SimpleBrushWrapper * getSimpleBrush() {
         return mBrushData.fWrapper.get();
     }
+
+    BrushesContext* getContext() const {
+        return mContext;
+    }
+
+    void bookmark();
+    void unbookmark();
 protected:
-    BrushContexedWrapper(const BrushData& brushData) :
-        mBrushData(brushData) {}
+    BrushContexedWrapper(BrushesContext* context,
+                         const BrushData& brushData) :
+        mBrushData(brushData), mContext(context) {}
 signals:
     void selectionChanged(bool);
+    void bookmarkedChanged(bool);
 private:
+    bool mBookmarked = false;
     bool mSelected = false;
     const BrushData& mBrushData;
+    BrushesContext* const mContext;
 };
 
 #endif // BRUSHCONTEXEDWRAPPER_H
