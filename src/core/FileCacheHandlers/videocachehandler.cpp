@@ -237,6 +237,6 @@ bool hasSound(const char* path) {
 
 void VideoFileHandler::afterPathSet(const QString &path) {
     mDataHandler = VideoDataHandler::sGetCreateDataHandler<VideoDataHandler>(path);
-    if(!hasSound(path.toLatin1().data())) return mSoundHandler.reset();
+    if(!hasSound(path.toUtf8().data())) return mSoundHandler.reset();
     mSoundHandler = SoundDataHandler::sGetCreateDataHandler<SoundDataHandler>(path);
 }

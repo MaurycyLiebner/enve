@@ -172,25 +172,25 @@ void OutputSettingsProfile::load(const QString &path) {
                 mName = val;
             } else if(var == "Format") {
                 mSettings.outputFormat = av_guess_format(
-                            val.toLatin1().data(), nullptr, nullptr);
+                            val.toUtf8().data(), nullptr, nullptr);
             } else if(var == "Video enabled") {
                 mSettings.videoEnabled = (val == "true");
             } else if(var == "Video codec") {
                 mSettings.videoCodec = avcodec_find_encoder_by_name(
-                            val.toLatin1().data());
+                            val.toUtf8().data());
             } else if(var == "Pixel format") {
                 mSettings.videoPixelFormat = av_get_pix_fmt(
-                            val.toLatin1().data());
+                            val.toUtf8().data());
             } else if(var == "Video bitrate") {
                 mSettings.videoBitrate = val.toInt();
             } else if(var == "Audio enabled") {
                 mSettings.audioEnabled = (val == "true");
             } else if(var == "Audio codec") {
                 mSettings.audioCodec = avcodec_find_encoder_by_name(
-                            val.toLatin1().data());
+                            val.toUtf8().data());
             } else if(var == "Sample format") {
                 mSettings.audioSampleFormat = av_get_sample_fmt(
-                            val.toLatin1().data());
+                            val.toUtf8().data());
             } else if(var == "Channel layout") {
                 mSettings.audioChannelsLayout =
                         OutputSettings::sGetChannelsLayout(val);

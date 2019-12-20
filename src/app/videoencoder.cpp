@@ -522,7 +522,7 @@ bool VideoEncoder::startEncoding(RenderInstanceSettings * const settings) {
     mRenderInstanceSettings->renderingAboutToStart();
     mOutputSettings = mRenderInstanceSettings->getOutputRenderSettings();
     mRenderSettings = mRenderInstanceSettings->getRenderSettings();
-    mPathByteArray = mRenderInstanceSettings->getOutputDestination().toLatin1();
+    mPathByteArray = mRenderInstanceSettings->getOutputDestination().toUtf8();
 
     mOutputFormat = mOutputSettings.outputFormat;
     mSoundIterator = SoundIterator();
