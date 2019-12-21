@@ -8,7 +8,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - sourceline: 'ppa:beineri/opt-qt-5.12.6-xenial'
+            - sourceline: 'ppa:beineri/opt-qt-5.12.0-xenial'
             - # sourceline: 'ppa:jonathonf/ffmpeg-4'
           packages:
             - g++-7
