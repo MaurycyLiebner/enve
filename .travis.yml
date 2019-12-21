@@ -29,7 +29,7 @@ matrix:
             - build-essential freeglut3-dev libfontconfig-dev libfreetype6-dev
             - libgif-dev libgl1-mesa-dev libglu1-mesa-dev libharfbuzz-dev
             - libicu-dev libjpeg-dev libpng-dev libwebp-dev
-            - p7zip-full libpulse-dev
+            - p7zip-full libpulse-dev libxkbcommon-x11-0
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
         - QT_INSTALL_DIR=~/Qt
