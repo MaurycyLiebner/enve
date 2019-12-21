@@ -1,4 +1,5 @@
 language: cpp
+sudo: required
 
 matrix:
   include:
@@ -30,13 +31,16 @@ matrix:
             - libicu-dev libjpeg-dev libpng-dev libwebp-dev
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
-
+        - QT_INSTALL_DIR=~/Qt
+        - QT_VERSION=5.12.4
+        - QT_BIN=${QT_INSTALL_DIR}/${QT_VERSION}/gcc_64/bin
+        - PATH="${QT_BIN}:${PATH}"
 before_install:
     - eval "${MATRIX_EVAL}"
-install:
     - wget https://raw.githubusercontent.com/qbs/qbs/master/scripts/install-qt.sh
     - chmod +x install-qt.sh
-    - sudo ./install-qt.sh --version 5.12.4 qtbase
+    - ./install-qt.sh -d ${QT_INSTALL_DIR} --version ${QT_VERSION} qtbase qtsvg qtmultimedia
+install:
     - ## FFMPEG
     - wget https://github.com/MaurycyLiebner/enve/files/3968745/ffmpeg-dev-4.2.tar.gz
     - tar xf ffmpeg-dev-4.2.tar.gz
@@ -93,7 +97,6 @@ script:
     - echo "#ifndef LATEST_COMMIT_DATE" >> $enveSplash
     - echo "#define LATEST_COMMIT_DATE $LATEST_COMMIT_DATE" >> $enveSplash
     - echo "#endif" >> $enveSplash
-    - export PATH=/opt/Qt/5.12.4/gcc_64/bin:$PATH
     - qmake ../../enve.pro
     - make -j 2 CC=gcc-7 CPP=g++-7 CXX=g++-7 LD=g++-7
     - cd ..
