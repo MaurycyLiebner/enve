@@ -44,7 +44,7 @@ install:
     - wget https://raw.githubusercontent.com/skalee/non-interactive-qt-installer/master/control_script.js
     - wget https://raw.githubusercontent.com/skalee/non-interactive-qt-installer/master/qt_installer.sh
     - chmod +x qt_installer.sh
-    - ./qt_installer.sh
+    - xvfb-run --auto-servernum --error-file=/dev/stderr ./qt_installer.sh
     - ## FFMPEG
     - wget https://github.com/MaurycyLiebner/enve/files/3968745/ffmpeg-dev-4.2.tar.gz
     - tar xf ffmpeg-dev-4.2.tar.gz
