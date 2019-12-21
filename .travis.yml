@@ -4,6 +4,8 @@ matrix:
   include:
     - os: linux
       dist: xenial
+      services:
+        - xvfb
       addons:
         apt:
           sources:
@@ -36,9 +38,15 @@ before_install:
     - eval "${MATRIX_EVAL}"
 install:
     - # Qt
-    - wget https://raw.githubusercontent.com/qbs/qbs/master/scripts/install-qt.sh
-    - chmod +x install-qt.sh
-    - ./install-qt.sh --version 5.12.6 qtbase qtsvg qtmultimedia
+    - touch qt_install_vars.js
+    - echo 'var InstallComponents = [ "qt.qt5.5124.gcc_64" ]' >> qt_install_vars.js
+    - echo 'var InstallPath = "/opt/Qt"' >> qt_install_vars.js
+    - export QT_INSTALLER_DOWNLOAD_NAME="qt-unified-linux-x64-online.run"
+    - export QT_INSTALLER_VARS="${TRAVIS_BUILD_DIR}/qt_install_vars.js"
+    - wget https://raw.githubusercontent.com/skalee/non-interactive-qt-installer/master/control_script.js
+    - wget https://raw.githubusercontent.com/skalee/non-interactive-qt-installer/master/qt_installer.sh
+    - chmod +x qt_installer.sh
+    - xvfb-run --auto-servernum --error-file=/dev/stderr ./qt_installer.sh
     - ## FFMPEG
     - wget https://github.com/MaurycyLiebner/enve/files/3968745/ffmpeg-dev-4.2.tar.gz
     - tar xf ffmpeg-dev-4.2.tar.gz
