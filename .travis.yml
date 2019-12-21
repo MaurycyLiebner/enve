@@ -36,6 +36,8 @@ matrix:
         - QT_VERSION=5.12.4
         - QT_BIN=${QT_INSTALL_DIR}/${QT_VERSION}/gcc_64/bin
         - PATH="${QT_BIN}:${PATH}"
+        - QT_LIB=${QT_INSTALL_DIR}/${QT_VERSION}/gcc_64/lib
+        - LD_LIBRARY_PATH=${QT_LIB}:${LD_LIBRARY_PATH}
 before_install:
     - eval "${MATRIX_EVAL}"
     - wget https://raw.githubusercontent.com/qbs/qbs/master/scripts/install-qt.sh
