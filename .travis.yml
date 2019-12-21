@@ -8,11 +8,11 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - sourceline: 'ppa:beineri/opt-qt-5.12.0-xenial'
+            - # sourceline: 'ppa:beineri/opt-qt-5.12.0-xenial'
             - # sourceline: 'ppa:jonathonf/ffmpeg-4'
           packages:
             - g++-7
-            - qt512base qt512multimedia qt512svg
+            - # qt512base qt512multimedia qt512svg
             - # ffmpeg debs dependencies
             - libvorbisfile3 libsoxr0 libcrystalhd3 libgsm1 libmp3lame0
             - libopus0 libshine3 libsnappy1v5 libspeex1 libtheora0 libtwolame0
@@ -28,12 +28,24 @@ matrix:
             - build-essential freeglut3-dev libfontconfig-dev libfreetype6-dev
             - libgif-dev libgl1-mesa-dev libglu1-mesa-dev libharfbuzz-dev
             - libicu-dev libjpeg-dev libpng-dev libwebp-dev
+            - xvfb
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
 before_install:
     - eval "${MATRIX_EVAL}"
 install:
+    - # Qt
+    - touch qt_install_vars.js
+    - echo 'var InstallComponents = [ "qt.qt5.5124.gcc_64" ]' >> qt_install_vars.js
+    - echo 'var InstallPath = "/opt/Qt"' >> qt_install_vars.js
+    - export QT_INSTALLER_DOWNLOAD_NAME="qt-unified-linux-x64-online.run"
+    - export QT_INSTALLER_VARS="${TRAVIS_BUILD_DIR}/qt_install_vars.js"
+    - wget https://raw.githubusercontent.com/skalee/non-interactive-qt-installer/master/control_script.js
+    - wget https://raw.githubusercontent.com/skalee/non-interactive-qt-installer/master/qt_installer.sh
+    - chmod +x qt_installer.sh
+    - ./qt_installer.sh
+    - ## FFMPEG
     - wget https://github.com/MaurycyLiebner/enve/files/3968745/ffmpeg-dev-4.2.tar.gz
     - tar xf ffmpeg-dev-4.2.tar.gz
     - cd ffmpeg-dev-4.2
@@ -78,7 +90,7 @@ before_script:
     - mv exec-x86_64.so exec.so
     - cd Release
 script:
-    - source /opt/qt512/bin/qt512-env.sh
+    - # source /opt/qt512/bin/qt512-env.sh
     - # embed commit hash and date
     - LATEST_COMMIT_HASH=\"$(git log --pretty=format:'%h' -n 1)\"
     - enveSplash=../../src/app/GUI/envesplash.h
@@ -89,7 +101,7 @@ script:
     - echo "#ifndef LATEST_COMMIT_DATE" >> $enveSplash
     - echo "#define LATEST_COMMIT_DATE $LATEST_COMMIT_DATE" >> $enveSplash
     - echo "#endif" >> $enveSplash
-    - #
+    - export PATH=/opt/Qt/5.12.4/gcc_64/bin/:$PATH
     - qmake ../../enve.pro
     - make -j 2 CC=gcc-7 CPP=g++-7 CXX=g++-7 LD=g++-7
     - cd ..
