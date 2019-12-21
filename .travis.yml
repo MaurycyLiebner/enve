@@ -29,7 +29,7 @@ matrix:
             - build-essential freeglut3-dev libfontconfig-dev libfreetype6-dev
             - libgif-dev libgl1-mesa-dev libglu1-mesa-dev libharfbuzz-dev
             - libicu-dev libjpeg-dev libpng-dev libwebp-dev
-            - p7zip-full
+            - p7zip-full libpulse-dev
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
         - QT_INSTALL_DIR=~/Qt
@@ -37,12 +37,12 @@ matrix:
         - QT_BIN=${QT_INSTALL_DIR}/${QT_VERSION}/gcc_64/bin
         - PATH="${QT_BIN}:${PATH}"
         - QT_LIB=${QT_INSTALL_DIR}/${QT_VERSION}/gcc_64/lib
-        - LD_LIBRARY_PATH=${QT_LIB}:${LD_LIBRARY_PATH}
+        - LD_LIBRARY_PATH="${QT_LIB}:${LD_LIBRARY_PATH}"
 before_install:
     - eval "${MATRIX_EVAL}"
     - wget https://raw.githubusercontent.com/qbs/qbs/master/scripts/install-qt.sh
     - chmod +x install-qt.sh
-    - ./install-qt.sh -d ${QT_INSTALL_DIR} --version ${QT_VERSION} qtbase qtsvg qtmultimedia qtdeclarative
+    - ./install-qt.sh -d ${QT_INSTALL_DIR} --version ${QT_VERSION} qtbase qtsvg qtmultimedia qtdeclarative icu
 install:
     - ## FFMPEG
     - wget https://github.com/MaurycyLiebner/enve/files/3968745/ffmpeg-dev-4.2.tar.gz
