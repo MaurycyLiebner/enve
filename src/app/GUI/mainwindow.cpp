@@ -1086,11 +1086,12 @@ void MainWindow::saveFile() {
 
 void MainWindow::saveFileAs() {
     disableEventFilter();
-    const QString saveAs = QFileDialog::getSaveFileName(this, "Save File",
-                               mDocument.fEvFile,
-                               "enve Files (*.ev)");
+    QString saveAs = QFileDialog::getSaveFileName(this, "Save File",
+                                                  mDocument.fEvFile,
+                                                  "enve Files (*.ev)");
     enableEventFilter();
     if(!saveAs.isEmpty()) {
+        if(saveAs.right(3) != ".ev") saveAs += ".ev";
         try {
             saveToFile(saveAs);
             mDocument.setPath(saveAs);
