@@ -24,48 +24,35 @@ class BrushCollection;
 #include "Private/esettings.h"
 #include "Paint/brushcontexedwrapper.h"
 class FlowLayout;
+class ScrollArea;
 
 class BrushSelectionWidget : public QTabWidget {
     Q_OBJECT
 public:
     BrushSelectionWidget(BrushesContext &context,
                          QWidget * const parent = nullptr);
-    void updateBrushes();
 
-    static qsptr<BrushesContext> sCreateNewContext() {
-        if(!sLoaded) {
-            const QString brushesDir = eSettings::sSettingsDir() + "/brushes";
-            sLoadCollectionsFromDir(brushesDir);
-            sLoadCollectionsFromDir(":/brushes");
-            sLoaded = true;
-        }
-        return enve::make_shared<BrushesContext>(BrushCollectionData::sData);
-    }
+    static qsptr<BrushesContext> sCreateNewContext();
 
-    void setCurrentBrush(SimpleBrushWrapper* const wrapper) {
-        mContext.setSelectedWrapper(wrapper);
-    }
+    void setCurrentBrush(SimpleBrushWrapper* const wrapper);
 
-    SimpleBrushWrapper * getCurrentBrush() {
-        if(mCurrentBrushCWrapper)
-            return mCurrentBrushCWrapper->getSimpleBrush();
-        return nullptr;
-    }
+    SimpleBrushWrapper * getCurrentBrush();
 
     static qsptr<BrushesContext> sPaintContext;
     static qsptr<BrushesContext> sOutlineContext;
 signals:
     void currentBrushChanged(BrushContexedWrapper*);
 private:
-    void brushCWrapperSelected(BrushContexedWrapper * wrapper) {
-        if(mCurrentBrushCWrapper) mCurrentBrushCWrapper->setSelected(false);
-        mCurrentBrushCWrapper = wrapper;
-        emit currentBrushChanged(wrapper);
-    }
+    void setupBookmarksTab();
+    void setNumberBookmarked(const int bookmarked);
+    void updateBrushes();
+    void brushCWrapperSelected(BrushContexedWrapper * wrapper);
     static void sLoadCollectionsFromDir(const QString& mainDirPath);
 
     static bool sLoaded;
 
+    int mNumberBookmarked = 0;
+    ScrollArea* mBookmarksScroll;
     BrushContexedWrapper * mCurrentBrushCWrapper = nullptr;
     BrushesContext& mContext;
 };

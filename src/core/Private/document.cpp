@@ -80,6 +80,11 @@ SmartPathClipboard* Document::getSmartPathClipboard() const {
     return static_cast<SmartPathClipboard*>(contT);
 }
 
+void Document::setPath(const QString &path) {
+    fEvFile = path;
+    emit evFilePathChanged(fEvFile);
+}
+
 void Document::setCanvasMode(const CanvasMode mode) {
     fCanvasMode = mode;
     emit canvasModeSet(mode);
@@ -198,13 +203,73 @@ bool Document::removeGradient(const int id) {
     return true;
 }
 
+void Document::addBookmarkBrush(SimpleBrushWrapper * const brush) {
+    if(!brush) return;
+    removeBookmarkBrush(brush);
+    fBrushes << brush;
+    emit bookmarkBrushAdded(brush);
+}
+
+void Document::removeBookmarkBrush(SimpleBrushWrapper * const brush) {
+    if(fBrushes.removeOne(brush))
+        emit bookmarkBrushRemoved(brush);
+}
+
+void Document::addBookmarkColor(const QColor &color) {
+    removeBookmarkColor(color);
+    fColors << color;
+    emit bookmarkColorAdded(color);
+}
+
+void Document::removeBookmarkColor(const QColor &color) {
+    const auto rgba = color.rgba();
+    for(const auto& iColor : fColors) {
+        if(iColor.rgba() == rgba) {
+            emit bookmarkColorRemoved(color);
+            break;
+        }
+    }
+}
+
+void Document::setBrush(BrushContexedWrapper * const brush) {
+    fBrush = brush->getSimpleBrush();
+    if(fBrush) fBrush->setColor(fBrushColor);
+    emit brushChanged(brush);
+    emit brushSizeChanged(fBrush ? fBrush->getBrushSize() : 0.f);
+    emit brushColorChanged(fBrush ? fBrush->getColor() : Qt::white);
+}
+
+void Document::setBrushColor(const QColor &color) {
+    fBrushColor = color;
+    if(fBrush) fBrush->setColor(fBrushColor);
+    emit brushColorChanged(color);
+}
+
+void Document::incBrushRadius() {
+    if(!fBrush) return;
+    fBrush->incPaintBrushSize(0.3);
+    emit brushSizeChanged(fBrush->getBrushSize());
+}
+
+void Document::decBrushRadius() {
+    if(!fBrush) return;
+    fBrush->decPaintBrushSize(0.3);
+    emit brushSizeChanged(fBrush->getBrushSize());
+}
+
 void Document::clear() {
     setPath("");
     const int nScenes = fScenes.count();
     for(int i = 0; i < nScenes; i++) removeScene(0);
     replaceClipboard(nullptr);
     fGradients.clear();
+    for(const auto brush : fBrushes) {
+        removeBookmarkBrush(brush);
+    }
     fBrushes.clear();
+    for(const auto& color : fColors) {
+        removeBookmarkColor(color);
+    }
     fColors.clear();
 }
 

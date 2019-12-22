@@ -45,8 +45,9 @@ void SavedColorsWidget::addColor(const QColor& color) {
 }
 
 void SavedColorsWidget::removeColor(const QColor &color) {
+    const auto rgba = color.rgba();
     for(const auto wid : mButtons) {
-        if(wid->getColor() == color) {
+        if(wid->getColor().rgba() == rgba) {
             mButtons.removeOne(wid);
             wid->deleteLater();
             break;

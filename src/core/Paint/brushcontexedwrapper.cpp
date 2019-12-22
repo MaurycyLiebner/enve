@@ -16,17 +16,52 @@
 
 #include "brushcontexedwrapper.h"
 #include "brushescontext.h"
+#include "Private/document.h"
+
+BrushContexedWrapper::BrushContexedWrapper(BrushesContext *context,
+                                           const BrushData &brushData) :
+    mBrushData(brushData), mContext(context) {}
+
+void BrushContexedWrapper::setSelected(const bool selected) {
+    if(selected == mSelected) return;
+    mSelected = selected;
+    emit selectionChanged(mSelected);
+}
+
+bool BrushContexedWrapper::selected() const {
+    return mSelected;
+}
+
+bool BrushContexedWrapper::bookmarked() const {
+    return mBookmarked;
+}
+
+void BrushContexedWrapper::setBookmarked(const bool bookmarked) {
+    if(bookmarked == mBookmarked) return;
+    mBookmarked = bookmarked;
+    emit bookmarkedChanged(mBookmarked);
+}
+
+const BrushData &BrushContexedWrapper::getBrushData() const {
+    return mBrushData;
+}
+
+SimpleBrushWrapper *BrushContexedWrapper::getSimpleBrush() {
+    return mBrushData.fWrapper.get();
+}
+
+BrushesContext *BrushContexedWrapper::getContext() const {
+    return mContext;
+}
 
 void BrushContexedWrapper::bookmark() {
     if(mBookmarked) return;
-    mBookmarked = true;
-    mContext->addBookmark(this);
-    emit bookmarkedChanged(mBookmarked);
+    Document::sInstance->addBookmarkBrush(getSimpleBrush());
+    setBookmarked(true);
 }
 
 void BrushContexedWrapper::unbookmark() {
     if(!mBookmarked) return;
-    mBookmarked = false;
-    mContext->removeBookmark(this);
-    emit bookmarkedChanged(mBookmarked);
+    Document::sInstance->removeBookmarkBrush(getSimpleBrush());
+    setBookmarked(false);
 }

@@ -90,10 +90,7 @@ public:
     BoxesClipboard* getBoxesClipboard() const;
     SmartPathClipboard* getSmartPathClipboard() const;
 
-    void setPath(const QString& path) {
-        fEvFile = path;
-        emit evFilePathChanged(fEvFile);
-    }
+    void setPath(const QString& path);
 
     void setCanvasMode(const CanvasMode mode);
 
@@ -118,58 +115,21 @@ public:
     Gradient * getGradientWithRWId(const int rwId) const;
     Gradient * getGradientWithDocumentId(const int id) const;
 
-    void addBookmarkBrush(SimpleBrushWrapper* const brush) {
-        if(!brush) return;
-        removeBookmarkBrush(brush);
-        fBrushes << brush;
-        emit bookmarkBrushAdded(brush);
-    }
+    void addBookmarkBrush(SimpleBrushWrapper* const brush);
 
-    void removeBookmarkBrush(SimpleBrushWrapper* const brush) {
-        if(fBrushes.removeOne(brush))
-            emit bookmarkBrushRemoved(brush);
-    }
+    void removeBookmarkBrush(SimpleBrushWrapper* const brush);
 
-    void addBookmarkColor(const QColor& color) {
-        removeBookmarkColor(color);
-        fColors << color;
-        emit bookmarkColorAdded(color);
-    }
+    void addBookmarkColor(const QColor& color);
 
-    void removeBookmarkColor(const QColor& color) {
-        for(const auto& iColor : fColors) {
-            if(iColor.rgba() == color.rgba()) {
-                emit bookmarkColorRemoved(color);
-                break;
-            }
-        }
-    }
+    void removeBookmarkColor(const QColor& color);
 
-    void setBrush(BrushContexedWrapper * const brush) {
-        fBrush = brush->getSimpleBrush();
-        if(fBrush) fBrush->setColor(fBrushColor);
-        emit brushChanged(brush);
-        emit brushSizeChanged(fBrush ? fBrush->getBrushSize() : 0.f);
-        emit brushColorChanged(fBrush ? fBrush->getColor() : Qt::white);
-    }
+    void setBrush(BrushContexedWrapper * const brush);
 
-    void setBrushColor(const QColor &color) {
-        fBrushColor = color;
-        if(fBrush) fBrush->setColor(fBrushColor);
-        emit brushColorChanged(color);
-    }
+    void setBrushColor(const QColor &color);
 
-    void incBrushRadius() {
-        if(!fBrush) return;
-        fBrush->incPaintBrushSize(0.3);
-        emit brushSizeChanged(fBrush->getBrushSize());
-    }
+    void incBrushRadius();
 
-    void decBrushRadius() {
-        if(!fBrush) return;
-        fBrush->decPaintBrushSize(0.3);
-        emit brushSizeChanged(fBrush->getBrushSize());
-    }
+    void decBrushRadius();
 //
     void clear();
 //

@@ -22,6 +22,7 @@
 #include <QDebug>
 #include <QDockWidget>
 #include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
+#include "Private/document.h"
 
 bool BrushSelectionWidget::sLoaded = false;
 qsptr<BrushesContext> BrushSelectionWidget::sPaintContext;
@@ -32,7 +33,46 @@ BrushSelectionWidget::BrushSelectionWidget(BrushesContext& context,
     QTabWidget(parent), mContext(context) {
     setSizePolicy(QSizePolicy::Preferred, sizePolicy().verticalPolicy());
 
+    setupBookmarksTab();
     updateBrushes();
+}
+
+void BrushSelectionWidget::setupBookmarksTab() {
+    mBookmarksScroll = new ScrollArea(this);
+    const auto tabWidget = new QWidget(this);
+    const auto tabWidgetLay = new FlowLayout(tabWidget, 0, 0, 0);
+    connect(&mContext, &BrushesContext::bookmarkAdded,
+            this, [this, tabWidgetLay, tabWidget](BrushContexedWrapper* const brush) {
+        const auto bWidget = new BrushWidget(brush, tabWidget);
+        connect(bWidget, &BrushWidget::selected,
+                this, &BrushSelectionWidget::brushCWrapperSelected);
+        connect(&mContext, &BrushesContext::bookmarkRemoved,
+                bWidget, [this, bWidget](BrushContexedWrapper* const brush) {
+            if(brush == bWidget->getBrush()) {
+                bWidget->deleteLater();
+                setNumberBookmarked(mNumberBookmarked - 1);
+            }
+        });
+
+        tabWidgetLay->addWidget(bWidget);
+        setNumberBookmarked(mNumberBookmarked + 1);
+    });
+
+    tabWidget->setLayout(tabWidgetLay);
+    mBookmarksScroll->setWidget(tabWidget);
+    mBookmarksScroll->hide();
+}
+
+void BrushSelectionWidget::setNumberBookmarked(const int bookmarked) {
+    if(mNumberBookmarked == bookmarked) return;
+    if(mNumberBookmarked == 0 && bookmarked > 0) {
+        insertTab(0, mBookmarksScroll, "Bookmarks");
+        mBookmarksScroll->show();
+    } else if(bookmarked == 0) {
+        removeTab(0);
+        mBookmarksScroll->hide();
+    }
+    mNumberBookmarked = bookmarked;
 }
 
 void BrushSelectionWidget::updateBrushes() {
@@ -50,6 +90,33 @@ void BrushSelectionWidget::updateBrushes() {
         tabScroll->setWidget(tabWidget);
         addTab(tabScroll, coll.fName);
     }
+}
+
+qsptr<BrushesContext> BrushSelectionWidget::sCreateNewContext() {
+    if(!sLoaded) {
+        const QString brushesDir = eSettings::sSettingsDir() + "/brushes";
+        sLoadCollectionsFromDir(brushesDir);
+        sLoadCollectionsFromDir(":/brushes");
+        sLoaded = true;
+    }
+    return enve::make_shared<BrushesContext>(BrushCollectionData::sData);
+}
+
+void BrushSelectionWidget::setCurrentBrush(SimpleBrushWrapper * const wrapper) {
+    mContext.setSelectedWrapper(wrapper);
+}
+
+SimpleBrushWrapper *BrushSelectionWidget::getCurrentBrush() {
+    if(mCurrentBrushCWrapper)
+        return mCurrentBrushCWrapper->getSimpleBrush();
+    return nullptr;
+}
+
+void BrushSelectionWidget::brushCWrapperSelected(BrushContexedWrapper *wrapper) {
+    if(mCurrentBrushCWrapper && mCurrentBrushCWrapper != wrapper)
+        mCurrentBrushCWrapper->setSelected(false);
+    mCurrentBrushCWrapper = wrapper;
+    emit currentBrushChanged(wrapper);
 }
 
 void loadBrushFromFile(const QString &path, BrushCollectionData& coll) {

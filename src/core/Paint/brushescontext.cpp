@@ -1,4 +1,6 @@
 #include "brushescontext.h"
+
+#include "Private/document.h"
 QList<BrushCollectionData> BrushCollectionData::sData;
 
 BrushContexedCollection::BrushContexedCollection(BrushesContext * const context,
@@ -13,6 +15,18 @@ BrushesContext::BrushesContext(const QList<BrushCollectionData> &raw) {
     for(const auto& coll : raw) {
         fCollections << BrushContexedCollection(this, coll);
     }
+    connect(Document::sInstance, &Document::bookmarkBrushAdded,
+            this, [this](SimpleBrushWrapper* const brush) {
+        const auto wrapper = brushWrapper(brush);
+        wrapper->setBookmarked(true);
+        emit bookmarkAdded(wrapper);
+    });
+    connect(Document::sInstance, &Document::bookmarkBrushRemoved,
+            this, [this](SimpleBrushWrapper* const brush) {
+        const auto wrapper = brushWrapper(brush);
+        wrapper->setBookmarked(false);
+        emit bookmarkRemoved(wrapper);
+    });
 }
 
 BrushContexedWrapper *BrushesContext::brushWrapper(
@@ -25,18 +39,6 @@ BrushContexedWrapper *BrushesContext::brushWrapper(
         }
     }
     return nullptr;
-}
-
-void BrushesContext::addBookmark(BrushContexedWrapper * const brush) {
-    if(fBookmarked.contains(brush)) return;
-    fBookmarked << brush;
-    emit bookmarkAdded(brush);
-}
-
-void BrushesContext::removeBookmark(BrushContexedWrapper * const brush) {
-    if(fBookmarked.removeOne(brush)) {
-        emit bookmarkRemoved(brush);
-    }
 }
 
 bool BrushesContext::setSelectedWrapper(SimpleBrushWrapper * const wrapper) {

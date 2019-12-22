@@ -32,38 +32,25 @@ class BrushContexedWrapper : public SelfRef {
     Q_OBJECT
     e_OBJECT
 public:
-    void setSelected(const bool selected) {
-        if(selected == mSelected) return;
-        mSelected = selected;
-        emit selectionChanged(mSelected);
-    }
+    void setSelected(const bool selected);
 
-    bool selected() const {
-        return mSelected;
-    }
+    bool selected() const;
 
-    bool bookmarked() const {
-        return mBookmarked;
-    }
+    bool bookmarked() const;
 
-    const BrushData& getBrushData() const {
-        return mBrushData;
-    }
+    void setBookmarked(const bool bookmarked);
 
-    SimpleBrushWrapper * getSimpleBrush() {
-        return mBrushData.fWrapper.get();
-    }
+    const BrushData& getBrushData() const;
 
-    BrushesContext* getContext() const {
-        return mContext;
-    }
+    SimpleBrushWrapper * getSimpleBrush();
+
+    BrushesContext* getContext() const;
 
     void bookmark();
     void unbookmark();
 protected:
     BrushContexedWrapper(BrushesContext* context,
-                         const BrushData& brushData) :
-        mBrushData(brushData), mContext(context) {}
+                         const BrushData& brushData);
 signals:
     void selectionChanged(bool);
     void bookmarkedChanged(bool);

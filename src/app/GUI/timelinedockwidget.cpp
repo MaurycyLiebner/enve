@@ -136,8 +136,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
             if(act->text() == "Bookmark") {
                 const auto ctxt = BrushSelectionWidget::sPaintContext;
                 const auto wrapper = ctxt->brushWrapper(brush);
-                if(!wrapper) return;
-                ctxt->addBookmark(wrapper);
+                if(wrapper) wrapper->bookmark();
             }
         }
     });

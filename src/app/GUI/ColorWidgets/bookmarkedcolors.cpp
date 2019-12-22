@@ -31,10 +31,11 @@ void BookmarkedColors::addColor(const QColor &color) {
 }
 
 void BookmarkedColors::removeColor(const QColor &color) {
+    const auto rgba = color.rgba();
     const int iCount = count();
     for(int i = 0 ; i < iCount; i++) {
         const auto button = static_cast<SavedColorButton*>(getWidget(i));
-        if(button->getColor() == color) {
+        if(button->getColor().rgba() == rgba) {
             removeWidget(button);
             break;
         }
