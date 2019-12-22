@@ -462,6 +462,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
             this, [this](const QColor& color) {
         setCurrentColor(color);
         emitFullColorChangedSignal();
+        Document::sInstance->actionFinished();
     });
 
     connect(mTabWidget, &QTabWidget::currentChanged,
