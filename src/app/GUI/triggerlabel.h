@@ -10,6 +10,7 @@ protected:
     void mousePressEvent(QMouseEvent *ev);
 signals:
     void triggered();
+    void requestContextMenu(QPoint);
 private:
 };
 

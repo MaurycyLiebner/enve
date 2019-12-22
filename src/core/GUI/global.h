@@ -22,6 +22,10 @@ extern int MIN_WIDGET_DIM;
 extern int BUTTON_DIM;
 extern int KEY_RECT_SIZE;
 
+#include <QPixmap>
+
+extern QPixmap* ALPHA_MESH_PIX;
+
 #include <QString>
 
 QString gSingleLineTooltip(const QString& text);

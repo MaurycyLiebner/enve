@@ -15,6 +15,18 @@ BrushesContext::BrushesContext(const QList<BrushCollectionData> &raw) {
     }
 }
 
+BrushContexedWrapper *BrushesContext::brushWrapper(
+        const SimpleBrushWrapper * const brush) {
+    for(const auto& coll : fCollections) {
+        for(auto& wrapper : coll.fBrushes) {
+            if(wrapper->getSimpleBrush() == brush) {
+                return wrapper.get();
+            }
+        }
+    }
+    return nullptr;
+}
+
 void BrushesContext::addBookmark(BrushContexedWrapper * const brush) {
     if(fBookmarked.contains(brush)) return;
     fBookmarked << brush;

@@ -23,6 +23,7 @@
 #include "colorlabel.h"
 #include "GUI/global.h"
 #include "GUI/actionbutton.h"
+#include "GUI/ColorWidgets/savedcolorswidget.h"
 
 void moveAndResizeValueRect(const int rect_x_t,
                             int *rect_y_t,
@@ -93,8 +94,10 @@ void ColorSettingsWidget::setCurrentColor(const qreal h_t,
     hslSSpin->setValueExternal(hslSat);
     lSpin->setValueExternal(lig);
 
+    mBookmarkedColors->setColor(QColor::fromHsvF(h_t, s_t, v_t, a_t));
+
     if(mAlphaHidden) return;
-    mColorLabel->setAlpha(alphaGl);
+    mColorLabel->setAlpha(a_t);
     aRect->setColorHSV_f(hueGl, satGl, valGl);
     aRect->setDisplayedValue(a_t);
     aSpin->setValueExternal(a_t);
@@ -206,6 +209,7 @@ ColorSetting ColorSettingsWidget::getColorSetting(
 void ColorSettingsWidget::emitColorChangedSignal() {
     const auto colorSetting = getColorSetting(ColorSettingType::change,
                                               mLastTriggered);
+    mBookmarkedColors->setColor(colorSetting.getColor());
     emit colorSettingSignal(colorSetting);
 }
 
@@ -451,6 +455,14 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
             this, &ColorSettingsWidget::setColorMode);
 
     mWidgetsLayout->addLayout(mColorModeLayout);
+
+    mBookmarkedColors = new SavedColorsWidget(this);
+    mWidgetsLayout->addWidget(mBookmarkedColors);
+    connect(mBookmarkedColors, &SavedColorsWidget::colorSet,
+            this, [this](const QColor& color) {
+        setCurrentColor(color);
+        emitFullColorChangedSignal();
+    });
 
     connect(mTabWidget, &QTabWidget::currentChanged,
             this, &ColorSettingsWidget::moveAlphaWidgetToTab);

@@ -16,7 +16,6 @@
 
 #include "global.h"
 
-
 QString gSingleLineTooltip(const QString &text) {
     return "<p style='white-space:pre'>" + text + "</p>";
 }

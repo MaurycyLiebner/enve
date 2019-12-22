@@ -19,39 +19,44 @@
 #include <QAction>
 #include <QMenu>
 #include "colorhelpers.h"
+#include "Private/document.h"
 
 SavedColorsWidget::SavedColorsWidget(QWidget *parent)
     : QWidget(parent) {
-    mMainLayout = new QHBoxLayout(this);
-    mMainLayout->setAlignment(Qt::AlignLeft);
+    mMainLayout = new FlowLayout(this);
     setLayout(mMainLayout);
+    for(const auto& color : Document::sInstance->fColors) {
+        addColor(color);
+    }
+    connect(Document::sInstance, &Document::bookmarkColorAdded,
+            this, &SavedColorsWidget::addColor);
+    connect(Document::sInstance, &Document::bookmarkColorRemoved,
+            this, &SavedColorsWidget::removeColor);
+    setVisible(!mButtons.isEmpty());
 }
 
-void SavedColorsWidget::addColorButton(const QColor& colorT) {
-    SavedColorButton *buttonT = new SavedColorButton(colorT, this);
-    connect(buttonT, SIGNAL(colorButtonPressed(QColor)),
-            this, SLOT(setColorFromButton(QColor) ) );
-    mMainLayout->addWidget(buttonT, Qt::AlignLeft);
+void SavedColorsWidget::addColor(const QColor& color) {
+    const auto button = new SavedColorButton(color, this);
+    connect(button, &SavedColorButton::selected,
+            this, &SavedColorsWidget::colorSet);
+    mMainLayout->addWidget(button);
+    mButtons << button;
+    setVisible(!mButtons.isEmpty());
 }
 
-void SavedColorsWidget::mousePressEvent(QMouseEvent *e) {
-    if(e->button() == Qt::RightButton) {
-        QMenu menu(this);
-        menu.addAction("Add Color");
-        menu.addAction("Delete Collection");
-        QAction *selected_action = menu.exec(e->globalPos());
-        if(selected_action != nullptr) {
-            if(selected_action->text() == "Add Color") {
-                //addColorButton(window_variables->current_color);
-            } else if(selected_action->text() == "Delete Collection") {
-
-            }
-        } else {
-
+void SavedColorsWidget::removeColor(const QColor &color) {
+    for(const auto wid : mButtons) {
+        if(wid->getColor() == color) {
+            mButtons.removeOne(wid);
+            wid->deleteLater();
+            break;
         }
     }
+    setVisible(!mButtons.isEmpty());
 }
 
-void SavedColorsWidget::setColorFromButton(const QColor &colorT) {
-    Q_UNUSED(colorT)
+void SavedColorsWidget::setColor(const QColor &color) {
+    for(const auto wid : mButtons) {
+        wid->setSelected(wid->getColor().rgba() == color.rgba());
+    }
 }

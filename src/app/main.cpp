@@ -37,6 +37,8 @@ int MIN_WIDGET_DIM;
 int BUTTON_DIM;
 int KEY_RECT_SIZE;
 
+QPixmap* ALPHA_MESH_PIX;
+
 void setDefaultFormat() {
     QSurfaceFormat format;
     format.setVersion(3, 3);
@@ -58,6 +60,20 @@ int main(int argc, char *argv[]) {
     MIN_WIDGET_DIM = FONT_HEIGHT*4/3;
     BUTTON_DIM = qRound(MIN_WIDGET_DIM*1.1);
     KEY_RECT_SIZE = MIN_WIDGET_DIM*3/5;
+    QPixmap alphaMeshPix;
+    {
+        const int dim = MIN_WIDGET_DIM/2;
+        alphaMeshPix = QPixmap(2*dim, 2*dim);
+        ALPHA_MESH_PIX = &alphaMeshPix;
+        const QColor light = QColor::fromRgbF(0.2, 0.2, 0.2);
+        const QColor dark = QColor::fromRgbF(0.4, 0.4, 0.4);
+        QPainter p(ALPHA_MESH_PIX);
+        p.fillRect(0, 0, dim, dim, light);
+        p.fillRect(dim, 0, dim, dim, dark);
+        p.fillRect(0, dim, dim, dim, dark);
+        p.fillRect(dim, dim, dim, dim, light);
+        p.end();
+    }
 
     //#ifdef QT_DEBUG
     //    const qint64 pId = QCoreApplication::applicationPid();

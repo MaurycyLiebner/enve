@@ -19,6 +19,8 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QWidget>
+#include <QMenu>
+#include "Private/document.h"
 #include "colorwidgetshaders.h"
 
 ColorLabel::ColorLabel(QWidget *parent) : ColorWidget(parent) {
@@ -27,7 +29,18 @@ ColorLabel::ColorLabel(QWidget *parent) : ColorWidget(parent) {
 }
 
 void ColorLabel::mousePressEvent(QMouseEvent *e) {
-    Q_UNUSED(e);
+    QMenu menu(this);
+    menu.addAction("Bookmark");
+    const auto act = menu.exec(e->globalPos());
+    if(act) {
+        if(act->text() == "Bookmark") {
+            const QColor col = QColor::fromHsvF(qreal(mHue),
+                                                qreal(mSaturation),
+                                                qreal(mValue),
+                                                mAlpha);
+            Document::sInstance->addBookmarkColor(col);
+        }
+    }
 }
 
 void ColorLabel::setAlpha(const qreal alpha_t) {

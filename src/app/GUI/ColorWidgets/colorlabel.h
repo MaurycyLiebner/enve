@@ -27,9 +27,6 @@ public:
     void saveCurrentColorAsLast();
     void setLastColorHSV(GLfloat h, GLfloat s, GLfloat v);
     void mousePressEvent(QMouseEvent *e);
-signals:
-
-public slots:
     void setAlpha(const qreal alpha_t);
 private:
     void paintGL();

@@ -68,6 +68,7 @@ TEMPLATE = app
 SOURCES += main.cpp\
     GUI/BoxesList/boxscroller.cpp \
     GUI/BrushWidgets/bookmarkedbrushes.cpp \
+    GUI/ColorWidgets/bookmarkedcolors.cpp \
     GUI/RenderWidgets/outputsettingsdialog.cpp \
     GUI/RenderWidgets/rendersettingsdialog.cpp \
     GUI/RenderWidgets/rendersettingsdisplaywidget.cpp \
@@ -104,7 +105,6 @@ SOURCES += main.cpp\
     GUI/ColorWidgets/colorpickingwidget.cpp \
     GUI/ColorWidgets/savedcolorbutton.cpp \
     GUI/ColorWidgets/savedcolorswidget.cpp \
-    GUI/ColorWidgets/savedcolorwidgets.cpp \
     GUI/GradientWidgets/gradientwidget.cpp \
     GUI/ColorWidgets/glwidget.cpp \
     GUI/widgetwrappernode.cpp \
@@ -171,6 +171,7 @@ SOURCES += main.cpp\
 HEADERS  += \
     GUI/BoxesList/boxscroller.h \
     GUI/BrushWidgets/bookmarkedbrushes.h \
+    GUI/ColorWidgets/bookmarkedcolors.h \
     GUI/RenderWidgets/outputsettingsdialog.h \
     GUI/RenderWidgets/rendersettingsdialog.h \
     GUI/RenderWidgets/rendersettingsdisplaywidget.h \
@@ -206,7 +207,6 @@ HEADERS  += \
     GUI/ColorWidgets/colorpickingwidget.h \
     GUI/ColorWidgets/savedcolorbutton.h \
     GUI/ColorWidgets/savedcolorswidget.h \
-    GUI/ColorWidgets/savedcolorwidgets.h \
     GUI/GradientWidgets/gradientwidget.h \
     GUI/ColorWidgets/glwidget.h \
     GUI/widgetwrappernode.h \

@@ -60,6 +60,7 @@
 #include "envelicense.h"
 #include "switchbutton.h"
 #include "centralwidget.h"
+#include "ColorWidgets/bookmarkedcolors.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 
@@ -251,10 +252,10 @@ MainWindow::MainWindow(Document& document,
     mLeftDock2->setTitleBarWidget(leftDock2Label);
 
     const auto bBrush = new BookmarkedBrushes(true, 64, pCtxt.get(), this);
-    mCentralWidget = new CentralWidget(bBrush, mLayoutHandler->sceneLayout());
-
-//    const auto bColor = new BookmarkedColors(centralWidget);
-//    centralLay->addWidget(bColor, 0, Qt::AlignRight);
+    const auto bColor = new BookmarkedColors(true, 64, this);
+    mCentralWidget = new CentralWidget(bBrush,
+                                       mLayoutHandler->sceneLayout(),
+                                       bColor);
 
     setupToolBar();
     setupStatusBar();
@@ -568,7 +569,7 @@ void MainWindow::setupMenuBar() {
     connect(mFillAndStrokeSettingsDock, &QAction::toggled,
             mFillStrokeSettingsDock, &QDockWidget::setVisible);
 
-    mBrushSettingsDockAction = mPanelsMenu->addAction("Brush Settings");
+    mBrushSettingsDockAction = mPanelsMenu->addAction("Paint Brush");
     mBrushSettingsDockAction->setCheckable(true);
     mBrushSettingsDockAction->setChecked(false);
     mBrushSettingsDockAction->setShortcut(QKeySequence(Qt::Key_B));

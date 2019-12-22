@@ -118,6 +118,33 @@ public:
     Gradient * getGradientWithRWId(const int rwId) const;
     Gradient * getGradientWithDocumentId(const int id) const;
 
+    void addBookmarkBrush(SimpleBrushWrapper* const brush) {
+        if(!brush) return;
+        removeBookmarkBrush(brush);
+        fBrushes << brush;
+        emit bookmarkBrushAdded(brush);
+    }
+
+    void removeBookmarkBrush(SimpleBrushWrapper* const brush) {
+        if(fBrushes.removeOne(brush))
+            emit bookmarkBrushRemoved(brush);
+    }
+
+    void addBookmarkColor(const QColor& color) {
+        removeBookmarkColor(color);
+        fColors << color;
+        emit bookmarkColorAdded(color);
+    }
+
+    void removeBookmarkColor(const QColor& color) {
+        for(const auto& iColor : fColors) {
+            if(iColor.rgba() == color.rgba()) {
+                emit bookmarkColorRemoved(color);
+                break;
+            }
+        }
+    }
+
     void setBrush(BrushContexedWrapper * const brush) {
         fBrush = brush->getSimpleBrush();
         if(fBrush) fBrush->setColor(fBrushColor);
@@ -182,6 +209,11 @@ signals:
     void brushChanged(BrushContexedWrapper* brush);
     void brushColorChanged(QColor color);
     void brushSizeChanged(float size);
+//
+    void bookmarkColorAdded(QColor color);
+    void bookmarkColorRemoved(QColor color);
+    void bookmarkBrushAdded(SimpleBrushWrapper* brush);
+    void bookmarkBrushRemoved(SimpleBrushWrapper* brush);
 //
     void evFilePathChanged(QString);
     void documentChanged();

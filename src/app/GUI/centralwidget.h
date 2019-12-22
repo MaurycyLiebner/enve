@@ -10,6 +10,7 @@ class CentralWidget : public QWidget {
 public:
     CentralWidget(BookmarkedWidget* left,
                   QWidget* central,
+                  BookmarkedWidget* right,
                   QWidget* parent = nullptr);
 
     void setSidesVisibilitySetting(const bool vis);
@@ -24,7 +25,7 @@ private:
     CanvasMode mMode = CanvasMode::boxTransform;
     BookmarkedWidget* const mLeft;
     QWidget* const mCentral;
-    //QWidget* mRight;
+    BookmarkedWidget* const mRight;
 };
 
 #endif // CENTRALWIDGET_H

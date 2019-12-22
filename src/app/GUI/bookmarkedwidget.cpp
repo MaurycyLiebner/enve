@@ -73,7 +73,7 @@ void BookmarkedWidget::updateSize() {
 }
 
 void BookmarkedWidget::updateLayout() {
-    if(mWidgets.isEmpty()) return hide();
+    if(mWidgets.isEmpty()) return;
     const auto setPos = mVertical ?
                 [](QWidget* wid, const int y) { wid->move(0, y); } :
                 [](QWidget* wid, const int x) { wid->move(x, 0); };
@@ -116,6 +116,4 @@ void BookmarkedWidget::updateLayout() {
         else mDownArrow->setFixedWidth(dim - currXY);
         mDownArrow->setEnabled(mLastViewed < mWidgets.count() - 1);
     } else mDownArrow->hide();
-
-    show();
 }

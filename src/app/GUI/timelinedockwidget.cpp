@@ -105,11 +105,46 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
 
     mColorLabel = new TriggerLabel("");
     mColorLabel->setToolTip(gSingleLineTooltip("Current Color", "E"));
+    connect(mColorLabel, &TriggerLabel::requestContextMenu,
+            this, [this](const QPoint& pos) {
+        QMenu menu(this);
+        menu.addAction("Bookmark");
+        const auto act = menu.exec(pos);
+        if(act) {
+            if(act->text() == "Bookmark") {
+                const QColor& col = mDocument.fBrushColor;
+                Document::sInstance->addBookmarkColor(col);
+            }
+        }
+    });
+    connect(mColorLabel, &TriggerLabel::triggered, this, [this]() {
+        mMainWindow->toggleFillStrokeSettingsDockVisible();
+    });
 
     connect(&mDocument, &Document::brushColorChanged,
             this, &TimelineDockWidget::setBrushColor);
     mBrushLabel = new TriggerLabel("");
     mBrushLabel->setToolTip(gSingleLineTooltip("Current Brush", "B"));
+    connect(mBrushLabel, &TriggerLabel::requestContextMenu,
+            this, [this](const QPoint& pos) {
+        const auto brush = mDocument.fBrush;
+        if(!brush) return;
+        QMenu menu(this);
+        menu.addAction("Bookmark");
+        const auto act = menu.exec(pos);
+        if(act) {
+            if(act->text() == "Bookmark") {
+                const auto ctxt = BrushSelectionWidget::sPaintContext;
+                const auto wrapper = ctxt->brushWrapper(brush);
+                if(!wrapper) return;
+                ctxt->addBookmark(wrapper);
+            }
+        }
+    });
+    connect(mBrushLabel, &TriggerLabel::triggered, this, [this]() {
+        mMainWindow->togglePaintBrushDockVisible();
+    });
+
     connect(&mDocument, &Document::brushChanged,
             this, &TimelineDockWidget::setBrush);
 
@@ -333,7 +368,15 @@ void TimelineDockWidget::updateButtonsVisibility(const CanvasMode mode) {
 void TimelineDockWidget::setBrushColor(const QColor &color) {
     const int dim = mToolBar->height() - 2;
     QPixmap pix(dim, dim);
-    pix.fill(color);
+    if(color.alpha() == 255) {
+        pix.fill(color);
+    } else {
+        QPainter p(&pix);
+        p.drawTiledPixmap(0, 0, dim, dim, *ALPHA_MESH_PIX);
+        p.fillRect(0, 0, dim, dim, color);
+        p.end();
+    }
+
     mColorLabel->setPixmap(pix);
 }
 

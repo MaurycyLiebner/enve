@@ -32,6 +32,7 @@
 
 class ColorLabel;
 class ActionButton;
+class SavedColorsWidget;
 
 class ColorSettingsWidget : public QWidget {
     Q_OBJECT
@@ -118,6 +119,7 @@ private:
     QHBoxLayout *mColorModeLayout = new QHBoxLayout();
     QLabel *mColorModeLabel = new QLabel("Color model:", this);
     QComboBox *mColorModeCombo;
+    SavedColorsWidget* mBookmarkedColors;
 
     QTabWidget *mTabWidget = new QTabWidget();
     QVBoxLayout *mWidgetsLayout = new QVBoxLayout();

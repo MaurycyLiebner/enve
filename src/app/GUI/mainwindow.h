@@ -147,6 +147,12 @@ public:
     void installLineFilter(QObject* const object) {
         object->installEventFilter(mLineFilter);
     }
+
+    void togglePaintBrushDockVisible()
+    { mBrushSettingsDockAction->toggle(); }
+
+    void toggleFillStrokeSettingsDockVisible()
+    { mFillAndStrokeSettingsDock->toggle(); }
 public:
     //void saveOutput(QString renderDest);
     //void renderOutput();

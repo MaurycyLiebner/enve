@@ -26,15 +26,26 @@ class SavedColorButton : public QWidget {
 public:
     explicit SavedColorButton(const QColor& colorT,
                               QWidget *parent = nullptr);
-
-    void mousePressEvent(QMouseEvent *e);
+    const QColor& getColor() const
+    { return mColor; }
+    void setSelected(const bool selected);
+protected:
     void paintEvent(QPaintEvent *);
+    void mousePressEvent(QMouseEvent *e);
+    void enterEvent(QEvent*) {
+        mHovered = true;
+        update();
+    }
+    void leaveEvent(QEvent*) {
+        mHovered = false;
+        update();
+    }
 private:
+    bool mHovered = false;
+    bool mSelected = false;
     QColor mColor;
-
 signals:
-    void colorButtonPressed(QColor);
-public slots:
+    void selected(QColor);
 };
 
 #endif // SAVEDCOLORBUTTON_H

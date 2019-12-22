@@ -18,23 +18,24 @@
 #define SAVEDCOLORSWIDGET_H
 
 #include <QWidget>
-#include <QVBoxLayout>
+#include "GUI/BrushWidgets/flowlayout.h"
 #include "colorhelpers.h"
 
-class SavedColorsWidget : public QWidget
-{
+class SavedColorButton;
+
+class SavedColorsWidget : public QWidget {
     Q_OBJECT
 public:
     explicit SavedColorsWidget(QWidget *parent = nullptr);
 
-    void addColorButton(const QColor& colorT);
-    void mousePressEvent(QMouseEvent *e);
+    void addColor(const QColor& color);
+    void removeColor(const QColor& color);
+    void setColor(const QColor& color);
 private:
-    QHBoxLayout *mMainLayout = nullptr;
+    FlowLayout *mMainLayout = nullptr;
+    QList<SavedColorButton*> mButtons;
 signals:
-
-public slots:
-    void setColorFromButton(const QColor &colorT);
+    void colorSet(QColor);
 };
 
 #endif // SAVEDCOLORSWIDGET_H

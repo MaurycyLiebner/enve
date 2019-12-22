@@ -32,8 +32,8 @@ class BrushesContext : public SelfRef {
 public:
     BrushesContext(const QList<BrushCollectionData>& raw);
 
+    BrushContexedWrapper* brushWrapper(const SimpleBrushWrapper * const brush);
     void addBookmark(BrushContexedWrapper* const brush);
-
     void removeBookmark(BrushContexedWrapper* const brush);
 
     bool setSelectedWrapper(SimpleBrushWrapper* const wrapper);

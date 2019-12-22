@@ -19,34 +19,55 @@
 #include <QMenu>
 #include <QAction>
 #include "GUI/global.h"
+#include "Private/document.h"
 
 SavedColorButton::SavedColorButton(const QColor &colorT,
                                    QWidget *parent) :
     QWidget(parent) {
     mColor = colorT;
-    setFixedSize(2*MIN_WIDGET_DIM, 2*MIN_WIDGET_DIM);
+    setFixedSize(MIN_WIDGET_DIM, MIN_WIDGET_DIM);
+}
+
+void SavedColorButton::setSelected(const bool selected) {
+    mSelected = selected;
+    update();
 }
 
 void SavedColorButton::mousePressEvent(QMouseEvent *e) {
     if(e->button() == Qt::LeftButton) {
-        emit colorButtonPressed(mColor);
+        emit selected(mColor);
     } else if(e->button() == Qt::RightButton) {
         QMenu menu(this);
-        menu.addAction("Delete Color");
-        QAction *selected_action = menu.exec(e->globalPos());
-        if(selected_action != nullptr) {
-            if(selected_action->text() == "Delete Color") {
-                deleteLater();
+        menu.addAction("Unbookmark");
+        const auto act = menu.exec(e->globalPos());
+        if(act) {
+            if(act->text() == "Unbookmark") {
+                Document::sInstance->removeBookmarkColor(getColor());
             }
-        } else {
-
         }
     }
 }
 
 void SavedColorButton::paintEvent(QPaintEvent *) {
     QPainter p(this);
+    if(mColor.alpha() != 255) {
+        p.drawTiledPixmap(rect(), *ALPHA_MESH_PIX);
+    }
     p.fillRect(rect(), mColor);
+    p.setPen(Qt::black);
+    p.drawRect(0, 0, width() - 1, height() - 1);
+    p.setPen(Qt::white);
+    p.drawRect(3, 3, width() - 7, height() - 7);
+    if(mSelected) {
+        if(mHovered) {
+            p.setPen(QPen(Qt::red, 1, Qt::DashLine));
+            p.drawRect(2, 2, width() - 5, height() - 5);
+        }
+        p.setPen(QPen(Qt::red, 2));
+        p.drawRect(1, 1, width() - 2, height() - 2);
+    } else if(mHovered) {
+        p.setPen(QPen(Qt::red, 1, Qt::DashLine));
+        p.drawRect(0, 0, width() - 1, height() - 1);
+    }
     p.end();
 }
-
