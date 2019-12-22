@@ -17,7 +17,7 @@
 #ifndef GRAPHKEY_H
 #define GRAPHKEY_H
 #include "key.h"
-#include "../basicreadwrite.h"
+#include "../ReadWrite/basicreadwrite.h"
 #include "../pointhelpers.h"
 
 enum QrealPointType : short;

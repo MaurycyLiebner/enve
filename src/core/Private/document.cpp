@@ -204,6 +204,8 @@ void Document::clear() {
     for(int i = 0; i < nScenes; i++) removeScene(0);
     replaceClipboard(nullptr);
     fGradients.clear();
+    fBrushes.clear();
+    fColors.clear();
 }
 
 void Document::SWT_setupAbstraction(SWT_Abstraction * const abstraction,

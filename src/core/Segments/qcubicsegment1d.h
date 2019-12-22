@@ -19,8 +19,9 @@
 #include <QPointF>
 #include <QPainterPath>
 #include "../simplemath.h"
-#include "../basicreadwrite.h"
 typedef std::pair<qreal, qreal> qrealPair;
+class eWriteStream;
+class eReadStream;
 
 struct qCubicSegment1D {
     typedef std::pair<qCubicSegment1D, qCubicSegment1D> Pair;

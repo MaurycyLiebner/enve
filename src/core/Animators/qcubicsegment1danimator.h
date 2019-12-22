@@ -18,7 +18,7 @@
 #define QCUBICSEGMENT1DANIMATOR_H
 #include "Animators/interpolationanimatort.h"
 #include "Segments/qcubicsegment1d.h"
-#include "basicreadwrite.h"
+#include "../ReadWrite/basicreadwrite.h"
 class qCubicSegment1DAnimator;
 
 class qCubicSegment1DAnimator : public InterpolationAnimatorT<qCubicSegment1D> {

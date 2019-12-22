@@ -50,25 +50,27 @@
 #include "GUI/GradientWidgets/gradientwidget.h"
 #include <QMessageBox>
 #include "PathEffects/patheffectsinclude.h"
-#include "basicreadwrite.h"
+#include "ReadWrite/basicreadwrite.h"
 #include "Boxes/internallinkcanvas.h"
 #include "Boxes/smartvectorpath.h"
 #include "Sound/singlesound.h"
 #include "Sound/soundcomposition.h"
 #include "Animators/rastereffectanimators.h"
+#include "ReadWrite/filefooter.h"
 
 void MainWindow::loadEVFile(const QString &path) {
     QFile file(path);
     if(!file.exists()) RuntimeThrow("File does not exist " + path);
     if(!file.open(QIODevice::ReadOnly))
         RuntimeThrow("Could not open file " + path);
-    eReadStream readStream(&file);
-
     try {
-        if(!FileFooter::sCompatible(&file))
-            RuntimeThrow("Incompatible or incomplete data");
+        const int evVersion = FileFooter::sReadEvFileVersion(&file);
+        if(evVersion <= 0) RuntimeThrow("Incompatible or incomplete data");
+        eReadStream readStream(evVersion, &file);
+
         const qint64 savedPos = file.pos();
-        const qint64 pos = file.size() - FileFooter::sSize() - qint64(sizeof(int));
+        const qint64 pos = file.size() - FileFooter::sSize(evVersion) -
+                qint64(sizeof(int));
         file.seek(pos);
         readStream.readFutureTable();
         file.seek(savedPos);

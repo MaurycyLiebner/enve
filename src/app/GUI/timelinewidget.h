@@ -24,7 +24,7 @@
 #include <QMenuBar>
 #include "smartPointers/stdselfref.h"
 #include "framerange.h"
-#include "basicreadwrite.h"
+#include "ReadWrite/basicreadwrite.h"
 
 class SWT_Abstraction;
 class FrameScrollBar;

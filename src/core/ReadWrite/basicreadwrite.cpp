@@ -14,16 +14,5 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "RasterEffects/customrastereffect.h"
 #include "ReadWrite/basicreadwrite.h"
 
-CustomRasterEffect::CustomRasterEffect(const QString &name,
-                                       const HardwareSupport hwSupport,
-                                       const bool hwInterchangeable) :
-    RasterEffect(name, hwSupport, hwInterchangeable,
-                 RasterEffectType::CUSTOM) {}
-
-void CustomRasterEffect::writeIdentifier(eWriteStream& dst) const {
-    RasterEffect::writeIdentifier(dst);
-    getIdentifier().write(dst);
-}

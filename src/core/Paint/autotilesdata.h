@@ -19,7 +19,7 @@
 #include <QtCore>
 #include <QList>
 #include "skia/skiaincludes.h"
-#include "basicreadwrite.h"
+#include "../ReadWrite/basicreadwrite.h"
 #ifndef TILE_SIZE
     #define TILE_SIZE 64
 #endif

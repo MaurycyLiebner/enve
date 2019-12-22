@@ -21,7 +21,7 @@ class Canvas;
 #include "../singlewidgettarget.h"
 #include "../framerange.h"
 #include "../MovablePoints/pointshandler.h"
-#include "../basicreadwrite.h"
+#include "../ReadWrite/basicreadwrite.h"
 
 class ComplexAnimator;
 class Key;

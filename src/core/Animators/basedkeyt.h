@@ -18,7 +18,7 @@
 #define BASEDKEYT_H
 #include "key.h"
 #include "../differsinterpolate.h"
-#include "../basicreadwrite.h"
+#include "../ReadWrite/basicreadwrite.h"
 
 template <typename B, typename T>
 class BasedKeyT : public B {

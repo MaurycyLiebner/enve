@@ -18,7 +18,7 @@
 #define ANIMATORT_H
 #include "animator.h"
 #include "key.h"
-#include "basicreadwrite.h"
+#include "../ReadWrite/basicreadwrite.h"
 #include "differsinterpolate.h"
 #include "keyt.h"
 #include "basedanimatort.h"

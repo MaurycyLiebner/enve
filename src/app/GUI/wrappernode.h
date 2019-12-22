@@ -21,7 +21,7 @@
 #include <QtCore>
 #include "smartPointers/ememory.h"
 #include "widgetstack.h"
-#include "basicreadwrite.h"
+#include "ReadWrite/basicreadwrite.h"
 
 enum class WrapperNodeType {
     base,

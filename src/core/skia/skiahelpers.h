@@ -20,7 +20,7 @@
 #include "skiaincludes.h"
 #include "../exceptions.h"
 #include <QIODevice>
-#include "../basicreadwrite.h"
+#include "../ReadWrite/basicreadwrite.h"
 
 namespace SkiaHelpers {
     sk_sp<SkImage> makeCopy(const sk_sp<SkImage>& img);

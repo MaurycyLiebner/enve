@@ -15,14 +15,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Private/document.h"
-#include "basicreadwrite.h"
+#include "ReadWrite/basicreadwrite.h"
 
 #include "Animators/gradient.h"
 #include "canvas.h"
 
+void Document::writeBookmarked(eWriteStream &dst) const {
+    dst << fColors.count();
+    for(const auto &col : fColors) {
+        dst << col;
+    }
+
+    dst << fBrushes.count();
+    for(const auto &brush : fBrushes) {
+        dst << brush;
+    }
+}
+
 void Document::writeGradients(eWriteStream &dst) const {
-    const int nGrads = fGradients.count();
-    dst.write(&nGrads, sizeof(int));
+    dst << fGradients.count();
     int id = 0;
     for(const auto &grad : fGradients)
         grad->write(id++, dst);
@@ -38,6 +49,8 @@ void Document::writeScenes(eWriteStream &dst) const {
 }
 
 void Document::write(eWriteStream& dst) const {
+    writeBookmarked(dst);
+    dst.writeCheckpoint();
     writeGradients(dst);
     dst.writeCheckpoint();
     writeScenes(dst);
@@ -48,6 +61,20 @@ void Document::write(eWriteStream& dst) const {
 //        }
 //    }
 //    target->write(rcConstChar(&currentCanvasId), sizeof(int));
+}
+
+void Document::readBookmarked(eReadStream &src) {
+    int nCol; src >> nCol;
+    for(int i = 0; i < nCol; i++) {
+        QColor col; src >> col;
+        addBookmarkColor(col);
+    }
+
+    int nBrush; src >> nBrush;
+    for(int i = 0; i < nBrush; i++) {
+        SimpleBrushWrapper* brush; src >> brush;
+        if(brush) addBookmarkBrush(brush);
+    }
 }
 
 void Document::readGradients(eReadStream& src) {
@@ -69,6 +96,10 @@ void Document::readScenes(eReadStream& src) {
 }
 
 void Document::read(eReadStream& src) {
+    if(src.evFileVersion() > 1) {
+        readBookmarked(src);
+        src.readCheckpoint("Error reading bookmarks");
+    }
     readGradients(src);
     src.readCheckpoint("Error reading gradients");
     readScenes(src);

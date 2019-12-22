@@ -20,7 +20,7 @@
 #include <QWeakPointer>
 #include <typeindex>
 #include "smartPointers/ememory.h"
-#include "basicreadwrite.h"
+#include "ReadWrite/basicreadwrite.h"
 #include "Animators/SmartPath/smartpath.h"
 class QrealAnimator;
 class BoundingBox;

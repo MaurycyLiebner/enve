@@ -17,7 +17,7 @@
 #ifndef KEY_H
 #define KEY_H
 #include "../smartPointers/ememory.h"
-#include "../basicreadwrite.h"
+#include "../ReadWrite/basicreadwrite.h"
 
 #include <QtCore>
 class QPainter;

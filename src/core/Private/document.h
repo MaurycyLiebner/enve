@@ -183,9 +183,11 @@ private:
     Clipboard *getClipboard(const ClipboardType type) const;
 
     void clearGradientRWIds() const;
+    void writeBookmarked(eWriteStream &dst) const;
     void writeGradients(eWriteStream &dst) const;
     void writeScenes(eWriteStream &dst) const;
 
+    void readBookmarked(eReadStream &src);
     void readGradients(eReadStream &src);
     void readScenes(eReadStream &src);
 signals:

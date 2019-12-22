@@ -155,7 +155,7 @@ bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     }
 }
 
-#include "basicreadwrite.h"
+#include "ReadWrite/basicreadwrite.h"
 void SingleSound::writeProperty(eWriteStream& dst) const {
     if(videoSound()) {
         StaticComplexAnimator::writeProperty(dst);

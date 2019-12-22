@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "custompatheffect.h"
-#include "basicreadwrite.h"
+#include "ReadWrite/basicreadwrite.h"
 
 CustomPathEffect::CustomPathEffect(const QString &name) :
     PathEffect(name, PathEffectType::CUSTOM) {}

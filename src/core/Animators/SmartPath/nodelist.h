@@ -19,7 +19,7 @@
 #include "node.h"
 #include "smartPointers/stdselfref.h"
 #include "smartPointers/stdpointer.h"
-#include "basicreadwrite.h"
+#include "../../ReadWrite/basicreadwrite.h"
 class SkPath;
 class NodeList {
     friend class SmartPath;

@@ -18,7 +18,7 @@
 #define SINGLEWIDGETABSTRACTION_H
 
 #include "smartPointers/ememory.h"
-#include "basicreadwrite.h"
+#include "ReadWrite/basicreadwrite.h"
 class SingleWidgetTarget;
 
 enum SWT_BoxRule : short;

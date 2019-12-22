@@ -18,7 +18,7 @@
 #define SMARTPATHANIMATOR_H
 #include "../interpolationanimatort.h"
 #include "differsinterpolate.h"
-#include "basicreadwrite.h"
+#include "../../ReadWrite/basicreadwrite.h"
 #include "smartpathkey.h"
 #include "../../MovablePoints/segment.h"
 #include "../../skia/skiahelpers.h"

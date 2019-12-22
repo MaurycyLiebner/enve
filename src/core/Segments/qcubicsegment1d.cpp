@@ -18,6 +18,7 @@
 #include "simplemath.h"
 #include "qcubicsegment2d.h"
 #include "skia/skiaincludes.h"
+#include "../ReadWrite/basicreadwrite.h"
 
 qreal qCubicSegment1D::valAtT(const qreal t) const {
     return qPow(1 - t, 3)*p0() +

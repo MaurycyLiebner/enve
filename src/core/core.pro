@@ -183,6 +183,10 @@ SOURCES += \
     RasterEffects/rastereffect.cpp \
     RasterEffects/rastereffectcaller.cpp \
     RasterEffects/shadoweffect.cpp \
+    ReadWrite/basicreadwrite.cpp \
+    ReadWrite/ereadstream.cpp \
+    ReadWrite/ewritestream.cpp \
+    ReadWrite/filefooter.cpp \
     ShaderEffects/shadereffect.cpp \
     ShaderEffects/shadereffectcaller.cpp \
     ShaderEffects/shadereffectcreator.cpp \
@@ -259,7 +263,6 @@ SOURCES += \
     Animators/animatort.cpp \
     Animators/interpolatedanimator.cpp \
     Animators/steppedanimator.cpp \
-    basicreadwrite.cpp \
     differsinterpolate.cpp \
     skia/skiahelpers.cpp \
     Animators/keyt.cpp \
@@ -421,6 +424,11 @@ HEADERS += \
     RasterEffects/rastereffectcaller.h \
     RasterEffects/rastereffectsinclude.h \
     RasterEffects/shadoweffect.h \
+    ReadWrite/basicreadwrite.h \
+    ReadWrite/efuturepos.h \
+    ReadWrite/ereadstream.h \
+    ReadWrite/ewritestream.h \
+    ReadWrite/filefooter.h \
     ShaderEffects/intanimatorcreator.h \
     ShaderEffects/qrealanimatorcreator.h \
     ShaderEffects/shadereffect.h \
@@ -504,7 +512,6 @@ HEADERS += \
     Animators/animatort.h \
     Animators/interpolatedanimator.h \
     Animators/steppedanimator.h \
-    basicreadwrite.h \
     differsinterpolate.h \
     skia/skiahelpers.h \
     Animators/keyt.h \
