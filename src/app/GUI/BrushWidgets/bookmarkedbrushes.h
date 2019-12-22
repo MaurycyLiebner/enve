@@ -3,17 +3,16 @@
 #include "brushselectionwidget.h"
 #include "brushwidget.h"
 
-#include <QDialog>
+#include "../bookmarkedwidget.h"
 
-class BookmarkedBrushes : public QDialog {
+class BookmarkedBrushes : public BookmarkedWidget {
     Q_OBJECT
 public:
-    BookmarkedBrushes(BrushesContext* const brushesContext,
+    BookmarkedBrushes(const bool vertical,
+                      const int dimension,
+                      BrushesContext* const brushesContext,
                       QWidget* const parent);
 private:
-    void updateWidth();
-
-    QList<BrushWidget*> mWidgets;
     BrushesContext* const mBrushesContext;
 };
 

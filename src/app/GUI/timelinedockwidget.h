@@ -114,8 +114,6 @@ private:
     QAction* mIncBrushSizeAct;
     ActionButton *mIncBrushSize;
 
-    BookmarkedBrushes* mBookmarkedBrushes;
-
     QAction *mTimelineAction;
     QAction *mRenderAction;
 

@@ -37,10 +37,12 @@ void BrushWidget::paintEvent(QPaintEvent *) {
     p.drawImage(QRect(0, 0, width(), height()), brushData.fIcon);
 
     if(mBrushCWrapper->bookmarked()) {
+        p.setRenderHint(QPainter::Antialiasing, true);
         p.setBrush(QColor(0, 175, 255));
         p.setPen(Qt::NoPen);
-        p.drawRect(-1, 5, 15, 10);
+        p.drawEllipse(5, 5, 7, 7);
         p.setBrush(Qt::NoBrush);
+        p.setRenderHint(QPainter::Antialiasing, false);
     }
 
     if(isSelected()) {

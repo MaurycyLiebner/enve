@@ -54,6 +54,7 @@ class BoxScrollWidget;
 class ScrollWidget;
 class ScrollArea;
 class UsageWidget;
+class CentralWidget;
 //class SoundComposition;
 
 const QString MENU_STYLESHEET =
@@ -168,6 +169,7 @@ protected:
     void lockFinished();
 private:
     QWidget * mWelcomeDialog = nullptr;
+    CentralWidget * mCentralWidget = nullptr;
 
     void openWelcomeDialog();
     void closeWelcomeDialog();
@@ -281,6 +283,7 @@ private:
     QAction *mObjectsAndAnimationsDock;
     QAction *mFillAndStrokeSettingsDock;
     QAction *mBrushSettingsDockAction;
+    QAction *mBrushColorBookmarksAction;
 
     FontsWidget *mFontWidget = nullptr;
 

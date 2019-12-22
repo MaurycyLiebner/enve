@@ -343,6 +343,21 @@ QPushButton:disabled {
     color: rgb(65, 65, 65);
 }
 
+QPushButton#darkButton {
+    color: white;
+    background: qlineargradient(x1:0, y1:0,
+                                x2:0, y2:1,
+        stop:0 rgb(125, 125, 125),
+        stop:0.5 rgb(60, 60, 60));
+}
+
+QPushButton#darkButton:disabled {
+    background: qlineargradient(x1:0, y1:0,
+                                x2:0, y2:1,
+        stop:0 rgb(160, 160, 160),
+        stop:0.5 rgb(148, 148, 148));
+    color: rgb(200, 200, 200);
+}
 
 QPushButton#middleButton,
 QPushButton#rightButton,

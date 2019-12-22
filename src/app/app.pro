@@ -75,10 +75,12 @@ SOURCES += main.cpp\
     GUI/Settings/settingsdialog.cpp \
     GUI/Settings/settingswidget.cpp \
     GUI/audiohandler.cpp \
+    GUI/bookmarkedwidget.cpp \
     GUI/buttonbase.cpp \
     GUI/canvasbasewrappernode.cpp \
     GUI/canvaswindowevents.cpp \
     GUI/canvaswrappernode.cpp \
+    GUI/centralwidget.cpp \
     GUI/changewidthwidget.cpp \
     GUI/ekeyfilter.cpp \
     GUI/envelicense.cpp \
@@ -176,9 +178,11 @@ HEADERS  += \
     GUI/Settings/settingsdialog.h \
     GUI/Settings/settingswidget.h \
     GUI/audiohandler.h \
+    GUI/bookmarkedwidget.h \
     GUI/buttonbase.h \
     GUI/canvasbasewrappernode.h \
     GUI/canvaswrappernode.h \
+    GUI/centralwidget.h \
     GUI/changewidthwidget.h \
     GUI/ekeyfilter.h \
     GUI/envelicense.h \

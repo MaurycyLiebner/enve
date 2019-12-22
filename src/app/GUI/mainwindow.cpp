@@ -59,6 +59,7 @@
 #include "envesplash.h"
 #include "envelicense.h"
 #include "switchbutton.h"
+#include "centralwidget.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 
@@ -248,6 +249,12 @@ MainWindow::MainWindow(Document& document,
     leftDock2Label->setObjectName("dockLabel");
     leftDock2Label->setAlignment(Qt::AlignCenter);
     mLeftDock2->setTitleBarWidget(leftDock2Label);
+
+    const auto bBrush = new BookmarkedBrushes(true, 64, pCtxt.get(), this);
+    mCentralWidget = new CentralWidget(bBrush, mLayoutHandler->sceneLayout());
+
+//    const auto bColor = new BookmarkedColors(centralWidget);
+//    centralLay->addWidget(bColor, 0, Qt::AlignRight);
 
     setupToolBar();
     setupStatusBar();
@@ -569,6 +576,15 @@ void MainWindow::setupMenuBar() {
     connect(mBrushSettingsDockAction, &QAction::toggled,
             mBrushSettingsDock, &QDockWidget::setVisible);
 
+    mBrushColorBookmarksAction =
+            mPanelsMenu->addAction("Brush/Color Bookmarks");
+    mBrushColorBookmarksAction->setCheckable(true);
+    mBrushColorBookmarksAction->setChecked(true);
+    mBrushColorBookmarksAction->setShortcut(QKeySequence(Qt::Key_U));
+
+    connect(mBrushColorBookmarksAction, &QAction::toggled,
+            mCentralWidget, &CentralWidget::setSidesVisibilitySetting);
+
     const auto help = mMenuBar->addMenu("Help");
 
     help->addAction("License", this, [this]() {
@@ -606,7 +622,7 @@ void MainWindow::closeWelcomeDialog() {
     SimpleTask::sSchedule([this]() {
         if(!mWelcomeDialog) return;
         mWelcomeDialog = nullptr;
-        setCentralWidget(mLayoutHandler->sceneLayout());
+        setCentralWidget(mCentralWidget);
     });
 }
 
@@ -807,6 +823,7 @@ MainWindow *MainWindow::sGetInstance() {
 
 void MainWindow::updateCanvasModeButtonsChecked() {
     const CanvasMode currentMode = mDocument.fCanvasMode;
+    mCentralWidget->setCanvasMode(currentMode);
     mBoxTransformMode->setState(currentMode == CanvasMode::boxTransform);
     mPointTransformMode->setState(currentMode == CanvasMode::pointTransform);
     mAddPointMode->setState(currentMode == CanvasMode::pathCreate);
