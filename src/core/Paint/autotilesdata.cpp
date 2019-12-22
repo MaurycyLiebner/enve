@@ -201,45 +201,45 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
 
     uint8_t * const dstP = static_cast<uint8_t*>(dst.getPixels());
 
-//    if(tM0 > 0 || rM0 > 0) {
-//        for(int y = 0; y < dst.height(); y++) {
-//            auto lLine = dstP + y*dst.width()*4;
-//            for(int x = 0; x < tM0; x++) {
-//                *lLine++ = 0;
-//                *lLine++ = 0;
-//                *lLine++ = 0;
-//                *lLine++ = 0;
-//            }
+    if(tM0 > 0 || rM0 > 0) {
+        for(int y = 0; y < dst.height(); y++) {
+            auto lLine = dstP + y*dst.width()*4;
+            for(int x = 0; x < tM0; x++) {
+                *lLine++ = 0;
+                *lLine++ = 0;
+                *lLine++ = 0;
+                *lLine++ = 0;
+            }
 
-//            auto rLine = dstP + ((y + 1)*dst.width() - rM0)*4;
-//            for(int x = 0; x < rM0; x++) {
-//                *rLine++ = 0;
-//                *rLine++ = 0;
-//                *rLine++ = 0;
-//                *rLine++ = 0;
-//            }
-//        }
-//    }
+            auto rLine = dstP + ((y + 1)*dst.width() - rM0)*4;
+            for(int x = 0; x < rM0; x++) {
+                *rLine++ = 0;
+                *rLine++ = 0;
+                *rLine++ = 0;
+                *rLine++ = 0;
+            }
+        }
+    }
 
-//    for(int y = 0; y < tM0; y++) {
-//        auto tLine = dstP + (y*dst.width() + lM0)*4;
-//        for(int x = lM0; x < dst.width() - rM0; x++) {
-//            *tLine++ = 0;
-//            *tLine++ = 0;
-//            *tLine++ = 0;
-//            *tLine++ = 0;
-//        }
-//    }
+    for(int y = 0; y < tM0; y++) {
+        auto tLine = dstP + (y*dst.width() + lM0)*4;
+        for(int x = lM0; x < dst.width() - rM0; x++) {
+            *tLine++ = 0;
+            *tLine++ = 0;
+            *tLine++ = 0;
+            *tLine++ = 0;
+        }
+    }
 
-//    for(int y = dst.height() - bM0; y < dst.height(); y++) {
-//        auto bLine = dstP + (y*dst.width() + lM0)*4;
-//        for(int x = lM0; x < dst.width() - rM0; x++) {
-//            *bLine++ = 0;
-//            *bLine++ = 0;
-//            *bLine++ = 0;
-//            *bLine++ = 0;
-//        }
-//    }
+    for(int y = dst.height() - bM0; y < dst.height(); y++) {
+        auto bLine = dstP + (y*dst.width() + lM0)*4;
+        for(int x = lM0; x < dst.width() - rM0; x++) {
+            *bLine++ = 0;
+            *bLine++ = 0;
+            *bLine++ = 0;
+            *bLine++ = 0;
+        }
+    }
 
     const int minY = -mZeroTileRow*TILE_SIZE + qMax(0, -tM);
     const int minX = -mZeroTileCol*TILE_SIZE + qMax(0, -lM);
