@@ -327,7 +327,7 @@ public:
 
     qsptr<BoundingBox> createLink();
     ImageBox* createImageBox(const QString &path);
-    ImageSequenceBox* createAnimationBoxForPaths(const QString &folderPath);
+    ImageSequenceBox* createImageSequenceBox(const QString &folderPath);
     VideoBox* createVideoForPath(const QString &path);
     ExternalLinkBox *createLinkToFileWithPath(const QString &path);
     SingleSound* createSoundForPath(const QString &path);

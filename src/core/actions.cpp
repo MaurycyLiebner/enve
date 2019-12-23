@@ -337,33 +337,38 @@ void Actions::importFile(const QString &path,
     if(!file.exists())
         RuntimeThrow("File " + path + " does not exit.");
 
-    const QString extension = path.split(".").last();
-    if(isSoundExt(extension)) {
-        mActiveScene->createSoundForPath(path);
-    } else {
-        qsptr<BoundingBox> importedBox;
-        mActiveScene->blockUndoRedo();
-        if(isImageExt(extension)) {
-            mActiveScene->createImageBox(path);
-        } else if(isVideoExt(extension)) {
-            mActiveScene->createVideoForPath(path);
+    QFileInfo fInfo(path);
+    if(fInfo.isDir()) {
+        mActiveScene->createImageSequenceBox(path);
+    } else { // is file
+        const QString extension = path.split(".").last();
+        if(isSoundExt(extension)) {
+            mActiveScene->createSoundForPath(path);
         } else {
-            try {
-                importedBox = ImportHandler::sInstance->import(path);
-            } catch(const std::exception& e) {
-                mActiveScene->unblockUndoRedo();
-                gPrintExceptionCritical(e);
-                return;
+            qsptr<BoundingBox> importedBox;
+            mActiveScene->blockUndoRedo();
+            if(isImageExt(extension)) {
+                mActiveScene->createImageBox(path);
+            } else if(isVideoExt(extension)) {
+                mActiveScene->createVideoForPath(path);
+            } else {
+                try {
+                    importedBox = ImportHandler::sInstance->import(path);
+                } catch(const std::exception& e) {
+                    mActiveScene->unblockUndoRedo();
+                    gPrintExceptionCritical(e);
+                    return;
+                }
             }
-        }
-        mActiveScene->unblockUndoRedo();
+            mActiveScene->unblockUndoRedo();
 
-        if(importedBox) {
-            importedBox->planCenterPivotPosition();
-            mActiveScene->getCurrentGroup()->addContained(importedBox);
-            importedBox->startPosTransform();
-            importedBox->moveByAbs(relDropPos);
-            importedBox->finishTransform();
+            if(importedBox) {
+                importedBox->planCenterPivotPosition();
+                mActiveScene->getCurrentGroup()->addContained(importedBox);
+                importedBox->startPosTransform();
+                importedBox->moveByAbs(relDropPos);
+                importedBox->finishTransform();
+            }
         }
     }
     afterAction();

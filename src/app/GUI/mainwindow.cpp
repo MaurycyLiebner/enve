@@ -296,9 +296,9 @@ void MainWindow::setupMenuBar() {
                          Qt::CTRL + Qt::Key_O);
     mRecentMenu = mFileMenu->addMenu("Open Recent");
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Link...",
-                         this, &MainWindow::linkFile,
-                         Qt::CTRL + Qt::Key_L);
+//    mFileMenu->addAction("Link...",
+//                         this, &MainWindow::linkFile,
+//                         Qt::CTRL + Qt::Key_L);
     mFileMenu->addAction("Import File...",
                          this,
                          qOverload<>(&MainWindow::importFile),
@@ -1166,7 +1166,7 @@ void MainWindow::importImageSequence() {
                 this, "Import Image Sequence", "");
     enableEventFilter();
     if(!folder.isEmpty()) {
-        mDocument.fActiveScene->createAnimationBoxForPaths(folder);
+        mDocument.fActiveScene->createImageSequenceBox(folder);
     }
     mDocument.actionFinished();
 }

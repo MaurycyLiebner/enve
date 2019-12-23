@@ -30,6 +30,9 @@ public:
     void changeSourceFile(QWidget * const dialogParent);
     void writeBoundingBox(eWriteStream& dst);
     void readBoundingBox(eReadStream& src);
+
+private:
+    QString mDirPath;
 };
 
 #endif // IMAGESEQUENCEBOX_H

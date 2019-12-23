@@ -176,6 +176,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
 //    mControlButtonsLayout->addWidget(mGoToNextKeyButton);
 //    mGoToNextKeyButton->setFocusPolicy(Qt::NoFocus);
     QAction *resA = mToolBar->addAction("Resolution:");
+    resA->setToolTip(gSingleLineTooltip("Preview resolution"));
     mToolBar->widgetForAction(resA)->setObjectName("inactiveToolButton");
 
     mToolBar->addWidget(mResolutionComboBox);

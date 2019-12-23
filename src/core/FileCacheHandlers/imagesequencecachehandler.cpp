@@ -21,12 +21,6 @@
 #include "filesourcescache.h"
 #include "fileshandler.h"
 
-ImageSequenceCacheHandler::ImageSequenceCacheHandler() {}
-
-void ImageSequenceCacheHandler::setFolderPath(const QString &folderPath) {
-    mFileHandler = FilesHandler::sInstance->getFileHandler<ImageSequenceFileHandler>(folderPath);
-}
-
 void ImageSequenceFileHandler::afterPathSet(const QString &folderPath) {
     Q_UNUSED(folderPath)
     reload();
@@ -58,7 +52,7 @@ eTask *ImageSequenceFileHandler::scheduleFrameLoad(const int frame) {
 
 void ImageSequenceFileHandler::reload() {
     mFrameImageHandlers.clear();
-    QDir dir(mFolderPath);
+    QDir dir(mPath);
     mFileMissing = !dir.exists();
     if(mFileMissing) return;
     dir.setFilter(QDir::Files);
@@ -78,4 +72,10 @@ void ImageSequenceFileHandler::replace(QWidget* const parent) {
     const auto dir = QFileDialog::getExistingDirectory(
                 parent, "Import Image Sequence", mPath);
     if(!dir.isEmpty()) setPath(dir);
+}
+
+ImageSequenceCacheHandler::ImageSequenceCacheHandler() {}
+
+void ImageSequenceCacheHandler::setFolderPath(const QString &folderPath) {
+    mFileHandler = FilesHandler::sInstance->getFileHandler<ImageSequenceFileHandler>(folderPath);
 }

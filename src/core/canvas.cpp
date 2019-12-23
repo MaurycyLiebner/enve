@@ -418,7 +418,7 @@ ImageBox *Canvas::createImageBox(const QString &path) {
 }
 
 #include "Boxes/imagesequencebox.h"
-ImageSequenceBox* Canvas::createAnimationBoxForPaths(const QString &folderPath) {
+ImageSequenceBox* Canvas::createImageSequenceBox(const QString &folderPath) {
     const auto aniBox = enve::make_shared<ImageSequenceBox>();
     aniBox->planCenterPivotPosition();
     aniBox->setFolderPath(folderPath);

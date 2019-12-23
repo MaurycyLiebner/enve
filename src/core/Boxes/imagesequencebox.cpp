@@ -27,7 +27,7 @@ void ImageSequenceBox::setFolderPath(const QString &folderPath) {
     const auto iscHandler = enve::make_shared<ImageSequenceCacheHandler>();
     iscHandler->setFolderPath(folderPath);
     mSrcFramesCache = iscHandler;
-
+    mDirPath = folderPath;
     animationDataChanged();
 }
 
@@ -39,10 +39,11 @@ void ImageSequenceBox::changeSourceFile(QWidget * const dialogParent) {
 
 void ImageSequenceBox::writeBoundingBox(eWriteStream& dst) {
     AnimationBox::writeBoundingBox(dst);
-
+    dst << mDirPath;
 }
 
 void ImageSequenceBox::readBoundingBox(eReadStream& src) {
     AnimationBox::readBoundingBox(src);
-;
+    QString dir; src >> dir;
+    setFolderPath(dir);
 }

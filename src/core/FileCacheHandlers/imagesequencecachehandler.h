@@ -31,7 +31,6 @@ public:
     eTask* scheduleFrameLoad(const int frame);
     int getFrameCount() const { return mFrameImageHandlers.count(); }
 private:
-    QString mFolderPath;
     QList<qsptr<ImageDataHandler>> mFrameImageHandlers;
 };
 
