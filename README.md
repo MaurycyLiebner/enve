@@ -9,7 +9,7 @@ You can use enve to create vector animations, raster animations, and even use so
 Enve was created with flexibility and expandability in mind.
 
 <p align="center">
-  <a href="https://twitter.com/enve27539724" target="_blank">
+  <a href="https://twitter.com/enve2d" target="_blank">
     <img src="https://image.flaticon.com/icons/png/512/187/187187.png" alt="enve on Twitter" width="64" height="64" border="10" hspace="20"/>
   </a>
 
