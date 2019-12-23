@@ -31,8 +31,8 @@ void PathPivot::drawSk(SkCanvas * const canvas,
                        const float invScale,
                        const bool keyOnCurrent,
                        const bool ctrlPressed) {
-    Q_UNUSED(keyOnCurrent);
-    Q_UNUSED(ctrlPressed);
+    Q_UNUSED(keyOnCurrent)
+    Q_UNUSED(ctrlPressed)
     const SkPoint absPos = toSkPoint(getAbsolutePos());
     if(isVisible(mode)) {
         const SkColor fillCol = isSelected() ?

@@ -72,7 +72,7 @@ void Gradient::prp_startTransform() {
 
 void Gradient::prp_setInheritedFrameShift(const int shift,
                                           ComplexAnimator *parentAnimator) {
-    Q_UNUSED(shift);
+    Q_UNUSED(shift)
     if(!parentAnimator) return;
     for(const auto &key : anim_mKeys) {
         parentAnimator->ca_updateDescendatKeyFrame(key);
@@ -168,7 +168,7 @@ QGradientStops Gradient::getQGradientStopsAtAbsFrame(const qreal absFrame) {
 }
 
 void Gradient::updateQGradientStops(const UpdateReason reason) {
-    Q_UNUSED(reason);
+    Q_UNUSED(reason)
     mQGradientStops.clear();
     const qreal inc = 1./(mColors.length() - 1);
     qreal cPos = 0;

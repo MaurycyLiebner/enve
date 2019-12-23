@@ -131,8 +131,8 @@ public:
 
     void processGpu(QGL33 * const gl,
                     SwitchableContext &context) final {
-        Q_UNUSED(gl);
-        Q_UNUSED(context);
+        Q_UNUSED(gl)
+        Q_UNUSED(context)
     }
 protected:
     void queTaskNow() final;
@@ -147,8 +147,8 @@ public:
 
     void processGpu(QGL33 * const gl,
                     SwitchableContext &context) {
-        Q_UNUSED(gl);
-        Q_UNUSED(context);
+        Q_UNUSED(gl)
+        Q_UNUSED(context)
     }
 protected:
     void queTaskNow();

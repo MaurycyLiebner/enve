@@ -134,7 +134,7 @@ public:
 
     template<typename T>
     bool compatibleTarget(DynamicComplexAnimatorBase<T> * const obj) {
-        Q_UNUSED(obj);
+        Q_UNUSED(obj)
         return mContentBaseType == std::type_index(typeid(T));
     }
 private:

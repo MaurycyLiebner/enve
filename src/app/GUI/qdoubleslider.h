@@ -66,7 +66,7 @@ public:
     }
 
     virtual void openContextMenu(const QPoint &globalPos) {
-        Q_UNUSED(globalPos);
+        Q_UNUSED(globalPos)
     }
 
     void setNeighbouringSliderToTheLeft(const bool bT) {

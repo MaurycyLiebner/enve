@@ -274,9 +274,9 @@ void Animator::anim_updateKeyOnCurrrentFrame() {
 
 TimelineMovable *Animator::anim_getTimelineMovable(
         const int relX, const int minViewedFrame, const qreal pixelsPerFrame) {
-    Q_UNUSED(relX);
-    Q_UNUSED(minViewedFrame);
-    Q_UNUSED(pixelsPerFrame);
+    Q_UNUSED(relX)
+    Q_UNUSED(minViewedFrame)
+    Q_UNUSED(pixelsPerFrame)
     return nullptr;
 }
 

@@ -23,7 +23,7 @@ qsptr<CustomRasterEffect> eCreateNewestVersion() {
 
 qsptr<CustomRasterEffect> eCreate(
         const CustomIdentifier &identifier) {
-    Q_UNUSED(identifier);
+    Q_UNUSED(identifier)
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
     return enve::make_shared<DabTest000>();
@@ -114,7 +114,7 @@ void DabTestCaller000::sInitialize(QGL33 * const gl) {
 void DabTestCaller000::processGpu(QGL33 * const gl,
                               GpuRenderTools &renderTools,
                               GpuRenderData &data) {
-    Q_UNUSED(data);
+    Q_UNUSED(data)
     renderTools.switchToOpenGL(gl);
 
     if(!sInitialized) {

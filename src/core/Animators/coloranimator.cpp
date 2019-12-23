@@ -223,21 +223,21 @@ void ColorAnimator::setupTreeViewMenu(PropertyMenu * const menu) {
 
     const PropertyMenu::CheckSelectedOp<ColorAnimator> rgbOp =
     [](ColorAnimator * anim, bool checked) {
-        Q_UNUSED(checked);
+        Q_UNUSED(checked)
         anim->setColorMode(ColorMode::rgb);
     };
     colorModeMenu->addCheckableAction("RGB", mColorMode == ColorMode::rgb, rgbOp);
 
     const PropertyMenu::CheckSelectedOp<ColorAnimator> hsvOp =
     [](ColorAnimator * anim, bool checked) {
-        Q_UNUSED(checked);
+        Q_UNUSED(checked)
         anim->setColorMode(ColorMode::rgb);
     };
     colorModeMenu->addCheckableAction("HSV", mColorMode == ColorMode::hsv, hsvOp);
 
     const PropertyMenu::CheckSelectedOp<ColorAnimator> hslOp =
     [](ColorAnimator * anim, bool checked) {
-        Q_UNUSED(checked);
+        Q_UNUSED(checked)
         anim->setColorMode(ColorMode::rgb);
     };
     colorModeMenu->addCheckableAction("HSL", mColorMode == ColorMode::hsl, hslOp);

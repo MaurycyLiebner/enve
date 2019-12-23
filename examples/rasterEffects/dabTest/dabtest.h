@@ -66,8 +66,8 @@ public:
                 GpuRenderData& data);
     void processCpu(CpuRenderTools& renderTools,
                     const CpuRenderData& data) {
-        Q_UNUSED(renderTools);
-        Q_UNUSED(data);
+        Q_UNUSED(renderTools)
+        Q_UNUSED(data)
     }
 private:
     static bool sInitialized;

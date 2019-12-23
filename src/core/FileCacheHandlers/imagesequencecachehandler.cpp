@@ -28,7 +28,7 @@ void ImageSequenceCacheHandler::setFolderPath(const QString &folderPath) {
 }
 
 void ImageSequenceFileHandler::afterPathSet(const QString &folderPath) {
-    Q_UNUSED(folderPath);
+    Q_UNUSED(folderPath)
     reload();
 }
 

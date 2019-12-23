@@ -169,8 +169,8 @@ qint64 SoundComposition::readData(char *data, qint64 maxLen) {
 }
 
 qint64 SoundComposition::writeData(const char *data, qint64 len) {
-    Q_UNUSED(data);
-    Q_UNUSED(len);
+    Q_UNUSED(data)
+    Q_UNUSED(len)
 
     return 0;
 }

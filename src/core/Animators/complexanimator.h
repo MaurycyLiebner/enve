@@ -117,7 +117,7 @@ public:
     template <class T = Property>
     T *ca_getFirstDescendant() const {
         return ca_getFirstDescendant<T>([](T* const prop) {
-            Q_UNUSED(prop);
+            Q_UNUSED(prop)
             return true;
         });
     }

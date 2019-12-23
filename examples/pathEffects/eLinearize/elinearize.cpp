@@ -24,7 +24,7 @@ qsptr<CustomPathEffect> eCreateNewestVersion() {
 
 qsptr<CustomPathEffect> eCreate(
         const CustomIdentifier &identifier) {
-    Q_UNUSED(identifier);
+    Q_UNUSED(identifier)
     // Choose version based on identifier
     // if(identifier.fVersion == CustomIdentifier::Version{0, 0, 0})
     return enve::make_shared<eLinearize000>();

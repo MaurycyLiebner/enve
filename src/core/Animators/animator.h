@@ -225,7 +225,7 @@ protected:
     Animator(const QString &name);
 
     virtual void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
-        Q_UNUSED(key);
+        Q_UNUSED(key)
     }
 public:
     virtual void anim_addKeyAtRelFrame(const int relFrame) = 0;

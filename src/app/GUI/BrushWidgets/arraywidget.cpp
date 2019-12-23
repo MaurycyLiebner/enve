@@ -138,7 +138,7 @@ void ArrayWidget::resizeEvent(QResizeEvent* event) {
 }
 
 void ArrayWidget::connectChildWidget(QWidget *wid) {
-    Q_UNUSED(wid);
+    Q_UNUSED(wid)
 }
 
 void ArrayWidget::nextButtonPressed() {

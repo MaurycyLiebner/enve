@@ -31,8 +31,8 @@ void GradientPoint::setColor(const QColor &fillColor) {
 void GradientPoint::drawSk(SkCanvas * const canvas, const CanvasMode mode,
                            const float invScale, const bool keyOnCurrent,
                            const bool ctrlPressed) {
-    Q_UNUSED(mode);
-    Q_UNUSED(ctrlPressed);
+    Q_UNUSED(mode)
+    Q_UNUSED(ctrlPressed)
 
     const SkPoint absPos = toSkPoint(getAbsolutePos());
     canvas->save();

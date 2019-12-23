@@ -94,7 +94,7 @@ DurationRectangle::DurationRectangle(Property &parentProp) :
 }
 
 void DurationRectangle::pressed(const bool shiftPressed) {
-    Q_UNUSED(shiftPressed);
+    Q_UNUSED(shiftPressed)
 //    if(mParentProperty.SWT_isBoundingBox() ||
 //       mParentProperty.SWT_isSingleSound()) {
 //        const auto cont = static_cast<eBoxOrSound*>(&mParentProperty);

@@ -1376,7 +1376,7 @@ void gGetValuesForNodeRemoval(
         const QPointF &pC0, const QPointF &pP1, const QPointF &pC2,
         QPointF &nextC0, const QPointF &nextP1,
         qreal t) {
-    Q_UNUSED(pP1);
+    Q_UNUSED(pP1)
     t = CLAMP(t, 0, 1);
     if(isZero6Dec(t)) {
         prevC2 = pC2;

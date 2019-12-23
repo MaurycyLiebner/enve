@@ -36,7 +36,7 @@ public:
     TimelineMovable(const Type type, Property& parentProp);
 
     virtual void pressed(const bool shiftPressed) {
-        Q_UNUSED(shiftPressed);
+        Q_UNUSED(shiftPressed)
     }
 
     virtual Qt::CursorShape getHoverCursorShape() {

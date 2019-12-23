@@ -27,7 +27,7 @@ public:
     }
 
     void setValueForGraph(const qreal value) {
-        Q_UNUSED(value);
+        Q_UNUSED(value)
     }
 
     void setRelFrame(const int frame) {

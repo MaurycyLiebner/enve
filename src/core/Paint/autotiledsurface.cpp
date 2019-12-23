@@ -101,5 +101,5 @@ void AutoTiledSurface::startRequest(MyPaintTileRequest * const request) {
 }
 
 void AutoTiledSurface::endRequest(MyPaintTileRequest * const request) {
-    Q_UNUSED(request);
+    Q_UNUSED(request)
 }

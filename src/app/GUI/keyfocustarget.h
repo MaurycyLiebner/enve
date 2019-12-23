@@ -30,12 +30,12 @@ public:
 
     static bool KFT_handleKeyEvent(QKeyEvent *e);
     virtual bool KFT_keyPressEvent(QKeyEvent *e) {
-        Q_UNUSED(e);
+        Q_UNUSED(e)
         return false;
     }
 
     virtual bool KFT_keyReleaseEvent(QKeyEvent *e) {
-        Q_UNUSED(e);
+        Q_UNUSED(e)
         return false;
     }
 

@@ -27,7 +27,7 @@ UniformSpecifier ShaderValueHandler::create(const GLint loc) const {
     QString script = fName + " = " + mScript;
     if(!fGLValue) {
         return [script](QGL33 * const gl, QJSEngine& engine) {
-            Q_UNUSED(gl);
+            Q_UNUSED(gl)
             engine.evaluate(script);
         };
     }

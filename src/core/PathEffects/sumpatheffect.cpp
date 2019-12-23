@@ -43,6 +43,6 @@ void SumEffectCaller::apply(SkPath &path) {
 }
 
 stdsptr<PathEffectCaller> SumPathEffect::getEffectCaller(const qreal relFrame) const {
-    Q_UNUSED(relFrame);
+    Q_UNUSED(relFrame)
     return enve::make_shared<SumEffectCaller>();
 }

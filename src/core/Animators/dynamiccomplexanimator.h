@@ -33,7 +33,7 @@ public:
     }
 
     bool SWT_dropIntoSupport(const int index, const QMimeData* const data) {
-        Q_UNUSED(index);
+        Q_UNUSED(index)
         return eMimeData::sHasType<T>(data);
     }
 
@@ -116,7 +116,7 @@ private:
 
 template <class T>
 qsptr<T> TCreateOnly(eReadStream& src) {
-    Q_UNUSED(src);
+    Q_UNUSED(src)
     return enve::make_shared<T>();
 }
 

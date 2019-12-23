@@ -82,7 +82,7 @@ public:
     WrapperNode* fChild = nullptr;
 
     void closeChild(WrapperNode* const child) {
-        Q_UNUSED(child);
+        Q_UNUSED(child)
         return;
 //        if(child == fChild) fChild.reset();
 //        else Q_ASSERT(false);

@@ -35,7 +35,7 @@ UniformSpecifier qrealAnimatorCreate(
         };
     } else {
         return [valScript](QGL33 * const gl, QJSEngine& e) {
-            Q_UNUSED(gl);
+            Q_UNUSED(gl)
             e.evaluate(valScript);
         };
     }
@@ -59,7 +59,7 @@ UniformSpecifier intAnimatorCreate(
         };
     } else {
         return [valScript](QGL33 * const gl, QJSEngine& e) {
-            Q_UNUSED(gl);
+            Q_UNUSED(gl)
             e.evaluate(valScript);
         };
     }

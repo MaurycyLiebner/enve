@@ -122,7 +122,7 @@ public:
     }
 
     virtual bool prp_handlesMode(const CanvasMode mode) const {
-        Q_UNUSED(mode);
+        Q_UNUSED(mode)
         return false;
     }
 
@@ -130,10 +130,10 @@ public:
                                       const qreal pixelsPerFrame,
                                       const FrameRange &absFrameRange,
                                       const int rowHeight) {
-        Q_UNUSED(p);
-        Q_UNUSED(pixelsPerFrame);
-        Q_UNUSED(absFrameRange);
-        Q_UNUSED(rowHeight);
+        Q_UNUSED(p)
+        Q_UNUSED(pixelsPerFrame)
+        Q_UNUSED(absFrameRange)
+        Q_UNUSED(rowHeight)
     }
 
     virtual void drawCanvasControls(SkCanvas * const canvas,
@@ -154,7 +154,7 @@ public:
 
     virtual QString prp_getValueText() { return ""; }
 
-    virtual void prp_setTransformed(const bool bT) { Q_UNUSED(bT); }
+    virtual void prp_setTransformed(const bool bT) { Q_UNUSED(bT) }
 
     virtual void prp_setInheritedFrameShift(const int shift,
                                             ComplexAnimator* parentAnimator);
@@ -164,16 +164,16 @@ public:
     }
 
     virtual FrameRange prp_getIdenticalRelRange(const int relFrame) const {
-        Q_UNUSED(relFrame);
+        Q_UNUSED(relFrame)
         return {FrameRange::EMIN, FrameRange::EMAX};
     }
 
     virtual void readProperty(eReadStream& src) {
-        Q_UNUSED(src);
+        Q_UNUSED(src)
     }
 
     virtual void writeProperty(eWriteStream& dst) const {
-        Q_UNUSED(dst);
+        Q_UNUSED(dst)
     }
 
     virtual BasicTransformAnimator *getTransformAnimator() const {

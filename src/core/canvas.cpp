@@ -749,8 +749,8 @@ void Canvas::selectOnlyLastPressedPoint() {
 bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                  const bool parentSatisfies,
                                  const bool parentMainTarget) const {
-    Q_UNUSED(parentSatisfies);
-    Q_UNUSED(parentMainTarget);
+    Q_UNUSED(parentSatisfies)
+    Q_UNUSED(parentMainTarget)
     const SWT_BoxRule rule = rules.fRule;
     const bool alwaysShowChildren = rules.fAlwaysShowChildren;
     if(alwaysShowChildren) {

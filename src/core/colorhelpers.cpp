@@ -301,7 +301,7 @@ void hsl_to_rgb_float(float &h_, float &s_, float &l_) {
 }
 
 void hsv_to_hsl(float &h, float &s, float &v) {
-    Q_UNUSED(h);
+    Q_UNUSED(h)
     float ss = s;
     float vv = v;
     v = (2.f - ss) * vv;
@@ -314,7 +314,7 @@ void hsv_to_hsl(float &h, float &s, float &v) {
 }
 
 void hsl_to_hsv(float &h, float &s, float &l) {
-    Q_UNUSED(h);
+    Q_UNUSED(h)
     float ss = s;
     float ll = l;
     ll *= 2.f;
@@ -327,7 +327,7 @@ void hsl_to_hsv(float &h, float &s, float &l) {
 }
 
 void qhsv_to_hsl(qreal &h, qreal &s, qreal &v) {
-    Q_UNUSED(h);
+    Q_UNUSED(h)
     qreal ss = s;
     qreal vv = v;
     v = (2 - ss) * vv;
@@ -341,7 +341,7 @@ void qhsv_to_hsl(qreal &h, qreal &s, qreal &v) {
 }
 
 void qhsl_to_hsv(qreal &h, qreal &s, qreal &l) {
-    Q_UNUSED(h);
+    Q_UNUSED(h)
     qreal ss = s;
     qreal ll = l;
     ll *= 2;

@@ -81,7 +81,7 @@ public:
     virtual bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                      const bool parentSatisfies,
                                      const bool parentMainTarget) const {
-        Q_UNUSED(rules);
+        Q_UNUSED(rules)
         return parentSatisfies && !parentMainTarget;
     }
 
@@ -90,31 +90,31 @@ public:
     }
 
     virtual bool SWT_dropSupport(const QMimeData* const data) {
-        Q_UNUSED(data);
+        Q_UNUSED(data)
         return false;
     }
 
     virtual bool SWT_drop(const QMimeData* const data) {
-        Q_UNUSED(data);
+        Q_UNUSED(data)
         return false;
     }
 
     virtual bool SWT_dropIntoSupport(const int index,
                                      const QMimeData* const data) {
-        Q_UNUSED(index);
-        Q_UNUSED(data);
+        Q_UNUSED(index)
+        Q_UNUSED(data)
         return false;
     }
 
     virtual bool SWT_dropInto(const int index,
                               const QMimeData* const data) {
-        Q_UNUSED(index);
-        Q_UNUSED(data);
+        Q_UNUSED(index)
+        Q_UNUSED(data)
         return false;
     }
 
     virtual void SWT_setChildrenAncestorDisabled(const bool bT) {
-        Q_UNUSED(bT);
+        Q_UNUSED(bT)
     }
 
     virtual bool SWT_visibleOnlyIfParentDescendant() const {

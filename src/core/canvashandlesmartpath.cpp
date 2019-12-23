@@ -102,7 +102,7 @@ void Canvas::handleAddSmartPointMouseMove(const MouseEvent &e) {
 }
 
 void Canvas::handleAddSmartPointMouseRelease(const MouseEvent &e) {
-    Q_UNUSED(e);
+    Q_UNUSED(e)
     if(mLastEndPoint) {
         if(!mStartTransform) mLastEndPoint->finishTransform();
         //mCurrentSmartEndPoint->prp_afterWholeInfluenceRangeChanged();
