@@ -21,6 +21,7 @@
 #include "Boxes/containerbox.h"
 #include "Properties/boxtargetproperty.h"
 #include "GUI/mainwindow.h"
+#include "Properties/emimedata.h"
 
 BoxTargetWidget::BoxTargetWidget(QWidget *parent) : QWidget(parent) {
     setAcceptDrops(true);

@@ -29,6 +29,10 @@ Property::Property(const QString& name) :
     });
 }
 
+void Property::updateCanvasProps() {
+    if(mParent_k) mParent_k->updateCanvasProps();
+}
+
 void Property::drawCanvasControls(SkCanvas * const canvas,
                                   const CanvasMode mode,
                                   const float invScale,
@@ -65,6 +69,11 @@ void Property::prp_afterWholeInfluenceRangeChanged() {
     prp_afterChangedAbsRange(prp_absInfluenceRange());
 }
 
+void Property::prp_afterChangedRelRange(const FrameRange &range, const bool clip) {
+    const auto absRange = prp_relRangeToAbsRange(range);
+    prp_afterChangedAbsRange(absRange, clip);
+}
+
 const QString &Property::prp_getName() const {
     return prp_mName;
 }
@@ -87,15 +96,31 @@ void Property::prp_setInheritedFrameShift(const int shift,
     prp_afterFrameShiftChanged(oldRange, newRange);
 }
 
+void Property::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
+                                          const FrameRange &newAbsRange) {
+    prp_afterChangedAbsRange((newAbsRange + oldAbsRange).adjusted(-1, 1), false);
+}
+
+BasicTransformAnimator *Property::getTransformAnimator() const {
+    if(mParent_k) return mParent_k->getTransformAnimator();
+    return nullptr;
+}
+
 QMatrix Property::getTransform() const {
     const auto trans = getTransformAnimator();
     if(trans) return trans->getTotalTransform();
     return QMatrix();
 }
 
+void Property::prp_setSelected(const bool selected) {
+    if(prp_mSelected == selected) return;
+    prp_mSelected = selected;
+    emit prp_selectionChanged(selected, QPrivateSignal());
+}
+
 FrameRange Property::prp_relRangeToAbsRange(const FrameRange& range) const {
     return {prp_relFrameToAbsFrame(range.fMin),
-            prp_relFrameToAbsFrame(range.fMax)};
+                prp_relFrameToAbsFrame(range.fMax)};
 }
 
 FrameRange Property::prp_absRangeToRelRange(const FrameRange& range) const {
@@ -130,7 +155,16 @@ qreal Property::prp_relFrameToAbsFrameF(const qreal relFrame) const {
 void Property::prp_setName(const QString &newName) {
     if(newName == prp_mName) return;
     prp_mName = newName;
-    emit prp_nameChanged(newName);
+    emit prp_nameChanged(newName, QPrivateSignal());
+}
+
+bool Property::prp_differencesBetweenRelFrames(
+        const int frame1, const int frame2) const {
+    return !prp_getIdenticalRelRange(frame1).inRange(frame2);
+}
+
+FrameRange Property::prp_absInfluenceRange() const {
+    return prp_relRangeToAbsRange(prp_relInfluenceRange());
 }
 
 void Property::enabledDrawingOnCanvas() {
@@ -163,11 +197,11 @@ void Property::setParent(ComplexAnimator * const parent) {
                 this, &Property::prp_ancestorChanged);
     }
     if(mPointsHandler) mPointsHandler->setTransform(getTransformAnimator());
-    emit prp_parentChanged(parent);
-    emit prp_ancestorChanged();
+    emit prp_parentChanged(parent, QPrivateSignal());
+    emit prp_ancestorChanged(QPrivateSignal());
 }
 
-#include "Boxes/boundingbox.h"
+#include "canvas.h"
 void Property::prp_selectionChangeTriggered(const bool shiftPressed) {
     if(!mParentScene) return;
     if(shiftPressed) {

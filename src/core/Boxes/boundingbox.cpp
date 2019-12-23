@@ -78,7 +78,7 @@ BoundingBox::~BoundingBox() {
 void BoundingBox::writeBoundingBox(eWriteStream& dst) {
     if(mWriteId < 0) assignWriteId();
     eBoxOrSound::writeProperty(dst);
-    dst << prp_mName;
+    dst << prp_getName();
     dst << mWriteId;
     dst.write(&mBlendMode, sizeof(SkBlendMode));
 }
@@ -373,7 +373,7 @@ void BoundingBox::planUpdate(const UpdateReason reason) {
 
 stdsptr<BoxRenderData> BoundingBox::queRender(const qreal relFrame) {
     const auto currentRenderData = updateCurrentRenderData(relFrame);
-    setupRenderData(relFrame, currentRenderData, mParentScene);
+    setupRenderData(relFrame, currentRenderData, getParentScene());
     const auto currentSPtr = enve::shared(currentRenderData);
     currentSPtr->queTask();
     return currentSPtr;
@@ -508,44 +508,44 @@ void addRasterEffectActionToMenu(const QString& text,
 void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<BoundingBox>()) return;
     menu->addedActionsForType<BoundingBox>();
-    Q_ASSERT(mParentScene);
-    const auto parentScene = mParentScene;
+    const auto pScene = getParentScene();
+    Q_ASSERT(pScene);
 
     menu->addSection("Box");
 
-    menu->addPlainAction("Create Link", [parentScene]() {
-        parentScene->createLinkBoxForSelected();
+    menu->addPlainAction("Create Link", [pScene]() {
+        pScene->createLinkBoxForSelected();
     });
-    menu->addPlainAction("Center Pivot", [parentScene]() {
-        parentScene->centerPivotForSelected();
+    menu->addPlainAction("Center Pivot", [pScene]() {
+        pScene->centerPivotForSelected();
     });
 
     menu->addSeparator();
 
-    menu->addPlainAction("Copy", [parentScene]() {
-        parentScene->copyAction();
+    menu->addPlainAction("Copy", [pScene]() {
+        pScene->copyAction();
     })->setShortcut(Qt::CTRL + Qt::Key_C);
 
-    menu->addPlainAction("Cut", [parentScene]() {
-        parentScene->cutAction();
+    menu->addPlainAction("Cut", [pScene]() {
+        pScene->cutAction();
     })->setShortcut(Qt::CTRL + Qt::Key_X);
 
-    menu->addPlainAction("Duplicate", [parentScene]() {
-        parentScene->duplicateSelectedBoxes();
+    menu->addPlainAction("Duplicate", [pScene]() {
+        pScene->duplicateSelectedBoxes();
     })->setShortcut(Qt::CTRL + Qt::Key_D);
 
-    menu->addPlainAction("Delete", [parentScene]() {
-        parentScene->removeSelectedBoxesAndClearList();
+    menu->addPlainAction("Delete", [pScene]() {
+        pScene->removeSelectedBoxesAndClearList();
     })->setShortcut(Qt::Key_Delete);
 
     menu->addSeparator();
 
-    menu->addPlainAction("Group", [parentScene]() {
-        parentScene->groupSelectedBoxes();
+    menu->addPlainAction("Group", [pScene]() {
+        pScene->groupSelectedBoxes();
     })->setShortcut(Qt::CTRL + Qt::Key_G);
 
-    menu->addPlainAction("Ungroup", [parentScene]() {
-        parentScene->ungroupSelectedBoxes();
+    menu->addPlainAction("Ungroup", [pScene]() {
+        pScene->ungroupSelectedBoxes();
     })->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
 
     menu->addSeparator();
@@ -960,7 +960,7 @@ bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     }
     if(satisfies) {
         if(!rules.fSearchString.isEmpty()) {
-            satisfies = prp_mName.contains(rules.fSearchString);
+            satisfies = prp_getName().contains(rules.fSearchString);
         }
     }
     return satisfies;

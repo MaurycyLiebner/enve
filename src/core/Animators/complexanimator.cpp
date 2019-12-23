@@ -235,11 +235,6 @@ void ComplexAnimator::prp_startTransform() {
         property->prp_startTransform();
 }
 
-void ComplexAnimator::prp_setTransformed(const bool bT) {
-    for(const auto &property : ca_mChildAnimators)
-        property->prp_setTransformed(bT);
-}
-
 void ComplexAnimator::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
                                                  const FrameRange &newAbsRange) {
     Animator::prp_afterFrameShiftChanged(oldAbsRange, newAbsRange);

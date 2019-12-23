@@ -34,11 +34,12 @@ protected:
                   const QString& name);
 public:
     bool SWT_isQrealAnimator() const { return true; }
+
     void prp_startTransform();
     void prp_finishTransform();
     void prp_cancelTransform();
+
     QString prp_getValueText();
-    void prp_setTransformed(const bool bT) { mTransformed = bT; }
     void prp_afterChangedAbsRange(const FrameRange& range,
                                   const bool clip = true) {
         if(range.inRange(anim_getCurrentAbsFrame()))

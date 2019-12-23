@@ -30,14 +30,14 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     mTopLeftPoint = enve::make_shared<AnimatedPoint>(
                 mTopLeftAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
-    mPointsHandler->appendPt(mTopLeftPoint);
+    getPointsHandler()->appendPt(mTopLeftPoint);
     mTopLeftPoint->setRelativePos(QPointF(0, 0));
 
     mBottomRightAnimator = enve::make_shared<QPointFAnimator>("bottom right");
     mBottomRightPoint = enve::make_shared<AnimatedPoint>(
                 mBottomRightAnimator.get(), mTransformAnimator.data(),
                 TYPE_PATH_POINT);
-    mPointsHandler->appendPt(mBottomRightPoint);
+    getPointsHandler()->appendPt(mBottomRightPoint);
     mBottomRightPoint->setRelativePos(QPointF(10, 10));
 
     //mTopLeftPoint->setBottomRightPoint(mBottomRightPoint);

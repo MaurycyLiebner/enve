@@ -316,7 +316,7 @@ BoxTransformAnimator::BoxTransformAnimator() {
 
     setPointsHandler(enve::make_shared<PointsHandler>());
     const auto pivotPt = enve::make_shared<BoxPathPoint>(mPivotAnimator.get(), this);
-    mPointsHandler->appendPt(pivotPt);
+    getPointsHandler()->appendPt(pivotPt);
 }
 
 MovablePoint *BoxTransformAnimator::getPivotMovablePoint() {

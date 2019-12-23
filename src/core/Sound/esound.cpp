@@ -20,12 +20,14 @@
 
 eSound::eSound() : eBoxOrSound("sound") {
     connect(this, &eBoxOrSound::aboutToChangeAncestor, this, [this]() {
-        if(!mParentScene) return;
-        mParentScene->getSoundComposition()->removeSound(ref<eSound>());
+        const auto pScene = getParentScene();
+        if(!pScene) return;
+        pScene->getSoundComposition()->removeSound(ref<eSound>());
     });
     connect(this, &eBoxOrSound::prp_ancestorChanged, this, [this]() {
-        if(!mParentScene) return;
-        mParentScene->getSoundComposition()->addSound(ref<eSound>());
+        const auto pScene = getParentScene();
+        if(!pScene) return;
+        pScene->getSoundComposition()->addSound(ref<eSound>());
     });
 }
 
@@ -53,8 +55,9 @@ int eSound::getSampleShift() const{
 }
 
 qreal eSound::getCanvasFPS() const {
-    if(!mParentScene) return 1;
-    return mParentScene->getFps();
+    const auto pScene = getParentScene();
+    if(!pScene) return 1;
+    return pScene->getFps();
 }
 
 iValueRange eSound::absSecondToRelSeconds(const int absSecond) {

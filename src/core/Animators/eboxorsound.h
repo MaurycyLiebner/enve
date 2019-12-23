@@ -31,7 +31,6 @@ public:
 
     void setParentGroup(ContainerBox * const parent);
     ContainerBox *getParentGroup() const { return mParentGroup; }
-    Canvas* getParentScene() const { return mParentScene; }
     void removeFromParent_k();
     bool isAncestor(const BoundingBox * const box) const;
 

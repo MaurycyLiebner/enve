@@ -27,13 +27,13 @@ GradientPoints::GradientPoints(PathBox * const parent) :
     mStartAnimator = enve::make_shared<QPointFAnimator>("point1");
     ca_addChild(mStartAnimator);
     mStartPoint = enve::make_shared<GradientPoint>(mStartAnimator.get(), mParent_k);
-    mPointsHandler->appendPt(mStartPoint);
+    getPointsHandler()->appendPt(mStartPoint);
 
     mEndAnimator = enve::make_shared<QPointFAnimator>("point2");
     ca_addChild(mEndAnimator);
 
     mEndPoint = enve::make_shared<GradientPoint>(mEndAnimator.get(), mParent_k);
-    mPointsHandler->appendPt(mEndPoint);
+    getPointsHandler()->appendPt(mEndPoint);
 
     mEnabled = false;
 }

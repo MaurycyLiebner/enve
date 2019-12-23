@@ -205,8 +205,9 @@ void ContainerBox::forcedMarginMeaningfulChange() {
 }
 
 QRect ContainerBox::currentGlobalBounds() const {
-    if(!mParentScene) return QRect();
-    const auto sceneBounds = mParentScene->getCurrentBounds();
+    const auto pScene = getParentScene();
+    if(!pScene) return QRect();
+    const auto sceneBounds = pScene->getCurrentBounds();
     return sceneBounds.adjusted(-mForcedMargin.left(),
                                 -mForcedMargin.top(),
                                 mForcedMargin.right(),
@@ -228,8 +229,8 @@ void ContainerBox::queTasks() {
 void ContainerBox::promoteToLayer() {
     if(!SWT_isGroupBox()) return;
     if(!SWT_isLinkBox()) mType = TYPE_LAYER;
-    if(prp_mName.contains("Group")) {
-        auto newName  = prp_mName;
+    if(prp_getName().contains("Group")) {
+        auto newName  = prp_getName();
         newName.replace("Group", "Layer");
         prp_setName(newName);
     }
@@ -244,8 +245,8 @@ void ContainerBox::promoteToLayer() {
 void ContainerBox::demoteToGroup() {
     if(!SWT_isLayerBox()) return;
     if(!SWT_isLinkBox()) mType = TYPE_GROUP;
-    if(prp_mName.contains("Layer")) {
-        auto newName  = prp_mName;
+    if(prp_getName().contains("Layer")) {
+        auto newName  = prp_getName();
         newName.replace("Layer", "Group");
         prp_setName(newName);
     }
@@ -536,16 +537,18 @@ void ContainerBox::setupRenderData(const qreal relFrame,
 }
 
 void ContainerBox::selectAllBoxesFromBoxesGroup() {
+    const auto pScene = getParentScene();
     for(const auto& box : mContainedBoxes) {
         if(box->isSelected()) continue;
-        mParentScene->addBoxToSelection(box);
+        pScene->addBoxToSelection(box);
     }
 }
 
 void ContainerBox::deselectAllBoxesFromBoxesGroup() {
+    const auto pScene = getParentScene();
     for(const auto& box : mContainedBoxes) {
         if(box->isSelected()) {
-            mParentScene->removeBoxFromSelection(box);
+            pScene->removeBoxFromSelection(box);
         }
     }
 }
@@ -590,11 +593,12 @@ void ContainerBox::anim_setAbsFrame(const int frame) {
 }
 
 void ContainerBox::addContainedBoxesToSelection(const QRectF &rect) {
+    const auto pScene = getParentScene();
     for(const auto& box : mContainedBoxes) {
         if(box->isVisibleAndUnlocked() &&
                 box->isVisibleAndInVisibleDurationRect()) {
             if(box->isContainedIn(rect)) {
-                mParentScene->addBoxToSelection(box);
+                pScene->addBoxToSelection(box);
             }
         }
     }
@@ -656,8 +660,9 @@ void ContainerBox::removeContainedFromList(const int id) {
     updateContainedBoxes();
     if(child->SWT_isContainerBox()) {
         const auto group = static_cast<ContainerBox*>(child.get());
-        if(group->isCurrentGroup() && mParentScene) {
-            mParentScene->setCurrentGroupParentAsCurrentGroup();
+        const auto pScene = getParentScene();
+        if(group->isCurrentGroup() && pScene) {
+            pScene->setCurrentGroupParentAsCurrentGroup();
         }
     }
 

@@ -18,6 +18,7 @@
 
 #include "canvas.h"
 #include "Timeline/durationrectangle.h"
+#include "Properties/emimedata.h"
 
 eBoxOrSound::eBoxOrSound(const QString &name) :
     StaticComplexAnimator(name) {
@@ -142,7 +143,8 @@ void eBoxOrSound::drawTimelineControls(QPainter * const p,
         p->save();
         const int width = qCeil(absFrameRange.span()*pixelsPerFrame);
         const QRect drawRect(0, 0, width, rowHeight);
-        const qreal fps = mParentScene ? mParentScene->getFps() : 1;
+        const auto pScene = getParentScene();
+        const qreal fps = pScene ? pScene->getFps() : 1;
         mDurationRectangle->draw(p, drawRect, fps,
                                  pixelsPerFrame, absFrameRange);
         p->restore();
@@ -292,18 +294,19 @@ void eBoxOrSound::deselect() {
 }
 
 void eBoxOrSound::selectionChangeTriggered(const bool shiftPressed) {
-    if(!mParentScene) return;
+    const auto pScene = getParentScene();
+    if(!pScene) return;
     if(!SWT_isBoundingBox()) return;
     const auto bb = static_cast<BoundingBox*>(this);
     if(shiftPressed) {
         if(mSelected) {
-            mParentScene->removeBoxFromSelection(bb);
+            pScene->removeBoxFromSelection(bb);
         } else {
-            mParentScene->addBoxToSelection(bb);
+            pScene->addBoxToSelection(bb);
         }
     } else {
-        mParentScene->clearBoxesSelection();
-        mParentScene->addBoxToSelection(bb);
+        pScene->clearBoxesSelection();
+        pScene->addBoxToSelection(bb);
     }
 }
 
@@ -357,9 +360,10 @@ void eBoxOrSound::unlock() {
 
 void eBoxOrSound::setLocked(const bool locked) {
     if(locked == mLocked) return;
-    if(mParentScene && mSelected && SWT_isBoundingBox()) {
+    const auto pScene = getParentScene();
+    if(pScene && mSelected && SWT_isBoundingBox()) {
         const auto bb = static_cast<BoundingBox*>(this);
-        mParentScene->removeBoxFromSelection(bb);
+        pScene->removeBoxFromSelection(bb);
     }
     mLocked = locked;
     SWT_scheduleContentUpdate(SWT_BR_LOCKED);

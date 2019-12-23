@@ -84,7 +84,7 @@ HardwareSupport PathBox::hardwareSupport() const {
 void PathBox::setupRenderData(const qreal relFrame,
                               BoxRenderData * const data,
                               Canvas* const scene) {
-    if(!mParentScene) return;
+    if(!getParentScene()) return;
     BoundingBox::setupRenderData(relFrame, data, scene);
 
     bool currentEditPathCompatible = false;

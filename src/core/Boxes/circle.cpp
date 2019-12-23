@@ -31,7 +31,7 @@ Circle::Circle() : PathBox(TYPE_CIRCLE) {
     mCenterPoint = enve::make_shared<AnimatedPoint>(mCenterAnimator.get(),
                                              mTransformAnimator.get(),
                                              TYPE_PATH_POINT);
-    mPointsHandler->appendPt(mCenterPoint);
+    getPointsHandler()->appendPt(mCenterPoint);
 
     mCenterPoint->disableSelection();
     mCenterPoint->setRelativePos(QPointF(0, 0));
@@ -43,7 +43,7 @@ Circle::Circle() : PathBox(TYPE_CIRCLE) {
     mHorizontalRadiusPoint = enve::make_shared<CircleRadiusPoint>(
                 mHorizontalRadiusAnimator.get(), mTransformAnimator.get(),
                 mCenterPoint.get(), TYPE_PATH_POINT, false);
-    mPointsHandler->appendPt(mHorizontalRadiusPoint);
+    getPointsHandler()->appendPt(mHorizontalRadiusPoint);
     mHorizontalRadiusPoint->setRelativePos(QPointF(10, 0));
     const auto hXAnimator = mHorizontalRadiusAnimator->getXAnimator();
     ca_prependChildAnimator(mPathEffectsAnimators.data(),
@@ -55,7 +55,7 @@ Circle::Circle() : PathBox(TYPE_CIRCLE) {
     mVerticalRadiusPoint = enve::make_shared<CircleRadiusPoint>(
                 mVerticalRadiusAnimator.get(), mTransformAnimator.get(),
                 mCenterPoint.get(), TYPE_PATH_POINT, true);
-    mPointsHandler->appendPt(mVerticalRadiusPoint);
+    getPointsHandler()->appendPt(mVerticalRadiusPoint);
     mVerticalRadiusPoint->setRelativePos(QPointF(0, 10));
     const auto vYAnimator = mVerticalRadiusAnimator->getYAnimator();
     ca_prependChildAnimator(mPathEffectsAnimators.data(),

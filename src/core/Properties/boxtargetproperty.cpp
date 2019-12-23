@@ -17,6 +17,7 @@
 #include "boxtargetproperty.h"
 #include "Animators/complexanimator.h"
 #include "Boxes/boundingbox.h"
+#include "Properties/emimedata.h"
 
 BoxTargetProperty::BoxTargetProperty(const QString &name) :
     Property(name) {}

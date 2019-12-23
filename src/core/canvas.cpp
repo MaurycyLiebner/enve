@@ -42,7 +42,7 @@ Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
                const int frameCount, const qreal fps) :
     mDocument(document), mPaintTarget(this) {
-    mParentScene = this;
+    SceneParentSelfAssign(this);
     connect(&mDocument, &Document::canvasModeSet,
             this, &Canvas::setCanvasMode);
     std::function<bool(int)> changeFrameFunc =

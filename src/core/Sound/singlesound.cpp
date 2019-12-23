@@ -26,7 +26,7 @@
 SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
     mIndependent(!durRect) {
     connect(this, &eBoxOrSound::prp_ancestorChanged, this, [this]() {
-        if(!mParentScene) return;
+        if(!getParentScene()) return;
         updateDurationRectLength();
     });
     if(mIndependent) {
@@ -109,7 +109,7 @@ QrealSnapshot SingleSound::getVolumeSnap() const {
 }
 
 void SingleSound::updateDurationRectLength() {
-    if(mIndependent && mCacheHandler && mParentScene) {
+    if(mIndependent && mCacheHandler && getParentScene()) {
         const qreal secs = mCacheHandler ? mCacheHandler->durationSec() : 0;
         const qreal fps = getCanvasFPS();
         const int frames = qCeil(qAbs(secs*fps*mStretch));

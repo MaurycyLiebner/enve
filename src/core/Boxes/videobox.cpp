@@ -102,18 +102,19 @@ void VideoBox::animationDataChanged() {
 }
 
 void VideoBox::soundDataChanged() {
+    const auto pScene = getParentScene();
     const auto soundHandler = mFileHandler->getSoundHandler();
     if(soundHandler) {
         if(!mSound->SWT_isVisible()) {
-            if(mParentScene) {
-                mParentScene->getSoundComposition()->addSound(mSound);
+            if(pScene) {
+                pScene->getSoundComposition()->addSound(mSound);
             }
         }
         mDurationRectangle->setSoundCacheHandler(&soundHandler->getCacheHandler());
     } else {
         if(mSound->SWT_isVisible()) {
-            if(mParentScene) {
-                mParentScene->getSoundComposition()->removeSound(mSound);
+            if(pScene) {
+                pScene->getSoundComposition()->removeSound(mSound);
             }
         }
         mDurationRectangle->setSoundCacheHandler(nullptr);

@@ -178,6 +178,7 @@ SOURCES += \
     Private/esettings.cpp \
     Private/memorystructs.cpp \
     Properties/boxtargetproperty.cpp \
+    Properties/emimedata.cpp \
     RasterEffects/blureffect.cpp \
     RasterEffects/customrastereffect.cpp \
     RasterEffects/rastereffect.cpp \
@@ -417,6 +418,7 @@ HEADERS += \
     Private/esettings.h \
     Private/memorystructs.h \
     Properties/boxtargetproperty.h \
+    Properties/emimedata.h \
     RasterEffects/blureffect.h \
     RasterEffects/customrastereffect.h \
     RasterEffects/rastereffect.h \

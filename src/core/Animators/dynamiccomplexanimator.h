@@ -19,6 +19,7 @@
 #include <QApplication>
 #include "complexanimator.h"
 #include "typemenu.h"
+#include "Properties/emimedata.h"
 
 template <class T>
 class DynamicComplexAnimatorBase : public ComplexAnimator {
