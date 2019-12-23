@@ -27,7 +27,7 @@ public:
     BoxWithPathEffects(const eBoxType type);
 
     void setupCanvasMenu(PropertyMenu * const menu);
-    void setupTreeViewMenu(PropertyMenu * const menu);
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     void addPathEffect(const qsptr<PathEffect> &effect);
     void addFillPathEffect(const qsptr<PathEffect> &effect);

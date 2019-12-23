@@ -47,7 +47,7 @@ void BoxWithPathEffects::setupCanvasMenu(PropertyMenu * const menu) {
     PathEffectsMenu::addPathEffectsToActionMenu(menu);
 }
 
-void BoxWithPathEffects::setupTreeViewMenu(PropertyMenu * const menu) {
+void BoxWithPathEffects::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     const PropertyMenu::CheckSelectedOp<BoxWithPathEffects> pathOp =
     [](BoxWithPathEffects* const box, const bool checked) {
         box->setPathEffectsEnabled(checked);
@@ -82,7 +82,7 @@ void BoxWithPathEffects::setupTreeViewMenu(PropertyMenu * const menu) {
 
     menu->addSeparator();
 
-    BoundingBox::setupTreeViewMenu(menu);
+    BoundingBox::prp_setupTreeViewMenu(menu);
 }
 
 void BoxWithPathEffects::addPathEffect(const qsptr<PathEffect>& effect) {

@@ -30,14 +30,14 @@ BrushSettingsAnimator::BrushSettingsAnimator() :
     mTimeCurve->setCurrentValue(qCubicSegment1D(1));
 }
 
-void BrushSettingsAnimator::writeProperty(eWriteStream& dst) const {
-    StaticComplexAnimator::writeProperty(dst);
+void BrushSettingsAnimator::prp_writeProperty(eWriteStream& dst) const {
+    StaticComplexAnimator::prp_writeProperty(dst);
     dst << (mBrush ? mBrush->getCollectionName() : "");
     dst << (mBrush ? mBrush->getBrushName() : "");
 }
 
-void BrushSettingsAnimator::readProperty(eReadStream& src) {
-    StaticComplexAnimator::readProperty(src);
+void BrushSettingsAnimator::prp_readProperty(eReadStream& src) {
+    StaticComplexAnimator::prp_readProperty(src);
     QString brushCollection; src >> brushCollection;
     QString brushName; src >> brushName;
     mBrush = BrushCollectionData::sGetBrush(brushCollection, brushName);

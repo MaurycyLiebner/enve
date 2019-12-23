@@ -98,7 +98,7 @@ void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
     child->prp_setInheritedFrameShift(prp_getTotalFrameShift(), this);
     if(child->drawsOnCanvas() ||
        child->SWT_isComplexAnimator()) {
-        updateCanvasProps();
+        prp_updateCanvasProps();
     }
 
     const bool changeInfluence = !(SWT_isBoundingBox() &&
@@ -140,7 +140,8 @@ int ComplexAnimator::getChildPropertyIndex(Property * const child) {
 }
 
 void ComplexAnimator::ca_updateDescendatKeyFrame(Key* key) {
-    for(const auto& ckey : anim_mKeys) {
+    const auto& keys = anim_getKeys();
+    for(const auto& ckey : keys) {
         const auto complexKey = static_cast<ComplexKey*>(ckey);
         if(complexKey->hasKey(key)) {
             complexKey->removeAnimatorKey(key);
@@ -196,7 +197,7 @@ void ComplexAnimator::ca_removeChild(const qsptr<Property> child) {
     ca_mChildAnimators.removeAt(getChildPropertyIndex(child.get()));
     if(child->drawsOnCanvas() ||
        child->SWT_isComplexAnimator()) {
-        updateCanvasProps();
+        prp_updateCanvasProps();
     }
     ca_childAnimatorIsRecordingChanged();
 

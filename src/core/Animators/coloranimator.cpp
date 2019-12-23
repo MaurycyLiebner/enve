@@ -27,13 +27,13 @@ ColorAnimator::ColorAnimator(const QString &name) : StaticComplexAnimator(name) 
     ca_addChild(mAlphaAnimator);
 }
 
-void ColorAnimator::writeProperty(eWriteStream& dst) const {
-    StaticComplexAnimator::writeProperty(dst);
+void ColorAnimator::prp_writeProperty(eWriteStream& dst) const {
+    StaticComplexAnimator::prp_writeProperty(dst);
     dst.write(&mColorMode, sizeof(ColorMode));
 }
 
-void ColorAnimator::readProperty(eReadStream& src) {
-    StaticComplexAnimator::readProperty(src);
+void ColorAnimator::prp_readProperty(eReadStream& src) {
+    StaticComplexAnimator::prp_readProperty(src);
     src.read(&mColorMode, sizeof(ColorMode));
     setColorMode(mColorMode);
 }
@@ -151,7 +151,8 @@ void ColorAnimator::setColorMode(const ColorMode colorMode) {
         return;
     }
 
-    for(const auto &key : anim_mKeys) {
+    const auto& keys = anim_getKeys();
+    for(const auto &key : keys) {
         const int frame = key->getAbsFrame();
 
         qreal rF = mVal1Animator->getBaseValueAtAbsFrame(frame);
@@ -165,7 +166,7 @@ void ColorAnimator::setColorMode(const ColorMode colorMode) {
         mVal3Animator->saveValueToKey(frame, bF);
     }
 
-    if(!anim_mKeys.isEmpty()) {
+    if(!keys.isEmpty()) {
         mVal1Animator->anim_setRecordingWithoutChangingKeys(true);
         mVal2Animator->anim_setRecordingWithoutChangingKeys(true);
         mVal3Animator->anim_setRecordingWithoutChangingKeys(true);
@@ -218,7 +219,7 @@ void ColorAnimator::setCurrentAlphaValue(const qreal alpha) {
     mAlphaAnimator->setCurrentBaseValue(alpha);
 }
 
-void ColorAnimator::setupTreeViewMenu(PropertyMenu * const menu) {
+void ColorAnimator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     const auto colorModeMenu = menu->addMenu("Color Mode");
 
     const PropertyMenu::CheckSelectedOp<ColorAnimator> rgbOp =

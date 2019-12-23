@@ -63,16 +63,16 @@ void Key::setRelFrameAndUpdateParentAnimator(const int relFrame) {
 
 void Key::addToSelection(QList<Animator*> &toSelect) {
     if(isSelected()) return;
-    if(!mParentAnimator->hasSelectedKeys()) {
+    if(!mParentAnimator->anim_hasSelectedKeys()) {
         toSelect << mParentAnimator;
     }
-    mParentAnimator->addKeyToSelected(this);
+    mParentAnimator->anim_addKeyToSelected(this);
 }
 
 void Key::removeFromSelection(QList<Animator*> &toRemove) {
     if(isSelected()) {
-        mParentAnimator->removeKeyFromSelected(this);
-        if(!mParentAnimator->hasSelectedKeys()) {
+        mParentAnimator->anim_removeKeyFromSelected(this);
+        if(!mParentAnimator->anim_hasSelectedKeys()) {
             toRemove << mParentAnimator;
         }
     }

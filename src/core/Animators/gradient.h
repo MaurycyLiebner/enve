@@ -76,8 +76,8 @@ public:
 signals:
     void changed();
 private:
-    void writeProperty(eWriteStream& dst) const;
-    void readProperty(eReadStream& src);
+    void prp_writeProperty(eWriteStream& dst) const;
+    void prp_readProperty(eReadStream& src);
 
     static int sNextDocumnetId;
     const int mDocumentId;

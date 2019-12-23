@@ -58,15 +58,14 @@ class AnimatedSurface : public Animator {
 protected:
     AnimatedSurface();
 public:
-    void drawTimelineControls(QPainter * const p,
-                              const qreal pixelsPerFrame,
-                              const FrameRange &absFrameRange,
-                              const int rowHeight) {
+    void prp_drawTimelineControls(
+            QPainter * const p, const qreal pixelsPerFrame,
+            const FrameRange &absFrameRange, const int rowHeight) {
         const int width = qCeil(absFrameRange.span()*pixelsPerFrame);
         const QRect drawRect(0, 0, width, rowHeight);
         mFrameImagesCache.drawCacheOnTimeline(p, drawRect, absFrameRange.fMin,
                                               absFrameRange.fMax);
-        Animator::drawTimelineControls(p, pixelsPerFrame,
+        Animator::prp_drawTimelineControls(p, pixelsPerFrame,
                                        absFrameRange,
                                        rowHeight);
     }
@@ -144,19 +143,19 @@ public:
         }
     }
 
-    stdsptr<Key> createKey() {
+    stdsptr<Key> anim_createKey() {
         return enve::make_shared<ASKey>(this);
     }
 
-    void readProperty(eReadStream& src) {
-        Animator::readProperty(src);
-        readKeys(src);
+    void prp_readProperty(eReadStream& src) {
+        Animator::prp_readProperty(src);
+        anim_readKeys(src);
         mBaseValue->read(src);
     }
 
-    void writeProperty(eWriteStream& dst) const {
-        Animator::writeProperty(dst);
-        writeKeys(dst);
+    void prp_writeProperty(eWriteStream& dst) const {
+        Animator::prp_writeProperty(dst);
+        anim_writeKeys(dst);
         mBaseValue->write(dst);
     }
 

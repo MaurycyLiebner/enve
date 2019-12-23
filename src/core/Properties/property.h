@@ -56,7 +56,7 @@ class Property : public SingleWidgetTarget {
 protected:
     Property(const QString &name);
 
-    virtual void updateCanvasProps();
+    virtual void prp_updateCanvasProps();
 public:
     bool SWT_isProperty() const final { return true; }
 
@@ -71,22 +71,20 @@ public:
         return {FrameRange::EMIN, FrameRange::EMAX};
     }
 
-    virtual void drawTimelineControls(QPainter * const p,
-                                      const qreal pixelsPerFrame,
-                                      const FrameRange &absFrameRange,
-                                      const int rowHeight) {
+    virtual void prp_drawTimelineControls(
+            QPainter * const p, const qreal pixelsPerFrame,
+            const FrameRange &absFrameRange, const int rowHeight) {
         Q_UNUSED(p)
         Q_UNUSED(pixelsPerFrame)
         Q_UNUSED(absFrameRange)
         Q_UNUSED(rowHeight)
     }
 
-    virtual void drawCanvasControls(SkCanvas * const canvas,
-                                    const CanvasMode mode,
-                                    const float invScale,
-                                    const bool ctrlPressed);
+    virtual void prp_drawCanvasControls(
+            SkCanvas * const canvas, const CanvasMode mode,
+            const float invScale, const bool ctrlPressed);
 
-    virtual void setupTreeViewMenu(PropertyMenu * const menu);
+    virtual void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     virtual void prp_cancelTransform() {}
     virtual void prp_startTransform() {}
@@ -94,8 +92,8 @@ public:
 
     virtual QString prp_getValueText() { return ""; }
 
-    virtual void readProperty(eReadStream& src) { Q_UNUSED(src) }
-    virtual void writeProperty(eWriteStream& dst) const { Q_UNUSED(dst) }
+    virtual void prp_readProperty(eReadStream& src) { Q_UNUSED(src) }
+    virtual void prp_writeProperty(eWriteStream& dst) const { Q_UNUSED(dst) }
 
     virtual int prp_getTotalFrameShift() const;
     virtual int prp_getInheritedFrameShift() const;

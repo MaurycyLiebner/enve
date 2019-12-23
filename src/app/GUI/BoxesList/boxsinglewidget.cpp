@@ -550,7 +550,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                 if(!pTarget->prp_isSelected()) pTarget->prp_selectionChangeTriggered(shiftPressed);
             }
             PropertyMenu pMenu(&menu, mParent->currentScene(), MainWindow::sGetInstance());
-            pTarget->setupTreeViewMenu(&pMenu);
+            pTarget->prp_setupTreeViewMenu(&pMenu);
         }
         menu.exec(event->globalPos());
         setSelected(false);
@@ -617,15 +617,15 @@ void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e) {
     } else Document::sInstance->actionFinished();
 }
 
-void BoxSingleWidget::drawTimelineControls(QPainter * const p,
+void BoxSingleWidget::prp_drawTimelineControls(QPainter * const p,
                                const qreal pixelsPerFrame,
                                const FrameRange &viewedFrames) {
     if(isHidden() || !mTarget) return;
     const auto target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {
         const auto anim_target = static_cast<Animator*>(target);
-        anim_target->drawTimelineControls(p, pixelsPerFrame, viewedFrames,
-                                          MIN_WIDGET_DIM);
+        anim_target->prp_drawTimelineControls(
+                    p, pixelsPerFrame, viewedFrames, MIN_WIDGET_DIM);
     }
 }
 

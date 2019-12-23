@@ -45,7 +45,7 @@ public:
 
     void writeIdentifier(eWriteStream& dst) const;
 
-    void setupTreeViewMenu(PropertyMenu * const menu);
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     bool SWT_isRasterEffect() const final { return true; }
 

@@ -29,8 +29,8 @@ public:
 
     void showHideChildrenBeforeChaningPaintType(const PaintType newPaintType);
 
-    void writeProperty(eWriteStream& dst) const;
-    void readProperty(eReadStream& src);
+    void prp_writeProperty(eWriteStream& dst) const;
+    void prp_readProperty(eReadStream& src);
 public:
     void strokeWidthAction(const QrealAction& action);
     void setCurrentStrokeWidth(const qreal newWidth);

@@ -14,27 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EEFFECT_H
-#define EEFFECT_H
-#include "staticcomplexanimator.h"
+#ifndef OVERLAPPINGKEYS_H
+#define OVERLAPPINGKEYS_H
+#include "key.h"
 
-class eEffect : public StaticComplexAnimator {
-    Q_OBJECT
+class OverlappingKeys {
 public:
-    eEffect(const QString &name);
+    OverlappingKeys(const stdsptr<Key>& key,
+                    Animator * const animator);
 
-    virtual void writeIdentifier(eWriteStream& dst) const = 0;
+    int getFrame() const;
 
-    void prp_writeProperty(eWriteStream& dst) const;
-    void prp_readProperty(eReadStream& src);
+    bool hasKey(const Key* const key) const;
+    bool hasMultiple() const;
+    Key * getKey() const;
+    bool isEmpty() const;
 
-    void switchVisible();
-    void setVisible(const bool visible);
-    bool isVisible() const;
-signals:
-    void effectVisibilityChanged(bool);
+    void removeKey(const stdsptr<Key>& key);
+    void addKey(const stdsptr<Key>& key);
+    void merge();
 private:
-    bool mVisible = true;
+    Animator * mAnimator;
+    QList<stdsptr<Key>> mKeys;
 };
 
-#endif // EEFFECT_H
+#endif // OVERLAPPINGKEYS_H

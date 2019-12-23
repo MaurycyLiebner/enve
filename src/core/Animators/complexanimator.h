@@ -29,7 +29,7 @@ class ComplexAnimator : public Animator {
 protected:
     ComplexAnimator(const QString& name);
 public:
-    stdsptr<Key> createKey() final {
+    stdsptr<Key> anim_createKey() final {
         return nullptr;
     }
 

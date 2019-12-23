@@ -63,8 +63,8 @@ public:
     void setStrokeBrushTimeCurve(const qCubicSegment1D& curve) {
         mTimeCurve->setCurrentValue(curve);
     }
-    void writeProperty(eWriteStream &dst) const;
-    void readProperty(eReadStream &src);
+    void prp_writeProperty(eWriteStream &dst) const;
+    void prp_readProperty(eReadStream &src);
 private:
     qsptr<qCubicSegment1DAnimator> mWidthCurve =
             enve::make_shared<qCubicSegment1DAnimator>("width");

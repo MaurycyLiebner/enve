@@ -821,7 +821,7 @@ void ContainerBox::writeAllContained(eWriteStream& dst) {
             box->writeBoundingBox(dst);
         } else {
             Q_ASSERT(child->SWT_isSingleSound());
-            child->writeProperty(dst);
+            child->prp_writeProperty(dst);
         }
         dst.assignFuturePos(futureId);
         dst.writeCheckpoint();
@@ -894,7 +894,7 @@ void ContainerBox::readContained(eReadStream& src) {
         addContained(box);
     } else {
         const auto sound = enve::make_shared<SingleSound>();
-        sound->readProperty(src);
+        sound->prp_readProperty(src);
         addContained(sound);
     }
     src.readCheckpoint("Error reading contained");

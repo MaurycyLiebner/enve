@@ -29,14 +29,13 @@ Property::Property(const QString& name) :
     });
 }
 
-void Property::updateCanvasProps() {
-    if(mParent_k) mParent_k->updateCanvasProps();
+void Property::prp_updateCanvasProps() {
+    if(mParent_k) mParent_k->prp_updateCanvasProps();
 }
 
-void Property::drawCanvasControls(SkCanvas * const canvas,
-                                  const CanvasMode mode,
-                                  const float invScale,
-                                  const bool ctrlPressed) {
+void Property::prp_drawCanvasControls(
+        SkCanvas * const canvas, const CanvasMode mode,
+        const float invScale, const bool ctrlPressed) {
     if(mPointsHandler) {
         bool key;
         if(SWT_isAnimator()) {
@@ -47,7 +46,7 @@ void Property::drawCanvasControls(SkCanvas * const canvas,
     }
 }
 
-void Property::setupTreeViewMenu(PropertyMenu * const menu) {
+void Property::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     const auto clipboard = Document::sInstance->getPropertyClipboard();
     const bool compat = clipboard && clipboard->compatibleTarget(this);
     menu->addPlainAction("Paste", [this, clipboard]() {
@@ -169,7 +168,7 @@ FrameRange Property::prp_absInfluenceRange() const {
 
 void Property::enabledDrawingOnCanvas() {
     mDrawOnCanvas = true;
-    if(mParent_k) mParent_k->updateCanvasProps();
+    if(mParent_k) mParent_k->prp_updateCanvasProps();
 }
 
 void Property::setPointsHandler(const stdsptr<PointsHandler> &handler) {

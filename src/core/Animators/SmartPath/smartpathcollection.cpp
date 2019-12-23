@@ -21,13 +21,13 @@
 SmartPathCollection::SmartPathCollection() :
     SmartPathCollectionBase("paths") {}
 
-void SmartPathCollection::writeProperty(eWriteStream &dst) const {
-    SmartPathCollectionBase::writeProperty(dst);
+void SmartPathCollection::prp_writeProperty(eWriteStream &dst) const {
+    SmartPathCollectionBase::prp_writeProperty(dst);
     dst.write(&mFillType, sizeof(SkPath::FillType));
 }
 
-void SmartPathCollection::readProperty(eReadStream &src) {
-    SmartPathCollectionBase::readProperty(src);
+void SmartPathCollection::prp_readProperty(eReadStream &src) {
+    SmartPathCollectionBase::prp_readProperty(src);
     src.read(&mFillType, sizeof(SkPath::FillType));
 }
 

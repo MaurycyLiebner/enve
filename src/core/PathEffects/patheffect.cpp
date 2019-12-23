@@ -31,8 +31,8 @@ void PathEffect::writeIdentifier(eWriteStream& dst) const {
     dst.write(&mPathEffectType, sizeof(PathEffectType));
 }
 
-void PathEffect::setupTreeViewMenu(PropertyMenu * const menu) {
-    eEffect::setupTreeViewMenu(menu);
+void PathEffect::prp_setupTreeViewMenu(PropertyMenu * const menu) {
+    eEffect::prp_setupTreeViewMenu(menu);
     const PropertyMenu::PlainSelectedOp<PathEffect> dOp =
     [](PathEffect* const eff) {
         const auto parent = eff->getParent<DynamicComplexAnimatorBase<PathEffect>>();

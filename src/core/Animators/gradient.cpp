@@ -35,28 +35,28 @@ Gradient::Gradient(const QColor &color1, const QColor &color2) :
 void Gradient::write(const int id, eWriteStream& dst) {
     mReadWriteId = id;
     dst << id;
-    writeProperty(dst);
+    prp_writeProperty(dst);
 }
 
 int Gradient::read(eReadStream& src) {
     src >> mReadWriteId;
-    readProperty(src);
+    prp_readProperty(src);
     return mReadWriteId;
 }
 
-void Gradient::writeProperty(eWriteStream& dst) const {
+void Gradient::prp_writeProperty(eWriteStream& dst) const {
     const int nColors = mColors.count();
     dst << nColors;
     for(const auto& color : mColors)
-        color->writeProperty(dst);
+        color->prp_writeProperty(dst);
 }
 
-void Gradient::readProperty(eReadStream& src) {
+void Gradient::prp_readProperty(eReadStream& src) {
     int nColors;
     src >> nColors;
     for(int i = 0; i < nColors; i++) {
         const auto colorAnim = enve::make_shared<ColorAnimator>();
-        colorAnim->readProperty(src);
+        colorAnim->prp_readProperty(src);
         addColorToList(colorAnim);
     }
     updateQGradientStops(UpdateReason::userChange);
@@ -74,7 +74,8 @@ void Gradient::prp_setInheritedFrameShift(const int shift,
                                           ComplexAnimator *parentAnimator) {
     Q_UNUSED(shift)
     if(!parentAnimator) return;
-    for(const auto &key : anim_mKeys) {
+    const auto& keys = anim_getKeys();
+    for(const auto &key : keys) {
         parentAnimator->ca_updateDescendatKeyFrame(key);
     }
 }

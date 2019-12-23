@@ -347,7 +347,7 @@ void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode mode) {
     if(mSelectedKeysAnimators.isEmpty()) return;
 
     for(const auto& anim : mGraphAnimators) {
-        if(!anim->hasSelectedKeys()) continue;
+        if(!anim->anim_hasSelectedKeys()) continue;
         anim->graph_setCtrlsModeForSelectedKeys(mode);
     }
     graphConstrainAnimatorCtrlsFrameValues();
@@ -356,7 +356,7 @@ void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode mode) {
 void KeysView::graphSetTwoSideCtrlForSelected() {
     if(mSelectedKeysAnimators.isEmpty()) return;
     for(const auto& anim : mGraphAnimators) {
-        if(!anim->hasSelectedKeys()) continue;
+        if(!anim->anim_hasSelectedKeys()) continue;
         anim->graph_enableCtrlPtsForSelected();
     }
     graphConstrainAnimatorCtrlsFrameValues();

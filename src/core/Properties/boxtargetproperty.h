@@ -36,8 +36,8 @@ public:
     bool SWT_drop(const QMimeData* const data);
 
     bool SWT_isBoxTargetProperty() const { return true; }
-    void writeProperty(eWriteStream &dst) const;
-    void readProperty(eReadStream& src);
+    void prp_writeProperty(eWriteStream &dst) const;
+    void prp_readProperty(eReadStream& src);
 signals:
     void targetSet(BoundingBox*);
 private:

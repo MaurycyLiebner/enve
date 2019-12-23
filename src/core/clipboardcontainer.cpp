@@ -95,7 +95,7 @@ void KeysClipboard::paste(const int pasteFrame, const bool merge,
         eReadStream readStream(&buffer);
         int nKeys; readStream >> nKeys;
         for(int i = 0; i < nKeys; i++) {
-            const auto keyT = animator->createKey();
+            const auto keyT = animator->anim_createKey();
             keyT->readKey(readStream);
             if(keyT->getAbsFrame() < firstKeyFrame)
                 firstKeyFrame = keyT->getAbsFrame();
@@ -134,7 +134,7 @@ PropertyClipboard::PropertyClipboard(const Property* const source) :
     QBuffer buffer(&mData);
     buffer.open(QIODevice::WriteOnly);
     eWriteStream writeStream(&buffer);
-    source->writeProperty(writeStream);
+    source->prp_writeProperty(writeStream);
     buffer.close();
 }
 
@@ -143,7 +143,7 @@ bool PropertyClipboard::paste(Property * const target) {
     QBuffer buffer(&mData);
     buffer.open(QIODevice::ReadOnly);
     eReadStream readStream(&buffer);
-    target->readProperty(readStream);
+    target->prp_readProperty(readStream);
     buffer.close();
     return true;
 }

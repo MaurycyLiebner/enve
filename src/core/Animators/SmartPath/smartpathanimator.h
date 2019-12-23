@@ -43,15 +43,14 @@ public:
 
     QMimeData *SWT_createMimeData();
 
-    void setupTreeViewMenu(PropertyMenu * const menu);
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
-    void drawCanvasControls(SkCanvas * const canvas,
-                            const CanvasMode mode,
-                            const float invScale,
-                            const bool ctrlPressed) {
+    void prp_drawCanvasControls(
+            SkCanvas * const canvas, const CanvasMode mode,
+            const float invScale, const bool ctrlPressed) {
         SkiaHelpers::drawOutlineOverlay(canvas, mCurrentPath, invScale,
                                         toSkMatrix(getTransform()));
-        Property::drawCanvasControls(canvas, mode, invScale, ctrlPressed);
+        Property::prp_drawCanvasControls(canvas, mode, invScale, ctrlPressed);
     }
 
     void prp_afterChangedAbsRange(const FrameRange &range,
@@ -81,12 +80,12 @@ public:
         anim_appendKey(newKey);
     }
 
-    stdsptr<Key> createKey() {
+    stdsptr<Key> anim_createKey() {
         return enve::make_shared<SmartPathKey>(this);
     }
 
-    void readProperty(eReadStream& src);
-    void writeProperty(eWriteStream& dst) const;
+    void prp_readProperty(eReadStream& src);
+    void prp_writeProperty(eWriteStream& dst) const;
 
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType type,
@@ -186,7 +185,8 @@ public:
     }
 
     void actionRemoveNode(const int nodeId, const bool approx) {
-        for(const auto &key : anim_mKeys) {
+        const auto& keys = anim_getKeys();
+        for(const auto &key : keys) {
             const auto spKey = static_cast<SmartPathKey*>(key);
             spKey->getValue().actionRemoveNode(nodeId, approx);
         }
@@ -204,7 +204,8 @@ public:
         if(mBaseValue.getNodeCount() == 0)
             return actionAddFirstNode(data);
         beforeBinaryPathChange();
-        for(const auto &key : anim_mKeys) {
+        const auto& keys = anim_getKeys();
+        for(const auto &key : keys) {
             const auto spKey = static_cast<SmartPathKey*>(key);
             spKey->getValue().actionPrependNode();
         }
@@ -223,7 +224,8 @@ public:
         if(mBaseValue.getNodeCount() == 0)
             return actionAddFirstNode(data);
         beforeBinaryPathChange();
-        for(const auto &key : anim_mKeys) {
+        const auto& keys = anim_getKeys();
+        for(const auto &key : keys) {
             const auto spKey = static_cast<SmartPathKey*>(key);
             spKey->getValue().actionAppendNodeAtEndNode();
         }
@@ -244,7 +246,8 @@ public:
         if(curr->getNodePtr(node2Id)->getCtrlsMode() == CTRLS_SYMMETRIC) {
             curr->actionSetNormalNodeCtrlsMode(node2Id, CTRLS_SMOOTH);
         }
-        for(const auto &key : anim_mKeys) {
+        const auto& keys = anim_getKeys();
+        for(const auto &key : keys) {
             const auto spKey = static_cast<SmartPathKey*>(key);
             spKey->getValue().actionInsertNodeBetween(node1Id, node2Id, t);
         }
@@ -255,7 +258,8 @@ public:
     }
 
     void actionConnectNodes(const int node1Id, const int node2Id) {
-        for(const auto &key : anim_mKeys) {
+        const auto& keys = anim_getKeys();
+        for(const auto &key : keys) {
             const auto spKey = static_cast<SmartPathKey*>(key);
             spKey->getValue().actionConnectNodes(node1Id, node2Id);
         }
@@ -264,7 +268,8 @@ public:
     }
 
     void actionMergeNodes(const int node1Id, const int node2Id) {
-        for(const auto &key : anim_mKeys) {
+        const auto& keys = anim_getKeys();
+        for(const auto &key : keys) {
             const auto spKey = static_cast<SmartPathKey*>(key);
             spKey->getValue().actionMergeNodes(node1Id, node2Id);
         }
@@ -294,7 +299,8 @@ public:
     }
 
     void actionReverseAll() {
-        for(const auto &key : anim_mKeys) {
+        const auto& keys = anim_getKeys();
+        for(const auto &key : keys) {
             const auto spKey = static_cast<SmartPathKey*>(key);
             spKey->getValue().actionReversePath();
         }
@@ -304,7 +310,8 @@ public:
 
     void actionAppendMoveAllFrom(SmartPathAnimator * const other) {
         anim_coordinateKeysWith(other);
-        for(int i = 0; i < anim_mKeys.count(); i++) {
+        const auto& keys = anim_getKeys();
+        for(int i = 0; i < keys.count(); i++) {
             const auto thisKey = anim_getKeyAtIndex<SmartPathKey>(i);
             const auto otherKey = other->anim_getKeyAtIndex<SmartPathKey>(i);
             thisKey->getValue().actionAppendMoveAllFrom(
@@ -318,7 +325,8 @@ public:
 
     void actionPrependMoveAllFrom(SmartPathAnimator * const other) {
         anim_coordinateKeysWith(other);
-        for(int i = 0; i < anim_mKeys.count(); i++) {
+        const auto& keys = anim_getKeys();
+        for(int i = 0; i < keys.count(); i++) {
             const auto thisKey = anim_getKeyAtIndex<SmartPathKey>(i);
             const auto otherKey = other->anim_getKeyAtIndex<SmartPathKey>(i);
             thisKey->getValue().actionPrependMoveAllFrom(
@@ -339,7 +347,8 @@ public:
         const auto baseDetached = mBaseValue.getAndClearLastDetached();
         SmartPath baseSmartPath(baseDetached);
         const auto newAnim = enve::make_shared<SmartPathAnimator>(baseSmartPath);
-        for(const auto &key : anim_mKeys) {
+        const auto& keys = anim_getKeys();
+        for(const auto &key : keys) {
             const auto spKey = static_cast<SmartPathKey*>(key);
             auto& sp = spKey->getValue();
             const auto keyDetached = sp.getAndClearLastDetached();
@@ -353,7 +362,8 @@ public:
 
 
     void applyTransform(const QMatrix &transform) {
-        for(const auto &key : anim_mKeys) {
+        const auto& keys = anim_getKeys();
+        for(const auto &key : keys) {
             const auto spKey = static_cast<SmartPathKey*>(key);
             spKey->getValue().applyTransform(transform);
         }
@@ -393,7 +403,8 @@ public:
         if(pasteClosed != baseClosed) {
             if(pasteClosed) path.actionOpen();
             else {
-                for(const auto &key : anim_mKeys) {
+                const auto& keys = anim_getKeys();
+                for(const auto &key : keys) {
                     const auto spKey = static_cast<SmartPathKey*>(key);
                     auto& sp = spKey->getValue();
                     sp.actionOpen();
@@ -405,7 +416,8 @@ public:
         const int baseNodes = mBaseValue.getNodeCount();
         const int addNodes = pasteNodes - baseNodes;
         if(addNodes > 0) {
-            for(const auto &key : anim_mKeys) {
+            const auto& keys = anim_getKeys();
+            for(const auto &key : keys) {
                 const auto spKey = static_cast<SmartPathKey*>(key);
                 auto& sp = spKey->getValue();
                 sp.addDissolvedNodes(addNodes);
@@ -415,13 +427,11 @@ public:
         }
 
         auto key = anim_getKeyAtRelFrame<SmartPathKey>(frame);
-        if(key) key->assignValue(path);
+        if(key) key->setValue(path);
         else {
             const auto newKey = enve::make_shared<SmartPathKey>(path, frame, this);
             anim_appendKey(newKey);
-            key = newKey.get();
         }
-        anim_updateAfterChangedKey(key);
     }
 signals:
     void pathBlendModeChagned(Mode);
@@ -436,7 +446,8 @@ private:
     }
 
     int actionAddFirstNode(const NormalNodeData &data) {
-        for(const auto &key : anim_mKeys) {
+        const auto& keys = anim_getKeys();
+        for(const auto &key : keys) {
             const auto spKey = static_cast<SmartPathKey*>(key);
             spKey->getValue().actionAddFirstNode(data);
         }

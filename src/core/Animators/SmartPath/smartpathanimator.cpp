@@ -50,7 +50,7 @@ QMimeData *SmartPathAnimator::SWT_createMimeData() {
 
 #include "typemenu.h"
 #include "Private/document.h"
-void SmartPathAnimator::setupTreeViewMenu(PropertyMenu * const menu) {
+void SmartPathAnimator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     const auto spClipboard = Document::sInstance->getSmartPathClipboard();
     menu->addPlainAction("Paste Path", [this, spClipboard]() {
         pastePath(spClipboard->path());
@@ -67,19 +67,19 @@ void SmartPathAnimator::setupTreeViewMenu(PropertyMenu * const menu) {
     };
     menu->addPlainAction("Delete Path(s)", dOp);
     menu->addSeparator();
-    Animator::setupTreeViewMenu(menu);
+    Animator::prp_setupTreeViewMenu(menu);
 }
 
-void SmartPathAnimator::readProperty(eReadStream& src) {
-    readKeys(src);
+void SmartPathAnimator::prp_readProperty(eReadStream& src) {
+    anim_readKeys(src);
     src >> mBaseValue;
     src.read(&mMode, sizeof(Mode));
     prp_afterWholeInfluenceRangeChanged();
     updateAllPoints();
 }
 
-void SmartPathAnimator::writeProperty(eWriteStream &dst) const {
-    writeKeys(dst);
+void SmartPathAnimator::prp_writeProperty(eWriteStream &dst) const {
+    anim_writeKeys(dst);
     dst << mBaseValue;
     dst.write(&mMode, sizeof(Mode));
 }
@@ -99,7 +99,8 @@ void SmartPathAnimator::graph_getValueConstraints(
 
 void SmartPathAnimator::actionDisconnectNodes(const int node1Id,
                                               const int node2Id) {
-    for(const auto &key : anim_mKeys) {
+    const auto& keys = anim_getKeys();
+    for(const auto &key : keys) {
         const auto spKey = static_cast<SmartPathKey*>(key);
         auto& keyPath = spKey->getValue();
         keyPath.actionDisconnectNodes(node1Id, node2Id);

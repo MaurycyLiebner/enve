@@ -20,203 +20,10 @@
 class QIODevice;
 #include "../Properties/property.h"
 #include "key.h"
+#include "overlappingkeylist.h"
 
-class ComplexAnimator;
-class Key;
-class ComplexKey;
-class QrealPoint;
 class QPainter;
 class TimelineMovable;
-enum CtrlsMode : short;
-
-class OverlappingKeys {
-public:
-    OverlappingKeys(const stdsptr<Key>& key,
-                    Animator * const animator) :
-        mAnimator(animator) {
-        mKeys << key;
-    }
-
-    int getFrame() const {
-        const auto key = getKey();
-        if(key) return key->getRelFrame();
-        return 0;
-    }
-
-    bool hasKey(const Key* const key) const {
-        for(const auto& iKey : mKeys) {
-            if(iKey.get() == key) return true;
-        }
-        return false;
-    }
-
-    bool hasMultiple() const { return mKeys.count() > 1; }
-
-    Key * getKey() const {
-        if(mKeys.isEmpty()) return nullptr;
-        if(mKeys.count() == 1) return mKeys.last().get();
-        for(const auto& iKey : mKeys) {
-            if(iKey->isDescendantSelected()) return iKey.get();
-        }
-        return mKeys.last().get();
-    }
-
-    bool isEmpty() const {
-        return mKeys.isEmpty();
-    }
-
-    void removeKey(const stdsptr<Key>& key) {
-        for(int i = 0; i < mKeys.count(); i++) {
-            const auto& iKey = mKeys.at(i);
-            if(iKey.get() == key.get()) {
-                mKeys.removeAt(i);
-                break;
-            }
-        }
-    }
-
-    void addKey(const stdsptr<Key>& key) {
-        mKeys.append(key);
-    }
-
-    void merge();
-private:
-    Animator * mAnimator;
-    QList<stdsptr<Key>> mKeys;
-};
-
-class OverlappingKeyList {
-    typedef QList<OverlappingKeys>::const_iterator OKeyListCIter;
-    typedef QList<OverlappingKeys>::iterator OKeyListIter;
-public:
-    OverlappingKeyList(Animator * const animator) :
-        mAnimator(animator) {}
-
-    class iterator {
-    public:
-        iterator(const int id,
-                const QList<OverlappingKeys> * const list) :
-            mList(list) {
-            setId(id);
-        }
-
-        iterator& operator++() {
-            setId(mId + 1);
-            return *this;
-        }
-
-        bool operator!=(const iterator& other) const {
-            return this->mId != other.mId;
-        }
-
-        Key * const & operator->() const { return mKey; }
-        Key * const &operator*() const { return mKey; }
-    protected:
-        int mId;
-    private:
-        void setId(const int id) {
-            mId = id;
-            if(mId < 0 || mId >= mList->count()) mKey = nullptr;
-            else mKey = mList->at(mId).getKey();
-        }
-        const QList<OverlappingKeys> * mList = nullptr;
-        Key * mKey = nullptr;
-    };
-
-    iterator begin() const {
-        return iterator(0, &mList);
-    }
-
-    iterator end() const {
-        return iterator(mList.count(), &mList);
-    }
-
-    int count() const {
-        return mList.count();
-    }
-
-    bool isEmpty() const {
-        return mList.isEmpty();
-    }
-
-    bool hasKey(const Key* const key, int* idP = nullptr) const {
-        int id = idAtFrame(key->getRelFrame());
-        if(idP) *idP = id;
-        if(id < 0) return false;
-        if(id >= mList.count()) return false;
-        return mList.at(id).hasKey(key);
-    }
-
-    bool isDuplicateAtIdex(const int index) const {
-        return mList.at(index).hasMultiple();
-    }
-
-    void add(const stdsptr<Key>& key);
-
-    void remove(const stdsptr<Key>& key) {
-        const int relFrame = key->getRelFrame();
-        const int removeId = idAtFrame(relFrame);
-        if(removeId == -1) return;
-        auto& ovrlp = mList[removeId];
-        ovrlp.removeKey(key);
-        if(ovrlp.isEmpty()) mList.removeAt(removeId);
-    }
-
-    template <class T = Key>
-    T * atId(const int id) const {
-        if(id < 0) return nullptr;
-        if(id >= mList.count()) return nullptr;
-        return static_cast<T*>(mList.at(id).getKey());
-    }
-
-    template <class T = Key>
-    T * atRelFrame(const int relFrame) const {
-        const int id = idAtFrame(relFrame);
-        const auto kAtId = atId<T>(id);
-        if(!kAtId) return nullptr;
-        if(kAtId->getRelFrame() == relFrame) return kAtId;
-        return nullptr;
-    }
-
-    std::pair<int, int> prevAndNextId(const int relFrame) const {
-        if(mList.isEmpty()) return {-1, -1};
-        const auto notLess = lowerBound(relFrame);
-        if(notLess == mList.end())
-            return {mList.count() - 1, -1};
-        const int notLessId = notLess - mList.begin();
-        if(notLess->getFrame() == relFrame) {
-            if(notLessId == mList.count() - 1)
-                return {notLessId - 1, -1};
-            return {notLessId - 1, notLessId + 1};
-        }
-        // notLess is greater than relFrame
-        return {notLessId - 1, notLessId};
-    }
-
-    template <class T = Key>
-    T * first() const {
-        return atId<T>(0);
-    }
-
-    template <class T = Key>
-    T * last() const {
-        return atId<T>(mList.count() - 1);
-    }
-
-    void mergeAll() {
-        for(auto& oKey : mList) oKey.merge();
-    }
-private:
-    OKeyListCIter upperBound(const int relFrame) const;
-    OKeyListCIter lowerBound(const int relFrame) const;
-    OKeyListIter upperBound(const int relFrame);
-    OKeyListIter lowerBound(const int relFrame);
-
-    int idAtFrame(const int relFrame) const;
-
-    Animator * const mAnimator;
-    QList<OverlappingKeys> mList;
-};
 
 class Animator : public Property {
     Q_OBJECT
@@ -224,12 +31,13 @@ class Animator : public Property {
 protected:
     Animator(const QString &name);
 
-    virtual void anim_afterKeyOnCurrentFrameChanged(Key* const key) {
-        Q_UNUSED(key)
-    }
+    virtual void anim_afterKeyOnCurrentFrameChanged(Key* const key)
+    { Q_UNUSED(key) }
 public:
+    bool SWT_isAnimator() const final { return true; }
+
     virtual void anim_addKeyAtRelFrame(const int relFrame) = 0;
-    virtual stdsptr<Key> createKey() = 0;
+    virtual stdsptr<Key> anim_createKey() = 0;
 
     virtual void anim_scaleTime(const int pivotAbsFrame,
                                 const qreal scale);
@@ -246,10 +54,16 @@ public:
     virtual bool anim_isDescendantRecording() const;
 
     virtual TimelineMovable *anim_getTimelineMovable(
-                                           const int relX,
-                                           const int minViewedFrame,
-                                           const qreal pixelsPerFrame);
+                const int relX, const int minViewedFrame,
+                const qreal pixelsPerFrame) {
+        Q_UNUSED(relX)
+        Q_UNUSED(minViewedFrame)
+        Q_UNUSED(pixelsPerFrame)
+        return nullptr;
+    }
+
     virtual void anim_removeAllKeys();
+    virtual void anim_shiftAllKeys(const int shift);
     virtual void anim_getKeysInRect(const QRectF &selectionRect,
                                     const qreal pixelsPerFrame,
                                     QList<Key*>& keysList,
@@ -257,14 +71,11 @@ public:
     virtual void anim_updateAfterShifted();
     virtual void anim_setRecording(const bool rec);
 
-    bool SWT_isAnimator() const { return true; }
+    void prp_drawTimelineControls(
+            QPainter * const p, const qreal pixelsPerFrame,
+            const FrameRange &absFrameRange, const int rowHeight);
 
-    void drawTimelineControls(QPainter * const p,
-                              const qreal pixelsPerFrame,
-                              const FrameRange &absFrameRange,
-                              const int rowHeight);
-
-    void setupTreeViewMenu(PropertyMenu * const menu);
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     void prp_afterFrameShiftChanged(const FrameRange& oldAbsRange,
                                     const FrameRange& newAbsRange);
@@ -326,37 +137,42 @@ public:
     int anim_getCurrentAbsFrame() const;
 
     void anim_moveKeyToRelFrame(Key * const key, const int newFrame);
-    virtual void anim_shiftAllKeys(const int shift);
 
     int anim_getPrevKeyRelFrame(const int relFrame) const;
     int anim_getNextKeyRelFrame(const int relFrame) const;
-    bool hasSelectedKeys() const;
 
-    void addKeyToSelected(Key * const key);
-    void removeKeyFromSelected(Key * const key);
+    bool anim_hasSelectedKeys() const;
 
-    void writeSelectedKeys(eWriteStream &dst);
+    void anim_addKeyToSelected(Key * const key);
+    void anim_removeKeyFromSelected(Key * const key);
 
-    void deselectAllKeys();
-    void selectAllKeys();
+    void anim_writeSelectedKeys(eWriteStream &dst);
 
-    void incSelectedKeysFrame(const int dFrame);
+    void anim_deselectAllKeys();
+    void anim_selectAllKeys();
 
-    void scaleSelectedKeysFrame(const int absPivotFrame,
-                                const qreal scale);
+    void anim_incSelectedKeysFrame(const int dFrame);
 
-    void cancelSelectedKeysTransform();
-    void finishSelectedKeysTransform();
-    void startSelectedKeysTransform();
+    void anim_scaleSelectedKeysFrame(const int absPivotFrame,
+                                     const qreal scale);
 
-    void deleteSelectedKeys();
+    void anim_cancelSelectedKeysTransform();
+    void anim_finishSelectedKeysTransform();
+    void anim_startSelectedKeysTransform();
+
+    void anim_deleteSelectedKeys();
     void anim_deleteCurrentKey();
 
-    int getLowestAbsFrameForSelectedKey();
+    int anim_getLowestAbsFrameForSelectedKey();
 
-    const QList<Key*>& getSelectedKeys() const {
+    const QList<Key*>& anim_getSelectedKeys() const {
         return anim_mSelectedKeys;
     }
+
+    const OverlappingKeyList& anim_getKeys() const {
+        return anim_mKeys;
+    }
+
     template <class T = Key>
     T* anim_getKeyAtIndex(const int id) const;
     int anim_getKeyIndex(const Key * const key) const;
@@ -364,40 +180,31 @@ public:
     void anim_coordinateKeysWith(Animator * const other);
     void anim_addKeysWhereOtherHasKeys(const Animator * const other);
 protected:
-    void readKeys(eReadStream &src);
-    void writeKeys(eWriteStream& dst) const;
+    void anim_readKeys(eReadStream &src);
+    void anim_writeKeys(eWriteStream& dst) const;
 
-    IdRange frameRangeToKeyIdRange(const FrameRange& relRange) const {
-        int min = anim_getPrevKeyId(relRange.fMin + 1);
-        int max = anim_getNextKeyId(relRange.fMax - 1);
-        if(min == -1) min = 0;
-        if(max == -1) max = anim_mKeys.count() - 1;
-        return {min, max};
-    }
-
-    OverlappingKeyList anim_mKeys;
-    QList<Key*> anim_mSelectedKeys;
+    IdRange anim_frameRangeToKeyIdRange(const FrameRange& relRange) const;
+signals:
+    void anim_isRecordingChanged();
+    void anim_changedKeyOnCurrentFrame(Key* key, QPrivateSignal);
+    void anim_removedKey(Key* key, QPrivateSignal);
+    void anim_addedKey(Key* key, QPrivateSignal);
 private:
     void anim_drawKey(QPainter * const p, Key * const key,
                       const qreal pixelsPerFrame,
                       const int startFrame,
                       const int rowHeight);
+    void removeKeyWithoutDeselecting(const stdsptr<Key> &keyToRemove);
+    void anim_updateKeyOnCurrrentFrame();
+    void anim_setKeyOnCurrentFrame(Key * const key);
 
     bool anim_mIsRecording = false;
 
     int anim_mCurrentAbsFrame = 0;
     int anim_mCurrentRelFrame = 0;
-signals:
-    void anim_changedKeyOnCurrentFrame(Key*);
-    void anim_isRecordingChanged();
-    void anim_removedKey(Key*);
-    void anim_addedKey(Key*);
-private:
-    void removeKeyWithoutDeselecting(const stdsptr<Key> &keyToRemove);
-    void anim_updateKeyOnCurrrentFrame();
-    void anim_setKeyOnCurrentFrame(Key * const key);
-
     stdptr<Key> anim_mKeyOnCurrentFrame;
+    QList<Key*> anim_mSelectedKeys;
+    OverlappingKeyList anim_mKeys;
 };
 
 

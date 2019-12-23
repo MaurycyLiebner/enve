@@ -54,11 +54,11 @@ void IntProperty::prp_finishTransform() {
 
 bool IntProperty::SWT_isIntProperty() const { return true; }
 
-void IntProperty::writeProperty(eWriteStream& dst) const {
+void IntProperty::prp_writeProperty(eWriteStream& dst) const {
     dst << mValue;
 }
 
-void IntProperty::readProperty(eReadStream& src) {
+void IntProperty::prp_readProperty(eReadStream& src) {
     src >> mValue;
 }
 

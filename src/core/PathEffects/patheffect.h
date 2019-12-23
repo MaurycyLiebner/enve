@@ -54,7 +54,7 @@ public:
 
     void writeIdentifier(eWriteStream &dst) const;
 
-    void setupTreeViewMenu(PropertyMenu * const menu);
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     PathEffectType getEffectType();
 protected:

@@ -36,7 +36,7 @@ bool PathEffectAnimators::SWT_isPathEffectAnimators() const {
 
 void PathEffectAnimators::readPathEffect(eReadStream& src) {
     const auto pathEffect = readIdCreatePathEffect(src);
-    pathEffect->readProperty(src);
+    pathEffect->prp_readProperty(src);
     addChild(pathEffect);
 }
 

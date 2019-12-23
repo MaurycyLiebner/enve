@@ -77,14 +77,14 @@ BoundingBox::~BoundingBox() {
 
 void BoundingBox::writeBoundingBox(eWriteStream& dst) {
     if(mWriteId < 0) assignWriteId();
-    eBoxOrSound::writeProperty(dst);
+    eBoxOrSound::prp_writeProperty(dst);
     dst << prp_getName();
     dst << mWriteId;
     dst.write(&mBlendMode, sizeof(SkBlendMode));
 }
 
 void BoundingBox::readBoundingBox(eReadStream& src) {
-    eBoxOrSound::readProperty(src);
+    eBoxOrSound::prp_readProperty(src);
     QString name;
     src >> name;
     prp_setName(name);
@@ -201,7 +201,7 @@ void BoundingBox::drawAllCanvasControls(SkCanvas * const canvas,
                                         const float invScale,
                                         const bool ctrlPressed) {
     for(const auto& prop : mCanvasProps)
-        prop->drawCanvasControls(canvas, mode, invScale, ctrlPressed);
+        prop->prp_drawCanvasControls(canvas, mode, invScale, ctrlPressed);
 }
 
 MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPos,
@@ -758,7 +758,7 @@ void BoundingBox::addOutlineBasePathEffect(const qsptr<PathEffect> &) {}
 void BoundingBox::addOutlinePathEffect(const qsptr<PathEffect> &) {}
 
 #include <QInputDialog>
-void BoundingBox::setupTreeViewMenu(PropertyMenu * const menu) {
+void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     const auto parentWidget = menu->getParentWidget();
     menu->addPlainAction("Rename", [this, parentWidget]() {
         bool ok;

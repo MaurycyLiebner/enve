@@ -104,8 +104,8 @@ int eBoxOrSound::prp_getRelFrameShift() const {
     return mDurationRectangle->getRelShift();
 }
 
-void eBoxOrSound::writeProperty(eWriteStream& dst) const {
-    StaticComplexAnimator::writeProperty(dst);
+void eBoxOrSound::prp_writeProperty(eWriteStream& dst) const {
+    StaticComplexAnimator::prp_writeProperty(dst);
     dst << mVisible;
     dst << mLocked;
 
@@ -114,8 +114,8 @@ void eBoxOrSound::writeProperty(eWriteStream& dst) const {
     if(hasDurRect) mDurationRectangle->writeDurationRectangle(dst);
 }
 
-void eBoxOrSound::readProperty(eReadStream& src) {
-    StaticComplexAnimator::readProperty(src);
+void eBoxOrSound::prp_readProperty(eReadStream& src) {
+    StaticComplexAnimator::prp_readProperty(src);
     src >> mVisible;
     src >> mLocked;
 
@@ -135,10 +135,9 @@ TimelineMovable *eBoxOrSound::anim_getTimelineMovable(
                                             minViewedFrame);
 }
 
-void eBoxOrSound::drawTimelineControls(QPainter * const p,
-                                       const qreal pixelsPerFrame,
-                                       const FrameRange &absFrameRange,
-                                       const int rowHeight) {
+void eBoxOrSound::prp_drawTimelineControls(
+        QPainter * const p, const qreal pixelsPerFrame,
+        const FrameRange &absFrameRange, const int rowHeight) {
     if(mDurationRectangle) {
         p->save();
         const int width = qCeil(absFrameRange.span()*pixelsPerFrame);
@@ -150,8 +149,8 @@ void eBoxOrSound::drawTimelineControls(QPainter * const p,
         p->restore();
     }
 
-    ComplexAnimator::drawTimelineControls(p, pixelsPerFrame,
-                                          absFrameRange, rowHeight);
+    ComplexAnimator::prp_drawTimelineControls(
+                p, pixelsPerFrame, absFrameRange, rowHeight);
 }
 
 void eBoxOrSound::setDurationRectangle(

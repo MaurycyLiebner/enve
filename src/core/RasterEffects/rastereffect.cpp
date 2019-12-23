@@ -40,8 +40,8 @@ void RasterEffect::writeIdentifier(eWriteStream &dst) const {
     dst.write(&mType, sizeof(RasterEffectType));
 }
 
-void RasterEffect::setupTreeViewMenu(PropertyMenu * const menu) {
-    eEffect::setupTreeViewMenu(menu);
+void RasterEffect::prp_setupTreeViewMenu(PropertyMenu * const menu) {
+    eEffect::prp_setupTreeViewMenu(menu);
     const PropertyMenu::PlainSelectedOp<RasterEffect> dOp =
     [](RasterEffect* const eff) {
         const auto parent = eff->getParent<DynamicComplexAnimatorBase<RasterEffect>>();

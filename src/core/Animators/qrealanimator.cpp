@@ -34,17 +34,17 @@ QrealAnimator::QrealAnimator(const qreal iniVal,
 
 QrealAnimator::QrealAnimator(const QString &name) : GraphAnimator(name) {}
 
-void QrealAnimator::writeProperty(eWriteStream& dst) const {
-    writeKeys(dst);
+void QrealAnimator::prp_writeProperty(eWriteStream& dst) const {
+    anim_writeKeys(dst);
     dst << mCurrentBaseValue;
 }
 
-stdsptr<Key> QrealAnimator::createKey() {
+stdsptr<Key> QrealAnimator::anim_createKey() {
     return enve::make_shared<QrealKey>(this);
 }
 
-void QrealAnimator::readProperty(eReadStream& src) {
-    readKeys(src);
+void QrealAnimator::prp_readProperty(eReadStream& src) {
+    anim_readKeys(src);
 
     qreal val; src >> val;
     if(!anim_hasKeys()) setCurrentBaseValue(val);
@@ -108,7 +108,8 @@ QrealSnapshot QrealAnimator::makeSnapshot(
         const qreal frameMultiplier,
         const qreal valueMultiplier) const {
     QrealSnapshot snapshot(mCurrentBaseValue, frameMultiplier, valueMultiplier);
-    for(const auto& key : anim_mKeys) {
+    const auto& keys = anim_getKeys();
+    for(const auto& key : keys) {
         const auto qaKey = static_cast<QrealKey*>(key);
         snapshot.appendKey(qaKey);
     }
@@ -121,11 +122,12 @@ QrealSnapshot QrealAnimator::makeSnapshot(
         const qreal valueMultiplier) const {
     const int prevKeyId = anim_getPrevKeyId(minFrame);
     const int nextKeyId = anim_getNextKeyId(maxFrame);
-    const int minI = clamp(prevKeyId, 0, anim_mKeys.count() - 1);
-    const int maxI = clamp(nextKeyId, 0, anim_mKeys.count() - 1);
+    const auto& keys = anim_getKeys();
+    const int minI = clamp(prevKeyId, 0, keys.count() - 1);
+    const int maxI = clamp(nextKeyId, 0, keys.count() - 1);
     QrealSnapshot snapshot(mCurrentBaseValue, frameMultiplier, valueMultiplier);
     for(int i = minI; i <= maxI; i++) {
-        const auto iKey = anim_mKeys.atId<QrealKey>(i);
+        const auto iKey = keys.atId<QrealKey>(i);
         snapshot.appendKey(iKey);
     }
     return snapshot;
@@ -138,7 +140,8 @@ void QrealAnimator::setValueRange(const qreal minVal, const qreal maxVal) {
 }
 
 void QrealAnimator::incAllValues(const qreal valInc) {
-    for(const auto &key : anim_mKeys) {
+    const auto& keys = anim_getKeys();
+    for(const auto &key : keys) {
         static_cast<QrealKey*>(key)->incValue(valInc);
     }
     incCurrentBaseValue(valInc);
@@ -193,7 +196,7 @@ bool QrealAnimator::hasNoise() {
 }
 
 qreal QrealAnimator::calculateBaseValueAtRelFrame(const qreal frame) const {
-    if(anim_mKeys.isEmpty()) return mCurrentBaseValue;
+    if(!anim_hasKeys()) return mCurrentBaseValue;
     const auto pn = anim_getPrevAndNextKeyIdF(frame);
     const int prevId = pn.first;
     const int nextId = pn.second;
@@ -296,10 +299,10 @@ void QrealAnimator::anim_addKeyAtRelFrame(const int relFrame) {
 }
 
 void QrealAnimator::anim_removeAllKeys() {
-    if(anim_mKeys.isEmpty()) return;
+    if(!anim_hasKeys()) return;
     const qreal currentValue = mCurrentBaseValue;
 
-    const auto keys = anim_mKeys;
+    const auto keys = anim_getKeys();
     for(const auto& key : keys) {
         anim_removeKey(key->ref<Key>());
     }
@@ -339,13 +342,14 @@ qValueRange QrealAnimator::graph_getMinAndMaxValues() const {
     if(mGraphMinMaxValuesFixed) {
         return {mMinPossibleVal, mMaxPossibleVal};
     }
-    if(anim_mKeys.isEmpty()) {
+    if(!anim_hasKeys()) {
         return {mCurrentBaseValue - mPrefferedValueStep,
                 mCurrentBaseValue + mPrefferedValueStep};
     }
     qreal minVal = TEN_MIL;
     qreal maxVal = -TEN_MIL;
-    for(const auto &key : anim_mKeys) {
+    const auto& keys = anim_getKeys();
+    for(const auto &key : keys) {
         const auto qaKey = static_cast<QrealKey*>(key);
         const qreal keyVal = qaKey->getValue();
         const qreal startVal = qaKey->getStartValue();
@@ -361,11 +365,12 @@ qValueRange QrealAnimator::graph_getMinAndMaxValues() const {
 
 qValueRange QrealAnimator::graph_getMinAndMaxValuesBetweenFrames(
         const int startFrame, const int endFrame) const {
-    if(anim_mKeys.isEmpty()) return {mCurrentBaseValue, mCurrentBaseValue};
+    if(!anim_hasKeys()) return {mCurrentBaseValue, mCurrentBaseValue};
     bool first = true;
     qreal minVal = TEN_MIL;
     qreal maxVal = -TEN_MIL;
-    for(const auto &key : anim_mKeys) {
+    const auto& keys = anim_getKeys();
+    for(const auto &key : keys) {
         const auto qaKey = static_cast<QrealKey*>(key);
         const int keyFrame = key->getAbsFrame();
         if(keyFrame > endFrame || keyFrame < startFrame) continue;

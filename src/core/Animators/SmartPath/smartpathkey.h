@@ -29,10 +29,7 @@ public:
     void save();
     void restore();
 
-    SkPath getPath() const {
-        return getValue().getPathAt();
-    }
-    void assignValue(const SmartPath &value);
+    SkPath getPath() const;
 };
 
 #endif // SMARTPATHKEY_H

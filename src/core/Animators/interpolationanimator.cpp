@@ -23,7 +23,7 @@ InterpolationAnimator::InterpolationAnimator(const QString &name) :
 
 qreal InterpolationAnimator::getInterpolatedFrameAtRelFrame(
         const qreal frame) const {
-    if(anim_mKeys.isEmpty()) return frame;
+    if(!anim_hasKeys()) return frame;
     const auto pn = anim_getPrevAndNextKeyIdF(frame);
     const int prevId = pn.first;
     const int nextId = pn.second;

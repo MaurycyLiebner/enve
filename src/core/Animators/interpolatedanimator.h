@@ -22,7 +22,7 @@ template <typename T>
 class InterpolatedAnimator : public AnimatorT<T> {
 public:
     T getValueAtRelFrame(const int relFrame) const {
-        if(Animator::anim_mKeys.isEmpty())
+        if(!Animator::anim_hasKeys())
             return this->getCurrentValue();
         int prevId; int nextId;
         this->anim_getPrevAndNextKeyIdF(prevId, nextId, relFrame);

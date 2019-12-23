@@ -29,9 +29,9 @@ protected:
 public:
     bool SWT_isColorAnimator() const { return true; }
 
-    void writeProperty(eWriteStream& dst) const;
-    void readProperty(eReadStream& src);
-    void setupTreeViewMenu(PropertyMenu * const menu);
+    void prp_writeProperty(eWriteStream& dst) const;
+    void prp_readProperty(eReadStream& src);
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     void qra_setCurrentValue(const QColor &qcolorValue);
 

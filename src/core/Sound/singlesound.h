@@ -31,7 +31,7 @@ protected:
 public:
     bool SWT_isSingleSound() const { return mIndependent; }
 
-    void setupTreeViewMenu(PropertyMenu * const menu);
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     int prp_getRelFrameShift() const;
 
@@ -44,8 +44,8 @@ public:
                              const bool parentSatisfies,
                              const bool parentMainTarget) const;
 
-    void writeProperty(eWriteStream& dst) const;
-    void readProperty(eReadStream& src);
+    void prp_writeProperty(eWriteStream& dst) const;
+    void prp_readProperty(eReadStream& src);
 
     void setFilePath(const QString &path);
 

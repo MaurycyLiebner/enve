@@ -27,8 +27,8 @@ public:
     bool getValue();
 
     bool SWT_isBoolProperty() const { return true; }
-    void writeProperty(eWriteStream& dst) const;
-    void readProperty(eReadStream& src);
+    void prp_writeProperty(eWriteStream& dst) const;
+    void prp_readProperty(eReadStream& src);
     void setValue(const bool value);
 signals:
     void valueChanged(bool);
@@ -44,8 +44,8 @@ protected:
     BoolPropertyContainer(const QString& name);
 public:
     bool SWT_isBoolPropertyContainer() const { return true; }
-    void writeProperty(eWriteStream& dst) const;
-    void readProperty(eReadStream& src);
+    void prp_writeProperty(eWriteStream& dst) const;
+    void prp_readProperty(eReadStream& src);
 
     void setValue(const bool value);
     bool getValue();

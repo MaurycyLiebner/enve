@@ -38,19 +38,19 @@ void PaintSettingsAnimator::setup(const QColor &color,
     setGradientVar(gradient);
 }
 
-void PaintSettingsAnimator::writeProperty(eWriteStream& dst) const {
-    mColor->writeProperty(dst);
+void PaintSettingsAnimator::prp_writeProperty(eWriteStream& dst) const {
+    mColor->prp_writeProperty(dst);
     dst.write(&mPaintType, sizeof(PaintType));
     dst.write(&mGradientType, sizeof(GradientType));
     const int gradRWId = mGradient ? mGradient->getReadWriteId() : -1;
     dst << gradRWId;
     const int gradDocId = mGradient ? mGradient->getDocumentId() : -1;
     dst << gradDocId;
-    mGradientPoints->writeProperty(dst);
+    mGradientPoints->prp_writeProperty(dst);
 }
 
-void PaintSettingsAnimator::readProperty(eReadStream& src) {
-    mColor->readProperty(src);
+void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
+    mColor->prp_readProperty(src);
     PaintType paintType;
     src.read(&paintType, sizeof(PaintType));
     src.read(&mGradientType, sizeof(GradientType));
@@ -65,7 +65,7 @@ void PaintSettingsAnimator::readProperty(eReadStream& src) {
     }
     setGradientVar(grad);
     setPaintType(paintType);
-    mGradientPoints->readProperty(src);
+    mGradientPoints->prp_readProperty(src);
 }
 
 void PaintSettingsAnimator::setGradientVar(Gradient* const grad) {

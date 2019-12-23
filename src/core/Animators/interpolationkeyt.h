@@ -21,6 +21,14 @@
 template <typename T>
 class InterpolationKeyT : public GraphKeyT<T> {
     e_OBJECT
+protected:
+    InterpolationKeyT(const T &value, const int frame,
+                      Animator * const parentAnimator) :
+        GraphKeyT<T>(value, frame, parentAnimator) {}
+    InterpolationKeyT(const int frame, Animator * const parentAnimator) :
+        GraphKeyT<T>(frame, parentAnimator) {}
+    InterpolationKeyT(Animator * const parentAnimator) :
+        GraphKeyT<T>(parentAnimator) {}
 public:
     qreal getValueForGraph() const {
         return this->mRelFrame;
@@ -37,14 +45,6 @@ public:
         this->setStartValueVar(this->mStartPt.getRawYValue() + dFrame);
         this->setEndValueVar(this->mEndPt.getRawYValue() + dFrame);
     }
-protected:
-    InterpolationKeyT(const T &value, const int frame,
-                      Animator * const parentAnimator) :
-        GraphKeyT<T>(value, frame, parentAnimator) {}
-    InterpolationKeyT(const int frame, Animator * const parentAnimator) :
-        GraphKeyT<T>(frame, parentAnimator) {}
-    InterpolationKeyT(Animator * const parentAnimator) :
-        GraphKeyT<T>(parentAnimator) {}
 };
 
 #endif // INTERPOLATIONKEYT_H

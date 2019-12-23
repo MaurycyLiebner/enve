@@ -27,7 +27,7 @@ class InterpolationAnimatorT :
 public:
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType type,
-            qreal &minValue, qreal &maxValue) const {
+            qreal &minValue, qreal &maxValue) const override {
         if(type == QrealPointType::KEY_POINT) {
             minValue = key->getRelFrame();
             maxValue = minValue;

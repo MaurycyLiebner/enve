@@ -41,8 +41,8 @@ protected:
     virtual void showHideChildrenBeforeChaningPaintType(
             const PaintType newPaintType);
 public:
-    void writeProperty(eWriteStream& dst) const;
-    void readProperty(eReadStream& src);
+    void prp_writeProperty(eWriteStream& dst) const;
+    void prp_readProperty(eReadStream& src);
 
     void setup(const QColor &color,
                const PaintType paintType,

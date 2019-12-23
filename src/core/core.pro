@@ -74,6 +74,8 @@ SOURCES += \
     Animators/gradient.cpp \
     Animators/gradientpoints.cpp \
     Animators/outlinesettingsanimator.cpp \
+    Animators/overlappingkeylist.cpp \
+    Animators/overlappingkeys.cpp \
     Animators/paintsettingsanimator.cpp \
     Animators/qcubicsegment1danimator.cpp \
     Animators/qrealsnapshot.cpp \
@@ -309,6 +311,8 @@ HEADERS += \
     Animators/gradient.h \
     Animators/gradientpoints.h \
     Animators/outlinesettingsanimator.h \
+    Animators/overlappingkeylist.h \
+    Animators/overlappingkeys.h \
     Animators/paintsettingsanimator.h \
     Animators/qcubicsegment1danimator.h \
     Animators/qrealsnapshot.h \

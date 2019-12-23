@@ -19,13 +19,13 @@
 eEffect::eEffect(const QString &name) :
     StaticComplexAnimator(name) {}
 
-void eEffect::writeProperty(eWriteStream& dst) const {
-    StaticComplexAnimator::writeProperty(dst);
+void eEffect::prp_writeProperty(eWriteStream& dst) const {
+    StaticComplexAnimator::prp_writeProperty(dst);
     dst << mVisible;
 }
 
-void eEffect::readProperty(eReadStream& src) {
-    StaticComplexAnimator::readProperty(src);
+void eEffect::prp_readProperty(eReadStream& src) {
+    StaticComplexAnimator::prp_readProperty(src);
     bool visible; src >> visible;
     setVisible(visible);
 }

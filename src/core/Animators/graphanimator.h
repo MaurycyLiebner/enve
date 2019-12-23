@@ -18,8 +18,12 @@
 #define GRAPHANIMATOR_H
 #include "animator.h"
 #define GetAsGK(key) static_cast<GraphKey*>(key)
+
 class GraphKey;
+class QrealPoint;
+enum CtrlsMode : short;
 enum QrealPointType : short;
+
 class GraphAnimator : public Animator {
     struct GraphPath {
         operator const QPainterPath&() const { return fPath; }
@@ -57,7 +61,7 @@ public:
     void graph_updateKeysPath(const FrameRange& relFrameRange);
 
     void gAddKeysInRectToList(const QRectF &frameValueRect,
-                              QList<GraphKey*> &keys);
+                              QList<GraphKey*> &target);
 
     void graph_drawKeysPath(QPainter * const p,
                             const QColor &paintColor,

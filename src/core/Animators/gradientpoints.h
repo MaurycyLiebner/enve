@@ -28,10 +28,9 @@ class GradientPoints : public StaticComplexAnimator {
 protected:
     GradientPoints(PathBox * const parent);
 public:
-    void drawCanvasControls(SkCanvas *const canvas,
-                            const CanvasMode mode,
-                            const float invScale,
-                            const bool ctrlPressed);
+    void prp_drawCanvasControls(
+            SkCanvas *const canvas, const CanvasMode mode,
+            const float invScale, const bool ctrlPressed);
 
     void enable();
     void disable();

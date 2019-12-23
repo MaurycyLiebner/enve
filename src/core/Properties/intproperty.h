@@ -26,8 +26,8 @@ protected:
 public:
     bool SWT_isIntProperty() const;
 
-    void writeProperty(eWriteStream& dst) const;
-    void readProperty(eReadStream& src);
+    void prp_writeProperty(eWriteStream& dst) const;
+    void prp_readProperty(eReadStream& src);
     void prp_startTransform();
     void prp_finishTransform();
 

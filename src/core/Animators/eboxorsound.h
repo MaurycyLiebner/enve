@@ -49,16 +49,15 @@ public:
         StaticComplexAnimator::prp_afterChangedAbsRange(croppedRange);
     }
 
-    void writeProperty(eWriteStream& dst) const;
-    void readProperty(eReadStream& src);
+    void prp_writeProperty(eWriteStream& dst) const;
+    void prp_readProperty(eReadStream& src);
 
     TimelineMovable *anim_getTimelineMovable(
             const int relX, const int minViewedFrame,
             const qreal pixelsPerFrame);
-    void drawTimelineControls(QPainter * const p,
-                              const qreal pixelsPerFrame,
-                              const FrameRange &absFrameRange,
-                              const int rowHeight);
+    void prp_drawTimelineControls(
+            QPainter * const p, const qreal pixelsPerFrame,
+            const FrameRange &absFrameRange, const int rowHeight);
 
     void setDurationRectangle(const qsptr<DurationRectangle> &durationRect);
     bool hasDurationRectangle() const;

@@ -195,7 +195,7 @@ public:
     virtual void addOutlineBasePathEffect(const qsptr<PathEffect>&);
     virtual void addOutlinePathEffect(const qsptr<PathEffect>&);
 
-    void setupTreeViewMenu(PropertyMenu * const menu);
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
     virtual void setupCanvasMenu(PropertyMenu * const menu);
 
     virtual void setupRenderData(const qreal relFrame,
@@ -354,7 +354,7 @@ public:
 protected:
     void setRelBoundingRect(const QRectF& relRect);
 
-    void updateCanvasProps() {
+    void prp_updateCanvasProps() {
         mCanvasProps.clear();
         ca_execOnDescendants([this](Property * prop) {
             if(prop->drawsOnCanvas()) mCanvasProps.append(prop);
@@ -408,14 +408,14 @@ void BoundingBox::sWriteReadMember(B* const from, B* const to, const T member) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     eWriteStream writeStream(&buffer);
-    (from->*member)->writeProperty(writeStream);
+    (from->*member)->prp_writeProperty(writeStream);
     writeStream.writeFutureTable();
     buffer.seek(0);
     eReadStream readStream(&buffer);
     buffer.seek(buffer.size() - qint64(sizeof(int)));
     readStream.readFutureTable();
     buffer.seek(0);
-    (to->*member)->readProperty(readStream);
+    (to->*member)->prp_readProperty(readStream);
     buffer.close();
 }
 

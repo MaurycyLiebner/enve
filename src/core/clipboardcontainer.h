@@ -117,7 +117,7 @@ protected:
         eWriteStream dst(&buffer);
         dst << source.count();
         for(const auto& src : source)
-            src->writeProperty(dst);
+            src->prp_writeProperty(dst);
         buffer.close();
     }
 public:
@@ -127,7 +127,7 @@ public:
         QBuffer buffer(&mData);
         buffer.open(QIODevice::ReadOnly);
         eReadStream src(&buffer);
-        target->readProperty(src);
+        target->prp_readProperty(src);
         buffer.close();
         return true;
     }

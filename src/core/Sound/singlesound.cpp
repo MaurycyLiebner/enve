@@ -43,7 +43,7 @@ SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
 
 #include <QInputDialog>
 #include "typemenu.h"
-void SingleSound::setupTreeViewMenu(PropertyMenu * const menu) {
+void SingleSound::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     const PropertyMenu::CheckSelectedOp<SingleSound> enableOp =
             [](SingleSound * sound, bool enable) {
         sound->setVisibile(enable);
@@ -156,24 +156,24 @@ bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 }
 
 #include "ReadWrite/basicreadwrite.h"
-void SingleSound::writeProperty(eWriteStream& dst) const {
+void SingleSound::prp_writeProperty(eWriteStream& dst) const {
     if(videoSound()) {
-        StaticComplexAnimator::writeProperty(dst);
+        StaticComplexAnimator::prp_writeProperty(dst);
         dst << mVisible;
         return;
     }
-    eBoxOrSound::writeProperty(dst);
+    eBoxOrSound::prp_writeProperty(dst);
     const auto filePath = mCacheHandler ? mCacheHandler->getFilePath() : "";
     dst << filePath;
 }
 
-void SingleSound::readProperty(eReadStream& src) {
+void SingleSound::prp_readProperty(eReadStream& src) {
     if(videoSound()) {
-        StaticComplexAnimator::readProperty(src);
+        StaticComplexAnimator::prp_readProperty(src);
         src >> mVisible;
         return;
     }
-    eBoxOrSound::readProperty(src);
+    eBoxOrSound::prp_readProperty(src);
     QString filePath;
     src >> filePath;
     if(!filePath.isEmpty()) setFilePath(filePath);

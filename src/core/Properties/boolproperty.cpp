@@ -30,11 +30,11 @@ void BoolProperty::setValue(const bool value) {
     emit valueChanged(value);
 }
 
-void BoolProperty::writeProperty(eWriteStream& dst) const {
+void BoolProperty::prp_writeProperty(eWriteStream& dst) const {
     dst << mValue;
 }
 
-void BoolProperty::readProperty(eReadStream& src) {
+void BoolProperty::prp_readProperty(eReadStream& src) {
     src >> mValue;
 }
 
@@ -57,14 +57,14 @@ void BoolPropertyContainer::setValue(const bool value) {
 }
 
 
-void BoolPropertyContainer::writeProperty(eWriteStream& dst) const {
+void BoolPropertyContainer::prp_writeProperty(eWriteStream& dst) const {
     dst << mValue;
-    StaticComplexAnimator::writeProperty(dst);
+    StaticComplexAnimator::prp_writeProperty(dst);
 }
 
-void BoolPropertyContainer::readProperty(eReadStream& src) {
+void BoolPropertyContainer::prp_readProperty(eReadStream& src) {
     bool value;
     src >> value;
     setValue(value);
-    StaticComplexAnimator::readProperty(src);
+    StaticComplexAnimator::prp_readProperty(src);
 }

@@ -67,7 +67,7 @@ public:
     static void loadStaticPixmaps();
     static void clearStaticPixmaps();
 
-    void drawTimelineControls(QPainter * const p,
+    void prp_drawTimelineControls(QPainter * const p,
                   const qreal pixelsPerFrame,
                   const FrameRange &viewedFrames);
     Key *getKeyAtPos(const int pressX,

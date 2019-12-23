@@ -54,8 +54,8 @@ public:
         return true;
     }
 
-    void setupTreeViewMenu(PropertyMenu * const menu) {
-        ComplexAnimator::setupTreeViewMenu(menu);
+    void prp_setupTreeViewMenu(PropertyMenu * const menu) {
+        ComplexAnimator::prp_setupTreeViewMenu(menu);
         menu->addSeparator();
 
         const PropertyMenu::PlainSelectedOp<DynamicComplexAnimatorBase<T>> dOp =
@@ -135,7 +135,7 @@ public:
         buffer.open(QIODevice::ReadWrite);
         eWriteStream writeStream(&buffer);
         if(TWriteType) (src->*TWriteType)(writeStream);
-        src->writeProperty(writeStream);
+        src->prp_writeProperty(writeStream);
         writeStream.writeFutureTable();
         buffer.seek(0);
         eReadStream readStream(&buffer);
@@ -143,31 +143,31 @@ public:
         readStream.readFutureTable();
         buffer.seek(0);
         const auto duplicate = TReadTypeAndCreate(readStream);
-        duplicate->readProperty(readStream);
+        duplicate->prp_readProperty(readStream);
         buffer.close();
         return duplicate;
     }
 
-    void writeProperty(eWriteStream& dst) const {
+    void prp_writeProperty(eWriteStream& dst) const {
         const int nProps = this->ca_mChildAnimators.count();
         dst << nProps;
         for(const auto& prop : this->ca_mChildAnimators) {
             const auto futureId = dst.planFuturePos();
             const auto TProp = static_cast<T*>(prop.get());
             if(TWriteType) (TProp->*TWriteType)(dst);
-            TProp->writeProperty(dst);
+            TProp->prp_writeProperty(dst);
             dst.assignFuturePos(futureId);
         }
     }
 
-    void readProperty(eReadStream& src) {
+    void prp_readProperty(eReadStream& src) {
         int nProps;
         src >> nProps;
         for(int i = 0; i < nProps; i++) {
             const auto futurePos = src.readFuturePos();
             try {
                 const auto prop = TReadTypeAndCreate(src);
-                prop->readProperty(src);
+                prop->prp_readProperty(src);
                 this->addChild(prop);
             } catch(const std::exception& e) {
                 src.seek(futurePos);

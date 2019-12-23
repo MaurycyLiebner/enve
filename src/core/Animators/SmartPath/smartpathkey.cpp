@@ -18,21 +18,19 @@
 
 SmartPathKey::SmartPathKey(const SmartPath &value, const int relFrame,
                            Animator * const parentAnimator) :
-    InterpolationKeyT<SmartPath>(relFrame, parentAnimator) {
-    mValue = value;
-}
+    InterpolationKeyT<SmartPath>(value, relFrame, parentAnimator) {}
 
 SmartPathKey::SmartPathKey(Animator * const parentAnimator) :
     InterpolationKeyT<SmartPath>(parentAnimator) {}
 
 void SmartPathKey::save() {
-    mValue.save();
+    getValue().save();
 }
 
 void SmartPathKey::restore() {
-    mValue.restore();
+    getValue().restore();
 }
 
-void SmartPathKey::assignValue(const SmartPath &value) {
-    mValue = value;
+SkPath SmartPathKey::getPath() const {
+    return getValue().getPathAt();
 }

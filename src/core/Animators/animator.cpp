@@ -195,27 +195,35 @@ void Animator::anim_addKeysWhereOtherHasKeys(const Animator * const other) {
     }
 }
 #include "ReadWrite/basicreadwrite.h"
-void Animator::readKeys(eReadStream& src) {
+void Animator::anim_readKeys(eReadStream& src) {
     int nKeys; src >> nKeys;
     if(nKeys < 0 || nKeys > 10000)
         RuntimeThrow("Invalid key count " + std::to_string(nKeys));
     for(int i = 0; i < nKeys; i++) {
-        const auto key = createKey();
+        const auto key = anim_createKey();
         key->readKey(src);
         anim_appendKey(key);
     }
 }
 
-void Animator::writeSelectedKeys(eWriteStream &dst) {
+void Animator::anim_writeSelectedKeys(eWriteStream &dst) {
     const int nKeys = anim_mSelectedKeys.count();
     dst << nKeys;
     for(const auto& key : anim_mSelectedKeys) key->writeKey(dst);
 }
 
-void Animator::writeKeys(eWriteStream &dst) const {
+void Animator::anim_writeKeys(eWriteStream &dst) const {
     const int nKeys = anim_mKeys.count();
     dst << nKeys;
     for(const auto &key : anim_mKeys) key->writeKey(dst);
+}
+
+IdRange Animator::anim_frameRangeToKeyIdRange(const FrameRange &relRange) const {
+    int min = anim_getPrevKeyId(relRange.fMin + 1);
+    int max = anim_getNextKeyId(relRange.fMax - 1);
+    if(min == -1) min = 0;
+    if(max == -1) max = anim_mKeys.count() - 1;
+    return {min, max};
 }
 
 void Animator::anim_coordinateKeysWith(Animator * const other) {
@@ -229,8 +237,8 @@ void Animator::anim_deleteCurrentKey() {
 
 void Animator::anim_updateAfterShifted() {
     for(const auto &key : anim_mKeys) {
-        emit anim_removedKey(key);
-        emit anim_addedKey(key);
+        emit anim_removedKey(key, QPrivateSignal());
+        emit anim_addedKey(key, QPrivateSignal());
     }
 }
 
@@ -241,11 +249,11 @@ void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
     if(newKey->getRelFrame() == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(newKey.get());
     if(!isComplex) anim_updateAfterChangedKey(newKey.get());
-    emit anim_addedKey(newKey.get());
+    emit anim_addedKey(newKey.get(), QPrivateSignal());
 }
 
 void Animator::anim_removeKey(const stdsptr<Key>& keyToRemove) {
-    removeKeyFromSelected(keyToRemove.get());
+    anim_removeKeyFromSelected(keyToRemove.get());
     removeKeyWithoutDeselecting(keyToRemove);
 }
 
@@ -257,7 +265,7 @@ void Animator::removeKeyWithoutDeselecting(const stdsptr<Key>& keyToRemove) {
     const int rFrame = keyPtr->getRelFrame();
     if(rFrame == anim_mCurrentRelFrame)
         anim_setKeyOnCurrentFrame(nullptr);
-    emit anim_removedKey(keyPtr);
+    emit anim_removedKey(keyPtr, QPrivateSignal());
 }
 
 void Animator::anim_moveKeyToRelFrame(Key * const key, const int newFrame) {
@@ -270,14 +278,6 @@ void Animator::anim_moveKeyToRelFrame(Key * const key, const int newFrame) {
 void Animator::anim_updateKeyOnCurrrentFrame() {
     const auto key = anim_getKeyAtRelFrame(anim_mCurrentRelFrame);
     anim_setKeyOnCurrentFrame(key);
-}
-
-TimelineMovable *Animator::anim_getTimelineMovable(
-        const int relX, const int minViewedFrame, const qreal pixelsPerFrame) {
-    Q_UNUSED(relX)
-    Q_UNUSED(minViewedFrame)
-    Q_UNUSED(pixelsPerFrame)
-    return nullptr;
 }
 
 Key *Animator::anim_getKeyAtPos(const qreal relX,
@@ -348,7 +348,7 @@ void Animator::anim_setKeyOnCurrentFrame(Key* const key) {
     if(key == anim_mKeyOnCurrentFrame) return;
     anim_mKeyOnCurrentFrame = key;
     anim_afterKeyOnCurrentFrameChanged(key);
-    emit anim_changedKeyOnCurrentFrame(key);
+    emit anim_changedKeyOnCurrentFrame(key, QPrivateSignal());
 }
 
 void Animator::anim_getKeysInRect(const QRectF &selectionRect,
@@ -462,13 +462,12 @@ void Animator::anim_drawKey(QPainter * const p,
     p->drawEllipse(keyCenter, keyRadius, keyRadius);
 }
 
-void Animator::drawTimelineControls(QPainter * const p,
-                                    const qreal pixelsPerFrame,
-                                    const FrameRange &absFrameRange,
-                                    const int rowHeight) {
+void Animator::prp_drawTimelineControls(
+        QPainter * const p, const qreal pixelsPerFrame,
+        const FrameRange &absFrameRange, const int rowHeight) {
     p->translate(prp_getTotalFrameShift()*pixelsPerFrame, 0);
     const auto relRange = prp_absRangeToRelRange(absFrameRange);
-    const auto idRange = frameRangeToKeyIdRange(relRange);
+    const auto idRange = anim_frameRangeToKeyIdRange(relRange);
     for(int i = idRange.fMin; i <= idRange.fMax; i++) {
         if(i < 0 || i >= anim_mKeys.count()) continue;
         const auto& key = anim_mKeys.atId(i);
@@ -478,8 +477,8 @@ void Animator::drawTimelineControls(QPainter * const p,
 }
 
 #include "typemenu.h"
-void Animator::setupTreeViewMenu(PropertyMenu * const menu) {
-    Property::setupTreeViewMenu(menu);
+void Animator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
+    Property::prp_setupTreeViewMenu(menu);
     menu->addSeparator();
     const PropertyMenu::PlainSelectedOp<Animator> aOp =
     [](Animator * animTarget) {
@@ -500,77 +499,77 @@ void Animator::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
     Property::prp_afterFrameShiftChanged(oldAbsRange, newAbsRange);
 }
 
-bool Animator::hasSelectedKeys() const {
+bool Animator::anim_hasSelectedKeys() const {
     return !anim_mSelectedKeys.isEmpty();
 }
 
-void Animator::addKeyToSelected(Key * const key) {
+void Animator::anim_addKeyToSelected(Key * const key) {
     if(key->isSelected()) return;
     anim_mSelectedKeys << key;
     key->setSelected(true);
 }
 
-void Animator::removeKeyFromSelected(Key * const key) {
+void Animator::anim_removeKeyFromSelected(Key * const key) {
     if(key->isSelected()) {
         key->setSelected(false);
         anim_mSelectedKeys.removeOne(key);
     }
 }
 
-void Animator::deselectAllKeys() {
+void Animator::anim_deselectAllKeys() {
     for(const auto& key : anim_mSelectedKeys) {
         key->setSelected(false);
     }
     anim_mSelectedKeys.clear();
 }
 
-void Animator::selectAllKeys() {
+void Animator::anim_selectAllKeys() {
     for(const auto& key : anim_mKeys) {
-        addKeyToSelected(key);
+        anim_addKeyToSelected(key);
     }
 }
 
-void Animator::incSelectedKeysFrame(const int dFrame) {
+void Animator::anim_incSelectedKeysFrame(const int dFrame) {
     for(const auto& key : anim_mSelectedKeys) {
         const int newFrame = key->getRelFrame() + dFrame;
         anim_moveKeyToRelFrame(key, newFrame);
     }
 }
 
-void Animator::scaleSelectedKeysFrame(const int absPivotFrame,
+void Animator::anim_scaleSelectedKeysFrame(const int absPivotFrame,
                                       const qreal scale) {
     for(const auto& key : anim_mSelectedKeys) {
         key->scaleFrameAndUpdateParentAnimator(absPivotFrame, scale, true);
     }
 }
 
-void Animator::cancelSelectedKeysTransform() {
+void Animator::anim_cancelSelectedKeysTransform() {
     for(const auto& key : anim_mSelectedKeys) {
         key->cancelFrameTransform();
     }
 }
 
-void Animator::finishSelectedKeysTransform() {
+void Animator::anim_finishSelectedKeysTransform() {
     for(const auto& key : anim_mSelectedKeys) {
         key->finishFrameTransform();
     }
     anim_mergeKeysIfNeeded();
 }
 
-void Animator::startSelectedKeysTransform() {
+void Animator::anim_startSelectedKeysTransform() {
     for(const auto& key : anim_mSelectedKeys) {
         key->startFrameTransform();
     }
 }
 
-void Animator::deleteSelectedKeys() {
+void Animator::anim_deleteSelectedKeys() {
     for(const auto& key : anim_mSelectedKeys) {
         key->deleteKey();
     }
     anim_mSelectedKeys.clear();
 }
 
-int Animator::getLowestAbsFrameForSelectedKey() {
+int Animator::anim_getLowestAbsFrameForSelectedKey() {
     int lowestKey = FrameRange::EMAX;
     for(const auto& key : anim_mSelectedKeys) {
         int keyAbsFrame = key->getAbsFrame();
@@ -579,90 +578,4 @@ int Animator::getLowestAbsFrameForSelectedKey() {
         }
     }
     return lowestKey;
-}
-
-void OverlappingKeys::merge() {
-    if(mKeys.count() < 2) return;
-    Key * target = nullptr;
-    for(const auto& iKey : mKeys) {
-        if(iKey->isDescendantSelected()) {
-            target = iKey.get();
-            break;
-        }
-    }
-    if(!target) target = mKeys.last().get();
-
-    if(mAnimator->SWT_isComplexAnimator()) {
-        const auto cTarget = static_cast<ComplexKey*>(target);
-        for(int i = 0; i < mKeys.count(); i++) {
-            const auto& iKey = mKeys.at(i);
-            if(iKey.get() == target) continue;
-            const auto cKey = static_cast<ComplexKey*>(iKey.get());
-            cKey->moveAllKeysTo(cTarget);
-            mAnimator->anim_removeKey(iKey);
-            i--;
-        }
-    } else {
-        for(int i = 0; i < mKeys.count(); i++) {
-            const auto& iKey = mKeys.at(i);
-            if(iKey.get() == target) continue;
-            mAnimator->anim_removeKey(iKey);
-            i--;
-        }
-    }
-}
-
-void OverlappingKeyList::add(const stdsptr<Key> &key) {
-    const int relFrame = key->getRelFrame();
-    const auto notLess = lowerBound(relFrame);
-    if(notLess == mList.end()) {
-        mList.append(OverlappingKeys(key, mAnimator));
-    } else {
-        if(notLess->getFrame() == relFrame) notLess->addKey(key);
-        else {
-            const int insertId = notLess - mList.begin();
-            mList.insert(insertId, OverlappingKeys(key, mAnimator));
-        }
-    }
-}
-
-bool OKeyFrameMore(const int relFrame, const OverlappingKeys& keys) {
-    return keys.getFrame() > relFrame;
-}
-
-OverlappingKeyList::OKeyListCIter
-    OverlappingKeyList::upperBound(const int relFrame) const {
-    return std::upper_bound(mList.begin(), mList.end(),
-                            relFrame, OKeyFrameMore);
-}
-
-OverlappingKeyList::OKeyListIter
-    OverlappingKeyList::upperBound(const int relFrame) {
-    return std::upper_bound(mList.begin(), mList.end(),
-                            relFrame, OKeyFrameMore);
-}
-
-bool OKeyFrameLess(const OverlappingKeys& keys,
-                   const int relFrame) {
-    return keys.getFrame() < relFrame;
-}
-
-OverlappingKeyList::OKeyListCIter
-    OverlappingKeyList::lowerBound(const int relFrame) const {
-    return std::lower_bound(mList.begin(), mList.end(),
-                            relFrame, OKeyFrameLess);
-}
-
-OverlappingKeyList::OKeyListIter
-    OverlappingKeyList::lowerBound(const int relFrame) {
-    return std::lower_bound(mList.begin(), mList.end(),
-                            relFrame, OKeyFrameLess);
-}
-
-int OverlappingKeyList::idAtFrame(const int relFrame) const {
-    const auto notPrevious = lowerBound(relFrame);
-    if(notPrevious == mList.end()) return -1;
-    if(notPrevious->getFrame() == relFrame)
-        return notPrevious - mList.begin();
-    return -1;
 }
