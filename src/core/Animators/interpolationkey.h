@@ -36,8 +36,8 @@ public:
         if(frame == this->mRelFrame) return;
         const int dFrame = frame - mRelFrame;
         GraphKey::setRelFrame(frame);
-        setStartValueVar(mStartPt.getRawYValue() + dFrame);
-        setEndValueVar(mEndPt.getRawYValue() + dFrame);
+        setC0ValueVar(c0Clamped().getRawYValue() + dFrame);
+        setC1ValueVar(c1Clamped().getRawYValue() + dFrame);
     }
 };
 

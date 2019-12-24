@@ -209,9 +209,9 @@ void SmartNodePoint::updateCtrlPtPos(SmartCtrlPoint * const pointToUpdate) {
     const auto otherPt = pointToUpdate == mC0Pt.get() ? mC2Pt.get() : mC0Pt.get();
     const QPointF relPos = otherPt->getRelativePos();
     QPointF newPos;
-    if(getCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC) {
+    if(getCtrlsMode() == CtrlsMode::symmetric) {
         newPos = symmetricToPos(relPos, getRelativePos());
-    } else if(getCtrlsMode() == CtrlsMode::CTRLS_SMOOTH) {
+    } else if(getCtrlsMode() == CtrlsMode::smooth) {
         const qreal distFromCenter =
                 pointToLen(pointToUpdate->getRelativePos() -
                            getRelativePos());
@@ -353,14 +353,14 @@ SmartNodePoint *SmartNodePoint::getConnectedSeparateNodePoint() {
 
 void SmartNodePoint::setC2Enabled(const bool enabled) {
     if(enabled == getC2Enabled()) return;
-    if(getC2Enabled()) setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+    if(getC2Enabled()) setCtrlsMode(CtrlsMode::corner);
     currentPath()->actionSetNormalNodeC2Enabled(getNodeId(), enabled);
     mParentAnimator->pathChanged();
 }
 
 void SmartNodePoint::setC0Enabled(const bool enabled) {
     if(enabled == getC0Enabled()) return;
-    if(mNode_d->getC0Enabled()) setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+    if(mNode_d->getC0Enabled()) setCtrlsMode(CtrlsMode::corner);
     currentPath()->actionSetNormalNodeC0Enabled(getNodeId(), enabled);
     mParentAnimator->pathChanged();
 }
@@ -418,7 +418,7 @@ void SmartNodePoint::setCtrlsMode(const CtrlsMode mode) {
     currentPath()->actionSetNormalNodeCtrlsMode(getNodeId(), mode);
     updateFromNodeData();
     mParentAnimator->pathChanged();
-    if(mode == CtrlsMode::CTRLS_CORNER) return;
+    if(mode == CtrlsMode::corner) return;
     mNextNormalSegment.afterChanged();
     if(mPrevNormalPoint) mPrevNormalPoint->afterNextNodeC0P1Changed();
 }
@@ -544,7 +544,7 @@ SmartNodePoint* SmartNodePoint::actionAddPointAbsPos(const QPointF &absPos) {
 
 void SmartNodePoint::c0Moved(const QPointF &c0) {
     currentPath()->actionSetNormalNodeC0(getNodeId(), c0);
-    if(getCtrlsMode() != CTRLS_CORNER) {
+    if(getCtrlsMode() != CtrlsMode::corner) {
         updateCtrlPtPos(mC2Pt.get());
         currentPath()->actionSetNormalNodeC2(getNodeId(),
                                              mC2Pt->getRelativePos());
@@ -556,7 +556,7 @@ void SmartNodePoint::c0Moved(const QPointF &c0) {
 
 void SmartNodePoint::c2Moved(const QPointF &c2) {
     currentPath()->actionSetNormalNodeC2(getNodeId(), c2);
-    if(getCtrlsMode() != CTRLS_CORNER) {
+    if(getCtrlsMode() != CtrlsMode::corner) {
         updateCtrlPtPos(mC0Pt.get());
         currentPath()->actionSetNormalNodeC0(getNodeId(),
                                              mC0Pt->getRelativePos());

@@ -54,7 +54,7 @@ void QrealAnimator::graph_getValueConstraints(
         GraphKey *key, const QrealPointType type,
         qreal &minMoveValue, qreal &maxMoveValue) const {
     Q_UNUSED(key)
-    if(type == QrealPointType::END_POINT) {
+    if(type == QrealPointType::c1Pt) {
         minMoveValue = -DBL_MAX;
         maxMoveValue = DBL_MAX;
 //        auto nextKey = key->getNextKey<GraphKey>();
@@ -64,7 +64,7 @@ void QrealAnimator::graph_getValueConstraints(
 //            return;
 //        }
 //        qreal p0 = key->getValueForGraph();
-//        qreal p2 = nextKey->getStartValue();
+//        qreal p2 = nextKey->getC0Value();
 //        qreal p3 = nextKey->getValueForGraph();
 //        int iMax = 2*(nextKey->getRelFrame() - key->getRelFrame());
 //        minMoveValue = DBL_MIN;
@@ -76,7 +76,7 @@ void QrealAnimator::graph_getValueConstraints(
 //            qreal minVal = gSolveForP1(p0, p2, p3, t, mMinPossibleVal);
 //            minMoveValue = qMax(minMoveValue, minVal);
 //        }
-    } else if(type == QrealPointType::START_POINT) {
+    } else if(type == QrealPointType::c0Pt) {
         minMoveValue = -DBL_MAX;
         maxMoveValue = DBL_MAX;
 //        auto prevKey = key->getPrevKey<GraphKey>();
@@ -86,7 +86,7 @@ void QrealAnimator::graph_getValueConstraints(
 //            return;
 //        }
 //        qreal p0 = prevKey->getValueForGraph();
-//        qreal p1 = prevKey->getEndValue();
+//        qreal p1 = prevKey->getC1Value();
 //        qreal p3 = key->getValueForGraph();
 //        int iMax = 2*(key->getRelFrame() - prevKey->getRelFrame());
 //        minMoveValue = DBL_MIN;
@@ -98,7 +98,7 @@ void QrealAnimator::graph_getValueConstraints(
 //            qreal minVal = gSolveForP2(p0, p1, p3, t, mMinPossibleVal);
 //            minMoveValue = qMax(minMoveValue, minVal);
 //        }
-    } else { // KEY_POINT
+    } else { // keyPt
         minMoveValue = mMinPossibleVal;
         maxMoveValue = mMaxPossibleVal;
     }
@@ -210,13 +210,13 @@ qreal QrealAnimator::calculateBaseValueAtRelFrame(const qreal frame) const {
 
     if(prevKey && nextKey) {
         const qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
-                                  prevKey->getEndFrame(),
-                                  nextKey->getStartFrame(),
+                                  prevKey->getC1Frame(),
+                                  nextKey->getC0Frame(),
                                   qreal(nextKey->getRelFrame())};
         const qreal t = gTFromX(seg, frame);
         const qreal p0y = prevKey->getValue();
-        const qreal p1y = prevKey->getEndValue();
-        const qreal p2y = nextKey->getStartValue();
+        const qreal p1y = prevKey->getC1Value();
+        const qreal p2y = nextKey->getC0Value();
         const qreal p3y = nextKey->getValue();
         return clamp(gCubicValueAtT({p0y, p1y, p2y, p3y}, t),
                      mMinPossibleVal, mMaxPossibleVal);
@@ -316,10 +316,10 @@ QPainterPath QrealAnimator::graph_getPathForSegment(
     if(prevKey) {
         path.moveTo(prevKey->getRelFrame(), prevKey->getValueForGraph());
         if(nextKey) {
-            path.cubicTo(QPointF(prevKey->getEndFrame(),
-                                 prevKey->getEndValue()),
-                         QPointF(nextKey->getStartFrame(),
-                                 nextKey->getStartValue()),
+            path.cubicTo(QPointF(prevKey->getC1Frame(),
+                                 prevKey->getC1Value()),
+                         QPointF(nextKey->getC0Frame(),
+                                 nextKey->getC0Value()),
                          QPointF(nextKey->getRelFrame(),
                                  nextKey->getValueForGraph()));
         } else {
@@ -352,8 +352,8 @@ qValueRange QrealAnimator::graph_getMinAndMaxValues() const {
     for(const auto &key : keys) {
         const auto qaKey = static_cast<QrealKey*>(key);
         const qreal keyVal = qaKey->getValue();
-        const qreal startVal = qaKey->getStartValue();
-        const qreal endVal = qaKey->getEndValue();
+        const qreal startVal = qaKey->getC0Value();
+        const qreal endVal = qaKey->getC1Value();
         const qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
         const qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
         if(maxKeyVal > maxVal) maxVal = maxKeyVal;
@@ -376,8 +376,8 @@ qValueRange QrealAnimator::graph_getMinAndMaxValuesBetweenFrames(
         if(keyFrame > endFrame || keyFrame < startFrame) continue;
         if(first) first = false;
         const qreal keyVal = qaKey->getValue();
-        const qreal startVal = qaKey->getStartValue();
-        const qreal endVal = qaKey->getEndValue();
+        const qreal startVal = qaKey->getC0Value();
+        const qreal endVal = qaKey->getC1Value();
         const qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
         const qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
         if(maxKeyVal > maxVal) maxVal = maxKeyVal;

@@ -27,7 +27,7 @@ class SmartCtrlPoint;
 class SmartPathAnimator;
 
 enum class CanvasMode : short;
-enum CtrlsMode : short;
+enum class CtrlsMode : short;
 
 class SmartNodePoint : public NonAnimatedMovablePoint {
     e_OBJECT

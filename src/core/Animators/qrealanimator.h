@@ -19,7 +19,6 @@
 #include "graphanimator.h"
 #include "qrealsnapshot.h"
 class QrealKey;
-class QrealPoint;
 class RandomQrealGenerator;
 
 class QrealAnimator :  public GraphAnimator {

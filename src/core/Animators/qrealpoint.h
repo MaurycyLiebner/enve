@@ -21,10 +21,10 @@
 
 class GraphKey;
 
-enum QrealPointType : short {
-    START_POINT,
-    END_POINT,
-    KEY_POINT
+enum class QrealPointType : short {
+    c0Pt,
+    keyPt,
+    c1Pt
 };
 
 class QrealPoint : public StdSelfRef {
@@ -63,14 +63,14 @@ public:
 
     void setSelected(const bool selected);
 
+    bool isC0Pt() const
+    { return mType == QrealPointType::c0Pt; }
     bool isKeyPt() const
-    { return mType == KEY_POINT; }
-    bool isStartPt() const
-    { return mType == START_POINT; }
-    bool isEndPt() const
-    { return mType == END_POINT; }
+    { return mType == QrealPointType::keyPt; }
+    bool isC1Pt() const
+    { return mType == QrealPointType::c1Pt; }
     bool isCtrlPt() const
-    { return isEndPt() || isStartPt(); }
+    { return isC1Pt() || isC0Pt(); }
 
     bool isEnabled();
 

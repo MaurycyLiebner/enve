@@ -18,12 +18,12 @@
 #include "qrealkey.h"
 
 void QrealSnapshot::appendKey(const QrealKey * const key) {
-    mKeys.append({key->getStartFrame()*mFrameMultiplier,
-                  key->getStartValue()*mValueMultiplier,
+    mKeys.append({key->getC0Frame()*mFrameMultiplier,
+                  key->getC0Value()*mValueMultiplier,
                   key->getRelFrame()*mFrameMultiplier,
                   key->getValue()*mValueMultiplier,
-                  key->getEndFrame()*mFrameMultiplier,
-                  key->getEndValue()*mValueMultiplier});
+                  key->getC1Frame()*mFrameMultiplier,
+                  key->getC1Value()*mValueMultiplier});
 }
 
 qreal QrealSnapshot::getValue(const qreal relFrame) const {

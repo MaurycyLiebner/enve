@@ -24,7 +24,7 @@ class VectorPath;
 class Canvas;
 class ContainerBox;
 class BoundingBox;
-enum CtrlsMode : short;
+enum class CtrlsMode : short;
 
 class TextSvgAttributes {
 public:

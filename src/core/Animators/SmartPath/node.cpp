@@ -41,14 +41,14 @@ Node Node::sInterpolateNormal(const Node &node1, const Node &node2,
     const CtrlsMode node2Ctrls = node2.getCtrlsMode();
     if(node1Ctrls == node2Ctrls) {
         result.mCtrlsMode = node1Ctrls;
-    } else if(node1Ctrls == CtrlsMode::CTRLS_CORNER ||
-              node2Ctrls == CtrlsMode::CTRLS_CORNER) {
-        result.mCtrlsMode = CtrlsMode::CTRLS_CORNER;
-    } else if(node1Ctrls == CtrlsMode::CTRLS_SMOOTH ||
-              node2Ctrls == CtrlsMode::CTRLS_SMOOTH) {
-        result.mCtrlsMode = CtrlsMode::CTRLS_SMOOTH;
+    } else if(node1Ctrls == CtrlsMode::corner ||
+              node2Ctrls == CtrlsMode::corner) {
+        result.mCtrlsMode = CtrlsMode::corner;
+    } else if(node1Ctrls == CtrlsMode::smooth ||
+              node2Ctrls == CtrlsMode::smooth) {
+        result.mCtrlsMode = CtrlsMode::smooth;
     } else {
-        result.mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
+        result.mCtrlsMode = CtrlsMode::symmetric;
     }
     result.setCtrlsMode(result.mCtrlsMode);
     return result;

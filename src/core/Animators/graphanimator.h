@@ -21,20 +21,10 @@
 
 class GraphKey;
 class QrealPoint;
-enum CtrlsMode : short;
-enum QrealPointType : short;
+enum class CtrlsMode : short;
+enum class QrealPointType : short;
 
 class GraphAnimator : public Animator {
-    struct GraphPath {
-        operator const QPainterPath&() const { return fPath; }
-
-        void reset() { fPath = QPainterPath(); }
-        bool isEmpty() const { return fPath.isEmpty(); }
-
-        QPainterPath fPath;
-        FrameRange fRange;
-    };
-
 protected:
     GraphAnimator(const QString& name);
 public:
@@ -44,7 +34,8 @@ public:
     virtual qValueRange graph_getMinAndMaxValues() const;
     virtual qValueRange graph_getMinAndMaxValuesBetweenFrames(
             const int startFrame, const int endFrame) const;
-    virtual qreal graph_clampGraphValue(const qreal value) { return value; }
+    virtual qreal graph_clampGraphValue(const qreal value)
+    { return value; }
     virtual QPainterPath graph_getPathForSegment(
             const GraphKey * const prevKey,
             const GraphKey * const nextKey) const;
@@ -52,10 +43,8 @@ public:
     bool SWT_isGraphAnimator() const { return true; }
 
     void prp_afterChangedAbsRange(const FrameRange& range,
-                                  const bool clip = true) {
-        Animator::prp_afterChangedAbsRange(range, clip);
-        graph_updateKeysPath(prp_absRangeToRelRange(range));
-    }
+                                  const bool clip = true);
+
     void graph_constrainCtrlsFrameValues();
 
     void graph_updateKeysPath(const FrameRange& relFrameRange);
@@ -88,19 +77,28 @@ public:
     void graph_finishSelectedKeysTransform();
     void graph_cancelSelectedKeysTransform();
 protected:
-    qreal prevKeyWeight(const GraphKey * const prevKey,
-                        const GraphKey * const nextKey,
-                        const qreal  frame) const;
-
-    QList<GraphPath> graph_mKeyPaths;
+    qreal graph_prevKeyWeight(const GraphKey * const prevKey,
+                              const GraphKey * const nextKey,
+                              const qreal  frame) const;
 private:
     IdRange graph_relFrameRangeToGraphPathIdRange(
             const FrameRange &relFrameRange) const;
 
-
     void graph_getFrameConstraints(
             GraphKey *key, const QrealPointType type,
             qreal &minMoveFrame, qreal &maxMoveFrame) const;
+
+    struct GraphPath {
+        operator const QPainterPath&() const { return fPath; }
+
+        void reset() { fPath = QPainterPath(); }
+        bool isEmpty() const { return fPath.isEmpty(); }
+
+        QPainterPath fPath;
+        FrameRange fRange;
+    };
+
+    QList<GraphPath> graph_mKeyPaths;
 };
 
 #endif // GRAPHANIMATOR_H

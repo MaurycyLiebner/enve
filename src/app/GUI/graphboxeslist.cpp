@@ -33,19 +33,19 @@ int KeysView::graphGetAnimatorId(GraphAnimator * const anim) {
 
 void KeysView::graphSetSmoothCtrlAction() {
     graphSetTwoSideCtrlForSelected();
-    graphSetCtrlsModeForSelected(CTRLS_SMOOTH);
+    graphSetCtrlsModeForSelected(CtrlsMode::smooth);
     Document::sInstance->actionFinished();
 }
 
 void KeysView::graphSetSymmetricCtrlAction() {
     graphSetTwoSideCtrlForSelected();
-    graphSetCtrlsModeForSelected(CTRLS_SYMMETRIC);
+    graphSetCtrlsModeForSelected(CtrlsMode::symmetric);
     Document::sInstance->actionFinished();
 }
 
 void KeysView::graphSetCornerCtrlAction() {
     graphSetTwoSideCtrlForSelected();
-    graphSetCtrlsModeForSelected(CTRLS_CORNER);
+    graphSetCtrlsModeForSelected(CtrlsMode::corner);
     Document::sInstance->actionFinished();
 }
 
@@ -61,18 +61,18 @@ void KeysView::graphMakeSegmentsSmoothAction(const bool smooth) {
         Q_ASSERT(segment.length() > 1);
         auto firstKey = segment.first();
         auto lastKey = segment.last();
-        firstKey->setEndEnabledForGraph(smooth);
-        if(smooth) firstKey->makeStartAndEndSmooth();
+        firstKey->setC1Enabled(smooth);
+        if(smooth) firstKey->makeC0C1Smooth();
         //firstKey->keyChanged();
         for(int i = 1; i < segment.length() - 1; i++) {
             auto innerKey = segment.at(i);
-            innerKey->setEndEnabledForGraph(smooth);
-            innerKey->setStartEnabledForGraph(smooth);
-            if(smooth) innerKey->makeStartAndEndSmooth();
+            innerKey->setC1Enabled(smooth);
+            innerKey->setC0Enabled(smooth);
+            if(smooth) innerKey->makeC0C1Smooth();
             //innerKey->keyChanged();
         }
-        lastKey->setStartEnabledForGraph(smooth);
-        if(smooth) lastKey->makeStartAndEndSmooth();
+        lastKey->setC0Enabled(smooth);
+        if(smooth) lastKey->makeC0C1Smooth();
         lastKey->afterKeyChanged();
     }
 
@@ -374,10 +374,10 @@ void KeysView::graphClearAnimatorSelection() {
 void KeysView::graphDeletePressed() {
     if(mGPressedPoint && mGPressedPoint->isCtrlPt()) {
         const auto parentKey = mGPressedPoint->getParentKey();
-        if(mGPressedPoint->isEndPt()) {
-            parentKey->setEndEnabledForGraph(false);
-        } else if(mGPressedPoint->isStartPt()) {
-            parentKey->setStartEnabledForGraph(false);
+        if(mGPressedPoint->isC1Pt()) {
+            parentKey->setC1Enabled(false);
+        } else if(mGPressedPoint->isC0Pt()) {
+            parentKey->setC0Enabled(false);
         }
         parentKey->afterKeyChanged();
     } else {

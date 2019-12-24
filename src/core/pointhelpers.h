@@ -31,10 +31,10 @@
 
 typedef std::pair<qreal, qreal> qrealPair;
 
-enum CtrlsMode : short {
-    CTRLS_SMOOTH,
-    CTRLS_SYMMETRIC,
-    CTRLS_CORNER
+enum class CtrlsMode : short {
+    smooth,
+    symmetric,
+    corner
 };
 
 //template <typename T>

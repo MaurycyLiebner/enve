@@ -26,17 +26,17 @@ QrealPoint::QrealPoint(QrealPointType type,
 }
 
 qreal QrealPoint::getRelFrame() {
-    if(mType == KEY_POINT) return mParentKey->getRelFrame();
-    if(mType == START_POINT) return mParentKey->getStartFrame();
-    /*if(mType == END_POINT)*/ return mParentKey->getEndFrame();
+    if(mType == QrealPointType::keyPt) return mParentKey->getRelFrame();
+    if(mType == QrealPointType::c0Pt) return mParentKey->getC0Frame();
+    /*if(mType == END_POINT)*/ return mParentKey->getC1Frame();
 }
 
 void QrealPoint::setRelFrame(const qreal frame) {
-    if(mType == KEY_POINT) {
+    if(mType == QrealPointType::keyPt) {
         return mParentKey->setRelFrameAndUpdateParentAnimator(qRound(frame));
     }
-    if(mType == START_POINT) return mParentKey->setStartFrame(frame);
-    if(mType == END_POINT) return mParentKey->setEndFrame(frame);
+    if(mType == QrealPointType::c0Pt) return mParentKey->setC0Frame(frame);
+    if(mType == QrealPointType::c1Pt) return mParentKey->setC1Frame(frame);
 }
 
 void QrealPoint::setAbsFrame(const qreal absFrame) {
@@ -52,19 +52,19 @@ void QrealPoint::finishTransform() {
 }
 
 qreal QrealPoint::getValue() {
-    if(mType == KEY_POINT) return mParentKey->getValueForGraph();
-    if(mType == START_POINT) return mParentKey->getStartValue();
-    /*if(mType == END_POINT)*/ return mParentKey->getEndValue();
+    if(mType == QrealPointType::keyPt) return mParentKey->getValueForGraph();
+    if(mType == QrealPointType::c0Pt) return mParentKey->getC0Value();
+    /*if(mType == END_POINT)*/ return mParentKey->getC1Value();
 }
 
 void QrealPoint::setValue(const qreal value) {
-    if(mType == KEY_POINT) return mParentKey->setValueForGraph(value);
-    if(mType == START_POINT) return mParentKey->setStartValueForGraph(value);
-    if(mType == END_POINT) return mParentKey->setEndValueForGraph(value);
+    if(mType == QrealPointType::keyPt) return mParentKey->setValueForGraph(value);
+    if(mType == QrealPointType::c0Pt) return mParentKey->setC0Value(value);
+    if(mType == QrealPointType::c1Pt) return mParentKey->setC1Value(value);
 }
 
 bool QrealPoint::isSelected() {
-    if(mType == KEY_POINT) return mParentKey->isSelected();
+    if(mType == QrealPointType::keyPt) return mParentKey->isSelected();
     return mIsSelected;
 }
 
@@ -76,19 +76,19 @@ bool QrealPoint::isNear(const qreal absFrame, const qreal value,
 }
 
 void QrealPoint::moveBy(const qreal dFrame, const qreal dValue) {
-    if(mType == KEY_POINT) {
+    if(mType == QrealPointType::keyPt) {
         mParentKey->changeFrameAndValueBy({dFrame, dValue});
-    } else if(mType == START_POINT) {
-        const auto& pt = mParentKey->startPt();
+    } else if(mType == QrealPointType::c0Pt) {
+        const auto& pt = mParentKey->c0Clamped();
         const auto relTo = pt.getRawSavedValue();
-        mParentKey->setStartFrameVar(relTo.x() + dFrame);
-        mParentKey->setStartValueVar(relTo.y() + dValue);
+        mParentKey->setC0FrameVar(relTo.x() + dFrame);
+        mParentKey->setC0ValueVar(relTo.y() + dValue);
         mParentKey->updateCtrlFromCtrl(mType);
-    } else if(mType == END_POINT) {
-        const auto& pt = mParentKey->endPt();
+    } else if(mType == QrealPointType::c1Pt) {
+        const auto& pt = mParentKey->c1Clamped();
         const auto relTo = pt.getRawSavedValue();
-        mParentKey->setEndFrameVar(relTo.x() + dFrame);
-        mParentKey->setEndValueVar(relTo.y() + dValue);
+        mParentKey->setC1FrameVar(relTo.x() + dFrame);
+        mParentKey->setC1ValueVar(relTo.y() + dValue);
         mParentKey->updateCtrlFromCtrl(mType);
     }
 }
@@ -107,13 +107,13 @@ qreal QrealPoint::getAbsFrame() {
 QPointF QrealPoint::getSavedFrameAndValue() const {
     const QPointF keySaved(mParentKey->getRelFrame(),
                            mParentKey->getValueForGraph());
-    if(mType == KEY_POINT) {
+    if(mType == QrealPointType::keyPt) {
         return keySaved;
-    } else if(mType == START_POINT) {
-        const auto& pt = mParentKey->startPt();
+    } else if(mType == QrealPointType::c0Pt) {
+        const auto& pt = mParentKey->c0Clamped();
         return pt.getClampedSavedValue(keySaved);
     } else /*if(mType == END_POINT)*/ {
-        const auto& pt = mParentKey->endPt();
+        const auto& pt = mParentKey->c1Clamped();
         return pt.getClampedSavedValue(keySaved);
     }
 }
@@ -152,6 +152,6 @@ void QrealPoint::setSelected(const bool selected) {
 
 bool QrealPoint::isEnabled() {
     if(isKeyPt()) return true;
-    if(isStartPt()) return mParentKey->getStartEnabledForGraph();
-    /*if(isEndPoint())*/ return mParentKey->getEndEnabledForGraph();
+    if(isC0Pt()) return mParentKey->getC0Enabled();
+    /*if(isEndPoint())*/ return mParentKey->getC1Enabled();
 }

@@ -42,7 +42,7 @@ struct Node {
         mP1 = p1;
         mC2 = p1;
         mType = NORMAL;
-        mCtrlsMode = CtrlsMode::CTRLS_CORNER;
+        mCtrlsMode = CtrlsMode::corner;
         mC0Enabled = false;
         mC2Enabled = false;
     }
@@ -133,14 +133,14 @@ struct Node {
         if(isZero2Dec(pointToLen(mC0 - mP1)) ||
            isZero2Dec(pointToLen(mC2 - mP1)) ||
            !mC0Enabled || !mC2Enabled) {
-            mCtrlsMode = CtrlsMode::CTRLS_CORNER;
+            mCtrlsMode = CtrlsMode::corner;
             return;
         }
         if(gIsSymmetric(mC0, mP1, mC2))
-            mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
+            mCtrlsMode = CtrlsMode::symmetric;
         else if(gIsSmooth(mC0, mP1, mC2))
-                    mCtrlsMode = CtrlsMode::CTRLS_SMOOTH;
-        else mCtrlsMode = CtrlsMode::CTRLS_CORNER;
+                    mCtrlsMode = CtrlsMode::smooth;
+        else mCtrlsMode = CtrlsMode::corner;
     }
 protected:
     void setNodeId(const int nodeId) {
@@ -153,9 +153,9 @@ protected:
 
     void setCtrlsMode(const CtrlsMode ctrlsMode) {
         mCtrlsMode = ctrlsMode;
-        if(ctrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
+        if(ctrlsMode == CtrlsMode::symmetric) {
             gGetCtrlsSymmetricPos(mC0, mP1, mC2, mC0, mC2);
-        } else if(ctrlsMode == CtrlsMode::CTRLS_SMOOTH) {
+        } else if(ctrlsMode == CtrlsMode::smooth) {
             gGetCtrlsSmoothPos(mC0, mP1, mC2, mC0, mC2);
         } else return;
         setC0Enabled(true);
@@ -173,7 +173,7 @@ private:
     bool mC0Enabled = true;
     bool mC2Enabled = true;
     NodeType mType;
-    CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_CORNER;
+    CtrlsMode mCtrlsMode = CtrlsMode::corner;
     int mId = -1;
     //! @brief T value for segment defined by previous and next normal node
     qreal mT;

@@ -465,15 +465,15 @@ void Canvas::updatePivotIfNeeded() {
 }
 
 void Canvas::makePointCtrlsSymmetric() {
-    setPointCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+    setPointCtrlsMode(CtrlsMode::symmetric);
 }
 
 void Canvas::makePointCtrlsSmooth() {
-    setPointCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+    setPointCtrlsMode(CtrlsMode::smooth);
 }
 
 void Canvas::makePointCtrlsCorner() {
-    setPointCtrlsMode(CtrlsMode::CTRLS_CORNER);
+    setPointCtrlsMode(CtrlsMode::corner);
 }
 
 void Canvas::makeSegmentLine() {

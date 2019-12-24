@@ -82,16 +82,16 @@ void Canvas::handleAddSmartPointMouseMove(const MouseEvent &e) {
     if(mStartTransform) mLastEndPoint->startTransform();
     if(mLastEndPoint->hasNextNormalPoint() &&
        mLastEndPoint->hasPrevNormalPoint()) {
-        mLastEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+        mLastEndPoint->setCtrlsMode(CtrlsMode::corner);
         mLastEndPoint->setC0Enabled(true);
         mLastEndPoint->moveC0ToAbsPos(e.fPos);
     } else {
         if(!mLastEndPoint->hasNextNormalPoint() &&
            !mLastEndPoint->hasPrevNormalPoint()) {            
-            mLastEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+            mLastEndPoint->setCtrlsMode(CtrlsMode::corner);
             mLastEndPoint->setC2Enabled(true);
         } else {
-            mLastEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+            mLastEndPoint->setCtrlsMode(CtrlsMode::symmetric);
         }
         if(mLastEndPoint->hasNextNormalPoint()) {
             mLastEndPoint->moveC0ToAbsPos(e.fPos);

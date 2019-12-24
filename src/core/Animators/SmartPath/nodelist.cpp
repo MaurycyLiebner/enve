@@ -258,9 +258,9 @@ void NodeList::promoteDissolvedNodeToNormal(const int nodeId,
     node->setC2(second.c1());
     nextNormalV->setC0(second.c2());
     setNodeType(node, Node::NORMAL);
-    setNodeCtrlsMode(prevNormalV, CtrlsMode::CTRLS_SMOOTH);
-    setNodeCtrlsMode(node, CtrlsMode::CTRLS_SMOOTH);
-    setNodeCtrlsMode(nextNormalV, CtrlsMode::CTRLS_SMOOTH);
+    setNodeCtrlsMode(prevNormalV, CtrlsMode::smooth);
+    setNodeCtrlsMode(node, CtrlsMode::smooth);
+    setNodeCtrlsMode(nextNormalV, CtrlsMode::smooth);
     for(int i = prevNormalV->getNodeId() + 1; i < nodeId; i++) {
         Node * const iNode = mNodes[i];
         if(iNode->isDissolved()) {

@@ -404,12 +404,22 @@ void MainWindow::setupMenuBar() {
                            Qt::CTRL + Qt::SHIFT + Qt::Key_G);
     mObjectMenu->addSeparator();
     const auto transformMenu = mObjectMenu->addMenu("Transform");
-    transformMenu->addAction("Move", nullptr, nullptr, Qt::Key_G)->setDisabled(true);
-    transformMenu->addAction("Rotate", nullptr, nullptr, Qt::Key_R)->setDisabled(true);
-    transformMenu->addAction("Scale", nullptr, nullptr, Qt::Key_S)->setDisabled(true);
+    const auto moveAct = transformMenu->addAction("Move");
+    moveAct->setShortcut(Qt::Key_G);
+    moveAct->setDisabled(true);
+    const auto rotateAct = transformMenu->addAction("Rotate");
+    rotateAct->setShortcut(Qt::Key_R);
+    rotateAct->setDisabled(true);
+    const auto scaleAct = transformMenu->addAction("Scale");
+    scaleAct->setShortcut(Qt::Key_S);
+    scaleAct->setDisabled(true);
     transformMenu->addSeparator();
-    transformMenu->addAction("X-Axis Only", nullptr, nullptr, Qt::Key_X)->setDisabled(true);
-    transformMenu->addAction("Y-Axis Only", nullptr, nullptr, Qt::Key_Y)->setDisabled(true);
+    const auto xAct = transformMenu->addAction("X-Axis Only");
+    xAct->setShortcut(Qt::Key_X);
+    xAct->setDisabled(true);
+    const auto yAct = transformMenu->addAction("Y-Axis Only");
+    yAct->setShortcut(Qt::Key_Y);
+    yAct->setDisabled(true);
 
 
     mPathMenu = mMenuBar->addMenu("&Path");

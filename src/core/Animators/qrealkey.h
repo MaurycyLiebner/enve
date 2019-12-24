@@ -31,17 +31,10 @@ class QrealKey : public GraphKey {
     e_OBJECT
 public:
     QrealKey(QrealAnimator * const parentAnimator);
-    QrealKey(const qreal value,
-             const int frame,
+    QrealKey(const qreal value, const int frame,
              QrealAnimator * const parentAnimator);
 
-    qreal getValue() const;
-    void setValue(const qreal value);
-
     void changeFrameAndValueBy(const QPointF &frameValueChange);
-    void incValue(const qreal incBy);
-
-    QrealAnimator *getParentQrealAnimator() const;
 
     bool differsFromKey(Key *key) const;
 
@@ -51,14 +44,18 @@ public:
     void writeKey(eWriteStream& dst);
     void readKey(eReadStream& src);
 
-    qreal getValueForGraph() const {
-        return getValue();
-    }
+    qreal getValueForGraph() const
+    { return getValue(); }
 
-    void setValueForGraph(const qreal value) {
-        setValue(value);
-    }
-protected:
+    void setValueForGraph(const qreal value)
+    { setValue(value); }
+
+    qreal getValue() const;
+    void setValue(const qreal value);
+
+    QrealAnimator *getParentQrealAnimator() const;
+    void incValue(const qreal incBy);
+private:
     qreal mValue;
     qreal mSavedValue;
 };

@@ -42,8 +42,8 @@ public:
         if(frame == this->mRelFrame) return;
         const int dFrame = frame - this->mRelFrame;
         GraphKeyT<T>::setRelFrame(frame);
-        this->setStartValueVar(this->mStartPt.getRawYValue() + dFrame);
-        this->setEndValueVar(this->mEndPt.getRawYValue() + dFrame);
+        this->setC0ValueVar(this->c0Clamped().getRawYValue() + dFrame);
+        this->setC1ValueVar(this->c1Clamped().getRawYValue() + dFrame);
     }
 };
 

@@ -28,7 +28,7 @@ public:
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType type,
             qreal &minValue, qreal &maxValue) const override {
-        if(type == QrealPointType::KEY_POINT) {
+        if(type == QrealPointType::keyPt) {
             minValue = key->getRelFrame();
             maxValue = minValue;
             //getFrameConstraints(key, type, minValue, maxValue);
@@ -49,13 +49,13 @@ protected:
         const qreal prevFrame = prevKey->getRelFrame();
         const qreal nextFrame = nextKey->getRelFrame();
         const qCubicSegment1D seg{prevFrame,
-                                  prevKey->getEndFrame(),
-                                  nextKey->getStartFrame(),
+                                  prevKey->getC1Frame(),
+                                  nextKey->getC0Frame(),
                                   nextFrame};
         const qreal t = gTFromX(seg, frame);
         const qreal p0y = prevKey->getValueForGraph();
-        const qreal p1y = prevKey->getEndValue();
-        const qreal p2y = nextKey->getStartValue();
+        const qreal p1y = prevKey->getC1Value();
+        const qreal p2y = nextKey->getC0Value();
         const qreal p3y = nextKey->getValueForGraph();
         const qreal iFrame = gCubicValueAtT({p0y, p1y, p2y, p3y}, t);
         const qreal tEff = (iFrame - prevFrame)/(nextFrame - prevFrame);

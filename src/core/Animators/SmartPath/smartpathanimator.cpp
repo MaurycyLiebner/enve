@@ -87,7 +87,7 @@ void SmartPathAnimator::prp_writeProperty(eWriteStream &dst) const {
 void SmartPathAnimator::graph_getValueConstraints(
         GraphKey *key, const QrealPointType type,
         qreal &minValue, qreal &maxValue) const {
-    if(type == QrealPointType::KEY_POINT) {
+    if(type == QrealPointType::keyPt) {
         minValue = key->getRelFrame();
         maxValue = minValue;
         //getFrameConstraints(key, type, minValue, maxValue);

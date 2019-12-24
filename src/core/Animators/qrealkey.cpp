@@ -23,8 +23,8 @@ QrealKey::QrealKey(const qreal value, const int frame,
                    QrealAnimator * const parentAnimator) :
     GraphKey(frame, parentAnimator) {
     mValue = value;
-    setStartValueVar(mValue);
-    setEndValueVar(mValue);
+    setC0ValueVar(mValue);
+    setC1ValueVar(mValue);
 }
 
 QrealKey::QrealKey(QrealAnimator * const parentAnimator) :
@@ -52,8 +52,8 @@ qreal QrealKey::getValue() const { return mValue; }
 
 void QrealKey::setValue(const qreal value) {
     const qreal dVal = value - mValue;
-    setStartValueVar(mStartPt.getRawYValue() + dVal);
-    setEndValueVar(mEndPt.getRawYValue() + dVal);
+    setC0ValueVar(c0Clamped().getRawYValue() + dVal);
+    setC1ValueVar(c1Clamped().getRawYValue() + dVal);
 
     mValue = value;
     if(!this->mParentAnimator) return;
@@ -61,25 +61,23 @@ void QrealKey::setValue(const qreal value) {
 }
 
 void QrealKey::writeKey(eWriteStream& dst) {
-    Key::writeKey(dst);
+    GraphKey::writeKey(dst);
     dst << mValue;
-
-    dst << mStartEnabled;
-    dst.write(&mStartPt, sizeof(ClampedPoint));
-
-    dst << mEndEnabled;
-    dst.write(&mEndPt, sizeof(ClampedPoint));
 }
 
 void QrealKey::readKey(eReadStream& src) {
-    Key::readKey(src);
+    GraphKey::readKey(src);
     src >> mValue;
 
-    src >> mStartEnabled;
-    src.read(&mStartPt, sizeof(ClampedPoint));
+    if(src.evFileVersion() < 3) {
+        bool c0Enabled; src >> c0Enabled;
+        setC0Enabled(c0Enabled);
+        readC0Clamped(src);
 
-    src >> mEndEnabled;
-    src.read(&mEndPt, sizeof(ClampedPoint));
+        bool c1Enabled; src >> c1Enabled;
+        setC1Enabled(c1Enabled);
+        readC1Clamped(src);
+    }
 }
 
 void QrealKey::finishValueTransform() {
@@ -88,14 +86,13 @@ void QrealKey::finishValueTransform() {
 
 void QrealKey::startValueTransform() {
     mSavedValue = mValue;
-    mStartPt.saveYValue();
-    mEndPt.saveYValue();
+    saveC0C1Value();
 }
 
 void QrealKey::cancelValueTransform() {
     setValue(mSavedValue);
-    setStartValueVar(mStartPt.getRawSavedYValue());
-    setEndValueVar(mEndPt.getRawSavedYValue());
+    setC0ValueVar(c0Clamped().getRawSavedYValue());
+    setC1ValueVar(c1Clamped().getRawSavedYValue());
 }
 
 bool QrealKey::differsFromKey(Key *key) const {
@@ -103,9 +100,9 @@ bool QrealKey::differsFromKey(Key *key) const {
     const auto qaKey = static_cast<QrealKey*>(key);
     if(isZero4Dec(qaKey->getValue() - mValue)) {
         if(key->getRelFrame() > mRelFrame) {
-            if(qaKey->getStartEnabledForGraph() || mEndEnabled) return true;
+            if(qaKey->getC0Enabled() || getC1Enabled()) return true;
         } else {
-            if(qaKey->getEndEnabledForGraph() || mStartEnabled) return true;
+            if(qaKey->getC1Enabled() || getC0Enabled()) return true;
         }
         return false;
     }

@@ -54,7 +54,7 @@ class VideoBox;
 class ImageBox;
 class Document;
 
-enum CtrlsMode : short;
+enum class CtrlsMode : short;
 
 class MouseEvent {
 protected:

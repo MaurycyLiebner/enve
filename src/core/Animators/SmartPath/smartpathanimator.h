@@ -121,16 +121,16 @@ public:
         const auto prevKey = anim_getKeyAtIndex<SmartPathKey>(prevId);
         const auto nextKey = anim_getKeyAtIndex<SmartPathKey>(nextId);
         const bool adjKeys = pn.second - pn.first == 1;
-        const auto keyAtRelFrame = adjKeys ?
-                    nullptr :
+        const auto keyAtRelFrame = adjKeys ? nullptr :
                     anim_getKeyAtIndex<SmartPathKey>(pn.first + 1);
         if(keyAtRelFrame) return keyAtRelFrame->getValue().getPathAt();
         if(prevKey && nextKey) {
             SkPath result;
-            const qreal nWeight = prevKeyWeight(prevKey, nextKey, frame);
+            const qreal nWeight = graph_prevKeyWeight(prevKey, nextKey, frame);
             SmartPath sPath;
-            gInterpolate(prevKey->getValue(), nextKey->getValue(),
-                         nWeight, sPath);
+            const auto& prevPath = prevKey->getValue();
+            const auto& nextPath = nextKey->getValue();
+            gInterpolate(prevPath, nextPath, nWeight, sPath);
             return sPath.getPathAt();
         } else if(!prevKey && nextKey) {
             return nextKey->getPath();
@@ -196,7 +196,7 @@ public:
 
 
     int actionAddNewAtStart(const QPointF &relPos) {
-        return actionAddNewAtStart({false, false, CTRLS_CORNER,
+        return actionAddNewAtStart({false, false, CtrlsMode::corner,
                                     relPos, relPos, relPos});
     }
 
@@ -216,7 +216,7 @@ public:
     }
 
     int actionAddNewAtEnd(const QPointF &relPos) {
-        return actionAddNewAtEnd({false, false, CTRLS_CORNER,
+        return actionAddNewAtEnd({false, false, CtrlsMode::corner,
                                   relPos, relPos, relPos});
     }
 
@@ -240,11 +240,11 @@ public:
                                 const qreal t) {
         beforeBinaryPathChange();
         const auto curr = getCurrentlyEditedPath();
-        if(curr->getNodePtr(node1Id)->getCtrlsMode() == CTRLS_SYMMETRIC) {
-            curr->actionSetNormalNodeCtrlsMode(node1Id, CTRLS_SMOOTH);
+        if(curr->getNodePtr(node1Id)->getCtrlsMode() == CtrlsMode::symmetric) {
+            curr->actionSetNormalNodeCtrlsMode(node1Id, CtrlsMode::smooth);
         }
-        if(curr->getNodePtr(node2Id)->getCtrlsMode() == CTRLS_SYMMETRIC) {
-            curr->actionSetNormalNodeCtrlsMode(node2Id, CTRLS_SMOOTH);
+        if(curr->getNodePtr(node2Id)->getCtrlsMode() == CtrlsMode::symmetric) {
+            curr->actionSetNormalNodeCtrlsMode(node2Id, CtrlsMode::smooth);
         }
         const auto& keys = anim_getKeys();
         for(const auto &key : keys) {
@@ -441,7 +441,7 @@ protected:
     }
 private:
     int actionAddFirstNode(const QPointF &relPos) {
-        return actionAddFirstNode({false, false, CTRLS_SYMMETRIC,
+        return actionAddFirstNode({false, false, CtrlsMode::symmetric,
                                    relPos, relPos, relPos});
     }
 
@@ -476,9 +476,10 @@ private:
         if(keyAtFrame) {
             result = keyAtFrame->getValue();
         } else if(prevKey && nextKey) {
-            const qreal nWeight = prevKeyWeight(prevKey, nextKey, relFrame);
-            gInterpolate(prevKey->getValue(), nextKey->getValue(),
-                         nWeight, result);
+            const qreal nWeight = graph_prevKeyWeight(prevKey, nextKey, relFrame);
+            const auto& prevPath = prevKey->getValue();
+            const auto& nextPath = nextKey->getValue();
+            gInterpolate(prevPath, nextPath, nWeight, result);
         } else if(prevKey) {
             result = prevKey->getValue();
         } else if(nextKey) {

@@ -41,7 +41,7 @@ class TimelineMovable;
 class KeysClipboard;
 class Animator;
 #include "GUI/valueinput.h"
-enum CtrlsMode : short;
+enum class CtrlsMode : short;
 
 class KeysView : public QWidget, public KeyFocusTarget {
     Q_OBJECT

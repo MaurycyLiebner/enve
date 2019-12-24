@@ -68,6 +68,8 @@ LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 SOURCES += \
     Animators/SmartPath/smartpath.cpp \
     Animators/brushsettingsanimator.cpp \
+    Animators/clampedpoint.cpp \
+    Animators/clampedvalue.cpp \
     Animators/coloranimator.cpp \
     Animators/eboxorsound.cpp \
     Animators/eeffect.cpp \
@@ -305,6 +307,8 @@ SOURCES += \
 HEADERS += \
     Animators/SmartPath/smartpath.h \
     Animators/brushsettingsanimator.h \
+    Animators/clampedpoint.h \
+    Animators/clampedvalue.h \
     Animators/coloranimator.h \
     Animators/dynamiccomplexanimator.h \
     Animators/eboxorsound.h \

@@ -38,13 +38,13 @@ qreal InterpolationAnimator::getInterpolatedFrameAtRelFrame(
         return frame;
     } else { // if(prevKey && nextKey) {
         const qCubicSegment1D seg{qreal(prevKey->getRelFrame()),
-                                  prevKey->getEndFrame(),
-                                  nextKey->getStartFrame(),
+                                  prevKey->getC1Frame(),
+                                  nextKey->getC0Frame(),
                                   qreal(nextKey->getRelFrame())};
         const qreal t = gTFromX(seg, frame);
         const qreal p0y = prevKey->getValueForGraph();
-        const qreal p1y = prevKey->getEndValue();
-        const qreal p2y = nextKey->getStartValue();
+        const qreal p1y = prevKey->getC1Value();
+        const qreal p2y = nextKey->getC0Value();
         const qreal p3y = nextKey->getValueForGraph();
         return gCubicValueAtT({p0y, p1y, p2y, p3y}, t);
     }
@@ -53,7 +53,7 @@ qreal InterpolationAnimator::getInterpolatedFrameAtRelFrame(
 void InterpolationAnimator::graph_getValueConstraints(
         GraphKey *key, const QrealPointType type,
         qreal &minValue, qreal &maxValue) const {
-    if(type == QrealPointType::KEY_POINT) {
+    if(type == QrealPointType::keyPt) {
         minValue = key->getRelFrame();
         maxValue = minValue;
         //getFrameConstraints(key, type, minValue, maxValue);
