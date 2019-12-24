@@ -14,26 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOOLPROPERTY_H
-#define BOOLPROPERTY_H
-#include "property.h"
+#ifndef BOOLPROPERTYCONTAINER_H
+#define BOOLPROPERTYCONTAINER_H
 
-class BoolProperty : public Property {
+#include "../Animators/staticcomplexanimator.h"
+
+class BoolPropertyContainer : public StaticComplexAnimator {
     Q_OBJECT
     e_OBJECT
 protected:
-    BoolProperty(const QString& name);
+    BoolPropertyContainer(const QString& name);
 public:
-    bool SWT_isBoolProperty() const { return true; }
+    bool SWT_isBoolPropertyContainer() const { return true; }
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
-    bool getValue();
     void setValue(const bool value);
+    bool getValue();
+
+    using ComplexAnimator::ca_addChild;
+    using ComplexAnimator::ca_insertChild;
+    using ComplexAnimator::ca_prependChildAnimator;
 signals:
     void valueChanged(bool);
 private:
     bool mValue = false;
 };
 
-#endif // BOOLPROPERTY_H
+#endif // BOOLPROPERTYCONTAINER_H

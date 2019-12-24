@@ -16,7 +16,7 @@
 
 #ifndef LINKBOX_H
 #define LINKBOX_H
-#include "canvas.h"
+#include "Boxes/containerbox.h"
 #include "Properties/boxtargetproperty.h"
 #include "Properties/boolproperty.h"
 

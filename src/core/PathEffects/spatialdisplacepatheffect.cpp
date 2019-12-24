@@ -17,7 +17,7 @@
 #include "spatialdisplacepatheffect.h"
 #include "Animators/intanimator.h"
 #include "randomgrid.h"
-#include "Properties/boolproperty.h"
+#include "Properties/boolpropertycontainer.h"
 #include "pointhelpers.h"
 
 SpatialDisplacePathEffect::SpatialDisplacePathEffect() :

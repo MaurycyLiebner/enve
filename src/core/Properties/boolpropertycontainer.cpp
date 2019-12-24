@@ -14,26 +14,34 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "boolproperty.h"
+#include "boolpropertycontainer.h"
 
-BoolProperty::BoolProperty(const QString &name) :
-    Property(name) {}
+BoolPropertyContainer::BoolPropertyContainer(const QString &name) :
+    StaticComplexAnimator(name) {}
 
-void BoolProperty::prp_writeProperty(eWriteStream& dst) const {
-    dst << mValue;
-}
-
-void BoolProperty::prp_readProperty(eReadStream& src) {
-    src >> mValue;
-}
-
-bool BoolProperty::getValue() {
+bool BoolPropertyContainer::getValue() {
     return mValue;
 }
 
-void BoolProperty::setValue(const bool value) {
+void BoolPropertyContainer::setValue(const bool value) {
     if(mValue == value) return;
     mValue = value;
     prp_afterWholeInfluenceRangeChanged();
+
+    for(const auto& prop : ca_mChildAnimators) {
+        prop->SWT_setDisabled(!value);
+    }
     emit valueChanged(value);
+}
+
+
+void BoolPropertyContainer::prp_writeProperty(eWriteStream& dst) const {
+    dst << mValue;
+    StaticComplexAnimator::prp_writeProperty(dst);
+}
+
+void BoolPropertyContainer::prp_readProperty(eReadStream& src) {
+    bool value; src >> value;
+    setValue(value);
+    StaticComplexAnimator::prp_readProperty(src);
 }

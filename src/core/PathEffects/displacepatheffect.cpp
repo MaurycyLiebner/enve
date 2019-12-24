@@ -16,7 +16,7 @@
 
 #include "displacepatheffect.h"
 #include "Animators/intanimator.h"
-#include "Properties/boolproperty.h"
+#include "Properties/boolpropertycontainer.h"
 #include "pointhelpers.h"
 
 DisplacePathEffect::DisplacePathEffect() :

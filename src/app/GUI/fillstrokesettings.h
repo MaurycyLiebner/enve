@@ -43,6 +43,7 @@ class ActionButton;
 class Segment1DEditor;
 class QDockWidget;
 class ColorSetting;
+class Document;
 
 class FillStrokeSettingsWidget : public QTabWidget {
     Q_OBJECT

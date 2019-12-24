@@ -21,7 +21,6 @@
 #include <QLabel>
 #include "Boxes/boxwithpatheffects.h"
 #include "Animators/paintsettingsanimator.h"
-#include "canvas.h"
 #include "Paint/autotiledsurface.h"
 #include "pathboxrenderdata.h"
 #include <mypaint-brush.h>

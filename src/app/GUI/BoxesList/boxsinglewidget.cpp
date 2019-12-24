@@ -32,6 +32,7 @@
 #include "Animators/qstringanimator.h"
 #include "Animators/randomqrealgenerator.h"
 #include "Properties/boolproperty.h"
+#include "Properties/boolpropertycontainer.h"
 #include "Properties/intproperty.h"
 #include "Animators/qpointfanimator.h"
 #include "Boxes/pathbox.h"

@@ -179,6 +179,7 @@ SOURCES += \
     Private/documentrw.cpp \
     Private/esettings.cpp \
     Private/memorystructs.cpp \
+    Properties/boolpropertycontainer.cpp \
     Properties/boxtargetproperty.cpp \
     Properties/emimedata.cpp \
     RasterEffects/blureffect.cpp \
@@ -421,6 +422,7 @@ HEADERS += \
     Private/document.h \
     Private/esettings.h \
     Private/memorystructs.h \
+    Properties/boolpropertycontainer.h \
     Properties/boxtargetproperty.h \
     Properties/emimedata.h \
     RasterEffects/blureffect.h \

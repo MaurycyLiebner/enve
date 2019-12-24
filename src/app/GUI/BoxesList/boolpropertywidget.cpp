@@ -16,6 +16,7 @@
 
 #include "boolpropertywidget.h"
 #include "Properties/boolproperty.h"
+#include "Properties/boolpropertycontainer.h"
 #include "GUI/mainwindow.h"
 #include "GUI/global.h"
 
