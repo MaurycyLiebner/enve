@@ -47,8 +47,9 @@ protected:
                  const MovablePointType type);
 public:
     typedef std::function<void(MovablePoint*)> PtOp;
+    typedef std::function<void()> Op;
 
-    ~MovablePoint() { if(mRemoveFromSelection) mRemoveFromSelection(this); }
+    ~MovablePoint() { if(mRemoveFromSelection) mRemoveFromSelection(); }
 
     virtual QPointF getRelativePos() const = 0;
     virtual void setRelativePos(const QPointF &relPos) = 0;
@@ -102,7 +103,8 @@ public:
 
     bool isContainedInRect(const QRectF &absRect);
 
-    void setSelected(const bool selected, const PtOp &deselect = nullptr);
+    void setSelected(const bool selected, const Op &deselect = nullptr);
+    void deselect();
 
     bool isSelected() const { return mSelected; }
 
@@ -153,7 +155,7 @@ protected:
                         const SkColor &fillColor,
                         const bool keyOnCurrent = false);
 private:
-    PtOp mRemoveFromSelection;
+    std::function<void()> mRemoveFromSelection;
 
     bool mSelectionEnabled = true;
     bool mSelected = false;

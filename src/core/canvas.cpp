@@ -575,6 +575,7 @@ void Canvas::deleteAction() {
 }
 
 void Canvas::copyAction() {
+    if(mSelectedBoxes.isEmpty()) return;
     const auto container = enve::make_shared<BoxesClipboard>(mSelectedBoxes.getList());
     Document::sInstance->replaceClipboard(container);
 }
@@ -587,6 +588,7 @@ void Canvas::pasteAction() {
 }
 
 void Canvas::cutAction() {
+    if(mSelectedBoxes.isEmpty()) return;
     copyAction();
     deleteAction();
 }

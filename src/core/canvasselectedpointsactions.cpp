@@ -186,8 +186,8 @@ void Canvas::selectAndAddContainedPointsToSelection(const QRectF& absRect) {
 
 void Canvas::addPointToSelection(MovablePoint* const point) {
     if(point->isSelected()) return;
-    const auto ptDeselector = [this](MovablePoint* const pt) {
-        removePointFromSelection(pt);
+    const auto ptDeselector = [this, point]() {
+        removePointFromSelection(point);
     };
     point->setSelected(true, ptDeselector);
     mSelectedPoints_d.append(point);

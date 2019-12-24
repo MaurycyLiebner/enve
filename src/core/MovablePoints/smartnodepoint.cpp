@@ -124,14 +124,18 @@ void SmartNodePoint::canvasContextMenu(PointTypeMenu * const menu) {
             menu->addPlainAction("Demote to dissolved approx.", opApprox);
             menu->addSeparator();
         }
-        PointTypeMenu::PlainSelectedOp<SmartNodePoint> op = [](SmartNodePoint * pt) {
-            pt->actionRemove(false);
+        PointTypeMenu::AllOp<SmartNodePoint> op =
+        [](const QList<SmartNodePoint*>& pts) {
+            for(const auto pt : pts) {
+                pt->remove();
+                pt->deselect();
+            }
         };
         menu->addPlainAction("Remove", op);
-        PointTypeMenu::PlainSelectedOp<SmartNodePoint> opApprox = [](SmartNodePoint * pt) {
-            pt->actionRemove(true);
-        };
-        menu->addPlainAction("Remove approx.", opApprox);
+//        PointTypeMenu::PlainSelectedOp<SmartNodePoint> opApprox = [](SmartNodePoint * pt) {
+//            pt->actionRemove(true);
+//        };
+//        menu->addPlainAction("Remove approx.", opApprox);
     } else { //if(isDissolved()) {
         PointTypeMenu::PlainSelectedOp<SmartNodePoint> op = [](SmartNodePoint * pt) {
             pt->actionPromoteToNormal();

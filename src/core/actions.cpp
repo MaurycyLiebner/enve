@@ -208,6 +208,7 @@ void Actions::makeSegmentCurve() const {
 void Actions::deleteAction() const {
     if(!mActiveScene) return;
     mActiveScene->deleteAction();
+    afterAction();
 }
 
 void Actions::copyAction() const {
@@ -218,16 +219,19 @@ void Actions::copyAction() const {
 void Actions::pasteAction() const {
     if(!mActiveScene) return;
     mActiveScene->pasteAction();
+    afterAction();
 }
 
 void Actions::cutAction() const {
     if(!mActiveScene) return;
     mActiveScene->cutAction();
+    afterAction();
 }
 
 void Actions::duplicateAction() const {
     if(!mActiveScene) return;
     mActiveScene->duplicateAction();
+    afterAction();
 }
 
 void Actions::selectAllAction() const {

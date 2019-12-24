@@ -213,9 +213,13 @@ qreal MovablePoint::getRadius() {
     return mRadius;
 }
 
-void MovablePoint::setSelected(const bool selected, const PtOp& deselect) {
+void MovablePoint::setSelected(const bool selected, const Op &deselect) {
     mSelected = selected;
     mRemoveFromSelection = deselect;
+}
+
+void MovablePoint::deselect() {
+    if(mRemoveFromSelection) mRemoveFromSelection();
 }
 
 bool MovablePoint::isNodePoint() {
