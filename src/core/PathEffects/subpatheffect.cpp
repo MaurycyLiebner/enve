@@ -91,7 +91,7 @@ void SubPathEffectCaller::apply(SkPath &path) {
                 if(currLen > minLength) {
                     first = false;
                     qreal maxFrag;
-                    const bool last = currLen + pathLen > maxLength;
+                    const bool last = currLen > maxLength;
                     if(last) maxFrag = maxRemLen/pathLen;
                     else maxFrag = 1;
                     path.addPath(iPath.getFragment(minRemLen/pathLen, maxFrag).toSkPath());
