@@ -64,9 +64,9 @@ PathBox::PathBox(const eBoxType type) : BoxWithPathEffects(type) {
     mStrokeSettings->setPaintType(PaintType::FLATPAINT);
     mStrokeSettings->setCurrentColor(QColor(0, 0, 0));
 
-    ca_prependChildAnimator(mPathEffectsAnimators.get(),
+    ca_prependChild(mPathEffectsAnimators.get(),
                             mFillSettings);
-    ca_prependChildAnimator(mPathEffectsAnimators.get(),
+    ca_prependChild(mPathEffectsAnimators.get(),
                             mStrokeSettings);
 
     ca_moveChildBelow(mRasterEffectsAnimators.data(),

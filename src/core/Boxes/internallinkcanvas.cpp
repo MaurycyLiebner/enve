@@ -22,7 +22,7 @@
 InternalLinkCanvas::InternalLinkCanvas(ContainerBox * const linkTarget) :
     InternalLinkGroupBox(linkTarget) {
     mType = TYPE_INTERNAL_LINK_CANVAS;
-    ca_prependChildAnimator(mTransformAnimator.data(), mClipToCanvas);
+    ca_prependChild(mTransformAnimator.data(), mClipToCanvas);
 }
 
 void InternalLinkCanvas::setupRenderData(const qreal relFrame,

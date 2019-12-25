@@ -54,7 +54,7 @@ void BoxWithPathEffects::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     };
     menu->addCheckableAction("Path Effects",
                              getPathEffectsVisible(), pathOp)->
-            setDisabled(mPathEffectsAnimators->hasChildAnimators());
+            setDisabled(mPathEffectsAnimators->ca_hasChildren());
 
     const PropertyMenu::CheckSelectedOp<BoxWithPathEffects> fillOp =
     [](BoxWithPathEffects* const box, const bool checked) {
@@ -62,7 +62,7 @@ void BoxWithPathEffects::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     };
     menu->addCheckableAction("Fill Effects",
                              getFillEffectsVisible(), fillOp)->
-            setDisabled(mFillPathEffectsAnimators->hasChildAnimators());
+            setDisabled(mFillPathEffectsAnimators->ca_hasChildren());
 
     const PropertyMenu::CheckSelectedOp<BoxWithPathEffects> outBaseOp =
     [](BoxWithPathEffects* const box, const bool checked) {
@@ -70,7 +70,7 @@ void BoxWithPathEffects::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     };
     menu->addCheckableAction("Outline Base Effects",
                              getOutlineBaseEffectsVisible(), outBaseOp)->
-            setDisabled(mOutlineBasePathEffectsAnimators->hasChildAnimators());
+            setDisabled(mOutlineBasePathEffectsAnimators->ca_hasChildren());
 
     const PropertyMenu::CheckSelectedOp<BoxWithPathEffects> outOp =
     [](BoxWithPathEffects* const box, const bool checked) {
@@ -78,7 +78,7 @@ void BoxWithPathEffects::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     };
     menu->addCheckableAction("Outline Effects",
                              getOutlineEffectsVisible(), outOp)->
-            setDisabled(mOutlinePathEffectsAnimators->hasChildAnimators());
+            setDisabled(mOutlinePathEffectsAnimators->ca_hasChildren());
 
     menu->addSeparator();
 
@@ -103,7 +103,7 @@ void BoxWithPathEffects::addOutlinePathEffect(const qsptr<PathEffect>& effect) {
 
 void BoxWithPathEffects::setPathEffectsEnabled(const bool enable) {
     mPathEffectsAnimators->SWT_setVisible(
-                mPathEffectsAnimators->hasChildAnimators() || enable);
+                mPathEffectsAnimators->ca_hasChildren() || enable);
 }
 
 bool BoxWithPathEffects::getPathEffectsVisible() const {
@@ -112,7 +112,7 @@ bool BoxWithPathEffects::getPathEffectsVisible() const {
 
 void BoxWithPathEffects::setFillEffectsEnabled(const bool enable) {
     mFillPathEffectsAnimators->SWT_setVisible(
-                mFillPathEffectsAnimators->hasChildAnimators() || enable);
+                mFillPathEffectsAnimators->ca_hasChildren() || enable);
 }
 
 bool BoxWithPathEffects::getFillEffectsVisible() const {
@@ -121,7 +121,7 @@ bool BoxWithPathEffects::getFillEffectsVisible() const {
 
 void BoxWithPathEffects::setOutlineBaseEffectsEnabled(const bool enable) {
     mOutlineBasePathEffectsAnimators->SWT_setVisible(
-                mOutlineBasePathEffectsAnimators->hasChildAnimators() || enable);
+                mOutlineBasePathEffectsAnimators->ca_hasChildren() || enable);
 }
 
 bool BoxWithPathEffects::getOutlineBaseEffectsVisible() const {
@@ -130,7 +130,7 @@ bool BoxWithPathEffects::getOutlineBaseEffectsVisible() const {
 
 void BoxWithPathEffects::setOutlineEffectsEnabled(const bool enable) {
     mOutlinePathEffectsAnimators->SWT_setVisible(
-                mOutlinePathEffectsAnimators->hasChildAnimators() || enable);
+                mOutlinePathEffectsAnimators->ca_hasChildren() || enable);
 }
 
 bool BoxWithPathEffects::getOutlineEffectsVisible() const {

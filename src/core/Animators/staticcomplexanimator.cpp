@@ -18,3 +18,15 @@
 
 StaticComplexAnimator::StaticComplexAnimator(const QString &name) :
     ComplexAnimator(name) {}
+
+void StaticComplexAnimator::prp_writeProperty(eWriteStream &dst) const {
+    const auto& children = ca_getChildren();
+    for(const auto& prop : children)
+        prop->prp_writeProperty(dst);
+}
+
+void StaticComplexAnimator::prp_readProperty(eReadStream &src) {
+    const auto& children = ca_getChildren();
+    for(const auto& prop : children)
+        prop->prp_readProperty(src);
+}

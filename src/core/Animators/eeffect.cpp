@@ -17,7 +17,9 @@
 #include "eeffect.h"
 
 eEffect::eEffect(const QString &name) :
-    StaticComplexAnimator(name) {}
+    StaticComplexAnimator(name) {
+    ca_setDisabledWhenEmpty(false);
+}
 
 void eEffect::prp_writeProperty(eWriteStream& dst) const {
     StaticComplexAnimator::prp_writeProperty(dst);

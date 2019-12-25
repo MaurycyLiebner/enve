@@ -71,6 +71,7 @@ SOURCES += \
     Animators/clampedpoint.cpp \
     Animators/clampedvalue.cpp \
     Animators/coloranimator.cpp \
+    Animators/complexkey.cpp \
     Animators/eboxorsound.cpp \
     Animators/eeffect.cpp \
     Animators/gradient.cpp \
@@ -310,6 +311,7 @@ HEADERS += \
     Animators/clampedpoint.h \
     Animators/clampedvalue.h \
     Animators/coloranimator.h \
+    Animators/complexkey.h \
     Animators/dynamiccomplexanimator.h \
     Animators/eboxorsound.h \
     Animators/eeffect.h \

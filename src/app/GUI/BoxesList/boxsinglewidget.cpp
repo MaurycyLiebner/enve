@@ -323,7 +323,7 @@ ColorAnimator *BoxSingleWidget::getColorTarget() const {
         color = static_cast<ColorAnimator*>(mTarget->getTarget());
     } else if(swt->SWT_isComplexAnimator()) {
         const auto ca = static_cast<ComplexAnimator*>(mTarget->getTarget());
-        color = static_cast<ColorAnimator*>(ca->getPropertyForGUI());
+        color = static_cast<ColorAnimator*>(ca->ca_getGUIProperty());
     }
     return color;
 }
@@ -432,7 +432,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                 secondValueSliderVisible = mSecondValueSlider->isVisible();
             } else {
                 const auto ca_target = static_cast<ComplexAnimator*>(target);
-                Property * const guiProp = ca_target->getPropertyForGUI();
+                Property * const guiProp = ca_target->ca_getGUIProperty();
                 if(guiProp) {
                     if(guiProp->SWT_isQrealAnimator()) {
                         valueSliderVisible = true;

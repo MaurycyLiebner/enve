@@ -26,7 +26,7 @@ SolidifyPathEffect::SolidifyPathEffect() :
 
     ca_addChild(mDisplacement);
 
-    setPropertyForGUI(mDisplacement.get());
+    ca_setGUIProperty(mDisplacement.get());
 }
 
 class SolidifyEffectCaller : public PathEffectCaller {

@@ -49,7 +49,8 @@ SmartNodePoint *SmartPathCollection::createNewSubPathAtPos(const QPointF &absPos
 
 SkPath SmartPathCollection::getPathAtRelFrame(const qreal relFrame) const {
     SkPath result;
-    for(const auto& child : ca_mChildAnimators) {
+    const auto& children = ca_getChildren();
+    for(const auto& child : children) {
         const auto path = static_cast<SmartPathAnimator*>(child.get());
         const auto mode = path->getMode();
         if(mode == SmartPathAnimator::NORMAL)

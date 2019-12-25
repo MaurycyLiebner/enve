@@ -25,7 +25,7 @@ DashPathEffect::DashPathEffect() :
 
     ca_addChild(mSize);
 
-    setPropertyForGUI(mSize.get());
+    ca_setGUIProperty(mSize.get());
 }
 
 class DashEffectCaller : public PathEffectCaller {

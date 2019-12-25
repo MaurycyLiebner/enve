@@ -36,7 +36,7 @@ SmartVectorPath::SmartVectorPath() :
             this, [this](const UpdateReason reason) {
         setPathsOutdated(reason);
     });
-    ca_prependChildAnimator(mPathEffectsAnimators.data(),
+    ca_prependChild(mPathEffectsAnimators.data(),
                             mPathAnimator);
 }
 

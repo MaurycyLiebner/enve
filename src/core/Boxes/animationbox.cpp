@@ -33,7 +33,7 @@ AnimationBox::AnimationBox(const eBoxType type) : BoundingBox(type) {
     mDurationRectangleLocked = true;
 
     mFrameAnimator = enve::make_shared<IntAnimator>("frame");
-    ca_prependChildAnimator(mRasterEffectsAnimators.get(), mFrameAnimator);
+    ca_prependChild(mRasterEffectsAnimators.get(), mFrameAnimator);
     mFrameAnimator->SWT_hide();
 }
 

@@ -46,8 +46,8 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     ca_addChild(mTopLeftAnimator);
     ca_addChild(mBottomRightAnimator);
 
-    ca_prependChildAnimator(mTopLeftAnimator.get(), mRasterEffectsAnimators);
-    ca_prependChildAnimator(mBottomRightAnimator.get(), mRasterEffectsAnimators);
+    ca_prependChild(mTopLeftAnimator.get(), mRasterEffectsAnimators);
+    ca_prependChild(mBottomRightAnimator.get(), mRasterEffectsAnimators);
 
     mRadiusAnimator = enve::make_shared<QPointFAnimator>("round radius");
     mRadiusAnimator->setValuesRange(0, 9999);
@@ -57,7 +57,7 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
                 TYPE_PATH_POINT);
 
     ca_addChild(mRadiusAnimator);
-    ca_prependChildAnimator(mRadiusAnimator.get(), mRasterEffectsAnimators);
+    ca_prependChild(mRadiusAnimator.get(), mRasterEffectsAnimators);
 
     const auto pathUpdater = [this](const UpdateReason reason) {
         setPathsOutdated(reason);

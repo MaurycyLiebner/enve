@@ -60,11 +60,10 @@ public:
 
         const PropertyMenu::PlainSelectedOp<DynamicComplexAnimatorBase<T>> dOp =
         [](DynamicComplexAnimatorBase<T> * animTarget) {
-            animTarget->ca_removeAllChildAnimators();
+            animTarget->ca_removeAllChildren();
         };
         menu->addPlainAction("Clear", dOp)->setEnabled(this->ca_getNumberOfChildren());
     }
-
 
     void insertChild(const qsptr<T>& newChild, const int index) {
         clearOldParent(newChild);
@@ -90,22 +89,22 @@ public:
 
     void prependChild(T * const oldChild, const qsptr<T>& newChild) {
         clearOldParent(newChild);
-        ca_prependChildAnimator(oldChild, newChild);
+        ca_prependChild(oldChild, newChild);
     }
 
     void replaceChild(const qsptr<T>& oldChild, const qsptr<T> &newChild) {
         clearOldParent(newChild);
-        ca_replaceChildAnimator(oldChild, newChild);
+        ca_replaceChild(oldChild, newChild);
     }
 
-    using ComplexAnimator::ca_removeAllChildAnimators;
+    using ComplexAnimator::ca_removeAllChildren;
 private:
     using ComplexAnimator::ca_addChild;
     using ComplexAnimator::ca_insertChild;
-    using ComplexAnimator::ca_prependChildAnimator;
+    using ComplexAnimator::ca_prependChild;
 
     using ComplexAnimator::ca_removeChild;
-    using ComplexAnimator::ca_replaceChildAnimator;
+    using ComplexAnimator::ca_replaceChild;
     using ComplexAnimator::ca_takeChildAt;
 
     void clearOldParent(const qsptr<T>& futureChild) {
@@ -130,7 +129,7 @@ protected:
     DynamicComplexAnimator(const QString &name) :
         DynamicComplexAnimatorBase<T>(name) {}
 public:
-    qsptr<T> createDuplicate(T* const src) {
+    qsptr<T> createDuplicate(T* const src) override {
         QBuffer buffer;
         buffer.open(QIODevice::ReadWrite);
         eWriteStream writeStream(&buffer);
@@ -148,10 +147,11 @@ public:
         return duplicate;
     }
 
-    void prp_writeProperty(eWriteStream& dst) const {
-        const int nProps = this->ca_mChildAnimators.count();
+    void prp_writeProperty(eWriteStream& dst) const override {
+        const auto& children = this->ca_getChildren();
+        const int nProps = children.count();
         dst << nProps;
-        for(const auto& prop : this->ca_mChildAnimators) {
+        for(const auto& prop : children) {
             const auto futureId = dst.planFuturePos();
             const auto TProp = static_cast<T*>(prop.get());
             if(TWriteType) (TProp->*TWriteType)(dst);
@@ -160,7 +160,7 @@ public:
         }
     }
 
-    void prp_readProperty(eReadStream& src) {
+    void prp_readProperty(eReadStream& src) override {
         int nProps;
         src >> nProps;
         for(int i = 0; i < nProps; i++) {

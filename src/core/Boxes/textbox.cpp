@@ -37,12 +37,12 @@ TextBox::TextBox() : PathBox(TYPE_TEXT) {
     };
 
     mText = enve::make_shared<QStringAnimator>("text");
-    ca_prependChildAnimator(mRasterEffectsAnimators.data(), mText);
+    ca_prependChild(mRasterEffectsAnimators.data(), mText);
     connect(mText.get(), &Property::prp_currentFrameChanged,
             this, pathsUpdater);
 
     mLinesDist = enve::make_shared<QrealAnimator>(100, 0, 100, 1, "line dist");
-    ca_prependChildAnimator(mRasterEffectsAnimators.data(), mLinesDist);
+    ca_prependChild(mRasterEffectsAnimators.data(), mLinesDist);
     connect(mLinesDist.get(), &Property::prp_currentFrameChanged,
             this, pathsUpdater);
 }

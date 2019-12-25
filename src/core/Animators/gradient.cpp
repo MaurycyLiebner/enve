@@ -121,7 +121,7 @@ QGradientStops Gradient::getQGradientStops() {
 }
 
 void Gradient::swapColors(const int id1, const int id2) {
-    ca_swapChildAnimators(mColors.at(id1).get(),
+    ca_swapChildren(mColors.at(id1).get(),
                           mColors.at(id2).get());
     mColors.swap(id1, id2);
     updateQGradientStops(UpdateReason::userChange);

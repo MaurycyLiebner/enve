@@ -51,7 +51,7 @@ void ExternalLinkBox::setSrc(const QString &src) {
 InternalLinkBox::InternalLinkBox(BoundingBox * const linkTarget) :
     BoundingBox(TYPE_INTERNAL_LINK) {
     setLinkTarget(linkTarget);
-    ca_prependChildAnimator(mTransformAnimator.data(), mBoxTarget);
+    ca_prependChild(mTransformAnimator.data(), mBoxTarget);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
             this, &InternalLinkBox::setTargetSlot);
 }

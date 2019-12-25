@@ -243,7 +243,7 @@ public:
 
     void anim_setAbsFrame(const int frame);
 
-    void ca_childAnimatorIsRecordingChanged();
+    void ca_childIsRecordingChanged();
 
     QMatrix getTotalTransform() const;
 

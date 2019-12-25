@@ -21,17 +21,18 @@
 
 RasterEffectAnimators::RasterEffectAnimators(BoundingBox * const parentBox) :
     RasterEffectAnimatorsBase("raster effects"), mParentBox_k(parentBox) {
-    makeHiddenWhenEmpty();
+    ca_setHiddenWhenEmpty();
 
-    connect(this, &ComplexAnimator::childAdded,
+    connect(this, &ComplexAnimator::ca_childAdded,
             this, &RasterEffectAnimators::updateMaxForcedMargin);
-    connect(this, &ComplexAnimator::childRemoved,
+    connect(this, &ComplexAnimator::ca_childRemoved,
             this, &RasterEffectAnimators::updateMaxForcedMargin);
 }
 
 void RasterEffectAnimators::updateMaxForcedMargin() {
     QMargins newMargins;
-    for(const auto& effect : ca_mChildAnimators) {
+    const auto& children = ca_getChildren();
+    for(const auto& effect : children) {
         const auto rasterEffect = static_cast<RasterEffect*>(effect.get());
         if(!rasterEffect->forceMargin()) continue;
         const auto reMargin = rasterEffect->getMargin();
@@ -61,7 +62,8 @@ void RasterEffectAnimators::updateMaxForcedMargin() {
 
 void RasterEffectAnimators::addEffects(const qreal relFrame,
                                        BoxRenderData * const data) {
-    for(const auto& effect : ca_mChildAnimators) {
+    const auto& children = ca_getChildren();
+    for(const auto& effect : children) {
         auto rasterEffect = static_cast<RasterEffect*>(effect.get());
         if(rasterEffect->isVisible()) {
             const auto effectRenderData =
@@ -74,7 +76,8 @@ void RasterEffectAnimators::addEffects(const qreal relFrame,
 
 void RasterEffectAnimators::updateIfUsesProgram(
         const ShaderEffectProgram * const program) {
-    for(const auto& effect : ca_mChildAnimators) {
+    const auto& children = ca_getChildren();
+    for(const auto& effect : children) {
         const auto shaderEffect = dynamic_cast<ShaderEffect*>(effect.get());
         if(!shaderEffect) continue;
         shaderEffect->updateIfUsesProgram(program);
@@ -82,7 +85,7 @@ void RasterEffectAnimators::updateIfUsesProgram(
 }
 
 bool RasterEffectAnimators::hasEffects() {
-    return !ca_mChildAnimators.isEmpty();
+    return ca_hasChildren();
 }
 
 qsptr<ShaderEffect> readIdCreateShaderEffect(eReadStream& src) {

@@ -35,7 +35,7 @@ Circle::Circle() : PathBox(TYPE_CIRCLE) {
 
     mCenterPoint->disableSelection();
     mCenterPoint->setRelativePos(QPointF(0, 0));
-    ca_prependChildAnimator(mPathEffectsAnimators.data(),
+    ca_prependChild(mPathEffectsAnimators.data(),
                             mCenterAnimator);
 
     mHorizontalRadiusAnimator =
@@ -46,7 +46,7 @@ Circle::Circle() : PathBox(TYPE_CIRCLE) {
     getPointsHandler()->appendPt(mHorizontalRadiusPoint);
     mHorizontalRadiusPoint->setRelativePos(QPointF(10, 0));
     const auto hXAnimator = mHorizontalRadiusAnimator->getXAnimator();
-    ca_prependChildAnimator(mPathEffectsAnimators.data(),
+    ca_prependChild(mPathEffectsAnimators.data(),
                             hXAnimator->ref<QrealAnimator>());
     hXAnimator->prp_setName("horizontal radius");
 
@@ -58,7 +58,7 @@ Circle::Circle() : PathBox(TYPE_CIRCLE) {
     getPointsHandler()->appendPt(mVerticalRadiusPoint);
     mVerticalRadiusPoint->setRelativePos(QPointF(0, 10));
     const auto vYAnimator = mVerticalRadiusAnimator->getYAnimator();
-    ca_prependChildAnimator(mPathEffectsAnimators.data(),
+    ca_prependChild(mPathEffectsAnimators.data(),
                             vYAnimator->ref<QrealAnimator>());
     vYAnimator->prp_setName("vertical radius");
 

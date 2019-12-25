@@ -28,7 +28,8 @@ void BoolPropertyContainer::setValue(const bool value) {
     mValue = value;
     prp_afterWholeInfluenceRangeChanged();
 
-    for(const auto& prop : ca_mChildAnimators) {
+    const auto& children = ca_getChildren();
+    for(const auto& prop : children) {
         prop->SWT_setDisabled(!value);
     }
     emit valueChanged(value);

@@ -29,25 +29,22 @@ class ComplexAnimator : public Animator {
 protected:
     ComplexAnimator(const QString& name);
 public:
-    stdsptr<Key> anim_createKey() final {
-        return nullptr;
-    }
+    virtual void ca_childIsRecordingChanged();
+    virtual void ca_removeAllChildren();
+
+    bool SWT_isComplexAnimator() const
+    { return true; }
 
     void SWT_setupAbstraction(SWT_Abstraction *abstraction,
-                                     const UpdateFuncs &updateFuncs,
-                                     const int visiblePartWidgetId);
+                              const UpdateFuncs &updateFuncs,
+                              const int visiblePartWidgetId);
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool parentSatisfies,
                              const bool parentMainTarget) const;
 
-    bool SWT_isComplexAnimator() const;
 
-    void SWT_setChildrenAncestorDisabled(const bool bT) {
-        for(const auto& prop : ca_mChildAnimators) {
-            prop->SWT_setAncestorDisabled(bT);
-        }
-    }
+    void SWT_setChildrenAncestorDisabled(const bool bT);
 
     void anim_setAbsFrame(const int frame);
 
@@ -61,48 +58,41 @@ public:
                                     const FrameRange& newAbsRange);
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
+
+    stdsptr<Key> anim_createKey() final
+    { return nullptr; }
+
     bool anim_isDescendantRecording() const;
-    virtual void ca_removeAllChildAnimators();
-
-    void anim_addKeyAtRelFrame(const int relFrame) {
-        for(const auto &property : ca_mChildAnimators) {
-            if(property->SWT_isAnimator()) {
-                static_cast<Animator*>(property.get())->anim_addKeyAtRelFrame(relFrame);
-            }
-        }
-    }
-
+    void anim_addKeyAtRelFrame(const int relFrame);
     void anim_setRecording(const bool rec);
     void anim_shiftAllKeys(const int shift);
 
-    virtual void ca_childAnimatorIsRecordingChanged();
-
-    void ca_swapChildAnimators(Property * const animator1,
-                               Property * const animator2);
+    void ca_swapChildren(Property * const child1,
+                         Property * const child2);
     void ca_moveChildInList(Property *child, const int to);
     void ca_moveChildInList(Property *child, const int from, const int to);
     void ca_moveChildBelow(Property *move, Property *below);
     void ca_moveChildAbove(Property *move, Property *above);
 
-    bool hasChildAnimators() const;
+    bool ca_hasChildren() const;
 
-    void ca_changeChildAnimatorZ(const int oldIndex, const int newIndex);
+    void ca_changeChildZ(const int oldIndex, const int newIndex);
     int ca_getNumberOfChildren() const;
 
     template <typename T = Property>
     T *ca_getChildAt(const int i) const {
         if(i < 0 || i >= ca_getNumberOfChildren())
             RuntimeThrow("Index outside of range");
-        return static_cast<T*>(ca_mChildAnimators.at(i).data());
+        return static_cast<T*>(ca_mChildren.at(i).data());
     }
 
-    int getChildPropertyIndex(Property * const child);
+    int ca_getChildPropertyIndex(Property * const child);
 
     void ca_updateDescendatKeyFrame(Key* key);
 
     template <class T = Property>
     T *ca_getFirstDescendant(const std::function<bool(T*)>& tester) const {
-        for(const auto &prop : ca_mChildAnimators) {
+        for(const auto &prop : ca_mChildren) {
             const auto target = dynamic_cast<T*>(prop.data());
             if(target && tester(target)) return target;
             else if(prop->SWT_isComplexAnimator()) {
@@ -129,96 +119,46 @@ public:
         });
     }
 
-    void ca_execOnDescendants(const std::function<void(Property*)>& op) const {
-        for(const auto& child : ca_mChildAnimators) {
-            op(child.get());
-            if(child->SWT_isComplexAnimator()) {
-                static_cast<ComplexAnimator*>(child.get())->ca_execOnDescendants(op);
-            }
-        }
-    }
+    void ca_execOnDescendants(const std::function<void(Property*)>& op) const;
 
-    Property* getPropertyForGUI() const {
-        return mPropertyGUI;
-    }
+    Property* ca_getGUIProperty() const
+    { return ca_mGUIProperty; }
 
-    void setPropertyForGUI(Property * const prop) {
-        mPropertyGUI = prop;
-    }
+    void ca_setGUIProperty(Property * const prop)
+    { ca_mGUIProperty = prop; }
 
     void ca_addDescendantsKey(Key * const key);
     void ca_removeDescendantsKey(Key * const key);
 signals:
-    void childAdded(Property*);
-    void childRemoved(Property*);
+    void ca_childAdded(Property*);
+    void ca_childRemoved(Property*);
 protected:
-    void ca_addChild(const qsptr<Property> &childAnimator) {
-        ca_insertChild(childAnimator, ca_getNumberOfChildren());
-    }
+    void ca_addChild(const qsptr<Property> &child);
     void ca_insertChild(const qsptr<Property> &child, const int id);
     void ca_removeChild(const qsptr<Property> child);
 
     template <typename T = Property>
     qsptr<T> ca_takeChildAt(const int i) {
-        const auto result = ca_mChildAnimators.at(i);
+        const auto result = ca_mChildren.at(i);
         ca_removeChild(result);
         return result->ref<T>();
     }
 
-    void ca_prependChildAnimator(Property *childAnimator,
-                                 const qsptr<Property>& prependWith);
-    void ca_replaceChildAnimator(const qsptr<Property> &childAnimator,
-                                 const qsptr<Property>& replaceWith);
+    void ca_prependChild(Property *child, const qsptr<Property>& prependWith);
+    void ca_replaceChild(const qsptr<Property> &child,
+                         const qsptr<Property>& replaceWith);
 
-    QList<qsptr<Property>> ca_mChildAnimators;
 
-    void makeHiddenWhenEmpty() {
-        if(mHiddenEmpty) return;
-        mHiddenEmpty = true;
-        if(!hasChildAnimators()) {
-            SWT_setEnabled(false);
-            SWT_setVisible(false);
-        }
-    }
+    void ca_setHiddenWhenEmpty();
+    void ca_setDisabledWhenEmpty(const bool disabled);
+    const QList<qsptr<Property>>& ca_getChildren() const
+    { return ca_mChildren; }
 private:
-    bool mHiddenEmpty = false;
-    qptr<Property> mPropertyGUI;
-    bool ca_mChildAnimatorRecording = false;
-};
-
-class ComplexKey : public Key {
-    e_OBJECT
-public:
-    void deleteKey();
-    bool isDescendantSelected() const;
-
-    void startFrameTransform();
-    void finishFrameTransform();
-    void cancelFrameTransform();
-
-    bool isSelected() const;
-    void addToSelection(QList<Animator *> &selectedAnimators);
-    void removeFromSelection(QList<Animator*> &selectedAnimators);
-    bool differsFromKey(Key *otherKey) const;
-
-    void addAnimatorKey(Key * const key);
-
-    void removeAnimatorKey(Key * const key);
-
-    bool isEmpty() const;
-
-//    void setRelFrame(const int frame);
-
-    void moveAllKeysTo(ComplexKey * const target);
-    bool hasKey(Key *key) const;
-
-    int getChildKeysCount() const;
-    bool hasSameKey(Key *otherKey) const;
-protected:
-    ComplexKey(const int absFrame,
-               ComplexAnimator * const parentAnimator);
-private:
-    QList<Key*> mKeys;
+    bool ca_mDisabledEmpty = true;
+    bool ca_mHiddenEmpty = false;
+    bool ca_mChildRecording = false;
+    qptr<Property> ca_mGUIProperty;
+    QList<qsptr<Property>> ca_mChildren;
 };
 
 #endif // COMPLEXANIMATOR_H

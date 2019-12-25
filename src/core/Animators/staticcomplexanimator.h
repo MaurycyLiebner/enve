@@ -22,20 +22,12 @@ class StaticComplexAnimator : public ComplexAnimator {
 public:
     StaticComplexAnimator(const QString &name);
 
-    void prp_writeProperty(eWriteStream& dst) const {
-        for(const auto& prop : ca_mChildAnimators)
-            prop->prp_writeProperty(dst);
-    }
-
-    void prp_readProperty(eReadStream& src) {
-        for(const auto& prop : ca_mChildAnimators)
-            prop->prp_readProperty(src);
-    }
-
+    void prp_writeProperty(eWriteStream& dst) const;
+    void prp_readProperty(eReadStream& src);
 private:
-    using ComplexAnimator::ca_removeAllChildAnimators;
+    using ComplexAnimator::ca_removeAllChildren;
     using ComplexAnimator::ca_removeChild;
-    using ComplexAnimator::ca_replaceChildAnimator;
+    using ComplexAnimator::ca_replaceChild;
     using ComplexAnimator::ca_takeChildAt;
 };
 

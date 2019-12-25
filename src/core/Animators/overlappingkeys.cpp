@@ -16,7 +16,8 @@
 
 #include "overlappingkeys.h"
 
-#include "complexanimator.h"
+#include "animator.h"
+#include "complexkey.h"
 
 OverlappingKeys::OverlappingKeys(const stdsptr<Key> &key,
                                  Animator * const animator) :

@@ -23,11 +23,11 @@
 
 PathEffectAnimators::PathEffectAnimators() :
     PathEffectAnimatorsBase("path effects") {
-    makeHiddenWhenEmpty();
+    ca_setHiddenWhenEmpty();
 }
 
 bool PathEffectAnimators::hasEffects() {
-    return !ca_mChildAnimators.isEmpty();
+    return ca_hasChildren();
 }
 
 bool PathEffectAnimators::SWT_isPathEffectAnimators() const {
@@ -43,7 +43,8 @@ void PathEffectAnimators::readPathEffect(eReadStream& src) {
 #include "patheffectstask.h"
 void PathEffectAnimators::addEffects(const qreal relFrame,
                                      QList<stdsptr<PathEffectCaller>>& list) const {
-    for(const auto& effect : ca_mChildAnimators) {
+    const auto& children = ca_getChildren();
+    for(const auto& effect : children) {
         const auto pEffect = static_cast<PathEffect*>(effect.get());
         if(!pEffect->isVisible()) continue;
         list << pEffect->getEffectCaller(relFrame);

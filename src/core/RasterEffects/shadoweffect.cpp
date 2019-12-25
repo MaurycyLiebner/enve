@@ -52,7 +52,7 @@ ShadowEffect::ShadowEffect() :
     mOpacity->setCurrentBaseValue(1);
     ca_addChild(mOpacity);
 
-    setPropertyForGUI(mColor.data());
+    ca_setGUIProperty(mColor.data());
 }
 
 

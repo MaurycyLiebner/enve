@@ -34,7 +34,7 @@ public:
 
     using ComplexAnimator::ca_addChild;
     using ComplexAnimator::ca_insertChild;
-    using ComplexAnimator::ca_prependChildAnimator;
+    using ComplexAnimator::ca_prependChild;
 signals:
     void valueChanged(bool);
 private:

@@ -109,8 +109,8 @@ void BoundingBox::prp_afterChangedAbsRange(const FrameRange &range, const bool c
     }
 }
 
-void BoundingBox::ca_childAnimatorIsRecordingChanged() {
-    ComplexAnimator::ca_childAnimatorIsRecordingChanged();
+void BoundingBox::ca_childIsRecordingChanged() {
+    ComplexAnimator::ca_childIsRecordingChanged();
     SWT_scheduleContentUpdate(SWT_BR_ANIMATED);
     SWT_scheduleContentUpdate(SWT_BR_NOT_ANIMATED);
 }
@@ -122,7 +122,7 @@ qsptr<BoundingBox> BoundingBox::createLink() {
 }
 
 void BoundingBox::clearRasterEffects() {
-    mRasterEffectsAnimators->ca_removeAllChildAnimators();
+    mRasterEffectsAnimators->ca_removeAllChildren();
 }
 
 QPointF BoundingBox::getRelCenterPosition() {
@@ -179,7 +179,7 @@ void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
 void BoundingBox::setRasterEffectsEnabled(const bool enable) {
     mRasterEffectsAnimators->SWT_setEnabled(enable);
     mRasterEffectsAnimators->SWT_setVisible(
-                mRasterEffectsAnimators->hasChildAnimators() || enable);
+                mRasterEffectsAnimators->ca_hasChildren() || enable);
 }
 
 bool BoundingBox::getRasterEffectsEnabled() const {

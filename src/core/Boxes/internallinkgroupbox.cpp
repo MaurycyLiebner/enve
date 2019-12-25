@@ -23,7 +23,7 @@ InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget) :
     ContainerBox(TYPE_INTERNAL_LINK_GROUP) {
     setLinkTarget(linkTarget);
 
-    ca_prependChildAnimator(mTransformAnimator.data(), mBoxTarget);
+    ca_prependChild(mTransformAnimator.data(), mBoxTarget);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
             this, &InternalLinkGroupBox::setTargetSlot);
 }
