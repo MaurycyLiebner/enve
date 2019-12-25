@@ -380,7 +380,7 @@ void MainWindow::setupMenuBar() {
     mObjectMenu->addAction("Lower",
                            &mActions, &Actions::lowerAction,
                            Qt::Key_PageDown);
-    mObjectMenu->addAction("Rasie to &Top",
+    mObjectMenu->addAction("Raise to &Top",
                            &mActions, &Actions::raiseToTopAction,
                            Qt::Key_Home);
     mObjectMenu->addAction("Lower to &Bottom",
