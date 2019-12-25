@@ -115,22 +115,25 @@ void SkiaHelpers::writeBitmap(const SkBitmap& bitmap,
 
 void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
                                      const SkPath &path,
-                                     const float invScale) {
-    drawOutlineOverlay(canvas, path, invScale, false, 0);
+                                     const float invScale,
+                                     const SkColor &color) {
+    drawOutlineOverlay(canvas, path, invScale, false, 0, color);
 }
 
 void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
                                      const SkPath &path,
                                      const float invScale,
-                                     const SkMatrix& transform) {
-    drawOutlineOverlay(canvas, path, invScale, transform, false, 0);
+                                     const SkMatrix& transform,
+                                     const SkColor &color) {
+    drawOutlineOverlay(canvas, path, invScale, transform, false, 0, color);
 }
 
 void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
                                      const SkPath &path,
                                      const float invScale,
                                      const bool dashes,
-                                     const float intervalSize) {
+                                     const float intervalSize,
+                                     const SkColor &color) {
     SkPaint paint;
     if(dashes) {
         const float intervals[2] = {intervalSize*invScale,
@@ -143,7 +146,7 @@ void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
     paint.setColor(SK_ColorBLACK);
     canvas->drawPath(path, paint);
     paint.setStrokeWidth(0.75f*invScale);
-    paint.setColor(SK_ColorWHITE);
+    paint.setColor(color);
     canvas->drawPath(path, paint);
 }
 
@@ -152,19 +155,20 @@ void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
                                      const float invScale,
                                      const SkMatrix& transform,
                                      const bool dashes,
-                                     const float intervalSize) {
+                                     const float intervalSize,
+                                     const SkColor &color) {
     SkPath mappedPath = path;
     mappedPath.transform(transform);
     drawOutlineOverlay(canvas, mappedPath, invScale,
-                       dashes, intervalSize);
+                       dashes, intervalSize, color);
 }
 
 void SkiaHelpers::forceLink() {
 #define FORCE_UNDEFINED_SYMBOL(x, nid) \
     auto __fus_fp_ ## nid = &x; Q_UNUSED(__fus_fp_ ## nid)
 
-    FORCE_UNDEFINED_SYMBOL(SkTextUtils::GetPath, 0);
-    FORCE_UNDEFINED_SYMBOL(SkOpBuilder::add, 1);
+    FORCE_UNDEFINED_SYMBOL(SkTextUtils::GetPath, 0)
+    FORCE_UNDEFINED_SYMBOL(SkOpBuilder::add, 1)
     GrContext::MakeGL();
     GrGLMakeNativeInterface()->validate();
 }

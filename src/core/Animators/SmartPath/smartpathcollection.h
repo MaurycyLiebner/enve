@@ -24,6 +24,7 @@
 class SmartPathAnimator;
 class SmartNodePoint;
 typedef DynamicComplexAnimator<SmartPathAnimator> SmartPathCollectionBase;
+
 class SmartPathCollection : public SmartPathCollectionBase {
     Q_OBJECT
     e_OBJECT
@@ -35,21 +36,10 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
-    template<typename... Args>
-    SmartPathAnimator *createNewPath(Args && ...arguments) {
-        const auto newPath = enve::make_shared<SmartPathAnimator>(arguments...);
-        addChild(newPath);
-        return newPath.get();
-    }
-
     SmartNodePoint * createNewSubPathAtRelPos(const QPointF &relPos);
     SmartNodePoint * createNewSubPathAtPos(const QPointF &absPos);
 
-    void moveAllFrom(SmartPathCollection * const from) {
-        const int iMax = from->ca_getNumberOfChildren() - 1;
-        for(int i = iMax; i >= 0; i--)
-            addChild(from->takeChildAt(i));
-    }
+    void moveAllFrom(SmartPathCollection * const from);
 
     SkPath getPathAtRelFrame(const qreal relFrame) const;
 
@@ -57,19 +47,17 @@ public:
 
     void loadSkPath(const SkPath& path);
 
-    void setFillType(const SkPath::FillType fillType) {
-        if(mFillType == fillType) return;
-        mFillType = fillType;
-        prp_afterWholeInfluenceRangeChanged();
-        emit fillTypeChanged(fillType);
-    }
-
-    SkPath::FillType getFillType() const {
-        return mFillType;
-    }
+    void setFillType(const SkPath::FillType fillType);
+    SkPath::FillType getFillType() const
+    { return mFillType; }
 signals:
     void fillTypeChanged(SkPath::FillType);
 private:
+    SmartPathAnimator *createNewPath();
+    SmartPathAnimator *createNewPath(const SkPath& path);
+
+    void updatePathColors();
+
     SkPath::FillType mFillType = SkPath::kWinding_FillType;
 };
 

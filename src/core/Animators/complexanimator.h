@@ -76,7 +76,6 @@ public:
 
     bool ca_hasChildren() const;
 
-    void ca_changeChildZ(const int oldIndex, const int newIndex);
     int ca_getNumberOfChildren() const;
 
     template <typename T = Property>
@@ -132,6 +131,7 @@ public:
 signals:
     void ca_childAdded(Property*);
     void ca_childRemoved(Property*);
+    void ca_childMoved(Property*);
 protected:
     void ca_addChild(const qsptr<Property> &child);
     void ca_insertChild(const qsptr<Property> &child, const int id);

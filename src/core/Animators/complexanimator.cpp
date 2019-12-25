@@ -72,7 +72,6 @@ void ComplexAnimator::SWT_setupAbstraction(
                                                       visiblePartWidgetId);
         abstraction->addChildAbstraction(newAbs->ref<SWT_Abstraction>());
     }
-
 }
 
 FrameRange ComplexAnimator::prp_getIdenticalRelRange(const int relFrame) const {
@@ -210,6 +209,7 @@ void ComplexAnimator::ca_moveChildInList(Property* child,
     ca_mChildren.move(from, boundTo);
     SWT_moveChildTo(child, boundTo);
     prp_afterWholeInfluenceRangeChanged();
+    emit ca_childMoved(child);
 }
 
 void ComplexAnimator::ca_removeChild(const qsptr<Property> child) {
@@ -264,6 +264,8 @@ void ComplexAnimator::ca_swapChildren(Property * const child1,
     const int id2 = ca_getChildPropertyIndex(child2);
     ca_mChildren.swap(id1, id2);
     prp_afterWholeInfluenceRangeChanged();
+    emit ca_childMoved(child1);
+    emit ca_childMoved(child2);
 }
 
 bool ComplexAnimator::ca_hasChildren() const {
@@ -281,12 +283,6 @@ void ComplexAnimator::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
     const int thisShift = prp_getTotalFrameShift();
     for(const auto &property : ca_mChildren)
         property->prp_setInheritedFrameShift(thisShift, this);
-}
-
-void ComplexAnimator::ca_changeChildZ(const int oldIndex,
-                                              const int newIndex) {
-    ca_mChildren.move(oldIndex, newIndex);
-    prp_afterWholeInfluenceRangeChanged();
 }
 
 void ComplexAnimator::anim_setAbsFrame(const int frame) {

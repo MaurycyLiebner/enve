@@ -451,10 +451,10 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     } else if(target->SWT_isSmartPathAnimator()) {
         const auto path = static_cast<SmartPathAnimator*>(target);
         mPathBlendModeVisible = true;
-        mPathBlendModeCombo->setCurrentIndex(path->getMode());
+        mPathBlendModeCombo->setCurrentIndex(static_cast<int>(path->getMode()));
         connect(path, &SmartPathAnimator::pathBlendModeChagned,
                 this, [this](const SmartPathAnimator::Mode mode) {
-            mPathBlendModeCombo->setCurrentIndex(mode);
+            mPathBlendModeCombo->setCurrentIndex(static_cast<int>(mode));
         });
     }
 
@@ -718,6 +718,19 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                     const int adj = qRound(4*qreal(GRAPH_PROPERTY->width())/20);
                     p.fillRect(visRect.adjusted(adj, adj, -adj, -adj), color);
                 }
+            }
+            if(target->SWT_isSmartPathAnimator()) {
+                const auto path = static_cast<SmartPathAnimator*>(target);
+                const QRect colRect(mContentButton->pos(),
+                                    mContentButton->size());
+                p.setPen(Qt::NoPen);
+                p.setRenderHint(QPainter::Antialiasing, true);
+                p.setBrush(path->getPathColor());
+                const int radius = qRound(MIN_WIDGET_DIM*0.2);
+                p.drawEllipse(colRect.center() + QPoint(MIN_WIDGET_DIM, 2),
+                              radius, radius);
+                p.setRenderHint(QPainter::Antialiasing, false);
+                nameX += MIN_WIDGET_DIM;
             }
         } else nameX += MIN_WIDGET_DIM;
 

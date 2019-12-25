@@ -67,6 +67,7 @@ LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 
 SOURCES += \
     Animators/SmartPath/smartpath.cpp \
+    Animators/SmartPath/smartpathanimatoractions.cpp \
     Animators/brushsettingsanimator.cpp \
     Animators/clampedpoint.cpp \
     Animators/clampedvalue.cpp \

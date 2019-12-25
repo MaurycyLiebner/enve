@@ -45,25 +45,29 @@ namespace SkiaHelpers {
 
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,
-                            const float invScale);
+                            const float invScale,
+                            const SkColor &color = SK_ColorWHITE);
 
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,
                             const float invScale,
-                            const SkMatrix& transform);
+                            const SkMatrix& transform,
+                            const SkColor &color = SK_ColorWHITE);
 
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,
                             const float invScale,
                             const bool dashes,
-                            const float intervalSize);
+                            const float intervalSize,
+                            const SkColor &color = SK_ColorWHITE);
 
     void drawOutlineOverlay(SkCanvas * const canvas,
                             const SkPath &path,
                             const float invScale,
                             const SkMatrix& transform,
                             const bool dashes,
-                            const float intervalSize);
+                            const float intervalSize,
+                            const SkColor &color = SK_ColorWHITE);
 
     void forceLink();
 }

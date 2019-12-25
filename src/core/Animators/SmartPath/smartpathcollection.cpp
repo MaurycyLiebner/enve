@@ -19,7 +19,14 @@
 #include "Animators/transformanimator.h"
 
 SmartPathCollection::SmartPathCollection() :
-    SmartPathCollectionBase("paths") {}
+    SmartPathCollectionBase("paths") {
+    connect(this, &ComplexAnimator::ca_childRemoved,
+            this, &SmartPathCollection::updatePathColors);
+    connect(this, &ComplexAnimator::ca_childAdded,
+            this, &SmartPathCollection::updatePathColors);
+    connect(this, &ComplexAnimator::ca_childMoved,
+            this, &SmartPathCollection::updatePathColors);
+}
 
 void SmartPathCollection::prp_writeProperty(eWriteStream &dst) const {
     SmartPathCollectionBase::prp_writeProperty(dst);
@@ -47,34 +54,40 @@ SmartNodePoint *SmartPathCollection::createNewSubPathAtPos(const QPointF &absPos
     return pathHandler->addNewAtEnd(relPos);
 }
 
+void SmartPathCollection::moveAllFrom(SmartPathCollection * const from) {
+    const int iMax = from->ca_getNumberOfChildren() - 1;
+    for(int i = iMax; i >= 0; i--)
+        addChild(from->takeChildAt(i));
+}
+
 SkPath SmartPathCollection::getPathAtRelFrame(const qreal relFrame) const {
     SkPath result;
     const auto& children = ca_getChildren();
     for(const auto& child : children) {
         const auto path = static_cast<SmartPathAnimator*>(child.get());
         const auto mode = path->getMode();
-        if(mode == SmartPathAnimator::NORMAL)
+        if(mode == SmartPathAnimator::Mode::normal)
             result.addPath(path->getPathAtRelFrame(relFrame));
         else {
             SkPathOp op{SkPathOp::kUnion_SkPathOp};
             switch(mode) {
-                case(SmartPathAnimator::NORMAL):
-                case(SmartPathAnimator::ADD):
+                case(SmartPathAnimator::Mode::normal):
+                case(SmartPathAnimator::Mode::add):
                     op = SkPathOp::kUnion_SkPathOp;
                     break;
-                case(SmartPathAnimator::REMOVE):
+                case(SmartPathAnimator::Mode::remove):
                     op = SkPathOp::kDifference_SkPathOp;
                     break;
-                case(SmartPathAnimator::REMOVE_REVERSE):
+                case(SmartPathAnimator::Mode::removeReverse):
                     op = SkPathOp::kReverseDifference_SkPathOp;
                     break;
-                case(SmartPathAnimator::INTERSECT):
+                case(SmartPathAnimator::Mode::intersect):
                     op = SkPathOp::kIntersect_SkPathOp;
                     break;
-                case(SmartPathAnimator::EXCLUDE):
+                case(SmartPathAnimator::Mode::exclude):
                     op = SkPathOp::kXOR_SkPathOp;
                     break;
-                case(SmartPathAnimator::DIVIDE):
+                case(SmartPathAnimator::Mode::divide):
                     const SkPath skPath = path->getPathAtRelFrame(relFrame);
                     SkPath intersect;
                     op = SkPathOp::kIntersect_SkPathOp;
@@ -105,4 +118,38 @@ void SmartPathCollection::applyTransform(const QMatrix &transform) const {
 void SmartPathCollection::loadSkPath(const SkPath &path) {
     const QList<SkPath> paths = gBreakApart(path);
     for(const auto& sPath : paths) createNewPath(sPath);
+}
+
+void SmartPathCollection::setFillType(const SkPath::FillType fillType) {
+    if(mFillType == fillType) return;
+    mFillType = fillType;
+    prp_afterWholeInfluenceRangeChanged();
+    emit fillTypeChanged(fillType);
+}
+
+SmartPathAnimator *SmartPathCollection::createNewPath() {
+    const auto newPath = enve::make_shared<SmartPathAnimator>();
+    addChild(newPath);
+    return newPath.get();
+}
+
+SmartPathAnimator *SmartPathCollection::createNewPath(const SkPath &path) {
+    const auto newPath = enve::make_shared<SmartPathAnimator>(path);
+    addChild(newPath);
+    return newPath.get();
+}
+
+const QList<QColor> gPathColors =
+    { QColor(255, 255, 255),
+      QColor(0, 255, 255), QColor(255, 155, 0),
+      QColor(255, 0, 255), QColor(0, 255, 0),
+      QColor(255, 0, 0)};
+
+void SmartPathCollection::updatePathColors() {
+    const auto& children = ca_getChildren();
+    int i = 0;
+    for(const auto& child : children) {
+        const auto path = static_cast<SmartPathAnimator*>(child.get());
+        path->setPathColor(gPathColors[(i++) % gPathColors.length()]);
+    }
 }
