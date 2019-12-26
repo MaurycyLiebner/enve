@@ -20,6 +20,7 @@
 #include "renderinstancewidget.h"
 #include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 #include "videoencoder.h"
+#include "ReadWrite/basicreadwrite.h"
 
 RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
     mMainLayout = new QVBoxLayout(this);
@@ -129,7 +130,25 @@ void RenderWidget::clearRenderQueue() {
     for(int i = mRenderInstanceWidgets.count() - 1; i >= 0; i--) {
         delete mRenderInstanceWidgets.at(i);
     }
+    leaveOnlyStartRenderButtonEnabled();
 }
+
+void RenderWidget::write(eWriteStream &dst) const {
+    dst << mRenderInstanceWidgets.count();
+    for(const auto widget : mRenderInstanceWidgets) {
+        widget->write(dst);
+    }
+}
+
+void RenderWidget::read(eReadStream &src) {
+    int nWidgets; src >> nWidgets;
+    for(int i = 0; i < nWidgets; i++) {
+        const auto wid = new RenderInstanceWidget(nullptr, this);
+        wid->read(src);
+        addRenderInstanceWidget(wid);
+    }
+}
+
 #include "renderhandler.h"
 void RenderWidget::render(RenderInstanceSettings &settings) {
     const RenderSettings &renderSettings = settings.getRenderSettings();

@@ -92,7 +92,7 @@ static void addVideoStream(OutputStream * const ost,
                            AVFormatContext * const oc,
                            const OutputSettings &outSettings,
                            const RenderSettings &renSettings) {
-    const AVCodec * const codec = outSettings.videoCodec;
+    const AVCodec * const codec = outSettings.fVideoCodec;
 
 //    if(!codec) {
 //        /* find the video encoder */
@@ -112,7 +112,7 @@ static void addVideoStream(OutputStream * const ost,
     ost->fCodec = c;
 
     /* Put sample parameters. */
-    c->bit_rate = outSettings.videoBitrate;//settings->getVideoBitrate();
+    c->bit_rate = outSettings.fVideoBitrate;//settings->getVideoBitrate();
     /* Resolution must be a multiple of two. */
     c->width    = renSettings.fVideoWidth;
     c->height   = renSettings.fVideoHeight;
@@ -124,7 +124,7 @@ static void addVideoStream(OutputStream * const ost,
     c->time_base       = ost->fStream->time_base;
 
     c->gop_size      = 12; /* emit one intra frame every twelve frames at most */
-    c->pix_fmt       = outSettings.videoPixelFormat;//RGBA;
+    c->pix_fmt       = outSettings.fVideoPixelFormat;//RGBA;
     if(c->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
         /* just for testing, we also add B-frames */
         c->max_b_frames = 2;
@@ -261,7 +261,7 @@ static void addAudioStream(OutputStream * const ost,
                            AVFormatContext * const oc,
                            const OutputSettings &settings,
                            const eSoundSettingsData& inSound) {
-    const AVCodec * const codec = settings.audioCodec;
+    const AVCodec * const codec = settings.fAudioCodec;
 
 //    /* find the audio encoder */
 //    codec = avcodec_find_encoder(codec_id);
@@ -278,11 +278,11 @@ static void addAudioStream(OutputStream * const ost,
     ost->fCodec = c;
 
     /* put sample parameters */
-    c->sample_fmt     = settings.audioSampleFormat;
-    c->sample_rate    = settings.audioSampleRate;
-    c->channel_layout = settings.audioChannelsLayout;
+    c->sample_fmt     = settings.fAudioSampleFormat;
+    c->sample_rate    = settings.fAudioSampleRate;
+    c->channel_layout = settings.fAudioChannelsLayout;
     c->channels       = av_get_channel_layout_nb_channels(c->channel_layout);
-    c->bit_rate       = settings.audioBitrate;
+    c->bit_rate       = settings.fAudioBitrate;
     c->time_base      = { 1, c->sample_rate };
 
     ost->fStream->time_base = { 1, c->sample_rate };
@@ -323,7 +323,7 @@ static void addAudioStream(OutputStream * const ost,
                                  c->sample_rate;
     qDebug() << "sample format" << av_get_sample_fmt_name(inSound.fSampleFormat) <<
                                    av_get_sample_fmt_name(c->sample_fmt);
-    qDebug() << "bitrate" << settings.audioBitrate;
+    qDebug() << "bitrate" << settings.fAudioBitrate;
 #endif
 }
 
@@ -459,7 +459,7 @@ void VideoEncoder::startEncodingNow() {
     mAllAudioProvided = false;
     mEncodeVideo = false;
     mEncodeAudio = false;
-    if(mOutputSettings.videoCodec && mOutputSettings.videoEnabled) {
+    if(mOutputSettings.fVideoCodec && mOutputSettings.fVideoEnabled) {
         try {
             addVideoStream(&mVideoStream, mFormatContext,
                            mOutputSettings, mRenderSettings);
@@ -470,11 +470,11 @@ void VideoEncoder::startEncodingNow() {
     }
     const auto soundComp = scene->getSoundComposition();
     if(mOutputFormat->audio_codec != AV_CODEC_ID_NONE &&
-       mOutputSettings.audioEnabled && soundComp->hasAnySounds()) {
+       mOutputSettings.fAudioEnabled && soundComp->hasAnySounds()) {
         eSoundSettings::sSave();
-        eSoundSettings::sSetSampleRate(mOutputSettings.audioSampleRate);
-        eSoundSettings::sSetSampleFormat(mOutputSettings.audioSampleFormat);
-        eSoundSettings::sSetChannelLayout(mOutputSettings.audioChannelsLayout);
+        eSoundSettings::sSetSampleRate(mOutputSettings.fAudioSampleRate);
+        eSoundSettings::sSetSampleFormat(mOutputSettings.fAudioSampleFormat);
+        eSoundSettings::sSetChannelLayout(mOutputSettings.fAudioChannelsLayout);
         mInSoundSettings = eSoundSettings::sData();
         try {
             addAudioStream(&mAudioStream, mFormatContext, mOutputSettings,
@@ -488,14 +488,14 @@ void VideoEncoder::startEncodingNow() {
     // open streams
     if(mEncodeVideo) {
         try {
-            openVideo(mOutputSettings.videoCodec, &mVideoStream);
+            openVideo(mOutputSettings.fVideoCodec, &mVideoStream);
         } catch (...) {
             RuntimeThrow("Error opening video stream");
         }
     }
     if(mEncodeAudio) {
         try {
-            openAudio(mOutputSettings.audioCodec, &mAudioStream,
+            openAudio(mOutputSettings.fAudioCodec, &mAudioStream,
                       mInSoundSettings);
         } catch (...) {
             RuntimeThrow("Error opening audio stream");
@@ -524,7 +524,7 @@ bool VideoEncoder::startEncoding(RenderInstanceSettings * const settings) {
     mRenderSettings = mRenderInstanceSettings->getRenderSettings();
     mPathByteArray = mRenderInstanceSettings->getOutputDestination().toUtf8();
 
-    mOutputFormat = mOutputSettings.outputFormat;
+    mOutputFormat = mOutputSettings.fOutputFormat;
     mSoundIterator = SoundIterator();
     try {
         startEncodingNow();

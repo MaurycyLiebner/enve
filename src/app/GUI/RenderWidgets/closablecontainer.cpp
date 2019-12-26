@@ -71,7 +71,7 @@ void ClosableContainer::setChecked(const bool check) {
     mCheckBox->setChecked(true);
 }
 
-bool ClosableContainer::isChecked() {
+bool ClosableContainer::isChecked() const {
     if(!mCheckBox) return true;
     return mCheckBox->isChecked();
 }

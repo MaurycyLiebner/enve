@@ -16,6 +16,7 @@
 
 #include "renderinstancesettings.h"
 #include "canvas.h"
+#include "simpletask.h"
 
 RenderInstanceSettings::RenderInstanceSettings(Canvas* canvas) {
     setTargetCanvas(canvas);
@@ -43,11 +44,14 @@ const QString &RenderInstanceSettings::getOutputDestination() const {
     return mOutputDestination;
 }
 
-void RenderInstanceSettings::setTargetCanvas(Canvas *canvas) {
+void RenderInstanceSettings::setTargetCanvas(
+        Canvas *canvas, const bool copySceneSettings) {
     if(mTargetCanvas) disconnect(mTargetCanvas, nullptr, this, nullptr);
     if(canvas) {
-        if(!mTargetCanvas) {
-            mRenderSettings.fMaxFrame = canvas->getMaxFrame();
+        if(!mTargetCanvas && copySceneSettings) {
+            const auto frameRange = canvas->getFrameRange();
+            mRenderSettings.fMinFrame = frameRange.fMin;
+            mRenderSettings.fMaxFrame = frameRange.fMax;
             mRenderSettings.fBaseWidth = canvas->getCanvasWidth();
             mRenderSettings.fBaseHeight = canvas->getCanvasHeight();
             mRenderSettings.fVideoWidth = qRound(mRenderSettings.fBaseWidth*
@@ -108,7 +112,6 @@ void RenderInstanceSettings::setRenderSettings(
 }
 
 void RenderInstanceSettings::renderingAboutToStart() {
-    copySettingsFromOutputSettingsProfile();
     mRenderError.clear();
     mRenderSettings.fTimeBase = { 1, qRound(mRenderSettings.fFps) };
     mRenderSettings.fFrameInc = mRenderSettings.fBaseFps/mRenderSettings.fFps;
@@ -131,18 +134,75 @@ RenderState RenderInstanceSettings::getCurrentState() const {
     return mState;
 }
 
-void RenderInstanceSettings::copySettingsFromOutputSettingsProfile() {
-    if(!mOutputSettingsProfile) return;
-    mOutputSettings = mOutputSettingsProfile->getSettings();
-}
-
 void RenderInstanceSettings::setOutputSettingsProfile(
         OutputSettingsProfile *profile) {
-    if(!profile) mOutputSettingsProfile.clear();
-    else mOutputSettingsProfile = profile;
-    copySettingsFromOutputSettingsProfile();
+    if(mOutputSettingsProfile) {
+        disconnect(mOutputSettingsProfile, nullptr, this, nullptr);
+    }
+    mOutputSettingsProfile = profile;
+    if(profile) {
+        connect(profile, &OutputSettingsProfile::changed,
+                this, [this, profile]() {
+            mOutputSettings = profile->getSettings();
+        });
+        mOutputSettings = profile->getSettings();
+    }
 }
 
 OutputSettingsProfile *RenderInstanceSettings::getOutputSettingsProfile() {
     return mOutputSettingsProfile;
+}
+
+void RenderInstanceSettings::write(eWriteStream &dst) const {
+    dst.write(&mState, sizeof(RenderState));
+    dst << mOutputDestination;
+    dst << mRenderError;
+    mRenderSettings.write(dst);
+    mOutputSettings.write(dst);
+
+    dst << (mOutputSettingsProfile ? mOutputSettingsProfile->getName() : "");
+
+    int targetWriteId = -1;
+    int targetDocumentId = -1;
+
+    if(mTargetCanvas) {
+        if(mTargetCanvas->getWriteId() < 0) mTargetCanvas->assignWriteId();
+        targetWriteId = mTargetCanvas->getWriteId();
+        targetDocumentId = mTargetCanvas->getDocumentId();
+    }
+    dst << targetWriteId;
+    dst << targetDocumentId;
+}
+
+void RenderInstanceSettings::read(eReadStream &src) {
+    src.read(&mState, sizeof(RenderState));
+    src >> mOutputDestination;
+    src >> mRenderError;
+    mRenderSettings.read(src);
+    mOutputSettings.read(src);
+
+    QString outputProfile; src >> outputProfile;
+    const auto profile = OutputSettingsProfile::sGetByName(outputProfile);
+    setOutputSettingsProfile(profile);
+
+    int targetReadId;
+    src >> targetReadId;
+    int targetDocumentId;
+    src >> targetDocumentId;
+    if(targetReadId != -1 && targetDocumentId != -1) {
+        const auto canvasSetter = [this, targetReadId, targetDocumentId]() {
+            BoundingBox* box = nullptr;
+            if(targetReadId != -1)
+                box = BoundingBox::sGetBoxByReadId(targetReadId);
+             if(!box && targetDocumentId != -1)
+                 box = BoundingBox::sGetBoxByDocumentId(targetDocumentId);
+             if(box && box->SWT_isCanvas())
+                 setTargetCanvas(static_cast<Canvas*>(box), false);
+        };
+        mTargetCanvas.clear();
+        canvasSetter();
+        if(!mTargetCanvas) SimpleTask::sSchedule(canvasSetter);
+    }
+
+    emit stateChanged(mState);
 }

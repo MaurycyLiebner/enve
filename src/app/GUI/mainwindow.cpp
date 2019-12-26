@@ -176,9 +176,9 @@ MainWindow::MainWindow(Document& document,
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
 
     mLayoutHandler = new LayoutHandler(mDocument, mAudioHandler);
-    mBoxesListAnimationDockWidget =
+    mTimeline =
             new TimelineDockWidget(mDocument, mLayoutHandler, this);
-    mBottomDock->setWidget(mBoxesListAnimationDockWidget);
+    mBottomDock->setWidget(mTimeline);
 
     mBrushSettingsDock = new QDockWidget("Brush Settings", this);
     mBrushSettingsDock->setFeatures(QDockWidget::DockWidgetMovable |
@@ -647,7 +647,7 @@ void MainWindow::closeWelcomeDialog() {
 
 void MainWindow::addCanvasToRenderQue() {
     if(!mDocument.fActiveScene) return;
-    mBoxesListAnimationDockWidget->getRenderWidget()->
+    mTimeline->getRenderWidget()->
     createNewRenderInstanceWidgetForCanvas(mDocument.fActiveScene);
 }
 
@@ -655,13 +655,13 @@ void MainWindow::updateSettingsForCurrentCanvas(Canvas* const scene) {
     mObjectSettingsWidget->setCurrentScene(scene);
     if(!scene) {
         mObjectSettingsWidget->setMainTarget(nullptr);
-        mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(nullptr);
+        mTimeline->updateSettingsForCurrentCanvas(nullptr);
         return;
     }
     mClipViewToCanvas->setChecked(scene->clipToCanvas());
     mRasterEffectsVisible->setChecked(scene->getRasterEffectsVisible());
     mPathEffectsVisible->setChecked(scene->getPathEffectsVisible());
-    mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(scene);
+    mTimeline->updateSettingsForCurrentCanvas(scene);
     mObjectSettingsWidget->setMainTarget(scene->getCurrentGroup());
 }
 
@@ -1056,7 +1056,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
     if(isActiveWindow()) {
         bool returnBool = false;
         if(event->type() == QEvent::KeyPress &&
-           mBoxesListAnimationDockWidget->processKeyPress(event)) {
+           mTimeline->processKeyPress(event)) {
             returnBool = true;
         } else {
             returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);
@@ -1076,7 +1076,7 @@ void MainWindow::clearAll() {
     setFileChangedSinceSaving(false);
     mObjectSettingsWidget->setMainTarget(nullptr);
 
-    mBoxesListAnimationDockWidget->clearAll();
+    mTimeline->clearAll();
     mFillStrokeSettings->clearAll();
     mDocument.clear();
     mLayoutHandler->clear();

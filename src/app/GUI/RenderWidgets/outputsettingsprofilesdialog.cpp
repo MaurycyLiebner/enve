@@ -19,10 +19,8 @@
 #include "outputsettingsdialog.h"
 #include "outputsettingsdisplaywidget.h"
 #include "GUI/global.h"
-QList<stdsptr<OutputSettingsProfile>> OutputSettingsProfilesDialog::sOutputProfiles;
-bool OutputSettingsProfilesDialog::sOutputProfilesLoaded = false;
 
-OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
+OutputProfilesDialog::OutputProfilesDialog(
         const OutputSettings &currentSettings,
         QWidget *parent) :
  QDialog(parent) {
@@ -48,23 +46,23 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
     mNewProfileButton = new QPushButton("New...", this);
     mNewProfileButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(mNewProfileButton, &QPushButton::released,
-            this, &OutputSettingsProfilesDialog::createAndEditNewProfile);
+            this, &OutputProfilesDialog::createAndEditNewProfile);
     mDuplicateProfileButton = new QPushButton("Duplicate", this);
     mDuplicateProfileButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(mDuplicateProfileButton, &QPushButton::released,
-            this, &OutputSettingsProfilesDialog::duplicateCurrentProfile);
+            this, &OutputProfilesDialog::duplicateCurrentProfile);
     mEditProfileButton = new QPushButton("Edit...", this);
     mEditProfileButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(mEditProfileButton, &QPushButton::released,
-            this, &OutputSettingsProfilesDialog::editCurrentProfile);
+            this, &OutputProfilesDialog::editCurrentProfile);
     mSaveProfileButton = new QPushButton("Save", this);
     mSaveProfileButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(mSaveProfileButton, &QPushButton::released,
-            this, &OutputSettingsProfilesDialog::saveCurrentProfile);
+            this, &OutputProfilesDialog::saveCurrentProfile);
     mDeleteProfileButton = new QPushButton("Delete", this);
     mDeleteProfileButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(mDeleteProfileButton, &QPushButton::released,
-            this, &OutputSettingsProfilesDialog::deleteCurrentProfile);
+            this, &OutputProfilesDialog::deleteCurrentProfile);
     mProfileButtonsLayout->addWidget(mNewProfileButton);
     mProfileButtonsLayout->addWidget(mDuplicateProfileButton);
     mProfileButtonsLayout->addWidget(mEditProfileButton);
@@ -108,7 +106,7 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
     mStatusBar = new QStatusBar(this);
     mainLayout->addWidget(mStatusBar);
 
-    for(const auto& profile : sOutputProfiles) {
+    for(const auto& profile : OutputSettingsProfile::sOutputProfiles) {
         mProfilesComboBox->addItem(profile->getName());
     }
 
@@ -119,15 +117,23 @@ OutputSettingsProfilesDialog::OutputSettingsProfilesDialog(
         mProfilesComboBox->setDisabled(true);
     }
     connect(mProfilesComboBox, &QComboBox::editTextChanged,
-            this, &OutputSettingsProfilesDialog::setCurrentProfileName);
+            this, &OutputProfilesDialog::setCurrentProfileName);
     connect(mProfilesComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
-            this, &OutputSettingsProfilesDialog::currentProfileChanged);
+            this, &OutputProfilesDialog::currentProfileChanged);
 
     currentProfileChanged();
 }
 
-void OutputSettingsProfilesDialog::updateButtonsEnabled() {
-    if(sOutputProfiles.isEmpty()) {
+OutputSettingsProfile *OutputProfilesDialog::getCurrentProfile() {
+    if(OutputSettingsProfile::sOutputProfiles.isEmpty()) return nullptr;
+    const int index = mProfilesComboBox->currentIndex();
+    if(index < 0) return nullptr;
+    if(index >= OutputSettingsProfile::sOutputProfiles.count()) return nullptr;
+    return OutputSettingsProfile::sOutputProfiles.at(index).get();
+}
+
+void OutputProfilesDialog::updateButtonsEnabled() {
+    if(OutputSettingsProfile::sOutputProfiles.isEmpty()) {
         mDuplicateProfileButton->setDisabled(true);
         mEditProfileButton->setDisabled(true);
         mDeleteProfileButton->setDisabled(true);
@@ -142,7 +148,7 @@ void OutputSettingsProfilesDialog::updateButtonsEnabled() {
     }
 }
 
-void OutputSettingsProfilesDialog::currentProfileChanged() {
+void OutputProfilesDialog::currentProfileChanged() {
     OutputSettingsProfile *currentProfile = getCurrentProfile();
     if(!currentProfile) {
         mOutputSettingsDisplayWidget->hide();
@@ -152,39 +158,39 @@ void OutputSettingsProfilesDialog::currentProfileChanged() {
     mOutputSettingsDisplayWidget->setOutputSettings(currentProfile->getSettings());
 }
 
-void OutputSettingsProfilesDialog::setCurrentProfileName(const QString &name) {
+void OutputProfilesDialog::setCurrentProfileName(const QString &name) {
     OutputSettingsProfile *currentProfile = getCurrentProfile();
     if(!currentProfile) return;
     currentProfile->setName(name);
     mProfilesComboBox->setItemText(mProfilesComboBox->currentIndex(), name);
 }
 
-void OutputSettingsProfilesDialog::deleteCurrentProfile() {
+void OutputProfilesDialog::deleteCurrentProfile() {
     OutputSettingsProfile *currentProfile = getCurrentProfile();
     if(!currentProfile) return;
     const int currentId = mProfilesComboBox->currentIndex();
     mProfilesComboBox->removeItem(currentId);
-    sOutputProfiles.takeAt(currentId)->removeFile();
+    OutputSettingsProfile::sOutputProfiles.takeAt(currentId)->removeFile();
     updateButtonsEnabled();
     currentProfileChanged();
 }
 
-void OutputSettingsProfilesDialog::duplicateCurrentProfile() {
+void OutputProfilesDialog::duplicateCurrentProfile() {
     OutputSettingsProfile *currentProfile = getCurrentProfile();
     if(!currentProfile) return;
     auto newProfile = enve::make_shared<OutputSettingsProfile>();
     newProfile->setSettings(currentProfile->getSettings());
     newProfile->setName(currentProfile->getName() + " copy");
-    sOutputProfiles.append(newProfile);
+    OutputSettingsProfile::sOutputProfiles.append(newProfile);
     mProfilesComboBox->addItem(newProfile->getName());
     mProfilesComboBox->setCurrentIndex(mProfilesComboBox->count() - 1);
 }
 
-void OutputSettingsProfilesDialog::createAndEditNewProfile() {
+void OutputProfilesDialog::createAndEditNewProfile() {
     OutputSettingsDialog *dialog = new OutputSettingsDialog(OutputSettings(), this);
     if(dialog->exec()) {
         auto newProfile = enve::make_shared<OutputSettingsProfile>();
-        sOutputProfiles.append(newProfile);
+        OutputSettingsProfile::sOutputProfiles.append(newProfile);
         mProfilesComboBox->addItem(newProfile->getName());
         mProfilesComboBox->setCurrentIndex(mProfilesComboBox->count() - 1);
         updateButtonsEnabled();
@@ -194,7 +200,7 @@ void OutputSettingsProfilesDialog::createAndEditNewProfile() {
     delete dialog;
 }
 
-void OutputSettingsProfilesDialog::editCurrentProfile() {
+void OutputProfilesDialog::editCurrentProfile() {
     const auto currentProfile = getCurrentProfile();
     if(!currentProfile) return;
     const OutputSettings &outputSettings = currentProfile->getSettings();
@@ -206,7 +212,7 @@ void OutputSettingsProfilesDialog::editCurrentProfile() {
     delete dialog;
 }
 
-void OutputSettingsProfilesDialog::saveCurrentProfile() {
+void OutputProfilesDialog::saveCurrentProfile() {
     const auto profile = getCurrentProfile();
     if(!profile) return;
     try {

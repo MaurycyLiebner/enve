@@ -74,6 +74,7 @@ void BoxTargetProperty::prp_readProperty(eReadStream& src) {
     src >> targetReadId;
     int targetDocumentId;
     src >> targetDocumentId;
+    if(targetReadId == -1 || targetDocumentId == -1) return;
     SimpleTask::sSchedule([this, targetReadId, targetDocumentId]() {
         BoundingBox* targetBox = nullptr;
         if(targetReadId != -1)

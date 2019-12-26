@@ -174,57 +174,57 @@ OutputSettings OutputSettingsDialog::getSettings() {
         int formatId = mOutputFormatsComboBox->currentIndex();
         currentOutputFormat = mOutputFormatsList.at(formatId);
     }
-    settings.outputFormat = currentOutputFormat;
+    settings.fOutputFormat = currentOutputFormat;
 
-    settings.videoEnabled = mVideoGroupBox->isChecked();
+    settings.fVideoEnabled = mVideoGroupBox->isChecked();
     const AVCodec *currentVideoCodec = nullptr;
     if(mVideoCodecsComboBox->count() > 0) {
         int codecId = mVideoCodecsComboBox->currentIndex();
         currentVideoCodec = mVideoCodecsList.at(codecId);
     }
-    settings.videoCodec = currentVideoCodec;
+    settings.fVideoCodec = currentVideoCodec;
 
     AVPixelFormat currentPixelFormat = AV_PIX_FMT_NONE;
     if(mPixelFormatsList.count() > 0) {
         int formatId = mPixelFormatsComboBox->currentIndex();
         currentPixelFormat = mPixelFormatsList.at(formatId);
     }
-    settings.videoPixelFormat = currentPixelFormat;
-    settings.videoBitrate = qRound(mBitrateSpinBox->value()*1000000);
+    settings.fVideoPixelFormat = currentPixelFormat;
+    settings.fVideoBitrate = qRound(mBitrateSpinBox->value()*1000000);
 
-    settings.audioEnabled = mAudioGroupBox->isChecked();
+    settings.fAudioEnabled = mAudioGroupBox->isChecked();
     const AVCodec *currentAudioCodec = nullptr;
     if(mAudioCodecsComboBox->count() > 0) {
         const int codecId = mAudioCodecsComboBox->currentIndex();
         currentAudioCodec = mAudioCodecsList.at(codecId);
     }
-    settings.audioCodec = currentAudioCodec;
+    settings.fAudioCodec = currentAudioCodec;
 
     AVSampleFormat currentSampleFormat = AV_SAMPLE_FMT_NONE;
     if(mSampleFormatsComboBox->count() > 0) {
         const int formatId = mSampleFormatsComboBox->currentIndex();
         currentSampleFormat = mSampleFormatsList.at(formatId);
     }
-    settings.audioSampleFormat = currentSampleFormat;
+    settings.fAudioSampleFormat = currentSampleFormat;
 
     int currentSampleRate = 0;
     if(mSampleRateComboBox->count() > 0) {
         currentSampleRate = mSampleRateComboBox->currentData().toInt();
     }
-    settings.audioSampleRate = currentSampleRate;
+    settings.fAudioSampleRate = currentSampleRate;
 
     int currentAudioBitrate = 0;
     if(mAudioBitrateComboBox->count() > 0) {
         currentAudioBitrate = mAudioBitrateComboBox->currentData().toInt();
     }
-    settings.audioBitrate = currentAudioBitrate;
+    settings.fAudioBitrate = currentAudioBitrate;
 
     uint64_t currentChannelsLayout = 0;
     if(mAudioChannelLayoutsComboBox->count() > 0) {
         const int layoutId = mAudioChannelLayoutsComboBox->currentIndex();
         currentChannelsLayout = mAudioChannelLayoutsList.at(layoutId);
     }
-    settings.audioChannelsLayout = currentChannelsLayout;
+    settings.fAudioChannelsLayout = currentChannelsLayout;
 
     return settings;
 }
@@ -462,8 +462,8 @@ void OutputSettingsDialog::updateAvailableSampleFormats() {
     while(*sampleFormats != -1) {
         mSampleFormatsList << *sampleFormats;
         QString formatName;
-        const auto it = OutputSettings::SAMPLE_FORMATS_NAMES.find(*sampleFormats);
-        if(it == OutputSettings::SAMPLE_FORMATS_NAMES.end()) {
+        const auto it = OutputSettings::sSampleFormatNames.find(*sampleFormats);
+        if(it == OutputSettings::sSampleFormatNames.end()) {
             formatName = "unrecognized";
         } else {
             formatName = it->second;
@@ -578,38 +578,38 @@ void OutputSettingsDialog::updateAvailableAudioChannelLayouts() {
 }
 
 void OutputSettingsDialog::restoreInitialSettings() {
-    const auto currentOutputFormat = mInitialSettings.outputFormat;
+    const auto currentOutputFormat = mInitialSettings.fOutputFormat;
     if(!currentOutputFormat) {
         mOutputFormatsComboBox->setCurrentIndex(0);
     } else {
         QString currentOutputFormatName = QString(currentOutputFormat->long_name);
         mOutputFormatsComboBox->setCurrentText(currentOutputFormatName);
     }
-    const AVCodec *currentVideoCodec = mInitialSettings.videoCodec;
+    const AVCodec *currentVideoCodec = mInitialSettings.fVideoCodec;
     if(!currentVideoCodec) {
         mVideoCodecsComboBox->setCurrentIndex(0);
     } else {
         QString currentCodecName = QString(currentVideoCodec->long_name);
         mVideoCodecsComboBox->setCurrentText(currentCodecName);
     }
-    AVPixelFormat currentFormat = mInitialSettings.videoPixelFormat;
+    AVPixelFormat currentFormat = mInitialSettings.fVideoPixelFormat;
     if(currentFormat == AV_PIX_FMT_NONE) {
         mPixelFormatsComboBox->setCurrentIndex(0);
     } else {
         QString currentFormatName = QString(av_get_pix_fmt_name(currentFormat));
         mPixelFormatsComboBox->setCurrentText(currentFormatName);
     }
-    const int currentBitrate = mInitialSettings.videoBitrate;
+    const int currentBitrate = mInitialSettings.fVideoBitrate;
     if(currentBitrate <= 0) {
         mBitrateSpinBox->setValue(9.);
     } else {
         mBitrateSpinBox->setValue(currentBitrate/1000000.);
     }
     const bool noVideoCodecs = mVideoCodecsComboBox->count() == 0;
-    mVideoGroupBox->setChecked(mInitialSettings.videoEnabled &&
+    mVideoGroupBox->setChecked(mInitialSettings.fVideoEnabled &&
                                !noVideoCodecs);
 
-    const AVCodec *currentAudioCodec = mInitialSettings.audioCodec;
+    const AVCodec *currentAudioCodec = mInitialSettings.fAudioCodec;
     if(!currentAudioCodec) {
         mAudioCodecsComboBox->setCurrentIndex(0);
     } else {
@@ -617,15 +617,15 @@ void OutputSettingsDialog::restoreInitialSettings() {
         mAudioCodecsComboBox->setCurrentText(currentCodecName);
     }
 
-    AVSampleFormat currentSampleFormat = mInitialSettings.audioSampleFormat;
+    AVSampleFormat currentSampleFormat = mInitialSettings.fAudioSampleFormat;
     if(currentSampleFormat == AV_SAMPLE_FMT_NONE) {
         mSampleFormatsComboBox->setCurrentIndex(0);
     } else {
-        QString currentFormatName = OutputSettings::SAMPLE_FORMATS_NAMES.at(currentSampleFormat);
+        QString currentFormatName = OutputSettings::sSampleFormatNames.at(currentSampleFormat);
         mSampleFormatsComboBox->setCurrentText(currentFormatName);
     }
 
-    const int currentSampleRate = mInitialSettings.audioSampleRate;
+    const int currentSampleRate = mInitialSettings.fAudioSampleRate;
     const int currSRId = mSampleRateComboBox->findData(QVariant(currentSampleRate));
     if(currSRId == -1) {
         const int i48000Id = mSampleRateComboBox->findData(QVariant(48000));
@@ -644,7 +644,7 @@ void OutputSettingsDialog::restoreInitialSettings() {
         mSampleRateComboBox->setCurrentIndex(currSRId);
     }
 
-    const int currentAudioBitrate = mInitialSettings.audioBitrate;
+    const int currentAudioBitrate = mInitialSettings.fAudioBitrate;
     const int currABRId = mAudioBitrateComboBox->findData(QVariant(currentAudioBitrate));
     if(currABRId == -1) {
         int i192Id = mAudioBitrateComboBox->findData(QVariant(192000));
@@ -658,7 +658,7 @@ void OutputSettingsDialog::restoreInitialSettings() {
         mAudioBitrateComboBox->setCurrentIndex(currABRId);
     }
 
-    const uint64_t currentChannelsLayout = mInitialSettings.audioChannelsLayout;
+    const uint64_t currentChannelsLayout = mInitialSettings.fAudioChannelsLayout;
     if(currentChannelsLayout == 0) {
         const int st = mAudioChannelLayoutsComboBox->findText("Stereo");
         mAudioChannelLayoutsComboBox->setCurrentIndex(st == -1 ? 0 : st);
@@ -674,7 +674,7 @@ void OutputSettingsDialog::restoreInitialSettings() {
     }
 
     const bool noAudioCodecs = mAudioCodecsComboBox->count() == 0;
-    mAudioGroupBox->setChecked(mInitialSettings.audioEnabled &&
+    mAudioGroupBox->setChecked(mInitialSettings.fAudioEnabled &&
                                !noAudioCodecs);
 }
 

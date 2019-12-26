@@ -18,24 +18,9 @@
 #define RENDERINSTANCESETTINGS_H
 class Canvas;
 #include "outputsettings.h"
+#include "rendersettings.h"
 #include "smartPointers/ememory.h"
 #include "Private/esettings.h"
-
-struct RenderSettings {
-    qreal fResolution = 1;
-    qreal fBaseFps = 24;
-    qreal fFps = 24;
-    qreal fFrameInc = 1;
-    AVRational fTimeBase = { 1, 24 }; // inverse of fps - 1/fps
-    int fVideoWidth = 0;
-    int fVideoHeight = 0;
-
-    int fBaseWidth = 0;
-    int fBaseHeight = 0;
-
-    int fMinFrame = 0;
-    int fMaxFrame = 0;
-};
 
 enum class RenderState {
     none,
@@ -55,7 +40,7 @@ public:
     QString getName();
     void setOutputDestination(const QString &outputDestination);
     const QString &getOutputDestination() const;
-    void setTargetCanvas(Canvas *canvas);
+    void setTargetCanvas(Canvas *canvas, const bool copySceneSettings = true);
     Canvas *getTargetCanvas() const;
     void setCurrentRenderFrame(const int currentRenderFrame);
     int currentRenderFrame();
@@ -68,9 +53,11 @@ public:
                          const QString &text = "");
     const QString &getRenderError() const;
     RenderState getCurrentState() const;
-    void copySettingsFromOutputSettingsProfile();
     void setOutputSettingsProfile(OutputSettingsProfile *profile);
     OutputSettingsProfile *getOutputSettingsProfile();
+
+    void write(eWriteStream& dst) const;
+    void read(eReadStream& src);
 signals:
     void stateChanged(const RenderState state);
     void renderFrameChanged(const int frame);
@@ -81,7 +68,7 @@ private:
     QString mOutputDestination;
     QString mRenderError;
 
-    stdptr<OutputSettingsProfile> mOutputSettingsProfile;
+    qptr<OutputSettingsProfile> mOutputSettingsProfile;
 
     qptr<Canvas> mTargetCanvas;
 

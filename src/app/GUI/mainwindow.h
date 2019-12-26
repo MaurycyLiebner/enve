@@ -246,7 +246,7 @@ private:
     QDockWidget *mLeftDock;
     QDockWidget *mLeftDock2;
     QDockWidget *mBrushSettingsDock;
-    TimelineDockWidget *mBoxesListAnimationDockWidget = nullptr;
+    TimelineDockWidget *mTimeline = nullptr;
     BrushSelectionWidget *mBrushSelectionWidget = nullptr;
 
     QStatusBar* mStatusBar;

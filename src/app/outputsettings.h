@@ -19,6 +19,7 @@
 #include <QString>
 #include "Private/esettings.h"
 #include "smartPointers/ememory.h"
+#include "ReadWrite/basicreadwrite.h"
 
 extern "C" {
     #include <libavcodec/avcodec.h>
@@ -32,27 +33,30 @@ extern "C" {
 }
 
 struct OutputSettings {
-    static const std::map<int, QString> SAMPLE_FORMATS_NAMES;
-    static const std::map<uint64_t, QString> sChannelLayouts;
+    static const std::map<int, QString> sSampleFormatNames;
     static QString sGetChannelsLayoutName(const uint64_t &layout);
     static uint64_t sGetChannelsLayout(const QString &name);
 
-    const AVOutputFormat *outputFormat = nullptr;
+    void write(eWriteStream& dst) const;
+    void read(eReadStream& src);
 
-    bool videoEnabled = false;
-    const AVCodec *videoCodec = nullptr;
-    AVPixelFormat videoPixelFormat = AV_PIX_FMT_NONE;
-    int videoBitrate = 0;
+    const AVOutputFormat *fOutputFormat = nullptr;
 
-    bool audioEnabled = false;
-    const AVCodec *audioCodec = nullptr;
-    AVSampleFormat audioSampleFormat = AV_SAMPLE_FMT_NONE;
-    uint64_t audioChannelsLayout = 0;
-    int audioSampleRate = 0;
-    int audioBitrate = 0;
+    bool fVideoEnabled = false;
+    const AVCodec *fVideoCodec = nullptr;
+    AVPixelFormat fVideoPixelFormat = AV_PIX_FMT_NONE;
+    int fVideoBitrate = 0;
+
+    bool fAudioEnabled = false;
+    const AVCodec *fAudioCodec = nullptr;
+    AVSampleFormat fAudioSampleFormat = AV_SAMPLE_FMT_NONE;
+    uint64_t fAudioChannelsLayout = 0;
+    int fAudioSampleRate = 0;
+    int fAudioBitrate = 0;
 };
 
-class OutputSettingsProfile : public StdSelfRef {
+class OutputSettingsProfile : public SelfRef {
+    Q_OBJECT
     e_OBJECT
 public:
     OutputSettingsProfile();
@@ -61,7 +65,7 @@ public:
     void setName(const QString &name) { mName = name; }
 
     const OutputSettings &getSettings() const { return mSettings; }
-    void setSettings(const OutputSettings &settings) { mSettings = settings; }
+    void setSettings(const OutputSettings &settings);
 
     void save();
     void load(const QString& path);
@@ -69,6 +73,12 @@ public:
     bool wasSaved() const { return !mPath.isEmpty(); }
     void removeFile();
     const QString& path() const { return mPath; }
+
+    static OutputSettingsProfile* sGetByName(const QString& name);
+    static QList<qsptr<OutputSettingsProfile>> sOutputProfiles;
+    static bool sOutputProfilesLoaded;
+signals:
+    void changed();
 private:
     QString mPath;
     QString mName = "Untitled";

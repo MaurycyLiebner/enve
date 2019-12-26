@@ -29,7 +29,7 @@ public:
     void addContentWidget(QWidget *widget);
     void setCheckable(const bool check);
     void setChecked(const bool check);
-    bool isChecked();
+    bool isChecked() const;
 
     void setContentVisible(const bool visible);
 protected:

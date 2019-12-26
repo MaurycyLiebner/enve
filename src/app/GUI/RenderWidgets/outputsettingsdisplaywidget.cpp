@@ -70,45 +70,45 @@ OutputSettingsDisplayWidget::OutputSettingsDisplayWidget(QWidget *parent) :
 }
 
 void OutputSettingsDisplayWidget::setOutputSettings(const OutputSettings &settings) {
-    if(!settings.outputFormat) {
+    if(!settings.fOutputFormat) {
         setOutputFormatText("-");
     } else {
-        setOutputFormatText(QString(settings.outputFormat->long_name));
+        setOutputFormatText(QString(settings.fOutputFormat->long_name));
     }
     if(!mAlwaysShowAll) {
-        setVideoLabelsVisible(settings.videoEnabled);
+        setVideoLabelsVisible(settings.fVideoEnabled);
     }
-    if(!settings.videoCodec) {
+    if(!settings.fVideoCodec) {
         setVideoCodecText("-");
     } else {
-        setVideoCodecText(QString(settings.videoCodec->long_name));
+        setVideoCodecText(QString(settings.fVideoCodec->long_name));
     }
-    const char *pixelFormat = av_get_pix_fmt_name(settings.videoPixelFormat);
+    const char *pixelFormat = av_get_pix_fmt_name(settings.fVideoPixelFormat);
     if(!pixelFormat) {
         setPixelFormatText("-");
     } else {
         setPixelFormatText(QString(pixelFormat));
     }
-    setVideoBitrateText(QString::number(settings.videoBitrate/1000000) + " Mbps");
+    setVideoBitrateText(QString::number(settings.fVideoBitrate/1000000) + " Mbps");
     if(!mAlwaysShowAll) {
-        setAudioLabelsVisible(settings.audioEnabled);
+        setAudioLabelsVisible(settings.fAudioEnabled);
     }
-    if(!settings.audioCodec) {
+    if(!settings.fAudioCodec) {
         setAudioCodecText("-");
     } else {
-        setAudioCodecText(QString(settings.audioCodec->long_name));
+        setAudioCodecText(QString(settings.fAudioCodec->long_name));
     }
-    setAudioSampleRateText(QString::number(settings.audioSampleRate) + " Hz");
-    int formatId = settings.audioSampleFormat;
-    if(OutputSettings::SAMPLE_FORMATS_NAMES.find(formatId) ==
-            OutputSettings::SAMPLE_FORMATS_NAMES.end()) {
+    setAudioSampleRateText(QString::number(settings.fAudioSampleRate) + " Hz");
+    int formatId = settings.fAudioSampleFormat;
+    if(OutputSettings::sSampleFormatNames.find(formatId) ==
+            OutputSettings::sSampleFormatNames.end()) {
         setAudioSampleFormatText("-");
     } else {
-        setAudioSampleFormatText(OutputSettings::SAMPLE_FORMATS_NAMES.at(formatId));
+        setAudioSampleFormatText(OutputSettings::sSampleFormatNames.at(formatId));
     }
-    setAudioBitrateText(QString::number(settings.audioBitrate/1000) + " kbps");
+    setAudioBitrateText(QString::number(settings.fAudioBitrate/1000) + " kbps");
 
     const auto channLay = OutputSettings::sGetChannelsLayoutName(
-                settings.audioChannelsLayout);
+                settings.fAudioChannelsLayout);
     setAudioChannelLayoutText(channLay);
 }

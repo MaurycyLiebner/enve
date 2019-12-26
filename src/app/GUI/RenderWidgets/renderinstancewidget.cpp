@@ -43,8 +43,8 @@ RenderInstanceWidget::RenderInstanceWidget(const RenderInstanceSettings& sett,
 }
 
 void RenderInstanceWidget::iniGUI() {
-    if(!OutputSettingsProfilesDialog::sOutputProfilesLoaded) {
-        OutputSettingsProfilesDialog::sOutputProfilesLoaded = true;
+    if(!OutputSettingsProfile::sOutputProfilesLoaded) {
+        OutputSettingsProfile::sOutputProfilesLoaded = true;
         QDir(eSettings::sSettingsDir()).mkdir("OutputProfiles");
         const QString dirPath = eSettings::sSettingsDir() + "/OutputProfiles";
         QDirIterator dirIt(dirPath, QDirIterator::NoIteratorFlags);
@@ -59,7 +59,7 @@ void RenderInstanceWidget::iniGUI() {
             } catch(const std::exception& e) {
                 gPrintExceptionCritical(e);
             }
-            OutputSettingsProfilesDialog::sOutputProfiles << profile;
+            OutputSettingsProfile::sOutputProfiles << profile;
         }
     }
 
@@ -204,15 +204,15 @@ void RenderInstanceWidget::updateFromSettings() {
     const OutputSettings &outputSettings = mSettings.getOutputRenderSettings();
     OutputSettingsProfile *outputProfile = mSettings.getOutputSettingsProfile();
     QString outputTxt;
-    if(!outputProfile) {
-        const auto formatT = outputSettings.outputFormat;
+    if(outputProfile) {
+        outputTxt = outputProfile->getName();
+    } else {
+        const auto formatT = outputSettings.fOutputFormat;
         if(formatT) {
             outputTxt = "Custom " + QString(formatT->long_name);
         } else {
             outputTxt = "Settings";
         }
-    } else {
-        outputTxt = outputProfile->getName();
     }
     mOutputSettingsButton->setText(outputTxt);
     mOutputSettingsDisplayWidget->setOutputSettings(outputSettings);
@@ -254,14 +254,13 @@ void RenderInstanceWidget::mousePressEvent(QMouseEvent *e) {
 }
 
 void RenderInstanceWidget::openOutputSettingsDialog() {
-    mSettings.copySettingsFromOutputSettingsProfile();
     const OutputSettings &outputSettings = mSettings.getOutputRenderSettings();
     const auto dialog = new OutputSettingsDialog(outputSettings, this);
     if(dialog->exec()) {
         mSettings.setOutputSettingsProfile(nullptr);
         OutputSettings outputSettings = dialog->getSettings();
         mSettings.setOutputRenderSettings(outputSettings);
-        const auto outputFormat = outputSettings.outputFormat;
+        const auto outputFormat = outputSettings.fOutputFormat;
         if(!outputFormat) {
             mOutputSettingsButton->setText("Settings");
         } else {
@@ -290,7 +289,7 @@ void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
     QString outputDst = mSettings.getOutputDestination();
     if(outputDst.isEmpty()) outputDst = renderOutputDir() + "/untitled";
     const OutputSettings &outputSettings = mSettings.getOutputRenderSettings();
-    const auto format = outputSettings.outputFormat;
+    const auto format = outputSettings.fOutputFormat;
     if(!format) return;
     QString tmpStr = QString(format->extensions);
     QStringList supportedExt = tmpStr.split(",");
@@ -332,7 +331,7 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     QString supportedExts;
     QString selectedExt;
     const OutputSettings &outputSettings = mSettings.getOutputRenderSettings();
-    const auto format = outputSettings.outputFormat;
+    const auto format = outputSettings.fOutputFormat;
     if(format) {
         QString tmpStr(format->extensions);
         selectedExt = "." + tmpStr.split(",").first();
@@ -362,6 +361,17 @@ void RenderInstanceWidget::openRenderSettingsDialog() {
     delete dialog;
 }
 
+void RenderInstanceWidget::write(eWriteStream &dst) const {
+    mSettings.write(dst);
+    dst << isChecked();
+}
+
+void RenderInstanceWidget::read(eReadStream &src) {
+    mSettings.read(src);
+    bool checked; src >> checked;
+    setChecked(checked);
+}
+
 #include "Private/esettings.h"
 OutputProfilesListButton::OutputProfilesListButton(RenderInstanceWidget *parent) :
     QPushButton(parent) {
@@ -374,13 +384,13 @@ void OutputProfilesListButton::mousePressEvent(QMouseEvent *e) {
         QMenu menu;
         int i = 0;
         for(const auto& profile :
-            OutputSettingsProfilesDialog::sOutputProfiles) {
+            OutputSettingsProfile::sOutputProfiles) {
             QAction *actionT = new QAction(profile->getName());
             actionT->setData(QVariant(i));
             menu.addAction(actionT);
             i++;
         }
-        if(OutputSettingsProfilesDialog::sOutputProfiles.isEmpty()) {
+        if(OutputSettingsProfile::sOutputProfiles.isEmpty()) {
             menu.addAction("No profiles")->setEnabled(false);
         }
         menu.addSeparator();
@@ -394,18 +404,15 @@ void OutputProfilesListButton::mousePressEvent(QMouseEvent *e) {
             if(profileId == -1) {
                 const OutputSettings &outputSettings =
                         mParentWidget->getSettings().getOutputRenderSettings();
-                OutputSettingsProfilesDialog *profilesDialog =
-                        new OutputSettingsProfilesDialog(outputSettings, this);
-                if(profilesDialog->exec()) {
-                    OutputSettingsProfile *profileT =
-                            profilesDialog->getCurrentProfile();
-                    emit profileSelected(profileT);
+                const auto dialog = new OutputProfilesDialog(outputSettings, this);
+                if(dialog->exec()) {
+                    const auto profile = dialog->getCurrentProfile();
+                    emit profileSelected(profile);
                 }
             } else {
-                OutputSettingsProfile *profileT =
-                        OutputSettingsProfilesDialog::
+                const auto profile = OutputSettingsProfile::
                         sOutputProfiles.at(profileId).get();
-                emit profileSelected(profileT);
+                emit profileSelected(profile);
             }
         }
     }

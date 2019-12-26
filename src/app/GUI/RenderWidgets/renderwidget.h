@@ -28,9 +28,10 @@ class ScrollArea;
 class Canvas;
 class RenderInstanceWidget;
 class RenderInstanceSettings;
+class eWriteStream;
+class eReadStream;
 
-class RenderWidget : public QWidget
-{
+class RenderWidget : public QWidget {
     Q_OBJECT
 public:
     explicit RenderWidget(QWidget *parent = nullptr);
@@ -39,6 +40,9 @@ public:
     void setRenderedFrame(const int frame);
 
     void clearRenderQueue();
+
+    void write(eWriteStream& dst) const;
+    void read(eReadStream& src);
 private:
     void render(RenderInstanceSettings& settings);
     void addRenderInstanceWidget(RenderInstanceWidget *wid);

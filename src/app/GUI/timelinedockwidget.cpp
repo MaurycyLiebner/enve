@@ -282,7 +282,7 @@ void TimelineDockWidget::setResolutionFractionText(QString text) {
 }
 
 void TimelineDockWidget::clearAll() {
-
+    mRenderWidget->clearRenderQueue();
 }
 
 RenderWidget *TimelineDockWidget::getRenderWidget() {

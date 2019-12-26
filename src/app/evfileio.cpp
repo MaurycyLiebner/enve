@@ -57,6 +57,8 @@
 #include "Sound/soundcomposition.h"
 #include "Animators/rastereffectanimators.h"
 #include "ReadWrite/filefooter.h"
+#include "GUI/timelinedockwidget.h"
+#include "GUI/RenderWidgets/renderwidget.h"
 
 void MainWindow::loadEVFile(const QString &path) {
     QFile file(path);
@@ -79,6 +81,11 @@ void MainWindow::loadEVFile(const QString &path) {
         readStream.readCheckpoint("Error reading Document");
         mLayoutHandler->read(readStream);
         readStream.readCheckpoint("Error reading Layout");
+        if(readStream.evFileVersion() > 4) {
+            const auto renderWidget = mTimeline->getRenderWidget();
+            renderWidget->read(readStream);
+            readStream.readCheckpoint("Error reading Render Widget");
+        }
     } catch(...) {
         file.close();
         RuntimeThrow("Error while reading from file " + path);
@@ -102,6 +109,9 @@ void MainWindow::saveToFile(const QString &path) {
         mDocument.write(writeStream);
         writeStream.writeCheckpoint();
         mLayoutHandler->write(writeStream);
+        writeStream.writeCheckpoint();
+        const auto renderWidget = mTimeline->getRenderWidget();
+        renderWidget->write(writeStream);
         writeStream.writeCheckpoint();
 
         writeStream.writeFutureTable();

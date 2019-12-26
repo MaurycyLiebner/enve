@@ -46,6 +46,9 @@ public:
     RenderInstanceWidget(const RenderInstanceSettings& canvas,
                          QWidget *parent);
     RenderInstanceSettings &getSettings();
+
+    void write(eWriteStream &dst) const;
+    void read(eReadStream &src);
 protected:
     void mousePressEvent(QMouseEvent* e);
 private:

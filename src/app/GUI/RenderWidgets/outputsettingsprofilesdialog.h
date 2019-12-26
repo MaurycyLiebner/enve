@@ -23,21 +23,12 @@
 #include <QStatusBar>
 #include "renderinstancesettings.h"
 class OutputSettingsDisplayWidget;
-class OutputSettingsProfilesDialog : public QDialog {
+class OutputProfilesDialog : public QDialog {
 public:
-    OutputSettingsProfilesDialog(const OutputSettings &currentSettings,
+    OutputProfilesDialog(const OutputSettings &currentSettings,
                                  QWidget *parent = nullptr);
 
-    OutputSettingsProfile *getCurrentProfile() {
-        if(sOutputProfiles.isEmpty()) return nullptr;
-        const int index = mProfilesComboBox->currentIndex();
-        if(index < 0) return nullptr;
-        if(index >= sOutputProfiles.count()) return nullptr;
-        return sOutputProfiles.at(index).get();
-    }
-
-    static QList<stdsptr<OutputSettingsProfile>> sOutputProfiles;
-    static bool sOutputProfilesLoaded;
+    OutputSettingsProfile *getCurrentProfile();
 protected:
     void updateButtonsEnabled();
     void currentProfileChanged();
