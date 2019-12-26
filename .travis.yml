@@ -94,6 +94,7 @@ before_script:
     - cd qt5ct-0.*/
     - QT_SELECT=5 qmake
     - make -j 2 && sudo make install
+    - cd ..
 script:
     - # source /opt/qt512/bin/qt512-env.sh
     - # embed commit hash and date
