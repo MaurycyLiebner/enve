@@ -78,6 +78,17 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     const int iconSize = 5*MIN_WIDGET_DIM/4;
     const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
 
+    mPlayFromBeginningButton = new ActionButton(
+                iconsDir + "/preview.png",
+                gSingleLineTooltip("Play From the Beginning"), this);
+    connect(mPlayFromBeginningButton, &ActionButton::pressed,
+            this, [this]() {
+        const auto scene = mDocument.fActiveScene;
+        if(!scene) return;
+        scene->anim_setAbsFrame(scene->getFrameRange().fMin);
+        renderPreview();
+    });
+
     mPlayButton = SwitchButton::sCreate2Switch(iconsDir + "/play.png",
                                                iconsDir + "/pause.png",
                                                "Render Preview", this);
@@ -189,6 +200,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mToolBar->addSeparator();
     //mResolutionComboBox->setFocusPolicy(Qt::NoFocus);
 
+    mToolBar->addWidget(mPlayFromBeginningButton);
     mToolBar->addWidget(mPlayButton);
     mToolBar->addWidget(mStopButton);
 
@@ -249,6 +261,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
 
     mMainLayout->addWidget(mToolBar);
 
+    mPlayFromBeginningButton->setEnabled(false);
     mPlayButton->setEnabled(false);
     mStopButton->setEnabled(false);
 
@@ -256,6 +269,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
 
     connect(&mDocument, &Document::activeSceneSet,
             this, [this](Canvas* const scene) {
+        mPlayFromBeginningButton->setEnabled(scene);
         mPlayButton->setEnabled(scene);
         mStopButton->setEnabled(scene);
     });
@@ -325,6 +339,7 @@ bool TimelineDockWidget::processKeyPress(QKeyEvent *event) {
 
 void TimelineDockWidget::previewFinished() {
     //setPlaying(false);
+    mPlayFromBeginningButton->setDisabled(false);
     mStopButton->setDisabled(true);
     mPlayButton->setState(0);
     mPlayButton->setToolTip("Render Preview");
@@ -334,6 +349,7 @@ void TimelineDockWidget::previewFinished() {
 }
 
 void TimelineDockWidget::previewBeingPlayed() {
+    mPlayFromBeginningButton->setDisabled(true);
     mStopButton->setDisabled(false);
     mPlayButton->setState(1);
     mPlayButton->setToolTip("Pause Preview");
@@ -343,6 +359,7 @@ void TimelineDockWidget::previewBeingPlayed() {
 }
 
 void TimelineDockWidget::previewBeingRendered() {
+    mPlayFromBeginningButton->setDisabled(true);
     mStopButton->setDisabled(false);
     mPlayButton->setState(0);
     mPlayButton->setToolTip("Play Preview");
@@ -352,6 +369,7 @@ void TimelineDockWidget::previewBeingRendered() {
 }
 
 void TimelineDockWidget::previewPaused() {
+    mPlayFromBeginningButton->setDisabled(true);
     mStopButton->setDisabled(false);
     mPlayButton->setState(0);
     mPlayButton->setToolTip("Resume Preview");

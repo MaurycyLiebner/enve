@@ -96,6 +96,7 @@ private:
     QVBoxLayout *mMainLayout;
     QComboBox *mResolutionComboBox;
 
+    ActionButton *mPlayFromBeginningButton;
     SwitchButton *mPlayButton;
     ActionButton *mStopButton;
 
