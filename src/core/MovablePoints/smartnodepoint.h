@@ -161,7 +161,7 @@ public:
         return mNode_d->getCtrlsMode();
     }
 
-    Node::NodeType getType() const {
+    NodeType getType() const {
         Q_ASSERT(mNode_d);
         return mNode_d->getType();
     }
@@ -188,11 +188,11 @@ public:
     bool hasPrevNormalPoint() const;
 
     bool isNormal() const {
-        return getType() == Node::NORMAL;
+        return getType() == NodeType::normal;
     }
 
     bool isDissolved() const {
-        return getType() == Node::DISSOLVED;
+        return getType() == NodeType::dissolved;
     }
 
     const Node* getTargetNode() const {

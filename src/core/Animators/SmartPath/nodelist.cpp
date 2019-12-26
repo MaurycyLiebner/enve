@@ -20,6 +20,11 @@
 #include "exceptions.h"
 #include "smartPointers/ememory.h"
 
+NodeList::NodeList(ListOfNodes &&other) : mNodes(std::move(other)) {}
+
+NodeList::NodeList(const NodeList &other) :
+    mNodes(other.mNodes), mClosed(other.mClosed) {}
+
 qCubicSegment2D gSegmentFromNodes(const Node& prevNode,
                                   const Node& nextNode) {
     return qCubicSegment2D(prevNode.p1(), prevNode.c2(),
@@ -72,6 +77,29 @@ bool NodeList::write(eWriteStream& dst) const {
     return true;
 }
 
+void NodeList::append(NodeList &&other) {
+    mNodes.appendNodes(std::move(other.mNodes));
+}
+
+void NodeList::prepend(NodeList &&other) {
+    mNodes.prependNodes(std::move(other.mNodes));
+}
+
+void NodeList::moveNodesToFrontStartingWith(const int first) {
+    mNodes.moveNodesToFrontStartingWith(first);
+}
+
+NodeList NodeList::detachNodesStartingWith(const int first) {
+    return NodeList(mNodes.detachNodesStartingWith(first));
+}
+
+void NodeList::swap(NodeList &other) {
+    mNodes.swap(other.getList());
+    const bool wasClosed = mClosed;
+    mClosed = other.isClosed();
+    other.setClosed(wasClosed);
+}
+
 void NodeList::removeNodeFromList(const int nodeId) {
     mNodes.removeAt(nodeId);
 }
@@ -84,12 +112,9 @@ Node *NodeList::insertNodeToList(const int nodeId, const Node &node) {
     return insertedNode;
 }
 
-void NodeList::reverse() {
-    mNodes.reverse();
-}
-
-bool NodeList::isClosed() const {
-    return mClosed;
+void NodeList::reset() {
+    mClosed = false;
+    mNodes.clear();
 }
 
 int NodeList::insertNodeBefore(const int nextId,
@@ -123,6 +148,10 @@ int NodeList::appendNode(const Node &nodeBlueprint) {
     const int insertId = mNodes.count();
     insertNodeToList(insertId, nodeBlueprint);
     return insertId;
+}
+
+Node *NodeList::appendAndGetNode(const Node &nodeBlueprint) {
+    return mNodes[appendNode(nodeBlueprint)];
 }
 
 void NodeList::approximateBeforeDemoteOrRemoval(
@@ -222,7 +251,7 @@ void NodeList::demoteNormalNodeToDissolved(const int nodeId,
                                          prevNormalV, nextNormalV);
     }
 
-    setNodeType(node, Node::DISSOLVED);
+    setNodeType(node, NodeType::dissolved);
 
     const int prevNormalId = prevNormalV->getNodeId();
     const int nextNormalId = nextNormalV->getNodeId();
@@ -257,7 +286,7 @@ void NodeList::promoteDissolvedNodeToNormal(const int nodeId,
     node->setP1(first.p3());
     node->setC2(second.c1());
     nextNormalV->setC0(second.c2());
-    setNodeType(node, Node::NORMAL);
+    setNodeType(node, NodeType::normal);
     if(prevNormalV->getC2Enabled() || nextNormalV->getC0Enabled()) {
         setNodeCtrlsMode(prevNormalV, CtrlsMode::smooth);
         setNodeCtrlsMode(node, CtrlsMode::smooth);
@@ -491,6 +520,80 @@ qreal NodeList::nextT(const int nodeId) const {
     return node->t();
 }
 
+int NodeList::normalCount() const {
+    int result = 0;
+    for(const auto& node : mNodes) {
+        if(node->isNormal()) result++;
+    }
+    return result;
+}
+
+void NodeList::setNodeType(const int nodeId, const NodeType type) const {
+    if(nodeId < 0 || nodeId >= mNodes.count()) return;
+    setNodeType(mNodes[nodeId], type);
+}
+
+void NodeList::setNodeType(Node * const node, const NodeType type) const {
+    node->setType(type);
+}
+
+void NodeList::setNodeCtrlsMode(const int nodeId, const CtrlsMode ctrlsMode) {
+    if(nodeId < 0 || nodeId >= mNodes.count()) return;
+    setNodeCtrlsMode(mNodes[nodeId], ctrlsMode);
+}
+
+void NodeList::setNodeCtrlsMode(Node * const node, const CtrlsMode ctrlsMode) {
+    node->setCtrlsMode(ctrlsMode);
+}
+
+void NodeList::setNodeC0Enabled(const int nodeId, const bool enabled) {
+    if(nodeId < 0 || nodeId >= mNodes.count()) return;
+    setNodeC0Enabled(mNodes[nodeId], enabled);
+}
+
+void NodeList::setNodeC0Enabled(Node * const node, const bool enabled) {
+    node->setC0Enabled(enabled);
+}
+
+void NodeList::setNodeC2Enabled(const int nodeId, const bool enabled) {
+    if(nodeId < 0 || nodeId >= mNodes.count()) return;
+    setNodeC2Enabled(mNodes[nodeId], enabled);
+}
+
+void NodeList::setNodeC2Enabled(Node * const node, const bool enabled) {
+    node->setC2Enabled(enabled);
+}
+
+Node *NodeList::prevNode(const Node * const node) const {
+    return prevNode(node->getNodeId());
+}
+
+Node *NodeList::nextNode(const Node * const node) const {
+    return nextNode(node->getNodeId());
+}
+
+Node *NodeList::prevNode(const int nodeId) const {
+    if(mNodes.count() <= 1) return nullptr;
+    if(nodeId > 0) return mNodes[nodeId - 1];
+    if(mClosed) return mNodes.last();
+    return nullptr;
+}
+
+Node *NodeList::nextNode(const int nodeId) const {
+    if(mNodes.count() <= 1) return nullptr;
+    if(nodeId < mNodes.count() - 1) return mNodes[nodeId + 1];
+    if(mClosed) return mNodes.first();
+    return nullptr;
+}
+
+Node *NodeList::prevNormal(const Node * const node) const {
+    return prevNormal(node->getNodeId());
+}
+
+Node *NodeList::nextNormal(const Node * const node) const {
+    return nextNormal(node->getNodeId());
+}
+
 Node * NodeList::prevNormal(const int nodeId) const {
     if(mNodes.count() <= 1) return nullptr;
     Node * currNode = mNodes.at(nodeId);
@@ -520,8 +623,8 @@ NodeList NodeList::sInterpolate(const NodeList &list1,
         RuntimeThrow("Cannot interpolate paths with different node count");
     if(list1.isClosed() != list2.isClosed())
         RuntimeThrow("Cannot interpolate a closed path with an open path.");
-    auto list1Cpy = list1.createDeepCopy();
-    auto list2Cpy = list2.createDeepCopy();
+    NodeList list1Cpy = list1;
+    NodeList list2Cpy = list2;
     const bool closed = list1Cpy.isClosed();
     NodeList result;
     result.setClosed(closed);

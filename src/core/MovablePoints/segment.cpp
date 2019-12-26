@@ -234,8 +234,8 @@ bool NormalSegment::isValid() const {
 
 bool NormalSegment::isNormal() const {
     if(!isValid()) return false;
-    return mFirstNode->getType() == Node::NORMAL &&
-            mLastNode->getType() == Node::NORMAL;
+    return mFirstNode->getType() == NodeType::normal &&
+            mLastNode->getType() == NodeType::normal;
 }
 
 void NormalSegment::clear() {

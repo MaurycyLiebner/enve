@@ -16,7 +16,7 @@
 
 #ifndef NODELIST_H
 #define NODELIST_H
-#include "node.h"
+#include "listofnodes.h"
 #include "smartPointers/stdselfref.h"
 #include "smartPointers/stdpointer.h"
 #include "../../ReadWrite/basicreadwrite.h"
@@ -26,114 +26,53 @@ class NodeList {
 protected:
     NodeList() = default;
 public:
-    NodeList(ListOfNodes&& other) : mNodes(std::move(other)) {}
+    NodeList(ListOfNodes&& other);
+    NodeList(const NodeList& other);
 
-    Node* operator[](const int i) const {
-        return mNodes[i];
-    }
+    Node* operator[](const int i) const
+    { return mNodes[i]; }
 
-    Node* at(const int i) const {
-        return mNodes[i];
-    }
+    Node* at(const int i) const
+    { return mNodes[i]; }
 
-    int count() const {
-        return mNodes.count();
-    }
+    int count() const
+    { return mNodes.count(); }
 
-    int normalCount() const {
-        int result = 0;
-        for(const auto& node : mNodes) {
-            if(node->isNormal()) result++;
-        }
-        return result;
-    }
+    int normalCount() const;
 
-    void setNodeType(const int nodeId, const Node::NodeType type) const {
-        if(nodeId < 0 || nodeId >= mNodes.count()) return;
-        setNodeType(mNodes[nodeId], type);
-    }
+    void setNodeType(const int nodeId, const NodeType type) const;
+    void setNodeType(Node * const node, const NodeType type) const;
 
-    void setNodeType(Node * const node, const Node::NodeType type) const {
-        node->setType(type);
-    }
+    void setNodeCtrlsMode(const int nodeId, const CtrlsMode ctrlsMode);
+    void setNodeCtrlsMode(Node * const node, const CtrlsMode ctrlsMode);
 
-    void setNodeCtrlsMode(const int nodeId, const CtrlsMode ctrlsMode) {
-        if(nodeId < 0 || nodeId >= mNodes.count()) return;
-        setNodeCtrlsMode(mNodes[nodeId], ctrlsMode);
-    }
+    void setNodeC0Enabled(const int nodeId, const bool enabled);
+    void setNodeC0Enabled(Node * const node, const bool enabled);
+    void setNodeC2Enabled(const int nodeId, const bool enabled);
+    void setNodeC2Enabled(Node * const node, const bool enabled);
 
-    void setNodeCtrlsMode(Node * const node, const CtrlsMode ctrlsMode) {
-        node->setCtrlsMode(ctrlsMode);
-    }
-
-    void setNodeC0Enabled(const int nodeId, const bool enabled) {
-        if(nodeId < 0 || nodeId >= mNodes.count()) return;
-        setNodeC0Enabled(mNodes[nodeId], enabled);
-    }
-
-    void setNodeC0Enabled(Node * const node, const bool enabled) {
-        node->setC0Enabled(enabled);
-    }
-
-    void setNodeC2Enabled(const int nodeId, const bool enabled) {
-        if(nodeId < 0 || nodeId >= mNodes.count()) return;
-        setNodeC2Enabled(mNodes[nodeId], enabled);
-    }
-
-    void setNodeC2Enabled(Node * const node, const bool enabled) {
-        node->setC2Enabled(enabled);
-    }
-
-    Node * prevNode(const Node * const node) const {
-        return prevNode(node->getNodeId());
-    }
-
-    Node * nextNode(const Node * const node) const {
-        return nextNode(node->getNodeId());
-    }
-
-    Node * prevNode(const int nodeId) const {
-        if(mNodes.count() <= 1) return nullptr;
-        if(nodeId > 0) return mNodes[nodeId - 1];
-        if(mClosed) return mNodes.last();
-        return nullptr;
-    }
-
-    Node * nextNode(const int nodeId) const {
-        if(mNodes.count() <= 1) return nullptr;
-        if(nodeId < mNodes.count() - 1) return mNodes[nodeId + 1];
-        if(mClosed) return mNodes.first();
-        return nullptr;
-    }
-
-    Node * prevNormal(const Node * const node) const {
-        return prevNormal(node->getNodeId());
-    }
-
-    Node * nextNormal(const Node * const node) const {
-        return nextNormal(node->getNodeId());
-    }
-
+    Node * prevNode(const Node * const node) const;
+    Node * nextNode(const Node * const node) const;
+    Node * prevNode(const int nodeId) const;
+    Node * nextNode(const int nodeId) const;
+    Node * prevNormal(const Node * const node) const;
+    Node * nextNormal(const Node * const node) const;
     Node * prevNormal(const int nodeId) const;
     Node * nextNormal(const int nodeId) const;
 
     SkPath toSkPath() const;
     void setPath(const SkPath &path);
     void removeNodeFromList(const int nodeId);
-    void reverse();
-    bool isClosed() const;
-    void setClosed(const bool closed) {
-        mClosed = closed;
-    }
+    void reverse()
+    { mNodes.reverse(); }
+    bool isClosed() const
+    { return mClosed; }
+    void setClosed(const bool closed)
+    { mClosed = closed; }
 
-    void reset() {
-        mClosed = false;
-        mNodes.clear();
-    }
-
-    void clear() {
-        reset();
-    }
+    void reset();
+    void clear()
+    { reset(); }
 
     int insertFirstNode(const Node &nodeBlueprint);
 
@@ -158,66 +97,32 @@ public:
     void updateDissolvedNodePosition(const int nodeId);
     void updateDissolvedNodePosition(const int nodeId, Node * const node);
 
-    NodeList createDeepCopy() const {
-        NodeList copy;
-        copy.setNodeList(mNodes);
-        copy.setClosed(mClosed);
-        return copy;
-    }
-
-    void applyTransform(const QMatrix &transform) {
-        mNodes.applyTransform(transform);
-    }
+    void applyTransform(const QMatrix &transform)
+    { mNodes.applyTransform(transform); }
 
     bool read(eReadStream& src);
     bool write(eWriteStream &dst) const;
 protected:
-    void appendShallowCopyFrom(NodeList&& other) {
-        mNodes.appendNodes(std::move(other.mNodes));
-    }
+    void append(NodeList&& other);
+    void prepend(NodeList&& other);
 
-    void prependShallowCopyFrom(NodeList&& other) {
-        mNodes.prependNodes(std::move(other.mNodes));
-    }
+    void moveNodesToFrontStartingWith(const int first);
 
-    void moveNodesToFrontStartingWith(const int first) {
-        mNodes.moveNodesToFrontStartingWith(first);
-    }
+    NodeList detachNodesStartingWith(const int first);
 
-    NodeList detachNodesStartingWith(const int first) {
-        return NodeList(mNodes.detachNodesStartingWith(first));
-    }
+    void swap(NodeList& other);
 
-    void swap(NodeList& other) {
-        mNodes.swap(other.getList());
-        const bool wasClosed = mClosed;
-        mClosed = other.isClosed();
-        other.setClosed(wasClosed);
-    }
+    ListOfNodes& getList()
+    { return mNodes; }
 
-    ListOfNodes& getList() {
-        return mNodes;
-    }
-
-    const ListOfNodes& getList() const {
-        return mNodes;
-    }
-
-    void setNodeList(ListOfNodes&& list) {
-        mNodes = std::move(list);
-    }
-
-    void setNodeList(const ListOfNodes& list) {
-        mNodes = list;
-    }
+    const ListOfNodes& getList() const
+    { return mNodes; }
 
     int insertNodeBefore(const int nextId, const Node &nodeBlueprint);
     int insertNodeAfter(const int prevId, const Node &nodeBlueprint);
     int prependNode(const Node &nodeBlueprint);
     int appendNode(const Node &nodeBlueprint);
-    Node * appendAndGetNode(const Node &nodeBlueprint) {
-        return mNodes[appendNode(nodeBlueprint)];
-    }
+    Node * appendAndGetNode(const Node &nodeBlueprint);
 
     static NodeList sInterpolate(const NodeList &list1,
                                  const NodeList &list2,

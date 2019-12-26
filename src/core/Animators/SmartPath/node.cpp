@@ -17,12 +17,45 @@
 #include "node.h"
 #include "exceptions.h"
 
-Node Node::sInterpolateDissolved(const Node &node1, const Node &node2,
-                        const qreal weight2) {
-    if(!node1.isDissolved() || !node2.isDissolved())
-        RuntimeThrow("Unsupported node type");
-    const qreal w1 = 1 - weight2;
-    return Node(w1*node1.t() + weight2*node2.t());
+Node::Node() { mType = NodeType::none; }
+
+Node::Node(const QPointF &p1) {
+    mC0 = p1;
+    mP1 = p1;
+    mC2 = p1;
+    mType = NodeType::normal;
+    mCtrlsMode = CtrlsMode::corner;
+    mC0Enabled = false;
+    mC2Enabled = false;
+}
+
+Node::Node(const QPointF &c0, const QPointF &p1, const QPointF &c2) {
+    mC0 = c0;
+    mP1 = p1;
+    mC2 = c2;
+    mType = NodeType::normal;
+
+    guessCtrlsMode();
+    disableUnnecessaryCtrls();
+}
+
+Node::Node(const NormalNodeData &data) {
+    mType = NodeType::normal;
+    setNormalData(data);
+}
+
+Node::Node(const qreal t) {
+    mT = t;
+    mType = NodeType::dissolved;
+}
+
+void Node::setNormalData(const NormalNodeData &data) {
+    mC0 = data.fC0;
+    mP1 = data.fP1;
+    mC2 = data.fC2;
+    mC0Enabled = data.fC0Enabled;
+    mC2Enabled = data.fC2Enabled;
+    mCtrlsMode = data.fCtrlsMode;
 }
 
 Node Node::sInterpolateNormal(const Node &node1, const Node &node2,
@@ -52,4 +85,48 @@ Node Node::sInterpolateNormal(const Node &node1, const Node &node2,
     }
     result.setCtrlsMode(result.mCtrlsMode);
     return result;
+}
+
+Node Node::sInterpolateDissolved(const Node &node1, const Node &node2,
+                        const qreal weight2) {
+    if(!node1.isDissolved() || !node2.isDissolved())
+        RuntimeThrow("Unsupported node type");
+    const qreal w1 = 1 - weight2;
+    return Node(w1*node1.t() + weight2*node2.t());
+}
+
+void Node::applyTransform(const QMatrix &transform) {
+    mC0 = transform.map(mC0);
+    mP1 = transform.map(mP1);
+    mC2 = transform.map(mC2);
+}
+
+void Node::disableUnnecessaryCtrls() {
+    if(isZero2Dec(pointToLen(mC0 - mP1))) setC0Enabled(false);
+    if(isZero2Dec(pointToLen(mC2 - mP1))) setC2Enabled(false);
+}
+
+void Node::guessCtrlsMode() {
+    if(isZero2Dec(pointToLen(mC0 - mP1)) ||
+            isZero2Dec(pointToLen(mC2 - mP1)) ||
+            !mC0Enabled || !mC2Enabled) {
+        mCtrlsMode = CtrlsMode::corner;
+        return;
+    }
+    if(gIsSymmetric(mC0, mP1, mC2))
+        mCtrlsMode = CtrlsMode::symmetric;
+    else if(gIsSmooth(mC0, mP1, mC2))
+        mCtrlsMode = CtrlsMode::smooth;
+    else mCtrlsMode = CtrlsMode::corner;
+}
+
+void Node::setCtrlsMode(const CtrlsMode ctrlsMode) {
+    mCtrlsMode = ctrlsMode;
+    if(ctrlsMode == CtrlsMode::symmetric) {
+        gGetCtrlsSymmetricPos(mC0, mP1, mC2, mC0, mC2);
+    } else if(ctrlsMode == CtrlsMode::smooth) {
+        gGetCtrlsSmoothPos(mC0, mP1, mC2, mC0, mC2);
+    } else return;
+    setC0Enabled(true);
+    setC2Enabled(true);
 }

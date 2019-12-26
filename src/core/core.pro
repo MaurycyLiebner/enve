@@ -66,6 +66,7 @@ QMAKE_CXXFLAGS += -fopenmp
 LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 
 SOURCES += \
+    Animators/SmartPath/listofnodes.cpp \
     Animators/SmartPath/smartpath.cpp \
     Animators/SmartPath/smartpathanimatoractions.cpp \
     Animators/brushsettingsanimator.cpp \
@@ -307,6 +308,7 @@ SOURCES += \
     typemenu.cpp
 
 HEADERS += \
+    Animators/SmartPath/listofnodes.h \
     Animators/SmartPath/smartpath.h \
     Animators/brushsettingsanimator.h \
     Animators/clampedpoint.h \

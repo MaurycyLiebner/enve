@@ -180,8 +180,92 @@ void SmartPath::actionConnectNodes(const int node1Id, const int node2Id) {
     } else return;
 }
 
+void SmartPath::actionSetDissolvedNodeT(const int nodeId, const qreal t) {
+    Node * const node = mNodesList.at(nodeId);
+    if(!node->isDissolved()) return;
+    node->setT(t);
+    updateDissolvedNodePosition(nodeId, node);
+}
+
+void SmartPath::actionSetNormalNodeValues(
+        const int nodeId, const QPointF &c0,
+        const QPointF &p1, const QPointF &c2) {
+    Node * const node = mNodesList.at(nodeId);
+    if(!node->isNormal()) return;
+    node->setC0(c0);
+    node->setP1(p1);
+    node->setC2(c2);
+}
+
+void SmartPath::actionSetNormalNodeValues(const int nodeId,
+                                          const NormalNodeData &data) {
+    Node * const node = mNodesList.at(nodeId);
+    if(!node->isNormal()) return;
+    node->setNormalData(data);
+}
+
+void SmartPath::actionSetNormalNodeP1(const int nodeId, const QPointF &p1) {
+    Node * const node = mNodesList.at(nodeId);
+    if(!node->isNormal()) return;
+    node->setP1(p1);
+}
+
+void SmartPath::actionSetNormalNodeC0(const int nodeId, const QPointF &c0) {
+    Node * const node = mNodesList.at(nodeId);
+    if(!node->isNormal()) return;
+    node->setC0(c0);
+}
+
+void SmartPath::actionSetNormalNodeC2(const int nodeId, const QPointF &c2) {
+    Node * const node = mNodesList.at(nodeId);
+    if(!node->isNormal()) return;
+    node->setC2(c2);
+}
+
+void SmartPath::actionSetNormalNodeCtrlsMode(const int nodeId, const CtrlsMode mode) {
+    Node * const node = mNodesList.at(nodeId);
+    if(!node->isNormal()) return;
+    mNodesList.setNodeCtrlsMode(node, mode);
+}
+
+void SmartPath::actionSetNormalNodeC0Enabled(const int nodeId, const bool enabled) {
+    Node * const node = mNodesList.at(nodeId);
+    if(!node->isNormal()) return;
+    mNodesList.setNodeC0Enabled(node, enabled);
+}
+
+void SmartPath::actionSetNormalNodeC2Enabled(const int nodeId, const bool enabled) {
+    Node * const node = mNodesList.at(nodeId);
+    if(!node->isNormal()) return;
+    mNodesList.setNodeC2Enabled(node, enabled);
+}
+
+void SmartPath::actionReversePath() {
+    mNodesList.reverse();
+}
+
+void SmartPath::actionAppendMoveAllFrom(SmartPath &&other) {
+    mNodesList.append(std::move(other.mNodesList));
+    other.clear();
+}
+
+void SmartPath::actionPrependMoveAllFrom(SmartPath &&other) {
+    mNodesList.prepend(std::move(other.mNodesList));
+    other.clear();
+}
+
 void SmartPath::actionMergeNodes(const int node1Id, const int node2Id) {
     mNodesList.mergeNodes(node1Id, node2Id);
+}
+
+void SmartPath::reset() {
+    mNodesList.clear();
+    mSavedList.clear();
+    mLastDetached.clear();
+}
+
+void SmartPath::clear() {
+    reset();
 }
 
 SkPath SmartPath::getPathAt() const {
@@ -192,8 +276,67 @@ void SmartPath::setPath(const SkPath &path) {
     mNodesList.setPath(path);
 }
 
+const Node *SmartPath::getNodePtr(const int id) const {
+    if(id < 0) return nullptr;
+    if(id >= mNodesList.count()) return nullptr;
+    return mNodesList[id];
+}
+
+int SmartPath::prevNodeId(const int nodeId) const {
+    const auto node = mNodesList.prevNode(nodeId);
+    if(node) return node->getNodeId();
+    return -1;
+}
+
+int SmartPath::nextNodeId(const int nodeId) const {
+    const auto node = mNodesList.nextNode(nodeId);
+    if(node) return node->getNodeId();
+    return -1;
+}
+
+int SmartPath::prevNormalId(const int nodeId) const {
+    const auto node = mNodesList.prevNormal(nodeId);
+    if(node) return node->getNodeId();
+    return -1;
+}
+
+int SmartPath::nextNormalId(const int nodeId) const {
+    const auto node = mNodesList.nextNormal(nodeId);
+    if(node) return node->getNodeId();
+    return -1;
+}
+
 qValueRange SmartPath::dissolvedTRange(const int nodeId) {
     return {mNodesList.prevT(nodeId), mNodesList.nextT(nodeId)};
+}
+
+void SmartPath::updateDissolvedNodePosition(const int nodeId) {
+    mNodesList.updateDissolvedNodePosition(nodeId);
+}
+
+void SmartPath::updateDissolvedNodePosition(const int nodeId, Node * const node) {
+    mNodesList.updateDissolvedNodePosition(nodeId, node);
+}
+
+void SmartPath::addDissolvedNodes(const int add) {
+    Q_ASSERT(getNodeCount() >= 2);
+    const int n0 = getNodeCount() - 2;
+    const int n1 = n0 + 1;
+    for(int i = 0; i < add; i++)
+        actionInsertNodeBetween(n0, n1, 0.5);
+}
+
+void SmartPath::sInterpolate(const SmartPath &path1, const SmartPath &path2,
+                             const qreal path2Weight, SmartPath &target) {
+    target = NodeList::sInterpolate(path1.getNodesRef(),
+                                    path2.getNodesRef(),
+                                    path2Weight);
+}
+
+NodeList SmartPath::getAndClearLastDetached() {
+    NodeList detached;
+    mLastDetached.swap(detached);
+    return detached;
 }
 
 eWriteStream &operator<<(eWriteStream &dst, const SmartPath &path) {

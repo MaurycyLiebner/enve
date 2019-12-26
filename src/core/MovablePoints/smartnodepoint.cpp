@@ -82,7 +82,7 @@ int SmartNodePoint::moveToClosestSegment(const QPointF &absPos) {
 
 #include <QApplication>
 void SmartNodePoint::setRelativePos(const QPointF &relPos) {
-    if(getType() == Node::NORMAL) {
+    if(getType() == NodeType::normal) {
         NonAnimatedMovablePoint::setRelativePos(relPos);
         currentPath()->actionSetNormalNodeP1(getNodeId(), getRelativePos());
         mNextNormalSegment.afterChanged();
@@ -91,7 +91,7 @@ void SmartNodePoint::setRelativePos(const QPointF &relPos) {
         const QPointF change = relPos - getSavedRelPos();
         mC0Pt->moveByRel(change);
         mC2Pt->moveByRel(change);
-    } else if(getType() == Node::DISSOLVED) {
+    } else if(getType() == NodeType::dissolved) {
         const auto parentSeg = mPrevNormalPoint->getNextNormalSegment();
         const auto tRange = currentPath()->dissolvedTRange(getNodeId());
         const auto parentRelSeg = parentSeg.getAsRelSegment();
@@ -263,7 +263,7 @@ void SmartNodePoint::drawSk(SkCanvas * const canvas,
     const QPointF qAbsPos = getAbsolutePos();
     const SkPoint skAbsPos = toSkPoint(qAbsPos);
 
-    if(getType() == Node::NORMAL) {
+    if(getType() == NodeType::normal) {
         const SkColor fillCol = isSelected() ?
                     SkColorSetRGB(0, 200, 255) :
                     SkColorSetRGB(170, 240, 255);
@@ -295,7 +295,7 @@ void SmartNodePoint::drawSk(SkCanvas * const canvas,
                                qAbsPos, skAbsPos, invScale);
             }
         }
-    } else if(getType() == Node::DISSOLVED) {
+    } else if(getType() == NodeType::dissolved) {
         const SkColor fillCol = isSelected() ?
                     SkColorSetRGB(255, 0, 0) :
                     SkColorSetRGB(255, 120, 120);
@@ -601,9 +601,9 @@ void SmartNodePoint::updateFromNodeData() {
     setNextNormalPoint(nextNormalNode);
 
     const auto type = getType();
-    if(type == Node::NORMAL) setRadius(6.5);
-    else setRadius(type == Node::DISSOLVED ? 5.5 : 4);
-    setSelectionEnabled(type == Node::NORMAL);
+    if(type == NodeType::normal) setRadius(6.5);
+    else setRadius(type == NodeType::dissolved ? 5.5 : 4);
+    setSelectionEnabled(type == NodeType::normal);
 }
 
 bool SmartNodePoint::isEndPoint() const {
