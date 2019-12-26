@@ -257,6 +257,11 @@ void Document::decBrushRadius() {
     emit brushSizeChanged(fBrush->getBrushSize());
 }
 
+void Document::setOnionDisabled(const bool disabled) {
+    fOnionVisible = !disabled;
+    actionFinished();
+}
+
 void Document::clear() {
     setPath("");
     const int nScenes = fScenes.count();

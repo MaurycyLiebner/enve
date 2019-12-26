@@ -20,13 +20,14 @@
 void PaintTarget::draw(SkCanvas * const canvas,
                        const QMatrix& viewTrans,
                        const QRect& drawRect,
-                       const SkFilterQuality filter) {
+                       const SkFilterQuality filter,
+                       const bool drawOnion) {
     if(!isValid()) return;
     const auto canvasRect = viewTrans.inverted().mapRect(drawRect);
     const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
     const auto relDRect = pDrawTrans.inverted().mapRect(canvasRect);
     canvas->concat(toSkMatrix(pDrawTrans));
-    mPaintOnion.draw(canvas);
+    if(drawOnion) mPaintOnion.draw(canvas);
     SkPaint paint;
     paint.setFilterQuality(filter);
     mPaintDrawable->drawOnCanvas(canvas, {0, 0}, &relDRect, &paint);

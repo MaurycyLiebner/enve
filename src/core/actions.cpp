@@ -175,6 +175,12 @@ void Actions::mergePointsSlot() const {
     afterAction();
 }
 
+void Actions::subdivideSegments() const {
+    if(!mActiveScene) return;
+    mActiveScene->subdivideSegments();
+    afterAction();
+}
+
 void Actions::makePointCtrlsSymmetric() const {
     if(!mActiveScene) return;
     mActiveScene->makePointCtrlsSymmetric();
@@ -202,6 +208,12 @@ void Actions::makeSegmentLine() const {
 void Actions::makeSegmentCurve() const {
     if(!mActiveScene) return;
     mActiveScene->makeSegmentCurve();
+    afterAction();
+}
+
+void Actions::newEmptyPaintFrame() {
+    if(!mActiveScene) return;
+    mActiveScene->newEmptyPaintFrameAction();
     afterAction();
 }
 

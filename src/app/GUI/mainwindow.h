@@ -267,13 +267,30 @@ private:
     ActionButton *mActionConnectPoints;
     ActionButton *mActionDisconnectPoints;
     ActionButton *mActionMergePoints;
+    ActionButton *mActionNewNode;
+    QAction *mActionConnectPointsAct;
+    QAction *mActionDisconnectPointsAct;
+    QAction *mActionMergePointsAct;
+    QAction* mActionNewNodeAct;
+//
+    QAction* mSeparator1;
 //
     ActionButton *mActionSymmetricPointCtrls;
     ActionButton *mActionSmoothPointCtrls;
     ActionButton *mActionCornerPointCtrls;
+    QAction *mActionSymmetricPointCtrlsAct;
+    QAction *mActionSmoothPointCtrlsAct;
+    QAction *mActionCornerPointCtrlsAct;
+//
+    QAction* mSeparator2;
 //
     ActionButton *mActionLine;
     ActionButton *mActionCurve;
+    QAction *mActionLineAct;
+    QAction *mActionCurveAct;
+//
+    ActionButton *mActionNewEmptyPaintFrame;
+    QAction *mActionNewEmptyPaintFrameAct;
 //
     QAction *mNoneQuality;
     QAction *mLowQuality;
@@ -292,6 +309,7 @@ private:
     QAction *mBrushColorBookmarksAction;
 
     FontsWidget *mFontWidget = nullptr;
+    QAction* mFontWidgetAct = nullptr;
 
     QMenuBar *mMenuBar;
     QMenu *mFileMenu;

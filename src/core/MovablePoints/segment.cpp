@@ -28,9 +28,8 @@ bool NormalSegment::operator==(const NormalSegment &other) const {
 NormalSegment::NormalSegment() {}
 
 NormalSegment::NormalSegment(SmartNodePoint * const firstNode,
-                             SmartNodePoint * const lastNode,
-                             PathPointsHandler * const handler) :
-    mHandler_k(handler) {
+                             SmartNodePoint * const lastNode) :
+    mHandler_k(firstNode->getHandler()) {
     mFirstNode = firstNode;
     if(mFirstNode) mFirstNodeC2 = mFirstNode->getC2Pt();
     mLastNode = lastNode;
@@ -40,9 +39,14 @@ NormalSegment::NormalSegment(SmartNodePoint * const firstNode,
 
 SmartNodePoint *NormalSegment::divideAtAbsPos(const QPointF &absPos) {
     if(!isValid()) return nullptr;
+    const qreal t = closestAbsT(absPos);
+    return divideAtT(t);
+}
+
+SmartNodePoint *NormalSegment::divideAtT(const qreal &t) {
+    if(!isValid()) return nullptr;
     const int firstId = mFirstNode->getNodeId();
     const int lastId = mLastNode->getNodeId();
-    const qreal t = closestAbsT(absPos);
     const auto result = mHandler_k->divideSegment(firstId, lastId, t);
     reset();
     return result;

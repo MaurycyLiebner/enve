@@ -36,6 +36,10 @@
     <qresource prefix="/">
         <file>icons/toolbarButtons/plain/brush-</file>
         <file>icons/toolbarButtons/plain/brush+</file>
+        <file>icons/toolbarButtons/plain/nodeNew</file>
+        <file>icons/toolbarButtons/plain/newEmpty</file>
+        <file>icons/toolbarButtons/plain/onionDisabled</file>
+        <file>icons/toolbarButtons/plain/onionEnabled</file>
     </qresource>
     <qresource prefix="/checkbox">
         <file alias="Checkbox_checked_normal.png">pixmaps/Checkbox_checked_normal.png</file>

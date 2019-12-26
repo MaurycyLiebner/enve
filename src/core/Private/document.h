@@ -73,6 +73,7 @@ public:
 
     QColor fBrushColor;
     const SimpleBrushWrapper* fBrush = nullptr;
+    bool fOnionVisible = true;
 
     std::set<FileHandler, FileCompare> fFiles;
 
@@ -128,8 +129,9 @@ public:
     void setBrushColor(const QColor &color);
 
     void incBrushRadius();
-
     void decBrushRadius();
+
+    void setOnionDisabled(const bool disabled);
 //
     void clear();
 //

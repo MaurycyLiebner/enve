@@ -54,6 +54,9 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
             this, &FontsWidget::emitSizeChanged);
 
     mMainLayout = new QHBoxLayout(this);
+    mMainLayout->setSpacing(MIN_WIDGET_DIM);
+    mMainLayout->setContentsMargins(0, 0, 0, 0);
+    setContentsMargins(0, 0, 0, 0);
     setLayout(mMainLayout);
     mMainLayout->addWidget(mFontFamilyCombo);
     mMainLayout->addWidget(mFontStyleCombo);

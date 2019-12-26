@@ -431,7 +431,7 @@ bool SmartNodePoint::hasPrevNormalPoint() const {
     return mPrevNormalPoint;
 }
 
-const PathPointsHandler *SmartNodePoint::getHandler() {
+PathPointsHandler *SmartNodePoint::getHandler() {
     return mHandler_k.data();
 }
 
@@ -444,7 +444,7 @@ void SmartNodePoint::setNextNormalPoint(SmartNodePoint * const nextPoint) {
     if(mNextNormalPoint == this) RuntimeThrow("Node cannot point to itself");
     mNextNormalPoint = nextPoint;
     if(nextPoint && isNormal()) {
-        mNextNormalSegment = NormalSegment(this, nextPoint, mHandler_k);
+        mNextNormalSegment = NormalSegment(this, nextPoint);
     } else mNextNormalSegment.reset();
 }
 

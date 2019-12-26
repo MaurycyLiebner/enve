@@ -23,9 +23,10 @@ LayoutHandler::LayoutHandler(Document& document,
     mDocument(document), mAudioHandler(audioHandler) {
     const auto canvasComboLayout = new QHBoxLayout;
     canvasComboLayout->setSpacing(0);
-    canvasComboLayout->setMargin(0);
+    canvasComboLayout->setContentsMargins(0, 0, 0, 0);
 
     mComboWidget = new QWidget;
+    mComboWidget->setContentsMargins(0, 0, 0, 0);
     mComboWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     mComboWidget->setLayout(canvasComboLayout);
     mComboWidget->setObjectName("invisWid");
@@ -36,19 +37,17 @@ LayoutHandler::LayoutHandler(Document& document,
     mComboBox->setEditable(true);
     mComboBox->setObjectName("currentLayoutComboBox");
     mComboBox->setLayoutDirection(Qt::RightToLeft);
-    mComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    mComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     const auto newLayPush = new QPushButton("+", mComboWidget);
     newLayPush->setObjectName("addCanvasButton");
     newLayPush->setFixedWidth(MIN_WIDGET_DIM);
-    newLayPush->setMinimumHeight(0);
-    newLayPush->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    newLayPush->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
 
     const auto removeLayPush = new QPushButton("x", mComboWidget);
     removeLayPush->setObjectName("removeCanvasButton");
     removeLayPush->setFixedWidth(MIN_WIDGET_DIM);
-    removeLayPush->setMinimumHeight(0);
-    removeLayPush->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    removeLayPush->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
 
     canvasComboLayout->addWidget(mComboBox);
     canvasComboLayout->addWidget(newLayPush);

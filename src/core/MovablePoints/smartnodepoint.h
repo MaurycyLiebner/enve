@@ -207,7 +207,7 @@ public:
         setNextNormalPoint(nullptr);
     }
 
-    const PathPointsHandler * getHandler();
+    PathPointsHandler * getHandler();
 protected:
     void setNextPoint(SmartNodePoint * const nextPoint);
     void setPrevPoint(SmartNodePoint * const prevPoint);

@@ -64,6 +64,7 @@ public:
     void connectPointsSlot() const;
     void disconnectPointsSlot() const;
     void mergePointsSlot() const;
+    void subdivideSegments() const;
 
     void makePointCtrlsSymmetric() const;
     void makePointCtrlsSmooth() const;
@@ -71,6 +72,8 @@ public:
 
     void makeSegmentLine() const;
     void makeSegmentCurve() const;
+
+    void newEmptyPaintFrame();
 
     void deleteAction() const;
     void copyAction() const;

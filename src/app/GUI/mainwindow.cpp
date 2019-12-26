@@ -735,62 +735,62 @@ void MainWindow::setupToolBar() {
 
 //    mToolBar->addSeparator();
 
-    //mToolBar->addSeparator();
     mToolBar->widgetForAction(mToolBar->addAction("     "))->
             setObjectName("emptyToolButton");
-    //mToolBar->addSeparator();
+    mToolBar->addWidget(mLayoutHandler->comboWidget());
+    mToolBar->widgetForAction(mToolBar->addAction("     "))->
+            setObjectName("emptyToolButton");
 
     mActionConnectPoints = new ActionButton(iconsDir + "/nodeConnect.png",
                                             "Connect Nodes", this);
-    mToolBar->addWidget(mActionConnectPoints);
+    mActionConnectPointsAct = mToolBar->addWidget(mActionConnectPoints);
 
     mActionDisconnectPoints = new ActionButton(iconsDir + "/nodeDisconnect.png",
                                                "Disconnect Nodes", this);
-    mToolBar->addWidget(mActionDisconnectPoints);
+    mActionDisconnectPointsAct = mToolBar->addWidget(mActionDisconnectPoints);
 
     mActionMergePoints = new ActionButton(iconsDir + "/nodeMerge.png",
                                           "Merge Nodes", this);
-    mToolBar->addWidget(mActionMergePoints);
+    mActionMergePointsAct = mToolBar->addWidget(mActionMergePoints);
+
+    mActionNewNode = new ActionButton(iconsDir + "/nodeNew.png",
+                                      "New Node", this);
+    mActionNewNodeAct = mToolBar->addWidget(mActionNewNode);
 //
-    mToolBar->addSeparator();
+    mSeparator1 = mToolBar->addSeparator();
 
     mActionSymmetricPointCtrls = new ActionButton(iconsDir + "/nodeSymmetric.png",
                                                   "Symmetric Nodes", this);
-    mToolBar->addWidget(mActionSymmetricPointCtrls);
+    mActionSymmetricPointCtrlsAct = mToolBar->addWidget(mActionSymmetricPointCtrls);
 
     mActionSmoothPointCtrls = new ActionButton(iconsDir + "/nodeSmooth.png",
                                                "Smooth Nodes", this);
-    mToolBar->addWidget(mActionSmoothPointCtrls);
+    mActionSmoothPointCtrlsAct = mToolBar->addWidget(mActionSmoothPointCtrls);
 
     mActionCornerPointCtrls = new ActionButton(iconsDir + "/nodeCorner.png",
                                                "Corner Nodes", this);
-    mToolBar->addWidget(mActionCornerPointCtrls);
+    mActionCornerPointCtrlsAct = mToolBar->addWidget(mActionCornerPointCtrls);
 
 //
-    mToolBar->addSeparator();
+    mSeparator2 = mToolBar->addSeparator();
 
     mActionLine = new ActionButton(iconsDir + "/segmentLine.png",
                                    gSingleLineTooltip("Make Segment Line"), this);
-    mToolBar->addWidget(mActionLine);
+    mActionLineAct = mToolBar->addWidget(mActionLine);
 
     mActionCurve = new ActionButton(iconsDir + "/segmentCurve.png",
                                     gSingleLineTooltip("Make Segment Curve"), this);
-    mToolBar->addWidget(mActionCurve);
+    mActionCurveAct = mToolBar->addWidget(mActionCurve);
 
-    //mToolBar->addSeparator();
-    mToolBar->widgetForAction(mToolBar->addAction("     "))->
-            setObjectName("emptyToolButton");
-    //mToolBar->addSeparator();
-//
     mFontWidget = new FontsWidget(this);
-    mToolBar->addWidget(mFontWidget);
+    mFontWidgetAct = mToolBar->addWidget(mFontWidget);
 
-    //mToolBar->addSeparator();
-    mToolBar->widgetForAction(mToolBar->addAction("     "))->
-            setObjectName("emptyToolButton");
-    //mToolBar->addSeparator();
+    mActionNewEmptyPaintFrame = new ActionButton(
+                iconsDir + "/newEmpty.png",
+                gSingleLineTooltip("New Empty Frame", "N"), this);
+    mActionNewEmptyPaintFrameAct = mToolBar->addWidget(mActionNewEmptyPaintFrame);
 
-    mToolBar->addWidget(mLayoutHandler->comboWidget());
+    mToolBar->setFixedHeight(2*MIN_WIDGET_DIM);
 
     addToolBar(mToolBar);
 
@@ -814,26 +814,35 @@ void MainWindow::connectToolBarActions() {
             &mActions, &Actions::setTextMode);
     connect(mPaintMode, &ActionButton::pressed,
             &mActions, &Actions::setPaintMode);
+
     connect(mActionConnectPoints, &ActionButton::pressed,
             &mActions, &Actions::connectPointsSlot);
     connect(mActionDisconnectPoints, &ActionButton::pressed,
             &mActions, &Actions::disconnectPointsSlot);
     connect(mActionMergePoints, &ActionButton::pressed,
             &mActions, &Actions::mergePointsSlot);
+    connect(mActionNewNode, &ActionButton::pressed,
+            &mActions, &Actions::subdivideSegments);
+
     connect(mActionSymmetricPointCtrls, &ActionButton::pressed,
             &mActions, &Actions::makePointCtrlsSymmetric);
     connect(mActionSmoothPointCtrls, &ActionButton::pressed,
             &mActions, &Actions::makePointCtrlsSmooth);
     connect(mActionCornerPointCtrls, &ActionButton::pressed,
             &mActions, &Actions::makePointCtrlsCorner);
+
     connect(mActionLine, &ActionButton::pressed,
             &mActions, &Actions::makeSegmentLine);
     connect(mActionCurve, &ActionButton::pressed,
             &mActions, &Actions::makeSegmentCurve);
+
     connect(mFontWidget, &FontsWidget::fontSizeChanged,
             &mActions, &Actions::setFontSize);
     connect(mFontWidget, &FontsWidget::fontFamilyAndStyleChanged,
             &mActions, &Actions::setFontFamilyAndStyle);
+
+    connect(mActionNewEmptyPaintFrame, &ActionButton::pressed,
+            &mActions, &Actions::newEmptyPaintFrame);
 }
 
 MainWindow *MainWindow::sGetInstance() {
@@ -841,16 +850,35 @@ MainWindow *MainWindow::sGetInstance() {
 }
 
 void MainWindow::updateCanvasModeButtonsChecked() {
-    const CanvasMode currentMode = mDocument.fCanvasMode;
-    mCentralWidget->setCanvasMode(currentMode);
-    mBoxTransformMode->setState(currentMode == CanvasMode::boxTransform);
-    mPointTransformMode->setState(currentMode == CanvasMode::pointTransform);
-    mAddPointMode->setState(currentMode == CanvasMode::pathCreate);
-    mPickPaintSettingsMode->setState(currentMode == CanvasMode::pickFillStroke);
-    mCircleMode->setState(currentMode == CanvasMode::circleCreate);
-    mRectangleMode->setState(currentMode == CanvasMode::rectCreate);
-    mTextMode->setState(currentMode == CanvasMode::textCreate);
-    mPaintMode->setState(currentMode == CanvasMode::paint);
+    const CanvasMode mode = mDocument.fCanvasMode;
+    mCentralWidget->setCanvasMode(mode);
+    mBoxTransformMode->setState(mode == CanvasMode::boxTransform);
+    mPointTransformMode->setState(mode == CanvasMode::pointTransform);
+    mAddPointMode->setState(mode == CanvasMode::pathCreate);
+    mPickPaintSettingsMode->setState(mode == CanvasMode::pickFillStroke);
+    mCircleMode->setState(mode == CanvasMode::circleCreate);
+    mRectangleMode->setState(mode == CanvasMode::rectCreate);
+    mTextMode->setState(mode == CanvasMode::textCreate);
+    mPaintMode->setState(mode == CanvasMode::paint);
+
+    const bool boxMode = mode == CanvasMode::boxTransform;
+    mFontWidgetAct->setVisible(boxMode);
+
+    const bool pointMode = mode == CanvasMode::pointTransform;
+    mActionConnectPointsAct->setVisible(pointMode);
+    mActionDisconnectPointsAct->setVisible(pointMode);
+    mActionMergePointsAct->setVisible(pointMode);
+    mActionNewNodeAct->setVisible(pointMode);
+    mActionSymmetricPointCtrlsAct->setVisible(pointMode);
+    mActionSmoothPointCtrlsAct->setVisible(pointMode);
+    mActionCornerPointCtrlsAct->setVisible(pointMode);
+    mActionLineAct->setVisible(pointMode);
+    mActionCurveAct->setVisible(pointMode);
+    mSeparator1->setVisible(pointMode);
+    mSeparator2->setVisible(pointMode);
+
+    const bool paintMode = mode == CanvasMode::paint;
+    mActionNewEmptyPaintFrameAct->setVisible(paintMode);
 }
 
 //void MainWindow::stopPreview() {

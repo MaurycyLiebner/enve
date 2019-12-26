@@ -32,7 +32,8 @@ struct PaintTarget {
     void draw(SkCanvas * const canvas,
               const QMatrix& viewTrans,
               const QRect& drawRect,
-              const SkFilterQuality filter);
+              const SkFilterQuality filter,
+              const bool drawOnion);
 
     void paintPress(const QPointF& pos,
                     const ulong ts, const qreal pressure,

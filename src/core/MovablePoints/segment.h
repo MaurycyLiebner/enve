@@ -59,10 +59,10 @@ public:
     };
     NormalSegment();
     NormalSegment(SmartNodePoint * const firstNode,
-                  SmartNodePoint * const lastNode,
-                  PathPointsHandler * const handler);
+                  SmartNodePoint * const lastNode);
 
     SmartNodePoint* divideAtAbsPos(const QPointF& absPos);
+    SmartNodePoint *divideAtT(const qreal &t);
 
     QPointF getRelPosAtT(const qreal t) const;
     QPointF getAbsPosAtT(const qreal t) const;

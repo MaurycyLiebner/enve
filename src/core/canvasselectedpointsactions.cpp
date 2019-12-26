@@ -98,6 +98,20 @@ void Canvas::mergePoints() {
     }
 }
 
+void Canvas::subdivideSegments() {
+    for(const auto& point : mSelectedPoints_d) {
+        if(point->isSmartNodePoint()) {
+            auto asNodePt = static_cast<SmartNodePoint*>(point);
+            const auto nextPoint = asNodePt->getNextPoint();
+            if(!nextPoint) continue;
+            if(nextPoint->isSelected()) {
+                NormalSegment(asNodePt, nextPoint).divideAtT(0.5);
+            }
+        }
+    }
+    clearPointsSelection();
+}
+
 void Canvas::setPointCtrlsMode(const CtrlsMode mode) {
     for(const auto& point : mSelectedPoints_d) {
         if(point->isSmartNodePoint()) {

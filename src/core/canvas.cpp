@@ -262,7 +262,8 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
     if(mPaintTarget.isValid()) {
         canvas->save();
-        mPaintTarget.draw(canvas, viewTrans, drawRect, filter);
+        mPaintTarget.draw(canvas, viewTrans, drawRect,
+                          filter, mDocument.fOnionVisible);
         const SkIRect bRect = toSkIRect(mPaintTarget.pixelBoundingRect());
         paint.setStyle(SkPaint::kStroke_Style);
         paint.setColor(SK_ColorRED);
@@ -484,6 +485,11 @@ void Canvas::makeSegmentCurve() {
     makeSelectedPointsSegmentsCurves();
 }
 
+void Canvas::newEmptyPaintFrameAction() {
+    if(mPaintTarget.isValid())
+        mPaintTarget.newEmptyFrame();
+}
+
 void Canvas::moveSecondSelectionPoint(const QPointF &pos) {
     mSelectionRect.setBottomRight(pos);
 }
@@ -528,7 +534,7 @@ void Canvas::updatePaintBox() {
 bool Canvas::handlePaintModeKeyPress(const KeyEvent &e) {
     if(mCurrentMode != CanvasMode::paint) return false;
     if(e.fKey == Qt::Key_N && mPaintTarget.isValid()) {
-        mPaintTarget.newEmptyFrame();
+        newEmptyPaintFrameAction();
     } else return false;
     return true;
 }

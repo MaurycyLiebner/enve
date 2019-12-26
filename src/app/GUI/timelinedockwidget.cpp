@@ -165,6 +165,12 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     connect(mIncBrushSize, &ActionButton::pressed,
             &mDocument, &Document::incBrushRadius);
 
+    mOnion = SwitchButton::sCreate2Switch(
+                iconsDir + "/onionEnabled.png", iconsDir + "/onionDisabled.png",
+                gSingleLineTooltip("Onion Skin"), this);
+    connect(mOnion, &SwitchButton::toggled,
+            &mDocument, &Document::setOnionDisabled);
+
     mToolBar = new QToolBar(this);
     mToolBar->setMovable(false);
 
@@ -206,6 +212,10 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mDecBrushSizeAct = mToolBar->addWidget(mDecBrushSize);
     mBrushSizeLabelAct = mToolBar->addWidget(mBrushSizeLabel);
     mIncBrushSizeAct = mToolBar->addWidget(mIncBrushSize);
+    mToolBar->widgetForAction(mToolBar->addAction(""))->
+            setObjectName("emptyToolButton");
+    mOnionAct = mToolBar->addWidget(mOnion);
+
     mBrushLabel->setStyleSheet("QWidget {"
                                    "background: white;"
                                    "border: 1px solid black;"
@@ -280,6 +290,7 @@ RenderWidget *TimelineDockWidget::getRenderWidget() {
 }
 
 bool TimelineDockWidget::processKeyPress(QKeyEvent *event) {
+    const CanvasMode mode = mDocument.fCanvasMode;
     const int key = event->key();
     const auto mods = event->modifiers();
     if(key == Qt::Key_Right && !(mods & Qt::ControlModifier)) {
@@ -303,7 +314,7 @@ bool TimelineDockWidget::processKeyPress(QKeyEvent *event) {
     } else if(key == Qt::Key_P &&
               !(mods & Qt::ControlModifier) && !(mods & Qt::AltModifier)) {
         mLocalPivot->toggle();
-    } else if(key == Qt::Key_N &&
+    } else if(mode == CanvasMode::pointTransform && key == Qt::Key_N &&
               !(mods & Qt::ControlModifier) && !(mods & Qt::AltModifier)) {
         mNodeVisibility->toggle();
     } else {
@@ -362,7 +373,7 @@ void TimelineDockWidget::updateButtonsVisibility(const CanvasMode mode) {
     mDecBrushSizeAct->setVisible(mode == CanvasMode::paint);
     mBrushSizeLabelAct->setVisible(mode == CanvasMode::paint);
     mIncBrushSizeAct->setVisible(mode == CanvasMode::paint);
-
+    mOnionAct->setVisible(mode == CanvasMode::paint);
 }
 
 void TimelineDockWidget::setBrushColor(const QColor &color) {

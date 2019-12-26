@@ -272,6 +272,7 @@ public:
     void mergePoints();
     void disconnectPoints();
     void connectPoints();
+    void subdivideSegments();
 
     void setSelectedFontFamilyAndStyle(const QString& family,
                                        const QString& style);
@@ -441,6 +442,8 @@ public:
 
     void makeSegmentLine();
     void makeSegmentCurve();
+
+    void newEmptyPaintFrameAction();
 
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode mode,

@@ -113,6 +113,8 @@ private:
     QLabel* mBrushSizeLabel;
     QAction* mIncBrushSizeAct;
     ActionButton *mIncBrushSize;
+    QAction* mOnionAct;
+    SwitchButton *mOnion;
 
     QAction *mTimelineAction;
     QAction *mRenderAction;
