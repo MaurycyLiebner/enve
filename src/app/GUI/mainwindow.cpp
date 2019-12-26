@@ -123,6 +123,7 @@ MainWindow::MainWindow(Document& document,
             this, &MainWindow::closeWelcomeDialog);
 
     const auto iconDir = eSettings::sIconsDir();
+    setWindowIcon(QIcon(iconDir + "/enve.png"));
     const auto downArr = iconDir + "/down-arrow.png";
     const auto upArr = iconDir + "/up-arrow.png";
     const QString iconSS =
