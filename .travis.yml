@@ -88,6 +88,12 @@ before_script:
     - wget https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/exec-x86_64.so
     - mv exec-x86_64.so exec.so
     - cd Release
+    - # Compile qt5ct
+    - wget https://excellmedia.dl.sourceforge.net/project/qt5ct/qt5ct-0.37.tar.bz2
+    - tar xf qt5ct-0.*.tar.bz2
+    - cd qt5ct-0.*/
+    - QT_SELECT=5 qmake
+    - make -j 2 && sudo make install
 script:
     - # source /opt/qt512/bin/qt512-env.sh
     - # embed commit hash and date
@@ -111,7 +117,7 @@ script:
     - cp Release/src/app/enve AppDir/usr/bin/
     - cp -av Release/src/core/*.so* AppDir/usr/lib/
     - cp -av ../third_party/gperftools-2.7-enve-mod/.libs/libtcmalloc.so* AppDir/usr/lib/
-    - ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage
+    - ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage -extra-plugins=platformthemes/libqt5ct.so,styles/libqt5ct-style.so
 after_success:
     - |
       export GREP_PATH=grep;
