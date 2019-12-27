@@ -25,16 +25,19 @@ EnveSplash::EnveSplash() {
             "Further development will only be possible with your support. "
             "Press 'Support enve' on the menu bar for more information.\n\n"
             "Please note that major version zero 0.x.y is for initial development; "
-            "hence numerous bugs should be expected.\n\n"
-            "Remember - enve is not a video editor.";
-    const auto splashPath = eSettings::sIconsDir() + "/splash.png";
+            "hence numerous bugs should be expected.";
+    const auto splashPath = eSettings::sIconsDir() + "/splash1.png";
     const QPixmap pixmap(splashPath);
-    mTextRect = QRect(qRound(0.03*pixmap.width()), qRound(0.20*pixmap.height()),
-                      qRound(0.94*pixmap.width()), qRound(0.6*pixmap.height()));
-    mMessageRect = QRect(mTextRect.x(), qRound(0.84*pixmap.height()),
-                         qRound(0.94*pixmap.width()), qRound(0.09*pixmap.height()));
-    mBottomRect = QRect(mTextRect.x(), qRound(0.93*pixmap.height()),
-                        qRound(0.94*pixmap.width()), qRound(0.07*pixmap.height()));
+    const int x = qRound(0.03*pixmap.width());
+    const int width = qRound(0.94*pixmap.width());
+    mTextRect = QRect(x, qRound(0.16*pixmap.height()),
+                      width, qRound(0.42*pixmap.height()));
+    mMessageRect = QRect(x, qRound(0.65*pixmap.height()),
+                         width, qRound(0.08*pixmap.height()));
+    mSponsorsRect = QRect(x, qRound(0.72*pixmap.height()),
+                        width, qRound(0.24*pixmap.height()));
+    mBottomRect = QRect(x, qRound(0.91*pixmap.height()),
+                        width, qRound(0.09*pixmap.height()));
     setPixmap(pixmap);
     setFixedSize(pixmap.width(), pixmap.height());
 //    setWindowFlag(Qt::WindowStaysOnTopHint);
@@ -57,6 +60,7 @@ void EnveSplash::drawContents(QPainter * const p) {
                 Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, mText);
     p->drawText(mMessageRect, Qt::AlignCenter, message());
     p->setPen(QColor(Qt::gray));
+    p->drawText(mSponsorsRect, Qt::AlignVCenter, "Sponsors: Stian Andreassen");
     p->drawText(mBottomRect, Qt::AlignVCenter | Qt::AlignLeft, "Maurycy Liebner");
     QString rightTxt;
 #if defined(LATEST_COMMIT_HASH) && defined(LATEST_COMMIT_DATE)

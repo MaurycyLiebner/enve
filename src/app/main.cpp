@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
     eFilterSettings filterSettings;
     QDir(eSettings::sSettingsDir()).mkpath(eSettings::sIconsDir());
     try {
-        const QString pngPath = eSettings::sIconsDir() + "/splash.png";
+        const QString pngPath = eSettings::sIconsDir() + "/splash1.png";
 #ifdef QT_DEBUG
         QFile(pngPath).remove();
 #endif

@@ -29,6 +29,7 @@ private:
     QRect mTextRect;
     QRect mMessageRect;
     QRect mBottomRect;
+    QRect mSponsorsRect;
 };
 
 #endif // ENVESPLASH_H
