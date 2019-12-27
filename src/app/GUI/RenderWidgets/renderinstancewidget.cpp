@@ -345,6 +345,7 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     QString saveAs = QFileDialog::getSaveFileName(this, "Output Destination",
                                                   iniText, supportedExts);
     if(saveAs.isEmpty()) return;
+    if(saveAs.right(selectedExt.length()) != selectedExt) saveAs += selectedExt;
     mSettings.setOutputDestination(saveAs);
     mOutputDestinationButton->setText(saveAs);
 }

@@ -1099,8 +1099,10 @@ void MainWindow::updateTitle() {
 void MainWindow::openFile() {
     if(askForSaving()) {
         disable();
+        const QString defPath = mDocument.fEvFile.isEmpty() ?
+                    QDir::homePath() : mDocument.fEvFile;
         const QString openPath = QFileDialog::getOpenFileName(this,
-            "Open File", mDocument.fEvFile, "enve Files (*.ev)");
+            "Open File", defPath, "enve Files (*.ev)");
         if(!openPath.isEmpty()) openFile(openPath);
         enable();
     }
@@ -1176,9 +1178,11 @@ bool MainWindow::closeProject() {
 
 void MainWindow::importFile() {
     disableEventFilter();
+    const QString defPath = mDocument.fEvFile.isEmpty() ?
+                QDir::homePath() : mDocument.fEvFile;
     QStringList importPaths = QFileDialog::getOpenFileNames(
                                             this,
-                                            "Import File", "",
+                                            "Import File", defPath,
                                             "Files (*.ev *.svg "
                                                    "*.mp4 *.mov *.avi *.mkv *.m4v "
                                                    "*.png *.jpg "
@@ -1198,8 +1202,10 @@ void MainWindow::importFile() {
 
 void MainWindow::linkFile() {
     disableEventFilter();
+    const QString defPath = mDocument.fEvFile.isEmpty() ?
+                QDir::homePath() : mDocument.fEvFile;
     QStringList importPaths = QFileDialog::getOpenFileNames(this,
-        "Link File", "", "enve Files (*.ev)");
+        "Link File", defPath, "enve Files (*.ev)");
     enableEventFilter();
     if(!importPaths.isEmpty()) {
         for(const QString &path : importPaths) {
@@ -1211,8 +1217,10 @@ void MainWindow::linkFile() {
 
 void MainWindow::importImageSequence() {
     disableEventFilter();
+    const QString defPath = mDocument.fEvFile.isEmpty() ?
+                QDir::homePath() : mDocument.fEvFile;
     const auto folder = QFileDialog::getExistingDirectory(
-                this, "Import Image Sequence", "");
+                this, "Import Image Sequence", defPath);
     enableEventFilter();
     if(!folder.isEmpty()) {
         mDocument.fActiveScene->createImageSequenceBox(folder);
