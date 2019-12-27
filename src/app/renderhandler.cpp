@@ -154,10 +154,11 @@ void RenderHandler::renderPreview() {
     setRenderingPreview(true);
 
     emit previewBeingRendered();
+    mPreviewSate = PreviewSate::rendering;
+
     if(TaskScheduler::sAllQuedCpuTasksFinished()) {
         nextPreviewRenderFrame();
     }
-    mPreviewSate = PreviewSate::rendering;
 }
 
 void RenderHandler::interruptPreview() {
