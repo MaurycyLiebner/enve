@@ -24,6 +24,7 @@
 #include "textbox.h"
 #include "Animators/rastereffectanimators.h"
 #include "Sound/singlesound.h"
+#include "actions.h"
 
 ContainerBox::ContainerBox(const eBoxType type) :
     BoxWithPathEffects(type) {
@@ -34,38 +35,51 @@ ContainerBox::ContainerBox(const eBoxType type) :
 
 bool ContainerBox::SWT_dropSupport(const QMimeData * const data) {
     return BoxWithPathEffects::SWT_dropSupport(data) ||
-           eMimeData::sHasType<eBoxOrSound>(data);
+           eMimeData::sHasType<eBoxOrSound>(data) ||
+           data->hasUrls();
 }
 
 bool ContainerBox::SWT_dropIntoSupport(const int index, const QMimeData * const data) {
     if(eMimeData::sHasType<eBoxOrSound>(data)) {
         return index >= ca_getNumberOfChildren();
     }
-    return false;
+    return data->hasUrls();
 }
 
 bool ContainerBox::SWT_drop(const QMimeData * const data) {
     if(BoxWithPathEffects::SWT_drop(data)) return true;
-    if(eMimeData::sHasType<eBoxOrSound>(data))
+    if(eMimeData::sHasType<eBoxOrSound>(data) ||
+       data->hasUrls())
         return SWT_dropInto(ca_getNumberOfChildren(), data);
     return false;
 }
 
 bool ContainerBox::SWT_dropInto(const int index, const QMimeData * const data) {
-    const auto eData = static_cast<const eMimeData*>(data);
-    const auto bData = static_cast<const eDraggedObjects*>(eData);
-    int dropId = index;
-    for(int i = 0; i < bData->count(); i++) {
-        const auto iObj = bData->getObject<eBoxOrSound>(i);
-        if(iObj->SWT_isContainerBox()) {
-            const auto box = static_cast<BoundingBox*>(iObj);
-            if(box == this) continue;
-            if(isAncestor(box)) continue;
+    if(eMimeData::sHasType<eBoxOrSound>(data)) {
+        const auto eData = static_cast<const eMimeData*>(data);
+        const auto bData = static_cast<const eDraggedObjects*>(eData);
+        int dropId = index;
+        for(int i = 0; i < bData->count(); i++) {
+            const auto iObj = bData->getObject<eBoxOrSound>(i);
+            if(iObj->SWT_isContainerBox()) {
+                const auto box = static_cast<BoundingBox*>(iObj);
+                if(box == this) continue;
+                if(isAncestor(box)) continue;
+            }
+            insertContained((dropId++) - ca_getNumberOfChildren(),
+                            iObj->ref<eBoxOrSound>());
         }
-        insertContained((dropId++) - ca_getNumberOfChildren(),
-                        iObj->ref<eBoxOrSound>());
+        return true;
+    } else if(data->hasUrls()) {
+        const auto urls = data->urls();
+        int dropId = index;
+        for(const auto& url : urls) {
+            Actions::sInstance->importFile(url.path(), this,
+                                           (dropId++) - ca_getNumberOfChildren());
+        }
+        return true;
     }
-    return true;
+    return false;
 }
 
 void ContainerBox::iniPathEffects() {

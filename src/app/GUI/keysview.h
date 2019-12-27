@@ -144,6 +144,8 @@ public:
     int graphGetAnimatorId(GraphAnimator * const anim);
     QrealPoint *graphGetPointAtPos(const QPointF &pressPos) const;
 private:
+    qreal xToFrame(const qreal x) const;
+
     void cancelTransform();
     void finishTransform();
 

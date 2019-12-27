@@ -411,46 +411,6 @@ qsptr<BoundingBox> Canvas::createLink() {
     return enve::make_shared<InternalLinkCanvas>(this);
 }
 
-ImageBox *Canvas::createImageBox(const QString &path) {
-    const auto img = enve::make_shared<ImageBox>(path);
-    img->planCenterPivotPosition();
-    mCurrentContainer->addContained(img);
-    return img.get();
-}
-
-#include "Boxes/imagesequencebox.h"
-ImageSequenceBox* Canvas::createImageSequenceBox(const QString &folderPath) {
-    const auto aniBox = enve::make_shared<ImageSequenceBox>();
-    aniBox->planCenterPivotPosition();
-    aniBox->setFolderPath(folderPath);
-    mCurrentContainer->addContained(aniBox);
-    return aniBox.get();
-}
-
-#include "Boxes/videobox.h"
-VideoBox* Canvas::createVideoForPath(const QString &path) {
-    const auto vidBox = enve::make_shared<VideoBox>();
-    vidBox->planCenterPivotPosition();
-    vidBox->setFilePath(path);
-    mCurrentContainer->addContained(vidBox);
-    return vidBox.get();
-}
-
-#include "Boxes/linkbox.h"
-ExternalLinkBox* Canvas::createLinkToFileWithPath(const QString &path) {
-    const auto extLinkBox = enve::make_shared<ExternalLinkBox>();
-    extLinkBox->setSrc(path);
-    mCurrentContainer->addContained(extLinkBox);
-    return extLinkBox.get();
-}
-
-SingleSound* Canvas::createSoundForPath(const QString &path) {
-    const auto singleSound = enve::make_shared<SingleSound>();
-    singleSound->setFilePath(path);
-    mCurrentContainer->addContained(singleSound);
-    return singleSound.get();
-}
-
 void Canvas::schedulePivotUpdate() {
     if(mTransMode == TransformMode::rotate ||
        mTransMode == TransformMode::scale ||

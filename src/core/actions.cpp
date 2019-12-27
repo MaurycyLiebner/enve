@@ -19,6 +19,8 @@
 #include "canvas.h"
 #include "Paint/simplebrushwrapper.h"
 #include "paintsettingsapplier.h"
+#include "Sound/singlesound.h"
+
 Actions* Actions::sInstance = nullptr;
 
 Actions::Actions(Document &document) : mDocument(document),
@@ -345,8 +347,10 @@ void Actions::setPathEffectsVisible(const bool bT) {
 #include "Boxes/imagebox.h"
 #include "importhandler.h"
 
-bool Actions::handleDropEvent(QDropEvent * const event,
-                              const QPointF& relDropPos) {
+eBoxOrSound* Actions::handleDropEvent(QDropEvent * const event,
+                                      const QPointF& relDropPos,
+                                      const int frame) {
+    if(!mActiveScene) return nullptr;
     const QMimeData* mimeData = event->mimeData();
 
     if(mimeData->hasUrls()) {
@@ -354,59 +358,105 @@ bool Actions::handleDropEvent(QDropEvent * const event,
         const QList<QUrl> urlList = mimeData->urls();
         for(int i = 0; i < urlList.size() && i < 32; i++) {
             try {
-                importFile(urlList.at(i).toLocalFile(), relDropPos);
-                return true;
+                return importFile(urlList.at(i).toLocalFile(),
+                                  mActiveScene->getCurrentGroup(),
+                                  0, relDropPos, frame);
             } catch(const std::exception& e) {
                 gPrintExceptionCritical(e);
             }
         }
     }
-    return false;
+    return nullptr;
 }
 
-void Actions::importFile(const QString &path,
-                         const QPointF &relDropPos) {
-    if(!mActiveScene) return;
 
+qsptr<ImageBox> createImageBox(const QString &path) {
+    const auto img = enve::make_shared<ImageBox>(path);
+    return img;
+}
+
+#include "Boxes/imagesequencebox.h"
+qsptr<ImageSequenceBox> createImageSequenceBox(const QString &folderPath) {
+    const auto aniBox = enve::make_shared<ImageSequenceBox>();
+    aniBox->setFolderPath(folderPath);
+    return aniBox;
+}
+
+#include "Boxes/videobox.h"
+qsptr<VideoBox> createVideoForPath(const QString &path) {
+    const auto vidBox = enve::make_shared<VideoBox>();
+    vidBox->setFilePath(path);
+    return vidBox;
+}
+
+qsptr<SingleSound> createSoundForPath(const QString &path) {
+    const auto singleSound = enve::make_shared<SingleSound>();
+    singleSound->setFilePath(path);
+    return singleSound;
+}
+
+eBoxOrSound *Actions::importFile(const QString &path) {
+    if(!mActiveScene) return nullptr;
+    return importFile(path, mActiveScene->getCurrentGroup());
+}
+
+eBoxOrSound *Actions::importFile(const QString &path,
+                                 ContainerBox* const target,
+                                 const int insertId,
+                                 const QPointF &relDropPos,
+                                 const int frame) {
+    if(!mActiveScene) return nullptr;
+    qsptr<eBoxOrSound> result;
     const QFile file(path);
     if(!file.exists())
         RuntimeThrow("File " + path + " does not exit.");
 
     QFileInfo fInfo(path);
     if(fInfo.isDir()) {
-        mActiveScene->createImageSequenceBox(path);
+        result = createImageSequenceBox(path);
+        target->insertContained(insertId, result);
     } else { // is file
         const QString extension = path.split(".").last();
         if(isSoundExt(extension)) {
-            mActiveScene->createSoundForPath(path);
+            result = createSoundForPath(path);
+            target->insertContained(insertId, result);
         } else {
             qsptr<BoundingBox> importedBox;
             mActiveScene->blockUndoRedo();
-            if(isImageExt(extension)) {
-                mActiveScene->createImageBox(path);
-            } else if(isVideoExt(extension)) {
-                mActiveScene->createVideoForPath(path);
-            } else {
-                try {
+            try {
+                if(isImageExt(extension)) {
+                    importedBox = createImageBox(path);
+                } else if(isVideoExt(extension)) {
+                    importedBox = createVideoForPath(path);
+                } else {
                     importedBox = ImportHandler::sInstance->import(path);
-                } catch(const std::exception& e) {
-                    mActiveScene->unblockUndoRedo();
-                    gPrintExceptionCritical(e);
-                    return;
                 }
+            } catch(const std::exception& e) {
+                gPrintExceptionCritical(e);
             }
             mActiveScene->unblockUndoRedo();
 
+            result = importedBox;
             if(importedBox) {
                 importedBox->planCenterPivotPosition();
-                mActiveScene->getCurrentGroup()->addContained(importedBox);
+                target->insertContained(insertId, importedBox);
                 importedBox->startPosTransform();
                 importedBox->moveByAbs(relDropPos);
                 importedBox->finishTransform();
             }
         }
     }
+    if(result && frame) result->shiftAll(frame);
     afterAction();
+    return result.get();
+}
+
+#include "Boxes/linkbox.h"
+ExternalLinkBox* Actions::linkFile(const QString &path) {
+    const auto extLinkBox = enve::make_shared<ExternalLinkBox>();
+    extLinkBox->setSrc(path);
+    mActiveScene->getCurrentGroup()->addContained(extLinkBox);
+    return extLinkBox.get();
 }
 
 void Actions::setMovePathMode() {

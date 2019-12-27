@@ -42,7 +42,8 @@ KeysView::KeysView(BoxScroller *boxesListVisible,
 }
 
 void KeysView::dropEvent(QDropEvent *event) {
-    Actions::sInstance->handleDropEvent(event);
+    const int frame = qRound(xToFrame(event->posF().x()));
+    Actions::sInstance->handleDropEvent(event, QPointF(0, 0), frame);
 }
 
 void KeysView::dragEnterEvent(QDragEnterEvent *event) {
@@ -178,7 +179,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
     const QPoint posU = e->pos() + QPoint(-MIN_WIDGET_DIM/2, 0);
     if(e->button() == Qt::MiddleButton) {
         if(mGraphViewed) gMiddlePress(posU);
-        else  middlePress(posU);
+        else middlePress(posU);
     } else if(e->button() == Qt::LeftButton) {
         if(mIsMouseGrabbing) return;
         mFirstMove = true;
@@ -197,9 +198,8 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                                             mMinViewedFrame);
                 if(!mLastPressedMovable) {
                     mSelecting = true;
-                    const qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
-                    const QPointF xFramePos(posUXFrame,
-                                            posU.y() + mViewedTop);
+                    const qreal posUXFrame = xToFrame(posU.x());
+                    const QPointF xFramePos(posUXFrame, posU.y() + mViewedTop);
                     mSelectionRect.setTopLeft(xFramePos);
                     mSelectionRect.setBottomRight(xFramePos);
                 } else {

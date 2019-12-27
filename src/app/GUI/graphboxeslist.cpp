@@ -271,6 +271,10 @@ QrealPoint * KeysView::graphGetPointAtPos(const QPointF &pressPos) const {
     return point;
 }
 
+qreal KeysView::xToFrame(const qreal x) const {
+    return x/mPixelsPerFrame + mMinViewedFrame;
+}
+
 void KeysView::graphMousePress(const QPointF &pressPos) {
     mFirstMove = true;
     QrealPoint * const pressedPoint = graphGetPointAtPos(pressPos);

@@ -327,11 +327,6 @@ public:
     bool keyPressEvent(QKeyEvent *event);
 
     qsptr<BoundingBox> createLink();
-    ImageBox* createImageBox(const QString &path);
-    ImageSequenceBox* createImageSequenceBox(const QString &folderPath);
-    VideoBox* createVideoForPath(const QString &path);
-    ExternalLinkBox *createLinkToFileWithPath(const QString &path);
-    SingleSound* createSoundForPath(const QString &path);
 
     void setPreviewing(const bool bT);
     void setOutputRendering(const bool bT);

@@ -28,6 +28,9 @@ class PaintSettingsApplier;
 class Document;
 class Canvas;
 class QrealAction;
+class eBoxOrSound;
+class ContainerBox;
+class ExternalLinkBox;
 
 class Actions : public QObject {
 public:
@@ -108,10 +111,16 @@ public:
     void setRasterEffectsVisible(const bool bT);
     void setPathEffectsVisible(const bool bT);
 
-    bool handleDropEvent(QDropEvent * const event,
-                         const QPointF &relDropPos = QPointF(0, 0));
-    void importFile(const QString &path,
-                    const QPointF &relDropPos = QPointF(0, 0));
+    eBoxOrSound* handleDropEvent(QDropEvent * const event,
+                                 const QPointF &relDropPos = QPointF(0, 0),
+                                 const int frame = 0);
+    eBoxOrSound* importFile(const QString &path);
+    eBoxOrSound* importFile(const QString &path,
+                            ContainerBox * const target,
+                            const int insertId = 0,
+                            const QPointF &relDropPos = QPointF(0, 0),
+                            const int frame = 0);
+    ExternalLinkBox *linkFile(const QString &path);
 
     void setMovePathMode();
     void setMovePointMode();

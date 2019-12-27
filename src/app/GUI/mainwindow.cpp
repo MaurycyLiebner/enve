@@ -1210,7 +1210,7 @@ void MainWindow::linkFile() {
     if(!importPaths.isEmpty()) {
         for(const QString &path : importPaths) {
             if(path.isEmpty()) continue;
-            mDocument.fActiveScene->createLinkToFileWithPath(path);
+            mActions.linkFile(path);
         }
     }
 }
@@ -1221,10 +1221,7 @@ void MainWindow::importImageSequence() {
                 QDir::homePath() : mDocument.fEvFile;
     const auto folder = eDialogs::openDir("Import Image Sequence", defPath);
     enableEventFilter();
-    if(!folder.isEmpty()) {
-        mDocument.fActiveScene->createImageSequenceBox(folder);
-    }
-    mDocument.actionFinished();
+    if(!folder.isEmpty()) mActions.importFile(folder);
 }
 
 //void MainWindow::importVideo() {
