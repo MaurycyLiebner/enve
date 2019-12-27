@@ -125,7 +125,7 @@ script:
     - cp Release/src/app/enve AppDir/usr/bin/
     - cp -av Release/src/core/*.so* AppDir/usr/lib/
     - cp -av ../third_party/gperftools-2.7-enve-mod/.libs/libtcmalloc.so* AppDir/usr/lib/
-    - ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage -extra-plugins=platformthemes/libqt5ct.so,styles/libqt5ct-style.so
+    - ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage -extra-plugins=platformthemes/libqt5ct.so,styles/libqt5ct-style.so,platformthemes/libqgtk2.so,styles/libqgtk2style.so
 after_success:
     - |
       export GREP_PATH=grep;
