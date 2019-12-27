@@ -140,6 +140,9 @@ public:
     int graphGetAnimatorId(GraphAnimator * const anim);
     QrealPoint *graphGetPointAtPos(const QPointF &pressPos) const;
 private:
+    void cancelTransform();
+    void finishTransform();
+
     void scrollRight();
     void scrollLeft();
     void handleMouseMoveScroll(const QPoint &pos);

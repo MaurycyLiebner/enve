@@ -123,6 +123,38 @@ void KeysView::wheelEvent(QWheelEvent *e) {
     }
 }
 
+void KeysView::cancelTransform() {
+    if(!mFirstMove) {
+        if(mGraphViewed) {
+            for(const auto& anim : mGraphAnimators) {
+                anim->graph_cancelSelectedKeysTransform();
+            }
+        } else {
+            for(const auto& anim : mSelectedKeysAnimators) {
+                anim->anim_cancelSelectedKeysTransform();
+            }
+        }
+    }
+
+    releaseMouseAndDontTrack();
+}
+
+void KeysView::finishTransform() {
+    if(!mFirstMove) {
+        if(mGraphViewed) {
+            for(const auto& anim : mGraphAnimators) {
+                anim->graph_finishSelectedKeysTransform();
+            }
+        } else {
+            for(const auto& anim : mSelectedKeysAnimators) {
+                anim->anim_finishSelectedKeysTransform();
+            }
+        }
+    }
+
+    releaseMouseAndDontTrack();
+}
+
 void KeysView::mousePressEvent(QMouseEvent *e) {
     KFT_setFocus();
     const QPoint posU = e->pos() + QPoint(-MIN_WIDGET_DIM/2, 0);
@@ -174,19 +206,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
         }
     } else {
         if(mMovingKeys) {
-            if(!mFirstMove) {
-                if(mGraphViewed) {
-                    for(const auto& anim : mGraphAnimators) {
-                        anim->graph_cancelSelectedKeysTransform();
-                    }
-                } else {
-                    for(const auto& anim : mSelectedKeysAnimators) {
-                        anim->anim_cancelSelectedKeysTransform();
-                    }
-                }
-            }
-
-            releaseMouseAndDontTrack();
+            cancelTransform();
         } else {
             auto movable = mBoxesListVisible->getRectangleMovableAtPos(
                                         posU.x(), posU.y(),
@@ -236,6 +256,11 @@ bool KeysView::KFT_keyPressEvent(QKeyEvent *event) {
             QPoint(-MIN_WIDGET_DIM/2, 0);
     if(inputHandled) {
         handleMouseMove(mLastMovePos, QApplication::mouseButtons());
+    } else if(event->key() == Qt::Key_Escape) {
+        cancelTransform();
+    } else if(event->key() == Qt::Key_Return ||
+              event->key() == Qt::Key_Enter) {
+        finishTransform();
     } else if(graphProcessFilteredKeyEvent(event)) {
     } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_V) {
@@ -681,10 +706,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                     addKeyToSelection(mGPressedPoint->getParentKey());
                 }
             } else {
-                for(const auto& anim : mGraphAnimators) {
-                    if(!anim->anim_hasSelectedKeys()) continue;
-                    anim->graph_finishSelectedKeysTransform();
-                }
+                finishTransform();
             }
         }
         mGPressedPoint->setSelected(false);
