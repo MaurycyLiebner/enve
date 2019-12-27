@@ -1133,8 +1133,10 @@ void MainWindow::saveFile() {
 
 void MainWindow::saveFileAs() {
     disableEventFilter();
+    const QString defPath = mDocument.fEvFile.isEmpty() ?
+                QDir::homePath() : mDocument.fEvFile;
     QString saveAs = QFileDialog::getSaveFileName(this, "Save File",
-                                                  mDocument.fEvFile,
+                                                  defPath,
                                                   "enve Files (*.ev)");
     enableEventFilter();
     if(!saveAs.isEmpty()) {
