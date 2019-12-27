@@ -593,7 +593,7 @@ SmartVectorPath *Canvas::getPathResultingFromOperation(
     }
     SkPath resultPath;
     builder.resolve(&resultPath);
-    //newPath->loadPathFromSkPath(resultPath);
+    newPath->loadSkPath(resultPath);
     mCurrentContainer->addContained(newPath);
     return newPath.get();
 }
