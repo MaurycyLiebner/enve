@@ -91,7 +91,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
 
     mPlayButton = SwitchButton::sCreate2Switch(iconsDir + "/play.png",
                                                iconsDir + "/pause.png",
-                                               "Render Preview", this);
+                                               gSingleLineTooltip("Render Preview", "Space"), this);
     mStopButton = new ActionButton(iconsDir + "/stop.png", "Stop Preview", this);
     connect(mStopButton, &ActionButton::pressed,
             this, &TimelineDockWidget::interruptPreview);
@@ -350,7 +350,7 @@ void TimelineDockWidget::previewFinished() {
     mPlayFromBeginningButton->setDisabled(false);
     mStopButton->setDisabled(true);
     mPlayButton->setState(0);
-    mPlayButton->setToolTip("Render Preview");
+    mPlayButton->setToolTip(gSingleLineTooltip("Render Preview", "Space"));
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
             this, &TimelineDockWidget::renderPreview);
@@ -360,7 +360,7 @@ void TimelineDockWidget::previewBeingPlayed() {
     mPlayFromBeginningButton->setDisabled(true);
     mStopButton->setDisabled(false);
     mPlayButton->setState(1);
-    mPlayButton->setToolTip("Pause Preview");
+    mPlayButton->setToolTip(gSingleLineTooltip("Pause Preview", "Space"));
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
             this, &TimelineDockWidget::pausePreview);
@@ -370,7 +370,7 @@ void TimelineDockWidget::previewBeingRendered() {
     mPlayFromBeginningButton->setDisabled(true);
     mStopButton->setDisabled(false);
     mPlayButton->setState(0);
-    mPlayButton->setToolTip("Play Preview");
+    mPlayButton->setToolTip(gSingleLineTooltip("Play Preview", "Space"));
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
             this, &TimelineDockWidget::playPreview);
@@ -380,7 +380,7 @@ void TimelineDockWidget::previewPaused() {
     mPlayFromBeginningButton->setDisabled(true);
     mStopButton->setDisabled(false);
     mPlayButton->setState(0);
-    mPlayButton->setToolTip("Resume Preview");
+    mPlayButton->setToolTip(gSingleLineTooltip("Resume Preview", "Space"));
     disconnect(mPlayButton, nullptr, this, nullptr);
     connect(mPlayButton, &ActionButton::pressed,
             this, &TimelineDockWidget::resumePreview);
