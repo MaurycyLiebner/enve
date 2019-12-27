@@ -104,14 +104,17 @@ qsptr<ShaderEffect> readIdCreateShaderEffect(eReadStream& src) {
 
 #include "customidentifier.h"
 #include "RasterEffects/customrastereffectcreator.h"
+#include "RasterEffects/blureffect.h"
+#include "RasterEffects/shadoweffect.h"
+
 qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream &src) {
     RasterEffectType type;
     src.read(&type, sizeof(RasterEffectType));
     switch(type) {
         case(RasterEffectType::BLUR):
-            return nullptr;
+            return enve::make_shared<BlurEffect>();
         case(RasterEffectType::SHADOW):
-            return nullptr;
+            return enve::make_shared<ShadowEffect>();
         case(RasterEffectType::CUSTOM): {
             const auto id = CustomIdentifier::sRead(src);
             const auto eff = CustomRasterEffectCreator::sCreateForIdentifier(id);
