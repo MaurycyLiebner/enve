@@ -288,7 +288,7 @@ MainWindow::~MainWindow() {
 void MainWindow::setupMenuBar() {
     mMenuBar = new QMenuBar(this);
 
-    mFileMenu = mMenuBar->addMenu("&File");
+    mFileMenu = mMenuBar->addMenu("File");
     mFileMenu->addAction("New...",
                          this, &MainWindow::newFile,
                          Qt::CTRL + Qt::Key_N);
@@ -322,7 +322,7 @@ void MainWindow::setupMenuBar() {
     mFileMenu->addSeparator();
     mFileMenu->addAction("Exit", this, &MainWindow::close);
 
-    mEditMenu = mMenuBar->addMenu("&Edit");
+    mEditMenu = mMenuBar->addMenu("Edit");
 
     mEditMenu->addAction("Undo",
                          &mActions, &Actions::undoAction,
@@ -372,7 +372,7 @@ void MainWindow::setupMenuBar() {
 //    mSelectSameMenu->addAction("Stroke Style");
 //    mSelectSameMenu->addAction("Object Type");
 
-    mObjectMenu = mMenuBar->addMenu("&Object");
+    mObjectMenu = mMenuBar->addMenu("Object");
 
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Raise",
@@ -381,10 +381,10 @@ void MainWindow::setupMenuBar() {
     mObjectMenu->addAction("Lower",
                            &mActions, &Actions::lowerAction,
                            Qt::Key_PageDown);
-    mObjectMenu->addAction("Raise to &Top",
+    mObjectMenu->addAction("Raise to Top",
                            &mActions, &Actions::raiseToTopAction,
                            Qt::Key_Home);
-    mObjectMenu->addAction("Lower to &Bottom",
+    mObjectMenu->addAction("Lower to Bottom",
                            &mActions, &Actions::lowerToBottomAction,
                            Qt::Key_End);
     mObjectMenu->addSeparator();
@@ -423,7 +423,7 @@ void MainWindow::setupMenuBar() {
     yAct->setDisabled(true);
 
 
-    mPathMenu = mMenuBar->addMenu("&Path");
+    mPathMenu = mMenuBar->addMenu("Path");
 
     mPathMenu->addAction("Object to Path", &mActions,
                          &Actions::objectsToPathAction);
@@ -459,16 +459,16 @@ void MainWindow::setupMenuBar() {
 
 //    mEffectsMenu->addAction("Blur");
 
-    mSceneMenu = mMenuBar->addMenu("&Scene");
+    mSceneMenu = mMenuBar->addMenu("Scene");
     mSceneMenu->addAction("New scene...", this, [this]() {
         CanvasSettingsDialog::sNewCanvasDialog(mDocument, this);
     });
 
     mSceneMenu->addAction("Add to Render Queue", this, &MainWindow::addCanvasToRenderQue);
 
-    mViewMenu = mMenuBar->addMenu("&View");
+    mViewMenu = mMenuBar->addMenu("View");
 
-    const auto filteringMenu = mViewMenu->addMenu("&Filtering");
+    const auto filteringMenu = mViewMenu->addMenu("Filtering");
 
     mNoneQuality = filteringMenu->addAction("None", [this]() {
         eFilterSettings::sSetDisplayFilter(kNone_SkFilterQuality);
@@ -554,7 +554,7 @@ void MainWindow::setupMenuBar() {
             &mActions, &Actions::setPathEffectsVisible);
 
 
-    mPanelsMenu = mViewMenu->addMenu("&Docks");
+    mPanelsMenu = mViewMenu->addMenu("Docks");
 
     mCurrentObjectDock = mPanelsMenu->addAction("Selected Objects");
     mCurrentObjectDock->setCheckable(true);
@@ -605,7 +605,7 @@ void MainWindow::setupMenuBar() {
     connect(mBrushColorBookmarksAction, &QAction::toggled,
             mCentralWidget, &CentralWidget::setSidesVisibilitySetting);
 
-    const auto help = mMenuBar->addMenu("&Help");
+    const auto help = mMenuBar->addMenu("Help");
 
     help->addAction("License", this, [this]() {
         if(EnveLicense::sInstance) {
