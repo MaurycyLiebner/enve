@@ -28,7 +28,7 @@ protected:
     virtual void afterPathSet(const QString& path) = 0;
     virtual void reload() = 0;
 public:
-    virtual void replace(QWidget* const parent) = 0;
+    virtual void replace() = 0;
 
     void reloadAction() {
         reload();

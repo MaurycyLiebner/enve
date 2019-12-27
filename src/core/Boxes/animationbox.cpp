@@ -188,8 +188,8 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
     menu->addPlainAction("Reload", reloadOp);
 
     const PropertyMenu::PlainSelectedOp<AnimationBox> setSrcOp =
-    [widget](AnimationBox * box) {
-        box->changeSourceFile(widget);
+    [](AnimationBox * box) {
+        box->changeSourceFile();
     };
     menu->addPlainAction("Set Source File...", setSrcOp);
 

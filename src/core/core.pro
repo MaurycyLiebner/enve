@@ -142,6 +142,7 @@ SOURCES += \
     GUI/boxeslistactionbutton.cpp \
     GUI/coloranimatorbutton.cpp \
     GUI/durationrectsettingsdialog.cpp \
+    GUI/edialogs.cpp \
     GUI/ewidgets.cpp \
     GUI/global.cpp \
     GUI/newcanvasdialog.cpp \
@@ -388,6 +389,7 @@ HEADERS += \
     GUI/boxeslistactionbutton.h \
     GUI/coloranimatorbutton.h \
     GUI/durationrectsettingsdialog.h \
+    GUI/edialogs.h \
     GUI/ewidgets.h \
     GUI/global.h \
     GUI/newcanvasdialog.h \

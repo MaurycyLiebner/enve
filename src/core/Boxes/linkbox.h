@@ -27,7 +27,7 @@ class ExternalLinkBox : public ContainerBox {
 public:
     void reload();
 
-    void changeSrc(QWidget *dialogParent);
+    void changeSrc();
 
     void setSrc(const QString &src);
 private:

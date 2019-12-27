@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "linkbox.h"
-#include <QFileDialog>
+#include "GUI/edialogs.h"
 #include "canvas.h"
 #include "Timeline/durationrectangle.h"
 #include "Animators/transformanimator.h"
@@ -34,11 +34,9 @@ void ExternalLinkBox::reload() {
     planUpdate(UpdateReason::userChange);
 }
 
-void ExternalLinkBox::changeSrc(QWidget* dialogParent) {
-    QString src = QFileDialog::getOpenFileName(dialogParent,
-                                               "Link File",
-                                               "",
-                                               "enve Files (*.ev)");
+void ExternalLinkBox::changeSrc() {
+    QString src = eDialogs::openFile("Link File", mSrc,
+                                     "enve Files (*.ev)");
     if(!src.isEmpty()) setSrc(src);
 }
 

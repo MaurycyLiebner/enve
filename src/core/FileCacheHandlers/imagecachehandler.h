@@ -81,7 +81,7 @@ protected:
         mDataHandler->clearCache();
     }
 public:
-    void replace(QWidget * const parent);
+    void replace();
 
     ImageLoader * scheduleLoad() {
         if(!mDataHandler) return nullptr;

@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Boxes/imagebox.h"
-#include <QFileDialog>
+#include "GUI/edialogs.h"
 #include <QMenu>
 #include "FileCacheHandlers/imagecachehandler.h"
 #include "fileshandler.h"
@@ -67,7 +67,6 @@ void ImageBox::reload() {
 void ImageBox::setupCanvasMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<ImageBox>()) return;
     menu->addedActionsForType<ImageBox>();
-    const auto widget = menu->getParentWidget();
 
     const PropertyMenu::PlainSelectedOp<ImageBox> reloadOp =
     [](ImageBox * box) {
@@ -76,17 +75,16 @@ void ImageBox::setupCanvasMenu(PropertyMenu * const menu) {
     menu->addPlainAction("Reload", reloadOp);
 
     const PropertyMenu::PlainSelectedOp<ImageBox> setSrcOp =
-    [widget](ImageBox * box) {
-        box->changeSourceFile(widget);
+    [](ImageBox * box) {
+        box->changeSourceFile();
     };
     menu->addPlainAction("Set Source File...", setSrcOp);
 
     BoundingBox::setupCanvasMenu(menu);
 }
 
-void ImageBox::changeSourceFile(QWidget * const dialogParent) {
-    QString importPath = QFileDialog::getOpenFileName(dialogParent,
-                                            "Change Source", mImageFilePath,
+void ImageBox::changeSourceFile() {
+    QString importPath = eDialogs::openFile("Change Source", mImageFilePath,
                                             "Image Files (*.png *.jpg)");
     if(!importPath.isEmpty()) setFilePath(importPath);
 }

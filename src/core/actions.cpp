@@ -345,6 +345,25 @@ void Actions::setPathEffectsVisible(const bool bT) {
 #include "Boxes/imagebox.h"
 #include "importhandler.h"
 
+bool Actions::handleDropEvent(QDropEvent * const event,
+                              const QPointF& relDropPos) {
+    const QMimeData* mimeData = event->mimeData();
+
+    if(mimeData->hasUrls()) {
+        event->acceptProposedAction();
+        const QList<QUrl> urlList = mimeData->urls();
+        for(int i = 0; i < urlList.size() && i < 32; i++) {
+            try {
+                importFile(urlList.at(i).toLocalFile(), relDropPos);
+                return true;
+            } catch(const std::exception& e) {
+                gPrintExceptionCritical(e);
+            }
+        }
+    }
+    return false;
+}
+
 void Actions::importFile(const QString &path,
                          const QPointF &relDropPos) {
     if(!mActiveScene) return;

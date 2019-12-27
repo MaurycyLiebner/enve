@@ -16,7 +16,7 @@
 
 #include "imagesequencecachehandler.h"
 
-#include <QFileDialog>
+#include "GUI/edialogs.h"
 
 #include "filesourcescache.h"
 #include "fileshandler.h"
@@ -68,9 +68,8 @@ void ImageSequenceFileHandler::reload() {
     if(mFrameImageHandlers.isEmpty()) mFileMissing = true;
 }
 
-void ImageSequenceFileHandler::replace(QWidget* const parent) {
-    const auto dir = QFileDialog::getExistingDirectory(
-                parent, "Import Image Sequence", mPath);
+void ImageSequenceFileHandler::replace() {
+    const auto dir = eDialogs::openDir("Import Image Sequence", mPath);
     if(!dir.isEmpty()) setPath(dir);
 }
 

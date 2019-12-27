@@ -208,7 +208,7 @@ void FileSourceListVisibleWidget::showContextMenu(const QPoint &globalPos) {
                 abs->fTarget->reloadAction();
             }
         } else if(selected_action->text() == "Replace...") {
-            mSelectedList.first()->fTarget->replace(MainWindow::sGetInstance());
+            mSelectedList.first()->fTarget->replace();
         }
 
         Document::sInstance->actionFinished();

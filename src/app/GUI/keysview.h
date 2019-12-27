@@ -113,6 +113,10 @@ protected:
 protected:
     void KFT_setFocusToWidget();
     void KFT_clearFocus();
+
+    void dropEvent(QDropEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
 signals:
     void changedViewedFrames(FrameRange);
     void wheelEventSignal(QWheelEvent*);

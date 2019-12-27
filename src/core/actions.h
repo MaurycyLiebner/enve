@@ -19,6 +19,8 @@
 
 #include <QString>
 
+class QDropEvent;
+
 #include "colorhelpers.h"
 #include "skia/skiaincludes.h"
 
@@ -106,6 +108,8 @@ public:
     void setRasterEffectsVisible(const bool bT);
     void setPathEffectsVisible(const bool bT);
 
+    bool handleDropEvent(QDropEvent * const event,
+                         const QPointF &relDropPos = QPointF(0, 0));
     void importFile(const QString &path,
                     const QPointF &relDropPos = QPointF(0, 0));
 

@@ -526,20 +526,8 @@ int CanvasWindow::getMaxFrame() {
 }
 
 void CanvasWindow::dropEvent(QDropEvent *event) {
-    const QMimeData* mimeData = event->mimeData();
-
-    if(mimeData->hasUrls()) {
-        event->acceptProposedAction();
-        const QList<QUrl> urlList = mimeData->urls();
-        for(int i = 0; i < urlList.size() && i < 32; i++) {
-            try {
-                const QPointF pos = mapToCanvasCoord(event->posF());
-                mActions.importFile(urlList.at(i).toLocalFile(), pos);
-            } catch(const std::exception& e) {
-                gPrintExceptionCritical(e);
-            }
-        }
-    }
+    const QPointF pos = mapToCanvasCoord(event->posF());
+    mActions.handleDropEvent(event, pos);
 }
 
 void CanvasWindow::dragEnterEvent(QDragEnterEvent *event) {

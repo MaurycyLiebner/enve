@@ -40,7 +40,7 @@ class AnimationBox : public BoundingBox {
 protected:
     AnimationBox(const eBoxType type);
 public:
-    virtual void changeSourceFile(QWidget * const dialogParent) = 0;
+    virtual void changeSourceFile() = 0;
     virtual void animationDataChanged();
     virtual void setStretch(const qreal stretch) {
         mStretch = stretch;

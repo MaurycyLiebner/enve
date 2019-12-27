@@ -230,6 +230,10 @@ void BoxScroller::stopScrolling() {
 }
 
 void BoxScroller::dropEvent(QDropEvent *event) {
+    if(Actions::sInstance->handleDropEvent(event)) {
+        mCurrentMimeData = nullptr;
+        return;
+    }
     stopScrolling();
     mCurrentMimeData = event->mimeData();
     mLastDragMoveY = event->pos().y();

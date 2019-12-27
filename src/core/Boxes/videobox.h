@@ -32,7 +32,7 @@ public:
     void soundDataChanged();
 
     bool SWT_isVideoBox() const { return true; }
-    void changeSourceFile(QWidget * const dialogParent);
+    void changeSourceFile();
 
     void writeBoundingBox(eWriteStream& dst);
     void readBoundingBox(eReadStream& src);
@@ -42,6 +42,7 @@ public:
     SingleSound* sound() const
     { return mSound.get(); }
     void setFilePath(const QString& path);
+    QString getFilePath();
 private:
     qsptr<SingleSound> mSound;
     qptr<VideoFileHandler> mFileHandler;

@@ -49,7 +49,7 @@ public:
     void writeBoundingBox(eWriteStream& dst);
     void readBoundingBox(eReadStream& src);
 
-    void changeSourceFile(QWidget * const dialogParent);
+    void changeSourceFile();
     void setFilePath(const QString &path);
 
     void reload();

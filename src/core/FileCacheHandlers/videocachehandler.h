@@ -97,7 +97,7 @@ protected:
         mSoundHandler->reload();
     }
 public:
-    void replace(QWidget* const parent);
+    void replace();
 
     VideoDataHandler* getFrameHandler() const {
         return mDataHandler.get();

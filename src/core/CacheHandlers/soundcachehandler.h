@@ -156,7 +156,7 @@ protected:
         mDataHandler->reload();
     }
 public:
-    void replace(QWidget* const parent);
+    void replace();
 private:
     qsptr<SoundDataHandler> mDataHandler;
 };

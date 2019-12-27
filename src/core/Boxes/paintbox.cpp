@@ -42,16 +42,14 @@ stdsptr<BoxRenderData> PaintBox::createRenderData() {
     return enve::make_shared<PaintBoxRenderData>(this);
 }
 
-#include <QFileDialog>
+#include "GUI/edialogs.h"
 #include "typemenu.h"
 void PaintBox::setupCanvasMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<PaintBox>()) return;
     menu->addedActionsForType<PaintBox>();
-    const auto widget = menu->getParentWidget();
-    PropertyMenu::PlainSelectedOp<PaintBox> op = [widget](PaintBox * box) {
-        const QString importPath = QFileDialog::getOpenFileName(
-                                        widget,
-                                        "Load From Image", "",
+    PropertyMenu::PlainSelectedOp<PaintBox> op = [](PaintBox * box) {
+        const QString importPath = eDialogs::openFile(
+                                        "Load From Image", QDir::homePath(),
                                         "Image Files (*.png *.jpg)");
         if(!importPath.isEmpty()) {
             QImage img;

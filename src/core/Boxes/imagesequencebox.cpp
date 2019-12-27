@@ -17,7 +17,7 @@
 #include "imagesequencebox.h"
 #include "FileCacheHandlers/imagesequencecachehandler.h"
 #include "filesourcescache.h"
-#include <QFileDialog>
+#include "GUI/edialogs.h"
 
 ImageSequenceBox::ImageSequenceBox() : AnimationBox(TYPE_IMAGESQUENCE) {
     prp_setName("Image Sequence");
@@ -31,9 +31,8 @@ void ImageSequenceBox::setFolderPath(const QString &folderPath) {
     animationDataChanged();
 }
 
-void ImageSequenceBox::changeSourceFile(QWidget * const dialogParent) {
-    const auto dir = QFileDialog::getExistingDirectory(
-                dialogParent, "Import Image Sequence");
+void ImageSequenceBox::changeSourceFile() {
+    const auto dir = eDialogs::openDir("Import Image Sequence", mDirPath);
     if(!dir.isEmpty()) setFolderPath(dir);
 }
 

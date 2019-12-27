@@ -37,7 +37,25 @@ KeysView::KeysView(BoxScroller *boxesListVisible,
     mBoxesListVisible->setKeysView(this);
 
     setMouseTracking(true);
+    setAcceptDrops(true);
     mScrollTimer = new QTimer(this);
+}
+
+void KeysView::dropEvent(QDropEvent *event) {
+    Actions::sInstance->handleDropEvent(event);
+}
+
+void KeysView::dragEnterEvent(QDragEnterEvent *event) {
+    if(event->mimeData()->hasUrls()) {
+       event->acceptProposedAction();
+        KFT_setFocus();
+    }
+}
+
+void KeysView::dragMoveEvent(QDragMoveEvent *event) {
+    if(event->mimeData()->hasUrls()) {
+        event->acceptProposedAction();
+    }
 }
 
 void KeysView::setCurrentScene(Canvas * const scene) {

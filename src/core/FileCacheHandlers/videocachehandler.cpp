@@ -19,7 +19,7 @@
 #include "Boxes/videobox.h"
 #include "CacheHandlers/imagecachecontainer.h"
 
-#include <QFileDialog>
+#include "GUI/edialogs.h"
 #include "filesourcescache.h"
 
 #include "videoframeloader.h"
@@ -132,9 +132,9 @@ void VideoDataHandler::clearCache() {
     mFrameLoaders.clear();
 }
 
-void VideoFileHandler::replace(QWidget* const parent) {
-    const QString importPath = QFileDialog::getOpenFileName(
-                parent, "Replace Video Source " + mPath, "",
+void VideoFileHandler::replace() {
+    const QString importPath = eDialogs::openFile(
+                "Replace Video Source " + mPath, mPath,
                 "Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
     if(!importPath.isEmpty()) {
         const QFile file(importPath);

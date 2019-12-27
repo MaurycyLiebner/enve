@@ -24,7 +24,7 @@ protected:
     void afterPathSet(const QString& folderPath);
     void reload();
 public:
-    void replace(QWidget * const parent);
+    void replace();
 
     sk_sp<SkImage> getFrameAtFrame(const int relFrame);
     sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame);

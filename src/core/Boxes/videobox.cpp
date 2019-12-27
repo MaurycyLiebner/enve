@@ -51,10 +51,10 @@ void VideoBox::readBoundingBox(eReadStream& src) {
     setFilePath(path);
 }
 
-#include <QFileDialog>
-void VideoBox::changeSourceFile(QWidget * const dialogParent) {
-    const QString path = QFileDialog::getOpenFileName(
-                dialogParent, "Change Source", "",
+#include "GUI/edialogs.h"
+void VideoBox::changeSourceFile() {
+    const QString path = eDialogs::openFile(
+                "Change Source", getFilePath(),
                 "Video Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
     if(!path.isEmpty()) setFilePath(path);
 }
@@ -94,6 +94,11 @@ void VideoBox::setFilePath(const QString &path) {
     }
 
     animationDataChanged();
+}
+
+QString VideoBox::getFilePath() {
+    if(mFileHandler) return mFileHandler->path();
+    return "";
 }
 
 void VideoBox::animationDataChanged() {

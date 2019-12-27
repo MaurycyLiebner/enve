@@ -26,7 +26,7 @@
 #include <QToolBar>
 #include "GUI/ColorWidgets/colorsettingswidget.h"
 #include <QMenuBar>
-#include <QFileDialog>
+#include "GUI/edialogs.h"
 #include <QMessageBox>
 #include "timelinedockwidget.h"
 #include "Private/Tasks/taskexecutor.h"
@@ -61,7 +61,7 @@
 #include "switchbutton.h"
 #include "centralwidget.h"
 #include "ColorWidgets/bookmarkedcolors.h"
-#include "edialogs.h"
+#include "GUI/edialogs.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 
