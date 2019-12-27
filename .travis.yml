@@ -89,13 +89,6 @@ before_script:
     - wget https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/exec-x86_64.so
     - mv exec-x86_64.so exec.so
     - cd Release
-    - # Compile qtstyleplugins
-    - git clone http://code.qt.io/qt/qtstyleplugins.git
-    - cd qtstyleplugins
-    - qmake
-    - make -j 2
-    - sudo make install 
-    - cd ..
 script:
     - # source /opt/qt512/bin/qt512-env.sh
     - # embed commit hash and date
@@ -119,7 +112,7 @@ script:
     - cp Release/src/app/enve AppDir/usr/bin/
     - cp -av Release/src/core/*.so* AppDir/usr/lib/
     - cp -av ../third_party/gperftools-2.7-enve-mod/.libs/libtcmalloc.so* AppDir/usr/lib/
-    - ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage -extra-plugins=platformthemes/libqgtk2.so,styles/libqgtk2style.so
+    - ./linuxdeployqt-6-x86_64.AppImage AppDir/usr/share/applications/enve.desktop -appimage
 after_success:
     - |
       export GREP_PATH=grep;
