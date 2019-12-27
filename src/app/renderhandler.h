@@ -29,6 +29,10 @@ class Document;
 class VideoEncoder;
 class MemoryHandler;
 
+enum class PreviewSate {
+    stopped, rendering, playing, paused
+};
+
 class RenderHandler : public QObject {
     Q_OBJECT
 public:
@@ -48,6 +52,9 @@ public:
     void resumePreview();
     void renderPreview();
     void renderFromSettings(RenderInstanceSettings * const settings);
+
+    PreviewSate currentPreviewState() const
+    { return mPreviewSate; }
 
     static RenderHandler* sInstance;
 signals:
@@ -90,6 +97,7 @@ private:
     int mCurrentPreviewFrame;
     int mMaxPreviewFrame;
 
+    PreviewSate mPreviewSate = PreviewSate::stopped;
     //! @brief true if preview is currently playing
     bool mPreviewing = false;
     //! @brief true if currently preview is being rendered

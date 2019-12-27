@@ -157,6 +157,7 @@ void RenderHandler::renderPreview() {
     if(TaskScheduler::sAllQuedCpuTasksFinished()) {
         nextPreviewRenderFrame();
     }
+    mPreviewSate = PreviewSate::rendering;
 }
 
 void RenderHandler::interruptPreview() {
@@ -208,12 +209,15 @@ void RenderHandler::stopPreview() {
     mPreviewFPSTimer->stop();
     stopAudio();
     emit previewFinished();
+
+    mPreviewSate = PreviewSate::stopped;
 }
 
 void RenderHandler::pausePreview() {
     if(mPreviewing) {
         mPreviewFPSTimer->stop();
         emit previewPaused();
+        mPreviewSate = PreviewSate::paused;
     }
 }
 
@@ -221,6 +225,7 @@ void RenderHandler::resumePreview() {
     if(mPreviewing) {
         mPreviewFPSTimer->start();
         emit previewBeingPlayed();
+        mPreviewSate = PreviewSate::playing;
     }
 }
 
@@ -259,6 +264,8 @@ void RenderHandler::playPreview() {
     mPreviewFPSTimer->start();
     emit previewBeingPlayed();
     emit mCurrentScene->requestUpdate();
+
+    mPreviewSate = PreviewSate::playing;
 }
 
 void RenderHandler::nextPreviewRenderFrame() {

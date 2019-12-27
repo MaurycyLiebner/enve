@@ -1057,7 +1057,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
     if(isActiveWindow()) {
         bool returnBool = false;
         if(event->type() == QEvent::KeyPress &&
-           mTimeline->processKeyPress(event)) {
+            mTimeline->processKeyPress(event)) {
             returnBool = true;
         } else {
             returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);

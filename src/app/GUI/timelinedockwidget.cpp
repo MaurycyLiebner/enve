@@ -307,7 +307,15 @@ bool TimelineDockWidget::processKeyPress(QKeyEvent *event) {
     const CanvasMode mode = mDocument.fCanvasMode;
     const int key = event->key();
     const auto mods = event->modifiers();
-    if(key == Qt::Key_Right && !(mods & Qt::ControlModifier)) {
+    if(key == Qt::Key_Space) {
+        const auto state = RenderHandler::sInstance->currentPreviewState();
+        switch(state) {
+            case PreviewSate::stopped: renderPreview(); break;
+            case PreviewSate::rendering: playPreview(); break;
+            case PreviewSate::playing: pausePreview(); break;
+            case PreviewSate::paused: resumePreview(); break;
+        }
+    } else if(key == Qt::Key_Right && !(mods & Qt::ControlModifier)) {
         mDocument.incActiveSceneFrame();
     } else if(key == Qt::Key_Left && !(mods & Qt::ControlModifier)) {
         mDocument.decActiveSceneFrame();
