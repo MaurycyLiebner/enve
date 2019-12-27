@@ -28,7 +28,6 @@
 #include "Sound/singlesound.h"
 #include "svgimporter.h"
 #include "filesourcescache.h"
-#include <QFileDialog>
 #include "videoencoder.h"
 #include "usagewidget.h"
 #include "memorychecker.h"

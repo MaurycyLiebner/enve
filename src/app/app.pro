@@ -82,6 +82,7 @@ SOURCES += main.cpp\
     GUI/canvaswrappernode.cpp \
     GUI/centralwidget.cpp \
     GUI/changewidthwidget.cpp \
+    GUI/edialogs.cpp \
     GUI/ekeyfilter.cpp \
     GUI/envelicense.cpp \
     GUI/envesplash.cpp \
@@ -185,6 +186,7 @@ HEADERS  += \
     GUI/canvaswrappernode.h \
     GUI/centralwidget.h \
     GUI/changewidthwidget.h \
+    GUI/edialogs.h \
     GUI/ekeyfilter.h \
     GUI/envelicense.h \
     GUI/envesplash.h \

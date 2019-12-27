@@ -27,7 +27,6 @@
 #include "clipboardcontainer.h"
 #include "Boxes/paintbox.h"
 #include "PathEffects/patheffectsinclude.h"
-#include <QFileDialog>
 #include "RasterEffects/rastereffect.h"
 #include "MovablePoints/smartnodepoint.h"
 #include "pointtypemenu.h"

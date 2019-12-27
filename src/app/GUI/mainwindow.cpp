@@ -61,6 +61,7 @@
 #include "switchbutton.h"
 #include "centralwidget.h"
 #include "ColorWidgets/bookmarkedcolors.h"
+#include "edialogs.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 
@@ -1101,8 +1102,8 @@ void MainWindow::openFile() {
         disable();
         const QString defPath = mDocument.fEvFile.isEmpty() ?
                     QDir::homePath() : mDocument.fEvFile;
-        const QString openPath = QFileDialog::getOpenFileName(this,
-            "Open File", defPath, "enve Files (*.ev)");
+        const QString openPath = eDialogs::openFile("Open File", defPath,
+                                                    "enve Files (*.ev)");
         if(!openPath.isEmpty()) openFile(openPath);
         enable();
     }
@@ -1137,9 +1138,9 @@ void MainWindow::saveFileAs() {
     disableEventFilter();
     const QString defPath = mDocument.fEvFile.isEmpty() ?
                 QDir::homePath() : mDocument.fEvFile;
-    QString saveAs = QFileDialog::getSaveFileName(this, "Save File",
-                                                  defPath,
-                                                  "enve Files (*.ev)");
+
+    QString saveAs = eDialogs::saveFile("Save File", defPath,
+                                        "enve Files (*.ev)");
     enableEventFilter();
     if(!saveAs.isEmpty()) {
         if(saveAs.right(3) != ".ev") saveAs += ".ev";
@@ -1180,8 +1181,7 @@ void MainWindow::importFile() {
     disableEventFilter();
     const QString defPath = mDocument.fEvFile.isEmpty() ?
                 QDir::homePath() : mDocument.fEvFile;
-    QStringList importPaths = QFileDialog::getOpenFileNames(
-                                            this,
+    QStringList importPaths = eDialogs::openFiles(
                                             "Import File", defPath,
                                             "Files (*.ev *.svg "
                                                    "*.mp4 *.mov *.avi *.mkv *.m4v "
@@ -1204,7 +1204,7 @@ void MainWindow::linkFile() {
     disableEventFilter();
     const QString defPath = mDocument.fEvFile.isEmpty() ?
                 QDir::homePath() : mDocument.fEvFile;
-    QStringList importPaths = QFileDialog::getOpenFileNames(this,
+    QStringList importPaths = eDialogs::openFiles(
         "Link File", defPath, "enve Files (*.ev)");
     enableEventFilter();
     if(!importPaths.isEmpty()) {
@@ -1219,8 +1219,7 @@ void MainWindow::importImageSequence() {
     disableEventFilter();
     const QString defPath = mDocument.fEvFile.isEmpty() ?
                 QDir::homePath() : mDocument.fEvFile;
-    const auto folder = QFileDialog::getExistingDirectory(
-                this, "Import Image Sequence", defPath);
+    const auto folder = eDialogs::openDir("Import Image Sequence", defPath);
     enableEventFilter();
     if(!folder.isEmpty()) {
         mDocument.fActiveScene->createImageSequenceBox(folder);

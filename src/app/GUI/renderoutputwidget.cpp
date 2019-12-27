@@ -15,8 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "renderoutputwidget.h"
-#include <QFileDialog>
 #include <QLineEdit>
+#include <QDir>
+#include "GUI/edialogs.h"
 
 RenderOutputWidget::RenderOutputWidget(const int canvasWidth,
                                        const int canvasHeight,
@@ -111,11 +112,8 @@ void RenderOutputWidget::emitRender() {
 }
 
 void RenderOutputWidget::chooseDir() {
-    QString dir = QFileDialog::getExistingDirectory(
-                this, tr("Open Directory"),
-                mPathLabel->text(),
-                QFileDialog::ShowDirsOnly
-                | QFileDialog::DontResolveSymlinks);
+    QString dir = eDialogs::openDir(tr("Open Directory"),
+                                    mPathLabel->text());
     if(dir.isNull() ) return;
     mPathLabel->setText(dir);
 }

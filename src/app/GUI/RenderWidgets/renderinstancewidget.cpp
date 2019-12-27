@@ -16,13 +16,13 @@
 
 #include "renderinstancewidget.h"
 #include "GUI/global.h"
-#include <QFileDialog>
 #include <QMenu>
 #include "outputsettingsdialog.h"
 #include "outputsettingsprofilesdialog.h"
 #include "outputsettingsdisplaywidget.h"
 #include "rendersettingsdisplaywidget.h"
 #include "Private/esettings.h"
+#include "GUI/edialogs.h"
 
 RenderInstanceWidget::RenderInstanceWidget(
         Canvas *canvas, QWidget *parent) :
@@ -342,8 +342,8 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     if(iniText.isEmpty()) {
         iniText = renderOutputDir() + "/untitled" + selectedExt;
     }
-    QString saveAs = QFileDialog::getSaveFileName(this, "Output Destination",
-                                                  iniText, supportedExts);
+    QString saveAs = eDialogs::saveFile("Output Destination",
+                                        iniText, supportedExts);
     if(saveAs.isEmpty()) return;
     if(saveAs.right(selectedExt.length()) != selectedExt) saveAs += selectedExt;
     mSettings.setOutputDestination(saveAs);
