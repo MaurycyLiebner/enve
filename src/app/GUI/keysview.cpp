@@ -370,9 +370,9 @@ void KeysView::paintEvent(QPaintEvent *) {
     int minFrame = mMinViewedFrame;
     int maxFrame = mMaxViewedFrame;
 
-    minFrame += ceil((-xT)/mPixelsPerFrame);
+    minFrame += qCeil((-xT)/mPixelsPerFrame);
     minFrame = minFrame - minFrame%iInc - 1;
-    maxFrame += floor((width() - 40 - xT)/mPixelsPerFrame) - maxFrame%iInc;
+    maxFrame += qFloor((width() - 40 - xT)/mPixelsPerFrame) - maxFrame%iInc;
     for(int i = minFrame; i <= maxFrame; i += iInc) {
         const qreal xTT = xT + (i - mMinViewedFrame + 1)*mPixelsPerFrame;
         p.drawLine(QPointF(xTT, 0), QPointF(xTT, height()));

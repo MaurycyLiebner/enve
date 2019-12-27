@@ -20,6 +20,7 @@
 #include "GUI/global.h"
 #include "keysview.h"
 #include "actionbutton.h"
+#include "switchbutton.h"
 #include "Private/esettings.h"
 
 AnimationDockWidget::AnimationDockWidget(QWidget *parent,
@@ -62,6 +63,13 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     connect(mFitToHeightButton, &ActionButton::pressed,
             keysView, &KeysView::graphResetValueScaleAndMinShownAction);
 
+    const auto valueLines = SwitchButton::sCreate2Switch(iconsDir + "/horizontalLinesOn.png",
+                                                         iconsDir + "/horizontalLinesOff.png",
+                                                         gSingleLineTooltip("Disable Value Lines"),
+                                                         this);
+    connect(valueLines, &SwitchButton::toggled,
+            keysView, &KeysView::graphSetValueLinesDisabled);
+
     addWidget(mLineButton);
     addWidget(mCurveButton);
     addSeparator();
@@ -70,12 +78,13 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     addWidget(mCornerButton);
     addSeparator();
     addWidget(mFitToHeightButton);
-//    mButtonsLayout->addWidget(mTwoSideCtrlButton);
-//    mButtonsLayout->addWidget(mLeftSideCtrlButton);
-//    mButtonsLayout->addWidget(mRightSideCtrlButton);
-//    mButtonsLayout->addWidget(mNoSideCtrlButton);
+    addWidget(valueLines);
 
-    setStyleSheet("border: 1px solid black; padding: 10px; margin-bottom: -1px");
+    setStyleSheet("QToolBar {"
+                      "border: 1px solid black;"
+                      "padding: 10px;"
+                      "margin-bottom: -1px"
+                  "}");
 }
 
 void AnimationDockWidget::paintEvent(QPaintEvent *) {

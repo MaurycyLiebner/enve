@@ -29,10 +29,6 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *);
-signals:
-
-public slots:
-
 private:
     QHBoxLayout *mButtonsLayout;
     ActionButton *mLineButton;

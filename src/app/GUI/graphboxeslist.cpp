@@ -126,29 +126,30 @@ void KeysView::graphPaint(QPainter *p) {
     //p->drawText(QRectF(xL - 20, 0, 40, 20),
     //            Qt::AlignCenter, QString::number(mCurrentFrame));
     p->drawLine(xL, 20, xL, height());*/
-    QPen pen = QPen(QColor(255, 255, 255), 1.);
-    p->setPen(pen);
-    qreal incY = mValueInc*mPixelsPerValUnit;
-    qreal yL = height() + fmod(mMinShownVal, mValueInc)*mPixelsPerValUnit + incY;
-    qreal currValue = mMinShownVal - fmod(mMinShownVal, mValueInc) - mValueInc;
-    int nLines = qCeil(yL/incY);
-    QLine *lines = new QLine[static_cast<uint>(nLines)];
-    int currLine = 0;
-    while(yL > 0) {
-        p->drawText(QRectF(-MIN_WIDGET_DIM/4, yL - incY,
-                           2*MIN_WIDGET_DIM, 2*incY),
-                    Qt::AlignCenter,
-                    QString::number(currValue, 'f', mValuePrec));
-        int yLi = qRound(yL);
-        lines[currLine] = QLine(2*MIN_WIDGET_DIM, yLi, width(), yLi);
-        currLine++;
-        yL -= incY;
-        currValue += mValueInc;
+    if(graph_mValueLinesVisible) {
+        p->setPen(QColor(255, 255, 255));
+        const qreal incY = mValueInc*mPixelsPerValUnit;
+        qreal yL = height() + fmod(mMinShownVal, mValueInc)*mPixelsPerValUnit + incY;
+        qreal currValue = mMinShownVal - fmod(mMinShownVal, mValueInc) - mValueInc;
+        const int nLines = qCeil(yL/incY);
+        const auto lines = new QLine[static_cast<uint>(nLines)];
+        int currLine = 0;
+        while(yL > 0) {
+            p->drawText(QRectF(-MIN_WIDGET_DIM/4, yL - incY,
+                               2*MIN_WIDGET_DIM, 2*incY),
+                        Qt::AlignCenter,
+                        QString::number(currValue, 'f', mValuePrec));
+            int yLi = qRound(yL);
+            lines[currLine] = QLine(2*MIN_WIDGET_DIM, yLi, width(), yLi);
+            currLine++;
+            yL -= incY;
+            currValue += mValueInc;
+        }
+        p->setPen(QColor(200, 200, 200));
+        p->drawLines(lines, nLines);
+        delete[] lines;
     }
-    pen.setColor(QColor(200, 200, 200));
-    p->setPen(pen);
-    p->drawLines(lines, nLines);
-    delete[] lines;
+
     p->setRenderHint(QPainter::Antialiasing);
 
     QMatrix transform;
@@ -171,6 +172,7 @@ void KeysView::graphPaint(QPainter *p) {
     p->setRenderHint(QPainter::Antialiasing, false);
 
     if(mSelecting) {
+        QPen pen;
         pen.setColor(Qt::blue);
         pen.setWidthF(2);
         pen.setStyle(Qt::DotLine);
@@ -435,6 +437,11 @@ bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event) {
 
 void KeysView::graphResetValueScaleAndMinShownAction() {
     graphResetValueScaleAndMinShown();
+    update();
+}
+
+void KeysView::graphSetValueLinesDisabled(const bool disabled) {
+    graph_mValueLinesVisible = !disabled;
     update();
 }
 

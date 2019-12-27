@@ -29,6 +29,8 @@
     </qresource>
     <qresource prefix="/pixmaps">
         <file>splash.svg</file>
+        <file>icons/toolbarButtons/plain/horizontalLinesOff</file>
+        <file>icons/toolbarButtons/plain/horizontalLinesOn</file>
     </qresource>
     <qresource prefix="/other">
         <file>GPL3-license.txt</file>

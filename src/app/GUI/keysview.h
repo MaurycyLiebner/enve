@@ -120,7 +120,7 @@ public:
     static QColor sGetAnimatorColor(const int i);
 
     void graphResetValueScaleAndMinShownAction();
-
+    void graphSetValueLinesDisabled(const bool disabled);
     void graphUpdateAfterKeysChanged();
 
     void setFramesRange(const FrameRange &range);
@@ -217,6 +217,7 @@ private:
 
     // graph
 
+    bool graph_mValueLinesVisible = true;
     qreal mPixelsPerValUnit = 0;
     qreal mMinShownVal = 0;
     stdptr<QrealPoint> mGHoveredPoint;
