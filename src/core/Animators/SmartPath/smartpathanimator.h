@@ -126,6 +126,7 @@ public:
     { return mPathColor; }
 signals:
     void pathBlendModeChagned(Mode);
+    void emptied();
 protected:
     SmartPath& getBaseValue()
     { return mBaseValue; }

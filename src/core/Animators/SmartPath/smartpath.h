@@ -92,7 +92,7 @@ public:
     void clear();
 
     bool isEmpty() const
-    { return mNodesList.count() == 0; }
+    { return mNodesList.isEmpty(); }
 
     SkPath getPathAt() const;
     void setPath(const SkPath& path);

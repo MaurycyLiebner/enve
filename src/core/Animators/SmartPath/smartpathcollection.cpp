@@ -26,6 +26,18 @@ SmartPathCollection::SmartPathCollection() :
             this, &SmartPathCollection::updatePathColors);
     connect(this, &ComplexAnimator::ca_childMoved,
             this, &SmartPathCollection::updatePathColors);
+    connect(this, &ComplexAnimator::ca_childRemoved,
+            this, [this](Property* const child) {
+        const auto path = static_cast<SmartPathAnimator*>(child);
+        disconnect(path, &SmartPathAnimator::emptied, this, nullptr);
+    });
+    connect(this, &ComplexAnimator::ca_childAdded,
+            this, [this](Property* const child) {
+        const auto path = static_cast<SmartPathAnimator*>(child);
+        connect(path, &SmartPathAnimator::emptied, this, [this, path]() {
+            removeChild(enve::shared<SmartPathAnimator>(path));
+        });
+    });
 }
 
 void SmartPathCollection::prp_writeProperty(eWriteStream &dst) const {

@@ -69,6 +69,8 @@ public:
     { return mClosed; }
     void setClosed(const bool closed)
     { mClosed = closed; }
+    bool isEmpty() const
+    { return mNodes.isEmpty(); }
 
     void reset();
     void clear()

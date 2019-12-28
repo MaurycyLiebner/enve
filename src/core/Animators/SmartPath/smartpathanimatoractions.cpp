@@ -23,7 +23,8 @@ void SmartPathAnimator::actionRemoveNode(const int nodeId, const bool approx) {
         spKey->getValue().actionRemoveNode(nodeId, approx);
     }
     mBaseValue.actionRemoveNode(nodeId, approx);
-    prp_afterWholeInfluenceRangeChanged();
+    if(mBaseValue.isEmpty()) emit emptied();
+    else prp_afterWholeInfluenceRangeChanged();
 }
 
 int SmartPathAnimator::actionAddNewAtStart(const QPointF &relPos) {

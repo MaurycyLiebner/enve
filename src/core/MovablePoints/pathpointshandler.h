@@ -107,11 +107,12 @@ private:
     SimpleTaskScheduler scheduleNodesRemoval;
 
     void flushNodesRemoval() {
-        std::sort(mRemoveNodes.begin(), mRemoveNodes.end());
-        for(auto it = mRemoveNodes.rbegin(); it != mRemoveNodes.rend(); it++) {
+        auto nodes = mRemoveNodes;
+        mRemoveNodes.clear();
+        std::sort(nodes.begin(), nodes.end());
+        for(auto it = nodes.rbegin(); it != nodes.rend(); it++) {
             removeNode(*it, false);
         }
-        mRemoveNodes.clear();
     }
 
     void updatePoints(int min, int max) {
