@@ -21,8 +21,9 @@
 struct ContainerBoxRenderData : public BoxRenderData {
     e_OBJECT
 public:
+    ContainerBoxRenderData(BoundingBox * const parentBox);
+
     QList<stdsptr<BoxRenderData>> fChildrenRenderData;
-    ContainerBoxRenderData(BoundingBox * const parentBoxT);
 protected:
     void drawSk(SkCanvas * const canvas);
     void transformRenderCanvas(SkCanvas& canvas) const final;

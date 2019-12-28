@@ -18,7 +18,12 @@
 #define TEXTBOX_H
 #include "Boxes/pathbox.h"
 #include "skia/skiaincludes.h"
+#include "../Animators/texteffectcollection.h"
 class QStringAnimator;
+
+enum class TextFragmentType : short {
+    letter, word, line, whole
+};
 
 class TextBox : public PathBox {
 public:
@@ -39,6 +44,11 @@ public:
     void setSelectedFontFamilyAndStyle(const QString &fontFamily,
                                        const QString &fontStyle);
 
+    stdsptr<BoxRenderData> createRenderData();
+    void setupRenderData(const qreal relFrame,
+                         BoxRenderData * const data,
+                         Canvas * const scene);
+
     qreal getFontSize();
     QString getFontFamily();
     QString getFontStyle();
@@ -46,18 +56,23 @@ public:
 
     void openTextEditor(QWidget* dialogParent);
 
-    void setTextAlignment(const Qt::Alignment &alignment) {
-        mAlignment = alignment;
-        planUpdate(UpdateReason::userChange);
-    }
+    void setTextAlignment(const Qt::Alignment &alignment);
 
     void setCurrentValue(const QString &text);
 private:
     Qt::Alignment mAlignment = Qt::AlignLeft;
     QFont mFont;
 
-    qsptr<QrealAnimator> mLinesDist;
+    qsptr<StaticComplexAnimator> mSpacingCont;
+    qsptr<QrealAnimator> mLetterSpacing;
+    qsptr<QrealAnimator> mWordSpacing;
+    qsptr<QrealAnimator> mLineSpacing;
+
     qsptr<QStringAnimator> mText;
+    qsptr<TextEffectCollection> mTextEffects;
+
+    TextFragmentType mFragmentsType;
+    QList<SkPath> mTextFragments;
 };
 
 #endif // TEXTBOX_H

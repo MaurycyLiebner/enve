@@ -25,6 +25,9 @@ public:
 
     virtual void writeIdentifier(eWriteStream& dst) const = 0;
 
+    bool SWT_isTextEffect() const final
+    { return true; }
+
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 

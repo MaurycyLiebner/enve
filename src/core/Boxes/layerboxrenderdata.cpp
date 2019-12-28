@@ -17,8 +17,8 @@
 #include "layerboxrenderdata.h"
 #include "skia/skqtconversions.h"
 
-ContainerBoxRenderData::ContainerBoxRenderData(BoundingBox * const parentBoxT) :
-    BoxRenderData(parentBoxT) {
+ContainerBoxRenderData::ContainerBoxRenderData(BoundingBox * const parentBox) :
+    BoxRenderData(parentBox) {
     mDelayDataSet = true;
 }
 
@@ -29,14 +29,14 @@ void ContainerBoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {
 #include "pointhelpers.h"
 void ContainerBoxRenderData::updateRelBoundingRect() {
     fRelBoundingRect = QRectF();
-    const auto invTrans = fTransform.inverted();
+    const auto invTrans = fTotalTransform.inverted();
     for(const auto &child : fChildrenRenderData) {
         QPointF tl = child->fRelBoundingRect.topLeft();
         QPointF tr = child->fRelBoundingRect.topRight();
         QPointF br = child->fRelBoundingRect.bottomRight();
         QPointF bl = child->fRelBoundingRect.bottomLeft();
 
-        const auto trans = child->fTransform*invTrans;
+        const auto trans = child->fTotalTransform*invTrans;
 
         tl = trans.map(tl);
         tr = trans.map(tr);

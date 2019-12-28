@@ -53,3 +53,16 @@ void RasterEffect::prp_setupTreeViewMenu(PropertyMenu * const menu) {
 QMimeData *RasterEffect::SWT_createMimeData() {
     return new eMimeData(QList<RasterEffect*>() << this);
 }
+
+void RasterEffect::switchInstanceHwSupport() {
+    if(mTypeHwSupport == HardwareSupport::cpuOnly) return;
+    if(mTypeHwSupport == HardwareSupport::gpuOnly) return;
+    if(mInstHwSupport == HardwareSupport::cpuOnly) {
+        if(mHwInterchangeable) mInstHwSupport = mTypeHwSupport;
+        else mInstHwSupport = HardwareSupport::gpuOnly;
+    } else if(mInstHwSupport == HardwareSupport::gpuOnly) {
+        mInstHwSupport = HardwareSupport::cpuOnly;
+    } else mInstHwSupport = HardwareSupport::gpuOnly;
+    if(!mHwInterchangeable) prp_afterWholeInfluenceRangeChanged();
+    emit hardwareSupportChanged();
+}

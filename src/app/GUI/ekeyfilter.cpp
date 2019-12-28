@@ -57,7 +57,7 @@ eKeyFilter *eKeyFilter::sCreateNumberFilter(MainWindow * const window) {
 bool eKeyFilter::eventFilter(QObject *watched, QEvent *event) {
     Q_UNUSED(watched)
     if(event->type() == QEvent::KeyPress ||
-            event->type() == QEvent::KeyRelease) {
+       event->type() == QEvent::KeyRelease) {
         const auto kEvent = static_cast<QKeyEvent*>(event);
         if(mAllow(kEvent->key())) return false;
         if(mMainWindow->processKeyEvent(kEvent)) return true;

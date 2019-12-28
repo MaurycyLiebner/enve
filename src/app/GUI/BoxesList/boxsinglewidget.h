@@ -85,7 +85,6 @@ public:
         mSelected = selected;
         update();
     }
-    bool isTargetDisabled();
 protected:
     bool mSelected = false;
     void mousePressEvent(QMouseEvent *e);

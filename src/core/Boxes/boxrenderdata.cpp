@@ -33,7 +33,8 @@ void BoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {
 
 void BoxRenderData::copyFrom(BoxRenderData *src) {
     fRelTransform = src->fRelTransform;
-    fTransform = src->fTransform;
+    fInheritedTransform = src->fInheritedTransform;
+    fTotalTransform = src->fTotalTransform;
     fRelFrame = src->fRelFrame;
     fRelBoundingRect = src->fRelBoundingRect;
     fRenderTransform = src->fRenderTransform;
@@ -112,7 +113,7 @@ void BoxRenderData::processGpu(QGL33 * const gl,
         fRenderedImage = fRenderedImage->makeRasterImage();
     else mEffectsRenderer.processGpu(gl, context, this);
 }
-
+#include "textboxrenderdata.h"
 void BoxRenderData::process() {
     if(mStep == Step::EFFECTS) return;
     updateGlobalRect();
@@ -133,6 +134,10 @@ void BoxRenderData::process() {
 
 void BoxRenderData::beforeProcessing(const Hardware hw) {
     if(mStep == Step::EFFECTS) {
+        if(!fRenderedImage) {
+            finishedProcessing();
+            return;
+        }
         if(hw == Hardware::cpu) {
             mState = eTaskState::waiting;
             mEffectsRenderer.processCpu(this);
@@ -141,6 +146,7 @@ void BoxRenderData::beforeProcessing(const Hardware hw) {
     }
     setupRenderData();
     if(!mDataSet) dataSet();
+    if(isZero4Dec(fOpacity)) finishedProcessing();
 }
 
 void BoxRenderData::afterProcessing() {
@@ -182,9 +188,9 @@ void BoxRenderData::dataSet() {
     if(!fParentBox || !fParentIsTarget) return;
     fParentBox->updateCurrentPreviewDataFromRenderData(this);
 }
-
+#include "Boxes/textboxrenderdata.h"
 void BoxRenderData::updateGlobalRect() {
-    fScaledTransform = fTransform*fResolutionScale;
+    fScaledTransform = fTotalTransform*fResolutionScale;
     QRectF baseRectF = fScaledTransform.mapRect(fRelBoundingRect);
     for(const QRectF &rectT : fOtherGlobalRects) {
         baseRectF = baseRectF.united(rectT);

@@ -146,12 +146,10 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
             if(static_cast<SingleSound*>(target)->isVisible()) {
                 return BoxSingleWidget::UNMUTED_PIXMAP;
             } else return BoxSingleWidget::MUTED_PIXMAP;
-        } else if(target->SWT_isRasterEffect()) {
-            if(static_cast<RasterEffect*>(target)->isVisible()) {
-                return BoxSingleWidget::VISIBLE_PIXMAP;
-            } else return BoxSingleWidget::INVISIBLE_PIXMAP;
-        } else if(target->SWT_isPathEffect()) {
-            if(static_cast<PathEffect*>(target)->isVisible()) {
+        } else if(target->SWT_isRasterEffect() ||
+                  target->SWT_isPathEffect() ||
+                  target->SWT_isTextEffect()) {
+            if(static_cast<eEffect*>(target)->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
             } else return BoxSingleWidget::INVISIBLE_PIXMAP;
         } else if(target->SWT_isGraphAnimator()) {
@@ -181,6 +179,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
             this, &BoxSingleWidget::switchBoxLockedAction);
 
     mHwSupportButton = new PixmapActionButton(this);
+    // mHwSupportButton->setToolTip(gSingleLineTooltip("GPU/CPU Processing"));
     mHwSupportButton->setPixmapChooser([this]() {
         if(!mTarget) return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
@@ -220,6 +219,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mColorButton->setContentsMargins(0, 3, 0, 3);
 
     mPropertyComboBox = new QComboBox(this);
+    mPropertyComboBox->setFocusPolicy(Qt::NoFocus);
     connect(mPropertyComboBox, qOverload<int>(&QComboBox::activated),
             this, [this](const int id) {
         if(!mTarget) return;
@@ -353,6 +353,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                                target->SWT_isSound() ||
                                target->SWT_isPathEffect() ||
                                target->SWT_isRasterEffect() ||
+                               target->SWT_isTextEffect() ||
                                target->SWT_isGraphAnimator());
     mLockedButton->setVisible(target->SWT_isBoundingBox());
     mHwSupportButton->setVisible(target->SWT_isRasterEffect());
@@ -462,7 +463,15 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         connect(static_cast<Animator*>(target), &Animator::anim_isRecordingChanged,
                 this, [this]() { mRecordButton->update(); });
     }
-    if(target->SWT_isPathEffect() || target->SWT_isRasterEffect()) {
+    if(target->SWT_isPathEffect() ||
+       target->SWT_isRasterEffect() ||
+       target->SWT_isTextEffect()) {
+        if(target->SWT_isRasterEffect()) {
+            const auto effect = static_cast<RasterEffect*>(target);
+            connect(effect, &RasterEffect::hardwareSupportChanged,
+                    this, [this]() { mHwSupportButton->update(); });
+        }
+
         const auto effTarget = static_cast<eEffect*>(target);
         connect(effTarget, &eEffect::effectVisibilityChanged,
                 this, [this]() { mVisibleButton->update(); });
@@ -533,7 +542,6 @@ void BoxSingleWidget::clearStaticPixmaps() {
 
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     if(!mTarget) return;
-    if(isTargetDisabled()) return;
     if(event->x() < mFillWidget->x() ||
        event->x() > mFillWidget->x() + mFillWidget->width()) return;
     const auto target = mTarget->getTarget();
@@ -562,15 +570,10 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     Document::sInstance->actionFinished();
 }
 
-bool BoxSingleWidget::isTargetDisabled() {
-    if(!mTarget) return true;
-    return mTarget->getTarget()->SWT_isDisabled();
-}
-
 void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
+    if(!mTarget) return;
     if(!mDragPressPos) return;
     if(!(event->buttons() & Qt::LeftButton)) return;
-    if(isTargetDisabled()) return;
     const auto dist = (event->pos() - mDragStartPos).manhattanLength();
     if(dist < QApplication::startDragDistance()) return;
     const auto drag = new QDrag(this);
@@ -594,7 +597,7 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
-    if(isTargetDisabled()) return;
+    if(!mTarget) return;
     if(event->x() < mFillWidget->x() ||
        event->x() > mFillWidget->x() + mFillWidget->width()) return;
     setSelected(false);
@@ -612,7 +615,7 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e) {
-    if(isTargetDisabled()) return;
+    if(!mTarget) return;
     if(e->modifiers() & Qt::ShiftModifier) {
         //mousePressEvent(e);
     } else Document::sInstance->actionFinished();
@@ -734,6 +737,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             }
         } else nameX += MIN_WIDGET_DIM;
 
+        if(!target->SWT_isAnimator()) nameX += MIN_WIDGET_DIM;
         p.setPen(Qt::white);
     } else { //if(target->SWT_isComplexAnimator()) {
         p.setPen(Qt::white);
@@ -773,10 +777,10 @@ void BoxSingleWidget::switchBoxVisibleAction() {
     if(!target) return;
     if(target->SWT_isBoundingBox() || target->SWT_isSound()) {
         static_cast<eBoxOrSound*>(target)->switchVisible();
-    } else if(target->SWT_isRasterEffect()) {
-        static_cast<RasterEffect*>(target)->switchVisible();
-    } else if(target->SWT_isPathEffect()) {
-        static_cast<PathEffect*>(target)->switchVisible();
+    } else if(target->SWT_isRasterEffect() ||
+              target->SWT_isPathEffect() ||
+              target->SWT_isTextEffect()) {
+        static_cast<eEffect*>(target)->switchVisible();
     } else if(target->SWT_isGraphAnimator()) {
         const auto bsvt = static_cast<BoxScroller*>(mParent);
         const auto keysView = bsvt->getKeysView();

@@ -87,6 +87,7 @@ SOURCES += \
     Animators/qstringanimator.cpp \
     Animators/rastereffectanimators.cpp \
     Animators/staticcomplexanimator.cpp \
+    Animators/texteffectcollection.cpp \
     Boxes/animationbox.cpp \
     Boxes/boundingbox.cpp \
     Boxes/boxrendercontainer.cpp \
@@ -114,6 +115,7 @@ SOURCES += \
     Boxes/renderdatahandler.cpp \
     Boxes/smartvectorpath.cpp \
     Boxes/textbox.cpp \
+    Boxes/textboxrenderdata.cpp \
     Boxes/videobox.cpp \
     Boxes/waitingforboxload.cpp \
     CacheHandlers/cachecontainer.cpp \
@@ -251,6 +253,8 @@ SOURCES += \
     Animators/key.cpp \
     Animators/boolanimator.cpp \
     switchablecontext.cpp \
+    texteffect.cpp \
+    texteffectcaller.cpp \
     undoredo.cpp \
     exceptions.cpp \
     glhelpers.cpp \
@@ -330,6 +334,7 @@ HEADERS += \
     Animators/qstringanimator.h \
     Animators/rastereffectanimators.h \
     Animators/staticcomplexanimator.h \
+    Animators/texteffectcollection.h \
     Boxes/animationbox.h \
     Boxes/boundingbox.h \
     Boxes/boxrendercontainer.h \
@@ -358,6 +363,7 @@ HEADERS += \
     Boxes/renderdatahandler.h \
     Boxes/smartvectorpath.h \
     Boxes/textbox.h \
+    Boxes/textboxrenderdata.h \
     Boxes/videobox.h \
     Boxes/waitingforboxload.h \
     CacheHandlers/cachecontainer.h \
@@ -507,6 +513,8 @@ HEADERS += \
     Animators/intanimator.h \
     Animators/boolanimator.h \
     switchablecontext.h \
+    texteffect.h \
+    texteffectcaller.h \
     undoredo.h \
     exceptions.h \
     glhelpers.h \

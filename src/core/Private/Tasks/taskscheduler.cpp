@@ -206,7 +206,7 @@ bool TaskScheduler::processNextQuedGpuTask() {
             processNextTasks();
             return true;
         }
-        const int additional = mQuedCpuTasks.taskCount()/(mCpuExecutors.count()*10);
+        const int additional = mQuedCpuTasks.taskCount()/mCpuExecutors.count();
         scheduleGpuTask(task);
         for(int i = 0; i < additional; i++) {
             const auto iTask = mQuedCpuTasks.takeQuedForGpuProcessing();
@@ -236,7 +236,7 @@ void TaskScheduler::afterCpuGpuTaskFinished() {
 }
 
 void TaskScheduler::processNextQuedCpuTask() {
-    const int additional = mQuedCpuTasks.taskCount()/(mCpuExecutors.count()*4);
+    const int additional = mQuedCpuTasks.taskCount()/mCpuExecutors.count();
     while(availableCpuThreads() > 0 && !mQuedCpuTasks.isEmpty()) {
         const auto task = mQuedCpuTasks.takeQuedForCpuProcessing();
         if(task) {

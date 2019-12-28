@@ -35,7 +35,9 @@ void ShaderEffect::writeIdentifier(eWriteStream& dst) const {
 }
 
 stdsptr<RasterEffectCaller> ShaderEffect::getEffectCaller(
-        const qreal relFrame, const qreal resolution) const {
+        const qreal relFrame, const qreal resolution,
+        const qreal influence) const {
+    Q_UNUSED(influence)
     const auto effect = enve::make_shared<ShaderEffectCaller>(*mProgram);
     QJSEngine& engine = effect->getJSEngine();
 

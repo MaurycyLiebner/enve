@@ -307,7 +307,11 @@ bool TimelineDockWidget::processKeyPress(QKeyEvent *event) {
     const CanvasMode mode = mDocument.fCanvasMode;
     const int key = event->key();
     const auto mods = event->modifiers();
-    if(key == Qt::Key_Space) {
+    if(key == Qt::Key_Escape) {
+        const auto state = RenderHandler::sInstance->currentPreviewState();
+        if(state == PreviewSate::stopped) return false;
+        interruptPreview();
+    } else if(key == Qt::Key_Space) {
         const auto state = RenderHandler::sInstance->currentPreviewState();
         switch(state) {
             case PreviewSate::stopped: renderPreview(); break;

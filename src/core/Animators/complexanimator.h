@@ -128,6 +128,9 @@ public:
 
     void ca_addDescendantsKey(Key * const key);
     void ca_removeDescendantsKey(Key * const key);
+
+    void ca_setHiddenWhenEmpty(const bool hidden);
+    void ca_setDisabledWhenEmpty(const bool disabled);
 signals:
     void ca_childAdded(Property*);
     void ca_childRemoved(Property*);
@@ -148,9 +151,6 @@ protected:
     void ca_replaceChild(const qsptr<Property> &child,
                          const qsptr<Property>& replaceWith);
 
-
-    void ca_setHiddenWhenEmpty();
-    void ca_setDisabledWhenEmpty(const bool disabled);
     const QList<qsptr<Property>>& ca_getChildren() const
     { return ca_mChildren; }
 private:

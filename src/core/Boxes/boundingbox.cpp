@@ -44,7 +44,7 @@ QList<BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 BoundingBox::BoundingBox(const eBoxType type) : eBoxOrSound("box"),
     mDocumentId(sNextDocumentId++), mType(type),
     mTransformAnimator(enve::make_shared<BoxTransformAnimator>()),
-    mRasterEffectsAnimators(enve::make_shared<RasterEffectAnimators>(this)) {
+    mRasterEffectsAnimators(enve::make_shared<RasterEffectAnimators>()) {
     sDocumentBoxes << this;
     ca_addChild(mTransformAnimator);
     const auto pivotAnim = mTransformAnimator->getPivotAnimator();
@@ -616,7 +616,8 @@ void BoundingBox::setupRenderData(const qreal relFrame,
     data->fBoxStateId = mStateId;
     data->fRelFrame = qRound(relFrame);
     data->fRelTransform = getRelativeTransformAtFrame(relFrame);
-    data->fTransform = getTotalTransformAtFrame(relFrame);
+    data->fInheritedTransform = getInheritedTransformAtFrame(relFrame);
+    data->fTotalTransform = getTotalTransformAtFrame(relFrame);
     data->fResolution = scene->getResolutionFraction();
     data->fResolutionScale.reset();
     data->fResolutionScale.scale(data->fResolution, data->fResolution);
@@ -741,6 +742,12 @@ QMatrix BoundingBox::getRelativeTransformAtFrame(const qreal relFrame) {
     if(isZero6Dec(relFrame - anim_getCurrentRelFrame()))
         return mTransformAnimator->getRelativeTransform();
     return mTransformAnimator->getRelativeTransformAtFrame(relFrame);
+}
+
+QMatrix BoundingBox::getInheritedTransformAtFrame(const qreal relFrame) {
+    if(isZero6Dec(relFrame - anim_getCurrentRelFrame()))
+        return mTransformAnimator->getInheritedTransform();
+    return mTransformAnimator->getInheritedTransformAtFrame(relFrame);
 }
 
 QMatrix BoundingBox::getTotalTransformAtFrame(const qreal relFrame) {

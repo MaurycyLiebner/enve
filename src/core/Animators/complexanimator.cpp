@@ -40,21 +40,16 @@ void ComplexAnimator::ca_replaceChild(const qsptr<Property>& child,
     ca_insertChild(replaceWith, id);
 }
 
-void ComplexAnimator::ca_setHiddenWhenEmpty() {
-    if(ca_mHiddenEmpty) return;
-    ca_mHiddenEmpty = true;
-    if(!ca_hasChildren()) {
-        SWT_setEnabled(false);
-        SWT_setVisible(false);
-    }
+void ComplexAnimator::ca_setHiddenWhenEmpty(const bool hidden) {
+    if(ca_mHiddenEmpty == hidden) return;
+    ca_mHiddenEmpty = hidden;
+    SWT_setVisible(ca_hasChildren() || !hidden);
 }
 
 void ComplexAnimator::ca_setDisabledWhenEmpty(const bool disabled) {
     if(ca_mDisabledEmpty == disabled) return;
     ca_mDisabledEmpty = disabled;
-    if(ca_mDisabledEmpty && !ca_hasChildren()) {
-        SWT_setEnabled(false);
-    } else SWT_setEnabled(true);
+    SWT_setEnabled(!ca_mDisabledEmpty || ca_hasChildren());
 }
 
 int ComplexAnimator::ca_getNumberOfChildren() const {
@@ -109,8 +104,8 @@ void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
         return ca_moveChildInList(child.get(), (cId < id ? id - 1 : id));
     }
 
-    if(ca_mDisabledEmpty && !ca_hasChildren()) {
-        SWT_setEnabled(true);
+    if(!ca_hasChildren()) {
+        if(ca_mDisabledEmpty) SWT_setEnabled(true);
         if(ca_mHiddenEmpty) SWT_setVisible(true);
     }
 
@@ -237,8 +232,8 @@ void ComplexAnimator::ca_removeChild(const qsptr<Property> child) {
         prp_afterChangedAbsRange(changedRange);
     }
 
-    if(ca_mDisabledEmpty && !ca_hasChildren()) {
-        SWT_setEnabled(false);
+    if(!ca_hasChildren()) {
+        if(ca_mDisabledEmpty) SWT_setEnabled(false);
         if(ca_mHiddenEmpty) SWT_setVisible(false);
     }
 

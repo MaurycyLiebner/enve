@@ -139,9 +139,8 @@ stdsptr<eTask> TaskQue::takeQuedForGpuProcessing() {
     }
     for(int i = 0; i < mCpuPreffered.count(); i++) {
         const auto& task = mCpuPreffered.at(i);
-        if(!task->readyToBeProcessed()) continue;
-        if(task->hardwareSupport() == HardwareSupport::cpuOnly) continue;
-        return mCpuPreffered.takeAt(i);
+        if(task->readyToBeProcessed())
+            return mCpuPreffered.takeAt(i);
     }
     return nullptr;
 }

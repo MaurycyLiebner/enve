@@ -18,15 +18,46 @@
 #include "RasterEffects/rastereffect.h"
 #include "Boxes/boundingbox.h"
 #include "Boxes/containerbox.h"
+#include "RasterEffects/rastereffectsinclude.h"
+#include "RasterEffects/customrastereffectcreator.h"
 
-RasterEffectAnimators::RasterEffectAnimators(BoundingBox * const parentBox) :
-    RasterEffectAnimatorsBase("raster effects"), mParentBox_k(parentBox) {
-    ca_setHiddenWhenEmpty();
+RasterEffectAnimators::RasterEffectAnimators() :
+    RasterEffectAnimatorsBase("raster effects") {
+    ca_setHiddenWhenEmpty(true);
 
     connect(this, &ComplexAnimator::ca_childAdded,
             this, &RasterEffectAnimators::updateMaxForcedMargin);
     connect(this, &ComplexAnimator::ca_childRemoved,
             this, &RasterEffectAnimators::updateMaxForcedMargin);
+}
+
+template <typename T>
+void addRasterEffectActionToMenu(const QString& text,
+                                 PropertyMenu * const menu) {
+    menu->addPlainAction<RasterEffectAnimators>(
+                text, [](RasterEffectAnimators * target) {
+        target->addChild(enve::make_shared<T>());
+    });
+}
+
+void RasterEffectAnimators::prp_setupTreeViewMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<RasterEffectAnimators>()) return;
+    menu->addedActionsForType<RasterEffectAnimators>();
+    const auto rasterEffectsMenu = menu->addMenu("Add Effect");
+    addRasterEffectActionToMenu<BlurEffect>("Blur", rasterEffectsMenu);
+    addRasterEffectActionToMenu<ShadowEffect>("Shadow", rasterEffectsMenu);
+    CustomRasterEffectCreator::sAddToMenu(rasterEffectsMenu, &BoundingBox::addRasterEffect);
+    if(!rasterEffectsMenu->isEmpty()) rasterEffectsMenu->addSeparator();
+    for(const auto& creator : ShaderEffectCreator::sEffectCreators) {
+        const PropertyMenu::PlainSelectedOp<RasterEffectAnimators> op =
+        [creator](RasterEffectAnimators * target) {
+            const auto effect = creator->create();
+            target->addChild(qSharedPointerCast<RasterEffect>(effect));
+        };
+        rasterEffectsMenu->addPlainAction(creator->fName, op);
+    }
+    menu->addSeparator();
+    RasterEffectAnimatorsBase::prp_setupTreeViewMenu(menu);
 }
 
 void RasterEffectAnimators::updateMaxForcedMargin() {
@@ -54,20 +85,18 @@ void RasterEffectAnimators::updateMaxForcedMargin() {
 
     mMaxForcedMargin = newMargins;
 
-    if(changed && mParentBox_k->SWT_isLayerBox()) {
-        const auto cont = static_cast<ContainerBox*>(mParentBox_k);
-        cont->forcedMarginMeaningfulChange();
-    }
+    if(changed) forcedMarginChanged();
 }
 
 void RasterEffectAnimators::addEffects(const qreal relFrame,
-                                       BoxRenderData * const data) {
+                                       BoxRenderData * const data,
+                                       const qreal influence) {
     const auto& children = ca_getChildren();
     for(const auto& effect : children) {
         auto rasterEffect = static_cast<RasterEffect*>(effect.get());
         if(rasterEffect->isVisible()) {
-            const auto effectRenderData =
-                    rasterEffect->getEffectCaller(relFrame, data->fResolution);
+            const auto effectRenderData = rasterEffect->getEffectCaller(
+                        relFrame, data->fResolution, influence);
             if(!effectRenderData) continue;
             data->addEffect(effectRenderData);
         }

@@ -83,7 +83,8 @@ public:
     DabTest000();
 
     stdsptr<RasterEffectCaller> getEffectCaller(
-            const qreal relFrame, const qreal resolution) const;
+            const qreal relFrame, const qreal resolution,
+            const qreal influence) const;
 
     CustomIdentifier getIdentifier() const;
 private:

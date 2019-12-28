@@ -129,8 +129,10 @@ public:
     virtual bool SWT_isComplexAnimator() const { return false; }
     virtual bool SWT_isRasterEffectAnimators() const { return false; }
     virtual bool SWT_isPathEffectAnimators() const { return false; }
+    virtual bool SWT_isTextEffectCollection() const { return false; }
     virtual bool SWT_isRasterEffect() const { return false; }
     virtual bool SWT_isPathEffect() const { return false; }
+    virtual bool SWT_isTextEffect() const { return false; }
     virtual bool SWT_isIntAnimator() const { return false; }
     virtual bool SWT_isGradient() const { return false; }
     virtual bool SWT_isFillSettingsAnimator() const { return false; }

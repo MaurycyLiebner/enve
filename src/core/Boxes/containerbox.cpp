@@ -30,6 +30,9 @@ ContainerBox::ContainerBox(const eBoxType type) :
     BoxWithPathEffects(type) {
     if(type == eBoxType::TYPE_GROUP) prp_setName("Group");
     else if(type == eBoxType::TYPE_LAYER) prp_setName("Layer");
+    connect(mRasterEffectsAnimators.get(),
+            &RasterEffectAnimators::forcedMarginChanged,
+            this, &ContainerBox::forcedMarginMeaningfulChange);
     iniPathEffects();
 }
 

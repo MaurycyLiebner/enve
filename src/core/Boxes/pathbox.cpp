@@ -143,7 +143,7 @@ void PathBox::setupRenderData(const qreal relFrame,
     if(currentOutlinePathCompatible) {
         pathData->fOutlinePath = mOutlinePathSk;
     } else {
-        mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &pathData->fStroker);
+        setupStrokerSettings(pathData, relFrame);
 
         if(scene->getPathEffectsVisible()) {
             addOutlineBaseEffects(relFrame, outlineBaseEffects);
@@ -171,6 +171,43 @@ void PathBox::setupRenderData(const qreal relFrame,
         data->fRelBoundingRectSet = true;
         data->fRelBoundingRect = mRelRect;
     }
+    setupPaintSettings(pathData, relFrame);
+}
+
+void PathBox::setupPathEffects(PathBoxRenderData * const pathData,
+                               const qreal relFrame,
+                               Canvas* const scene) {
+    QList<stdsptr<PathEffectCaller>> pathEffects;
+    QList<stdsptr<PathEffectCaller>> fillEffects;
+    QList<stdsptr<PathEffectCaller>> outlineBaseEffects;
+    QList<stdsptr<PathEffectCaller>> outlineEffects;
+
+    if(scene->getPathEffectsVisible()) {
+        addPathEffects(relFrame, pathEffects);
+        addFillEffects(relFrame, fillEffects);
+        addOutlineBaseEffects(relFrame, outlineBaseEffects);
+        addOutlineEffects(relFrame, outlineEffects);
+    }
+
+    if(!pathEffects.isEmpty() || !fillEffects.isEmpty() ||
+       !outlineBaseEffects.isEmpty() || !outlineEffects.isEmpty()) {
+        const auto pathTask = enve::make_shared<PathEffectsTask>(
+                    pathData, std::move(pathEffects), std::move(fillEffects),
+                    std::move(outlineBaseEffects), std::move(outlineEffects));
+        pathTask->addDependent(pathData);
+        pathData->delayDataSet();
+        pathTask->queTask();
+    }
+}
+
+void PathBox::setupStrokerSettings(PathBoxRenderData * const pathData,
+                                   const qreal relFrame) {
+    mStrokeSettings->setStrokerSettingsForRelFrameSk(
+                relFrame, &pathData->fStroker);
+}
+
+void PathBox::setupPaintSettings(PathBoxRenderData * const pathData,
+                                 const qreal relFrame) {
 
     UpdatePaintSettings &fillSettings = pathData->fPaintSettings;
 
@@ -449,15 +486,17 @@ void PathBox::updateDrawGradients() {
 
 void PathBox::updateCurrentPreviewDataFromRenderData(
         BoxRenderData* renderData) {
-    auto pathRenderData = static_cast<PathBoxRenderData*>(renderData);
-    mCurrentPathsFrame = renderData->fRelFrame;
-    mEditPathSk = pathRenderData->fEditPath;
-    mPathSk = pathRenderData->fPath;
-    mOutlinePathSk = pathRenderData->fOutlinePath;
-    mFillPathSk = pathRenderData->fFillPath;
-    mCurrentPathsOutdated = false;
-    mCurrentOutlinePathOutdated = false;
-    mCurrentFillPathOutdated = false;
+    const auto pathRenderData = dynamic_cast<PathBoxRenderData*>(renderData);
+    if(pathRenderData) {
+        mCurrentPathsFrame = renderData->fRelFrame;
+        mEditPathSk = pathRenderData->fEditPath;
+        mPathSk = pathRenderData->fPath;
+        mOutlinePathSk = pathRenderData->fOutlinePath;
+        mFillPathSk = pathRenderData->fFillPath;
+        mCurrentPathsOutdated = false;
+        mCurrentOutlinePathOutdated = false;
+        mCurrentFillPathOutdated = false;
+    }
 
     BoundingBox::updateCurrentPreviewDataFromRenderData(renderData);
 }

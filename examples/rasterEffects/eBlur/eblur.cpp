@@ -62,9 +62,9 @@ eBlur::eBlur() : CustomRasterEffect(eName().toLower(),
             this, &CustomRasterEffect::forcedMarginChanged);
 }
 
-stdsptr<RasterEffectCaller> eBlur::getEffectCaller(const qreal relFrame,
-                                                   const qreal resolution) const {
-    const qreal radius = mRadius->getEffectiveValue(relFrame)*resolution;
+stdsptr<RasterEffectCaller> eBlur::getEffectCaller(
+        const qreal relFrame, const qreal resolution, const qreal influence) const {
+    const qreal radius = mRadius->getEffectiveValue(relFrame)*resolution*influence;
     if(isZero4Dec(radius)) return nullptr;
     return enve::make_shared<eBlurCaller>(instanceHwSupport(), radius);
 }

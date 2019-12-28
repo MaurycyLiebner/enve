@@ -14,23 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef STATICCOMPLEXANIMATOR_H
-#define STATICCOMPLEXANIMATOR_H
-#include "complexanimator.h"
+#ifndef TEXTEFFECTCOLLECTION_H
+#define TEXTEFFECTCOLLECTION_H
 
-class StaticComplexAnimator : public ComplexAnimator {
+#include "Animators/dynamiccomplexanimator.h"
+
+#include "texteffect.h"
+
+class TextEffectCollection : public DynamicComplexAnimator<TextEffect> {
+    e_OBJECT
+protected:
+    TextEffectCollection();
 public:
-    StaticComplexAnimator(const QString &name);
+    bool SWT_isTextEffectCollection() const final
+    { return true; }
 
-    void prp_writeProperty(eWriteStream& dst) const;
-    void prp_readProperty(eReadStream& src);
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
-    using ComplexAnimator::ca_addChild;
-private:
-    using ComplexAnimator::ca_removeAllChildren;
-    using ComplexAnimator::ca_removeChild;
-    using ComplexAnimator::ca_replaceChild;
-    using ComplexAnimator::ca_takeChildAt;
+    bool hasEffects()
+    { return ca_hasChildren(); }
+
+    void addEffects(QList<TextEffect*>& list) const;
 };
 
-#endif // STATICCOMPLEXANIMATOR_H
+#endif // TEXTEFFECTCOLLECTION_H

@@ -29,29 +29,32 @@ typedef DynamicComplexAnimator<
     &readIdCreateRasterEffect> RasterEffectAnimatorsBase;
 class RasterEffectAnimators : public RasterEffectAnimatorsBase {
     e_OBJECT
+    Q_OBJECT
 protected:
-    RasterEffectAnimators(BoundingBox * const parentBox);
+    RasterEffectAnimators();
 public:
     bool SWT_isRasterEffectAnimators() const { return true; }
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
-    BoundingBox *getParentBox() { return mParentBox_k; }
     bool hasEffects();
 
     void addEffects(const qreal relFrame,
-                    BoxRenderData * const data);
+                    BoxRenderData * const data,
+                    const qreal influence = 1);
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program);
     //void readRasterEffect(QIODevice *target);
     const QMargins& getMaxForcedMargin() const {
         return mMaxForcedMargin;
     }
+signals:
+    void forcedMarginChanged();
 private:
     void updateMaxForcedMargin();
 
     QMargins mMaxForcedMargin;
 
     bool mUnbound = false;
-    BoundingBox * const mParentBox_k;
 };
 
 #endif // RasterEffectANIMATORS_H

@@ -54,7 +54,7 @@ void RenderContainer::clear() {
 }
 
 void RenderContainer::setSrcRenderData(BoxRenderData * const data) {
-    mTransform = data->fTransform;
+    mTransform = data->fTotalTransform;
     mResolutionFraction = data->fResolution;
     mImageSk = data->fRenderedImage;
     mGlobalRect = data->fGlobalRect;

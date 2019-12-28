@@ -60,13 +60,16 @@ public:
     QrealSnapshot(const qreal currentValue) :
         QrealSnapshot(currentValue, 1, 1) {}
     QrealSnapshot(const qreal currentValue,
-             const qreal frameMultiplier,
-             const qreal valueMultiplier) :
+                  const qreal frameMultiplier,
+                  const qreal valueMultiplier) :
         mCurrentValue(currentValue*valueMultiplier),
         mFrameMultiplier(frameMultiplier),
         mValueMultiplier(valueMultiplier) {}
 
     void appendKey(const QrealKey * const key);
+    void appendKey(const qreal c0Frame, const qreal c0Value,
+                   const qreal pFrame, const qreal pValue,
+                   const qreal c1Frame, const qreal c1Value);
 
     qreal getValue(const qreal relFrame) const;
 protected:

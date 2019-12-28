@@ -23,7 +23,7 @@
 
 PathEffectAnimators::PathEffectAnimators() :
     PathEffectAnimatorsBase("path effects") {
-    ca_setHiddenWhenEmpty();
+    ca_setHiddenWhenEmpty(true);
 }
 
 bool PathEffectAnimators::hasEffects() {

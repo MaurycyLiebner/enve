@@ -38,7 +38,8 @@ protected:
                  const RasterEffectType type);
 public:
     virtual stdsptr<RasterEffectCaller> getEffectCaller(
-            const qreal relFrame, const qreal resolution) const = 0;
+            const qreal relFrame, const qreal resolution,
+            const qreal influence) const = 0;
 
     virtual bool forceMargin() const { return false; }
     virtual QMargins getMargin() const { return QMargins(); }
@@ -55,18 +56,9 @@ public:
         return mInstHwSupport;
     }
 
-    void switchInstanceHwSupport() {
-        if(mTypeHwSupport == HardwareSupport::cpuOnly) return;
-        if(mTypeHwSupport == HardwareSupport::gpuOnly) return;
-        if(mInstHwSupport == HardwareSupport::cpuOnly) {
-            if(mHwInterchangeable) mInstHwSupport = mTypeHwSupport;
-            else mInstHwSupport = HardwareSupport::gpuOnly;
-        } else if(mInstHwSupport == HardwareSupport::gpuOnly) {
-            mInstHwSupport = HardwareSupport::cpuOnly;
-        } else mInstHwSupport = HardwareSupport::gpuOnly;
-        if(!mHwInterchangeable) prp_afterWholeInfluenceRangeChanged();
-    }
+    void switchInstanceHwSupport();
 signals:
+    void hardwareSupportChanged();
     void forcedMarginChanged();
 private:
     const RasterEffectType mType;

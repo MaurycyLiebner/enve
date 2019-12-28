@@ -275,6 +275,7 @@ bool KeysView::KFT_keyPressEvent(QKeyEvent *event) {
     if(inputHandled) {
         handleMouseMove(mLastMovePos, QApplication::mouseButtons());
     } else if(event->key() == Qt::Key_Escape) {
+        if(!mIsMouseGrabbing) return false;
         cancelTransform();
     } else if(event->key() == Qt::Key_Return ||
               event->key() == Qt::Key_Enter) {

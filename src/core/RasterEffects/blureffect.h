@@ -8,7 +8,8 @@ protected:
     BlurEffect();
 public:
     stdsptr<RasterEffectCaller> getEffectCaller(
-            const qreal relFrame, const qreal resolution) const;
+            const qreal relFrame, const qreal resolution,
+            const qreal influence) const;
     QMargins getMargin() const;
     bool forceMargin() const { return true; }
 private:

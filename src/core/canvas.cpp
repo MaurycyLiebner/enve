@@ -517,6 +517,7 @@ bool Canvas::handleTransormationInputKeyEvent(const KeyEvent &e) {
         updateTransformation(e);
         mStartTransform = false;
     } else if(e.fKey == Qt::Key_Escape) {
+        if(!e.fMouseGrabbing) return false;
         cancelCurrentTransform();
         e.fReleaseMouse();
     } else if(e.fKey == Qt::Key_Return ||

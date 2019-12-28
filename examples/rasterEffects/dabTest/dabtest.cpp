@@ -66,8 +66,8 @@ DabTest000::DabTest000() :
 }
 
 stdsptr<RasterEffectCaller> DabTest000::getEffectCaller(
-        const qreal relFrame, const qreal resolution) const {
-    const qreal radius = mRadius->getEffectiveValue(relFrame)*resolution;
+        const qreal relFrame, const qreal resolution, const qreal influence) const {
+    const qreal radius = mRadius->getEffectiveValue(relFrame)*resolution*influence;
     const qreal hardness = mHardness->getEffectiveValue(relFrame);
 
     Dab dab;

@@ -78,8 +78,9 @@ public:
 
     QMatrix fResolutionScale;
     QMatrix fScaledTransform;
+    QMatrix fInheritedTransform;
     QMatrix fRelTransform;
-    QMatrix fTransform;
+    QMatrix fTotalTransform;
     QMatrix fRenderTransform;
 
     bool fRelBoundingRectSet = false;

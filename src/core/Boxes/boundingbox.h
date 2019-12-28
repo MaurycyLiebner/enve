@@ -185,6 +185,7 @@ public:
 
     virtual QMatrix getRelativeTransformAtCurrentFrame();
     virtual QMatrix getRelativeTransformAtFrame(const qreal relFrame);
+    virtual QMatrix getInheritedTransformAtFrame(const qreal relFrame);
     virtual QMatrix getTotalTransformAtFrame(const qreal relFrame);
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
 

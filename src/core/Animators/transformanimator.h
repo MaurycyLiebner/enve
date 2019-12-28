@@ -26,14 +26,15 @@ class MovablePoint;
 class QPointFAnimator;
 
 class BasicTransformAnimator : public StaticComplexAnimator {
+    e_OBJECT
     Q_OBJECT
-    friend class SeflRef;
 protected:
     BasicTransformAnimator();
 public:
     virtual void reset();
     virtual QMatrix getCurrentTransform();
     virtual QMatrix getRelativeTransformAtFrame(const qreal relFrame);
+    virtual QMatrix getInheritedTransformAtFrame(const qreal relFrame);
     virtual QMatrix getTotalTransformAtFrame(const qreal relFrame);
 
     bool SWT_isBasicTransformAnimator() const;
@@ -60,9 +61,6 @@ public:
     void startRotTransform();
     void startPosTransform();
     void startScaleTransform();
-
-    qreal getYScale();
-    qreal getXScale();
 
     void setRelativePos(const QPointF &relPos);
     void setAbsolutePos(const QPointF &pos);
@@ -97,6 +95,9 @@ public:
                                     const QPointF &pivot);
 
     void updateRelativeTransform(const UpdateReason reason);
+    void updateInheritedTransform(const UpdateReason reason);
+
+    const QMatrix &getInheritedTransform() const;
     const QMatrix &getTotalTransform() const;
     const QMatrix &getRelativeTransform() const;
 
@@ -113,6 +114,7 @@ protected:
     QList<qsptr<BasicTransformAnimator>> mChildBoxes;
 
     QMatrix mRelTransform;
+    QMatrix mInheritedTransform;
     QMatrix mTotalTransform;
 
     qptr<BasicTransformAnimator> mParentTransform;
@@ -124,16 +126,14 @@ signals:
     void totalTransformChanged(const UpdateReason);
 };
 
-class BoxTransformAnimator : public BasicTransformAnimator {
+class AdvancedTransformAnimator : public BasicTransformAnimator {
     e_OBJECT
 protected:
-    BoxTransformAnimator();
+    AdvancedTransformAnimator();
 public:
     void reset();
-    QMatrix getCurrentTransform();
     QMatrix getRelativeTransformAtFrame(const qreal relFrame);
-
-    bool SWT_isBoxTransformAnimator() const { return true; }
+    QMatrix getCurrentTransform();
 
     void resetPivot();
     void setPivotFixedTransform(const QPointF &point);
@@ -149,7 +149,6 @@ public:
     void startOpacityTransform();
     void setOpacity(const qreal newOpacity);
 
-    MovablePoint *getPivotMovablePoint();
     void startPivotTransform();
     void finishPivotTransform();
     QPointF getPivotAbs();
@@ -171,10 +170,18 @@ public:
         return mOpacityAnimator.get();
     }
 private:
-    stdsptr<BoxPathPoint> mPivotPoint;
     qsptr<QPointFAnimator> mPivotAnimator;
     qsptr<QPointFAnimator> mShearAnimator;
     qsptr<QrealAnimator> mOpacityAnimator;
+};
+
+class BoxTransformAnimator : public AdvancedTransformAnimator {
+    e_OBJECT
+protected:
+    BoxTransformAnimator();
+public:
+    bool SWT_isBoxTransformAnimator() const { return true; }
+
 };
 
 #endif // TRANSFORMANIMATOR_H
