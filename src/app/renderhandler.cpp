@@ -135,6 +135,21 @@ void RenderHandler::nextCurrentRenderFrame() {
     else setFrameAction(mCurrentRenderFrame);
 }
 
+void RenderHandler::setPreviewState(const PreviewSate state) {
+    if(mPreviewSate == state) return;
+    if(mPreviewSate == PreviewSate::stopped) {
+        setRenderingPreview(true);
+    } else if(mPreviewSate == PreviewSate::rendering) {
+        setRenderingPreview(false);
+        if(state == PreviewSate::playing) {
+            setPreviewing(true);
+        }
+    } else if(state == PreviewSate::stopped) {
+        setPreviewing(false);
+    }
+    mPreviewSate = state;
+}
+
 void RenderHandler::renderPreview() {
     setCurrentScene(mDocument.fActiveScene);
     if(!mCurrentScene) return;
@@ -151,10 +166,10 @@ void RenderHandler::renderPreview() {
     mCurrentSoundComposition->setMinFrameUseRange(mCurrentRenderFrame);
 
     mMaxRenderFrame = mCurrentScene->getMaxFrame();
-    setRenderingPreview(true);
+
+    setPreviewState(PreviewSate::rendering);
 
     emit previewBeingRendered();
-    mPreviewSate = PreviewSate::rendering;
 
     if(TaskScheduler::sAllQuedCpuTasksFinished()) {
         nextPreviewRenderFrame();
@@ -173,52 +188,49 @@ void RenderHandler::outOfMemory() {
     }
 }
 
-void RenderHandler::setRenderingPreview(const bool bT) {
-    mRenderingPreview = bT;
-    if(mCurrentScene) mCurrentScene->setRenderingPreview(bT);
-    TaskScheduler::sInstance->setAlwaysQue(bT);
+void RenderHandler::setRenderingPreview(const bool rendering) {
+    mRenderingPreview = rendering;
+    if(mCurrentScene) mCurrentScene->setRenderingPreview(rendering);
+    TaskScheduler::sInstance->setAlwaysQue(rendering);
 }
 
-void RenderHandler::setPreviewing(const bool bT) {
-    mPreviewing = bT;
-    if(mCurrentScene) mCurrentScene->setPreviewing(bT);
-    TaskScheduler::sInstance->setAlwaysQue(bT);
+void RenderHandler::setPreviewing(const bool previewing) {
+    mPreviewing = previewing;
+    if(mCurrentScene) mCurrentScene->setPreviewing(previewing);
 }
 
 void RenderHandler::interruptPreviewRendering() {
-    setRenderingPreview(false);
     TaskScheduler::sClearAllFinishedFuncs();
-    clearPreview();
+    stopPreview();
 }
 
 void RenderHandler::interruptOutputRendering() {
     if(mCurrentScene) mCurrentScene->setOutputRendering(false);
     TaskScheduler::sInstance->setAlwaysQue(false);
     TaskScheduler::sClearAllFinishedFuncs();
-    clearPreview();
+    stopPreview();
 }
 
 void RenderHandler::stopPreview() {
-    setPreviewing(false);
     if(mCurrentScene) {
         mCurrentScene->clearUseRange();
         setFrameAction(mSavedCurrentFrame);
         mCurrentScene->setSceneFrame(mSavedCurrentFrame);
+        emit mCurrentScene->currentFrameChanged(mSavedCurrentFrame);
         emit mCurrentScene->requestUpdate();
     }
 
     mPreviewFPSTimer->stop();
     stopAudio();
     emit previewFinished();
-
-    mPreviewSate = PreviewSate::stopped;
+    setPreviewState(PreviewSate::stopped);
 }
 
 void RenderHandler::pausePreview() {
     if(mPreviewing) {
         mPreviewFPSTimer->stop();
         emit previewPaused();
-        mPreviewSate = PreviewSate::paused;
+        setPreviewState(PreviewSate::paused);
     }
 }
 
@@ -226,7 +238,7 @@ void RenderHandler::resumePreview() {
     if(mPreviewing) {
         mPreviewFPSTimer->start();
         emit previewBeingPlayed();
-        mPreviewSate = PreviewSate::playing;
+        setPreviewState(PreviewSate::playing);
     }
 }
 
@@ -254,10 +266,8 @@ void RenderHandler::playPreview() {
     mMaxPreviewFrame = maxPreviewFrame;
     mCurrentPreviewFrame = minPreviewFrame;
     mCurrentScene->setSceneFrame(mCurrentPreviewFrame);
-    mCurrentScene->setPreviewing(true);
 
-    setRenderingPreview(false);
-    setPreviewing(true);
+    setPreviewState(PreviewSate::playing);
 
     startAudio();
     const int mSecInterval = qRound(1000/mCurrentScene->getFps());
@@ -265,8 +275,6 @@ void RenderHandler::playPreview() {
     mPreviewFPSTimer->start();
     emit previewBeingPlayed();
     emit mCurrentScene->requestUpdate();
-
-    mPreviewSate = PreviewSate::playing;
 }
 
 void RenderHandler::nextPreviewRenderFrame() {
@@ -281,16 +289,11 @@ void RenderHandler::nextPreviewRenderFrame() {
     }
 }
 
-void RenderHandler::clearPreview() {
-    emit previewFinished();
-    stopPreview();
-}
-
 void RenderHandler::nextPreviewFrame() {
     if(!mCurrentScene) return;
     mCurrentPreviewFrame++;
     if(mCurrentPreviewFrame > mMaxPreviewFrame) {
-        clearPreview();
+        stopPreview();
     } else {
         mCurrentScene->setSceneFrame(mCurrentPreviewFrame);
         mCurrentScene->setMinFrameUseRange(mCurrentPreviewFrame);

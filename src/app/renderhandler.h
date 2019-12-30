@@ -74,9 +74,9 @@ private:
     void nextPreviewFrame();
     void nextCurrentRenderFrame();
 
-    void setRenderingPreview(const bool bT);
-    void setPreviewing(const bool bT);
-    void clearPreview();
+    void setPreviewState(const PreviewSate state);
+    void setRenderingPreview(const bool rendering);
+    void setPreviewing(const bool previewing);
 
     void startAudio();
     void audioPushTimerExpired();

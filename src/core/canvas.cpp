@@ -386,9 +386,11 @@ void Canvas::renderDataFinished(BoxRenderData *renderData) {
         if(mSceneFrame) {
             newerSate = mSceneFrame->fBoxState < renderData->fBoxStateId;
             const int cRelFrame = anim_getCurrentRelFrame();
-            const int finishedFrameDist = qAbs(cRelFrame - relFrame);
-            const int cRenderDataFrame = mSceneFrame->getRangeMin();
-            const int oldFrameDist = qAbs(cRelFrame - cRenderDataFrame);
+            const int finishedFrameDist = qMin(qAbs(cRelFrame - range.fMin),
+                                               qAbs(cRelFrame - range.fMax));
+            const FrameRange cRange = mSceneFrame->getRange();
+            const int oldFrameDist = qMin(qAbs(cRelFrame - cRange.fMin),
+                                          qAbs(cRelFrame - cRange.fMax));
             closerFrame = finishedFrameDist < oldFrameDist;
         }
         if(newerSate || closerFrame) {
