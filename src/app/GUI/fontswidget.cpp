@@ -28,8 +28,9 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
     mFontFamilyCombo = new QComboBox(this);
     mFontFamilyCombo->setFocusPolicy(Qt::NoFocus);
     mFontSizeCombo = new QComboBox(this);
-    mFontSizeCombo->setFocusPolicy(Qt::NoFocus);
+    mFontSizeCombo->setFocusPolicy(Qt::ClickFocus);
     mFontSizeCombo->setEditable(true);
+    mFontSizeCombo->setAutoCompletion(false);
     mFontSizeCombo->setMinimumContentsLength(3);
 
     mFontSizeCombo->lineEdit()->setStyleSheet(
@@ -40,7 +41,7 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
                     "background: rgb(255, 255, 255);"
                 "}");
     MainWindow::sGetInstance()->installNumericFilter(mFontSizeCombo);
-    mFontSizeCombo->setValidator(new QIntValidator(0, 999, mFontSizeCombo));
+    mFontSizeCombo->setValidator(new QIntValidator(1, 999, mFontSizeCombo));
 
     mFontFamilyCombo->addItems(mFontDatabase.families());
     connect(mFontFamilyCombo, &QComboBox::currentTextChanged,
