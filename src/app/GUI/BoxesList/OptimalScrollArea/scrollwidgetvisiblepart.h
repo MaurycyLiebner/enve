@@ -86,7 +86,7 @@ protected:
 
     UpdateFuncs mUpdateFuncs;
     static int sNextId;
-    int mId;
+    const int mId;
     int mNVisible = 0;
     bool mAlwaysShowChildren = false;
     SWT_RulesCollection mCurrentRulesCollection;

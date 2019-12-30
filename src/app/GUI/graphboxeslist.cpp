@@ -22,9 +22,19 @@
 #include "Animators/qrealpoint.h"
 #include "GUI/global.h"
 #include "Animators/qrealkey.h"
+#include "GUI/BoxesList/boxscroller.h"
 
 QColor KeysView::sGetAnimatorColor(const int i) {
     return ANIMATOR_COLORS.at(i % ANIMATOR_COLORS.length());
+}
+
+bool KeysView::graphIsSelected(GraphAnimator * const anim) {
+    if(mCurrentScene) {
+        const int id = mBoxesListVisible->getId();
+        const auto all = mCurrentScene->getSelectedForGraph(id);
+        if(all) return all->contains(anim);
+    }
+    return false;
 }
 
 int KeysView::graphGetAnimatorId(GraphAnimator * const anim) {
@@ -368,15 +378,6 @@ void KeysView::graphSetTwoSideCtrlForSelected() {
     graphConstrainAnimatorCtrlsFrameValues();
 }
 
-void KeysView::graphClearAnimatorSelection() {
-    clearKeySelection();
-
-//    for(QrealAnimator *animator : mAnimators) {
-//        animator->setIsCurrentAnimator(false);
-//    }
-    mGraphAnimators.clear();
-}
-
 void KeysView::graphDeletePressed() {
     if(mGPressedPoint && mGPressedPoint->isCtrlPt()) {
         const auto parentKey = mGPressedPoint->getParentKey();
@@ -458,23 +459,64 @@ void KeysView::graphResetValueScaleAndMinShown() {
     graphUpdateDimensions();
 }
 
-void KeysView::graphAddViewedAnimator(GraphAnimator * const animator) {
-    mGraphAnimators << animator;
-    graphUpdateDimensions();
-    graphResetValueScaleAndMinShown();
-    connect(animator, &QObject::destroyed, this, [this, animator]() {
+void KeysView::graphSetOnlySelectedVisible(const bool selectedOnly) {
+    if(graph_mOnlySelectedVisible == selectedOnly) return;
+    graph_mOnlySelectedVisible = selectedOnly;
+    graphUpdateVisbile();
+}
+
+bool KeysView::graphValidateVisible(GraphAnimator* const animator) {
+    if(graph_mOnlySelectedVisible){
+        return animator->prp_isParentBoxSelected();
+    }
+    return true;
+}
+
+void KeysView::graphAddToViewedAnimatorList(GraphAnimator * const animator) {
+    auto& connContext = mGraphAnimators.addObj(animator);
+    connContext << connect(animator, &QObject::destroyed,
+                           this, [this, animator]() {
         graphRemoveViewedAnimator(animator);
     });
+}
 
+void KeysView::graphUpdateVisbile() {
+    mGraphAnimators.clear();
+    if(mCurrentScene) {
+        const int id = mBoxesListVisible->getId();
+        const auto all = mCurrentScene->getSelectedForGraph(id);
+        if(all) {
+            for(const auto anim : *all) {
+                if(graphValidateVisible(anim)) {
+                    graphAddToViewedAnimatorList(anim);
+                }
+            }
+        }
+    }
+    graphUpdateDimensions();
+    graphResetValueScaleAndMinShown();
     update();
 }
 
+void KeysView::graphAddViewedAnimator(GraphAnimator * const animator) {
+    if(!mCurrentScene) return Q_ASSERT(false);
+    mCurrentScene->addSelectedForGraph(mBoxesListVisible->getId(), animator);
+    if(graphValidateVisible(animator)) {
+        graphAddToViewedAnimatorList(animator);
+        graphUpdateDimensions();
+        graphResetValueScaleAndMinShown();
+        update();
+    }
+}
+
 void KeysView::graphRemoveViewedAnimator(GraphAnimator * const animator) {
-    disconnect(animator, nullptr, this, nullptr);
-    mGraphAnimators.removeOne(animator);
-    graphUpdateDimensions();
-    graphResetValueScaleAndMinShown();
-    update();
+    if(!mCurrentScene) return Q_ASSERT(false);
+    mCurrentScene->removeSelectedForGraph(mBoxesListVisible->getId(), animator);
+    if(mGraphAnimators.removeObj(animator)) {
+        graphUpdateDimensions();
+        graphResetValueScaleAndMinShown();
+        update();
+    }
 }
 
 void KeysView::scheduleGraphUpdateAfterKeysChanged() {

@@ -23,6 +23,7 @@
 #include "keyfocustarget.h"
 #include "smartPointers/ememory.h"
 #include "framerange.h"
+#include "conncontext.h"
 
 const QList<QColor> ANIMATOR_COLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
                                       QColor(255, 255, 0), QColor(255, 0, 255),
@@ -136,14 +137,17 @@ public:
     void graphSetCornerCtrlAction();
     void graphSetTwoSideCtrlForSelected();
 
-    void graphClearAnimatorSelection();
-
     void setViewedVerticalRange(const int top, const int bottom);
     void clearHovered();
 
     int graphGetAnimatorId(GraphAnimator * const anim);
     QrealPoint *graphGetPointAtPos(const QPointF &pressPos) const;
+    bool graphValidateVisible(GraphAnimator * const animator);
+    void graphUpdateVisbile();
+    void graphSetOnlySelectedVisible(const bool selectedOnly);
+    bool graphIsSelected(GraphAnimator * const anim);
 private:
+    void graphAddToViewedAnimatorList(GraphAnimator * const animator);
     qreal xToFrame(const qreal x) const;
 
     void cancelTransform();
@@ -213,7 +217,7 @@ private:
 
     qptr<Canvas> mCurrentScene;
     QList<Animator*> mSelectedKeysAnimators;
-    QList<GraphAnimator*> mGraphAnimators;
+    ConnContextObjList<GraphAnimator*> mGraphAnimators;
 
     int mMinViewedFrame = 0;
     int mMaxViewedFrame = 50;
@@ -223,6 +227,7 @@ private:
 
     // graph
 
+    bool graph_mOnlySelectedVisible = false;
     bool graph_mValueLinesVisible = true;
     qreal mPixelsPerValUnit = 0;
     qreal mMinShownVal = 0;

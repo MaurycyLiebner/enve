@@ -713,9 +713,12 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             const auto bswvp = static_cast<BoxScroller*>(mParent);
             const auto keysView = bswvp->getKeysView();
             if(keysView) {
-                const int id = keysView->graphGetAnimatorId(graphAnim);
-                if(id >= 0) {
-                    const auto color = keysView->sGetAnimatorColor(id);
+                const bool selected = keysView->graphIsSelected(graphAnim);
+                if(selected) {
+                    const int id = keysView->graphGetAnimatorId(graphAnim);
+                    const auto color = id >= 0 ?
+                                keysView->sGetAnimatorColor(id) :
+                                QColor(Qt::black);
                     const QRect visRect(mVisibleButton->pos(),
                                         GRAPH_PROPERTY->size());
                     const int adj = qRound(4*qreal(GRAPH_PROPERTY->width())/20);
@@ -786,7 +789,7 @@ void BoxSingleWidget::switchBoxVisibleAction() {
         const auto keysView = bsvt->getKeysView();
         if(keysView) {
             const auto animTarget = static_cast<GraphAnimator*>(target);
-            if(keysView->graphGetAnimatorId(animTarget) != -1) {
+            if(keysView->graphIsSelected(animTarget)) {
                 keysView->graphRemoveViewedAnimator(animTarget);
             } else {
                 keysView->graphAddViewedAnimator(animTarget);

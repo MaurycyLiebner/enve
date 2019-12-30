@@ -200,6 +200,12 @@ void Property::setParent(ComplexAnimator * const parent) {
     emit prp_ancestorChanged(QPrivateSignal());
 }
 
+bool Property::prp_isParentBoxSelected() const {
+    const auto pBox = getFirstAncestor<eBoxOrSound>();
+    if(pBox) return pBox->isSelected();
+    return false;
+}
+
 #include "canvas.h"
 void Property::prp_selectionChangeTriggered(const bool shiftPressed) {
     if(!mParentScene) return;

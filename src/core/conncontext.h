@@ -57,15 +57,16 @@ public:
     }
 
     //! @brief Removes(but does not delete) the object and corresponding connections
-    void removeObj(const T& obj) {
+    bool removeObj(const T& obj) {
         for(int i = 0; i < this->count(); i++) {
             const auto iObj = this->at(i);
             if(iObj == obj) {
                 this->removeAt(i);
                 mCCtxs.removeAt(i);
-                break;
+                return true;
             }
         }
+        return false;
     }
 
     void moveObj(const int from, const int to) {
@@ -92,6 +93,7 @@ public:
 
     const QList<T>& getList() const { return *this; }
 
+    using QList<T>::contains;
     using QList<T>::indexOf;
     using QList<T>::begin;
     using QList<T>::end;

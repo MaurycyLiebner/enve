@@ -162,6 +162,8 @@ public:
         return mParent_k->getFirstAncestor<T>();
     }
 
+    bool prp_isParentBoxSelected() const;
+
     bool drawsOnCanvas() const
     { return mDrawOnCanvas; }
 

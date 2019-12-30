@@ -426,6 +426,7 @@ signals:
     void newFrameRange(FrameRange);
     void currentBoxChanged(BoundingBox*);
     void selectedPaintSettingsChanged();
+    void selectionChanged();
     void currentFrameChanged(int);
     void currentContainerSet(ContainerBox*);
     void dimensionsChanged(int, int);
@@ -611,6 +612,10 @@ public:
             sceneCont->fBoxState = mStateId;
         }
     }
+
+    void addSelectedForGraph(const int widgetId, GraphAnimator* const anim);
+    bool removeSelectedForGraph(const int widgetId, GraphAnimator* const anim);
+    const ConnContextObjList<GraphAnimator*>* getSelectedForGraph(const int widgetId) const;
 private:
     void openTextEditorForTextBox(TextBox *textBox);
 
@@ -694,6 +699,8 @@ protected:
 
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = CanvasMode::boxTransform;
+
+    std::map<int, stdsptr<ConnContextObjList<GraphAnimator*>>> mSelectedForGraph;
 
     void handleMovePointMousePressEvent(const MouseEvent& e);
     void handleMovePointMouseMove(const MouseEvent& e);

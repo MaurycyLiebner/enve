@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/styles">
         <file alias="stylesheet.qss">stylesheet.qss</file>
+        <file>icons/toolbarButtons/plain/notOnlySelectedVisible</file>
+        <file>icons/toolbarButtons/plain/onlySelectedVisible</file>
     </qresource>
     <qresource prefix="/cursors">
         <file alias="cursor-node.xpm">pixmaps/cursor-node.xpm</file>

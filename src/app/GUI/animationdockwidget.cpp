@@ -70,6 +70,13 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     connect(valueLines, &SwitchButton::toggled,
             keysView, &KeysView::graphSetValueLinesDisabled);
 
+    const auto selectedVisible = SwitchButton::sCreate2Switch(iconsDir + "/notOnlySelectedVisible.png",
+                                                         iconsDir + "/onlySelectedVisible.png",
+                                                         gSingleLineTooltip("View Only Selected Objects' Properties"),
+                                                         this);
+    connect(selectedVisible, &SwitchButton::toggled,
+            keysView, &KeysView::graphSetOnlySelectedVisible);
+
     addWidget(mLineButton);
     addWidget(mCurveButton);
     addSeparator();
@@ -79,6 +86,8 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     addSeparator();
     addWidget(mFitToHeightButton);
     addWidget(valueLines);
+    addSeparator();
+    addWidget(selectedVisible);
 
     setStyleSheet("QToolBar {"
                       "border: 1px solid black;"

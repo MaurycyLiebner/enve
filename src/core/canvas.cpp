@@ -100,6 +100,29 @@ void Canvas::queTasks() {
     mDrawnSinceQue = false;
 }
 
+void Canvas::addSelectedForGraph(const int widgetId, GraphAnimator * const anim) {
+    const auto it = mSelectedForGraph.find(widgetId);
+    if(it == mSelectedForGraph.end()) {
+        const auto list = std::make_shared<ConnContextObjList<GraphAnimator*>>();
+        mSelectedForGraph.insert({widgetId, list});
+    }
+    auto& connCtxt = mSelectedForGraph[widgetId]->addObj(anim);
+    connCtxt << connect(anim, &QObject::destroyed,
+                        this, [this, widgetId, anim]() {
+        removeSelectedForGraph(widgetId, anim);
+    });
+}
+
+bool Canvas::removeSelectedForGraph(const int widgetId, GraphAnimator * const anim) {
+    return mSelectedForGraph[widgetId]->removeObj(anim);
+}
+
+const ConnContextObjList<GraphAnimator*>* Canvas::getSelectedForGraph(const int widgetId) const {
+    const auto it = mSelectedForGraph.find(widgetId);
+    if(it == mSelectedForGraph.end()) return nullptr;
+    return it->second.get();
+}
+
 void Canvas::setCurrentBoxesGroup(ContainerBox * const group) {
     if(mCurrentContainer) {
         mCurrentContainer->setIsCurrentGroup_k(false);
