@@ -87,7 +87,7 @@ void TaskScheduler::queCpuTask(const stdsptr<eTask>& task) {
 
 bool TaskScheduler::overflowed() const {
     const int nQues = mQuedCpuTasks.countQues();
-    const int maxQues = mCpuExecutors.count();
+    const int maxQues = mAlwaysQue ? mCpuExecutors.count() : 1;
     return nQues >= maxQues;
 }
 
