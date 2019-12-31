@@ -32,12 +32,18 @@ public:
     QPointF getRelativePos() const {
         const qreal height = mTextEffect->getGuideLineHeight();
         const QPointF pos = AnimatedPoint::getRelativePos();
+        if(mTextEffect->target() == TextFragmentType::line)
+            return {pos.y()*height, pos.x()};
         return {pos.x(), -pos.y()*height};
     }
 
     void setRelativePos(const QPointF &relPos) {
         const qreal height = mTextEffect->getGuideLineHeight();
-        AnimatedPoint::setRelativePos({relPos.x(), -relPos.y()/height});
+        if(mTextEffect->target() == TextFragmentType::line) {
+            AnimatedPoint::setRelativePos({relPos.y(), relPos.x()/height});
+        } else {
+            AnimatedPoint::setRelativePos({relPos.x(), -relPos.y()/height});
+        }
     }
 private:
     TextEffect * const mTextEffect;
@@ -153,7 +159,7 @@ qreal TextEffect::getGuideLineHeight() {
 void TextEffect::prp_drawCanvasControls(
         SkCanvas * const canvas, const CanvasMode mode,
         const float invScale, const bool ctrlPressed) {
-    if(!prp_isSelected() || !isVisible()) return;
+    if(mode != CanvasMode::pointTransform || !isVisible()) return;
 
     SkPath path;
 
@@ -173,9 +179,9 @@ void TextEffect::prp_drawCanvasControls(
     std::sort(pList.begin(), pList.end(), ptXLess);
 
     QPointF prevPt = pList.first();
-    path.moveTo(toSkScalar(prevPt.x()), toSkScalar(prevPt.y()*height));
+    path.moveTo(toSkScalar(prevPt.x()), -toSkScalar(prevPt.y()*height));
     const int iMax = pList.count() - 1;
-    for(int i = 0; i <= iMax; i++) {
+    for(int i = 1; i <= iMax; i++) {
         const auto& pt = pList.at(i);
 
         path.cubicTo(toSkScalar(prevPt.x()*(1 - smoothness) + pt.x()*smoothness),
@@ -188,12 +194,6 @@ void TextEffect::prp_drawCanvasControls(
         prevPt = pt;
     }
 
-    if(target() == TextFragmentType::line) {
-        SkMatrix transform;
-        transform.setRotate(90);
-        path.transform(transform);
-    }
-    const auto transform = toSkMatrix(eEffect::getTransform());
     SkPath topLine;
     topLine.moveTo(toSkScalar(minX), -toSkScalar(height));
     topLine.lineTo(toSkScalar(maxX), -toSkScalar(height));
@@ -201,6 +201,16 @@ void TextEffect::prp_drawCanvasControls(
     SkPath bottomLine;
     bottomLine.moveTo(toSkScalar(minX), toSkScalar(0));
     bottomLine.lineTo(toSkScalar(maxX), toSkScalar(0));
+
+    if(target() == TextFragmentType::line) {
+        SkMatrix transform;
+        transform.setRotate(90);
+
+        path.transform(transform);
+        topLine.transform(transform);
+        bottomLine.transform(transform);
+    }
+    const auto transform = toSkMatrix(eEffect::getTransform());
 
     SkiaHelpers::drawOutlineOverlay(canvas, topLine, invScale,
                                     transform, true, 5.f, SK_ColorBLUE);
