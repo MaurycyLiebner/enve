@@ -21,7 +21,7 @@
 BoxWithPathEffects::BoxWithPathEffects(const eBoxType type) :
     BoundingBox(type) {
     mPathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
-    mPathEffectsAnimators->prp_setName("path effects");
+    mPathEffectsAnimators->prp_setName("path base effects");
 
     mFillPathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
     mFillPathEffectsAnimators->prp_setName("fill effects");
@@ -44,7 +44,7 @@ void BoxWithPathEffects::setupCanvasMenu(PropertyMenu * const menu) {
     menu->addedActionsForType<BoxWithPathEffects>();
 
     BoundingBox::setupCanvasMenu(menu);
-    PathEffectsMenu::addPathEffectsToActionMenu(menu);
+    PathEffectsMenu::addPathEffectsToBoxActionMenu(menu);
 }
 
 void BoxWithPathEffects::prp_setupTreeViewMenu(PropertyMenu * const menu) {
@@ -188,14 +188,14 @@ bool BoxWithPathEffects::differenceInFillPathBetweenFrames(const int frame1, con
     return mParentGroup->differenceInFillPathBetweenFrames(pFrame1, pFrame2);
 }
 
-void BoxWithPathEffects::addPathEffects(const qreal relFrame,
+void BoxWithPathEffects::addBasePathEffects(const qreal relFrame,
                                         QList<stdsptr<PathEffectCaller>>& list) {
     mPathEffectsAnimators->addEffects(relFrame, list);
     if(!mParentGroup) return;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     const qreal parentRelFrame =
             mParentGroup->prp_absFrameToRelFrameF(absFrame);
-    mParentGroup->addPathEffects(parentRelFrame, list);
+    mParentGroup->addBasePathEffects(parentRelFrame, list);
 }
 
 void BoxWithPathEffects::addFillEffects(const qreal relFrame,

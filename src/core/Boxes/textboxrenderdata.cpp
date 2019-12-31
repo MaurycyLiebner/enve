@@ -17,6 +17,7 @@
 #include "textboxrenderdata.h"
 #include "textbox.h"
 #include "PathEffects/patheffectstask.h"
+#include "canvas.h"
 
 qreal textLineX(const Qt::Alignment &alignment,
                 const qreal lineWidth,
@@ -59,6 +60,19 @@ LetterRenderData::LetterRenderData(TextBox * const parent) :
     fParentIsTarget = false;
 }
 
+void LetterRenderData::afterQued() {
+    if(!fPathEffects.isEmpty() || !fFillEffects.isEmpty() ||
+       !fOutlineBaseEffects.isEmpty() || !fOutlineEffects.isEmpty()) {
+        const auto pathTask = enve::make_shared<PathEffectsTask>(
+                    this, std::move(fPathEffects), std::move(fFillEffects),
+                    std::move(fOutlineBaseEffects), std::move(fOutlineEffects));
+        pathTask->addDependent(this);
+        this->delayDataSet();
+        pathTask->queTask();
+    }
+    BoxRenderData::afterQued();
+}
+
 void LetterRenderData::initialize(const qreal relFrame,
                                   const QPointF &pos,
                                   const QString &letter,
@@ -81,6 +95,10 @@ void LetterRenderData::initialize(const qreal relFrame,
     fFillPath = textPath;
     fOutlineBasePath = textPath;
     fStroker.strokePath(fOutlineBasePath, &fOutlinePath);
+
+    parent->addPathEffects(relFrame, scene, fPathEffects, fFillEffects,
+                           fOutlineBaseEffects, fOutlineEffects);
+
 }
 
 void LetterRenderData::applyTransform(const QMatrix &transform) {

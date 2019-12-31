@@ -23,7 +23,8 @@ class LinesPathEffect : public PathEffect {
 protected:
     LinesPathEffect();
 public:
-    stdsptr<PathEffectCaller> getEffectCaller(const qreal relFrame) const;
+    stdsptr<PathEffectCaller> getEffectCaller(
+            const qreal relFrame, const qreal influence) const;
 private:
     qsptr<QrealAnimator> mAngle;
     qsptr<QrealAnimator> mDistance;

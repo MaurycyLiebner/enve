@@ -111,7 +111,8 @@ void eLinearize000EffectCaller::apply(SkPath &path) {
     }
 }
 
-stdsptr<PathEffectCaller> eLinearize000::getEffectCaller(const qreal relFrame) const {
-    const qreal infl = mInfluence->getEffectiveValue(relFrame);
+stdsptr<PathEffectCaller> eLinearize000::getEffectCaller(
+        const qreal relFrame, const qreal influence) const {
+    const qreal infl = mInfluence->getEffectiveValue(relFrame)*influence;
     return enve::make_shared<eLinearize000EffectCaller>(infl);
 }

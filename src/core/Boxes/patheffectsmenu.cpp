@@ -18,9 +18,9 @@
 
 template <typename T, typename U>
 void addPathEffectActionToMenu(const QString& text, PropertyMenu * const menu,
-                               const U& adder) {
-    menu->addPlainAction<BoundingBox>(text, [adder](BoundingBox * box) {
-        (box->*adder)(enve::make_shared<T>());
+                               void (U::*adder)(const qsptr<PathEffect>&)) {
+    menu->addPlainAction<U>(text, [adder](U * obj) {
+        (obj->*adder)(enve::make_shared<T>());
     });
 }
 
@@ -50,7 +50,7 @@ void addPathEffectsActionToMenu(PropertyMenu * const menu, const U &adder) {
     CustomPathEffectCreator::sAddToMenu(menu, adder);
 }
 
-void PathEffectsMenu::addPathEffectsToActionMenu(PropertyMenu * const menu) {
+void PathEffectsMenu::addPathEffectsToBoxActionMenu(PropertyMenu * const menu) {
     if(menu->hasSharedMenu("Path Effects")) return;
     menu->addSharedMenu("Path Effects");
     menu->addSection("Path Effects");
@@ -70,4 +70,10 @@ void PathEffectsMenu::addPathEffectsToActionMenu(PropertyMenu * const menu) {
     const auto outlinePathEffectsMenu = menu->addMenu("Outline Effects");
     addPathEffectsActionToMenu(outlinePathEffectsMenu,
                                &BoundingBox::addOutlinePathEffect);
+}
+
+#include "PathEffects/patheffectanimators.h"
+void PathEffectsMenu::addPathEffectsToCollectionActionMenu(PropertyMenu * const menu) {
+    const auto addEffectMenu = menu->addMenu("Add Effect");
+    addPathEffectsActionToMenu(addEffectMenu, &PathEffectAnimators::addChild);
 }

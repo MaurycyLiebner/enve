@@ -45,7 +45,8 @@ void SolidifyEffectCaller::apply(SkPath &path) {
     gSolidify(mDisplacement, src, &path);
 }
 
-stdsptr<PathEffectCaller> SolidifyPathEffect::getEffectCaller(const qreal relFrame) const {
-    const qreal displ = mDisplacement->getEffectiveValue(relFrame);
+stdsptr<PathEffectCaller> SolidifyPathEffect::getEffectCaller(
+        const qreal relFrame, const qreal influence) const {
+    const qreal displ = mDisplacement->getEffectiveValue(relFrame)*influence;
     return enve::make_shared<SolidifyEffectCaller>(displ);
 }

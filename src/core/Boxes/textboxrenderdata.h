@@ -20,6 +20,7 @@
 #include "pathboxrenderdata.h"
 
 class TextBox;
+class PathEffectCaller;
 
 extern qreal textLineX(const Qt::Alignment &alignment,
                        const qreal lineWidth,
@@ -34,6 +35,8 @@ class LetterRenderData : public PathBoxRenderData {
 public:
     LetterRenderData(TextBox* const parent);
 
+    void afterQued();
+
     void initialize(const qreal relFrame,
                     const QPointF &pos,
                     const QString &letter,
@@ -45,6 +48,11 @@ public:
 
     QRectF fBoundingRect;
     QPointF fLetterPos;
+
+    QList<stdsptr<PathEffectCaller>> fPathEffects;
+    QList<stdsptr<PathEffectCaller>> fFillEffects;
+    QList<stdsptr<PathEffectCaller>> fOutlineBaseEffects;
+    QList<stdsptr<PathEffectCaller>> fOutlineEffects;
 };
 
 class WordRenderData : public ContainerBoxRenderData {

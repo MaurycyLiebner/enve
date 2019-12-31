@@ -23,7 +23,8 @@ class DashPathEffect : public PathEffect {
 protected:
     DashPathEffect();
 public:
-    stdsptr<PathEffectCaller> getEffectCaller(const qreal relFrame) const;
+    stdsptr<PathEffectCaller> getEffectCaller(
+            const qreal relFrame, const qreal influence) const;
 private:
     qsptr<QrealAnimator> mSize;
 };

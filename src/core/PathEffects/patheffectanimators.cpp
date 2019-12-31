@@ -26,6 +26,15 @@ PathEffectAnimators::PathEffectAnimators() :
     ca_setHiddenWhenEmpty(true);
 }
 
+#include "Boxes/patheffectsmenu.h"
+void PathEffectAnimators::prp_setupTreeViewMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<PathEffectAnimators>()) return;
+    menu->addedActionsForType<PathEffectAnimators>();
+    PathEffectsMenu::addPathEffectsToCollectionActionMenu(menu);
+    menu->addSeparator();
+    PathEffectAnimatorsBase::prp_setupTreeViewMenu(menu);
+}
+
 bool PathEffectAnimators::hasEffects() {
     return ca_hasChildren();
 }
@@ -42,12 +51,13 @@ void PathEffectAnimators::readPathEffect(eReadStream& src) {
 
 #include "patheffectstask.h"
 void PathEffectAnimators::addEffects(const qreal relFrame,
-                                     QList<stdsptr<PathEffectCaller>>& list) const {
+                                     QList<stdsptr<PathEffectCaller>>& list,
+                                     const qreal influence) const {
     const auto& children = ca_getChildren();
     for(const auto& effect : children) {
         const auto pEffect = static_cast<PathEffect*>(effect.get());
         if(!pEffect->isVisible()) continue;
-        list << pEffect->getEffectCaller(relFrame);
+        list << pEffect->getEffectCaller(relFrame, influence);
     }
 }
 

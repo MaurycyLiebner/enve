@@ -46,7 +46,8 @@ protected:
     PathEffect(const QString& name, const PathEffectType type);
 public:
     virtual stdsptr<PathEffectCaller>
-        getEffectCaller(const qreal relFrame) const = 0;
+        getEffectCaller(const qreal relFrame,
+                        const qreal influence) const = 0;
 
     bool SWT_isPathEffect() const;
 

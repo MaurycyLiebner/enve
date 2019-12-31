@@ -52,7 +52,7 @@ public:
 
     template <typename U>
     static void sAddToMenu(PropertyMenu * const menu,
-                           const U &adder) {
+                           void (U::*adder)(const qsptr<B>&)) {
         for(const auto& creator : sCreators)
             sAddToMenu(menu, creator, adder);
     }
@@ -60,11 +60,11 @@ private:
     template <typename U>
     static void sAddToMenu(PropertyMenu * const menu,
                            const CustomHandler<B, C>& creator,
-                           const U &adder) {
-        menu->addPlainAction<BoundingBox>(creator.mName(),
-        [adder, creator](BoundingBox * const box) {
+                           void (U::*adder)(const qsptr<B>&)) {
+        menu->addPlainAction<U>(creator.mName(),
+        [adder, creator](U * const obj) {
             const auto cEffect = creator.mCreatorNew();
-            (box->*adder)(qSharedPointerCast<B>(cEffect));
+            (obj->*adder)(qSharedPointerCast<B>(cEffect));
         });
     }
     static QList<CustomHandler<B, C>> sCreators;

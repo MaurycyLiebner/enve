@@ -109,9 +109,10 @@ void SubPathEffectCaller::apply(SkPath &path) {
     }
 }
 
-stdsptr<PathEffectCaller> SubPathEffect::getEffectCaller(const qreal relFrame) const {
+stdsptr<PathEffectCaller> SubPathEffect::getEffectCaller(
+        const qreal relFrame, const qreal influence) const {
     const bool pathWise = mPathWise->getValue();
-    const qreal minFrac = mMin->getEffectiveValue(relFrame)/100;
-    const qreal maxFrac = mMax->getEffectiveValue(relFrame)/100;
+    const qreal minFrac = mMin->getEffectiveValue(relFrame)*0.01*influence;
+    const qreal maxFrac = mMax->getEffectiveValue(relFrame)*0.01*influence + 1 - influence;
     return enve::make_shared<SubPathEffectCaller>(pathWise, minFrac, maxFrac);
 }

@@ -91,7 +91,9 @@ void ZigZagEffectCaller::apply(SkPath &path) {
     }
 }
 
-stdsptr<PathEffectCaller> ZigZagPathEffect::getEffectCaller(const qreal relFrame) const {
+stdsptr<PathEffectCaller> ZigZagPathEffect::getEffectCaller(
+        const qreal relFrame, const qreal influence) const {
+    Q_UNUSED(influence)
     const qreal degAngle = mAngle->getEffectiveValue(relFrame);
     const qreal distInc = mDistance->getEffectiveValue(relFrame);
     return enve::make_shared<ZigZagEffectCaller>(degAngle, distInc);

@@ -42,7 +42,9 @@ void SumEffectCaller::apply(SkPath &path) {
     builder.resolve(&path);
 }
 
-stdsptr<PathEffectCaller> SumPathEffect::getEffectCaller(const qreal relFrame) const {
+stdsptr<PathEffectCaller> SumPathEffect::getEffectCaller(
+        const qreal relFrame, const qreal influence) const {
     Q_UNUSED(relFrame)
+    Q_UNUSED(influence)
     return enve::make_shared<SumEffectCaller>();
 }

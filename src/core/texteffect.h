@@ -73,7 +73,12 @@ private:
     qsptr<QrealAnimator> mPeriodicSmoothness;
 
     qsptr<AdvancedTransformAnimator> mTransform;
-    //qsptr<PathEffectAnimators> mPathEffects;
+
+    qsptr<PathEffectAnimators> mBasePathEffects;
+    qsptr<PathEffectAnimators> mFillPathEffects;
+    qsptr<PathEffectAnimators> mOutlineBasePathEffects;
+    qsptr<PathEffectAnimators> mOutlinePathEffects;
+
     qsptr<RasterEffectAnimators> mRasterEffects;
 };
 

@@ -47,9 +47,10 @@ void DuplicateEffectCaller::apply(SkPath &path) {
 }
 
 
-stdsptr<PathEffectCaller> DuplicatePathEffect::getEffectCaller(const qreal relFrame) const {
+stdsptr<PathEffectCaller> DuplicatePathEffect::getEffectCaller(
+        const qreal relFrame, const qreal influence) const {
     const int count = mCount->getEffectiveIntValue(relFrame);
-    const qreal dX = mTranslation->getEffectiveXValue(relFrame);
-    const qreal dY = mTranslation->getEffectiveYValue(relFrame);
+    const qreal dX = mTranslation->getEffectiveXValue(relFrame)*influence;
+    const qreal dY = mTranslation->getEffectiveYValue(relFrame)*influence;
     return enve::make_shared<DuplicateEffectCaller>(count, dX, dY);
 }

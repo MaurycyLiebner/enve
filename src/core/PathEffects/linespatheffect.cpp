@@ -78,7 +78,9 @@ void LinesEffectCaller::apply(SkPath &path) {
     }
 }
 
-stdsptr<PathEffectCaller> LinesPathEffect::getEffectCaller(const qreal relFrame) const {
+stdsptr<PathEffectCaller> LinesPathEffect::getEffectCaller(
+        const qreal relFrame, const qreal influence) const {
+    Q_UNUSED(influence)
     const qreal degAngle = mAngle->getEffectiveValue(relFrame);
     const qreal distInc = mDistance->getEffectiveValue(relFrame);
     return enve::make_shared<LinesEffectCaller>(degAngle, distInc);

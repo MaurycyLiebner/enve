@@ -75,10 +75,11 @@ void SpatialDisplaceEffectCaller::apply(SkPath &path) {
     }
 }
 
-stdsptr<PathEffectCaller> SpatialDisplacePathEffect::getEffectCaller(const qreal relFrame) const {
+stdsptr<PathEffectCaller> SpatialDisplacePathEffect::getEffectCaller(
+        const qreal relFrame, const qreal influence) const {
     const qreal baseSeed = mSeed->getBaseSeed(relFrame);
     const qreal gridSize = mSeed->getGridSize(relFrame);
-    const qreal maxDev = mMaxDev->getEffectiveValue(relFrame);
+    const qreal maxDev = mMaxDev->getEffectiveValue(relFrame)*influence;
     const qreal segLen = mSegLength->getEffectiveValue(relFrame);
     const qreal smooth = mSmoothness->getEffectiveValue(relFrame);
     const bool lengthBased = mLengthBased->getValue();

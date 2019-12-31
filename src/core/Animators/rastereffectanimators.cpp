@@ -46,7 +46,8 @@ void RasterEffectAnimators::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     const auto rasterEffectsMenu = menu->addMenu("Add Effect");
     addRasterEffectActionToMenu<BlurEffect>("Blur", rasterEffectsMenu);
     addRasterEffectActionToMenu<ShadowEffect>("Shadow", rasterEffectsMenu);
-    CustomRasterEffectCreator::sAddToMenu(rasterEffectsMenu, &BoundingBox::addRasterEffect);
+    CustomRasterEffectCreator::sAddToMenu(rasterEffectsMenu,
+                                          &BoundingBox::addRasterEffect);
     if(!rasterEffectsMenu->isEmpty()) rasterEffectsMenu->addSeparator();
     for(const auto& creator : ShaderEffectCreator::sEffectCreators) {
         const PropertyMenu::PlainSelectedOp<RasterEffectAnimators> op =

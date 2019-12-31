@@ -34,11 +34,14 @@ protected:
 public:
     bool SWT_isPathEffectAnimators() const;
 
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
+
     bool hasEffects();
     void readPathEffect(eReadStream &target);
 
     void addEffects(const qreal relFrame,
-                    QList<stdsptr<PathEffectCaller>>& list) const;
+                    QList<stdsptr<PathEffectCaller>>& list,
+                    const qreal influence = 1) const;
 private:
 };
 

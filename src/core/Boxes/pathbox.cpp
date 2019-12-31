@@ -122,7 +122,7 @@ void PathBox::setupRenderData(const qreal relFrame,
         pathData->fPath = mPathSk;
     } else {
         if(scene->getPathEffectsVisible())
-            addPathEffects(relFrame, pathEffects);
+            addBasePathEffects(relFrame, pathEffects);
         pathData->fPath = pathData->fEditPath;
     }
 
@@ -174,32 +174,18 @@ void PathBox::setupRenderData(const qreal relFrame,
     setupPaintSettings(pathData, relFrame);
 }
 
-PathEffectsTask* PathBox::setupPathEffects(PathBoxRenderData * const pathData,
-                                           const qreal relFrame,
-                                           Canvas* const scene) {
-    QList<stdsptr<PathEffectCaller>> pathEffects;
-    QList<stdsptr<PathEffectCaller>> fillEffects;
-    QList<stdsptr<PathEffectCaller>> outlineBaseEffects;
-    QList<stdsptr<PathEffectCaller>> outlineEffects;
-
+void PathBox::addPathEffects(
+        const qreal relFrame, Canvas* const scene,
+        PathEffectsCList& pathEffects,
+        PathEffectsCList& fillEffects,
+        PathEffectsCList& outlineBaseEffects,
+        PathEffectsCList& outlineEffects) {
     if(scene->getPathEffectsVisible()) {
-        addPathEffects(relFrame, pathEffects);
+        addBasePathEffects(relFrame, pathEffects);
         addFillEffects(relFrame, fillEffects);
         addOutlineBaseEffects(relFrame, outlineBaseEffects);
         addOutlineEffects(relFrame, outlineEffects);
     }
-
-    if(!pathEffects.isEmpty() || !fillEffects.isEmpty() ||
-       !outlineBaseEffects.isEmpty() || !outlineEffects.isEmpty()) {
-        const auto pathTask = enve::make_shared<PathEffectsTask>(
-                    pathData, std::move(pathEffects), std::move(fillEffects),
-                    std::move(outlineBaseEffects), std::move(outlineEffects));
-        pathTask->addDependent(pathData);
-        pathData->delayDataSet();
-        pathTask->queTask();
-        return pathTask.get();
-    }
-    return nullptr;
 }
 
 void PathBox::setupStrokerSettings(PathBoxRenderData * const pathData,

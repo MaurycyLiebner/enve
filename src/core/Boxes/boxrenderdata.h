@@ -47,7 +47,7 @@ protected:
     void afterCanceled() {}
     void beforeProcessing(const Hardware hw) final;
     void afterProcessing() final;
-    void afterQued() final;
+    void afterQued();
     void queTaskNow() final;
 
     virtual SkColor eraseColor() const {

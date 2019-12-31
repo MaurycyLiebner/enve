@@ -23,7 +23,8 @@ class SubPathEffect : public PathEffect {
 protected:
     SubPathEffect();
 public:
-    stdsptr<PathEffectCaller> getEffectCaller(const qreal relFrame) const;
+    stdsptr<PathEffectCaller> getEffectCaller(
+            const qreal relFrame, const qreal influence) const;
 private:
     qsptr<BoolProperty> mPathWise;
     qsptr<QrealAnimator> mMin;

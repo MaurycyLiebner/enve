@@ -48,7 +48,8 @@ void DashEffectCaller::apply(SkPath &path) {
     SkDashPathEffect::Make(intervals, 2, 0.f)->filterPath(&path, src, &rec, &cullRec);
 }
 
-stdsptr<PathEffectCaller> DashPathEffect::getEffectCaller(const qreal relFrame) const {
-    const qreal width = mSize->getEffectiveValue(relFrame);
+stdsptr<PathEffectCaller> DashPathEffect::getEffectCaller(
+        const qreal relFrame, const qreal influence) const {
+    const qreal width = mSize->getEffectiveValue(relFrame)*influence;
     return enve::make_shared<DashEffectCaller>(width);
 }

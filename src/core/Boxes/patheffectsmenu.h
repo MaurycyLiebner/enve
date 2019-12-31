@@ -21,7 +21,8 @@
 #include "boundingbox.h"
 
 namespace PathEffectsMenu {
-    void addPathEffectsToActionMenu(PropertyMenu * const menu);
+    void addPathEffectsToBoxActionMenu(PropertyMenu * const menu);
+    void addPathEffectsToCollectionActionMenu(PropertyMenu * const menu);
 }
 
 #endif // PATHEFFECTSMENU_H

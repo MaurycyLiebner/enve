@@ -58,7 +58,7 @@ public:
     bool differenceInFillPathBetweenFrames(
             const int frame1, const int frame2) const;
 
-    void addPathEffects(const qreal relFrame,
+    void addBasePathEffects(const qreal relFrame,
                         QList<stdsptr<PathEffectCaller>>& list);
     void addFillEffects(const qreal relFrame,
                         QList<stdsptr<PathEffectCaller>>& list);

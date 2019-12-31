@@ -79,9 +79,14 @@ public:
     void updateCurrentPreviewDataFromRenderData(
             BoxRenderData *renderData);
 
-    PathEffectsTask *setupPathEffects(PathBoxRenderData * const pathData,
-                                      const qreal relFrame,
-                                      Canvas* const scene);
+    typedef QList<stdsptr<PathEffectCaller>> PathEffectsCList;
+    void addPathEffects(
+            const qreal relFrame, Canvas* const scene,
+            PathEffectsCList &pathEffects,
+            PathEffectsCList &fillEffects,
+            PathEffectsCList &outlineBaseEffects,
+            PathEffectsCList &outlineEffects);
+
     void setupStrokerSettings(PathBoxRenderData * const pathData,
                               const qreal relFrame);
     void setupPaintSettings(PathBoxRenderData * const pathData,

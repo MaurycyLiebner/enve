@@ -43,7 +43,9 @@ void SubdivideEffectCaller::apply(SkPath &path) {
     }
 }
 
-stdsptr<PathEffectCaller> SubdividePathEffect::getEffectCaller(const qreal relFrame) const {
+stdsptr<PathEffectCaller> SubdividePathEffect::getEffectCaller(
+        const qreal relFrame, const qreal influence) const {
+    Q_UNUSED(influence)
     const int count = mCount->getEffectiveIntValue(relFrame);
     return enve::make_shared<SubdivideEffectCaller>(count);
 }

@@ -25,7 +25,8 @@ class DuplicatePathEffect : public PathEffect {
 protected:
     DuplicatePathEffect();
 public:
-    stdsptr<PathEffectCaller> getEffectCaller(const qreal relFrame) const;
+    stdsptr<PathEffectCaller> getEffectCaller(
+            const qreal relFrame, const qreal influence) const;
 private:
     qsptr<IntAnimator> mCount;
     qsptr<QPointFAnimator> mTranslation;

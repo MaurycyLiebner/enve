@@ -23,7 +23,8 @@ class SumPathEffect : public PathEffect {
 protected:
     SumPathEffect();
 public:
-    stdsptr<PathEffectCaller> getEffectCaller(const qreal relFrame) const;
+    stdsptr<PathEffectCaller> getEffectCaller(const qreal relFrame,
+                                              const qreal influence) const;
 };
 
 

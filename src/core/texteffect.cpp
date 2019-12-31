@@ -50,7 +50,23 @@ TextEffect::TextEffect() : eEffect("text effect") {
                 0.5, 0, 1, 0.1, "smoothness");
 
     mTransform = enve::make_shared<AdvancedTransformAnimator>();
-    //mPathEffects = enve::make_shared<PathEffectAnimators>();
+
+    mBasePathEffects = enve::make_shared<PathEffectAnimators>();
+    mBasePathEffects->ca_setHiddenWhenEmpty(false);
+    mBasePathEffects->prp_setName("path base effects");
+
+    mFillPathEffects = enve::make_shared<PathEffectAnimators>();
+    mFillPathEffects->ca_setHiddenWhenEmpty(false);
+    mFillPathEffects->prp_setName("fill effects");
+
+    mOutlineBasePathEffects = enve::make_shared<PathEffectAnimators>();
+    mOutlineBasePathEffects->ca_setHiddenWhenEmpty(false);
+    mOutlineBasePathEffects->prp_setName("outline base effects");
+
+    mOutlinePathEffects = enve::make_shared<PathEffectAnimators>();
+    mOutlinePathEffects->ca_setHiddenWhenEmpty(false);
+    mOutlinePathEffects->prp_setName("outline effects");
+
     mRasterEffects = enve::make_shared<RasterEffectAnimators>();
     mRasterEffects->ca_setHiddenWhenEmpty(false);
 
@@ -73,7 +89,10 @@ TextEffect::TextEffect() : eEffect("text effect") {
 
 
     ca_addChild(mTransform);
-    //ca_addChild(mPathEffects);
+    ca_addChild(mBasePathEffects);
+    ca_addChild(mFillPathEffects);
+    ca_addChild(mOutlineBasePathEffects);
+    ca_addChild(mOutlinePathEffects);
     ca_addChild(mRasterEffects);
 
     ca_setGUIProperty(mInfluence.get());
@@ -135,6 +154,13 @@ void TextEffect::applyToLetter(LetterRenderData * const letterData,
     letterData->applyTransform(transform);
     letterData->fOpacity *= opacity;
 
+    {
+        mBasePathEffects->addEffects(relFrame, letterData->fPathEffects, influence);
+        mFillPathEffects->addEffects(relFrame, letterData->fFillEffects, influence);
+        mOutlineBasePathEffects->addEffects(relFrame, letterData->fOutlineBaseEffects, influence);
+        mOutlinePathEffects->addEffects(relFrame, letterData->fOutlineEffects, influence);
+    }
+
     mRasterEffects->addEffects(relFrame, letterData, influence);
 }
 
@@ -175,10 +201,8 @@ QrealSnapshot diminishGuide(const qreal ampl,
     const qreal x1 = center;
     const qreal x2 = center + qAbs(range);
 
-    const qreal yMax = qAbs(range) < 1 ? qAbs(range) : 1;
-
-    const qreal y02 = range > 0 ? 0 : yMax;
-    const qreal y1 = range > 0 ? yMax : 0;
+    const qreal y02 = range > 0 ? 0 : 1;
+    const qreal y1 = range > 0 ? 1 : 0;
 
     result.appendKey(x0, y02,
                      x0, y02,
@@ -277,6 +301,7 @@ void TextEffect::apply(TextBoxRenderData * const textData) const {
             applyToLine(line.get(), influence);
         }
     } break;
+    default: break;
     }
 }
 

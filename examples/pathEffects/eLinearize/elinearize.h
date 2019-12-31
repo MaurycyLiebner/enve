@@ -24,7 +24,8 @@ public:
     eLinearize000();
 
     CustomIdentifier getIdentifier() const;
-    stdsptr<PathEffectCaller> getEffectCaller(const qreal relFrame) const;
+    stdsptr<PathEffectCaller> getEffectCaller(
+            const qreal relFrame, const qreal influence) const;
 private:
     qsptr<QrealAnimator> mInfluence;
 };
