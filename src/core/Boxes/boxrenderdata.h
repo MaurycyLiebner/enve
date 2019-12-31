@@ -62,12 +62,7 @@ public:
         mDelayDataSet = true;
     }
 
-    bool nextStep() {
-        if(mState == eTaskState::waiting) mState = eTaskState::processing;
-        const bool result = !mEffectsRenderer.isEmpty();
-        if(result) mStep = Step::EFFECTS;
-        return result;
-    }
+    bool nextStep();
 
     void processGpu(QGL33 * const gl, SwitchableContext &context);
     void process();

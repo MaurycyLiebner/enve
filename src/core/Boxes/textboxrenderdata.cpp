@@ -79,6 +79,7 @@ void LetterRenderData::initialize(const qreal relFrame,
                                   const SkFont &font,
                                   TextBox * const parent,
                                   Canvas * const scene) {
+    fOriginalPos = pos;
     fLetterPos = pos;
     parent->BoundingBox::setupWithoutRasterEffects(relFrame, this, scene);
     parent->setupPaintSettings(this, relFrame);
@@ -121,6 +122,7 @@ void WordRenderData::initialize(const qreal relFrame,
                                 Canvas * const scene) {
     parent->BoundingBox::setupWithoutRasterEffects(relFrame, this, scene);
 
+    fOriginalPos = pos;
     fWordPos = pos;
     qreal xPos = pos.x();
 
@@ -166,6 +168,8 @@ void LineRenderData::initialize(const qreal relFrame,
                                 const qreal wordSpacing,
                                 TextBox * const parent,
                                 Canvas * const scene) {
+    fOriginalPos = pos;
+    fLinePos = pos;
     fString = line;
     parent->BoundingBox::setupRenderData(relFrame, this, scene);
 

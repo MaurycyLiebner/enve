@@ -40,6 +40,10 @@ public:
     QMimeData *SWT_createMimeData();
 
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
+    void prp_drawCanvasControls(SkCanvas * const canvas,
+                                const CanvasMode mode,
+                                const float invScale,
+                                const bool ctrlPressed);
 
     void writeIdentifier(eWriteStream& dst) const
     { Q_UNUSED(dst) }

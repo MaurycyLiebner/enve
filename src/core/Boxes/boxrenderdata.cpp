@@ -59,7 +59,7 @@ stdsptr<BoxRenderData> BoxRenderData::makeCopy() {
 }
 
 void BoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {
-    if(fOpacity < 0.001) return;
+    if(isZero4Dec(fOpacity)) return;
     if(fUseRenderTransform) canvas->concat(toSkMatrix(fRenderTransform));
     if(fBlendMode == SkBlendMode::kDstIn ||
        fBlendMode == SkBlendMode::kSrcIn ||
@@ -86,7 +86,7 @@ void BoxRenderData::processGpu(QGL33 * const gl,
     if(mStep == Step::EFFECTS)
         return mEffectsRenderer.processGpu(gl, context, this);
     updateGlobalRect();
-    if(fOpacity < 0.001) return;
+    if(isZero4Dec(fOpacity)) return;
     if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
 
     context.switchToSkia();
@@ -117,7 +117,7 @@ void BoxRenderData::processGpu(QGL33 * const gl,
 void BoxRenderData::process() {
     if(mStep == Step::EFFECTS) return;
     updateGlobalRect();
-    if(fOpacity < 0.001) return;
+    if(isZero4Dec(fOpacity)) return;
     if(fGlobalRect.width() <= 0 || fGlobalRect.height() <= 0) return;
 
     const auto info = SkiaHelpers::getPremulRGBAInfo(fGlobalRect.width(),
@@ -176,6 +176,14 @@ HardwareSupport BoxRenderData::hardwareSupport() const {
 
 void BoxRenderData::queTaskNow() {
     TaskScheduler::sGetInstance()->queCpuTask(ref<eTask>());
+}
+
+bool BoxRenderData::nextStep() {
+    if(mState == eTaskState::waiting) mState = eTaskState::processing;
+    const bool result = !mEffectsRenderer.isEmpty() &&
+                        fRenderedImage;
+    if(result) mStep = Step::EFFECTS;
+    return result;
 }
 
 void BoxRenderData::dataSet() {

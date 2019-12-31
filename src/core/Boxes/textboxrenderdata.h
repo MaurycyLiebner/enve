@@ -48,6 +48,7 @@ public:
 
     QRectF fBoundingRect;
     QPointF fLetterPos;
+    QPointF fOriginalPos;
 
     QList<stdsptr<PathEffectCaller>> fPathEffects;
     QList<stdsptr<PathEffectCaller>> fFillEffects;
@@ -72,6 +73,7 @@ public:
 
     QRectF fBoundingRect;
     QPointF fWordPos;
+    QPointF fOriginalPos;
     QList<stdsptr<LetterRenderData>> fLetters;
 };
 
@@ -91,8 +93,8 @@ public:
     void applyTransform(const QMatrix &transform);
     void queAllWords();
 
-    QRectF fBoundingRect;
     QPointF fLinePos;
+    QPointF fOriginalPos;
     QString fString;
     QList<stdsptr<WordRenderData>> fWords;
 };
