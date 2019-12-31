@@ -142,6 +142,12 @@ void Canvas::convertSelectedPathStrokesToPath() {
     }
 }
 
+void Canvas::setSelectedTextAlignment(const Qt::Alignment alignment) const {
+    for(const auto &box : mSelectedBoxes) {
+        box->setTextAlignment(alignment);
+    }
+}
+
 void Canvas::setSelectedFontFamilyAndStyle(
         const QString& family, const QString& style) {
     for(const auto &box : mSelectedBoxes) {

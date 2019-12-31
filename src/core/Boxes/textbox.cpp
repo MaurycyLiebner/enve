@@ -77,9 +77,9 @@ void TextBox::openTextEditor(QWidget* dialogParent) {
     if(ok) mText->setCurrentValue(text);
 }
 
-void TextBox::setTextAlignment(const Qt::Alignment &alignment) {
+void TextBox::setTextAlignment(const Qt::Alignment alignment) {
     mAlignment = alignment;
-    planUpdate(UpdateReason::userChange);
+    setPathsOutdated(UpdateReason::userChange);
 }
 
 void TextBox::setFont(const QFont &font) {

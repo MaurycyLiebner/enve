@@ -143,6 +143,13 @@ void Actions::pathsBreakApartAction() const {
     afterAction();
 }
 
+void Actions::setTextAlignment(const Qt::Alignment alignment) const {
+    if(!mActiveScene) return;
+    mDocument.fTextAlignment = alignment;
+    mActiveScene->setSelectedTextAlignment(alignment);
+    afterAction();
+}
+
 void Actions::setFontFamilyAndStyle(const QString& family,
                                     const QString& style) const {
     if(!mActiveScene) return;

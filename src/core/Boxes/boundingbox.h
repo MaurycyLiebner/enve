@@ -125,6 +125,10 @@ public:
     virtual void setSelectedFontSize(const qreal fontSize)
     { Q_UNUSED(fontSize) }
 
+
+    virtual void setTextAlignment(const Qt::Alignment alignment)
+    { Q_UNUSED(alignment) }
+
     virtual void setSelectedFontFamilyAndStyle(const QString &family,
                                                const QString &style) {
         Q_UNUSED(family)

@@ -62,6 +62,7 @@ public:
     void pathsCombineAction() const;
     void pathsBreakApartAction() const;
 
+    void setTextAlignment(const Qt::Alignment alignment) const;
     void setFontFamilyAndStyle(const QString& family,
                                const QString& style) const;
     void setFontSize(const qreal size) const;

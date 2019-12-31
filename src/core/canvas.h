@@ -274,6 +274,7 @@ public:
     void connectPoints();
     void subdivideSegments();
 
+    void setSelectedTextAlignment(const Qt::Alignment alignment) const;
     void setSelectedFontFamilyAndStyle(const QString& family,
                                        const QString& style);
     void setSelectedFontSize(const qreal size);

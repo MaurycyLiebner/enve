@@ -842,6 +842,8 @@ void MainWindow::connectToolBarActions() {
             &mActions, &Actions::setFontSize);
     connect(mFontWidget, &FontsWidget::fontFamilyAndStyleChanged,
             &mActions, &Actions::setFontFamilyAndStyle);
+    connect(mFontWidget, &FontsWidget::textAlignmentChanged,
+            &mActions, &Actions::setTextAlignment);
 
     connect(mActionNewEmptyPaintFrame, &ActionButton::pressed,
             &mActions, &Actions::newEmptyPaintFrame);

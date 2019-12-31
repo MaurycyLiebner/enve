@@ -39,6 +39,7 @@ public:
     bool differenceInEditPathBetweenFrames(
                 const int frame1, const int frame2) const;
 
+    void setTextAlignment(const Qt::Alignment alignment);
     void setFont(const QFont &font);
     void setSelectedFontSize(const qreal size);
     void setSelectedFontFamilyAndStyle(const QString &fontFamily,
@@ -55,8 +56,6 @@ public:
     QString getCurrentValue();
 
     void openTextEditor(QWidget* dialogParent);
-
-    void setTextAlignment(const Qt::Alignment &alignment);
 
     void setCurrentValue(const QString &text);
 private:

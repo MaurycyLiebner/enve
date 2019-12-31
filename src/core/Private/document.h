@@ -64,6 +64,7 @@ public:
     // all in document
     QList<qsptr<Gradient>> fGradients;
 
+    Qt::Alignment fTextAlignment = Qt::AlignLeft;
     QString fFontFamily = "Arial";
     QString fFontStyle = "Regular";
     qreal fFontSize = 72;

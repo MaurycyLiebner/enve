@@ -3,6 +3,9 @@
         <file alias="stylesheet.qss">stylesheet.qss</file>
         <file>icons/toolbarButtons/plain/notOnlySelectedVisible</file>
         <file>icons/toolbarButtons/plain/onlySelectedVisible</file>
+        <file>icons/toolbarButtons/plain/alignCenter</file>
+        <file>icons/toolbarButtons/plain/alignLeft</file>
+        <file>icons/toolbarButtons/plain/alignRight</file>
     </qresource>
     <qresource prefix="/cursors">
         <file alias="cursor-node.xpm">pixmaps/cursor-node.xpm</file>

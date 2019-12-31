@@ -63,6 +63,33 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
     mMainLayout->addWidget(mFontStyleCombo);
     mMainLayout->addWidget(mFontSizeCombo);
 
+    const QString iconsDir = eSettings::sIconsDir() + "/toolbarButtons";
+
+    mAlignLeft = new ActionButton(iconsDir + "/alignLeft.png",
+                                  "Align Text Left", this);
+    connect(mAlignLeft, &ActionButton::pressed,
+            this, [this]() { emit textAlignmentChanged(Qt::AlignLeft); });
+
+    mAlignCenter = new ActionButton(iconsDir + "/alignCenter.png",
+                                    "Align Text Center", this);
+    connect(mAlignCenter, &ActionButton::pressed,
+            this, [this]() { emit textAlignmentChanged(Qt::AlignCenter); });
+
+    mAlignRight = new ActionButton(iconsDir + "/alignRight.png",
+                                  "Align Text Right", this);
+    connect(mAlignRight, &ActionButton::pressed,
+            this, [this]() { emit textAlignmentChanged(Qt::AlignRight); });
+
+    const auto buttonsLayout = new QHBoxLayout;
+    buttonsLayout->setSpacing(MIN_WIDGET_DIM/5);
+    buttonsLayout->setContentsMargins(0, 0, 0, 0);
+
+    buttonsLayout->addWidget(mAlignLeft);
+    buttonsLayout->addWidget(mAlignCenter);
+    buttonsLayout->addWidget(mAlignRight);
+
+    mMainLayout->addLayout(buttonsLayout);
+
     updateStylesFromCurrentFamilyAndEmit();
 }
 

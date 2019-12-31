@@ -21,6 +21,7 @@
 #include <QHBoxLayout>
 #include <QComboBox>
 #include <QFontDatabase>
+#include "actionbutton.h"
 
 class FontsWidget : public QWidget {
     Q_OBJECT
@@ -40,14 +41,15 @@ public:
 signals:
     void fontFamilyAndStyleChanged(QString family, QString style);
     void fontSizeChanged(qreal size);
-private slots:
+    void textAlignmentChanged(Qt::Alignment alignment);
+private:
     void updateStylesFromCurrentFamilyAndEmit(const QString &family);
     void updateStylesFromCurrentFamilyAndEmit();
     void updateSizesFromCurrentFamilyAndStylesAndEmit();
 
     void emitFamilyAndStyleChanged();
     void emitSizeChanged();
-private:
+
     void updateStylesFromCurrentFamily(const QString &family);
     void updateSizesFromCurrentFamilyAndStyles();
 
@@ -56,6 +58,10 @@ private:
     QComboBox *mFontFamilyCombo;
     QComboBox *mFontStyleCombo;
     QComboBox *mFontSizeCombo;
+
+    ActionButton *mAlignLeft;
+    ActionButton *mAlignCenter;
+    ActionButton *mAlignRight;
 
     QFontDatabase mFontDatabase;
 };
