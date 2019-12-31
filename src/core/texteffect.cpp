@@ -63,15 +63,19 @@ TextEffect::TextEffect() : eEffect("text effect") {
 
     mP1Anim = enve::make_shared<QPointFAnimator>("point 1");
     mP1Anim->getYAnimator()->setValueRange(0, 1);
+    mP1Anim->getYAnimator()->setPrefferedValueStep(0.1);
     mP1Anim->setBaseValue(-40, 0);
     mP2Anim = enve::make_shared<QPointFAnimator>("point 2");
     mP2Anim->getYAnimator()->setValueRange(0, 1);
+    mP2Anim->getYAnimator()->setPrefferedValueStep(0.1);
     mP2Anim->setBaseValue(-10, 1);
     mP3Anim = enve::make_shared<QPointFAnimator>("point 3");
     mP3Anim->getYAnimator()->setValueRange(0, 1);
+    mP3Anim->getYAnimator()->setPrefferedValueStep(0.1);
     mP3Anim->setBaseValue(20, 1);
     mP4Anim = enve::make_shared<QPointFAnimator>("point 4");
     mP4Anim->getYAnimator()->setValueRange(0, 1);
+    mP4Anim->getYAnimator()->setPrefferedValueStep(0.1);
     mP4Anim->setBaseValue(50, 0);
 
     setPointsHandler(enve::make_shared<PointsHandler>());
@@ -92,6 +96,8 @@ TextEffect::TextEffect() : eEffect("text effect") {
                 0, 0, 1, 0.1, "influence");
     mPeriod = enve::make_shared<QrealAnimator>(
                 50, 1, 9999, 5, "period");
+    mPeriodicShift = enve::make_shared<QrealAnimator>(
+                0, -9999, 9999, 5, "shift");
     mPeriodicSmoothness = enve::make_shared<QrealAnimator>(
                 0.5, 0, 1, 0.1, "smoothness");
 
@@ -132,6 +138,7 @@ TextEffect::TextEffect() : eEffect("text effect") {
     ca_addChild(mPeriodicCont);
     mPeriodicCont->ca_addChild(mPeriodicInfluence);
     mPeriodicCont->ca_addChild(mPeriod);
+    mPeriodicCont->ca_addChild(mPeriodicShift);
     mPeriodicCont->ca_addChild(mPeriodicSmoothness);
     mPeriodicCont->ca_setGUIProperty(mPeriodicInfluence.get());
 
@@ -150,9 +157,15 @@ TextEffect::TextEffect() : eEffect("text effect") {
 bool ptXLess(const QPointF& p1, const QPointF& p2)
 { return p1.x() < p2.x(); }
 
-qreal TextEffect::getGuideLineHeight() {
+qreal TextEffect::getGuideLineHeight() const {
     const auto textBox = getFirstAncestor<TextBox>();
     if(textBox) return textBox->getFontSize();
+    return 0;
+}
+
+qreal TextEffect::getGuideLineWidth() const {
+    const auto textBox = getFirstAncestor<TextBox>();
+    if(textBox) return textBox->getRelBoundingRect().width();
     return 0;
 }
 
@@ -202,6 +215,37 @@ void TextEffect::prp_drawCanvasControls(
     bottomLine.moveTo(toSkScalar(minX), toSkScalar(0));
     bottomLine.lineTo(toSkScalar(maxX), toSkScalar(0));
 
+    SkPath cyclicalPath;
+    const qreal periodInfl = mPeriodicInfluence->getEffectiveValue();
+    if(!isZero4Dec(periodInfl)) {
+        const qreal period = mPeriod->getEffectiveValue();
+        const qreal shift = mPeriodicShift->getEffectiveValue();
+        const qreal smoothness = mPeriodicSmoothness->getEffectiveValue();
+        const qreal width = getGuideLineWidth();
+
+        const qreal firstX = shift - qCeil(shift/period)*period;
+        const qreal last = width + period;
+        cyclicalPath.moveTo(toSkScalar(firstX), toSkScalar(height));
+        for(qreal x = firstX + 0.5*period ; x < last; x += period) {
+            const qreal x0 = x - 0.5*period;
+            const qreal x1 = x;
+            const qreal x2 = x + 0.5*period;
+
+            cyclicalPath.cubicTo(toSkScalar(x0*(1 - smoothness) + x1*smoothness),
+                                 toSkScalar(height),
+                                 toSkScalar(x1*(1 - smoothness) + x0*smoothness),
+                                 0,
+                                 toSkScalar(x1),
+                                 0);
+            cyclicalPath.cubicTo(toSkScalar(x1*(1 - smoothness) + x2*smoothness),
+                                 0,
+                                 toSkScalar(x2*(1 - smoothness) + x1*smoothness),
+                                 toSkScalar(height),
+                                 toSkScalar(x2),
+                                 toSkScalar(height));
+        }
+    }
+
     if(target() == TextFragmentType::line) {
         SkMatrix transform;
         transform.setRotate(90);
@@ -209,6 +253,7 @@ void TextEffect::prp_drawCanvasControls(
         path.transform(transform);
         topLine.transform(transform);
         bottomLine.transform(transform);
+        cyclicalPath.transform(transform);
     }
     const auto transform = toSkMatrix(eEffect::getTransform());
 
@@ -218,7 +263,8 @@ void TextEffect::prp_drawCanvasControls(
                                     transform, true, 5.f, SK_ColorBLUE);
     SkiaHelpers::drawOutlineOverlay(canvas, path, invScale,
                                     transform, SK_ColorRED);
-
+    SkiaHelpers::drawOutlineOverlay(canvas, cyclicalPath, invScale,
+                                    transform, SK_ColorRED);
     eEffect::prp_drawCanvasControls(canvas, mode, invScale, ctrlPressed);
 }
 
@@ -344,13 +390,13 @@ QrealSnapshot diminishGuide(const qreal ampl,
 
 QrealSnapshot cyclicalGuide(const qreal ampl,
                             const qreal period,
-                            const qreal center,
+                            const qreal shift,
                             const qreal smoothness,
-                            const int nTargets) {
+                            const qreal width) {
     QrealSnapshot result(ampl, 1, ampl);
 
-    const qreal first = center - qCeil(center/period)*period;
-    const qreal last = nTargets + 2*period;
+    const qreal first = shift - qCeil(shift/period)*period;
+    const qreal last = width + 2*period;
     for(qreal x = first ; x < last; x += period) {
         const qreal xm1 = x - 0.5*period;
         const qreal x0 = x;
@@ -369,6 +415,8 @@ QrealSnapshot cyclicalGuide(const qreal ampl,
 
 void TextEffect::apply(TextBoxRenderData * const textData) const {
     const qreal relFrame = textData->fRelFrame;
+    const qreal maxInfl = mInfluence->getEffectiveValue(relFrame);
+    if(isZero4Dec(maxInfl)) return;
     const qreal minInfl = mMinInfluence->getEffectiveValue(relFrame);
     const qreal ampl = mInfluence->getEffectiveValue(relFrame);
     const qreal period = mPeriod->getEffectiveValue(relFrame);
@@ -382,19 +430,21 @@ void TextEffect::apply(TextBoxRenderData * const textData) const {
 
     const qreal perInfl = mPeriodicInfluence->getEffectiveValue(relFrame);
     const qreal perSmoothness = mPeriodicSmoothness->getEffectiveValue(relFrame);
-    const auto baseGuide = diminishGuide(ampl, p1, p2, p3, p4, dimSmoothness);
+    const qreal perShift = mPeriodicShift->getEffectiveValue(relFrame);
+    if(isZero4Dec(dimInfl + perInfl)) return;
 
+    const qreal inflSum = qMin(1., dimInfl + perInfl);
+    const auto baseGuide = diminishGuide(ampl, p1, p2, p3, p4, dimSmoothness);
+    const auto sinGuide = cyclicalGuide(ampl, period, perShift, perSmoothness,
+                                        getGuideLineWidth());
     switch(target()) {
     case TextFragmentType::letter: {
         for(const auto& line : textData->fLines) {
-            const auto sinGuide = cyclicalGuide(ampl, period, 0, perSmoothness,
-                                                line->fString.count());
-
             for(const auto& word : line->fWords) {
                 for(const auto& letter : word->fLetters) {
                     const qreal xPos = letter->fOriginalPos.x();
-                    const qreal baseInfl = baseGuide.getValue(xPos)*dimInfl + 1 - dimInfl;
-                    const qreal sinInfl = sinGuide.getValue(xPos)*perInfl + 1 - perInfl;
+                    const qreal baseInfl = baseGuide.getValue(xPos)*dimInfl + inflSum - dimInfl;
+                    const qreal sinInfl = sinGuide.getValue(xPos)*perInfl + inflSum - perInfl;
                     const qreal influence = qBound(minInfl, baseInfl*sinInfl, 1.);
                     applyToLetter(letter.get(), influence);
                 }
@@ -403,24 +453,20 @@ void TextEffect::apply(TextBoxRenderData * const textData) const {
     } break;
     case TextFragmentType::word: {
         for(const auto& line : textData->fLines) {
-            const auto sinGuide = cyclicalGuide(ampl, period, 0, perSmoothness,
-                                                line->fWords.count());
             for(const auto& word : line->fWords) {
                 const qreal xPos = word->fOriginalPos.x();
-                const qreal baseInfl = baseGuide.getValue(xPos)*dimInfl + 1 - dimInfl;
-                const qreal sinInfl = sinGuide.getValue(xPos)*perInfl + 1 - perInfl;
+                const qreal baseInfl = baseGuide.getValue(xPos)*dimInfl + inflSum - dimInfl;
+                const qreal sinInfl = sinGuide.getValue(xPos)*perInfl + inflSum - perInfl;
                 const qreal influence = qBound(minInfl, baseInfl*sinInfl, 1.);
                 applyToWord(word.get(), influence);
             }
         }
     } break;
     case TextFragmentType::line: {
-        const auto sinGuide = cyclicalGuide(ampl, period, 0, perSmoothness,
-                                            textData->fLines.count());
         for(const auto& line : textData->fLines) {
             const qreal yPos = line->fOriginalPos.y();
-            const qreal baseInfl = baseGuide.getValue(yPos)*dimInfl + 1 - dimInfl;
-            const qreal sinInfl = sinGuide.getValue(yPos)*perInfl + 1 - perInfl;
+            const qreal baseInfl = baseGuide.getValue(yPos)*dimInfl + inflSum - dimInfl;
+            const qreal sinInfl = sinGuide.getValue(yPos)*perInfl + inflSum - perInfl;
             const qreal influence = qBound(minInfl, baseInfl*sinInfl, 1.);
             applyToLine(line.get(), influence);
         }

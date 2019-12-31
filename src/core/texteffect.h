@@ -52,11 +52,13 @@ public:
     void apply(TextBoxRenderData * const textData) const;
     TextFragmentType target() const;
 
-    qreal getGuideLineHeight();
+    qreal getGuideLineWidth() const;
+    qreal getGuideLineHeight() const;
 private:
     QMatrix getTransform(const qreal relFrame,
                          const qreal influence,
                          const QPointF &addPivot) const;
+
     void applyToLetter(LetterRenderData * const letterData,
                        const qreal influence) const;
     void applyToWord(WordRenderData * const wordData,
@@ -84,8 +86,9 @@ private:
     qsptr<QrealAnimator> mDiminishSmoothness;
 
     qsptr<StaticComplexAnimator> mPeriodicCont;
-    qsptr<QrealAnimator> mPeriod;
     qsptr<QrealAnimator> mPeriodicInfluence;
+    qsptr<QrealAnimator> mPeriod;
+    qsptr<QrealAnimator> mPeriodicShift;
     qsptr<QrealAnimator> mPeriodicSmoothness;
 
     qsptr<AdvancedTransformAnimator> mTransform;
