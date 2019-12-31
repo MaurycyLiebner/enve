@@ -21,6 +21,27 @@
 #include "Boxes/textbox.h"
 
 #include "Animators/qpointfanimator.h"
+#include "MovablePoints/animatedpoint.h"
+
+class TextEffectPoint : public AnimatedPoint {
+public:
+    TextEffectPoint(QPointFAnimator * const anim,
+                    TextEffect* const effect) :
+        AnimatedPoint(anim, TYPE_PATH_POINT), mTextEffect(effect) {}
+
+    QPointF getRelativePos() const {
+        const qreal height = mTextEffect->getGuideLineHeight();
+        const QPointF pos = AnimatedPoint::getRelativePos();
+        return {pos.x(), -pos.y()*height};
+    }
+
+    void setRelativePos(const QPointF &relPos) {
+        const qreal height = mTextEffect->getGuideLineHeight();
+        AnimatedPoint::setRelativePos({relPos.x(), -relPos.y()/height});
+    }
+private:
+    TextEffect * const mTextEffect;
+};
 
 TextEffect::TextEffect() : eEffect("text effect") {
     mInfluence = enve::make_shared<QrealAnimator>(
@@ -33,13 +54,32 @@ TextEffect::TextEffect() : eEffect("text effect") {
     mDiminishCont = enve::make_shared<StaticComplexAnimator>("diminish");
     mDiminishInfluence = enve::make_shared<QrealAnimator>(
                 1, 0, 1, 0.1, "influence");
-    mDiminishCenter = enve::make_shared<QrealAnimator>(
-                0, -9999, 9999, 5, "center");
-    mDiminishRange = enve::make_shared<QrealAnimator>(
-                100, -9999, 9999, 5, "range");
+
+    mP1Anim = enve::make_shared<QPointFAnimator>("point 1");
+    mP1Anim->getYAnimator()->setValueRange(0, 1);
+    mP1Anim->setBaseValue(-40, 0);
+    mP2Anim = enve::make_shared<QPointFAnimator>("point 2");
+    mP2Anim->getYAnimator()->setValueRange(0, 1);
+    mP2Anim->setBaseValue(-10, 1);
+    mP3Anim = enve::make_shared<QPointFAnimator>("point 3");
+    mP3Anim->getYAnimator()->setValueRange(0, 1);
+    mP3Anim->setBaseValue(20, 1);
+    mP4Anim = enve::make_shared<QPointFAnimator>("point 4");
+    mP4Anim->getYAnimator()->setValueRange(0, 1);
+    mP4Anim->setBaseValue(50, 0);
+
+    setPointsHandler(enve::make_shared<PointsHandler>());
+    mP1Pt = enve::make_shared<TextEffectPoint>(mP1Anim.get(), this);
+    mP2Pt = enve::make_shared<TextEffectPoint>(mP2Anim.get(), this);
+    mP3Pt = enve::make_shared<TextEffectPoint>(mP3Anim.get(), this);
+    mP4Pt = enve::make_shared<TextEffectPoint>(mP4Anim.get(), this);
+    getPointsHandler()->appendPt(mP1Pt);
+    getPointsHandler()->appendPt(mP2Pt);
+    getPointsHandler()->appendPt(mP3Pt);
+    getPointsHandler()->appendPt(mP4Pt);
+
     mDiminishSmoothness = enve::make_shared<QrealAnimator>(
                 0.5, 0, 1, 0.1, "smoothness");
-
 
     mPeriodicCont = enve::make_shared<StaticComplexAnimator>("periodic");
     mPeriodicInfluence = enve::make_shared<QrealAnimator>(
@@ -76,8 +116,10 @@ TextEffect::TextEffect() : eEffect("text effect") {
 
     ca_addChild(mDiminishCont);
     mDiminishCont->ca_addChild(mDiminishInfluence);
-    mDiminishCont->ca_addChild(mDiminishCenter);
-    mDiminishCont->ca_addChild(mDiminishRange);
+    mDiminishCont->ca_addChild(mP1Anim);
+    mDiminishCont->ca_addChild(mP2Anim);
+    mDiminishCont->ca_addChild(mP3Anim);
+    mDiminishCont->ca_addChild(mP4Anim);
     mDiminishCont->ca_addChild(mDiminishSmoothness);
     mDiminishCont->ca_setGUIProperty(mDiminishInfluence.get());
 
@@ -86,7 +128,6 @@ TextEffect::TextEffect() : eEffect("text effect") {
     mPeriodicCont->ca_addChild(mPeriod);
     mPeriodicCont->ca_addChild(mPeriodicSmoothness);
     mPeriodicCont->ca_setGUIProperty(mPeriodicInfluence.get());
-
 
     ca_addChild(mTransform);
     ca_addChild(mBasePathEffects);
@@ -100,49 +141,75 @@ TextEffect::TextEffect() : eEffect("text effect") {
     enabledDrawingOnCanvas();
 }
 
+bool ptXLess(const QPointF& p1, const QPointF& p2)
+{ return p1.x() < p2.x(); }
+
+qreal TextEffect::getGuideLineHeight() {
+    const auto textBox = getFirstAncestor<TextBox>();
+    if(textBox) return textBox->getFontSize();
+    return 0;
+}
+
 void TextEffect::prp_drawCanvasControls(
         SkCanvas * const canvas, const CanvasMode mode,
         const float invScale, const bool ctrlPressed) {
-    if(!prp_isSelected()) {
-        return eEffect::prp_drawCanvasControls(
-                    canvas, mode, invScale, ctrlPressed);
-    }
+    if(!prp_isSelected() || !isVisible()) return;
 
     SkPath path;
 
     //const qreal dimInfl = mDiminishInfluence->getEffectiveValue();
-    const qreal center = mDiminishCenter->getEffectiveValue();
-    const qreal diminishRange = mDiminishRange->getEffectiveValue();
-    const qreal dimSmoothness = mDiminishSmoothness->getEffectiveValue();
+    const QPointF p1 = mP1Anim->getEffectiveValue();
+    const QPointF p2 = mP2Anim->getEffectiveValue();
+    const QPointF p3 = mP3Anim->getEffectiveValue();
+    const QPointF p4 = mP4Anim->getEffectiveValue();
 
-    const qreal x0 = center - qAbs(diminishRange);
-    const qreal x1 = center;
-    const qreal x2 = center + qAbs(diminishRange);
+    const qreal minX = qMin4(p1.x(), p2.x(), p3.x(), p4.x());
+    const qreal maxX = qMax4(p1.x(), p2.x(), p3.x(), p4.x());
+    const qreal height = getGuideLineHeight();
 
-    const qreal height = qBound(20., qAbs(diminishRange)*0.3, 100.);
-    const qreal y02 = -(diminishRange > 0 ? 0 : 1)*height;
-    const qreal y1 = -(diminishRange > 0 ? 1 : 0)*height;
+    const qreal smoothness = mDiminishSmoothness->getEffectiveValue();
 
-    path.moveTo(toSkScalar(x0), toSkScalar(y02));
-    path.cubicTo(toSkScalar(x0*(1 - dimSmoothness) + x1*dimSmoothness),
-                 toSkScalar(y02),
-                 toSkScalar(x1*(1 - dimSmoothness) + x0*dimSmoothness),
-                 toSkScalar(y1),
-                 toSkScalar(x1), toSkScalar(y1));
-    path.cubicTo(toSkScalar(x1*(1 - dimSmoothness) + x2*dimSmoothness),
-                 toSkScalar(y1),
-                 toSkScalar(x2*(1 - dimSmoothness) + x1*dimSmoothness),
-                 toSkScalar(y02),
-                 toSkScalar(x2), toSkScalar(y02));
+    QList<QPointF> pList{p1, p2, p3, p4};
+    std::sort(pList.begin(), pList.end(), ptXLess);
+
+    QPointF prevPt = pList.first();
+    path.moveTo(toSkScalar(prevPt.x()), toSkScalar(prevPt.y()*height));
+    const int iMax = pList.count() - 1;
+    for(int i = 0; i <= iMax; i++) {
+        const auto& pt = pList.at(i);
+
+        path.cubicTo(toSkScalar(prevPt.x()*(1 - smoothness) + pt.x()*smoothness),
+                     -toSkScalar(prevPt.y()*height),
+                     toSkScalar(pt.x()*(1 - smoothness) + prevPt.x()*smoothness),
+                     -toSkScalar(pt.y()*height),
+                     toSkScalar(pt.x()),
+                     -toSkScalar(pt.y()*height));
+
+        prevPt = pt;
+    }
 
     if(target() == TextFragmentType::line) {
         SkMatrix transform;
         transform.setRotate(90);
         path.transform(transform);
     }
+    const auto transform = toSkMatrix(eEffect::getTransform());
+    SkPath topLine;
+    topLine.moveTo(toSkScalar(minX), -toSkScalar(height));
+    topLine.lineTo(toSkScalar(maxX), -toSkScalar(height));
+
+    SkPath bottomLine;
+    bottomLine.moveTo(toSkScalar(minX), toSkScalar(0));
+    bottomLine.lineTo(toSkScalar(maxX), toSkScalar(0));
+
+    SkiaHelpers::drawOutlineOverlay(canvas, topLine, invScale,
+                                    transform, true, 5.f, SK_ColorBLUE);
+    SkiaHelpers::drawOutlineOverlay(canvas, bottomLine, invScale,
+                                    transform, true, 5.f, SK_ColorBLUE);
     SkiaHelpers::drawOutlineOverlay(canvas, path, invScale,
-                                    toSkMatrix(eEffect::getTransform()));
-    Property::prp_drawCanvasControls(canvas, mode, invScale, ctrlPressed);
+                                    transform, SK_ColorRED);
+
+    eEffect::prp_drawCanvasControls(canvas, mode, invScale, ctrlPressed);
 }
 
 bool TextEffect::SWT_dropSupport(const QMimeData * const data) {
@@ -240,26 +307,27 @@ void TextEffect::applyToLine(LineRenderData * const lineData,
 }
 
 QrealSnapshot diminishGuide(const qreal ampl,
-                            const qreal center,
-                            const qreal range,
+                            const QPointF& p1,
+                            const QPointF& p2,
+                            const QPointF& p3,
+                            const QPointF& p4,
                             const qreal smoothness) {
+    QList<QPointF> pList{p1, p2, p3, p4};
+    std::sort(pList.begin(), pList.end(), ptXLess);
+
     QrealSnapshot result(ampl, 1, ampl);
-    const qreal x0 = center - qAbs(range);
-    const qreal x1 = center;
-    const qreal x2 = center + qAbs(range);
 
-    const qreal y02 = range > 0 ? 0 : 1;
-    const qreal y1 = range > 0 ? 1 : 0;
+    QPointF prevPt = pList.first();
+    const int iMax = pList.count() - 1;
+    for(int i = 0; i <= iMax; i++) {
+        const auto& pt = pList.at(i);
+        const auto& nextPt = pList.at(qMin(iMax, i + 1));
 
-    result.appendKey(x0, y02,
-                     x0, y02,
-                     x0*(1 - smoothness) + x1*smoothness, y02);
-    result.appendKey(x1*(1 - smoothness) + x0*smoothness, y1,
-                     x1, y1,
-                     x1*(1 - smoothness) + x2*smoothness, y1);
-    result.appendKey(x2*(1 - smoothness) + x1*smoothness, y02,
-                     x2, y02,
-                     x2, y02);
+        result.appendKey(pt.x()*(1 - smoothness) + prevPt.x()*smoothness, pt.y(),
+                         pt.x(), pt.y(),
+                         pt.x()*(1 - smoothness) + nextPt.x()*smoothness, pt.y());
+        prevPt = pt;
+    }
 
     return result;
 }
@@ -296,18 +364,20 @@ void TextEffect::apply(TextBoxRenderData * const textData) const {
     const qreal period = mPeriod->getEffectiveValue(relFrame);
 
     const qreal dimInfl = mDiminishInfluence->getEffectiveValue(relFrame);
-    const qreal center = mDiminishCenter->getEffectiveValue(relFrame);
-    const qreal diminishRange = mDiminishRange->getEffectiveValue(relFrame);
+    const QPointF p1 = mP1Anim->getEffectiveValue(relFrame);
+    const QPointF p2 = mP2Anim->getEffectiveValue(relFrame);
+    const QPointF p3 = mP3Anim->getEffectiveValue(relFrame);
+    const QPointF p4 = mP4Anim->getEffectiveValue(relFrame);
     const qreal dimSmoothness = mDiminishSmoothness->getEffectiveValue(relFrame);
 
     const qreal perInfl = mPeriodicInfluence->getEffectiveValue(relFrame);
     const qreal perSmoothness = mPeriodicSmoothness->getEffectiveValue(relFrame);
-    const auto baseGuide = diminishGuide(ampl, center, diminishRange, dimSmoothness);
+    const auto baseGuide = diminishGuide(ampl, p1, p2, p3, p4, dimSmoothness);
 
     switch(target()) {
     case TextFragmentType::letter: {
         for(const auto& line : textData->fLines) {
-            const auto sinGuide = cyclicalGuide(ampl, period, center, perSmoothness,
+            const auto sinGuide = cyclicalGuide(ampl, period, 0, perSmoothness,
                                                 line->fString.count());
 
             for(const auto& word : line->fWords) {
@@ -323,7 +393,7 @@ void TextEffect::apply(TextBoxRenderData * const textData) const {
     } break;
     case TextFragmentType::word: {
         for(const auto& line : textData->fLines) {
-            const auto sinGuide = cyclicalGuide(ampl, period, center, perSmoothness,
+            const auto sinGuide = cyclicalGuide(ampl, period, 0, perSmoothness,
                                                 line->fWords.count());
             for(const auto& word : line->fWords) {
                 const qreal xPos = word->fOriginalPos.x();
@@ -335,7 +405,7 @@ void TextEffect::apply(TextBoxRenderData * const textData) const {
         }
     } break;
     case TextFragmentType::line: {
-        const auto sinGuide = cyclicalGuide(ampl, period, center, perSmoothness,
+        const auto sinGuide = cyclicalGuide(ampl, period, 0, perSmoothness,
                                             textData->fLines.count());
         for(const auto& line : textData->fLines) {
             const qreal yPos = line->fOriginalPos.y();

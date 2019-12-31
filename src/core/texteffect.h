@@ -27,6 +27,7 @@ class LetterRenderData;
 class WordRenderData;
 class LineRenderData;
 class TextBoxRenderData;
+class AnimatedPoint;
 
 enum class TextFragmentType : short;
 
@@ -50,6 +51,8 @@ public:
 
     void apply(TextBoxRenderData * const textData) const;
     TextFragmentType target() const;
+
+    qreal getGuideLineHeight();
 private:
     QMatrix getTransform(const qreal relFrame,
                          const qreal influence,
@@ -67,8 +70,17 @@ private:
 
     qsptr<StaticComplexAnimator> mDiminishCont;
     qsptr<QrealAnimator> mDiminishInfluence;
-    qsptr<QrealAnimator> mDiminishCenter;
-    qsptr<QrealAnimator> mDiminishRange;
+
+    qsptr<QPointFAnimator> mP1Anim;
+    qsptr<QPointFAnimator> mP2Anim;
+    qsptr<QPointFAnimator> mP3Anim;
+    qsptr<QPointFAnimator> mP4Anim;
+
+    stdsptr<AnimatedPoint> mP1Pt;
+    stdsptr<AnimatedPoint> mP2Pt;
+    stdsptr<AnimatedPoint> mP3Pt;
+    stdsptr<AnimatedPoint> mP4Pt;
+
     qsptr<QrealAnimator> mDiminishSmoothness;
 
     qsptr<StaticComplexAnimator> mPeriodicCont;

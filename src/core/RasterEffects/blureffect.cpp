@@ -22,6 +22,7 @@ BlurEffect::BlurEffect() :
     ca_addChild(mRadius);
     connect(mRadius.get(), &QrealAnimator::valueChangedSignal,
             this, &RasterEffect::forcedMarginChanged);
+    ca_setGUIProperty(mRadius.get());
 }
 
 stdsptr<RasterEffectCaller> BlurEffect::getEffectCaller(

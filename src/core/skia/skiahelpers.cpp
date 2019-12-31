@@ -137,7 +137,7 @@ void SkiaHelpers::drawOutlineOverlay(SkCanvas * const canvas,
     SkPaint paint;
     if(dashes) {
         const float intervals[2] = {intervalSize*invScale,
-                                       intervalSize*invScale};
+                                    intervalSize*invScale};
         paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
     }
     paint.setAntiAlias(true);
