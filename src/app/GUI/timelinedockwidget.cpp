@@ -92,7 +92,8 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mPlayButton = SwitchButton::sCreate2Switch(iconsDir + "/play.png",
                                                iconsDir + "/pause.png",
                                                gSingleLineTooltip("Render Preview", "Space"), this);
-    mStopButton = new ActionButton(iconsDir + "/stop.png", "Stop Preview", this);
+    mStopButton = new ActionButton(iconsDir + "/stop.png",
+                                   gSingleLineTooltip("Stop Preview", "Esc"), this);
     connect(mStopButton, &ActionButton::pressed,
             this, &TimelineDockWidget::interruptPreview);
 
