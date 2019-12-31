@@ -20,7 +20,7 @@
 #include "FileCacheHandlers/imagecachehandler.h"
 #include "fileshandler.h"
 
-ImageBox::ImageBox() : BoundingBox(TYPE_IMAGE) {
+ImageBox::ImageBox() : BoundingBox(eBoxType::image) {
     prp_setName("Image");
 }
 

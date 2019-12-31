@@ -21,7 +21,7 @@
 #include "Animators/transformanimator.h"
 #include "Animators/rastereffectanimators.h"
 
-Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
+Rectangle::Rectangle() : PathBox(eBoxType::rectangle) {
     prp_setName("Rectangle");
 
     setPointsHandler(enve::make_shared<PointsHandler>());

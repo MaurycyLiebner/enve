@@ -17,7 +17,7 @@
 #include "ecustombox.h"
 
 eCustomBox::eCustomBox(const QString& name) :
-    BoundingBox(eBoxType::TYPE_CUSTOM) {
+    BoundingBox(eBoxType::custom) {
     prp_setName(name);
 }
 

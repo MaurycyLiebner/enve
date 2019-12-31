@@ -23,7 +23,7 @@
 
 void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.isEmpty()) return;
-    const auto newGroup = enve::make_shared<ContainerBox>(TYPE_GROUP);
+    const auto newGroup = enve::make_shared<ContainerBox>(eBoxType::group);
     mCurrentContainer->addContained(newGroup);
     for(int i = mSelectedBoxes.count() - 1; i >= 0; i--) {
         const auto boxSP = mSelectedBoxes.at(i)->ref<BoundingBox>();

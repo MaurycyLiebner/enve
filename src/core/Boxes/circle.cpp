@@ -22,7 +22,7 @@
 #include "MovablePoints/pointshandler.h"
 #include "PathEffects/patheffectanimators.h"
 
-Circle::Circle() : PathBox(TYPE_CIRCLE) {
+Circle::Circle() : PathBox(eBoxType::circle) {
     prp_setName("Circle");
 
     setPointsHandler(enve::make_shared<PointsHandler>());

@@ -20,7 +20,7 @@
 #include "layerboxrenderdata.h"
 
 InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget) :
-    ContainerBox(TYPE_INTERNAL_LINK_GROUP) {
+    ContainerBox(eBoxType::internalLinkGroup) {
     setLinkTarget(linkTarget);
 
     ca_prependChild(mTransformAnimator.data(), mBoxTarget);

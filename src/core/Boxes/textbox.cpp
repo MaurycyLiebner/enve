@@ -27,7 +27,7 @@
 #include "textboxrenderdata.h"
 #include "pathboxrenderdata.h"
 
-TextBox::TextBox() : PathBox(TYPE_TEXT) {
+TextBox::TextBox() : PathBox(eBoxType::text) {
     prp_setName("text");
 
     mFillSettings->setPaintType(PaintType::FLATPAINT);

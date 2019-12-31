@@ -50,23 +50,23 @@ enum class CanvasMode : short;
 
 class SimpleBrushWrapper;
 
-enum eBoxType {
-    TYPE_VECTOR_PATH,
-    TYPE_CIRCLE,
-    TYPE_IMAGE,
-    TYPE_RECTANGLE,
-    TYPE_TEXT,
-    TYPE_LAYER,
-    TYPE_CANVAS,
-    TYPE_INTERNAL_LINK,
-    TYPE_INTERNAL_LINK_GROUP,
-    TYPE_INTERNAL_LINK_CANVAS,
-    TYPE_EXTERNAL_LINK,
-    TYPE_VIDEO,
-    TYPE_IMAGESQUENCE,
-    TYPE_PAINT,
-    TYPE_GROUP,
-    TYPE_CUSTOM
+enum class eBoxType {
+    vectorPath,
+    circle,
+    image,
+    rectangle,
+    text,
+    layer,
+    canvas,
+    internalLink,
+    internalLinkGroup,
+    internalLinkCanvas,
+    externalLink,
+    video,
+    imageSequence,
+    paint,
+    group,
+    custom
 };
 
 class BoundingBox;
@@ -85,12 +85,12 @@ public:
 
     static BoundingBox *sGetBoxByDocumentId(const int documentId);
 
-    static void sClearWriteBoxes();
-
     static void sAddReadBox(BoundingBox * const box);
     static BoundingBox *sGetBoxByReadId(const int readId);
     static void sClearReadBoxes();
     static void sForEveryReadBox(const std::function<void(BoundingBox*)>& func);
+
+    static void sClearWriteBoxes();
 
     template <typename B, typename T>
     static void sWriteReadMember(B* const from, B* const to, const T member);
@@ -110,21 +110,6 @@ public:
     virtual SmartVectorPath *objectToVectorPathBox();
     virtual SmartVectorPath *strokeToVectorPathBox();
 
-    void moveByRel(const QPointF &trans);
-    void moveByAbs(const QPointF &trans);
-    void rotateBy(const qreal rot);
-    void scale(const qreal scaleBy);
-    void scale(const qreal scaleXBy, const qreal scaleYBy);
-    void saveTransformPivotAbsPos(const QPointF &absPivot);
-
-    void startPosTransform();
-    void startRotTransform();
-    void startScaleTransform();
-
-    void startTransform();
-    void finishTransform();
-    void cancelTransform();
-
     virtual void centerPivotPosition();
     virtual QPointF getRelCenterPosition();
 
@@ -135,13 +120,10 @@ public:
 
     virtual bool relPointInsidePath(const QPointF &relPos) const;
 
-    virtual void setFont(const QFont &font) {
-        Q_UNUSED(font)
-    }
-
-    virtual void setSelectedFontSize(const qreal fontSize) {
-        Q_UNUSED(fontSize)
-    }
+    virtual void setFont(const QFont &font)
+    { Q_UNUSED(font) }
+    virtual void setSelectedFontSize(const qreal fontSize)
+    { Q_UNUSED(fontSize) }
 
     virtual void setSelectedFontFamilyAndStyle(const QString &family,
                                                const QString &style) {
@@ -189,14 +171,17 @@ public:
     virtual QMatrix getTotalTransformAtFrame(const qreal relFrame);
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
 
-    virtual void applyPaintSetting(const PaintSettingsApplier &setting);
+    virtual void applyPaintSetting(const PaintSettingsApplier &setting)
+    { Q_UNUSED(setting) }
+    virtual void addPathEffect(const qsptr<PathEffect>& effect)
+    { Q_UNUSED(effect) }
+    virtual void addFillPathEffect(const qsptr<PathEffect>& effect)
+    { Q_UNUSED(effect) }
+    virtual void addOutlineBasePathEffect(const qsptr<PathEffect>& effect)
+    { Q_UNUSED(effect) }
+    virtual void addOutlinePathEffect(const qsptr<PathEffect>& effect)
+    { Q_UNUSED(effect) }
 
-    virtual void addPathEffect(const qsptr<PathEffect>&);
-    virtual void addFillPathEffect(const qsptr<PathEffect>&);
-    virtual void addOutlineBasePathEffect(const qsptr<PathEffect>&);
-    virtual void addOutlinePathEffect(const qsptr<PathEffect>&);
-
-    void prp_setupTreeViewMenu(PropertyMenu * const menu);
     virtual void setupCanvasMenu(PropertyMenu * const menu);
 
     virtual void setupRenderData(const qreal relFrame,
@@ -215,36 +200,69 @@ public:
 
     virtual bool shouldScheduleUpdate() { return true; }
     virtual void queTasks();
-    stdsptr<BoxRenderData> queRender(const qreal relFrame);
 
     virtual void writeIdentifier(eWriteStream& dst) const;
 
     virtual void writeBoundingBox(eWriteStream& dst);
     virtual void readBoundingBox(eReadStream& src);
 
-    void setupRasterEffectsF(const qreal relFrame,
-                             BoxRenderData * const data);
-    virtual SkBlendMode getBlendMode();
+    virtual SkBlendMode getBlendMode()
+    { return mBlendMode; }
 
-    bool SWT_isBoundingBox() const;
+    virtual void updateIfUsesProgram(const ShaderEffectProgram * const program) const;
+
+    bool SWT_isBoundingBox() const final
+    { return true; }
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool parentSatisfies,
                              const bool parentMainTarget) const;
-    bool SWT_visibleOnlyIfParentDescendant() const;
+    bool SWT_visibleOnlyIfParentDescendant() const
+    { return false; }
 
     bool SWT_dropSupport(const QMimeData* const data);
     bool SWT_drop(const QMimeData* const data);
+protected:
+    void prp_updateCanvasProps();
+public:
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     void prp_afterChangedAbsRange(const FrameRange &range,
                                   const bool clip = true);
+
+    void anim_setAbsFrame(const int frame);
+
+    void ca_childIsRecordingChanged();
+
+    BasicTransformAnimator *getTransformAnimator() const;
+
+    stdsptr<BoxRenderData> queRender(const qreal relFrame);
+
+    void setupWithoutRasterEffects(const qreal relFrame,
+                                   BoxRenderData * const data,
+                                   Canvas* const scene);
+    void setupRasterEffects(const qreal relFrame,
+                            BoxRenderData * const data,
+                            Canvas* const scene);
+
     void drawAllCanvasControls(SkCanvas * const canvas,
                                const CanvasMode mode,
                                const float invScale,
                                const bool ctrlPressed);
 
-    void anim_setAbsFrame(const int frame);
+    void moveByRel(const QPointF &trans);
+    void moveByAbs(const QPointF &trans);
+    void rotateBy(const qreal rot);
+    void scale(const qreal scaleBy);
+    void scale(const qreal scaleXBy, const qreal scaleYBy);
+    void saveTransformPivotAbsPos(const QPointF &absPivot);
 
-    void ca_childIsRecordingChanged();
+    void startPosTransform();
+    void startRotTransform();
+    void startScaleTransform();
+
+    void startTransform();
+    void finishTransform();
+    void cancelTransform();
 
     QMatrix getTotalTransform() const;
 
@@ -296,11 +314,9 @@ public:
     void resetTranslation();
     void resetRotation();
 
-    BasicTransformAnimator *getTransformAnimator() const;
     BoxTransformAnimator *getBoxTransformAnimator() const;
     QRectF getRelBoundingRect() const;
-    void drawHoveredPathSk(SkCanvas *canvas,
-                           const SkPath &path,
+    void drawHoveredPathSk(SkCanvas *canvas, const SkPath &path,
                            const float invScale);
 
     void setRasterEffectsEnabled(const bool enable);
@@ -331,8 +347,6 @@ public:
 
     void addLinkingBox(BoundingBox *box);
     void removeLinkingBox(BoundingBox *box);
-    const QList<BoundingBox*> &getLinkingBoxes() const;
-
 
     void incReasonsNotToApplyUglyTransform();
     void decReasonsNotToApplyUglyTransform();
@@ -346,55 +360,10 @@ public:
 
     void planCenterPivotPosition();
 
-    bool visibleForCanvas() const { return mVisibleInScene; }
-    void setVisibleForScene(const bool visible) {
-        mVisibleInScene = visible;
-    }
-
-    virtual void updateIfUsesProgram(const ShaderEffectProgram * const program) const;
-protected:
-    void setRelBoundingRect(const QRectF& relRect);
-
-    void prp_updateCanvasProps() {
-        mCanvasProps.clear();
-        ca_execOnDescendants([this](Property * prop) {
-            if(prop->drawsOnCanvas()) mCanvasProps.append(prop);
-        });
-        if(drawsOnCanvas()) mCanvasProps.append(this);
-    }
-
-    uint mStateId = 0;
-
-    int mNReasonsNotToApplyUglyTransform = 0;
-    int mReadId = -1;
-    int mWriteId = -1;
-    const int mDocumentId;
-
-    eBoxType mType;
-    SkBlendMode mBlendMode = SkBlendMode::kSrcOver;
-
-    QPointF mSavedTransformPivot;
-
-    QRectF mRelRect;
-    SkRect mRelRectSk;
-    SkPath mSkRelBoundingRectPath;
-
-    BasicTransformAnimator* mParentTransform = nullptr;
-
-    QList<BoundingBox*> mLinkingBoxes;
-
-    RenderDataHandler mRenderDataHandler;
-    RenderContainer mDrawRenderContainer;
-
-    const qsptr<BoxTransformAnimator> mTransformAnimator;
-    const qsptr<RasterEffectAnimators> mRasterEffectsAnimators;
-
-    bool mVisibleInScene = true;
-    bool mCenterPivotPlanned = false;
-    bool mUpdatePlanned = false;
-    UpdateReason mPlannedReason;
-
-    QList<Property*> mCanvasProps;
+    bool visibleForScene() const
+    { return mVisibleInScene; }
+    void setVisibleForScene(const bool visible)
+    { mVisibleInScene = visible; }
 private:
     void cancelWaitingTasks();
     void afterTotalTransformChanged(const UpdateReason reason);
@@ -402,6 +371,53 @@ signals:
     void globalPivotInfluenced();
     void fillStrokeSettingsChanged();
     void blendModeChanged(SkBlendMode);
+protected:
+    void setRelBoundingRect(const QRectF& relRect);
+
+    uint mStateId = 0;
+
+    int mNReasonsNotToApplyUglyTransform = 0;
+protected:
+    bool getUpdatePlanned() const
+    { return mUpdatePlanned; }
+
+    SkBlendMode getBlendMode() const
+    { return mBlendMode; }
+
+    const QList<BoundingBox*>& getLinkingBoxes() const
+    { return mLinkingBoxes; }
+
+    const int mDocumentId;
+
+    eBoxType mType;
+
+    QRectF mRelRect;
+    SkRect mRelRectSk;
+    SkPath mSkRelBoundingRectPath;
+
+    RenderDataHandler mRenderDataHandler;
+
+    const qsptr<BoxTransformAnimator> mTransformAnimator;
+    const qsptr<RasterEffectAnimators> mRasterEffectsAnimators;
+private:
+    SkBlendMode mBlendMode = SkBlendMode::kSrcOver;
+
+    int mReadId = -1;
+    int mWriteId = -1;
+
+    bool mVisibleInScene = true;
+    bool mCenterPivotPlanned = false;
+    bool mUpdatePlanned = false;
+    UpdateReason mPlannedReason;
+
+    QPointF mSavedTransformPivot;
+
+    BasicTransformAnimator* mParentTransform = nullptr;
+
+    QList<Property*> mCanvasProps;
+    QList<BoundingBox*> mLinkingBoxes;
+
+    RenderContainer mDrawRenderContainer;
 };
 
 template <typename B, typename T>

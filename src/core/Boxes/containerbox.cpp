@@ -28,8 +28,8 @@
 
 ContainerBox::ContainerBox(const eBoxType type) :
     BoxWithPathEffects(type) {
-    if(type == eBoxType::TYPE_GROUP) prp_setName("Group");
-    else if(type == eBoxType::TYPE_LAYER) prp_setName("Layer");
+    if(type == eBoxType::group) prp_setName("Group");
+    else if(type == eBoxType::layer) prp_setName("Layer");
     connect(mRasterEffectsAnimators.get(),
             &RasterEffectAnimators::forcedMarginChanged,
             this, &ContainerBox::forcedMarginMeaningfulChange);
@@ -238,14 +238,14 @@ void ContainerBox::queChildrenTasks() {
 
 void ContainerBox::queTasks() {
     queChildrenTasks();
-    if(mUpdatePlanned && SWT_isGroupBox())
+    if(getUpdatePlanned() && SWT_isGroupBox())
         updateRelBoundingRect();
     else BoundingBox::queTasks();
 }
 
 void ContainerBox::promoteToLayer() {
     if(!SWT_isGroupBox()) return;
-    if(!SWT_isLinkBox()) mType = TYPE_LAYER;
+    if(!SWT_isLinkBox()) mType = eBoxType::layer;
     if(prp_getName().contains("Group")) {
         auto newName  = prp_getName();
         newName.replace("Group", "Layer");
@@ -254,14 +254,15 @@ void ContainerBox::promoteToLayer() {
     mRasterEffectsAnimators->SWT_enable();
     prp_afterWholeInfluenceRangeChanged();
 
-    for(const auto& box : mLinkingBoxes) {
+    const auto& linkingBoxes = getLinkingBoxes();
+    for(const auto& box : linkingBoxes) {
         static_cast<ContainerBox*>(box)->promoteToLayer();
     }
 }
 
 void ContainerBox::demoteToGroup() {
     if(!SWT_isLayerBox()) return;
-    if(!SWT_isLinkBox()) mType = TYPE_GROUP;
+    if(!SWT_isLinkBox()) mType = eBoxType::group;
     if(prp_getName().contains("Layer")) {
         auto newName  = prp_getName();
         newName.replace("Layer", "Group");
@@ -270,7 +271,8 @@ void ContainerBox::demoteToGroup() {
     mRasterEffectsAnimators->SWT_disable();
     prp_afterWholeInfluenceRangeChanged();
 
-    for(const auto& box : mLinkingBoxes) {
+    const auto& linkingBoxes = getLinkingBoxes();
+    for(const auto& box : linkingBoxes) {
         static_cast<ContainerBox*>(box)->demoteToGroup();
     }
 }
@@ -489,7 +491,7 @@ void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
         SkPaint paint;
         const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
         paint.setAlpha(static_cast<U8CPU>(intAlpha));
-        paint.setBlendMode(mBlendMode);
+        paint.setBlendMode(getBlendMode());
         canvas->saveLayer(nullptr, &paint);
         drawContained(canvas, filter);
         canvas->restore();
@@ -645,13 +647,15 @@ void ContainerBox::insertContained(const int id, const qsptr<eBoxOrSound>& child
         connCtx << connect(child.data(), &Property::prp_absFrameRangeChanged,
                            this, &Property::prp_afterChangedAbsRange);
         const auto cBox = static_cast<BoundingBox*>(child.get());
-        for(const auto& box : mLinkingBoxes) {
+        const auto& linkingBoxes = getLinkingBoxes();
+        for(const auto& box : linkingBoxes) {
             const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
             internalLinkGroup->insertContained(id, cBox->createLink());
         }
     } else /*if(child->SWT_isSound())*/ {
         const auto sound = static_cast<SingleSound*>(child.get());
-        for(const auto& box : mLinkingBoxes) {
+        const auto& linkingBoxes = getLinkingBoxes();
+        for(const auto& box : linkingBoxes) {
             const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
             internalLinkGroup->insertContained(id, sound->createLink());
         }
@@ -687,7 +691,8 @@ void ContainerBox::removeContainedFromList(const int id) {
     child->setParentGroup(nullptr);
     updateContainedIds(id);
 
-    for(const auto& box : mLinkingBoxes) {
+    const auto& linkingBoxes = getLinkingBoxes();
+    for(const auto& box : linkingBoxes) {
         const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
         internalLinkGroup->removeContainedFromList(id);
     }
@@ -775,8 +780,8 @@ void ContainerBox::moveContainedInList(eBoxOrSound * const child,
     SWT_moveChildTo(child, containedIdToAbstractionId(boundTo));
     planUpdate(UpdateReason::userChange);
 
-
-    for(const auto& box : mLinkingBoxes) {
+    const auto& linkingBoxes = getLinkingBoxes();
+    for(const auto& box : linkingBoxes) {
         const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
         internalLinkGroup->moveContainedInList(from, to);
     }
@@ -867,38 +872,41 @@ qsptr<BoundingBox> readIdCreateBox(eReadStream& src) {
     eBoxType type;
     src.read(&type, sizeof(eBoxType));
     switch(type) {
-        case(eBoxType::TYPE_VECTOR_PATH):
+        case(eBoxType::vectorPath):
             return enve::make_shared<SmartVectorPath>();
-        case(eBoxType::TYPE_IMAGE):
+        case(eBoxType::image):
             return enve::make_shared<ImageBox>();
-        case(eBoxType::TYPE_TEXT):
+        case(eBoxType::text):
             return enve::make_shared<TextBox>();
-        case(eBoxType::TYPE_VIDEO):
+        case(eBoxType::video):
             return enve::make_shared<VideoBox>();
-        case(eBoxType::TYPE_RECTANGLE):
+        case(eBoxType::rectangle):
             return enve::make_shared<Rectangle>();
-        case(eBoxType::TYPE_CIRCLE):
+        case(eBoxType::circle):
             return enve::make_shared<Circle>();
-        case(eBoxType::TYPE_LAYER):
-            return enve::make_shared<ContainerBox>(TYPE_LAYER);
-        case(eBoxType::TYPE_GROUP):
-            return enve::make_shared<ContainerBox>(TYPE_GROUP);
-        case(eBoxType::TYPE_PAINT):
+        case(eBoxType::layer):
+            return enve::make_shared<ContainerBox>(eBoxType::layer);
+        case(eBoxType::group):
+            return enve::make_shared<ContainerBox>(eBoxType::group);
+        case(eBoxType::paint):
             return enve::make_shared<PaintBox>();
-        case(eBoxType::TYPE_IMAGESQUENCE):
+        case(eBoxType::imageSequence):
             return enve::make_shared<ImageSequenceBox>();
-        case(eBoxType::TYPE_INTERNAL_LINK):
+        case(eBoxType::internalLink):
             return enve::make_shared<InternalLinkBox>(nullptr);
-        case(eBoxType::TYPE_INTERNAL_LINK_GROUP):
+        case(eBoxType::internalLinkGroup):
             return enve::make_shared<InternalLinkGroupBox>(nullptr);
-        case(eBoxType::TYPE_EXTERNAL_LINK):
+        case(eBoxType::externalLink):
             return enve::make_shared<ExternalLinkBox>();
-        case(eBoxType::TYPE_INTERNAL_LINK_CANVAS):
+        case(eBoxType::internalLinkCanvas):
             return enve::make_shared<InternalLinkCanvas>(nullptr);
-        case(eBoxType::TYPE_CUSTOM): {
+        case(eBoxType::custom): {
             const auto id = CustomIdentifier::sRead(src);
             return CustomBoxCreator::sCreateForIdentifier(id);
-        } default: RuntimeThrow("Invalid box type '" + std::to_string(type) + "'");
+        } default: {
+            const int typeId = static_cast<int>(type);
+            RuntimeThrow("Invalid box type '" + std::to_string(typeId) + "'");
+        }
     }
 }
 

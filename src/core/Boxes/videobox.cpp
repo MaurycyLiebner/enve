@@ -28,7 +28,7 @@ extern "C" {
 #include "filesourcescache.h"
 #include "fileshandler.h"
 
-VideoBox::VideoBox() : AnimationBox(TYPE_VIDEO) {
+VideoBox::VideoBox() : AnimationBox(eBoxType::video) {
     prp_setName("Video");
     const auto flar = mDurationRectangle->ref<FixedLenAnimationRect>();
     mSound = enve::make_shared<SingleSound>(flar);

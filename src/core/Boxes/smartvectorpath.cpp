@@ -29,7 +29,7 @@
 #include "PathEffects/patheffectanimators.h"
 
 SmartVectorPath::SmartVectorPath() :
-    PathBox(eBoxType::TYPE_VECTOR_PATH) {
+    PathBox(eBoxType::vectorPath) {
     prp_setName("Path");
     mPathAnimator = enve::make_shared<SmartPathCollection>();
     connect(mPathAnimator.get(), &Property::prp_currentFrameChanged,

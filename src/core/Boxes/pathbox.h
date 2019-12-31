@@ -79,9 +79,9 @@ public:
     void updateCurrentPreviewDataFromRenderData(
             BoxRenderData *renderData);
 
-    void setupPathEffects(PathBoxRenderData * const pathData,
-                          const qreal relFrame,
-                          Canvas* const scene);
+    PathEffectsTask *setupPathEffects(PathBoxRenderData * const pathData,
+                                      const qreal relFrame,
+                                      Canvas* const scene);
     void setupStrokerSettings(PathBoxRenderData * const pathData,
                               const qreal relFrame);
     void setupPaintSettings(PathBoxRenderData * const pathData,

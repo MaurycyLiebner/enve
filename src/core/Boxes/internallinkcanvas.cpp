@@ -21,7 +21,7 @@
 
 InternalLinkCanvas::InternalLinkCanvas(ContainerBox * const linkTarget) :
     InternalLinkGroupBox(linkTarget) {
-    mType = TYPE_INTERNAL_LINK_CANVAS;
+    mType = eBoxType::internalLinkCanvas;
     ca_prependChild(mTransformAnimator.data(), mClipToCanvas);
 }
 

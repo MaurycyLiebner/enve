@@ -186,12 +186,6 @@ bool BoundingBox::getRasterEffectsEnabled() const {
     return mRasterEffectsAnimators->SWT_isEnabled();
 }
 
-void BoundingBox::applyPaintSetting(const PaintSettingsApplier &setting) {
-    Q_UNUSED(setting)
-}
-
-bool BoundingBox::SWT_isBoundingBox() const { return true; }
-
 void BoundingBox::updateAllBoxes(const UpdateReason reason) {
     planUpdate(reason);
 }
@@ -249,10 +243,6 @@ void BoundingBox::setBlendModeSk(const SkBlendMode blendMode) {
     mBlendMode = blendMode;
     prp_afterWholeInfluenceRangeChanged();
     emit blendModeChanged(blendMode);
-}
-
-SkBlendMode BoundingBox::getBlendMode() {
-    return mBlendMode;
 }
 
 void BoundingBox::resetScale() {
@@ -345,6 +335,14 @@ void BoundingBox::setRelBoundingRect(const QRectF& relRect) {
         mCenterPivotPlanned = false;
         setPivotRelPos(getRelCenterPosition());
     }
+}
+
+void BoundingBox::prp_updateCanvasProps() {
+    mCanvasProps.clear();
+    ca_execOnDescendants([this](Property * prop) {
+        if(prop->drawsOnCanvas()) mCanvasProps.append(prop);
+    });
+    if(drawsOnCanvas()) mCanvasProps.append(this);
 }
 
 void BoundingBox::updateCurrentPreviewDataFromRenderData(
@@ -610,6 +608,13 @@ void BoundingBox::finishTransform() {
 void BoundingBox::setupRenderData(const qreal relFrame,
                                   BoxRenderData * const data,
                                   Canvas* const scene) {
+    setupWithoutRasterEffects(relFrame, data, scene);
+    setupRasterEffects(relFrame, data, scene);
+}
+
+void BoundingBox::setupWithoutRasterEffects(const qreal relFrame,
+                                            BoxRenderData * const data,
+                                            Canvas* const scene) {
     Q_ASSERT(scene);
     if(!scene) return;
 
@@ -622,13 +627,8 @@ void BoundingBox::setupRenderData(const qreal relFrame,
     data->fResolutionScale.reset();
     data->fResolutionScale.scale(data->fResolution, data->fResolution);
     data->fOpacity = mTransformAnimator->getOpacity(relFrame);
-    const bool effectsVisible = scene->getRasterEffectsVisible();
     data->fBaseMargin = QMargins() + 2;
     data->fBlendMode = getBlendMode();
-
-    if(data->fOpacity > 0.001 && effectsVisible) {
-        setupRasterEffectsF(relFrame, data);
-    }
 
     {
         QRectF maxBoundsF;
@@ -639,9 +639,15 @@ void BoundingBox::setupRenderData(const qreal relFrame,
     }
 }
 
-void BoundingBox::setupRasterEffectsF(const qreal relFrame,
-                                      BoxRenderData * const data) {
-    mRasterEffectsAnimators->addEffects(relFrame, data);
+void BoundingBox::setupRasterEffects(const qreal relFrame,
+                                     BoxRenderData * const data,
+                                     Canvas* const scene) {
+    Q_ASSERT(scene);
+    if(!scene) return;
+    const bool effectsVisible = scene->getRasterEffectsVisible();
+    if(data->fOpacity > 0.001 && effectsVisible) {
+        mRasterEffectsAnimators->addEffects(relFrame, data);
+    }
 }
 
 void BoundingBox::addLinkingBox(BoundingBox *box) {
@@ -650,10 +656,6 @@ void BoundingBox::addLinkingBox(BoundingBox *box) {
 
 void BoundingBox::removeLinkingBox(BoundingBox *box) {
     mLinkingBoxes.removeOne(box);
-}
-
-const QList<BoundingBox*> &BoundingBox::getLinkingBoxes() const {
-    return mLinkingBoxes;
 }
 
 void BoundingBox::incReasonsNotToApplyUglyTransform() {
@@ -755,14 +757,6 @@ QMatrix BoundingBox::getTotalTransformAtFrame(const qreal relFrame) {
         return mTransformAnimator->getTotalTransform();
     return mTransformAnimator->getTotalTransformAtFrame(relFrame);
 }
-
-void BoundingBox::addPathEffect(const qsptr<PathEffect> &) {}
-
-void BoundingBox::addFillPathEffect(const qsptr<PathEffect> &) {}
-
-void BoundingBox::addOutlineBasePathEffect(const qsptr<PathEffect> &) {}
-
-void BoundingBox::addOutlinePathEffect(const qsptr<PathEffect> &) {}
 
 #include <QInputDialog>
 void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
@@ -973,10 +967,6 @@ bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     return satisfies;
 }
 
-bool BoundingBox::SWT_visibleOnlyIfParentDescendant() const {
-    return false;
-}
-
 bool BoundingBox::SWT_dropSupport(const QMimeData * const data) {
     return mRasterEffectsAnimators->SWT_dropSupport(data);
 }
@@ -988,9 +978,9 @@ bool BoundingBox::SWT_drop(const QMimeData * const data) {
 }
 
 void BoundingBox::renderDataFinished(BoxRenderData *renderData) {
+    const bool currentState = renderData->fBoxStateId == mStateId;
     const qreal relFrame = renderData->fRelFrame;
-    if(renderData->fBoxStateId == mStateId)
-        mRenderDataHandler.removeItemAtRelFrame(relFrame);
+    if(currentState) mRenderDataHandler.removeItemAtRelFrame(relFrame);
     auto currentRenderData = mDrawRenderContainer.getSrcRenderData();
     bool newerSate = true;
     bool closerFrame = true;
@@ -1004,7 +994,6 @@ void BoundingBox::renderDataFinished(BoxRenderData *renderData) {
     }
     if(newerSate || closerFrame) {
         mDrawRenderContainer.setSrcRenderData(renderData);
-        const bool currentState = renderData->fBoxStateId == mStateId;
         const bool currentFrame = isZero4Dec(relFrame - anim_getCurrentRelFrame());
         const bool expired = !currentState || !currentFrame;
         mDrawRenderContainer.setExpired(expired);

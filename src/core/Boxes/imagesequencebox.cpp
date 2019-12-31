@@ -19,7 +19,8 @@
 #include "filesourcescache.h"
 #include "GUI/edialogs.h"
 
-ImageSequenceBox::ImageSequenceBox() : AnimationBox(TYPE_IMAGESQUENCE) {
+ImageSequenceBox::ImageSequenceBox() :
+    AnimationBox(eBoxType::imageSequence) {
     prp_setName("Image Sequence");
 }
 

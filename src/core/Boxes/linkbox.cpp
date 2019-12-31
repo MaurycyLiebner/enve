@@ -23,8 +23,8 @@
 #include "videobox.h"
 #include "Sound/singlesound.h"
 
-ExternalLinkBox::ExternalLinkBox() : ContainerBox(TYPE_LAYER) {
-    mType = TYPE_EXTERNAL_LINK;
+ExternalLinkBox::ExternalLinkBox() : ContainerBox(eBoxType::layer) {
+    mType = eBoxType::externalLink;
     prp_setName("Link Empty");
 }
 
@@ -47,7 +47,7 @@ void ExternalLinkBox::setSrc(const QString &src) {
 }
 
 InternalLinkBox::InternalLinkBox(BoundingBox * const linkTarget) :
-    BoundingBox(TYPE_INTERNAL_LINK) {
+    BoundingBox(eBoxType::internalLink) {
     setLinkTarget(linkTarget);
     ca_prependChild(mTransformAnimator.data(), mBoxTarget);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,

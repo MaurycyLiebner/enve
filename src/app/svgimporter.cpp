@@ -585,7 +585,7 @@ qsptr<ContainerBox> loadBoxesGroup(const QDomElement &groupElement,
     qsptr<ContainerBox> boxesGroup;
     const bool hasTransform = attributes.hasTransform();
     if(allRootChildNodes.count() > 1 || hasTransform || !parentGroup) {
-        boxesGroup = enve::make_shared<ContainerBox>(TYPE_GROUP);
+        boxesGroup = enve::make_shared<ContainerBox>(eBoxType::group);
         boxesGroup->planCenterPivotPosition();
         attributes.apply(boxesGroup.get());
         if(parentGroup) parentGroup->addContained(boxesGroup);

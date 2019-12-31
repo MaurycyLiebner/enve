@@ -16,6 +16,7 @@
 
 #include "textboxrenderdata.h"
 #include "textbox.h"
+#include "PathEffects/patheffectstask.h"
 
 qreal textLineX(const Qt::Alignment &alignment,
                 const qreal lineWidth,
@@ -65,7 +66,7 @@ void LetterRenderData::initialize(const qreal relFrame,
                                   TextBox * const parent,
                                   Canvas * const scene) {
     fLetterPos = pos;
-    parent->BoundingBox::setupRenderData(relFrame, this, scene);
+    parent->BoundingBox::setupWithoutRasterEffects(relFrame, this, scene);
     parent->setupPaintSettings(this, relFrame);
     parent->setupStrokerSettings(this, relFrame);
     SkPath textPath;
@@ -80,8 +81,6 @@ void LetterRenderData::initialize(const qreal relFrame,
     fFillPath = textPath;
     fOutlineBasePath = textPath;
     fStroker.strokePath(fOutlineBasePath, &fOutlinePath);
-
-    parent->setupPathEffects(this, relFrame, scene);
 }
 
 void LetterRenderData::applyTransform(const QMatrix &transform) {
@@ -102,7 +101,7 @@ void WordRenderData::initialize(const qreal relFrame,
                                 const qreal letterSpacing,
                                 TextBox * const parent,
                                 Canvas * const scene) {
-    parent->BoundingBox::setupRenderData(relFrame, this, scene);
+    parent->BoundingBox::setupWithoutRasterEffects(relFrame, this, scene);
 
     fWordPos = pos;
     qreal xPos = pos.x();

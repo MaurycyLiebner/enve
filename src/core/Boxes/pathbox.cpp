@@ -174,9 +174,9 @@ void PathBox::setupRenderData(const qreal relFrame,
     setupPaintSettings(pathData, relFrame);
 }
 
-void PathBox::setupPathEffects(PathBoxRenderData * const pathData,
-                               const qreal relFrame,
-                               Canvas* const scene) {
+PathEffectsTask* PathBox::setupPathEffects(PathBoxRenderData * const pathData,
+                                           const qreal relFrame,
+                                           Canvas* const scene) {
     QList<stdsptr<PathEffectCaller>> pathEffects;
     QList<stdsptr<PathEffectCaller>> fillEffects;
     QList<stdsptr<PathEffectCaller>> outlineBaseEffects;
@@ -197,7 +197,9 @@ void PathBox::setupPathEffects(PathBoxRenderData * const pathData,
         pathTask->addDependent(pathData);
         pathData->delayDataSet();
         pathTask->queTask();
+        return pathTask.get();
     }
+    return nullptr;
 }
 
 void PathBox::setupStrokerSettings(PathBoxRenderData * const pathData,

@@ -27,7 +27,7 @@ protected:
     ContainerBox(const eBoxType type);
 public:
     bool SWT_isContainerBox() const { return true; }
-    bool SWT_isGroupBox() const { return mType == TYPE_GROUP; }
+    bool SWT_isGroupBox() const { return mType == eBoxType::group; }
     bool SWT_isLayerBox() const { return !SWT_isGroupBox(); }
 
     HardwareSupport hardwareSupport() const {
