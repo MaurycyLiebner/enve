@@ -195,13 +195,17 @@ SkPath TextBox::getPathAtRelFrameF(const qreal relFrame) {
         if(lineWidth > maxWidth) maxWidth = lineWidth;
         lineWidths << lineWidth;
     }
+    qreal xTranslate;
+    if(mAlignment == Qt::AlignLeft) xTranslate = 0;
+    else if(mAlignment == Qt::AlignRight) xTranslate = -maxWidth;
+    else /*if(mAlignment == Qt::AlignCenter)*/ xTranslate = -0.5*maxWidth;
 
     SkPath result;
     for(int i = 0; i < lines.count(); i++) {
         const auto& line = lines.at(i);
         if(line.isEmpty()) continue;
         const qreal lineWidth = lineWidths.at(i);
-        const qreal lineX = textLineX(mAlignment, lineWidth, maxWidth);
+        const qreal lineX = textLineX(mAlignment, lineWidth, maxWidth) + xTranslate;
         const qreal lineY = i*lineInc;
         if(isOne4Dec(letterSpacing) && isOne4Dec(wordSpacing)) {
             SkPath linePath;
