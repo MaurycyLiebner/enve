@@ -144,7 +144,13 @@ void Canvas::convertSelectedPathStrokesToPath() {
 
 void Canvas::setSelectedTextAlignment(const Qt::Alignment alignment) const {
     for(const auto &box : mSelectedBoxes) {
-        box->setTextAlignment(alignment);
+        box->setTextHAlignment(alignment);
+    }
+}
+
+void Canvas::setSelectedTextVAlignment(const Qt::Alignment alignment) const {
+    for(const auto &box : mSelectedBoxes) {
+        box->setTextVAlignment(alignment);
     }
 }
 

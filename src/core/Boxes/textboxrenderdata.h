@@ -110,7 +110,8 @@ public:
                     const qreal letterSpacing,
                     const qreal wordSpacing,
                     const qreal lineSpacing,
-                    const Qt::Alignment alignment,
+                    const Qt::Alignment hAlignment,
+                    const Qt::Alignment vAlignment,
                     TextBox * const parent,
                     Canvas * const scene);
 

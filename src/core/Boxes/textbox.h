@@ -39,7 +39,9 @@ public:
     bool differenceInEditPathBetweenFrames(
                 const int frame1, const int frame2) const;
 
-    void setTextAlignment(const Qt::Alignment alignment);
+    void setTextHAlignment(const Qt::Alignment alignment);
+    void setTextVAlignment(const Qt::Alignment alignment);
+
     void setFont(const QFont &font);
     void setSelectedFontSize(const qreal size);
     void setSelectedFontFamilyAndStyle(const QString &fontFamily,
@@ -59,7 +61,9 @@ public:
 
     void setCurrentValue(const QString &text);
 private:
-    Qt::Alignment mAlignment = Qt::AlignLeft;
+    Qt::Alignment mHAlignment = Qt::AlignLeft;
+    Qt::Alignment mVAlignment = Qt::AlignTop;
+
     QFont mFont;
 
     qsptr<StaticComplexAnimator> mSpacingCont;

@@ -126,7 +126,9 @@ public:
     { Q_UNUSED(fontSize) }
 
 
-    virtual void setTextAlignment(const Qt::Alignment alignment)
+    virtual void setTextVAlignment(const Qt::Alignment alignment)
+    { Q_UNUSED(alignment) }
+    virtual void setTextHAlignment(const Qt::Alignment alignment)
     { Q_UNUSED(alignment) }
 
     virtual void setSelectedFontFamilyAndStyle(const QString &family,

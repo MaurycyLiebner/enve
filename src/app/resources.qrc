@@ -6,6 +6,9 @@
         <file>icons/toolbarButtons/plain/alignCenter</file>
         <file>icons/toolbarButtons/plain/alignLeft</file>
         <file>icons/toolbarButtons/plain/alignRight</file>
+        <file>icons/toolbarButtons/plain/alignVCenter</file>
+        <file>icons/toolbarButtons/plain/alignTop</file>
+        <file>icons/toolbarButtons/plain/alignBottom</file>
     </qresource>
     <qresource prefix="/cursors">
         <file alias="cursor-node.xpm">pixmaps/cursor-node.xpm</file>

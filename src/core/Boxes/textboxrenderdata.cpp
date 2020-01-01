@@ -242,25 +242,41 @@ void TextBoxRenderData::initialize(const QString &text,
                                    const qreal letterSpacing,
                                    const qreal wordSpacing,
                                    const qreal lineSpacing,
-                                   const Qt::Alignment alignment,
+                                   const Qt::Alignment hAlignment,
+                                   const Qt::Alignment vAlignment,
                                    TextBox * const parent,
                                    Canvas* const scene) {
-    const QStringList lineStrs = text.split(QRegExp("\n|\r\n|\r"));
+    const QStringList lines = text.split(QRegExp("\n|\r\n|\r"));
 
     qreal maxWidth = 0;
 
-    for(const auto& line : lineStrs) {
+    for(const auto& line : lines) {
         const qreal lineWidth = horizontalAdvance(font, line, letterSpacing,
                                                   wordSpacing);
         if(lineWidth > maxWidth) maxWidth = lineWidth;
     }
 
     const qreal lineInc = static_cast<qreal>(font.getSpacing())*lineSpacing;
-    qreal yPos = 0;
-    for(const auto& lineStr : lineStrs) {
+
+    qreal xTranslate;
+    if(hAlignment == Qt::AlignLeft) xTranslate = 0;
+    else if(hAlignment == Qt::AlignRight) xTranslate = -maxWidth;
+    else /*if(hAlignment == Qt::AlignCenter)*/ xTranslate = -0.5*maxWidth;
+
+    SkFontMetrics metrics;
+    font.getMetrics(&metrics);
+    const qreal height = (lines.count() - 1)*lineInc +
+            static_cast<qreal>(metrics.fAscent + metrics.fDescent);
+    qreal yTranslate;
+    if(vAlignment == Qt::AlignTop) yTranslate = 0;
+    else if(vAlignment == Qt::AlignBottom) yTranslate = -height;
+    else /*if(vAlignment == Qt::AlignCenter)*/ yTranslate = -0.5*height;
+
+    qreal yPos = yTranslate;
+    for(const auto& lineStr : lines) {
         const qreal lineWidth = horizontalAdvance(font, lineStr, letterSpacing,
                                                   wordSpacing);
-        const qreal xPos = textLineX(alignment, lineWidth, maxWidth);
+        const qreal xPos = textLineX(hAlignment, lineWidth, maxWidth) + xTranslate;
         const auto line = enve::make_shared<LineRenderData>(parent);
         line->initialize(fRelFrame, QPointF(xPos, yPos), lineStr,
                          font, letterSpacing, wordSpacing, parent, scene);

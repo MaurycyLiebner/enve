@@ -77,8 +77,13 @@ void TextBox::openTextEditor(QWidget* dialogParent) {
     if(ok) mText->setCurrentValue(text);
 }
 
-void TextBox::setTextAlignment(const Qt::Alignment alignment) {
-    mAlignment = alignment;
+void TextBox::setTextHAlignment(const Qt::Alignment alignment) {
+    mHAlignment = alignment;
+    setPathsOutdated(UpdateReason::userChange);
+}
+
+void TextBox::setTextVAlignment(const Qt::Alignment alignment) {
+    mVAlignment = alignment;
     setPathsOutdated(UpdateReason::userChange);
 }
 
@@ -126,7 +131,7 @@ void TextBox::setupRenderData(const qreal relFrame,
     const auto textData = static_cast<TextBoxRenderData*>(data);
     textData->initialize(textAtFrame, font,
                          letterSpacing, wordSpacing, lineSpacing,
-                         mAlignment, this, scene);
+                         mHAlignment, mVAlignment, this, scene);
     QList<TextEffect*> textEffects;
     mTextEffects->addEffects(textEffects);
     for(const auto textEffect : textEffects) {
@@ -174,7 +179,7 @@ void TextBox::setupCanvasMenu(PropertyMenu * const menu) {
     };
     menu->addPlainAction("Set Text...", setText);
 }
-
+#include "include/core/SkFontMetrics.h"
 SkPath TextBox::getPathAtRelFrameF(const qreal relFrame) {
     const SkFont font = toSkFont(mFont);
     const qreal fontSize = static_cast<qreal>(font.getSize());
@@ -187,7 +192,6 @@ SkPath TextBox::getPathAtRelFrameF(const qreal relFrame) {
     const qreal lineInc = static_cast<qreal>(font.getSpacing())*lineSpacing;
 
     const QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
-    const QFontMetricsF fm(mFont);
     qreal maxWidth = 0;
     QList<qreal> lineWidths;
     for(const auto& line : lines) {
@@ -197,17 +201,26 @@ SkPath TextBox::getPathAtRelFrameF(const qreal relFrame) {
         lineWidths << lineWidth;
     }
     qreal xTranslate;
-    if(mAlignment == Qt::AlignLeft) xTranslate = 0;
-    else if(mAlignment == Qt::AlignRight) xTranslate = -maxWidth;
-    else /*if(mAlignment == Qt::AlignCenter)*/ xTranslate = -0.5*maxWidth;
+    if(mHAlignment == Qt::AlignLeft) xTranslate = 0;
+    else if(mHAlignment == Qt::AlignRight) xTranslate = -maxWidth;
+    else /*if(mHAlignment == Qt::AlignCenter)*/ xTranslate = -0.5*maxWidth;
+
+    SkFontMetrics metrics;
+    font.getMetrics(&metrics);
+    const qreal height = (lines.count() - 1)*lineInc +
+            static_cast<qreal>(metrics.fAscent + metrics.fDescent);
+    qreal yTranslate;
+    if(mVAlignment == Qt::AlignTop) yTranslate = 0;
+    else if(mVAlignment == Qt::AlignBottom) yTranslate = -height;
+    else /*if(mVAlignment == Qt::AlignCenter)*/ yTranslate = -0.5*height;
 
     SkPath result;
     for(int i = 0; i < lines.count(); i++) {
         const auto& line = lines.at(i);
         if(line.isEmpty()) continue;
         const qreal lineWidth = lineWidths.at(i);
-        const qreal lineX = textLineX(mAlignment, lineWidth, maxWidth) + xTranslate;
-        const qreal lineY = i*lineInc;
+        const qreal lineX = textLineX(mHAlignment, lineWidth, maxWidth) + xTranslate;
+        const qreal lineY = i*lineInc + yTranslate;
         if(isZero4Dec(letterSpacing) && isOne4Dec(wordSpacing)) {
             SkPath linePath;
             SkTextUtils::GetPath(line.toUtf8().data(),
@@ -285,7 +298,8 @@ bool TextBox::differenceInEditPathBetweenFrames(
 
 void TextBox::writeBoundingBox(eWriteStream& dst) {
     PathBox::writeBoundingBox(dst);
-    dst.write(&mAlignment, sizeof(Qt::Alignment));
+    dst.write(&mHAlignment, sizeof(Qt::Alignment));
+    dst.write(&mVAlignment, sizeof(Qt::Alignment));
     dst << mFont.pointSizeF();
     dst << mFont.family();
     dst << mFont.styleName();
@@ -293,7 +307,8 @@ void TextBox::writeBoundingBox(eWriteStream& dst) {
 
 void TextBox::readBoundingBox(eReadStream& src) {
     PathBox::readBoundingBox(src);
-    src.read(&mAlignment, sizeof(Qt::Alignment));
+    src.read(&mHAlignment, sizeof(Qt::Alignment));
+    src.read(&mVAlignment, sizeof(Qt::Alignment));
     qreal fontSize;
     QString fontFamily;
     QString fontStyle;

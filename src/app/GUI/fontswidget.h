@@ -42,6 +42,7 @@ signals:
     void fontFamilyAndStyleChanged(QString family, QString style);
     void fontSizeChanged(qreal size);
     void textAlignmentChanged(Qt::Alignment alignment);
+    void textVAlignmentChanged(Qt::Alignment alignment);
 private:
     void updateStylesFromCurrentFamilyAndEmit(const QString &family);
     void updateStylesFromCurrentFamilyAndEmit();
@@ -62,6 +63,10 @@ private:
     ActionButton *mAlignLeft;
     ActionButton *mAlignCenter;
     ActionButton *mAlignRight;
+
+    ActionButton *mAlignTop;
+    ActionButton *mAlignVCenter;
+    ActionButton *mAlignBottom;
 
     QFontDatabase mFontDatabase;
 };

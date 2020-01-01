@@ -150,6 +150,13 @@ void Actions::setTextAlignment(const Qt::Alignment alignment) const {
     afterAction();
 }
 
+void Actions::setTextVAlignment(const Qt::Alignment alignment) const {
+    if(!mActiveScene) return;
+    mDocument.fTextVAlignment = alignment;
+    mActiveScene->setSelectedTextVAlignment(alignment);
+    afterAction();
+}
+
 void Actions::setFontFamilyAndStyle(const QString& family,
                                     const QString& style) const {
     if(!mActiveScene) return;
