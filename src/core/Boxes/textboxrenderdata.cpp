@@ -46,12 +46,12 @@ qreal horizontalAdvance(const SkFont& font, const QString& str,
     const int nSpaces = str.count(" ");
     if(nSpaces > 0) {
         const SkScalar space = font.measureText(
-                    " ", static_cast<size_t>(str.length()),
+                    " ", static_cast<size_t>(1),
                     SkTextEncoding::kUTF8);
         result -= nSpaces*space;
         result *= static_cast<SkScalar>(letterSpacing);
         result += nSpaces*space*static_cast<SkScalar>(wordSpacing);
-    }
+    } else result *= static_cast<SkScalar>(letterSpacing);
     return static_cast<qreal>(result);
 }
 
@@ -237,14 +237,16 @@ void TextBoxRenderData::initialize(const QString &text,
     qreal maxWidth = 0;
 
     for(const auto& line : lineStrs) {
-        const qreal lineWidth = horizontalAdvance(font, line)*letterSpacing;
+        const qreal lineWidth = horizontalAdvance(font, line, letterSpacing,
+                                                  wordSpacing);
         if(lineWidth > maxWidth) maxWidth = lineWidth;
     }
 
     const qreal lineInc = static_cast<qreal>(font.getSpacing())*lineSpacing;
     qreal yPos = 0;
     for(const auto& lineStr : lineStrs) {
-        const qreal lineWidth = horizontalAdvance(font, lineStr)*letterSpacing;
+        const qreal lineWidth = horizontalAdvance(font, lineStr, letterSpacing,
+                                                  wordSpacing);
         const qreal xPos = textLineX(alignment, lineWidth, maxWidth);
         const auto line = enve::make_shared<LineRenderData>(parent);
         line->initialize(fRelFrame, QPointF(xPos, yPos), lineStr,
