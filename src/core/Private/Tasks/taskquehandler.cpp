@@ -64,10 +64,15 @@ void TaskQueHandler::addTask(const stdsptr<eTask> &task) {
     if(mCurrentQue) {
         mCurrentQue->addTask(task);
     } else {
-        if(mQues.isEmpty()) beginQue();
-        else mCurrentQue = mQues.first().get();
-        addTask(task);
-        endQue();
+        if(mQues.isEmpty()) {
+            beginQue();
+            addTask(task);
+            endQue();
+        } else {
+            const auto que = mQues.first().get();
+            que->addTask(task);
+            mTaskCount++;
+        }
     }
 }
 
