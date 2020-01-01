@@ -39,19 +39,30 @@ qreal horizontalAdvance(const SkFont& font, const QString& str) {
 }
 
 qreal horizontalAdvance(const SkFont& font, const QString& str,
+                        const qreal letterSpacing) {
+    SkScalar result = font.measureText(str.toUtf8().data(),
+                                       static_cast<size_t>(str.length()),
+                                       SkTextEncoding::kUTF8);
+    const qreal fontSize = static_cast<qreal>(font.getSize());
+    result += static_cast<SkScalar>(fontSize*letterSpacing*str.length());
+    return static_cast<qreal>(result);
+}
+
+qreal horizontalAdvance(const SkFont& font, const QString& str,
                         const qreal letterSpacing, const qreal wordSpacing) {
     SkScalar result = font.measureText(str.toUtf8().data(),
                                        static_cast<size_t>(str.length()),
                                        SkTextEncoding::kUTF8);
+    const qreal fontSize = static_cast<qreal>(font.getSize());
     const int nSpaces = str.count(" ");
     if(nSpaces > 0) {
         const SkScalar space = font.measureText(
                     " ", static_cast<size_t>(1),
                     SkTextEncoding::kUTF8);
-        result -= nSpaces*space;
-        result *= static_cast<SkScalar>(letterSpacing);
-        result += nSpaces*space*static_cast<SkScalar>(wordSpacing);
-    } else result *= static_cast<SkScalar>(letterSpacing);
+        result += nSpaces*space*static_cast<SkScalar>(wordSpacing - 1);
+    }
+    const int nNonSpaces = str.length() - nSpaces;
+    result += static_cast<SkScalar>(fontSize*letterSpacing*nNonSpaces);
     return static_cast<qreal>(result);
 }
 
@@ -126,6 +137,8 @@ void WordRenderData::initialize(const qreal relFrame,
     fWordPos = pos;
     qreal xPos = pos.x();
 
+    const qreal spacingAdd = static_cast<qreal>(font.getSize())*letterSpacing;
+
     for(const auto& letterStr : word) {
         const auto letter = enve::make_shared<LetterRenderData>(parent);
         letter->initialize(relFrame, QPointF(xPos, pos.y()),
@@ -134,7 +147,7 @@ void WordRenderData::initialize(const qreal relFrame,
         fLetters << letter;
 
         fChildrenRenderData << letter;
-        xPos += horizontalAdvance(font, letterStr)*letterSpacing;
+        xPos += horizontalAdvance(font, letterStr) + spacingAdd;
     }
 }
 
@@ -185,7 +198,7 @@ void LineRenderData::initialize(const qreal relFrame,
                          letterSpacing, parent, scene);
         fWords << word;
         fChildrenRenderData << word;
-        xPos += horizontalAdvance(font, wordStr)*letterSpacing;
+        xPos += horizontalAdvance(font, wordStr, letterSpacing);
     };
 
     int i0 = 0;

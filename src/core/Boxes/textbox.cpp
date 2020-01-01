@@ -44,7 +44,7 @@ TextBox::TextBox() : PathBox(eBoxType::text) {
             this, pathsUpdater);
 
     mSpacingCont = enve::make_shared<StaticComplexAnimator>("spacing");
-    mLetterSpacing = enve::make_shared<QrealAnimator>(1, -100, 100, 0.1, "letters");
+    mLetterSpacing = enve::make_shared<QrealAnimator>(0, -100, 100, 0.1, "letters");
     mWordSpacing = enve::make_shared<QrealAnimator>(1, -100, 100, 0.1, "words");
     mLineSpacing = enve::make_shared<QrealAnimator>(1, -100, 100, 0.1, "lines");
 
@@ -177,6 +177,7 @@ void TextBox::setupCanvasMenu(PropertyMenu * const menu) {
 
 SkPath TextBox::getPathAtRelFrameF(const qreal relFrame) {
     const SkFont font = toSkFont(mFont);
+    const qreal fontSize = static_cast<qreal>(font.getSize());
     const QString textAtFrame = mText->getValueAtRelFrame(relFrame);
 
     const qreal letterSpacing = mLetterSpacing->getEffectiveValue(relFrame);
@@ -207,7 +208,7 @@ SkPath TextBox::getPathAtRelFrameF(const qreal relFrame) {
         const qreal lineWidth = lineWidths.at(i);
         const qreal lineX = textLineX(mAlignment, lineWidth, maxWidth) + xTranslate;
         const qreal lineY = i*lineInc;
-        if(isOne4Dec(letterSpacing) && isOne4Dec(wordSpacing)) {
+        if(isZero4Dec(letterSpacing) && isOne4Dec(wordSpacing)) {
             SkPath linePath;
             SkTextUtils::GetPath(line.toUtf8().data(),
                                  static_cast<size_t>(line.length()),
@@ -215,7 +216,7 @@ SkPath TextBox::getPathAtRelFrameF(const qreal relFrame) {
                                  toSkScalar(lineX), toSkScalar(lineY),
                                  font, &linePath);
             result.addPath(linePath);
-        } else if(isOne4Dec(letterSpacing)) {
+        } else if(isZero4Dec(letterSpacing)) {
             qreal xPos = lineX;
             const qreal spaceX = horizontalAdvance(font, " ")*wordSpacing;
 
@@ -264,7 +265,7 @@ SkPath TextBox::getPathAtRelFrameF(const qreal relFrame) {
                                      font, &letterPath);
                 result.addPath(letterPath);
 
-                xPos += horizontalAdvance(font, letter)*letterSpacing;
+                xPos += horizontalAdvance(font, letter) + letterSpacing*fontSize;
             }
         }
     }

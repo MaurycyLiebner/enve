@@ -29,6 +29,8 @@ extern qreal textLineX(const Qt::Alignment &alignment,
 extern qreal horizontalAdvance(const SkFont& font,
                                const QString& str);
 extern qreal horizontalAdvance(const SkFont& font, const QString& str,
+                               const qreal letterSpacing);
+extern qreal horizontalAdvance(const SkFont& font, const QString& str,
                                const qreal letterSpacing, const qreal wordSpacing);
 
 class LetterRenderData : public PathBoxRenderData {
