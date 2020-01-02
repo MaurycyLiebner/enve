@@ -62,6 +62,7 @@
 #include "centralwidget.h"
 #include "ColorWidgets/bookmarkedcolors.h"
 #include "GUI/edialogs.h"
+#include "closesignalingdockwidget.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 
@@ -156,41 +157,26 @@ MainWindow::MainWindow(Document& document,
 
     mDocument.setPath("");
 
-    mFillStrokeSettingsDock = new QDockWidget("Fill and Stroke", this);
+    mFillStrokeSettingsDock = new CloseSignalingDockWidget("Fill and Stroke", this);
     //const auto fillStrokeSettingsScroll = new ScrollArea(this);
     mFillStrokeSettings = new FillStrokeSettingsWidget(mDocument, this);
     //fillStrokeSettingsScroll->setWidget(mFillStrokeSettings);
-    const auto fillStrokeDockLabel = new QLabel("Fill and Stroke", this);
-    fillStrokeDockLabel->setObjectName("dockLabel");
-    fillStrokeDockLabel->setAlignment(Qt::AlignCenter);
-    mFillStrokeSettingsDock->setTitleBarWidget(fillStrokeDockLabel);
     mFillStrokeSettingsDock->setWidget(mFillStrokeSettings);
-    mFillStrokeSettingsDock->setFeatures(QDockWidget::DockWidgetMovable |
-                                         QDockWidget::DockWidgetFloatable);
     addDockWidget(Qt::RightDockWidgetArea, mFillStrokeSettingsDock);
     mFillStrokeSettingsDock->setMinimumWidth(MIN_WIDGET_DIM*12);
     mFillStrokeSettingsDock->setMaximumWidth(MIN_WIDGET_DIM*20);
 
-    mBottomDock = new QDockWidget("Timeline", this);
-
-    mBottomDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
-    mBottomDock->setTitleBarWidget(new QWidget());
-    addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
+    mTimelineDock = new CloseSignalingDockWidget("Timeline", this);
+    mTimelineDock->setTitleBarWidget(new QWidget());
+    addDockWidget(Qt::BottomDockWidgetArea, mTimelineDock);
 
     mLayoutHandler = new LayoutHandler(mDocument, mAudioHandler);
-    mTimeline =
-            new TimelineDockWidget(mDocument, mLayoutHandler, this);
-    mBottomDock->setWidget(mTimeline);
+    mTimeline = new TimelineDockWidget(mDocument, mLayoutHandler, this);
+    mTimelineDock->setWidget(mTimeline);
 
-    mBrushSettingsDock = new QDockWidget("Brush Settings", this);
-    mBrushSettingsDock->setFeatures(QDockWidget::DockWidgetMovable |
-                                    QDockWidget::DockWidgetFloatable);
+    mBrushSettingsDock = new CloseSignalingDockWidget("Brush Settings", this);
     mBrushSettingsDock->setMinimumWidth(MIN_WIDGET_DIM*10);
     mBrushSettingsDock->setMaximumWidth(MIN_WIDGET_DIM*20);
-    const auto brushDockLabel = new QLabel("Brush Settings", this);
-    brushDockLabel->setObjectName("dockLabel");
-    brushDockLabel->setAlignment(Qt::AlignCenter);
-    mBrushSettingsDock->setTitleBarWidget(brushDockLabel);
 
     const auto pCtxt = BrushSelectionWidget::sPaintContext;
     mBrushSelectionWidget = new BrushSelectionWidget(*pCtxt.get(), this);
@@ -206,15 +192,9 @@ MainWindow::MainWindow(Document& document,
     addDockWidget(Qt::LeftDockWidgetArea, mBrushSettingsDock);
     mBrushSettingsDock->hide();
 
-    mLeftDock = new QDockWidget("Selected Objects", this);
-    mLeftDock->setFeatures(QDockWidget::DockWidgetMovable |
-                           QDockWidget::DockWidgetFloatable);
-    mLeftDock->setMinimumWidth(MIN_WIDGET_DIM*10);
-    mLeftDock->setMaximumWidth(MIN_WIDGET_DIM*20);
-    const auto leftDockLabel = new QLabel("Selected Objects", this);
-    leftDockLabel->setObjectName("dockLabel");
-    leftDockLabel->setAlignment(Qt::AlignCenter);
-    mLeftDock->setTitleBarWidget(leftDockLabel);
+    mSelectedObjectDock = new CloseSignalingDockWidget("Selected Objects", this);
+    mSelectedObjectDock->setMinimumWidth(MIN_WIDGET_DIM*10);
+    mSelectedObjectDock->setMaximumWidth(MIN_WIDGET_DIM*20);
 
     mObjectSettingsScrollArea = new ScrollArea(this);
     mObjectSettingsWidget = new BoxScrollWidget(
@@ -236,22 +216,15 @@ MainWindow::MainWindow(Document& document,
     mObjectSettingsScrollArea->verticalScrollBar()->setSingleStep(
                 MIN_WIDGET_DIM);
 
-    mLeftDock->setWidget(mObjectSettingsScrollArea);
-    addDockWidget(Qt::LeftDockWidgetArea, mLeftDock);
+    mSelectedObjectDock->setWidget(mObjectSettingsScrollArea);
+    addDockWidget(Qt::LeftDockWidgetArea, mSelectedObjectDock);
 
-    mLeftDock2 = new QDockWidget(this);
-    mLeftDock2->setFeatures(QDockWidget::DockWidgetMovable |
-                            QDockWidget::DockWidgetFloatable);
-    mLeftDock2->setMinimumWidth(MIN_WIDGET_DIM*10);
-    mLeftDock2->setMaximumWidth(MIN_WIDGET_DIM*20);
+    mFilesDock = new CloseSignalingDockWidget("Files", this);
+    mFilesDock->setMinimumWidth(MIN_WIDGET_DIM*10);
+    mFilesDock->setMaximumWidth(MIN_WIDGET_DIM*20);
 
-    mLeftDock2->setWidget(new FileSourceList(this));
-    addDockWidget(Qt::LeftDockWidgetArea, mLeftDock2);
-
-    const auto leftDock2Label = new QLabel("Files", this);
-    leftDock2Label->setObjectName("dockLabel");
-    leftDock2Label->setAlignment(Qt::AlignCenter);
-    mLeftDock2->setTitleBarWidget(leftDock2Label);
+    mFilesDock->setWidget(new FileSourceList(this));
+    addDockWidget(Qt::LeftDockWidgetArea, mFilesDock);
 
     const auto bBrush = new BookmarkedBrushes(true, 64, pCtxt.get(), this);
     const auto bColor = new BookmarkedColors(true, 64, this);
@@ -557,48 +530,57 @@ void MainWindow::setupMenuBar() {
 
     mPanelsMenu = mViewMenu->addMenu("Docks");
 
-    mCurrentObjectDock = mPanelsMenu->addAction("Selected Objects");
-    mCurrentObjectDock->setCheckable(true);
-    mCurrentObjectDock->setChecked(true);
-    mCurrentObjectDock->setShortcut(QKeySequence(Qt::Key_O));
+    mSelectedObjectDockAct = mPanelsMenu->addAction("Selected Objects");
+    mSelectedObjectDockAct->setCheckable(true);
+    mSelectedObjectDockAct->setChecked(true);
+    mSelectedObjectDockAct->setShortcut(QKeySequence(Qt::Key_O));
 
-    connect(mCurrentObjectDock, &QAction::toggled,
-            mLeftDock, &QDockWidget::setVisible);
+    connect(mSelectedObjectDock, &CloseSignalingDockWidget::madeVisible,
+            mSelectedObjectDockAct, &QAction::setChecked);
+    connect(mSelectedObjectDockAct, &QAction::toggled,
+            mSelectedObjectDock, &QDockWidget::setVisible);
 
-    mFilesDock = mPanelsMenu->addAction("Files");
-    mFilesDock->setCheckable(true);
-    mFilesDock->setChecked(true);
-    mFilesDock->setShortcut(QKeySequence(Qt::Key_F));
+    mFilesDockAct = mPanelsMenu->addAction("Files");
+    mFilesDockAct->setCheckable(true);
+    mFilesDockAct->setChecked(true);
+    mFilesDockAct->setShortcut(QKeySequence(Qt::Key_F));
 
-    connect(mFilesDock, &QAction::toggled,
-            mLeftDock2, &QDockWidget::setVisible);
+    connect(mFilesDock, &CloseSignalingDockWidget::madeVisible,
+            mFilesDockAct, &QAction::setChecked);
+    connect(mFilesDockAct, &QAction::toggled,
+            mFilesDock, &QDockWidget::setVisible);
 
-    mObjectsAndAnimationsDock = mPanelsMenu->addAction("Objects and Animations");
-    mObjectsAndAnimationsDock->setCheckable(true);
-    mObjectsAndAnimationsDock->setChecked(true);
-    mObjectsAndAnimationsDock->setShortcut(QKeySequence(Qt::Key_T));
+    mTimelineDockAct = mPanelsMenu->addAction("Timeline");
+    mTimelineDockAct->setCheckable(true);
+    mTimelineDockAct->setChecked(true);
+    mTimelineDockAct->setShortcut(QKeySequence(Qt::Key_T));
 
-    connect(mObjectsAndAnimationsDock, &QAction::toggled,
-            mBottomDock, &QDockWidget::setVisible);
+    connect(mTimelineDock, &CloseSignalingDockWidget::madeVisible,
+            mTimelineDockAct, &QAction::setChecked);
+    connect(mTimelineDockAct, &QAction::toggled,
+            mTimelineDock, &QDockWidget::setVisible);
 
-    mFillAndStrokeSettingsDock = mPanelsMenu->addAction("Fill and Stroke");
-    mFillAndStrokeSettingsDock->setCheckable(true);
-    mFillAndStrokeSettingsDock->setChecked(true);
-    mFillAndStrokeSettingsDock->setShortcut(QKeySequence(Qt::Key_E));
+    mFillAndStrokeDockAct = mPanelsMenu->addAction("Fill and Stroke");
+    mFillAndStrokeDockAct->setCheckable(true);
+    mFillAndStrokeDockAct->setChecked(true);
+    mFillAndStrokeDockAct->setShortcut(QKeySequence(Qt::Key_E));
 
-    connect(mFillAndStrokeSettingsDock, &QAction::toggled,
+    connect(mFillStrokeSettingsDock, &CloseSignalingDockWidget::madeVisible,
+            mFillAndStrokeDockAct, &QAction::setChecked);
+    connect(mFillAndStrokeDockAct, &QAction::toggled,
             mFillStrokeSettingsDock, &QDockWidget::setVisible);
 
-    mBrushSettingsDockAction = mPanelsMenu->addAction("Paint Brush");
-    mBrushSettingsDockAction->setCheckable(true);
-    mBrushSettingsDockAction->setChecked(false);
-    mBrushSettingsDockAction->setShortcut(QKeySequence(Qt::Key_B));
+    mBrushDockAction = mPanelsMenu->addAction("Paint Brush");
+    mBrushDockAction->setCheckable(true);
+    mBrushDockAction->setChecked(false);
+    mBrushDockAction->setShortcut(QKeySequence(Qt::Key_B));
 
-    connect(mBrushSettingsDockAction, &QAction::toggled,
+    connect(mBrushSettingsDock, &CloseSignalingDockWidget::madeVisible,
+            mBrushDockAction, &QAction::setChecked);
+    connect(mBrushDockAction, &QAction::toggled,
             mBrushSettingsDock, &QDockWidget::setVisible);
 
-    mBrushColorBookmarksAction =
-            mPanelsMenu->addAction("Brush/Color Bookmarks");
+    mBrushColorBookmarksAction = mPanelsMenu->addAction("Brush/Color Bookmarks");
     mBrushColorBookmarksAction->setCheckable(true);
     mBrushColorBookmarksAction->setChecked(true);
     mBrushColorBookmarksAction->setShortcut(QKeySequence(Qt::Key_U));

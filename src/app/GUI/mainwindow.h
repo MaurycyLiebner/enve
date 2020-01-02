@@ -17,7 +17,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QDockWidget>
 #include <QMainWindow>
 #include <QGraphicsView>
 #include <QComboBox>
@@ -55,6 +54,7 @@ class ScrollWidget;
 class ScrollArea;
 class UsageWidget;
 class CentralWidget;
+class CloseSignalingDockWidget;
 //class SoundComposition;
 
 const QString MENU_STYLESHEET =
@@ -149,10 +149,10 @@ public:
     }
 
     void togglePaintBrushDockVisible()
-    { mBrushSettingsDockAction->toggle(); }
+    { mBrushDockAction->toggle(); }
 
     void toggleFillStrokeSettingsDockVisible()
-    { mFillAndStrokeSettingsDock->toggle(); }
+    { mFillAndStrokeDockAct->toggle(); }
 public:
     //void saveOutput(QString renderDest);
     //void renderOutput();
@@ -241,11 +241,11 @@ private:
 //    QList<BoundingBox*> mBoxesAwaitingUpdate;
 //    bool mNoBoxesAwaitUpdate = true;
 
-    QDockWidget *mFillStrokeSettingsDock;
-    QDockWidget *mBottomDock;
-    QDockWidget *mLeftDock;
-    QDockWidget *mLeftDock2;
-    QDockWidget *mBrushSettingsDock;
+    CloseSignalingDockWidget *mFillStrokeSettingsDock;
+    CloseSignalingDockWidget *mTimelineDock;
+    CloseSignalingDockWidget *mSelectedObjectDock;
+    CloseSignalingDockWidget *mFilesDock;
+    CloseSignalingDockWidget *mBrushSettingsDock;
     TimelineDockWidget *mTimeline = nullptr;
     BrushSelectionWidget *mBrushSelectionWidget = nullptr;
 
@@ -301,11 +301,11 @@ private:
     QAction *mClipViewToCanvas;
     QAction *mRasterEffectsVisible;
     QAction *mPathEffectsVisible;
-    QAction *mCurrentObjectDock;
-    QAction *mFilesDock;
-    QAction *mObjectsAndAnimationsDock;
-    QAction *mFillAndStrokeSettingsDock;
-    QAction *mBrushSettingsDockAction;
+    QAction *mSelectedObjectDockAct;
+    QAction *mFilesDockAct;
+    QAction *mTimelineDockAct;
+    QAction *mFillAndStrokeDockAct;
+    QAction *mBrushDockAction;
     QAction *mBrushColorBookmarksAction;
 
     FontsWidget *mFontWidget = nullptr;

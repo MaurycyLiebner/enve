@@ -201,6 +201,21 @@ QLabel#dockLabel {
     stop:0 lightgray, stop:1 darkgray);
 }
 
+QDockWidget {
+    color: black;
+}
+
+QDockWidget::title {
+    text-align: center;
+    border: 0;
+    border-bottom: 1px solid black;
+    padding-bottom: 1px;
+    padding-top: 1px;
+    color: black;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+    stop:0 lightgray, stop:1 darkgray);
+}
+
 QLabel#blackTextLabel {
     color: black;
     background: transparent;
