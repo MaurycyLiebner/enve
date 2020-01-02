@@ -1,5 +1,5 @@
 // enve - 2D animations software
-// Copyright (C) 2016-2019 Maurycy Liebner
+// Copyright (C) 2016-2020 Maurycy Liebner
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

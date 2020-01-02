@@ -249,7 +249,7 @@ You have successfuly created your own enve AppImage!
 
 ## Authors
 
-**Maurycy Liebner** - 2016 - 2019 - [MaurycyLiebner](https://github.com/MaurycyLiebner)
+**Maurycy Liebner** - 2016 - 2020 - [MaurycyLiebner](https://github.com/MaurycyLiebner)
 
 ## License
 
