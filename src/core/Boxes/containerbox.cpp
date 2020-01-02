@@ -441,7 +441,8 @@ BoundingBox *ContainerBox::getBoxAtFromAllDescendents(const QPointF &absPos) {
 
 void ContainerBox::ungroup_k() {
     //clearBoxesSelection();
-    for(auto box : mContained) {
+    for(int i = mContained.count() - 1; i >= 0; i--) {
+        auto box = mContained.at(i);
         removeContained(box);
         mParentGroup->addContained(box);
     }
