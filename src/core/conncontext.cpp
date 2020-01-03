@@ -15,3 +15,19 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "conncontext.h"
+
+ConnContext::ConnContext() {}
+
+ConnContext::~ConnContext() {
+    clear();
+}
+
+ConnContext &ConnContext::operator<<(const QMetaObject::Connection &connection) {
+    mConns << connection;
+    return *this;
+}
+
+void ConnContext::clear() {
+    for(const auto& conn : mConns)
+        QObject::disconnect(conn);
+}

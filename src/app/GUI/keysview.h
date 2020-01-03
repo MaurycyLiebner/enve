@@ -23,7 +23,7 @@
 #include "keyfocustarget.h"
 #include "smartPointers/ememory.h"
 #include "framerange.h"
-#include "conncontext.h"
+#include "conncontextobjlist.h"
 
 const QList<QColor> ANIMATOR_COLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
                                       QColor(255, 255, 0), QColor(255, 0, 255),

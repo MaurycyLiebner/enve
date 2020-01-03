@@ -23,7 +23,7 @@ class BoundingBox;
 
 #include "Boxes/containerbox.h"
 #include "MovablePoints/movablepoint.h"
-#include "conncontext.h"
+#include "conncontextobjlist.h"
 
 class CanvasBase : public ContainerBox {
     friend class Canvas;

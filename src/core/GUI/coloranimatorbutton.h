@@ -18,6 +18,7 @@
 #define COLORANIMATORBUTTON_H
 #include "boxeslistactionbutton.h"
 #include "smartPointers/selfref.h"
+#include "conncontextptr.h"
 class ColorAnimator;
 
 class ColorAnimatorButton : public BoxesListActionButton {
@@ -37,7 +38,7 @@ protected:
     void paintEvent(QPaintEvent *);
 private:
     QColor mColor;
-    qptr<ColorAnimator> mColorTarget;
+    ConnContextQPtr<ColorAnimator> mColorTarget;
 };
 
 #endif // COLORANIMATORBUTTON_H

@@ -40,25 +40,17 @@ ColorAnimatorButton::ColorAnimatorButton(const QColor &color,
 }
 
 void ColorAnimatorButton::setColorTarget(ColorAnimator * const target) {
-    if(mColorTarget) {
-        disconnect(mColorTarget->getVal1Animator(), nullptr,
-                   this, nullptr);
-        disconnect(mColorTarget->getVal2Animator(), nullptr,
-                   this, nullptr);
-        disconnect(mColorTarget->getVal3Animator(), nullptr,
-                   this, nullptr);
-    }
-    mColorTarget = target;
+    mColorTarget.assign(target);
     if(target) {
-        connect(target->getVal1Animator(),
-                &QrealAnimator::valueChangedSignal,
-                this, qOverload<>(&ColorAnimatorButton::update));
-        connect(target->getVal2Animator(),
-                &QrealAnimator::valueChangedSignal,
-                this, qOverload<>(&ColorAnimatorButton::update));
-        connect(target->getVal3Animator(),
-                &QrealAnimator::valueChangedSignal,
-                this, qOverload<>(&ColorAnimatorButton::update));
+        mColorTarget << connect(target->getVal1Animator(),
+                                &QrealAnimator::valueChangedSignal,
+                                this, qOverload<>(&ColorAnimatorButton::update));
+        mColorTarget << connect(target->getVal2Animator(),
+                                &QrealAnimator::valueChangedSignal,
+                                this, qOverload<>(&ColorAnimatorButton::update));
+        mColorTarget << connect(target->getVal3Animator(),
+                                &QrealAnimator::valueChangedSignal,
+                                this, qOverload<>(&ColorAnimatorButton::update));
     }
 }
 

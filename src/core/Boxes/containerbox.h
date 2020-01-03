@@ -17,7 +17,7 @@
 #ifndef CONTAINERBOX_H
 #define CONTAINERBOX_H
 #include "boxwithpatheffects.h"
-#include "conncontext.h"
+#include "conncontextobjlist.h"
 class PathBox;
 class PathEffectAnimators;
 

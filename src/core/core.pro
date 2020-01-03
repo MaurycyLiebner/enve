@@ -478,6 +478,8 @@ HEADERS += \
     colorhelpers.h \
     colorsetting.h \
     conncontext.h \
+    conncontextobjlist.h \
+    conncontextptr.h \
     core_global.h \
     cpurendertools.h \
     customhandler.h \
