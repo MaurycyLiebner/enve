@@ -16,7 +16,9 @@
 
 #ifndef COMBOBOXPROPERTY_H
 #define COMBOBOXPROPERTY_H
+
 #include "property.h"
+
 class ComboBoxProperty : public Property {
     Q_OBJECT
     e_OBJECT
@@ -28,24 +30,10 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
-    const QStringList &getValueNames() {
-        return mValueNames;
-    }
-
-    QString getCurrentValueName() {
-        if(mCurrentValue >= mValueNames.count()) return "null";
-        return mValueNames.at(mCurrentValue);
-    }
-
-    int getCurrentValue() {
-        return mCurrentValue;
-    }
-    void setCurrentValue(const int id) {
-        if(mCurrentValue == id) return;
-        mCurrentValue = id;
-        emit valueChanged(id);
-        prp_afterWholeInfluenceRangeChanged();
-    }
+    const QStringList &getValueNames() { return mValueNames; }
+    QString getCurrentValueName();
+    int getCurrentValue() { return mCurrentValue; }
+    void setCurrentValue(const int id);
 signals:
     void valueChanged(int);
 private:

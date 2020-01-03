@@ -29,3 +29,15 @@ void ComboBoxProperty::prp_writeProperty(eWriteStream& dst) const {
 void ComboBoxProperty::prp_readProperty(eReadStream& src) {
     src >> mCurrentValue;
 }
+
+QString ComboBoxProperty::getCurrentValueName() {
+    if(mCurrentValue >= mValueNames.count()) return "null";
+    return mValueNames.at(mCurrentValue);
+}
+
+void ComboBoxProperty::setCurrentValue(const int id) {
+    if(mCurrentValue == id) return;
+    mCurrentValue = id;
+    emit valueChanged(id);
+    prp_afterWholeInfluenceRangeChanged();
+}
