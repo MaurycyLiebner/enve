@@ -286,11 +286,12 @@ QString renderOutputDir() {
 }
 
 void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
-    QString outputDst = mSettings.getOutputDestination();
-    if(outputDst.isEmpty()) outputDst = renderOutputDir() + "/untitled";
     const OutputSettings &outputSettings = mSettings.getOutputRenderSettings();
     const auto format = outputSettings.fOutputFormat;
     if(!format) return;
+    const bool isImgSeq = !std::strcmp(format->name, "image2");
+    QString outputDst = mSettings.getOutputDestination();
+    if(outputDst.isEmpty()) outputDst = renderOutputDir() + "/untitled";
     const QString tmpStr = QString(format->extensions);
     const QStringList supportedExt = tmpStr.split(",");
     const QString fileName = outputDst.split("/").last();
@@ -302,8 +303,7 @@ void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
             currExt = dividedName.last();
         }
     }
-    if(supportedExt.contains(currExt)) return;
-    if(!supportedExt.isEmpty()) {
+    if(!supportedExt.contains(currExt) && !supportedExt.isEmpty()) {
         const QString firstSupported = supportedExt.first();
         if(!firstSupported.isEmpty()) {
             if(currExt.isEmpty()) {
@@ -315,9 +315,14 @@ void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
                 outputDst.remove(extId, 1 + currExt.count());
             }
             outputDst += "." + firstSupported;
-            mSettings.setOutputDestination(outputDst);
         }
     }
+    if(isImgSeq && outputDst.contains(".") && !outputDst.contains("%05d")) {
+        QStringList div = outputDst.split(".");
+        div.replace(div.count() - 2, div.at(div.count() - 2) + "%05d");
+        outputDst = div.join(".");
+    }
+    mSettings.setOutputDestination(outputDst);
     mOutputDestinationButton->setText(outputDst);
 }
 
@@ -332,10 +337,9 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     QString selectedExt;
     const OutputSettings &outputSettings = mSettings.getOutputRenderSettings();
     const auto format = outputSettings.fOutputFormat;
-    QStringList supportedExt;
     if(format) {
         QString tmpStr = QString(format->extensions);
-        supportedExt = tmpStr.split(",");
+        const QStringList supportedExt = tmpStr.split(",");
         selectedExt = "." + supportedExt.first();
         tmpStr.replace(",", " *.");
         supportedExts = "Output File (*." + tmpStr + ")";
@@ -347,10 +351,9 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     QString saveAs = eDialogs::saveFile("Output Destination",
                                         iniText, supportedExts);
     if(saveAs.isEmpty()) return;
-    const auto saveAsExt = saveAs.right(selectedExt.length());
-    if(!supportedExts.contains(saveAsExt)) saveAs += selectedExt;
     mSettings.setOutputDestination(saveAs);
     mOutputDestinationButton->setText(saveAs);
+    updateOutputDestinationFromCurrentFormat();
 }
 
 #include "rendersettingsdialog.h"
