@@ -262,25 +262,19 @@ void PathBox::resetFillGradientPointsPos() {
 
 void PathBox::setStrokeBrush(SimpleBrushWrapper * const brush) {
     mStrokeSettings->setStrokeBrush(brush);
-    prp_afterWholeInfluenceRangeChanged();
-    planUpdate(UpdateReason::userChange);
 }
 
-void PathBox::setStrokeBrushWidthCurve(const qCubicSegment1D &curve) {
-    mStrokeSettings->setStrokeBrushWidthCurve(curve);
-}
+void PathBox::applyStrokeBrushWidthAction(const PathBox::SegAction &action)
+{ mStrokeSettings->applyStrokeBrushWidthAction(action); }
 
-void PathBox::setStrokeBrushTimeCurve(const qCubicSegment1D &curve) {
-    mStrokeSettings->setStrokeBrushTimeCurve(curve);
-}
+void PathBox::applyStrokeBrushPressureAction(const PathBox::SegAction &action)
+{ mStrokeSettings->applyStrokeBrushPressureAction(action); }
 
-void PathBox::setStrokeBrushPressureCurve(const qCubicSegment1D &curve) {
-    mStrokeSettings->setStrokeBrushPressureCurve(curve);
-}
+void PathBox::applyStrokeBrushSpacingAction(const PathBox::SegAction &action)
+{ mStrokeSettings->applyStrokeBrushSpacingAction(action); }
 
-void PathBox::setStrokeBrushSpacingCurve(const qCubicSegment1D &curve) {
-    mStrokeSettings->setStrokeBrushSpacingCurve(curve);
-}
+void PathBox::applyStrokeBrushTimeAction(const PathBox::SegAction &action)
+{ mStrokeSettings->applyStrokeBrushTimeAction(action); }
 
 void PathBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
     mStrokeSettings->setCapStyle(capStyle);

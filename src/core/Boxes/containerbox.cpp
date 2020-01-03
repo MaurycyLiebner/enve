@@ -135,27 +135,27 @@ void ContainerBox::setStrokeBrush(SimpleBrushWrapper * const brush) {
     }
 }
 
-void ContainerBox::setStrokeBrushWidthCurve(const qCubicSegment1D& curve) {
+void ContainerBox::applyStrokeBrushWidthAction(const SegAction& action) {
     for(const auto& box : mContainedBoxes) {
-        box->setStrokeBrushWidthCurve(curve);
+        box->applyStrokeBrushWidthAction(action);
     }
 }
 
-void ContainerBox::setStrokeBrushTimeCurve(const qCubicSegment1D& curve) {
+void ContainerBox::applyStrokeBrushPressureAction(const SegAction& action) {
     for(const auto& box : mContainedBoxes) {
-        box->setStrokeBrushTimeCurve(curve);
+        box->applyStrokeBrushPressureAction(action);
     }
 }
 
-void ContainerBox::setStrokeBrushPressureCurve(const qCubicSegment1D& curve) {
+void ContainerBox::applyStrokeBrushSpacingAction(const SegAction& action) {
     for(const auto& box : mContainedBoxes) {
-        box->setStrokeBrushPressureCurve(curve);
+        box->applyStrokeBrushSpacingAction(action);
     }
 }
 
-void ContainerBox::setStrokeBrushSpacingCurve(const qCubicSegment1D& curve) {
+void ContainerBox::applyStrokeBrushTimeAction(const SegAction& action) {
     for(const auto& box : mContainedBoxes) {
-        box->setStrokeBrushSpacingCurve(curve);
+        box->applyStrokeBrushTimeAction(action);
     }
 }
 

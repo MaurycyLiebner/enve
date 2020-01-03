@@ -20,6 +20,7 @@
 #include "Animators/brushsettingsanimator.h"
 
 class OutlineSettingsAnimator : public PaintSettingsAnimator {
+    typedef qCubicSegment1DAnimator::Action SegAction;
     e_OBJECT
 protected:
     OutlineSettingsAnimator(GradientPoints* const grdPts,
@@ -37,6 +38,18 @@ public:
     void setCapStyle(const SkPaint::Cap capStyle);
     void setJoinStyle(const SkPaint::Join joinStyle);
     void setStrokerSettingsSk(SkStroke * const stroker);
+
+    void applyStrokeBrushWidthAction(const SegAction& action)
+    { mBrushSettings->applyWidthAction(action); }
+
+    void applyStrokeBrushPressureAction(const SegAction& action)
+    { mBrushSettings->applyPressureAction(action); }
+
+    void applyStrokeBrushSpacingAction(const SegAction& action)
+    { mBrushSettings->applySpacingAction(action); }
+
+    void applyStrokeBrushTimeAction(const SegAction& action)
+    { mBrushSettings->applyTimeAction(action); }
 
     void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve) {
         mBrushSettings->setStrokeBrushSpacingCurve(curve);

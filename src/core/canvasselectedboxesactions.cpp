@@ -219,32 +219,27 @@ void Canvas::setSelectedStrokeBrush(SimpleBrushWrapper * const brush) {
     }
 }
 
-void Canvas::setSelectedStrokeBrushWidthCurve(
-        const qCubicSegment1D& curve) {
+void Canvas::applyStrokeBrushWidthActionToSelected(const SegAction& action) {
     for(const auto &box : mSelectedBoxes) {
-        box->setStrokeBrushWidthCurve(curve);
+        box->applyStrokeBrushWidthAction(action);
     }
 }
 
-
-void Canvas::setSelectedStrokeBrushTimeCurve(
-        const qCubicSegment1D& curve) {
+void Canvas::applyStrokeBrushPressureActionToSelected(const SegAction& action) {
     for(const auto &box : mSelectedBoxes) {
-        box->setStrokeBrushTimeCurve(curve);
+        box->applyStrokeBrushPressureAction(action);
     }
 }
 
-void Canvas::setSelectedStrokeBrushSpacingCurve(
-        const qCubicSegment1D& curve) {
+void Canvas::applyStrokeBrushSpacingActionToSelected(const SegAction& action) {
     for(const auto &box : mSelectedBoxes) {
-        box->setStrokeBrushSpacingCurve(curve);
+        box->applyStrokeBrushSpacingAction(action);
     }
 }
 
-void Canvas::setSelectedStrokeBrushPressureCurve(
-        const qCubicSegment1D& curve) {
+void Canvas::applyStrokeBrushTimeActionToSelected(const SegAction& action) {
     for(const auto &box : mSelectedBoxes) {
-        box->setStrokeBrushPressureCurve(curve);
+        box->applyStrokeBrushTimeAction(action);
     }
 }
 

@@ -33,6 +33,30 @@ protected:
 
     virtual void afterValueChanged() {}
 public:
+    class Action {
+        enum Type { START, SET, FINISH };
+        Action(const T& value, const Type type) :
+            mValue(value), mType(type) {}
+    public:
+        void apply(BasedAnimatorT* const target) const {
+            if(mType == START) target->prp_startTransform();
+            else if(mType == SET) target->setCurrentValue(mValue);
+            else if(mType == FINISH) target->prp_finishTransform();
+        }
+
+        static Action sMakeStart()
+        { return Action{T(), START}; }
+        static Action sMakeSet(const T& value)
+        { return Action{value, SET}; }
+        static Action sMakeFinish()
+        { return Action{T(), FINISH}; }
+    private:
+        T mValue;
+        Type mType;
+    };
+
+    void prp_startTransform() override;
+    void prp_finishTransform() override;
     void prp_afterChangedAbsRange(const FrameRange& range,
                                   const bool clip) override;
 
@@ -54,7 +78,34 @@ protected:
     void updateValueFromCurrentFrame();
 
     T mCurrentValue;
+private:
+    T mSavedCurrentValue;
+    bool mTransformed = false;
 };
+
+template<typename B, typename K, typename T>
+void BasedAnimatorT<B, K, T>::prp_startTransform() {
+    if(mTransformed) return;
+    if(this->anim_isRecording() &&
+            !this->anim_getKeyOnCurrentFrame()) {
+        this->anim_saveCurrentValueAsKey();
+    }
+    mSavedCurrentValue = mCurrentValue;
+    mTransformed = true;
+}
+
+template<typename B, typename K, typename T>
+void BasedAnimatorT<B, K, T>::prp_finishTransform() {
+    if(mTransformed) {
+//        addUndoRedo(new ChangeQrealAnimatorValue(mSavedCurrentValue,
+//                                                 mCurrentValue,
+//                                                 this) );
+
+        mTransformed = false;
+
+        emit prp_finishTransform();
+    }
+}
 
 template<typename B, typename K, typename T>
 void BasedAnimatorT<B, K, T>::prp_afterChangedAbsRange(const FrameRange &range,
@@ -137,8 +188,10 @@ T BasedAnimatorT<B, K, T>::getValueAtRelFrame(const qreal frame) const {
 template<typename B, typename K, typename T>
 void BasedAnimatorT<B, K, T>::setCurrentValue(const T &value) {
     mCurrentValue = value;
-    if(this->anim_isRecording()) this->anim_saveCurrentValueAsKey();
+    const auto currKey = this->template anim_getKeyOnCurrentFrame<K>();
+    if(currKey) currKey->setValue(mCurrentValue);
     else this->prp_afterWholeInfluenceRangeChanged();
+
     afterValueChanged();
 }
 

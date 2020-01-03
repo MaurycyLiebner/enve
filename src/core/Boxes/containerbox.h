@@ -23,6 +23,7 @@ class PathEffectAnimators;
 
 class ContainerBox : public BoxWithPathEffects {
     e_OBJECT
+    typedef qCubicSegment1DAnimator::Action SegAction;
 protected:
     ContainerBox(const eBoxType type);
 public:
@@ -86,10 +87,11 @@ public:
     void setStrokeJoinStyle(const SkPaint::Join joinStyle);
 
     void setStrokeBrush(SimpleBrushWrapper * const brush);
-    void setStrokeBrushWidthCurve(const qCubicSegment1D& curve);
-    void setStrokeBrushTimeCurve(const qCubicSegment1D& curve);
-    void setStrokeBrushPressureCurve(const qCubicSegment1D& curve);
-    void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve);
+
+    void applyStrokeBrushWidthAction(const SegAction& action);
+    void applyStrokeBrushPressureAction(const SegAction& action);
+    void applyStrokeBrushSpacingAction(const SegAction& action);
+    void applyStrokeBrushTimeAction(const SegAction& action);
 
     FillSettingsAnimator *getFillSettings() const;
     OutlineSettingsAnimator *getStrokeSettings() const;

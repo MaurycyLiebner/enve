@@ -139,6 +139,7 @@ struct KeyEvent : public MouseEvent {
 
 class Canvas : public CanvasBase {
     friend class CanvasWindow;
+    typedef qCubicSegment1DAnimator::Action SegAction;
     Q_OBJECT
     e_OBJECT
 public:
@@ -229,14 +230,11 @@ public:
     void setSelectedCapStyle(const SkPaint::Cap capStyle);
     void setSelectedJoinStyle(const SkPaint::Join joinStyle);
     void setSelectedStrokeBrush(SimpleBrushWrapper * const brush);
-    void setSelectedStrokeBrushWidthCurve(
-            const qCubicSegment1D& curve);
-    void setSelectedStrokeBrushTimeCurve(
-            const qCubicSegment1D& curve);
-    void setSelectedStrokeBrushPressureCurve(
-            const qCubicSegment1D& curve);
-    void setSelectedStrokeBrushSpacingCurve(
-            const qCubicSegment1D& curve);
+
+    void applyStrokeBrushWidthActionToSelected(const SegAction& action);
+    void applyStrokeBrushPressureActionToSelected(const SegAction& action);
+    void applyStrokeBrushSpacingActionToSelected(const SegAction& action);
+    void applyStrokeBrushTimeActionToSelected(const SegAction& action);
 
     void strokeWidthAction(const QrealAction &action);
 

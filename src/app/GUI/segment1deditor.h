@@ -20,6 +20,7 @@
 #include <QWidget>
 #include "Segments/qcubicsegment1d.h"
 #include "Animators/qcubicsegment1danimator.h"
+#include "conncontextptr.h"
 class Segment1DEditor : public QWidget {
     Q_OBJECT
     enum PressedPt {
@@ -29,51 +30,21 @@ class Segment1DEditor : public QWidget {
 public:
     explicit Segment1DEditor(const qreal minY, const qreal maxY,
                              QWidget *parent = nullptr);
-
-    void setValueRange(const qreal minY, const qreal maxY) {
-        mMinY = minY;
-        mMaxY = maxY;
-        update();
-    }
-
-    void setCurrentAnimator(qCubicSegment1DAnimator * const animator) {
-        if(mCurrentAnimator)
-            disconnect(mCurrentAnimator, nullptr, this, nullptr);
-        mCurrentAnimator = animator;
-        if(mCurrentAnimator)
-            connect(mCurrentAnimator,
-                    &qCubicSegment1DAnimator::currentValueChanged,
-                    this, &Segment1DEditor::updateAfterAnimatorChanged);
-        updateAfterAnimatorChanged();
-    }
-
-    void setCurrentSegment(const qCubicSegment1D& seg) {
-        mCurrentSegment = seg;
-        updateDrawPath();
-        emit segmentChanged(seg);
-    }
-
-    void setMargin(const qreal margin) {
-        mMargin = margin;
-        clampTopMarginAddMarginY();
-    }
-
-    void setPointRadius(const qreal radius) {
-        mPtRad = radius;
-        clampTopMarginAddMarginY();
-    }
-
-    void sendValueToAnimator() {
-        if(!mCurrentAnimator) return;
-        mCurrentAnimator->setCurrentValue(mCurrentSegment);
-    }
+    void setValueRange(const qreal minY, const qreal maxY);
+    void setCurrentAnimator(qCubicSegment1DAnimator * const animator);
+    void setCurrentSegment(const qCubicSegment1D& seg);
+    void setMargin(const qreal margin);
+    void setPointRadius(const qreal radius);
+    void sendValueToAnimator();
 protected:
     void paintEvent(QPaintEvent*);
     void mousePressEvent(QMouseEvent* e);
+    void mouseReleaseEvent(QMouseEvent* e);
     void mouseMoveEvent(QMouseEvent* e);
     void resizeEvent(QResizeEvent*);
     void wheelEvent(QWheelEvent* e);
 private:
+    void updateAfterAnimatorChanged();
     void updateDrawPath();
     QPointF valueToPos(const QPointF &value) const;
     qreal xValueToXPos(const qreal x) const;
@@ -84,7 +55,7 @@ private:
     QPointF c1() const;
     QPointF c2() const;
     QPointF p1() const;
-    qptr<qCubicSegment1DAnimator> mCurrentAnimator;
+    ConnContextQPtr<qCubicSegment1DAnimator> mCurrentAnimator;
     qCubicSegment1D mCurrentSegment;
     QPainterPath mCurrentDrawPath;
     qreal mMinY;
@@ -99,13 +70,10 @@ private:
     qreal mTopMargin = 0;
     void clampTopMarginAddMarginY();
 signals:
+    void editingStarted();
+    void editingFinished();
     void segmentEdited(qCubicSegment1D);
     void segmentChanged(qCubicSegment1D);
-public slots:
-    void updateAfterAnimatorChanged() {
-        if(!mCurrentAnimator) return;
-        setCurrentSegment(mCurrentAnimator->getCurrentValue());
-    }
 };
 
 #endif // SEGMENT1DEDITOR_H

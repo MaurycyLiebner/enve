@@ -21,32 +21,41 @@
 #include "Paint/simplebrushwrapper.h"
 
 class BrushSettingsAnimator : public StaticComplexAnimator {
-public:
+    typedef qCubicSegment1DAnimator::Action SegAction;
+    e_OBJECT
     BrushSettingsAnimator();
+public:    
+    void prp_writeProperty(eWriteStream &dst) const;
+    void prp_readProperty(eReadStream &src);
 
-    qCubicSegment1DAnimator * getWidthAnimator() const {
-        return mWidthCurve.data();
-    }
+    qCubicSegment1DAnimator * getWidthAnimator() const
+    { return mWidthCurve.data(); }
 
-    qCubicSegment1DAnimator * getPressureAnimator() const {
-        return mPressureCurve.data();
-    }
+    qCubicSegment1DAnimator * getPressureAnimator() const
+    { return mPressureCurve.data(); }
 
-    qCubicSegment1DAnimator * getSpacingAnimator() const {
-        return mSpacingCurve.data();
-    }
+    qCubicSegment1DAnimator * getSpacingAnimator() const
+    { return mSpacingCurve.data(); }
 
-    qCubicSegment1DAnimator * getTimeAnimator() const {
-        return mTimeCurve.data();
-    }
+    qCubicSegment1DAnimator * getTimeAnimator() const
+    { return mTimeCurve.data(); }
 
-    SimpleBrushWrapper* getBrush() const {
-        return mBrush;
-    }
+    SimpleBrushWrapper* getBrush() const
+    { return mBrush; }
 
-    void setBrush(SimpleBrushWrapper * const brush) {
-        mBrush = brush;
-    }
+    void setBrush(SimpleBrushWrapper * const brush);
+
+    void applyWidthAction(const SegAction& action)
+    { action.apply(mWidthCurve.get()); }
+
+    void applyPressureAction(const SegAction& action)
+    { action.apply(mPressureCurve.get()); }
+
+    void applySpacingAction(const SegAction& action)
+    { action.apply(mSpacingCurve.get()); }
+
+    void applyTimeAction(const SegAction& action)
+    { action.apply(mTimeCurve.get()); }
 
     void setStrokeBrushWidthCurve(const qCubicSegment1D& curve) {
         mWidthCurve->setCurrentValue(curve);
@@ -63,8 +72,6 @@ public:
     void setStrokeBrushTimeCurve(const qCubicSegment1D& curve) {
         mTimeCurve->setCurrentValue(curve);
     }
-    void prp_writeProperty(eWriteStream &dst) const;
-    void prp_readProperty(eReadStream &src);
 private:
     qsptr<qCubicSegment1DAnimator> mWidthCurve =
             enve::make_shared<qCubicSegment1DAnimator>("width");

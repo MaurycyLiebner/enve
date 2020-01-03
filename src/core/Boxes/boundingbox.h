@@ -25,6 +25,7 @@
 #include "colorhelpers.h"
 #include "waitingforboxload.h"
 #include "MovablePoints/segment.h"
+#include "Animators/qcubicsegment1danimator.h"
 class Canvas;
 
 class QrealAction;
@@ -76,6 +77,7 @@ typedef TypeMenu<Property> PropertyMenu;
 class BoundingBox : public eBoxOrSound {
     Q_OBJECT
     e_OBJECT
+    typedef qCubicSegment1DAnimator::Action SegAction;
 protected:
     BoundingBox(const eBoxType type);
 public:
@@ -149,20 +151,21 @@ public:
     virtual FillSettingsAnimator *getFillSettings() const;
     virtual OutlineSettingsAnimator *getStrokeSettings() const;
 
+    virtual void applyStrokeBrushWidthAction(const SegAction& action)
+    { Q_UNUSED(action) }
+    virtual void applyStrokeBrushPressureAction(const SegAction& action)
+    { Q_UNUSED(action) }
+    virtual void applyStrokeBrushSpacingAction(const SegAction& action)
+    { Q_UNUSED(action) }
+    virtual void applyStrokeBrushTimeAction(const SegAction& action)
+    { Q_UNUSED(action) }
+
     virtual void setStrokeCapStyle(const SkPaint::Cap capStyle)
     { Q_UNUSED(capStyle) }
     virtual void setStrokeJoinStyle(const SkPaint::Join joinStyle)
     { Q_UNUSED(joinStyle) }
     virtual void setStrokeBrush(SimpleBrushWrapper * const brush)
     { Q_UNUSED(brush) }
-    virtual void setStrokeBrushWidthCurve(const qCubicSegment1D& curve)
-    { Q_UNUSED(curve) }
-    virtual void setStrokeBrushTimeCurve(const qCubicSegment1D& curve)
-    { Q_UNUSED(curve) }
-    virtual void setStrokeBrushPressureCurve(const qCubicSegment1D& curve)
-    { Q_UNUSED(curve) }
-    virtual void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve)
-    { Q_UNUSED(curve) }
     virtual void strokeWidthAction(const QrealAction& action)
     { Q_UNUSED(action) }
 

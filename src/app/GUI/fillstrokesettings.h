@@ -47,6 +47,7 @@ class Document;
 
 class FillStrokeSettingsWidget : public QTabWidget {
     Q_OBJECT
+    typedef qCubicSegment1DAnimator::Action SegAction;
 public:
     explicit FillStrokeSettingsWidget(Document& document,
                                       QWidget * const parent = nullptr);
@@ -66,10 +67,6 @@ public:
     void setCurrentBrushSettings(BrushSettingsAnimator * const brushSettings);
 
     void emitStrokeBrushChanged();
-    void emitStrokeBrushWidthCurveChanged();
-    void emitStrokeBrushTimeCurveChanged();
-    void emitStrokeBrushSpacingCurveChanged();
-    void emitStrokeBrushPressureCurveChanged();
 
     void emitCapStyleChanged();
     void emitJoinStyleChanged();
@@ -78,10 +75,11 @@ private:
     void setRadialGradientAction();
 
     void setStrokeBrush(BrushContexedWrapper * const brush);
-    void setBrushTimeCurve(const qCubicSegment1D& seg);
-    void setBrushWidthCurve(const qCubicSegment1D& seg);
-    void setBrushPressureCurve(const qCubicSegment1D& seg);
-    void setBrushSpacingCurve(const qCubicSegment1D& seg);
+
+    void applyBrushSpacingAction(const SegAction& action);
+    void applyBrushPressureAction(const SegAction& action);
+    void applyBrushWidthAction(const SegAction& action);
+    void applyBrushTimeAction(const SegAction& action);
 
     void paintTypeSet(const PaintType type);
     void setFillTarget();
@@ -158,11 +156,6 @@ private:
     qreal mCurrentStrokeWidth;
 
     SimpleBrushWrapper* mCurrentStrokeBrush = nullptr;
-    qCubicSegment1D mCurrentStrokeBrushWidthCurve;
-    qCubicSegment1D mCurrentStrokeBrushTimeCurve;
-    qCubicSegment1D mCurrentStrokeBrushPressureCurve;
-    qCubicSegment1D mCurrentStrokeBrushSpacingCurve;
-
     //
 
     void setBrushPaintType();

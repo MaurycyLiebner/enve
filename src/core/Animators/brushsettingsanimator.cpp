@@ -42,3 +42,8 @@ void BrushSettingsAnimator::prp_readProperty(eReadStream& src) {
     QString brushName; src >> brushName;
     mBrush = BrushCollectionData::sGetBrush(brushCollection, brushName);
 }
+
+void BrushSettingsAnimator::setBrush(SimpleBrushWrapper * const brush) {
+    mBrush = brush;
+    prp_afterWholeInfluenceRangeChanged();
+}

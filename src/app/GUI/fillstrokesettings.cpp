@@ -235,14 +235,66 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     connect(mBrushSelectionWidget,
             &BrushSelectionWidget::currentBrushChanged,
             this, &FillStrokeSettingsWidget::setStrokeBrush);
+
+    connect(mBrushWidthCurveEditor, &Segment1DEditor::editingStarted,
+            this, [this]() {
+        applyBrushWidthAction(SegAction::sMakeStart());
+    });
+
     connect(mBrushWidthCurveEditor, &Segment1DEditor::segmentEdited,
-            this, &FillStrokeSettingsWidget::setBrushWidthCurve);
+            this, [this](const qCubicSegment1D& seg) {
+        applyBrushWidthAction(SegAction::sMakeSet(seg));
+    });
+
+    connect(mBrushWidthCurveEditor, &Segment1DEditor::editingStarted,
+            this, [this]() {
+        applyBrushWidthAction(SegAction::sMakeFinish());
+    });
+
+    connect(mBrushTimeCurveEditor, &Segment1DEditor::editingStarted,
+            this, [this]() {
+        applyBrushTimeAction(SegAction::sMakeStart());
+    });
+
     connect(mBrushTimeCurveEditor, &Segment1DEditor::segmentEdited,
-            this, &FillStrokeSettingsWidget::setBrushTimeCurve);
+            this, [this](const qCubicSegment1D& seg) {
+        applyBrushTimeAction(SegAction::sMakeSet(seg));
+    });
+
+    connect(mBrushTimeCurveEditor, &Segment1DEditor::editingStarted,
+            this, [this]() {
+        applyBrushTimeAction(SegAction::sMakeFinish());
+    });
+
+    connect(mBrushPressureCurveEditor, &Segment1DEditor::editingStarted,
+            this, [this]() {
+        applyBrushPressureAction(SegAction::sMakeStart());
+    });
+
     connect(mBrushPressureCurveEditor, &Segment1DEditor::segmentEdited,
-            this, &FillStrokeSettingsWidget::setBrushPressureCurve);
+            this, [this](const qCubicSegment1D& seg) {
+        applyBrushPressureAction(SegAction::sMakeSet(seg));
+    });
+
+    connect(mBrushPressureCurveEditor, &Segment1DEditor::editingStarted,
+            this, [this]() {
+        applyBrushPressureAction(SegAction::sMakeFinish());
+    });
+
+    connect(mBrushSpacingCurveEditor, &Segment1DEditor::editingStarted,
+            this, [this]() {
+        applyBrushSpacingAction(SegAction::sMakeStart());
+    });
+
     connect(mBrushSpacingCurveEditor, &Segment1DEditor::segmentEdited,
-            this, &FillStrokeSettingsWidget::setBrushSpacingCurve);
+            this, [this](const qCubicSegment1D& seg) {
+        applyBrushSpacingAction(SegAction::sMakeSet(seg));
+    });
+
+    connect(mBrushSpacingCurveEditor, &Segment1DEditor::editingStarted,
+            this, [this]() {
+        applyBrushSpacingAction(SegAction::sMakeFinish());
+    });
 
     mMainLayout->addLayout(mTargetLayout);
     mMainLayout->addLayout(mColorTypeLayout);
@@ -377,38 +429,39 @@ void FillStrokeSettingsWidget::setStrokeBrush(
     mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setBrushSpacingCurve(
-        const qCubicSegment1D& seg) {
-    mCurrentStrokeBrushSpacingCurve = seg;
-    emitStrokeBrushSpacingCurveChanged();
+void FillStrokeSettingsWidget::applyBrushSpacingAction(
+        const SegAction& action) {
+    const auto scene = mDocument.fActiveScene;
+    if(scene) scene->applyStrokeBrushSpacingActionToSelected(action);
     mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setBrushPressureCurve(
-        const qCubicSegment1D& seg) {
-    mCurrentStrokeBrushPressureCurve = seg;
-    emitStrokeBrushPressureCurveChanged();
+void FillStrokeSettingsWidget::applyBrushPressureAction(
+        const SegAction& action) {
+    const auto scene = mDocument.fActiveScene;
+    if(scene) scene->applyStrokeBrushPressureActionToSelected(action);
     mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setBrushWidthCurve(
-        const qCubicSegment1D& seg) {
-    mCurrentStrokeBrushWidthCurve = seg;
-    emitStrokeBrushWidthCurveChanged();
+void FillStrokeSettingsWidget::applyBrushWidthAction(
+        const SegAction& action) {
+    const auto scene = mDocument.fActiveScene;
+    if(scene) scene->applyStrokeBrushWidthActionToSelected(action);
     mDocument.actionFinished();
 }
 
-void FillStrokeSettingsWidget::setBrushTimeCurve(
-        const qCubicSegment1D& seg) {
-    mCurrentStrokeBrushTimeCurve = seg;
-    emitStrokeBrushTimeCurveChanged();
+void FillStrokeSettingsWidget::applyBrushTimeAction(
+        const SegAction& action) {
+    const auto scene = mDocument.fActiveScene;
+    if(scene) scene->applyStrokeBrushTimeActionToSelected(action);
     mDocument.actionFinished();
 }
 
 void FillStrokeSettingsWidget::setCurrentBrushSettings(
         BrushSettingsAnimator * const brushSettings) {
     if(brushSettings) {
-        mBrushSelectionWidget->setCurrentBrush(brushSettings->getBrush());
+        mBrushSelectionWidget->setCurrentBrush(
+                    brushSettings->getBrush());
         mBrushWidthCurveEditor->setCurrentAnimator(
                     brushSettings->getWidthAnimator());
         mBrushPressureCurveEditor->setCurrentAnimator(
@@ -622,26 +675,6 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
 void FillStrokeSettingsWidget::emitStrokeBrushChanged() {
     const auto scene = mDocument.fActiveScene;
     if(scene) scene->setSelectedStrokeBrush(mCurrentStrokeBrush);
-}
-
-void FillStrokeSettingsWidget::emitStrokeBrushWidthCurveChanged() {
-    const auto scene = mDocument.fActiveScene;
-    if(scene) scene->setSelectedStrokeBrushWidthCurve(mCurrentStrokeBrushWidthCurve);
-}
-
-void FillStrokeSettingsWidget::emitStrokeBrushTimeCurveChanged() {
-    const auto scene = mDocument.fActiveScene;
-    if(scene) scene->setSelectedStrokeBrushTimeCurve(mCurrentStrokeBrushTimeCurve);
-}
-
-void FillStrokeSettingsWidget::emitStrokeBrushSpacingCurveChanged() {
-    const auto scene = mDocument.fActiveScene;
-    if(scene) scene->setSelectedStrokeBrushSpacingCurve(mCurrentStrokeBrushSpacingCurve);
-}
-
-void FillStrokeSettingsWidget::emitStrokeBrushPressureCurveChanged() {
-    const auto scene = mDocument.fActiveScene;
-    if(scene) scene->setSelectedStrokeBrushPressureCurve(mCurrentStrokeBrushPressureCurve);
 }
 
 void FillStrokeSettingsWidget::emitCapStyleChanged() {

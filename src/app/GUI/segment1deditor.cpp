@@ -31,6 +31,43 @@ Segment1DEditor::Segment1DEditor(const qreal minY, const qreal maxY,
     //updateDrawPath();
 }
 
+void Segment1DEditor::setValueRange(const qreal minY, const qreal maxY) {
+    mMinY = minY;
+    mMaxY = maxY;
+    update();
+}
+
+void Segment1DEditor::setCurrentAnimator(qCubicSegment1DAnimator * const animator) {
+    auto& conn = mCurrentAnimator.assign(animator);
+    if(mCurrentAnimator) {
+        conn << connect(mCurrentAnimator,
+                        &qCubicSegment1DAnimator::currentValueChanged,
+                        this, &Segment1DEditor::updateAfterAnimatorChanged);
+    }
+    updateAfterAnimatorChanged();
+}
+
+void Segment1DEditor::setCurrentSegment(const qCubicSegment1D &seg) {
+    mCurrentSegment = seg;
+    updateDrawPath();
+    emit segmentChanged(seg);
+}
+
+void Segment1DEditor::setMargin(const qreal margin) {
+    mMargin = margin;
+    clampTopMarginAddMarginY();
+}
+
+void Segment1DEditor::setPointRadius(const qreal radius) {
+    mPtRad = radius;
+    clampTopMarginAddMarginY();
+}
+
+void Segment1DEditor::sendValueToAnimator() {
+    if(!mCurrentAnimator) return;
+    mCurrentAnimator->setCurrentValue(mCurrentSegment);
+}
+
 qreal Segment1DEditor::xValueToXPos(const qreal x) const {
     qreal wid = width() - 2*mPtRad - 2*mMargin;
     return x*wid + mPtRad + mMargin;
@@ -39,7 +76,7 @@ qreal Segment1DEditor::xValueToXPos(const qreal x) const {
 qreal Segment1DEditor::yValueToYPos(const qreal y) const {
     qreal hig = height() - 2*mPtRad - 2*mMargin - 2*mAddMarginY;
     return height() - ((y - mMinY)*hig/(mMaxY - mMinY) +
-                    mPtRad + mMargin + mAddMarginY + mTopMargin);
+                       mPtRad + mMargin + mAddMarginY + mTopMargin);
 }
 
 QPointF Segment1DEditor::valueToPos(const QPointF& value) const {
@@ -132,6 +169,7 @@ void Segment1DEditor::paintEvent(QPaintEvent *) {
 }
 
 void Segment1DEditor::mousePressEvent(QMouseEvent *e) {
+    if(e->button() != Qt::LeftButton) return;
     const QPointF pos = e->pos();
     mPressedPos = pos;
     mPressedValue = posToValue(pos);
@@ -168,6 +206,8 @@ void Segment1DEditor::mousePressEvent(QMouseEvent *e) {
     } else {
         mPressedPt = NONE;
     }
+
+    emit editingStarted();
 //    if(c1Dist < mPtRad) {
 //        mPressedPt = C1;
 //        mPressedPtValue = c1();
@@ -200,7 +240,12 @@ void Segment1DEditor::mousePressEvent(QMouseEvent *e) {
 //        } else {
 //            mPressedPt = NONE;
 //        }
-//    }
+    //    }
+}
+
+void Segment1DEditor::mouseReleaseEvent(QMouseEvent *e) {
+    if(e->button() != Qt::LeftButton) return;
+    emit editingFinished();
 }
 
 void Segment1DEditor::mouseMoveEvent(QMouseEvent *e) {
@@ -244,6 +289,11 @@ void Segment1DEditor::wheelEvent(QWheelEvent *e) {
     }
     clampTopMarginAddMarginY();
     mPressedPos = valueToPos(mPressedValue);
+}
+
+void Segment1DEditor::updateAfterAnimatorChanged() {
+    if(!mCurrentAnimator) return update();
+    setCurrentSegment(mCurrentAnimator->getCurrentValue());
 }
 
 void Segment1DEditor::clampTopMarginAddMarginY() {

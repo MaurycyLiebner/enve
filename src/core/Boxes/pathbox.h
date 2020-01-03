@@ -24,6 +24,7 @@
 #include "Paint/autotiledsurface.h"
 #include "pathboxrenderdata.h"
 #include <mypaint-brush.h>
+#include "Animators/qcubicsegment1danimator.h"
 class SmartVectorPath;
 class GradientPoints;
 class SkStroke;
@@ -31,6 +32,7 @@ class PathEffectAnimators;
 class PathEffect;
 
 class PathBox : public BoxWithPathEffects {
+    typedef qCubicSegment1DAnimator::Action SegAction;
     e_OBJECT
 protected:
     PathBox(const eBoxType type);
@@ -44,10 +46,12 @@ public:
     void setStrokeCapStyle(const SkPaint::Cap capStyle);
     void setStrokeJoinStyle(const SkPaint::Join joinStyle);
     void setStrokeBrush(SimpleBrushWrapper * const brush);
-    void setStrokeBrushWidthCurve(const qCubicSegment1D& curve);
-    void setStrokeBrushTimeCurve(const qCubicSegment1D& curve);
-    void setStrokeBrushPressureCurve(const qCubicSegment1D& curve);
-    void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve);
+
+    void applyStrokeBrushWidthAction(const SegAction& action);
+    void applyStrokeBrushPressureAction(const SegAction& action);
+    void applyStrokeBrushSpacingAction(const SegAction& action);
+    void applyStrokeBrushTimeAction(const SegAction& action);
+
     void strokeWidthAction(const QrealAction &action);
 
     void setOutlineCompositionMode(
