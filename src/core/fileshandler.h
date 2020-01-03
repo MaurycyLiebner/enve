@@ -25,17 +25,14 @@ class FilesHandler : public QObject {
 public:
     FilesHandler();
 
-    void clear() {
-        const auto fhs = mFileHandlers;
-        for(const auto& fh : fhs) removeFileHandler(fh);
-    }
+    void clear();
 
     template <typename T>
     T *getFileHandler(const QString &filePath);
     bool removeFileHandler(const qsptr<FileCacheHandler> &fh);
 
     static FilesHandler* sInstance;
-private:
+private:    
     QList<qsptr<FileCacheHandler>> mFileHandlers;
 signals:
     void addedCacheHandler(FileCacheHandler*);
@@ -55,6 +52,8 @@ T *FilesHandler::getFileHandler(const QString &filePath) {
         return nullptr;
     }
     mFileHandlers.append(fh);
+    connect(fh.get(), &FileCacheHandler::deleteApproved,
+            this, &FilesHandler::removeFileHandler);
     emit addedCacheHandler(fh.get());
 
     return fh.get();

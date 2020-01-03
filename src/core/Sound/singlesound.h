@@ -18,6 +18,7 @@
 #define SINGLESOUND_H
 #include "esound.h"
 #include "Animators/qrealanimator.h"
+#include "CacheHandlers/soundcachehandler.h"
 class FixedLenAnimationRect;
 class SoundHandler;
 class SoundDataHandler;
@@ -74,6 +75,7 @@ private:
     const bool mIndependent;
 
     qreal mStretch = 1;
+    FileHandlerObjRef<SoundFileHandler> mSoundFileHandler;
     stdsptr<SoundHandler> mCacheHandler;
 
     qsptr<QrealAnimator> mVolumeAnimator =

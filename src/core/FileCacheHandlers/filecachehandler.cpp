@@ -18,4 +18,39 @@
 #include "Boxes/boundingbox.h"
 #include "filedatacachehandler.h"
 
+#include <QMessageBox>
+
 FileCacheHandler::FileCacheHandler() {}
+
+void FileCacheHandler::reloadAction() {
+    reload();
+    emit reloaded();
+}
+
+bool FileCacheHandler::deleteAction() {
+    if(mReferenceCount) {
+        const int buttonId = QMessageBox::question(
+                    nullptr, "Delete", QString("Are you sure you want to delete "
+                    "%1 object(s) referencing \"%2\"?").arg(mReferenceCount).arg(mPath),
+                    "Cancel", "Delete");
+        if(buttonId == 0) return false;
+    }
+    const auto selfRef = ref<FileCacheHandler>();
+    emit deleteApproved(selfRef);
+    return true;
+}
+
+void FileCacheHandler::setPath(const QString &path) {
+    if(mPath == path) return;
+    mPath = path;
+    afterPathSet(path);
+    emit pathChanged(path);
+}
+
+void FileHandlerObjRefBase::increment(FileCacheHandler * const hadler) const {
+    hadler->mReferenceCount++;
+}
+
+void FileHandlerObjRefBase::decrement(FileCacheHandler * const hadler) const {
+    hadler->mReferenceCount--;
+}

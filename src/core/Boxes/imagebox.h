@@ -54,7 +54,7 @@ public:
 
     void reload();
 private:
-    ImageFileHandler* mImgCacheHandler = nullptr;
+    FileHandlerObjRef<ImageFileHandler> mImgCacheHandler;
     QString mImageFilePath;
 };
 

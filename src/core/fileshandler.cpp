@@ -23,6 +23,11 @@ FilesHandler::FilesHandler() {
     sInstance = this;
 }
 
+void FilesHandler::clear() {
+    const auto fhs = mFileHandlers;
+    for(const auto& fh : fhs) removeFileHandler(fh);
+}
+
 bool FilesHandler::removeFileHandler(const qsptr<FileCacheHandler> &fh) {
     const auto result = mFileHandlers.removeOne(fh);
     if(result) emit removedCacheHandler(fh.get());

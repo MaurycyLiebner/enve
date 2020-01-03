@@ -1,4 +1,4 @@
-// enve - 2D animations software
+﻿// enve - 2D animations software
 // Copyright (C) 2016-2020 Maurycy Liebner
 
 // This program is free software: you can redistribute it and/or modify
@@ -24,6 +24,7 @@
 #include <QDrag>
 #include "FileCacheHandlers/videocachehandler.h"
 #include "FileCacheHandlers/imagecachehandler.h"
+#include "FileCacheHandlers/imagesequencecachehandler.h"
 
 FileSourceWidget::FileSourceWidget(FileSourceListVisibleWidget *parent) :
     QWidget(parent) {
@@ -71,7 +72,7 @@ void FileSourceWidget::paintEvent(QPaintEvent *) {
     pathString = fm.elidedText(pathString, Qt::ElideLeft, spaceForPath);
     const int pathWidth = fm.width(pathString);
 
-    if(mTargetCache->selected) {
+    if(mTargetCache->fSelected) {
         p.fillRect(QRect(0.5*MIN_WIDGET_DIM, 0,
                          pathWidth + MIN_WIDGET_DIM, MIN_WIDGET_DIM),
                    QColor(180, 180, 180));
@@ -105,7 +106,7 @@ void FileSourceWidget::mouseReleaseEvent(QMouseEvent *event) {
             mTargetCache->setSelected(true);
         }
     } else {
-        if(!mTargetCache->selected) {
+        if(!mTargetCache->fSelected) {
             mParentVisibleWidget->clearSelected();
             mTargetCache->setSelected(true);
         }
@@ -162,16 +163,16 @@ void FileSourceListVisibleWidget::paintEvent(QPaintEvent *) {
 void FileSourceListVisibleWidget::updateVisibleWidgetsContent() {
     int firstVisibleId = mVisibleTop/MIN_WIDGET_DIM;
 
-    for(const auto& wid : mSingleWidgets) wid->hide();
-
-    int idP = 0;
-    for(int i = firstVisibleId;
-        i < mCacheList.count() &&
-        idP < mSingleWidgets.count(); i++) {
-        const auto fsw = static_cast<FileSourceWidget*>(mSingleWidgets.at(idP));
-        fsw->setTargetCache(mCacheList.at(i).get());
-        fsw->show();
-        idP++;
+    int iTarget = firstVisibleId;
+    for(int iWidget = 0; iWidget < mSingleWidgets.count(); iWidget++) {
+        const auto fsw = static_cast<FileSourceWidget*>(mSingleWidgets.at(iWidget));
+        if(iTarget < mCacheList.count()) {
+            fsw->setTargetCache(mCacheList.at(iTarget++).get());
+            fsw->show();
+        } else {
+            fsw->setTargetCache(nullptr);
+            fsw->hide();
+        }
     }
 }
 
@@ -189,7 +190,7 @@ void FileSourceListVisibleWidget::removeCacheHandlerFromList(
     for(int i = 0; i < mCacheList.count(); i++) {
         const auto& abs = mCacheList.at(i);
         if(abs->fTarget == handler) {
-            if(abs->selected) removeFromSelectedList(abs.get());
+            if(abs->fSelected) removeFromSelectedList(abs.get());
             mCacheList.removeAt(i);
             scheduleContentUpdate();
             return;
@@ -201,6 +202,8 @@ void FileSourceListVisibleWidget::showContextMenu(const QPoint &globalPos) {
     QMenu menu;
     menu.addAction("Reload");
     if(mSelectedList.count() == 1) menu.addAction("Replace...");
+    menu.addSeparator();
+    menu.addAction("Delete");
     const auto selected_action = menu.exec(globalPos);
     if(selected_action) {
         if(selected_action->text() == "Reload") {
@@ -209,11 +212,13 @@ void FileSourceListVisibleWidget::showContextMenu(const QPoint &globalPos) {
             }
         } else if(selected_action->text() == "Replace...") {
             mSelectedList.first()->fTarget->replace();
+        } else if(selected_action->text() == "Delete") {
+            for(const auto& abs : mSelectedList) {
+                abs->fTarget->deleteAction();
+            }
         }
 
         Document::sInstance->actionFinished();
-    } else {
-
     }
 }
 
@@ -239,10 +244,16 @@ void FileSourceList::dropEvent(QDropEvent *event) {
             if(url.isLocalFile()) {
                 const QString urlStr = url.toLocalFile();
                 const QString ext = urlStr.split(".").last();
-                if(isVideoExt(ext)) {
-                    //FileCacheHandler::sGetHandlerForFilePath<VideoFrameCacheHandler>(urlStr);
+                QFileInfo fInfo(urlStr);
+                const auto filesHandler = FilesHandler::sInstance;
+                if(fInfo.isDir()) {
+                    filesHandler->getFileHandler<ImageSequenceFileHandler>(urlStr);
+                } else if(isSoundExt(ext)) {
+                    filesHandler->getFileHandler<SoundFileHandler>(urlStr);
                 } else if(isImageExt(ext)) {
-                    //FileCacheHandler::sGetHandlerForFilePath<ImageCacheHandler>(urlStr);
+                    filesHandler->getFileHandler<ImageFileHandler>(urlStr);
+                } else if(isVideoExt(ext)) {
+                    filesHandler->getFileHandler<VideoFileHandler>(urlStr);
                 }
             }
         }
@@ -262,11 +273,11 @@ void FileSourceList::dragEnterEvent(QDragEnterEvent *event) {
 }
 
 void FileCacheHandlerAbstraction::setSelected(const bool bT) {
-    if(bT == selected) return;
-    selected = bT;
-    if(selected) {
-        parentVisibleWidget->addToSelectedList(this);
+    if(bT == fSelected) return;
+    fSelected = bT;
+    if(fSelected) {
+        fParentVisibleWidget->addToSelectedList(this);
     } else {
-        parentVisibleWidget->removeFromSelectedList(this);
+        fParentVisibleWidget->removeFromSelectedList(this);
     }
 }

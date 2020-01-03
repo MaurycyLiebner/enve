@@ -74,6 +74,8 @@ void VideoBox::setFilePath(const QString &path) {
                    this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
         disconnect(oldDataHandler, &VideoDataHandler::frameCountUpdated,
                    this, &VideoBox::updateDurationRectangleAnimationRange);
+        disconnect(mFileHandler, &VideoFileHandler::deleteApproved,
+                   this, &BoundingBox::removeFromParent_k);
     }
     mSrcFramesCache.reset();
 
@@ -87,6 +89,8 @@ void VideoBox::setFilePath(const QString &path) {
                 this, &VideoBox::animationDataChanged);
         connect(mFileHandler, &VideoFileHandler::reloaded,
                 this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
+        connect(mFileHandler, &VideoFileHandler::deleteApproved,
+                this, &BoundingBox::removeFromParent_k);
         connect(newDataHandler, &VideoDataHandler::frameCountUpdated,
                 this, &VideoBox::updateDurationRectangleAnimationRange);
     } else {

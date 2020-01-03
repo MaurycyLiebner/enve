@@ -45,7 +45,7 @@ public:
     QString getFilePath();
 private:
     qsptr<SingleSound> mSound;
-    qptr<VideoFileHandler> mFileHandler;
+    FileHandlerObjRef<VideoFileHandler> mFileHandler;
 };
 
 #endif // VIDEOBOX_H

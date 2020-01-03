@@ -18,6 +18,7 @@
 #include "FileCacheHandlers/imagesequencecachehandler.h"
 #include "filesourcescache.h"
 #include "GUI/edialogs.h"
+#include "fileshandler.h"
 
 ImageSequenceBox::ImageSequenceBox() :
     AnimationBox(eBoxType::imageSequence) {
@@ -29,6 +30,17 @@ void ImageSequenceBox::setFolderPath(const QString &folderPath) {
     iscHandler->setFolderPath(folderPath);
     mSrcFramesCache = iscHandler;
     mDirPath = folderPath;
+
+    if(mFileHandler) {
+        disconnect(mFileHandler, &FileCacheHandler::deleteApproved,
+                   this, &BoundingBox::removeFromParent_k);
+    }
+    mFileHandler = FilesHandler::sInstance->getFileHandler
+            <ImageSequenceFileHandler>(folderPath);
+    if(mFileHandler) {
+        connect(mFileHandler, &FileCacheHandler::deleteApproved,
+                this, &BoundingBox::removeFromParent_k);
+    }
     animationDataChanged();
 }
 

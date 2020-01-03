@@ -17,6 +17,7 @@
 #ifndef IMAGESEQUENCEBOX_H
 #define IMAGESEQUENCEBOX_H
 #include "animationbox.h"
+#include "FileCacheHandlers/imagesequencecachehandler.h"
 
 class ImageSequenceBox : public AnimationBox {
     e_OBJECT
@@ -30,9 +31,9 @@ public:
     void changeSourceFile();
     void writeBoundingBox(eWriteStream& dst);
     void readBoundingBox(eReadStream& src);
-
 private:
     QString mDirPath;
+    FileHandlerObjRef<ImageSequenceFileHandler> mFileHandler;
 };
 
 #endif // IMAGESEQUENCEBOX_H

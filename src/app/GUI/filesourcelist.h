@@ -24,19 +24,19 @@
 #include "GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h"
 #include "fileshandler.h"
 class FileSourceListVisibleWidget;
-struct FileCacheHandlerAbstraction {
+struct FileCacheHandlerAbstraction : public QObject {
     FileCacheHandlerAbstraction(
-            FileCacheHandler *targetT,
-            FileSourceListVisibleWidget *parentVisibleWidgetT) {
-        fTarget = targetT;
-        parentVisibleWidget = parentVisibleWidgetT;
-    }
+            FileCacheHandler *target,
+            FileSourceListVisibleWidget *parent) :
+        QObject(target), fTarget(target),
+        fParentVisibleWidget(parent) {}
 
-    FileCacheHandler *fTarget;
-    bool selected = false;
+    FileCacheHandler * const fTarget;
+    FileSourceListVisibleWidget * const fParentVisibleWidget;
+    bool fSelected = false;
 
     void switchSelected() {
-        setSelected(!selected);
+        setSelected(!fSelected);
     }
 
     void setSelected(const bool bT);
@@ -49,7 +49,6 @@ struct FileCacheHandlerAbstraction {
         return fTarget->fileMissing();
     }
 
-    FileSourceListVisibleWidget *parentVisibleWidget;
 };
 
 class FileSourceWidget : public QWidget {
@@ -64,7 +63,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent *);
     bool mFileNameOnly = true;
-    FileCacheHandlerAbstraction *mTargetCache = nullptr;
+    qptr<FileCacheHandlerAbstraction> mTargetCache;
     FileSourceListVisibleWidget *mParentVisibleWidget = nullptr;
     void mouseMoveEvent(QMouseEvent *event);
     QPoint mDragStartPos;
@@ -106,7 +105,7 @@ public:
 
     void clearSelected() {
         for(const auto& abs : mSelectedList) {
-            abs->selected = false;
+            abs->fSelected = false;
         }
 
         mSelectedList.clear();

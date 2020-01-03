@@ -46,6 +46,8 @@ void ImageBox::setFilePath(const QString &path) {
                    this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
         disconnect(mImgCacheHandler, &ImageFileHandler::reloaded,
                    this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
+        disconnect(mImgCacheHandler, &ImageFileHandler::deleteApproved,
+                   this, &BoundingBox::removeFromParent_k);
     }
     mImgCacheHandler = FilesHandler::sInstance->getFileHandler<ImageFileHandler>(path);
 
@@ -55,6 +57,8 @@ void ImageBox::setFilePath(const QString &path) {
                 this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
         connect(mImgCacheHandler, &ImageFileHandler::reloaded,
                 this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
+        connect(mImgCacheHandler, &ImageFileHandler::deleteApproved,
+                this, &BoundingBox::removeFromParent_k);
     }
     prp_afterWholeInfluenceRangeChanged();
 }

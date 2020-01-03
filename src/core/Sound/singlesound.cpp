@@ -120,7 +120,15 @@ void SingleSound::updateDurationRectLength() {
 }
 
 void SingleSound::setFilePath(const QString &path) {
-    FilesHandler::sInstance->getFileHandler<SoundFileHandler>(path);
+    if(mSoundFileHandler) {
+        disconnect(mSoundFileHandler, &FileCacheHandler::deleteApproved,
+                   this, &eBoxOrSound::removeFromParent_k);
+    }
+    mSoundFileHandler = FilesHandler::sInstance->getFileHandler<SoundFileHandler>(path);
+    if(mSoundFileHandler) {
+        connect(mSoundFileHandler, &FileCacheHandler::deleteApproved,
+                this, &eBoxOrSound::removeFromParent_k);
+    }
     if(videoSound()) RuntimeThrow("Setting file path for video sound");
     const auto newDataHandler = FileDataCacheHandler::
             sGetDataHandler<SoundDataHandler>(path);
