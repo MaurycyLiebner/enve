@@ -18,7 +18,6 @@
 #include <QMenu>
 #include "Animators/qrealanimator.h"
 #include "mainwindow.h"
-#include "Properties/intproperty.h"
 
 QrealAnimatorValueSlider::QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
                                                    qreal prefferedStep,
@@ -119,9 +118,6 @@ void QrealAnimatorValueSlider::emitValueChanged(qreal value) {
         if(mTarget->SWT_isQrealAnimator()) {
             const auto da = static_cast<QrealAnimator*>(mTarget.data());
             da->setCurrentBaseValue(value);
-        } else if(mTarget->SWT_isIntProperty()) {
-            const auto iProp = static_cast<IntProperty*>(mTarget.data());
-            iProp->setCurrentValue(qRound(value));
         }
     }
     QDoubleSlider::emitValueChanged(value);
@@ -133,9 +129,6 @@ void QrealAnimatorValueSlider::setValueExternal(qreal value) {
         if(mTarget->SWT_isQrealAnimator()) {
             const auto da = static_cast<QrealAnimator*>(mTarget.data());
             da->setCurrentBaseValue(value);
-        } else if(mTarget->SWT_isIntProperty()) {
-            const auto iProp = static_cast<IntProperty*>(mTarget.data());
-            iProp->setCurrentValue(qRound(value));
         }
         mBlockAnimatorSignals = false;
     }
@@ -213,25 +206,6 @@ void QrealAnimatorValueSlider::setTarget(QrealAnimator * const animator) {
 
         setDisplayedValue(animator->getCurrentBaseValue());
     }
-}
-
-void QrealAnimatorValueSlider::setTarget(IntProperty * const animator) {
-    if(animator == mTarget) return;
-    clearTarget();
-    if(animator) {
-        setNumberDecimals(0);
-        connect(animator, &IntProperty::valueChangedSignal,
-                this, &QrealAnimatorValueSlider::setValueFromAnimator);
-        connect(animator, &IntProperty::destroyed,
-                this, &QrealAnimatorValueSlider::nullifyAnimator);
-
-        setValueRange(animator->getMinValue(),
-                      animator->getMaxValue());
-        setPrefferedValueStep(1);
-
-        setDisplayedValue(animator->getValue());
-        mTarget = animator;
-    } else update();
 }
 
 bool QrealAnimatorValueSlider::hasTarget() {

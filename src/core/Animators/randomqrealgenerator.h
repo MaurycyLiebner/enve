@@ -17,7 +17,6 @@
 #ifndef RANDOMQREALGENERATOR_H
 #define RANDOMQREALGENERATOR_H
 #include "qrealvalueeffect.h"
-class IntProperty;
 class IntAnimator;
 class ComboBoxProperty;
 

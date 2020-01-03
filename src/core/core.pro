@@ -246,7 +246,6 @@ SOURCES += \
     singlewidgetabstraction.cpp \
     Properties/property.cpp \
     Properties/comboboxproperty.cpp \
-    Properties/intproperty.cpp \
     Animators/complexanimator.cpp \
     Animators/animator.cpp \
     Animators/intanimator.cpp \
@@ -506,7 +505,6 @@ HEADERS += \
     singlewidgetabstraction.h \
     Properties/property.h \
     Properties/comboboxproperty.h \
-    Properties/intproperty.h \
     Animators/key.h \
     Animators/complexanimator.h \
     Animators/animator.h \

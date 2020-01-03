@@ -33,7 +33,6 @@
 #include "Animators/randomqrealgenerator.h"
 #include "Properties/boolproperty.h"
 #include "Properties/boolpropertycontainer.h"
-#include "Properties/intproperty.h"
 #include "Animators/qpointfanimator.h"
 #include "Boxes/pathbox.h"
 #include "canvas.h"
@@ -407,10 +406,8 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                 this, [this](const int id) {
             mPropertyComboBox->setCurrentIndex(id);
         });
-    } else if(target->SWT_isIntProperty() || target->SWT_isQrealAnimator()) {
-        if(target->SWT_isQrealAnimator())
-            mValueSlider->setTarget(static_cast<QrealAnimator*>(target));
-        else mValueSlider->setTarget(static_cast<IntProperty*>(target));
+    } else if(target->SWT_isQrealAnimator()) {
+        mValueSlider->setTarget(static_cast<QrealAnimator*>(target));
         valueSliderVisible = true;
         mValueSlider->setNeighbouringSliderToTheRight(false);
     } else if(target->SWT_isComplexAnimator()) {

@@ -25,7 +25,6 @@
 #include "Animators/qrealanimator.h"
 #include "Animators/gradient.h"
 #include "Properties/comboboxproperty.h"
-#include "Properties/intproperty.h"
 #include "PathEffects/patheffectanimators.h"
 #include "PathEffects/patheffect.h"
 #include "Boxes/boundingbox.h"

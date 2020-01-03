@@ -18,7 +18,6 @@
 #define QREALANIMATORVALUESLIDER_H
 #include "qdoubleslider.h"
 #include "smartPointers/ememory.h"
-class IntProperty;
 class QrealAnimator;
 class Property;
 
@@ -40,7 +39,6 @@ public:
     void openContextMenu(const QPoint &globalPos);
 
     void setTarget(QrealAnimator * const animator);
-    void setTarget(IntProperty * const animator);
 
     bool hasTarget();
 

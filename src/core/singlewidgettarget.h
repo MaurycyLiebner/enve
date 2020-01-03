@@ -169,7 +169,6 @@ public:
     virtual bool SWT_isComboBoxProperty() const { return false; }
     virtual bool SWT_isBoxTargetProperty() const { return false; }
     virtual bool SWT_isProperty() const { return false; }
-    virtual bool SWT_isIntProperty() const { return false; }
     // Sound
     virtual bool SWT_isSingleSound() const { return false; }
     virtual bool SWT_isSound() const { return false; }
