@@ -16,20 +16,18 @@
 
 #ifndef BOOLANIMATOR_H
 #define BOOLANIMATOR_H
+
 #include "intanimator.h"
 
 class BoolAnimator : public IntAnimator {
     e_OBJECT
-public:
-    bool getCurrentBoolValue();
-    void setCurrentBoolValue(const bool bT);
-    bool getCurrentBoolValueAtRelFrame(const qreal relFrame) {
-        return getBaseIntValue(relFrame) == 1;
-    }
-
-    bool SWT_isBoolAnimator() const { return true; }
-protected:
     BoolAnimator(const QString& name);
+public:
+    bool SWT_isBoolAnimator() const { return true; }
+
+    bool getBoolValue();
+    void setCurrentBoolValue(const bool value);
+    bool getBoolValue(const qreal relFrame);
 };
 
 #endif // BOOLANIMATOR_H

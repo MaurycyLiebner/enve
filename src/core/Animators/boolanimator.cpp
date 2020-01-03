@@ -20,10 +20,14 @@ BoolAnimator::BoolAnimator(const QString &name) : IntAnimator(name) {
     setIntValueRange(0, 1);
 }
 
-bool BoolAnimator::getCurrentBoolValue() {
+bool BoolAnimator::getBoolValue() {
     return getCurrentIntValue() == 1;
 }
 
-void BoolAnimator::setCurrentBoolValue(const bool bT) {
-    setCurrentIntValue((bT ? 1 : 0));
+void BoolAnimator::setCurrentBoolValue(const bool value) {
+    setCurrentIntValue(value ? 1 : 0);
+}
+
+bool BoolAnimator::getBoolValue(const qreal relFrame) {
+    return getBaseIntValue(relFrame) == 1;
 }
