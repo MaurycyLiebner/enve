@@ -291,10 +291,10 @@ void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
     const OutputSettings &outputSettings = mSettings.getOutputRenderSettings();
     const auto format = outputSettings.fOutputFormat;
     if(!format) return;
-    QString tmpStr = QString(format->extensions);
-    QStringList supportedExt = tmpStr.split(",");
-    QString fileName = outputDst.split("/").last();
-    QStringList dividedName = fileName.split(".");
+    const QString tmpStr = QString(format->extensions);
+    const QStringList supportedExt = tmpStr.split(",");
+    const QString fileName = outputDst.split("/").last();
+    const QStringList dividedName = fileName.split(".");
     QString currExt;
     if(dividedName.count() > 1) {
         QString namePart = dividedName.at(dividedName.count() - 2);
@@ -304,7 +304,7 @@ void RenderInstanceWidget::updateOutputDestinationFromCurrentFormat() {
     }
     if(supportedExt.contains(currExt)) return;
     if(!supportedExt.isEmpty()) {
-        QString firstSupported = supportedExt.first();
+        const QString firstSupported = supportedExt.first();
         if(!firstSupported.isEmpty()) {
             if(currExt.isEmpty()) {
                 if(outputDst.right(1) == ".") {
@@ -332,9 +332,11 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     QString selectedExt;
     const OutputSettings &outputSettings = mSettings.getOutputRenderSettings();
     const auto format = outputSettings.fOutputFormat;
+    QStringList supportedExt;
     if(format) {
-        QString tmpStr(format->extensions);
-        selectedExt = "." + tmpStr.split(",").first();
+        QString tmpStr = QString(format->extensions);
+        supportedExt = tmpStr.split(",");
+        selectedExt = "." + supportedExt.first();
         tmpStr.replace(",", " *.");
         supportedExts = "Output File (*." + tmpStr + ")";
     }
@@ -345,7 +347,8 @@ void RenderInstanceWidget::openOutputDestinationDialog() {
     QString saveAs = eDialogs::saveFile("Output Destination",
                                         iniText, supportedExts);
     if(saveAs.isEmpty()) return;
-    if(saveAs.right(selectedExt.length()) != selectedExt) saveAs += selectedExt;
+    const auto saveAsExt = saveAs.right(selectedExt.length());
+    if(!supportedExts.contains(saveAsExt)) saveAs += selectedExt;
     mSettings.setOutputDestination(saveAs);
     mOutputDestinationButton->setText(saveAs);
 }
