@@ -18,6 +18,7 @@
 #define BOXTARGETPROPERTY_H
 #include <QtCore>
 #include "Properties/property.h"
+#include "conncontextptr.h"
 class BoundingBox;
 class QrealAnimator;
 
@@ -28,20 +29,20 @@ class BoxTargetProperty : public Property {
 public:
     BoxTargetProperty(const QString& name);
 
-    BoundingBox *getTarget() const;
-    void setTarget(BoundingBox * const box);
-
     bool SWT_dropSupport(const QMimeData* const data);
-
     bool SWT_drop(const QMimeData* const data);
 
     bool SWT_isBoxTargetProperty() const { return true; }
+
     void prp_writeProperty(eWriteStream &dst) const;
     void prp_readProperty(eReadStream& src);
+
+    BoundingBox *getTarget() const;
+    void setTarget(BoundingBox * const box);
 signals:
     void targetSet(BoundingBox*);
 private:
-    BoundingBox* mTarget_d = nullptr;
+    ConnContextPtr<BoundingBox> mTarget_d;
 };
 
 #endif // BOXTARGETPROPERTY_H

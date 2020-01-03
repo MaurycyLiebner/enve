@@ -27,14 +27,10 @@ BoundingBox* BoxTargetProperty::getTarget() const {
 }
 
 void BoxTargetProperty::setTarget(BoundingBox* const box) {
-    if(mTarget_d) {
-        disconnect(mTarget_d, &BoundingBox::destroyed,
-                   this, nullptr);
-    }
-    mTarget_d = box;
+    mTarget_d.assign(box);
     if(box) {
-        connect(box, &BoundingBox::destroyed,
-                this, [this]() { setTarget(nullptr); });
+        mTarget_d << connect(box, &BoundingBox::destroyed,
+                             this, [this]() { setTarget(nullptr); });
     }
     prp_afterWholeInfluenceRangeChanged();
     emit targetSet(box);
