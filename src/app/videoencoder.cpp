@@ -661,8 +661,8 @@ void VideoEncoder::process() {
         const bool encodeVideo = mEncodeVideo && hasVideo && videoAligned;
         if(encodeVideo) {
             const auto cacheCont = _mContainers.at(_mCurrentContainerId);
-            const auto contRage = cacheCont->getRange()*_mRenderRange;
-            const int nFrames = contRage.span();
+            const auto contRange = cacheCont->getRange()*_mRenderRange;
+            const int nFrames = contRange.span();
             try {
                 writeVideoFrame(mFormatContext, &mVideoStream,
                                 cacheCont->getImageSk(), &hasVideo);

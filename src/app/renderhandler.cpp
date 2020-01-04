@@ -348,6 +348,7 @@ void RenderHandler::nextSaveOutputFrame() {
     //mCurrentScene->renderCurrentFrameToOutput(*mCurrentRenderSettings);
     if(mCurrentRenderFrame >= mMaxRenderFrame) {
         if(mCurrentEncodeSoundSecond <= mMaxSoundSec) return;
+        if(mCurrentEncodeFrame <= mMaxRenderFrame) return;
         TaskScheduler::sSetFreeThreadsForCpuTasksAvailableFunc(nullptr);
         Document::sInstance->actionFinished();
         if(TaskScheduler::sAllTasksFinished()) {
