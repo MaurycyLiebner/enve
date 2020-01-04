@@ -459,13 +459,13 @@ void Canvas::clearBoxesSelectionList() {
 void Canvas::applyCurrentTransformationToSelected() {
 }
 
-bool zAsc(BoundingBox* const box1, BoundingBox* const box2) {
-    return box1->getZIndex() > box2->getZIndex();
-}
+//bool zAsc(BoundingBox* const box1, BoundingBox* const box2) {
+//    return box1->getZIndex() > box2->getZIndex();
+//}
 
-void Canvas::sortSelectedBoxesAsc() {
-    mSelectedBoxes.sort(zAsc);
-}
+//void Canvas::sortSelectedBoxesAsc() {
+//    mSelectedBoxes.sort(zAsc);
+//}
 
 bool zDesc(BoundingBox* const box1, BoundingBox* const box2) {
     return box1->getZIndex() < box2->getZIndex();
@@ -481,11 +481,14 @@ void Canvas::raiseSelectedBoxesToTop() {
     for(auto it = begin; it != end; it++) {
         (*it)->bringToFront();
     }
+    sortSelectedBoxesDesc();
 }
 
 void Canvas::lowerSelectedBoxesToBottom() {
-    for(const auto &box : mSelectedBoxes)
+    for(const auto &box : mSelectedBoxes) {
         box->bringToEnd();
+    }
+    sortSelectedBoxesDesc();
 }
 
 void Canvas::lowerSelectedBoxes() {
@@ -496,10 +499,11 @@ void Canvas::lowerSelectedBoxes() {
     for(auto it = begin; it != end; it++) {
         const auto box = *it;
         const int boxZ = box->getZIndex();
-        if(boxZ - 1 != lastZ || lastBoxChanged) box->moveDown();
+        if(boxZ + 1 != lastZ || lastBoxChanged) box->moveDown();
         lastZ = boxZ;
         lastBoxChanged = boxZ - box->getZIndex() != 0;
     }
+    sortSelectedBoxesDesc();
 }
 
 void Canvas::raiseSelectedBoxes() {
@@ -507,10 +511,11 @@ void Canvas::raiseSelectedBoxes() {
     bool lastBoxChanged = true;
     for(const auto &box : mSelectedBoxes) {
         const int boxZ = box->getZIndex();
-        if(boxZ + 1 != lastZ || lastBoxChanged) box->moveUp();
+        if(boxZ - 1 != lastZ || lastBoxChanged) box->moveUp();
         lastZ = boxZ;
         lastBoxChanged = boxZ - box->getZIndex() != 0;
     }
+    sortSelectedBoxesDesc();
 }
 
 void Canvas::deselectAllBoxes() {

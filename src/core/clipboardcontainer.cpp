@@ -36,7 +36,7 @@ BoxesClipboard::BoxesClipboard(const QList<BoundingBox*> &src) :
 
     const bool isBox = true;
     const int iCount = src.count();
-    for(int i = 0; i < iCount; i++) {
+    for(int i = iCount - 1; i >= 0; i--) {
         const auto& iBox = src[i];
         const auto future = writeStream.planFuturePos();
         writeStream << isBox;

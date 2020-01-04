@@ -642,7 +642,7 @@ protected:
 
     SmartVectorPath *getPathResultingFromOperation(const SkPathOp &pathOp);
 
-    void sortSelectedBoxesAsc();
+//    void sortSelectedBoxesAsc();
     void sortSelectedBoxesDesc();
 
     qsptr<SoundComposition> mSoundComposition;
