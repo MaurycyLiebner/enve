@@ -99,13 +99,14 @@ SOURCES += \
     Boxes/ecustombox.cpp \
     Boxes/effectsrenderer.cpp \
     Boxes/effectsubtaskspawner.cpp \
+    Boxes/externallinkbox.cpp \
     Boxes/imagebox.cpp \
     Boxes/imagerenderdata.cpp \
     Boxes/imagesequencebox.cpp \
+    Boxes/internallinkbox.cpp \
     Boxes/internallinkcanvas.cpp \
     Boxes/internallinkgroupbox.cpp \
     Boxes/layerboxrenderdata.cpp \
-    Boxes/linkbox.cpp \
     Boxes/linkcanvasrenderdata.cpp \
     Boxes/paintbox.cpp \
     Boxes/pathbox.cpp \
@@ -346,13 +347,14 @@ HEADERS += \
     Boxes/ecustombox.h \
     Boxes/effectsrenderer.h \
     Boxes/effectsubtaskspawner.h \
+    Boxes/externallinkbox.h \
     Boxes/imagebox.h \
     Boxes/imagerenderdata.h \
     Boxes/imagesequencebox.h \
+    Boxes/internallinkbox.h \
     Boxes/internallinkcanvas.h \
     Boxes/internallinkgroupbox.h \
     Boxes/layerboxrenderdata.h \
-    Boxes/linkbox.h \
     Boxes/linkcanvasrenderdata.h \
     Boxes/paintbox.h \
     Boxes/pathbox.h \

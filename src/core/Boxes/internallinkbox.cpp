@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "linkbox.h"
+#include "internallinkbox.h"
 #include "GUI/edialogs.h"
 #include "canvas.h"
 #include "Timeline/durationrectangle.h"
@@ -23,49 +23,23 @@
 #include "videobox.h"
 #include "Sound/singlesound.h"
 
-ExternalLinkBox::ExternalLinkBox() : ContainerBox(eBoxType::layer) {
-    mType = eBoxType::externalLink;
-    prp_setName("Link Empty");
-}
-
-void ExternalLinkBox::reload() {
-
-
-    planUpdate(UpdateReason::userChange);
-}
-
-void ExternalLinkBox::changeSrc() {
-    QString src = eDialogs::openFile("Link File", mSrc,
-                                     "enve Files (*.ev)");
-    if(!src.isEmpty()) setSrc(src);
-}
-
-void ExternalLinkBox::setSrc(const QString &src) {
-    mSrc = src;
-    prp_setName("Link " + src);
-    reload();
-}
-
 InternalLinkBox::InternalLinkBox(BoundingBox * const linkTarget) :
     BoundingBox(eBoxType::internalLink) {
     setLinkTarget(linkTarget);
     ca_prependChild(mTransformAnimator.data(), mBoxTarget);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
-            this, &InternalLinkBox::setTargetSlot);
+            this, &InternalLinkBox::setLinkTarget);
 }
 
 void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
     mSound.reset();
-    disconnect(mBoxTarget.data(), nullptr, this, nullptr);
-    if(getLinkTarget()) {
-        disconnect(getLinkTarget(), nullptr, this, nullptr);
-        getLinkTarget()->removeLinkingBox(this);
-    }
+    if(mLinkTarget) mLinkTarget->removeLinkingBox(this);
+    auto& conn = mLinkTarget.assign(linkTarget);
+    mBoxTarget->setTarget(linkTarget);
     if(linkTarget) {
         prp_setName(linkTarget->prp_getName() + " link");
-        mBoxTarget->setTarget(linkTarget);
         linkTarget->addLinkingBox(this);
-        connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
+        conn << connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
                 this, [this, linkTarget](const FrameRange& range) {
             const auto relRange = linkTarget->prp_absRangeToRelRange(range);
             prp_afterChangedRelRange(relRange);
@@ -73,17 +47,14 @@ void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
         if(linkTarget->SWT_isVideoBox()) {
             const auto vidBox = static_cast<VideoBox*>(linkTarget);
             mSound = vidBox->sound()->createLink();
-            connect(this, &eBoxOrSound::parentChanged,
-                    mSound.get(), &eBoxOrSound::setParentGroup);
+            conn << connect(this, &eBoxOrSound::parentChanged,
+                            mSound.get(), &eBoxOrSound::setParentGroup);
             mSound->setParentGroup(mParentGroup);
         }
     } else {
         prp_setName("empty link");
-        mBoxTarget->setTarget(nullptr);
     }
     planUpdate(UpdateReason::userChange);
-    connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
-            this, &InternalLinkBox::setTargetSlot);
 }
 
 QPointF InternalLinkBox::getRelCenterPosition() {
@@ -92,10 +63,16 @@ QPointF InternalLinkBox::getRelCenterPosition() {
 }
 
 BoundingBox *InternalLinkBox::getLinkTarget() const {
-    return mBoxTarget->getTarget();
+    return mLinkTarget;
+}
+
+bool InternalLinkBox::isParentLink() const {
+    if(!mParentGroup) return false;
+    return mParentGroup->SWT_isLinkBox();
 }
 
 stdsptr<BoxRenderData> InternalLinkBox::createRenderData() {
+    if(!getLinkTarget()) return nullptr;
     const auto renderData = getLinkTarget()->createRenderData();
     renderData->fParentBox = this;
     return renderData;
@@ -107,6 +84,11 @@ void InternalLinkBox::setupRenderData(const qreal relFrame,
     const auto linkTarget = getLinkTarget();
     if(linkTarget) linkTarget->setupRenderData(relFrame, data, scene);
     BoundingBox::setupRenderData(relFrame, data, scene);
+}
+
+SkBlendMode InternalLinkBox::getBlendMode() {
+    if(isParentLink()) return getLinkTarget()->getBlendMode();
+    return BoundingBox::getBlendMode();
 }
 
 bool InternalLinkBox::relPointInsidePath(const QPointF &relPos) const {
@@ -149,4 +131,22 @@ int InternalLinkBox::prp_getRelFrameShift() const {
         return getLinkTarget()->prp_getRelFrameShift() +
                 BoundingBox::prp_getRelFrameShift();
     } else return BoundingBox::prp_getRelFrameShift();
+}
+
+QMatrix InternalLinkBox::getRelativeTransformAtFrame(const qreal relFrame) {
+    if(isParentLink()) {
+        return getLinkTarget()->getRelativeTransformAtFrame(relFrame);
+    } else {
+        return BoundingBox::getRelativeTransformAtFrame(relFrame);
+    }
+}
+
+QMatrix InternalLinkBox::getTotalTransformAtFrame(const qreal relFrame) {
+    if(isParentLink()) {
+        const auto linkTarget = getLinkTarget();
+        return linkTarget->getRelativeTransformAtFrame(relFrame)*
+                mParentGroup->getTotalTransformAtFrame(relFrame);
+    } else {
+        return BoundingBox::getTotalTransformAtFrame(relFrame);
+    }
 }

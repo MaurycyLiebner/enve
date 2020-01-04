@@ -24,67 +24,50 @@ class InternalLinkGroupBox : public ContainerBox {
 protected:
     InternalLinkGroupBox(ContainerBox * const linkTarget);
 public:
-    ~InternalLinkGroupBox();
+    ~InternalLinkGroupBox()
+    { setLinkTarget(nullptr); }
+
     bool SWT_isLinkBox() const { return true; }
-    bool SWT_isGroupBox() const {
-        const auto finalTarget = getFinalTarget();
-        if(!finalTarget) return false;
-        return finalTarget->SWT_isGroupBox();
-    }
+    bool SWT_isGroupBox() const;
 
-    void SWT_setupAbstraction(SWT_Abstraction* abstraction,
-                              const UpdateFuncs &updateFuncs,
-                              const int visiblePartWidgetId) {
-        BoundingBox::SWT_setupAbstraction(abstraction, updateFuncs,
-                                          visiblePartWidgetId);
-    }
+    void SWT_setupAbstraction(SWT_Abstraction* abs,
+                              const UpdateFuncs &funcs,
+                              const int widgetId)
+    { BoundingBox::SWT_setupAbstraction(abs, funcs, widgetId); }
 
 
-    bool SWT_dropSupport(const QMimeData * const data) {
-        return BoundingBox::SWT_dropSupport(data);
-    }
+    bool SWT_dropSupport(const QMimeData * const data)
+    { return BoundingBox::SWT_dropSupport(data); }
 
-    bool SWT_dropIntoSupport(const int index, const QMimeData * const data) {
-        return BoundingBox::SWT_dropIntoSupport(index, data);
-    }
+    bool SWT_dropIntoSupport(const int index, const QMimeData * const data)
+    { return BoundingBox::SWT_dropIntoSupport(index, data); }
 
-    bool SWT_drop(const QMimeData * const data) {
-        return BoundingBox::SWT_drop(data);
-    }
+    bool SWT_drop(const QMimeData * const data)
+    { return BoundingBox::SWT_drop(data); }
 
-    bool SWT_dropInto(const int index, const QMimeData * const data) {
-        return BoundingBox::SWT_dropInto(index, data);
-    }
+    bool SWT_dropInto(const int index, const QMimeData * const data)
+    { return BoundingBox::SWT_dropInto(index, data); }
 
-    void writeBoundingBox(eWriteStream& dst);
-    void readBoundingBox(eReadStream& src);
+    int prp_getRelFrameShift() const;
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
+    FrameRange prp_relInfluenceRange() const;
+
+    void writeBoundingBox(eWriteStream& dst)
+    { BoundingBox::writeBoundingBox(dst); }
+
+    void readBoundingBox(eReadStream& src)
+    { BoundingBox::readBoundingBox(src); }
+
     //bool relPointInsidePath(const QPointF &relPos);
     QPointF getRelCenterPosition();
 
     bool isFrameInDurationRect(const int relFrame) const;
 
     stdsptr<BoxRenderData> createRenderData();
-    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
-    FrameRange prp_relInfluenceRange() const;
     bool isFrameFInDurationRect(const qreal relFrame) const;
 
-    QMatrix getRelativeTransformAtFrame(const qreal relFrame) {
-        if(isParentLink()) {
-            return getLinkTarget()->getRelativeTransformAtFrame(relFrame);
-        } else {
-            return BoundingBox::getRelativeTransformAtFrame(relFrame);
-        }
-    }
-
-    QMatrix getTotalTransformAtFrame(const qreal relFrame) {
-        if(isParentLink()) {
-            const auto linkTarget = getLinkTarget();
-            return linkTarget->getRelativeTransformAtFrame(relFrame)*
-                    mParentGroup->getTotalTransformAtFrame(relFrame);
-        } else {
-            return BoundingBox::getTotalTransformAtFrame(relFrame);
-        }
-    }
+    QMatrix getRelativeTransformAtFrame(const qreal relFrame);
+    QMatrix getTotalTransformAtFrame(const qreal relFrame);
 
     SkBlendMode getBlendMode();
 
@@ -92,21 +75,17 @@ public:
                          BoxRenderData * const data,
                          Canvas * const scene);
 
-    int prp_getRelFrameShift() const;
-
     bool relPointInsidePath(const QPointF &relPos) const;
 
-    void setTargetSlot(BoundingBox * const target);
     void setLinkTarget(ContainerBox * const linkTarget);
     ContainerBox *getLinkTarget() const;
     ContainerBox *getFinalTarget() const;
 protected:
-    bool isParentLink() const {
-        return mParentGroup ? mParentGroup->SWT_isLinkBox() : false;
-    }
+    bool isParentLink() const;
 
     qsptr<BoxTargetProperty> mBoxTarget =
             enve::make_shared<BoxTargetProperty>("link target");
+    ConnContextQPtr<ContainerBox> mLinkTarget;
 };
 
 #endif // INTERNALLINKGROUPBOX_H

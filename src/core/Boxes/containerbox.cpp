@@ -25,6 +25,7 @@
 #include "Animators/rastereffectanimators.h"
 #include "Sound/singlesound.h"
 #include "actions.h"
+#include "externallinkbox.h"
 
 ContainerBox::ContainerBox(const eBoxType type) :
     BoxWithPathEffects(type) {
@@ -530,9 +531,8 @@ void processChildData(BoundingBox * const child,
         return;
     }
     auto boxRenderData = child->getCurrentRenderData(childRelFrame);
-    if(!boxRenderData) {
-        boxRenderData = child->queRender(childRelFrame);
-    }
+    if(!boxRenderData) boxRenderData = child->queRender(childRelFrame);
+    if(!boxRenderData) return;
     boxRenderData->addDependent(parentData);
     parentData->fChildrenRenderData << boxRenderData;
 }
@@ -866,7 +866,7 @@ void ContainerBox::writeBoundingBox(eWriteStream& dst) {
 #include "paintbox.h"
 #include "imagesequencebox.h"
 #include "internallinkcanvas.h"
-#include "linkbox.h"
+#include "internallinkbox.h"
 #include "customboxcreator.h"
 
 qsptr<BoundingBox> readIdCreateBox(eReadStream& src) {

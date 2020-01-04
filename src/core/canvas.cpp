@@ -27,7 +27,7 @@
 #include "Sound/singlesound.h"
 #include "GUI/global.h"
 #include "pointhelpers.h"
-#include "Boxes/linkbox.h"
+#include "Boxes/internallinkbox.h"
 #include "clipboardcontainer.h"
 #include "Boxes/paintbox.h"
 #include <QFile>

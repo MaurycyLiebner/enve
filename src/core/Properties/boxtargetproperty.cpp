@@ -27,6 +27,7 @@ BoundingBox* BoxTargetProperty::getTarget() const {
 }
 
 void BoxTargetProperty::setTarget(BoundingBox* const box) {
+    if(box == mTarget_d) return;
     mTarget_d.assign(box);
     if(box) {
         mTarget_d << connect(box, &BoundingBox::destroyed,

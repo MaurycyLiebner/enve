@@ -20,6 +20,7 @@
 #include "Paint/simplebrushwrapper.h"
 #include "paintsettingsapplier.h"
 #include "Sound/singlesound.h"
+#include "Boxes/externallinkbox.h"
 
 Actions* Actions::sInstance = nullptr;
 
@@ -465,7 +466,7 @@ eBoxOrSound *Actions::importFile(const QString &path,
     return result.get();
 }
 
-#include "Boxes/linkbox.h"
+#include "Boxes/internallinkbox.h"
 ExternalLinkBox* Actions::linkFile(const QString &path) {
     const auto extLinkBox = enve::make_shared<ExternalLinkBox>();
     extLinkBox->setSrc(path);

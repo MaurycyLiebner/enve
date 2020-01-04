@@ -25,19 +25,16 @@ InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget) :
 
     ca_prependChild(mTransformAnimator.data(), mBoxTarget);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
-            this, &InternalLinkGroupBox::setTargetSlot);
+            this, [this](BoundingBox* const target) {
+        const auto cbTarget = dynamic_cast<ContainerBox*>(target);
+        setLinkTarget(cbTarget);
+    });
 }
 
-InternalLinkGroupBox::~InternalLinkGroupBox() {
-    setLinkTarget(nullptr);
-}
-
-void InternalLinkGroupBox::writeBoundingBox(eWriteStream& dst) {
-    BoundingBox::writeBoundingBox(dst);
-}
-
-void InternalLinkGroupBox::readBoundingBox(eReadStream& src) {
-    BoundingBox::readBoundingBox(src);
+bool InternalLinkGroupBox::SWT_isGroupBox() const {
+    const auto finalTarget = getFinalTarget();
+    if(!finalTarget) return false;
+    return finalTarget->SWT_isGroupBox();
 }
 
 SkBlendMode InternalLinkGroupBox::getBlendMode() {
@@ -63,6 +60,11 @@ ContainerBox *InternalLinkGroupBox::getFinalTarget() const {
     return getLinkTarget();
 }
 
+bool InternalLinkGroupBox::isParentLink() const {
+    if(!mParentGroup) return false;
+    return mParentGroup->SWT_isLinkBox();
+}
+
 bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) const {
     if(!getLinkTarget()) return false;
     return getLinkTarget()->relPointInsidePath(relPos);
@@ -78,6 +80,24 @@ bool InternalLinkGroupBox::isFrameFInDurationRect(const qreal relFrame) const {
     if(!getLinkTarget()) return false;
     return ContainerBox::isFrameFInDurationRect(relFrame) &&
             getLinkTarget()->isFrameFInDurationRect(relFrame);
+}
+
+QMatrix InternalLinkGroupBox::getRelativeTransformAtFrame(const qreal relFrame) {
+    if(isParentLink()) {
+        return getLinkTarget()->getRelativeTransformAtFrame(relFrame);
+    } else {
+        return BoundingBox::getRelativeTransformAtFrame(relFrame);
+    }
+}
+
+QMatrix InternalLinkGroupBox::getTotalTransformAtFrame(const qreal relFrame) {
+    if(isParentLink()) {
+        const auto linkTarget = getLinkTarget();
+        return linkTarget->getRelativeTransformAtFrame(relFrame)*
+                mParentGroup->getTotalTransformAtFrame(relFrame);
+    } else {
+        return BoundingBox::getTotalTransformAtFrame(relFrame);
+    }
 }
 
 FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(const int relFrame) const {
@@ -105,32 +125,26 @@ int InternalLinkGroupBox::prp_getRelFrameShift() const {
     } else return ContainerBox::prp_getRelFrameShift();
 }
 
-void InternalLinkGroupBox::setTargetSlot(BoundingBox * const target) {
-    setLinkTarget(dynamic_cast<ContainerBox*>(target));
-}
 #include "Sound/singlesound.h"
 #include "Sound/esoundlink.h"
 
 void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
-    disconnect(mBoxTarget.data(), nullptr, this, nullptr);
-    if(getLinkTarget()) {
-        disconnect(getLinkTarget(), nullptr, this, nullptr);
-        getLinkTarget()->removeLinkingBox(this);
-        removeAllContained();
-    }
+    if(getLinkTarget()) getLinkTarget()->removeLinkingBox(this);
+    removeAllContained();
+    mBoxTarget->setTarget(linkTarget);
+    auto& conn = mLinkTarget.assign(linkTarget);
     if(linkTarget) {
         prp_setName(linkTarget->prp_getName() + " link");
-        connect(linkTarget, &Property::prp_nameChanged,
-                this, &Property::prp_setName);
-        mBoxTarget->setTarget(linkTarget);
+        conn << connect(linkTarget, &Property::prp_nameChanged,
+                       this, &Property::prp_setName);
         linkTarget->addLinkingBox(this);
-        connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
+        conn << connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
                 this, [this, linkTarget](const FrameRange& targetAbs) {
             const auto relRange = linkTarget->prp_absRangeToRelRange(targetAbs);
             prp_afterChangedRelRange(relRange);
         });
 
-        connect(linkTarget->getTransformAnimator(), &Property::prp_absFrameRangeChanged,
+        conn << connect(linkTarget->getTransformAnimator(), &Property::prp_absFrameRangeChanged,
                 this, [this, linkTarget](const FrameRange& targetAbs) {
             const auto relRange = linkTarget->prp_absRangeToRelRange(targetAbs);
             mTransformAnimator->prp_afterChangedRelRange(relRange);
@@ -151,11 +165,8 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
         }
     } else {
         prp_setName("empty link");
-        mBoxTarget->setTarget(nullptr);
     }
     planUpdate(UpdateReason::userChange);
-    connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
-            this, &InternalLinkGroupBox::setTargetSlot);
 }
 
 QPointF InternalLinkGroupBox::getRelCenterPosition() {
@@ -164,7 +175,7 @@ QPointF InternalLinkGroupBox::getRelCenterPosition() {
 }
 
 ContainerBox *InternalLinkGroupBox::getLinkTarget() const {
-    return static_cast<ContainerBox*>(mBoxTarget->getTarget());
+    return mLinkTarget;
 }
 
 stdsptr<BoxRenderData> InternalLinkGroupBox::createRenderData() {

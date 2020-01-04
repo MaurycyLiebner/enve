@@ -575,7 +575,7 @@ void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
 //    return mapAbsPosToRel(posSum/count);
 //}
 
-#include "Boxes/linkbox.h"
+#include "Boxes/internallinkbox.h"
 void Canvas::createLinkBoxForSelected() {
     for(const auto& selectedBox : mSelectedBoxes)
         mCurrentContainer->addContained(selectedBox->createLink());

@@ -22,7 +22,7 @@
 #include "Boxes/rectangle.h"
 #include "Boxes/imagebox.h"
 #include "Boxes/textbox.h"
-#include "Boxes/linkbox.h"
+#include "Boxes/internallinkbox.h"
 #include "pointhelpers.h"
 #include "clipboardcontainer.h"
 #include "Boxes/paintbox.h"

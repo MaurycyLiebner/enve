@@ -28,7 +28,7 @@
 #include "Animators/transformanimator.h"
 #include "RasterEffects/rastereffect.h"
 #include "RasterEffects/customrastereffectcreator.h"
-#include "linkbox.h"
+#include "internallinkbox.h"
 #include "Animators/qpointfanimator.h"
 #include "MovablePoints/pathpointshandler.h"
 #include "typemenu.h"
@@ -371,6 +371,7 @@ void BoundingBox::planUpdate(const UpdateReason reason) {
 
 stdsptr<BoxRenderData> BoundingBox::queRender(const qreal relFrame) {
     const auto currentRenderData = updateCurrentRenderData(relFrame);
+    if(!currentRenderData) return nullptr;
     setupRenderData(relFrame, currentRenderData, getParentScene());
     const auto currentSPtr = enve::shared(currentRenderData);
     currentSPtr->queTask();
@@ -388,9 +389,7 @@ void BoundingBox::queTasks() {
 
 BoxRenderData *BoundingBox::updateCurrentRenderData(const qreal relFrame) {
     const auto renderData = createRenderData();
-    if(!renderData) {
-        RuntimeThrow(typeid(*this).name() + "::createRenderData returned a nullptr");
-    }
+    if(!renderData) return nullptr;
     renderData->fRelFrame = relFrame;
     mRenderDataHandler.addItemAtRelFrame(renderData);
     return renderData.get();
