@@ -459,20 +459,20 @@ void Canvas::clearBoxesSelectionList() {
 void Canvas::applyCurrentTransformationToSelected() {
 }
 
-bool zAsc(const qptr<BoundingBox> &box1, const qptr<BoundingBox> &box2) {
+bool zAsc(BoundingBox* const box1, BoundingBox* const box2) {
     return box1->getZIndex() > box2->getZIndex();
 }
 
 void Canvas::sortSelectedBoxesAsc() {
-    std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zAsc);
+    mSelectedBoxes.sort(zAsc);
 }
 
-bool zDesc(const qptr<BoundingBox>& box1, const qptr<BoundingBox>& box2) {
+bool zDesc(BoundingBox* const box1, BoundingBox* const box2) {
     return box1->getZIndex() < box2->getZIndex();
 }
 
 void Canvas::sortSelectedBoxesDesc() {
-    std::sort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zDesc);
+    mSelectedBoxes.sort(zDesc);
 }
 
 void Canvas::raiseSelectedBoxesToTop() {
