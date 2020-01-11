@@ -310,7 +310,7 @@ void BoxSingleWidget::setFillType(const int id) {
 
     if(target->SWT_isSmartPathCollection()) {
         const auto pAnim = static_cast<SmartPathCollection*>(target);
-        pAnim->setFillType(static_cast<SkPath::FillType>(id));
+        pAnim->setFillType(static_cast<SkPathFillType>(id));
     }
     Document::sInstance->actionFinished();
 }
@@ -417,10 +417,10 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         } else if(target->SWT_isSmartPathCollection()) {
             const auto coll = static_cast<SmartPathCollection*>(target);
             mFillTypeVisible = true;
-            mFillTypeCombo->setCurrentIndex(coll->getFillType());
+            mFillTypeCombo->setCurrentIndex(static_cast<int>(coll->getFillType()));
             connect(coll, &SmartPathCollection::fillTypeChanged,
-                    this, [this](const SkPath::FillType type) {
-                mFillTypeCombo->setCurrentIndex(type);
+                    this, [this](const SkPathFillType type) {
+                mFillTypeCombo->setCurrentIndex(static_cast<int>(type));
             });
         }
         if(target->SWT_isComplexAnimator() && !abs->contentVisible()) {

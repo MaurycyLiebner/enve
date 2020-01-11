@@ -596,7 +596,7 @@ SkPath gPathToPolyline(const SkPath& path) {
     for(;;) {
         qCubicSegment2D seg;
         SkPoint pts[4];
-        switch(iter.next(pts, true, true)) {
+        switch(iter.next(pts)) {
         case SkPath::kLine_Verb: {
             const QPointF pt1 = toQPointF(pts[1]);
             result.lineTo(pts[1]);
@@ -650,7 +650,7 @@ void gForEverySegmentInPath(
     SkPath::Iter iter(path, false);
     for(;;) {
         SkPoint pts[4];
-        switch(iter.next(pts, true, true)) {
+        switch(iter.next(pts)) {
         case SkPath::kLine_Verb: {
             const QPointF pt1 = toQPointF(pts[1]);
             func(qCubicSegment2D(lastPos, lastPos, pt1, pt1));
@@ -697,7 +697,7 @@ void gForEverySegmentInPath(
     SkPath::Iter iter(path, false);
     for(;;) {
         SkPoint pts[4];
-        switch(iter.next(pts, true, true)) {
+        switch(iter.next(pts)) {
         case SkPath::kLine_Verb: {
             const SkPoint pt1 = pts[1];
             SkPath seg;
@@ -826,13 +826,13 @@ void gAtomicDisplaceFilterPath(const qreal baseSeed,
     SkPath::Iter iter(src, false);
     SkPath::Iter nextIter(src, false);
     SkPoint pts[4];
-    nextIter.next(pts, true, true);
+    nextIter.next(pts);
     SkPoint prevDisp{0, 0};
     SkPoint firstDisp{0, 0};
     int i = 0;
     for(;;) {
-        const auto nextVerb = nextIter.next(pts, true, true);
-        const auto verb = iter.next(pts, true, true);
+        const auto nextVerb = nextIter.next(pts);
+        const auto verb = iter.next(pts);
         if(verb == SkPath::kMove_Verb) {
             seedContourInc += 1000.;
             i = 0;
@@ -885,7 +885,7 @@ void gSpatialDisplaceFilterPath(const qreal baseSeed,
     SkPoint pts[4];
     SkPoint prevDisp{0, 0};
     for(;;) {
-        const auto verb = iter.next(pts, true, true);
+        const auto verb = iter.next(pts);
         SkPoint targetPt{0, 0};
         switch(verb) {
         case SkPath::kLine_Verb: {
@@ -1398,7 +1398,7 @@ QList<SkPath> gBreakApart(const SkPath &src) {
     SkPath current;
     for(;;) {
         SkPoint pts[4];
-        switch(iter.next(pts, true, true)) {
+        switch(iter.next(pts)) {
         case SkPath::kLine_Verb: {
             current.lineTo(pts[1]);
         } break;

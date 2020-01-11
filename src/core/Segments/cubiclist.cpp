@@ -114,7 +114,7 @@ QList<CubicList> CubicList::sMakeFromSkPath(const SkPath &src) {
     SkPath::Iter iter(src, false);
     for(;;) {
         SkPoint pts[4];
-        switch(iter.next(pts, true, true)) {
+        switch(iter.next(pts)) {
         case SkPath::kLine_Verb: {
             QPointF pt1 = toQPointF(pts[1]);
             segs << qCubicSegment2D(lastPos, lastPos, pt1, pt1);

@@ -26,7 +26,7 @@ GpuRenderTools::GpuRenderTools(QGL33 * const gl,
     mGL(gl), mContext(context) {
     mContext.switchToSkia();
     if(!img->isTextureBacked())
-        img = img->makeTextureImage(context.grContext(), nullptr, GrMipMapped::kNo);
+        img = img->makeTextureImage(context.grContext(), GrMipMapped::kNo);
     const auto grTex = img->getBackendTexture(true);
     GrGLTextureInfo texInfo;
     grTex.getGLTextureInfo(&texInfo);

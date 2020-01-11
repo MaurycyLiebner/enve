@@ -84,7 +84,7 @@ void eLinearize000EffectCaller::apply(SkPath &path) {
     SkPath::Iter iter(src, false);
     SkPoint pts[4];
     for(;;) {
-        switch(iter.next(pts, true, true)) {
+        switch(iter.next(pts)) {
         case SkPath::kLine_Verb: {
             path.lineTo(pts[1]);
         } break;

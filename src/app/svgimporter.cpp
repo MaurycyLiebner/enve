@@ -490,7 +490,7 @@ bool parsePathDataFast(const QString &dataStr,
                 const float ry = (*num++);
                 const float xAxisRotation = (*num++);
                 const auto largeArcFlag  = SkPath::ArcSize(*num++);
-                const auto sweepFlag = SkPath::Direction(static_cast<int>(*num++) ? 0 : 1);
+                const auto sweepFlag = SkPathDirection(static_cast<int>(*num++) ? 0 : 1);
                 const float ex = (*num++) + offsetX;
                 const float ey = (*num++) + offsetY;
                 count -= 7;
@@ -511,7 +511,7 @@ bool parsePathDataFast(const QString &dataStr,
                 const float ry = (*num++);
                 const float xAxisRotation = (*num++);
                 const auto largeArcFlag  = SkPath::ArcSize(*num++);
-                const auto sweepFlag = SkPath::Direction(static_cast<int>(*num++) ? 0 : 1);
+                const auto sweepFlag = SkPathDirection(static_cast<int>(*num++) ? 0 : 1);
                 const float ex = (*num++);
                 const float ey = (*num++);
                 count -= 7;
@@ -978,7 +978,7 @@ void BoxSvgAttributes::setParent(const BoxSvgAttributes &parent) {
     mFillRule = parent.getFillRule();
 }
 
-SkPath::FillType BoxSvgAttributes::getFillRule() const {
+SkPathFillType BoxSvgAttributes::getFillRule() const {
     return mFillRule;
 }
 
@@ -1062,9 +1062,9 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
                 setFillAttribute(value);
             } else if(name == "fill-rule") {
                 if(value == "nonzero") {
-                    mFillRule = SkPath::kWinding_FillType;
+                    mFillRule = SkPathFillType::kWinding;
                 } else { // "evenodd"
-                    mFillRule = SkPath::kEvenOdd_FillType;
+                    mFillRule = SkPathFillType::kEvenOdd;
                 }
             } else if(name == "fill-opacity") {
                 mFillAttributes.setColorOpacity(toDouble(value));

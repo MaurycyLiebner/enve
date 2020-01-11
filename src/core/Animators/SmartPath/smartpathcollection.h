@@ -47,18 +47,18 @@ public:
 
     void loadSkPath(const SkPath& path);
 
-    void setFillType(const SkPath::FillType fillType);
-    SkPath::FillType getFillType() const
+    void setFillType(const SkPathFillType fillType);
+    SkPathFillType getFillType() const
     { return mFillType; }
 signals:
-    void fillTypeChanged(SkPath::FillType);
+    void fillTypeChanged(SkPathFillType);
 private:
     SmartPathAnimator *createNewPath();
     SmartPathAnimator *createNewPath(const SkPath& path);
 
     void updatePathColors();
 
-    SkPath::FillType mFillType = SkPath::kWinding_FillType;
+    SkPathFillType mFillType = SkPathFillType::kWinding;
 };
 
 #endif // SMARTPATHCOLLECTION_H

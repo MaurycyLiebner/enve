@@ -42,12 +42,12 @@ SmartPathCollection::SmartPathCollection() :
 
 void SmartPathCollection::prp_writeProperty(eWriteStream &dst) const {
     SmartPathCollectionBase::prp_writeProperty(dst);
-    dst.write(&mFillType, sizeof(SkPath::FillType));
+    dst.write(&mFillType, sizeof(SkPathFillType));
 }
 
 void SmartPathCollection::prp_readProperty(eReadStream &src) {
     SmartPathCollectionBase::prp_readProperty(src);
-    src.read(&mFillType, sizeof(SkPath::FillType));
+    src.read(&mFillType, sizeof(SkPathFillType));
 }
 
 SmartNodePoint *SmartPathCollection::createNewSubPathAtRelPos(const QPointF &relPos) {
@@ -132,7 +132,7 @@ void SmartPathCollection::loadSkPath(const SkPath &path) {
     for(const auto& sPath : paths) createNewPath(sPath);
 }
 
-void SmartPathCollection::setFillType(const SkPath::FillType fillType) {
+void SmartPathCollection::setFillType(const SkPathFillType fillType) {
     if(mFillType == fillType) return;
     mFillType = fillType;
     prp_afterWholeInfluenceRangeChanged();
