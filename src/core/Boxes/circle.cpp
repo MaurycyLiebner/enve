@@ -146,6 +146,10 @@ bool Circle::differenceInEditPathBetweenFrames(
     return mVerticalRadiusAnimator->prp_differencesBetweenRelFrames(frame1, frame2);
 }
 
+void Circle::setCenter(const QPointF &center) {
+    mCenterAnimator->setBaseValue(center);
+}
+
 CircleRadiusPoint::CircleRadiusPoint(QPointFAnimator * const associatedAnimator,
                                      BasicTransformAnimator * const parent,
                                      AnimatedPoint * const centerPoint,

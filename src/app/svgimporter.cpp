@@ -651,9 +651,8 @@ void loadCircle(const QDomElement &pathElement,
     circle = enve::make_shared<Circle>();
     circle->setHorizontalRadius(rX);
     circle->setVerticalRadius(rY);
+    circle->setCenter(QPointF(cXstr.toDouble(), cYstr.toDouble()));
     circle->planCenterPivotPosition();
-
-    circle->moveByRel(QPointF(cXstr.toDouble(), cYstr.toDouble()));
 
     attributes.apply(circle.data());
     parentGroup->addContained(circle);
@@ -1231,26 +1230,25 @@ void BoxSvgAttributes::decomposeTransformMatrix() {
     const qreal m21 = mRelTransform.m21();
     const qreal m22 = mRelTransform.m22();
 
-    const qreal delta = m11 * m22 - m21 * m12;
+    const qreal delta = m11 * m22 - m12 * m21;
 
     // Apply the QR-like decomposition.
-    if(!isZero4Dec(m11) || !isZero4Dec(m21)) {
-        const qreal r = sqrt(m11 * m11 + m21 * m21);
-        //const qreal rotRad = m21 > 0 ? acos(m11 / r) : -acos(m11 / r);
-        const qreal rotRad = m21 > 0 ? -acos(m11 / r) : acos(m11 / r);
+    if(!isZero4Dec(m11) || !isZero4Dec(m12)) {
+        const qreal r = sqrt(m11 * m11 + m12 * m12);
+        const qreal rotRad = m12 > 0 ? acos(m11 / r) : -acos(m11 / r);
         mRot = rotRad*180/PI;
         mScaleX = r;
         mScaleY = delta/r;
-        mShearX = atan((m11 * m12 + m21 * m22) / (r * r));
+        mShearX = atan((m11 * m21 + m12 * m22) / (r * r));
         mShearY = 0;
-    } else if(!isZero4Dec(m12) || !isZero4Dec(m22)) {
-        const qreal s = sqrt(m12 * m12 + m22 * m22);
-        const qreal rotRad = m22 > 0 ? acos(-m12 / s) : -acos(-m12 / s);
+    } else if(!isZero4Dec(m21) || !isZero4Dec(m22)) {
+        const qreal s = sqrt(m21 * m21 + m22 * m22);
+        const qreal rotRad = m22 > 0 ? acos(-m21 / s) : -acos(-m21 / s);
         mRot = 90 - rotRad*180/PI;
         mScaleX = delta/s;
         mScaleY = s;
         mShearX = 0;
-        mShearY = atan((m11 * m12 + m21 * m22) / (s * s));
+        mShearY = atan((m11 * m21 + m12 * m22) / (s * s));
     } else {
         mRot = 0;
         mScaleX = 0;

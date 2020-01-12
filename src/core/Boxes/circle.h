@@ -50,6 +50,7 @@ public:
     bool differenceInEditPathBetweenFrames(
                 const int frame1, const int frame2) const;
 
+    void setCenter(const QPointF& center);
     void setVerticalRadius(const qreal verticalRadius);
     void setHorizontalRadius(const qreal horizontalRadius);
     void setRadius(const qreal radius);
