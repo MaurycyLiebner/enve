@@ -143,13 +143,17 @@ void BoundingBox::updateIfUsesProgram(
     mRasterEffectsAnimators->updateIfUsesProgram(program);
 }
 
-void BoundingBox::copyTransformationTo(BoundingBox * const targetBox) {
+void BoundingBox::copyTransformationTo(BoundingBox * const targetBox) const {
     sWriteReadMember(this, targetBox, &BoundingBox::mTransformAnimator);
 }
 
-void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) {
-    copyTransformationTo(targetBox);
+void BoundingBox::copyRasterEffectsTo(BoundingBox * const targetBox) const {
     sWriteReadMember(this, targetBox, &BoundingBox::mRasterEffectsAnimators);
+}
+
+void BoundingBox::copyBoundingBoxDataTo(BoundingBox * const targetBox) const {
+    copyTransformationTo(targetBox);
+    copyRasterEffectsTo(targetBox);
 }
 
 void BoundingBox::drawHoveredSk(SkCanvas *canvas, const float invScale) {

@@ -184,13 +184,12 @@ void Canvas::resetSelectedRotation() {
 
 void Canvas::getDisplayedFillStrokeSettingsFromLastSelected(
         PaintSettingsAnimator*& fillSetings, OutlineSettingsAnimator*& strokeSettings) {
-    if(mSelectedBoxes.isEmpty()) {
+    if(mCurrentBox) {
+        fillSetings = mCurrentBox->getFillSettings();
+        strokeSettings = mCurrentBox->getStrokeSettings();
+    } else {
         fillSetings = nullptr;
         strokeSettings = nullptr;
-    } else {
-        const auto box = mSelectedBoxes.last();
-        fillSetings = box->getFillSettings();
-        strokeSettings = box->getStrokeSettings();
     }
 }
 
@@ -583,25 +582,27 @@ void Canvas::createLinkBoxForSelected() {
 
 #include "clipboardcontainer.h"
 void Canvas::duplicateSelectedBoxes() {
-    const auto container = enve::make_shared<BoxesClipboard>(mSelectedBoxes.getList());
+    const auto container = enve::make_shared<BoxesClipboard>(
+                mSelectedBoxes.getList());
     clearBoxesSelection();
     container->pasteTo(mCurrentContainer);
 }
 
-SmartVectorPath *Canvas::getPathResultingFromOperation(
-        const SkPathOp& pathOp) {
-    auto newPath = enve::make_shared<SmartVectorPath>();
+SmartVectorPath *Canvas::getPathResultingFromOperation(const SkPathOp& pathOp) {
+    const auto newPath = enve::make_shared<SmartVectorPath>();
     newPath->planCenterPivotPosition();
     SkOpBuilder builder;
     bool first = true;
     for(const auto &box : mSelectedBoxes) {
         if(box->SWT_isPathBox()) {
-            SkPath boxPath = static_cast<PathBox*>(box)->getRelativePath();
+            const auto pBox = static_cast<PathBox*>(box);
+            SkPath boxPath = pBox->getRelativePath();
             const QMatrix boxTrans = box->getRelativeTransformAtCurrentFrame();
             boxPath.transform(toSkMatrix(boxTrans));
             if(first) {
                 builder.add(boxPath, SkPathOp::kUnion_SkPathOp);
                 first = false;
+                pBox->copyDataToOperationResult(newPath.get());
             } else {
                 builder.add(boxPath, pathOp);
             }

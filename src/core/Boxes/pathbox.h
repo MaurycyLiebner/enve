@@ -116,7 +116,8 @@ public:
     GradientPoints *getFillGradientPoints();
     GradientPoints *getStrokeGradientPoints();
 
-    void copyPathBoxDataTo(PathBox * const targetBox);
+    void copyDataToOperationResult(PathBox * const targetBox) const;
+    void copyPathBoxDataTo(PathBox * const targetBox) const;
 
     bool differenceInOutlinePathBetweenFrames(
             const int frame1, const int frame2) const;

@@ -400,7 +400,16 @@ void PathBox::applyPaintSetting(const PaintSettingsApplier &setting) {
     setting.apply(this);
 }
 
-void PathBox::copyPathBoxDataTo(PathBox * const targetBox) {
+void PathBox::copyDataToOperationResult(PathBox * const targetBox) const {
+    copyRasterEffectsTo(targetBox);
+    sWriteReadMember(this, targetBox, &PathBox::mFillSettings);
+    sWriteReadMember(this, targetBox, &PathBox::mStrokeSettings);
+    sWriteReadMember(this, targetBox, &PathBox::mFillPathEffectsAnimators);
+    sWriteReadMember(this, targetBox, &PathBox::mOutlineBasePathEffectsAnimators);
+    sWriteReadMember(this, targetBox, &PathBox::mOutlinePathEffectsAnimators);
+}
+
+void PathBox::copyPathBoxDataTo(PathBox * const targetBox) const {
     copyBoundingBoxDataTo(targetBox);
     sWriteReadMember(this, targetBox, &PathBox::mFillSettings);
     sWriteReadMember(this, targetBox, &PathBox::mStrokeSettings);

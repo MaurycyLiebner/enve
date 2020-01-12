@@ -557,10 +557,12 @@ void FillStrokeSettingsWidget::paintTypeSet(const PaintType type) {
 
 void FillStrokeSettingsWidget::colorSettingReceived(
         const ColorSetting &colorSetting) {
-    PaintSettingsApplier paintSetting;
-    paintSetting << std::make_shared<ColorPaintSetting>(mTarget, colorSetting);
     const auto scene = mDocument.fActiveScene;
-    if(scene) scene->applyPaintSettingToSelected(paintSetting);
+    if(getCurrentPaintTypeVal() != PaintType::GRADIENTPAINT && scene) {
+        PaintSettingsApplier paintSetting;
+        paintSetting << std::make_shared<ColorPaintSetting>(mTarget, colorSetting);
+        scene->applyPaintSettingToSelected(paintSetting);
+    }
     mDocument.setBrushColor(colorSetting.getColor());
 }
 

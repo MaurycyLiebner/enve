@@ -95,7 +95,7 @@ public:
     static void sClearWriteBoxes();
 
     template <typename B, typename T>
-    static void sWriteReadMember(B* const from, B* const to, const T member);
+    static void sWriteReadMember(const B* const from, B* const to, const T member);
 private:
     static int sNextDocumentId;
     static QList<BoundingBox*> sDocumentBoxes;
@@ -340,8 +340,9 @@ public:
 
     QPointF mapRelPosToAbs(const QPointF &relPos) const;
 
-    void copyTransformationTo(BoundingBox * const targetBox);
-    void copyBoundingBoxDataTo(BoundingBox * const targetBox);
+    void copyTransformationTo(BoundingBox * const targetBox) const;
+    void copyRasterEffectsTo(BoundingBox * const targetBox) const;
+    void copyBoundingBoxDataTo(BoundingBox * const targetBox) const;
 
 //    int prp_getParentFrameShift() const;
 
@@ -430,7 +431,7 @@ private:
 };
 
 template <typename B, typename T>
-void BoundingBox::sWriteReadMember(B* const from, B* const to, const T member) {
+void BoundingBox::sWriteReadMember(const B * const from, B* const to, const T member) {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     eWriteStream writeStream(&buffer);
