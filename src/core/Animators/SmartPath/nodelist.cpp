@@ -448,8 +448,7 @@ void NodeList::setPath(const SkPath &path) {
                 if(iter.peek() == SkPath::kClose_Verb) {
                     firstNode->setC0Enabled(false);
                     firstNode->mC0 = firstNode->mP1;
-                }
-                prevNode = appendAndGetNode(Node(qPt));
+                } else prevNode = appendAndGetNode(Node(qPt));
             }
                 break;
             case SkPath::kConic_Verb: {

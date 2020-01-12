@@ -72,18 +72,12 @@ Rectangle::Rectangle() : PathBox(eBoxType::rectangle) {
 
 SkPath Rectangle::getPathAtRelFrameF(const qreal relFrame) {
     SkPath path;
-    const SkPoint topLeft =
-            toSkPoint(mTopLeftAnimator->
-                                getEffectiveValue(relFrame));
-    const SkPoint bottomRight =
-            toSkPoint(mBottomRightAnimator->
-                                getEffectiveValue(relFrame));
-    const QPointF radiusAtFrame =
-            mRadiusAnimator->getEffectiveValue(relFrame);
-    path.addRoundRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
-                                       bottomRight.x(), bottomRight.y()),
-                      toSkScalar(radiusAtFrame.x()),
-                      toSkScalar(radiusAtFrame.y()));
+    const QPointF topLeft = mTopLeftAnimator->getEffectiveValue(relFrame);
+    const QPointF bottomRight = mBottomRightAnimator->getEffectiveValue(relFrame);
+    const QPointF radius = mRadiusAnimator->getEffectiveValue(relFrame);
+    const SkRect rect = SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
+                                         bottomRight.x(), bottomRight.y());
+    path.addRoundRect(rect, radius.x(), radius.y());
     return path;
 }
 
