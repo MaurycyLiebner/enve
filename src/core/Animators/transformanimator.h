@@ -135,6 +135,7 @@ public:
     QMatrix getRelativeTransformAtFrame(const qreal relFrame);
     QMatrix getCurrentTransform();
 
+    void resetShear();
     void resetPivot();
     void setPivotFixedTransform(const QPointF &point);
 

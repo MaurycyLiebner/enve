@@ -332,12 +332,17 @@ AdvancedTransformAnimator::AdvancedTransformAnimator() {
     ca_addChild(mOpacityAnimator);
 }
 
+void AdvancedTransformAnimator::resetShear() {
+    mShearAnimator->setBaseValue(QPointF(0, 0));
+}
+
 void AdvancedTransformAnimator::resetPivot() {
     mPivotAnimator->setBaseValue(QPointF(0, 0));
 }
 
 void AdvancedTransformAnimator::reset() {
     BasicTransformAnimator::reset();
+    resetShear();
     resetPivot();
 }
 
