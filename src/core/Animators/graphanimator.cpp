@@ -155,7 +155,7 @@ void GraphAnimator::graph_getFrameConstraints(
         maxMoveFrame = DBL_MAX;
         return;
     }
-    const qreal keyFrame = key->getAbsFrame();
+    const qreal keyFrame = key->getRelFrame();
 
     qreal startMinMoveFrame;
     qreal endMaxMoveFrame;
@@ -165,14 +165,14 @@ void GraphAnimator::graph_getFrameConstraints(
     if(keyId == keys.count() - 1) {
         endMaxMoveFrame = keyFrame + 5000;
     } else {
-        endMaxMoveFrame = keys.atId(keyId + 1)->getAbsFrame();
+        endMaxMoveFrame = keys.atId(keyId + 1)->getRelFrame();
     }
 
     if(keyId == 0) {
         startMinMoveFrame = keyFrame - 5000;
     } else {
         const auto& prevKey = keys.atId(keyId - 1);
-        startMinMoveFrame = prevKey->getAbsFrame();
+        startMinMoveFrame = prevKey->getRelFrame();
     }
 
     if(key->getCtrlsMode() == CtrlsMode::symmetric) {
