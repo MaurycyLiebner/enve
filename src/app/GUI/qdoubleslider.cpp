@@ -205,6 +205,10 @@ void QDoubleSlider::emitEditingFinished(qreal value) {
     emit editingFinished(value);
 }
 
+void QDoubleSlider::emitEditingCanceled() {
+    emit editingCanceled();
+}
+
 void QDoubleSlider::setDisplayedValue(qreal value) {
     setValueNoUpdate(value);
     update();
@@ -243,8 +247,13 @@ void QDoubleSlider::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void QDoubleSlider::mousePressEvent(QMouseEvent *event) {
     if(event->button() == Qt::RightButton) {
-        openContextMenu(event->globalPos());
+        if(mMouseMoved) {
+            emitEditingCanceled();
+            mCanceled = true;
+            setCursor(Qt::ArrowCursor);
+        } else openContextMenu(event->globalPos());
     } else if(event->button() == Qt::LeftButton) {
+        mCanceled = false;
         setCursor(Qt::BlankCursor);
         mPressX = event->x();
         mGlobalPressPos = event->globalPos();
@@ -274,6 +283,7 @@ void QDoubleSlider::mouseMoveEvent(QMouseEvent *event) {
     cursor().setPos(mGlobalPressPos);
 
     emitValueChanged(mValue);
+    mMouseMoved = true;
 }
 
 #include <QApplication>
@@ -322,11 +332,13 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
         }
         return !mTextEdit;
     } else if(event->type() == QEvent::MouseButtonRelease) {
+        if(mCanceled) return true;
         const auto mouseEvent = static_cast<QMouseEvent*>(event);
         if(mouseEvent->button() == Qt::RightButton) return false;
         if(!mTextEdit) {
             Actions::sInstance->finishSmoothChange();
             if(mMouseMoved) {
+                mMouseMoved = false;
                 setCursor(Qt::ArrowCursor);
                 emitEditingFinished(mValue);
                 Document::sInstance->actionFinished();
@@ -341,13 +353,13 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
         }
         return !mTextEdit;
     } else if(event->type() == QEvent::MouseMove) {
+        if(mCanceled) return true;
         const auto mouseEvent = static_cast<QMouseEvent*>(event);
         if(!(mouseEvent->buttons() & Qt::LeftButton)) return false;
         if(!mTextEdit) {
             mMovesCount++;
             if(mMovesCount > 2) {
                 mouseMoveEvent(static_cast<QMouseEvent*>(event));
-                mMouseMoved = true;
                 Document::sInstance->updateScenes();
             }
         }

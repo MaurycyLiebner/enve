@@ -36,30 +36,4 @@ protected:
     }
 };
 
-class qCubicSegment1DAction {
-    enum Type { START, SET, FINISH, CANCEL };
-    qCubicSegment1DAction(const qCubicSegment1D value, const Type type) :
-        mValue(value), mType(type) {}
-public:
-    void apply(qCubicSegment1DAnimator* const target) const {
-        if(mType == START) target->prp_startTransform();
-        else if(mType == SET) target->setCurrentValue(mValue);
-        else if(mType == FINISH) target->prp_finishTransform();
-        else if(mType == CANCEL) target->prp_cancelTransform();
-    }
-
-    static qCubicSegment1DAction sMakeStart()
-    { return qCubicSegment1DAction{0., START}; }
-    static qCubicSegment1DAction sMakeSet(const qreal value)
-    { return qCubicSegment1DAction{value, SET}; }
-    static qCubicSegment1DAction sMakeFinish()
-    { return qCubicSegment1DAction{0., FINISH}; }
-    static qCubicSegment1DAction sMakeCencel()
-    { return qCubicSegment1DAction{0., CANCEL}; }
-private:
-    qCubicSegment1D mValue;
-    Type mType;
-};
-
-
 #endif // QCUBICSEGMENT1DANIMATOR_H

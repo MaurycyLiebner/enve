@@ -51,6 +51,7 @@ public:
     void emitEditingStarted(qreal value);
     void emitValueChangedExternal(qreal value);
     void emitEditingFinished(qreal value);
+    void emitEditingCanceled();
 
     void nullifyAnimator();
     void setValueFromAnimator(qreal val);

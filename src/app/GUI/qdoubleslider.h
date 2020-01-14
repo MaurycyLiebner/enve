@@ -87,10 +87,12 @@ protected:
     virtual void emitEditingStarted(qreal value);
     virtual void emitValueChanged(qreal value);
     virtual void emitEditingFinished(qreal value);
+    virtual void emitEditingCanceled();
 signals:
     void editingStarted(qreal);
     void valueChanged(qreal);
     void editingFinished(qreal);
+    void editingCanceled();
 public slots:
     void setDisplayedValue(qreal value);
 protected:
@@ -106,6 +108,7 @@ protected:
     bool mTextEdit = false;
     int mMovesCount = 0;
     bool mMouseMoved = false;
+    bool mCanceled = false;
     QDoubleValidator *mValidator;
     qreal mMinValue = 0.;
     qreal mMaxValue = 0.;

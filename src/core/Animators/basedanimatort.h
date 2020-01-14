@@ -34,7 +34,7 @@ protected:
     virtual void afterValueChanged() {}
 public:
     class Action {
-        enum Type { START, SET, FINISH };
+        enum Type { START, SET, FINISH, CANCEL };
         Action(const T& value, const Type type) :
             mValue(value), mType(type) {}
     public:
@@ -42,6 +42,7 @@ public:
             if(mType == START) target->prp_startTransform();
             else if(mType == SET) target->setCurrentValue(mValue);
             else if(mType == FINISH) target->prp_finishTransform();
+            else if(mType == CANCEL) target->prp_cancelTransform();
         }
 
         static Action sMakeStart()
@@ -50,6 +51,8 @@ public:
         { return Action{value, SET}; }
         static Action sMakeFinish()
         { return Action{T(), FINISH}; }
+        static Action sMakeCancel()
+        { return Action{T(), CANCEL}; }
     private:
         T mValue;
         Type mType;

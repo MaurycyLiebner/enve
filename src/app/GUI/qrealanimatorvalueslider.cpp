@@ -81,7 +81,6 @@ QrealAnimator* QrealAnimatorValueSlider::getQPointFAnimatorSibling() {
 }
 
 void QrealAnimatorValueSlider::mouseMoveEvent(QMouseEvent *event) {
-    QDoubleSlider::mouseMoveEvent(event);
     if(event->modifiers() & Qt::ShiftModifier) {
         const auto other = getQPointFAnimatorSibling();
         if(!other) return;
@@ -89,6 +88,7 @@ void QrealAnimatorValueSlider::mouseMoveEvent(QMouseEvent *event) {
         const qreal dValue = (event->x() - mPressX)*0.1*mPrefferedValueStep;
         other->incCurrentBaseValue(dValue);
     }
+    QDoubleSlider::mouseMoveEvent(event);
 }
 
 bool QrealAnimatorValueSlider::eventFilter(QObject *obj, QEvent *event) {
@@ -143,6 +143,16 @@ void QrealAnimatorValueSlider::emitEditingFinished(qreal value) {
         if(other) other->prp_finishTransform();
     }
     QDoubleSlider::emitEditingFinished(value);
+}
+
+void QrealAnimatorValueSlider::emitEditingCanceled() {
+    if(mTarget) {
+        mBlockAnimatorSignals = false;
+        mTarget->prp_cancelTransform();
+        const auto other = getQPointFAnimatorSibling();
+        if(other) other->prp_cancelTransform();
+    }
+    QDoubleSlider::emitEditingCanceled();
 }
 
 void QrealAnimatorValueSlider::nullifyAnimator() {

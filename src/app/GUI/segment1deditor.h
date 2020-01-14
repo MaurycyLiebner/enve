@@ -70,6 +70,7 @@ private:
     qreal mTopMargin = 0;
     void clampTopMarginAddMarginY();
 signals:
+    void editingCanceled();
     void editingStarted();
     void editingFinished();
     void segmentEdited(qCubicSegment1D);

@@ -174,6 +174,10 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
             actions, [actions]() {
         actions->strokeWidthAction(QrealAction::sMakeFinish());
     });
+    connect(mLineWidthSpin, &QrealAnimatorValueSlider::editingCanceled,
+            actions, [actions]() {
+        actions->strokeWidthAction(QrealAction::sMakeCancel());
+    });
 
     mStrokeSettingsLayout->addWidget(mStrokeJoinCapWidget);
     mStrokeSettingsWidget->setLayout(mStrokeSettingsLayout);
@@ -246,9 +250,14 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
         applyBrushWidthAction(SegAction::sMakeSet(seg));
     });
 
-    connect(mBrushWidthCurveEditor, &Segment1DEditor::editingStarted,
+    connect(mBrushWidthCurveEditor, &Segment1DEditor::editingFinished,
             this, [this]() {
         applyBrushWidthAction(SegAction::sMakeFinish());
+    });
+
+    connect(mBrushWidthCurveEditor, &Segment1DEditor::editingCanceled,
+            this, [this]() {
+        applyBrushWidthAction(SegAction::sMakeCancel());
     });
 
     connect(mBrushTimeCurveEditor, &Segment1DEditor::editingStarted,
@@ -261,9 +270,14 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
         applyBrushTimeAction(SegAction::sMakeSet(seg));
     });
 
-    connect(mBrushTimeCurveEditor, &Segment1DEditor::editingStarted,
+    connect(mBrushTimeCurveEditor, &Segment1DEditor::editingFinished,
             this, [this]() {
         applyBrushTimeAction(SegAction::sMakeFinish());
+    });
+
+    connect(mBrushTimeCurveEditor, &Segment1DEditor::editingCanceled,
+            this, [this]() {
+        applyBrushTimeAction(SegAction::sMakeCancel());
     });
 
     connect(mBrushPressureCurveEditor, &Segment1DEditor::editingStarted,
@@ -276,9 +290,14 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
         applyBrushPressureAction(SegAction::sMakeSet(seg));
     });
 
-    connect(mBrushPressureCurveEditor, &Segment1DEditor::editingStarted,
+    connect(mBrushPressureCurveEditor, &Segment1DEditor::editingFinished,
             this, [this]() {
         applyBrushPressureAction(SegAction::sMakeFinish());
+    });
+
+    connect(mBrushPressureCurveEditor, &Segment1DEditor::editingCanceled,
+            this, [this]() {
+        applyBrushPressureAction(SegAction::sMakeCancel());
     });
 
     connect(mBrushSpacingCurveEditor, &Segment1DEditor::editingStarted,
@@ -291,9 +310,14 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
         applyBrushSpacingAction(SegAction::sMakeSet(seg));
     });
 
-    connect(mBrushSpacingCurveEditor, &Segment1DEditor::editingStarted,
+    connect(mBrushSpacingCurveEditor, &Segment1DEditor::editingFinished,
             this, [this]() {
         applyBrushSpacingAction(SegAction::sMakeFinish());
+    });
+
+    connect(mBrushSpacingCurveEditor, &Segment1DEditor::editingCanceled,
+            this, [this]() {
+        applyBrushSpacingAction(SegAction::sMakeCancel());
     });
 
     mMainLayout->addLayout(mTargetLayout);

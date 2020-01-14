@@ -169,6 +169,10 @@ void Segment1DEditor::paintEvent(QPaintEvent *) {
 }
 
 void Segment1DEditor::mousePressEvent(QMouseEvent *e) {
+    if(e->button() == Qt::RightButton) {
+        mPressedPt = NONE;
+        emit editingCanceled();
+    }
     if(e->button() != Qt::LeftButton) return;
     const QPointF pos = e->pos();
     mPressedPos = pos;
