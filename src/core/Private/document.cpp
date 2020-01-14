@@ -30,17 +30,23 @@ Document::Document(TaskScheduler& taskScheduler) {
     Q_ASSERT(!sInstance);
     sInstance = this;
     connect(&taskScheduler, &TaskScheduler::finishedAllQuedTasks,
-            this, &Document::actionFinished);
+            this, &Document::updateScenes);
 }
 
-void Document::actionFinished() {
+void Document::updateScenes() {
     SimpleTask::sProcessAll();
     TaskScheduler::sInstance->queTasks();
 
     for(const auto& scene : fVisibleScenes) {
+        emit scene.first->requestUpdate();
+    }
+}
+
+void Document::actionFinished() {
+    updateScenes();
+    for(const auto& scene : fVisibleScenes) {
         const auto newUndoRedo = scene.first->newUndoRedoSet();
         if(newUndoRedo || true) emit documentChanged();
-        emit scene.first->requestUpdate();
     }
 }
 

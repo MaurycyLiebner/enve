@@ -120,10 +120,16 @@ void CanvasWindow::setCanvasMode(const CanvasMode mode) {
     update();
 }
 
-void CanvasWindow::queTasksAndUpdate() {
+void CanvasWindow::finishAction() {
     updatePivotIfNeeded();
     update();
     Document::sInstance->actionFinished();
+}
+
+void CanvasWindow::queTasksAndUpdate() {
+    updatePivotIfNeeded();
+    update();
+    Document::sInstance->updateScenes();
 }
 
 bool CanvasWindow::hasNoCanvas() {
@@ -194,7 +200,7 @@ void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
                            event, [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
                            this));
-    queTasksAndUpdate();
+    finishAction();
 }
 
 void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
@@ -236,7 +242,7 @@ void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
                            event, [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
                            this));
-    queTasksAndUpdate();
+    finishAction();
 }
 
 void CanvasWindow::KFT_setFocusToWidget() {
@@ -497,7 +503,7 @@ void CanvasWindow::setResolutionFraction(const qreal percent) {
     mCurrentCanvas->setResolutionFraction(percent);
     mCurrentCanvas->prp_afterWholeInfluenceRangeChanged();
     mCurrentCanvas->updateAllBoxes(UpdateReason::userChange);
-    queTasksAndUpdate();
+    finishAction();
 }
 
 void CanvasWindow::updatePivotIfNeeded() {

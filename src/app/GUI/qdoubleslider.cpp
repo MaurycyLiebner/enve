@@ -285,7 +285,6 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
         if(keyEvent->key() == Qt::Key_Return ||
            keyEvent->key() == Qt::Key_Enter) {
             finishTextEditing();
-            Document::sInstance->actionFinished();
         } else if((keyEvent->key() == Qt::Key_Period ||
                   keyEvent->key() == Qt::Key_Comma) && mTextEdit) {
             QString currentText = mLineEdit->text();
@@ -314,7 +313,6 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
         if(mTextEdit) {
             if(!rect().contains(mouseEvent->pos()) ) {
                 finishTextEditing();
-                Document::sInstance->actionFinished();
 //                QApplication::setOverrideCursor(QApplication::widgetAt(mouseEvent->globalPos())->cursor());
 //                QApplication::restoreOverrideCursor();
             }
@@ -350,7 +348,7 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
             if(mMovesCount > 2) {
                 mouseMoveEvent(static_cast<QMouseEvent*>(event));
                 mMouseMoved = true;
-                Document::sInstance->actionFinished();
+                Document::sInstance->updateScenes();
             }
         }
         return !mTextEdit;
@@ -392,6 +390,7 @@ void QDoubleSlider::finishTextEditing() {
     mLineEdit->deselect();
     mLineEdit->clearFocus();
     mLineEdit->editingFinished();
+    Document::sInstance->actionFinished();
 }
 
 void QDoubleSlider::lineEditingFinished() {

@@ -56,6 +56,7 @@ public:
     void setCurrentCanvas(Canvas * const canvas);
     bool hasNoCanvas();
 
+    void finishAction();
     void queTasksAndUpdate();
     bool KFT_keyReleaseEvent(QKeyEvent *event);
     bool KFT_keyPressEvent(QKeyEvent *event);

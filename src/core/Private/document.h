@@ -84,6 +84,7 @@ public:
     Canvas* fActiveScene = nullptr;
     qptr<BoundingBox> fCurrentBox;
 
+    void updateScenes();
     void actionFinished();
 
     void replaceClipboard(const stdsptr<Clipboard>& container);
