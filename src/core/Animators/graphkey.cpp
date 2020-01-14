@@ -89,12 +89,12 @@ void GraphKey::finishFrameTransform() {
     const qreal newC0Frame = c0Clamped().getRawXValue();
     const qreal newC1Frame = c1Clamped().getRawXValue();
     ur.fUndo = [this, oldFrame, oldC0Frame, oldC1Frame]() {
-        setRelFrame(oldFrame);
+        moveToRelFrame(oldFrame);
         setC0FrameVar(oldC0Frame);
         setC1FrameVar(oldC1Frame);
     };
     ur.fRedo = [this, newFrame, newC0Frame, newC1Frame]() {
-        setRelFrame(newFrame);
+        moveToRelFrame(newFrame);
         setC0FrameVar(newC0Frame);
         setC1FrameVar(newC1Frame);
     };

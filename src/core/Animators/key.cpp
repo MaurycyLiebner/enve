@@ -109,10 +109,10 @@ void Key::finishFrameTransform() {
     const int oldFrame = mSavedRelFrame;
     const int newFrame = mRelFrame;
     ur.fUndo = [this, oldFrame]() {
-        setRelFrame(oldFrame);
+        moveToRelFrame(oldFrame);
     };
     ur.fRedo = [this, newFrame]() {
-        setRelFrame(newFrame);
+        moveToRelFrame(newFrame);
     };
     addUndoRedo(ur);
 }
@@ -135,6 +135,11 @@ qreal Key::relFrameToAbsFrameF(const qreal relFrame) const {
 qreal Key::absFrameToRelFrameF(const qreal absFrame) const {
     if(!mParentAnimator) return absFrame;
     return mParentAnimator->prp_absFrameToRelFrameF(absFrame);
+}
+
+void Key::moveToRelFrame(const int frame) {
+    if(!mParentAnimator) return;
+    mParentAnimator->anim_moveKeyToRelFrame(this, frame);
 }
 
 void Key::addUndoRedo(const UndoRedo &undoRedo) {

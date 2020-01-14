@@ -89,7 +89,6 @@ public:
     }
 
     int getRelFrame() const;
-    void setAbsFrame(const int frame);
 
     Key* getNextKey() const;
     Key* getPrevKey() const;
@@ -130,16 +129,20 @@ public:
     int absFrameToRelFrame(const int absFrame) const;
     qreal relFrameToAbsFrameF(const qreal relFrame) const;
     qreal absFrameToRelFrameF(const qreal absFrame) const;
+
+    void moveToRelFrame(const int frame);
 protected:
-    void addUndoRedo(const UndoRedo& undoRedo);
     virtual void setRelFrame(const int frame);
-    bool mIsSelected = false;
-    bool mHovered = false;
+    void addUndoRedo(const UndoRedo& undoRedo);
+    void setAbsFrame(const int frame);
 
     int mRelFrame;
     int mSavedRelFrame;
 
     const QPointer<Animator> mParentAnimator;
+private:
+    bool mIsSelected = false;
+    bool mHovered = false;
 };
 
 #endif // KEY_H
