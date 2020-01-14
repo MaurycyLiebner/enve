@@ -300,10 +300,10 @@ void MainWindow::setupMenuBar() {
 
     mEditMenu->addAction("Undo",
                          &mActions, &Actions::undoAction,
-                         Qt::CTRL + Qt::Key_Z)->setDisabled(true);
+                         Qt::CTRL + Qt::Key_Z);
     mEditMenu->addAction("Redo",
                          &mActions, &Actions::redoAction,
-                         Qt::CTRL + Qt::SHIFT + Qt::Key_Z)->setDisabled(true);
+                         Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Cut",
                          &mActions, &Actions::cutAction,

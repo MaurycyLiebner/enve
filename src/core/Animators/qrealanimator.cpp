@@ -427,15 +427,20 @@ void QrealAnimator::prp_startTransform() {
     mTransformed = true;
 }
 
+#include "canvas.h"
 void QrealAnimator::prp_finishTransform() {
     if(mTransformed) {
-//        addUndoRedo(new ChangeQrealAnimatorValue(mSavedCurrentValue,
-//                                                 mCurrentValue,
-//                                                 this) );
-
+        UndoRedo ur;
+        const qreal oldValue = mSavedCurrentValue;
+        const qreal newValue = mCurrentBaseValue;
+        ur.fUndo = [this, oldValue]() {
+            setCurrentBaseValue(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setCurrentBaseValue(newValue);
+        };
+        prp_addUndoRedo(ur);
         mTransformed = false;
-
-        emit prp_finishTransform();
     }
 }
 

@@ -38,8 +38,8 @@ void Document::actionFinished() {
     TaskScheduler::sInstance->queTasks();
 
     for(const auto& scene : fVisibleScenes) {
-        //if(scene.first->newUndoRedoSet())
-            emit documentChanged();
+        const auto newUndoRedo = scene.first->newUndoRedoSet();
+        if(newUndoRedo || true) emit documentChanged();
         emit scene.first->requestUpdate();
     }
 }

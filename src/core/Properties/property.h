@@ -16,7 +16,6 @@
 
 #ifndef PROPERTY_H
 #define PROPERTY_H
-class UndoRedo;
 class Canvas;
 #include "../singlewidgettarget.h"
 #include "../framerange.h"
@@ -45,6 +44,10 @@ enum class UpdateReason {
     userChange
 };
 
+struct UndoRedo {
+    std::function<void()> fUndo;
+    std::function<void()> fRedo;
+};
 
 class Property;
 template<typename T> class TypeMenu;
@@ -138,7 +141,7 @@ public:
 
     //
 
-    void addUndoRedo(const stdsptr<UndoRedo> &undoRedo);
+    void prp_addUndoRedo(const UndoRedo &undoRedo);
 
     template <class T = ComplexAnimator>
     T *getParent() const {

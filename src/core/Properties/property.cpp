@@ -179,9 +179,15 @@ void Property::setPointsHandler(const stdsptr<PointsHandler> &handler) {
     }
 }
 
-void Property::addUndoRedo(const stdsptr<UndoRedo>& undoRedo) {
-    if(!mParentCanvasUndoRedoStack) return;
-    mParentCanvasUndoRedoStack->addUndoRedo(undoRedo);
+void Property::prp_addUndoRedo(const UndoRedo& undoRedo) {
+    const auto parentScene = getParentScene();
+    if(!parentScene) return;
+    qptr<Property> thisQPtr = this;
+    auto undo = undoRedo.fUndo;
+    auto redo = undoRedo.fRedo;
+    undo = [thisQPtr, undo]() { if(thisQPtr) undo(); };
+    redo = [thisQPtr, redo]() { if(thisQPtr) redo(); };
+    parentScene->addUndoRedo(undo, redo);
 }
 
 void Property::setParent(ComplexAnimator * const parent) {

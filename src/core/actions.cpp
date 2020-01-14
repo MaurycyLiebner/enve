@@ -437,7 +437,6 @@ eBoxOrSound *Actions::importFile(const QString &path,
             target->insertContained(insertId, result);
         } else {
             qsptr<BoundingBox> importedBox;
-            mActiveScene->blockUndoRedo();
             try {
                 if(isImageExt(extension)) {
                     importedBox = createImageBox(path);
@@ -449,7 +448,6 @@ eBoxOrSound *Actions::importFile(const QString &path,
             } catch(const std::exception& e) {
                 gPrintExceptionCritical(e);
             }
-            mActiveScene->unblockUndoRedo();
 
             result = importedBox;
             if(importedBox) {

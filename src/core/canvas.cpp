@@ -852,6 +852,11 @@ void Canvas::unblockUndoRedo() {
     mUndoRedoStack->unblockUndoRedo();
 }
 
+void Canvas::addUndoRedo(const stdfunc<void()>& undo,
+                         const stdfunc<void()>& redo) {
+    mUndoRedoStack->addUndoRedo(undo, redo);
+}
+
 SoundComposition *Canvas::getSoundComposition() {
     return mSoundComposition.get();
 }

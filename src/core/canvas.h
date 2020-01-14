@@ -616,6 +616,7 @@ public:
     void addSelectedForGraph(const int widgetId, GraphAnimator* const anim);
     bool removeSelectedForGraph(const int widgetId, GraphAnimator* const anim);
     const ConnContextObjList<GraphAnimator*>* getSelectedForGraph(const int widgetId) const;
+    void addUndoRedo(const stdfunc<void ()> &undo, const stdfunc<void ()> &redo);
 private:
     void openTextEditorForTextBox(TextBox *textBox);
 

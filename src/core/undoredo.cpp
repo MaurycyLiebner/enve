@@ -15,6 +15,47 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "undoredo.h"
+#include "exceptions.h"
+
+class UndoRedo_priv {
+public:
+    UndoRedo_priv(const int frame,
+                  const std::function<void()>& undo,
+                  const std::function<void()>& redo) :
+        fFrame(frame), fUndo(undo), fRedo(redo) {}
+
+    const int fFrame;
+    const std::function<void()> fUndo;
+    const std::function<void()> fRedo;
+};
+
+class UndoRedoSet : public UndoRedo_priv {
+public:
+    UndoRedoSet(const int frame) :
+        UndoRedo_priv(frame,
+                 [this]() { undo(); },
+                 [this]() { redo(); }) {}
+
+    void addUndoRedo(const stdsptr<UndoRedo_priv>& undoRedo)
+    { mSet << undoRedo; }
+    bool isEmpty()
+    { return mSet.isEmpty(); }
+private:
+    void undo();
+    void redo();
+
+    QList<stdsptr<UndoRedo_priv>> mSet;
+};
+
+void UndoRedoSet::undo() {
+    for(int i = mSet.length() - 1; i >= 0; i--)
+        mSet.at(i)->fUndo();
+}
+
+void UndoRedoSet::redo() {
+    for(const auto& undoRedo : mSet)
+        undoRedo->fRedo();
+}
 
 UndoRedoStack::UndoRedoStack(const std::function<bool(int)> &changeFrameFunc) :
     mChangeFrameFunc(changeFrameFunc) {
@@ -25,42 +66,24 @@ void UndoRedoStack::startNewSet() {
     mNumberOfSets++;
 }
 
-UndoRedoStack::~UndoRedoStack() {
-    clearUndoStack();
-    clearRedoStack();
-}
-
 bool UndoRedoStack::finishSet() {
     mNumberOfSets--;
-    if(mNumberOfSets == 0) {
-        return addSet();
-    }
-    return false; // !!! when is this needed??
+    if(mNumberOfSets == 0) return addSet();
+    return false;
 }
 
 bool UndoRedoStack::addSet() {
-    if((mCurrentSet == nullptr) ? true : mCurrentSet->isEmpty()) {
-        mCurrentSet = nullptr;
-        return false;
-    }
-    addUndoRedo(mCurrentSet);
+    const bool add = mCurrentSet && !mCurrentSet->isEmpty();
+    if(add) addUndoRedo(mCurrentSet);
     mCurrentSet = nullptr;
-    return true;
+    return add;
 }
 
-void UndoRedoStack::addToSet(const stdsptr<UndoRedo>& undoRedo) {
+void UndoRedoStack::addToSet(const stdsptr<UndoRedo_priv>& undoRedo) {
     if(!mCurrentSet) {
-        mCurrentSet = enve::make_shared<UndoRedoSet>(mCurrentAbsFrame);
+        mCurrentSet = std::make_shared<UndoRedoSet>(mCurrentAbsFrame);
     }
     mCurrentSet->addUndoRedo(undoRedo);
-}
-
-void UndoRedoStack::clearRedoStack() {
-    mRedoStack.clear();
-}
-
-void UndoRedoStack::clearUndoStack() {
-    mUndoStack.clear();
 }
 
 void UndoRedoStack::emptySomeOfUndo() {
@@ -71,67 +94,43 @@ void UndoRedoStack::emptySomeOfUndo() {
     }
 }
 
-void UndoRedoStack::clearAll() {
-    clearRedoStack();
-    clearUndoStack();
+void UndoRedoStack::addUndoRedo(const std::function<void()>& undoFunc,
+                                const std::function<void()>& redoFunc) {
+    if(!undoFunc) RuntimeThrow("Missing undo function.");
+    if(!redoFunc) RuntimeThrow("Missing redo function.");
+    const auto undoRedo = std::make_shared<UndoRedo_priv>(mCurrentAbsFrame,
+                                                          undoFunc, redoFunc);
+    addUndoRedo(undoRedo);
 }
 
-void UndoRedoStack::addUndoRedo(const stdsptr<UndoRedo> &undoRedo) {
-    if(!undoRedo) return;
-    undoRedo->setFrame(mCurrentAbsFrame);
+void UndoRedoStack::addUndoRedo(const stdsptr<UndoRedo_priv>& undoRedo) {
     if(mNumberOfSets != 0) {
         addToSet(undoRedo);
     } else {
-        //        int currentFrame = mMainWindow->getCurrentFrame();
-//        if(currentFrame != mLastUndoRedoFrame) {
-//            UndoRedo *frameChangeUndoRedo =
-//                    new ChangeViewedFrameUndoRedo(mLastUndoRedoFrame,
-//                                                  currentFrame);
-//            mLastUndoRedoFrame = currentFrame;
-//            addUndoRedo(frameChangeUndoRedo);
-//        }
-//        if(currentFrame != mLastUndoRedoFrame) {
-//            bool noSet = mCurrentSet == nullptr;
-
-//            if(noSet) {
-//                addToSet(undoRedo);
-//                addToSet(new ChangeViewedFrameUndoRedo(mLastUndoRedoFrame, currentFrame));
-//                mLastUndoRedoFrame = currentFrame;
-//                addSet();
-//                return;
-//            } else {
-//                addToSet(new ChangeViewedFrameUndoRedo(mLastUndoRedoFrame, currentFrame));
-//                mLastUndoRedoFrame = currentFrame;
-//            }
-//        }
-        clearRedoStack();
+        mRedoStack.clear();
         emptySomeOfUndo();
         mUndoStack << undoRedo;
     }
 }
 
-void UndoRedoStack::redo() {
-    if(mRedoStack.isEmpty()) {
-        return;
-    }
-    stdsptr<UndoRedo> toRedo = mRedoStack.last();
-    if(mChangeFrameFunc(toRedo->getFrame())) return;
+bool UndoRedoStack::redo() {
+    if(mRedoStack.isEmpty()) return false;
+    stdsptr<UndoRedo_priv> toRedo = mRedoStack.last();
+    if(mChangeFrameFunc(toRedo->fFrame)) return true;
     mRedoStack.removeLast();
-    toRedo->printRedoName();
-    toRedo->redo();
+    toRedo->fRedo();
     mUndoStack << toRedo;
+    return true;
 }
 
-void UndoRedoStack::undo() {
-    if(mUndoStack.isEmpty()) {
-        return;
-    }
-    stdsptr<UndoRedo> toUndo = mUndoStack.last();
-    if(mChangeFrameFunc(toUndo->getFrame())) return;
+bool UndoRedoStack::undo() {
+    if(mUndoStack.isEmpty()) return false;
+    stdsptr<UndoRedo_priv> toUndo = mUndoStack.last();
+    if(mChangeFrameFunc(toUndo->fFrame)) return true;
     mUndoStack.removeLast();
-    toUndo->printUndoName();
-    toUndo->undo();
+    toUndo->fUndo();
     mRedoStack << toUndo;
+    return true;
 }
 
 void UndoRedoStack::blockUndoRedo() {
@@ -144,52 +143,4 @@ void UndoRedoStack::unblockUndoRedo() {
 
 bool UndoRedoStack::undoRedoBlocked() {
     return mUndoRedoBlocked;
-}
-
-UndoRedo::UndoRedo(const QString &name) {
-    mName = name;
-    printName();
-}
-
-UndoRedo::~UndoRedo() {
-    qDebug() << "DELETE " << mName;
-}
-
-void UndoRedo::undo() {}
-
-void UndoRedo::redo() {}
-
-void UndoRedo::printName() { qDebug() << mName; }
-
-void UndoRedo::printUndoName() { qDebug() << "UNDO " << mName; }
-
-void UndoRedo::printRedoName() { qDebug() << "REDO " << mName; }
-
-int UndoRedo::getFrame() { return mFrame; }
-
-UndoRedoSet::UndoRedoSet(const int absFrame) :
-    UndoRedo("UndoRedoSet") {
-    setFrame(absFrame);
-}
-
-UndoRedoSet::~UndoRedoSet() {}
-
-void UndoRedoSet::undo() {
-    for(int i = mSet.length() - 1; i >= 0; i--) {
-        mSet.at(i)->undo();
-    }
-}
-
-void UndoRedoSet::redo() {
-    for(const auto& undoRedo : mSet) {
-        undoRedo->redo();
-    }
-}
-
-void UndoRedoSet::addUndoRedo(const stdsptr<UndoRedo> &undoRedo) {
-    mSet << undoRedo;
-}
-
-bool UndoRedoSet::isEmpty() {
-    return mSet.isEmpty();
 }
