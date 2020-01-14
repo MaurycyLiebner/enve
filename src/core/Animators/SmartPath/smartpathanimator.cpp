@@ -227,6 +227,18 @@ void SmartPathAnimator::cancelPathChange() {
 void SmartPathAnimator::finishPathChange() {
     if(!mPathChanged) return;
     mPathChanged = false;
+    const auto oldValue = mBaseValue.getSaved();
+    const auto newValue = mBaseValue.getNodesRef();
+    UndoRedo ur;
+    ur.fUndo = [this, oldValue]() {
+        mBaseValue = oldValue;
+        prp_afterWholeInfluenceRangeChanged();
+    };
+    ur.fRedo = [this, newValue]() {
+        mBaseValue = newValue;
+        prp_afterWholeInfluenceRangeChanged();
+    };
+    prp_addUndoRedo(ur);
 }
 
 qsptr<SmartPathAnimator> SmartPathAnimator::createFromDetached() {

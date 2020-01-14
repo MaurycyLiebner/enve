@@ -115,6 +115,8 @@ public:
     void save() { mSavedList = mNodesList; }
     void restore() { mNodesList = mSavedList; }
 
+    const NodeList& getSaved() { return mSavedList; }
+
     int getNodeCount() const
     { return mNodesList.count(); }
 
@@ -140,7 +142,7 @@ public:
     { return mNodesList.read(src); }
     bool write(eWriteStream& dst) const
     { return mNodesList.write(dst); }
-protected:
+
     const NodeList& getNodesRef() const
     { return mNodesList; }
 private:

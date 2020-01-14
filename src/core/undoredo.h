@@ -49,7 +49,7 @@ private:
     void addToSet(const stdsptr<UndoRedo_priv> &undoRedo);
     void addUndoRedo(const stdsptr<UndoRedo_priv>& undoRedo);
 
-    int mCurrentAbsFrame;
+    int mCurrentAbsFrame = 0;
     const std::function<bool(int)> mChangeFrameFunc;
 
     bool mUndoRedoBlocked = false;
