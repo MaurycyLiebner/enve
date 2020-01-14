@@ -154,7 +154,8 @@ void eBoxOrSound::prp_drawTimelineControls(
 }
 
 void eBoxOrSound::setDurationRectangle(
-        const qsptr<DurationRectangle>& durationRect) {
+        const qsptr<DurationRectangle>& durationRect,
+        const bool addUndoRedo) {
     if(durationRect == mDurationRectangle) return;
     Q_ASSERT(!mDurationRectangleLocked);
     if(mDurationRectangle) {
@@ -169,7 +170,22 @@ void eBoxOrSound::setDurationRectangle(
     const auto oldDurRect = mDurationRectangle;
     mDurationRectangle = durationRect;
     prp_afterFrameShiftChanged(oldRange, newRange);
-    if(!mDurationRectangle) return shiftAll(oldDurRect->getRelShift());
+
+    if(addUndoRedo) {
+        UndoRedo ur;
+        ur.fUndo = [this]() {
+            setDurationRectangle(nullptr, false);
+        };
+        ur.fRedo = [this, durationRect]() {
+            setDurationRectangle(durationRect, false);
+        };
+        prp_addUndoRedo(ur);
+    }
+
+    if(!mDurationRectangle)
+        return anim_shiftAllKeys(oldDurRect->getRelShift(), addUndoRedo);
+    if(mDurationRectangle->getRelShift() != 0)
+        anim_shiftAllKeys(-mDurationRectangle->getRelShift(), addUndoRedo);
 
     connect(mDurationRectangle.data(), &DurationRectangle::shiftChanged,
             this, [this](const int oldShift, const int newShift) {
@@ -222,6 +238,12 @@ void eBoxOrSound::finishDurationRectPosTransform() {
     }
 }
 
+void eBoxOrSound::cancelDurationRectPosTransform() {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->cancelPosTransform();
+    }
+}
+
 void eBoxOrSound::moveDurationRect(const int dFrame) {
     if(hasDurationRectangle()) {
         mDurationRectangle->changeFramePosBy(dFrame);
@@ -240,6 +262,12 @@ void eBoxOrSound::finishMinFramePosTransform() {
     }
 }
 
+void eBoxOrSound::cancelMinFramePosTransform() {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->cancelMinFramePosTransform();
+    }
+}
+
 void eBoxOrSound::moveMinFrame(const int dFrame) {
     if(hasDurationRectangle()) {
         mDurationRectangle->moveMinFrame(dFrame);
@@ -255,6 +283,12 @@ void eBoxOrSound::startMaxFramePosTransform() {
 void eBoxOrSound::finishMaxFramePosTransform() {
     if(hasDurationRectangle()) {
         mDurationRectangle->finishMaxFramePosTransform();
+    }
+}
+
+void eBoxOrSound::cancelMaxFramePosTransform() {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->cancelMaxFramePosTransform();
     }
 }
 

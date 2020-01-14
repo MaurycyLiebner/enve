@@ -59,19 +59,27 @@ public:
             QPainter * const p, const qreal pixelsPerFrame,
             const FrameRange &absFrameRange, const int rowHeight);
 
-    void setDurationRectangle(const qsptr<DurationRectangle> &durationRect);
+    void setDurationRectangle(const qsptr<DurationRectangle> &durationRect,
+                              const bool addUndoRedo = true);
     bool hasDurationRectangle() const;
     void createDurationRectangle();
     bool isVisibleAndInVisibleDurationRect() const;
+
     void startDurationRectPosTransform();
     void finishDurationRectPosTransform();
+    void cancelDurationRectPosTransform();
     void moveDurationRect(const int dFrame);
+
     void startMinFramePosTransform();
     void finishMinFramePosTransform();
+    void cancelMinFramePosTransform();
     void moveMinFrame(const int dFrame);
+
     void startMaxFramePosTransform();
     void finishMaxFramePosTransform();
+    void cancelMaxFramePosTransform();
     void moveMaxFrame(const int dFrame);
+
     DurationRectangle *getDurationRectangle() const;
     bool isVisibleAndInDurationRect(const int relFrame) const;
     bool isFrameFVisibleAndInDurationRect(const qreal relFrame) const;

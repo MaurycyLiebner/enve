@@ -793,6 +793,27 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                     }
                 }
             }
+        } else if(e->button() == Qt::RightButton) {
+            if(mMovingRect) {
+                if(!mFirstMove) {
+                    const auto childProp = mLastPressedMovable->getParentProperty();
+                    if(mMoveAllSelected) {
+                        if(mLastPressedMovable->isDurationRect()) {
+                            mCurrentScene->cancelDurationRectPosTransformForAllSelected();
+                        } else if(mLastPressedMovable->isMinFrame()) {
+                            mCurrentScene->cancelMinFramePosTransformForAllSelected();
+                        } else if(mLastPressedMovable->isMaxFrame()) {
+                            mCurrentScene->cancelMaxFramePosTransformForAllSelected();
+                        }
+                        const auto ebs = static_cast<eBoxOrSound*>(childProp);
+                        if(!ebs->isSelected()) mLastPressedMovable->cancelPosTransform();
+                    } else {
+                        mLastPressedMovable->cancelPosTransform();
+                    }
+                    mMovingRect = false;
+                    mLastPressedMovable = nullptr;
+                }
+            }
         }
     }
     updateHovered(e->pos() + QPoint(-MIN_WIDGET_DIM/2, 0));

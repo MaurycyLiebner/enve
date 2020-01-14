@@ -131,6 +131,7 @@ public:
     qreal absFrameToRelFrameF(const qreal absFrame) const;
 
     void moveToRelFrame(const int frame);
+    void moveToRelFrameAction(const int frame);
 protected:
     virtual void setRelFrame(const int frame);
     void addUndoRedo(const UndoRedo& undoRedo);

@@ -30,26 +30,26 @@ void Animator::anim_scaleTime(const int pivotAbsFrame, const qreal scale) {
     }
 }
 
-void Animator::anim_shiftAllKeys(const int shift) {
+void Animator::anim_shiftAllKeys(const int shift, const bool addUndoRedo) {
     QList<Key*> keys;
     for(const auto& key : anim_mKeys) {
         keys << key;
     }
     for(const auto key : keys) {
-        anim_moveKeyToRelFrame(key, key->getRelFrame() + shift);
+        const int targetFrame = key->getRelFrame() + shift;
+        if(addUndoRedo) key->moveToRelFrameAction(targetFrame);
+        else key->moveToRelFrame(targetFrame);
     }
 }
 
-bool Animator::anim_nextRelFrameWithKey(const int relFrame,
-                                        int &nextRelFrame) {
+bool Animator::anim_nextRelFrameWithKey(const int relFrame, int &nextRelFrame) {
     const auto key = anim_getNextKey(relFrame);
     if(!key) return false;
     nextRelFrame = key->getRelFrame();
     return true;
 }
 
-bool Animator::anim_prevRelFrameWithKey(const int relFrame,
-                                       int &prevRelFrame) {
+bool Animator::anim_prevRelFrameWithKey(const int relFrame, int &prevRelFrame) {
     const auto key = anim_getPrevKey(relFrame);
     if(!key) return false;
     prevRelFrame = key->getRelFrame();

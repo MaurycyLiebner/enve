@@ -56,8 +56,9 @@ public:
     void setHovered(const bool hovered);
     bool isHovered();
 
-    void startPosTransform() {}
-    void finishPosTransform() {}
+    void startPosTransform();
+    void cancelPosTransform();
+    void finishPosTransform();
 
     bool isDurationRect() { return mType == DURATION_RECT; }
     bool isMinFrame() { return mType == MIN_FRAME; }
@@ -83,6 +84,9 @@ protected:
     int mClampMin = 0;
     int mClampMax = 0;
     int mValue = 0;
+private:
+    bool mTransformed = false;
+    int mSavedValue = 0;
 };
 
 class DurationMinMax : public TimelineMovable {
@@ -186,10 +190,12 @@ public:
 
     void moveMinFrame(const int change);
     void finishMinFramePosTransform();
+    void cancelMinFramePosTransform();
     void startMinFramePosTransform();
 
     void moveMaxFrame(const int change);
     void finishMaxFramePosTransform();
+    void cancelMaxFramePosTransform();
     void startMaxFramePosTransform();
 
     void setRasterCacheHandler(const HddCachableCacheHandler * const handler) {

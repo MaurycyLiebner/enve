@@ -556,11 +556,16 @@ public:
     void moveDurationRectForAllSelected(const int dFrame);
     void startDurationRectPosTransformForAllSelected();
     void finishDurationRectPosTransformForAllSelected();
+    void cancelDurationRectPosTransformForAllSelected();
+
     void startMinFramePosTransformForAllSelected();
     void finishMinFramePosTransformForAllSelected();
+    void cancelMinFramePosTransformForAllSelected();
     void moveMinFrameForAllSelected(const int dFrame);
+
     void startMaxFramePosTransformForAllSelected();
     void finishMaxFramePosTransformForAllSelected();
+    void cancelMaxFramePosTransformForAllSelected();
     void moveMaxFrameForAllSelected(const int dFrame);
 
     bool newUndoRedoSet();

@@ -795,6 +795,11 @@ void Canvas::finishDurationRectPosTransformForAllSelected() {
         box->finishDurationRectPosTransform();
 }
 
+void Canvas::cancelDurationRectPosTransformForAllSelected() {
+    for(const auto& box : mSelectedBoxes)
+        box->cancelDurationRectPosTransform();
+}
+
 void Canvas::moveDurationRectForAllSelected(const int dFrame) {
     for(const auto& box : mSelectedBoxes)
         box->moveDurationRect(dFrame);
@@ -810,6 +815,11 @@ void Canvas::finishMinFramePosTransformForAllSelected() {
         box->finishMinFramePosTransform();
 }
 
+void Canvas::cancelMinFramePosTransformForAllSelected() {
+    for(const auto& box : mSelectedBoxes)
+        box->cancelMinFramePosTransform();
+}
+
 void Canvas::moveMinFrameForAllSelected(const int dFrame) {
     for(const auto& box : mSelectedBoxes)
         box->moveMinFrame(dFrame);
@@ -823,6 +833,12 @@ void Canvas::startMaxFramePosTransformForAllSelected() {
 void Canvas::finishMaxFramePosTransformForAllSelected() {
     for(const auto& box : mSelectedBoxes)
         box->finishMaxFramePosTransform();
+}
+
+
+void Canvas::cancelMaxFramePosTransformForAllSelected() {
+    for(const auto& box : mSelectedBoxes)
+        box->cancelMaxFramePosTransform();
 }
 
 void Canvas::moveMaxFrameForAllSelected(const int dFrame) {

@@ -360,10 +360,10 @@ void ComplexAnimator::ca_addChild(const qsptr<Property> &child) {
     ca_insertChild(child, ca_getNumberOfChildren());
 }
 
-void ComplexAnimator::anim_shiftAllKeys(const int shift) {
+void ComplexAnimator::anim_shiftAllKeys(const int shift, const bool addUndoRedo) {
     for(const auto &property : ca_mChildren) {
         if(!property->SWT_isAnimator()) continue;
         const auto anim = static_cast<Animator*>(property.get());
-        anim->anim_shiftAllKeys(shift);
+        anim->anim_shiftAllKeys(shift, addUndoRedo);
     }
 }

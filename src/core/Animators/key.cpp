@@ -142,6 +142,12 @@ void Key::moveToRelFrame(const int frame) {
     mParentAnimator->anim_moveKeyToRelFrame(this, frame);
 }
 
+void Key::moveToRelFrameAction(const int frame) {
+    startFrameTransform();
+    moveToRelFrame(frame);
+    finishFrameTransform();
+}
+
 void Key::addUndoRedo(const UndoRedo &undoRedo) {
     if(!mParentAnimator) return;
     const auto parentScene = mParentAnimator->getParentScene();

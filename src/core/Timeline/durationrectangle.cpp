@@ -59,6 +59,34 @@ bool TimelineMovable::isHovered() {
     return mHovered;
 }
 
+void TimelineMovable::startPosTransform() {
+    if(mTransformed) return;
+    mTransformed = true;
+    mSavedValue = mValue;
+}
+
+void TimelineMovable::cancelPosTransform() {
+    if(!mTransformed) return;
+    mTransformed = false;
+    setValue(mSavedValue);
+}
+
+void TimelineMovable::finishPosTransform() {
+    if(!mTransformed) return;
+    mTransformed = false;
+    UndoRedo ur;
+    const qptr<TimelineMovable> thisQPtr = this;
+    const int oldValue = mSavedValue;
+    const int newValue = mValue;
+    ur.fUndo = [thisQPtr, oldValue]() {
+        if(thisQPtr) thisQPtr->setValueUnClamped(oldValue);
+    };
+    ur.fRedo = [thisQPtr, newValue]() {
+        if(thisQPtr) thisQPtr->setValueUnClamped(newValue);
+    };
+    mParentProperty.prp_addUndoRedo(ur);
+}
+
 void TimelineMovable::setClampMax(const int max) {
     mClampMax = max;
 }
@@ -241,12 +269,20 @@ void DurationRectangle::finishMinFramePosTransform() {
     mMinFrame.finishPosTransform();
 }
 
+void DurationRectangle::cancelMinFramePosTransform() {
+    mMinFrame.cancelPosTransform();
+}
+
 void DurationRectangle::moveMinFrame(const int change) {
     mMinFrame.changeFramePosBy(change);
 }
 
 void DurationRectangle::startMaxFramePosTransform() {
     mMaxFrame.startPosTransform();
+}
+
+void DurationRectangle::cancelMaxFramePosTransform() {
+    mMaxFrame.cancelPosTransform();
 }
 
 void DurationRectangle::openDurationSettingsDialog(QWidget *parent) {
