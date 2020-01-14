@@ -629,7 +629,8 @@ void ContainerBox::addContained(const qsptr<eBoxOrSound>& child) {
 }
 
 #include "Sound/esoundlink.h"
-void ContainerBox::insertContained(const int id, const qsptr<eBoxOrSound>& child) {
+void ContainerBox::insertContained(const int id, const qsptr<eBoxOrSound>& child,
+                                   const bool addUndoRedo) {
     if(child->getParentGroup() == this) {
         const int cId = mContained.indexOf(child);
         moveContainedInList(child.get(), cId, (cId < id ? id - 1 : id));
@@ -663,6 +664,17 @@ void ContainerBox::insertContained(const int id, const qsptr<eBoxOrSound>& child
     }
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());
     child->prp_afterWholeInfluenceRangeChanged();
+
+    if(addUndoRedo) {
+        UndoRedo ur;
+        ur.fUndo = [this, child]() {
+            removeContained(child, false);
+        };
+        ur.fRedo = [this, id, child]() {
+            insertContained(id, child, false);
+        };
+        prp_addUndoRedo(ur);
+    }
 }
 
 void ContainerBox::updateContainedIds(const int firstId) {
@@ -677,7 +689,7 @@ void ContainerBox::removeAllContained() {
     while(mContained.count() > 0) removeContained(mContained.last());
 }
 
-void ContainerBox::removeContainedFromList(const int id) {
+void ContainerBox::removeContainedFromList(const int id, const bool addUndoRedo) {
     const auto child = mContained.takeObjAt(id);
     updateContainedBoxes();
     if(child->SWT_isContainerBox()) {
@@ -699,6 +711,17 @@ void ContainerBox::removeContainedFromList(const int id) {
     }
 
     prp_afterWholeInfluenceRangeChanged();
+
+    if(addUndoRedo) {
+        UndoRedo ur;
+        ur.fUndo = [this, id, child]() {
+            insertContained(id, child, false);
+        };
+        ur.fRedo = [this, id]() {
+            removeContainedFromList(id, false);
+        };
+        prp_addUndoRedo(ur);
+    }
 }
 
 int ContainerBox::getContainedIndex(eBoxOrSound * const child) {
@@ -717,10 +740,11 @@ bool ContainerBox::replaceContained(const qsptr<eBoxOrSound> &replaced,
     return true;
 }
 
-void ContainerBox::removeContained(const qsptr<eBoxOrSound>& child) {
+void ContainerBox::removeContained(const qsptr<eBoxOrSound>& child,
+                                   const bool addUndoRedo) {
     const int index = getContainedIndex(child.get());
     if(index < 0) return;
-    removeContainedFromList(index);
+    removeContainedFromList(index, addUndoRedo);
     //child->setParent(nullptr);
 }
 
