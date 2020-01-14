@@ -56,7 +56,9 @@ public:
     };
 
     void prp_startTransform() override;
+    void prp_cancelTransform() override;
     void prp_finishTransform() override;
+
     void prp_afterChangedAbsRange(const FrameRange& range,
                                   const bool clip) override;
 
@@ -86,24 +88,41 @@ private:
 template<typename B, typename K, typename T>
 void BasedAnimatorT<B, K, T>::prp_startTransform() {
     if(mTransformed) return;
-    if(this->anim_isRecording() &&
-            !this->anim_getKeyOnCurrentFrame()) {
+    if(this->anim_isRecording() && !this->anim_getKeyOnCurrentFrame()) {
         this->anim_saveCurrentValueAsKey();
+    }
+    if(const auto key = this->template anim_getKeyOnCurrentFrame<K>()) {
+        key->startValueTransform();
     }
     mSavedCurrentValue = mCurrentValue;
     mTransformed = true;
 }
 
 template<typename B, typename K, typename T>
+void BasedAnimatorT<B, K, T>::prp_cancelTransform() {
+    if(!mTransformed) return;
+    mTransformed = false;
+    setCurrentValue(mSavedCurrentValue);
+}
+
+template<typename B, typename K, typename T>
 void BasedAnimatorT<B, K, T>::prp_finishTransform() {
-    if(mTransformed) {
-//        addUndoRedo(new ChangeQrealAnimatorValue(mSavedCurrentValue,
-//                                                 mCurrentValue,
-//                                                 this) );
+    if(!mTransformed) return;
+    mTransformed = false;
 
-        mTransformed = false;
-
-        emit prp_finishTransform();
+    if(const auto key = this->template anim_getKeyOnCurrentFrame<K>()) {
+        key->finishValueTransform();
+    } else {
+        UndoRedo ur;
+        const T oldValue = mSavedCurrentValue;
+        const T newValue = mCurrentValue;
+        ur.fUndo = [this, oldValue]() {
+            setCurrentValue(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setCurrentValue(newValue);
+        };
+        this->prp_addUndoRedo(ur);
     }
 }
 

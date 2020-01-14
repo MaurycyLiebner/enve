@@ -42,7 +42,7 @@ void SmartNodePoint::startTransform() {
     NonAnimatedMovablePoint::startTransform();
     if(!mC0Pt->isSelected()) mC0Pt->NonAnimatedMovablePoint::startTransform();
     if(!mC2Pt->isSelected()) mC2Pt->NonAnimatedMovablePoint::startTransform();
-    mParentAnimator->startPathChange();
+    mParentAnimator->prp_startTransform();
 }
 
 void SmartNodePoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
@@ -68,11 +68,11 @@ void SmartNodePoint::cancelTransform() {
     NonAnimatedMovablePoint::cancelTransform();
     if(!mC0Pt->isSelected()) mC0Pt->NonAnimatedMovablePoint::cancelTransform();
     if(!mC2Pt->isSelected()) mC2Pt->NonAnimatedMovablePoint::cancelTransform();
-    mParentAnimator->cancelPathChange();
+    mParentAnimator->prp_cancelTransform();
 }
 
 void SmartNodePoint::finishTransform() {
-    mParentAnimator->finishPathChange();
+    mParentAnimator->prp_finishTransform();
 }
 
 int SmartNodePoint::moveToClosestSegment(const QPointF &absPos) {

@@ -423,13 +423,21 @@ void QrealAnimator::prp_startTransform() {
     if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
         anim_saveCurrentValueAsKey();
     }
+    if(const auto key = anim_getKeyOnCurrentFrame<QrealKey>()) {
+        key->startValueTransform();
+    }
     mSavedCurrentValue = mCurrentBaseValue;
     mTransformed = true;
 }
 
 #include "canvas.h"
 void QrealAnimator::prp_finishTransform() {
-    if(mTransformed) {
+    if(!mTransformed) return;
+    mTransformed = false;
+
+    if(const auto key = anim_getKeyOnCurrentFrame<QrealKey>()) {
+        key->finishValueTransform();
+    } else {
         UndoRedo ur;
         const qreal oldValue = mSavedCurrentValue;
         const qreal newValue = mCurrentBaseValue;
@@ -440,7 +448,6 @@ void QrealAnimator::prp_finishTransform() {
             setCurrentBaseValue(newValue);
         };
         prp_addUndoRedo(ur);
-        mTransformed = false;
     }
 }
 

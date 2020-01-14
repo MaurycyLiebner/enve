@@ -151,7 +151,7 @@ signals:
 };
 
 class QrealAction {
-    enum Type { START, SET, FINISH };
+    enum Type { START, SET, FINISH, CANCEL };
     QrealAction(const qreal value, const Type type) :
         mValue(value), mType(type) {}
 public:
@@ -159,6 +159,7 @@ public:
         if(mType == START) target->prp_startTransform();
         else if(mType == SET) target->setCurrentBaseValue(mValue);
         else if(mType == FINISH) target->prp_finishTransform();
+        else if(mType == CANCEL) target->prp_cancelTransform();
     }
 
     static QrealAction sMakeStart()
@@ -167,6 +168,8 @@ public:
     { return QrealAction{value, SET}; }
     static QrealAction sMakeFinish()
     { return QrealAction{0., FINISH}; }
+    static QrealAction sMakeCancel()
+    { return QrealAction{0., CANCEL}; }
 private:
     qreal mValue;
     Type mType;

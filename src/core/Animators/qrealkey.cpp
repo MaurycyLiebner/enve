@@ -81,18 +81,28 @@ void QrealKey::readKey(eReadStream& src) {
 }
 
 void QrealKey::finishValueTransform() {
+    UndoRedo ur;
+    const qreal oldValue = mSavedValue;
+    const qreal newValue = mValue;
+    ur.fUndo = [this, oldValue]() {
+        setValue(oldValue);
+    };
+    ur.fRedo = [this, newValue]() {
+        setValue(newValue);
+    };
+    addUndoRedo(ur);
 
+    finishCtrlPointsValueTransform();
 }
 
 void QrealKey::startValueTransform() {
     mSavedValue = mValue;
-    saveC0C1Value();
+    startCtrlPointsValueTransform();
 }
 
 void QrealKey::cancelValueTransform() {
     setValue(mSavedValue);
-    setC0ValueVar(c0Clamped().getRawSavedYValue());
-    setC1ValueVar(c1Clamped().getRawSavedYValue());
+    cancelCtrlPointsValueTransform();
 }
 
 bool QrealKey::differsFromKey(Key *key) const {

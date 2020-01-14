@@ -18,12 +18,13 @@
 #define KEY_H
 #include "../smartPointers/ememory.h"
 #include "../ReadWrite/basicreadwrite.h"
+#include "../Properties/property.h"
 
 #include <QtCore>
 class QPainter;
 class KeyCloner;
 class Animator;
-
+class UndoRedo;
 class KeysClipboard;
 
 class Key : public StdSelfRef {
@@ -38,7 +39,12 @@ public:
 //                    qreal pixelsPerFrame, qreal pixelsPerValue);
 
     virtual void startFrameTransform();
+    virtual void cancelFrameTransform();
     virtual void finishFrameTransform();
+
+    virtual void startValueTransform() {}
+    virtual void cancelValueTransform() {}
+    virtual void finishValueTransform() {}
 
     virtual void deleteKey() {
         removeFromAnimator();
@@ -49,7 +55,6 @@ public:
     virtual void readKey(eReadStream &src);
 
 
-    virtual void cancelFrameTransform();
     virtual void scaleFrameAndUpdateParentAnimator(
             const int relativeToFrame,
             const qreal scaleFactor,
@@ -126,6 +131,7 @@ public:
     qreal relFrameToAbsFrameF(const qreal relFrame) const;
     qreal absFrameToRelFrameF(const qreal absFrame) const;
 protected:
+    void addUndoRedo(const UndoRedo& undoRedo);
     virtual void setRelFrame(const int frame);
     bool mIsSelected = false;
     bool mHovered = false;

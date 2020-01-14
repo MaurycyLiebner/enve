@@ -44,6 +44,33 @@ void GraphKey::changeFrameAndValueBy(const QPointF &frameValueChange) {
     }
 }
 
+void GraphKey::startCtrlPointsValueTransform() {
+    mC0Clamped.saveYValue();
+    mC1Clamped.saveYValue();
+}
+
+void GraphKey::finishCtrlPointsValueTransform() {
+    UndoRedo ur;
+    const qreal oldC0Value = c0Clamped().getRawSavedYValue();
+    const qreal oldC1Value = c1Clamped().getRawSavedYValue();
+    const qreal newC0Value = c0Clamped().getRawYValue();
+    const qreal newC1Value = c1Clamped().getRawYValue();
+    ur.fUndo = [this, oldC0Value, oldC1Value]() {
+        setC0ValueVar(oldC0Value);
+        setC1ValueVar(oldC1Value);
+    };
+    ur.fRedo = [this, newC0Value, newC1Value]() {
+        setC0ValueVar(newC0Value);
+        setC1ValueVar(newC1Value);
+    };
+    addUndoRedo(ur);
+}
+
+void GraphKey::cancelCtrlPointsValueTransform() {
+    setC0ValueVar(c0Clamped().getRawSavedYValue());
+    setC1ValueVar(c1Clamped().getRawSavedYValue());
+}
+
 void GraphKey::startFrameTransform() {
     Key::startFrameTransform();
     mC0Clamped.saveValue();
@@ -54,10 +81,24 @@ void GraphKey::startFrameTransform() {
 }
 
 void GraphKey::finishFrameTransform() {
-    //    if(!mParentAnimator) return;
-    //    mParentAnimator->addUndoRedo(
-    //                new ChangeKeyFrameUndoRedo(mSavedRelFrame,
-    //                                           mRelFrame, this));
+    UndoRedo ur;
+    const int oldFrame = mSavedRelFrame;
+    const qreal oldC0Frame = c0Clamped().getRawSavedXValue();
+    const qreal oldC1Frame = c1Clamped().getRawSavedXValue();
+    const int newFrame = mRelFrame;
+    const qreal newC0Frame = c0Clamped().getRawXValue();
+    const qreal newC1Frame = c1Clamped().getRawXValue();
+    ur.fUndo = [this, oldFrame, oldC0Frame, oldC1Frame]() {
+        setRelFrame(oldFrame);
+        setC0FrameVar(oldC0Frame);
+        setC1FrameVar(oldC1Frame);
+    };
+    ur.fRedo = [this, newFrame, newC0Frame, newC1Frame]() {
+        setRelFrame(newFrame);
+        setC0FrameVar(newC0Frame);
+        setC1FrameVar(newC1Frame);
+    };
+    addUndoRedo(ur);
 }
 
 void GraphKey::cancelFrameTransform() {
@@ -69,7 +110,6 @@ void GraphKey::cancelFrameTransform() {
     setC0Enabled(mSavedC0Enabled);
     setC1Enabled(mSavedC1Enabled);
 }
-
 
 void GraphKey::writeKey(eWriteStream& dst) {
     Key::writeKey(dst);
@@ -250,16 +290,19 @@ void GraphKey::drawGraphKey(QPainter *p, const QColor &paintColor) const {
 void GraphKey::startFrameAndValueTransform() {
     startFrameTransform();
     startValueTransform();
+    startCtrlPointsValueTransform();
 }
 
 void GraphKey::finishFrameAndValueTransform() {
     finishFrameTransform();
     finishValueTransform();
+    finishCtrlPointsValueTransform();
 }
 
 void GraphKey::cancelFrameAndValueTransform() {
     cancelFrameTransform();
     cancelValueTransform();
+    cancelCtrlPointsValueTransform();
 }
 
 void GraphKey::constrainC0Value(const qreal minVal, const qreal maxVal) {
@@ -441,9 +484,4 @@ qreal GraphKey::getC1Value() const {
         return mC1Clamped.getClampedValue(relTo).y();
     }
     return getValueForGraph();
-}
-
-void GraphKey::saveC0C1Value() {
-    mC0Clamped.saveYValue();
-    mC1Clamped.saveYValue();
 }

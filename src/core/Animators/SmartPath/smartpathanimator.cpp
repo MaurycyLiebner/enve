@@ -195,18 +195,25 @@ SkPath SmartPathAnimator::getPathAtRelFrame(const qreal frame) {
 }
 
 void SmartPathAnimator::beforeBinaryPathChange() {
-    if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
-        anim_saveCurrentValueAsKey();
-    }
+    prp_startTransform();
 }
 
-void SmartPathAnimator::startPathChange() {
+void SmartPathAnimator::afterBinaryPathChange() {
+    pathChangedExec();
+    prp_finishTransform();
+}
+
+void SmartPathAnimator::prp_startTransform() {
     if(mPathChanged) return;
     mPathChanged = true;
     if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
         anim_saveCurrentValueAsKey();
     }
-    mPathBeingChanged_d->save();
+    if(const auto key = anim_getKeyOnCurrentFrame<SmartPathKey>()) {
+        key->startValueTransform();
+    } else {
+        mBaseValue.save();
+    }
 }
 
 void SmartPathAnimator::pathChangedExec() {
@@ -215,30 +222,38 @@ void SmartPathAnimator::pathChangedExec() {
     else prp_afterWholeInfluenceRangeChanged();
 }
 
-void SmartPathAnimator::cancelPathChange() {
+void SmartPathAnimator::prp_cancelTransform() {
     if(!mPathChanged) return;
     mPathChanged = false;
     mPathBeingChanged_d->restore();
-    const auto spk = anim_getKeyOnCurrentFrame<SmartPathKey>();
-    if(spk) anim_updateAfterChangedKey(spk);
-    else prp_afterWholeInfluenceRangeChanged();
+    if(const auto key = anim_getKeyOnCurrentFrame<SmartPathKey>()) {
+        key->cancelValueTransform();
+        anim_updateAfterChangedKey(key);
+    } else {
+        mBaseValue.restore();
+        prp_afterWholeInfluenceRangeChanged();
+    }
 }
 
-void SmartPathAnimator::finishPathChange() {
+void SmartPathAnimator::prp_finishTransform() {
     if(!mPathChanged) return;
     mPathChanged = false;
-    const auto oldValue = mBaseValue.getSaved();
-    const auto newValue = mBaseValue.getNodesRef();
-    UndoRedo ur;
-    ur.fUndo = [this, oldValue]() {
-        mBaseValue = oldValue;
-        prp_afterWholeInfluenceRangeChanged();
-    };
-    ur.fRedo = [this, newValue]() {
-        mBaseValue = newValue;
-        prp_afterWholeInfluenceRangeChanged();
-    };
-    prp_addUndoRedo(ur);
+    if(const auto key = anim_getKeyOnCurrentFrame<SmartPathKey>()) {
+        key->finishValueTransform();
+    } else {
+        const auto oldValue = mBaseValue.getSaved();
+        const auto newValue = mBaseValue.getNodesRef();
+        UndoRedo ur;
+        ur.fUndo = [this, oldValue]() {
+            mBaseValue = oldValue;
+            prp_afterWholeInfluenceRangeChanged();
+        };
+        ur.fRedo = [this, newValue]() {
+            mBaseValue = newValue;
+            prp_afterWholeInfluenceRangeChanged();
+        };
+        prp_addUndoRedo(ur);
+    }
 }
 
 qsptr<SmartPathAnimator> SmartPathAnimator::createFromDetached() {

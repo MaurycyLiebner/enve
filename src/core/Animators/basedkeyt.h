@@ -19,6 +19,7 @@
 #include "key.h"
 #include "../differsinterpolate.h"
 #include "../ReadWrite/basicreadwrite.h"
+#include "animator.h"
 
 template <typename B, typename T>
 class BasedKeyT : public B {
@@ -50,6 +51,34 @@ public:
         src >> mValue;
     }
 
+    void startValueTransform() override {
+        if(mTransformed) return;
+        mSavedValue = mValue;
+        mTransformed = true;
+    }
+
+    void cancelValueTransform() override {
+        if(!mTransformed) return;
+        setValue(mSavedValue);
+        mTransformed = false;
+    }
+
+    void finishValueTransform() override {
+        if(!mTransformed) return;
+        mTransformed = false;
+
+        UndoRedo ur;
+        const auto oldValue = mSavedValue;
+        const auto newValue = getValue();
+        ur.fUndo = [this, oldValue]() {
+            setValue(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setValue(newValue);
+        };
+        this->addUndoRedo(ur);
+    }
+
     T &getValue() { return mValue; }
     const T &getValue() const { return mValue; }
 
@@ -59,7 +88,9 @@ public:
         this->mParentAnimator->anim_updateAfterChangedKey(this);
     }
 private:
+    bool mTransformed = false;
     T mValue;
+    T mSavedValue;
 };
 
 #endif // BASEDKEYT_H

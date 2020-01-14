@@ -33,13 +33,9 @@ public:
 
     virtual void changeFrameAndValueBy(const QPointF &frameValueChange);
 
-    virtual void startValueTransform() {}
-    virtual void cancelValueTransform() {}
-    virtual void finishValueTransform() {}
-
-    void startFrameTransform();
-    void finishFrameTransform();
-    void cancelFrameTransform();
+    void startFrameTransform() final;
+    void finishFrameTransform() final;
+    void cancelFrameTransform() final;
 
     void writeKey(eWriteStream& dst);
     void readKey(eReadStream& src);
@@ -56,10 +52,12 @@ public:
     const ClampedPoint& c1Clamped() const
     { return mC1Clamped; }
 
+    void startCtrlPointsValueTransform();
+    void finishCtrlPointsValueTransform();
+    void cancelCtrlPointsValueTransform();
+
     qreal getC1Value() const;
     qreal getC0Value() const;
-
-    void saveC0C1Value();
 
     void setC1Value(const qreal value);
     void setC0Value(const qreal value);

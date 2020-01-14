@@ -18,6 +18,7 @@
 #include "qrealpoint.h"
 #include "animator.h"
 #include "pointhelpers.h"
+#include "canvas.h"
 
 Key::Key(Animator * const parentAnimator) :
     Key(0, parentAnimator) {}
@@ -104,10 +105,16 @@ void Key::setSelected(const bool bT) {
 }
 
 void Key::finishFrameTransform() {
-    if(!mParentAnimator) return;
-//    mParentAnimator->addUndoRedo(
-//                new ChangeKeyFrameUndoRedo(mSavedRelFrame,
-//                                           mRelFrame, this));
+    UndoRedo ur;
+    const int oldFrame = mSavedRelFrame;
+    const int newFrame = mRelFrame;
+    ur.fUndo = [this, oldFrame]() {
+        setRelFrame(oldFrame);
+    };
+    ur.fRedo = [this, newFrame]() {
+        setRelFrame(newFrame);
+    };
+    addUndoRedo(ur);
 }
 
 int Key::relFrameToAbsFrame(const int relFrame) const {
@@ -128,6 +135,18 @@ qreal Key::relFrameToAbsFrameF(const qreal relFrame) const {
 qreal Key::absFrameToRelFrameF(const qreal absFrame) const {
     if(!mParentAnimator) return absFrame;
     return mParentAnimator->prp_absFrameToRelFrameF(absFrame);
+}
+
+void Key::addUndoRedo(const UndoRedo &undoRedo) {
+    if(!mParentAnimator) return;
+    const auto parentScene = mParentAnimator->getParentScene();
+    if(!parentScene) return;
+    stdptr<Key> thisPtr = this;
+    auto undo = undoRedo.fUndo;
+    auto redo = undoRedo.fRedo;
+    undo = [thisPtr, undo]() { if(thisPtr) undo(); };
+    redo = [thisPtr, redo]() { if(thisPtr) redo(); };
+    parentScene->addUndoRedo(undo, redo);
 }
 
 int Key::getAbsFrame() const {

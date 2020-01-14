@@ -23,14 +23,6 @@ SmartPathKey::SmartPathKey(const SmartPath &value, const int relFrame,
 SmartPathKey::SmartPathKey(Animator * const parentAnimator) :
     InterpolationKeyT<SmartPath>(parentAnimator) {}
 
-void SmartPathKey::save() {
-    getValue().save();
-}
-
-void SmartPathKey::restore() {
-    getValue().restore();
-}
-
 SkPath SmartPathKey::getPath() const {
     return getValue().getPathAt();
 }

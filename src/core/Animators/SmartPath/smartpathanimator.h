@@ -78,11 +78,13 @@ public:
     { return mBaseValue.isClosed(); }
 
     void beforeBinaryPathChange();
-    void startPathChange();
+    void afterBinaryPathChange();
+
+    void prp_startTransform();
     SimpleTaskScheduler pathChanged;
     void pathChangedExec();
-    void cancelPathChange();
-    void finishPathChange();
+    void prp_cancelTransform();
+    void prp_finishTransform();
 
     void actionRemoveNode(const int nodeId, const bool approx);
     int actionAddNewAtStart(const QPointF &relPos);

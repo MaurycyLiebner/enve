@@ -59,14 +59,14 @@ void SmartCtrlPoint::startTransform() {
     if(mParentPoint_k->getCtrlsMode() != CtrlsMode::corner) {
         mOtherCtrlPt_cv->NonAnimatedMovablePoint::startTransform();
     }
-    mParentPoint_k->getTargetAnimator()->startPathChange();
+    mParentPoint_k->getTargetAnimator()->prp_startTransform();
 }
 
 void SmartCtrlPoint::finishTransform() {
     if(mParentPoint_k->getCtrlsMode() != CtrlsMode::corner) {
         mOtherCtrlPt_cv->NonAnimatedMovablePoint::finishTransform();
     }
-    mParentPoint_k->getTargetAnimator()->finishPathChange();
+    mParentPoint_k->getTargetAnimator()->prp_finishTransform();
 }
 
 void SmartCtrlPoint::cancelTransform() {
@@ -74,7 +74,7 @@ void SmartCtrlPoint::cancelTransform() {
     if(mParentPoint_k->getCtrlsMode() != CtrlsMode::corner) {
         mOtherCtrlPt_cv->NonAnimatedMovablePoint::cancelTransform();
     }
-    mParentPoint_k->getTargetAnimator()->cancelPathChange();
+    mParentPoint_k->getTargetAnimator()->prp_cancelTransform();
 }
 
 void SmartCtrlPoint::setOtherCtrlPt(SmartCtrlPoint * const ctrlPt) {

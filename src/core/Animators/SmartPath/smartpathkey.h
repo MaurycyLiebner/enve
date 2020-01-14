@@ -26,9 +26,6 @@ protected:
                  Animator * const parentAnimator);
     SmartPathKey(Animator * const parentAnimator);
 public:
-    void save();
-    void restore();
-
     SkPath getPath() const;
 };
 
