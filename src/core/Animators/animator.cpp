@@ -444,6 +444,17 @@ FrameRange Animator::prp_getIdenticalRelRange(const int relFrame) const {
 
 void Animator::anim_saveCurrentValueAsKey() {
     anim_addKeyAtRelFrame(anim_getCurrentRelFrame());
+    if(const auto key = anim_getKeyOnCurrentFrame()) {
+        UndoRedo ur;
+        const stdsptr<Key> keySPtr = key->ref<Key>();
+        ur.fUndo = [this, keySPtr]() {
+            anim_removeKey(keySPtr);
+        };
+        ur.fRedo = [this, keySPtr]() {
+            anim_appendKey(keySPtr);
+        };
+        prp_addUndoRedo(ur);
+    }
 }
 
 void Animator::anim_drawKey(QPainter * const p,

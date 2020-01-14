@@ -36,8 +36,8 @@ protected:
 public:
     bool SWT_isAnimator() const final { return true; }
 
-    virtual void anim_addKeyAtRelFrame(const int relFrame) = 0;
     virtual stdsptr<Key> anim_createKey() = 0;
+    virtual void anim_addKeyAtRelFrame(const int relFrame) = 0;
 
     virtual void anim_scaleTime(const int pivotAbsFrame,
                                 const qreal scale);
