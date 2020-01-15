@@ -23,6 +23,28 @@ PathPointsHandler::PathPointsHandler(
     scheduleNodesRemoval([this]() { flushNodesRemoval(); }),
     mTargetAnimator(targetAnimator) {}
 
+NormalSegment PathPointsHandler::getNormalSegment(const QPointF &absPos, const qreal invScale) const {
+    qreal minDist = 5*invScale;
+    NormalSegment bestSeg;
+    for(int i = 0; i < count(); i++) {
+        const auto point = getPointWithId<SmartNodePoint>(i);
+        const auto nSeg = point->getNextNormalSegment();
+        if(!nSeg.isValid()) continue;
+        auto absSeg = nSeg.getAsAbsSegment();
+        const qreal dist = absSeg.minDistanceTo(absPos);
+        if(dist < minDist) {
+            minDist = dist;
+            bestSeg = nSeg;
+        }
+    }
+    return bestSeg;
+}
+
+void PathPointsHandler::scheduleRemoveNode(const int nodeId) {
+    mRemoveNodes << nodeId;
+    scheduleNodesRemoval();
+}
+
 SmartNodePoint *PathPointsHandler::createNewNodePoint(const int nodeId) {
     const auto newPt = enve::make_shared<SmartNodePoint>(this, mTargetAnimator);
     insertPt(nodeId, newPt);
@@ -54,6 +76,22 @@ void PathPointsHandler::updateAllPoints() {
     for(int i = 0; i < count(); i++) getPointWithId<SmartNodePoint>(i)->clear();
     while(count() < newCount) createNewNodePoint(count());
     for(int i = 0; i < count(); i++) updatePoint(i);
+}
+
+void PathPointsHandler::flushNodesRemoval() {
+    auto nodes = mRemoveNodes;
+    mRemoveNodes.clear();
+    std::sort(nodes.begin(), nodes.end());
+    for(auto it = nodes.rbegin(); it != nodes.rend(); it++) {
+        removeNode(*it, false);
+    }
+}
+
+void PathPointsHandler::updatePoints(int min, int max) {
+    const int lastId = count() - 1;
+    min = clamp(min, 0, lastId);
+    max = clamp(max, 0, lastId);
+    for(int i = min; i <= max; i++) updatePoint(i);
 }
 
 void PathPointsHandler::setCtrlsMode(const int nodeId,
@@ -151,6 +189,28 @@ void PathPointsHandler::removeSegment(const NormalSegment &segment) {
         const auto newAnim = mTargetAnimator->createFromDetached();
         spColl->addChild(newAnim);
     }
+}
+
+int PathPointsHandler::getPrevNodeId(const int startId) const
+{ return targetPath()->prevNodeId(startId); }
+
+int PathPointsHandler::getNextNodeId(const int startId) const
+{ return targetPath()->nextNodeId(startId); }
+
+SmartNodePoint *PathPointsHandler::getPrevNode(const int startId) const
+{ return getPointWithId<SmartNodePoint>(getPrevNodeId(startId)); }
+
+SmartNodePoint *PathPointsHandler::getNextNode(const int startId) const
+{ return getPointWithId<SmartNodePoint>(getNextNodeId(startId)); }
+
+SmartNodePoint *PathPointsHandler::getPrevNormalNode(const int startId) const {
+    const int normalId = targetPath()->prevNormalId(startId);
+    return getPointWithId<SmartNodePoint>(normalId);
+}
+
+SmartNodePoint *PathPointsHandler::getNextNormalNode(const int startId) const {
+    const int normalId = targetPath()->nextNormalId(startId);
+    return getPointWithId<SmartNodePoint>(normalId);
 }
 
 SmartNodePoint *PathPointsHandler::getClosestNode(

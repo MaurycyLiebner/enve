@@ -29,27 +29,9 @@ protected:
     PathPointsHandler(SmartPathAnimator * const targetAnimator);
 public:
     NormalSegment getNormalSegment(const QPointF &absPos,
-                                   const qreal invScale) const {
-        qreal minDist = 5*invScale;
-        NormalSegment bestSeg;
-        for(int i = 0; i < count(); i++) {
-            const auto point = getPointWithId<SmartNodePoint>(i);
-            const auto nSeg = point->getNextNormalSegment();
-            if(!nSeg.isValid()) continue;
-            auto absSeg = nSeg.getAsAbsSegment();
-            const qreal dist = absSeg.minDistanceTo(absPos);
-            if(dist < minDist) {
-                minDist = dist;
-                bestSeg = nSeg;
-            }
-        }
-        return bestSeg;
-    }
+                                   const qreal invScale) const;
 
-    void scheduleRemoveNode(const int nodeId) {
-        mRemoveNodes << nodeId;
-        scheduleNodesRemoval();
-    }
+    void scheduleRemoveNode(const int nodeId);
 
     // actions on NORMAL
     void setCtrlsMode(const int nodeId, const CtrlsMode mode);
@@ -71,31 +53,13 @@ public:
     void createSegment(const int node1Id, const int node2Id);
     void removeSegment(const NormalSegment &segment);
 
-    int getPrevNodeId(const int startId) const {
-        return targetPath()->prevNodeId(startId);
-    }
+    int getPrevNodeId(const int startId) const;
+    int getNextNodeId(const int startId) const;
 
-    int getNextNodeId(const int startId) const {
-        return targetPath()->nextNodeId(startId);
-    }
-
-    SmartNodePoint* getPrevNode(const int startId) const {
-        return getPointWithId<SmartNodePoint>(getPrevNodeId(startId));
-    }
-
-    SmartNodePoint* getNextNode(const int startId) const {
-        return getPointWithId<SmartNodePoint>(getNextNodeId(startId));
-    }
-
-    SmartNodePoint* getPrevNormalNode(const int startId) const {
-        return getPointWithId<SmartNodePoint>(targetPath()->prevNormalId(startId));
-    }
-
-    SmartNodePoint* getNextNormalNode(const int startId) const {
-        const int normalId = targetPath()->nextNormalId(startId);
-        return getPointWithId<SmartNodePoint>(normalId);
-    }
-
+    SmartNodePoint* getPrevNode(const int startId) const;
+    SmartNodePoint* getNextNode(const int startId) const;
+    SmartNodePoint* getPrevNormalNode(const int startId) const;
+    SmartNodePoint* getNextNormalNode(const int startId) const;
     SmartNodePoint* getClosestNode(const QPointF& absPos, const qreal& maxDist) const;
 
     void updateAllPoints();
@@ -106,22 +70,9 @@ public:
 private:
     SimpleTaskScheduler scheduleNodesRemoval;
 
-    void flushNodesRemoval() {
-        auto nodes = mRemoveNodes;
-        mRemoveNodes.clear();
-        std::sort(nodes.begin(), nodes.end());
-        for(auto it = nodes.rbegin(); it != nodes.rend(); it++) {
-            removeNode(*it, false);
-        }
-    }
+    void flushNodesRemoval();
 
-    void updatePoints(int min, int max) {
-        const int lastId = count() - 1;
-        min = clamp(min, 0, lastId);
-        max = clamp(max, 0, lastId);
-        for(int i = min; i <= max; i++) updatePoint(i);
-    }
-
+    void updatePoints(int min, int max);
     void updatePoint(const int nodeId);
     void updatePoint(SmartNodePoint * const pt, const int nodeId);
 

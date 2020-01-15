@@ -73,10 +73,9 @@ class SingleWidgetTarget : public SelfRef {
     Q_OBJECT
 public:
     SingleWidgetTarget() {}
-    virtual void SWT_setupAbstraction(
-            SWT_Abstraction*,
-            const UpdateFuncs &,
-            const int) {}
+    virtual void SWT_setupAbstraction(SWT_Abstraction*,
+                                      const UpdateFuncs &,
+                                      const int) {}
 
     virtual bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                      const bool parentSatisfies,
@@ -177,28 +176,17 @@ public:
     void SWT_addChildAt(SingleWidgetTarget * const child, const int id);
     void SWT_removeChild(SingleWidgetTarget * const child);
 
-    SWT_Abstraction *SWT_createAbstraction(
-            const UpdateFuncs &updateFuncs,
-            const int visiblePartWidgetId);
+    SWT_Abstraction *SWT_createAbstraction(const UpdateFuncs &updateFuncs,
+                                           const int visiblePartWidgetId);
 
-    void SWT_removeAbstractionForWidget(const int visiblePartWidgetId) {
-        SWT_mAllAbstractions.erase(visiblePartWidgetId);
-    }
+    void SWT_removeAbstractionForWidget(const int visiblePartWidgetId);
 
     SWT_Abstraction* SWT_getAbstractionForWidget(
-            const int visiblePartWidgetId) const {
-        const auto it = SWT_mAllAbstractions.find(visiblePartWidgetId);
-        if(it == SWT_mAllAbstractions.end()) return nullptr;
-        return it->second.get();
-    }
+            const int visiblePartWidgetId) const;
 
     SWT_Abstraction* SWT_abstractionForWidget(
             const UpdateFuncs &updateFuncs,
-            const int visiblePartWidgetId) {
-        const auto curr = SWT_getAbstractionForWidget(visiblePartWidgetId);
-        if(curr) return curr;
-        return SWT_createAbstraction(updateFuncs, visiblePartWidgetId);
-    }
+            const int visiblePartWidgetId);
 
     void SWT_scheduleContentUpdate(const SWT_BoxRule rule);
 
@@ -206,59 +194,30 @@ public:
 
     void SWT_moveChildTo(SingleWidgetTarget * const target, const int id);
 
-    bool SWT_isVisible() const {
-        return SWT_mVisible;
-    }
+    bool SWT_isVisible() const { return SWT_mVisible; }
 
-    void SWT_hide() {
-        SWT_setVisible(false);
-    }
+    void SWT_hide() { SWT_setVisible(false); }
+    void SWT_show() { SWT_setVisible(true); }
+    void SWT_setVisible(const bool bT);
 
-    void SWT_show() {
-        SWT_setVisible(true);
-    }
+    void SWT_setEnabled(const bool enabled)
+    { SWT_setDisabled(!enabled); }
 
-    void SWT_setVisible(const bool bT) {
-        if(SWT_mVisible == bT) return;
-        SWT_mVisible = bT;
-        for(const auto &swa : SWT_mAllAbstractions) {
-            swa.second->afterContentVisibilityChanged();
-        }
-    }
+    void SWT_setDisabled(const bool disable);
 
-    void SWT_setEnabled(const bool enabled) {
-        SWT_setDisabled(!enabled);
-    }
+    void SWT_disable()
+    { SWT_setDisabled(true); }
 
-    void SWT_setDisabled(const bool disable) {
-        if(SWT_mDisabled == disable) return;
-        SWT_mDisabled = disable;
-        SWT_setChildrenAncestorDisabled(SWT_isDisabled());
-        emit SWT_changedDisabled(SWT_isDisabled());
-    }
+    void SWT_enable()
+    { SWT_setDisabled(false); }
 
-    void SWT_disable() {
-        SWT_setDisabled(true);
-    }
+    bool SWT_isEnabled() const
+    { return !SWT_isDisabled(); }
 
-    void SWT_enable() {
-        SWT_setDisabled(false);
-    }
+    bool SWT_isDisabled() const
+    { return SWT_mDisabled || SWT_mAncestorDisabled; }
 
-    bool SWT_isEnabled() const {
-        return !SWT_isDisabled();
-    }
-
-    bool SWT_isDisabled() const {
-        return SWT_mDisabled || SWT_mAncestorDisabled;
-    }
-
-    void SWT_setAncestorDisabled(const bool disabled) {
-        if(SWT_mAncestorDisabled == disabled) return;
-        SWT_mAncestorDisabled = disabled;
-        SWT_setChildrenAncestorDisabled(SWT_isDisabled());
-        emit SWT_changedDisabled(SWT_isDisabled());
-    }
+    void SWT_setAncestorDisabled(const bool disabled);
 signals:
     void SWT_changedDisabled(bool);
 private:

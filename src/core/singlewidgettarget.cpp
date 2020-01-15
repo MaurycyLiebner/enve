@@ -29,6 +29,24 @@ SWT_Abstraction* SingleWidgetTarget::SWT_createAbstraction(
     return abs.get();
 }
 
+void SingleWidgetTarget::SWT_removeAbstractionForWidget(const int visiblePartWidgetId) {
+    SWT_mAllAbstractions.erase(visiblePartWidgetId);
+}
+
+SWT_Abstraction *SingleWidgetTarget::SWT_getAbstractionForWidget(
+        const int visiblePartWidgetId) const {
+    const auto it = SWT_mAllAbstractions.find(visiblePartWidgetId);
+    if(it == SWT_mAllAbstractions.end()) return nullptr;
+    return it->second.get();
+}
+
+SWT_Abstraction *SingleWidgetTarget::SWT_abstractionForWidget(
+        const UpdateFuncs &updateFuncs, const int visiblePartWidgetId) {
+    const auto curr = SWT_getAbstractionForWidget(visiblePartWidgetId);
+    if(curr) return curr;
+    return SWT_createAbstraction(updateFuncs, visiblePartWidgetId);
+}
+
 void SingleWidgetTarget::SWT_addChild(SingleWidgetTarget * const child) {
     for(const auto& abs : SWT_mAllAbstractions) {
         abs.second->addChild(child);
@@ -66,4 +84,26 @@ void SingleWidgetTarget::SWT_moveChildTo(
     for(const auto& abs : SWT_mAllAbstractions) {
         abs.second->moveChildTo(child, id);
     }
+}
+
+void SingleWidgetTarget::SWT_setVisible(const bool bT) {
+    if(SWT_mVisible == bT) return;
+    SWT_mVisible = bT;
+    for(const auto &swa : SWT_mAllAbstractions) {
+        swa.second->afterContentVisibilityChanged();
+    }
+}
+
+void SingleWidgetTarget::SWT_setDisabled(const bool disable) {
+    if(SWT_mDisabled == disable) return;
+    SWT_mDisabled = disable;
+    SWT_setChildrenAncestorDisabled(SWT_isDisabled());
+    emit SWT_changedDisabled(SWT_isDisabled());
+}
+
+void SingleWidgetTarget::SWT_setAncestorDisabled(const bool disabled) {
+    if(SWT_mAncestorDisabled == disabled) return;
+    SWT_mAncestorDisabled = disabled;
+    SWT_setChildrenAncestorDisabled(SWT_isDisabled());
+    emit SWT_changedDisabled(SWT_isDisabled());
 }
