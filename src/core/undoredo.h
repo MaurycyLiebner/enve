@@ -24,7 +24,8 @@
 class UndoRedo_priv;
 class UndoRedoSet;
 
-class UndoRedoStack : public StdSelfRef {
+class UndoRedoStack : public SelfRef {
+    Q_OBJECT
 public:
     class StackBlock {
     public:
@@ -38,11 +39,18 @@ public:
 
     UndoRedoStack(const std::function<bool(int)>& changeFrameFunc);
 
-    void startNewSet();
-    bool finishSet();
+    void pushName(const QString& name);
+    bool newCollection();
 
-    void addUndoRedo(const std::function<void()> &undo,
+    void addUndoRedo(const QString &name,
+                     const std::function<void()> &undo,
                      const std::function<void()> &redo);
+
+    QString undoText() const;
+    QString redoText() const;
+
+    bool canUndo() const;
+    bool canRedo() const;
 
     bool redo();
     bool undo();
@@ -52,18 +60,38 @@ public:
 
     void setFrame(const int frame)
     { mCurrentAbsFrame = frame; }
+signals:
+    void canUndoChanged(bool canUndo);
+    void canRedoChanged(bool canRedo);
+
+    void undoTextChanged(const QString& undoText);
+    void redoTextChanged(const QString& undoText);
 private:
-    bool addSet();
+    void checkUndoRedoChanged();
+
+    void checkUndoRedoTextChanged();
+    void checkUndoTextChanged();
+    void checkRedoTextChanged();
+
+    void checkCanUndoRedoChanged();
+    void checkCanUndoChanged();
+    void checkCanRedoChanged();
+
     void addToSet(const stdsptr<UndoRedo_priv> &undoRedo);
-    void addUndoRedo(const stdsptr<UndoRedo_priv>& undoRedo);
 
     int mCurrentAbsFrame = 0;
     const std::function<bool(int)> mChangeFrameFunc;
 
     int mUndoRedoBlocked = 0;
     int mLastUndoRedoFrame = FrameRange::EMAX;
-    int mNumberOfSets = 0;
 
+    bool mCanUndo = false;
+    bool mCanRedo = false;
+
+    QString mUndoText;
+    QString mRedoText;
+
+    QString mCurrentSetName;
     stdsptr<UndoRedoSet> mCurrentSet;
     QList<stdsptr<UndoRedo_priv>> mUndoStack;
     QList<stdsptr<UndoRedo_priv>> mRedoStack;

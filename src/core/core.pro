@@ -216,6 +216,7 @@ SOURCES += \
     Timeline/animationrect.cpp \
     Timeline/durationrectangle.cpp \
     Timeline/fixedlenanimationrect.cpp \
+    action.cpp \
     actions.cpp \
     canvas.cpp \
     canvashandlesmartpath.cpp \
@@ -474,6 +475,7 @@ HEADERS += \
     Timeline/animationrect.h \
     Timeline/durationrectangle.h \
     Timeline/fixedlenanimationrect.h \
+    action.h \
     actions.h \
     canvas.h \
     clipboardcontainer.h \

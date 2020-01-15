@@ -622,7 +622,13 @@ public:
     void addSelectedForGraph(const int widgetId, GraphAnimator* const anim);
     bool removeSelectedForGraph(const int widgetId, GraphAnimator* const anim);
     const ConnContextObjList<GraphAnimator*>* getSelectedForGraph(const int widgetId) const;
-    void addUndoRedo(const stdfunc<void ()> &undo, const stdfunc<void ()> &redo);
+    void addUndoRedo(const QString &name,
+                     const stdfunc<void ()> &undo,
+                     const stdfunc<void ()> &redo);
+    void pushUndoRedoName(const QString& name);
+
+    UndoRedoStack* undoRedoStack() const
+    { return mUndoRedoStack.get(); }
 private:
     void openTextEditorForTextBox(TextBox *textBox);
 
@@ -635,7 +641,7 @@ protected:
     Document& mDocument;
     bool mDrawnSinceQue = true;
 
-    stdsptr<UndoRedoStack> mUndoRedoStack;
+    qsptr<UndoRedoStack> mUndoRedoStack;
 
     void updatePaintBox();
 

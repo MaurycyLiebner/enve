@@ -187,7 +187,13 @@ void Property::prp_addUndoRedo(const UndoRedo& undoRedo) {
     auto redo = undoRedo.fRedo;
     undo = [thisQPtr, undo]() { if(thisQPtr) undo(); };
     redo = [thisQPtr, redo]() { if(thisQPtr) redo(); };
-    parentScene->addUndoRedo(undo, redo);
+    parentScene->addUndoRedo(prp_getName() + " Change", undo, redo);
+}
+
+void Property::prp_pushUndoRedoName(const QString& name) {
+    const auto parentScene = getParentScene();
+    if(!parentScene) return;
+    parentScene->pushUndoRedoName(name);
 }
 
 void Property::setParent(ComplexAnimator * const parent) {

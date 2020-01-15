@@ -28,18 +28,43 @@ Actions::Actions(Document &document) : mDocument(document),
     mActiveScene(mDocument.fActiveScene) {
     Q_ASSERT(!sInstance);
     sInstance = this;
-}
 
-void Actions::undoAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->undo();
-    afterAction();
-}
+    connect(&document, &Document::activeSceneSet,
+            this, &Actions::connectToActiveScene);
 
-void Actions::redoAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->redo();
-    afterAction();
+    { // undoAction
+        const auto undoActionCan = [this]() {
+            if(!mActiveScene) return false;
+            return mActiveScene->undoRedoStack()->canUndo();
+        };
+        const auto undoActionExec = [this]() {
+            mActiveScene->undo();
+            afterAction();
+        };
+        const auto undoActionText = [this]() {
+            if(!mActiveScene) return QString();
+            return mActiveScene->undoRedoStack()->undoText();
+        };
+        undoAction = new Action(undoActionCan, undoActionExec,
+                                undoActionText, this);
+    }
+
+    { // redoAction
+        const auto redoActionCan = [this]() {
+            if(!mActiveScene) return false;
+            return mActiveScene->undoRedoStack()->canRedo();
+        };
+        const auto redoActionExec = [this]() {
+            mActiveScene->redo();
+            afterAction();
+        };
+        const auto redoActionText = [this]() {
+            if(!mActiveScene) return QString();
+            return mActiveScene->undoRedoStack()->redoText();
+        };
+        redoAction = new Action(redoActionCan, redoActionExec,
+                                redoActionText, this);
+    }
 }
 
 void Actions::raiseAction() const {
@@ -506,7 +531,26 @@ void Actions::setPaintMode() {
 
 void Actions::finishSmoothChange() {
     mSmoothChange = false;
-//    mDocument.actionFinished();
+    //    mDocument.actionFinished();
+}
+
+void Actions::connectToActiveScene() {
+    auto& conn = mActiveSceneConnections;
+    conn.clear();
+    if(!mActiveScene) return;
+
+    {
+        const auto urStack = mActiveScene->undoRedoStack();
+        conn << connect(urStack, &UndoRedoStack::canUndoChanged,
+                        undoAction, &Action::raiseCanExecuteChanged);
+        conn << connect(urStack, &UndoRedoStack::undoTextChanged,
+                        undoAction, &Action::raiseTextChanged);
+
+        conn << connect(urStack, &UndoRedoStack::canRedoChanged,
+                        redoAction, &Action::raiseCanExecuteChanged);
+        conn << connect(urStack, &UndoRedoStack::redoTextChanged,
+                        redoAction, &Action::raiseTextChanged);
+    }
 }
 
 void Actions::afterAction() const {

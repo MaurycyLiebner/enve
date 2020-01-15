@@ -23,6 +23,8 @@ class QDropEvent;
 
 #include "colorhelpers.h"
 #include "skia/skiaincludes.h"
+#include "action.h"
+#include "conncontext.h"
 
 class PaintSettingsApplier;
 class Document;
@@ -37,9 +39,6 @@ public:
     Actions(Document& document);
 
     static Actions* sInstance;
-
-    void undoAction() const;
-    void redoAction() const;
 
     void raiseAction() const;
     void lowerAction() const;
@@ -136,12 +135,17 @@ public:
     bool smoothChange() const { return mSmoothChange; }
     void startSmoothChange() { mSmoothChange = true; }
     void finishSmoothChange();
+
+    Action* undoAction;
+    Action* redoAction;
 private:
+    void connectToActiveScene();
     void afterAction() const;
 
     bool mSmoothChange = false;
     Document& mDocument;
     Canvas* const & mActiveScene;
+    ConnContext mActiveSceneConnections;
 };
 
 #endif // ACTIONS_H

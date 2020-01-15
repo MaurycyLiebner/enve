@@ -298,12 +298,14 @@ void MainWindow::setupMenuBar() {
 
     mEditMenu = mMenuBar->addMenu("Edit");
 
-    mEditMenu->addAction("Undo",
-                         &mActions, &Actions::undoAction,
-                         Qt::CTRL + Qt::Key_Z);
-    mEditMenu->addAction("Redo",
-                         &mActions, &Actions::redoAction,
-                         Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
+    const auto undoQAct = mEditMenu->addAction("Undo");
+    undoQAct->setShortcut(Qt::CTRL + Qt::Key_Z);
+    mActions.undoAction->connect(undoQAct);
+
+    const auto redoQAct = mEditMenu->addAction("Redo");
+    redoQAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
+    mActions.redoAction->connect(redoQAct);
+
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Cut",
                          &mActions, &Actions::cutAction,

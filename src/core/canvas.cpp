@@ -846,9 +846,7 @@ void Canvas::moveMaxFrameForAllSelected(const int dFrame) {
 }
 
 bool Canvas::newUndoRedoSet() {
-    const bool ret = mUndoRedoStack->finishSet();
-    mUndoRedoStack->startNewSet();
-    return ret;
+    return mUndoRedoStack->newCollection();
 }
 
 void Canvas::undo() {
@@ -863,9 +861,14 @@ UndoRedoStack::StackBlock Canvas::blockUndoRedo() {
     return mUndoRedoStack->blockUndoRedo();
 }
 
-void Canvas::addUndoRedo(const stdfunc<void()>& undo,
+void Canvas::addUndoRedo(const QString& name,
+                         const stdfunc<void()>& undo,
                          const stdfunc<void()>& redo) {
-    mUndoRedoStack->addUndoRedo(undo, redo);
+    mUndoRedoStack->addUndoRedo(name, undo, redo);
+}
+
+void Canvas::pushUndoRedoName(const QString& name) {
+    mUndoRedoStack->pushName(name);
 }
 
 SoundComposition *Canvas::getSoundComposition() {

@@ -132,8 +132,7 @@ public:
     bool replaceContained(const qsptr<eBoxOrSound>& replaced,
                              const qsptr<eBoxOrSound>& replacer);
     void addContained(const qsptr<eBoxOrSound> &child);
-    void insertContained(const int id, const qsptr<eBoxOrSound> &child,
-                         const bool addUndoRedo = true);
+    void insertContained(const int id, const qsptr<eBoxOrSound> &child);
     void updateContainedIds(const int firstId);
     void updateContainedIds(const int firstId, const int lastId);
     int getContainedIndex(eBoxOrSound * const child);
@@ -152,7 +151,7 @@ public:
     void moveContainedAbove(eBoxOrSound * const boxToMove,
                             eBoxOrSound * const above);
 
-    void removeContainedFromList(const int id, const bool addUndoRedo = true);
+    void removeContainedFromList(const int id);
     void setDescendantCurrentGroup(const bool bT);
     bool isDescendantCurrentGroup() const;
 
@@ -174,8 +173,7 @@ private:
     void iniPathEffects();
     void updateRelBoundingRect();
 protected:
-    void removeContained(const qsptr<eBoxOrSound> &child,
-                         const bool addUndoRedo = true);
+    void removeContained(const qsptr<eBoxOrSound> &child);
 
     QMargins mForcedMargin;
     

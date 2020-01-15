@@ -157,7 +157,7 @@ void Key::addUndoRedo(const UndoRedo &undoRedo) {
     auto redo = undoRedo.fRedo;
     undo = [thisPtr, undo]() { if(thisPtr) undo(); };
     redo = [thisPtr, redo]() { if(thisPtr) redo(); };
-    parentScene->addUndoRedo(undo, redo);
+    parentScene->addUndoRedo("KeyFrame Change", undo, redo);
 }
 
 int Key::getAbsFrame() const {

@@ -629,8 +629,7 @@ void ContainerBox::addContained(const qsptr<eBoxOrSound>& child) {
 }
 
 #include "Sound/esoundlink.h"
-void ContainerBox::insertContained(const int id, const qsptr<eBoxOrSound>& child,
-                                   const bool addUndoRedo) {
+void ContainerBox::insertContained(const int id, const qsptr<eBoxOrSound>& child) {
     if(child->getParentGroup() == this) {
         const int cId = mContained.indexOf(child);
         moveContainedInList(child.get(), cId, (cId < id ? id - 1 : id));
@@ -665,13 +664,14 @@ void ContainerBox::insertContained(const int id, const qsptr<eBoxOrSound>& child
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());
     child->prp_afterWholeInfluenceRangeChanged();
 
-    if(addUndoRedo) {
+    {
+        prp_pushUndoRedoName("Insert " + child->prp_getName());
         UndoRedo ur;
         ur.fUndo = [this, child]() {
-            removeContained(child, false);
+            removeContained(child);
         };
         ur.fRedo = [this, id, child]() {
-            insertContained(id, child, false);
+            insertContained(id, child);
         };
         prp_addUndoRedo(ur);
     }
@@ -689,7 +689,7 @@ void ContainerBox::removeAllContained() {
     while(mContained.count() > 0) removeContained(mContained.last());
 }
 
-void ContainerBox::removeContainedFromList(const int id, const bool addUndoRedo) {
+void ContainerBox::removeContainedFromList(const int id) {
     const auto child = mContained.takeObjAt(id);
     updateContainedBoxes();
     if(child->SWT_isContainerBox()) {
@@ -712,13 +712,14 @@ void ContainerBox::removeContainedFromList(const int id, const bool addUndoRedo)
 
     prp_afterWholeInfluenceRangeChanged();
 
-    if(addUndoRedo) {
+    {
+        prp_pushUndoRedoName("Remove " + child->prp_getName());
         UndoRedo ur;
         ur.fUndo = [this, id, child]() {
-            insertContained(id, child, false);
+            insertContained(id, child);
         };
         ur.fRedo = [this, id]() {
-            removeContainedFromList(id, false);
+            removeContainedFromList(id);
         };
         prp_addUndoRedo(ur);
     }
@@ -740,11 +741,10 @@ bool ContainerBox::replaceContained(const qsptr<eBoxOrSound> &replaced,
     return true;
 }
 
-void ContainerBox::removeContained(const qsptr<eBoxOrSound>& child,
-                                   const bool addUndoRedo) {
+void ContainerBox::removeContained(const qsptr<eBoxOrSound>& child) {
     const int index = getContainedIndex(child.get());
     if(index < 0) return;
-    removeContainedFromList(index, addUndoRedo);
+    removeContainedFromList(index);
     //child->setParent(nullptr);
 }
 
@@ -776,18 +776,21 @@ void ContainerBox::decreaseContainedZInList(eBoxOrSound * const child) {
 void ContainerBox::bringContainedToEndList(eBoxOrSound * const child) {
     const int index = getContainedIndex(child);
     if(index == mContainedBoxes.count() - 1) return;
+    prp_pushUndoRedoName("Lower " + child->prp_getName() + " to Bottom");
     moveContainedInList(child, index, mContainedBoxes.count() - 1);
 }
 
 void ContainerBox::bringContainedToFrontList(eBoxOrSound * const child) {
     const int index = getContainedIndex(child);
     if(index == 0) return;
+    prp_pushUndoRedoName("Raise " + child->prp_getName() + " to Top");
     moveContainedInList(child, index, 0);
 }
 
 void ContainerBox::moveContainedInList(eBoxOrSound * const child, const int to) {
     const int from = getContainedIndex(child);
     if(from == -1) return;
+    prp_pushUndoRedoName("Change " + child->prp_getName() + " Z-Index");
     moveContainedInList(child, from, to);
 }
 

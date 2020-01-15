@@ -142,6 +142,7 @@ public:
     //
 
     void prp_addUndoRedo(const UndoRedo &undoRedo);
+    void prp_pushUndoRedoName(const QString& name);
 
     template <class T = ComplexAnimator>
     T *getParent() const {
@@ -200,7 +201,6 @@ private:
     bool mDrawOnCanvas = false;
     int prp_mInheritedFrameShift = 0;
     QString prp_mName;
-    stdptr<UndoRedoStack> mParentCanvasUndoRedoStack;
     qptr<Property> mParent_k;
     stdsptr<PointsHandler> mPointsHandler;
     Canvas* mParentScene = nullptr;

@@ -331,7 +331,6 @@ private:
     RenderHandler& mRenderHandler;
 
     LayoutHandler *mLayoutHandler = nullptr;
-    stdptr<UndoRedoStack> mCurrentUndoRedoStack;
 
     FillStrokeSettingsWidget *mFillStrokeSettings;
 
