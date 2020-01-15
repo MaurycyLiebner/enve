@@ -23,8 +23,7 @@ ColorSetting::ColorSetting(const ColorMode settingModeT,
                            const qreal val2T,
                            const qreal val3T,
                            const qreal alphaT,
-                           const ColorSettingType typeT,
-                           ColorAnimator * const excludeT) {
+                           const ColorSettingType typeT) {
     fType = typeT;
     fSettingMode = settingModeT;
     fChangedValue = changedValueT;
@@ -32,11 +31,9 @@ ColorSetting::ColorSetting(const ColorMode settingModeT,
     fVal2 = val2T;
     fVal3 = val3T;
     fAlpha = alphaT;
-    mExclude = excludeT;
 }
 
 void ColorSetting::apply(ColorAnimator * const target) const {
-    if(target == mExclude) return;
     if(fChangedValue == ColorParameter::colorMode) {
         target->setColorMode(fSettingMode);
         return;

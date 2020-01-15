@@ -45,7 +45,7 @@ void ColorSettingsWidget::setCurrentColor(const qreal h_t,
     GLfloat hueGl = static_cast<GLfloat>(h_t);
     GLfloat satGl = static_cast<GLfloat>(s_t);
     GLfloat valGl = static_cast<GLfloat>(v_t);
-    GLfloat alphaGl = static_cast<GLfloat>(a_t);
+    //GLfloat alphaGl = static_cast<GLfloat>(a_t);
     //wheel_triangle_widget->setColorHSV_f(h_t, s_t, v_t);
     r_rect->setColorHSV_f(hueGl, satGl, valGl);
     g_rect->setColorHSV_f(hueGl, satGl, valGl);
@@ -186,7 +186,7 @@ ColorSetting ColorSettingsWidget::getColorSetting(
                     gSpin->value(),
                     bSpin->value(),
                     alphaVal,
-                    type, mTargetAnimator);
+                    type);
     } else if(tabId == 1) {
         return ColorSetting(
                     ColorMode::hsv, parameter,
@@ -194,7 +194,7 @@ ColorSetting ColorSettingsWidget::getColorSetting(
                     hsvSSpin->value(),
                     vSpin->value(),
                     alphaVal,
-                    type, mTargetAnimator);
+                    type);
     } else { //if(tabId == 2) {
         return ColorSetting(
                     ColorMode::hsl, parameter,
@@ -202,7 +202,7 @@ ColorSetting ColorSettingsWidget::getColorSetting(
                     hslSSpin->value(),
                     lSpin->value(),
                     alphaVal,
-                    type, mTargetAnimator);
+                    type);
     }
 }
 
@@ -214,26 +214,12 @@ void ColorSettingsWidget::emitColorChangedSignal() {
 }
 
 void ColorSettingsWidget::emitEditingFinishedSignal() {
-    const int tabId = mTabWidget->currentIndex();
-    if(mTargetAnimator) {
-        if(mTargetAnimator->getColorMode() != static_cast<ColorMode>(tabId)) {
-            mTargetAnimator->prp_finishTransform();
-        }
-    }
     const auto colorSetting = getColorSetting(ColorSettingType::finish,
                                               mLastTriggered);
     emit colorSettingSignal(colorSetting);
 }
 
 void ColorSettingsWidget::emitEditingStartedSignal() {
-    int tabId = mTabWidget->currentIndex();
-    if(mTargetAnimator) {
-        if(mTargetAnimator->getColorMode() != static_cast<ColorMode>(tabId)) {
-            mTargetAnimator->startVal1Transform();
-            mTargetAnimator->startVal2Transform();
-            mTargetAnimator->startVal3Transform();
-        }
-    }
     const auto colorSetting = getColorSetting(ColorSettingType::start,
                                               mLastTriggered);
     emit colorSettingSignal(colorSetting);
@@ -284,13 +270,14 @@ void ColorSettingsWidget::emitEditingStartedAlpha() {
     emitEditingStartedSignal();
 }
 
-void ColorSettingsWidget::emitFullColorChangedSignal() {
+void ColorSettingsWidget::emitStartFullColorChangedSignal() {
     mLastTriggered = ColorParameter::all;
-    if(mTargetAnimator) mTargetAnimator->prp_startTransform();
     updateValuesFromHSV();
     updateAlphaFromSpin();
-    if(mTargetAnimator) mTargetAnimator->prp_finishTransform();
     emitEditingStartedSignal();
+}
+
+void ColorSettingsWidget::emitFinishFullColorChangedSignal() {
     emitColorChangedSignal();
     emitEditingFinishedSignal();
 }
@@ -348,8 +335,9 @@ void ColorSettingsWidget::startColorPicking() {
     const auto wid = new ColorPickingWidget(MainWindow::sGetInstance());
     connect(wid, &ColorPickingWidget::colorSelected,
             [this](const QColor & color) {
+        emitStartFullColorChangedSignal();
         setCurrentColor(color);
-        emitFullColorChangedSignal();
+        emitFinishFullColorChangedSignal();
     });
 }
 
@@ -460,8 +448,9 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mWidgetsLayout->addWidget(mBookmarkedColors);
     connect(mBookmarkedColors, &SavedColorsWidget::colorSet,
             this, [this](const QColor& color) {
+        emitStartFullColorChangedSignal();
         setCurrentColor(color);
-        emitFullColorChangedSignal();
+        emitFinishFullColorChangedSignal();
         Document::sInstance->actionFinished();
     });
 
@@ -604,6 +593,11 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
             lSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
     connect(aRect, &ColorValueRect::valueChanged,
             aSpin, &QrealAnimatorValueSlider::emitValueChangedExternal);
+
+    connect(this, &ColorSettingsWidget::colorSettingSignal,
+            this, [this](const ColorSetting& setting) {
+        if(mTargetAnimator) setting.apply(mTargetAnimator);
+    });
 
 
     //setMinimumSize(250, 200);
@@ -780,10 +774,7 @@ void ColorSettingsWidget::updateAlphaFromSpin() {
     aRect->setDisplayedValue(aSpin->value());
 }
 
-void ColorSettingsWidget::setColorMode(const int colorMode) {
-    if(mTargetAnimator) {
-        mTargetAnimator->setColorMode(static_cast<ColorMode>(colorMode));
-    }
+void ColorSettingsWidget::setColorMode() {
     const auto colorSetting = getColorSetting(ColorSettingType::apply,
                                               ColorParameter::colorMode);
     emit colorSettingSignal(colorSetting);

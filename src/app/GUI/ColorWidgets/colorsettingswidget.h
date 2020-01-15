@@ -70,7 +70,8 @@ private:
 
     void emitEditingStartedAlpha();
 
-    void emitFullColorChangedSignal();
+    void emitStartFullColorChangedSignal();
+    void emitFinishFullColorChangedSignal();
 
     void moveAlphaWidgetToTab(const int tabId);
 
@@ -86,7 +87,7 @@ private:
     void setValuesFromHSL();
     void updateAlphaFromSpin();
 
-    void setColorMode(const int colorMode);
+    void setColorMode();
     void refreshColorAnimatorTarget();
     void nullifyAnimator();
 

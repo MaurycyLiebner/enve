@@ -34,8 +34,7 @@ public:
                  const qreal val2T,
                  const qreal val3T,
                  const qreal alphaT,
-                 const ColorSettingType typeT,
-                 ColorAnimator * const excludeT = nullptr);
+                 const ColorSettingType typeT);
     void apply(ColorAnimator * const target) const;
 
     QColor getColor() const {
@@ -62,7 +61,6 @@ private:
     void startColorTransform(ColorAnimator* const target) const;
     void finishColorTransform(ColorAnimator* const target) const;
     void changeColor(ColorAnimator* const target) const;
-
-    qptr<ColorAnimator> mExclude;
 };
+
 #endif // COLORSETTING_H
