@@ -130,8 +130,13 @@ QPointF BoundingBox::getRelCenterPosition() {
 }
 
 void BoundingBox::centerPivotPosition() {
-    mTransformAnimator->setPivotFixedTransform(
-                getRelCenterPosition());
+    const auto pos = mTransformAnimator->getPosAnimator();
+    const auto pivot = mTransformAnimator->getPivotAnimator();
+    pos->prp_startTransform();
+    pivot->prp_startTransform();
+    mTransformAnimator->setPivotFixedTransform(getRelCenterPosition());
+    pos->prp_finishTransform();
+    pivot->prp_finishTransform();
 }
 
 void BoundingBox::planCenterPivotPosition() {
