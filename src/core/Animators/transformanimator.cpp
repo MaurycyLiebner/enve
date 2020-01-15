@@ -42,15 +42,21 @@ BasicTransformAnimator::BasicTransformAnimator() :
 }
 
 void BasicTransformAnimator::resetScale() {
+    mScaleAnimator->prp_startTransform();
     mScaleAnimator->setBaseValue(QPointF(1, 1));
+    mScaleAnimator->prp_finishTransform();
 }
 
 void BasicTransformAnimator::resetTranslation() {
+    mPosAnimator->prp_startTransform();
     mPosAnimator->setBaseValue(QPointF(0, 0));
+    mPosAnimator->prp_finishTransform();
 }
 
 void BasicTransformAnimator::resetRotation() {
+    mRotAnimator->prp_startTransform();
     mRotAnimator->setCurrentBaseValue(0);
+    mRotAnimator->prp_finishTransform();
 }
 
 void BasicTransformAnimator::reset() {
