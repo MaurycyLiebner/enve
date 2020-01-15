@@ -58,10 +58,8 @@ void PathPointsHandler::updateAllPoints() {
 
 void PathPointsHandler::setCtrlsMode(const int nodeId,
                                      const CtrlsMode mode) {
-    mTargetAnimator->beforeBinaryPathChange();
-    targetPath()->actionSetNormalNodeCtrlsMode(nodeId, mode);
+    mTargetAnimator->actionSetNormalNodeCtrlsMode(nodeId, mode);
     updatePoint(nodeId);
-    mTargetAnimator->pathChanged();
 }
 
 void PathPointsHandler::removeNode(const int nodeId, const bool approx) {
@@ -79,9 +77,7 @@ SmartNodePoint* PathPointsHandler::addNewAtEnd(const QPointF &relPos) {
 }
 
 void PathPointsHandler::promoteToNormal(const int nodeId) {
-    mTargetAnimator->beforeBinaryPathChange();
-    targetPath()->actionPromoteDissolvedNodeToNormal(nodeId);
-    mTargetAnimator->pathChanged();
+    mTargetAnimator->actionPromoteToNormal(nodeId);
 
     const int prevNormalId = targetPath()->prevNormalId(nodeId);
     const int nextNormalId = targetPath()->nextNormalId(nodeId);
@@ -91,9 +87,7 @@ void PathPointsHandler::promoteToNormal(const int nodeId) {
 
 void PathPointsHandler::demoteToDissolved(const int nodeId,
                                           const bool approx) {
-    mTargetAnimator->beforeBinaryPathChange();
-    targetPath()->actionDemoteToDissolved(nodeId, approx);
-    mTargetAnimator->pathChanged();
+    mTargetAnimator->actionDemoteToDissolved(nodeId, approx);
 
     const int prevNormalId = targetPath()->prevNormalId(nodeId);
     const int nextNormalId = targetPath()->nextNormalId(nodeId);

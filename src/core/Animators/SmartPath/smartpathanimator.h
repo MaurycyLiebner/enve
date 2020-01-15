@@ -77,14 +77,15 @@ public:
     bool isClosed() const
     { return mBaseValue.isClosed(); }
 
-    void beforeBinaryPathChange();
-    void afterBinaryPathChange();
-
     void prp_startTransform();
     SimpleTaskScheduler pathChanged;
     void pathChangedExec();
     void prp_cancelTransform();
     void prp_finishTransform();
+
+    void actionSetNormalNodeCtrlsMode(const int nodeId, const CtrlsMode mode);
+    void actionDemoteToDissolved(const int nodeId, const bool approx);
+    void actionPromoteToNormal(const int nodeId);
 
     void actionRemoveNode(const int nodeId, const bool approx);
     int actionAddNewAtStart(const QPointF &relPos);
@@ -103,7 +104,6 @@ public:
     void actionReverseAll();
 
     void actionAppendMoveAllFrom(SmartPathAnimator * const other);
-
     void actionPrependMoveAllFrom(SmartPathAnimator * const other);
 
     bool hasDetached() const

@@ -194,15 +194,6 @@ SkPath SmartPathAnimator::getPathAtRelFrame(const qreal frame) {
     return mBaseValue.getPathAt();
 }
 
-void SmartPathAnimator::beforeBinaryPathChange() {
-    prp_startTransform();
-}
-
-void SmartPathAnimator::afterBinaryPathChange() {
-    pathChangedExec();
-    prp_finishTransform();
-}
-
 void SmartPathAnimator::prp_startTransform() {
     if(mPathChanged) return;
     mPathChanged = true;
@@ -254,6 +245,35 @@ void SmartPathAnimator::prp_finishTransform() {
         };
         prp_addUndoRedo(ur);
     }
+}
+
+void SmartPathAnimator::actionSetNormalNodeCtrlsMode(
+        const int nodeId, const CtrlsMode mode) {
+    prp_pushUndoRedoName("Set Node Ctrls Mode");
+
+    prp_startTransform();
+    mPathBeingChanged_d->actionSetNormalNodeCtrlsMode(nodeId, mode);
+    prp_finishTransform();
+    pathChanged();
+}
+
+void SmartPathAnimator::actionDemoteToDissolved(
+        const int nodeId, const bool approx) {
+    prp_pushUndoRedoName("Demote Node");
+
+    prp_startTransform();
+    mPathBeingChanged_d->actionDemoteToDissolved(nodeId, approx);
+    prp_finishTransform();
+    pathChanged();
+}
+
+void SmartPathAnimator::actionPromoteToNormal(const int nodeId) {
+    prp_pushUndoRedoName("Promote Node");
+
+    prp_startTransform();
+    mPathBeingChanged_d->actionPromoteDissolvedNodeToNormal(nodeId);
+    prp_finishTransform();
+    pathChanged();
 }
 
 qsptr<SmartPathAnimator> SmartPathAnimator::createFromDetached() {
