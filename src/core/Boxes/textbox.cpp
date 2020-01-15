@@ -78,16 +78,55 @@ void TextBox::openTextEditor(QWidget* dialogParent) {
 }
 
 void TextBox::setTextHAlignment(const Qt::Alignment alignment) {
+    if(mHAlignment == alignment) return;
+    {
+        UndoRedo ur;
+        const auto oldValue = mHAlignment;
+        const auto newValue = alignment;
+        ur.fUndo = [this, oldValue]() {
+            setTextHAlignment(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setTextHAlignment(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mHAlignment = alignment;
     setPathsOutdated(UpdateReason::userChange);
 }
 
 void TextBox::setTextVAlignment(const Qt::Alignment alignment) {
+    if(mVAlignment == alignment) return;
+    {
+        UndoRedo ur;
+        const auto oldValue = mVAlignment;
+        const auto newValue = alignment;
+        ur.fUndo = [this, oldValue]() {
+            setTextVAlignment(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setTextVAlignment(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mVAlignment = alignment;
     setPathsOutdated(UpdateReason::userChange);
 }
 
 void TextBox::setFont(const QFont &font) {
+    if(mFont == font) return;
+    {
+        UndoRedo ur;
+        const auto oldValue = mFont;
+        const auto newValue = font;
+        ur.fUndo = [this, oldValue]() {
+            setFont(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setFont(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mFont = font;
     prp_afterWholeInfluenceRangeChanged();
     setPathsOutdated(UpdateReason::userChange);
