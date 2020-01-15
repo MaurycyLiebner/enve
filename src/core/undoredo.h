@@ -26,6 +26,16 @@ class UndoRedoSet;
 
 class UndoRedoStack : public StdSelfRef {
 public:
+    class StackBlock {
+    public:
+        StackBlock(UndoRedoStack& stack) : mStack(stack) {
+            mStack.mUndoRedoBlocked++;
+        }
+        ~StackBlock() { mStack.mUndoRedoBlocked--; }
+    private:
+        UndoRedoStack& mStack;
+    };
+
     UndoRedoStack(const std::function<bool(int)>& changeFrameFunc);
 
     void startNewSet();
@@ -38,9 +48,7 @@ public:
     bool undo();
     void emptySomeOfUndo();
 
-    void blockUndoRedo();
-    void unblockUndoRedo();
-    bool undoRedoBlocked();
+    StackBlock blockUndoRedo();
 
     void setFrame(const int frame)
     { mCurrentAbsFrame = frame; }
@@ -52,7 +60,7 @@ private:
     int mCurrentAbsFrame = 0;
     const std::function<bool(int)> mChangeFrameFunc;
 
-    bool mUndoRedoBlocked = false;
+    int mUndoRedoBlocked = 0;
     int mLastUndoRedoFrame = FrameRange::EMAX;
     int mNumberOfSets = 0;
 

@@ -35,6 +35,7 @@
 #include "Paint/painttarget.h"
 #include "CacheHandlers/usesharedpointer.h"
 #include "CacheHandlers/sceneframecontainer.h"
+#include "undoredo.h"
 
 class AnimatedSurface;
 class PaintBox;
@@ -573,7 +574,7 @@ public:
     void undo();
     void redo();
 
-    void blockUndoRedo();
+    UndoRedoStack::StackBlock blockUndoRedo();
     void unblockUndoRedo();
 
     void setParentToLastSelected();

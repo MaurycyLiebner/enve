@@ -96,6 +96,7 @@ void UndoRedoStack::emptySomeOfUndo() {
 
 void UndoRedoStack::addUndoRedo(const std::function<void()>& undoFunc,
                                 const std::function<void()>& redoFunc) {
+    if(mUndoRedoBlocked) return;
     if(!undoFunc) RuntimeThrow("Missing undo function.");
     if(!redoFunc) RuntimeThrow("Missing redo function.");
     const auto undoRedo = std::make_shared<UndoRedo_priv>(mCurrentAbsFrame,
@@ -104,6 +105,7 @@ void UndoRedoStack::addUndoRedo(const std::function<void()>& undoFunc,
 }
 
 void UndoRedoStack::addUndoRedo(const stdsptr<UndoRedo_priv>& undoRedo) {
+    if(mUndoRedoBlocked) return;
     if(mNumberOfSets != 0) {
         addToSet(undoRedo);
     } else {
@@ -118,7 +120,10 @@ bool UndoRedoStack::redo() {
     stdsptr<UndoRedo_priv> toRedo = mRedoStack.last();
     if(mChangeFrameFunc(toRedo->fFrame)) return true;
     mRedoStack.removeLast();
-    toRedo->fRedo();
+    {
+        const auto block = blockUndoRedo();
+        toRedo->fRedo();
+    }
     mUndoStack << toRedo;
     return true;
 }
@@ -128,19 +133,14 @@ bool UndoRedoStack::undo() {
     stdsptr<UndoRedo_priv> toUndo = mUndoStack.last();
     if(mChangeFrameFunc(toUndo->fFrame)) return true;
     mUndoStack.removeLast();
-    toUndo->fUndo();
+    {
+        const auto block = blockUndoRedo();
+        toUndo->fUndo();
+    }
     mRedoStack << toUndo;
     return true;
 }
 
-void UndoRedoStack::blockUndoRedo() {
-    mUndoRedoBlocked = true;
-}
-
-void UndoRedoStack::unblockUndoRedo() {
-    mUndoRedoBlocked = false;
-}
-
-bool UndoRedoStack::undoRedoBlocked() {
-    return mUndoRedoBlocked;
+UndoRedoStack::StackBlock UndoRedoStack::blockUndoRedo() {
+    return StackBlock(*this);
 }

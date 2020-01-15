@@ -19,7 +19,6 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QApplication>
-#include "undoredo.h"
 #include "MovablePoints/pathpivot.h"
 #include "Boxes/imagebox.h"
 #include "Sound/soundcomposition.h"
@@ -860,12 +859,8 @@ void Canvas::redo() {
     mUndoRedoStack->redo();
 }
 
-void Canvas::blockUndoRedo() {
-    mUndoRedoStack->blockUndoRedo();
-}
-
-void Canvas::unblockUndoRedo() {
-    mUndoRedoStack->unblockUndoRedo();
+UndoRedoStack::StackBlock Canvas::blockUndoRedo() {
+    return mUndoRedoStack->blockUndoRedo();
 }
 
 void Canvas::addUndoRedo(const stdfunc<void()>& undo,
