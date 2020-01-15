@@ -89,8 +89,9 @@ void Document::readScenes(eReadStream& src) {
     int nScenes;
     src.read(&nScenes, sizeof(int));
     for(int i = 0; i < nScenes; i++) {
-        const auto canvas = createNewScene();
-        canvas->readBoundingBox(src);
+        const auto scene = createNewScene();
+        const auto block = scene->blockUndoRedo();
+        scene->readBoundingBox(src);
         src.readCheckpoint("Error reading scene");
     }
 }

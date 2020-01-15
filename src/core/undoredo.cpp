@@ -156,7 +156,7 @@ bool UndoRedoStack::undo() {
 }
 
 UndoRedoStack::StackBlock UndoRedoStack::blockUndoRedo() {
-    return StackBlock(*this);
+    return StackBlock(this);
 }
 
 void UndoRedoStack::checkUndoRedoChanged() {

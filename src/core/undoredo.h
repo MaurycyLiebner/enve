@@ -29,12 +29,20 @@ class UndoRedoStack : public SelfRef {
 public:
     class StackBlock {
     public:
-        StackBlock(UndoRedoStack& stack) : mStack(stack) {
-            mStack.mUndoRedoBlocked++;
+        StackBlock(UndoRedoStack* stack = nullptr) : mStack(stack) {
+            if(mStack) mStack->mUndoRedoBlocked++;
         }
-        ~StackBlock() { mStack.mUndoRedoBlocked--; }
+
+        ~StackBlock() { reset(); }
+
+        void reset() {
+            if(mStack) {
+                mStack->mUndoRedoBlocked--;
+                mStack = nullptr;
+            }
+        }
     private:
-        UndoRedoStack& mStack;
+        UndoRedoStack* mStack = nullptr;
     };
 
     UndoRedoStack(const std::function<bool(int)>& changeFrameFunc);

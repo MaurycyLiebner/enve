@@ -633,7 +633,9 @@ eBoxOrSound *Actions::importFile(const QString &path,
                                  const int insertId,
                                  const QPointF &relDropPos,
                                  const int frame) {
-    if(!mActiveScene) return nullptr;
+    const auto scene = target->getParentScene();
+    auto block = scene ? scene->blockUndoRedo() :
+                         UndoRedoStack::StackBlock();
     qsptr<eBoxOrSound> result;
     const QFile file(path);
     if(!file.exists())
@@ -649,30 +651,32 @@ eBoxOrSound *Actions::importFile(const QString &path,
             result = createSoundForPath(path);
             target->insertContained(insertId, result);
         } else {
-            qsptr<BoundingBox> importedBox;
             try {
                 if(isImageExt(extension)) {
-                    importedBox = createImageBox(path);
+                    result = createImageBox(path);
                 } else if(isVideoExt(extension)) {
-                    importedBox = createVideoForPath(path);
+                    result = createVideoForPath(path);
                 } else {
-                    importedBox = ImportHandler::sInstance->import(path);
+                    result = ImportHandler::sInstance->import(path);
                 }
             } catch(const std::exception& e) {
                 gPrintExceptionCritical(e);
             }
-
-            result = importedBox;
-            if(importedBox) {
-                importedBox->planCenterPivotPosition();
-                target->insertContained(insertId, importedBox);
-                importedBox->startPosTransform();
-                importedBox->moveByAbs(relDropPos);
-                importedBox->finishTransform();
-            }
         }
     }
-    if(result && frame) result->shiftAll(frame);
+    if(result) {
+        if(frame) result->shiftAll(frame);
+        block.reset();
+        target->prp_pushUndoRedoName("Import File");
+        target->insertContained(insertId, result);
+        if(result->SWT_isBoundingBox()) {
+            const auto importedBox = static_cast<BoundingBox*>(result.get());
+            importedBox->planCenterPivotPosition();
+            importedBox->startPosTransform();
+            importedBox->moveByAbs(relDropPos);
+            importedBox->finishTransform();
+        }
+    }
     afterAction();
     return result.get();
 }
