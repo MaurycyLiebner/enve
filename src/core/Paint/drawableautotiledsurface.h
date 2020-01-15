@@ -19,90 +19,7 @@
 #include "autotiledsurface.h"
 #include "skia/skiahelpers.h"
 #include "CacheHandlers/hddcachablecont.h"
-
-struct TileBitmaps {
-    int fRowCount = 0;
-    int fColumnCount = 0;
-    int fZeroTileRow = 0;
-    int fZeroTileCol = 0;
-    QList<QList<SkBitmap>> fBitmaps;
-
-    TileBitmaps() {}
-
-    TileBitmaps(const TileBitmaps& src) {
-        fRowCount = src.fRowCount;
-        fColumnCount = src.fColumnCount;
-        fZeroTileRow = src.fZeroTileRow;
-        fZeroTileCol = src.fZeroTileCol;
-        fBitmaps.clear();
-        for(const auto& srcList : src.fBitmaps) {
-            fBitmaps << QList<SkBitmap>();
-            auto& list = fBitmaps.last();
-            for(const auto& srcBitmap : srcList) {
-                list << SkiaHelpers::makeCopy(srcBitmap);
-            }
-        }
-    }
-
-    TileBitmaps(TileBitmaps &&other) {
-        swap(other);
-    }
-
-    TileBitmaps &operator=(const TileBitmaps& other) {
-        TileBitmaps tmp(other);
-        swap(tmp);
-        return *this;
-    }
-
-    TileBitmaps &operator=(TileBitmaps &&other) {
-        TileBitmaps tmp(std::move(other));
-        swap(tmp);
-        return *this;
-    }
-
-    void write(eWriteStream& dst) const {
-        dst << fRowCount;
-        dst << fColumnCount;
-        dst << fZeroTileRow;
-        dst << fZeroTileCol;
-        for(const auto& col : fBitmaps) {
-            for(const auto& tile : col) {
-                SkiaHelpers::writeBitmap(tile, dst);
-            }
-        }
-    }
-
-    void read(eReadStream& src) {
-        src >> fRowCount;
-        src >> fColumnCount;
-        src >> fZeroTileRow;
-        src >> fZeroTileCol;
-        for(int i = 0; i < fColumnCount; i++) {
-            fBitmaps.append(QList<SkBitmap>());
-            auto& col = fBitmaps.last();
-            for(int j = 0; j < fZeroTileRow; j++)
-                col.append(SkiaHelpers::readBitmap(src));
-        }
-    }
-
-    void swap(TileBitmaps& other) {
-        fBitmaps.swap(other.fBitmaps);
-        std::swap(fRowCount, other.fRowCount);
-        std::swap(fColumnCount, other.fColumnCount);
-        std::swap(fZeroTileRow, other.fZeroTileRow);
-        std::swap(fZeroTileCol, other.fZeroTileCol);
-    }
-
-    bool isEmpty() const { return fBitmaps.isEmpty(); }
-
-    void clear() {
-        fBitmaps.clear();
-        fZeroTileCol = 0;
-        fZeroTileRow = 0;
-        fColumnCount = 0;
-        fRowCount = 0;
-    }
-};
+#include "tilebitmaps.h"
 
 class DrawableAutoTiledSurface : public HddCachable {
     e_OBJECT
@@ -115,18 +32,8 @@ protected:
     stdsptr<eHddTask> createTmpFileDataSaver();
     stdsptr<eHddTask> createTmpFileDataLoader();
 
-    int getByteCount() {
-        const int spixels = mColumnCount*mRowCount*TILE_SPIXEL_SIZE;
-        return spixels*static_cast<int>(sizeof(uint16_t));
-    }
-
-    int clearMemory() {
-        const int bytes = DrawableAutoTiledSurface::getByteCount();
-        clearBitmaps();
-        scheduleSaveToTmpFile();
-        return bytes;
-    }
-
+    int getByteCount();
+    int clearMemory();
     void noDataLeft_k() { Q_ASSERT(false); }
 public:
     void drawOnCanvas(SkCanvas * const canvas,
@@ -151,157 +58,58 @@ public:
         drawOnCanvas(canvas, dst, nullptr, paint);
     }
 
-    const AutoTiledSurface &surface() const {
-        return mSurface;
-    }
+    const AutoTiledSurface &surface() const
+    { return mSurface; }
 
-    void pixelRectChanged(const QRect& pixRect) {
-        if(mTmpFile) scheduleDeleteTmpFile();
-        updateTileRecBitmaps(pixRectToTileRect(pixRect));
-    }
+    void pixelRectChanged(const QRect& pixRect);
 
-    QRect pixelBoundingRect() const {
-        return tileRectToPixRect(tileBoundingRect());
-    }
+    QRect pixelBoundingRect() const
+    { return tileRectToPixRect(tileBoundingRect()); }
 
-    int width() const {
-        return pixelBoundingRect().width();
-    }
+    int width() const
+    { return pixelBoundingRect().width(); }
 
-    int height() const {
-        return pixelBoundingRect().height();
-    }
+    int height() const
+    { return pixelBoundingRect().height(); }
 
-    void write(eWriteStream& dst) {
-        if(!storesDataInMemory()) {
-            if(!mTmpFile) RuntimeThrow("No tmp file, and no data in memory");
-            dst.writeFile(mTmpFile.get());
-        } else mSurface.write(dst);
-    }
+    void write(eWriteStream& dst);
+    void read(eReadStream& src);
 
-    void read(eReadStream& src) {
-        mSurface.read(src);
-        afterDataReplaced();
-        updateTileBitmaps();
-    }
+    void updateTileBitmaps();
 
-    void updateTileBitmaps() {
-        updateTileRecBitmaps(mSurface.tileBoundingRect());
-    }
+    void clearBitmaps();
 
-    void clearBitmaps() {
-        mTileBitmaps.clear();
-    }
-
-    bool hasTileBitmaps() {
-        return !mTileBitmaps.isEmpty();
-    }
+    bool hasTileBitmaps()
+    { return !mTileBitmaps.isEmpty(); }
 
     void drawingDoneForNow() { afterDataReplaced(); }
 private:
     void updateTileRecBitmaps(QRect tileRect);
 
-    void setTileBitmaps(const TileBitmaps& tiles) {
-        mTileBitmaps = tiles;
-    }
+    void setTileBitmaps(const TileBitmaps& tiles);
+    void setTileBitmaps(TileBitmaps&& tiles);
 
-    void setTileBitmaps(TileBitmaps&& tiles) {
-        mTileBitmaps = std::move(tiles);
-    }
+    void stretchBitmapsToTile(const int tx, const int ty);
 
-    void stretchBitmapsToTile(const int tx, const int ty) {
-        const int colId = tx + mZeroTileCol;
-        const int rowId = ty + mZeroTileRow;
+    QList<SkBitmap> newBitmapColumn();
 
-        if(rowId < 0) {
-            prependBitmapRows(qAbs(rowId));
-        } else if(rowId >= mRowCount) {
-            appendBitmapRows(qAbs(rowId - mRowCount + 1));
-        }
-        if(colId < 0) {
-            prependBitmapColumns(qAbs(colId));
-        } else if(colId >= mColumnCount) {
-            appendBitmapColumns(qAbs(colId - mColumnCount + 1));
-        }
-    }
+    void prependBitmapRows(const int count);
+    void appendBitmapRows(const int count);
+    void prependBitmapColumns(const int count);
+    void appendBitmapColumns(const int count);
 
-    QList<SkBitmap> newBitmapColumn() {
-        QList<SkBitmap> col;
-        for(int j = 0; j < mRowCount; j++) col.append(SkBitmap());
-        return col;
-    }
+    SkBitmap bitmapForTile(const int tx, const int ty) const;
+    SkBitmap imageForTileId(const int colId, const int rowId) const;
 
-    void prependBitmapRows(const int count) {
-        for(auto& col : mBitmaps) {
-            for(int i = 0; i < count; i++) {
-                col.prepend(SkBitmap());
-            }
-        }
-        mRowCount += count;
-        mZeroTileRow += count;
-    }
+    QPoint zeroTile() const
+    { return QPoint(mZeroTileCol, mZeroTileRow); }
 
-    void appendBitmapRows(const int count) {
-        for(auto& col : mBitmaps) {
-            for(int i = 0; i < count; i++) {
-                col.append(SkBitmap());
-            }
-        }
-        mRowCount += count;
-    }
+    QPoint zeroTilePos() const
+    { return zeroTile()*TILE_SIZE; }
 
-    void prependBitmapColumns(const int count) {
-        for(int i = 0; i < count; i++) {
-            mBitmaps.prepend(newBitmapColumn());
-        }
-        mColumnCount += count;
-        mZeroTileCol += count;
-    }
-
-    void appendBitmapColumns(const int count) {
-        for(int i = 0; i < count; i++) {
-            mBitmaps.append(newBitmapColumn());
-        }
-        mColumnCount += count;
-    }
-
-    SkBitmap bitmapForTile(const int tx, const int ty) const {
-        const auto zeroTileV = zeroTile();
-        return imageForTileId(tx + zeroTileV.x(), ty + zeroTileV.y());
-    }
-
-    SkBitmap imageForTileId(const int colId, const int rowId) const {
-        return mBitmaps.at(colId).at(rowId);
-    }
-
-    QPoint zeroTile() const {
-        return QPoint(mZeroTileCol, mZeroTileRow);
-    }
-
-    QPoint zeroTilePos() const {
-        return zeroTile()*TILE_SIZE;
-    }
-
-    QRect tileBoundingRect() const {
-        return QRect(-mZeroTileCol, -mZeroTileRow,
-                     mColumnCount, mRowCount);
-    }
-
-    QRect tileRectToPixRect(const QRect& tileRect) const {
-        return QRect(tileRect.x()*TILE_SIZE,
-                     tileRect.y()*TILE_SIZE,
-                     tileRect.width()*TILE_SIZE,
-                     tileRect.height()*TILE_SIZE);
-    }
-
-    QRect pixRectToTileRect(const QRect& pixRect) const {
-        const int widthRem = (pixRect.width() % TILE_SIZE) ? 2 : 1;
-        const int heightRem = (pixRect.height() % TILE_SIZE) ? 2 : 1;
-        return QRect(qFloor(static_cast<qreal>(pixRect.x())/TILE_SIZE),
-                     qFloor(static_cast<qreal>(pixRect.y())/TILE_SIZE),
-                     pixRect.width()/TILE_SIZE + widthRem,
-                     pixRect.height()/TILE_SIZE + heightRem);
-    }
+    QRect tileBoundingRect() const;
+    QRect tileRectToPixRect(const QRect& tileRect) const;
+    QRect pixRectToTileRect(const QRect& pixRect) const;
 
     AutoTiledSurface mSurface;
     TileBitmaps mTileBitmaps;

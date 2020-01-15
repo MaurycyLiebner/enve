@@ -60,6 +60,32 @@ void DrawableAutoTiledSurface::drawOnCanvas(SkCanvas * const canvas,
     }
 }
 
+void DrawableAutoTiledSurface::pixelRectChanged(const QRect &pixRect) {
+    if(mTmpFile) scheduleDeleteTmpFile();
+    updateTileRecBitmaps(pixRectToTileRect(pixRect));
+}
+
+void DrawableAutoTiledSurface::write(eWriteStream &dst) {
+    if(!storesDataInMemory()) {
+        if(!mTmpFile) RuntimeThrow("No tmp file, and no data in memory");
+        dst.writeFile(mTmpFile.get());
+    } else mSurface.write(dst);
+}
+
+void DrawableAutoTiledSurface::read(eReadStream &src) {
+    mSurface.read(src);
+    afterDataReplaced();
+    updateTileBitmaps();
+}
+
+void DrawableAutoTiledSurface::updateTileBitmaps() {
+    updateTileRecBitmaps(mSurface.tileBoundingRect());
+}
+
+void DrawableAutoTiledSurface::clearBitmaps() {
+    mTileBitmaps.clear();
+}
+
 void DrawableAutoTiledSurface::updateTileRecBitmaps(QRect tileRect) {
     const QRect maxRect = mSurface.tileBoundingRect();
     if(!maxRect.intersects(tileRect)) return;
@@ -84,13 +110,106 @@ void DrawableAutoTiledSurface::updateTileRecBitmaps(QRect tileRect) {
     }
 }
 
+void DrawableAutoTiledSurface::setTileBitmaps(const TileBitmaps &tiles) {
+    mTileBitmaps = tiles;
+}
+
+void DrawableAutoTiledSurface::setTileBitmaps(TileBitmaps &&tiles) {
+    mTileBitmaps = std::move(tiles);
+}
+
+void DrawableAutoTiledSurface::stretchBitmapsToTile(const int tx, const int ty) {
+    const int colId = tx + mZeroTileCol;
+    const int rowId = ty + mZeroTileRow;
+
+    if(rowId < 0) {
+        prependBitmapRows(qAbs(rowId));
+    } else if(rowId >= mRowCount) {
+        appendBitmapRows(qAbs(rowId - mRowCount + 1));
+    }
+    if(colId < 0) {
+        prependBitmapColumns(qAbs(colId));
+    } else if(colId >= mColumnCount) {
+        appendBitmapColumns(qAbs(colId - mColumnCount + 1));
+    }
+}
+
+QList<SkBitmap> DrawableAutoTiledSurface::newBitmapColumn() {
+    QList<SkBitmap> col;
+    for(int j = 0; j < mRowCount; j++) col.append(SkBitmap());
+    return col;
+}
+
+void DrawableAutoTiledSurface::prependBitmapRows(const int count) {
+    for(auto& col : mBitmaps) {
+        for(int i = 0; i < count; i++) {
+            col.prepend(SkBitmap());
+        }
+    }
+    mRowCount += count;
+    mZeroTileRow += count;
+}
+
+void DrawableAutoTiledSurface::appendBitmapRows(const int count) {
+    for(auto& col : mBitmaps) {
+        for(int i = 0; i < count; i++) {
+            col.append(SkBitmap());
+        }
+    }
+    mRowCount += count;
+}
+
+void DrawableAutoTiledSurface::prependBitmapColumns(const int count) {
+    for(int i = 0; i < count; i++) {
+        mBitmaps.prepend(newBitmapColumn());
+    }
+    mColumnCount += count;
+    mZeroTileCol += count;
+}
+
+void DrawableAutoTiledSurface::appendBitmapColumns(const int count) {
+    for(int i = 0; i < count; i++) {
+        mBitmaps.append(newBitmapColumn());
+    }
+    mColumnCount += count;
+}
+
+SkBitmap DrawableAutoTiledSurface::bitmapForTile(const int tx, const int ty) const {
+    const auto zeroTileV = zeroTile();
+    return imageForTileId(tx + zeroTileV.x(), ty + zeroTileV.y());
+}
+
+SkBitmap DrawableAutoTiledSurface::imageForTileId(const int colId, const int rowId) const {
+    return mBitmaps.at(colId).at(rowId);
+}
+
+QRect DrawableAutoTiledSurface::tileBoundingRect() const {
+    return QRect(-mZeroTileCol, -mZeroTileRow, mColumnCount, mRowCount);
+}
+
+QRect DrawableAutoTiledSurface::tileRectToPixRect(const QRect &tileRect) const {
+    return QRect(tileRect.x()*TILE_SIZE,
+                 tileRect.y()*TILE_SIZE,
+                 tileRect.width()*TILE_SIZE,
+                 tileRect.height()*TILE_SIZE);
+}
+
+QRect DrawableAutoTiledSurface::pixRectToTileRect(const QRect &pixRect) const {
+    const int widthRem = (pixRect.width() % TILE_SIZE) ? 2 : 1;
+    const int heightRem = (pixRect.height() % TILE_SIZE) ? 2 : 1;
+    return QRect(qFloor(static_cast<qreal>(pixRect.x())/TILE_SIZE),
+                 qFloor(static_cast<qreal>(pixRect.y())/TILE_SIZE),
+                 pixRect.width()/TILE_SIZE + widthRem,
+                 pixRect.height()/TILE_SIZE + heightRem);
+}
+
 #include "CacheHandlers/tmploader.h"
 #include "CacheHandlers/tmpsaver.h"
 
 class SurfaceSaver : public TmpSaver {
     e_OBJECT
-public:
-    typedef std::function<void(const qsptr<QTemporaryFile>&)> Func;
+    public:
+        typedef std::function<void(const qsptr<QTemporaryFile>&)> Func;
 protected:
     SurfaceSaver(DrawableAutoTiledSurface* const target,
                  const AutoTiledSurface &surface) :
@@ -144,4 +263,16 @@ stdsptr<eHddTask> DrawableAutoTiledSurface::createTmpFileDataLoader() {
         }
     };
     return enve::make_shared<SurfaceLoader>(mTmpFile, this, func);
+}
+
+int DrawableAutoTiledSurface::getByteCount() {
+    const int spixels = mColumnCount*mRowCount*TILE_SPIXEL_SIZE;
+    return spixels*static_cast<int>(sizeof(uint16_t));
+}
+
+int DrawableAutoTiledSurface::clearMemory() {
+    const int bytes = DrawableAutoTiledSurface::getByteCount();
+    clearBitmaps();
+    scheduleSaveToTmpFile();
+    return bytes;
 }

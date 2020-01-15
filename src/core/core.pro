@@ -164,6 +164,7 @@ SOURCES += \
     Paint/onionskin.cpp \
     Paint/painttarget.cpp \
     Paint/simplebrushwrapper.cpp \
+    Paint/tilebitmaps.cpp \
     PathEffects/custompatheffect.cpp \
     PathEffects/dashpatheffect.cpp \
     PathEffects/displacepatheffect.cpp \
@@ -416,6 +417,7 @@ HEADERS += \
     Paint/onionskin.h \
     Paint/painttarget.h \
     Paint/simplebrushwrapper.h \
+    Paint/tilebitmaps.h \
     PathEffects/custompatheffect.h \
     PathEffects/custompatheffectcreator.h \
     PathEffects/dashpatheffect.h \
