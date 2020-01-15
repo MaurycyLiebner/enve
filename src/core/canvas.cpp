@@ -867,7 +867,7 @@ void Canvas::addUndoRedo(const QString& name,
     mUndoRedoStack->addUndoRedo(name, undo, redo);
 }
 
-void Canvas::pushUndoRedoName(const QString& name) {
+void Canvas::pushUndoRedoName(const QString& name) const {
     mUndoRedoStack->pushName(name);
 }
 

@@ -626,7 +626,7 @@ public:
     void addUndoRedo(const QString &name,
                      const stdfunc<void ()> &undo,
                      const stdfunc<void ()> &redo);
-    void pushUndoRedoName(const QString& name);
+    void pushUndoRedoName(const QString& name) const;
 
     UndoRedoStack* undoRedoStack() const
     { return mUndoRedoStack.get(); }

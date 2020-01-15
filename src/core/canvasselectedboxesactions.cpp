@@ -143,12 +143,14 @@ void Canvas::convertSelectedPathStrokesToPath() {
 }
 
 void Canvas::setSelectedTextAlignment(const Qt::Alignment alignment) const {
+    pushUndoRedoName("Change Text Alignment");
     for(const auto &box : mSelectedBoxes) {
         box->setTextHAlignment(alignment);
     }
 }
 
 void Canvas::setSelectedTextVAlignment(const Qt::Alignment alignment) const {
+    pushUndoRedoName("Change Text Alignment");
     for(const auto &box : mSelectedBoxes) {
         box->setTextVAlignment(alignment);
     }
@@ -156,28 +158,33 @@ void Canvas::setSelectedTextVAlignment(const Qt::Alignment alignment) const {
 
 void Canvas::setSelectedFontFamilyAndStyle(
         const QString& family, const QString& style) {
+    pushUndoRedoName("Change Font");
     for(const auto &box : mSelectedBoxes) {
         box->setSelectedFontFamilyAndStyle(family, style);
     }
 }
 
 void Canvas::setSelectedFontSize(const qreal size) {
+    pushUndoRedoName("Change Font Size");
     for(const auto &box : mSelectedBoxes) {
         box->setSelectedFontSize(size);
     }
 }
 
 void Canvas::resetSelectedTranslation() {
+    pushUndoRedoName("Reset Translation");
     for(const auto &box : mSelectedBoxes)
         box->resetTranslation();
 }
 
 void Canvas::resetSelectedScale() {
+    pushUndoRedoName("Reset Scale");
     for(const auto &box : mSelectedBoxes)
         box->resetScale();
 }
 
 void Canvas::resetSelectedRotation() {
+    pushUndoRedoName("Reset Rotation");
     for(const auto &box : mSelectedBoxes)
         box->resetRotation();
 }
@@ -201,18 +208,21 @@ void Canvas::applyPaintSettingToSelected(const PaintSettingsApplier &setting) {
 }
 
 void Canvas::setSelectedCapStyle(const SkPaint::Cap capStyle) {
+    pushUndoRedoName("Set Cap Style");
     for(const auto &box : mSelectedBoxes) {
         box->setStrokeCapStyle(capStyle);
     }
 }
 
 void Canvas::setSelectedJoinStyle(const SkPaint::Join joinStyle) {
+    pushUndoRedoName("Set Join Style");
     for(const auto &box : mSelectedBoxes) {
         box->setStrokeJoinStyle(joinStyle);
     }
 }
 
 void Canvas::setSelectedStrokeBrush(SimpleBrushWrapper * const brush) {
+    pushUndoRedoName("Set Stroke Brush");
     for(const auto &box : mSelectedBoxes) {
         box->setStrokeBrush(brush);
     }
@@ -376,6 +386,7 @@ void Canvas::ungroupSelectedBoxes() {
 }
 
 void Canvas::centerPivotForSelected() {
+    pushUndoRedoName("Center pivot");
     for(const auto &box : mSelectedBoxes)
         box->centerPivotPosition();
 }
