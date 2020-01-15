@@ -31,6 +31,12 @@ public:
         setShortcut(shortcut);
     }
 
+    NoShortcutAction(const QString &text,
+                     const QKeySequence &shortcut = 0,
+                     QObject * const parent = nullptr) :
+        QAction(text, parent) {
+        setShortcut(shortcut);
+    }
 protected:
     bool event(QEvent *e);
 };

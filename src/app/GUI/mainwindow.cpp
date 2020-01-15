@@ -307,23 +307,46 @@ void MainWindow::setupMenuBar() {
     mActions.redoAction->connect(redoQAct);
 
     mEditMenu->addSeparator();
-    mEditMenu->addAction(new NoShortcutAction("Cut",
-                         &mActions, &Actions::cutAction,
-                         Qt::CTRL + Qt::Key_X, mEditMenu));
-    mEditMenu->addAction(new NoShortcutAction("Copy",
-                         &mActions, &Actions::copyAction,
-                         Qt::CTRL + Qt::Key_C, mEditMenu));
-    mEditMenu->addAction(new NoShortcutAction("Paste",
-                         &mActions, &Actions::pasteAction,
-                         Qt::CTRL + Qt::Key_V, mEditMenu));
+
+    {
+        const auto qAct = new NoShortcutAction("Cut");
+        mEditMenu->addAction(qAct);
+        qAct->setShortcut(Qt::CTRL + Qt::Key_X);
+        mActions.cutAction->connect(qAct);
+    }
+
+    {
+        const auto qAct = new NoShortcutAction("Copy");
+        mEditMenu->addAction(qAct);
+        qAct->setShortcut(Qt::CTRL + Qt::Key_C);
+        mActions.copyAction->connect(qAct);
+    }
+
+    {
+        const auto qAct = new NoShortcutAction("Paste");
+        mEditMenu->addAction(qAct);
+        qAct->setShortcut(Qt::CTRL + Qt::Key_V);
+        mActions.pasteAction->connect(qAct);
+    }
+
     mEditMenu->addSeparator();
-    mEditMenu->addAction(new NoShortcutAction("Duplicate",
-                         &mActions, &Actions::duplicateAction,
-                         Qt::CTRL + Qt::Key_D, mEditMenu));
+
+    {
+        const auto qAct = new NoShortcutAction("Duplicate");
+        mEditMenu->addAction(qAct);
+        qAct->setShortcut(Qt::CTRL + Qt::Key_D);
+        mActions.duplicateAction->connect(qAct);
+    }
+
     mEditMenu->addSeparator();
-    mEditMenu->addAction(new NoShortcutAction("Delete",
-                         &mActions, &Actions::deleteAction,
-                         Qt::Key_Delete, mEditMenu));
+
+    {
+        const auto qAct = new NoShortcutAction("Delete");
+        mEditMenu->addAction(qAct);
+        qAct->setShortcut(Qt::Key_Delete);
+        mActions.deleteAction->connect(qAct);
+    }
+
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Select All",
                          &mActions, &Actions::selectAllAction,
@@ -351,35 +374,59 @@ void MainWindow::setupMenuBar() {
     mObjectMenu = mMenuBar->addMenu("Object");
 
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Raise",
-                           &mActions, &Actions::raiseAction,
-                           Qt::Key_PageUp);
-    mObjectMenu->addAction("Lower",
-                           &mActions, &Actions::lowerAction,
-                           Qt::Key_PageDown);
-    mObjectMenu->addAction("Raise to Top",
-                           &mActions, &Actions::raiseToTopAction,
-                           Qt::Key_Home);
-    mObjectMenu->addAction("Lower to Bottom",
-                           &mActions, &Actions::lowerToBottomAction,
-                           Qt::Key_End);
+
+    const auto raiseQAct = mObjectMenu->addAction("Raise");
+    raiseQAct->setShortcut(Qt::Key_PageUp);
+    mActions.raiseAction->connect(raiseQAct);
+
+    const auto lowerQAct = mObjectMenu->addAction("Lower");
+    lowerQAct->setShortcut(Qt::Key_PageDown);
+    mActions.lowerAction->connect(lowerQAct);
+
+    const auto rttQAct = mObjectMenu->addAction("Raise to Top");
+    rttQAct->setShortcut(Qt::Key_Home);
+    mActions.raiseToTopAction->connect(rttQAct);
+
+    const auto ltbQAct = mObjectMenu->addAction("Lower to Bottom");
+    ltbQAct->setShortcut(Qt::Key_End);
+    mActions.lowerToBottomAction->connect(ltbQAct);
+
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Rotate 90° CW",
-                           &mActions, &Actions::rotate90CWAction);
-    mObjectMenu->addAction("Rotate 90° CCW",
-                           &mActions, &Actions::rotate90CCWAction);
-    mObjectMenu->addAction("Flip Horizontal", &mActions,
-                           &Actions::flipHorizontalAction, Qt::Key_H);
-    mObjectMenu->addAction("Flip Vertical", &mActions,
-                           &Actions::flipVerticalAction, Qt::Key_V);
+
+    {
+        const auto qAct = mObjectMenu->addAction("Rotate 90° CW");
+        mActions.rotate90CWAction->connect(qAct);
+    }
+
+    {
+        const auto qAct = mObjectMenu->addAction("Rotate 90° CCW");
+        mActions.rotate90CCWAction->connect(qAct);
+    }
+
+    {
+        const auto qAct = mObjectMenu->addAction("Flip Horizontal");
+        qAct->setShortcut(Qt::Key_H);
+        mActions.flipHorizontalAction->connect(qAct);
+    }
+
+    {
+        const auto qAct = mObjectMenu->addAction("Flip Vertical");
+        qAct->setShortcut(Qt::Key_V);
+        mActions.flipVerticalAction->connect(qAct);
+    }
+
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Group", &mActions,
-                           &Actions::groupSelectedBoxes,
-                           Qt::CTRL + Qt::Key_G);
-    mObjectMenu->addAction("Ungroup", &mActions,
-                           &Actions::ungroupSelectedBoxes,
-                           Qt::CTRL + Qt::SHIFT + Qt::Key_G);
+
+    const auto groupQAct = mObjectMenu->addAction("Group");
+    groupQAct->setShortcut(Qt::CTRL + Qt::Key_G);
+    mActions.groupAction->connect(groupQAct);
+
+    const auto ungroupQAct = mObjectMenu->addAction("Ungroup");
+    ungroupQAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
+    mActions.ungroupAction->connect(ungroupQAct);
+
     mObjectMenu->addSeparator();
+
     const auto transformMenu = mObjectMenu->addMenu("Transform");
     const auto moveAct = transformMenu->addAction("Move");
     moveAct->setShortcut(Qt::Key_G);
@@ -401,35 +448,61 @@ void MainWindow::setupMenuBar() {
 
     mPathMenu = mMenuBar->addMenu("Path");
 
-    mPathMenu->addAction("Object to Path", &mActions,
-                         &Actions::objectsToPathAction);
-    mPathMenu->addAction("Stroke to Path", &mActions,
-                         &Actions::strokeToPathAction);
+    const auto otpQAct = mPathMenu->addAction("Object to Path");
+    mActions.objectsToPathAction->connect(otpQAct);
+
+    const auto stpQAct = mPathMenu->addAction("Stroke to Path");
+    mActions.strokeToPathAction->connect(stpQAct);
+
     mPathMenu->addSeparator();
-    mPathMenu->addAction("Union", &mActions,
-                         &Actions::pathsUnionAction,
-                         Qt::CTRL + Qt::Key_Plus);
-    mPathMenu->addAction("Difference", &mActions,
-                         &Actions::pathsDifferenceAction,
-                         Qt::CTRL + Qt::Key_Minus);
-    mPathMenu->addAction("Intersection", &mActions,
-                         &Actions::pathsIntersectionAction,
-                         Qt::CTRL + Qt::Key_Asterisk);
-    mPathMenu->addAction("Exclusion", &mActions,
-                         &Actions::pathsExclusionAction,
-                         Qt::CTRL + Qt::Key_AsciiCircum);
-    mPathMenu->addAction("Division", &mActions,
-                         &Actions::pathsDivisionAction,
-                         Qt::CTRL + Qt::Key_Slash);
+
+    {
+        const auto qAct = mPathMenu->addAction("Union");
+        qAct->setShortcut(Qt::CTRL + Qt::Key_Plus);
+        mActions.pathsUnionAction->connect(qAct);
+    }
+
+    {
+        const auto qAct = mPathMenu->addAction("Difference");
+        qAct->setShortcut(Qt::CTRL + Qt::Key_Minus);
+        mActions.pathsDifferenceAction->connect(qAct);
+    }
+
+    {
+        const auto qAct = mPathMenu->addAction("Intersection");
+        qAct->setShortcut(Qt::CTRL + Qt::Key_Asterisk);
+        mActions.pathsIntersectionAction->connect(qAct);
+    }
+
+    {
+        const auto qAct = mPathMenu->addAction("Exclusion");
+        qAct->setShortcut(Qt::CTRL + Qt::Key_AsciiCircum);
+        mActions.pathsExclusionAction->connect(qAct);
+    }
+
+    {
+        const auto qAct = mPathMenu->addAction("Division");
+        qAct->setShortcut(Qt::CTRL + Qt::Key_Slash);
+        mActions.pathsDivisionAction->connect(qAct);
+    }
+
+
 //    mPathMenu->addAction("Cut Path", mCanvas,
 //                         &Actions::pathsCutAction);
+
     mPathMenu->addSeparator();
-    mPathMenu->addAction("Combine", &mActions,
-                         &Actions::pathsCombineAction,
-                         Qt::CTRL + Qt::Key_K);
-    mPathMenu->addAction("Break Apart", &mActions,
-                         &Actions::pathsBreakApartAction,
-                         Qt::CTRL + Qt::SHIFT + Qt::Key_K);
+
+    {
+        const auto qAct = mPathMenu->addAction("Combine");
+        qAct->setShortcut(Qt::CTRL + Qt::Key_K);
+        mActions.pathsCombineAction->connect(qAct);
+    }
+
+    {
+        const auto qAct = mPathMenu->addAction("Break Apart");
+        qAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_K);
+        mActions.pathsBreakApartAction->connect(qAct);
+    }
 
 //    mEffectsMenu = mMenuBar->addMenu("Effects");
 

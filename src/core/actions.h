@@ -40,27 +40,6 @@ public:
 
     static Actions* sInstance;
 
-    void raiseAction() const;
-    void lowerAction() const;
-    void raiseToTopAction() const;
-    void lowerToBottomAction() const;
-
-    void objectsToPathAction() const;
-    void strokeToPathAction() const;
-
-    void rotate90CWAction() const;
-    void rotate90CCWAction() const;
-    void flipHorizontalAction() const;
-    void flipVerticalAction() const;
-
-    void pathsUnionAction() const;
-    void pathsDifferenceAction() const;
-    void pathsIntersectionAction() const;
-    void pathsDivisionAction() const;
-    void pathsExclusionAction() const;
-    void pathsCombineAction() const;
-    void pathsBreakApartAction() const;
-
     void setTextAlignment(const Qt::Alignment alignment) const;
     void setTextVAlignment(const Qt::Alignment alignment) const;
     void setFontFamilyAndStyle(const QString& family,
@@ -81,18 +60,9 @@ public:
 
     void newEmptyPaintFrame();
 
-    void deleteAction() const;
-    void copyAction() const;
-    void pasteAction() const;
-    void cutAction() const;
-    void duplicateAction() const;
-
     void selectAllAction() const;
     void invertSelectionAction() const;
     void clearSelectionAction() const;
-
-    void groupSelectedBoxes() const;
-    void ungroupSelectedBoxes() const;
 
     void startSelectedStrokeColorTransform() const;
     void startSelectedFillColorTransform() const;
@@ -135,6 +105,36 @@ public:
     bool smoothChange() const { return mSmoothChange; }
     void startSmoothChange() { mSmoothChange = true; }
     void finishSmoothChange();
+
+    UndoableAction* raiseAction;
+    UndoableAction* lowerAction;
+    UndoableAction* raiseToTopAction;
+    UndoableAction* lowerToBottomAction;
+
+    UndoableAction* objectsToPathAction;
+    UndoableAction* strokeToPathAction;
+
+    UndoableAction* groupAction;
+    UndoableAction* ungroupAction;
+
+    UndoableAction* pathsUnionAction;
+    UndoableAction* pathsDifferenceAction;
+    UndoableAction* pathsIntersectionAction;
+    UndoableAction* pathsDivisionAction;
+    UndoableAction* pathsExclusionAction;
+    UndoableAction* pathsCombineAction;
+    UndoableAction* pathsBreakApartAction;
+
+    UndoableAction* deleteAction;
+    UndoableAction* copyAction;
+    UndoableAction* pasteAction;
+    UndoableAction* cutAction;
+    UndoableAction* duplicateAction;
+
+    UndoableAction* rotate90CWAction;
+    UndoableAction* rotate90CCWAction;
+    UndoableAction* flipHorizontalAction;
+    UndoableAction* flipVerticalAction;
 
     Action* undoAction;
     Action* redoAction;

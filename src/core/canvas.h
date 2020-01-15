@@ -427,7 +427,8 @@ signals:
     void newFrameRange(FrameRange);
     void currentBoxChanged(BoundingBox*);
     void selectedPaintSettingsChanged();
-    void selectionChanged();
+    void objectSelectionChanged();
+    void pointSelectionChanged();
     void currentFrameChanged(int);
     void currentContainerSet(ContainerBox*);
     void dimensionsChanged(int, int);

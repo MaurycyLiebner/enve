@@ -61,12 +61,12 @@ void KeysView::dragMoveEvent(QDragMoveEvent *event) {
 
 void KeysView::setCurrentScene(Canvas * const scene) {
     if(mCurrentScene) {
-        disconnect(mCurrentScene.data(), &Canvas::selectionChanged,
+        disconnect(mCurrentScene.data(), &Canvas::objectSelectionChanged,
                    this, &KeysView::graphUpdateVisbile);
     }
     mCurrentScene = scene;
     if(mCurrentScene) {
-        connect(mCurrentScene.data(), &Canvas::selectionChanged,
+        connect(mCurrentScene.data(), &Canvas::objectSelectionChanged,
                 this, &KeysView::graphUpdateVisbile);
     }
     graphUpdateVisbile();

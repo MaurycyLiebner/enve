@@ -205,13 +205,14 @@ void Canvas::addPointToSelection(MovablePoint* const point) {
     };
     point->setSelected(true, ptDeselector);
     mSelectedPoints_d.append(point);
+    emit pointSelectionChanged();
     schedulePivotUpdate();
 }
 
 void Canvas::removePointFromSelection(MovablePoint * const point) {
     point->setSelected(false);
     mSelectedPoints_d.removeOne(point);
-
+    emit pointSelectionChanged();
     schedulePivotUpdate();
 }
 
@@ -229,7 +230,9 @@ void Canvas::removeSelectedPointsAndClearList() {
         point->setSelected(false);
         point->remove();
     }
-    mSelectedPoints_d.clear(); schedulePivotUpdate();
+    mSelectedPoints_d.clear();
+    emit pointSelectionChanged();
+    schedulePivotUpdate();
 }
 
 void Canvas::clearPointsSelection() {
@@ -238,6 +241,7 @@ void Canvas::clearPointsSelection() {
     }
 
     mSelectedPoints_d.clear();
+    emit pointSelectionChanged();
     if(mCurrentMode == CanvasMode::pointTransform) schedulePivotUpdate();
 //    if(mLastPressedPoint) {
 //        mLastPressedPoint->setSelected(false);

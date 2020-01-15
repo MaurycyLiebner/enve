@@ -39,7 +39,7 @@ public:
 
     void connect(QAction* const action);
 
-    void operator()() const { execute(); }
+    void operator()() const { if(canExecute()) execute(); }
 
     void raiseCanExecuteChanged()
     { emit canExecuteChanged(canExecute()); }
@@ -48,6 +48,20 @@ public:
 signals:
     void canExecuteChanged(bool can);
     void textChanged(const QString& text);
+};
+
+class UndoableAction : public Action {
+public:
+    explicit UndoableAction(const std::function<bool()>& canExecuteFunc,
+                            const std::function<void()>& executeFunc,
+                            const std::function<QString()>& textFunc,
+                            const std::function<void(const QString&)>& pushNameFunc,
+                            QObject *parent = nullptr);
+    explicit UndoableAction(const std::function<bool()>& canExecuteFunc,
+                            const std::function<void()>& executeFunc,
+                            const QString& textVal,
+                            const std::function<void(const QString&)>& pushNameFunc,
+                            QObject *parent = nullptr);
 };
 
 #endif // ACTION_H

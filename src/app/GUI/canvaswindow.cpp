@@ -292,21 +292,21 @@ bool CanvasWindow::handleCutCopyPasteKeyPress(QKeyEvent *event) {
     if(event->modifiers() & Qt::ControlModifier &&
             event->key() == Qt::Key_V) {
         if(event->isAutoRepeat()) return false;
-        mActions.pasteAction();
+        (*mActions.pasteAction)();
     } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_C) {
         if(event->isAutoRepeat()) return false;
-        mActions.copyAction();
+        (*mActions.copyAction)();
     } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_D) {
         if(event->isAutoRepeat()) return false;
-        mActions.duplicateAction();
+        (*mActions.duplicateAction)();
     } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_X) {
         if(event->isAutoRepeat()) return false;
-        mActions.cutAction();
+        (*mActions.cutAction)();
     } else if(event->key() == Qt::Key_Delete) {
-        mActions.deleteAction();
+        (*mActions.deleteAction)();
     } else return false;
     return true;
 }
@@ -356,9 +356,9 @@ bool CanvasWindow::handleGroupChangeKeyPress(QKeyEvent *event) {
     if(event->modifiers() & Qt::ControlModifier &&
        event->key() == Qt::Key_G) {
        if(event->modifiers() & Qt::ShiftModifier) {
-           mActions.ungroupSelectedBoxes();
+           (*mActions.ungroupAction)();
        } else {
-           mActions.groupSelectedBoxes();
+           (*mActions.groupAction)();
        }
     } else return false;
     return true;

@@ -41,3 +41,23 @@ void Action::connect(QAction * const action) {
     action->setText(text());
     action->setEnabled(canExecute());
 }
+
+UndoableAction::UndoableAction(const std::function<bool()>& canExecuteFunc,
+                               const std::function<void()>& executeFunc,
+                               const std::function<QString()>& textFunc,
+                               const std::function<void(const QString&)>& pushNameFunc,
+                               QObject *parent) :
+    Action(canExecuteFunc,
+           [this, executeFunc, pushNameFunc]() {
+                pushNameFunc(text());
+                executeFunc();
+           },
+           textFunc, parent) {}
+
+UndoableAction::UndoableAction(const std::function<bool()>& canExecuteFunc,
+                               const std::function<void()>& executeFunc,
+                               const QString &textVal,
+                               const std::function<void(const QString&)>& pushNameFunc,
+                               QObject *parent) :
+    UndoableAction(canExecuteFunc, executeFunc,
+                   [textVal]() { return textVal; }, pushNameFunc, parent) {}

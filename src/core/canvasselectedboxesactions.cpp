@@ -421,7 +421,7 @@ void Canvas::addBoxToSelection(BoundingBox * const box) {
         if(box->SWT_isPaintBox()) mPaintTarget.setPaintBox(static_cast<PaintBox*>(box));
     }
     emit selectedPaintSettingsChanged();
-    emit selectionChanged();
+    emit objectSelectionChanged();
 }
 
 void Canvas::removeBoxFromSelection(BoundingBox * const box) {
@@ -433,7 +433,7 @@ void Canvas::removeBoxFromSelection(BoundingBox * const box) {
     if(mSelectedBoxes.isEmpty()) setCurrentBox(nullptr);
     else setCurrentBox(mSelectedBoxes.last());
     emit selectedPaintSettingsChanged();
-    emit selectionChanged();
+    emit objectSelectionChanged();
 }
 
 void Canvas::clearBoxesSelection() {
@@ -452,7 +452,7 @@ void Canvas::clearBoxesSelectionList() {
         mPaintTarget.setPaintBox(nullptr);
     mSelectedBoxes.clear();
     emit selectedPaintSettingsChanged();
-    emit selectionChanged();
+    emit objectSelectionChanged();
 }
 
 void Canvas::applyCurrentTransformationToSelected() {

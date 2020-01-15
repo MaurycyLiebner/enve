@@ -32,6 +32,11 @@ Actions::Actions(Document &document) : mDocument(document),
     connect(&document, &Document::activeSceneSet,
             this, &Actions::connectToActiveScene);
 
+    const auto pushName = [this](const QString& name) {
+        if(!mActiveScene) return;
+        mActiveScene->pushUndoRedoName(name);
+    };
+
     { // undoAction
         const auto undoActionCan = [this]() {
             if(!mActiveScene) return false;
@@ -65,108 +70,332 @@ Actions::Actions(Document &document) : mDocument(document),
         redoAction = new Action(redoActionCan, redoActionExec,
                                 redoActionText, this);
     }
-}
 
-void Actions::raiseAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->raiseSelectedBoxes();
-    afterAction();
-}
+    { // raiseAction
+        const auto raiseActionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto raiseActionExec = [this]() {
+            mActiveScene->raiseSelectedBoxes();
+            afterAction();
+        };
+        raiseAction = new UndoableAction(raiseActionCan, raiseActionExec,
+                                         "Raise", pushName, this);
+    }
 
-void Actions::lowerAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->lowerSelectedBoxes();
-    afterAction();
-}
+    { // lowerAction
+        const auto lowerActionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto lowerActionExec = [this]() {
+            mActiveScene->lowerSelectedBoxes();
+            afterAction();
+        };
+        lowerAction = new UndoableAction(lowerActionCan, lowerActionExec,
+                                         "Lower", pushName, this);
+    }
 
-void Actions::raiseToTopAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->raiseSelectedBoxesToTop();
-    afterAction();
-}
+    { // raiseToTopAction
+        const auto raiseToTopActionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto raiseToTopActionExec = [this]() {
+            mActiveScene->raiseSelectedBoxesToTop();
+            afterAction();
+        };
+        raiseToTopAction = new UndoableAction(raiseToTopActionCan,
+                                              raiseToTopActionExec,
+                                              "Raise to Top", pushName,
+                                              this);
+    }
 
-void Actions::lowerToBottomAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->lowerSelectedBoxesToBottom();
-    afterAction();
-}
 
-void Actions::objectsToPathAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->convertSelectedBoxesToPath();
-    afterAction();
-}
+    { // lowerToBottomAction
+        const auto lowerToBottomActionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto lowerToBottomActionExec = [this]() {
+            mActiveScene->lowerSelectedBoxesToBottom();
+            afterAction();
+        };
+        lowerToBottomAction = new UndoableAction(lowerToBottomActionCan,
+                                                 lowerToBottomActionExec,
+                                                 "Lower to Bottom", pushName,
+                                                 this);
+    }
 
-void Actions::strokeToPathAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->convertSelectedPathStrokesToPath();
-    afterAction();
-}
+    { // objectsToPathAction
+        const auto objectsToPathActionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto objectsToPathActionExec = [this]() {
+            mActiveScene->convertSelectedBoxesToPath();
+            afterAction();
+        };
+        objectsToPathAction = new UndoableAction(objectsToPathActionCan,
+                                                 objectsToPathActionExec,
+                                                 "Object to Path", pushName,
+                                                 this);
+    }
 
-void Actions::rotate90CWAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->rotateSelectedBoxesStartAndFinish(90);
-    afterAction();
-}
+    { // strokeToPathAction
+        const auto strokeToPathActionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto strokeToPathActionExec = [this]() {
+            mActiveScene->convertSelectedPathStrokesToPath();
+            afterAction();
+        };
+        strokeToPathAction = new UndoableAction(strokeToPathActionCan,
+                                                strokeToPathActionExec,
+                                                "Stroke to Path", pushName,
+                                                this);
+    }
 
-void Actions::rotate90CCWAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->rotateSelectedBoxesStartAndFinish(-90);
-    afterAction();
-}
+    { // groupAction
+        const auto groupActionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto groupActionExec = [this]() {
+            mActiveScene->groupSelectedBoxes();
+            afterAction();
+        };
+        groupAction = new UndoableAction(groupActionCan,
+                                         groupActionExec,
+                                         "Group", pushName,
+                                         this);
+    }
 
-void Actions::flipHorizontalAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->flipSelectedBoxesHorizontally();
-    afterAction();
-}
+    { // ungroupAction
+        const auto ungroupActionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto ungroupActionExec = [this]() {
+            mActiveScene->ungroupSelectedBoxes();
+            afterAction();
+        };
+        ungroupAction = new UndoableAction(ungroupActionCan,
+                                           ungroupActionExec,
+                                           "Ungroup", pushName,
+                                           this);
+    }
 
-void Actions::flipVerticalAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->flipSelectedBoxesVertically();
-    afterAction();
-}
+    { // pathsUnionAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->selectedPathsUnion();
+            afterAction();
+        };
+        pathsUnionAction = new UndoableAction(actionCan, actionExec,
+                                              "Union", pushName, this);
+    }
 
-void Actions::pathsUnionAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->selectedPathsUnion();
-    afterAction();
-}
+    { // pathsDifferenceAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->selectedPathsDifference();
+            afterAction();
+        };
+        pathsDifferenceAction = new UndoableAction(actionCan, actionExec,
+                                                   "Difference", pushName, this);
+    }
 
-void Actions::pathsDifferenceAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->selectedPathsDifference();
-    afterAction();
-}
+    { // pathsIntersectionAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->selectedPathsIntersection();
+            afterAction();
+        };
+        pathsIntersectionAction = new UndoableAction(actionCan, actionExec,
+                                                     "Intersection", pushName, this);
+    }
 
-void Actions::pathsIntersectionAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->selectedPathsIntersection();
-    afterAction();
-}
+    { // pathsDivisionAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->selectedPathsDivision();
+            afterAction();
+        };
+        pathsDivisionAction = new UndoableAction(actionCan, actionExec,
+                                                 "Division", pushName, this);
+    }
 
-void Actions::pathsDivisionAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->selectedPathsDivision();
-    afterAction();
-}
+    { // pathsExclusionAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->selectedPathsExclusion();
+            afterAction();
+        };
+        pathsExclusionAction = new UndoableAction(actionCan, actionExec,
+                                                  "Exclusion", pushName, this);
+    }
 
-void Actions::pathsExclusionAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->selectedPathsExclusion();
-    afterAction();
-}
+    { // pathsCombineAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->selectedPathsCombine();
+            afterAction();
+        };
+        pathsCombineAction = new UndoableAction(actionCan, actionExec,
+                                                "Combine", pushName, this);
+    }
 
-void Actions::pathsCombineAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->selectedPathsCombine();
-    afterAction();
-}
+    { // pathsBreakApartAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->selectedPathsBreakApart();
+            afterAction();
+        };
+        pathsBreakApartAction = new UndoableAction(actionCan, actionExec,
+                                                   "Break Apart", pushName, this);
+    }
 
-void Actions::pathsBreakApartAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->selectedPathsBreakApart();
-    afterAction();
+    { // deleteAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty() ||
+                   !mActiveScene->isPointSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->deleteAction();
+            afterAction();
+        };
+        deleteAction = new UndoableAction(actionCan, actionExec,
+                                          "Delete", pushName, this);
+    }
+
+    { // copyAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->copyAction();
+            afterAction();
+        };
+        copyAction = new UndoableAction(actionCan, actionExec,
+                                        "Copy", pushName, this);
+    }
+
+    { // pasteAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->pasteAction();
+            afterAction();
+        };
+        pasteAction = new UndoableAction(actionCan, actionExec,
+                                        "Paste", pushName, this);
+    }
+
+    { // cutAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->cutAction();
+            afterAction();
+        };
+        cutAction = new UndoableAction(actionCan, actionExec,
+                                       "Cut", pushName, this);
+    }
+
+    { // duplicateAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->duplicateAction();
+            afterAction();
+        };
+        duplicateAction = new UndoableAction(actionCan, actionExec,
+                                             "Duplicate", pushName, this);
+    }
+
+    { // rotate90CWAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->rotateSelectedBoxesStartAndFinish(90);
+            afterAction();
+        };
+        rotate90CWAction = new UndoableAction(actionCan, actionExec,
+                                              "Rotate 90° CW", pushName, this);
+    }
+
+    { // rotate90CCWAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->rotateSelectedBoxesStartAndFinish(-90);
+            afterAction();
+        };
+        rotate90CCWAction = new UndoableAction(actionCan, actionExec,
+                                               "Rotate 90° CCW", pushName, this);
+    }
+
+    { // flipHorizontalAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->flipSelectedBoxesHorizontally();
+            afterAction();
+        };
+        flipHorizontalAction = new UndoableAction(actionCan, actionExec,
+                                                  "Flip Horizontal", pushName, this);
+    }
+
+    { // flipVerticalAction
+        const auto actionCan = [this]() {
+            if(!mActiveScene) return false;
+            return !mActiveScene->isBoxSelectionEmpty();
+        };
+        const auto actionExec = [this]() {
+            mActiveScene->flipSelectedBoxesVertically();
+            afterAction();
+        };
+        flipVerticalAction = new UndoableAction(actionCan, actionExec,
+                                                "Flip Vertical", pushName, this);
+    }
 }
 
 void Actions::setTextAlignment(const Qt::Alignment alignment) const {
@@ -259,35 +488,6 @@ void Actions::newEmptyPaintFrame() {
     afterAction();
 }
 
-void Actions::deleteAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->deleteAction();
-    afterAction();
-}
-
-void Actions::copyAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->copyAction();
-}
-
-void Actions::pasteAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->pasteAction();
-    afterAction();
-}
-
-void Actions::cutAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->cutAction();
-    afterAction();
-}
-
-void Actions::duplicateAction() const {
-    if(!mActiveScene) return;
-    mActiveScene->duplicateAction();
-    afterAction();
-}
-
 void Actions::selectAllAction() const {
     if(!mActiveScene) return;
     mActiveScene->selectAllAction();
@@ -301,18 +501,6 @@ void Actions::invertSelectionAction() const {
 void Actions::clearSelectionAction() const {
     if(!mActiveScene) return;
     mActiveScene->clearSelectionAction();
-}
-
-void Actions::groupSelectedBoxes() const {
-    if(!mActiveScene) return;
-    mActiveScene->groupSelectedBoxes();
-    afterAction();
-}
-
-void Actions::ungroupSelectedBoxes() const {
-    if(!mActiveScene) return;
-    mActiveScene->ungroupSelectedBoxes();
-    afterAction();
 }
 
 void Actions::startSelectedStrokeColorTransform() const {
@@ -539,6 +727,10 @@ void Actions::connectToActiveScene() {
     conn.clear();
     if(!mActiveScene) return;
 
+    undoAction->raiseCanExecuteChanged();
+    undoAction->raiseTextChanged();
+    redoAction->raiseCanExecuteChanged();
+    redoAction->raiseTextChanged();
     {
         const auto urStack = mActiveScene->undoRedoStack();
         conn << connect(urStack, &UndoRedoStack::canUndoChanged,
@@ -550,6 +742,99 @@ void Actions::connectToActiveScene() {
                         redoAction, &Action::raiseCanExecuteChanged);
         conn << connect(urStack, &UndoRedoStack::redoTextChanged,
                         redoAction, &Action::raiseTextChanged);
+    }
+
+    raiseAction->raiseCanExecuteChanged();
+    lowerAction->raiseCanExecuteChanged();
+    raiseToTopAction->raiseCanExecuteChanged();
+    lowerToBottomAction->raiseCanExecuteChanged();
+    {
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        raiseAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        lowerAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        raiseToTopAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        lowerToBottomAction, &Action::raiseCanExecuteChanged);
+    }
+
+    objectsToPathAction->raiseCanExecuteChanged();
+    strokeToPathAction->raiseCanExecuteChanged();
+    {
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        objectsToPathAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        strokeToPathAction, &Action::raiseCanExecuteChanged);
+    }
+
+    groupAction->raiseCanExecuteChanged();
+    ungroupAction->raiseCanExecuteChanged();
+    {
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        groupAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        ungroupAction, &Action::raiseCanExecuteChanged);
+    }
+
+
+    pathsUnionAction->raiseCanExecuteChanged();
+    pathsDifferenceAction->raiseCanExecuteChanged();
+    pathsIntersectionAction->raiseCanExecuteChanged();
+    pathsDivisionAction->raiseCanExecuteChanged();
+    pathsExclusionAction->raiseCanExecuteChanged();
+    pathsCombineAction->raiseCanExecuteChanged();
+    pathsBreakApartAction->raiseCanExecuteChanged();
+    {
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        pathsUnionAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        pathsDifferenceAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        pathsIntersectionAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        pathsDivisionAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        pathsExclusionAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        pathsCombineAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        pathsBreakApartAction, &Action::raiseCanExecuteChanged);
+    }
+
+    deleteAction->raiseCanExecuteChanged();
+    copyAction->raiseCanExecuteChanged();
+    pasteAction->raiseCanExecuteChanged();
+    cutAction->raiseCanExecuteChanged();
+    duplicateAction->raiseCanExecuteChanged();
+    {
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        deleteAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::pointSelectionChanged,
+                        deleteAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        copyAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        pasteAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        cutAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        duplicateAction, &Action::raiseCanExecuteChanged);
+    }
+
+    rotate90CWAction->raiseCanExecuteChanged();
+    rotate90CCWAction->raiseCanExecuteChanged();
+    flipHorizontalAction->raiseCanExecuteChanged();
+    flipVerticalAction->raiseCanExecuteChanged();
+    {
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        rotate90CWAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        rotate90CCWAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        flipHorizontalAction, &Action::raiseCanExecuteChanged);
+        conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
+                        flipVerticalAction, &Action::raiseCanExecuteChanged);
     }
 }
 
