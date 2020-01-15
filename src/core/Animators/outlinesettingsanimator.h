@@ -82,7 +82,7 @@ public:
     }
 
     void setOutlineCompositionMode(
-            const QPainter::CompositionMode &compositionMode);
+            const QPainter::CompositionMode compositionMode);
 
     QPainter::CompositionMode getOutlineCompositionMode();
     void setLineWidthUpdaterTarget(PathBox * const path);

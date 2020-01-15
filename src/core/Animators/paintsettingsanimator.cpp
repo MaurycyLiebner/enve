@@ -99,6 +99,24 @@ QColor PaintSettingsAnimator::getColor(const qreal relFrame) const {
     return mColor->getColor(relFrame);
 }
 
+void PaintSettingsAnimator::setGradientType(const GradientType type) {
+    if(mGradientType == type) return;
+    {
+        UndoRedo ur;
+        const auto oldValue = mGradientType;
+        const auto newValue = type;
+        ur.fUndo = [this, oldValue]() {
+            setGradientType(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setGradientType(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
+    mGradientType = type;
+    prp_afterWholeInfluenceRangeChanged();
+}
+
 PaintType PaintSettingsAnimator::getPaintType() const {
     return mPaintType;
 }
@@ -109,6 +127,18 @@ Gradient *PaintSettingsAnimator::getGradient() const {
 
 void PaintSettingsAnimator::setGradient(Gradient* gradient) {
     if(gradient == mGradient) return;
+    {
+        UndoRedo ur;
+        const qptr<Gradient> oldValue = mGradient;
+        const qptr<Gradient> newValue = gradient;
+        ur.fUndo = [this, oldValue]() {
+            setGradient(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setGradient(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     setGradientVar(gradient);
     mTarget_k->requestGlobalFillStrokeUpdateIfSelected();
 }
@@ -127,6 +157,18 @@ void PaintSettingsAnimator::showHideChildrenBeforeChaningPaintType(
 
 void PaintSettingsAnimator::setPaintType(const PaintType paintType) {
     if(paintType == mPaintType) return;
+    {
+        UndoRedo ur;
+        const auto oldValue = mPaintType;
+        const auto newValue = paintType;
+        ur.fUndo = [this, oldValue]() {
+            setPaintType(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setPaintType(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
 
     showHideChildrenBeforeChaningPaintType(paintType);
 

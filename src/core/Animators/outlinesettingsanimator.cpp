@@ -61,11 +61,37 @@ void OutlineSettingsAnimator::setCurrentStrokeWidth(const qreal newWidth) {
 }
 
 void OutlineSettingsAnimator::setCapStyle(const SkPaint::Cap capStyle) {
+    if(mCapStyle == capStyle) return;
+    {
+        UndoRedo ur;
+        const auto oldValue = mCapStyle;
+        const auto newValue = capStyle;
+        ur.fUndo = [this, oldValue]() {
+            setCapStyle(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setCapStyle(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mCapStyle = capStyle;
     prp_afterWholeInfluenceRangeChanged();
 }
 
 void OutlineSettingsAnimator::setJoinStyle(const SkPaint::Join joinStyle) {
+    if(mJoinStyle == joinStyle) return;
+    {
+        UndoRedo ur;
+        const auto oldValue = mJoinStyle;
+        const auto newValue = joinStyle;
+        ur.fUndo = [this, oldValue]() {
+            setJoinStyle(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setJoinStyle(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mJoinStyle = joinStyle;
     prp_afterWholeInfluenceRangeChanged();
 }
@@ -101,7 +127,7 @@ QrealAnimator *OutlineSettingsAnimator::getStrokeWidthAnimator() {
 }
 
 void OutlineSettingsAnimator::setOutlineCompositionMode(
-        const QPainter::CompositionMode &compositionMode) {
+        const QPainter::CompositionMode compositionMode) {
     mOutlineCompositionMode = compositionMode;
 }
 

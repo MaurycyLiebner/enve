@@ -61,11 +61,7 @@ public:
     void setGradientVar(Gradient * const grad);
     QColor getColor(const qreal relFrame) const;
     GradientType getGradientType() { return mGradientType; }
-    void setGradientType(const GradientType type) {
-        if(mGradientType == type) return;
-        mGradientType = type;
-        prp_afterWholeInfluenceRangeChanged();
-    }
+    void setGradientType(const GradientType type);
 private:
     GradientType mGradientType = GradientType::LINEAR;
     PaintType mPaintType = NOPAINT;

@@ -44,6 +44,19 @@ void BrushSettingsAnimator::prp_readProperty(eReadStream& src) {
 }
 
 void BrushSettingsAnimator::setBrush(SimpleBrushWrapper * const brush) {
+    if(mBrush == brush) return;
+    {
+        UndoRedo ur;
+        const stdptr<SimpleBrushWrapper> oldValue = mBrush;
+        const stdptr<SimpleBrushWrapper> newValue = brush;
+        ur.fUndo = [this, oldValue]() {
+            setBrush(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setBrush(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mBrush = brush;
     prp_afterWholeInfluenceRangeChanged();
 }
