@@ -790,7 +790,6 @@ void ContainerBox::bringContainedToFrontList(eBoxOrSound * const child) {
 void ContainerBox::moveContainedInList(eBoxOrSound * const child, const int to) {
     const int from = getContainedIndex(child);
     if(from == -1) return;
-    prp_pushUndoRedoName("Change " + child->prp_getName() + " Z-Index");
     moveContainedInList(child, from, to);
 }
 
@@ -815,6 +814,22 @@ void ContainerBox::moveContainedInList(eBoxOrSound * const child,
     }
 
     prp_afterWholeInfluenceRangeChanged();
+
+
+    {
+        prp_pushUndoRedoName("Change Z-Index");
+        UndoRedo ur;
+        qptr<eBoxOrSound> childQPtr = child;
+        ur.fUndo = [this, from, to, childQPtr]() {
+            if(!childQPtr) return;
+            moveContainedInList(childQPtr.data(), to, from);
+        };
+        ur.fRedo = [this, from, to, childQPtr]() {
+            if(!childQPtr) return;
+            moveContainedInList(childQPtr.data(), from, to);
+        };
+        prp_addUndoRedo(ur);
+    }
 }
 
 void ContainerBox::moveContainedBelow(eBoxOrSound * const boxToMove,
