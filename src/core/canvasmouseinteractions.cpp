@@ -336,7 +336,11 @@ void Canvas::handleMovePathMouseRelease(const MouseEvent &e) {
     if(mRotPivot->isSelected()) {
         if(!mStartTransform) mRotPivot->finishTransform();
         mRotPivot->setSelected(false);
-    } else if(mTransMode == TransformMode::rotate || mTransMode == TransformMode::scale) {
+    } else if(mTransMode == TransformMode::rotate) {
+        pushUndoRedoName("Rotate Objects");
+        finishSelectedBoxesTransform();
+    } else if(mTransMode == TransformMode::scale) {
+        pushUndoRedoName("Scale Objects");
         finishSelectedBoxesTransform();
     } else if(mStartTransform) {
         mSelecting = false;
@@ -354,6 +358,7 @@ void Canvas::handleMovePathMouseRelease(const MouseEvent &e) {
         mCurrentContainer->addContainedBoxesToSelection(mSelectionRect);
         mSelecting = false;
     } else {
+        pushUndoRedoName("Move Objects");
         finishSelectedBoxesTransform();
     }
 }
