@@ -132,6 +132,7 @@ QPointF BasicTransformAnimator::mapRelPosToAbs(const QPointF &relPos) const {
 }
 
 QPointF BasicTransformAnimator::mapFromParent(const QPointF &parentRelPos) const {
+    if(!mParentTransform) return parentRelPos;
     const auto absPos = mParentTransform->mapRelPosToAbs(parentRelPos);
     return mapAbsPosToRel(absPos);
 }
@@ -171,6 +172,7 @@ QMatrix BasicTransformAnimator::getRelativeTransformAtFrame(const qreal relFrame
 }
 
 void BasicTransformAnimator::moveByAbs(const QPointF &absTrans) {
+    if(!mParentTransform) return;
     const auto savedRelPos = mPosAnimator->getSavedValue();
     const auto savedAbsPos = mParentTransform->mapRelPosToAbs(savedRelPos);
     moveToAbs(savedAbsPos + absTrans);
@@ -181,6 +183,7 @@ void BasicTransformAnimator::moveToAbs(const QPointF &absPos) {
 }
 
 void BasicTransformAnimator::setAbsolutePos(const QPointF &pos) {
+    if(!mParentTransform) return;
     setRelativePos(mParentTransform->mapAbsPosToRel(pos));
 }
 
