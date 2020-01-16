@@ -117,7 +117,6 @@ SOURCES += \
     Boxes/textbox.cpp \
     Boxes/textboxrenderdata.cpp \
     Boxes/videobox.cpp \
-    Boxes/waitingforboxload.cpp \
     CacheHandlers/cachecontainer.cpp \
     CacheHandlers/hddcachablecachehandler.cpp \
     CacheHandlers/hddcachablerangecont.cpp \
@@ -368,7 +367,6 @@ HEADERS += \
     Boxes/textbox.h \
     Boxes/textboxrenderdata.h \
     Boxes/videobox.h \
-    Boxes/waitingforboxload.h \
     CacheHandlers/cachecontainer.h \
     CacheHandlers/hddcachablecachehandler.h \
     CacheHandlers/hddcachablecont.h \

@@ -23,7 +23,6 @@
 #include "renderdatahandler.h"
 #include "smartPointers/ememory.h"
 #include "colorhelpers.h"
-#include "waitingforboxload.h"
 #include "MovablePoints/segment.h"
 #include "Animators/qcubicsegment1danimator.h"
 class Canvas;
