@@ -122,23 +122,17 @@ void ColorSettingsWidget::refreshColorAnimatorTarget() {
     setTarget(mTargetAnimator);
 }
 
-void ColorSettingsWidget::nullifyAnimator() {
-    setTarget(nullptr);
-}
-
 void ColorSettingsWidget::setTarget(ColorAnimator * const target) {
     auto& conn = mTargetAnimator.assign(target);
-    rSpin->clearTarget();
-    gSpin->clearTarget();
-    bSpin->clearTarget();
-    hSpin->clearTarget();
-    hslSSpin->clearTarget();
-    lSpin->clearTarget();
-    hsvSSpin->clearTarget();
-    vSpin->clearTarget();
-    if(!mAlphaHidden) {
-        aSpin->clearTarget();
-    }
+    rSpin->setTarget(nullptr);
+    gSpin->setTarget(nullptr);
+    bSpin->setTarget(nullptr);
+    hSpin->setTarget(nullptr);
+    hslSSpin->setTarget(nullptr);
+    lSpin->setTarget(nullptr);
+    hsvSSpin->setTarget(nullptr);
+    vSpin->setTarget(nullptr);
+    if(!mAlphaHidden) aSpin->setTarget(nullptr);
     if(target) {
         mColorModeCombo->setCurrentIndex(int(target->getColorMode()));
         if(!mAlphaHidden) {
@@ -169,8 +163,6 @@ void ColorSettingsWidget::setTarget(ColorAnimator * const target) {
                         this, &ColorSettingsWidget::refreshColorAnimatorTarget);
         conn << connect(target, &ColorAnimator::colorChanged,
                         mBookmarkedColors, &SavedColorsWidget::setColor);
-        conn << connect(target, &QObject::destroyed,
-                        this, &ColorSettingsWidget::nullifyAnimator);
     }
 }
 

@@ -90,7 +90,6 @@ private:
 
     void setColorMode();
     void refreshColorAnimatorTarget();
-    void nullifyAnimator();
 
     void connectSignalsAndSlots();
     void connectColorWidgetSignalToSlot(ColorWidget *slot_obj,

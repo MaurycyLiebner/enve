@@ -116,7 +116,7 @@ bool QrealAnimatorValueSlider::eventFilter(QObject *obj, QEvent *event) {
 void QrealAnimatorValueSlider::emitValueChanged(qreal value) {
     if(mTarget) {
         if(mTarget->SWT_isQrealAnimator()) {
-            const auto da = static_cast<QrealAnimator*>(mTarget.data());
+            const auto da = static_cast<QrealAnimator*>(*mTarget);
             da->setCurrentBaseValue(value);
         }
     }
@@ -127,7 +127,7 @@ void QrealAnimatorValueSlider::setValueExternal(qreal value) {
     if(mTarget) {
         mBlockAnimatorSignals = true;
         if(mTarget->SWT_isQrealAnimator()) {
-            const auto da = static_cast<QrealAnimator*>(mTarget.data());
+            const auto da = static_cast<QrealAnimator*>(*mTarget);
             da->setCurrentBaseValue(value);
         }
         mBlockAnimatorSignals = false;
@@ -155,10 +155,6 @@ void QrealAnimatorValueSlider::emitEditingCanceled() {
     QDoubleSlider::emitEditingCanceled();
 }
 
-void QrealAnimatorValueSlider::nullifyAnimator() {
-    clearTarget();
-}
-
 void QrealAnimatorValueSlider::setValueFromAnimator(qreal val) {
     if(mBlockAnimatorSignals) return;
     setDisplayedValue(val);
@@ -172,7 +168,7 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
         bool rec = false;
         bool key = false;
         if(mTarget->SWT_isAnimator()) {
-            const auto aTarget = static_cast<Animator*>(mTarget.data());
+            const auto aTarget = static_cast<Animator*>(*mTarget);
             rec = aTarget->anim_isRecording();
             key = aTarget->anim_getKeyOnCurrentFrame();
         }
@@ -192,23 +188,15 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
     }
 }
 
-void QrealAnimatorValueSlider::clearTarget() {
-    if(mTarget) disconnect(mTarget, nullptr, this, nullptr);
-    mTarget = nullptr;
-}
-
 void QrealAnimatorValueSlider::setTarget(QrealAnimator * const animator) {
     if(animator == mTarget) return;
-    clearTarget();
-    mTarget = animator;
+    auto& conn = mTarget.assign(animator);
     if(mTarget) {
         setNumberDecimals(animator->getNumberDecimals());
-        connect(animator, &QrealAnimator::valueChanged,
-                this, &QrealAnimatorValueSlider::setValueFromAnimator);
-        connect(animator, &QrealAnimator::destroyed,
-                this, &QrealAnimatorValueSlider::nullifyAnimator);
-        connect(animator, &QrealAnimator::anim_changedKeyOnCurrentFrame,
-                this, qOverload<>(&QrealAnimatorValueSlider::update));
+        conn << connect(animator, &QrealAnimator::valueChanged,
+                        this, &QrealAnimatorValueSlider::setValueFromAnimator);
+        conn << connect(animator, &QrealAnimator::anim_changedKeyOnCurrentFrame,
+                        this, qOverload<>(&QrealAnimatorValueSlider::update));
 
         setValueRange(animator->getMinPossibleValue(),
                       animator->getMaxPossibleValue());
@@ -231,7 +219,7 @@ void QrealAnimatorValueSlider::openContextMenu(
         const QPoint &globalPos) {
     if(!mTarget) return;
     if(!mTarget->SWT_isAnimator()) return;
-    const auto aTarget = static_cast<Animator*>(mTarget.data());
+    const auto aTarget = static_cast<Animator*>(*mTarget);
     QMenu menu(this);
 
     if(aTarget->anim_getKeyOnCurrentFrame()) {

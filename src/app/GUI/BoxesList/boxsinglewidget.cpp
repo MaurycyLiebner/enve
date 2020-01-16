@@ -328,9 +328,9 @@ ColorAnimator *BoxSingleWidget::getColorTarget() const {
 }
 
 void BoxSingleWidget::clearAndHideValueAnimators() {
-    mValueSlider->clearTarget();
+    mValueSlider->setTarget(nullptr);
     mValueSlider->hide();
-    mSecondValueSlider->clearTarget();
+    mSecondValueSlider->setTarget(nullptr);
     mSecondValueSlider->hide();
 }
 
@@ -369,8 +369,8 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mSelected = false;
 
     mColorButton->setColorTarget(nullptr);
-    mValueSlider->clearTarget();
-    mSecondValueSlider->clearTarget();
+    mValueSlider->setTarget(nullptr);
+    mSecondValueSlider->setTarget(nullptr);
 
     bool valueSliderVisible = false;
     bool secondValueSliderVisible = false;
@@ -436,7 +436,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                         valueSliderVisible = true;
                         mValueSlider->setTarget(static_cast<QrealAnimator*>(guiProp));
                         mValueSlider->setNeighbouringSliderToTheRight(false);
-                        mSecondValueSlider->clearTarget();
+                        mSecondValueSlider->setTarget(nullptr);
                     } else if(guiProp->SWT_isColorAnimator()) {
                         mColorButton->setColorTarget(static_cast<ColorAnimator*>(guiProp));
                         colorButtonVisible = true;

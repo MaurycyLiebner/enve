@@ -18,6 +18,7 @@
 #define QREALANIMATORVALUESLIDER_H
 #include "qdoubleslider.h"
 #include "smartPointers/ememory.h"
+#include "conncontextptr.h"
 class QrealAnimator;
 class Property;
 
@@ -33,7 +34,6 @@ public:
                              QrealAnimator* animator, QWidget *parent = nullptr);
     QrealAnimatorValueSlider(QrealAnimator* animator, QWidget *parent = nullptr);
     QrealAnimatorValueSlider(QWidget *parent = nullptr);
-    ~QrealAnimatorValueSlider() {}
 
     void paint(QPainter *p);
     void openContextMenu(const QPoint &globalPos);
@@ -44,7 +44,6 @@ public:
 
     bool isTargetDisabled();
 
-    void clearTarget();
 
     void setValueExternal(qreal value);
 
@@ -53,7 +52,6 @@ public:
     void emitEditingFinished(qreal value);
     void emitEditingCanceled();
 
-    void nullifyAnimator();
     void setValueFromAnimator(qreal val);
 protected:
     void emitValueChanged(qreal value);
@@ -63,7 +61,7 @@ private:
     QrealAnimator *getQPointFAnimatorSibling();
 
     bool mBlockAnimatorSignals = false;
-    qptr<Property> mTarget;
+    ConnContextQPtr<Property> mTarget;
 signals:
     void displayedValueChanged(qreal);
 };

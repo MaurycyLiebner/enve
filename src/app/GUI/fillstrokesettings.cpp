@@ -693,7 +693,7 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
     } else {
         setCurrentBrushSettings(nullptr);
         mCurrentStrokeColorAnimator = nullptr;
-        mLineWidthSpin->clearTarget();
+        mLineWidthSpin->setTarget(nullptr);
     }
 }
 
