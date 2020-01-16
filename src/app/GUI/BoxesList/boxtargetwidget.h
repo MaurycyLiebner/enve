@@ -21,6 +21,7 @@
 class BoundingBox;
 class BoxTargetProperty;
 #include "smartPointers/ememory.h"
+#include "conncontextptr.h"
 
 class BoxTargetWidget : public QWidget {
     Q_OBJECT
@@ -30,7 +31,7 @@ public:
     void setTargetProperty(BoxTargetProperty *property);
 private:
     bool mDragging = false;
-    qptr<BoxTargetProperty> mProperty;
+    ConnContextQPtr<BoxTargetProperty> mProperty;
 signals:
 
 public slots:

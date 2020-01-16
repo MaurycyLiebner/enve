@@ -29,7 +29,9 @@ BoxTargetWidget::BoxTargetWidget(QWidget *parent) : QWidget(parent) {
 }
 
 void BoxTargetWidget::setTargetProperty(BoxTargetProperty *property) {
-    mProperty = property;
+    auto& conn = mProperty.assign(property);
+    if(property) conn << connect(property, &BoxTargetProperty::targetSet,
+                                 this, qOverload<>(&QWidget::update));
     update();
 }
 
