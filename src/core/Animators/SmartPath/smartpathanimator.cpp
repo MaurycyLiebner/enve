@@ -314,6 +314,19 @@ const SkPath &SmartPathAnimator::getCurrentPath() {
 
 void SmartPathAnimator::setMode(const SmartPathAnimator::Mode mode) {
     if(mMode == mode) return;
+    {
+        prp_pushUndoRedoName("Set Path Blend Mode");
+        UndoRedo ur;
+        const auto oldValue = mMode;
+        const auto newValue = mode;
+        ur.fUndo = [this, oldValue]() {
+            setMode(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setMode(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mMode = mode;
     prp_afterWholeInfluenceRangeChanged();
     emit pathBlendModeChagned(mode);
