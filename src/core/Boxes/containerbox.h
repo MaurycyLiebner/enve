@@ -19,7 +19,7 @@
 #include "boxwithpatheffects.h"
 #include "conncontextobjlist.h"
 class PathBox;
-class PathEffectAnimators;
+class PathEffectCollection;
 
 class ContainerBox : public BoxWithPathEffects {
     e_OBJECT

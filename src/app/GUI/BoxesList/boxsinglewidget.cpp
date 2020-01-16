@@ -68,7 +68,7 @@ bool BoxSingleWidget::sStaticPixmapsLoaded = false;
 #include "GUI/coloranimatorbutton.h"
 #include "canvas.h"
 #include "PathEffects/patheffect.h"
-#include "PathEffects/patheffectanimators.h"
+#include "PathEffects/patheffectcollection.h"
 #include "Sound/singlesound.h"
 
 #include <QApplication>

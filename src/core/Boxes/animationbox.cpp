@@ -21,7 +21,7 @@
 #include "imagebox.h"
 #include "undoredo.h"
 #include "Animators/qrealkey.h"
-#include "Animators/rastereffectcollection.h"
+#include "RasterEffects/rastereffectcollection.h"
 
 AnimationBox::AnimationBox(const eBoxType type) : BoundingBox(type) {
     connect(this, &eBoxOrSound::parentChanged,

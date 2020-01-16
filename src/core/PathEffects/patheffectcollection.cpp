@@ -14,43 +14,43 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "patheffectanimators.h"
+#include "patheffectcollection.h"
 #include "PathEffects/patheffect.h"
 #include "Boxes/pathbox.h"
 #include "Boxes/containerbox.h"
 #include "custompatheffectcreator.h"
 #include <QDebug>
 
-PathEffectAnimators::PathEffectAnimators() :
-    PathEffectAnimatorsBase("path effects") {
+PathEffectCollection::PathEffectCollection() :
+    PathEffectCollectionBase("path effects") {
     ca_setHiddenWhenEmpty(true);
 }
 
 #include "Boxes/patheffectsmenu.h"
-void PathEffectAnimators::prp_setupTreeViewMenu(PropertyMenu * const menu) {
-    if(menu->hasActionsForType<PathEffectAnimators>()) return;
-    menu->addedActionsForType<PathEffectAnimators>();
+void PathEffectCollection::prp_setupTreeViewMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<PathEffectCollection>()) return;
+    menu->addedActionsForType<PathEffectCollection>();
     PathEffectsMenu::addPathEffectsToCollectionActionMenu(menu);
     menu->addSeparator();
-    PathEffectAnimatorsBase::prp_setupTreeViewMenu(menu);
+    PathEffectCollectionBase::prp_setupTreeViewMenu(menu);
 }
 
-bool PathEffectAnimators::hasEffects() {
+bool PathEffectCollection::hasEffects() {
     return ca_hasChildren();
 }
 
-bool PathEffectAnimators::SWT_isPathEffectAnimators() const {
+bool PathEffectCollection::SWT_isPathEffectCollection() const {
     return true;
 }
 
-void PathEffectAnimators::readPathEffect(eReadStream& src) {
+void PathEffectCollection::readPathEffect(eReadStream& src) {
     const auto pathEffect = readIdCreatePathEffect(src);
     pathEffect->prp_readProperty(src);
     addChild(pathEffect);
 }
 
 #include "patheffectstask.h"
-void PathEffectAnimators::addEffects(const qreal relFrame,
+void PathEffectCollection::addEffects(const qreal relFrame,
                                      QList<stdsptr<PathEffectCaller>>& list,
                                      const qreal influence) const {
     const auto& children = ca_getChildren();

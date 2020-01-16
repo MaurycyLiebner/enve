@@ -27,7 +27,7 @@
 #include "GUI/global.h"
 #include "singlewidgetabstraction.h"
 #include "GUI/keysview.h"
-#include "Animators/rastereffectcollection.h"
+#include "RasterEffects/rastereffectcollection.h"
 
 BoxScroller::BoxScroller(ScrollWidget * const parent) :
     ScrollWidgetVisiblePart(parent) {

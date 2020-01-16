@@ -26,7 +26,7 @@
 #include "Animators/transformanimator.h"
 #include "MovablePoints/segment.h"
 #include "Animators/SmartPath/smartpathanimator.h"
-#include "PathEffects/patheffectanimators.h"
+#include "PathEffects/patheffectcollection.h"
 
 SmartVectorPath::SmartVectorPath() :
     PathBox(eBoxType::vectorPath) {

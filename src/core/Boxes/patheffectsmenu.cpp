@@ -72,8 +72,8 @@ void PathEffectsMenu::addPathEffectsToBoxActionMenu(PropertyMenu * const menu) {
                                &BoundingBox::addOutlinePathEffect);
 }
 
-#include "PathEffects/patheffectanimators.h"
+#include "PathEffects/patheffectcollection.h"
 void PathEffectsMenu::addPathEffectsToCollectionActionMenu(PropertyMenu * const menu) {
     const auto addEffectMenu = menu->addMenu("Add Effect");
-    addPathEffectsActionToMenu(addEffectMenu, &PathEffectAnimators::addChild);
+    addPathEffectsActionToMenu(addEffectMenu, &PathEffectCollection::addChild);
 }

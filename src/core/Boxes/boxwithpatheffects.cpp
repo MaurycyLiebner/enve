@@ -15,21 +15,21 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "boxwithpatheffects.h"
-#include "../PathEffects/patheffectanimators.h"
+#include "../PathEffects/patheffectcollection.h"
 #include "../PathEffects/patheffectstask.h"
 
 BoxWithPathEffects::BoxWithPathEffects(const eBoxType type) :
     BoundingBox(type) {
-    mPathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
+    mPathEffectsAnimators = enve::make_shared<PathEffectCollection>();
     mPathEffectsAnimators->prp_setName("path base effects");
 
-    mFillPathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
+    mFillPathEffectsAnimators = enve::make_shared<PathEffectCollection>();
     mFillPathEffectsAnimators->prp_setName("fill effects");
 
-    mOutlineBasePathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
+    mOutlineBasePathEffectsAnimators = enve::make_shared<PathEffectCollection>();
     mOutlineBasePathEffectsAnimators->prp_setName("outline base effects");
 
-    mOutlinePathEffectsAnimators = enve::make_shared<PathEffectAnimators>();
+    mOutlinePathEffectsAnimators = enve::make_shared<PathEffectCollection>();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
 
     ca_addChild(mPathEffectsAnimators);
@@ -137,19 +137,19 @@ bool BoxWithPathEffects::getOutlineEffectsVisible() const {
     return mOutlinePathEffectsAnimators->SWT_isVisible();
 }
 
-PathEffectAnimators *BoxWithPathEffects::getPathEffectsAnimators() {
+PathEffectCollection *BoxWithPathEffects::getPathEffectsAnimators() {
     return mPathEffectsAnimators.data();
 }
 
-PathEffectAnimators *BoxWithPathEffects::getFillPathEffectsAnimators() {
+PathEffectCollection *BoxWithPathEffects::getFillPathEffectsAnimators() {
     return mFillPathEffectsAnimators.data();
 }
 
-PathEffectAnimators *BoxWithPathEffects::getOutlineBasrPathEffectsAnimators() {
+PathEffectCollection *BoxWithPathEffects::getOutlineBasrPathEffectsAnimators() {
     return mOutlineBasePathEffectsAnimators.data();
 }
 
-PathEffectAnimators *BoxWithPathEffects::getOutlinePathEffectsAnimators() {
+PathEffectCollection *BoxWithPathEffects::getOutlinePathEffectsAnimators() {
     return mOutlinePathEffectsAnimators.data();
 }
 

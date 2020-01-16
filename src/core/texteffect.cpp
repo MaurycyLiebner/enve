@@ -103,19 +103,19 @@ TextEffect::TextEffect() : eEffect("text effect") {
 
     mTransform = enve::make_shared<AdvancedTransformAnimator>();
 
-    mBasePathEffects = enve::make_shared<PathEffectAnimators>();
+    mBasePathEffects = enve::make_shared<PathEffectCollection>();
     mBasePathEffects->ca_setHiddenWhenEmpty(false);
     mBasePathEffects->prp_setName("path base effects");
 
-    mFillPathEffects = enve::make_shared<PathEffectAnimators>();
+    mFillPathEffects = enve::make_shared<PathEffectCollection>();
     mFillPathEffects->ca_setHiddenWhenEmpty(false);
     mFillPathEffects->prp_setName("fill effects");
 
-    mOutlineBasePathEffects = enve::make_shared<PathEffectAnimators>();
+    mOutlineBasePathEffects = enve::make_shared<PathEffectCollection>();
     mOutlineBasePathEffects->ca_setHiddenWhenEmpty(false);
     mOutlineBasePathEffects->prp_setName("outline base effects");
 
-    mOutlinePathEffects = enve::make_shared<PathEffectAnimators>();
+    mOutlinePathEffects = enve::make_shared<PathEffectCollection>();
     mOutlinePathEffects->ca_setHiddenWhenEmpty(false);
     mOutlinePathEffects->prp_setName("outline effects");
 

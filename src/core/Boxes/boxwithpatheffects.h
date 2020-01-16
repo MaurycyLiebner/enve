@@ -18,7 +18,7 @@
 #define BOXWITHPATHEFFECTS_H
 #include "boundingbox.h"
 
-class PathEffectAnimators;
+class PathEffectCollection;
 class PathEffectsTask;
 class PathEffectCaller;
 
@@ -46,10 +46,10 @@ public:
     void setOutlineEffectsEnabled(const bool enable);
     bool getOutlineEffectsVisible() const;
 
-    PathEffectAnimators *getPathEffectsAnimators();
-    PathEffectAnimators *getFillPathEffectsAnimators();
-    PathEffectAnimators *getOutlineBasrPathEffectsAnimators();
-    PathEffectAnimators *getOutlinePathEffectsAnimators();
+    PathEffectCollection *getPathEffectsAnimators();
+    PathEffectCollection *getFillPathEffectsAnimators();
+    PathEffectCollection *getOutlineBasrPathEffectsAnimators();
+    PathEffectCollection *getOutlinePathEffectsAnimators();
 
     bool differenceInPathBetweenFrames(
             const int frame1, const int frame2) const;
@@ -69,10 +69,10 @@ public:
 protected:
     void getMotionBlurProperties(QList<Property*> &list) const;
 
-    qsptr<PathEffectAnimators> mPathEffectsAnimators;
-    qsptr<PathEffectAnimators> mFillPathEffectsAnimators;
-    qsptr<PathEffectAnimators> mOutlineBasePathEffectsAnimators;
-    qsptr<PathEffectAnimators> mOutlinePathEffectsAnimators;
+    qsptr<PathEffectCollection> mPathEffectsAnimators;
+    qsptr<PathEffectCollection> mFillPathEffectsAnimators;
+    qsptr<PathEffectCollection> mOutlineBasePathEffectsAnimators;
+    qsptr<PathEffectCollection> mOutlinePathEffectsAnimators;
 };
 
 #endif // BOXWITHPATHEFFECTS_H

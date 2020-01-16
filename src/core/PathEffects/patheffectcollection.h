@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef PATHEFFECTANIMATORS_H
-#define PATHEFFECTANIMATORS_H
+#ifndef PATHEFFECTCOLLECTION_H
+#define PATHEFFECTCOLLECTION_H
 #include "PathEffects/patheffect.h"
 #include "Animators/dynamiccomplexanimator.h"
 #include "skia/skiaincludes.h"
@@ -26,13 +26,13 @@ qsptr<PathEffect> readIdCreatePathEffect(eReadStream& src);
 
 typedef DynamicComplexAnimator<PathEffect,
         &PathEffect::writeIdentifier,
-        &readIdCreatePathEffect> PathEffectAnimatorsBase;
-class PathEffectAnimators : public PathEffectAnimatorsBase {
+        &readIdCreatePathEffect> PathEffectCollectionBase;
+class PathEffectCollection : public PathEffectCollectionBase {
     e_OBJECT
 protected:
-    PathEffectAnimators();
+    PathEffectCollection();
 public:
-    bool SWT_isPathEffectAnimators() const;
+    bool SWT_isPathEffectCollection() const;
 
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
@@ -46,4 +46,4 @@ private:
 };
 
 
-#endif // PATHEFFECTANIMATORS_H
+#endif // PATHEFFECTCOLLECTION_H

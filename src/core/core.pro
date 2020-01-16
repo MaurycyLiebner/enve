@@ -85,8 +85,6 @@ SOURCES += \
     Animators/qcubicsegment1danimator.cpp \
     Animators/qrealsnapshot.cpp \
     Animators/qstringanimator.cpp \
-    Animators/rastereffectcollection.cpp \
-    Animators/rastereffectmenucreator.cpp \
     Animators/staticcomplexanimator.cpp \
     Animators/texteffectcollection.cpp \
     Boxes/animationbox.cpp \
@@ -171,8 +169,8 @@ SOURCES += \
     PathEffects/displacepatheffect.cpp \
     PathEffects/duplicatepatheffect.cpp \
     PathEffects/linespatheffect.cpp \
-    PathEffects/patheffectanimators.cpp \
     PathEffects/patheffectcaller.cpp \
+    PathEffects/patheffectcollection.cpp \
     PathEffects/patheffectstask.cpp \
     PathEffects/solidifypatheffect.cpp \
     PathEffects/spatialdisplacepatheffect.cpp \
@@ -197,6 +195,8 @@ SOURCES += \
     RasterEffects/customrastereffect.cpp \
     RasterEffects/rastereffect.cpp \
     RasterEffects/rastereffectcaller.cpp \
+    RasterEffects/rastereffectcollection.cpp \
+    RasterEffects/rastereffectmenucreator.cpp \
     RasterEffects/shadoweffect.cpp \
     ReadWrite/basicreadwrite.cpp \
     ReadWrite/ereadstream.cpp \
@@ -335,8 +335,6 @@ HEADERS += \
     Animators/qcubicsegment1danimator.h \
     Animators/qrealsnapshot.h \
     Animators/qstringanimator.h \
-    Animators/rastereffectcollection.h \
-    Animators/rastereffectmenucreator.h \
     Animators/staticcomplexanimator.h \
     Animators/texteffectcollection.h \
     Boxes/animationbox.h \
@@ -426,8 +424,8 @@ HEADERS += \
     PathEffects/displacepatheffect.h \
     PathEffects/duplicatepatheffect.h \
     PathEffects/linespatheffect.h \
-    PathEffects/patheffectanimators.h \
     PathEffects/patheffectcaller.h \
+    PathEffects/patheffectcollection.h \
     PathEffects/patheffectsinclude.h \
     PathEffects/patheffectstask.h \
     PathEffects/solidifypatheffect.h \
@@ -453,6 +451,8 @@ HEADERS += \
     RasterEffects/rastereffect.h \
     RasterEffects/customrastereffectcreator.h \
     RasterEffects/rastereffectcaller.h \
+    RasterEffects/rastereffectcollection.h \
+    RasterEffects/rastereffectmenucreator.h \
     RasterEffects/rastereffectsinclude.h \
     RasterEffects/shadoweffect.h \
     ReadWrite/basicreadwrite.h \

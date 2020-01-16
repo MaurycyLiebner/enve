@@ -28,7 +28,7 @@
 class SmartVectorPath;
 class GradientPoints;
 class SkStroke;
-class PathEffectAnimators;
+class PathEffectCollection;
 class PathEffect;
 
 class PathBox : public BoxWithPathEffects {

@@ -20,7 +20,7 @@
 #include "Animators/gradientpoints.h"
 #include "Animators/transformanimator.h"
 #include "MovablePoints/pointshandler.h"
-#include "PathEffects/patheffectanimators.h"
+#include "PathEffects/patheffectcollection.h"
 
 Circle::Circle() : PathBox(eBoxType::circle) {
     prp_setName("Circle");

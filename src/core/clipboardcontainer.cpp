@@ -18,7 +18,7 @@
 #include "Boxes/boundingbox.h"
 #include "Boxes/containerbox.h"
 #include "Properties/boxtargetproperty.h"
-#include "PathEffects/patheffectanimators.h"
+#include "PathEffects/patheffectcollection.h"
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "Properties/boxtargetproperty.h"
 

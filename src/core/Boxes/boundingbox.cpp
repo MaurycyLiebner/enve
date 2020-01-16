@@ -24,7 +24,7 @@
 #include "GUI/global.h"
 #include "MovablePoints/movablepoint.h"
 #include "Private/Tasks/taskscheduler.h"
-#include "Animators/rastereffectcollection.h"
+#include "RasterEffects/rastereffectcollection.h"
 #include "Animators/transformanimator.h"
 #include "RasterEffects/rastereffect.h"
 #include "RasterEffects/customrastereffectcreator.h"
@@ -34,7 +34,7 @@
 #include "typemenu.h"
 #include "patheffectsmenu.h"
 #include "RasterEffects/rastereffectsinclude.h"
-#include "Animators/rastereffectmenucreator.h"
+#include "RasterEffects/rastereffectmenucreator.h"
 
 int BoundingBox::sNextDocumentId = 0;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
