@@ -259,6 +259,14 @@ void ContainerBox::promoteToLayer() {
     for(const auto& box : linkingBoxes) {
         static_cast<ContainerBox*>(box)->promoteToLayer();
     }
+
+    if(!SWT_isLinkBox()) {
+        prp_pushUndoRedoName("Promote to Layer");
+        UndoRedo ur;
+        ur.fUndo = [this]() { demoteToGroup(); };
+        ur.fRedo = [this]() { promoteToLayer(); };
+        prp_addUndoRedo(ur);
+    }
 }
 
 void ContainerBox::demoteToGroup() {
@@ -275,6 +283,14 @@ void ContainerBox::demoteToGroup() {
     const auto& linkingBoxes = getLinkingBoxes();
     for(const auto& box : linkingBoxes) {
         static_cast<ContainerBox*>(box)->demoteToGroup();
+    }
+
+    if(!SWT_isLinkBox()) {
+        prp_pushUndoRedoName("Demote to Group");
+        UndoRedo ur;
+        ur.fUndo = [this]() { promoteToLayer(); };
+        ur.fRedo = [this]() { demoteToGroup(); };
+        prp_addUndoRedo(ur);
     }
 }
 
