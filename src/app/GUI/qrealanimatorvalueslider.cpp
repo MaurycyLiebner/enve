@@ -203,7 +203,7 @@ void QrealAnimatorValueSlider::setTarget(QrealAnimator * const animator) {
     mTarget = animator;
     if(mTarget) {
         setNumberDecimals(animator->getNumberDecimals());
-        connect(animator, &QrealAnimator::valueChangedSignal,
+        connect(animator, &QrealAnimator::valueChanged,
                 this, &QrealAnimatorValueSlider::setValueFromAnimator);
         connect(animator, &QrealAnimator::destroyed,
                 this, &QrealAnimatorValueSlider::nullifyAnimator);

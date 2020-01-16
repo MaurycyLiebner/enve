@@ -30,13 +30,13 @@ ColorAnimator::ColorAnimator(const QString &name) : StaticComplexAnimator(name) 
         emit colorChanged(getColor());
     };
 
-    connect(mVal1Animator.get(), &QrealAnimator::valueChangedSignal,
+    connect(mVal1Animator.get(), &QrealAnimator::valueChanged,
             this, emitColorChange);
-    connect(mVal2Animator.get(), &QrealAnimator::valueChangedSignal,
+    connect(mVal2Animator.get(), &QrealAnimator::valueChanged,
             this, emitColorChange);
-    connect(mVal3Animator.get(), &QrealAnimator::valueChangedSignal,
+    connect(mVal3Animator.get(), &QrealAnimator::valueChanged,
             this, emitColorChange);
-    connect(mAlphaAnimator.get(), &QrealAnimator::valueChangedSignal,
+    connect(mAlphaAnimator.get(), &QrealAnimator::valueChanged,
             this, emitColorChange);
 }
 

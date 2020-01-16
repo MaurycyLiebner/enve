@@ -43,13 +43,13 @@ void ColorAnimatorButton::setColorTarget(ColorAnimator * const target) {
     mColorTarget.assign(target);
     if(target) {
         mColorTarget << connect(target->getVal1Animator(),
-                                &QrealAnimator::valueChangedSignal,
+                                &QrealAnimator::valueChanged,
                                 this, qOverload<>(&ColorAnimatorButton::update));
         mColorTarget << connect(target->getVal2Animator(),
-                                &QrealAnimator::valueChangedSignal,
+                                &QrealAnimator::valueChanged,
                                 this, qOverload<>(&ColorAnimatorButton::update));
         mColorTarget << connect(target->getVal3Animator(),
-                                &QrealAnimator::valueChangedSignal,
+                                &QrealAnimator::valueChanged,
                                 this, qOverload<>(&ColorAnimatorButton::update));
     }
 }

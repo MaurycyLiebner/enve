@@ -262,7 +262,7 @@ void QrealAnimator::setCurrentBaseValue(qreal newValue) {
     if(currKey) currKey->setValue(mCurrentBaseValue);
     else prp_afterWholeInfluenceRangeChanged();
 
-    emit valueChangedSignal(mCurrentBaseValue);
+    emit valueChanged(mCurrentBaseValue);
 
     //anim_updateKeysPath();
 }
@@ -271,7 +271,7 @@ bool QrealAnimator::updateBaseValueFromCurrentFrame() {
     const qreal newValue = calculateBaseValueAtRelFrame(anim_getCurrentRelFrame());
     if(isZero4Dec(newValue - mCurrentBaseValue)) return false;
     mCurrentBaseValue = newValue;
-    emit valueChangedSignal(mCurrentBaseValue);
+    emit valueChanged(mCurrentBaseValue);
     return true;
 }
 
@@ -406,7 +406,7 @@ void QrealAnimator::multSavedValueToCurrentValue(const qreal multBy) {
 void QrealAnimator::setCurrentBaseValueNoUpdate(
         const qreal newValue) {
     mCurrentBaseValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
-    emit valueChangedSignal(mCurrentBaseValue);
+    emit valueChanged(mCurrentBaseValue);
 }
 
 void QrealAnimator::incCurrentValueNoUpdate(

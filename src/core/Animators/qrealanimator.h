@@ -147,7 +147,7 @@ private:
     qreal mPrefferedValueStep = 1;
     bool updateBaseValueFromCurrentFrame();
 signals:
-    void valueChangedSignal(qreal);
+    void valueChanged(qreal);
 };
 
 class QrealAction {

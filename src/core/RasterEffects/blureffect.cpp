@@ -20,7 +20,7 @@ BlurEffect::BlurEffect() :
                  false, RasterEffectType::BLUR) {
     mRadius = enve::make_shared<QrealAnimator>(10, 0, 999.999, 1, "radius");
     ca_addChild(mRadius);
-    connect(mRadius.get(), &QrealAnimator::valueChangedSignal,
+    connect(mRadius.get(), &QrealAnimator::valueChanged,
             this, &RasterEffect::forcedMarginChanged);
     ca_setGUIProperty(mRadius.get());
 }
