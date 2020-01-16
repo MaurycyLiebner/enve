@@ -65,18 +65,42 @@ public:
         menu->addPlainAction("Clear", dOp)->setEnabled(this->ca_getNumberOfChildren());
     }
 
-    void insertChild(const qsptr<T>& newChild, const int index) {
-        clearOldParent(newChild);
-        ca_insertChild(newChild, index);
+    void insertChild(const qsptr<T>& child, const int index) {
+        clearOldParent(child);
+        ca_insertChild(child, index);
+
+        {
+            prp_pushUndoRedoName("Insert " + child->prp_getName());
+            UndoRedo ur;
+            ur.fUndo = [this, child]() {
+                removeChild(child);
+            };
+            ur.fRedo = [this, child, index]() {
+                insertChild(child, index);
+            };
+            prp_addUndoRedo(ur);
+        }
     }
 
     void addChild(const qsptr<T>& newChild) {
-        clearOldParent(newChild);
-        ca_addChild(newChild);
+        insertChild(newChild, ca_getNumberOfChildren());
     }
 
     void removeChild(const qsptr<T>& child) {
+        const int index = ca_getChildPropertyIndex(child.get());
         ca_removeChild(child);
+
+        {
+            prp_pushUndoRedoName("Remove " + child->prp_getName());
+            UndoRedo ur;
+            ur.fUndo = [this, child]() {
+                removeChild(child);
+            };
+            ur.fRedo = [this, child, index]() {
+                insertChild(child, index);
+            };
+            prp_addUndoRedo(ur);
+        }
     }
 
     T* getChild(const int index) const {
@@ -84,17 +108,9 @@ public:
     }
 
     qsptr<T> takeChildAt(const int index) {
-        return ca_takeChildAt(index)->template ref<T>();
-    }
-
-    void prependChild(T * const oldChild, const qsptr<T>& newChild) {
-        clearOldParent(newChild);
-        ca_prependChild(oldChild, newChild);
-    }
-
-    void replaceChild(const qsptr<T>& oldChild, const qsptr<T> &newChild) {
-        clearOldParent(newChild);
-        ca_replaceChild(oldChild, newChild);
+        const auto child = getChild(index)->template ref<T>();
+        removeChild(child);
+        return child;
     }
 
     using ComplexAnimator::ca_removeAllChildren;
