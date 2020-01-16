@@ -680,7 +680,7 @@ void ContainerBox::insertContained(const int id, const qsptr<eBoxOrSound>& child
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());
     child->prp_afterWholeInfluenceRangeChanged();
 
-    {
+    if(!SWT_isLinkBox()) {
         prp_pushUndoRedoName("Insert " + child->prp_getName());
         UndoRedo ur;
         ur.fUndo = [this, child]() {
@@ -728,7 +728,7 @@ void ContainerBox::removeContainedFromList(const int id) {
 
     prp_afterWholeInfluenceRangeChanged();
 
-    {
+    if(!SWT_isLinkBox()) {
         prp_pushUndoRedoName("Remove " + child->prp_getName());
         UndoRedo ur;
         ur.fUndo = [this, id, child]() {
@@ -832,7 +832,7 @@ void ContainerBox::moveContainedInList(eBoxOrSound * const child,
     prp_afterWholeInfluenceRangeChanged();
 
 
-    {
+    if(!SWT_isLinkBox()) {
         prp_pushUndoRedoName("Change Z-Index");
         UndoRedo ur;
         qptr<eBoxOrSound> childQPtr = child;
