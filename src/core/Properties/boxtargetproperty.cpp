@@ -28,6 +28,20 @@ BoundingBox* BoxTargetProperty::getTarget() const {
 
 void BoxTargetProperty::setTarget(BoundingBox* const box) {
     if(box == mTarget_d) return;
+    {
+        prp_pushUndoRedoName("Set Box Target");
+        UndoRedo ur;
+        const qptr<BoundingBox> oldValue = mTarget_d.operator BoundingBox *();
+        const qptr<BoundingBox> newValue = box;
+        ur.fUndo = [this, oldValue]() {
+            setTarget(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setTarget(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
+
     mTarget_d.assign(box);
     if(box) {
         mTarget_d << connect(box, &BoundingBox::destroyed,
