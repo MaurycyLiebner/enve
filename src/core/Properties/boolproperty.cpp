@@ -33,6 +33,19 @@ bool BoolProperty::getValue() {
 
 void BoolProperty::setValue(const bool value) {
     if(mValue == value) return;
+    {
+        prp_pushUndoRedoName(value ? "Enable Property" : "Disable Property");
+        UndoRedo ur;
+        const auto oldValue = mValue;
+        const auto newValue = value;
+        ur.fUndo = [this, oldValue]() {
+            setValue(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setValue(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mValue = value;
     prp_afterWholeInfluenceRangeChanged();
     emit valueChanged(value);
