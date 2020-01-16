@@ -330,6 +330,19 @@ void Animator::anim_setRecordingWithoutChangingKeys(const bool rec) {
 
 void Animator::anim_setRecordingValue(const bool rec) {
     if(rec == anim_mIsRecording) return;
+    {
+        prp_pushUndoRedoName("Set Recording");
+        UndoRedo ur;
+        const auto oldValue = anim_mIsRecording;
+        const auto newValue = rec;
+        ur.fUndo = [this, oldValue]() {
+            anim_setRecordingValue(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            anim_setRecordingValue(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     anim_mIsRecording = rec;
     emit anim_isRecordingChanged();
 }
