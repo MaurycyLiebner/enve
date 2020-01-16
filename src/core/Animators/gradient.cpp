@@ -20,7 +20,7 @@
 
 int Gradient::sNextDocumnetId = 0;
 
-Gradient::Gradient() : ComplexAnimator("gradient"),
+Gradient::Gradient() : DynamicComplexAnimator<ColorAnimator>("gradient"),
     mDocumentId(sNextDocumnetId++) {
     connect(this, &Property::prp_currentFrameChanged,
             this, &Gradient::updateQGradientStops);
@@ -28,8 +28,8 @@ Gradient::Gradient() : ComplexAnimator("gradient"),
 
 Gradient::Gradient(const QColor &color1, const QColor &color2) :
     Gradient() {
-    addColorToList(color1);
-    addColorToList(color2);
+    addColor(color1);
+    addColor(color2);
 }
 
 void Gradient::write(const int id, eWriteStream& dst) {
@@ -44,66 +44,14 @@ int Gradient::read(eReadStream& src) {
     return mReadWriteId;
 }
 
-void Gradient::prp_writeProperty(eWriteStream& dst) const {
-    const int nColors = mColors.count();
-    dst << nColors;
-    for(const auto& color : mColors)
-        color->prp_writeProperty(dst);
-}
-
-void Gradient::prp_readProperty(eReadStream& src) {
-    int nColors;
-    src >> nColors;
-    for(int i = 0; i < nColors; i++) {
-        const auto colorAnim = enve::make_shared<ColorAnimator>();
-        colorAnim->prp_readProperty(src);
-        addColorToList(colorAnim);
-    }
-    updateQGradientStops(UpdateReason::userChange);
-}
-
-bool Gradient::isEmpty() const {
-    return mColors.isEmpty();
-}
-
-void Gradient::prp_startTransform() {
-    //savedColors = colors;
-}
-
-void Gradient::prp_setInheritedFrameShift(const int shift,
-                                          ComplexAnimator *parentAnimator) {
+void Gradient::prp_setInheritedFrameShift(
+        const int shift, ComplexAnimator *parentAnimator) {
     Q_UNUSED(shift)
     if(!parentAnimator) return;
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
         parentAnimator->ca_updateDescendatKeyFrame(key);
     }
-}
-
-void Gradient::addColorToList(const QColor &color) {
-    auto newColorAnimator = enve::make_shared<ColorAnimator>();
-    newColorAnimator->setColor(color);
-    addColorToList(newColorAnimator);
-}
-
-void Gradient::addColorToList(const qsptr<ColorAnimator>& newColorAnimator) {
-    mColors << newColorAnimator;
-
-    ca_addChild(newColorAnimator);
-}
-
-QColor Gradient::getColorAt(const int id) {
-    if(id < 0 || id >= mColors.count()) return Qt::black;
-    return mColors.at(id)->getColor();
-}
-
-ColorAnimator *Gradient::getColorAnimatorAt(const int id) {
-    if(id < 0 || id >= mColors.count()) return nullptr;
-    return mColors.at(id).get();
-}
-
-int Gradient::getColorCount() {
-    return mColors.length();
 }
 
 QColor Gradient::getLastQGradientStopQColor() {
@@ -116,76 +64,56 @@ QColor Gradient::getFirstQGradientStopQColor() {
     return mQGradientStops.first().second;
 }
 
-QGradientStops Gradient::getQGradientStops() {
-    return mQGradientStops;
-}
-
-void Gradient::swapColors(const int id1, const int id2) {
-    ca_swapChildren(mColors.at(id1).get(),
-                          mColors.at(id2).get());
-    mColors.swap(id1, id2);
-    updateQGradientStops(UpdateReason::userChange);
-    prp_afterWholeInfluenceRangeChanged();
-}
-
-void Gradient::removeColor(const int id) {
-    removeColor(mColors.at(id));
-}
-
-void Gradient::removeColor(const qsptr<ColorAnimator>& color) {
-    ca_removeChild(color);
-    mColors.removeOne(color);
-    updateQGradientStops(UpdateReason::userChange);
-    prp_afterWholeInfluenceRangeChanged();
-}
-
 void Gradient::addColor(const QColor &color) {
-    addColorToList(color);
-    updateQGradientStops(UpdateReason::userChange);
-    prp_afterWholeInfluenceRangeChanged();
+    auto newColorAnimator = enve::make_shared<ColorAnimator>();
+    newColorAnimator->setColor(color);
+    addChild(newColorAnimator);
 }
 
 void Gradient::replaceColor(const int id, const QColor &color) {
-    mColors.at(id)->setColor(color);
-    updateQGradientStops(UpdateReason::userChange);
-    prp_afterWholeInfluenceRangeChanged();
+    const auto colorAnim = getChild(id);
+    colorAnim->setColor(color);
 }
 
 void Gradient::startColorIdTransform(const int id) {
-    if(mColors.count() <= id || id < 0) return;
-    mColors.at(id)->prp_startTransform();
+    const auto color = getChild(id);
+    color->prp_startTransform();
+}
+
+QColor Gradient::getColorAt(const int id) {
+    const int nCols = ca_getNumberOfChildren();
+    if(id < 0 || id >= nCols) return Qt::black;
+    const auto color = getChild(id);
+    return color->getColor();
 }
 
 QGradientStops Gradient::getQGradientStopsAtAbsFrame(const qreal absFrame) {
+    const int nCols = ca_getNumberOfChildren();
     QGradientStops stops;
-    const qreal inc = 1./(mColors.length() - 1);
+    const qreal inc = 1./(nCols - 1);
     qreal cPos = 0.;
-    for(int i = 0; i < mColors.length(); i++) {
-        stops.append(QPair<qreal, QColor>(clamp(cPos, 0, 1),
-                     mColors.at(i)->getColor(absFrame)) );
+    for(int i = 0; i < nCols; i++) {
+        const auto colorAnim = getChild(i);
+        const auto color = colorAnim->getColor(absFrame);
+        const auto stop = QPair<qreal, QColor>(clamp(cPos, 0, 1), color);
+        stops.append(stop);
         cPos += inc;
     }
     return stops;
 }
 
-void Gradient::updateQGradientStops(const UpdateReason reason) {
-    Q_UNUSED(reason)
+void Gradient::updateQGradientStops() {
+    const int nCols = ca_getNumberOfChildren();
     mQGradientStops.clear();
-    const qreal inc = 1./(mColors.length() - 1);
+    const qreal inc = 1./(nCols - 1);
     qreal cPos = 0;
-    for(int i = 0; i < mColors.length(); i++) {
-        mQGradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0, 1),
-                                    mColors.at(i)->getColor()) );
+    for(int i = 0; i < nCols; i++) {
+        const auto colorAnim = getChild(i);
+        const auto color = colorAnim->getColor();
+        const auto stop = QPair<qreal, QColor>(clamp(cPos, 0, 1), color);
+        mQGradientStops.append(stop);
         cPos += inc;
     }
 
     emit changed();
-}
-
-int Gradient::getReadWriteId() {
-    return mReadWriteId;
-}
-
-void Gradient::clearReadWriteId() {
-    mReadWriteId = -1;
 }

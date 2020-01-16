@@ -67,8 +67,8 @@ public:
     void anim_setRecording(const bool rec);
     void anim_shiftAllKeys(const int shift, const bool addUndoRedo = true);
 
-    void ca_swapChildren(Property * const child1,
-                         Property * const child2);
+    void ca_swapChildren(Property * const child1, Property * const child2);
+    void ca_swapChildren(const int id1, const int id2);
     void ca_moveChildInList(Property *child, const int to);
     void ca_moveChildInList(Property *child, const int from, const int to);
     void ca_moveChildBelow(Property *move, Property *below);

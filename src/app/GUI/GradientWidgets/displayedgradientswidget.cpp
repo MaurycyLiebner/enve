@@ -60,7 +60,7 @@ void DisplayedGradientsWidget::paintGL() {
     for(int i = mTopGradientId; i < mTopGradientId + visibleGradients; i++) {
         int yInverted = height() - yT - MIN_WIDGET_DIM;
         Gradient *gradient = mGradientWidget->getGradientAt(i);
-        int nColors = gradient->getColorCount();
+        const int nColors = gradient->ca_getNumberOfChildren();
         QColor lastColor = gradient->getColorAt(0);
         int xT = 0;
         const float xInc = static_cast<float>(width())/(nColors - 1);

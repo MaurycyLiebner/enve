@@ -17,13 +17,12 @@
 #ifndef GRADIENT_H
 #define GRADIENT_H
 #include <QGradientStops>
-#include "Animators/complexanimator.h"
-class ColorAnimator;
-class PathBox;
+#include "Animators/dynamiccomplexanimator.h"
+#include "coloranimator.h"
 
 enum class GradientType : short { LINEAR, RADIAL };
 
-class Gradient : public ComplexAnimator {
+class Gradient : public DynamicComplexAnimator<ColorAnimator> {
     Q_OBJECT
     e_OBJECT
 protected:
@@ -31,60 +30,39 @@ protected:
     Gradient(const QColor &color1, const QColor &color2);
 public:
     bool SWT_isGradient() const { return true; }
-    void prp_startTransform();
-    void prp_setInheritedFrameShift(const int shift,
-                                    ComplexAnimator* parentAnimator);
 
-    int prp_getTotalFrameShift() const {
-        return 0;
-    }
+    void prp_setInheritedFrameShift(
+            const int shift, ComplexAnimator* parentAnimator);
 
-    int prp_getInheritedFrameShift() const {
-        return 0;
-    }
+    int prp_getTotalFrameShift() const { return 0; }
+    int prp_getInheritedFrameShift() const { return 0; }
 
     void write(const int id, eWriteStream &dst);
     int read(eReadStream &src);
-    int getReadWriteId();
+    int getReadWriteId() { return mReadWriteId; }
     int getDocumentId() const { return mDocumentId; }
-    void clearReadWriteId();
+    void clearReadWriteId() { mReadWriteId = -1; }
 
-    void swapColors(const int id1, const int id2);
-    void removeColor(const qsptr<ColorAnimator> &color);
     void addColor(const QColor &color);
     void replaceColor(const int id, const QColor &color);
-    bool affectsPaths();
 
-    void updateQGradientStops(const UpdateReason reason);
+    void updateQGradientStops();
 
-    void addColorToList(const QColor &color);
     QColor getColorAt(const int id);
-    int getColorCount();
-
     QColor getLastQGradientStopQColor();
     QColor getFirstQGradientStopQColor();
 
-    QGradientStops getQGradientStops();
+    QGradientStops getQGradientStops() { return mQGradientStops; }
     void startColorIdTransform(const int id);
-    void addColorToList(const qsptr<ColorAnimator> &newColorAnimator);
-    ColorAnimator *getColorAnimatorAt(const int id);
-    void removeColor(const int id);
-
-    bool isEmpty() const;
 
     QGradientStops getQGradientStopsAtAbsFrame(const qreal absFrame);
 signals:
     void changed();
 private:
-    void prp_writeProperty(eWriteStream& dst) const;
-    void prp_readProperty(eReadStream& src);
-
     static int sNextDocumnetId;
     const int mDocumentId;
     int mReadWriteId = -1;
     QGradientStops mQGradientStops;
-    QList<qsptr<ColorAnimator>> mColors;
-    qptr<ColorAnimator> mCurrentColor;
 };
 
 #endif // GRADIENT_H

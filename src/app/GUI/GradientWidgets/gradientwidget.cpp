@@ -69,7 +69,7 @@ void GradientWidget::setCurrentColorId(const int id) {
         mCurrentColor = nullptr;
         return;
     }
-    mCurrentColor = mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
+    mCurrentColor = mCurrentGradient->getChild(mCurrentColorId);
     connect(mCurrentColor, &QObject::destroyed, this, [this]() {
         setCurrentColorId(0);
     });
@@ -124,7 +124,7 @@ QColor GradientWidget::getColor() {
 
 ColorAnimator *GradientWidget::getColorAnimator() {
     if(!mCurrentGradient) return nullptr;
-    return mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
+    return mCurrentGradient->getChild(mCurrentColorId);
 }
 
 void GradientWidget::setCurrentGradient(const int listId) {
@@ -141,11 +141,11 @@ void GradientWidget::colorRightPress(const int x, const QPoint &point) {
         const auto selected_action = menu.exec(point);
         if(selected_action) {
             if(selected_action->text() == "Delete Color") {
-                if(mCurrentGradient->getColorCount() < 2) {
+                if(mCurrentGradient->ca_getNumberOfChildren() < 2) {
                     mCurrentGradient->replaceColor(mCurrentColorId,
                                                    QColor(0, 0, 0));
                 } else {
-                    mCurrentGradient->removeColor(mCurrentColorId);
+                    mCurrentGradient->takeChildAt(mCurrentColorId);
                 }
                 startGradientTransform();
                 setCurrentColorId(0);
@@ -165,7 +165,7 @@ void GradientWidget::colorRightPress(const int x, const QPoint &point) {
 }
 
 int GradientWidget::getColorIdAtX(const int x) {
-    const int nCols = mCurrentGradient->getColorCount();
+    const int nCols = mCurrentGradient->ca_getNumberOfChildren();
     return clampInt(x*nCols/width(), 0, nCols - 1);
 }
 
@@ -176,11 +176,11 @@ void GradientWidget::colorLeftPress(const int x) {
 
 void GradientWidget::moveColor(const int x) {
     if(mCurrentGradient) {
-        const int nCols = mCurrentGradient->getColorCount();
+        const int nCols = mCurrentGradient->ca_getNumberOfChildren();
         const int colorId = clampInt(x*nCols/width(), 0, nCols - 1);
         if(colorId != mCurrentColorId) {
             startGradientTransform();
-            mCurrentGradient->swapColors(mCurrentColorId, colorId);
+            mCurrentGradient->ca_swapChildren(mCurrentColorId, colorId);
             setCurrentColorId(colorId);
             finishGradientTransform();
             updateAll();

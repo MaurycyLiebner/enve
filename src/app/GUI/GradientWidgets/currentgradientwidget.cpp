@@ -32,7 +32,7 @@ void CurrentGradientWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(PLAIN_PROGRAM.fID);
     Gradient *gradient = mGradientWidget->getCurrentGradient();
-    int nColors = gradient->getColorCount();
+    const int nColors = gradient->ca_getNumberOfChildren();
     int currentColorId = mGradientWidget->getColorId();
     mGradientWidget->getColor();
     qreal xT = 0;

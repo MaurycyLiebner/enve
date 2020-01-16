@@ -263,6 +263,10 @@ void ComplexAnimator::ca_swapChildren(Property * const child1,
     emit ca_childMoved(child2);
 }
 
+void ComplexAnimator::ca_swapChildren(const int id1, const int id2) {
+    ca_swapChildren(ca_getChildAt(id1), ca_getChildAt(id2));
+}
+
 bool ComplexAnimator::ca_hasChildren() const {
     return !ca_mChildren.isEmpty();
 }
