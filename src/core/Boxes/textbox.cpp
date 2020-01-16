@@ -74,7 +74,11 @@ void TextBox::openTextEditor(QWidget* dialogParent) {
             QInputDialog::getMultiLineText(
                 dialogParent, prp_getName() + " text",
                 "Text:", mText->getCurrentValue(), &ok);
-    if(ok) mText->setCurrentValue(text);
+    if(ok) {
+        mText->prp_startTransform();
+        mText->setCurrentValue(text);
+        mText->prp_finishTransform();
+    }
 }
 
 void TextBox::setTextHAlignment(const Qt::Alignment alignment) {
