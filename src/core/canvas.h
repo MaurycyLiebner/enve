@@ -446,7 +446,6 @@ public:
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode mode,
                                    const qreal invScale);
-    void duplicateSelectedBoxes();
     void clearLastPressedPoint();
     void clearCurrentSmartEndPoint();
     void applyPaintSettingToSelected(const PaintSettingsApplier &setting);

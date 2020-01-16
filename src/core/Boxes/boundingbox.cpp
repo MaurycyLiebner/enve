@@ -543,7 +543,7 @@ void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
     })->setShortcut(Qt::CTRL + Qt::Key_X);
 
     menu->addPlainAction("Duplicate", [pScene]() {
-        pScene->duplicateSelectedBoxes();
+        pScene->duplicateAction();
     })->setShortcut(Qt::CTRL + Qt::Key_D);
 
     menu->addPlainAction("Delete", [pScene]() {

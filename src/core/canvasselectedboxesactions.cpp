@@ -587,16 +587,9 @@ void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
 
 #include "Boxes/internallinkbox.h"
 void Canvas::createLinkBoxForSelected() {
+    pushUndoRedoName("Create Link");
     for(const auto& selectedBox : mSelectedBoxes)
         mCurrentContainer->addContained(selectedBox->createLink());
-}
-
-#include "clipboardcontainer.h"
-void Canvas::duplicateSelectedBoxes() {
-    const auto container = enve::make_shared<BoxesClipboard>(
-                mSelectedBoxes.getList());
-    clearBoxesSelection();
-    container->pasteTo(mCurrentContainer);
 }
 
 SmartVectorPath *Canvas::getPathResultingFromOperation(const SkPathOp& pathOp) {
