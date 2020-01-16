@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RasterEffectANIMATORS_H
-#define RasterEffectANIMATORS_H
+#ifndef RASTEREFFECTCOLLECTION_H
+#define RASTEREFFECTCOLLECTION_H
 #include "Animators/dynamiccomplexanimator.h"
 #include "smartPointers/ememory.h"
 #include "RasterEffects/rastereffect.h"
@@ -26,14 +26,14 @@ struct BoxRenderData;
 qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream& src);
 typedef DynamicComplexAnimator<
     RasterEffect, &RasterEffect::writeIdentifier,
-    &readIdCreateRasterEffect> RasterEffectAnimatorsBase;
-class RasterEffectAnimators : public RasterEffectAnimatorsBase {
+    &readIdCreateRasterEffect> RasterEffectCollectionBase;
+class RasterEffectCollection : public RasterEffectCollectionBase {
     e_OBJECT
     Q_OBJECT
 protected:
-    RasterEffectAnimators();
+    RasterEffectCollection();
 public:
-    bool SWT_isRasterEffectAnimators() const { return true; }
+    bool SWT_isRasterEffectCollection() const { return true; }
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     bool hasEffects();
@@ -57,4 +57,4 @@ private:
     bool mUnbound = false;
 };
 
-#endif // RasterEffectANIMATORS_H
+#endif // RASTEREFFECTCOLLECTION_H

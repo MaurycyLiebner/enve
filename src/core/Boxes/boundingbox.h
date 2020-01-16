@@ -36,7 +36,7 @@ class TimelineMovable;
 class FillSettingsAnimator;
 class OutlineSettingsAnimator;
 class PaintSettingsApplier;
-class RasterEffectAnimators;
+class RasterEffectCollection;
 class ShaderEffectProgram;
 class BoxTransformAnimator;
 class BasicTransformAnimator;
@@ -408,7 +408,7 @@ protected:
     RenderDataHandler mRenderDataHandler;
 
     const qsptr<BoxTransformAnimator> mTransformAnimator;
-    const qsptr<RasterEffectAnimators> mRasterEffectsAnimators;
+    const qsptr<RasterEffectCollection> mRasterEffectsAnimators;
 private:
     SkBlendMode mBlendMode = SkBlendMode::kSrcOver;
 

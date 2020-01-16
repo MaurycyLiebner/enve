@@ -14,35 +14,35 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "rastereffectanimators.h"
+#include "rastereffectcollection.h"
 #include "RasterEffects/rastereffect.h"
 #include "Boxes/boundingbox.h"
 #include "Boxes/containerbox.h"
 #include "RasterEffects/rastereffectsinclude.h"
 #include "RasterEffects/customrastereffectcreator.h"
 
-RasterEffectAnimators::RasterEffectAnimators() :
-    RasterEffectAnimatorsBase("raster effects") {
+RasterEffectCollection::RasterEffectCollection() :
+    RasterEffectCollectionBase("raster effects") {
     ca_setHiddenWhenEmpty(true);
 
     connect(this, &ComplexAnimator::ca_childAdded,
-            this, &RasterEffectAnimators::updateMaxForcedMargin);
+            this, &RasterEffectCollection::updateMaxForcedMargin);
     connect(this, &ComplexAnimator::ca_childRemoved,
-            this, &RasterEffectAnimators::updateMaxForcedMargin);
+            this, &RasterEffectCollection::updateMaxForcedMargin);
 }
 
 template <typename T>
 void addRasterEffectActionToMenu(const QString& text,
                                  PropertyMenu * const menu) {
-    menu->addPlainAction<RasterEffectAnimators>(
-                text, [](RasterEffectAnimators * target) {
+    menu->addPlainAction<RasterEffectCollection>(
+                text, [](RasterEffectCollection * target) {
         target->addChild(enve::make_shared<T>());
     });
 }
 
-void RasterEffectAnimators::prp_setupTreeViewMenu(PropertyMenu * const menu) {
-    if(menu->hasActionsForType<RasterEffectAnimators>()) return;
-    menu->addedActionsForType<RasterEffectAnimators>();
+void RasterEffectCollection::prp_setupTreeViewMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<RasterEffectCollection>()) return;
+    menu->addedActionsForType<RasterEffectCollection>();
     const auto rasterEffectsMenu = menu->addMenu("Add Effect");
     addRasterEffectActionToMenu<BlurEffect>("Blur", rasterEffectsMenu);
     addRasterEffectActionToMenu<ShadowEffect>("Shadow", rasterEffectsMenu);
@@ -50,18 +50,18 @@ void RasterEffectAnimators::prp_setupTreeViewMenu(PropertyMenu * const menu) {
                                           &BoundingBox::addRasterEffect);
     if(!rasterEffectsMenu->isEmpty()) rasterEffectsMenu->addSeparator();
     for(const auto& creator : ShaderEffectCreator::sEffectCreators) {
-        const PropertyMenu::PlainSelectedOp<RasterEffectAnimators> op =
-        [creator](RasterEffectAnimators * target) {
+        const PropertyMenu::PlainSelectedOp<RasterEffectCollection> op =
+        [creator](RasterEffectCollection * target) {
             const auto effect = creator->create();
             target->addChild(qSharedPointerCast<RasterEffect>(effect));
         };
         rasterEffectsMenu->addPlainAction(creator->fName, op);
     }
     menu->addSeparator();
-    RasterEffectAnimatorsBase::prp_setupTreeViewMenu(menu);
+    RasterEffectCollectionBase::prp_setupTreeViewMenu(menu);
 }
 
-void RasterEffectAnimators::updateMaxForcedMargin() {
+void RasterEffectCollection::updateMaxForcedMargin() {
     QMargins newMargins;
     const auto& children = ca_getChildren();
     for(const auto& effect : children) {
@@ -89,7 +89,7 @@ void RasterEffectAnimators::updateMaxForcedMargin() {
     if(changed) forcedMarginChanged();
 }
 
-void RasterEffectAnimators::addEffects(const qreal relFrame,
+void RasterEffectCollection::addEffects(const qreal relFrame,
                                        BoxRenderData * const data,
                                        const qreal influence) {
     const auto& children = ca_getChildren();
@@ -104,7 +104,7 @@ void RasterEffectAnimators::addEffects(const qreal relFrame,
     }
 }
 
-void RasterEffectAnimators::updateIfUsesProgram(
+void RasterEffectCollection::updateIfUsesProgram(
         const ShaderEffectProgram * const program) {
     const auto& children = ca_getChildren();
     for(const auto& effect : children) {
@@ -114,7 +114,7 @@ void RasterEffectAnimators::updateIfUsesProgram(
     }
 }
 
-bool RasterEffectAnimators::hasEffects() {
+bool RasterEffectCollection::hasEffects() {
     return ca_hasChildren();
 }
 

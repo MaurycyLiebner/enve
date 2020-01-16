@@ -24,7 +24,7 @@
 #include "GUI/global.h"
 #include "MovablePoints/movablepoint.h"
 #include "Private/Tasks/taskscheduler.h"
-#include "Animators/rastereffectanimators.h"
+#include "Animators/rastereffectcollection.h"
 #include "Animators/transformanimator.h"
 #include "RasterEffects/rastereffect.h"
 #include "RasterEffects/customrastereffectcreator.h"
@@ -44,7 +44,7 @@ QList<BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 BoundingBox::BoundingBox(const eBoxType type) : eBoxOrSound("box"),
     mDocumentId(sNextDocumentId++), mType(type),
     mTransformAnimator(enve::make_shared<BoxTransformAnimator>()),
-    mRasterEffectsAnimators(enve::make_shared<RasterEffectAnimators>()) {
+    mRasterEffectsAnimators(enve::make_shared<RasterEffectCollection>()) {
     sDocumentBoxes << this;
     ca_addChild(mTransformAnimator);
     const auto pivotAnim = mTransformAnimator->getPivotAnimator();

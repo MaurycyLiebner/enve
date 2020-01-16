@@ -24,7 +24,7 @@
 #include "Animators/transformanimator.h"
 #include "paintsettingsapplier.h"
 #include "Animators/gradient.h"
-#include "Animators/rastereffectanimators.h"
+#include "Animators/rastereffectcollection.h"
 #include "Animators/outlinesettingsanimator.h"
 #include "PathEffects/patheffectstask.h"
 #include "Private/Tasks/taskscheduler.h"

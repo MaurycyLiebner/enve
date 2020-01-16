@@ -85,7 +85,7 @@ SOURCES += \
     Animators/qcubicsegment1danimator.cpp \
     Animators/qrealsnapshot.cpp \
     Animators/qstringanimator.cpp \
-    Animators/rastereffectanimators.cpp \
+    Animators/rastereffectcollection.cpp \
     Animators/staticcomplexanimator.cpp \
     Animators/texteffectcollection.cpp \
     Boxes/animationbox.cpp \
@@ -334,7 +334,7 @@ HEADERS += \
     Animators/qcubicsegment1danimator.h \
     Animators/qrealsnapshot.h \
     Animators/qstringanimator.h \
-    Animators/rastereffectanimators.h \
+    Animators/rastereffectcollection.h \
     Animators/staticcomplexanimator.h \
     Animators/texteffectcollection.h \
     Boxes/animationbox.h \

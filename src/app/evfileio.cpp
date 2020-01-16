@@ -54,7 +54,7 @@
 #include "Boxes/smartvectorpath.h"
 #include "Sound/singlesound.h"
 #include "Sound/soundcomposition.h"
-#include "Animators/rastereffectanimators.h"
+#include "Animators/rastereffectcollection.h"
 #include "ReadWrite/filefooter.h"
 #include "GUI/timelinedockwidget.h"
 #include "GUI/RenderWidgets/renderwidget.h"

@@ -19,7 +19,7 @@
 #include "Animators/gradientpoints.h"
 #include "MovablePoints/animatedpoint.h"
 #include "Animators/transformanimator.h"
-#include "Animators/rastereffectanimators.h"
+#include "Animators/rastereffectcollection.h"
 
 Rectangle::Rectangle() : PathBox(eBoxType::rectangle) {
     prp_setName("Rectangle");

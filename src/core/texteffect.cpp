@@ -119,7 +119,7 @@ TextEffect::TextEffect() : eEffect("text effect") {
     mOutlinePathEffects->ca_setHiddenWhenEmpty(false);
     mOutlinePathEffects->prp_setName("outline effects");
 
-    mRasterEffects = enve::make_shared<RasterEffectAnimators>();
+    mRasterEffects = enve::make_shared<RasterEffectCollection>();
     mRasterEffects->ca_setHiddenWhenEmpty(false);
 
     ca_addChild(mInfluence);

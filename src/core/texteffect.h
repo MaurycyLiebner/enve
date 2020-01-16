@@ -20,7 +20,7 @@
 #include "Animators/qrealanimator.h"
 #include "Properties/comboboxproperty.h"
 #include "Animators/transformanimator.h"
-#include "Animators/rastereffectanimators.h"
+#include "Animators/rastereffectcollection.h"
 #include "PathEffects/patheffectanimators.h"
 
 class LetterRenderData;
@@ -98,7 +98,7 @@ private:
     qsptr<PathEffectAnimators> mOutlineBasePathEffects;
     qsptr<PathEffectAnimators> mOutlinePathEffects;
 
-    qsptr<RasterEffectAnimators> mRasterEffects;
+    qsptr<RasterEffectCollection> mRasterEffects;
 };
 
 #endif // TEXTEFFECT_H

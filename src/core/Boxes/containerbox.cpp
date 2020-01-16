@@ -22,7 +22,7 @@
 #include "PathEffects/patheffectanimators.h"
 #include "PathEffects/patheffect.h"
 #include "textbox.h"
-#include "Animators/rastereffectanimators.h"
+#include "Animators/rastereffectcollection.h"
 #include "Sound/singlesound.h"
 #include "actions.h"
 #include "externallinkbox.h"
@@ -32,7 +32,7 @@ ContainerBox::ContainerBox(const eBoxType type) :
     if(type == eBoxType::group) prp_setName("Group");
     else if(type == eBoxType::layer) prp_setName("Layer");
     connect(mRasterEffectsAnimators.get(),
-            &RasterEffectAnimators::forcedMarginChanged,
+            &RasterEffectCollection::forcedMarginChanged,
             this, &ContainerBox::forcedMarginMeaningfulChange);
     iniPathEffects();
 }

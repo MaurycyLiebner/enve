@@ -20,7 +20,7 @@
 #include "canvas.h"
 #include "Animators/gradientpoints.h"
 #include "Animators/qstringanimator.h"
-#include "Animators/rastereffectanimators.h"
+#include "Animators/rastereffectcollection.h"
 #include "typemenu.h"
 #include "Animators/transformanimator.h"
 #include "Animators/outlinesettingsanimator.h"
