@@ -250,6 +250,19 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
 
 void BoundingBox::setBlendModeSk(const SkBlendMode blendMode) {
     if(mBlendMode == blendMode) return;
+    {
+        prp_pushUndoRedoName("Set Blend Mode");
+        UndoRedo ur;
+        const auto oldValue = mBlendMode;
+        const auto newValue = blendMode;
+        ur.fUndo = [this, oldValue]() {
+            setBlendModeSk(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setBlendModeSk(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mBlendMode = blendMode;
     prp_afterWholeInfluenceRangeChanged();
     emit blendModeChanged(blendMode);
