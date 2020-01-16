@@ -309,17 +309,17 @@ void MainWindow::setupMenuBar() {
     mEditMenu->addSeparator();
 
     {
-        const auto qAct = new NoShortcutAction("Cut");
-        mEditMenu->addAction(qAct);
-        qAct->setShortcut(Qt::CTRL + Qt::Key_X);
-        mActions.cutAction->connect(qAct);
-    }
-
-    {
         const auto qAct = new NoShortcutAction("Copy");
         mEditMenu->addAction(qAct);
         qAct->setShortcut(Qt::CTRL + Qt::Key_C);
         mActions.copyAction->connect(qAct);
+    }
+
+    {
+        const auto qAct = new NoShortcutAction("Cut");
+        mEditMenu->addAction(qAct);
+        qAct->setShortcut(Qt::CTRL + Qt::Key_X);
+        mActions.cutAction->connect(qAct);
     }
 
     {
