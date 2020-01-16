@@ -20,6 +20,7 @@
 #include "Boxes/containerbox.h"
 #include "RasterEffects/rastereffectsinclude.h"
 #include "RasterEffects/customrastereffectcreator.h"
+#include "rastereffectmenucreator.h"
 
 RasterEffectCollection::RasterEffectCollection() :
     RasterEffectCollectionBase("raster effects") {
@@ -31,32 +32,12 @@ RasterEffectCollection::RasterEffectCollection() :
             this, &RasterEffectCollection::updateMaxForcedMargin);
 }
 
-template <typename T>
-void addRasterEffectActionToMenu(const QString& text,
-                                 PropertyMenu * const menu) {
-    menu->addPlainAction<RasterEffectCollection>(
-                text, [](RasterEffectCollection * target) {
-        target->addChild(enve::make_shared<T>());
-    });
-}
-
 void RasterEffectCollection::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<RasterEffectCollection>()) return;
     menu->addedActionsForType<RasterEffectCollection>();
     const auto rasterEffectsMenu = menu->addMenu("Add Effect");
-    addRasterEffectActionToMenu<BlurEffect>("Blur", rasterEffectsMenu);
-    addRasterEffectActionToMenu<ShadowEffect>("Shadow", rasterEffectsMenu);
-    CustomRasterEffectCreator::sAddToMenu(rasterEffectsMenu,
-                                          &BoundingBox::addRasterEffect);
-    if(!rasterEffectsMenu->isEmpty()) rasterEffectsMenu->addSeparator();
-    for(const auto& creator : ShaderEffectCreator::sEffectCreators) {
-        const PropertyMenu::PlainSelectedOp<RasterEffectCollection> op =
-        [creator](RasterEffectCollection * target) {
-            const auto effect = creator->create();
-            target->addChild(qSharedPointerCast<RasterEffect>(effect));
-        };
-        rasterEffectsMenu->addPlainAction(creator->fName, op);
-    }
+    RasterEffectMenuCreator::addEffects(
+                rasterEffectsMenu, &RasterEffectCollection::addChild);
     menu->addSeparator();
     RasterEffectCollectionBase::prp_setupTreeViewMenu(menu);
 }

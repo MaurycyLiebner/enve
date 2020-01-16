@@ -49,70 +49,15 @@ public:
     const QList<stdsptr<ShaderPropertyCreator>> fProperties;
     ShaderEffectProgram fProgram;
 
-    bool compatible(const QList<PropertyType>& props) const {
-        if(props.count() != fProperties.count()) return false;
-        for(int i = 0; i < props.count(); i++) {
-            const auto& iType = props.at(i);
-            const auto prop = fProperties.at(i).get();
-            if(iType == PTYPE_FLOAT) {
-                const bool iCompatible =
-                        dynamic_cast<QrealAnimatorCreator*>(prop);
-                if(!iCompatible) return false;
-            } else if(iType == PTYPE_INT) {
-                const bool iCompatible =
-                        dynamic_cast<IntAnimatorCreator*>(prop);
-                if(!iCompatible) return false;
-            } else return false;
-        }
-        return true;
-    }
+    bool compatible(const QList<PropertyType>& props) const;
 
-    void reloadProgram(QGL33 * const gl, const QString& fragPath) {
-        if(!QFile(fragPath).exists()) return;
-        ShaderEffectProgram program;
-        try {
-            program = ShaderEffectProgram::sCreateProgram(
-                        gl, fragPath,
-                        fProgram.fMarginScript, fProperties,
-                        fProgram.fPropUniCreators,
-                        fProgram.fValueHandlers);
-        } catch(...) {
-            RuntimeThrow("Failed to load a new version of '" + fragPath + "'");
-        }
-        gl->glDeleteProgram(fProgram.fId);
-        fProgram = program;
-    }
+    void reloadProgram(QGL33 * const gl, const QString& fragPath);
 
     qsptr<ShaderEffect> create() const;
 
-    void writeIdentifier(eWriteStream& dst) const {
-        dst << fName;
-        dst << fGrePath;
-        const int nChildren = fProperties.count();
-        dst << nChildren;
-        for(const auto& anim : fProperties) {
-            PropertyType type;
-            if(dynamic_cast<QrealAnimatorCreator*>(anim.get())) {
-                type = PTYPE_FLOAT;
-            } else if(dynamic_cast<IntAnimatorCreator*>(anim.get())) {
-                type = PTYPE_INT;
-            } else RuntimeThrow("Only QrealAnimator and IntAnimator supported");
-            dst.write(&type, sizeof(PropertyType));
-        }
-    }
+    void writeIdentifier(eWriteStream& dst) const;
 
-    static Identifier sReadIdentifier(eReadStream& src) {
-        QString name; src >> name;
-        QString grePath; src >> grePath;
-        QList<PropertyType> props;
-        int nChildren; src >> nChildren;
-        for(int i = 0; i < nChildren; i++) {
-            PropertyType type;
-            src.read(&type, sizeof(PropertyType));
-            props << type;
-        }
-        return Identifier(grePath, name, props);
-    }
+    static Identifier sReadIdentifier(eReadStream& src);
 
     static stdsptr<ShaderEffectCreator> sLoadFromFile(
             QGL33 * const gl, const QString& grePath);
@@ -136,6 +81,17 @@ public:
 
     static QList<stdsptr<ShaderEffectCreator>> sGetBestCompatibleEffects(
             const Identifier& id);
+
+    template <typename T> using Func = std::function<T>;
+    template <typename T> using Creator = Func<qsptr<T>()>;
+    using CCreator = Creator<ShaderEffect>;
+    using CAdder = Func<void(const QString&, const CCreator&)>;
+    static void sForEveryEffect(const CAdder& add) {
+        for(const auto& creator : sEffectCreators) {
+            const auto cCreator = [creator]() { return creator->create(); };
+            add(creator->fName, cCreator);
+        }
+    }
 
     static QList<stdsptr<ShaderEffectCreator>> sEffectCreators;
 };

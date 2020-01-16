@@ -86,6 +86,7 @@ SOURCES += \
     Animators/qrealsnapshot.cpp \
     Animators/qstringanimator.cpp \
     Animators/rastereffectcollection.cpp \
+    Animators/rastereffectmenucreator.cpp \
     Animators/staticcomplexanimator.cpp \
     Animators/texteffectcollection.cpp \
     Boxes/animationbox.cpp \
@@ -335,6 +336,7 @@ HEADERS += \
     Animators/qrealsnapshot.h \
     Animators/qstringanimator.h \
     Animators/rastereffectcollection.h \
+    Animators/rastereffectmenucreator.h \
     Animators/staticcomplexanimator.h \
     Animators/texteffectcollection.h \
     Boxes/animationbox.h \

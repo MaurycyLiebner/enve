@@ -22,10 +22,73 @@
 
 QList<stdsptr<ShaderEffectCreator>> ShaderEffectCreator::sEffectCreators;
 
+bool ShaderEffectCreator::compatible(const QList<PropertyType> &props) const {
+    if(props.count() != fProperties.count()) return false;
+    for(int i = 0; i < props.count(); i++) {
+        const auto& iType = props.at(i);
+        const auto prop = fProperties.at(i).get();
+        if(iType == PTYPE_FLOAT) {
+            const bool iCompatible =
+                    dynamic_cast<QrealAnimatorCreator*>(prop);
+            if(!iCompatible) return false;
+        } else if(iType == PTYPE_INT) {
+            const bool iCompatible =
+                    dynamic_cast<IntAnimatorCreator*>(prop);
+            if(!iCompatible) return false;
+        } else return false;
+    }
+    return true;
+}
+
+void ShaderEffectCreator::reloadProgram(QGL33 * const gl, const QString &fragPath) {
+    if(!QFile(fragPath).exists()) return;
+    ShaderEffectProgram program;
+    try {
+        program = ShaderEffectProgram::sCreateProgram(
+                    gl, fragPath,
+                    fProgram.fMarginScript, fProperties,
+                    fProgram.fPropUniCreators,
+                    fProgram.fValueHandlers);
+    } catch(...) {
+        RuntimeThrow("Failed to load a new version of '" + fragPath + "'");
+    }
+    gl->glDeleteProgram(fProgram.fId);
+    fProgram = program;
+}
+
 qsptr<ShaderEffect> ShaderEffectCreator::create() const {
     auto shaderEffect = enve::make_shared<ShaderEffect>(
                 fName, this, &fProgram, fProperties);
     return shaderEffect;
+}
+
+void ShaderEffectCreator::writeIdentifier(eWriteStream &dst) const {
+    dst << fName;
+    dst << fGrePath;
+    const int nChildren = fProperties.count();
+    dst << nChildren;
+    for(const auto& anim : fProperties) {
+        PropertyType type;
+        if(dynamic_cast<QrealAnimatorCreator*>(anim.get())) {
+            type = PTYPE_FLOAT;
+        } else if(dynamic_cast<IntAnimatorCreator*>(anim.get())) {
+            type = PTYPE_INT;
+        } else RuntimeThrow("Only QrealAnimator and IntAnimator supported");
+        dst.write(&type, sizeof(PropertyType));
+    }
+}
+
+ShaderEffectCreator::Identifier ShaderEffectCreator::sReadIdentifier(eReadStream &src) {
+    QString name; src >> name;
+    QString grePath; src >> grePath;
+    QList<PropertyType> props;
+    int nChildren; src >> nChildren;
+    for(int i = 0; i < nChildren; i++) {
+        PropertyType type;
+        src.read(&type, sizeof(PropertyType));
+        props << type;
+    }
+    return Identifier(grePath, name, props);
 }
 
 qreal stringToDouble(const QString &str) {

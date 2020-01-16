@@ -34,6 +34,7 @@
 #include "typemenu.h"
 #include "patheffectsmenu.h"
 #include "RasterEffects/rastereffectsinclude.h"
+#include "Animators/rastereffectmenucreator.h"
 
 int BoundingBox::sNextDocumentId = 0;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
@@ -503,14 +504,6 @@ QRectF BoundingBox::getRelBoundingRect() const {
     return mRelRect;
 }
 
-template <typename T>
-void addRasterEffectActionToMenu(const QString& text,
-                                 PropertyMenu * const menu) {
-    menu->addPlainAction<BoundingBox>(text, [](BoundingBox * box) {
-        box->addRasterEffect(enve::make_shared<T>());
-    });
-}
-
 void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<BoundingBox>()) return;
     menu->addedActionsForType<BoundingBox>();
@@ -557,18 +550,8 @@ void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
     menu->addSeparator();
 
     const auto rasterEffectsMenu = menu->addMenu("Raster Effects");
-    addRasterEffectActionToMenu<BlurEffect>("Blur", rasterEffectsMenu);
-    addRasterEffectActionToMenu<ShadowEffect>("Shadow", rasterEffectsMenu);
-    CustomRasterEffectCreator::sAddToMenu(rasterEffectsMenu, &BoundingBox::addRasterEffect);
-    if(!rasterEffectsMenu->isEmpty()) rasterEffectsMenu->addSeparator();
-    for(const auto& creator : ShaderEffectCreator::sEffectCreators) {
-        const PropertyMenu::PlainSelectedOp<BoundingBox> op =
-        [creator](BoundingBox * box) {
-            const auto effect = creator->create();
-            box->addRasterEffect(qSharedPointerCast<RasterEffect>(effect));
-        };
-        rasterEffectsMenu->addPlainAction(creator->fName, op);
-    }
+    RasterEffectMenuCreator::addEffects(
+                rasterEffectsMenu, &BoundingBox::addRasterEffect);
 }
 
 void BoundingBox::moveByAbs(const QPointF &trans) {
