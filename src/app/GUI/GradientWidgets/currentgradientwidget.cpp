@@ -30,8 +30,9 @@ CurrentGradientWidget::CurrentGradientWidget(GradientWidget *gradientWidget,
 
 void CurrentGradientWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT);
+    const auto gradient = mGradientWidget->getCurrentGradient();
+    if(!gradient) return;
     glUseProgram(PLAIN_PROGRAM.fID);
-    Gradient *gradient = mGradientWidget->getCurrentGradient();
     const int nColors = gradient->ca_getNumberOfChildren();
     int currentColorId = mGradientWidget->getColorId();
     mGradientWidget->getColor();
@@ -108,6 +109,11 @@ void CurrentGradientWidget::mouseMoveEvent(QMouseEvent *event) {
     }
     mHoveredX = event->x();
     update();
+}
+
+void CurrentGradientWidget::mouseReleaseEvent(QMouseEvent *event) {
+    if(event->button() != Qt::LeftButton) return;
+    mGradientWidget->colorRelease();
 }
 
 void CurrentGradientWidget::leaveEvent(QEvent *) {

@@ -30,6 +30,7 @@ public:
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
     void leaveEvent(QEvent *);
     int mHoveredX = 0;
     GradientWidget *mGradientWidget;

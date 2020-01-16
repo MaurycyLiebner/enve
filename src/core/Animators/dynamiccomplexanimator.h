@@ -113,6 +113,48 @@ public:
         return child;
     }
 
+    void swapChildren(const int id1, const int id2) {
+        ca_swapChildren(id1, id2);
+
+        {
+            prp_pushUndoRedoName("Swap");
+            UndoRedo ur;
+            ur.fUndo = [this, id1, id2]() {
+                swapChildren(id2, id1);
+            };
+            ur.fRedo = [this, id1, id2]() {
+                swapChildren(id1, id2);
+            };
+            prp_addUndoRedo(ur);
+        }
+    }
+
+    void saveOrder() {
+        mSavedOrder = ca_getChildren();
+    }
+
+    void restoreOrder() {
+        restoreOrder(mSavedOrder);
+    }
+
+    void finishOrder() {
+        prp_pushUndoRedoName("Reorder");
+        UndoRedo ur;
+        const auto oldValue = mSavedOrder;
+        const auto newValue = ca_getChildren();
+        ur.fUndo = [this, oldValue]() {
+            restoreOrder(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            restoreOrder(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
+
+    void swapChildrenTemporary(const int id1, const int id2) {
+        ca_swapChildren(id1, id2);
+    }
+
     using ComplexAnimator::ca_removeAllChildren;
 private:
     using ComplexAnimator::ca_addChild;
@@ -123,11 +165,24 @@ private:
     using ComplexAnimator::ca_replaceChild;
     using ComplexAnimator::ca_takeChildAt;
 
+    using ComplexAnimator::ca_swapChildren;
+    using ComplexAnimator::ca_moveChildInList;
+    using ComplexAnimator::ca_moveChildBelow;
+    using ComplexAnimator::ca_moveChildAbove;
+
+    void restoreOrder(const QList<qsptr<Property>>& order) {
+        ca_removeAllChildren();
+        for(const auto& child : order)
+            ca_addChild(child);
+    }
+
     void clearOldParent(const qsptr<T>& futureChild) {
         const auto oldParent = futureChild->template getParent
                 <DynamicComplexAnimatorBase<T>>();
         if(oldParent) oldParent->removeChild(futureChild);
     }
+
+    QList<qsptr<Property>> mSavedOrder;
 };
 
 template <class T>

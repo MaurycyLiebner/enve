@@ -133,8 +133,11 @@ void GradientWidget::setCurrentGradient(const int listId) {
 }
 
 void GradientWidget::colorRightPress(const int x, const QPoint &point) {
-    colorLeftPress(x);
-    if(mCurrentGradient) {
+    if(!mCurrentGradient) return;
+    if(mReordering) {
+        mCurrentGradient->restoreOrder();
+    } else {
+        colorLeftPress(x);
         QMenu menu(this);
         menu.addAction("Delete Color");
         menu.addAction("Add Color");
@@ -147,19 +150,13 @@ void GradientWidget::colorRightPress(const int x, const QPoint &point) {
                 } else {
                     mCurrentGradient->takeChildAt(mCurrentColorId);
                 }
-                startGradientTransform();
                 setCurrentColorId(0);
-                finishGradientTransform();
                 updateAll();
             } else if(selected_action->text() == "Add Color") {
-                startGradientTransform();
                 mCurrentGradient->addColor(QColor(0, 0, 0));
-                finishGradientTransform();
                 updateAll();
             }
             Document::sInstance->actionFinished();
-        } else {
-
         }
     }
 }
@@ -170,22 +167,32 @@ int GradientWidget::getColorIdAtX(const int x) {
 }
 
 void GradientWidget::colorLeftPress(const int x) {
-    if(mCurrentGradient) setCurrentColorId(getColorIdAtX(x));
+    if(!mCurrentGradient) return;
+    mFirstMove = true;
+    setCurrentColorId(getColorIdAtX(x));
     updateAll();
 }
 
+void GradientWidget::colorRelease() {
+    mReordering = false;
+    if(mFirstMove || !mCurrentGradient) return;
+    mCurrentGradient->finishOrder();
+}
+
 void GradientWidget::moveColor(const int x) {
-    if(mCurrentGradient) {
-        const int nCols = mCurrentGradient->ca_getNumberOfChildren();
-        const int colorId = clampInt(x*nCols/width(), 0, nCols - 1);
-        if(colorId != mCurrentColorId) {
-            startGradientTransform();
-            mCurrentGradient->ca_swapChildren(mCurrentColorId, colorId);
-            setCurrentColorId(colorId);
-            finishGradientTransform();
-            updateAll();
-            Document::sInstance->actionFinished();
-        }
+    if(!mCurrentGradient) return;
+    if(mFirstMove) {
+        mFirstMove = false;
+        mReordering = true;
+        mCurrentGradient->saveOrder();
+    }
+    const int nCols = mCurrentGradient->ca_getNumberOfChildren();
+    const int colorId = clampInt(x*nCols/width(), 0, nCols - 1);
+    if(colorId != mCurrentColorId) {
+        mCurrentGradient->swapChildrenTemporary(mCurrentColorId, colorId);
+        setCurrentColorId(colorId);
+        updateAll();
+        Document::sInstance->updateScenes();
     }
 }
 
@@ -233,19 +240,4 @@ void GradientWidget::gradientContextMenuReq(const int gradId,
     } else {
 
     }
-}
-
-void GradientWidget::startSelectedColorTransform() {
-    if(!mCurrentGradient) return;
-    mCurrentGradient->startColorIdTransform(mCurrentColorId);
-}
-
-void GradientWidget::finishGradientTransform() {
-    if(!mCurrentGradient) return;
-    mCurrentGradient->prp_finishTransform();
-}
-
-void GradientWidget::startGradientTransform() {
-    if(!mCurrentGradient) return;
-    mCurrentGradient->prp_startTransform();
 }

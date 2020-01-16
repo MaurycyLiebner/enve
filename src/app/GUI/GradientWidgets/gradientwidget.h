@@ -35,10 +35,7 @@ public:
 
     void moveColor(const int x);
 
-    void finishGradientTransform();
-    void startGradientTransform();
     void clearAll();
-    void startSelectedColorTransform();
     void updateNumberOfGradients();
 
     void gradientLeftPressed(const int gradId);
@@ -47,6 +44,7 @@ public:
 
     void colorRightPress(const int x, const QPoint &point);
     void colorLeftPress(const int x);
+    void colorRelease();
     int getColorIdAtX(const int x);
 
     void updateAfterFrameChanged(const int absFrame);
@@ -69,6 +67,9 @@ private:
     QVBoxLayout *mMainLayout;
     GradientsListWidget *mGradientsListWidget;
     CurrentGradientWidget *mCurrentGradientWidget;
+
+    bool mReordering = false;
+    bool mFirstMove = false;
 
     int mNumberVisibleGradients = 6;
     int mHalfHeight = 64;
