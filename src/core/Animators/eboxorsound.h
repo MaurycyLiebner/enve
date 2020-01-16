@@ -44,10 +44,7 @@ public:
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
     int prp_getRelFrameShift() const;
     void prp_afterChangedAbsRange(const FrameRange &range,
-                                  const bool clip = true) {
-        const auto croppedRange = clip ? prp_absInfluenceRange()*range : range;
-        StaticComplexAnimator::prp_afterChangedAbsRange(croppedRange);
-    }
+                                  const bool clip = true);
 
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);

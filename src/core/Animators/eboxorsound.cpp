@@ -104,6 +104,12 @@ int eBoxOrSound::prp_getRelFrameShift() const {
     return mDurationRectangle->getRelShift();
 }
 
+void eBoxOrSound::prp_afterChangedAbsRange(const FrameRange &range,
+                                           const bool clip) {
+    const auto croppedRange = clip ? prp_absInfluenceRange()*range : range;
+    StaticComplexAnimator::prp_afterChangedAbsRange(croppedRange);
+}
+
 void eBoxOrSound::prp_writeProperty(eWriteStream& dst) const {
     StaticComplexAnimator::prp_writeProperty(dst);
     dst << mVisible;
@@ -345,6 +351,21 @@ void eBoxOrSound::selectionChangeTriggered(const bool shiftPressed) {
 
 void eBoxOrSound::setVisibile(const bool visible) {
     if(mVisible == visible) return;
+    if(!SWT_isLinkBox()) {
+        if(SWT_isSound()) {
+            prp_pushUndoRedoName(visible ? "Mute" : "Unmute");
+        } else prp_pushUndoRedoName(visible ? "Hide" : "Show");
+        UndoRedo ur;
+        const auto oldValue = mVisible;
+        const auto newValue = visible;
+        ur.fUndo = [this, oldValue]() {
+            setVisibile(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setVisibile(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mVisible = visible;
 
     prp_afterWholeInfluenceRangeChanged();
