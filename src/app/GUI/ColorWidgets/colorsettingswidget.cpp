@@ -108,59 +108,49 @@ void ColorSettingsWidget::setCurrentColor(const QColor &color) {
                     color.valueF(), color.alphaF());
 }
 
-void ColorSettingsWidget::hideAlphaControlers() {
-    delete aLabel;
-    delete aRect;
-    delete aSpin;
-    delete aLayout;
-    mAlphaHidden = true;
-    mColorModeCombo->hide();
-    mColorModeLabel->hide();
-}
-
-void ColorSettingsWidget::refreshColorAnimatorTarget() {
-    setTarget(mTargetAnimator);
-}
-
-void ColorSettingsWidget::setTarget(ColorAnimator * const target) {
-    auto& conn = mTargetAnimator.assign(target);
-    rSpin->setTarget(nullptr);
-    gSpin->setTarget(nullptr);
-    bSpin->setTarget(nullptr);
-    hSpin->setTarget(nullptr);
-    hslSSpin->setTarget(nullptr);
-    lSpin->setTarget(nullptr);
-    hsvSSpin->setTarget(nullptr);
-    vSpin->setTarget(nullptr);
-    if(!mAlphaHidden) aSpin->setTarget(nullptr);
-    if(target) {
-        mColorModeCombo->setCurrentIndex(int(target->getColorMode()));
-        if(!mAlphaHidden) {
-            aSpin->setTarget(target->getAlphaAnimator());
-        }
-        if(target->getColorMode() == ColorMode::rgb) {
-            rSpin->setTarget(target->getVal1Animator());
-            gSpin->setTarget(target->getVal2Animator());
-            bSpin->setTarget(target->getVal3Animator());
-
+void ColorSettingsWidget::updateWidgetTargets() {
+    if(mTarget) {
+        const auto colorMode = mTarget->getColorMode();
+        mColorModeCombo->setCurrentIndex(static_cast<int>(colorMode));
+        if(!mAlphaHidden) aSpin->setTarget(mTarget->getAlphaAnimator());
+        if(mTarget->getColorMode() == ColorMode::rgb) {
+            rSpin->setTarget(mTarget->getVal1Animator());
+            gSpin->setTarget(mTarget->getVal2Animator());
+            bSpin->setTarget(mTarget->getVal3Animator());
             updateValuesFromRGB();
-        } else if(target->getColorMode() == ColorMode::hsl) {
-            hSpin->setTarget(target->getVal1Animator());
-            hslSSpin->setTarget(target->getVal2Animator());
-            lSpin->setTarget(target->getVal3Animator());
-
+        } else if(mTarget->getColorMode() == ColorMode::hsl) {
+            hSpin->setTarget(mTarget->getVal1Animator());
+            hslSSpin->setTarget(mTarget->getVal2Animator());
+            lSpin->setTarget(mTarget->getVal3Animator());
             updateValuesFromHSL();
         } else { // HSVMODE
-            hSpin->setTarget(target->getVal1Animator());
-            hsvSSpin->setTarget(target->getVal2Animator());
-            vSpin->setTarget(target->getVal3Animator());
-
+            hSpin->setTarget(mTarget->getVal1Animator());
+            hsvSSpin->setTarget(mTarget->getVal2Animator());
+            vSpin->setTarget(mTarget->getVal3Animator());
             updateValuesFromHSV();
         }
 
         updateAlphaFromSpin();
+    } else {
+        rSpin->setTarget(nullptr);
+        gSpin->setTarget(nullptr);
+        bSpin->setTarget(nullptr);
+        hSpin->setTarget(nullptr);
+        hslSSpin->setTarget(nullptr);
+        lSpin->setTarget(nullptr);
+        hsvSSpin->setTarget(nullptr);
+        vSpin->setTarget(nullptr);
+        aSpin->setTarget(nullptr);
+    }
+}
+
+void ColorSettingsWidget::setTarget(ColorAnimator * const target) {
+    auto& conn = mTarget.assign(target);
+
+    updateWidgetTargets();
+    if(target) {
         conn << connect(target, &ColorAnimator::colorModeChanged,
-                        this, &ColorSettingsWidget::refreshColorAnimatorTarget);
+                        this, &ColorSettingsWidget::updateWidgetTargets);
         conn << connect(target, &ColorAnimator::colorChanged,
                         mBookmarkedColors, &SavedColorsWidget::setColor);
     }
@@ -589,7 +579,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
 
     connect(this, &ColorSettingsWidget::colorSettingSignal,
             this, [this](const ColorSetting& setting) {
-        if(mTargetAnimator) setting.apply(mTargetAnimator);
+        if(mTarget) setting.apply(mTarget);
     });
 
 

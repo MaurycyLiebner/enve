@@ -44,16 +44,14 @@ public:
     void setCurrentColor(const QColor &color);
     void setCurrentColor(const qreal h_t, const qreal s_t,
                          const qreal v_t, const qreal a_t = 1);
-    void hideAlphaControlers();
 
     void setTarget(ColorAnimator * const target);
 
     ColorSetting getColorSetting(const ColorSettingType type,
-                                        const ColorParameter parameter) const;
+                                 const ColorParameter parameter) const;
 signals:
     void colorSettingSignal(const ColorSetting&);
 private:
-
     void emitColorChangedSignal();
     void emitEditingFinishedSignal();
     void emitEditingStartedSignal();
@@ -89,7 +87,7 @@ private:
     void updateAlphaFromSpin();
 
     void setColorMode();
-    void refreshColorAnimatorTarget();
+    void updateWidgetTargets();
 
     void connectSignalsAndSlots();
     void connectColorWidgetSignalToSlot(ColorWidget *slot_obj,
@@ -115,7 +113,7 @@ private:
     bool mBlockColorSettings = false;
     ColorParameter mLastTriggered;
 
-    ConnContextQPtr<ColorAnimator> mTargetAnimator;
+    ConnContextQPtr<ColorAnimator> mTarget;
 
     QHBoxLayout *mColorModeLayout = new QHBoxLayout();
     QLabel *mColorModeLabel = new QLabel("Color model:", this);
