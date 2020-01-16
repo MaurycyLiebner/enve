@@ -29,6 +29,7 @@
 #include "Animators/coloranimator.h"
 #include "Animators/paintsettingsanimator.h"
 #include "paintsettingsapplier.h"
+#include "conncontextptr.h"
 
 class ColorLabel;
 class ActionButton;
@@ -115,7 +116,7 @@ private:
     bool mBlockColorSettings = false;
     ColorParameter mLastTriggered;
 
-    ColorAnimator *mTargetAnimator = nullptr;
+    ConnContextQPtr<ColorAnimator> mTargetAnimator;
 
     QHBoxLayout *mColorModeLayout = new QHBoxLayout();
     QLabel *mColorModeLabel = new QLabel("Color model:", this);

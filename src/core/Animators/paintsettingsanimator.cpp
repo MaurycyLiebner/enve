@@ -33,7 +33,7 @@ PaintSettingsAnimator::PaintSettingsAnimator(const QString &name,
 void PaintSettingsAnimator::setup(const QColor &color,
                                   const PaintType paintType,
                                   Gradient* const gradient) {
-    mColor->qra_setCurrentValue(color);
+    mColor->setColor(color);
     setPaintType(paintType);
     setGradientVar(gradient);
 }
@@ -144,7 +144,7 @@ void PaintSettingsAnimator::setGradient(Gradient* gradient) {
 }
 
 void PaintSettingsAnimator::setCurrentColor(const QColor &color) {
-    mColor->qra_setCurrentValue(color);
+    mColor->setColor(color);
 }
 
 void PaintSettingsAnimator::showHideChildrenBeforeChaningPaintType(

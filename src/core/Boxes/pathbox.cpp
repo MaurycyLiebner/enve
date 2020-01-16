@@ -381,7 +381,7 @@ void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
         const PaintType paintType = strokeSettings->getPaintType();
         mStrokeSettings->setPaintType(paintType);
         if(paintType == FLATPAINT) {
-            mStrokeSettings->getColorAnimator()->qra_setCurrentValue(
+            mStrokeSettings->getColorAnimator()->setColor(
                         strokeSettings->getColor());
         } else if(paintType == GRADIENTPAINT) {
             mStrokeSettings->setGradient(strokeSettings->getGradient());

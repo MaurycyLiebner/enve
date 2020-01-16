@@ -69,7 +69,7 @@ eShadow::eShadow() :
     mTranslation->setBaseValue(QPointF(0, 0));
     ca_addChild(mTranslation);
 
-    mColor->qra_setCurrentValue(Qt::black);
+    mColor->setColor(Qt::black);
     ca_addChild(mColor);
 
     mOpacity->setValueRange(0, 9);

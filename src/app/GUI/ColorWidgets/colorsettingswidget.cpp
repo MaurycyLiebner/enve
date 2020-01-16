@@ -127,8 +127,7 @@ void ColorSettingsWidget::nullifyAnimator() {
 }
 
 void ColorSettingsWidget::setTarget(ColorAnimator * const target) {
-    if(mTargetAnimator) disconnect(mTargetAnimator, nullptr, this, nullptr);
-    mTargetAnimator = target;
+    auto& conn = mTargetAnimator.assign(target);
     rSpin->clearTarget();
     gSpin->clearTarget();
     bSpin->clearTarget();
@@ -166,10 +165,12 @@ void ColorSettingsWidget::setTarget(ColorAnimator * const target) {
         }
 
         updateAlphaFromSpin();
-        connect(target, &ColorAnimator::colorModeChanged,
-                this, &ColorSettingsWidget::refreshColorAnimatorTarget);
-        connect(target, &QObject::destroyed,
-                this, &ColorSettingsWidget::nullifyAnimator);
+        conn << connect(target, &ColorAnimator::colorModeChanged,
+                        this, &ColorSettingsWidget::refreshColorAnimatorTarget);
+        conn << connect(target, &ColorAnimator::colorChanged,
+                        mBookmarkedColors, &SavedColorsWidget::setColor);
+        conn << connect(target, &QObject::destroyed,
+                        this, &ColorSettingsWidget::nullifyAnimator);
     }
 }
 

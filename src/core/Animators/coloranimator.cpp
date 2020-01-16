@@ -25,6 +25,19 @@ ColorAnimator::ColorAnimator(const QString &name) : StaticComplexAnimator(name) 
     ca_addChild(mVal2Animator);
     ca_addChild(mVal3Animator);
     ca_addChild(mAlphaAnimator);
+
+    const auto emitColorChange = [this]() {
+        emit colorChanged(getColor());
+    };
+
+    connect(mVal1Animator.get(), &QrealAnimator::valueChangedSignal,
+            this, emitColorChange);
+    connect(mVal2Animator.get(), &QrealAnimator::valueChangedSignal,
+            this, emitColorChange);
+    connect(mVal3Animator.get(), &QrealAnimator::valueChangedSignal,
+            this, emitColorChange);
+    connect(mAlphaAnimator.get(), &QrealAnimator::valueChangedSignal,
+            this, emitColorChange);
 }
 
 void ColorAnimator::prp_writeProperty(eWriteStream& dst) const {
@@ -36,29 +49,6 @@ void ColorAnimator::prp_readProperty(eReadStream& src) {
     StaticComplexAnimator::prp_readProperty(src);
     src.read(&mColorMode, sizeof(ColorMode));
     setColorMode(mColorMode);
-}
-
-void ColorAnimator::qra_setCurrentValue(const QColor &colorValue) {
-    qreal val1, val2, val3;
-    if(mColorMode == ColorMode::rgb) {
-        val1 = colorValue.redF();
-        val2 = colorValue.greenF();
-        val3 = colorValue.blueF();
-    } else if(mColorMode == ColorMode::hsv) {
-        val1 = colorValue.hsvHueF();
-        val2 = colorValue.hsvSaturationF();
-        val3 = colorValue.valueF();
-    } else { // HSLMODE
-        val1 = colorValue.hslHueF();
-        val2 = colorValue.hslSaturationF();
-        val3 = colorValue.lightnessF();
-    }
-    const qreal alpha = colorValue.alphaF();
-
-    mVal1Animator->setCurrentBaseValue(val1);
-    mVal2Animator->setCurrentBaseValue(val2);
-    mVal3Animator->setCurrentBaseValue(val3);
-    mAlphaAnimator->setCurrentBaseValue(alpha);
 }
 
 QColor ColorAnimator::getColor() const {

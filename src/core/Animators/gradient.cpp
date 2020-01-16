@@ -82,7 +82,7 @@ void Gradient::prp_setInheritedFrameShift(const int shift,
 
 void Gradient::addColorToList(const QColor &color) {
     auto newColorAnimator = enve::make_shared<ColorAnimator>();
-    newColorAnimator->qra_setCurrentValue(color);
+    newColorAnimator->setColor(color);
     addColorToList(newColorAnimator);
 }
 
@@ -146,7 +146,7 @@ void Gradient::addColor(const QColor &color) {
 }
 
 void Gradient::replaceColor(const int id, const QColor &color) {
-    mColors.at(id)->qra_setCurrentValue(color);
+    mColors.at(id)->setColor(color);
     updateQGradientStops(UpdateReason::userChange);
     prp_afterWholeInfluenceRangeChanged();
 }

@@ -33,8 +33,6 @@ public:
     void prp_readProperty(eReadStream& src);
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
-    void qra_setCurrentValue(const QColor &qcolorValue);
-
     QColor getColor() const;
     QColor getColor(const qreal relFrame);
     void setColor(const QColor& col);
@@ -87,6 +85,7 @@ private:
     qsptr<QrealAnimator> mAlphaAnimator =
             QrealAnimator::sCreate0to1Animator("alpha");
 signals:
+    void colorChanged(const QColor&);
     void colorModeChanged(ColorMode);
 };
 

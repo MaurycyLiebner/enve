@@ -56,7 +56,7 @@ Canvas::Canvas(Document &document,
     mUndoRedoStack = enve::make_shared<UndoRedoStack>(changeFrameFunc);
     mFps = fps;
 
-    mBackgroundColor->qra_setCurrentValue(QColor(75, 75, 75));
+    mBackgroundColor->setColor(QColor(75, 75, 75));
     ca_addChild(mBackgroundColor);
     mSoundComposition = qsptr<SoundComposition>::create(this);
 
