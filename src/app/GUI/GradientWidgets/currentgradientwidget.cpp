@@ -34,22 +34,26 @@ void CurrentGradientWidget::paintGL() {
     if(!gradient) return;
     glUseProgram(PLAIN_PROGRAM.fID);
     const int nColors = gradient->ca_getNumberOfChildren();
-    int currentColorId = mGradientWidget->getColorId();
+    const int currentColorId = mGradientWidget->getColorId();
     mGradientWidget->getColor();
-    qreal xT = 0;
-    const qreal xInc = static_cast<qreal>(width())/nColors;
-    int hoveredColorId = qFloor(mHoveredX/xInc);
+    int colX = 0;
+    const int xInc = width()/nColors;
+    const int hoveredColorId = mHoveredX < 0 ? -1 : mHoveredX/xInc;
 
     glUniform2f(PLAIN_PROGRAM.fMeshSizeLoc,
                 height()/static_cast<float>(3*xInc), 1.f/3);
     for(int j = 0; j < nColors; j++) {
-        QColor currentColor = gradient->getColorAt(j);
-        glViewport(qRound(xT), 0, qCeil(xInc), height());
+        const QColor color = gradient->getColorAt(j);
+        const int cWidth = j == nColors - 1 ? width() - colX : xInc;
+        glViewport(colX, 0, cWidth, height());
 
+        const bool lightBorder = shouldValPointerBeLightHSV(color.hueF(),
+                                                            color.hsvSaturationF(),
+                                                            color.valueF());
 
         glUniform4f(PLAIN_PROGRAM.fRGBAColorLoc,
-                    currentColor.redF(), currentColor.greenF(),
-                    currentColor.blueF(), currentColor.alphaF());
+                    color.redF(), color.greenF(),
+                    color.blueF(), color.alphaF());
 
         glBindVertexArray(mPlainSquareVAO);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -59,9 +63,7 @@ void CurrentGradientWidget::paintGL() {
                         1.f/xInc, 1.f/height());
             glUniform2f(DOUBLE_BORDER_PROGRAM.fOuterBorderSizeLoc,
                         1.f/xInc, 1.f/height());
-            if(shouldValPointerBeLightHSV(currentColor.hueF(),
-                                          currentColor.hsvSaturationF(),
-                                          currentColor.valueF())) {
+            if(lightBorder) {
                 glUniform4f(DOUBLE_BORDER_PROGRAM.fInnerBorderColorLoc,
                             1, 1, 1, 1);
                 glUniform4f(DOUBLE_BORDER_PROGRAM.fOuterBorderColorLoc,
@@ -79,19 +81,15 @@ void CurrentGradientWidget::paintGL() {
             glUseProgram(BORDER_PROGRAM.fID);
             glUniform2f(BORDER_PROGRAM.fBorderSizeLoc,
                         1.f/xInc, 1.f/height());
-            if(shouldValPointerBeLightHSV(currentColor.hueF(),
-                                          currentColor.hsvSaturationF(),
-                                          currentColor.valueF())) {
-                glUniform4f(BORDER_PROGRAM.fBorderColorLoc,
-                            1, 1, 1, 1);
+            if(lightBorder) {
+                glUniform4f(BORDER_PROGRAM.fBorderColorLoc, 1, 1, 1, 1);
             } else {
-                glUniform4f(BORDER_PROGRAM.fBorderColorLoc,
-                            0, 0, 0, 1);
+                glUniform4f(BORDER_PROGRAM.fBorderColorLoc, 0, 0, 0, 1);
             }
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             glUseProgram(PLAIN_PROGRAM.fID);
         }
-        xT = qRound(xT) + xInc;
+        colX += xInc;
     }
 }
 
