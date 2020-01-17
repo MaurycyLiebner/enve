@@ -27,43 +27,16 @@ class GradientWidget : public QWidget {
 public:
     GradientWidget(QWidget * const parent);
 
-    void setCurrentGradient(Gradient *gradient,
-                            const bool emitChange = true);
+    void setCurrentGradient(Gradient *gradient);
     Gradient *getCurrentGradient();
-    QColor getColor();
     ColorAnimator *getColorAnimator();
 
-    void moveColor(const int x);
-
     void clearAll();
-    void updateNumberOfGradients();
-
-    void gradientLeftPressed(const int gradId);
-    void gradientContextMenuReq(const int gradId,
-                                const QPoint globalPos);
-
-    void colorRightPress(const int x, const QPoint &point);
-    void colorLeftPress(const int x);
-    void colorRelease();
-    int getColorIdAtX(const int x);
-
-    void updateAfterFrameChanged(const int absFrame);
-
-    int getGradientsCount() const;
-
-    Gradient* getGradientAt(const int id) const;
-
-    int getColorId() const {
-        return mCurrentColorId;
-    }
-
-    void setCurrentColor(const QColor &col);
 signals:
+    void selectionChanged(Gradient*);
     void selectedColorChanged(ColorAnimator*);
-    void currentGradientChanged(Gradient *gradient);
+    void triggered(Gradient *gradient);
 private:
-    void updateAll();
-
     QVBoxLayout *mMainLayout;
     GradientsListWidget *mGradientsListWidget;
     CurrentGradientWidget *mCurrentGradientWidget;
@@ -80,8 +53,6 @@ private:
     ColorAnimator *mCurrentColor = nullptr;
     int mCurrentColorId = 0;
     int mCenterGradientId = 1;
-    void setCurrentGradient(const int listId);
-    void setCurrentColorId(const int id);
 };
 
 #endif // GRADIENTWIDGET_H

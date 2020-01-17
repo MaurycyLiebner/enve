@@ -19,23 +19,33 @@
 #include "GUI/global.h"
 #include "GUI/ColorWidgets/colorwidgetshaders.h"
 #include "Animators/gradient.h"
+#include "Private/document.h"
 
-CurrentGradientWidget::CurrentGradientWidget(GradientWidget *gradientWidget,
-                                             QWidget *parent) :
+CurrentGradientWidget::CurrentGradientWidget(QWidget *parent) :
     GLWidget(parent) {
     setMouseTracking(true);
-    mGradientWidget = gradientWidget;
     setFixedHeight(MIN_WIDGET_DIM);
+}
+
+void CurrentGradientWidget::setCurrentGradient(Gradient * const gradient) {
+    auto& conn = mGradient.assign(gradient);
+    if(gradient) {
+        conn << connect(gradient, &Gradient::prp_currentFrameChanged,
+                        this, qOverload<>(&QWidget::update));
+        conn << connect(gradient, &Gradient::ca_childRemoved,
+                        this, &CurrentGradientWidget::updateCurrentColor);
+        conn << connect(gradient, &Gradient::ca_childAdded,
+                        this, &CurrentGradientWidget::updateCurrentColor);
+    }
+    setCurrentColorId(0);
+    update();
 }
 
 void CurrentGradientWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT);
-    const auto gradient = mGradientWidget->getCurrentGradient();
-    if(!gradient) return;
+    if(!mGradient) return;
     glUseProgram(PLAIN_PROGRAM.fID);
-    const int nColors = gradient->ca_getNumberOfChildren();
-    const int currentColorId = mGradientWidget->getColorId();
-    mGradientWidget->getColor();
+    const int nColors = mGradient->ca_getNumberOfChildren();
     int colX = 0;
     const int xInc = width()/nColors;
     const int hoveredColorId = mHoveredX < 0 ? -1 : mHoveredX/xInc;
@@ -43,7 +53,7 @@ void CurrentGradientWidget::paintGL() {
     glUniform2f(PLAIN_PROGRAM.fMeshSizeLoc,
                 height()/static_cast<float>(3*xInc), 1.f/3);
     for(int j = 0; j < nColors; j++) {
-        const QColor color = gradient->getColorAt(j);
+        const QColor color = mGradient->getColorAt(j);
         const int cWidth = j == nColors - 1 ? width() - colX : xInc;
         glViewport(colX, 0, cWidth, height());
 
@@ -57,7 +67,7 @@ void CurrentGradientWidget::paintGL() {
 
         glBindVertexArray(mPlainSquareVAO);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        if(j == currentColorId) {
+        if(j == mColorId) {
             glUseProgram(DOUBLE_BORDER_PROGRAM.fID);
             glUniform2f(DOUBLE_BORDER_PROGRAM.fInnerBorderSizeLoc,
                         1.f/xInc, 1.f/height());
@@ -93,17 +103,84 @@ void CurrentGradientWidget::paintGL() {
     }
 }
 
-void CurrentGradientWidget::mousePressEvent(QMouseEvent *event) {
-    if(event->button() == Qt::RightButton) {
-        mGradientWidget->colorRightPress(event->x(), event->globalPos());
-    } else if(event->button() == Qt::LeftButton) {
-        mGradientWidget->colorLeftPress(event->x());
+void CurrentGradientWidget::colorRightPress(const int x, const QPoint &point) {
+    if(!mGradient) return;
+    if(mReordering) {
+        mGradient->restoreOrder();
+    } else {
+        colorLeftPress(x);
+        QMenu menu(this);
+        menu.addAction("Delete Color");
+        menu.addAction("Add Color");
+        const auto selectedAction = menu.exec(point);
+        if(selectedAction) {
+            if(selectedAction->text() == "Delete Color") {
+                if(mGradient->ca_getNumberOfChildren() < 2) {
+                    mColor->setColor(Qt::black);
+                } else {
+                    mGradient->removeChild(mColor->ref<ColorAnimator>());
+                }
+            } else if(selectedAction->text() == "Add Color") {
+                mGradient->addColor(Qt::black);
+            }
+            Document::sInstance->actionFinished();
+        }
     }
 }
 
+void CurrentGradientWidget::colorLeftPress(const int x) {
+    if(!mGradient) return;
+    mFirstMove = true;
+    setCurrentColorId(getColorIdAtX(x));
+}
+
+void CurrentGradientWidget::mousePressEvent(QMouseEvent *event) {
+    if(event->button() == Qt::RightButton) {
+        colorRightPress(event->x(), event->globalPos());
+    } else if(event->button() == Qt::LeftButton) {
+        colorLeftPress(event->x());
+    }
+}
+
+int CurrentGradientWidget::getColorIdAtX(const int x) {
+    const int nCols = mGradient->ca_getNumberOfChildren();
+    return qBound(0, x*nCols/width(), nCols - 1);
+}
+
+void CurrentGradientWidget::setCurrentColorId(const int id) {
+    mColorId = id;
+    if(!mGradient || !mGradient->ca_hasChildren()) {
+        mColor.assign(nullptr);
+        return;
+    }
+    const int nColors = mGradient->ca_getNumberOfChildren();
+    mColorId = qBound(0, id, nColors - 1);
+
+    auto& conn = mColor.assign(mGradient->getChild(mColorId));
+    conn << connect(mColor, &QObject::destroyed,
+                    this, &CurrentGradientWidget::updateCurrentColor);
+    emit selectedColorChanged(mColor);
+    update();
+}
+
+ColorAnimator *CurrentGradientWidget::getColorAnimator() {
+    return mColor;
+}
+
 void CurrentGradientWidget::mouseMoveEvent(QMouseEvent *event) {
-    if(event->buttons() & Qt::LeftButton) {
-        mGradientWidget->moveColor(event->x());
+    if(event->buttons() & Qt::LeftButton && mGradient) {
+        if(mFirstMove) {
+            mFirstMove = false;
+            mReordering = true;
+            mGradient->saveOrder();
+        }
+        const int nCols = mGradient->ca_getNumberOfChildren();
+        const int colorId = clampInt(event->x()*nCols/width(), 0, nCols - 1);
+        if(colorId != mColorId) {
+            mGradient->swapChildrenTemporary(mColorId, colorId);
+            setCurrentColorId(colorId);
+            Document::sInstance->updateScenes();
+        }
     }
     mHoveredX = event->x();
     update();
@@ -111,10 +188,18 @@ void CurrentGradientWidget::mouseMoveEvent(QMouseEvent *event) {
 
 void CurrentGradientWidget::mouseReleaseEvent(QMouseEvent *event) {
     if(event->button() != Qt::LeftButton) return;
-    mGradientWidget->colorRelease();
+    mReordering = false;
+    if(mFirstMove || !mGradient) return;
+    mGradient->finishOrder();
 }
 
 void CurrentGradientWidget::leaveEvent(QEvent *) {
     mHoveredX = -1;
     update();
+}
+
+void CurrentGradientWidget::updateCurrentColor() {
+    if(!mGradient) setCurrentColorId(0);
+    const int nColors = mGradient->ca_getNumberOfChildren();
+    setCurrentColorId(qBound(0, mColorId, nColors));
 }

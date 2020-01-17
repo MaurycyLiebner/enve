@@ -18,25 +18,41 @@
 #define CURRENTGRADIENTWIDGET_H
 
 #include "GUI/ColorWidgets/glwidget.h"
+#include "conncontextptr.h"
 class GradientWidget;
+class ColorAnimator;
 
 class CurrentGradientWidget : public GLWidget {
     Q_OBJECT
 public:
-    explicit CurrentGradientWidget(GradientWidget *gradientWidget,
-                                   QWidget *parent = nullptr);
+    explicit CurrentGradientWidget(QWidget *parent = nullptr);
 
-    void paintGL();
+    void setCurrentGradient(Gradient* const gradient);
+    void colorRightPress(const int x, const QPoint &point);
+    void colorLeftPress(const int x);
+    void setCurrentColorId(const int id);
+
+    ColorAnimator *getColorAnimator();
 protected:
+    void paintGL();
+
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void leaveEvent(QEvent *);
-    int mHoveredX = 0;
-    GradientWidget *mGradientWidget;
 signals:
+    void selectedColorChanged(ColorAnimator*);
+private:
+    void updateCurrentColor();
+    int getColorIdAtX(const int x);
 
-public slots:
+    bool mReordering = false;
+    bool mFirstMove = true;
+    int mHoveredX = 0;
+
+    ConnContextQPtr<Gradient> mGradient;
+    ConnContextQPtr<ColorAnimator> mColor;
+    int mColorId = 0;
 };
 
 #endif // CURRENTGRADIENTWIDGET_H

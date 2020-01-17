@@ -23,15 +23,13 @@ class DisplayedGradientsWidget;
 
 class GradientsListWidget : public ScrollArea {
 public:
-    explicit GradientsListWidget(GradientWidget *gradientWidget,
-                                 QWidget *parent = nullptr);
+    explicit GradientsListWidget(QWidget *parent = nullptr);
 
-    void setNumberGradients(const int n);
-
-    DisplayedGradientsWidget *getDisplayedGradientsWidget();
-
+    DisplayedGradientsWidget *getList();
 protected:
     void scrollContentsBy(int dx, int dy);
+    void resizeEvent(QResizeEvent *e);
+
     DisplayedGradientsWidget *mDisplayedGradients;
 };
 

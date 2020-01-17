@@ -30,8 +30,8 @@ GradientWidget::GradientWidget(QWidget * const parent) :
     mMainLayout->setMargin(0);
     mMainLayout->setSpacing(0);
     mMainLayout->setAlignment(Qt::AlignTop);
-    mGradientsListWidget = new GradientsListWidget(this, this);
-    mCurrentGradientWidget = new CurrentGradientWidget(this, this);
+    mGradientsListWidget = new GradientsListWidget(this);
+    mCurrentGradientWidget = new CurrentGradientWidget(this);
     mMainLayout->addWidget(mGradientsListWidget);
     mMainLayout->addSpacing(MIN_WIDGET_DIM/2);
     mMainLayout->addWidget(mCurrentGradientWidget);
@@ -39,205 +39,35 @@ GradientWidget::GradientWidget(QWidget * const parent) :
 
     mScrollItemHeight = MIN_WIDGET_DIM;
 
+    const auto list = mGradientsListWidget->getList();
+    connect(list, &DisplayedGradientsWidget::selectionChanged,
+            this, &GradientWidget::setCurrentGradient);
+    connect(list, &DisplayedGradientsWidget::triggered,
+            this, &GradientWidget::triggered);
 
-    connect(Document::sInstance, &Document::gradientCreated,
-            this, [this](Gradient* const gradient) {
-        connect(gradient, &Gradient::prp_absFrameRangeChanged,
-                this, &GradientWidget::updateAll);
-        updateNumberOfGradients();
-    });
-    connect(Document::sInstance, &Document::gradientRemoved,
-            this, [this](Gradient* const gradient) {
-        disconnect(gradient, nullptr, this, nullptr);
-        updateNumberOfGradients();
-    });
-//    newGradient();
-//    newGradient(Color(1.f, 1.f, 0.f), Color(0.f, 1.f, 1.f, 0.5f));
-//    newGradient(Color(1.f, 0.f, 0.f), Color(0.f, 1.f, 0.f));
-}
+    connect(this, &GradientWidget::selectionChanged,
+            mCurrentGradientWidget, &CurrentGradientWidget::setCurrentGradient);
+    connect(mCurrentGradientWidget, &CurrentGradientWidget::selectedColorChanged,
+            this, &GradientWidget::selectedColorChanged);
 
-void GradientWidget::updateAll() {
-    mCurrentGradientWidget->update();
-    mGradientsListWidget->getDisplayedGradientsWidget()->update();
-    update();
-}
-
-void GradientWidget::setCurrentColorId(const int id) {
-    if(mCurrentColor) disconnect(mCurrentColor, nullptr, this, nullptr);
-    mCurrentColorId = id;
-    if(!mCurrentGradient) {
-        mCurrentColor = nullptr;
-        return;
-    }
-    mCurrentColor = mCurrentGradient->getChild(mCurrentColorId);
-    connect(mCurrentColor, &QObject::destroyed, this, [this]() {
-        setCurrentColorId(0);
-    });
-    emit selectedColorChanged(mCurrentColor);
-    update();
-}
-
-void GradientWidget::updateNumberOfGradients() {
-    mGradientsListWidget->setNumberGradients(
-                Document::sInstance->fGradients.count());
 }
 
 void GradientWidget::clearAll() {
     mCurrentGradient = nullptr;
     mCenterGradientId = 1;
     mCurrentColorId = 0;
-    updateAll();
 }
 
-void GradientWidget::setCurrentColor(const QColor& col) {
-    mCurrentGradient->replaceColor(mCurrentColorId, col);
-    updateAll();
-}
-
-void GradientWidget::setCurrentGradient(Gradient *gradient,
-                                        const bool emitChange) {
-    if(!gradient) {
-        if(Document::sInstance->fGradients.isEmpty()) {
-            const auto newGrad = Document::sInstance->createNewGradient();
-            newGrad->addColor(Qt::black);
-            newGrad->addColor(Qt::white);
-        }
-        setCurrentGradient(0);
-        return;
-    } else if(mCurrentGradient == gradient) {
-        return;
-    }
+void GradientWidget::setCurrentGradient(Gradient *gradient) {
+    if(mCurrentGradient == gradient) return;
     mCurrentGradient = gradient;
-    setCurrentColorId(0);
-
-    if(emitChange) emit currentGradientChanged(mCurrentGradient);
+    emit selectionChanged(gradient);
 }
 
 Gradient *GradientWidget::getCurrentGradient() {
     return mCurrentGradient;
 }
 
-QColor GradientWidget::getColor() {
-    if(!mCurrentGradient) return QColor();
-    return mCurrentGradient->getColorAt(mCurrentColorId);
-}
-
 ColorAnimator *GradientWidget::getColorAnimator() {
-    if(!mCurrentGradient) return nullptr;
-    return mCurrentGradient->getChild(mCurrentColorId);
-}
-
-void GradientWidget::setCurrentGradient(const int listId) {
-    if(listId >= Document::sInstance->fGradients.length()) return;
-    setCurrentGradient(Document::sInstance->fGradients.at(listId).data());
-}
-
-void GradientWidget::colorRightPress(const int x, const QPoint &point) {
-    if(!mCurrentGradient) return;
-    if(mReordering) {
-        mCurrentGradient->restoreOrder();
-    } else {
-        colorLeftPress(x);
-        QMenu menu(this);
-        menu.addAction("Delete Color");
-        menu.addAction("Add Color");
-        const auto selected_action = menu.exec(point);
-        if(selected_action) {
-            if(selected_action->text() == "Delete Color") {
-                if(mCurrentGradient->ca_getNumberOfChildren() < 2) {
-                    mCurrentGradient->replaceColor(mCurrentColorId,
-                                                   QColor(0, 0, 0));
-                } else {
-                    mCurrentGradient->takeChildAt(mCurrentColorId);
-                }
-                setCurrentColorId(0);
-                updateAll();
-            } else if(selected_action->text() == "Add Color") {
-                mCurrentGradient->addColor(QColor(0, 0, 0));
-                updateAll();
-            }
-            Document::sInstance->actionFinished();
-        }
-    }
-}
-
-int GradientWidget::getColorIdAtX(const int x) {
-    const int nCols = mCurrentGradient->ca_getNumberOfChildren();
-    return clampInt(x*nCols/width(), 0, nCols - 1);
-}
-
-void GradientWidget::colorLeftPress(const int x) {
-    if(!mCurrentGradient) return;
-    mFirstMove = true;
-    setCurrentColorId(getColorIdAtX(x));
-    updateAll();
-}
-
-void GradientWidget::colorRelease() {
-    mReordering = false;
-    if(mFirstMove || !mCurrentGradient) return;
-    mCurrentGradient->finishOrder();
-}
-
-void GradientWidget::moveColor(const int x) {
-    if(!mCurrentGradient) return;
-    if(mFirstMove) {
-        mFirstMove = false;
-        mReordering = true;
-        mCurrentGradient->saveOrder();
-    }
-    const int nCols = mCurrentGradient->ca_getNumberOfChildren();
-    const int colorId = clampInt(x*nCols/width(), 0, nCols - 1);
-    if(colorId != mCurrentColorId) {
-        mCurrentGradient->swapChildrenTemporary(mCurrentColorId, colorId);
-        setCurrentColorId(colorId);
-        updateAll();
-        Document::sInstance->updateScenes();
-    }
-}
-
-void GradientWidget::updateAfterFrameChanged(const int absFrame) {
-    for(const auto& gradient : Document::sInstance->fGradients)
-        gradient->anim_setAbsFrame(absFrame);
-}
-
-int GradientWidget::getGradientsCount() const {
-    return Document::sInstance->fGradients.count();
-}
-
-Gradient *GradientWidget::getGradientAt(const int id) const {
-    return Document::sInstance->fGradients.at(id).get();
-}
-
-void GradientWidget::gradientLeftPressed(const int gradId) {
-    if(gradId >= Document::sInstance->fGradients.count() || gradId < 0) return;
-    setCurrentGradient(gradId);
-    Document::sInstance->actionFinished();
-}
-
-void GradientWidget::gradientContextMenuReq(const int gradId,
-                                            const QPoint globalPos) {
-    const bool gradPressed = gradId < Document::sInstance->fGradients.count() && gradId >= 0;
-    QMenu menu(this);
-    menu.addAction("New Gradient");
-    if(gradPressed) {
-        menu.addAction("Duplicate Gradient");
-        menu.addAction("Delete Gradient");
-    }
-    const auto selected_action = menu.exec(globalPos);
-    if(selected_action) {
-        if(selected_action->text() == "Delete Gradient") {
-            Document::sInstance->removeGradient(gradId);
-        } else if(selected_action->text() == "Duplicate Gradient") {
-            Document::sInstance->duplicateGradient(gradId);
-        } else if(selected_action->text() == "New Gradient") {
-            const auto newGrad = Document::sInstance->createNewGradient();
-            newGrad->addColor(Qt::black);
-            newGrad->addColor(Qt::white);
-            setCurrentGradient(newGrad);
-        }
-        Document::sInstance->actionFinished();
-    } else {
-
-    }
+    return mCurrentGradientWidget->getColorAnimator();
 }

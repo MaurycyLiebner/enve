@@ -409,7 +409,7 @@ void FillStrokeSettingsWidget::updateColorAnimator() {
 
 void FillStrokeSettingsWidget::updateAfterTargetChanged() {
     if(getCurrentPaintTypeVal() == GRADIENTPAINT) {
-        mGradientWidget->setCurrentGradient(getCurrentGradientVal(), false);
+        mGradientWidget->setCurrentGradient(getCurrentGradientVal());
         const auto gradType = getCurrentGradientTypeVal();
         mLinearGradientButton->setChecked(gradType == GradientType::LINEAR);
         mRadialGradientButton->setChecked(gradType == GradientType::RADIAL);
@@ -596,7 +596,7 @@ void FillStrokeSettingsWidget::connectGradient() {
             mColorsSettingsWidget,
             &ColorSettingsWidget::setTarget);
     connect(mGradientWidget,
-            &GradientWidget::currentGradientChanged,
+            &GradientWidget::triggered,
             this, &FillStrokeSettingsWidget::setGradientAction);
 }
 
@@ -605,7 +605,7 @@ void FillStrokeSettingsWidget::disconnectGradient() {
                &GradientWidget::selectedColorChanged,
                mColorsSettingsWidget,
                &ColorSettingsWidget::setTarget);
-    disconnect(mGradientWidget, &GradientWidget::currentGradientChanged,
+    disconnect(mGradientWidget, &GradientWidget::triggered,
                this, &FillStrokeSettingsWidget::setGradientAction);
 }
 

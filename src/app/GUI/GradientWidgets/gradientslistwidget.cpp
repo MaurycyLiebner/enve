@@ -16,26 +16,27 @@
 
 #include "gradientslistwidget.h"
 #include <QScrollBar>
+#include <QResizeEvent>
 #include "displayedgradientswidget.h"
 
-GradientsListWidget::GradientsListWidget(GradientWidget *gradientWidget,
-                                         QWidget *parent) :
+GradientsListWidget::GradientsListWidget(QWidget *parent) :
     ScrollArea(parent) {
     setFixedHeight(6*MIN_WIDGET_DIM);
     verticalScrollBar()->setSingleStep(MIN_WIDGET_DIM);
-    mDisplayedGradients = new DisplayedGradientsWidget(gradientWidget, this);
+    mDisplayedGradients = new DisplayedGradientsWidget(this);
     setWidget(mDisplayedGradients);
 }
 
-void GradientsListWidget::setNumberGradients(const int n) {
-    mDisplayedGradients->setNumberGradients(n);
-}
-
-DisplayedGradientsWidget *GradientsListWidget::getDisplayedGradientsWidget() {
+DisplayedGradientsWidget *GradientsListWidget::getList() {
     return mDisplayedGradients;
 }
 
 void GradientsListWidget::scrollContentsBy(int dx, int dy) {
     mDisplayedGradients->incTop(dy);
     QScrollArea::scrollContentsBy(dx, dy);
+}
+
+void GradientsListWidget::resizeEvent(QResizeEvent *e) {
+    mDisplayedGradients->setMinimumHeight(e->size().height());
+    mDisplayedGradients->updateHeight();
 }
