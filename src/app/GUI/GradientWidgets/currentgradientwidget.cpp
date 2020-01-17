@@ -42,6 +42,7 @@ void CurrentGradientWidget::setCurrentGradient(Gradient * const gradient) {
 }
 
 void CurrentGradientWidget::paintGL() {
+    glClearColor(0.3f, 0.3f, 0.3f, 1);
     glClear(GL_COLOR_BUFFER_BIT);
     if(!mGradient) return;
     glUseProgram(PLAIN_PROGRAM.fID);
