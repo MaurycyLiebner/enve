@@ -450,23 +450,18 @@ void Canvas::updatePivotIfNeeded() {
 }
 
 void Canvas::makePointCtrlsSymmetric() {
+    prp_pushUndoRedoName("Make Nodes Symmetric");
     setPointCtrlsMode(CtrlsMode::symmetric);
 }
 
 void Canvas::makePointCtrlsSmooth() {
+    prp_pushUndoRedoName("Make Nodes Smooth");
     setPointCtrlsMode(CtrlsMode::smooth);
 }
 
 void Canvas::makePointCtrlsCorner() {
+    prp_pushUndoRedoName("Make Nodes Corner");
     setPointCtrlsMode(CtrlsMode::corner);
-}
-
-void Canvas::makeSegmentLine() {
-    makeSelectedPointsSegmentsLines();
-}
-
-void Canvas::makeSegmentCurve() {
-    makeSelectedPointsSegmentsCurves();
 }
 
 void Canvas::newEmptyPaintFrameAction() {

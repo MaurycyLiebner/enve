@@ -20,19 +20,30 @@
 #include "MovablePoints/pathpointshandler.h"
 #include "Private/document.h"
 
-void Canvas::connectPoints() {
-    QList<SmartNodePoint*> selectedEndPts;
+QList<SmartNodePoint*> Canvas::getSortedSelectedNodes() {
+    QList<SmartNodePoint*> nodes;
     for(const auto& point : mSelectedPoints_d) {
         if(point->isSmartNodePoint()) {
-            auto asNodePt = static_cast<SmartNodePoint*>(point);
-            if(asNodePt->isEndPoint()) {
-                selectedEndPts.append(asNodePt);
-            }
+            nodes << static_cast<SmartNodePoint*>(point);
         }
     }
-    if(selectedEndPts.count() == 2) {
-        const auto point1 = selectedEndPts.first();
-        const auto point2 = selectedEndPts.last();
+    std::sort(nodes.begin(), nodes.end(),
+              [](SmartNodePoint* pt1, SmartNodePoint* pt2) {
+        return pt1->getNodeId() > pt2->getNodeId();
+    });
+    return nodes;
+}
+
+void Canvas::connectPoints() {
+    prp_pushUndoRedoName("Connect Nodes");
+    const auto nodes = getSortedSelectedNodes();
+    QList<SmartNodePoint*> endNodes;
+    for(const auto& node : nodes) {
+        if(node->isEndPoint()) endNodes.append(node);
+    }
+    if(endNodes.count() == 2) {
+        const auto point1 = endNodes.first();
+        const auto point2 = endNodes.last();
         const auto node1 = point1->getTargetNode();
         const auto node2 = point2->getTargetNode();
 
@@ -51,39 +62,25 @@ void Canvas::connectPoints() {
 }
 
 void Canvas::disconnectPoints() {
-    for(const auto& point : mSelectedPoints_d) {
-        if(point->isSmartNodePoint()) {
-            auto asNodePt = static_cast<SmartNodePoint*>(point);
-            const auto nextPoint = asNodePt->getNextPoint();
-            if(!nextPoint) continue;
-            if(nextPoint->isSelected()) {
-                asNodePt->actionDisconnectFromNormalPoint(nextPoint);
-                break;
-            }
-        }
+    prp_pushUndoRedoName("Disconnect Nodes");
+    const auto nodes = getSortedSelectedNodes();
+    for(const auto& node : nodes) {
+        const auto nextPoint = node->getNextPoint();
+        if(!nextPoint || !nextPoint->isSelected()) continue;
+        node->actionDisconnectFromNormalPoint(nextPoint);
+        break;
     }
     clearPointsSelection();
 }
 
 void Canvas::mergePoints() {
-    QList<SmartNodePoint*> selectedNodePoints;
-    for(const auto& point : mSelectedPoints_d) {
-        if(point->isSmartNodePoint()) {
-            const auto asNodePt = static_cast<SmartNodePoint*>(point);
-            selectedNodePoints.append(asNodePt);
-        }
-    }
-    if(selectedNodePoints.count() == 2) {
-        std::sort(selectedNodePoints.begin(), selectedNodePoints.end(),
-                  [](const SmartNodePoint * const v1,
-                     const SmartNodePoint * const v2) {
-            return v1->getNodeId() < v2->getNodeId();
-        });
-        const auto firstPoint = selectedNodePoints.first();
-        const auto secondPoint = selectedNodePoints.last();
-        bool vailable = false;
-        vailable = vailable || (firstPoint->isEndPoint() &&
-                                secondPoint->isEndPoint());
+    prp_pushUndoRedoName("Merge Nodes");
+    const auto nodes = getSortedSelectedNodes();
+
+    if(nodes.count() == 2) {
+        const auto firstPoint = nodes.last();
+        const auto secondPoint = nodes.first();
+
         const bool ends = firstPoint->isEndPoint() && secondPoint->isEndPoint();
         const bool neigh = firstPoint->getPreviousPoint() == secondPoint ||
                            firstPoint->getNextPoint() == secondPoint;
@@ -95,19 +92,23 @@ void Canvas::mergePoints() {
         }
         removePointFromSelection(secondPoint);
         firstPoint->actionMergeWithNormalPoint(secondPoint);
+    } else {
+        for(const auto& node : nodes) {
+            const auto nextPoint = node->getNextPoint();
+            if(!nextPoint || !nextPoint->isSelected()) continue;
+            node->actionMergeWithNormalPoint(nextPoint);
+        }
+        clearPointsSelection();
     }
 }
 
 void Canvas::subdivideSegments() {
-    for(const auto& point : mSelectedPoints_d) {
-        if(point->isSmartNodePoint()) {
-            auto asNodePt = static_cast<SmartNodePoint*>(point);
-            const auto nextPoint = asNodePt->getNextPoint();
-            if(!nextPoint) continue;
-            if(nextPoint->isSelected()) {
-                NormalSegment(asNodePt, nextPoint).divideAtT(0.5);
-            }
-        }
+    prp_pushUndoRedoName("Subdivide Segments");
+    const auto nodes = getSortedSelectedNodes();
+    for(const auto& node : nodes) {
+        const auto nextPoint = node->getNextPoint();
+        if(!nextPoint || !nextPoint->isSelected()) continue;
+        NormalSegment(node, nextPoint).divideAtT(0.5);
     }
     clearPointsSelection();
 }
@@ -121,7 +122,8 @@ void Canvas::setPointCtrlsMode(const CtrlsMode mode) {
     }
 }
 
-void Canvas::makeSelectedPointsSegmentsCurves() {
+void Canvas::makeSegmentCurve() {
+    prp_pushUndoRedoName("Make Segments Curves");
     QList<SmartNodePoint*> selectedSNodePoints;
     for(const auto& point : mSelectedPoints_d) {
         if(point->isSmartNodePoint()) {
@@ -139,7 +141,8 @@ void Canvas::makeSelectedPointsSegmentsCurves() {
     }
 }
 
-void Canvas::makeSelectedPointsSegmentsLines() {
+void Canvas::makeSegmentLine() {
+    prp_pushUndoRedoName("Make Segments Lines");
     QList<SmartNodePoint*> selectedSNodePoints;
     for(const auto& point : mSelectedPoints_d) {
         if(point->isSmartNodePoint()) {

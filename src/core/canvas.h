@@ -192,8 +192,6 @@ public:
     void selectedPathsIntersection();
     void selectedPathsDivision();
     void selectedPathsExclusion();
-    void makeSelectedPointsSegmentsCurves();
-    void makeSelectedPointsSegmentsLines();
 
     void centerPivotForSelected();
     void resetSelectedScale();
@@ -630,6 +628,7 @@ public:
     UndoRedoStack* undoRedoStack() const
     { return mUndoRedoStack.get(); }
 private:
+    QList<SmartNodePoint*> getSortedSelectedNodes();
     void openTextEditorForTextBox(TextBox *textBox);
 
     void scaleSelected(const MouseEvent &e);
