@@ -185,15 +185,8 @@ Gradient *Document::duplicateGradient(const int id) {
     if(id < 0 || id >= fGradients.count()) return nullptr;
     const auto from = fGradients.at(id).get();
     const auto newGrad = createNewGradient();
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    eWriteStream writeStream(&buffer);
-    from->write(-1, writeStream);
-    if(buffer.reset()) {
-        eReadStream readStream(&buffer);
-        newGrad->read(readStream);
-    }
-    buffer.close();
+    const auto clipboard = enve::make_shared<PropertyClipboard>(from);
+    clipboard->paste(newGrad);
     return newGrad;
 }
 
