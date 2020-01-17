@@ -93,11 +93,11 @@ public:
         {
             prp_pushUndoRedoName("Remove " + child->prp_getName());
             UndoRedo ur;
-            ur.fUndo = [this, child]() {
-                removeChild(child);
-            };
-            ur.fRedo = [this, child, index]() {
+            ur.fUndo = [this, child, index]() {
                 insertChild(child, index);
+            };
+            ur.fRedo = [this, child]() {
+                removeChild(child);
             };
             prp_addUndoRedo(ur);
         }
