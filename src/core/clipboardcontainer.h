@@ -44,9 +44,14 @@ class Clipboard : public StdSelfRef {
 public:
     Clipboard(const ClipboardType type);
     ClipboardType getType() const;
-protected:
-    QByteArray mData;
+
+    using Writer = std::function<void(eWriteStream&)>;
+    using Reader = std::function<void(eReadStream&)>;
+
+    void write(const Writer& writer);
+    void read(const Reader& reader);
 private:
+    QByteArray mData;
     const ClipboardType mType;
 };
 
@@ -81,7 +86,6 @@ private:
     QList<AnimatorKeyDataPair> mAnimatorData;
 };
 
-
 class PropertyClipboard : public Clipboard {
     e_OBJECT
 protected:
@@ -112,23 +116,21 @@ protected:
     DynamicPropsClipboard(const QList<T*>& source) :
         Clipboard(ClipboardType::dynamicProperties),
         mContentBaseType(std::type_index(typeid(T))) {
-        QBuffer buffer(&mData);
-        buffer.open(QIODevice::WriteOnly);
-        eWriteStream dst(&buffer);
-        dst << source.count();
-        for(const auto& src : source)
-            src->prp_writeProperty(dst);
-        buffer.close();
+        const auto writer = [&source](eWriteStream& writeStream) {
+            writeStream << source.count();
+            for(const auto& src : source)
+                src->prp_writeProperty(writeStream);
+        };
+        write(writer);
     }
 public:
     template<typename T>
     bool paste(DynamicComplexAnimatorBase<T> * const target) {
         if(!compatibleTarget(target)) return false;
-        QBuffer buffer(&mData);
-        buffer.open(QIODevice::ReadOnly);
-        eReadStream src(&buffer);
-        target->prp_readProperty(src);
-        buffer.close();
+        const auto reader = [target](eReadStream& readStream) {
+            target->prp_readProperty(readStream);
+        };
+        read(reader);
         return true;
     }
 

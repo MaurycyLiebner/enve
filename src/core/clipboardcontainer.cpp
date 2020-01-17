@@ -26,46 +26,59 @@ Clipboard::Clipboard(const ClipboardType type) : mType(type) {}
 
 ClipboardType Clipboard::getType() const { return mType; }
 
-BoxesClipboard::BoxesClipboard(const QList<BoundingBox*> &src) :
-    Clipboard(ClipboardType::boxes) {
+void Clipboard::write(const Clipboard::Writer &writer) {
     QBuffer buffer(&mData);
     buffer.open(QIODevice::WriteOnly);
     eWriteStream writeStream(&buffer);
-    const int nBoxes = src.count();
-    writeStream << nBoxes;
-
-    const bool isBox = true;
-    const int iCount = src.count();
-    for(int i = iCount - 1; i >= 0; i--) {
-        const auto& iBox = src[i];
-        const auto future = writeStream.planFuturePos();
-        writeStream << isBox;
-        iBox->writeIdentifier(writeStream);
-        iBox->writeBoundingBox(writeStream);
-        writeStream.writeCheckpoint();
-        writeStream.assignFuturePos(future);
-    }
+    writer(writeStream);
     writeStream.writeFutureTable();
     buffer.close();
-
-    BoundingBox::sClearWriteBoxes();
 }
 
-#include "canvas.h"
-void BoxesClipboard::pasteTo(ContainerBox* const parent) {
-    const int oldCount = parent->getContainedBoxesCount();
+void Clipboard::read(const Clipboard::Reader &reader) {
     QBuffer buffer(&mData);
     buffer.open(QIODevice::ReadOnly);
     eReadStream readStream(&buffer);
     buffer.seek(buffer.size() - qint64(sizeof(int)));
     readStream.readFutureTable();
     buffer.seek(0);
-    try {
-        parent->readAllContained(readStream);
-    } catch(const std::exception& e) {
-        gPrintExceptionCritical(e);
-    }
+    reader(readStream);
     buffer.close();
+}
+
+BoxesClipboard::BoxesClipboard(const QList<BoundingBox*> &src) :
+    Clipboard(ClipboardType::boxes) {
+    const auto writer = [&src](eWriteStream& writeStream) {
+        const int nBoxes = src.count();
+        writeStream << nBoxes;
+
+        const bool isBox = true;
+        const int iCount = src.count();
+        for(int i = iCount - 1; i >= 0; i--) {
+            const auto& iBox = src[i];
+            const auto future = writeStream.planFuturePos();
+            writeStream << isBox;
+            iBox->writeIdentifier(writeStream);
+            iBox->writeBoundingBox(writeStream);
+            writeStream.writeCheckpoint();
+            writeStream.assignFuturePos(future);
+        }
+    };
+    write(writer);
+    BoundingBox::sClearWriteBoxes();
+}
+
+#include "canvas.h"
+void BoxesClipboard::pasteTo(ContainerBox* const parent) {
+    const int oldCount = parent->getContainedBoxesCount();
+    const auto reader = [parent](eReadStream& readStream) {
+        try {
+            parent->readAllContained(readStream);
+        } catch(const std::exception& e) {
+            gPrintExceptionCritical(e);
+        }
+    };
+    read(reader);
     const int newCount = parent->getContainedBoxesCount();
     const auto parentScene = parent->getParentScene();
     if(parentScene) {
@@ -87,7 +100,7 @@ void KeysClipboard::paste(const int pasteFrame, const bool merge,
 
     QList<QList<stdsptr<Key>>> animatorKeys;
     for(const auto &animData : mAnimatorData) {
-        Animator *animator = animData.first;
+        Animator * const animator = animData.first;
         if(!animator) continue;
         QList<stdsptr<Key>> keys;
         QBuffer buffer(const_cast<QByteArray*>(&animData.second));
@@ -111,6 +124,7 @@ void KeysClipboard::paste(const int pasteFrame, const bool merge,
     int keysId = 0;
     for(const auto &animData : mAnimatorData) {
         Animator * const animator = animData.first;
+        if(!animator) continue;
         const auto& keys = animatorKeys.at(keysId);
         for(const auto& key : keys) {
             key->setRelFrame(key->getRelFrame() + dFrame);
@@ -131,19 +145,17 @@ void KeysClipboard::addTargetAnimator(
 PropertyClipboard::PropertyClipboard(const Property* const source) :
     Clipboard(ClipboardType::property),
     mContentType(std::type_index(typeid(*source))) {
-    QBuffer buffer(&mData);
-    buffer.open(QIODevice::WriteOnly);
-    eWriteStream writeStream(&buffer);
-    source->prp_writeProperty(writeStream);
-    buffer.close();
+    const auto writer = [source](eWriteStream& writeStream) {
+        source->prp_writeProperty(writeStream);
+    };
+    write(writer);
 }
 
 bool PropertyClipboard::paste(Property * const target) {
     if(!compatibleTarget(target)) return false;
-    QBuffer buffer(&mData);
-    buffer.open(QIODevice::ReadOnly);
-    eReadStream readStream(&buffer);
-    target->prp_readProperty(readStream);
-    buffer.close();
+    const auto reader = [target](eReadStream& readStream) {
+        target->prp_readProperty(readStream);
+    };
+    read(reader);
     return true;
 }
