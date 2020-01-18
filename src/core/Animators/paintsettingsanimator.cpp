@@ -23,32 +23,26 @@
 #include "gradientpoints.h"
 #include "gradient.h"
 #include "Private/document.h"
+#include "canvas.h"
 
 PaintSettingsAnimator::PaintSettingsAnimator(const QString &name,
-                                             GradientPoints * const grdPts,
+                                             const qsptr<GradientPoints>& grdPts,
                                              PathBox * const parent) :
     ComplexAnimator(name),
     mTarget_k(parent), mGradientPoints(grdPts) {}
-
-void PaintSettingsAnimator::setup(const QColor &color,
-                                  const PaintType paintType,
-                                  Gradient* const gradient) {
-    mColor->setColor(color);
-    setPaintType(paintType);
-    setGradientVar(gradient);
-}
 
 void PaintSettingsAnimator::prp_writeProperty(eWriteStream& dst) const {
     mColor->prp_writeProperty(dst);
     dst.write(&mPaintType, sizeof(PaintType));
     dst.write(&mGradientType, sizeof(GradientType));
     const int gradRWId = mGradient ? mGradient->getReadWriteId() : -1;
-    dst << gradRWId;
     const int gradDocId = mGradient ? mGradient->getDocumentId() : -1;
+    dst << gradRWId;
     dst << gradDocId;
     mGradientPoints->prp_writeProperty(dst);
 }
 
+#include "simpletask.h"
 void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
     mColor->prp_readProperty(src);
     PaintType paintType;
@@ -56,37 +50,35 @@ void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
     src.read(&mGradientType, sizeof(GradientType));
     int gradRWId; src >> gradRWId;
     int gradDocId; src >> gradDocId;
-    Gradient* grad = nullptr;
-    if(gradRWId != -1) {
-        grad = Document::sInstance->getGradientWithRWId(gradRWId);
-    }
-    if(gradDocId != -1 && !grad) {
-        grad = Document::sInstance->getGradientWithDocumentId(gradDocId);
-    }
-    setGradientVar(grad);
-    setPaintType(paintType);
     mGradientPoints->prp_readProperty(src);
+    setPaintType(paintType);
+    SimpleTask::sSchedule([this, gradRWId, gradDocId]() {
+        const auto parentScene = getParentScene();
+        if(!parentScene) return;
+        SceneBoundGradient* gradient = nullptr;
+        if(gradRWId != -1)
+            gradient = parentScene->getGradientWithRWId(gradRWId);
+        if(!gradient && gradDocId != -1)
+            gradient = parentScene->getGradientWithDocumentId(gradDocId);
+        setGradientVar(gradient);
+    });
 }
 
-void PaintSettingsAnimator::setGradientVar(Gradient* const grad) {
+void PaintSettingsAnimator::setGradientVar(SceneBoundGradient* const grad) {
     if(grad == mGradient) return;
     if(mGradient) {
-        ca_removeChild(mGradient->ref<Gradient>());
-        ca_removeChild(mGradientPoints->ref<GradientPoints>());
-    }
-    if(grad && !mGradient) {
-        if(mTarget_k->getFillSettings() == this)
-            mTarget_k->resetFillGradientPointsPos();
-        else mTarget_k->resetStrokeGradientPointsPos();
+        ca_removeChild(mGradient->ref<SceneBoundGradient>());
+        ca_removeChild(mGradientPoints);
     }
     auto& conn = mGradient.assign(grad);
     if(grad) {
-        ca_addChild(grad->ref<Gradient>());
-        ca_addChild(mGradientPoints->ref<GradientPoints>());
-        conn << connect(grad, &Gradient::prp_currentFrameChanged,
+        ca_addChild(grad->ref<SceneBoundGradient>());
+        ca_addChild(mGradientPoints);
+        conn << connect(grad, &SceneBoundGradient::prp_currentFrameChanged,
                         this, [this]() { mTarget_k->updateDrawGradients(); });
     }
     mTarget_k->updateDrawGradients();
+    mTarget_k->requestGlobalFillStrokeUpdateIfSelected();
 }
 
 QColor PaintSettingsAnimator::getColor() const {
@@ -119,26 +111,30 @@ PaintType PaintSettingsAnimator::getPaintType() const {
     return mPaintType;
 }
 
-Gradient *PaintSettingsAnimator::getGradient() const {
+SceneBoundGradient *PaintSettingsAnimator::getGradient() const {
     return *mGradient;
 }
 
-void PaintSettingsAnimator::setGradient(Gradient* gradient) {
+void PaintSettingsAnimator::setGradient(SceneBoundGradient* gradient) {
     if(gradient == mGradient) return;
+    if(gradient && !mGradient) {
+        if(mTarget_k->getFillSettings() == this)
+            mTarget_k->resetFillGradientPointsPos();
+        else mTarget_k->resetStrokeGradientPointsPos();
+    }
     {
         UndoRedo ur;
-        const qptr<Gradient> oldValue = *mGradient;
-        const qptr<Gradient> newValue = gradient;
+        const qptr<SceneBoundGradient> oldValue = *mGradient;
+        const qptr<SceneBoundGradient> newValue = gradient;
         ur.fUndo = [this, oldValue]() {
-            setGradient(oldValue);
+            setGradientVar(oldValue);
         };
         ur.fRedo = [this, newValue]() {
-            setGradient(newValue);
+            setGradientVar(newValue);
         };
         prp_addUndoRedo(ur);
     }
     setGradientVar(gradient);
-    mTarget_k->requestGlobalFillStrokeUpdateIfSelected();
 }
 
 void PaintSettingsAnimator::setCurrentColor(const QColor &color) {
@@ -147,6 +143,8 @@ void PaintSettingsAnimator::setCurrentColor(const QColor &color) {
 
 void PaintSettingsAnimator::showHideChildrenBeforeChaningPaintType(
         const PaintType newPaintType) {
+    if(mPaintType == GRADIENTPAINT)
+        setGradientVar(nullptr);
     if(mPaintType == FLATPAINT || mPaintType == BRUSHPAINT)
         ca_removeChild(mColor);
     if(newPaintType == FLATPAINT || newPaintType == BRUSHPAINT)

@@ -37,6 +37,16 @@ void GradientsListWidget::scrollContentsBy(int dx, int dy) {
 }
 
 void GradientsListWidget::resizeEvent(QResizeEvent *e) {
-    mDisplayedGradients->setMinimumHeight(e->size().height());
+    const QSize size = e->size();
+    mDisplayedGradients->setMinimumHeight(size.height());
     mDisplayedGradients->updateHeight();
+    const int scrollBarWidth = verticalScrollBar()->width();
+    const int availableWidth = size.width() - scrollBarWidth;
+    mDisplayedGradients->setFixedWidth(availableWidth);
+}
+
+void GradientsListWidget::showEvent(QShowEvent *e) {
+    Q_UNUSED(e)
+    mDisplayedGradients->update();
+    return ScrollArea::showEvent(e);
 }

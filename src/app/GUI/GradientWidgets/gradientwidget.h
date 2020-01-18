@@ -27,15 +27,17 @@ class GradientWidget : public QWidget {
 public:
     GradientWidget(QWidget * const parent);
 
-    void setCurrentGradient(Gradient *gradient);
-    Gradient *getCurrentGradient();
+    void setCurrentGradient(SceneBoundGradient *gradient);
+    SceneBoundGradient *getCurrentGradient();
     ColorAnimator *getColorAnimator();
 
     void clearAll();
 signals:
-    void selectionChanged(Gradient*);
+    void selectionChanged(SceneBoundGradient*);
     void selectedColorChanged(ColorAnimator*);
-    void triggered(Gradient *gradient);
+    void triggered(SceneBoundGradient *gradient);
+protected:
+    void showEvent(QShowEvent *e);
 private:
     QVBoxLayout *mMainLayout;
     GradientsListWidget *mGradientsListWidget;
@@ -49,7 +51,7 @@ private:
     int mQuorterHeight = 32;
     int mScrollItemHeight;
 
-    Gradient *mCurrentGradient = nullptr;
+    SceneBoundGradient *mCurrentGradient = nullptr;
     ColorAnimator *mCurrentColor = nullptr;
     int mCurrentColorId = 0;
     int mCenterGradientId = 1;

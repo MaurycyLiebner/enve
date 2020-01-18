@@ -40,8 +40,10 @@ GradientWidget::GradientWidget(QWidget * const parent) :
     mScrollItemHeight = MIN_WIDGET_DIM;
 
     const auto list = mGradientsListWidget->getList();
-    connect(list, &DisplayedGradientsWidget::selectionChanged,
+    connect(list, &DisplayedGradientsWidget::triggered,
             this, &GradientWidget::setCurrentGradient);
+    connect(this, &GradientWidget::selectionChanged,
+            list, &DisplayedGradientsWidget::setSelectedGradient);
     connect(list, &DisplayedGradientsWidget::triggered,
             this, &GradientWidget::triggered);
 
@@ -58,16 +60,22 @@ void GradientWidget::clearAll() {
     mCurrentColorId = 0;
 }
 
-void GradientWidget::setCurrentGradient(Gradient *gradient) {
+void GradientWidget::setCurrentGradient(SceneBoundGradient *gradient) {
     if(mCurrentGradient == gradient) return;
     mCurrentGradient = gradient;
     emit selectionChanged(gradient);
 }
 
-Gradient *GradientWidget::getCurrentGradient() {
+SceneBoundGradient *GradientWidget::getCurrentGradient() {
     return mCurrentGradient;
 }
 
 ColorAnimator *GradientWidget::getColorAnimator() {
     return mCurrentGradientWidget->getColorAnimator();
+}
+
+void GradientWidget::showEvent(QShowEvent *e) {
+    Q_UNUSED(e)
+    mCurrentGradientWidget->update();
+    return QWidget::showEvent(e);
 }

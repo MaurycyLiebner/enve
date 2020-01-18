@@ -32,13 +32,6 @@ void Document::writeBookmarked(eWriteStream &dst) const {
     }
 }
 
-void Document::writeGradients(eWriteStream &dst) const {
-    dst << fGradients.count();
-    int id = 0;
-    for(const auto &grad : fGradients)
-        grad->write(id++, dst);
-}
-
 void Document::writeScenes(eWriteStream &dst) const {
     const int nScenes = fScenes.count();
     dst.write(&nScenes, sizeof(int));
@@ -51,10 +44,7 @@ void Document::writeScenes(eWriteStream &dst) const {
 void Document::write(eWriteStream& dst) const {
     writeBookmarked(dst);
     dst.writeCheckpoint();
-    writeGradients(dst);
-    dst.writeCheckpoint();
     writeScenes(dst);
-    clearGradientRWIds();
 
 //        if(canvas.get() == mCurrentCanvas) {
 //            currentCanvasId = mCurrentCanvas->getWriteId();
@@ -78,10 +68,9 @@ void Document::readBookmarked(eReadStream &src) {
 }
 
 void Document::readGradients(eReadStream& src) {
-    int nGrads;
-    src.read(&nGrads, sizeof(int));
+    int nGrads; src >> nGrads;
     for(int i = 0; i < nGrads; i++) {
-        createNewGradient()->read(src);
+        enve::make_shared<SceneBoundGradient>(nullptr)->read(src);
     }
 }
 
@@ -96,32 +85,16 @@ void Document::readScenes(eReadStream& src) {
     }
 }
 
+#include "simpletask.h"
 void Document::read(eReadStream& src) {
     if(src.evFileVersion() > 1) {
         readBookmarked(src);
         src.readCheckpoint("Error reading bookmarks");
     }
-    readGradients(src);
-    src.readCheckpoint("Error reading gradients");
+    if(src.evFileVersion() <= 5) {
+        readGradients(src);
+        src.readCheckpoint("Error reading gradients");
+    }
     readScenes(src);
-    clearGradientRWIds();
-}
-
-Gradient *Document::getGradientWithRWId(const int rwId) const {
-    for(const auto &grad : fGradients) {
-        if(grad->getReadWriteId() == rwId) return grad.get();
-    }
-    return nullptr;
-}
-
-Gradient *Document::getGradientWithDocumentId(const int id) const {
-    for(const auto &grad : fGradients) {
-        if(grad->getDocumentId() == id) return grad.get();
-    }
-    return nullptr;
-}
-
-void Document::clearGradientRWIds() const {
-    for(const auto &grad : fGradients)
-        grad->clearReadWriteId();
+    SimpleTask::sProcessAll();
 }

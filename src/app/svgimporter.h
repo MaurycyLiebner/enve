@@ -44,7 +44,7 @@ private:
 };
 
 struct SvgGradient {
-    Gradient* fGradient;
+    SceneBoundGradient* fGradient;
     qreal fX1;
     qreal fY1;
     qreal fX2;
@@ -66,7 +66,7 @@ public:
 
     const QColor &getColor() const;
     PaintType getPaintType() const;
-    Gradient *getGradient() const;
+    SceneBoundGradient *getGradient() const;
 
     void apply(BoundingBox * const box) const;
     void apply(BoundingBox * const box,
@@ -75,7 +75,7 @@ protected:
     qreal mOpacity = 1;
     QColor mColor;
     PaintType mPaintType = FLATPAINT;//NOPAINT;
-    Gradient *mGradient = nullptr;
+    SceneBoundGradient *mGradient = nullptr;
     QPointF mGradientP1;
     QPointF mGradientP2;
 };

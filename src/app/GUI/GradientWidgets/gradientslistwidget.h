@@ -29,6 +29,7 @@ public:
 protected:
     void scrollContentsBy(int dx, int dy);
     void resizeEvent(QResizeEvent *e);
+    void showEvent(QShowEvent *e);
 
     DisplayedGradientsWidget *mDisplayedGradients;
 };

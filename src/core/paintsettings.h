@@ -31,12 +31,12 @@ struct ColorSettings {
     ColorMode fMode;
 };
 
-class Gradient;
+class SceneBoundGradient;
 enum class GradientType : short;
 #include "smartPointers/ememory.h"
 struct GradientSettings {
     GradientType fType;
-    qptr<Gradient> fGradient;
+    qptr<SceneBoundGradient> fGradient;
 };
 
 struct FillSettings {

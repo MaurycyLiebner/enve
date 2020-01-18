@@ -106,8 +106,9 @@ void MainWindow::saveToFile(const QString &path) {
     try {
         writeStream.writeCheckpoint();
         mDocument.write(writeStream);
+
         writeStream.writeCheckpoint();
-        mLayoutHandler->write(writeStream);
+        mLayoutHandler->write(writeStream);        
         writeStream.writeCheckpoint();
         const auto renderWidget = mTimeline->getRenderWidget();
         renderWidget->write(writeStream);

@@ -85,6 +85,7 @@ SOURCES += \
     Animators/qcubicsegment1danimator.cpp \
     Animators/qrealsnapshot.cpp \
     Animators/qstringanimator.cpp \
+    Animators/sceneboundgradient.cpp \
     Animators/staticcomplexanimator.cpp \
     Animators/texteffectcollection.cpp \
     Boxes/animationbox.cpp \
@@ -334,6 +335,7 @@ HEADERS += \
     Animators/qcubicsegment1danimator.h \
     Animators/qrealsnapshot.h \
     Animators/qstringanimator.h \
+    Animators/sceneboundgradient.h \
     Animators/staticcomplexanimator.h \
     Animators/texteffectcollection.h \
     Boxes/animationbox.h \

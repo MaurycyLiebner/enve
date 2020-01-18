@@ -20,7 +20,7 @@
 #include "colorhelpers.h"
 #include "skia/skiaincludes.h"
 #include "glhelpers.h"
-class Gradient;
+class SceneBoundGradient;
 
 class GLWidget : public QOpenGLWidget, protected QGL33 {
 public:

@@ -27,7 +27,7 @@
 #include "Tasks/taskscheduler.h"
 #include "clipboardcontainer.h"
 
-class Gradient;
+class SceneBoundGradient;
 class FileDataCacheHandler;
 class Canvas;
 enum class CanvasMode : short;
@@ -60,9 +60,6 @@ public:
     // bookmarked
     QList<QColor> fColors;
     QList<SimpleBrushWrapper*> fBrushes;
-
-    // all in document
-    QList<qsptr<Gradient>> fGradients;
 
     Qt::Alignment fTextAlignment = Qt::AlignLeft;
     Qt::Alignment fTextVAlignment = Qt::AlignTop;
@@ -112,13 +109,6 @@ public:
     void incActiveSceneFrame();
     void decActiveSceneFrame();
 
-    Gradient * createNewGradient();
-    Gradient * duplicateGradient(const int id);
-    bool removeGradient(const qsptr<Gradient>& gradient);
-    bool removeGradient(const int id);
-    Gradient * getGradientWithRWId(const int rwId) const;
-    Gradient * getGradientWithDocumentId(const int id) const;
-
     void addBookmarkBrush(SimpleBrushWrapper* const brush);
 
     void removeBookmarkBrush(SimpleBrushWrapper* const brush);
@@ -147,13 +137,12 @@ public:
 private:
     Clipboard *getClipboard(const ClipboardType type) const;
 
-    void clearGradientRWIds() const;
     void writeBookmarked(eWriteStream &dst) const;
-    void writeGradients(eWriteStream &dst) const;
     void writeScenes(eWriteStream &dst) const;
 
+    void readGradients(eReadStream& src);
+
     void readBookmarked(eReadStream &src);
-    void readGradients(eReadStream &src);
     void readScenes(eReadStream &src);
 signals:
     void canvasModeSet(CanvasMode);
@@ -169,9 +158,6 @@ signals:
     void currentBoxChanged(BoundingBox*);
 //
     void selectedPaintSettingsChanged();
-//
-    void gradientCreated(Gradient*);
-    void gradientRemoved(Gradient*);
 //
     void brushChanged(BrushContexedWrapper* brush);
     void brushColorChanged(QColor color);

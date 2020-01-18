@@ -174,34 +174,6 @@ void Document::decActiveSceneFrame() {
     setActiveSceneFrame(getActiveSceneFrame() - 1);
 }
 
-Gradient *Document::createNewGradient() {
-    const auto grad = enve::make_shared<Gradient>();
-    fGradients.append(grad);
-    emit gradientCreated(grad.get());
-    return grad.get();
-}
-
-Gradient *Document::duplicateGradient(const int id) {
-    if(id < 0 || id >= fGradients.count()) return nullptr;
-    const auto from = fGradients.at(id).get();
-    const auto newGrad = createNewGradient();
-    const auto clipboard = enve::make_shared<PropertyClipboard>(from);
-    clipboard->paste(newGrad);
-    return newGrad;
-}
-
-bool Document::removeGradient(const qsptr<Gradient> &gradient) {
-    const int id = fGradients.indexOf(gradient);
-    return removeGradient(id);
-}
-
-bool Document::removeGradient(const int id) {
-    if(id < 0 || id >= fGradients.count()) return false;
-    const auto grad = fGradients.takeAt(id);
-    emit gradientRemoved(grad.data());
-    return true;
-}
-
 void Document::addBookmarkBrush(SimpleBrushWrapper * const brush) {
     if(!brush) return;
     removeBookmarkBrush(brush);
@@ -266,7 +238,6 @@ void Document::clear() {
     const int nScenes = fScenes.count();
     for(int i = 0; i < nScenes; i++) removeScene(0);
     replaceClipboard(nullptr);
-    fGradients.clear();
     for(const auto brush : fBrushes) {
         removeBookmarkBrush(brush);
     }

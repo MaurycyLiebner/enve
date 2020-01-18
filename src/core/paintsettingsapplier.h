@@ -23,7 +23,7 @@
 #include "Animators/gradient.h"
 #include "Animators/outlinesettingsanimator.h"
 class ColorAnimator;
-class Gradient;
+class SceneBoundGradient;
 class PathBox;
 enum PaintType : short;
 class PaintSettingsAnimator;
@@ -65,14 +65,14 @@ private:
 class GradientPaintSetting : public PaintSetting {
 public:
     GradientPaintSetting(const Target& target,
-                         Gradient * const gradient) :
+                         SceneBoundGradient * const gradient) :
         PaintSetting(target), mGradient(gradient) {}
 protected:
     void applyToPS(PaintSettingsAnimator * const target) const {
         target->setGradient(mGradient);
     }
 private:
-    Gradient * const mGradient;
+    SceneBoundGradient * const mGradient;
 };
 
 class GradientPtsPosSetting : public PaintSetting {

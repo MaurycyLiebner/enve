@@ -27,7 +27,7 @@ class CurrentGradientWidget : public GLWidget {
 public:
     explicit CurrentGradientWidget(QWidget *parent = nullptr);
 
-    void setCurrentGradient(Gradient* const gradient);
+    void setCurrentGradient(SceneBoundGradient* const gradient);
     void colorRightPress(const int x, const QPoint &point);
     void colorLeftPress(const int x);
     void setCurrentColorId(const int id);
@@ -50,7 +50,7 @@ private:
     bool mFirstMove = true;
     int mHoveredX = 0;
 
-    ConnContextQPtr<Gradient> mGradient;
+    ConnContextQPtr<SceneBoundGradient> mGradient;
     QPointer<ColorAnimator> mColor;
     int mColorId = 0;
 };

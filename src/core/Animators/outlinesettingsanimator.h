@@ -23,7 +23,7 @@ class OutlineSettingsAnimator : public PaintSettingsAnimator {
     typedef qCubicSegment1DAnimator::Action SegAction;
     e_OBJECT
 protected:
-    OutlineSettingsAnimator(GradientPoints* const grdPts,
+    OutlineSettingsAnimator(const qsptr<GradientPoints> &grdPts,
                             PathBox * const parent);
 public:
     bool SWT_isStrokeSettings() const { return true; }

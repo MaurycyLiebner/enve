@@ -17,8 +17,7 @@
 #include "outlinesettingsanimator.h"
 #include "Boxes/pathbox.h"
 
-OutlineSettingsAnimator::OutlineSettingsAnimator(
-        GradientPoints * const grdPts,
+OutlineSettingsAnimator::OutlineSettingsAnimator(const qsptr<GradientPoints> &grdPts,
         PathBox * const parent) :
     PaintSettingsAnimator("outline", grdPts, parent) {
 

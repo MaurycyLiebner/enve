@@ -348,7 +348,7 @@ private:
     void connectToolBarActions();
     void setupMenuBar();
 
-    QList<Gradient*> mLoadedGradientsList;
+    QList<SceneBoundGradient*> mLoadedGradientsList;
 protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *obj, QEvent *e);

@@ -871,6 +871,7 @@ SoundComposition *Canvas::getSoundComposition() {
 }
 
 void Canvas::writeBoundingBox(eWriteStream& dst) {
+    writeGradients(dst);
     ContainerBox::writeBoundingBox(dst);
     const int currFrame = getCurrentFrame();
     dst << currFrame;
@@ -879,9 +880,11 @@ void Canvas::writeBoundingBox(eWriteStream& dst) {
     dst << mHeight;
     dst << mFps;
     dst.write(&mRange, sizeof(FrameRange));
+    clearGradientRWIds();
 }
 
 void Canvas::readBoundingBox(eReadStream& src) {
+    if(src.evFileVersion() > 5) readGradients(src);
     ContainerBox::readBoundingBox(src);
     int currFrame;
     src >> currFrame;
@@ -891,4 +894,57 @@ void Canvas::readBoundingBox(eReadStream& src) {
     src >> mFps;
     src.read(&mRange, sizeof(FrameRange));
     anim_setAbsFrame(currFrame);
+    clearGradientRWIds();
+}
+
+void Canvas::readGradients(eReadStream& src) {
+    int nGrads; src >> nGrads;
+    for(int i = 0; i < nGrads; i++) {
+        createNewGradient()->read(src);
+    }
+}
+
+void Canvas::writeGradients(eWriteStream &dst) const {
+    dst << mGradients.count();
+    int id = 0;
+    for(const auto &grad : mGradients) {
+        grad->write(id++, dst);
+    }
+}
+
+SceneBoundGradient *Canvas::createNewGradient() {
+    const auto grad = enve::make_shared<SceneBoundGradient>(this);
+    mGradients.append(grad);
+    emit gradientCreated(grad.get());
+    return grad.get();
+}
+
+bool Canvas::removeGradient(const qsptr<SceneBoundGradient> &gradient) {
+    if(mGradients.removeOne(gradient)) {
+        emit gradientRemoved(gradient.data());
+        return true;
+    }
+    return false;
+}
+
+SceneBoundGradient *Canvas::getGradientWithRWId(const int rwId) const {
+    for(const auto &grad : mGradients) {
+        if(grad->getReadWriteId() == rwId) return grad.get();
+    }
+    return nullptr;
+}
+
+SceneBoundGradient *Canvas::getGradientWithDocumentId(const int id) const {
+    for(const auto &grad : mGradients) {
+        if(grad->getDocumentId() == id) return grad.get();
+    }
+    return nullptr;
+}
+
+#include "simpletask.h"
+void Canvas::clearGradientRWIds() const {
+    SimpleTask::sSchedule([this]() {
+        for(const auto &grad : mGradients)
+            grad->clearReadWriteId();
+    });
 }

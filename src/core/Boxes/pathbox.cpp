@@ -58,9 +58,9 @@ PathBox::PathBox(const eBoxType type) : BoxWithPathEffects(type) {
     mFillGradientPoints = enve::make_shared<GradientPoints>(this);
 
     mFillSettings = enve::make_shared<FillSettingsAnimator>(
-                mFillGradientPoints.data(), this);
+                mFillGradientPoints, this);
     mStrokeSettings = enve::make_shared<OutlineSettingsAnimator>(
-                mStrokeGradientPoints.data(), this);
+                mStrokeGradientPoints, this);
     mStrokeSettings->setPaintType(PaintType::FLATPAINT);
     mStrokeSettings->setCurrentColor(QColor(0, 0, 0));
 

@@ -431,6 +431,8 @@ signals:
     void currentContainerSet(ContainerBox*);
     void dimensionsChanged(int, int);
     void fpsChanged(qreal);
+    void gradientCreated(SceneBoundGradient*);
+    void gradientRemoved(SceneBoundGradient*);
 public:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
@@ -627,7 +629,19 @@ public:
 
     UndoRedoStack* undoRedoStack() const
     { return mUndoRedoStack.get(); }
+
+    const QList<qsptr<SceneBoundGradient>>& gradients() const
+    { return mGradients; }
+    SceneBoundGradient * createNewGradient();
+    bool removeGradient(const qsptr<SceneBoundGradient>& gradient);
+
+    SceneBoundGradient * getGradientWithRWId(const int rwId) const;
+    SceneBoundGradient * getGradientWithDocumentId(const int id) const;
 private:
+    void readGradients(eReadStream &src);
+    void writeGradients(eWriteStream &dst) const;
+
+    void clearGradientRWIds() const;
     QList<SmartNodePoint*> getSortedSelectedNodes();
     void openTextEditorForTextBox(TextBox *textBox);
 
@@ -636,6 +650,8 @@ private:
     qreal mLastDRot = 0;
     int mRotHalfCycles = 0;
     TransformMode mTransMode = TransformMode::none;
+
+    QList<qsptr<SceneBoundGradient>> mGradients;
 protected:
     Document& mDocument;
     bool mDrawnSinceQue = true;

@@ -831,9 +831,9 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
     } else if(tagName == "linearGradient") {
         const QString id = element.attribute("id");
         QString linkId = element.attribute("xlink:href");
-        Gradient* gradient = nullptr;
+        SceneBoundGradient* gradient = nullptr;
         if(linkId.isEmpty()) {
-            gradient = Document::sInstance->createNewGradient();
+            //gradient = Document::sInstance->createNewGradient();
             const QDomNodeList allRootChildNodes = element.childNodes();
             for(int i = 0; i < allRootChildNodes.count(); i++) {
                 const QDomNode iNode = allRootChildNodes.at(i);
@@ -862,7 +862,7 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
             if(it != gGradients.end()) {
                 gradient = it.value().fGradient;
             } else {
-                gradient = Document::sInstance->createNewGradient();
+                //gradient = Document::sInstance->createNewGradient();
             }
         }
         const QString x1 = element.attribute("x1");
@@ -1290,7 +1290,7 @@ const QColor &FillSvgAttributes::getColor() const { return mColor; }
 
 PaintType FillSvgAttributes::getPaintType() const { return mPaintType; }
 
-Gradient *FillSvgAttributes::getGradient() const { return mGradient; }
+SceneBoundGradient *FillSvgAttributes::getGradient() const { return mGradient; }
 
 void FillSvgAttributes::apply(BoundingBox *box) const {
     apply(box, PaintSetting::FILL);

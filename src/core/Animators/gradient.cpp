@@ -18,40 +18,17 @@
 #include "Animators/coloranimator.h"
 #include "Boxes/pathbox.h"
 
-int Gradient::sNextDocumnetId = 0;
-
-Gradient::Gradient() : DynamicComplexAnimator<ColorAnimator>("gradient"),
-    mDocumentId(sNextDocumnetId++) {
+Gradient::Gradient() : DynamicComplexAnimator<ColorAnimator>("gradient") {
     connect(this, &Property::prp_currentFrameChanged,
             this, &Gradient::updateQGradientStops);
 }
 
-Gradient::Gradient(const QColor &color1, const QColor &color2) :
-    Gradient() {
-    addColor(color1);
-    addColor(color2);
+void Gradient::prp_writeProperty(eWriteStream &dst) const {
+    DynamicComplexAnimator<ColorAnimator>::prp_writeProperty(dst);
 }
 
-void Gradient::write(const int id, eWriteStream& dst) {
-    mReadWriteId = id;
-    dst << id;
-    prp_writeProperty(dst);
-}
-
-int Gradient::read(eReadStream& src) {
-    src >> mReadWriteId;
-    prp_readProperty(src);
-    return mReadWriteId;
-}
-
-void Gradient::prp_setInheritedFrameShift(
-        const int shift, ComplexAnimator *parentAnimator) {
-    Q_UNUSED(shift)
-    if(!parentAnimator) return;
-    const auto& keys = anim_getKeys();
-    for(const auto &key : keys) {
-        parentAnimator->ca_updateDescendatKeyFrame(key);
-    }
+void Gradient::prp_readProperty(eReadStream &src) {
+    DynamicComplexAnimator<ColorAnimator>::prp_readProperty(src);
 }
 
 QColor Gradient::getLastQGradientStopQColor() {

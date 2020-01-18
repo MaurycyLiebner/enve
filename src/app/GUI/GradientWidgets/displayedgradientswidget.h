@@ -20,27 +20,30 @@
 #include "GUI/ColorWidgets/glwidget.h"
 #include "GUI/global.h"
 #include "conncontextobjlist.h"
-class Gradient;
+#include "conncontextptr.h"
+class SceneBoundGradient;
 class GradientWidget;
+class Canvas;
 
 class DisplayedGradientsWidget : public GLWidget {
     Q_OBJECT
 public:
     explicit DisplayedGradientsWidget(QWidget *parent = nullptr);
 
+    void setScene(Canvas* const scene);
+
     void incTop(const int inc);
     void setTop(const int top);
 
-    void setSelectedGradient(Gradient *gradient);
+    void setSelectedGradient(SceneBoundGradient *gradient);
 
-    void addGradient(Gradient* const gradient);
-    void removeGradient(Gradient* const gradient);
-    void clear();
+    void addGradient(SceneBoundGradient* const gradient);
+    void removeGradient(SceneBoundGradient* const gradient);
 
     void updateHeight();
 signals:
-    void selectionChanged(Gradient*);
-    void triggered(Gradient*);
+    void selectionChanged(SceneBoundGradient*);
+    void triggered(SceneBoundGradient*);
 protected:
     void paintGL();
 
@@ -52,6 +55,8 @@ private:
     void gradientContextMenuReq(const int gradId, const QPoint &globalPos);
     void gradientLeftPressed(const int gradId);
 
+    ConnContextQPtr<Canvas> mScene;
+
     int mContextMenuGradientId = -1;
     int mDisplayedTop = 0;
     int mTopGradientId = 0;
@@ -59,8 +64,8 @@ private:
 
     int mMaxVisibleGradients = 6;
 
-    QPointer<Gradient> mSelectedGradient;
-    ConnContextObjList<Gradient*> mGradients;
+    QPointer<SceneBoundGradient> mSelectedGradient;
+    ConnContextObjList<SceneBoundGradient*> mGradients;
 };
 
 #endif // DISPLACYEDGRADIENTSWIDGET_H

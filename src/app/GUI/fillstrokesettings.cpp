@@ -408,12 +408,6 @@ void FillStrokeSettingsWidget::updateColorAnimator() {
 }
 
 void FillStrokeSettingsWidget::updateAfterTargetChanged() {
-    if(getCurrentPaintTypeVal() == GRADIENTPAINT) {
-        mGradientWidget->setCurrentGradient(getCurrentGradientVal());
-        const auto gradType = getCurrentGradientTypeVal();
-        mLinearGradientButton->setChecked(gradType == GradientType::LINEAR);
-        mRadialGradientButton->setChecked(gradType == GradientType::RADIAL);
-    }
     setCurrentPaintType(getCurrentPaintTypeVal());
     if(getCurrentPaintTypeVal() == NOPAINT) {
         mFillGradientButton->setChecked(false);
@@ -430,6 +424,10 @@ void FillStrokeSettingsWidget::updateAfterTargetChanged() {
         mFillBrushButton->setChecked(false);
         mFillFlatButton->setChecked(false);
         mFillNoneButton->setChecked(false);
+        mGradientWidget->setCurrentGradient(getCurrentGradientVal());
+        const auto gradType = getCurrentGradientTypeVal();
+        mLinearGradientButton->setChecked(gradType == GradientType::LINEAR);
+        mRadialGradientButton->setChecked(gradType == GradientType::RADIAL);
     } else if(getCurrentPaintTypeVal() == BRUSHPAINT) {
         mFillGradientButton->setChecked(false);
         mFillFlatButton->setChecked(false);
@@ -552,7 +550,7 @@ void FillStrokeSettingsWidget::paintTypeSet(const PaintType type) {
     }
 
     PaintType currentPaintType;
-    Gradient *currentGradient;
+    SceneBoundGradient *currentGradient;
     GradientType currentGradientType;
     if(mTarget == PaintSetting::FILL) {
         currentPaintType = mCurrentFillPaintType;
@@ -648,12 +646,12 @@ void FillStrokeSettingsWidget::setCurrentColorVal(const QColor& color) {
     else mCurrentStrokeColor = color;
 }
 
-Gradient *FillStrokeSettingsWidget::getCurrentGradientVal() {
+SceneBoundGradient *FillStrokeSettingsWidget::getCurrentGradientVal() {
     if(mTarget == PaintSetting::FILL) return mCurrentFillGradient;
     else return mCurrentStrokeGradient;
 }
 
-void FillStrokeSettingsWidget::setCurrentGradientVal(Gradient *gradient) {
+void FillStrokeSettingsWidget::setCurrentGradientVal(SceneBoundGradient *gradient) {
     if(mTarget == PaintSetting::FILL) mCurrentFillGradient = gradient;
     else mCurrentStrokeGradient = gradient;
 }
@@ -714,7 +712,7 @@ void FillStrokeSettingsWidget::emitJoinStyleChanged() {
 }
 
 void FillStrokeSettingsWidget::applyGradient() {
-    Gradient *currentGradient;
+    SceneBoundGradient *currentGradient;
     GradientType currentGradientType;
     if(mTarget == PaintSetting::FILL) {
         currentGradient = mCurrentFillGradient;
@@ -732,7 +730,7 @@ void FillStrokeSettingsWidget::applyGradient() {
     if(scene) scene->applyPaintSettingToSelected(applier);
 }
 
-void FillStrokeSettingsWidget::setGradientAction(Gradient *gradient) {
+void FillStrokeSettingsWidget::setGradientAction(SceneBoundGradient *gradient) {
     setCurrentGradientVal(gradient);
     applyGradient();
     mDocument.actionFinished();
@@ -838,14 +836,8 @@ void FillStrokeSettingsWidget::setGradientPaintType() {
     connectGradient();
     if(mTarget == PaintSetting::FILL) {
         mCurrentFillPaintType = GRADIENTPAINT;
-        if(!mCurrentFillGradient) {
-            mCurrentFillGradient = mGradientWidget->getCurrentGradient();
-        }
     } else {
         mCurrentStrokePaintType = GRADIENTPAINT;
-        if(!mCurrentStrokeGradient) {
-            mCurrentStrokeGradient = mGradientWidget->getCurrentGradient();
-        }
     }
     if(mColorsSettingsWidget->isHidden()) mColorsSettingsWidget->show();
     if(mGradientWidget->isHidden()) mGradientWidget->show();
@@ -854,6 +846,5 @@ void FillStrokeSettingsWidget::setGradientPaintType() {
     setCurrentIndex(0);
     updateColorAnimator();
 
-    mGradientWidget->update();
     if(mTarget == PaintSetting::OUTLINE) mStrokeJoinCapWidget->show();
 }

@@ -27,14 +27,14 @@ CurrentGradientWidget::CurrentGradientWidget(QWidget *parent) :
     setFixedHeight(MIN_WIDGET_DIM);
 }
 
-void CurrentGradientWidget::setCurrentGradient(Gradient * const gradient) {
+void CurrentGradientWidget::setCurrentGradient(SceneBoundGradient * const gradient) {
     auto& conn = mGradient.assign(gradient);
     if(gradient) {
-        conn << connect(gradient, &Gradient::prp_currentFrameChanged,
+        conn << connect(gradient, &SceneBoundGradient::prp_currentFrameChanged,
                         this, qOverload<>(&QWidget::update));
-        conn << connect(gradient, &Gradient::ca_childRemoved,
+        conn << connect(gradient, &SceneBoundGradient::ca_childRemoved,
                         this, &CurrentGradientWidget::updateCurrentColor);
-        conn << connect(gradient, &Gradient::ca_childAdded,
+        conn << connect(gradient, &SceneBoundGradient::ca_childAdded,
                         this, &CurrentGradientWidget::updateCurrentColor);
     }
     setCurrentColorId(0);
@@ -45,8 +45,9 @@ void CurrentGradientWidget::paintGL() {
     glClearColor(0.3f, 0.3f, 0.3f, 1);
     glClear(GL_COLOR_BUFFER_BIT);
     if(!mGradient) return;
-    glUseProgram(PLAIN_PROGRAM.fID);
     const int nColors = mGradient->ca_getNumberOfChildren();
+    if(nColors == 0) return;
+    glUseProgram(PLAIN_PROGRAM.fID);
     int colX = 0;
     const int xInc = width()/nColors;
     const int hoveredColorId = mHoveredX < 0 ? -1 : mHoveredX/xInc;

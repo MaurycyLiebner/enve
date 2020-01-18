@@ -19,19 +19,34 @@
 #include "GUI/GradientWidgets/gradientwidget.h"
 #include "Animators/gradient.h"
 #include "Private/document.h"
+#include "canvas.h"
 
 DisplayedGradientsWidget::DisplayedGradientsWidget(QWidget *parent) :
     GLWidget(parent) {
     setMouseTracking(true);
+    connect(Document::sInstance, &Document::activeSceneSet,
+            this, &DisplayedGradientsWidget::setScene);
+}
 
-    connect(Document::sInstance, &Document::gradientCreated,
-            this, [this](Gradient* const gradient) {
-        addGradient(gradient);
-    });
-    connect(Document::sInstance, &Document::gradientRemoved,
-            this, [this](Gradient* const gradient) {
-        removeGradient(gradient);
-    });
+void DisplayedGradientsWidget::setScene(Canvas * const scene) {
+    if(scene == mScene) return;
+    mGradients.clear();
+    setSelectedGradient(nullptr);
+    auto& conn = mScene.assign(scene);
+    if(scene) {
+        conn << connect(scene, &Canvas::gradientCreated,
+                this, [this](SceneBoundGradient* const gradient) {
+            addGradient(gradient);
+        });
+        conn << connect(scene, &Canvas::gradientRemoved,
+                this, [this](SceneBoundGradient* const gradient) {
+            removeGradient(gradient);
+        });
+        for(const auto& gradient : scene->gradients()) {
+            addGradient(gradient.get());
+        }
+    }
+    updateHeight();
 }
 
 void DisplayedGradientsWidget::incTop(const int inc) {
@@ -116,21 +131,22 @@ void DisplayedGradientsWidget::paintGL() {
     }
 }
 
-void DisplayedGradientsWidget::setSelectedGradient(Gradient *gradient) {
+void DisplayedGradientsWidget::setSelectedGradient(SceneBoundGradient *gradient) {
     if(mSelectedGradient == gradient) return;
     mSelectedGradient = gradient;
     emit selectionChanged(mSelectedGradient);
+    update();
 }
 
-void DisplayedGradientsWidget::addGradient(Gradient * const gradient) {
+void DisplayedGradientsWidget::addGradient(SceneBoundGradient * const gradient) {
     auto& conn = mGradients.addObj(gradient);
-    conn << connect(gradient, &Gradient::prp_absFrameRangeChanged,
+    conn << connect(gradient, &SceneBoundGradient::prp_absFrameRangeChanged,
                     this, qOverload<>(&QWidget::update));
     if(!mSelectedGradient) setSelectedGradient(gradient);
     updateHeight();
 }
 
-void DisplayedGradientsWidget::removeGradient(Gradient * const gradient) {
+void DisplayedGradientsWidget::removeGradient(SceneBoundGradient * const gradient) {
     const int removeId = mGradients.indexOf(gradient);
     if(!mGradients.removeObj(gradient)) return;
     if(mSelectedGradient == gradient) {
@@ -140,14 +156,9 @@ void DisplayedGradientsWidget::removeGradient(Gradient * const gradient) {
     updateHeight();
 }
 
-void DisplayedGradientsWidget::clear() {
-    mGradients.clear();
-    setSelectedGradient(nullptr);
-    updateHeight();
-}
-
 void DisplayedGradientsWidget::gradientLeftPressed(const int gradId) {
-    if(gradId >= Document::sInstance->fGradients.count() || gradId < 0) return;
+    if(!mScene) return;
+    if(gradId >= mScene->gradients().count() || gradId < 0) return;
     const auto gradient = mGradients.at(gradId);
     setSelectedGradient(gradient);
     emit triggered(gradient);
@@ -156,11 +167,12 @@ void DisplayedGradientsWidget::gradientLeftPressed(const int gradId) {
 
 void DisplayedGradientsWidget::gradientContextMenuReq(
         const int gradId, const QPoint& globalPos) {
+    if(!mScene) return;
     mContextMenuGradientId = gradId;
     const bool gradPressed = gradId < mGradients.count() && gradId >= 0;
     const auto pressedGradient = gradPressed ? mGradients.at(gradId) : nullptr;
     const auto clipboard = Document::sInstance->getPropertyClipboard();
-    const bool compat = clipboard && clipboard->hasType<Gradient>();
+    const bool compat = clipboard && clipboard->hasType<SceneBoundGradient>();
     QMenu menu(this);
     const auto newAct = menu.addAction("New Gradient");
     const auto pasteAct = menu.addAction("Paste Gradient");
@@ -183,12 +195,12 @@ void DisplayedGradientsWidget::gradientContextMenuReq(
     const auto selectedAction = menu.exec(globalPos);
     if(selectedAction) {
         if(selectedAction == newAct) {
-            const auto newGrad = Document::sInstance->createNewGradient();
+            const auto newGrad = mScene->createNewGradient();
             newGrad->addColor(Qt::black);
             newGrad->addColor(Qt::white);
             setSelectedGradient(newGrad);
         } else if(selectedAction == pasteAct) {
-            const auto newGrad = Document::sInstance->createNewGradient();
+            const auto newGrad = mScene->createNewGradient();
             clipboard->paste(newGrad);
         } else if(selectedAction == pasteIntoAct) {
             pressedGradient->clear();
@@ -198,9 +210,12 @@ void DisplayedGradientsWidget::gradientContextMenuReq(
                         pressedGradient);
             Document::sInstance->replaceClipboard(clipboard);
         } else if(selectedAction == duplicateAct) {
-            setSelectedGradient(Document::sInstance->duplicateGradient(gradId));
+            const auto newGrad = mScene->createNewGradient();
+            const auto clipboard = enve::make_shared<PropertyClipboard>(pressedGradient);
+            clipboard->paste(newGrad);
+            setSelectedGradient(newGrad);
         } else if(selectedAction == deleteAct) {
-            Document::sInstance->removeGradient(gradId);
+            mScene->removeGradient(pressedGradient->ref<SceneBoundGradient>());
         }
         if(mSelectedGradient) emit triggered(mSelectedGradient);
         Document::sInstance->actionFinished();

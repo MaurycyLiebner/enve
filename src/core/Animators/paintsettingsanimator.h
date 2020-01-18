@@ -22,7 +22,7 @@
 #include "colorhelpers.h"
 #include "skia/skiaincludes.h"
 #include "smartPointers/ememory.h"
-#include "Animators/gradient.h"
+#include "Animators/sceneboundgradient.h"
 #include "Animators/staticcomplexanimator.h"
 #include "paintsettings.h"
 #include "Paint/simplebrushwrapper.h"
@@ -36,7 +36,7 @@ class GradientPoints;
 class PaintSettingsAnimator : public ComplexAnimator {
 protected:
     PaintSettingsAnimator(const QString &name,
-                          GradientPoints * const grdPts,
+                          const qsptr<GradientPoints> &grdPts,
                           PathBox * const parent);
 
     virtual void showHideChildrenBeforeChaningPaintType(
@@ -45,21 +45,17 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
-    void setup(const QColor &color,
-               const PaintType paintType,
-               Gradient * const gradient);
-
     QColor getColor() const;
     PaintType getPaintType() const;
-    Gradient *getGradient() const;
-    void setGradient(Gradient *gradient);
+    SceneBoundGradient *getGradient() const;
+    void setGradient(SceneBoundGradient *gradient);
     void setCurrentColor(const QColor &color);
     void setPaintType(const PaintType paintType);
     ColorAnimator *getColorAnimator();
     void setGradientPointsPos(const QPointF& pt1, const QPointF& pt2);
 
     void duplicateColorAnimatorFrom(ColorAnimator *source);
-    void setGradientVar(Gradient * const grad);
+    void setGradientVar(SceneBoundGradient * const grad);
     QColor getColor(const qreal relFrame) const;
     GradientType getGradientType() { return mGradientType; }
     void setGradientType(const GradientType type);
@@ -68,15 +64,15 @@ private:
     PaintType mPaintType = NOPAINT;
 
     PathBox * const mTarget_k;
-    GradientPoints * const mGradientPoints;
+    const qsptr<GradientPoints> mGradientPoints;
     qsptr<ColorAnimator> mColor = enve::make_shared<ColorAnimator>();
-    ConnContextQPtr<Gradient> mGradient;
+    ConnContextQPtr<SceneBoundGradient> mGradient;
 };
 
 class FillSettingsAnimator : public PaintSettingsAnimator {
     e_OBJECT
 protected:
-    FillSettingsAnimator(GradientPoints * const grdPts,
+    FillSettingsAnimator(const qsptr<GradientPoints> &grdPts,
                          PathBox * const parent) :
         PaintSettingsAnimator("fill", grdPts, parent) {}
 public:

@@ -27,21 +27,11 @@ class Gradient : public DynamicComplexAnimator<ColorAnimator> {
     e_OBJECT
 protected:
     Gradient();
-    Gradient(const QColor &color1, const QColor &color2);
 public:
     bool SWT_isGradient() const { return true; }
 
-    void prp_setInheritedFrameShift(
-            const int shift, ComplexAnimator* parentAnimator);
-
-    int prp_getTotalFrameShift() const { return 0; }
-    int prp_getInheritedFrameShift() const { return 0; }
-
-    void write(const int id, eWriteStream &dst);
-    int read(eReadStream &src);
-    int getReadWriteId() { return mReadWriteId; }
-    int getDocumentId() const { return mDocumentId; }
-    void clearReadWriteId() { mReadWriteId = -1; }
+    void prp_writeProperty(eWriteStream &dst) const;
+    void prp_readProperty(eReadStream &src);
 
     void addColor(const QColor &color);
     void replaceColor(const int id, const QColor &color);
@@ -57,9 +47,6 @@ public:
 
     QGradientStops getQGradientStopsAtAbsFrame(const qreal absFrame);
 private:
-    static int sNextDocumnetId;
-    const int mDocumentId;
-    int mReadWriteId = -1;
     QGradientStops mQGradientStops;
 };
 
