@@ -657,7 +657,7 @@ eBoxOrSound *Actions::importFile(const QString &path,
                 } else if(isVideoExt(extension)) {
                     result = createVideoForPath(path);
                 } else {
-                    result = ImportHandler::sInstance->import(path);
+                    result = ImportHandler::sInstance->import(path, scene);
                 }
             } catch(const std::exception& e) {
                 gPrintExceptionCritical(e);

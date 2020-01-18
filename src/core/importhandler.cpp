@@ -27,7 +27,8 @@ ImportHandler::ImportHandler() {
     sInstance = this;
 }
 
-qsptr<BoundingBox> ImportHandler::import(const QString &path) const {
+qsptr<BoundingBox> ImportHandler::import(const QString &path,
+                                         Canvas* const scene) const {
     {
         const QFile file(path);
         if(!file.exists()) RuntimeThrow("File does not exist");
@@ -36,7 +37,7 @@ qsptr<BoundingBox> ImportHandler::import(const QString &path) const {
     for(const auto& importer : mImporters) {
         if(importer->supports(info)) {
             try {
-                return importer->import(info);
+                return importer->import(info, scene);
             } catch(...) {
                 const auto imp = importer.get();
                 RuntimeThrow("Importer " + typeid(*imp).name() + " failed.");

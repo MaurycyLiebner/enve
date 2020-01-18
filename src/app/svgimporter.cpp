@@ -30,6 +30,143 @@
 #include "MovablePoints/smartnodepoint.h"
 #include "Private/document.h"
 
+class TextSvgAttributes {
+public:
+    TextSvgAttributes() {}
+
+    void setFontFamily(const QString &family);
+    void setFontSize(const int size);
+    void setFontStyle(const QFont::Style &style);
+    void setFontWeight(const int weight);
+
+    void setFontAlignment(const Qt::Alignment &alignment);
+
+    const QFont &getFont() const { return mFont; }
+private:
+    Qt::Alignment mAlignment = Qt::AlignLeft;
+    QFont mFont;
+};
+
+struct SvgGradient {
+    SceneBoundGradient* fGradient;
+    qreal fX1;
+    qreal fY1;
+    qreal fX2;
+    qreal fY2;
+    QMatrix fTrans;
+};
+
+class FillSvgAttributes {
+public:
+    FillSvgAttributes() {}
+
+    void setColor(const QColor &val);
+
+    void setColorOpacity(const qreal opacity);
+
+    void setPaintType(const PaintType type);
+
+    void setGradient(const SvgGradient& gradient);
+
+    const QColor &getColor() const;
+    PaintType getPaintType() const;
+    SceneBoundGradient *getGradient() const;
+
+    void apply(BoundingBox * const box) const;
+    void apply(BoundingBox * const box,
+               const PaintSetting::Target& target) const;
+protected:
+    qreal mOpacity = 1;
+    QColor mColor;
+    PaintType mPaintType = FLATPAINT;//NOPAINT;
+    SceneBoundGradient *mGradient = nullptr;
+    QPointF mGradientP1;
+    QPointF mGradientP2;
+};
+
+class StrokeSvgAttributes : public FillSvgAttributes {
+public:
+    StrokeSvgAttributes() {}
+
+    qreal getLineWidth() const;
+    SkPaint::Cap getCapStyle() const;
+    SkPaint::Join getJoinStyle() const;
+    QPainter::CompositionMode getOutlineCompositionMode() const;
+
+    void setLineWidth(const qreal val);
+
+    void setCapStyle(const SkPaint::Cap capStyle);
+    void setJoinStyle(const SkPaint::Join joinStyle);
+
+    void setOutlineCompositionMode(const QPainter::CompositionMode compMode);
+
+    void apply(BoundingBox *box, const qreal scale) const;
+protected:
+    SkPaint::Cap mCapStyle = SkPaint::kRound_Cap;
+    SkPaint::Join mJoinStyle = SkPaint::kRound_Join;
+    QPainter::CompositionMode mOutlineCompositionMode =
+            QPainter::CompositionMode_Source;
+    qreal mLineWidth = 0;
+};
+
+class BoxSvgAttributes {
+public:
+    void setParent(const BoxSvgAttributes &parent);
+
+    SkPathFillType getFillRule() const;
+    const QMatrix &getRelTransform() const;
+    const FillSvgAttributes &getFillAttributes() const;
+    const StrokeSvgAttributes &getStrokeAttributes() const;
+    const TextSvgAttributes &getTextAttributes() const;
+
+    void loadBoundingBoxAttributes(const QDomElement &element);
+
+    bool hasTransform() const;
+
+    void apply(BoundingBox *box) const;
+    void setFillAttribute(const QString &value);
+    void setStrokeAttribute(const QString &value);
+protected:
+    void decomposeTransformMatrix();
+
+    SkPathFillType mFillRule = SkPathFillType::kEvenOdd;
+
+    qreal mDx = 0;
+    qreal mDy = 0;
+    qreal mScaleX = 1;
+    qreal mScaleY = 1;
+    qreal mShearX = 0;
+    qreal mShearY = 0;
+    qreal mRot = 0;
+
+    qreal mOpacity = 100;
+
+    QMatrix mRelTransform;
+
+    QString mId;
+
+    FillSvgAttributes mFillAttributes;
+    StrokeSvgAttributes mStrokeAttributes;
+    TextSvgAttributes mTextAttributes;
+};
+
+class PathAnimator;
+class VectorPathAnimator;
+class SmartPathAnimator;
+
+class SmartVectorPath;
+class VectorPathSvgAttributes : public BoxSvgAttributes {
+public:
+    SkPath& newPath() {
+        mSeparatePaths << SkPath();
+        return mSeparatePaths.last();
+    }
+
+    void apply(SmartVectorPath * const path);
+protected:
+    QList<SkPath> mSeparatePaths;
+};
+
 struct SvgAttribute {
     SvgAttribute(const QString &nameValueStr) {
         const QStringList nameValueList = nameValueStr.split(":");
@@ -578,9 +715,14 @@ bool parsePolylineDataFast(const QString &dataStr,
     return true;
 }
 
+void loadElement(const QDomElement &element, ContainerBox *parentGroup,
+                 const BoxSvgAttributes &parentGroupAttributes,
+                 Canvas* const scene);
+
 qsptr<ContainerBox> loadBoxesGroup(const QDomElement &groupElement,
                                    ContainerBox *parentGroup,
-                                   const BoxSvgAttributes &attributes) {
+                                   const BoxSvgAttributes &attributes,
+                                   Canvas* const scene) {
     const QDomNodeList allRootChildNodes = groupElement.childNodes();
     qsptr<ContainerBox> boxesGroup;
     const bool hasTransform = attributes.hasTransform();
@@ -596,7 +738,8 @@ qsptr<ContainerBox> loadBoxesGroup(const QDomElement &groupElement,
     for(int i = 0; i < allRootChildNodes.count(); i++) {
         const QDomNode iNode = allRootChildNodes.at(i);
         if(iNode.isElement()) {
-            loadElement(iNode.toElement(), boxesGroup.get(), attributes);
+            loadElement(iNode.toElement(), boxesGroup.get(),
+                        attributes, scene);
         }
     }
     return boxesGroup;
@@ -817,14 +960,16 @@ QMatrix getMatrixFromString(const QString &str) {
 #include "GUI/GradientWidgets/gradientwidget.h"
 static QMap<QString, SvgGradient> gGradients;
 void loadElement(const QDomElement &element, ContainerBox *parentGroup,
-                 const BoxSvgAttributes &parentGroupAttributes) {
+                 const BoxSvgAttributes &parentGroupAttributes,
+                 Canvas* const scene) {
     const QString tagName = element.tagName();
     if(tagName == "defs") {
         const QDomNodeList allRootChildNodes = element.childNodes();
         for(int i = 0; i < allRootChildNodes.count(); i++) {
             const QDomNode iNode = allRootChildNodes.at(i);
             if(iNode.isElement()) {
-                loadElement(iNode.toElement(), parentGroup, parentGroupAttributes);
+                loadElement(iNode.toElement(), parentGroup,
+                            parentGroupAttributes, scene);
             }
         }
         return;
@@ -833,7 +978,7 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
         QString linkId = element.attribute("xlink:href");
         SceneBoundGradient* gradient = nullptr;
         if(linkId.isEmpty()) {
-            //gradient = Document::sInstance->createNewGradient();
+            gradient = scene->createNewGradient();
             const QDomNodeList allRootChildNodes = element.childNodes();
             for(int i = 0; i < allRootChildNodes.count(); i++) {
                 const QDomNode iNode = allRootChildNodes.at(i);
@@ -862,7 +1007,7 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
             if(it != gGradients.end()) {
                 gradient = it.value().fGradient;
             } else {
-                //gradient = Document::sInstance->createNewGradient();
+                gradient = scene->createNewGradient();
             }
         }
         const QString x1 = element.attribute("x1");
@@ -893,7 +1038,8 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
         attributes.setParent(parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
         if(tagName == "g" || tagName == "text") {
-            const auto group = loadBoxesGroup(element, parentGroup, attributes);
+            const auto group = loadBoxesGroup(element, parentGroup,
+                                              attributes, scene);
             if(group->getContainedBoxesCount() == 0)
                 group->removeFromParent_k();
         } else if(tagName == "circle" || tagName == "ellipse") {
@@ -942,7 +1088,8 @@ bool getFlatColorFromString(const QString &colorStr, FillSvgAttributes *target) 
     return true;
 }
 
-qsptr<BoundingBox> loadSVGFile(const QString &filename) {
+qsptr<BoundingBox> loadSVGFile(const QString &filename,
+                               Canvas * const scene) {
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QDomDocument document;
@@ -950,7 +1097,8 @@ qsptr<BoundingBox> loadSVGFile(const QString &filename) {
             const QDomElement rootElement = document.firstChildElement("svg");
             if(!rootElement.isNull()) {
                 BoxSvgAttributes attributes;
-                const auto result = loadBoxesGroup(rootElement, nullptr, attributes);
+                const auto result = loadBoxesGroup(rootElement, nullptr,
+                                                   attributes, scene);
                 gGradients.clear();
                 if(result->getContainedBoxesCount() == 1) {
                     return qSharedPointerCast<BoundingBox>(

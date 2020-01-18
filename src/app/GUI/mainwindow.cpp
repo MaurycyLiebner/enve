@@ -76,7 +76,9 @@ public:
         return fileInfo.suffix() == "ev";
     }
 
-    qsptr<BoundingBox> import(const QFileInfo& fileInfo) const {
+    qsptr<BoundingBox> import(const QFileInfo& fileInfo,
+                              Canvas* const scene) const {
+        Q_UNUSED(scene);
         MainWindow::sGetInstance()->loadEVFile(fileInfo.absoluteFilePath());
         return nullptr;
     }
@@ -88,8 +90,9 @@ public:
         return fileInfo.suffix() == "svg";
     }
 
-    qsptr<BoundingBox> import(const QFileInfo& fileInfo) const {
-        return loadSVGFile(fileInfo.absoluteFilePath());
+    qsptr<BoundingBox> import(const QFileInfo& fileInfo,
+                              Canvas* const scene) const {
+        return loadSVGFile(fileInfo.absoluteFilePath(), scene);
     }
 };
 
