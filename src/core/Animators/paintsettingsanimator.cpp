@@ -76,6 +76,8 @@ void PaintSettingsAnimator::setGradientVar(SceneBoundGradient* const grad) {
         ca_addChild(mGradientPoints);
         conn << connect(grad, &SceneBoundGradient::prp_currentFrameChanged,
                         this, [this]() { mTarget_k->updateDrawGradients(); });
+        conn << connect(grad, &Gradient::removed,
+                        this, [this]() { setGradient(nullptr); });
     }
     mTarget_k->updateDrawGradients();
     mTarget_k->requestGlobalFillStrokeUpdateIfSelected();

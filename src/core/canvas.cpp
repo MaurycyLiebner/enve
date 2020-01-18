@@ -913,14 +913,43 @@ void Canvas::writeGradients(eWriteStream &dst) const {
 }
 
 SceneBoundGradient *Canvas::createNewGradient() {
+    prp_pushUndoRedoName("Create Gradient");
     const auto grad = enve::make_shared<SceneBoundGradient>(this);
-    mGradients.append(grad);
-    emit gradientCreated(grad.get());
+    addGradient(grad);
     return grad.get();
 }
 
+void Canvas::addGradient(const qsptr<SceneBoundGradient>& grad) {
+    prp_pushUndoRedoName("Add Gradient");
+    mGradients.append(grad);
+    emit gradientCreated(grad.get());
+    {
+        UndoRedo ur;
+        ur.fUndo = [this, grad]() {
+            removeGradient(grad);
+        };
+        ur.fRedo = [this, grad]() {
+            addGradient(grad);
+        };
+        prp_addUndoRedo(ur);
+    }
+}
+
 bool Canvas::removeGradient(const qsptr<SceneBoundGradient> &gradient) {
+    const auto guard = gradient;
     if(mGradients.removeOne(gradient)) {
+        prp_pushUndoRedoName("Remove Gradient");
+        {
+            UndoRedo ur;
+            ur.fUndo = [this, guard]() {
+                addGradient(guard);
+            };
+            ur.fRedo = [this, guard]() {
+                removeGradient(guard);
+            };
+            prp_addUndoRedo(ur);
+        }
+        emit gradient->removed();
         emit gradientRemoved(gradient.data());
         return true;
     }

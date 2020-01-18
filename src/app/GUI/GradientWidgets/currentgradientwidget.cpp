@@ -191,6 +191,7 @@ void CurrentGradientWidget::mouseReleaseEvent(QMouseEvent *event) {
     mReordering = false;
     if(mFirstMove || !mGradient) return;
     mGradient->finishOrder();
+    Document::sInstance->actionFinished();
 }
 
 void CurrentGradientWidget::leaveEvent(QEvent *) {

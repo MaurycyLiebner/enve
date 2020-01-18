@@ -638,6 +638,8 @@ public:
     SceneBoundGradient * getGradientWithRWId(const int rwId) const;
     SceneBoundGradient * getGradientWithDocumentId(const int id) const;
 private:
+    void addGradient(const qsptr<SceneBoundGradient>& grad);
+
     void readGradients(eReadStream &src);
     void writeGradients(eWriteStream &dst) const;
 

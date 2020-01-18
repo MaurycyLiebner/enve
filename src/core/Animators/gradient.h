@@ -46,6 +46,8 @@ public:
     void startColorIdTransform(const int id);
 
     QGradientStops getQGradientStopsAtAbsFrame(const qreal absFrame);
+signals:
+    void removed();
 private:
     QGradientStops mQGradientStops;
 };

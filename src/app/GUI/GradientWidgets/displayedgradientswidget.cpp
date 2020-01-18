@@ -144,6 +144,7 @@ void DisplayedGradientsWidget::addGradient(SceneBoundGradient * const gradient) 
                     this, qOverload<>(&QWidget::update));
     if(!mSelectedGradient) setSelectedGradient(gradient);
     updateHeight();
+    update();
 }
 
 void DisplayedGradientsWidget::removeGradient(SceneBoundGradient * const gradient) {
@@ -154,6 +155,7 @@ void DisplayedGradientsWidget::removeGradient(SceneBoundGradient * const gradien
         setSelectedGradient(selectId >= 0 ? mGradients.at(selectId) : nullptr);
     }
     updateHeight();
+    update();
 }
 
 void DisplayedGradientsWidget::gradientLeftPressed(const int gradId) {
