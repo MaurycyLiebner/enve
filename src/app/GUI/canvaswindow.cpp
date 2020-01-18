@@ -172,6 +172,11 @@ void CanvasWindow::tabletEvent(QTabletEvent *e) {
 }
 
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
+    if(event->buttons() & Qt::MiddleButton) {
+        if(event->button() == Qt::MiddleButton)
+            QApplication::setOverrideCursor(Qt::ClosedHandCursor);
+        return;
+    }
     KFT_setFocus();
     if(!mCurrentCanvas || mBlockInput) return;
     if(mMouseGrabber && event->button() == Qt::LeftButton) return;
@@ -192,6 +197,8 @@ void CanvasWindow::mousePressEvent(QMouseEvent *event) {
 }
 
 void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
+    if(event->button() == Qt::MiddleButton)
+        QApplication::restoreOverrideCursor();
     if(!mCurrentCanvas || mBlockInput) return;
     const auto pos = mapToCanvasCoord(event->pos());
     mCurrentCanvas->mouseReleaseEvent(
