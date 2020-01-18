@@ -123,7 +123,7 @@ qsptr<BoundingBox> BoundingBox::createLink() {
 }
 
 void BoundingBox::clearRasterEffects() {
-    mRasterEffectsAnimators->ca_removeAllChildren();
+    mRasterEffectsAnimators->clear();
 }
 
 QPointF BoundingBox::getRelCenterPosition() {

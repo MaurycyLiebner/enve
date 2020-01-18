@@ -82,6 +82,13 @@ public:
         }
     }
 
+    void clear() {
+        const int nChildren = ca_getNumberOfChildren();
+        for(int i = nChildren - 1; i >= 0; i--) {
+            takeChildAt(i);
+        }
+    }
+
     void addChild(const qsptr<T>& newChild) {
         insertChild(newChild, ca_getNumberOfChildren());
     }
@@ -154,8 +161,6 @@ public:
     void swapChildrenTemporary(const int id1, const int id2) {
         ca_swapChildren(id1, id2);
     }
-
-    using ComplexAnimator::ca_removeAllChildren;
 private:
     using ComplexAnimator::ca_addChild;
     using ComplexAnimator::ca_insertChild;
@@ -164,6 +169,8 @@ private:
     using ComplexAnimator::ca_removeChild;
     using ComplexAnimator::ca_replaceChild;
     using ComplexAnimator::ca_takeChildAt;
+
+    using ComplexAnimator::ca_removeAllChildren;
 
     using ComplexAnimator::ca_swapChildren;
     using ComplexAnimator::ca_moveChildInList;
