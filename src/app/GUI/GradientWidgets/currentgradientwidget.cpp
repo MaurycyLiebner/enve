@@ -151,15 +151,13 @@ int CurrentGradientWidget::getColorIdAtX(const int x) {
 void CurrentGradientWidget::setCurrentColorId(const int id) {
     mColorId = id;
     if(!mGradient || !mGradient->ca_hasChildren()) {
-        mColor.assign(nullptr);
+        mColor = nullptr;
         return;
     }
     const int nColors = mGradient->ca_getNumberOfChildren();
     mColorId = qBound(0, id, nColors - 1);
 
-    auto& conn = mColor.assign(mGradient->getChild(mColorId));
-    conn << connect(mColor, &QObject::destroyed,
-                    this, &CurrentGradientWidget::updateCurrentColor);
+    mColor = mGradient->getChild(mColorId);
     emit selectedColorChanged(mColor);
     update();
 }
@@ -200,7 +198,7 @@ void CurrentGradientWidget::leaveEvent(QEvent *) {
 }
 
 void CurrentGradientWidget::updateCurrentColor() {
-    if(!mGradient) setCurrentColorId(0);
+    if(!mGradient) return setCurrentColorId(0);
     const int nColors = mGradient->ca_getNumberOfChildren();
     setCurrentColorId(qBound(0, mColorId, nColors));
 }

@@ -26,6 +26,7 @@
 #include "Animators/staticcomplexanimator.h"
 #include "paintsettings.h"
 #include "Paint/simplebrushwrapper.h"
+#include "conncontextptr.h"
 
 class PathBox;
 class SkStroke;
@@ -69,7 +70,7 @@ private:
     PathBox * const mTarget_k;
     GradientPoints * const mGradientPoints;
     qsptr<ColorAnimator> mColor = enve::make_shared<ColorAnimator>();
-    qptr<Gradient> mGradient;
+    ConnContextQPtr<Gradient> mGradient;
 };
 
 class FillSettingsAnimator : public PaintSettingsAnimator {

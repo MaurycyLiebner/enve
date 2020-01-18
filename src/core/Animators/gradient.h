@@ -56,8 +56,6 @@ public:
     void startColorIdTransform(const int id);
 
     QGradientStops getQGradientStopsAtAbsFrame(const qreal absFrame);
-signals:
-    void changed();
 private:
     static int sNextDocumnetId;
     const int mDocumentId;

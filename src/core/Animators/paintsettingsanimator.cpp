@@ -73,22 +73,20 @@ void PaintSettingsAnimator::setGradientVar(Gradient* const grad) {
     if(mGradient) {
         ca_removeChild(mGradient->ref<Gradient>());
         ca_removeChild(mGradientPoints->ref<GradientPoints>());
-        disconnect(mGradient, &Gradient::changed, this, nullptr);
     }
+    if(grad && !mGradient) {
+        if(mTarget_k->getFillSettings() == this)
+            mTarget_k->resetFillGradientPointsPos();
+        else mTarget_k->resetStrokeGradientPointsPos();
+    }
+    auto& conn = mGradient.assign(grad);
     if(grad) {
         ca_addChild(grad->ref<Gradient>());
         ca_addChild(mGradientPoints->ref<GradientPoints>());
-        connect(grad, &Gradient::changed,
-                this, [this]() { mTarget_k->updateDrawGradients(); });
-        if(grad && !mGradient) {
-            if(mTarget_k->getFillSettings() == this)
-                mTarget_k->resetFillGradientPointsPos();
-            else mTarget_k->resetStrokeGradientPointsPos();
-        }
+        conn << connect(grad, &Gradient::prp_currentFrameChanged,
+                        this, [this]() { mTarget_k->updateDrawGradients(); });
     }
-    mGradient = grad;
-
-    prp_afterWholeInfluenceRangeChanged();
+    mTarget_k->updateDrawGradients();
 }
 
 QColor PaintSettingsAnimator::getColor() const {
@@ -122,14 +120,14 @@ PaintType PaintSettingsAnimator::getPaintType() const {
 }
 
 Gradient *PaintSettingsAnimator::getGradient() const {
-    return mGradient.data();
+    return *mGradient;
 }
 
 void PaintSettingsAnimator::setGradient(Gradient* gradient) {
     if(gradient == mGradient) return;
     {
         UndoRedo ur;
-        const qptr<Gradient> oldValue = mGradient;
+        const qptr<Gradient> oldValue = *mGradient;
         const qptr<Gradient> newValue = gradient;
         ur.fUndo = [this, oldValue]() {
             setGradient(oldValue);

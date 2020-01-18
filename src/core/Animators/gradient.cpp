@@ -114,6 +114,4 @@ void Gradient::updateQGradientStops() {
         mQGradientStops.append(stop);
         cPos += inc;
     }
-
-    emit changed();
 }

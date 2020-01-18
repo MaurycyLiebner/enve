@@ -51,7 +51,7 @@ private:
     int mHoveredX = 0;
 
     ConnContextQPtr<Gradient> mGradient;
-    ConnContextQPtr<ColorAnimator> mColor;
+    QPointer<ColorAnimator> mColor;
     int mColorId = 0;
 };
 
