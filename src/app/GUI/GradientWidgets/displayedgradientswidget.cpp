@@ -85,10 +85,10 @@ void DisplayedGradientsWidget::paintGL() {
         const int nColors = gradient->ca_getNumberOfChildren();
         QColor lastColor = gradient->getColorAt(0);
         int xT = 0;
-        const float xInc = static_cast<float>(width())/(nColors - 1);
+        const float xInc = static_cast<float>(width())/qMax(1, nColors - 1);
         glUniform2f(GRADIENT_PROGRAM.fMeshSizeLoc,
                     MIN_WIDGET_DIM/(3.f*xInc), 1.f/3);
-        for(int j = 1; j < nColors; j++) {
+        for(int j = (nColors == 1 ? 0 : 1); j < nColors; j++) {
             const QColor color = gradient->getColorAt(j);
             glViewport(xT, yInverted, qRound(xInc), MIN_WIDGET_DIM);
 
