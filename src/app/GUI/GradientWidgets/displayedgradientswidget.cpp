@@ -52,7 +52,7 @@ void DisplayedGradientsWidget::updateTopGradientId() {
 }
 
 void DisplayedGradientsWidget::updateHeight() {
-    setFixedHeight(qMax(minimumHeight(), mGradients.count()*MIN_WIDGET_DIM));
+    setFixedHeight(qMax(minimumHeight(), (mGradients.count() + 1)*MIN_WIDGET_DIM));
 }
 
 #include "GUI/ColorWidgets/colorwidgetshaders.h"
@@ -158,23 +158,49 @@ void DisplayedGradientsWidget::gradientContextMenuReq(
         const int gradId, const QPoint& globalPos) {
     mContextMenuGradientId = gradId;
     const bool gradPressed = gradId < mGradients.count() && gradId >= 0;
+    const auto pressedGradient = gradPressed ? mGradients.at(gradId) : nullptr;
+    const auto clipboard = Document::sInstance->getPropertyClipboard();
+    const bool compat = clipboard && clipboard->hasType<Gradient>();
     QMenu menu(this);
-    menu.addAction("New Gradient");
+    const auto newAct = menu.addAction("New Gradient");
+    const auto pasteAct = menu.addAction("Paste Gradient");
+    pasteAct->setEnabled(compat);
+    QAction* pasteIntoAct = nullptr;
+    QAction* copyAct = nullptr;
+    QAction* duplicateAct = nullptr;
+    QAction* deleteAct = nullptr;
+
     if(gradPressed) {
-        menu.addAction("Duplicate Gradient");
-        menu.addAction("Delete Gradient");
+        menu.addSeparator();
+        pasteIntoAct = menu.addAction("Paste Into Gradient");
+        pasteIntoAct->setEnabled(compat);
+        copyAct = menu.addAction("Copy Gradient");
+        menu.addSeparator();
+        duplicateAct = menu.addAction("Duplicate Gradient");
+        menu.addSeparator();
+        deleteAct = menu.addAction("Delete Gradient");
     }
     const auto selectedAction = menu.exec(globalPos);
     if(selectedAction) {
-        if(selectedAction->text() == "Delete Gradient") {
-            Document::sInstance->removeGradient(gradId);
-        } else if(selectedAction->text() == "Duplicate Gradient") {
-            setSelectedGradient(Document::sInstance->duplicateGradient(gradId));
-        } else if(selectedAction->text() == "New Gradient") {
+        if(selectedAction == newAct) {
             const auto newGrad = Document::sInstance->createNewGradient();
             newGrad->addColor(Qt::black);
             newGrad->addColor(Qt::white);
             setSelectedGradient(newGrad);
+        } else if(selectedAction == pasteAct) {
+            const auto newGrad = Document::sInstance->createNewGradient();
+            clipboard->paste(newGrad);
+        } else if(selectedAction == pasteIntoAct) {
+            pressedGradient->clear();
+            clipboard->paste(pressedGradient);
+        } else if(selectedAction == copyAct) {
+            const auto clipboard = enve::make_shared<PropertyClipboard>(
+                        pressedGradient);
+            Document::sInstance->replaceClipboard(clipboard);
+        } else if(selectedAction == duplicateAct) {
+            setSelectedGradient(Document::sInstance->duplicateGradient(gradId));
+        } else if(selectedAction == deleteAct) {
+            Document::sInstance->removeGradient(gradId);
         }
         if(mSelectedGradient) emit triggered(mSelectedGradient);
         Document::sInstance->actionFinished();
