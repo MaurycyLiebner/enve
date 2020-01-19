@@ -320,7 +320,7 @@ void eBoxOrSound::createDurationRectangle() {
 void eBoxOrSound::setSelected(const bool select) {
     if(mSelected == select) return;
     mSelected = select;
-    SWT_scheduleContentUpdate(SWT_BR_SELECTED);
+    SWT_scheduleContentUpdate(SWT_BoxRule::selected);
     emit selectionChanged(select);
 }
 
@@ -370,8 +370,8 @@ void eBoxOrSound::setVisibile(const bool visible) {
 
     prp_afterWholeInfluenceRangeChanged();
 
-    SWT_scheduleContentUpdate(SWT_BR_VISIBLE);
-    SWT_scheduleContentUpdate(SWT_BR_HIDDEN);
+    SWT_scheduleContentUpdate(SWT_BoxRule::visible);
+    SWT_scheduleContentUpdate(SWT_BoxRule::hidden);
 
     emit visibilityChanged(visible);
 }
@@ -420,8 +420,8 @@ void eBoxOrSound::setLocked(const bool locked) {
         pScene->removeBoxFromSelection(bb);
     }
     mLocked = locked;
-    SWT_scheduleContentUpdate(SWT_BR_LOCKED);
-    SWT_scheduleContentUpdate(SWT_BR_UNLOCKED);
+    SWT_scheduleContentUpdate(SWT_BoxRule::locked);
+    SWT_scheduleContentUpdate(SWT_BoxRule::unlocked);
     emit lockedChanged(locked);
 }
 

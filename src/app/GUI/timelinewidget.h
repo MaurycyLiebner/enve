@@ -40,10 +40,12 @@ class SceneChooser;
 class StackWrapperCornerMenu;
 class BoxScroller;
 
-enum SWT_Type : short;
-enum SWT_BoxRule : short;
+enum class SWT_Type : short;
+enum class SWT_BoxRule : short;
+enum class SWT_Target : short;
 
 class TimelineWidget : public QWidget {
+    Q_OBJECT
 public:
     explicit TimelineWidget(Document& document,
                             QMenuBar * const menu,
@@ -63,28 +65,16 @@ private:
     void setViewedFrameRange(const FrameRange &range);
     void setCanvasFrameRange(const FrameRange &range);
 
-    void setRuleNone();
-    void setRuleSelected();
-    void setRuleAnimated();
-    void setRuleNotAnimated();
-    void setRuleVisible();
-    void setRuleHidden();
-    void setRuleUnloced();
-    void setRuleLocked();
-
-    void setTargetAll();
-    void setTargetCurrentCanvas();
-    void setTargetCurrentGroup();
-
     void setSearchText(const QString &text);
     void moveSlider(int val);
-
-    void setTypeAll();
-    void setTypeGraphics();
-    void setTypeSound();
+signals:
+    void typeChanged(const SWT_Type target);
+    void targetChanged(const SWT_Target target);
+    void boxRuleChanged(const SWT_BoxRule rule);
 private:
-    void setCurrentType(const SWT_Type type);
+    void setType(const SWT_Type type);
     void setBoxRule(const SWT_BoxRule rule);
+    void setTarget(const SWT_Target target);
 
     Canvas* mCurrentScene = nullptr;
 

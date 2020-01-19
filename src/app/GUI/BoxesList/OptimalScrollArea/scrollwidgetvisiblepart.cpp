@@ -27,7 +27,7 @@ int ScrollWidgetVisiblePart::sNextId = 0;
 
 ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(ScrollWidget * const parent) :
     MinimalScrollWidgetVisiblePart(parent), mId(sNextId++) {
-    mCurrentRulesCollection.fRule = SWT_BR_ALL;
+    mCurrentRulesCollection.fRule = SWT_BoxRule::all;
     setupUpdateFuncs();
 }
 
@@ -140,9 +140,9 @@ QWidget *ScrollWidgetVisiblePart::createNewSingleWidget() {
 }
 
 SWT_RulesCollection::SWT_RulesCollection() {
-    fType = SWT_TYPE_ALL;
-    fRule = SWT_BR_ALL;
+    fType = SWT_Type::all;
+    fRule = SWT_BoxRule::all;
     fAlwaysShowChildren = false;
-    fTarget = SWT_TARGET_CURRENT_CANVAS;
+    fTarget = SWT_Target::canvas;
     fSearchString = "";
 }

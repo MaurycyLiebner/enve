@@ -112,8 +112,8 @@ void BoundingBox::prp_afterChangedAbsRange(const FrameRange &range, const bool c
 
 void BoundingBox::ca_childIsRecordingChanged() {
     ComplexAnimator::ca_childIsRecordingChanged();
-    SWT_scheduleContentUpdate(SWT_BR_ANIMATED);
-    SWT_scheduleContentUpdate(SWT_BR_NOT_ANIMATED);
+    SWT_scheduleContentUpdate(SWT_BoxRule::animated);
+    SWT_scheduleContentUpdate(SWT_BoxRule::notAnimated);
 }
 
 qsptr<BoundingBox> BoundingBox::createLink() {
@@ -916,50 +916,50 @@ bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     const SWT_BoxRule rule = rules.fRule;
     bool satisfies = false;
     const bool alwaysShowChildren = rules.fAlwaysShowChildren;
-    if(rules.fType == SWT_TYPE_SOUND) return false;
+    if(rules.fType == SWT_Type::sound) return false;
     if(alwaysShowChildren) {
-        if(rule == SWT_BR_ALL) {
+        if(rule == SWT_BoxRule::all) {
             satisfies = parentSatisfies;
-        } else if(rule == SWT_BR_SELECTED) {
+        } else if(rule == SWT_BoxRule::selected) {
             satisfies = isSelected() ||
                     (parentSatisfies && !parentMainTarget);
-        } else if(rule == SWT_BR_ANIMATED) {
+        } else if(rule == SWT_BoxRule::animated) {
             satisfies = isAnimated() ||
                     (parentSatisfies && !parentMainTarget);
-        } else if(rule == SWT_BR_NOT_ANIMATED) {
+        } else if(rule == SWT_BoxRule::notAnimated) {
             satisfies = !isAnimated() ||
                     (parentSatisfies && !parentMainTarget);
-        } else if(rule == SWT_BR_VISIBLE) {
+        } else if(rule == SWT_BoxRule::visible) {
             satisfies = isVisible() ||
                     (parentSatisfies && !parentMainTarget);
-        } else if(rule == SWT_BR_HIDDEN) {
+        } else if(rule == SWT_BoxRule::hidden) {
             satisfies = !isVisible() ||
                     (parentSatisfies && !parentMainTarget);
-        } else if(rule == SWT_BR_LOCKED) {
+        } else if(rule == SWT_BoxRule::locked) {
             satisfies = isLocked() ||
                     (parentSatisfies && !parentMainTarget);
-        } else if(rule == SWT_BR_UNLOCKED) {
+        } else if(rule == SWT_BoxRule::unlocked) {
             satisfies = !isLocked() ||
                     (parentSatisfies && !parentMainTarget);
         }
     } else {
-        if(rule == SWT_BR_ALL) {
+        if(rule == SWT_BoxRule::all) {
             satisfies = parentSatisfies;
-        } else if(rule == SWT_BR_SELECTED) {
+        } else if(rule == SWT_BoxRule::selected) {
             satisfies = isSelected();
-        } else if(rule == SWT_BR_ANIMATED) {
+        } else if(rule == SWT_BoxRule::animated) {
             satisfies = isAnimated();
-        } else if(rule == SWT_BR_NOT_ANIMATED) {
+        } else if(rule == SWT_BoxRule::notAnimated) {
             satisfies = !isAnimated();
-        } else if(rule == SWT_BR_VISIBLE) {
+        } else if(rule == SWT_BoxRule::visible) {
             satisfies = isVisible() && parentSatisfies;
-        } else if(rule == SWT_BR_HIDDEN) {
+        } else if(rule == SWT_BoxRule::hidden) {
             satisfies = !isVisible() ||
                     (parentSatisfies && !parentMainTarget);
-        } else if(rule == SWT_BR_LOCKED) {
+        } else if(rule == SWT_BoxRule::locked) {
             satisfies = isLocked() ||
                     (parentSatisfies && !parentMainTarget);
-        } else if(rule == SWT_BR_UNLOCKED) {
+        } else if(rule == SWT_BoxRule::unlocked) {
             satisfies = !isLocked() && parentSatisfies;
         }
     }

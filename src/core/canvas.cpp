@@ -744,23 +744,23 @@ bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     if(alwaysShowChildren) {
         return false;
     } else {
-        if(rules.fType == SWT_TYPE_SOUND) return false;
+        if(rules.fType == SWT_Type::sound) return false;
 
-        if(rule == SWT_BR_ALL) {
+        if(rule == SWT_BoxRule::all) {
             return true;
-        } else if(rule == SWT_BR_SELECTED) {
+        } else if(rule == SWT_BoxRule::selected) {
             return false;
-        } else if(rule == SWT_BR_ANIMATED) {
+        } else if(rule == SWT_BoxRule::animated) {
             return false;
-        } else if(rule == SWT_BR_NOT_ANIMATED) {
+        } else if(rule == SWT_BoxRule::notAnimated) {
             return false;
-        } else if(rule == SWT_BR_VISIBLE) {
+        } else if(rule == SWT_BoxRule::visible) {
             return true;
-        } else if(rule == SWT_BR_HIDDEN) {
+        } else if(rule == SWT_BoxRule::hidden) {
             return false;
-        } else if(rule == SWT_BR_LOCKED) {
+        } else if(rule == SWT_BoxRule::locked) {
             return false;
-        } else if(rule == SWT_BR_UNLOCKED) {
+        } else if(rule == SWT_BoxRule::unlocked) {
             return true;
         }
     }

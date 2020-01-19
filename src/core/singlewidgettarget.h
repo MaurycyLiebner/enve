@@ -24,28 +24,28 @@ class QMenu;
 class QAction;
 class QMimeData;
 
-enum SWT_BoxRule : short {
-    SWT_BR_ALL,
-    SWT_BR_SELECTED,
-    SWT_BR_VISIBLE,
-    SWT_BR_HIDDEN,
-    SWT_BR_LOCKED,
-    SWT_BR_UNLOCKED,
-    SWT_BR_ANIMATED,
-    SWT_BR_NOT_ANIMATED
+enum class SWT_BoxRule : short {
+    all,
+    selected,
+    visible,
+    hidden,
+    locked,
+    unlocked,
+    animated,
+    notAnimated
 };
 
 
-enum SWT_Target : short {
-    SWT_TARGET_CURRENT_CANVAS,
-    SWT_TARGET_CURRENT_GROUP,
-    SWT_TARGET_ALL
+enum class SWT_Target : short {
+    canvas,
+    group,
+    all
 };
 
-enum SWT_Type : short {
-    SWT_TYPE_ALL,
-    SWT_TYPE_GRAPHICS,
-    SWT_TYPE_SOUND
+enum class SWT_Type : short {
+    all,
+    graphics,
+    sound
 };
 
 struct SWT_RulesCollection {

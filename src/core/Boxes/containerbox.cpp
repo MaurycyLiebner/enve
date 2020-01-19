@@ -884,7 +884,7 @@ bool ContainerBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     const bool bbVisible = BoundingBox::SWT_shouldBeVisible(rules,
                                                             parentSatisfies,
                                                             parentMainTarget);
-    if(rule == SWT_BR_SELECTED) return bbVisible && !isCurrentGroup();
+    if(rule == SWT_BoxRule::selected) return bbVisible && !isCurrentGroup();
     return bbVisible;
 }
 

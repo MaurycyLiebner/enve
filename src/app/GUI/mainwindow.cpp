@@ -204,9 +204,9 @@ MainWindow::MainWindow(Document& document,
                 mDocument, mObjectSettingsScrollArea);
     mObjectSettingsScrollArea->setWidget(mObjectSettingsWidget);
     mObjectSettingsWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_BR_SELECTED);
+            setCurrentRule(SWT_BoxRule::selected);
     mObjectSettingsWidget->getVisiblePartWidget()->
-            setCurrentTarget(nullptr, SWT_TARGET_CURRENT_GROUP);
+            setCurrentTarget(nullptr, SWT_Target::group);
 
     connect(mObjectSettingsScrollArea->verticalScrollBar(),
             &QScrollBar::valueChanged,

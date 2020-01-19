@@ -152,10 +152,10 @@ bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                       const bool parentSatisfies,
                                       const bool parentMainTarget) const {
     if(mIndependent) {
-        if(rules.fRule == SWT_BR_VISIBLE && !mVisible) return false;
-        if(rules.fRule == SWT_BR_SELECTED && !mSelected) return false;
-        if(rules.fType == SWT_TYPE_SOUND) return true;
-        if(rules.fType == SWT_TYPE_GRAPHICS) return false;
+        if(rules.fRule == SWT_BoxRule::visible && !mVisible) return false;
+        if(rules.fRule == SWT_BoxRule::selected && !mSelected) return false;
+        if(rules.fType == SWT_Type::sound) return true;
+        if(rules.fType == SWT_Type::graphics) return false;
         return parentSatisfies;
     } else {
         return StaticComplexAnimator::SWT_shouldBeVisible(

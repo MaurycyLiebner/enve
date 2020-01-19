@@ -21,8 +21,8 @@
 #include "ReadWrite/basicreadwrite.h"
 class SingleWidgetTarget;
 
-enum SWT_BoxRule : short;
-enum SWT_Target : short;
+enum class SWT_BoxRule : short;
+enum class SWT_Target : short;
 struct SWT_RulesCollection;
 
 class SWT_Abstraction;

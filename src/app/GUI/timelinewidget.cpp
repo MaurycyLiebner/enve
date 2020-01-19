@@ -82,36 +82,84 @@ TimelineWidget::TimelineWidget(Document &document,
     QMenu * const settingsMenu = mCornerMenuBar->addMenu(
                 QIcon(iconsDir + "/settings_dots.png"), "Settings");
     QMenu * const objectsMenu = settingsMenu->addMenu("State");
-    objectsMenu->addAction("All", this,
-                           &TimelineWidget::setRuleNone);
-    objectsMenu->addAction("Selected", this,
-                           &TimelineWidget::setRuleSelected);
-    objectsMenu->addAction("Animated", this,
-                           &TimelineWidget::setRuleAnimated);
-    objectsMenu->addAction("Not Animated", this,
-                           &TimelineWidget::setRuleNotAnimated);
-    objectsMenu->addAction("Visible", this,
-                           &TimelineWidget::setRuleVisible);
-    objectsMenu->addAction("Hidden", this,
-                           &TimelineWidget::setRuleHidden);
-    objectsMenu->addAction("Unlocked", this,
-                           &TimelineWidget::setRuleUnloced);
-    objectsMenu->addAction("Locked", this,
-                           &TimelineWidget::setRuleLocked);
+
+    const auto ruleActionAdder = [this, objectsMenu](
+            const SWT_BoxRule rule, const QString& text) {
+        const auto slot = [this, rule]() { setBoxRule(rule); };
+        const auto action = objectsMenu->addAction(text, this, slot);
+        action->setCheckable(true);
+        connect(this, &TimelineWidget::boxRuleChanged,
+                action, [action, rule](const SWT_BoxRule setRule) {
+            action->setChecked(rule == setRule);
+        });
+        return action;
+    };
+
+    ruleActionAdder(SWT_BoxRule::all, "All")->setChecked(true);
+    ruleActionAdder(SWT_BoxRule::selected, "Selected");
+    ruleActionAdder(SWT_BoxRule::animated, "Animated");
+    ruleActionAdder(SWT_BoxRule::notAnimated, "Not Animated");
+    ruleActionAdder(SWT_BoxRule::visible, "Visible");
+    ruleActionAdder(SWT_BoxRule::hidden, "Hidden");
+    ruleActionAdder(SWT_BoxRule::unlocked, "Unlocked");
+    ruleActionAdder(SWT_BoxRule::locked, "Locked");
 
     QMenu * const targetMenu = settingsMenu->addMenu("Target");
-//    targetMenu->addAction("All", this,
-//                          &BoxesListKeysViewWidget::setTargetAll);
-    targetMenu->addAction("Current Scene", this,
-                          &TimelineWidget::setTargetCurrentCanvas);
-    targetMenu->addAction("Current Group", this,
-                          &TimelineWidget::setTargetCurrentGroup);
+
+    const auto targetActionAdder = [this, targetMenu](
+            const SWT_Target target, const QString& text) {
+        const auto slot = [this, target]() { setTarget(target); };
+        const auto action = targetMenu->addAction(text, this, slot);
+        action->setCheckable(true);
+        connect(this, &TimelineWidget::targetChanged,
+                action, [action, target](const SWT_Target setTarget) {
+            action->setChecked(target == setTarget);
+        });
+        return action;
+    };
+
+    //targetActionAdder(SWT_Target::all, "All");
+    targetActionAdder(SWT_Target::canvas, "Current Scene")->setChecked(true);
+    targetActionAdder(SWT_Target::group, "Current Group");
+
     QMenu * const typeMenu = settingsMenu->addMenu("Type");
-    typeMenu->addAction("All", this, &TimelineWidget::setTypeAll);
-    typeMenu->addAction("Graphics", this,
-                        &TimelineWidget::setTypeGraphics);
-    typeMenu->addAction("Sound", this,
-                        &TimelineWidget::setTypeSound);
+
+    const auto typeActionAdder = [this, typeMenu](
+            const SWT_Type type, const QString& text) {
+        const auto slot = [this, type]() { setType(type); };
+        const auto action = typeMenu->addAction(text, this, slot);
+        action->setCheckable(true);
+        connect(this, &TimelineWidget::typeChanged,
+                action, [action, type](const SWT_Type setType) {
+            action->setChecked(type == setType);
+        });
+        return action;
+    };
+
+    typeActionAdder(SWT_Type::all, "All")->setChecked(true);
+    typeActionAdder(SWT_Type::sound, "Sound");
+    typeActionAdder(SWT_Type::graphics, "Graphics");
+
+    settingsMenu->addSeparator();
+
+    {
+        const auto op = [this]() {
+            setBoxRule(SWT_BoxRule::all);
+            setTarget(SWT_Target::canvas);
+            setType(SWT_Type::all);
+        };
+        const auto act = settingsMenu->addAction("Reset", this, op);
+        const auto can = [this]() {
+            const auto rules = mBoxesListVisible->getCurrentRulesCollection();
+            return rules.fRule != SWT_BoxRule::all ||
+                   rules.fTarget != SWT_Target::canvas ||
+                   rules.fType != SWT_Type::all;
+        };
+        const auto setEnabled = [act, can]() { act->setEnabled(can()); };
+        connect(this, &TimelineWidget::typeChanged, act, setEnabled);
+        connect(this, &TimelineWidget::targetChanged, act, setEnabled);
+        connect(this, &TimelineWidget::boxRuleChanged, act, setEnabled);
+    }
 
     //QMenu *viewMenu = mBoxesListMenuBar->addMenu("View");
     mGraphAct = mCornerMenuBar->addAction("Graph");
@@ -121,12 +169,6 @@ TimelineWidget::TimelineWidget(Document &document,
             this, &TimelineWidget::setGraphEnabled);
 
     mCornerMenuBar->setCornerWidget(menu);
-//    mCornerMenuBar->addSeparator();
-//    mCornerMenuBar->addAction(" + ", this,
-//                              &TimelineWidget::addNewBelowThis);
-//    mCornerMenuBar->addAction(" - ", this,
-//                              &TimelineWidget::removeThis);
-//    mCornerMenuBar->addSeparator();
 
     mSearchLine = new QLineEdit("", mBoxesListMenuBar);
     mSearchLine->setMinimumHeight(0);
@@ -155,8 +197,8 @@ TimelineWidget::TimelineWidget(Document &document,
 
     mBoxesListWidget = new BoxScrollWidget(mDocument, mBoxesListScrollArea);
     mBoxesListVisible = mBoxesListWidget->getVisiblePartWidget();
-    mBoxesListVisible->setCurrentRule(SWT_BR_ALL);
-    mBoxesListVisible->setCurrentTarget(nullptr, SWT_TARGET_CURRENT_CANVAS);
+    mBoxesListVisible->setCurrentRule(SWT_BoxRule::all);
+    mBoxesListVisible->setCurrentTarget(nullptr, SWT_Target::canvas);
 
     mBoxesListScrollArea->setWidget(mBoxesListWidget);
     mMainLayout->addWidget(mMenuWidget, 0, 0);
@@ -261,17 +303,17 @@ void TimelineWidget::setCurrentScene(Canvas * const scene) {
 
 
         const auto rules = mBoxesListVisible->getCurrentRulesCollection();
-        if(rules.fTarget == SWT_TARGET_CURRENT_CANVAS) {
+        if(rules.fTarget == SWT_Target::canvas) {
             mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
-                        scene, SWT_TARGET_CURRENT_CANVAS);
-        } else if(rules.fTarget == SWT_TARGET_CURRENT_GROUP) {
+                        scene, SWT_Target::canvas);
+        } else if(rules.fTarget == SWT_Target::group) {
             mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
-                        scene->getCurrentGroup(), SWT_TARGET_CURRENT_GROUP);
+                        scene->getCurrentGroup(), SWT_Target::group);
         }
         connect(scene, &Canvas::currentContainerSet, this,
                 [this](ContainerBox* const container) {
             mBoxesListVisible->scheduleContentUpdateIfIsCurrentTarget(
-                        container, SWT_TARGET_CURRENT_GROUP);
+                        container, SWT_Target::group);
         });
         connect(scene, &Canvas::requestUpdate, this, [this]() {
             mFrameScrollBar->update();
@@ -367,78 +409,34 @@ void TimelineWidget::setBoxesListWidth(const int width) {
 
 void TimelineWidget::setBoxRule(const SWT_BoxRule rule) {
     mBoxesListWidget->getVisiblePartWidget()->setCurrentRule(rule);
-    Document::sInstance->actionFinished();
+    emit boxRuleChanged(rule);
+    Document::sInstance->updateScenes();
 }
 
-void TimelineWidget::setRuleNone() {
-    setBoxRule(SWT_BR_ALL);
+void TimelineWidget::setTarget(const SWT_Target target) {
+    const auto wid = mBoxesListWidget->getVisiblePartWidget();
+    switch(target) {
+    case SWT_Target::all:
+        wid->setCurrentTarget(&mDocument, SWT_Target::all);
+        break;
+    case SWT_Target::canvas:
+        wid->setCurrentTarget(mCurrentScene, SWT_Target::canvas);
+        break;
+    case SWT_Target::group:
+        const auto group = mCurrentScene ? mCurrentScene->getCurrentGroup() :
+                                           nullptr;
+        wid->setCurrentTarget(group, SWT_Target::group);
+        break;
+    }
+
+    emit targetChanged(target);
+    Document::sInstance->updateScenes();
 }
 
-void TimelineWidget::setRuleSelected() {
-    setBoxRule(SWT_BR_SELECTED);
-}
-
-void TimelineWidget::setRuleAnimated() {
-    setBoxRule(SWT_BR_ANIMATED);
-}
-
-void TimelineWidget::setRuleNotAnimated() {
-    setBoxRule(SWT_BR_NOT_ANIMATED);
-}
-
-void TimelineWidget::setRuleVisible() {
-    setBoxRule(SWT_BR_VISIBLE);
-}
-
-void TimelineWidget::setRuleHidden() {
-    setBoxRule(SWT_BR_HIDDEN);
-}
-
-void TimelineWidget::setRuleUnloced() {
-    setBoxRule(SWT_BR_UNLOCKED);
-}
-
-void TimelineWidget::setRuleLocked() {
-    setBoxRule(SWT_BR_LOCKED);
-}
-
-void TimelineWidget::setTargetAll() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentTarget(&mDocument, SWT_TARGET_ALL);
-    Document::sInstance->actionFinished();
-}
-
-void TimelineWidget::setTargetCurrentCanvas() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentTarget(
-                mCurrentScene,
-                SWT_TARGET_CURRENT_CANVAS);
-    Document::sInstance->actionFinished();
-}
-
-void TimelineWidget::setTargetCurrentGroup() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentTarget(
-                mCurrentScene->getCurrentGroup(),
-                SWT_TARGET_CURRENT_GROUP);
-    Document::sInstance->actionFinished();
-}
-
-void TimelineWidget::setCurrentType(const SWT_Type type) {
+void TimelineWidget::setType(const SWT_Type type) {
     mBoxesListWidget->getVisiblePartWidget()->setCurrentType(type);
-    Document::sInstance->actionFinished();
-}
-
-void TimelineWidget::setTypeAll() {
-    setCurrentType(SWT_TYPE_ALL);
-}
-
-void TimelineWidget::setTypeSound() {
-    setCurrentType(SWT_TYPE_SOUND);
-}
-
-void TimelineWidget::setTypeGraphics() {
-    setCurrentType(SWT_TYPE_GRAPHICS);
+    emit typeChanged(type);
+    Document::sInstance->updateScenes();
 }
 
 void TimelineWidget::setSearchText(const QString &text) {
@@ -452,8 +450,7 @@ void TimelineWidget::setViewedFrameRange(const FrameRange& range) {
     mKeysView->setFramesRange(range);
 }
 
-void TimelineWidget::setCanvasFrameRange(
-        const FrameRange& range) {
+void TimelineWidget::setCanvasFrameRange(const FrameRange& range) {
     mFrameRangeScrollBar->setDisplayedFrameRange(range);
     setViewedFrameRange(mFrameRangeScrollBar->getViewedRange());
     mFrameRangeScrollBar->setCanvasFrameRange(range);
