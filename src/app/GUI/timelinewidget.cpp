@@ -352,6 +352,11 @@ void TimelineWidget::writeState(eWriteStream &dst) const {
     dst << mFrameScrollBar->getFirstViewedFrame();
     dst << mFrameRangeScrollBar->getFirstViewedFrame();
     dst << mFrameRangeScrollBar->getLastViewedFrame();
+
+    const auto rules = mBoxesListVisible->getCurrentRulesCollection();
+    dst.write(&rules.fRule, sizeof(SWT_BoxRule));
+    dst.write(&rules.fType, sizeof(SWT_Type));
+    dst.write(&rules.fTarget, sizeof(SWT_Target));
 }
 
 void TimelineWidget::readState(eReadStream &src) {
@@ -372,6 +377,18 @@ void TimelineWidget::readState(eReadStream &src) {
     int frame; src >> frame;
     int minViewedFrame; src >> minViewedFrame;
     int maxViewedFrame; src >> maxViewedFrame;
+
+    if(src.evFileVersion() > 6) {
+        SWT_BoxRule boxRule;
+        SWT_Type type;
+        SWT_Target target;
+        src.read(&boxRule, sizeof(SWT_BoxRule));
+        src.read(&type, sizeof(SWT_Type));
+        src.read(&target, sizeof(SWT_Target));
+        setBoxRule(boxRule);
+        setType(type);
+        setTarget(target);
+    }
 
     BoundingBox* sceneBox = nullptr;;
     if(sceneReadId != -1)
@@ -408,24 +425,23 @@ void TimelineWidget::setBoxesListWidth(const int width) {
 }
 
 void TimelineWidget::setBoxRule(const SWT_BoxRule rule) {
-    mBoxesListWidget->getVisiblePartWidget()->setCurrentRule(rule);
+    mBoxesListVisible->setCurrentRule(rule);
     emit boxRuleChanged(rule);
     Document::sInstance->updateScenes();
 }
 
 void TimelineWidget::setTarget(const SWT_Target target) {
-    const auto wid = mBoxesListWidget->getVisiblePartWidget();
     switch(target) {
     case SWT_Target::all:
-        wid->setCurrentTarget(&mDocument, SWT_Target::all);
+        mBoxesListVisible->setCurrentTarget(&mDocument, SWT_Target::all);
         break;
     case SWT_Target::canvas:
-        wid->setCurrentTarget(mCurrentScene, SWT_Target::canvas);
+        mBoxesListVisible->setCurrentTarget(mCurrentScene, SWT_Target::canvas);
         break;
     case SWT_Target::group:
         const auto group = mCurrentScene ? mCurrentScene->getCurrentGroup() :
                                            nullptr;
-        wid->setCurrentTarget(group, SWT_Target::group);
+        mBoxesListVisible->setCurrentTarget(group, SWT_Target::group);
         break;
     }
 
@@ -434,13 +450,13 @@ void TimelineWidget::setTarget(const SWT_Target target) {
 }
 
 void TimelineWidget::setType(const SWT_Type type) {
-    mBoxesListWidget->getVisiblePartWidget()->setCurrentType(type);
+    mBoxesListVisible->setCurrentType(type);
     emit typeChanged(type);
     Document::sInstance->updateScenes();
 }
 
 void TimelineWidget::setSearchText(const QString &text) {
-    mBoxesListWidget->getVisiblePartWidget()->setCurrentSearchText(text);
+    mBoxesListVisible->setCurrentSearchText(text);
     Document::sInstance->actionFinished();
 }
 
