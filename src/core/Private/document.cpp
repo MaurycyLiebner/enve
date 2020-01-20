@@ -46,7 +46,7 @@ void Document::actionFinished() {
     updateScenes();
     for(const auto& scene : fVisibleScenes) {
         const auto newUndoRedo = scene.first->newUndoRedoSet();
-        if(newUndoRedo || true) emit documentChanged();
+        if(newUndoRedo) emit documentChanged();
     }
 }
 
