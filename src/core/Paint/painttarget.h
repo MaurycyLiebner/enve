@@ -43,6 +43,7 @@ struct PaintTarget {
                    const ulong ts, const qreal pressure,
                    const qreal xTilt, const qreal yTilt,
                    const SimpleBrushWrapper * const brush);
+    void paintRelease();
 
     void newEmptyFrame() {
         if(!isValid()) return;
@@ -72,7 +73,8 @@ struct PaintTarget {
         if(!isValid()) return QRect();
         return mPaintDrawable->pixelBoundingRect();
     }
-
+private:
+    QRect mTotalRoi;
     ulong mLastTs;
     int mLastFrame = 0;
     qptr<PaintBox> mPaintDrawableBox;

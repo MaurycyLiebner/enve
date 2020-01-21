@@ -122,7 +122,8 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
     if(isPreviewingOrRendering()) return;
     if(e.fButton != Qt::LeftButton) return;
     schedulePivotUpdate();
-    if(mCurrentMode == CanvasMode::paint) return;
+    if(mCurrentMode == CanvasMode::paint)
+        return mPaintTarget.paintRelease();
 
     handleLeftMouseRelease(e);
 
@@ -173,6 +174,7 @@ void Canvas::tabletEvent(const QTabletEvent * const e,
     if(type == QEvent::TabletRelease ||
        e->buttons() & Qt::MiddleButton) {
         mStylusDrawing = false;
+        mPaintTarget.paintRelease();
     } else if(e->type() == QEvent::TabletPress) {
         if(e->button() == Qt::RightButton) return;
         if(e->button() == Qt::LeftButton) {

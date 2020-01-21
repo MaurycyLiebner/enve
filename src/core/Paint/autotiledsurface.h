@@ -28,20 +28,25 @@
 #include "autotilesdata.h"
 #include "brushstroke.h"
 
-struct AutoTiledSurface {
+class AutoTiledSurfaceBase {
     friend struct BrushStroke;
     friend struct BrushStrokeSet;
+public:
+    using Request = MyPaintTileRequestStartFunction;
+    using TileCreator = std::function<stdsptr<Tile>(const size_t&)>;
 
-    AutoTiledSurface();
-    AutoTiledSurface(const AutoTiledSurface& other);
-    AutoTiledSurface(AutoTiledSurface&& other);
+    AutoTiledSurfaceBase(const TileCreator tileCreator,
+                         const Request requestStart,
+                         const Request requestEnd);
+    AutoTiledSurfaceBase(const AutoTiledSurfaceBase& other);
+    AutoTiledSurfaceBase(AutoTiledSurfaceBase&& other);
 
-    AutoTiledSurface& operator=(const AutoTiledSurface& other);
-    AutoTiledSurface& operator=(AutoTiledSurface&& other);
+    AutoTiledSurfaceBase& operator=(const AutoTiledSurfaceBase& other);
+    AutoTiledSurfaceBase& operator=(AutoTiledSurfaceBase&& other);
 
-    ~AutoTiledSurface();
+    ~AutoTiledSurfaceBase();
 
-    void swap(AutoTiledSurface& other) {
+    void swap(AutoTiledSurfaceBase& other) {
         mAutoTilesData.swap(other.mAutoTilesData);
     }
 
@@ -57,12 +62,12 @@ struct AutoTiledSurface {
         mypaint_brush_reset(brush);
         mypaint_brush_new_stroke(brush);
 
-        mypaint_surface_begin_atomic(fMyPaintSurface);
-        mypaint_brush_stroke_to(brush, fMyPaintSurface,
+        mypaint_surface_begin_atomic(mMyPaintSurface);
+        mypaint_brush_stroke_to(brush, mMyPaintSurface,
                                 pos.x(), pos.y(), pressure,
                                 xtilt, ytilt, dTime);
         MyPaintRectangle roi;
-        mypaint_surface_end_atomic(fMyPaintSurface, &roi);
+        mypaint_surface_end_atomic(mMyPaintSurface, &roi);
         return roi;
     }
 
@@ -72,21 +77,21 @@ struct AutoTiledSurface {
                                     const double pressure,
                                     const double xtilt,
                                     const double ytilt) const {
-        mypaint_surface_begin_atomic(fMyPaintSurface);
-        mypaint_brush_stroke_to(brush, fMyPaintSurface,
+        mypaint_surface_begin_atomic(mMyPaintSurface);
+        mypaint_brush_stroke_to(brush, mMyPaintSurface,
                                 pos.x(), pos.y(), pressure,
                                 xtilt, ytilt, dTime);
         MyPaintRectangle roi;
-        mypaint_surface_end_atomic(fMyPaintSurface, &roi);
+        mypaint_surface_end_atomic(mMyPaintSurface, &roi);
         return roi;
     }
 
     void execute(MyPaintBrush * const brush, BrushStrokeSet& set) {
-        set.execute(brush, fMyPaintSurface, 5);
+        set.execute(brush, mMyPaintSurface, 5);
     }
 
-    void tileToBitmap(const int tx, const int ty, SkBitmap& bitmap) {
-        mAutoTilesData.tileToBitmap(tx, ty, bitmap);
+    bool tileToBitmap(const int tx, const int ty, SkBitmap& bitmap) {
+        return mAutoTilesData.tileToBitmap(tx, ty, bitmap);
     }
 
     SkBitmap tileToBitmap(const int tx, const int ty) {
@@ -120,22 +125,58 @@ struct AutoTiledSurface {
     }
 
     void clear() { mAutoTilesData.clear(); }
+
+    void replaceTile(const int tx, const int ty,
+                     const stdsptr<Tile>& tile);
+
+    void discardTransparentTiles();
+    void autoCrop();
+protected:
+    stdsptr<Tile> requestTile(const int tx, const int ty);
 private:
     static void sFree(MyPaintSurface *surface);
 
-    static void sRequestStart(MyPaintTiledSurface *tiled_surface,
-                              MyPaintTileRequest *request);
-
-    static void sRequestEnd(MyPaintTiledSurface *tiled_surface,
-                            MyPaintTileRequest *request);
-
     void free();
-    void startRequest(MyPaintTileRequest * const request);
-    void endRequest(MyPaintTileRequest * const request);
-protected:
-    MyPaintTiledSurface fParent;
-    MyPaintSurface* const fMyPaintSurface;
+
+    MyPaintTiledSurface mParent;
+    MyPaintSurface* const mMyPaintSurface;
     AutoTilesData mAutoTilesData;
+    const TileCreator mTileCreator;
+    const Request mRequestStart;
+    const Request mRequestEnd;
+};
+
+class AutoTiledSurface : public AutoTiledSurfaceBase {
+public:
+    AutoTiledSurface();
+
+    static void sRequestStart(MyPaintTiledSurface *surface,
+                              MyPaintTileRequest *request);
+    static void sRequestEnd(MyPaintTiledSurface *,
+                            MyPaintTileRequest *);
+};
+#include "undoabletile.h"
+class UndoableAutoTiledSurface : public AutoTiledSurfaceBase {
+public:
+    UndoableAutoTiledSurface();
+
+    QList<UndoTile> takeUndoList() {
+        for(auto& pair : mUndoList)
+            pair.saveForRedoAndReset();
+        const auto result = mUndoList;
+        mUndoList.clear();
+        return result;
+    }
+
+    static void sRequestStart(MyPaintTiledSurface *surface,
+                              MyPaintTileRequest *request);
+    static void sRequestEnd(MyPaintTiledSurface *,
+                            MyPaintTileRequest *);
+private:
+    void addToUndoList(const UndoTile& tile)
+    { mUndoList << tile; }
+
+    QList<UndoTile> mUndoList;
 };
 
 #endif // AUTOTILEDSURFACE_H

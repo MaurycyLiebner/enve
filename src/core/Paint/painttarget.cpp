@@ -101,6 +101,7 @@ void PaintTarget::paintPress(const QPointF& pos,
                 target.paintPressEvent(brush->getBrush(),
                                        drawPos, 1, pressure, xTilt, yTilt);
         const QRect qRoi(roi.x, roi.y, roi.width, roi.height);
+        mTotalRoi = qRoi;
         mPaintDrawable->pixelRectChanged(qRoi);
         mLastTs = ts;
         mChanged = true;
@@ -122,6 +123,52 @@ void PaintTarget::paintMove(const QPointF& pos,
                                       xTilt, yTilt);
         const QRect qRoi(roi.x, roi.y, roi.width, roi.height);
         mPaintDrawable->pixelRectChanged(qRoi);
+        if(mTotalRoi.isNull()) {
+            mTotalRoi = qRoi;
+        } else {
+            mTotalRoi = mTotalRoi.united(qRoi);
+        }
     }
     mLastTs = ts;
+}
+
+#include "Private/document.h"
+void PaintTarget::paintRelease() {
+    if(mPaintAnimSurface && mPaintDrawable) {
+        auto& target = mPaintDrawable->surface();
+        auto undoList = target.takeUndoList();
+        if(undoList.isEmpty()) return;
+        {
+            mPaintAnimSurface->prp_pushUndoRedoName("Paint");
+            const stdptr<DrawableAutoTiledSurface> ptr = mPaintDrawable.get();
+            const QRect roi = mTotalRoi;
+            UndoRedo ur;
+            const auto anim = mPaintAnimSurface;
+
+            const auto replaceTile = [undoList, anim, ptr, roi](
+                    const stdsptr<Tile>& (UndoTile::*getter)() const) {
+                if(!ptr) return;
+                auto& surface = ptr->surface();
+                for(const auto& undoTile : undoList) {
+                    surface.replaceTile(undoTile.tileX(),
+                                        undoTile.tileY(),
+                                        (undoTile.*getter)());
+                }
+                ptr->autoCrop();
+                ptr->pixelRectChanged(roi);
+                const int relFrame = anim->anim_getCurrentRelFrame();
+                const auto identicalRange = anim->prp_getIdenticalRelRange(relFrame);
+                anim->prp_afterChangedRelRange(identicalRange);
+            };
+
+            ur.fUndo = [replaceTile]() {
+                replaceTile(&UndoTile::oldValue);
+            };
+            ur.fRedo = [replaceTile]() {
+                replaceTile(&UndoTile::newValue);
+            };
+            mPaintAnimSurface->prp_addUndoRedo(ur);
+        }
+        Document::sInstance->actionFinished();
+    }
 }

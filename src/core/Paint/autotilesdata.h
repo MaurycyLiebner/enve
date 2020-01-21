@@ -20,17 +20,22 @@
 #include <QList>
 #include "skia/skiaincludes.h"
 #include "../ReadWrite/basicreadwrite.h"
+#include "glhelpers.h"
+#include "tile.h"
+#include "smartPointers/stdselfref.h"
+
 #ifndef TILE_SIZE
     #define TILE_SIZE 64
 #endif
 
 #ifndef TILE_SPIXEL_SIZE
-    #define TILE_SPIXEL_SIZE 16384 //TILE_SIZE*TILE_SIZE*4
+    #define TILE_SPIXEL_SIZE TILE_SIZE*TILE_SIZE*4
 #endif
-#include "glhelpers.h"
 
 struct AutoTilesData {
-    AutoTilesData();
+    using TileCreator = std::function<stdsptr<Tile>(const size_t&)>;
+
+    AutoTilesData(const TileCreator& tileCreator);
     AutoTilesData(const AutoTilesData& other);
     AutoTilesData(AutoTilesData&& other);
 
@@ -43,80 +48,52 @@ struct AutoTilesData {
 
     void clear();
 
+    stdsptr<Tile> requestTile(const int tx, const int ty);
     bool stretchToTile(const int tx, const int ty);
-    uint16_t* getTile(const int tx, const int ty) const;
+    void replaceTile(const int tx, const int ty,
+                     const stdsptr<Tile>& tile);
+    stdsptr<Tile> getTile(const int tx, const int ty) const;
 
     int width() const;
     int height() const;
 
-    void tileToBitmap(const int tx, const int ty, SkBitmap& bitmap);
+    bool tileToBitmap(const int tx, const int ty, SkBitmap &bitmap);
+    bool tileToBitmap(const Tile &srcTile, SkBitmap& bitmap);
     SkBitmap tileToBitmap(const int tx, const int ty);
     SkBitmap toBitmap(const QMargins& margin = QMargins()) const;
 
     bool drawOnPixmap(SkPixmap &dst, int drawX, int drawY) const;
 
-    QPoint zeroTile() const {
-        return QPoint(mZeroTileCol, mZeroTileRow);
-    }
+    QPoint zeroTile() const;
+    QPoint zeroTilePos() const;
+    QRect pixelBoundingRect() const;
+    QRect tileBoundingRect() const;
+    QRect tileRectToPixRect(const QRect& tileRect) const;
+    QRect pixRectToTileRect(const QRect& pixRect) const;
 
-    QPoint zeroTilePos() const {
-        return zeroTile()*TILE_SIZE;
-    }
-
-    QRect pixelBoundingRect() const {
-        return tileRectToPixRect(tileBoundingRect());
-    }
-
-    QRect tileBoundingRect() const {
-        return QRect(-mZeroTileCol, -mZeroTileRow,
-                     mColumnCount, mRowCount);
-    }
-
-    QRect tileRectToPixRect(const QRect& tileRect) const {
-        return QRect(tileRect.x()*TILE_SIZE,
-                     tileRect.y()*TILE_SIZE,
-                     tileRect.width()*TILE_SIZE,
-                     tileRect.height()*TILE_SIZE);
-    }
-
-    QRect pixRectToTileRect(const QRect& pixRect) const {
-        const int widthRem = pixRect.width() % TILE_SIZE ? 1 : 0;
-        const int heightRem = pixRect.height() % TILE_SIZE ? 1 : 0;
-        return QRect(pixRect.x()/TILE_SIZE,
-                     pixRect.y()/TILE_SIZE,
-                     pixRect.width()/TILE_SIZE + widthRem,
-                     pixRect.height()/TILE_SIZE + heightRem);
-    }
-
-    void setPixelClamp(const QRect& pixRect) {
-        mMinCol = qFloor(qreal(pixRect.left())/TILE_SIZE);
-        mMaxCol = qCeil(qreal(pixRect.right())/TILE_SIZE);
-        mMinRow = qFloor(qreal(pixRect.top())/TILE_SIZE);
-        mMaxRow = qCeil(qreal(pixRect.bottom())/TILE_SIZE);
-    }
+    void setPixelClamp(const QRect& pixRect);
 
     bool isEmpty() const { return mColumnCount == 0 || mRowCount == 0; }
 
-    void swap(AutoTilesData& other) {
-        mColumns.swap(other.mColumns);
-
-        std::swap(mMinCol, other.mMinCol);
-        std::swap(mMaxCol, other.mMaxCol);
-        std::swap(mMinRow, other.mMinRow);
-        std::swap(mMaxRow, other.mMaxRow);
-
-        std::swap(mZeroTileCol, other.mZeroTileCol);
-        std::swap(mZeroTileRow, other.mZeroTileRow);
-        std::swap(mColumnCount, other.mColumnCount);
-        std::swap(mRowCount, other.mRowCount);
-    }
+    void swap(AutoTilesData& other);
 
     void write(eWriteStream &dst) const;
     void read(eReadStream& src);
+
+    void discardTransparentTiles();
+    void autoCrop();
 protected:
-    uint16_t* getTileByIndex(const int colId, const int rowId) const;
+    stdsptr<Tile> getTileByIndex(const int colId, const int rowId) const;
 private:
-    QList<uint16_t*> newColumn();
+    bool columnEmpty(const int colId);
+    bool rowEmpty(const int rowId);
+
+    bool cropFirstColumnIfEmpty();
+    bool cropLastColumnIfEmpty();
+    bool cropFirstRowIfEmpty();
+    bool cropLastRowIfEmpty();
+
+    QList<stdsptr<Tile>> newColumn();
     void prependRows(const int count);
     void appendRows(const int count);
     void prependColumns(const int count);
@@ -131,7 +108,9 @@ private:
     int mZeroTileRow = 0;
     int mColumnCount = 0;
     int mRowCount = 0;
-    QList<QList<uint16_t*>> mColumns;
+    QList<QList<stdsptr<Tile>>> mColumns;
+
+    const TileCreator mTileCreator;
 };
 
 #endif // AUTOTILESDATA_H

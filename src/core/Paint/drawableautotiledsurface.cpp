@@ -27,12 +27,14 @@ DrawableAutoTiledSurface::DrawableAutoTiledSurface() :
 }
 
 DrawableAutoTiledSurface::DrawableAutoTiledSurface(
-        const DrawableAutoTiledSurface &other) : DrawableAutoTiledSurface() {
+        const DrawableAutoTiledSurface &other) :
+    DrawableAutoTiledSurface() {
     mSurface = other.mSurface;
     mTileBitmaps = other.mTileBitmaps;
 }
 
-DrawableAutoTiledSurface &DrawableAutoTiledSurface::operator=(const DrawableAutoTiledSurface &other) {
+DrawableAutoTiledSurface &DrawableAutoTiledSurface::operator=(
+        const DrawableAutoTiledSurface &other) {
     mSurface = other.mSurface;
     mTileBitmaps = other.mTileBitmaps;
     return *this;
@@ -84,6 +86,13 @@ void DrawableAutoTiledSurface::updateTileBitmaps() {
 
 void DrawableAutoTiledSurface::clearBitmaps() {
     mTileBitmaps.clear();
+}
+
+void DrawableAutoTiledSurface::autoCrop() {
+    mSurface.autoCrop();
+    // 2020.01.22 TODO remove only unnecessary bitmaps
+    clearBitmaps();
+    updateTileBitmaps();
 }
 
 void DrawableAutoTiledSurface::updateTileRecBitmaps(QRect tileRect) {
@@ -212,10 +221,10 @@ class SurfaceSaver : public TmpSaver {
         typedef std::function<void(const qsptr<QTemporaryFile>&)> Func;
 protected:
     SurfaceSaver(DrawableAutoTiledSurface* const target,
-                 const AutoTiledSurface &surface) :
+                 const UndoableAutoTiledSurface &surface) :
         TmpSaver(target), mSurface(surface) {}
     SurfaceSaver(DrawableAutoTiledSurface* const target,
-                 AutoTiledSurface &&bitmaps) :
+                 UndoableAutoTiledSurface &&bitmaps) :
         TmpSaver(target), mSurface(std::move(bitmaps)) {}
 
 
@@ -223,13 +232,13 @@ protected:
         mSurface.write(dst);
     }
 private:
-    const AutoTiledSurface mSurface;
+    const UndoableAutoTiledSurface mSurface;
 };
 
 class SurfaceLoader : public TmpLoader {
     e_OBJECT
 public:
-    typedef std::function<void(AutoTiledSurface&&)> Func;
+    typedef std::function<void(UndoableAutoTiledSurface&&)> Func;
 protected:
     SurfaceLoader(const qsptr<QTemporaryFile> &file,
                   DrawableAutoTiledSurface* const target,
@@ -244,7 +253,7 @@ protected:
         if(mFinishedFunc) mFinishedFunc(std::move(mSurface));
     }
 private:
-    AutoTiledSurface mSurface;
+    UndoableAutoTiledSurface mSurface;
     const Func mFinishedFunc;
 };
 
@@ -255,7 +264,7 @@ stdsptr<eHddTask> DrawableAutoTiledSurface::createTmpFileDataSaver() {
 stdsptr<eHddTask> DrawableAutoTiledSurface::createTmpFileDataLoader() {
     stdptr<DrawableAutoTiledSurface> thisP = this;
     const SurfaceLoader::Func func =
-    [thisP](AutoTiledSurface&& surface) {
+    [thisP](UndoableAutoTiledSurface&& surface) {
         if(thisP) {
             thisP->mSurface = std::move(surface);
             thisP->updateTileBitmaps();

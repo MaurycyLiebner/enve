@@ -22,84 +22,130 @@
 #include "colorconversions.h"
 #include "autotiledsurface.h"
 
-AutoTiledSurface::AutoTiledSurface() :
-    fMyPaintSurface(&fParent.parent) {
-    mypaint_tiled_surface_init(&fParent,
-                               sRequestStart,
-                               sRequestEnd);
-    fParent.parent.destroy = sFree;
+AutoTiledSurfaceBase::AutoTiledSurfaceBase(const TileCreator tileCreator,
+                                           const Request requestStart,
+                                           const Request requestEnd) :
+    mMyPaintSurface(&mParent.parent),
+    mAutoTilesData(tileCreator),
+    mRequestStart(requestStart),
+    mRequestEnd(requestEnd) {
+    mypaint_tiled_surface_init(&mParent, requestStart, requestEnd);
+    mParent.parent.destroy = sFree;
 #ifdef _OPENMP
-    fParent.threadsafe_tile_requests = true;
+    mParent.threadsafe_tile_requests = true;
 #else
     fParent.threadsafe_tile_requests = false;
 #endif
 }
 
-AutoTiledSurface::AutoTiledSurface(const AutoTiledSurface &other) :
-    AutoTiledSurface() {
+AutoTiledSurfaceBase::AutoTiledSurfaceBase(const AutoTiledSurfaceBase &other) :
+    AutoTiledSurfaceBase(other.mTileCreator,
+                         other.mRequestStart,
+                         other.mRequestEnd) {
     mAutoTilesData = other.mAutoTilesData;
 }
 
-AutoTiledSurface::AutoTiledSurface(AutoTiledSurface &&other) :
-    AutoTiledSurface() {
+AutoTiledSurfaceBase::AutoTiledSurfaceBase(AutoTiledSurfaceBase &&other) :
+    AutoTiledSurfaceBase(other.mTileCreator,
+                         other.mRequestStart,
+                         other.mRequestEnd) {
     mAutoTilesData = std::move(other.mAutoTilesData);
 }
 
-AutoTiledSurface &AutoTiledSurface::operator=(const AutoTiledSurface &other) {
+AutoTiledSurfaceBase &AutoTiledSurfaceBase::operator=(const AutoTiledSurfaceBase &other) {
     mAutoTilesData = other.mAutoTilesData;
     return *this;
 }
 
-AutoTiledSurface &AutoTiledSurface::operator=(AutoTiledSurface &&other) {
+AutoTiledSurfaceBase &AutoTiledSurfaceBase::operator=(AutoTiledSurfaceBase &&other) {
     mAutoTilesData = std::move(other.mAutoTilesData);
     return *this;
 }
 
-AutoTiledSurface::~AutoTiledSurface() {
+AutoTiledSurfaceBase::~AutoTiledSurfaceBase() {
     free();
 }
 
-void AutoTiledSurface::setPixelClamp(const QRect &pixRect) {
+void AutoTiledSurfaceBase::setPixelClamp(const QRect &pixRect) {
     mAutoTilesData.setPixelClamp(pixRect);
 }
 
-void AutoTiledSurface::loadBitmap(const SkBitmap& src) {
+void AutoTiledSurfaceBase::loadBitmap(const SkBitmap& src) {
     mAutoTilesData.loadBitmap(src);
 }
 
-void AutoTiledSurface::sFree(MyPaintSurface *surface) {
-    const auto self = reinterpret_cast<AutoTiledSurface*>(surface);
+void AutoTiledSurfaceBase::replaceTile(const int tx, const int ty,
+                                       const stdsptr<Tile> &tile) {
+    mAutoTilesData.replaceTile(tx, ty, tile);
+}
+
+void AutoTiledSurfaceBase::discardTransparentTiles() {
+    mAutoTilesData.discardTransparentTiles();
+}
+
+void AutoTiledSurfaceBase::autoCrop() {
+    mAutoTilesData.autoCrop();
+}
+
+stdsptr<Tile> AutoTiledSurfaceBase::requestTile(const int tx, const int ty) {
+    return mAutoTilesData.requestTile(tx, ty);
+}
+
+void AutoTiledSurfaceBase::sFree(MyPaintSurface *surface) {
+    const auto self = reinterpret_cast<AutoTiledSurfaceBase*>(surface);
     self->free();
 }
 
-void AutoTiledSurface::sRequestStart(MyPaintTiledSurface *tiled_surface,
-                                     MyPaintTileRequest *request) {
-    const auto self = reinterpret_cast<AutoTiledSurface*>(tiled_surface);
-    self->startRequest(request);
-}
 
-void AutoTiledSurface::sRequestEnd(MyPaintTiledSurface *tiled_surface,
-                                   MyPaintTileRequest *request) {
-    const auto self = reinterpret_cast<AutoTiledSurface*>(tiled_surface);
-    self->endRequest(request);
-}
-
-void AutoTiledSurface::free() {
-    mypaint_tiled_surface_destroy(&fParent);
+void AutoTiledSurfaceBase::free() {
+    mypaint_tiled_surface_destroy(&mParent);
 }
 
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
-void AutoTiledSurface::startRequest(MyPaintTileRequest * const request) {
+void AutoTiledSurface::sRequestStart(MyPaintTiledSurface *surface,
+                                     MyPaintTileRequest *request) {
+    const auto self = reinterpret_cast<AutoTiledSurface*>(surface);
     #pragma omp critical
     {
-        mAutoTilesData.stretchToTile(request->tx, request->ty);
-        request->buffer = mAutoTilesData.getTile(request->tx, request->ty);
+        // make copy for undo/redo if not yet done,
+        // keep references to tiles,
+        // flush undo/redo later
+        const auto tile = self->requestTile(request->tx, request->ty);
+        request->buffer = tile->requestZeroedData();
     }
 }
 
-void AutoTiledSurface::endRequest(MyPaintTileRequest * const request) {
-    Q_UNUSED(request)
+void AutoTiledSurface::sRequestEnd(MyPaintTiledSurface *,
+                                   MyPaintTileRequest *) {}
+
+AutoTiledSurface::AutoTiledSurface() :
+    AutoTiledSurfaceBase([](const size_t& size) {
+                            return std::make_shared<Tile>(size);
+                         }, sRequestStart, sRequestEnd) {}
+
+void UndoableAutoTiledSurface::sRequestStart(MyPaintTiledSurface *surface,
+                                             MyPaintTileRequest *request) {
+    const auto self = reinterpret_cast<UndoableAutoTiledSurface*>(surface);
+    #pragma omp critical
+    {
+        // make copy for undo/redo if not yet done,
+        // keep references to tiles,
+        // flush undo/redo later
+        const auto tile = self->requestTile(request->tx, request->ty);
+        const auto undoableTile = std::static_pointer_cast<UndoableTile>(tile);
+        if(!undoableTile->fUndo) {
+            self->addToUndoList(UndoTile(request->tx, request->ty, undoableTile));
+        }
+        request->buffer = tile->requestZeroedData();
+    }
 }
+
+void UndoableAutoTiledSurface::sRequestEnd(MyPaintTiledSurface *,
+                                           MyPaintTileRequest *) {}
+UndoableAutoTiledSurface::UndoableAutoTiledSurface() :
+    AutoTiledSurfaceBase([](const size_t& size) {
+                            return std::make_shared<UndoableTile>(size);
+                         }, sRequestStart, sRequestEnd) {}

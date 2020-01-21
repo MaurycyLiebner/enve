@@ -465,8 +465,7 @@ void Canvas::makePointCtrlsCorner() {
 }
 
 void Canvas::newEmptyPaintFrameAction() {
-    if(mPaintTarget.isValid())
-        mPaintTarget.newEmptyFrame();
+    if(mPaintTarget.isValid()) mPaintTarget.newEmptyFrame();
 }
 
 void Canvas::moveSecondSelectionPoint(const QPointF &pos) {

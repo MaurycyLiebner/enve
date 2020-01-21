@@ -18,44 +18,29 @@
 #include "exceptions.h"
 #include "skia/skiahelpers.h"
 
-uint16_t *allocateTile(const size_t& size) {
-    auto ptr = new uint16_t[size];
-    if(!ptr) RuntimeThrow("Could not allocate memory for a tile.");
-    return ptr;
-}
+AutoTilesData::AutoTilesData(const TileCreator& tileCreator) :
+    mTileCreator(tileCreator) {}
 
-uint16_t *newZeroedTile(const size_t& size) {
-    auto ptr = new uint16_t[size];
-    if(!ptr) RuntimeThrow("Could not allocate memory for a tile.");
-    memset(ptr, 0, size*sizeof(uint16_t));
-    return ptr;
-}
-
-AutoTilesData::AutoTilesData() {}
-
-AutoTilesData::AutoTilesData(const AutoTilesData &other) {
+AutoTilesData::AutoTilesData(const AutoTilesData &other) :
+    AutoTilesData(other.mTileCreator) {
     mZeroTileCol = other.mZeroTileCol;
     mZeroTileRow = other.mZeroTileRow;
     mColumnCount = other.mColumnCount;
     mRowCount = other.mRowCount;
 
     for(auto& column : other.mColumns) {
-        mColumns.append(QList<uint16_t*>());
-        QList<uint16_t*> &col = mColumns.last();
+        mColumns.append(QList<stdsptr<Tile>>());
+        QList<stdsptr<Tile>> &col = mColumns.last();
         for(auto& srcTile : column) {
-            const auto dstTile = allocateTile(TILE_SPIXEL_SIZE);
-            uint16_t * dstP = dstTile;
-            const uint16_t * srcP = srcTile;
-            for(int sp = 0; sp < TILE_SPIXEL_SIZE; sp++) {
-                *(dstP++) = *(srcP++);
-            }
-
+            const auto dstTile = mTileCreator(TILE_SPIXEL_SIZE);
+            dstTile->copyFrom(*srcTile.get());
             col << dstTile;
         }
     }
 }
 
-AutoTilesData::AutoTilesData(AutoTilesData &&other) {
+AutoTilesData::AutoTilesData(AutoTilesData &&other) :
+    AutoTilesData(other.mTileCreator) {
     swap(other);
 }
 
@@ -80,14 +65,13 @@ void AutoTilesData::loadBitmap(const SkBitmap &src) {
         const bool lastCol = col == (nCols - 1);
         const int x0 = col*TILE_SIZE;
         const int maxX = qMin(x0 + TILE_SIZE, src.width());
-        QList<uint16_t*> colRows;
+        QList<stdsptr<Tile>> colRows;
         for(int row = 0; row < nRows; row++) {
             const bool lastRow = row == (nRows - 1);
             const bool iniZeroed = lastCol || lastRow;
-            uint16_t * tileP;
+            const auto tile = mTileCreator(TILE_SPIXEL_SIZE);
             try {
-                tileP = iniZeroed ? newZeroedTile(TILE_SPIXEL_SIZE) :
-                                    allocateTile(TILE_SPIXEL_SIZE);
+                if(iniZeroed) tile->zeroData();
             } catch(...) {
                 clear();
                 RuntimeThrow("Failed to load bitmap to AutoTilesData.");
@@ -95,6 +79,7 @@ void AutoTilesData::loadBitmap(const SkBitmap &src) {
 
             const int y0 = row*TILE_SIZE;
             const int maxY = qMin(y0 + TILE_SIZE, src.height());
+            const auto tileP = tile->requestData();
             for(int y = y0; y < maxY; y++) {
                 const uint8_t * srcLine = srcP + (y*src.width() + x0)*4;
                 uint16_t* dstLine = tileP + (y - y0)*TILE_SIZE*4;
@@ -105,7 +90,7 @@ void AutoTilesData::loadBitmap(const SkBitmap &src) {
                     *dstLine++ = (*srcLine++ * (1<<15) + 255/2) / 255;
                 }
             }
-            colRows << tileP;
+            colRows << tile;
         }
         mColumns << colRows;
     }
@@ -120,11 +105,6 @@ AutoTilesData::~AutoTilesData() {
 }
 
 void AutoTilesData::clear() {
-    for(const auto& col : mColumns) {
-        for(const auto& row : col) {
-            free(row);
-        }
-    }
     mColumns.clear();
     mZeroTileCol = 0;
     mZeroTileRow = 0;
@@ -132,12 +112,12 @@ void AutoTilesData::clear() {
     mRowCount = 0;
 }
 
-uint16_t *AutoTilesData::getTile(const int tx, const int ty) const {
+stdsptr<Tile> AutoTilesData::getTile(const int tx, const int ty) const {
     return getTileByIndex(tx + mZeroTileCol, ty + mZeroTileRow);
 }
 
-uint16_t *AutoTilesData::getTileByIndex(const int colId,
-                                        const int rowId) const {
+stdsptr<Tile> AutoTilesData::getTileByIndex(const int colId,
+                                            const int rowId) const {
     if(colId < 0 || colId >= mColumnCount ||
        rowId < 0 || rowId >= mRowCount) return nullptr;
     return mColumns.at(colId).at(rowId);
@@ -151,12 +131,24 @@ int AutoTilesData::height() const {
     return mRowCount*TILE_SIZE;
 }
 
-void AutoTilesData::tileToBitmap(const int tx, const int ty, SkBitmap &bitmap) {
+bool AutoTilesData::tileToBitmap(const Tile &srcTile, SkBitmap &bitmap) {
     Q_ASSERT(bitmap.width() == TILE_SIZE);
     Q_ASSERT(bitmap.height() == TILE_SIZE);
+    const uint16_t * const srcP = srcTile.data();
     uint8_t * const dstP = static_cast<uint8_t*>(bitmap.getPixels());
     Q_ASSERT(dstP);
-    const uint16_t * const srcP = getTile(tx, ty);
+    if(!srcP) {
+        for(int y = 0; y < TILE_SIZE; y++) {
+            uint8_t * dstLine = dstP + y*bitmap.width()*4;
+            for(int x = 0; x < TILE_SIZE; x++) {
+                *dstLine++ = 0;
+                *dstLine++ = 0;
+                *dstLine++ = 0;
+                *dstLine++ = 0;
+            }
+        }
+        return false;
+    }
 
     for(int y = 0; y < TILE_SIZE; y++) {
         uint8_t * dstLine = dstP + y*bitmap.width()*4;
@@ -173,14 +165,22 @@ void AutoTilesData::tileToBitmap(const int tx, const int ty, SkBitmap &bitmap) {
             *dstLine++ = (a * 255 + (1<<15)/2) / (1<<15);
         }
     }
+    return true;
 }
 
 SkBitmap AutoTilesData::tileToBitmap(const int tx, const int ty) {
-    const auto info = SkiaHelpers::getPremulRGBAInfo(TILE_SIZE, TILE_SIZE);
     SkBitmap bitmap;
+    const auto srcTile = getTile(tx, ty);
+    if(!srcTile->data()) return bitmap;
+    const auto info = SkiaHelpers::getPremulRGBAInfo(TILE_SIZE, TILE_SIZE);
     bitmap.allocPixels(info);
-    tileToBitmap(tx, ty, bitmap);
+    tileToBitmap(*srcTile, bitmap);
     return bitmap;
+}
+
+bool AutoTilesData::tileToBitmap(const int tx, const int ty, SkBitmap &bitmap) {
+    const auto srcTile = getTile(tx, ty);
+    return tileToBitmap(*srcTile, bitmap);
 }
 
 SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
@@ -251,9 +251,22 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
         const int x0 = col*TILE_SIZE + lM;
         const int maxX = qMin(x0 + TILE_SIZE, dst.width() - rM0);
         for(int row = minRow; row < maxRow; row++) {
-            const uint16_t * const srcP = getTileByIndex(col, row);
+            const auto srcTile = getTileByIndex(col, row);
+            const uint16_t * const srcP = srcTile->data();
             const int y0 = row*TILE_SIZE + tM;
             const int maxY = qMin(y0 + TILE_SIZE, dst.height() - bM0);
+            if(!srcP) {
+                for(int y = qMax(minY, y0); y < maxY; y++) {
+                    uint8_t * dstLine = dstP + (y*dst.width() + x0)*4 + minX - qMin(minX, x0);
+                    for(int x = qMax(minX, x0); x < maxX; x++) {
+                        *dstLine++ = 0;
+                        *dstLine++ = 0;
+                        *dstLine++ = 0;
+                        *dstLine++ = 0;
+                    }
+                }
+                continue;
+            }
             for(int y = qMax(minY, y0); y < maxY; y++) {
                 uint8_t * dstLine = dstP + (y*dst.width() + x0)*4 + minX - qMin(minX, x0);
                 const uint16_t * srcLine = srcP + (y - y0)*TILE_SIZE*4 + minX - qMin(minX, x0);
@@ -274,8 +287,7 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
     return dst;
 }
 
-bool AutoTilesData::drawOnPixmap(SkPixmap &dst,
-                                 int drawX, int drawY) const {
+bool AutoTilesData::drawOnPixmap(SkPixmap &dst, int drawX, int drawY) const {
     drawX -= mZeroTileCol*TILE_SIZE;
     drawY -= mZeroTileRow*TILE_SIZE;
     const qreal qDrawX = drawX;
@@ -329,10 +341,23 @@ bool AutoTilesData::drawOnPixmap(SkPixmap &dst,
         for(int row = minSrcRow; row <= nRows; row++) {
             const int dstRow = minDstRow + row;
             const int srcRow = minSrcRow + row;
-            const uint16_t * const srcP = getTileByIndex(srcCol, srcRow);
+            const auto srcTile = getTileByIndex(srcCol, srcRow);
+            const uint16_t * const srcP = srcTile->data();
             const int dstY0 = dstRow*TILE_SIZE;
             const int minTileDstY = qMax(dstY0, minDstY);
             const int maxTileDstY = qMin((dstRow + 1)*TILE_SIZE - 1, maxDstY);
+            if(!srcP) {
+                for(int y = minTileDstY; y <= maxTileDstY; y++) {
+                    uint8_t * dstLine = dstP + (y*dst.width() + minTileDstX)*4;
+                    for(int x = minTileDstX; x <= maxTileDstX; x++) {
+                        *dstLine++ = 0;
+                        *dstLine++ = 0;
+                        *dstLine++ = 0;
+                        *dstLine++ = 0;
+                    }
+                }
+                continue;
+            }
             for(int y = minTileDstY; y <= maxTileDstY; y++) {
                 uint8_t * dstLine = dstP + (y*dst.width() + minTileDstX)*4;
                 const uint16_t * srcLine = srcP +
@@ -363,6 +388,60 @@ bool AutoTilesData::drawOnPixmap(SkPixmap &dst,
     return true;
 }
 
+QPoint AutoTilesData::zeroTile() const {
+    return QPoint(mZeroTileCol, mZeroTileRow);
+}
+
+QPoint AutoTilesData::zeroTilePos() const {
+    return zeroTile()*TILE_SIZE;
+}
+
+QRect AutoTilesData::pixelBoundingRect() const {
+    return tileRectToPixRect(tileBoundingRect());
+}
+
+QRect AutoTilesData::tileBoundingRect() const {
+    return QRect(-mZeroTileCol, -mZeroTileRow,
+                 mColumnCount, mRowCount);
+}
+
+QRect AutoTilesData::tileRectToPixRect(const QRect &tileRect) const {
+    return QRect(tileRect.x()*TILE_SIZE,
+                 tileRect.y()*TILE_SIZE,
+                 tileRect.width()*TILE_SIZE,
+                 tileRect.height()*TILE_SIZE);
+}
+
+QRect AutoTilesData::pixRectToTileRect(const QRect &pixRect) const {
+    const int widthRem = pixRect.width() % TILE_SIZE ? 1 : 0;
+    const int heightRem = pixRect.height() % TILE_SIZE ? 1 : 0;
+    return QRect(pixRect.x()/TILE_SIZE,
+                 pixRect.y()/TILE_SIZE,
+                 pixRect.width()/TILE_SIZE + widthRem,
+                 pixRect.height()/TILE_SIZE + heightRem);
+}
+
+void AutoTilesData::setPixelClamp(const QRect &pixRect) {
+    mMinCol = qFloor(qreal(pixRect.left())/TILE_SIZE);
+    mMaxCol = qCeil(qreal(pixRect.right())/TILE_SIZE);
+    mMinRow = qFloor(qreal(pixRect.top())/TILE_SIZE);
+    mMaxRow = qCeil(qreal(pixRect.bottom())/TILE_SIZE);
+}
+
+void AutoTilesData::swap(AutoTilesData &other) {
+    mColumns.swap(other.mColumns);
+
+    std::swap(mMinCol, other.mMinCol);
+    std::swap(mMaxCol, other.mMaxCol);
+    std::swap(mMinRow, other.mMinRow);
+    std::swap(mMaxRow, other.mMaxRow);
+
+    std::swap(mZeroTileCol, other.mZeroTileCol);
+    std::swap(mZeroTileRow, other.mZeroTileRow);
+    std::swap(mColumnCount, other.mColumnCount);
+    std::swap(mRowCount, other.mRowCount);
+}
+
 void AutoTilesData::write(eWriteStream& dst) const {
     dst << mZeroTileCol;
     dst << mZeroTileRow;
@@ -373,8 +452,8 @@ void AutoTilesData::write(eWriteStream& dst) const {
     const int nRows = mColumns.isEmpty() ? 0 : mColumns.first().count();
     dst << nRows;
     for(const auto& col : mColumns) {
-        for(const auto& row : col) {
-            dst.write(row, TILE_SPIXEL_SIZE*sizeof(uint16_t));
+        for(const auto& tile : col) {
+            tile->write(dst);
         }
     }
 }
@@ -390,14 +469,83 @@ void AutoTilesData::read(eReadStream &src) {
     int nRows;
     src >> nRows;
     for(int col = 0; col < nCols; col++) {
-        mColumns << QList<uint16_t*>();
-        QList<uint16_t*>& column = mColumns.last();
+        mColumns << QList<stdsptr<Tile>>();
+        QList<stdsptr<Tile>>& column = mColumns.last();
         for(int row = 0; row < nRows; row++) {
-            const auto tile = allocateTile(TILE_SPIXEL_SIZE);
-            src.read(tile, TILE_SPIXEL_SIZE*sizeof(uint16_t));
-            column << tile;
+            column << Tile::sRead(src);;
         }
     }
+}
+
+void AutoTilesData::discardTransparentTiles() {
+    for(QList<stdsptr<Tile>>& col : mColumns) {
+        for(auto& tile : col) {
+            if(!tile->data()) continue;
+            if(!tile->dataTransparent()) continue;
+            tile->removeData();
+        }
+    }
+}
+
+bool AutoTilesData::columnEmpty(const int colId) {
+    const auto& col = mColumns.at(colId);
+    for(const auto& tile : col) {
+        if(tile->data()) return false;
+    }
+    return true;
+}
+
+bool AutoTilesData::rowEmpty(const int rowId) {
+    for(const auto& col : mColumns) {
+        if(col.at(rowId)->data()) return false;
+    }
+    return true;
+}
+
+bool AutoTilesData::cropFirstColumnIfEmpty() {
+    if(mColumns.isEmpty()) return false;
+    if(!columnEmpty(0)) return false;
+    mColumns.removeFirst();
+    mColumnCount--;
+    mZeroTileCol--;
+    return true;
+}
+
+bool AutoTilesData::cropLastColumnIfEmpty() {
+    if(mColumns.isEmpty()) return false;
+    if(!columnEmpty(mColumnCount - 1)) return false;
+    mColumns.removeLast();
+    mColumnCount--;
+    return true;
+}
+
+bool AutoTilesData::cropFirstRowIfEmpty() {
+    if(mColumns.isEmpty()) return false;
+    if(!rowEmpty(0)) return false;
+    for(auto& col : mColumns) col.removeFirst();
+    mRowCount--;
+    mZeroTileRow--;
+    return true;
+}
+
+bool AutoTilesData::cropLastRowIfEmpty() {
+    if(mColumns.isEmpty()) return false;
+    if(!rowEmpty(mRowCount - 1)) return false;
+    for(auto& col : mColumns) col.removeLast();
+    mRowCount--;
+    return true;
+}
+
+void AutoTilesData::autoCrop() {
+    while(cropFirstColumnIfEmpty()) continue;
+    while(cropLastColumnIfEmpty()) continue;
+    while(cropFirstRowIfEmpty()) continue;
+    while(cropLastRowIfEmpty()) continue;
+}
+
+stdsptr<Tile> AutoTilesData::requestTile(const int tx, const int ty) {
+    stretchToTile(tx, ty);
+    return getTile(tx, ty);
 }
 
 bool AutoTilesData::stretchToTile(const int tx, const int ty) {
@@ -428,18 +576,24 @@ bool AutoTilesData::stretchToTile(const int tx, const int ty) {
     return true;
 }
 
-QList<uint16_t *> AutoTilesData::newColumn() {
-    QList<uint16_t*> col;
+void AutoTilesData::replaceTile(const int tx, const int ty,
+                                const stdsptr<Tile> &tile) {
+    stretchToTile(tx, ty);
+    getTile(tx, ty)->copyFrom(*tile);
+}
+
+QList<stdsptr<Tile>> AutoTilesData::newColumn() {
+    QList<stdsptr<Tile>> col;
     for(int j = 0; j < mRowCount; j++) {
-        col << newZeroedTile(TILE_SPIXEL_SIZE);
+        col.append(mTileCreator(TILE_SPIXEL_SIZE));
     }
     return col;
 }
 
 void AutoTilesData::prependRows(const int count) {
-    for(QList<uint16_t*>& col : mColumns) {
+    for(QList<stdsptr<Tile>>& col : mColumns) {
         for(int i = 0; i < count; i++) {
-            col.prepend(newZeroedTile(TILE_SPIXEL_SIZE));
+            col.prepend(mTileCreator(TILE_SPIXEL_SIZE));
         }
     }
     mRowCount += count;
@@ -447,9 +601,9 @@ void AutoTilesData::prependRows(const int count) {
 }
 
 void AutoTilesData::appendRows(const int count) {
-    for(QList<uint16_t*>& col : mColumns) {
+    for(QList<stdsptr<Tile>>& col : mColumns) {
         for(int i = 0; i < count; i++) {
-            col.append(newZeroedTile(TILE_SPIXEL_SIZE));
+            col.append(mTileCreator(TILE_SPIXEL_SIZE));
         }
     }
     mRowCount += count;

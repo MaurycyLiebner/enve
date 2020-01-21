@@ -58,7 +58,7 @@ public:
         drawOnCanvas(canvas, dst, nullptr, paint);
     }
 
-    const AutoTiledSurface &surface() const
+    UndoableAutoTiledSurface &surface()
     { return mSurface; }
 
     void pixelRectChanged(const QRect& pixRect);
@@ -83,6 +83,8 @@ public:
     { return !mTileBitmaps.isEmpty(); }
 
     void drawingDoneForNow() { afterDataReplaced(); }
+
+    void autoCrop();
 private:
     void updateTileRecBitmaps(QRect tileRect);
 
@@ -111,7 +113,7 @@ private:
     QRect tileRectToPixRect(const QRect& tileRect) const;
     QRect pixRectToTileRect(const QRect& pixRect) const;
 
-    AutoTiledSurface mSurface;
+    UndoableAutoTiledSurface mSurface;
     TileBitmaps mTileBitmaps;
     int &mRowCount;
     int &mColumnCount;
