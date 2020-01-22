@@ -129,7 +129,7 @@ void SmartPathAnimator::anim_addKeyAtRelFrame(const int relFrame) {
     const auto newKey = enve::make_shared<SmartPathKey>(this);
     newKey->setRelFrame(relFrame);
     deepCopySmartPathFromRelFrame(relFrame, newKey->getValue());
-    anim_appendKey(newKey);
+    anim_appendKeyAction(newKey);
 }
 
 stdsptr<Key> SmartPathAnimator::anim_createKey() {

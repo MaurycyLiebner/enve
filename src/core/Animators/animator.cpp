@@ -242,6 +242,36 @@ void Animator::anim_updateAfterShifted() {
     }
 }
 
+void Animator::anim_appendKeyAction(const stdsptr<Key>& newKey) {
+    anim_appendKey(newKey);
+    {
+        prp_pushUndoRedoName("Add Key");
+        UndoRedo ur;
+        ur.fUndo = [this, newKey]() {
+            anim_removeKey(newKey);
+        };
+        ur.fRedo = [this, newKey]() {
+            anim_appendKey(newKey);
+        };
+        prp_addUndoRedo(ur);
+    }
+}
+
+void Animator::anim_removeKeyAction(const stdsptr<Key>& newKey) {
+    anim_removeKey(newKey);
+    {
+        prp_pushUndoRedoName("Remove Key");
+        UndoRedo ur;
+        ur.fUndo = [this, newKey]() {
+            anim_appendKey(newKey);
+        };
+        ur.fRedo = [this, newKey]() {
+            anim_removeKey(newKey);
+        };
+        prp_addUndoRedo(ur);
+    }
+}
+
 void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
     const bool isComplex = SWT_isComplexAnimator();
     if(!isComplex) anim_setRecordingValue(true);
@@ -457,17 +487,6 @@ FrameRange Animator::prp_getIdenticalRelRange(const int relFrame) const {
 
 void Animator::anim_saveCurrentValueAsKey() {
     anim_addKeyAtRelFrame(anim_getCurrentRelFrame());
-    if(const auto key = anim_getKeyOnCurrentFrame()) {
-        UndoRedo ur;
-        const stdsptr<Key> keySPtr = key->ref<Key>();
-        ur.fUndo = [this, keySPtr]() {
-            anim_removeKey(keySPtr);
-        };
-        ur.fRedo = [this, keySPtr]() {
-            anim_appendKey(keySPtr);
-        };
-        prp_addUndoRedo(ur);
-    }
 }
 
 void Animator::anim_drawKey(QPainter * const p,

@@ -174,7 +174,7 @@ public:
         } else {
             newKey = enve::make_shared<ASKey>(*mBaseValue.get(), relFrame, this);
         }
-        anim_appendKey(newKey);
+        anim_appendKeyAction(newKey);
     }
 
     void anim_setAbsFrame(const int frame) {
@@ -207,7 +207,7 @@ public:
         const auto currKey = anim_getKeyAtRelFrame<ASKey>(relFrame);
         if(currKey) anim_removeKey(currKey->ref<ASKey>());
         const auto newKey = enve::make_shared<ASKey>(relFrame, this);
-        anim_appendKey(newKey);
+        anim_appendKeyAction(newKey);
     }
 
     //! If the image is available returns nullptr,

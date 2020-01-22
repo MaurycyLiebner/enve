@@ -156,7 +156,7 @@ void BasedAnimatorT<B, K, T>::anim_addKeyAtRelFrame(const int relFrame) {
     if(this->anim_getKeyAtRelFrame(relFrame)) return;
     const T value = getValueAtRelFrame(relFrame);
     const auto newKey = enve::make_shared<K>(value, relFrame, this);
-    this->anim_appendKey(newKey);
+    this->anim_appendKeyAction(newKey);
 }
 
 template<typename B, typename K, typename T>
