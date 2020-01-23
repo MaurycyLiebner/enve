@@ -84,8 +84,18 @@ public:
 
     void drawingDoneForNow() { afterDataReplaced(); }
 
-    void autoCrop();
+    void updateTileDimensions();
 private:
+    void removeFirstColumn();
+    void removeLastColumn();
+    void removeFirstRow();
+    void removeLastRow();
+
+    void removeFirstColumns(const int count);
+    void removeLastColumns(const int count);
+    void removeFirstRows(const int count);
+    void removeLastRows(const int count);
+
     void updateTileRecBitmaps(QRect tileRect);
 
     void setTileBitmaps(const TileBitmaps& tiles);
@@ -94,6 +104,11 @@ private:
     void stretchBitmapsToTile(const int tx, const int ty);
 
     QList<SkBitmap> newBitmapColumn();
+
+    void prependBitmapRow();
+    void appendBitmapRow();
+    void prependBitmapColumn();
+    void appendBitmapColumn();
 
     void prependBitmapRows(const int count);
     void appendBitmapRows(const int count);

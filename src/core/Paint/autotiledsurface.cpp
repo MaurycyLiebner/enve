@@ -114,7 +114,8 @@ void AutoTiledSurface::sRequestStart(MyPaintTiledSurface *surface,
         // keep references to tiles,
         // flush undo/redo later
         const auto tile = self->requestTile(request->tx, request->ty);
-        request->buffer = tile->requestZeroedData();
+        if(tile) request->buffer = tile->requestZeroedData();
+        else request->buffer = nullptr;
     }
 }
 

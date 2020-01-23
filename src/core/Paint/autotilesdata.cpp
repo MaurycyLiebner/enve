@@ -241,11 +241,13 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
         }
     }
 
-    const int minY = -mZeroTileRow*TILE_SIZE + qMax(0, -tM);
-    const int minX = -mZeroTileCol*TILE_SIZE + qMax(0, -lM);
-    const int minCol = mZeroTileCol + minX/TILE_SIZE;
+    const int minYMargin = qMax(0, -tM);
+    const int minXMargin = qMax(0, -lM);
+    const int minY = minYMargin;
+    const int minX = minXMargin;
+    const int minCol = minXMargin/TILE_SIZE;
     const int maxCol = mColumnCount - qMax(0, -rM/TILE_SIZE);
-    const int minRow = mZeroTileRow + minY/TILE_SIZE;
+    const int minRow = minYMargin/TILE_SIZE;
     const int maxRow = mRowCount - qMax(0, -bM/TILE_SIZE);
     for(int col = minCol; col < maxCol; col++) {
         const int x0 = col*TILE_SIZE + lM;

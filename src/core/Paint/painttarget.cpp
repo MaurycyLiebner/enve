@@ -154,7 +154,8 @@ void PaintTarget::paintRelease() {
                                         undoTile.tileY(),
                                         (undoTile.*getter)());
                 }
-                ptr->autoCrop();
+                surface.autoCrop();
+                ptr->updateTileDimensions();
                 ptr->pixelRectChanged(roi);
                 const int relFrame = anim->anim_getCurrentRelFrame();
                 const auto identicalRange = anim->prp_getIdenticalRelRange(relFrame);

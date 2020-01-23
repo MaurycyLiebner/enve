@@ -88,11 +88,65 @@ void DrawableAutoTiledSurface::clearBitmaps() {
     mTileBitmaps.clear();
 }
 
-void DrawableAutoTiledSurface::autoCrop() {
-    mSurface.autoCrop();
-    // 2020.01.22 TODO remove only unnecessary bitmaps
-    clearBitmaps();
-    updateTileBitmaps();
+void DrawableAutoTiledSurface::removeFirstColumn() {
+    mBitmaps.removeFirst();
+    mColumnCount--;
+    mZeroTileCol--;
+}
+
+void DrawableAutoTiledSurface::removeLastColumn() {
+    mBitmaps.removeLast();
+    mColumnCount--;
+}
+
+void DrawableAutoTiledSurface::removeFirstRow() {
+    for(auto& col : mBitmaps) col.removeFirst();
+    mRowCount--;
+    mZeroTileRow--;
+}
+
+void DrawableAutoTiledSurface::removeLastRow() {
+    for(auto& col : mBitmaps) col.removeLast();
+    mRowCount--;
+}
+
+void DrawableAutoTiledSurface::removeFirstColumns(const int count) {
+    for(int i = 0; i < count; i++) removeFirstColumn();
+}
+
+void DrawableAutoTiledSurface::removeLastColumns(const int count) {
+    for(int i = 0; i < count; i++) removeLastColumn();
+}
+
+void DrawableAutoTiledSurface::removeFirstRows(const int count) {
+    for(int i = 0; i < count; i++) removeFirstRow();
+}
+
+void DrawableAutoTiledSurface::removeLastRows(const int count) {
+    for(int i = 0; i < count; i++) removeLastRow();
+}
+
+void DrawableAutoTiledSurface::updateTileDimensions() {
+    const auto tRect = mSurface.tileBoundingRect();
+    const int colsToPrepend = -mZeroTileCol - tRect.x();
+    const int rowsToPrepend = -mZeroTileRow - tRect.y();
+    const int colsToAppend = tRect.width() - mColumnCount - colsToPrepend;
+    const int rowsToAppend = tRect.height() - mRowCount - rowsToPrepend;
+
+    prependBitmapColumns(colsToPrepend);
+    prependBitmapRows(rowsToPrepend);
+    appendBitmapColumns(colsToAppend);
+    appendBitmapRows(rowsToAppend);
+
+    removeFirstColumns(-colsToPrepend);
+    removeFirstRows(-rowsToPrepend);
+    removeLastColumns(-colsToAppend);
+    removeLastRows(-rowsToAppend);
+
+    Q_ASSERT(mZeroTileCol == -tRect.x());
+    Q_ASSERT(mZeroTileRow == -tRect.y());
+    Q_ASSERT(mColumnCount == tRect.width());
+    Q_ASSERT(mRowCount == tRect.height());
 }
 
 void DrawableAutoTiledSurface::updateTileRecBitmaps(QRect tileRect) {
@@ -149,38 +203,42 @@ QList<SkBitmap> DrawableAutoTiledSurface::newBitmapColumn() {
     return col;
 }
 
+void DrawableAutoTiledSurface::prependBitmapRow() {
+    for(auto& col : mBitmaps) col.prepend(SkBitmap());
+    mRowCount++;
+    mZeroTileRow++;
+}
+
+void DrawableAutoTiledSurface::appendBitmapRow() {
+    for(auto& col : mBitmaps) col.append(SkBitmap());
+    mRowCount++;
+}
+
+void DrawableAutoTiledSurface::prependBitmapColumn() {
+    mBitmaps.prepend(newBitmapColumn());
+    mColumnCount++;
+    mZeroTileCol++;
+}
+
+void DrawableAutoTiledSurface::appendBitmapColumn() {
+    mBitmaps.append(newBitmapColumn());
+    mColumnCount++;
+}
+
 void DrawableAutoTiledSurface::prependBitmapRows(const int count) {
-    for(auto& col : mBitmaps) {
-        for(int i = 0; i < count; i++) {
-            col.prepend(SkBitmap());
-        }
-    }
-    mRowCount += count;
-    mZeroTileRow += count;
+    for(int i = 0; i < count; i++) prependBitmapRow();
 }
 
 void DrawableAutoTiledSurface::appendBitmapRows(const int count) {
-    for(auto& col : mBitmaps) {
-        for(int i = 0; i < count; i++) {
-            col.append(SkBitmap());
-        }
-    }
-    mRowCount += count;
+    for(int i = 0; i < count; i++) appendBitmapRow();
 }
 
 void DrawableAutoTiledSurface::prependBitmapColumns(const int count) {
-    for(int i = 0; i < count; i++) {
-        mBitmaps.prepend(newBitmapColumn());
-    }
-    mColumnCount += count;
-    mZeroTileCol += count;
+    for(int i = 0; i < count; i++) prependBitmapColumn();
 }
 
 void DrawableAutoTiledSurface::appendBitmapColumns(const int count) {
-    for(int i = 0; i < count; i++) {
-        mBitmaps.append(newBitmapColumn());
-    }
-    mColumnCount += count;
+    for(int i = 0; i < count; i++) appendBitmapColumn();
 }
 
 SkBitmap DrawableAutoTiledSurface::bitmapForTile(const int tx, const int ty) const {
