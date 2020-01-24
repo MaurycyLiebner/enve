@@ -287,10 +287,16 @@ void NodeList::promoteDissolvedNodeToNormal(const int nodeId,
     node->setC2(second.c1());
     nextNormalV->setC0(second.c2());
     setNodeType(node, NodeType::normal);
-    if(prevNormalV->getC2Enabled() || nextNormalV->getC0Enabled()) {
-        setNodeCtrlsMode(prevNormalV, CtrlsMode::smooth);
+    const bool segmentNotLinear = prevNormalV->getC2Enabled() ||
+                                  nextNormalV->getC0Enabled();
+    if(segmentNotLinear) {
+        const bool makePrevSmooth = prevNormalV->getC0Enabled() &&
+                                    prevNormal(prevNormalV);
+        if(makePrevSmooth) setNodeCtrlsMode(prevNormalV, CtrlsMode::smooth);
         setNodeCtrlsMode(node, CtrlsMode::smooth);
-        setNodeCtrlsMode(nextNormalV, CtrlsMode::smooth);
+        const bool makeNextSmooth = nextNormalV->getC2Enabled() &&
+                                    nextNormal(nextNormalV);
+        if(makeNextSmooth) setNodeCtrlsMode(nextNormalV, CtrlsMode::smooth);
     } else {
         node->setC0Enabled(false);
         node->setC2Enabled(false);
