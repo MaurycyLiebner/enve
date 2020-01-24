@@ -224,7 +224,7 @@ void QrealAnimatorValueSlider::openContextMenu(
 
     if(aTarget->anim_getKeyOnCurrentFrame()) {
         menu.addAction("Delete Key", aTarget,
-                       &Animator::anim_deleteCurrentKey);
+                       &Animator::anim_deleteCurrentKeyAction);
     } else {
         menu.addAction("Add Key", aTarget,
                        &Animator::anim_saveCurrentValueAsKey);

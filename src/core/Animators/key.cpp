@@ -38,11 +38,6 @@ void Key::readKey(eReadStream& src) {
     src >> mRelFrame;
 }
 
-void Key::removeFromAnimator() {
-    if(!mParentAnimator) return;
-    mParentAnimator->anim_removeKey(ref<Key>());
-}
-
 bool Key::hasPrevKey() const {
     if(!mParentAnimator) return false;
     return mParentAnimator->anim_hasPrevKey(this);

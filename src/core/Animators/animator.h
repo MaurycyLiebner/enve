@@ -161,7 +161,7 @@ public:
     void anim_startSelectedKeysTransform();
 
     void anim_deleteSelectedKeys();
-    void anim_deleteCurrentKey();
+    void anim_deleteCurrentKeyAction();
 
     int anim_getLowestAbsFrameForSelectedKey();
 

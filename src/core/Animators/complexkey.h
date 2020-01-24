@@ -26,7 +26,6 @@ protected:
     ComplexKey(const int absFrame,
                ComplexAnimator * const parent);
 public:
-    void deleteKey();
     bool isDescendantSelected() const;
 
     void startFrameTransform()

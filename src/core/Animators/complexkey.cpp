@@ -27,11 +27,6 @@ void ComplexKey::addChildKey(Key * const key) {
     mKeys << key;
 }
 
-void ComplexKey::deleteKey() {
-    const auto keys = mKeys;
-    for(const auto& key : keys) key->deleteKey();
-}
-
 void ComplexKey::removeChildKey(Key * const key) {
     mKeys.removeOne(key);
 }

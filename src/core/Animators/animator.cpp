@@ -231,8 +231,9 @@ void Animator::anim_coordinateKeysWith(Animator * const other) {
     other->anim_addKeysWhereOtherHasKeys(this);
 }
 
-void Animator::anim_deleteCurrentKey() {
-    if(anim_mKeyOnCurrentFrame) anim_mKeyOnCurrentFrame->deleteKey();
+void Animator::anim_deleteCurrentKeyAction() {
+    if(anim_mKeyOnCurrentFrame && !SWT_isComplexAnimator())
+        anim_removeKeyAction(anim_mKeyOnCurrentFrame->ref<Key>());
 }
 
 void Animator::anim_updateAfterShifted() {
@@ -531,7 +532,7 @@ void Animator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
 
     const PropertyMenu::PlainSelectedOp<Animator> dOp =
     [](Animator * animTarget) {
-        animTarget->anim_deleteCurrentKey();
+        animTarget->anim_deleteCurrentKeyAction();
     };
     menu->addPlainAction("Delete Key(s)", dOp)->setEnabled(anim_getKeyOnCurrentFrame());
 }
@@ -607,7 +608,7 @@ void Animator::anim_startSelectedKeysTransform() {
 
 void Animator::anim_deleteSelectedKeys() {
     for(const auto& key : anim_mSelectedKeys) {
-        key->deleteKey();
+        anim_removeKeyAction(key->ref<Key>());
     }
     anim_mSelectedKeys.clear();
 }

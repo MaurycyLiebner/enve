@@ -46,10 +46,6 @@ public:
     virtual void cancelValueTransform() {}
     virtual void finishValueTransform() {}
 
-    virtual void deleteKey() {
-        removeFromAnimator();
-    }
-
     virtual bool differsFromKey(Key* key) const = 0;
     virtual void writeKey(eWriteStream &dst);
     virtual void readKey(eReadStream &src);
@@ -76,7 +72,6 @@ public:
     T* getParentAnimator() const {
         return static_cast<T*>(mParentAnimator.data());
     }
-    void removeFromAnimator();
 
     void setSelected(const bool bT);
 
