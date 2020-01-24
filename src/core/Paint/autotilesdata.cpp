@@ -183,14 +183,79 @@ bool AutoTilesData::tileToBitmap(const int tx, const int ty, SkBitmap &bitmap) {
     return tileToBitmap(*srcTile, bitmap);
 }
 
+void clearMarginPixels(const QMargins& margin, SkBitmap& dst) {
+    uint8_t * const dstP = static_cast<uint8_t*>(dst.getPixels());
+
+    const int lM = qMax(0, margin.left());
+    const int tM = qMax(0, margin.top());
+    const int rM = qMax(0, margin.right());
+    const int bM = qMax(0, margin.bottom());
+
+    if(lM > 0) {
+        // for every pixel row
+        for(int y = 0; y < dst.height(); y++) {
+            // set left margin pixels to 0
+            const int firstRowPixelId = y*dst.width();
+            auto lLine = dstP + firstRowPixelId*4;
+            for(int x = 0; x < lM; x++) {
+                *lLine++ = 0;
+                *lLine++ = 0;
+                *lLine++ = 0;
+                *lLine++ = 0;
+            }
+        }
+    }
+    if(rM > 0) {
+        // for every pixel row
+        const int firstMarginPixel = dst.width() - rM;
+        for(int y = 0; y < dst.height(); y++) {
+            // set right margin pixels to 0
+            const int firstRowPixelId = y*dst.width() + firstMarginPixel;
+            auto rLine = dstP + firstRowPixelId*4;
+            for(int x = 0; x < rM; x++) {
+                *rLine++ = 0;
+                *rLine++ = 0;
+                *rLine++ = 0;
+                *rLine++ = 0;
+            }
+        }
+    }
+
+    // set top margin pixels to 0
+    for(int y = 0; y < tM; y++) {
+        // for every pixel in column
+        const int firstRowPixelId = y*dst.width() + lM;
+        auto tLine = dstP + firstRowPixelId*4;
+        const int maxX = dst.width() - rM;
+        for(int x = lM; x < maxX; x++) {
+            *tLine++ = 0;
+            *tLine++ = 0;
+            *tLine++ = 0;
+            *tLine++ = 0;
+        }
+    }
+
+    // set bottom margin pixels to 0
+    for(int y = dst.height() - bM; y < dst.height(); y++) {
+        const int firstRowPixelId = y*dst.width() + lM;
+        auto bLine = dstP + firstRowPixelId*4;
+        // for every pixel in column
+        const int maxX = dst.width() - rM;
+        for(int x = lM; x < maxX; x++) {
+            *bLine++ = 0;
+            *bLine++ = 0;
+            *bLine++ = 0;
+            *bLine++ = 0;
+        }
+    }
+}
+
 SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
     const int lM = margin.left();
     const int tM = margin.top();
     const int rM = margin.right();
     const int bM = margin.bottom();
 
-    const int lM0 = qMax(0, lM);
-    const int tM0 = qMax(0, tM);
     const int rM0 = qMax(0, rM);
     const int bM0 = qMax(0, bM);
 
@@ -199,47 +264,11 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
     SkBitmap dst;
     dst.allocPixels(info);
 
+    clearMarginPixels(margin, dst);
+
     uint8_t * const dstP = static_cast<uint8_t*>(dst.getPixels());
 
-    if(tM0 > 0 || rM0 > 0) {
-        for(int y = 0; y < dst.height(); y++) {
-            auto lLine = dstP + y*dst.width()*4;
-            for(int x = 0; x < tM0; x++) {
-                *lLine++ = 0;
-                *lLine++ = 0;
-                *lLine++ = 0;
-                *lLine++ = 0;
-            }
 
-            auto rLine = dstP + ((y + 1)*dst.width() - rM0)*4;
-            for(int x = 0; x < rM0; x++) {
-                *rLine++ = 0;
-                *rLine++ = 0;
-                *rLine++ = 0;
-                *rLine++ = 0;
-            }
-        }
-    }
-
-    for(int y = 0; y < tM0; y++) {
-        auto tLine = dstP + (y*dst.width() + lM0)*4;
-        for(int x = lM0; x < dst.width() - rM0; x++) {
-            *tLine++ = 0;
-            *tLine++ = 0;
-            *tLine++ = 0;
-            *tLine++ = 0;
-        }
-    }
-
-    for(int y = dst.height() - bM0; y < dst.height(); y++) {
-        auto bLine = dstP + (y*dst.width() + lM0)*4;
-        for(int x = lM0; x < dst.width() - rM0; x++) {
-            *bLine++ = 0;
-            *bLine++ = 0;
-            *bLine++ = 0;
-            *bLine++ = 0;
-        }
-    }
 
     const int minYMargin = qMax(0, -tM);
     const int minXMargin = qMax(0, -lM);
