@@ -183,71 +183,34 @@ bool AutoTilesData::tileToBitmap(const int tx, const int ty, SkBitmap &bitmap) {
     return tileToBitmap(*srcTile, bitmap);
 }
 
-void clearMarginPixels(const QMargins& margin, SkBitmap& dst) {
+void clearRect(const QRect& rect, SkBitmap& dst) {
     uint8_t * const dstP = static_cast<uint8_t*>(dst.getPixels());
 
+    for(int y = rect.top(); y < rect.bottom(); y++) {
+        const int firstRowPixelId = y*dst.width() + rect.left();
+        uint8_t * dstLine = dstP + firstRowPixelId*4;
+        for(int x = rect.left(); x < rect.right(); x++) {
+            *dstLine++ = 0;
+            *dstLine++ = 0;
+            *dstLine++ = 0;
+            *dstLine++ = 0;
+        }
+    }
+}
+
+void clearMarginPixels(const QMargins& margin, SkBitmap& dst) {
     const int lM = qMax(0, margin.left());
     const int tM = qMax(0, margin.top());
     const int rM = qMax(0, margin.right());
     const int bM = qMax(0, margin.bottom());
 
-    if(lM > 0) {
-        // for every pixel row
-        for(int y = 0; y < dst.height(); y++) {
-            // set left margin pixels to 0
-            const int firstRowPixelId = y*dst.width();
-            auto lLine = dstP + firstRowPixelId*4;
-            for(int x = 0; x < lM; x++) {
-                *lLine++ = 0;
-                *lLine++ = 0;
-                *lLine++ = 0;
-                *lLine++ = 0;
-            }
-        }
-    }
-    if(rM > 0) {
-        // for every pixel row
-        const int firstMarginPixel = dst.width() - rM;
-        for(int y = 0; y < dst.height(); y++) {
-            // set right margin pixels to 0
-            const int firstRowPixelId = y*dst.width() + firstMarginPixel;
-            auto rLine = dstP + firstRowPixelId*4;
-            for(int x = 0; x < rM; x++) {
-                *rLine++ = 0;
-                *rLine++ = 0;
-                *rLine++ = 0;
-                *rLine++ = 0;
-            }
-        }
-    }
+    const int width = dst.width();
+    const int height = dst.height();
 
-    // set top margin pixels to 0
-    for(int y = 0; y < tM; y++) {
-        // for every pixel in column
-        const int firstRowPixelId = y*dst.width() + lM;
-        auto tLine = dstP + firstRowPixelId*4;
-        const int maxX = dst.width() - rM;
-        for(int x = lM; x < maxX; x++) {
-            *tLine++ = 0;
-            *tLine++ = 0;
-            *tLine++ = 0;
-            *tLine++ = 0;
-        }
-    }
-
-    // set bottom margin pixels to 0
-    for(int y = dst.height() - bM; y < dst.height(); y++) {
-        const int firstRowPixelId = y*dst.width() + lM;
-        auto bLine = dstP + firstRowPixelId*4;
-        // for every pixel in column
-        const int maxX = dst.width() - rM;
-        for(int x = lM; x < maxX; x++) {
-            *bLine++ = 0;
-            *bLine++ = 0;
-            *bLine++ = 0;
-            *bLine++ = 0;
-        }
-    }
+    clearRect(QRect(0, 0, lM, height), dst);
+    clearRect(QRect(width - rM, 0, rM, height), dst);
+    clearRect(QRect(lM, 0, width - lM - rM, tM), dst);
+    clearRect(QRect(lM, height - bM, width - lM - rM, bM), dst);
 }
 
 SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
@@ -286,16 +249,10 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
             const uint16_t * const srcP = srcTile->data();
             const int y0 = row*TILE_SIZE + tM;
             const int maxY = qMin(y0 + TILE_SIZE, dst.height() - bM0);
+            // if no tile data
             if(!srcP) {
-                for(int y = qMax(minY, y0); y < maxY; y++) {
-                    uint8_t * dstLine = dstP + (y*dst.width() + x0)*4 + minX - qMin(minX, x0);
-                    for(int x = qMax(minX, x0); x < maxX; x++) {
-                        *dstLine++ = 0;
-                        *dstLine++ = 0;
-                        *dstLine++ = 0;
-                        *dstLine++ = 0;
-                    }
-                }
+                clearRect(QRect(QPoint(qMax(minX, x0), qMax(minY, y0)),
+                                QPoint(maxX, maxY)), dst);
                 continue;
             }
             for(int y = qMax(minY, y0); y < maxY; y++) {
