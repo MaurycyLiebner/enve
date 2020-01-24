@@ -219,11 +219,9 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
     const int rM = margin.right();
     const int bM = margin.bottom();
 
-    const int rM0 = qMax(0, rM);
-    const int bM0 = qMax(0, bM);
-
-    const auto info = SkiaHelpers::getPremulRGBAInfo(width() + lM + rM,
-                                                     height() + tM + bM);
+    const int dstWidth  = width()  + lM + rM;
+    const int dstHeight = height() + tM + bM;
+    const auto info = SkiaHelpers::getPremulRGBAInfo(dstWidth, dstHeight);
     SkBitmap dst;
     dst.allocPixels(info);
 
@@ -231,47 +229,69 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
 
     uint8_t * const dstP = static_cast<uint8_t*>(dst.getPixels());
 
+    const QPoint dstTL(qMax(0, lM),
+                       qMax(0, tM));
+    const QPoint dstBR(dst.width()  - 1 - qMax(0, rM),
+                       dst.height() - 1 - qMax(0, bM));
 
+    const QRect dstRect(dstTL, dstBR);
+    const QPoint srcTL(qMax(0, -lM),
+                       qMax(0, -tM));
+    const QPoint srcBR(width()  - 1 - qMax(0, -rM),
+                       height() - 1 - qMax(0, -bM));
+    const QRect srcRect(srcTL, srcBR);
+    if(!srcRect.isValid()) return dst;
+    const QPoint srcTileTL(srcRect.left()/ TILE_SIZE,
+                           srcRect.top() / TILE_SIZE);
+    const QPoint srcTileBR(srcRect.right() / TILE_SIZE,
+                           srcRect.bottom()/ TILE_SIZE);
+    const QRect srcTileRect(srcTileTL, srcTileBR);
 
-    const int minYMargin = qMax(0, -tM);
-    const int minXMargin = qMax(0, -lM);
-    const int minY = minYMargin;
-    const int minX = minXMargin;
-    const int minCol = minXMargin/TILE_SIZE;
-    const int maxCol = mColumnCount - qMax(0, -rM/TILE_SIZE);
-    const int minRow = minYMargin/TILE_SIZE;
-    const int maxRow = mRowCount - qMax(0, -bM/TILE_SIZE);
-    for(int col = minCol; col < maxCol; col++) {
-        const int x0 = col*TILE_SIZE + lM;
-        const int maxX = qMin(x0 + TILE_SIZE, dst.width() - rM0);
-        for(int row = minRow; row < maxRow; row++) {
-            const auto srcTile = getTileByIndex(col, row);
+    const int minSrcCol = srcTileRect.left();
+    const int maxSrcCol = srcTileRect.right();
+    const int minSrcRow = srcTileRect.top();
+    const int maxSrcRow = srcTileRect.bottom();
+    for(int srcCol = minSrcCol; srcCol <= maxSrcCol; srcCol++) {
+        for(int srcRow = minSrcRow; srcRow <= maxSrcRow; srcRow++) {
+            const QRect tSrcRect(srcCol*TILE_SIZE,
+                                 srcRow*TILE_SIZE,
+                                 TILE_SIZE, TILE_SIZE);
+            const QRect tClippedSrcRect = tSrcRect.intersected(srcRect);
+            const QRect tileDstRect = tClippedSrcRect.translated(lM, tM);
+            const auto srcTile = getTileByIndex(srcCol, srcRow);
             const uint16_t * const srcP = srcTile->data();
-            const int y0 = row*TILE_SIZE + tM;
-            const int maxY = qMin(y0 + TILE_SIZE, dst.height() - bM0);
             // if no tile data
             if(!srcP) {
-                clearRect(QRect(QPoint(qMax(minX, x0), qMax(minY, y0)),
-                                QPoint(maxX, maxY)), dst);
-                continue;
-            }
-            for(int y = qMax(minY, y0); y < maxY; y++) {
-                uint8_t * dstLine = dstP + (y*dst.width() + x0)*4 + minX - qMin(minX, x0);
-                const uint16_t * srcLine = srcP + (y - y0)*TILE_SIZE*4 + minX - qMin(minX, x0);
-                for(int x = qMax(minX, x0); x < maxX; x++) {
-                    const uint32_t r = *srcLine++;
-                    const uint32_t g = *srcLine++;
-                    const uint32_t b = *srcLine++;
-                    const uint32_t a = *srcLine++;
-
-                    *dstLine++ = (r * 255 + (1<<15)/2) / (1<<15);
-                    *dstLine++ = (g * 255 + (1<<15)/2) / (1<<15);
-                    *dstLine++ = (b * 255 + (1<<15)/2) / (1<<15);
-                    *dstLine++ = (a * 255 + (1<<15)/2) / (1<<15);
+                clearRect(tileDstRect, dst);
+            } else {
+                const QRect relTileRect = tClippedSrcRect.translated(
+                                                    -srcCol*TILE_SIZE,
+                                                    -srcRow*TILE_SIZE);
+                const int minSrcX = relTileRect.left();
+                const int maxSrcX = relTileRect.right();
+                const int minSrcY = relTileRect.top();
+                const int maxSrcY = relTileRect.bottom();
+                const int minDstX = tileDstRect.x();
+                const int minDstY = tileDstRect.y();
+                const int iMax = (maxSrcX - minSrcX + 1)*4; // for every subpixel (4)
+                const int jMax = maxSrcY - minSrcY + 1;
+                for(int j = 0; j < jMax; j++) {
+                    const int srcY = minSrcY + j;
+                    const int srcPixelId = srcY*TILE_SIZE + minSrcX;
+                    const uint16_t * srcLine = srcP + srcPixelId*4;
+                    const int dstY = minDstY + j;
+                    const int dstPixelId = dstY*dstWidth + minDstX;
+                    uint8_t * dstLine = dstP + dstPixelId*4;
+                    for(int i = 0; i < iMax; i++) {
+                        const uint32_t val = *srcLine++;
+                        *dstLine++ = (val * 255 + (1<<15)/2) / (1<<15);
+                    }
                 }
             }
+
         }
     }
+
     return dst;
 }
 
