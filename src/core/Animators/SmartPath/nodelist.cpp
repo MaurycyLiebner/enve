@@ -435,9 +435,9 @@ void NodeList::setPath(const SkPath &path) {
     int quadId = 0;
     SkPoint *ptsT = nullptr;
 
-    SkPath::Verb verbT = iter.next(pts);
+    SkPath::Verb verb = iter.next(pts);
     for(;;) {
-        switch(verbT) {
+        switch(verb) {
             case SkPath::kMove_Verb: {
                 if(firstNode) return;
                 const QPointF qPt = toQPointF(pts[0]);
@@ -461,18 +461,24 @@ void NodeList::setPath(const SkPath &path) {
             }
                 break;
             case SkPath::kConic_Verb: {
-                ptsT = const_cast<SkPoint*>(conicToQuads.computeQuads(
-                            pts, iter.conicWeight(), 2));
-                quadsCount = conicToQuads.countQuads();
-                quadId = 0;
+                const QPointF p0 = toQPointF(pts[0]);
+                const QPointF p1 = toQPointF(pts[1]);
+                const QPointF p2 = toQPointF(pts[2]);
+                const qreal weight = SkScalarToDouble(iter.conicWeight());
+
+                const auto seg = qCubicSegment2D::sFromConic(p0, p1, p2, weight);
+                pts[1] = toSkPoint(seg.c1());
+                pts[2] = toSkPoint(seg.c2());
+                pts[3] = toSkPoint(seg.p3());
+                verb = SkPath::kCubic_Verb;
+                continue;
             }
-                break;
             case SkPath::kQuad_Verb: {
                 const SkPoint ctrlPtT = pts[1];
                 pts[1] = pts[0] + (ctrlPtT - pts[0])*0.66667f;
                 pts[3] = pts[2];
                 pts[2] = pts[3] + (ctrlPtT - pts[3])*0.66667f;
-                verbT = SkPath::kCubic_Verb;
+                verb = SkPath::kCubic_Verb;
                 continue;
             }
             case SkPath::kCubic_Verb: {
@@ -504,11 +510,11 @@ void NodeList::setPath(const SkPath &path) {
             pts[0] = ptsT[firstPtId];
             pts[1] = ptsT[firstPtId + 1];
             pts[2] = ptsT[firstPtId + 2];
-            verbT = SkPath::kQuad_Verb;
+            verb = SkPath::kQuad_Verb;
             quadId++;
             quadsCount--;
         } else {
-            verbT = iter.next(pts);
+            verb = iter.next(pts);
             verbId++;
         }
     }

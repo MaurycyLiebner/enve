@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "skqtconversions.h"
+#include "Segments/qcubicsegment2d.h"
 
 QRect toQRect(const SkIRect &rect) {
     return QRect(rect.left(), rect.top(),
@@ -119,8 +120,8 @@ QPainterPath toQPainterPath(const SkPath& path) {
 
     SkPoint pts[4];
     for(;;) {
-        auto nextVerb = iter.next(pts);
-        switch(nextVerb) {
+        auto verb = iter.next(pts);
+        switch(verb) {
             case SkPath::kMove_Verb: {
                 const SkPoint pt = pts[0];
                 qPath.moveTo(toQPointF(pt));
@@ -132,6 +133,19 @@ QPainterPath toQPainterPath(const SkPath& path) {
                 qPath.lineTo(toQPointF(pt));
             }
                 break;
+            case SkPath::kConic_Verb: {
+                const QPointF p0 = toQPointF(pts[0]);
+                const QPointF p1 = toQPointF(pts[1]);
+                const QPointF p2 = toQPointF(pts[2]);
+                const qreal weight = SkScalarToDouble(iter.conicWeight());
+
+                const auto seg = qCubicSegment2D::sFromConic(p0, p1, p2, weight);
+                pts[1] = toSkPoint(seg.c1());
+                pts[2] = toSkPoint(seg.c2());
+                pts[3] = toSkPoint(seg.p3());
+                verb = SkPath::kCubic_Verb;
+                continue;
+            }
             case SkPath::kCubic_Verb: {
                 const SkPoint endPt = pts[1];
                 const SkPoint startPt = pts[2];
@@ -151,16 +165,6 @@ QPainterPath toQPainterPath(const SkPath& path) {
                              toQPointF(targetPt));
             }
                 break;
-            case SkPath::kConic_Verb: {
-                const QPointF p0 = qPath.currentPosition();
-                const QPointF p1 = toQPointF(pts[1]);
-                const QPointF p2 = toQPointF(pts[2]);
-                const qreal weight = SkScalarToDouble(iter.conicWeight());
-
-                const qreal u = 4*weight/(3*(1 + weight));
-                qPath.cubicTo(p0*(1 - u) + p1*u, p2*(1 - u) + p1*u, p2);
-            }
-            break;
             case SkPath::kDone_Verb:
                 return qPath;
         }
