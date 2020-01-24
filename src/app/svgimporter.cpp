@@ -959,6 +959,8 @@ QMatrix getMatrixFromString(const QString &str) {
 
 #include "GUI/GradientWidgets/gradientwidget.h"
 static QMap<QString, SvgGradient> gGradients;
+//            to       from
+static QMap<QString, QStringList> gUnresolvedGradientLinks;
 void loadElement(const QDomElement &element, ContainerBox *parentGroup,
                  const BoxSvgAttributes &parentGroupAttributes,
                  Canvas* const scene) {
@@ -1004,12 +1006,24 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
         } else {
             if(linkId.at(0) == "#") linkId.remove(0, 1);
             const auto it = gGradients.find(linkId);
-            if(it != gGradients.end()) {
-                gradient = it.value().fGradient;
+            if(it == gGradients.end()) {
+                gUnresolvedGradientLinks[linkId].append(id);
+                gradient = nullptr;
             } else {
-                gradient = scene->createNewGradient();
+                gradient = it.value().fGradient;
             }
         }
+        const auto it = gUnresolvedGradientLinks.find(id);
+        if(it != gUnresolvedGradientLinks.end()) {
+            if(gradient) {
+                for(const auto& linking : it.value()) {
+                    gGradients[linking].fGradient = gradient;
+                }
+            } else {
+                gUnresolvedGradientLinks[linkId] = it.value();
+            }
+        }
+
         const QString x1 = element.attribute("x1");
         const QString y1 = element.attribute("y1");
         const QString x2 = element.attribute("x2");
@@ -1100,6 +1114,13 @@ qsptr<BoundingBox> loadSVGFile(const QString &filename,
                 const auto result = loadBoxesGroup(rootElement, nullptr,
                                                    attributes, scene);
                 gGradients.clear();
+                auto it = gUnresolvedGradientLinks.begin();
+                while(it != gUnresolvedGradientLinks.end()) {
+                    qDebug() << "unresolved gradient links to " + it.key() + ":";
+                    qDebug() << it.value().join(", ");
+                    it++;
+                }
+                gUnresolvedGradientLinks.clear();
                 if(result->getContainedBoxesCount() == 1) {
                     return qSharedPointerCast<BoundingBox>(
                                 result->takeContained_k(0));
