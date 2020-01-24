@@ -28,7 +28,6 @@ class VideoBox : public AnimationBox {
 protected:
     VideoBox();
 public:
-    void animationDataChanged();
     void soundDataChanged();
 
     bool SWT_isVideoBox() const { return true; }
@@ -44,6 +43,9 @@ public:
     void setFilePath(const QString& path);
     QString getFilePath();
 private:
+    void fileHandlerConnector(ConnContext& conn, VideoFileHandler* obj);
+    void fileHandlerAfterAssigned(VideoFileHandler* obj);
+
     qsptr<SingleSound> mSound;
     FileHandlerObjRef<VideoFileHandler> mFileHandler;
 };

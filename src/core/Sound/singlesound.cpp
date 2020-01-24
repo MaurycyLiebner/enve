@@ -23,8 +23,22 @@
 #include "esoundlink.h"
 #include "../canvas.h"
 
+SoundFileHandler* soundFileHandlerGetter(const QString& path) {
+    return FilesHandler::sInstance->getFileHandler<SoundFileHandler>(path);
+}
+
 SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
-    mIndependent(!durRect) {
+    mIndependent(!durRect),
+    mFileHandler(this,
+                 [](const QString& path) {
+                     return soundFileHandlerGetter(path);
+                 },
+                 [this](SoundFileHandler* obj) {
+                     fileHandlerAfterAssigned(obj);
+                 },
+                 [this](ConnContext& conn, SoundFileHandler* obj) {
+                     fileHandlerConnector(conn, obj);
+                 }) {
     connect(this, &eBoxOrSound::prp_ancestorChanged, this, [this]() {
         if(!getParentScene()) return;
         updateDurationRectLength();
@@ -39,6 +53,25 @@ SingleSound::SingleSound(const qsptr<FixedLenAnimationRect>& durRect) :
     mDurationRectangle->setSoundCacheHandler(getCacheHandler());
 
     ca_addChild(mVolumeAnimator);
+}
+
+void SingleSound::fileHandlerConnector(ConnContext &conn, SoundFileHandler *obj) {
+    conn << connect(obj, &SoundFileHandler::pathChanged,
+                    this, &SingleSound::prp_afterWholeInfluenceRangeChanged);
+    conn << connect(obj, &SoundFileHandler::reloaded,
+                    this, &SingleSound::prp_afterWholeInfluenceRangeChanged);
+}
+
+void SingleSound::fileHandlerAfterAssigned(SoundFileHandler *obj) {
+    if(obj) {
+        const auto newDataHandler = FileDataCacheHandler::
+                sGetDataHandler<SoundDataHandler>(obj->path());
+        setSoundDataHandler(newDataHandler);
+        prp_setName(QFileInfo(obj->path()).fileName());
+    } else {
+        setSoundDataHandler(nullptr);
+        prp_setName("Sound");
+    }
 }
 
 #include <QInputDialog>
@@ -120,25 +153,13 @@ void SingleSound::updateDurationRectLength() {
 }
 
 void SingleSound::setFilePath(const QString &path) {
-    if(mSoundFileHandler) {
-        disconnect(mSoundFileHandler, &FileCacheHandler::deleteApproved,
-                   this, &eBoxOrSound::removeFromParent_k);
-    }
-    mSoundFileHandler = FilesHandler::sInstance->getFileHandler<SoundFileHandler>(path);
-    if(mSoundFileHandler) {
-        connect(mSoundFileHandler, &FileCacheHandler::deleteApproved,
-                this, &eBoxOrSound::removeFromParent_k);
-    }
+    mFileHandler.assign(path);
     if(videoSound()) RuntimeThrow("Setting file path for video sound");
-    const auto newDataHandler = FileDataCacheHandler::
-            sGetDataHandler<SoundDataHandler>(path);
-    setSoundDataHandler(newDataHandler);
-    prp_setName(QFileInfo(path).fileName());
 }
 
 void SingleSound::setSoundDataHandler(SoundDataHandler* const newDataHandler) {
-    mCacheHandler.reset();
     if(newDataHandler) mCacheHandler = enve::make_shared<SoundHandler>(newDataHandler);
+    else mCacheHandler.reset();
     mDurationRectangle->setSoundCacheHandler(getCacheHandler());
     updateDurationRectLength();
 }

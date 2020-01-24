@@ -71,7 +71,6 @@ public:
                               &mSecondsCache));
     }
 private:
-    QList<SoundHandler*> mSoundHandlers;
     QList<int> mSecondsBeingRead;
     QList<stdsptr<SoundReaderForMerger>> mSecondReaders;
     HddCachableCacheHandler mSecondsCache;

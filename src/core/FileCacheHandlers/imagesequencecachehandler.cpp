@@ -73,8 +73,6 @@ void ImageSequenceFileHandler::replace() {
     if(!dir.isEmpty()) setPath(dir);
 }
 
-ImageSequenceCacheHandler::ImageSequenceCacheHandler() {}
-
-void ImageSequenceCacheHandler::setFolderPath(const QString &folderPath) {
-    mFileHandler = FilesHandler::sInstance->getFileHandler<ImageSequenceFileHandler>(folderPath);
-}
+ImageSequenceCacheHandler::ImageSequenceCacheHandler(
+        ImageSequenceFileHandler *fileHandler) :
+    mFileHandler(fileHandler) {}

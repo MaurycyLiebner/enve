@@ -20,7 +20,21 @@
 #include "FileCacheHandlers/imagecachehandler.h"
 #include "fileshandler.h"
 
-ImageBox::ImageBox() : BoundingBox(eBoxType::image) {
+ImageFileHandler* imageFileHandlerGetter(const QString& path) {
+    return FilesHandler::sInstance->getFileHandler<ImageFileHandler>(path);
+}
+
+ImageBox::ImageBox() : BoundingBox(eBoxType::image),
+    mFileHandler(this,
+                 [](const QString& path) {
+                     return imageFileHandlerGetter(path);
+                 },
+                 [this](ImageFileHandler* obj) {
+                     return fileHandlerAfterAssigned(obj);
+                 },
+                 [this](ConnContext& conn, ImageFileHandler* obj) {
+                     fileHandlerConnector(conn, obj);
+                 }) {
     prp_setName("Image");
 }
 
@@ -28,9 +42,20 @@ ImageBox::ImageBox(const QString &filePath) : ImageBox() {
     setFilePath(filePath);
 }
 
+void ImageBox::fileHandlerConnector(ConnContext &conn, ImageFileHandler *obj) {
+    conn << connect(obj, &ImageFileHandler::pathChanged,
+                    this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
+    conn << connect(obj, &ImageFileHandler::reloaded,
+                    this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
+}
+
+void ImageBox::fileHandlerAfterAssigned(ImageFileHandler *obj) {
+    Q_UNUSED(obj);
+}
+
 void ImageBox::writeBoundingBox(eWriteStream& dst) {
     BoundingBox::writeBoundingBox(dst);
-    dst << mImageFilePath;
+    dst << mFileHandler.path();
 }
 
 void ImageBox::readBoundingBox(eReadStream& src) {
@@ -40,31 +65,14 @@ void ImageBox::readBoundingBox(eReadStream& src) {
 }
 
 void ImageBox::setFilePath(const QString &path) {
-    mImageFilePath = path;
-    if(mImgCacheHandler) {
-        disconnect(mImgCacheHandler, &ImageFileHandler::pathChanged,
-                   this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
-        disconnect(mImgCacheHandler, &ImageFileHandler::reloaded,
-                   this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
-        disconnect(mImgCacheHandler, &ImageFileHandler::deleteApproved,
-                   this, &BoundingBox::removeFromParent_k);
-    }
-    mImgCacheHandler = FilesHandler::sInstance->getFileHandler<ImageFileHandler>(path);
+    mFileHandler.assign(path);
 
     prp_setName(path.split("/").last());
-    if(mImgCacheHandler) {
-        connect(mImgCacheHandler, &ImageFileHandler::pathChanged,
-                this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
-        connect(mImgCacheHandler, &ImageFileHandler::reloaded,
-                this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
-        connect(mImgCacheHandler, &ImageFileHandler::deleteApproved,
-                this, &BoundingBox::removeFromParent_k);
-    }
     prp_afterWholeInfluenceRangeChanged();
 }
 
 void ImageBox::reload() {
-    if(mImgCacheHandler) mImgCacheHandler->reloadAction();
+    if(mFileHandler) mFileHandler->reloadAction();
 }
 
 #include "typemenu.h"
@@ -89,7 +97,7 @@ void ImageBox::setupCanvasMenu(PropertyMenu * const menu) {
 #include "filesourcescache.h"
 void ImageBox::changeSourceFile() {
     const QString filters = FileExtensions::imageFilters();
-    QString importPath = eDialogs::openFile("Change Source", mImageFilePath,
+    QString importPath = eDialogs::openFile("Change Source", mFileHandler.path(),
                                             "Image Files (" + filters + ")");
     if(!importPath.isEmpty()) setFilePath(importPath);
 }
@@ -99,18 +107,18 @@ void ImageBox::setupRenderData(const qreal relFrame,
                                Canvas* const scene) {
     BoundingBox::setupRenderData(relFrame, data, scene);
     const auto imgData = static_cast<ImageBoxRenderData*>(data);
-    if(mImgCacheHandler->hasImage()) {
-        imgData->fImage = mImgCacheHandler->getImageCopy();
+    if(mFileHandler->hasImage()) {
+        imgData->fImage = mFileHandler->getImageCopy();
     } else {
-        const auto loader = mImgCacheHandler->scheduleLoad();
+        const auto loader = mFileHandler->scheduleLoad();
         loader->addDependent(imgData);
     }
 }
 
 stdsptr<BoxRenderData> ImageBox::createRenderData() {
-    return enve::make_shared<ImageBoxRenderData>(mImgCacheHandler, this);
+    return enve::make_shared<ImageBoxRenderData>(mFileHandler, this);
 }
 
 void ImageBoxRenderData::loadImageFromHandler() {
-    fImage = fSrcCacheHandler->getImageCopy();
+    if(fSrcCacheHandler) fImage = fSrcCacheHandler->getImageCopy();
 }

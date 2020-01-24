@@ -19,39 +19,54 @@
 #include "filesourcescache.h"
 #include "GUI/edialogs.h"
 #include "fileshandler.h"
+#include "Boxes/containerbox.h"
+
+ImageSequenceFileHandler* imageSequenceFileHandlerGetter(const QString& path) {
+    const auto fileHandler = FilesHandler::sInstance;
+    return fileHandler->getFileHandler<ImageSequenceFileHandler>(path);
+}
 
 ImageSequenceBox::ImageSequenceBox() :
-    AnimationBox(eBoxType::imageSequence) {
+    AnimationBox(eBoxType::imageSequence),
+    mFileHandler(this,
+                 [](const QString& path) {
+                     return imageSequenceFileHandlerGetter(path);
+                 },
+                 [this](ImageSequenceFileHandler* obj) {
+                     return fileHandlerAfterAssigned(obj);
+                 },
+                 [this](ConnContext& conn, ImageSequenceFileHandler* obj) {
+                     fileHandlerConnector(conn, obj);
+                 }) {
     prp_setName("Image Sequence");
 }
 
-void ImageSequenceBox::setFolderPath(const QString &folderPath) {
-    const auto iscHandler = enve::make_shared<ImageSequenceCacheHandler>();
-    iscHandler->setFolderPath(folderPath);
-    mSrcFramesCache = iscHandler;
-    mDirPath = folderPath;
+void ImageSequenceBox::fileHandlerConnector(ConnContext &conn,
+                                            ImageSequenceFileHandler *obj) {
+    Q_UNUSED(conn)
+    Q_UNUSED(obj)
+}
 
-    if(mFileHandler) {
-        disconnect(mFileHandler, &FileCacheHandler::deleteApproved,
-                   this, &BoundingBox::removeFromParent_k);
-    }
-    mFileHandler = FilesHandler::sInstance->getFileHandler
-            <ImageSequenceFileHandler>(folderPath);
-    if(mFileHandler) {
-        connect(mFileHandler, &FileCacheHandler::deleteApproved,
-                this, &BoundingBox::removeFromParent_k);
-    }
+void ImageSequenceBox::fileHandlerAfterAssigned(ImageSequenceFileHandler *obj) {
+    if(obj) {
+        mSrcFramesCache = enve::make_shared<ImageSequenceCacheHandler>(obj);
+    } else mSrcFramesCache.reset();
     animationDataChanged();
 }
 
+void ImageSequenceBox::setFolderPath(const QString &folderPath) {
+    mFileHandler.assign(folderPath);
+}
+
 void ImageSequenceBox::changeSourceFile() {
-    const auto dir = eDialogs::openDir("Import Image Sequence", mDirPath);
+    const auto dir = eDialogs::openDir("Import Image Sequence",
+                                       mFileHandler.path());
     if(!dir.isEmpty()) setFolderPath(dir);
 }
 
 void ImageSequenceBox::writeBoundingBox(eWriteStream& dst) {
     AnimationBox::writeBoundingBox(dst);
-    dst << mDirPath;
+    dst << mFileHandler.path();
 }
 
 void ImageSequenceBox::readBoundingBox(eReadStream& src) {

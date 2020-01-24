@@ -28,7 +28,21 @@ extern "C" {
 #include "filesourcescache.h"
 #include "fileshandler.h"
 
-VideoBox::VideoBox() : AnimationBox(eBoxType::video) {
+VideoFileHandler* videoFileHandlerGetter(const QString& path) {
+    return FilesHandler::sInstance->getFileHandler<VideoFileHandler>(path);
+}
+
+VideoBox::VideoBox() : AnimationBox(eBoxType::video),
+    mFileHandler(this,
+                 [](const QString& path) {
+                     return videoFileHandlerGetter(path);
+                 },
+                 [this](VideoFileHandler* obj) {
+                     return fileHandlerAfterAssigned(obj);
+                 },
+                 [this](ConnContext& conn, VideoFileHandler* obj) {
+                     fileHandlerConnector(conn, obj);
+                 }) {
     prp_setName("Video");
     const auto flar = mDurationRectangle->ref<FixedLenAnimationRect>();
     mSound = enve::make_shared<SingleSound>(flar);
@@ -38,6 +52,38 @@ VideoBox::VideoBox() : AnimationBox(eBoxType::video) {
 
     connect(this, &eBoxOrSound::parentChanged,
             mSound.get(), &eBoxOrSound::setParentGroup);
+}
+
+void VideoBox::fileHandlerConnector(ConnContext &conn, VideoFileHandler *obj) {
+    const auto newDataHandler = obj ? obj->getFrameHandler() : nullptr;
+    if(newDataHandler) {
+        mSrcFramesCache = enve::make_shared<VideoFrameHandler>(newDataHandler);
+        getAnimationDurationRect()->setRasterCacheHandler(
+                    &newDataHandler->getCacheHandler());
+        conn << connect(obj, &VideoFileHandler::pathChanged,
+                        this, &VideoBox::animationDataChanged);
+        conn << connect(obj, &VideoFileHandler::pathChanged,
+                        this, &VideoBox::soundDataChanged);
+        conn << connect(obj, &VideoFileHandler::reloaded,
+                        this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
+        conn << connect(newDataHandler, &VideoDataHandler::frameCountUpdated,
+                        this, &VideoBox::updateDurationRectangleAnimationRange);
+    }
+}
+
+void VideoBox::fileHandlerAfterAssigned(VideoFileHandler *obj) {
+    const auto newDataHandler = obj ? obj->getFrameHandler() : nullptr;
+    if(newDataHandler) {
+        mSrcFramesCache = enve::make_shared<VideoFrameHandler>(newDataHandler);
+        getAnimationDurationRect()->setRasterCacheHandler(
+                    &newDataHandler->getCacheHandler());
+    } else {
+        mSrcFramesCache.reset();
+        getAnimationDurationRect()->setRasterCacheHandler(nullptr);
+    }
+
+    soundDataChanged();
+    animationDataChanged();
 }
 
 void VideoBox::writeBoundingBox(eWriteStream& dst) {
@@ -65,54 +111,17 @@ void VideoBox::setStretch(const qreal stretch) {
 }
 
 void VideoBox::setFilePath(const QString &path) {
-    if(mSrcFramesCache) {
-        const auto videoSrc = static_cast<VideoFrameHandler*>(mSrcFramesCache.get());
-        const auto oldDataHandler = videoSrc->getDataHandler();
-        disconnect(mFileHandler, &VideoFileHandler::pathChanged,
-                   this, &VideoBox::animationDataChanged);
-        disconnect(mFileHandler, &VideoFileHandler::reloaded,
-                   this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
-        disconnect(oldDataHandler, &VideoDataHandler::frameCountUpdated,
-                   this, &VideoBox::updateDurationRectangleAnimationRange);
-        disconnect(mFileHandler, &VideoFileHandler::deleteApproved,
-                   this, &BoundingBox::removeFromParent_k);
-    }
-    mSrcFramesCache.reset();
-
-    mFileHandler = FilesHandler::sInstance->getFileHandler<VideoFileHandler>(path);
-    const auto newDataHandler = mFileHandler->getFrameHandler();
-    if(newDataHandler) {
-        mSrcFramesCache = enve::make_shared<VideoFrameHandler>(newDataHandler);
-        getAnimationDurationRect()->setRasterCacheHandler(
-                    &newDataHandler->getCacheHandler());
-        connect(mFileHandler, &VideoFileHandler::pathChanged,
-                this, &VideoBox::animationDataChanged);
-        connect(mFileHandler, &VideoFileHandler::reloaded,
-                this, &ImageBox::prp_afterWholeInfluenceRangeChanged);
-        connect(mFileHandler, &VideoFileHandler::deleteApproved,
-                this, &BoundingBox::removeFromParent_k);
-        connect(newDataHandler, &VideoDataHandler::frameCountUpdated,
-                this, &VideoBox::updateDurationRectangleAnimationRange);
-    } else {
-        getAnimationDurationRect()->setRasterCacheHandler(nullptr);
-    }
-
-    animationDataChanged();
+    mFileHandler.assign(path);
 }
 
 QString VideoBox::getFilePath() {
-    if(mFileHandler) return mFileHandler->path();
-    return "";
-}
-
-void VideoBox::animationDataChanged() {
-    soundDataChanged();
-    AnimationBox::animationDataChanged();
+    return mFileHandler.path();
 }
 
 void VideoBox::soundDataChanged() {
     const auto pScene = getParentScene();
-    const auto soundHandler = mFileHandler->getSoundHandler();
+    const auto soundHandler = mFileHandler ?
+                mFileHandler->getSoundHandler() : nullptr;
     if(soundHandler) {
         if(!mSound->SWT_isVisible()) {
             if(pScene) {

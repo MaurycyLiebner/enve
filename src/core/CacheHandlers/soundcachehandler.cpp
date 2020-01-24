@@ -46,11 +46,7 @@ SoundReaderForMerger *SoundHandler::addSecondReader(const int secondId) {
     return reader.get();
 }
 
-void SoundDataHandler::afterSourceChanged() {
-    for(const auto& handler : mSoundHandlers) {
-        handler->afterSourceChanged();
-    }
-}
+void SoundDataHandler::afterSourceChanged() {}
 
 #include "GUI/edialogs.h"
 void SoundFileHandler::replace() {

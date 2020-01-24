@@ -1,4 +1,4 @@
-// enve - 2D animations software
+﻿// enve - 2D animations software
 // Copyright (C) 2016-2020 Maurycy Liebner
 
 // This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,10 @@ public:
     void writeBoundingBox(eWriteStream& dst);
     void readBoundingBox(eReadStream& src);
 private:
-    QString mDirPath;
+    void fileHandlerConnector(ConnContext& conn,
+                              ImageSequenceFileHandler* obj);
+    void fileHandlerAfterAssigned(ImageSequenceFileHandler *obj);
+
     FileHandlerObjRef<ImageSequenceFileHandler> mFileHandler;
 };
 

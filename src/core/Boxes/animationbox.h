@@ -41,7 +41,7 @@ protected:
     AnimationBox(const eBoxType type);
 public:
     virtual void changeSourceFile() = 0;
-    virtual void animationDataChanged();
+    void animationDataChanged();
     virtual void setStretch(const qreal stretch) {
         mStretch = stretch;
         prp_afterWholeInfluenceRangeChanged();

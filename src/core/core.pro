@@ -135,6 +135,7 @@ SOURCES += \
     FileCacheHandlers/audiostreamsdata.cpp \
     FileCacheHandlers/filecachehandler.cpp \
     FileCacheHandlers/filedatacachehandler.cpp \
+    FileCacheHandlers/filehandlerobjref.cpp \
     FileCacheHandlers/imagecachehandler.cpp \
     FileCacheHandlers/imagesequencecachehandler.cpp \
     FileCacheHandlers/soundreader.cpp \
@@ -391,6 +392,7 @@ HEADERS += \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/filecachehandler.h \
     FileCacheHandlers/filedatacachehandler.h \
+    FileCacheHandlers/filehandlerobjref.h \
     FileCacheHandlers/imagecachehandler.h \
     FileCacheHandlers/imagesequencecachehandler.h \
     FileCacheHandlers/soundreader.h \

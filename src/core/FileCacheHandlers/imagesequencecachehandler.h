@@ -37,10 +37,8 @@ private:
 class ImageSequenceCacheHandler : public AnimationFrameHandler {
     e_OBJECT
 protected:
-    ImageSequenceCacheHandler();
+    ImageSequenceCacheHandler(ImageSequenceFileHandler* fileHandler);
 public:
-    void setFolderPath(const QString& folderPath);
-
     sk_sp<SkImage> getFrameAtFrame(const int relFrame) {
         if(!mFileHandler) return nullptr;
         return mFileHandler->getFrameAtFrame(relFrame);
@@ -61,7 +59,7 @@ public:
         return mFileHandler->getFrameCount();
     }
 private:
-    qptr<ImageSequenceFileHandler> mFileHandler;
+    const qptr<ImageSequenceFileHandler> mFileHandler;
 
 };
 #endif // IMAGESEQUENCECACHEHANDLER_H

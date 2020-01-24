@@ -46,11 +46,3 @@ void FileCacheHandler::setPath(const QString &path) {
     afterPathSet(path);
     emit pathChanged(path);
 }
-
-void FileHandlerObjRefBase::increment(FileCacheHandler * const hadler) const {
-    hadler->mReferenceCount++;
-}
-
-void FileHandlerObjRefBase::decrement(FileCacheHandler * const hadler) const {
-    hadler->mReferenceCount--;
-}

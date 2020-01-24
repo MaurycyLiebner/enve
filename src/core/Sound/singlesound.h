@@ -23,6 +23,7 @@ class FixedLenAnimationRect;
 class SoundHandler;
 class SoundDataHandler;
 class HddCachableCacheHandler;
+#include "FileCacheHandlers/filehandlerobjref.h"
 
 class SingleSound : public eSound {
     e_OBJECT
@@ -71,11 +72,13 @@ public:
     void setSoundDataHandler(SoundDataHandler * const newDataHandler);
 private:
     void updateDurationRectLength();
+    void fileHandlerConnector(ConnContext &conn, SoundFileHandler *obj);
+    void fileHandlerAfterAssigned(SoundFileHandler *obj);
 
     const bool mIndependent;
 
     qreal mStretch = 1;
-    FileHandlerObjRef<SoundFileHandler> mSoundFileHandler;
+    FileHandlerObjRef<SoundFileHandler> mFileHandler;
     stdsptr<SoundHandler> mCacheHandler;
 
     qsptr<QrealAnimator> mVolumeAnimator =

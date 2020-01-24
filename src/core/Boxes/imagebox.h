@@ -20,6 +20,7 @@
 #include "skia/skiaincludes.h"
 #include "FileCacheHandlers/imagecachehandler.h"
 #include "imagerenderdata.h"
+#include "FileCacheHandlers/filehandlerobjref.h"
 
 struct ImageBoxRenderData : public ImageRenderData {
     ImageBoxRenderData(ImageFileHandler * const cacheHandler,
@@ -54,8 +55,10 @@ public:
 
     void reload();
 private:
-    FileHandlerObjRef<ImageFileHandler> mImgCacheHandler;
-    QString mImageFilePath;
+    void fileHandlerConnector(ConnContext& conn, ImageFileHandler* obj);
+    void fileHandlerAfterAssigned(ImageFileHandler* obj);
+
+    FileHandlerObjRef<ImageFileHandler> mFileHandler;
 };
 
 #endif // IMAGEBOX_H
