@@ -451,10 +451,13 @@ void NodeList::setPath(const SkPath &path) {
                 prevNode->setC2Enabled(false);
                 prevNode->mC2 = prevNode->mP1;
 
+                bool appendNode;
                 if(iter.peek() == SkPath::kClose_Verb) {
                     firstNode->setC0Enabled(false);
                     firstNode->mC0 = firstNode->mP1;
-                } else prevNode = appendAndGetNode(Node(qPt));
+                    appendNode = !isZero4Dec(pointToLen(firstNode->p1() - qPt));
+                } else appendNode = true;
+                if(appendNode) prevNode = appendAndGetNode(Node(qPt));
             }
                 break;
             case SkPath::kConic_Verb: {
