@@ -44,13 +44,15 @@ stdsptr<BoxRenderData> PaintBox::createRenderData() {
 
 #include "GUI/edialogs.h"
 #include "typemenu.h"
+#include "filesourcescache.h"
 void PaintBox::setupCanvasMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<PaintBox>()) return;
     menu->addedActionsForType<PaintBox>();
     PropertyMenu::PlainSelectedOp<PaintBox> op = [](PaintBox * box) {
+        const QString filters = FileExtensions::imageFilters();
         const QString importPath = eDialogs::openFile(
                                         "Load From Image", QDir::homePath(),
-                                        "Image Files (*.png *.jpg)");
+                                        "Image Files (" + filters + ")");
         if(!importPath.isEmpty()) {
             QImage img;
             if(img.load(importPath)) {

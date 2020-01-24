@@ -48,9 +48,11 @@ void ImageLoader::afterCanceled() {
 }
 
 #include "GUI/edialogs.h"
+#include "filesourcescache.h"
 void ImageFileHandler::replace() {
+    const QString filters = FileExtensions::imageFilters();;
     const auto importPath = eDialogs::openFile(
                 "Change Source", mPath,
-                "Image Files (*.png *.jpg)");
+                "Image Files (" + filters + ")");
     if(!importPath.isEmpty()) setPath(importPath);
 }

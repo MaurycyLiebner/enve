@@ -16,7 +16,7 @@
 
 #ifndef FILESOURCESCACHE_H
 #define FILESOURCESCACHE_H
-#include <QString>
+#include <QStringList>
 
 bool hasVideoExt(const QString &filename);
 bool hasSoundExt(const QString &filename);
@@ -29,5 +29,17 @@ bool isSoundExt(const QString &extension);
 bool isVectorExt(const QString &extension);
 bool isImageExt(const QString &extension);
 bool isEvExt(const QString &extension);
+
+namespace FileExtensions {
+    extern QStringList image;
+    extern QStringList sound;
+    extern QStringList video;
+
+    QString filters(const QStringList& exts);
+
+    QString imageFilters();
+    QString soundFilters();
+    QString videoFilters();
+};
 
 #endif // FILESOURCESCACHE_H

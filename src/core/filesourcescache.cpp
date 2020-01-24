@@ -17,32 +17,31 @@
 #include "filesourcescache.h"
 #include <QStringList>
 
-const QStringList videoExts{"avi", "mp4", "mov",
-                            "mkv", "m4v", "webm",
-                            "flv", "vob", "wmv",
-                            "3gp", "rmvb", "gif",
-                            "mpeg", "mpg", "mp2",
-                            "mpv"};
+QStringList FileExtensions::image{"png", "jpg", "tiff",
+                                  "tif", "jpeg", "bmp"};
+QStringList FileExtensions::sound{"mp3", "wav", "aiff",
+                                  "flac", "m4a", "oga"};
+QStringList FileExtensions::video{"avi", "mp4", "mov",
+                                  "mkv", "m4v", "webm",
+                                  "flv", "vob", "wmv",
+                                  "3gp", "rmvb", "gif",
+                                  "mpeg", "mpg", "mp2",
+                                  "mpv"};
+
 bool isVideoExt(const QString &extension) {
-    return videoExts.contains(extension.toLower());
+    return FileExtensions::video.contains(extension.toLower());
 }
 
-const QStringList audioExts{"mp3", "wav", "aiff",
-                            "flac", "m4a", "oga",
-                            "gsm"};
 bool isSoundExt(const QString &extension) {
-    return audioExts.contains(extension.toLower());
+    return FileExtensions::sound.contains(extension.toLower());
 }
 
 bool isVectorExt(const QString &extension) {
     return extension.toLower() == "svg";
 }
 
-const QStringList imageExts{"png", "jpg", "tiff",
-                            "tif", "jpeg", "bmp",
-                            "gsm"};
 bool isImageExt(const QString &extension) {
-    return imageExts.contains(extension.toLower());
+    return FileExtensions::image.contains(extension.toLower());
 }
 
 bool isEvExt(const QString &extension) {
@@ -68,3 +67,17 @@ bool hasImageExt(const QString &filename) {
 bool hasAvExt(const QString &filename) {
     return isEvExt(filename.split(".").last());
 }
+
+QString FileExtensions::filters(const QStringList &exts) {
+    QString result;
+    for(const auto& ext : exts) {
+        result += "*." + ext + " ";
+    }
+    return result;
+}
+
+QString FileExtensions::imageFilters() { return filters(image); }
+
+QString FileExtensions::soundFilters() { return filters(sound); }
+
+QString FileExtensions::videoFilters() { return filters(video); }

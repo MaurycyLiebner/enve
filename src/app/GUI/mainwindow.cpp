@@ -1245,12 +1245,12 @@ void MainWindow::importFile() {
     disableEventFilter();
     const QString defPath = mDocument.fEvFile.isEmpty() ?
                 QDir::homePath() : mDocument.fEvFile;
-    QStringList importPaths = eDialogs::openFiles(
-                                            "Import File", defPath,
-                                            "Files (*.ev *.svg "
-                                                   "*.mp4 *.mov *.avi *.mkv *.m4v "
-                                                   "*.png *.jpg "
-                                                   "*.wav *.mp3)");
+    const auto importPaths = eDialogs::openFiles(
+                "Import File", defPath,
+                "Files (*.ev *.svg " +
+                        FileExtensions::videoFilters() +
+                        FileExtensions::imageFilters() +
+                        FileExtensions::soundFilters() + ")");
     enableEventFilter();
     if(!importPaths.isEmpty()) {
         for(const QString &path : importPaths) {

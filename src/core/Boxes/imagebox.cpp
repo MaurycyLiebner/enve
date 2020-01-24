@@ -86,10 +86,11 @@ void ImageBox::setupCanvasMenu(PropertyMenu * const menu) {
 
     BoundingBox::setupCanvasMenu(menu);
 }
-
+#include "filesourcescache.h"
 void ImageBox::changeSourceFile() {
+    const QString filters = FileExtensions::imageFilters();
     QString importPath = eDialogs::openFile("Change Source", mImageFilePath,
-                                            "Image Files (*.png *.jpg)");
+                                            "Image Files (" + filters + ")");
     if(!importPath.isEmpty()) setFilePath(importPath);
 }
 
