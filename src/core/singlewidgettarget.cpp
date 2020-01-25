@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "singlewidgettarget.h"
-#include "singlewidgetabstraction.h"
+#include "swt_abstraction.h"
 
 SWT_Abstraction* SingleWidgetTarget::SWT_createAbstraction(
         const UpdateFuncs& updateFuncs,

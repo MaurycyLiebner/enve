@@ -251,7 +251,6 @@ SOURCES += \
     smartPointers/stdpointer.cpp \
     smartPointers/stdselfref.cpp \
     singlewidgettarget.cpp \
-    singlewidgetabstraction.cpp \
     Properties/property.cpp \
     Properties/comboboxproperty.cpp \
     Animators/complexanimator.cpp \
@@ -260,6 +259,7 @@ SOURCES += \
     Animators/key.cpp \
     Animators/boolanimator.cpp \
     switchablecontext.cpp \
+    swt_abstraction.cpp \
     texteffect.cpp \
     texteffectcaller.cpp \
     transformvalues.cpp \
@@ -521,7 +521,6 @@ HEADERS += \
     smartPointers/selfref.h \
     smartPointers/stdselfref.h \
     singlewidgettarget.h \
-    singlewidgetabstraction.h \
     Properties/property.h \
     Properties/comboboxproperty.h \
     Animators/key.h \
@@ -530,6 +529,7 @@ HEADERS += \
     Animators/intanimator.h \
     Animators/boolanimator.h \
     switchablecontext.h \
+    swt_abstraction.h \
     texteffect.h \
     texteffectcaller.h \
     transformvalues.h \

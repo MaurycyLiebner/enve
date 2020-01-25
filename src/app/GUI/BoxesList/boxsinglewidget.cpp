@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "boxsinglewidget.h"
-#include "singlewidgetabstraction.h"
+#include "swt_abstraction.h"
 #include "singlewidgettarget.h"
 #include "OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "GUI/ColorWidgets/colorsettingswidget.h"

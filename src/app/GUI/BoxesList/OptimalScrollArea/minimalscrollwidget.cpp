@@ -17,7 +17,7 @@
 #include "minimalscrollwidget.h"
 #include "minimalscrollwidgetvisiblepart.h"
 #include "singlewidget.h"
-#include "singlewidgetabstraction.h"
+#include "swt_abstraction.h"
 #include "singlewidgettarget.h"
 #include "scrollarea.h"
 #include "GUI/global.h"

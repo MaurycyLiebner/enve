@@ -17,7 +17,7 @@
 #include "Boxes/boundingbox.h"
 #include "Boxes/containerbox.h"
 #include "canvas.h"
-#include "singlewidgetabstraction.h"
+#include "swt_abstraction.h"
 #include "Timeline/durationrectangle.h"
 #include "pointhelpers.h"
 #include "skia/skqtconversions.h"

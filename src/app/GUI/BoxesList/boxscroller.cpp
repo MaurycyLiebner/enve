@@ -25,7 +25,7 @@
 #include "Boxes/containerbox.h"
 #include "GUI/mainwindow.h"
 #include "GUI/global.h"
-#include "singlewidgetabstraction.h"
+#include "swt_abstraction.h"
 #include "GUI/keysview.h"
 #include "RasterEffects/rastereffectcollection.h"
 

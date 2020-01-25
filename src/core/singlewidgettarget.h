@@ -18,7 +18,7 @@
 #define SINGLEWIDGETTARGET_H
 #include <QList>
 #include <map>
-#include "singlewidgetabstraction.h"
+#include "swt_abstraction.h"
 
 class QMenu;
 class QAction;

@@ -19,7 +19,7 @@
 #include "mainwindow.h"
 #include "timelinedockwidget.h"
 #include "GUI/BoxesList/boxsinglewidget.h"
-#include "singlewidgetabstraction.h"
+#include "swt_abstraction.h"
 #include "GUI/BoxesList/boxscrollwidget.h"
 #include "keysview.h"
 #include "GUI/BoxesList/boxscrollarea.h"

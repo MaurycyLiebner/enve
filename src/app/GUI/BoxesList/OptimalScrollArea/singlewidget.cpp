@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "singlewidget.h"
-#include "singlewidgetabstraction.h"
+#include "swt_abstraction.h"
 #include "scrollwidgetvisiblepart.h"
 #include "GUI/global.h"
 

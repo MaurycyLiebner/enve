@@ -19,7 +19,7 @@
 #include <QComboBox>
 #include "mainwindow.h"
 #include "GUI/BoxesList/boxscroller.h"
-#include "singlewidgetabstraction.h"
+#include "swt_abstraction.h"
 #include "renderoutputwidget.h"
 #include "Sound/soundcomposition.h"
 #include "GUI/global.h"

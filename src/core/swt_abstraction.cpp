@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "singlewidgetabstraction.h"
+#include "swt_abstraction.h"
 #include "singlewidgettarget.h"
 
 SWT_Abstraction::SWT_Abstraction(
@@ -132,9 +132,9 @@ void SWT_Abstraction::scheduleSearchContentUpdate() {
     mUpdateFuncs.fContentUpdateIfSearchNotEmpty();
 }
 
-void SWT_Abstraction::setContentVisible(const bool bT) {
+void SWT_Abstraction::setContentVisible(const bool visible) {
     //if(bT == mContentVisible) return;
-    mContentVisible = bT;
+    mContentVisible = visible;
     afterContentVisibilityChanged();
 }
 
@@ -169,6 +169,20 @@ void SWT_Abstraction::readAll(eReadStream &src) {
 void SWT_Abstraction::writeAll(eWriteStream &dst) const {
     for(const auto& child : mChildren) child->writeAll(dst);
     write(dst);
+}
+
+void SWT_Abstraction::setParent(SWT_Abstraction * const parent) {
+    mParent = parent;
+}
+
+void SWT_Abstraction::setIdInParent(const int id) {
+    mIdInParent = id;
+}
+
+void SWT_Abstraction::updateChildrenIds(const int minId, const int maxId) const {
+    for(int i = minId; i <= maxId; i++) {
+        mChildren.at(i)->setIdInParent(i);
+    }
 }
 
 void SWT_Abstraction::addChild(SingleWidgetTarget * const target) {

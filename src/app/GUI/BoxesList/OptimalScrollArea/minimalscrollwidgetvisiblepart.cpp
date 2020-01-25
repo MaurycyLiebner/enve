@@ -16,7 +16,7 @@
 
 #include "minimalscrollwidgetvisiblepart.h"
 #include <QPainter>
-#include "singlewidgetabstraction.h"
+#include "swt_abstraction.h"
 #include "singlewidget.h"
 #include "scrollwidget.h"
 #include "singlewidgettarget.h"

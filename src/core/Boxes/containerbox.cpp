@@ -891,7 +891,7 @@ void ContainerBox::moveContainedAbove(eBoxOrSound * const boxToMove,
     moveContainedInList(boxToMove, indexFrom, indexTo);
 }
 
-#include "singlewidgetabstraction.h"
+#include "swt_abstraction.h"
 void ContainerBox::SWT_setupAbstraction(SWT_Abstraction* abstraction,
                                         const UpdateFuncs &updateFuncs,
                                         const int visiblePartWidgetId) {

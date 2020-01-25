@@ -57,7 +57,7 @@ int ComplexAnimator::ca_getNumberOfChildren() const {
 }
 
 #include <QDebug>
-#include "singlewidgetabstraction.h"
+#include "swt_abstraction.h"
 void ComplexAnimator::SWT_setupAbstraction(
         SWT_Abstraction* abstraction,
         const UpdateFuncs &updateFuncs,

@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SINGLEWIDGETABSTRACTION_H
-#define SINGLEWIDGETABSTRACTION_H
+#ifndef SWT_ABSTRACTION_H
+#define SWT_ABSTRACTION_H
 
 #include "smartPointers/ememory.h"
 #include "ReadWrite/basicreadwrite.h"
@@ -58,7 +58,7 @@ public:
                      const int swtHeight);
     int getHeight() const { return mHeight; }
 
-    void setContentVisible(const bool bT);
+    void setContentVisible(const bool visible);
 
     SingleWidgetTarget *getTarget() const;
 
@@ -74,9 +74,8 @@ public:
 
     bool contentVisible();
 
-    int getParentVisiblePartWidgetId() {
-        return mVisiblePartWidgetId;
-    }
+    int getParentVisiblePartWidgetId()
+    { return mVisiblePartWidgetId; }
 
     void scheduleContentUpdate(const SWT_BoxRule rule);
     void scheduleSearchContentUpdate();
@@ -92,17 +91,11 @@ public:
     void moveChildTo(SingleWidgetTarget * const target, const int id);
     void afterContentVisibilityChanged();
 
-    SWT_Abstraction* getParent() const {
-        return mParent;
-    }
+    SWT_Abstraction* getParent() const { return mParent; }
 
-    int getIdInParent() const {
-        return mIdInParent;
-    }
+    int getIdInParent() const { return mIdInParent; }
 
-    int childrenCount() const {
-        return mChildren.count();
-    }
+    int childrenCount() const { return mChildren.count(); }
 
     void removeAlongWithAllChildren_k();
 
@@ -112,18 +105,10 @@ public:
     void readAll(eReadStream& src);
     void writeAll(eWriteStream& dst) const;
 protected:
-    void setParent(SWT_Abstraction * const parent) {
-        mParent = parent;
-    }
-    void setIdInParent(const int id) {
-        mIdInParent = id;
-    }
+    void setParent(SWT_Abstraction * const parent);
+    void setIdInParent(const int id);
 private:
-    void updateChildrenIds(const int minId, const int maxId) const {
-        for(int i = minId; i <= maxId; i++) {
-            mChildren.at(i)->setIdInParent(i);
-        }
-    }
+    void updateChildrenIds(const int minId, const int maxId) const;
 
     bool mIsMainTarget = false;
     bool mContentVisible = false;
@@ -137,4 +122,4 @@ private:
     stdptr<SWT_Abstraction> mParent;
 };
 
-#endif // SINGLEWIDGETABSTRACTION_H
+#endif // SWT_ABSTRACTION_H
