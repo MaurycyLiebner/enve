@@ -19,7 +19,7 @@
 #include "FileCacheHandlers/filecachehandler.h"
 #include "filesourcescache.h"
 #include <QWidget>
-#include "GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h"
+#include "GUI/BoxesList/OptimalScrollArea/scrollvisiblepartbase.h"
 #include "GUI/BoxesList/OptimalScrollArea/scrollarea.h"
 #include "GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h"
 #include "fileshandler.h"
@@ -60,12 +60,13 @@ public:
     void switchFileNameOnly();
 protected:
     void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent *);
+private:
     bool mFileNameOnly = true;
     qptr<FileCacheHandlerAbstraction> mTargetCache;
     FileSourceListVisibleWidget *mParentVisibleWidget = nullptr;
-    void mouseMoveEvent(QMouseEvent *event);
     QPoint mDragStartPos;
 };
 
@@ -74,17 +75,15 @@ public:
     FileSourceListScrollWidget(ScrollArea *parent);
 
     void updateHeight();
-
-    void createVisiblePartWidget();
 };
 
-class FileSourceListVisibleWidget : public MinimalScrollWidgetVisiblePart {
+class FileSourceListVisibleWidget : public ScrollVisiblePartBase {
 public:
     FileSourceListVisibleWidget(MinimalScrollWidget *parent = nullptr);
 
     void updateVisibleWidgetsContent();
-
     QWidget *createNewSingleWidget();
+
     void addCacheHandlerToList(FileCacheHandler * const handler);
     void removeCacheHandlerFromList(FileCacheHandler * const handler);
 

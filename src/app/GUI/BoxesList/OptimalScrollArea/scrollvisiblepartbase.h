@@ -14,15 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef MINIMALSCROLLWIDGETVISIBLEPART_H
-#define MINIMALSCROLLWIDGETVISIBLEPART_H
+#ifndef SCROLLVISIBLEPARTBASE_H
+#define SCROLLVISIBLEPARTBASE_H
 class MinimalScrollWidget;
 class SingleWidget;
 #include <QWidget>
 
-class MinimalScrollWidgetVisiblePart : public QWidget {
+class ScrollVisiblePartBase : public QWidget {
 public:
-    MinimalScrollWidgetVisiblePart(MinimalScrollWidget * const parent);
+    ScrollVisiblePartBase(MinimalScrollWidget * const parent);
+
+    virtual QWidget *createNewSingleWidget() = 0;
+    virtual void updateVisibleWidgetsContent() = 0;
+
+    void updateParentHeightAndContent();
 
     void setVisibleTop(const int top);
     void setVisibleHeight(const int height);
@@ -32,32 +37,36 @@ public:
 
     void planScheduleUpdateParentHeight();
     void updateParentHeightIfNeeded();
-
     void updateVisibleWidgets();
-    virtual void updateVisibleWidgetsContent();
-
     void updateParentHeight();
-
-    virtual QWidget *createNewSingleWidget() = 0;
     void updateWidgetsWidth();
 
     void callUpdaters();
 
     void scheduleContentUpdate();
+
+    MinimalScrollWidget* parentWidget() const
+    { return mParentWidget; }
+
+    int visibleTop() const { return mVisibleTop; }
+    int visibleHeight() const { return mVisibleHeight; }
+
+    const QList<QWidget*>& widgets() const
+    { return mSingleWidgets; }
 protected:
-    void postEvent();
     bool event(QEvent* event);
+private:
+    void postUpdateEvent();
 
-    MinimalScrollWidget *mParentWidget;
-
-    QList<QWidget*> mSingleWidgets;
+    bool mEventSent = false;
+    bool mContentUpdateScheduled = false;
+    bool mParentHeightUpdateScheduled = false;
 
     int mVisibleTop = 0;
     int mVisibleHeight = 0;
-private:
-    bool mEventSent = false;
-    bool mVisibleWidgetsContentUpdateScheduled = false;
-    bool mParentHeightUpdateScheduled = false;
+
+    MinimalScrollWidget *mParentWidget;
+    QList<QWidget*> mSingleWidgets;
 };
 
-#endif // MINIMALSCROLLWIDGETVISIBLEPART_H
+#endif // SCROLLVISIBLEPARTBASE_H

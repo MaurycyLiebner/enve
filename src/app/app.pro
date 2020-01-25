@@ -65,6 +65,7 @@ TARGET = enve
 TEMPLATE = app
 
 SOURCES += main.cpp\
+    GUI/BoxesList/OptimalScrollArea/scrollvisiblepartbase.cpp \
     GUI/BoxesList/boxscroller.cpp \
     GUI/BrushWidgets/bookmarkedbrushes.cpp \
     GUI/ColorWidgets/bookmarkedcolors.cpp \
@@ -134,7 +135,6 @@ SOURCES += main.cpp\
     GUI/GradientWidgets/currentgradientwidget.cpp \
     GUI/RenderWidgets/closablecontainer.cpp \
     GUI/BoxesList/boxtargetwidget.cpp \
-    GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
     GUI/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
@@ -170,6 +170,7 @@ SOURCES += main.cpp\
     GUI/BrushWidgets/brushwidget.cpp
 
 HEADERS  += \
+    GUI/BoxesList/OptimalScrollArea/scrollvisiblepartbase.h \
     GUI/BoxesList/boxscroller.h \
     GUI/BrushWidgets/bookmarkedbrushes.h \
     GUI/ColorWidgets/bookmarkedcolors.h \
@@ -238,7 +239,6 @@ HEADERS  += \
     GUI/GradientWidgets/currentgradientwidget.h \
     GUI/RenderWidgets/closablecontainer.h \
     GUI/BoxesList/boxtargetwidget.h \
-    GUI/BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
     GUI/BoxesList/OptimalScrollArea/minimalscrollwidget.h \
     GUI/paintboxsettingsdialog.h \
     execdelegator.h \

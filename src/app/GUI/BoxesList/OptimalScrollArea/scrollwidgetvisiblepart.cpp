@@ -26,41 +26,64 @@
 int ScrollWidgetVisiblePart::sNextId = 0;
 
 ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(ScrollWidget * const parent) :
-    MinimalScrollWidgetVisiblePart(parent), mId(sNextId++) {
-    mCurrentRulesCollection.fRule = SWT_BoxRule::all;
+    ScrollVisiblePartBase(parent), mId(sNextId++) {
+    mRulesCollection.fRule = SWT_BoxRule::all;
     setupUpdateFuncs();
 }
 
 void ScrollWidgetVisiblePart::setCurrentRule(const SWT_BoxRule rule) {
-    mCurrentRulesCollection.fRule = rule;
-    updateParentHeight();
-    updateVisibleWidgetsContent();
+    mRulesCollection.fRule = rule;
+    updateParentHeightAndContent();
 }
 
 void ScrollWidgetVisiblePart::setCurrentTarget(SingleWidgetTarget* targetP,
                                                const SWT_Target target) {
-    mCurrentRulesCollection.fTarget = target;
-    static_cast<ScrollWidget*>(mParentWidget)->setMainTarget(targetP);
-    updateParentHeight();
-    updateVisibleWidgetsContent();
+    mRulesCollection.fTarget = target;
+    const auto parent = static_cast<ScrollWidget*>(parentWidget());
+    parent->setMainTarget(targetP);
+    updateParentHeightAndContent();
 }
 
 void ScrollWidgetVisiblePart::setCurrentType(const SWT_Type type) {
-    mCurrentRulesCollection.fType = type;
-    updateParentHeight();
-    updateVisibleWidgetsContent();
+    mRulesCollection.fType = type;
+    updateParentHeightAndContent();
+}
+
+void ScrollWidgetVisiblePart::setupUpdateFuncs() {
+    const QPointer<ScrollWidgetVisiblePart> thisQPtr = this;
+    mUpdateFuncs.fContentUpdateIfIsCurrentRule =
+            [thisQPtr](const SWT_BoxRule rule) {
+        if(!thisQPtr) return;
+        thisQPtr->scheduleContentUpdateIfIsCurrentRule(rule);
+    };
+    mUpdateFuncs.fContentUpdateIfIsCurrentTarget =
+            [thisQPtr](SingleWidgetTarget* targetP,
+            const SWT_Target target) {
+        if(!thisQPtr) return;
+        thisQPtr->scheduleContentUpdateIfIsCurrentTarget(targetP, target);
+    };
+    mUpdateFuncs.fContentUpdateIfSearchNotEmpty = [thisQPtr]() {
+        if(!thisQPtr) return;
+        thisQPtr->scheduleSearchUpdate();
+    };
+    mUpdateFuncs.fUpdateParentHeight = [thisQPtr]() {
+        if(!thisQPtr) return;
+        thisQPtr->planScheduleUpdateParentHeight();
+    };
+    mUpdateFuncs.fUpdateVisibleWidgetsContent = [thisQPtr]() {
+        if(!thisQPtr) return;
+        thisQPtr->planScheduleUpdateVisibleWidgetsContent();
+    };
 }
 
 void ScrollWidgetVisiblePart::setAlwaysShowChildren(const bool alwaysShowChildren) {
-    mCurrentRulesCollection.fAlwaysShowChildren = alwaysShowChildren;
-    updateParentHeight();
-    updateVisibleWidgetsContent();
+    mRulesCollection.fAlwaysShowChildren = alwaysShowChildren;
+    updateParentHeightAndContent();
 }
 
 void ScrollWidgetVisiblePart::setCurrentSearchText(const QString &text) {
-    mCurrentRulesCollection.fSearchString = text;
-    updateParentHeight();
-    updateVisibleWidgetsContent();
+    mRulesCollection.fSearchString = text;
+    updateParentHeightAndContent();
 }
 
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(const SWT_BoxRule rule) {
@@ -72,38 +95,39 @@ void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(const SWT_Box
 
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentTarget(
         SingleWidgetTarget* targetP, const SWT_Target target) {
-    if(mCurrentRulesCollection.fTarget == target) {
-        static_cast<ScrollWidget*>(mParentWidget)->setMainTarget(targetP);
-        updateParentHeight();
-        updateVisibleWidgetsContent();
+    if(mRulesCollection.fTarget == target) {
+        const auto parent = static_cast<ScrollWidget*>(parentWidget());
+        parent->setMainTarget(targetP);
+        updateParentHeightAndContent();
         //planScheduleUpdateParentHeight();
         //planScheduleUpdateVisibleWidgetsContent();
     }
 }
 
-void ScrollWidgetVisiblePart::scheduleContentUpdateIfSearchNotEmpty() {
-    if(mCurrentRulesCollection.fSearchString.isEmpty()) return;
+void ScrollWidgetVisiblePart::scheduleSearchUpdate() {
+    if(mRulesCollection.fSearchString.isEmpty()) return;
     planScheduleUpdateParentHeight();
     planScheduleUpdateVisibleWidgetsContent();
 }
 
 bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_BoxRule rule) {
-    return rule == mCurrentRulesCollection.fRule;
+    return rule == mRulesCollection.fRule;
 }
 
 void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
     if(!mMainAbstraction) {
-        for(const auto& wid : mSingleWidgets) wid->hide();
+        const auto& wids = widgets();
+        for(const auto& wid : wids) wid->hide();
         return;
     }
-    //updateParentHeight();
 
     int currentWidgetId = 0;
     SetAbsFunc setAbsFunc = [this, &currentWidgetId](
             SWT_Abstraction* newAbs, const int currX) {
-        if(currentWidgetId < mSingleWidgets.count()) {
+        const auto& wids = widgets();
+        if(currentWidgetId < wids.count()) {
             const auto currWidget = static_cast<SingleWidget*>(
-                        mSingleWidgets.at(currentWidgetId));
+                        wids.at(currentWidgetId));
             currWidget->setTargetAbstraction(newAbs);
             const int currWx = currWidget->x();
             currWidget->move(currX, currWidget->y());
@@ -112,17 +136,19 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
         }
     };
     int currY = MIN_WIDGET_DIM/2;
+    const int top = visibleTop();
+    const int bottom = top + visibleHeight() + MIN_WIDGET_DIM/2;
     mMainAbstraction->setAbstractions(
-                mVisibleTop,
-                mVisibleTop + mVisibleHeight + currY,
+                top, bottom,
                 currY, 0, MIN_WIDGET_DIM,
-                setAbsFunc,
-                mCurrentRulesCollection,
+                setAbsFunc, mRulesCollection,
                 true, false);
 
-    mNVisible = currentWidgetId;
-    for(int i = currentWidgetId; i < mSingleWidgets.count(); i++) {
-        mSingleWidgets.at(i)->hide();
+    mVisibleCount = currentWidgetId;
+    const auto& wids = widgets();
+    const int nWidgets = wids.count();
+    for(int i = currentWidgetId; i < nWidgets; i++) {
+        wids.at(i)->hide();
     }
 }
 
@@ -137,12 +163,4 @@ void ScrollWidgetVisiblePart::setMainAbstraction(SWT_Abstraction* abs) {
 
 QWidget *ScrollWidgetVisiblePart::createNewSingleWidget() {
     return new SingleWidget(this);
-}
-
-SWT_RulesCollection::SWT_RulesCollection() {
-    fType = SWT_Type::all;
-    fRule = SWT_BoxRule::all;
-    fAlwaysShowChildren = false;
-    fTarget = SWT_Target::canvas;
-    fSearchString = "";
 }

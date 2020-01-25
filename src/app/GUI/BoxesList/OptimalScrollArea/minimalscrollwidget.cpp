@@ -15,17 +15,19 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "minimalscrollwidget.h"
-#include "minimalscrollwidgetvisiblepart.h"
+#include "scrollvisiblepartbase.h"
 #include "singlewidget.h"
 #include "swt_abstraction.h"
 #include "singlewidgettarget.h"
 #include "scrollarea.h"
 #include "GUI/global.h"
 
-MinimalScrollWidget::MinimalScrollWidget(ScrollArea * const parent) :
-    QWidget(parent) {
-    mParentScrollArea = parent;
-    //createVisiblePartWidget();
+MinimalScrollWidget::MinimalScrollWidget(ScrollVisiblePartBase * const visiblePart,
+                                         ScrollArea * const parent) :
+    QWidget(parent),
+    mVisiblePartWidget(visiblePart),
+    mParentScrollArea(parent) {
+    visiblePart->setParent(this);
 }
 
 void MinimalScrollWidget::scrollParentAreaBy(const int by) {
@@ -34,18 +36,21 @@ void MinimalScrollWidget::scrollParentAreaBy(const int by) {
 
 void MinimalScrollWidget::setWidth(const int width) {
     setFixedWidth(width);
-    mMinimalVisiblePartWidget->setFixedWidth(width);
-    mMinimalVisiblePartWidget->updateWidgetsWidth();
+    mVisiblePartWidget->setFixedWidth(width);
+    mVisiblePartWidget->updateWidgetsWidth();
 }
+
+int MinimalScrollWidget::minHeight() const
+{ return mParentScrollArea->height(); }
 
 void MinimalScrollWidget::changeVisibleTop(const int top) {
     int newTop = top - top % MIN_WIDGET_DIM;
-    mMinimalVisiblePartWidget->move(0, newTop);
-    mMinimalVisiblePartWidget->setVisibleTop(newTop);
+    mVisiblePartWidget->move(0, newTop);
+    mVisiblePartWidget->setVisibleTop(newTop);
 }
 
 void MinimalScrollWidget::changeVisibleHeight(const int height) {
     int newHeight = qCeil(height/(qreal)MIN_WIDGET_DIM)*
                     MIN_WIDGET_DIM;
-    mMinimalVisiblePartWidget->setVisibleHeight(newHeight);
+    mVisiblePartWidget->setVisibleHeight(newHeight);
 }

@@ -33,17 +33,6 @@ public:
     explicit BoxScroller(ScrollWidget * const parent);
 
     QWidget *createNewSingleWidget();
-    void paintEvent(QPaintEvent *);
-    void drawKeys(QPainter * const p,
-                  const qreal pixelsPerFrame,
-                  const FrameRange &viewedFrameRange);
-    Key *getKeyAtPos(const int pressX,
-                     const int pressY,
-                     const qreal pixelsPerFrame,
-                     const int minViewedFrame);
-    void getKeysInRect(QRectF selectionRect,
-                       const qreal pixelsPerFrame,
-                       QList<Key *> &listKeys);
 
     void updateDropTarget();
 
@@ -51,25 +40,20 @@ public:
     void scrollUp();
     void scrollDown();
 
-    TimelineMovable *getRectangleMovableAtPos(
-            const int pressX, const int pressY,
-            const qreal pixelsPerFrame, const int minViewedFrame);
-    KeysView *getKeysView() const {
-        return mKeysView;
-    }
+    KeysView *getKeysView() const
+    { return mKeysView; }
 
-    Canvas* currentScene() const {
-        return mCurrentScene;
-    }
+    Canvas* currentScene() const
+    { return mCurrentScene; }
 
-    void setCurrentScene(Canvas* const scene) {
-        mCurrentScene = scene;
-    }
+    void setCurrentScene(Canvas* const scene)
+    { mCurrentScene = scene; }
 
-    void setKeysView(KeysView *keysView) {
-        mKeysView = keysView;
-    }
+    void setKeysView(KeysView *keysView)
+    { mKeysView = keysView; }
 protected:
+    void paintEvent(QPaintEvent *);
+
     void dropEvent(QDropEvent *event);
     void dragLeaveEvent(QDragLeaveEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
@@ -80,9 +64,9 @@ private:
     };
 
     struct DropTarget {
-        SWT_Abstraction * fTargetParent;
-        int fTargetId;
-        DropType fDropType;
+        SWT_Abstraction * fTargetParent = nullptr;
+        int fTargetId = 0;
+        DropType fDropType = DropType::none;
 
         bool isValid() const {
             return fTargetParent && fDropType != DropType::none;

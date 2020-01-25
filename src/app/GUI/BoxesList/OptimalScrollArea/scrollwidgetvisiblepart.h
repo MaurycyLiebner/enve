@@ -17,7 +17,7 @@
 #ifndef SCROLLWIDGETVISIBLEPART_H
 #define SCROLLWIDGETVISIBLEPART_H
 
-#include "minimalscrollwidgetvisiblepart.h"
+#include "scrollvisiblepartbase.h"
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QtMath>
@@ -27,7 +27,7 @@
 class ScrollWidget;
 class SingleWidgetTarget;
 
-class ScrollWidgetVisiblePart : public MinimalScrollWidgetVisiblePart {
+class ScrollWidgetVisiblePart : public ScrollVisiblePartBase {
     Q_OBJECT
 public:
     ScrollWidgetVisiblePart(ScrollWidget * const parent);
@@ -41,61 +41,37 @@ public:
                           const SWT_Target target);
     void setAlwaysShowChildren(const bool alwaysShowChildren);
     void setCurrentSearchText(const QString &text);
+    void setCurrentType(const SWT_Type type);
 
     void scheduleContentUpdateIfIsCurrentRule(const SWT_BoxRule rule);
     bool isCurrentRule(const SWT_BoxRule rule);
 
-    SWT_RulesCollection getCurrentRulesCollection() {
-        return mCurrentRulesCollection;
-    }
+    SWT_RulesCollection getRulesCollection()
+    { return mRulesCollection; }
 
-    bool getAlwaysShowChildren() {
-        return mAlwaysShowChildren;
-    }
+    bool getAlwaysShowChildren()
+    { return mAlwaysShowChildren; }
 
-    void scheduleContentUpdateIfSearchNotEmpty();
     void scheduleContentUpdateIfIsCurrentTarget(SingleWidgetTarget *targetP,
                                                 const SWT_Target target);
-    void setCurrentType(const SWT_Type type);
     int getId() const { return mId; }
+    int visibleCount() const { return mVisibleCount; }
 
-    const UpdateFuncs& getUpdateFuncs() const {
-        return mUpdateFuncs;
-    }
-protected:
-    void setupUpdateFuncs() {
-        const QPointer<ScrollWidgetVisiblePart> thisQPtr = this;
-        mUpdateFuncs.fContentUpdateIfIsCurrentRule =
-                [thisQPtr](const SWT_BoxRule rule) {
-            if(!thisQPtr) return;
-            thisQPtr->scheduleContentUpdateIfIsCurrentRule(rule);
-        };
-        mUpdateFuncs.fContentUpdateIfIsCurrentTarget =
-                [thisQPtr](SingleWidgetTarget* targetP,
-                       const SWT_Target target) {
-            if(!thisQPtr) return;
-            thisQPtr->scheduleContentUpdateIfIsCurrentTarget(targetP, target);
-        };
-        mUpdateFuncs.fContentUpdateIfSearchNotEmpty = [thisQPtr]() {
-            if(!thisQPtr) return;
-            thisQPtr->scheduleContentUpdateIfSearchNotEmpty();
-        };
-        mUpdateFuncs.fUpdateParentHeight = [thisQPtr]() {
-            if(!thisQPtr) return;
-            thisQPtr->planScheduleUpdateParentHeight();
-        };
-        mUpdateFuncs.fUpdateVisibleWidgetsContent = [thisQPtr]() {
-            if(!thisQPtr) return;
-            thisQPtr->planScheduleUpdateVisibleWidgetsContent();
-        };
-    }
+    const UpdateFuncs& getUpdateFuncs() const
+    { return mUpdateFuncs; }
+
+    SWT_Abstraction* getMainAbstration() const
+    { return mMainAbstraction; }
+private:
+    void setupUpdateFuncs();
+    void scheduleSearchUpdate();
 
     UpdateFuncs mUpdateFuncs;
     static int sNextId;
     const int mId;
-    int mNVisible = 0;
+    int mVisibleCount = 0;
     bool mAlwaysShowChildren = false;
-    SWT_RulesCollection mCurrentRulesCollection;
+    SWT_RulesCollection mRulesCollection;
     stdptr<SWT_Abstraction> mMainAbstraction;
 };
 

@@ -22,14 +22,16 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QtMath>
+#include <functional>
 class SingleWidget;
-class MinimalScrollWidgetVisiblePart;
+class ScrollVisiblePartBase;
 class ScrollArea;
 
 class MinimalScrollWidget : public QWidget {
     Q_OBJECT
 public:
-    explicit MinimalScrollWidget(ScrollArea * const parent);
+    explicit MinimalScrollWidget(ScrollVisiblePartBase * const visiblePart,
+                                 ScrollArea * const parent);
 
     virtual void updateHeight() = 0;
 
@@ -38,10 +40,14 @@ public:
     void changeVisibleTop(const int top);
     void changeVisibleHeight(const int height);
     void setWidth(const int width);
+
+    int minHeight() const;
 protected:
-    virtual void createVisiblePartWidget() = 0;
-    MinimalScrollWidgetVisiblePart *mMinimalVisiblePartWidget;
-    ScrollArea *mParentScrollArea;
+    ScrollVisiblePartBase* visiblePartWidget() const
+    { return mVisiblePartWidget; }
+private:
+    ScrollVisiblePartBase * const mVisiblePartWidget;
+    ScrollArea * const mParentScrollArea;
 };
 
 

@@ -22,24 +22,20 @@
 #include "scrollarea.h"
 #include "GUI/global.h"
 
-ScrollWidget::ScrollWidget(ScrollArea * const parent) :
-    MinimalScrollWidget(parent) {
-    //createVisiblePartWidget();
+ScrollWidget::ScrollWidget(ScrollWidgetVisiblePart * const visiblePart,
+                           ScrollArea * const parent) :
+    MinimalScrollWidget(visiblePart, parent),
+    mVisiblePartWidget(visiblePart) {
     connect(parent, &ScrollArea::heightChanged,
             this, &ScrollWidget::updateHeightAfterScrollAreaResize);
 }
 
 void ScrollWidget::updateAbstraction() {
-    if(mMainAbstraction) {
-        mMainAbstraction->setIsMainTarget(false);
-//        if(mMainAbstraction->isDeletable()) {
-//            delete mMainAbstraction;
-//        }
-    }
+    if(mMainAbstraction) mMainAbstraction->setIsMainTarget(false);
     if(!mMainTarget) {
         mMainAbstraction = nullptr;
     } else {
-        int widId = mVisiblePartWidget->getId();
+        const int widId = mVisiblePartWidget->getId();
         mMainAbstraction = mMainTarget->SWT_getAbstractionForWidget(widId);
         mMainAbstraction->setIsMainTarget(true);
     }
@@ -47,23 +43,65 @@ void ScrollWidget::updateAbstraction() {
     updateHeight();
 }
 
-void ScrollWidget::createVisiblePartWidget() {
-    mVisiblePartWidget = new ScrollWidgetVisiblePart(this);
-    mMinimalVisiblePartWidget = mVisiblePartWidget;
-}
-
 void ScrollWidget::setMainTarget(SingleWidgetTarget *target) {
     mMainTarget = target;
     updateAbstraction();
 }
 
+void ScrollWidget::setCurrentRule(const SWT_BoxRule rule) {
+    mVisiblePartWidget->setCurrentRule(rule);
+}
+
+void ScrollWidget::setCurrentTarget(SingleWidgetTarget *targetP,
+                                    const SWT_Target target) {
+    mVisiblePartWidget->setCurrentTarget(targetP, target);
+}
+
+void ScrollWidget::setCurrentSearchText(const QString &text) {
+    mVisiblePartWidget->setCurrentSearchText(text);
+}
+
+void ScrollWidget::setCurrentType(const SWT_Type type) {
+    mVisiblePartWidget->setCurrentType(type);
+}
+
+SWT_RulesCollection ScrollWidget::getRulesCollection()
+{ return mVisiblePartWidget->getRulesCollection(); }
+
+bool ScrollWidget::getAlwaysShowChildren()
+{ return mVisiblePartWidget->getAlwaysShowChildren();; }
+
+SWT_Abstraction *ScrollWidget::getMainAbstration() const
+{ return mMainAbstraction; }
+
+void ScrollWidget::scheduleContentUpdateIfIsCurrentTarget(
+        SingleWidgetTarget *targetP, const SWT_Target target) {
+    mVisiblePartWidget->scheduleContentUpdateIfIsCurrentTarget(
+                targetP, target);
+}
+
+int ScrollWidget::getId() const {
+    return mVisiblePartWidget->getId();
+}
+
+int ScrollWidget::visibleCount() const {
+    return mVisiblePartWidget->visibleCount();
+}
+
+void ScrollWidget::updateVisible() {
+    mVisiblePartWidget->update();
+}
+
+const QList<QWidget*>& ScrollWidget::visibleWidgets() {
+    return mVisiblePartWidget->widgets();
+}
+
 void ScrollWidget::updateHeight() {
     if(!mMainAbstraction) return hide();
     mContentHeight = mMainAbstraction->updateHeight(
-                mVisiblePartWidget->getCurrentRulesCollection(),
+                mVisiblePartWidget->getRulesCollection(),
                 false, false, MIN_WIDGET_DIM) + 3*MIN_WIDGET_DIM/2;
-    const int parentHeight = mParentScrollArea->height();
-    setFixedHeight(qMax(mContentHeight, parentHeight));
+    setFixedHeight(qMax(mContentHeight, minHeight()));
     if(isHidden()) show();
 }
 

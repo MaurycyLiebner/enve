@@ -22,7 +22,7 @@
 #include "Animators/qrealpoint.h"
 #include "GUI/global.h"
 #include "Animators/qrealkey.h"
-#include "GUI/BoxesList/boxscroller.h"
+#include "GUI/BoxesList/boxscrollwidget.h"
 
 QColor KeysView::sGetAnimatorColor(const int i) {
     return ANIMATOR_COLORS.at(i % ANIMATOR_COLORS.length());
@@ -30,7 +30,7 @@ QColor KeysView::sGetAnimatorColor(const int i) {
 
 bool KeysView::graphIsSelected(GraphAnimator * const anim) {
     if(mCurrentScene) {
-        const int id = mBoxesListVisible->getId();
+        const int id = mBoxesListWidget->getId();
         const auto all = mCurrentScene->getSelectedForGraph(id);
         if(all) return all->contains(anim);
     }
@@ -483,7 +483,7 @@ void KeysView::graphAddToViewedAnimatorList(GraphAnimator * const animator) {
 void KeysView::graphUpdateVisbile() {
     mGraphAnimators.clear();
     if(mCurrentScene) {
-        const int id = mBoxesListVisible->getId();
+        const int id = mBoxesListWidget->getId();
         const auto all = mCurrentScene->getSelectedForGraph(id);
         if(all) {
             for(const auto anim : *all) {
@@ -500,7 +500,8 @@ void KeysView::graphUpdateVisbile() {
 
 void KeysView::graphAddViewedAnimator(GraphAnimator * const animator) {
     if(!mCurrentScene) return Q_ASSERT(false);
-    mCurrentScene->addSelectedForGraph(mBoxesListVisible->getId(), animator);
+    const int id = mBoxesListWidget->getId();
+    mCurrentScene->addSelectedForGraph(id, animator);
     if(graphValidateVisible(animator)) {
         graphAddToViewedAnimatorList(animator);
         graphUpdateDimensions();
@@ -511,7 +512,8 @@ void KeysView::graphAddViewedAnimator(GraphAnimator * const animator) {
 
 void KeysView::graphRemoveViewedAnimator(GraphAnimator * const animator) {
     if(!mCurrentScene) return Q_ASSERT(false);
-    mCurrentScene->removeSelectedForGraph(mBoxesListVisible->getId(), animator);
+    const int id = mBoxesListWidget->getId();
+    mCurrentScene->removeSelectedForGraph(id, animator);
     if(mGraphAnimators.removeObj(animator)) {
         graphUpdateDimensions();
         graphResetValueScaleAndMinShown();

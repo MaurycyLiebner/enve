@@ -20,7 +20,9 @@
 #include <QPainter>
 #include <QMenu>
 #include "mainwindow.h"
+#include "GUI/BoxesList/boxscrollwidget.h"
 #include "GUI/BoxesList/boxscroller.h"
+#include "GUI/BoxesList/boxsinglewidget.h"
 #include "Timeline/durationrectangle.h"
 #include "GUI/global.h"
 #include "pointhelpers.h"
@@ -30,11 +32,10 @@
 #include "clipboardcontainer.h"
 #include "Animators/qrealpoint.h"
 
-KeysView::KeysView(BoxScroller *boxesListVisible,
+KeysView::KeysView(BoxScrollWidget *boxesListVisible,
                    QWidget *parent) :
-    QWidget(parent) {
-    mBoxesListVisible = boxesListVisible;
-    mBoxesListVisible->setKeysView(this);
+    QWidget(parent), mBoxesListWidget(boxesListVisible) {
+    mBoxesListWidget->setSiblingKeysView(this);
 
     setMouseTracking(true);
     setAcceptDrops(true);
@@ -112,6 +113,37 @@ void KeysView::deleteSelectedKeys() {
         anim->anim_deleteSelectedKeys();
 }
 
+
+void KeysView::getKeysInRect(QRectF selectionRect,
+                             const qreal pixelsPerFrame,
+                             QList<Key*>& listKeys) {
+    const auto mainAbs = mBoxesListWidget->getMainAbstration();
+    if(!mainAbs) return;
+    const auto rules = mBoxesListWidget->getRulesCollection();
+    QList<SWT_Abstraction*> abstractions;
+//    selectionRect.adjust(-0.5, -(BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5,
+//                         0.5, (BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5);
+    selectionRect.adjust(0.5, 0, 0.5, 0);
+    const int minX = qRound(selectionRect.top() - MIN_WIDGET_DIM*0.5);
+    const int minY = qRound(selectionRect.bottom() - MIN_WIDGET_DIM*0.5);
+    int currY = 0;
+    const SetAbsFunc setter = [&abstractions](SWT_Abstraction * abs, int) {
+        abstractions.append(abs);
+    };
+    mainAbs->setAbstractions(
+            minX, minY, currY, 0, MIN_WIDGET_DIM,
+            setter, rules, true, false);
+
+    for(const auto& abs : abstractions) {
+        const auto target = abs->getTarget();
+        if(target->SWT_isAnimator()) {
+            const auto anim_target = static_cast<Animator*>(target);
+            anim_target->anim_getKeysInRect(selectionRect, pixelsPerFrame,
+                                            listKeys, KEY_RECT_SIZE);
+        }
+    }
+}
+
 void KeysView::selectKeysInSelectionRect() {
     if(mGraphViewed) {
         QList<GraphKey*> keysList;
@@ -123,9 +155,8 @@ void KeysView::selectKeysInSelectionRect() {
         }
     } else {
         QList<Key*> listKeys;
-        mBoxesListVisible->getKeysInRect(mSelectionRect.translated(-0.5, 0),
-                                         mPixelsPerFrame,
-                                         listKeys);
+        getKeysInRect(mSelectionRect.translated(-0.5, 0),
+                      mPixelsPerFrame, listKeys);
         for(const auto& key : listKeys) {
             addKeyToSelection(key);
         }
@@ -183,6 +214,23 @@ void KeysView::finishTransform() {
     releaseMouseAndDontTrack();
 }
 
+
+TimelineMovable *KeysView::getRectangleMovableAtPos(
+        const int pressX, const int pressY,
+        const qreal pixelsPerFrame,
+        const int minViewedFrame) {
+    const auto& wids = mBoxesListWidget->visibleWidgets();
+    for(const auto& container : wids) {
+        const int containerTop = container->y();
+        const int containerBottom = containerTop + container->height();
+        if(containerTop > pressY || containerBottom < pressY) continue;
+        const auto bsw = static_cast<BoxSingleWidget*>(container);
+        return bsw->getRectangleMovableAtPos(pressX, pixelsPerFrame,
+                                             minViewedFrame);
+    }
+    return nullptr;
+}
+
 void KeysView::mousePressEvent(QMouseEvent *e) {
     KFT_setFocus();
     const QPoint posU = e->pos() + QPoint(-MIN_WIDGET_DIM/2, 0);
@@ -195,13 +243,11 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
         mLastPressPos = posU;
         if(mGraphViewed) graphMousePress(posU);
         else {
-            mLastPressedKey = mBoxesListVisible->getKeyAtPos(
-                                                      posU.x(), posU.y(),
-                                                      mPixelsPerFrame,
-                                                      mMinViewedFrame);
+            mLastPressedKey = getKeyAtPos(posU.x(), posU.y(),
+                                          mPixelsPerFrame,
+                                          mMinViewedFrame);
             if(!mLastPressedKey) {
-                mLastPressedMovable =
-                        mBoxesListVisible->getRectangleMovableAtPos(
+                mLastPressedMovable = getRectangleMovableAtPos(
                                             posU.x(), posU.y(),
                                             mPixelsPerFrame,
                                             mMinViewedFrame);
@@ -235,7 +281,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
         if(mMovingKeys) {
             cancelTransform();
         } else {
-            auto movable = mBoxesListVisible->getRectangleMovableAtPos(
+            auto movable = getRectangleMovableAtPos(
                                         posU.x(), posU.y(),
                                         mPixelsPerFrame,
                                         mMinViewedFrame);
@@ -368,7 +414,21 @@ bool KeysView::KFT_keyPressEvent(QKeyEvent *event) {
     return true;
 }
 
-#include "GUI/BoxesList/boxsinglewidget.h"
+void KeysView::drawKeys(QPainter * const p,
+                        const qreal pixelsPerFrame,
+                        const FrameRange &viewedFrameRange) {
+    p->save();
+    p->setPen(Qt::NoPen);
+    const auto& wids = mBoxesListWidget->visibleWidgets();
+    for(const auto& container : wids) {
+        const auto bsw = static_cast<BoxSingleWidget*>(container);
+        p->save();
+        bsw->prp_drawTimelineControls(p, pixelsPerFrame, viewedFrameRange);
+        p->restore();
+        p->translate(0, container->height());
+    }
+    p->restore();
+}
 
 void KeysView::paintEvent(QPaintEvent *) {
     QPainter p(this);
@@ -431,7 +491,7 @@ void KeysView::paintEvent(QPaintEvent *) {
         p.translate((frameAtZeroXi - mMinViewedFrame)*mPixelsPerFrame, 0);
         const int maxFrame = qCeil(mMaxViewedFrame + 3*transDFrame);
         const FrameRange viewedFrameRange{frameAtZeroXi, maxFrame};
-        mBoxesListVisible->drawKeys(&p, mPixelsPerFrame, viewedFrameRange);
+        drawKeys(&p, mPixelsPerFrame, viewedFrameRange);
         p.restore();
         if(mSelecting) {
             p.setPen(QPen(Qt::blue, 2, Qt::DotLine));
@@ -466,6 +526,23 @@ void KeysView::KFT_clearFocus() {
     update();
 }
 
+Key *KeysView::getKeyAtPos(const int pressX, const int pressY,
+                           const qreal pixelsPerFrame,
+                           const int minViewedFrame) {
+    const int remaining = pressY % MIN_WIDGET_DIM;
+    if(remaining < (MIN_WIDGET_DIM - KEY_RECT_SIZE)/2 ||
+       remaining > (MIN_WIDGET_DIM + KEY_RECT_SIZE)/2) return nullptr;
+    const auto& wids = mBoxesListWidget->visibleWidgets();
+    for(const auto& container : wids) {
+        const int containerTop = container->y();
+        const int containerBottom = containerTop + container->height();
+        if(containerTop > pressY || containerBottom < pressY) continue;
+        const auto bsw = static_cast<BoxSingleWidget*>(container);
+        return bsw->getKeyAtPos(pressX, pixelsPerFrame, minViewedFrame);
+    }
+    return nullptr;
+}
+
 void KeysView::updateHovered(const QPoint &posU) {
     if(mGraphViewed) {
         clearHoveredKey();
@@ -477,16 +554,17 @@ void KeysView::updateHovered(const QPoint &posU) {
         return;
     }
     if(mHoveredKey) mHoveredKey->setHovered(false);
-    mHoveredKey = mBoxesListVisible->getKeyAtPos(posU.x(), posU.y(),
-                                                 mPixelsPerFrame,
-                                                 mMinViewedFrame);
+    mHoveredKey = getKeyAtPos(posU.x(), posU.y(),
+                              mPixelsPerFrame,
+                              mMinViewedFrame);
     if(mHoveredKey) {
         mHoveredKey->setHovered(true);
         clearHoveredMovable();
     } else {
         const auto lastMovable = mHoveredMovable;
-        mHoveredMovable = mBoxesListVisible->getRectangleMovableAtPos(
-                            posU.x(), posU.y(), mPixelsPerFrame,
+        mHoveredMovable = getRectangleMovableAtPos(
+                            posU.x(), posU.y(),
+                            mPixelsPerFrame,
                             mMinViewedFrame);
         if(lastMovable != mHoveredMovable) {
             if(lastMovable) lastMovable->setHovered(false);

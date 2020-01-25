@@ -24,37 +24,26 @@
 
 BoxScrollWidget::BoxScrollWidget(Document &document,
                                  ScrollArea * const parent) :
-    ScrollWidget(parent) {
-    createVisiblePartWidget();
+    ScrollWidget(new BoxScroller(this), parent) {
+    const auto visPartWidget = visiblePartWidget();
     mCoreAbs = document.SWT_createAbstraction(
-                mVisiblePartWidget->getUpdateFuncs(),
-                mVisiblePartWidget->getId());
+                visPartWidget->getUpdateFuncs(),
+                visPartWidget->getId());
 }
 
 BoxScrollWidget::~BoxScrollWidget() {
     if(mCoreAbs) mCoreAbs->removeAlongWithAllChildren_k();
 }
 
-//void BoxScrollWidget::updateAbstraction() {
-//    if(!mMainTarget) {
-//        mMainAbstraction = nullptr;
-//    } else {
-//        mMainAbstraction = mMainTarget->
-//                SWT_getAbstractionForWidget(mVisiblePartWidget);
-//    }
-//    mVisiblePartWidget->setMainAbstraction(mMainAbstraction);
-//    updateHeight();
-//}
-
-BoxScroller *BoxScrollWidget::getVisiblePartWidget() {
-    return static_cast<BoxScroller*>(mVisiblePartWidget);
+BoxScroller *BoxScrollWidget::getBoxScroller() {
+    const auto visPartWidget = visiblePartWidget();
+    return static_cast<BoxScroller*>(visPartWidget);
 }
 
 void BoxScrollWidget::setCurrentScene(Canvas * const scene) {
-    getVisiblePartWidget()->setCurrentScene(scene);
+    getBoxScroller()->setCurrentScene(scene);
 }
 
-void BoxScrollWidget::createVisiblePartWidget() {
-    mVisiblePartWidget = new BoxScroller(this);
-    mMinimalVisiblePartWidget = mVisiblePartWidget;
+void BoxScrollWidget::setSiblingKeysView(KeysView * const keysView) {
+    getBoxScroller()->setKeysView(keysView);
 }

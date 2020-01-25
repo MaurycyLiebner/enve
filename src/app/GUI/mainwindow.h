@@ -50,7 +50,6 @@ class MemoryHandler;
 
 class ObjectSettingsWidget;
 class BoxScrollWidget;
-class ScrollWidget;
 class ScrollArea;
 class UsageWidget;
 class CentralWidget;

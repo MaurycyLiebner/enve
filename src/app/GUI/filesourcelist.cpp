@@ -117,23 +117,18 @@ void FileSourceWidget::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 FileSourceListScrollWidget::FileSourceListScrollWidget(ScrollArea *parent) :
-    MinimalScrollWidget(parent) {
-    createVisiblePartWidget();
+    MinimalScrollWidget(new FileSourceListVisibleWidget(this), parent) {
     updateHeight();
 }
 
 void FileSourceListScrollWidget::updateHeight() {
-    FileSourceListVisibleWidget *visWid =
-            ((FileSourceListVisibleWidget*)mMinimalVisiblePartWidget);
+    const auto visWid = static_cast<FileSourceListVisibleWidget*>(
+                visiblePartWidget());
     setFixedHeight((visWid->getCacheListCount() + 0.5) * MIN_WIDGET_DIM);
 }
 
-void FileSourceListScrollWidget::createVisiblePartWidget() {
-    mMinimalVisiblePartWidget = new FileSourceListVisibleWidget(this);
-}
-
 FileSourceListVisibleWidget::FileSourceListVisibleWidget(MinimalScrollWidget *parent) :
-    MinimalScrollWidgetVisiblePart(parent) {
+    ScrollVisiblePartBase(parent) {
     connect(FilesHandler::sInstance, &FilesHandler::addedCacheHandler,
             this, &FileSourceListVisibleWidget::addCacheHandlerToList);
     connect(FilesHandler::sInstance, &FilesHandler::removedCacheHandler,
@@ -161,11 +156,13 @@ void FileSourceListVisibleWidget::paintEvent(QPaintEvent *) {
 }
 
 void FileSourceListVisibleWidget::updateVisibleWidgetsContent() {
-    int firstVisibleId = mVisibleTop/MIN_WIDGET_DIM;
+    int firstVisibleId = visibleTop()/MIN_WIDGET_DIM;
 
     int iTarget = firstVisibleId;
-    for(int iWidget = 0; iWidget < mSingleWidgets.count(); iWidget++) {
-        const auto fsw = static_cast<FileSourceWidget*>(mSingleWidgets.at(iWidget));
+    const auto& wids = widgets();
+    const int nWidgets =  wids.count();
+    for(int iWidget = 0; iWidget < nWidgets; iWidget++) {
+        const auto fsw = static_cast<FileSourceWidget*>(wids.at(iWidget));
         if(iTarget < mCacheList.count()) {
             fsw->setTargetCache(mCacheList.at(iTarget++).get());
             fsw->show();

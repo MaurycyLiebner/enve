@@ -14,31 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOXSCROLLWIDGET_H
-#define BOXSCROLLWIDGET_H
+#include "swt_rulescollection.h"
 
-#include "OptimalScrollArea/scrollwidget.h"
-#include "GUI/keyfocustarget.h"
-class BoxScroller;
-class ScrollArea;
-class WindowSingleWidgetTarget;
-class Document;
-class Canvas;
-class KeysView;
+SWT_RulesCollection::SWT_RulesCollection() {}
 
-class BoxScrollWidget : public ScrollWidget {
-    Q_OBJECT
-public:
-    explicit BoxScrollWidget(Document& document,
-                             ScrollArea * const parent = nullptr);
-    ~BoxScrollWidget();
-
-    void setCurrentScene(Canvas* const scene);
-    void setSiblingKeysView(KeysView* const keysView);
-private:
-    BoxScroller *getBoxScroller();
-
-    stdptr<SWT_Abstraction> mCoreAbs;
-};
-
-#endif // BOXSCROLLWIDGET_H
+SWT_RulesCollection::SWT_RulesCollection(const SWT_BoxRule rule,
+                                         const bool alwaysShowChildren,
+                                         const SWT_Target target,
+                                         const SWT_Type type,
+                                         const QString &searchString) {
+    fRule = rule;
+    fAlwaysShowChildren = alwaysShowChildren;
+    fTarget = target;
+    fType = type;
+    fSearchString = searchString;
+}

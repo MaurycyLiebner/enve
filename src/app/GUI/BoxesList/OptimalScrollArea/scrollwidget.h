@@ -22,33 +22,60 @@
 #include <QLabel>
 #include "minimalscrollwidget.h"
 #include "smartPointers/ememory.h"
+#include "swt_rulescollection.h"
 class SingleWidget;
 class ScrollWidgetVisiblePart;
 class SWT_Abstraction;
 class SingleWidgetTarget;
 class ScrollArea;
 
+enum class SWT_BoxRule : short;
+enum class SWT_Target : short;
+enum class SWT_Type : short;
+
 class ScrollWidget : public MinimalScrollWidget {
     Q_OBJECT
 public:
-    explicit ScrollWidget(ScrollArea * const parent);
+    explicit ScrollWidget(ScrollWidgetVisiblePart* const visiblePart,
+                          ScrollArea * const parent);
 
     void updateHeight();
-    virtual void updateAbstraction();
 
     void setMainTarget(SingleWidgetTarget *target);
-    int getContentHeight() {
-        return mContentHeight;
-    }
-private:
-    void updateHeightAfterScrollAreaResize(const int parentHeight);
+    void setCurrentRule(const SWT_BoxRule rule);
+    void setCurrentTarget(SingleWidgetTarget* targetP,
+                          const SWT_Target target);
+    void setCurrentSearchText(const QString &text);
+    void setCurrentType(const SWT_Type type);
+
+    void scheduleContentUpdateIfIsCurrentRule(const SWT_BoxRule rule);
+    bool isCurrentRule(const SWT_BoxRule rule);
+
+    SWT_RulesCollection getRulesCollection();
+    bool getAlwaysShowChildren();
+
+    SWT_Abstraction* getMainAbstration() const;
+
+    void scheduleContentUpdateIfIsCurrentTarget(SingleWidgetTarget *targetP,
+                                                const SWT_Target target);
+    int getId() const;
+    int visibleCount() const;
+
+    int getContentHeight() { return mContentHeight; }
+
+    void updateVisible();
+    const QList<QWidget*> &visibleWidgets();
 protected:
-    virtual void createVisiblePartWidget();
+    ScrollWidgetVisiblePart* visiblePartWidget() const
+    { return mVisiblePartWidget; }
+private:
+    void updateAbstraction();
+    void updateHeightAfterScrollAreaResize(const int parentHeight);
 
     int mContentHeight = 0;
     qptr<SingleWidgetTarget> mMainTarget;
     stdptr<SWT_Abstraction> mMainAbstraction;
-    ScrollWidgetVisiblePart *mVisiblePartWidget = nullptr;
+    ScrollWidgetVisiblePart * const mVisiblePartWidget;
 };
 
 #endif // SCROLLWIDGET_H

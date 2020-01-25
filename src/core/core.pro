@@ -260,6 +260,7 @@ SOURCES += \
     Animators/boolanimator.cpp \
     switchablecontext.cpp \
     swt_abstraction.cpp \
+    swt_rulescollection.cpp \
     texteffect.cpp \
     texteffectcaller.cpp \
     transformvalues.cpp \
@@ -530,6 +531,7 @@ HEADERS += \
     Animators/boolanimator.h \
     switchablecontext.h \
     swt_abstraction.h \
+    swt_rulescollection.h \
     texteffect.h \
     texteffectcaller.h \
     transformvalues.h \

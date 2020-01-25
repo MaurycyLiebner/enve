@@ -98,7 +98,6 @@ private:
     QLineEdit *mSearchLine;
     ScrollArea *mBoxesListScrollArea;
     BoxScrollWidget *mBoxesListWidget;
-    BoxScroller *mBoxesListVisible;
     KeysView *mKeysView;
     AnimationDockWidget *mAnimationDockWidget;
 };

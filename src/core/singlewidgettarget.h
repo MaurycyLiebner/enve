@@ -19,55 +19,11 @@
 #include <QList>
 #include <map>
 #include "swt_abstraction.h"
+#include "swt_rulescollection.h"
 
 class QMenu;
 class QAction;
 class QMimeData;
-
-enum class SWT_BoxRule : short {
-    all,
-    selected,
-    visible,
-    hidden,
-    locked,
-    unlocked,
-    animated,
-    notAnimated
-};
-
-
-enum class SWT_Target : short {
-    canvas,
-    group,
-    all
-};
-
-enum class SWT_Type : short {
-    all,
-    graphics,
-    sound
-};
-
-struct SWT_RulesCollection {
-    SWT_RulesCollection();
-    SWT_RulesCollection(const SWT_BoxRule ruleT,
-                        const bool alwaysShowChildrenT,
-                        const SWT_Target targetT,
-                        const SWT_Type typeT,
-                        const QString &searchStringT) {
-        fRule = ruleT;
-        fAlwaysShowChildren = alwaysShowChildrenT;
-        fTarget = targetT;
-        fType = typeT;
-        fSearchString = searchStringT;
-    }
-
-    SWT_BoxRule fRule;
-    bool fAlwaysShowChildren;
-    SWT_Target fTarget;
-    SWT_Type fType;
-    QString fSearchString;
-};
 
 class SingleWidgetTarget : public SelfRef {
     Q_OBJECT

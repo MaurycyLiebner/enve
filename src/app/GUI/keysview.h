@@ -41,13 +41,16 @@ class AnimationDockWidget;
 class TimelineMovable;
 class KeysClipboard;
 class Animator;
+class BoxScrollWidget;
+
 #include "GUI/valueinput.h"
+
 enum class CtrlsMode : short;
 
 class KeysView : public QWidget, public KeyFocusTarget {
     Q_OBJECT
 public:
-    explicit KeysView(BoxScroller *boxesListVisible,
+    explicit KeysView(BoxScrollWidget *boxesListVisible,
                       QWidget *parent = nullptr);
 
     void setCurrentScene(Canvas* const scene);
@@ -147,6 +150,19 @@ public:
     void graphSetOnlySelectedVisible(const bool selectedOnly);
     bool graphIsSelected(GraphAnimator * const anim);
 private:
+    void getKeysInRect(QRectF selectionRect,
+                       const qreal pixelsPerFrame,
+                       QList<Key *> &listKeys);
+    void drawKeys(QPainter * const p, const qreal pixelsPerFrame,
+                  const FrameRange &viewedFrameRange);
+    Key *getKeyAtPos(const int pressX, const int pressY,
+                     const qreal pixelsPerFrame,
+                     const int minViewedFrame);
+    TimelineMovable *getRectangleMovableAtPos(
+            const int pressX, const int pressY,
+            const qreal pixelsPerFrame,
+            const int minViewedFrame);
+
     void graphAddToViewedAnimatorList(GraphAnimator * const animator);
     qreal xToFrame(const qreal x) const;
 
@@ -195,7 +211,7 @@ private:
     int mViewedTop = 0;
     int mViewedBottom = 0;
 
-    BoxScroller *mBoxesListVisible;
+    BoxScrollWidget *mBoxesListWidget;
     QRectF mSelectionRect;
     bool mSelecting = false;
     bool mGraphViewed = false;
