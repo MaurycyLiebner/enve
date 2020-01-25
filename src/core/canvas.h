@@ -149,6 +149,7 @@ public:
                     const int canvasHeight = 1080,
                     const int frameCount = 200,
                     const qreal fps = 24);
+    ~Canvas();
 public:
     void prp_afterChangedAbsRange(const FrameRange &range,
                                   const bool clip = true);

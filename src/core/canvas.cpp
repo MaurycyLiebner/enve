@@ -77,6 +77,11 @@ Canvas::Canvas(Document &document,
     //setCanvasMode(MOVE_PATH);
 }
 
+Canvas::~Canvas() {
+    clearPointsSelection();
+    clearBoxesSelection();
+}
+
 qreal Canvas::getResolutionFraction() {
     return mResolutionFraction;
 }
