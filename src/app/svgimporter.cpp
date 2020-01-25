@@ -29,6 +29,8 @@
 #include "Animators/SmartPath/smartpathanimator.h"
 #include "MovablePoints/smartnodepoint.h"
 #include "Private/document.h"
+#include "matrixdecomposition.h"
+#include "transformvalues.h"
 
 class TextSvgAttributes {
 public:
@@ -127,17 +129,9 @@ public:
     void setFillAttribute(const QString &value);
     void setStrokeAttribute(const QString &value);
 protected:
-    void decomposeTransformMatrix();
-
     SkPathFillType mFillRule = SkPathFillType::kEvenOdd;
 
-    qreal mDx = 0;
-    qreal mDy = 0;
-    qreal mScaleX = 1;
-    qreal mScaleY = 1;
-    qreal mShearX = 0;
-    qreal mShearY = 0;
-    qreal mRot = 0;
+    TransformValues mDecomposedTrans;
 
     qreal mOpacity = 100;
 
@@ -1381,7 +1375,7 @@ void BoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
         mRelTransform = getMatrixFromString(matrixStr)*mRelTransform;
     }
 
-    decomposeTransformMatrix();
+    mDecomposedTrans = MatrixDecomposition::decompose(mRelTransform);
 }
 
 bool BoxSvgAttributes::hasTransform() const {
@@ -1391,43 +1385,6 @@ bool BoxSvgAttributes::hasTransform() const {
              isZero4Dec(mRelTransform.m22() - 1) &&
              isZero4Dec(mRelTransform.m12()) &&
              isZero4Dec(mRelTransform.m21()));
-}
-
-void BoxSvgAttributes::decomposeTransformMatrix() {
-    const qreal m11 = mRelTransform.m11();
-    const qreal m12 = mRelTransform.m12();
-    const qreal m21 = mRelTransform.m21();
-    const qreal m22 = mRelTransform.m22();
-
-    const qreal delta = m11 * m22 - m12 * m21;
-
-    // Apply the QR-like decomposition.
-    if(!isZero4Dec(m11) || !isZero4Dec(m12)) {
-        const qreal r = sqrt(m11 * m11 + m12 * m12);
-        const qreal rotRad = m12 > 0 ? acos(m11 / r) : -acos(m11 / r);
-        mRot = rotRad*180/PI;
-        mScaleX = r;
-        mScaleY = delta/r;
-        mShearX = atan((m11 * m21 + m12 * m22) / (r * r));
-        mShearY = 0;
-    } else if(!isZero4Dec(m21) || !isZero4Dec(m22)) {
-        const qreal s = sqrt(m21 * m21 + m22 * m22);
-        const qreal rotRad = m22 > 0 ? acos(-m21 / s) : -acos(-m21 / s);
-        mRot = 90 - rotRad*180/PI;
-        mScaleX = delta/s;
-        mScaleY = s;
-        mShearX = 0;
-        mShearY = atan((m11 * m21 + m12 * m22) / (s * s));
-    } else {
-        mRot = 0;
-        mScaleX = 0;
-        mScaleY = 0;
-        mShearX = 0;
-        mShearY = 0;
-    }
-
-    mDx = mRelTransform.dx();
-    mDy = mRelTransform.dy();
 }
 
 #include "Animators/paintsettingsanimator.h"
@@ -1539,10 +1496,10 @@ void BoxSvgAttributes::apply(BoundingBox *box) const {
     }
     const auto transAnim = box->getBoxTransformAnimator();
     transAnim->setOpacity(mOpacity);
-    transAnim->translate(mDx, mDy);
-    transAnim->setScale(mScaleX, mScaleY);
-    transAnim->setRotation(mRot);
-    transAnim->setShear(mShearX, mShearY);
+    transAnim->translate(mDecomposedTrans.fMoveX, mDecomposedTrans.fMoveY);
+    transAnim->setScale(mDecomposedTrans.fScaleX, mDecomposedTrans.fScaleY);
+    transAnim->setRotation(mDecomposedTrans.fRotation);
+    transAnim->setShear(mDecomposedTrans.fShearX, mDecomposedTrans.fShearY);
 }
 
 void VectorPathSvgAttributes::apply(SmartVectorPath * const path) {

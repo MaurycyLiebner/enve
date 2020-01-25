@@ -124,7 +124,10 @@ public:
     void addContainedBoxesToSelection(const QRectF &rect);
 
     void setIsCurrentGroup_k(const bool bT);
-    void ungroup_k();
+
+    void ungroupAction_k();
+    void ungroupKeepTransform_k();
+    void ungroupAbandomTransform_k();
 
     bool isCurrentGroup() const;
 
@@ -162,6 +165,8 @@ public:
     int containedIdToAbstractionId(const int contId) const {
         return contId + ca_getNumberOfChildren();
     }
+
+    bool areAllChildrenStatic();
     int getContainedBoxesCount() const;
     void removeAllContained();
 

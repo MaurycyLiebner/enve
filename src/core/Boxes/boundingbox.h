@@ -322,6 +322,8 @@ public:
     void resetTranslation();
     void resetRotation();
 
+    void applyParentTransform();
+    bool isTransformationStatic() const;
     BoxTransformAnimator *getBoxTransformAnimator() const;
     QRectF getRelBoundingRect() const;
     void drawHoveredPathSk(SkCanvas *canvas, const SkPath &path,

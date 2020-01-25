@@ -241,6 +241,7 @@ SOURCES += \
     filesourcescache.cpp \
     gpurendertools.cpp \
     importhandler.cpp \
+    matrixdecomposition.cpp \
     memorydatahandler.cpp \
     paintsettings.cpp \
     paintsettingsapplier.cpp \
@@ -261,6 +262,7 @@ SOURCES += \
     switchablecontext.cpp \
     texteffect.cpp \
     texteffectcaller.cpp \
+    transformvalues.cpp \
     undoredo.cpp \
     exceptions.cpp \
     glhelpers.cpp \
@@ -505,6 +507,7 @@ HEADERS += \
     filesourcescache.h \
     gpurendertools.h \
     importhandler.h \
+    matrixdecomposition.h \
     memorydatahandler.h \
     paintsettings.h \
     paintsettingsapplier.h \
@@ -529,6 +532,7 @@ HEADERS += \
     switchablecontext.h \
     texteffect.h \
     texteffectcaller.h \
+    transformvalues.h \
     undoredo.h \
     exceptions.h \
     glhelpers.h \

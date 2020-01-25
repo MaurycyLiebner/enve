@@ -456,8 +456,27 @@ BoundingBox *ContainerBox::getBoxAtFromAllDescendents(const QPointF &absPos) {
     return boxAtPos;
 }
 
-void ContainerBox::ungroup_k() {
-    //clearBoxesSelection();
+bool ContainerBox::areAllChildrenStatic() {
+    for(const auto& box : mContainedBoxes) {
+        const bool boxStatic = box->isTransformationStatic();
+        if(!boxStatic) return false;
+    }
+    return true;
+}
+
+void ContainerBox::ungroupAction_k() {
+    if(areAllChildrenStatic()) ungroupKeepTransform_k();
+    else ungroupAbandomTransform_k();
+}
+
+void ContainerBox::ungroupKeepTransform_k() {
+    for(const auto& box : mContainedBoxes) {
+        box->applyParentTransform();
+    }
+    ungroupAbandomTransform_k();
+}
+
+void ContainerBox::ungroupAbandomTransform_k() {
     for(int i = mContained.count() - 1; i >= 0; i--) {
         auto box = mContained.at(i);
         removeContained(box);
@@ -472,11 +491,19 @@ void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
 
     menu->addSection("Layer & Group");
 
-    const auto ungroupAction = menu->addPlainAction<ContainerBox>(
+    const auto ungroupAbandonAction = menu->addPlainAction<ContainerBox>(
                 "Ungroup", [](ContainerBox * box) {
-        box->ungroup_k();
+        box->ungroupAbandomTransform_k();
     });
-    ungroupAction->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
+    const auto ungroupKeepAction = menu->addPlainAction<ContainerBox>(
+                "Ungroup (Keep Transform)", [](ContainerBox * box) {
+        box->ungroupKeepTransform_k();
+    });
+    QAction* defaultUngroup;
+    if(areAllChildrenStatic()) {
+        defaultUngroup = ungroupKeepAction;
+    } else defaultUngroup = ungroupAbandonAction;
+    defaultUngroup->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
 
     menu->addSeparator();
 

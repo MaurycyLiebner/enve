@@ -137,20 +137,24 @@ public:
 
     void resetShear();
     void resetPivot();
-    void setPivotFixedTransform(const QPointF &point);
+    void setPivotFixedTransform(const QPointF &newPivot);
 
     QPointF getPivot();
     qreal getPivotX();
     qreal getPivotY();
 
+    void startShearTransform();
     void setShear(const qreal shearX, const qreal shearY);
 
     qreal getOpacity();
 
+    void startTransformSkipOpacity();
+
     void startOpacityTransform();
     void setOpacity(const qreal newOpacity);
-
+    void setPivot(const qreal x, const qreal y);
     void startPivotTransform();
+
     void finishPivotTransform();
     QPointF getPivotAbs();
 

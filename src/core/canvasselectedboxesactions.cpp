@@ -379,9 +379,9 @@ bool Canvas::isBoxSelectionEmpty() const {
 
 void Canvas::ungroupSelectedBoxes() {
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isContainerBox()) {
-            static_cast<ContainerBox*>(box)->ungroup_k();
-        }
+        if(!box->SWT_isContainerBox()) continue;
+        const auto cont = static_cast<ContainerBox*>(box);
+        cont->ungroupAction_k();
     }
 }
 

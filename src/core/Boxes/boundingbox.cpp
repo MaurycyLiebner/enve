@@ -35,6 +35,7 @@
 #include "patheffectsmenu.h"
 #include "RasterEffects/rastereffectsinclude.h"
 #include "RasterEffects/rastereffectmenucreator.h"
+#include "matrixdecomposition.h"
 
 int BoundingBox::sNextDocumentId = 0;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
@@ -560,6 +561,8 @@ void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
         pScene->ungroupSelectedBoxes();
     })->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
 
+
+
     menu->addSeparator();
 
     const auto rasterEffectsMenu = menu->addMenu("Raster Effects");
@@ -710,6 +713,27 @@ void BoundingBox::getMotionBlurProperties(QList<Property*> &list) const {
     list.append(mTransformAnimator->getPosAnimator());
     list.append(mTransformAnimator->getPivotAnimator());
     list.append(mTransformAnimator->getRotAnimator());
+}
+
+void BoundingBox::applyParentTransform() {
+    if(!mParentTransform) return;
+    const auto parentTransform = mParentTransform->getRelativeTransform();
+    const auto thisTransform = mTransformAnimator->getRelativeTransform();
+    const auto newTransform = thisTransform*parentTransform;
+    const auto pivot = mTransformAnimator->getPivot();
+    const auto dec = MatrixDecomposition::decomposePivoted(newTransform, pivot);
+
+    mTransformAnimator->startTransformSkipOpacity();
+    mTransformAnimator->setPivot(dec.fPivotX, dec.fPivotY);
+    mTransformAnimator->setPosition(dec.fMoveX, dec.fMoveY);
+    mTransformAnimator->setScale(dec.fScaleX, dec.fScaleY);
+    mTransformAnimator->setRotation(dec.fRotation);
+    mTransformAnimator->setShear(dec.fShearX, dec.fShearY);
+    mTransformAnimator->prp_finishTransform();
+}
+
+bool BoundingBox::isTransformationStatic() const {
+    return !mTransformAnimator->anim_isRecording();
 }
 
 BasicTransformAnimator *BoundingBox::getTransformAnimator() const {

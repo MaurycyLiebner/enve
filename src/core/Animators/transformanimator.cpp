@@ -20,6 +20,7 @@
 #include "qpointfanimator.h"
 #include "MovablePoints/animatedpoint.h"
 #include "skia/skqtconversions.h"
+#include "matrixdecomposition.h"
 
 BasicTransformAnimator::BasicTransformAnimator() :
     StaticComplexAnimator("transformation") {
@@ -325,7 +326,8 @@ QMatrix BasicTransformAnimator::getTotalTransformAtFrame(
 AdvancedTransformAnimator::AdvancedTransformAnimator() {
     mShearAnimator = enve::make_shared<QPointFAnimator>("shear");
     mShearAnimator->setBaseValue(QPointF(0, 0));
-    mShearAnimator->setValuesRange(-1, 1);
+    mShearAnimator->setValuesRange(-100, 100);
+    mShearAnimator->setPrefferedValueStep(0.1);
 
     mPivotAnimator = enve::make_shared<QPointFAnimator>("pivot");
     mPivotAnimator->setBaseValue(QPointF(0, 0));
@@ -363,6 +365,10 @@ void AdvancedTransformAnimator::setOpacity(const qreal newOpacity) {
     mOpacityAnimator->setCurrentBaseValue(newOpacity);
 }
 
+void AdvancedTransformAnimator::setPivot(const qreal x, const qreal y) {
+    mPivotAnimator->setBaseValue(QPointF(x, y));
+}
+
 void AdvancedTransformAnimator::startPivotTransform() {
     if(!mPosAnimator->anim_isDescendantRecording())
         mPosAnimator->prp_startTransform();
@@ -376,32 +382,32 @@ void AdvancedTransformAnimator::finishPivotTransform() {
 }
 
 void AdvancedTransformAnimator::setPivotFixedTransform(
-        const QPointF &point) {
-    const QMatrix currentMatrix = getCurrentTransform();
-    QMatrix futureMatrix;
-    futureMatrix.translate(point.x() + mPosAnimator->getEffectiveXValue(),
-                           point.y() + mPosAnimator->getEffectiveYValue());
+        const QPointF &newPivot) {
+    TransformValues oldTransfom;
+    oldTransfom.fPivotX = mPivotAnimator->getEffectiveXValue();
+    oldTransfom.fPivotY = mPivotAnimator->getEffectiveYValue();
+    oldTransfom.fMoveX = mPosAnimator->getEffectiveXValue();
+    oldTransfom.fMoveY = mPosAnimator->getEffectiveYValue();
+    oldTransfom.fRotation = mRotAnimator->getEffectiveValue();
+    oldTransfom.fScaleX = mScaleAnimator->getEffectiveXValue();
+    oldTransfom.fScaleY = mScaleAnimator->getEffectiveYValue();
+    oldTransfom.fShearX = mShearAnimator->getEffectiveXValue();
+    oldTransfom.fShearY = mShearAnimator->getEffectiveYValue();
+    const auto newTransform = MatrixDecomposition::
+            setPivotKeepTransform(oldTransfom, newPivot);
 
-    futureMatrix.rotate(mRotAnimator->getEffectiveValue());
-    futureMatrix.scale(mScaleAnimator->getEffectiveXValue(),
-                       mScaleAnimator->getEffectiveYValue());
-    futureMatrix.shear(mShearAnimator->getEffectiveXValue(),
-                       mShearAnimator->getEffectiveYValue());
-
-    futureMatrix.translate(-point.x(), -point.y());
-
-    const qreal posXInc = currentMatrix.dx() - futureMatrix.dx();
-    const qreal posYInc = currentMatrix.dy() - futureMatrix.dy();
+    const qreal posXInc = newTransform.fMoveX - oldTransfom.fMoveX;
+    const qreal posYInc = newTransform.fMoveY - oldTransfom.fMoveY;
     const bool posAnimated = mPosAnimator->anim_isDescendantRecording();
     const bool pivotAnimated = mPivotAnimator->anim_isDescendantRecording();
     if(pivotAnimated) {
-        mPivotAnimator->setBaseValue(point);
+        mPivotAnimator->setBaseValue(newPivot);
     } else if(posAnimated && !pivotAnimated) {
         mPosAnimator->incAllBaseValues(posXInc, posYInc);
-        mPivotAnimator->setBaseValueWithoutCallingUpdater(point);
+        mPivotAnimator->setBaseValueWithoutCallingUpdater(newPivot);
     } else { // if(!posAnimated && !pivotAnimated) {
         mPosAnimator->incBaseValuesWithoutCallingUpdater(posXInc, posYInc);
-        mPivotAnimator->setBaseValueWithoutCallingUpdater(point);
+        mPivotAnimator->setBaseValueWithoutCallingUpdater(newPivot);
     }
 }
 
@@ -436,12 +442,24 @@ qreal AdvancedTransformAnimator::getPivotY() {
     return mPivotAnimator->getEffectiveYValue();
 }
 
+void AdvancedTransformAnimator::startShearTransform() {
+    mShearAnimator->prp_startTransform();
+}
+
 void AdvancedTransformAnimator::setShear(const qreal shearX, const qreal shearY) {
     mShearAnimator->setBaseValue(shearX, shearY);
 }
 
 qreal AdvancedTransformAnimator::getOpacity() {
     return mOpacityAnimator->getCurrentBaseValue();
+}
+
+void AdvancedTransformAnimator::startTransformSkipOpacity() {
+    startPosTransform();
+    startPivotTransform();
+    startRotTransform();
+    startScaleTransform();
+    startShearTransform();
 }
 
 QMatrix AdvancedTransformAnimator::getCurrentTransform() {
