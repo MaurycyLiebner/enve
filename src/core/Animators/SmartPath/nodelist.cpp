@@ -491,12 +491,15 @@ void NodeList::setPath(const SkPath &path) {
                 prevNode->disableUnnecessaryCtrls();
                 prevNode->guessCtrlsMode();
 
+                bool appendNode;
                 if(iter.peek() == SkPath::kClose_Verb && quadsCount == 0) {
-                    firstNode->setC0Enabled(true);
-                    firstNode->mC0 = c1Pt;
-                } else {
-                    prevNode = appendAndGetNode(Node(c1Pt, p2Pt, p2Pt));
-                }
+                    appendNode = !isZero4Dec(pointToLen(firstNode->p1() - p2Pt));
+                    if(!appendNode) {
+                        firstNode->setC0Enabled(true);
+                        firstNode->mC0 = c1Pt;
+                    }
+                } else appendNode = true;
+                if(appendNode) prevNode = appendAndGetNode(Node(c1Pt, p2Pt, p2Pt));
             }
                 break;
             case SkPath::kClose_Verb:
