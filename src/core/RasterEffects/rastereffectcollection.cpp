@@ -73,15 +73,16 @@ void RasterEffectCollection::updateMaxForcedMargin() {
 void RasterEffectCollection::addEffects(const qreal relFrame,
                                        BoxRenderData * const data,
                                        const qreal influence) {
+    const bool zeroInfluence = isZero4Dec(influence);
     const auto& children = ca_getChildren();
     for(const auto& effect : children) {
-        auto rasterEffect = static_cast<RasterEffect*>(effect.get());
-        if(rasterEffect->isVisible()) {
-            const auto effectRenderData = rasterEffect->getEffectCaller(
-                        relFrame, data->fResolution, influence);
-            if(!effectRenderData) continue;
-            data->addEffect(effectRenderData);
-        }
+        const auto rEffect = static_cast<RasterEffect*>(effect.get());
+        if(!rEffect->isVisible()) continue;
+        if(zeroInfluence && rEffect->skipZeroInfluence(relFrame)) continue;
+        const auto effectRenderData = rEffect->getEffectCaller(
+                    relFrame, data->fResolution, influence);
+        if(!effectRenderData) continue;
+        data->addEffect(effectRenderData);
     }
 }
 

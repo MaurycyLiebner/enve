@@ -53,10 +53,12 @@ void PathEffectCollection::readPathEffect(eReadStream& src) {
 void PathEffectCollection::addEffects(const qreal relFrame,
                                      QList<stdsptr<PathEffectCaller>>& list,
                                      const qreal influence) const {
+    const bool zeroInfluence = isZero4Dec(influence);
     const auto& children = ca_getChildren();
     for(const auto& effect : children) {
         const auto pEffect = static_cast<PathEffect*>(effect.get());
         if(!pEffect->isVisible()) continue;
+        if(zeroInfluence && pEffect->skipZeroInfluence(relFrame)) continue;
         list << pEffect->getEffectCaller(relFrame, influence);
     }
 }

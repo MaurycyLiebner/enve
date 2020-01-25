@@ -54,3 +54,8 @@ stdsptr<PathEffectCaller> DuplicatePathEffect::getEffectCaller(
     const qreal dY = mTranslation->getEffectiveYValue(relFrame)*influence;
     return enve::make_shared<DuplicateEffectCaller>(count, dX, dY);
 }
+
+bool DuplicatePathEffect::skipZeroInfluence(const qreal relFrame) const {
+    const int count = mCount->getEffectiveIntValue(relFrame);
+    return count > 0;
+}

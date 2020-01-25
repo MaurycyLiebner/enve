@@ -315,49 +315,53 @@ QMatrix TextEffect::getTransform(const qreal relFrame,
 
 void TextEffect::applyToLetter(LetterRenderData * const letterData,
                                const qreal influence) const {
-    if(isZero4Dec(influence)) return;
     const qreal relFrame = letterData->fRelFrame;
-    const qreal opacity = 1 + influence*(mTransform->getOpacity(relFrame)*0.01 - 1);
+    if(!isZero4Dec(influence)) {
+        const qreal currOpacity = mTransform->getOpacity(relFrame)*0.01;
+        const qreal opacity = 1 + influence*(currOpacity - 1);
 
-    const auto transform = getTransform(relFrame, influence,
-                                        letterData->fLetterPos);
-    letterData->applyTransform(transform);
-    letterData->fOpacity *= opacity;
-
-    {
-        mBasePathEffects->addEffects(relFrame, letterData->fPathEffects, influence);
-        mFillPathEffects->addEffects(relFrame, letterData->fFillEffects, influence);
-        mOutlineBasePathEffects->addEffects(relFrame, letterData->fOutlineBaseEffects, influence);
-        mOutlinePathEffects->addEffects(relFrame, letterData->fOutlineEffects, influence);
+        const auto transform = getTransform(relFrame, influence,
+                                            letterData->fLetterPos);
+        letterData->applyTransform(transform);
+        letterData->fOpacity *= opacity;
     }
+
+    mBasePathEffects->addEffects(relFrame, letterData->fPathEffects, influence);
+    mFillPathEffects->addEffects(relFrame, letterData->fFillEffects, influence);
+    mOutlineBasePathEffects->addEffects(relFrame, letterData->fOutlineBaseEffects, influence);
+    mOutlinePathEffects->addEffects(relFrame, letterData->fOutlineEffects, influence);
 
     mRasterEffects->addEffects(relFrame, letterData, influence);
 }
 
 void TextEffect::applyToWord(WordRenderData * const wordData,
                              const qreal influence) const {
-    if(isZero4Dec(influence)) return;
     const qreal relFrame = wordData->fRelFrame;
-    const qreal opacity = 1 + influence*(mTransform->getOpacity(relFrame)*0.01 - 1);
+    if(!isZero4Dec(influence)) {
+        const qreal currOpacity = mTransform->getOpacity(relFrame)*0.01;
+        const qreal opacity = 1 + influence*(currOpacity - 1);
 
-    const auto transform = getTransform(relFrame, influence,
-                                        wordData->fWordPos);
-    wordData->applyTransform(transform);
-    wordData->fOpacity *= opacity;
+        const auto transform = getTransform(relFrame, influence,
+                                            wordData->fWordPos);
+        wordData->applyTransform(transform);
+        wordData->fOpacity *= opacity;
+    }
 
     mRasterEffects->addEffects(relFrame, wordData, influence);
 }
 
 void TextEffect::applyToLine(LineRenderData * const lineData,
                              const qreal influence) const {
-    if(isZero4Dec(influence)) return;
     const qreal relFrame = lineData->fRelFrame;
-    const qreal opacity = 1 + influence*(mTransform->getOpacity(relFrame)*0.01 - 1);
+    if(!isZero4Dec(influence)) {
+        const qreal currOpacity = mTransform->getOpacity(relFrame)*0.01;
+        const qreal opacity = 1 + influence*(currOpacity - 1);
 
-    const auto transform = getTransform(relFrame, influence,
-                                        lineData->fLinePos);
-    lineData->applyTransform(transform);
-    lineData->fOpacity *= opacity;
+        const auto transform = getTransform(relFrame, influence,
+                                            lineData->fLinePos);
+        lineData->applyTransform(transform);
+        lineData->fOpacity *= opacity;
+    }
 
     mRasterEffects->addEffects(relFrame, lineData, influence);
 }

@@ -87,3 +87,8 @@ stdsptr<PathEffectCaller> SpatialDisplacePathEffect::getEffectCaller(
     return enve::make_shared<SpatialDisplaceEffectCaller>(
                 baseSeed, gridSize, maxDev, segLen, smooth, lengthBased);
 }
+
+bool SpatialDisplacePathEffect::skipZeroInfluence(const qreal relFrame) const {
+    Q_UNUSED(relFrame)
+    return !mLengthBased->getValue();
+}
