@@ -479,6 +479,14 @@ QMatrix AdvancedTransformAnimator::getCurrentTransform() {
     return matrix;
 }
 
+void AdvancedTransformAnimator::setValues(const TransformValues &values) {
+    setPivot(values.fPivotX, values.fPivotY);
+    setPosition(values.fMoveX, values.fMoveY);
+    setScale(values.fScaleX, values.fScaleY);
+    setRotation(values.fRotation);
+    setShear(values.fShearX, values.fShearY);
+}
+
 QMatrix AdvancedTransformAnimator::getRelativeTransformAtFrame(const qreal relFrame) {
     const qreal pivotX = mPivotAnimator->getEffectiveXValue(relFrame);
     const qreal pivotY = mPivotAnimator->getEffectiveYValue(relFrame);

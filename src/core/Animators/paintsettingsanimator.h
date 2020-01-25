@@ -27,11 +27,13 @@
 #include "paintsettings.h"
 #include "Paint/simplebrushwrapper.h"
 #include "conncontextptr.h"
+#include "transformvalues.h"
 
 class PathBox;
 class SkStroke;
 
 class GradientPoints;
+class AdvancedTransformAnimator;
 
 class PaintSettingsAnimator : public ComplexAnimator {
 protected:
@@ -59,6 +61,9 @@ public:
     QColor getColor(const qreal relFrame) const;
     GradientType getGradientType() { return mGradientType; }
     void setGradientType(const GradientType type);
+
+    QMatrix getGradientTransform(const qreal relFrame) const;
+    void setGradientTransform(const TransformValues& transform);
 private:
     GradientType mGradientType = GradientType::LINEAR;
     PaintType mPaintType = NOPAINT;
@@ -67,6 +72,7 @@ private:
     const qsptr<GradientPoints> mGradientPoints;
     qsptr<ColorAnimator> mColor = enve::make_shared<ColorAnimator>();
     ConnContextQPtr<SceneBoundGradient> mGradient;
+    qsptr<AdvancedTransformAnimator> mGradientTransform;
 };
 
 class FillSettingsAnimator : public PaintSettingsAnimator {
@@ -91,7 +97,8 @@ struct UpdatePaintSettings {
     void updateGradient(const QGradientStops &stops,
                         const QPointF &start,
                         const QPointF &finalStop,
-                        const GradientType gradientType);
+                        const GradientType gradientType,
+                        const QMatrix &transform);
     PaintType fPaintType;
     QColor fPaintColor;
     sk_sp<SkShader> fGradient;

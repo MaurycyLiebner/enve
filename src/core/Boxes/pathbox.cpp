@@ -196,7 +196,7 @@ void PathBox::setupStrokerSettings(PathBoxRenderData * const pathData,
 
 void PathBox::setupPaintSettings(PathBoxRenderData * const pathData,
                                  const qreal relFrame) {
-
+    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     UpdatePaintSettings &fillSettings = pathData->fPaintSettings;
 
     fillSettings.fPaintColor = mFillSettings->getColor(relFrame);
@@ -204,11 +204,11 @@ void PathBox::setupPaintSettings(PathBoxRenderData * const pathData,
     const auto fillGrad = mFillSettings->getGradient();
     if(fillGrad) {
         fillSettings.updateGradient(
-                    fillGrad->getQGradientStopsAtAbsFrame(
-                        prp_relFrameToAbsFrameF(relFrame)),
+                    fillGrad->getQGradientStopsAtAbsFrame(absFrame),
                     mFillGradientPoints->getStartPointAtRelFrameF(relFrame),
                     mFillGradientPoints->getEndPointAtRelFrameF(relFrame),
-                    mFillSettings->getGradientType());
+                    mFillSettings->getGradientType(),
+                    mFillSettings->getGradientTransform(relFrame));
     }
 
     UpdateStrokeSettings &strokeSettings = pathData->fStrokeSettings;
@@ -220,11 +220,11 @@ void PathBox::setupPaintSettings(PathBoxRenderData * const pathData,
     const auto strokeGrad = mStrokeSettings->getGradient();
     if(strokeSettings.fPaintType == PaintType::GRADIENTPAINT && strokeGrad) {
         strokeSettings.updateGradient(
-                    strokeGrad->getQGradientStopsAtAbsFrame(
-                        prp_relFrameToAbsFrameF(relFrame)),
-                        mStrokeGradientPoints->getStartPointAtRelFrameF(relFrame),
-                        mStrokeGradientPoints->getEndPointAtRelFrameF(relFrame),
-                        mStrokeSettings->getGradientType());
+                    strokeGrad->getQGradientStopsAtAbsFrame(absFrame),
+                    mStrokeGradientPoints->getStartPointAtRelFrameF(relFrame),
+                    mStrokeGradientPoints->getEndPointAtRelFrameF(relFrame),
+                    mStrokeSettings->getGradientType(),
+                    mStrokeSettings->getGradientTransform(relFrame));
     }
 
     const auto brushSettings = mStrokeSettings->getBrushSettings();

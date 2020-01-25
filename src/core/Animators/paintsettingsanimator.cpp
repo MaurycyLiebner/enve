@@ -24,12 +24,15 @@
 #include "gradient.h"
 #include "Private/document.h"
 #include "canvas.h"
+#include "transformanimator.h"
 
 PaintSettingsAnimator::PaintSettingsAnimator(const QString &name,
                                              const qsptr<GradientPoints>& grdPts,
                                              PathBox * const parent) :
     ComplexAnimator(name),
-    mTarget_k(parent), mGradientPoints(grdPts) {}
+    mTarget_k(parent), mGradientPoints(grdPts) {
+    mGradientTransform = enve::make_shared<AdvancedTransformAnimator>();
+}
 
 void PaintSettingsAnimator::prp_writeProperty(eWriteStream& dst) const {
     mColor->prp_writeProperty(dst);
@@ -40,6 +43,7 @@ void PaintSettingsAnimator::prp_writeProperty(eWriteStream& dst) const {
     dst << gradRWId;
     dst << gradDocId;
     mGradientPoints->prp_writeProperty(dst);
+    mGradientTransform->prp_writeProperty(dst);
 }
 
 #include "simpletask.h"
@@ -51,6 +55,9 @@ void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
     int gradRWId; src >> gradRWId;
     int gradDocId; src >> gradDocId;
     mGradientPoints->prp_readProperty(src);
+    if(src.evFileVersion() > 7) {
+        mGradientTransform->prp_readProperty(src);
+    }
     setPaintType(paintType);
     SimpleTask::sSchedule([this, gradRWId, gradDocId]() {
         const auto parentScene = getParentScene();
@@ -69,11 +76,13 @@ void PaintSettingsAnimator::setGradientVar(SceneBoundGradient* const grad) {
     if(mGradient) {
         ca_removeChild(mGradient->ref<SceneBoundGradient>());
         ca_removeChild(mGradientPoints);
+        ca_removeChild(mGradientTransform);
     }
     auto& conn = mGradient.assign(grad);
     if(grad) {
         ca_addChild(grad->ref<SceneBoundGradient>());
         ca_addChild(mGradientPoints);
+        ca_addChild(mGradientTransform);
         conn << connect(grad, &SceneBoundGradient::prp_currentFrameChanged,
                         this, [this]() { mTarget_k->updateDrawGradients(); });
         conn << connect(grad, &Gradient::removed,
@@ -107,6 +116,14 @@ void PaintSettingsAnimator::setGradientType(const GradientType type) {
     }
     mGradientType = type;
     prp_afterWholeInfluenceRangeChanged();
+}
+
+QMatrix PaintSettingsAnimator::getGradientTransform(const qreal relFrame) const {
+    return mGradientTransform->getRelativeTransformAtFrame(relFrame);
+}
+
+void PaintSettingsAnimator::setGradientTransform(const TransformValues &transform) {
+    mGradientTransform->setValues(transform);
 }
 
 PaintType PaintSettingsAnimator::getPaintType() const {
@@ -213,16 +230,21 @@ void UpdatePaintSettings::applyPainterSettingsSk(SkPaint *paint) {
 void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
                                          const QPointF &start,
                                          const QPointF &finalStop,
-                                         const GradientType gradientType) {
+                                         const GradientType gradientType,
+                                         const QMatrix& transform) {
     const int nStops = stops.count();
     QVector<SkPoint> gradPoints(nStops);
     QVector<SkColor> gradColors(nStops);
     QVector<float> gradPos(nStops);
 
-    const float xInc = static_cast<float>(finalStop.x() - start.x());
-    const float yInc = static_cast<float>(finalStop.y() - start.y());
-    float currX = static_cast<float>(start.x());
-    float currY = static_cast<float>(start.y());
+    const QMatrix invertedTransform = transform.inverted();
+    const QPointF mappedStart = invertedTransform.map(start);
+    const QPointF mappedEnd = invertedTransform.map(finalStop);
+
+    const float xInc = static_cast<float>(mappedEnd.x() - mappedStart.x());
+    const float yInc = static_cast<float>(mappedEnd.y() - mappedStart.y());
+    float currX = static_cast<float>(mappedStart.x());
+    float currY = static_cast<float>(mappedStart.y());
     float currT = 0;
     const float tInc = 1.f/(nStops - 1);
 
@@ -237,18 +259,21 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
         currY += yInc;
         currT += tInc;
     }
+    const SkMatrix skTransform = toSkMatrix(transform);
     if(gradientType == GradientType::LINEAR) {
         fGradient = SkGradientShader::MakeLinear(gradPoints.data(),
                                                  gradColors.data(),
                                                  gradPos.data(), nStops,
-                                                 SkTileMode::kClamp);
+                                                 SkTileMode::kClamp,
+                                                 0, &skTransform);
     } else {
-        const QPointF distPt = finalStop - start;
+        const QPointF distPt = mappedEnd - mappedStart;
         const qreal radius = qSqrt(pow2(distPt.x()) + pow2(distPt.y()));
         fGradient = SkGradientShader::MakeRadial(
                         toSkPoint(start), toSkScalar(radius),
                         gradColors.data(), gradPos.data(),
-                        nStops, SkTileMode::kClamp);
+                        nStops, SkTileMode::kClamp,
+                        0, &skTransform);
     }
 }
 

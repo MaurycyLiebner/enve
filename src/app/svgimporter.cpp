@@ -84,6 +84,7 @@ protected:
     SceneBoundGradient *mGradient = nullptr;
     QPointF mGradientP1;
     QPointF mGradientP2;
+    QMatrix mGradientTransform;
 };
 
 class StrokeSvgAttributes : public FillSvgAttributes {
@@ -1024,7 +1025,6 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
         const QString y2 = element.attribute("y2");
         const QString gradTrans = element.attribute("gradientTransform");
         const QMatrix trans = getMatrixFromString(gradTrans);
-
         gGradients.insert(id, {gradient,
                                toDouble(x1), toDouble(y1),
                                toDouble(x2), toDouble(y2),
@@ -1408,6 +1408,7 @@ void FillSvgAttributes::setGradient(const SvgGradient& gradient) {
     mGradient = gradient.fGradient;
     mGradientP1 = gradient.fTrans.map(QPointF{gradient.fX1, gradient.fY1});
     mGradientP2 = gradient.fTrans.map(QPointF{gradient.fX2, gradient.fY2});
+    mGradientTransform = gradient.fTrans;
     if(!mGradient) return;
     setPaintType(GRADIENTPAINT);
 }
@@ -1435,6 +1436,7 @@ void FillSvgAttributes::apply(BoundingBox * const box,
     } else if(mPaintType == GRADIENTPAINT) {
         GradientPaintSetting(target, mGradient).apply(pathBox);
         GradientPtsPosSetting(target, mGradientP1, mGradientP2).apply(pathBox);
+        GradientTransformSetting(target, mGradientTransform).apply(pathBox);
     }
     PaintTypePaintSetting(target, mPaintType).apply(pathBox);
 }

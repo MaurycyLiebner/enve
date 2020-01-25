@@ -19,6 +19,7 @@
 #include <QMatrix>
 #include "staticcomplexanimator.h"
 #include "../skia/skiaincludes.h"
+#include "transformvalues.h"
 
 class TransformUpdater;
 class BoxPathPoint;
@@ -134,6 +135,8 @@ public:
     void reset();
     QMatrix getRelativeTransformAtFrame(const qreal relFrame);
     QMatrix getCurrentTransform();
+
+    void setValues(const TransformValues& values);
 
     void resetShear();
     void resetPivot();

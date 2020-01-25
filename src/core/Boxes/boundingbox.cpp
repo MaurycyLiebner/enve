@@ -724,11 +724,7 @@ void BoundingBox::applyParentTransform() {
     const auto dec = MatrixDecomposition::decomposePivoted(newTransform, pivot);
 
     mTransformAnimator->startTransformSkipOpacity();
-    mTransformAnimator->setPivot(dec.fPivotX, dec.fPivotY);
-    mTransformAnimator->setPosition(dec.fMoveX, dec.fMoveY);
-    mTransformAnimator->setScale(dec.fScaleX, dec.fScaleY);
-    mTransformAnimator->setRotation(dec.fRotation);
-    mTransformAnimator->setShear(dec.fShearX, dec.fShearY);
+    mTransformAnimator->setValues(dec);
     mTransformAnimator->prp_finishTransform();
 }
 

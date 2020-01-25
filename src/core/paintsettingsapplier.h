@@ -22,6 +22,7 @@
 #include "Boxes/pathbox.h"
 #include "Animators/gradient.h"
 #include "Animators/outlinesettingsanimator.h"
+#include "matrixdecomposition.h"
 class ColorAnimator;
 class SceneBoundGradient;
 class PathBox;
@@ -87,6 +88,20 @@ protected:
 private:
     const QPointF mPt1;
     const QPointF mPt2;
+};
+
+class GradientTransformSetting : public PaintSetting {
+public:
+    GradientTransformSetting(const Target& target,
+                             const QMatrix& trans) :
+        PaintSetting(target), mTransform(trans) {}
+protected:
+    void applyToPS(PaintSettingsAnimator * const target) const {
+        const auto dec = MatrixDecomposition::decompose(mTransform);
+        target->setGradientTransform(dec);
+    }
+private:
+    const QMatrix mTransform;
 };
 
 class GradientTypePaintSetting : public PaintSetting {
