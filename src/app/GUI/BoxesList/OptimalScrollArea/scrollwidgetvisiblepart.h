@@ -64,23 +64,29 @@ public:
     }
 protected:
     void setupUpdateFuncs() {
+        const QPointer<ScrollWidgetVisiblePart> thisQPtr = this;
         mUpdateFuncs.fContentUpdateIfIsCurrentRule =
-                [this](const SWT_BoxRule rule) {
-            scheduleContentUpdateIfIsCurrentRule(rule);
+                [thisQPtr](const SWT_BoxRule rule) {
+            if(!thisQPtr) return;
+            thisQPtr->scheduleContentUpdateIfIsCurrentRule(rule);
         };
         mUpdateFuncs.fContentUpdateIfIsCurrentTarget =
-                [this](SingleWidgetTarget* targetP,
+                [thisQPtr](SingleWidgetTarget* targetP,
                        const SWT_Target target) {
-            scheduleContentUpdateIfIsCurrentTarget(targetP, target);
+            if(!thisQPtr) return;
+            thisQPtr->scheduleContentUpdateIfIsCurrentTarget(targetP, target);
         };
-        mUpdateFuncs.fContentUpdateIfSearchNotEmpty = [this]() {
-            scheduleContentUpdateIfSearchNotEmpty();
+        mUpdateFuncs.fContentUpdateIfSearchNotEmpty = [thisQPtr]() {
+            if(!thisQPtr) return;
+            thisQPtr->scheduleContentUpdateIfSearchNotEmpty();
         };
-        mUpdateFuncs.fUpdateParentHeight = [this]() {
-            planScheduleUpdateParentHeight();
+        mUpdateFuncs.fUpdateParentHeight = [thisQPtr]() {
+            if(!thisQPtr) return;
+            thisQPtr->planScheduleUpdateParentHeight();
         };
-        mUpdateFuncs.fUpdateVisibleWidgetsContent = [this]() {
-            planScheduleUpdateVisibleWidgetsContent();
+        mUpdateFuncs.fUpdateVisibleWidgetsContent = [thisQPtr]() {
+            if(!thisQPtr) return;
+            thisQPtr->planScheduleUpdateVisibleWidgetsContent();
         };
     }
 
