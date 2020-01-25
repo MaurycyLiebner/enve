@@ -60,7 +60,9 @@ void EnveSplash::drawContents(QPainter * const p) {
                 Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, mText);
     p->drawText(mMessageRect, Qt::AlignCenter, message());
     p->setPen(QColor(Qt::gray));
-    p->drawText(mSponsorsRect, Qt::AlignVCenter, "Sponsors: Stian Andreassen");
+    p->drawText(mSponsorsRect, Qt::AlignVCenter, "Sponsors: "
+                                                 "Stian Andreassen, "
+                                                 "Hugo Locurcio");
     p->drawText(mBottomRect, Qt::AlignVCenter | Qt::AlignLeft, "Maurycy Liebner");
     QString rightTxt;
 #if defined(LATEST_COMMIT_HASH) && defined(LATEST_COMMIT_DATE)
