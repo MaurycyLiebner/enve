@@ -15,8 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "boolpropertywidget.h"
-#include "Properties/boolproperty.h"
-#include "Properties/boolpropertycontainer.h"
 #include "GUI/mainwindow.h"
 #include "GUI/global.h"
 
@@ -46,7 +44,7 @@ void BoolPropertyWidget::mousePressEvent(QMouseEvent *) {
 }
 
 void BoolPropertyWidget::paintEvent(QPaintEvent *) {
-    if(mTarget == nullptr && mTargetContainer == nullptr) return;
+    if(!mTarget && !mTargetContainer) return;
     QPainter p(this);
     if(mTarget) {
         if(mTarget->SWT_isDisabled()) p.setOpacity(.5);
@@ -64,13 +62,13 @@ void BoolPropertyWidget::paintEvent(QPaintEvent *) {
 
     p.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 5., 5.);
 
-    bool valueT;
-    if(!mTarget) {
-        valueT = mTargetContainer->getValue();
+    bool value;
+    if(mTargetContainer) {
+        value = mTargetContainer->getValue();
     } else {
-        valueT = mTarget->getValue();
+        value = mTarget->getValue();
     }
-    if(valueT) {
+    if(value) {
         p.setPen(QPen(Qt::black, 2.));
         p.drawLine(QPoint(6, height()/2), QPoint(width()/2, height() - 6));
         p.drawLine(QPoint(width()/2, height() - 6), QPoint(width() - 6, 6));

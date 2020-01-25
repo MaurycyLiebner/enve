@@ -17,9 +17,9 @@
 #ifndef BOOLPROPERTYWIDGET_H
 #define BOOLPROPERTYWIDGET_H
 
-#include <QCheckBox>
-class BoolProperty;
-class BoolPropertyContainer;
+#include <QWidget>
+#include "Properties/boolproperty.h"
+#include "Properties/boolpropertycontainer.h"
 
 class BoolPropertyWidget : public QWidget {
     Q_OBJECT
@@ -35,8 +35,8 @@ protected:
     void leaveEvent(QEvent *);
 private:
     bool mHovered = false;
-    BoolProperty *mTarget = nullptr;
-    BoolPropertyContainer *mTargetContainer = nullptr;
+    qptr<BoolProperty> mTarget;
+    qptr<BoolPropertyContainer> mTargetContainer;
 };
 
 #endif // BOOLPROPERTYWIDGET_H
