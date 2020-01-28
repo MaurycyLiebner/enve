@@ -14,30 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SWITCHBUTTON_H
-#define SWITCHBUTTON_H
+#ifndef SCULPTPATHANIMATOR_H
+#define SCULPTPATHANIMATOR_H
 
-#include "buttonbase.h"
+#include "sculptpath.h"
+#include "../interoptimalanimatort.h"
 
-class SwitchButton : public ButtonBase {
-    Q_OBJECT
+class SculptPathAnimator : public InterOptimalAnimatorT<SculptPath> {
 public:
-    SwitchButton(const QString &toolTip, QWidget *parent);
-    ~SwitchButton();
+    SculptPathAnimator();
 
-    static SwitchButton* sCreate2Switch(
-            const QString &icon0, const QString &icon1,
-            const QString &toolTip, QWidget *parent);
+    void prp_drawCanvasControls(SkCanvas * const canvas,
+                                const CanvasMode mode,
+                                const float invScale,
+                                const bool ctrlPressed);
 
-    int addState(const QString& icon);
+    void sculpt(const SculptTarget target,
+                const SculptMode mode,
+                const SculptBrush &brush);
 
-    bool setState(const int state);
-    void toggle();
-private:
-    QList<QImage*> mStates;
-    int mCurrentState = -1;
-signals:
-    void toggled(int);
+    void applyTransform(const QMatrix &transform);
 };
 
-#endif // SWITCHBUTTON_H
+#endif // SCULPTPATHANIMATOR_H

@@ -307,3 +307,16 @@ RESOURCES += brushesRamon
 
 brushesTanda.files = $$files(brushes/Tanda/*)
 RESOURCES += brushesTanda
+
+DISTFILES += \
+    icons/toolbarButtons/checkable/color \
+    icons/toolbarButtons/checkable/position \
+    icons/toolbarButtons/checkable/pressure \
+    icons/toolbarButtons/checkable/sculpt+ \
+    icons/toolbarButtons/checkable/sculpt- \
+    icons/toolbarButtons/checkable/sculpt<- \
+    icons/toolbarButtons/checkable/sculpt= \
+    icons/toolbarButtons/checkable/sculptUnchecked \
+    icons/toolbarButtons/checkable/spacing \
+    icons/toolbarButtons/checkable/time \
+    icons/toolbarButtons/checkable/width

@@ -953,6 +953,7 @@ void ContainerBox::writeBoundingBox(eWriteStream& dst) {
 #include "internallinkcanvas.h"
 #include "internallinkbox.h"
 #include "customboxcreator.h"
+#include "sculptpathbox.h"
 
 qsptr<BoundingBox> readIdCreateBox(eReadStream& src) {
     eBoxType type;
@@ -989,11 +990,12 @@ qsptr<BoundingBox> readIdCreateBox(eReadStream& src) {
         case(eBoxType::custom): {
             const auto id = CustomIdentifier::sRead(src);
             return CustomBoxCreator::sCreateForIdentifier(id);
-        } default: {
-            const int typeId = static_cast<int>(type);
-            RuntimeThrow("Invalid box type '" + std::to_string(typeId) + "'");
-        }
+        } case(eBoxType::sculptPath):
+            return enve::make_shared<SculptPathBox>();
+        case(eBoxType::canvas) : break;
     }
+    const int typeId = static_cast<int>(type);
+    RuntimeThrow("Invalid box type '" + std::to_string(typeId) + "'");
 }
 
 void ContainerBox::readContained(eReadStream& src) {

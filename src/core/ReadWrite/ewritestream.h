@@ -64,10 +64,17 @@ public:
     eWriteStream& operator<<(const iValueRange val);
     eWriteStream& operator<<(const qreal val);
     eWriteStream& operator<<(const QPointF& val);
+    eWriteStream& operator<<(const QRectF& val);
     eWriteStream& operator<<(const QMatrix& val);
     eWriteStream& operator<<(const QColor& val);
     eWriteStream& operator<<(const QString& val);
     eWriteStream& operator<<(SimpleBrushWrapper* const brush);
+
+    template <typename T>
+    eWriteStream& operator<<(const T& value) {
+        value.write(*this);
+        return *this;
+    }
 private:
     QIODevice* const mDst;
     eWriteFutureTable mFutureTable;

@@ -721,6 +721,10 @@ void Actions::setPaintMode() {
     mDocument.setCanvasMode(CanvasMode::paint);
 }
 
+void Actions::setSculptMode() {
+    mDocument.setCanvasMode(CanvasMode::sculptPath);
+}
+
 void Actions::finishSmoothChange() {
     mSmoothChange = false;
     //    mDocument.actionFinished();

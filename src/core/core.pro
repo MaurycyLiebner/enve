@@ -66,6 +66,11 @@ QMAKE_CXXFLAGS += -fopenmp
 LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 
 SOURCES += \
+    Animators/SculptPath/sculptbrush.cpp \
+    Animators/SculptPath/sculptnode.cpp \
+    Animators/SculptPath/sculptnodebase.cpp \
+    Animators/SculptPath/sculptpath.cpp \
+    Animators/SculptPath/sculptpathanimator.cpp \
     Animators/SmartPath/listofnodes.cpp \
     Animators/SmartPath/smartpath.cpp \
     Animators/SmartPath/smartpathanimatoractions.cpp \
@@ -114,6 +119,8 @@ SOURCES += \
     Boxes/patheffectsmenu.cpp \
     Boxes/rectangle.cpp \
     Boxes/renderdatahandler.cpp \
+    Boxes/sculptpathbox.cpp \
+    Boxes/sculptpathboxrenderdata.cpp \
     Boxes/smartvectorpath.cpp \
     Boxes/textbox.cpp \
     Boxes/textboxrenderdata.cpp \
@@ -322,6 +329,11 @@ SOURCES += \
     typemenu.cpp
 
 HEADERS += \
+    Animators/SculptPath/sculptbrush.h \
+    Animators/SculptPath/sculptnode.h \
+    Animators/SculptPath/sculptnodebase.h \
+    Animators/SculptPath/sculptpath.h \
+    Animators/SculptPath/sculptpathanimator.h \
     Animators/SmartPath/listofnodes.h \
     Animators/SmartPath/smartpath.h \
     Animators/brushsettingsanimator.h \
@@ -334,6 +346,7 @@ HEADERS += \
     Animators/eeffect.h \
     Animators/gradient.h \
     Animators/gradientpoints.h \
+    Animators/interoptimalanimatort.h \
     Animators/outlinesettingsanimator.h \
     Animators/overlappingkeylist.h \
     Animators/overlappingkeys.h \
@@ -371,6 +384,8 @@ HEADERS += \
     Boxes/patheffectsmenu.h \
     Boxes/rectangle.h \
     Boxes/renderdatahandler.h \
+    Boxes/sculptpathbox.h \
+    Boxes/sculptpathboxrenderdata.h \
     Boxes/smartvectorpath.h \
     Boxes/textbox.h \
     Boxes/textboxrenderdata.h \

@@ -14,30 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SWITCHBUTTON_H
-#define SWITCHBUTTON_H
+#ifndef SCULPTPATHBOXRENDERDATA_H
+#define SCULPTPATHBOXRENDERDATA_H
 
-#include "buttonbase.h"
+#include "boxrenderdata.h"
+#include "Animators/SculptPath/sculptpath.h"
 
-class SwitchButton : public ButtonBase {
-    Q_OBJECT
+class SculptPathBox;
+
+class SculptPathBoxRenderData : public BoxRenderData {
 public:
-    SwitchButton(const QString &toolTip, QWidget *parent);
-    ~SwitchButton();
+    SculptPathBoxRenderData(SculptPathBox* const parent);
 
-    static SwitchButton* sCreate2Switch(
-            const QString &icon0, const QString &icon1,
-            const QString &toolTip, QWidget *parent);
+    void updateRelBoundingRect();
 
-    int addState(const QString& icon);
-
-    bool setState(const int state);
-    void toggle();
-private:
-    QList<QImage*> mStates;
-    int mCurrentState = -1;
-signals:
-    void toggled(int);
+    QColor fColor;
+    qreal fWidth;
+    SculptPath fPath;
+    stdsptr<SimpleBrushWrapper> fBrush;
+protected:
+    void drawSk(SkCanvas * const canvas);
 };
 
-#endif // SWITCHBUTTON_H
+#endif // SCULPTPATHBOXRENDERDATA_H

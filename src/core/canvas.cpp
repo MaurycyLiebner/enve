@@ -96,6 +96,13 @@ void Canvas::setCurrentGroupParentAsCurrentGroup() {
     setCurrentBoxesGroup(mCurrentContainer->getParentGroup());
 }
 
+bool Canvas::hasValidSculptTarget() const {
+    for(const auto& box : mSelectedBoxes) {
+        if(box->SWT_isSculptPathBox()) return true;
+    }
+    return false;
+}
+
 void Canvas::queTasks() {
     if(Actions::sInstance->smoothChange() && mCurrentContainer) {
         if(!mDrawnSinceQue) return;

@@ -255,14 +255,15 @@ private:
     SwitchButton *mBoxTransformMode;
     SwitchButton *mPointTransformMode;
     SwitchButton *mAddPointMode;
-    SwitchButton *mPickPaintSettingsMode;
-
-    SwitchButton *mCircleMode;
-//
-    SwitchButton *mRectangleMode;
-    SwitchButton *mTextMode;
     SwitchButton *mPaintMode;
 //
+    SwitchButton *mSculptMode;
+    SwitchButton *mCircleMode;
+    SwitchButton *mRectangleMode;
+    SwitchButton *mTextMode;
+//
+    SwitchButton *mPickPaintSettingsMode;
+
     ActionButton *mActionConnectPoints;
     ActionButton *mActionDisconnectPoints;
     ActionButton *mActionMergePoints;

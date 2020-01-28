@@ -78,6 +78,11 @@ eReadStream &eReadStream::operator>>(QPointF &val) {
     return *this;
 }
 
+eReadStream &eReadStream::operator>>(QRectF &val) {
+    read(&val, sizeof(QRectF));
+    return *this;
+}
+
 eReadStream &eReadStream::operator>>(QMatrix &val) {
     read(&val, sizeof(QMatrix));
     return *this;

@@ -138,6 +138,9 @@ struct qValueRange {
         return fMax > fMin;
     }
 
+    qreal clamp(const qreal value) const
+    { return qBound(fMin, value, fMax); }
+
     bool inRange(const qreal val) const {
         return val >= fMin && val <= fMax;
     }

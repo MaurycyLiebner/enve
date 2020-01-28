@@ -215,7 +215,7 @@ void QDoubleSlider::setDisplayedValue(qreal value) {
 }
 
 void QDoubleSlider::fitWidthToContent() {
-    QFontMetrics fm = QFontMetrics(QFont());
+    const QFontMetrics fm(QApplication::font());
     QString textMax;
     QString textMin;
     if(mShowName) {
@@ -228,9 +228,8 @@ void QDoubleSlider::fitWidthToContent() {
     int textWidth = qMax(fm.width(textMax), fm.width(textMin));
     int newWidth = qMin(3*MIN_WIDGET_DIM,
                         textWidth + textWidth%2 + MIN_WIDGET_DIM/2);
-    int minWidth = qMax(0, newWidth - MIN_WIDGET_DIM);
-    setMinimumWidth(minWidth);
-    mLineEdit->setMinimumWidth(minWidth);
+    setMinimumWidth(newWidth);
+    mLineEdit->setMinimumWidth(newWidth);
     setMaximumWidth(newWidth);
     mLineEdit->setMaximumWidth(newWidth);
 }

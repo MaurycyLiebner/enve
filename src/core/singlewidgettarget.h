@@ -118,6 +118,7 @@ public:
     virtual bool SWT_isVideoBox() const { return false; }
     virtual bool SWT_isPaintBox() const { return false; }
     virtual bool SWT_isSmartVectorPath() const { return false; }
+    virtual bool SWT_isSculptPathBox() const { return false; }
     // Properties
     virtual bool SWT_isBoolProperty() const { return false; }
     virtual bool SWT_isBoolPropertyContainer() const { return false; }

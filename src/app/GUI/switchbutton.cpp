@@ -38,6 +38,7 @@ SwitchButton *SwitchButton::sCreate2Switch(
 bool SwitchButton::setState(const int state) {
     if(state < 0) return false;
     if(state >= mStates.count()) return false;
+    if(mCurrentState == state) return false;
     mCurrentState = state;
     setCurrentIcon(*mStates.at(mCurrentState));
     return true;
@@ -50,8 +51,8 @@ int SwitchButton::addState(const QString &icon) {
 }
 
 void SwitchButton::toggle() {
-    mCurrentState++;
-    if(mCurrentState >= mStates.count()) mCurrentState = 0;
-    setCurrentIcon(*mStates.at(mCurrentState));
+    int state = mCurrentState + 1;
+    if(state >= mStates.count()) state = 0;
+    setState(state);
     emit toggled(mCurrentState);
 }

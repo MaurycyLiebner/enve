@@ -88,6 +88,11 @@ eWriteStream &eWriteStream::operator<<(const QPointF &val) {
     return *this;
 }
 
+eWriteStream &eWriteStream::operator<<(const QRectF &val) {
+    write(&val, sizeof(QRectF));
+    return *this;
+}
+
 eWriteStream &eWriteStream::operator<<(const QMatrix &val) {
     write(&val, sizeof(QMatrix));
     return *this;

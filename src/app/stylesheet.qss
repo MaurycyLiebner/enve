@@ -4,6 +4,16 @@ QWidget {
     outline: 0;
 }
 
+QWidget#transparentWidget {
+    background: transparent;
+}
+
+QWidget#colorLabel {
+   background: black;
+   border: 1px solid black;
+   padding-left: -1px;
+}
+
 QMainWindow::separator {
     background: rgb(30, 30, 30);
     width: 8px;

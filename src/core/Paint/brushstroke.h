@@ -39,12 +39,29 @@ struct BrushStroke {
     qCubicSegment1D fTimeCurve;
     qCubicSegment1D fWidthCurve;
     qCubicSegment1D fSpacingCurve;
+    bool fUseColor = false;
+    QColor fColor = Qt::black;
 private:
     QRect execute(MyPaintBrush * const brush,
                   MyPaintSurface * const surface,
                   const bool press,
                   double dLen) {
         QRect changedRect;
+        if(fUseColor) {
+            mypaint_brush_set_base_value(brush,
+                                         MYPAINT_BRUSH_SETTING_COLOR_H,
+                                         fColor.hueF());
+            mypaint_brush_set_base_value(brush,
+                                         MYPAINT_BRUSH_SETTING_COLOR_S,
+                                         fColor.saturationF());
+            mypaint_brush_set_base_value(brush,
+                                         MYPAINT_BRUSH_SETTING_COLOR_V,
+                                         fColor.valueF());
+            mypaint_brush_set_base_value(brush,
+                                         MYPAINT_BRUSH_SETTING_OPAQUE,
+                                         fColor.alphaF());
+        }
+
         if(press) changedRect = executePress(brush, surface);
         const double totalLength = fStrokePath.length();
         const int iMax = qCeil(totalLength/dLen);
@@ -77,6 +94,7 @@ private:
         mypaint_brush_set_base_value(brush,
                                      MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
                                      qLn(width));
+
         mypaint_surface_begin_atomic(surface);
         mypaint_brush_stroke_to(brush, surface, pos.x(), pos.y(), pressure,
                                 xTilt, yTilt, time*lenFrag);
@@ -107,7 +125,7 @@ private:
 
         mypaint_surface_begin_atomic(surface);
         mypaint_brush_stroke_to(brush, surface, pos.x(), pos.y(), pressure,
-                                xTilt, yTilt, 0.1);
+                                xTilt, yTilt, 1);
         MyPaintRectangle roi;
         mypaint_surface_end_atomic(surface, &roi);
         return QRect(roi.x, roi.y, roi.width, roi.height);

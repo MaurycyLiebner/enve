@@ -52,10 +52,17 @@ public:
     eReadStream& operator>>(iValueRange& val);
     eReadStream& operator>>(qreal &val);
     eReadStream& operator>>(QPointF &val);
+    eReadStream& operator>>(QRectF &val);
     eReadStream& operator>>(QMatrix &val);
     eReadStream& operator>>(QColor& val);
     eReadStream& operator>>(QString &val);
     eReadStream& operator>>(SimpleBrushWrapper*& brush);
+
+    template <typename T>
+    eReadStream& operator>>(T& value) {
+        value.read(*this);
+        return *this;
+    }
 
     int evFileVersion() const;
 private:

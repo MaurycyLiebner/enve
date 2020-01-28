@@ -66,7 +66,8 @@ enum class eBoxType {
     imageSequence,
     paint,
     group,
-    custom
+    custom,
+    sculptPath
 };
 
 class BoundingBox;

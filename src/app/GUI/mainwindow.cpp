@@ -769,11 +769,11 @@ void MainWindow::setupToolBar() {
 
     mToolBar->addSeparator();
 
-    mPickPaintSettingsMode = SwitchButton::sCreate2Switch(
-                iconsDir + "/pickUnchecked.png",
-                iconsDir + "/pickChecked.png",
-                gSingleLineTooltip("Pick Mode", "F5"), this);
-    mToolBar->addWidget(mPickPaintSettingsMode);
+    mSculptMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/sculptUnchecked.png",
+                iconsDir + "/sculptChecked.png",
+                gSingleLineTooltip("Sculpt Path Mode", "F5"), this);
+    mToolBar->addWidget(mSculptMode);
 
     mCircleMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/circleCreateUnchecked.png",
@@ -793,7 +793,13 @@ void MainWindow::setupToolBar() {
                 gSingleLineTooltip("Add Text Mode", "F8"), this);
     mToolBar->addWidget(mTextMode);
 
-//    mToolBar->addSeparator();
+    mToolBar->addSeparator();
+
+    mPickPaintSettingsMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/pickUnchecked.png",
+                iconsDir + "/pickChecked.png",
+                gSingleLineTooltip("Pick Mode", "F9"), this);
+    mToolBar->addWidget(mPickPaintSettingsMode);
 
     mToolBar->widgetForAction(mToolBar->addAction("     "))->
             setObjectName("emptyToolButton");
@@ -864,16 +870,20 @@ void MainWindow::connectToolBarActions() {
             &mActions, &Actions::setMovePointMode);
     connect(mAddPointMode, &ActionButton::pressed,
             &mActions, &Actions::setAddPointMode);
-    connect(mPickPaintSettingsMode, &ActionButton::pressed,
-            &mActions, &Actions::setPickPaintSettingsMode);
+    connect(mPaintMode, &ActionButton::pressed,
+            &mActions, &Actions::setPaintMode);
+
+    connect(mSculptMode, &ActionButton::pressed,
+            &mActions, &Actions::setSculptMode);
     connect(mCircleMode, &ActionButton::pressed,
             &mActions, &Actions::setCircleMode);
     connect(mRectangleMode, &ActionButton::pressed,
             &mActions, &Actions::setRectangleMode);
     connect(mTextMode, &ActionButton::pressed,
             &mActions, &Actions::setTextMode);
-    connect(mPaintMode, &ActionButton::pressed,
-            &mActions, &Actions::setPaintMode);
+
+    connect(mPickPaintSettingsMode, &ActionButton::pressed,
+            &mActions, &Actions::setPickPaintSettingsMode);
 
     connect(mActionConnectPoints, &ActionButton::pressed,
             &mActions, &Actions::connectPointsSlot);
@@ -916,14 +926,18 @@ MainWindow *MainWindow::sGetInstance() {
 void MainWindow::updateCanvasModeButtonsChecked() {
     const CanvasMode mode = mDocument.fCanvasMode;
     mCentralWidget->setCanvasMode(mode);
+
     mBoxTransformMode->setState(mode == CanvasMode::boxTransform);
     mPointTransformMode->setState(mode == CanvasMode::pointTransform);
     mAddPointMode->setState(mode == CanvasMode::pathCreate);
-    mPickPaintSettingsMode->setState(mode == CanvasMode::pickFillStroke);
+    mPaintMode->setState(mode == CanvasMode::paint);
+
+    mSculptMode->setState(mode == CanvasMode::sculptPath);
     mCircleMode->setState(mode == CanvasMode::circleCreate);
     mRectangleMode->setState(mode == CanvasMode::rectCreate);
     mTextMode->setState(mode == CanvasMode::textCreate);
-    mPaintMode->setState(mode == CanvasMode::paint);
+
+    mPickPaintSettingsMode->setState(mode == CanvasMode::pickFillStroke);
 
     const bool boxMode = mode == CanvasMode::boxTransform;
     mFontWidgetAct->setVisible(boxMode);
@@ -1055,13 +1069,15 @@ bool handleCanvasModeKeyPress(Document& document, const int key) {
     }  else if(key == Qt::Key_F4) {
         document.setCanvasMode(CanvasMode::paint);
     } else if(key == Qt::Key_F5) {
-        document.setCanvasMode(CanvasMode::pickFillStroke);
+        document.setCanvasMode(CanvasMode::sculptPath);
     } else if(key == Qt::Key_F6) {
         document.setCanvasMode(CanvasMode::circleCreate);
     } else if(key == Qt::Key_F7) {
         document.setCanvasMode(CanvasMode::rectCreate);
     } else if(key == Qt::Key_F8) {
         document.setCanvasMode(CanvasMode::textCreate);
+    } else if(key == Qt::Key_F9) {
+        document.setCanvasMode(CanvasMode::pickFillStroke);
     } else return false;
     KeyFocusTarget::KFT_sSetRandomTarget();
     return true;

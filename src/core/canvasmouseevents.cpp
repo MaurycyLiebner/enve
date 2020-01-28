@@ -16,11 +16,24 @@
 
 #include "canvas.h"
 #include "Boxes/paintbox.h"
+#include "Boxes/sculptpathbox.h"
+#include "Animators/SculptPath/sculptbrush.h"
 #include "Boxes/textbox.h"
 #include "Boxes/rectangle.h"
 #include "Boxes/circle.h"
 #include "Private/document.h"
 #include "MovablePoints/pathpivot.h"
+
+void Canvas::newSculptPathBox(const QPointF &pos) {
+    const auto sculptBox = enve::make_shared<SculptPathBox>();
+    sculptBox->setStrokeBrush(mDocument.fBrush);
+    sculptBox->planCenterPivotPosition();
+    mCurrentContainer->addContained(sculptBox);
+    sculptBox->setAbsolutePos(pos);
+    clearBoxesSelection();
+    clearPointsSelection();
+    addBoxToSelection(sculptBox.get());
+}
 
 void Canvas::newPaintBox(const QPointF &pos) {
     const auto paintBox = enve::make_shared<PaintBox>();
@@ -41,6 +54,13 @@ void Canvas::mousePressEvent(const MouseEvent &e) {
             if(!mPaintTarget.isValid()) newPaintBox(e.fPos);
             mPaintTarget.paintPress(e.fPos, e.fTimestamp, 0.5,
                                     0, 0, mDocument.fBrush);
+        }
+    } else if(mCurrentMode == CanvasMode::sculptPath) {
+        if(e.fButton == Qt::LeftButton) {
+            sculptPress(e.fPos, 1);
+            e.fGrabMouse();
+        } else if(e.fButton == Qt::RightButton) {
+            sculptCancel();
         }
     } else {
         if(e.fButton == Qt::LeftButton) {
@@ -70,6 +90,8 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
         mPaintTarget.paintMove(e.fPos, e.fTimestamp, 1,
                                0, 0, mDocument.fBrush);
         return;
+    } else if(mCurrentMode == CanvasMode::sculptPath && leftPressed) {
+        return sculptMove(e.fPos, 1);
     } else if(leftPressed || e.fMouseGrabbing) {
         if(mMovesToSkip > 0) {
             mMovesToSkip--;
@@ -124,6 +146,8 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
     schedulePivotUpdate();
     if(mCurrentMode == CanvasMode::paint)
         return mPaintTarget.paintRelease();
+    else if(mCurrentMode == CanvasMode::sculptPath)
+        return sculptRelease(e.fPos, 1);
 
     handleLeftMouseRelease(e);
 
@@ -131,6 +155,7 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
     mHoveredPoint_d = mPressedPoint;
     mPressedPoint = nullptr;
 }
+
 #include "MovablePoints/smartnodepoint.h"
 #include "MovablePoints/pathpointshandler.h"
 #include "Private/document.h"
@@ -167,26 +192,88 @@ void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
     }
 }
 
+void Canvas::sculptPress(const QPointF& pos, const qreal pressure) {
+    mDocument.fSculptBrush.pressAt(pos, pressure);
+    if(!hasValidSculptTarget()) newSculptPathBox(pos);
+    for(const auto& box : mSelectedBoxes) {
+        if(!box->SWT_isSculptPathBox()) continue;
+        const auto sculptBox = static_cast<SculptPathBox*>(box);
+        const auto transform = sculptBox->getTotalTransform();
+        const auto relBrush = SculptBrush(transform, mDocument.fSculptBrush);
+        sculptBox->sculptStarted();
+        sculptBox->sculpt(mDocument.fSculptTarget,
+                          mDocument.fSculptMode,
+                          relBrush);
+    }
+}
+
+void Canvas::sculptMove(const QPointF& pos, const qreal pressure) {
+    mDocument.fSculptBrush.moveTo(pos, pressure);
+    for(const auto& box : mSelectedBoxes) {
+        if(!box->SWT_isSculptPathBox()) continue;
+        const auto sculptBox = static_cast<SculptPathBox*>(box);
+        const auto transform = sculptBox->getTotalTransform();
+        const auto relBrush = SculptBrush(transform.inverted(),
+                                          mDocument.fSculptBrush);
+        sculptBox->sculpt(mDocument.fSculptTarget,
+                          mDocument.fSculptMode,
+                          relBrush);
+    }
+}
+
+void Canvas::sculptCancel() {
+    for(const auto& box : mSelectedBoxes) {
+        if(!box->SWT_isSculptPathBox()) continue;
+        const auto sculptBox = static_cast<SculptPathBox*>(box);
+        sculptBox->sculptCanceled();
+    }
+}
+
+void Canvas::sculptRelease(const QPointF& pos, const qreal pressure) {
+    Q_UNUSED(pos)
+    Q_UNUSED(pressure)
+    for(const auto& box : mSelectedBoxes) {
+        if(!box->SWT_isSculptPathBox()) continue;
+        const auto sculptBox = static_cast<SculptPathBox*>(box);
+        sculptBox->sculptFinished();
+    }
+}
+
 void Canvas::tabletEvent(const QTabletEvent * const e,
                          const QPointF &pos) {
-    if(mCurrentMode != CanvasMode::paint) return;
     const auto type = e->type();
-    if(type == QEvent::TabletRelease ||
-       e->buttons() & Qt::MiddleButton) {
-        mStylusDrawing = false;
-        mPaintTarget.paintRelease();
-    } else if(e->type() == QEvent::TabletPress) {
-        if(e->button() == Qt::RightButton) return;
-        if(e->button() == Qt::LeftButton) {
-            mStylusDrawing = true;
-            if(!mPaintTarget.isValid()) newPaintBox(pos);
-            mPaintTarget.paintPress(pos, e->timestamp(), e->pressure(),
-                                    e->xTilt(), e->yTilt(),
-                                    mDocument.fBrush);
+    if(mCurrentMode == CanvasMode::paint) {
+        if(type == QEvent::TabletRelease ||
+           e->buttons() & Qt::MiddleButton) {
+            mStylusDrawing = false;
+            mPaintTarget.paintRelease();
+        } else if(e->type() == QEvent::TabletPress) {
+            if(e->button() == Qt::RightButton) return;
+            if(e->button() == Qt::LeftButton) {
+                mStylusDrawing = true;
+                if(!mPaintTarget.isValid()) newPaintBox(pos);
+                mPaintTarget.paintPress(pos, e->timestamp(), e->pressure(),
+                                        e->xTilt(), e->yTilt(),
+                                        mDocument.fBrush);
+            }
+        } else if(type == QEvent::TabletMove && mStylusDrawing) {
+            mPaintTarget.paintMove(pos, e->timestamp(), e->pressure(),
+                                   e->xTilt(), e->yTilt(),
+                                   mDocument.fBrush);
         }
-    } else if(type == QEvent::TabletMove && mStylusDrawing) {
-        mPaintTarget.paintMove(pos, e->timestamp(), e->pressure(),
-                               e->xTilt(), e->yTilt(),
-                               mDocument.fBrush);
+    } else if(mCurrentMode == CanvasMode::sculptPath) {
+        if(type == QEvent::TabletRelease ||
+           e->buttons() & Qt::MiddleButton) {
+            mStylusDrawing = false;
+            sculptRelease(pos, e->pressure());
+        } else if(e->type() == QEvent::TabletPress) {
+            if(e->button() == Qt::RightButton) return;
+            if(e->button() == Qt::LeftButton) {
+                mStylusDrawing = true;
+                sculptPress(pos, e->pressure());
+            }
+        } else if(type == QEvent::TabletMove && mStylusDrawing) {
+            sculptMove(pos, e->pressure());
+        }
     }
 }

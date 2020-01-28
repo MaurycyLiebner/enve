@@ -92,16 +92,19 @@ public:
                             const QPointF &relDropPos = QPointF(0, 0),
                             const int frame = 0);
     ExternalLinkBox *linkFile(const QString &path);
-
+//
     void setMovePathMode();
     void setMovePointMode();
     void setAddPointMode();
-    void setPickPaintSettingsMode();
+    void setPaintMode();
+
+    void setSculptMode();
     void setRectangleMode();
     void setCircleMode();
     void setTextMode();
-    void setPaintMode();
 
+    void setPickPaintSettingsMode();
+//
     bool smoothChange() const { return mSmoothChange; }
     void startSmoothChange() { mSmoothChange = true; }
     void finishSmoothChange();

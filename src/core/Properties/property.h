@@ -33,10 +33,11 @@ enum class CanvasMode : short {
     pointTransform,
     pathCreate,
     paint,
-    pickFillStroke,
+    sculptPath,
     circleCreate,
     rectCreate,
-    textCreate
+    textCreate,
+    pickFillStroke
 };
 
 enum class UpdateReason {

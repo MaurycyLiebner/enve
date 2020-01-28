@@ -298,6 +298,7 @@ public:
 
     void selectAndAddContainedPointsToSelection(const QRectF &absRect);
 //
+    void newSculptPathBox(const QPointF &pos);
     void newPaintBox(const QPointF &pos);
 
     void mousePressEvent(const MouseEvent &e);
@@ -598,6 +599,8 @@ public:
         return mPaintTarget.isValid();
     }
 
+    bool hasValidSculptTarget() const;
+
     void queTasks();
 
     void setMinFrameUseRange(const int min) {
@@ -650,6 +653,12 @@ private:
 
     void scaleSelected(const MouseEvent &e);
     void rotateSelected(const MouseEvent &e);
+
+    void sculptPress(const QPointF& pos, const qreal pressure);
+    void sculptMove(const QPointF& pos, const qreal pressure);
+    void sculptRelease(const QPointF& pos, const qreal pressure);
+    void sculptCancel();
+
     qreal mLastDRot = 0;
     int mRotHalfCycles = 0;
     TransformMode mTransMode = TransformMode::none;

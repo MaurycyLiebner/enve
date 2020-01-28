@@ -40,6 +40,8 @@ CanvasWindow::CanvasWindow(Document &document,
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
     connect(&mDocument, &Document::canvasModeSet,
             this, &CanvasWindow::setCanvasMode);
+    connect(&mDocument, &Document::sculptBrushSizeChanged,
+            this, &CanvasWindow::updateSculptModeCursor);
 
     setAcceptDrops(true);
     setMouseTracking(true);
@@ -94,21 +96,51 @@ void CanvasWindow::updatePaintModeCursor() {
     }
 }
 
+void CanvasWindow::updateSculptModeCursor() {
+    if(mDocument.fCanvasMode != CanvasMode::sculptPath) return;
+    mValidSculptTarget = mCurrentCanvas && mCurrentCanvas->hasValidSculptTarget();
+    if(mValidSculptTarget) {
+        const qreal viewScale = mViewTransform.m11();
+        const qreal radius = mDocument.fSculptBrush.radius()*viewScale;
+        const qreal clampedRadius = qBound(1., radius, 200.);
+        const int iRadius = qRound(clampedRadius);
+        const int margin = 3;
+        const int dim = 2*(iRadius + margin);
+        QPixmap brushPix(dim, dim);
+        brushPix.fill(Qt::transparent);
+        QPainter p(&brushPix);
+        const QRect circleRect(margin, margin, 2*iRadius, 2*iRadius);
+        p.setPen(Qt::white);
+        p.drawEllipse(circleRect);
+        p.setPen(Qt::black);
+        p.drawEllipse(circleRect.adjusted(-1, -1, 1, 1));
+        p.end();
+
+        setCursor(QCursor(brushPix, iRadius + margin, iRadius + margin));
+    } else {
+        setCursor(QCursor(QPixmap(":/cursors/cursor_crosshair_open.png")));
+    }
+}
+
 void CanvasWindow::setCanvasMode(const CanvasMode mode) {
     if(mode == CanvasMode::boxTransform) {
         setCursor(QCursor(Qt::ArrowCursor) );
     } else if(mode == CanvasMode::pointTransform) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-node.xpm"), 0, 0) );
-    } else if(mode == CanvasMode::pickFillStroke) {
-        setCursor(QCursor(QPixmap(":/cursors/cursor_color_picker.png"), 2, 20) );
+    } else if(mode == CanvasMode::pathCreate) {
+        setCursor(QCursor(QPixmap(":/cursors/cursor-pen.xpm"), 4, 4) );
+    } else if(mode == CanvasMode::paint) {
+        updatePaintModeCursor();
+    } else if(mode == CanvasMode::sculptPath) {
+        updateSculptModeCursor();
     } else if(mode == CanvasMode::circleCreate) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-ellipse.xpm"), 4, 4) );
     } else if(mode == CanvasMode::rectCreate) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-rect.xpm"), 4, 4) );
     } else if(mode == CanvasMode::textCreate) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-text.xpm"), 4, 4) );
-    } else if(mode == CanvasMode::paint) {
-        updatePaintModeCursor();
+    } else if(mode == CanvasMode::pickFillStroke) {
+        setCursor(QCursor(QPixmap(":/cursors/cursor_color_picker.png"), 2, 20) );
     } else {
         setCursor(QCursor(QPixmap(":/cursors/cursor-pen.xpm"), 4, 4) );
     }
@@ -162,24 +194,30 @@ void CanvasWindow::renderSk(SkCanvas * const canvas) {
 
 void CanvasWindow::tabletEvent(QTabletEvent *e) {
     if(!mCurrentCanvas) return;
-    if(mDocument.fCanvasMode != CanvasMode::paint) return;
+    const auto canvasMode = mDocument.fCanvasMode;
     const QPoint globalPos = mapToGlobal(QPoint(0, 0));
     const qreal x = e->hiResGlobalX() - globalPos.x();
     const qreal y = e->hiResGlobalY() - globalPos.y();
     mCurrentCanvas->tabletEvent(e, mapToCanvasCoord({x, y}));
-    if(!mValidPaintTarget) updatePaintModeCursor();
-    update();
+    if(canvasMode == CanvasMode::paint) {
+        if(!mValidPaintTarget) updatePaintModeCursor();
+        update();
+    } else if(canvasMode == CanvasMode::sculptPath) {
+        if(!mValidSculptTarget) updateSculptModeCursor();
+        finishAction();
+    }
 }
 
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
+    const auto button = event->button();
     if(event->buttons() & Qt::MiddleButton) {
-        if(event->button() == Qt::MiddleButton)
+        if(button == Qt::MiddleButton)
             QApplication::setOverrideCursor(Qt::ClosedHandCursor);
         return;
     }
     KFT_setFocus();
     if(!mCurrentCanvas || mBlockInput) return;
-    if(mMouseGrabber && event->button() == Qt::LeftButton) return;
+    if(mMouseGrabber && button == Qt::LeftButton) return;
     const auto pos = mapToCanvasCoord(event->pos());
     mCurrentCanvas->mousePressEvent(
                 MouseEvent(pos, pos, pos, mMouseGrabber,
@@ -189,15 +227,21 @@ void CanvasWindow::mousePressEvent(QMouseEvent *event) {
                            this));
     queTasksAndUpdate();
     mPrevMousePos = pos;
-    if(event->button() == Qt::LeftButton) {
+    if(button == Qt::LeftButton) {
         mPrevPressPos = pos;
-        if(mDocument.fCanvasMode == CanvasMode::paint && !mValidPaintTarget)
+        const auto mode = mDocument.fCanvasMode;
+        if(mode == CanvasMode::paint && !mValidPaintTarget)
             updatePaintModeCursor();
+        else if(mode == CanvasMode::sculptPath) {
+            if(!mValidSculptTarget) updateSculptModeCursor();
+            grabMouse();
+        }
     }
 }
 
 void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
-    if(event->button() == Qt::MiddleButton)
+    const auto button = event->button();
+    if(button == Qt::MiddleButton)
         QApplication::restoreOverrideCursor();
     if(!mCurrentCanvas || mBlockInput) return;
     const auto pos = mapToCanvasCoord(event->pos());
@@ -207,6 +251,7 @@ void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
                            event, [this]() { releaseMouse(); },
                            [this]() { grabMouse(); },
                            this));
+    if(button == Qt::LeftButton) releaseMouse();
     finishAction();
 }
 
@@ -497,9 +542,13 @@ bool CanvasWindow::KFT_keyPressEvent(QKeyEvent *event) {
     if(e.fKey == Qt::Key_I && !isMouseGrabber()) {
         mActions.invertSelectionAction();
     } else if(e.fKey == Qt::Key_W) {
-        mDocument.incBrushRadius();
+        const auto canvasMode = mDocument.fCanvasMode;
+        if(canvasMode == CanvasMode::paint) mDocument.incBrushRadius();
+        else mDocument.incSculptBrushRadius();
     } else if(e.fKey == Qt::Key_Q) {
-        mDocument.decBrushRadius();
+        const auto canvasMode = mDocument.fCanvasMode;
+        if(canvasMode == CanvasMode::paint) mDocument.decBrushRadius();
+        else mDocument.decSculptBrushRadius();
     } else return false;
 
     return true;

@@ -26,6 +26,7 @@
 #include "actions.h"
 #include "Tasks/taskscheduler.h"
 #include "clipboardcontainer.h"
+#include "Animators/SculptPath/sculptpath.h"
 
 class SceneBoundGradient;
 class FileDataCacheHandler;
@@ -70,8 +71,12 @@ public:
     FillSettings fFill;
     StrokeSettings fStroke;
 
+    SculptBrush fSculptBrush = SculptBrush(3, 0.5, 0.8, 1);
+    SculptTarget fSculptTarget = SculptTarget::position;
+    SculptMode fSculptMode = SculptMode::drag;
+
     QColor fBrushColor;
-    const SimpleBrushWrapper* fBrush = nullptr;
+    SimpleBrushWrapper* fBrush = nullptr;
     bool fOnionVisible = true;
 
     std::set<FileHandler, FileCompare> fFiles;
@@ -116,7 +121,7 @@ public:
     void addBookmarkColor(const QColor& color);
 
     void removeBookmarkColor(const QColor& color);
-
+//
     void setBrush(BrushContexedWrapper * const brush);
 
     void setBrushColor(const QColor &color);
@@ -125,6 +130,18 @@ public:
     void decBrushRadius();
 
     void setOnionDisabled(const bool disabled);
+//
+    void incSculptBrushRadius();
+    void decSculptBrushRadius();
+
+    void incSculptHardness();
+    void decSculptHardness();
+
+    void incSculptOpacity();
+    void decSculptOpacity();
+
+    void setSculptTarget(const SculptTarget target);
+    void setSculptMode(const SculptMode mode);
 //
     void clear();
 //
@@ -170,6 +187,13 @@ signals:
 //
     void evFilePathChanged(QString);
     void documentChanged();
+//
+    void sculptBrushSizeChanged(const qreal size);
+    void sculptHardnessChanged(const qreal hardness);
+    void sculptOpacityChanged(const qreal opacity);
+
+    void sculptTargetChanged(const SculptTarget target);
+    void sculptModeChanged(const SculptMode mode);
 };
 
 #endif // DOCUMENT_H

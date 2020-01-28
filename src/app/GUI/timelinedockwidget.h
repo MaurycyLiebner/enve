@@ -37,6 +37,7 @@
 #include "timelinebasewrappernode.h"
 #include "triggerlabel.h"
 #include "BrushWidgets/bookmarkedbrushes.h"
+#include "qdoubleslider.h"
 
 class FrameScrollBar;
 class TimelineWidget;
@@ -84,8 +85,19 @@ private:
 
     void updateButtonsVisibility(const CanvasMode mode);
 private:
+    QAction *addSpaceToToolbar();
+
     void setBrushColor(const QColor& color);
     void setBrush(BrushContexedWrapper* const brush);
+
+    void setSculptBrushColor(const QColor& color);
+    void setupSculptBrushSizeButtons(const QString &iconsDir);
+    void setupSculptBrushColorLabel();
+    void setupSculptModeButtons(const QString& iconsDir);
+    void setupSculptTargetButtons(const QString& iconsDir);
+    void setupSculptValueSpins();
+    void sculptModeChanged();
+    void sculptTargetChanged();
 
     Document& mDocument;
     MainWindow* const mMainWindow;
@@ -116,7 +128,56 @@ private:
     ActionButton *mIncBrushSize;
     QAction* mOnionAct;
     SwitchButton *mOnion;
+    //
+    QAction* mDecSculptBrushSizeAct;
+    ActionButton* mDecSculptBrushSize;
+    QAction* mSculptBrushSizeLabelAct;
+    QLabel* mSculptBrushSizeLabel;
+    QAction* mIncSculptBrushSizeAct;
+    ActionButton* mIncSculptBrushSize;
 
+    TriggerLabel* mSculptColorLabel;
+    QAction* mSculptColorLabelAct;
+
+    QAction* mDragModeAct;
+    SwitchButton* mDragMode;
+    QAction* mAddModeAct;
+    SwitchButton* mAddMode;
+    QAction* mReplaceModeAct;
+    SwitchButton* mReplaceMode;
+    QAction* mSubtractModeAct;
+    SwitchButton* mSubtractMode;
+
+    QAction* mSculptModeTargetSeperator;
+
+    QAction* mPositionTargetAct;
+    SwitchButton* mPositionTarget;
+    QAction* mWidthTargetAct;
+    SwitchButton* mWidthTarget;
+    QAction* mPressureTargetAct;
+    SwitchButton* mPressureTarget;
+    QAction* mSpacingTargetAct;
+    SwitchButton* mSpacingTarget;
+    QAction* mTimeTargetAct;
+    SwitchButton* mTimeTarget;
+    QAction* mColorTargetAct;
+    SwitchButton* mColorTarget;
+
+    QAction* mSculptSpace0;
+
+    QDoubleSlider* mValue;
+    QAction* mValueAct;
+
+    QAction* mSculptSpace1;
+
+    QDoubleSlider* mHardness;
+    QAction* mHardnessAct;
+
+    QAction* mSculptSpace2;
+
+    QDoubleSlider* mOpacity;
+    QAction* mOpacityAct;
+    //
     QAction *mTimelineAction;
     QAction *mRenderAction;
 
