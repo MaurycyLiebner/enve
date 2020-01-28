@@ -26,7 +26,9 @@ void RenderContainer::drawSk(SkCanvas * const canvas,
     const auto blendMode = paint.getBlendMode();
     if(blendMode == SkBlendMode::kDstIn ||
        blendMode == SkBlendMode::kSrcIn ||
-       blendMode == SkBlendMode::kDstATop) {
+       blendMode == SkBlendMode::kDstATop ||
+       blendMode == SkBlendMode::kModulate ||
+       blendMode == SkBlendMode::kSrcOut) {
         canvas->save();
         auto rect = SkRect::MakeXYWH(mGlobalRect.x(), mGlobalRect.y(),
                                      mImageSk->width(), mImageSk->height());

@@ -237,15 +237,13 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     for(int modeId = int(SkBlendMode::kSrcOver);
         modeId <= int(SkBlendMode::kLastMode); modeId++) {
         const auto mode = static_cast<SkBlendMode>(modeId);
-        if(mode == SkBlendMode::kSrcOut) continue;
-        if(mode == SkBlendMode::kSrcATop) continue;
-        if(mode == SkBlendMode::kDstATop) continue;
-        if(mode == SkBlendMode::kModulate) continue;
         mBlendModeCombo->addItem(SkBlendMode_Name(mode), modeId);
     }
 
     mBlendModeCombo->insertSeparator(8);
-    mBlendModeCombo->insertSeparator(19);
+    mBlendModeCombo->insertSeparator(14);
+    mBlendModeCombo->insertSeparator(21);
+    mBlendModeCombo->insertSeparator(25);
     connect(mBlendModeCombo, qOverload<int>(&QComboBox::activated),
             this, &BoxSingleWidget::setCompositionMode);
     mBlendModeCombo->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);

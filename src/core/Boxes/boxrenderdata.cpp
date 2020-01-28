@@ -63,7 +63,9 @@ void BoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {
     if(fUseRenderTransform) canvas->concat(toSkMatrix(fRenderTransform));
     if(fBlendMode == SkBlendMode::kDstIn ||
        fBlendMode == SkBlendMode::kSrcIn ||
-       fBlendMode == SkBlendMode::kDstATop) {
+       fBlendMode == SkBlendMode::kDstATop ||
+       fBlendMode == SkBlendMode::kModulate ||
+       fBlendMode == SkBlendMode::kSrcOut) {
         canvas->save();
         auto rect = SkRect::MakeXYWH(fGlobalRect.x(), fGlobalRect.y(),
                                      fRenderedImage->width(),
