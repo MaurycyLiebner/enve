@@ -31,13 +31,14 @@ void SculptPathAnimator::prp_drawCanvasControls(
         SkCanvas * const canvas, const CanvasMode mode,
         const float invScale, const bool ctrlPressed) {
     if(mode == CanvasMode::sculptPath) {
+        const float clampedInvScale = qBound(0.333f, invScale, 1.f);
         const auto current = getCurrentlyEdited();
         const auto& nodes = current->nodes();
         const auto transform = getTransformAnimator()->getCurrentTransform();
         SkPaint outlinePaint;
         outlinePaint.setStyle(SkPaint::kStroke_Style);
         outlinePaint.setColor(SK_ColorWHITE);
-        outlinePaint.setStrokeWidth(invScale);
+        outlinePaint.setStrokeWidth(clampedInvScale);
         SkPaint paint;
         paint.setStyle(SkPaint::kFill_Style);
         const auto target = Document::sInstance->fSculptTarget;
@@ -79,7 +80,7 @@ void SculptPathAnimator::prp_drawCanvasControls(
             };
             break;
         }
-        const float radius = qMin(10.f, 3*invScale);
+        const float radius = 3*clampedInvScale;
         for(const auto& node : nodes) {
             paint.setColor(nodeColor(*node));
             const QPointF qAbsPos = transform.map(node->pos());
