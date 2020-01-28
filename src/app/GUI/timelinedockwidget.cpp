@@ -512,6 +512,14 @@ void TimelineDockWidget::setupSculptValueSpins() {
     mOpacityAct = mToolBar->addWidget(opacityWidget);
 }
 
+void TimelineDockWidget::updateSculptPositionEnabled() {
+    const SculptMode mode = mDocument.fSculptMode;
+    const SculptTarget target = mDocument.fSculptTarget;
+    mPositionTarget->setEnabled(target != SculptTarget::position ||
+                                (mode == SculptMode::drag ||
+                                 mode == SculptMode::replace));
+}
+
 void TimelineDockWidget::sculptTargetChanged() {
     const SculptTarget target = mDocument.fSculptTarget;
     mPositionTarget->setState(target == SculptTarget::position);
@@ -520,6 +528,8 @@ void TimelineDockWidget::sculptTargetChanged() {
     mSpacingTarget->setState(target == SculptTarget::spacing);
     mTimeTarget->setState(target == SculptTarget::time);
     mColorTarget->setState(target == SculptTarget::color);
+
+    updateSculptPositionEnabled();
 }
 
 void TimelineDockWidget::sculptModeChanged() {
@@ -528,6 +538,8 @@ void TimelineDockWidget::sculptModeChanged() {
     mAddMode->setState(mode == SculptMode::add);
     mReplaceMode->setState(mode == SculptMode::replace);
     mSubtractMode->setState(mode == SculptMode::subtract);
+
+    updateSculptPositionEnabled();
 }
 
 void TimelineDockWidget::setResolutionFractionText(QString text) {

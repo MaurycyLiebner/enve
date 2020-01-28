@@ -99,6 +99,8 @@ private:
     void sculptModeChanged();
     void sculptTargetChanged();
 
+    void updateSculptPositionEnabled();
+
     Document& mDocument;
     MainWindow* const mMainWindow;
     QStackedWidget* const mTimelineLayout;
