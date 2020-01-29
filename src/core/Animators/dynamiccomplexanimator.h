@@ -208,20 +208,16 @@ protected:
         DynamicComplexAnimatorBase<T>(name) {}
 public:
     qsptr<T> createDuplicate(T* const src) override {
-        QBuffer buffer;
-        buffer.open(QIODevice::ReadWrite);
-        eWriteStream writeStream(&buffer);
-        if(TWriteType) (src->*TWriteType)(writeStream);
-        src->prp_writeProperty(writeStream);
-        writeStream.writeFutureTable();
-        buffer.seek(0);
-        eReadStream readStream(&buffer);
-        buffer.seek(buffer.size() - qint64(sizeof(int)));
-        readStream.readFutureTable();
-        buffer.seek(0);
-        const auto duplicate = TReadTypeAndCreate(readStream);
-        duplicate->prp_readProperty(readStream);
-        buffer.close();
+        Clipboard clipboard(ClipboardType::property);
+        clipboard.write([this, src](eWriteStream& dst) {
+            if(TWriteType) (src->*TWriteType)(dst);
+            src->prp_writeProperty(dst);
+        });
+        qsptr<T> duplicate;
+        clipboard.read([this, &duplicate](eReadStream& src) {
+            duplicate = TReadTypeAndCreate(src);
+            duplicate->prp_readProperty(src);
+        });
         return duplicate;
     }
 
