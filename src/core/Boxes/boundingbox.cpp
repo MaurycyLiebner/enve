@@ -365,9 +365,9 @@ void BoundingBox::setRelBoundingRect(const QRectF& relRect) {
 void BoundingBox::prp_updateCanvasProps() {
     mCanvasProps.clear();
     ca_execOnDescendants([this](Property * prop) {
-        if(prop->drawsOnCanvas()) mCanvasProps.append(prop);
+        if(prop->prp_drawsOnCanvas()) mCanvasProps.append(prop);
     });
-    if(drawsOnCanvas()) mCanvasProps.append(this);
+    if(prp_drawsOnCanvas()) mCanvasProps.append(this);
 }
 
 void BoundingBox::updateCurrentPreviewDataFromRenderData(

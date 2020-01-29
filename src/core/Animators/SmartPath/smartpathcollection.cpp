@@ -30,6 +30,8 @@ SmartPathCollection::SmartPathCollection() :
             this, [this](Property* const child) {
         const auto path = static_cast<SmartPathAnimator*>(child);
         disconnect(path, &SmartPathAnimator::emptied, this, nullptr);
+        disconnect(child, &Property::prp_selectionChanged,
+                   this, &SmartPathCollection::updateVisibleChildren);
     });
     connect(this, &ComplexAnimator::ca_childAdded,
             this, [this](Property* const child) {
@@ -37,6 +39,8 @@ SmartPathCollection::SmartPathCollection() :
         connect(path, &SmartPathAnimator::emptied, this, [this, path]() {
             removeChild(enve::shared<SmartPathAnimator>(path));
         });
+        connect(child, &Property::prp_selectionChanged,
+                this, &SmartPathCollection::updateVisibleChildren);
     });
 }
 
@@ -154,5 +158,20 @@ void SmartPathCollection::updatePathColors() {
     for(const auto& child : children) {
         const auto path = static_cast<SmartPathAnimator*>(child.get());
         path->setPathColor(gPathColors[(i++) % gPathColors.length()]);
+    }
+}
+
+void SmartPathCollection::updateVisibleChildren() {
+    bool allVisible = true;
+    const auto& children = ca_getChildren();
+    for(const auto& child : children) {
+        if(child->prp_isSelected()) {
+            allVisible = false;
+            break;
+        }
+    }
+    for(const auto& child : children) {
+        const bool enabled = allVisible || child->prp_isSelected();
+        child->prp_setDrawingOnCanvasEnabled(enabled);
     }
 }

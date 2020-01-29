@@ -166,15 +166,23 @@ FrameRange Property::prp_absInfluenceRange() const {
     return prp_relRangeToAbsRange(prp_relInfluenceRange());
 }
 
-void Property::enabledDrawingOnCanvas() {
-    mDrawOnCanvas = true;
+void Property::prp_enabledDrawingOnCanvas() {
+    prp_setDrawingOnCanvasEnabled(true);
+}
+
+void Property::prp_disableDrawingOnCanvas() {
+    prp_setDrawingOnCanvasEnabled(false);
+}
+
+void Property::prp_setDrawingOnCanvasEnabled(const bool enabled) {
+    mDrawOnCanvas = enabled;
     if(mParent_k) mParent_k->prp_updateCanvasProps();
 }
 
 void Property::setPointsHandler(const stdsptr<PointsHandler> &handler) {
     mPointsHandler = handler;
     if(mPointsHandler) {
-        enabledDrawingOnCanvas();
+        prp_enabledDrawingOnCanvas();
         mPointsHandler->setTransform(getTransformAnimator());
     }
 }

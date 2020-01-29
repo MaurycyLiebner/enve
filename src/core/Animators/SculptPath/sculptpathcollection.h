@@ -54,6 +54,8 @@ public:
 signals:
     void fillTypeChanged(SkPathFillType);
 private:
+    void updateVisibleChildren();
+
     SculptPathAnimator *createNewPath();
     SculptPathAnimator *createNewPath(const SkPath& path);
 

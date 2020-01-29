@@ -25,6 +25,16 @@ SculptPathCollection::SculptPathCollection() :
 //            this, &SculptPathCollection::updatePathColors);
 //    connect(this, &ComplexAnimator::ca_childMoved,
 //            this, &SculptPathCollection::updatePathColors);
+    connect(this, &SculptPathCollection::ca_childAdded,
+            this, [this](Property* const child) {
+        connect(child, &Property::prp_selectionChanged,
+                this, &SculptPathCollection::updateVisibleChildren);
+    });
+    connect(this, &SculptPathCollection::ca_childRemoved,
+            this, [this](Property* const child) {
+        disconnect(child, &Property::prp_selectionChanged,
+                   this, &SculptPathCollection::updateVisibleChildren);
+    });
 }
 
 void SculptPathCollection::prp_writeProperty(eWriteStream &dst) const {
@@ -79,6 +89,21 @@ void SculptPathCollection::setFillType(const SkPathFillType fillType) {
     emit fillTypeChanged(fillType);
 }
 
+void SculptPathCollection::updateVisibleChildren() {
+    bool allVisible = true;
+    const auto& children = ca_getChildren();
+    for(const auto& child : children) {
+        if(child->prp_isSelected()) {
+            allVisible = false;
+            break;
+        }
+    }
+    for(const auto& child : children) {
+        const bool enabled = allVisible || child->prp_isSelected();
+        child->prp_setDrawingOnCanvasEnabled(enabled);
+    }
+}
+
 SculptPathAnimator *SculptPathCollection::createNewPath(const SkPath &path) {
     const auto newPath = createNewPath();
     newPath->getCurrentlyEdited()->setPath(path, 5);
@@ -102,6 +127,7 @@ void SculptPathCollection::sculpt(const SculptTarget target,
     const int iMax = ca_getNumberOfChildren() - 1;
     for(int i = 0; i <= iMax; i++) {
         const auto path = ca_getChildAt<SculptPathAnimator>(i);
+        if(!path->prp_drawsOnCanvas()) continue;
         path->sculpt(target, mode, brush);
     }
 }

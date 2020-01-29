@@ -112,7 +112,7 @@ void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
     ca_mChildren.insert(id, child);
     child->setParent(this);
     child->prp_setInheritedFrameShift(prp_getTotalFrameShift(), this);
-    if(child->drawsOnCanvas() ||
+    if(child->prp_drawsOnCanvas() ||
        child->SWT_isComplexAnimator()) {
         prp_updateCanvasProps();
     }
@@ -221,7 +221,7 @@ void ComplexAnimator::ca_removeChild(const qsptr<Property> child) {
 
     child->setParent(nullptr);
     ca_mChildren.removeAt(ca_getChildPropertyIndex(child.get()));
-    if(child->drawsOnCanvas() ||
+    if(child->prp_drawsOnCanvas() ||
        child->SWT_isComplexAnimator()) {
         prp_updateCanvasProps();
     }

@@ -169,7 +169,7 @@ public:
 
     bool prp_isParentBoxSelected() const;
 
-    bool drawsOnCanvas() const
+    bool prp_drawsOnCanvas() const
     { return mDrawOnCanvas; }
 
     PointsHandler * getPointsHandler() const
@@ -180,8 +180,11 @@ public:
 
     bool prp_isSelected() const { return prp_mSelected; }
     void prp_selectionChangeTriggered(const bool shiftPressed);
+
+    void prp_enabledDrawingOnCanvas();
+    void prp_disableDrawingOnCanvas();
+    void prp_setDrawingOnCanvasEnabled(const bool enabled);
 protected:
-    void enabledDrawingOnCanvas();
     void setPointsHandler(const stdsptr<PointsHandler>& handler);
 
     class SceneParentSelfAssign {

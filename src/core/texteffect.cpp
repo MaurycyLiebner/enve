@@ -151,7 +151,7 @@ TextEffect::TextEffect() : eEffect("text effect") {
 
     ca_setGUIProperty(mInfluence.get());
 
-    enabledDrawingOnCanvas();
+    prp_enabledDrawingOnCanvas();
 }
 
 bool ptXLess(const QPointF& p1, const QPointF& p2)

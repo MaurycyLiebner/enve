@@ -23,7 +23,7 @@ using SculptPathKey = InterpolationKeyT<SculptPath>;
 
 SculptPathAnimator::SculptPathAnimator() :
     InterOptimalAnimatorT<SculptPath>("sculpt path") {
-    enabledDrawingOnCanvas();
+    prp_enabledDrawingOnCanvas();
     const auto circle = SkPath().addCircle(0, 0, 50);
     getCurrentlyEdited()->setPath(circle, 5);
 }

@@ -51,6 +51,8 @@ public:
 signals:
     void fillTypeChanged(SkPathFillType);
 private:
+    void updateVisibleChildren();
+
     SmartPathAnimator *createNewPath();
     SmartPathAnimator *createNewPath(const SkPath& path);
 
