@@ -31,6 +31,19 @@ SculptPathBox::SculptPathBox() : BoundingBox(eBoxType::sculptPath) {
 }
 
 void SculptPathBox::setStrokeBrush(SimpleBrushWrapper * const brush) {
+    if(mBrush == brush) return;
+    {
+        UndoRedo ur;
+        const stdptr<SimpleBrushWrapper> oldValue = mBrush;
+        const stdptr<SimpleBrushWrapper> newValue = brush;
+        ur.fUndo = [this, oldValue]() {
+            setStrokeBrush(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setStrokeBrush(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mBrush = brush;
     prp_afterWholeInfluenceRangeChanged();
 }
