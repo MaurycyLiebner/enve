@@ -21,6 +21,7 @@
 #include "boundingbox.h"
 #include "imagebox.h"
 class AnimationFrameHandler;
+class IntFrameRemapping;
 
 struct AnimationBoxRenderData : public ImageRenderData {
     AnimationBoxRenderData(AnimationFrameHandler *cacheHandler,
@@ -61,9 +62,6 @@ public:
     stdsptr<BoxRenderData> createRenderData();
     bool shouldScheduleUpdate();
 
-    void writeBoundingBox(eWriteStream& dst) const;
-    void readBoundingBox(eReadStream& src);
-
     FixedLenAnimationRect *getAnimationDurationRect() const;
     void updateDurationRectangleAnimationRange();
 
@@ -72,9 +70,7 @@ public:
     int getAnimationFrameForRelFrame(const qreal relFrame);
 
     void enableFrameRemappingAction();
-    void enableFrameRemapping();
-    void disableFrameRemapping();
-    void setFrameRemappingEnabled(const bool enabled);
+    void disableFrameRemappingAction();
 
     qreal getStretch() const { return mStretch; }
 
@@ -85,7 +81,8 @@ protected:
     qsptr<AnimationFrameHandler> mSrcFramesCache;
 
     bool mFrameRemappingEnabled = false;
-    qsptr<IntAnimator> mFrameAnimator;
+
+    qsptr<IntFrameRemapping> mFrameRemapping;
 };
 
 #endif // ANIMATIONBOX_H

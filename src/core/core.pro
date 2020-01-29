@@ -105,6 +105,7 @@ SOURCES += \
     Boxes/effectsrenderer.cpp \
     Boxes/effectsubtaskspawner.cpp \
     Boxes/externallinkbox.cpp \
+    Boxes/frameremapping.cpp \
     Boxes/imagebox.cpp \
     Boxes/imagerenderdata.cpp \
     Boxes/imagesequencebox.cpp \
@@ -371,6 +372,7 @@ HEADERS += \
     Boxes/effectsrenderer.h \
     Boxes/effectsubtaskspawner.h \
     Boxes/externallinkbox.h \
+    Boxes/frameremapping.h \
     Boxes/imagebox.h \
     Boxes/imagerenderdata.h \
     Boxes/imagesequencebox.h \

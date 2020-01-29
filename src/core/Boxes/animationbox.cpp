@@ -22,6 +22,7 @@
 #include "undoredo.h"
 #include "Animators/qrealkey.h"
 #include "RasterEffects/rastereffectcollection.h"
+#include "frameremapping.h"
 
 AnimationBox::AnimationBox(const eBoxType type) : BoundingBox(type) {
     connect(this, &eBoxOrSound::parentChanged,
@@ -32,9 +33,12 @@ AnimationBox::AnimationBox(const eBoxType type) : BoundingBox(type) {
     setDurationRectangle(enve::make_shared<FixedLenAnimationRect>(*this));
     mDurationRectangleLocked = true;
 
-    mFrameAnimator = enve::make_shared<IntAnimator>("frame");
-    ca_prependChild(mRasterEffectsAnimators.get(), mFrameAnimator);
-    mFrameAnimator->SWT_hide();
+    mFrameRemapping = enve::make_shared<IntFrameRemapping>();
+    ca_prependChild(mRasterEffectsAnimators.get(), mFrameRemapping);
+    mFrameRemapping->disableAction();
+
+    connect(mFrameRemapping.get(), &IntFrameRemapping::enabledChanged,
+            this, &AnimationBox::updateDurationRectangleAnimationRange);
 }
 
 FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() const {
@@ -42,16 +46,17 @@ FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() const {
 }
 
 void AnimationBox::updateDurationRectangleAnimationRange() {
-    if(mFrameRemappingEnabled) {
-        const int nFrames = getAnimationDurationRect()->getFrameDuration();
-        getAnimationDurationRect()->setAnimationFrameDuration(0);
-        getAnimationDurationRect()->setFramesDuration(nFrames);
+    const auto durRect = getAnimationDurationRect();
+    if(mFrameRemapping->enabled()) {
+        const int nFrames = durRect->getFrameDuration();
+        durRect->setAnimationFrameDuration(0);
+        durRect->setFramesDuration(nFrames);
     } else {
         int frameCount;
         if(mSrcFramesCache) frameCount = mSrcFramesCache->getFrameCount();
         else frameCount = 0;
         const int nFrames = qRound(frameCount*qAbs(mStretch));
-        getAnimationDurationRect()->setAnimationFrameDuration(nFrames);
+        durRect->setAnimationFrameDuration(nFrames);
     }
 }
 
@@ -59,11 +64,11 @@ void AnimationBox::animationDataChanged() {
     //if(mParentGroup) {
     updateDurationRectangleAnimationRange();
     //}
-    if(mFrameRemappingEnabled) {
+    if(mFrameRemapping->enabled()) {
         int frameCount;
         if(mSrcFramesCache) frameCount = mSrcFramesCache->getFrameCount();
         else frameCount = 1;
-        mFrameAnimator->setIntValueRange(0, frameCount - 1);
+        mFrameRemapping->setFrameCount(frameCount);
     }
     prp_afterWholeInfluenceRangeChanged();
 }
@@ -78,8 +83,8 @@ int AnimationBox::getAnimationFrameForRelFrame(const qreal relFrame) {
     const int animStartRelFrame =
                 getAnimationDurationRect()->getMinAnimRelFrame();
     int pixId;
-    if(mFrameRemappingEnabled) {
-        pixId = mFrameAnimator->getBaseIntValue(relFrame);
+    if(mFrameRemapping->enabled()) {
+        pixId = mFrameRemapping->frame(relFrame);
     } else {
         if(isZero6Dec(mStretch)) {
             pixId = lastFrameId;
@@ -96,61 +101,14 @@ int AnimationBox::getAnimationFrameForRelFrame(const qreal relFrame) {
 }
 
 void AnimationBox::enableFrameRemappingAction() {
-    if(mFrameRemappingEnabled) return;
-    prp_pushUndoRedoName("Enable Frame Remapping");
     const int frameCount = mSrcFramesCache->getFrameCount();
-    mFrameAnimator->setIntValueRange(0, frameCount - 1);
-    const int animStartRelFrame =
-                getAnimationDurationRect()->getMinAnimRelFrame();
-    if(frameCount > 1) {
-        const auto firstFrameKey = enve::make_shared<QrealKey>(0, animStartRelFrame,
-                                                        mFrameAnimator.get());
-        mFrameAnimator->anim_appendKey(firstFrameKey);
-        const int value = frameCount - 1;
-        const int frame = animStartRelFrame + frameCount - 1;
-        const auto lastFrameKey = enve::make_shared<QrealKey>(value, frame,
-                                                       mFrameAnimator.get());
-        mFrameAnimator->anim_appendKey(lastFrameKey);
-    } else {
-        mFrameAnimator->setCurrentIntValue(0);
-    }
-    enableFrameRemapping();
+    const auto durRect = getAnimationDurationRect();
+    const int animStartRelFrame = durRect->getMinAnimRelFrame();
+    mFrameRemapping->enableAction(0, frameCount - 1, animStartRelFrame);
 }
 
-void AnimationBox::enableFrameRemapping() {
-    setFrameRemappingEnabled(true);
-}
-
-void AnimationBox::disableFrameRemapping() {
-    setFrameRemappingEnabled(false);
-}
-
-void AnimationBox::setFrameRemappingEnabled(const bool enabled) {
-    if(mFrameRemappingEnabled == enabled) return;
-    {
-        prp_pushUndoRedoName("Set Frame Remapping");
-        UndoRedo ur;
-        const auto oldValue = mFrameRemappingEnabled;
-        const auto newValue = enabled;
-        ur.fUndo = [this, oldValue]() {
-            setFrameRemappingEnabled(oldValue);
-        };
-        ur.fRedo = [this, newValue]() {
-            setFrameRemappingEnabled(newValue);
-        };
-        prp_addUndoRedo(ur);
-    }
-    mFrameRemappingEnabled = enabled;
-    if(enabled) {
-        mFrameAnimator->SWT_show();
-    } else {
-        mFrameAnimator->anim_removeAllKeys();
-        mFrameAnimator->anim_setRecordingValue(false);
-        mFrameAnimator->SWT_hide();
-    }
-    prp_afterWholeInfluenceRangeChanged();
-    planUpdate(UpdateReason::userChange);
-    updateDurationRectangleAnimationRange();
+void AnimationBox::disableFrameRemappingAction() {
+    mFrameRemapping->disableAction();
 }
 
 void AnimationBox::reload() {
@@ -164,7 +122,7 @@ void AnimationBox::anim_setAbsFrame(const int frame) {
 }
 
 FrameRange AnimationBox::prp_getIdenticalRelRange(const int relFrame) const {
-    if(isVisibleAndInDurationRect(relFrame) && !mFrameRemappingEnabled) {
+    if(isVisibleAndInDurationRect(relFrame) && !mFrameRemapping->enabled()) {
         const auto animDur = getAnimationDurationRect();
         const auto animRange = animDur->getAnimRelRange();
         if(animRange.inRange(relFrame))
@@ -206,10 +164,10 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
     const PropertyMenu::CheckSelectedOp<AnimationBox> remapOp =
     [](AnimationBox * box, bool checked) {
         if(checked) box->enableFrameRemappingAction();
-        else box->disableFrameRemapping();
+        else box->disableFrameRemappingAction();
     };
     menu->addCheckableAction("Frame Remapping",
-                             mFrameRemappingEnabled, remapOp);
+                             mFrameRemapping->enabled(), remapOp);
 
     const PropertyMenu::PlainSelectedOp<AnimationBox> stretchOp =
     [widget](AnimationBox * box) {
@@ -225,19 +183,6 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
     menu->addPlainAction("Stretch...", stretchOp);
 
     BoundingBox::setupCanvasMenu(menu);
-}
-
-void AnimationBox::writeBoundingBox(eWriteStream& dst) const {
-    BoundingBox::writeBoundingBox(dst);
-    dst << mFrameRemappingEnabled;
-}
-
-void AnimationBox::readBoundingBox(eReadStream& src) {
-    BoundingBox::readBoundingBox(src);
-    bool frameRemapping;
-    src >> frameRemapping;
-    if(frameRemapping) enableFrameRemapping();
-    else disableFrameRemapping();
 }
 
 void AnimationBox::setupRenderData(const qreal relFrame,
