@@ -38,6 +38,7 @@
 #include "canvas.h"
 
 #include "Animators/SmartPath/smartpathcollection.h"
+#include "Animators/SculptPath/sculptpathcollection.h"
 
 #include "typemenu.h"
 
@@ -309,6 +310,9 @@ void BoxSingleWidget::setFillType(const int id) {
     if(target->SWT_isSmartPathCollection()) {
         const auto pAnim = static_cast<SmartPathCollection*>(target);
         pAnim->setFillType(static_cast<SkPathFillType>(id));
+    } else if(target->SWT_isSculptPathCollection()) {
+        const auto pAnim = static_cast<SculptPathCollection*>(target);
+        pAnim->setFillType(static_cast<SkPathFillType>(id));
     }
     Document::sInstance->actionFinished();
 }
@@ -417,6 +421,14 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
             mFillTypeVisible = true;
             mFillTypeCombo->setCurrentIndex(static_cast<int>(coll->getFillType()));
             connect(coll, &SmartPathCollection::fillTypeChanged,
+                    this, [this](const SkPathFillType type) {
+                mFillTypeCombo->setCurrentIndex(static_cast<int>(type));
+            });
+        } else if(target->SWT_isSculptPathCollection()) {
+            const auto coll = static_cast<SculptPathCollection*>(target);
+            mFillTypeVisible = true;
+            mFillTypeCombo->setCurrentIndex(static_cast<int>(coll->getFillType()));
+            connect(coll, &SculptPathCollection::fillTypeChanged,
                     this, [this](const SkPathFillType type) {
                 mFillTypeCombo->setCurrentIndex(static_cast<int>(type));
             });

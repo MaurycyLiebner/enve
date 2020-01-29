@@ -93,6 +93,7 @@ public:
     virtual bool SWT_isFillSettingsAnimator() const { return false; }
     virtual bool SWT_isStrokeSettings() const { return false; }
     virtual bool SWT_isSmartPathCollection() const { return false; }
+    virtual bool SWT_isSculptPathCollection() const { return false; }
     virtual bool SWT_isQPointFAnimator() const { return false; }
     virtual bool SWT_isQrealAnimator() const { return false; }
     virtual bool SWT_isQStringAnimator() const { return false; }

@@ -18,7 +18,7 @@
 #define SCULPTPATHBOX_H
 
 #include "boundingbox.h"
-#include "Animators/SculptPath/sculptpathanimator.h"
+#include "Animators/SculptPath/sculptpathcollection.h"
 #include "Animators/brushsettingsanimator.h"
 #include "Animators/coloranimator.h"
 #include "Animators/paintsettingsanimator.h"
@@ -59,7 +59,7 @@ public:
 private:
     stdptr<SimpleBrushWrapper> mBrush;
 
-    qsptr<SculptPathAnimator> mPath;
+    qsptr<SculptPathCollection> mPath;
     qsptr<QrealAnimator> mBrushWidth;
 
     qsptr<FillSettingsAnimator> mFillSettings;

@@ -517,7 +517,8 @@ void TimelineDockWidget::updateSculptPositionEnabled() {
     const SculptTarget target = mDocument.fSculptTarget;
     mPositionTarget->setEnabled(target != SculptTarget::position ||
                                 (mode == SculptMode::drag ||
-                                 mode == SculptMode::replace));
+                                 mode == SculptMode::replace ||
+                                 mode == SculptMode::add));
 }
 
 void TimelineDockWidget::sculptTargetChanged() {

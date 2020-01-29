@@ -25,7 +25,12 @@ SculptPathBoxRenderData::SculptPathBoxRenderData(
     BoxRenderData(parent) {}
 
 void SculptPathBoxRenderData::updateRelBoundingRect() {
-    fRelBoundingRect = fPath.boundingRect();
+    if(fPath.isEmpty()) return;
+    fRelBoundingRect = fPath.first().boundingRect();
+    for(int i = 1; i < fPath.count(); i++) {
+        const auto iRect = fPath.at(i).boundingRect();
+        fRelBoundingRect = fRelBoundingRect.united(iRect);
+    }
 }
 
 void SculptPathBoxRenderData::drawSk(SkCanvas * const canvas) {
@@ -33,14 +38,16 @@ void SculptPathBoxRenderData::drawSk(SkCanvas * const canvas) {
     if(!fBrush) return;
     if(fPaintSettings.fPaintType != NOPAINT) {
         SkPath path;
-        const auto& nodes = fPath.nodes();
-        bool first = true;
-        for(const auto& node : nodes) {
-            const SkPoint pos = toSkPoint(node->pos());
-            if(first) {
-                path.moveTo(pos);
-                first = false;
-            } else path.lineTo(pos);
+        for(const auto& subPath : fPath) {
+            const auto& nodes = subPath.nodes();
+            bool first = true;
+            for(const auto& node : nodes) {
+                const SkPoint pos = toSkPoint(node->pos());
+                if(first) {
+                    path.moveTo(pos);
+                    first = false;
+                } else path.lineTo(pos);
+            }
         }
         SkPaint paint;
         paint.setStyle(SkPaint::kFill_Style);
@@ -59,11 +66,10 @@ void SculptPathBoxRenderData::drawSk(SkCanvas * const canvas) {
 
     const auto strokeBrush = fBrush->getBrush();
     const auto width = fWidth*fResolution;
-    const auto set = fPath.generateBrushSet(transform, width);
-    fBrush->setColor(toSkScalar(fColor.hueF()),
-                     toSkScalar(fColor.saturationF()),
-                     toSkScalar(fColor.valueF()));
-    surf.execute(strokeBrush, set);
+    for(const auto& subPath : fPath) {
+        const auto set = subPath.generateBrushSet(transform, width);
+        surf.execute(strokeBrush, set);
+    }
 
     mBitmap.reset();
 

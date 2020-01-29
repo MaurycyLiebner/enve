@@ -71,6 +71,7 @@ SOURCES += \
     Animators/SculptPath/sculptnodebase.cpp \
     Animators/SculptPath/sculptpath.cpp \
     Animators/SculptPath/sculptpathanimator.cpp \
+    Animators/SculptPath/sculptpathcollection.cpp \
     Animators/SmartPath/listofnodes.cpp \
     Animators/SmartPath/smartpath.cpp \
     Animators/SmartPath/smartpathanimatoractions.cpp \
@@ -336,6 +337,7 @@ HEADERS += \
     Animators/SculptPath/sculptnodebase.h \
     Animators/SculptPath/sculptpath.h \
     Animators/SculptPath/sculptpathanimator.h \
+    Animators/SculptPath/sculptpathcollection.h \
     Animators/SmartPath/listofnodes.h \
     Animators/SmartPath/smartpath.h \
     Animators/brushsettingsanimator.h \

@@ -29,9 +29,8 @@ public:
 
     void updateRelBoundingRect();
 
-    QColor fColor;
     qreal fWidth;
-    SculptPath fPath;
+    QList<SculptPath> fPath;
     stdsptr<SimpleBrushWrapper> fBrush;
     UpdatePaintSettings fPaintSettings;
 protected:
