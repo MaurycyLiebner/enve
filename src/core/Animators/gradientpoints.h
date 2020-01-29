@@ -26,7 +26,7 @@ class QPointFAnimator;
 class GradientPoints : public StaticComplexAnimator {
     e_OBJECT
 protected:
-    GradientPoints(PathBox * const parent);
+    GradientPoints(BoundingBox * const parent);
 public:
     void prp_drawCanvasControls(
             SkCanvas *const canvas, const CanvasMode mode,
@@ -41,8 +41,8 @@ public:
 
     QPointF getStartPointAtRelFrame(const int relFrame);
     QPointF getEndPointAtRelFrame(const int relFrame);
-    QPointF getStartPointAtRelFrameF(const qreal relFrame);
-    QPointF getEndPointAtRelFrameF(const qreal relFrame);
+    QPointF getStartPoint(const qreal relFrame);
+    QPointF getEndPoint(const qreal relFrame);
 
     bool enabled() const {
         return mEnabled;
@@ -55,8 +55,6 @@ private:
 
     stdsptr<GradientPoint> mStartPoint;
     stdsptr<GradientPoint> mEndPoint;
-
-    PathBox* const mParent_k;
 };
 
 #endif // GRADIENTPOINTS_H

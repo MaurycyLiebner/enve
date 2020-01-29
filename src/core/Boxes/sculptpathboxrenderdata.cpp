@@ -31,6 +31,23 @@ void SculptPathBoxRenderData::updateRelBoundingRect() {
 void SculptPathBoxRenderData::drawSk(SkCanvas * const canvas) {
     Q_UNUSED(canvas)
     if(!fBrush) return;
+    if(fPaintSettings.fPaintType != NOPAINT) {
+        SkPath path;
+        const auto& nodes = fPath.nodes();
+        bool first = true;
+        for(const auto& node : nodes) {
+            const SkPoint pos = toSkPoint(node->pos());
+            if(first) {
+                path.moveTo(pos);
+                first = false;
+            } else path.lineTo(pos);
+        }
+        SkPaint paint;
+        paint.setStyle(SkPaint::kFill_Style);
+        fPaintSettings.applyPainterSettingsSk(&paint);
+        canvas->drawPath(path, paint);
+    }
+
     AutoTiledSurface surf;
     surf.setPixelClamp(fMaxBoundsRect.translated(-fGlobalRect.topLeft()));
     surf.loadBitmap(mBitmap);
@@ -42,7 +59,7 @@ void SculptPathBoxRenderData::drawSk(SkCanvas * const canvas) {
 
     const auto strokeBrush = fBrush->getBrush();
     const auto width = fWidth*fResolution;
-    auto set = fPath.generateBrushSet(transform, width);
+    const auto set = fPath.generateBrushSet(transform, width);
     fBrush->setColor(toSkScalar(fColor.hueF()),
                      toSkScalar(fColor.saturationF()),
                      toSkScalar(fColor.valueF()));

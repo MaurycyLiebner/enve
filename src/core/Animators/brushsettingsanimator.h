@@ -20,6 +20,8 @@
 #include "Animators/qcubicsegment1danimator.h"
 #include "Paint/simplebrushwrapper.h"
 
+struct UpdateStrokeSettings;
+
 class BrushSettingsAnimator : public StaticComplexAnimator {
     typedef qCubicSegment1DAnimator::Action SegAction;
     e_OBJECT
@@ -57,21 +59,20 @@ public:
     void applyTimeAction(const SegAction& action)
     { action.apply(mTimeCurve.get()); }
 
-    void setStrokeBrushWidthCurve(const qCubicSegment1D& curve) {
-        mWidthCurve->setCurrentValue(curve);
-    }
+    void setStrokeBrushWidthCurve(const qCubicSegment1D& curve)
+    { mWidthCurve->setCurrentValue(curve); }
 
-    void setStrokeBrushPressureCurve(const qCubicSegment1D& curve) {
-        mPressureCurve->setCurrentValue(curve);
-    }
+    void setStrokeBrushPressureCurve(const qCubicSegment1D& curve)
+    { mPressureCurve->setCurrentValue(curve); }
 
-    void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve) {
-        mSpacingCurve->setCurrentValue(curve);
-    }
+    void setStrokeBrushSpacingCurve(const qCubicSegment1D& curve)
+    { mSpacingCurve->setCurrentValue(curve); }
 
-    void setStrokeBrushTimeCurve(const qCubicSegment1D& curve) {
-        mTimeCurve->setCurrentValue(curve);
-    }
+    void setStrokeBrushTimeCurve(const qCubicSegment1D& curve)
+    { mTimeCurve->setCurrentValue(curve); }
+
+    void setupStrokeSettings(const qreal relFrame,
+                             UpdateStrokeSettings& settings);
 private:
     qsptr<qCubicSegment1DAnimator> mWidthCurve =
             enve::make_shared<qCubicSegment1DAnimator>("width");

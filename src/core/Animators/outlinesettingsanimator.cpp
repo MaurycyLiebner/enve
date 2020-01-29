@@ -17,13 +17,10 @@
 #include "outlinesettingsanimator.h"
 #include "Boxes/pathbox.h"
 
-OutlineSettingsAnimator::OutlineSettingsAnimator(const qsptr<GradientPoints> &grdPts,
-        PathBox * const parent) :
-    PaintSettingsAnimator("outline", grdPts, parent) {
+OutlineSettingsAnimator::OutlineSettingsAnimator(BoundingBox * const parent) :
+    PaintSettingsAnimator("outline", parent) {
 
     ca_addChild(mLineWidth);
-    connect(mLineWidth.get(), &Property::prp_currentFrameChanged,
-            parent, &PathBox::setOutlinePathOutdated);
 }
 
 void OutlineSettingsAnimator::prp_writeProperty(eWriteStream& dst) const {
@@ -107,6 +104,21 @@ void OutlineSettingsAnimator::setStrokerSettingsForRelFrameSk(
     stroker->setWidth(toSkScalar(widthT));
     stroker->setCap(mCapStyle);
     stroker->setJoin(mJoinStyle);
+}
+
+void OutlineSettingsAnimator::duplicateStrokeSettingsNotAnim(
+        OutlineSettingsAnimator * const settings) {
+    duplicatePaintSettingsNotAnim(settings);
+    if(settings) {
+        const qreal width = settings->getCurrentStrokeWidth();
+        mLineWidth->setCurrentBaseValue(width);
+    }
+}
+
+void OutlineSettingsAnimator::setupStrokeSettings(const qreal relFrame,
+                                                  UpdateStrokeSettings &settings) {
+    setupPaintSettings(relFrame, settings);
+    settings.fOutlineWidth = mLineWidth->getEffectiveValue(relFrame);
 }
 
 qreal OutlineSettingsAnimator::getCurrentStrokeWidth() const {

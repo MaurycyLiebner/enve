@@ -19,6 +19,7 @@
 
 #include "boxrenderdata.h"
 #include "Animators/SculptPath/sculptpath.h"
+#include "Animators/paintsettingsanimator.h"
 
 class SculptPathBox;
 
@@ -32,6 +33,7 @@ public:
     qreal fWidth;
     SculptPath fPath;
     stdsptr<SimpleBrushWrapper> fBrush;
+    UpdatePaintSettings fPaintSettings;
 protected:
     void drawSk(SkCanvas * const canvas);
 };

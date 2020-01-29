@@ -19,20 +19,20 @@
 #include "skia/skqtconversions.h"
 #include "Boxes/pathbox.h"
 
-GradientPoints::GradientPoints(PathBox * const parent) :
-    StaticComplexAnimator("gradient points"), mParent_k(parent) {
+GradientPoints::GradientPoints(BoundingBox * const parent) :
+    StaticComplexAnimator("gradient points") {
 
     setPointsHandler(enve::make_shared<PointsHandler>());
 
     mStartAnimator = enve::make_shared<QPointFAnimator>("point1");
     ca_addChild(mStartAnimator);
-    mStartPoint = enve::make_shared<GradientPoint>(mStartAnimator.get(), mParent_k);
+    mStartPoint = enve::make_shared<GradientPoint>(mStartAnimator.get(), parent);
     getPointsHandler()->appendPt(mStartPoint);
 
     mEndAnimator = enve::make_shared<QPointFAnimator>("point2");
     ca_addChild(mEndAnimator);
 
-    mEndPoint = enve::make_shared<GradientPoint>(mEndAnimator.get(), mParent_k);
+    mEndPoint = enve::make_shared<GradientPoint>(mEndAnimator.get(), parent);
     getPointsHandler()->appendPt(mEndPoint);
 
     mEnabled = false;
@@ -81,11 +81,11 @@ QPointF GradientPoints::getEndPointAtRelFrame(const int relFrame) {
     return mEndAnimator->getEffectiveValue(relFrame);
 }
 
-QPointF GradientPoints::getStartPointAtRelFrameF(const qreal relFrame) {
+QPointF GradientPoints::getStartPoint(const qreal relFrame) {
     return mStartAnimator->getEffectiveValue(relFrame);
 }
 
-QPointF GradientPoints::getEndPointAtRelFrameF(const qreal relFrame) {
+QPointF GradientPoints::getEndPoint(const qreal relFrame) {
     return mEndAnimator->getEffectiveValue(relFrame);
 }
 

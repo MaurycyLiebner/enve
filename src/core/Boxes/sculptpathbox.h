@@ -21,6 +21,7 @@
 #include "Animators/SculptPath/sculptpathanimator.h"
 #include "Animators/brushsettingsanimator.h"
 #include "Animators/coloranimator.h"
+#include "Animators/paintsettingsanimator.h"
 
 class SculptPathBox : public BoundingBox {
 public:
@@ -43,6 +44,10 @@ public:
     void readBoundingBox(eReadStream& src);
     void writeBoundingBox(eWriteStream& dst);
 
+    FillSettingsAnimator *getFillSettings() const
+    { return mFillSettings.get(); }
+
+    void setPath(const SkPath& path);
     void sculptStarted();
     void sculpt(const SculptTarget target,
                 const SculptMode mode,
@@ -56,6 +61,8 @@ private:
 
     qsptr<SculptPathAnimator> mPath;
     qsptr<QrealAnimator> mBrushWidth;
+
+    qsptr<FillSettingsAnimator> mFillSettings;
 };
 
 #endif // SCULPTPATHBOX_H

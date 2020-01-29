@@ -43,34 +43,16 @@ public:
 
     HardwareSupport hardwareSupport() const;
 
-    void setStrokeCapStyle(const SkPaint::Cap capStyle);
-    void setStrokeJoinStyle(const SkPaint::Join joinStyle);
-    void setStrokeBrush(SimpleBrushWrapper * const brush);
-
-    void applyStrokeBrushWidthAction(const SegAction& action);
-    void applyStrokeBrushPressureAction(const SegAction& action);
-    void applyStrokeBrushSpacingAction(const SegAction& action);
-    void applyStrokeBrushTimeAction(const SegAction& action);
-
-    void strokeWidthAction(const QrealAction &action);
-
-    void setOutlineCompositionMode(
-            const QPainter::CompositionMode &compositionMode);
-
-    void startSelectedStrokeColorTransform();
-    void startSelectedFillColorTransform();
-
     OutlineSettingsAnimator *getStrokeSettings() const;
     FillSettingsAnimator *getFillSettings() const;
 
     SmartVectorPath *objectToVectorPathBox();
     SmartVectorPath *strokeToVectorPathBox();
+    SculptPathBox* objectToSculptPathBox();
 
     bool relPointInsidePath(const QPointF &relPos) const;
 
     void drawHoveredSk(SkCanvas *canvas, const float invScale);
-
-    void applyPaintSetting(const PaintSettingsApplier &setting);
 
     bool SWT_isPathBox() const { return true; }
 
@@ -107,14 +89,8 @@ public:
     void duplicatePaintSettingsFrom(FillSettingsAnimator * const fillSettings,
                                     OutlineSettingsAnimator * const strokeSettings);
 
-    void updateStrokeDrawGradient();
-    void updateFillDrawGradient();
     const SkPath &getRelativePath() const;
-    void updateDrawGradients();
     void setOutlineAffectedByScale(const bool bT);
-
-    GradientPoints *getFillGradientPoints();
-    GradientPoints *getStrokeGradientPoints();
 
     void copyDataToOperationResult(PathBox * const targetBox) const;
     void copyPathBoxDataTo(PathBox * const targetBox) const;
@@ -136,9 +112,6 @@ public:
         mCurrentFillPathOutdated = true;
         planUpdate(reason);
     }
-
-    void resetStrokeGradientPointsPos();
-    void resetFillGradientPointsPos();
 protected:
     bool mOutlineAffectedByScale = true;
     bool mCurrentPathsOutdated = true;
@@ -152,8 +125,8 @@ protected:
     SkPath mFillPathSk;
     SkPath mOutlinePathSk;
 
-    qsptr<GradientPoints> mFillGradientPoints;
-    qsptr<GradientPoints> mStrokeGradientPoints;
+    GradientPoints* mFillGradientPoints = nullptr;
+    GradientPoints* mStrokeGradientPoints = nullptr;
 
     qsptr<FillSettingsAnimator> mFillSettings;
     qsptr<OutlineSettingsAnimator> mStrokeSettings;

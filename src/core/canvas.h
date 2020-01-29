@@ -200,6 +200,7 @@ public:
     void resetSelectedRotation();
     void convertSelectedBoxesToPath();
     void convertSelectedPathStrokesToPath();
+    void convertSelectedBoxesToSculptedPath();
 
     void applySampledMotionBlurToSelected();
     void applyLinesEffectToSelected();

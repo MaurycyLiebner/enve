@@ -35,11 +35,12 @@ class SkStroke;
 class GradientPoints;
 class AdvancedTransformAnimator;
 
+struct UpdatePaintSettings;
+
 class PaintSettingsAnimator : public ComplexAnimator {
 protected:
     PaintSettingsAnimator(const QString &name,
-                          const qsptr<GradientPoints> &grdPts,
-                          PathBox * const parent);
+                          BoundingBox * const parent);
 
     virtual void showHideChildrenBeforeChaningPaintType(
             const PaintType newPaintType);
@@ -64,12 +65,22 @@ public:
 
     QMatrix getGradientTransform(const qreal relFrame) const;
     void setGradientTransform(const TransformValues& transform);
+
+    GradientPoints* getGradientPoints() const
+    { return mGradientPoints.get(); }
+
+    void setupPaintSettings(const qreal relFrame,
+                            UpdatePaintSettings& settings);
+    void duplicatePaintSettingsNotAnim(PaintSettingsAnimator * const settings);
 private:
+    void resetGradientPoints();
+    void updateGradientPoint();
+
     GradientType mGradientType = GradientType::LINEAR;
     PaintType mPaintType = NOPAINT;
 
-    PathBox * const mTarget_k;
-    const qsptr<GradientPoints> mGradientPoints;
+    BoundingBox * const mTarget_k;
+    qsptr<GradientPoints> mGradientPoints;
     qsptr<ColorAnimator> mColor = enve::make_shared<ColorAnimator>();
     ConnContextQPtr<SceneBoundGradient> mGradient;
     qsptr<AdvancedTransformAnimator> mGradientTransform;
@@ -78,9 +89,8 @@ private:
 class FillSettingsAnimator : public PaintSettingsAnimator {
     e_OBJECT
 protected:
-    FillSettingsAnimator(const qsptr<GradientPoints> &grdPts,
-                         PathBox * const parent) :
-        PaintSettingsAnimator("fill", grdPts, parent) {}
+    FillSettingsAnimator(BoundingBox * const parent) :
+        PaintSettingsAnimator("fill", parent) {}
 public:
     bool SWT_isFillSettingsAnimator() const { return true; }
 };

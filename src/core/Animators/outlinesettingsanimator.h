@@ -23,8 +23,7 @@ class OutlineSettingsAnimator : public PaintSettingsAnimator {
     typedef qCubicSegment1DAnimator::Action SegAction;
     e_OBJECT
 protected:
-    OutlineSettingsAnimator(const qsptr<GradientPoints> &grdPts,
-                            PathBox * const parent);
+    OutlineSettingsAnimator(BoundingBox * const parent);
 public:
     bool SWT_isStrokeSettings() const { return true; }
 
@@ -92,6 +91,11 @@ public:
 
     void setStrokerSettingsForRelFrameSk(const qreal relFrame,
                                          SkStroke * const stroker);
+
+    void setupStrokeSettings(const qreal relFrame,
+                             UpdateStrokeSettings& settings);
+    void duplicateStrokeSettingsNotAnim(
+            OutlineSettingsAnimator * const settings);
 private:
     SkPaint::Cap mCapStyle = SkPaint::kRound_Cap;
     SkPaint::Join mJoinStyle = SkPaint::kRound_Join;

@@ -458,6 +458,13 @@ void MainWindow::setupMenuBar() {
     mPathMenu->addSeparator();
 
     {
+        const auto qAct = mPathMenu->addAction("Object to Sculpted Path");
+        mActions.objectsToSculptedPathAction->connect(qAct);
+    }
+
+    mPathMenu->addSeparator();
+
+    {
         const auto qAct = mPathMenu->addAction("Union");
         qAct->setShortcut(Qt::CTRL + Qt::Key_Plus);
         mActions.pathsUnionAction->connect(qAct);

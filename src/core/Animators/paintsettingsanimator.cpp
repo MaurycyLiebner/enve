@@ -25,12 +25,13 @@
 #include "Private/document.h"
 #include "canvas.h"
 #include "transformanimator.h"
+#include "simpletask.h"
 
 PaintSettingsAnimator::PaintSettingsAnimator(const QString &name,
-                                             const qsptr<GradientPoints>& grdPts,
-                                             PathBox * const parent) :
+                                             BoundingBox * const parent) :
     ComplexAnimator(name),
-    mTarget_k(parent), mGradientPoints(grdPts) {
+    mTarget_k(parent) {
+    mGradientPoints = enve::make_shared<GradientPoints>(parent);
     mGradientTransform = enve::make_shared<AdvancedTransformAnimator>();
 }
 
@@ -46,7 +47,6 @@ void PaintSettingsAnimator::prp_writeProperty(eWriteStream& dst) const {
     mGradientTransform->prp_writeProperty(dst);
 }
 
-#include "simpletask.h"
 void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
     mColor->prp_readProperty(src);
     PaintType paintType;
@@ -71,6 +71,16 @@ void PaintSettingsAnimator::prp_readProperty(eReadStream& src) {
     });
 }
 
+void PaintSettingsAnimator::updateGradientPoint() {
+    if(mPaintType == GRADIENTPAINT && mGradient) {
+        mGradientPoints->setColors(mGradient->getFirstQGradientStopQColor(),
+                                   mGradient->getLastQGradientStopQColor());
+        mGradientPoints->enable();
+    } else {
+        mGradientPoints->disable();
+    }
+}
+
 void PaintSettingsAnimator::setGradientVar(SceneBoundGradient* const grad) {
     if(grad == mGradient) return;
     if(mGradient) {
@@ -84,11 +94,11 @@ void PaintSettingsAnimator::setGradientVar(SceneBoundGradient* const grad) {
         ca_addChild(mGradientPoints);
         ca_addChild(mGradientTransform);
         conn << connect(grad, &SceneBoundGradient::prp_currentFrameChanged,
-                        this, [this]() { mTarget_k->updateDrawGradients(); });
+                        this, [this]() { updateGradientPoint(); });
         conn << connect(grad, &Gradient::removed,
                         this, [this]() { setGradient(nullptr); });
     }
-    mTarget_k->updateDrawGradients();
+    updateGradientPoint();
     mTarget_k->requestGlobalFillStrokeUpdateIfSelected();
 }
 
@@ -126,6 +136,39 @@ void PaintSettingsAnimator::setGradientTransform(const TransformValues &transfor
     mGradientTransform->setValues(transform);
 }
 
+void PaintSettingsAnimator::setupPaintSettings(const qreal relFrame,
+                                               UpdatePaintSettings &settings) {
+    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
+
+    settings.fPaintColor = getColor(relFrame);
+    settings.fPaintType = mPaintType;
+    if(mGradient && mPaintType == PaintType::GRADIENTPAINT) {
+        const auto gradientStops = mGradient->getQGradientStops(absFrame);
+        const auto startPoint = mGradientPoints->getStartPoint(relFrame);
+        const auto endPoint = mGradientPoints->getEndPoint(relFrame);
+        const auto gradientType = getGradientType();
+        const auto gradientTransform = getGradientTransform(relFrame);
+        settings.updateGradient(gradientStops, startPoint, endPoint,
+                                    gradientType, gradientTransform);
+    }
+}
+
+void PaintSettingsAnimator::duplicatePaintSettingsNotAnim(
+        PaintSettingsAnimator * const settings) {
+    if(!settings) {
+        setPaintType(NOPAINT);
+    } else {
+        const PaintType paintType = settings->getPaintType();
+        setPaintType(paintType);
+        if(paintType == FLATPAINT) {
+            setCurrentColor(settings->getColor());
+        } else if(paintType == GRADIENTPAINT) {
+            setGradient(settings->getGradient());
+            setGradientType(settings->getGradientType());
+        }
+    }
+}
+
 PaintType PaintSettingsAnimator::getPaintType() const {
     return mPaintType;
 }
@@ -134,13 +177,16 @@ SceneBoundGradient *PaintSettingsAnimator::getGradient() const {
     return *mGradient;
 }
 
+void PaintSettingsAnimator::resetGradientPoints() {
+    const QRectF relRect = mTarget_k->getRelBoundingRect();
+    mGradientPoints->anim_setRecording(false);
+    mGradientPoints->setPositions(relRect.topLeft(),
+                                  relRect.bottomRight());
+}
+
 void PaintSettingsAnimator::setGradient(SceneBoundGradient* gradient) {
     if(gradient == mGradient) return;
-    if(gradient && !mGradient) {
-        if(mTarget_k->getFillSettings() == this)
-            mTarget_k->resetFillGradientPointsPos();
-        else mTarget_k->resetStrokeGradientPointsPos();
-    }
+    if(gradient && !mGradient) resetGradientPoints();
     {
         UndoRedo ur;
         const qptr<SceneBoundGradient> oldValue = *mGradient;
@@ -188,7 +234,7 @@ void PaintSettingsAnimator::setPaintType(const PaintType paintType) {
     showHideChildrenBeforeChaningPaintType(paintType);
 
     mPaintType = paintType;
-    mTarget_k->updateDrawGradients();
+    updateGradientPoint();
     mTarget_k->requestGlobalFillStrokeUpdateIfSelected();
     prp_afterWholeInfluenceRangeChanged();
 

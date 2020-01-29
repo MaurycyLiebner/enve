@@ -56,6 +56,7 @@ void SculptPath::setPath(const SkPath &path, const qreal spacing) {
             mNodes.append(stdsptr<SculptNode>(node));
         }
     }
+    updateBoundingRect();
 }
 
 BrushStroke generateBrushStroke(const QMatrix &transform,

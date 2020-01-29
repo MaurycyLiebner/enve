@@ -36,6 +36,7 @@
 #include "RasterEffects/rastereffectsinclude.h"
 #include "RasterEffects/rastereffectmenucreator.h"
 #include "matrixdecomposition.h"
+#include "paintsettingsapplier.h"
 
 int BoundingBox::sNextDocumentId = 0;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
@@ -452,17 +453,85 @@ BoundingBox *BoundingBox::getBoxAtFromAllDescendents(const QPointF &absPos) {
     return nullptr;
 }
 
+void BoundingBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
+    const auto strokeSettings = getStrokeSettings();
+    if(!strokeSettings) return;
+    strokeSettings->setCapStyle(capStyle);
+    prp_afterWholeInfluenceRangeChanged();
+    planUpdate(UpdateReason::userChange);
+}
+
+void BoundingBox::setStrokeJoinStyle(const SkPaint::Join joinStyle) {
+    const auto strokeSettings = getStrokeSettings();
+    if(!strokeSettings) return;
+    strokeSettings->setJoinStyle(joinStyle);
+    prp_afterWholeInfluenceRangeChanged();
+    planUpdate(UpdateReason::userChange);
+}
+
+void BoundingBox::setOutlineCompositionMode(
+        const QPainter::CompositionMode compositionMode) {
+    const auto strokeSettings = getStrokeSettings();
+    if(!strokeSettings) return;
+    strokeSettings->setOutlineCompositionMode(compositionMode);
+    prp_afterWholeInfluenceRangeChanged();
+    planUpdate(UpdateReason::userChange);
+}
+
+void BoundingBox::setStrokeBrush(SimpleBrushWrapper * const brush) {
+    const auto strokeSettings = getStrokeSettings();
+    if(!strokeSettings) return;
+    strokeSettings->setStrokeBrush(brush);
+}
+
+void BoundingBox::applyStrokeBrushWidthAction(const SegAction &action) {
+    const auto strokeSettings = getStrokeSettings();
+    if(!strokeSettings) return;
+    strokeSettings->applyStrokeBrushWidthAction(action);
+}
+
+void BoundingBox::applyStrokeBrushPressureAction(const SegAction &action) {
+    const auto strokeSettings = getStrokeSettings();
+    if(!strokeSettings) return;
+    strokeSettings->applyStrokeBrushPressureAction(action);
+}
+
+void BoundingBox::applyStrokeBrushSpacingAction(const SegAction &action) {
+    const auto strokeSettings = getStrokeSettings();
+    if(!strokeSettings) return;
+    strokeSettings->applyStrokeBrushSpacingAction(action);
+}
+
+void BoundingBox::applyStrokeBrushTimeAction(const SegAction &action) {
+    const auto strokeSettings = getStrokeSettings();
+    if(!strokeSettings) return;
+    strokeSettings->applyStrokeBrushTimeAction(action);
+}
+
 QPointF BoundingBox::mapAbsPosToRel(const QPointF &absPos) {
     return mTransformAnimator->mapAbsPosToRel(absPos);
 }
 
-FillSettingsAnimator *BoundingBox::getFillSettings() const {
-    return nullptr;
+void BoundingBox::strokeWidthAction(const QrealAction& action) {
+    const auto strokeSettings = getStrokeSettings();
+    if(!strokeSettings) return;
+    strokeSettings->strokeWidthAction(action);
 }
 
-OutlineSettingsAnimator *BoundingBox::getStrokeSettings() const {
-    return nullptr;
+void BoundingBox::startSelectedStrokeColorTransform() {
+    const auto strokeSettings = getStrokeSettings();
+    if(!strokeSettings) return;
+    strokeSettings->getColorAnimator()->prp_startTransform();
 }
+
+void BoundingBox::startSelectedFillColorTransform() {
+    const auto fillSettings = getStrokeSettings();
+    if(!fillSettings) return;
+    fillSettings->getColorAnimator()->prp_startTransform();
+}
+
+void BoundingBox::applyPaintSetting(const PaintSettingsApplier &setting)
+{ setting.apply(this); }
 
 void BoundingBox::drawBoundingRect(SkCanvas * const canvas,
                                    const float invScale) {
@@ -739,10 +808,6 @@ BasicTransformAnimator *BoundingBox::getTransformAnimator() const {
 BoxTransformAnimator *BoundingBox::getBoxTransformAnimator() const {
     return mTransformAnimator.get();
 }
-
-SmartVectorPath *BoundingBox::objectToVectorPathBox() { return nullptr; }
-
-SmartVectorPath *BoundingBox::strokeToVectorPathBox() { return nullptr; }
 
 bool BoundingBox::isAnimated() const {
     return anim_isDescendantRecording();

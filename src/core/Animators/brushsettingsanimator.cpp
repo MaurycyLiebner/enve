@@ -16,6 +16,7 @@
 
 #include "brushsettingsanimator.h"
 #include "Paint/brushescontext.h"
+#include "paintsettingsanimator.h"
 
 BrushSettingsAnimator::BrushSettingsAnimator() :
     StaticComplexAnimator("brush settings") {
@@ -59,4 +60,15 @@ void BrushSettingsAnimator::setBrush(SimpleBrushWrapper * const brush) {
     }
     mBrush = brush;
     prp_afterWholeInfluenceRangeChanged();
+}
+
+void BrushSettingsAnimator::setupStrokeSettings(const qreal relFrame,
+                                                UpdateStrokeSettings &settings) {
+    if(!mBrush) return;
+    settings.fStrokeBrush = mBrush->createDuplicate();
+    settings.fTimeCurve = mTimeCurve->getValueAtRelFrame(relFrame);
+    settings.fWidthCurve = mWidthCurve->getValueAtRelFrame(relFrame)*
+                           settings.fOutlineWidth;
+    settings.fPressureCurve = mPressureCurve->getValueAtRelFrame(relFrame);
+    settings.fSpacingCurve = mSpacingCurve->getValueAtRelFrame(relFrame);
 }

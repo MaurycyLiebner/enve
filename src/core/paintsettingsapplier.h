@@ -36,14 +36,15 @@ public:
     enum Target { FILL, OUTLINE };
     virtual ~PaintSetting() {}
 
-    void apply(PathBox * const target) const {
-        applyToPS(targetPaintSettings(target));
+    void apply(BoundingBox * const target) const {
+        const auto targetSettings = targetPaintSettings(target);
+        if(targetSettings) applyToPS(targetSettings);
     }
 protected:
     PaintSetting(const Target& target) : mTarget(target) {}
     virtual void applyToPS(PaintSettingsAnimator * const target) const = 0;
 private:
-    PaintSettingsAnimator * targetPaintSettings(PathBox * const target) const {
+    PaintSettingsAnimator * targetPaintSettings(BoundingBox * const target) const {
         if(mTarget == FILL) return target->getFillSettings();
         return target->getStrokeSettings();
     }
@@ -195,7 +196,7 @@ public:
     inline PaintSettingsApplier &operator<< (const stdsptr<PaintSetting> &t)
     { mSettings << t; return *this; }
 
-    void apply(PathBox * const target) const {
+    void apply(BoundingBox * const target) const {
         for(const auto& setting : mSettings)
             setting->apply(target);
     }

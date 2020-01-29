@@ -23,7 +23,9 @@ SculptPathBox::SculptPathBox() : BoundingBox(eBoxType::sculptPath) {
     prp_setName("Sculpt Path");
     mBrushWidth = enve::make_shared<QrealAnimator>(1, 0, 999, 1, "width");
     mPath = enve::make_shared<SculptPathAnimator>();
+    mFillSettings = enve::make_shared<FillSettingsAnimator>(this);
 
+    ca_prependChild(mRasterEffectsAnimators.data(), mFillSettings);
     ca_prependChild(mRasterEffectsAnimators.data(), mBrushWidth);
     ca_prependChild(mRasterEffectsAnimators.data(), mPath);
 }
@@ -46,6 +48,9 @@ void SculptPathBox::setupRenderData(const qreal relFrame,
     sculptData->fWidth = mBrushWidth->getEffectiveValue(relFrame);
     mPath->deepCopyValue(relFrame, sculptData->fPath);
     sculptData->fBrush = mBrush ? mBrush->createDuplicate() : nullptr;
+
+    UpdatePaintSettings &fillSettings = sculptData->fPaintSettings;
+    mFillSettings->setupPaintSettings(relFrame, fillSettings);
 }
 
 stdsptr<BoxRenderData> SculptPathBox::createRenderData() {
@@ -75,6 +80,12 @@ void SculptPathBox::writeBoundingBox(eWriteStream &dst) {
     BoundingBox::writeBoundingBox(dst);
 
     dst << mBrush.data();
+}
+
+void SculptPathBox::setPath(const SkPath &path) {
+    mPath->prp_startTransform();
+    mPath->getCurrentlyEdited()->setPath(path, 5);
+    mPath->prp_finishTransform();
 }
 
 void SculptPathBox::sculptStarted() {

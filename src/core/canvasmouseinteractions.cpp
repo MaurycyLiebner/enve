@@ -394,21 +394,17 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
                         if(e.shiftMod()) {
                             pathBox->duplicateStrokeSettingsFrom(
                                         srcPathBox->getStrokeSettings());
-                            pathBox->resetStrokeGradientPointsPos();
                         } else {
                             pathBox->duplicateFillSettingsFrom(
                                         srcPathBox->getFillSettings());
-                            pathBox->resetFillGradientPointsPos();
                         }
                     } else {
                         if(e.shiftMod()) {
                             pathBox->duplicateStrokeSettingsNotAnimatedFrom(
                                         srcPathBox->getStrokeSettings());
-                            pathBox->resetStrokeGradientPointsPos();
                         } else {
                             pathBox->duplicateFillSettingsNotAnimatedFrom(
                                         srcPathBox->getFillSettings());
-                            pathBox->resetFillGradientPointsPos();
                         }
                     }
                 }

@@ -102,6 +102,11 @@ public:
     bool compatibleTarget(T* const obj) const {
         return mContentType == std::type_index(typeid(*obj));
     }
+
+    template<typename T>
+    static bool sCopyAndPaste(T* const from, T* const to) {
+        return PropertyClipboard(from).paste(to);
+    }
 private:
     const std::type_index mContentType;
 };

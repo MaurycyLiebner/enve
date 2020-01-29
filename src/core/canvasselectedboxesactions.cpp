@@ -142,6 +142,11 @@ void Canvas::convertSelectedPathStrokesToPath() {
     }
 }
 
+void Canvas::convertSelectedBoxesToSculptedPath() {
+    for(const auto &box : mSelectedBoxes)
+        box->objectToSculptPathBox();
+}
+
 void Canvas::setSelectedTextAlignment(const Qt::Alignment alignment) const {
     pushUndoRedoName("Change Text Alignment");
     for(const auto &box : mSelectedBoxes) {

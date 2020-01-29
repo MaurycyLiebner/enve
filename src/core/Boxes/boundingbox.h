@@ -42,6 +42,7 @@ class BasicTransformAnimator;
 
 class ContainerBox;
 class SmartVectorPath;
+class SculptPathBox;
 class DurationRectangle;
 struct ContainerBoxRenderData;
 class ShaderEffect;
@@ -109,8 +110,12 @@ protected:
 public:
     virtual qsptr<BoundingBox> createLink();
 
-    virtual SmartVectorPath *objectToVectorPathBox();
-    virtual SmartVectorPath *strokeToVectorPathBox();
+    virtual SmartVectorPath *objectToVectorPathBox()
+    { return nullptr; }
+    virtual SmartVectorPath *strokeToVectorPathBox()
+    { return nullptr;}
+    virtual SculptPathBox *objectToSculptPathBox()
+    { return nullptr; }
 
     virtual void centerPivotPosition();
     virtual QPointF getRelCenterPosition();
@@ -148,29 +153,26 @@ public:
 
     virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
 
-    virtual FillSettingsAnimator *getFillSettings() const;
-    virtual OutlineSettingsAnimator *getStrokeSettings() const;
+    virtual FillSettingsAnimator *getFillSettings() const
+    { return nullptr; }
+    virtual OutlineSettingsAnimator *getStrokeSettings() const
+    { return nullptr; }
 
-    virtual void applyStrokeBrushWidthAction(const SegAction& action)
-    { Q_UNUSED(action) }
-    virtual void applyStrokeBrushPressureAction(const SegAction& action)
-    { Q_UNUSED(action) }
-    virtual void applyStrokeBrushSpacingAction(const SegAction& action)
-    { Q_UNUSED(action) }
-    virtual void applyStrokeBrushTimeAction(const SegAction& action)
-    { Q_UNUSED(action) }
+    virtual void applyStrokeBrushWidthAction(const SegAction& action);
+    virtual void applyStrokeBrushPressureAction(const SegAction& action);
+    virtual void applyStrokeBrushSpacingAction(const SegAction& action);
+    virtual void applyStrokeBrushTimeAction(const SegAction& action);
 
-    virtual void setStrokeCapStyle(const SkPaint::Cap capStyle)
-    { Q_UNUSED(capStyle) }
-    virtual void setStrokeJoinStyle(const SkPaint::Join joinStyle)
-    { Q_UNUSED(joinStyle) }
-    virtual void setStrokeBrush(SimpleBrushWrapper * const brush)
-    { Q_UNUSED(brush) }
-    virtual void strokeWidthAction(const QrealAction& action)
-    { Q_UNUSED(action) }
+    virtual void setStrokeCapStyle(const SkPaint::Cap capStyle);
+    virtual void setStrokeJoinStyle(const SkPaint::Join joinStyle);
+    virtual void setStrokeBrush(SimpleBrushWrapper * const brush);
 
-    virtual void startSelectedStrokeColorTransform() {}
-    virtual void startSelectedFillColorTransform() {}
+    virtual void setOutlineCompositionMode(
+            const QPainter::CompositionMode compositionMode);
+
+    virtual void strokeWidthAction(const QrealAction& action);
+    virtual void startSelectedStrokeColorTransform();
+    virtual void startSelectedFillColorTransform();
 
     virtual void updateAllBoxes(const UpdateReason reason);
 
@@ -180,8 +182,7 @@ public:
     virtual QMatrix getTotalTransformAtFrame(const qreal relFrame);
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
 
-    virtual void applyPaintSetting(const PaintSettingsApplier &setting)
-    { Q_UNUSED(setting) }
+    virtual void applyPaintSetting(const PaintSettingsApplier &setting);
     virtual void addPathEffect(const qsptr<PathEffect>& effect)
     { Q_UNUSED(effect) }
     virtual void addFillPathEffect(const qsptr<PathEffect>& effect)

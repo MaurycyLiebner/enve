@@ -15,6 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Boxes/pathbox.h"
+
+#include "Boxes/sculptpathbox.h"
 #include "MovablePoints/gradientpoint.h"
 #include "Animators/gradientpoints.h"
 #include "skia/skiaincludes.h"
@@ -28,6 +30,7 @@
 #include "Animators/outlinesettingsanimator.h"
 #include "PathEffects/patheffectstask.h"
 #include "Private/Tasks/taskscheduler.h"
+#include "clipboardcontainer.h"
 
 PathBox::PathBox(const eBoxType type) : BoxWithPathEffects(type) {
     connect(this, &eBoxOrSound::parentChanged, this, [this]() {
@@ -54,23 +57,23 @@ PathBox::PathBox(const eBoxType type) : BoxWithPathEffects(type) {
         setOutlinePathOutdated(reason);
     });
 
-    mStrokeGradientPoints = enve::make_shared<GradientPoints>(this);
-    mFillGradientPoints = enve::make_shared<GradientPoints>(this);
+    mFillSettings = enve::make_shared<FillSettingsAnimator>(this);
+    mFillGradientPoints = mFillSettings->getGradientPoints();
+    mStrokeSettings = enve::make_shared<OutlineSettingsAnimator>(this);
+    mStrokeGradientPoints = mFillSettings->getGradientPoints();
 
-    mFillSettings = enve::make_shared<FillSettingsAnimator>(
-                mFillGradientPoints, this);
-    mStrokeSettings = enve::make_shared<OutlineSettingsAnimator>(
-                mStrokeGradientPoints, this);
     mStrokeSettings->setPaintType(PaintType::FLATPAINT);
     mStrokeSettings->setCurrentColor(QColor(0, 0, 0));
 
-    ca_prependChild(mPathEffectsAnimators.get(),
-                            mFillSettings);
-    ca_prependChild(mPathEffectsAnimators.get(),
-                            mStrokeSettings);
+    ca_prependChild(mPathEffectsAnimators.get(), mFillSettings);
+    ca_prependChild(mPathEffectsAnimators.get(), mStrokeSettings);
 
     ca_moveChildBelow(mRasterEffectsAnimators.data(),
                       mOutlinePathEffectsAnimators.data());
+
+    const auto lineWidthAnim = mStrokeSettings->getStrokeWidthAnimator();
+    connect(lineWidthAnim, &Property::prp_currentFrameChanged,
+            this, &PathBox::setOutlinePathOutdated);
 }
 
 HardwareSupport PathBox::hardwareSupport() const {
@@ -196,124 +199,16 @@ void PathBox::setupStrokerSettings(PathBoxRenderData * const pathData,
 
 void PathBox::setupPaintSettings(PathBoxRenderData * const pathData,
                                  const qreal relFrame) {
-    const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
     UpdatePaintSettings &fillSettings = pathData->fPaintSettings;
-
-    fillSettings.fPaintColor = mFillSettings->getColor(relFrame);
-    fillSettings.fPaintType = mFillSettings->getPaintType();
-    const auto fillGrad = mFillSettings->getGradient();
-    if(fillGrad) {
-        fillSettings.updateGradient(
-                    fillGrad->getQGradientStopsAtAbsFrame(absFrame),
-                    mFillGradientPoints->getStartPointAtRelFrameF(relFrame),
-                    mFillGradientPoints->getEndPointAtRelFrameF(relFrame),
-                    mFillSettings->getGradientType(),
-                    mFillSettings->getGradientTransform(relFrame));
-    }
-
     UpdateStrokeSettings &strokeSettings = pathData->fStrokeSettings;
-    const auto widthAnimator = mStrokeSettings->getStrokeWidthAnimator();
-    strokeSettings.fOutlineWidth = widthAnimator->getEffectiveValue(relFrame);
 
-    strokeSettings.fPaintColor = mStrokeSettings->getColor(relFrame);
-    strokeSettings.fPaintType = mStrokeSettings->getPaintType();
-    const auto strokeGrad = mStrokeSettings->getGradient();
-    if(strokeSettings.fPaintType == PaintType::GRADIENTPAINT && strokeGrad) {
-        strokeSettings.updateGradient(
-                    strokeGrad->getQGradientStopsAtAbsFrame(absFrame),
-                    mStrokeGradientPoints->getStartPointAtRelFrameF(relFrame),
-                    mStrokeGradientPoints->getEndPointAtRelFrameF(relFrame),
-                    mStrokeSettings->getGradientType(),
-                    mStrokeSettings->getGradientTransform(relFrame));
-    }
+    mFillSettings->setupPaintSettings(relFrame, fillSettings);
+    mStrokeSettings->setupStrokeSettings(relFrame, strokeSettings);
 
     const auto brushSettings = mStrokeSettings->getBrushSettings();
     if(strokeSettings.fPaintType == PaintType::BRUSHPAINT && brushSettings) {
-        auto brush = brushSettings->getBrush();
-        if(brush) {
-            strokeSettings.fStrokeBrush = brush->createDuplicate();
-            strokeSettings.fTimeCurve =
-                    brushSettings->getTimeAnimator()->
-                        getValueAtRelFrame(relFrame);
-
-            strokeSettings.fWidthCurve =
-                    brushSettings->getWidthAnimator()->
-                        getValueAtRelFrame(relFrame)*strokeSettings.fOutlineWidth;
-            strokeSettings.fPressureCurve =
-                    brushSettings->getPressureAnimator()->
-                        getValueAtRelFrame(relFrame);
-            strokeSettings.fSpacingCurve =
-                    brushSettings->getSpacingAnimator()->
-                        getValueAtRelFrame(relFrame);
-        }
+        brushSettings->setupStrokeSettings(relFrame, strokeSettings);
     }
-}
-
-void PathBox::resetStrokeGradientPointsPos() {
-    mStrokeGradientPoints->anim_setRecording(false);
-    mStrokeGradientPoints->setPositions(mRelRect.topLeft(), mRelRect.bottomRight());
-}
-
-void PathBox::resetFillGradientPointsPos() {
-    mFillGradientPoints->anim_setRecording(false);
-    mFillGradientPoints->setPositions(mRelRect.topLeft(), mRelRect.bottomRight());
-}
-
-
-void PathBox::setStrokeBrush(SimpleBrushWrapper * const brush) {
-    mStrokeSettings->setStrokeBrush(brush);
-}
-
-void PathBox::applyStrokeBrushWidthAction(const PathBox::SegAction &action)
-{ mStrokeSettings->applyStrokeBrushWidthAction(action); }
-
-void PathBox::applyStrokeBrushPressureAction(const PathBox::SegAction &action)
-{ mStrokeSettings->applyStrokeBrushPressureAction(action); }
-
-void PathBox::applyStrokeBrushSpacingAction(const PathBox::SegAction &action)
-{ mStrokeSettings->applyStrokeBrushSpacingAction(action); }
-
-void PathBox::applyStrokeBrushTimeAction(const PathBox::SegAction &action)
-{ mStrokeSettings->applyStrokeBrushTimeAction(action); }
-
-void PathBox::setStrokeCapStyle(const SkPaint::Cap capStyle) {
-    mStrokeSettings->setCapStyle(capStyle);
-    prp_afterWholeInfluenceRangeChanged();
-    planUpdate(UpdateReason::userChange);
-}
-
-void PathBox::setStrokeJoinStyle(const SkPaint::Join joinStyle) {
-    mStrokeSettings->setJoinStyle(joinStyle);
-    prp_afterWholeInfluenceRangeChanged();
-    planUpdate(UpdateReason::userChange);
-}
-
-void PathBox::setOutlineCompositionMode(
-        const QPainter::CompositionMode &compositionMode) {
-    mStrokeSettings->setOutlineCompositionMode(compositionMode);
-    prp_afterWholeInfluenceRangeChanged();
-    planUpdate(UpdateReason::userChange);
-}
-
-void PathBox::strokeWidthAction(const QrealAction& action) {
-    mStrokeSettings->strokeWidthAction(action);
-}
-
-void PathBox::startSelectedStrokeColorTransform() {
-    mStrokeSettings->getColorAnimator()->prp_startTransform();
-}
-
-void PathBox::startSelectedFillColorTransform() {
-    mFillSettings->getColorAnimator()->prp_startTransform();
-}
-
-
-GradientPoints *PathBox::getStrokeGradientPoints() {
-    return mStrokeGradientPoints.data();
-}
-
-GradientPoints *PathBox::getFillGradientPoints() {
-    return mFillGradientPoints.data();
 }
 
 void PathBox::duplicatePaintSettingsFrom(
@@ -359,45 +254,16 @@ void PathBox::duplicateStrokeSettingsFrom(
 
 void PathBox::duplicateFillSettingsNotAnimatedFrom(
         FillSettingsAnimator * const fillSettings) {
-    if(!fillSettings) {
-        mFillSettings->setPaintType(NOPAINT);
-    } else {
-        const PaintType paintType = fillSettings->getPaintType();
-        mFillSettings->setPaintType(paintType);
-        if(paintType == FLATPAINT) {
-            mFillSettings->setCurrentColor(fillSettings->getColor());
-        } else if(paintType == GRADIENTPAINT) {
-            mFillSettings->setGradient(fillSettings->getGradient());
-            mFillSettings->setGradientType(fillSettings->getGradientType());
-        }
-    }
+    mFillSettings->duplicatePaintSettingsNotAnim(fillSettings);
 }
 
 void PathBox::duplicateStrokeSettingsNotAnimatedFrom(
         OutlineSettingsAnimator * const strokeSettings) {
-    if(!strokeSettings) {
-        mStrokeSettings->setPaintType(NOPAINT);
-    } else {
-        const PaintType paintType = strokeSettings->getPaintType();
-        mStrokeSettings->setPaintType(paintType);
-        if(paintType == FLATPAINT) {
-            mStrokeSettings->getColorAnimator()->setColor(
-                        strokeSettings->getColor());
-        } else if(paintType == GRADIENTPAINT) {
-            mStrokeSettings->setGradient(strokeSettings->getGradient());
-            mStrokeSettings->setGradientType(strokeSettings->getGradientType());
-        }
-        mStrokeSettings->getStrokeWidthAnimator()->setCurrentBaseValue(
-                    strokeSettings->getCurrentStrokeWidth());
-    }
+    mStrokeSettings->duplicateStrokeSettingsNotAnim(strokeSettings);
 }
 
 void PathBox::drawHoveredSk(SkCanvas *canvas, const float invScale) {
     drawHoveredPathSk(canvas, mPathSk, invScale);
-}
-
-void PathBox::applyPaintSetting(const PaintSettingsApplier &setting) {
-    setting.apply(this);
 }
 
 void PathBox::copyDataToOperationResult(PathBox * const targetBox) const {
@@ -446,34 +312,17 @@ SmartVectorPath *PathBox::strokeToVectorPathBox() {
     return newPath.get();
 }
 
+SculptPathBox *PathBox::objectToSculptPathBox() {
+    const auto newPath = enve::make_shared<SculptPathBox>();
+    newPath->setPath(mEditPathSk);
+    PropertyClipboard::sCopyAndPaste(mFillSettings.get(),
+                                     newPath->getFillSettings());
+    copyBoundingBoxDataTo(newPath.get());
+    mParentGroup->addContained(newPath);
+    return newPath.get();
+}
+
 const SkPath &PathBox::getRelativePath() const { return mPathSk; }
-
-void PathBox::updateFillDrawGradient() {
-    const auto gradient = mFillSettings->getGradient();
-    if(mFillSettings->getPaintType() == GRADIENTPAINT && gradient) {
-        mFillGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
-                                       gradient->getLastQGradientStopQColor());
-        mFillGradientPoints->enable();
-    } else {
-        mFillGradientPoints->disable();
-    }
-}
-
-void PathBox::updateStrokeDrawGradient() {
-    const auto gradient = mStrokeSettings->getGradient();
-    if(mStrokeSettings->getPaintType() == GRADIENTPAINT && gradient) {
-        mStrokeGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
-                                         gradient->getLastQGradientStopQColor());
-        mStrokeGradientPoints->enable();
-    } else {
-        mStrokeGradientPoints->disable();
-    }
-}
-
-void PathBox::updateDrawGradients() {
-    updateFillDrawGradient();
-    updateStrokeDrawGradient();
-}
 
 void PathBox::updateCurrentPreviewDataFromRenderData(
         BoxRenderData* renderData) {

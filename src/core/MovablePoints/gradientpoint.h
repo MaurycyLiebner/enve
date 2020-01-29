@@ -23,7 +23,7 @@ class GradientPoint : public AnimatedPoint {
     e_OBJECT
 public:
     GradientPoint(QPointFAnimator* const associatedAnimator,
-                  PathBox * const parent);
+                  BoundingBox * const parent);
     void setColor(const QColor &fillColor);
     void drawSk(SkCanvas * const canvas,
                 const CanvasMode mode,

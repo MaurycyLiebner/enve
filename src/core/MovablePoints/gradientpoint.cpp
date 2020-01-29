@@ -20,7 +20,7 @@
 #include "Animators/transformanimator.h"
 
 GradientPoint::GradientPoint(QPointFAnimator * const associatedAnimator,
-                             PathBox* const parent) :
+                             BoundingBox* const parent) :
     AnimatedPoint(associatedAnimator, parent->getTransformAnimator(),
                   TYPE_GRADIENT_POINT) {}
 

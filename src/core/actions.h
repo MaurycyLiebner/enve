@@ -116,6 +116,7 @@ public:
 
     UndoableAction* objectsToPathAction;
     UndoableAction* strokeToPathAction;
+    UndoableAction* objectsToSculptedPathAction;
 
     UndoableAction* groupAction;
     UndoableAction* ungroupAction;

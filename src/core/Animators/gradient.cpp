@@ -64,7 +64,7 @@ QColor Gradient::getColorAt(const int id) {
     return color->getColor();
 }
 
-QGradientStops Gradient::getQGradientStopsAtAbsFrame(const qreal absFrame) {
+QGradientStops Gradient::getQGradientStops(const qreal absFrame) {
     const int nCols = ca_getNumberOfChildren();
     QGradientStops stops;
     const qreal inc = 1./(nCols - 1);
