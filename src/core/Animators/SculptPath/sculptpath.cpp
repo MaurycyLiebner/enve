@@ -194,6 +194,8 @@ void SculptPath::applyTransform(const QMatrix &transform) {
     for(const auto& node : mNodes) {
         node->setPos(transform.map(node->pos()));
     }
+    remesh(5);
+    updateBoundingRect();
 }
 
 void SculptPath::read(eReadStream &src) {
