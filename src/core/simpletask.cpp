@@ -28,7 +28,7 @@ SimpleTask* SimpleTask::sSchedule(const Func &func) {
 
 void SimpleTask::sProcessAll() {
     for(int i = 0; i < sTasks.count(); i++) {
-        const auto& task = sTasks.at(i);
+        const auto task = sTasks.at(i);
         task->process();
         delete task;
     }
