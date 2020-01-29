@@ -433,20 +433,10 @@ private:
     RenderContainer mDrawRenderContainer;
 };
 
+#include "clipboardcontainer.h"
 template <typename B, typename T>
 void BoundingBox::sWriteReadMember(const B * const from, B* const to, const T member) {
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    eWriteStream writeStream(&buffer);
-    (from->*member)->prp_writeProperty(writeStream);
-    writeStream.writeFutureTable();
-    buffer.seek(0);
-    eReadStream readStream(&buffer);
-    buffer.seek(buffer.size() - qint64(sizeof(int)));
-    readStream.readFutureTable();
-    buffer.seek(0);
-    (to->*member)->prp_readProperty(readStream);
-    buffer.close();
+    PropertyClipboard::sCopyAndPaste(from->*member, to->*member);
 }
 
 #endif // BOUNDINGBOX_H

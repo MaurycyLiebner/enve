@@ -107,6 +107,11 @@ public:
     static bool sCopyAndPaste(T* const from, T* const to) {
         return PropertyClipboard(from).paste(to);
     }
+
+    template<typename T>
+    static bool sCopyAndPaste(const qsptr<T>& from, const qsptr<T>& to) {
+        return PropertyClipboard(from.get()).paste(to.get());
+    }
 private:
     const std::type_index mContentType;
 };
