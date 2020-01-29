@@ -33,6 +33,7 @@ public:
     QList<SculptPath> fPath;
     stdsptr<SimpleBrushWrapper> fBrush;
     UpdatePaintSettings fPaintSettings;
+    SkPathFillType fFillType;
 protected:
     void drawSk(SkCanvas * const canvas);
 };

@@ -49,6 +49,7 @@ void SculptPathBoxRenderData::drawSk(SkCanvas * const canvas) {
                 } else path.lineTo(pos);
             }
         }
+        path.setFillType(fFillType);
         SkPaint paint;
         paint.setStyle(SkPaint::kFill_Style);
         fPaintSettings.applyPainterSettingsSk(&paint);

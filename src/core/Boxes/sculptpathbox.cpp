@@ -61,6 +61,7 @@ void SculptPathBox::setupRenderData(const qreal relFrame,
     sculptData->fWidth = mBrushWidth->getEffectiveValue(relFrame);
     sculptData->fPath = mPath->getPathAtRelFrame(relFrame);
     sculptData->fBrush = mBrush ? mBrush->createDuplicate() : nullptr;
+    sculptData->fFillType = mPath->getFillType();
 
     UpdatePaintSettings &fillSettings = sculptData->fPaintSettings;
     mFillSettings->setupPaintSettings(relFrame, fillSettings);
