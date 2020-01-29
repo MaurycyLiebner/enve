@@ -58,12 +58,9 @@ SmartNodePoint *SmartPathCollection::createNewSubPathAtRelPos(const QPointF &rel
 }
 
 SmartNodePoint *SmartPathCollection::createNewSubPathAtPos(const QPointF &absPos) {
-    const auto newPath = createNewPath();
-    const auto handler = newPath->getPointsHandler();
-    const auto pathHandler = static_cast<PathPointsHandler*>(handler);
-    const auto trans = handler->transform();
+    const auto trans = getTransformAnimator();
     const auto relPos = trans ? trans->mapAbsPosToRel(absPos) : absPos;
-    return pathHandler->addNewAtEnd(relPos);
+    return createNewSubPathAtRelPos(relPos);
 }
 
 void SmartPathCollection::moveAllFrom(SmartPathCollection * const from) {
