@@ -17,6 +17,7 @@
 #include "sculptpathanimator.h"
 #include "Animators/transformanimator.h"
 #include "Private/document.h"
+#include "Properties/emimedata.h"
 
 using SculptPathKey = InterpolationKeyT<SculptPath>;
 
@@ -25,6 +26,10 @@ SculptPathAnimator::SculptPathAnimator() :
     enabledDrawingOnCanvas();
     const auto circle = SkPath().addCircle(0, 0, 50);
     getCurrentlyEdited()->setPath(circle, 5);
+}
+
+QMimeData *SculptPathAnimator::SWT_createMimeData() {
+    return new eMimeData(QList<SculptPathAnimator*>() << this);
 }
 
 void SculptPathAnimator::prp_drawCanvasControls(

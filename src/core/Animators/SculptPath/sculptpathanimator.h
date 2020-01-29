@@ -25,6 +25,8 @@ class SculptPathAnimator : public InterOptimalAnimatorT<SculptPath> {
 public:
     SculptPathAnimator();
 
+    QMimeData *SWT_createMimeData();
+
     void prp_drawCanvasControls(SkCanvas * const canvas,
                                 const CanvasMode mode,
                                 const float invScale,
