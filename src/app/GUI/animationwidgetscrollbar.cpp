@@ -274,7 +274,7 @@ void FrameScrollBar::setDisplayedFrameRange(const FrameRange& range) {
         }
         divInc++;
     }
-
+    mDrawFrameInc = qMax(1, mDrawFrameInc);
     mMaxSpan = range.span() - 1;
     setViewedFrameRange({mFirstViewedFrame, mFirstViewedFrame + mViewedFramesSpan});
 }
