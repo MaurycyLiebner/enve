@@ -368,6 +368,8 @@ void BoundingBox::prp_updateCanvasProps() {
         if(prop->prp_drawsOnCanvas()) mCanvasProps.append(prop);
     });
     if(prp_drawsOnCanvas()) mCanvasProps.append(this);
+    const auto parentScene = getParentScene();
+    if(parentScene) parentScene->requestUpdate();
 }
 
 void BoundingBox::updateCurrentPreviewDataFromRenderData(
