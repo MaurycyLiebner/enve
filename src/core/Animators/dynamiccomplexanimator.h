@@ -120,6 +120,13 @@ public:
         return child;
     }
 
+
+    void moveAllFrom(DynamicComplexAnimatorBase<T> * const from) {
+        const int iMax = from->ca_getNumberOfChildren() - 1;
+        for(int i = iMax; i >= 0; i--)
+            addChild(from->takeChildAt(i));
+    }
+
     void swapChildren(const int id1, const int id2) {
         ca_swapChildren(id1, id2);
 

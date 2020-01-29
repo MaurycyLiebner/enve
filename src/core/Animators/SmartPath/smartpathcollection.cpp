@@ -63,12 +63,6 @@ SmartNodePoint *SmartPathCollection::createNewSubPathAtPos(const QPointF &absPos
     return createNewSubPathAtRelPos(relPos);
 }
 
-void SmartPathCollection::moveAllFrom(SmartPathCollection * const from) {
-    const int iMax = from->ca_getNumberOfChildren() - 1;
-    for(int i = iMax; i >= 0; i--)
-        addChild(from->takeChildAt(i));
-}
-
 SkPath SmartPathCollection::getPathAtRelFrame(const qreal relFrame) const {
     SkPath result;
     const auto& children = ca_getChildren();

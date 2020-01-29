@@ -39,8 +39,6 @@ public:
     SmartNodePoint * createNewSubPathAtRelPos(const QPointF &relPos);
     SmartNodePoint * createNewSubPathAtPos(const QPointF &absPos);
 
-    void moveAllFrom(SmartPathCollection * const from);
-
     SkPath getPathAtRelFrame(const qreal relFrame) const;
 
     void applyTransform(const QMatrix &transform) const;
