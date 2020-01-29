@@ -26,7 +26,7 @@
 #include "pointhelpers.h"
 #include "pathoperations.h"
 #include "autotilesdata.h"
-#include "brushstroke.h"
+#include "brushstrokeset.h"
 
 class AutoTiledSurfaceBase {
     friend struct BrushStroke;
@@ -86,7 +86,7 @@ public:
         return roi;
     }
 
-    void execute(MyPaintBrush * const brush, BrushStrokeSet& set) {
+    void execute(MyPaintBrush * const brush, const BrushStrokeSet& set) {
         set.execute(brush, mMyPaintSurface, 5);
     }
 

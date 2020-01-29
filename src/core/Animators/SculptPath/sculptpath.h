@@ -20,7 +20,7 @@
 #include "sculptbrush.h"
 #include "smartPointers/stdselfref.h"
 #include "skia/skiaincludes.h"
-#include "Paint/brushstroke.h"
+#include "Paint/brushstrokeset.h"
 
 enum class SculptMode {
     drag, add, replace, subtract

@@ -43,13 +43,13 @@ struct qCubicSegment1D {
 
     qreal valAtT(const qreal t) const;
 
-    qreal length();
-    qreal tAtLength(const qreal len);
-    qreal lengthAtT(qreal t);
-    qreal lengthFracAtT(qreal t);
+    qreal length() const;
+    qreal tAtLength(const qreal len) const;
+    qreal lengthAtT(qreal t) const;
+    qreal lengthFracAtT(qreal t) const;
 
-    Pair dividedAtT(qreal t);
-    qCubicSegment1D tFragment(qreal minT, qreal maxT);
+    Pair dividedAtT(qreal t) const;
+    qCubicSegment1D tFragment(qreal minT, qreal maxT) const;
 
     qreal p0() const;
     qreal c1() const;
@@ -63,12 +63,12 @@ struct qCubicSegment1D {
 
     qreal minDistanceTo(const qreal p,
                         qreal * const pBestT = nullptr,
-                        qreal * const pBestPos = nullptr);
+                        qreal * const pBestPos = nullptr) const;
     qreal minDistanceTo(const qreal p,
                         const qreal minT,
                         const qreal maxT,
                         qreal * const pBestT = nullptr,
-                        qreal * const pBestPos = nullptr);
+                        qreal * const pBestPos = nullptr) const;
 
     bool operator==(const qCubicSegment1D& seg) const {
         return isZero6Dec(seg.p0() - p0()) &&
@@ -120,12 +120,12 @@ struct qCubicSegment1D {
 //                                            _qCubicSegment2D& seg2);
 private:
     qreal tAtLength(const qreal length, const qreal maxLenErr,
-                    const qreal minT, const qreal maxT);
+                    const qreal minT, const qreal maxT) const;
     void solveDerivativeZero(qreal &t1, qreal &t2, qreal &t3) const;
 
-    void updateLength();
-    bool mLengthUpToDate = false;
-    qreal fLength;
+    void updateLength() const;
+    mutable bool mLengthUpToDate = false;
+    mutable qreal fLength;
 
     qreal mP0;
     qreal mC1;

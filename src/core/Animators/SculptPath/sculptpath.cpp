@@ -64,8 +64,8 @@ BrushStroke generateBrushStroke(const QMatrix &transform,
 
     BrushStroke result;
 
-    result.fXTilt = DefaultTiltCurve;
-    result.fYTilt = DefaultTiltCurve;
+    result.fXTilt = DEFAULT_TILT_CURVE;
+    result.fYTilt = DEFAULT_TILT_CURVE;
 
     const auto lastPos = transform.map(startNode->pos());
     const auto iPos = transform.map(endNode->pos());

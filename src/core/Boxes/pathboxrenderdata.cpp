@@ -67,7 +67,7 @@ void PathBoxRenderData::drawSk(SkCanvas * const canvas) {
 
             const auto strokeBrush = fStrokeSettings.fStrokeBrush->getBrush();
             auto strokeWidthCurve = fStrokeSettings.fWidthCurve*fResolution;
-            auto strokeBrushSet = BrushStrokeSet::outlineStrokesForSkPath(
+            const auto strokeBrushSet = BrushStrokeSet::sOutlineStrokesForSkPath(
                         pathT,
                         fStrokeSettings.fTimeCurve,
                         fStrokeSettings.fPressureCurve,
@@ -77,7 +77,7 @@ void PathBoxRenderData::drawSk(SkCanvas * const canvas) {
                         toSkScalar(fStrokeSettings.fPaintColor.saturationF()),
                         toSkScalar(fStrokeSettings.fPaintColor.valueF()));
             //const auto brush = fStrokeSettings.fStrokeBrush->getBrush();
-            for(auto& set : strokeBrushSet)
+            for(const auto& set : strokeBrushSet)
                 surf.execute(strokeBrush, set);
 
             mBitmap.reset();

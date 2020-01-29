@@ -26,7 +26,7 @@ struct CubicList {
     CubicList(const QList<qCubicSegment2D>& segs);
     CubicList(const CubicList& src);
 
-    PosAndTan posAndTanAtLength(const qreal atLength) {
+    PosAndTan posAndTanAtLength(const qreal atLength) const {
         if(atLength < 0) {
             if(mSegments.isEmpty()) return { QPointF(0, 0), QPointF(0, 0) };
             return { mSegments.first().p0(), mSegments.first().tanAtT(0) };
@@ -44,7 +44,7 @@ struct CubicList {
         return { mSegments.last().p3(), mSegments.last().tanAtT(1) };
     }
 
-    QPointF posAtLength(const qreal atLength) {
+    QPointF posAtLength(const qreal atLength) const {
         if(atLength < 0) {
             if(mSegments.isEmpty()) return QPointF(0, 0);
             return mSegments.first().p0();
@@ -62,7 +62,7 @@ struct CubicList {
         return mSegments.last().p3();
     }
 
-    QPointF tanAtLength(const qreal atLength) {
+    QPointF tanAtLength(const qreal atLength) const {
         if(atLength < 0) {
             if(mSegments.isEmpty()) return QPointF(0, 0);
             return mSegments.first().tanAtT(0);
@@ -81,14 +81,14 @@ struct CubicList {
     }
 
     CubicList getFragment(const qreal minLenFrac,
-                          const qreal maxLenFrac);
+                          const qreal maxLenFrac) const;
 
     CubicList getFragmentUnbound(const qreal minLenFrac,
-                                 const qreal maxLenFrac);
+                                 const qreal maxLenFrac) const;
 
     static QList<CubicList> sMakeFromSkPath(const SkPath& src);
 
-    SkPath toSkPath() {
+    SkPath toSkPath() const {
         if(isEmpty()) return SkPath();
         SkPath path;
         bool first = true;
@@ -111,7 +111,7 @@ struct CubicList {
         return path;
     }
 
-    qreal getTotalLength();
+    qreal getTotalLength() const;
 
     bool isEmpty() const;
     bool isClosed() const {
@@ -120,7 +120,7 @@ struct CubicList {
 
     qreal minDistanceTo(const QPointF &p,
                         qreal * const pBestT = nullptr,
-                        QPointF * const pBestPos = nullptr);
+                        QPointF * const pBestPos = nullptr) const;
 
     void opSmoothOut(const qreal smoothness);
     void subdivide(const int sub = 1);
@@ -141,23 +141,27 @@ struct CubicList {
         return mSegments;
     }
 
-    int lineIntersections(const QLineF& line, QList<QPointF>& pts);
+    int lineIntersections(const QLineF& line,
+                          QList<QPointF>& pts) const;
 
     typedef QList<qCubicSegment2D>::const_iterator const_iterator;
     const_iterator cbegin() const { return mSegments.cbegin(); }
     const_iterator cend() const { return mSegments.cend(); }
 
+    const_iterator begin() const { return mSegments.cbegin(); }
+    const_iterator end() const { return mSegments.cend(); }
+
     typedef QList<qCubicSegment2D>::iterator iterator;
     iterator begin() { return mSegments.begin(); }
     iterator end() { return mSegments.end(); }
 private:
-    void updateTotalLength();
+    void updateTotalLength() const;
     void updateClosed();
 
     bool mClosedUpToDate = true;
     bool mClosed = false;
-    bool mTotalLengthUpToDate = false;
-    qreal mTotalLength = 0;
+    mutable bool mTotalLengthUpToDate = false;
+    mutable qreal mTotalLength = 0;
     QList<qCubicSegment2D> mSegments;
 };
 

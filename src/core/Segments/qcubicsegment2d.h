@@ -78,20 +78,20 @@ struct qCubicSegment2D {
     qCubicSegment1D xSeg() const;
     qCubicSegment1D ySeg() const;
 
-    QPointF tanAtLength(const qreal len);
+    QPointF tanAtLength(const qreal len) const;
     QPointF tanAtT(const qreal t) const;
 
-    PosAndTan posAndTanAtLength(const qreal len);
+    PosAndTan posAndTanAtLength(const qreal len) const;
     PosAndTan posAndTanAtT(const qreal t) const;
 
     QPointF posAtT(const qreal t) const;
-    QPointF posAtLength(const qreal len);
-    qreal tAtPos(const QPointF& pos);
+    QPointF posAtLength(const qreal len) const;
+    qreal tAtPos(const QPointF& pos) const;
 
-    qreal length();
-    qreal tAtLength(const qreal len);
-    qreal lengthAtT(qreal t);
-    qreal lengthFracAtT(qreal t);
+    qreal length() const;
+    qreal tAtLength(const qreal len) const;
+    qreal lengthAtT(qreal t) const;
+    qreal lengthFracAtT(qreal t) const;
 
     Pair dividedAtT(qreal t) const;
 
@@ -109,12 +109,12 @@ struct qCubicSegment2D {
     PosAndT closestPosAndT(const QPointF& p);
     qreal minDistanceTo(const QPointF &p,
                         qreal * const pBestT = nullptr,
-                        QPointF * const pBestPos = nullptr);
+                        QPointF * const pBestPos = nullptr) const;
     qreal minDistanceTo(const QPointF &p,
                         const qreal minT,
                         const qreal maxT,
                         qreal * const pBestT = nullptr,
-                        QPointF * const pBestPos = nullptr);
+                        QPointF * const pBestPos = nullptr) const;
 
     qCubicSegment2D rotated(const qreal deg) const {
         qCubicSegment2D result(*this);
@@ -159,9 +159,9 @@ struct qCubicSegment2D {
     qreal tFurthestInDirection(const qreal deg) const;
 
     qCubicSegment2D tFragment(qreal minT, qreal maxT) const;
-    qCubicSegment2D lenFragment(const qreal minLen, const qreal maxLen);
+    qCubicSegment2D lenFragment(const qreal minLen, const qreal maxLen) const;
     qCubicSegment2D lenFracFragment(const qreal minLenFrac,
-                                    const qreal maxLenFrac);
+                                    const qreal maxLenFrac) const;
 
     bool isLine() const {
         const qreal arr1 = mP0.x()*(mC1.y() - mC2.y()) +
@@ -183,11 +183,11 @@ struct qCubicSegment2D {
     }
 private:
     qreal tAtLength(const qreal length, const qreal maxLenErr,
-                    const qreal minT, const qreal maxT);
+                    const qreal minT, const qreal maxT) const;
 
-    void updateLength();
-    bool mLengthUpToDate = false;
-    qreal fLength;
+    void updateLength() const;
+    mutable bool mLengthUpToDate = false;
+    mutable qreal fLength;
 
     QPointF mP0;
     QPointF mC1;

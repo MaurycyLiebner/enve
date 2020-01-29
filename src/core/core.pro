@@ -166,6 +166,7 @@ SOURCES += \
     Paint/brushcontexedwrapper.cpp \
     Paint/brushescontext.cpp \
     Paint/brushstroke.cpp \
+    Paint/brushstrokeset.cpp \
     Paint/colorconversions.cpp \
     Paint/drawableautotiledsurface.cpp \
     Paint/onionskin.cpp \
@@ -434,6 +435,7 @@ HEADERS += \
     Paint/brushcontexedwrapper.h \
     Paint/brushescontext.h \
     Paint/brushstroke.h \
+    Paint/brushstrokeset.h \
     Paint/colorconversions.h \
     Paint/drawableautotiledsurface.h \
     Paint/onionskin.h \

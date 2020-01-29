@@ -32,7 +32,7 @@ CubicList::CubicList(const CubicList &src) {
 }
 
 CubicList CubicList::getFragment(const qreal minLenFrac,
-                                 const qreal maxLenFrac) {
+                                 const qreal maxLenFrac) const {
     if(minLenFrac > maxLenFrac) return CubicList();
     //Q_ASSERT(minLenFrac > 0);
     //Q_ASSERT(maxLenFrac < 1);
@@ -73,7 +73,7 @@ CubicList CubicList::getFragment(const qreal minLenFrac,
 }
 
 CubicList CubicList::getFragmentUnbound(const qreal minLenFrac,
-                                        const qreal maxLenFrac) {
+                                        const qreal maxLenFrac) const {
     if(minLenFrac > maxLenFrac) return CubicList();
     const qreal shiftToPos = floor4Dec(minLenFrac);
     const qreal posMinLenFrac = minLenFrac - shiftToPos; // always between 0 and 1
@@ -162,7 +162,7 @@ QList<CubicList> CubicList::sMakeFromSkPath(const SkPath &src) {
     }
 }
 
-qreal CubicList::getTotalLength() {
+qreal CubicList::getTotalLength() const {
     if(!mTotalLengthUpToDate) updateTotalLength();
     return mTotalLength;
 }
@@ -171,7 +171,7 @@ bool CubicList::isEmpty() const { return mSegments.isEmpty(); }
 
 qreal CubicList::minDistanceTo(const QPointF &p,
                                qreal * const pBestT,
-                               QPointF * const pBestPos) {
+                               QPointF * const pBestPos) const {
     qreal bestT = 0;
     QPointF bestPos;
     qreal smallestDist = __DBL_MAX__;
@@ -258,7 +258,7 @@ void CubicList::subdivide(const int sub) {
     }
 }
 
-void CubicList::updateTotalLength() {
+void CubicList::updateTotalLength() const {
     mTotalLengthUpToDate = true;
     mTotalLength = 0;
     for(auto& seg : mSegments)
@@ -276,7 +276,7 @@ void CubicList::updateClosed() {
     mClosed = pointToLen(firstSeg.p0() - lastSeg.p3()) < 0.1;
 }
 
-int cubicBezierLine(qCubicSegment2D &seg,
+int cubicBezierLine(const qCubicSegment2D &seg,
                     const QLineF& line,
                     QList<QPointF>& result);
 
@@ -296,9 +296,10 @@ bool descendingY(const QPointF& pt1, const QPointF& pt2) {
     return pt1.y() > pt2.y();
 }
 
-int CubicList::lineIntersections(const QLineF &line, QList<QPointF> &pts) {
+int CubicList::lineIntersections(const QLineF &line,
+                                 QList<QPointF> &pts) const {
     if(isZero6Dec(line.length())) return 0;
-    for(auto& seg : mSegments) cubicBezierLine(seg, line, pts);
+    for(const auto& seg : mSegments) cubicBezierLine(seg, line, pts);
     if(isZero6Dec(line.dx())) {
         if(line.dy() > 0) {
             std::sort(pts.begin(), pts.end(), ascendingY);
@@ -318,7 +319,7 @@ int CubicList::lineIntersections(const QLineF &line, QList<QPointF> &pts) {
 int polySolveCubic(double a, double b, double c,
                    double *x0, double *x1, double *x2);
 
-int cubicBezierLine(qCubicSegment2D& seg,
+int cubicBezierLine(const qCubicSegment2D& seg,
                     const QLineF& line,
                     QList<QPointF>& result) {
     const QRectF segBB = seg.ptsBoundingRect();
