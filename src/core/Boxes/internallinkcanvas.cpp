@@ -60,12 +60,13 @@ void InternalLinkCanvas::setupRenderData(const qreal relFrame,
                                          Canvas* const scene) {
     const qreal remapped = mFrameRemapping->frame(relFrame);
     InternalLinkGroupBox::setupRenderData(remapped, data, scene);
+    data->fRelFrame = relFrame;
 
     ContainerBox* finalTarget = getFinalTarget();
     auto canvasData = static_cast<LinkCanvasRenderData*>(data);
     const auto canvasTarget = static_cast<Canvas*>(finalTarget);
     canvasData->fBgColor = toSkColor(canvasTarget->getBgColorAnimator()->
-            getColor(remapped));
+            getColor(relFrame));
     //qreal res = mParentScene->getResolutionFraction();
     canvasData->fCanvasHeight = canvasTarget->getCanvasHeight();//*res;
     canvasData->fCanvasWidth = canvasTarget->getCanvasWidth();//*res;
