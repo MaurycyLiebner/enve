@@ -118,20 +118,11 @@ void AnimationBox::enableFrameRemappingAction() {
 }
 
 void AnimationBox::enableFrameRemapping() {
-    if(mFrameRemappingEnabled) return;
-    mFrameRemappingEnabled = true;
-    mFrameAnimator->SWT_show();
+    setFrameRemappingEnabled(true);
 }
 
 void AnimationBox::disableFrameRemapping() {
-    if(!mFrameRemappingEnabled) return;
-    mFrameRemappingEnabled = false;
-    mFrameAnimator->anim_removeAllKeys();
-    mFrameAnimator->anim_setRecordingValue(false);
-    mFrameAnimator->SWT_hide();
-    prp_afterWholeInfluenceRangeChanged();
-    planUpdate(UpdateReason::userChange);
-    updateDurationRectangleAnimationRange();
+    setFrameRemappingEnabled(false);
 }
 
 void AnimationBox::setFrameRemappingEnabled(const bool enabled) {
