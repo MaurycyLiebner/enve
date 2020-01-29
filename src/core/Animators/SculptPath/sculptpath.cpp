@@ -35,6 +35,7 @@ SculptPath &SculptPath::operator=(const SculptPath &other) {
     for(const auto& otherNode : other.mNodes) {
         mNodes.append(std::make_shared<SculptNode>(*otherNode));
     }
+    mBoundingRect = other.mBoundingRect;
     return *this;
 }
 
@@ -353,6 +354,17 @@ SculptPath SculptPath::sInterpolate(const SculptPath &path1,
             result.mNodes << node;
         }
     }
+    const qreal path2Infl = 1 - path1Infl;
+    const qreal top = path1.mBoundingRect.top()*path1Infl +
+                      path2.mBoundingRect.top()*path2Infl;
+    const qreal left = path1.mBoundingRect.left()*path1Infl +
+                       path2.mBoundingRect.left()*path2Infl;
+    const qreal right = path1.mBoundingRect.right()*path1Infl +
+                        path2.mBoundingRect.right()*path2Infl;
+    const qreal bottom = path1.mBoundingRect.bottom()*path1Infl +
+                         path2.mBoundingRect.bottom()*path2Infl;
+    result.mBoundingRect = QRect(QPoint{qFloor(left), qFloor(top)},
+                                 QPoint{qCeil(right), qCeil(bottom)});
     result.remesh(5);
     return result;
 }
