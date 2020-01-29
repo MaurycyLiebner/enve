@@ -169,6 +169,10 @@ void PaintSettingsAnimator::duplicatePaintSettingsNotAnim(
     }
 }
 
+void PaintSettingsAnimator::applyTransform(const QMatrix &transform) {
+    mGradientPoints->applyTransform(transform);
+}
+
 PaintType PaintSettingsAnimator::getPaintType() const {
     return mPaintType;
 }

@@ -471,7 +471,7 @@ void Canvas::clearBoxesSelectionList() {
     emit objectSelectionChanged();
 }
 
-void Canvas::applyCurrentTransformationToSelected() {
+void Canvas::applyCurrentTransformToSelected() {
 }
 
 //bool zAsc(BoundingBox* const box1, BoundingBox* const box2) {

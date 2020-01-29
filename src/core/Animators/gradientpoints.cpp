@@ -42,6 +42,11 @@ void GradientPoints::enable() {
     mEnabled = true;
 }
 
+void GradientPoints::applyTransform(const QMatrix &transform) {
+    mStartAnimator->applyTransform(transform);
+    mEndAnimator->applyTransform(transform);
+}
+
 void GradientPoints::setPositions(const QPointF &startPos,
                                   const QPointF &endPos) {
     mStartPoint->setRelativePos(startPos);

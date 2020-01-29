@@ -59,15 +59,18 @@ void SmartVectorPath::setupCanvasMenu(PropertyMenu * const menu) {
     menu->addedActionsForType<SmartVectorPath>();
     PathBox::setupCanvasMenu(menu);
     PropertyMenu::PlainSelectedOp<SmartVectorPath> op = [](SmartVectorPath * box) {
-        box->applyCurrentTransformation();
+        box->applyCurrentTransform();
     };
     menu->addSeparator();
     menu->addPlainAction("Apply Transformation", op);
 }
 
-void SmartVectorPath::applyCurrentTransformation() {
+void SmartVectorPath::applyCurrentTransform() {
     mNReasonsNotToApplyUglyTransform++;
-    mPathAnimator->applyTransform(mTransformAnimator->getCurrentTransform());
+    const auto transform = mTransformAnimator->getCurrentTransform();
+    mPathAnimator->applyTransform(transform);
+    getFillSettings()->applyTransform(transform);
+    getStrokeSettings()->applyTransform(transform);
     mTransformAnimator->reset();
     planCenterPivotPosition();
     mNReasonsNotToApplyUglyTransform--;

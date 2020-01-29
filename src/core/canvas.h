@@ -250,7 +250,7 @@ public:
     qreal getResolutionFraction();
     void setResolutionFraction(const qreal percent);
 
-    void applyCurrentTransformationToSelected();
+    void applyCurrentTransformToSelected();
     QPointF getSelectedPointsAbsPivotPos();
     bool isPointSelectionEmpty() const;
     void scaleSelectedPointsBy(const qreal scaleXBy,

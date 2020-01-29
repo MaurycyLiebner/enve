@@ -42,7 +42,7 @@ public:
 
     bool differenceInEditPathBetweenFrames(const int frame1,
                                            const int frame2) const;
-    void applyCurrentTransformation();
+    void applyCurrentTransform();
 
     void loadSkPath(const SkPath& path);
 

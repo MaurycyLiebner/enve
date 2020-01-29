@@ -63,7 +63,7 @@ void SculptPathBox::setupCanvasMenu(PropertyMenu * const menu) {
     menu->addedActionsForType<SculptPathBox>();
     BoundingBox::setupCanvasMenu(menu);
     PropertyMenu::PlainSelectedOp<SculptPathBox> op = [](SculptPathBox * box) {
-        box->applyCurrentTransformation();
+        box->applyCurrentTransform();
     };
     menu->addSeparator();
     menu->addPlainAction("Apply Transformation", op);
@@ -106,10 +106,12 @@ void SculptPathBox::sculptFinished() {
     mPath->prp_finishTransform();
 }
 
-void SculptPathBox::applyCurrentTransformation() {
+void SculptPathBox::applyCurrentTransform() {
     mNReasonsNotToApplyUglyTransform++;
     const auto transform = mTransformAnimator->getCurrentTransform();
     mPath->applyTransform(transform);
+    getFillSettings()->applyTransform(transform);
+    mTransformAnimator->reset();
     planCenterPivotPosition();
     mNReasonsNotToApplyUglyTransform--;
 }

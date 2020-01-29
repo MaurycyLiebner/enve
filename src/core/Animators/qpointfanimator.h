@@ -69,6 +69,8 @@ public:
 
     qreal getEffectiveYValue();
     qreal getEffectiveYValue(const qreal relFrame);
+
+    void applyTransform(const QMatrix &transform);
 protected:
     qsptr<QrealAnimator> mXAnimator;
     qsptr<QrealAnimator> mYAnimator;

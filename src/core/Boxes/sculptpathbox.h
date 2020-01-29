@@ -55,7 +55,7 @@ public:
     void sculptCanceled();
     void sculptFinished();
 
-    void applyCurrentTransformation();
+    void applyCurrentTransform();
 private:
     stdptr<SimpleBrushWrapper> mBrush;
 

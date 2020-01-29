@@ -72,6 +72,7 @@ public:
     void setupPaintSettings(const qreal relFrame,
                             UpdatePaintSettings& settings);
     void duplicatePaintSettingsNotAnim(PaintSettingsAnimator * const settings);
+    void applyTransform(const QMatrix& transform);
 private:
     void resetGradientPoints();
     void updateGradientPoint();

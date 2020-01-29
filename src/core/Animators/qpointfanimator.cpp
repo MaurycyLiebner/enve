@@ -16,6 +16,7 @@
 
 #include "qpointfanimator.h"
 #include "qrealanimator.h"
+#include "qrealkey.h"
 
 QPointFAnimator::QPointFAnimator(const QString &name) :
     StaticComplexAnimator(name) {
@@ -148,4 +149,24 @@ qreal QPointFAnimator::getSavedXValue() {
 
 qreal QPointFAnimator::getSavedYValue() {
     return mYAnimator->getSavedBaseValue();
+}
+
+void QPointFAnimator::applyTransform(const QMatrix &transform) {
+    mXAnimator->anim_coordinateKeysWith(mYAnimator.get());
+    const auto& xKeys = mXAnimator->anim_getKeys();
+    const auto& yKeys = mYAnimator->anim_getKeys();
+    Q_ASSERT(xKeys.count() == yKeys.count());
+    const int nKeys = xKeys.count();
+    if(nKeys == 0) {
+        setBaseValue(transform.map(getEffectiveValue()));
+    } else {
+        for(int i = 0; i < nKeys; i++) {
+            const auto xKey = xKeys.atId<QrealKey>(i);
+            const auto yKey = yKeys.atId<QrealKey>(i);
+            const QPointF oldValue(xKey->getValue(), yKey->getValue());
+            const QPointF newValue = transform.map(oldValue);
+            xKey->setValue(newValue.x());
+            yKey->setValue(newValue.y());
+        }
+    }
 }
