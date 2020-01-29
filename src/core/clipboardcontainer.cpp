@@ -33,7 +33,6 @@ void Clipboard::write(const Clipboard::Writer &writer) {
     writer(writeStream);
     writeStream.writeFutureTable();
     buffer.close();
-    BoundingBox::sClearWriteBoxes();
 }
 
 void Clipboard::read(const Clipboard::Reader &reader) {
@@ -45,7 +44,6 @@ void Clipboard::read(const Clipboard::Reader &reader) {
     buffer.seek(0);
     reader(readStream);
     buffer.close();
-    BoundingBox::sClearReadBoxes();
 }
 
 BoxesClipboard::BoxesClipboard(const QList<BoundingBox*> &src) :
