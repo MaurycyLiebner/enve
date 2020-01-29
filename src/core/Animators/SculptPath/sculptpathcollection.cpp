@@ -124,6 +124,10 @@ void SculptPathCollection::loadSkPath(const SkPath &path) {
 void SculptPathCollection::sculpt(const SculptTarget target,
                                   const SculptMode mode,
                                   const SculptBrush &brush) {
+    if(target == SculptTarget::position && mode == SculptMode::add) {
+        createNewSubPathAtRelPos(brush.center(), brush.radius());
+        return;
+    }
     const int iMax = ca_getNumberOfChildren() - 1;
     for(int i = 0; i <= iMax; i++) {
         const auto path = ca_getChildAt<SculptPathAnimator>(i);

@@ -24,7 +24,7 @@
 #include "Private/document.h"
 #include "MovablePoints/pathpivot.h"
 
-void Canvas::newSculptPathBox(const QPointF &pos) {
+SculptPathBox* Canvas::newSculptPathBox(const QPointF &pos) {
     const auto sculptBox = enve::make_shared<SculptPathBox>();
     sculptBox->setStrokeBrush(mDocument.fBrush);
     sculptBox->planCenterPivotPosition();
@@ -33,6 +33,7 @@ void Canvas::newSculptPathBox(const QPointF &pos) {
     clearBoxesSelection();
     clearPointsSelection();
     addBoxToSelection(sculptBox.get());
+    return sculptBox.get();
 }
 
 void Canvas::newPaintBox(const QPointF &pos) {
@@ -193,17 +194,26 @@ void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
 }
 
 void Canvas::sculptPress(const QPointF& pos, const qreal pressure) {
-    mDocument.fSculptBrush.pressAt(pos, pressure);
-    if(!hasValidSculptTarget()) newSculptPathBox(pos);
+    auto& absSculptBrush = mDocument.fSculptBrush;
+    absSculptBrush.pressAt(pos, pressure);
+    if(!hasValidSculptTarget()) {
+        const auto newBox = newSculptPathBox(pos);
+        const qreal radius = absSculptBrush.radius();
+        newBox->setPath(SkPath().addCircle(0, 0, radius));
+    }
     for(const auto& box : mSelectedBoxes) {
         if(!box->SWT_isSculptPathBox()) continue;
         const auto sculptBox = static_cast<SculptPathBox*>(box);
         const auto transform = sculptBox->getTotalTransform();
-        const auto relBrush = SculptBrush(transform, mDocument.fSculptBrush);
+        const auto relBrush = SculptBrush(transform, absSculptBrush);
         sculptBox->sculptStarted();
         sculptBox->sculpt(mDocument.fSculptTarget,
                           mDocument.fSculptMode,
                           relBrush);
+    }
+    if(mDocument.fSculptTarget == SculptTarget::position &&
+       mDocument.fSculptMode == SculptMode::add) {
+        mDocument.setSculptMode(SculptMode::drag);
     }
 }
 

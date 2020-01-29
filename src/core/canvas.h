@@ -299,7 +299,7 @@ public:
 
     void selectAndAddContainedPointsToSelection(const QRectF &absRect);
 //
-    void newSculptPathBox(const QPointF &pos);
+    SculptPathBox* newSculptPathBox(const QPointF &pos);
     void newPaintBox(const QPointF &pos);
 
     void mousePressEvent(const MouseEvent &e);

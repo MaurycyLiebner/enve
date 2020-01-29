@@ -29,6 +29,7 @@ public:
     SculptBrush(const QMatrix& transform,
                 const SculptBrush& other);
 
+    QPointF center() const { return mPos2; }
     qreal radius() const { return mRadius; }
     void incExpRadius(const qreal inc);
     void decExpRadius(const qreal dec)
