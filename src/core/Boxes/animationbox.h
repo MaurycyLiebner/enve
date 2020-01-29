@@ -74,6 +74,7 @@ public:
     void enableFrameRemappingAction();
     void enableFrameRemapping();
     void disableFrameRemapping();
+    void setFrameRemappingEnabled(const bool enabled);
 
     qreal getStretch() const { return mStretch; }
 

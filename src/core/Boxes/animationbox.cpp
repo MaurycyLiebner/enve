@@ -97,6 +97,7 @@ int AnimationBox::getAnimationFrameForRelFrame(const qreal relFrame) {
 
 void AnimationBox::enableFrameRemappingAction() {
     if(mFrameRemappingEnabled) return;
+    prp_pushUndoRedoName("Enable Frame Remapping");
     const int frameCount = mSrcFramesCache->getFrameCount();
     mFrameAnimator->setIntValueRange(0, frameCount - 1);
     const int animStartRelFrame =
@@ -114,9 +115,6 @@ void AnimationBox::enableFrameRemappingAction() {
         mFrameAnimator->setCurrentIntValue(0);
     }
     enableFrameRemapping();
-    prp_afterWholeInfluenceRangeChanged();
-    planUpdate(UpdateReason::userChange);
-    updateDurationRectangleAnimationRange();
 }
 
 void AnimationBox::enableFrameRemapping() {
@@ -131,6 +129,34 @@ void AnimationBox::disableFrameRemapping() {
     mFrameAnimator->anim_removeAllKeys();
     mFrameAnimator->anim_setRecordingValue(false);
     mFrameAnimator->SWT_hide();
+    prp_afterWholeInfluenceRangeChanged();
+    planUpdate(UpdateReason::userChange);
+    updateDurationRectangleAnimationRange();
+}
+
+void AnimationBox::setFrameRemappingEnabled(const bool enabled) {
+    if(mFrameRemappingEnabled == enabled) return;
+    {
+        prp_pushUndoRedoName("Set Frame Remapping");
+        UndoRedo ur;
+        const auto oldValue = mFrameRemappingEnabled;
+        const auto newValue = enabled;
+        ur.fUndo = [this, oldValue]() {
+            setFrameRemappingEnabled(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setFrameRemappingEnabled(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
+    mFrameRemappingEnabled = enabled;
+    if(enabled) {
+        mFrameAnimator->SWT_show();
+    } else {
+        mFrameAnimator->anim_removeAllKeys();
+        mFrameAnimator->anim_setRecordingValue(false);
+        mFrameAnimator->SWT_hide();
+    }
     prp_afterWholeInfluenceRangeChanged();
     planUpdate(UpdateReason::userChange);
     updateDurationRectangleAnimationRange();
