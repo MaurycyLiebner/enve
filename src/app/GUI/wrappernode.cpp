@@ -16,6 +16,7 @@
 
 #include "wrappernode.h"
 #include "widgetwrappernode.h"
+#include "exceptions.h"
 
 WrapperNode* WrapperNode::sRead(eReadStream &src,
                                 const WrapperNodeCreator &creator) {
@@ -30,7 +31,7 @@ WrapperNode* WrapperNode::sRead(eReadStream &src,
         wid = new VWidgetStackNode(creator);
     } else if(type == WrapperNodeType::base) {
         wid = new BaseWrapperNode(creator);
-    }
+    } else RuntimeThrow("Invalid WrapperNodeType, data corrupted");
     wid->readData(src);
     return wid;
 }
