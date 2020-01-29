@@ -99,7 +99,7 @@ void PathBox::setupRenderData(const qreal relFrame,
         const int prevFrame = qFloor(qMin(data->fRelFrame, mCurrentPathsFrame));
         const int nextFrame = qCeil(qMax(data->fRelFrame, mCurrentPathsFrame));
 
-        const bool sameFrame = prevFrame == nextFrame;
+        const bool sameFrame = isZero4Dec(data->fRelFrame - mCurrentPathsFrame);
 
         currentEditPathCompatible = sameFrame || !differenceInEditPathBetweenFrames(prevFrame, nextFrame);
         if(currentEditPathCompatible) {

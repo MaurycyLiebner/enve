@@ -22,19 +22,50 @@
 InternalLinkCanvas::InternalLinkCanvas(ContainerBox * const linkTarget) :
     InternalLinkGroupBox(linkTarget) {
     mType = eBoxType::internalLinkCanvas;
+    mFrameRemapping->disableAction();
     ca_prependChild(mTransformAnimator.data(), mClipToCanvas);
+    ca_prependChild(mTransformAnimator.data(), mFrameRemapping);
+}
+
+void InternalLinkCanvas::enableFrameRemappingAction() {
+    const auto finalTarget = static_cast<Canvas*>(getFinalTarget());
+    const int minFrame = finalTarget->getMinFrame();
+    const int maxFrame = finalTarget->getMaxFrame();
+    mFrameRemapping->enableAction(minFrame, maxFrame, minFrame);
+}
+
+void InternalLinkCanvas::disableFrameRemappingAction() {
+    mFrameRemapping->disableAction();
+}
+
+#include "typemenu.h"
+#include <QInputDialog>
+void InternalLinkCanvas::setupCanvasMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<InternalLinkCanvas>()) return;
+    menu->addedActionsForType<InternalLinkCanvas>();
+
+    const PropertyMenu::CheckSelectedOp<InternalLinkCanvas> remapOp =
+    [](InternalLinkCanvas * box, bool checked) {
+        if(checked) box->enableFrameRemappingAction();
+        else box->disableFrameRemappingAction();
+    };
+    menu->addCheckableAction("Frame Remapping",
+                             mFrameRemapping->enabled(), remapOp);
+
+    BoundingBox::setupCanvasMenu(menu);
 }
 
 void InternalLinkCanvas::setupRenderData(const qreal relFrame,
                                          BoxRenderData * const data,
                                          Canvas* const scene) {
-    InternalLinkGroupBox::setupRenderData(relFrame, data, scene);
+    const qreal remapped = mFrameRemapping->frame(relFrame);
+    InternalLinkGroupBox::setupRenderData(remapped, data, scene);
 
     ContainerBox* finalTarget = getFinalTarget();
     auto canvasData = static_cast<LinkCanvasRenderData*>(data);
     const auto canvasTarget = static_cast<Canvas*>(finalTarget);
     canvasData->fBgColor = toSkColor(canvasTarget->getBgColorAnimator()->
-            getColor(relFrame));
+            getColor(remapped));
     //qreal res = mParentScene->getResolutionFraction();
     canvasData->fCanvasHeight = canvasTarget->getCanvasHeight();//*res;
     canvasData->fCanvasWidth = canvasTarget->getCanvasWidth();//*res;

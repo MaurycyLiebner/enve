@@ -18,6 +18,7 @@
 #define INTERNALLINKCANVAS_H
 #include "internallinkgroupbox.h"
 #include "Properties/boolproperty.h"
+#include "Boxes/frameremapping.h"
 
 class InternalLinkCanvas : public InternalLinkGroupBox {
     e_OBJECT
@@ -34,11 +35,17 @@ public:
 
     bool relPointInsidePath(const QPointF &relPos) const;
     void anim_setAbsFrame(const int frame);
+    void setupCanvasMenu(PropertyMenu * const menu);
+
+    void enableFrameRemappingAction();
+    void disableFrameRemappingAction();
 
     bool clipToCanvas();
 private:
     qsptr<BoolProperty> mClipToCanvas =
             enve::make_shared<BoolProperty>("clip");
+    qsptr<QrealFrameRemapping> mFrameRemapping =
+            enve::make_shared<QrealFrameRemapping>();
 };
 
 #endif // INTERNALLINKCANVAS_H

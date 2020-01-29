@@ -782,10 +782,6 @@ int Canvas::getCurrentFrame() const {
     return anim_getCurrentAbsFrame();
 }
 
-int Canvas::getMaxFrame() {
-    return mRange.fMax;
-}
-
 HddCachableCacheHandler &Canvas::getSoundCacheHandler() {
     return mSoundComposition->getCacheHandler();
 }

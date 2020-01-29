@@ -695,7 +695,7 @@ void BoundingBox::setupWithoutRasterEffects(const qreal relFrame,
     if(!scene) return;
 
     data->fBoxStateId = mStateId;
-    data->fRelFrame = qRound(relFrame);
+    data->fRelFrame = relFrame;
     data->fRelTransform = getRelativeTransformAtFrame(relFrame);
     data->fInheritedTransform = getInheritedTransformAtFrame(relFrame);
     data->fTotalTransform = getTotalTransformAtFrame(relFrame);

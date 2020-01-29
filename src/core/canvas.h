@@ -467,7 +467,8 @@ public:
 
     bool getPivotLocal() const;
 
-    int getMaxFrame();
+    int getMinFrame() const { return mRange.fMin; }
+    int getMaxFrame() const { return mRange.fMax; }
 
     //void updatePixmaps();
     HddCachableCacheHandler& getSceneFramesHandler() {
