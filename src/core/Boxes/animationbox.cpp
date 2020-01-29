@@ -143,14 +143,7 @@ void AnimationBox::reload() {
 void AnimationBox::anim_setAbsFrame(const int frame) {
     BoundingBox::anim_setAbsFrame(frame);
     if(!mSrcFramesCache) return;
-
-    mNewCurrentFrameUpdateNeeded = true;
-
-    //if(!mWaitingForSchedulerToBeProcessed) {
-        //planScheduleUpdate();
-    //} else {
-        planUpdate(UpdateReason::frameChange);
-    //}
+    planUpdate(UpdateReason::frameChange);
 }
 
 FrameRange AnimationBox::prp_getIdenticalRelRange(const int relFrame) const {

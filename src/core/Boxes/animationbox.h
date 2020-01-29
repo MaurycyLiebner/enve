@@ -81,7 +81,6 @@ public:
 protected:
     qreal mStretch = 1;
 
-    bool mNewCurrentFrameUpdateNeeded = false;
     qsptr<AnimationFrameHandler> mSrcFramesCache;
 
     bool mFrameRemappingEnabled = false;
