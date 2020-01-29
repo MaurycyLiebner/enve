@@ -89,7 +89,7 @@ void SculptPathBox::readBoundingBox(eReadStream &src) {
     setStrokeBrush(brush);
 }
 
-void SculptPathBox::writeBoundingBox(eWriteStream &dst) {
+void SculptPathBox::writeBoundingBox(eWriteStream& dst) const {
     BoundingBox::writeBoundingBox(dst);
 
     dst << mBrush.data();

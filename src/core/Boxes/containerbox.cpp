@@ -915,7 +915,7 @@ bool ContainerBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     return bbVisible;
 }
 
-void ContainerBox::writeAllContained(eWriteStream& dst) {
+void ContainerBox::writeAllContained(eWriteStream& dst) const {
     const int nCont = mContained.count();
     dst << nCont;
     for(int i = nCont - 1; i >= 0; i--) {
@@ -936,7 +936,7 @@ void ContainerBox::writeAllContained(eWriteStream& dst) {
     }
 }
 
-void ContainerBox::writeBoundingBox(eWriteStream& dst) {
+void ContainerBox::writeBoundingBox(eWriteStream& dst) const {
     BoundingBox::writeBoundingBox(dst);
     dst.writeCheckpoint();
     writeAllContained(dst);

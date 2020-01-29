@@ -778,7 +778,7 @@ bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     return false;
 }
 
-int Canvas::getCurrentFrame() {
+int Canvas::getCurrentFrame() const {
     return anim_getCurrentAbsFrame();
 }
 
@@ -881,7 +881,7 @@ SoundComposition *Canvas::getSoundComposition() {
     return mSoundComposition.get();
 }
 
-void Canvas::writeBoundingBox(eWriteStream& dst) {
+void Canvas::writeBoundingBox(eWriteStream& dst) const {
     writeGradients(dst);
     ContainerBox::writeBoundingBox(dst);
     const int currFrame = getCurrentFrame();

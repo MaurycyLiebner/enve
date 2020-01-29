@@ -217,7 +217,7 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
     BoundingBox::setupCanvasMenu(menu);
 }
 
-void AnimationBox::writeBoundingBox(eWriteStream& dst) {
+void AnimationBox::writeBoundingBox(eWriteStream& dst) const {
     BoundingBox::writeBoundingBox(dst);
     dst << mFrameRemappingEnabled;
 }

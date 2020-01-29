@@ -42,7 +42,7 @@ int BoundingBox::sNextDocumentId = 0;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
 QList<BoundingBox*> BoundingBox::sReadBoxes;
 int BoundingBox::sNextWriteId;
-QList<BoundingBox*> BoundingBox::sBoxesWithWriteIds;
+QList<const BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 
 BoundingBox::BoundingBox(const eBoxType type) : eBoxOrSound("box"),
     mDocumentId(sNextDocumentId++), mType(type),
@@ -78,7 +78,7 @@ BoundingBox::~BoundingBox() {
     sDocumentBoxes.removeOne(this);
 }
 
-void BoundingBox::writeBoundingBox(eWriteStream& dst) {
+void BoundingBox::writeBoundingBox(eWriteStream& dst) const {
     if(mWriteId < 0) assignWriteId();
     eBoxOrSound::prp_writeProperty(dst);
     dst << prp_getName();
@@ -924,17 +924,17 @@ int BoundingBox::getWriteId() const {
     return mWriteId;
 }
 
-int BoundingBox::assignWriteId() {
+int BoundingBox::assignWriteId() const {
     mWriteId = sNextWriteId++;
     sBoxesWithWriteIds << this;
     return mWriteId;
 }
 
-void BoundingBox::clearReadId() {
+void BoundingBox::clearReadId() const {
     mReadId = -1;
 }
 
-void BoundingBox::clearWriteId() {
+void BoundingBox::clearWriteId() const {
     mWriteId = -1;
 }
 

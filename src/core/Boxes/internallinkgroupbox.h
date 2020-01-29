@@ -52,7 +52,7 @@ public:
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
     FrameRange prp_relInfluenceRange() const;
 
-    void writeBoundingBox(eWriteStream& dst)
+    void writeBoundingBox(eWriteStream& dst) const
     { BoundingBox::writeBoundingBox(dst); }
 
     void readBoundingBox(eReadStream& src)

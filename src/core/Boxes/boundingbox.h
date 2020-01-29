@@ -104,7 +104,7 @@ private:
     static QList<BoundingBox*> sReadBoxes;
 
     static int sNextWriteId;
-    static QList<BoundingBox*> sBoxesWithWriteIds;
+    static QList<const BoundingBox*> sBoxesWithWriteIds;
 protected:
     virtual void getMotionBlurProperties(QList<Property*> &list) const;
 public:
@@ -213,7 +213,7 @@ public:
 
     virtual void writeIdentifier(eWriteStream& dst) const;
 
-    virtual void writeBoundingBox(eWriteStream& dst);
+    virtual void writeBoundingBox(eWriteStream& dst) const;
     virtual void readBoundingBox(eReadStream& src);
 
     virtual SkBlendMode getBlendMode()
@@ -289,12 +289,12 @@ public:
 
     int getDocumentId() const { return mDocumentId; }
 
-    int assignWriteId();
-    void clearWriteId();
+    int assignWriteId() const;
+    void clearWriteId() const;
     int getWriteId() const;
 
     int getReadId() const;
-    void clearReadId();
+    void clearReadId() const;
 
     void clearParent();
     void setParentTransform(BasicTransformAnimator *parent);
@@ -415,8 +415,8 @@ protected:
 private:
     SkBlendMode mBlendMode = SkBlendMode::kSrcOver;
 
-    int mReadId = -1;
-    int mWriteId = -1;
+    mutable int mReadId = -1;
+    mutable int mWriteId = -1;
 
     bool mVisibleInScene = true;
     bool mCenterPivotPlanned = false;

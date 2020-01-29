@@ -47,7 +47,7 @@ public:
                          BoxRenderData * const data,
                          Canvas * const scene);
     stdsptr<BoxRenderData> createRenderData();
-    void writeBoundingBox(eWriteStream& dst);
+    void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);
 
     void changeSourceFile();

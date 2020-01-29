@@ -42,7 +42,7 @@ public:
     void setupCanvasMenu(PropertyMenu * const menu);
 
     void readBoundingBox(eReadStream& src);
-    void writeBoundingBox(eWriteStream& dst);
+    void writeBoundingBox(eWriteStream& dst) const;
 
     FillSettingsAnimator *getFillSettings() const
     { return mFillSettings.get(); }

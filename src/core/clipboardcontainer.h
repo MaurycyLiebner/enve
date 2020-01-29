@@ -36,6 +36,7 @@ enum class ClipboardType : short {
     boxes,
     keys,
     property,
+    box,
     dynamicProperties,
     smartPath
 };
@@ -84,6 +85,36 @@ public:
     void addTargetAnimator(Animator *anim, const QByteArray& keyData);
 private:
     QList<AnimatorKeyDataPair> mAnimatorData;
+};
+
+class BoxClipboard : public Clipboard {
+    e_OBJECT
+protected:
+    BoxClipboard(const BoundingBox * const source);
+public:
+    bool paste(BoundingBox * const target);
+
+    template<typename T>
+    bool hasType() {
+        return mContentType == std::type_index(typeid(T));
+    }
+
+    template<typename T>
+    bool compatibleTarget(T* const obj) const {
+        return mContentType == std::type_index(typeid(*obj));
+    }
+
+    template<typename T>
+    static bool sCopyAndPaste(T* const from, T* const to) {
+        return BoxClipboard(from).paste(to);
+    }
+
+    template<typename T>
+    static bool sCopyAndPaste(const qsptr<T>& from, const qsptr<T>& to) {
+        return BoxClipboard(from.get()).paste(to.get());
+    }
+private:
+    const std::type_index mContentType;
 };
 
 class PropertyClipboard : public Clipboard {

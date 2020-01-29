@@ -33,7 +33,7 @@ public:
     bool SWT_isVideoBox() const { return true; }
     void changeSourceFile();
 
-    void writeBoundingBox(eWriteStream& dst);
+    void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);
 
     void setStretch(const qreal stretch);

@@ -54,11 +54,11 @@ public:
         return assign(mGetter(path));
     }
 
-    T* data() { return mFileHandler; }
-    operator T*() { return data(); }
-    T* operator->() { return mFileHandler; }
+    T* data() const { return mFileHandler; }
+    operator T*() const { return data(); }
+    T* operator->() const { return mFileHandler; }
 
-    const QString& path() {
+    const QString& path() const {
         const auto obj = data();
         if(obj) return obj->path();
         else return mPath;

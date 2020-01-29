@@ -86,7 +86,7 @@ void VideoBox::fileHandlerAfterAssigned(VideoFileHandler *obj) {
     animationDataChanged();
 }
 
-void VideoBox::writeBoundingBox(eWriteStream& dst) {
+void VideoBox::writeBoundingBox(eWriteStream& dst) const {
     AnimationBox::writeBoundingBox(dst);
     dst << mFileHandler->path();
 }

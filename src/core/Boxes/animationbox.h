@@ -61,7 +61,7 @@ public:
     stdsptr<BoxRenderData> createRenderData();
     bool shouldScheduleUpdate();
 
-    void writeBoundingBox(eWriteStream& dst);
+    void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);
 
     FixedLenAnimationRect *getAnimationDurationRect() const;

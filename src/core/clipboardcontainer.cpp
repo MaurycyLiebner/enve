@@ -33,6 +33,7 @@ void Clipboard::write(const Clipboard::Writer &writer) {
     writer(writeStream);
     writeStream.writeFutureTable();
     buffer.close();
+    BoundingBox::sClearWriteBoxes();
 }
 
 void Clipboard::read(const Clipboard::Reader &reader) {
@@ -44,6 +45,7 @@ void Clipboard::read(const Clipboard::Reader &reader) {
     buffer.seek(0);
     reader(readStream);
     buffer.close();
+    BoundingBox::sClearReadBoxes();
 }
 
 BoxesClipboard::BoxesClipboard(const QList<BoundingBox*> &src) :
@@ -155,6 +157,24 @@ bool PropertyClipboard::paste(Property * const target) {
     if(!compatibleTarget(target)) return false;
     const auto reader = [target](eReadStream& readStream) {
         target->prp_readProperty(readStream);
+    };
+    read(reader);
+    return true;
+}
+
+BoxClipboard::BoxClipboard(const BoundingBox* const source) :
+    Clipboard(ClipboardType::box),
+    mContentType(std::type_index(typeid(*source))) {
+    const auto writer = [source](eWriteStream& writeStream) {
+        source->writeBoundingBox(writeStream);
+    };
+    write(writer);
+}
+
+bool BoxClipboard::paste(BoundingBox * const target) {
+    if(!compatibleTarget(target)) return false;
+    const auto reader = [target](eReadStream& readStream) {
+        target->readBoundingBox(readStream);
     };
     read(reader);
     return true;

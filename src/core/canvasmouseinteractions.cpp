@@ -69,21 +69,9 @@ void Canvas::addActionsToMenu(QMenu *const menu) {
     }
 
     menu->addAction("Duplicate Scene", [this]() {
-        QBuffer buffer;
-        buffer.open(QIODevice::ReadWrite);
-        eWriteStream writeStream(&buffer);
-        writeBoundingBox(writeStream);
-        writeStream.writeFutureTable();
-        buffer.seek(0);
-        eReadStream readStream(&buffer);
-        buffer.seek(buffer.size() - qint64(sizeof(int)));
-        readStream.readFutureTable();
-        buffer.seek(0);
         const auto newScene = Document::sInstance->createNewScene();
-        newScene->readBoundingBox(readStream);
+        BoxClipboard::sCopyAndPaste(this, newScene);
         newScene->prp_setName(newScene->prp_getName() + " copy");
-        buffer.close();
-        BoundingBox::sClearReadBoxes();
     });
 
     const auto parentWidget = menu->parentWidget();

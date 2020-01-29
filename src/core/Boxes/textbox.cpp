@@ -339,7 +339,7 @@ bool TextBox::differenceInEditPathBetweenFrames(
 }
 
 
-void TextBox::writeBoundingBox(eWriteStream& dst) {
+void TextBox::writeBoundingBox(eWriteStream& dst) const {
     PathBox::writeBoundingBox(dst);
     dst.write(&mHAlignment, sizeof(Qt::Alignment));
     dst.write(&mVAlignment, sizeof(Qt::Alignment));

@@ -64,7 +64,7 @@ void ImageSequenceBox::changeSourceFile() {
     if(!dir.isEmpty()) setFolderPath(dir);
 }
 
-void ImageSequenceBox::writeBoundingBox(eWriteStream& dst) {
+void ImageSequenceBox::writeBoundingBox(eWriteStream& dst) const {
     AnimationBox::writeBoundingBox(dst);
     dst << mFileHandler.path();
 }

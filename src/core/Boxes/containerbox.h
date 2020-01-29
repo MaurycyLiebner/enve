@@ -101,8 +101,8 @@ public:
     void queChildrenTasks();
     void queTasks();
 
-    void writeAllContained(eWriteStream &dst);
-    void writeBoundingBox(eWriteStream& dst);
+    void writeAllContained(eWriteStream &dst) const;
+    void writeBoundingBox(eWriteStream& dst) const;
     void readContained(eReadStream &src);
     void readAllContained(eReadStream &src);
     void readBoundingBox(eReadStream& src);

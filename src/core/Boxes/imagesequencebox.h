@@ -29,7 +29,7 @@ public:
     bool SWT_isImageSequenceBox() const { return true; }
 
     void changeSourceFile();
-    void writeBoundingBox(eWriteStream& dst);
+    void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);
 private:
     void fileHandlerConnector(ConnContext& conn,

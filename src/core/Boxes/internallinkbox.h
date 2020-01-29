@@ -36,7 +36,7 @@ public:
     FrameRange prp_relInfluenceRange() const;
     int prp_getRelFrameShift() const;
 
-    void writeBoundingBox(eWriteStream& dst)
+    void writeBoundingBox(eWriteStream& dst) const
     { BoundingBox::writeBoundingBox(dst); }
 
     void readBoundingBox(eReadStream& src)

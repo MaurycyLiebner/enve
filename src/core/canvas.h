@@ -453,7 +453,7 @@ public:
     void clearCurrentSmartEndPoint();
     void applyPaintSettingToSelected(const PaintSettingsApplier &setting);
 
-    int getCurrentFrame();
+    int getCurrentFrame() const;
     FrameRange getFrameRange() const { return mRange; }
 
     SoundComposition *getSoundComposition();
@@ -526,7 +526,7 @@ public:
     void renderDataFinished(BoxRenderData *renderData);
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
-    void writeBoundingBox(eWriteStream& dst);
+    void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);
     bool anim_prevRelFrameWithKey(const int relFrame, int &prevRelFrame);
     bool anim_nextRelFrameWithKey(const int relFrame, int &nextRelFrame);

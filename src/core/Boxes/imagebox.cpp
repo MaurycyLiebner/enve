@@ -53,7 +53,7 @@ void ImageBox::fileHandlerAfterAssigned(ImageFileHandler *obj) {
     Q_UNUSED(obj);
 }
 
-void ImageBox::writeBoundingBox(eWriteStream& dst) {
+void ImageBox::writeBoundingBox(eWriteStream& dst) const {
     BoundingBox::writeBoundingBox(dst);
     dst << mFileHandler.path();
 }
