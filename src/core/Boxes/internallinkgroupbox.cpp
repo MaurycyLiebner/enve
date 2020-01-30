@@ -37,7 +37,7 @@ bool InternalLinkGroupBox::SWT_isGroupBox() const {
     return finalTarget->SWT_isGroupBox();
 }
 
-SkBlendMode InternalLinkGroupBox::getBlendMode() {
+SkBlendMode InternalLinkGroupBox::getBlendMode() const {
     if(isParentLink() && getLinkTarget()) {
         return getLinkTarget()->getBlendMode();
     }

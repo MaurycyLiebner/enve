@@ -49,7 +49,7 @@ public:
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data,
                          Canvas * const scene);
-    SkBlendMode getBlendMode();
+    SkBlendMode getBlendMode() const;
 
     QMatrix getRelativeTransformAtFrame(const qreal relFrame);
     QMatrix getTotalTransformAtFrame(const qreal relFrame);

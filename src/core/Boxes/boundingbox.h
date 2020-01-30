@@ -215,7 +215,7 @@ public:
     virtual void writeBoundingBox(eWriteStream& dst) const;
     virtual void readBoundingBox(eReadStream& src);
 
-    virtual SkBlendMode getBlendMode()
+    virtual SkBlendMode getBlendMode() const
     { return mBlendMode; }
 
     virtual void updateIfUsesProgram(const ShaderEffectProgram * const program) const;
@@ -395,9 +395,6 @@ protected:
 protected:
     bool getUpdatePlanned() const
     { return mUpdatePlanned; }
-
-    SkBlendMode getBlendMode() const
-    { return mBlendMode; }
 
     const QList<BoundingBox*>& getLinkingBoxes() const
     { return mLinkingBoxes; }

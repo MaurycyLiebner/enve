@@ -86,7 +86,7 @@ void InternalLinkBox::setupRenderData(const qreal relFrame,
     BoundingBox::setupRenderData(relFrame, data, scene);
 }
 
-SkBlendMode InternalLinkBox::getBlendMode() {
+SkBlendMode InternalLinkBox::getBlendMode() const {
     if(isParentLink()) return getLinkTarget()->getBlendMode();
     return BoundingBox::getBlendMode();
 }
