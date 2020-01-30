@@ -35,7 +35,6 @@ void SculptPathBoxRenderData::updateRelBoundingRect() {
 
 void SculptPathBoxRenderData::drawSk(SkCanvas * const canvas) {
     Q_UNUSED(canvas)
-    if(!fBrush) return;
     if(fPaintSettings.fPaintType != NOPAINT) {
         SkPath path;
         for(const auto& subPath : fPath) {
@@ -55,7 +54,7 @@ void SculptPathBoxRenderData::drawSk(SkCanvas * const canvas) {
         fPaintSettings.applyPainterSettingsSk(&paint);
         canvas->drawPath(path, paint);
     }
-
+    if(!fBrush) return;
     AutoTiledSurface surf;
     surf.setPixelClamp(fMaxBoundsRect.translated(-fGlobalRect.topLeft()));
     surf.loadBitmap(mBitmap);
