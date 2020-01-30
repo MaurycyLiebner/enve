@@ -69,12 +69,12 @@ void CanvasWindow::setCurrentCanvas(Canvas * const canvas) {
     if(mCurrentCanvas == canvas) return;
     if(mCurrentCanvas) {
         disconnect(mCurrentCanvas, nullptr, this, nullptr);
-        mDocument.removeVisibleScene(mCurrentCanvas);
+        if(isVisible()) mDocument.removeVisibleScene(mCurrentCanvas);
     }
     mCurrentCanvas = canvas;
     if(KFT_hasFocus()) mDocument.setActiveScene(mCurrentCanvas);
     if(mCurrentCanvas) {
-        mDocument.addVisibleScene(mCurrentCanvas);
+        if(isVisible()) mDocument.addVisibleScene(mCurrentCanvas);
         emit changeCanvasFrameRange(canvas->getFrameRange());
         updatePivotIfNeeded();
         connect(mCurrentCanvas, &Canvas::requestUpdate,

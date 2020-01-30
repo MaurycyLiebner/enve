@@ -17,6 +17,7 @@
 #include "canvaswindow.h"
 #include "canvas.h"
 #include "GUI/global.h"
+#include "Private/document.h"
 
 QPointF CanvasWindow::mapToCanvasCoord(const QPointF& windowCoord) {
     return mViewTransform.inverted().map(windowCoord);
@@ -78,6 +79,16 @@ bool CanvasWindow::event(QEvent *e) {
     if(e->type() == QEvent::ShowToParent) fitCanvasToSize();
     else if(e->type() == QEvent::Show) KFT_setFocus();
     return QWidget::event(e);
+}
+
+void CanvasWindow::hideEvent(QHideEvent *e) {
+    GLWindow::hideEvent(e);
+    mDocument.removeVisibleScene(mCurrentCanvas);
+}
+
+void CanvasWindow::showEvent(QShowEvent *e) {
+    GLWindow::showEvent(e);
+    mDocument.addVisibleScene(mCurrentCanvas);
 }
 
 void CanvasWindow::resetTransormation() {

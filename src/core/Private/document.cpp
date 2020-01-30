@@ -121,6 +121,7 @@ bool Document::removeScene(const int id) {
 
 void Document::addVisibleScene(Canvas * const scene) {
     fVisibleScenes[scene]++;
+    updateScenes();
 }
 
 bool Document::removeVisibleScene(Canvas * const scene) {

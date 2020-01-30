@@ -82,9 +82,11 @@ public:
 
     void writeState(eWriteStream& dst) const;
     void readState(eReadStream& src);
-
+protected:
     bool event(QEvent *e);
 
+    void hideEvent(QHideEvent* e);
+    void showEvent(QShowEvent* e);
     void resizeEvent(QResizeEvent* e);
 
     void dropEvent(QDropEvent *event);
@@ -96,7 +98,7 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
-protected:
+
     void KFT_setFocusToWidget();
 
     void KFT_clearFocus() {

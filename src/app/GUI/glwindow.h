@@ -37,7 +37,7 @@ protected:
     void resizeGL(int, int) final;
     void initializeGL() final;
     void paintGL() final;
-    void showEvent(QShowEvent *e) final;
+    void showEvent(QShowEvent *e);
 
     void initialize();
     void bindSkia(const int w, const int h);
