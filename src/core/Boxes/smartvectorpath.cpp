@@ -27,6 +27,7 @@
 #include "MovablePoints/segment.h"
 #include "Animators/SmartPath/smartpathanimator.h"
 #include "PathEffects/patheffectcollection.h"
+#include "Animators/qpointfanimator.h"
 
 SmartVectorPath::SmartVectorPath() :
     PathBox(eBoxType::vectorPath) {
@@ -66,13 +67,15 @@ void SmartVectorPath::setupCanvasMenu(PropertyMenu * const menu) {
 }
 
 void SmartVectorPath::applyCurrentTransform() {
+    prp_pushUndoRedoName("Apply Transform");
     mNReasonsNotToApplyUglyTransform++;
-    const auto transform = mTransformAnimator->getCurrentTransform();
+    const auto transform = mTransformAnimator->getRotScaleShearTransform();
     mPathAnimator->applyTransform(transform);
     getFillSettings()->applyTransform(transform);
     getStrokeSettings()->applyTransform(transform);
-    mTransformAnimator->reset();
-    planCenterPivotPosition();
+    mTransformAnimator->startRotScaleShearTransform();
+    mTransformAnimator->resetRotScaleShear();
+    mTransformAnimator->prp_finishTransform();
     mNReasonsNotToApplyUglyTransform--;
 }
 

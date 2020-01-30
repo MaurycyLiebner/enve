@@ -300,7 +300,11 @@ void SmartPathAnimator::applyTransform(const QMatrix &transform) {
         const auto spKey = static_cast<SmartPathKey*>(key);
         spKey->getValue().applyTransform(transform);
     }
-    mBaseValue.applyTransform(transform);
+    if(keys.isEmpty()) {
+        prp_startTransform();
+        mBaseValue.applyTransform(transform);
+        prp_finishTransform();
+    } else mBaseValue.applyTransform(transform);
     prp_afterWholeInfluenceRangeChanged();
 }
 

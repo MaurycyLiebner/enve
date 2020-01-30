@@ -117,7 +117,8 @@ public:
     virtual SculptPathBox *objectToSculptPathBox()
     { return nullptr; }
 
-    virtual void centerPivotPosition();
+    void centerPivotPositionAction();
+    void centerPivotPosition();
     virtual QPointF getRelCenterPosition();
 
     virtual void selectAndAddContainedPointsToList(

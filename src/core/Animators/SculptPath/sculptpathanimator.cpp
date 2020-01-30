@@ -107,8 +107,14 @@ void SculptPathAnimator::applyTransform(const QMatrix &transform) {
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
         const auto spKey = static_cast<SculptPathKey*>(key);
+        spKey->startValueTransform();
         spKey->getValue().applyTransform(transform);
+        spKey->finishValueTransform();
     }
-    baseValue().applyTransform(transform);
+    if(keys.isEmpty()) {
+        prp_startTransform();
+        baseValue().applyTransform(transform);
+        prp_finishTransform();
+    } else baseValue().applyTransform(transform);
     prp_afterWholeInfluenceRangeChanged();
 }

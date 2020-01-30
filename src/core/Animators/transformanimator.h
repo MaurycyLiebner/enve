@@ -138,6 +138,10 @@ public:
 
     void setValues(const TransformValues& values);
 
+    QMatrix getRotScaleShearTransform();
+    void startRotScaleShearTransform();
+    void resetRotScaleShear();
+
     void resetShear();
     void resetPivot();
     void setPivotFixedTransform(const QPointF &newPivot);

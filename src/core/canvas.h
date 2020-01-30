@@ -172,8 +172,6 @@ public:
 
     QSize getCanvasSize();
 
-    void centerPivotPosition() {}
-
     //
     void finishSelectedPointsTransform();
     void finishSelectedBoxesTransform();

@@ -351,6 +351,12 @@ void AdvancedTransformAnimator::resetPivot() {
     mPivotAnimator->setBaseValue(QPointF(0, 0));
 }
 
+void AdvancedTransformAnimator::resetRotScaleShear() {
+    resetRotation();
+    resetScale();
+    resetShear();
+}
+
 void AdvancedTransformAnimator::reset() {
     BasicTransformAnimator::reset();
     resetShear();
@@ -442,6 +448,12 @@ qreal AdvancedTransformAnimator::getPivotY() {
     return mPivotAnimator->getEffectiveYValue();
 }
 
+void AdvancedTransformAnimator::startRotScaleShearTransform() {
+    startRotTransform();
+    startScaleTransform();
+    startShearTransform();
+}
+
 void AdvancedTransformAnimator::startShearTransform() {
     mShearAnimator->prp_startTransform();
 }
@@ -485,6 +497,21 @@ void AdvancedTransformAnimator::setValues(const TransformValues &values) {
     setScale(values.fScaleX, values.fScaleY);
     setRotation(values.fRotation);
     setShear(values.fShearX, values.fShearY);
+}
+
+QMatrix AdvancedTransformAnimator::getRotScaleShearTransform() {
+    const qreal pivotX = mPivotAnimator->getEffectiveXValue();
+    const qreal pivotY = mPivotAnimator->getEffectiveYValue();
+
+    QMatrix matrix;
+    matrix.translate(pivotX, pivotY);
+    matrix.rotate(mRotAnimator->getEffectiveValue());
+    matrix.scale(mScaleAnimator->getEffectiveXValue(),
+                 mScaleAnimator->getEffectiveYValue());
+    matrix.shear(mShearAnimator->getEffectiveXValue(),
+                 mShearAnimator->getEffectiveYValue());
+    matrix.translate(-pivotX, -pivotY);
+    return matrix;
 }
 
 QMatrix AdvancedTransformAnimator::getRelativeTransformAtFrame(const qreal relFrame) {

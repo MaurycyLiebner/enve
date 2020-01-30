@@ -133,11 +133,17 @@ QPointF BoundingBox::getRelCenterPosition() {
 }
 
 void BoundingBox::centerPivotPosition() {
+    const auto center = getRelCenterPosition();
+    mTransformAnimator->setPivotFixedTransform(center);
+    requestGlobalPivotUpdateIfSelected();
+}
+
+void BoundingBox::centerPivotPositionAction() {
     const auto pos = mTransformAnimator->getPosAnimator();
     const auto pivot = mTransformAnimator->getPivotAnimator();
     pos->prp_startTransform();
     pivot->prp_startTransform();
-    mTransformAnimator->setPivotFixedTransform(getRelCenterPosition());
+    centerPivotPosition();
     pos->prp_finishTransform();
     pivot->prp_finishTransform();
 }
@@ -358,7 +364,7 @@ void BoundingBox::setRelBoundingRect(const QRectF& relRect) {
 
     if(mCenterPivotPlanned) {
         mCenterPivotPlanned = false;
-        setPivotRelPos(getRelCenterPosition());
+        centerPivotPosition();
     }
 }
 
@@ -879,8 +885,6 @@ void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
 
     setupCanvasMenu(menu->addMenu("Actions"));
 }
-
-
 
 FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
         const int relFrame, const bool takeAncestorsIntoAccount) {

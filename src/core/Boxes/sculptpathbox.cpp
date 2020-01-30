@@ -18,6 +18,7 @@
 #include "RasterEffects/rastereffectcollection.h"
 #include "sculptpathboxrenderdata.h"
 #include "Animators/transformanimator.h"
+#include "Animators/qpointfanimator.h"
 
 SculptPathBox::SculptPathBox() : BoundingBox(eBoxType::sculptPath) {
     prp_setName("Sculpt Path");
@@ -121,11 +122,13 @@ void SculptPathBox::sculptFinished() {
 }
 
 void SculptPathBox::applyCurrentTransform() {
+    prp_pushUndoRedoName("Apply Transform");
     mNReasonsNotToApplyUglyTransform++;
-    const auto transform = mTransformAnimator->getCurrentTransform();
+    const auto transform = mTransformAnimator->getRotScaleShearTransform();
     mPath->applyTransform(transform);
     getFillSettings()->applyTransform(transform);
-    mTransformAnimator->reset();
-    planCenterPivotPosition();
+    mTransformAnimator->startRotScaleShearTransform();
+    mTransformAnimator->resetRotScaleShear();
+    mTransformAnimator->prp_finishTransform();
     mNReasonsNotToApplyUglyTransform--;
 }

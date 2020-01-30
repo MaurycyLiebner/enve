@@ -393,7 +393,7 @@ void Canvas::ungroupSelectedBoxes() {
 void Canvas::centerPivotForSelected() {
     pushUndoRedoName("Center pivot");
     for(const auto &box : mSelectedBoxes)
-        box->centerPivotPosition();
+        box->centerPivotPositionAction();
 }
 
 void Canvas::removeSelectedBoxesAndClearList() {

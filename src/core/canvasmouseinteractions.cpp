@@ -136,6 +136,7 @@ void Canvas::handleRightButtonMousePress(const MouseEvent& e) {
             menu.exec(e.fGlobalPos);
         }
     }
+    mDocument.actionFinished();
 }
 
 void Canvas::clearHoveredEdge() {

@@ -158,15 +158,21 @@ void QPointFAnimator::applyTransform(const QMatrix &transform) {
     Q_ASSERT(xKeys.count() == yKeys.count());
     const int nKeys = xKeys.count();
     if(nKeys == 0) {
+        prp_startTransform();
         setBaseValue(transform.map(getEffectiveValue()));
+        prp_finishTransform();
     } else {
         for(int i = 0; i < nKeys; i++) {
             const auto xKey = xKeys.atId<QrealKey>(i);
             const auto yKey = yKeys.atId<QrealKey>(i);
             const QPointF oldValue(xKey->getValue(), yKey->getValue());
             const QPointF newValue = transform.map(oldValue);
+            xKey->startValueTransform();
+            yKey->startValueTransform();
             xKey->setValue(newValue.x());
             yKey->setValue(newValue.y());
+            xKey->finishValueTransform();
+            yKey->finishValueTransform();
         }
     }
 }
