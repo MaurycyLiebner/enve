@@ -34,6 +34,7 @@ public:
 
     BrushContexedWrapper* brushWrapper(const SimpleBrushWrapper * const brush);
     bool setSelectedWrapper(SimpleBrushWrapper* const wrapper);
+    bool setSelectedName(const QString& name);
 
     QList<BrushContexedCollection> fCollections;
 signals:

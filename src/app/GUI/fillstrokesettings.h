@@ -44,6 +44,7 @@ class Segment1DEditor;
 class QDockWidget;
 class ColorSetting;
 class Document;
+class BrushLabel;
 
 class FillStrokeSettingsWidget : public QTabWidget {
     Q_OBJECT
@@ -52,25 +53,26 @@ public:
     explicit FillStrokeSettingsWidget(Document& document,
                                       QWidget * const parent = nullptr);
 
+    void setCurrentBox(BoundingBox * const box);
+    void clearAll();
+private:
+    void setDisplayedBrush(SimpleBrushWrapper* const brush);
     void setCurrentSettings(PaintSettingsAnimator *fillPaintSettings,
                             OutlineSettingsAnimator *strokePaintSettings);
     void updateAfterTargetChanged();
     void setCurrentPaintType(const PaintType paintType);
 
-    GradientWidget *getGradientWidget();
-
-    void clearAll();
     void setFillValuesFromFillSettings(PaintSettingsAnimator *settings);
     void setStrokeValuesFromStrokeSettings(OutlineSettingsAnimator *settings);
 
     void updateColorAnimator();
     void setCurrentBrushSettings(BrushSettingsAnimator * const brushSettings);
 
-    void emitStrokeBrushChanged();
+    void emitStrokeBrushChanged(SimpleBrushWrapper* const brush);
 
     void emitCapStyleChanged();
     void emitJoinStyleChanged();
-private:
+
     void setLinearGradientAction();
     void setRadialGradientAction();
 
@@ -103,7 +105,7 @@ private:
 
     void setColorAnimatorTarget(ColorAnimator *animator);
     void colorSettingReceived(const ColorSetting &colorSetting);
-private:
+
     void updateCurrentSettings();
     void applyGradient();
 
@@ -154,8 +156,6 @@ private:
     SkPaint::Cap mCurrentCapStyle;
     SkPaint::Join mCurrentJoinStyle;
     qreal mCurrentStrokeWidth;
-
-    SimpleBrushWrapper* mCurrentStrokeBrush = nullptr;
     //
 
     void setBrushPaintType();
@@ -204,6 +204,7 @@ private:
 
     QWidget *mFillAndStrokeWidget;
 
+    BrushLabel* mBrushLabel;
     BrushSelectionWidget* mBrushSelectionWidget;
 
     QWidget* mBrushSettingsWidget;
@@ -211,6 +212,8 @@ private:
     Segment1DEditor* mBrushPressureCurveEditor;
     Segment1DEditor* mBrushSpacingCurveEditor;
     Segment1DEditor* mBrushTimeCurveEditor;
+
+    ConnContextQPtr<BoundingBox> mCurrentBox;
 };
 
 #endif // FILLSTROKESETTINGS_H

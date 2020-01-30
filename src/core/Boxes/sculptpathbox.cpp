@@ -19,6 +19,7 @@
 #include "sculptpathboxrenderdata.h"
 #include "Animators/transformanimator.h"
 #include "Animators/qpointfanimator.h"
+#include "Private/document.h"
 
 SculptPathBox::SculptPathBox() : BoundingBox(eBoxType::sculptPath) {
     prp_setName("Sculpt Path");
@@ -29,6 +30,8 @@ SculptPathBox::SculptPathBox() : BoundingBox(eBoxType::sculptPath) {
     ca_prependChild(mRasterEffectsAnimators.data(), mFillSettings);
     ca_prependChild(mRasterEffectsAnimators.data(), mBrushWidth);
     ca_prependChild(mRasterEffectsAnimators.data(), mPath);
+
+    setStrokeBrush(Document::sInstance->fOutlineBrush);
 }
 
 void SculptPathBox::setStrokeBrush(SimpleBrushWrapper * const brush) {
@@ -47,6 +50,8 @@ void SculptPathBox::setStrokeBrush(SimpleBrushWrapper * const brush) {
     }
     mBrush = brush;
     prp_afterWholeInfluenceRangeChanged();
+
+    emit brushChanged(brush);
 }
 
 void SculptPathBox::strokeWidthAction(const QrealAction &action) {

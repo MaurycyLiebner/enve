@@ -60,6 +60,7 @@ void BrushSettingsAnimator::setBrush(SimpleBrushWrapper * const brush) {
     }
     mBrush = brush;
     prp_afterWholeInfluenceRangeChanged();
+    emit brushChanged(brush);
 }
 
 void BrushSettingsAnimator::setupStrokeSettings(const qreal relFrame,

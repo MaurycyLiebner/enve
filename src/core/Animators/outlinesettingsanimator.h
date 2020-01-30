@@ -31,7 +31,9 @@ public:
 
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
-public:
+
+    void setPaintType(const PaintType paintType);
+
     void strokeWidthAction(const QrealAction& action);
     void setCurrentStrokeWidth(const qreal newWidth);
     void setCapStyle(const SkPaint::Cap capStyle);

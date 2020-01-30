@@ -240,8 +240,6 @@ public:
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
 
-    void getDisplayedFillStrokeSettingsFromLastSelected(
-            PaintSettingsAnimator*& fillSetings, OutlineSettingsAnimator*& strokeSettings);
     void scaleSelectedBy(const qreal scaleXBy, const qreal scaleYBy,
                          const QPointF &absOrigin, const bool startTrans);
 

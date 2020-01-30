@@ -68,6 +68,7 @@ SOURCES += main.cpp\
     GUI/BoxesList/OptimalScrollArea/scrollvisiblepartbase.cpp \
     GUI/BoxesList/boxscroller.cpp \
     GUI/BrushWidgets/bookmarkedbrushes.cpp \
+    GUI/BrushWidgets/brushlabel.cpp \
     GUI/ColorWidgets/bookmarkedcolors.cpp \
     GUI/RenderWidgets/outputsettingsdialog.cpp \
     GUI/RenderWidgets/rendersettingsdialog.cpp \
@@ -173,6 +174,7 @@ HEADERS  += \
     GUI/BoxesList/OptimalScrollArea/scrollvisiblepartbase.h \
     GUI/BoxesList/boxscroller.h \
     GUI/BrushWidgets/bookmarkedbrushes.h \
+    GUI/BrushWidgets/brushlabel.h \
     GUI/ColorWidgets/bookmarkedcolors.h \
     GUI/RenderWidgets/outputsettingsdialog.h \
     GUI/RenderWidgets/rendersettingsdialog.h \

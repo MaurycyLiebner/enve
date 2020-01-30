@@ -25,6 +25,7 @@ struct UpdateStrokeSettings;
 class BrushSettingsAnimator : public StaticComplexAnimator {
     typedef qCubicSegment1DAnimator::Action SegAction;
     e_OBJECT
+    Q_OBJECT
     BrushSettingsAnimator();
 public:    
     void prp_writeProperty(eWriteStream &dst) const;
@@ -73,6 +74,8 @@ public:
 
     void setupStrokeSettings(const qreal relFrame,
                              UpdateStrokeSettings& settings);
+signals:
+    void brushChanged(SimpleBrushWrapper* brush);
 private:
     qsptr<qCubicSegment1DAnimator> mWidthCurve =
             enve::make_shared<qCubicSegment1DAnimator>("width");

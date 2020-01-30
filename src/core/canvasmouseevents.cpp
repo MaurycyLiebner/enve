@@ -26,7 +26,6 @@
 
 SculptPathBox* Canvas::newSculptPathBox(const QPointF &pos) {
     const auto sculptBox = enve::make_shared<SculptPathBox>();
-    sculptBox->setStrokeBrush(mDocument.fBrush);
     sculptBox->planCenterPivotPosition();
     mCurrentContainer->addContained(sculptBox);
     sculptBox->setAbsolutePos(pos);

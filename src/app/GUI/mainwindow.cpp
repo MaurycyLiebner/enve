@@ -227,8 +227,17 @@ MainWindow::MainWindow(Document& document,
     mFilesDock->setWidget(new FileSourceList(this));
     addDockWidget(Qt::LeftDockWidgetArea, mFilesDock);
 
+
+    {
+        const auto brush = BrushCollectionData::sGetBrush("Deevad", "2B_pencil");
+        const auto paintCtxt = BrushSelectionWidget::sPaintContext;
+        const auto paintBrush = paintCtxt->brushWrapper(brush);
+        mDocument.setBrush(paintBrush);
+        mDocument.fOutlineBrush = brush;
+    }
     const auto bBrush = new BookmarkedBrushes(true, 64, pCtxt.get(), this);
     const auto bColor = new BookmarkedColors(true, 64, this);
+
     mCentralWidget = new CentralWidget(bBrush,
                                        mLayoutHandler->sceneLayout(),
                                        bColor);
@@ -994,17 +1003,12 @@ SimpleBrushWrapper *MainWindow::getCurrentBrush() const {
 
 #include "Boxes/textbox.h"
 void MainWindow::setCurrentBox(BoundingBox *box) {
-    if(!box) {
-        mFillStrokeSettings->setCurrentSettings(nullptr, nullptr);
-    } else {
-        mFillStrokeSettings->setCurrentSettings(box->getFillSettings(),
-                                                box->getStrokeSettings());
-        if(box->SWT_isTextBox()) {
-            TextBox *txtBox = static_cast<TextBox*>(box);
-            mFontWidget->setCurrentSettings(txtBox->getFontSize(),
-                                            txtBox->getFontFamily(),
-                                            txtBox->getFontStyle());
-        }
+    mFillStrokeSettings->setCurrentBox(box);
+    if(box && box->SWT_isTextBox()) {
+        const auto txtBox = static_cast<TextBox*>(box);
+        mFontWidget->setCurrentSettings(txtBox->getFontSize(),
+                                        txtBox->getFontFamily(),
+                                        txtBox->getFontStyle());
     }
 }
 

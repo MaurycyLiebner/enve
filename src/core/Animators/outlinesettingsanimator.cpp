@@ -16,6 +16,7 @@
 
 #include "outlinesettingsanimator.h"
 #include "Boxes/pathbox.h"
+#include "Private/document.h"
 
 OutlineSettingsAnimator::OutlineSettingsAnimator(BoundingBox * const parent) :
     PaintSettingsAnimator("outline", parent) {
@@ -39,6 +40,14 @@ void OutlineSettingsAnimator::prp_readProperty(eReadStream& src) {
     src.read(&mCapStyle, sizeof(SkPaint::Cap));
     src.read(&mJoinStyle, sizeof(SkPaint::Join));
     src.read(&mOutlineCompositionMode, sizeof(QPainter::CompositionMode));
+}
+
+void OutlineSettingsAnimator::setPaintType(const PaintType paintType) {
+    PaintSettingsAnimator::setPaintType(paintType);
+    const auto defaultBrush = Document::sInstance->fOutlineBrush;
+    if(paintType == BRUSHPAINT && !mBrushSettings->getBrush()) {
+        mBrushSettings->setBrush(defaultBrush);
+    }
 }
 
 void OutlineSettingsAnimator::showHideChildrenBeforeChaningPaintType(

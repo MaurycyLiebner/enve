@@ -48,12 +48,13 @@ public:
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 
+    virtual void setPaintType(const PaintType paintType);
+
     QColor getColor() const;
     PaintType getPaintType() const;
     SceneBoundGradient *getGradient() const;
     void setGradient(SceneBoundGradient *gradient);
     void setCurrentColor(const QColor &color);
-    void setPaintType(const PaintType paintType);
     ColorAnimator *getColorAnimator();
     void setGradientPointsPos(const QPointF& pt1, const QPointF& pt2);
 

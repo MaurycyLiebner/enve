@@ -50,6 +50,7 @@ class Canvas;
 class Document;
 class LayoutHandler;
 class SwitchButton;
+class BrushLabel;
 class BrushContexedWrapper;
 
 enum class CanvasMode : short;
@@ -121,7 +122,7 @@ private:
 
     QAction* mBrushColorWidgetAct;
     TriggerLabel* mColorLabel;
-    TriggerLabel* mBrushLabel;
+    BrushLabel* mBrushLabel;
     QAction* mDecBrushSizeAct;
     ActionButton *mDecBrushSize;
     QAction* mBrushSizeLabelAct;

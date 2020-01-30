@@ -84,6 +84,8 @@ void BrushSelectionWidget::updateBrushes() {
             const auto bWidget = new BrushWidget(brush.get(), tabWidget);
             connect(bWidget, &BrushWidget::selected,
                     this, &BrushSelectionWidget::brushCWrapperSelected);
+            connect(bWidget, &BrushWidget::triggered,
+                    this, &BrushSelectionWidget::brushTriggered);
             tabWidgetLay->addWidget(bWidget);
         }
         tabWidget->setLayout(tabWidgetLay);
@@ -103,19 +105,20 @@ qsptr<BrushesContext> BrushSelectionWidget::sCreateNewContext() {
 }
 
 void BrushSelectionWidget::setCurrentBrush(SimpleBrushWrapper * const wrapper) {
+    if(mSelected && mSelected->getSimpleBrush() == wrapper) return;
     mContext.setSelectedWrapper(wrapper);
 }
 
 SimpleBrushWrapper *BrushSelectionWidget::getCurrentBrush() {
-    if(mCurrentBrushCWrapper)
-        return mCurrentBrushCWrapper->getSimpleBrush();
+    if(mSelected)
+        return mSelected->getSimpleBrush();
     return nullptr;
 }
 
 void BrushSelectionWidget::brushCWrapperSelected(BrushContexedWrapper *wrapper) {
-    if(mCurrentBrushCWrapper && mCurrentBrushCWrapper != wrapper)
-        mCurrentBrushCWrapper->setSelected(false);
-    mCurrentBrushCWrapper = wrapper;
+    if(mSelected && mSelected != wrapper)
+        mSelected->setSelected(false);
+    mSelected = wrapper;
     emit currentBrushChanged(wrapper);
 }
 

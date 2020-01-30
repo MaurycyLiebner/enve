@@ -30,6 +30,9 @@
 #include "Animators/gradient.h"
 #include "Private/esettings.h"
 #include "Private/document.h"
+#include "Boxes/sculptpathbox.h"
+#include "BrushWidgets/brushlabel.h"
+#include "GUI/global.h"
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
                                                    QWidget * const parent) :
@@ -101,8 +104,17 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     //mLineWidthSpin->setRange(0.0, 1000.0);
     //mLineWidthSpin->setSuffix(" px");
     //mLineWidthSpin->setSingleStep(0.1);
-    mLineWidthLayout->addWidget(mLineWidthLabel);
-    mLineWidthLayout->addWidget(mLineWidthSpin, Qt::AlignLeft);
+
+    mBrushLabel = new BrushLabel(BrushSelectionWidget::sOutlineContext.get());
+    mBrushLabel->setToolTip(gSingleLineTooltip("Current Brush"));
+    connect(mBrushLabel, &BrushLabel::triggered,
+            this, [this]() { setCurrentIndex(1); });
+
+    mLineWidthLayout->addWidget(mBrushLabel, 0, Qt::AlignTop);
+    mLineWidthLayout->addWidget(mLineWidthLabel, 0,
+                                Qt::AlignRight | Qt::AlignBottom);
+    mLineWidthLayout->addWidget(mLineWidthSpin, 0,
+                                Qt::AlignRight | Qt::AlignBottom);
 
     mStrokeSettingsLayout->addLayout(mLineWidthLayout);
 
@@ -213,7 +225,6 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mGradientTypeWidget->setContentsMargins(0, 0, 0, 0);
     mGradientTypeWidget->setLayout(mGradientTypeLayout);
 
-
     const auto brushCurvesWidget = new QWidget(this);
     mBrushWidthCurveEditor = new Segment1DEditor(0, 1, this);
     mBrushPressureCurveEditor = new Segment1DEditor(0, 1, this);
@@ -237,7 +248,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mBrushSelectionWidget = new BrushSelectionWidget(*oCtxt.get(), this);
 
     connect(mBrushSelectionWidget,
-            &BrushSelectionWidget::currentBrushChanged,
+            &BrushSelectionWidget::brushTriggered,
             this, &FillStrokeSettingsWidget::setStrokeBrush);
 
     connect(mBrushWidthCurveEditor, &Segment1DEditor::editingStarted,
@@ -337,6 +348,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     addTab(mBrushSettingsWidget, "Stroke Curves");
 
     mGradientTypeWidget->hide();
+    mBrushLabel->hide();
 
     setFillTarget();
     setCapStyle(SkPaint::kRound_Cap);
@@ -446,8 +458,10 @@ void FillStrokeSettingsWidget::setCurrentPaintType(
 
 void FillStrokeSettingsWidget::setStrokeBrush(
         BrushContexedWrapper * const brush) {
-    mCurrentStrokeBrush = brush->getSimpleBrush();
-    emitStrokeBrushChanged();
+    const auto simpleBrush = brush->getSimpleBrush();
+    mDocument.fOutlineBrush = simpleBrush;
+    setDisplayedBrush(simpleBrush);
+    emitStrokeBrushChanged(simpleBrush);
     mDocument.actionFinished();
 }
 
@@ -479,11 +493,18 @@ void FillStrokeSettingsWidget::applyBrushTimeAction(
     mDocument.actionFinished();
 }
 
+void FillStrokeSettingsWidget::setDisplayedBrush(
+        SimpleBrushWrapper* const brush) {
+    const auto ctxt = BrushSelectionWidget::sOutlineContext.get();
+    const auto bw = ctxt->brushWrapper(brush);
+    mBrushLabel->setBrush(bw);
+    mBrushSelectionWidget->setCurrentBrush(brush);
+}
+
 void FillStrokeSettingsWidget::setCurrentBrushSettings(
         BrushSettingsAnimator * const brushSettings) {
     if(brushSettings) {
-        mBrushSelectionWidget->setCurrentBrush(
-                    brushSettings->getBrush());
+        setDisplayedBrush(brushSettings->getBrush());
         mBrushWidthCurveEditor->setCurrentAnimator(
                     brushSettings->getWidthAnimator());
         mBrushPressureCurveEditor->setCurrentAnimator(
@@ -500,16 +521,31 @@ void FillStrokeSettingsWidget::setCurrentBrushSettings(
     }
 }
 
+void FillStrokeSettingsWidget::setCurrentBox(BoundingBox* const box) {
+    const auto fillSettings = box ? box->getFillSettings() : nullptr;
+    const auto strokeSettings = box ? box->getStrokeSettings() : nullptr;
+    setCurrentSettings(fillSettings, strokeSettings);
+    auto& conn = mCurrentBox.assign(box);
+    if(box) {
+        conn << connect(box, &BoundingBox::brushChanged,
+                        this, &FillStrokeSettingsWidget::setDisplayedBrush);
+        if(box->SWT_isSculptPathBox()) {
+            const auto sculptBox = static_cast<SculptPathBox*>(box);
+            setDisplayedBrush(sculptBox->brush());
+            if(mTarget == PaintSetting::OUTLINE)
+                setBrushPaintType();
+            else mCurrentStrokePaintType = BRUSHPAINT;
+        }
+    }
+}
+
 void FillStrokeSettingsWidget::updateCurrentSettings() {
     const auto scene = mDocument.fActiveScene;
     if(scene) {
-        PaintSettingsAnimator* fillSetings;
-        OutlineSettingsAnimator* strokeSettings;
-        scene->getDisplayedFillStrokeSettingsFromLastSelected(
-                    fillSetings, strokeSettings);
-        setCurrentSettings(fillSetings, strokeSettings);
+        const auto currentBox = scene->getCurrentBox();
+        setCurrentBox(currentBox);
     } else {
-        setCurrentSettings(nullptr, nullptr);
+        setCurrentBox(nullptr);
     }
 }
 
@@ -518,14 +554,8 @@ void FillStrokeSettingsWidget::setCurrentSettings(
         OutlineSettingsAnimator *strokePaintSettings) {
     setFillValuesFromFillSettings(fillPaintSettings);
     setStrokeValuesFromStrokeSettings(strokePaintSettings);
-    //mLineWidthSpin->setValue(strokePaintSettings->getCurrentStrokeWidth());
-
     if(mTarget == PaintSetting::FILL) setFillTarget();
     else setStrokeTarget();
-}
-
-GradientWidget *FillStrokeSettingsWidget::getGradientWidget() {
-    return mGradientWidget;
 }
 
 void FillStrokeSettingsWidget::clearAll() {
@@ -696,9 +726,10 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
 }
 
 
-void FillStrokeSettingsWidget::emitStrokeBrushChanged() {
+void FillStrokeSettingsWidget::emitStrokeBrushChanged(
+        SimpleBrushWrapper* const brush) {
     const auto scene = mDocument.fActiveScene;
-    if(scene) scene->setSelectedStrokeBrush(mCurrentStrokeBrush);
+    if(scene) scene->setSelectedStrokeBrush(brush);
 }
 
 void FillStrokeSettingsWidget::emitCapStyleChanged() {
@@ -801,6 +832,7 @@ void FillStrokeSettingsWidget::setStrokeTarget() {
 
 void FillStrokeSettingsWidget::setBrushPaintType() {
     disconnectGradient();
+    mBrushLabel->show();
     mColorsSettingsWidget->show();
     mGradientWidget->hide();
     mGradientTypeWidget->hide();
@@ -812,6 +844,7 @@ void FillStrokeSettingsWidget::setBrushPaintType() {
 
 void FillStrokeSettingsWidget::setNoPaintType() {
     setCurrentPaintTypeVal(NOPAINT);
+    mBrushLabel->hide();
     mColorsSettingsWidget->hide();
     mGradientWidget->hide();
     mGradientTypeWidget->hide();
@@ -822,6 +855,7 @@ void FillStrokeSettingsWidget::setNoPaintType() {
 
 void FillStrokeSettingsWidget::setFlatPaintType() {
     disconnectGradient();
+    mBrushLabel->hide();
     mColorsSettingsWidget->show();
     mGradientWidget->hide();
     mGradientTypeWidget->hide();
@@ -834,6 +868,7 @@ void FillStrokeSettingsWidget::setFlatPaintType() {
 
 void FillStrokeSettingsWidget::setGradientPaintType() {
     connectGradient();
+    mBrushLabel->hide();
     if(mTarget == PaintSetting::FILL) {
         mCurrentFillPaintType = GRADIENTPAINT;
     } else {

@@ -47,6 +47,8 @@ public:
     FillSettingsAnimator *getFillSettings() const
     { return mFillSettings.get(); }
 
+    SimpleBrushWrapper* brush() const
+    { return mBrush.data(); }
     void setPath(const SkPath& path);
     void sculptStarted();
     void sculpt(const SculptTarget target,

@@ -194,18 +194,6 @@ void Canvas::resetSelectedRotation() {
         box->resetRotation();
 }
 
-void Canvas::getDisplayedFillStrokeSettingsFromLastSelected(
-        PaintSettingsAnimator*& fillSetings, OutlineSettingsAnimator*& strokeSettings) {
-    if(mCurrentBox) {
-        fillSetings = mCurrentBox->getFillSettings();
-        strokeSettings = mCurrentBox->getStrokeSettings();
-    } else {
-        fillSetings = nullptr;
-        strokeSettings = nullptr;
-    }
-}
-
-
 void Canvas::applyPaintSettingToSelected(const PaintSettingsApplier &setting) {
     for(const auto &box : mSelectedBoxes) {
         box->applyPaintSetting(setting);

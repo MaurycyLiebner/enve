@@ -386,6 +386,7 @@ signals:
     void globalPivotInfluenced();
     void fillStrokeSettingsChanged();
     void blendModeChanged(SkBlendMode);
+    void brushChanged(SimpleBrushWrapper* brush);
 protected:
     void setRelBoundingRect(const QRectF& relRect);
 

@@ -42,6 +42,7 @@ public:
     static qsptr<BrushesContext> sOutlineContext;
 signals:
     void currentBrushChanged(BrushContexedWrapper*);
+    void brushTriggered(BrushContexedWrapper*);
 private:
     void setupBookmarksTab();
     void setNumberBookmarked(const int bookmarked);
@@ -53,7 +54,7 @@ private:
 
     int mNumberBookmarked = 0;
     ScrollArea* mBookmarksScroll;
-    BrushContexedWrapper * mCurrentBrushCWrapper = nullptr;
+    BrushContexedWrapper * mSelected = nullptr;
     BrushesContext& mContext;
 };
 

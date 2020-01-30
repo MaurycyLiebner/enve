@@ -37,8 +37,7 @@ SmartVectorPath::SmartVectorPath() :
             this, [this](const UpdateReason reason) {
         setPathsOutdated(reason);
     });
-    ca_prependChild(mPathEffectsAnimators.data(),
-                            mPathAnimator);
+    ca_prependChild(mPathEffectsAnimators.data(), mPathAnimator);
 }
 
 bool SmartVectorPath::differenceInEditPathBetweenFrames(

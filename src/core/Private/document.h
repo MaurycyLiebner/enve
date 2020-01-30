@@ -71,6 +71,8 @@ public:
     FillSettings fFill;
     StrokeSettings fStroke;
 
+    SimpleBrushWrapper* fOutlineBrush = nullptr;
+
     SculptBrush fSculptBrush = SculptBrush(3, 0.5, 0.8, 1);
     SculptTarget fSculptTarget = SculptTarget::position;
     SculptMode fSculptMode = SculptMode::drag;

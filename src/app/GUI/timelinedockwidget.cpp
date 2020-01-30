@@ -34,6 +34,7 @@
 #include "layouthandler.h"
 #include "memoryhandler.h"
 #include "switchbutton.h"
+#include "GUI/BrushWidgets/brushlabel.h"
 
 TimelineDockWidget::TimelineDockWidget(Document& document,
                                        LayoutHandler * const layoutH,
@@ -135,23 +136,9 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
 
     connect(&mDocument, &Document::brushColorChanged,
             this, &TimelineDockWidget::setBrushColor);
-    mBrushLabel = new TriggerLabel("");
+    mBrushLabel = new BrushLabel(BrushSelectionWidget::sPaintContext.get());
     mBrushLabel->setToolTip(gSingleLineTooltip("Current Brush", "B"));
-    connect(mBrushLabel, &TriggerLabel::requestContextMenu,
-            this, [this](const QPoint& pos) {
-        const auto brush = mDocument.fBrush;
-        if(!brush) return;
-        QMenu menu(this);
-        menu.addAction("Bookmark");
-        const auto act = menu.exec(pos);
-        if(act) {
-            if(act->text() == "Bookmark") {
-                const auto ctxt = BrushSelectionWidget::sPaintContext;
-                const auto wrapper = ctxt->brushWrapper(brush);
-                if(wrapper) wrapper->bookmark();
-            }
-        }
-    });
+
     connect(mBrushLabel, &TriggerLabel::triggered, this, [this]() {
         mMainWindow->togglePaintBrushDockVisible();
     });
@@ -236,10 +223,6 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     setupSculptTargetButtons(iconsDir);
     setupSculptValueSpins();
 
-    mBrushLabel->setStyleSheet("QWidget {"
-                                   "background: white;"
-                                   "border: 1px solid black;"
-                               "}");
     mColorLabel->setObjectName("colorLabel");
 
     QWidget * const spacerWidget = new QWidget(this);
@@ -716,17 +699,10 @@ void TimelineDockWidget::setSculptBrushColor(const QColor &color) {
 }
 
 void TimelineDockWidget::setBrush(BrushContexedWrapper* const brush) {
-    const int dim = mToolBar->height() - 2;
-    if(!brush) {
-        QPixmap pix(dim, dim);
-        pix.fill(Qt::white);
-        mBrushLabel->setPixmap(pix);
-        return;
-    }
-    const auto& icon = brush->getBrushData().fIcon;
-    const auto img = icon.scaled(dim, dim, Qt::KeepAspectRatio,
-                                 Qt::SmoothTransformation);
-    mBrushLabel->setPixmap(QPixmap::fromImage(img));
+    mBrushLabel->setContentsMargins(1, 1, 1, 0);
+    const int dim = mToolBar->height() - 1;
+    mBrushLabel->setFixedSize(dim, dim);
+    mBrushLabel->setBrush(brush);
 }
 
 void TimelineDockWidget::pausePreview() {

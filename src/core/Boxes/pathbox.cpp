@@ -74,6 +74,10 @@ PathBox::PathBox(const eBoxType type) : BoxWithPathEffects(type) {
     const auto lineWidthAnim = mStrokeSettings->getStrokeWidthAnimator();
     connect(lineWidthAnim, &Property::prp_currentFrameChanged,
             this, &PathBox::setOutlinePathOutdated);
+
+    const auto brushSettings = mStrokeSettings->getBrushSettings();
+    connect(brushSettings, &BrushSettingsAnimator::brushChanged,
+            this, &BoundingBox::brushChanged);
 }
 
 HardwareSupport PathBox::hardwareSupport() const {

@@ -42,6 +42,7 @@ protected:
     void mousePressEvent(QMouseEvent* e);
 signals:
     void selected(BrushContexedWrapper*);
+    void triggered(BrushContexedWrapper*);
 private:
     void selectionChanged(const bool sel) {
         if(sel) emit selected(mBrushCWrapper);

@@ -490,6 +490,7 @@ void BoundingBox::setStrokeBrush(SimpleBrushWrapper * const brush) {
     const auto strokeSettings = getStrokeSettings();
     if(!strokeSettings) return;
     strokeSettings->setStrokeBrush(brush);
+    requestGlobalFillStrokeUpdateIfSelected();
 }
 
 void BoundingBox::applyStrokeBrushWidthAction(const SegAction &action) {

@@ -52,3 +52,15 @@ bool BrushesContext::setSelectedWrapper(SimpleBrushWrapper * const wrapper) {
     }
     return false;
 }
+
+bool BrushesContext::setSelectedName(const QString &name) {
+    for(const auto& coll : fCollections) {
+        for(auto& brush : coll.fBrushes) {
+            if(brush->getBrushData().fName == name) {
+                brush->setSelected(true);
+                return true;
+            }
+        }
+    }
+    return false;
+}

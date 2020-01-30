@@ -31,6 +31,7 @@ BrushWidget::BrushWidget(BrushContexedWrapper * const brushCWrapper,
 }
 
 void BrushWidget::paintEvent(QPaintEvent *) {
+    if(!mBrushCWrapper) return;
     QPainter p(this);
 
     const auto& brushData = mBrushCWrapper->getBrushData();
@@ -61,6 +62,7 @@ void BrushWidget::paintEvent(QPaintEvent *) {
 }
 
 void BrushWidget::mousePressEvent(QMouseEvent *e) {
+    if(!mBrushCWrapper) return;
     const auto pressedButton = e->button();
     if(pressedButton == Qt::RightButton) {
         QMenu menu(this);
@@ -77,6 +79,7 @@ void BrushWidget::mousePressEvent(QMouseEvent *e) {
         }
     } else if(pressedButton == Qt::LeftButton) {
         mBrushCWrapper->setSelected(true);
+        emit triggered(mBrushCWrapper);
     } else return;
     update();
 }
