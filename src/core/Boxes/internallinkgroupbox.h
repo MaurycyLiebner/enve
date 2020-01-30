@@ -77,6 +77,8 @@ public:
 
     bool relPointInsidePath(const QPointF &relPos) const;
 
+    HardwareSupport hardwareSupport() const;
+
     void setLinkTarget(ContainerBox * const linkTarget);
     ContainerBox *getLinkTarget() const;
     ContainerBox *getFinalTarget() const;

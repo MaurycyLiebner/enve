@@ -70,6 +70,11 @@ bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) const {
     return getLinkTarget()->relPointInsidePath(relPos);
 }
 
+HardwareSupport InternalLinkGroupBox::hardwareSupport() const {
+    if(!getLinkTarget()) return BoundingBox::hardwareSupport();
+    return getLinkTarget()->hardwareSupport();
+}
+
 bool InternalLinkGroupBox::isFrameInDurationRect(const int relFrame) const {
     if(!getLinkTarget()) return false;
     return ContainerBox::isFrameInDurationRect(relFrame) &&

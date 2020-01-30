@@ -57,6 +57,8 @@ public:
     bool isFrameInDurationRect(const int relFrame) const;
     bool isFrameFInDurationRect(const qreal relFrame) const;
 
+    HardwareSupport hardwareSupport() const;
+
     void setLinkTarget(BoundingBox * const linkTarget);
     BoundingBox *getLinkTarget() const;
 protected:

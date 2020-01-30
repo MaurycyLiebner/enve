@@ -108,6 +108,11 @@ bool InternalLinkBox::isFrameFInDurationRect(const qreal relFrame) const {
             getLinkTarget()->isFrameFInDurationRect(relFrame);
 }
 
+HardwareSupport InternalLinkBox::hardwareSupport() const {
+    if(!getLinkTarget()) return BoundingBox::hardwareSupport();
+    return getLinkTarget()->hardwareSupport();
+}
+
 FrameRange InternalLinkBox::prp_getIdenticalRelRange(const int relFrame) const {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     if(mVisible && getLinkTarget())
