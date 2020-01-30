@@ -150,8 +150,6 @@ public:
     virtual void drawHoveredSk(SkCanvas *canvas,
                                const float invScale);
 
-    virtual const SkPath &getRelBoundingRectPath();
-
     virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
 
     virtual FillSettingsAnimator *getFillSettings() const
@@ -328,7 +326,10 @@ public:
     void applyParentTransform();
     bool isTransformationStatic() const;
     BoxTransformAnimator *getBoxTransformAnimator() const;
-    QRectF getRelBoundingRect() const;
+    const QRectF& getRelBoundingRect() const
+    { return mRelRect; }
+    const SkPath &getRelBoundingRectPath() const
+    { return mSkRelBoundingRectPath; }
     void drawHoveredPathSk(SkCanvas *canvas, const SkPath &path,
                            const float invScale);
 
@@ -405,10 +406,6 @@ protected:
 
     eBoxType mType;
 
-    QRectF mRelRect;
-    SkRect mRelRectSk;
-    SkPath mSkRelBoundingRectPath;
-
     RenderDataHandler mRenderDataHandler;
 
     const qsptr<BoxTransformAnimator> mTransformAnimator;
@@ -425,6 +422,10 @@ private:
     UpdateReason mPlannedReason;
 
     QPointF mSavedTransformPivot;
+
+    QRectF mRelRect;
+    SkRect mRelRectSk;
+    SkPath mSkRelBoundingRectPath;
 
     BasicTransformAnimator* mParentTransform = nullptr;
 

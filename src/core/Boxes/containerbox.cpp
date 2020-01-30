@@ -394,7 +394,7 @@ FrameRange ContainerBox::getFirstAndLastIdenticalForMotionBlur(
 
 
 bool ContainerBox::relPointInsidePath(const QPointF &relPos) const {
-    if(mRelRect.contains(relPos)) {
+    if(getRelBoundingRect().contains(relPos)) {
         const QPointF absPos = mapRelPosToAbs(relPos);
         for(const auto& box : mContainedBoxes) {
             if(box->absPointInsidePath(absPos)) {

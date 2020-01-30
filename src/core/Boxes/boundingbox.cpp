@@ -548,10 +548,6 @@ void BoundingBox::drawBoundingRect(SkCanvas * const canvas,
                                     true, MIN_WIDGET_DIM*0.25f);
 }
 
-const SkPath &BoundingBox::getRelBoundingRectPath() {
-    return mSkRelBoundingRectPath;
-}
-
 QMatrix BoundingBox::getTotalTransform() const {
     return mTransformAnimator->getTotalTransform();
 }
@@ -589,10 +585,6 @@ void BoundingBox::scaleRelativeToSavedPivot(const qreal scaleBy) {
 
 QPointF BoundingBox::mapRelPosToAbs(const QPointF &relPos) const {
     return mTransformAnimator->mapRelPosToAbs(relPos);
-}
-
-QRectF BoundingBox::getRelBoundingRect() const {
-    return mRelRect;
 }
 
 void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {

@@ -172,7 +172,7 @@ void PathBox::setupRenderData(const qreal relFrame,
 
     if(currentOutlinePathCompatible && currentFillPathCompatible) {
         data->fRelBoundingRectSet = true;
-        data->fRelBoundingRect = mRelRect;
+        data->fRelBoundingRect = getRelBoundingRect();
     }
     setupPaintSettings(pathData, relFrame);
 }
@@ -343,7 +343,7 @@ void PathBox::updateCurrentPreviewDataFromRenderData(
 
 bool PathBox::relPointInsidePath(const QPointF &relPos) const {
     const SkPoint relPosSk = toSkPoint(relPos);
-    if(mSkRelBoundingRectPath.contains(relPosSk.x(), relPosSk.y()) ) {
+    if(getRelBoundingRectPath().contains(relPosSk.x(), relPosSk.y()) ) {
         if(mFillPathSk.contains(relPosSk.x(), relPosSk.y())) {
             return true;
         }

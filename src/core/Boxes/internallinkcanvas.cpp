@@ -93,7 +93,7 @@ stdsptr<BoxRenderData> InternalLinkCanvas::createRenderData() {
 }
 
 bool InternalLinkCanvas::relPointInsidePath(const QPointF &relPos) const {
-    if(mClipToCanvas->getValue()) return mRelRect.contains(relPos);
+    if(mClipToCanvas->getValue()) return getRelBoundingRect().contains(relPos);
     return InternalLinkGroupBox::relPointInsidePath(relPos);
 }
 
