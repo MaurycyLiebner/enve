@@ -129,6 +129,18 @@ void SmartPathCollection::loadSkPath(const SkPath &path) {
 
 void SmartPathCollection::setFillType(const SkPathFillType fillType) {
     if(mFillType == fillType) return;
+    {
+        UndoRedo ur;
+        const auto oldValue = mFillType;
+        const auto newValue = fillType;
+        ur.fUndo = [this, oldValue]() {
+            setFillType(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setFillType(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mFillType = fillType;
     prp_afterWholeInfluenceRangeChanged();
     emit fillTypeChanged(fillType);

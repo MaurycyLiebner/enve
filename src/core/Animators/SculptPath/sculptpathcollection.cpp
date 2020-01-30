@@ -84,6 +84,18 @@ void SculptPathCollection::applyTransform(const QMatrix &transform) const {
 
 void SculptPathCollection::setFillType(const SkPathFillType fillType) {
     if(mFillType == fillType) return;
+    {
+        UndoRedo ur;
+        const auto oldValue = mFillType;
+        const auto newValue = fillType;
+        ur.fUndo = [this, oldValue]() {
+            setFillType(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setFillType(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mFillType = fillType;
     prp_afterWholeInfluenceRangeChanged();
     emit fillTypeChanged(fillType);
