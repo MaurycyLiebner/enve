@@ -20,7 +20,6 @@
 #include "qrealsnapshot.h"
 #include "../conncontextptr.h"
 class QrealKey;
-class RandomQrealGenerator;
 class ExpressionValue;
 
 class QrealAnimator :  public GraphAnimator {
@@ -123,10 +122,6 @@ public:
 
     bool getBeingTransformed() { return mTransformed; }
 
-    void setGenerator(const qsptr<RandomQrealGenerator> &generator);
-
-    bool hasNoise();
-
     static auto sCreate0to1Animator(const QString& name) {
         auto anim = enve::make_shared<QrealAnimator>(0, 0, 1, 0.01, name);
         anim->graphFixMinMaxValues();
@@ -152,7 +147,6 @@ private:
     qreal mCurrentBaseValue = 0;
     qreal mSavedCurrentValue = 0;
 
-    qsptr<RandomQrealGenerator> mRandomGenerator;
     ConnContextQSPtr<ExpressionValue> mExpression;
 
     qreal mPrefferedValueStep = 1;

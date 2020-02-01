@@ -327,7 +327,6 @@ SOURCES += \
     Animators/transformanimator.cpp \
     Animators/qrealanimator.cpp \
     Animators/qrealkey.cpp \
-    Animators/randomqrealgenerator.cpp \
     Animators/qrealvalueeffect.cpp \
     Animators/qpointfanimator.cpp \
     MovablePoints/movablepoint.cpp \
@@ -622,7 +621,6 @@ HEADERS += \
     Animators/transformanimator.h \
     Animators/qrealanimator.h \
     Animators/qrealkey.h \
-    Animators/randomqrealgenerator.h \
     Animators/qrealvalueeffect.h \
     Animators/qpointfanimator.h \
     MovablePoints/movablepoint.h \

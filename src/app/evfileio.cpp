@@ -16,7 +16,6 @@
 
 #include <fstream>
 #include "Animators/qrealanimator.h"
-#include "Animators/randomqrealgenerator.h"
 #include "Animators/qpointfanimator.h"
 #include "Animators/coloranimator.h"
 #include "Animators/qstringanimator.h"

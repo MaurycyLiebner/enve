@@ -18,7 +18,6 @@
 #include <QMenu>
 #include "qrealpoint.h"
 #include "qrealkey.h"
-#include "randomqrealgenerator.h"
 #include "Expressions/expressionvalue.h"
 #include "Expressions/expressionparser.h"
 #include "simpletask.h"
@@ -192,22 +191,6 @@ qreal QrealAnimator::getBaseValueAtAbsFrame(const qreal frame) const {
     return getBaseValue(prp_absFrameToRelFrameF(frame));
 }
 
-void QrealAnimator::setGenerator(const qsptr<RandomQrealGenerator>& generator) {
-    if(generator == mRandomGenerator.data()) return;
-
-    if(!generator) {
-        mRandomGenerator.reset();
-    } else {
-        mRandomGenerator = generator->ref<RandomQrealGenerator>();
-    }
-
-    prp_afterWholeInfluenceRangeChanged();
-}
-
-bool QrealAnimator::hasNoise() {
-    return !mRandomGenerator.isNull();
-}
-
 bool QrealAnimator::hasValidExpression() const {
     return mExpression ? mExpression->isValid() : false;
 }
@@ -272,10 +255,7 @@ qreal QrealAnimator::getBaseValue(const qreal relFrame) const {
 
 qreal QrealAnimator::getEffectiveValue(const qreal relFrame) const {
     if(mExpression) return mExpression->value(relFrame);
-    if(mRandomGenerator.isNull()) return getBaseValue(relFrame);
-    const qreal val = getBaseValue(relFrame) +
-            mRandomGenerator->getDevAtRelFrame(relFrame);
-    return qMin(mMaxPossibleVal, qMax(mMinPossibleVal, val));
+    else return getBaseValue(relFrame);
 }
 
 qreal QrealAnimator::getCurrentBaseValue() const {
@@ -286,10 +266,7 @@ qreal QrealAnimator::getEffectiveValue() const {
     if(mExpression) return qBound(mMinPossibleVal,
                                   mExpression->currentValue(),
                                   mMaxPossibleVal);
-    if(mRandomGenerator.isNull()) return mCurrentBaseValue;
-    const qreal val = mCurrentBaseValue +
-            mRandomGenerator->getDevAtRelFrame(anim_getCurrentRelFrame());
-    return qMin(mMaxPossibleVal, qMax(mMinPossibleVal, val));
+    else return mCurrentBaseValue;
 }
 
 void QrealAnimator::setCurrentBaseValue(qreal newValue) {
