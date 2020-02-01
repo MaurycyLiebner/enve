@@ -54,6 +54,8 @@ public:
 
     static void sNewCanvasDialog(Document &document, QWidget * const parent);
 private:
+    bool validate();
+
     Canvas * mTargetCanvas = nullptr;
 
     QVBoxLayout *mMainLayout;
@@ -80,6 +82,8 @@ private:
     QHBoxLayout *mBgColorLayout;
     QLabel *mBgColorLabel;
     ColorAnimatorButton *mBgColorButton;
+
+    QLabel* mErrorLabel;
 
     QPushButton *mOkButton;
     QPushButton *mCancelButton;

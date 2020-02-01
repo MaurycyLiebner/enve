@@ -168,11 +168,6 @@ bool CanvasWindow::hasNoCanvas() {
     return !mCurrentCanvas;
 }
 
-void CanvasWindow::renameCurrentCanvas(const QString &newName) {
-    if(!mCurrentCanvas) return;
-    mCurrentCanvas->prp_setName(newName);
-}
-
 #include "glhelpers.h"
 
 void CanvasWindow::renderSk(SkCanvas * const canvas) {

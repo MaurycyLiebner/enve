@@ -169,6 +169,7 @@ SOURCES += \
     GUI/ewidgets.cpp \
     GUI/global.cpp \
     GUI/newcanvasdialog.cpp \
+    GUI/propertynamedialog.cpp \
     GUI/twocolumnlayout.cpp \
     GUI/valueinput.cpp \
     MovablePoints/gradientpoint.cpp \
@@ -450,6 +451,7 @@ HEADERS += \
     GUI/ewidgets.h \
     GUI/global.h \
     GUI/newcanvasdialog.h \
+    GUI/propertynamedialog.h \
     GUI/twocolumnlayout.h \
     GUI/valueinput.h \
     MovablePoints/gradientpoint.h \

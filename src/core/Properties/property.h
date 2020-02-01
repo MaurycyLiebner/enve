@@ -21,6 +21,7 @@ class Canvas;
 #include "../framerange.h"
 #include "../MovablePoints/pointshandler.h"
 #include "../ReadWrite/basicreadwrite.h"
+#include "../conncontextptr.h"
 
 class ComplexAnimator;
 class Key;
@@ -146,7 +147,7 @@ public:
 
     template <class T = ComplexAnimator>
     T *getParent() const {
-        return static_cast<T*>(mParent_k.data());
+        return static_cast<T*>(*mParent_k);
     }
 
     void setParent(ComplexAnimator * const parent);
@@ -154,14 +155,14 @@ public:
     template <class T = Property>
     T *getFirstAncestor(const std::function<bool(Property*)>& tester) const {
         if(!mParent_k) return nullptr;
-        if(tester(mParent_k)) return static_cast<T*>(mParent_k.data());
+        if(tester(mParent_k)) return static_cast<T*>(*mParent_k);
         return mParent_k->getFirstAncestor<T>(tester);
     }
 
     template <class T = Property>
     T *getFirstAncestor() const {
         if(!mParent_k) return nullptr;
-        const auto target = dynamic_cast<T*>(mParent_k.data());
+        const auto target = dynamic_cast<T*>(*mParent_k);
         if(target) return target;
         return mParent_k->getFirstAncestor<T>();
     }
@@ -185,6 +186,8 @@ public:
     void prp_setDrawingOnCanvasEnabled(const bool enabled);
 
     void prp_getFullPath(QStringList& names) const;
+    static bool prp_sValidateName(const QString& name,
+                                  QString* error = nullptr);
 protected:
     void setPointsHandler(const stdsptr<PointsHandler>& handler);
 
@@ -201,12 +204,13 @@ signals:
     void prp_selectionChanged(bool, QPrivateSignal);
     void prp_parentChanged(ComplexAnimator*, QPrivateSignal);
     void prp_ancestorChanged(QPrivateSignal);
+    void prp_pathChanged();
 private:
     bool prp_mSelected = false;
     bool mDrawOnCanvas = false;
     int prp_mInheritedFrameShift = 0;
     QString prp_mName;
-    qptr<Property> mParent_k;
+    ConnContextQPtr<Property> mParent_k;
     stdsptr<PointsHandler> mPointsHandler;
     Canvas* mParentScene = nullptr;
 };

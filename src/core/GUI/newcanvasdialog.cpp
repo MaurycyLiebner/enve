@@ -51,6 +51,8 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &name,
     mNameLayout = new QHBoxLayout();
     mNameEditLabel = new QLabel("Name: ", this);
     mNameEdit = new QLineEdit(name, this);
+    connect(mNameEdit, &QLineEdit::textChanged,
+            this, &CanvasSettingsDialog::validate);
     mNameLayout->addWidget(mNameEditLabel);
     mNameLayout->addWidget(mNameEdit);
     mMainLayout->addLayout(mNameLayout);
@@ -107,6 +109,10 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &name,
     mBgColorLayout->addWidget(mBgColorButton);
     mMainLayout->addLayout(mBgColorLayout);
 
+    mErrorLabel = new QLabel(this);
+    mErrorLabel->setObjectName("errorLabel");
+    mMainLayout->addWidget(mErrorLabel);
+
     mOkButton = new QPushButton("Ok", this);
     mCancelButton = new QPushButton("Cancel", this);
     mButtonsLayout = new QHBoxLayout();
@@ -119,6 +125,19 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &name,
     connect(mCancelButton, &QPushButton::released,
             this, &CanvasSettingsDialog::reject);
     connect(this, &QDialog::rejected, this, &QDialog::close);
+
+    validate();
+}
+
+bool CanvasSettingsDialog::validate() {
+    QString nameError;
+    const bool validName = Property::prp_sValidateName(
+                mNameEdit->text(), &nameError);
+    if(!nameError.isEmpty()) nameError += "\n";
+    mErrorLabel->setText(nameError);
+    const bool valid = validName;
+    mOkButton->setEnabled(valid);
+    return valid;
 }
 
 int CanvasSettingsDialog::getCanvasWidth() const {

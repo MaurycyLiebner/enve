@@ -26,6 +26,7 @@ Property::Property(const QString& name) :
     prp_mName(name) {
     connect(this, &Property::prp_ancestorChanged, this, [this]() {
         mParentScene = mParent_k ? mParent_k->mParentScene : nullptr;
+        emit prp_pathChanged();
     });
 }
 
@@ -159,6 +160,7 @@ void Property::prp_setName(const QString &newName) {
     if(newName == prp_mName) return;
     prp_mName = newName;
     emit prp_nameChanged(newName, QPrivateSignal());
+    emit prp_pathChanged();
 }
 
 bool Property::prp_differencesBetweenRelFrames(
@@ -188,6 +190,28 @@ void Property::prp_getFullPath(QStringList& names) const {
     names.append(prp_getName());
 }
 
+bool Property::prp_sValidateName(const QString &name,
+                                 QString *error) {
+    if(name.isEmpty()) {
+        *error = "Name cannot be empty";
+        return false;
+    }
+    if(!name.front().isLetter()) {
+        *error = "Name has to start with a letter";
+        return false;
+    }
+    if(name.back() == ' ') {
+        *error = "Name cannot end with a space";
+        return false;
+    }
+    const int nValid = name.count(QRegExp("[A-Za-z0-9_ ]"));
+    if(nValid != name.count()) {
+        *error = "Invalid characters used";
+        return false;
+    }
+    return true;
+}
+
 void Property::setPointsHandler(const stdsptr<PointsHandler> &handler) {
     mPointsHandler = handler;
     if(mPointsHandler) {
@@ -215,14 +239,12 @@ void Property::prp_pushUndoRedoName(const QString& name) {
 
 void Property::setParent(ComplexAnimator * const parent) {
     if(mParent_k == parent) return;
-    if(mParent_k) {
-        disconnect(mParent_k, &Property::prp_ancestorChanged,
-                   this, &Property::prp_ancestorChanged);
-    }
-    mParent_k = parent;
+    auto& conn = mParent_k.assign(parent);
     if(parent) {
-        connect(mParent_k, &Property::prp_ancestorChanged,
-                this, &Property::prp_ancestorChanged);
+        conn << connect(mParent_k, &Property::prp_ancestorChanged,
+                        this, &Property::prp_ancestorChanged);
+        conn << connect(mParent_k, &Property::prp_pathChanged,
+                        this, &Property::prp_pathChanged);
     }
     if(mPointsHandler) mPointsHandler->setTransform(getTransformAnimator());
     emit prp_parentChanged(parent, QPrivateSignal());

@@ -4,7 +4,7 @@
 
 ExpressionSource::ExpressionSource(QrealAnimator * const parent) :
     ExpressionSourceBase(parent) {
-    connect(parent, &QrealAnimator::prp_ancestorChanged,
+    connect(parent, &QrealAnimator::prp_pathChanged,
             this, &ExpressionSource::updateSourcePath);
 }
 
@@ -59,7 +59,7 @@ void ExpressionSource::lookForSource() {
         });
         conn << connect(newSource, &QrealAnimator::effectiveValueChanged,
                         this, &ExpressionValue::updateValue);
-        conn << connect(newSource, &QrealAnimator::prp_ancestorChanged,
+        conn << connect(newSource, &QrealAnimator::prp_pathChanged,
                         this, &ExpressionSource::updateSourcePath);
     }
 }

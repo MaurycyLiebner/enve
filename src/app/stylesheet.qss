@@ -197,6 +197,10 @@ QLabel {
     background: none;
 }
 
+QLabel#errorLabel {
+    color: red;
+}
+
 QWidget:disabled {
     color: grey;
 }

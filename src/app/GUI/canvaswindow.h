@@ -148,7 +148,6 @@ private:
 signals:
     void changeCanvasFrameRange(FrameRange);
 public:
-    void renameCurrentCanvas(const QString &newName);
     void setCurrentCanvas(const int id);
 
     QPointF mapToCanvasCoord(const QPointF& windowCoord);

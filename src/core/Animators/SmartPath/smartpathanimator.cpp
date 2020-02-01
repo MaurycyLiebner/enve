@@ -51,14 +51,12 @@ QMimeData *SmartPathAnimator::SWT_createMimeData() {
 #include "typemenu.h"
 #include "Private/document.h"
 #include <QInputDialog>
+#include "GUI/propertynamedialog.h"
+
 void SmartPathAnimator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     const auto parentWidget = menu->getParentWidget();
     menu->addPlainAction("Rename", [this, parentWidget]() {
-        bool ok;
-        const QString text = QInputDialog::getText(parentWidget, tr("New name dialog"),
-                                                   tr("Name:"), QLineEdit::Normal,
-                                                   prp_getName(), &ok);
-        if(ok) prp_setName(text);
+        PropertyNameDialog::sRenameProperty(this, parentWidget);
     });
     const auto spClipboard = Document::sInstance->getSmartPathClipboard();
     menu->addPlainAction("Paste Path", [this, spClipboard]() {
