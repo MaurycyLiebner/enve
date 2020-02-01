@@ -19,6 +19,7 @@
 #include "qrealpoint.h"
 #include "qrealkey.h"
 #include "randomqrealgenerator.h"
+#include "Expressions/expressionvalue.h"
 
 QrealAnimator::QrealAnimator(const qreal iniVal,
                              const qreal minVal,
@@ -195,6 +196,23 @@ bool QrealAnimator::hasNoise() {
     return !mRandomGenerator.isNull();
 }
 
+void QrealAnimator::setExpression(const QString &text,
+                                  const qsptr<ExpressionValue> &expression) {
+    mExpressionText = text;
+    auto& conn = mExpression.assign(expression);
+    if(expression) {
+        expression->setRelFrame(anim_getCurrentRelFrame());
+        conn << connect(expression.get(), &ExpressionValue::currentValueChanged,
+                        this, &QrealAnimator::effectiveValueChanged);
+        conn << connect(expression.get(), &ExpressionValue::relRangeChanged,
+                        this, [this](const FrameRange& range) {
+            prp_afterChangedRelRange(range);
+        });
+    }
+    emit effectiveValueChanged(getEffectiveValue());
+    prp_afterWholeInfluenceRangeChanged();
+}
+
 qreal QrealAnimator::calculateBaseValueAtRelFrame(const qreal frame) const {
     if(!anim_hasKeys()) return mCurrentBaseValue;
     const auto pn = anim_getPrevAndNextKeyIdF(frame);
@@ -235,6 +253,7 @@ qreal QrealAnimator::getBaseValue(const qreal relFrame) const {
 }
 
 qreal QrealAnimator::getEffectiveValue(const qreal relFrame) const {
+    if(mExpression) return mExpression->value(relFrame);
     if(mRandomGenerator.isNull()) return getBaseValue(relFrame);
     const qreal val = getBaseValue(relFrame) +
             mRandomGenerator->getDevAtRelFrame(relFrame);
@@ -246,6 +265,9 @@ qreal QrealAnimator::getCurrentBaseValue() const {
 }
 
 qreal QrealAnimator::getEffectiveValue() const {
+    if(mExpression) return qBound(mMinPossibleVal,
+                                  mExpression->currentValue(),
+                                  mMaxPossibleVal);
     if(mRandomGenerator.isNull()) return mCurrentBaseValue;
     const qreal val = mCurrentBaseValue +
             mRandomGenerator->getDevAtRelFrame(anim_getCurrentRelFrame());
@@ -262,7 +284,8 @@ void QrealAnimator::setCurrentBaseValue(qreal newValue) {
     if(currKey) currKey->setValue(mCurrentBaseValue);
     else prp_afterWholeInfluenceRangeChanged();
 
-    emit valueChanged(mCurrentBaseValue);
+    emit baseValueChanged(mCurrentBaseValue);
+    emit effectiveValueChanged(getEffectiveValue());
 
     //anim_updateKeysPath();
 }
@@ -271,7 +294,8 @@ bool QrealAnimator::updateBaseValueFromCurrentFrame() {
     const qreal newValue = calculateBaseValueAtRelFrame(anim_getCurrentRelFrame());
     if(isZero4Dec(newValue - mCurrentBaseValue)) return false;
     mCurrentBaseValue = newValue;
-    emit valueChanged(mCurrentBaseValue);
+    emit baseValueChanged(mCurrentBaseValue);
+    emit effectiveValueChanged(getEffectiveValue());
     return true;
 }
 
@@ -287,7 +311,11 @@ void QrealAnimator::saveValueToKey(const int frame, const qreal value) {
 
 void QrealAnimator::anim_setAbsFrame(const int frame) {
     Animator::anim_setAbsFrame(frame);
-    const bool changed = updateBaseValueFromCurrentFrame();
+    bool changed = updateBaseValueFromCurrentFrame();
+    if(mExpression) {
+        const bool exprValChanged = mExpression->setRelFrame(frame);
+        changed = changed || exprValChanged;
+    }
     if(changed) prp_afterChangedCurrent(UpdateReason::frameChange);
 }
 
@@ -403,14 +431,13 @@ void QrealAnimator::multSavedValueToCurrentValue(const qreal multBy) {
     setCurrentBaseValue(mSavedCurrentValue * multBy);
 }
 
-void QrealAnimator::setCurrentBaseValueNoUpdate(
-        const qreal newValue) {
+void QrealAnimator::setCurrentBaseValueNoUpdate(const qreal newValue) {
     mCurrentBaseValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
-    emit valueChanged(mCurrentBaseValue);
+    emit baseValueChanged(mCurrentBaseValue);
+    emit effectiveValueChanged(getEffectiveValue());
 }
 
-void QrealAnimator::incCurrentValueNoUpdate(
-        const qreal incBy) {
+void QrealAnimator::incCurrentValueNoUpdate(const qreal incBy) {
     setCurrentBaseValueNoUpdate(mCurrentBaseValue + incBy);
 }
 

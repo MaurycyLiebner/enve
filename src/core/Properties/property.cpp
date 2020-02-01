@@ -73,6 +73,10 @@ void Property::prp_afterChangedRelRange(const FrameRange &range, const bool clip
     prp_afterChangedAbsRange(absRange, clip);
 }
 
+FrameRange Property::prp_getIdenticalAbsRange(const int relFrame) const {
+    return prp_relRangeToAbsRange(prp_getIdenticalRelRange(relFrame));
+}
+
 const QString &Property::prp_getName() const {
     return prp_mName;
 }

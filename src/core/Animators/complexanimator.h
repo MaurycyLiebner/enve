@@ -118,6 +118,16 @@ public:
         });
     }
 
+    Property* ca_findPropertyWithPathRecBothWays(
+            const int id, const QStringList& path,
+            QStringList * const completions = nullptr) const;
+    virtual Property* ca_findPropertyWithPathRec(
+            const int id, const QStringList& path,
+            QStringList * const completions = nullptr) const;
+    virtual Property* ca_findPropertyWithPath(
+            const int id, const QStringList& path,
+            QStringList * const completions = nullptr) const;
+
     void ca_execOnDescendants(const std::function<void(Property*)>& op) const;
 
     Property* ca_getGUIProperty() const

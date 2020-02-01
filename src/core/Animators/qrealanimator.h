@@ -18,8 +18,10 @@
 #define VALUEANIMATORS_H
 #include "graphanimator.h"
 #include "qrealsnapshot.h"
+#include "../conncontextptr.h"
 class QrealKey;
 class RandomQrealGenerator;
+class ExpressionValue;
 
 class QrealAnimator :  public GraphAnimator {
     Q_OBJECT
@@ -128,6 +130,12 @@ public:
         anim->graphFixMinMaxValues();
         return anim;
     }
+
+    bool hasExpression() const { return mExpression; }
+    void clearExpression() { setExpression("", nullptr); }
+    const QString& expressionText() const { return mExpressionText; }
+    void setExpression(const QString& text,
+                       const qsptr<ExpressionValue>& expression);
 private:
     qreal calculateBaseValueAtRelFrame(const qreal frame) const;
 
@@ -143,11 +151,14 @@ private:
     qreal mSavedCurrentValue = 0;
 
     qsptr<RandomQrealGenerator> mRandomGenerator;
+    QString mExpressionText;
+    ConnContextQSPtr<ExpressionValue> mExpression;
 
     qreal mPrefferedValueStep = 1;
     bool updateBaseValueFromCurrentFrame();
 signals:
-    void valueChanged(qreal);
+    void effectiveValueChanged(qreal);
+    void baseValueChanged(qreal);
 };
 
 class QrealAction {

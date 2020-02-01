@@ -58,4 +58,24 @@ private:
     QPointer<T> mPtr;
 };
 
+template <typename T>
+class ConnContextQSPtr {
+public:
+    T* operator->() const { return mPtr.get(); }
+    operator T*() const { return mPtr.get(); }
+    operator bool() const { return mPtr; }
+    T* operator*() const { return mPtr.get(); }
+    ConnContext& operator<<(const QMetaObject::Connection& connection)
+    { return mConnContext << connection; }
+
+    ConnContext& assign(const QSharedPointer<T>& ptr) {
+        mPtr = ptr;
+        mConnContext.clear();
+        return mConnContext;
+    }
+private:
+    ConnContext mConnContext;
+    QSharedPointer<T> mPtr;
+};
+
 #endif // CONNCONTEXTPTR_H

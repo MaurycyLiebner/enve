@@ -126,6 +126,7 @@ public:
             mParent_k->prp_afterChangedCurrent(reason);
     }
 
+    FrameRange prp_getIdenticalAbsRange(const int relFrame) const;
     FrameRange prp_relRangeToAbsRange(const FrameRange &range) const;
     FrameRange prp_absRangeToRelRange(const FrameRange &range) const;
     int prp_absFrameToRelFrame(const int absFrame) const;

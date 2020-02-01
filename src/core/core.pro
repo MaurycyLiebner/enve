@@ -66,6 +66,12 @@ QMAKE_CXXFLAGS += -fopenmp
 LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 
 SOURCES += \
+    Animators/Expressions/expressionfunction.cpp \
+    Animators/Expressions/expressionoperator.cpp \
+    Animators/Expressions/expressionparser.cpp \
+    Animators/Expressions/expressionplainvalue.cpp \
+    Animators/Expressions/expressionsource.cpp \
+    Animators/Expressions/expressionvalue.cpp \
     Animators/SculptPath/sculptbrush.cpp \
     Animators/SculptPath/sculptnode.cpp \
     Animators/SculptPath/sculptnodebase.cpp \
@@ -332,6 +338,12 @@ SOURCES += \
     typemenu.cpp
 
 HEADERS += \
+    Animators/Expressions/expressionfunction.h \
+    Animators/Expressions/expressionoperator.h \
+    Animators/Expressions/expressionparser.h \
+    Animators/Expressions/expressionplainvalue.h \
+    Animators/Expressions/expressionsource.h \
+    Animators/Expressions/expressionvalue.h \
     Animators/SculptPath/sculptbrush.h \
     Animators/SculptPath/sculptnode.h \
     Animators/SculptPath/sculptnodebase.h \

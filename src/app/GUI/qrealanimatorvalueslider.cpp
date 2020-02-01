@@ -18,6 +18,7 @@
 #include <QMenu>
 #include "Animators/qrealanimator.h"
 #include "mainwindow.h"
+#include "expressiondialog.h"
 
 QrealAnimatorValueSlider::QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
                                                    qreal prefferedStep,
@@ -185,6 +186,15 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
         } else {
             QDoubleSlider::paint(p, !isTargetDisabled() && isEnabled());
         }
+        if(mTarget->SWT_isQrealAnimator()) {
+            const auto aTarget = static_cast<QrealAnimator*>(*mTarget);
+            if(aTarget->hasExpression()) {
+                p->setBrush(QColor(0, 125, 255));
+                p->setPen(Qt::NoPen);
+                p->setRenderHint(QPainter::Antialiasing);
+                p->drawEllipse({7, height()/2}, 3, 3);
+            }
+        }
     }
 }
 
@@ -193,7 +203,7 @@ void QrealAnimatorValueSlider::setTarget(QrealAnimator * const animator) {
     auto& conn = mTarget.assign(animator);
     if(mTarget) {
         setNumberDecimals(animator->getNumberDecimals());
-        conn << connect(animator, &QrealAnimator::valueChanged,
+        conn << connect(animator, &QrealAnimator::effectiveValueChanged,
                         this, &QrealAnimatorValueSlider::setValueFromAnimator);
         conn << connect(animator, &QrealAnimator::anim_changedKeyOnCurrentFrame,
                         this, qOverload<>(&QrealAnimatorValueSlider::update));
@@ -218,17 +228,35 @@ bool QrealAnimatorValueSlider::isTargetDisabled() {
 void QrealAnimatorValueSlider::openContextMenu(
         const QPoint &globalPos) {
     if(!mTarget) return;
-    if(!mTarget->SWT_isAnimator()) return;
-    const auto aTarget = static_cast<Animator*>(*mTarget);
+    if(!mTarget->SWT_isQrealAnimator()) return;
+    const auto aTarget = static_cast<QrealAnimator*>(*mTarget);
     QMenu menu(this);
 
-    if(aTarget->anim_getKeyOnCurrentFrame()) {
-        menu.addAction("Delete Key", aTarget,
-                       &Animator::anim_deleteCurrentKeyAction);
-    } else {
-        menu.addAction("Add Key", aTarget,
-                       &Animator::anim_saveCurrentValueAsKey);
-    }
+    const bool keyOnFrame = aTarget->anim_getKeyOnCurrentFrame();
+    const auto deleteKey = menu.addAction(
+                "Delete Key", aTarget,
+                &Animator::anim_deleteCurrentKeyAction);
+    deleteKey->setEnabled(keyOnFrame);
+
+    const auto addKey = menu.addAction(
+                "Add Key", aTarget,
+                &Animator::anim_saveCurrentValueAsKey);
+    addKey->setEnabled(!keyOnFrame);
+
+    menu.addSeparator();
+
+    const auto setExpression = menu.addAction("Set Expression");
+
+    connect(setExpression, &QAction::triggered,
+            this, [this, aTarget]() {
+        const auto dialog = new ExpressionDialog(aTarget, this);
+        dialog->show();
+    });
+
+    const auto clearExpression = menu.addAction(
+                "Clear Expression", aTarget,
+                &QrealAnimator::clearExpression);
+    clearExpression->setEnabled(aTarget->hasExpression());
 
     menu.addSeparator();
 

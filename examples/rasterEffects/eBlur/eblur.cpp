@@ -58,7 +58,7 @@ eBlur::eBlur() : CustomRasterEffect(eName().toLower(),
                                     HardwareSupport::gpuPreffered, false) {
     mRadius = enve::make_shared<QrealAnimator>(10, 0, 999.999, 1, "radius");
     ca_addChild(mRadius);
-    connect(mRadius.get(), &QrealAnimator::valueChanged,
+    connect(mRadius.get(), &QrealAnimator::effectiveValueChanged,
             this, &CustomRasterEffect::forcedMarginChanged);
 }
 

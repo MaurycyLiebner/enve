@@ -56,6 +56,13 @@ public:
 
     void anim_setAbsFrame(const int frame);
 
+    Property* ca_findPropertyWithPath(
+            const int id, const QStringList& path,
+            QStringList * const completions) const;
+    Property* ca_findPropertyWithPathRec(
+            const int id, const QStringList& path,
+            QStringList* const completions) const;
+
     BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
     void anim_scaleTime(const int pivotAbsFrame, const qreal scale);
     void updateAllBoxes(const UpdateReason reason);

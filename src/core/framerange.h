@@ -36,6 +36,10 @@ struct iValueRange {
         return fMax >= fMin;
     }
 
+    bool inRange(const qreal val) const {
+        return val >= fMin && val <= fMax;
+    }
+
     bool inRange(const int val) const {
         return val >= fMin && val <= fMax;
     }
