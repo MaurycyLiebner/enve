@@ -9,6 +9,7 @@
 #include <QAbstractItemView>
 #include <QScrollBar>
 #include <QStatusBar>
+#include <QApplication>
 
 #include "Animators/qrealanimator.h"
 #include "Animators/Expressions/expressionparser.h"
@@ -132,7 +133,6 @@ public:
     ExpressionEditor(QrealAnimator* const target,
                      const QString& text, QWidget* const parent) :
         QTextEdit(text, parent) {
-        setTabChangesFocus(true);
         setTextColor(Qt::red);
         setMinimumWidth(400);
         const auto doc = document();
@@ -159,16 +159,30 @@ public:
     }
 protected:
     void keyPressEvent(QKeyEvent *e) override {
+        const auto key = e->key();
+        const bool wasComplete = mCompleter->popup()->isVisible();
         const auto mods = e->modifiers();
         const bool ctrlPressed = mods.testFlag(Qt::ControlModifier);
-        const bool spacePressed = e->key() == Qt::Key_Space;
+        const bool spacePressed = key == Qt::Key_Space;
         const bool isShortcut = ctrlPressed && spacePressed;
-        if(e->key() == Qt::Key_Return) {
+        if(key == Qt::Key_Return ||
+           key == Qt::Key_Tab) {
             return QWidget::keyPressEvent(e);
         } else if(isShortcut) {
             showCompleter();
         } else QTextEdit::keyPressEvent(e);
+        const bool input = e->text().contains(QRegExp("[A-Za-z0-9_ \\.\\$]"));
+        const bool deletion = key == Qt::Key_Delete ||
+                              key == Qt::Key_Backspace;
+        const bool arrows = key == Qt::Key_Right ||
+                            key == Qt::Key_Left;
+        const bool complete = input || deletion || (arrows && wasComplete);
+        if(complete) {
+            QTimer::singleShot(1, this, [this]() { showCompleter(); });
+        }
     }
+
+
 private:
     void showCompleter() {
         const auto popup = mCompleter->popup();
@@ -288,8 +302,10 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Expression " + target->prp_getName());
 
-    const auto mainLayout = new QVBoxLayout(this);
-    setLayout(mainLayout);
+    const auto windowLayout = new QVBoxLayout(this);
+    setLayout(windowLayout);
+
+    const auto mainLayout = new QVBoxLayout;
 
     mLine = new ExpressionEditor(target, this);
 
@@ -322,8 +338,17 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
     buttonsLayout->addWidget(cancelButton);
 
     mainLayout->addLayout(buttonsLayout);
-    mainLayout->addWidget(new QStatusBar(this));
-    setStatusTip("Use Ctrl + Space for suggestions");
+
+    windowLayout->setContentsMargins(0, 0, 0, 0);
+    const auto style = QApplication::style();
+    mainLayout->setContentsMargins(style->pixelMetric(QStyle::PM_LayoutLeftMargin),
+                                   style->pixelMetric(QStyle::PM_LayoutTopMargin),
+                                   style->pixelMetric(QStyle::PM_LayoutRightMargin),
+                                   style->pixelMetric(QStyle::PM_LayoutBottomMargin));
+    windowLayout->addLayout(mainLayout);
+    const auto statusBar = new QStatusBar(this);
+    windowLayout->addWidget(statusBar);
+    statusBar->showMessage("Use Ctrl + Space for suggestions", 10000);
 
     connect(applyButton, &QPushButton::released,
             this, &ExpressionDialog::apply);
