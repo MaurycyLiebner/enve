@@ -5,26 +5,38 @@
 #include "expressionplainvalue.h"
 #include "expressionoperator.h"
 #include "expressionfunction.h"
+#include "expressionrandomfunction.h"
 #include "expressionsource.h"
+#include "expressionsourceframe.h"
+#include "expressionsourcevalue.h"
 
-QSharedPointer<ExpressionValue> parsePrepared(
-        const QString &exp, QrealAnimator* const parent);
+void skipSpaces(const QString& exp, int& position) {
+    while(position < exp.count() && exp.at(position) == ' ') {
+        position++;
+    }
+}
 
-bool parseExpression(const QString& exp, int& position,
+bool parseExpression(const QString& exp,
+                     int& position,
                      QString& expression) {
+    int newPosition = position;
     expression.clear();
     bool first = true;
-    for(; position < exp.length(); position++) {
-        const auto& character = exp.at(position);
+    for(; newPosition < exp.length(); newPosition++) {
+        const auto& character = exp.at(newPosition);
         const bool valid = character.isLetter() ||
                            character == '_' ||
                            (character.isNumber() && !first) ||
+                           (character == ' ' && !first) ||
                            character == '.';
         if(valid) expression.append(character);
         else break;
         first = false;
     }
-    return !expression.isEmpty();
+    if(expression.isEmpty()) return false;
+    expression = expression.trimmed();
+    position = newPosition;
+    return true;
 }
 
 enum class Operator {
@@ -47,62 +59,97 @@ Operator idOperator(const QChar& character) {
     else return Operator::notOperator;
 }
 
-bool parseOperator(const QString& exp, int& position,
+bool parseOperator(const QString& exp,
+                   int& position,
                    Operator& oper) {
+    int newPosition = position;
     oper = idOperator(exp.at(position));
     if(oper == Operator::notOperator) return false;
-    position++;
+    newPosition++;
+    position = newPosition;
+    return true;
+}
+
+enum class Special {
+    value, frame
+};
+
+bool parseSpecial(const QString& exp,
+                  int& position,
+                  Special& spec) {
+    int newPosition = position;
+    const auto part = exp.mid(position, 6);
+    if(part == "$value") {
+        spec = Special::value;
+    } else if(part == "$frame") {
+        spec = Special::frame;
+    } else return false;
+    newPosition += 6;
+    position = newPosition;
     return true;
 }
 
 enum class Function {
     sin, cos, tan, exp,
     asin, acos, atan,
+    sqrt, rand
 };
 
-bool parseFunction(const QString& exp, int& position,
+bool parseFunction(const QString& exp,
+                   int& position,
                    Function& function) {
     if(position + 5 >= exp.length()) return false;
-    const auto str4 = exp.mid(position, 4);
-    const auto str5 = exp.mid(position, 5);
+    int newPosition = position;
+    const auto str4 = exp.mid(newPosition, 4);
+    const auto str5 = exp.mid(newPosition, 5);
     if(str4 == "sin(") {
         function = Function::sin;
-        position += 3;
+        newPosition += 3;
     } else if(str4 == "cos(") {
         function = Function::cos;
-        position += 3;
+        newPosition += 3;
     } else if(str4 == "tan(") {
         function = Function::tan;
-        position += 3;
+        newPosition += 3;
     } else if(str4 == "exp(") {
         function = Function::exp;
-        position += 3;
+        newPosition += 3;
     } else if(str5 == "asin(") {
         function = Function::asin;
-        position += 4;
+        newPosition += 4;
     } else if(str5 == "acos(") {
         function = Function::acos;
-        position += 4;
+        newPosition += 4;
     } else if(str5 == "atan(") {
         function = Function::atan;
-        position += 4;
+        newPosition += 4;
+    } else if(str5 == "sqrt(") {
+        function = Function::sqrt;
+        newPosition += 4;
+    } else if(str5 == "rand(") {
+        function = Function::rand;
+        newPosition += 4;
     } else return false;
+    position = newPosition;
     return true;
 }
 
-bool parseBrackets(const QString& exp, int& position,
+bool parseBrackets(const QString& exp,
+                   int& position,
                    QString& contained) {
-    if(exp.at(position) != '(') return false;
-    position++;
+    if(position >= exp.count()) return false;
+    int newPosition = position;
+    if(exp.at(newPosition) != '(') return false;
+    newPosition++;
     contained.clear();
     bool foundClosing = false;
     int containedBrackets = 0;
-    for(; position < exp.length(); position++) {
-        const auto& character = exp.at(position);
+    for(; newPosition < exp.length(); newPosition++) {
+        const auto& character = exp.at(newPosition);
         if(character == '(') containedBrackets++;
         else if(character == ')') {
             if(containedBrackets == 0) {
-                position++;
+                newPosition++;
                 foundClosing = true;
                 break;
             }
@@ -112,75 +159,87 @@ bool parseBrackets(const QString& exp, int& position,
     }
     if(containedBrackets > 0 || !foundClosing)
         RuntimeThrow("Missing closing brackets.");
+    position = newPosition;
     return true;
 }
 
-bool parsePlainValue(const QString& exp, int& position,
-                     qreal& value) {
-    QString valueStr;
+bool parsePlainValue(const QString& exp,
+                     int& position,
+                     qreal& value,
+                     QString& parsed) {
+    parsed.clear();
+    int newPosition = position;
 
     bool separator = false;
-    for(; position < exp.length(); position++) {
-        const auto& character = exp.at(position);
+    for(; newPosition < exp.length(); newPosition++) {
+        const auto& character = exp.at(newPosition);
         const bool charSeparator = character == '.' || character == ',';
         if(charSeparator) {
             if(separator) break;
             separator = true;
-        }
-        if(!character.isNumber()) break;
-        valueStr.append(character);
+        } else if(!character.isNumber()) break;
+        parsed.append(character);
     }
 
-    if(valueStr.isEmpty()) return false;
+    if(parsed.isEmpty()) return false;
     bool ok;
-    value = valueStr.toDouble(&ok);
+    value = parsed.toDouble(&ok);
     Q_ASSERT(ok);
-    return ok;
-}
-
-bool parseImplicitMultiplication(const QString& exp, int& position,
-                                 qreal& value) {
-    const int iniPosition = position;
-    const bool isNumeric = parsePlainValue(exp, position, value);
-    if(isNumeric && position < exp.count()) {
-        const auto& character = exp.at(position);
-        if(character.isLetter()) return true;
-    }
-    position = iniPosition;
-    return false;
+    position = newPosition;
+    return true;
 }
 
 QSharedPointer<ExpressionValue> createOperator(
-            const QString& exp, QrealAnimator * const parent,
-            int& position, const Operator oper,
-            const QSharedPointer<ExpressionValue>& opValue1) {
-    if(!opValue1) RuntimeThrow("Operator needs a value before it.");
-    const auto opValue2 = parsePrepared(exp.mid(position), parent);
-    if(!opValue2) RuntimeThrow("Operator needs a value after it.");
-    position = exp.count();
+            const Operator oper,
+            const QSharedPointer<ExpressionValue>& opValue1,
+            const QSharedPointer<ExpressionValue>& opValue2) {
+    if(!opValue1) RuntimeThrow("Missing value before operator.");
+    if(!opValue2) RuntimeThrow("Missing value after operator.");
     std::function<qreal(qreal, qreal)> func;
+    QString symbol;
+    bool needsBrackets;
+    bool childrenNeedBrackets;
     switch(oper) {
     case Operator::multiply:
+        needsBrackets = false;
+        childrenNeedBrackets = true;
+        symbol = "*";
         func = [](qreal v1, qreal v2) { return v1 * v2; };
         break;
     case Operator::exponate:
+        needsBrackets = false;
+        childrenNeedBrackets = true;
+        symbol = "^";
         func = [](qreal v1, qreal v2) { return std::pow(v1, v2); };
         break;
     case Operator::modulo:
+        needsBrackets = false;
+        childrenNeedBrackets = true;
+        symbol = "%";
         func = [](qreal v1, qreal v2) { return std::fmod(v1, v2); };
         break;
     case Operator::divide:
+        needsBrackets = false;
+        childrenNeedBrackets = true;
+        symbol = "/";
         func = [](qreal v1, qreal v2) { return v1 / v2; };
         break;
     case Operator::add:
+        needsBrackets = true;
+        childrenNeedBrackets = false;
+        symbol = "+";
         func = [](qreal v1, qreal v2) { return v1 + v2; };
         break;
     case Operator::subtract:
+        needsBrackets = true;
+        childrenNeedBrackets = false;
+        symbol = "-";
         func = [](qreal v1, qreal v2) { return v1 - v2; };
         break;
     case Operator::notOperator: return nullptr;
     }
-    return ExpressionOperator::sCreate(func, opValue1, opValue2);
+    return ExpressionOperator::sCreate(childrenNeedBrackets, needsBrackets,
+                                       symbol, func, opValue1, opValue2);
 }
 
 QSharedPointer<ExpressionValue> createFunction(
@@ -189,71 +248,104 @@ QSharedPointer<ExpressionValue> createFunction(
     QString parsed;
     if(position >= exp.count() || !parseBrackets(exp, position, parsed))
         RuntimeThrow("Missing Function parameter.");
-    const auto inner = parsePrepared(parsed, parent);
+    const auto inner = ExpressionParser::parse(parsed, parent);
     if(!inner) RuntimeThrow("Missing Function parameter.");
     std::function<qreal(qreal)> func;
+    QString name;
     switch(function) {
     case Function::sin:
+        name = "sin";
         func = [](qreal v) { return std::sin(v); };
         break;
     case Function::cos:
+        name = "cos";
         func = [](qreal v) { return std::cos(v); };
         break;
     case Function::tan:
+        name = "tan";
         func = [](qreal v) { return std::tan(v); };
         break;
     case Function::exp:
+        name = "exp";
         func = [](qreal v) { return std::exp(v); };
         break;
     case Function::asin:
+        name = "asin";
         func = [](qreal v) { return std::asin(v); };
         break;
     case Function::acos:
+        name = "acos";
         func = [](qreal v) { return std::acos(v); };
         break;
     case Function::atan:
+        name = "atan";
         func = [](qreal v) { return std::atan(v); };
         break;
+    case Function::sqrt:
+        name = "sqrt";
+        func = [](qreal v) { return std::sqrt(v); };
+        break;
+    case Function::rand:
+        return ExpressionRandomFunction::sCreate(inner);
+        break;
     }
-    return ExpressionFunction::sCreate(func, inner);
+    return ExpressionFunction::sCreate(name, func, inner);
 }
 
-QSharedPointer<ExpressionValue> parsePrepared(
+QSharedPointer<ExpressionValue> ExpressionParser::parse(
         const QString& exp, QrealAnimator* const parent) {
     QString parsed;
-    Operator oper;
+    Special spec;
+    Operator oper = Operator::notOperator;
     Function func;
     qreal value;
     QSharedPointer<ExpressionValue> opValue1;
+    QSharedPointer<ExpressionValue> opValue2;
+
+    const auto setValue = [&opValue1, &opValue2](
+            const QSharedPointer<ExpressionValue>& value) {
+        if(opValue1) opValue2 = value;
+        else opValue1 = value;
+    };
 
     for(int i = 0; i < exp.count();) {
+        Operator operTmp;
+        skipSpaces(exp, i);
+        QSharedPointer<ExpressionValue> lastValue;
         if(parseBrackets(exp, i, parsed)) {
-            opValue1 = parsePrepared(parsed, parent);
-        } else if(parsePlainValue(exp, i, value)) {
-            opValue1 = ExpressionPlainValue::sCreate(value);
-            if(i < exp.count()) {
-                const auto& character = exp.at(i);
-                if(character.isLetter() || character == '_' || character == '(') {
-                    opValue1 = createOperator(exp, parent, i, Operator::multiply, opValue1);
-                }
-            }
-        } else if(parseOperator(exp, i, oper)) {
-            opValue1 = createOperator(exp, parent, i, oper, opValue1);
+            lastValue = parse(parsed, parent);
+        } else if(parsePlainValue(exp, i, value, parsed)) {
+            lastValue = ExpressionPlainValue::sCreate(parsed, value);
+        } else if(parseOperator(exp, i, operTmp)) {
+            if(oper != Operator::notOperator)
+                RuntimeThrow("Two operators in row " + exp.mid(i));
+            oper = operTmp;
+            continue;
         } else if(parseFunction(exp, i, func)) {
-            opValue1 = createFunction(exp, parent, i, func);
+            lastValue = createFunction(exp, parent, i, func);
+        } else if(parseSpecial(exp, i, spec)) {
+            switch(spec) {
+            case Special::value:
+                lastValue = ExpressionSourceValue::sCreate(parent);
+                break;
+            case Special::frame:
+                lastValue = ExpressionSourceFrame::sCreate(parent);
+                break;
+            }
         } else if(parseExpression(exp, i, parsed)) {
-            opValue1 = ExpressionSource::sCreate(parsed, parent);
+            lastValue = ExpressionSource::sCreate(parsed, parent);
         } else {
             if(exp.at(i) == ')') RuntimeThrow("Unexpected closing bracket.");
             RuntimeThrow("Invalid expression " + exp.mid(i));
         }
+        if(lastValue) setValue(lastValue);
+        if(oper == Operator::notOperator && opValue1 && opValue2)
+            oper = Operator::multiply;
+        if(oper != Operator::notOperator) {
+            opValue1 = createOperator(oper, opValue1, opValue2);
+            opValue2.reset();
+            oper = Operator::notOperator;
+        }
     }
     return opValue1;
-}
-
-
-QSharedPointer<ExpressionValue> ExpressionParser::parse(
-        QString exp, QrealAnimator* const parent) {
-    exp.remove(' ');
-    return parsePrepared(exp, parent);
 }

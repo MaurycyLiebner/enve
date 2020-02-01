@@ -183,6 +183,11 @@ void Property::prp_setDrawingOnCanvasEnabled(const bool enabled) {
     if(mParent_k) mParent_k->prp_updateCanvasProps();
 }
 
+void Property::prp_getFullPath(QStringList& names) const {
+    if(mParent_k) mParent_k->prp_getFullPath(names);
+    names.append(prp_getName());
+}
+
 void Property::setPointsHandler(const stdsptr<PointsHandler> &handler) {
     mPointsHandler = handler;
     if(mPointsHandler) {

@@ -20,6 +20,8 @@
 #include "qrealkey.h"
 #include "randomqrealgenerator.h"
 #include "Expressions/expressionvalue.h"
+#include "Expressions/expressionparser.h"
+#include "simpletask.h"
 
 QrealAnimator::QrealAnimator(const qreal iniVal,
                              const qreal minVal,
@@ -38,6 +40,7 @@ QrealAnimator::QrealAnimator(const QString &name) : GraphAnimator(name) {}
 void QrealAnimator::prp_writeProperty(eWriteStream& dst) const {
     anim_writeKeys(dst);
     dst << mCurrentBaseValue;
+    dst << (mExpression ? mExpression->toString() : "");
 }
 
 stdsptr<Key> QrealAnimator::anim_createKey() {
@@ -48,6 +51,15 @@ void QrealAnimator::prp_readProperty(eReadStream& src) {
     anim_readKeys(src);
 
     qreal val; src >> val;
+    if(src.evFileVersion() > 8) {
+        QString expression; src >> expression;
+        if(!expression.isEmpty()) {
+            SimpleTask::sSchedule([this, expression]() {
+                const auto exp = ExpressionParser::parse(expression, this);
+                setExpression(exp);
+            });
+        }
+    }
     if(!anim_hasKeys()) setCurrentBaseValue(val);
 }
 
@@ -196,9 +208,15 @@ bool QrealAnimator::hasNoise() {
     return !mRandomGenerator.isNull();
 }
 
-void QrealAnimator::setExpression(const QString &text,
-                                  const qsptr<ExpressionValue> &expression) {
-    mExpressionText = text;
+bool QrealAnimator::hasValidExpression() const {
+    return mExpression ? mExpression->isValid() : false;
+}
+
+QString QrealAnimator::expressionText() const {
+    return mExpression ? mExpression->toString() : "";
+}
+
+void QrealAnimator::setExpression(const qsptr<ExpressionValue> &expression) {
     auto& conn = mExpression.assign(expression);
     if(expression) {
         expression->setRelFrame(anim_getCurrentRelFrame());
@@ -483,6 +501,12 @@ void QrealAnimator::prp_cancelTransform() {
         mTransformed = false;
         setCurrentBaseValue(mSavedCurrentValue);
     }
+}
+
+FrameRange QrealAnimator::prp_getIdenticalRelRange(const int relFrame) const {
+    const auto base = Animator::prp_getIdenticalRelRange(relFrame);
+    if(mExpression) return base * mExpression->identicalRange(relFrame);
+    else return base;
 }
 
 void QrealAnimator::multCurrentBaseValue(const qreal mult) {

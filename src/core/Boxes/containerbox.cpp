@@ -312,36 +312,25 @@ void ContainerBox::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
 Property* ContainerBox::ca_findPropertyWithPath(
         const int id, const QStringList& path,
         QStringList* const completions) const {
-    const auto found = ComplexAnimator::ca_findPropertyWithPath(
+    Property* found = ComplexAnimator::ca_findPropertyWithPath(
                 id, path, completions);
-    if(found) return found;
+    if(found && !completions) return found;
     const bool isLast = id == path.count() - 1;
     const auto& name = path.at(id);
     for(const auto &child : mContainedBoxes) {
         const auto childName = child->prp_getName();
         if(childName == name) {
             if(isLast) return child;
-            const auto found = child->ca_findPropertyWithPath(
+            const auto iFound = child->ca_findPropertyWithPath(
                         id + 1, path, completions);
-            if(found) return found;
+            if(iFound && !found) {
+                found = iFound;
+                if(!completions) break;
+            }
         }
         if(isLast && completions) *completions << childName;
     }
-    return nullptr;
-}
-
-Property* ContainerBox::ca_findPropertyWithPathRec(
-        const int id, const QStringList& path,
-        QStringList * const completions) const {
-    const auto found = ComplexAnimator::ca_findPropertyWithPathRec(
-                id, path, completions);
-    if(found) return found;
-    for(const auto &child : mContainedBoxes) {
-        const auto found = child->ca_findPropertyWithPath(
-                    0, path, completions);
-        if(found) return found;
-    }
-    return nullptr;
+    return found;
 }
 
 void ContainerBox::shiftAll(const int shift) {

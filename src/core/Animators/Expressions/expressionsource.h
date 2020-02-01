@@ -1,29 +1,24 @@
 #ifndef EXPRESSIONSOURCE_H
 #define EXPRESSIONSOURCE_H
-#include "expressionvalue.h"
-#include "conncontextptr.h"
+#include "expressionsourcebase.h"
 
-class QrealAnimator;
-
-class ExpressionSource : public ExpressionValue {
+class ExpressionSource : public ExpressionSourceBase {
 public:
     ExpressionSource(QrealAnimator* const parent);
 
     static sptr sCreate(const QString& path, QrealAnimator* const parent);
 
     qreal calculateValue(const qreal relFrame) const override;
-    void collapse() override {}
-    bool isPlainValue() const override
-    { return false; }
-    bool isValid() const override;
     FrameRange identicalRange(const qreal relFrame) const override;
+    QString toString() const override
+    { return mPath; }
 
     void setPath(const QString& path);
-    void lookForSource();
 private:
-    QPointer<QrealAnimator> mParent;
-    ConnContextQPtr<QrealAnimator> mSource;
-    QStringList mPath;
+    void lookForSource();
+    void updateSourcePath();
+
+    QString mPath;
 };
 
 #endif // EXPRESSIONSOURCE_H

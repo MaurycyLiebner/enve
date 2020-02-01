@@ -189,7 +189,11 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
         if(mTarget->SWT_isQrealAnimator()) {
             const auto aTarget = static_cast<QrealAnimator*>(*mTarget);
             if(aTarget->hasExpression()) {
-                p->setBrush(QColor(0, 125, 255));
+                if(aTarget->hasValidExpression()) {
+                    p->setBrush(QColor(0, 125, 255));
+                } else {
+                    p->setBrush(QColor(255, 125, 0));
+                }
                 p->setPen(Qt::NoPen);
                 p->setRenderHint(QPainter::Antialiasing);
                 p->drawEllipse({7, height()/2}, 3, 3);

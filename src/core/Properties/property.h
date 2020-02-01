@@ -185,6 +185,8 @@ public:
     void prp_enabledDrawingOnCanvas();
     void prp_disableDrawingOnCanvas();
     void prp_setDrawingOnCanvasEnabled(const bool enabled);
+
+    void prp_getFullPath(QStringList& names) const;
 protected:
     void setPointsHandler(const stdsptr<PointsHandler>& handler);
 

@@ -67,10 +67,15 @@ LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 
 SOURCES += \
     Animators/Expressions/expressionfunction.cpp \
+    Animators/Expressions/expressionfunctionbase.cpp \
     Animators/Expressions/expressionoperator.cpp \
     Animators/Expressions/expressionparser.cpp \
     Animators/Expressions/expressionplainvalue.cpp \
+    Animators/Expressions/expressionrandomfunction.cpp \
     Animators/Expressions/expressionsource.cpp \
+    Animators/Expressions/expressionsourcebase.cpp \
+    Animators/Expressions/expressionsourceframe.cpp \
+    Animators/Expressions/expressionsourcevalue.cpp \
     Animators/Expressions/expressionvalue.cpp \
     Animators/SculptPath/sculptbrush.cpp \
     Animators/SculptPath/sculptnode.cpp \
@@ -339,10 +344,15 @@ SOURCES += \
 
 HEADERS += \
     Animators/Expressions/expressionfunction.h \
+    Animators/Expressions/expressionfunctionbase.h \
     Animators/Expressions/expressionoperator.h \
     Animators/Expressions/expressionparser.h \
     Animators/Expressions/expressionplainvalue.h \
+    Animators/Expressions/expressionrandomfunction.h \
     Animators/Expressions/expressionsource.h \
+    Animators/Expressions/expressionsourcebase.h \
+    Animators/Expressions/expressionsourceframe.h \
+    Animators/Expressions/expressionsourcevalue.h \
     Animators/Expressions/expressionvalue.h \
     Animators/SculptPath/sculptbrush.h \
     Animators/SculptPath/sculptnode.h \

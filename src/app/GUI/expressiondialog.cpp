@@ -8,11 +8,12 @@
 #include <QCompleter>
 #include <QAbstractItemView>
 #include <QScrollBar>
+#include <QStatusBar>
 
 #include "Animators/qrealanimator.h"
 #include "Animators/Expressions/expressionparser.h"
 #include "GUI/global.h"
-
+#include "Boxes/boundingbox.h"
 #include "Private/document.h"
 
 class Highlighter : public QSyntaxHighlighter {
@@ -26,28 +27,25 @@ public:
         mEditor(editor) {
         HighlightingRule rule;
 
-        QTextCharFormat objectFormat;
-        objectFormat.setForeground(QColor(255, 128, 128));
-        rule.pattern = QRegularExpression(QStringLiteral("\\b[A-Za-z_][A-Za-z0-9_]*\\b"));
-        rule.format = objectFormat;
-        mHighlightingRules.append(rule);
+        const QStringList funcs = {
+            QStringLiteral("sin"),
+            QStringLiteral("cos"),
+            QStringLiteral("tan"),
+            QStringLiteral("asin"),
+            QStringLiteral("acos"),
+            QStringLiteral("atan"),
+            QStringLiteral("exp"),
+            QStringLiteral("sqrt"),
+            QStringLiteral("rand")
+        };
 
         QTextCharFormat funcFormat;
         funcFormat.setFontWeight(QFont::Bold);
-        const QString funcs[] = {
-            QStringLiteral("\\bsin\\(\\b"),
-            QStringLiteral("\\bcos\\(\\b"),
-            QStringLiteral("\\btan\\(\\b"),
-            QStringLiteral("\\basin\\(\\b"),
-            QStringLiteral("\\bacos\\(\\b"),
-            QStringLiteral("\\batan\\(\\b"),
-            QStringLiteral("\\bexp\\(\\b")
-        };
-
-        for (const QString &pattern : funcs) {
-            rule.pattern = QRegularExpression(pattern);
-            rule.format = funcFormat;
+        rule.format = funcFormat;
+        for (const QString &func : funcs) {
+            rule.pattern = QRegularExpression(QString("(\\b|(?<=[0-9]))%1\\(").arg(func));
             mFuncRules.append(rule);
+            mBaseComplete << func + "()";
         }
 
         QTextCharFormat operatorFormat;
@@ -58,7 +56,11 @@ public:
 
         QTextCharFormat numberFormat;
         numberFormat.setForeground(QColor(255, 225, 155));
-        rule.pattern = QRegularExpression(QStringLiteral("\\b[0-9\\.]+\\b"));
+        rule.pattern = QRegularExpression(
+                    QStringLiteral("\\b("
+                                       "([0-9]+[\\.]?[0-9]*)|"
+                                       "([0-9]*[\\.]?[0-9]+)"
+                                   ")"));
         rule.format = numberFormat;
         mHighlightingRules.append(rule);
 
@@ -66,11 +68,32 @@ public:
 
         mBracketsHighlightFormat.setBackground(QColor(0, 125, 200));
 
-        mObjectsExpression = QRegularExpression(QStringLiteral(
-                             "\\b"
-                             "(?!sin\\(|cos\\(|tan\\(|exp\\(|"
-                                "asin\\(|acos\\(|atan\\()"
-                             "([A-Za-z_][A-Za-z0-9_]*\\.?)+"));
+        const auto funcExclude = funcs.join(QStringLiteral("\\(|")) + "\\(";
+        mObjectsExpression = QRegularExpression(
+                             "(\\b|(?<=[0-9]))"
+                             "(?!(?<=\\$))"
+                             "(?!" + funcExclude + ")"
+                             "([A-Za-z_]([A-Za-z0-9_ ]*[A-Za-z0-9_])*\\.?)+");
+        QTextCharFormat objectFormat;
+        objectFormat.setForeground(QColor(255, 128, 128));
+        objectFormat.setBackground(QColor(45, 45, 45));
+        rule.pattern = mObjectsExpression;
+        rule.format = objectFormat;
+        mHighlightingRules.append(rule);
+
+        const QStringList specs = {
+            QStringLiteral("value"),
+            QStringLiteral("frame")
+        };
+
+        QTextCharFormat specialFormat;
+        specialFormat.setForeground(QColor(185, 255, 155));
+        rule.format = specialFormat;
+        for (const QString &spec : specs) {
+            rule.pattern = QRegularExpression(QString("\\$%1\\b").arg(spec));
+            mHighlightingRules.append(rule);
+            mBaseComplete << "$" + spec;
+        }
     }
 
     void setCursorPos(const int pos) {
@@ -88,10 +111,12 @@ private:
     int mCursorPos = 0;
     QTextCharFormat mBracketsHighlightFormat;
     QTextCharFormat mErrorFormat;
-    QVector<HighlightingRule> mFuncRules;
     QVector<HighlightingRule> mHighlightingRules;
+    QVector<HighlightingRule> mFuncRules;
 
     QRegularExpression mObjectsExpression;
+
+    QStringList mBaseComplete;
 
     QrealAnimator* const mTarget;
     ComplexAnimator* const mSearchCtxt;
@@ -107,6 +132,7 @@ public:
     ExpressionEditor(QrealAnimator* const target,
                      const QString& text, QWidget* const parent) :
         QTextEdit(text, parent) {
+        setTabChangesFocus(true);
         setTextColor(Qt::red);
         setMinimumWidth(400);
         const auto doc = document();
@@ -124,26 +150,37 @@ public:
         mCompleter->setCompletionMode(QCompleter::PopupCompletion);
         mCompleter->setCaseSensitivity(Qt::CaseSensitive);
         QObject::connect(mCompleter,
-                         QOverload<const QString &>::of(&QCompleter::activated),
+                         qOverload<const QString&>(&QCompleter::activated),
                          this, &ExpressionEditor::insertCompletion);
     }
 
     void setCompleterList(const QStringList& values) {
         mCompleter->setModel(new QStringListModel(values, mCompleter));
-        const auto popup = mCompleter->popup();
-        if(values.isEmpty()) return popup->hide();
-        mCompleter->setCompletionPrefix(textUnderCursor());
-        QRect cr = cursorRect();
-        cr.setWidth(popup->sizeHintForColumn(0)
-                    + popup->verticalScrollBar()->sizeHint().width());
-        mCompleter->complete(cr);
     }
 protected:
     void keyPressEvent(QKeyEvent *e) override {
-        if(e->key() == Qt::Key_Return) return;
-        QTextEdit::keyPressEvent(e);
+        const auto mods = e->modifiers();
+        const bool ctrlPressed = mods.testFlag(Qt::ControlModifier);
+        const bool spacePressed = e->key() == Qt::Key_Space;
+        const bool isShortcut = ctrlPressed && spacePressed;
+        if(e->key() == Qt::Key_Return) {
+            return QWidget::keyPressEvent(e);
+        } else if(isShortcut) {
+            showCompleter();
+        } else QTextEdit::keyPressEvent(e);
     }
 private:
+    void showCompleter() {
+        const auto popup = mCompleter->popup();
+        const auto underCursor = textUnderCursor();
+        mCompleter->setCompletionPrefix(underCursor);
+        QRect cr = cursorRect();
+        const auto scrollBar = popup->verticalScrollBar();
+        const int scrollBarWidth = scrollBar->sizeHint().width();
+        cr.setWidth(popup->sizeHintForColumn(0) + scrollBarWidth);
+        mCompleter->complete(cr);
+    }
+
     void insertCompletion(const QString &completion) {
         QTextCursor tc = textCursor();
         const int prefixLen = mCompleter->completionPrefix().length();
@@ -151,18 +188,25 @@ private:
         tc.movePosition(QTextCursor::Left);
         tc.movePosition(QTextCursor::EndOfWord);
         tc.insertText(completion.right(extra));
+        if(completion.right(1) == ')') tc.movePosition(QTextCursor::Left);
         setTextCursor(tc);
     }
 
     QString textUnderCursor() const {
         QTextCursor tc = textCursor();
+        tc.movePosition(QTextCursor::Left);
         tc.select(QTextCursor::WordUnderCursor);
-        return tc.selectedText();
+        QString result = tc.selectedText();
+        if(result == ".") {
+            tc.movePosition(QTextCursor::Right);
+            tc.select(QTextCursor::WordUnderCursor);
+            result = tc.selectedText();
+        }
+        return result;
     }
 
     QCompleter* mCompleter;
 };
-
 
 void Highlighter::highlightBlock(const QString &text) {
     QList<int> openBrackets;
@@ -199,7 +243,8 @@ void Highlighter::highlightBlock(const QString &text) {
         }
     }
 
-    mEditor->setCompleterList(QStringList());
+    bool addFuncsComplete = true;
+    QStringList completions;
     auto matchIterator = mObjectsExpression.globalMatch(text);
     while(matchIterator.hasNext()) {
         const auto match = matchIterator.next();
@@ -212,15 +257,14 @@ void Highlighter::highlightBlock(const QString &text) {
                 const auto& jObj = subPath.at(j);
                 min += jObj.count() + 1;
             }
-            const auto lastObjPath = subPath.last();
+            const auto& lastObjPath = subPath.last();
             const int max = min + lastObjPath.count();
-            const bool autocomplete = mCursorPos > min && mCursorPos <= max;
-            QStringList completions;
-            const auto obj = mSearchCtxt->ca_findPropertyWithPathRecBothWays(
+            const bool autocomplete = mCursorPos >= min && mCursorPos <= max;
+            const auto obj = mSearchCtxt->ca_findPropertyWithPathRec(
                         0, subPath, autocomplete ? &completions : nullptr);
             if(autocomplete) {
+                if(objs.count() > 1) addFuncsComplete = false;
                 completions.removeDuplicates();
-                mEditor->setCompleterList(completions);
             }
 
             if(!obj || obj == mTarget) {
@@ -230,6 +274,12 @@ void Highlighter::highlightBlock(const QString &text) {
             }
         }
     }
+    if(addFuncsComplete) {
+        QStringList tmp = mBaseComplete;
+        tmp.append(completions);
+        completions = tmp;
+    }
+    mEditor->setCompleterList(completions);
 }
 
 ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
@@ -272,6 +322,8 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
     buttonsLayout->addWidget(cancelButton);
 
     mainLayout->addLayout(buttonsLayout);
+    mainLayout->addWidget(new QStatusBar(this));
+    setStatusTip("Use Ctrl + Space for suggestions");
 
     connect(applyButton, &QPushButton::released,
             this, &ExpressionDialog::apply);
@@ -291,11 +343,11 @@ void ExpressionDialog::apply() {
         expr = ExpressionParser::parse(text, mTarget);
         if(!expr) return;
         expr->setRelFrame(0);
-        expr->collapse();
+        //expr->collapse();
         if(!expr->isValid()) {
             mTarget->clearExpression();
             RuntimeThrow("Invalid expression.");
-        } else mTarget->setExpression(text, expr);
+        } else mTarget->setExpression(expr);
         Document::sInstance->actionFinished();
     } catch(const std::exception& e) {
         const QString error = e.what();

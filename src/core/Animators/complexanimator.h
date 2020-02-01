@@ -118,10 +118,7 @@ public:
         });
     }
 
-    Property* ca_findPropertyWithPathRecBothWays(
-            const int id, const QStringList& path,
-            QStringList * const completions = nullptr) const;
-    virtual Property* ca_findPropertyWithPathRec(
+    Property* ca_findPropertyWithPathRec(
             const int id, const QStringList& path,
             QStringList * const completions = nullptr) const;
     virtual Property* ca_findPropertyWithPath(

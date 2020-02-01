@@ -6,7 +6,7 @@ class QrealAnimator;
 
 namespace ExpressionParser {
     QSharedPointer<ExpressionValue> parse(
-            QString exp, QrealAnimator* const parent);
+            const QString& exp, QrealAnimator* const parent);
 };
 
 #endif // EXPRESSIONPARSER_H

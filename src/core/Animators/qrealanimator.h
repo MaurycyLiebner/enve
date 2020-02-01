@@ -40,6 +40,8 @@ public:
     void prp_finishTransform();
     void prp_cancelTransform();
 
+    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
+
     QString prp_getValueText();
     void prp_afterChangedAbsRange(const FrameRange& range,
                                   const bool clip = true) {
@@ -131,11 +133,11 @@ public:
         return anim;
     }
 
+    bool hasValidExpression() const;
     bool hasExpression() const { return mExpression; }
-    void clearExpression() { setExpression("", nullptr); }
-    const QString& expressionText() const { return mExpressionText; }
-    void setExpression(const QString& text,
-                       const qsptr<ExpressionValue>& expression);
+    void clearExpression() { setExpression(nullptr); }
+    QString expressionText() const;
+    void setExpression(const qsptr<ExpressionValue>& expression);
 private:
     qreal calculateBaseValueAtRelFrame(const qreal frame) const;
 
@@ -151,7 +153,6 @@ private:
     qreal mSavedCurrentValue = 0;
 
     qsptr<RandomQrealGenerator> mRandomGenerator;
-    QString mExpressionText;
     ConnContextQSPtr<ExpressionValue> mExpression;
 
     qreal mPrefferedValueStep = 1;

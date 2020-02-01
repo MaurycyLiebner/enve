@@ -168,15 +168,15 @@ void ComplexAnimator::ca_updateDescendatKeyFrame(Key* key) {
     }
 }
 
-Property *ComplexAnimator::ca_findPropertyWithPathRecBothWays(
+Property *ComplexAnimator::ca_findPropertyWithPathRec(
         const int id, const QStringList &path,
         QStringList * const completions) const {
     Property* found = nullptr;
     const ComplexAnimator* acestorIter = this;
     while(acestorIter && (completions || !found)) {
-        const auto iFound = acestorIter->ca_findPropertyWithPathRec(
-                    id, path, completions);
-        if(!found) found = iFound;
+        const auto iFound = acestorIter->
+                ca_findPropertyWithPath(id, path, completions);
+        if(iFound && !found) found = iFound;
         acestorIter = acestorIter->getParent();
     }
     return found;
@@ -186,38 +186,27 @@ Property *ComplexAnimator::ca_findPropertyWithPath(
         const int id, const QStringList &path,
         QStringList* const completions) const {
     if(id >= path.count()) return nullptr;
+    Property* found = nullptr;
     const bool isLast = id == path.count() - 1;
     const auto& name = path.at(id);
     for(const auto &prop : ca_mChildren) {
+        if(!prop->SWT_isVisible()) continue;
         const auto& propName = prop->prp_getName();
         if(propName == name) {
             if(isLast) return prop.get();
             if(prop->SWT_isComplexAnimator()) {
                 const auto ca = static_cast<ComplexAnimator*>(prop.get());
-                const auto found = ca->ca_findPropertyWithPath(
+                const auto iFound = ca->ca_findPropertyWithPath(
                             id + 1, path, completions);
-                if(found) return found;
+                if(iFound && !found) {
+                    found = iFound;
+                    if(!completions) break;
+                }
             }
         }
         if(isLast && completions) *completions << propName;
     }
-    return nullptr;
-}
-
-Property *ComplexAnimator::ca_findPropertyWithPathRec(
-        const int id, const QStringList &path,
-        QStringList * const completions) const {
-    const auto found = ca_findPropertyWithPath(id, path, completions);
-    if(found) return found;
-    for(const auto &prop : ca_mChildren) {
-        if(prop->SWT_isComplexAnimator()) {
-            const auto ca = static_cast<ComplexAnimator*>(prop.get());
-            const auto found = ca->ca_findPropertyWithPathRec(
-                        0, path, completions);
-            if(found) return found;
-        }
-    }
-    return nullptr;
+    return found;
 }
 
 void ComplexAnimator::ca_execOnDescendants(const std::function<void (Property *)> &op) const {

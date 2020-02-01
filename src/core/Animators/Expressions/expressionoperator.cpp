@@ -2,9 +2,14 @@
 #include "expressionplainvalue.h"
 
 ExpressionOperator::ExpressionOperator(
+        const bool childrenNeedBrackets,
+        const bool needsBrackets,
+        const QString &symbol,
         const std::function<qreal(qreal, qreal)> &func,
         const sptr &value1, const sptr &value2) :
-    mFunc(func), mValue1(value1), mValue2(value2) {
+    ExpressionValue(needsBrackets),
+    mChildrenNeedBrackets(childrenNeedBrackets),
+    mSymbol(symbol), mFunc(func), mValue1(value1), mValue2(value2) {
     connect(mValue1.get(), &ExpressionValue::currentValueChanged,
             this, &ExpressionValue::updateValue);
     connect(mValue1.get(), &ExpressionValue::relRangeChanged,
@@ -16,9 +21,14 @@ ExpressionOperator::ExpressionOperator(
 }
 
 ExpressionValue::sptr ExpressionOperator::sCreate(
+        const bool childrenNeedBrackets,
+        const bool needsBrackets,
+        const QString& name,
         const std::function<qreal (qreal, qreal)> &func,
         const sptr &value1, const sptr &value2) {
-    return sptr(new ExpressionOperator(func, value1, value2));
+    return sptr(new ExpressionOperator(childrenNeedBrackets,
+                                       needsBrackets, name,
+                                       func, value1, value2));
 }
 
 void ExpressionOperator::collapse() {
@@ -53,4 +63,19 @@ bool ExpressionOperator::setRelFrame(const qreal relFrame) {
     const bool changed1 = mValue1->setRelFrame(relFrame);
     const bool changed2 = mValue2->setRelFrame(relFrame);
     return changed1 || changed2;
+}
+
+QString ExpressionOperator::toString() const {
+    QString str1;
+    QString str2;
+    if(mChildrenNeedBrackets) {
+        const bool brackets1 = mValue1->needsBrackets();
+        if(brackets1) str1 = "(" + mValue1->toString() + ")";
+        else str1 = mValue1->toString();
+
+        const bool brackets2 = mValue2->needsBrackets();
+        if(brackets2) str2 = "(" + mValue2->toString() + ")";
+        else str2 = mValue2->toString();
+    }
+    return str1 + " " + mSymbol + " " + str2;
 }
