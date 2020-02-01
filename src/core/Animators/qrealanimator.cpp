@@ -29,8 +29,8 @@ QrealAnimator::QrealAnimator(const qreal iniVal,
                              const QString &name) :
     GraphAnimator(name) {
     mCurrentBaseValue = iniVal;
-    mMinPossibleVal = minVal;
-    mMaxPossibleVal = maxVal;
+    mClampMin = minVal;
+    mClampMax = maxVal;
     mPrefferedValueStep = prefferdStep;
 }
 
@@ -111,8 +111,8 @@ void QrealAnimator::graph_getValueConstraints(
 //            minMoveValue = qMax(minMoveValue, minVal);
 //        }
     } else { // keyPt
-        minMoveValue = mMinPossibleVal;
-        maxMoveValue = mMaxPossibleVal;
+        minMoveValue = mClampMin;
+        maxMoveValue = mClampMax;
     }
 }
 
@@ -146,8 +146,8 @@ QrealSnapshot QrealAnimator::makeSnapshot(
 }
 
 void QrealAnimator::setValueRange(const qreal minVal, const qreal maxVal) {
-    mMinPossibleVal = minVal;
-    mMaxPossibleVal = maxVal;
+    mClampMin = minVal;
+    mClampMax = maxVal;
     setCurrentBaseValue(mCurrentBaseValue);
 }
 
@@ -159,16 +159,12 @@ void QrealAnimator::incAllValues(const qreal valInc) {
     incCurrentBaseValue(valInc);
 }
 
-QString QrealAnimator::prp_getValueText() {
-    return QString::number(mCurrentBaseValue, 'f', 2);
-}
-
 qreal QrealAnimator::getMinPossibleValue() {
-    return mMinPossibleVal;
+    return mClampMin;
 }
 
 qreal QrealAnimator::getMaxPossibleValue() {
-    return mMaxPossibleVal;
+    return mClampMax;
 }
 
 qreal QrealAnimator::getPrefferedValueStep() {
@@ -238,7 +234,7 @@ qreal QrealAnimator::calculateBaseValueAtRelFrame(const qreal frame) const {
         const qreal p2y = nextKey->getC0Value();
         const qreal p3y = nextKey->getValue();
         return clamp(gCubicValueAtT({p0y, p1y, p2y, p3y}, t),
-                     mMinPossibleVal, mMaxPossibleVal);
+                     mClampMin, mClampMax);
     } else if(prevKey) {
         return prevKey->getValue();
     } else if(nextKey) {
@@ -263,14 +259,12 @@ qreal QrealAnimator::getCurrentBaseValue() const {
 }
 
 qreal QrealAnimator::getEffectiveValue() const {
-    if(mExpression) return qBound(mMinPossibleVal,
-                                  mExpression->currentValue(),
-                                  mMaxPossibleVal);
+    if(mExpression) return clamped(mExpression->currentValue());
     else return mCurrentBaseValue;
 }
 
 void QrealAnimator::setCurrentBaseValue(qreal newValue) {
-    newValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
+    newValue = clamped(newValue);
 
     if(isZero4Dec(newValue - mCurrentBaseValue)) return;
 
@@ -363,7 +357,7 @@ QPainterPath QrealAnimator::graph_getPathForSegment(
 
 qValueRange QrealAnimator::graph_getMinAndMaxValues() const {
     if(mGraphMinMaxValuesFixed) {
-        return {mMinPossibleVal, mMaxPossibleVal};
+        return {mClampMin, mClampMax};
     }
     if(!anim_hasKeys()) {
         return {mCurrentBaseValue - mPrefferedValueStep,
@@ -427,7 +421,7 @@ void QrealAnimator::multSavedValueToCurrentValue(const qreal multBy) {
 }
 
 void QrealAnimator::setCurrentBaseValueNoUpdate(const qreal newValue) {
-    mCurrentBaseValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
+    mCurrentBaseValue = clamped(newValue);
     emit baseValueChanged(mCurrentBaseValue);
     emit effectiveValueChanged(getEffectiveValue());
 }

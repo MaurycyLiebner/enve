@@ -94,8 +94,6 @@ public:
     virtual void prp_startTransform() {}
     virtual void prp_finishTransform() {}
 
-    virtual QString prp_getValueText() { return ""; }
-
     virtual void prp_readProperty(eReadStream& src) { Q_UNUSED(src) }
     virtual void prp_writeProperty(eWriteStream& dst) const { Q_UNUSED(dst) }
 

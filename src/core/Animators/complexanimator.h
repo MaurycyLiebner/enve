@@ -52,8 +52,6 @@ public:
     void prp_finishTransform();
     void prp_cancelTransform();
 
-    QString prp_getValueText();
-
     void prp_afterFrameShiftChanged(const FrameRange& oldAbsRange,
                                     const FrameRange& newAbsRange);
 

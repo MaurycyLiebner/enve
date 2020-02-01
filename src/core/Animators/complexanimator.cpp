@@ -350,10 +350,6 @@ bool ComplexAnimator::anim_isDescendantRecording() const {
     return ca_mChildRecording;
 }
 
-QString ComplexAnimator::prp_getValueText() {
-    return "";
-}
-
 void ComplexAnimator::anim_setRecording(const bool rec) {
     for(const auto &property : ca_mChildren) {
         if(!property->SWT_isAnimator()) continue;

@@ -41,7 +41,6 @@ public:
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
-    QString prp_getValueText();
     void prp_afterChangedAbsRange(const FrameRange& range,
                                   const bool clip = true) {
         if(range.inRange(anim_getCurrentAbsFrame()))
@@ -80,11 +79,11 @@ public:
 
     void setValueRange(const qreal minVal, const qreal maxVal);
     void setMinValue(const qreal minVal) {
-        mMinPossibleVal = minVal;
+        mClampMin = minVal;
         setCurrentBaseValue(mCurrentBaseValue);
     }
     void setMaxValue(const qreal maxVal) {
-        mMaxPossibleVal = maxVal;
+        mClampMax = maxVal;
         setCurrentBaseValue(mCurrentBaseValue);
     }
 
@@ -103,6 +102,9 @@ public:
 
     qreal getSavedBaseValue();
     void incAllValues(const qreal valInc);
+
+    qreal clamped(const qreal value) const
+    { return qBound(mClampMin, value, mClampMax); }
 
     qreal getMinPossibleValue();
     qreal getMaxPossibleValue();
@@ -141,8 +143,8 @@ private:
 
     int mDecimals = 3;
 
-    qreal mMaxPossibleVal = TEN_MIL;
-    qreal mMinPossibleVal = -TEN_MIL;
+    qreal mClampMax = TEN_MIL;
+    qreal mClampMin = -TEN_MIL;
 
     qreal mCurrentBaseValue = 0;
     qreal mSavedCurrentValue = 0;
