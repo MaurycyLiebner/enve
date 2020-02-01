@@ -9,7 +9,6 @@ bool ExpressionValue::setRelFrame(const qreal relFrame) {
 }
 
 qreal ExpressionValue::value(const qreal relFrame) const {
-    if(!isValid()) return 1;
     const auto idRange = identicalRange(mRelFrame);
     const bool inRange = idRange.inRange(relFrame);
     if(inRange) return mCurrentValue;
