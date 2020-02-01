@@ -68,14 +68,14 @@ bool ExpressionOperator::setRelFrame(const qreal relFrame) {
 QString ExpressionOperator::toString() const {
     QString str1;
     QString str2;
-    if(mChildrenNeedBrackets) {
-        const bool brackets1 = mValue1->needsBrackets();
-        if(brackets1) str1 = "(" + mValue1->toString() + ")";
-        else str1 = mValue1->toString();
+    const bool brackets1 = mChildrenNeedBrackets &&
+                           mValue1->needsBrackets();
+    if(brackets1) str1 = "(" + mValue1->toString() + ")";
+    else str1 = mValue1->toString();
 
-        const bool brackets2 = mValue2->needsBrackets();
-        if(brackets2) str2 = "(" + mValue2->toString() + ")";
-        else str2 = mValue2->toString();
-    }
+    const bool brackets2 = mChildrenNeedBrackets &&
+                           mValue2->needsBrackets();
+    if(brackets2) str2 = "(" + mValue2->toString() + ")";
+    else str2 = mValue2->toString();
     return str1 + " " + mSymbol + " " + str2;
 }
