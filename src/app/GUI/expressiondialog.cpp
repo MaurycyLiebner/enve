@@ -152,6 +152,7 @@ public:
         QObject::connect(mCompleter,
                          qOverload<const QString&>(&QCompleter::activated),
                          this, &ExpressionEditor::insertCompletion);
+        setText(" "); setText(""); // force autocomplete update
     }
 
     void setCompleterList(const QStringList& values) {
@@ -208,6 +209,14 @@ private:
 
     QString textUnderCursor() const {
         QTextCursor tc = textCursor();
+        {
+            auto checkSpace = tc;
+            checkSpace.movePosition(QTextCursor::Left,
+                                    QTextCursor::KeepAnchor);
+            if(checkSpace.selectedText() == " ") {
+                return "";
+            }
+        }
         tc.movePosition(QTextCursor::Left);
         tc.select(QTextCursor::WordUnderCursor);
         QString result = tc.selectedText();
@@ -257,6 +266,7 @@ void Highlighter::highlightBlock(const QString &text) {
         }
     }
 
+    bool objCompletSetup = false;
     bool addFuncsComplete = true;
     QStringList completions;
     auto matchIterator = mObjectsExpression.globalMatch(text);
@@ -279,6 +289,7 @@ void Highlighter::highlightBlock(const QString &text) {
             if(autocomplete) {
                 if(objs.count() > 1) addFuncsComplete = false;
                 completions.removeDuplicates();
+                objCompletSetup = true;
             }
 
             if(!obj || obj == mTarget) {
@@ -287,6 +298,10 @@ void Highlighter::highlightBlock(const QString &text) {
                 break;
             }
         }
+    }
+    if(!objCompletSetup) {
+        mSearchCtxt->ca_findPropertyWithPathRec(
+                    0, QStringList() << "", &completions);
     }
     if(addFuncsComplete) {
         QStringList tmp = mBaseComplete;
