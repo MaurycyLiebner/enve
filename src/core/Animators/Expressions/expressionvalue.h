@@ -42,6 +42,8 @@ public:
     qreal value(const qreal relFrame) const;
     bool updateValue();
 
+    int relFrame() const { return mRelFrame; }
+
     bool needsBrackets() const
     { return mNeedsBrackets; }
 protected:

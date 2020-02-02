@@ -71,10 +71,10 @@ void ExpressionSource::lookForSource() {
         conn << connect(newSource, &Property::prp_absFrameRangeChanged,
                         this, [this, prnt](const FrameRange& absRange) {
             const auto relRange = prnt->prp_absRangeToRelRange(absRange);
+            const bool currentFrameAffected = relRange.inRange(relFrame());
+            if(currentFrameAffected) updateValue();
             emit relRangeChanged(relRange);
         });
-        conn << connect(newSource, &QrealAnimator::effectiveValueChanged,
-                        this, &ExpressionValue::updateValue);
         conn << connect(newSource, &QrealAnimator::prp_pathChanged,
                         this, &ExpressionSource::updateSourcePath);
     }
