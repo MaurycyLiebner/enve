@@ -176,19 +176,6 @@ void Property::prp_setNameAction(const QString &newName) {
 
 void Property::prp_setName(const QString &newName) {
     if(newName == prp_mName) return;
-    {
-        prp_pushUndoRedoName("Rename");
-        UndoRedo ur;
-        const auto oldValue = prp_mName;
-        const auto newValue = newName;
-        ur.fUndo = [this, oldValue]() {
-            prp_setName(oldValue);
-        };
-        ur.fRedo = [this, newValue]() {
-            prp_setName(newValue);
-        };
-        prp_addUndoRedo(ur);
-    }
     prp_mName = newName;
     emit prp_nameChanged(newName, QPrivateSignal());
     emit prp_pathChanged();
