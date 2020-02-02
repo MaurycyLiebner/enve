@@ -60,7 +60,6 @@ protected:
 private:
     QrealAnimator *getQPointFAnimatorSibling();
 
-    bool mBlockAnimatorSignals = false;
     ConnContextQPtr<Property> mTarget;
 signals:
     void displayedValueChanged(qreal);

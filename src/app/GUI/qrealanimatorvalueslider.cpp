@@ -56,7 +56,6 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(QString name,
 
 void QrealAnimatorValueSlider::emitEditingStarted(qreal value) {
     if(mTarget) {
-        mBlockAnimatorSignals = true;
         mTarget->prp_startTransform();
     }
     QDoubleSlider::emitEditingStarted(value);
@@ -126,20 +125,16 @@ void QrealAnimatorValueSlider::emitValueChanged(qreal value) {
 
 void QrealAnimatorValueSlider::setValueExternal(qreal value) {
     if(mTarget) {
-        mBlockAnimatorSignals = true;
         if(mTarget->SWT_isQrealAnimator()) {
             const auto da = static_cast<QrealAnimator*>(*mTarget);
             da->setCurrentBaseValue(value);
         }
-        mBlockAnimatorSignals = false;
     }
-    setDisplayedValue(value);
 }
 
 void QrealAnimatorValueSlider::emitEditingFinished(qreal value) {
     if(mTarget) {
         mTarget->prp_finishTransform();
-        mBlockAnimatorSignals = false;
         const auto other = getQPointFAnimatorSibling();
         if(other) other->prp_finishTransform();
     }
@@ -148,7 +143,6 @@ void QrealAnimatorValueSlider::emitEditingFinished(qreal value) {
 
 void QrealAnimatorValueSlider::emitEditingCanceled() {
     if(mTarget) {
-        mBlockAnimatorSignals = false;
         mTarget->prp_cancelTransform();
         const auto other = getQPointFAnimatorSibling();
         if(other) other->prp_cancelTransform();
@@ -157,7 +151,6 @@ void QrealAnimatorValueSlider::emitEditingCanceled() {
 }
 
 void QrealAnimatorValueSlider::setValueFromAnimator(qreal val) {
-    if(mBlockAnimatorSignals) return;
     setDisplayedValue(val);
     emit displayedValueChanged(val);
 }
@@ -215,8 +208,7 @@ void QrealAnimatorValueSlider::setTarget(QrealAnimator * const animator) {
         setValueRange(animator->getMinPossibleValue(),
                       animator->getMaxPossibleValue());
         setPrefferedValueStep(animator->getPrefferedValueStep());
-
-        setDisplayedValue(animator->getCurrentBaseValue());
+        setDisplayedValue(animator->getEffectiveValue());
     }
 }
 
