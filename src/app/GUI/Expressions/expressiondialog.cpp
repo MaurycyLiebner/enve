@@ -97,13 +97,13 @@ void ExpressionDialog::apply() {
     const auto text = mLine->toPlainText();
     try {
         expr = ExpressionParser::parse(text, mTarget);
-        if(!expr) return;
-        expr->setRelFrame(0);
-        //expr->collapse();
-        if(!expr->isValid()) {
+        if(!expr || !expr->isValid()) {
             mTarget->clearExpression();
             RuntimeThrow("Invalid expression.");
-        } else mTarget->setExpression(expr);
+        } else {
+            expr->setRelFrame(0);
+            mTarget->setExpression(expr);
+        }
         Document::sInstance->actionFinished();
     } catch(const std::exception& e) {
         const QString error = e.what();

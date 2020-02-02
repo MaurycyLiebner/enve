@@ -27,7 +27,7 @@ ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
 ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
                                    const QString &text,
                                    QWidget * const parent) :
-    QTextEdit(text, parent) {
+    QTextEdit(parent) {
     setTextColor(Qt::red);
     setMinimumWidth(400);
     const auto doc = document();
@@ -47,7 +47,7 @@ ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
     QObject::connect(mCompleter,
                      qOverload<const QString&>(&QCompleter::activated),
                      this, &ExpressionEditor::insertCompletion);
-    setText(" "); setText(""); // force autocomplete update
+    setText(text); // force autocomplete update
 }
 
 void ExpressionEditor::setCompleterList(const QStringList &values) {
