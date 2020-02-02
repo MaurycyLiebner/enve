@@ -250,7 +250,7 @@ qreal QrealAnimator::getBaseValue(const qreal relFrame) const {
 }
 
 qreal QrealAnimator::getEffectiveValue(const qreal relFrame) const {
-    if(mExpression) return mExpression->value(relFrame);
+    if(mExpression) return clamped(mExpression->value(relFrame));
     else return getBaseValue(relFrame);
 }
 

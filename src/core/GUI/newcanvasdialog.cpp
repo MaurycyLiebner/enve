@@ -164,7 +164,7 @@ qreal CanvasSettingsDialog::getFps() const {
 
 void CanvasSettingsDialog::applySettingsToCanvas(Canvas * const canvas) const {
     if(!canvas) return;
-    canvas->setName(getCanvasName());
+    canvas->prp_setNameAction(getCanvasName());
     canvas->setCanvasSize(getCanvasWidth(), getCanvasHeight());
     canvas->setFps(getFps());
     canvas->setFrameRange(getFrameRange());

@@ -18,7 +18,7 @@
 #include <QMenu>
 #include "Animators/qrealanimator.h"
 #include "mainwindow.h"
-#include "expressiondialog.h"
+#include "Expressions/expressiondialog.h"
 
 QrealAnimatorValueSlider::QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
                                                    qreal prefferedStep,

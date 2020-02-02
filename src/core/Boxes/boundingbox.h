@@ -379,9 +379,6 @@ public:
     { return mVisibleInScene; }
     void setVisibleForScene(const bool visible)
     { mVisibleInScene = visible; }
-
-    void rename(const QString& newName);
-    void setName(const QString& newName);
 private:
     void cancelWaitingTasks();
     void afterTotalTransformChanged(const UpdateReason reason);
@@ -412,9 +409,6 @@ protected:
     const qsptr<BoxTransformAnimator> mTransformAnimator;
     const qsptr<RasterEffectCollection> mRasterEffectsAnimators;
 private:
-    using Property::prp_setName;
-    using Property::prp_setNameAction;
-
     SkBlendMode mBlendMode = SkBlendMode::kSrcOver;
 
     mutable int mReadId = -1;

@@ -116,7 +116,7 @@ private:
         if(scene) {
             const bool valid = Property::prp_sValidateName(newName);
             if(!valid) return;
-            scene->setName(newName);
+            scene->prp_setNameAction(newName);
         }
         layout->fName = newName;
         mComboBox->setItemText(id, newName);

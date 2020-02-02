@@ -102,7 +102,7 @@ void OutlineSettingsAnimator::setJoinStyle(const SkPaint::Join joinStyle) {
 }
 
 void OutlineSettingsAnimator::setStrokerSettingsSk(SkStroke * const stroker) {
-    stroker->setWidth(toSkScalar(mLineWidth->getCurrentBaseValue()));
+    stroker->setWidth(toSkScalar(mLineWidth->getEffectiveValue()));
     stroker->setCap(mCapStyle);
     stroker->setJoin(mJoinStyle);
 }
@@ -131,7 +131,7 @@ void OutlineSettingsAnimator::setupStrokeSettings(const qreal relFrame,
 }
 
 qreal OutlineSettingsAnimator::getCurrentStrokeWidth() const {
-    return mLineWidth->getCurrentBaseValue();
+    return mLineWidth->getEffectiveValue();
 }
 
 SkPaint::Cap OutlineSettingsAnimator::getCapStyle() const {
@@ -156,7 +156,7 @@ QPainter::CompositionMode OutlineSettingsAnimator::getOutlineCompositionMode() {
 }
 
 bool OutlineSettingsAnimator::nonZeroLineWidth() {
-    return !isZero4Dec(mLineWidth->getCurrentBaseValue());
+    return !isZero4Dec(mLineWidth->getEffectiveValue());
 }
 
 QrealAnimator *OutlineSettingsAnimator::getLineWidthAnimator() {

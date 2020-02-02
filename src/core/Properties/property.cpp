@@ -211,7 +211,7 @@ void Property::prp_getFullPath(QStringList& names) const {
 QString Property::prp_sFixName(const QString &name) {
     QString result = name.trimmed();
 
-    result.remove("[^a-zA-Z0-9 _]");
+    result.remove(QRegExp("[^A-Za-z0-9 _]"));
     while(!result.isEmpty() &&
           (result.front() == ' ' ||
            result.front().isDigit())) {

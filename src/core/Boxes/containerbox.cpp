@@ -310,7 +310,7 @@ void ContainerBox::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
 }
 
 QString stringScrapEndDigits(const QString& string) {
-    const QRegExp endNumbers(QStringLiteral("[0-9]+\\b"));
+    const QRegExp endNumbers(QStringLiteral("[0-9]+$"));
     const int endNumbersIndex = endNumbers.indexIn(string);
     QString trimmedName;
     if(endNumbersIndex >= 0) {
@@ -320,26 +320,30 @@ QString stringScrapEndDigits(const QString& string) {
     }
 }
 
-QString ContainerBox::makeNameUniqueForDescendants(const QString &name) {
+using NamesGetter = std::function<QStringList(const QString&)>;
+QString makeNameUnique(const QString& name,
+                       const NamesGetter& namesGetter) {
     const QString trimmedName = stringScrapEndDigits(name).trimmed();
-    const QStringList usedList = allDescendantsNamesStartingWith(trimmedName);
+    const QString fixedName = Property::prp_sFixName(trimmedName);
+    const QStringList usedList = namesGetter(fixedName);
     for(int i = 0;; i++) {
         const QString suffix = i == 0 ? "" : + " " + QString::number(i);
-        const QString testName = trimmedName + suffix;
+        const QString testName = fixedName + suffix;
         const bool taken = usedList.contains(testName);
         if(!taken) return testName;
     }
 }
 
+QString ContainerBox::makeNameUniqueForDescendants(const QString &name) {
+    return makeNameUnique(name, [this](const QString& name) {
+        return allDescendantsNamesStartingWith(name);
+    });
+}
+
 QString ContainerBox::makeNameUniqueForContained(const QString &name) {
-    const QString trimmedName = stringScrapEndDigits(name).trimmed();
-    const QStringList usedList = allContainedNamesStartingWith(trimmedName);
-    for(int i = 0;; i++) {
-        const QString suffix = i == 0 ? "" : + " " + QString::number(i);
-        const QString testName = trimmedName + suffix;
-        const bool taken = usedList.contains(testName);
-        if(!taken) return testName;
-    }
+    return makeNameUnique(name, [this](const QString& name) {
+        return allContainedNamesStartingWith(name);
+    });
 }
 
 eBoxOrSound *ContainerBox::firstDescendantWithName(const QString &name) {

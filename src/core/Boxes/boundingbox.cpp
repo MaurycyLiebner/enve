@@ -82,16 +82,16 @@ BoundingBox::~BoundingBox() {
 void BoundingBox::writeBoundingBox(eWriteStream& dst) const {
     if(mWriteId < 0) assignWriteId();
     eBoxOrSound::prp_writeProperty(dst);
-    dst << prp_getName();
     dst << mWriteId;
     dst.write(&mBlendMode, sizeof(SkBlendMode));
 }
 
 void BoundingBox::readBoundingBox(eReadStream& src) {
     eBoxOrSound::prp_readProperty(src);
-    QString name;
-    src >> name;
-    rename(name);
+    if(src.evFileVersion() < 10) {
+        QString name; src >> name;
+        prp_setName(name);
+    }
     src >> mReadId;
     src.read(&mBlendMode, sizeof(SkBlendMode));
 
@@ -151,22 +151,6 @@ void BoundingBox::centerPivotPositionAction() {
 
 void BoundingBox::planCenterPivotPosition() {
     mCenterPivotPlanned = true;
-}
-
-void BoundingBox::rename(const QString &newName) {
-    if(newName == prp_getName()) return;
-    const auto fixedName = Property::prp_sFixName(newName);
-    const auto parentScene = getParentScene();
-    if(parentScene) {
-        const QString uniqueName = parentScene->
-                makeNameUniqueForDescendants(fixedName);
-        return prp_setNameAction(uniqueName);
-    }
-    prp_setNameAction(fixedName);
-}
-
-void BoundingBox::setName(const QString &newName) {
-    prp_setNameAction(newName);
 }
 
 void BoundingBox::updateIfUsesProgram(

@@ -463,7 +463,7 @@ void AdvancedTransformAnimator::setShear(const qreal shearX, const qreal shearY)
 }
 
 qreal AdvancedTransformAnimator::getOpacity() {
-    return mOpacityAnimator->getCurrentBaseValue();
+    return mOpacityAnimator->getEffectiveValue();
 }
 
 void AdvancedTransformAnimator::startTransformSkipOpacity() {

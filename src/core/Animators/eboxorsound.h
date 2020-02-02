@@ -107,6 +107,9 @@ public:
     void bringToEnd();
     void setZListIndex(const int z) { mZListIndex = z; }
     int getZIndex() const { return mZListIndex; }
+
+    void rename(const QString& newName);
+private:
 protected:
     bool mSelected = false;
     bool mInVisibleRange = true;

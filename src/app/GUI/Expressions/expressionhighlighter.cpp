@@ -42,6 +42,7 @@ ExpressionHighlighter::ExpressionHighlighter(
     };
 
     QTextCharFormat funcFormat;
+    funcFormat.setForeground(Qt::white);
     funcFormat.setFontWeight(QFont::Bold);
     rule.format = funcFormat;
     for (const QString &func : funcs) {
@@ -75,7 +76,7 @@ ExpressionHighlighter::ExpressionHighlighter(
                 "(\\b|(?<=[0-9]))"
                 "(?!(?<=\\$))"
                 "(?!" + funcExclude + ")"
-                                      "([A-Za-z_]([A-Za-z0-9_ ]*[A-Za-z0-9_])*\\.?)+");
+                "([A-Za-z_]([A-Za-z0-9_ ]*[A-Za-z0-9_])*\\.?)+");
     QTextCharFormat objectFormat;
     objectFormat.setForeground(QColor(255, 128, 128));
     objectFormat.setBackground(QColor(45, 45, 45));

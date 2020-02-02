@@ -71,7 +71,7 @@ void Canvas::addActionsToMenu(QMenu *const menu) {
     menu->addAction("Duplicate Scene", [this]() {
         const auto newScene = Document::sInstance->createNewScene();
         BoxClipboard::sCopyAndPaste(this, newScene);
-        newScene->setName(newScene->prp_getName() + " copy");
+        newScene->prp_setNameAction(newScene->prp_getName() + " copy");
     });
 
     const auto parentWidget = menu->parentWidget();

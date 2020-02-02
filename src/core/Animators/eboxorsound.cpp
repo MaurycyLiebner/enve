@@ -118,6 +118,8 @@ void eBoxOrSound::prp_writeProperty(eWriteStream& dst) const {
     const bool hasDurRect = mDurationRectangle;
     dst << hasDurRect;
     if(hasDurRect) mDurationRectangle->writeDurationRectangle(dst);
+
+    dst << prp_getName();
 }
 
 void eBoxOrSound::prp_readProperty(eReadStream& src) {
@@ -130,6 +132,10 @@ void eBoxOrSound::prp_readProperty(eReadStream& src) {
     if(hasDurRect) {
         if(!mDurationRectangle) createDurationRectangle();
         mDurationRectangle->readDurationRectangle(src);
+    }
+    if(src.evFileVersion() >= 10) {
+        QString name; src >> name;
+        prp_setName(name);
     }
 }
 
@@ -439,4 +445,16 @@ void eBoxOrSound::bringToFront() {
 
 void eBoxOrSound::bringToEnd() {
     mParentGroup->bringContainedToEndList(this);
+}
+
+void eBoxOrSound::rename(const QString &newName) {
+    if(newName == prp_getName()) return;
+    const auto fixedName = Property::prp_sFixName(newName);
+    const auto parentScene = getParentScene();
+    if(parentScene) {
+        const QString uniqueName = parentScene->
+                makeNameUniqueForDescendants(fixedName);
+        return prp_setNameAction(uniqueName);
+    }
+    prp_setNameAction(fixedName);
 }
