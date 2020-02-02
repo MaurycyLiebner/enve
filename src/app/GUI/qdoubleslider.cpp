@@ -38,9 +38,6 @@ QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
     mLineEdit->installEventFilter(this);
     installEventFilter(this);
     mLineEdit->setFixedHeight(MIN_WIDGET_DIM);
-//    mValidator = new QDoubleValidator(minVal, maxVal, 3, this);
-//    mValidator->setNotation(QDoubleValidator::StandardNotation);
-    //mLineEdit->setValidator(mValidator);
     mLineEdit->hide();
 
     connect(mLineEdit, &QLineEdit::editingFinished,
@@ -65,18 +62,14 @@ QDoubleSlider::QDoubleSlider(QWidget *parent) :
 QDoubleSlider::~QDoubleSlider() {
     removeEventFilter(this);
     mLineEdit->removeEventFilter(this);
-//    delete mLineEdit;
-//    mLineEdit = nullptr;
-//    delete mValidator;
-//    mValidator = nullptr;
 }
 
-void QDoubleSlider::setValueSliderVisibile(bool valueSliderVisible) {
+void QDoubleSlider::setValueSliderVisibile(const bool valueSliderVisible) {
     mShowValueSlider = valueSliderVisible;
     update();
 }
 
-void QDoubleSlider::setNameVisible(bool nameVisible) {
+void QDoubleSlider::setNameVisible(const bool nameVisible) {
     mShowName = nameVisible;
     fitWidthToContent();
 }
@@ -87,9 +80,8 @@ void QDoubleSlider::setName(const QString &name) {
     fitWidthToContent();
 }
 
-void QDoubleSlider::setNumberDecimals(int decimals) {
+void QDoubleSlider::setNumberDecimals(const int decimals) {
     mDecimals = decimals;
-    //updateLineEditFromValue();
     fitWidthToContent();
 }
 
@@ -101,11 +93,10 @@ QString QDoubleSlider::getValueString() {
     return QLocale().toString(mValue, 'f', mDecimals);
 }
 
-void QDoubleSlider::setValueRange(qreal min, qreal max) {
+void QDoubleSlider::setValueRange(const qreal min, const qreal max) {
     mMinValue = min;
     mMaxValue = max;
-    setDisplayedValue(mValue);
-    //updateLineEditFromValue();
+    setDisplayedValue(clamped(mValue));
     fitWidthToContent();
 }
 
@@ -189,25 +180,27 @@ void QDoubleSlider::paint(QPainter *p,
     p->restore();
 }
 
-void QDoubleSlider::emitEditingStarted(const qreal value) {
+void QDoubleSlider::startTransform(const qreal value) {
     emit editingStarted(value);
 }
 
-void QDoubleSlider::emitValueChanged(const qreal value) {
+void QDoubleSlider::setValue(const qreal value) {
     setDisplayedValue(value);
-    emit valueChanged(value);
+    emit valueEdited(mValue);
 }
 
-void QDoubleSlider::emitEditingFinished(const qreal value) {
+void QDoubleSlider::finishTransform(const qreal value) {
     emit editingFinished(value);
 }
 
-void QDoubleSlider::emitEditingCanceled() {
+void QDoubleSlider::cancelTransform() {
     emit editingCanceled();
 }
 
 void QDoubleSlider::setDisplayedValue(const qreal value) {
-    mValue = clamped(value);
+    const qreal clampedValue = clamped(value);
+    if(isZero4Dec(mValue - clampedValue)) return;
+    mValue = clampedValue;
     update();
 }
 
@@ -244,7 +237,7 @@ void QDoubleSlider::mouseDoubleClickEvent(QMouseEvent *event) {
 void QDoubleSlider::mousePressEvent(QMouseEvent *event) {
     if(event->button() == Qt::RightButton) {
         if(mMouseMoved) {
-            emitEditingCanceled();
+            cancelTransform();
             mCanceled = true;
             setCursor(Qt::ArrowCursor);
         } else openContextMenu(event->globalPos());
@@ -261,21 +254,23 @@ void QDoubleSlider::setPrefferedValueStep(const qreal step) {
     mPrefferedValueStep = step;
 }
 
-qreal QDoubleSlider::maximum() {
-    return mMaxValue;
+void QDoubleSlider::setIsRightSlider(const bool value) {
+    mLeftNeighbour = value;
+    update();
 }
 
-qreal QDoubleSlider::minimum() {
-    return mMinValue;
+void QDoubleSlider::setIsLeftSlider(const bool value) {
+    mRightNeighbour = value;
+    update();
 }
 
 void QDoubleSlider::mouseMoveEvent(QMouseEvent *event) {
-    if(!mMouseMoved) emitEditingStarted(mValue);
+    if(!mMouseMoved) startTransform(mValue);
 
     const qreal dValue = (event->x() - mLastX)*0.1*mPrefferedValueStep;
     const qreal newValue = clamped(mLastValue + dValue);
     mLastValue = newValue;
-    emitValueChanged(newValue);
+    setValue(newValue);
 
     mMouseMoved = true;
     cursor().setPos(mGlobalPressPos);
@@ -321,7 +316,7 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
             if(mMouseMoved) {
                 mMouseMoved = false;
                 setCursor(Qt::ArrowCursor);
-                emitEditingFinished(mValue);
+                finishTransform(mValue);
                 Document::sInstance->actionFinished();
             } else {
                 updateLineEditFromValue();
@@ -397,7 +392,7 @@ void QDoubleSlider::lineEditingFinished() {
     } catch(const std::exception& e) {}
     if(!expr || !expr->isValid()) return;
     const qreal newValue = clamped(expr->calculateValue(0));
-    emitEditingStarted(newValue);
-    emitValueChanged(newValue);
-    emitEditingFinished(newValue);
+    startTransform(newValue);
+    setValue(newValue);
+    finishTransform(newValue);
 }

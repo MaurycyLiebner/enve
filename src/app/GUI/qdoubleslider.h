@@ -34,70 +34,63 @@ public:
                   const qreal prefferedStep,
                   QWidget * const parent = nullptr);
     QDoubleSlider(QWidget *parent = nullptr);
-    virtual ~QDoubleSlider();
+    ~QDoubleSlider();
 
-    bool eventFilter(QObject *, QEvent *event);
-
-    void setValueSliderVisibile(bool valueSliderVisible);
-    void setNameVisible(bool nameVisible);
+    void setValueSliderVisibile(const bool valueSliderVisible);
+    void setNameVisible(const bool nameVisible);
     void setName(const QString& name);
-    void setNumberDecimals(int decimals);
+    void setNumberDecimals(const int decimals);
 
     void updateLineEditFromValue();
     void fitWidthToContent();
     QString getValueString();
 
-    void setValueRange(qreal min, qreal max);
-    virtual void paint(QPainter *p);
-    void paint(QPainter *p,
-               const QColor &allFill,
-               const QColor &sliderFill,
-               const QColor &stroke,
-               const QColor &text);
-    void paint(QPainter * const p, const bool enabled);
+    void setValueRange(const qreal min, const qreal max);
 
     void setPrefferedValueStep(const qreal step);
 
-    qreal maximum();
-    qreal minimum();
-    qreal value() {
-        return mValue;
-    }
+    qreal minimum() { return mMinValue; }
+    qreal value() { return mValue; }
+    qreal maximum() { return mMaxValue; }
 
-    virtual void openContextMenu(const QPoint &globalPos) {
-        Q_UNUSED(globalPos)
-    }
-
-    void setNeighbouringSliderToTheLeft(const bool bT) {
-        mLeftNeighbour = bT;
-        update();
-    }
-
-    void setNeighbouringSliderToTheRight(const bool bT) {
-        mRightNeighbour = bT;
-        update();
-    }
+    void setIsRightSlider(const bool value);
+    void setIsLeftSlider(const bool value);
 
     void setDisplayedValue(const qreal value);
 
     qreal clamped(const qreal value) const
     { return qBound(mMinValue, value, mMaxValue); }
 protected:
+    virtual void paint(QPainter *p);
+    virtual void openContextMenu(const QPoint &globalPos)
+    { Q_UNUSED(globalPos) }
+
+    virtual void startTransform(const qreal value);
+    virtual void setValue(const qreal value);
+    virtual void finishTransform(const qreal value);
+    virtual void cancelTransform();
+
+    bool eventFilter(QObject *, QEvent *event);
     void paintEvent(QPaintEvent *);
     void mouseDoubleClickEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
 
-    virtual void emitEditingStarted(const qreal value);
-    virtual void emitValueChanged(const qreal value);
-    virtual void emitEditingFinished(const qreal value);
-    virtual void emitEditingCanceled();
+    void paint(QPainter *p,
+               const QColor &allFill,
+               const QColor &sliderFill,
+               const QColor &stroke,
+               const QColor &text);
+    void paint(QPainter * const p, const bool enabled);
 signals:
     void editingStarted(qreal);
-    void valueChanged(qreal);
+    void valueEdited(qreal);
     void editingFinished(qreal);
     void editingCanceled();
 protected:
+    void finishTextEditing();
+    void lineEditingFinished();
+
     bool mLeftNeighbour = false;
     bool mRightNeighbour = false;
     int mDecimals = 3;
@@ -114,14 +107,11 @@ protected:
     qreal mMinValue = 0.;
     qreal mMaxValue = 0.;
     qreal mPrefferedValueStep = 1.;
-    void finishTextEditing();
 
     QPoint mGlobalPressPos;
     int mLastX;
     qreal mLastValue;
     bool mShowValueSlider = true;
-private slots:
-    void lineEditingFinished();
 };
 
 #endif // QDOUBLESLIDER_H

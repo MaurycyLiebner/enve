@@ -410,7 +410,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     } else if(target->SWT_isQrealAnimator()) {
         mValueSlider->setTarget(static_cast<QrealAnimator*>(target));
         valueSliderVisible = true;
-        mValueSlider->setNeighbouringSliderToTheRight(false);
+        mValueSlider->setIsLeftSlider(false);
     } else if(target->SWT_isComplexAnimator()) {
         if(target->SWT_isColorAnimator()) {
             colorButtonVisible = true;
@@ -444,7 +444,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                     if(guiProp->SWT_isQrealAnimator()) {
                         valueSliderVisible = true;
                         mValueSlider->setTarget(static_cast<QrealAnimator*>(guiProp));
-                        mValueSlider->setNeighbouringSliderToTheRight(false);
+                        mValueSlider->setIsLeftSlider(false);
                         mSecondValueSlider->setTarget(nullptr);
                     } else if(guiProp->SWT_isColorAnimator()) {
                         mColorButton->setColorTarget(static_cast<ColorAnimator*>(guiProp));
@@ -822,10 +822,10 @@ void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
         const auto pt_target = static_cast<QPointFAnimator*>(target);
         mValueSlider->setTarget(pt_target->getXAnimator());
         mValueSlider->show();
-        mValueSlider->setNeighbouringSliderToTheRight(true);
+        mValueSlider->setIsLeftSlider(true);
         mSecondValueSlider->setTarget(pt_target->getYAnimator());
         mSecondValueSlider->show();
-        mSecondValueSlider->setNeighbouringSliderToTheLeft(true);
+        mSecondValueSlider->setIsRightSlider(true);
     } else {
         clearAndHideValueAnimators();
     }

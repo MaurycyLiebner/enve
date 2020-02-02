@@ -35,34 +35,24 @@ public:
     QrealAnimatorValueSlider(QrealAnimator* animator, QWidget *parent = nullptr);
     QrealAnimatorValueSlider(QWidget *parent = nullptr);
 
+    void setTarget(QrealAnimator * const animator);
+    bool hasTarget();
+    bool isTargetDisabled();
+protected:
     void paint(QPainter *p);
     void openContextMenu(const QPoint &globalPos);
 
-    void setTarget(QrealAnimator * const animator);
+    void startTransform(const qreal value);
+    void setValue(const qreal value);
+    void finishTransform(const qreal value);
+    void cancelTransform();
 
-    bool hasTarget();
-
-    bool isTargetDisabled();
-
-
-    void setValueExternal(qreal value);
-
-    void emitEditingStarted(const qreal value);
-    void emitValueChangedExternal(qreal value);
-    void emitEditingFinished(const qreal value);
-    void emitEditingCanceled();
-
-    void setValueFromAnimator(qreal val);
-protected:
-    void emitValueChanged(const qreal value);
     void mouseMoveEvent(QMouseEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
 private:
     QrealAnimator *getQPointFAnimatorSibling();
 
     ConnContextQPtr<Property> mTarget;
-signals:
-    void displayedValueChanged(qreal);
 };
 
 #endif // QREALANIMATORVALUESLIDER_H

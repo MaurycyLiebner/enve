@@ -76,15 +76,55 @@ private:
 
     void startColorPicking();
 
-    void setAlphaFromSpin(const qreal val);
+    void setAlpha(const qreal val);
 
-    void updateValuesFromRGB();
-    void updateValuesFromHSV();
-    void updateValuesFromHSL();
-    void setValuesFromRGB();
-    void setValuesFromHSV();
-    void setValuesFromHSL();
+    void updateValuesFromRGBSpins();
+    void updateValuesFromHSVSpins();
+    void updateValuesFromHSLSpins();
     void updateAlphaFromSpin();
+
+    void setAllDisplayedFromRGB(const qreal red,
+                                const qreal green,
+                                const qreal blue);
+    void setAllDisplayedFromHSV(const qreal hue,
+                                const qreal saturation,
+                                const qreal value);
+    void setAllDisplayedFromHSL(const qreal hue,
+                                const qreal saturation,
+                                const qreal lightness);
+
+
+    void setDisplayedRGB(const qreal red,
+                         const qreal green,
+                         const qreal blue);
+    void setDisplayedHSV(const qreal hue,
+                         const qreal saturation,
+                         const qreal value);
+    void setDisplayedHSL(const qreal hue,
+                         const qreal saturation,
+                         const qreal lightness);
+
+    void setRGB(const qreal red,
+                const qreal green,
+                const qreal blue);
+    void setHSV(const qreal hue,
+                const qreal saturation,
+                const qreal value);
+    void setHSL(const qreal hue,
+                const qreal saturation,
+                const qreal lightness);
+
+    void setRed(const qreal red);
+    void setGreen(const qreal green);
+    void setBlue(const qreal blue);
+
+    void setHSVHue(const qreal hue);
+    void setHSVSaturation(const qreal saturation);
+    void setHSVValue(const qreal value);
+
+    void setHSLHue(const qreal hue);
+    void setHSLSaturation(const qreal saturation);
+    void setHSLLightness(const qreal value);
 
     void setColorMode();
     void updateWidgetTargets();
@@ -100,15 +140,6 @@ private:
     void connectColorWidgetSignalToSlotsWithoutThis(ColorWidget *signal_src,
                                                     const char *signal,
                                                     const char *slot);
-    void setRectValuesAndColor(
-        const qreal red,
-        const qreal green,
-        const qreal blue,
-        const qreal hue,
-        const qreal hsvSaturation,
-        const qreal value,
-        const qreal hslSaturation,
-        const qreal lightness);
 
     bool mBlockColorSettings = false;
     ColorParameter mLastTriggered;
@@ -188,6 +219,8 @@ private:
     ActionButton *mPickingButton;
 
     ColorLabel *mColorLabel = nullptr;
+
+    ConnContext mUpdateConnections;
 };
 
 #endif // COLORSETTINGSWIDGET_H

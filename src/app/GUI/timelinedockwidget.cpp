@@ -452,7 +452,7 @@ void TimelineDockWidget::setupSculptValueSpins() {
     const auto valueLabel = new QLabel("value: ");
     mValue = new QDoubleSlider(0, 1, 0.1, this);
     mValue->setDisplayedValue(mDocument.fSculptBrush.value());
-    connect(mValue, &QDoubleSlider::valueChanged,
+    connect(mValue, &QDoubleSlider::valueEdited,
             this, [this](const qreal value) {
         mDocument.fSculptBrush.setValue(value);
     });
@@ -469,7 +469,7 @@ void TimelineDockWidget::setupSculptValueSpins() {
     const auto hardnessLabel = new QLabel("hardness: ");
     mHardness = new QDoubleSlider(0, 1, 0.1, this);
     mHardness->setDisplayedValue(mDocument.fSculptBrush.hardness());
-    connect(mHardness, &QDoubleSlider::valueChanged,
+    connect(mHardness, &QDoubleSlider::valueEdited,
             this, [this](const qreal value) {
         mDocument.fSculptBrush.setHardness(value);
     });
@@ -486,7 +486,7 @@ void TimelineDockWidget::setupSculptValueSpins() {
     const auto opacityLabel = new QLabel("opacity: ");
     mOpacity = new QDoubleSlider(0, 1, 0.1, this);
     mOpacity->setDisplayedValue(mDocument.fSculptBrush.opacity());
-    connect(mOpacity, &QDoubleSlider::valueChanged,
+    connect(mOpacity, &QDoubleSlider::valueEdited,
             this, [this](const qreal value) {
         mDocument.fSculptBrush.setOpacity(value);
     });

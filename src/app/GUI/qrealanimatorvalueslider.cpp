@@ -54,18 +54,6 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(QString name,
 
 }
 
-void QrealAnimatorValueSlider::emitEditingStarted(const qreal value) {
-    if(mTarget) {
-        mTarget->prp_startTransform();
-    }
-    QDoubleSlider::emitEditingStarted(value);
-}
-
-void QrealAnimatorValueSlider::emitValueChangedExternal(qreal value) {
-    setDisplayedValue(value);
-    emitValueChanged(value);
-}
-
 #include "Animators/qpointfanimator.h"
 QrealAnimator* QrealAnimatorValueSlider::getQPointFAnimatorSibling() {
     if(mTarget->SWT_isQrealAnimator()) {
@@ -114,46 +102,37 @@ bool QrealAnimatorValueSlider::eventFilter(QObject *obj, QEvent *event) {
     return QDoubleSlider::eventFilter(obj, event);
 }
 
-void QrealAnimatorValueSlider::emitValueChanged(const qreal value) {
+void QrealAnimatorValueSlider::startTransform(const qreal value) {
+    if(mTarget) mTarget->prp_startTransform();
+    QDoubleSlider::startTransform(value);
+}
+
+void QrealAnimatorValueSlider::setValue(const qreal value) {
     if(mTarget) {
         if(mTarget->SWT_isQrealAnimator()) {
             const auto da = static_cast<QrealAnimator*>(*mTarget);
             da->setCurrentBaseValue(value);
         }
     }
-    emit valueChanged(value);
+    QDoubleSlider::setValue(value);
 }
 
-void QrealAnimatorValueSlider::setValueExternal(qreal value) {
-    if(mTarget) {
-        if(mTarget->SWT_isQrealAnimator()) {
-            const auto da = static_cast<QrealAnimator*>(*mTarget);
-            da->setCurrentBaseValue(value);
-        }
-    }
-}
-
-void QrealAnimatorValueSlider::emitEditingFinished(const qreal value) {
+void QrealAnimatorValueSlider::finishTransform(const qreal value) {
     if(mTarget) {
         mTarget->prp_finishTransform();
         const auto other = getQPointFAnimatorSibling();
         if(other) other->prp_finishTransform();
     }
-    QDoubleSlider::emitEditingFinished(value);
+    QDoubleSlider::finishTransform(value);
 }
 
-void QrealAnimatorValueSlider::emitEditingCanceled() {
+void QrealAnimatorValueSlider::cancelTransform() {
     if(mTarget) {
         mTarget->prp_cancelTransform();
         const auto other = getQPointFAnimatorSibling();
         if(other) other->prp_cancelTransform();
     }
-    QDoubleSlider::emitEditingCanceled();
-}
-
-void QrealAnimatorValueSlider::setValueFromAnimator(qreal val) {
-    setDisplayedValue(val);
-    emit displayedValueChanged(val);
+    QDoubleSlider::cancelTransform();
 }
 
 void QrealAnimatorValueSlider::paint(QPainter *p) {
@@ -202,7 +181,7 @@ void QrealAnimatorValueSlider::setTarget(QrealAnimator * const animator) {
     if(mTarget) {
         setNumberDecimals(animator->getNumberDecimals());
         conn << connect(animator, &QrealAnimator::effectiveValueChanged,
-                        this, &QrealAnimatorValueSlider::setValueFromAnimator);
+                        this, &QrealAnimatorValueSlider::setDisplayedValue);
         conn << connect(animator, &QrealAnimator::anim_changedKeyOnCurrentFrame,
                         this, qOverload<>(&QrealAnimatorValueSlider::update));
 

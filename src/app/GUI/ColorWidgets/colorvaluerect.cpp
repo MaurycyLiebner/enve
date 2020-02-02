@@ -103,6 +103,7 @@ void ColorValueRect::setDisplayedValue(const qreal val_t) {
 }
 
 void ColorValueRect::setValueAndEmitValueChanged(const qreal valT) {
+    if(isZero4Dec(valT - mVal)) return;
     setDisplayedValue(valT);
     emit valueChanged(valT);
 }
