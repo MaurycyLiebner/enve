@@ -22,12 +22,14 @@ ExpressionPlainValue::ExpressionPlainValue(const qreal value) :
 ExpressionPlainValue::ExpressionPlainValue(const QString &string,
                                            const qreal value) :
     ExpressionValue(false),
-    mString(string), mValue(value) { updateValue(); }
+    mString(string), mValue(value) {}
 
 using sptr = QSharedPointer<ExpressionPlainValue>;
 sptr ExpressionPlainValue::sCreate(
         const QString &string, const qreal value) {
-    return sptr(new ExpressionPlainValue(string, value));
+    const auto result = new ExpressionPlainValue(string, value);
+    result->updateValue();
+    return sptr(result);
 }
 
 sptr ExpressionPlainValue::sCreate(const qreal value) {

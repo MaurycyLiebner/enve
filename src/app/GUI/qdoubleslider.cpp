@@ -20,6 +20,7 @@
 #include "pointhelpers.h"
 #include "mainwindow.h"
 #include "GUI/global.h"
+#include "Animators/Expressions/expressionparser.h"
 
 QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
                              const qreal prefferedStep,
@@ -37,9 +38,9 @@ QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
     mLineEdit->installEventFilter(this);
     installEventFilter(this);
     mLineEdit->setFixedHeight(MIN_WIDGET_DIM);
-    mValidator = new QDoubleValidator(minVal, maxVal, 3, this);
-    mValidator->setNotation(QDoubleValidator::StandardNotation);
-    mLineEdit->setValidator(mValidator);
+//    mValidator = new QDoubleValidator(minVal, maxVal, 3, this);
+//    mValidator->setNotation(QDoubleValidator::StandardNotation);
+    //mLineEdit->setValidator(mValidator);
     mLineEdit->hide();
 
     connect(mLineEdit, &QLineEdit::editingFinished,
@@ -92,10 +93,6 @@ void QDoubleSlider::setNumberDecimals(int decimals) {
     fitWidthToContent();
 }
 
-void QDoubleSlider::setValueNoUpdate(const qreal value) {
-    mValue = clamp(value, mMinValue, mMaxValue);
-}
-
 void QDoubleSlider::updateLineEditFromValue() {
     mLineEdit->setText(QLocale().toString(mValue, 'f', mDecimals));
 }
@@ -105,10 +102,9 @@ QString QDoubleSlider::getValueString() {
 }
 
 void QDoubleSlider::setValueRange(qreal min, qreal max) {
-    mValidator->setRange(min, max, 3);
     mMinValue = min;
     mMaxValue = max;
-    setValueNoUpdate(mValue);
+    setDisplayedValue(mValue);
     //updateLineEditFromValue();
     fitWidthToContent();
 }
@@ -193,15 +189,16 @@ void QDoubleSlider::paint(QPainter *p,
     p->restore();
 }
 
-void QDoubleSlider::emitEditingStarted(qreal value) {
+void QDoubleSlider::emitEditingStarted(const qreal value) {
     emit editingStarted(value);
 }
 
-void QDoubleSlider::emitValueChanged(qreal value) {
+void QDoubleSlider::emitValueChanged(const qreal value) {
+    setDisplayedValue(value);
     emit valueChanged(value);
 }
 
-void QDoubleSlider::emitEditingFinished(qreal value) {
+void QDoubleSlider::emitEditingFinished(const qreal value) {
     emit editingFinished(value);
 }
 
@@ -209,8 +206,8 @@ void QDoubleSlider::emitEditingCanceled() {
     emit editingCanceled();
 }
 
-void QDoubleSlider::setDisplayedValue(qreal value) {
-    setValueNoUpdate(value);
+void QDoubleSlider::setDisplayedValue(const qreal value) {
+    mValue = clamped(value);
     update();
 }
 
@@ -254,9 +251,9 @@ void QDoubleSlider::mousePressEvent(QMouseEvent *event) {
     } else if(event->button() == Qt::LeftButton) {
         mCanceled = false;
         setCursor(Qt::BlankCursor);
-        mPressX = event->x();
+        mLastX = event->x();
         mGlobalPressPos = event->globalPos();
-        mPressValue = mValue;
+        mLastValue = mValue;
     }
 }
 
@@ -274,47 +271,32 @@ qreal QDoubleSlider::minimum() {
 
 void QDoubleSlider::mouseMoveEvent(QMouseEvent *event) {
     if(!mMouseMoved) emitEditingStarted(mValue);
-    const qreal dValue = (event->x() - mPressX)*0.1*mPrefferedValueStep;
-    setValueNoUpdate(mPressValue + dValue);
-    update();
 
-    mPressValue = mValue;
-    cursor().setPos(mGlobalPressPos);
+    const qreal dValue = (event->x() - mLastX)*0.1*mPrefferedValueStep;
+    const qreal newValue = clamped(mLastValue + dValue);
+    mLastValue = newValue;
+    emitValueChanged(newValue);
 
-    emitValueChanged(mValue);
     mMouseMoved = true;
+    cursor().setPos(mGlobalPressPos);
 }
 
 #include <QApplication>
 bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
-    if(event->type() == QEvent::Paint) {
+    const auto etype = event->type();
+    if(etype == QEvent::Paint) {
         return false;
-    } else if(event->type() == QEvent::KeyPress) {
+    } else if(etype == QEvent::KeyPress) {
         const auto keyEvent = static_cast<QKeyEvent*>(event);
-        if(keyEvent->key() == Qt::Key_Return ||
-           keyEvent->key() == Qt::Key_Enter) {
+        const auto ekey = keyEvent->key();
+        if(ekey == Qt::Key_Return ||
+           ekey == Qt::Key_Enter) {
             finishTextEditing();
-        } else if((keyEvent->key() == Qt::Key_Period ||
-                  keyEvent->key() == Qt::Key_Comma) && mTextEdit) {
-            QString currentText = mLineEdit->text();
-            int int2;
-            QString currentTextPeriod = currentText + ".";
-            if(mValidator->validate(currentTextPeriod, int2) !=
-                    QValidator::Invalid) {
-                mLineEdit->setText(currentTextPeriod);
-                return true;
-            }
-            QString currentTextComa = currentText + ",";
-            if(mValidator->validate(currentTextComa, int2) !=
-                    QValidator::Invalid) {
-                mLineEdit->setText(currentTextComa);
-                return true;
-            }
         }
         return !mTextEdit;
-    } else if(event->type() == QEvent::KeyRelease) {
+    } else if(etype == QEvent::KeyRelease) {
         return !mTextEdit;
-    } else if(event->type() == QEvent::MouseButtonPress) {
+    } else if(etype == QEvent::MouseButtonPress) {
         const auto mouseEvent = static_cast<QMouseEvent*>(event);
         if(mouseEvent->button() == Qt::RightButton) return false;
         mMouseMoved = false;
@@ -330,7 +312,7 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
             mousePressEvent(mouseEvent);
         }
         return !mTextEdit;
-    } else if(event->type() == QEvent::MouseButtonRelease) {
+    } else if(etype == QEvent::MouseButtonRelease) {
         if(mCanceled) return true;
         const auto mouseEvent = static_cast<QMouseEvent*>(event);
         if(mouseEvent->button() == Qt::RightButton) return false;
@@ -351,7 +333,7 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
             }
         }
         return !mTextEdit;
-    } else if(event->type() == QEvent::MouseMove) {
+    } else if(etype == QEvent::MouseMove) {
         if(mCanceled) return true;
         const auto mouseEvent = static_cast<QMouseEvent*>(event);
         if(!(mouseEvent->buttons() & Qt::LeftButton)) return false;
@@ -363,10 +345,10 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
             }
         }
         return !mTextEdit;
-    } else if(event->type() == QEvent::FocusOut) {
+    } else if(etype == QEvent::FocusOut) {
         mTextEdit = false;
         mLineEdit->hide();
-    } else if(event->type() == QEvent::FocusIn) {
+    } else if(etype == QEvent::FocusIn) {
         mTextEdit = true;
     }/* else if(event->type() == QEvent::Wheel) {
         if(mWheelEnabled || mTextEdit) {
@@ -405,13 +387,17 @@ void QDoubleSlider::finishTextEditing() {
 }
 
 void QDoubleSlider::lineEditingFinished() {
+    mLineEdit->releaseMouse();
     mLineEdit->setCursor(Qt::ArrowCursor);
     setCursor(Qt::ArrowCursor);
     const QString text = mLineEdit->text();
-    setValueNoUpdate(QLocale().toDouble(text));
-    mLineEdit->releaseMouse();
-
-    emitEditingStarted(mValue);
-    emitValueChanged(mValue);
-    emitEditingFinished(mValue);
+    ExpressionValue::sptr expr;
+    try {
+        expr = ExpressionParser::parse(text, nullptr);
+    } catch(const std::exception& e) {}
+    if(!expr || !expr->isValid()) return;
+    const qreal newValue = clamped(expr->calculateValue(0));
+    emitEditingStarted(newValue);
+    emitValueChanged(newValue);
+    emitEditingFinished(newValue);
 }

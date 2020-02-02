@@ -42,9 +42,11 @@ ExpressionValue::sptr ExpressionOperator::sCreate(
         const QString& name,
         const std::function<qreal (qreal, qreal)> &func,
         const sptr &value1, const sptr &value2) {
-    return sptr(new ExpressionOperator(childrenNeedBrackets,
-                                       needsBrackets, name,
-                                       func, value1, value2));
+    const auto result = new ExpressionOperator(childrenNeedBrackets,
+                                               needsBrackets, name,
+                                               func, value1, value2);
+    result->updateValue();
+    return sptr(result);
 }
 
 void ExpressionOperator::collapse() {

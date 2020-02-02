@@ -20,12 +20,20 @@
 ExpressionSourceValue::ExpressionSourceValue(
         QrealAnimator * const parent) :
     ExpressionSourceBase(parent) {
-    setSource(parent);
+    auto& conn = setSource(parent);
+    conn << connect(parent, &Property::prp_absFrameRangeChanged,
+                    this, [this, parent](const FrameRange& absRange) {
+        const auto relRange = parent->prp_absRangeToRelRange(absRange);
+        const bool currentFrameAffected = relRange.inRange(relFrame());
+        if(currentFrameAffected) updateValue();
+    });
 }
 
 ExpressionValue::sptr ExpressionSourceValue::sCreate(
         QrealAnimator * const parent) {
-    return sptr(new ExpressionSourceValue(parent));
+    const auto result = new ExpressionSourceValue(parent);
+    result->updateValue();
+    return sptr(result);
 }
 
 qreal ExpressionSourceValue::calculateValue(const qreal relFrame) const {

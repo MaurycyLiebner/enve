@@ -18,7 +18,9 @@
 
 ExpressionValue::sptr ExpressionRandomFunction::sCreate(
         const ExpressionValue::sptr &value) {
-    return sptr(new ExpressionRandomFunction("rand", value));
+    const auto result = new ExpressionRandomFunction("rand", value);
+    result->updateValue();
+    return sptr(result);
 }
 
 qreal ExpressionRandomFunction::calculateValue(const qreal relFrame) const {

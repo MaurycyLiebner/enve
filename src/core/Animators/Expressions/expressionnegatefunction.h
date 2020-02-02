@@ -14,22 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "expressionfunction.h"
+#ifndef EXPRESSIONNEGATEFUNCTION_H
+#define EXPRESSIONNEGATEFUNCTION_H
+#include "expressionfunctionbase.h"
 
-ExpressionFunction::ExpressionFunction(const QString& name,
-                                       const std::function<qreal(qreal)>& func,
-                                       const sptr& value) :
-    ExpressionFunctionBase(name, value), mFunc(func) {}
+class ExpressionNegateFunction : public ExpressionFunctionBase {
+public:    
+    ExpressionNegateFunction(const sptr& value);
 
-ExpressionValue::sptr ExpressionFunction::sCreate(
-        const QString& name,
-        const std::function<qreal(qreal)> &func,
-        const sptr &value) {
-    const auto result = new ExpressionFunction(name, func, value);
-    result->updateValue();
-    return sptr(result);
-}
+    static sptr sCreate(const sptr& value);
 
-qreal ExpressionFunction::calculateValue(const qreal relFrame) const {
-    return mFunc(innerValue(relFrame));
-}
+    qreal calculateValue(const qreal relFrame) const override
+    { return -innerValue(relFrame); }
+    QString toString() const override
+    { return "-" + innerString(); }
+};
+
+#endif // EXPRESSIONNEGATEFUNCTION_H

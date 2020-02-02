@@ -56,12 +56,13 @@ bool ExpressionSource::dependsOn(QrealAnimator * const source) const {
     const auto thisSource = this->source();
     if(!thisSource) return false;
     return source == thisSource ||
-           thisSource->expressionDependsOn(source);
+            thisSource->expressionDependsOn(source);
 }
 
 void ExpressionSource::setPath(const QString &path) {
     mPath = path;
     lookForSource();
+    updateValue();
 }
 
 void ExpressionSource::lookForSource() {

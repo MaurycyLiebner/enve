@@ -14,28 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "expressionsourceframe.h"
-#include "Animators/qrealanimator.h"
+#include "expressionnegatefunction.h"
 
-ExpressionSourceFrame::ExpressionSourceFrame(
-        QrealAnimator * const parent) :
-    ExpressionSourceBase(parent) {
-    setSource(parent);
-}
+ExpressionNegateFunction::ExpressionNegateFunction(
+        const ExpressionValue::sptr &value) :
+    ExpressionFunctionBase("-", value) {}
 
-ExpressionValue::sptr ExpressionSourceFrame::sCreate(
-        QrealAnimator * const parent) {
-    const auto result = new ExpressionSourceFrame(parent);
+ExpressionValue::sptr ExpressionNegateFunction::sCreate(
+        const ExpressionValue::sptr &value) {
+    const auto result = new ExpressionNegateFunction(value);
     result->updateValue();
     return sptr(result);
-}
-
-qreal ExpressionSourceFrame::calculateValue(const qreal relFrame) const {
-    return relFrame;
-}
-
-FrameRange ExpressionSourceFrame::identicalRange(const qreal relFrame) const {
-    const auto src = source();
-    if(!src) return FrameRange::EMINMAX;
-    return {qFloor(relFrame), qCeil(relFrame)};
 }

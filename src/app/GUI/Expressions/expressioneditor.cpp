@@ -28,7 +28,6 @@ ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
                                    const QString &text,
                                    QWidget * const parent) :
     QTextEdit(parent) {
-    setTextColor(Qt::red);
     setMinimumWidth(400);
     const auto doc = document();
     doc->setMaximumBlockCount(1);

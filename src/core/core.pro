@@ -68,6 +68,7 @@ LIBS += -lskia -lpthread -lfreetype -lpng -ldl -fopenmp
 SOURCES += \
     Animators/Expressions/expressionfunction.cpp \
     Animators/Expressions/expressionfunctionbase.cpp \
+    Animators/Expressions/expressionnegatefunction.cpp \
     Animators/Expressions/expressionoperator.cpp \
     Animators/Expressions/expressionparser.cpp \
     Animators/Expressions/expressionplainvalue.cpp \
@@ -345,6 +346,7 @@ SOURCES += \
 HEADERS += \
     Animators/Expressions/expressionfunction.h \
     Animators/Expressions/expressionfunctionbase.h \
+    Animators/Expressions/expressionnegatefunction.h \
     Animators/Expressions/expressionoperator.h \
     Animators/Expressions/expressionparser.h \
     Animators/Expressions/expressionplainvalue.h \

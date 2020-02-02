@@ -25,6 +25,7 @@
 #include "expressionsource.h"
 #include "expressionsourceframe.h"
 #include "expressionsourcevalue.h"
+#include "expressionnegatefunction.h"
 
 void skipSpaces(const QString& exp, int& position) {
     while(position < exp.count() && exp.at(position) == ' ') {
@@ -183,6 +184,7 @@ bool parsePlainValue(const QString& exp,
                      int& position,
                      qreal& value,
                      QString& parsed) {
+    if(position >= exp.count()) return false;
     parsed.clear();
     int newPosition = position;
 
@@ -317,6 +319,7 @@ QSharedPointer<ExpressionValue> ExpressionParser::parse(
     qreal value;
     QSharedPointer<ExpressionValue> opValue1;
     QSharedPointer<ExpressionValue> opValue2;
+    bool negate = false;
 
     const auto setValue = [&opValue1, &opValue2](
             const QSharedPointer<ExpressionValue>& value) {
@@ -327,34 +330,58 @@ QSharedPointer<ExpressionValue> ExpressionParser::parse(
     for(int i = 0; i < exp.count();) {
         Operator operTmp;
         skipSpaces(exp, i);
+        if(i >= exp.count()) break;
         QSharedPointer<ExpressionValue> lastValue;
         if(parseBrackets(exp, i, parsed)) {
             lastValue = parse(parsed, parent);
         } else if(parsePlainValue(exp, i, value, parsed)) {
             lastValue = ExpressionPlainValue::sCreate(parsed, value);
         } else if(parseOperator(exp, i, operTmp)) {
-            if(oper != Operator::notOperator)
-                RuntimeThrow("Two operators in row " + exp.mid(i));
-            oper = operTmp;
+            bool negator = false;
+            if(!opValue1) {
+                if(operTmp == Operator::subtract) {
+                    negator = true;
+                } else RuntimeThrow("Missing value before operator");
+            } else if(oper != Operator::notOperator) {
+                if(operTmp == Operator::subtract) {
+                    negator = true;
+                } else RuntimeThrow("Two operators in row " + exp.mid(i));
+            }
+            if(negator) negate = !negate;
+            else oper = operTmp;
             continue;
         } else if(parseFunction(exp, i, func)) {
             lastValue = createFunction(exp, parent, i, func);
         } else if(parseSpecial(exp, i, spec)) {
-            switch(spec) {
-            case Special::value:
-                lastValue = ExpressionSourceValue::sCreate(parent);
-                break;
-            case Special::frame:
-                lastValue = ExpressionSourceFrame::sCreate(parent);
-                break;
+            if(parent) {
+                switch(spec) {
+                case Special::value:
+                    lastValue = ExpressionSourceValue::sCreate(parent);
+                    break;
+                case Special::frame:
+                    lastValue = ExpressionSourceFrame::sCreate(parent);
+                    break;
+                }
+            } else {
+                lastValue = ExpressionPlainValue::sCreate(1);
             }
         } else if(parseExpression(exp, i, parsed)) {
-            lastValue = ExpressionSource::sCreate(parsed, parent);
+            if(parent) {
+                lastValue = ExpressionSource::sCreate(parsed, parent);
+            } else {
+                lastValue = ExpressionPlainValue::sCreate(1);
+            }
         } else {
             if(exp.at(i) == ')') RuntimeThrow("Unexpected closing bracket.");
             RuntimeThrow("Invalid expression " + exp.mid(i));
         }
-        if(lastValue) setValue(lastValue);
+        if(lastValue) {
+            if(negate) {
+                lastValue = ExpressionNegateFunction::sCreate(lastValue);
+                negate = false;
+            }
+            setValue(lastValue);
+        }
         if(oper == Operator::notOperator && opValue1 && opValue2)
             oper = Operator::multiply;
         if(oper != Operator::notOperator) {

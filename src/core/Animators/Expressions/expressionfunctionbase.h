@@ -40,6 +40,7 @@ public:
 protected:
     qreal innerValue(const qreal relFrame) const
     { return mValue->value(relFrame); }
+    QString innerString() const { return mValue->toString(); }
 private:
     const QString mName;
     sptr mValue;

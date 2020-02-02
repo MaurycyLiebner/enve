@@ -54,7 +54,7 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(QString name,
 
 }
 
-void QrealAnimatorValueSlider::emitEditingStarted(qreal value) {
+void QrealAnimatorValueSlider::emitEditingStarted(const qreal value) {
     if(mTarget) {
         mTarget->prp_startTransform();
     }
@@ -83,10 +83,11 @@ QrealAnimator* QrealAnimatorValueSlider::getQPointFAnimatorSibling() {
 void QrealAnimatorValueSlider::mouseMoveEvent(QMouseEvent *event) {
     if(event->modifiers() & Qt::ShiftModifier) {
         const auto other = getQPointFAnimatorSibling();
-        if(!other) return;
-        if(!mMouseMoved) other->prp_startTransform();
-        const qreal dValue = (event->x() - mPressX)*0.1*mPrefferedValueStep;
-        other->incCurrentBaseValue(dValue);
+        if(other) {
+            if(!mMouseMoved) other->prp_startTransform();
+            const qreal dValue = (event->x() - mLastX)*0.1*mPrefferedValueStep;
+            other->incCurrentBaseValue(dValue);
+        }
     }
     QDoubleSlider::mouseMoveEvent(event);
 }
@@ -113,14 +114,14 @@ bool QrealAnimatorValueSlider::eventFilter(QObject *obj, QEvent *event) {
     return QDoubleSlider::eventFilter(obj, event);
 }
 
-void QrealAnimatorValueSlider::emitValueChanged(qreal value) {
+void QrealAnimatorValueSlider::emitValueChanged(const qreal value) {
     if(mTarget) {
         if(mTarget->SWT_isQrealAnimator()) {
             const auto da = static_cast<QrealAnimator*>(*mTarget);
             da->setCurrentBaseValue(value);
         }
     }
-    QDoubleSlider::emitValueChanged(value);
+    emit valueChanged(value);
 }
 
 void QrealAnimatorValueSlider::setValueExternal(qreal value) {
@@ -132,7 +133,7 @@ void QrealAnimatorValueSlider::setValueExternal(qreal value) {
     }
 }
 
-void QrealAnimatorValueSlider::emitEditingFinished(qreal value) {
+void QrealAnimatorValueSlider::emitEditingFinished(const qreal value) {
     if(mTarget) {
         mTarget->prp_finishTransform();
         const auto other = getQPointFAnimatorSibling();

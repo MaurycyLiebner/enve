@@ -47,14 +47,14 @@ public:
 
     void setValueExternal(qreal value);
 
-    void emitEditingStarted(qreal value);
+    void emitEditingStarted(const qreal value);
     void emitValueChangedExternal(qreal value);
-    void emitEditingFinished(qreal value);
+    void emitEditingFinished(const qreal value);
     void emitEditingCanceled();
 
     void setValueFromAnimator(qreal val);
 protected:
-    void emitValueChanged(qreal value);
+    void emitValueChanged(const qreal value);
     void mouseMoveEvent(QMouseEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
 private:

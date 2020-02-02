@@ -101,7 +101,6 @@ void ExpressionDialog::apply() {
             mTarget->clearExpression();
             RuntimeThrow("Invalid expression.");
         } else {
-            expr->setRelFrame(0);
             mTarget->setExpression(expr);
         }
         Document::sInstance->actionFinished();
