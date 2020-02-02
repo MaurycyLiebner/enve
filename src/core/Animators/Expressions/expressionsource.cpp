@@ -52,6 +52,13 @@ FrameRange ExpressionSource::identicalRange(const qreal relFrame) const {
     return parentRelRange;
 }
 
+bool ExpressionSource::dependsOn(QrealAnimator * const source) const {
+    const auto thisSource = this->source();
+    if(!thisSource) return false;
+    return source == thisSource ||
+           thisSource->expressionDependsOn(source);
+}
+
 void ExpressionSource::setPath(const QString &path) {
     mPath = path;
     lookForSource();
@@ -65,6 +72,10 @@ void ExpressionSource::lookForSource() {
         const auto objs = mPath.split('.');
         const auto found = searchCtxt->ca_findPropertyWithPathRec(0, objs);
         if(found != prnt) newSource = qobject_cast<QrealAnimator*>(found);
+    }
+    if(newSource && (newSource == prnt ||
+       newSource->expressionDependsOn(prnt))) {
+        newSource = nullptr;
     }
     auto& conn = setSource(newSource);
     if(newSource) {

@@ -34,6 +34,9 @@ public:
     { return mValue->identicalRange(relFrame); }
     QString toString() const override
     { return mName + "( " + mValue->toString() + " )"; }
+
+    bool dependsOn(QrealAnimator* const source) const override
+    { return mValue->dependsOn(source); }
 protected:
     qreal innerValue(const qreal relFrame) const
     { return mValue->value(relFrame); }

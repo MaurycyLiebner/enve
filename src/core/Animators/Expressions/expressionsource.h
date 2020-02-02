@@ -29,6 +29,8 @@ public:
     QString toString() const override
     { return mPath; }
 
+    bool dependsOn(QrealAnimator* const source) const override;
+
     void setPath(const QString& path);
 private:
     void lookForSource();

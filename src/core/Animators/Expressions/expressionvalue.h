@@ -22,6 +22,8 @@
 #include "framerange.h"
 #include "simplemath.h"
 
+class QrealAnimator;
+
 class ExpressionValue : public QObject {
     Q_OBJECT
 public:
@@ -33,6 +35,9 @@ public:
     virtual void collapse() = 0;
     virtual FrameRange identicalRange(const qreal relFrame) const = 0;
     virtual QString toString() const = 0;
+
+    virtual bool dependsOn(QrealAnimator* const source) const
+    { Q_UNUSED(source) return false; }
 
     virtual bool setRelFrame(const qreal relFrame);
 

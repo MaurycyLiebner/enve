@@ -187,6 +187,11 @@ qreal QrealAnimator::getBaseValueAtAbsFrame(const qreal frame) const {
     return getBaseValue(prp_absFrameToRelFrameF(frame));
 }
 
+bool QrealAnimator::expressionDependsOn(QrealAnimator * const source) const {
+    if(!mExpression) return false;
+    return mExpression->dependsOn(source);
+}
+
 bool QrealAnimator::hasValidExpression() const {
     return mExpression ? mExpression->isValid() : false;
 }

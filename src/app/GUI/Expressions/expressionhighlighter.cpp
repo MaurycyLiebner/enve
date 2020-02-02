@@ -165,7 +165,17 @@ void ExpressionHighlighter::highlightBlock(const QString &text) {
                 objCompletSetup = true;
             }
 
-            if(!obj || obj == mTarget) {
+            bool error = !obj;
+            if(!error) {
+                const bool isQra = obj->SWT_isQrealAnimator();
+                error = obj == mTarget ||
+                        (!isQra && !obj->SWT_isComplexAnimator());
+                if(!error && isQra) {
+                    const auto qra = static_cast<QrealAnimator*>(obj);
+                    error = qra->expressionDependsOn(mTarget);
+                }
+            }
+            if(error) {
                 const int len = match.capturedEnd() - min;
                 setFormat(min, len, mErrorFormat);
                 break;

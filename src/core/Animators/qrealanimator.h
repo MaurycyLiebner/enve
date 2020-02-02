@@ -130,6 +130,7 @@ public:
         return anim;
     }
 
+    bool expressionDependsOn(QrealAnimator* const source) const;
     bool hasValidExpression() const;
     bool hasExpression() const { return mExpression; }
     void clearExpression() { setExpression(nullptr); }

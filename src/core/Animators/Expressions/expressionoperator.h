@@ -38,6 +38,9 @@ public:
     FrameRange identicalRange(const qreal relFrame) const override;
     bool setRelFrame(const qreal relFrame) override;
     QString toString() const override;
+
+    bool dependsOn(QrealAnimator* const source) const override
+    { return mValue1->dependsOn(source) || mValue2->dependsOn(source); }
 private:
     qreal value1(const qreal relFrame) const
     { return mValue1->value(relFrame); }
