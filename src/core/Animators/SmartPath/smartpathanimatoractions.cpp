@@ -19,6 +19,8 @@
 void SmartPathAnimator::actionRemoveNode(const int nodeId, const bool approx) {
     prp_pushUndoRedoName("Remove Node");
 
+    prp_startTransform();
+
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
         const auto spKey = static_cast<SmartPathKey*>(key);
@@ -26,7 +28,6 @@ void SmartPathAnimator::actionRemoveNode(const int nodeId, const bool approx) {
         spKey->getValue().actionRemoveNode(nodeId, approx);
         key->finishValueTransform();
     }
-    prp_startTransform();
     mBaseValue.actionRemoveNode(nodeId, approx);
     prp_finishTransform();
 
@@ -45,6 +46,8 @@ int SmartPathAnimator::actionAddNewAtStart(const NormalNodeData &data) {
 
     prp_pushUndoRedoName("Add New Node");
 
+    prp_startTransform();
+
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
         const auto spKey = static_cast<SmartPathKey*>(key);
@@ -53,7 +56,6 @@ int SmartPathAnimator::actionAddNewAtStart(const NormalNodeData &data) {
         spKey->finishValueTransform();
     }
 
-    prp_startTransform();
     const int id = mBaseValue.actionPrependNode();
     getCurrentlyEditedPath()->actionSetNormalNodeValues(id, data);
     prp_finishTransform();
@@ -71,6 +73,8 @@ int SmartPathAnimator::actionAddNewAtEnd(const NormalNodeData &data) {
     if(mBaseValue.getNodeCount() == 0) return actionAddFirstNode(data);
     prp_pushUndoRedoName("Add New Node");
 
+    prp_startTransform();
+
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
         const auto spKey = static_cast<SmartPathKey*>(key);
@@ -79,7 +83,6 @@ int SmartPathAnimator::actionAddNewAtEnd(const NormalNodeData &data) {
         spKey->finishValueTransform();
     }
 
-    prp_startTransform();
     const int id = mBaseValue.actionAppendNodeAtEndNode();
     getCurrentlyEditedPath()->actionSetNormalNodeValues(id, data);
     prp_finishTransform();
@@ -92,6 +95,7 @@ int SmartPathAnimator::actionInsertNodeBetween(
         const int node1Id, const int node2Id, const qreal t) {
     prp_pushUndoRedoName("Add New Node");
 
+    prp_startTransform();
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
         const auto spKey = static_cast<SmartPathKey*>(key);
@@ -100,7 +104,6 @@ int SmartPathAnimator::actionInsertNodeBetween(
         spKey->finishValueTransform();
     }
 
-    prp_startTransform();
     const auto curr = getCurrentlyEditedPath();
     if(curr->getNodePtr(node1Id)->getCtrlsMode() == CtrlsMode::symmetric) {
         curr->actionSetNormalNodeCtrlsMode(node1Id, CtrlsMode::smooth);
@@ -120,6 +123,7 @@ void SmartPathAnimator::actionConnectNodes(
         const int node1Id, const int node2Id) {
     prp_pushUndoRedoName("Connect Nodes");
 
+    prp_startTransform();
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
         const auto spKey = static_cast<SmartPathKey*>(key);
@@ -128,7 +132,6 @@ void SmartPathAnimator::actionConnectNodes(
         spKey->finishValueTransform();
     }
 
-    prp_startTransform();
     mBaseValue.actionConnectNodes(node1Id, node2Id);
     prp_finishTransform();
 
@@ -138,6 +141,7 @@ void SmartPathAnimator::actionConnectNodes(
 void SmartPathAnimator::actionMergeNodes(const int node1Id, const int node2Id) {
     prp_pushUndoRedoName("Merge Nodes");
 
+    prp_startTransform();
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
         const auto spKey = static_cast<SmartPathKey*>(key);
@@ -146,7 +150,6 @@ void SmartPathAnimator::actionMergeNodes(const int node1Id, const int node2Id) {
         spKey->finishValueTransform();
     }
 
-    prp_startTransform();
     mBaseValue.actionMergeNodes(node1Id, node2Id);
     prp_finishTransform();
 
@@ -171,6 +174,7 @@ void SmartPathAnimator::actionDisconnectNodes(const int node1Id,
                                               const int node2Id) {
     prp_pushUndoRedoName("Disconnect Nodes");
 
+    prp_startTransform();
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
         const auto spKey = static_cast<SmartPathKey*>(key);
@@ -180,7 +184,6 @@ void SmartPathAnimator::actionDisconnectNodes(const int node1Id,
         key->finishValueTransform();
     }
 
-    prp_startTransform();
     mBaseValue.actionDisconnectNodes(node1Id, node2Id);
     prp_finishTransform();
 
@@ -199,6 +202,8 @@ void SmartPathAnimator::actionReverseCurrent() {
 void SmartPathAnimator::actionReverseAll() {
     prp_pushUndoRedoName("Reverse Nodes");
 
+    prp_startTransform();
+
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
         const auto spKey = static_cast<SmartPathKey*>(key);
@@ -207,7 +212,6 @@ void SmartPathAnimator::actionReverseAll() {
         key->finishValueTransform();
     }
 
-    prp_startTransform();
     mBaseValue.actionReversePath();
     prp_finishTransform();
 
@@ -216,6 +220,8 @@ void SmartPathAnimator::actionReverseAll() {
 
 void SmartPathAnimator::actionAppendMoveAllFrom(SmartPathAnimator * const other) {
     prp_pushUndoRedoName("Connect Paths");
+
+    prp_startTransform();
 
     anim_coordinateKeysWith(other);
     const auto& keys = anim_getKeys();
@@ -229,7 +235,6 @@ void SmartPathAnimator::actionAppendMoveAllFrom(SmartPathAnimator * const other)
         thisKey->finishValueTransform();
     }
 
-    prp_startTransform();
     mBaseValue.actionAppendMoveAllFrom(std::move(other->getBaseValue()));
     prp_finishTransform();
 
@@ -239,6 +244,8 @@ void SmartPathAnimator::actionAppendMoveAllFrom(SmartPathAnimator * const other)
 
 void SmartPathAnimator::actionPrependMoveAllFrom(SmartPathAnimator * const other) {
     prp_pushUndoRedoName("Connect Paths");
+
+    prp_startTransform();
 
     anim_coordinateKeysWith(other);
     const auto& keys = anim_getKeys();
@@ -251,7 +258,6 @@ void SmartPathAnimator::actionPrependMoveAllFrom(SmartPathAnimator * const other
         thisKey->finishValueTransform();
     }
 
-    prp_startTransform();
     mBaseValue.actionPrependMoveAllFrom(std::move(other->getBaseValue()));
     prp_finishTransform();
 
@@ -267,6 +273,8 @@ int SmartPathAnimator::actionAddFirstNode(const QPointF &relPos) {
 int SmartPathAnimator::actionAddFirstNode(const NormalNodeData &data) {
     prp_pushUndoRedoName("Add New Node");
 
+    prp_startTransform();
+
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
         const auto spKey = static_cast<SmartPathKey*>(key);
@@ -275,7 +283,6 @@ int SmartPathAnimator::actionAddFirstNode(const NormalNodeData &data) {
         key->finishValueTransform();
     }
 
-    prp_startTransform();
     const int id = mBaseValue.actionAddFirstNode(data);
     prp_finishTransform();
 
