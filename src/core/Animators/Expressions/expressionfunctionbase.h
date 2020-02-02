@@ -33,7 +33,7 @@ public:
     FrameRange identicalRange(const qreal relFrame) const override
     { return mValue->identicalRange(relFrame); }
     QString toString() const override
-    { return mName + "( " + mValue->toString() + " )"; }
+    { return mName + "(" + mValue->toString() + ")"; }
 
     bool dependsOn(QrealAnimator* const source) const override
     { return mValue->dependsOn(source); }

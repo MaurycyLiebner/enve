@@ -310,8 +310,11 @@ QSharedPointer<ExpressionValue> createFunction(
     return ExpressionFunction::sCreate(name, func, inner);
 }
 
-QSharedPointer<ExpressionValue> ExpressionParser::parse(
-        const QString& exp, QrealAnimator* const parent) {
+QSharedPointer<ExpressionValue> parse(
+        const QString& exp,
+        int& i,
+        QrealAnimator* const parent,
+        const bool stopAtBreak) {
     QString parsed;
     Special spec;
     Operator oper = Operator::notOperator;
@@ -327,13 +330,13 @@ QSharedPointer<ExpressionValue> ExpressionParser::parse(
         else opValue1 = value;
     };
 
-    for(int i = 0; i < exp.count();) {
+    while(i < exp.count()) {
         Operator operTmp;
         skipSpaces(exp, i);
         if(i >= exp.count()) break;
         QSharedPointer<ExpressionValue> lastValue;
         if(parseBrackets(exp, i, parsed)) {
-            lastValue = parse(parsed, parent);
+            lastValue = ExpressionParser::parse(parsed, parent);
         } else if(parsePlainValue(exp, i, value, parsed)) {
             lastValue = ExpressionPlainValue::sCreate(parsed, value);
         } else if(parseOperator(exp, i, operTmp)) {
@@ -347,9 +350,25 @@ QSharedPointer<ExpressionValue> ExpressionParser::parse(
                     negator = true;
                 } else RuntimeThrow("Two operators in row " + exp.mid(i));
             }
-            if(negator) negate = !negate;
-            else oper = operTmp;
-            continue;
+            if(negator) {
+                negate = !negate;
+                continue;
+            } else {
+                oper = operTmp;
+                const bool addSub = oper == Operator::subtract ||
+                                    oper == Operator::add;
+                if(addSub) {
+                    if(stopAtBreak) {
+                        i--;
+                        return opValue1;
+                    } else {
+                        opValue2 = parse(exp, i, parent, true);
+                    }
+                } else {
+                    continue;
+                }
+            }
+
         } else if(parseFunction(exp, i, func)) {
             lastValue = createFunction(exp, parent, i, func);
         } else if(parseSpecial(exp, i, spec)) {
@@ -382,8 +401,9 @@ QSharedPointer<ExpressionValue> ExpressionParser::parse(
             }
             setValue(lastValue);
         }
-        if(oper == Operator::notOperator && opValue1 && opValue2)
+        if(oper == Operator::notOperator && opValue1 && opValue2) {
             oper = Operator::multiply;
+        }
         if(oper != Operator::notOperator) {
             opValue1 = createOperator(oper, opValue1, opValue2);
             opValue2.reset();
@@ -391,4 +411,10 @@ QSharedPointer<ExpressionValue> ExpressionParser::parse(
         }
     }
     return opValue1;
+}
+
+QSharedPointer<ExpressionValue> ExpressionParser::parse(
+        const QString& exp, QrealAnimator* const parent) {
+    int pos = 0;
+    return parse(exp, pos, parent, false);
 }
