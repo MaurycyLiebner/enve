@@ -14,23 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EXPRESSIONFUNCTION_H
-#define EXPRESSIONFUNCTION_H
-#include "expressionfunctionbase.h"
+#ifndef EXPRESSIONDIALOG_H
+#define EXPRESSIONDIALOG_H
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QLabel>
 
-class ExpressionFunction : public ExpressionFunctionBase {
+class QrealAnimator;
+class ExpressionEditor;
+
+class ExpressionDialog : public QDialog {
 public:
-    ExpressionFunction(const QString& name,
-                       const std::function<qreal(qreal)>& func,
-                       const sptr& value);
+    ExpressionDialog(QrealAnimator* const target,
+                     QWidget * const parent = nullptr);
 
-    static sptr sCreate(const QString& name,
-                        const std::function<qreal(qreal)>& func,
-                        const sptr& value);
-
-    qreal calculateValue(const qreal relFrame) const override;
 private:
-    const std::function<qreal(qreal)> mFunc;
+    void apply();
+
+    QrealAnimator* const mTarget;
+
+    ExpressionEditor* mLine;
+    QLabel* mErrorLabel;
 };
 
-#endif // EXPRESSIONFUNCTION_H
+#endif // EXPRESSIONDIALOG_H

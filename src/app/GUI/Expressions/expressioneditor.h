@@ -14,28 +14,35 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "expressionsourcevalue.h"
+#ifndef EXPRESSIONEDITOR_H
+#define EXPRESSIONEDITOR_H
+
+#include <QTextEdit>
+#include <QCompleter>
+
+#include <QStringListModel>
+#include <QAbstractItemView>
+
+#include "GUI/global.h"
 #include "Animators/qrealanimator.h"
 
-ExpressionSourceValue::ExpressionSourceValue(
-        QrealAnimator * const parent) :
-    ExpressionSourceBase(parent) {
-    setSource(parent);
-}
+class ExpressionEditor : public QTextEdit {
+public:
+    ExpressionEditor(QrealAnimator* const target,
+                     QWidget* const parent);
 
-ExpressionValue::sptr ExpressionSourceValue::sCreate(
-        QrealAnimator * const parent) {
-    return sptr(new ExpressionSourceValue(parent));
-}
+    ExpressionEditor(QrealAnimator* const target,
+                     const QString& text, QWidget* const parent);
 
-qreal ExpressionSourceValue::calculateValue(const qreal relFrame) const {
-    const auto src = source();
-    if(!src) return 1;
-    return src->getBaseValue(relFrame);
-}
+    void setCompleterList(const QStringList& values);
+protected:
+    void keyPressEvent(QKeyEvent *e) override;
+private:
+    void showCompleter();
+    void insertCompletion(const QString &completion);
+    QString textUnderCursor() const;
 
-FrameRange ExpressionSourceValue::identicalRange(const qreal relFrame) const {
-    const auto src = source();
-    if(!src) return FrameRange::EMINMAX;
-    return src->Animator::prp_getIdenticalRelRange(relFrame);
-}
+    QCompleter* mCompleter;
+};
+
+#endif // EXPRESSIONEDITOR_H

@@ -70,6 +70,9 @@ SOURCES += main.cpp\
     GUI/BrushWidgets/bookmarkedbrushes.cpp \
     GUI/BrushWidgets/brushlabel.cpp \
     GUI/ColorWidgets/bookmarkedcolors.cpp \
+    GUI/Expressions/expressiondialog.cpp \
+    GUI/Expressions/expressioneditor.cpp \
+    GUI/Expressions/expressionhighlighter.cpp \
     GUI/RenderWidgets/outputsettingsdialog.cpp \
     GUI/RenderWidgets/rendersettingsdialog.cpp \
     GUI/RenderWidgets/rendersettingsdisplaywidget.cpp \
@@ -89,7 +92,6 @@ SOURCES += main.cpp\
     GUI/envelicense.cpp \
     GUI/envesplash.cpp \
     GUI/ewidgetsimpl.cpp \
-    GUI/expressiondialog.cpp \
     GUI/layouthandler.cpp \
     GUI/scenechooser.cpp \
     GUI/switchbutton.cpp \
@@ -177,6 +179,9 @@ HEADERS  += \
     GUI/BrushWidgets/bookmarkedbrushes.h \
     GUI/BrushWidgets/brushlabel.h \
     GUI/ColorWidgets/bookmarkedcolors.h \
+    GUI/Expressions/expressiondialog.h \
+    GUI/Expressions/expressioneditor.h \
+    GUI/Expressions/expressionhighlighter.h \
     GUI/RenderWidgets/outputsettingsdialog.h \
     GUI/RenderWidgets/rendersettingsdialog.h \
     GUI/RenderWidgets/rendersettingsdisplaywidget.h \
@@ -195,7 +200,6 @@ HEADERS  += \
     GUI/envelicense.h \
     GUI/envesplash.h \
     GUI/ewidgetsimpl.h \
-    GUI/expressiondialog.h \
     GUI/layouthandler.h \
     GUI/scenechooser.h \
     GUI/switchbutton.h \
