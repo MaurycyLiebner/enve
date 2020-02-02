@@ -23,7 +23,7 @@
 #include "matrixdecomposition.h"
 
 BasicTransformAnimator::BasicTransformAnimator() :
-    StaticComplexAnimator("transformation") {
+    StaticComplexAnimator("transform") {
     mPosAnimator = enve::make_shared<QPointFAnimator>("pos");
     mPosAnimator->setBaseValue(QPointF(0, 0));
 
