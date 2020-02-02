@@ -29,8 +29,8 @@
 
 ContainerBox::ContainerBox(const eBoxType type) :
     BoxWithPathEffects(type) {
-    if(type == eBoxType::group) prp_setName("Group");
-    else if(type == eBoxType::layer) prp_setName("Layer");
+    if(type == eBoxType::group) rename("Group");
+    else if(type == eBoxType::layer) rename("Layer");
     connect(mRasterEffectsAnimators.get(),
             &RasterEffectCollection::forcedMarginChanged,
             this, &ContainerBox::forcedMarginMeaningfulChange);
@@ -250,7 +250,7 @@ void ContainerBox::promoteToLayer() {
     if(prp_getName().contains("Group")) {
         auto newName  = prp_getName();
         newName.replace("Group", "Layer");
-        prp_setName(newName);
+        rename(newName);
     }
     mRasterEffectsAnimators->SWT_enable();
     prp_afterWholeInfluenceRangeChanged();
@@ -275,7 +275,7 @@ void ContainerBox::demoteToGroup() {
     if(prp_getName().contains("Layer")) {
         auto newName  = prp_getName();
         newName.replace("Layer", "Group");
-        prp_setName(newName);
+        rename(newName);
     }
     mRasterEffectsAnimators->SWT_disable();
     prp_afterWholeInfluenceRangeChanged();
@@ -309,6 +309,100 @@ void ContainerBox::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
         child->prp_setInheritedFrameShift(thisShift, this);
 }
 
+QString stringScrapEndDigits(const QString& string) {
+    const QRegExp endNumbers(QStringLiteral("[0-9]+\\b"));
+    const int endNumbersIndex = endNumbers.indexIn(string);
+    QString trimmedName;
+    if(endNumbersIndex >= 0) {
+        return string.mid(0, endNumbersIndex);
+    } else {
+        return string;
+    }
+}
+
+QString ContainerBox::makeNameUniqueForDescendants(const QString &name) {
+    const QString trimmedName = stringScrapEndDigits(name).trimmed();
+    const QStringList usedList = allDescendantsNamesStartingWith(trimmedName);
+    for(int i = 0;; i++) {
+        const QString suffix = i == 0 ? "" : + " " + QString::number(i);
+        const QString testName = trimmedName + suffix;
+        const bool taken = usedList.contains(testName);
+        if(!taken) return testName;
+    }
+}
+
+QString ContainerBox::makeNameUniqueForContained(const QString &name) {
+    const QString trimmedName = stringScrapEndDigits(name).trimmed();
+    const QStringList usedList = allContainedNamesStartingWith(trimmedName);
+    for(int i = 0;; i++) {
+        const QString suffix = i == 0 ? "" : + " " + QString::number(i);
+        const QString testName = trimmedName + suffix;
+        const bool taken = usedList.contains(testName);
+        if(!taken) return testName;
+    }
+}
+
+eBoxOrSound *ContainerBox::firstDescendantWithName(const QString &name) {
+    for(const auto &child : mContained) {
+        const bool nameMatch = child->prp_getName() == name;
+        if(nameMatch) return child.get();
+        if(child->SWT_isContainerBox()) {
+            const auto cont = static_cast<ContainerBox*>(child.get());
+            const auto matched = cont->firstDescendantWithName(name);
+            if(matched) return matched;
+        }
+    }
+    return nullptr;
+}
+
+eBoxOrSound *ContainerBox::firstContainedWithName(const QString& name) {
+    for(const auto &child : mContained) {
+        const bool nameMatch = child->prp_getName() == name;
+        if(nameMatch) return child.get();
+    }
+    return nullptr;
+}
+
+QStringList ContainerBox::allDescendantsNamesStartingWith(const QString &text) {
+    QStringList result;
+    QList<eBoxOrSound*> matches;
+    allDescendantsStartingWith(text, matches);
+    for(const auto match : matches) {
+        result << match->prp_getName();
+    }
+    return result;
+}
+
+QStringList ContainerBox::allContainedNamesStartingWith(const QString &text) {
+    QStringList result;
+    QList<eBoxOrSound*> matches;
+    allContainedStartingWith(text, matches);
+    for(const auto match : matches) {
+        result << match->prp_getName();
+    }
+    return result;
+}
+
+void ContainerBox::allDescendantsStartingWith(
+        const QString &text, QList<eBoxOrSound*> &result) {
+    for(const auto &child : mContained) {
+        const bool nameMatch = child->prp_getName().startsWith(text);
+        if(nameMatch) result << child.get();
+        if(child->SWT_isContainerBox()) {
+            const auto cont = static_cast<ContainerBox*>(child.get());
+            cont->allDescendantsStartingWith(text, result);
+        }
+    }
+}
+
+void ContainerBox::allContainedStartingWith(
+        const QString &text, QList<eBoxOrSound*> &result) {
+    for(const auto &child : mContained) {
+        const bool nameMatch = child->prp_getName().startsWith(text);
+        if(nameMatch) result << child.get();
+    }
+}
+
 Property* ContainerBox::ca_findPropertyWithPath(
         const int id, const QStringList& path,
         QStringList* const completions) const {
@@ -317,10 +411,10 @@ Property* ContainerBox::ca_findPropertyWithPath(
     if(found && !completions) return found;
     const bool isLast = id == path.count() - 1;
     const auto& name = path.at(id);
-    for(const auto &child : mContainedBoxes) {
+    for(const auto &child : mContained) {
         const auto childName = child->prp_getName();
         if(childName == name) {
-            if(isLast) return child;
+            if(isLast) return child.get();
             const auto iFound = child->ca_findPropertyWithPath(
                         id + 1, path, completions);
             if(iFound && !found) {
@@ -696,13 +790,23 @@ void ContainerBox::addContained(const qsptr<eBoxOrSound>& child) {
 }
 
 #include "Sound/esoundlink.h"
-void ContainerBox::insertContained(const int id, const qsptr<eBoxOrSound>& child) {
+void ContainerBox::insertContained(
+        const int id, const qsptr<eBoxOrSound>& child) {
     if(child->getParentGroup() == this) {
         const int cId = mContained.indexOf(child);
         moveContainedInList(child.get(), cId, (cId < id ? id - 1 : id));
         return;
     }
     child->removeFromParent_k();
+
+    {
+        const QString oldName = child->prp_getName();
+        const auto parentScene = getParentScene();
+        const auto nameCtxt = parentScene ? parentScene : this;
+        const QString newName = nameCtxt->makeNameUniqueForDescendants(oldName);
+        child->prp_setName(newName);
+    }
+
     auto& connCtx = mContained.insertObj(id, child);
     updateContainedBoxes();
     child->setParentGroup(this);

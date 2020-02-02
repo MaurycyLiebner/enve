@@ -164,7 +164,7 @@ qreal CanvasSettingsDialog::getFps() const {
 
 void CanvasSettingsDialog::applySettingsToCanvas(Canvas * const canvas) const {
     if(!canvas) return;
-    canvas->prp_setName(getCanvasName());
+    canvas->setName(getCanvasName());
     canvas->setCanvasSize(getCanvasWidth(), getCanvasHeight());
     canvas->setFps(getFps());
     canvas->setFrameRange(getFrameRange());
@@ -183,6 +183,7 @@ void CanvasSettingsDialog::sNewCanvasDialog(Document& document,
     const auto docPtr = &document;
     connect(dialog, &QDialog::accepted, dialog, [dialog, docPtr]() {
         const auto newCanvas = docPtr->createNewScene();
+        const auto block = newCanvas->blockUndoRedo();
         dialog->applySettingsToCanvas(newCanvas);
         dialog->close();
         docPtr->actionFinished();

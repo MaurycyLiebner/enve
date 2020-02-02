@@ -174,6 +174,20 @@ public:
     int getContainedBoxesCount() const;
     void removeAllContained();
 
+    QString makeNameUniqueForDescendants(const QString& name);
+    QString makeNameUniqueForContained(const QString& name);
+
+    eBoxOrSound* firstDescendantWithName(const QString& name);
+    eBoxOrSound* firstContainedWithName(const QString &name);
+
+    QStringList allDescendantsNamesStartingWith(const QString& text);
+    QStringList allContainedNamesStartingWith(const QString& text);
+
+    void allDescendantsStartingWith(
+            const QString& text, QList<eBoxOrSound*> &result);
+    void allContainedStartingWith(
+            const QString& text, QList<eBoxOrSound*> &result);
+
     void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
 private:
     void updateAllChildPaths(const UpdateReason reason,

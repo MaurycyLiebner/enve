@@ -112,9 +112,14 @@ public:
 private:
     void rename(const int id, const QString& newName) {
         auto& layout = mLayouts[uint(id)];
+        const auto scene = layout->fScene;
+        if(scene) {
+            const bool valid = Property::prp_sValidateName(newName);
+            if(!valid) return;
+            scene->setName(newName);
+        }
         layout->fName = newName;
         mComboBox->setItemText(id, newName);
-        if(layout->fScene) layout->fScene->prp_setName(newName);
     }
 
     void renameCurrent(const QString& newName) {

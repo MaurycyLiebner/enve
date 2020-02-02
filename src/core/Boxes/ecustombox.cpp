@@ -18,7 +18,7 @@
 
 eCustomBox::eCustomBox(const QString& name) :
     BoundingBox(eBoxType::custom) {
-    prp_setName(name);
+    rename(name);
 }
 
 void eCustomBox::writeIdentifier(eWriteStream& dst) const {

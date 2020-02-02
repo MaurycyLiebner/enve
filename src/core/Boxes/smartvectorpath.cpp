@@ -31,7 +31,7 @@
 
 SmartVectorPath::SmartVectorPath() :
     PathBox(eBoxType::vectorPath) {
-    prp_setName("Path");
+    rename("Path");
     mPathAnimator = enve::make_shared<SmartPathCollection>();
     connect(mPathAnimator.get(), &Property::prp_currentFrameChanged,
             this, [this](const UpdateReason reason) {

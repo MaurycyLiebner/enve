@@ -28,7 +28,7 @@
 #include "pathboxrenderdata.h"
 
 TextBox::TextBox() : PathBox(eBoxType::text) {
-    prp_setName("text");
+    rename("text");
 
     mFillSettings->setPaintType(PaintType::FLATPAINT);
     mFillSettings->setCurrentColor(QColor(0, 0, 0));

@@ -156,6 +156,24 @@ qreal Property::prp_relFrameToAbsFrameF(const qreal relFrame) const {
     return relFrame + prp_getTotalFrameShift();
 }
 
+void Property::prp_setNameAction(const QString &newName) {
+    if(newName == prp_mName) return;
+    {
+        prp_pushUndoRedoName("Rename");
+        UndoRedo ur;
+        const auto oldValue = prp_mName;
+        const auto newValue = newName;
+        ur.fUndo = [this, oldValue]() {
+            prp_setName(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            prp_setName(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
+    prp_setName(newName);
+}
+
 void Property::prp_setName(const QString &newName) {
     if(newName == prp_mName) return;
     {
@@ -201,6 +219,19 @@ void Property::prp_setDrawingOnCanvasEnabled(const bool enabled) {
 void Property::prp_getFullPath(QStringList& names) const {
     if(mParent_k) mParent_k->prp_getFullPath(names);
     names.append(prp_getName());
+}
+
+QString Property::prp_sFixName(const QString &name) {
+    QString result = name.trimmed();
+
+    result.remove("[^a-zA-Z0-9 _]");
+    while(!result.isEmpty() &&
+          (result.front() == ' ' ||
+           result.front().isDigit())) {
+        result.remove(0, 1);
+    }
+    if(result.isEmpty()) return "Object";
+    return result;
 }
 
 bool Property::prp_sValidateName(const QString &name,

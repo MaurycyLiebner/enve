@@ -20,7 +20,7 @@
 
 ExternalLinkBox::ExternalLinkBox() : ContainerBox(eBoxType::layer) {
     mType = eBoxType::externalLink;
-    prp_setName("Link Empty");
+    rename("Link Empty");
 }
 
 void ExternalLinkBox::reload() {
@@ -37,6 +37,6 @@ void ExternalLinkBox::changeSrc() {
 
 void ExternalLinkBox::setSrc(const QString &src) {
     mSrc = src;
-    prp_setName("Link " + src);
+    rename("Link " + src);
     reload();
 }

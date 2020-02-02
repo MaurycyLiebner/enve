@@ -5,12 +5,15 @@
 #include <QLineEdit>
 
 class Property;
+class BoundingBox;
 
 class PropertyNameDialog : public QDialog {
 public:
     PropertyNameDialog(const QString& initialValue,
                        QWidget* const parent = nullptr);
 
+    static bool sRenameBox(BoundingBox * const box,
+                           QWidget * const parent);
     static bool sRenameProperty(Property* const prop,
                                 QWidget* const parent);
 

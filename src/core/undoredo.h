@@ -68,6 +68,8 @@ public:
 
     void setFrame(const int frame)
     { mCurrentAbsFrame = frame; }
+
+    void clear();
 signals:
     void canUndoChanged(bool canUndo);
     void canRedoChanged(bool canRedo);

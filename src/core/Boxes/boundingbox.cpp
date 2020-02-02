@@ -37,6 +37,7 @@
 #include "RasterEffects/rastereffectmenucreator.h"
 #include "matrixdecomposition.h"
 #include "paintsettingsapplier.h"
+#include "GUI/propertynamedialog.h"
 
 int BoundingBox::sNextDocumentId = 0;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
@@ -90,7 +91,7 @@ void BoundingBox::readBoundingBox(eReadStream& src) {
     eBoxOrSound::prp_readProperty(src);
     QString name;
     src >> name;
-    prp_setName(name);
+    rename(name);
     src >> mReadId;
     src.read(&mBlendMode, sizeof(SkBlendMode));
 
@@ -150,6 +151,22 @@ void BoundingBox::centerPivotPositionAction() {
 
 void BoundingBox::planCenterPivotPosition() {
     mCenterPivotPlanned = true;
+}
+
+void BoundingBox::rename(const QString &newName) {
+    if(newName == prp_getName()) return;
+    const auto fixedName = Property::prp_sFixName(newName);
+    const auto parentScene = getParentScene();
+    if(parentScene) {
+        const QString uniqueName = parentScene->
+                makeNameUniqueForDescendants(fixedName);
+        return prp_setNameAction(uniqueName);
+    }
+    prp_setNameAction(fixedName);
+}
+
+void BoundingBox::setName(const QString &newName) {
+    prp_setNameAction(newName);
 }
 
 void BoundingBox::updateIfUsesProgram(
@@ -852,11 +869,7 @@ QMatrix BoundingBox::getTotalTransformAtFrame(const qreal relFrame) {
 void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     const auto parentWidget = menu->getParentWidget();
     menu->addPlainAction("Rename", [this, parentWidget]() {
-        bool ok;
-        const QString text = QInputDialog::getText(parentWidget, tr("New name dialog"),
-                                                   tr("Name:"), QLineEdit::Normal,
-                                                   prp_getName(), &ok);
-        if(ok) prp_setName(text);
+        PropertyNameDialog::sRenameBox(this, parentWidget);
     });
 
     const PropertyMenu::CheckSelectedOp<BoundingBox> visRangeOp =

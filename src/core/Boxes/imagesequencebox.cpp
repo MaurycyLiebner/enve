@@ -38,7 +38,7 @@ ImageSequenceBox::ImageSequenceBox() :
                  [this](ConnContext& conn, ImageSequenceFileHandler* obj) {
                      fileHandlerConnector(conn, obj);
                  }) {
-    prp_setName("Image Sequence");
+    rename("Image Sequence");
 }
 
 void ImageSequenceBox::fileHandlerConnector(ConnContext &conn,

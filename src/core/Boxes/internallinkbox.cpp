@@ -37,7 +37,7 @@ void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
     auto& conn = mLinkTarget.assign(linkTarget);
     mBoxTarget->setTarget(linkTarget);
     if(linkTarget) {
-        prp_setName(linkTarget->prp_getName() + " link");
+        rename(linkTarget->prp_getName() + " link");
         linkTarget->addLinkingBox(this);
         conn << connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
                 this, [this, linkTarget](const FrameRange& range) {
@@ -52,7 +52,7 @@ void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
             mSound->setParentGroup(mParentGroup);
         }
     } else {
-        prp_setName("empty link");
+        rename("empty link");
     }
     planUpdate(UpdateReason::userChange);
 }

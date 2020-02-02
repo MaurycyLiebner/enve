@@ -23,7 +23,7 @@
 #include "PathEffects/patheffectcollection.h"
 
 Circle::Circle() : PathBox(eBoxType::circle) {
-    prp_setName("Circle");
+    rename("Circle");
 
     setPointsHandler(enve::make_shared<PointsHandler>());
 

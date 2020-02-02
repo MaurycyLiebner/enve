@@ -139,7 +139,7 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
     mBoxTarget->setTarget(linkTarget);
     auto& conn = mLinkTarget.assign(linkTarget);
     if(linkTarget) {
-        prp_setName(linkTarget->prp_getName() + " link");
+        rename(linkTarget->prp_getName() + " link");
         conn << connect(linkTarget, &Property::prp_nameChanged,
                        this, &Property::prp_setName);
         linkTarget->addLinkingBox(this);
@@ -169,7 +169,7 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
             }
         }
     } else {
-        prp_setName("empty link");
+        rename("empty link");
     }
     planUpdate(UpdateReason::userChange);
 }

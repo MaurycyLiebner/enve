@@ -1,7 +1,11 @@
 #include "propertynamedialog.h"
-#include "Properties/property.h"
+
 #include <QVBoxLayout>
 #include <QPushButton>
+
+#include "Properties/property.h"
+#include "Boxes/boundingbox.h"
+#include "canvas.h"
 
 PropertyNameDialog::PropertyNameDialog(
         const QString &initialValue,
@@ -37,12 +41,25 @@ PropertyNameDialog::PropertyNameDialog(
     validate();
 }
 
+bool PropertyNameDialog::sRenameBox(BoundingBox * const box,
+                                    QWidget * const parent) {
+    const auto dialog = new PropertyNameDialog(box->prp_getName(),
+                                               parent);
+    const auto result = dialog->exec() == QDialog::Accepted;
+    if(result) {
+        const QString inputName = dialog->name();
+        box->rename(inputName);
+    }
+    delete dialog;
+    return result;
+}
+
 bool PropertyNameDialog::sRenameProperty(Property * const prop,
                                          QWidget * const parent) {
     const auto dialog = new PropertyNameDialog(prop->prp_getName(),
                                                parent);
     const auto result = dialog->exec() == QDialog::Accepted;
-    if(result) prop->prp_setName(dialog->name());
+    if(result) prop->prp_setNameAction(dialog->name());
     delete dialog;
     return result;
 }

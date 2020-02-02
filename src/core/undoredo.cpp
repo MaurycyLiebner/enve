@@ -159,6 +159,12 @@ UndoRedoStack::StackBlock UndoRedoStack::blockUndoRedo() {
     return StackBlock(this);
 }
 
+void UndoRedoStack::clear() {
+    mUndoStack.clear();
+    mRedoStack.clear();
+    checkUndoRedoChanged();
+}
+
 void UndoRedoStack::checkUndoRedoChanged() {
     checkCanUndoRedoChanged();
     checkUndoRedoTextChanged();

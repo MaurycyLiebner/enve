@@ -22,7 +22,7 @@
 #include "RasterEffects/rastereffectcollection.h"
 
 Rectangle::Rectangle() : PathBox(eBoxType::rectangle) {
-    prp_setName("Rectangle");
+    rename("Rectangle");
 
     setPointsHandler(enve::make_shared<PointsHandler>());
 

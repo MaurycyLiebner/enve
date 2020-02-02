@@ -28,7 +28,7 @@ AnimationBox::AnimationBox(const eBoxType type) : BoundingBox(type) {
     connect(this, &eBoxOrSound::parentChanged,
             this, &AnimationBox::updateDurationRectangleAnimationRange);
 
-    prp_setName("Animation");
+    rename("Animation");
 
     setDurationRectangle(enve::make_shared<FixedLenAnimationRect>(*this));
     mDurationRectangleLocked = true;

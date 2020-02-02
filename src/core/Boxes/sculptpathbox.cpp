@@ -22,7 +22,7 @@
 #include "Private/document.h"
 
 SculptPathBox::SculptPathBox() : BoundingBox(eBoxType::sculptPath) {
-    prp_setName("Sculpt Path");
+    rename("Sculpt Path");
     mBrushWidth = enve::make_shared<QrealAnimator>(1, 0, 999, 1, "width");
     mPath = enve::make_shared<SculptPathCollection>();
     mFillSettings = enve::make_shared<FillSettingsAnimator>(this);

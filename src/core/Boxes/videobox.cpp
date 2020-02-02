@@ -43,7 +43,7 @@ VideoBox::VideoBox() : AnimationBox(eBoxType::video),
                  [this](ConnContext& conn, VideoFileHandler* obj) {
                      fileHandlerConnector(conn, obj);
                  }) {
-    prp_setName("Video");
+    rename("Video");
     const auto flar = mDurationRectangle->ref<FixedLenAnimationRect>();
     mSound = enve::make_shared<SingleSound>(flar);
     ca_addChild(mSound);

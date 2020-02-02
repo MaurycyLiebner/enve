@@ -35,7 +35,7 @@ ImageBox::ImageBox() : BoundingBox(eBoxType::image),
                  [this](ConnContext& conn, ImageFileHandler* obj) {
                      fileHandlerConnector(conn, obj);
                  }) {
-    prp_setName("Image");
+    rename("Image");
 }
 
 ImageBox::ImageBox(const QString &filePath) : ImageBox() {
@@ -67,7 +67,7 @@ void ImageBox::readBoundingBox(eReadStream& src) {
 void ImageBox::setFilePath(const QString &path) {
     mFileHandler.assign(path);
 
-    prp_setName(path.split("/").last());
+    rename(path.split("/").last());
     prp_afterWholeInfluenceRangeChanged();
 }
 

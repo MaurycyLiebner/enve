@@ -20,7 +20,7 @@
 #include "Animators/transformanimator.h"
 
 PaintBox::PaintBox() : BoundingBox(eBoxType::paint) {
-    prp_setName("Paint Box");
+    rename("Paint Box");
     mSurface = enve::make_shared<AnimatedSurface>();
     ca_addChild(mSurface);
 }
