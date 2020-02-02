@@ -56,10 +56,10 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
             this, [this](const int state) {
         if(state) {
             connect(mLine, &ExpressionEditor::textChanged,
-                    this, &ExpressionDialog::apply);
+                    this, [this]() { apply(false); });
         } else {
             disconnect(mLine, &ExpressionEditor::textChanged,
-                       this, &ExpressionDialog::apply);
+                       this, nullptr);
         }
     });
 
@@ -82,28 +82,29 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
     statusBar->showMessage("Use Ctrl + Space for suggestions", 10000);
 
     connect(applyButton, &QPushButton::released,
-            this, &ExpressionDialog::apply);
+            this, [this]() { apply(true); });
     connect(okButton, &QPushButton::released,
-            this, &ExpressionDialog::apply);
+            this, [this]() { apply(true); });
     connect(okButton, &QPushButton::released,
             this, &ExpressionDialog::accept);
     connect(cancelButton, &QPushButton::released,
             this, &ExpressionDialog::reject);
 }
 
-void ExpressionDialog::apply() {
+void ExpressionDialog::apply(const bool action) {
     mErrorLabel->clear();
     ExpressionValue::sptr expr;
     const auto text = mLine->toPlainText();
     try {
         expr = ExpressionParser::parse(text, mTarget);
-        if(!expr || !expr->isValid()) {
-            mTarget->clearExpression();
-            RuntimeThrow("Invalid expression.");
+        if(expr && !expr->isValid()) expr = nullptr;
+        if(action) {
+            mTarget->setExpressionAction(expr);
         } else {
             mTarget->setExpression(expr);
         }
         Document::sInstance->actionFinished();
+        if(!expr) RuntimeThrow("Invalid expression.");
     } catch(const std::exception& e) {
         const QString error = e.what();
         const QString lastLine = error.split(QRegExp("\n|\r\n|\r")).last();

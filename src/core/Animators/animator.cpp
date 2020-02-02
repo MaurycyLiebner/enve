@@ -522,6 +522,9 @@ void Animator::prp_drawTimelineControls(
 
 #include "typemenu.h"
 void Animator::prp_setupTreeViewMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<Animator>()) return;
+    menu->addedActionsForType<Animator>();
+
     Property::prp_setupTreeViewMenu(menu);
     menu->addSeparator();
     const PropertyMenu::PlainSelectedOp<Animator> aOp =

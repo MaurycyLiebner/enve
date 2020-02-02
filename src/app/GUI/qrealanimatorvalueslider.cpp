@@ -252,7 +252,7 @@ void QrealAnimatorValueSlider::openContextMenu(
 
     const auto clearExpression = menu.addAction(
                 "Clear Expression", aTarget,
-                &QrealAnimator::clearExpression);
+                &QrealAnimator::clearExpressionAction);
     clearExpression->setEnabled(aTarget->hasExpression());
 
     menu.addSeparator();

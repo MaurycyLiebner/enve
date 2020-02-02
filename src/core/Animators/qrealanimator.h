@@ -133,9 +133,10 @@ public:
     bool expressionDependsOn(QrealAnimator* const source) const;
     bool hasValidExpression() const;
     bool hasExpression() const { return mExpression; }
-    void clearExpression() { setExpression(nullptr); }
+    void clearExpressionAction() { setExpressionAction(nullptr); }
     QString expressionText() const;
     void setExpression(const qsptr<ExpressionValue>& expression);
+    void setExpressionAction(const qsptr<ExpressionValue>& expression);
 private:
     qreal calculateBaseValueAtRelFrame(const qreal frame) const;
 

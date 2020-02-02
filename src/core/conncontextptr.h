@@ -73,6 +73,8 @@ public:
         mConnContext.clear();
         return mConnContext;
     }
+
+    const QSharedPointer<T>& sptr() const { return mPtr; }
 private:
     ConnContext mConnContext;
     QSharedPointer<T> mPtr;

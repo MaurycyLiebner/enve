@@ -200,6 +200,23 @@ QString QrealAnimator::expressionText() const {
     return mExpression ? mExpression->toString() : "";
 }
 
+void QrealAnimator::setExpressionAction(const qsptr<ExpressionValue> &expression) {
+    {
+        prp_pushUndoRedoName("Change Expression");
+        UndoRedo ur;
+        const auto oldValue = mExpression.sptr();
+        const auto newValue = expression;
+        ur.fUndo = [this, oldValue]() {
+            setExpression(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setExpression(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
+    setExpression(expression);
+}
+
 void QrealAnimator::setExpression(const qsptr<ExpressionValue> &expression) {
     auto& conn = mExpression.assign(expression);
     if(expression) {
