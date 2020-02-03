@@ -34,6 +34,9 @@ public:
     void prp_writeProperty(eWriteStream &dst) const override;
     void prp_readProperty(eReadStream& src) override;
 
+    void prp_afterChangedAbsRange(const FrameRange &range,
+                                  const bool clip) override;
+
     void anim_setAbsFrame(const int frame) override;
     stdsptr<Key> anim_createKey() override;
     void anim_addKeyAtRelFrame(const int relFrame) override;
@@ -59,6 +62,8 @@ private:
     void deepCopyValue(const qreal relFrame,
                        K * const prevKey, K * const nextKey,
                        K * const keyAtFrame, T &result) const;
+    void startBaseValueTransform();
+    void finishBaseValueTransform();
 
     bool mChanged = false;
     T mBaseValue;
@@ -67,11 +72,50 @@ private:
 };
 
 template <typename T, typename K>
+void InterOptimalAnimatorT<T, K>::prp_afterChangedAbsRange(
+        const FrameRange &range, const bool clip) {
+    if(!mChanged && range.inRange(anim_getCurrentAbsFrame()))
+        updateBaseValue();
+    GraphAnimator::prp_afterChangedAbsRange(range, clip);
+}
+
+template <typename T, typename K>
+void InterOptimalAnimatorT<T, K>::startBaseValueTransform() {
+    if(mChanged) return;
+    mSavedBaseValue = mBaseValue;
+    mChanged = true;
+}
+
+template <typename T, typename K>
+void InterOptimalAnimatorT<T, K>::finishBaseValueTransform() {
+    if(!mChanged) return;
+    mChanged = false;
+    {
+        const auto oldValue = mSavedBaseValue;
+        const auto newValue = mBaseValue;
+        UndoRedo ur;
+        ur.fUndo = [this, oldValue]() {
+            mBaseValue = oldValue;
+            prp_afterWholeInfluenceRangeChanged();
+        };
+        ur.fRedo = [this, newValue]() {
+            mBaseValue = newValue;
+            prp_afterWholeInfluenceRangeChanged();
+        };
+        prp_addUndoRedo(ur);
+    }
+}
+
+template <typename T, typename K>
 void InterOptimalAnimatorT<T, K>::anim_removeAllKeys() {
     if(!this->anim_hasKeys()) return;
+    startBaseValueTransform();
+
     const T currentValue = mBaseValue;
     Animator::anim_removeAllKeys();
+
     mBaseValue = currentValue;
+    finishBaseValueTransform();
 }
 
 template <typename T, typename K>
@@ -90,14 +134,14 @@ void InterOptimalAnimatorT<T, K>::graph_getValueConstraints(
 template <typename T, typename K>
 void InterOptimalAnimatorT<T, K>::prp_startTransform() {
     if(mChanged) return;
-    mChanged = true;
     if(anim_isRecording() && !anim_getKeyOnCurrentFrame()) {
         anim_saveCurrentValueAsKey();
     }
     if(const auto key = anim_getKeyOnCurrentFrame<K>()) {
+        mChanged = true;
         key->startValueTransform();
     } else {
-        mSavedBaseValue = mBaseValue;
+        startBaseValueTransform();
     }
 }
 
@@ -112,10 +156,8 @@ template <typename T, typename K>
 void InterOptimalAnimatorT<T, K>::prp_cancelTransform() {
     if(!mChanged) return;
     mChanged = false;
-
     if(const auto key = anim_getKeyOnCurrentFrame<K>()) {
         key->cancelValueTransform();
-        anim_updateAfterChangedKey(key);
     } else {
         mBaseValue = mSavedBaseValue;
         prp_afterWholeInfluenceRangeChanged();
@@ -125,24 +167,13 @@ void InterOptimalAnimatorT<T, K>::prp_cancelTransform() {
 template <typename T, typename K>
 void InterOptimalAnimatorT<T, K>::prp_finishTransform() {
     if(!mChanged) return;
-    mChanged = false;
     if(const auto key = anim_getKeyOnCurrentFrame<K>()) {
+        mChanged = false;
         key->finishValueTransform();
-        updateBaseValue();
     } else {
-        const auto oldValue = mSavedBaseValue;
-        const auto newValue = mBaseValue;
-        UndoRedo ur;
-        ur.fUndo = [this, oldValue]() {
-            mBaseValue = oldValue;
-            prp_afterWholeInfluenceRangeChanged();
-        };
-        ur.fRedo = [this, newValue]() {
-            mBaseValue = newValue;
-            prp_afterWholeInfluenceRangeChanged();
-        };
-        prp_addUndoRedo(ur);
+        finishBaseValueTransform();
     }
+    updateBaseValue();
 }
 
 template <typename T, typename K>

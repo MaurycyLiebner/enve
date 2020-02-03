@@ -59,6 +59,7 @@ public:
     void anim_addKeyAtRelFrame(const int relFrame);
     stdsptr<Key> anim_createKey();
     void anim_afterKeyOnCurrentFrameChanged(Key* const key);
+    void anim_removeAllKeys();
 
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType type,
@@ -132,6 +133,8 @@ signals:
 protected:
     SmartPath& getBaseValue()
     { return mBaseValue; }
+    void startBaseValueTransform();
+    void finishBaseValueTransform();
 private:
     int actionAddFirstNode(const QPointF &relPos);
     int actionAddFirstNode(const NormalNodeData &data);

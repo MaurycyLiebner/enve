@@ -139,6 +139,8 @@ public:
     void setExpressionAction(const qsptr<ExpressionValue>& expression);
 private:
     qreal calculateBaseValueAtRelFrame(const qreal frame) const;
+    void startBaseValueTransform();
+    void finishBaseValueTransform();
 
     bool mGraphMinMaxValuesFixed = false;
     bool mTransformed = false;

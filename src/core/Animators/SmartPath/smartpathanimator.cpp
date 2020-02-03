@@ -88,7 +88,9 @@ void SmartPathAnimator::prp_drawCanvasControls(
 
 void SmartPathAnimator::prp_afterChangedAbsRange(
         const FrameRange &range, const bool clip) {
-    if(range.inRange(anim_getCurrentAbsFrame())) updateBaseValue();
+    if(range.inRange(anim_getCurrentAbsFrame())) {
+        updateBaseValue();
+    }
     GraphAnimator::prp_afterChangedAbsRange(range, clip);
 }
 
@@ -138,6 +140,18 @@ void SmartPathAnimator::anim_afterKeyOnCurrentFrameChanged(Key * const key) {
     const auto spk = static_cast<SmartPathKey*>(key);
     if(spk) mPathBeingChanged_d = &spk->getValue();
     else mPathBeingChanged_d = &mBaseValue;
+}
+
+void SmartPathAnimator::anim_removeAllKeys() {
+    if(!this->anim_hasKeys()) return;
+    startBaseValueTransform();
+
+    const auto currentValue = mBaseValue;
+    Animator::anim_removeAllKeys();
+
+    mBaseValue = currentValue;
+    prp_afterWholeInfluenceRangeChanged();
+    finishBaseValueTransform();
 }
 
 void SmartPathAnimator::graph_getValueConstraints(
@@ -224,24 +238,34 @@ void SmartPathAnimator::prp_cancelTransform() {
     }
 }
 
-void SmartPathAnimator::prp_finishTransform() {
+void SmartPathAnimator::startBaseValueTransform() {
+    mBaseValue.save();
+}
+
+void SmartPathAnimator::finishBaseValueTransform() {
     if(!mPathChanged) return;
     mPathChanged = false;
+    const auto oldValue = mBaseValue.getSaved();
+    const auto newValue = mBaseValue.getNodesRef();
+    UndoRedo ur;
+    ur.fUndo = [this, oldValue]() {
+        mBaseValue = oldValue;
+        prp_afterWholeInfluenceRangeChanged();
+    };
+    ur.fRedo = [this, newValue]() {
+        mBaseValue = newValue;
+        prp_afterWholeInfluenceRangeChanged();
+    };
+    prp_addUndoRedo(ur);
+}
+
+void SmartPathAnimator::prp_finishTransform() {
+    if(!mPathChanged) return;
     if(const auto key = anim_getKeyOnCurrentFrame<SmartPathKey>()) {
+        mPathChanged = false;
         key->finishValueTransform();
     } else {
-        const auto oldValue = mBaseValue.getSaved();
-        const auto newValue = mBaseValue.getNodesRef();
-        UndoRedo ur;
-        ur.fUndo = [this, oldValue]() {
-            mBaseValue = oldValue;
-            prp_afterWholeInfluenceRangeChanged();
-        };
-        ur.fRedo = [this, newValue]() {
-            mBaseValue = newValue;
-            prp_afterWholeInfluenceRangeChanged();
-        };
-        prp_addUndoRedo(ur);
+        finishBaseValueTransform();
     }
 }
 

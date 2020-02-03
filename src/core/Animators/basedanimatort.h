@@ -83,6 +83,8 @@ public:
     { return mCurrentValue; }
 protected:
     void updateValueFromCurrentFrame();
+    void startBaseValueTransform();
+    void finishBaseValueTransform();
 
     T mCurrentValue;
 private:
@@ -91,41 +93,17 @@ private:
 };
 
 template<typename B, typename K, typename T>
-void BasedAnimatorT<B, K, T>::anim_removeAllKeys() {
-    if(!this->anim_hasKeys()) return;
-    const T currentValue = mCurrentValue;
-    Animator::anim_removeAllKeys();
-    setCurrentValue(currentValue);
-}
-
-template<typename B, typename K, typename T>
-void BasedAnimatorT<B, K, T>::prp_startTransform() {
+void BasedAnimatorT<B, K, T>::startBaseValueTransform() {
     if(mTransformed) return;
-    if(this->anim_isRecording() && !this->anim_getKeyOnCurrentFrame()) {
-        this->anim_saveCurrentValueAsKey();
-    }
-    if(const auto key = this->template anim_getKeyOnCurrentFrame<K>()) {
-        key->startValueTransform();
-    }
     mSavedCurrentValue = mCurrentValue;
     mTransformed = true;
 }
 
 template<typename B, typename K, typename T>
-void BasedAnimatorT<B, K, T>::prp_cancelTransform() {
+void BasedAnimatorT<B, K, T>::finishBaseValueTransform() {
     if(!mTransformed) return;
     mTransformed = false;
-    setCurrentValue(mSavedCurrentValue);
-}
-
-template<typename B, typename K, typename T>
-void BasedAnimatorT<B, K, T>::prp_finishTransform() {
-    if(!mTransformed) return;
-    mTransformed = false;
-
-    if(const auto key = this->template anim_getKeyOnCurrentFrame<K>()) {
-        key->finishValueTransform();
-    } else {
+    {
         UndoRedo ur;
         const T oldValue = mSavedCurrentValue;
         const T newValue = mCurrentValue;
@@ -136,6 +114,53 @@ void BasedAnimatorT<B, K, T>::prp_finishTransform() {
             setCurrentValue(newValue);
         };
         this->prp_addUndoRedo(ur);
+    }
+}
+
+template<typename B, typename K, typename T>
+void BasedAnimatorT<B, K, T>::anim_removeAllKeys() {
+    if(!this->anim_hasKeys()) return;
+    startBaseValueTransform();
+
+    const T currentValue = mCurrentValue;
+    Animator::anim_removeAllKeys();
+
+    setCurrentValue(currentValue);
+    finishBaseValueTransform();
+}
+
+template<typename B, typename K, typename T>
+void BasedAnimatorT<B, K, T>::prp_startTransform() {
+    if(mTransformed) return;
+    if(this->anim_isRecording() && !this->anim_getKeyOnCurrentFrame()) {
+        this->anim_saveCurrentValueAsKey();
+    }
+    if(const auto key = this->template anim_getKeyOnCurrentFrame<K>()) {
+        mTransformed = true;
+        key->startValueTransform();
+    } else startBaseValueTransform();
+}
+
+template<typename B, typename K, typename T>
+void BasedAnimatorT<B, K, T>::prp_cancelTransform() {
+    if(!mTransformed) return;
+    mTransformed = false;
+
+    if(const auto key = this->anim_getKeyOnCurrentFrame()) {
+        key->cancelValueTransform();
+    } else {
+        setCurrentValue(mSavedCurrentValue);
+    }
+}
+
+template<typename B, typename K, typename T>
+void BasedAnimatorT<B, K, T>::prp_finishTransform() {
+    if(const auto key = this->template anim_getKeyOnCurrentFrame<K>()) {
+        if(!mTransformed) return;
+        mTransformed = false;
+        key->finishValueTransform();
+    } else {
+        finishBaseValueTransform();
     }
 }
 

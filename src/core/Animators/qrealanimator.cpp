@@ -340,9 +340,13 @@ void QrealAnimator::anim_addKeyAtRelFrame(const int relFrame) {
 
 void QrealAnimator::anim_removeAllKeys() {
     if(!anim_hasKeys()) return;
+    startBaseValueTransform();
+
     const qreal currentValue = mCurrentBaseValue;
     Animator::anim_removeAllKeys();
+
     setCurrentBaseValue(currentValue);
+    finishBaseValueTransform();
 }
 
 QPainterPath QrealAnimator::graph_getPathForSegment(
@@ -461,18 +465,30 @@ void QrealAnimator::prp_startTransform() {
     if(const auto key = anim_getKeyOnCurrentFrame<QrealKey>()) {
         key->startValueTransform();
     }
-    mSavedCurrentValue = mCurrentBaseValue;
-    mTransformed = true;
+    startBaseValueTransform();
 }
 
 #include "canvas.h"
 void QrealAnimator::prp_finishTransform() {
-    if(!mTransformed) return;
-    mTransformed = false;
-
     if(const auto key = anim_getKeyOnCurrentFrame<QrealKey>()) {
+        if(!mTransformed) return;
+        mTransformed = false;
         key->finishValueTransform();
     } else {
+        finishBaseValueTransform();
+    }
+}
+
+void QrealAnimator::startBaseValueTransform() {
+    if(mTransformed) return;
+    mSavedCurrentValue = mCurrentBaseValue;
+    mTransformed = true;
+}
+
+void QrealAnimator::finishBaseValueTransform() {
+    if(!mTransformed) return;
+    mTransformed = false;
+    {
         UndoRedo ur;
         const qreal oldValue = mSavedCurrentValue;
         const qreal newValue = mCurrentBaseValue;
@@ -487,8 +503,12 @@ void QrealAnimator::prp_finishTransform() {
 }
 
 void QrealAnimator::prp_cancelTransform() {
-    if(mTransformed) {
-        mTransformed = false;
+    if(!mTransformed) return;
+    mTransformed = false;
+
+    if(const auto key = anim_getKeyOnCurrentFrame<QrealKey>()) {
+        key->cancelValueTransform();
+    } else {
         setCurrentBaseValue(mSavedCurrentValue);
     }
 }
