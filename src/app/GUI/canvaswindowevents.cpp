@@ -83,12 +83,14 @@ bool CanvasWindow::event(QEvent *e) {
 
 void CanvasWindow::hideEvent(QHideEvent *e) {
     GLWindow::hideEvent(e);
-    mDocument.removeVisibleScene(mCurrentCanvas);
+    if(mCurrentCanvas)
+        mDocument.removeVisibleScene(mCurrentCanvas);
 }
 
 void CanvasWindow::showEvent(QShowEvent *e) {
     GLWindow::showEvent(e);
-    mDocument.addVisibleScene(mCurrentCanvas);
+    if(mCurrentCanvas)
+        mDocument.addVisibleScene(mCurrentCanvas);
 }
 
 void CanvasWindow::resetTransormation() {
