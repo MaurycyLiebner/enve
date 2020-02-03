@@ -106,7 +106,7 @@ void QDoubleSlider::paint(QPainter * const p, const bool enabled) {
 }
 
 QString QDoubleSlider::valueToText(const qreal value) const {
-    return QLocale().toString(value, 'f', mDecimals);
+    return QString::number(value, 'f', mDecimals);
 }
 
 qreal QDoubleSlider::getDValueForMouseMove(const int mouseX) const {

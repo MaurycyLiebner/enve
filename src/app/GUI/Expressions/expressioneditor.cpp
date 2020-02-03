@@ -30,10 +30,8 @@ ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
     QTextEdit(parent) {
     setMinimumWidth(400);
     const auto doc = document();
-    doc->setMaximumBlockCount(1);
     setAcceptRichText(false);
     const auto highligter = new ExpressionHighlighter(target, this, doc);
-    setFixedHeight(13*MIN_WIDGET_DIM/10);
     connect(this, &QTextEdit::cursorPositionChanged,
             this, [this, highligter]() {
         const auto cursor = textCursor();
@@ -60,8 +58,9 @@ void ExpressionEditor::keyPressEvent(QKeyEvent *e) {
     const bool ctrlPressed = mods.testFlag(Qt::ControlModifier);
     const bool spacePressed = key == Qt::Key_Space;
     const bool isShortcut = ctrlPressed && spacePressed;
-    if(key == Qt::Key_Return ||
-            key == Qt::Key_Tab) {
+    const auto popup = mCompleter->popup();
+    const bool popupVisible = popup->isVisible();
+    if((key == Qt::Key_Return || key == Qt::Key_Tab) && popupVisible) {
         return QWidget::keyPressEvent(e);
     } else if(isShortcut) {
         showCompleter();

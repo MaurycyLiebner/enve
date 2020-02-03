@@ -20,7 +20,7 @@ ExpressionValue::ExpressionValue(const bool needsBrackets) :
     mNeedsBrackets(needsBrackets) {}
 
 bool ExpressionValue::setRelFrame(const qreal relFrame) {
-    setRelFrameValue(relFrame);
+    if(!setRelFrameValue(relFrame)) return false;
     return updateValue();
 }
 
@@ -36,5 +36,11 @@ bool ExpressionValue::updateValue() {
     if(isZero4Dec(mCurrentValue - newValue)) return false;
     mCurrentValue = newValue;
     emit currentValueChanged(mCurrentValue);
+    return true;
+}
+
+bool ExpressionValue::setRelFrameValue(const qreal relFrame) {
+    if(isZero4Dec(mRelFrame - relFrame)) return false;
+    mRelFrame = relFrame;
     return true;
 }

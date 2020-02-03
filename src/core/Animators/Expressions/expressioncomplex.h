@@ -14,16 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EXPRESSIONFUNCTIONBASE_H
-#define EXPRESSIONFUNCTIONBASE_H
+#ifndef EXPRESSIONCOMPLEX_H
+#define EXPRESSIONCOMPLEX_H
+
 #include "expressionsinglechild.h"
+#include "expressionvariable.h"
 
-class ExpressionFunctionBase : public ExpressionSingleChild {
+using ExpressionVarSPtr = QSharedPointer<ExpressionVariable>;
+
+class ExpressionComplex : public ExpressionSingleChild {
 public:
-    using ExpressionSingleChild::ExpressionSingleChild;
+    ExpressionComplex(const QList<ExpressionVarSPtr> &vars,
+                      const sptr& value);
 
-    QString toString() const override
-    { return name() + "(" + innerString() + ")"; }
+    sptr sCreate(const QList<ExpressionVarSPtr>& vars,
+                 const ExpressionValue::sptr &value);
+
+    qreal calculateValue(const qreal relFrame) const override;
+    void collapse() override;
+    QString toString() const override;
+private:
+    QList<ExpressionVarSPtr> mVariables;
 };
 
-#endif // EXPRESSIONFUNCTIONBASE_H
+#endif // EXPRESSIONCOMPLEX_H

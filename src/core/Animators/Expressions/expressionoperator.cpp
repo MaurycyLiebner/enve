@@ -77,7 +77,7 @@ FrameRange ExpressionOperator::identicalRange(const qreal relFrame) const {
 }
 
 bool ExpressionOperator::setRelFrame(const qreal relFrame) {
-    setRelFrameValue(relFrame);
+    if(!setRelFrameValue(relFrame)) return false;
     const bool changed1 = mValue1->setRelFrame(relFrame);
     const bool changed2 = mValue2->setRelFrame(relFrame);
     return changed1 || changed2;

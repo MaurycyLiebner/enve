@@ -52,14 +52,13 @@ public:
     bool needsBrackets() const
     { return mNeedsBrackets; }
 protected:
-    void setRelFrameValue(const qreal relFrame)
-    { mRelFrame = relFrame; }
+    bool setRelFrameValue(const qreal relFrame);
 signals:
     void relRangeChanged(const FrameRange& range);
     void currentValueChanged(const qreal value);
 private:
     const bool mNeedsBrackets;
-    qreal mRelFrame;
+    qreal mRelFrame = 123456789.;
     qreal mCurrentValue;
 };
 

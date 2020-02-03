@@ -26,6 +26,15 @@
 #include "expressionsourceframe.h"
 #include "expressionsourcevalue.h"
 #include "expressionnegatefunction.h"
+#include "expressioncomplex.h"
+
+using ExprSPtr = QSharedPointer<ExpressionValue>;
+using VariableMap = std::map<QString, ExprSPtr>;
+
+ExprSPtr parse(const QString& exp, int& i,
+               QrealAnimator* const parent,
+               VariableMap& variables,
+               const bool stopAtBreak);
 
 void skipSpaces(const QString& exp, int& position) {
     while(position < exp.count() && exp.at(position) == ' ') {
@@ -33,8 +42,7 @@ void skipSpaces(const QString& exp, int& position) {
     }
 }
 
-bool parseExpression(const QString& exp,
-                     int& position,
+bool parseExpression(const QString& exp, int& position,
                      QString& expression) {
     int newPosition = position;
     expression.clear();
@@ -87,21 +95,37 @@ bool parseOperator(const QString& exp,
     return true;
 }
 
-enum class Special {
-    value, frame
-};
+bool parseSpecial(const QString& exp, int& position,
+                  QString& parsed) {
+    if(exp.at(position) != '$') return false;
+    int newPosition = position + 1;
+    parsed = "$";
+    for(;newPosition < exp.count(); newPosition++) {
+        const auto& character = exp.at(newPosition);
+        if(!character.isLetter() && !character.isDigit()
+           && character != '_') break;
+        parsed.append(character);
+    }
+    position = newPosition;
+    return true;
+}
 
-bool parseSpecial(const QString& exp,
-                  int& position,
-                  Special& spec) {
-    int newPosition = position;
-    const auto part = exp.mid(position, 6);
-    if(part == "$value") {
-        spec = Special::value;
-    } else if(part == "$frame") {
-        spec = Special::frame;
+bool parseSettingSpecial(const QString& exp, int& position,
+                         QString& parsed) {
+    if(exp.at(position) != '$') return false;
+    int newPosition = position + 1;
+    parsed = "$";
+    while(newPosition < exp.count()) {
+        const auto& character = exp.at(newPosition++);
+        if(!character.isLetter() && !character.isDigit()
+           && character != '_') break;
+        parsed.append(character);
+    }
+    skipSpaces(exp, newPosition);
+    if(newPosition < exp.count()) {
+        const auto& character = exp.at(newPosition++);
+        if(character != '=') return false;
     } else return false;
-    newPosition += 6;
     position = newPosition;
     return true;
 }
@@ -112,8 +136,7 @@ enum class Function {
     sqrt, rand
 };
 
-bool parseFunction(const QString& exp,
-                   int& position,
+bool parseFunction(const QString& exp, int& position,
                    Function& function) {
     if(position + 5 >= exp.length()) return false;
     int newPosition = position;
@@ -154,8 +177,7 @@ bool parseFunction(const QString& exp,
     return true;
 }
 
-bool parseBrackets(const QString& exp,
-                   int& position,
+bool parseBrackets(const QString& exp, int& position,
                    QString& contained) {
     if(position >= exp.count()) return false;
     int newPosition = position;
@@ -183,10 +205,8 @@ bool parseBrackets(const QString& exp,
     return true;
 }
 
-bool parsePlainValue(const QString& exp,
-                     int& position,
-                     qreal& value,
-                     QString& parsed) {
+bool parsePlainValue(const QString& exp, int& position,
+                     qreal& value, QString& parsed) {
     if(position >= exp.count()) return false;
     parsed.clear();
     int newPosition = position;
@@ -198,8 +218,9 @@ bool parsePlainValue(const QString& exp,
         if(charSeparator) {
             if(separator) break;
             separator = true;
+            parsed.append('.');
         } else if(!character.isNumber()) break;
-        parsed.append(character);
+        else parsed.append(character);
     }
 
     if(parsed.isEmpty()) return false;
@@ -210,16 +231,15 @@ bool parsePlainValue(const QString& exp,
     return true;
 }
 
-QSharedPointer<ExpressionValue> createOperator(
-            const Operator oper,
-            const QSharedPointer<ExpressionValue>& opValue1,
-            const QSharedPointer<ExpressionValue>& opValue2) {
+ExprSPtr createOperator(const Operator oper,
+                        const ExprSPtr& opValue1,
+                        const ExprSPtr& opValue2) {
     if(!opValue1) RuntimeThrow("Missing value before operator.");
     if(!opValue2) RuntimeThrow("Missing value after operator.");
     std::function<qreal(qreal, qreal)> func;
     QString symbol;
-    bool needsBrackets;
-    bool childrenNeedBrackets;
+    bool needsBrackets = false;
+    bool childrenNeedBrackets = false;
     switch(oper) {
     case Operator::multiply:
         needsBrackets = false;
@@ -263,13 +283,15 @@ QSharedPointer<ExpressionValue> createOperator(
                                        symbol, func, opValue1, opValue2);
 }
 
-QSharedPointer<ExpressionValue> createFunction(
-            const QString& exp, QrealAnimator * const parent,
-            int& position, const Function function) {
+ExprSPtr createFunction(const QString& exp, int& position,
+                        QrealAnimator * const parent,
+                        VariableMap& variables,
+                        const Function function) {
     QString parsed;
     if(position >= exp.count() || !parseBrackets(exp, position, parsed))
         RuntimeThrow("Missing Function parameter.");
-    const auto inner = ExpressionParser::parse(parsed, parent);
+    int pos = 0;
+    const auto inner = parse(parsed, pos, parent, variables, false);
     if(!inner) RuntimeThrow("Missing Function parameter.");
     std::function<qreal(qreal)> func;
     QString name;
@@ -317,22 +339,19 @@ QSharedPointer<ExpressionValue> createFunction(
     return ExpressionFunction::sCreate(name, func, inner);
 }
 
-QSharedPointer<ExpressionValue> parse(
-        const QString& exp,
-        int& i,
-        QrealAnimator* const parent,
-        const bool stopAtBreak) {
+ExprSPtr parse(const QString& exp, int& i,
+               QrealAnimator* const parent,
+               VariableMap& variables,
+               const bool stopAtBreak) {
     QString parsed;
-    Special spec;
     Operator oper = Operator::notOperator;
     Function func;
     qreal value;
-    QSharedPointer<ExpressionValue> opValue1;
-    QSharedPointer<ExpressionValue> opValue2;
+    ExprSPtr opValue1;
+    ExprSPtr opValue2;
     bool negate = false;
 
-    const auto setValue = [&opValue1, &opValue2](
-            const QSharedPointer<ExpressionValue>& value) {
+    const auto setValue = [&opValue1, &opValue2](const ExprSPtr& value) {
         if(opValue1) opValue2 = value;
         else opValue1 = value;
     };
@@ -341,7 +360,7 @@ QSharedPointer<ExpressionValue> parse(
         Operator operTmp;
         skipSpaces(exp, i);
         if(i >= exp.count()) break;
-        QSharedPointer<ExpressionValue> lastValue;
+        ExprSPtr lastValue;
         if(parseBrackets(exp, i, parsed)) {
             lastValue = ExpressionParser::parse(parsed, parent);
         } else if(parsePlainValue(exp, i, value, parsed)) {
@@ -369,7 +388,7 @@ QSharedPointer<ExpressionValue> parse(
                         i--;
                         return opValue1;
                     } else {
-                        opValue2 = parse(exp, i, parent, true);
+                        opValue2 = parse(exp, i, parent, variables, true);
                     }
                 } else {
                     continue;
@@ -377,26 +396,16 @@ QSharedPointer<ExpressionValue> parse(
             }
 
         } else if(parseFunction(exp, i, func)) {
-            lastValue = createFunction(exp, parent, i, func);
-        } else if(parseSpecial(exp, i, spec)) {
-            if(parent) {
-                switch(spec) {
-                case Special::value:
-                    lastValue = ExpressionSourceValue::sCreate(parent);
-                    break;
-                case Special::frame:
-                    lastValue = ExpressionSourceFrame::sCreate(parent);
-                    break;
-                }
-            } else {
-                lastValue = ExpressionPlainValue::sCreate(1);
-            }
+            lastValue = createFunction(exp, i, parent, variables, func);
+        } else if(parseSpecial(exp, i, parsed)) {
+            const auto it = variables.find(parsed);
+            if(it != variables.end()) {
+                lastValue = it->second;
+            } else RuntimeThrow("Invalid variable.");
         } else if(parseExpression(exp, i, parsed)) {
             if(parent) {
                 lastValue = ExpressionSource::sCreate(parsed, parent);
-            } else {
-                lastValue = ExpressionPlainValue::sCreate(1);
-            }
+            } else RuntimeThrow("No context to look for objects in.");
         } else {
             if(exp.at(i) == ')') RuntimeThrow("Unexpected closing bracket.");
             RuntimeThrow("Invalid expression " + exp.mid(i));
@@ -420,8 +429,38 @@ QSharedPointer<ExpressionValue> parse(
     return opValue1;
 }
 
-QSharedPointer<ExpressionValue> ExpressionParser::parse(
-        const QString& exp, QrealAnimator* const parent) {
-    int pos = 0;
-    return parse(exp, pos, parent, false);
+ExprSPtr ExpressionParser::parse(QString exp, QrealAnimator* const parent) {
+    exp.remove(QRegExp("\n|\r\n|\r"));
+    const auto lines = exp.split(';', QString::SkipEmptyParts);
+    VariableMap variables;
+    ExprSPtr frame;
+    ExprSPtr value;
+    if(parent) {
+        frame = ExpressionSourceFrame::sCreate(parent);
+        value = ExpressionSourceValue::sCreate(parent);
+        variables["$frame"] = frame;
+        variables["$value"] = value;
+    }
+    ExprSPtr lastValue;
+    for(const auto& line : lines) {
+        int pos = 0;
+        QString varName;
+        if(parseSettingSpecial(line, pos, varName)) {
+            const auto definition = parse(line, pos, parent, variables, false);
+            if(!definition) RuntimeThrow("Missing function definition.");
+            const auto var = ExpressionVariable::sCreate(varName, definition);
+            variables[varName] = var;
+        } else lastValue = parse(line, pos, parent, variables, false);
+    }
+    if(!lastValue) RuntimeThrow("No return value.");
+    QList<QSharedPointer<ExpressionVariable>> varList;
+    {
+        for(auto it = variables.begin(); it != variables.end(); it++) {
+            const auto& expr = it->second;
+            if(expr == frame || expr == value) continue;
+            varList << qSharedPointerCast<ExpressionVariable>(expr);
+        }
+    }
+    const auto cplx = new ExpressionComplex(varList, lastValue);
+    return QSharedPointer<ExpressionComplex>(cplx);
 }
