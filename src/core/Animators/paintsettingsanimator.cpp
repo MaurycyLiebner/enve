@@ -213,7 +213,7 @@ void PaintSettingsAnimator::setCurrentColor(const QColor &color) {
 void PaintSettingsAnimator::showHideChildrenBeforeChaningPaintType(
         const PaintType newPaintType) {
     if(mPaintType == GRADIENTPAINT)
-        setGradientVar(nullptr);
+        setGradient(nullptr);
     if(mPaintType == FLATPAINT || mPaintType == BRUSHPAINT)
         ca_removeChild(mColor);
     if(newPaintType == FLATPAINT || newPaintType == BRUSHPAINT)

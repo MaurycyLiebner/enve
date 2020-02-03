@@ -59,7 +59,6 @@ public:
     void setGradientPointsPos(const QPointF& pt1, const QPointF& pt2);
 
     void duplicateColorAnimatorFrom(ColorAnimator *source);
-    void setGradientVar(SceneBoundGradient * const grad);
     QColor getColor(const qreal relFrame) const;
     GradientType getGradientType() { return mGradientType; }
     void setGradientType(const GradientType type);
@@ -75,6 +74,7 @@ public:
     void duplicatePaintSettingsNotAnim(PaintSettingsAnimator * const settings);
     void applyTransform(const QMatrix& transform);
 private:
+    void setGradientVar(SceneBoundGradient * const grad);
     void resetGradientPoints();
     void updateGradientPoint();
 
