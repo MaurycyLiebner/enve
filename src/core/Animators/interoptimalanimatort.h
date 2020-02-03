@@ -40,6 +40,8 @@ public:
 
     void anim_afterKeyOnCurrentFrameChanged(Key * const key) override;
 
+    void anim_removeAllKeys() override;
+
     void graph_getValueConstraints(
             GraphKey *key, const QrealPointType type,
             qreal &minValue, qreal &maxValue) const override;
@@ -63,6 +65,14 @@ private:
     T mSavedBaseValue;
     T * mBeingChanged = &mBaseValue;
 };
+
+template <typename T, typename K>
+void InterOptimalAnimatorT<T, K>::anim_removeAllKeys() {
+    if(!this->anim_hasKeys()) return;
+    const T currentValue = mBaseValue;
+    Animator::anim_removeAllKeys();
+    mBaseValue = currentValue;
+}
 
 template <typename T, typename K>
 void InterOptimalAnimatorT<T, K>::graph_getValueConstraints(

@@ -385,7 +385,8 @@ bool Animator::anim_isRecording() {
 void Animator::anim_removeAllKeys() {
     if(anim_mKeys.isEmpty()) return;
     const auto keys = anim_mKeys;
-    for(const auto& key : keys) anim_removeKey(key->ref<Key>());
+    for(const auto& key : keys)
+        anim_removeKeyAction(key->ref<Key>());
 }
 
 void Animator::anim_setKeyOnCurrentFrame(Key* const key) {

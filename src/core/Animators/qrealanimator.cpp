@@ -340,11 +340,7 @@ void QrealAnimator::anim_addKeyAtRelFrame(const int relFrame) {
 void QrealAnimator::anim_removeAllKeys() {
     if(!anim_hasKeys()) return;
     const qreal currentValue = mCurrentBaseValue;
-
-    const auto keys = anim_getKeys();
-    for(const auto& key : keys) {
-        anim_removeKey(key->ref<Key>());
-    }
+    Animator::anim_removeAllKeys();
     setCurrentBaseValue(currentValue);
 }
 

@@ -69,6 +69,8 @@ public:
 
     void anim_addKeyAtRelFrame(const int relFrame) override;
 
+    void anim_removeAllKeys() override;
+
     void prp_writeProperty(eWriteStream& dst) const override;
     void prp_readProperty(eReadStream& src) override;
 
@@ -87,6 +89,14 @@ private:
     T mSavedCurrentValue;
     bool mTransformed = false;
 };
+
+template<typename B, typename K, typename T>
+void BasedAnimatorT<B, K, T>::anim_removeAllKeys() {
+    if(!this->anim_hasKeys()) return;
+    const T currentValue = mCurrentValue;
+    Animator::anim_removeAllKeys();
+    setCurrentValue(currentValue);
+}
 
 template<typename B, typename K, typename T>
 void BasedAnimatorT<B, K, T>::prp_startTransform() {

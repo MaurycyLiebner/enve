@@ -21,8 +21,7 @@ FrameRemappingBase::FrameRemappingBase() : QrealAnimator("frame") {}
 
 void FrameRemappingBase::disableAction() {
     setEnabled(false);
-    anim_removeAllKeys();
-    anim_setRecordingValue(false);
+    anim_setRecording(false);
 }
 
 void FrameRemappingBase::setFrameCount(const int count) {
