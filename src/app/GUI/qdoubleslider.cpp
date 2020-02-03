@@ -200,6 +200,10 @@ void QDoubleSlider::finishTransform(const qreal value) {
 }
 
 void QDoubleSlider::cancelTransform() {
+    Actions::sInstance->finishSmoothChange();
+    Document::sInstance->actionFinished();
+    mCanceled = true;
+    setCursor(Qt::ArrowCursor);
     emit editingCanceled();
 }
 
@@ -246,11 +250,8 @@ void QDoubleSlider::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void QDoubleSlider::mousePressEvent(QMouseEvent *event) {
     if(event->button() == Qt::RightButton) {
-        if(mMouseMoved) {
-            cancelTransform();
-            mCanceled = true;
-            setCursor(Qt::ArrowCursor);
-        } else openContextMenu(event->globalPos());
+        if(mMouseMoved && !mCanceled) cancelTransform();
+        else openContextMenu(event->globalPos());
     } else if(event->button() == Qt::LeftButton) {
         mCanceled = false;
         setCursor(Qt::BlankCursor);
