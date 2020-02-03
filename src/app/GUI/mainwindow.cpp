@@ -526,9 +526,17 @@ void MainWindow::setupMenuBar() {
 //    mEffectsMenu->addAction("Blur");
 
     mSceneMenu = mMenuBar->addMenu("Scene");
-    mSceneMenu->addAction("New scene...", this, [this]() {
+    mSceneMenu->addAction("New Scene...", this, [this]() {
         CanvasSettingsDialog::sNewCanvasDialog(mDocument, this);
     });
+
+
+    {
+        const auto qAct = mSceneMenu->addAction("Delete Scene");
+        mActions.deleteSceneAction->connect(qAct);
+    }
+
+    mSceneMenu->addSeparator();
 
     mSceneMenu->addAction("Add to Render Queue", this, &MainWindow::addCanvasToRenderQue);
 

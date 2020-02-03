@@ -109,6 +109,8 @@ public:
     void startSmoothChange() { mSmoothChange = true; }
     void finishSmoothChange();
 
+    Action* deleteSceneAction;
+
     UndoableAction* raiseAction;
     UndoableAction* lowerAction;
     UndoableAction* raiseToTopAction;

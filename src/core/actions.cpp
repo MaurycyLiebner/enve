@@ -22,6 +22,8 @@
 #include "Sound/singlesound.h"
 #include "Boxes/externallinkbox.h"
 
+#include <QMessageBox>
+
 Actions* Actions::sInstance = nullptr;
 
 Actions::Actions(Document &document) : mDocument(document),
@@ -37,6 +39,31 @@ Actions::Actions(Document &document) : mDocument(document),
         mActiveScene->pushUndoRedoName(name);
     };
 
+    { // deleteSceneAction
+        const auto deleteSceneActionCan = [this]() {
+            return static_cast<bool>(mActiveScene);
+        };
+        const auto deleteSceneActionExec = [this]() {
+            if(!mActiveScene) return false;
+            const auto sceneName = mActiveScene->prp_getName();
+            const int buttonId = QMessageBox::question(
+                        nullptr, "Delete " + sceneName,
+                        QString("Are you sure you want to delete "
+                        "%1? This action cannot be undone.").arg(sceneName),
+                        "Cancel", "Delete");
+            if(buttonId == 0) return false;
+            return mDocument.removeScene(mActiveScene->ref<Canvas>());
+        };
+        const auto deleteSceneActionText = [this]() {
+            if(!mActiveScene) return QStringLiteral("Delete Scene");
+            return "Delete " + mActiveScene->prp_getName();
+        };
+        deleteSceneAction = new Action(deleteSceneActionCan,
+                                       deleteSceneActionExec,
+                                       deleteSceneActionText,
+                                       this);
+    }
+
     { // undoAction
         const auto undoActionCan = [this]() {
             if(!mActiveScene) return false;
@@ -47,7 +74,7 @@ Actions::Actions(Document &document) : mDocument(document),
             afterAction();
         };
         const auto undoActionText = [this]() {
-            if(!mActiveScene) return QString();
+            if(!mActiveScene) return QStringLiteral("Undo");
             return mActiveScene->undoRedoStack()->undoText();
         };
         undoAction = new Action(undoActionCan, undoActionExec,
@@ -64,7 +91,7 @@ Actions::Actions(Document &document) : mDocument(document),
             afterAction();
         };
         const auto redoActionText = [this]() {
-            if(!mActiveScene) return QString();
+            if(!mActiveScene) return QStringLiteral("Redo");
             return mActiveScene->undoRedoStack()->redoText();
         };
         redoAction = new Action(redoActionCan, redoActionExec,
@@ -749,13 +776,19 @@ void Actions::finishSmoothChange() {
 void Actions::connectToActiveScene() {
     auto& conn = mActiveSceneConnections;
     conn.clear();
-    if(!mActiveScene) return;
+
+    deleteSceneAction->raiseCanExecuteChanged();
+    deleteSceneAction->raiseTextChanged();
+    if(mActiveScene) {
+        conn << connect(mActiveScene, &Canvas::prp_nameChanged,
+                        deleteSceneAction, &Action::raiseTextChanged);
+    }
 
     undoAction->raiseCanExecuteChanged();
     undoAction->raiseTextChanged();
     redoAction->raiseCanExecuteChanged();
     redoAction->raiseTextChanged();
-    {
+    if(mActiveScene) {
         const auto urStack = mActiveScene->undoRedoStack();
         conn << connect(urStack, &UndoRedoStack::canUndoChanged,
                         undoAction, &Action::raiseCanExecuteChanged);
@@ -772,7 +805,7 @@ void Actions::connectToActiveScene() {
     lowerAction->raiseCanExecuteChanged();
     raiseToTopAction->raiseCanExecuteChanged();
     lowerToBottomAction->raiseCanExecuteChanged();
-    {
+    if(mActiveScene) {
         conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
                         raiseAction, &Action::raiseCanExecuteChanged);
         conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
@@ -786,7 +819,7 @@ void Actions::connectToActiveScene() {
     objectsToPathAction->raiseCanExecuteChanged();
     strokeToPathAction->raiseCanExecuteChanged();
     objectsToSculptedPathAction->raiseCanExecuteChanged();
-    {
+    if(mActiveScene) {
         conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
                         objectsToPathAction, &Action::raiseCanExecuteChanged);
         conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
@@ -797,7 +830,7 @@ void Actions::connectToActiveScene() {
 
     groupAction->raiseCanExecuteChanged();
     ungroupAction->raiseCanExecuteChanged();
-    {
+    if(mActiveScene) {
         conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
                         groupAction, &Action::raiseCanExecuteChanged);
         conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
@@ -812,7 +845,7 @@ void Actions::connectToActiveScene() {
     pathsExclusionAction->raiseCanExecuteChanged();
     pathsCombineAction->raiseCanExecuteChanged();
     pathsBreakApartAction->raiseCanExecuteChanged();
-    {
+    if(mActiveScene) {
         conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
                         pathsUnionAction, &Action::raiseCanExecuteChanged);
         conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
@@ -834,7 +867,7 @@ void Actions::connectToActiveScene() {
     pasteAction->raiseCanExecuteChanged();
     cutAction->raiseCanExecuteChanged();
     duplicateAction->raiseCanExecuteChanged();
-    {
+    if(mActiveScene) {
         conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
                         deleteAction, &Action::raiseCanExecuteChanged);
         conn << connect(mActiveScene, &Canvas::pointSelectionChanged,
@@ -853,7 +886,7 @@ void Actions::connectToActiveScene() {
     rotate90CCWAction->raiseCanExecuteChanged();
     flipHorizontalAction->raiseCanExecuteChanged();
     flipVerticalAction->raiseCanExecuteChanged();
-    {
+    if(mActiveScene) {
         conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
                         rotate90CWAction, &Action::raiseCanExecuteChanged);
         conn << connect(mActiveScene, &Canvas::objectSelectionChanged,
