@@ -21,9 +21,7 @@
 #include "Animators/transformanimator.h"
 #include "RasterEffects/rastereffectcollection.h"
 
-Rectangle::Rectangle() : PathBox(eBoxType::rectangle) {
-    rename("Rectangle");
-
+Rectangle::Rectangle() : PathBox("Rectangle", eBoxType::rectangle) {
     setPointsHandler(enve::make_shared<PointsHandler>());
 
     mTopLeftAnimator = enve::make_shared<QPointFAnimator>("top left");

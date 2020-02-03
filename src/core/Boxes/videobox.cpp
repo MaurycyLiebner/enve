@@ -32,7 +32,7 @@ VideoFileHandler* videoFileHandlerGetter(const QString& path) {
     return FilesHandler::sInstance->getFileHandler<VideoFileHandler>(path);
 }
 
-VideoBox::VideoBox() : AnimationBox(eBoxType::video),
+VideoBox::VideoBox() : AnimationBox("Video", eBoxType::video),
     mFileHandler(this,
                  [](const QString& path) {
                      return videoFileHandlerGetter(path);
@@ -43,7 +43,6 @@ VideoBox::VideoBox() : AnimationBox(eBoxType::video),
                  [this](ConnContext& conn, VideoFileHandler* obj) {
                      fileHandlerConnector(conn, obj);
                  }) {
-    rename("Video");
     const auto flar = mDurationRectangle->ref<FixedLenAnimationRect>();
     mSound = enve::make_shared<SingleSound>(flar);
     ca_addChild(mSound);

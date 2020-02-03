@@ -27,7 +27,7 @@ ImageSequenceFileHandler* imageSequenceFileHandlerGetter(const QString& path) {
 }
 
 ImageSequenceBox::ImageSequenceBox() :
-    AnimationBox(eBoxType::imageSequence),
+    AnimationBox("Image Sequence", eBoxType::imageSequence),
     mFileHandler(this,
                  [](const QString& path) {
                      return imageSequenceFileHandlerGetter(path);
@@ -37,9 +37,7 @@ ImageSequenceBox::ImageSequenceBox() :
                  },
                  [this](ConnContext& conn, ImageSequenceFileHandler* obj) {
                      fileHandlerConnector(conn, obj);
-                 }) {
-    rename("Image Sequence");
-}
+                 }) {}
 
 void ImageSequenceBox::fileHandlerConnector(ConnContext &conn,
                                             ImageSequenceFileHandler *obj) {

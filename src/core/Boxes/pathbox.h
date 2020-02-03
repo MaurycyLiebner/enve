@@ -35,7 +35,7 @@ class PathBox : public BoxWithPathEffects {
     typedef qCubicSegment1DAnimator::Action SegAction;
     e_OBJECT
 protected:
-    PathBox(const eBoxType type);
+    PathBox(const QString& name, const eBoxType type);
 public:
     virtual bool differenceInEditPathBetweenFrames(
             const int frame1, const int frame2) const = 0;

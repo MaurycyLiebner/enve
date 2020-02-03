@@ -19,8 +19,7 @@
 #include "MovablePoints/animatedpoint.h"
 #include "Animators/transformanimator.h"
 
-PaintBox::PaintBox() : BoundingBox(eBoxType::paint) {
-    rename("Paint Box");
+PaintBox::PaintBox() : BoundingBox("Paint Box", eBoxType::paint) {
     mSurface = enve::make_shared<AnimatedSurface>();
     ca_addChild(mSurface);
 }

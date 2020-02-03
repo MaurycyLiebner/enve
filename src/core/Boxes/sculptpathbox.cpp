@@ -21,8 +21,8 @@
 #include "Animators/qpointfanimator.h"
 #include "Private/document.h"
 
-SculptPathBox::SculptPathBox() : BoundingBox(eBoxType::sculptPath) {
-    rename("Sculpt Path");
+SculptPathBox::SculptPathBox() :
+    BoundingBox("Sculpt Path", eBoxType::sculptPath) {
     mBrushWidth = enve::make_shared<QrealAnimator>(1, 0, 999, 1, "width");
     mPath = enve::make_shared<SculptPathCollection>();
     mFillSettings = enve::make_shared<FillSettingsAnimator>(this);

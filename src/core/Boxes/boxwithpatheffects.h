@@ -24,7 +24,7 @@ class PathEffectCaller;
 
 class BoxWithPathEffects : public BoundingBox {
 public:
-    BoxWithPathEffects(const eBoxType type);
+    BoxWithPathEffects(const QString &name, const eBoxType type);
 
     void setupCanvasMenu(PropertyMenu * const menu);
     void prp_setupTreeViewMenu(PropertyMenu * const menu);

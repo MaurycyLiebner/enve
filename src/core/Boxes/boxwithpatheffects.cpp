@@ -18,8 +18,9 @@
 #include "../PathEffects/patheffectcollection.h"
 #include "../PathEffects/patheffectstask.h"
 
-BoxWithPathEffects::BoxWithPathEffects(const eBoxType type) :
-    BoundingBox(type) {
+BoxWithPathEffects::BoxWithPathEffects(
+        const QString &name, const eBoxType type) :
+    BoundingBox(name, type) {
     mPathEffectsAnimators = enve::make_shared<PathEffectCollection>();
     mPathEffectsAnimators->prp_setName("path base effects");
 

@@ -174,14 +174,18 @@ public:
     int getContainedBoxesCount() const;
     void removeAllContained();
 
-    QString makeNameUniqueForDescendants(const QString& name);
-    QString makeNameUniqueForContained(const QString& name);
+    QString makeNameUniqueForDescendants(
+            const QString& name, eBoxOrSound * const skip = nullptr);
+    QString makeNameUniqueForContained(
+            const QString& name, eBoxOrSound * const skip = nullptr);
 
     eBoxOrSound* firstDescendantWithName(const QString& name);
     eBoxOrSound* firstContainedWithName(const QString &name);
 
-    QStringList allDescendantsNamesStartingWith(const QString& text);
-    QStringList allContainedNamesStartingWith(const QString& text);
+    QStringList allDescendantsNamesStartingWith(
+            const QString& text, eBoxOrSound * const skip = nullptr);
+    QStringList allContainedNamesStartingWith(
+            const QString& text, eBoxOrSound * const skip = nullptr);
 
     void allDescendantsStartingWith(
             const QString& text, QList<eBoxOrSound*> &result);

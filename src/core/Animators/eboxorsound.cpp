@@ -21,7 +21,7 @@
 #include "Properties/emimedata.h"
 
 eBoxOrSound::eBoxOrSound(const QString &name) :
-    StaticComplexAnimator(name) {
+    StaticComplexAnimator(name + " 0") {
     connect(this, &Property::prp_nameChanged, this,
             &SingleWidgetTarget::SWT_scheduleSearchContentUpdate);
 }
@@ -453,7 +453,7 @@ void eBoxOrSound::rename(const QString &newName) {
     const auto parentScene = getParentScene();
     if(parentScene) {
         const QString uniqueName = parentScene->
-                makeNameUniqueForDescendants(fixedName);
+                makeNameUniqueForDescendants(fixedName, this);
         return prp_setNameAction(uniqueName);
     }
     prp_setNameAction(fixedName);

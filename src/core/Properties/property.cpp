@@ -217,7 +217,7 @@ QString Property::prp_sFixName(const QString &name) {
            result.front().isDigit())) {
         result.remove(0, 1);
     }
-    if(result.isEmpty()) return "Object";
+    if(result.isEmpty()) return "Object 0";
     return result;
 }
 

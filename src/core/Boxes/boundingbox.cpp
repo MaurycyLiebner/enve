@@ -45,7 +45,8 @@ QList<BoundingBox*> BoundingBox::sReadBoxes;
 int BoundingBox::sNextWriteId;
 QList<const BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 
-BoundingBox::BoundingBox(const eBoxType type) : eBoxOrSound("box"),
+BoundingBox::BoundingBox(const QString& name, const eBoxType type) :
+    eBoxOrSound(name),
     mDocumentId(sNextDocumentId++), mType(type),
     mTransformAnimator(enve::make_shared<BoxTransformAnimator>()),
     mRasterEffectsAnimators(enve::make_shared<RasterEffectCollection>()) {

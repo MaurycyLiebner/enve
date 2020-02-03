@@ -21,6 +21,7 @@
 
 InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget) :
     ContainerBox(eBoxType::internalLinkGroup) {
+    prp_setName("Link 0");
     setLinkTarget(linkTarget);
 
     ca_prependChild(mTransformAnimator.data(), mBoxTarget);
@@ -139,7 +140,7 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
     mBoxTarget->setTarget(linkTarget);
     auto& conn = mLinkTarget.assign(linkTarget);
     if(linkTarget) {
-        rename(linkTarget->prp_getName() + " link");
+        rename(linkTarget->prp_getName() + " Link 0");
         conn << connect(linkTarget, &Property::prp_nameChanged,
                        this, &Property::prp_setName);
         linkTarget->addLinkingBox(this);
@@ -169,7 +170,7 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
             }
         }
     } else {
-        rename("empty link");
+        rename("Empty Link 0");
     }
     planUpdate(UpdateReason::userChange);
 }

@@ -80,7 +80,7 @@ class BoundingBox : public eBoxOrSound {
     e_OBJECT
     typedef qCubicSegment1DAnimator::Action SegAction;
 protected:
-    BoundingBox(const eBoxType type);
+    BoundingBox(const QString& name, const eBoxType type);
 public:
     ~BoundingBox();
 

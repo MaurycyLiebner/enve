@@ -22,9 +22,7 @@
 #include "MovablePoints/pointshandler.h"
 #include "PathEffects/patheffectcollection.h"
 
-Circle::Circle() : PathBox(eBoxType::circle) {
-    rename("Circle");
-
+Circle::Circle() : PathBox("Circle", eBoxType::circle) {
     setPointsHandler(enve::make_shared<PointsHandler>());
 
     mCenterAnimator = enve::make_shared<QPointFAnimator>("center");

@@ -28,9 +28,8 @@
 #include "externallinkbox.h"
 
 ContainerBox::ContainerBox(const eBoxType type) :
-    BoxWithPathEffects(type) {
-    if(type == eBoxType::group) rename("Group");
-    else if(type == eBoxType::layer) rename("Layer");
+    BoxWithPathEffects(type == eBoxType::group ? "Group" : "Layer",
+                       type) {
     connect(mRasterEffectsAnimators.get(),
             &RasterEffectCollection::forcedMarginChanged,
             this, &ContainerBox::forcedMarginMeaningfulChange);
@@ -323,26 +322,30 @@ QString stringScrapEndDigits(const QString& string) {
 using NamesGetter = std::function<QStringList(const QString&)>;
 QString makeNameUnique(const QString& name,
                        const NamesGetter& namesGetter) {
-    const QString trimmedName = stringScrapEndDigits(name).trimmed();
+    const QString fixedBaseName = Property::prp_sFixName(name);
+    const QString trimmedName = stringScrapEndDigits(fixedBaseName).trimmed();
     const QString fixedName = Property::prp_sFixName(trimmedName);
     const QStringList usedList = namesGetter(fixedName);
+    if(!usedList.contains(fixedBaseName)) return fixedBaseName;
     for(int i = 0;; i++) {
-        const QString suffix = i == 0 ? "" : + " " + QString::number(i);
+        const QString suffix = " " + QString::number(i);
         const QString testName = fixedName + suffix;
         const bool taken = usedList.contains(testName);
         if(!taken) return testName;
     }
 }
 
-QString ContainerBox::makeNameUniqueForDescendants(const QString &name) {
-    return makeNameUnique(name, [this](const QString& name) {
-        return allDescendantsNamesStartingWith(name);
+QString ContainerBox::makeNameUniqueForDescendants(
+        const QString &name, eBoxOrSound * const skip) {
+    return makeNameUnique(name, [this, skip](const QString& name) {
+        return allDescendantsNamesStartingWith(name, skip);
     });
 }
 
-QString ContainerBox::makeNameUniqueForContained(const QString &name) {
-    return makeNameUnique(name, [this](const QString& name) {
-        return allContainedNamesStartingWith(name);
+QString ContainerBox::makeNameUniqueForContained(
+        const QString &name, eBoxOrSound * const skip) {
+    return makeNameUnique(name, [this, skip](const QString& name) {
+        return allContainedNamesStartingWith(name, skip);
     });
 }
 
@@ -367,21 +370,25 @@ eBoxOrSound *ContainerBox::firstContainedWithName(const QString& name) {
     return nullptr;
 }
 
-QStringList ContainerBox::allDescendantsNamesStartingWith(const QString &text) {
+QStringList ContainerBox::allDescendantsNamesStartingWith(
+        const QString &text, eBoxOrSound* const skip) {
     QStringList result;
     QList<eBoxOrSound*> matches;
     allDescendantsStartingWith(text, matches);
     for(const auto match : matches) {
+        if(match == skip) continue;
         result << match->prp_getName();
     }
     return result;
 }
 
-QStringList ContainerBox::allContainedNamesStartingWith(const QString &text) {
+QStringList ContainerBox::allContainedNamesStartingWith(
+        const QString &text, eBoxOrSound * const skip) {
     QStringList result;
     QList<eBoxOrSound*> matches;
     allContainedStartingWith(text, matches);
     for(const auto match : matches) {
+        if(match == skip) continue;
         result << match->prp_getName();
     }
     return result;

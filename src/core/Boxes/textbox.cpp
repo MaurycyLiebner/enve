@@ -27,9 +27,7 @@
 #include "textboxrenderdata.h"
 #include "pathboxrenderdata.h"
 
-TextBox::TextBox() : PathBox(eBoxType::text) {
-    rename("text");
-
+TextBox::TextBox() : PathBox("Text", eBoxType::text) {
     mFillSettings->setPaintType(PaintType::FLATPAINT);
     mFillSettings->setCurrentColor(QColor(0, 0, 0));
     mStrokeSettings->setPaintType(PaintType::NOPAINT);

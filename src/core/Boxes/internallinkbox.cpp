@@ -24,7 +24,7 @@
 #include "Sound/singlesound.h"
 
 InternalLinkBox::InternalLinkBox(BoundingBox * const linkTarget) :
-    BoundingBox(eBoxType::internalLink) {
+    BoundingBox("Link", eBoxType::internalLink) {
     setLinkTarget(linkTarget);
     ca_prependChild(mTransformAnimator.data(), mBoxTarget);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
@@ -37,7 +37,7 @@ void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
     auto& conn = mLinkTarget.assign(linkTarget);
     mBoxTarget->setTarget(linkTarget);
     if(linkTarget) {
-        rename(linkTarget->prp_getName() + " link");
+        rename(linkTarget->prp_getName() + " Link 0");
         linkTarget->addLinkingBox(this);
         conn << connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
                 this, [this, linkTarget](const FrameRange& range) {
@@ -52,7 +52,7 @@ void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
             mSound->setParentGroup(mParentGroup);
         }
     } else {
-        rename("empty link");
+        rename("Empty Link 0");
     }
     planUpdate(UpdateReason::userChange);
 }

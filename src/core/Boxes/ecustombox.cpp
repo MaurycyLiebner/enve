@@ -17,9 +17,7 @@
 #include "ecustombox.h"
 
 eCustomBox::eCustomBox(const QString& name) :
-    BoundingBox(eBoxType::custom) {
-    rename(name);
-}
+    BoundingBox(name, eBoxType::custom) {}
 
 void eCustomBox::writeIdentifier(eWriteStream& dst) const {
     BoundingBox::writeIdentifier(dst);

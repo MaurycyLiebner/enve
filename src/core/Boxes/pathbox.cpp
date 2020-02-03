@@ -32,7 +32,8 @@
 #include "Private/Tasks/taskscheduler.h"
 #include "clipboardcontainer.h"
 
-PathBox::PathBox(const eBoxType type) : BoxWithPathEffects(type) {
+PathBox::PathBox(const QString &name, const eBoxType type) :
+    BoxWithPathEffects(name, type) {
     connect(this, &eBoxOrSound::parentChanged, this, [this]() {
         setPathsOutdated(UpdateReason::userChange);
     });

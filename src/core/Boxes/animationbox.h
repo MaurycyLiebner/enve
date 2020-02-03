@@ -39,7 +39,7 @@ struct AnimationBoxRenderData : public ImageRenderData {
 class AnimationBox : public BoundingBox {
     e_OBJECT
 protected:
-    AnimationBox(const eBoxType type);
+    AnimationBox(const QString& name, const eBoxType type);
 public:
     virtual void changeSourceFile() = 0;
     void animationDataChanged();

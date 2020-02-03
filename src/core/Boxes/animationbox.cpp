@@ -24,11 +24,10 @@
 #include "RasterEffects/rastereffectcollection.h"
 #include "frameremapping.h"
 
-AnimationBox::AnimationBox(const eBoxType type) : BoundingBox(type) {
+AnimationBox::AnimationBox(const QString &name, const eBoxType type) :
+    BoundingBox(name, type) {
     connect(this, &eBoxOrSound::parentChanged,
             this, &AnimationBox::updateDurationRectangleAnimationRange);
-
-    rename("Animation");
 
     setDurationRectangle(enve::make_shared<FixedLenAnimationRect>(*this));
     mDurationRectangleLocked = true;

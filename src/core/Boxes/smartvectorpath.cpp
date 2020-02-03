@@ -30,8 +30,7 @@
 #include "Animators/qpointfanimator.h"
 
 SmartVectorPath::SmartVectorPath() :
-    PathBox(eBoxType::vectorPath) {
-    rename("Path");
+    PathBox("Path", eBoxType::vectorPath) {
     mPathAnimator = enve::make_shared<SmartPathCollection>();
     connect(mPathAnimator.get(), &Property::prp_currentFrameChanged,
             this, [this](const UpdateReason reason) {
