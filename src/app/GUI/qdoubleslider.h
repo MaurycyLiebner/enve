@@ -41,7 +41,6 @@ public:
     void setName(const QString& name);
     void setNumberDecimals(const int decimals);
 
-    void updateLineEditFromValue();
     void fitWidthToContent();
     QString getValueString();
 
@@ -64,6 +63,8 @@ protected:
     virtual void paint(QPainter *p);
     virtual void openContextMenu(const QPoint &globalPos)
     { Q_UNUSED(globalPos) }
+    virtual QString getEditText() const
+    { return mValueString; }
 
     virtual void startTransform(const qreal value);
     virtual void setValue(const qreal value);
@@ -88,9 +89,17 @@ signals:
     void editingFinished(qreal);
     void editingCanceled();
 protected:
+    QString valueToText(const qreal value) const;
+    qreal getDValueForMouseMove(const int mouseX) const;
+    bool mouseMoved() const { return mMouseMoved; }
+    bool textEditing() const { return mTextEdit; }
+    void updateValueString();
+private:
     void finishTextEditing();
     void lineEditingFinished();
+    void updateLineEditFromValue();
 
+    bool mMouseMoved = false;
     bool mLeftNeighbour = false;
     bool mRightNeighbour = false;
     int mDecimals = 3;
@@ -99,17 +108,17 @@ protected:
     bool mShowName = false;
 
     QLineEdit *mLineEdit = nullptr;
-    qreal mValue = 0.;
+    QString mValueString;
+    qreal mValue = 0;
     bool mTextEdit = false;
+    int mLastX;
     int mMovesCount = 0;
-    bool mMouseMoved = false;
     bool mCanceled = false;
-    qreal mMinValue = 0.;
-    qreal mMaxValue = 0.;
-    qreal mPrefferedValueStep = 1.;
+    qreal mMinValue = 0;
+    qreal mMaxValue = 0;
+    qreal mPrefferedValueStep = 1;
 
     QPoint mGlobalPressPos;
-    int mLastX;
     qreal mLastValue;
     bool mShowValueSlider = true;
 };

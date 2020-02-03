@@ -156,6 +156,7 @@ private:
     qreal mPrefferedValueStep = 1;
     bool updateBaseValueFromCurrentFrame();
 signals:
+    void expressionChanged();
     void effectiveValueChanged(qreal);
     void baseValueChanged(qreal);
 };

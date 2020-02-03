@@ -56,7 +56,7 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(QString name,
 
 #include "Animators/qpointfanimator.h"
 QrealAnimator* QrealAnimatorValueSlider::getQPointFAnimatorSibling() {
-    if(mTarget->SWT_isQrealAnimator()) {
+    if(mTarget) {
         const auto parent = mTarget->getParent();
         if(parent && parent->SWT_isQPointFAnimator()) {
             const auto qPA = static_cast<QPointFAnimator*>(parent);
@@ -72,8 +72,8 @@ void QrealAnimatorValueSlider::mouseMoveEvent(QMouseEvent *event) {
     if(event->modifiers() & Qt::ShiftModifier) {
         const auto other = getQPointFAnimatorSibling();
         if(other) {
-            if(!mMouseMoved) other->prp_startTransform();
-            const qreal dValue = (event->x() - mLastX)*0.1*mPrefferedValueStep;
+            if(!mouseMoved()) other->prp_startTransform();
+            const qreal dValue = getDValueForMouseMove(event->x());
             other->incCurrentBaseValue(dValue);
         }
     }
@@ -90,7 +90,7 @@ bool QrealAnimatorValueSlider::eventFilter(QObject *obj, QEvent *event) {
             const auto other = getQPointFAnimatorSibling();
             if(other) {
                 if(keyPress) {
-                    if(mMouseMoved) {
+                    if(mouseMoved()) {
                         other->prp_startTransform();
                     }
                 } else if(keyRelease) {
@@ -107,14 +107,18 @@ void QrealAnimatorValueSlider::startTransform(const qreal value) {
     QDoubleSlider::startTransform(value);
 }
 
+QString QrealAnimatorValueSlider::getEditText() const {
+    if(mTarget && mTarget->hasExpression()) {
+        return valueToText(mBaseValue);
+    }
+    return QDoubleSlider::getEditText();
+}
+
 void QrealAnimatorValueSlider::setValue(const qreal value) {
     if(mTarget) {
-        if(mTarget->SWT_isQrealAnimator()) {
-            const auto da = static_cast<QrealAnimator*>(*mTarget);
-            da->setCurrentBaseValue(value);
-        }
-    }
-    QDoubleSlider::setValue(value);
+        mTarget->setCurrentBaseValue(value);
+        emit valueEdited(this->value());
+    } else QDoubleSlider::setValue(value);
 }
 
 void QrealAnimatorValueSlider::finishTransform(const qreal value) {
@@ -141,11 +145,9 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
     } else {
         bool rec = false;
         bool key = false;
-        if(mTarget->SWT_isAnimator()) {
-            const auto aTarget = static_cast<Animator*>(*mTarget);
-            rec = aTarget->anim_isRecording();
-            key = aTarget->anim_getKeyOnCurrentFrame();
-        }
+        const auto aTarget = static_cast<Animator*>(*mTarget);
+        rec = aTarget->anim_isRecording();
+        key = aTarget->anim_getKeyOnCurrentFrame();
         if(rec) {
             const bool disabled = isTargetDisabled() || !isEnabled();
             QDoubleSlider::paint(p,
@@ -159,32 +161,49 @@ void QrealAnimatorValueSlider::paint(QPainter *p) {
         } else {
             QDoubleSlider::paint(p, !isTargetDisabled() && isEnabled());
         }
-        if(mTarget->SWT_isQrealAnimator()) {
-            const auto aTarget = static_cast<QrealAnimator*>(*mTarget);
-            if(aTarget->hasExpression()) {
-                if(aTarget->hasValidExpression()) {
-                    p->setBrush(QColor(0, 125, 255));
-                } else {
-                    p->setBrush(QColor(255, 125, 0));
-                }
-                p->setPen(Qt::NoPen);
-                p->setRenderHint(QPainter::Antialiasing);
-                p->drawEllipse({7, height()/2}, 3, 3);
+        if(!textEditing() && mTarget->hasExpression()) {
+            if(mTarget->hasValidExpression()) {
+                p->setBrush(QColor(0, 125, 255));
+            } else {
+                p->setBrush(QColor(255, 125, 0));
             }
+            p->setPen(Qt::NoPen);
+            p->setRenderHint(QPainter::Antialiasing);
+            p->drawEllipse({7, height()/2}, 3, 3);
         }
     }
+}
+
+void QrealAnimatorValueSlider::targetHasExpressionChanged() {
+    QObject::disconnect(mExprConn);
+    if(mTarget) {
+        const bool hasExpression = mTarget->hasExpression();
+        if(hasExpression) {
+            mExprConn = connect(mTarget, &QrealAnimator::baseValueChanged,
+                    this, [this](const qreal value) {
+                mBaseValue = value;
+                setName(valueToText(mBaseValue));
+            });
+        }
+        mBaseValue = mTarget->getCurrentBaseValue();
+        setName(valueToText(mBaseValue));
+        setNameVisible(hasExpression);
+    } else setNameVisible(false);
 }
 
 void QrealAnimatorValueSlider::setTarget(QrealAnimator * const animator) {
     if(animator == mTarget) return;
     auto& conn = mTarget.assign(animator);
-    if(mTarget) {
-        setNumberDecimals(animator->getNumberDecimals());
+    targetHasExpressionChanged();
+    if(animator) {
         conn << connect(animator, &QrealAnimator::effectiveValueChanged,
                         this, &QrealAnimatorValueSlider::setDisplayedValue);
         conn << connect(animator, &QrealAnimator::anim_changedKeyOnCurrentFrame,
                         this, qOverload<>(&QrealAnimatorValueSlider::update));
+        conn << connect(animator, &QrealAnimator::expressionChanged,
+                        this, &QrealAnimatorValueSlider::targetHasExpressionChanged);
 
+        setNumberDecimals(animator->getNumberDecimals());
         setValueRange(animator->getMinPossibleValue(),
                       animator->getMaxPossibleValue());
         setPrefferedValueStep(animator->getPrefferedValueStep());
@@ -204,8 +223,7 @@ bool QrealAnimatorValueSlider::isTargetDisabled() {
 void QrealAnimatorValueSlider::openContextMenu(
         const QPoint &globalPos) {
     if(!mTarget) return;
-    if(!mTarget->SWT_isQrealAnimator()) return;
-    const auto aTarget = static_cast<QrealAnimator*>(*mTarget);
+    const auto aTarget = *mTarget;
     QMenu menu(this);
 
     const bool keyOnFrame = aTarget->anim_getKeyOnCurrentFrame();

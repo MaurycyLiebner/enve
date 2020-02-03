@@ -25,12 +25,14 @@
 QDoubleSlider::QDoubleSlider(const qreal minVal, const qreal maxVal,
                              const qreal prefferedStep,
                              QWidget * const parent) : QWidget(parent) {
-    mValue = minVal;
     mMinValue = minVal;
     mMaxValue = maxVal;
     mPrefferedValueStep = prefferedStep;
+    setDisplayedValue(minVal);
+    updateValueString();
+
     setFixedHeight(MIN_WIDGET_DIM);
-    mLineEdit = new QLineEdit(QLocale().toString(mValue, 'f', mDecimals), this);
+    mLineEdit = new QLineEdit(mValueString, this);
     mLineEdit->setAttribute(Qt::WA_TranslucentBackground);
     mLineEdit->setStyleSheet("background-color: rgba(0, 0, 0, 0);"
                              "color: black;");
@@ -76,21 +78,17 @@ void QDoubleSlider::setNameVisible(const bool nameVisible) {
 
 void QDoubleSlider::setName(const QString &name) {
     mName = name;
-    setNameVisible(true);
-    fitWidthToContent();
+    update();
 }
 
 void QDoubleSlider::setNumberDecimals(const int decimals) {
     mDecimals = decimals;
     fitWidthToContent();
+    updateValueString();
 }
 
 void QDoubleSlider::updateLineEditFromValue() {
-    mLineEdit->setText(QLocale().toString(mValue, 'f', mDecimals));
-}
-
-QString QDoubleSlider::getValueString() {
-    return QLocale().toString(mValue, 'f', mDecimals);
+    mLineEdit->setText(getEditText());
 }
 
 void QDoubleSlider::setValueRange(const qreal min, const qreal max) {
@@ -105,6 +103,14 @@ void QDoubleSlider::paint(QPainter * const p, const bool enabled) {
           enabled ? QColor(220, 220, 220) : QColor(200, 200, 200),
           enabled ? Qt::black : Qt::darkGray,
           enabled ? Qt::black : Qt::darkGray);
+}
+
+QString QDoubleSlider::valueToText(const qreal value) const {
+    return QLocale().toString(value, 'f', mDecimals);
+}
+
+qreal QDoubleSlider::getDValueForMouseMove(const int mouseX) const {
+    return (mouseX - mLastX)*0.1*mPrefferedValueStep;
 }
 
 void QDoubleSlider::paint(QPainter *p) {
@@ -151,9 +157,9 @@ void QDoubleSlider::paint(QPainter *p,
         p->setPen(text);
         if(mShowName) {
             p->drawText(rect(), Qt::AlignCenter,
-                        mName + ": " + getValueString());
+                        mName + ": " + mValueString);
         } else {
-            p->drawText(rect(), Qt::AlignCenter, getValueString());
+            p->drawText(rect(), Qt::AlignCenter, mValueString);
         }
     }
     p->setPen(QPen(stroke, 1));
@@ -197,11 +203,16 @@ void QDoubleSlider::cancelTransform() {
     emit editingCanceled();
 }
 
+void QDoubleSlider::updateValueString() {
+    mValueString = valueToText(mValue);
+    update();
+}
+
 void QDoubleSlider::setDisplayedValue(const qreal value) {
     const qreal clampedValue = clamped(value);
     if(isZero4Dec(mValue - clampedValue)) return;
     mValue = clampedValue;
-    update();
+    updateValueString();
 }
 
 void QDoubleSlider::fitWidthToContent() {
@@ -209,19 +220,18 @@ void QDoubleSlider::fitWidthToContent() {
     QString textMax;
     QString textMin;
     if(mShowName) {
-        textMax = mName + ": " + QString::number(mMaxValue, 'f', mDecimals);
-        textMin = mName + ": " + QString::number(mMinValue, 'f', mDecimals);
+        textMax = mName + ": " + valueToText(mMaxValue);
+        textMin = mName + ": " + valueToText(mMinValue);
     } else {
-        textMax = QString::number(mMaxValue, 'f', mDecimals);
-        textMin = QString::number(mMinValue, 'f', mDecimals);
+        textMax = valueToText(mMaxValue);
+        textMin = valueToText(mMinValue);
     }
-    int textWidth = qMax(fm.width(textMax), fm.width(textMin));
-    int newWidth = qMin(3*MIN_WIDGET_DIM,
-                        textWidth + textWidth%2 + MIN_WIDGET_DIM/2);
-    setMinimumWidth(newWidth);
-    mLineEdit->setMinimumWidth(newWidth);
-    setMaximumWidth(newWidth);
-    mLineEdit->setMaximumWidth(newWidth);
+    const int textWidth = qMax(fm.width(textMax), fm.width(textMin));
+    const int maxWidth = (mShowName ? 6 : 3)*MIN_WIDGET_DIM;
+    const int padding = MIN_WIDGET_DIM/2;
+    const int newWidth = qMin(maxWidth, textWidth + padding);
+    setFixedWidth(newWidth);
+    mLineEdit->setFixedWidth(newWidth);
 }
 
 void QDoubleSlider::paintEvent(QPaintEvent *) {
@@ -267,7 +277,7 @@ void QDoubleSlider::setIsLeftSlider(const bool value) {
 void QDoubleSlider::mouseMoveEvent(QMouseEvent *event) {
     if(!mMouseMoved) startTransform(mValue);
 
-    const qreal dValue = (event->x() - mLastX)*0.1*mPrefferedValueStep;
+    const qreal dValue = getDValueForMouseMove(event->x());
     const qreal newValue = clamped(mLastValue + dValue);
     mLastValue = newValue;
     setValue(newValue);

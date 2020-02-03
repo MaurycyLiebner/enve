@@ -20,7 +20,6 @@
 #include "smartPointers/ememory.h"
 #include "conncontextptr.h"
 class QrealAnimator;
-class Property;
 
 class QrealAnimatorValueSlider : public QDoubleSlider {
     Q_OBJECT
@@ -41,6 +40,7 @@ public:
 protected:
     void paint(QPainter *p);
     void openContextMenu(const QPoint &globalPos);
+    QString getEditText() const;
 
     void startTransform(const qreal value);
     void setValue(const qreal value);
@@ -51,8 +51,11 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event);
 private:
     QrealAnimator *getQPointFAnimatorSibling();
+    void targetHasExpressionChanged();
 
-    ConnContextQPtr<Property> mTarget;
+    QMetaObject::Connection mExprConn;
+    ConnContextQPtr<QrealAnimator> mTarget;
+    qreal mBaseValue;
 };
 
 #endif // QREALANIMATORVALUESLIDER_H

@@ -230,6 +230,7 @@ void QrealAnimator::setExpression(const qsptr<ExpressionValue> &expression) {
     }
     emit effectiveValueChanged(getEffectiveValue());
     prp_afterWholeInfluenceRangeChanged();
+    emit expressionChanged();
 }
 
 qreal QrealAnimator::calculateBaseValueAtRelFrame(const qreal frame) const {

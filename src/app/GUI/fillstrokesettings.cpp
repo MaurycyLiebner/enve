@@ -98,8 +98,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
     mTargetLayout->addWidget(mStrokeTargetButton);
 
     //mLineWidthSpin = new QDoubleSpinBox(this);
-    mLineWidthSpin = new QrealAnimatorValueSlider("line width", 0., 1000., 1., this);
-    mLineWidthSpin->setNameVisible(false);
+    mLineWidthSpin = new QrealAnimatorValueSlider(0, 1000, 0.5, this);
     //mLineWidthSpin->setValueSliderVisibile(false);
     //mLineWidthSpin->setRange(0.0, 1000.0);
     //mLineWidthSpin->setSuffix(" px");
