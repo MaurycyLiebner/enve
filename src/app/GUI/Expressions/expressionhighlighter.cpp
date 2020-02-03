@@ -37,6 +37,7 @@ ExpressionHighlighter::ExpressionHighlighter(
         QStringLiteral("acos"),
         QStringLiteral("atan"),
         QStringLiteral("exp"),
+        QStringLiteral("abs"),
         QStringLiteral("sqrt"),
         QStringLiteral("rand")
     };

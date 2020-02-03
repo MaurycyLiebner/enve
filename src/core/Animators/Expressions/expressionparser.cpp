@@ -107,7 +107,7 @@ bool parseSpecial(const QString& exp,
 }
 
 enum class Function {
-    sin, cos, tan, exp,
+    sin, cos, tan, exp, abs,
     asin, acos, atan,
     sqrt, rand
 };
@@ -130,6 +130,9 @@ bool parseFunction(const QString& exp,
         newPosition += 3;
     } else if(str4 == "exp(") {
         function = Function::exp;
+        newPosition += 3;
+    } else if(str4 == "abs(") {
+        function = Function::abs;
         newPosition += 3;
     } else if(str5 == "asin(") {
         function = Function::asin;
@@ -286,6 +289,10 @@ QSharedPointer<ExpressionValue> createFunction(
     case Function::exp:
         name = "exp";
         func = [](qreal v) { return std::exp(v); };
+        break;
+    case Function::abs:
+        name = "abs";
+        func = [](qreal v) { return std::abs(v); };
         break;
     case Function::asin:
         name = "asin";
