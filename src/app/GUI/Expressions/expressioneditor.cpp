@@ -131,12 +131,28 @@ void ExpressionEditor::showCompleter() {
 }
 
 void ExpressionEditor::insertCompletion(const QString &completion) {
+    if(completion.isEmpty()) return;
     QTextCursor tc = textCursor();
     const int prefixLen = mCompleter->completionPrefix().length();
     const int extra = completion.length() - prefixLen;
-    tc.movePosition(QTextCursor::Left);
-    tc.movePosition(QTextCursor::EndOfWord);
+    bool afterDot = false;
+    {
+        auto checkDot = tc;
+        checkDot.movePosition(QTextCursor::Left,
+                              QTextCursor::KeepAnchor);
+        const auto selected = checkDot.selectedText();
+        if(!selected.isEmpty()) {
+            const auto prevCharacter = selected.front();
+            if(prevCharacter == '.') afterDot = true;
+        }
+    }
+
+    if(!afterDot) {
+        tc.movePosition(QTextCursor::Left);
+        tc.movePosition(QTextCursor::EndOfWord);
+    }
     tc.insertText(completion.right(extra));
+
     if(completion.right(1) == ')') tc.movePosition(QTextCursor::Left);
     setTextCursor(tc);
 }
