@@ -29,7 +29,11 @@ public:
                           ExpressionEditor* const editor,
                           QTextDocument *parent);
 
-    void setCursorPos(const int pos);
+    void setCursor(const QTextCursor& cursor);
+
+    void addVariable(const QString& name);
+    void removeVariable(const QString& name);
+    void updateVariablesRule();
 protected:
     void highlightBlock(const QString &text) override;
 private:
@@ -39,14 +43,21 @@ private:
     };
 
     int mCursorPos = 0;
+    QTextCursor mOldCursor;
+
     QTextCharFormat mBracketsHighlightFormat;
     QTextCharFormat mErrorFormat;
+
+    QStringList mVariables;
+    HighlightingRule mVariablesRule;
     QVector<HighlightingRule> mHighlightingRules;
     QVector<HighlightingRule> mFuncRules;
 
     QRegularExpression mObjectsExpression;
 
+    QStringList mVariablesComplete;
     QStringList mBaseComplete;
+    QStringList mBaseVarsComplete;
 
     QrealAnimator* const mTarget;
     ComplexAnimator* const mSearchCtxt;

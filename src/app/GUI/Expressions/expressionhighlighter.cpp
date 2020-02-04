@@ -74,7 +74,7 @@ ExpressionHighlighter::ExpressionHighlighter(
 
     const auto funcExclude = funcs.join(QStringLiteral("\\(|")) + "\\(";
     mObjectsExpression = QRegularExpression(
-                "(\\b|(?<=[0-9]))"
+                "\\b"
                 "(?!(?<=\\$))"
                 "(?!" + funcExclude + ")"
                 "([A-Za-z_]([A-Za-z0-9_ ]*[A-Za-z0-9_])*\\.?)+");
@@ -98,11 +98,25 @@ ExpressionHighlighter::ExpressionHighlighter(
         mHighlightingRules.append(rule);
         mBaseComplete << "$" + spec;
     }
+    mVariablesRule.format = specialFormat;
+
+    mBaseVarsComplete = mBaseComplete;
 }
 
-void ExpressionHighlighter::setCursorPos(const int pos) {
-    mCursorPos = pos;
-    setDocument(document());
+void ExpressionHighlighter::setCursor(const QTextCursor& cursor) {
+    mCursorPos = cursor.positionInBlock();
+    const auto oldBlock = mOldCursor.block();
+    if(oldBlock.isValid()) rehighlightBlock(oldBlock);
+    rehighlightBlock(cursor.block());
+    mOldCursor = cursor;
+}
+
+void ExpressionHighlighter::addVariable(const QString &name) {
+    mVariables << name;
+}
+
+void ExpressionHighlighter::removeVariable(const QString &name){
+    mVariables.removeAll(name);
 }
 
 void ExpressionHighlighter::highlightBlock(const QString &text) {
@@ -137,6 +151,15 @@ void ExpressionHighlighter::highlightBlock(const QString &text) {
         while(matchIterator.hasNext()) {
             const auto match = matchIterator.next();
             setFormat(match.capturedStart(), match.capturedLength() - 1, rule.format);
+        }
+    }
+
+    {
+        auto matchIterator = mVariablesRule.pattern.globalMatch(text);
+        while(matchIterator.hasNext()) {
+            const auto match = matchIterator.next();
+            setFormat(match.capturedStart(), match.capturedLength(),
+                      mVariablesRule.format);
         }
     }
 
@@ -188,9 +211,21 @@ void ExpressionHighlighter::highlightBlock(const QString &text) {
                     0, QStringList() << "", &completions);
     }
     if(addFuncsComplete) {
-        QStringList tmp = mBaseComplete;
+        QStringList tmp = mBaseVarsComplete;
         tmp.append(completions);
         completions = tmp;
     }
     mEditor->setCompleterList(completions);
+}
+
+void ExpressionHighlighter::updateVariablesRule() {
+    mVariablesRule.pattern = QRegularExpression(
+                "\\$(" + mVariables.join('|') +")\\b");
+    mVariablesComplete.clear();
+    for(const auto& var : mVariables) {
+        mVariablesComplete << "$" + var;
+    }
+    mBaseVarsComplete = mBaseComplete;
+    mBaseVarsComplete.append(mVariablesComplete);
+    setDocument(document());
 }

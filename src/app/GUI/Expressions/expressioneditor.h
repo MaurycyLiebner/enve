@@ -26,6 +26,8 @@
 #include "GUI/global.h"
 #include "Animators/qrealanimator.h"
 
+class ExpressionHighlighter;
+
 class ExpressionEditor : public QTextEdit {
 public:
     ExpressionEditor(QrealAnimator* const target,
@@ -38,11 +40,18 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *e) override;
 private:
+    void updateVariables(const int from,
+                         const int charsRemoved,
+                         const int charsAdded);
     void showCompleter();
     void insertCompletion(const QString &completion);
     QString textUnderCursor() const;
 
+    ExpressionHighlighter* mHighlighter;
     QCompleter* mCompleter;
+
+    QRegularExpression mVariableDefinition;
+    std::map<int, QStringList> mVariables;
 };
 
 #endif // EXPRESSIONEDITOR_H

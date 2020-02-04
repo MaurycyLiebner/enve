@@ -31,20 +31,23 @@ ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
     setMinimumWidth(400);
     const auto doc = document();
     setAcceptRichText(false);
-    const auto highligter = new ExpressionHighlighter(target, this, doc);
+    mHighlighter = new ExpressionHighlighter(target, this, doc);
     connect(this, &QTextEdit::cursorPositionChanged,
-            this, [this, highligter]() {
+            this, [this]() {
         const auto cursor = textCursor();
-        highligter->setCursorPos(cursor.positionInBlock());
+        mHighlighter->setCursor(cursor);
     });
     mCompleter = new QCompleter(this);
     mCompleter->setWidget(this);
     mCompleter->setCompletionMode(QCompleter::PopupCompletion);
     mCompleter->setCaseSensitivity(Qt::CaseSensitive);
-    QObject::connect(mCompleter,
-                     qOverload<const QString&>(&QCompleter::activated),
-                     this, &ExpressionEditor::insertCompletion);
-    setText(text); // force autocomplete update
+    connect(mCompleter,
+            qOverload<const QString&>(&QCompleter::activated),
+            this, &ExpressionEditor::insertCompletion);
+    mVariableDefinition = QRegularExpression("\\$[A-Za-z_][A-Za-z0-9_]* *=");
+    connect(doc, &QTextDocument::contentsChange,
+            this, &ExpressionEditor::updateVariables);
+    setText(text);
 }
 
 void ExpressionEditor::setCompleterList(const QStringList &values) {
@@ -76,6 +79,46 @@ void ExpressionEditor::keyPressEvent(QKeyEvent *e) {
     }
 }
 
+void ExpressionEditor::updateVariables(const int from,
+                                       const int charsRemoved,
+                                       const int charsAdded) {
+    const auto doc = document();
+    QTextBlock block = doc->findBlock(from);
+    if(!block.isValid()) return;
+
+    QTextBlock lastBlock = doc->findBlock(from + charsAdded + (charsRemoved > 0 ? 1 : 0));
+    if(!lastBlock.isValid()) lastBlock = doc->lastBlock();
+    const int endPosition = lastBlock.position() + lastBlock.length();
+
+    bool changed = false;
+    while(block.isValid() && (block.position() < endPosition)) {
+        const int blockId = block.blockNumber();
+        auto& variables = mVariables[blockId];
+        const auto oldVariables = variables;
+        variables.clear();
+        {
+            auto matchIterator = mVariableDefinition.globalMatch(block.text());
+            while(matchIterator.hasNext()) {
+                const auto match = matchIterator.next();
+                auto def = match.captured();
+                variables << def.remove('$').remove('=').trimmed();
+            }
+        }
+        for(const auto& var : variables) {
+            if(oldVariables.contains(var)) continue;
+            mHighlighter->addVariable(var);
+            changed = true;
+        }
+        for(const auto& var : oldVariables) {
+            if(variables.contains(var)) continue;
+            mHighlighter->removeVariable(var);
+            changed = true;
+        }
+        block = block.next();
+    }
+    if(changed) mHighlighter->updateVariablesRule();
+}
+
 void ExpressionEditor::showCompleter() {
     const auto popup = mCompleter->popup();
     const auto underCursor = textUnderCursor();
@@ -100,21 +143,31 @@ void ExpressionEditor::insertCompletion(const QString &completion) {
 
 QString ExpressionEditor::textUnderCursor() const {
     QTextCursor tc = textCursor();
+    QChar prevCharacter;
     {
         auto checkSpace = tc;
         checkSpace.movePosition(QTextCursor::Left,
                                 QTextCursor::KeepAnchor);
-        if(checkSpace.selectedText() == " ") {
-            return "";
-        }
+        const auto selected = checkSpace.selectedText();
+        if(selected.isEmpty()) prevCharacter = ' ';
+        else prevCharacter = selected.front();
     }
+    if(prevCharacter == ' ') return "";
+    else if(prevCharacter == '$') return "$";
+    else if(!prevCharacter.isLetter() && !prevCharacter.isDigit()) return "";
+
     tc.movePosition(QTextCursor::Left);
     tc.select(QTextCursor::WordUnderCursor);
+
     QString result = tc.selectedText();
-    if(result == ".") {
-        tc.movePosition(QTextCursor::Right);
-        tc.select(QTextCursor::WordUnderCursor);
-        result = tc.selectedText();
+    {
+        auto checkVar = tc;
+        checkVar.movePosition(QTextCursor::Left,
+                              QTextCursor::MoveAnchor);
+        checkVar.movePosition(QTextCursor::Left,
+                              QTextCursor::KeepAnchor);
+        const auto selected = checkVar.selectedText();
+        if(selected == "$") result.prepend('$');
     }
     return result;
 }
