@@ -80,7 +80,7 @@ public:
 protected:
     qreal mOpacity = 1;
     QColor mColor;
-    PaintType mPaintType = FLATPAINT;//NOPAINT;
+    PaintType mPaintType = NOPAINT;
     SceneBoundGradient *mGradient = nullptr;
     QPointF mGradientP1;
     QPointF mGradientP2;
