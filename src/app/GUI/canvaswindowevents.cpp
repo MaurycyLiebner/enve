@@ -56,7 +56,7 @@ void CanvasWindow::resizeEvent(QResizeEvent *e) {
 
 void CanvasWindow::fitCanvasToSize() {
     if(mFitToSizeBlocked) {
-        mFitToSizeBlocked = true;
+        mFitToSizeBlocked = false;
         return;
     }
     if(!mCurrentCanvas) return;
