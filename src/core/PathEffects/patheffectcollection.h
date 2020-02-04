@@ -23,10 +23,13 @@ class PathBox;
 class PathEffectsTask;
 
 qsptr<PathEffect> readIdCreatePathEffect(eReadStream& src);
+void writePathEffectType(PathEffect* const obj, eWriteStream& dst);
 
-typedef DynamicComplexAnimator<PathEffect,
-        &PathEffect::writeIdentifier,
-        &readIdCreatePathEffect> PathEffectCollectionBase;
+typedef DynamicComplexAnimator<
+    PathEffect,
+    &writePathEffectType,
+    &readIdCreatePathEffect> PathEffectCollectionBase;
+
 class PathEffectCollection : public PathEffectCollectionBase {
     e_OBJECT
 protected:

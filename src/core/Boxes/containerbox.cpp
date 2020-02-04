@@ -26,6 +26,7 @@
 #include "Sound/singlesound.h"
 #include "actions.h"
 #include "externallinkbox.h"
+#include "namefixer.h"
 
 ContainerBox::ContainerBox(const eBoxType type) :
     BoxWithPathEffects(type == eBoxType::group ? "Group" : "Layer",
@@ -308,43 +309,18 @@ void ContainerBox::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
         child->prp_setInheritedFrameShift(thisShift, this);
 }
 
-QString stringScrapEndDigits(const QString& string) {
-    const QRegExp endNumbers(QStringLiteral("[0-9]+$"));
-    const int endNumbersIndex = endNumbers.indexIn(string);
-    QString trimmedName;
-    if(endNumbersIndex >= 0) {
-        return string.mid(0, endNumbersIndex);
-    } else {
-        return string;
-    }
-}
-
-using NamesGetter = std::function<QStringList(const QString&)>;
-QString makeNameUnique(const QString& name,
-                       const NamesGetter& namesGetter) {
-    const QString fixedBaseName = Property::prp_sFixName(name);
-    const QString trimmedName = stringScrapEndDigits(fixedBaseName).trimmed();
-    const QString fixedName = Property::prp_sFixName(trimmedName);
-    const QStringList usedList = namesGetter(fixedName);
-    if(!usedList.contains(fixedBaseName)) return fixedBaseName;
-    for(int i = 0;; i++) {
-        const QString suffix = " " + QString::number(i);
-        const QString testName = fixedName + suffix;
-        const bool taken = usedList.contains(testName);
-        if(!taken) return testName;
-    }
-}
-
 QString ContainerBox::makeNameUniqueForDescendants(
         const QString &name, eBoxOrSound * const skip) {
-    return makeNameUnique(name, [this, skip](const QString& name) {
+    return NameFixer::makeNameUnique(
+                name, [this, skip](const QString& name) {
         return allDescendantsNamesStartingWith(name, skip);
     });
 }
 
 QString ContainerBox::makeNameUniqueForContained(
         const QString &name, eBoxOrSound * const skip) {
-    return makeNameUnique(name, [this, skip](const QString& name) {
+    return NameFixer::makeNameUnique(
+                name, [this, skip](const QString& name) {
         return allContainedNamesStartingWith(name, skip);
     });
 }

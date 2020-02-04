@@ -95,6 +95,7 @@ SOURCES += \
     Animators/clampedvalue.cpp \
     Animators/coloranimator.cpp \
     Animators/complexkey.cpp \
+    Animators/customproperties.cpp \
     Animators/eboxorsound.cpp \
     Animators/eeffect.cpp \
     Animators/gradient.cpp \
@@ -269,6 +270,7 @@ SOURCES += \
     importhandler.cpp \
     matrixdecomposition.cpp \
     memorydatahandler.cpp \
+    namefixer.cpp \
     paintsettings.cpp \
     paintsettingsapplier.cpp \
     pathoperations.cpp \
@@ -375,6 +377,7 @@ HEADERS += \
     Animators/clampedvalue.h \
     Animators/coloranimator.h \
     Animators/complexkey.h \
+    Animators/customproperties.h \
     Animators/dynamiccomplexanimator.h \
     Animators/eboxorsound.h \
     Animators/eeffect.h \
@@ -507,6 +510,7 @@ HEADERS += \
     Properties/boolpropertycontainer.h \
     Properties/boxtargetproperty.h \
     Properties/emimedata.h \
+    Properties/namedproperty.h \
     RasterEffects/blureffect.h \
     RasterEffects/customrastereffect.h \
     RasterEffects/rastereffect.h \
@@ -562,6 +566,7 @@ HEADERS += \
     importhandler.h \
     matrixdecomposition.h \
     memorydatahandler.h \
+    namefixer.h \
     paintsettings.h \
     paintsettingsapplier.h \
     pathoperations.h \

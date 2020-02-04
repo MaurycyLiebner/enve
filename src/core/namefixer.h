@@ -14,27 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EXPRESSIONCOMPLEX_H
-#define EXPRESSIONCOMPLEX_H
+#ifndef NAMEFIXER_H
+#define NAMEFIXER_H
 
-#include "expressionsinglechild.h"
-#include "expressionvariable.h"
+#include <QRegExp>
+#include <functional>
 
-using ExpressionVarSPtr = QSharedPointer<ExpressionVariable>;
-
-class ExpressionComplex : public ExpressionSingleChild {
-public:
-    ExpressionComplex(const QList<ExpressionVarSPtr> &vars,
-                      const sptr& value);
-
-    static sptr sCreate(const QList<ExpressionVarSPtr>& vars,
-                        const ExpressionValue::sptr &value);
-
-    qreal calculateValue(const qreal relFrame) const override;
-    void collapse() override;
-    QString toString() const override;
-private:
-    QList<ExpressionVarSPtr> mVariables;
+namespace NameFixer {
+    QString stringScrapEndDigits(const QString& string);
+    using NamesGetter = std::function<QStringList(const QString&)>;
+    QString makeNameUnique(const QString& name,
+                           const NamesGetter& namesGetter);
 };
 
-#endif // EXPRESSIONCOMPLEX_H
+#endif // NAMEFIXER_H

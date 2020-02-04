@@ -37,6 +37,7 @@
 #include "RasterEffects/rastereffectmenucreator.h"
 #include "matrixdecomposition.h"
 #include "paintsettingsapplier.h"
+#include "Animators/customproperties.h"
 #include "GUI/propertynamedialog.h"
 
 int BoundingBox::sNextDocumentId = 0;
@@ -49,8 +50,13 @@ BoundingBox::BoundingBox(const QString& name, const eBoxType type) :
     eBoxOrSound(name),
     mDocumentId(sNextDocumentId++), mType(type),
     mTransformAnimator(enve::make_shared<BoxTransformAnimator>()),
+    mCustomProperties(enve::make_shared<CustomProperties>()),
     mRasterEffectsAnimators(enve::make_shared<RasterEffectCollection>()) {
     sDocumentBoxes << this;
+
+    ca_addChild(mCustomProperties);
+    mCustomProperties->SWT_setVisible(false);
+
     ca_addChild(mTransformAnimator);
     const auto pivotAnim = mTransformAnimator->getPivotAnimator();
     connect(pivotAnim, &Property::prp_currentFrameChanged,
@@ -852,11 +858,23 @@ QMatrix BoundingBox::getTotalTransformAtFrame(const qreal relFrame) {
 
 #include <QInputDialog>
 void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<BoundingBox>()) return;
+    menu->addedActionsForType<BoundingBox>();
     const auto parentWidget = menu->getParentWidget();
     menu->addPlainAction("Rename", [this, parentWidget]() {
         PropertyNameDialog::sRenameBox(this, parentWidget);
     });
-
+    menu->addSeparator();
+    {
+        const PropertyMenu::CheckSelectedOp<BoundingBox> visRangeOp =
+        [](BoundingBox* const box, const bool checked) {
+            box->mCustomProperties->SWT_setVisible(checked);
+        };
+        menu->addCheckableAction("Custom Properties",
+                                 mCustomProperties->SWT_isVisible(),
+                                 visRangeOp);
+    }
+    menu->addSeparator();
     const PropertyMenu::CheckSelectedOp<BoundingBox> visRangeOp =
     [](BoundingBox* const box, const bool checked) {
         if(box->mDurationRectangleLocked) return;
@@ -865,7 +883,6 @@ void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
         if(checked) box->createDurationRectangle();
         else box->setDurationRectangle(nullptr);
     };
-
     menu->addCheckableAction("Visibility Range",
                              hasDurationRectangle(),
                              visRangeOp);
@@ -873,7 +890,7 @@ void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
                          [this, parentWidget]() {
         mDurationRectangle->openDurationSettingsDialog(parentWidget);
     })->setEnabled(mDurationRectangle);
-
+    menu->addSeparator();
     setupCanvasMenu(menu->addMenu("Actions"));
 }
 

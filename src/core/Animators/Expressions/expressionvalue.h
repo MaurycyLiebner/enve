@@ -59,7 +59,7 @@ signals:
 private:
     const bool mNeedsBrackets;
     qreal mRelFrame = 123456789.;
-    qreal mCurrentValue;
+    qreal mCurrentValue = 0;
 };
 
 #endif // EXPRESSIONVALUE_H

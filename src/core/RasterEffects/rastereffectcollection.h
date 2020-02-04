@@ -23,10 +23,15 @@
 
 class BoundingBox;
 struct BoxRenderData;
+
 qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream& src);
+void writeRasterEffectType(RasterEffect* const obj, eWriteStream& dst);
+
 typedef DynamicComplexAnimator<
-    RasterEffect, &RasterEffect::writeIdentifier,
+    RasterEffect,
+    &writeRasterEffectType,
     &readIdCreateRasterEffect> RasterEffectCollectionBase;
+
 class RasterEffectCollection : public RasterEffectCollectionBase {
     e_OBJECT
     Q_OBJECT

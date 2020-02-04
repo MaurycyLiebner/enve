@@ -20,6 +20,7 @@
 #include "complexanimator.h"
 #include "typemenu.h"
 #include "Properties/emimedata.h"
+#include "namefixer.h"
 
 template <class T>
 class DynamicComplexAnimatorBase : public ComplexAnimator {
@@ -168,6 +169,35 @@ public:
     void swapChildrenTemporary(const int id1, const int id2) {
         ca_swapChildren(id1, id2);
     }
+
+    void allStartingWith(const QString &text,
+                         QList<Property*> &result) {
+        const auto& children = ca_getChildren();
+        for(const auto &child : children) {
+            const bool nameMatch = child->prp_getName().startsWith(text);
+            if(nameMatch) result << child.get();
+        }
+    }
+
+    QStringList allNamesStartingWith(const QString &text,
+                                     Property * const skip) {
+        QStringList result;
+        QList<Property*> matches;
+        allStartingWith(text, matches);
+        for(const auto match : matches) {
+            if(match == skip) continue;
+            result << match->prp_getName();
+        }
+        return result;
+    }
+
+    QString makeNameUnique(const QString &name,
+                           Property * const skip) {
+        return NameFixer::makeNameUnique(
+                    name, [this, skip](const QString& name) {
+            return allNamesStartingWith(name, skip);
+        });
+    }
 private:
     using ComplexAnimator::ca_addChild;
     using ComplexAnimator::ca_insertChild;
@@ -206,7 +236,7 @@ qsptr<T> TCreateOnly(eReadStream& src) {
 }
 
 template <class T,
-          void (T::*TWriteType)(eWriteStream& dst) const = nullptr,
+          void (*TWriteType)(T* const obj, eWriteStream& dst) = nullptr,
           qsptr<T> (*TReadTypeAndCreate)(eReadStream& src) = &TCreateOnly<T>>
 class DynamicComplexAnimator : public DynamicComplexAnimatorBase<T> {
     e_OBJECT
@@ -217,7 +247,7 @@ public:
     qsptr<T> createDuplicate(T* const src) override {
         Clipboard clipboard(ClipboardType::property);
         clipboard.write([this, src](eWriteStream& dst) {
-            if(TWriteType) (src->*TWriteType)(dst);
+            if(TWriteType) TWriteType(src, dst);
             src->prp_writeProperty(dst);
         });
         qsptr<T> duplicate;
@@ -235,7 +265,7 @@ public:
         for(const auto& prop : children) {
             const auto futureId = dst.planFuturePos();
             const auto TProp = static_cast<T*>(prop.get());
-            if(TWriteType) (TProp->*TWriteType)(dst);
+            if(TWriteType) TWriteType(TProp, dst);
             TProp->prp_writeProperty(dst);
             dst.assignFuturePos(futureId);
         }

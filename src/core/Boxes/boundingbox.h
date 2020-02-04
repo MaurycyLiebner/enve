@@ -39,6 +39,7 @@ class RasterEffectCollection;
 class ShaderEffectProgram;
 class BoxTransformAnimator;
 class BasicTransformAnimator;
+class CustomProperties;
 
 class ContainerBox;
 class SmartVectorPath;
@@ -407,6 +408,7 @@ protected:
     RenderDataHandler mRenderDataHandler;
 
     const qsptr<BoxTransformAnimator> mTransformAnimator;
+    const qsptr<CustomProperties> mCustomProperties;
     const qsptr<RasterEffectCollection> mRasterEffectsAnimators;
 private:
     SkBlendMode mBlendMode = SkBlendMode::kSrcOver;

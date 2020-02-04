@@ -97,3 +97,7 @@ qsptr<PathEffect> readIdCreatePathEffect(eReadStream &src) {
                                 QString::number(int(type)) + "'");
     }
 }
+
+void writePathEffectType(PathEffect * const obj, eWriteStream &dst) {
+    obj->writeIdentifier(dst);
+}

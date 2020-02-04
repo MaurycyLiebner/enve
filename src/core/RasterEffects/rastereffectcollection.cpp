@@ -138,3 +138,7 @@ qsptr<RasterEffect> readIdCreateRasterEffect(eReadStream &src) {
                               QString::number(int(type)) + "'");
     }
 }
+
+void writeRasterEffectType(RasterEffect * const obj, eWriteStream &dst) {
+    obj->writeIdentifier(dst);
+}

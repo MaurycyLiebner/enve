@@ -461,6 +461,5 @@ ExprSPtr ExpressionParser::parse(QString exp, QrealAnimator* const parent) {
             varList << qSharedPointerCast<ExpressionVariable>(expr);
         }
     }
-    const auto cplx = new ExpressionComplex(varList, lastValue);
-    return QSharedPointer<ExpressionComplex>(cplx);
+    return ExpressionComplex::sCreate(varList, lastValue);
 }
