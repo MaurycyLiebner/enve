@@ -179,9 +179,6 @@ public:
     QString makeNameUniqueForContained(
             const QString& name, eBoxOrSound * const skip = nullptr);
 
-    eBoxOrSound* firstDescendantWithName(const QString& name);
-    eBoxOrSound* firstContainedWithName(const QString &name);
-
     QStringList allDescendantsNamesStartingWith(
             const QString& text, eBoxOrSound * const skip = nullptr);
     QStringList allContainedNamesStartingWith(

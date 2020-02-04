@@ -349,27 +349,6 @@ QString ContainerBox::makeNameUniqueForContained(
     });
 }
 
-eBoxOrSound *ContainerBox::firstDescendantWithName(const QString &name) {
-    for(const auto &child : mContained) {
-        const bool nameMatch = child->prp_getName() == name;
-        if(nameMatch) return child.get();
-        if(child->SWT_isContainerBox()) {
-            const auto cont = static_cast<ContainerBox*>(child.get());
-            const auto matched = cont->firstDescendantWithName(name);
-            if(matched) return matched;
-        }
-    }
-    return nullptr;
-}
-
-eBoxOrSound *ContainerBox::firstContainedWithName(const QString& name) {
-    for(const auto &child : mContained) {
-        const bool nameMatch = child->prp_getName() == name;
-        if(nameMatch) return child.get();
-    }
-    return nullptr;
-}
-
 QStringList ContainerBox::allDescendantsNamesStartingWith(
         const QString &text, eBoxOrSound* const skip) {
     QStringList result;
