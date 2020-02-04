@@ -30,7 +30,7 @@ public:
                      QWidget * const parent = nullptr);
 
 private:
-    void apply(const bool action);
+    bool apply(const bool action);
 
     QrealAnimator* const mTarget;
 

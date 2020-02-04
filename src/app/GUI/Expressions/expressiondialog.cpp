@@ -84,14 +84,15 @@ ExpressionDialog::ExpressionDialog(QrealAnimator* const target,
     connect(applyButton, &QPushButton::released,
             this, [this]() { apply(true); });
     connect(okButton, &QPushButton::released,
-            this, [this]() { apply(true); });
-    connect(okButton, &QPushButton::released,
-            this, &ExpressionDialog::accept);
+            this, [this]() {
+        const bool valid = apply(true);
+        if(valid) accept();
+    });
     connect(cancelButton, &QPushButton::released,
             this, &ExpressionDialog::reject);
 }
 
-void ExpressionDialog::apply(const bool action) {
+bool ExpressionDialog::apply(const bool action) {
     mErrorLabel->clear();
     ExpressionValue::sptr expr;
     const auto text = mLine->toPlainText();
@@ -104,10 +105,13 @@ void ExpressionDialog::apply(const bool action) {
             mTarget->setExpression(expr);
         }
         Document::sInstance->actionFinished();
-        if(!expr) RuntimeThrow("Invalid expression.");
+        if(!expr && !text.isEmpty())
+            RuntimeThrow("Invalid expression.");
     } catch(const std::exception& e) {
         const QString error = e.what();
         const QString lastLine = error.split(QRegExp("\n|\r\n|\r")).last();
         mErrorLabel->setText(lastLine);
+        return false;
     }
+    return true;
 }
