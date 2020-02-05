@@ -26,7 +26,10 @@ bool ExpressionSourceBase::isValid() const
 
 ConnContext &ExpressionSourceBase::setSource(
         QrealAnimator * const source) {
-    return mSource.assign(source);
+    auto& conn = mSource.assign(source);
+    updateValue();
+    emit relRangeChanged(FrameRange::EMINMAX);
+    return conn;
 }
 
 QrealAnimator *ExpressionSourceBase::parent() const

@@ -23,6 +23,9 @@ class SimpleTask : public QObject {
     Q_OBJECT
     typedef std::function<void(void)> Func;
 public:
+    static SimpleTask *sScheduleContexted(
+            const QPointer<QObject>& ctxt,
+            const Func& func);
     static SimpleTask *sSchedule(const Func& func);
     static void sProcessAll();
 private:

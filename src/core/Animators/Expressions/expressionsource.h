@@ -17,6 +17,7 @@
 #ifndef EXPRESSIONSOURCE_H
 #define EXPRESSIONSOURCE_H
 #include "expressionsourcebase.h"
+#include "simpletask.h"
 
 class ExpressionSource : public ExpressionSourceBase {
 public:
@@ -30,12 +31,24 @@ public:
     { return mPath; }
 
     bool dependsOn(QrealAnimator* const source) const override;
+    bool isValid() const override
+    { return validSource(); }
 
     void setPath(const QString& path);
 private:
-    void lookForSource();
+    QrealAnimator *validSource() const;
+
+    //! @brief False when source exists, but cannot locate it, e.g.,
+    //! after source was removed, but still exists in undo/redo
+    void setSourcePathValid(const bool valid);
+
+    void setSource(QrealAnimator* const newSource);
+    SimpleTaskScheduler pathChanged;
+    QrealAnimator* findSource();
+    void reloadSource();
     void updateSourcePath();
 
+    bool mSourcePathValid = false;
     QString mPath;
 };
 

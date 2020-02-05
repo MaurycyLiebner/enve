@@ -16,9 +16,17 @@
 
 #include "simpletask.h"
 
+#include <QPointer>
+
 QList<SimpleTask*> SimpleTask::sTasks;
 
 SimpleTask::SimpleTask(const Func& func) : mFunc(func) {}
+
+SimpleTask *SimpleTask::sScheduleContexted(
+        const QPointer<QObject> &ctxt,
+        const Func &func) {
+    return sSchedule([func, ctxt]() { if(ctxt) func(); });
+}
 
 SimpleTask* SimpleTask::sSchedule(const Func &func) {
     const auto task = new SimpleTask(func);
@@ -40,7 +48,7 @@ SimpleTaskScheduler::SimpleTaskScheduler(const Func &func) :
 
 void SimpleTaskScheduler::schedule() {
     if(mScheduled) return;
-    const auto task = SimpleTask::sSchedule(mFunc);
+    const auto task = SimpleTask::sScheduleContexted(this, mFunc);
     connect(task, &SimpleTask::destroyed, this, [this]() { mScheduled = false; });
     mScheduled = true;
 }
