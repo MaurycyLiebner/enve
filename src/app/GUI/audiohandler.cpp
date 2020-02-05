@@ -54,6 +54,7 @@ void AudioHandler::initializeAudio(const eSoundSettingsData& soundSettings) {
     }
 
     mAudioOutput = new QAudioOutput(mAudioDevice, mAudioFormat, this);
+    mAudioOutput->setNotifyInterval(128);
 }
 
 void AudioHandler::startAudio() {

@@ -102,26 +102,24 @@ void SoundReader::readFrame() {
     int nSamples = 0;
     while(true) {
         mOpenedAudio->fLastDstSample = -10*dstSampleRate;
-        if(av_read_frame(formatContext, packet) < 0) {
-            break;
-        } else {
-            if(packet->stream_index == audioStreamIndex) {
-                const int sendRet = avcodec_send_packet(codecContext, packet);
-                if(sendRet < 0) RuntimeThrow("Sending packet to the decoder failed");
+        const int readRet = av_read_frame(formatContext, packet);
+        if(readRet < 0) break;
+        if(packet->stream_index == audioStreamIndex) {
+            const int sendRet = avcodec_send_packet(codecContext, packet);
+            if(sendRet < 0) RuntimeThrow("Sending packet to the decoder failed");
 
-                const int recRet = avcodec_receive_frame(codecContext, decodedFrame);
-                av_packet_unref(packet);
+            const int recRet = avcodec_receive_frame(codecContext, decodedFrame);
+            av_packet_unref(packet);
 
-                if(recRet == AVERROR_EOF)
-                    break;
-                else if(recRet == AVERROR(EAGAIN)) {
-                    continue;
-                } else if(recRet < 0)
-                    RuntimeThrow("Did not receive frame from the decoder");
-            } else {
-                av_packet_unref(packet);
+            if(recRet == AVERROR_EOF)
+                break;
+            else if(recRet == AVERROR(EAGAIN)) {
                 continue;
-            }
+            } else if(recRet < 0)
+                RuntimeThrow("Did not receive frame from the decoder");
+        } else {
+            av_packet_unref(packet);
+            continue;
         }
 
         // calculate PTS:

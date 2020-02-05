@@ -44,6 +44,8 @@ RenderHandler::RenderHandler(Document &document,
             this, &RenderHandler::nextPreviewFrame);
     connect(mPreviewFPSTimer, &QTimer::timeout,
             this, &RenderHandler::audioPushTimerExpired);
+    connect(audioHandler.audioOutput(), &QAudioOutput::notify,
+            this, &RenderHandler::audioPushTimerExpired);
 
     const auto vidEmitter = videoEncoder.getEmitter();
 //    connect(vidEmitter, &VideoEncoderEmitter::encodingStarted,
@@ -270,6 +272,7 @@ void RenderHandler::playPreview() {
     setPreviewState(PreviewSate::playing);
 
     startAudio();
+
     const int mSecInterval = qRound(1000/mCurrentScene->getFps());
     mPreviewFPSTimer->setInterval(mSecInterval);
     mPreviewFPSTimer->start();
@@ -369,7 +372,9 @@ void RenderHandler::nextSaveOutputFrame() {
 
 void RenderHandler::startAudio() {
     mAudioHandler.startAudio();
-    if(mCurrentSoundComposition) mCurrentSoundComposition->start(mCurrentPreviewFrame);
+    if(mCurrentSoundComposition)
+        mCurrentSoundComposition->start(mCurrentPreviewFrame);
+    audioPushTimerExpired();
 }
 
 void RenderHandler::stopAudio() {

@@ -51,6 +51,8 @@ public:
     void startAudio();
     void stopAudio();
     void setVolume(const int value);
+
+    QAudioOutput* audioOutput() const { return mAudioOutput; }
 private:
     QAudioDeviceInfo mAudioDevice;
     QAudioOutput *mAudioOutput = nullptr;
