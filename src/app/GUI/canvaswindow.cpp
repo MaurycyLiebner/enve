@@ -99,27 +99,30 @@ void CanvasWindow::updatePaintModeCursor() {
 void CanvasWindow::updateSculptModeCursor() {
     if(mDocument.fCanvasMode != CanvasMode::sculptPath) return;
     mValidSculptTarget = mCurrentCanvas && mCurrentCanvas->hasValidSculptTarget();
-    if(mValidSculptTarget) {
-        const qreal viewScale = mViewTransform.m11();
-        const qreal radius = mDocument.fSculptBrush.radius()*viewScale;
-        const qreal clampedRadius = qBound(1., radius, 200.);
-        const int iRadius = qRound(clampedRadius);
-        const int margin = 3;
-        const int dim = 2*(iRadius + margin);
-        QPixmap brushPix(dim, dim);
-        brushPix.fill(Qt::transparent);
-        QPainter p(&brushPix);
-        const QRect circleRect(margin, margin, 2*iRadius, 2*iRadius);
-        p.setPen(Qt::white);
-        p.drawEllipse(circleRect);
-        p.setPen(Qt::black);
-        p.drawEllipse(circleRect.adjusted(-1, -1, 1, 1));
-        p.end();
+    const qreal viewScale = mViewTransform.m11();
+    const qreal radius = mDocument.fSculptBrush.radius()*viewScale;
+    const qreal clampedRadius = qBound(1., radius, 200.);
+    const int iRadius = qRound(clampedRadius);
+    const int margin = 3;
+    const int dim = 2*(iRadius + margin);
+    QPixmap brushPix(dim, dim);
+    brushPix.fill(Qt::transparent);
+    QPainter p(&brushPix);
+    p.setRenderHint(QPainter::Antialiasing);
+    const QRect circleRect(margin, margin, 2*iRadius, 2*iRadius);
+    const int penWidth = mValidSculptTarget ? 1 : 2;
+    QPen pen;
+    pen.setWidth(penWidth);
+    pen.setColor(Qt::white);
+    p.setPen(pen);
+    p.drawEllipse(circleRect);
+    pen.setColor(Qt::black);
+    p.setPen(pen);
+    p.drawEllipse(circleRect.adjusted(-penWidth, -penWidth,
+                                       penWidth,  penWidth));
+    p.end();
 
-        setCursor(QCursor(brushPix, iRadius + margin, iRadius + margin));
-    } else {
-        setCursor(QCursor(QPixmap(":/cursors/cursor_crosshair_open.png")));
-    }
+    setCursor(QCursor(brushPix, iRadius + margin, iRadius + margin));
 }
 
 void CanvasWindow::setCanvasMode(const CanvasMode mode) {
