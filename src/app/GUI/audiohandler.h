@@ -49,6 +49,8 @@ public:
 
     void initializeAudio(const eSoundSettingsData &soundSettings);
     void startAudio();
+    void pauseAudio();
+    void resumeAudio();
     void stopAudio();
     void setVolume(const int value);
 

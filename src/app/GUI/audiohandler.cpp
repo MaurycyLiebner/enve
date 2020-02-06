@@ -61,6 +61,14 @@ void AudioHandler::startAudio() {
     mAudioIOOutput = mAudioOutput->start();
 }
 
+void AudioHandler::pauseAudio() {
+    mAudioOutput->suspend();
+}
+
+void AudioHandler::resumeAudio() {
+    mAudioOutput->resume();
+}
+
 void AudioHandler::stopAudio() {
     //mAudioOutput->suspend();
     //mCurrentSoundComposition->stop();

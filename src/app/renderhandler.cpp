@@ -230,6 +230,7 @@ void RenderHandler::stopPreview() {
 
 void RenderHandler::pausePreview() {
     if(mPreviewing) {
+        mAudioHandler.pauseAudio();
         mPreviewFPSTimer->stop();
         emit previewPaused();
         setPreviewState(PreviewSate::paused);
@@ -238,6 +239,7 @@ void RenderHandler::pausePreview() {
 
 void RenderHandler::resumePreview() {
     if(mPreviewing) {
+        mAudioHandler.resumeAudio();
         mPreviewFPSTimer->start();
         emit previewBeingPlayed();
         setPreviewState(PreviewSate::playing);
