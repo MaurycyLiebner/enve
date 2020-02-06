@@ -37,18 +37,19 @@ void seek(const int tryN, const int secondId,
           AVFormatContext * const formatContext,
           const int audioStreamIndex, AVStream * const audioStream,
           AVCodecContext * const codecContext) {
-    const int64_t tsms = qFloor(secondId * 1000 - tryN);
+    const int64_t tsms = qFloor((secondId - 1 - tryN) * 1000);
     const int64_t tm = av_rescale(tsms, audioStream->time_base.den,
                                   audioStream->time_base.num)/1000;
     if(tm <= 0)
         avformat_seek_file(formatContext, audioStreamIndex,
                            INT64_MIN, 0, 0, 0);
     else {
-        const int64_t tsms0 = qFloor((secondId - tryN) * 1000);
+        const int64_t tsms0 = qFloor((secondId - 1 - tryN) * 1000);
         const int64_t tm0 = av_rescale(tsms0, audioStream->time_base.den,
                                        audioStream->time_base.num)/1000;
         if(avformat_seek_file(formatContext, audioStreamIndex, tm0,
                               tm, tm, AVSEEK_FLAG_FRAME) < 0) {
+            qDebug() << "Failed to seek to " << secondId;
             avformat_seek_file(formatContext, audioStreamIndex,
                                INT64_MIN, 0, INT64_MAX, 0);
         }
