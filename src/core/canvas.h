@@ -417,7 +417,7 @@ protected:
     void handleMovePathMouseRelease(const MouseEvent &e);
     void handleMovePointMouseRelease(const MouseEvent &e);
 
-    void handleRightButtonMousePress(const MouseEvent &e);
+    void handleRightButtonMouseRelease(const MouseEvent &e);
     void handleLeftButtonMousePress(const MouseEvent &e);
 signals:
     void requestUpdate();

@@ -59,14 +59,10 @@ void Canvas::mousePressEvent(const MouseEvent &e) {
         if(e.fButton == Qt::LeftButton) {
             sculptPress(e.fPos, 1);
             e.fGrabMouse();
-        } else if(e.fButton == Qt::RightButton) {
-            sculptCancel();
         }
     } else {
         if(e.fButton == Qt::LeftButton) {
             handleLeftButtonMousePress(e);
-        } else if(e.fButton == Qt::RightButton) {
-            handleRightButtonMousePress(e);
         }
     }
 }
@@ -142,6 +138,14 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
 
 void Canvas::mouseReleaseEvent(const MouseEvent &e) {
     if(isPreviewingOrRendering()) return;
+    if(e.fButton == Qt::RightButton) {
+        if(mCurrentMode == CanvasMode::paint) {
+        } else if(mCurrentMode == CanvasMode::sculptPath) {
+            sculptCancel();
+        } else {
+            handleRightButtonMouseRelease(e);
+        }
+    }
     if(e.fButton != Qt::LeftButton) return;
     schedulePivotUpdate();
     if(mCurrentMode == CanvasMode::paint)

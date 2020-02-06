@@ -205,7 +205,8 @@ void CanvasWindow::tabletEvent(QTabletEvent *e) {
 
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
     const auto button = event->button();
-    if(event->buttons() & Qt::MiddleButton) {
+    if(event->buttons() & Qt::MiddleButton ||
+       event->buttons() & Qt::RightButton) {
         if(button == Qt::MiddleButton)
             QApplication::setOverrideCursor(Qt::ClosedHandCursor);
         return;
@@ -238,6 +239,11 @@ void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
     const auto button = event->button();
     if(button == Qt::MiddleButton)
         QApplication::restoreOverrideCursor();
+    else if(button == Qt::RightButton &&
+            QApplication::overrideCursor()) {
+        QApplication::restoreOverrideCursor();
+        return;
+    }
     if(!mCurrentCanvas || mBlockInput) return;
     const auto pos = mapToCanvasCoord(event->pos());
     mCurrentCanvas->mouseReleaseEvent(
@@ -253,7 +259,10 @@ void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
 void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
     if(!mCurrentCanvas || mBlockInput) return;
     auto pos = mapToCanvasCoord(event->pos());
-    if(event->buttons() & Qt::MiddleButton) {
+    if(event->buttons() & Qt::MiddleButton ||
+       event->buttons() & Qt::RightButton) {
+        if(!QApplication::overrideCursor())
+            QApplication::setOverrideCursor(Qt::ClosedHandCursor);
         translateView(pos - mPrevMousePos);
         pos = mPrevMousePos;
     }

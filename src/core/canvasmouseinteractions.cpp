@@ -93,7 +93,7 @@ void Canvas::addActionsToMenu(QMenu *const menu) {
     });
 }
 
-void Canvas::handleRightButtonMousePress(const MouseEvent& e) {
+void Canvas::handleRightButtonMouseRelease(const MouseEvent& e) {
     if(e.fMouseGrabbing) {
         cancelCurrentTransform();
         e.fReleaseMouse();
