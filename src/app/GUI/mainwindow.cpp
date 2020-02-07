@@ -160,7 +160,8 @@ MainWindow::MainWindow(Document& document,
 
     mDocument.setPath("");
 
-    mFillStrokeSettingsDock = new CloseSignalingDockWidget("Fill and Stroke", this);
+    mFillStrokeSettingsDock = new CloseSignalingDockWidget(
+                tr("Fill and Stroke", "Dock"), this);
     //const auto fillStrokeSettingsScroll = new ScrollArea(this);
     mFillStrokeSettings = new FillStrokeSettingsWidget(mDocument, this);
     //fillStrokeSettingsScroll->setWidget(mFillStrokeSettings);
@@ -169,7 +170,7 @@ MainWindow::MainWindow(Document& document,
     mFillStrokeSettingsDock->setMinimumWidth(MIN_WIDGET_DIM*12);
     mFillStrokeSettingsDock->setMaximumWidth(MIN_WIDGET_DIM*20);
 
-    mTimelineDock = new CloseSignalingDockWidget("Timeline", this);
+    mTimelineDock = new CloseSignalingDockWidget(tr("Timeline", "Dock"), this);
     mTimelineDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::BottomDockWidgetArea, mTimelineDock);
 
@@ -177,7 +178,8 @@ MainWindow::MainWindow(Document& document,
     mTimeline = new TimelineDockWidget(mDocument, mLayoutHandler, this);
     mTimelineDock->setWidget(mTimeline);
 
-    mBrushSettingsDock = new CloseSignalingDockWidget("Brush Settings", this);
+    mBrushSettingsDock = new CloseSignalingDockWidget(
+                tr("Brush Settings", "Dock"), this);
     mBrushSettingsDock->setMinimumWidth(MIN_WIDGET_DIM*10);
     mBrushSettingsDock->setMaximumWidth(MIN_WIDGET_DIM*20);
 
@@ -195,7 +197,8 @@ MainWindow::MainWindow(Document& document,
     addDockWidget(Qt::LeftDockWidgetArea, mBrushSettingsDock);
     mBrushSettingsDock->hide();
 
-    mSelectedObjectDock = new CloseSignalingDockWidget("Selected Objects", this);
+    mSelectedObjectDock = new CloseSignalingDockWidget(
+                tr("Selected Objects", "Dock"), this);
     mSelectedObjectDock->setMinimumWidth(MIN_WIDGET_DIM*10);
     mSelectedObjectDock->setMaximumWidth(MIN_WIDGET_DIM*20);
 
@@ -220,7 +223,7 @@ MainWindow::MainWindow(Document& document,
     mSelectedObjectDock->setWidget(mObjectSettingsScrollArea);
     addDockWidget(Qt::LeftDockWidgetArea, mSelectedObjectDock);
 
-    mFilesDock = new CloseSignalingDockWidget("Files", this);
+    mFilesDock = new CloseSignalingDockWidget(tr("Files", "Dock"), this);
     mFilesDock->setMinimumWidth(MIN_WIDGET_DIM*10);
     mFilesDock->setMaximumWidth(MIN_WIDGET_DIM*20);
 
@@ -272,68 +275,70 @@ MainWindow::~MainWindow() {
 void MainWindow::setupMenuBar() {
     mMenuBar = new QMenuBar(this);
 
-    mFileMenu = mMenuBar->addMenu("File");
-    mFileMenu->addAction("New...",
+    mFileMenu = mMenuBar->addMenu(tr("File", "MenuBar"));
+    mFileMenu->addAction(tr("New...", "MenuBar_File"),
                          this, &MainWindow::newFile,
                          Qt::CTRL + Qt::Key_N);
-    mFileMenu->addAction("Open...",
+    mFileMenu->addAction(tr("Open...", "MenuBar_File"),
                          this, qOverload<>(&MainWindow::openFile),
                          Qt::CTRL + Qt::Key_O);
-    mRecentMenu = mFileMenu->addMenu("Open Recent");
+    mRecentMenu = mFileMenu->addMenu(tr("Open Recent", "MenuBar_File"));
     mFileMenu->addSeparator();
 //    mFileMenu->addAction("Link...",
 //                         this, &MainWindow::linkFile,
 //                         Qt::CTRL + Qt::Key_L);
-    mFileMenu->addAction("Import File...",
-                         this,
-                         qOverload<>(&MainWindow::importFile),
+    mFileMenu->addAction(tr("Import File...", "MenuBar_File"),
+                         this, qOverload<>(&MainWindow::importFile),
                          Qt::CTRL + Qt::Key_I);
-    mFileMenu->addAction("Import Image Sequence...",
+    mFileMenu->addAction(tr("Import Image Sequence...", "MenuBar_File"),
                          this, &MainWindow::importImageSequence);
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Revert", this, &MainWindow::revert);
+    mFileMenu->addAction(tr("Revert", "MenuBar_File"),
+                         this, &MainWindow::revert);
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Save",
+    mFileMenu->addAction(tr("Save", "MenuBar_File"),
                          this, &MainWindow::saveFile,
                          Qt::CTRL + Qt::Key_S);
-    mFileMenu->addAction("Save As...",
+    mFileMenu->addAction(tr("Save As...", "MenuBar_File"),
                          this, &MainWindow::saveFileAs,
                          Qt::CTRL + Qt::SHIFT + Qt::Key_S);
-    mFileMenu->addAction("Save Backup",
+    mFileMenu->addAction(tr("Save Backup", "MenuBar_File"),
                          this, &MainWindow::saveBackup);
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Close", this, &MainWindow::closeProject);
+    mFileMenu->addAction(tr("Close", "MenuBar_File"),
+                         this, &MainWindow::closeProject);
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Exit", this, &MainWindow::close);
+    mFileMenu->addAction(tr("Exit", "MenuBar_File"),
+                         this, &MainWindow::close);
 
-    mEditMenu = mMenuBar->addMenu("Edit");
+    mEditMenu = mMenuBar->addMenu(tr("Edit", "MenuBar"));
 
-    const auto undoQAct = mEditMenu->addAction("Undo");
+    const auto undoQAct = mEditMenu->addAction(tr("Undo", "MenuBar_Edit"));
     undoQAct->setShortcut(Qt::CTRL + Qt::Key_Z);
     mActions.undoAction->connect(undoQAct);
 
-    const auto redoQAct = mEditMenu->addAction("Redo");
+    const auto redoQAct = mEditMenu->addAction(tr("Redo", "MenuBar_Edit"));
     redoQAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
     mActions.redoAction->connect(redoQAct);
 
     mEditMenu->addSeparator();
 
     {
-        const auto qAct = new NoShortcutAction("Copy");
+        const auto qAct = new NoShortcutAction(tr("Copy", "MenuBar_Edit"));
         mEditMenu->addAction(qAct);
         qAct->setShortcut(Qt::CTRL + Qt::Key_C);
         mActions.copyAction->connect(qAct);
     }
 
     {
-        const auto qAct = new NoShortcutAction("Cut");
+        const auto qAct = new NoShortcutAction(tr("Cut", "MenuBar_Edit"));
         mEditMenu->addAction(qAct);
         qAct->setShortcut(Qt::CTRL + Qt::Key_X);
         mActions.cutAction->connect(qAct);
     }
 
     {
-        const auto qAct = new NoShortcutAction("Paste");
+        const auto qAct = new NoShortcutAction(tr("Paste", "MenuBar_Edit"));
         mEditMenu->addAction(qAct);
         qAct->setShortcut(Qt::CTRL + Qt::Key_V);
         mActions.pasteAction->connect(qAct);
@@ -342,7 +347,7 @@ void MainWindow::setupMenuBar() {
     mEditMenu->addSeparator();
 
     {
-        const auto qAct = new NoShortcutAction("Duplicate");
+        const auto qAct = new NoShortcutAction(tr("Duplicate", "MenuBar_Edit"));
         mEditMenu->addAction(qAct);
         qAct->setShortcut(Qt::CTRL + Qt::Key_D);
         mActions.duplicateAction->connect(qAct);
@@ -351,24 +356,27 @@ void MainWindow::setupMenuBar() {
     mEditMenu->addSeparator();
 
     {
-        const auto qAct = new NoShortcutAction("Delete");
+        const auto qAct = new NoShortcutAction(tr("Delete", "MenuBar_Edit"));
         mEditMenu->addAction(qAct);
         qAct->setShortcut(Qt::Key_Delete);
         mActions.deleteAction->connect(qAct);
     }
 
     mEditMenu->addSeparator();
-    mEditMenu->addAction(new NoShortcutAction("Select All",
-                         &mActions, &Actions::selectAllAction,
-                         Qt::Key_A, mEditMenu));
-    mEditMenu->addAction(new NoShortcutAction("Invert Selection",
-                                              &mActions, &Actions::invertSelectionAction,
-                                              Qt::Key_I, mEditMenu));
-    mEditMenu->addAction(new NoShortcutAction("Clear Selection",
-                         &mActions, &Actions::clearSelectionAction,
-                         Qt::ALT + Qt::Key_A, mEditMenu));
+    mEditMenu->addAction(new NoShortcutAction(
+                             tr("Select All", "MenuBar_Edit"),
+                             &mActions, &Actions::selectAllAction,
+                             Qt::Key_A, mEditMenu));
+    mEditMenu->addAction(new NoShortcutAction(
+                             tr("Invert Selection", "MenuBar_Edit"),
+                             &mActions, &Actions::invertSelectionAction,
+                             Qt::Key_I, mEditMenu));
+    mEditMenu->addAction(new NoShortcutAction(
+                             tr("Clear Selection", "MenuBar_Edit"),
+                             &mActions, &Actions::clearSelectionAction,
+                             Qt::ALT + Qt::Key_A, mEditMenu));
     mEditMenu->addSeparator();
-    mEditMenu->addAction("Settings...", [this]() {
+    mEditMenu->addAction(tr("Settings...", "MenuBar_Edit"), [this]() {
         const auto settDial = new SettingsDialog(this);
         settDial->exec();
     });
@@ -381,124 +389,148 @@ void MainWindow::setupMenuBar() {
 //    mSelectSameMenu->addAction("Stroke Style");
 //    mSelectSameMenu->addAction("Object Type");
 
-    mObjectMenu = mMenuBar->addMenu("Object");
+    mObjectMenu = mMenuBar->addMenu(tr("Object", "MenuBar"));
 
     mObjectMenu->addSeparator();
 
-    const auto raiseQAct = mObjectMenu->addAction("Raise");
+    const auto raiseQAct = mObjectMenu->addAction(
+                tr("Raise", "MenuBar_Object"));
     raiseQAct->setShortcut(Qt::Key_PageUp);
     mActions.raiseAction->connect(raiseQAct);
 
-    const auto lowerQAct = mObjectMenu->addAction("Lower");
+    const auto lowerQAct = mObjectMenu->addAction(
+                tr("Lower", "MenuBar_Object"));
     lowerQAct->setShortcut(Qt::Key_PageDown);
     mActions.lowerAction->connect(lowerQAct);
 
-    const auto rttQAct = mObjectMenu->addAction("Raise to Top");
+    const auto rttQAct = mObjectMenu->addAction(
+                tr("Raise to Top", "MenuBar_Object"));
     rttQAct->setShortcut(Qt::Key_Home);
     mActions.raiseToTopAction->connect(rttQAct);
 
-    const auto ltbQAct = mObjectMenu->addAction("Lower to Bottom");
+    const auto ltbQAct = mObjectMenu->addAction(
+                tr("Lower to Bottom", "MenuBar_Object"));
     ltbQAct->setShortcut(Qt::Key_End);
     mActions.lowerToBottomAction->connect(ltbQAct);
 
     mObjectMenu->addSeparator();
 
     {
-        const auto qAct = mObjectMenu->addAction("Rotate 90° CW");
+        const auto qAct = mObjectMenu->addAction(
+                    tr("Rotate 90° CW", "MenuBar_Object"));
         mActions.rotate90CWAction->connect(qAct);
     }
 
     {
-        const auto qAct = mObjectMenu->addAction("Rotate 90° CCW");
+        const auto qAct = mObjectMenu->addAction(
+                    tr("Rotate 90° CCW", "MenuBar_Object"));
         mActions.rotate90CCWAction->connect(qAct);
     }
 
     {
-        const auto qAct = mObjectMenu->addAction("Flip Horizontal");
+        const auto qAct = mObjectMenu->addAction(
+                    tr("Flip Horizontal", "MenuBar_Object"));
         qAct->setShortcut(Qt::Key_H);
         mActions.flipHorizontalAction->connect(qAct);
     }
 
     {
-        const auto qAct = mObjectMenu->addAction("Flip Vertical");
+        const auto qAct = mObjectMenu->addAction(
+                    tr("Flip Vertical", "MenuBar_Object"));
         qAct->setShortcut(Qt::Key_V);
         mActions.flipVerticalAction->connect(qAct);
     }
 
     mObjectMenu->addSeparator();
 
-    const auto groupQAct = mObjectMenu->addAction("Group");
+    const auto groupQAct = mObjectMenu->addAction(
+                tr("Group", "MenuBar_Object"));
     groupQAct->setShortcut(Qt::CTRL + Qt::Key_G);
     mActions.groupAction->connect(groupQAct);
 
-    const auto ungroupQAct = mObjectMenu->addAction("Ungroup");
+    const auto ungroupQAct = mObjectMenu->addAction(
+                tr("Ungroup", "MenuBar_Object"));
     ungroupQAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
     mActions.ungroupAction->connect(ungroupQAct);
 
     mObjectMenu->addSeparator();
 
-    const auto transformMenu = mObjectMenu->addMenu("Transform");
-    const auto moveAct = transformMenu->addAction("Move");
+    const auto transformMenu = mObjectMenu->addMenu(
+                tr("Transform", "MenuBar_Object"));
+    const auto moveAct = transformMenu->addAction(
+                tr("Move", "MenuBar_Object_Transform"));
     moveAct->setShortcut(Qt::Key_G);
     moveAct->setDisabled(true);
-    const auto rotateAct = transformMenu->addAction("Rotate");
+    const auto rotateAct = transformMenu->addAction(
+                tr("Rotate", "MenuBar_Object_Transform"));
     rotateAct->setShortcut(Qt::Key_R);
     rotateAct->setDisabled(true);
-    const auto scaleAct = transformMenu->addAction("Scale");
+    const auto scaleAct = transformMenu->addAction(
+                tr("Scale", "MenuBar_Object_Transform"));
     scaleAct->setShortcut(Qt::Key_S);
     scaleAct->setDisabled(true);
     transformMenu->addSeparator();
-    const auto xAct = transformMenu->addAction("X-Axis Only");
+    const auto xAct = transformMenu->addAction(
+                tr("X-Axis Only", "MenuBar_Object_Transform"));
     xAct->setShortcut(Qt::Key_X);
     xAct->setDisabled(true);
-    const auto yAct = transformMenu->addAction("Y-Axis Only");
+    const auto yAct = transformMenu->addAction(
+                tr("Y-Axis Only", "MenuBar_Object_Transform"));
     yAct->setShortcut(Qt::Key_Y);
     yAct->setDisabled(true);
 
 
-    mPathMenu = mMenuBar->addMenu("Path");
+    mPathMenu = mMenuBar->addMenu(tr("Path", "MenuBar"));
 
-    const auto otpQAct = mPathMenu->addAction("Object to Path");
+    const auto otpQAct = mPathMenu->addAction(
+                tr("Object to Path", "MenuBar_Path"));
     mActions.objectsToPathAction->connect(otpQAct);
 
-    const auto stpQAct = mPathMenu->addAction("Stroke to Path");
+    const auto stpQAct = mPathMenu->addAction(
+                tr("Stroke to Path", "MenuBar_Path"));
     mActions.strokeToPathAction->connect(stpQAct);
 
     mPathMenu->addSeparator();
 
     {
-        const auto qAct = mPathMenu->addAction("Object to Sculpted Path");
+        const auto qAct = mPathMenu->addAction(
+                    tr("Object to Sculpted Path", "MenuBar_Path"));
         mActions.objectsToSculptedPathAction->connect(qAct);
     }
 
     mPathMenu->addSeparator();
 
     {
-        const auto qAct = mPathMenu->addAction("Union");
+        const auto qAct = mPathMenu->addAction(
+                    tr("Union", "MenuBar_Path"));
         qAct->setShortcut(Qt::CTRL + Qt::Key_Plus);
         mActions.pathsUnionAction->connect(qAct);
     }
 
     {
-        const auto qAct = mPathMenu->addAction("Difference");
+        const auto qAct = mPathMenu->addAction(
+                    tr("Difference", "MenuBar_Path"));
         qAct->setShortcut(Qt::CTRL + Qt::Key_Minus);
         mActions.pathsDifferenceAction->connect(qAct);
     }
 
     {
-        const auto qAct = mPathMenu->addAction("Intersection");
+        const auto qAct = mPathMenu->addAction(
+                    tr("Intersection", "MenuBar_Path"));
         qAct->setShortcut(Qt::CTRL + Qt::Key_Asterisk);
         mActions.pathsIntersectionAction->connect(qAct);
     }
 
     {
-        const auto qAct = mPathMenu->addAction("Exclusion");
+        const auto qAct = mPathMenu->addAction(
+                    tr("Exclusion", "MenuBar_Path"));
         qAct->setShortcut(Qt::CTRL + Qt::Key_AsciiCircum);
         mActions.pathsExclusionAction->connect(qAct);
     }
 
     {
-        const auto qAct = mPathMenu->addAction("Division");
+        const auto qAct = mPathMenu->addAction(
+                    tr("Division", "MenuBar_Path"));
         qAct->setShortcut(Qt::CTRL + Qt::Key_Slash);
         mActions.pathsDivisionAction->connect(qAct);
     }
@@ -510,13 +542,15 @@ void MainWindow::setupMenuBar() {
     mPathMenu->addSeparator();
 
     {
-        const auto qAct = mPathMenu->addAction("Combine");
+        const auto qAct = mPathMenu->addAction(
+                    tr("Combine", "MenuBar_Path"));
         qAct->setShortcut(Qt::CTRL + Qt::Key_K);
         mActions.pathsCombineAction->connect(qAct);
     }
 
     {
-        const auto qAct = mPathMenu->addAction("Break Apart");
+        const auto qAct = mPathMenu->addAction(
+                    tr("Break Apart", "MenuBar_Path"));
         qAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_K);
         mActions.pathsBreakApartAction->connect(qAct);
     }
@@ -525,26 +559,30 @@ void MainWindow::setupMenuBar() {
 
 //    mEffectsMenu->addAction("Blur");
 
-    mSceneMenu = mMenuBar->addMenu("Scene");
-    mSceneMenu->addAction("New Scene...", this, [this]() {
+    mSceneMenu = mMenuBar->addMenu(tr("Scene", "MenuBar"));
+
+    mSceneMenu->addAction(tr("New Scene...", "MenuBar_Scene"), this, [this]() {
         CanvasSettingsDialog::sNewCanvasDialog(mDocument, this);
     });
 
-
     {
-        const auto qAct = mSceneMenu->addAction("Delete Scene");
+        const auto qAct = mSceneMenu->addAction(
+                    tr("Delete Scene", "MenuBar_Scene"));
         mActions.deleteSceneAction->connect(qAct);
     }
 
     mSceneMenu->addSeparator();
 
-    mSceneMenu->addAction("Add to Render Queue", this, &MainWindow::addCanvasToRenderQue);
+    mSceneMenu->addAction(tr("Add to Render Queue", "MenuBar_Scene"),
+                          this, &MainWindow::addCanvasToRenderQue);
 
-    mViewMenu = mMenuBar->addMenu("View");
+    mViewMenu = mMenuBar->addMenu(tr("View", "MenuBar"));
 
-    const auto filteringMenu = mViewMenu->addMenu("Filtering");
+    const auto filteringMenu = mViewMenu->addMenu(
+                tr("Filtering", "MenuBar_View"));
 
-    mNoneQuality = filteringMenu->addAction("None", [this]() {
+    mNoneQuality = filteringMenu->addAction(
+                tr("None", "MenuBar_View_Filtering"), [this]() {
         eFilterSettings::sSetDisplayFilter(kNone_SkFilterQuality);
         centralWidget()->update();
 
@@ -557,7 +595,8 @@ void MainWindow::setupMenuBar() {
     mNoneQuality->setChecked(eFilterSettings::sDisplay() == kNone_SkFilterQuality &&
                              !eFilterSettings::sSmartDisplat());
 
-    mLowQuality = filteringMenu->addAction("Low", [this]() {
+    mLowQuality = filteringMenu->addAction(
+                tr("Low", "MenuBar_View_Filtering"), [this]() {
         eFilterSettings::sSetDisplayFilter(kLow_SkFilterQuality);
         centralWidget()->update();
 
@@ -570,7 +609,8 @@ void MainWindow::setupMenuBar() {
     mLowQuality->setChecked(eFilterSettings::sDisplay() == kLow_SkFilterQuality &&
                             !eFilterSettings::sSmartDisplat());
 
-    mMediumQuality = filteringMenu->addAction("Medium", [this]() {
+    mMediumQuality = filteringMenu->addAction(
+                tr("Medium", "MenuBar_View_Filtering"), [this]() {
         eFilterSettings::sSetDisplayFilter(kMedium_SkFilterQuality);
         centralWidget()->update();
 
@@ -583,7 +623,8 @@ void MainWindow::setupMenuBar() {
     mMediumQuality->setChecked(eFilterSettings::sDisplay() == kMedium_SkFilterQuality &&
                                !eFilterSettings::sSmartDisplat());
 
-    mHighQuality = filteringMenu->addAction("High", [this]() {
+    mHighQuality = filteringMenu->addAction(
+                tr("High", "MenuBar_View_Filtering"), [this]() {
         eFilterSettings::sSetDisplayFilter(kHigh_SkFilterQuality);
         centralWidget()->update();
 
@@ -596,7 +637,8 @@ void MainWindow::setupMenuBar() {
     mHighQuality->setChecked(eFilterSettings::sDisplay() == kHigh_SkFilterQuality &&
                              !eFilterSettings::sSmartDisplat());
 
-    mDynamicQuality = filteringMenu->addAction("Dynamic", [this]() {
+    mDynamicQuality = filteringMenu->addAction(
+                tr("Dynamic", "MenuBar_View_Filtering"), [this]() {
         eFilterSettings::sSetSmartDisplay(true);
         centralWidget()->update();
 
@@ -608,29 +650,33 @@ void MainWindow::setupMenuBar() {
     mDynamicQuality->setCheckable(true);
     mDynamicQuality->setChecked(eFilterSettings::sSmartDisplat());
 
-    mClipViewToCanvas = mViewMenu->addAction("Clip to Scene");
+    mClipViewToCanvas = mViewMenu->addAction(
+                tr("Clip to Scene", "MenuBar_View"));
     mClipViewToCanvas->setCheckable(true);
     mClipViewToCanvas->setChecked(true);
     mClipViewToCanvas->setShortcut(QKeySequence(Qt::Key_C));
     connect(mClipViewToCanvas, &QAction::triggered,
             &mActions, &Actions::setClipToCanvas);
 
-    mRasterEffectsVisible = mViewMenu->addAction("Raster Effects");
+    mRasterEffectsVisible = mViewMenu->addAction(
+                tr("Raster Effects", "MenuBar_View"));
     mRasterEffectsVisible->setCheckable(true);
     mRasterEffectsVisible->setChecked(true);
     connect(mRasterEffectsVisible, &QAction::triggered,
             &mActions, &Actions::setRasterEffectsVisible);
 
-    mPathEffectsVisible = mViewMenu->addAction("Path Effects");
+    mPathEffectsVisible = mViewMenu->addAction(
+                tr("Path Effects", "MenuBar_View"));
     mPathEffectsVisible->setCheckable(true);
     mPathEffectsVisible->setChecked(true);
     connect(mPathEffectsVisible, &QAction::triggered,
             &mActions, &Actions::setPathEffectsVisible);
 
 
-    mPanelsMenu = mViewMenu->addMenu("Docks");
+    mPanelsMenu = mViewMenu->addMenu(tr("Docks", "MenuBar_View"));
 
-    mSelectedObjectDockAct = mPanelsMenu->addAction("Selected Objects");
+    mSelectedObjectDockAct = mPanelsMenu->addAction(
+                tr("Selected Objects", "MenuBar_View_Docks"));
     mSelectedObjectDockAct->setCheckable(true);
     mSelectedObjectDockAct->setChecked(true);
     mSelectedObjectDockAct->setShortcut(QKeySequence(Qt::Key_O));
@@ -640,7 +686,8 @@ void MainWindow::setupMenuBar() {
     connect(mSelectedObjectDockAct, &QAction::toggled,
             mSelectedObjectDock, &QDockWidget::setVisible);
 
-    mFilesDockAct = mPanelsMenu->addAction("Files");
+    mFilesDockAct = mPanelsMenu->addAction(
+                tr("Files", "MenuBar_View_Docks"));
     mFilesDockAct->setCheckable(true);
     mFilesDockAct->setChecked(true);
     mFilesDockAct->setShortcut(QKeySequence(Qt::Key_F));
@@ -650,7 +697,8 @@ void MainWindow::setupMenuBar() {
     connect(mFilesDockAct, &QAction::toggled,
             mFilesDock, &QDockWidget::setVisible);
 
-    mTimelineDockAct = mPanelsMenu->addAction("Timeline");
+    mTimelineDockAct = mPanelsMenu->addAction(
+                tr("Timeline", "MenuBar_View_Docks"));
     mTimelineDockAct->setCheckable(true);
     mTimelineDockAct->setChecked(true);
     mTimelineDockAct->setShortcut(QKeySequence(Qt::Key_T));
@@ -660,7 +708,8 @@ void MainWindow::setupMenuBar() {
     connect(mTimelineDockAct, &QAction::toggled,
             mTimelineDock, &QDockWidget::setVisible);
 
-    mFillAndStrokeDockAct = mPanelsMenu->addAction("Fill and Stroke");
+    mFillAndStrokeDockAct = mPanelsMenu->addAction(
+                tr("Fill and Stroke", "MenuBar_View_Docks"));
     mFillAndStrokeDockAct->setCheckable(true);
     mFillAndStrokeDockAct->setChecked(true);
     mFillAndStrokeDockAct->setShortcut(QKeySequence(Qt::Key_E));
@@ -670,7 +719,8 @@ void MainWindow::setupMenuBar() {
     connect(mFillAndStrokeDockAct, &QAction::toggled,
             mFillStrokeSettingsDock, &QDockWidget::setVisible);
 
-    mBrushDockAction = mPanelsMenu->addAction("Paint Brush");
+    mBrushDockAction = mPanelsMenu->addAction(
+                tr("Paint Brush", "MenuBar_View_Docks"));
     mBrushDockAction->setCheckable(true);
     mBrushDockAction->setChecked(false);
     mBrushDockAction->setShortcut(QKeySequence(Qt::Key_B));
@@ -680,7 +730,8 @@ void MainWindow::setupMenuBar() {
     connect(mBrushDockAction, &QAction::toggled,
             mBrushSettingsDock, &QDockWidget::setVisible);
 
-    mBrushColorBookmarksAction = mPanelsMenu->addAction("Brush/Color Bookmarks");
+    mBrushColorBookmarksAction = mPanelsMenu->addAction(
+                tr("Brush/Color Bookmarks", "MenuBar_View_Docks"));
     mBrushColorBookmarksAction->setCheckable(true);
     mBrushColorBookmarksAction->setChecked(true);
     mBrushColorBookmarksAction->setShortcut(QKeySequence(Qt::Key_U));
@@ -688,9 +739,9 @@ void MainWindow::setupMenuBar() {
     connect(mBrushColorBookmarksAction, &QAction::toggled,
             mCentralWidget, &CentralWidget::setSidesVisibilitySetting);
 
-    const auto help = mMenuBar->addMenu("Help");
+    const auto help = mMenuBar->addMenu(tr("Help", "MenuBar"));
 
-    help->addAction("License", this, [this]() {
+    help->addAction(tr("License", "MenuBar_Help"), this, [this]() {
         if(EnveLicense::sInstance) {
             delete EnveLicense::sInstance;
         } else {
@@ -700,7 +751,7 @@ void MainWindow::setupMenuBar() {
     });
 
     mMenuBar->addSeparator();
-    mMenuBar->addAction("Support enve", this, []() {
+    mMenuBar->addAction(tr("Support enve", "MenuBar"), this, []() {
         QDesktopServices::openUrl(QUrl("https://maurycyliebner.github.io/"));
     });
 
@@ -757,7 +808,7 @@ void MainWindow::setupStatusBar() {
 }
 
 void MainWindow::setupToolBar() {
-    mToolBar = new QToolBar("Toolbar", this);
+    mToolBar = new QToolBar(tr("Toolbar"), this);
     mToolBar->setMovable(false);
 
     mToolBar->setIconSize(QSize(24, 24));
@@ -769,26 +820,26 @@ void MainWindow::setupToolBar() {
     mBoxTransformMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/boxTransformUnchecked.png",
                 iconsDir + "/boxTransformChecked.png",
-                gSingleLineTooltip("Object Mode", "F1"), this);
+                gSingleLineTooltip(tr("Object Mode", "ToolBar"), "F1"), this);
     mBoxTransformMode->toggle();
     mToolBar->addWidget(mBoxTransformMode);
 
     mPointTransformMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/pointTransformUnchecked.png",
                 iconsDir + "/pointTransformChecked.png",
-                gSingleLineTooltip("Point Mode", "F2"), this);
+                gSingleLineTooltip(tr("Point Mode", "ToolBar"), "F2"), this);
     mToolBar->addWidget(mPointTransformMode);
 
     mAddPointMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/pathCreateUnchecked.png",
                 iconsDir +  "/pathCreateChecked.png",
-                gSingleLineTooltip("Add Path Mode", "F3"), this);
+                gSingleLineTooltip(tr("Add Path Mode", "ToolBar"), "F3"), this);
     mToolBar->addWidget(mAddPointMode);
 
     mPaintMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/paintUnchecked.png",
                 iconsDir + "/paintChecked.png",
-                gSingleLineTooltip("Paint Mode", "F4"), this);
+                gSingleLineTooltip(tr("Paint Mode", "ToolBar"), "F4"), this);
     mToolBar->addWidget(mPaintMode);
 
     mToolBar->addSeparator();
@@ -796,25 +847,25 @@ void MainWindow::setupToolBar() {
     mSculptMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/sculptUnchecked.png",
                 iconsDir + "/sculptChecked.png",
-                gSingleLineTooltip("Sculpt Path Mode", "F5"), this);
+                gSingleLineTooltip(tr("Sculpt Path Mode", "ToolBar"), "F5"), this);
     mToolBar->addWidget(mSculptMode);
 
     mCircleMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/circleCreateUnchecked.png",
                 iconsDir + "/circleCreateChecked.png",
-                gSingleLineTooltip("Add Circle Mode", "F6"), this);
+                gSingleLineTooltip(tr("Add Circle Mode", "ToolBar"), "F6"), this);
     mToolBar->addWidget(mCircleMode);
 
     mRectangleMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/rectCreateUnchecked.png",
                 iconsDir + "/rectCreateChecked.png",
-                gSingleLineTooltip("Add Rectange Mode", "F7"), this);
+                gSingleLineTooltip(tr("Add Rectange Mode", "ToolBar"), "F7"), this);
     mToolBar->addWidget(mRectangleMode);
 
     mTextMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/textCreateUnchecked.png",
                 iconsDir + "/textCreateChecked.png",
-                gSingleLineTooltip("Add Text Mode", "F8"), this);
+                gSingleLineTooltip(tr("Add Text Mode", "ToolBar"), "F8"), this);
     mToolBar->addWidget(mTextMode);
 
     mToolBar->addSeparator();
@@ -822,7 +873,7 @@ void MainWindow::setupToolBar() {
     mPickPaintSettingsMode = SwitchButton::sCreate2Switch(
                 iconsDir + "/pickUnchecked.png",
                 iconsDir + "/pickChecked.png",
-                gSingleLineTooltip("Pick Mode", "F9"), this);
+                gSingleLineTooltip(tr("Pick Mode", "ToolBar"), "F9"), this);
     mToolBar->addWidget(mPickPaintSettingsMode);
 
     mToolBar->widgetForAction(mToolBar->addAction("     "))->
@@ -832,44 +883,44 @@ void MainWindow::setupToolBar() {
             setObjectName("emptyToolButton");
 
     mActionConnectPoints = new ActionButton(iconsDir + "/nodeConnect.png",
-                                            "Connect Nodes", this);
+                                            tr("Connect Nodes", "ToolBar"), this);
     mActionConnectPointsAct = mToolBar->addWidget(mActionConnectPoints);
 
     mActionDisconnectPoints = new ActionButton(iconsDir + "/nodeDisconnect.png",
-                                               "Disconnect Nodes", this);
+                                               tr("Disconnect Nodes", "ToolBar"), this);
     mActionDisconnectPointsAct = mToolBar->addWidget(mActionDisconnectPoints);
 
     mActionMergePoints = new ActionButton(iconsDir + "/nodeMerge.png",
-                                          "Merge Nodes", this);
+                                          tr("Merge Nodes", "ToolBar"), this);
     mActionMergePointsAct = mToolBar->addWidget(mActionMergePoints);
 
     mActionNewNode = new ActionButton(iconsDir + "/nodeNew.png",
-                                      "New Node", this);
+                                      tr("New Node", "ToolBar"), this);
     mActionNewNodeAct = mToolBar->addWidget(mActionNewNode);
 //
     mSeparator1 = mToolBar->addSeparator();
 
     mActionSymmetricPointCtrls = new ActionButton(iconsDir + "/nodeSymmetric.png",
-                                                  "Symmetric Nodes", this);
+                                                  tr("Symmetric Nodes", "ToolBar"), this);
     mActionSymmetricPointCtrlsAct = mToolBar->addWidget(mActionSymmetricPointCtrls);
 
     mActionSmoothPointCtrls = new ActionButton(iconsDir + "/nodeSmooth.png",
-                                               "Smooth Nodes", this);
+                                               tr("Smooth Nodes", "ToolBar"), this);
     mActionSmoothPointCtrlsAct = mToolBar->addWidget(mActionSmoothPointCtrls);
 
     mActionCornerPointCtrls = new ActionButton(iconsDir + "/nodeCorner.png",
-                                               "Corner Nodes", this);
+                                               tr("Corner Nodes", "ToolBar"), this);
     mActionCornerPointCtrlsAct = mToolBar->addWidget(mActionCornerPointCtrls);
 
 //
     mSeparator2 = mToolBar->addSeparator();
 
     mActionLine = new ActionButton(iconsDir + "/segmentLine.png",
-                                   gSingleLineTooltip("Make Segment Line"), this);
+                                   gSingleLineTooltip(tr("Make Segment Line", "ToolBar")), this);
     mActionLineAct = mToolBar->addWidget(mActionLine);
 
     mActionCurve = new ActionButton(iconsDir + "/segmentCurve.png",
-                                    gSingleLineTooltip("Make Segment Curve"), this);
+                                    gSingleLineTooltip(tr("Make Segment Curve", "ToolBar")), this);
     mActionCurveAct = mToolBar->addWidget(mActionCurve);
 
     mFontWidget = new FontsWidget(this);
@@ -877,7 +928,7 @@ void MainWindow::setupToolBar() {
 
     mActionNewEmptyPaintFrame = new ActionButton(
                 iconsDir + "/newEmpty.png",
-                gSingleLineTooltip("New Empty Frame", "N"), this);
+                gSingleLineTooltip(tr("New Empty Frame", "ToolBar"), "N"), this);
     mActionNewEmptyPaintFrameAct = mToolBar->addWidget(mActionNewEmptyPaintFrame);
 
     mToolBar->setFixedHeight(2*MIN_WIDGET_DIM);
@@ -1026,11 +1077,19 @@ FillStrokeSettingsWidget *MainWindow::getFillStrokeSettings() {
 
 bool MainWindow::askForSaving() {
     if(mChangedSinceSaving) {
-        int buttonId = QMessageBox::question(this, "Save", "Save changes to document \"" +
-                                      mDocument.fEvFile.split("/").last() +
-                                      "\"?", "Close without saving",
-                                      "Cancel",
-                                      "Save");
+        const QString title = tr("Save", "AskSaveDialog_Title");
+        const QString fileName = mDocument.fEvFile.split("/").last();
+
+        const QString question = tr("Save changes to document \"%1\"?",
+                                    "AskSaveDialog_Question");
+        const QString questionWithTarget = question.arg(fileName);
+        const QString closeNoSave =  tr("Close without saving",
+                                        "AskSaveDialog_Button");
+        const QString cancel = tr("Cancel", "AskSaveDialog_Button");
+        const QString save = tr("Save", "AskSaveDialog_Button");
+        const int buttonId = QMessageBox::question(
+                    this, title, questionWithTarget,
+                    closeNoSave, cancel, save);
         if(buttonId == 1) {
             return false;
         } else if(buttonId == 2) {
@@ -1199,8 +1258,10 @@ void MainWindow::openFile() {
         disable();
         const QString defPath = mDocument.fEvFile.isEmpty() ?
                     QDir::homePath() : mDocument.fEvFile;
-        const QString openPath = eDialogs::openFile("Open File", defPath,
-                                                    "enve Files (*.ev)");
+
+        const QString title = tr("Open File", "OpenDialog_Title");
+        const QString files = tr("enve Files %1", "OpenDialog_FileType");
+        const QString openPath = eDialogs::openFile(title, defPath, files.arg("(*.ev)"));
         if(!openPath.isEmpty()) openFile(openPath);
         enable();
     }
@@ -1236,8 +1297,9 @@ void MainWindow::saveFileAs() {
     const QString defPath = mDocument.fEvFile.isEmpty() ?
                 QDir::homePath() : mDocument.fEvFile;
 
-    QString saveAs = eDialogs::saveFile("Save File", defPath,
-                                        "enve Files (*.ev)");
+    const QString title = tr("Save File", "SaveDialog_Title");
+    const QString fileType = tr("enve Files %1", "SaveDialog_FileType");
+    QString saveAs = eDialogs::saveFile(title, defPath, fileType.arg("(*.ev)"));
     enableEventFilter();
     if(!saveAs.isEmpty()) {
         if(saveAs.right(3) != ".ev") saveAs += ".ev";
@@ -1278,12 +1340,15 @@ void MainWindow::importFile() {
     disableEventFilter();
     const QString defPath = mDocument.fEvFile.isEmpty() ?
                 QDir::homePath() : mDocument.fEvFile;
+
+    const QString title = tr("Import File(s)", "ImportDialog_Title");
+    const QString fileType = tr("Files %1", "ImportDialog_FileTypes");
+    const QString fileTypes = "(*.ev *.svg " +
+            FileExtensions::videoFilters() +
+            FileExtensions::imageFilters() +
+            FileExtensions::soundFilters() + ")";
     const auto importPaths = eDialogs::openFiles(
-                "Import File", defPath,
-                "Files (*.ev *.svg " +
-                        FileExtensions::videoFilters() +
-                        FileExtensions::imageFilters() +
-                        FileExtensions::soundFilters() + ")");
+                title, defPath, fileType.arg(fileTypes));
     enableEventFilter();
     if(!importPaths.isEmpty()) {
         for(const QString &path : importPaths) {
@@ -1301,8 +1366,10 @@ void MainWindow::linkFile() {
     disableEventFilter();
     const QString defPath = mDocument.fEvFile.isEmpty() ?
                 QDir::homePath() : mDocument.fEvFile;
-    QStringList importPaths = eDialogs::openFiles(
-        "Link File", defPath, "enve Files (*.ev)");
+    const QString title = tr("Link File", "LinkDialog_Title");
+    const QString fileType = tr("enve Files %1", "LinkDialog_FileType");
+    const auto importPaths = eDialogs::openFiles(
+                title, defPath, fileType.arg("(*.ev)"));
     enableEventFilter();
     if(!importPaths.isEmpty()) {
         for(const QString &path : importPaths) {
@@ -1316,7 +1383,9 @@ void MainWindow::importImageSequence() {
     disableEventFilter();
     const QString defPath = mDocument.fEvFile.isEmpty() ?
                 QDir::homePath() : mDocument.fEvFile;
-    const auto folder = eDialogs::openDir("Import Image Sequence", defPath);
+    const QString title = tr("Import Image Sequence",
+                             "ImportSequenceDialog_Title");
+    const auto folder = eDialogs::openDir(title, defPath);
     enableEventFilter();
     if(!folder.isEmpty()) mActions.importFile(folder);
 }
