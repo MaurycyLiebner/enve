@@ -68,7 +68,7 @@ Rectangle::Rectangle() : PathBox("Rectangle", eBoxType::rectangle) {
             this, pathUpdater);
 }
 
-SkPath Rectangle::getPathAtRelFrameF(const qreal relFrame) {
+SkPath Rectangle::getRelativePath(const qreal relFrame) const {
     SkPath path;
     const QPointF topLeft = mTopLeftAnimator->getEffectiveValue(relFrame);
     const QPointF bottomRight = mBottomRightAnimator->getEffectiveValue(relFrame);

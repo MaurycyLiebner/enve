@@ -77,7 +77,7 @@ void SmartVectorPath::applyCurrentTransform() {
     mNReasonsNotToApplyUglyTransform--;
 }
 
-SkPath SmartVectorPath::getPathAtRelFrameF(const qreal relFrame) {
+SkPath SmartVectorPath::getRelativePath(const qreal relFrame) const {
      return mPathAnimator->getPathAtRelFrame(relFrame);
 }
 

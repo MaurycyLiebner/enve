@@ -40,6 +40,7 @@ class ShaderEffectProgram;
 class BoxTransformAnimator;
 class BasicTransformAnimator;
 class CustomProperties;
+class BlendEffectCollection;
 
 class ContainerBox;
 class SmartVectorPath;
@@ -48,6 +49,7 @@ class DurationRectangle;
 struct ContainerBoxRenderData;
 class ShaderEffect;
 class RasterEffect;
+struct ChildRenderData;
 enum class CanvasMode : short;
 
 class SimpleBrushWrapper;
@@ -147,9 +149,9 @@ public:
     }
 
     virtual void drawPixmapSk(SkCanvas * const canvas,
-                              const SkFilterQuality filter);
-    virtual void drawHoveredSk(SkCanvas *canvas,
-                               const float invScale);
+                              const SkFilterQuality filter, int &drawId,
+                              QList<std::function<bool(int)>> &delayed);
+    virtual void drawHoveredSk(SkCanvas *canvas, const float invScale);
 
     virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
 
@@ -380,6 +382,12 @@ public:
     { return mVisibleInScene; }
     void setVisibleForScene(const bool visible)
     { mVisibleInScene = visible; }
+
+    void blendSetup(ChildRenderData& data,
+                    const int index, const qreal relFrame,
+                    QList<ChildRenderData>& delayed) const;
+    void drawPixmapSk(SkCanvas * const canvas,
+                      const SkFilterQuality filter);
 private:
     void cancelWaitingTasks();
     void afterTotalTransformChanged(const UpdateReason reason);
@@ -407,8 +415,9 @@ protected:
 
     RenderDataHandler mRenderDataHandler;
 
-    const qsptr<BoxTransformAnimator> mTransformAnimator;
     const qsptr<CustomProperties> mCustomProperties;
+    const qsptr<BlendEffectCollection> mBlendEffectCollection;
+    const qsptr<BoxTransformAnimator> mTransformAnimator;
     const qsptr<RasterEffectCollection> mRasterEffectsAnimators;
 private:
     SkBlendMode mBlendMode = SkBlendMode::kSrcOver;

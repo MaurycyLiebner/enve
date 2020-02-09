@@ -45,7 +45,7 @@ protected:
 public:
     bool SWT_isCircle() const;
 
-    SkPath getPathAtRelFrameF(const qreal relFrame);
+    SkPath getRelativePath(const qreal relFrame) const;
 
     bool differenceInEditPathBetweenFrames(
                 const int frame1, const int frame2) const;

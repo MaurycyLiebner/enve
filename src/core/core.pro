@@ -110,6 +110,8 @@ SOURCES += \
     Animators/sceneboundgradient.cpp \
     Animators/staticcomplexanimator.cpp \
     Animators/texteffectcollection.cpp \
+    BlendEffects/blendeffect.cpp \
+    BlendEffects/blendeffectcollection.cpp \
     Boxes/animationbox.cpp \
     Boxes/boundingbox.cpp \
     Boxes/boxrendercontainer.cpp \
@@ -394,6 +396,8 @@ HEADERS += \
     Animators/sceneboundgradient.h \
     Animators/staticcomplexanimator.h \
     Animators/texteffectcollection.h \
+    BlendEffects/blendeffect.h \
+    BlendEffects/blendeffectcollection.h \
     Boxes/animationbox.h \
     Boxes/boundingbox.h \
     Boxes/boxrendercontainer.h \

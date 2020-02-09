@@ -38,7 +38,7 @@ public:
 
     void setupCanvasMenu(PropertyMenu * const menu);
 
-    SkPath getPathAtRelFrameF(const qreal relFrame);
+    SkPath getRelativePath(const qreal relFrame) const;
 
     bool differenceInEditPathBetweenFrames(const int frame1,
                                            const int frame2) const;

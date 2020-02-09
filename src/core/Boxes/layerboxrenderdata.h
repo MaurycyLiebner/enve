@@ -18,12 +18,43 @@
 #define CONTAINERBOXRENDERDATA_H
 #include "boxrenderdata.h"
 
+struct PathClipOp {
+    SkPath fClipPath;
+    SkClipOp fClipPathOp;
+    bool fClipPathAA;
+
+    void clip(SkCanvas * const canvas) const {
+        canvas->clipPath(fClipPath, fClipPathOp, fClipPathAA);
+    }
+};
+
+struct PathClip {
+    int fTargetIndex;
+    QList<PathClipOp> fClipOps;
+
+    void clip(SkCanvas * const canvas) const {
+        for(const auto& op : fClipOps) op.clip(canvas);
+    }
+};
+
+struct ChildRenderData {
+    template <typename T>
+    ChildRenderData(const stdsptr<T>& data) :
+        fData(data) {}
+
+    inline BoxRenderData* operator->() const
+    { return fData.operator->(); }
+
+    stdsptr<BoxRenderData> fData;
+    PathClip fClip;
+};
+
 struct ContainerBoxRenderData : public BoxRenderData {
     e_OBJECT
 public:
     ContainerBoxRenderData(BoundingBox * const parentBox);
 
-    QList<stdsptr<BoxRenderData>> fChildrenRenderData;
+    QList<ChildRenderData> fChildrenRenderData;
 protected:
     void drawSk(SkCanvas * const canvas);
     void transformRenderCanvas(SkCanvas& canvas) const final;

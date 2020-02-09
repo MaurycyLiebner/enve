@@ -17,6 +17,7 @@
 #include "swt_abstraction.h"
 #include "singlewidgettarget.h"
 #include "Animators/customproperties.h"
+#include "BlendEffects/blendeffectcollection.h"
 
 SWT_Abstraction::SWT_Abstraction(
         SingleWidgetTarget * const target,
@@ -165,6 +166,10 @@ void SWT_Abstraction::write(eWriteStream &dst) const {
 void SWT_Abstraction::readAll(eReadStream &src) {
     if(src.evFileVersion() < 11 &&
        qobject_cast<CustomProperties*>(mTarget_k)) {
+        return;
+    }
+    if(src.evFileVersion() < 12 &&
+       qobject_cast<BlendEffectCollection*>(mTarget_k)) {
         return;
     }
     for(const auto& child : mChildren) child->readAll(src);

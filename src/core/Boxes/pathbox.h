@@ -39,7 +39,7 @@ protected:
 public:
     virtual bool differenceInEditPathBetweenFrames(
             const int frame1, const int frame2) const = 0;
-    virtual SkPath getPathAtRelFrameF(const qreal relFrame) = 0;
+    virtual SkPath getRelativePath(const qreal relFrame) const = 0;
 
     HardwareSupport hardwareSupport() const;
 
@@ -89,6 +89,8 @@ public:
     void duplicatePaintSettingsFrom(FillSettingsAnimator * const fillSettings,
                                     OutlineSettingsAnimator * const strokeSettings);
 
+    SkPath getAbsolutePath(const qreal relFrame) const;
+    SkPath getAbsolutePath() const;
     const SkPath &getRelativePath() const;
     void setOutlineAffectedByScale(const bool bT);
 

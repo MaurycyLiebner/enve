@@ -181,7 +181,7 @@ void TextBox::setupRenderData(const qreal relFrame,
     textData->queAllLines();
 
     if(mCurrentPathsOutdated) {
-        mEditPathSk = getPathAtRelFrameF(anim_getCurrentRelFrame());
+        mEditPathSk = getRelativePath(anim_getCurrentRelFrame());
         mPathSk = mEditPathSk;
         mFillPathSk = mEditPathSk;
 
@@ -221,7 +221,7 @@ void TextBox::setupCanvasMenu(PropertyMenu * const menu) {
     menu->addPlainAction("Set Text...", setText);
 }
 #include "include/core/SkFontMetrics.h"
-SkPath TextBox::getPathAtRelFrameF(const qreal relFrame) {
+SkPath TextBox::getRelativePath(const qreal relFrame) const {
     const SkFont font = toSkFont(mFont);
     const qreal fontSize = static_cast<qreal>(font.getSize());
     const QString textAtFrame = mText->getValueAtRelFrame(relFrame);

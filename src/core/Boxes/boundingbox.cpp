@@ -39,6 +39,7 @@
 #include "paintsettingsapplier.h"
 #include "Animators/customproperties.h"
 #include "GUI/propertynamedialog.h"
+#include "BlendEffects/blendeffectcollection.h"
 
 int BoundingBox::sNextDocumentId = 0;
 QList<BoundingBox*> BoundingBox::sDocumentBoxes;
@@ -49,13 +50,16 @@ QList<const BoundingBox*> BoundingBox::sBoxesWithWriteIds;
 BoundingBox::BoundingBox(const QString& name, const eBoxType type) :
     eBoxOrSound(name),
     mDocumentId(sNextDocumentId++), mType(type),
-    mTransformAnimator(enve::make_shared<BoxTransformAnimator>()),
     mCustomProperties(enve::make_shared<CustomProperties>()),
+    mBlendEffectCollection(enve::make_shared<BlendEffectCollection>()),
+    mTransformAnimator(enve::make_shared<BoxTransformAnimator>()),
     mRasterEffectsAnimators(enve::make_shared<RasterEffectCollection>()) {
     sDocumentBoxes << this;
 
     ca_addChild(mCustomProperties);
     mCustomProperties->SWT_setVisible(false);
+
+    ca_addChild(mBlendEffectCollection);
 
     ca_addChild(mTransformAnimator);
     const auto pivotAnim = mTransformAnimator->getPivotAnimator();
@@ -160,6 +164,12 @@ void BoundingBox::planCenterPivotPosition() {
     mCenterPivotPlanned = true;
 }
 
+void BoundingBox::blendSetup(ChildRenderData &data,
+                             const int index, const qreal relFrame,
+                             QList<ChildRenderData> &delayed) const {
+    mBlendEffectCollection->blendSetup(data, index, relFrame, delayed);
+}
+
 void BoundingBox::updateIfUsesProgram(
         const ShaderEffectProgram * const program) const {
     mRasterEffectsAnimators->updateIfUsesProgram(program);
@@ -252,6 +262,7 @@ NormalSegment BoundingBox::getNormalSegment(const QPointF &absPos,
 }
 
 #include "efiltersettings.h"
+
 void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
                                const SkFilterQuality filter) {
     const qreal opacity = mTransformAnimator->getOpacity();
@@ -262,6 +273,12 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
     paint.setBlendMode(mBlendMode);
     paint.setFilterQuality(filter);
     mDrawRenderContainer.drawSk(canvas, paint);
+}
+
+void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
+                               const SkFilterQuality filter, int& drawId,
+                               QList<std::function<bool(int)>> &delayed) {
+    mBlendEffectCollection->drawBlendSetup(this, canvas, filter, drawId, delayed);
 }
 
 void BoundingBox::setBlendModeSk(const SkBlendMode blendMode) {

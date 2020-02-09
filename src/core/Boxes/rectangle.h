@@ -29,7 +29,7 @@ public:
     MovablePoint *getBottomRightPoint();
 
     bool SWT_isRectangle() const { return true; }
-    SkPath getPathAtRelFrameF(const qreal relFrame);
+    SkPath getRelativePath(const qreal relFrame) const;
 
     void setTopLeftPos(const QPointF &pos);
     void setBottomRightPos(const QPointF &pos);

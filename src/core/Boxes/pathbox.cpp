@@ -122,7 +122,7 @@ void PathBox::setupRenderData(const qreal relFrame,
     if(currentEditPathCompatible) {
         pathData->fEditPath = mEditPathSk;
     } else {
-        pathData->fEditPath = getPathAtRelFrameF(relFrame);
+        pathData->fEditPath = getRelativePath(relFrame);
     }
 
     QList<stdsptr<PathEffectCaller>> pathEffects;
@@ -325,6 +325,21 @@ SculptPathBox *PathBox::objectToSculptPathBox() {
     copyBoundingBoxDataTo(newPath.get());
     mParentGroup->addContained(newPath);
     return newPath.get();
+}
+
+
+SkPath PathBox::getAbsolutePath(const qreal relFrame) const {
+    SkPath result;
+    const auto transform = toSkMatrix(getTotalTransform());
+    getRelativePath(relFrame).transform(transform, &result);
+    return result;
+}
+
+SkPath PathBox::getAbsolutePath() const {
+    SkPath result;
+    const auto transform = toSkMatrix(getTotalTransform());
+    mPathSk.transform(transform, &result);
+    return result;
 }
 
 const SkPath &PathBox::getRelativePath() const { return mPathSk; }

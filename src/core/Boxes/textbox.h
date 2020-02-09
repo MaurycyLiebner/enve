@@ -31,7 +31,7 @@ public:
 
     bool SWT_isTextBox() const { return true; }
     void setupCanvasMenu(PropertyMenu * const menu);
-    SkPath getPathAtRelFrameF(const qreal relFrame);
+    SkPath getRelativePath(const qreal relFrame) const;
 
     void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);

@@ -95,7 +95,7 @@ void Circle::setRadius(const qreal radius) {
 
 bool Circle::SWT_isCircle() const { return true; }
 
-SkPath Circle::getPathAtRelFrameF(const qreal relFrame) {
+SkPath Circle::getRelativePath(const qreal relFrame) const {
     const QPointF center = mCenterAnimator->getEffectiveValue();
     const qreal xRad = mHorizontalRadiusAnimator->getEffectiveXValue(relFrame);
     const qreal yRad = mVerticalRadiusAnimator->getEffectiveYValue(relFrame);
