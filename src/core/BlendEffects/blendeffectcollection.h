@@ -5,7 +5,13 @@
 
 #include "blendeffect.h"
 
-typedef DynamicComplexAnimator<BlendEffect> BlendEffectCollectionBase;
+qsptr<BlendEffect> readIdCreateBlendEffect(eReadStream& src);
+void writeBlendEffectType(BlendEffect* const obj, eWriteStream& dst);
+
+typedef DynamicComplexAnimator<
+    BlendEffect,
+    &writeBlendEffectType,
+    &readIdCreateBlendEffect> BlendEffectCollectionBase;
 
 class BlendEffectCollection : public BlendEffectCollectionBase {
     Q_OBJECT
@@ -24,7 +30,7 @@ public:
     void drawBlendSetup(BoundingBox * const boxToDraw,
                         SkCanvas * const canvas,
                         const SkFilterQuality filter, int& drawId,
-                        QList<std::function<bool(int)>> &delayed) const;
+                        QList<BlendEffect::Delayed> &delayed) const;
 
 };
 

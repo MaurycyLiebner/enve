@@ -277,7 +277,7 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
 
 void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
                                const SkFilterQuality filter, int& drawId,
-                               QList<std::function<bool(int)>> &delayed) {
+                               QList<BlendEffect::Delayed> &delayed) {
     mBlendEffectCollection->drawBlendSetup(this, canvas, filter, drawId, delayed);
 }
 

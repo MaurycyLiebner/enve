@@ -30,6 +30,8 @@ struct PathClipOp {
 
 struct PathClip {
     int fTargetIndex;
+    bool fAbove;
+    BoundingBox* fTargetBox = nullptr;
     QList<PathClipOp> fClipOps;
 
     void clip(SkCanvas * const canvas) const {
@@ -46,6 +48,7 @@ struct ChildRenderData {
     { return fData.operator->(); }
 
     stdsptr<BoxRenderData> fData;
+    bool fIsMain = false;
     PathClip fClip;
 };
 

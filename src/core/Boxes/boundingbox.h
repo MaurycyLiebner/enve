@@ -25,6 +25,7 @@
 #include "colorhelpers.h"
 #include "MovablePoints/segment.h"
 #include "Animators/qcubicsegment1danimator.h"
+#include "BlendEffects/blendeffect.h"
 class Canvas;
 
 class QrealAction;
@@ -150,7 +151,7 @@ public:
 
     virtual void drawPixmapSk(SkCanvas * const canvas,
                               const SkFilterQuality filter, int &drawId,
-                              QList<std::function<bool(int)>> &delayed);
+                              QList<BlendEffect::Delayed> &delayed);
     virtual void drawHoveredSk(SkCanvas *canvas, const float invScale);
 
     virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);

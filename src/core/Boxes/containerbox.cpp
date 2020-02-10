@@ -606,16 +606,17 @@ void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
 
 void ContainerBox::drawContained(SkCanvas * const canvas,
                                  const SkFilterQuality filter, int& drawId,
-                                 QList<std::function<bool(int)>>& delayed) {
+                                 QList<BlendEffect::Delayed> &delayed) {
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
         const auto& box = mContainedBoxes.at(i);
+        const auto& nextBox = i == 0 ? nullptr : mContainedBoxes.at(i - 1);
         if(!box->isVisible()) continue;
         if(box->isVisibleAndInVisibleDurationRect())
             box->drawPixmapSk(canvas, filter, drawId, delayed);
         drawId++;
         for(int i = 0; i < delayed.count(); i++) {
             const auto& del = delayed.at(i);
-            if(del(drawId)) delayed.removeAt(i--);
+            if(del(drawId, box, nextBox)) delayed.removeAt(i--);
         }
     }
 }
@@ -624,17 +625,17 @@ void ContainerBox::drawContained(SkCanvas * const canvas,
 void ContainerBox::drawContained(SkCanvas * const canvas,
                                  const SkFilterQuality filter) {
     int drawId = 0;
-    QList<std::function<bool(int)>> delayed;
+    QList<BlendEffect::Delayed> delayed;
     drawContained(canvas, filter, drawId, delayed);
     for(int i = 0; i < delayed.count(); i++) {
         const auto& del = delayed.at(i);
-        if(del(INT_MAX)) delayed.removeAt(i--);
+        if(del(INT_MAX, nullptr, nullptr)) delayed.removeAt(i--);
     }
 }
 
 void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
                                 const SkFilterQuality filter, int& drawId,
-                                QList<std::function<bool(int)>> &delayed) {
+                                QList<BlendEffect::Delayed> &delayed) {
     if(SWT_isGroupBox()) return drawContained(canvas, filter, drawId, delayed);
     if(mIsDescendantCurrentGroup) {
         SkPaint paint;
@@ -683,6 +684,8 @@ void processChildData(BoundingBox * const child,
     if(!boxRenderData) return;
     boxRenderData->addDependent(parentData);
     ChildRenderData cData = boxRenderData;
+    cData.fIsMain = true;
+    cData.fClip.fTargetIndex = parentData->fChildrenRenderData.count();
     child->blendSetup(cData, parentData->fChildrenRenderData.count(),
                       childRelFrame, delayed);
     parentData->fChildrenRenderData << cData;
@@ -706,6 +709,24 @@ void ContainerBox::setupRenderData(const qreal relFrame,
         const qreal boxRelFrame = box->prp_absFrameToRelFrameF(absFrame);
         processChildData(box, groupData, boxRelFrame, absFrame, delayed);
     }
+    for(auto& del : delayed) {
+        auto& iClip = del.fClip;
+        if(!iClip.fTargetBox) continue;
+        const ChildRenderData* target = nullptr;
+        for(const auto& child : groupData->fChildrenRenderData) {
+            if(!child.fIsMain) continue;
+            const auto iTarget = child.fData->fParentBox;
+            if(iTarget == iClip.fTargetBox) {
+                target = &child;
+                break;
+            }
+        }
+        if(target) {
+            iClip.fTargetBox = nullptr;
+            const int dIndex = iClip.fAbove ? 1 : 0;
+            iClip.fTargetIndex = target->fClip.fTargetIndex + dIndex;
+        }
+    }
     std::sort(delayed.begin(), delayed.end(),
               [](const ChildRenderData& c1,
                  const ChildRenderData& c2) {
@@ -713,7 +734,9 @@ void ContainerBox::setupRenderData(const qreal relFrame,
     });
     int shift = 0;
     for(const auto& del : delayed) {
-        const int targetIndex = del.fClip.fTargetIndex + shift;
+        const auto& iClip = del.fClip;
+        if(iClip.fTargetBox) continue;
+        const int targetIndex = iClip.fTargetIndex + shift;
         groupData->fChildrenRenderData.insert(targetIndex, del);
         shift++;
     }

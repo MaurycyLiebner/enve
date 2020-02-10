@@ -3,24 +3,46 @@
 
 #include "Animators/staticcomplexanimator.h"
 
-#include "Animators/intanimator.h"
 #include "Properties/boxtargetproperty.h"
 
 class PathBox;
+class ChildRenderData;
+
+enum class BlendEffectType {
+    move, targeted
+};
 
 class BlendEffect : public StaticComplexAnimator {
     Q_OBJECT
     e_OBJECT
 protected:
-    BlendEffect();
+    BlendEffect(const BlendEffectType type);
 public:
+    virtual void blendSetup(ChildRenderData &data,
+                            const int index,
+                            const qreal relFrame,
+                            QList<ChildRenderData> &delayed) const = 0;
+
+    using Delayed = std::function<bool(int id,
+                                       BoundingBox* prev,
+                                       BoundingBox* next)>;
+    virtual void drawBlendSetup(BoundingBox* const boxToDraw,
+                                const qreal relFrame,
+                                SkCanvas * const canvas,
+                                const SkFilterQuality filter,
+                                const int drawId,
+                                QList<Delayed> &delayed) const = 0;
+
+    void prp_setupTreeViewMenu(PropertyMenu * const menu);
+
+    void writeIdentifier(eWriteStream &dst) const;
+
     bool isPathValid() const;
-    int zIndex(const qreal relFrame) const;
     SkPath clipPath(const qreal relFrame) const;
 private:
     PathBox* clipPathSource() const;
 
-    qsptr<IntAnimator> mZIndex;
+    const BlendEffectType mType;
     qsptr<BoxTargetProperty> mClipPath;
 };
 

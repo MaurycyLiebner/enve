@@ -1,20 +1,36 @@
 #include "blendeffect.h"
 #include "Boxes/pathbox.h"
 
-BlendEffect::BlendEffect() : StaticComplexAnimator("blend effect") {
-    mZIndex = enve::make_shared<IntAnimator>("z-index");
+BlendEffect::BlendEffect(const BlendEffectType type) :
+    StaticComplexAnimator("blend effect"), mType(type) {
     mClipPath = enve::make_shared<BoxTargetProperty>("clip path");
 
-    ca_addChild(mZIndex);
     ca_addChild(mClipPath);
+}
+
+void BlendEffect::writeIdentifier(eWriteStream& dst) const {
+    dst.write(&mType, sizeof(BlendEffectType));
+}
+
+void BlendEffect::prp_setupTreeViewMenu(PropertyMenu * const menu) {
+    if(menu->hasActionsForType<BlendEffect>()) return;
+    menu->addedActionsForType<BlendEffect>();
+    {
+        const PropertyMenu::PlainSelectedOp<BlendEffect> dOp =
+        [](BlendEffect* const prop) {
+            const auto parent = prop->template getParent<
+                    DynamicComplexAnimatorBase<BlendEffect>>();
+            parent->removeChild(prop->template ref<BlendEffect>());
+        };
+        menu->addPlainAction("Delete", dOp);
+    }
+
+    menu->addSeparator();
+    StaticComplexAnimator::prp_setupTreeViewMenu(menu);
 }
 
 bool BlendEffect::isPathValid() const {
     return clipPathSource();
-}
-
-int BlendEffect::zIndex(const qreal relFrame) const {
-    return mZIndex->getEffectiveIntValue(relFrame);
 }
 
 SkPath BlendEffect::clipPath(const qreal relFrame) const {

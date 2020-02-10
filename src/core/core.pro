@@ -112,6 +112,8 @@ SOURCES += \
     Animators/texteffectcollection.cpp \
     BlendEffects/blendeffect.cpp \
     BlendEffects/blendeffectcollection.cpp \
+    BlendEffects/moveblendeffect.cpp \
+    BlendEffects/targetedblendeffect.cpp \
     Boxes/animationbox.cpp \
     Boxes/boundingbox.cpp \
     Boxes/boxrendercontainer.cpp \
@@ -398,6 +400,8 @@ HEADERS += \
     Animators/texteffectcollection.h \
     BlendEffects/blendeffect.h \
     BlendEffects/blendeffectcollection.h \
+    BlendEffects/moveblendeffect.h \
+    BlendEffects/targetedblendeffect.h \
     Boxes/animationbox.h \
     Boxes/boundingbox.h \
     Boxes/boxrendercontainer.h \
