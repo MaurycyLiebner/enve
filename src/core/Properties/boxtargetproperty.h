@@ -42,7 +42,7 @@ public:
 signals:
     void targetSet(BoundingBox*);
 private:
-    ConnContextPtr<BoundingBox> mTarget_d;
+    ConnContextQPtr<BoundingBox> mTarget_d;
 };
 
 #endif // BOXTARGETPROPERTY_H

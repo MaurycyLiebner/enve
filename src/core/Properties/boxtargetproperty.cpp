@@ -18,6 +18,7 @@
 #include "Animators/complexanimator.h"
 #include "Boxes/boundingbox.h"
 #include "Properties/emimedata.h"
+#include "simpletask.h"
 
 BoxTargetProperty::BoxTargetProperty(const QString &name) :
     Property(name) {}
@@ -44,8 +45,13 @@ void BoxTargetProperty::setTarget(BoundingBox* const box) {
 
     mTarget_d.assign(box);
     if(box) {
-        mTarget_d << connect(box, &BoundingBox::destroyed,
-                             this, [this]() { setTarget(nullptr); });
+        mTarget_d << connect(box, &BoundingBox::prp_ancestorChanged,
+                             this, [this]() {
+            SimpleTask::sScheduleContexted(this, [this]() {
+                if(mTarget_d && mTarget_d->getParentScene()) return;
+                setTarget(nullptr);
+            });
+        });
     }
     prp_afterWholeInfluenceRangeChanged();
     emit targetSet(box);
