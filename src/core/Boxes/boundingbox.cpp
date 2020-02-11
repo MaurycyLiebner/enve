@@ -296,6 +296,7 @@ void BoundingBox::detachedBlendSetup(
         SkCanvas * const canvas,
         const SkFilterQuality filter, int& drawId,
         QList<BlendEffect::Delayed> &delayed) {
+    if(!blendEffectsEnabled()) return;
     mBlendEffectCollection->detachedBlendSetup(
                 this, canvas, filter, drawId, delayed);
 }
@@ -306,7 +307,9 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
     Q_UNUSED(drawId)
     Q_UNUSED(delayed)
     canvas->save();
-    mBlendEffectCollection->drawBlendSetup(canvas);
+    if(blendEffectsEnabled()) {
+        mBlendEffectCollection->drawBlendSetup(canvas);
+    }
     drawPixmapSk(canvas, filter);
     canvas->restore();
 }
