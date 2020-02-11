@@ -432,6 +432,9 @@ protected:
     const qsptr<BoxTransformAnimator> mTransformAnimator;
     const qsptr<RasterEffectCollection> mRasterEffectsAnimators;
 private:
+    void setCustomPropertiesVisible(const bool visible);
+    void setBlendEffectsVisible(const bool visible);
+
     SkBlendMode mBlendMode = SkBlendMode::kSrcOver;
 
     mutable int mReadId = -1;
