@@ -60,6 +60,7 @@ BoundingBox::BoundingBox(const QString& name, const eBoxType type) :
     mCustomProperties->SWT_setVisible(false);
 
     ca_addChild(mBlendEffectCollection);
+    mBlendEffectCollection->SWT_hide();
 
     ca_addChild(mTransformAnimator);
     const auto pivotAnim = mTransformAnimator->getPivotAnimator();
@@ -167,6 +168,7 @@ void BoundingBox::planCenterPivotPosition() {
 void BoundingBox::blendSetup(ChildRenderData &data,
                              const int index, const qreal relFrame,
                              QList<ChildRenderData> &delayed) const {
+    if(!blendEffectsEnabled()) return;
     mBlendEffectCollection->blendSetup(data, index, relFrame, delayed);
 }
 
@@ -275,10 +277,38 @@ void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
     mDrawRenderContainer.drawSk(canvas, paint);
 }
 
+bool BoundingBox::blendEffectsEnabled() const {
+    return mBlendEffectCollection->SWT_isVisible();
+}
+
+bool BoundingBox::hasBlendEffects() const {
+    return mBlendEffectCollection->ca_hasChildren();
+}
+
+ContainerBox *BoundingBox::getFirstParentLayer() const {
+    const auto parent = getParentGroup();
+    if(!parent) return nullptr;
+    if(parent->SWT_isLayerBox()) return parent;
+    return parent->getFirstParentLayer();
+}
+
+void BoundingBox::detachedBlendSetup(
+        SkCanvas * const canvas,
+        const SkFilterQuality filter, int& drawId,
+        QList<BlendEffect::Delayed> &delayed) {
+    mBlendEffectCollection->detachedBlendSetup(
+                this, canvas, filter, drawId, delayed);
+}
+
 void BoundingBox::drawPixmapSk(SkCanvas * const canvas,
                                const SkFilterQuality filter, int& drawId,
                                QList<BlendEffect::Delayed> &delayed) {
-    mBlendEffectCollection->drawBlendSetup(this, canvas, filter, drawId, delayed);
+    Q_UNUSED(drawId)
+    Q_UNUSED(delayed)
+    canvas->save();
+    mBlendEffectCollection->drawBlendSetup(canvas);
+    drawPixmapSk(canvas, filter);
+    canvas->restore();
 }
 
 void BoundingBox::setBlendModeSk(const SkBlendMode blendMode) {
@@ -889,6 +919,23 @@ void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
         };
         menu->addCheckableAction("Custom Properties",
                                  mCustomProperties->SWT_isVisible(),
+                                 visRangeOp);
+    }
+    {
+        const PropertyMenu::CheckSelectedOp<BoundingBox> visRangeOp =
+        [](BoundingBox* const box, const bool checked) {
+            box->mBlendEffectCollection->SWT_setVisible(checked);
+            const auto pLayer = box->getFirstParentLayer();
+            if(pLayer) {
+                if(checked) {
+                    pLayer->addBoxWithBlendEffects(box);
+                } else {
+                    pLayer->removeBoxWithBlendEffects(box);
+                }
+            }
+        };
+        menu->addCheckableAction("Blend Effects",
+                                 mBlendEffectCollection->SWT_isVisible(),
                                  visRangeOp);
     }
     menu->addSeparator();

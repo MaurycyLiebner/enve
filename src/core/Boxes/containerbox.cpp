@@ -260,6 +260,9 @@ void ContainerBox::promoteToLayer() {
         static_cast<ContainerBox*>(box)->promoteToLayer();
     }
 
+    const auto pLayer = getFirstParentLayer();
+    if(pLayer) removeAllChildBoxesWithBlendEffects(pLayer);
+
     if(!SWT_isLinkBox()) {
         prp_pushUndoRedoName("Promote to Layer");
         UndoRedo ur;
@@ -284,6 +287,9 @@ void ContainerBox::demoteToGroup() {
     for(const auto& box : linkingBoxes) {
         static_cast<ContainerBox*>(box)->demoteToGroup();
     }
+
+    const auto pLayer = getFirstParentLayer();
+    if(pLayer) addAllChildBoxesWithBlendEffects(pLayer);
 
     if(!SWT_isLinkBox()) {
         prp_pushUndoRedoName("Demote to Group");
@@ -366,6 +372,32 @@ void ContainerBox::allContainedStartingWith(
     for(const auto &child : mContained) {
         const bool nameMatch = child->prp_getName().startsWith(text);
         if(nameMatch) result << child.get();
+    }
+}
+
+void ContainerBox::addAllChildBoxesWithBlendEffects(
+        ContainerBox * const layer) {
+    for(const auto &child : mContainedBoxes) {
+        if(child->blendEffectsEnabled()) {
+            layer->addBoxWithBlendEffects(child);
+        }
+        if(child->SWT_isGroupBox()) {
+            const auto cBox = static_cast<ContainerBox*>(child);
+            cBox->addAllChildBoxesWithBlendEffects(layer);
+        }
+    }
+}
+
+void ContainerBox::removeAllChildBoxesWithBlendEffects(
+        ContainerBox * const layer) {
+    for(const auto &child : mContainedBoxes) {
+        if(child->blendEffectsEnabled()) {
+            layer->removeBoxWithBlendEffects(child);
+        }
+        if(child->SWT_isGroupBox()) {
+            const auto cBox = static_cast<ContainerBox*>(child);
+            cBox->removeAllChildBoxesWithBlendEffects(layer);
+        }
     }
 }
 
@@ -604,28 +636,56 @@ void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
     BoxWithPathEffects::setupCanvasMenu(menu);
 }
 
-void ContainerBox::drawContained(SkCanvas * const canvas,
-                                 const SkFilterQuality filter, int& drawId,
-                                 QList<BlendEffect::Delayed> &delayed) {
-    for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
-        const auto& box = mContainedBoxes.at(i);
-        const auto& nextBox = i == 0 ? nullptr : mContainedBoxes.at(i - 1);
-        if(!box->isVisible()) continue;
-        if(box->isVisibleAndInVisibleDurationRect())
-            box->drawPixmapSk(canvas, filter, drawId, delayed);
-        drawId++;
-        for(int i = 0; i < delayed.count(); i++) {
-            const auto& del = delayed.at(i);
-            if(del(drawId, box, nextBox)) delayed.removeAt(i--);
-        }
+void handleDelayed(QList<BlendEffect::Delayed> &delayed,
+                   const int drawId,
+                   BoundingBox* const prevBox,
+                   BoundingBox* const nextBox) {
+    for(int i = 0; i < delayed.count(); i++) {
+        const auto& del = delayed.at(i);
+        if(del(drawId, prevBox, nextBox)) delayed.removeAt(i--);
     }
 }
 
+void ContainerBox::drawContained(SkCanvas * const canvas,
+                                 const SkFilterQuality filter, int& drawId,
+                                 QList<BlendEffect::Delayed> &delayed) {
+    if(mContainedBoxes.isEmpty()) return;
+    handleDelayed(delayed, drawId, nullptr, mContainedBoxes.last());
+    for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
+        const auto& box = mContainedBoxes.at(i);
+        const auto& nextBox = i == 0 ? nullptr : mContainedBoxes.at(i - 1);
+        if(box->isVisibleAndInVisibleDurationRect()) {
+            box->drawPixmapSk(canvas, filter, drawId, delayed);
+            if(!box->SWT_isGroupBox()) drawId++;
+        }
+        handleDelayed(delayed, drawId, box, nextBox);
+    }
+}
+
+void ContainerBox::containedDetachedBlendSetup(
+        SkCanvas * const canvas,
+        const SkFilterQuality filter, int& drawId,
+        QList<BlendEffect::Delayed> &delayed) const {
+    for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
+        const auto& box = mContainedBoxes.at(i);
+        if(box->isVisibleAndInVisibleDurationRect()) {
+            if(box->SWT_isGroupBox()) {
+                const auto cBox = static_cast<ContainerBox*>(box);
+                cBox->containedDetachedBlendSetup(canvas, filter, drawId, delayed);
+            } else {
+                box->detachedBlendSetup(canvas, filter, drawId, delayed);
+                drawId++;
+            }
+        }
+    }
+}
 
 void ContainerBox::drawContained(SkCanvas * const canvas,
                                  const SkFilterQuality filter) {
     int drawId = 0;
     QList<BlendEffect::Delayed> delayed;
+    containedDetachedBlendSetup(canvas, filter, drawId, delayed);
+    drawId = 0;
     drawContained(canvas, filter, drawId, delayed);
     for(int i = 0; i < delayed.count(); i++) {
         const auto& del = delayed.at(i);
@@ -843,11 +903,21 @@ void ContainerBox::insertContained(
     if(child->SWT_isBoundingBox()) {
         connCtx << connect(child.data(), &Property::prp_absFrameRangeChanged,
                            this, &Property::prp_afterChangedAbsRange);
-        const auto cBox = static_cast<BoundingBox*>(child.get());
+        const auto box = static_cast<BoundingBox*>(child.get());
         const auto& linkingBoxes = getLinkingBoxes();
         for(const auto& box : linkingBoxes) {
             const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
-            internalLinkGroup->insertContained(id, cBox->createLink());
+            internalLinkGroup->insertContained(id, box->createLink());
+        }
+        const auto pLayer = box->getFirstParentLayer();
+        if(pLayer) {
+            if(box->blendEffectsEnabled()) {
+                pLayer->addBoxWithBlendEffects(box);
+            }
+            if(box->SWT_isGroupBox()) {
+                const auto cBox = static_cast<ContainerBox*>(child.get());
+                cBox->addAllChildBoxesWithBlendEffects(pLayer);
+            }
         }
     } else /*if(child->SWT_isSound())*/ {
         const auto sound = static_cast<SingleSound*>(child.get());
@@ -889,10 +959,25 @@ void ContainerBox::removeContainedFromList(const int id) {
     const auto child = mContained.takeObjAt(id);
     updateContainedBoxes();
     if(child->SWT_isContainerBox()) {
-        const auto group = static_cast<ContainerBox*>(child.get());
         const auto pScene = getParentScene();
+        const auto group = static_cast<ContainerBox*>(child.get());
         if(group->isCurrentGroup() && pScene) {
             pScene->setCurrentGroupParentAsCurrentGroup();
+        }
+    }
+
+
+    if(child->SWT_isBoundingBox()) {
+        const auto box = static_cast<BoundingBox*>(child.get());
+        const auto pLayer = box->getFirstParentLayer();
+        if(pLayer) {
+            if(box->blendEffectsEnabled()) {
+                pLayer->removeBoxWithBlendEffects(box);
+            }
+            if(box->SWT_isGroupBox()) {
+                const auto cBox = static_cast<ContainerBox*>(child.get());
+                cBox->removeAllChildBoxesWithBlendEffects(pLayer);
+            }
         }
     }
 

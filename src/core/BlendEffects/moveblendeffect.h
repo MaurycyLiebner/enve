@@ -28,12 +28,14 @@ public:
                     const int index,
                     const qreal relFrame,
                     QList<ChildRenderData> &delayed) const;
-    void drawBlendSetup(BoundingBox* const boxToDraw,
+    void detachedBlendSetup(BoundingBox* const boxToDraw,
                         const qreal relFrame,
                         SkCanvas * const canvas,
                         const SkFilterQuality filter,
                         const int drawId,
                         QList<Delayed> &delayed) const;
+    void drawBlendSetup(const qreal relFrame,
+                        SkCanvas * const canvas) const;
 
     int zIndex(const qreal relFrame) const;
 private:

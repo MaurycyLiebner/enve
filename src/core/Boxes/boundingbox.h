@@ -389,6 +389,17 @@ public:
                     QList<ChildRenderData>& delayed) const;
     void drawPixmapSk(SkCanvas * const canvas,
                       const SkFilterQuality filter);
+    void detachedBlendSetup(
+            SkCanvas * const canvas,
+            const SkFilterQuality filter, int& drawId,
+            QList<BlendEffect::Delayed> &delayed);
+
+    bool blendEffectsEnabled() const;
+    bool hasBlendEffects() const;
+    bool hasEnabledBlendEffects() const
+    { return blendEffectsEnabled() && hasBlendEffects(); }
+
+    ContainerBox* getFirstParentLayer() const;
 private:
     void cancelWaitingTasks();
     void afterTotalTransformChanged(const UpdateReason reason);

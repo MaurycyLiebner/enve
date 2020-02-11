@@ -194,6 +194,19 @@ public:
     void allContainedStartingWith(
             const QString& text, QList<eBoxOrSound*> &result);
 
+    void addBoxWithBlendEffects(BoundingBox* const box)
+    { mBoxesWithBlendEffects << box; }
+    void removeBoxWithBlendEffects(BoundingBox* const box)
+    { mBoxesWithBlendEffects.removeOne(box); }
+
+    void addAllChildBoxesWithBlendEffects(ContainerBox * const layer);
+    void removeAllChildBoxesWithBlendEffects(ContainerBox* const layer);
+
+    void containedDetachedBlendSetup(
+            SkCanvas * const canvas,
+            const SkFilterQuality filter, int& drawId,
+            QList<BlendEffect::Delayed> &delayed) const;
+
     void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
 private:
     void updateAllChildPaths(const UpdateReason reason,
@@ -208,6 +221,7 @@ protected:
     
     bool mIsCurrentGroup = false;
     bool mIsDescendantCurrentGroup = false;
+    QList<BoundingBox*> mBoxesWithBlendEffects;
     QList<BoundingBox*> mContainedBoxes;
     ConnContextObjList<qsptr<eBoxOrSound>> mContained;
 };

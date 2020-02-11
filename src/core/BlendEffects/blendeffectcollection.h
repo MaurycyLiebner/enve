@@ -27,10 +27,11 @@ public:
     void blendSetup(ChildRenderData &data,
                     const int index, const qreal relFrame,
                     QList<ChildRenderData> &delayed) const;
-    void drawBlendSetup(BoundingBox * const boxToDraw,
+    void detachedBlendSetup(BoundingBox * const boxToDraw,
                         SkCanvas * const canvas,
                         const SkFilterQuality filter, int& drawId,
                         QList<BlendEffect::Delayed> &delayed) const;
+    void drawBlendSetup(SkCanvas * const canvas);
 
 };
 

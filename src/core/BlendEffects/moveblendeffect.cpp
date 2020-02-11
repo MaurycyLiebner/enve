@@ -20,7 +20,7 @@
 #include "Boxes/boundingbox.h"
 
 MoveBlendEffect::MoveBlendEffect() :
-    BlendEffect(BlendEffectType::move) {
+    BlendEffect("move", BlendEffectType::move) {
     mZIndex = enve::make_shared<IntAnimator>("z-index");
     ca_addChild(mZIndex);
 }
@@ -47,16 +47,27 @@ void MoveBlendEffect::blendSetup(
     delayed << iData;
 }
 
-void MoveBlendEffect::drawBlendSetup(BoundingBox* const boxToDraw,
+void MoveBlendEffect::detachedBlendSetup(BoundingBox* const boxToDraw,
                                      const qreal relFrame,
                                      SkCanvas * const canvas,
                                      const SkFilterQuality filter,
                                      const int drawId,
                                      QList<Delayed> &delayed) const {
     const int dIndex = zIndex(relFrame);
-    if(dIndex <= 0) return;
+    if(dIndex == 0) return;
     const int zIndex = drawId + (qAbs(dIndex) == 1 ? 2*dIndex : dIndex);
-    if(!isPathValid()) {
+    if(isPathValid()) {
+        const auto clipPath = this->clipPath(relFrame);
+        delayed << [boxToDraw, zIndex, clipPath, canvas, filter]
+                   (const int drawId, BoundingBox*, BoundingBox*) {
+            if(drawId < zIndex) return false;
+            canvas->save();
+            canvas->clipPath(clipPath, SkClipOp::kIntersect, false);
+            boxToDraw->drawPixmapSk(canvas, filter);
+            canvas->restore();
+            return true;
+        };
+    } else {
         delayed << [boxToDraw, zIndex, canvas, filter]
                    (const int drawId, BoundingBox*, BoundingBox*) {
             if(drawId < zIndex) return false;
@@ -65,21 +76,19 @@ void MoveBlendEffect::drawBlendSetup(BoundingBox* const boxToDraw,
             canvas->restore();
             return true;
         };
-        return;
     }
-    const auto clipPath = this->clipPath(relFrame);
+}
 
-    canvas->clipPath(clipPath, SkClipOp::kDifference, false);
-
-    delayed << [boxToDraw, zIndex, clipPath, canvas, filter]
-               (const int drawId, BoundingBox*, BoundingBox*) {
-        if(drawId < zIndex) return false;
-        canvas->save();
-        canvas->clipPath(clipPath, SkClipOp::kIntersect, false);
-        boxToDraw->drawPixmapSk(canvas, filter);
-        canvas->restore();
-        return true;
-    };
+void MoveBlendEffect::drawBlendSetup(const qreal relFrame,
+                                     SkCanvas * const canvas) const {
+    const int dIndex = zIndex(relFrame);
+    if(dIndex == 0) return;
+    if(isPathValid()) {
+        const auto clipPath = this->clipPath(relFrame);
+        canvas->clipPath(clipPath, SkClipOp::kDifference, false);
+    } else {
+        canvas->clipPath(SkPath(), SkClipOp::kIntersect, false);
+    }
 }
 
 int MoveBlendEffect::zIndex(const qreal relFrame) const {

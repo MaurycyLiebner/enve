@@ -1,9 +1,19 @@
 #include "blendeffect.h"
 #include "Boxes/pathbox.h"
 
-BlendEffect::BlendEffect(const BlendEffectType type) :
-    StaticComplexAnimator("blend effect"), mType(type) {
+BlendEffect::BlendEffect(const QString& name,
+                         const BlendEffectType type) :
+    StaticComplexAnimator(name), mType(type) {
     mClipPath = enve::make_shared<BoxTargetProperty>("clip path");
+
+    connect(mClipPath.get(), &BoxTargetProperty::targetSet,
+            this, [this](BoundingBox* const newClipBox) {
+        auto& conn = mClipBox.assign(newClipBox);
+        if(newClipBox) {
+            conn << connect(newClipBox, &Property::prp_absFrameRangeChanged,
+                            this, &Property::prp_afterChangedAbsRange);
+        }
+    });
 
     ca_addChild(mClipPath);
 }

@@ -20,7 +20,7 @@
 #include "Boxes/boundingbox.h"
 
 TargetedBlendEffect::TargetedBlendEffect() :
-    BlendEffect(BlendEffectType::targeted) {
+    BlendEffect("targeted", BlendEffectType::targeted) {
     const auto poses = QStringList() << "above" << "below";
     mAboveBelow = enve::make_shared<ComboBoxProperty>("position", poses);
     mTarget = enve::make_shared<BoxTargetProperty>("target");
@@ -53,7 +53,7 @@ void TargetedBlendEffect::blendSetup(
     delayed << iData;
 }
 
-void TargetedBlendEffect::drawBlendSetup(
+void TargetedBlendEffect::detachedBlendSetup(
         BoundingBox* const boxToDraw,
         const qreal relFrame,
         SkCanvas * const canvas,
@@ -64,7 +64,20 @@ void TargetedBlendEffect::drawBlendSetup(
     const auto target = this->target();
     if(!target) return;
     const bool isAbove = above();
-    if(!isPathValid()) {
+    if(isPathValid()) {
+        const auto clipPath = this->clipPath(relFrame);
+        delayed << [boxToDraw, target, isAbove, clipPath, canvas, filter]
+                   (int, BoundingBox* prev, BoundingBox* next) {
+            const bool above = isAbove && prev == target;
+            const bool below = !isAbove && next == target;
+            if(!above && !below) return false;
+            canvas->save();
+            canvas->clipPath(clipPath, SkClipOp::kIntersect, false);
+            boxToDraw->drawPixmapSk(canvas, filter);
+            canvas->restore();
+            return true;
+        };
+    } else {
         delayed << [boxToDraw, target, isAbove, canvas, filter]
                    (int, BoundingBox* prev, BoundingBox* next) {
             const bool above = isAbove && prev == target;
@@ -75,24 +88,20 @@ void TargetedBlendEffect::drawBlendSetup(
             canvas->restore();
             return true;
         };
-        canvas->clipPath(SkPath(), SkClipOp::kIntersect, false);
-        return;
     }
-    const auto clipPath = this->clipPath(relFrame);
+}
 
-    canvas->clipPath(clipPath, SkClipOp::kDifference, false);
-
-    delayed << [boxToDraw, target, isAbove, clipPath, canvas, filter]
-               (int, BoundingBox* prev, BoundingBox* next) {
-        const bool above = isAbove && prev == target;
-        const bool below = !isAbove && next == target;
-        if(!above && !below) return false;
-        canvas->save();
-        canvas->clipPath(clipPath, SkClipOp::kIntersect, false);
-        boxToDraw->drawPixmapSk(canvas, filter);
-        canvas->restore();
-        return true;
-    };
+void TargetedBlendEffect::drawBlendSetup(
+        const qreal relFrame,
+        SkCanvas * const canvas) const {
+    const auto target = this->target();
+    if(!target) return;
+    if(isPathValid()) {
+        const auto clipPath = this->clipPath(relFrame);
+        canvas->clipPath(clipPath, SkClipOp::kDifference, false);
+    } else {
+        canvas->clipPath(SkPath(), SkClipOp::kIntersect, false);
+    }
 }
 
 BoundingBox *TargetedBlendEffect::target() const {

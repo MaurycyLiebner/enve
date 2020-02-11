@@ -16,7 +16,8 @@ class BlendEffect : public StaticComplexAnimator {
     Q_OBJECT
     e_OBJECT
 protected:
-    BlendEffect(const BlendEffectType type);
+    BlendEffect(const QString &name,
+                const BlendEffectType type);
 public:
     virtual void blendSetup(ChildRenderData &data,
                             const int index,
@@ -26,12 +27,14 @@ public:
     using Delayed = std::function<bool(int id,
                                        BoundingBox* prev,
                                        BoundingBox* next)>;
-    virtual void drawBlendSetup(BoundingBox* const boxToDraw,
+    virtual void detachedBlendSetup(BoundingBox* const boxToDraw,
                                 const qreal relFrame,
                                 SkCanvas * const canvas,
                                 const SkFilterQuality filter,
                                 const int drawId,
                                 QList<Delayed> &delayed) const = 0;
+    virtual void drawBlendSetup(const qreal relFrame,
+                                SkCanvas * const canvas) const = 0;
 
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
@@ -42,6 +45,7 @@ public:
 private:
     PathBox* clipPathSource() const;
 
+    ConnContextQPtr<BoundingBox> mClipBox;
     const BlendEffectType mType;
     qsptr<BoxTargetProperty> mClipPath;
 };

@@ -43,20 +43,26 @@ void BlendEffectCollection::blendSetup(
     }
 }
 
-void BlendEffectCollection::drawBlendSetup(
-        BoundingBox* const boxToDraw,
-        SkCanvas * const canvas,
-        const SkFilterQuality filter, int &drawId,
-        QList<BlendEffect::Delayed> &delayed) const {
-    canvas->save();
+void BlendEffectCollection::drawBlendSetup(SkCanvas * const canvas) {
     const qreal relFrame = anim_getCurrentRelFrame();
     const int iMax = ca_getNumberOfChildren();
     for(int i = 0; i < iMax; i++) {
         const auto effect = getChild(i);
-        effect->drawBlendSetup(boxToDraw, relFrame, canvas, filter, drawId, delayed);
+        effect->drawBlendSetup(relFrame, canvas);
     }
-    boxToDraw->drawPixmapSk(canvas, filter);
-    canvas->restore();
+}
+
+void BlendEffectCollection::detachedBlendSetup(
+        BoundingBox* const boxToDraw,
+        SkCanvas * const canvas,
+        const SkFilterQuality filter, int &drawId,
+        QList<BlendEffect::Delayed> &delayed) const {
+    const qreal relFrame = anim_getCurrentRelFrame();
+    const int iMax = ca_getNumberOfChildren();
+    for(int i = 0; i < iMax; i++) {
+        const auto effect = getChild(i);
+        effect->detachedBlendSetup(boxToDraw, relFrame, canvas, filter, drawId, delayed);
+    }
 }
 
 void BlendEffectCollection::prp_writeProperty(eWriteStream &dst) const {
