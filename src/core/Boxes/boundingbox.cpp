@@ -948,6 +948,7 @@ void BoundingBox::setBlendEffectsVisible(const bool visible) {
             pLayer->removeBoxWithBlendEffects(this);
         }
     }
+    prp_afterWholeInfluenceRangeChanged();
 }
 
 #include <QInputDialog>
