@@ -35,6 +35,7 @@
 #include "Animators/qpointfanimator.h"
 #include "Boxes/pathbox.h"
 #include "canvas.h"
+#include "BlendEffects/blendeffectcollection.h"
 
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "Animators/SculptPath/sculptpathcollection.h"
@@ -58,6 +59,7 @@ QPixmap* BoxSingleWidget::C_PIXMAP;
 QPixmap* BoxSingleWidget::G_PIXMAP;
 QPixmap* BoxSingleWidget::CG_PIXMAP;
 QPixmap* BoxSingleWidget::GRAPH_PROPERTY;
+QPixmap* BoxSingleWidget::PROMOTE_TO_LAYER_PIXMAP;
 
 bool BoxSingleWidget::sStaticPixmapsLoaded = false;
 
@@ -206,6 +208,47 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mMainLayout->addWidget(mFillWidget);
     mFillWidget->setStyleSheet("background-color: rgba(0, 0, 0, 0)");
 
+    mPromoteToLayerButton = new PixmapActionButton(this);
+    // mHwSupportButton->setToolTip(gSingleLineTooltip("GPU/CPU Processing"));
+    mPromoteToLayerButton->setPixmapChooser([this]() {
+        if(!mTarget) return static_cast<QPixmap*>(nullptr);
+        const auto target = mTarget->getTarget();
+        ContainerBox* targetGroup = nullptr;
+        if(target->SWT_isGroupBox()) {
+            targetGroup = static_cast<ContainerBox*>(target);
+        } else if(target->SWT_isRasterEffectCollection() ||
+                  qobject_cast<BlendEffectCollection*>(target)) {
+            const auto pTarget = static_cast<Property*>(target);
+            const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
+            if(parentBox && parentBox->SWT_isGroupBox()) {
+                targetGroup = static_cast<ContainerBox*>(parentBox);
+            }
+        }
+        if(targetGroup) {
+            return BoxSingleWidget::PROMOTE_TO_LAYER_PIXMAP;
+        } else return static_cast<QPixmap*>(nullptr);
+    });
+    mPromoteToLayerButton->setToolTip("Promote to Layer");
+
+    mMainLayout->addWidget(mPromoteToLayerButton);
+    connect(mPromoteToLayerButton, &BoxesListActionButton::pressed,
+            this, [this]() {
+        if(!mTarget) return;
+        const auto target = mTarget->getTarget();
+        ContainerBox* targetGroup = nullptr;
+        if(target->SWT_isGroupBox()) {
+            targetGroup = static_cast<ContainerBox*>(target);
+        } else if(target->SWT_isRasterEffectCollection() ||
+                  qobject_cast<BlendEffectCollection*>(target)) {
+            const auto pTarget = static_cast<Property*>(target);
+            const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
+            if(parentBox && parentBox->SWT_isGroupBox()) {
+                targetGroup = static_cast<ContainerBox*>(parentBox);
+            }
+        }
+        if(targetGroup) targetGroup->promoteToLayer();
+    });
+
     mValueSlider = new QrealAnimatorValueSlider(nullptr, this);
     mMainLayout->addWidget(mValueSlider, Qt::AlignRight);
 
@@ -336,15 +379,12 @@ void BoxSingleWidget::clearAndHideValueAnimators() {
 }
 
 void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
-    if(mTarget) {
-        const auto oldTarget = mTarget->getTarget();
-        disconnect(oldTarget, nullptr, this, nullptr);
-    }
+    mTargetConn.clear();
     SingleWidget::setTargetAbstraction(abs);
     if(!abs) return;
     auto target = abs->getTarget();
-    connect(target, &SingleWidgetTarget::SWT_changedDisabled,
-            this, qOverload<>(&QWidget::update));
+    mTargetConn << connect(target, &SingleWidgetTarget::SWT_changedDisabled,
+                           this, qOverload<>(&QWidget::update));
     mContentButton->setVisible(target->SWT_isComplexAnimator());
     mRecordButton->setVisible(target->SWT_isAnimator() &&
                               !target->SWT_isBoundingBox() &&
@@ -357,7 +397,31 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                                target->SWT_isGraphAnimator());
     mLockedButton->setVisible(target->SWT_isBoundingBox());
     mHwSupportButton->setVisible(target->SWT_isRasterEffect());
-
+    {
+        ContainerBox* targetGroup = nullptr;
+        if(target->SWT_isGroupBox() && !target->SWT_isLinkBox()) {
+            targetGroup = static_cast<ContainerBox*>(target);
+            mTargetConn << connect(targetGroup,
+                                   &ContainerBox::switchedGroupLayer,
+                                   this, [this, targetGroup]() {
+                mBlendModeCombo->setEnabled(targetGroup->SWT_isLayerBox());
+            });
+        } else if(target->SWT_isRasterEffectCollection() ||
+                  qobject_cast<BlendEffectCollection*>(target)) {
+            const auto pTarget = static_cast<Property*>(target);
+            const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
+            if(parentBox && parentBox->SWT_isGroupBox()) {
+                targetGroup = static_cast<ContainerBox*>(parentBox);
+            }
+        }
+        mPromoteToLayerButton->setVisible(targetGroup);
+        if(targetGroup) {
+            mTargetConn << connect(targetGroup,
+                                   &ContainerBox::switchedGroupLayer,
+                                   mPromoteToLayerButton,
+                                   qOverload<>(&QWidget::update));
+        }
+    }
     mBoxTargetWidget->setVisible(target->SWT_isBoxTargetProperty());
     mCheckBox->setVisible(target->SWT_isBoolProperty() ||
                           target->SWT_isBoolPropertyContainer());
@@ -383,28 +447,28 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         mBlendModeVisible = true;
         mBlendModeCombo->setCurrentText(SkBlendMode_Name(boxPtr->getBlendMode()));
         mBlendModeCombo->setEnabled(!target->SWT_isGroupBox());
-        connect(boxPtr, &BoundingBox::blendModeChanged,
-                this, [this](const SkBlendMode mode) {
+        mTargetConn << connect(boxPtr, &BoundingBox::blendModeChanged,
+                               this, [this](const SkBlendMode mode) {
             mBlendModeCombo->setCurrentText(SkBlendMode_Name(mode));
         });
     } else if(target->SWT_isSingleSound()) {
     } else if(target->SWT_isBoolProperty()) {
         const auto bTarget = static_cast<BoolProperty*>(target);
         mCheckBox->setTarget(bTarget);
-        connect(bTarget, &BoolProperty::valueChanged,
-                this, [this]() { mCheckBox->update(); });
+        mTargetConn << connect(bTarget, &BoolProperty::valueChanged,
+                               this, [this]() { mCheckBox->update(); });
     } else if(target->SWT_isBoolPropertyContainer()) {
         const auto bTarget = static_cast<BoolPropertyContainer*>(target);
         mCheckBox->setTarget(bTarget);
-        connect(bTarget, &BoolPropertyContainer::valueChanged,
-                this, [this]() { mCheckBox->update(); });
+        mTargetConn << connect(bTarget, &BoolPropertyContainer::valueChanged,
+                               this, [this]() { mCheckBox->update(); });
     } else if(target->SWT_isComboBoxProperty()) {
         const auto comboBoxProperty = static_cast<ComboBoxProperty*>(target);
         mPropertyComboBox->clear();
         mPropertyComboBox->addItems(comboBoxProperty->getValueNames());
         mPropertyComboBox->setCurrentIndex(comboBoxProperty->getCurrentValue());
-        connect(comboBoxProperty, &ComboBoxProperty::valueChanged,
-                this, [this](const int id) {
+        mTargetConn << connect(comboBoxProperty, &ComboBoxProperty::valueChanged,
+                               this, [this](const int id) {
             mPropertyComboBox->setCurrentIndex(id);
         });
     } else if(target->SWT_isQrealAnimator()) {
@@ -419,16 +483,16 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
             const auto coll = static_cast<SmartPathCollection*>(target);
             mFillTypeVisible = true;
             mFillTypeCombo->setCurrentIndex(static_cast<int>(coll->getFillType()));
-            connect(coll, &SmartPathCollection::fillTypeChanged,
-                    this, [this](const SkPathFillType type) {
+            mTargetConn << connect(coll, &SmartPathCollection::fillTypeChanged,
+                                   this, [this](const SkPathFillType type) {
                 mFillTypeCombo->setCurrentIndex(static_cast<int>(type));
             });
         } else if(target->SWT_isSculptPathCollection()) {
             const auto coll = static_cast<SculptPathCollection*>(target);
             mFillTypeVisible = true;
             mFillTypeCombo->setCurrentIndex(static_cast<int>(coll->getFillType()));
-            connect(coll, &SculptPathCollection::fillTypeChanged,
-                    this, [this](const SkPathFillType type) {
+            mTargetConn << connect(coll, &SculptPathCollection::fillTypeChanged,
+                                   this, [this](const SkPathFillType type) {
                 mFillTypeCombo->setCurrentIndex(static_cast<int>(type));
             });
         }
@@ -459,41 +523,41 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         const auto path = static_cast<SmartPathAnimator*>(target);
         mPathBlendModeVisible = true;
         mPathBlendModeCombo->setCurrentIndex(static_cast<int>(path->getMode()));
-        connect(path, &SmartPathAnimator::pathBlendModeChagned,
-                this, [this](const SmartPathAnimator::Mode mode) {
+        mTargetConn << connect(path, &SmartPathAnimator::pathBlendModeChagned,
+                               this, [this](const SmartPathAnimator::Mode mode) {
             mPathBlendModeCombo->setCurrentIndex(static_cast<int>(mode));
         });
     }
 
     if(target->SWT_isAnimator()) {
-        connect(static_cast<Animator*>(target), &Animator::anim_isRecordingChanged,
-                this, [this]() { mRecordButton->update(); });
+        mTargetConn << connect(static_cast<Animator*>(target), &Animator::anim_isRecordingChanged,
+                               this, [this]() { mRecordButton->update(); });
     }
     if(target->SWT_isPathEffect() ||
        target->SWT_isRasterEffect() ||
        target->SWT_isTextEffect()) {
         if(target->SWT_isRasterEffect()) {
             const auto effect = static_cast<RasterEffect*>(target);
-            connect(effect, &RasterEffect::hardwareSupportChanged,
-                    this, [this]() { mHwSupportButton->update(); });
+            mTargetConn << connect(effect, &RasterEffect::hardwareSupportChanged,
+                                   this, [this]() { mHwSupportButton->update(); });
         }
 
         const auto effTarget = static_cast<eEffect*>(target);
-        connect(effTarget, &eEffect::effectVisibilityChanged,
-                this, [this]() { mVisibleButton->update(); });
+        mTargetConn << connect(effTarget, &eEffect::effectVisibilityChanged,
+                               this, [this]() { mVisibleButton->update(); });
     }
     if(target->SWT_isBoundingBox() || target->SWT_isSound()) {
         const auto ptr = static_cast<eBoxOrSound*>(target);
-        connect(ptr, &eBoxOrSound::visibilityChanged,
-                this, [this]() { mVisibleButton->update(); });
-        connect(ptr, &eBoxOrSound::selectionChanged,
-                this, qOverload<>(&QWidget::update));
-        connect(ptr, &eBoxOrSound::lockedChanged,
-                this, [this]() { mLockedButton->update(); });
+        mTargetConn << connect(ptr, &eBoxOrSound::visibilityChanged,
+                               this, [this]() { mVisibleButton->update(); });
+        mTargetConn << connect(ptr, &eBoxOrSound::selectionChanged,
+                               this, qOverload<>(&QWidget::update));
+        mTargetConn << connect(ptr, &eBoxOrSound::lockedChanged,
+                               this, [this]() { mLockedButton->update(); });
     }
     if(!target->SWT_isBoundingBox() && !target->SWT_isSingleSound()) {
         const auto prop = static_cast<Property*>(target);
-        connect(prop, &Property::prp_selectionChanged,
+        mTargetConn << connect(prop, &Property::prp_selectionChanged,
                 this, qOverload<>(&QWidget::update));
     }
 
@@ -526,6 +590,7 @@ void BoxSingleWidget::loadStaticPixmaps() {
     G_PIXMAP = new QPixmap(iconsDir + "/g.png");
     CG_PIXMAP = new QPixmap(iconsDir + "/cg.png");
     GRAPH_PROPERTY = new QPixmap(iconsDir + "/graphProperty.png");
+    PROMOTE_TO_LAYER_PIXMAP = new QPixmap(iconsDir + "/promoteToLayer.png");
     sStaticPixmapsLoaded = true;
 }
 
@@ -544,6 +609,11 @@ void BoxSingleWidget::clearStaticPixmaps() {
     delete ANIMATOR_RECORDING;
     delete ANIMATOR_NOT_RECORDING;
     delete ANIMATOR_DESCENDANT_RECORDING;
+    delete PROMOTE_TO_LAYER_PIXMAP;
+    delete C_PIXMAP;
+    delete G_PIXMAP;
+    delete CG_PIXMAP;
+    delete GRAPH_PROPERTY;
 }
 
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {

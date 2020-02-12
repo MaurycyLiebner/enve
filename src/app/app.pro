@@ -317,6 +317,7 @@ brushesTanda.files = $$files(brushes/Tanda/*)
 RESOURCES += brushesTanda
 
 DISTFILES += \
+    icons/promoteToLayer \
     icons/toolbarButtons/checkable/color \
     icons/toolbarButtons/checkable/position \
     icons/toolbarButtons/checkable/pressure \

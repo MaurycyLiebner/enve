@@ -272,6 +272,7 @@ void ContainerBox::promoteToLayer() {
         ur.fRedo = [this]() { promoteToLayer(); };
         prp_addUndoRedo(ur);
     }
+    emit switchedGroupLayer();
 }
 
 void ContainerBox::demoteToGroup() {
@@ -301,6 +302,7 @@ void ContainerBox::demoteToGroup() {
         ur.fRedo = [this]() { demoteToGroup(); };
         prp_addUndoRedo(ur);
     }
+    emit switchedGroupLayer();
 }
 
 void ContainerBox::updateAllBoxes(const UpdateReason reason) {

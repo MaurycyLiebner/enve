@@ -22,6 +22,7 @@ class PathBox;
 class PathEffectCollection;
 
 class ContainerBox : public BoxWithPathEffects {
+    Q_OBJECT
     e_OBJECT
     typedef qCubicSegment1DAnimator::Action SegAction;
 protected:
@@ -208,6 +209,8 @@ public:
             QList<BlendEffect::Delayed> &delayed) const;
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
+signals:
+    void switchedGroupLayer();
 private:
     void updateAllChildPaths(const UpdateReason reason,
                              void (PathBox::*func)(const UpdateReason));

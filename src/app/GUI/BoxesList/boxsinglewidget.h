@@ -62,6 +62,7 @@ public:
     static QPixmap* G_PIXMAP;
     static QPixmap* CG_PIXMAP;
     static QPixmap* GRAPH_PROPERTY;
+    static QPixmap* PROMOTE_TO_LAYER_PIXMAP;
 
     static bool sStaticPixmapsLoaded;
     static void loadStaticPixmaps();
@@ -138,10 +139,13 @@ private:
     QrealAnimatorValueSlider *mValueSlider;
     QrealAnimatorValueSlider *mSecondValueSlider;
 
+    PixmapActionButton *mPromoteToLayerButton;
     QComboBox *mPropertyComboBox;
     QComboBox *mBlendModeCombo;
     QComboBox *mPathBlendModeCombo;
     QComboBox *mFillTypeCombo;
+
+    ConnContext mTargetConn;
 };
 
 #endif // BOXSINGLEWIDGET_H
