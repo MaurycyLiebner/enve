@@ -27,6 +27,7 @@
 #include "actions.h"
 #include "externallinkbox.h"
 #include "namefixer.h"
+#include "BlendEffects/blendeffectcollection.h"
 
 ContainerBox::ContainerBox(const eBoxType type) :
     BoxWithPathEffects(type == eBoxType::group ? "Group" : "Layer",
@@ -253,6 +254,7 @@ void ContainerBox::promoteToLayer() {
         rename(newName);
     }
     mRasterEffectsAnimators->SWT_enable();
+    mBlendEffectCollection->SWT_enable();
     prp_afterWholeInfluenceRangeChanged();
 
     const auto& linkingBoxes = getLinkingBoxes();
@@ -281,6 +283,7 @@ void ContainerBox::demoteToGroup() {
         rename(newName);
     }
     mRasterEffectsAnimators->SWT_disable();
+    mBlendEffectCollection->SWT_disable();
     prp_afterWholeInfluenceRangeChanged();
 
     const auto& linkingBoxes = getLinkingBoxes();
