@@ -58,8 +58,9 @@ void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
 }
 
 QPointF InternalLinkBox::getRelCenterPosition() {
-    if(!getLinkTarget()) return QPointF();
-    return getLinkTarget()->getRelCenterPosition();
+    const auto linkTarget = getLinkTarget();
+    if(!linkTarget) return QPointF();
+    return linkTarget->getRelCenterPosition();
 }
 
 BoundingBox *InternalLinkBox::getLinkTarget() const {
@@ -72,8 +73,9 @@ bool InternalLinkBox::isParentLink() const {
 }
 
 stdsptr<BoxRenderData> InternalLinkBox::createRenderData() {
-    if(!getLinkTarget()) return nullptr;
-    const auto renderData = getLinkTarget()->createRenderData();
+    const auto linkTarget = getLinkTarget();
+    if(!linkTarget) return nullptr;
+    const auto renderData = linkTarget->createRenderData();
     renderData->fParentBox = this;
     return renderData;
 }
@@ -92,55 +94,64 @@ SkBlendMode InternalLinkBox::getBlendMode() const {
 }
 
 bool InternalLinkBox::relPointInsidePath(const QPointF &relPos) const {
-    if(!getLinkTarget()) return false;
-    return getLinkTarget()->relPointInsidePath(relPos);
+    const auto linkTarget = getLinkTarget();
+    if(!linkTarget) return false;
+    return linkTarget->relPointInsidePath(relPos);
 }
 
 bool InternalLinkBox::isFrameInDurationRect(const int relFrame) const {
-    if(!getLinkTarget()) return false;
+    const auto linkTarget = getLinkTarget();
+    if(!linkTarget) return false;
     return BoundingBox::isFrameInDurationRect(relFrame) &&
-            getLinkTarget()->isFrameInDurationRect(relFrame);
+           linkTarget->isFrameInDurationRect(relFrame);
 }
 
 bool InternalLinkBox::isFrameFInDurationRect(const qreal relFrame) const {
-    if(!getLinkTarget()) return false;
+    const auto linkTarget = getLinkTarget();
+    if(!linkTarget) return false;
     return BoundingBox::isFrameFInDurationRect(relFrame) &&
-            getLinkTarget()->isFrameFInDurationRect(relFrame);
+           linkTarget->isFrameFInDurationRect(relFrame);
 }
 
 HardwareSupport InternalLinkBox::hardwareSupport() const {
-    if(!getLinkTarget()) return BoundingBox::hardwareSupport();
-    return getLinkTarget()->hardwareSupport();
+    const auto linkTarget = getLinkTarget();
+    if(!linkTarget) return BoundingBox::hardwareSupport();
+    return linkTarget->hardwareSupport();
 }
 
 FrameRange InternalLinkBox::prp_getIdenticalRelRange(const int relFrame) const {
+    const auto linkTarget = getLinkTarget();
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
-    if(mVisible && getLinkTarget())
+    if(mVisible && linkTarget)
         range *= BoundingBox::prp_getIdenticalRelRange(relFrame);
     else return range;
-    auto targetRange = getLinkTarget()->prp_getIdenticalRelRange(relFrame);
+    auto targetRange = linkTarget->prp_getIdenticalRelRange(relFrame);
     return range*targetRange;
 }
 
 FrameRange InternalLinkBox::prp_relInfluenceRange() const {
+    const auto linkTarget = getLinkTarget();
     FrameRange inflRange;
     if(mDurationRectangle) inflRange = mDurationRectangle->getRelFrameRange();
     else inflRange = ComplexAnimator::prp_relInfluenceRange();
-    if(getLinkTarget()) {
-        return inflRange*getLinkTarget()->prp_relInfluenceRange();
+    if(linkTarget) {
+        return inflRange*linkTarget->prp_relInfluenceRange();
     } else return inflRange;
 }
 
 int InternalLinkBox::prp_getRelFrameShift() const {
-    if(getLinkTarget()) {
-        return getLinkTarget()->prp_getRelFrameShift() +
-                BoundingBox::prp_getRelFrameShift();
+    const auto linkTarget = getLinkTarget();
+    if(linkTarget) {
+        return linkTarget->prp_getRelFrameShift() +
+               BoundingBox::prp_getRelFrameShift();
     } else return BoundingBox::prp_getRelFrameShift();
 }
 
 QMatrix InternalLinkBox::getRelativeTransformAtFrame(const qreal relFrame) {
     if(isParentLink()) {
-        return getLinkTarget()->getRelativeTransformAtFrame(relFrame);
+        const auto linkTarget = getLinkTarget();
+        if(!linkTarget) return QMatrix();
+        return linkTarget->getRelativeTransformAtFrame(relFrame);
     } else {
         return BoundingBox::getRelativeTransformAtFrame(relFrame);
     }
@@ -149,8 +160,9 @@ QMatrix InternalLinkBox::getRelativeTransformAtFrame(const qreal relFrame) {
 QMatrix InternalLinkBox::getTotalTransformAtFrame(const qreal relFrame) {
     if(isParentLink()) {
         const auto linkTarget = getLinkTarget();
+        if(!linkTarget) return QMatrix();
         return linkTarget->getRelativeTransformAtFrame(relFrame)*
-                mParentGroup->getTotalTransformAtFrame(relFrame);
+               mParentGroup->getTotalTransformAtFrame(relFrame);
     } else {
         return BoundingBox::getTotalTransformAtFrame(relFrame);
     }
