@@ -23,6 +23,7 @@
 BoxRenderData::BoxRenderData(BoundingBox * const parent) :
     fFilterQuality(eFilterSettings::sRender()) {
     fParentBox = parent;
+    fBlendEffectIdentifier = parent;
 }
 
 void BoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {

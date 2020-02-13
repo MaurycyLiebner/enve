@@ -47,7 +47,7 @@ void MoveBlendEffect::blendSetup(
     delayed << iData;
 }
 
-void MoveBlendEffect::detachedBlendSetup(BoundingBox* const boxToDraw,
+void MoveBlendEffect::detachedBlendSetup(const BoundingBox* const boxToDraw,
                                      const qreal relFrame,
                                      SkCanvas * const canvas,
                                      const SkFilterQuality filter,

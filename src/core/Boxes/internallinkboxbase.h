@@ -57,6 +57,15 @@ public:
     bool isFrameFInDurationRect(const qreal relFrame) const override;
 
     HardwareSupport hardwareSupport() const override;
+
+
+    void blendSetup(ChildRenderData& data,
+                    const int index, const qreal relFrame,
+                    QList<ChildRenderData>& delayed) const override;
+    void detachedBlendSetup(
+            SkCanvas * const canvas,
+            const SkFilterQuality filter, int& drawId,
+            QList<BlendEffect::Delayed> &delayed) const override;
 protected:
     ConnContext& assignLinkTarget(BoxT * const linkTarget);
     BoxT *getLinkTarget() const
@@ -213,7 +222,31 @@ stdsptr<BoxRenderData> ILBB::createRenderData() {
     if(!linkTarget) return nullptr;
     const auto renderData = linkTarget->createRenderData();
     renderData->fParentBox = this;
+    if(!mInnerLink) renderData->fBlendEffectIdentifier = this;
     return renderData;
+}
+
+template <typename BoxT>
+void ILBB::blendSetup(ChildRenderData& data,
+                      const int index, const qreal relFrame,
+                      QList<ChildRenderData>& delayed) const {
+    if(mInnerLink) {
+        const auto linkTarget = getLinkTarget();
+        if(!linkTarget) return;
+        linkTarget->blendSetup(data, index, relFrame, delayed);
+    } else BoxT::blendSetup(data, index, relFrame, delayed);
+}
+
+template <typename BoxT>
+void ILBB::detachedBlendSetup(
+        SkCanvas * const canvas,
+        const SkFilterQuality filter, int& drawId,
+        QList<BlendEffect::Delayed> &delayed) const {
+    if(mInnerLink) {
+        const auto linkTarget = getLinkTarget();
+        if(!linkTarget) return;
+        linkTarget->detachedBlendSetup(canvas, filter, drawId, delayed);
+    } else BoxT::detachedBlendSetup(canvas, filter, drawId, delayed);
 }
 
 #endif // INTERNALLINKBOXBASE_H

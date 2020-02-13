@@ -44,13 +44,13 @@ public:
 
 
     void drawContained(SkCanvas * const canvas,
-                       const SkFilterQuality filter);
+                       const SkFilterQuality filter) const;
     void drawContained(SkCanvas * const canvas,
                        const SkFilterQuality filter, int& drawId,
-                       QList<BlendEffect::Delayed>& delayed);
+                       QList<BlendEffect::Delayed>& delayed) const;
     void drawPixmapSk(SkCanvas * const canvas,
                       const SkFilterQuality filter, int &drawId,
-                      QList<BlendEffect::Delayed> &delayed);
+                      QList<BlendEffect::Delayed> &delayed) const;
 
     qsptr<BoundingBox> createLink(const bool inner);
     stdsptr<BoxRenderData> createRenderData();

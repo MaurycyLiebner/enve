@@ -27,7 +27,7 @@ public:
     using Delayed = std::function<bool(int id,
                                        BoundingBox* prev,
                                        BoundingBox* next)>;
-    virtual void detachedBlendSetup(BoundingBox* const boxToDraw,
+    virtual void detachedBlendSetup(const BoundingBox* const boxToDraw,
                                 const qreal relFrame,
                                 SkCanvas * const canvas,
                                 const SkFilterQuality filter,

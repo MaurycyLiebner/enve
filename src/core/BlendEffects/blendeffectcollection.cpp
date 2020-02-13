@@ -53,7 +53,7 @@ void BlendEffectCollection::drawBlendSetup(SkCanvas * const canvas) {
 }
 
 void BlendEffectCollection::detachedBlendSetup(
-        BoundingBox* const boxToDraw,
+        const BoundingBox* const boxToDraw,
         SkCanvas * const canvas,
         const SkFilterQuality filter, int &drawId,
         QList<BlendEffect::Delayed> &delayed) const {

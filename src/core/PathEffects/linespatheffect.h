@@ -25,7 +25,10 @@ protected:
 public:
     stdsptr<PathEffectCaller> getEffectCaller(
             const qreal relFrame, const qreal influence) const;
-    bool skipZeroInfluence(const qreal relFrame) const { return false; }
+    bool skipZeroInfluence(const qreal relFrame) const {
+        Q_UNUSED(relFrame)
+        return false;
+    }
 private:
     qsptr<QrealAnimator> mAngle;
     qsptr<QrealAnimator> mDistance;

@@ -54,7 +54,7 @@ void TargetedBlendEffect::blendSetup(
 }
 
 void TargetedBlendEffect::detachedBlendSetup(
-        BoundingBox* const boxToDraw,
+        const BoundingBox* const boxToDraw,
         const qreal relFrame,
         SkCanvas * const canvas,
         const SkFilterQuality filter,

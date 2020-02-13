@@ -643,7 +643,7 @@ void handleDelayed(QList<BlendEffect::Delayed> &delayed,
 
 void ContainerBox::drawContained(SkCanvas * const canvas,
                                  const SkFilterQuality filter, int& drawId,
-                                 QList<BlendEffect::Delayed> &delayed) {
+                                 QList<BlendEffect::Delayed> &delayed) const {
     if(mContainedBoxes.isEmpty()) return;
     handleDelayed(delayed, drawId, nullptr, mContainedBoxes.last());
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
@@ -676,7 +676,7 @@ void ContainerBox::containedDetachedBlendSetup(
 }
 
 void ContainerBox::drawContained(SkCanvas * const canvas,
-                                 const SkFilterQuality filter) {
+                                 const SkFilterQuality filter) const {
     int drawId = 0;
     QList<BlendEffect::Delayed> delayed;
     containedDetachedBlendSetup(canvas, filter, drawId, delayed);
@@ -690,7 +690,7 @@ void ContainerBox::drawContained(SkCanvas * const canvas,
 
 void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
                                 const SkFilterQuality filter, int& drawId,
-                                QList<BlendEffect::Delayed> &delayed) {
+                                QList<BlendEffect::Delayed> &delayed) const {
     if(SWT_isGroupBox()) return drawContained(canvas, filter, drawId, delayed);
     if(mIsDescendantCurrentGroup) {
         SkPaint paint;
@@ -770,8 +770,8 @@ void ContainerBox::setupRenderData(const qreal relFrame,
         const ChildRenderData* target = nullptr;
         for(const auto& child : groupData->fChildrenRenderData) {
             if(!child.fIsMain) continue;
-            const auto iTarget = child.fData->fParentBox;
-            if(iTarget == iClip.fTargetBox) {
+            const auto iIdentifier = child.fData->fBlendEffectIdentifier;
+            if(iIdentifier == iClip.fTargetBox) {
                 target = &child;
                 break;
             }

@@ -19,7 +19,7 @@
 #include "skia/skiahelpers.h"
 
 void RenderContainer::drawSk(SkCanvas * const canvas,
-                             SkPaint& paint) {
+                             SkPaint& paint) const {
     if(!mSrcRenderData) return;
     canvas->save();
     canvas->concat(toSkMatrix(mPaintTransform));

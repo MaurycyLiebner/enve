@@ -28,7 +28,7 @@ public:
                     const int index,
                     const qreal relFrame,
                     QList<ChildRenderData> &delayed) const;
-    void detachedBlendSetup(BoundingBox* const boxToDraw,
+    void detachedBlendSetup(const BoundingBox* const boxToDraw,
                         const qreal relFrame,
                         SkCanvas * const canvas,
                         const SkFilterQuality filter,

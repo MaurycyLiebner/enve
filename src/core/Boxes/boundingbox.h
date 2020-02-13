@@ -151,7 +151,7 @@ public:
 
     virtual void drawPixmapSk(SkCanvas * const canvas,
                               const SkFilterQuality filter, int &drawId,
-                              QList<BlendEffect::Delayed> &delayed);
+                              QList<BlendEffect::Delayed> &delayed) const;
     virtual void drawHoveredSk(SkCanvas *canvas, const float invScale);
 
     virtual BoundingBox *getBoxAtFromAllDescendents(const QPointF &absPos);
@@ -380,15 +380,15 @@ public:
     void setVisibleForScene(const bool visible)
     { mVisibleInScene = visible; }
 
-    void blendSetup(ChildRenderData& data,
+    virtual void blendSetup(ChildRenderData& data,
                     const int index, const qreal relFrame,
                     QList<ChildRenderData>& delayed) const;
     void drawPixmapSk(SkCanvas * const canvas,
-                      const SkFilterQuality filter);
-    void detachedBlendSetup(
+                      const SkFilterQuality filter) const;
+    virtual void detachedBlendSetup(
             SkCanvas * const canvas,
             const SkFilterQuality filter, int& drawId,
-            QList<BlendEffect::Delayed> &delayed);
+            QList<BlendEffect::Delayed> &delayed) const;
 
     bool blendEffectsEnabled() const;
     bool hasBlendEffects() const;

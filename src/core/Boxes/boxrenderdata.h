@@ -101,6 +101,7 @@ public:
 
     bool fParentIsTarget = true;
     qptr<BoundingBox> fParentBox;
+    BoundingBox* fBlendEffectIdentifier;
     sk_sp<SkImage> fRenderedImage;
 
     void drawRenderedImageForParent(SkCanvas * const canvas);
