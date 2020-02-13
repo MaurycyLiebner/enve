@@ -582,7 +582,7 @@ void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
 void Canvas::createLinkBoxForSelected() {
     pushUndoRedoName("Create Link");
     for(const auto& selectedBox : mSelectedBoxes)
-        mCurrentContainer->addContained(selectedBox->createLink());
+        mCurrentContainer->addContained(selectedBox->createLink(false));
 }
 
 SmartVectorPath *Canvas::getPathResultingFromOperation(const SkPathOp& pathOp) {

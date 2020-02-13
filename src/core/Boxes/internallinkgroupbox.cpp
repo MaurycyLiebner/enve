@@ -19,10 +19,10 @@
 #include "Timeline/durationrectangle.h"
 #include "layerboxrenderdata.h"
 
-InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget) :
-    InternalLinkBoxBase<ContainerBox>(eBoxType::internalLinkGroup) {
+InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget,
+                                           const bool innerLink) :
+    InternalLinkBoxBase<ContainerBox>(eBoxType::internalLinkGroup, innerLink) {
     prp_setName("Link 0");
-    setLinkTarget(linkTarget);
 
     ca_prependChild(mTransformAnimator.data(), mBoxTarget);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
@@ -30,6 +30,7 @@ InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget) :
         const auto cbTarget = dynamic_cast<ContainerBox*>(target);
         setLinkTarget(cbTarget);
     });
+    mBoxTarget->setTarget(linkTarget);
 }
 
 bool InternalLinkGroupBox::SWT_isGroupBox() const {
@@ -56,16 +57,6 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
     mBoxTarget->setTarget(linkTarget);
     auto& conn = assignLinkTarget(linkTarget);
     if(linkTarget) {
-        rename(linkTarget->prp_getName() + " Link 0");
-        conn << connect(linkTarget, &Property::prp_nameChanged,
-                       this, &Property::prp_setName);
-        linkTarget->addLinkingBox(this);
-        conn << connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
-                this, [this, linkTarget](const FrameRange& targetAbs) {
-            const auto relRange = linkTarget->prp_absRangeToRelRange(targetAbs);
-            prp_afterChangedRelRange(relRange);
-        });
-
         conn << connect(linkTarget->getTransformAnimator(), &Property::prp_absFrameRangeChanged,
                 this, [this, linkTarget](const FrameRange& targetAbs) {
             const auto relRange = linkTarget->prp_absRangeToRelRange(targetAbs);
@@ -77,7 +68,7 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
             const auto& child = boxesList.at(i);
             if(child->SWT_isBoundingBox()) {
                 const auto box = static_cast<BoundingBox*>(child.get());
-                const auto newLink = box->createLink();
+                const auto newLink = box->createLink(true);
                 addContained(newLink);
             } else /*(child->SWT_isSound())*/ {
                 const auto sound = static_cast<SingleSound*>(child.get());
@@ -85,8 +76,6 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
                 addContained(newLink);
             }
         }
-    } else {
-        rename("Empty Link 0");
     }
     planUpdate(UpdateReason::userChange);
 }

@@ -443,8 +443,8 @@ void Canvas::prp_afterChangedAbsRange(const FrameRange &range, const bool clip) 
     }
 }
 
-qsptr<BoundingBox> Canvas::createLink() {
-    return enve::make_shared<InternalLinkCanvas>(this);
+qsptr<BoundingBox> Canvas::createLink(const bool inner) {
+    return enve::make_shared<InternalLinkCanvas>(this, inner);
 }
 
 void Canvas::schedulePivotUpdate() {

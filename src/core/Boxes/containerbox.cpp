@@ -713,8 +713,8 @@ void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
     } else BoundingBox::drawPixmapSk(canvas, filter, drawId, delayed);
 }
 
-qsptr<BoundingBox> ContainerBox::createLink() {
-    auto linkBox = enve::make_shared<InternalLinkGroupBox>(this);
+qsptr<BoundingBox> ContainerBox::createLink(const bool inner) {
+    auto linkBox = enve::make_shared<InternalLinkGroupBox>(this, inner);
     copyTransformationTo(linkBox.get());
     return std::move(linkBox);
 }
@@ -912,7 +912,7 @@ void ContainerBox::insertContained(
         const auto& linkingBoxes = getLinkingBoxes();
         for(const auto& box : linkingBoxes) {
             const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
-            internalLinkGroup->insertContained(id, box->createLink());
+            internalLinkGroup->insertContained(id, box->createLink(true));
         }
         const auto pLayer = box->getFirstParentLayer();
         if(pLayer) {
@@ -1223,13 +1223,13 @@ qsptr<BoundingBox> readIdCreateBox(eReadStream& src) {
         case(eBoxType::imageSequence):
             return enve::make_shared<ImageSequenceBox>();
         case(eBoxType::internalLink):
-            return enve::make_shared<InternalLinkBox>(nullptr);
+            return enve::make_shared<InternalLinkBox>(nullptr, false);
         case(eBoxType::internalLinkGroup):
-            return enve::make_shared<InternalLinkGroupBox>(nullptr);
+            return enve::make_shared<InternalLinkGroupBox>(nullptr, false);
         case(eBoxType::externalLink):
             return enve::make_shared<ExternalLinkBox>();
         case(eBoxType::internalLinkCanvas):
-            return enve::make_shared<InternalLinkCanvas>(nullptr);
+            return enve::make_shared<InternalLinkCanvas>(nullptr, false);
         case(eBoxType::custom): {
             const auto id = CustomIdentifier::sRead(src);
             return CustomBoxCreator::sCreateForIdentifier(id);

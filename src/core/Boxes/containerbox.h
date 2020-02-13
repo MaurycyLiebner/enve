@@ -52,7 +52,7 @@ public:
                       const SkFilterQuality filter, int &drawId,
                       QList<BlendEffect::Delayed> &delayed);
 
-    qsptr<BoundingBox> createLink();
+    qsptr<BoundingBox> createLink(const bool inner);
     stdsptr<BoxRenderData> createRenderData();
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data,

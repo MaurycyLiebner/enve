@@ -23,7 +23,13 @@
 template <typename BoxT>
 class InternalLinkBoxBase : public BoxT {
 protected:
-    using BoxT::BoxT;
+    InternalLinkBoxBase(const eBoxType type,
+                        const bool innerLink) :
+        BoxT(type), mInnerLink(innerLink) {}
+    InternalLinkBoxBase(const QString& name,
+                        const eBoxType type,
+                        const bool innerLink) :
+        BoxT(name, type), mInnerLink(innerLink) {}
 public:
     bool SWT_isLinkBox() const override { return true; }
 
@@ -52,59 +58,75 @@ public:
 
     HardwareSupport hardwareSupport() const override;
 protected:
-    ConnContext& assignLinkTarget(BoxT * const linkTarget)
-    { return mLinkTarget.assign(linkTarget); }
+    ConnContext& assignLinkTarget(BoxT * const linkTarget);
     BoxT *getLinkTarget() const
     { return mLinkTarget; }
     BoxT *getFinalTarget() const;
 
-    bool isParentLink() const;
-
     qsptr<BoxTargetProperty> mBoxTarget =
             enve::make_shared<BoxTargetProperty>("link target");
 private:
+    const bool mInnerLink;
     ConnContextQPtr<BoxT> mLinkTarget;
 };
 
-template <typename BoxT>
-bool InternalLinkBoxBase<BoxT>::isParentLink() const {
-    const auto parentGroup = this->getParentGroup();
-    if(!parentGroup) return false;
-    return parentGroup->SWT_isLinkBox();
-}
+#define ILBB InternalLinkBoxBase<BoxT>
 
 template <typename BoxT>
-bool InternalLinkBoxBase<BoxT>::relPointInsidePath(const QPointF &relPos) const {
+bool ILBB::relPointInsidePath(const QPointF &relPos) const {
     const auto linkTarget = getLinkTarget();
     if(!linkTarget) return false;
     return linkTarget->relPointInsidePath(relPos);
 }
 
 template <typename BoxT>
-QPointF InternalLinkBoxBase<BoxT>::getRelCenterPosition() {
+QPointF ILBB::getRelCenterPosition() {
     const auto linkTarget = getLinkTarget();
     if(!linkTarget) return QPointF();
     return linkTarget->getRelCenterPosition();
 }
 
 template <typename BoxT>
-SkBlendMode InternalLinkBoxBase<BoxT>::getBlendMode() const {
+SkBlendMode ILBB::getBlendMode() const {
     const auto linkTarget = getLinkTarget();
-    if(isParentLink() && linkTarget) {
+    if(mInnerLink && linkTarget) {
         return linkTarget->getBlendMode();
     }
     return BoxT::getBlendMode();
 }
 
 template <typename BoxT>
-HardwareSupport InternalLinkBoxBase<BoxT>::hardwareSupport() const {
+HardwareSupport ILBB::hardwareSupport() const {
     const auto linkTarget = getLinkTarget();
     if(!linkTarget) return BoxT::hardwareSupport();
     return linkTarget->hardwareSupport();
 }
 
+template<typename BoxT>
+ConnContext &ILBB::assignLinkTarget(BoxT * const linkTarget) {
+    auto& conn = mLinkTarget.assign(linkTarget);
+    if(linkTarget) {
+        if(mInnerLink) {
+            this->setVisibile(linkTarget->isVisible());
+            conn << QObject::connect(linkTarget, &eBoxOrSound::visibilityChanged,
+                                     this, [this](const bool visible) {
+                this->setVisibile(visible);
+            });
+        } else {
+            this->rename(linkTarget->prp_getName() + " Link 0");
+        }
+        linkTarget->addLinkingBox(this);
+        conn << QObject::connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
+                                 this, [this, linkTarget](const FrameRange& targetAbs) {
+            const auto relRange = linkTarget->prp_absRangeToRelRange(targetAbs);
+            this->prp_afterChangedRelRange(relRange);
+        });
+    } else if(!mInnerLink) this->rename("Empty Link 0");
+    return conn;
+}
+
 template <typename BoxT>
-bool InternalLinkBoxBase<BoxT>::isFrameInDurationRect(const int relFrame) const {
+bool ILBB::isFrameInDurationRect(const int relFrame) const {
     const auto linkTarget = getLinkTarget();
     if(!linkTarget) return false;
     return BoxT::isFrameInDurationRect(relFrame) &&
@@ -112,7 +134,7 @@ bool InternalLinkBoxBase<BoxT>::isFrameInDurationRect(const int relFrame) const 
 }
 
 template <typename BoxT>
-bool InternalLinkBoxBase<BoxT>::isFrameFInDurationRect(const qreal relFrame) const {
+bool ILBB::isFrameFInDurationRect(const qreal relFrame) const {
     const auto linkTarget = getLinkTarget();
     if(!linkTarget) return false;
     return BoxT::isFrameFInDurationRect(relFrame) &&
@@ -120,8 +142,8 @@ bool InternalLinkBoxBase<BoxT>::isFrameFInDurationRect(const qreal relFrame) con
 }
 
 template <typename BoxT>
-QMatrix InternalLinkBoxBase<BoxT>::getRelativeTransformAtFrame(const qreal relFrame) {
-    if(isParentLink()) {
+QMatrix ILBB::getRelativeTransformAtFrame(const qreal relFrame) {
+    if(mInnerLink) {
         const auto linkTarget = getLinkTarget();
         if(!linkTarget) return QMatrix();
         return linkTarget->getRelativeTransformAtFrame(relFrame);
@@ -131,8 +153,8 @@ QMatrix InternalLinkBoxBase<BoxT>::getRelativeTransformAtFrame(const qreal relFr
 }
 
 template <typename BoxT>
-QMatrix InternalLinkBoxBase<BoxT>::getTotalTransformAtFrame(const qreal relFrame) {
-    if(isParentLink()) {
+QMatrix ILBB::getTotalTransformAtFrame(const qreal relFrame) {
+    if(mInnerLink) {
         const auto parentGroup = this->getParentGroup();
         const auto linkTarget = getLinkTarget();
         if(!linkTarget || !parentGroup) return QMatrix();
@@ -144,18 +166,18 @@ QMatrix InternalLinkBoxBase<BoxT>::getTotalTransformAtFrame(const qreal relFrame
 }
 
 template <typename BoxT>
-BoxT *InternalLinkBoxBase<BoxT>::getFinalTarget() const {
+BoxT *ILBB::getFinalTarget() const {
     const auto linkTarget = getLinkTarget();
     if(!linkTarget) return nullptr;
     if(linkTarget->SWT_isLinkBox()) {
-        const auto targetAsLink = static_cast<InternalLinkBoxBase<BoxT>*>(linkTarget);
+        const auto targetAsLink = static_cast<ILBB*>(linkTarget);
         return targetAsLink->getFinalTarget();
     }
     return linkTarget;
 }
 
 template <typename BoxT>
-FrameRange InternalLinkBoxBase<BoxT>::prp_getIdenticalRelRange(const int relFrame) const {
+FrameRange ILBB::prp_getIdenticalRelRange(const int relFrame) const {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
     const auto linkTarget = getLinkTarget();
     if(this->isVisible() && linkTarget)
@@ -166,7 +188,7 @@ FrameRange InternalLinkBoxBase<BoxT>::prp_getIdenticalRelRange(const int relFram
 }
 
 template <typename BoxT>
-FrameRange InternalLinkBoxBase<BoxT>::prp_relInfluenceRange() const {
+FrameRange ILBB::prp_relInfluenceRange() const {
     const auto linkTarget = getLinkTarget();
     FrameRange inflRange;
     const auto durRect = this->getDurationRectangle();
@@ -178,7 +200,7 @@ FrameRange InternalLinkBoxBase<BoxT>::prp_relInfluenceRange() const {
 }
 
 template <typename BoxT>
-int InternalLinkBoxBase<BoxT>::prp_getRelFrameShift() const {
+int ILBB::prp_getRelFrameShift() const {
     const auto linkTarget = getLinkTarget();
     if(linkTarget) {
         return linkTarget->prp_getRelFrameShift() +
@@ -187,7 +209,7 @@ int InternalLinkBoxBase<BoxT>::prp_getRelFrameShift() const {
 }
 
 template <typename BoxT>
-stdsptr<BoxRenderData> InternalLinkBoxBase<BoxT>::createRenderData() {
+stdsptr<BoxRenderData> ILBB::createRenderData() {
     const auto linkTarget = getLinkTarget();
     if(!linkTarget) return nullptr;
     const auto renderData = linkTarget->createRenderData();

@@ -79,12 +79,6 @@ BoundingBox::BoundingBox(const QString& name, const eBoxType type) :
             setParentTransform(trans);
         } else setParentTransform(nullptr);
     });
-    connect(this, &eBoxOrSound::visibilityChanged,
-            this, [this](const bool visible) {
-        for(const auto& box : mLinkingBoxes) {
-            if(box->isParentLinkBox()) box->setVisibile(visible);
-        }
-    });
 }
 
 BoundingBox::~BoundingBox() {
@@ -131,8 +125,8 @@ void BoundingBox::ca_childIsRecordingChanged() {
     SWT_scheduleContentUpdate(SWT_BoxRule::notAnimated);
 }
 
-qsptr<BoundingBox> BoundingBox::createLink() {
-    auto linkBox = enve::make_shared<InternalLinkBox>(this);
+qsptr<BoundingBox> BoundingBox::createLink(const bool inner) {
+    auto linkBox = enve::make_shared<InternalLinkBox>(this, inner);
     copyTransformationTo(linkBox.get());
     return std::move(linkBox);
 }
@@ -1107,10 +1101,6 @@ void BoundingBox::selectAllCanvasPts(const MovablePoint::PtOp &adder,
         if(!handler) continue;
         handler->addAllPointsToSelection(adder, mode);
     }
-}
-
-bool BoundingBox::isParentLinkBox() {
-    return mParentGroup->SWT_isLinkBox();
 }
 
 bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,

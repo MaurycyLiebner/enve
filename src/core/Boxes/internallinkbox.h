@@ -25,7 +25,8 @@ class eSound;
 class InternalLinkBox : public InternalLinkBoxBase<BoundingBox> {
     e_OBJECT
 protected:
-    InternalLinkBox(BoundingBox * const linkTarget);
+    InternalLinkBox(BoundingBox * const linkTarget,
+                    const bool innerLink);
 public:
     ~InternalLinkBox()
     { setLinkTarget(nullptr); }

@@ -56,7 +56,7 @@ void Canvas::addActionsToMenu(QMenu *const menu) {
     QMenu * const linkCanvasMenu = menu->addMenu("Link Scene");
     for(const auto& canvas : mDocument.fScenes) {
         const auto slot = [this, canvas]() {
-            auto newLink = canvas->createLink();
+            auto newLink = canvas->createLink(false);
             mCurrentContainer->addContained(newLink);
             newLink->centerPivotPosition();
         };

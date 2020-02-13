@@ -112,7 +112,7 @@ private:
 protected:
     virtual void getMotionBlurProperties(QList<Property*> &list) const;
 public:
-    virtual qsptr<BoundingBox> createLink();
+    virtual qsptr<BoundingBox> createLink(const bool inner);
 
     virtual SmartVectorPath *objectToVectorPathBox()
     { return nullptr; }
@@ -301,7 +301,6 @@ public:
 
     void clearParent();
     void setParentTransform(BasicTransformAnimator *parent);
-    bool isParentLinkBox();
 
     bool isContainedIn(const QRectF &absRect) const;
 

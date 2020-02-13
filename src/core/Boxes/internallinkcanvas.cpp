@@ -19,8 +19,9 @@
 #include "Animators/transformanimator.h"
 #include "canvas.h"
 
-InternalLinkCanvas::InternalLinkCanvas(ContainerBox * const linkTarget) :
-    InternalLinkGroupBox(linkTarget) {
+InternalLinkCanvas::InternalLinkCanvas(ContainerBox * const linkTarget,
+                                       const bool innerLink) :
+    InternalLinkGroupBox(linkTarget, innerLink) {
     mType = eBoxType::internalLinkCanvas;
     mFrameRemapping->disableAction();
     ca_prependChild(mTransformAnimator.data(), mClipToCanvas);
@@ -82,8 +83,8 @@ bool InternalLinkCanvas::clipToCanvas() {
     return mClipToCanvas->getValue();
 }
 
-qsptr<BoundingBox> InternalLinkCanvas::createLink() {
-    auto linkBox = enve::make_shared<InternalLinkCanvas>(this);
+qsptr<BoundingBox> InternalLinkCanvas::createLink(const bool inner) {
+    auto linkBox = enve::make_shared<InternalLinkCanvas>(this, inner);
     copyTransformationTo(linkBox.get());
     return std::move(linkBox);
 }

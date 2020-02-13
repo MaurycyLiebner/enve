@@ -324,7 +324,7 @@ public:
 
     bool keyPressEvent(QKeyEvent *event);
 
-    qsptr<BoundingBox> createLink();
+    qsptr<BoundingBox> createLink(const bool inner);
 
     void setPreviewing(const bool bT);
     void setOutputRendering(const bool bT);

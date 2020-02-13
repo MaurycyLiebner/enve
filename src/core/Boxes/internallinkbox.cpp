@@ -23,12 +23,13 @@
 #include "videobox.h"
 #include "Sound/singlesound.h"
 
-InternalLinkBox::InternalLinkBox(BoundingBox * const linkTarget) :
-    InternalLinkBoxBase<BoundingBox>("Link", eBoxType::internalLink) {
-    setLinkTarget(linkTarget);
+InternalLinkBox::InternalLinkBox(BoundingBox * const linkTarget,
+                                 const bool innerLink) :
+    InternalLinkBoxBase<BoundingBox>("Link", eBoxType::internalLink, innerLink) {
     ca_prependChild(mTransformAnimator.data(), mBoxTarget);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
             this, &InternalLinkBox::setLinkTarget);
+    mBoxTarget->setTarget(linkTarget);
 }
 
 void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
@@ -38,13 +39,6 @@ void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
     auto& conn = assignLinkTarget(linkTarget);
     mBoxTarget->setTarget(linkTarget);
     if(linkTarget) {
-        rename(linkTarget->prp_getName() + " Link 0");
-        linkTarget->addLinkingBox(this);
-        conn << connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
-                this, [this, linkTarget](const FrameRange& range) {
-            const auto relRange = linkTarget->prp_absRangeToRelRange(range);
-            prp_afterChangedRelRange(relRange);
-        });
         if(linkTarget->SWT_isVideoBox()) {
             const auto vidBox = static_cast<VideoBox*>(linkTarget);
             mSound = vidBox->sound()->createLink();
@@ -52,8 +46,6 @@ void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
                             mSound.get(), &eBoxOrSound::setParentGroup);
             mSound->setParentGroup(mParentGroup);
         }
-    } else {
-        rename("Empty Link 0");
     }
     planUpdate(UpdateReason::userChange);
 }

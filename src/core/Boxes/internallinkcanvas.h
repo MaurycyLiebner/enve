@@ -23,13 +23,14 @@
 class InternalLinkCanvas : public InternalLinkGroupBox {
     e_OBJECT
 protected:
-    InternalLinkCanvas(ContainerBox * const linkTarget);
+    InternalLinkCanvas(ContainerBox * const linkTarget,
+                       const bool innerLink);
 public:
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data,
                          Canvas * const scene);
 
-    qsptr<BoundingBox> createLink();
+    qsptr<BoundingBox> createLink(const bool inner);
 
     stdsptr<BoxRenderData> createRenderData();
 

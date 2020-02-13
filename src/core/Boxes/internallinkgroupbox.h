@@ -23,7 +23,8 @@
 class InternalLinkGroupBox : public InternalLinkBoxBase<ContainerBox> {
     e_OBJECT
 protected:
-    InternalLinkGroupBox(ContainerBox * const linkTarget);
+    InternalLinkGroupBox(ContainerBox * const linkTarget,
+                         const bool innerLink);
 public:
     ~InternalLinkGroupBox()
     { setLinkTarget(nullptr); }
