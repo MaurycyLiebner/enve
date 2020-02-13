@@ -17,9 +17,10 @@
 #ifndef INTERNALLINKGROUPBOX_H
 #define INTERNALLINKGROUPBOX_H
 #include "containerbox.h"
+#include "internallinkboxbase.h"
 #include "Properties/boxtargetproperty.h"
 
-class InternalLinkGroupBox : public ContainerBox {
+class InternalLinkGroupBox : public InternalLinkBoxBase<ContainerBox> {
     e_OBJECT
 protected:
     InternalLinkGroupBox(ContainerBox * const linkTarget);
@@ -27,14 +28,12 @@ public:
     ~InternalLinkGroupBox()
     { setLinkTarget(nullptr); }
 
-    bool SWT_isLinkBox() const { return true; }
     bool SWT_isGroupBox() const;
 
     void SWT_setupAbstraction(SWT_Abstraction* abs,
                               const UpdateFuncs &funcs,
                               const int widgetId)
     { BoundingBox::SWT_setupAbstraction(abs, funcs, widgetId); }
-
 
     bool SWT_dropSupport(const QMimeData * const data)
     { return BoundingBox::SWT_dropSupport(data); }
@@ -48,46 +47,14 @@ public:
     bool SWT_dropInto(const int index, const QMimeData * const data)
     { return BoundingBox::SWT_dropInto(index, data); }
 
-    int prp_getRelFrameShift() const;
-    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
-    FrameRange prp_relInfluenceRange() const;
-
-    void writeBoundingBox(eWriteStream& dst) const
-    { BoundingBox::writeBoundingBox(dst); }
-
-    void readBoundingBox(eReadStream& src)
-    { BoundingBox::readBoundingBox(src); }
-
-    //bool relPointInsidePath(const QPointF &relPos);
-    QPointF getRelCenterPosition();
-
-    bool isFrameInDurationRect(const int relFrame) const;
-
-    stdsptr<BoxRenderData> createRenderData();
-    bool isFrameFInDurationRect(const qreal relFrame) const;
-
-    QMatrix getRelativeTransformAtFrame(const qreal relFrame);
-    QMatrix getTotalTransformAtFrame(const qreal relFrame);
-
-    SkBlendMode getBlendMode() const;
-
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data,
                          Canvas * const scene);
 
-    bool relPointInsidePath(const QPointF &relPos) const;
-
-    HardwareSupport hardwareSupport() const;
-
     void setLinkTarget(ContainerBox * const linkTarget);
-    ContainerBox *getLinkTarget() const;
-    ContainerBox *getFinalTarget() const;
 protected:
-    bool isParentLink() const;
-
     qsptr<BoxTargetProperty> mBoxTarget =
             enve::make_shared<BoxTargetProperty>("link target");
-    ConnContextQPtr<ContainerBox> mLinkTarget;
 };
 
 #endif // INTERNALLINKGROUPBOX_H

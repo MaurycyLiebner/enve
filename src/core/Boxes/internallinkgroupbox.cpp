@@ -20,7 +20,7 @@
 #include "layerboxrenderdata.h"
 
 InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget) :
-    ContainerBox(eBoxType::internalLinkGroup) {
+    InternalLinkBoxBase<ContainerBox>(eBoxType::internalLinkGroup) {
     prp_setName("Link 0");
     setLinkTarget(linkTarget);
 
@@ -38,109 +38,12 @@ bool InternalLinkGroupBox::SWT_isGroupBox() const {
     return finalTarget->SWT_isGroupBox();
 }
 
-SkBlendMode InternalLinkGroupBox::getBlendMode() const {
-    const auto linkTarget = getLinkTarget();
-    if(isParentLink() && linkTarget) {
-        return linkTarget->getBlendMode();
-    }
-    return BoundingBox::getBlendMode();
-}
-
 void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
                                            BoxRenderData * const data,
                                            Canvas* const scene) {
     const auto linkTarget = getLinkTarget();
     if(linkTarget) linkTarget->BoundingBox::setupRenderData(relFrame, data, scene);
     ContainerBox::setupRenderData(relFrame, data, scene);
-}
-
-ContainerBox *InternalLinkGroupBox::getFinalTarget() const {
-    const auto linkTarget = getLinkTarget();
-    if(!linkTarget) return nullptr;
-    if(linkTarget->SWT_isLinkBox()) {
-        return static_cast<InternalLinkGroupBox*>(linkTarget)->getFinalTarget();
-    }
-    return linkTarget;
-}
-
-bool InternalLinkGroupBox::isParentLink() const {
-    if(!mParentGroup) return false;
-    return mParentGroup->SWT_isLinkBox();
-}
-
-bool InternalLinkGroupBox::relPointInsidePath(const QPointF &relPos) const {
-    const auto linkTarget = getLinkTarget();
-    if(!linkTarget) return false;
-    return linkTarget->relPointInsidePath(relPos);
-}
-
-HardwareSupport InternalLinkGroupBox::hardwareSupport() const {
-    const auto linkTarget = getLinkTarget();
-    if(!linkTarget) return BoundingBox::hardwareSupport();
-    return linkTarget->hardwareSupport();
-}
-
-bool InternalLinkGroupBox::isFrameInDurationRect(const int relFrame) const {
-    const auto linkTarget = getLinkTarget();
-    if(!linkTarget) return false;
-    return ContainerBox::isFrameInDurationRect(relFrame) &&
-           linkTarget->isFrameInDurationRect(relFrame);
-}
-
-bool InternalLinkGroupBox::isFrameFInDurationRect(const qreal relFrame) const {
-    const auto linkTarget = getLinkTarget();
-    if(!linkTarget) return false;
-    return ContainerBox::isFrameFInDurationRect(relFrame) &&
-           linkTarget->isFrameFInDurationRect(relFrame);
-}
-
-QMatrix InternalLinkGroupBox::getRelativeTransformAtFrame(const qreal relFrame) {
-    if(isParentLink()) {
-        const auto linkTarget = getLinkTarget();
-        if(!linkTarget) return QMatrix();
-        return linkTarget->getRelativeTransformAtFrame(relFrame);
-    } else {
-        return BoundingBox::getRelativeTransformAtFrame(relFrame);
-    }
-}
-
-QMatrix InternalLinkGroupBox::getTotalTransformAtFrame(const qreal relFrame) {
-    if(isParentLink()) {
-        const auto linkTarget = getLinkTarget();
-        if(!linkTarget) return QMatrix();
-        return linkTarget->getRelativeTransformAtFrame(relFrame)*
-                mParentGroup->getTotalTransformAtFrame(relFrame);
-    } else {
-        return BoundingBox::getTotalTransformAtFrame(relFrame);
-    }
-}
-
-FrameRange InternalLinkGroupBox::prp_getIdenticalRelRange(const int relFrame) const {
-    FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
-    const auto linkTarget = getLinkTarget();
-    if(mVisible && linkTarget)
-        range *= ContainerBox::prp_getIdenticalRelRange(relFrame);
-    else return range;
-    auto targetRange = linkTarget->prp_getIdenticalRelRange(relFrame);
-    return range*targetRange;
-}
-
-FrameRange InternalLinkGroupBox::prp_relInfluenceRange() const {
-    const auto linkTarget = getLinkTarget();
-    FrameRange inflRange;
-    if(mDurationRectangle) inflRange = mDurationRectangle->getRelFrameRange();
-    else inflRange = ComplexAnimator::prp_relInfluenceRange();
-    if(linkTarget) {
-        return inflRange*linkTarget->prp_relInfluenceRange();
-    } else return inflRange;
-}
-
-int InternalLinkGroupBox::prp_getRelFrameShift() const {
-    const auto linkTarget = getLinkTarget();
-    if(linkTarget) {
-        return linkTarget->prp_getRelFrameShift() +
-                ContainerBox::prp_getRelFrameShift();
-    } else return ContainerBox::prp_getRelFrameShift();
 }
 
 #include "Sound/singlesound.h"
@@ -151,7 +54,7 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
     if(oldLinkTarget) oldLinkTarget->removeLinkingBox(this);
     removeAllContained();
     mBoxTarget->setTarget(linkTarget);
-    auto& conn = mLinkTarget.assign(linkTarget);
+    auto& conn = assignLinkTarget(linkTarget);
     if(linkTarget) {
         rename(linkTarget->prp_getName() + " Link 0");
         conn << connect(linkTarget, &Property::prp_nameChanged,
@@ -186,22 +89,4 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
         rename("Empty Link 0");
     }
     planUpdate(UpdateReason::userChange);
-}
-
-QPointF InternalLinkGroupBox::getRelCenterPosition() {
-    const auto linkTarget = getLinkTarget();
-    if(!linkTarget) return QPointF();
-    return linkTarget->getRelCenterPosition();
-}
-
-ContainerBox *InternalLinkGroupBox::getLinkTarget() const {
-    return mLinkTarget;
-}
-
-stdsptr<BoxRenderData> InternalLinkGroupBox::createRenderData() {
-    const auto linkTarget = getLinkTarget();
-    if(!linkTarget) return nullptr;
-    auto renderData = linkTarget->createRenderData();
-    renderData->fParentBox = this;
-    return renderData;
 }

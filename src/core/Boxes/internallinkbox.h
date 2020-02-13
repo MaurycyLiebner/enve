@@ -16,13 +16,13 @@
 
 #ifndef INTERNALLINKBOX_H
 #define INTERNALLINKBOX_H
-#include "Boxes/containerbox.h"
+#include "Boxes/internallinkboxbase.h"
 #include "Properties/boxtargetproperty.h"
 #include "Properties/boolproperty.h"
 
 class eSound;
 
-class InternalLinkBox : public BoundingBox {
+class InternalLinkBox : public InternalLinkBoxBase<BoundingBox> {
     e_OBJECT
 protected:
     InternalLinkBox(BoundingBox * const linkTarget);
@@ -30,44 +30,15 @@ public:
     ~InternalLinkBox()
     { setLinkTarget(nullptr); }
 
-    bool SWT_isLinkBox() const { return true; }
-
-    FrameRange prp_getIdenticalRelRange(const int relFrame) const;
-    FrameRange prp_relInfluenceRange() const;
-    int prp_getRelFrameShift() const;
-
-    void writeBoundingBox(eWriteStream& dst) const
-    { BoundingBox::writeBoundingBox(dst); }
-
-    void readBoundingBox(eReadStream& src)
-    { BoundingBox::readBoundingBox(src); }
-
-    bool relPointInsidePath(const QPointF &relPos) const;
-    QPointF getRelCenterPosition();
-
-    stdsptr<BoxRenderData> createRenderData();
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data,
                          Canvas * const scene);
-    SkBlendMode getBlendMode() const;
-
-    QMatrix getRelativeTransformAtFrame(const qreal relFrame);
-    QMatrix getTotalTransformAtFrame(const qreal relFrame);
-
-    bool isFrameInDurationRect(const int relFrame) const;
-    bool isFrameFInDurationRect(const qreal relFrame) const;
-
-    HardwareSupport hardwareSupport() const;
 
     void setLinkTarget(BoundingBox * const linkTarget);
-    BoundingBox *getLinkTarget() const;
 protected:
-    bool isParentLink() const;
-
     qsptr<BoxTargetProperty> mBoxTarget =
             enve::make_shared<BoxTargetProperty>("link target");
 private:
-    ConnContextQPtr<BoundingBox> mLinkTarget;
     qsptr<eSound> mSound;
 };
 

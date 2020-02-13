@@ -420,6 +420,7 @@ HEADERS += \
     Boxes/imagerenderdata.h \
     Boxes/imagesequencebox.h \
     Boxes/internallinkbox.h \
+    Boxes/internallinkboxbase.h \
     Boxes/internallinkcanvas.h \
     Boxes/internallinkgroupbox.h \
     Boxes/layerboxrenderdata.h \
