@@ -63,7 +63,7 @@ protected:
     { return mLinkTarget; }
     BoxT *getFinalTarget() const;
 
-    qsptr<BoxTargetProperty> mBoxTarget =
+    const qsptr<BoxTargetProperty> mBoxTarget =
             enve::make_shared<BoxTargetProperty>("link target");
 private:
     const bool mInnerLink;
@@ -115,7 +115,6 @@ ConnContext &ILBB::assignLinkTarget(BoxT * const linkTarget) {
         } else {
             this->rename(linkTarget->prp_getName() + " Link 0");
         }
-        linkTarget->addLinkingBox(this);
         conn << QObject::connect(linkTarget, &BoundingBox::prp_absFrameRangeChanged,
                                  this, [this, linkTarget](const FrameRange& targetAbs) {
             const auto relRange = linkTarget->prp_absRangeToRelRange(targetAbs);

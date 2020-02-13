@@ -54,8 +54,10 @@ public:
 
     void setLinkTarget(ContainerBox * const linkTarget);
 protected:
-    qsptr<BoxTargetProperty> mBoxTarget =
+    const qsptr<BoxTargetProperty> mBoxTarget =
             enve::make_shared<BoxTargetProperty>("link target");
+private:
+    void insertInnerLinkFor(const int id, eBoxOrSound* const obj);
 };
 
 #endif // INTERNALLINKGROUPBOX_H

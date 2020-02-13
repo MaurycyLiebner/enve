@@ -257,11 +257,6 @@ void ContainerBox::promoteToLayer() {
     mBlendEffectCollection->SWT_enable();
     prp_afterWholeInfluenceRangeChanged();
 
-    const auto& linkingBoxes = getLinkingBoxes();
-    for(const auto& box : linkingBoxes) {
-        static_cast<ContainerBox*>(box)->promoteToLayer();
-    }
-
     const auto pLayer = getFirstParentLayer();
     if(pLayer) removeAllChildBoxesWithBlendEffects(pLayer);
 
@@ -272,7 +267,7 @@ void ContainerBox::promoteToLayer() {
         ur.fRedo = [this]() { promoteToLayer(); };
         prp_addUndoRedo(ur);
     }
-    emit switchedGroupLayer();
+    emit switchedGroupLayer(eBoxType::layer);
 }
 
 void ContainerBox::demoteToGroup() {
@@ -287,11 +282,6 @@ void ContainerBox::demoteToGroup() {
     mBlendEffectCollection->SWT_disable();
     prp_afterWholeInfluenceRangeChanged();
 
-    const auto& linkingBoxes = getLinkingBoxes();
-    for(const auto& box : linkingBoxes) {
-        static_cast<ContainerBox*>(box)->demoteToGroup();
-    }
-
     const auto pLayer = getFirstParentLayer();
     if(pLayer) addAllChildBoxesWithBlendEffects(pLayer);
 
@@ -302,7 +292,7 @@ void ContainerBox::demoteToGroup() {
         ur.fRedo = [this]() { demoteToGroup(); };
         prp_addUndoRedo(ur);
     }
-    emit switchedGroupLayer();
+    emit switchedGroupLayer(eBoxType::group);
 }
 
 void ContainerBox::updateAllBoxes(const UpdateReason reason) {
@@ -909,11 +899,6 @@ void ContainerBox::insertContained(
         connCtx << connect(child.data(), &Property::prp_absFrameRangeChanged,
                            this, &Property::prp_afterChangedAbsRange);
         const auto box = static_cast<BoundingBox*>(child.get());
-        const auto& linkingBoxes = getLinkingBoxes();
-        for(const auto& box : linkingBoxes) {
-            const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
-            internalLinkGroup->insertContained(id, box->createLink(true));
-        }
         const auto pLayer = box->getFirstParentLayer();
         if(pLayer) {
             if(box->blendEffectsEnabled()) {
@@ -924,16 +909,10 @@ void ContainerBox::insertContained(
                 cBox->addAllChildBoxesWithBlendEffects(pLayer);
             }
         }
-    } else /*if(child->SWT_isSound())*/ {
-        const auto sound = static_cast<SingleSound*>(child.get());
-        const auto& linkingBoxes = getLinkingBoxes();
-        for(const auto& box : linkingBoxes) {
-            const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
-            internalLinkGroup->insertContained(id, sound->createLink());
-        }
     }
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());
     child->prp_afterWholeInfluenceRangeChanged();
+    emit insertedObject(id, child.get());
 
     if(!SWT_isLinkBox()) {
         prp_pushUndoRedoName("Insert " + child->prp_getName());
@@ -990,13 +969,8 @@ void ContainerBox::removeContainedFromList(const int id) {
     child->setParentGroup(nullptr);
     updateContainedIds(id);
 
-    const auto& linkingBoxes = getLinkingBoxes();
-    for(const auto& box : linkingBoxes) {
-        const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
-        internalLinkGroup->removeContainedFromList(id);
-    }
-
     prp_afterWholeInfluenceRangeChanged();
+    emit removedObject(id, child.get());
 
     if(!SWT_isLinkBox()) {
         prp_pushUndoRedoName("Remove " + child->prp_getName());
@@ -1093,14 +1067,8 @@ void ContainerBox::moveContainedInList(eBoxOrSound * const child,
     SWT_moveChildTo(child, containedIdToAbstractionId(boundTo));
     planUpdate(UpdateReason::userChange);
 
-    const auto& linkingBoxes = getLinkingBoxes();
-    for(const auto& box : linkingBoxes) {
-        const auto internalLinkGroup = static_cast<InternalLinkGroupBox*>(box);
-        internalLinkGroup->moveContainedInList(from, to);
-    }
-
     prp_afterWholeInfluenceRangeChanged();
-
+    emit movedObject(from, boundTo, child);
 
     if(!SWT_isLinkBox()) {
         prp_pushUndoRedoName("Change Z-Index");

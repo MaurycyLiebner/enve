@@ -779,14 +779,6 @@ void BoundingBox::setupRasterEffects(const qreal relFrame,
     }
 }
 
-void BoundingBox::addLinkingBox(BoundingBox *box) {
-    mLinkingBoxes << box;
-}
-
-void BoundingBox::removeLinkingBox(BoundingBox *box) {
-    mLinkingBoxes.removeOne(box);
-}
-
 void BoundingBox::incReasonsNotToApplyUglyTransform() {
     mNReasonsNotToApplyUglyTransform++;
 }

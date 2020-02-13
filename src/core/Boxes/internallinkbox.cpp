@@ -34,8 +34,6 @@ InternalLinkBox::InternalLinkBox(BoundingBox * const linkTarget,
 
 void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
     mSound.reset();
-    const auto oldLinkTarget = getLinkTarget();
-    if(oldLinkTarget) oldLinkTarget->removeLinkingBox(this);
     auto& conn = assignLinkTarget(linkTarget);
     mBoxTarget->setTarget(linkTarget);
     if(linkTarget) {

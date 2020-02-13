@@ -50,9 +50,20 @@ void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
 #include "Sound/singlesound.h"
 #include "Sound/esoundlink.h"
 
+void InternalLinkGroupBox::insertInnerLinkFor(
+        const int id, eBoxOrSound* const obj) {
+    if(obj->SWT_isBoundingBox()) {
+        const auto box = static_cast<BoundingBox*>(obj);
+        const auto newLink = box->createLink(true);
+        insertContained(id, newLink);
+    } else /*(obj->SWT_isSound())*/ {
+        const auto sound = static_cast<SingleSound*>(obj);
+        const auto newLink = sound->createLink();
+        insertContained(id, newLink);
+    }
+}
+
 void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
-    const auto oldLinkTarget = getLinkTarget();
-    if(oldLinkTarget) oldLinkTarget->removeLinkingBox(this);
     removeAllContained();
     mBoxTarget->setTarget(linkTarget);
     auto& conn = assignLinkTarget(linkTarget);
@@ -63,18 +74,27 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
             mTransformAnimator->prp_afterChangedRelRange(relRange);
         });
 
-        const auto &boxesList = linkTarget->getContained();
-        for(int i = boxesList.count() - 1; i >= 0; i--) {
-            const auto& child = boxesList.at(i);
-            if(child->SWT_isBoundingBox()) {
-                const auto box = static_cast<BoundingBox*>(child.get());
-                const auto newLink = box->createLink(true);
-                addContained(newLink);
-            } else /*(child->SWT_isSound())*/ {
-                const auto sound = static_cast<SingleSound*>(child.get());
-                const auto newLink = sound->createLink();
-                addContained(newLink);
+        conn << connect(linkTarget, &ContainerBox::switchedGroupLayer,
+                this, [this](const eBoxType type) {
+            if(type == eBoxType::group) {
+                demoteToGroup();
+            } else if(type == eBoxType::layer) {
+                promoteToLayer();
             }
+        });
+
+        conn << connect(linkTarget, &ContainerBox::insertedObject,
+                this, &InternalLinkGroupBox::insertInnerLinkFor);
+        conn << connect(linkTarget, &ContainerBox::removedObject,
+                        this, &ContainerBox::removeContainedFromList);
+        conn << connect(linkTarget, &ContainerBox::movedObject,
+                        this, qOverload<int, int>(&ContainerBox::moveContainedInList));
+
+        const auto &boxesList = linkTarget->getContained();
+        const int iMax = boxesList.count();
+        for(int i = 0; i < iMax; i++) {
+            const auto& child = boxesList.at(i);
+            insertInnerLinkFor(i, child.get());
         }
     }
     planUpdate(UpdateReason::userChange);

@@ -210,7 +210,11 @@ public:
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
 signals:
-    void switchedGroupLayer();
+    void switchedGroupLayer(const eBoxType type);
+    void insertedObject(const int id, eBoxOrSound* const obj);
+    void removedObject(const int id, eBoxOrSound* const obj);
+    void movedObject(const int from, const int to,
+                     eBoxOrSound* const obj);
 private:
     void updateAllChildPaths(const UpdateReason reason,
                              void (PathBox::*func)(const UpdateReason));

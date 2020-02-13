@@ -363,9 +363,6 @@ public:
 
     void updateDrawRenderContainerTransform();
 
-    void addLinkingBox(BoundingBox *box);
-    void removeLinkingBox(BoundingBox *box);
-
     void incReasonsNotToApplyUglyTransform();
     void decReasonsNotToApplyUglyTransform();
 
@@ -417,9 +414,6 @@ protected:
     bool getUpdatePlanned() const
     { return mUpdatePlanned; }
 
-    const QList<BoundingBox*>& getLinkingBoxes() const
-    { return mLinkingBoxes; }
-
     const int mDocumentId;
 
     eBoxType mType;
@@ -453,7 +447,6 @@ private:
     BasicTransformAnimator* mParentTransform = nullptr;
 
     QList<Property*> mCanvasProps;
-    QList<BoundingBox*> mLinkingBoxes;
 
     RenderContainer mDrawRenderContainer;
 };
