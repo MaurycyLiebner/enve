@@ -113,8 +113,9 @@ private:
     template <typename U>
     void applyPermutation(QList<U>& vec,
                           const std::vector<std::size_t>& p) {
-        std::vector<bool> done(vec.size());
-        for(std::size_t i = 0; i < vec.size(); ++i) {
+        const size_t vecSize = static_cast<size_t>(vec.size());
+        std::vector<bool> done(vecSize);
+        for(std::size_t i = 0; i < vecSize; ++i) {
             if(done[i]) continue;
             done[i] = true;
             std::size_t prev_j = i;
