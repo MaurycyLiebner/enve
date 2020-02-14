@@ -471,8 +471,8 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                                this, [this](const int id) {
             mPropertyComboBox->setCurrentIndex(id);
         });
-    } else if(target->SWT_isQrealAnimator()) {
-        mValueSlider->setTarget(static_cast<QrealAnimator*>(target));
+    } else if(const auto qra = qobject_cast<QrealAnimator*>(target)) {
+        mValueSlider->setTarget(qra);
         valueSliderVisible = true;
         mValueSlider->setIsLeftSlider(false);
     } else if(target->SWT_isComplexAnimator()) {
@@ -505,9 +505,9 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                 const auto ca_target = static_cast<ComplexAnimator*>(target);
                 Property * const guiProp = ca_target->ca_getGUIProperty();
                 if(guiProp) {
-                    if(guiProp->SWT_isQrealAnimator()) {
+                    if(const auto qra = qobject_cast<QrealAnimator*>(guiProp)) {
                         valueSliderVisible = true;
-                        mValueSlider->setTarget(static_cast<QrealAnimator*>(guiProp));
+                        mValueSlider->setTarget(qra);
                         mValueSlider->setIsLeftSlider(false);
                         mSecondValueSlider->setTarget(nullptr);
                     } else if(guiProp->SWT_isColorAnimator()) {

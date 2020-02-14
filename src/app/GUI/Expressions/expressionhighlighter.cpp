@@ -191,11 +191,10 @@ void ExpressionHighlighter::highlightBlock(const QString &text) {
 
             bool error = !obj;
             if(!error) {
-                const bool isQra = obj->SWT_isQrealAnimator();
+                const auto qra = qobject_cast<QrealAnimator*>(obj);
                 error = obj == mTarget ||
-                        (!isQra && !obj->SWT_isComplexAnimator());
-                if(!error && isQra) {
-                    const auto qra = static_cast<QrealAnimator*>(obj);
+                        (!qra && !obj->SWT_isComplexAnimator());
+                if(!error && qra) {
                     error = qra->expressionDependsOn(mTarget);
                 }
             }

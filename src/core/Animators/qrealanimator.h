@@ -33,8 +33,6 @@ protected:
                   const qreal prefferdStep,
                   const QString& name);
 public:
-    bool SWT_isQrealAnimator() const { return true; }
-
     void prp_startTransform();
     void prp_finishTransform();
     void prp_cancelTransform();
