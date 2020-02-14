@@ -262,6 +262,7 @@ void ContainerBox::promoteToLayer() {
 
     const auto pLayer = getFirstParentLayer();
     if(pLayer) removeAllChildBoxesWithBlendEffects(pLayer);
+    addAllChildBoxesWithBlendEffects(this);
 
     if(!SWT_isLinkBox()) {
         prp_pushUndoRedoName("Promote to Layer");
@@ -286,6 +287,7 @@ void ContainerBox::demoteToGroup() {
     mBlendEffectCollection->SWT_disable();
     prp_afterWholeInfluenceRangeChanged();
 
+    mBoxesWithBlendEffects.clear();
     const auto pLayer = getFirstParentLayer();
     if(pLayer) addAllChildBoxesWithBlendEffects(pLayer);
 
@@ -903,7 +905,7 @@ void ContainerBox::insertContained(
         connCtx << connect(child.data(), &Property::prp_absFrameRangeChanged,
                            this, &Property::prp_afterChangedAbsRange);
         const auto box = static_cast<BoundingBox*>(child.get());
-        const auto pLayer = box->getFirstParentLayer();
+        const auto pLayer = mIsLayer ? this : box->getFirstParentLayer();
         if(pLayer) {
             if(box->blendEffectsEnabled()) {
                 pLayer->addBoxWithBlendEffects(box);
@@ -914,6 +916,7 @@ void ContainerBox::insertContained(
             }
         }
     }
+
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());
     child->prp_afterWholeInfluenceRangeChanged();
     emit insertedObject(id, child.get());
@@ -954,10 +957,9 @@ void ContainerBox::removeContainedFromList(const int id) {
         }
     }
 
-
     if(child->SWT_isBoundingBox()) {
         const auto box = static_cast<BoundingBox*>(child.get());
-        const auto pLayer = box->getFirstParentLayer();
+        const auto pLayer = mIsLayer ? this : box->getFirstParentLayer();
         if(pLayer) {
             if(box->blendEffectsEnabled()) {
                 pLayer->removeBoxWithBlendEffects(box);
