@@ -264,7 +264,7 @@ void ContainerBox::promoteToLayer() {
     if(pLayer) removeAllChildBoxesWithBlendEffects(pLayer);
     addAllChildBoxesWithBlendEffects(this);
 
-    if(!SWT_isLinkBox()) {
+    {
         prp_pushUndoRedoName("Promote to Layer");
         UndoRedo ur;
         ur.fUndo = [this]() { demoteToGroup(); };
@@ -291,7 +291,7 @@ void ContainerBox::demoteToGroup() {
     const auto pLayer = getFirstParentLayer();
     if(pLayer) addAllChildBoxesWithBlendEffects(pLayer);
 
-    if(!SWT_isLinkBox()) {
+    {
         prp_pushUndoRedoName("Demote to Group");
         UndoRedo ur;
         ur.fUndo = [this]() { promoteToLayer(); };
