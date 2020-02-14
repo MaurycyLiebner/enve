@@ -38,6 +38,19 @@ void eEffect::switchVisible() {
 
 void eEffect::setVisible(const bool visible) {
     if(visible == mVisible) return;
+    {
+        prp_pushUndoRedoName(visible ? "Hide Effect" : "Show Effect");
+        UndoRedo ur;
+        const auto oldValue = mVisible;
+        const auto newValue = visible;
+        ur.fUndo = [this, oldValue]() {
+            setVisible(oldValue);
+        };
+        ur.fRedo = [this, newValue]() {
+            setVisible(newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
     mVisible = visible;
     prp_afterWholeInfluenceRangeChanged();
     emit effectVisibilityChanged(visible);

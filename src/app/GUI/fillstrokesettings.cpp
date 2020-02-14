@@ -99,7 +99,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(Document &document,
 
     //mLineWidthSpin = new QDoubleSpinBox(this);
     mLineWidthSpin = new QrealAnimatorValueSlider(0, 1000, 0.5, this);
-    //mLineWidthSpin->setValueSliderVisibile(false);
+    //mLineWidthSpin->setValueSliderVisible(false);
     //mLineWidthSpin->setRange(0.0, 1000.0);
     //mLineWidthSpin->setSuffix(" px");
     //mLineWidthSpin->setSingleStep(0.1);

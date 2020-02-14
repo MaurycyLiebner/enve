@@ -241,7 +241,7 @@ private:
     bool mIsDescendantCurrentGroup = false;
     QList<BoundingBox*> mBoxesWithBlendEffects;
     QList<BoundingBox*> mContainedBoxes;
-    QList<qsptr<Property>> mBlendShadows;
+    QList<qsptr<eBoxOrSound>> mBlendShadows;
     ConnContextObjList<qsptr<eBoxOrSound>> mContained;
 };
 

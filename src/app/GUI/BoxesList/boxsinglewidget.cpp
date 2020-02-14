@@ -94,7 +94,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mRecordButton->setPixmapChooser([this]() {
         if(!mTarget) return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(target->SWT_isBoundingBox()) {
+        if(qobject_cast<eBoxOrSound*>(target)) {
             return static_cast<QPixmap*>(nullptr);
         } else if(target->SWT_isComplexAnimator()) {
             const auto caTarget = static_cast<ComplexAnimator*>(target);
@@ -122,7 +122,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
         if(mTarget->childrenCount() == 0)
             return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(target->SWT_isBoundingBox() || target->SWT_isSingleSound()) {
+        if(qobject_cast<eBoxOrSound*>(target)) {
             if(mTarget->contentVisible()) {
                 return BoxSingleWidget::BOX_CHILDREN_VISIBLE;
             } else return BoxSingleWidget::BOX_CHILDREN_HIDDEN;
@@ -141,14 +141,14 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mVisibleButton->setPixmapChooser([this]() {
         if(!mTarget) return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(target->SWT_isBoundingBox()) {
-            if(static_cast<BoundingBox*>(target)->isVisible()) {
+        if(const auto ebos = qobject_cast<eBoxOrSound*>(target)) {
+            if(target->SWT_isSound()) {
+                if(ebos->isVisible()) {
+                    return BoxSingleWidget::UNMUTED_PIXMAP;
+                } else return BoxSingleWidget::MUTED_PIXMAP;
+            } else if(ebos->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
             } else return BoxSingleWidget::INVISIBLE_PIXMAP;
-        } else if(target->SWT_isSound()) {
-            if(static_cast<SingleSound*>(target)->isVisible()) {
-                return BoxSingleWidget::UNMUTED_PIXMAP;
-            } else return BoxSingleWidget::MUTED_PIXMAP;
         } else if(const auto eEff = qobject_cast<eEffect*>(target)) {
             if(eEff->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
@@ -389,10 +389,8 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                            this, qOverload<>(&QWidget::update));
     mContentButton->setVisible(target->SWT_isComplexAnimator());
     mRecordButton->setVisible(qobject_cast<Animator*>(target) &&
-                              !target->SWT_isBoundingBox() &&
-                              !target->SWT_isSingleSound());
-    mVisibleButton->setVisible(target->SWT_isBoundingBox() ||
-                               target->SWT_isSound() ||
+                              !qobject_cast<eBoxOrSound*>(target));
+    mVisibleButton->setVisible(qobject_cast<eBoxOrSound*>(target) ||
                                qobject_cast<eEffect*>(target) ||
                                target->SWT_isGraphAnimator());
     mLockedButton->setVisible(target->SWT_isBoundingBox());
@@ -756,7 +754,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         }
     }
     const bool ss = target->SWT_isSingleSound();
-    if(target->SWT_isBoundingBox() || ss) {
+    if(ss || target->SWT_isBoundingBox()) {
         const auto bsTarget = static_cast<eBoxOrSound*>(target);
 
         nameX += MIN_WIDGET_DIM/4;
@@ -773,7 +771,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         }
     } else if(qobject_cast<BlendEffectBoxShadow*>(target)) {
         p.fillRect(rect(), QColor(0, 255, 125, 50));
-        nameX += 3*MIN_WIDGET_DIM + MIN_WIDGET_DIM/4;
+        nameX += MIN_WIDGET_DIM + MIN_WIDGET_DIM/4;
     } else if(!target->SWT_isComplexAnimator()) {
         if(target->SWT_isGraphAnimator()) {
             const auto graphAnim = static_cast<GraphAnimator*>(target);

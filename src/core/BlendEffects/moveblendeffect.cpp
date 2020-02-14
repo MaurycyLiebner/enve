@@ -22,7 +22,13 @@
 MoveBlendEffect::MoveBlendEffect() :
     BlendEffect("move", BlendEffectType::move) {
     mZIndex = enve::make_shared<IntAnimator>("z-index");
+    mZIndex->setPrefferedValueStep(0.2);
     ca_addChild(mZIndex);
+}
+
+int MoveBlendEffect::calcDIndex(const qreal relFrame) const {
+    const int dIndex = zIndex(relFrame);
+    return dIndex + (dIndex > 0) - (dIndex < 0);
 }
 
 void MoveBlendEffect::blendSetup(
@@ -30,9 +36,9 @@ void MoveBlendEffect::blendSetup(
         const int index,
         const qreal relFrame,
         QList<ChildRenderData> &delayed) const {
-    const int dIndex = zIndex(relFrame);
+    const int dIndex = calcDIndex(relFrame);
     if(dIndex == 0) return;
-    const int zIndex = index + (qAbs(dIndex) == 1 ? 2*dIndex : dIndex);
+    const int zIndex = index + dIndex;
     ChildRenderData iData(data.fData);
     auto& iClip = iData.fClip;
     iClip.fTargetIndex = zIndex;
@@ -50,9 +56,9 @@ void MoveBlendEffect::blendSetup(
 void MoveBlendEffect::detachedBlendUISetup(
         const qreal relFrame, const int drawId,
         QList<UIDelayed> &delayed) {
-    const int dIndex = zIndex(relFrame);
+    const int dIndex = calcDIndex(relFrame);
     if(dIndex == 0) return;
-    const int zIndex = drawId + (qAbs(dIndex) == 1 ? 2*dIndex : dIndex);
+    const int zIndex = drawId + dIndex;
     delayed << [this, zIndex](const int drawId,
                               BoundingBox*, BoundingBox*) {
         if(drawId < zIndex) return static_cast<BlendEffect*>(nullptr);
@@ -66,9 +72,9 @@ void MoveBlendEffect::detachedBlendSetup(const BoundingBox* const boxToDraw,
                                      const SkFilterQuality filter,
                                      const int drawId,
                                      QList<Delayed> &delayed) const {
-    const int dIndex = zIndex(relFrame);
+    const int dIndex = calcDIndex(relFrame);
     if(dIndex == 0) return;
-    const int zIndex = drawId + (qAbs(dIndex) == 1 ? 2*dIndex : dIndex);
+    const int zIndex = drawId + dIndex;
     if(isPathValid()) {
         const auto clipPath = this->clipPath(relFrame);
         delayed << [boxToDraw, zIndex, clipPath, canvas, filter]
@@ -94,7 +100,7 @@ void MoveBlendEffect::detachedBlendSetup(const BoundingBox* const boxToDraw,
 
 void MoveBlendEffect::drawBlendSetup(const qreal relFrame,
                                      SkCanvas * const canvas) const {
-    const int dIndex = zIndex(relFrame);
+    const int dIndex = calcDIndex(relFrame);
     if(dIndex == 0) return;
     if(isPathValid()) {
         const auto clipPath = this->clipPath(relFrame);

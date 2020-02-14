@@ -56,6 +56,11 @@ public:
             QPainter * const p, const qreal pixelsPerFrame,
             const FrameRange &absFrameRange, const int rowHeight);
 
+
+    void drawDurationRectangle(
+            QPainter * const p, const qreal pixelsPerFrame,
+            const FrameRange &absFrameRange, const int rowHeight) const;
+
     void setDurationRectangle(const qsptr<DurationRectangle> &durationRect,
                               const bool addUndoRedo = true);
     bool hasDurationRectangle() const;
@@ -90,7 +95,7 @@ public:
     void hide();
     void show();
     bool isVisible() const;
-    void setVisibile(const bool visible);
+    void setVisible(const bool visible);
     void switchVisible();
 
     void lock();

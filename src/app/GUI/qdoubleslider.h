@@ -36,7 +36,7 @@ public:
     QDoubleSlider(QWidget *parent = nullptr);
     ~QDoubleSlider();
 
-    void setValueSliderVisibile(const bool valueSliderVisible);
+    void setValueSliderVisible(const bool valueSliderVisible);
     void setNameVisible(const bool nameVisible);
     void setName(const QString& name);
     void setNumberDecimals(const int decimals);

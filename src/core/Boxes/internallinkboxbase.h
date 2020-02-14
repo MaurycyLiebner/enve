@@ -116,10 +116,10 @@ ConnContext &ILBB::assignLinkTarget(BoxT * const linkTarget) {
     auto& conn = mLinkTarget.assign(linkTarget);
     if(linkTarget) {
         if(mInnerLink) {
-            this->setVisibile(linkTarget->isVisible());
+            this->setVisible(linkTarget->isVisible());
             conn << QObject::connect(linkTarget, &eBoxOrSound::visibilityChanged,
                                      this, [this](const bool visible) {
-                this->setVisibile(visible);
+                this->setVisible(visible);
             });
         } else {
             this->rename(linkTarget->prp_getName() + " Link 0");

@@ -79,7 +79,7 @@ void SingleSound::fileHandlerAfterAssigned(SoundFileHandler *obj) {
 void SingleSound::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     const PropertyMenu::CheckSelectedOp<SingleSound> enableOp =
             [](SingleSound * sound, bool enable) {
-        sound->setVisibile(enable);
+        sound->setVisible(enable);
     };
     menu->addCheckableAction("Enabled", isVisible(), enableOp);
     if(videoSound()) return;

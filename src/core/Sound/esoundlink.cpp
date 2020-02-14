@@ -19,7 +19,7 @@
 eSoundLink::eSoundLink(eSound * const target) :
     mTarget(target) {
     connect(mTarget, &eBoxOrSound::visibilityChanged,
-            this, &eBoxOrSound::setVisibile);
+            this, &eBoxOrSound::setVisible);
     connect(mTarget, &eSound::prp_absFrameRangeChanged,
             this, [this](const FrameRange& range) {
         const auto relRange = mTarget->prp_absRangeToRelRange(range);

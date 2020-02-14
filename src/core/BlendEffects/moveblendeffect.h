@@ -43,6 +43,8 @@ public:
 
     int zIndex(const qreal relFrame) const;
 private:
+    int calcDIndex(const qreal relFrame) const;
+
     qsptr<IntAnimator> mZIndex;
 };
 

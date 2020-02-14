@@ -385,7 +385,7 @@ public:
                     QList<ChildRenderData>& delayed) const;
     void drawPixmapSk(SkCanvas * const canvas,
                       const SkFilterQuality filter) const;
-    virtual void detachedBlendUISetup(int& drawId,
+    void detachedBlendUISetup(int& drawId,
             QList<BlendEffect::UIDelayed> &delayed) const;
     virtual void detachedBlendSetup(
             SkCanvas * const canvas,

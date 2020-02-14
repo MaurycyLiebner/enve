@@ -18,6 +18,7 @@
 #include "Animators/transformanimator.h"
 #include "Timeline/durationrectangle.h"
 #include "layerboxrenderdata.h"
+#include "BlendEffects/blendeffectboxshadow.h"
 
 InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget,
                                            const bool innerLink) :
@@ -50,9 +51,12 @@ void InternalLinkGroupBox::insertInnerLinkFor(
         const auto box = static_cast<BoundingBox*>(obj);
         const auto newLink = box->createLink(true);
         insertContained(id, newLink);
-    } else /*(obj->SWT_isSound())*/ {
+    } else if(obj->SWT_isSound()) {
         const auto sound = static_cast<SingleSound*>(obj);
         const auto newLink = sound->createLink();
+        insertContained(id, newLink);
+    } else if(const auto bebs = qobject_cast<BlendEffectBoxShadow*>(obj)) {
+        const auto newLink = bebs->createLink();
         insertContained(id, newLink);
     }
 }

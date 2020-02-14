@@ -33,8 +33,8 @@ public:
     //! @brief Adds the object at index and returns corresponding connection context
     ConnContext& insertObj(const int index, const T& obj) {
         const auto cctx = std::make_shared<ConnContext>();
-        this->insert(index, obj);
         mCCtxs.insert(index, cctx);
+        this->insert(index, obj);
         return *cctx.get();
     }
 
@@ -43,8 +43,8 @@ public:
         for(int i = 0; i < this->count(); i++) {
             const auto iObj = this->at(i);
             if(iObj == obj) {
-                this->removeAt(i);
                 mCCtxs.removeAt(i);
+                this->removeAt(i);
                 return true;
             }
         }
@@ -52,25 +52,23 @@ public:
     }
 
     void moveObj(const int from, const int to) {
-        this->move(from, to);
         mCCtxs.move(from, to);
+        this->move(from, to);
     }
 
     T takeObjAt(const int id) {
-        const auto obj = this->takeAt(id);
         mCCtxs.removeAt(id);
-        return obj;
+        return this->takeAt(id);
     }
 
     T takeObjLast() {
-        const auto obj = this->takeLast();
         mCCtxs.removeLast();
-        return obj;
+        return this->takeLast();
     }
 
     void clear() {
-        QList<T>::clear();
         mCCtxs.clear();
+        QList<T>::clear();
     }
 
     const QList<T>& getList() const { return *this; }

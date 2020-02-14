@@ -368,6 +368,7 @@ QStringList ContainerBox::allContainedNamesStartingWith(
 void ContainerBox::allDescendantsStartingWith(
         const QString &text, QList<eBoxOrSound*> &result) {
     for(const auto &child : mContained) {
+        if(qobject_cast<BlendEffectBoxShadow*>(child.get())) continue;
         const bool nameMatch = child->prp_getName().startsWith(text);
         if(nameMatch) result << child.get();
         if(child->SWT_isContainerBox()) {
@@ -380,6 +381,7 @@ void ContainerBox::allDescendantsStartingWith(
 void ContainerBox::allContainedStartingWith(
         const QString &text, QList<eBoxOrSound*> &result) {
     for(const auto &child : mContained) {
+        if(qobject_cast<BlendEffectBoxShadow*>(child.get())) continue;
         const bool nameMatch = child->prp_getName().startsWith(text);
         if(nameMatch) result << child.get();
     }
@@ -420,6 +422,7 @@ Property* ContainerBox::ca_findPropertyWithPath(
     const bool isLast = id == path.count() - 1;
     const auto& name = path.at(id);
     for(const auto &child : mContained) {
+        if(qobject_cast<BlendEffectBoxShadow*>(child.get())) continue;
         const auto childName = child->prp_getName();
         if(childName == name) {
             if(isLast) return child.get();
@@ -605,6 +608,7 @@ void ContainerBox::ungroupKeepTransform_k() {
 void ContainerBox::ungroupAbandomTransform_k() {
     for(int i = mContained.count() - 1; i >= 0; i--) {
         auto box = mContained.at(i);
+        if(qobject_cast<BlendEffectBoxShadow*>(box)) continue;
         removeContained(box);
         mParentGroup->addContained(box);
     }
@@ -690,10 +694,9 @@ void ContainerBox::handleUIDelayed(
             } else {
                 contId = 0;
             }
-            const int id = containedIdToAbstractionId(contId);
             const auto shadow = enve::make_shared<BlendEffectBoxShadow>(box, effect);
             mBlendShadows << shadow;
-            SWT_addChildAt(shadow.get(), id);
+            insertContained(contId, shadow);
             delayed.removeAt(i--);
         }
     }
@@ -701,7 +704,7 @@ void ContainerBox::handleUIDelayed(
 
 void ContainerBox::clearBlendEffectUI() {
     for(const auto& shadow : mBlendShadows) {
-        SWT_removeChild(shadow.get());
+        removeContained(shadow);
     }
     mBlendShadows.clear();
 }
@@ -942,7 +945,9 @@ BoundingBox *ContainerBox::getBoxAt(const QPointF &absPos) {
 void ContainerBox::anim_setAbsFrame(const int frame) {
     BoundingBox::anim_setAbsFrame(frame);
 
-    updateDrawRenderContainerTransform();
+    updateDrawRenderContainerTransform();;
+    for(const auto& cont : mBoxesWithBlendEffects)
+        cont->anim_setAbsFrame(frame);
     for(const auto& cont : mContained)
         cont->anim_setAbsFrame(frame);
 }
@@ -973,7 +978,8 @@ void ContainerBox::insertContained(
     }
     child->removeFromParent_k();
 
-    {
+    const bool isBoxShadow = qobject_cast<BlendEffectBoxShadow*>(child.get());
+    if(!isBoxShadow) {
         const QString oldName = child->prp_getName();
         const auto parentScene = getParentScene();
         const auto nameCtxt = parentScene ? parentScene : this;
@@ -982,37 +988,40 @@ void ContainerBox::insertContained(
     }
 
     auto& connCtx = mContained.insertObj(id, child);
-    updateContainedBoxes();
     child->setParentGroup(this);
 
     updateContainedIds(id);
-    if(!SWT_isLinkBox())
+
+    const bool isLinkBox = SWT_isLinkBox();
+    if(!isLinkBox) {
         SWT_addChildAt(child.get(), containedIdToAbstractionId(id));
+    }
 
     if(child->SWT_isBoundingBox()) {
+        updateContainedBoxes();
         const auto box = static_cast<BoundingBox*>(child.get());
         connCtx << connect(box, &Property::prp_absFrameRangeChanged,
                            this, &Property::prp_afterChangedAbsRange);
         connCtx << connect(box, &BoundingBox::blendEffectChanged,
                            this, &ContainerBox::afterChildBlendEffectChanged);
-        if(box->hasBlendEffects()) afterChildBlendEffectChanged();
         const auto pLayer = mIsLayer ? this : box->getFirstParentLayer();
         if(pLayer) {
             if(box->blendEffectsEnabled()) {
                 pLayer->addBoxWithBlendEffects(box);
             }
             if(box->SWT_isGroupBox()) {
-                const auto cBox = static_cast<ContainerBox*>(child.get());
+                const auto cBox = static_cast<ContainerBox*>(box);
                 cBox->addAllChildBoxesWithBlendEffects(pLayer);
             }
         }
+        if(box->hasBlendEffects()) afterChildBlendEffectChanged();
     }
 
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());
     child->prp_afterWholeInfluenceRangeChanged();
     emit insertedObject(id, child.get());
 
-    if(!SWT_isLinkBox()) {
+    if(!isLinkBox && !isBoxShadow) {
         prp_pushUndoRedoName("Insert " + child->prp_getName());
         UndoRedo ur;
         ur.fUndo = [this, child]() {
@@ -1039,7 +1048,6 @@ void ContainerBox::removeAllContained() {
 
 void ContainerBox::removeContainedFromList(const int id) {
     const auto child = mContained.takeObjAt(id);
-    updateContainedBoxes();
     if(child->SWT_isContainerBox()) {
         const auto pScene = getParentScene();
         const auto group = static_cast<ContainerBox*>(child.get());
@@ -1048,9 +1056,13 @@ void ContainerBox::removeContainedFromList(const int id) {
         }
     }
 
+    SWT_removeChild(child.get());
+    child->setParentGroup(nullptr);
+    updateContainedIds(id);
+
     if(child->SWT_isBoundingBox()) {
+        updateContainedBoxes();
         const auto box = static_cast<BoundingBox*>(child.get());
-        if(box->hasBlendEffects()) afterChildBlendEffectChanged();
         const auto pLayer = mIsLayer ? this : box->getFirstParentLayer();
         if(pLayer) {
             if(box->blendEffectsEnabled()) {
@@ -1061,16 +1073,13 @@ void ContainerBox::removeContainedFromList(const int id) {
                 cBox->removeAllChildBoxesWithBlendEffects(pLayer);
             }
         }
+        if(box->hasBlendEffects()) afterChildBlendEffectChanged();
+        prp_afterWholeInfluenceRangeChanged();
     }
 
-    SWT_removeChild(child.get());
-    child->setParentGroup(nullptr);
-    updateContainedIds(id);
-
-    prp_afterWholeInfluenceRangeChanged();
     emit removedObject(id, child.get());
 
-    if(!SWT_isLinkBox()) {
+    if(!SWT_isLinkBox() && !qobject_cast<BlendEffectBoxShadow*>(child.get())) {
         prp_pushUndoRedoName("Remove " + child->prp_getName());
         UndoRedo ur;
         ur.fUndo = [this, id, child]() {
@@ -1160,12 +1169,16 @@ void ContainerBox::moveContainedInList(eBoxOrSound * const child,
                                        const int from, const int to) {
     const int boundTo = qBound(0, to, mContained.count() - 1);
     mContained.moveObj(from, boundTo);
-    updateContainedBoxes();
     updateContainedIds(qMin(from, boundTo), qMax(from, boundTo));
     SWT_moveChildTo(child, containedIdToAbstractionId(boundTo));
-    planUpdate(UpdateReason::userChange);
 
-    prp_afterWholeInfluenceRangeChanged();
+    if(child->SWT_isBoundingBox()) {
+        updateContainedBoxes();
+        updateUIElementsForBlendEffects();
+        planUpdate(UpdateReason::userChange);
+        prp_afterWholeInfluenceRangeChanged();
+    }
+
     emit movedObject(from, boundTo, child);
 
     if(!SWT_isLinkBox()) {
@@ -1230,6 +1243,7 @@ void ContainerBox::writeAllContained(eWriteStream& dst) const {
     for(int i = nCont - 1; i >= 0; i--) {
         const auto futureId = dst.planFuturePos();
         const auto &child = mContained.at(i);
+        if(qobject_cast<BlendEffectBoxShadow*>(child.get())) continue;
         const bool isBox = child->SWT_isBoundingBox();
         dst << isBox;
         if(isBox) {

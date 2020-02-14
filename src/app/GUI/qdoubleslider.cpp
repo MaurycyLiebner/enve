@@ -66,7 +66,7 @@ QDoubleSlider::~QDoubleSlider() {
     mLineEdit->removeEventFilter(this);
 }
 
-void QDoubleSlider::setValueSliderVisibile(const bool valueSliderVisible) {
+void QDoubleSlider::setValueSliderVisible(const bool valueSliderVisible) {
     mShowValueSlider = valueSliderVisible;
     update();
 }

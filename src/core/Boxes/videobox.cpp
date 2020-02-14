@@ -138,5 +138,5 @@ void VideoBox::soundDataChanged() {
     }
     mSound->setSoundDataHandler(soundHandler);
     mSound->SWT_setVisible(soundHandler);
-    mSound->setVisibile(soundHandler);
+    mSound->setVisible(soundHandler);
 }

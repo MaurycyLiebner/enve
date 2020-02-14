@@ -21,7 +21,8 @@
 #include "Properties/emimedata.h"
 
 eBoxOrSound::eBoxOrSound(const QString &name) :
-    StaticComplexAnimator(name + " 0") {
+    StaticComplexAnimator(name) {
+    ca_setDisabledWhenEmpty(false);
     connect(this, &Property::prp_nameChanged, this,
             &SingleWidgetTarget::SWT_scheduleSearchContentUpdate);
 }
@@ -147,9 +148,9 @@ TimelineMovable *eBoxOrSound::anim_getTimelineMovable(
                                             minViewedFrame);
 }
 
-void eBoxOrSound::prp_drawTimelineControls(
+void eBoxOrSound::drawDurationRectangle(
         QPainter * const p, const qreal pixelsPerFrame,
-        const FrameRange &absFrameRange, const int rowHeight) {
+        const FrameRange &absFrameRange, const int rowHeight) const {
     if(mDurationRectangle) {
         p->save();
         const int width = qCeil(absFrameRange.span()*pixelsPerFrame);
@@ -160,7 +161,12 @@ void eBoxOrSound::prp_drawTimelineControls(
                                  pixelsPerFrame, absFrameRange);
         p->restore();
     }
+}
 
+void eBoxOrSound::prp_drawTimelineControls(
+        QPainter * const p, const qreal pixelsPerFrame,
+        const FrameRange &absFrameRange, const int rowHeight) {
+    drawDurationRectangle(p, pixelsPerFrame, absFrameRange, rowHeight);
     ComplexAnimator::prp_drawTimelineControls(
                 p, pixelsPerFrame, absFrameRange, rowHeight);
 }
@@ -355,7 +361,7 @@ void eBoxOrSound::selectionChangeTriggered(const bool shiftPressed) {
     }
 }
 
-void eBoxOrSound::setVisibile(const bool visible) {
+void eBoxOrSound::setVisible(const bool visible) {
     if(mVisible == visible) return;
     if(!SWT_isLinkBox()) {
         if(SWT_isSound()) {
@@ -365,10 +371,10 @@ void eBoxOrSound::setVisibile(const bool visible) {
         const auto oldValue = mVisible;
         const auto newValue = visible;
         ur.fUndo = [this, oldValue]() {
-            setVisibile(oldValue);
+            setVisible(oldValue);
         };
         ur.fRedo = [this, newValue]() {
-            setVisibile(newValue);
+            setVisible(newValue);
         };
         prp_addUndoRedo(ur);
     }
@@ -383,7 +389,7 @@ void eBoxOrSound::setVisibile(const bool visible) {
 }
 
 void eBoxOrSound::switchVisible() {
-    setVisibile(!mVisible);
+    setVisible(!mVisible);
 }
 
 void eBoxOrSound::switchLocked() {
@@ -391,11 +397,11 @@ void eBoxOrSound::switchLocked() {
 }
 
 void eBoxOrSound::hide() {
-    setVisibile(false);
+    setVisible(false);
 }
 
 void eBoxOrSound::show() {
-    setVisibile(true);
+    setVisible(true);
 }
 
 bool eBoxOrSound::isVisible() const {
