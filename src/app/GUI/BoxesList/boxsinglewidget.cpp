@@ -37,6 +37,7 @@
 #include "Boxes/pathbox.h"
 #include "canvas.h"
 #include "BlendEffects/blendeffectcollection.h"
+#include "BlendEffects/blendeffectboxshadow.h"
 
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "Animators/SculptPath/sculptpathcollection.h"
@@ -754,12 +755,12 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             p.fillRect(mFillWidget->geometry(), QColor(0, 0, 0, 55));
         }
     }
-    if(target->SWT_isBoundingBox() || target->SWT_isSingleSound()) {
+    const bool ss = target->SWT_isSingleSound();
+    if(target->SWT_isBoundingBox() || ss) {
         const auto bsTarget = static_cast<eBoxOrSound*>(target);
 
         nameX += MIN_WIDGET_DIM/4;
 
-        const bool ss = target->SWT_isSingleSound();
         if(ss) p.fillRect(rect(), QColor(0, 125, 255, 50));
         else   p.fillRect(rect(), QColor(0, 0, 0, 50));
 
@@ -770,6 +771,9 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         } else {
             p.setPen(Qt::white);
         }
+    } else if(qobject_cast<BlendEffectBoxShadow*>(target)) {
+        p.fillRect(rect(), QColor(0, 255, 125, 50));
+        nameX += 3*MIN_WIDGET_DIM + MIN_WIDGET_DIM/4;
     } else if(!target->SWT_isComplexAnimator()) {
         if(target->SWT_isGraphAnimator()) {
             const auto graphAnim = static_cast<GraphAnimator*>(target);

@@ -111,6 +111,7 @@ SOURCES += \
     Animators/staticcomplexanimator.cpp \
     Animators/texteffectcollection.cpp \
     BlendEffects/blendeffect.cpp \
+    BlendEffects/blendeffectboxshadow.cpp \
     BlendEffects/blendeffectcollection.cpp \
     BlendEffects/moveblendeffect.cpp \
     BlendEffects/targetedblendeffect.cpp \
@@ -399,6 +400,7 @@ HEADERS += \
     Animators/staticcomplexanimator.h \
     Animators/texteffectcollection.h \
     BlendEffects/blendeffect.h \
+    BlendEffects/blendeffectboxshadow.h \
     BlendEffects/blendeffectcollection.h \
     BlendEffects/moveblendeffect.h \
     BlendEffects/targetedblendeffect.h \

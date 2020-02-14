@@ -18,6 +18,7 @@
 #include "singlewidgettarget.h"
 #include "Animators/customproperties.h"
 #include "BlendEffects/blendeffectcollection.h"
+#include "BlendEffects/blendeffectboxshadow.h"
 
 SWT_Abstraction::SWT_Abstraction(
         SingleWidgetTarget * const target,
@@ -170,6 +171,10 @@ void SWT_Abstraction::readAll(eReadStream &src) {
     }
     if(src.evFileVersion() < 12 &&
        qobject_cast<BlendEffectCollection*>(mTarget_k)) {
+        return;
+    }
+    if(src.evFileVersion() < 14 &&
+       qobject_cast<BlendEffectBoxShadow*>(mTarget_k)) {
         return;
     }
     for(const auto& child : mChildren) child->readAll(src);

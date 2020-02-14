@@ -28,6 +28,7 @@
 #include "externallinkbox.h"
 #include "namefixer.h"
 #include "BlendEffects/blendeffectcollection.h"
+#include "BlendEffects/blendeffectboxshadow.h"
 
 ContainerBox::ContainerBox(const eBoxType type) :
     BoxWithPathEffects(type == eBoxType::group ? "Group" : "Layer",
@@ -261,8 +262,12 @@ void ContainerBox::promoteToLayer() {
     prp_afterWholeInfluenceRangeChanged();
 
     const auto pLayer = getFirstParentLayer();
-    if(pLayer) removeAllChildBoxesWithBlendEffects(pLayer);
+    if(pLayer) {
+        removeAllChildBoxesWithBlendEffects(pLayer);
+        pLayer->afterChildBlendEffectChanged();
+    }
     addAllChildBoxesWithBlendEffects(this);
+    afterChildBlendEffectChanged();
 
     {
         prp_pushUndoRedoName("Promote to Layer");
@@ -288,8 +293,12 @@ void ContainerBox::demoteToGroup() {
     prp_afterWholeInfluenceRangeChanged();
 
     mBoxesWithBlendEffects.clear();
+    clearBlendEffectUI();
     const auto pLayer = getFirstParentLayer();
-    if(pLayer) addAllChildBoxesWithBlendEffects(pLayer);
+    if(pLayer) {
+        addAllChildBoxesWithBlendEffects(pLayer);
+        pLayer->afterChildBlendEffectChanged();
+    }
 
     {
         prp_pushUndoRedoName("Demote to Group");
@@ -663,6 +672,88 @@ void ContainerBox::drawContained(SkCanvas * const canvas,
     }
 }
 
+void ContainerBox::handleUIDelayed(
+        QList<BlendEffect::UIDelayed> &delayed,
+        const int drawId,
+        BoundingBox* const prevBox,
+        BoundingBox* const nextBox) {
+    for(int i = 0; i < delayed.count(); i++) {
+        const auto& del = delayed.at(i);
+        if(const auto effect = del(drawId, prevBox, nextBox)) {
+            const auto box = effect->getFirstAncestor<BoundingBox>();
+            if(!box) continue;
+            int contId;
+            if(prevBox) {
+                contId = mContained.indexOf(prevBox->ref<eBoxOrSound>());
+            } else if(nextBox) {
+                contId = mContained.indexOf(nextBox->ref<eBoxOrSound>()) + 1;
+            } else {
+                contId = 0;
+            }
+            const int id = containedIdToAbstractionId(contId);
+            const auto shadow = enve::make_shared<BlendEffectBoxShadow>(box, effect);
+            mBlendShadows << shadow;
+            SWT_addChildAt(shadow.get(), id);
+            delayed.removeAt(i--);
+        }
+    }
+}
+
+void ContainerBox::clearBlendEffectUI() {
+    for(const auto& shadow : mBlendShadows) {
+        SWT_removeChild(shadow.get());
+    }
+    mBlendShadows.clear();
+}
+
+void ContainerBox::updateUIElementsForBlendEffects(
+        int& drawId, QList<BlendEffect::UIDelayed> &delayed) {
+    clearBlendEffectUI();
+    if(mContainedBoxes.isEmpty()) return;
+    handleUIDelayed(delayed, drawId, nullptr, mContainedBoxes.last());
+    for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
+        const auto& box = mContainedBoxes.at(i);
+        const auto& nextBox = i == 0 ? nullptr : mContainedBoxes.at(i - 1);
+        if(box->isVisibleAndInVisibleDurationRect()) {
+            if(box->SWT_isGroupBox()) {
+                const auto groupBox = static_cast<ContainerBox*>(box);
+                groupBox->updateUIElementsForBlendEffects(drawId, delayed);
+            } else drawId++;
+        }
+        handleUIDelayed(delayed, drawId, box, nextBox);
+    }
+}
+
+void ContainerBox::containedDetachedBlendUISetup(
+        int& drawId, QList<BlendEffect::UIDelayed> &delayed) {
+    for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
+        const auto& box = mContainedBoxes.at(i);
+        if(box->isVisibleAndInVisibleDurationRect()) {
+            if(box->SWT_isGroupBox()) {
+                const auto cBox = static_cast<ContainerBox*>(box);
+                cBox->containedDetachedBlendUISetup(drawId, delayed);
+            } else {
+                box->detachedBlendUISetup(drawId, delayed);
+                drawId++;
+            }
+        }
+    }
+}
+
+void ContainerBox::afterChildBlendEffectChanged() {
+    if(mIsLayer) updateUIElementsForBlendEffects();
+    else emit blendEffectChanged();
+}
+
+void ContainerBox::updateUIElementsForBlendEffects() {
+    int drawId = 0;
+    QList<BlendEffect::UIDelayed> delayed;
+    containedDetachedBlendUISetup(drawId, delayed);
+    drawId = 0;
+    updateUIElementsForBlendEffects(drawId, delayed);
+    handleUIDelayed(delayed, INT_MAX, nullptr, nullptr);
+}
+
 void ContainerBox::containedDetachedBlendSetup(
         SkCanvas * const canvas,
         const SkFilterQuality filter, int& drawId,
@@ -688,10 +779,7 @@ void ContainerBox::drawContained(SkCanvas * const canvas,
     containedDetachedBlendSetup(canvas, filter, drawId, delayed);
     drawId = 0;
     drawContained(canvas, filter, drawId, delayed);
-    for(int i = 0; i < delayed.count(); i++) {
-        const auto& del = delayed.at(i);
-        if(del(INT_MAX, nullptr, nullptr)) delayed.removeAt(i--);
-    }
+    handleDelayed(delayed, INT_MAX, nullptr, nullptr);
 }
 
 void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
@@ -902,9 +990,12 @@ void ContainerBox::insertContained(
         SWT_addChildAt(child.get(), containedIdToAbstractionId(id));
 
     if(child->SWT_isBoundingBox()) {
-        connCtx << connect(child.data(), &Property::prp_absFrameRangeChanged,
-                           this, &Property::prp_afterChangedAbsRange);
         const auto box = static_cast<BoundingBox*>(child.get());
+        connCtx << connect(box, &Property::prp_absFrameRangeChanged,
+                           this, &Property::prp_afterChangedAbsRange);
+        connCtx << connect(box, &BoundingBox::blendEffectChanged,
+                           this, &ContainerBox::afterChildBlendEffectChanged);
+        if(box->hasBlendEffects()) afterChildBlendEffectChanged();
         const auto pLayer = mIsLayer ? this : box->getFirstParentLayer();
         if(pLayer) {
             if(box->blendEffectsEnabled()) {
@@ -959,6 +1050,7 @@ void ContainerBox::removeContainedFromList(const int id) {
 
     if(child->SWT_isBoundingBox()) {
         const auto box = static_cast<BoundingBox*>(child.get());
+        if(box->hasBlendEffects()) afterChildBlendEffectChanged();
         const auto pLayer = mIsLayer ? this : box->getFirstParentLayer();
         if(pLayer) {
             if(box->blendEffectsEnabled()) {

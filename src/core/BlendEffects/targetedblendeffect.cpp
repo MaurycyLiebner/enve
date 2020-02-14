@@ -53,6 +53,23 @@ void TargetedBlendEffect::blendSetup(
     delayed << iData;
 }
 
+void TargetedBlendEffect::detachedBlendUISetup(
+        const qreal relFrame, const int drawId,
+        QList<UIDelayed> &delayed) {
+    Q_UNUSED(relFrame)
+    Q_UNUSED(drawId)
+    const auto target = this->target();
+    if(!target) return;
+    const bool isAbove = above();
+    delayed << [this, target, isAbove]
+               (int, BoundingBox* prev, BoundingBox* next) {
+        const bool above = isAbove && prev == target;
+        const bool below = !isAbove && next == target;
+        if(!above && !below) return static_cast<BlendEffect*>(nullptr);
+        return static_cast<BlendEffect*>(this);
+    };
+}
+
 void TargetedBlendEffect::detachedBlendSetup(
         const BoundingBox* const boxToDraw,
         const qreal relFrame,
@@ -60,7 +77,7 @@ void TargetedBlendEffect::detachedBlendSetup(
         const SkFilterQuality filter,
         const int drawId,
         QList<Delayed> &delayed) const {
-    Q_UNUSED(drawId);
+    Q_UNUSED(drawId)
     const auto target = this->target();
     if(!target) return;
     const bool isAbove = above();

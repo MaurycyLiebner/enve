@@ -385,6 +385,8 @@ public:
                     QList<ChildRenderData>& delayed) const;
     void drawPixmapSk(SkCanvas * const canvas,
                       const SkFilterQuality filter) const;
+    virtual void detachedBlendUISetup(int& drawId,
+            QList<BlendEffect::UIDelayed> &delayed) const;
     virtual void detachedBlendSetup(
             SkCanvas * const canvas,
             const SkFilterQuality filter, int& drawId,
@@ -404,6 +406,7 @@ signals:
     void fillStrokeSettingsChanged();
     void blendModeChanged(SkBlendMode);
     void brushChanged(SimpleBrushWrapper* brush);
+    void blendEffectChanged();
 protected:
     void setRelBoundingRect(const QRectF& relRect);
 

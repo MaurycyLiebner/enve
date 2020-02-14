@@ -24,9 +24,16 @@ public:
                             const qreal relFrame,
                             QList<ChildRenderData> &delayed) const = 0;
 
-    using Delayed = std::function<bool(int id,
-                                       BoundingBox* prev,
-                                       BoundingBox* next)>;
+    using UIDelayed = std::function<
+        BlendEffect*(int id, BoundingBox* prev,
+                     BoundingBox* next)>;
+    virtual void detachedBlendUISetup(
+            const qreal relFrame, const int drawId,
+            QList<UIDelayed> &delayed) = 0;
+
+    using Delayed = std::function<
+        bool(int id, BoundingBox* prev,
+             BoundingBox* next)>;
     virtual void detachedBlendSetup(const BoundingBox* const boxToDraw,
                                 const qreal relFrame,
                                 SkCanvas * const canvas,

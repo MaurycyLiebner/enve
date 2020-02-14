@@ -209,6 +209,18 @@ public:
             QList<BlendEffect::Delayed> &delayed) const;
 
     void updateIfUsesProgram(const ShaderEffectProgram * const program) const final;
+private:
+    void clearBlendEffectUI();
+    void afterChildBlendEffectChanged();
+    void updateUIElementsForBlendEffects();
+    void handleUIDelayed(QList<BlendEffect::UIDelayed> &delayed,
+                         const int drawId,
+                         BoundingBox* const prevBox,
+                         BoundingBox* const nextBox);
+    void containedDetachedBlendUISetup(
+            int& drawId, QList<BlendEffect::UIDelayed> &delayed);
+    void updateUIElementsForBlendEffects(
+            int& drawId, QList<BlendEffect::UIDelayed> &delayed);
 signals:
     void switchedGroupLayer(const eBoxType type);
     void insertedObject(const int id, eBoxOrSound* const obj);
@@ -229,6 +241,7 @@ private:
     bool mIsDescendantCurrentGroup = false;
     QList<BoundingBox*> mBoxesWithBlendEffects;
     QList<BoundingBox*> mContainedBoxes;
+    QList<qsptr<Property>> mBlendShadows;
     ConnContextObjList<qsptr<eBoxOrSound>> mContained;
 };
 

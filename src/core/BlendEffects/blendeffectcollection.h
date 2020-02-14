@@ -27,6 +27,8 @@ public:
     void blendSetup(ChildRenderData &data,
                     const int index, const qreal relFrame,
                     QList<ChildRenderData> &delayed) const;
+    void detachedBlendUISetup(int& drawId,
+                        QList<BlendEffect::UIDelayed> &delayed) const;
     void detachedBlendSetup(const BoundingBox * const boxToDraw,
                         SkCanvas * const canvas,
                         const SkFilterQuality filter, int& drawId,

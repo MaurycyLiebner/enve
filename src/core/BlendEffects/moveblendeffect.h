@@ -28,6 +28,10 @@ public:
                     const int index,
                     const qreal relFrame,
                     QList<ChildRenderData> &delayed) const;
+
+    void detachedBlendUISetup(const qreal relFrame,
+                              const int drawId,
+                              QList<UIDelayed> &delayed);
     void detachedBlendSetup(const BoundingBox* const boxToDraw,
                         const qreal relFrame,
                         SkCanvas * const canvas,

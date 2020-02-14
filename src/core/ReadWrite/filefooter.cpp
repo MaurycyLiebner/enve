@@ -3,7 +3,7 @@
 char FileFooter::sEVFormat[15] = "enve ev";
 char FileFooter::sAppName[15] = "enve";
 char FileFooter::sAppVersion[15] = "0.0.0c";
-const int FileFooter::sNewestEvRW = 13;
+const int FileFooter::sNewestEvRW = 14;
 
 bool FileFooter::sWrite(QIODevice * const target) {
     return target->write(reinterpret_cast<const char*>(&sNewestEvRW), sizeof(int)) &&

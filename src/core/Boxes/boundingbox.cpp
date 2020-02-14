@@ -79,6 +79,8 @@ BoundingBox::BoundingBox(const QString& name, const eBoxType type) :
             setParentTransform(trans);
         } else setParentTransform(nullptr);
     });
+    connect(mBlendEffectCollection.get(), &Property::prp_currentFrameChanged,
+            this, &BoundingBox::blendEffectChanged);
 }
 
 BoundingBox::~BoundingBox() {
@@ -284,6 +286,12 @@ ContainerBox *BoundingBox::getFirstParentLayer() const {
     if(!parent) return nullptr;
     if(parent->SWT_isLayerBox()) return parent;
     return parent->getFirstParentLayer();
+}
+
+void BoundingBox::detachedBlendUISetup(int& drawId,
+        QList<BlendEffect::UIDelayed> &delayed) const {
+    if(!blendEffectsEnabled()) return;
+    mBlendEffectCollection->detachedBlendUISetup(drawId, delayed);
 }
 
 void BoundingBox::detachedBlendSetup(

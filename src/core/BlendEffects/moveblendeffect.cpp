@@ -47,6 +47,19 @@ void MoveBlendEffect::blendSetup(
     delayed << iData;
 }
 
+void MoveBlendEffect::detachedBlendUISetup(
+        const qreal relFrame, const int drawId,
+        QList<UIDelayed> &delayed) {
+    const int dIndex = zIndex(relFrame);
+    if(dIndex == 0) return;
+    const int zIndex = drawId + (qAbs(dIndex) == 1 ? 2*dIndex : dIndex);
+    delayed << [this, zIndex](const int drawId,
+                              BoundingBox*, BoundingBox*) {
+        if(drawId < zIndex) return static_cast<BlendEffect*>(nullptr);
+        return static_cast<BlendEffect*>(this);
+    };
+}
+
 void MoveBlendEffect::detachedBlendSetup(const BoundingBox* const boxToDraw,
                                      const qreal relFrame,
                                      SkCanvas * const canvas,

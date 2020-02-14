@@ -52,6 +52,17 @@ void BlendEffectCollection::drawBlendSetup(SkCanvas * const canvas) {
     }
 }
 
+void BlendEffectCollection::detachedBlendUISetup(
+        int &drawId,
+        QList<BlendEffect::UIDelayed> &delayed) const {
+    const qreal relFrame = anim_getCurrentRelFrame();
+    const int iMax = ca_getNumberOfChildren();
+    for(int i = 0; i < iMax; i++) {
+        const auto effect = getChild(i);
+        effect->detachedBlendUISetup(relFrame, drawId, delayed);
+    }
+}
+
 void BlendEffectCollection::detachedBlendSetup(
         const BoundingBox* const boxToDraw,
         SkCanvas * const canvas,
