@@ -26,9 +26,6 @@ class TextEffectCollection : public DynamicComplexAnimator<TextEffect> {
 protected:
     TextEffectCollection();
 public:
-    bool SWT_isTextEffectCollection() const final
-    { return true; }
-
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     bool hasEffects()
