@@ -30,6 +30,7 @@
 #include "Properties/boxtargetproperty.h"
 #include "Properties/comboboxproperty.h"
 #include "Animators/qstringanimator.h"
+#include "RasterEffects/rastereffectcollection.h"
 #include "Properties/boolproperty.h"
 #include "Properties/boolpropertycontainer.h"
 #include "Animators/qpointfanimator.h"
@@ -147,10 +148,8 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
             if(static_cast<SingleSound*>(target)->isVisible()) {
                 return BoxSingleWidget::UNMUTED_PIXMAP;
             } else return BoxSingleWidget::MUTED_PIXMAP;
-        } else if(target->SWT_isRasterEffect() ||
-                  target->SWT_isPathEffect() ||
-                  target->SWT_isTextEffect()) {
-            if(static_cast<eEffect*>(target)->isVisible()) {
+        } else if(const auto eEff = qobject_cast<eEffect*>(target)) {
+            if(eEff->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
             } else return BoxSingleWidget::INVISIBLE_PIXMAP;
         } else if(target->SWT_isGraphAnimator()) {
@@ -184,8 +183,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mHwSupportButton->setPixmapChooser([this]() {
         if(!mTarget) return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(target->SWT_isRasterEffect()) {
-            const auto rEff = static_cast<RasterEffect*>(target);
+        if(const auto rEff = qobject_cast<RasterEffect*>(target)) {
             if(rEff->instanceHwSupport() == HardwareSupport::cpuOnly) {
                 return BoxSingleWidget::C_PIXMAP;
             } else if(rEff->instanceHwSupport() == HardwareSupport::gpuOnly) {
@@ -198,10 +196,10 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     connect(mHwSupportButton, &BoxesListActionButton::pressed, this, [this]() {
         if(!mTarget) return;
         const auto target = mTarget->getTarget();
-        if(!target->SWT_isRasterEffect()) return;
-        const auto rEff = static_cast<RasterEffect*>(target);
-        rEff->switchInstanceHwSupport();
-        Document::sInstance->actionFinished();
+        if(const auto rEff = qobject_cast<RasterEffect*>(target)) {
+            rEff->switchInstanceHwSupport();
+            Document::sInstance->actionFinished();
+        }
     });
 
     mFillWidget = new QWidget(this);
@@ -216,7 +214,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
         ContainerBox* targetGroup = nullptr;
         if(target->SWT_isGroupBox()) {
             targetGroup = static_cast<ContainerBox*>(target);
-        } else if(target->SWT_isRasterEffectCollection() ||
+        } else if(qobject_cast<RasterEffectCollection*>(target) ||
                   qobject_cast<BlendEffectCollection*>(target)) {
             const auto pTarget = static_cast<Property*>(target);
             const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
@@ -238,7 +236,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
         ContainerBox* targetGroup = nullptr;
         if(target->SWT_isGroupBox()) {
             targetGroup = static_cast<ContainerBox*>(target);
-        } else if(target->SWT_isRasterEffectCollection() ||
+        } else if(qobject_cast<RasterEffectCollection*>(target) ||
                   qobject_cast<BlendEffectCollection*>(target)) {
             const auto pTarget = static_cast<Property*>(target);
             const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
@@ -394,12 +392,10 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                               !target->SWT_isSingleSound());
     mVisibleButton->setVisible(target->SWT_isBoundingBox() ||
                                target->SWT_isSound() ||
-                               target->SWT_isPathEffect() ||
-                               target->SWT_isRasterEffect() ||
-                               target->SWT_isTextEffect() ||
+                               qobject_cast<eEffect*>(target) ||
                                target->SWT_isGraphAnimator());
     mLockedButton->setVisible(target->SWT_isBoundingBox());
-    mHwSupportButton->setVisible(target->SWT_isRasterEffect());
+    mHwSupportButton->setVisible(qobject_cast<RasterEffect*>(target));
     {
         ContainerBox* targetGroup = nullptr;
         if(target->SWT_isGroupBox()) {
@@ -409,7 +405,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                                    this, [this](const eBoxType type) {
                 mBlendModeCombo->setEnabled(type == eBoxType::layer);
             });
-        } else if(target->SWT_isRasterEffectCollection() ||
+        } else if(qobject_cast<RasterEffectCollection*>(target) ||
                   qobject_cast<BlendEffectCollection*>(target)) {
             const auto pTarget = static_cast<Property*>(target);
             const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
@@ -537,17 +533,13 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         mTargetConn << connect(static_cast<Animator*>(target), &Animator::anim_isRecordingChanged,
                                this, [this]() { mRecordButton->update(); });
     }
-    if(target->SWT_isPathEffect() ||
-       target->SWT_isRasterEffect() ||
-       target->SWT_isTextEffect()) {
-        if(target->SWT_isRasterEffect()) {
-            const auto effect = static_cast<RasterEffect*>(target);
-            mTargetConn << connect(effect, &RasterEffect::hardwareSupportChanged,
+    if(const auto eEff = qobject_cast<eEffect*>(target)) {
+        if(const auto rEff = qobject_cast<RasterEffect*>(target)) {
+            mTargetConn << connect(rEff, &RasterEffect::hardwareSupportChanged,
                                    this, [this]() { mHwSupportButton->update(); });
         }
 
-        const auto effTarget = static_cast<eEffect*>(target);
-        mTargetConn << connect(effTarget, &eEffect::effectVisibilityChanged,
+        mTargetConn << connect(eEff, &eEffect::effectVisibilityChanged,
                                this, [this]() { mVisibleButton->update(); });
     }
     if(target->SWT_isBoundingBox() || target->SWT_isSound()) {
@@ -860,10 +852,8 @@ void BoxSingleWidget::switchBoxVisibleAction() {
     if(!target) return;
     if(target->SWT_isBoundingBox() || target->SWT_isSound()) {
         static_cast<eBoxOrSound*>(target)->switchVisible();
-    } else if(target->SWT_isRasterEffect() ||
-              target->SWT_isPathEffect() ||
-              target->SWT_isTextEffect()) {
-        static_cast<eEffect*>(target)->switchVisible();
+    } else if(const auto eEff = qobject_cast<eEffect*>(target)) {
+        eEff->switchVisible();
     } else if(target->SWT_isGraphAnimator()) {
         const auto bsvt = static_cast<BoxScroller*>(mParent);
         const auto keysView = bsvt->getKeysView();

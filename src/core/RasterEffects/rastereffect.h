@@ -48,8 +48,6 @@ public:
 
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
-    bool SWT_isRasterEffect() const final { return true; }
-
     QMimeData *SWT_createMimeData() final;
 
     HardwareSupport instanceHwSupport() const {

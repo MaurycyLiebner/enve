@@ -38,7 +38,6 @@ class RasterEffectCollection : public RasterEffectCollectionBase {
 protected:
     RasterEffectCollection();
 public:
-    bool SWT_isRasterEffectCollection() const { return true; }
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     bool hasEffects();
