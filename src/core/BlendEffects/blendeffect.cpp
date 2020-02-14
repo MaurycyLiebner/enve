@@ -3,7 +3,7 @@
 
 BlendEffect::BlendEffect(const QString& name,
                          const BlendEffectType type) :
-    StaticComplexAnimator(name), mType(type) {
+    eEffect(name), mType(type) {
     mClipPath = enve::make_shared<BoxTargetProperty>("clip path");
 
     connect(mClipPath.get(), &BoxTargetProperty::targetSet,
@@ -16,6 +16,12 @@ BlendEffect::BlendEffect(const QString& name,
     });
 
     ca_addChild(mClipPath);
+}
+
+void BlendEffect::prp_readProperty(eReadStream& src) {
+    if(src.evFileVersion() < 13) {
+        StaticComplexAnimator::prp_readProperty(src);
+    } else eEffect::prp_readProperty(src);
 }
 
 void BlendEffect::writeIdentifier(eWriteStream& dst) const {

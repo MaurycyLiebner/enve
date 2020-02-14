@@ -1,7 +1,7 @@
 #ifndef BLENDEFFECT_H
 #define BLENDEFFECT_H
 
-#include "Animators/staticcomplexanimator.h"
+#include "Animators/eeffect.h"
 
 #include "Properties/boxtargetproperty.h"
 
@@ -12,7 +12,7 @@ enum class BlendEffectType {
     move, targeted
 };
 
-class BlendEffect : public StaticComplexAnimator {
+class BlendEffect : public eEffect {
     Q_OBJECT
     e_OBJECT
 protected:
@@ -37,6 +37,8 @@ public:
                                 SkCanvas * const canvas) const = 0;
 
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
+
+    void prp_readProperty(eReadStream& src);
 
     void writeIdentifier(eWriteStream &dst) const;
 
