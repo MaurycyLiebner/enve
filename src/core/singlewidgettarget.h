@@ -81,8 +81,6 @@ public:
     virtual bool SWT_isBoolAnimator() const { return false; }
     virtual bool SWT_isColorAnimator() const { return false; }
     virtual bool SWT_isComplexAnimator() const { return false; }
-    virtual bool SWT_isPathEffectCollection() const { return false; }
-    virtual bool SWT_isPathEffect() const { return false; }
     virtual bool SWT_isIntAnimator() const { return false; }
     virtual bool SWT_isGradient() const { return false; }
     virtual bool SWT_isFillSettingsAnimator() const { return false; }

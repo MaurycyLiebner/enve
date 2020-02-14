@@ -49,8 +49,6 @@ public:
         getEffectCaller(const qreal relFrame,
                         const qreal influence) const = 0;
 
-    bool SWT_isPathEffect() const;
-
     QMimeData *SWT_createMimeData() final;
 
     void writeIdentifier(eWriteStream &dst) const;

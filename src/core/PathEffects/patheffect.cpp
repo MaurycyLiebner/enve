@@ -48,5 +48,3 @@ PathEffectType PathEffect::getEffectType() {
 QMimeData *PathEffect::SWT_createMimeData() {
     return new eMimeData(QList<PathEffect*>() << this);
 }
-
-bool PathEffect::SWT_isPathEffect() const { return true; }

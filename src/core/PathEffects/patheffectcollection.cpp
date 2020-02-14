@@ -39,10 +39,6 @@ bool PathEffectCollection::hasEffects() {
     return ca_hasChildren();
 }
 
-bool PathEffectCollection::SWT_isPathEffectCollection() const {
-    return true;
-}
-
 void PathEffectCollection::readPathEffect(eReadStream& src) {
     const auto pathEffect = readIdCreatePathEffect(src);
     pathEffect->prp_readProperty(src);

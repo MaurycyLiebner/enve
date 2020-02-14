@@ -35,8 +35,6 @@ class PathEffectCollection : public PathEffectCollectionBase {
 protected:
     PathEffectCollection();
 public:
-    bool SWT_isPathEffectCollection() const;
-
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     bool hasEffects();
