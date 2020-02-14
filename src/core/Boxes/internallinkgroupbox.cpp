@@ -33,12 +33,6 @@ InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget,
     mBoxTarget->setTarget(linkTarget);
 }
 
-bool InternalLinkGroupBox::SWT_isGroupBox() const {
-    const auto finalTarget = getFinalTarget();
-    if(!finalTarget) return false;
-    return finalTarget->SWT_isGroupBox();
-}
-
 void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
                                            BoxRenderData * const data,
                                            Canvas* const scene) {
@@ -74,8 +68,10 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
             mTransformAnimator->prp_afterChangedRelRange(relRange);
         });
 
+        if(linkTarget->SWT_isLayerBox()) promoteToLayer();
+        else demoteToGroup();
         conn << connect(linkTarget, &ContainerBox::switchedGroupLayer,
-                this, [this](const eBoxType type) {
+                        this, [this](const eBoxType type) {
             if(type == eBoxType::group) {
                 demoteToGroup();
             } else if(type == eBoxType::layer) {

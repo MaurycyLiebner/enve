@@ -36,6 +36,8 @@ ContainerBox::ContainerBox(const eBoxType type) :
             &RasterEffectCollection::forcedMarginChanged,
             this, &ContainerBox::forcedMarginMeaningfulChange);
     iniPathEffects();
+    if(type == eBoxType::layer ||
+       type == eBoxType::canvas) promoteToLayer();
 }
 
 bool ContainerBox::SWT_dropSupport(const QMimeData * const data) {
@@ -248,6 +250,7 @@ void ContainerBox::queTasks() {
 void ContainerBox::promoteToLayer() {
     if(!SWT_isGroupBox()) return;
     if(!SWT_isLinkBox()) mType = eBoxType::layer;
+    mIsLayer = true;
     if(prp_getName().contains("Group")) {
         auto newName  = prp_getName();
         newName.replace("Group", "Layer");
@@ -273,6 +276,7 @@ void ContainerBox::promoteToLayer() {
 void ContainerBox::demoteToGroup() {
     if(!SWT_isLayerBox()) return;
     if(!SWT_isLinkBox()) mType = eBoxType::group;
+    mIsLayer = false;
     if(prp_getName().contains("Layer")) {
         auto newName  = prp_getName();
         newName.replace("Layer", "Group");

@@ -28,16 +28,13 @@ protected:
     InternalLinkBox(BoundingBox * const linkTarget,
                     const bool innerLink);
 public:
-    ~InternalLinkBox()
-    { setLinkTarget(nullptr); }
-
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data,
                          Canvas * const scene);
 
     void setLinkTarget(BoundingBox * const linkTarget);
 protected:
-    qsptr<BoxTargetProperty> mBoxTarget =
+    const qsptr<BoxTargetProperty> mBoxTarget =
             enve::make_shared<BoxTargetProperty>("link target");
 private:
     qsptr<eSound> mSound;

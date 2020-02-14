@@ -246,7 +246,10 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
                 targetGroup = static_cast<ContainerBox*>(parentBox);
             }
         }
-        if(targetGroup) targetGroup->promoteToLayer();
+        if(targetGroup) {
+            targetGroup->promoteToLayer();
+            Document::sInstance->actionFinished();
+        }
     });
 
     mValueSlider = new QrealAnimatorValueSlider(nullptr, this);
@@ -399,12 +402,12 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mHwSupportButton->setVisible(target->SWT_isRasterEffect());
     {
         ContainerBox* targetGroup = nullptr;
-        if(target->SWT_isGroupBox() && !target->SWT_isLinkBox()) {
+        if(target->SWT_isGroupBox()) {
             targetGroup = static_cast<ContainerBox*>(target);
             mTargetConn << connect(targetGroup,
                                    &ContainerBox::switchedGroupLayer,
-                                   this, [this, targetGroup]() {
-                mBlendModeCombo->setEnabled(targetGroup->SWT_isLayerBox());
+                                   this, [this](const eBoxType type) {
+                mBlendModeCombo->setEnabled(type == eBoxType::layer);
             });
         } else if(target->SWT_isRasterEffectCollection() ||
                   qobject_cast<BlendEffectCollection*>(target)) {
@@ -418,8 +421,9 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         if(targetGroup) {
             mTargetConn << connect(targetGroup,
                                    &ContainerBox::switchedGroupLayer,
-                                   mPromoteToLayerButton,
-                                   qOverload<>(&QWidget::update));
+                                   this, [this](const eBoxType type) {
+                mPromoteToLayerButton->setVisible(type == eBoxType::group);
+            });
         }
     }
     mBoxTargetWidget->setVisible(target->SWT_isBoxTargetProperty());

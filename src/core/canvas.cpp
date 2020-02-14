@@ -66,7 +66,7 @@ Canvas::Canvas(Document &document,
     mHeight = canvasHeight;
 
     mCurrentContainer = this;
-    mIsCurrentGroup = true;
+    setIsCurrentGroup_k(true);
 
     mRotPivot = enve::make_shared<PathPivot>(this);
 

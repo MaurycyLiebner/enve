@@ -26,11 +26,6 @@ protected:
     InternalLinkGroupBox(ContainerBox * const linkTarget,
                          const bool innerLink);
 public:
-    ~InternalLinkGroupBox()
-    { setLinkTarget(nullptr); }
-
-    bool SWT_isGroupBox() const;
-
     void SWT_setupAbstraction(SWT_Abstraction* abs,
                               const UpdateFuncs &funcs,
                               const int widgetId)

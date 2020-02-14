@@ -29,8 +29,8 @@ protected:
     ContainerBox(const eBoxType type);
 public:
     bool SWT_isContainerBox() const { return true; }
-    bool SWT_isGroupBox() const { return mType == eBoxType::group; }
-    bool SWT_isLayerBox() const { return !SWT_isGroupBox(); }
+    bool SWT_isGroupBox() const final { return !mIsLayer; }
+    bool SWT_isLayerBox() const final { return mIsLayer; }
 
     HardwareSupport hardwareSupport() const {
         if(SWT_isLayerBox()) return HardwareSupport::gpuPreffered;
@@ -218,14 +218,13 @@ signals:
 private:
     void updateAllChildPaths(const UpdateReason reason,
                              void (PathBox::*func)(const UpdateReason));
-
     void iniPathEffects();
     void updateRelBoundingRect();
-protected:
     void removeContained(const qsptr<eBoxOrSound> &child);
 
     QMargins mForcedMargin;
     
+    bool mIsLayer = false;
     bool mIsCurrentGroup = false;
     bool mIsDescendantCurrentGroup = false;
     QList<BoundingBox*> mBoxesWithBlendEffects;
