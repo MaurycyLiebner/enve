@@ -29,8 +29,8 @@ void writeRasterEffectType(RasterEffect* const obj, eWriteStream& dst);
 
 typedef DynamicComplexAnimator<
     RasterEffect,
-    &writeRasterEffectType,
-    &readIdCreateRasterEffect> RasterEffectCollectionBase;
+    writeRasterEffectType,
+    readIdCreateRasterEffect> RasterEffectCollectionBase;
 
 class RasterEffectCollection : public RasterEffectCollectionBase {
     e_OBJECT

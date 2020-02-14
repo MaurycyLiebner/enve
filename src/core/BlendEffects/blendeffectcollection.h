@@ -10,8 +10,8 @@ void writeBlendEffectType(BlendEffect* const obj, eWriteStream& dst);
 
 typedef DynamicComplexAnimator<
     BlendEffect,
-    &writeBlendEffectType,
-    &readIdCreateBlendEffect> BlendEffectCollectionBase;
+    writeBlendEffectType,
+    readIdCreateBlendEffect> BlendEffectCollectionBase;
 
 class BlendEffectCollection : public BlendEffectCollectionBase {
     Q_OBJECT

@@ -27,8 +27,8 @@ void writePathEffectType(PathEffect* const obj, eWriteStream& dst);
 
 typedef DynamicComplexAnimator<
     PathEffect,
-    &writePathEffectType,
-    &readIdCreatePathEffect> PathEffectCollectionBase;
+    writePathEffectType,
+    readIdCreatePathEffect> PathEffectCollectionBase;
 
 class PathEffectCollection : public PathEffectCollectionBase {
     e_OBJECT

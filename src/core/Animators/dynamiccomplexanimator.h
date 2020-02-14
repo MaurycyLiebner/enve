@@ -235,9 +235,15 @@ qsptr<T> TCreateOnly(eReadStream& src) {
     return enve::make_shared<T>();
 }
 
+template <class T>
+void TNoWriteType(T* const obj, eWriteStream& dst) {
+    Q_UNUSED(obj)
+    Q_UNUSED(dst)
+}
+
 template <class T,
-          void (*TWriteType)(T* const obj, eWriteStream& dst) = nullptr,
-          qsptr<T> (*TReadTypeAndCreate)(eReadStream& src) = &TCreateOnly<T>>
+          void (&TWriteType)(T* const obj, eWriteStream& dst) = TNoWriteType<T>,
+          qsptr<T> (&TReadTypeAndCreate)(eReadStream& src) = TCreateOnly<T>>
 class DynamicComplexAnimator : public DynamicComplexAnimatorBase<T> {
     e_OBJECT
 protected:
@@ -247,7 +253,7 @@ public:
     qsptr<T> createDuplicate(T* const src) override {
         Clipboard clipboard(ClipboardType::property);
         clipboard.write([this, src](eWriteStream& dst) {
-            if(TWriteType) TWriteType(src, dst);
+            TWriteType(src, dst);
             src->prp_writeProperty(dst);
         });
         qsptr<T> duplicate;
@@ -265,7 +271,7 @@ public:
         for(const auto& prop : children) {
             const auto futureId = dst.planFuturePos();
             const auto TProp = static_cast<T*>(prop.get());
-            if(TWriteType) TWriteType(TProp, dst);
+            TWriteType(TProp, dst);
             TProp->prp_writeProperty(dst);
             dst.assignFuturePos(futureId);
         }
@@ -286,6 +292,9 @@ public:
             }
         }
     }
+
+private:
+
 };
 
 #endif // DYNAMICCOMPLEXANIMATOR_H

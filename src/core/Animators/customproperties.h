@@ -23,8 +23,8 @@ void writeCPropertyType(Animator* const obj, eWriteStream& dst);
 
 using CustomPropertiesBase =
     DynamicComplexAnimator<Animator,
-                           &writeCPropertyType,
-                           &readIdCreateCProperty>;
+                           writeCPropertyType,
+                           readIdCreateCProperty>;
 
 class CustomProperties : public CustomPropertiesBase {
     Q_OBJECT
