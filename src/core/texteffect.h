@@ -36,6 +36,9 @@ class TextEffect : public eEffect {
 public:
     TextEffect();
 
+    bool SWT_isTextEffect() const final
+    { return true; }
+
     bool SWT_dropSupport(const QMimeData * const data);
     bool SWT_drop(const QMimeData * const data);
     QMimeData *SWT_createMimeData();
