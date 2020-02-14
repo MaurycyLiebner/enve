@@ -104,8 +104,8 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
                     return BoxSingleWidget::ANIMATOR_DESCENDANT_RECORDING;
                 } else return BoxSingleWidget::ANIMATOR_NOT_RECORDING;
             }
-        } else if(target->SWT_isAnimator()) {
-            if(static_cast<Animator*>(target)->anim_isRecording()) {
+        } else if(const auto asAnim = qobject_cast<Animator*>(target)) {
+            if(asAnim->anim_isRecording()) {
                 return BoxSingleWidget::ANIMATOR_RECORDING;
             } else return BoxSingleWidget::ANIMATOR_NOT_RECORDING;
         } else return static_cast<QPixmap*>(nullptr);
@@ -387,7 +387,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mTargetConn << connect(target, &SingleWidgetTarget::SWT_changedDisabled,
                            this, qOverload<>(&QWidget::update));
     mContentButton->setVisible(target->SWT_isComplexAnimator());
-    mRecordButton->setVisible(target->SWT_isAnimator() &&
+    mRecordButton->setVisible(qobject_cast<Animator*>(target) &&
                               !target->SWT_isBoundingBox() &&
                               !target->SWT_isSingleSound());
     mVisibleButton->setVisible(target->SWT_isBoundingBox() ||
@@ -529,8 +529,8 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         });
     }
 
-    if(target->SWT_isAnimator()) {
-        mTargetConn << connect(static_cast<Animator*>(target), &Animator::anim_isRecordingChanged,
+    if(const auto asAnim = qobject_cast<Animator*>(target)) {
+        mTargetConn << connect(asAnim, &Animator::anim_isRecordingChanged,
                                this, [this]() { mRecordButton->update(); });
     }
     if(const auto eEff = qobject_cast<eEffect*>(target)) {
@@ -698,9 +698,8 @@ void BoxSingleWidget::prp_drawTimelineControls(QPainter * const p,
                                const FrameRange &viewedFrames) {
     if(isHidden() || !mTarget) return;
     const auto target = mTarget->getTarget();
-    if(target->SWT_isAnimator()) {
-        const auto anim_target = static_cast<Animator*>(target);
-        anim_target->prp_drawTimelineControls(
+    if(const auto asAnim = qobject_cast<Animator*>(target)) {
+        asAnim->prp_drawTimelineControls(
                     p, pixelsPerFrame, viewedFrames, MIN_WIDGET_DIM);
     }
 }
@@ -710,12 +709,9 @@ Key* BoxSingleWidget::getKeyAtPos(const int pressX,
                                   const int minViewedFrame) {
     if(isHidden() || !mTarget) return nullptr;
     const auto target = mTarget->getTarget();
-    if(target->SWT_isAnimator()) {
-        const auto anim_target = static_cast<Animator*>(target);
-        return anim_target->anim_getKeyAtPos(pressX,
-                                             minViewedFrame,
-                                             pixelsPerFrame,
-                                             KEY_RECT_SIZE);
+    if(const auto asAnim = qobject_cast<Animator*>(target)) {
+        return asAnim->anim_getKeyAtPos(pressX, minViewedFrame,
+                                        pixelsPerFrame, KEY_RECT_SIZE);
     }
     return nullptr;
 }
@@ -726,12 +722,9 @@ TimelineMovable* BoxSingleWidget::getRectangleMovableAtPos(
                             const int minViewedFrame) {
     if(isHidden() || !mTarget) return nullptr;
     const auto target = mTarget->getTarget();
-    if(target->SWT_isAnimator()) {
-        const auto anim_target = static_cast<Animator*>(target);
-        return anim_target->anim_getTimelineMovable(
-                                    pressX,
-                                    minViewedFrame,
-                                    pixelsPerFrame);
+    if(const auto asAnim = qobject_cast<Animator*>(target)) {
+        return asAnim->anim_getTimelineMovable(
+                    pressX, minViewedFrame, pixelsPerFrame);
     }
     return nullptr;
 }
@@ -741,11 +734,9 @@ void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
                                     QList<Key*>& listKeys) {
     if(isHidden() || !mTarget) return;
     const auto target = mTarget->getTarget();
-    if(target->SWT_isAnimator()) {
-        const auto anim_target = static_cast<Animator*>(target);
-
-        anim_target->anim_getKeysInRect(selectionRect, pixelsPerFrame,
-                                       listKeys, KEY_RECT_SIZE);
+    if(const auto asAnim = qobject_cast<Animator*>(target)) {
+        asAnim->anim_getKeysInRect(selectionRect, pixelsPerFrame,
+                                   listKeys, KEY_RECT_SIZE);
     }
 }
 
@@ -812,7 +803,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             }
         } else nameX += MIN_WIDGET_DIM;
 
-        if(!target->SWT_isAnimator()) nameX += MIN_WIDGET_DIM;
+        if(!qobject_cast<Animator*>(target)) nameX += MIN_WIDGET_DIM;
         p.setPen(Qt::white);
     } else { //if(target->SWT_isComplexAnimator()) {
         p.setPen(Qt::white);
@@ -839,11 +830,11 @@ void BoxSingleWidget::switchRecordingAction() {
     if(!mTarget) return;
     const auto target = mTarget->getTarget();
     if(!target) return;
-    if(!target->SWT_isAnimator()) return;
-    auto aTarget = static_cast<Animator*>(target);
-    aTarget->anim_switchRecording();
-    Document::sInstance->actionFinished();
-    update();
+    if(const auto asAnim = qobject_cast<Animator*>(target)) {
+        asAnim->anim_switchRecording();
+        Document::sInstance->actionFinished();
+        update();
+    }
 }
 
 void BoxSingleWidget::switchBoxVisibleAction() {

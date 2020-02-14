@@ -39,8 +39,7 @@ void Property::prp_drawCanvasControls(
         const float invScale, const bool ctrlPressed) {
     if(mPointsHandler) {
         bool key;
-        if(SWT_isAnimator()) {
-            const auto asAnim = static_cast<Animator*>(this);
+        if(const auto asAnim = qobject_cast<Animator*>(this)) {
             key = asAnim->anim_getKeyOnCurrentFrame();
         } else key = false;
         mPointsHandler->drawPoints(canvas, invScale, key, mode, ctrlPressed);

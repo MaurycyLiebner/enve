@@ -120,8 +120,7 @@ void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
     const bool changeInfluence = !(SWT_isBoundingBox() &&
                                    child->SWT_isSound());
 
-    if(child->SWT_isAnimator()) {
-        const auto childAnimator = static_cast<Animator*>(child.get());
+    if(const auto childAnimator = qobject_cast<Animator*>(child.get())) {
         connect(childAnimator, &Animator::anim_isRecordingChanged,
                 this, &ComplexAnimator::ca_childIsRecordingChanged);
         connect(childAnimator, &Animator::anim_addedKey,
@@ -252,9 +251,8 @@ void ComplexAnimator::ca_removeChild(const qsptr<Property> child) {
     const bool changeInfluence = !(SWT_isBoundingBox() &&
                                    child->SWT_isSound());
     const auto childRange = child->prp_absInfluenceRange();
-    if(child->SWT_isAnimator()) {
-        const auto aRemove = static_cast<Animator*>(child.get());
-        aRemove->anim_removeAllKeysFromComplexAnimator(this);
+    if(const auto childAnimator = qobject_cast<Animator*>(child.get())) {
+        childAnimator->anim_removeAllKeysFromComplexAnimator(this);
     }
     disconnect(child.get(), nullptr, this, nullptr);
 
@@ -288,8 +286,8 @@ void ComplexAnimator::ca_removeAllChildren() {
 
 void ComplexAnimator::anim_addKeyAtRelFrame(const int relFrame) {
     for(const auto &property : ca_mChildren) {
-        if(property->SWT_isAnimator()) {
-            static_cast<Animator*>(property.get())->anim_addKeyAtRelFrame(relFrame);
+        if(const auto asAnim = qobject_cast<Animator*>(property.get())) {
+            asAnim->anim_addKeyAtRelFrame(relFrame);
         }
     }
 }
@@ -330,9 +328,9 @@ void ComplexAnimator::anim_setAbsFrame(const int frame) {
     Animator::anim_setAbsFrame(frame);
 
     for(const auto &property : ca_mChildren) {
-        if(!property->SWT_isAnimator()) continue;
-        const auto anim = static_cast<Animator*>(property.get());
-        anim->anim_setAbsFrame(frame);
+        if(const auto asAnim = qobject_cast<Animator*>(property.get())) {
+            asAnim->anim_setAbsFrame(frame);
+        }
     }
 }
 
@@ -352,9 +350,9 @@ bool ComplexAnimator::anim_isDescendantRecording() const {
 
 void ComplexAnimator::anim_setRecording(const bool rec) {
     for(const auto &property : ca_mChildren) {
-        if(!property->SWT_isAnimator()) continue;
-        const auto anim = static_cast<Animator*>(property.get());
-        anim->anim_setRecording(rec);
+        if(const auto asAnim = qobject_cast<Animator*>(property.get())) {
+            asAnim->anim_setRecording(rec);
+        }
     }
     anim_setRecordingValue(rec);
 }
@@ -363,12 +361,12 @@ void ComplexAnimator::ca_childIsRecordingChanged() {
     bool rec = true;
     bool childRec = false;
     for(const auto &property : ca_mChildren) {
-        if(!property->SWT_isAnimator()) continue;
-        const auto anim = static_cast<Animator*>(property.get());
-        const bool isChildRec = anim->anim_isRecording();
-        const bool isChildDescRec = anim->anim_isDescendantRecording();
-        if(isChildDescRec) childRec = true;
-        if(!isChildRec) rec = false;
+        if(const auto asAnim = qobject_cast<Animator*>(property.get())) {
+            const bool isChildRec = asAnim->anim_isRecording();
+            const bool isChildDescRec = asAnim->anim_isDescendantRecording();
+            if(isChildDescRec) childRec = true;
+            if(!isChildRec) rec = false;
+        }
     }
     rec = rec && childRec;
     if(childRec != ca_mChildRecording) {
@@ -403,8 +401,8 @@ void ComplexAnimator::ca_addChild(const qsptr<Property> &child) {
 
 void ComplexAnimator::anim_shiftAllKeys(const int shift, const bool addUndoRedo) {
     for(const auto &property : ca_mChildren) {
-        if(!property->SWT_isAnimator()) continue;
-        const auto anim = static_cast<Animator*>(property.get());
-        anim->anim_shiftAllKeys(shift, addUndoRedo);
+        if(const auto asAnim = qobject_cast<Animator*>(property.get())) {
+            asAnim->anim_shiftAllKeys(shift, addUndoRedo);
+        }
     }
 }

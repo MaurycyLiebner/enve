@@ -34,8 +34,6 @@ protected:
     virtual void anim_afterKeyOnCurrentFrameChanged(Key* const key)
     { Q_UNUSED(key) }
 public:
-    bool SWT_isAnimator() const final { return true; }
-
     virtual stdsptr<Key> anim_createKey() = 0;
     virtual void anim_addKeyAtRelFrame(const int relFrame) = 0;
 

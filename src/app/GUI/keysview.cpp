@@ -136,10 +136,9 @@ void KeysView::getKeysInRect(QRectF selectionRect,
 
     for(const auto& abs : abstractions) {
         const auto target = abs->getTarget();
-        if(target->SWT_isAnimator()) {
-            const auto anim_target = static_cast<Animator*>(target);
-            anim_target->anim_getKeysInRect(selectionRect, pixelsPerFrame,
-                                            listKeys, KEY_RECT_SIZE);
+        if(const auto asAnim = qobject_cast<Animator*>(target)) {
+            asAnim->anim_getKeysInRect(selectionRect, pixelsPerFrame,
+                                       listKeys, KEY_RECT_SIZE);
         }
     }
 }

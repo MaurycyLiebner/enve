@@ -77,7 +77,6 @@ public:
     }
 
     // Animators
-    virtual bool SWT_isAnimator() const { return false; }
     virtual bool SWT_isGraphAnimator() const { return false; }
     virtual bool SWT_isBoolAnimator() const { return false; }
     virtual bool SWT_isColorAnimator() const { return false; }
