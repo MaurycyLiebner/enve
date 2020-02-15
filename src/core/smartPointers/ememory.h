@@ -48,6 +48,42 @@ namespace enve {
         if(obj) return obj->template ref<T>();
         return nullptr;
     }
+
+    namespace {
+        template<typename T, typename U>
+        struct HasCastMethod
+        {
+            template<typename W, W* (*)(U&)> struct SFINAE {};
+            template<typename W> static char Test(SFINAE<W, &W::sCast>*);
+            template<typename W> static int Test(...);
+            static const bool Has = sizeof(Test<T>(0)) == sizeof(char);
+        };
+
+        template <typename T, class U>
+        inline T* cast_qt(U* const u, std::false_type) {
+            return dynamic_cast<T*>(u);
+        }
+
+        template <typename T, class U>
+        inline T* cast_qt(U* const u, std::true_type) {
+            return qobject_cast<T*>(u);
+        }
+
+        template <typename T, class U>
+        inline T* cast_enve(U* const u, std::false_type) {
+            return cast_qt<T>(u, std::integral_constant<bool, QtPrivate::HasQ_OBJECT_Macro<T>::Value>());
+        }
+
+        template <typename T, class U>
+        inline T* cast_enve(U* const u, std::true_type) {
+            return u ? T::sCast(*u) : nullptr;
+        }
+    }
+
+    template <typename T, class U>
+    inline T* cast(U* const u) {
+        return cast_enve<T>(u, std::integral_constant<bool, HasCastMethod<T, U>::Has>());
+    }
 }
 
 #endif // EMEMORY_H

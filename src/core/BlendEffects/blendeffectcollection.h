@@ -16,6 +16,7 @@ typedef DynamicComplexAnimator<
 class BlendEffectCollection : public BlendEffectCollectionBase {
     Q_OBJECT
     e_OBJECT
+    DECLARE_ETYPE(BlendEffectCollection)
 protected:
     BlendEffectCollection();
 public:

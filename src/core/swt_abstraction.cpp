@@ -170,11 +170,11 @@ void SWT_Abstraction::readAll(eReadStream &src) {
         return;
     }
     if(src.evFileVersion() < 12 &&
-       qobject_cast<BlendEffectCollection*>(mTarget_k)) {
+       enve::cast<BlendEffectCollection>(mTarget_k)) {
         return;
     }
     if(src.evFileVersion() < 14 &&
-       qobject_cast<BlendEffectBoxShadow*>(mTarget_k)) {
+       enve::cast<BlendEffectBoxShadow>(mTarget_k)) {
         return;
     }
     for(const auto& child : mChildren) child->readAll(src);
