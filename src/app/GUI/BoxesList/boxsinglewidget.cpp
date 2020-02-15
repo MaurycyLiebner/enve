@@ -843,8 +843,8 @@ void BoxSingleWidget::switchBoxVisibleAction() {
     if(!mTarget) return;
     const auto target = mTarget->getTarget();
     if(!target) return;
-    if(target->SWT_isBoundingBox() || target->SWT_isSound()) {
-        static_cast<eBoxOrSound*>(target)->switchVisible();
+    if(const auto ebos = qobject_cast<eBoxOrSound*>(target)) {
+        ebos->switchVisible();
     } else if(const auto eEff = qobject_cast<eEffect*>(target)) {
         eEff->switchVisible();
     } else if(target->SWT_isGraphAnimator()) {
