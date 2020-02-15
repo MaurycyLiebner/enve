@@ -54,7 +54,8 @@ void eBoxOrSound::removeFromParent_k() {
 bool eBoxOrSound::isAncestor(const BoundingBox * const box) const {
     if(!mParentGroup) return false;
     if(mParentGroup == box) return true;
-    if(box->SWT_isContainerBox()) return mParentGroup->isAncestor(box);
+    if(enve_cast<const ContainerBox*>(box))
+        return mParentGroup->isAncestor(box);
     return false;
 }
 

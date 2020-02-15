@@ -39,7 +39,7 @@ void Property::prp_drawCanvasControls(
         const float invScale, const bool ctrlPressed) {
     if(mPointsHandler) {
         bool key;
-        if(const auto asAnim = enve::cast<Animator*>(this)) {
+        if(const auto asAnim = enve_cast<Animator*>(this)) {
             key = asAnim->anim_getKeyOnCurrentFrame();
         } else key = false;
         mPointsHandler->drawPoints(canvas, invScale, key, mode, ctrlPressed);

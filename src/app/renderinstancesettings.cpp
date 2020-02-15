@@ -196,8 +196,8 @@ void RenderInstanceSettings::read(eReadStream &src) {
                 box = BoundingBox::sGetBoxByReadId(targetReadId);
              if(!box && targetDocumentId != -1)
                  box = BoundingBox::sGetBoxByDocumentId(targetDocumentId);
-             if(box && box->SWT_isCanvas())
-                 setTargetCanvas(static_cast<Canvas*>(box), false);
+             if(const auto scene = enve_cast<Canvas*>(box))
+                 setTargetCanvas(scene, false);
         };
         mTargetCanvas.clear();
         canvasSetter();

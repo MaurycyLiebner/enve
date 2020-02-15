@@ -21,6 +21,7 @@
 #include "Boxes/textbox.h"
 #include "Boxes/rectangle.h"
 #include "Boxes/circle.h"
+#include "Boxes/smartvectorpath.h"
 #include "Private/document.h"
 #include "MovablePoints/pathpivot.h"
 
@@ -177,16 +178,16 @@ void Canvas::mouseDoubleClickEvent(const MouseEvent &e) {
             node->getHandler()->addAllPointsToSelection(adder, mCurrentMode);
         }
     } else if(mHoveredBox) {
-        if(mHoveredBox->SWT_isContainerBox() && !mHoveredBox->SWT_isLinkBox()) {
+        if(enve_cast<ContainerBox*>(mHoveredBox) && !mHoveredBox->SWT_isLinkBox()) {
             setCurrentBoxesGroup(static_cast<ContainerBox*>(mHoveredBox.data()));
             updateHovered(e);
         } else if((mCurrentMode == CanvasMode::boxTransform ||
                    mCurrentMode == CanvasMode::pointTransform) &&
-                  mHoveredBox->SWT_isTextBox()) {
+                  enve_cast<TextBox*>(mHoveredBox)) {
             e.fReleaseMouse();
             static_cast<TextBox*>(mHoveredBox.data())->openTextEditor(e.fWidget);
         } else if(mCurrentMode == CanvasMode::boxTransform &&
-                  mHoveredBox->SWT_isSmartVectorPath()) {
+                  enve_cast<SmartVectorPath*>(mHoveredBox)) {
             Document::sInstance->setCanvasMode(CanvasMode::pointTransform);
         }
     } else if(!mHoveredBox && !mHoveredPoint_d && !mHoveredNormalSegment.isValid()) {
@@ -206,14 +207,14 @@ void Canvas::sculptPress(const QPointF& pos, const qreal pressure) {
         newBox->setPath(SkPath().addCircle(0, 0, radius));
     } else {
         for(const auto& box : mSelectedBoxes) {
-            if(!box->SWT_isSculptPathBox()) continue;
-            const auto sculptBox = static_cast<SculptPathBox*>(box);
-            const auto transform = sculptBox->getTotalTransform().inverted();
-            const auto relBrush = SculptBrush(transform, absSculptBrush);
-            sculptBox->sculptStarted();
-            sculptBox->sculpt(mDocument.fSculptTarget,
-                              mDocument.fSculptMode,
-                              relBrush);
+            if(const auto sculptBox = enve_cast<SculptPathBox*>(box)) {
+                const auto transform = sculptBox->getTotalTransform().inverted();
+                const auto relBrush = SculptBrush(transform, absSculptBrush);
+                sculptBox->sculptStarted();
+                sculptBox->sculpt(mDocument.fSculptTarget,
+                                  mDocument.fSculptMode,
+                                  relBrush);
+            }
         }
     }
     if(mDocument.fSculptTarget == SculptTarget::position &&
@@ -225,22 +226,22 @@ void Canvas::sculptPress(const QPointF& pos, const qreal pressure) {
 void Canvas::sculptMove(const QPointF& pos, const qreal pressure) {
     mDocument.fSculptBrush.moveTo(pos, pressure);
     for(const auto& box : mSelectedBoxes) {
-        if(!box->SWT_isSculptPathBox()) continue;
-        const auto sculptBox = static_cast<SculptPathBox*>(box);
-        const auto transform = sculptBox->getTotalTransform();
-        const auto relBrush = SculptBrush(transform.inverted(),
-                                          mDocument.fSculptBrush);
-        sculptBox->sculpt(mDocument.fSculptTarget,
-                          mDocument.fSculptMode,
-                          relBrush);
+        if(const auto sculptBox = enve_cast<SculptPathBox*>(box)) {
+            const auto transform = sculptBox->getTotalTransform();
+            const auto relBrush = SculptBrush(transform.inverted(),
+                                              mDocument.fSculptBrush);
+            sculptBox->sculpt(mDocument.fSculptTarget,
+                              mDocument.fSculptMode,
+                              relBrush);
+        }
     }
 }
 
 void Canvas::sculptCancel() {
     for(const auto& box : mSelectedBoxes) {
-        if(!box->SWT_isSculptPathBox()) continue;
-        const auto sculptBox = static_cast<SculptPathBox*>(box);
-        sculptBox->sculptCanceled();
+        if(const auto sculptBox = enve_cast<SculptPathBox*>(box)) {
+            sculptBox->sculptCanceled();
+        }
     }
 }
 
@@ -248,9 +249,9 @@ void Canvas::sculptRelease(const QPointF& pos, const qreal pressure) {
     Q_UNUSED(pos)
     Q_UNUSED(pressure)
     for(const auto& box : mSelectedBoxes) {
-        if(!box->SWT_isSculptPathBox()) continue;
-        const auto sculptBox = static_cast<SculptPathBox*>(box);
-        sculptBox->sculptFinished();
+        if(const auto sculptBox = enve_cast<SculptPathBox*>(box)) {
+            sculptBox->sculptFinished();
+        }
     }
 }
 

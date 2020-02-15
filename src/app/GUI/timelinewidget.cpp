@@ -361,10 +361,10 @@ void TimelineWidget::writeState(eWriteStream &dst) const {
 void TimelineWidget::readState(eReadStream &src) {
     const int id = mBoxesListWidget->getId();
     BoundingBox::sForEveryReadBox([id, &src](BoundingBox* const box) {
-        if(!box->SWT_isCanvas()) return;
-        const auto scene = static_cast<Canvas*>(box);
-        const auto abs = scene->SWT_getAbstractionForWidget(id);
-        if(abs) abs->readAll(src);
+        if(const auto scene = enve_cast<Canvas*>(box)) {
+            const auto abs = scene->SWT_getAbstractionForWidget(id);
+            if(abs) abs->readAll(src);
+        }
     });
 
     int sceneReadId; src >> sceneReadId;
@@ -395,7 +395,7 @@ void TimelineWidget::readState(eReadStream &src) {
     if(!sceneBox && sceneDocumentId != -1)
         sceneBox = BoundingBox::sGetBoxByDocumentId(sceneDocumentId);
 
-    setCurrentScene(enve::cast<Canvas*>(sceneBox));
+    setCurrentScene(enve_cast<Canvas*>(sceneBox));
 
     mSearchLine->setText(search);
 

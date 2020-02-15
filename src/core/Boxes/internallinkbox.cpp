@@ -37,8 +37,7 @@ void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
     auto& conn = assignLinkTarget(linkTarget);
     mBoxTarget->setTarget(linkTarget);
     if(linkTarget) {
-        if(linkTarget->SWT_isVideoBox()) {
-            const auto vidBox = static_cast<VideoBox*>(linkTarget);
+        if(const auto vidBox = enve_cast<VideoBox*>(linkTarget)) {
             mSound = vidBox->sound()->createLink();
             conn << connect(this, &eBoxOrSound::parentChanged,
                             mSound.get(), &eBoxOrSound::setParentGroup);

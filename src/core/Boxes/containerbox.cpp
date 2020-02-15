@@ -69,8 +69,7 @@ bool ContainerBox::SWT_dropInto(const int index, const QMimeData * const data) {
         int dropId = index;
         for(int i = 0; i < bData->count(); i++) {
             const auto iObj = bData->getObject<eBoxOrSound>(i);
-            if(iObj->SWT_isContainerBox()) {
-                const auto box = static_cast<BoundingBox*>(iObj);
+            if(const auto box = enve_cast<ContainerBox*>(iObj)) {
                 if(box == this) continue;
                 if(isAncestor(box)) continue;
             }
@@ -202,9 +201,9 @@ void ContainerBox::anim_scaleTime(const int pivotAbsFrame, const qreal scale) {
 void ContainerBox::updateAllChildPaths(const UpdateReason reason,
                                        void (PathBox::*func)(const UpdateReason)) {
     for(const auto& box : mContainedBoxes) {
-        if(box->SWT_isPathBox()) {
+        if(enve_cast<PathBox*>(box)) {
             (static_cast<PathBox*>(box)->*func)(reason);
-        } else if(box->SWT_isContainerBox()) {
+        } else if(enve_cast<ContainerBox*>(box)) {
             static_cast<ContainerBox*>(box)->updateAllChildPaths(reason, func);
         }
     }
@@ -219,7 +218,7 @@ void ContainerBox::forcedMarginMeaningfulChange() {
     mForcedMargin.setBottom(qMax(inheritedMargin.bottom(), thisMargin.bottom()));
     mForcedMargin.setRight(qMax(inheritedMargin.right(), thisMargin.right()));
     for(const auto& box : mContainedBoxes) {
-        if(box->SWT_isContainerBox()) {
+        if(enve_cast<ContainerBox*>(box)) {
             const auto cont = static_cast<ContainerBox*>(box);
             cont->forcedMarginMeaningfulChange();
         } else box->planUpdate(UpdateReason::userChange);
@@ -368,10 +367,10 @@ QStringList ContainerBox::allContainedNamesStartingWith(
 void ContainerBox::allDescendantsStartingWith(
         const QString &text, QList<eBoxOrSound*> &result) {
     for(const auto &child : mContained) {
-        if(enve::cast<BlendEffectBoxShadow*>(child.get())) continue;
+        if(enve_cast<BlendEffectBoxShadow*>(child.get())) continue;
         const bool nameMatch = child->prp_getName().startsWith(text);
         if(nameMatch) result << child.get();
-        if(child->SWT_isContainerBox()) {
+        if(enve_cast<ContainerBox*>(child)) {
             const auto cont = static_cast<ContainerBox*>(child.get());
             cont->allDescendantsStartingWith(text, result);
         }
@@ -381,7 +380,7 @@ void ContainerBox::allDescendantsStartingWith(
 void ContainerBox::allContainedStartingWith(
         const QString &text, QList<eBoxOrSound*> &result) {
     for(const auto &child : mContained) {
-        if(enve::cast<BlendEffectBoxShadow*>(child.get())) continue;
+        if(enve_cast<BlendEffectBoxShadow*>(child.get())) continue;
         const bool nameMatch = child->prp_getName().startsWith(text);
         if(nameMatch) result << child.get();
     }
@@ -422,7 +421,7 @@ Property* ContainerBox::ca_findPropertyWithPath(
     const bool isLast = id == path.count() - 1;
     const auto& name = path.at(id);
     for(const auto &child : mContained) {
-        if(enve::cast<BlendEffectBoxShadow*>(child.get())) continue;
+        if(enve_cast<BlendEffectBoxShadow*>(child.get())) continue;
         const auto childName = child->prp_getName();
         if(childName == name) {
             if(isLast) return child.get();
@@ -555,7 +554,7 @@ bool ContainerBox::isCurrentGroup() const {
 void ContainerBox::updateContainedBoxes() {
     mContainedBoxes.clear();
     for(const auto& child : mContained) {
-        if(child->SWT_isBoundingBox()) {
+        if(enve_cast<BoundingBox*>(child)) {
             mContainedBoxes << static_cast<BoundingBox*>(child.get());
         }
     }
@@ -608,7 +607,7 @@ void ContainerBox::ungroupKeepTransform_k() {
 void ContainerBox::ungroupAbandomTransform_k() {
     for(int i = mContained.count() - 1; i >= 0; i--) {
         auto box = mContained.at(i);
-        if(enve::cast<BlendEffectBoxShadow*>(box.get())) continue;
+        if(enve_cast<BlendEffectBoxShadow*>(box.get())) continue;
         removeContained(box);
         mParentGroup->addContained(box);
     }
@@ -978,7 +977,7 @@ void ContainerBox::insertContained(
     }
     child->removeFromParent_k();
 
-    const bool isBoxShadow = enve::cast<BlendEffectBoxShadow*>(child.get());
+    const bool isBoxShadow = enve_cast<BlendEffectBoxShadow*>(child.get());
     if(!isBoxShadow) {
         const QString oldName = child->prp_getName();
         const auto parentScene = getParentScene();
@@ -997,7 +996,7 @@ void ContainerBox::insertContained(
         SWT_addChildAt(child.get(), containedIdToAbstractionId(id));
     }
 
-    if(child->SWT_isBoundingBox()) {
+    if(enve_cast<BoundingBox*>(child)) {
         updateContainedBoxes();
         const auto box = static_cast<BoundingBox*>(child.get());
         connCtx << connect(box, &Property::prp_absFrameRangeChanged,
@@ -1048,7 +1047,7 @@ void ContainerBox::removeAllContained() {
 
 void ContainerBox::removeContainedFromList(const int id) {
     const auto child = mContained.takeObjAt(id);
-    if(child->SWT_isContainerBox()) {
+    if(enve_cast<ContainerBox*>(child)) {
         const auto pScene = getParentScene();
         const auto group = static_cast<ContainerBox*>(child.get());
         if(group->isCurrentGroup() && pScene) {
@@ -1060,7 +1059,7 @@ void ContainerBox::removeContainedFromList(const int id) {
     child->setParentGroup(nullptr);
     updateContainedIds(id);
 
-    if(child->SWT_isBoundingBox()) {
+    if(enve_cast<BoundingBox*>(child)) {
         updateContainedBoxes();
         const auto box = static_cast<BoundingBox*>(child.get());
         const auto pLayer = mIsLayer ? this : box->getFirstParentLayer();
@@ -1079,7 +1078,7 @@ void ContainerBox::removeContainedFromList(const int id) {
 
     emit removedObject(id, child.get());
 
-    if(!SWT_isLinkBox() && !enve::cast<BlendEffectBoxShadow*>(child.get())) {
+    if(!SWT_isLinkBox() && !enve_cast<BlendEffectBoxShadow*>(child.get())) {
         prp_pushUndoRedoName("Remove " + child->prp_getName());
         UndoRedo ur;
         ur.fUndo = [this, id, child]() {
@@ -1172,7 +1171,7 @@ void ContainerBox::moveContainedInList(eBoxOrSound * const child,
     updateContainedIds(qMin(from, boundTo), qMax(from, boundTo));
     SWT_moveChildTo(child, containedIdToAbstractionId(boundTo));
 
-    if(child->SWT_isBoundingBox()) {
+    if(enve_cast<BoundingBox*>(child)) {
         updateContainedBoxes();
         updateUIElementsForBlendEffects();
         planUpdate(UpdateReason::userChange);
@@ -1243,16 +1242,16 @@ void ContainerBox::writeAllContained(eWriteStream& dst) const {
     dst << nWrite;
     for(int i = nCont - 1; i >= 0; i--) {
         const auto &child = mContained.at(i);
-        if(enve::cast<BlendEffectBoxShadow*>(child.get())) continue;
+        if(enve_cast<BlendEffectBoxShadow*>(child.get())) continue;
         const auto futureId = dst.planFuturePos();
-        const bool isBox = child->SWT_isBoundingBox();
+        const bool isBox = enve_cast<BoundingBox*>(child);
         dst << isBox;
         if(isBox) {
             const auto box = static_cast<BoundingBox*>(child.get());
             box->writeIdentifier(dst);
             box->writeBoundingBox(dst);
         } else {
-            Q_ASSERT(child->SWT_isSingleSound());
+            Q_ASSERT(enve_cast<SingleSound*>(child));
             child->prp_writeProperty(dst);
         }
         dst.assignFuturePos(futureId);

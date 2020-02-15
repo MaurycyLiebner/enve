@@ -86,9 +86,9 @@ qsptr<Animator> readIdCreateCProperty(eReadStream &src) {
 
 void writeCPropertyType(Animator * const obj, eWriteStream &dst) {
     PropertyType type;
-    if(enve::cast<QrealAnimator*>(obj)) {
+    if(enve_cast<QrealAnimator*>(obj)) {
         type = PropertyType::QrealAnimator;
-    } else if(obj->SWT_isQPointFAnimator()) {
+    } else if(enve_cast<QPointFAnimator*>(obj)) {
         type = PropertyType::QPointFAnimator;
     } else RuntimeThrow("Unsupported Type");
     dst.write(&type, sizeof(PropertyType));

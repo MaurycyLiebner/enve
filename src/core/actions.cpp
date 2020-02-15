@@ -712,8 +712,7 @@ eBoxOrSound *Actions::importFile(const QString &path,
         block.reset();
         target->prp_pushUndoRedoName("Import File");
         target->insertContained(insertId, result);
-        if(result->SWT_isBoundingBox()) {
-            const auto importedBox = static_cast<BoundingBox*>(result.get());
+        if(const auto importedBox = enve_cast<BoundingBox*>(result)) {
             importedBox->planCenterPivotPosition();
             importedBox->startPosTransform();
             importedBox->moveByAbs(relDropPos);

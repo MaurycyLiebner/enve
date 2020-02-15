@@ -58,8 +58,7 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(QString name,
 QrealAnimator* QrealAnimatorValueSlider::getQPointFAnimatorSibling() {
     if(mTarget) {
         const auto parent = mTarget->getParent();
-        if(parent && parent->SWT_isQPointFAnimator()) {
-            const auto qPA = static_cast<QPointFAnimator*>(parent);
+        if(const auto qPA = enve_cast<QPointFAnimator*>(parent)) {
             const bool thisX = qPA->getXAnimator() == mTarget;
             return thisX ? qPA->getYAnimator() :
                            qPA->getXAnimator();

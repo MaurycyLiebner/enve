@@ -36,6 +36,7 @@
 #include "Animators/transformanimator.h"
 #include "glhelpers.h"
 #include "Private/document.h"
+#include "Boxes/sculptpathbox.h"
 
 Canvas::Canvas(Document &document,
                const int canvasWidth, const int canvasHeight,
@@ -98,7 +99,7 @@ void Canvas::setCurrentGroupParentAsCurrentGroup() {
 
 bool Canvas::hasValidSculptTarget() const {
     for(const auto& box : mSelectedBoxes) {
-        if(box->SWT_isSculptPathBox()) return true;
+        if(enve_cast<SculptPathBox*>(box)) return true;
     }
     return false;
 }
@@ -269,7 +270,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
     canvas->restore();
 
-    if(!mCurrentContainer->SWT_isCanvas())
+    if(!enve_cast<Canvas*>(mCurrentContainer))
         mCurrentContainer->drawBoundingRect(canvas, invZoom);
     if(!mPaintTarget.isValid()) {
         const auto mods = QApplication::queryKeyboardModifiers();
@@ -514,7 +515,7 @@ void Canvas::updatePaintBox() {
     if(mCurrentMode != CanvasMode::paint) return;
     for(int i = mSelectedBoxes.count() - 1; i >= 0; i--) {
         const auto& iBox = mSelectedBoxes.at(i);
-        if(iBox->SWT_isPaintBox()) {
+        if(enve_cast<PaintBox*>(iBox)) {
             mPaintTarget.setPaintBox(static_cast<PaintBox*>(iBox));
             break;
         }

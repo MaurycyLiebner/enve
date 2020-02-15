@@ -59,7 +59,5 @@ SkPath BlendEffect::clipPath(const qreal relFrame) const {
 
 PathBox *BlendEffect::clipPathSource() const {
     const auto target = mClipPath->getTarget();
-    if(!target) return nullptr;
-    if(!target->SWT_isPathBox()) return nullptr;
-    return static_cast<PathBox*>(target);
+    return enve_cast<PathBox*>(target);
 }

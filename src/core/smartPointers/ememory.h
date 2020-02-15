@@ -21,6 +21,8 @@
 #include "stdselfref.h"
 #include "selfref.h"
 
+#define enve_cast enve::cast
+
 namespace enve {
     template <class T, typename... Args>
     inline auto make_shared(Args && ...args) {

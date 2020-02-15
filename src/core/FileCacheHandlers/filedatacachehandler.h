@@ -62,7 +62,7 @@ template<typename T>
 T *FileDataCacheHandler::sGetDataHandler(const QString &filePath) {
     for(const auto &handler : sDataHandlers) {
         if(handler->getFilePath() == filePath) {
-            const auto handlerT = enve::cast<T*>(handler);
+            const auto handlerT = enve_cast<T*>(handler);
             if(handlerT) return handlerT;
         }
     }

@@ -1425,8 +1425,8 @@ void FillSvgAttributes::apply(BoundingBox *box) const {
 
 void FillSvgAttributes::apply(BoundingBox * const box,
                               const PaintSetting::Target& target) const {
-    if(!box->SWT_isPathBox()) return;
-    const auto pathBox = static_cast<PathBox*>(box);
+    const auto pathBox = enve_cast<PathBox*>(box);
+    if(!pathBox) return;
     if(mPaintType == FLATPAINT) {
         ColorSetting colorSetting(ColorMode::rgb, ColorParameter::all,
                                   mColor.redF(), mColor.greenF(),
@@ -1480,8 +1480,7 @@ void StrokeSvgAttributes::apply(BoundingBox *box, const qreal scale) const {
 }
 
 void BoxSvgAttributes::apply(BoundingBox *box) const {
-    if(box->SWT_isPathBox()) {
-        const auto path = static_cast<PathBox*>(box);
+    if(const auto path = enve_cast<PathBox*>(box)) {
         const qreal m11 = mRelTransform.m11();
         const qreal m12 = mRelTransform.m12();
         const qreal m21 = mRelTransform.m21();
@@ -1491,8 +1490,7 @@ void BoxSvgAttributes::apply(BoundingBox *box) const {
         const qreal syAbs = qSqrt(m12*m12 + m22*m22);
         mStrokeAttributes.apply(path, (sxAbs + syAbs)*0.5);
         mFillAttributes.apply(path);
-        if(box->SWT_isTextBox()) {
-            const auto text = static_cast<TextBox*>(box);
+        if(const auto text = enve_cast<TextBox*>(box)) {
             text->setFont(mTextAttributes.getFont());
         }
     }

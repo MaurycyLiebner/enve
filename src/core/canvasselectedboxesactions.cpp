@@ -84,8 +84,7 @@ bool Canvas::anim_prevRelFrameWithKey(const int relFrame,
 
 void Canvas::shiftAllPointsForAllKeys(const int by) {
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isSmartVectorPath()) {
-//            const auto svp = static_cast<SmartVectorPath*>(box);
+        if(const auto svp = enve_cast<SmartVectorPath*>(box)) {
 //            svp->shiftAllPointsForAllKeys(by);
         }
     }
@@ -93,24 +92,24 @@ void Canvas::shiftAllPointsForAllKeys(const int by) {
 
 void Canvas::revertAllPointsForAllKeys() {
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isSmartVectorPath()) {
-            //static_cast<SmartVectorPath*>(box)->revertAllPointsForAllKeys();
+        if(const auto svp = enve_cast<SmartVectorPath*>(box)) {
+            //svp->revertAllPointsForAllKeys();
         }
     }
 }
 
 void Canvas::shiftAllPoints(const int by) {
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isSmartVectorPath()) {
-            //static_cast<SmartVectorPath*>(box)->shiftAllPoints(by);
+        if(const auto svp = enve_cast<SmartVectorPath*>(box)) {
+            //svp->shiftAllPoints(by);
         }
     }
 }
 
 void Canvas::revertAllPoints() {
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isSmartVectorPath()) {
-            //static_cast<SmartVectorPath*>(box)->revertAllPoints();
+        if(const auto svp = enve_cast<SmartVectorPath*>(box)) {
+            //svp->revertAllPoints();
         }
     }
 }
@@ -372,9 +371,9 @@ bool Canvas::isBoxSelectionEmpty() const {
 
 void Canvas::ungroupSelectedBoxes() {
     for(const auto &box : mSelectedBoxes) {
-        if(!box->SWT_isContainerBox()) continue;
-        const auto cont = static_cast<ContainerBox*>(box);
-        cont->ungroupAction_k();
+        if(const auto cont = enve_cast<ContainerBox*>(box)) {
+            cont->ungroupAction_k();
+        }
     }
 }
 
@@ -422,7 +421,9 @@ void Canvas::addBoxToSelection(BoundingBox * const box) {
     setCurrentBox(box);
 
     if(mCurrentMode == CanvasMode::paint) {
-        if(box->SWT_isPaintBox()) mPaintTarget.setPaintBox(static_cast<PaintBox*>(box));
+        if(const auto pBox = enve_cast<PaintBox*>(box)) {
+            mPaintTarget.setPaintBox(pBox);
+        }
     }
     emit selectedPaintSettingsChanged();
     emit objectSelectionChanged();
@@ -591,8 +592,7 @@ SmartVectorPath *Canvas::getPathResultingFromOperation(const SkPathOp& pathOp) {
     SkOpBuilder builder;
     bool first = true;
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isPathBox()) {
-            const auto pBox = static_cast<PathBox*>(box);
+        if(const auto pBox = enve_cast<PathBox*>(box)) {
             SkPath boxPath = pBox->getRelativePath();
             const QMatrix boxTrans = box->getRelativeTransformAtCurrentFrame();
             boxPath.transform(toSkMatrix(boxTrans));
@@ -656,8 +656,7 @@ void Canvas::selectedPathsBreakApart() {
     if(mSelectedBoxes.isEmpty()) return;
     QList<qsptr<SmartVectorPath>> created;
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isSmartVectorPath()) {
-            const auto path = static_cast<SmartVectorPath*>(box);
+        if(const auto path = enve_cast<SmartVectorPath*>(box)) {
             created << path->breakPathsApart_k();
         }
     }
@@ -679,8 +678,8 @@ void Canvas::selectedPathsCombine() {
     if(mSelectedBoxes.isEmpty()) return;
     SmartVectorPath *firstVectorPath = nullptr;
     for(const auto &box : mSelectedBoxes) {
-        if(box->SWT_isSmartVectorPath()) {
-            firstVectorPath = static_cast<SmartVectorPath*>(box);
+        if(const auto path = enve_cast<SmartVectorPath*>(box)) {
+            firstVectorPath = path;
             break;
         }
     }
@@ -695,8 +694,7 @@ void Canvas::selectedPathsCombine() {
     const QMatrix firstTranf = firstVectorPath->getTotalTransform();
     for(const auto &box : mSelectedBoxes) {
         if(box == firstVectorPath) continue;
-        if(box->SWT_isSmartVectorPath()) {
-            const auto boxPath = static_cast<SmartVectorPath*>(box);
+        if(const auto boxPath = enve_cast<SmartVectorPath*>(box)) {
             const QMatrix relTransf = boxPath->getTotalTransform()*
                     firstTranf.inverted();
             const auto srcVP = boxPath->getPathAnimator();

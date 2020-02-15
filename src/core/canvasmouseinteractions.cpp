@@ -281,7 +281,7 @@ void Canvas::handleMovePointMouseRelease(const MouseEvent &e) {
             }
         } else {
             mPressedBox = mCurrentContainer->getBoxAt(e.fPos);
-            if(!mPressedBox ? true : mPressedBox->SWT_isContainerBox()) {
+            if(mPressedBox ? !!enve_cast<ContainerBox*>(mPressedBox) : true) {
                 const auto pressedBox = getBoxAtFromAllDescendents(e.fPos);
                 if(!pressedBox) {
                     if(!e.shiftMod()) {
@@ -374,11 +374,10 @@ void Canvas::handleLeftMouseRelease(const MouseEvent &e) {
     } else if(mCurrentMode == CanvasMode::pathCreate) {
         handleAddSmartPointMouseRelease(e);
     } else if(mCurrentMode == CanvasMode::pickFillStroke) {
-        if(mPressedBox) {
+        if(mPressedBox && enve_cast<PathBox*>(mPressedBox)) {
             const auto srcPathBox = static_cast<PathBox*>(mPressedBox.data());
             for(const auto& box : mSelectedBoxes) {
-                if(box->SWT_isPathBox()) {
-                    const auto pathBox = static_cast<PathBox*>(box);
+                if(const auto pathBox = enve_cast<PathBox*>(box)) {
                     if(e.ctrlMod()) {
                         if(e.shiftMod()) {
                             pathBox->duplicateStrokeSettingsFrom(
@@ -459,7 +458,7 @@ void Canvas::handleMovePointMouseMove(const MouseEvent &e) {
                         SmartNodePoint* closestNode = nullptr;
                         qreal minDist = 10/e.fScale;
                         for(const auto& sBox : mSelectedBoxes) {
-                            if(!sBox->SWT_isSmartVectorPath()) continue;
+                            if(!enve_cast<SmartVectorPath*>(sBox)) continue;
                             const auto sPatBox = static_cast<SmartVectorPath*>(sBox);
                             const auto sAnim = sPatBox->getPathAnimator();
                             for(int i = 0; i < sAnim->ca_getNumberOfChildren(); i++) {

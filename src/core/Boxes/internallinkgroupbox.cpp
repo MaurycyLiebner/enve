@@ -28,7 +28,7 @@ InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget,
     ca_prependChild(mTransformAnimator.data(), mBoxTarget);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
             this, [this](BoundingBox* const target) {
-        const auto cbTarget = enve::cast<ContainerBox*>(target);
+        const auto cbTarget = enve_cast<ContainerBox*>(target);
         setLinkTarget(cbTarget);
     });
     mBoxTarget->setTarget(linkTarget);
@@ -47,15 +47,13 @@ void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
 
 void InternalLinkGroupBox::insertInnerLinkFor(
         const int id, eBoxOrSound* const obj) {
-    if(obj->SWT_isBoundingBox()) {
-        const auto box = static_cast<BoundingBox*>(obj);
+    if(const auto box = enve_cast<BoundingBox*>(obj)) {
         const auto newLink = box->createLink(true);
         insertContained(id, newLink);
-    } else if(obj->SWT_isSound()) {
-        const auto sound = static_cast<SingleSound*>(obj);
+    } else if(const auto sound = enve_cast<eSound*>(obj)) {
         const auto newLink = sound->createLink();
         insertContained(id, newLink);
-    } else if(const auto bebs = enve::cast<BlendEffectBoxShadow*>(obj)) {
+    } else if(const auto bebs = enve_cast<BlendEffectBoxShadow*>(obj)) {
         const auto newLink = bebs->createLink();
         insertContained(id, newLink);
     }

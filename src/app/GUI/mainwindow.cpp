@@ -1063,8 +1063,7 @@ SimpleBrushWrapper *MainWindow::getCurrentBrush() const {
 #include "Boxes/textbox.h"
 void MainWindow::setCurrentBox(BoundingBox *box) {
     mFillStrokeSettings->setCurrentBox(box);
-    if(box && box->SWT_isTextBox()) {
-        const auto txtBox = static_cast<TextBox*>(box);
+    if(const auto txtBox = enve_cast<TextBox*>(box)) {
         mFontWidget->setCurrentSettings(txtBox->getFontSize(),
                                         txtBox->getFontFamily(),
                                         txtBox->getFontStyle());

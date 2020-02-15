@@ -51,7 +51,7 @@ void BoxTargetWidget::dragEnterEvent(QDragEnterEvent *event) {
         auto boxMimeData = static_cast<const eMimeData*>(event->mimeData());
         BoundingBox *targetT = boxMimeData->getObjects<BoundingBox>().first();
         const auto tester = [](Property * prop) {
-            return prop->SWT_isBoundingBox();
+            return enve_cast<BoundingBox*>(prop);
         };
         const auto parentBox = mProperty->getFirstAncestor<BoundingBox>(tester);
         Q_ASSERT(parentBox);

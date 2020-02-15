@@ -528,8 +528,7 @@ void FillStrokeSettingsWidget::setCurrentBox(BoundingBox* const box) {
     if(box) {
         conn << connect(box, &BoundingBox::brushChanged,
                         this, &FillStrokeSettingsWidget::setDisplayedBrush);
-        if(box->SWT_isSculptPathBox()) {
-            const auto sculptBox = static_cast<SculptPathBox*>(box);
+        if(const auto sculptBox = enve_cast<SculptPathBox*>(box)) {
             setDisplayedBrush(sculptBox->brush());
             if(mTarget == PaintSetting::OUTLINE)
                 setBrushPaintType();

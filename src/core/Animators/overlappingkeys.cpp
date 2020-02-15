@@ -18,6 +18,7 @@
 
 #include "animator.h"
 #include "complexkey.h"
+#include "complexanimator.h"
 
 OverlappingKeys::OverlappingKeys(const stdsptr<Key> &key,
                                  Animator * const animator) :
@@ -80,7 +81,7 @@ void OverlappingKeys::merge() {
     }
     if(!target) target = mKeys.last().get();
 
-    if(mAnimator->SWT_isComplexAnimator()) {
+    if(enve_cast<ComplexAnimator*>(mAnimator)) {
         const auto cTarget = static_cast<ComplexKey*>(target);
         for(int i = 0; i < mKeys.count(); i++) {
             const auto& iKey = mKeys.at(i);

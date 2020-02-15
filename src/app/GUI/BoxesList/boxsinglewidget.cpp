@@ -94,18 +94,17 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mRecordButton->setPixmapChooser([this]() {
         if(!mTarget) return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(enve::cast<eBoxOrSound*>(target)) {
+        if(enve_cast<eBoxOrSound*>(target)) {
             return static_cast<QPixmap*>(nullptr);
-        } else if(target->SWT_isComplexAnimator()) {
-            const auto caTarget = static_cast<ComplexAnimator*>(target);
-            if(caTarget->anim_isRecording()) {
+        } else if(const auto asCAnim = enve_cast<ComplexAnimator*>(target)) {
+            if(asCAnim->anim_isRecording()) {
                 return BoxSingleWidget::ANIMATOR_RECORDING;
             } else {
-                if(caTarget->anim_isDescendantRecording()) {
+                if(asCAnim->anim_isDescendantRecording()) {
                     return BoxSingleWidget::ANIMATOR_DESCENDANT_RECORDING;
                 } else return BoxSingleWidget::ANIMATOR_NOT_RECORDING;
             }
-        } else if(const auto asAnim = enve::cast<Animator*>(target)) {
+        } else if(const auto asAnim = enve_cast<Animator*>(target)) {
             if(asAnim->anim_isRecording()) {
                 return BoxSingleWidget::ANIMATOR_RECORDING;
             } else return BoxSingleWidget::ANIMATOR_NOT_RECORDING;
@@ -122,7 +121,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
         if(mTarget->childrenCount() == 0)
             return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(enve::cast<eBoxOrSound*>(target)) {
+        if(enve_cast<eBoxOrSound*>(target)) {
             if(mTarget->contentVisible()) {
                 return BoxSingleWidget::BOX_CHILDREN_VISIBLE;
             } else return BoxSingleWidget::BOX_CHILDREN_HIDDEN;
@@ -141,19 +140,19 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mVisibleButton->setPixmapChooser([this]() {
         if(!mTarget) return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(const auto ebos = enve::cast<eBoxOrSound*>(target)) {
-            if(target->SWT_isSound()) {
+        if(const auto ebos = enve_cast<eBoxOrSound*>(target)) {
+            if(enve_cast<eSound*>(target)) {
                 if(ebos->isVisible()) {
                     return BoxSingleWidget::UNMUTED_PIXMAP;
                 } else return BoxSingleWidget::MUTED_PIXMAP;
             } else if(ebos->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
             } else return BoxSingleWidget::INVISIBLE_PIXMAP;
-        } else if(const auto eEff = enve::cast<eEffect*>(target)) {
+        } else if(const auto eEff = enve_cast<eEffect*>(target)) {
             if(eEff->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
             } else return BoxSingleWidget::INVISIBLE_PIXMAP;
-        } else if(target->SWT_isGraphAnimator()) {
+        } else if(enve_cast<GraphAnimator*>(target)) {
             const auto bsvt = static_cast<BoxScroller*>(mParent);
             const auto keysView = bsvt->getKeysView();
             if(keysView) return BoxSingleWidget::GRAPH_PROPERTY;
@@ -168,8 +167,8 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mLockedButton->setPixmapChooser([this]() {
         if(!mTarget) return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(target->SWT_isBoundingBox()) {
-            if(static_cast<BoundingBox*>(target)->isLocked()) {
+        if(const auto box = enve_cast<BoundingBox*>(target)) {
+            if(box->isLocked()) {
                 return BoxSingleWidget::LOCKED_PIXMAP;
             } else return BoxSingleWidget::UNLOCKED_PIXMAP;
         } else return static_cast<QPixmap*>(nullptr);
@@ -184,7 +183,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mHwSupportButton->setPixmapChooser([this]() {
         if(!mTarget) return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(const auto rEff = enve::cast<RasterEffect*>(target)) {
+        if(const auto rEff = enve_cast<RasterEffect*>(target)) {
             if(rEff->instanceHwSupport() == HardwareSupport::cpuOnly) {
                 return BoxSingleWidget::C_PIXMAP;
             } else if(rEff->instanceHwSupport() == HardwareSupport::gpuOnly) {
@@ -197,7 +196,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     connect(mHwSupportButton, &BoxesListActionButton::pressed, this, [this]() {
         if(!mTarget) return;
         const auto target = mTarget->getTarget();
-        if(const auto rEff = enve::cast<RasterEffect*>(target)) {
+        if(const auto rEff = enve_cast<RasterEffect*>(target)) {
             rEff->switchInstanceHwSupport();
             Document::sInstance->actionFinished();
         }
@@ -215,8 +214,8 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
         ContainerBox* targetGroup = nullptr;
         if(target->SWT_isGroupBox()) {
             targetGroup = static_cast<ContainerBox*>(target);
-        } else if(enve::cast<RasterEffectCollection*>(target) ||
-                  enve::cast<BlendEffectCollection*>(target)) {
+        } else if(enve_cast<RasterEffectCollection*>(target) ||
+                  enve_cast<BlendEffectCollection*>(target)) {
             const auto pTarget = static_cast<Property*>(target);
             const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
             if(parentBox && parentBox->SWT_isGroupBox()) {
@@ -237,8 +236,8 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
         ContainerBox* targetGroup = nullptr;
         if(target->SWT_isGroupBox()) {
             targetGroup = static_cast<ContainerBox*>(target);
-        } else if(enve::cast<RasterEffectCollection*>(target) ||
-                  enve::cast<BlendEffectCollection*>(target)) {
+        } else if(enve_cast<RasterEffectCollection*>(target) ||
+                  enve_cast<BlendEffectCollection*>(target)) {
             const auto pTarget = static_cast<Property*>(target);
             const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
             if(parentBox && parentBox->SWT_isGroupBox()) {
@@ -268,10 +267,10 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
             this, [this](const int id) {
         if(!mTarget) return;
         const auto target = mTarget->getTarget();
-        if(!target->SWT_isComboBoxProperty()) return;
-        const auto comboBoxProperty = static_cast<ComboBoxProperty*>(target);
-        comboBoxProperty->setCurrentValue(id);
-        Document::sInstance->actionFinished();
+        if(const auto combo = enve_cast<ComboBoxProperty*>(target)) {
+            combo->setCurrentValue(id);
+            Document::sInstance->actionFinished();
+        }
     });
     mMainLayout->addWidget(mPropertyComboBox);
 
@@ -327,8 +326,7 @@ void BoxSingleWidget::setCompositionMode(const int id) {
     if(!mTarget) return;
     const auto target = mTarget->getTarget();
 
-    if(target->SWT_isBoundingBox()) {
-        const auto boxTarget = static_cast<BoundingBox*>(target);
+    if(const auto boxTarget = enve_cast<BoundingBox*>(target)) {
         const int modeId = mBlendModeCombo->itemData(id).toInt();
         const auto mode = static_cast<SkBlendMode>(modeId);
         boxTarget->setBlendModeSk(mode);
@@ -340,8 +338,7 @@ void BoxSingleWidget::setPathCompositionMode(const int id) {
     if(!mTarget) return;
     const auto target = mTarget->getTarget();
 
-    if(target->SWT_isSmartPathAnimator()) {
-        const auto pAnim = static_cast<SmartPathAnimator*>(target);
+    if(const auto pAnim = enve_cast<SmartPathAnimator*>(target)) {
         pAnim->setMode(static_cast<SmartPathAnimator::Mode>(id));
     }
     Document::sInstance->actionFinished();
@@ -351,11 +348,9 @@ void BoxSingleWidget::setFillType(const int id) {
     if(!mTarget) return;
     const auto target = mTarget->getTarget();
 
-    if(target->SWT_isSmartPathCollection()) {
-        const auto pAnim = static_cast<SmartPathCollection*>(target);
+    if(const auto pAnim = enve_cast<SmartPathCollection*>(target)) {
         pAnim->setFillType(static_cast<SkPathFillType>(id));
-    } else if(target->SWT_isSculptPathCollection()) {
-        const auto pAnim = static_cast<SculptPathCollection*>(target);
+    } else if(const auto pAnim = enve_cast<SculptPathCollection*>(target)) {
         pAnim->setFillType(static_cast<SkPathFillType>(id));
     }
     Document::sInstance->actionFinished();
@@ -364,11 +359,12 @@ void BoxSingleWidget::setFillType(const int id) {
 ColorAnimator *BoxSingleWidget::getColorTarget() const {
     const auto swt = mTarget->getTarget();
     ColorAnimator * color = nullptr;
-    if(swt->SWT_isColorAnimator()) {
-        color = static_cast<ColorAnimator*>(mTarget->getTarget());
-    } else if(swt->SWT_isComplexAnimator()) {
-        const auto ca = static_cast<ComplexAnimator*>(mTarget->getTarget());
-        color = static_cast<ColorAnimator*>(ca->ca_getGUIProperty());
+    if(const auto ca = enve_cast<ComplexAnimator*>(swt)) {
+        color = enve_cast<ColorAnimator*>(swt);
+        if(!color) {
+            const auto guiProp = ca->ca_getGUIProperty();
+            color = enve_cast<ColorAnimator*>(guiProp);
+        }
     }
     return color;
 }
@@ -384,48 +380,56 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mTargetConn.clear();
     SingleWidget::setTargetAbstraction(abs);
     if(!abs) return;
-    auto target = abs->getTarget();
-    mTargetConn << connect(target, &SingleWidgetTarget::SWT_changedDisabled,
+    const auto target = abs->getTarget();
+    const auto prop = enve_cast<Property*>(target);
+    if(!prop) return;
+    mTargetConn << connect(prop, &SingleWidgetTarget::SWT_changedDisabled,
                            this, qOverload<>(&QWidget::update));
-    mContentButton->setVisible(target->SWT_isComplexAnimator());
-    mRecordButton->setVisible(enve::cast<Animator*>(target) &&
-                              !enve::cast<eBoxOrSound*>(target));
-    mVisibleButton->setVisible(enve::cast<eBoxOrSound*>(target) ||
-                               enve::cast<eEffect*>(target) ||
-                               target->SWT_isGraphAnimator());
-    mLockedButton->setVisible(target->SWT_isBoundingBox());
-    mHwSupportButton->setVisible(enve::cast<RasterEffect*>(target));
+
+    const auto boolProperty = enve_cast<BoolProperty*>(prop);
+    const auto boolPropertyContainer = enve_cast<BoolPropertyContainer*>(prop);
+    const auto boxTargetProperty = enve_cast<BoxTargetProperty*>(prop);
+    const auto animator = enve_cast<Animator*>(prop);
+    const auto graphAnimator = enve_cast<GraphAnimator*>(prop);
+    const auto complexAnimator = enve_cast<ComplexAnimator*>(prop);
+    const auto eboxOrSound = enve_cast<eBoxOrSound*>(prop);
+    const auto eeffect = enve_cast<eEffect*>(prop);
+    const auto rasterEffect = enve_cast<RasterEffect*>(prop);
+    const auto boundingBox = enve_cast<BoundingBox*>(prop);
+
+    mContentButton->setVisible(complexAnimator);
+    mRecordButton->setVisible(animator && !eboxOrSound);
+    mVisibleButton->setVisible(eboxOrSound || eeffect || graphAnimator);
+    mLockedButton->setVisible(boundingBox);
+    mHwSupportButton->setVisible(rasterEffect);
     {
         ContainerBox* targetGroup = nullptr;
-        if(target->SWT_isGroupBox()) {
-            targetGroup = static_cast<ContainerBox*>(target);
+        if(prop->SWT_isGroupBox()) {
+            targetGroup = static_cast<ContainerBox*>(prop);
             mTargetConn << connect(targetGroup,
                                    &ContainerBox::switchedGroupLayer,
                                    this, [this](const eBoxType type) {
                 mBlendModeCombo->setEnabled(type == eBoxType::layer);
             });
-        } else if(enve::cast<RasterEffectCollection*>(target) ||
-                  enve::cast<BlendEffectCollection*>(target)) {
-            const auto pTarget = static_cast<Property*>(target);
-            const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
+        } else if(enve_cast<RasterEffectCollection*>(prop) ||
+                  enve_cast<BlendEffectCollection*>(prop)) {
+            const auto parentBox = prop->getFirstAncestor<BoundingBox>();
             if(parentBox && parentBox->SWT_isGroupBox()) {
                 targetGroup = static_cast<ContainerBox*>(parentBox);
             }
         }
         mPromoteToLayerButton->setVisible(targetGroup);
         if(targetGroup) {
-            mTargetConn << connect(targetGroup,
-                                   &ContainerBox::switchedGroupLayer,
+            mTargetConn << connect(targetGroup, &ContainerBox::switchedGroupLayer,
                                    this, [this](const eBoxType type) {
                 mPromoteToLayerButton->setVisible(type == eBoxType::group);
             });
         }
     }
-    mBoxTargetWidget->setVisible(target->SWT_isBoxTargetProperty());
-    mCheckBox->setVisible(target->SWT_isBoolProperty() ||
-                          target->SWT_isBoolPropertyContainer());
+    mBoxTargetWidget->setVisible(boxTargetProperty);
+    mCheckBox->setVisible(boolProperty || boolPropertyContainer);
 
-    mPropertyComboBox->setVisible(target->SWT_isComboBoxProperty());
+    mPropertyComboBox->setVisible(enve_cast<ComboBoxProperty*>(prop));
 
     mPathBlendModeVisible = false;
     mBlendModeVisible = false;
@@ -440,54 +444,49 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     bool secondValueSliderVisible = false;
     bool colorButtonVisible = false;
 
-    if(target->SWT_isBoundingBox()) {
-        const auto boxPtr = static_cast<BoundingBox*>(target);
-
+    if(boundingBox) {
         mBlendModeVisible = true;
-        mBlendModeCombo->setCurrentText(SkBlendMode_Name(boxPtr->getBlendMode()));
-        mBlendModeCombo->setEnabled(!target->SWT_isGroupBox());
-        mTargetConn << connect(boxPtr, &BoundingBox::blendModeChanged,
+        const auto blendName = SkBlendMode_Name(boundingBox->getBlendMode());
+        mBlendModeCombo->setCurrentText(blendName);
+        mBlendModeCombo->setEnabled(!prop->SWT_isGroupBox());
+        mTargetConn << connect(boundingBox, &BoundingBox::blendModeChanged,
                                this, [this](const SkBlendMode mode) {
             mBlendModeCombo->setCurrentText(SkBlendMode_Name(mode));
         });
-    } else if(target->SWT_isSingleSound()) {
-    } else if(target->SWT_isBoolProperty()) {
-        const auto bTarget = static_cast<BoolProperty*>(target);
-        mCheckBox->setTarget(bTarget);
-        mTargetConn << connect(bTarget, &BoolProperty::valueChanged,
+    } else if(enve_cast<SingleSound*>(prop)) {
+    } else if(boolProperty) {
+        mCheckBox->setTarget(boolProperty);
+        mTargetConn << connect(boolProperty, &BoolProperty::valueChanged,
                                this, [this]() { mCheckBox->update(); });
-    } else if(target->SWT_isBoolPropertyContainer()) {
-        const auto bTarget = static_cast<BoolPropertyContainer*>(target);
-        mCheckBox->setTarget(bTarget);
-        mTargetConn << connect(bTarget, &BoolPropertyContainer::valueChanged,
+    } else if(boolPropertyContainer) {
+        mCheckBox->setTarget(boolPropertyContainer);
+        mTargetConn << connect(boolPropertyContainer,
+                               &BoolPropertyContainer::valueChanged,
                                this, [this]() { mCheckBox->update(); });
-    } else if(target->SWT_isComboBoxProperty()) {
-        const auto comboBoxProperty = static_cast<ComboBoxProperty*>(target);
+    } else if(const auto combo = enve_cast<ComboBoxProperty*>(prop)) {
         mPropertyComboBox->clear();
-        mPropertyComboBox->addItems(comboBoxProperty->getValueNames());
-        mPropertyComboBox->setCurrentIndex(comboBoxProperty->getCurrentValue());
-        mTargetConn << connect(comboBoxProperty, &ComboBoxProperty::valueChanged,
+        mPropertyComboBox->addItems(combo->getValueNames());
+        mPropertyComboBox->setCurrentIndex(combo->getCurrentValue());
+        mTargetConn << connect(combo, &ComboBoxProperty::valueChanged,
                                this, [this](const int id) {
             mPropertyComboBox->setCurrentIndex(id);
         });
-    } else if(const auto qra = enve::cast<QrealAnimator*>(target)) {
+    } else if(const auto qra = enve_cast<QrealAnimator*>(prop)) {
         mValueSlider->setTarget(qra);
         valueSliderVisible = true;
         mValueSlider->setIsLeftSlider(false);
-    } else if(target->SWT_isComplexAnimator()) {
-        if(target->SWT_isColorAnimator()) {
+    } else if(complexAnimator) {
+        if(const auto col = enve_cast<ColorAnimator*>(prop)) {
             colorButtonVisible = true;
-            mColorButton->setColorTarget(static_cast<ColorAnimator*>(target));
-        } else if(target->SWT_isSmartPathCollection()) {
-            const auto coll = static_cast<SmartPathCollection*>(target);
+            mColorButton->setColorTarget(col);
+        } else if(const auto coll = enve_cast<SmartPathCollection*>(prop)) {
             mFillTypeVisible = true;
             mFillTypeCombo->setCurrentIndex(static_cast<int>(coll->getFillType()));
             mTargetConn << connect(coll, &SmartPathCollection::fillTypeChanged,
                                    this, [this](const SkPathFillType type) {
                 mFillTypeCombo->setCurrentIndex(static_cast<int>(type));
             });
-        } else if(target->SWT_isSculptPathCollection()) {
-            const auto coll = static_cast<SculptPathCollection*>(target);
+        } else if(const auto coll = enve_cast<SculptPathCollection*>(prop)) {
             mFillTypeVisible = true;
             mFillTypeCombo->setCurrentIndex(static_cast<int>(coll->getFillType()));
             mTargetConn << connect(coll, &SculptPathCollection::fillTypeChanged,
@@ -495,31 +494,29 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                 mFillTypeCombo->setCurrentIndex(static_cast<int>(type));
             });
         }
-        if(target->SWT_isComplexAnimator() && !abs->contentVisible()) {
-            if(target->SWT_isQPointFAnimator()) {
+        if(complexAnimator && !abs->contentVisible()) {
+            if(enve_cast<QPointFAnimator*>(prop)) {
                 updateValueSlidersForQPointFAnimator();
                 valueSliderVisible = mValueSlider->isVisible();
                 secondValueSliderVisible = mSecondValueSlider->isVisible();
             } else {
-                const auto ca_target = static_cast<ComplexAnimator*>(target);
-                Property * const guiProp = ca_target->ca_getGUIProperty();
+                Property * const guiProp = complexAnimator->ca_getGUIProperty();
                 if(guiProp) {
-                    if(const auto qra = enve::cast<QrealAnimator*>(guiProp)) {
+                    if(const auto qra = enve_cast<QrealAnimator*>(guiProp)) {
                         valueSliderVisible = true;
                         mValueSlider->setTarget(qra);
                         mValueSlider->setIsLeftSlider(false);
                         mSecondValueSlider->setTarget(nullptr);
-                    } else if(guiProp->SWT_isColorAnimator()) {
+                    } else if(enve_cast<ColorAnimator*>(guiProp)) {
                         mColorButton->setColorTarget(static_cast<ColorAnimator*>(guiProp));
                         colorButtonVisible = true;
                     }
                 }
             }
         }
-    } else if(target->SWT_isBoxTargetProperty()) {
-        mBoxTargetWidget->setTargetProperty(static_cast<BoxTargetProperty*>(target));
-    } else if(target->SWT_isSmartPathAnimator()) {
-        const auto path = static_cast<SmartPathAnimator*>(target);
+    } else if(boxTargetProperty) {
+        mBoxTargetWidget->setTargetProperty(boxTargetProperty);
+    } else if(const auto path = enve_cast<SmartPathAnimator*>(prop)) {
         mPathBlendModeVisible = true;
         mPathBlendModeCombo->setCurrentIndex(static_cast<int>(path->getMode()));
         mTargetConn << connect(path, &SmartPathAnimator::pathBlendModeChagned,
@@ -528,21 +525,21 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         });
     }
 
-    if(const auto asAnim = enve::cast<Animator*>(target)) {
-        mTargetConn << connect(asAnim, &Animator::anim_isRecordingChanged,
+    if(animator) {
+        mTargetConn << connect(animator, &Animator::anim_isRecordingChanged,
                                this, [this]() { mRecordButton->update(); });
     }
-    if(const auto eEff = enve::cast<eEffect*>(target)) {
-        if(const auto rEff = enve::cast<RasterEffect*>(target)) {
-            mTargetConn << connect(rEff, &RasterEffect::hardwareSupportChanged,
+    if(eeffect) {
+        if(rasterEffect) {
+            mTargetConn << connect(rasterEffect, &RasterEffect::hardwareSupportChanged,
                                    this, [this]() { mHwSupportButton->update(); });
         }
 
-        mTargetConn << connect(eEff, &eEffect::effectVisibilityChanged,
+        mTargetConn << connect(eeffect, &eEffect::effectVisibilityChanged,
                                this, [this]() { mVisibleButton->update(); });
     }
-    if(target->SWT_isBoundingBox() || target->SWT_isSound()) {
-        const auto ptr = static_cast<eBoxOrSound*>(target);
+    if(boundingBox || enve_cast<eSound*>(prop)) {
+        const auto ptr = static_cast<eBoxOrSound*>(prop);
         mTargetConn << connect(ptr, &eBoxOrSound::visibilityChanged,
                                this, [this]() { mVisibleButton->update(); });
         mTargetConn << connect(ptr, &eBoxOrSound::selectionChanged,
@@ -550,10 +547,9 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         mTargetConn << connect(ptr, &eBoxOrSound::lockedChanged,
                                this, [this]() { mLockedButton->update(); });
     }
-    if(!target->SWT_isBoundingBox() && !target->SWT_isSingleSound()) {
-        const auto prop = static_cast<Property*>(target);
+    if(!boundingBox && !enve_cast<SingleSound*>(prop)) {
         mTargetConn << connect(prop, &Property::prp_selectionChanged,
-                this, qOverload<>(&QWidget::update));
+                               this, qOverload<>(&QWidget::update));
     }
 
     mValueSlider->setVisible(valueSliderVisible);
@@ -620,10 +616,9 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
         setSelected(true);
         QMenu menu(this);
 
-        if(target->SWT_isProperty()) {
-            const auto pTarget = static_cast<Property*>(target);
+        if(const auto pTarget = enve_cast<Property*>(target)) {
             const bool shiftPressed = event->modifiers() & Qt::ShiftModifier;
-            if(target->SWT_isBoundingBox() || target->SWT_isSingleSound()) {
+            if(enve_cast<BoundingBox*>(target) || enve_cast<SingleSound*>(target)) {
                 const auto box = static_cast<eBoxOrSound*>(target);
                 if(!box->isSelected()) box->selectionChangeTriggered(shiftPressed);
             } else {
@@ -675,12 +670,11 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
     if(pointToLen(event->pos() - mDragStartPos) > MIN_WIDGET_DIM/2) return;
     const bool shiftPressed = event->modifiers() & Qt::ShiftModifier;
     const auto target = mTarget->getTarget();
-    if(target->SWT_isBoundingBox() || target->SWT_isSingleSound()) {
+    if(enve_cast<BoundingBox*>(target) || enve_cast<SingleSound*>(target)) {
         const auto boxTarget = static_cast<eBoxOrSound*>(target);
         boxTarget->selectionChangeTriggered(shiftPressed);
         Document::sInstance->actionFinished();
-    } else if(target->SWT_isProperty()) {
-        const auto pTarget = static_cast<Property*>(target);
+    } else if(const auto pTarget = enve_cast<Property*>(target)) {
         pTarget->prp_selectionChangeTriggered(shiftPressed);
     }
 }
@@ -697,7 +691,7 @@ void BoxSingleWidget::prp_drawTimelineControls(QPainter * const p,
                                const FrameRange &viewedFrames) {
     if(isHidden() || !mTarget) return;
     const auto target = mTarget->getTarget();
-    if(const auto asAnim = enve::cast<Animator*>(target)) {
+    if(const auto asAnim = enve_cast<Animator*>(target)) {
         asAnim->prp_drawTimelineControls(
                     p, pixelsPerFrame, viewedFrames, MIN_WIDGET_DIM);
     }
@@ -708,7 +702,7 @@ Key* BoxSingleWidget::getKeyAtPos(const int pressX,
                                   const int minViewedFrame) {
     if(isHidden() || !mTarget) return nullptr;
     const auto target = mTarget->getTarget();
-    if(const auto asAnim = enve::cast<Animator*>(target)) {
+    if(const auto asAnim = enve_cast<Animator*>(target)) {
         return asAnim->anim_getKeyAtPos(pressX, minViewedFrame,
                                         pixelsPerFrame, KEY_RECT_SIZE);
     }
@@ -721,7 +715,7 @@ TimelineMovable* BoxSingleWidget::getRectangleMovableAtPos(
                             const int minViewedFrame) {
     if(isHidden() || !mTarget) return nullptr;
     const auto target = mTarget->getTarget();
-    if(const auto asAnim = enve::cast<Animator*>(target)) {
+    if(const auto asAnim = enve_cast<Animator*>(target)) {
         return asAnim->anim_getTimelineMovable(
                     pressX, minViewedFrame, pixelsPerFrame);
     }
@@ -733,7 +727,7 @@ void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
                                     QList<Key*>& listKeys) {
     if(isHidden() || !mTarget) return;
     const auto target = mTarget->getTarget();
-    if(const auto asAnim = enve::cast<Animator*>(target)) {
+    if(const auto asAnim = enve_cast<Animator*>(target)) {
         asAnim->anim_getKeysInRect(selectionRect, pixelsPerFrame,
                                    listKeys, KEY_RECT_SIZE);
     }
@@ -742,39 +736,39 @@ void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
 void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(!mTarget) return;
     QPainter p(this);
-    auto target = mTarget->getTarget();
-    if(target->SWT_isDisabled()) p.setOpacity(.5);
+    const auto target = mTarget->getTarget();
+    const auto prop = enve_cast<Property*>(target);
+    if(!prop) return;
+    if(prop->SWT_isDisabled()) p.setOpacity(.5);
 
     int nameX = mFillWidget->x();
-    const QString name = static_cast<Property*>(target)->prp_getName();
-    if(!target->SWT_isBoundingBox() && !target->SWT_isSingleSound()) {
-        const auto prop = static_cast<Property*>(target);
+
+    const auto bsTarget = enve_cast<eBoxOrSound*>(prop);
+    if(!bsTarget) {
         if(prop->prp_isSelected()) {
             p.fillRect(mFillWidget->geometry(), QColor(0, 0, 0, 55));
         }
     }
-    const bool ss = target->SWT_isSingleSound();
-    if(ss || target->SWT_isBoundingBox()) {
-        const auto bsTarget = static_cast<eBoxOrSound*>(target);
-
+    if(bsTarget) {
         nameX += MIN_WIDGET_DIM/4;
+        const bool ss = enve_cast<SingleSound*>(prop);
+        if(ss || enve_cast<BoundingBox*>(prop)) {
+            if(ss) p.fillRect(rect(), QColor(0, 125, 255, 50));
+            else   p.fillRect(rect(), QColor(0, 0, 0, 50));
 
-        if(ss) p.fillRect(rect(), QColor(0, 125, 255, 50));
-        else   p.fillRect(rect(), QColor(0, 0, 0, 50));
-
-        if(bsTarget->isSelected()) {
-            if(ss) p.fillRect(mFillWidget->geometry(), QColor(125, 200, 255));
-            else   p.fillRect(mFillWidget->geometry(), QColor(180, 180, 180));
-            p.setPen(Qt::black);
-        } else {
-            p.setPen(Qt::white);
+            if(bsTarget->isSelected()) {
+                if(ss) p.fillRect(mFillWidget->geometry(), QColor(125, 200, 255));
+                else   p.fillRect(mFillWidget->geometry(), QColor(180, 180, 180));
+                p.setPen(Qt::black);
+            } else {
+                p.setPen(Qt::white);
+            }
+        } else if(enve_cast<BlendEffectBoxShadow*>(prop)) {
+            p.fillRect(rect(), QColor(0, 255, 125, 50));
+            nameX += MIN_WIDGET_DIM;
         }
-    } else if(enve::cast<BlendEffectBoxShadow*>(target)) {
-        p.fillRect(rect(), QColor(0, 255, 125, 50));
-        nameX += MIN_WIDGET_DIM + MIN_WIDGET_DIM/4;
-    } else if(!target->SWT_isComplexAnimator()) {
-        if(target->SWT_isGraphAnimator()) {
-            const auto graphAnim = static_cast<GraphAnimator*>(target);
+    } else if(!enve_cast<ComplexAnimator*>(prop)) {
+        if(const auto graphAnim = enve_cast<GraphAnimator*>(prop)) {
             const auto bswvp = static_cast<BoxScroller*>(mParent);
             const auto keysView = bswvp->getKeysView();
             if(keysView) {
@@ -790,8 +784,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                     p.fillRect(visRect.adjusted(adj, adj, -adj, -adj), color);
                 }
             }
-            if(target->SWT_isSmartPathAnimator()) {
-                const auto path = static_cast<SmartPathAnimator*>(target);
+            if(const auto path = enve_cast<SmartPathAnimator*>(prop)) {
                 const QRect colRect(QPoint{nameX, 0},
                                     QSize{MIN_WIDGET_DIM, MIN_WIDGET_DIM});
                 p.setPen(Qt::NoPen);
@@ -805,13 +798,14 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             }
         } else nameX += MIN_WIDGET_DIM;
 
-        if(!enve::cast<Animator*>(target)) nameX += MIN_WIDGET_DIM;
+        if(!enve_cast<Animator*>(prop)) nameX += MIN_WIDGET_DIM;
         p.setPen(Qt::white);
-    } else { //if(target->SWT_isComplexAnimator()) {
+    } else { //if(enve_cast<ComplexAnimator*>(target)) {
         p.setPen(Qt::white);
     }
 
     const QRect textRect(nameX, 0, width() - nameX - MIN_WIDGET_DIM, MIN_WIDGET_DIM);
+    const QString& name = prop->prp_getName();
     p.drawText(textRect, name, QTextOption(Qt::AlignVCenter));
     if(mSelected) {
         p.setBrush(Qt::NoBrush);
@@ -832,7 +826,7 @@ void BoxSingleWidget::switchRecordingAction() {
     if(!mTarget) return;
     const auto target = mTarget->getTarget();
     if(!target) return;
-    if(const auto asAnim = enve::cast<Animator*>(target)) {
+    if(const auto asAnim = enve_cast<Animator*>(target)) {
         asAnim->anim_switchRecording();
         Document::sInstance->actionFinished();
         update();
@@ -843,19 +837,18 @@ void BoxSingleWidget::switchBoxVisibleAction() {
     if(!mTarget) return;
     const auto target = mTarget->getTarget();
     if(!target) return;
-    if(const auto ebos = enve::cast<eBoxOrSound*>(target)) {
+    if(const auto ebos = enve_cast<eBoxOrSound*>(target)) {
         ebos->switchVisible();
-    } else if(const auto eEff = enve::cast<eEffect*>(target)) {
+    } else if(const auto eEff = enve_cast<eEffect*>(target)) {
         eEff->switchVisible();
-    } else if(target->SWT_isGraphAnimator()) {
+    } else if(const auto graph = enve_cast<GraphAnimator*>(target)) {
         const auto bsvt = static_cast<BoxScroller*>(mParent);
         const auto keysView = bsvt->getKeysView();
         if(keysView) {
-            const auto animTarget = static_cast<GraphAnimator*>(target);
-            if(keysView->graphIsSelected(animTarget)) {
-                keysView->graphRemoveViewedAnimator(animTarget);
+            if(keysView->graphIsSelected(graph)) {
+                keysView->graphRemoveViewedAnimator(graph);
             } else {
-                keysView->graphAddViewedAnimator(animTarget);
+                keysView->graphAddViewedAnimator(graph);
             }
             Document::sInstance->actionFinished();
         }
@@ -874,13 +867,13 @@ void BoxSingleWidget::switchBoxLockedAction() {
 void BoxSingleWidget::updateValueSlidersForQPointFAnimator() {
     if(!mTarget) return;
     const auto target = mTarget->getTarget();
-    if(!target->SWT_isQPointFAnimator() || mTarget->contentVisible()) return;
+    const auto asQPointFAnim = enve_cast<QPointFAnimator*>(target);
+    if(!asQPointFAnim || mTarget->contentVisible()) return;
     if(width() - mFillWidget->x() > 10*MIN_WIDGET_DIM) {
-        const auto pt_target = static_cast<QPointFAnimator*>(target);
-        mValueSlider->setTarget(pt_target->getXAnimator());
+        mValueSlider->setTarget(asQPointFAnim->getXAnimator());
         mValueSlider->show();
         mValueSlider->setIsLeftSlider(true);
-        mSecondValueSlider->setTarget(pt_target->getYAnimator());
+        mSecondValueSlider->setTarget(asQPointFAnim->getYAnimator());
         mSecondValueSlider->show();
         mSecondValueSlider->setIsRightSlider(true);
     } else {

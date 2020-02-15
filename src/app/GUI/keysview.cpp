@@ -136,7 +136,7 @@ void KeysView::getKeysInRect(QRectF selectionRect,
 
     for(const auto& abs : abstractions) {
         const auto target = abs->getTarget();
-        if(const auto asAnim = enve::cast<Animator*>(target)) {
+        if(const auto asAnim = enve_cast<Animator*>(target)) {
             asAnim->anim_getKeysInRect(selectionRect, pixelsPerFrame,
                                        listKeys, KEY_RECT_SIZE);
         }
@@ -736,8 +736,7 @@ void KeysView::handleMouseMove(const QPoint &pos,
                     const auto childProp = mLastPressedMovable->getParentProperty();
                     const bool shiftPressed = QApplication::keyboardModifiers() & Qt::SHIFT;
                     mMoveAllSelected = shiftPressed &&
-                            (childProp->SWT_isBoundingBox() ||
-                             childProp->SWT_isSingleSound());
+                            enve_cast<eBoxOrSound*>(childProp);
                     if(mMoveAllSelected) {
                         if(mLastPressedMovable->isDurationRect()) {
                             mCurrentScene->startDurationRectPosTransformForAllSelected();
