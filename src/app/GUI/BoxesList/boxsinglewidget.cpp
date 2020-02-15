@@ -792,13 +792,13 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             }
             if(target->SWT_isSmartPathAnimator()) {
                 const auto path = static_cast<SmartPathAnimator*>(target);
-                const QRect colRect(mContentButton->pos(),
-                                    mContentButton->size());
+                const QRect colRect(QPoint{nameX, 0},
+                                    QSize{MIN_WIDGET_DIM, MIN_WIDGET_DIM});
                 p.setPen(Qt::NoPen);
                 p.setRenderHint(QPainter::Antialiasing, true);
                 p.setBrush(path->getPathColor());
                 const int radius = qRound(MIN_WIDGET_DIM*0.2);
-                p.drawEllipse(colRect.center() + QPoint(MIN_WIDGET_DIM, 2),
+                p.drawEllipse(colRect.center() + QPoint(0, 2),
                               radius, radius);
                 p.setRenderHint(QPainter::Antialiasing, false);
                 nameX += MIN_WIDGET_DIM;
