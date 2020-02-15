@@ -20,6 +20,7 @@
 #include "conncontextobjlist.h"
 class PathBox;
 class PathEffectCollection;
+class BlendEffectBoxShadow;
 
 class ContainerBox : public BoxWithPathEffects {
     Q_OBJECT
@@ -241,7 +242,7 @@ private:
     bool mIsDescendantCurrentGroup = false;
     QList<BoundingBox*> mBoxesWithBlendEffects;
     QList<BoundingBox*> mContainedBoxes;
-    QList<qsptr<eBoxOrSound>> mBlendShadows;
+    QList<qsptr<BlendEffectBoxShadow>> mBlendShadows;
     ConnContextObjList<qsptr<eBoxOrSound>> mContained;
 };
 

@@ -1239,11 +1239,12 @@ bool ContainerBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 
 void ContainerBox::writeAllContained(eWriteStream& dst) const {
     const int nCont = mContained.count();
-    dst << nCont;
+    const int nWrite = nCont - mBlendShadows.count();
+    dst << nWrite;
     for(int i = nCont - 1; i >= 0; i--) {
-        const auto futureId = dst.planFuturePos();
         const auto &child = mContained.at(i);
         if(qobject_cast<BlendEffectBoxShadow*>(child.get())) continue;
+        const auto futureId = dst.planFuturePos();
         const bool isBox = child->SWT_isBoundingBox();
         dst << isBox;
         if(isBox) {
