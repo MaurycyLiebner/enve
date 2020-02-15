@@ -27,8 +27,6 @@ SingleWidget::SingleWidget(ScrollWidgetVisiblePart *parent) :
 
 void SingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mTarget = abs;
-    if(!abs) hide();
-    else if(isHidden()) show();
 }
 
 SWT_Abstraction *SingleWidget::getTargetAbstraction() {

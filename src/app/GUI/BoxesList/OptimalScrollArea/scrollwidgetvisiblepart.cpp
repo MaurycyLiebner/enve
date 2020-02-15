@@ -133,6 +133,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
             currWidget->move(currX, currWidget->y());
             currWidget->setFixedWidth(currWx - currX + currWidget->width());
             currentWidgetId = currentWidgetId + 1;
+            currWidget->setVisible(newAbs);
         }
     };
     int currY = MIN_WIDGET_DIM/2;
