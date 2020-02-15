@@ -90,7 +90,7 @@ void RasterEffectCollection::updateIfUsesProgram(
         const ShaderEffectProgram * const program) {
     const auto& children = ca_getChildren();
     for(const auto& effect : children) {
-        const auto shaderEffect = dynamic_cast<ShaderEffect*>(effect.get());
+        const auto shaderEffect = enve::cast<ShaderEffect*>(effect.get());
         if(!shaderEffect) continue;
         shaderEffect->updateIfUsesProgram(program);
     }

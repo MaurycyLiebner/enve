@@ -251,7 +251,7 @@ NormalSegment BoundingBox::getNormalSegment(const QPointF &absPos,
         const auto& prop = mCanvasProps.at(i);
         const auto handler = prop->getPointsHandler();
         if(!handler) continue;
-        const auto pathHandler = dynamic_cast<PathPointsHandler*>(handler);
+        const auto pathHandler = enve::cast<PathPointsHandler*>(handler);
         if(!pathHandler) continue;
         const auto seg = pathHandler->getNormalSegment(absPos, invScale);
         if(seg.isValid()) return seg;

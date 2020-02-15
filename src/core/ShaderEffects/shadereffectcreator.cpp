@@ -29,11 +29,11 @@ bool ShaderEffectCreator::compatible(const QList<PropertyType> &props) const {
         const auto prop = fProperties.at(i).get();
         if(iType == PTYPE_FLOAT) {
             const bool iCompatible =
-                    dynamic_cast<QrealAnimatorCreator*>(prop);
+                    enve::cast<QrealAnimatorCreator*>(prop);
             if(!iCompatible) return false;
         } else if(iType == PTYPE_INT) {
             const bool iCompatible =
-                    dynamic_cast<IntAnimatorCreator*>(prop);
+                    enve::cast<IntAnimatorCreator*>(prop);
             if(!iCompatible) return false;
         } else return false;
     }
@@ -69,9 +69,9 @@ void ShaderEffectCreator::writeIdentifier(eWriteStream &dst) const {
     dst << nChildren;
     for(const auto& anim : fProperties) {
         PropertyType type;
-        if(dynamic_cast<QrealAnimatorCreator*>(anim.get())) {
+        if(enve::cast<QrealAnimatorCreator*>(anim.get())) {
             type = PTYPE_FLOAT;
-        } else if(dynamic_cast<IntAnimatorCreator*>(anim.get())) {
+        } else if(enve::cast<IntAnimatorCreator*>(anim.get())) {
             type = PTYPE_INT;
         } else RuntimeThrow("Only QrealAnimator and IntAnimator supported");
         dst.write(&type, sizeof(PropertyType));

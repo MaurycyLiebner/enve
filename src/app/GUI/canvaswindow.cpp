@@ -342,7 +342,7 @@ void CanvasWindow::readState(eReadStream &src) {
     if(!sceneBox && sceneDocumentId != -1)
         sceneBox = BoundingBox::sGetBoxByDocumentId(sceneDocumentId);
 
-    setCurrentCanvas(qobject_cast<Canvas*>(sceneBox));
+    setCurrentCanvas(enve::cast<Canvas*>(sceneBox));
     src >> mViewTransform;
     mFitToSizeBlocked = true;
 }

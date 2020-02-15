@@ -25,19 +25,9 @@ class QMenu;
 class QAction;
 class QMimeData;
 
+class Property;
 class BlendEffectBoxShadow;
 class BlendEffectCollection;
-
-#define DELARE_ETYPE_FUNCTION(className) \
-    virtual className* castTo##className() { return nullptr; }
-
-#define DECLARE_ETYPE(className) \
-    public: \
-    template <class U> \
-    static inline className* sCast(U& u) { \
-        return u.castTo##className(); \
-    } \
-    className* castTo##className() final { return this; }
 
 class SingleWidgetTarget : public SelfRef {
     Q_OBJECT
@@ -90,6 +80,7 @@ public:
         return true;
     }
 
+    DELARE_ETYPE_FUNCTION(Property)
     DELARE_ETYPE_FUNCTION(BlendEffectBoxShadow)
     DELARE_ETYPE_FUNCTION(BlendEffectCollection)
     // Animators

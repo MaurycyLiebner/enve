@@ -176,7 +176,7 @@ void TaskScheduler::processNextQuedHddTask() {
                 if(task->getState() > eTaskState::processing) {
                     return processNextTasks();
                 }
-                const auto hddTask = dynamic_cast<eHddTask*>(task.get());
+                const auto hddTask = enve::cast<eHddTask*>(task.get());
                 if(hddTask) hddTask->setController(mHddExecutor);
                 mQuedHddTasks.removeAt(i--);
                 mHddThreadBusy = true;

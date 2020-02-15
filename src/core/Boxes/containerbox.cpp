@@ -368,7 +368,7 @@ QStringList ContainerBox::allContainedNamesStartingWith(
 void ContainerBox::allDescendantsStartingWith(
         const QString &text, QList<eBoxOrSound*> &result) {
     for(const auto &child : mContained) {
-        if(qobject_cast<BlendEffectBoxShadow*>(child.get())) continue;
+        if(enve::cast<BlendEffectBoxShadow*>(child.get())) continue;
         const bool nameMatch = child->prp_getName().startsWith(text);
         if(nameMatch) result << child.get();
         if(child->SWT_isContainerBox()) {
@@ -381,7 +381,7 @@ void ContainerBox::allDescendantsStartingWith(
 void ContainerBox::allContainedStartingWith(
         const QString &text, QList<eBoxOrSound*> &result) {
     for(const auto &child : mContained) {
-        if(qobject_cast<BlendEffectBoxShadow*>(child.get())) continue;
+        if(enve::cast<BlendEffectBoxShadow*>(child.get())) continue;
         const bool nameMatch = child->prp_getName().startsWith(text);
         if(nameMatch) result << child.get();
     }
@@ -422,7 +422,7 @@ Property* ContainerBox::ca_findPropertyWithPath(
     const bool isLast = id == path.count() - 1;
     const auto& name = path.at(id);
     for(const auto &child : mContained) {
-        if(qobject_cast<BlendEffectBoxShadow*>(child.get())) continue;
+        if(enve::cast<BlendEffectBoxShadow*>(child.get())) continue;
         const auto childName = child->prp_getName();
         if(childName == name) {
             if(isLast) return child.get();
@@ -608,7 +608,7 @@ void ContainerBox::ungroupKeepTransform_k() {
 void ContainerBox::ungroupAbandomTransform_k() {
     for(int i = mContained.count() - 1; i >= 0; i--) {
         auto box = mContained.at(i);
-        if(qobject_cast<BlendEffectBoxShadow*>(box)) continue;
+        if(enve::cast<BlendEffectBoxShadow*>(box.get())) continue;
         removeContained(box);
         mParentGroup->addContained(box);
     }
@@ -978,7 +978,7 @@ void ContainerBox::insertContained(
     }
     child->removeFromParent_k();
 
-    const bool isBoxShadow = qobject_cast<BlendEffectBoxShadow*>(child.get());
+    const bool isBoxShadow = enve::cast<BlendEffectBoxShadow*>(child.get());
     if(!isBoxShadow) {
         const QString oldName = child->prp_getName();
         const auto parentScene = getParentScene();
@@ -1079,7 +1079,7 @@ void ContainerBox::removeContainedFromList(const int id) {
 
     emit removedObject(id, child.get());
 
-    if(!SWT_isLinkBox() && !qobject_cast<BlendEffectBoxShadow*>(child.get())) {
+    if(!SWT_isLinkBox() && !enve::cast<BlendEffectBoxShadow*>(child.get())) {
         prp_pushUndoRedoName("Remove " + child->prp_getName());
         UndoRedo ur;
         ur.fUndo = [this, id, child]() {
@@ -1243,7 +1243,7 @@ void ContainerBox::writeAllContained(eWriteStream& dst) const {
     dst << nWrite;
     for(int i = nCont - 1; i >= 0; i--) {
         const auto &child = mContained.at(i);
-        if(qobject_cast<BlendEffectBoxShadow*>(child.get())) continue;
+        if(enve::cast<BlendEffectBoxShadow*>(child.get())) continue;
         const auto futureId = dst.planFuturePos();
         const bool isBox = child->SWT_isBoundingBox();
         dst << isBox;

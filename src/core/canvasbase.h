@@ -34,7 +34,7 @@ public:
     void execOpOnSelectedBoxes(const std::function<void(const QList<T*>&)> &op) {
         QList<T*> all;
         for(const auto& box : mSelectedBoxes) {
-            const auto boxT = dynamic_cast<T*>(box);
+            const auto boxT = enve::cast<T*>(box);
             if(boxT) all << boxT;
         }
         op(all);
@@ -43,7 +43,7 @@ public:
     template <class T = BoundingBox>
     void execOpOnSelectedBoxes(const std::function<void(T*)> &op) {
         for(const auto& box : mSelectedBoxes) {
-            const auto boxT = dynamic_cast<T*>(box);
+            const auto boxT = enve::cast<T*>(box);
             if(boxT) op(boxT);
         }
     }
@@ -52,7 +52,7 @@ public:
     void execOpOnSelectedPoints(const std::function<void(const QList<T*>&)> &op) {
         QList<T*> all;
         for(const auto& pt : mSelectedPoints_d) {
-            const auto ptT = dynamic_cast<T*>(pt);
+            const auto ptT = enve::cast<T*>(pt);
             if(ptT) all << ptT;
         }
         op(all);
@@ -62,7 +62,7 @@ public:
     void execOpOnSelectedPoints(const std::function<void(T*)> &op) {
         if(mPressedPoint) {
             if(!mPressedPoint->selectionEnabled()) {
-                const auto ptT = dynamic_cast<T*>(mPressedPoint.data());
+                const auto ptT = enve::cast<T*>(mPressedPoint.data());
                 if(ptT) {
                     op(ptT);
                     //if(ptT->selectionEnabled()) addPointToSelection(ptT);
@@ -71,7 +71,7 @@ public:
             }
         }
         for(const auto& pt : mSelectedPoints_d) {
-            const auto ptT = dynamic_cast<T*>(pt);
+            const auto ptT = enve::cast<T*>(pt);
             if(ptT) {
                 op(ptT);
                 //if(!ptT->selectionEnabled()) removePointFromSelection(ptT);
@@ -82,7 +82,7 @@ public:
     template <class T = Property>
     void execOpOnSelectedProperties(const std::function<void(T*)> &op) {
         for(const auto prop : mSelectedProps) {
-            const auto t = dynamic_cast<T*>(prop);
+            const auto t = enve::cast<T*>(prop);
             if(t) op(t);
         }
     }

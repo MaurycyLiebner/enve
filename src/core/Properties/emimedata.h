@@ -18,6 +18,7 @@
 #define EMIMEDATA_H
 #include <QMimeData>
 #include "exceptions.h"
+#include "smartPointers/ememory.h"
 
 class eDraggedObjects {
 public:
@@ -37,7 +38,7 @@ public:
         if(!hasType<T>()) RuntimeThrow("Incompatible type");
         QList<T*> result;
         for(const auto& obj : mObjects) {
-            const auto ObjT = qobject_cast<T*>(obj);
+            const auto ObjT = enve::cast<T*>(obj);
             if(ObjT) result << ObjT;
         }
         return result;
@@ -45,7 +46,7 @@ public:
 
     template <typename T>
     T* getObject(const int index) const {
-        return qobject_cast<T*>(mObjects.at(index));
+        return enve::cast<T*>(mObjects.at(index));
     }
 
     int count() const { return mObjects.count(); }

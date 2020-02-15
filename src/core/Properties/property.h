@@ -163,7 +163,7 @@ public:
     template <class T = Property>
     T *getFirstAncestor() const {
         if(!mParent_k) return nullptr;
-        const auto target = dynamic_cast<T*>(*mParent_k);
+        const auto target = enve::cast<T*>(*mParent_k);
         if(target) return target;
         return mParent_k->getFirstAncestor<T>();
     }

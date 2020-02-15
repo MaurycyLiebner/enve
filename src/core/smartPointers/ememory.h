@@ -60,29 +60,60 @@ namespace enve {
         };
 
         template <typename T, class U>
-        inline T* cast_qt(U* const u, std::false_type) {
-            return dynamic_cast<T*>(u);
+        inline T cast_q_object(U* const u, std::false_type) {
+            return dynamic_cast<T>(u);
         }
 
         template <typename T, class U>
-        inline T* cast_qt(U* const u, std::true_type) {
-            return qobject_cast<T*>(u);
+        inline T cast_q_object(U* const u, std::true_type) {
+            return qobject_cast<T>(u);
         }
 
         template <typename T, class U>
-        inline T* cast_enve(U* const u, std::false_type) {
-            return cast_qt<T>(u, std::integral_constant<bool, QtPrivate::HasQ_OBJECT_Macro<T>::Value>());
+        inline T cast_qobject(U* const u, std::false_type) {
+            return dynamic_cast<T>(u);
         }
 
         template <typename T, class U>
-        inline T* cast_enve(U* const u, std::true_type) {
-            return u ? T::sCast(*u) : nullptr;
+        inline T cast_qobject(U* const u, std::true_type) {
+            typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type TO;
+            typedef QtPrivate::HasQ_OBJECT_Macro<TO> MacroCheck;
+            return cast_q_object<T>(u, std::__bool_constant<MacroCheck::Value>());
+        }
+
+        template <typename T, class U>
+        inline T cast_enve(U* const u, std::false_type) {
+            typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type TO;
+            return cast_qobject<T>(u, std::__bool_constant<std::is_base_of<QObject, TO>::value>());
+        }
+
+        template <typename T, class U>
+        inline T cast_enve(U* const u, std::true_type) {
+            typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type TO;
+            return u ? TO::sCast(*u) : nullptr;
         }
     }
 
+    //! @brief Use virtual function call, qobject_cast, or dynamic_cast,
+    //! depending on availability.
     template <typename T, class U>
-    inline T* cast(U* const u) {
-        return cast_enve<T>(u, std::integral_constant<bool, HasCastMethod<T, U>::Has>());
+    inline T cast(U* const u) {
+        typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type TO;
+        return cast_enve<T>(u, std::integral_constant<bool, HasCastMethod<TO, U>::Has>());
+    }
+
+    //! @brief Use virtual function call, qobject_cast, or dynamic_cast,
+    //! depending on availability.
+    template <typename T, class U>
+    inline T cast(const qptr<U>& u) {
+        return cast<T>(u.data());
+    }
+
+    //! @brief Use virtual function call, qobject_cast, or dynamic_cast,
+    //! depending on availability.
+    template <typename T, class U>
+    inline T cast(const qsptr<U>& u) {
+        return cast<T>(u.data());
     }
 }
 

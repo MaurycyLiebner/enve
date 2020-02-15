@@ -166,15 +166,15 @@ void SWT_Abstraction::write(eWriteStream &dst) const {
 
 void SWT_Abstraction::readAll(eReadStream &src) {
     if(src.evFileVersion() < 11 &&
-       qobject_cast<CustomProperties*>(mTarget_k)) {
+       enve::cast<CustomProperties*>(mTarget_k)) {
         return;
     }
     if(src.evFileVersion() < 12 &&
-       enve::cast<BlendEffectCollection>(mTarget_k)) {
+       enve::cast<BlendEffectCollection*>(mTarget_k)) {
         return;
     }
     if(src.evFileVersion() < 14 &&
-       enve::cast<BlendEffectBoxShadow>(mTarget_k)) {
+       enve::cast<BlendEffectBoxShadow*>(mTarget_k)) {
         return;
     }
     for(const auto& child : mChildren) child->readAll(src);

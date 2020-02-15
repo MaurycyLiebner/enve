@@ -28,4 +28,15 @@ private: \
     friend class StdSelfRef; \
     e_PROHIBIT_HEAP
 
+#define DELARE_ETYPE_FUNCTION(className) \
+    virtual className* to##className() { return nullptr; }
+
+#define DECLARE_ETYPE(className) \
+    public: \
+    template <class U> \
+    static inline className* sCast(U& u) { \
+        return u.to##className(); \
+    } \
+    className* to##className() final { return this; }
+
 #endif // EOBJECT_H

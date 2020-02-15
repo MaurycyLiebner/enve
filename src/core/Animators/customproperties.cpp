@@ -86,7 +86,7 @@ qsptr<Animator> readIdCreateCProperty(eReadStream &src) {
 
 void writeCPropertyType(Animator * const obj, eWriteStream &dst) {
     PropertyType type;
-    if(qobject_cast<QrealAnimator*>(obj)) {
+    if(enve::cast<QrealAnimator*>(obj)) {
         type = PropertyType::QrealAnimator;
     } else if(obj->SWT_isQPointFAnimator()) {
         type = PropertyType::QPointFAnimator;

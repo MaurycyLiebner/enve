@@ -346,7 +346,7 @@ const SkPath &PathBox::getRelativePath() const { return mPathSk; }
 
 void PathBox::updateCurrentPreviewDataFromRenderData(
         BoxRenderData* renderData) {
-    const auto pathRenderData = dynamic_cast<PathBoxRenderData*>(renderData);
+    const auto pathRenderData = enve::cast<PathBoxRenderData*>(renderData);
     if(pathRenderData) {
         mCurrentPathsFrame = renderData->fRelFrame;
         mEditPathSk = pathRenderData->fEditPath;

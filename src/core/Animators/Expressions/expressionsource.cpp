@@ -111,7 +111,7 @@ QrealAnimator *ExpressionSource::findSource() {
     QrealAnimator* result = nullptr;
     const auto objs = mPath.split('.');
     const auto found = searchCtxt->ca_findPropertyWithPathRec(0, objs);
-    if(found != prnt) result = qobject_cast<QrealAnimator*>(found);
+    if(found != prnt) result = enve::cast<QrealAnimator*>(found);
     if(result && (result == prnt ||
        result->expressionDependsOn(prnt))) {
         result = nullptr;

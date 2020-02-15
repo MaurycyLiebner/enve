@@ -94,7 +94,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mRecordButton->setPixmapChooser([this]() {
         if(!mTarget) return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(qobject_cast<eBoxOrSound*>(target)) {
+        if(enve::cast<eBoxOrSound*>(target)) {
             return static_cast<QPixmap*>(nullptr);
         } else if(target->SWT_isComplexAnimator()) {
             const auto caTarget = static_cast<ComplexAnimator*>(target);
@@ -105,7 +105,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
                     return BoxSingleWidget::ANIMATOR_DESCENDANT_RECORDING;
                 } else return BoxSingleWidget::ANIMATOR_NOT_RECORDING;
             }
-        } else if(const auto asAnim = qobject_cast<Animator*>(target)) {
+        } else if(const auto asAnim = enve::cast<Animator*>(target)) {
             if(asAnim->anim_isRecording()) {
                 return BoxSingleWidget::ANIMATOR_RECORDING;
             } else return BoxSingleWidget::ANIMATOR_NOT_RECORDING;
@@ -122,7 +122,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
         if(mTarget->childrenCount() == 0)
             return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(qobject_cast<eBoxOrSound*>(target)) {
+        if(enve::cast<eBoxOrSound*>(target)) {
             if(mTarget->contentVisible()) {
                 return BoxSingleWidget::BOX_CHILDREN_VISIBLE;
             } else return BoxSingleWidget::BOX_CHILDREN_HIDDEN;
@@ -141,7 +141,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mVisibleButton->setPixmapChooser([this]() {
         if(!mTarget) return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(const auto ebos = qobject_cast<eBoxOrSound*>(target)) {
+        if(const auto ebos = enve::cast<eBoxOrSound*>(target)) {
             if(target->SWT_isSound()) {
                 if(ebos->isVisible()) {
                     return BoxSingleWidget::UNMUTED_PIXMAP;
@@ -149,7 +149,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
             } else if(ebos->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
             } else return BoxSingleWidget::INVISIBLE_PIXMAP;
-        } else if(const auto eEff = qobject_cast<eEffect*>(target)) {
+        } else if(const auto eEff = enve::cast<eEffect*>(target)) {
             if(eEff->isVisible()) {
                 return BoxSingleWidget::VISIBLE_PIXMAP;
             } else return BoxSingleWidget::INVISIBLE_PIXMAP;
@@ -184,7 +184,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mHwSupportButton->setPixmapChooser([this]() {
         if(!mTarget) return static_cast<QPixmap*>(nullptr);
         const auto target = mTarget->getTarget();
-        if(const auto rEff = qobject_cast<RasterEffect*>(target)) {
+        if(const auto rEff = enve::cast<RasterEffect*>(target)) {
             if(rEff->instanceHwSupport() == HardwareSupport::cpuOnly) {
                 return BoxSingleWidget::C_PIXMAP;
             } else if(rEff->instanceHwSupport() == HardwareSupport::gpuOnly) {
@@ -197,7 +197,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     connect(mHwSupportButton, &BoxesListActionButton::pressed, this, [this]() {
         if(!mTarget) return;
         const auto target = mTarget->getTarget();
-        if(const auto rEff = qobject_cast<RasterEffect*>(target)) {
+        if(const auto rEff = enve::cast<RasterEffect*>(target)) {
             rEff->switchInstanceHwSupport();
             Document::sInstance->actionFinished();
         }
@@ -215,8 +215,8 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
         ContainerBox* targetGroup = nullptr;
         if(target->SWT_isGroupBox()) {
             targetGroup = static_cast<ContainerBox*>(target);
-        } else if(qobject_cast<RasterEffectCollection*>(target) ||
-                  qobject_cast<BlendEffectCollection*>(target)) {
+        } else if(enve::cast<RasterEffectCollection*>(target) ||
+                  enve::cast<BlendEffectCollection*>(target)) {
             const auto pTarget = static_cast<Property*>(target);
             const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
             if(parentBox && parentBox->SWT_isGroupBox()) {
@@ -237,8 +237,8 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
         ContainerBox* targetGroup = nullptr;
         if(target->SWT_isGroupBox()) {
             targetGroup = static_cast<ContainerBox*>(target);
-        } else if(qobject_cast<RasterEffectCollection*>(target) ||
-                  qobject_cast<BlendEffectCollection*>(target)) {
+        } else if(enve::cast<RasterEffectCollection*>(target) ||
+                  enve::cast<BlendEffectCollection*>(target)) {
             const auto pTarget = static_cast<Property*>(target);
             const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
             if(parentBox && parentBox->SWT_isGroupBox()) {
@@ -388,13 +388,13 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mTargetConn << connect(target, &SingleWidgetTarget::SWT_changedDisabled,
                            this, qOverload<>(&QWidget::update));
     mContentButton->setVisible(target->SWT_isComplexAnimator());
-    mRecordButton->setVisible(qobject_cast<Animator*>(target) &&
-                              !qobject_cast<eBoxOrSound*>(target));
-    mVisibleButton->setVisible(qobject_cast<eBoxOrSound*>(target) ||
-                               qobject_cast<eEffect*>(target) ||
+    mRecordButton->setVisible(enve::cast<Animator*>(target) &&
+                              !enve::cast<eBoxOrSound*>(target));
+    mVisibleButton->setVisible(enve::cast<eBoxOrSound*>(target) ||
+                               enve::cast<eEffect*>(target) ||
                                target->SWT_isGraphAnimator());
     mLockedButton->setVisible(target->SWT_isBoundingBox());
-    mHwSupportButton->setVisible(qobject_cast<RasterEffect*>(target));
+    mHwSupportButton->setVisible(enve::cast<RasterEffect*>(target));
     {
         ContainerBox* targetGroup = nullptr;
         if(target->SWT_isGroupBox()) {
@@ -404,8 +404,8 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                                    this, [this](const eBoxType type) {
                 mBlendModeCombo->setEnabled(type == eBoxType::layer);
             });
-        } else if(qobject_cast<RasterEffectCollection*>(target) ||
-                  qobject_cast<BlendEffectCollection*>(target)) {
+        } else if(enve::cast<RasterEffectCollection*>(target) ||
+                  enve::cast<BlendEffectCollection*>(target)) {
             const auto pTarget = static_cast<Property*>(target);
             const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
             if(parentBox && parentBox->SWT_isGroupBox()) {
@@ -470,7 +470,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                                this, [this](const int id) {
             mPropertyComboBox->setCurrentIndex(id);
         });
-    } else if(const auto qra = qobject_cast<QrealAnimator*>(target)) {
+    } else if(const auto qra = enve::cast<QrealAnimator*>(target)) {
         mValueSlider->setTarget(qra);
         valueSliderVisible = true;
         mValueSlider->setIsLeftSlider(false);
@@ -504,7 +504,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                 const auto ca_target = static_cast<ComplexAnimator*>(target);
                 Property * const guiProp = ca_target->ca_getGUIProperty();
                 if(guiProp) {
-                    if(const auto qra = qobject_cast<QrealAnimator*>(guiProp)) {
+                    if(const auto qra = enve::cast<QrealAnimator*>(guiProp)) {
                         valueSliderVisible = true;
                         mValueSlider->setTarget(qra);
                         mValueSlider->setIsLeftSlider(false);
@@ -528,12 +528,12 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         });
     }
 
-    if(const auto asAnim = qobject_cast<Animator*>(target)) {
+    if(const auto asAnim = enve::cast<Animator*>(target)) {
         mTargetConn << connect(asAnim, &Animator::anim_isRecordingChanged,
                                this, [this]() { mRecordButton->update(); });
     }
-    if(const auto eEff = qobject_cast<eEffect*>(target)) {
-        if(const auto rEff = qobject_cast<RasterEffect*>(target)) {
+    if(const auto eEff = enve::cast<eEffect*>(target)) {
+        if(const auto rEff = enve::cast<RasterEffect*>(target)) {
             mTargetConn << connect(rEff, &RasterEffect::hardwareSupportChanged,
                                    this, [this]() { mHwSupportButton->update(); });
         }
@@ -697,7 +697,7 @@ void BoxSingleWidget::prp_drawTimelineControls(QPainter * const p,
                                const FrameRange &viewedFrames) {
     if(isHidden() || !mTarget) return;
     const auto target = mTarget->getTarget();
-    if(const auto asAnim = qobject_cast<Animator*>(target)) {
+    if(const auto asAnim = enve::cast<Animator*>(target)) {
         asAnim->prp_drawTimelineControls(
                     p, pixelsPerFrame, viewedFrames, MIN_WIDGET_DIM);
     }
@@ -708,7 +708,7 @@ Key* BoxSingleWidget::getKeyAtPos(const int pressX,
                                   const int minViewedFrame) {
     if(isHidden() || !mTarget) return nullptr;
     const auto target = mTarget->getTarget();
-    if(const auto asAnim = qobject_cast<Animator*>(target)) {
+    if(const auto asAnim = enve::cast<Animator*>(target)) {
         return asAnim->anim_getKeyAtPos(pressX, minViewedFrame,
                                         pixelsPerFrame, KEY_RECT_SIZE);
     }
@@ -721,7 +721,7 @@ TimelineMovable* BoxSingleWidget::getRectangleMovableAtPos(
                             const int minViewedFrame) {
     if(isHidden() || !mTarget) return nullptr;
     const auto target = mTarget->getTarget();
-    if(const auto asAnim = qobject_cast<Animator*>(target)) {
+    if(const auto asAnim = enve::cast<Animator*>(target)) {
         return asAnim->anim_getTimelineMovable(
                     pressX, minViewedFrame, pixelsPerFrame);
     }
@@ -733,7 +733,7 @@ void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
                                     QList<Key*>& listKeys) {
     if(isHidden() || !mTarget) return;
     const auto target = mTarget->getTarget();
-    if(const auto asAnim = qobject_cast<Animator*>(target)) {
+    if(const auto asAnim = enve::cast<Animator*>(target)) {
         asAnim->anim_getKeysInRect(selectionRect, pixelsPerFrame,
                                    listKeys, KEY_RECT_SIZE);
     }
@@ -769,7 +769,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         } else {
             p.setPen(Qt::white);
         }
-    } else if(qobject_cast<BlendEffectBoxShadow*>(target)) {
+    } else if(enve::cast<BlendEffectBoxShadow*>(target)) {
         p.fillRect(rect(), QColor(0, 255, 125, 50));
         nameX += MIN_WIDGET_DIM + MIN_WIDGET_DIM/4;
     } else if(!target->SWT_isComplexAnimator()) {
@@ -805,7 +805,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             }
         } else nameX += MIN_WIDGET_DIM;
 
-        if(!qobject_cast<Animator*>(target)) nameX += MIN_WIDGET_DIM;
+        if(!enve::cast<Animator*>(target)) nameX += MIN_WIDGET_DIM;
         p.setPen(Qt::white);
     } else { //if(target->SWT_isComplexAnimator()) {
         p.setPen(Qt::white);
@@ -832,7 +832,7 @@ void BoxSingleWidget::switchRecordingAction() {
     if(!mTarget) return;
     const auto target = mTarget->getTarget();
     if(!target) return;
-    if(const auto asAnim = qobject_cast<Animator*>(target)) {
+    if(const auto asAnim = enve::cast<Animator*>(target)) {
         asAnim->anim_switchRecording();
         Document::sInstance->actionFinished();
         update();
@@ -843,9 +843,9 @@ void BoxSingleWidget::switchBoxVisibleAction() {
     if(!mTarget) return;
     const auto target = mTarget->getTarget();
     if(!target) return;
-    if(const auto ebos = qobject_cast<eBoxOrSound*>(target)) {
+    if(const auto ebos = enve::cast<eBoxOrSound*>(target)) {
         ebos->switchVisible();
-    } else if(const auto eEff = qobject_cast<eEffect*>(target)) {
+    } else if(const auto eEff = enve::cast<eEffect*>(target)) {
         eEff->switchVisible();
     } else if(target->SWT_isGraphAnimator()) {
         const auto bsvt = static_cast<BoxScroller*>(mParent);

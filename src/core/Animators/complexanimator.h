@@ -90,7 +90,7 @@ public:
     template <class T = Property>
     T *ca_getFirstDescendant(const std::function<bool(T*)>& tester) const {
         for(const auto &prop : ca_mChildren) {
-            const auto target = dynamic_cast<T*>(prop.data());
+            const auto target = enve::cast<T*>(prop.data());
             if(target && tester(target)) return target;
             else if(prop->SWT_isComplexAnimator()) {
                 const auto ca = static_cast<ComplexAnimator*>(prop.get());

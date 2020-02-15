@@ -120,7 +120,7 @@ void ComplexAnimator::ca_insertChild(const qsptr<Property>& child,
     const bool changeInfluence = !(SWT_isBoundingBox() &&
                                    child->SWT_isSound());
 
-    if(const auto childAnimator = qobject_cast<Animator*>(child.get())) {
+    if(const auto childAnimator = enve::cast<Animator*>(child.get())) {
         connect(childAnimator, &Animator::anim_isRecordingChanged,
                 this, &ComplexAnimator::ca_childIsRecordingChanged);
         connect(childAnimator, &Animator::anim_addedKey,
@@ -251,7 +251,7 @@ void ComplexAnimator::ca_removeChild(const qsptr<Property> child) {
     const bool changeInfluence = !(SWT_isBoundingBox() &&
                                    child->SWT_isSound());
     const auto childRange = child->prp_absInfluenceRange();
-    if(const auto childAnimator = qobject_cast<Animator*>(child.get())) {
+    if(const auto childAnimator = enve::cast<Animator*>(child.get())) {
         childAnimator->anim_removeAllKeysFromComplexAnimator(this);
     }
     disconnect(child.get(), nullptr, this, nullptr);
@@ -286,7 +286,7 @@ void ComplexAnimator::ca_removeAllChildren() {
 
 void ComplexAnimator::anim_addKeyAtRelFrame(const int relFrame) {
     for(const auto &property : ca_mChildren) {
-        if(const auto asAnim = qobject_cast<Animator*>(property.get())) {
+        if(const auto asAnim = enve::cast<Animator*>(property.get())) {
             asAnim->anim_addKeyAtRelFrame(relFrame);
         }
     }
@@ -328,7 +328,7 @@ void ComplexAnimator::anim_setAbsFrame(const int frame) {
     Animator::anim_setAbsFrame(frame);
 
     for(const auto &property : ca_mChildren) {
-        if(const auto asAnim = qobject_cast<Animator*>(property.get())) {
+        if(const auto asAnim = enve::cast<Animator*>(property.get())) {
             asAnim->anim_setAbsFrame(frame);
         }
     }
@@ -350,7 +350,7 @@ bool ComplexAnimator::anim_isDescendantRecording() const {
 
 void ComplexAnimator::anim_setRecording(const bool rec) {
     for(const auto &property : ca_mChildren) {
-        if(const auto asAnim = qobject_cast<Animator*>(property.get())) {
+        if(const auto asAnim = enve::cast<Animator*>(property.get())) {
             asAnim->anim_setRecording(rec);
         }
     }
@@ -361,7 +361,7 @@ void ComplexAnimator::ca_childIsRecordingChanged() {
     bool rec = true;
     bool childRec = false;
     for(const auto &property : ca_mChildren) {
-        if(const auto asAnim = qobject_cast<Animator*>(property.get())) {
+        if(const auto asAnim = enve::cast<Animator*>(property.get())) {
             const bool isChildRec = asAnim->anim_isRecording();
             const bool isChildDescRec = asAnim->anim_isDescendantRecording();
             if(isChildDescRec) childRec = true;
@@ -401,7 +401,7 @@ void ComplexAnimator::ca_addChild(const qsptr<Property> &child) {
 
 void ComplexAnimator::anim_shiftAllKeys(const int shift, const bool addUndoRedo) {
     for(const auto &property : ca_mChildren) {
-        if(const auto asAnim = qobject_cast<Animator*>(property.get())) {
+        if(const auto asAnim = enve::cast<Animator*>(property.get())) {
             asAnim->anim_shiftAllKeys(shift, addUndoRedo);
         }
     }
