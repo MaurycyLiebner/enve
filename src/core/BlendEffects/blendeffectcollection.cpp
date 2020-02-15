@@ -39,6 +39,7 @@ void BlendEffectCollection::blendSetup(
     const int iMax = ca_getNumberOfChildren();
     for(int i = 0; i < iMax; i++) {
         const auto effect = getChild(i);
+        if(!effect->isVisible()) continue;
         effect->blendSetup(data, index, relFrame, delayed);
     }
 }
@@ -48,6 +49,7 @@ void BlendEffectCollection::drawBlendSetup(SkCanvas * const canvas) {
     const int iMax = ca_getNumberOfChildren();
     for(int i = 0; i < iMax; i++) {
         const auto effect = getChild(i);
+        if(!effect->isVisible()) continue;
         effect->drawBlendSetup(relFrame, canvas);
     }
 }
@@ -72,6 +74,7 @@ void BlendEffectCollection::detachedBlendSetup(
     const int iMax = ca_getNumberOfChildren();
     for(int i = 0; i < iMax; i++) {
         const auto effect = getChild(i);
+        if(!effect->isVisible()) continue;
         effect->detachedBlendSetup(boxToDraw, relFrame, canvas, filter, drawId, delayed);
     }
 }
