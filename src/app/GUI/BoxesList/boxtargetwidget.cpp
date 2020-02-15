@@ -77,9 +77,7 @@ void BoxTargetWidget::dragLeaveEvent(QDragLeaveEvent *event) {
 void BoxTargetWidget::mousePressEvent(QMouseEvent *event) {
     if(!mProperty) return;
     if(event->button() == Qt::LeftButton) {
-        auto tester = &Property::SWT_isBoundingBox;
-        BoundingBox *parentBox =
-                mProperty->getFirstAncestor<BoundingBox>(tester);
+        const auto parentBox = mProperty->getFirstAncestor<BoundingBox>();
         if(!parentBox) return;
         const auto srcGroup = parentBox->getParentGroup();
         if(!srcGroup) return;

@@ -93,8 +93,6 @@ class FillSettingsAnimator : public PaintSettingsAnimator {
 protected:
     FillSettingsAnimator(BoundingBox * const parent) :
         PaintSettingsAnimator("fill", parent) {}
-public:
-    bool SWT_isFillSettingsAnimator() const { return true; }
 };
 
 struct UpdatePaintSettings {

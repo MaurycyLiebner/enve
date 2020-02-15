@@ -43,8 +43,6 @@ class Circle : public PathBox {
 protected:
     Circle();
 public:
-    bool SWT_isCircle() const;
-
     SkPath getRelativePath(const qreal relFrame) const;
 
     bool differenceInEditPathBetweenFrames(

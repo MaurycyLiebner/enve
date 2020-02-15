@@ -447,7 +447,7 @@ void BoundingBox::planUpdate(const UpdateReason reason) {
     if(mUpdatePlanned && mPlannedReason == UpdateReason::userChange) return;
     if(!isVisibleAndInVisibleDurationRect()) return;
     if(mParentGroup) mParentGroup->planUpdate(reason);
-    else if(!SWT_isCanvas()) return;
+    else if(!enve_cast<Canvas*>(this)) return;
     if(reason == UpdateReason::userChange) {
         mStateId++;
         mRenderDataHandler.clear();

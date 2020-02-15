@@ -6,8 +6,7 @@ class BlendEffect;
 
 class BlendEffectBoxShadow : public eBoxOrSound {
     e_OBJECT
-    Q_OBJECT
-    DECLARE_ETYPE(BlendEffectBoxShadow)
+    e_DECLARE_TYPE(BlendEffectBoxShadow)
 protected:
     BlendEffectBoxShadow(BoundingBox * const box,
                          BlendEffect* const effect);

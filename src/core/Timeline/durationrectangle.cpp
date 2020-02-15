@@ -131,9 +131,7 @@ void DurationRectangle::pressed(const bool shiftPressed) {
 }
 
 bool DurationRectangle::isSelected() {
-    if(mParentProperty.SWT_isBoundingBox() ||
-       mParentProperty.SWT_isSingleSound()) {
-        const auto cont = static_cast<eBoxOrSound*>(&mParentProperty);
+    if(const auto cont = enve_cast<eBoxOrSound*>(&mParentProperty)) {
         return cont->isSelected();
     }
     return false;

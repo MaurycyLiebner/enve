@@ -300,7 +300,7 @@ bool PathBox::differenceInOutlinePathBetweenFrames(const int frame1, const int f
 #include "Boxes/smartvectorpath.h"
 
 SmartVectorPath *PathBox::objectToVectorPathBox() {
-    if(SWT_isSmartVectorPath()) return nullptr;
+    if(enve_cast<SmartVectorPath*>(this)) return nullptr;
     const auto newPath = enve::make_shared<SmartVectorPath>();
     newPath->loadSkPath(mEditPathSk);
     copyPathBoxDataTo(newPath.get());

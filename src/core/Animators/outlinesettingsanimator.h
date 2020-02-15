@@ -25,8 +25,6 @@ class OutlineSettingsAnimator : public PaintSettingsAnimator {
 protected:
     OutlineSettingsAnimator(BoundingBox * const parent);
 public:
-    bool SWT_isStrokeSettings() const { return true; }
-
     void showHideChildrenBeforeChaningPaintType(const PaintType newPaintType);
 
     void prp_writeProperty(eWriteStream& dst) const;

@@ -27,8 +27,6 @@ class ColorAnimator : public StaticComplexAnimator {
 protected:
     ColorAnimator(const QString& name = "color");
 public:
-    bool SWT_isColorAnimator() const { return true; }
-
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
     void prp_setupTreeViewMenu(PropertyMenu * const menu);

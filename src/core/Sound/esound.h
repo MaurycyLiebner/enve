@@ -22,11 +22,11 @@ class Samples;
 class SoundReaderForMerger;
 
 class eSound : public eBoxOrSound {
-public:
+    e_OBJECT
+    e_DECLARE_TYPE(eSound)
+protected:
     eSound();
-
-    bool SWT_isSound() const { return true; }
-
+public:
     virtual int durationSeconds() const = 0;
     virtual QrealSnapshot getVolumeSnap() const = 0;
     virtual stdsptr<Samples> getSamplesForSecond(const int relSecondId) = 0;

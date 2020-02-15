@@ -25,9 +25,24 @@ class QMenu;
 class QAction;
 class QMimeData;
 
+// Properties
 class Property;
+// Animators
+class Animator;
+class ComplexAnimator;
+// Boxes
+class eBoxOrSound;
+class BoundingBox;
+class ContainerBox;
+class Canvas;
+class PathBox;
+class PaintBox;
+class SmartVectorPath;
+class SculptPathBox;
 class BlendEffectBoxShadow;
-class BlendEffectCollection;
+// Sound
+class SingleSound;
+class eSound;
 
 class SingleWidgetTarget : public SelfRef {
     Q_OBJECT
@@ -78,56 +93,29 @@ public:
 
     virtual bool SWT_visibleOnlyIfParentDescendant() const {
         return true;
-    }
+    }    
 
-    DELARE_ETYPE_FUNCTION(Property)
-    DELARE_ETYPE_FUNCTION(BlendEffectBoxShadow)
-    DELARE_ETYPE_FUNCTION(BlendEffectCollection)
+    // Properties
+    e_DECLARE_TYPE_FUNCTION(Property)
     // Animators
-    virtual bool SWT_isGraphAnimator() const { return false; }
-    virtual bool SWT_isBoolAnimator() const { return false; }
-    virtual bool SWT_isColorAnimator() const { return false; }
-    virtual bool SWT_isComplexAnimator() const { return false; }
-    virtual bool SWT_isIntAnimator() const { return false; }
-    virtual bool SWT_isGradient() const { return false; }
-    virtual bool SWT_isFillSettingsAnimator() const { return false; }
-    virtual bool SWT_isStrokeSettings() const { return false; }
-    virtual bool SWT_isSmartPathCollection() const { return false; }
-    virtual bool SWT_isSculptPathCollection() const { return false; }
-    virtual bool SWT_isQPointFAnimator() const { return false; }
-    virtual bool SWT_isQStringAnimator() const { return false; }
-    virtual bool SWT_isBasicTransformAnimator() const { return false; }
-    virtual bool SWT_isBoxTransformAnimator() const { return false; }
-    virtual bool SWT_isSmartPathAnimator() const { return false; }
-    virtual bool SWT_isAnimatedSurface() const { return false; }
-    virtual bool SWT_isQCubicSegment1DAnimator() const { return false; }
+    e_DECLARE_TYPE_FUNCTION(Animator)
+    e_DECLARE_TYPE_FUNCTION(ComplexAnimator)
     // Boxes
-    virtual bool SWT_isCanvas() const { return false; }
-    virtual bool SWT_isAnimationBox() const { return false; }
-    virtual bool SWT_isBoundingBox() const { return false; }
+    e_DECLARE_TYPE_FUNCTION(eBoxOrSound)
+    e_DECLARE_TYPE_FUNCTION(BoundingBox)
+    e_DECLARE_TYPE_FUNCTION(ContainerBox)
+    e_DECLARE_TYPE_FUNCTION(Canvas)
+    e_DECLARE_TYPE_FUNCTION(PathBox)
+    e_DECLARE_TYPE_FUNCTION(PaintBox)
+    e_DECLARE_TYPE_FUNCTION(SmartVectorPath)
+    e_DECLARE_TYPE_FUNCTION(SculptPathBox)
+    e_DECLARE_TYPE_FUNCTION(BlendEffectBoxShadow)
+    // Sound
+    e_DECLARE_TYPE_FUNCTION(eSound)
+
     virtual bool SWT_isLayerBox() const { return false; }
     virtual bool SWT_isGroupBox() const { return false; }
-    virtual bool SWT_isContainerBox() const { return false; }
-    virtual bool SWT_isCircle() const { return false; }
-    virtual bool SWT_isImageBox() const { return false; }
-    virtual bool SWT_isImageSequenceBox() const { return false; }
     virtual bool SWT_isLinkBox() const { return false; }
-    virtual bool SWT_isPathBox() const { return false; }
-    virtual bool SWT_isRectangle() const { return false; }
-    virtual bool SWT_isTextBox() const { return false; }
-    virtual bool SWT_isVideoBox() const { return false; }
-    virtual bool SWT_isPaintBox() const { return false; }
-    virtual bool SWT_isSmartVectorPath() const { return false; }
-    virtual bool SWT_isSculptPathBox() const { return false; }
-    // Properties
-    virtual bool SWT_isBoolProperty() const { return false; }
-    virtual bool SWT_isBoolPropertyContainer() const { return false; }
-    virtual bool SWT_isComboBoxProperty() const { return false; }
-    virtual bool SWT_isBoxTargetProperty() const { return false; }
-    virtual bool SWT_isProperty() const { return false; }
-    // Sound
-    virtual bool SWT_isSingleSound() const { return false; }
-    virtual bool SWT_isSound() const { return false; }
 
     void SWT_addChild(SingleWidgetTarget * const child);
     void SWT_addChildAt(SingleWidgetTarget * const child, const int id);

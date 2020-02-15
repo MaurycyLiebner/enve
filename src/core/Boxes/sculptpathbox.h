@@ -24,11 +24,11 @@
 #include "Animators/paintsettingsanimator.h"
 
 class SculptPathBox : public BoundingBox {
-public:
+    e_OBJECT
+    e_DECLARE_TYPE(SculptPathBox)
+protected:
     SculptPathBox();
-
-    bool SWT_isSculptPathBox() const { return true; }
-
+public:
     void setStrokeBrush(SimpleBrushWrapper * const brush);
     void strokeWidthAction(const QrealAction &action);
 

@@ -25,6 +25,7 @@ enum class CtrlsMode : short;
 enum class QrealPointType : short;
 
 class GraphAnimator : public Animator {
+    e_OBJECT
 protected:
     GraphAnimator(const QString& name);
 public:
@@ -39,8 +40,6 @@ public:
     virtual QPainterPath graph_getPathForSegment(
             const GraphKey * const prevKey,
             const GraphKey * const nextKey) const;
-
-    bool SWT_isGraphAnimator() const { return true; }
 
     void prp_afterChangedAbsRange(const FrameRange& range,
                                   const bool clip = true);

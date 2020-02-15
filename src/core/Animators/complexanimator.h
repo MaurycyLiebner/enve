@@ -24,16 +24,14 @@ class KeysClipboard;
 class QrealAnimator;
 
 class ComplexAnimator : public Animator {
-    e_OBJECT
     Q_OBJECT
+    e_OBJECT
+    e_DECLARE_TYPE(ComplexAnimator)
 protected:
     ComplexAnimator(const QString& name);
 public:
     virtual void ca_childIsRecordingChanged();
     virtual void ca_removeAllChildren();
-
-    bool SWT_isComplexAnimator() const
-    { return true; }
 
     void SWT_setupAbstraction(SWT_Abstraction *abstraction,
                               const UpdateFuncs &updateFuncs,

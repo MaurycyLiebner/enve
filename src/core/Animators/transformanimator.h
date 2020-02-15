@@ -38,8 +38,6 @@ public:
     virtual QMatrix getInheritedTransformAtFrame(const qreal relFrame);
     virtual QMatrix getTotalTransformAtFrame(const qreal relFrame);
 
-    bool SWT_isBasicTransformAnimator() const;
-
     FrameRange prp_getIdenticalRelRange(const int relFrame) const {
         if(mParentTransform) {
             const auto thisIdent = ComplexAnimator::prp_getIdenticalRelRange(relFrame);
@@ -191,9 +189,6 @@ class BoxTransformAnimator : public AdvancedTransformAnimator {
     e_OBJECT
 protected:
     BoxTransformAnimator();
-public:
-    bool SWT_isBoxTransformAnimator() const { return true; }
-
 };
 
 #endif // TRANSFORMANIMATOR_H

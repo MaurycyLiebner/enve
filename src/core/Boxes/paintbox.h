@@ -45,10 +45,10 @@ public:
 
 class PaintBox : public BoundingBox {
     e_OBJECT
+    e_DECLARE_TYPE(PaintBox)
 protected:
     PaintBox();
 public:
-    bool SWT_isPaintBox() const { return true; }
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data,
                          Canvas * const scene);

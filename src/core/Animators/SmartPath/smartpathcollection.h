@@ -31,8 +31,6 @@ class SmartPathCollection : public SmartPathCollectionBase {
 protected:
     SmartPathCollection();
 public:
-    bool SWT_isSmartPathCollection() const { return true; }
-
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 

@@ -31,11 +31,10 @@ class SmartVectorPathEdge;
 
 class SmartVectorPath : public PathBox {
     e_OBJECT
+    e_DECLARE_TYPE(SmartVectorPath)
 protected:
     SmartVectorPath();
 public:
-    bool SWT_isSmartVectorPath() const { return true; }
-
     void setupCanvasMenu(PropertyMenu * const menu);
 
     SkPath getRelativePath(const qreal relFrame) const;

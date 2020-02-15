@@ -16,7 +16,6 @@ typedef DynamicComplexAnimator<
 class BlendEffectCollection : public BlendEffectCollectionBase {
     Q_OBJECT
     e_OBJECT
-    DECLARE_ETYPE(BlendEffectCollection)
 protected:
     BlendEffectCollection();
 public:
@@ -35,7 +34,6 @@ public:
                         const SkFilterQuality filter, int& drawId,
                         QList<BlendEffect::Delayed> &delayed) const;
     void drawBlendSetup(SkCanvas * const canvas);
-
 };
 
 #endif // BLENDEFFECTCOLLECTION_H

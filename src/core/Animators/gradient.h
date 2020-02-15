@@ -28,8 +28,6 @@ class Gradient : public DynamicComplexAnimator<ColorAnimator> {
 protected:
     Gradient();
 public:
-    bool SWT_isGradient() const { return true; }
-
     void prp_writeProperty(eWriteStream &dst) const;
     void prp_readProperty(eReadStream &src);
 

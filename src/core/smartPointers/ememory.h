@@ -23,6 +23,8 @@
 
 #define enve_cast enve::cast
 
+class SingleWidgetTarget;
+
 namespace enve {
     template <class T, typename... Args>
     inline auto make_shared(Args && ...args) {
@@ -94,14 +96,27 @@ namespace enve {
             typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type TO;
             return u ? TO::sCast(*u) : nullptr;
         }
+
+        template <typename T, class U>
+        inline T cast_swt(U* const u, std::false_type) {
+            typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type TO;
+            return cast_qobject<T>(u, std::__bool_constant<std::is_base_of<QObject, TO>::value>());
+
+        }
+
+        template <typename T, class U>
+        inline T cast_swt(U* const u, std::true_type) {
+            typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type TO;
+            return cast_enve<T>(u, std::__bool_constant<HasCastMethod<TO, U>::Has>());
+        }
     }
 
     //! @brief Use virtual function call, qobject_cast, or dynamic_cast,
     //! depending on availability.
     template <typename T, class U>
     inline T cast(U* const u) {
-        typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type TO;
-        return cast_enve<T>(u, std::integral_constant<bool, HasCastMethod<TO, U>::Has>());
+        typedef typename std::remove_cv<U>::type UNC;
+        return cast_swt<T>(const_cast<UNC*>(u), std::__bool_constant<std::is_base_of<SingleWidgetTarget, UNC>::value>());
     }
 
     //! @brief Use virtual function call, qobject_cast, or dynamic_cast,

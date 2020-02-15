@@ -26,7 +26,6 @@ protected:
     ComboBoxProperty(const QString& name,
                      const QStringList &list);
 public:
-    bool SWT_isComboBoxProperty() const { return true; }
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 

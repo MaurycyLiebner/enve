@@ -26,13 +26,12 @@ class BoxTargetProperty;
 
 class BoxTargetProperty : public Property {
     Q_OBJECT
-public:
+    e_OBJECT
+protected:
     BoxTargetProperty(const QString& name);
-
+public:
     bool SWT_dropSupport(const QMimeData* const data);
     bool SWT_drop(const QMimeData* const data);
-
-    bool SWT_isBoxTargetProperty() const { return true; }
 
     void prp_writeProperty(eWriteStream &dst) const;
     void prp_readProperty(eReadStream& src);

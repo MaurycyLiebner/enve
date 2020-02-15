@@ -89,7 +89,7 @@ void Animator::prp_afterChangedAbsRange(const FrameRange &range, const bool clip
 }
 
 void Animator::anim_updateAfterChangedKey(Key * const key) {
-    if(SWT_isComplexAnimator() || !key) return;
+    if(toComplexAnimator() || !key) return;
     const int relFrame = key->getRelFrame();
     int prevKeyRelFrame = anim_getPrevKeyRelFrame(key);
     if(prevKeyRelFrame != FrameRange::EMIN) prevKeyRelFrame++;
@@ -232,7 +232,7 @@ void Animator::anim_coordinateKeysWith(Animator * const other) {
 }
 
 void Animator::anim_deleteCurrentKeyAction() {
-    if(anim_mKeyOnCurrentFrame && !SWT_isComplexAnimator())
+    if(anim_mKeyOnCurrentFrame && !toComplexAnimator())
         anim_removeKeyAction(anim_mKeyOnCurrentFrame->ref<Key>());
 }
 
@@ -274,7 +274,7 @@ void Animator::anim_removeKeyAction(const stdsptr<Key>& newKey) {
 }
 
 void Animator::anim_appendKey(const stdsptr<Key>& newKey) {
-    const bool isComplex = SWT_isComplexAnimator();
+    const bool isComplex = toComplexAnimator();
     if(!isComplex) anim_setRecordingValue(true);
     anim_mKeys.add(newKey);
     if(newKey->getRelFrame() == anim_mCurrentRelFrame)
@@ -319,7 +319,7 @@ Key *Animator::anim_getKeyAtPos(const qreal relX,
     const qreal absX = relX + minViewedFrame*pixelsPerFrame;
     const qreal absFrame = timelineRelFrame + minViewedFrame;
     qreal keySize = keyRectSize;
-    if(SWT_isComplexAnimator()) keySize *= 0.75;
+    if(toComplexAnimator()) keySize *= 0.75;
     if(pixelsPerFrame > keySize) {
         const int relFrameInt = qRound(timelineRelFrame);
         const qreal distToFrame = (relFrameInt + 0.5)*pixelsPerFrame - relX;
@@ -500,7 +500,7 @@ void Animator::anim_drawKey(QPainter * const p,
     else p->setBrush(Qt::red);
     if(key->isHovered()) p->setPen(QPen(Qt::black, 1.5));
     else p->setPen(QPen(Qt::black, 0.5));
-    const qreal keyRadius = rowHeight * (SWT_isComplexAnimator() ? 0.21 : 0.3);
+    const qreal keyRadius = rowHeight * (toComplexAnimator() ? 0.21 : 0.3);
     const int frameRelToStart = key->getRelFrame() - startFrame;
     const QPointF keyCenter((frameRelToStart + 0.5)*pixelsPerFrame,
                             0.5*rowHeight);

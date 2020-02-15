@@ -26,13 +26,11 @@ class HddCachableCacheHandler;
 #include "FileCacheHandlers/filehandlerobjref.h"
 
 class SingleSound : public eSound {
-    e_OBJECT
     Q_OBJECT
+    e_OBJECT
 protected:
     SingleSound(const qsptr<FixedLenAnimationRect> &durRect = nullptr);
 public:
-    bool SWT_isSingleSound() const { return mIndependent; }
-
     void prp_setupTreeViewMenu(PropertyMenu * const menu);
 
     int prp_getRelFrameShift() const;
@@ -61,9 +59,8 @@ public:
 
     const HddCachableCacheHandler* getCacheHandler() const;
 
-    bool videoSound() const {
-        return !mIndependent;
-    }
+    bool isIndependent() const { return mIndependent; }
+    bool isVideoSound() const { return !mIndependent; }
 
     void setStretch(const qreal stretch);
     qreal getStretch() const { return mStretch; }

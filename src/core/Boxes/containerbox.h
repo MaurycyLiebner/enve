@@ -25,11 +25,11 @@ class BlendEffectBoxShadow;
 class ContainerBox : public BoxWithPathEffects {
     Q_OBJECT
     e_OBJECT
+    e_DECLARE_TYPE(ContainerBox)
     typedef qCubicSegment1DAnimator::Action SegAction;
 protected:
     ContainerBox(const eBoxType type);
 public:
-    bool SWT_isContainerBox() const { return true; }
     bool SWT_isGroupBox() const final { return !mIsLayer; }
     bool SWT_isLayerBox() const final { return mIsLayer; }
 

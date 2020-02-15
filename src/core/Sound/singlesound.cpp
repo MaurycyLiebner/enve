@@ -82,7 +82,7 @@ void SingleSound::prp_setupTreeViewMenu(PropertyMenu * const menu) {
         sound->setVisible(enable);
     };
     menu->addCheckableAction("Enabled", isVisible(), enableOp);
-    if(videoSound()) return;
+    if(isVideoSound()) return;
     const auto widget = menu->getParentWidget();
     const PropertyMenu::PlainSelectedOp<SingleSound> stretchOp =
             [this, widget](SingleSound * sound) {
@@ -154,7 +154,7 @@ void SingleSound::updateDurationRectLength() {
 
 void SingleSound::setFilePath(const QString &path) {
     mFileHandler.assign(path);
-    if(videoSound()) RuntimeThrow("Setting file path for video sound");
+    if(isVideoSound()) RuntimeThrow("Setting file path for video sound");
 }
 
 void SingleSound::setSoundDataHandler(SoundDataHandler* const newDataHandler) {
@@ -186,7 +186,7 @@ bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 
 #include "ReadWrite/basicreadwrite.h"
 void SingleSound::prp_writeProperty(eWriteStream& dst) const {
-    if(videoSound()) {
+    if(isVideoSound()) {
         StaticComplexAnimator::prp_writeProperty(dst);
         dst << mVisible;
         return;
@@ -197,7 +197,7 @@ void SingleSound::prp_writeProperty(eWriteStream& dst) const {
 }
 
 void SingleSound::prp_readProperty(eReadStream& src) {
-    if(videoSound()) {
+    if(isVideoSound()) {
         StaticComplexAnimator::prp_readProperty(src);
         src >> mVisible;
         return;

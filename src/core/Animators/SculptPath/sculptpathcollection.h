@@ -28,8 +28,6 @@ class SculptPathCollection : public SculptPathCollectionBase {
 protected:
     SculptPathCollection();
 public:
-    bool SWT_isSculptPathCollection() const { return true; }
-
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 

@@ -39,8 +39,6 @@ public:
         divide
     };
 
-    bool SWT_isSmartPathAnimator() const { return true; }
-
     QMimeData *SWT_createMimeData();
 
     void prp_setupTreeViewMenu(PropertyMenu * const menu);

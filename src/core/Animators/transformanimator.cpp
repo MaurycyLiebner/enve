@@ -256,8 +256,6 @@ void BasicTransformAnimator::setParentTransformAnimator(
     updateInheritedTransform(UpdateReason::userChange);
 }
 
-bool BasicTransformAnimator::SWT_isBasicTransformAnimator() const { return true; }
-
 void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal sx,
                                                        const qreal sy,
                                                       const QPointF &pivot) {

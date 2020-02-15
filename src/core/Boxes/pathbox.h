@@ -34,6 +34,7 @@ class PathEffect;
 class PathBox : public BoxWithPathEffects {
     typedef qCubicSegment1DAnimator::Action SegAction;
     e_OBJECT
+    e_DECLARE_TYPE(PathBox)
 protected:
     PathBox(const QString& name, const eBoxType type);
 public:
@@ -53,8 +54,6 @@ public:
     bool relPointInsidePath(const QPointF &relPos) const;
 
     void drawHoveredSk(SkCanvas *canvas, const float invScale);
-
-    bool SWT_isPathBox() const { return true; }
 
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data,

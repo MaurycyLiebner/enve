@@ -53,8 +53,6 @@ public:
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
-
-    bool SWT_isAnimationBox() const { return true; }
     void setupCanvasMenu(PropertyMenu * const menu);
     void setupRenderData(const qreal relFrame,
                          BoxRenderData * const data,

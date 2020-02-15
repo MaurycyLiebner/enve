@@ -28,10 +28,10 @@ private: \
     friend class StdSelfRef; \
     e_PROHIBIT_HEAP
 
-#define DELARE_ETYPE_FUNCTION(className) \
+#define e_DECLARE_TYPE_FUNCTION(className) \
     virtual className* to##className() { return nullptr; }
 
-#define DECLARE_ETYPE(className) \
+#define e_DECLARE_TYPE(className) \
     public: \
     template <class U> \
     static inline className* sCast(U& u) { \

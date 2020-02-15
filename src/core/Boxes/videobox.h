@@ -30,7 +30,6 @@ protected:
 public:
     void soundDataChanged();
 
-    bool SWT_isVideoBox() const { return true; }
     void changeSourceFile();
 
     void writeBoundingBox(eWriteStream& dst) const;

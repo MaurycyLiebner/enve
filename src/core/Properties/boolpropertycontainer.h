@@ -25,7 +25,6 @@ class BoolPropertyContainer : public StaticComplexAnimator {
 protected:
     BoolPropertyContainer(const QString& name);
 public:
-    bool SWT_isBoolPropertyContainer() const { return true; }
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 

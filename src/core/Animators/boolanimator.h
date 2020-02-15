@@ -23,8 +23,6 @@ class BoolAnimator : public IntAnimator {
     e_OBJECT
     BoolAnimator(const QString& name);
 public:
-    bool SWT_isBoolAnimator() const { return true; }
-
     bool getBoolValue();
     void setCurrentBoolValue(const bool value);
     bool getBoolValue(const qreal relFrame);

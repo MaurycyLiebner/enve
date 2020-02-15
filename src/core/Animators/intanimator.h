@@ -32,7 +32,6 @@ public:
     void setCurrentIntValue(const int value);
     void setIntValueRange(const int minVal, const int maxVal);
 
-    bool SWT_isIntAnimator() const { return true; }
     int getBaseIntValue(const qreal relFrame) const;
     int getEffectiveIntValue(const qreal relFrame) const;
 

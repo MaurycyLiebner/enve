@@ -24,8 +24,6 @@ class QStringAnimator : public SteppedAnimator<QString> {
     e_OBJECT
 protected:
     QStringAnimator(const QString& name);
-public:
-    bool SWT_isQStringAnimator() const { return true; }
 };
 
 #endif // QSTRINGANIMATOR_H

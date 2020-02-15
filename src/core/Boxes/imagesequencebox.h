@@ -26,8 +26,6 @@ protected:
 public:
     void setFolderPath(const QString &folderPath);
 
-    bool SWT_isImageSequenceBox() const { return true; }
-
     void changeSourceFile();
     void writeBoundingBox(eWriteStream& dst) const;
     void readBoundingBox(eReadStream& src);

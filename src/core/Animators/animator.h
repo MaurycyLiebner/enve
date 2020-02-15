@@ -27,6 +27,7 @@ class TimelineMovable;
 
 class Animator : public Property {
     Q_OBJECT
+    e_DECLARE_TYPE(Animator)
     friend class OverlappingKeys;
 protected:
     Animator(const QString &name);

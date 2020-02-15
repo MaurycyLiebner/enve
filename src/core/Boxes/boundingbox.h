@@ -82,6 +82,7 @@ typedef TypeMenu<Property> PropertyMenu;
 class BoundingBox : public eBoxOrSound {
     Q_OBJECT
     e_OBJECT
+    e_DECLARE_TYPE(BoundingBox)
     typedef qCubicSegment1DAnimator::Action SegAction;
 protected:
     BoundingBox(const QString& name, const eBoxType type);
@@ -224,8 +225,6 @@ public:
 
     virtual void updateIfUsesProgram(const ShaderEffectProgram * const program) const;
 
-    bool SWT_isBoundingBox() const final
-    { return true; }
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool parentSatisfies,
                              const bool parentMainTarget) const;

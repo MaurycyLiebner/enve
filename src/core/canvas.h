@@ -143,14 +143,16 @@ class Canvas : public CanvasBase {
     typedef qCubicSegment1DAnimator::Action SegAction;
     Q_OBJECT
     e_OBJECT
-public:
+    e_DECLARE_TYPE(Canvas)
+protected:
     explicit Canvas(Document& document,
                     const int canvasWidth = 1920,
                     const int canvasHeight = 1080,
                     const int frameCount = 200,
                     const qreal fps = 24);
-    ~Canvas();
 public:
+    ~Canvas();
+
     void prp_afterChangedAbsRange(const FrameRange &range,
                                   const bool clip = true);
 
@@ -503,8 +505,6 @@ public:
         anim_scaleTime(0, fps/mFps);
         setFps(fps);
     }
-
-    bool SWT_isCanvas() const { return true; }
 
     void addActionsToMenu(QMenu* const menu);
 

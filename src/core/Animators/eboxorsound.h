@@ -26,9 +26,10 @@ class QMimeData;
 class eBoxOrSound : public StaticComplexAnimator {
     Q_OBJECT
     e_OBJECT
-public:
+    e_DECLARE_TYPE(eBoxOrSound)
+protected:
     eBoxOrSound(const QString& name);
-
+public:
     void setParentGroup(ContainerBox * const parent);
     ContainerBox *getParentGroup() const { return mParentGroup; }
     void removeFromParent_k();

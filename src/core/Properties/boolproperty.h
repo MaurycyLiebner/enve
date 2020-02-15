@@ -24,7 +24,6 @@ class BoolProperty : public Property {
 protected:
     BoolProperty(const QString& name);
 public:
-    bool SWT_isBoolProperty() const { return true; }
     void prp_writeProperty(eWriteStream& dst) const;
     void prp_readProperty(eReadStream& src);
 

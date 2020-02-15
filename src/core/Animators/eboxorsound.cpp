@@ -19,6 +19,7 @@
 #include "canvas.h"
 #include "Timeline/durationrectangle.h"
 #include "Properties/emimedata.h"
+#include "Sound/esound.h"
 
 eBoxOrSound::eBoxOrSound(const QString &name) :
     StaticComplexAnimator(name) {
@@ -348,8 +349,8 @@ void eBoxOrSound::deselect() {
 void eBoxOrSound::selectionChangeTriggered(const bool shiftPressed) {
     const auto pScene = getParentScene();
     if(!pScene) return;
-    if(!SWT_isBoundingBox()) return;
-    const auto bb = static_cast<BoundingBox*>(this);
+    const auto bb = enve_cast<BoundingBox*>(this);
+    if(!bb) return;
     if(shiftPressed) {
         if(mSelected) {
             pScene->removeBoxFromSelection(bb);
@@ -365,7 +366,7 @@ void eBoxOrSound::selectionChangeTriggered(const bool shiftPressed) {
 void eBoxOrSound::setVisible(const bool visible) {
     if(mVisible == visible) return;
     if(!SWT_isLinkBox()) {
-        if(SWT_isSound()) {
+        if(enve_cast<eSound*>(this)) {
             prp_pushUndoRedoName(visible ? "Mute" : "Unmute");
         } else prp_pushUndoRedoName(visible ? "Hide" : "Show");
         UndoRedo ur;
@@ -428,9 +429,10 @@ void eBoxOrSound::unlock() {
 void eBoxOrSound::setLocked(const bool locked) {
     if(locked == mLocked) return;
     const auto pScene = getParentScene();
-    if(pScene && mSelected && SWT_isBoundingBox()) {
-        const auto bb = static_cast<BoundingBox*>(this);
-        pScene->removeBoxFromSelection(bb);
+    if(pScene && mSelected) {
+        if(const auto bb = enve_cast<BoundingBox*>(this)) {
+            pScene->removeBoxFromSelection(bb);
+        }
     }
     mLocked = locked;
     SWT_scheduleContentUpdate(SWT_BoxRule::locked);

@@ -26,10 +26,10 @@ enum class TextFragmentType : short {
 };
 
 class TextBox : public PathBox {
-public:
+    e_OBJECT
+protected:
     TextBox();
-
-    bool SWT_isTextBox() const { return true; }
+public:
     void setupCanvasMenu(PropertyMenu * const menu);
     SkPath getRelativePath(const qreal relFrame) const;
 

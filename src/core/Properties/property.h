@@ -57,14 +57,14 @@ typedef TypeMenu<Property> PropertyMenu;
 
 class Property : public SingleWidgetTarget {
     Q_OBJECT
+    e_OBJECT
+    e_DECLARE_TYPE(Property)
     friend class SceneParentSelfAssign;
 protected:
     Property(const QString &name);
 
     virtual void prp_updateCanvasProps();
 public:
-    bool SWT_isProperty() const final { return true; }
-
     virtual int prp_getRelFrameShift() const { return 0; }
 
     virtual FrameRange prp_relInfluenceRange() const {
