@@ -98,6 +98,7 @@ private:
     void finishTextEditing();
     void lineEditingFinished();
     void updateLineEditFromValue();
+    bool cancelMove();
 
     bool mMouseMoved = false;
     bool mLeftNeighbour = false;
