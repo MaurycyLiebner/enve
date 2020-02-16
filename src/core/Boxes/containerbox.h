@@ -30,11 +30,11 @@ class ContainerBox : public BoxWithPathEffects {
 protected:
     ContainerBox(const eBoxType type);
 public:
-    bool SWT_isGroupBox() const final { return !mIsLayer; }
-    bool SWT_isLayerBox() const final { return mIsLayer; }
+    bool isGroup() const final { return !mIsLayer; }
+    bool isLayer() const final { return mIsLayer; }
 
     HardwareSupport hardwareSupport() const {
-        if(SWT_isLayerBox()) return HardwareSupport::gpuPreffered;
+        if(isLayer()) return HardwareSupport::gpuPreffered;
         return BoundingBox::hardwareSupport();
     }
 
@@ -107,7 +107,7 @@ public:
     FillSettingsAnimator *getFillSettings() const;
     OutlineSettingsAnimator *getStrokeSettings() const;
 
-    bool shouldScheduleUpdate() { return !SWT_isGroupBox(); }
+    bool shouldScheduleUpdate() { return isLayer(); }
 
     void queChildrenTasks();
     void queTasks();

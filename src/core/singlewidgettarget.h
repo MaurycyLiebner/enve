@@ -113,10 +113,6 @@ public:
     // Sound
     e_DECLARE_TYPE_FUNCTION(eSound)
 
-    virtual bool SWT_isLayerBox() const { return false; }
-    virtual bool SWT_isGroupBox() const { return false; }
-    virtual bool SWT_isLinkBox() const { return false; }
-
     void SWT_addChild(SingleWidgetTarget * const child);
     void SWT_addChildAt(SingleWidgetTarget * const child, const int id);
     void SWT_removeChild(SingleWidgetTarget * const child);

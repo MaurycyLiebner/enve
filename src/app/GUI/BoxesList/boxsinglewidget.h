@@ -107,9 +107,9 @@ protected:
     void clearAndHideValueAnimators();
     void updateValueSlidersForQPointFAnimator();
 private:
-    void clearSelected() {
-        setSelected(false);
-    }
+    ContainerBox *getPromoteTargetGroup();
+
+    void clearSelected() { setSelected(false); }
     void switchContentVisibleAction();
     void switchRecordingAction();
     void switchBoxLockedAction();

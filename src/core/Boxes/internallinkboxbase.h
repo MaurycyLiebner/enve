@@ -31,7 +31,7 @@ protected:
                         const bool innerLink) :
         BoxT(name, type), mInnerLink(innerLink) {}
 public:
-    bool SWT_isLinkBox() const override { return true; }
+    bool isLink() const final { return true; }
 
     FrameRange prp_getIdenticalRelRange(const int relFrame) const override;
     FrameRange prp_relInfluenceRange() const override;
@@ -177,7 +177,7 @@ template <typename BoxT>
 BoxT *ILBB::getFinalTarget() const {
     const auto linkTarget = getLinkTarget();
     if(!linkTarget) return nullptr;
-    if(linkTarget->SWT_isLinkBox()) {
+    if(linkTarget->isLink()) {
         const auto targetAsLink = static_cast<ILBB*>(linkTarget);
         return targetAsLink->getFinalTarget();
     }

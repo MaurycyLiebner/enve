@@ -242,14 +242,14 @@ void ContainerBox::queChildrenTasks() {
 
 void ContainerBox::queTasks() {
     queChildrenTasks();
-    if(getUpdatePlanned() && SWT_isGroupBox())
+    if(getUpdatePlanned() && isGroup())
         updateRelBoundingRect();
     else BoundingBox::queTasks();
 }
 
 void ContainerBox::promoteToLayer() {
-    if(!SWT_isGroupBox()) return;
-    if(!SWT_isLinkBox()) mType = eBoxType::layer;
+    if(!isGroup()) return;
+    if(!isLink()) mType = eBoxType::layer;
     mIsLayer = true;
     if(prp_getName().contains("Group")) {
         auto newName  = prp_getName();
@@ -279,8 +279,8 @@ void ContainerBox::promoteToLayer() {
 }
 
 void ContainerBox::demoteToGroup() {
-    if(!SWT_isLayerBox()) return;
-    if(!SWT_isLinkBox()) mType = eBoxType::group;
+    if(!isLayer()) return;
+    if(!isLink()) mType = eBoxType::group;
     mIsLayer = false;
     if(prp_getName().contains("Layer")) {
         auto newName  = prp_getName();
@@ -392,7 +392,7 @@ void ContainerBox::addAllChildBoxesWithBlendEffects(
         if(child->blendEffectsEnabled()) {
             layer->addBoxWithBlendEffects(child);
         }
-        if(child->SWT_isGroupBox()) {
+        if(child->isGroup()) {
             const auto cBox = static_cast<ContainerBox*>(child);
             cBox->addAllChildBoxesWithBlendEffects(layer);
         }
@@ -405,7 +405,7 @@ void ContainerBox::removeAllChildBoxesWithBlendEffects(
         if(child->blendEffectsEnabled()) {
             layer->removeBoxWithBlendEffects(child);
         }
-        if(child->SWT_isGroupBox()) {
+        if(child->isGroup()) {
             const auto cBox = static_cast<ContainerBox*>(child);
             cBox->removeAllChildBoxesWithBlendEffects(layer);
         }
@@ -572,7 +572,7 @@ void ContainerBox::setDescendantCurrentGroup(const bool bT) {
 }
 
 BoundingBox *ContainerBox::getBoxAtFromAllDescendents(const QPointF &absPos) {
-    if(SWT_isLinkBox()) return nullptr;
+    if(isLink()) return nullptr;
     BoundingBox* boxAtPos = nullptr;
     for(const auto& box : mContainedBoxes) {
         if(box->isVisibleAndUnlocked() &&
@@ -639,12 +639,12 @@ void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
     menu->addPlainAction<ContainerBox>("Promote to Layer",
                                        [](ContainerBox * box) {
         box->promoteToLayer();
-    })->setEnabled(SWT_isGroupBox());
+    })->setEnabled(isGroup());
 
     menu->addPlainAction<ContainerBox>("Demote to Group",
                                        [](ContainerBox * box) {
         box->demoteToGroup();
-    })->setDisabled(SWT_isGroupBox());
+    })->setDisabled(isGroup());
 
     BoxWithPathEffects::setupCanvasMenu(menu);
 }
@@ -669,7 +669,7 @@ void ContainerBox::drawContained(SkCanvas * const canvas,
         const auto& nextBox = i == 0 ? nullptr : mContainedBoxes.at(i - 1);
         if(box->isVisibleAndInVisibleDurationRect()) {
             box->drawPixmapSk(canvas, filter, drawId, delayed);
-            if(!box->SWT_isGroupBox()) drawId++;
+            if(!box->isGroup()) drawId++;
         }
         handleDelayed(delayed, drawId, box, nextBox);
     }
@@ -717,7 +717,7 @@ void ContainerBox::updateUIElementsForBlendEffects(
         const auto& box = mContainedBoxes.at(i);
         const auto& nextBox = i == 0 ? nullptr : mContainedBoxes.at(i - 1);
         if(box->isVisibleAndInVisibleDurationRect()) {
-            if(box->SWT_isGroupBox()) {
+            if(box->isGroup()) {
                 const auto groupBox = static_cast<ContainerBox*>(box);
                 groupBox->updateUIElementsForBlendEffects(drawId, delayed);
             } else drawId++;
@@ -731,7 +731,7 @@ void ContainerBox::containedDetachedBlendUISetup(
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
         const auto& box = mContainedBoxes.at(i);
         if(box->isVisibleAndInVisibleDurationRect()) {
-            if(box->SWT_isGroupBox()) {
+            if(box->isGroup()) {
                 const auto cBox = static_cast<ContainerBox*>(box);
                 cBox->containedDetachedBlendUISetup(drawId, delayed);
             } else {
@@ -763,7 +763,7 @@ void ContainerBox::containedDetachedBlendSetup(
     for(int i = mContainedBoxes.count() - 1; i >= 0; i--) {
         const auto& box = mContainedBoxes.at(i);
         if(box->isVisibleAndInVisibleDurationRect()) {
-            if(box->SWT_isGroupBox()) {
+            if(box->isGroup()) {
                 const auto cBox = static_cast<ContainerBox*>(box);
                 cBox->containedDetachedBlendSetup(canvas, filter, drawId, delayed);
             } else {
@@ -787,7 +787,7 @@ void ContainerBox::drawContained(SkCanvas * const canvas,
 void ContainerBox::drawPixmapSk(SkCanvas * const canvas,
                                 const SkFilterQuality filter, int& drawId,
                                 QList<BlendEffect::Delayed> &delayed) const {
-    if(SWT_isGroupBox()) return drawContained(canvas, filter, drawId, delayed);
+    if(isGroup()) return drawContained(canvas, filter, drawId, delayed);
     if(mIsDescendantCurrentGroup) {
         SkPaint paint;
         const int intAlpha = qRound(mTransformAnimator->getOpacity()*2.55);
@@ -820,7 +820,7 @@ void processChildData(BoundingBox * const child,
                       const qreal absFrame,
                       QList<ChildRenderData>& delayed) {
     if(!child->isFrameFVisibleAndInDurationRect(childRelFrame)) return;
-    if(child->SWT_isGroupBox()) {
+    if(child->isGroup()) {
         const auto childGroup = static_cast<ContainerBox*>(child);
         const auto& descs = childGroup->getContainedBoxes();
         for(int i = descs.count() - 1; i >= 0; i--) {
@@ -991,14 +991,13 @@ void ContainerBox::insertContained(
 
     updateContainedIds(id);
 
-    const bool isLinkBox = SWT_isLinkBox();
-    if(!isLinkBox) {
+    const bool isLink = this->isLink();
+    if(!isLink) {
         SWT_addChildAt(child.get(), containedIdToAbstractionId(id));
     }
 
-    if(enve_cast<BoundingBox*>(child)) {
+    if(const auto box = enve_cast<BoundingBox*>(child)) {
         updateContainedBoxes();
-        const auto box = static_cast<BoundingBox*>(child.get());
         connCtx << connect(box, &Property::prp_absFrameRangeChanged,
                            this, &Property::prp_afterChangedAbsRange);
         connCtx << connect(box, &BoundingBox::blendEffectChanged,
@@ -1008,7 +1007,7 @@ void ContainerBox::insertContained(
             if(box->blendEffectsEnabled()) {
                 pLayer->addBoxWithBlendEffects(box);
             }
-            if(box->SWT_isGroupBox()) {
+            if(box->isGroup()) {
                 const auto cBox = static_cast<ContainerBox*>(box);
                 cBox->addAllChildBoxesWithBlendEffects(pLayer);
             }
@@ -1020,7 +1019,7 @@ void ContainerBox::insertContained(
     child->prp_afterWholeInfluenceRangeChanged();
     emit insertedObject(id, child.get());
 
-    if(!isLinkBox && !isBoxShadow) {
+    if(!isLink && !isBoxShadow) {
         prp_pushUndoRedoName("Insert " + child->prp_getName());
         UndoRedo ur;
         ur.fUndo = [this, child]() {
@@ -1047,9 +1046,8 @@ void ContainerBox::removeAllContained() {
 
 void ContainerBox::removeContainedFromList(const int id) {
     const auto child = mContained.takeObjAt(id);
-    if(enve_cast<ContainerBox*>(child)) {
+    if(const auto group = enve_cast<ContainerBox*>(child)) {
         const auto pScene = getParentScene();
-        const auto group = static_cast<ContainerBox*>(child.get());
         if(group->isCurrentGroup() && pScene) {
             pScene->setCurrentGroupParentAsCurrentGroup();
         }
@@ -1059,15 +1057,14 @@ void ContainerBox::removeContainedFromList(const int id) {
     child->setParentGroup(nullptr);
     updateContainedIds(id);
 
-    if(enve_cast<BoundingBox*>(child)) {
+    if(const auto box = enve_cast<BoundingBox*>(child)) {
         updateContainedBoxes();
-        const auto box = static_cast<BoundingBox*>(child.get());
         const auto pLayer = mIsLayer ? this : box->getFirstParentLayer();
         if(pLayer) {
             if(box->blendEffectsEnabled()) {
                 pLayer->removeBoxWithBlendEffects(box);
             }
-            if(box->SWT_isGroupBox()) {
+            if(box->isGroup()) {
                 const auto cBox = static_cast<ContainerBox*>(child.get());
                 cBox->removeAllChildBoxesWithBlendEffects(pLayer);
             }
@@ -1078,7 +1075,7 @@ void ContainerBox::removeContainedFromList(const int id) {
 
     emit removedObject(id, child.get());
 
-    if(!SWT_isLinkBox() && !enve_cast<BlendEffectBoxShadow*>(child.get())) {
+    if(!isLink() && !enve_cast<BlendEffectBoxShadow*>(child.get())) {
         prp_pushUndoRedoName("Remove " + child->prp_getName());
         UndoRedo ur;
         ur.fUndo = [this, id, child]() {
@@ -1180,7 +1177,7 @@ void ContainerBox::moveContainedInList(eBoxOrSound * const child,
 
     emit movedObject(from, boundTo, child);
 
-    if(!SWT_isLinkBox()) {
+    if(!isLink()) {
         prp_pushUndoRedoName("Change Z-Index");
         UndoRedo ur;
         qptr<eBoxOrSound> childQPtr = child;
@@ -1244,10 +1241,10 @@ void ContainerBox::writeAllContained(eWriteStream& dst) const {
         const auto &child = mContained.at(i);
         if(enve_cast<BlendEffectBoxShadow*>(child.get())) continue;
         const auto futureId = dst.planFuturePos();
-        const bool isBox = enve_cast<BoundingBox*>(child);
+        const auto box = enve_cast<BoundingBox*>(child);
+        const bool isBox = box;
         dst << isBox;
         if(isBox) {
-            const auto box = static_cast<BoundingBox*>(child.get());
             box->writeIdentifier(dst);
             box->writeBoundingBox(dst);
         } else {

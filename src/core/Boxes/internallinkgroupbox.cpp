@@ -70,7 +70,7 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
             mTransformAnimator->prp_afterChangedRelRange(relRange);
         });
 
-        if(linkTarget->SWT_isLayerBox()) promoteToLayer();
+        if(linkTarget->isLayer()) promoteToLayer();
         else demoteToGroup();
         conn << connect(linkTarget, &ContainerBox::switchedGroupLayer,
                         this, [this](const eBoxType type) {

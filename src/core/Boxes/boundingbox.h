@@ -113,6 +113,9 @@ private:
 protected:
     virtual void getMotionBlurProperties(QList<Property*> &list) const;
 public:
+    virtual bool isGroup() const { return false; }
+    virtual bool isLayer() const { return false; }
+
     virtual qsptr<BoundingBox> createLink(const bool inner);
 
     virtual SmartVectorPath *objectToVectorPathBox()

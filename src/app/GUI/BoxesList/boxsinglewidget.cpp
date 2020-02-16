@@ -209,19 +209,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mPromoteToLayerButton = new PixmapActionButton(this);
     // mHwSupportButton->setToolTip(gSingleLineTooltip("GPU/CPU Processing"));
     mPromoteToLayerButton->setPixmapChooser([this]() {
-        if(!mTarget) return static_cast<QPixmap*>(nullptr);
-        const auto target = mTarget->getTarget();
-        ContainerBox* targetGroup = nullptr;
-        if(target->SWT_isGroupBox()) {
-            targetGroup = static_cast<ContainerBox*>(target);
-        } else if(enve_cast<RasterEffectCollection*>(target) ||
-                  enve_cast<BlendEffectCollection*>(target)) {
-            const auto pTarget = static_cast<Property*>(target);
-            const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
-            if(parentBox && parentBox->SWT_isGroupBox()) {
-                targetGroup = static_cast<ContainerBox*>(parentBox);
-            }
-        }
+        const auto targetGroup = getPromoteTargetGroup();
         if(targetGroup) {
             return BoxSingleWidget::PROMOTE_TO_LAYER_PIXMAP;
         } else return static_cast<QPixmap*>(nullptr);
@@ -231,19 +219,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mMainLayout->addWidget(mPromoteToLayerButton);
     connect(mPromoteToLayerButton, &BoxesListActionButton::pressed,
             this, [this]() {
-        if(!mTarget) return;
-        const auto target = mTarget->getTarget();
-        ContainerBox* targetGroup = nullptr;
-        if(target->SWT_isGroupBox()) {
-            targetGroup = static_cast<ContainerBox*>(target);
-        } else if(enve_cast<RasterEffectCollection*>(target) ||
-                  enve_cast<BlendEffectCollection*>(target)) {
-            const auto pTarget = static_cast<Property*>(target);
-            const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
-            if(parentBox && parentBox->SWT_isGroupBox()) {
-                targetGroup = static_cast<ContainerBox*>(parentBox);
-            }
-        }
+        const auto targetGroup = getPromoteTargetGroup();
         if(targetGroup) {
             targetGroup->promoteToLayer();
             Document::sInstance->actionFinished();
@@ -320,6 +296,23 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mMainLayout->addSpacing(MIN_WIDGET_DIM/2);
 
     hide();
+}
+
+ContainerBox* BoxSingleWidget::getPromoteTargetGroup() {
+    if(!mTarget) return nullptr;
+    const auto target = mTarget->getTarget();
+    ContainerBox* targetGroup = nullptr;
+    if(const auto box = enve_cast<ContainerBox*>(target)) {
+        if(box->isGroup()) targetGroup = box;
+    } else if(enve_cast<RasterEffectCollection*>(target) ||
+              enve_cast<BlendEffectCollection*>(target)) {
+        const auto pTarget = static_cast<Property*>(target);
+        const auto parentBox = pTarget->getFirstAncestor<BoundingBox>();
+        if(parentBox && parentBox->isGroup()) {
+            targetGroup = static_cast<ContainerBox*>(parentBox);
+        }
+    }
+    return targetGroup;
 }
 
 void BoxSingleWidget::setCompositionMode(const int id) {
@@ -404,8 +397,8 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mHwSupportButton->setVisible(rasterEffect);
     {
         ContainerBox* targetGroup = nullptr;
-        if(prop->SWT_isGroupBox()) {
-            targetGroup = static_cast<ContainerBox*>(prop);
+        if(boundingBox && boundingBox->isGroup()) {
+            targetGroup = static_cast<ContainerBox*>(boundingBox);
             mTargetConn << connect(targetGroup,
                                    &ContainerBox::switchedGroupLayer,
                                    this, [this](const eBoxType type) {
@@ -414,7 +407,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         } else if(enve_cast<RasterEffectCollection*>(prop) ||
                   enve_cast<BlendEffectCollection*>(prop)) {
             const auto parentBox = prop->getFirstAncestor<BoundingBox>();
-            if(parentBox && parentBox->SWT_isGroupBox()) {
+            if(parentBox && parentBox->isGroup()) {
                 targetGroup = static_cast<ContainerBox*>(parentBox);
             }
         }
@@ -448,7 +441,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         mBlendModeVisible = true;
         const auto blendName = SkBlendMode_Name(boundingBox->getBlendMode());
         mBlendModeCombo->setCurrentText(blendName);
-        mBlendModeCombo->setEnabled(!prop->SWT_isGroupBox());
+        mBlendModeCombo->setEnabled(!boundingBox->isGroup());
         mTargetConn << connect(boundingBox, &BoundingBox::blendModeChanged,
                                this, [this](const SkBlendMode mode) {
             mBlendModeCombo->setCurrentText(SkBlendMode_Name(mode));

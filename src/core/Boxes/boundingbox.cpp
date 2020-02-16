@@ -284,7 +284,7 @@ bool BoundingBox::hasBlendEffects() const {
 ContainerBox *BoundingBox::getFirstParentLayer() const {
     const auto parent = getParentGroup();
     if(!parent) return nullptr;
-    if(parent->SWT_isLayerBox()) return parent;
+    if(parent->isLayer()) return parent;
     return parent->getFirstParentLayer();
 }
 

@@ -365,7 +365,7 @@ void eBoxOrSound::selectionChangeTriggered(const bool shiftPressed) {
 
 void eBoxOrSound::setVisible(const bool visible) {
     if(mVisible == visible) return;
-    if(!SWT_isLinkBox()) {
+    if(!isLink()) {
         if(enve_cast<eSound*>(this)) {
             prp_pushUndoRedoName(visible ? "Mute" : "Unmute");
         } else prp_pushUndoRedoName(visible ? "Hide" : "Show");

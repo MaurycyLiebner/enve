@@ -22,6 +22,8 @@ class eSoundLink : public eSound {
 public:
     eSoundLink(eSound* const target);
 
+    bool isLink() const final { return true; }
+
     qsptr<eSound> createLink() {
         return enve::make_shared<eSoundLink>(mTarget);
     }

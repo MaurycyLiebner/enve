@@ -30,10 +30,7 @@ class eBoxOrSound : public StaticComplexAnimator {
 protected:
     eBoxOrSound(const QString& name);
 public:
-    void setParentGroup(ContainerBox * const parent);
-    ContainerBox *getParentGroup() const { return mParentGroup; }
-    void removeFromParent_k();
-    bool isAncestor(const BoundingBox * const box) const;
+    virtual bool isLink() const { return false; }
 
     virtual bool isFrameInDurationRect(const int relFrame) const;
     virtual bool isFrameFInDurationRect(const qreal relFrame) const;
@@ -57,6 +54,10 @@ public:
             QPainter * const p, const qreal pixelsPerFrame,
             const FrameRange &absFrameRange, const int rowHeight);
 
+    void setParentGroup(ContainerBox * const parent);
+    ContainerBox *getParentGroup() const { return mParentGroup; }
+    void removeFromParent_k();
+    bool isAncestor(const BoundingBox * const box) const;
 
     void drawDurationRectangle(
             QPainter * const p, const qreal pixelsPerFrame,
