@@ -92,7 +92,7 @@ void VideoFrameLoader::readFrame() {
     const auto videoStream = mOpenedVideo->fVideoStream;
     const auto packet = mOpenedVideo->fPacket;
     const auto codecContext = mOpenedVideo->fCodecContext;
-    auto decodedFrame = mOpenedVideo->fDecodedFrame;
+    auto& decodedFrame = mOpenedVideo->fDecodedFrame;
     //const auto swsContext = mOpenedVideo->fSwsContext;
     const qreal fps = mOpenedVideo->fFps;
 
@@ -145,19 +145,19 @@ void VideoFrameLoader::readFrame() {
             const auto frame = excessId == -1 ?
                         decodedFrame : mExcessFrames.takeAt(excessId).second;
             setFrameToConvert(frame, codecContext);
-            if(frame != decodedFrame) av_frame_unref(decodedFrame);
+            if(frame == decodedFrame) decodedFrame = av_frame_alloc();
+            else av_frame_unref(decodedFrame);
             break;
         } else if(currFrame == mFrameId || (!reseek && currFrame > mFrameId)) {
             if(currFrame > mFrameId)
                 qDebug() << "frame " + QString::number(currFrame) +
                             " instead of " + QString::number(mFrameId);            
             setFrameToConvert(decodedFrame, codecContext);
-            mOpenedVideo->fDecodedFrame = av_frame_alloc();
+            decodedFrame = av_frame_alloc();
             break;
         } else if(qAbs(mFrameId - currFrame) < 20) {
             mExcessFrames.append({currFrame, decodedFrame});
-            mOpenedVideo->fDecodedFrame = av_frame_alloc();
-            decodedFrame = mOpenedVideo->fDecodedFrame;
+            decodedFrame = av_frame_alloc();
         } else av_frame_unref(decodedFrame);
 
         if(reseek) seek(seekTry++, mFrameId, fps, formatContext,
