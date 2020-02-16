@@ -50,11 +50,12 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
 private:
-    QrealAnimator *getQPointFAnimatorSibling();
+    QrealAnimator *getTransformTargetSibling();
     void targetHasExpressionChanged();
 
     QMetaObject::Connection mExprConn;
     ConnContextQPtr<QrealAnimator> mTarget;
+    qptr<QrealAnimator> mTransformTarget;
     qreal mBaseValue;
 };
 

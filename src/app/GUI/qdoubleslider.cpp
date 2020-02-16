@@ -203,7 +203,6 @@ void QDoubleSlider::cancelTransform() {
     Actions::sInstance->finishSmoothChange();
     Document::sInstance->actionFinished();
     mCanceled = true;
-    setCursor(Qt::ArrowCursor);
     emit editingCanceled();
 }
 
@@ -250,13 +249,16 @@ void QDoubleSlider::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void QDoubleSlider::mousePressEvent(QMouseEvent *event) {
     if(event->button() == Qt::RightButton) {
-        if(mMouseMoved && !mCanceled) cancelTransform();
+        if(mMouseMoved && !mCanceled) {
+            cancelTransform();
+            QApplication::restoreOverrideCursor();
+        }
         else openContextMenu(event->globalPos());
     } else if(event->button() == Qt::LeftButton) {
+        grabMouse();
         mCanceled = false;
-        setCursor(Qt::BlankCursor);
-        mLastX = event->x();
         mGlobalPressPos = event->globalPos();
+        mLastX = event->globalX();
         mLastValue = mValue;
     }
 }
@@ -278,12 +280,15 @@ void QDoubleSlider::setIsLeftSlider(const bool value) {
 void QDoubleSlider::mouseMoveEvent(QMouseEvent *event) {
     if(!mMouseMoved) startTransform(mValue);
 
-    const qreal dValue = getDValueForMouseMove(event->x());
+    const qreal dValue = getDValueForMouseMove(event->globalX());
     const qreal newValue = clamped(mLastValue + dValue);
     mLastValue = newValue;
     setValue(newValue);
 
-    mMouseMoved = true;
+    if(!mMouseMoved) {
+        QApplication::setOverrideCursor(Qt::BlankCursor);
+        mMouseMoved = true;
+    }
     cursor().setPos(mGlobalPressPos);
 }
 
@@ -295,8 +300,7 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
     } else if(etype == QEvent::KeyPress) {
         const auto keyEvent = static_cast<QKeyEvent*>(event);
         const auto ekey = keyEvent->key();
-        if(ekey == Qt::Key_Return ||
-           ekey == Qt::Key_Enter) {
+        if(ekey == Qt::Key_Return || ekey == Qt::Key_Enter) {
             finishTextEditing();
         }
         return !mTextEdit;
@@ -304,14 +308,12 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
         return !mTextEdit;
     } else if(etype == QEvent::MouseButtonPress) {
         const auto mouseEvent = static_cast<QMouseEvent*>(event);
-        if(mouseEvent->button() == Qt::RightButton) return false;
+        if(mouseEvent->button() != Qt::LeftButton) return false;
         mMouseMoved = false;
         mMovesCount = 0;
         if(mTextEdit) {
             if(!rect().contains(mouseEvent->pos()) ) {
                 finishTextEditing();
-//                QApplication::setOverrideCursor(QApplication::widgetAt(mouseEvent->globalPos())->cursor());
-//                QApplication::restoreOverrideCursor();
             }
         } else {
             Actions::sInstance->startSmoothChange();
@@ -319,14 +321,15 @@ bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
         }
         return !mTextEdit;
     } else if(etype == QEvent::MouseButtonRelease) {
+        releaseMouse();
         if(mCanceled) return true;
         const auto mouseEvent = static_cast<QMouseEvent*>(event);
-        if(mouseEvent->button() == Qt::RightButton) return false;
+        if(mouseEvent->button() != Qt::LeftButton) return false;
         if(!mTextEdit) {
             Actions::sInstance->finishSmoothChange();
             if(mMouseMoved) {
+                QApplication::restoreOverrideCursor();
                 mMouseMoved = false;
-                setCursor(Qt::ArrowCursor);
                 finishTransform(mValue);
                 Document::sInstance->actionFinished();
             } else {
