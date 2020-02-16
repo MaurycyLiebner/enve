@@ -78,8 +78,8 @@ VideoFrameLoader *VideoFrameHandler::addFrameLoader(const int frameId) {
     return loader.get();
 }
 
-VideoFrameLoader *VideoFrameHandler::addFrameLoader(const int frameId,
-                                                    AVFrame * const frame) {
+VideoFrameLoader *VideoFrameHandler::addFrameConverter(
+        const int frameId,  AVFrame * const frame) {
     const auto loader = enve::make_shared<VideoFrameLoader>(
                     this, mVideoStreamsData, frameId, frame);
     mDataHandler->addFrameLoader(frameId, loader);

@@ -75,7 +75,7 @@ public:
 protected:
     VideoFrameLoader * getFrameLoader(const int frame);
     VideoFrameLoader * addFrameLoader(const int frameId);
-    VideoFrameLoader * addFrameLoader(const int frameId, AVFrame * const frame);
+    VideoFrameLoader * addFrameConverter(const int frameId, AVFrame * const frame);
     void removeFrameLoader(const int frame);
 
     void openVideoStream();

@@ -34,54 +34,26 @@ class VideoFrameLoader : public eHddTask {
 protected:
     VideoFrameLoader(VideoFrameHandler * const cacheHandler,
                      const stdsptr<VideoStreamsData>& openedVideo,
-                     const int frameId) :
-        mCacheHandler(cacheHandler), mOpenedVideo(openedVideo),
-        mFrameId(frameId) {}
+                     const int frameId);
     VideoFrameLoader(VideoFrameHandler * const cacheHandler,
                      const stdsptr<VideoStreamsData>& openedVideo,
                      const int frameId, AVFrame* const frame);
+public:
+    ~VideoFrameLoader();
 
+    void process();
+protected:
     void afterProcessing();
     void afterCanceled();
     void handleException();
 
     void queTaskNow();
-
-    void setFrameToConvert(AVFrame * const frame,
-                           AVCodecContext * const codecContext) {
-        cleanUp();
-        mFrameToConvert = frame;
-        mSwsContext = sws_getContext(codecContext->width,
-                                     codecContext->height,
-                                     codecContext->pix_fmt,
-                                     codecContext->width,
-                                     codecContext->height,
-                                     AV_PIX_FMT_RGBA, SWS_BICUBIC,
-                                     nullptr, nullptr, nullptr);
-    }
-public:
-    ~VideoFrameLoader() {
-        for(auto& excess : mExcessFrames) {
-            av_frame_unref(excess.second);
-            av_frame_free(&excess.second);
-        }
-        cleanUp();
-    }
-    void process();
 private:
-    void cleanUp() {
-        if(mFrameToConvert) {
-            av_frame_unref(mFrameToConvert);
-            av_frame_free(&mFrameToConvert);
-            mFrameToConvert = nullptr;
-        }
-        if(mSwsContext) {
-            sws_freeContext(mSwsContext);
-            mSwsContext = nullptr;
-        }
-    }
+    void cleanUp();
     void setupSwsContext(AVCodecContext * const codecContext);
     void readFrame();
+    void setFrameToConvert(AVFrame * const frame,
+                           AVCodecContext * const codecContext);
     void convertFrame();
 
     const qptr<VideoFrameHandler> mCacheHandler;

@@ -20,9 +20,23 @@
 
 VideoFrameLoader::VideoFrameLoader(VideoFrameHandler * const cacheHandler,
                                    const stdsptr<VideoStreamsData> &openedVideo,
+                                   const int frameId) :
+    mCacheHandler(cacheHandler), mOpenedVideo(openedVideo),
+    mFrameId(frameId) {}
+
+VideoFrameLoader::VideoFrameLoader(VideoFrameHandler * const cacheHandler,
+                                   const stdsptr<VideoStreamsData> &openedVideo,
                                    const int frameId, AVFrame * const frame) :
     VideoFrameLoader(cacheHandler, openedVideo, frameId) {
     setFrameToConvert(frame, openedVideo->fCodecContext);
+}
+
+VideoFrameLoader::~VideoFrameLoader() {
+    for(auto& excess : mExcessFrames) {
+        av_frame_unref(excess.second);
+        av_frame_free(&excess.second);
+    }
+    cleanUp();
 }
 
 void VideoFrameLoader::convertFrame() {
@@ -178,7 +192,8 @@ void VideoFrameLoader::afterProcessing() {
         if(currFL) {
             currFL->setFrameToConvert(excess.second, mOpenedVideo->fCodecContext);
         } else {
-            const auto newFL = mCacheHandler->addFrameLoader(excess.first, excess.second);
+            const auto newFL = mCacheHandler->addFrameConverter(
+                        excess.first, excess.second);
             newFL->queTask();
         }
     }
@@ -208,10 +223,36 @@ void VideoFrameLoader::queTaskNow() {
     }
 }
 
+void VideoFrameLoader::setFrameToConvert(
+        AVFrame * const frame,
+        AVCodecContext * const codecContext) {
+    cleanUp();
+    mFrameToConvert = frame;
+    mSwsContext = sws_getContext(codecContext->width,
+                                 codecContext->height,
+                                 codecContext->pix_fmt,
+                                 codecContext->width,
+                                 codecContext->height,
+                                 AV_PIX_FMT_RGBA, SWS_BICUBIC,
+                                 nullptr, nullptr, nullptr);
+}
+
 void VideoFrameLoader::process() {
     if(!mFrameToConvert) readFrame();
     if(mFrameToConvert) {
         hddPartFinished();
         convertFrame();
+    }
+}
+
+void VideoFrameLoader::cleanUp() {
+    if(mFrameToConvert) {
+        av_frame_unref(mFrameToConvert);
+        av_frame_free(&mFrameToConvert);
+        mFrameToConvert = nullptr;
+    }
+    if(mSwsContext) {
+        sws_freeContext(mSwsContext);
+        mSwsContext = nullptr;
     }
 }
