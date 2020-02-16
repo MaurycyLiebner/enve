@@ -47,7 +47,6 @@
 #include "fillstrokesettings.h"
 #include <QAudioOutput>
 #include "Sound/soundcomposition.h"
-#include "Sound/singlesound.h"
 #include "GUI/BoxesList/boxsinglewidget.h"
 #include "memoryhandler.h"
 #include "GUI/BrushWidgets/brushselectionwidget.h"

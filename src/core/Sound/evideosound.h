@@ -14,30 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ESOUNDLINK_H
-#define ESOUNDLINK_H
-#include "esound.h"
+#ifndef EVIDEOSOUND_H
+#define EVIDEOSOUND_H
 
-class eSoundLink : public eSound {
+#include "esoundobjectbase.h"
+
+class VideoBox;
+
+class eVideoSound : public eSoundObjectBase {
+    e_OBJECT
+protected:
+    eVideoSound(const qsptr<FixedLenAnimationRect>& durRect);
 public:
-    eSoundLink(eSound* const target);
+    QMimeData *SWT_createMimeData() { return nullptr; }
 
-    bool isLink() const final { return true; }
+    void prp_writeProperty(eWriteStream& dst) const;
+    void prp_readProperty(eReadStream& src);
 
-    qsptr<eSound> createLink() {
-        return enve::make_shared<eSoundLink>(mTarget);
-    }
-
-    FrameRange prp_relInfluenceRange() const;
-    int prp_getRelFrameShift() const;
-
-    qreal durationSeconds() const;
-    QrealSnapshot getVolumeSnap() const;
-    stdsptr<Samples> getSamplesForSecond(const int relSecondId);
-    SoundReaderForMerger * getSecondReader(const int relSecondId);
-    qreal getStretch() const;
-private:
-    eSound* const mTarget;
+    int prp_getRelFrameShift() const { return 0; }
+protected:
+    void updateDurationRectLength() {}
 };
 
-#endif // ESOUNDLINK_H
+#endif // EVIDEOSOUND_H

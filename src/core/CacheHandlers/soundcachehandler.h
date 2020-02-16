@@ -21,8 +21,6 @@
 #include "CacheHandlers/soundcachecontainer.h"
 #include "FileCacheHandlers/audiostreamsdata.h"
 #include "FileCacheHandlers/soundreader.h"
-class SoundHandler;
-class SingleSound;
 
 class SoundDataHandler : public FileDataCacheHandler {
     typedef stdsptr<SoundCacheContainer> stdptrSCC;
@@ -159,4 +157,5 @@ public:
 private:
     qsptr<SoundDataHandler> mDataHandler;
 };
+
 #endif // SOUNDCACHEHANDLER_H

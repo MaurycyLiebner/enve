@@ -21,7 +21,7 @@
 #include "Boxes/animationbox.h"
 #include "FileCacheHandlers/videocachehandler.h"
 
-class SingleSound;
+class eVideoSound;
 
 class VideoBox : public AnimationBox {
     e_OBJECT
@@ -37,7 +37,7 @@ public:
 
     void setStretch(const qreal stretch);
 
-    SingleSound* sound() const
+    eVideoSound* sound() const
     { return mSound.get(); }
     void setFilePath(const QString& path);
     QString getFilePath();
@@ -45,7 +45,7 @@ private:
     void fileHandlerConnector(ConnContext& conn, VideoFileHandler* obj);
     void fileHandlerAfterAssigned(VideoFileHandler* obj);
 
-    qsptr<SingleSound> mSound;
+    qsptr<eVideoSound> mSound;
     FileHandlerObjRef<VideoFileHandler> mFileHandler;
 };
 

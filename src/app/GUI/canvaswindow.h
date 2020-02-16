@@ -36,7 +36,6 @@ class PaintSettingsApplier;
 class RenderInstanceSettings;
 class eTask;
 class ImageBox;
-class SingleSound;
 class VideoBox;
 class Canvas;
 class PaintSettingsAnimator;

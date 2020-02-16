@@ -51,7 +51,6 @@
 #include "ReadWrite/basicreadwrite.h"
 #include "Boxes/internallinkcanvas.h"
 #include "Boxes/smartvectorpath.h"
-#include "Sound/singlesound.h"
 #include "Sound/soundcomposition.h"
 #include "RasterEffects/rastereffectcollection.h"
 #include "ReadWrite/filefooter.h"

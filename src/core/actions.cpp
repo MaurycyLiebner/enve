@@ -19,7 +19,7 @@
 #include "canvas.h"
 #include "Paint/simplebrushwrapper.h"
 #include "paintsettingsapplier.h"
-#include "Sound/singlesound.h"
+#include "Sound/eindependentsound.h"
 #include "Boxes/externallinkbox.h"
 
 #include <QMessageBox>
@@ -660,10 +660,10 @@ qsptr<VideoBox> createVideoForPath(const QString &path) {
     return vidBox;
 }
 
-qsptr<SingleSound> createSoundForPath(const QString &path) {
-    const auto singleSound = enve::make_shared<SingleSound>();
-    singleSound->setFilePath(path);
-    return singleSound;
+qsptr<eIndependentSound> createSoundForPath(const QString &path) {
+    const auto result = enve::make_shared<eIndependentSound>();
+    result->setFilePath(path);
+    return result;
 }
 
 eBoxOrSound *Actions::importFile(const QString &path) {

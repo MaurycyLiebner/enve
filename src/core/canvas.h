@@ -50,7 +50,6 @@ class Brush;
 class UndoRedoStack;
 class ExternalLinkBox;
 struct ShaderEffectCreator;
-class SingleSound;
 class VideoBox;
 class ImageBox;
 class Document;

@@ -25,7 +25,6 @@
 #include "GUI/global.h"
 #include "renderinstancesettings.h"
 #include "GUI/newcanvasdialog.h"
-#include "Sound/singlesound.h"
 #include "svgimporter.h"
 #include "filesourcescache.h"
 #include "videoencoder.h"

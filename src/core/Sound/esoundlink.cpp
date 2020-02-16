@@ -35,7 +35,7 @@ int eSoundLink::prp_getRelFrameShift() const {
     return mTarget->prp_getRelFrameShift();
 }
 
-int eSoundLink::durationSeconds() const {
+qreal eSoundLink::durationSeconds() const {
     return mTarget->durationSeconds();
 }
 

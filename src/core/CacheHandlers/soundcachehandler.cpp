@@ -16,7 +16,6 @@
 
 #include "soundcachehandler.h"
 #include "FileCacheHandlers/soundreader.h"
-#include "Sound/singlesound.h"
 
 SoundDataHandler::SoundDataHandler() {
     connect(eSoundSettings::sInstance, &eSoundSettings::settingsChanged,

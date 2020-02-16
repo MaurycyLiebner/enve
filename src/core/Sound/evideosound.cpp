@@ -14,30 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ESOUNDLINK_H
-#define ESOUNDLINK_H
-#include "esound.h"
+#include "evideosound.h"
 
-class eSoundLink : public eSound {
-public:
-    eSoundLink(eSound* const target);
+#include "Boxes/videobox.h"
 
-    bool isLink() const final { return true; }
+eVideoSound::eVideoSound(const qsptr<FixedLenAnimationRect> &durRect) :
+    eSoundObjectBase(durRect) {
 
-    qsptr<eSound> createLink() {
-        return enve::make_shared<eSoundLink>(mTarget);
-    }
+}
 
-    FrameRange prp_relInfluenceRange() const;
-    int prp_getRelFrameShift() const;
+#include "ReadWrite/basicreadwrite.h"
+void eVideoSound::prp_writeProperty(eWriteStream& dst) const {
+    StaticComplexAnimator::prp_writeProperty(dst);
+    dst << mVisible;
+}
 
-    qreal durationSeconds() const;
-    QrealSnapshot getVolumeSnap() const;
-    stdsptr<Samples> getSamplesForSecond(const int relSecondId);
-    SoundReaderForMerger * getSecondReader(const int relSecondId);
-    qreal getStretch() const;
-private:
-    eSound* const mTarget;
-};
-
-#endif // ESOUNDLINK_H
+void eVideoSound::prp_readProperty(eReadStream& src) {
+    StaticComplexAnimator::prp_readProperty(src);
+    src >> mVisible;
+}

@@ -243,10 +243,12 @@ SOURCES += \
     ShaderEffects/shadereffectprogram.cpp \
     ShaderEffects/shadervaluehandler.cpp \
     ShaderEffects/uniformspecifiercreator.cpp \
+    Sound/eindependentsound.cpp \
     Sound/esound.cpp \
     Sound/esoundlink.cpp \
+    Sound/esoundobjectbase.cpp \
     Sound/esoundsettings.cpp \
-    Sound/singlesound.cpp \
+    Sound/evideosound.cpp \
     Sound/soundcomposition.cpp \
     Sound/soundmerger.cpp \
     Tasks/updatable.cpp \
@@ -545,10 +547,12 @@ HEADERS += \
     ShaderEffects/shaderpropertycreator.h \
     ShaderEffects/shadervaluehandler.h \
     ShaderEffects/uniformspecifiercreator.h \
+    Sound/eindependentsound.h \
     Sound/esound.h \
     Sound/esoundlink.h \
+    Sound/esoundobjectbase.h \
     Sound/esoundsettings.h \
-    Sound/singlesound.h \
+    Sound/evideosound.h \
     Sound/soundcomposition.h \
     Sound/soundmerger.h \
     Tasks/updatable.h \

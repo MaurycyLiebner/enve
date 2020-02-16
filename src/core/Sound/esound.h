@@ -27,13 +27,15 @@ class eSound : public eBoxOrSound {
 protected:
     eSound();
 public:
-    virtual int durationSeconds() const = 0;
+    virtual qreal durationSeconds() const = 0;
     virtual QrealSnapshot getVolumeSnap() const = 0;
     virtual stdsptr<Samples> getSamplesForSecond(const int relSecondId) = 0;
     virtual SoundReaderForMerger * getSecondReader(const int relSecondId) = 0;
     virtual qreal getStretch() const = 0;
     virtual qsptr<eSound> createLink() = 0;
 
+    int durationSecondsCeil() const
+    { return qCeil(durationSeconds()); }
     iValueRange absSecondToRelSeconds(const int absSecond);
     int getSampleShift() const;
     SampleRange relSampleRange() const;

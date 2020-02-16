@@ -41,8 +41,8 @@ class SmartVectorPath;
 class SculptPathBox;
 class BlendEffectBoxShadow;
 // Sound
-class SingleSound;
 class eSound;
+class eIndependentSound;
 
 class SingleWidgetTarget : public SelfRef {
     Q_OBJECT
@@ -112,6 +112,7 @@ public:
     e_DECLARE_TYPE_FUNCTION(BlendEffectBoxShadow)
     // Sound
     e_DECLARE_TYPE_FUNCTION(eSound)
+    e_DECLARE_TYPE_FUNCTION(eIndependentSound)
 
     void SWT_addChild(SingleWidgetTarget * const child);
     void SWT_addChildAt(SingleWidgetTarget * const child, const int id);

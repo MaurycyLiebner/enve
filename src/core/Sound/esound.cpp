@@ -63,7 +63,7 @@ qreal eSound::getCanvasFPS() const {
 iValueRange eSound::absSecondToRelSeconds(const int absSecond) {
     if(getStretch() < 0) {
         const auto absStretch = absSecondToRelSecondsAbsStretch(absSecond);
-        const int secs = durationSeconds();
+        const int secs = durationSecondsCeil();
         return {secs - absStretch.fMax, secs - absStretch.fMin};
     }
     return absSecondToRelSecondsAbsStretch(absSecond);

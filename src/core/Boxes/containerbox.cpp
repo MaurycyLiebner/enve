@@ -23,7 +23,7 @@
 #include "PathEffects/patheffect.h"
 #include "textbox.h"
 #include "RasterEffects/rastereffectcollection.h"
-#include "Sound/singlesound.h"
+#include "Sound/eindependentsound.h"
 #include "actions.h"
 #include "externallinkbox.h"
 #include "namefixer.h"
@@ -1248,7 +1248,7 @@ void ContainerBox::writeAllContained(eWriteStream& dst) const {
             box->writeIdentifier(dst);
             box->writeBoundingBox(dst);
         } else {
-            Q_ASSERT(enve_cast<SingleSound*>(child));
+            Q_ASSERT(enve_cast<eIndependentSound*>(child));
             child->prp_writeProperty(dst);
         }
         dst.assignFuturePos(futureId);
@@ -1326,7 +1326,7 @@ void ContainerBox::readContained(eReadStream& src) {
         box->readBoundingBox(src);
         addContained(box);
     } else {
-        const auto sound = enve::make_shared<SingleSound>();
+        const auto sound = enve::make_shared<eIndependentSound>();
         sound->prp_readProperty(src);
         addContained(sound);
     }

@@ -22,7 +22,7 @@ extern "C" {
     #include <libavutil/imgutils.h>
 }
 #include <QDebug>
-#include "Sound/singlesound.h"
+#include "Sound/evideosound.h"
 #include "canvas.h"
 #include "Sound/soundcomposition.h"
 #include "filesourcescache.h"
@@ -44,7 +44,7 @@ VideoBox::VideoBox() : AnimationBox("Video", eBoxType::video),
                      fileHandlerConnector(conn, obj);
                  }) {
     const auto flar = mDurationRectangle->ref<FixedLenAnimationRect>();
-    mSound = enve::make_shared<SingleSound>(flar);
+    mSound = enve::make_shared<eVideoSound>(flar);
     ca_addChild(mSound);
     mSound->hide();
     mSound->SWT_hide();

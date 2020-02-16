@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "soundcomposition.h"
-#include "singlesound.h"
+#include "esound.h"
 #include "canvas.h"
 #include "CacheHandlers/soundcachecontainer.h"
 #include "soundmerger.h"

@@ -23,7 +23,6 @@
 #include "Boxes/imagebox.h"
 #include "Sound/soundcomposition.h"
 #include "Boxes/textbox.h"
-#include "Sound/singlesound.h"
 #include "GUI/global.h"
 #include "pointhelpers.h"
 #include "Boxes/internallinkbox.h"

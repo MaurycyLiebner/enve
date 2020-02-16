@@ -38,6 +38,7 @@
 #include "canvas.h"
 #include "BlendEffects/blendeffectcollection.h"
 #include "BlendEffects/blendeffectboxshadow.h"
+#include "Sound/eindependentsound.h"
 
 #include "Animators/SmartPath/smartpathcollection.h"
 #include "Animators/SculptPath/sculptpathcollection.h"
@@ -73,7 +74,7 @@ bool BoxSingleWidget::sStaticPixmapsLoaded = false;
 #include "canvas.h"
 #include "PathEffects/patheffect.h"
 #include "PathEffects/patheffectcollection.h"
-#include "Sound/singlesound.h"
+#include "Sound/esoundobjectbase.h"
 
 #include <QApplication>
 #include <QDrag>
@@ -446,7 +447,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                                this, [this](const SkBlendMode mode) {
             mBlendModeCombo->setCurrentText(SkBlendMode_Name(mode));
         });
-    } else if(enve_cast<SingleSound*>(prop)) {
+    } else if(enve_cast<eSoundObjectBase*>(prop)) {
     } else if(boolProperty) {
         mCheckBox->setTarget(boolProperty);
         mTargetConn << connect(boolProperty, &BoolProperty::valueChanged,
@@ -531,7 +532,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         mTargetConn << connect(eeffect, &eEffect::effectVisibilityChanged,
                                this, [this]() { mVisibleButton->update(); });
     }
-    if(boundingBox || enve_cast<eSound*>(prop)) {
+    if(boundingBox || enve_cast<eIndependentSound*>(prop)) {
         const auto ptr = static_cast<eBoxOrSound*>(prop);
         mTargetConn << connect(ptr, &eBoxOrSound::visibilityChanged,
                                this, [this]() { mVisibleButton->update(); });
@@ -540,7 +541,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         mTargetConn << connect(ptr, &eBoxOrSound::lockedChanged,
                                this, [this]() { mLockedButton->update(); });
     }
-    if(!boundingBox && !enve_cast<SingleSound*>(prop)) {
+    if(!boundingBox && !enve_cast<eIndependentSound*>(prop)) {
         mTargetConn << connect(prop, &Property::prp_selectionChanged,
                                this, qOverload<>(&QWidget::update));
     }
@@ -611,7 +612,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
 
         if(const auto pTarget = enve_cast<Property*>(target)) {
             const bool shiftPressed = event->modifiers() & Qt::ShiftModifier;
-            if(enve_cast<BoundingBox*>(target) || enve_cast<SingleSound*>(target)) {
+            if(enve_cast<BoundingBox*>(target) || enve_cast<eIndependentSound*>(target)) {
                 const auto box = static_cast<eBoxOrSound*>(target);
                 if(!box->isSelected()) box->selectionChangeTriggered(shiftPressed);
             } else {
@@ -663,7 +664,7 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
     if(pointToLen(event->pos() - mDragStartPos) > MIN_WIDGET_DIM/2) return;
     const bool shiftPressed = event->modifiers() & Qt::ShiftModifier;
     const auto target = mTarget->getTarget();
-    if(enve_cast<BoundingBox*>(target) || enve_cast<SingleSound*>(target)) {
+    if(enve_cast<BoundingBox*>(target) || enve_cast<eIndependentSound*>(target)) {
         const auto boxTarget = static_cast<eBoxOrSound*>(target);
         boxTarget->selectionChangeTriggered(shiftPressed);
         Document::sInstance->actionFinished();
@@ -744,7 +745,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     }
     if(bsTarget) {
         nameX += MIN_WIDGET_DIM/4;
-        const bool ss = enve_cast<SingleSound*>(prop);
+        const bool ss = enve_cast<eSoundObjectBase*>(prop);
         if(ss || enve_cast<BoundingBox*>(prop)) {
             if(ss) p.fillRect(rect(), QColor(0, 125, 255, 50));
             else   p.fillRect(rect(), QColor(0, 0, 0, 50));

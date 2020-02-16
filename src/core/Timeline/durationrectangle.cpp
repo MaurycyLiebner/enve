@@ -177,8 +177,6 @@ int DurationRectangle::getMaxAbsFrame() const {
     return mMaxFrame.getAbsFrame();
 }
 
-#include "Boxes/animationbox.h"
-#include "Sound/singlesound.h"
 void DurationRectangle::draw(QPainter * const p,
                              const QRect& drawRect,
                              const qreal fps,

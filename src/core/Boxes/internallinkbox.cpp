@@ -21,7 +21,7 @@
 #include "Animators/transformanimator.h"
 #include "skia/skiahelpers.h"
 #include "videobox.h"
-#include "Sound/singlesound.h"
+#include "Sound/evideosound.h"
 
 InternalLinkBox::InternalLinkBox(BoundingBox * const linkTarget,
                                  const bool innerLink) :
@@ -36,13 +36,11 @@ void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
     mSound.reset();
     auto& conn = assignLinkTarget(linkTarget);
     mBoxTarget->setTarget(linkTarget);
-    if(linkTarget) {
-        if(const auto vidBox = enve_cast<VideoBox*>(linkTarget)) {
-            mSound = vidBox->sound()->createLink();
-            conn << connect(this, &eBoxOrSound::parentChanged,
-                            mSound.get(), &eBoxOrSound::setParentGroup);
-            mSound->setParentGroup(mParentGroup);
-        }
+    if(const auto vidBox = enve_cast<VideoBox*>(linkTarget)) {
+        mSound = vidBox->sound()->createLink();
+        conn << connect(this, &eBoxOrSound::parentChanged,
+                        mSound.get(), &eBoxOrSound::setParentGroup);
+        mSound->setParentGroup(mParentGroup);
     }
     planUpdate(UpdateReason::userChange);
 }

@@ -42,7 +42,7 @@ void InternalLinkGroupBox::setupRenderData(const qreal relFrame,
     ContainerBox::setupRenderData(relFrame, data, scene);
 }
 
-#include "Sound/singlesound.h"
+#include "Sound/eindependentsound.h"
 #include "Sound/esoundlink.h"
 
 void InternalLinkGroupBox::insertInnerLinkFor(
@@ -50,7 +50,7 @@ void InternalLinkGroupBox::insertInnerLinkFor(
     if(const auto box = enve_cast<BoundingBox*>(obj)) {
         const auto newLink = box->createLink(true);
         insertContained(id, newLink);
-    } else if(const auto sound = enve_cast<eSound*>(obj)) {
+    } else if(const auto sound = enve_cast<eIndependentSound*>(obj)) {
         const auto newLink = sound->createLink();
         insertContained(id, newLink);
     } else if(const auto bebs = enve_cast<BlendEffectBoxShadow*>(obj)) {
