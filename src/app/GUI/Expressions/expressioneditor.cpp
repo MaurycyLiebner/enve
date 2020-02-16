@@ -28,6 +28,7 @@ ExpressionEditor::ExpressionEditor(QrealAnimator * const target,
                                    const QString &text,
                                    QWidget * const parent) :
     QTextEdit(parent) {
+    setFont(QFont("monospace"));
     setMinimumWidth(400);
     const auto doc = document();
     setAcceptRichText(false);
