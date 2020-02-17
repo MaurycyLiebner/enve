@@ -110,14 +110,13 @@ PerformanceSettingsWidget::PerformanceSettingsWidget(QWidget *parent) :
 }
 
 void PerformanceSettingsWidget::applySettings() {
-    eSettings& sett = *eSettings::sInstance;
-    sett.fCpuThreadsCap = mCpuThreadsCapCheck->isChecked() ?
+    mSett.fCpuThreadsCap = mCpuThreadsCapCheck->isChecked() ?
                 mCpuThreadsCapSlider->value() : 0;
-    sett.fRamMBCap = intMB(mRamMBCapCheck->isChecked() ?
+    mSett.fRamMBCap = intMB(mRamMBCapCheck->isChecked() ?
                 mRamMBCapSpin->value() : 0);
-    sett.fAccPreference = static_cast<AccPreference>(
+    mSett.fAccPreference = static_cast<AccPreference>(
                 mAccPreferenceSlider->value());
-    sett.fPathGpuAcc = mPathGpuAccCheck->isChecked();
+    mSett.fPathGpuAcc = mPathGpuAccCheck->isChecked();
 //        sett.fHddCache = mHddCacheCheck->isChecked();
 //        sett.fRamMBCap = mHddCacheMBCapCheck->isChecked() ?
 //                    mHddCacheMBCapSpin->value() : 0;
@@ -125,22 +124,21 @@ void PerformanceSettingsWidget::applySettings() {
 
 
 void PerformanceSettingsWidget::updateSettings() {
-    eSettings& sett = *eSettings::sInstance;
-    const bool capCpu = sett.fCpuThreadsCap > 0;
+    const bool capCpu = mSett.fCpuThreadsCap > 0;
     mCpuThreadsCapCheck->setChecked(capCpu);
-    const int nThreads = capCpu ? sett.fCpuThreadsCap :
+    const int nThreads = capCpu ? mSett.fCpuThreadsCap :
                                   HardwareInfo::sCpuThreads();
     mCpuThreadsCapSlider->setValue(nThreads);
 
-    const bool capRam = sett.fRamMBCap.fValue > 250;
+    const bool capRam = mSett.fRamMBCap.fValue > 250;
     mRamMBCapCheck->setChecked(capRam);
-    const int nRamMB = capRam ? sett.fRamMBCap.fValue :
+    const int nRamMB = capRam ? mSett.fRamMBCap.fValue :
                                 intMB(HardwareInfo::sRamKB()).fValue;
     mRamMBCapSpin->setValue(nRamMB);
 
-    mAccPreferenceSlider->setValue(static_cast<int>(sett.fAccPreference));
+    mAccPreferenceSlider->setValue(static_cast<int>(mSett.fAccPreference));
     updateAccPreferenceDesc();
-    mPathGpuAccCheck->setChecked(sett.fPathGpuAcc);
+    mPathGpuAccCheck->setChecked(mSett.fPathGpuAcc);
 
 //    mHddCacheCheck->setChecked(sett.fHddCache);
 

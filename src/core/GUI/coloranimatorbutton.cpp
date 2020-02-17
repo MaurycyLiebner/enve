@@ -85,6 +85,11 @@ void ColorAnimatorButton::openColorSettingsDialog() {
     dialog->show();
 }
 
+void ColorAnimatorButton::setColor(const QColor &color) {
+    mColor = color;
+    update();
+}
+
 QColor ColorAnimatorButton::color() const {
     if(mColorTarget) return mColorTarget->getColor();
     return mColor;

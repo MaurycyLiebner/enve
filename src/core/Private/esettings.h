@@ -16,7 +16,10 @@
 
 #ifndef SETTINGS_H
 #define SETTINGS_H
+
 #include <QtCore>
+#include <QColor>
+
 #include "skia/skiaincludes.h"
 #include "efiltersettings.h"
 #include "memorystructs.h"
@@ -86,7 +89,10 @@ public:
     AutosaveTarget fQuickSaveTarget = AutosaveTarget::same_folder;
 
     // timeline settings
+    bool fTimelineAlternateRow = true;
+    QColor fTimelineAlternateRowColor = QColor(0, 0, 0, 25);
     bool fTimelineHighlightRow = true;
+    QColor fTimelineHighlightRowColor = QColor(255, 255, 255, 15);
 };
 
 #endif // SETTINGS_H

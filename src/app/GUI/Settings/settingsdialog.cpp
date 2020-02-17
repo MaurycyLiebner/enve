@@ -12,6 +12,7 @@
 
 SettingsDialog::SettingsDialog(QWidget * const parent) :
     QDialog(parent) {
+    setMinimumWidth(20*MIN_WIDGET_DIM);
     setWindowTitle("Settings");
 
     const auto mainLauout = new QVBoxLayout;
@@ -19,7 +20,7 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
 
     mTabWidget = new QTabWidget(this);
     mTabWidget->setContentsMargins(MIN_WIDGET_DIM, MIN_WIDGET_DIM,
-                                  MIN_WIDGET_DIM, MIN_WIDGET_DIM);
+                                   MIN_WIDGET_DIM, MIN_WIDGET_DIM);
 
     const auto performance = new PerformanceSettingsWidget(this);
     addSettingsWidget(performance, "Performance");

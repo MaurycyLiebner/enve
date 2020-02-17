@@ -21,6 +21,8 @@
 
 #include <QCheckBox>
 
+class ColorAnimatorButton;
+
 class TimelineSettingsWidget : public SettingsWidget {
 public:
     explicit TimelineSettingsWidget(QWidget *parent = nullptr);
@@ -28,7 +30,11 @@ public:
     void applySettings();
     void updateSettings();
 private:
+    QCheckBox* mAlternateRowCheck = nullptr;
+    ColorAnimatorButton* mAlternateRowColor = nullptr;
+
     QCheckBox* mHighlightRowCheck = nullptr;
+    ColorAnimatorButton* mHighlightRowColor = nullptr;
 };
 
 #endif // TIMELINESETTINGSWIDGET_H

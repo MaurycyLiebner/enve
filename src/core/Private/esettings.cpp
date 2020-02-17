@@ -19,11 +19,138 @@
 #include "GUI/global.h"
 #include "exceptions.h"
 
+#include "smartPointers/stdselfref.h"
+
+struct eSetting {
+    eSetting(const QString& name) : fName(name) {}
+
+    virtual bool setValueString(const QString& value) = 0;
+    virtual void writeValue(QTextStream &textStream) const = 0;
+
+    void write(QTextStream &textStream) const {
+        textStream << fName + ": ";
+        writeValue(textStream);
+        textStream << endl;
+    }
+
+    const QString fName;
+};
+
+template <typename T>
+struct eSettingBase : public eSetting {
+    eSettingBase(T& value, const QString& name) :
+        eSetting(name), fValue(value) {}
+
+    T& fValue;
+};
+
+struct eBoolSetting : public eSettingBase<bool> {
+    using eSettingBase<bool>::eSettingBase;
+
+    bool setValueString(const QString& valueStr) {
+        const bool value = valueStr == "enabled";
+        bool ok = value || valueStr == "disabled";
+        if(ok) fValue = value;
+        return ok;
+    }
+
+    void writeValue(QTextStream &textStream) const {
+        textStream << (fValue ? "enabled" : "disabled");
+    }
+};
+
+struct eIntSetting : public eSettingBase<int> {
+    using eSettingBase<int>::eSettingBase;
+
+    bool setValueString(const QString& valueStr) {
+        bool ok;
+        const int value = valueStr.toInt(&ok);
+        if(ok) fValue = value;
+        return ok;
+    }
+
+    void writeValue(QTextStream &textStream) const {
+        textStream << fValue;
+    }
+};
+
+struct eStringSetting : public eSettingBase<QString> {
+    using eSettingBase<QString>::eSettingBase;
+
+    bool setValueString(const QString& valueStr) {
+        fValue = valueStr;
+        return true;
+    }
+
+    void writeValue(QTextStream &textStream) const {
+        textStream << fValue;
+    }
+};
+
+struct eColorSetting : public eSettingBase<QColor> {
+    using eSettingBase<QColor>::eSettingBase;
+
+    bool setValueString(const QString& valueStr) {
+        const QString oneVal = QStringLiteral("\\s*(\\d+)\\s*");
+        const QString oneValC = QStringLiteral("\\s*(\\d+)\\s*,");
+
+        QRegExp rx("rgba\\("
+                        "\\s*(\\d+)\\s*,"
+                        "\\s*(\\d+)\\s*,"
+                        "\\s*(\\d+)\\s*,"
+                        "\\s*(\\d+)\\s*"
+                   "\\)",
+                   Qt::CaseInsensitive);
+        if(rx.exactMatch(valueStr)) {
+            rx.indexIn(valueStr);
+            const QStringList intRGBA = rx.capturedTexts();
+            fValue.setRgb(intRGBA.at(1).toInt(),
+                          intRGBA.at(2).toInt(),
+                          intRGBA.at(3).toInt(),
+                          intRGBA.at(4).toInt());
+            return true;
+        } else return false;
+    }
+
+    void writeValue(QTextStream &textStream) const {
+        textStream << QString("rgba(%1, %2, %3, %4)").
+                      arg(fValue.red()).
+                      arg(fValue.green()).
+                      arg(fValue.blue()).
+                      arg(fValue.alpha());
+    }
+};
+
 eSettings* eSettings::sInstance = nullptr;
+
+static QList<stdsptr<eSetting>> gSettings;
 
 eSettings::eSettings() {
     Q_ASSERT(!sInstance);
     sInstance = this;
+
+    gSettings << std::make_shared<eIntSetting>(
+                     fCpuThreadsCap, "cpuThreadsCap");
+    gSettings << std::make_shared<eIntSetting>(
+                     reinterpret_cast<int&>(fRamMBCap), "ramMBCap");
+    gSettings << std::make_shared<eIntSetting>(
+                     reinterpret_cast<int&>(fAccPreference), "accPreference");
+    gSettings << std::make_shared<eBoolSetting>(
+                     fPathGpuAcc, "pathGpuAcc");
+    gSettings << std::make_shared<eBoolSetting>(
+                     fHddCache, "hddCache");
+    gSettings << std::make_shared<eIntSetting>(
+                     reinterpret_cast<int&>(fHddCacheMBCap), "hddCacheMBCap");
+
+
+    gSettings << std::make_shared<eBoolSetting>(
+                     fTimelineAlternateRow, "timelineAlternateRow");
+    gSettings << std::make_shared<eColorSetting>(
+                     fTimelineAlternateRowColor, "timelineAlternateRowColor");
+    gSettings << std::make_shared<eBoolSetting>(
+                     fTimelineHighlightRow, "timelineHighlightRow");
+    gSettings << std::make_shared<eColorSetting>(
+                     fTimelineHighlightRowColor, "timelineHighlightRowColor");
 }
 
 int eSettings::sCpuThreadsCapped() {
@@ -57,17 +184,10 @@ void eSettings::loadDefaults() {
     fHddCacheMBCap = intMB(0);
     fUndoCap = 25;
 
+    fTimelineAlternateRow = true;
+    fTimelineAlternateRowColor = QColor(0, 0, 0, 25);
     fTimelineHighlightRow = true;
-}
-
-bool enabledToBool(const QString& value, bool& ok) {
-    const bool result = value == "enabled";
-    ok = result || value == "disabled";
-    return result;
-}
-
-QString boolToEnabled(const bool value) {
-    return value ? "enabled" : "disabled";
+    fTimelineHighlightRowColor = QColor(255, 255, 255, 15);
 }
 
 void eSettings::loadFromFile() {
@@ -80,44 +200,30 @@ void eSettings::loadFromFile() {
 
     QTextStream textStream(&file);
 
+    QStringList invalidLines;
+
     QString line;
-    bool ok = true;
     while(!textStream.atEnd()) {
         line = textStream.readLine();
         const QStringList split = line.split(":");
         if(split.count() != 2) continue;
-        const QString setting = split.first().trimmed();
+        const QString settingName = split.first().trimmed();
         const QString value = split.last().trimmed();
-        if(setting == "cpuThreadsCap") {
-            const int cpuThreadsCap = value.toInt(&ok);
-            if(ok) fCpuThreads = cpuThreadsCap;
-        } else if(setting == "ramMBCap") {
-            const int ramMBCap = value.toInt(&ok);
-            if(ok) fRamMBCap = intMB(ramMBCap);
-        } else if(setting == "accPreference") {
-            const int accPreference = value.toInt(&ok);
-            ok = accPreference >= 0 && accPreference <= 4;
-            if(ok) fAccPreference = static_cast<AccPreference>(accPreference);
-        } else if(setting == "pathGpuAcc") { //
-            const bool pathGpuAcc = enabledToBool(value, ok);
-            if(ok) fPathGpuAcc = pathGpuAcc;
-        } else if(setting == "hddCache") { //
-            const bool hddCache = enabledToBool(value, ok);
-            if(ok) fHddCache = hddCache;
-        } else if(setting == "hddCacheMBCap") {
-            const int hddCacheMBCap = value.toInt(&ok);
-            if(ok) fHddCacheMBCap = intMB(hddCacheMBCap);
-        } else if(setting == "timelineHighlightRow") {
-            const bool highlightRow = enabledToBool(value, ok);
-            if(ok) fTimelineHighlightRow = highlightRow;
-        } else ok = false;
+        bool ok = false;
+        for(auto& setting : gSettings) {
+            if(settingName != setting->fName) continue;
+            ok = setting->setValueString(value);
+        }
 
-        if(!ok) break;
+        if(!ok) invalidLines << line;
     }
     file.close();
 
-    if(!ok) RuntimeThrow("Invalid setting \"" + line +
-                         "\" in \"" + settingsFile + "\"");
+    if(!invalidLines.isEmpty()) {
+        RuntimeThrow("Invalid setting(s) \n" +
+                     invalidLines.join("\n") +
+                     "\n in \"" + settingsFile + "\"");
+    }
 }
 
 void eSettings::saveToFile() {
@@ -127,16 +233,9 @@ void eSettings::saveToFile() {
         RuntimeThrow("Could not open \"" + settingsFile + "\" for writing");
     QTextStream textStream(&file);
 
-    textStream << "cpuThreadsCap: " << fCpuThreadsCap << endl;
-    textStream << "ramMBCap: " << fRamMBCap.fValue << endl;
-
-    textStream << "accPreference: " << static_cast<int>(fAccPreference) << endl;
-    textStream << "pathGpuAcc: " << boolToEnabled(fPathGpuAcc) << endl;
-
-//    textStream << "hddCache: " << boolToEnabled(fHddCache) << endl;
-//    textStream << "hddCacheMBCap: " << fHddCacheMBCap << endl;
-
-    textStream << "timelineHighlightRow: " << boolToEnabled(fTimelineHighlightRow) << endl;
+    for(const auto& setting : gSettings) {
+        setting->write(textStream);
+    }
 
     textStream.flush();
     file.close();

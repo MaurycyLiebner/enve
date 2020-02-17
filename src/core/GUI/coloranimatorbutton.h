@@ -32,7 +32,7 @@ public:
     void setColorTarget(ColorAnimator * const target);
     void openColorSettingsDialog();
 
-    void setColor(const QColor& color) { mColor = color; }
+    void setColor(const QColor& color);
     QColor color() const;
 protected:
     void paintEvent(QPaintEvent *);

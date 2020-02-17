@@ -44,10 +44,17 @@ void TimelineHighlightWidget::leaveEvent(QEvent *) {
 
 void TimelineHighlightWidget::paintEvent(QPaintEvent *) {
     QPainter p(this);
+    if(mSettings.fTimelineAlternateRow) {
+        const int height = this->height();
+        const QColor color = mSettings.fTimelineAlternateRowColor;
+        for(int i = 0; i < height; i += 2*MIN_WIDGET_DIM) {
+            p.fillRect(0, i, width(), MIN_WIDGET_DIM, color);
+        }
+    }
     if(mSettings.fTimelineHighlightRow && mHoverRow >= 0) {
         p.fillRect(0, mHoverRow*MIN_WIDGET_DIM,
                    width(), MIN_WIDGET_DIM,
-                   QColor(255, 255, 255, 15));
+                   mSettings.fTimelineHighlightRowColor);
     }
     p.end();
 }

@@ -17,18 +17,33 @@
 #include "timelinesettingswidget.h"
 #include "Private/esettings.h"
 
+#include "GUI/coloranimatorbutton.h"
+
 TimelineSettingsWidget::TimelineSettingsWidget(QWidget *parent) :
     SettingsWidget(parent) {
+    mAlternateRowCheck = new QCheckBox("Alternate row color", this);
+    mAlternateRowColor = new ColorAnimatorButton(
+                mSett.fTimelineAlternateRowColor);
+    add2HWidgets(mAlternateRowCheck, mAlternateRowColor);
+
     mHighlightRowCheck = new QCheckBox("Highlight row under mouse", this);
-    addWidget(mHighlightRowCheck);
+    mHighlightRowColor = new ColorAnimatorButton(
+                mSett.fTimelineHighlightRowColor);
+    add2HWidgets(mHighlightRowCheck, mHighlightRowColor);
 }
 
 void TimelineSettingsWidget::applySettings() {
-    eSettings& sett = *eSettings::sInstance;
-    sett.fTimelineHighlightRow = mHighlightRowCheck->isChecked();
+    mSett.fTimelineAlternateRow = mAlternateRowCheck->isChecked();
+    mSett.fTimelineAlternateRowColor = mAlternateRowColor->color();
+
+    mSett.fTimelineHighlightRow = mHighlightRowCheck->isChecked();
+    mSett.fTimelineHighlightRowColor = mHighlightRowColor->color();
 }
 
 void TimelineSettingsWidget::updateSettings() {
-    eSettings& sett = *eSettings::sInstance;
-    mHighlightRowCheck->setChecked(sett.fTimelineHighlightRow);
+    mAlternateRowCheck->setChecked(mSett.fTimelineAlternateRow);
+    mAlternateRowColor->setColor(mSett.fTimelineAlternateRowColor);
+
+    mHighlightRowCheck->setChecked(mSett.fTimelineHighlightRow);
+    mHighlightRowColor->setColor(mSett.fTimelineHighlightRowColor);
 }
