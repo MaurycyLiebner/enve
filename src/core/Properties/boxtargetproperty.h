@@ -38,10 +38,29 @@ public:
 
     BoundingBox *getTarget() const;
     void setTarget(BoundingBox * const box);
+
+    using Validator = std::function<bool(BoundingBox*)>;
+
+    const auto& validator() const
+    { return mValidator; }
+
+    template <typename T>
+    void setValidator();
+    void setValidator(const Validator& validator)
+    { mValidator = validator; }
 signals:
     void targetSet(BoundingBox*);
 private:
+    std::function<bool(BoundingBox*)> mValidator = nullptr;
     ConnContextQPtr<BoundingBox> mTarget_d;
 };
+
+template <typename T>
+void BoxTargetProperty::setValidator() {
+    const auto validator = [](BoundingBox* const box) {
+        return enve_cast<T*>(box);
+    };
+    setValidator(validator);
+}
 
 #endif // BOXTARGETPROPERTY_H

@@ -24,17 +24,10 @@ class BoxTargetProperty;
 #include "conncontextptr.h"
 
 class BoxTargetWidget : public QWidget {
-    Q_OBJECT
 public:
     explicit BoxTargetWidget(QWidget *parent = nullptr);
 
     void setTargetProperty(BoxTargetProperty *property);
-private:
-    bool mDragging = false;
-    ConnContextQPtr<BoxTargetProperty> mProperty;
-signals:
-
-public slots:
 protected:
     void dropEvent(QDropEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
@@ -42,6 +35,9 @@ protected:
     void dragLeaveEvent(QDragLeaveEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
+private:
+    bool mDragging = false;
+    ConnContextQPtr<BoxTargetProperty> mProperty;
 };
 
 #endif // BOXTARGETWIDGET_H

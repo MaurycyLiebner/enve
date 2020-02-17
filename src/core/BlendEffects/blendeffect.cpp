@@ -5,7 +5,7 @@ BlendEffect::BlendEffect(const QString& name,
                          const BlendEffectType type) :
     eEffect(name), mType(type) {
     mClipPath = enve::make_shared<BoxTargetProperty>("clip path");
-
+    mClipPath->setValidator<PathBox>();
     connect(mClipPath.get(), &BoxTargetProperty::targetSet,
             this, [this](BoundingBox* const newClipBox) {
         auto& conn = mClipBox.assign(newClipBox);
