@@ -1016,6 +1016,8 @@ void ContainerBox::insertContained(
     }
 
     child->anim_setAbsFrame(anim_getCurrentAbsFrame());
+    const int thisShift = prp_getTotalFrameShift();
+    child->prp_setInheritedFrameShift(thisShift, this);
     child->prp_afterWholeInfluenceRangeChanged();
     emit insertedObject(id, child.get());
 
