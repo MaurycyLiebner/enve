@@ -40,11 +40,9 @@ public:
     FrameRange prp_getIdenticalRelRange(const int relFrame) const;
 
     void prp_afterChangedAbsRange(const FrameRange& range,
-                                  const bool clip = true) {
-        if(range.inRange(anim_getCurrentAbsFrame()))
-            updateBaseValueFromCurrentFrame();
-        GraphAnimator::prp_afterChangedAbsRange(range, clip);
-    }
+                                  const bool clip = true);
+    void prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
+                                    const FrameRange &newAbsRange);
 
     void anim_setAbsFrame(const int frame);
     void anim_removeAllKeys();
@@ -76,14 +74,8 @@ public:
     void setPrefferedValueStep(const qreal valueStep);
 
     void setValueRange(const qreal minVal, const qreal maxVal);
-    void setMinValue(const qreal minVal) {
-        mClampMin = minVal;
-        setCurrentBaseValue(mCurrentBaseValue);
-    }
-    void setMaxValue(const qreal maxVal) {
-        mClampMax = maxVal;
-        setCurrentBaseValue(mCurrentBaseValue);
-    }
+    void setMinValue(const qreal minVal);
+    void setMaxValue(const qreal maxVal);
 
     void setCurrentBaseValue(qreal newValue);
     void setCurrentBaseValueNoUpdate(const qreal newValue);
@@ -139,6 +131,8 @@ private:
     qreal calculateBaseValueAtRelFrame(const qreal frame) const;
     void startBaseValueTransform();
     void finishBaseValueTransform();
+    bool updateExpressionRelFrame();
+    bool updateBaseValueFromCurrentFrame();
 
     bool mGraphMinMaxValuesFixed = false;
     bool mTransformed = false;
@@ -154,7 +148,6 @@ private:
     ConnContextQSPtr<ExpressionValue> mExpression;
 
     qreal mPrefferedValueStep = 1;
-    bool updateBaseValueFromCurrentFrame();
 signals:
     void expressionChanged();
     void effectiveValueChanged(qreal);

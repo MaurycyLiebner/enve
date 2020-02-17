@@ -151,6 +151,16 @@ void QrealAnimator::setValueRange(const qreal minVal, const qreal maxVal) {
     setCurrentBaseValue(mCurrentBaseValue);
 }
 
+void QrealAnimator::setMinValue(const qreal minVal) {
+    mClampMin = minVal;
+    setCurrentBaseValue(mCurrentBaseValue);
+}
+
+void QrealAnimator::setMaxValue(const qreal maxVal) {
+    mClampMax = maxVal;
+    setCurrentBaseValue(mCurrentBaseValue);
+}
+
 void QrealAnimator::incAllValues(const qreal valInc) {
     const auto& keys = anim_getKeys();
     for(const auto &key : keys) {
@@ -321,13 +331,23 @@ void QrealAnimator::saveValueToKey(const int frame, const qreal value) {
     }
 }
 
+bool QrealAnimator::updateExpressionRelFrame() {
+    if(!mExpression) return false;
+    const qreal relFrame = anim_getCurrentRelFrame();
+    return mExpression->setRelFrame(relFrame);
+}
+
+void QrealAnimator::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
+                                               const FrameRange &newAbsRange) {
+    GraphAnimator::prp_afterFrameShiftChanged(oldAbsRange, newAbsRange);
+    updateExpressionRelFrame();
+}
+
 void QrealAnimator::anim_setAbsFrame(const int frame) {
-    Animator::anim_setAbsFrame(frame);
-    bool changed = updateBaseValueFromCurrentFrame();
-    if(mExpression) {
-        const bool exprValChanged = mExpression->setRelFrame(frame);
-        changed = changed || exprValChanged;
-    }
+    GraphAnimator::anim_setAbsFrame(frame);
+    const bool baseValChanged = updateBaseValueFromCurrentFrame();
+    const bool exprValChanged = updateExpressionRelFrame();
+    const bool changed = baseValChanged || exprValChanged;
     if(changed) prp_afterChangedCurrent(UpdateReason::frameChange);
 }
 
@@ -343,7 +363,7 @@ void QrealAnimator::anim_removeAllKeys() {
     startBaseValueTransform();
 
     const qreal currentValue = mCurrentBaseValue;
-    Animator::anim_removeAllKeys();
+    GraphAnimator::anim_removeAllKeys();
 
     setCurrentBaseValue(currentValue);
     finishBaseValueTransform();
@@ -517,6 +537,13 @@ FrameRange QrealAnimator::prp_getIdenticalRelRange(const int relFrame) const {
     const auto base = Animator::prp_getIdenticalRelRange(relFrame);
     if(mExpression) return base * mExpression->identicalRange(relFrame);
     else return base;
+}
+
+void QrealAnimator::prp_afterChangedAbsRange(const FrameRange &range,
+                                             const bool clip) {
+    if(range.inRange(anim_getCurrentAbsFrame()))
+        updateBaseValueFromCurrentFrame();
+    GraphAnimator::prp_afterChangedAbsRange(range, clip);
 }
 
 void QrealAnimator::multCurrentBaseValue(const qreal mult) {
