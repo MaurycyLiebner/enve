@@ -29,7 +29,7 @@ SimpleBrushWrapper::~SimpleBrushWrapper() {
 }
 
 stdsptr<SimpleBrushWrapper> SimpleBrushWrapper::createDuplicate() {
-    auto brush = mypaint_brush_new();
+    auto brush = mypaint_brush_new_with_buckets(256);
     const char *data = mWholeFile.constData();
 
     if(!mypaint_brush_from_string(brush, data)) {

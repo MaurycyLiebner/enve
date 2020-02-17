@@ -67,7 +67,7 @@ install:
     - cd ..
     - # build libmypaint
     - tar xf libmypaint.tar.xz
-    - cd libmypaint-1.3.0
+    - cd libmypaint-1.5.0
     - export CFLAGS='-fopenmp -Ofast -ftree-vectorize -fopt-info-vec-optimized -funsafe-math-optimizations -funsafe-loop-optimizations -fPIC'
     - ./configure --enable-static --enable-openmp --enable-shared=false
     - sudo make

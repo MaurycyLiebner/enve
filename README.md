@@ -120,7 +120,7 @@ tar xf libmypaint.tar.xz
 ```
 Enter libmypaint directory:
 ```
-cd libmypaint-1.3.0
+cd libmypaint-1.5.0
 ```
 Set CFLAGS for better optimization:
 ```

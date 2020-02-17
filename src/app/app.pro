@@ -28,7 +28,7 @@ CONFIG += c++14
 
 ENVE_FOLDER = $$PWD/../..
 SKIA_FOLDER = $$ENVE_FOLDER/third_party/skia
-LIBMYPAINT_FOLDER = $$ENVE_FOLDER/third_party/libmypaint-1.3.0
+LIBMYPAINT_FOLDER = $$ENVE_FOLDER/third_party/libmypaint-1.5.0
 GPERFTOOLS_FOLDER = $$ENVE_FOLDER/third_party/gperftools-2.7-enve-mod
 
 INCLUDEPATH += ../core
@@ -305,6 +305,9 @@ RESOURCES += brushesClassic
 
 brushesDeevad.files = $$files(brushes/Deevad/*)
 RESOURCES += brushesDeevad
+
+brushesDieterle.files = $$files(brushes/Dieterle/*)
+RESOURCES += brushesDieterle
 
 brushesExperimental.files = $$files(brushes/Experimental/*)
 RESOURCES += brushesExperimental
