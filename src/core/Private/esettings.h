@@ -89,10 +89,10 @@ public:
     AutosaveTarget fQuickSaveTarget = AutosaveTarget::same_folder;
 
     // timeline settings
-    bool fTimelineAlternateRow = true;
-    QColor fTimelineAlternateRowColor = QColor(0, 0, 0, 25);
-    bool fTimelineHighlightRow = true;
-    QColor fTimelineHighlightRowColor = QColor(255, 255, 255, 15);
+    bool fTimelineAlternateRow;
+    QColor fTimelineAlternateRowColor;
+    bool fTimelineHighlightRow;
+    QColor fTimelineHighlightRowColor;
 };
 
 #endif // SETTINGS_H

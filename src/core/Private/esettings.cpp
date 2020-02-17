@@ -129,6 +129,8 @@ eSettings::eSettings() {
     Q_ASSERT(!sInstance);
     sInstance = this;
 
+    loadDefaults();
+
     gSettings << std::make_shared<eIntSetting>(
                      fCpuThreadsCap, "cpuThreadsCap");
     gSettings << std::make_shared<eIntSetting>(
@@ -186,8 +188,8 @@ void eSettings::loadDefaults() {
 
     fTimelineAlternateRow = true;
     fTimelineAlternateRowColor = QColor(0, 0, 0, 25);
-    fTimelineHighlightRow = true;
-    fTimelineHighlightRowColor = QColor(255, 255, 255, 15);
+    fTimelineHighlightRow = false;
+    fTimelineHighlightRowColor = QColor(255, 0, 0, 15);
 }
 
 void eSettings::loadFromFile() {

@@ -8,6 +8,7 @@
 SettingsWidget::SettingsWidget(QWidget *parent) :
     QWidget(parent), mSett(*eSettings::sInstance) {
     mMainLauout = new QVBoxLayout;
+    mMainLauout->setAlignment(Qt::AlignTop);
     setLayout(mMainLauout);
 }
 
