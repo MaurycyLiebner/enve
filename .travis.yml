@@ -9,17 +9,10 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - # sourceline: 'ppa:beineri/opt-qt-5.12.0-xenial'
-            - # sourceline: 'ppa:jonathonf/ffmpeg-4'
+            - sourceline: 'ppa:jonathonf/ffmpeg-4'
           packages:
             - g++-7
-            - # qt512base qt512multimedia qt512svg
-            - # ffmpeg debs dependencies
-            - libvorbisfile3 libsoxr0 libcrystalhd3 libgsm1 libmp3lame0
-            - libopus0 libshine3 libsnappy1v5 libspeex1 libtheora0 libtwolame0
-            - libwavpack1 libxvidcore4 libzvbi0
-            - libbluray1 libgme0 libssh-gcrypt-4
-            - # libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
+            - libswresample-dev libswscale-dev libavcodec-dev libavformat-dev libavresample-dev
             - libglib2.0-dev
             - unzip
             - libjson-c-dev intltool pkg-config
@@ -45,13 +38,6 @@ before_install:
     - chmod +x install-qt.sh
     - ./install-qt.sh -d ${QT_INSTALL_DIR} --version ${QT_VERSION} qtbase qttools qtsvg qtmultimedia qtdeclarative icu
 install:
-    - ## FFMPEG
-    - wget https://github.com/MaurycyLiebner/enve/files/3968745/ffmpeg-dev-4.2.tar.gz
-    - tar xf ffmpeg-dev-4.2.tar.gz
-    - cd ffmpeg-dev-4.2
-    - chmod +x install.py
-    - sudo python install.py
-    - cd ..
     - # skia dependencies
     - cd third_party
     - # build skia
