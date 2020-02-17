@@ -411,20 +411,13 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mLockedButton->setVisible(boundingBox);
     mHwSupportButton->setVisible(rasterEffect);
     {
-        ContainerBox* targetGroup = nullptr;
-        if(boundingBox && boundingBox->isGroup()) {
-            targetGroup = static_cast<ContainerBox*>(boundingBox);
+        const auto targetGroup = getPromoteTargetGroup();
+        if(boundingBox && targetGroup) {
             mTargetConn << connect(targetGroup,
                                    &ContainerBox::switchedGroupLayer,
                                    this, [this](const eBoxType type) {
                 mBlendModeCombo->setEnabled(type == eBoxType::layer);
             });
-        } else if(enve_cast<RasterEffectCollection*>(prop) ||
-                  enve_cast<BlendEffectCollection*>(prop)) {
-            const auto parentBox = prop->getFirstAncestor<BoundingBox>();
-            if(parentBox && parentBox->isGroup()) {
-                targetGroup = static_cast<ContainerBox*>(parentBox);
-            }
         }
         mPromoteToLayerButton->setVisible(targetGroup);
         if(targetGroup) {
