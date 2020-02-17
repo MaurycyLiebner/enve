@@ -29,7 +29,7 @@ MoveBlendEffect::MoveBlendEffect() :
 
 int MoveBlendEffect::calcDIndex(const qreal relFrame) const {
     const int dIndex = zIndex(relFrame);
-    return dIndex + (dIndex > 0) - (dIndex < 0);
+    return dIndex + (dIndex > 0);
 }
 
 void MoveBlendEffect::blendSetup(
@@ -68,11 +68,11 @@ void MoveBlendEffect::detachedBlendUISetup(
 }
 
 void MoveBlendEffect::detachedBlendSetup(const BoundingBox* const boxToDraw,
-                                     const qreal relFrame,
-                                     SkCanvas * const canvas,
-                                     const SkFilterQuality filter,
-                                     const int drawId,
-                                     QList<Delayed> &delayed) const {
+                                         const qreal relFrame,
+                                         SkCanvas * const canvas,
+                                         const SkFilterQuality filter,
+                                         const int drawId,
+                                         QList<Delayed> &delayed) const {
     const int dIndex = calcDIndex(relFrame);
     if(dIndex == 0) return;
     const int zIndex = drawId + dIndex;
