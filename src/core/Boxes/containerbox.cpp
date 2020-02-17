@@ -193,7 +193,7 @@ const QList<BoundingBox*> &ContainerBox::getContainedBoxes() const {
 void ContainerBox::anim_scaleTime(const int pivotAbsFrame, const qreal scale) {
     BoundingBox::anim_scaleTime(pivotAbsFrame, scale);
 
-    for(const auto& box : mContainedBoxes) {
+    for(const auto& box : mContained) {
         box->anim_scaleTime(pivotAbsFrame, scale);
     }
 }
@@ -320,7 +320,7 @@ void ContainerBox::prp_afterFrameShiftChanged(const FrameRange &oldAbsRange,
                                               const FrameRange &newAbsRange) {
     ComplexAnimator::prp_afterFrameShiftChanged(oldAbsRange, newAbsRange);
     const int thisShift = prp_getTotalFrameShift();
-    for(const auto &child : mContainedBoxes)
+    for(const auto &child : mContained)
         child->prp_setInheritedFrameShift(thisShift, this);
 }
 
@@ -442,7 +442,7 @@ void ContainerBox::shiftAll(const int shift) {
         mDurationRectangle->changeFramePosBy(shift);
     } else {
         anim_shiftAllKeys(shift);
-        for(const auto& box : mContainedBoxes) {
+        for(const auto& box : mContained) {
             box->shiftAll(shift);
         }
     }
@@ -541,7 +541,7 @@ void ContainerBox::setIsCurrentGroup_k(const bool bT) {
     mIsCurrentGroup = bT;
     setDescendantCurrentGroup(bT);
     if(!bT) {
-        if(mContainedBoxes.isEmpty() && mParentGroup) {
+        if(mContained.isEmpty() && mParentGroup) {
             removeFromParent_k();
         }
     }
@@ -554,8 +554,8 @@ bool ContainerBox::isCurrentGroup() const {
 void ContainerBox::updateContainedBoxes() {
     mContainedBoxes.clear();
     for(const auto& child : mContained) {
-        if(enve_cast<BoundingBox*>(child)) {
-            mContainedBoxes << static_cast<BoundingBox*>(child.get());
+        if(const auto box = enve_cast<BoundingBox*>(child)) {
+            mContainedBoxes << box;
         }
     }
 }
@@ -1119,14 +1119,14 @@ qsptr<eBoxOrSound> ContainerBox::takeContained_k(const int id) {
 
 void ContainerBox::removeContained_k(const qsptr<eBoxOrSound> &child) {
     removeContained(child);
-    if(mContainedBoxes.isEmpty() && mParentGroup) {
+    if(mContained.isEmpty() && mParentGroup) {
         removeFromParent_k();
     }
 }
 
 void ContainerBox::increaseContainedZInList(eBoxOrSound * const child) {
     const int index = getContainedIndex(child);
-    if(index == mContainedBoxes.count() - 1) return;
+    if(index == mContained.count() - 1) return;
     moveContainedInList(child, index, index + 1);
 }
 
@@ -1138,9 +1138,10 @@ void ContainerBox::decreaseContainedZInList(eBoxOrSound * const child) {
 
 void ContainerBox::bringContainedToEndList(eBoxOrSound * const child) {
     const int index = getContainedIndex(child);
-    if(index == mContainedBoxes.count() - 1) return;
+    const auto targetIndex = mContained.count() - 1;
+    if(index == targetIndex) return;
     prp_pushUndoRedoName("Lower " + child->prp_getName() + " to Bottom");
-    moveContainedInList(child, index, mContainedBoxes.count() - 1);
+    moveContainedInList(child, index, targetIndex);
 }
 
 void ContainerBox::bringContainedToFrontList(eBoxOrSound * const child) {
