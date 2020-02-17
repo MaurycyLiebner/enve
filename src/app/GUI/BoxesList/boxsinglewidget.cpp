@@ -76,10 +76,19 @@ bool BoxSingleWidget::sStaticPixmapsLoaded = false;
 #include "PathEffects/patheffectcollection.h"
 #include "Sound/esoundobjectbase.h"
 
+#include "GUI/ecombobox.h"
+
 #include <QApplication>
 #include <QDrag>
 #include <QMenu>
 #include <QInputDialog>
+
+eComboBox* createCombo(QWidget* const parent) {
+    const auto result = new eComboBox(parent);
+    result->setWheelMode(eComboBox::WheelMode::enabledWithCtrl);
+    result->setFocusPolicy(Qt::NoFocus);
+    return result;
+}
 
 BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     SingleWidget(parent), mParent(parent) {
@@ -238,13 +247,10 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
     mColorButton->setFixedHeight(mColorButton->height() - 6);
     mColorButton->setContentsMargins(0, 3, 0, 3);
 
-    mPropertyComboBox = new QComboBox(this);
-    mPropertyComboBox->setFocusPolicy(Qt::NoFocus);
-
+    mPropertyComboBox = createCombo(this);
     mMainLayout->addWidget(mPropertyComboBox);
 
-    mBlendModeCombo = new QComboBox(this);
-    mBlendModeCombo->setFocusPolicy(Qt::NoFocus);
+    mBlendModeCombo = createCombo(this);
     mMainLayout->addWidget(mBlendModeCombo);
 
     for(int modeId = int(SkBlendMode::kSrcOver);
@@ -261,8 +267,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
             this, &BoxSingleWidget::setCompositionMode);
     mBlendModeCombo->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
 
-    mPathBlendModeCombo = new QComboBox(this);
-    mPathBlendModeCombo->setFocusPolicy(Qt::NoFocus);
+    mPathBlendModeCombo = createCombo(this);
     mMainLayout->addWidget(mPathBlendModeCombo);
     mPathBlendModeCombo->addItems(QStringList() << "Normal" <<
                                   "Add" << "Remove" << "Remove reverse" <<
@@ -271,8 +276,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
             this, &BoxSingleWidget::setPathCompositionMode);
     mPathBlendModeCombo->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
 
-    mFillTypeCombo = new QComboBox(this);
-    mFillTypeCombo->setFocusPolicy(Qt::NoFocus);
+    mFillTypeCombo = createCombo(this);
     mMainLayout->addWidget(mFillTypeCombo);
     mFillTypeCombo->addItems(QStringList() << "Winding" << "Even-odd");
     connect(mFillTypeCombo, qOverload<int>(&QComboBox::activated),

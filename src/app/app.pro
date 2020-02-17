@@ -88,6 +88,7 @@ SOURCES += main.cpp\
     GUI/centralwidget.cpp \
     GUI/changewidthwidget.cpp \
     GUI/closesignalingdockwidget.cpp \
+    GUI/ecombobox.cpp \
     GUI/ekeyfilter.cpp \
     GUI/envelicense.cpp \
     GUI/envesplash.cpp \
@@ -196,6 +197,7 @@ HEADERS  += \
     GUI/centralwidget.h \
     GUI/changewidthwidget.h \
     GUI/closesignalingdockwidget.h \
+    GUI/ecombobox.h \
     GUI/ekeyfilter.h \
     GUI/envelicense.h \
     GUI/envesplash.h \

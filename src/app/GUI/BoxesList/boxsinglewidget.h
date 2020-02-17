@@ -38,6 +38,7 @@ class ComboBoxProperty;
 class ColorAnimator;
 class ColorAnimatorButton;
 class BoxScroller;
+class eComboBox;
 
 class BoxSingleWidget : public SingleWidget {
 public:
@@ -142,10 +143,10 @@ private:
     QrealAnimatorValueSlider *mSecondValueSlider;
 
     PixmapActionButton *mPromoteToLayerButton;
-    QComboBox *mPropertyComboBox;
-    QComboBox *mBlendModeCombo;
-    QComboBox *mPathBlendModeCombo;
-    QComboBox *mFillTypeCombo;
+    eComboBox *mPropertyComboBox;
+    eComboBox *mBlendModeCombo;
+    eComboBox *mPathBlendModeCombo;
+    eComboBox *mFillTypeCombo;
 
     ConnContext mTargetConn;
 };
