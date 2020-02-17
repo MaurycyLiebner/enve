@@ -236,13 +236,6 @@ void Animator::anim_deleteCurrentKeyAction() {
         anim_removeKeyAction(anim_mKeyOnCurrentFrame->ref<Key>());
 }
 
-void Animator::anim_updateAfterShifted() {
-    for(const auto &key : anim_mKeys) {
-        emit anim_removedKey(key, QPrivateSignal());
-        emit anim_addedKey(key, QPrivateSignal());
-    }
-}
-
 void Animator::anim_appendKeyAction(const stdsptr<Key>& newKey) {
     anim_appendKey(newKey);
     {

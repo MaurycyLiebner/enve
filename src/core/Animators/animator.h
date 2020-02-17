@@ -67,7 +67,6 @@ public:
                                     const qreal pixelsPerFrame,
                                     QList<Key*>& keysList,
                                     const int keyRectSize);
-    virtual void anim_updateAfterShifted();
     virtual void anim_setRecording(const bool rec);
 
     void prp_drawTimelineControls(
