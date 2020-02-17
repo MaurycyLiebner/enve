@@ -42,6 +42,7 @@ class TimelineMovable;
 class KeysClipboard;
 class Animator;
 class BoxScrollWidget;
+class TimelineHighlightWidget;
 
 #include "GUI/valueinput.h"
 
@@ -149,6 +150,8 @@ public:
     void graphUpdateVisbile();
     void graphSetOnlySelectedVisible(const bool selectedOnly);
     bool graphIsSelected(GraphAnimator * const anim);
+
+    TimelineHighlightWidget *requestHighlighter();
 private:
     void getKeysInRect(QRectF selectionRect,
                        const qreal pixelsPerFrame,
@@ -210,6 +213,8 @@ private:
     bool mIsMouseGrabbing = false;
     int mViewedTop = 0;
     int mViewedBottom = 0;
+
+    TimelineHighlightWidget* mHighlighter = nullptr;
 
     BoxScrollWidget *mBoxesListWidget;
     QRectF mSelectionRect;

@@ -56,6 +56,18 @@ void eSettings::loadDefaults() {
     fHddCacheFolder = "";
     fHddCacheMBCap = intMB(0);
     fUndoCap = 25;
+
+    fTimelineHighlightRow = true;
+}
+
+bool enabledToBool(const QString& value, bool& ok) {
+    const bool result = value == "enabled";
+    ok = result || value == "disabled";
+    return result;
+}
+
+QString boolToEnabled(const bool value) {
+    return value ? "enabled" : "disabled";
 }
 
 void eSettings::loadFromFile() {
@@ -87,16 +99,17 @@ void eSettings::loadFromFile() {
             ok = accPreference >= 0 && accPreference <= 4;
             if(ok) fAccPreference = static_cast<AccPreference>(accPreference);
         } else if(setting == "pathGpuAcc") { //
-            const bool pathGpuAcc = value == "enabled";
-            ok = pathGpuAcc || value == "disabled";
+            const bool pathGpuAcc = enabledToBool(value, ok);
             if(ok) fPathGpuAcc = pathGpuAcc;
         } else if(setting == "hddCache") { //
-            const bool hddCache = value == "enabled";
-            ok = hddCache || value == "disabled";
+            const bool hddCache = enabledToBool(value, ok);
             if(ok) fHddCache = hddCache;
         } else if(setting == "hddCacheMBCap") {
             const int hddCacheMBCap = value.toInt(&ok);
             if(ok) fHddCacheMBCap = intMB(hddCacheMBCap);
+        } else if(setting == "timelineHighlightRow") {
+            const bool highlightRow = enabledToBool(value, ok);
+            if(ok) fTimelineHighlightRow = highlightRow;
         } else ok = false;
 
         if(!ok) break;
@@ -118,10 +131,12 @@ void eSettings::saveToFile() {
     textStream << "ramMBCap: " << fRamMBCap.fValue << endl;
 
     textStream << "accPreference: " << static_cast<int>(fAccPreference) << endl;
-    textStream << "pathGpuAcc: " << (fPathGpuAcc ? "enabled" : "disabled") << endl;
+    textStream << "pathGpuAcc: " << boolToEnabled(fPathGpuAcc) << endl;
 
-//    textStream << "hddCache: " << (fHddCache ? "enabled" : "disabled") << endl;
+//    textStream << "hddCache: " << boolToEnabled(fHddCache) << endl;
 //    textStream << "hddCacheMBCap: " << fHddCacheMBCap << endl;
+
+    textStream << "timelineHighlightRow: " << boolToEnabled(fTimelineHighlightRow) << endl;
 
     textStream.flush();
     file.close();

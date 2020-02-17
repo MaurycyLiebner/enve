@@ -47,3 +47,7 @@ void BoxScrollWidget::setCurrentScene(Canvas * const scene) {
 void BoxScrollWidget::setSiblingKeysView(KeysView * const keysView) {
     getBoxScroller()->setKeysView(keysView);
 }
+
+TimelineHighlightWidget *BoxScrollWidget::requestHighlighter() {
+    return getBoxScroller()->requestHighlighter();
+}

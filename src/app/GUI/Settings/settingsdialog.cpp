@@ -5,10 +5,10 @@
 #include "GUI/global.h"
 
 #include "performancesettingswidget.h"
+#include "timelinesettingswidget.h"
 
 #include <QVBoxLayout>
 #include <QPushButton>
-#include <QTabWidget>
 
 SettingsDialog::SettingsDialog(QWidget * const parent) :
     QDialog(parent) {
@@ -17,13 +17,17 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
     const auto mainLauout = new QVBoxLayout;
     setLayout(mainLauout);
 
-    const auto tabWidget = new QTabWidget(this);
-    tabWidget->setContentsMargins(MIN_WIDGET_DIM, MIN_WIDGET_DIM,
+    mTabWidget = new QTabWidget(this);
+    mTabWidget->setContentsMargins(MIN_WIDGET_DIM, MIN_WIDGET_DIM,
                                   MIN_WIDGET_DIM, MIN_WIDGET_DIM);
-    mPerformanceSettingsWidget = new PerformanceSettingsWidget(this);
-    tabWidget->addTab(mPerformanceSettingsWidget, "Performance");
 
-    mainLauout->addWidget(tabWidget);
+    const auto performance = new PerformanceSettingsWidget(this);
+    addSettingsWidget(performance, "Performance");
+
+    const auto timeline = new TimelineSettingsWidget(this);
+    addSettingsWidget(timeline, "Timeline");
+
+    mainLauout->addWidget(mTabWidget);
 
     const auto buttonsLayout = new QHBoxLayout;
 
@@ -48,7 +52,9 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
     connect(cancelButton, &QPushButton::released, this, &QDialog::close);
 
     connect(applyButton, &QPushButton::released, this, [this]() {
-        mPerformanceSettingsWidget->applySettings();
+        for(const auto widget : mSettingWidgets) {
+            widget->applySettings();
+        }
         try {
             eSettings& sett = *eSettings::sInstance;
             sett.saveToFile();
@@ -61,6 +67,14 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
     updateSettings();
 }
 
+void SettingsDialog::addSettingsWidget(SettingsWidget * const widget,
+                                       const QString &name) {
+    mTabWidget->addTab(widget, name);
+    mSettingWidgets << widget;
+}
+
 void SettingsDialog::updateSettings() {
-    mPerformanceSettingsWidget->updateSettings();
+    for(const auto widget : mSettingWidgets) {
+        widget->updateSettings();
+    }
 }

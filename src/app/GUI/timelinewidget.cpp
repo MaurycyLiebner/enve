@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <QToolButton>
+#include <QStackedLayout>
+
 #include "timelinewidget.h"
 #include "animationwidgetscrollbar.h"
 #include "mainwindow.h"
@@ -30,7 +33,7 @@
 #include "canvas.h"
 #include "scenechooser.h"
 #include "changewidthwidget.h"
-#include <QToolButton>
+#include "timelinehighlightwidget.h"
 
 TimelineWidget::TimelineWidget(Document &document,
                                QMenuBar * const menu,
@@ -204,8 +207,15 @@ TimelineWidget::TimelineWidget(Document &document,
     mMainLayout->addWidget(mBoxesListScrollArea, 1, 0);
 
     mKeysViewLayout = new QVBoxLayout();
+
     mKeysView = new KeysView(mBoxesListWidget, this);
     mKeysViewLayout->addWidget(mKeysView);
+
+    const auto high1 = mBoxesListWidget->requestHighlighter();
+    const auto high2 = mKeysView->requestHighlighter();
+    high1->setOther(high2);
+    high2->setOther(high1);
+
     mAnimationDockWidget = new AnimationDockWidget(this, mKeysView);
     mAnimationDockWidget->hide();
     mMainLayout->addLayout(mKeysViewLayout, 1, 1);

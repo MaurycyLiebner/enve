@@ -14,33 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef BOXSCROLLWIDGET_H
-#define BOXSCROLLWIDGET_H
+#ifndef TIMELINEHIGHLIGHTWIDGET_H
+#define TIMELINEHIGHLIGHTWIDGET_H
 
-#include "OptimalScrollArea/scrollwidget.h"
-#include "GUI/keyfocustarget.h"
-class BoxScroller;
-class ScrollArea;
-class WindowSingleWidgetTarget;
-class Document;
-class Canvas;
-class KeysView;
-class TimelineHighlightWidget;
+#include <QWidget>
 
-class BoxScrollWidget : public ScrollWidget {
-    Q_OBJECT
+class eSettings;
+
+class TimelineHighlightWidget : public QWidget {
 public:
-    explicit BoxScrollWidget(Document& document,
-                             ScrollArea * const parent = nullptr);
-    ~BoxScrollWidget();
+    TimelineHighlightWidget(const bool track, QWidget* const parent);
 
-    void setCurrentScene(Canvas* const scene);
-    void setSiblingKeysView(KeysView* const keysView);
-    TimelineHighlightWidget *requestHighlighter();
+    void setOther(TimelineHighlightWidget* const other);
+protected:
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void leaveEvent(QEvent *) override;
+    void paintEvent(QPaintEvent *) override;
 private:
-    BoxScroller *getBoxScroller();
+    void setHoverRow(const int row);
 
-    stdptr<SWT_Abstraction> mCoreAbs;
+    int mHoverRow = -1;
+    const eSettings& mSettings;
+    TimelineHighlightWidget* mOther = nullptr;
 };
 
-#endif // BOXSCROLLWIDGET_H
+#endif // TIMELINEHIGHLIGHTWIDGET_H

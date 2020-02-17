@@ -28,6 +28,7 @@
 #include "swt_abstraction.h"
 #include "GUI/keysview.h"
 #include "RasterEffects/rastereffectcollection.h"
+#include "GUI/timelinehighlightwidget.h"
 
 BoxScroller::BoxScroller(ScrollWidget * const parent) :
     ScrollWidgetVisiblePart(parent) {
@@ -57,6 +58,19 @@ void BoxScroller::paintEvent(QPaintEvent *) {
     }
 
     p.end();
+}
+
+TimelineHighlightWidget *BoxScroller::requestHighlighter() {
+    if(!mHighlighter) {
+        mHighlighter = new TimelineHighlightWidget(false, this);
+        mHighlighter->resize(size());
+    }
+    return mHighlighter;
+}
+
+void BoxScroller::resizeEvent(QResizeEvent *e) {
+    if(mHighlighter) mHighlighter->resize(e->size());
+    ScrollWidgetVisiblePart::resizeEvent(e);
 }
 
 bool BoxScroller::tryDropIntoAbs(SWT_Abstraction* const abs,

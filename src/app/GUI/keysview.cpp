@@ -31,6 +31,7 @@
 #include <QApplication>
 #include "clipboardcontainer.h"
 #include "Animators/qrealpoint.h"
+#include "timelinehighlightwidget.h"
 
 KeysView::KeysView(BoxScrollWidget *boxesListVisible,
                    QWidget *parent) :
@@ -40,6 +41,14 @@ KeysView::KeysView(BoxScrollWidget *boxesListVisible,
     setMouseTracking(true);
     setAcceptDrops(true);
     mScrollTimer = new QTimer(this);
+}
+
+TimelineHighlightWidget *KeysView::requestHighlighter() {
+    if(!mHighlighter) {
+        mHighlighter = new TimelineHighlightWidget(true, this);
+        mHighlighter->resize(size());
+    }
+    return mHighlighter;
 }
 
 void KeysView::dropEvent(QDropEvent *event) {
@@ -74,6 +83,7 @@ void KeysView::setCurrentScene(Canvas * const scene) {
 }
 
 void KeysView::setGraphViewed(const bool bT) {
+    if(mHighlighter) mHighlighter->setHidden(bT);
     mGraphViewed = bT;
     if(bT) {
         graphResetValueScaleAndMinShown();
@@ -163,6 +173,7 @@ void KeysView::selectKeysInSelectionRect() {
 }
 
 void KeysView::resizeEvent(QResizeEvent *e) {
+    if(mHighlighter) mHighlighter->resize(e->size());
     updatePixelsPerFrame();
     if(mGraphViewed) graphResizeEvent(e);
 }

@@ -79,6 +79,7 @@ SOURCES += main.cpp\
     GUI/Settings/performancesettingswidget.cpp \
     GUI/Settings/settingsdialog.cpp \
     GUI/Settings/settingswidget.cpp \
+    GUI/Settings/timelinesettingswidget.cpp \
     GUI/audiohandler.cpp \
     GUI/bookmarkedwidget.cpp \
     GUI/buttonbase.cpp \
@@ -98,6 +99,7 @@ SOURCES += main.cpp\
     GUI/switchbutton.cpp \
     GUI/timelinebasewrappernode.cpp \
     GUI/timelinedockwidget.cpp \
+    GUI/timelinehighlightwidget.cpp \
     GUI/timelinewidget.cpp \
     GUI/timelinewrappernode.cpp \
     GUI/triggerlabel.cpp \
@@ -189,6 +191,7 @@ HEADERS  += \
     GUI/Settings/performancesettingswidget.h \
     GUI/Settings/settingsdialog.h \
     GUI/Settings/settingswidget.h \
+    GUI/Settings/timelinesettingswidget.h \
     GUI/audiohandler.h \
     GUI/bookmarkedwidget.h \
     GUI/buttonbase.h \
@@ -207,6 +210,7 @@ HEADERS  += \
     GUI/switchbutton.h \
     GUI/timelinebasewrappernode.h \
     GUI/timelinedockwidget.h \
+    GUI/timelinehighlightwidget.h \
     GUI/timelinewidget.h \
     GUI/timelinewrappernode.h \
     GUI/triggerlabel.h \

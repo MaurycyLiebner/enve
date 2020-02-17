@@ -84,6 +84,9 @@ public:
     int fQuickSaveCap = 5; // <= 0 - no cap
     int fAutoQuickSaveMin = 0; // <= 0 - disabled
     AutosaveTarget fQuickSaveTarget = AutosaveTarget::same_folder;
+
+    // timeline settings
+    bool fTimelineHighlightRow = true;
 };
 
 #endif // SETTINGS_H

@@ -27,6 +27,7 @@ class TimelineMovable;
 class Key;
 class KeysView;
 class Canvas;
+class TimelineHighlightWidget;
 
 class BoxScroller : public ScrollWidgetVisiblePart {
 public:
@@ -51,9 +52,11 @@ public:
 
     void setKeysView(KeysView *keysView)
     { mKeysView = keysView; }
+
+    TimelineHighlightWidget* requestHighlighter();
 protected:
     void paintEvent(QPaintEvent *);
-
+    void resizeEvent(QResizeEvent *e);
     void dropEvent(QDropEvent *event);
     void dragLeaveEvent(QDragLeaveEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
@@ -83,6 +86,7 @@ private:
     bool tryDropIntoAbs(SWT_Abstraction * const abs,
                         const int idInAbs, DropTarget &dropTarget);
 
+    TimelineHighlightWidget* mHighlighter = nullptr;
     Canvas* mCurrentScene = nullptr;
 
     QRect mCurrentDragRect;

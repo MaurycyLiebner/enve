@@ -2,17 +2,21 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
+#include <QTabWidget>
 
-class PerformanceSettingsWidget;
+class SettingsWidget;
 
 class SettingsDialog : public QDialog {
     Q_OBJECT
 public:
     explicit SettingsDialog(QWidget * const parent = nullptr);
 private:
+    void addSettingsWidget(SettingsWidget* const widget,
+                           const QString& name);
     void updateSettings();
 
-    PerformanceSettingsWidget* mPerformanceSettingsWidget = nullptr;
+    QTabWidget* mTabWidget = nullptr;
+    QList<SettingsWidget*> mSettingWidgets;
 };
 
 #endif // SETTINGSDIALOG_H
