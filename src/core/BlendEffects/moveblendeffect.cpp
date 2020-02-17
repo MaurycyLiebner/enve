@@ -24,6 +24,7 @@ MoveBlendEffect::MoveBlendEffect() :
     mZIndex = enve::make_shared<IntAnimator>("z-index");
     mZIndex->setPrefferedValueStep(0.2);
     ca_addChild(mZIndex);
+    ca_setGUIProperty(mZIndex.get());
 }
 
 int MoveBlendEffect::calcDIndex(const qreal relFrame) const {
