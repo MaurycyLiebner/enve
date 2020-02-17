@@ -240,15 +240,7 @@ BoxSingleWidget::BoxSingleWidget(BoxScroller * const parent) :
 
     mPropertyComboBox = new QComboBox(this);
     mPropertyComboBox->setFocusPolicy(Qt::NoFocus);
-    connect(mPropertyComboBox, qOverload<int>(&QComboBox::activated),
-            this, [this](const int id) {
-        if(!mTarget) return;
-        const auto target = mTarget->getTarget();
-        if(const auto combo = enve_cast<ComboBoxProperty*>(target)) {
-            combo->setCurrentValue(id);
-            Document::sInstance->actionFinished();
-        }
-    });
+
     mMainLayout->addWidget(mPropertyComboBox);
 
     mBlendModeCombo = new QComboBox(this);
@@ -350,6 +342,22 @@ void BoxSingleWidget::setFillType(const int id) {
     Document::sInstance->actionFinished();
 }
 
+void BoxSingleWidget::setComboProperty(ComboBoxProperty* const combo) {
+    if(!combo) return mPropertyComboBox->hide();
+    mPropertyComboBox->clear();
+    mPropertyComboBox->addItems(combo->getValueNames());
+    mPropertyComboBox->setCurrentIndex(combo->getCurrentValue());
+    mTargetConn << connect(combo, &ComboBoxProperty::valueChanged,
+                           mPropertyComboBox, &QComboBox::setCurrentIndex);
+    mTargetConn << connect(mPropertyComboBox,
+                           qOverload<int>(&QComboBox::activated),
+                           this, [combo](const int id) {
+        combo->setCurrentValue(id);
+        Document::sInstance->actionFinished();
+    });
+    mPropertyComboBox->show();
+}
+
 ColorAnimator *BoxSingleWidget::getColorTarget() const {
     const auto swt = mTarget->getTarget();
     ColorAnimator * color = nullptr;
@@ -383,10 +391,12 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     const auto boolProperty = enve_cast<BoolProperty*>(prop);
     const auto boolPropertyContainer = enve_cast<BoolPropertyContainer*>(prop);
     const auto boxTargetProperty = enve_cast<BoxTargetProperty*>(prop);
+    const auto comboBoxProperty = enve_cast<ComboBoxProperty*>(prop);
     const auto animator = enve_cast<Animator*>(prop);
     const auto graphAnimator = enve_cast<GraphAnimator*>(prop);
     const auto complexAnimator = enve_cast<ComplexAnimator*>(prop);
     const auto eboxOrSound = enve_cast<eBoxOrSound*>(prop);
+    const auto eindependentSound = enve_cast<eIndependentSound*>(prop);
     const auto eeffect = enve_cast<eEffect*>(prop);
     const auto rasterEffect = enve_cast<RasterEffect*>(prop);
     const auto boundingBox = enve_cast<BoundingBox*>(prop);
@@ -423,7 +433,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
     mBoxTargetWidget->setVisible(boxTargetProperty);
     mCheckBox->setVisible(boolProperty || boolPropertyContainer);
 
-    mPropertyComboBox->setVisible(enve_cast<ComboBoxProperty*>(prop));
+    mPropertyComboBox->setVisible(comboBoxProperty);
 
     mPathBlendModeVisible = false;
     mBlendModeVisible = false;
@@ -457,14 +467,8 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         mTargetConn << connect(boolPropertyContainer,
                                &BoolPropertyContainer::valueChanged,
                                this, [this]() { mCheckBox->update(); });
-    } else if(const auto combo = enve_cast<ComboBoxProperty*>(prop)) {
-        mPropertyComboBox->clear();
-        mPropertyComboBox->addItems(combo->getValueNames());
-        mPropertyComboBox->setCurrentIndex(combo->getCurrentValue());
-        mTargetConn << connect(combo, &ComboBoxProperty::valueChanged,
-                               this, [this](const int id) {
-            mPropertyComboBox->setCurrentIndex(id);
-        });
+    } else if(comboBoxProperty) {
+        setComboProperty(comboBoxProperty);
     } else if(const auto qra = enve_cast<QrealAnimator*>(prop)) {
         mValueSlider->setTarget(qra);
         valueSliderVisible = true;
@@ -494,17 +498,17 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
                 valueSliderVisible = mValueSlider->isVisible();
                 secondValueSliderVisible = mSecondValueSlider->isVisible();
             } else {
-                Property * const guiProp = complexAnimator->ca_getGUIProperty();
-                if(guiProp) {
-                    if(const auto qra = enve_cast<QrealAnimator*>(guiProp)) {
-                        valueSliderVisible = true;
-                        mValueSlider->setTarget(qra);
-                        mValueSlider->setIsLeftSlider(false);
-                        mSecondValueSlider->setTarget(nullptr);
-                    } else if(enve_cast<ColorAnimator*>(guiProp)) {
-                        mColorButton->setColorTarget(static_cast<ColorAnimator*>(guiProp));
-                        colorButtonVisible = true;
-                    }
+                const auto guiProp = complexAnimator->ca_getGUIProperty();
+                if(const auto qra = enve_cast<QrealAnimator*>(guiProp)) {
+                    valueSliderVisible = true;
+                    mValueSlider->setTarget(qra);
+                    mValueSlider->setIsLeftSlider(false);
+                    mSecondValueSlider->setTarget(nullptr);
+                } else if(const auto col = enve_cast<ColorAnimator*>(guiProp)) {
+                    mColorButton->setColorTarget(col);
+                    colorButtonVisible = true;
+                } else if(const auto combo = enve_cast<ComboBoxProperty*>(guiProp)) {
+                    setComboProperty(combo);
                 }
             }
         }
@@ -532,7 +536,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         mTargetConn << connect(eeffect, &eEffect::effectVisibilityChanged,
                                this, [this]() { mVisibleButton->update(); });
     }
-    if(boundingBox || enve_cast<eIndependentSound*>(prop)) {
+    if(boundingBox || eindependentSound) {
         const auto ptr = static_cast<eBoxOrSound*>(prop);
         mTargetConn << connect(ptr, &eBoxOrSound::visibilityChanged,
                                this, [this]() { mVisibleButton->update(); });
@@ -541,7 +545,7 @@ void BoxSingleWidget::setTargetAbstraction(SWT_Abstraction *abs) {
         mTargetConn << connect(ptr, &eBoxOrSound::lockedChanged,
                                this, [this]() { mLockedButton->update(); });
     }
-    if(!boundingBox && !enve_cast<eIndependentSound*>(prop)) {
+    if(!boundingBox && !eindependentSound) {
         mTargetConn << connect(prop, &Property::prp_selectionChanged,
                                this, qOverload<>(&QWidget::update));
     }

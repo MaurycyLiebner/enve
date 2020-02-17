@@ -120,6 +120,8 @@ private:
     void setFillType(const int id);
     ColorAnimator* getColorTarget() const;
 
+    void setComboProperty(ComboBoxProperty * const combo);
+
     BoxScroller* const mParent;
 
     bool mDragPressPos = false;
