@@ -409,8 +409,8 @@ void TimelineWidget::readState(eReadStream &src) {
 
     mSearchLine->setText(search);
 
-    mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(sliderPos);
-    mKeysView->setViewedVerticalRange(sliderPos, sliderPos + mBoxesListScrollArea->height());
+    //mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(sliderPos);
+    //mKeysView->setViewedVerticalRange(sliderPos, sliderPos + mBoxesListScrollArea->height());
 
     mFrameScrollBar->setFirstViewedFrame(frame);
     mFrameScrollBar->setDisplayedFrameRange({minViewedFrame, maxViewedFrame});
