@@ -33,7 +33,8 @@ QMimeData *SculptPathAnimator::SWT_createMimeData() {
 void SculptPathAnimator::prp_drawCanvasControls(
         SkCanvas * const canvas, const CanvasMode mode,
         const float invScale, const bool ctrlPressed) {
-    if(mode == CanvasMode::sculptPath) {
+    const bool visible = Document::sInstance->fSculptNodesVisible;
+    if(visible && mode == CanvasMode::sculptPath) {
         const float clampedInvScale = qBound(0.333f, invScale, 1.f);
         const auto current = getCurrentlyEdited();
         const auto& nodes = current->nodes();

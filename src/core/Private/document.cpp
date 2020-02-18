@@ -235,6 +235,11 @@ void Document::setOnionDisabled(const bool disabled) {
     actionFinished();
 }
 
+void Document::setSculptNodesHidden(const bool hidden) {
+    fSculptNodesVisible = !hidden;
+    actionFinished();
+}
+
 void Document::incSculptBrushRadius() {
     fSculptBrush.incExpRadius(0.3);
     emit sculptBrushSizeChanged(fSculptBrush.radius());

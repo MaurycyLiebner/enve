@@ -73,6 +73,7 @@ public:
 
     SimpleBrushWrapper* fOutlineBrush = nullptr;
 
+    bool fSculptNodesVisible = true;
     SculptBrush fSculptBrush = SculptBrush(3, 0.5, 0.8, 1);
     SculptTarget fSculptTarget = SculptTarget::position;
     SculptMode fSculptMode = SculptMode::drag;
@@ -133,6 +134,8 @@ public:
 
     void setOnionDisabled(const bool disabled);
 //
+    void setSculptNodesHidden(const bool hidden);
+
     void incSculptBrushRadius();
     void decSculptBrushRadius();
 

@@ -170,6 +170,13 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     connect(mOnion, &SwitchButton::toggled,
             &mDocument, &Document::setOnionDisabled);
 
+    mSculptNodeVisibility = SwitchButton::sCreate2Switch(
+                iconsDir + "/sculptNodesVisible.png",
+                iconsDir + "/sculptNodesHidden.png",
+                gSingleLineTooltip("Sculpt Node Visibility"), this);
+    connect(mSculptNodeVisibility, &SwitchButton::toggled,
+            &mDocument, &Document::setSculptNodesHidden);
+
     mToolBar = new QToolBar(this);
     mToolBar->setMovable(false);
 
@@ -217,6 +224,9 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     addSpaceToToolbar();
 
     mOnionAct = mToolBar->addWidget(mOnion);
+
+    mSculptNodeVisibilityAct = mToolBar->addWidget(mSculptNodeVisibility);
+    mSculptModeNodeVisibilitySpace = addSpaceToToolbar();
 
     setupSculptModeButtons(iconsDir);
     mSculptModeTargetSeperator = mToolBar->addSeparator();
@@ -649,6 +659,9 @@ void TimelineDockWidget::updateButtonsVisibility(const CanvasMode mode) {
     mDecSculptBrushSizeAct->setVisible(sculptMode);
     mSculptBrushSizeLabelAct->setVisible(sculptMode);
     mIncSculptBrushSizeAct->setVisible(sculptMode);
+
+    mSculptNodeVisibilityAct->setVisible(sculptMode);
+    mSculptModeNodeVisibilitySpace->setVisible(sculptMode);
 
     mDragModeAct->setVisible(sculptMode);
     mAddModeAct->setVisible(sculptMode);

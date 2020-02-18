@@ -142,6 +142,10 @@ private:
     TriggerLabel* mSculptColorLabel;
     QAction* mSculptColorLabelAct;
 
+    QAction* mSculptNodeVisibilityAct;
+    SwitchButton *mSculptNodeVisibility;
+    QAction* mSculptModeNodeVisibilitySpace;
+
     QAction* mDragModeAct;
     SwitchButton* mDragMode;
     QAction* mAddModeAct;
