@@ -182,6 +182,14 @@ void DrawableAutoTiledSurface::setTileBitmaps(TileBitmaps &&tiles) {
 }
 
 void DrawableAutoTiledSurface::stretchBitmapsToTile(const int tx, const int ty) {
+    if(mColumnCount == 0) {
+        mZeroTileCol = -tx;
+        mZeroTileRow = -ty;
+        appendBitmapRows(1);
+        appendBitmapColumns(1);
+        return;
+    }
+
     const int colId = tx + mZeroTileCol;
     const int rowId = ty + mZeroTileRow;
 
