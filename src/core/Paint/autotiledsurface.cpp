@@ -79,6 +79,10 @@ void AutoTiledSurfaceBase::replaceTile(const int tx, const int ty,
     mAutoTilesData.replaceTile(tx, ty, tile);
 }
 
+void AutoTiledSurfaceBase::move(const int dx, const int dy) {
+    mAutoTilesData.move(dx, dy);
+}
+
 void AutoTiledSurfaceBase::discardTransparentTiles() {
     mAutoTilesData.discardTransparentTiles();
 }

@@ -96,7 +96,14 @@ public:
         incPaintBrushSize(-dec);
     }
 
+    void setNormalMode() const {
+        finishEraseMode();
+        finishAlphaLockMode();
+        finishColorizeMode();
+    }
+
     void startEraseMode() const {
+        setNormalMode();
         setBaseValue(MYPAINT_BRUSH_SETTING_ERASER, 1);
     }
 
@@ -105,6 +112,7 @@ public:
     }
 
     void startAlphaLockMode() const {
+        setNormalMode();
         setBaseValue(MYPAINT_BRUSH_SETTING_LOCK_ALPHA, 1);
     }
 
@@ -113,6 +121,7 @@ public:
     }
 
     void startColorizeMode() const {
+        setNormalMode();
         setBaseValue(MYPAINT_BRUSH_SETTING_COLORIZE, 1);
     }
 

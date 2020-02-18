@@ -170,6 +170,88 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     connect(mOnion, &SwitchButton::toggled,
             &mDocument, &Document::setOnionDisabled);
 
+
+    mPaintNormalMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/paintChecked.png",
+                iconsDir + "/paintUnchecked.png",
+                gSingleLineTooltip("Paint"), this);
+    connect(mPaintNormalMode, &SwitchButton::toggled,
+            this, [this](const int state) {
+        if(state == 0) {
+            mDocument.setPaintMode(PaintMode::normal);
+        } else mPaintNormalMode->setState(0);
+    });
+
+    mPaintEraseMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/eraseChecked.png",
+                iconsDir + "/eraseUnchecked.png",
+                gSingleLineTooltip("Erase"), this);
+    mPaintEraseMode->setState(1);
+    connect(mPaintEraseMode, &SwitchButton::toggled,
+            this, [this](const int state) {
+        if(state == 0) {
+            mDocument.setPaintMode(PaintMode::erase);
+        } else mPaintEraseMode->setState(0);
+    });
+
+    mPaintLockAlphaMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/lockAlphaChecked.png",
+                iconsDir + "/lockAlphaUnchecked.png",
+                gSingleLineTooltip("Lock Alpha"), this);
+    mPaintLockAlphaMode->setState(1);
+    connect(mPaintLockAlphaMode, &SwitchButton::toggled,
+            this, [this](const int state) {
+        if(state == 0) {
+            mDocument.setPaintMode(PaintMode::lockAlpha);
+        } else mPaintLockAlphaMode->setState(0);
+    });
+
+    mPaintColorizeMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/colorizeChecked.png",
+                iconsDir + "/colorizeUnchecked.png",
+                gSingleLineTooltip("Colorize"), this);
+    mPaintColorizeMode->setState(1);
+    connect(mPaintColorizeMode, &SwitchButton::toggled,
+            this, [this](const int state) {
+        if(state == 0) {
+            mDocument.setPaintMode(PaintMode::colorize);
+        } else mPaintColorizeMode->setState(0);
+    });
+
+    mPaintMoveMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/paintMoveChecked.png",
+                iconsDir + "/paintMoveUnchecked.png",
+                gSingleLineTooltip("Move"), this);
+    mPaintMoveMode->setState(1);
+    connect(mPaintMoveMode, &SwitchButton::toggled,
+            this, [this](const int state) {
+        if(state == 0) {
+            mDocument.setPaintMode(PaintMode::move);
+        } else mPaintMoveMode->setState(0);
+    });
+
+    mPaintCropMode = SwitchButton::sCreate2Switch(
+                iconsDir + "/paintCropChecked.png",
+                iconsDir + "/paintCropUnchecked.png",
+                gSingleLineTooltip("Crop"), this);
+    mPaintCropMode->setState(1);
+    connect(mPaintCropMode, &SwitchButton::toggled,
+            this, [this](const int state) {
+        if(state == 0) {
+            mDocument.setPaintMode(PaintMode::crop);
+        } else mPaintCropMode->setState(0);
+    });
+
+    connect(&mDocument, &Document::paintModeChanged,
+            this, [this](const PaintMode mode) {
+        mPaintNormalMode->setState(mode != PaintMode::normal);
+        mPaintEraseMode->setState(mode != PaintMode::erase);
+        mPaintLockAlphaMode->setState(mode != PaintMode::lockAlpha);
+        mPaintColorizeMode->setState(mode != PaintMode::colorize);
+        mPaintMoveMode->setState(mode != PaintMode::move);
+        mPaintCropMode->setState(mode != PaintMode::crop);
+    });
+
     mSculptNodeVisibility = SwitchButton::sCreate2Switch(
                 iconsDir + "/sculptNodesVisible.png",
                 iconsDir + "/sculptNodesHidden.png",
@@ -224,6 +306,18 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     addSpaceToToolbar();
 
     mOnionAct = mToolBar->addWidget(mOnion);
+
+    mPaintModeSpace = addSpaceToToolbar();
+
+    mPaintNormalModeAct = mToolBar->addWidget(mPaintNormalMode);
+    mPaintEraseModeAct = mToolBar->addWidget(mPaintEraseMode);
+    mPaintLockAlphaModeAct = mToolBar->addWidget(mPaintLockAlphaMode);
+    mPaintColorizeModeAct = mToolBar->addWidget(mPaintColorizeMode);
+
+    mPaintModesSeparator = mToolBar->addSeparator();
+
+    mPaintMoveModeAct = mToolBar->addWidget(mPaintMoveMode);
+    mPaintCropModeAct = mToolBar->addWidget(mPaintCropMode);
 
     mSculptNodeVisibilityAct = mToolBar->addWidget(mSculptNodeVisibility);
     mSculptModeNodeVisibilitySpace = addSpaceToToolbar();
@@ -652,6 +746,17 @@ void TimelineDockWidget::updateButtonsVisibility(const CanvasMode mode) {
     mBrushSizeLabelAct->setVisible(paintMode);
     mIncBrushSizeAct->setVisible(paintMode);
     mOnionAct->setVisible(paintMode);
+    mPaintModeSpace->setVisible(paintMode);
+
+    mPaintNormalModeAct->setVisible(paintMode);
+    mPaintEraseModeAct->setVisible(paintMode);
+    mPaintLockAlphaModeAct->setVisible(paintMode);
+    mPaintColorizeModeAct->setVisible(paintMode);
+
+    mPaintModesSeparator->setVisible(paintMode);
+
+    mPaintMoveModeAct->setVisible(paintMode);
+    mPaintCropModeAct->setVisible(false);
 
     const bool sculptMode = mode == CanvasMode::sculptPath;
     mSculptColorLabelAct->setVisible(sculptMode);

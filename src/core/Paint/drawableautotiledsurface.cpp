@@ -149,6 +149,12 @@ void DrawableAutoTiledSurface::updateTileDimensions() {
     Q_ASSERT(mRowCount == tRect.height());
 }
 
+void DrawableAutoTiledSurface::move(const int dx, const int dy) {
+    mSurface.move(dx, dy);
+    updateTileDimensions();
+    updateTileBitmaps();
+}
+
 void DrawableAutoTiledSurface::updateTileRecBitmaps(QRect tileRect) {
     const QRect maxRect = mSurface.tileBoundingRect();
     if(!maxRect.intersects(tileRect)) return;

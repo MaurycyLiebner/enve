@@ -39,6 +39,11 @@ enum class NodeVisiblity {
     normalOnly
 };
 
+enum class PaintMode {
+    normal, erase, lockAlpha, colorize,
+    move, crop
+};
+
 class Document : public SingleWidgetTarget {
     Q_OBJECT
     typedef stdsptr<FileDataCacheHandler> FileHandler;
@@ -81,6 +86,7 @@ public:
     QColor fBrushColor;
     SimpleBrushWrapper* fBrush = nullptr;
     bool fOnionVisible = true;
+    PaintMode fPaintMode = PaintMode::normal;
 
     std::set<FileHandler, FileCompare> fFiles;
 
@@ -133,6 +139,7 @@ public:
     void decBrushRadius();
 
     void setOnionDisabled(const bool disabled);
+    void setPaintMode(const PaintMode mode);
 //
     void setSculptNodesHidden(const bool hidden);
 
@@ -184,6 +191,8 @@ signals:
     void brushChanged(BrushContexedWrapper* brush);
     void brushColorChanged(QColor color);
     void brushSizeChanged(float size);
+
+    void paintModeChanged(const PaintMode mode);
 //
     void bookmarkColorAdded(QColor color);
     void bookmarkColorRemoved(QColor color);

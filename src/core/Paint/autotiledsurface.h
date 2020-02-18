@@ -129,6 +129,7 @@ public:
     void replaceTile(const int tx, const int ty,
                      const stdsptr<Tile>& tile);
 
+    void move(const int dx, const int dy);
     void discardTransparentTiles();
     void autoCrop();
 protected:

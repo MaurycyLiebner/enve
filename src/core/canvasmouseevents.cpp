@@ -52,9 +52,19 @@ void Canvas::mousePressEvent(const MouseEvent &e) {
     if(e.fMouseGrabbing && e.fButton == Qt::LeftButton) return;
     if(mCurrentMode == CanvasMode::paint) {
         if(e.fButton == Qt::LeftButton) {
-            if(!mPaintTarget.isValid()) newPaintBox(e.fPos);
-            mPaintTarget.paintPress(e.fPos, e.fTimestamp, 0.5,
-                                    0, 0, mDocument.fBrush);
+            const auto paintMode = mDocument.fPaintMode;
+            if(paintMode <= PaintMode::colorize) {
+                if(!mPaintTarget.isValid()) {
+                    if(paintMode == PaintMode::normal) newPaintBox(e.fPos);
+                    else return;
+                }
+                mPaintTarget.paintPress(e.fPos, e.fTimestamp, 0.5,
+                                        0, 0, mDocument.fBrush);
+            } else if(paintMode == PaintMode::move) {
+                mPaintTarget.movePress(e.fPos);
+            } else if(paintMode == PaintMode::crop) {
+                mPaintTarget.cropPress(e.fPos);
+            }
         }
     } else if(mCurrentMode == CanvasMode::sculptPath) {
         if(e.fButton == Qt::LeftButton) {
@@ -83,9 +93,16 @@ void Canvas::mouseMoveEvent(const MouseEvent &e) {
         return;
     }
 
-    if(mCurrentMode == CanvasMode::paint && leftPressed)  {
-        mPaintTarget.paintMove(e.fPos, e.fTimestamp, 1,
-                               0, 0, mDocument.fBrush);
+    if(mCurrentMode == CanvasMode::paint && leftPressed) {
+        const auto paintMode = mDocument.fPaintMode;
+        if(paintMode <= PaintMode::colorize) {
+            mPaintTarget.paintMove(e.fPos, e.fTimestamp, 1,
+                                   0, 0, mDocument.fBrush);
+        } else if(paintMode == PaintMode::move) {
+            mPaintTarget.moveMove(e.fPos);
+        } else if(paintMode == PaintMode::crop) {
+            mPaintTarget.cropMove(e.fPos);
+        }
         return;
     } else if(mCurrentMode == CanvasMode::sculptPath && leftPressed) {
         return sculptMove(e.fPos, 1);
@@ -149,9 +166,17 @@ void Canvas::mouseReleaseEvent(const MouseEvent &e) {
     }
     if(e.fButton != Qt::LeftButton) return;
     schedulePivotUpdate();
-    if(mCurrentMode == CanvasMode::paint)
-        return mPaintTarget.paintRelease();
-    else if(mCurrentMode == CanvasMode::sculptPath)
+    if(mCurrentMode == CanvasMode::paint) {
+        const auto paintMode = mDocument.fPaintMode;
+        if(paintMode <= PaintMode::colorize) {
+            mPaintTarget.paintRelease();
+        } else if(paintMode == PaintMode::move) {
+            mPaintTarget.moveRelease(e.fPos);
+        } else if(paintMode == PaintMode::crop) {
+            mPaintTarget.cropRelease(e.fPos);
+        }
+        return;
+    } else if(mCurrentMode == CanvasMode::sculptPath)
         return sculptRelease(e.fPos, 1);
 
     handleLeftMouseRelease(e);

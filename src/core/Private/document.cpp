@@ -205,7 +205,16 @@ void Document::removeBookmarkColor(const QColor &color) {
 
 void Document::setBrush(BrushContexedWrapper * const brush) {
     fBrush = brush->getSimpleBrush();
-    if(fBrush) fBrush->setColor(fBrushColor);
+    if(fBrush) {
+        fBrush->setColor(fBrushColor);
+        switch(fPaintMode) {
+        case PaintMode::normal: fBrush->setNormalMode(); break;
+        case PaintMode::erase: fBrush->startEraseMode(); break;
+        case PaintMode::lockAlpha: fBrush->startAlphaLockMode(); break;
+        case PaintMode::colorize: fBrush->startColorizeMode(); break;
+        default: break;
+        }
+    }
     emit brushChanged(brush);
     emit brushSizeChanged(fBrush ? fBrush->getBrushSize() : 0.f);
     emit brushColorChanged(fBrush ? fBrush->getColor() : Qt::white);
@@ -233,6 +242,21 @@ void Document::decBrushRadius() {
 void Document::setOnionDisabled(const bool disabled) {
     fOnionVisible = !disabled;
     actionFinished();
+}
+
+void Document::setPaintMode(const PaintMode mode) {
+    if(mode == fPaintMode) return;
+    fPaintMode = mode;
+    if(fBrush) {
+        switch(fPaintMode) {
+        case PaintMode::normal: fBrush->setNormalMode(); break;
+        case PaintMode::erase: fBrush->startEraseMode(); break;
+        case PaintMode::lockAlpha: fBrush->startAlphaLockMode(); break;
+        case PaintMode::colorize: fBrush->startColorizeMode(); break;
+        default: break;
+        }
+    }
+    emit paintModeChanged(mode);
 }
 
 void Document::setSculptNodesHidden(const bool hidden) {

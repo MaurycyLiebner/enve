@@ -129,8 +129,28 @@ private:
     QLabel* mBrushSizeLabel;
     QAction* mIncBrushSizeAct;
     ActionButton *mIncBrushSize;
+
     QAction* mOnionAct;
     SwitchButton *mOnion;
+
+    QAction* mPaintModeSpace;
+
+    QAction* mPaintNormalModeAct;
+    SwitchButton *mPaintNormalMode;
+    QAction* mPaintEraseModeAct;
+    SwitchButton *mPaintEraseMode;
+    QAction* mPaintLockAlphaModeAct;
+    SwitchButton *mPaintLockAlphaMode;
+    QAction* mPaintColorizeModeAct;
+    SwitchButton *mPaintColorizeMode;
+
+    QAction* mPaintModesSeparator;
+
+    QAction* mPaintMoveModeAct;
+    SwitchButton *mPaintMoveMode;
+    QAction* mPaintCropModeAct;
+    SwitchButton *mPaintCropMode;
+
     //
     QAction* mDecSculptBrushSizeAct;
     ActionButton* mDecSculptBrushSize;

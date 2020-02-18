@@ -551,6 +551,195 @@ void AutoTilesData::autoCrop() {
     while(cropLastRowIfEmpty()) continue;
 }
 
+void AutoTilesData::crop(const QRect &pixRect) {
+    const auto iniPixRect = pixelBoundingRect();
+
+}
+
+void AutoTilesData::moveX(const int dx) {
+    const int dtx = dx/TILE_SIZE;
+    const int dpx = dx - dtx*TILE_SIZE;
+
+    mZeroTileCol -= dtx;
+
+    if(dpx == 0) return;
+
+    prependColumns(1);
+    appendColumns(1);
+
+    if(dpx > 0) {
+        for(int i = mColumnCount - 1; i >= 0; i--) {
+            const bool isFirst = i == 0;
+            const auto& col = mColumns.at(i);
+            const auto& prevCol = isFirst ? col : mColumns.at(i - 1);
+            for(int j = 0; j < mRowCount; j++) {
+                const auto& dstTile = col.at(j);
+                // move pixels inside tile
+                if(uint16_t* const dstData = dstTile->data()) {
+                    const int dstXDP = TILE_SIZE*4;
+                    const int srcXDP = (TILE_SIZE - dpx)*4;
+                    for(int y = 0; y < TILE_SIZE; y++) {
+                        const int rowDP = y*TILE_SIZE*4;
+                        uint16_t* dst = dstData + rowDP + dstXDP;
+                        uint16_t* src = dstData + rowDP + srcXDP;
+                        for(int dstX = TILE_SIZE - 1; dstX >= dpx; dstX--) {
+                            for(int sp = 0; sp < 4; sp++) *(--dst) = *(--src);
+                        }
+                    }
+                }
+                // the first column has no previous column to get data from
+                if(isFirst) continue;
+                uint16_t* const dstData = dstTile->requestZeroedData();
+
+                const auto& srcTile = prevCol.at(j);
+                uint16_t* const srcData = srcTile->requestZeroedData();
+
+                // move pixels from the previous tile
+                const int srcXDP = (TILE_SIZE - dpx)*4;
+                for(int y = 0; y < TILE_SIZE; y++) {
+                    const int rowDP = y*TILE_SIZE*4;
+                    uint16_t* dst = dstData + rowDP;
+                    uint16_t* src = srcData + rowDP + srcXDP;
+                    for(int dstX = 0; dstX < dpx; dstX++) {
+                        for(int sp = 0; sp < 4; sp++) *(dst++) = *(src++);
+                    }
+                }
+            }
+        }
+    } else if(dpx < 0) {
+        for(int i = 0; i < mColumnCount; i++) {
+            const bool isLast = i == (mColumnCount - 1);
+            const auto& col = mColumns.at(i);
+            const auto& nextCol = isLast ? col : mColumns.at(i + 1);
+            for(int j = 0; j < mRowCount; j++) {
+                const auto& dstTile = col.at(j);
+                // move pixels inside tile
+                const int maxX = TILE_SIZE + dpx;
+                if(uint16_t* const dstData = dstTile->data()) {
+                    const int srcXDP = -dpx*4;
+                    for(int y = 0; y < TILE_SIZE; y++) {
+                        const int rowDP = y*TILE_SIZE*4;
+                        uint16_t* dst = dstData + rowDP;
+                        uint16_t* src = dst + srcXDP;
+
+                        for(int dstX = 0; dstX < maxX; dstX++) {
+                            for(int sp = 0; sp < 4; sp++) *(dst++) = *(src++);
+                        }
+                    }
+                }
+
+                // the last column has no next column to get data from
+                if(isLast) continue;
+                uint16_t* const dstData = dstTile->requestZeroedData();
+
+                const auto& srcTile = nextCol.at(j);
+                uint16_t* const srcData = srcTile->requestZeroedData();
+
+                // move pixels from the next tile
+                const int dstX0 = TILE_SIZE + dpx;
+                const int dstXDP = dstX0*4;
+                for(int y = 0; y < TILE_SIZE; y++) {
+                    const int rowDP = y*TILE_SIZE*4;
+                    uint16_t* dst = dstData + rowDP + dstXDP;
+                    uint16_t* src = srcData + rowDP;
+                    for(int dstX = dstX0; dstX < TILE_SIZE; dstX++) {
+                        for(int sp = 0; sp < 4; sp++) *(dst++) = *(src++);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void AutoTilesData::moveY(const int dy) {
+    const int dty = dy/TILE_SIZE;
+    const int dpy = dy - dty*TILE_SIZE;
+
+    mZeroTileRow -= dty;
+
+    if(dpy == 0) return;
+
+    prependRows(1);
+    appendRows(1);
+
+    if(dpy > 0) {
+        for(const auto& col : mColumns) {
+            for(int j = mRowCount - 1; j >= 0; j--) {
+                const auto& dstTile = col.at(j);
+                // move pixels inside tile
+                if(uint16_t* const dstData = dstTile->data()) {
+                    for(int dstY = TILE_SIZE - 1; dstY >= dpy; dstY--) {
+                        uint16_t* dst = dstData + dstY*TILE_SIZE*4;
+                        uint16_t* src = dstData + (dstY - dpy)*TILE_SIZE*4;
+                        for(int x = 0; x < TILE_SIZE; x++) {
+                            for(int sp = 0; sp < 4; sp++) *(dst++) = *(src++);
+                        }
+                    }
+                }
+
+                // the first row has no previous row to get data from
+                const bool isFirst = j == 0;
+                if(isFirst) continue;
+                uint16_t* const dstData = dstTile->requestZeroedData();
+
+                const auto& srcTile = col.at(j - 1);
+                uint16_t* const srcData = srcTile->requestZeroedData();
+
+                // move pixels from the previous tile
+                uint16_t* dst = dstData;
+                uint16_t* src = srcData + (TILE_SIZE - dpy)*TILE_SIZE*4;
+                for(int dstY = 0; dstY < dpy; dstY++) {
+                    for(int x = 0; x < TILE_SIZE; x++) {
+                        for(int sp = 0; sp < 4; sp++) *(dst++) = *(src++);
+                    }
+                }
+            }
+        }
+    } else if(dpy < 0) {
+        for(const auto& col : mColumns) {
+            for(int j = 0; j < mRowCount; j++) {
+                const auto& dstTile = col.at(j);
+                // move pixels inside tile
+                if(uint16_t* const dstData = dstTile->data()) {
+                    const int maxY = TILE_SIZE + dpy;
+                    uint16_t* dst = dstData;
+                    uint16_t* src = dstData - dpy*TILE_SIZE*4;
+                    for(int dstY = 0; dstY < maxY; dstY++) {
+                        for(int x = 0; x < TILE_SIZE; x++) {
+                            for(int sp = 0; sp < 4; sp++) *(dst++) = *(src++);
+                        }
+                    }
+                }
+
+                // the last row has no next row to get data from
+                const bool isLast = j == (mRowCount - 1);
+                if(isLast) continue;
+                uint16_t* const dstData = dstTile->requestZeroedData();
+
+                const auto& srcTile = col.at(j + 1);
+                uint16_t* const srcData = srcTile->requestZeroedData();
+
+                // move pixels from the next tile
+                const int dstY0 = TILE_SIZE + dpy;
+                uint16_t* dst = dstData + dstY0*TILE_SIZE*4;
+                uint16_t* src = srcData;
+                for(int dstY = dstY0; dstY < TILE_SIZE; dstY++) {
+                    for(int x = 0; x < TILE_SIZE; x++) {
+                        for(int sp = 0; sp < 4; sp++) *(dst++) = *(src++);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void AutoTilesData::move(const int dx, const int dy) {
+    moveX(dx);
+    moveY(dy);
+    discardTransparentTiles();
+    autoCrop();
+}
+
 stdsptr<Tile> AutoTilesData::requestTile(const int tx, const int ty) {
     stretchToTile(tx, ty);
     return getTile(tx, ty);

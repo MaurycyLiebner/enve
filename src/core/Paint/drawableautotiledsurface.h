@@ -85,6 +85,8 @@ public:
     void drawingDoneForNow() { afterDataReplaced(); }
 
     void updateTileDimensions();
+
+    void move(const int dx, const int dy);
 private:
     void removeFirstColumn();
     void removeLastColumn();

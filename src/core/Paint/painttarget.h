@@ -73,7 +73,23 @@ struct PaintTarget {
         if(!isValid()) return QRect();
         return mPaintDrawable->pixelBoundingRect();
     }
+
+    void movePress(const QPointF& pos);
+    void moveMove(const QPointF& pos);
+    void moveRelease(const QPointF& pos);
+    void moveCancel();
+
+    void cropPress(const QPointF& pos);
+    void cropMove(const QPointF& pos);
+    void cropRelease(const QPointF& pos);
+    void cropCancel();
 private:
+    void startTransform();
+    QPointF absPosToRelPos(const QPointF& absPos) const;
+
+    QPointF mMovePress;
+    SkPoint mRelDrawPos = {0, 0};
+
     QRect mTotalRoi;
     ulong mLastTs;
     int mLastFrame = 0;

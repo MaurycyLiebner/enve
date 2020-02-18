@@ -16,6 +16,7 @@
 
 #include "painttarget.h"
 #include "canvas.h"
+#include "Private/document.h"
 
 void PaintTarget::draw(SkCanvas * const canvas,
                        const QMatrix& viewTrans,
@@ -30,7 +31,7 @@ void PaintTarget::draw(SkCanvas * const canvas,
     if(drawOnion) mPaintOnion.draw(canvas);
     SkPaint paint;
     paint.setFilterQuality(filter);
-    mPaintDrawable->drawOnCanvas(canvas, {0, 0}, &relDRect, &paint);
+    mPaintDrawable->drawOnCanvas(canvas, mRelDrawPos, &relDRect, &paint);
 }
 
 void PaintTarget::setPaintDrawable(DrawableAutoTiledSurface * const surf,
@@ -83,15 +84,85 @@ void PaintTarget::setPaintBox(PaintBox * const box) {
     }
 }
 
-void PaintTarget::paintPress(const QPointF& pos,
-                             const ulong ts, const qreal pressure,
-                             const qreal xTilt, const qreal yTilt,
-                             const SimpleBrushWrapper * const brush) {
+QPointF PaintTarget::absPosToRelPos(const QPointF& absPos) const {
+    if(mPaintDrawable) {
+        const auto pDrawTrans = mPaintDrawableBox->getTotalTransform();
+        return pDrawTrans.inverted().map(absPos);
+    }
+    return absPos;
+}
+
+void PaintTarget::startTransform() {
     if(mPaintAnimSurface) {
         if(mPaintAnimSurface->anim_isRecording() &&
            !mPaintAnimSurface->anim_getKeyOnCurrentFrame())
             mPaintAnimSurface->anim_saveCurrentValueAsKey();
     }
+}
+
+
+void PaintTarget::cropPress(const QPointF &pos) {
+    Q_UNUSED(pos)
+}
+
+void PaintTarget::cropMove(const QPointF &pos) {
+    Q_UNUSED(pos)
+}
+
+void PaintTarget::cropRelease(const QPointF &pos) {
+    startTransform();
+    Q_UNUSED(pos)
+}
+
+void PaintTarget::cropCancel() {
+    mRelDrawPos = {0, 0};
+}
+
+void PaintTarget::movePress(const QPointF &pos) {
+    mMovePress = absPosToRelPos(pos);
+}
+
+void PaintTarget::moveMove(const QPointF &pos) {
+    startTransform();
+    mRelDrawPos = toSkPoint(absPosToRelPos(pos) - mMovePress);
+}
+
+void PaintTarget::moveRelease(const QPointF &pos) {
+    moveMove(pos);
+    const int dx = qRound(mRelDrawPos.x());
+    const int dy = qRound(mRelDrawPos.y());
+    mChanged = true;
+    if(mPaintDrawable) {
+        mPaintDrawable->move(dx, dy);
+        if(mPaintAnimSurface) {
+            mPaintAnimSurface->prp_pushUndoRedoName("Move");
+            UndoRedo ur;
+            const auto anim = mPaintAnimSurface;
+            const stdptr<DrawableAutoTiledSurface> ptr = mPaintDrawable.get();
+            ur.fUndo = [dx, dy, ptr]() {
+                if(!ptr) return;
+                ptr->move(-dx, -dy);
+            };
+            ur.fRedo = [dx, dy, ptr]() {
+                if(!ptr) return;
+                ptr->move(dx, dy);
+            };
+            mPaintAnimSurface->prp_addUndoRedo(ur);
+        }
+        Document::sInstance->actionFinished();
+    }
+    mRelDrawPos = {0, 0};
+}
+
+void PaintTarget::moveCancel() {
+    mRelDrawPos = {0, 0};
+}
+
+void PaintTarget::paintPress(const QPointF& pos,
+                             const ulong ts, const qreal pressure,
+                             const qreal xTilt, const qreal yTilt,
+                             const SimpleBrushWrapper * const brush) {
+    startTransform();
 
     if(mPaintDrawable && brush) {
         const auto& target = mPaintDrawable->surface();
@@ -132,7 +203,6 @@ void PaintTarget::paintMove(const QPointF& pos,
     mLastTs = ts;
 }
 
-#include "Private/document.h"
 void PaintTarget::paintRelease() {
     if(mPaintAnimSurface && mPaintDrawable) {
         auto& target = mPaintDrawable->surface();
