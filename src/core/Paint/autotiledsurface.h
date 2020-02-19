@@ -129,7 +129,9 @@ public:
     void replaceTile(const int tx, const int ty,
                      const stdsptr<Tile>& tile);
 
+    void crop(const QRect &crop);
     void move(const int dx, const int dy);
+
     void discardTransparentTiles();
     void autoCrop();
 protected:
@@ -168,6 +170,8 @@ public:
         mUndoList.clear();
         return result;
     }
+
+    void triggerAllChange();
 
     static void sRequestStart(MyPaintTiledSurface *surface,
                               MyPaintTileRequest *request);

@@ -296,7 +296,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
 
     if(mPaintTarget.isValid()) {
         canvas->save();
-        mPaintTarget.draw(canvas, viewTrans, drawRect,
+        mPaintTarget.draw(canvas, viewTrans, invZoom, drawRect,
                           filter, mDocument.fOnionVisible);
         const SkIRect bRect = toSkIRect(mPaintTarget.pixelBoundingRect());
         paint.setStyle(SkPaint::kStroke_Style);

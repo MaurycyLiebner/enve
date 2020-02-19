@@ -510,53 +510,143 @@ bool AutoTilesData::rowEmpty(const int rowId) {
     return true;
 }
 
-bool AutoTilesData::cropFirstColumnIfEmpty() {
-    if(mColumns.isEmpty()) return false;
-    if(!columnEmpty(0)) return false;
+void AutoTilesData::removeFirstColumn() {
     mColumns.removeFirst();
     mColumnCount--;
     mZeroTileCol--;
+}
+
+void AutoTilesData::removeLastColumn() {
+    mColumns.removeLast();
+    mColumnCount--;
+}
+
+void AutoTilesData::removeFirstRow() {
+    for(auto& col : mColumns) col.removeFirst();
+    mRowCount--;
+    mZeroTileRow--;
+}
+
+void AutoTilesData::removeLastRow() {
+    for(auto& col : mColumns) col.removeLast();
+    mRowCount--;
+}
+
+void AutoTilesData::zeroFirstColumn() {
+    const auto& col = mColumns.first();
+    for(const auto& tile : col) tile->zeroData();
+}
+
+void AutoTilesData::zeroLastColumn() {
+    const auto& col = mColumns.last();
+    for(const auto& tile : col) tile->zeroData();
+}
+
+void AutoTilesData::zeroFirstRow() {
+    for(auto& col : mColumns) col.first()->zeroData();
+}
+
+void AutoTilesData::zeroLastRow() {
+    for(auto& col : mColumns) col.last()->zeroData();
+}
+
+bool AutoTilesData::cropFirstColumnIfEmpty() {
+    if(mColumns.isEmpty()) return false;
+    if(!columnEmpty(0)) return false;
+    removeFirstColumn();
     return true;
 }
 
 bool AutoTilesData::cropLastColumnIfEmpty() {
     if(mColumns.isEmpty()) return false;
     if(!columnEmpty(mColumnCount - 1)) return false;
-    mColumns.removeLast();
-    mColumnCount--;
+    removeLastColumn();
     return true;
 }
 
 bool AutoTilesData::cropFirstRowIfEmpty() {
     if(mColumns.isEmpty()) return false;
     if(!rowEmpty(0)) return false;
-    for(auto& col : mColumns) col.removeFirst();
-    mRowCount--;
-    mZeroTileRow--;
+    removeFirstRow();
     return true;
 }
 
 bool AutoTilesData::cropLastRowIfEmpty() {
     if(mColumns.isEmpty()) return false;
     if(!rowEmpty(mRowCount - 1)) return false;
-    for(auto& col : mColumns) col.removeLast();
-    mRowCount--;
+    removeLastRow();
     return true;
 }
 
 void AutoTilesData::autoCrop() {
+    discardTransparentTiles();
     while(cropFirstColumnIfEmpty()) continue;
     while(cropLastColumnIfEmpty()) continue;
     while(cropFirstRowIfEmpty()) continue;
     while(cropLastRowIfEmpty()) continue;
 }
 
-void AutoTilesData::crop(const QRect &pixRect) {
-    const auto iniPixRect = pixelBoundingRect();
+void AutoTilesData::crop(const QRect &cropRect) {
+    const QRect iniRect = pixelBoundingRect();
+    const QRect normalizedCrop = cropRect.normalized();
+    const QRect clampedCrop = normalizedCrop.intersected(iniRect);
 
+    {
+        const int dl = clampedCrop.left() - iniRect.left();
+        const int dtl = dl/TILE_SIZE;
+        const int dpl = dl - dtl*TILE_SIZE;
+
+        moveX(-dpl, false);
+        for(int i = 0; i < dtl; i++) {
+            zeroFirstColumn();
+            removeFirstColumn();
+        }
+        moveX(dpl, false);
+    }
+
+    {
+        const int dr = clampedCrop.right() - iniRect.right();
+        const int dtr = dr/TILE_SIZE;
+        const int dpr = dr - dtr*TILE_SIZE;
+
+        moveX(-dpr, false);
+        for(int i = 0; i < -dtr; i++) {
+            zeroLastColumn();
+            removeLastColumn();
+        }
+        moveX(dpr, false);
+    }
+
+    {
+        const int dt = clampedCrop.top() - iniRect.top();
+        const int dtt = dt/TILE_SIZE;
+        const int dpt = dt - dtt*TILE_SIZE;
+
+        moveY(-dpt, false);
+        for(int i = 0; i < dtt; i++) {
+            zeroFirstRow();
+            removeFirstRow();
+        }
+        moveY(dpt, false);
+    }
+
+    {
+        const int db = clampedCrop.bottom() - iniRect.bottom();
+        const int dtb = db/TILE_SIZE;
+        const int dpb = db - dtb*TILE_SIZE;
+
+        moveY(-dpb, false);
+        for(int i = 0; i < -dtb; i++) {
+            zeroLastRow();
+            removeLastRow();
+        }
+        moveY(dpb, false);
+    }
+
+    autoCrop();
 }
 
-void AutoTilesData::moveX(const int dx) {
+void AutoTilesData::moveX(const int dx, const bool extend) {
     const int dtx = dx/TILE_SIZE;
     const int dpx = dx - dtx*TILE_SIZE;
 
@@ -564,8 +654,13 @@ void AutoTilesData::moveX(const int dx) {
 
     if(dpx == 0) return;
 
-    prependColumns(1);
-    appendColumns(1);
+    if(extend) {
+        prependColumns(1);
+        appendColumns(1);
+    }
+
+    const auto emptyTile = mTileCreator(TILE_SPIXEL_SIZE);
+    emptyTile->requestZeroedData();
 
     if(dpx > 0) {
         for(int i = mColumnCount - 1; i >= 0; i--) {
@@ -587,11 +682,9 @@ void AutoTilesData::moveX(const int dx) {
                         }
                     }
                 }
-                // the first column has no previous column to get data from
-                if(isFirst) continue;
                 uint16_t* const dstData = dstTile->requestZeroedData();
 
-                const auto& srcTile = prevCol.at(j);
+                const auto& srcTile = isFirst ? emptyTile : prevCol.at(j);
                 uint16_t* const srcData = srcTile->requestZeroedData();
 
                 // move pixels from the previous tile
@@ -628,11 +721,9 @@ void AutoTilesData::moveX(const int dx) {
                     }
                 }
 
-                // the last column has no next column to get data from
-                if(isLast) continue;
                 uint16_t* const dstData = dstTile->requestZeroedData();
 
-                const auto& srcTile = nextCol.at(j);
+                const auto& srcTile = isLast ? emptyTile : nextCol.at(j);
                 uint16_t* const srcData = srcTile->requestZeroedData();
 
                 // move pixels from the next tile
@@ -651,7 +742,7 @@ void AutoTilesData::moveX(const int dx) {
     }
 }
 
-void AutoTilesData::moveY(const int dy) {
+void AutoTilesData::moveY(const int dy, const bool extend) {
     const int dty = dy/TILE_SIZE;
     const int dpy = dy - dty*TILE_SIZE;
 
@@ -659,8 +750,13 @@ void AutoTilesData::moveY(const int dy) {
 
     if(dpy == 0) return;
 
-    prependRows(1);
-    appendRows(1);
+    if(extend) {
+        prependRows(1);
+        appendRows(1);
+    }
+
+    const auto emptyTile = mTileCreator(TILE_SPIXEL_SIZE);
+    emptyTile->requestZeroedData();
 
     if(dpy > 0) {
         for(const auto& col : mColumns) {
@@ -677,12 +773,10 @@ void AutoTilesData::moveY(const int dy) {
                     }
                 }
 
-                // the first row has no previous row to get data from
-                const bool isFirst = j == 0;
-                if(isFirst) continue;
                 uint16_t* const dstData = dstTile->requestZeroedData();
 
-                const auto& srcTile = col.at(j - 1);
+                const bool isFirst = j == 0;
+                const auto& srcTile = isFirst ? emptyTile : col.at(j - 1);
                 uint16_t* const srcData = srcTile->requestZeroedData();
 
                 // move pixels from the previous tile
@@ -712,11 +806,10 @@ void AutoTilesData::moveY(const int dy) {
                 }
 
                 // the last row has no next row to get data from
-                const bool isLast = j == (mRowCount - 1);
-                if(isLast) continue;
                 uint16_t* const dstData = dstTile->requestZeroedData();
 
-                const auto& srcTile = col.at(j + 1);
+                const bool isLast = j == (mRowCount - 1);
+                const auto& srcTile = isLast ? emptyTile : col.at(j + 1);
                 uint16_t* const srcData = srcTile->requestZeroedData();
 
                 // move pixels from the next tile
@@ -734,9 +827,8 @@ void AutoTilesData::moveY(const int dy) {
 }
 
 void AutoTilesData::move(const int dx, const int dy) {
-    moveX(dx);
-    moveY(dy);
-    discardTransparentTiles();
+    moveX(dx, true);
+    moveY(dy, true);
     autoCrop();
 }
 

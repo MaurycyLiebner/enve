@@ -31,6 +31,7 @@ struct PaintTarget {
 
     void draw(SkCanvas * const canvas,
               const QMatrix& viewTrans,
+              const SkScalar invScale,
               const QRect& drawRect,
               const SkFilterQuality filter,
               const bool drawOnion);
@@ -85,8 +86,11 @@ struct PaintTarget {
     void cropCancel();
 private:
     void startTransform();
+    void addUndoRedo(const QString &name, const QRect &roi);
+
     QPointF absPosToRelPos(const QPointF& absPos) const;
 
+    QRect mCropRect;
     QPointF mMovePress;
     SkPoint mRelDrawPos = {0, 0};
 

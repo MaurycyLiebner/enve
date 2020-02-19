@@ -756,7 +756,7 @@ void TimelineDockWidget::updateButtonsVisibility(const CanvasMode mode) {
     mPaintModesSeparator->setVisible(paintMode);
 
     mPaintMoveModeAct->setVisible(paintMode);
-    mPaintCropModeAct->setVisible(false);
+    mPaintCropModeAct->setVisible(paintMode);
 
     const bool sculptMode = mode == CanvasMode::sculptPath;
     mSculptColorLabelAct->setVisible(sculptMode);

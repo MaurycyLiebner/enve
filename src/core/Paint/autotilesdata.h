@@ -83,16 +83,26 @@ struct AutoTilesData {
     void discardTransparentTiles();
     void autoCrop();
 
-    void crop(const QRect& pixRect);
+    void crop(const QRect& cropRect);
     void move(const int dx, const int dy);
 protected:
     stdsptr<Tile> getTileByIndex(const int colId, const int rowId) const;
 private:
-    void moveX(const int dx);
-    void moveY(const int dy);
+    void moveX(const int dx, const bool extend);
+    void moveY(const int dy, const bool extend);
 
     bool columnEmpty(const int colId);
     bool rowEmpty(const int rowId);
+
+    void removeFirstColumn();
+    void removeLastColumn();
+    void removeFirstRow();
+    void removeLastRow();
+
+    void zeroFirstColumn();
+    void zeroLastColumn();
+    void zeroFirstRow();
+    void zeroLastRow();
 
     bool cropFirstColumnIfEmpty();
     bool cropLastColumnIfEmpty();

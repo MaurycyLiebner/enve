@@ -86,6 +86,7 @@ public:
 
     void updateTileDimensions();
 
+    void crop(const QRect& crop);
     void move(const int dx, const int dy);
 private:
     void removeFirstColumn();

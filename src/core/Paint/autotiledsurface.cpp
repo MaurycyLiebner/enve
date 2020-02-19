@@ -79,6 +79,10 @@ void AutoTiledSurfaceBase::replaceTile(const int tx, const int ty,
     mAutoTilesData.replaceTile(tx, ty, tile);
 }
 
+void AutoTiledSurfaceBase::crop(const QRect& crop) {
+    mAutoTilesData.crop(crop);
+}
+
 void AutoTiledSurfaceBase::move(const int dx, const int dy) {
     mAutoTilesData.move(dx, dy);
 }
@@ -152,5 +156,18 @@ void UndoableAutoTiledSurface::sRequestEnd(MyPaintTiledSurface *,
                                            MyPaintTileRequest *) {}
 UndoableAutoTiledSurface::UndoableAutoTiledSurface() :
     AutoTiledSurfaceBase([](const size_t& size) {
-                            return std::make_shared<UndoableTile>(size);
-                         }, sRequestStart, sRequestEnd) {}
+    return std::make_shared<UndoableTile>(size);
+}, sRequestStart, sRequestEnd) {}
+
+void UndoableAutoTiledSurface::triggerAllChange() {
+    const QRect tiles = tileBoundingRect();
+    for(int tx = tiles.left(); tx <= tiles.right(); tx++) {
+        for(int ty = tiles.top(); ty <= tiles.bottom(); ty++) {
+            const auto tile = requestTile(tx, ty);
+            const auto undoableTile = std::static_pointer_cast<UndoableTile>(tile);
+            if(!undoableTile->fUndo) {
+                addToUndoList(UndoTile(tx, ty, undoableTile));
+            }
+        }
+    }
+}

@@ -20,6 +20,7 @@
 
 void PaintTarget::draw(SkCanvas * const canvas,
                        const QMatrix& viewTrans,
+                       const SkScalar invScale,
                        const QRect& drawRect,
                        const SkFilterQuality filter,
                        const bool drawOnion) {
@@ -32,6 +33,18 @@ void PaintTarget::draw(SkCanvas * const canvas,
     SkPaint paint;
     paint.setFilterQuality(filter);
     mPaintDrawable->drawOnCanvas(canvas, mRelDrawPos, &relDRect, &paint);
+    if(!mCropRect.isNull()) {
+        paint.setStyle(SkPaint::kStroke_Style);
+        paint.setAntiAlias(true);
+
+        paint.setColor(SK_ColorBLACK);
+        paint.setStrokeWidth(1.5f*invScale);
+        canvas->drawRect(toSkRect(mCropRect), paint);
+
+        paint.setColor(SK_ColorWHITE);
+        paint.setStrokeWidth(0.75f*invScale);
+        canvas->drawRect(toSkRect(mCropRect), paint);
+    }
 }
 
 void PaintTarget::setPaintDrawable(DrawableAutoTiledSurface * const surf,
@@ -102,20 +115,32 @@ void PaintTarget::startTransform() {
 
 
 void PaintTarget::cropPress(const QPointF &pos) {
-    Q_UNUSED(pos)
+    const auto relPos = absPosToRelPos(pos);
+    mCropRect = QRect(relPos.toPoint(), relPos.toPoint());
 }
 
 void PaintTarget::cropMove(const QPointF &pos) {
-    Q_UNUSED(pos)
+    const auto relPos = absPosToRelPos(pos);
+    mCropRect.setBottomRight(relPos.toPoint());
 }
 
 void PaintTarget::cropRelease(const QPointF &pos) {
+    cropMove(pos);
     startTransform();
-    Q_UNUSED(pos)
+    mChanged = true;
+
+    if(mPaintAnimSurface && mPaintDrawable) {
+        auto& target = mPaintDrawable->surface();
+        target.triggerAllChange();
+        const auto roi = mPaintDrawable->pixelBoundingRect();
+        mPaintDrawable->crop(mCropRect);
+        addUndoRedo("Crop", roi);
+    }
+    mCropRect = QRect();
 }
 
 void PaintTarget::cropCancel() {
-    mRelDrawPos = {0, 0};
+    mCropRect = QRect();
 }
 
 void PaintTarget::movePress(const QPointF &pos) {
@@ -203,15 +228,14 @@ void PaintTarget::paintMove(const QPointF& pos,
     mLastTs = ts;
 }
 
-void PaintTarget::paintRelease() {
+void PaintTarget::addUndoRedo(const QString& name, const QRect& roi) {
     if(mPaintAnimSurface && mPaintDrawable) {
         auto& target = mPaintDrawable->surface();
         auto undoList = target.takeUndoList();
         if(undoList.isEmpty()) return;
         {
-            mPaintAnimSurface->prp_pushUndoRedoName("Paint");
+            mPaintAnimSurface->prp_pushUndoRedoName(name);
             const stdptr<DrawableAutoTiledSurface> ptr = mPaintDrawable.get();
-            const QRect roi = mTotalRoi;
             UndoRedo ur;
             const auto anim = mPaintAnimSurface;
 
@@ -242,4 +266,8 @@ void PaintTarget::paintRelease() {
         }
         Document::sInstance->actionFinished();
     }
+}
+
+void PaintTarget::paintRelease() {
+    addUndoRedo("Paint", mTotalRoi);
 }
