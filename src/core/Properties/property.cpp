@@ -25,7 +25,11 @@
 Property::Property(const QString& name) :
     prp_mName(name) {
     connect(this, &Property::prp_ancestorChanged, this, [this]() {
-        mParentScene = mParent_k ? mParent_k->mParentScene : nullptr;
+        const auto newScene = mParent_k ? mParent_k->mParentScene : nullptr;
+        if(mParentScene != newScene) {
+            mParentScene = newScene;
+            emit prp_sceneChanged();
+        }
         emit prp_pathChanged();
     });
 }

@@ -14,22 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef EXTERNALLINKBOX_H
-#define EXTERNALLINKBOX_H
+#ifndef SVGFILECACHEHANDLER_H
+#define SVGFILECACHEHANDLER_H
 
-#include "Boxes/containerbox.h"
+#include "filecachehandler.h"
 
-class ExternalLinkBox : public ContainerBox {
+class ContainerBox;
+class Gradient;
+
+class SvgFileCacheHandler : public FileCacheHandler {
     e_OBJECT
-public:
+protected:
+    SvgFileCacheHandler();
+
+    void afterPathSet(const QString& path);
     void reload();
-
-    void changeSrc();
-
-    void setSrc(const QString &src);
-private:
-    ExternalLinkBox();
-    QString mSrc;
+public:
+    void replace();
 };
 
-#endif // EXTERNALLINKBOX_H
+#endif // SVGFILECACHEHANDLER_H

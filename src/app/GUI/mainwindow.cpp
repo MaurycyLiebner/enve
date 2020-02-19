@@ -91,7 +91,8 @@ public:
 
     qsptr<BoundingBox> import(const QFileInfo& fileInfo,
                               Canvas* const scene) const {
-        return loadSVGFile(fileInfo.absoluteFilePath(), scene);
+        return loadSVGFile(fileInfo.absoluteFilePath(),
+                           [scene]() { return scene->createNewGradient(); });
     }
 };
 
@@ -283,9 +284,9 @@ void MainWindow::setupMenuBar() {
                          Qt::CTRL + Qt::Key_O);
     mRecentMenu = mFileMenu->addMenu(tr("Open Recent", "MenuBar_File"));
     mFileMenu->addSeparator();
-//    mFileMenu->addAction("Link...",
-//                         this, &MainWindow::linkFile,
-//                         Qt::CTRL + Qt::Key_L);
+    mFileMenu->addAction("Link...",
+                         this, &MainWindow::linkFile,
+                         Qt::CTRL + Qt::Key_L);
     mFileMenu->addAction(tr("Import File...", "MenuBar_File"),
                          this, qOverload<>(&MainWindow::importFile),
                          Qt::CTRL + Qt::Key_I);
@@ -1365,14 +1366,18 @@ void MainWindow::linkFile() {
     const QString defPath = mDocument.fEvFile.isEmpty() ?
                 QDir::homePath() : mDocument.fEvFile;
     const QString title = tr("Link File", "LinkDialog_Title");
-    const QString fileType = tr("enve Files %1", "LinkDialog_FileType");
+    const QString fileType = tr("Files %1", "LinkDialog_FileType");
     const auto importPaths = eDialogs::openFiles(
-                title, defPath, fileType.arg("(*.ev)"));
+                title, defPath, fileType.arg("(*.svg)"));
     enableEventFilter();
     if(!importPaths.isEmpty()) {
         for(const QString &path : importPaths) {
             if(path.isEmpty()) continue;
-            mActions.linkFile(path);
+            try {
+                mActions.linkFile(path);
+            } catch(const std::exception& e) {
+                gPrintExceptionCritical(e);
+            }
         }
     }
 }

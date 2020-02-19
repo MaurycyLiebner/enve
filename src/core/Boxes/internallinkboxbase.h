@@ -58,7 +58,6 @@ public:
 
     HardwareSupport hardwareSupport() const override;
 
-
     void blendSetup(ChildRenderData& data,
                     const int index, const qreal relFrame,
                     QList<ChildRenderData>& delayed) const override;

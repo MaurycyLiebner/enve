@@ -66,7 +66,7 @@ enum class eBoxType {
     internalLink,
     internalLinkGroup,
     internalLinkCanvas,
-    externalLink,
+    svgLink,
     video,
     imageSequence,
     paint,

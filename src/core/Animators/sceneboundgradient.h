@@ -31,7 +31,7 @@ public:
     void write(const int id, eWriteStream &dst);
     int read(eReadStream &src);
 
-    int getReadWriteId() { return mReadWriteId; }
+    int getReadWriteId() const { return mReadWriteId; }
     int getDocumentId() const { return mDocumentId; }
     void clearReadWriteId() { mReadWriteId = -1; }
 private:

@@ -131,23 +131,23 @@ void DisplayedGradientsWidget::paintGL() {
     }
 }
 
-void DisplayedGradientsWidget::setSelectedGradient(SceneBoundGradient *gradient) {
+void DisplayedGradientsWidget::setSelectedGradient(Gradient *gradient) {
     if(mSelectedGradient == gradient) return;
     mSelectedGradient = gradient;
     emit selectionChanged(mSelectedGradient);
     update();
 }
 
-void DisplayedGradientsWidget::addGradient(SceneBoundGradient * const gradient) {
+void DisplayedGradientsWidget::addGradient(Gradient * const gradient) {
     auto& conn = mGradients.addObj(gradient);
-    conn << connect(gradient, &SceneBoundGradient::prp_absFrameRangeChanged,
+    conn << connect(gradient, &Gradient::prp_absFrameRangeChanged,
                     this, qOverload<>(&QWidget::update));
     if(!mSelectedGradient) setSelectedGradient(gradient);
     updateHeight();
     update();
 }
 
-void DisplayedGradientsWidget::removeGradient(SceneBoundGradient * const gradient) {
+void DisplayedGradientsWidget::removeGradient(Gradient * const gradient) {
     const int removeId = mGradients.indexOf(gradient);
     if(!mGradients.removeObj(gradient)) return;
     if(mSelectedGradient == gradient) {

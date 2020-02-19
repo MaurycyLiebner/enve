@@ -20,7 +20,7 @@
 #include "Paint/simplebrushwrapper.h"
 #include "paintsettingsapplier.h"
 #include "Sound/eindependentsound.h"
-#include "Boxes/externallinkbox.h"
+#include "Boxes/externallinkboxt.h"
 
 #include <QMessageBox>
 
@@ -724,11 +724,18 @@ eBoxOrSound *Actions::importFile(const QString &path,
 }
 
 #include "Boxes/internallinkbox.h"
-ExternalLinkBox* Actions::linkFile(const QString &path) {
-    const auto extLinkBox = enve::make_shared<ExternalLinkBox>();
-    extLinkBox->setSrc(path);
-    mActiveScene->getCurrentGroup()->addContained(extLinkBox);
-    return extLinkBox.get();
+#include "Boxes/svglinkbox.h"
+
+eBoxOrSound* Actions::linkFile(const QString &path) {
+    qsptr<eBoxOrSound> result;
+    if(hasVectorExt(path)) {
+        const auto svg = enve::make_shared<SvgLinkBox>();
+        svg->setFilePath(path);
+        result = svg;
+    } else RuntimeThrow("Cannot link file format " + path);
+    mActiveScene->getCurrentGroup()->addContained(result);
+    mDocument.actionFinished();
+    return result.get();
 }
 
 void Actions::setMovePathMode() {

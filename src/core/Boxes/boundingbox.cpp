@@ -687,12 +687,6 @@ void BoundingBox::setupCanvasMenu(PropertyMenu * const menu) {
         pScene->groupSelectedBoxes();
     })->setShortcut(Qt::CTRL + Qt::Key_G);
 
-    menu->addPlainAction("Ungroup", [pScene]() {
-        pScene->ungroupSelectedBoxes();
-    })->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
-
-
-
     menu->addSeparator();
 
     const auto rasterEffectsMenu = menu->addMenu("Raster Effects");
@@ -769,8 +763,8 @@ void BoundingBox::setupWithoutRasterEffects(const qreal relFrame,
 
     {
         QRectF maxBoundsF;
-        if(mParentGroup) maxBoundsF = QRectF(mParentGroup->currentGlobalBounds());
-        else maxBoundsF = QRectF(scene->getCurrentBounds());
+        if(mParentGroup) maxBoundsF = mParentGroup->currentGlobalBounds();
+        else maxBoundsF = scene->getCurrentBounds();
         const QRectF scaledMaxBoundsF = data->fResolutionScale.mapRect(maxBoundsF);
         data->fMaxBoundsRect = scaledMaxBoundsF.toAlignedRect();
     }

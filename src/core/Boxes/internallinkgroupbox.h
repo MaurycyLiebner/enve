@@ -23,8 +23,8 @@
 class InternalLinkGroupBox : public InternalLinkBoxBase<ContainerBox> {
     e_OBJECT
 protected:
-    InternalLinkGroupBox(ContainerBox * const linkTarget,
-                         const bool innerLink);
+    InternalLinkGroupBox(ContainerBox * const linkTarget = nullptr,
+                         const bool innerLink = false);
 public:
     void SWT_setupAbstraction(SWT_Abstraction* abs,
                               const UpdateFuncs &funcs,

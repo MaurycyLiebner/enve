@@ -91,7 +91,7 @@ public:
                             const int insertId = 0,
                             const QPointF &relDropPos = QPointF(0, 0),
                             const int frame = 0);
-    ExternalLinkBox *linkFile(const QString &path);
+    eBoxOrSound *linkFile(const QString &path);
 //
     void setMovePathMode();
     void setMovePointMode();

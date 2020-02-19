@@ -24,7 +24,9 @@ class BoundingBox;
 class Gradient;
 class Canvas;
 
+using GradientCreator = std::function<Gradient*()>;
+
 extern qsptr<BoundingBox> loadSVGFile(const QString &filename,
-                                      Canvas* const scene);
+                                      const GradientCreator& gradientCreator);
 
 #endif // SVGIMPORTER_H

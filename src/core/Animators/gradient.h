@@ -31,6 +31,9 @@ public:
     void prp_writeProperty(eWriteStream &dst) const;
     void prp_readProperty(eReadStream &src);
 
+    virtual int getReadWriteId() const { return -1; }
+    virtual int getDocumentId() const { return -1; }
+
     void addColor(const QColor &color);
     void replaceColor(const int id, const QColor &color);
 

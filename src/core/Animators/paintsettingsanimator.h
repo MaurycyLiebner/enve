@@ -52,8 +52,8 @@ public:
 
     QColor getColor() const;
     PaintType getPaintType() const;
-    SceneBoundGradient *getGradient() const;
-    void setGradient(SceneBoundGradient *gradient);
+    Gradient *getGradient() const;
+    void setGradient(Gradient *gradient);
     void setCurrentColor(const QColor &color);
     ColorAnimator *getColorAnimator();
     void setGradientPointsPos(const QPointF& pt1, const QPointF& pt2);
@@ -74,7 +74,7 @@ public:
     void duplicatePaintSettingsNotAnim(PaintSettingsAnimator * const settings);
     void applyTransform(const QMatrix& transform);
 private:
-    void setGradientVar(SceneBoundGradient * const grad);
+    void setGradientVar(Gradient * const grad);
     void resetGradientPoints();
     void updateGradientPoint();
 
@@ -84,7 +84,7 @@ private:
     BoundingBox * const mTarget_k;
     qsptr<GradientPoints> mGradientPoints;
     qsptr<ColorAnimator> mColor = enve::make_shared<ColorAnimator>();
-    ConnContextQPtr<SceneBoundGradient> mGradient;
+    ConnContextQPtr<Gradient> mGradient;
     qsptr<AdvancedTransformAnimator> mGradientTransform;
 };
 

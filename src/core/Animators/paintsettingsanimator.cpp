@@ -81,19 +81,19 @@ void PaintSettingsAnimator::updateGradientPoint() {
     }
 }
 
-void PaintSettingsAnimator::setGradientVar(SceneBoundGradient* const grad) {
+void PaintSettingsAnimator::setGradientVar(Gradient * const grad) {
     if(grad == mGradient) return;
     if(mGradient) {
-        ca_removeChild(mGradient->ref<SceneBoundGradient>());
+        ca_removeChild(mGradient->ref<Gradient>());
         ca_removeChild(mGradientPoints);
         ca_removeChild(mGradientTransform);
     }
     auto& conn = mGradient.assign(grad);
     if(grad) {
-        ca_addChild(grad->ref<SceneBoundGradient>());
+        ca_addChild(grad->ref<Gradient>());
         ca_addChild(mGradientPoints);
         ca_addChild(mGradientTransform);
-        conn << connect(grad, &SceneBoundGradient::prp_currentFrameChanged,
+        conn << connect(grad, &Gradient::prp_currentFrameChanged,
                         this, [this]() { updateGradientPoint(); });
         conn << connect(grad, &Gradient::removed,
                         this, [this]() { setGradient(nullptr); });
@@ -177,7 +177,7 @@ PaintType PaintSettingsAnimator::getPaintType() const {
     return mPaintType;
 }
 
-SceneBoundGradient *PaintSettingsAnimator::getGradient() const {
+Gradient *PaintSettingsAnimator::getGradient() const {
     return *mGradient;
 }
 
@@ -188,13 +188,13 @@ void PaintSettingsAnimator::resetGradientPoints() {
                                   relRect.bottomRight());
 }
 
-void PaintSettingsAnimator::setGradient(SceneBoundGradient* gradient) {
+void PaintSettingsAnimator::setGradient(Gradient* gradient) {
     if(gradient == mGradient) return;
     if(gradient && !mGradient) resetGradientPoints();
     {
         UndoRedo ur;
-        const qptr<SceneBoundGradient> oldValue = *mGradient;
-        const qptr<SceneBoundGradient> newValue = gradient;
+        const qptr<Gradient> oldValue = *mGradient;
+        const qptr<Gradient> newValue = gradient;
         ur.fUndo = [this, oldValue]() {
             setGradientVar(oldValue);
         };

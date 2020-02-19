@@ -25,6 +25,8 @@ InternalLinkGroupBox::InternalLinkGroupBox(ContainerBox * const linkTarget,
     InternalLinkBoxBase<ContainerBox>(eBoxType::internalLinkGroup, innerLink) {
     prp_setName("Link 0");
 
+    mBoxTarget->setValidator<ContainerBox>();
+
     ca_prependChild(mTransformAnimator.data(), mBoxTarget);
     connect(mBoxTarget.data(), &BoxTargetProperty::targetSet,
             this, [this](BoundingBox* const target) {
@@ -64,7 +66,8 @@ void InternalLinkGroupBox::setLinkTarget(ContainerBox * const linkTarget) {
     mBoxTarget->setTarget(linkTarget);
     auto& conn = assignLinkTarget(linkTarget);
     if(linkTarget) {
-        conn << connect(linkTarget->getTransformAnimator(), &Property::prp_absFrameRangeChanged,
+        conn << connect(linkTarget->getTransformAnimator(),
+                        &Property::prp_absFrameRangeChanged,
                 this, [this, linkTarget](const FrameRange& targetAbs) {
             const auto relRange = linkTarget->prp_absRangeToRelRange(targetAbs);
             mTransformAnimator->prp_afterChangedRelRange(relRange);

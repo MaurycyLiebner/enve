@@ -126,7 +126,6 @@ SOURCES += \
     Boxes/ecustombox.cpp \
     Boxes/effectsrenderer.cpp \
     Boxes/effectsubtaskspawner.cpp \
-    Boxes/externallinkbox.cpp \
     Boxes/frameremapping.cpp \
     Boxes/imagebox.cpp \
     Boxes/imagerenderdata.cpp \
@@ -145,6 +144,7 @@ SOURCES += \
     Boxes/sculptpathbox.cpp \
     Boxes/sculptpathboxrenderdata.cpp \
     Boxes/smartvectorpath.cpp \
+    Boxes/svglinkbox.cpp \
     Boxes/textbox.cpp \
     Boxes/textboxrenderdata.cpp \
     Boxes/videobox.cpp \
@@ -169,6 +169,7 @@ SOURCES += \
     FileCacheHandlers/imagecachehandler.cpp \
     FileCacheHandlers/imagesequencecachehandler.cpp \
     FileCacheHandlers/soundreader.cpp \
+    FileCacheHandlers/svgfilecachehandler.cpp \
     FileCacheHandlers/videocachehandler.cpp \
     FileCacheHandlers/videoframeloader.cpp \
     FileCacheHandlers/videostreamsdata.cpp \
@@ -293,6 +294,7 @@ SOURCES += \
     Animators/intanimator.cpp \
     Animators/key.cpp \
     Animators/boolanimator.cpp \
+    svgimporter.cpp \
     switchablecontext.cpp \
     swt_abstraction.cpp \
     swt_rulescollection.cpp \
@@ -418,7 +420,7 @@ HEADERS += \
     Boxes/ecustombox.h \
     Boxes/effectsrenderer.h \
     Boxes/effectsubtaskspawner.h \
-    Boxes/externallinkbox.h \
+    Boxes/externallinkboxt.h \
     Boxes/frameremapping.h \
     Boxes/imagebox.h \
     Boxes/imagerenderdata.h \
@@ -438,6 +440,7 @@ HEADERS += \
     Boxes/sculptpathbox.h \
     Boxes/sculptpathboxrenderdata.h \
     Boxes/smartvectorpath.h \
+    Boxes/svglinkbox.h \
     Boxes/textbox.h \
     Boxes/textboxrenderdata.h \
     Boxes/videobox.h \
@@ -465,6 +468,7 @@ HEADERS += \
     FileCacheHandlers/imagecachehandler.h \
     FileCacheHandlers/imagesequencecachehandler.h \
     FileCacheHandlers/soundreader.h \
+    FileCacheHandlers/svgfilecachehandler.h \
     FileCacheHandlers/videocachehandler.h \
     FileCacheHandlers/videoframeloader.h \
     FileCacheHandlers/videostreamsdata.h \
@@ -601,6 +605,7 @@ HEADERS += \
     Animators/animator.h \
     Animators/intanimator.h \
     Animators/boolanimator.h \
+    svgimporter.h \
     switchablecontext.h \
     swt_abstraction.h \
     swt_rulescollection.h \

@@ -60,13 +60,13 @@ void GradientWidget::clearAll() {
     mCurrentColorId = 0;
 }
 
-void GradientWidget::setCurrentGradient(SceneBoundGradient *gradient) {
+void GradientWidget::setCurrentGradient(Gradient *gradient) {
     if(mCurrentGradient == gradient) return;
     mCurrentGradient = gradient;
     emit selectionChanged(gradient);
 }
 
-SceneBoundGradient *GradientWidget::getCurrentGradient() {
+Gradient *GradientWidget::getCurrentGradient() {
     return mCurrentGradient;
 }
 

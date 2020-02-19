@@ -124,7 +124,6 @@ SOURCES += main.cpp\
     outputsettings.cpp \
     renderhandler.cpp \
     rendersettings.cpp \
-    svgimporter.cpp \
     GUI/BoxesList/OptimalScrollArea/scrollarea.cpp \
     GUI/BoxesList/OptimalScrollArea/scrollwidget.cpp \
     GUI/BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.cpp \
@@ -234,7 +233,6 @@ HEADERS  += \
     outputsettings.h \
     renderhandler.h \
     rendersettings.h \
-    svgimporter.h \
     keypoint.h \
     GUI/BoxesList/OptimalScrollArea/scrollarea.h \
     GUI/BoxesList/OptimalScrollArea/scrollwidget.h \

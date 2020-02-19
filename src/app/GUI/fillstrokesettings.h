@@ -87,7 +87,7 @@ private:
     void setFillTarget();
     void setStrokeTarget();
 
-    void setGradientAction(SceneBoundGradient* gradient);
+    void setGradientAction(Gradient *gradient);
     void setGradientType(const GradientType type);
 
     void setBevelJoinStyleAction();
@@ -126,14 +126,14 @@ private:
 
     void setCurrentColorVal(const QColor& color);
 
-    SceneBoundGradient *getCurrentGradientVal();
+    Gradient *getCurrentGradientVal();
 
     GradientType getCurrentGradientTypeVal() const {
         if(mTarget == PaintSetting::FILL) return mCurrentFillGradientType;
         else return mCurrentStrokeGradientType;
     }
 
-    void setCurrentGradientVal(SceneBoundGradient *gradient);
+    void setCurrentGradientVal(Gradient *gradient);
     void setCurrentGradientTypeVal(const GradientType type);
 
     Document& mDocument;
@@ -151,8 +151,8 @@ private:
     GradientType mCurrentStrokeGradientType = GradientType::LINEAR;
     GradientType mCurrentFillGradientType = GradientType::LINEAR;
 
-    qptr<SceneBoundGradient> mCurrentStrokeGradient;
-    qptr<SceneBoundGradient> mCurrentFillGradient;
+    qptr<Gradient> mCurrentStrokeGradient;
+    qptr<Gradient> mCurrentFillGradient;
     SkPaint::Cap mCurrentCapStyle;
     SkPaint::Join mCurrentJoinStyle;
     qreal mCurrentStrokeWidth;

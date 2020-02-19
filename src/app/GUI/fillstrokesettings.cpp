@@ -578,7 +578,7 @@ void FillStrokeSettingsWidget::paintTypeSet(const PaintType type) {
     }
 
     PaintType currentPaintType;
-    SceneBoundGradient *currentGradient;
+    Gradient *currentGradient;
     GradientType currentGradientType;
     if(mTarget == PaintSetting::FILL) {
         currentPaintType = mCurrentFillPaintType;
@@ -674,12 +674,12 @@ void FillStrokeSettingsWidget::setCurrentColorVal(const QColor& color) {
     else mCurrentStrokeColor = color;
 }
 
-SceneBoundGradient *FillStrokeSettingsWidget::getCurrentGradientVal() {
+Gradient *FillStrokeSettingsWidget::getCurrentGradientVal() {
     if(mTarget == PaintSetting::FILL) return mCurrentFillGradient;
     else return mCurrentStrokeGradient;
 }
 
-void FillStrokeSettingsWidget::setCurrentGradientVal(SceneBoundGradient *gradient) {
+void FillStrokeSettingsWidget::setCurrentGradientVal(Gradient *gradient) {
     if(mTarget == PaintSetting::FILL) mCurrentFillGradient = gradient;
     else mCurrentStrokeGradient = gradient;
 }
@@ -741,7 +741,7 @@ void FillStrokeSettingsWidget::emitJoinStyleChanged() {
 }
 
 void FillStrokeSettingsWidget::applyGradient() {
-    SceneBoundGradient *currentGradient;
+    Gradient *currentGradient;
     GradientType currentGradientType;
     if(mTarget == PaintSetting::FILL) {
         currentGradient = mCurrentFillGradient;
@@ -759,7 +759,7 @@ void FillStrokeSettingsWidget::applyGradient() {
     if(scene) scene->applyPaintSettingToSelected(applier);
 }
 
-void FillStrokeSettingsWidget::setGradientAction(SceneBoundGradient *gradient) {
+void FillStrokeSettingsWidget::setGradientAction(Gradient *gradient) {
     setCurrentGradientVal(gradient);
     applyGradient();
     mDocument.actionFinished();

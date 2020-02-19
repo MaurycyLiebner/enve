@@ -21,7 +21,7 @@
 #include "GUI/global.h"
 #include "conncontextobjlist.h"
 #include "conncontextptr.h"
-class SceneBoundGradient;
+class Gradient;
 class GradientWidget;
 class Canvas;
 
@@ -35,15 +35,15 @@ public:
     void incTop(const int inc);
     void setTop(const int top);
 
-    void setSelectedGradient(SceneBoundGradient *gradient);
+    void setSelectedGradient(Gradient *gradient);
 
-    void addGradient(SceneBoundGradient* const gradient);
-    void removeGradient(SceneBoundGradient* const gradient);
+    void addGradient(Gradient* const gradient);
+    void removeGradient(Gradient* const gradient);
 
     void updateHeight();
 signals:
-    void selectionChanged(SceneBoundGradient*);
-    void triggered(SceneBoundGradient*);
+    void selectionChanged(Gradient*);
+    void triggered(Gradient*);
 protected:
     void paintGL();
 
@@ -64,8 +64,8 @@ private:
 
     int mMaxVisibleGradients = 6;
 
-    QPointer<SceneBoundGradient> mSelectedGradient;
-    ConnContextObjList<SceneBoundGradient*> mGradients;
+    QPointer<Gradient> mSelectedGradient;
+    ConnContextObjList<Gradient*> mGradients;
 };
 
 #endif // DISPLACYEDGRADIENTSWIDGET_H

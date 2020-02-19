@@ -27,14 +27,14 @@ CurrentGradientWidget::CurrentGradientWidget(QWidget *parent) :
     setFixedHeight(MIN_WIDGET_DIM);
 }
 
-void CurrentGradientWidget::setCurrentGradient(SceneBoundGradient * const gradient) {
+void CurrentGradientWidget::setCurrentGradient(Gradient * const gradient) {
     auto& conn = mGradient.assign(gradient);
     if(gradient) {
-        conn << connect(gradient, &SceneBoundGradient::prp_currentFrameChanged,
+        conn << connect(gradient, &Gradient::prp_currentFrameChanged,
                         this, qOverload<>(&QWidget::update));
-        conn << connect(gradient, &SceneBoundGradient::ca_childRemoved,
+        conn << connect(gradient, &Gradient::ca_childRemoved,
                         this, &CurrentGradientWidget::updateCurrentColor);
-        conn << connect(gradient, &SceneBoundGradient::ca_childAdded,
+        conn << connect(gradient, &Gradient::ca_childAdded,
                         this, &CurrentGradientWidget::updateCurrentColor);
     }
     setCurrentColorId(0);

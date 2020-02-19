@@ -25,7 +25,7 @@
 #include "RasterEffects/rastereffectcollection.h"
 #include "Sound/eindependentsound.h"
 #include "actions.h"
-#include "externallinkbox.h"
+#include "externallinkboxt.h"
 #include "namefixer.h"
 #include "BlendEffects/blendeffectcollection.h"
 #include "BlendEffects/blendeffectboxshadow.h"
@@ -620,22 +620,6 @@ void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
 
     menu->addSection("Layer & Group");
 
-    const auto ungroupAbandonAction = menu->addPlainAction<ContainerBox>(
-                "Ungroup", [](ContainerBox * box) {
-        box->ungroupAbandomTransform_k();
-    });
-    const auto ungroupKeepAction = menu->addPlainAction<ContainerBox>(
-                "Ungroup (Keep Transform)", [](ContainerBox * box) {
-        box->ungroupKeepTransform_k();
-    });
-    QAction* defaultUngroup;
-    if(areAllChildrenStatic()) {
-        defaultUngroup = ungroupKeepAction;
-    } else defaultUngroup = ungroupAbandonAction;
-    defaultUngroup->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
-
-    menu->addSeparator();
-
     menu->addPlainAction<ContainerBox>("Promote to Layer",
                                        [](ContainerBox * box) {
         box->promoteToLayer();
@@ -645,6 +629,29 @@ void ContainerBox::setupCanvasMenu(PropertyMenu * const menu) {
                                        [](ContainerBox * box) {
         box->demoteToGroup();
     })->setDisabled(isGroup());
+
+
+    if(!isLink()) {
+        menu->addSeparator();
+
+        const auto ungroupAbandonAction = menu->addPlainAction<ContainerBox>(
+                    "Ungroup", [](ContainerBox * box) {
+            if(box->isLink()) return;
+            box->ungroupAbandomTransform_k();
+        });
+
+        const auto ungroupKeepAction = menu->addPlainAction<ContainerBox>(
+                    "Ungroup (Keep Transform)", [](ContainerBox * box) {
+            if(box->isLink()) return;
+            box->ungroupKeepTransform_k();
+        });
+
+        QAction* defaultUngroup;
+        if(areAllChildrenStatic()) {
+            defaultUngroup = ungroupKeepAction;
+        } else defaultUngroup = ungroupAbandonAction;
+        defaultUngroup->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
+    }
 
     BoxWithPathEffects::setupCanvasMenu(menu);
 }
@@ -1218,7 +1225,7 @@ void ContainerBox::SWT_setupAbstraction(SWT_Abstraction* abstraction,
                                         const int visiblePartWidgetId) {
     BoundingBox::SWT_setupAbstraction(abstraction, updateFuncs,
                                       visiblePartWidgetId);
-
+    if(isLink()) return;
     for(const auto& cont : mContained) {
         auto abs = cont->SWT_abstractionForWidget(updateFuncs, visiblePartWidgetId);
         abstraction->addChildAbstraction(abs->ref<SWT_Abstraction>());
@@ -1277,6 +1284,7 @@ void ContainerBox::writeBoundingBox(eWriteStream& dst) const {
 #include "internallinkbox.h"
 #include "customboxcreator.h"
 #include "sculptpathbox.h"
+#include "svglinkbox.h"
 
 qsptr<BoundingBox> readIdCreateBox(eReadStream& src) {
     eBoxType type;
@@ -1306,8 +1314,8 @@ qsptr<BoundingBox> readIdCreateBox(eReadStream& src) {
             return enve::make_shared<InternalLinkBox>(nullptr, false);
         case(eBoxType::internalLinkGroup):
             return enve::make_shared<InternalLinkGroupBox>(nullptr, false);
-        case(eBoxType::externalLink):
-            return enve::make_shared<ExternalLinkBox>();
+        case(eBoxType::svgLink):
+            return enve::make_shared<SvgLinkBox>();
         case(eBoxType::internalLinkCanvas):
             return enve::make_shared<InternalLinkCanvas>(nullptr, false);
         case(eBoxType::custom): {

@@ -208,6 +208,7 @@ signals:
     void prp_parentChanged(ComplexAnimator*, QPrivateSignal);
     void prp_ancestorChanged(QPrivateSignal);
     void prp_pathChanged();
+    void prp_sceneChanged();
 private:
     bool prp_mSelected = false;
     bool mDrawOnCanvas = false;

@@ -14,29 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "externallinkbox.h"
+#ifndef SVGLINKBOX_H
+#define SVGLINKBOX_H
 
-#include "GUI/edialogs.h"
+#include "externallinkboxt.h"
+#include "Boxes/containerbox.h"
+#include "FileCacheHandlers/svgfilecachehandler.h"
 
-ExternalLinkBox::ExternalLinkBox() : ContainerBox(eBoxType::layer) {
-    mType = eBoxType::externalLink;
-    rename("Link Empty");
-}
+using SvgLinkBoxBase =
+    ExternalLinkBoxT<ContainerBox,
+                     SvgFileCacheHandler>;
 
-void ExternalLinkBox::reload() {
+class SvgLinkBox : public SvgLinkBoxBase {
+public:
+    SvgLinkBox();
 
+    void changeSourceFile();
+private:
+    void updateContent();
+    void fileHandlerConnector(ConnContext &conn, SvgFileCacheHandler *obj);
+    void fileHandlerAfterAssigned(SvgFileCacheHandler *obj);
 
-    planUpdate(UpdateReason::userChange);
-}
+    QList<qsptr<Gradient>> mGradients;
+};
 
-void ExternalLinkBox::changeSrc() {
-    QString src = eDialogs::openFile("Link File", mSrc,
-                                     "enve Files (*.ev)");
-    if(!src.isEmpty()) setSrc(src);
-}
-
-void ExternalLinkBox::setSrc(const QString &src) {
-    mSrc = src;
-    rename("Link " + src);
-    reload();
-}
+#endif // SVGLINKBOX_H

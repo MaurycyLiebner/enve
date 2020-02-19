@@ -21,13 +21,14 @@
 #include "conncontextptr.h"
 class GradientWidget;
 class ColorAnimator;
+class Gradient;
 
 class CurrentGradientWidget : public GLWidget {
     Q_OBJECT
 public:
     explicit CurrentGradientWidget(QWidget *parent = nullptr);
 
-    void setCurrentGradient(SceneBoundGradient* const gradient);
+    void setCurrentGradient(Gradient * const gradient);
     void colorRightPress(const int x, const QPoint &point);
     void colorLeftPress(const int x);
     void setCurrentColorId(const int id);
@@ -50,7 +51,7 @@ private:
     bool mFirstMove = true;
     int mHoveredX = 0;
 
-    ConnContextQPtr<SceneBoundGradient> mGradient;
+    ConnContextQPtr<Gradient> mGradient;
     QPointer<ColorAnimator> mColor;
     int mColorId = 0;
 };

@@ -16,7 +16,6 @@
 
 #include "svgimporter.h"
 #include "Boxes/containerbox.h"
-#include "canvas.h"
 #include "colorhelpers.h"
 #include "pointhelpers.h"
 #include "Boxes/circle.h"
@@ -50,7 +49,7 @@ private:
 };
 
 struct SvgGradient {
-    SceneBoundGradient* fGradient;
+    Gradient* fGradient;
     qreal fX1;
     qreal fY1;
     qreal fX2;
@@ -72,7 +71,7 @@ public:
 
     const QColor &getColor() const;
     PaintType getPaintType() const;
-    SceneBoundGradient *getGradient() const;
+    Gradient *getGradient() const;
 
     void apply(BoundingBox * const box) const;
     void apply(BoundingBox * const box,
@@ -81,7 +80,7 @@ protected:
     qreal mOpacity = 1;
     QColor mColor;
     PaintType mPaintType = NOPAINT;
-    SceneBoundGradient *mGradient = nullptr;
+    Gradient *mGradient = nullptr;
     QPointF mGradientP1;
     QPointF mGradientP2;
     QMatrix mGradientTransform;
@@ -712,12 +711,12 @@ bool parsePolylineDataFast(const QString &dataStr,
 
 void loadElement(const QDomElement &element, ContainerBox *parentGroup,
                  const BoxSvgAttributes &parentGroupAttributes,
-                 Canvas* const scene);
+                 const GradientCreator& gradientCreator);
 
 qsptr<ContainerBox> loadBoxesGroup(const QDomElement &groupElement,
                                    ContainerBox *parentGroup,
                                    const BoxSvgAttributes &attributes,
-                                   Canvas* const scene) {
+                                   const GradientCreator& gradientCreator) {
     const QDomNodeList allRootChildNodes = groupElement.childNodes();
     qsptr<ContainerBox> boxesGroup;
     const bool hasTransform = attributes.hasTransform();
@@ -734,7 +733,7 @@ qsptr<ContainerBox> loadBoxesGroup(const QDomElement &groupElement,
         const QDomNode iNode = allRootChildNodes.at(i);
         if(iNode.isElement()) {
             loadElement(iNode.toElement(), boxesGroup.get(),
-                        attributes, scene);
+                        attributes, gradientCreator);
         }
     }
     return boxesGroup;
@@ -952,13 +951,12 @@ QMatrix getMatrixFromString(const QString &str) {
     return matrix;
 }
 
-#include "GUI/GradientWidgets/gradientwidget.h"
 static QMap<QString, SvgGradient> gGradients;
 //            to       from
 static QMap<QString, QStringList> gUnresolvedGradientLinks;
 void loadElement(const QDomElement &element, ContainerBox *parentGroup,
                  const BoxSvgAttributes &parentGroupAttributes,
-                 Canvas* const scene) {
+                 const GradientCreator& gradientCreator) {
     const QString tagName = element.tagName();
     if(tagName == "defs") {
         const QDomNodeList allRootChildNodes = element.childNodes();
@@ -966,16 +964,16 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
             const QDomNode iNode = allRootChildNodes.at(i);
             if(iNode.isElement()) {
                 loadElement(iNode.toElement(), parentGroup,
-                            parentGroupAttributes, scene);
+                            parentGroupAttributes, gradientCreator);
             }
         }
         return;
     } else if(tagName == "linearGradient") {
         const QString id = element.attribute("id");
         QString linkId = element.attribute("xlink:href");
-        SceneBoundGradient* gradient = nullptr;
+        Gradient* gradient = nullptr;
         if(linkId.isEmpty()) {
-            gradient = scene->createNewGradient();
+            gradient = gradientCreator();
             const QDomNodeList allRootChildNodes = element.childNodes();
             for(int i = 0; i < allRootChildNodes.count(); i++) {
                 const QDomNode iNode = allRootChildNodes.at(i);
@@ -1047,7 +1045,7 @@ void loadElement(const QDomElement &element, ContainerBox *parentGroup,
         attributes.loadBoundingBoxAttributes(element);
         if(tagName == "g" || tagName == "text") {
             const auto group = loadBoxesGroup(element, parentGroup,
-                                              attributes, scene);
+                                              attributes, gradientCreator);
             if(group->getContainedBoxesCount() == 0)
                 group->removeFromParent_k();
         } else if(tagName == "circle" || tagName == "ellipse") {
@@ -1097,7 +1095,7 @@ bool getFlatColorFromString(const QString &colorStr, FillSvgAttributes *target) 
 }
 
 qsptr<BoundingBox> loadSVGFile(const QString &filename,
-                               Canvas * const scene) {
+                               const GradientCreator& gradientCreator) {
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QDomDocument document;
@@ -1106,7 +1104,7 @@ qsptr<BoundingBox> loadSVGFile(const QString &filename,
             if(!rootElement.isNull()) {
                 BoxSvgAttributes attributes;
                 const auto result = loadBoxesGroup(rootElement, nullptr,
-                                                   attributes, scene);
+                                                   attributes, gradientCreator);
                 gGradients.clear();
                 auto it = gUnresolvedGradientLinks.begin();
                 while(it != gUnresolvedGradientLinks.end()) {
@@ -1417,7 +1415,7 @@ const QColor &FillSvgAttributes::getColor() const { return mColor; }
 
 PaintType FillSvgAttributes::getPaintType() const { return mPaintType; }
 
-SceneBoundGradient *FillSvgAttributes::getGradient() const { return mGradient; }
+Gradient *FillSvgAttributes::getGradient() const { return mGradient; }
 
 void FillSvgAttributes::apply(BoundingBox *box) const {
     apply(box, PaintSetting::FILL);

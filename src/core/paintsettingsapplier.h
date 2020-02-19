@@ -67,14 +67,14 @@ private:
 class GradientPaintSetting : public PaintSetting {
 public:
     GradientPaintSetting(const Target& target,
-                         SceneBoundGradient * const gradient) :
+                         Gradient * const gradient) :
         PaintSetting(target), mGradient(gradient) {}
 protected:
     void applyToPS(PaintSettingsAnimator * const target) const {
         target->setGradient(mGradient);
     }
 private:
-    SceneBoundGradient * const mGradient;
+    Gradient * const mGradient;
 };
 
 class GradientPtsPosSetting : public PaintSetting {

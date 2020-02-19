@@ -372,6 +372,7 @@ bool Canvas::isBoxSelectionEmpty() const {
 void Canvas::ungroupSelectedBoxes() {
     for(const auto &box : mSelectedBoxes) {
         if(const auto cont = enve_cast<ContainerBox*>(box)) {
+            if(cont->isLink()) continue;
             cont->ungroupAction_k();
         }
     }
