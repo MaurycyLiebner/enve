@@ -164,13 +164,19 @@ void PaintTarget::moveRelease(const QPointF &pos) {
             UndoRedo ur;
             const auto anim = mPaintAnimSurface;
             const stdptr<DrawableAutoTiledSurface> ptr = mPaintDrawable.get();
-            ur.fUndo = [dx, dy, ptr]() {
-                if(!ptr) return;
-                ptr->move(-dx, -dy);
-            };
-            ur.fRedo = [dx, dy, ptr]() {
+            const auto move = [ptr, anim](const int dx, const int dy) {
                 if(!ptr) return;
                 ptr->move(dx, dy);
+                if(!anim) return;
+                const int relFrame = anim->anim_getCurrentRelFrame();
+                const auto identicalRange = anim->prp_getIdenticalRelRange(relFrame);
+                anim->prp_afterChangedRelRange(identicalRange);
+            };
+            ur.fUndo = [dx, dy, move]() {
+                move(-dx, -dy);
+            };
+            ur.fRedo = [dx, dy, move]() {
+                move(dx, dy);
             };
             mPaintAnimSurface->prp_addUndoRedo(ur);
         }
@@ -251,6 +257,7 @@ void PaintTarget::addUndoRedo(const QString& name, const QRect& roi) {
                 surface.autoCrop();
                 ptr->updateTileDimensions();
                 ptr->pixelRectChanged(roi);
+                if(!anim) return;
                 const int relFrame = anim->anim_getCurrentRelFrame();
                 const auto identicalRange = anim->prp_getIdenticalRelRange(relFrame);
                 anim->prp_afterChangedRelRange(identicalRange);
