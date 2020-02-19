@@ -157,6 +157,18 @@ public:
     }
 
     void apply(SmartVectorPath * const path);
+
+    void removeInvalidPaths() {
+        for(int i = mSeparatePaths.count() - 1; i >= 0; i--) {
+            const auto& path = mSeparatePaths.at(i);
+            const bool valid = path.countVerbs() > 1;
+            if(!valid) mSeparatePaths.removeAt(i);
+        }
+    }
+
+    bool isEmpty() const {
+        return mSeparatePaths.isEmpty();
+    }
 protected:
     QList<SkPath> mSeparatePaths;
 };
@@ -742,10 +754,12 @@ qsptr<ContainerBox> loadBoxesGroup(const QDomElement &groupElement,
 void loadVectorPath(const QDomElement &pathElement,
                     ContainerBox *parentGroup,
                     VectorPathSvgAttributes& attributes) {
-    const auto vectorPath = enve::make_shared<SmartVectorPath>();
-    vectorPath->planCenterPivotPosition();
     const QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
+    attributes.removeInvalidPaths();
+    if(attributes.isEmpty()) return;
+    const auto vectorPath = enve::make_shared<SmartVectorPath>();
+    vectorPath->planCenterPivotPosition();
     attributes.apply(vectorPath.get());
     parentGroup->addContained(vectorPath);
 }
@@ -753,10 +767,12 @@ void loadVectorPath(const QDomElement &pathElement,
 void loadPolyline(const QDomElement &pathElement,
                   ContainerBox *parentGroup,
                   VectorPathSvgAttributes &attributes) {
-    auto vectorPath = enve::make_shared<SmartVectorPath>();
-    vectorPath->planCenterPivotPosition();
     const QString pathStr = pathElement.attribute("points");
     parsePolylineDataFast(pathStr, attributes);
+    attributes.removeInvalidPaths();
+    if(attributes.isEmpty()) return;
+    const auto vectorPath = enve::make_shared<SmartVectorPath>();
+    vectorPath->planCenterPivotPosition();
     attributes.apply(vectorPath.get());
     parentGroup->addContained(vectorPath);
 }
