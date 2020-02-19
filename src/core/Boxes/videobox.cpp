@@ -100,7 +100,7 @@ void VideoBox::readBoundingBox(eReadStream& src) {
 void VideoBox::changeSourceFile() {
     const QString path = eDialogs::openFile(
                 "Change Source", getFilePath(),
-                "Video Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
+                "Video Files (" + FileExtensions::videoFilters() + ")");
     if(!path.isEmpty()) setFilePath(path);
 }
 

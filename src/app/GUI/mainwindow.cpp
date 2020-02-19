@@ -1388,17 +1388,6 @@ void MainWindow::importImageSequence() {
     if(!folder.isEmpty()) mActions.importFile(folder);
 }
 
-//void MainWindow::importVideo() {
-//    disableEventFilter();
-//    QStringList importPaths = QFileDialog::getOpenFileNames(this,
-//        "Import Video", "", "Video (*.mp4 *.mov *.avi)");
-//    enableEventFilter();
-//    for(const QString &path : importPaths) {
-//        mCanvasWindow->createVideoForPath(path);
-//    }
-//    callUpdateSchedulers();
-//}
-
 void MainWindow::revert() {
     const auto path = mDocument.fEvFile;
     clearAll();

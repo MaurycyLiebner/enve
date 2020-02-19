@@ -135,7 +135,7 @@ void VideoDataHandler::clearCache() {
 void VideoFileHandler::replace() {
     const QString importPath = eDialogs::openFile(
                 "Replace Video Source " + mPath, mPath,
-                "Files (*.mp4 *.mov *.avi *.mkv *.m4v)");
+                "Video Files (" + FileExtensions::videoFilters() + ")");
     if(!importPath.isEmpty()) {
         const QFile file(importPath);
         if(!file.exists()) return;

@@ -168,7 +168,6 @@ public:
     void linkFile();
     void importImageSequence();
     void importFile();
-    //void importVideo();
     void revert();
 protected:
     void lockFinished();
