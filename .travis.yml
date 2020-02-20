@@ -64,6 +64,7 @@ install:
     - cd quazip-0.8.1/quazip
     - qmake
     - make
+    - sudo make install
     - cd ../../
     - # build gperftools
     - cd gperftools-2.7-enve-mod
