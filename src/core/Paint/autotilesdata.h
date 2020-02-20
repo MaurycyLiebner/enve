@@ -44,7 +44,7 @@ struct AutoTilesData {
 
     ~AutoTilesData();
 
-    void loadBitmap(const SkBitmap& src);
+    void loadPixmap(const SkPixmap& src);
 
     void clear();
 
@@ -88,6 +88,14 @@ struct AutoTilesData {
 protected:
     stdsptr<Tile> getTileByIndex(const int colId, const int rowId) const;
 private:
+    template <typename Addr, void (*To15Bit)(uint8_t const *& srcLine, uint16_t*& dstLine)>
+    void loadPixmap(const Addr * const src, const int width, const int height);
+
+    template <void (*Swapper)(uint8_t&, uint8_t&, uint8_t&, uint8_t&)>
+    void loadPixmap_XXXA_8888(const uint8_t * const addr8,
+                              const int width, const int height,
+                              const SkAlphaType alphaType);
+
     void moveX(const int dx, const bool extend);
     void moveY(const int dy, const bool extend);
 

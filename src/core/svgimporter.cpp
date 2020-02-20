@@ -15,6 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "svgimporter.h"
+
+#include <QtXml/QDomDocument>
+
 #include "Boxes/containerbox.h"
 #include "colorhelpers.h"
 #include "pointhelpers.h"
@@ -1110,41 +1113,39 @@ bool getFlatColorFromString(const QString &colorStr, FillSvgAttributes *target) 
     return true;
 }
 
+qsptr<BoundingBox> loadSVGFile(QIODevice* const src,
+                               const GradientCreator& gradientCreator) {
+    QDomDocument document;
+    if(!document.setContent(src))
+        RuntimeThrow("Cannot set file as QDomDocument content");
+    const QDomElement rootElement = document.firstChildElement("svg");
+    if(rootElement.isNull()) RuntimeThrow("File does not have svg root element");
+    BoxSvgAttributes attributes;
+    const auto result = loadBoxesGroup(rootElement, nullptr,
+                                       attributes, gradientCreator);
+    gGradients.clear();
+    auto it = gUnresolvedGradientLinks.begin();
+    while(it != gUnresolvedGradientLinks.end()) {
+        qDebug() << "unresolved gradient links to " + it.key() + ":";
+        qDebug() << it.value().join(", ");
+        it++;
+    }
+    gUnresolvedGradientLinks.clear();
+    if(result->getContainedBoxesCount() == 1) {
+        return qSharedPointerCast<BoundingBox>(
+                    result->takeContained_k(0));
+    } else if(result->getContainedBoxesCount() == 0) {
+        return nullptr;
+    }
+    return result;
+}
+
 qsptr<BoundingBox> loadSVGFile(const QString &filename,
                                const GradientCreator& gradientCreator) {
     QFile file(filename);
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QDomDocument document;
-        if(document.setContent(&file) ) {
-            const QDomElement rootElement = document.firstChildElement("svg");
-            if(!rootElement.isNull()) {
-                BoxSvgAttributes attributes;
-                const auto result = loadBoxesGroup(rootElement, nullptr,
-                                                   attributes, gradientCreator);
-                gGradients.clear();
-                auto it = gUnresolvedGradientLinks.begin();
-                while(it != gUnresolvedGradientLinks.end()) {
-                    qDebug() << "unresolved gradient links to " + it.key() + ":";
-                    qDebug() << it.value().join(", ");
-                    it++;
-                }
-                gUnresolvedGradientLinks.clear();
-                if(result->getContainedBoxesCount() == 1) {
-                    return qSharedPointerCast<BoundingBox>(
-                                result->takeContained_k(0));
-                } else if(result->getContainedBoxesCount() == 0) {
-                    return nullptr;
-                }
-                return result;
-            } else {
-                RuntimeThrow("File does not have svg root element");
-            }
-        } else {
-            RuntimeThrow("Cannot set file as QDomDocument content");
-        }
-    } else {
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
         RuntimeThrow("Cannot open file " + filename);
-    }
+    return loadSVGFile(&file, gradientCreator);
 }
 
 void BoxSvgAttributes::setParent(const BoxSvgAttributes &parent) {

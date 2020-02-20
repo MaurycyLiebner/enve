@@ -70,8 +70,8 @@ void AutoTiledSurfaceBase::setPixelClamp(const QRect &pixRect) {
     mAutoTilesData.setPixelClamp(pixRect);
 }
 
-void AutoTiledSurfaceBase::loadBitmap(const SkBitmap& src) {
-    mAutoTilesData.loadBitmap(src);
+void AutoTiledSurfaceBase::loadPixmap(const SkPixmap& src) {
+    mAutoTilesData.loadPixmap(src);
 }
 
 void AutoTiledSurfaceBase::replaceTile(const int tx, const int ty,

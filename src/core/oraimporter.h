@@ -14,20 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SVGIMPORTER_H
-#define SVGIMPORTER_H
+#ifndef ORAIMPORTER_H
+#define ORAIMPORTER_H
+
+#include <QString>
 
 #include "smartPointers/selfref.h"
 
-class BoundingBox;
+class ContainerBox;
 class Gradient;
-class Canvas;
 
 using GradientCreator = std::function<Gradient*()>;
 
-extern qsptr<BoundingBox> loadSVGFile(QIODevice* const src,
-                                      const GradientCreator& gradientCreator);
-extern qsptr<BoundingBox> loadSVGFile(const QString &filename,
-                                      const GradientCreator& gradientCreator);
+extern qsptr<ContainerBox> loadORAFile(const QString &filename,
+                                       const GradientCreator& gradientCreator);
 
-#endif // SVGIMPORTER_H
+#endif // ORAIMPORTER_H

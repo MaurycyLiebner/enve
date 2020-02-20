@@ -710,6 +710,10 @@ void BoundingBox::setRelativePos(const QPointF &relPos) {
     mTransformAnimator->setPosition(relPos.x(), relPos.y());
 }
 
+void BoundingBox::setOpacity(const qreal opacity) {
+    mTransformAnimator->setOpacity(opacity);
+}
+
 void BoundingBox::saveTransformPivotAbsPos(const QPointF &absPivot) {
     mSavedTransformPivot = mParentTransform->mapAbsPosToRel(absPivot) -
                            mTransformAnimator->getPivot();

@@ -56,38 +56,68 @@ AutoTilesData &AutoTilesData::operator=(AutoTilesData &&other) {
     return *this;
 }
 
-void AutoTilesData::loadBitmap(const SkBitmap &src) {
+template <void (*Swapper)(uint8_t&, uint8_t&, uint8_t&, uint8_t&)>
+void unpremul_8_to_15(uint8_t const *& srcLine, uint16_t*& dstLine) {
+    uint8_t r = *srcLine++;
+    uint8_t g = *srcLine++;
+    uint8_t b = *srcLine++;
+    uint8_t a = *srcLine++;
+    Swapper(r, g, b, a);
+
+    // convert to fixed point (with rounding)
+    uint32_t r32 = (r * (1<<15) + 255/2) / 255;
+    uint32_t g32 = (g * (1<<15) + 255/2) / 255;
+    uint32_t b32 = (b * (1<<15) + 255/2) / 255;
+    uint32_t a32 = (a * (1<<15) + 255/2) / 255;
+
+    // premultiply alpha (with rounding), save back
+    *dstLine++ = (r32 * a32 + (1<<15)/2) / (1<<15);
+    *dstLine++ = (g32 * a32 + (1<<15)/2) / (1<<15);
+    *dstLine++ = (b32 * a32 + (1<<15)/2) / (1<<15);
+    *dstLine++ = a32;
+}
+
+template <void (*Swapper)(uint8_t&, uint8_t&, uint8_t&, uint8_t&)>
+void premul_8_to_15(uint8_t const *& srcLine, uint16_t*& dstLine) {
+    uint8_t r = *srcLine++;
+    uint8_t g = *srcLine++;
+    uint8_t b = *srcLine++;
+    uint8_t a = *srcLine++;
+    Swapper(r, g, b, a);
+
+    // convert to fixed point (with rounding)
+    *dstLine++ = (r * (1<<15) + 255/2) / 255;
+    *dstLine++ = (g * (1<<15) + 255/2) / 255;
+    *dstLine++ = (b * (1<<15) + 255/2) / 255;
+    *dstLine++ = (a * (1<<15) + 255/2) / 255;
+}
+
+template <typename Addr, void (*To15Bit)(uint8_t const *& srcLine, uint16_t*& dstLine)>
+void AutoTilesData::loadPixmap(const Addr * const src, const int width, const int height) {
     clear();
-    const int nCols = qCeil(static_cast<qreal>(src.width())/TILE_SIZE);
-    const int nRows = qCeil(static_cast<qreal>(src.height())/TILE_SIZE);
-    const uint8_t * const srcP = static_cast<uint8_t*>(src.getPixels());
+    const int nCols = qCeil(static_cast<qreal>(width)/TILE_SIZE);
+    const int nRows = qCeil(static_cast<qreal>(height)/TILE_SIZE);
+
     for(int col = 0; col < nCols; col++) {
         const bool lastCol = col == (nCols - 1);
         const int x0 = col*TILE_SIZE;
-        const int maxX = qMin(x0 + TILE_SIZE, src.width());
+        const int maxX = qMin(x0 + TILE_SIZE, width);
         QList<stdsptr<Tile>> colRows;
         for(int row = 0; row < nRows; row++) {
+            const auto tile = mTileCreator(TILE_SPIXEL_SIZE);
+
             const bool lastRow = row == (nRows - 1);
             const bool iniZeroed = lastCol || lastRow;
-            const auto tile = mTileCreator(TILE_SPIXEL_SIZE);
-            try {
-                if(iniZeroed) tile->zeroData();
-            } catch(...) {
-                clear();
-                RuntimeThrow("Failed to load bitmap to AutoTilesData.");
-            }
+            if(iniZeroed) tile->zeroData();
+            const auto tileP = tile->requestData();
 
             const int y0 = row*TILE_SIZE;
-            const int maxY = qMin(y0 + TILE_SIZE, src.height());
-            const auto tileP = tile->requestData();
+            const int maxY = qMin(y0 + TILE_SIZE, height);
             for(int y = y0; y < maxY; y++) {
-                const uint8_t * srcLine = srcP + (y*src.width() + x0)*4;
+                const Addr * srcLine = src + (y*width + x0)*4;
                 uint16_t* dstLine = tileP + (y - y0)*TILE_SIZE*4;
                 for(int x = x0; x < maxX; x++) {
-                    *dstLine++ = (*srcLine++ * (1<<15) + 255/2) / 255;
-                    *dstLine++ = (*srcLine++ * (1<<15) + 255/2) / 255;
-                    *dstLine++ = (*srcLine++ * (1<<15) + 255/2) / 255;
-                    *dstLine++ = (*srcLine++ * (1<<15) + 255/2) / 255;
+                    To15Bit(srcLine, dstLine);
                 }
             }
             colRows << tile;
@@ -98,6 +128,48 @@ void AutoTilesData::loadBitmap(const SkBitmap &src) {
     mRowCount = nRows;
     mZeroTileCol = 0;
     mZeroTileRow = 0;
+}
+
+template <typename T>
+inline void BGRA_to_RGBA(T& b, T& g, T& r, T& a) {
+    Q_UNUSED(g)
+    Q_UNUSED(a)
+    std::swap(b, r);
+}
+
+template <typename T>
+inline void RGBA_to_RGBA(T& r, T& g, T& b, T& a) {
+    Q_UNUSED(r)
+    Q_UNUSED(g)
+    Q_UNUSED(b)
+    Q_UNUSED(a)
+}
+
+template <void (*Swapper)(uint8_t&, uint8_t&, uint8_t&, uint8_t&)>
+void AutoTilesData::loadPixmap_XXXA_8888(const uint8_t* const addr8,
+                                         const int width,
+                                         const int height,
+                                         const SkAlphaType alphaType) {
+    if(alphaType == kUnpremul_SkAlphaType) {
+        loadPixmap<uint8_t, unpremul_8_to_15<Swapper>>(addr8, width, height);
+    } else if(alphaType == kPremul_SkAlphaType) {
+        loadPixmap<uint8_t, premul_8_to_15<Swapper>>(addr8, width, height);
+    } else RuntimeThrow("Unsupported alpha type");
+}
+
+void AutoTilesData::loadPixmap(const SkPixmap &src) {
+    const int width = src.width();
+    const int height = src.height();
+    const auto& info = src.info();
+    const SkAlphaType alphaType = info.alphaType();
+    const SkColorType colorType = info.colorType();
+    if(colorType == SkColorType::kRGBA_8888_SkColorType) {
+        const auto addr8 = static_cast<const uint8_t*>(src.addr());
+        loadPixmap_XXXA_8888<RGBA_to_RGBA>(addr8, width, height, alphaType);
+    } else if(colorType == SkColorType::kBGRA_8888_SkColorType) {
+        const auto addr8 = static_cast<const uint8_t*>(src.addr());
+        loadPixmap_XXXA_8888<BGRA_to_RGBA>(addr8, width, height, alphaType);
+    } else RuntimeThrow("Unsupported color type");
 }
 
 AutoTilesData::~AutoTilesData() {

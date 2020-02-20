@@ -59,6 +59,12 @@ install:
     - sudo make
     - unset CFLAGS
     - cd ..
+    - # build quazip
+    - tar xf quazip-0.8.1.tar.gz
+    - cd quazip-0.8.1/quazip
+    - qmake
+    - make
+    - cd ..
     - # build gperftools
     - cd gperftools-2.7-enve-mod
     - ./autogen.sh

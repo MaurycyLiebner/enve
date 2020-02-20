@@ -27,9 +27,11 @@ LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -lavresample
 CONFIG += c++14
 
 ENVE_FOLDER = $$PWD/../..
-SKIA_FOLDER = $$ENVE_FOLDER/third_party/skia
-LIBMYPAINT_FOLDER = $$ENVE_FOLDER/third_party/libmypaint-1.5.0
-GPERFTOOLS_FOLDER = $$ENVE_FOLDER/third_party/gperftools-2.7-enve-mod
+THIRD_PARTY_FOLDER =  $$ENVE_FOLDER/third_party
+SKIA_FOLDER = $$THIRD_PARTY_FOLDER/skia
+LIBMYPAINT_FOLDER = $$THIRD_PARTY_FOLDER/libmypaint-1.5.0
+QUAZIP_FOLDER = $$THIRD_PARTY_FOLDER/quazip-0.8.1
+GPERFTOOLS_FOLDER = $$THIRD_PARTY_FOLDER/gperftools-2.7-enve-mod
 
 INCLUDEPATH += ../core
 DEPENDPATH += ../core
@@ -38,6 +40,9 @@ LIBS += -L$$OUT_PWD/../core -lenvecore
 
 INCLUDEPATH += $$LIBMYPAINT_FOLDER/include
 LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint -lgobject-2.0 -lglib-2.0 -ljson-c
+
+INCLUDEPATH += $$QUAZIP_FOLDER
+LIBS += -L$$QUAZIP_FOLDER/quazip -lquazip
 
 INCLUDEPATH += $$GPERFTOOLS_FOLDER/include
 LIBS += -L$$GPERFTOOLS_FOLDER/.libs -ltcmalloc

@@ -75,6 +75,8 @@ public:
     void write(eWriteStream& dst);
     void read(eReadStream& src);
 
+    void loadPixmap(const SkPixmap& src);
+
     void updateTileBitmaps();
 
     void clearBitmaps();

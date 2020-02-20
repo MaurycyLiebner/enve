@@ -319,6 +319,7 @@ public:
     void scaleRelativeToSavedPivot(const qreal scaleBy);
     void setAbsolutePos(const QPointF &pos);
     void setRelativePos(const QPointF &relPos);
+    void setOpacity(const qreal opacity);
 
     void scaleRelativeToSavedPivot(const qreal scaleXBy,
                                    const qreal scaleYBy);

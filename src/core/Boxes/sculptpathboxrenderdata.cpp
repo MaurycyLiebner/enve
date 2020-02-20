@@ -57,7 +57,7 @@ void SculptPathBoxRenderData::drawSk(SkCanvas * const canvas) {
     if(!fBrush) return;
     AutoTiledSurface surf;
     surf.setPixelClamp(fMaxBoundsRect.translated(-fGlobalRect.topLeft()));
-    surf.loadBitmap(mBitmap);
+    surf.loadPixmap(mBitmap.pixmap());
 
     SkPath pathT;
     QMatrix transform;

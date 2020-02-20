@@ -62,6 +62,7 @@
 #include "ColorWidgets/bookmarkedcolors.h"
 #include "GUI/edialogs.h"
 #include "closesignalingdockwidget.h"
+#include "oraimporter.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 
@@ -96,6 +97,19 @@ public:
     }
 };
 
+class eOraImporter : public eImporter {
+public:
+    bool supports(const QFileInfo& fileInfo) const {
+        return fileInfo.suffix() == "ora";
+    }
+
+    qsptr<BoundingBox> import(const QFileInfo& fileInfo,
+                              Canvas* const scene) const {
+        return loadORAFile(fileInfo.absoluteFilePath(),
+                           [scene]() { return scene->createNewGradient(); });
+    }
+};
+
 MainWindow::MainWindow(Document& document,
                        Actions& actions,
                        AudioHandler& audioHandler,
@@ -111,6 +125,7 @@ MainWindow::MainWindow(Document& document,
 
     ImportHandler::sInstance->addImporter<evImporter>();
     ImportHandler::sInstance->addImporter<eSvgImporter>();
+    ImportHandler::sInstance->addImporter<eOraImporter>();
 
     connect(&mDocument, &Document::evFilePathChanged,
             this, &MainWindow::updateTitle);

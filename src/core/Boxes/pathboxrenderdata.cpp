@@ -46,7 +46,7 @@ void PathBoxRenderData::drawSk(SkCanvas * const canvas) {
             if(!fStrokeSettings.fStrokeBrush) return;
             AutoTiledSurface surf;
             surf.setPixelClamp(fMaxBoundsRect.translated(-fGlobalRect.topLeft()));
-            surf.loadBitmap(mBitmap);
+            surf.loadPixmap(mBitmap.pixmap());
 
             SkPath pathT;
             QMatrix trans;

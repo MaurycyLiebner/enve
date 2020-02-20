@@ -41,13 +41,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 ENVE_FOLDER = $$PWD/../..
-SKIA_FOLDER = $$ENVE_FOLDER/third_party/skia
-LIBMYPAINT_FOLDER = $$ENVE_FOLDER/third_party/libmypaint-1.5.0
+THIRD_PARTY_FOLDER =  $$ENVE_FOLDER/third_party
+SKIA_FOLDER = $$THIRD_PARTY_FOLDER/skia
+LIBMYPAINT_FOLDER = $$THIRD_PARTY_FOLDER/libmypaint-1.5.0
+QUAZIP_FOLDER = $$THIRD_PARTY_FOLDER/quazip-0.8.1
 
 INCLUDEPATH += $$SKIA_FOLDER
 
 INCLUDEPATH += $$LIBMYPAINT_FOLDER/include
 LIBS += -L$$LIBMYPAINT_FOLDER/.libs -lmypaint -lgobject-2.0 -lglib-2.0 -ljson-c
+
+INCLUDEPATH += $$QUAZIP_FOLDER
+LIBS += -L$$QUAZIP_FOLDER/quazip -lquazip
 
 CONFIG(debug, debug|release) {
     LIBS += -L$$SKIA_FOLDER/out/Debug -lskia
@@ -279,6 +284,7 @@ SOURCES += \
     matrixdecomposition.cpp \
     memorydatahandler.cpp \
     namefixer.cpp \
+    oraimporter.cpp \
     paintsettings.cpp \
     paintsettingsapplier.cpp \
     pathoperations.cpp \
@@ -586,6 +592,7 @@ HEADERS += \
     matrixdecomposition.h \
     memorydatahandler.h \
     namefixer.h \
+    oraimporter.h \
     paintsettings.h \
     paintsettingsapplier.h \
     pathoperations.h \

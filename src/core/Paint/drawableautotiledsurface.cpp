@@ -80,7 +80,13 @@ void DrawableAutoTiledSurface::read(eReadStream &src) {
     updateTileBitmaps();
 }
 
+void DrawableAutoTiledSurface::loadPixmap(const SkPixmap &src) {
+    mSurface.loadPixmap(src);
+    updateTileBitmaps();
+}
+
 void DrawableAutoTiledSurface::updateTileBitmaps() {
+    updateTileDimensions();
     updateTileRecBitmaps(mSurface.tileBoundingRect());
 }
 
@@ -151,13 +157,11 @@ void DrawableAutoTiledSurface::updateTileDimensions() {
 
 void DrawableAutoTiledSurface::crop(const QRect& crop) {
     mSurface.crop(crop);
-    updateTileDimensions();
     updateTileBitmaps();
 }
 
 void DrawableAutoTiledSurface::move(const int dx, const int dy) {
     mSurface.move(dx, dy);
-    updateTileDimensions();
     updateTileBitmaps();
 }
 
