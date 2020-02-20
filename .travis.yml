@@ -64,7 +64,7 @@ install:
     - cd quazip-0.8.1/quazip
     - qmake
     - make
-    - cd ..
+    - cd ../../
     - # build gperftools
     - cd gperftools-2.7-enve-mod
     - ./autogen.sh
