@@ -22,12 +22,17 @@
 class BoundingBox;
 class Gradient;
 class Canvas;
+class QDomDocument;
 
 using GradientCreator = std::function<Gradient*()>;
 
-extern qsptr<BoundingBox> loadSVGFile(QIODevice* const src,
-                                      const GradientCreator& gradientCreator);
-extern qsptr<BoundingBox> loadSVGFile(const QString &filename,
-                                      const GradientCreator& gradientCreator);
+namespace ImportSVG {
+    qsptr<BoundingBox> loadSVGFile(const QDomDocument& src,
+                                   const GradientCreator& gradientCreator);
+    qsptr<BoundingBox> loadSVGFile(QIODevice* const src,
+                                   const GradientCreator& gradientCreator);
+    qsptr<BoundingBox> loadSVGFile(const QString &filename,
+                                   const GradientCreator& gradientCreator);
+}
 
 #endif // SVGIMPORTER_H

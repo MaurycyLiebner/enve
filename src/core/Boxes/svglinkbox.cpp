@@ -55,7 +55,7 @@ void SvgLinkBox::updateContent() {
             mGradients << grad;
             return grad.get();
         };
-        const auto imported = loadSVGFile(obj->path(), gradientCreator);
+        const auto imported = ImportSVG::loadSVGFile(obj->path(), gradientCreator);
         addContained(imported);
     }
 }

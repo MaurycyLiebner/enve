@@ -285,6 +285,7 @@ SOURCES += \
     memorydatahandler.cpp \
     namefixer.cpp \
     oraimporter.cpp \
+    oraparser.cpp \
     paintsettings.cpp \
     paintsettingsapplier.cpp \
     pathoperations.cpp \
@@ -593,6 +594,7 @@ HEADERS += \
     memorydatahandler.h \
     namefixer.h \
     oraimporter.h \
+    oraparser.h \
     paintsettings.h \
     paintsettingsapplier.h \
     pathoperations.h \

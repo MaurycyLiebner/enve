@@ -92,8 +92,11 @@ public:
 
     qsptr<BoundingBox> import(const QFileInfo& fileInfo,
                               Canvas* const scene) const {
-        return loadSVGFile(fileInfo.absoluteFilePath(),
-                           [scene]() { return scene->createNewGradient(); });
+        const auto gradientCreator = [scene]() {
+            return scene->createNewGradient();
+        };
+        return ImportSVG::loadSVGFile(fileInfo.absoluteFilePath(),
+                                      gradientCreator);
     }
 };
 
@@ -105,8 +108,11 @@ public:
 
     qsptr<BoundingBox> import(const QFileInfo& fileInfo,
                               Canvas* const scene) const {
-        return loadORAFile(fileInfo.absoluteFilePath(),
-                           [scene]() { return scene->createNewGradient(); });
+        const auto gradientCreator = [scene]() {
+            return scene->createNewGradient();
+        };
+        return ImportORA::loadORAFile(fileInfo.absoluteFilePath(),
+                                      gradientCreator);
     }
 };
 

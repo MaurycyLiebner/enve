@@ -26,7 +26,9 @@ class Gradient;
 
 using GradientCreator = std::function<Gradient*()>;
 
-extern qsptr<ContainerBox> loadORAFile(const QString &filename,
-                                       const GradientCreator& gradientCreator);
+namespace ImportORA {
+    qsptr<ContainerBox> loadORAFile(const QString &filename,
+                                    const GradientCreator& gradientCreator);
+}
 
 #endif // ORAIMPORTER_H

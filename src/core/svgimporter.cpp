@@ -1113,12 +1113,10 @@ bool getFlatColorFromString(const QString &colorStr, FillSvgAttributes *target) 
     return true;
 }
 
-qsptr<BoundingBox> loadSVGFile(QIODevice* const src,
-                               const GradientCreator& gradientCreator) {
-    QDomDocument document;
-    if(!document.setContent(src))
-        RuntimeThrow("Cannot set file as QDomDocument content");
-    const QDomElement rootElement = document.firstChildElement("svg");
+qsptr<BoundingBox> ImportSVG::loadSVGFile(
+        const QDomDocument& src,
+        const GradientCreator& gradientCreator) {
+    const QDomElement rootElement = src.firstChildElement("svg");
     if(rootElement.isNull()) RuntimeThrow("File does not have svg root element");
     BoxSvgAttributes attributes;
     const auto result = loadBoxesGroup(rootElement, nullptr,
@@ -1140,8 +1138,18 @@ qsptr<BoundingBox> loadSVGFile(QIODevice* const src,
     return result;
 }
 
-qsptr<BoundingBox> loadSVGFile(const QString &filename,
-                               const GradientCreator& gradientCreator) {
+qsptr<BoundingBox> ImportSVG::loadSVGFile(
+        QIODevice* const src,
+        const GradientCreator& gradientCreator) {
+    QDomDocument document;
+    if(!document.setContent(src))
+        RuntimeThrow("Cannot set file as QDomDocument content");
+    return loadSVGFile(document, gradientCreator);
+}
+
+qsptr<BoundingBox> ImportSVG::loadSVGFile(
+        const QString &filename,
+        const GradientCreator& gradientCreator) {
     QFile file(filename);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
         RuntimeThrow("Cannot open file " + filename);
