@@ -234,39 +234,7 @@ void PaintTarget::paintMove(const QPointF& pos,
 
 void PaintTarget::addUndoRedo(const QString& name, const QRect& roi) {
     if(mPaintAnimSurface && mPaintDrawable) {
-        auto& target = mPaintDrawable->surface();
-        auto undoList = target.takeUndoList();
-        if(undoList.isEmpty()) return;
-        {
-            mPaintAnimSurface->prp_pushUndoRedoName(name);
-            const stdptr<DrawableAutoTiledSurface> ptr = mPaintDrawable.get();
-            UndoRedo ur;
-            const auto anim = mPaintAnimSurface;
-
-            const auto replaceTile = [undoList, anim, ptr, roi](
-                    const stdsptr<Tile>& (UndoTile::*getter)() const) {
-                if(!ptr) return;
-                auto& surface = ptr->surface();
-                for(const auto& undoTile : undoList) {
-                    surface.replaceTile(undoTile.tileX(),
-                                        undoTile.tileY(),
-                                        (undoTile.*getter)());
-                }
-                surface.autoCrop();
-                ptr->updateTileDimensions();
-                ptr->pixelRectChanged(roi);
-                if(!anim) return;
-                anim->afterChangedCurrentContent();
-            };
-
-            ur.fUndo = [replaceTile]() {
-                replaceTile(&UndoTile::oldValue);
-            };
-            ur.fRedo = [replaceTile]() {
-                replaceTile(&UndoTile::newValue);
-            };
-            mPaintAnimSurface->prp_addUndoRedo(ur);
-        }
+        mPaintAnimSurface->addUndoRedo(name, roi);
         Document::sInstance->actionFinished();
     }
 }

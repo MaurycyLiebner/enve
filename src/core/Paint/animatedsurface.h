@@ -242,10 +242,12 @@ public:
     }
 
     void afterChangedCurrentContent();
+    void addUndoRedo(const QString &name, const QRect &roi);
 signals:
     void currentSurfaceChanged(DrawableAutoTiledSurface*);
 private:
-    void loadPixmapCreateFrame();
+    template <typename T>
+    void loadPixmapT(const T &src);
 
     void updateCurrent() {
         const auto spk = anim_getKeyOnCurrentFrame<ASKey>();

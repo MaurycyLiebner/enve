@@ -47,33 +47,73 @@ void AnimatedSurface::prp_afterChangedAbsRange(const FrameRange &range, const bo
     mFrameImagesCache.remove(relRange);
 }
 
-void AnimatedSurface::loadPixmapCreateFrame() {
+template <typename T>
+void AnimatedSurface::loadPixmapT(const T &src) {
     const bool createNewFrame = anim_isRecording() &&
                                 !anim_getKeyOnCurrentFrame();
     if(createNewFrame) newEmptyFrame();
+    auto& target = mCurrent_d->surface();
+    target.triggerAllChange();
+    const auto roi = mCurrent_d->pixelBoundingRect();
+
+    mCurrent_d->loadPixmap(src);
+
+    afterChangedCurrentContent();
+    addUndoRedo("Load Image", roi);
 }
 
 void AnimatedSurface::loadPixmap(const QImage &src) {
-    loadPixmapCreateFrame();
-    mCurrent_d->loadPixmap(src);
-    afterChangedCurrentContent();
+    loadPixmapT(src);
 }
 
 void AnimatedSurface::loadPixmap(const sk_sp<SkImage> &src) {
     SkPixmap pixmap;
-    if(src->peekPixels(&pixmap)) loadPixmap(pixmap);
+    const auto raster = src->makeRasterImage();
+    if(raster->peekPixels(&pixmap)) loadPixmap(pixmap);
 }
 
 void AnimatedSurface::loadPixmap(const SkPixmap &src) {
-    loadPixmapCreateFrame();
-    mCurrent_d->loadPixmap(src);
-    afterChangedCurrentContent();
+    loadPixmapT(src);
 }
 
 void AnimatedSurface::afterChangedCurrentContent() {
     const int relFrame = anim_getCurrentRelFrame();
     const auto identicalRange = prp_getIdenticalRelRange(relFrame);
     prp_afterChangedRelRange(identicalRange);
+}
+
+void AnimatedSurface::addUndoRedo(const QString& name, const QRect& roi) {
+    auto& target = mCurrent_d->surface();
+    auto undoList = target.takeUndoList();
+    if(undoList.isEmpty()) return;
+    {
+        prp_pushUndoRedoName(name);
+        const stdptr<DrawableAutoTiledSurface> ptr = mCurrent_d;
+        UndoRedo ur;
+
+        const auto replaceTile = [this, undoList, ptr, roi](
+                const stdsptr<Tile>& (UndoTile::*getter)() const) {
+            if(!ptr) return;
+            auto& surface = ptr->surface();
+            for(const auto& undoTile : undoList) {
+                surface.replaceTile(undoTile.tileX(),
+                                    undoTile.tileY(),
+                                    (undoTile.*getter)());
+            }
+            surface.autoCrop();
+            ptr->updateTileDimensions();
+            ptr->pixelRectChanged(roi);
+            afterChangedCurrentContent();
+        };
+
+        ur.fUndo = [replaceTile]() {
+            replaceTile(&UndoTile::oldValue);
+        };
+        ur.fRedo = [replaceTile]() {
+            replaceTile(&UndoTile::newValue);
+        };
+        prp_addUndoRedo(ur);
+    }
 }
 
 ASKey::ASKey(AnimatedSurface * const parent) :

@@ -15,10 +15,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Boxes/imagebox.h"
-#include "GUI/edialogs.h"
+
 #include <QMenu>
+
 #include "FileCacheHandlers/imagecachehandler.h"
 #include "fileshandler.h"
+#include "filesourcescache.h"
+#include "GUI/edialogs.h"
+#include "typemenu.h"
+#include "paintbox.h"
 
 ImageFileHandler* imageFileHandlerGetter(const QString& path) {
     return FilesHandler::sInstance->getFileHandler<ImageFileHandler>(path);
@@ -74,7 +79,6 @@ void ImageBox::reload() {
     if(mFileHandler) mFileHandler->reloadAction();
 }
 
-#include "typemenu.h"
 void ImageBox::setupCanvasMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<ImageBox>()) return;
     menu->addedActionsForType<ImageBox>();
@@ -91,9 +95,24 @@ void ImageBox::setupCanvasMenu(PropertyMenu * const menu) {
     };
     menu->addPlainAction("Set Source File...", setSrcOp);
 
+    menu->addSeparator();
+
+    const PropertyMenu::PlainSelectedOp<ImageBox> createPaintObj =
+    [](ImageBox * box) {
+        const auto parent = box->getParentGroup();
+        if(!parent) return;
+        const auto img = box->mFileHandler->getImage();
+        if(!img) return;
+        const auto paintObj = enve::make_shared<PaintBox>();
+        paintObj->getSurface()->loadPixmap(img);
+        box->copyBoundingBoxDataTo(paintObj.get());
+        parent->addContained(paintObj);
+    };
+    menu->addPlainAction("Create Paint Object", createPaintObj);
+
     BoundingBox::setupCanvasMenu(menu);
 }
-#include "filesourcescache.h"
+
 void ImageBox::changeSourceFile() {
     const QString filters = FileExtensions::imageFilters();
     QString importPath = eDialogs::openFile("Change Source", mFileHandler.path(),
