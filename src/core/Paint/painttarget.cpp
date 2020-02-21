@@ -168,9 +168,7 @@ void PaintTarget::moveRelease(const QPointF &pos) {
                 if(!ptr) return;
                 ptr->move(dx, dy);
                 if(!anim) return;
-                const int relFrame = anim->anim_getCurrentRelFrame();
-                const auto identicalRange = anim->prp_getIdenticalRelRange(relFrame);
-                anim->prp_afterChangedRelRange(identicalRange);
+                anim->afterChangedCurrentContent();
             };
             ur.fUndo = [dx, dy, move]() {
                 move(-dx, -dy);
@@ -258,9 +256,7 @@ void PaintTarget::addUndoRedo(const QString& name, const QRect& roi) {
                 ptr->updateTileDimensions();
                 ptr->pixelRectChanged(roi);
                 if(!anim) return;
-                const int relFrame = anim->anim_getCurrentRelFrame();
-                const auto identicalRange = anim->prp_getIdenticalRelRange(relFrame);
-                anim->prp_afterChangedRelRange(identicalRange);
+                anim->afterChangedCurrentContent();
             };
 
             ur.fUndo = [replaceTile]() {

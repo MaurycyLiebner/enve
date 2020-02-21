@@ -47,6 +47,35 @@ void AnimatedSurface::prp_afterChangedAbsRange(const FrameRange &range, const bo
     mFrameImagesCache.remove(relRange);
 }
 
+void AnimatedSurface::loadPixmapCreateFrame() {
+    const bool createNewFrame = anim_isRecording() &&
+                                !anim_getKeyOnCurrentFrame();
+    if(createNewFrame) newEmptyFrame();
+}
+
+void AnimatedSurface::loadPixmap(const QImage &src) {
+    loadPixmapCreateFrame();
+    mCurrent_d->loadPixmap(src);
+    afterChangedCurrentContent();
+}
+
+void AnimatedSurface::loadPixmap(const sk_sp<SkImage> &src) {
+    SkPixmap pixmap;
+    if(src->peekPixels(&pixmap)) loadPixmap(pixmap);
+}
+
+void AnimatedSurface::loadPixmap(const SkPixmap &src) {
+    loadPixmapCreateFrame();
+    mCurrent_d->loadPixmap(src);
+    afterChangedCurrentContent();
+}
+
+void AnimatedSurface::afterChangedCurrentContent() {
+    const int relFrame = anim_getCurrentRelFrame();
+    const auto identicalRange = prp_getIdenticalRelRange(relFrame);
+    prp_afterChangedRelRange(identicalRange);
+}
+
 ASKey::ASKey(AnimatedSurface * const parent) :
     Key(parent),
     mValue(enve::make_shared<DrawableAutoTiledSurface>()) {}

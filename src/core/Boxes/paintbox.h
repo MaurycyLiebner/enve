@@ -23,26 +23,6 @@ class QPointFAnimator;
 class AnimatedPoint;
 class SimpleBrushWrapper;
 
-struct PaintBoxRenderData : public ImageRenderData {
-    e_OBJECT
-public:
-    PaintBoxRenderData(BoundingBox * const parentBoxT) :
-        ImageRenderData(parentBoxT) {}
-
-    void loadImageFromHandler() {
-        if(fImage) return;
-        if(fASurface) fASurface->getFrameImage(qFloor(fRelFrame), fImage);
-    }
-
-    void updateRelBoundingRect() final {
-        Q_ASSERT(fSurface);
-        fRelBoundingRect = fSurface->surface().pixelBoundingRect();
-    }
-
-    qptr<AnimatedSurface> fASurface;
-    stdsptr<DrawableAutoTiledSurface> fSurface;
-};
-
 class PaintBox : public BoundingBox {
     e_OBJECT
     e_DECLARE_TYPE(PaintBox)
@@ -56,9 +36,8 @@ public:
 
     void setupCanvasMenu(PropertyMenu * const menu);
 
-    AnimatedSurface * getSurface() const {
-        return mSurface.get();
-    }
+    AnimatedSurface * getSurface() const
+    { return mSurface.get(); }
 private:
     qsptr<AnimatedSurface> mSurface;
 };

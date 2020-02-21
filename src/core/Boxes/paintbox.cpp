@@ -24,6 +24,26 @@ PaintBox::PaintBox() : BoundingBox("Paint Box", eBoxType::paint) {
     ca_addChild(mSurface);
 }
 
+struct PaintBoxRenderData : public ImageRenderData {
+    e_OBJECT
+public:
+    PaintBoxRenderData(BoundingBox * const parentBoxT) :
+        ImageRenderData(parentBoxT) {}
+
+    void loadImageFromHandler() {
+        if(fImage) return;
+        if(fASurface) fASurface->getFrameImage(qFloor(fRelFrame), fImage);
+    }
+
+    void updateRelBoundingRect() final {
+        Q_ASSERT(fSurface);
+        fRelBoundingRect = fSurface->surface().pixelBoundingRect();
+    }
+
+    qptr<AnimatedSurface> fASurface;
+    stdsptr<DrawableAutoTiledSurface> fSurface;
+};
+
 void PaintBox::setupRenderData(const qreal relFrame,
                                BoxRenderData * const data,
                                Canvas* const scene) {
@@ -55,7 +75,7 @@ void PaintBox::setupCanvasMenu(PropertyMenu * const menu) {
         if(!importPath.isEmpty()) {
             QImage img;
             if(img.load(importPath)) {
-                //box->loadFromImage(img);
+                box->mSurface->loadPixmap(img);
             }
         }
     };

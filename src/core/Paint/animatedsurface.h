@@ -210,6 +210,10 @@ public:
         anim_appendKeyAction(newKey);
     }
 
+    void loadPixmap(const QImage& src);
+    void loadPixmap(const sk_sp<SkImage>& src);
+    void loadPixmap(const SkPixmap& src);
+
     //! If the image is available returns nullptr,
     //! otherwise returns a task that has to finish for the image to be available,
     //! the task may also may be nullptr if something goes wrong
@@ -236,9 +240,13 @@ public:
         }
         return nullptr;
     }
+
+    void afterChangedCurrentContent();
 signals:
     void currentSurfaceChanged(DrawableAutoTiledSurface*);
 private:
+    void loadPixmapCreateFrame();
+
     void updateCurrent() {
         const auto spk = anim_getKeyOnCurrentFrame<ASKey>();
         if(spk) setCurrent(&spk->dSurface());
