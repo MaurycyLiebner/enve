@@ -68,6 +68,7 @@ void AnimatedSurface::loadPixmap(const QImage &src) {
 }
 
 void AnimatedSurface::loadPixmap(const sk_sp<SkImage> &src) {
+    if(!src) return;
     SkPixmap pixmap;
     const auto raster = src->makeRasterImage();
     if(raster->peekPixels(&pixmap)) loadPixmap(pixmap);

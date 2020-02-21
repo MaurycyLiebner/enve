@@ -28,7 +28,7 @@ class VideoBox : public AnimationBox {
 protected:
     VideoBox();
 public:
-    void soundDataChanged();
+    void setupCanvasMenu(PropertyMenu * const menu);
 
     void changeSourceFile();
 
@@ -42,6 +42,7 @@ public:
     void setFilePath(const QString& path);
     QString getFilePath();
 private:
+    void soundDataChanged();
     void fileHandlerConnector(ConnContext& conn, VideoFileHandler* obj);
     void fileHandlerAfterAssigned(VideoFileHandler* obj);
 
