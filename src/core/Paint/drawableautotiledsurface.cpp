@@ -82,11 +82,13 @@ void DrawableAutoTiledSurface::read(eReadStream &src) {
 
 void DrawableAutoTiledSurface::loadPixmap(const SkPixmap &src) {
     mSurface.loadPixmap(src);
+    afterDataReplaced();
     updateTileBitmaps();
 }
 
 void DrawableAutoTiledSurface::loadPixmap(const QImage &src) {
     mSurface.loadPixmap(src);
+    afterDataReplaced();
     updateTileBitmaps();
 }
 

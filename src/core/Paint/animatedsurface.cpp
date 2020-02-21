@@ -53,13 +53,14 @@ void AnimatedSurface::loadPixmapT(const T &src) {
                                 !anim_getKeyOnCurrentFrame();
     if(createNewFrame) newEmptyFrame();
     auto& target = mCurrent_d->surface();
-    target.triggerAllChange();
-    const auto roi = mCurrent_d->pixelBoundingRect();
-
-    mCurrent_d->loadPixmap(src);
-
+    const bool undoRedo = getParentScene();
+    if(undoRedo) {
+        target.triggerAllChange();
+        const auto roi = mCurrent_d->pixelBoundingRect();
+        mCurrent_d->loadPixmap(src);
+        addUndoRedo("Load Image", roi);
+    } else mCurrent_d->loadPixmap(src);
     afterChangedCurrentContent();
-    addUndoRedo("Load Image", roi);
 }
 
 void AnimatedSurface::loadPixmap(const QImage &src) {

@@ -41,7 +41,9 @@ public:
     uint16_t* data() const;
 
     void write(eWriteStream& dst) const;
-    static stdsptr<Tile> sRead(eReadStream& src);
+
+    using TileCreator = std::function<stdsptr<Tile>(const size_t&)>;
+    static stdsptr<Tile> sRead(eReadStream& src, const TileCreator& tileCreator);
 
     void copyFrom(const Tile& other);
 

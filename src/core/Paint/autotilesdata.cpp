@@ -658,7 +658,7 @@ void AutoTilesData::read(eReadStream &src) {
         mColumns << QList<stdsptr<Tile>>();
         QList<stdsptr<Tile>>& column = mColumns.last();
         for(int row = 0; row < nRows; row++) {
-            column << Tile::sRead(src);;
+            column << Tile::sRead(src, mTileCreator);
         }
     }
 }

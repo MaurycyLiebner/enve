@@ -75,10 +75,10 @@ void Tile::write(eWriteStream &dst) const {
     if(data) dst.write(mData, fSize*sizeof(uint16_t));
 }
 
-stdsptr<Tile> Tile::sRead(eReadStream &src) {
+stdsptr<Tile> Tile::sRead(eReadStream &src, const TileCreator &tileCreator) {
     size_t size; src >> size;
     bool data; src >> data;
-    const auto result = std::make_shared<Tile>(size);
+    const auto result = tileCreator(size);
     if(data) src.read(result->requestData(), size*sizeof(uint16_t));
     return result;
 }
