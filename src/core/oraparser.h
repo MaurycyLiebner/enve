@@ -20,6 +20,7 @@
 #include <QString>
 #include <quazip/quazipfile.h>
 #include <QtXml/QDomDocument>
+#include <QImage>
 
 #include "skia/skiaincludes.h"
 
@@ -52,16 +53,21 @@ struct OraLayer : public OraElement {
     QString fSource;
 };
 
+//#define OraLayerPNG_SkImage
+
+template <typename T>
 struct OraLayerPNG : public OraLayer {
     OraLayerPNG() : OraLayer(OraElementType::layerPNG) {}
-
-    sk_sp<SkImage> fImage;
+    T fImage;
 };
+
+using OraLayerPNG_Qt = OraLayerPNG<QImage>;
+using OraLayerPNG_Sk = OraLayerPNG<sk_sp<SkImage>>;
 
 struct OraLayerSVG : public OraLayer {
     OraLayerSVG() : OraLayer(OraElementType::layerSVG) {}
 
-    QDomDocument fDocument;
+    QByteArray fDocument;
 };
 
 struct OraText : public OraElement {
@@ -70,6 +76,7 @@ struct OraText : public OraElement {
     QString fText;
 };
 
+template <typename OraLayerPNG_XX>
 struct OraStack : public OraElement {
     OraStack(const QString& name, const OraElementType type) :
         OraElement(name, type) {}
@@ -78,15 +85,23 @@ struct OraStack : public OraElement {
     QList<std::shared_ptr<OraElement>> fChildren;
 };
 
-struct OraImage : public OraStack {
-    OraImage() : OraStack("Image", OraElementType::image) {}
+using OraStack_Qt = OraStack<OraLayerPNG_Qt>;
+using OraStack_Sk = OraStack<OraLayerPNG_Sk>;
+
+template <typename OraLayerPNG_XX>
+struct OraImage : public OraStack<OraLayerPNG_XX> {
+    OraImage() : OraStack<OraLayerPNG_XX>("Image", OraElementType::image) {}
 
     int fWidth;
     int fHeight;
 };
 
+using OraImage_Qt = OraImage<OraLayerPNG_Qt>;
+using OraImage_Sk = OraImage<OraLayerPNG_Sk>;
+
 namespace ImportORA {
-    std::shared_ptr<OraImage> readOraFile(const QString &filename);
+    std::shared_ptr<OraImage_Qt> readOraFileQImage(const QString &filename);
+    std::shared_ptr<OraImage_Sk> readOraFileSkImage(const QString &filename);
 }
 
 #endif // ORAPARSER_H

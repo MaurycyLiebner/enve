@@ -70,6 +70,8 @@ extern SkPaint::Join QJoinToSkJoin(const Qt::PenJoinStyle &join);
 extern SkPath toSkPath(const QPainterPath &qPath);
 extern QPainterPath toQPainterPath(const SkPath &path);
 
+extern sk_sp<SkImage> toSkImage(const QImage& qImg);
+
 extern void switchSkQ(const QPointF& qPos, SkPoint& skPos);
 extern void switchSkQ(const SkPoint& skPos, QPointF& qPos);
 extern void switchSkQ(const qreal q, float& sk);

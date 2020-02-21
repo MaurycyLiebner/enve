@@ -119,8 +119,11 @@ void parseOraElementAttributes(OraElement& oraEle,
     oraEle.fBlend = compositeOpToBlendMode(compOpStr);
 }
 
-std::shared_ptr<OraStack> parseStack(const QDomElement &element);
+template <typename OraLayerPNG_XX,
+          typename OraStack_XX = OraStack<OraLayerPNG_XX>>
+std::shared_ptr<OraStack_XX> parseStack(const QDomElement &element);
 
+template <typename OraLayerPNG_XX>
 std::shared_ptr<OraLayer> parseLayer(const QDomElement &element) {
     std::shared_ptr<OraLayer> result;
 
@@ -129,7 +132,7 @@ std::shared_ptr<OraLayer> parseLayer(const QDomElement &element) {
     if(ext == "svg") {
         result = std::make_shared<OraLayerSVG>();
     } else if(ext == "png") {
-        result = std::make_shared<OraLayerPNG>();
+        result = std::make_shared<OraLayerPNG_XX>();
     }
 
     if(result) {
@@ -147,7 +150,9 @@ std::shared_ptr<OraText> parseText(const QDomElement &element) {
     return result;
 }
 
-void parseStackContent(OraStack& stack, const QDomElement &element) {
+template <typename OraLayerPNG_XX,
+          typename OraStack_XX = OraStack<OraLayerPNG_XX>>
+void parseStackContent(OraStack_XX& stack, const QDomElement &element) {
     const auto childNodes = element.childNodes();
     for(int i = 0; i < childNodes.count(); i++) {
         const QDomNode iNode = childNodes.at(i);
@@ -156,9 +161,9 @@ void parseStackContent(OraStack& stack, const QDomElement &element) {
         const QString tagName = iElement.tagName();
         std::shared_ptr<OraElement> child;
         if(tagName == "stack") {
-            child = parseStack(iElement);
+            child = parseStack<OraLayerPNG_XX>(iElement);
         } else if(tagName == "layer") {
-            child = parseLayer(iElement);
+            child = parseLayer<OraLayerPNG_XX>(iElement);
         } else if(tagName == "text") {
             child = parseText(iElement);
         } else RuntimeThrow("Unrecognized type " + tagName);
@@ -166,19 +171,23 @@ void parseStackContent(OraStack& stack, const QDomElement &element) {
     }
 }
 
-std::shared_ptr<OraStack> parseStack(const QDomElement &element) {
-    auto result = std::make_shared<OraStack>();
+template <typename OraLayerPNG_XX, typename OraStack_XX>
+std::shared_ptr<OraStack_XX> parseStack(const QDomElement &element) {
+    auto result = std::make_shared<OraStack_XX>();
     parseOraElementAttributes(*result, element);
-    parseStackContent(*result, element);
+    parseStackContent<OraLayerPNG_XX>(*result, element);
     return result;
 }
 
-std::shared_ptr<OraImage> parseStackXml(QIODevice* const src) {
+template <typename OraLayerPNG_XX,
+          typename OraImage_XX = OraImage<OraLayerPNG_XX>,
+          typename OraStack_XX = OraStack<OraLayerPNG_XX>>
+std::shared_ptr<OraImage_XX> parseStackXml(QIODevice* const src) {
     QDomDocument document;
     if(!document.setContent(src)) RuntimeThrow("Could not parse content");
     const QDomElement rootElement = document.firstChildElement("image");
     if(rootElement.isNull()) RuntimeThrow("Missing root (image) element");
-    auto result = std::make_shared<OraImage>();
+    auto result = std::make_shared<OraImage_XX>();
     const QString wStr = rootElement.attribute("w");
     if(!wStr.isEmpty()) {
         bool ok;
@@ -191,41 +200,53 @@ std::shared_ptr<OraImage> parseStackXml(QIODevice* const src) {
         const int h = hStr.toInt(&ok);
         if(ok) result->fHeight = h;
     }
-    parseStackContent(*result, rootElement);
+    parseStackContent<OraLayerPNG_XX>(*result, rootElement);
     return result;
 }
 
-std::shared_ptr<OraImage> readStackXml(OraFileProcessor& fileProcessor) {
-    std::shared_ptr<OraImage> result;
+template <typename OraLayerPNG_XX,
+          typename OraImage_XX = OraImage<OraLayerPNG_XX>>
+std::shared_ptr<OraImage_XX> readStackXml(OraFileProcessor& fileProcessor) {
+    std::shared_ptr<OraImage_XX> result;
     fileProcessor.process("stack.xml", true, [&result](QIODevice* const src) {
-        result = parseStackXml(src);
+        result = parseStackXml<OraLayerPNG_XX>(src);
     });
     return result;
 }
 
-void loadLayerSourcePNG(OraLayerPNG& layer, OraFileProcessor& fileProcessor) {
+
+void loadLayerSourcePNG(OraLayerPNG_Sk& layer, OraFileProcessor& fileProcessor) {
     fileProcessor.process(layer.fSource, false, [&](QIODevice* const src) {
-        const auto qData = src->readAll();
+        const QByteArray qData = src->readAll();
         const auto data = SkData::MakeWithoutCopy(qData.data(), qData.size());
         layer.fImage = SkImage::DecodeToRaster(data);
     });
 }
 
-void loadLayerSourceSVG(OraLayerSVG& layer, OraFileProcessor& fileProcessor) {
-    fileProcessor.process(layer.fSource, true, [&](QIODevice* const src) {
-        if(!layer.fDocument.setContent(src))
-            RuntimeThrow("Cannot set file as QDomDocument content");
+void loadLayerSourcePNG(OraLayerPNG_Qt& layer, OraFileProcessor& fileProcessor) {
+    fileProcessor.process(layer.fSource, false, [&](QIODevice* const src) {
+        const QByteArray qData = src->readAll();
+        layer.fImage.loadFromData(qData);
     });
 }
 
-void loadLayerSourceFiles(OraStack& stack, OraFileProcessor& fileProcessor) {
+void loadLayerSourceSVG(OraLayerSVG& layer, OraFileProcessor& fileProcessor) {
+    fileProcessor.process(layer.fSource, true, [&](QIODevice* const src) {
+        layer.fDocument = src->readAll();
+    });
+}
+
+template <typename OraLayerPNG_XX,
+          typename OraStack_XX = OraStack<OraLayerPNG_XX>>
+void loadLayerSourceFiles(OraStack_XX& stack, OraFileProcessor& fileProcessor) {
     for(const auto& child : stack.fChildren) {
         switch(child->fType) {
         case OraElementType::stack:
-            loadLayerSourceFiles(static_cast<OraStack&>(*child), fileProcessor);
+            loadLayerSourceFiles<OraLayerPNG_XX>(static_cast<OraStack_XX&>(*child),
+                                                 fileProcessor);
             break;
         case OraElementType::layerPNG:
-            loadLayerSourcePNG(static_cast<OraLayerPNG&>(*child), fileProcessor);
+            loadLayerSourcePNG(static_cast<OraLayerPNG_XX&>(*child), fileProcessor);
             break;
         case OraElementType::layerSVG:
             loadLayerSourceSVG(static_cast<OraLayerSVG&>(*child), fileProcessor);
@@ -235,14 +256,23 @@ void loadLayerSourceFiles(OraStack& stack, OraFileProcessor& fileProcessor) {
     }
 }
 
-std::shared_ptr<OraImage> ImportORA::readOraFile(const QString &filename) {
+template <typename OraLayerPNG_XX>
+std::shared_ptr<OraImage<OraLayerPNG_XX>> readOraFile(const QString &filename) {
     QuaZip zip(filename);
     if(!zip.open(QuaZip::mdUnzip))
         RuntimeThrow("Could not open " + filename);
     QuaZipFile file(&zip);
 
     OraFileProcessor fileProcessor(zip, file);
-    const auto result = readStackXml(fileProcessor);
-    if(result) loadLayerSourceFiles(*result, fileProcessor);
+    const auto result = readStackXml<OraLayerPNG_XX>(fileProcessor);
+    if(result) loadLayerSourceFiles<OraLayerPNG_XX>(*result, fileProcessor);
     return result;
+}
+
+std::shared_ptr<OraImage_Qt> ImportORA::readOraFileQImage(const QString &filename) {
+    return readOraFile<OraLayerPNG_Qt>(filename);
+}
+
+std::shared_ptr<OraImage_Sk> ImportORA::readOraFileSkImage(const QString &filename) {
+    return readOraFile<OraLayerPNG_Sk>(filename);
 }

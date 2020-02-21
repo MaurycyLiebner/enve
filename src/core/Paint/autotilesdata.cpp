@@ -15,6 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "autotilesdata.h"
+
+#include <QImage>
+
 #include "exceptions.h"
 #include "skia/skiahelpers.h"
 
@@ -64,11 +67,16 @@ void unpremul_8_to_15(uint8_t const *& srcLine, uint16_t*& dstLine) {
     uint8_t a = *srcLine++;
     Swapper(r, g, b, a);
 
+    uint32_t r32 = r;
+    uint32_t g32 = g;
+    uint32_t b32 = b;
+    uint32_t a32 = a;
+
     // convert to fixed point (with rounding)
-    uint32_t r32 = (r * (1<<15) + 255/2) / 255;
-    uint32_t g32 = (g * (1<<15) + 255/2) / 255;
-    uint32_t b32 = (b * (1<<15) + 255/2) / 255;
-    uint32_t a32 = (a * (1<<15) + 255/2) / 255;
+    r32 = (r * (1<<15) + 255/2) / 255;
+    g32 = (g * (1<<15) + 255/2) / 255;
+    b32 = (b * (1<<15) + 255/2) / 255;
+    a32 = (a * (1<<15) + 255/2) / 255;
 
     // premultiply alpha (with rounding), save back
     *dstLine++ = (r32 * a32 + (1<<15)/2) / (1<<15);
@@ -92,7 +100,48 @@ void premul_8_to_15(uint8_t const *& srcLine, uint16_t*& dstLine) {
     *dstLine++ = (a * (1<<15) + 255/2) / 255;
 }
 
-template <typename Addr, void (*To15Bit)(uint8_t const *& srcLine, uint16_t*& dstLine)>
+template <void (*Swapper)(uint16_t&, uint16_t&, uint16_t&, uint16_t&)>
+void unpremul_16_to_15(uint16_t const *& srcLine, uint16_t*& dstLine) {
+    uint16_t r = *srcLine++;
+    uint16_t g = *srcLine++;
+    uint16_t b = *srcLine++;
+    uint16_t a = *srcLine++;
+    Swapper(r, g, b, a);
+
+    uint32_t r32 = r;
+    uint32_t g32 = g;
+    uint32_t b32 = b;
+    uint32_t a32 = a;
+
+    // convert to fixed point (with rounding)
+    r32 = (r32 * (1<<15) + USHRT_MAX/2) / USHRT_MAX;
+    g32 = (g32 * (1<<15) + USHRT_MAX/2) / USHRT_MAX;
+    b32 = (b32 * (1<<15) + USHRT_MAX/2) / USHRT_MAX;
+    a32 = (a32 * (1<<15) + USHRT_MAX/2) / USHRT_MAX;
+
+    // premultiply alpha (with rounding), save back
+    *dstLine++ = (r32 * a32 + (1<<15)/2) / (1<<15);
+    *dstLine++ = (g32 * a32 + (1<<15)/2) / (1<<15);
+    *dstLine++ = (b32 * a32 + (1<<15)/2) / (1<<15);
+    *dstLine++ = a32;
+}
+
+template <void (*Swapper)(uint16_t&, uint16_t&, uint16_t&, uint16_t&)>
+void premul_16_to_15(uint16_t const *& srcLine, uint16_t*& dstLine) {
+    uint16_t r = *srcLine++;
+    uint16_t g = *srcLine++;
+    uint16_t b = *srcLine++;
+    uint16_t a = *srcLine++;
+    Swapper(r, g, b, a);
+
+    // convert to fixed point (with rounding)
+    *dstLine++ = (r * (1<<15) + USHRT_MAX/2) / USHRT_MAX;
+    *dstLine++ = (g * (1<<15) + USHRT_MAX/2) / USHRT_MAX;
+    *dstLine++ = (b * (1<<15) + USHRT_MAX/2) / USHRT_MAX;
+    *dstLine++ = (a * (1<<15) + USHRT_MAX/2) / USHRT_MAX;
+}
+
+template <typename Addr, void (*To15Bit)(Addr const *& srcLine, uint16_t*& dstLine)>
 void AutoTilesData::loadPixmap(const Addr * const src, const int width, const int height) {
     clear();
     const int nCols = qCeil(static_cast<qreal>(width)/TILE_SIZE);
@@ -145,6 +194,18 @@ inline void RGBA_to_RGBA(T& r, T& g, T& b, T& a) {
     Q_UNUSED(a)
 }
 
+template <typename T>
+inline void ARGB_to_RGBA(T& a, T& r, T& g, T& b) {
+    const T rr = r;
+    const T gg = g;
+    const T bb = b;
+    const T aa = a;
+    a = rr;
+    r = gg;
+    g = bb;
+    b = aa;
+}
+
 template <void (*Swapper)(uint8_t&, uint8_t&, uint8_t&, uint8_t&)>
 void AutoTilesData::loadPixmap_XXXA_8888(const uint8_t* const addr8,
                                          const int width,
@@ -155,6 +216,51 @@ void AutoTilesData::loadPixmap_XXXA_8888(const uint8_t* const addr8,
     } else if(alphaType == kPremul_SkAlphaType) {
         loadPixmap<uint8_t, premul_8_to_15<Swapper>>(addr8, width, height);
     } else RuntimeThrow("Unsupported alpha type");
+}
+
+template <void (*Swapper)(uint16_t&, uint16_t&, uint16_t&, uint16_t&)>
+void AutoTilesData::loadPixmap_XXXA_16161616(const uint16_t* const addr16,
+                                             const int width,
+                                             const int height,
+                                             const SkAlphaType alphaType) {
+    if(alphaType == kUnpremul_SkAlphaType) {
+        loadPixmap<uint16_t, unpremul_16_to_15<Swapper>>(addr16, width, height);
+    } else if(alphaType == kPremul_SkAlphaType) {
+        loadPixmap<uint16_t, premul_16_to_15<Swapper>>(addr16, width, height);
+    } else RuntimeThrow("Unsupported alpha type");
+}
+
+void AutoTilesData::loadPixmap(const QImage &src) {
+    const int width = src.width();
+    const int height = src.height();
+    const auto format = src.format();
+    const auto pixelFormat = src.pixelFormat();
+    const auto formatPremultiplied = pixelFormat.premultiplied();
+    SkAlphaType alphaType;
+    switch(formatPremultiplied) {
+    case QPixelFormat::NotPremultiplied:
+        alphaType = SkAlphaType::kUnpremul_SkAlphaType;
+        break;
+    case QPixelFormat::Premultiplied:
+        alphaType = SkAlphaType::kPremul_SkAlphaType;
+        break;
+    }
+
+    if(format == QImage::Format_RGBA8888 ||
+       format == QImage::Format_RGBA8888_Premultiplied) {
+        loadPixmap_XXXA_8888<RGBA_to_RGBA>(src.bits(), width, height, alphaType);
+    } else if(format == QImage::Format_ARGB32 ||
+              format == QImage::Format_ARGB32_Premultiplied) {
+        loadPixmap_XXXA_8888<BGRA_to_RGBA>(src.bits(), width, height, alphaType);
+    } else if(format == QImage::Format_RGBA64 ||
+              format == QImage::Format_RGBA64_Premultiplied) {
+        const auto addr16 = reinterpret_cast<const uint16_t*>(src.bits());
+        loadPixmap_XXXA_16161616<RGBA_to_RGBA>(addr16, width, height, alphaType);
+    } else {
+        const QImage converted = src.convertToFormat(
+                    QImage::Format_RGBA8888_Premultiplied);
+        loadPixmap(converted);
+    }
 }
 
 void AutoTilesData::loadPixmap(const SkPixmap &src) {

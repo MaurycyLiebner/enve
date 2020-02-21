@@ -18,6 +18,7 @@
 #define ORAIMPORTER_H
 
 #include <QString>
+#include "skia/skiaincludes.h"
 
 #include "smartPointers/selfref.h"
 
@@ -29,6 +30,7 @@ using GradientCreator = std::function<Gradient*()>;
 namespace ImportORA {
     qsptr<ContainerBox> loadORAFile(const QString &filename,
                                     const GradientCreator& gradientCreator);
+    sk_sp<SkImage> loadMergedORAFile(const QString &filename);
 }
 
 #endif // ORAIMPORTER_H

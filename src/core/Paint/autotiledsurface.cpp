@@ -74,6 +74,10 @@ void AutoTiledSurfaceBase::loadPixmap(const SkPixmap& src) {
     mAutoTilesData.loadPixmap(src);
 }
 
+void AutoTiledSurfaceBase::loadPixmap(const QImage &src) {
+    mAutoTilesData.loadPixmap(src);
+}
+
 void AutoTiledSurfaceBase::replaceTile(const int tx, const int ty,
                                        const stdsptr<Tile> &tile) {
     mAutoTilesData.replaceTile(tx, ty, tile);

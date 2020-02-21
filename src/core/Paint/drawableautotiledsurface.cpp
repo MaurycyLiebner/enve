@@ -85,6 +85,11 @@ void DrawableAutoTiledSurface::loadPixmap(const SkPixmap &src) {
     updateTileBitmaps();
 }
 
+void DrawableAutoTiledSurface::loadPixmap(const QImage &src) {
+    mSurface.loadPixmap(src);
+    updateTileBitmaps();
+}
+
 void DrawableAutoTiledSurface::updateTileBitmaps() {
     updateTileDimensions();
     updateTileRecBitmaps(mSurface.tileBoundingRect());

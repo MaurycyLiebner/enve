@@ -1139,6 +1139,15 @@ qsptr<BoundingBox> ImportSVG::loadSVGFile(
 }
 
 qsptr<BoundingBox> ImportSVG::loadSVGFile(
+        const QByteArray& src,
+        const GradientCreator& gradientCreator) {
+    QDomDocument document;
+    if(!document.setContent(src))
+        RuntimeThrow("Cannot set file as QDomDocument content");
+    return loadSVGFile(document, gradientCreator);
+}
+
+qsptr<BoundingBox> ImportSVG::loadSVGFile(
         QIODevice* const src,
         const GradientCreator& gradientCreator) {
     QDomDocument document;

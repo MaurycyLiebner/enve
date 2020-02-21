@@ -29,6 +29,8 @@ using GradientCreator = std::function<Gradient*()>;
 namespace ImportSVG {
     qsptr<BoundingBox> loadSVGFile(const QDomDocument& src,
                                    const GradientCreator& gradientCreator);
+    qsptr<BoundingBox> loadSVGFile(const QByteArray& src,
+                                   const GradientCreator& gradientCreator);
     qsptr<BoundingBox> loadSVGFile(QIODevice* const src,
                                    const GradientCreator& gradientCreator);
     qsptr<BoundingBox> loadSVGFile(const QString &filename,

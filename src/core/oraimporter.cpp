@@ -38,13 +38,11 @@ qsptr<TextBox> textToBox(OraText& text) {
     return result;
 }
 
-qsptr<BoundingBox> layerPNGToBox(OraLayerPNG& layer) {
-    SkPixmap pixmap;
-    if(!layer.fImage || !layer.fImage->peekPixels(&pixmap))
-        RuntimeThrow("Decoding png layer failed");
+qsptr<BoundingBox> layerPNGToBox(OraLayerPNG_Qt& layer) {
     const auto result = enve::make_shared<PaintBox>();
     const auto surf = result->getSurface()->getCurrentSurface();
-    surf->loadPixmap(pixmap);
+    if(layer.fImage.isNull()) RuntimeThrow("Decoding png layer failed");
+    surf->loadPixmap(layer.fImage);
     if(result) applyAttributesToBox(layer, *result);
     return result;
 }
@@ -56,7 +54,7 @@ qsptr<BoundingBox> layerSVGToBox(OraLayerSVG& layer,
     return result;
 }
 
-qsptr<ContainerBox> stackToBox(OraStack& stack,
+qsptr<ContainerBox> stackToBox(OraStack_Qt& stack,
                                const GradientCreator& gradientCreator) {
     const auto result = enve::make_shared<ContainerBox>(eBoxType::layer);
     applyAttributesToBox(stack, *result);
@@ -65,14 +63,14 @@ qsptr<ContainerBox> stackToBox(OraStack& stack,
         const auto type = child->fType;
         switch(type) {
         case OraElementType::stack:
-            childBox = stackToBox(static_cast<OraStack&>(*child),
+            childBox = stackToBox(static_cast<OraStack_Qt&>(*child),
                                   gradientCreator);
             break;
         case OraElementType::text:
             childBox = textToBox(static_cast<OraText&>(*child));
             break;
         case OraElementType::layerPNG:
-            childBox = layerPNGToBox(static_cast<OraLayerPNG&>(*child));
+            childBox = layerPNGToBox(static_cast<OraLayerPNG_Qt&>(*child));
             break;
         case OraElementType::layerSVG:
             childBox = layerSVGToBox(static_cast<OraLayerSVG&>(*child),
@@ -90,6 +88,65 @@ qsptr<ContainerBox> stackToBox(OraStack& stack,
 
 qsptr<ContainerBox> ImportORA::loadORAFile(
         const QString &filename, const GradientCreator& gradientCreator) {
-    const auto oraImg = ImportORA::readOraFile(filename);
+    const auto oraImg = ImportORA::readOraFileQImage(filename);
     return stackToBox(*oraImg, gradientCreator);
+}
+
+void setupPaint(OraElement& element, SkPaint& paint) {
+    paint.setBlendMode(element.fBlend);
+    paint.setAlphaf(element.fOpacity);
+}
+
+void drawLayerPNG(OraLayerPNG_Sk& layer, SkCanvas& canvas) {
+    SkPaint paint;
+    setupPaint(layer, paint);
+    canvas.drawImage(layer.fImage, layer.fX, layer.fY, &paint);
+}
+
+#include <QtSvg/QSvgRenderer>
+void drawLayerSVG(OraLayerSVG& layer, SkCanvas& canvas) {
+    SkPaint paint;
+    setupPaint(layer, paint);
+
+    // render svg
+    QSvgRenderer renderer(layer.fDocument);
+    QImage qImg(renderer.defaultSize(), QImage::Format_RGBA8888_Premultiplied);
+    QPainter p(&qImg);
+    renderer.render(&p);
+    p.end();
+
+    canvas.drawImage(toSkImage(qImg), layer.fX, layer.fY, &paint);
+}
+
+void drawStack(OraStack_Sk& stack, SkCanvas& canvas) {
+    for(int i = stack.fChildren.count() - 1; i >= 0; i--) {
+        const auto& child = stack.fChildren.at(i);
+        if(!child->fVisible) continue;
+        switch(child->fType) {
+        case OraElementType::stack:
+            drawStack(static_cast<OraStack_Sk&>(*child), canvas);
+            break;
+        case OraElementType::layerPNG:
+            drawLayerPNG(static_cast<OraLayerPNG_Sk&>(*child), canvas);
+            break;
+        case OraElementType::layerSVG:
+            drawLayerSVG(static_cast<OraLayerSVG&>(*child), canvas);
+            break;
+        default: break;
+        }
+    }
+}
+
+sk_sp<SkImage> ImportORA::loadMergedORAFile(const QString &filename) {
+    const auto oraImg = ImportORA::readOraFileSkImage(filename);
+    const int width = oraImg->fWidth;
+    const int height = oraImg->fHeight;
+    const auto info = SkiaHelpers::getPremulRGBAInfo(width, height);
+
+    SkBitmap bitmap;
+    bitmap.allocPixels(info);
+    bitmap.eraseColor(SK_ColorTRANSPARENT);
+    SkCanvas canvas(bitmap);
+    drawStack(*oraImg, canvas);
+    return SkiaHelpers::transferDataToSkImage(bitmap);
 }

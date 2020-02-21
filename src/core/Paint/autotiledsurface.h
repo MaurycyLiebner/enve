@@ -52,6 +52,7 @@ public:
 
     void setPixelClamp(const QRect& pixRect);
     void loadPixmap(const SkPixmap &src);
+    void loadPixmap(const QImage &src);
 
     MyPaintRectangle paintPressEvent(MyPaintBrush * const brush,
                                      const QPointF& pos,

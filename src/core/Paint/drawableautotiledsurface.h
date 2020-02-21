@@ -76,6 +76,7 @@ public:
     void read(eReadStream& src);
 
     void loadPixmap(const SkPixmap& src);
+    void loadPixmap(const QImage &src);
 
     void updateTileBitmaps();
 

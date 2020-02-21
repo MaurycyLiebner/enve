@@ -15,7 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "skqtconversions.h"
+
+#include <QImage>
+
+#include "exceptions.h"
 #include "Segments/qcubicsegment2d.h"
+#include "skia/skiahelpers.h"
 
 QRect toQRect(const SkIRect &rect) {
     return QRect(rect.left(), rect.top(),
@@ -221,4 +226,97 @@ SkFont toSkFont(const QFont &qfont, const int qPPI, const int skPPI) {
 
 SkFont toSkFont(const QFont& qfont) {
     return toSkFont(qfont, 72, 72);
+}
+
+uint16_t floatToHalfFloat(const float float32) {
+    uint32_t fltInt32;
+    memcpy(&fltInt32, &float32, sizeof(float));
+
+    uint16_t fltInt16 = (fltInt32 >> 31) << 5;
+    uint16_t tmp = (fltInt32 >> 23) & 0xff;
+    tmp = (tmp - 0x70) & ((uint32_t)((int32_t)(0x70 - tmp) >> 4) >> 27);
+    fltInt16 = (fltInt16 | tmp) << 10;
+    fltInt16 |= (fltInt32 >> 13) & 0x3ff;
+    return fltInt16;
+}
+
+uint16_t uint16ToHalfFloat(const uint16_t uint16) {
+    return floatToHalfFloat(float(uint16)/USHRT_MAX);
+}
+
+sk_sp<SkImage> toSkImage(const QImage &qImg) {
+    const QImage::Format format = qImg.format();
+    const int width = qImg.width();
+    const int height = qImg.height();
+    switch(format) {
+    case QImage::Format_RGBA8888:
+    case QImage::Format_RGBA8888_Premultiplied: {
+        SkColorType colorType;
+        SkAlphaType alphaType;
+        if(format == QImage::Format_RGBA8888_Premultiplied) {
+            colorType = kRGBA_8888_SkColorType;
+            alphaType = kPremul_SkAlphaType;
+        } else { // QImage::Format_RGBA8888:
+            colorType = kRGBA_8888_SkColorType;
+            alphaType = kUnpremul_SkAlphaType;
+        }
+        const auto info = SkImageInfo::Make(width, height, colorType,
+                                            alphaType, nullptr);
+        SkBitmap bitmap;
+        bitmap.allocPixels(info, qImg.bytesPerLine());
+        const uint8_t* const src = reinterpret_cast<const uint8_t*>(qImg.bits());
+        const uint8_t* const end = src + qImg.width() * qImg.height() * 4;
+        uint8_t* dst = static_cast<uint8_t*>(bitmap.getPixels());
+        std::for_each(src, end, [&dst](const uint8_t c) {
+            *dst++ = c;
+        });
+        return SkiaHelpers::transferDataToSkImage(bitmap);
+    } break;
+    case QImage::Format_ARGB32:
+    case QImage::Format_ARGB32_Premultiplied: {
+        SkAlphaType alphaType;
+        if(format == QImage::Format_ARGB32_Premultiplied) {
+            alphaType = kPremul_SkAlphaType;
+        } else { // QImage::Format_ARGB32:
+            alphaType = kUnpremul_SkAlphaType;
+        }
+        const auto info = SkImageInfo::Make(width, height,
+                                            kRGBA_8888_SkColorType,
+                                            alphaType, nullptr);
+        SkBitmap bitmap;
+        bitmap.allocPixels(info, qImg.bytesPerLine());
+        const QRgb* const src = reinterpret_cast<const QRgb*>(qImg.bits());
+        const QRgb* const end = src + qImg.width() * qImg.height();
+        uint8_t* dst = static_cast<uint8_t*>(bitmap.getPixels());
+        std::for_each(src, end, [&dst](const QRgb& c) {
+            *dst++ = qRed(c);
+            *dst++ = qGreen(c);
+            *dst++ = qBlue(c);
+            *dst++ = qAlpha(c);
+        });
+        return SkiaHelpers::transferDataToSkImage(bitmap);
+    }
+    case QImage::Format_RGBA64:
+    case QImage::Format_RGBA64_Premultiplied: {
+        SkAlphaType alphaType;
+        if(format == QImage::Format_RGBA64_Premultiplied) {
+            alphaType = kPremul_SkAlphaType;
+        } else { // QImage::Format_RGBA64:
+            alphaType = kUnpremul_SkAlphaType;
+        }
+        const auto info = SkImageInfo::Make(width, height,
+                                            kRGBA_F16Norm_SkColorType,
+                                            alphaType, nullptr);
+        SkBitmap bitmap;
+        bitmap.allocPixels(info, qImg.bytesPerLine());
+        const uint16_t* const src = reinterpret_cast<const uint16_t*>(qImg.bits());
+        const uint16_t* const end = src + qImg.width() * qImg.height() * 4;
+        float* dst = static_cast<float*>(bitmap.getPixels());
+        std::for_each(src, end, [&dst](const uint16_t c) {
+            *dst++ = uint16ToHalfFloat(c);
+        });
+        return SkiaHelpers::transferDataToSkImage(bitmap);
+    }
+    default: RuntimeThrow("Unsupported format");
+    }
 }
