@@ -167,6 +167,7 @@ TimelineDockWidget::TimelineDockWidget(Document& document,
     mOnion = SwitchButton::sCreate2Switch(
                 iconsDir + "/onionEnabled.png", iconsDir + "/onionDisabled.png",
                 gSingleLineTooltip("Onion Skin"), this);
+    mOnion->setState(mDocument.fOnionVisible ? 0 : 1);
     connect(mOnion, &SwitchButton::toggled,
             &mDocument, &Document::setOnionDisabled);
 

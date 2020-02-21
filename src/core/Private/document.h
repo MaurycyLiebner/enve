@@ -85,7 +85,7 @@ public:
 
     QColor fBrushColor;
     SimpleBrushWrapper* fBrush = nullptr;
-    bool fOnionVisible = true;
+    bool fOnionVisible = false;
     PaintMode fPaintMode = PaintMode::normal;
 
     std::set<FileHandler, FileCompare> fFiles;
