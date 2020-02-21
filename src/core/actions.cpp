@@ -689,7 +689,7 @@ eBoxOrSound *Actions::importFile(const QString &path,
         result = createImageSequenceBox(path);
         target->insertContained(insertId, result);
     } else { // is file
-        const QString extension = path.split(".").last();
+        const QString extension = fInfo.suffix();
         if(isSoundExt(extension)) {
             result = createSoundForPath(path);
             target->insertContained(insertId, result);
@@ -728,10 +728,20 @@ eBoxOrSound *Actions::importFile(const QString &path,
 
 eBoxOrSound* Actions::linkFile(const QString &path) {
     qsptr<eBoxOrSound> result;
-    if(hasVectorExt(path)) {
+    const QFileInfo info(path);
+    const QString suffix = info.suffix();
+    if(suffix == "svg") {
         const auto svg = enve::make_shared<SvgLinkBox>();
         svg->setFilePath(path);
         result = svg;
+    } else if(suffix == "ora") {
+        const auto ora = enve::make_shared<ImageBox>();
+        ora->setFilePath(path);
+        result = ora;
+    } else if(suffix == "kra") {
+        const auto kra = enve::make_shared<ImageBox>();
+        kra->setFilePath(path);
+        result = kra;
     } else RuntimeThrow("Cannot link file format " + path);
     mActiveScene->getCurrentGroup()->addContained(result);
     mDocument.actionFinished();

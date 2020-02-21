@@ -14,24 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ORAIMPORTER_H
-#define ORAIMPORTER_H
+#ifndef ZIPFILELOADER_H
+#define ZIPFILELOADER_H
 
-#include <QString>
-#include "skia/skiaincludes.h"
+#include <quazip/quazipfile.h>
 
-#include "smartPointers/selfref.h"
+#include "exceptions.h"
 
-class ContainerBox;
-class Gradient;
+class ZipFileLoader {
+public:
+    ZipFileLoader();
 
-using GradientCreator = std::function<Gradient*()>;
+    void setZipPath(const QString& path);
 
-namespace ImportORA {
-    qsptr<ContainerBox> loadORAFile(const QString &filename,
-                                    const GradientCreator& gradientCreator);
-    sk_sp<SkImage> loadMergedORAFile(const QString &filename,
-                                     const bool useContained);
-}
+    using Processor = std::function<void(QIODevice* const src)>;
+    void process(const QString& file, const bool text,
+                 const Processor& func);
+private:
+    QuaZip mZip;
+    QuaZipFile mFile;
+};
 
-#endif // ORAIMPORTER_H
+
+
+#endif // ZIPFILELOADER_H

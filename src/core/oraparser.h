@@ -18,7 +18,6 @@
 #define ORAPARSER_H
 
 #include <QString>
-#include <quazip/quazipfile.h>
 #include <QtXml/QDomDocument>
 #include <QImage>
 
@@ -102,6 +101,7 @@ using OraImage_Sk = OraImage<OraLayerPNG_Sk>;
 namespace ImportORA {
     std::shared_ptr<OraImage_Qt> readOraFileQImage(const QString &filename);
     std::shared_ptr<OraImage_Sk> readOraFileSkImage(const QString &filename);
+    sk_sp<SkImage> loadContainedMerged(const QString &filename);
 }
 
 #endif // ORAPARSER_H

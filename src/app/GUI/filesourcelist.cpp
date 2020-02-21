@@ -240,14 +240,14 @@ void FileSourceList::dropEvent(QDropEvent *event) {
         for(const QUrl &url : urlList) {
             if(url.isLocalFile()) {
                 const QString urlStr = url.toLocalFile();
-                const QString ext = urlStr.split(".").last();
-                QFileInfo fInfo(urlStr);
+                const QFileInfo fInfo(urlStr);
+                const QString ext = fInfo.suffix();
                 const auto filesHandler = FilesHandler::sInstance;
                 if(fInfo.isDir()) {
                     filesHandler->getFileHandler<ImageSequenceFileHandler>(urlStr);
                 } else if(isSoundExt(ext)) {
                     filesHandler->getFileHandler<SoundFileHandler>(urlStr);
-                } else if(isImageExt(ext)) {
+                } else if(isImageExt(ext) || isLayersExt(ext)) {
                     filesHandler->getFileHandler<ImageFileHandler>(urlStr);
                 } else if(isVideoExt(ext)) {
                     filesHandler->getFileHandler<VideoFileHandler>(urlStr);

@@ -22,7 +22,7 @@ bool hasVideoExt(const QString &filename);
 bool hasSoundExt(const QString &filename);
 bool hasVectorExt(const QString &filename);
 bool hasImageExt(const QString &filename);
-bool hasAvExt(const QString &filename);
+bool hasEvExt(const QString &filename);
 
 bool isVideoExt(const QString &extension);
 bool isSoundExt(const QString &extension);
@@ -30,16 +30,20 @@ bool isVectorExt(const QString &extension);
 bool isImageExt(const QString &extension);
 bool isEvExt(const QString &extension);
 
+bool isLayersExt(const QString& ext);
+
 namespace FileExtensions {
     extern QStringList image;
     extern QStringList sound;
     extern QStringList video;
+    extern QStringList layers;
 
     QString filters(const QStringList& exts);
 
     QString imageFilters();
     QString soundFilters();
     QString videoFilters();
+    QString layersFilters();
 };
 
 #endif // FILESOURCESCACHE_H

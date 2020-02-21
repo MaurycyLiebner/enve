@@ -281,6 +281,7 @@ SOURCES += \
     filesourcescache.cpp \
     gpurendertools.cpp \
     importhandler.cpp \
+    kraimporter.cpp \
     matrixdecomposition.cpp \
     memorydatahandler.cpp \
     namefixer.cpp \
@@ -362,7 +363,8 @@ SOURCES += \
     MovablePoints/pointshandler.cpp \
     MovablePoints/pathpointshandler.cpp \
     canvasbase.cpp \
-    typemenu.cpp
+    typemenu.cpp \
+    zipfileloader.cpp
 
 HEADERS += \
     Animators/Expressions/expressioncomplex.h \
@@ -590,6 +592,7 @@ HEADERS += \
     filesourcescache.h \
     gpurendertools.h \
     importhandler.h \
+    kraimporter.h \
     matrixdecomposition.h \
     memorydatahandler.h \
     namefixer.h \
@@ -678,7 +681,8 @@ HEADERS += \
     MovablePoints/pathpointshandler.h \
     canvasbase.h \
     typemenu.h \
-    pointtypemenu.h
+    pointtypemenu.h \
+    zipfileloader.h
 
 unix {
     target.path = /usr/lib

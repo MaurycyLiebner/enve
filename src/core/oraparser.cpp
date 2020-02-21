@@ -16,33 +16,7 @@
 
 #include "oraparser.h"
 
-#include "exceptions.h"
-
-class OraFileProcessor {
-public:
-    OraFileProcessor(QuaZip& zip, QuaZipFile& file) :
-        mZip(zip), mFile(file) {}
-
-    using Processor = std::function<void(QIODevice* const src)>;
-    void process(const QString& file, const bool text, const Processor& func) {
-        if(!mZip.setCurrentFile(file))
-            RuntimeThrow("No stack.xml found in " + mZip.getZipName());
-        QIODevice::OpenMode openMode = QIODevice::ReadOnly;
-        if(text) openMode |= QIODevice::Text;
-        if(!mFile.open(openMode))
-            RuntimeThrow("Could not open stack.xml from " + mZip.getZipName());
-        try {
-            func(&mFile);
-        } catch(...) {
-            mFile.close();
-            RuntimeThrow("Could not parse stack.xml from " + mZip.getZipName());
-        }
-        mFile.close();
-    }
-private:
-    QuaZip& mZip;
-    QuaZipFile& mFile;
-};
+#include "zipfileloader.h"
 
 SkBlendMode compositeOpToBlendMode(const QString& compOpStr) {
     if(compOpStr.isEmpty()) return SkBlendMode::kSrcOver;
@@ -204,9 +178,32 @@ std::shared_ptr<OraImage_XX> parseStackXml(QIODevice* const src) {
     return result;
 }
 
+QSize parseOraSize(QIODevice* const src) {
+    QDomDocument document;
+    if(!document.setContent(src)) RuntimeThrow("Could not parse content");
+    const QDomElement rootElement = document.firstChildElement("image");
+    if(rootElement.isNull()) RuntimeThrow("Missing root (image) element");
+
+    QSize result;
+
+    const QString wStr = rootElement.attribute("w");
+    if(!wStr.isEmpty()) {
+        bool ok;
+        const int w = wStr.toInt(&ok);
+        if(ok) result.setWidth(w);
+    }
+    const QString hStr = rootElement.attribute("h");
+    if(!hStr.isEmpty()) {
+        bool ok;
+        const int h = hStr.toInt(&ok);
+        if(ok) result.setHeight(h);
+    }
+    return result;
+}
+
 template <typename OraLayerPNG_XX,
           typename OraImage_XX = OraImage<OraLayerPNG_XX>>
-std::shared_ptr<OraImage_XX> readStackXml(OraFileProcessor& fileProcessor) {
+std::shared_ptr<OraImage_XX> readStackXml(ZipFileLoader& fileProcessor) {
     std::shared_ptr<OraImage_XX> result;
     fileProcessor.process("stack.xml", true, [&result](QIODevice* const src) {
         result = parseStackXml<OraLayerPNG_XX>(src);
@@ -215,7 +212,7 @@ std::shared_ptr<OraImage_XX> readStackXml(OraFileProcessor& fileProcessor) {
 }
 
 
-void loadLayerSourcePNG(OraLayerPNG_Sk& layer, OraFileProcessor& fileProcessor) {
+void loadLayerSourcePNG(OraLayerPNG_Sk& layer, ZipFileLoader& fileProcessor) {
     fileProcessor.process(layer.fSource, false, [&](QIODevice* const src) {
         const QByteArray qData = src->readAll();
         const auto data = SkData::MakeWithoutCopy(qData.data(), qData.size());
@@ -223,14 +220,14 @@ void loadLayerSourcePNG(OraLayerPNG_Sk& layer, OraFileProcessor& fileProcessor) 
     });
 }
 
-void loadLayerSourcePNG(OraLayerPNG_Qt& layer, OraFileProcessor& fileProcessor) {
+void loadLayerSourcePNG(OraLayerPNG_Qt& layer, ZipFileLoader& fileProcessor) {
     fileProcessor.process(layer.fSource, false, [&](QIODevice* const src) {
         const QByteArray qData = src->readAll();
         layer.fImage.loadFromData(qData);
     });
 }
 
-void loadLayerSourceSVG(OraLayerSVG& layer, OraFileProcessor& fileProcessor) {
+void loadLayerSourceSVG(OraLayerSVG& layer, ZipFileLoader& fileProcessor) {
     fileProcessor.process(layer.fSource, true, [&](QIODevice* const src) {
         layer.fDocument = src->readAll();
     });
@@ -238,7 +235,7 @@ void loadLayerSourceSVG(OraLayerSVG& layer, OraFileProcessor& fileProcessor) {
 
 template <typename OraLayerPNG_XX,
           typename OraStack_XX = OraStack<OraLayerPNG_XX>>
-void loadLayerSourceFiles(OraStack_XX& stack, OraFileProcessor& fileProcessor) {
+void loadLayerSourceFiles(OraStack_XX& stack, ZipFileLoader& fileProcessor) {
     for(const auto& child : stack.fChildren) {
         switch(child->fType) {
         case OraElementType::stack:
@@ -258,12 +255,9 @@ void loadLayerSourceFiles(OraStack_XX& stack, OraFileProcessor& fileProcessor) {
 
 template <typename OraLayerPNG_XX>
 std::shared_ptr<OraImage<OraLayerPNG_XX>> readOraFile(const QString &filename) {
-    QuaZip zip(filename);
-    if(!zip.open(QuaZip::mdUnzip))
-        RuntimeThrow("Could not open " + filename);
-    QuaZipFile file(&zip);
+    ZipFileLoader fileProcessor;
+    fileProcessor.setZipPath(filename);
 
-    OraFileProcessor fileProcessor(zip, file);
     const auto result = readStackXml<OraLayerPNG_XX>(fileProcessor);
     if(result) loadLayerSourceFiles<OraLayerPNG_XX>(*result, fileProcessor);
     return result;
@@ -275,4 +269,17 @@ std::shared_ptr<OraImage_Qt> ImportORA::readOraFileQImage(const QString &filenam
 
 std::shared_ptr<OraImage_Sk> ImportORA::readOraFileSkImage(const QString &filename) {
     return readOraFile<OraLayerPNG_Sk>(filename);
+}
+
+sk_sp<SkImage> ImportORA::loadContainedMerged(const QString &filename) {
+    ZipFileLoader fileProcessor;
+    fileProcessor.setZipPath(filename);
+
+    sk_sp<SkImage> result;
+    fileProcessor.process("mergedimage.png", false, [&](QIODevice* const src) {
+        const QByteArray qData = src->readAll();
+        const auto data = SkData::MakeWithoutCopy(qData.data(), qData.size());
+        result = SkImage::DecodeToRaster(data);
+    });
+    return result;
 }

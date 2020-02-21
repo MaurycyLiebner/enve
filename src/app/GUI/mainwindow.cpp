@@ -1389,7 +1389,7 @@ void MainWindow::linkFile() {
     const QString title = tr("Link File", "LinkDialog_Title");
     const QString fileType = tr("Files %1", "LinkDialog_FileType");
     const auto importPaths = eDialogs::openFiles(
-                title, defPath, fileType.arg("(*.svg)"));
+                title, defPath, fileType.arg("(*.svg *.ora *.kra)"));
     enableEventFilter();
     if(!importPaths.isEmpty()) {
         for(const QString &path : importPaths) {

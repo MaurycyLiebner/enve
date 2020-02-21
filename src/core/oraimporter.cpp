@@ -137,7 +137,14 @@ void drawStack(OraStack_Sk& stack, SkCanvas& canvas) {
     }
 }
 
-sk_sp<SkImage> ImportORA::loadMergedORAFile(const QString &filename) {
+sk_sp<SkImage> ImportORA::loadMergedORAFile(const QString &filename,
+                                            const bool useContained) {
+    if(useContained) {
+        try {
+            const auto result = loadContainedMerged(filename);
+            return result;
+        } catch(...) {}
+    }
     const auto oraImg = ImportORA::readOraFileSkImage(filename);
     const int width = oraImg->fWidth;
     const int height = oraImg->fHeight;

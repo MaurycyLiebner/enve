@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ORAIMPORTER_H
-#define ORAIMPORTER_H
+#ifndef KRAIMPORTER_H
+#define KRAIMPORTER_H
 
 #include <QString>
 #include "skia/skiaincludes.h"
@@ -27,11 +27,11 @@ class Gradient;
 
 using GradientCreator = std::function<Gradient*()>;
 
-namespace ImportORA {
-    qsptr<ContainerBox> loadORAFile(const QString &filename,
+namespace ImportKRA {
+    qsptr<ContainerBox> loadKRAFile(const QString &filename,
                                     const GradientCreator& gradientCreator);
-    sk_sp<SkImage> loadMergedORAFile(const QString &filename,
+    sk_sp<SkImage> loadMergedKRAFile(const QString &filename,
                                      const bool useContained);
 }
 
-#endif // ORAIMPORTER_H
+#endif // KRAIMPORTER_H

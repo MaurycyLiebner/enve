@@ -14,24 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ORAIMPORTER_H
-#define ORAIMPORTER_H
+#include "kraimporter.h"
 
-#include <QString>
-#include "skia/skiaincludes.h"
+#include "zipfileloader.h"
 
-#include "smartPointers/selfref.h"
+sk_sp<SkImage> ImportKRA::loadMergedKRAFile(
+        const QString &filename, const bool useContained) {
+    if(!useContained) return nullptr;
+    ZipFileLoader fileProcessor;
+    fileProcessor.setZipPath(filename);
 
-class ContainerBox;
-class Gradient;
-
-using GradientCreator = std::function<Gradient*()>;
-
-namespace ImportORA {
-    qsptr<ContainerBox> loadORAFile(const QString &filename,
-                                    const GradientCreator& gradientCreator);
-    sk_sp<SkImage> loadMergedORAFile(const QString &filename,
-                                     const bool useContained);
+    sk_sp<SkImage> result;
+    fileProcessor.process("mergedimage.png", false, [&](QIODevice* const src) {
+        const QByteArray qData = src->readAll();
+        const auto data = SkData::MakeWithoutCopy(qData.data(), qData.size());
+        result = SkImage::DecodeToRaster(data);
+    });
+    return result;
 }
-
-#endif // ORAIMPORTER_H

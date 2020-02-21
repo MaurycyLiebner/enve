@@ -20,6 +20,7 @@
 #include "filecachehandler.h"
 #include "Tasks/updatable.h"
 class ImageDataHandler;
+
 class ImageLoader : public eHddTask {
     e_OBJECT
 protected:
@@ -29,19 +30,50 @@ public:
     void process();
     void afterProcessing();
     void afterCanceled();
-private:
+protected:
     ImageDataHandler * const mTargetHandler;
     const QString mFilePath;
     sk_sp<SkImage> mImage;
 };
 
+class OraLoader : public ImageLoader {
+    e_OBJECT
+protected:
+    using ImageLoader::ImageLoader;
+public:
+    void process();
+};
+
+class KraLoader : public ImageLoader {
+    e_OBJECT
+protected:
+    using ImageLoader::ImageLoader;
+public:
+    void process();
+};
+
 class ImageDataHandler : public FileDataCacheHandler {
     e_OBJECT
     friend class ImageLoader;
+
+    enum class Type {
+        image, kra, ora, none
+    };
+
 protected:
     ImageDataHandler();
 public:
-    void afterSourceChanged() {}
+    void afterSourceChanged() {
+        const QFileInfo info(getFilePath());
+        const auto suffix = info.suffix();
+        if(suffix == "ora") {
+            mType = Type::ora;
+        } else if(suffix == "kra") {
+            mType = Type::kra;
+        } else {
+            mType = Type::image;
+        }
+    }
 
     void clearCache() {
         mImage.reset();
@@ -60,6 +92,7 @@ protected:
         mImageLoader.reset();
     }
 private:
+    Type mType = Type::none;
     sk_sp<SkImage> mImage;
     stdsptr<ImageLoader> mImageLoader;
 };
@@ -70,11 +103,10 @@ protected:
     ImageFileHandler() {}
 
     void afterPathSet(const QString& path) {
-        mFileMissing = !QFile(path).exists();
+        const QFileInfo info(path);
+        mFileMissing = !info.exists();
         if(mFileMissing) return mDataHandler.reset();
-        const auto current = ImageDataHandler::sGetDataHandler<ImageDataHandler>(path);
-        if(current) mDataHandler = current->ref<ImageDataHandler>();
-        else mDataHandler = ImageDataHandler::sCreateDataHandler<ImageDataHandler>(path);
+        mDataHandler = ImageDataHandler::sGetCreateDataHandler<ImageDataHandler>(path);
     }
 
     void reload() {

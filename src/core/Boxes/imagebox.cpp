@@ -97,7 +97,7 @@ void ImageBox::setupCanvasMenu(PropertyMenu * const menu) {
 void ImageBox::changeSourceFile() {
     const QString filters = FileExtensions::imageFilters();
     QString importPath = eDialogs::openFile("Change Source", mFileHandler.path(),
-                                            "Image Files (" + filters + ")");
+                                            "Image Files (" + filters + " *.ora)");
     if(!importPath.isEmpty()) setFilePath(importPath);
 }
 
@@ -110,7 +110,7 @@ void ImageBox::setupRenderData(const qreal relFrame,
         imgData->fImage = mFileHandler->getImageCopy();
     } else {
         const auto loader = mFileHandler->scheduleLoad();
-        loader->addDependent(imgData);
+        if(loader) loader->addDependent(imgData);
     }
 }
 

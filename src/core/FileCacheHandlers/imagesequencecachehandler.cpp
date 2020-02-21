@@ -59,7 +59,8 @@ void ImageSequenceFileHandler::reload() {
     dir.setSorting(QDir::Name);
     const auto files = dir.entryInfoList();
     for(const auto& fileInfo : files) {
-        if(!isImageExt(fileInfo.suffix())) continue;
+        const auto suffix = fileInfo.suffix();
+        if(!isImageExt(suffix)) continue;
         const auto filePath = fileInfo.absoluteFilePath();
         const auto handler = ImageDataHandler::sGetCreateDataHandler<ImageDataHandler>(filePath);
         handler->clearCache();
