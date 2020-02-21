@@ -60,7 +60,7 @@ void ImageLoader::afterCanceled() {
 }
 
 void OraLoader::process() {
-    mImage = ImportORA::loadMergedORAFile(mFilePath, false);
+    mImage = ImportORA::loadMergedORAFile(mFilePath, true);
 }
 
 void KraLoader::process() {
