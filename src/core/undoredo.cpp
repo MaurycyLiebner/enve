@@ -91,7 +91,7 @@ void UndoRedoStack::addToSet(const stdsptr<UndoRedo_priv>& undoRedo) {
 }
 
 void UndoRedoStack::emptySomeOfUndo() {
-    if(mUndoStack.length() > 150) {
+    if(mUndoStack.length() > 50) {
         //            for(int i = 0; i < 50; i++) {
         mUndoStack.removeFirst();
         //            }
