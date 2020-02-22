@@ -178,6 +178,7 @@ SOURCES += \
     FileCacheHandlers/videocachehandler.cpp \
     FileCacheHandlers/videoframeloader.cpp \
     FileCacheHandlers/videostreamsdata.cpp \
+    GUI/animationboxtopaintobjectdialog.cpp \
     GUI/boxeslistactionbutton.cpp \
     GUI/coloranimatorbutton.cpp \
     GUI/durationrectsettingsdialog.cpp \
@@ -481,6 +482,7 @@ HEADERS += \
     FileCacheHandlers/videocachehandler.h \
     FileCacheHandlers/videoframeloader.h \
     FileCacheHandlers/videostreamsdata.h \
+    GUI/animationboxtopaintobjectdialog.h \
     GUI/boxeslistactionbutton.h \
     GUI/coloranimatorbutton.h \
     GUI/durationrectsettingsdialog.h \

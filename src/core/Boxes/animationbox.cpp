@@ -27,6 +27,7 @@
 #include "RasterEffects/rastereffectcollection.h"
 #include "frameremapping.h"
 #include "typemenu.h"
+#include "GUI/animationboxtopaintobjectdialog.h"
 
 AnimationBox::AnimationBox(const QString &name, const eBoxType type) :
     BoundingBox(name, type) {
@@ -188,34 +189,40 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
     [widget](AnimationBox * box) {
         const qptr<ContainerBox> parent = box->getParentGroup();
         if(!parent) return;
-        bool ok = false;
-        const int frameStep = QInputDialog::getInt(
-                    widget, "Increment for " + box->prp_getName(),
-                    "Frame Increment:", 1, 0, 100, 1, &ok);
+        int firstAbsFrame;
+        int lastAbsFrame;
+        int increment;
+        const bool ok = AnimationBoxToPaintObjectDialog::sExec(
+                    widget, box, firstAbsFrame, lastAbsFrame, increment);
         if(!ok) return;
         const auto paintObj = enve::make_shared<PaintBox>();
+        box->copyBoundingBoxDataTo(paintObj.get());
         const auto surface = paintObj->getSurface();
+        surface->anim_setAbsFrame(firstAbsFrame);
         surface->anim_setRecording(true);
         const auto src = box->mSrcFramesCache.get();
-        const int frameCount = src->getFrameCount();
-        const auto loader = [src, surface](const int i) {
-            const auto img = src->getFrameCopyAtFrame(i);
-            surface->anim_setAbsFrame(i);
+        const auto loader = [src, surface](const int animFrame, const int absFrame) {
+            const auto img = src->getFrameCopyAtFrame(animFrame);
+            surface->anim_setAbsFrame(absFrame);
             surface->loadPixmap(img);
         };
         eTask* lastTask = nullptr;
-        for(int i = 0; i < frameCount; i += frameStep) {
-            const auto task = src->scheduleFrameLoad(i);
+        const int firstRelFrame = box->prp_absFrameToRelFrame(firstAbsFrame);
+        const int iMax = lastAbsFrame - firstAbsFrame;
+        for(int i = 0; i <= iMax; i += increment) {
+            const int relFrame = firstRelFrame + i;
+            const int absFrame = firstAbsFrame + i;
+            const int animFrame = box->getAnimationFrameForRelFrame(relFrame);
+            const auto task = src->scheduleFrameLoad(animFrame);
             if(task) {
-                task->addDependent({[loader, i]() {
-                    loader(i);
+                task->addDependent({[loader, animFrame, absFrame]() {
+                    loader(animFrame, absFrame);
                 }, nullptr});
                 lastTask = task;
             } else {
-                loader(i);
+                loader(animFrame, absFrame);
             }
         }
-        box->copyBoundingBoxDataTo(paintObj.get());
         const auto adder = [paintObj, parent]() {
             if(!parent) return;
             parent->addContained(paintObj);
@@ -229,7 +236,6 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
         }
     };
     menu->addPlainAction("Create Paint Object...", createPaintObj);
-    menu->addSeparator();
 
     BoundingBox::setupCanvasMenu(menu);
 }
