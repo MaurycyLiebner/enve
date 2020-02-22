@@ -16,7 +16,7 @@
 
 #include "tmpsaver.h"
 
-TmpSaver::TmpSaver(HddCachable* const target) :
+TmpSaver::TmpSaver(HddCachableCont* const target) :
     mTarget(target) {}
 
 void TmpSaver::process() {

@@ -19,33 +19,22 @@
 #include "smartPointers/stdselfref.h"
 
 class CacheContainer : public StdSelfRef {
+    friend class UsePointerBase;
+    friend class UsedRange;
+    friend class MemoryHandler;
 protected:
     CacheContainer();
 public:
     ~CacheContainer();
 
-    virtual void noDataLeft_k() = 0;
     virtual int getByteCount() = 0;
-    virtual int free_RAM_k() {
-        const int bytes = getByteCount();
-        noDataLeft_k();
-        return bytes;
-    }
-
-    void incInUse() {
-        mInUse++;
-        removeFromMemoryManagment();
-    }
-
-    void decInUse() {
-        mInUse--;
-        Q_ASSERT(mInUse >= 0);
-        if(!mInUse) addToMemoryManagment();
-    }
-
-    bool handledByMemoryHandler() const {
-        return mHandledByMemoryHandler;
-    }
+protected:
+    virtual void noDataLeft_k() = 0;
+private:
+    virtual int free_RAM_k();
+public:
+    bool handledByMemoryHandler() const
+    { return mHandledByMemoryHandler; }
 
     bool inUse() const { return mInUse; }
 protected:
@@ -53,6 +42,9 @@ protected:
     void removeFromMemoryManagment();
     void updateInMemoryManagment();
 private:
+    void incInUse();
+    void decInUse();
+
     bool mHandledByMemoryHandler = false;
     int mInUse = 0;
 };

@@ -20,78 +20,29 @@
 #include "tmpdeleter.h"
 class eTask;
 
-class HddCachable : public CacheContainer {
+class HddCachableCont : public CacheContainer {
 protected:
-    HddCachable() {}
+    HddCachableCont();
     virtual int clearMemory() = 0;
     virtual stdsptr<eHddTask> createTmpFileDataSaver() = 0;
     virtual stdsptr<eHddTask> createTmpFileDataLoader() = 0;
 public:
-    ~HddCachable() {
-        if(mTmpFile) scheduleDeleteTmpFile();
-    }
+    ~HddCachableCont();
 
-    int free_RAM_k() final {
-        const int bytes = clearMemory();
-        setDataInMemory(false);
-        if(!mTmpFile && !mTmpSaveTask) noDataLeft_k();
-        return bytes;
-    }
+    int free_RAM_k() final;
 
-    eTask* scheduleDeleteTmpFile() {
-        if(!mTmpFile) return nullptr;
-        const auto updatable =
-                enve::make_shared<TmpDeleter>(mTmpFile);
-        mTmpFile.reset();
-        updatable->queTask();
-        return updatable.get();
-    }
+    eTask* scheduleDeleteTmpFile();
+    eTask* scheduleSaveToTmpFile();
+    eTask* scheduleLoadFromTmpFile();
 
-    eTask* scheduleSaveToTmpFile() {
-        if(mTmpSaveTask || mTmpFile) return nullptr;
-        mTmpSaveTask = createTmpFileDataSaver();
-        mTmpSaveTask->queTask();
-        return mTmpSaveTask.get();
-    }
+    void setDataSavedToTmpFile(const qsptr<QTemporaryFile> &tmpFile);
 
-    eTask* scheduleLoadFromTmpFile() {
-        if(storesDataInMemory()) return nullptr;
-        if(mTmpLoadTask) return mTmpLoadTask.get();
-        if(!mTmpSaveTask && !mTmpFile) return nullptr;
-
-        mTmpLoadTask = createTmpFileDataLoader();
-        if(mTmpSaveTask)
-            mTmpSaveTask->addDependent(mTmpLoadTask.get());
-        mTmpLoadTask->queTask();
-        return mTmpLoadTask.get();
-    }
-
-    void setDataSavedToTmpFile(const qsptr<QTemporaryFile> &tmpFile) {
-        mTmpSaveTask.reset();
-        mTmpFile = tmpFile;
-    }
-
-    bool storesDataInMemory() const {
-        return mDataInMemory;
-    }
-
+    bool storesDataInMemory() const { return mDataInMemory; }
     qsptr<QTemporaryFile> getTmpFile() const { return mTmpFile; }
 protected:
-    void afterDataLoadedFromTmpFile() {
-        setDataInMemory(true);
-        mTmpLoadTask.reset();
-        if(!inUse()) addToMemoryManagment();
-    }
-
-    void afterDataReplaced() {
-        setDataInMemory(true);
-        updateInMemoryManagment();
-        if(mTmpFile) scheduleDeleteTmpFile();
-    }
-
-    void setDataInMemory(const bool dataInMemory) {
-        mDataInMemory = dataInMemory;
-    }
+    void afterDataLoadedFromTmpFile();
+    void afterDataReplaced();
+    void setDataInMemory(const bool dataInMemory);
 
     qsptr<QTemporaryFile> mTmpFile;
 private:

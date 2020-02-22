@@ -26,6 +26,12 @@ CacheContainer::~CacheContainer() {
     removeFromMemoryManagment();
 }
 
+int CacheContainer::free_RAM_k() {
+    const int bytes = getByteCount();
+    noDataLeft_k();
+    return bytes;
+}
+
 void CacheContainer::addToMemoryManagment() {
     if(mHandledByMemoryHandler || mInUse) return;
     MemoryDataHandler::sInstance->addContainer(this);
@@ -41,4 +47,15 @@ void CacheContainer::removeFromMemoryManagment() {
 void CacheContainer::updateInMemoryManagment() {
     if(!mHandledByMemoryHandler) addToMemoryManagment();
     else MemoryDataHandler::sInstance->containerUpdated(this);
+}
+
+void CacheContainer::incInUse() {
+    mInUse++;
+    removeFromMemoryManagment();
+}
+
+void CacheContainer::decInUse() {
+    mInUse--;
+    Q_ASSERT(mInUse >= 0);
+    if(!mInUse) addToMemoryManagment();
 }

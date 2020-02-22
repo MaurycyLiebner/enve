@@ -1,62 +1,84 @@
 #ifndef USEPOINTER_H
 #define USEPOINTER_H
+
 #include "smartPointers/stdpointer.h"
 #include "cachecontainer.h"
 
-template <typename T = CacheContainer>
-class UsePointer {
-public:
-    UsePointer() {}
+class UsePointerBase {
+protected:
+    UsePointerBase() {}
 
-    UsePointer(T* const ptr) {
+    void decInUse(CacheContainer* ptr) {
+        if(ptr) ptr->decInUse();
+    }
+
+    void incInUse(CacheContainer* ptr) {
+        if(ptr) ptr->incInUse();
+    }
+};
+
+template <template<class> class Ptr, class T = CacheContainer>
+class UsePointerT : public UsePointerBase {
+public:
+    UsePointerT() {}
+
+    ~UsePointerT() { setPtr(nullptr); }
+
+    UsePointerT(T* const ptr) {
         setPtr(ptr);
     }
 
-    UsePointer(const UsePointer<T>& other) {
-        setPtr(other.get());
+    UsePointerT(const Ptr<T>& ptr) {
+        setPtr(ptr);
     }
 
-    UsePointer(UsePointer<T>&& other) {
-        mPtr = other.mPtr;
-        other.mPtr = nullptr;
+    UsePointerT(const UsePointerT& other) {
+        setPtr(other.mPtr);
     }
 
-    ~UsePointer() { if(mPtr) mPtr->decInUse(); }
+    T* get() const { return mPtr.get(); }
 
-    UsePointer<T> &operator=(const UsePointer<T>& other) {
-        UsePointer<T> tmp(other);
-        swap(tmp);
+    void swap(UsePointerT& other) {
+        const auto t = mPtr;
+        setPtr(other.mPtr);
+        other.setPtr(t);
+    }
+
+    void reset() { setPtr(nullptr); }
+
+    UsePointerT &operator=(const UsePointerT& other) {
+        setPtr(other.mPtr);
         return *this;
     }
 
-    UsePointer<T> &operator=(UsePointer<T> &&other) {
-        UsePointer<T> tmp(std::move(other));
-        swap(tmp);
-        return *this;
-    }
-
-    UsePointer<T> &operator=(T* const t) {
+    UsePointerT &operator=(const Ptr<T>& t) {
         setPtr(t);
         return *this;
     }
 
-    T* operator->() const { return mPtr; }
-    operator bool() const { return mPtr; }
-    bool operator==(T* const t) { return mPtr == t; }
-
-    void swap(UsePointer<T>& other) {
-        std::swap(mPtr, other.mPtr);
+    UsePointerT &operator=(T* const t) {
+        setPtr(t);
+        return *this;
     }
 
-    T* get() const { return mPtr; }
+    T* operator->() const { return get(); }
+    operator bool() const { return get(); }
+    bool operator==(T* const t) { return get() == t; }
+    bool operator==(const Ptr<T>& t) { return mPtr == t; }
 private:
-    void setPtr(T* const t) {
-        if(mPtr) mPtr->decInUse();
+    void setPtr(const Ptr<T>& t) {
+        decInUse(get());
         mPtr = t;
-        if(mPtr) mPtr->incInUse();
+        incInUse(get());
     }
 
-    stdptr<T> mPtr = nullptr;
+    Ptr<T> mPtr;
 };
+
+template <class T = CacheContainer>
+using UsePointer = UsePointerT<stdptr, T>;
+
+template <class T = CacheContainer>
+using UseSharedPointer = UsePointerT<stdsptr, T>;
 
 #endif // USEPOINTER_H

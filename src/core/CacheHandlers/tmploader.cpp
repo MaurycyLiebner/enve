@@ -17,7 +17,7 @@
 #include "tmploader.h"
 
 TmpLoader::TmpLoader(const qsptr<QTemporaryFile> &file,
-                     HddCachable * const target) :
+                     HddCachableCont * const target) :
     mTmpFile(file), mTarget(target) {}
 
 void TmpLoader::process() {

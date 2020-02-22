@@ -155,6 +155,7 @@ SOURCES += \
     Boxes/videobox.cpp \
     CacheHandlers/cachecontainer.cpp \
     CacheHandlers/hddcachablecachehandler.cpp \
+    CacheHandlers/hddcachablecont.cpp \
     CacheHandlers/hddcachablerangecont.cpp \
     CacheHandlers/imagecachecontainer.cpp \
     CacheHandlers/samples.cpp \
@@ -469,7 +470,6 @@ HEADERS += \
     CacheHandlers/tmpsaver.h \
     CacheHandlers/usedrange.h \
     CacheHandlers/usepointer.h \
-    CacheHandlers/usesharedpointer.h \
     FileCacheHandlers/animationcachehandler.h \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/filecachehandler.h \

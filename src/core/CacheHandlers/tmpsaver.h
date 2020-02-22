@@ -23,14 +23,14 @@
 class TmpSaver : public eHddTask {
     e_OBJECT
 public:
-    TmpSaver(HddCachable * const target);
+    TmpSaver(HddCachableCont * const target);
 
     virtual void write(eWriteStream& dst) = 0;
 
     void process();
     void afterProcessing();
 private:
-    const stdptr<HddCachable> mTarget;
+    const stdptr<HddCachableCont> mTarget;
     bool mSavingSuccessful = false;
     qsptr<QTemporaryFile> mTmpFile;
 };

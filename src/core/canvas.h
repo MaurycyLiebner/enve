@@ -33,7 +33,7 @@
 #include <QAction>
 #include "Animators/outlinesettingsanimator.h"
 #include "Paint/painttarget.h"
-#include "CacheHandlers/usesharedpointer.h"
+#include "CacheHandlers/usepointer.h"
 #include "CacheHandlers/sceneframecontainer.h"
 #include "undoredo.h"
 

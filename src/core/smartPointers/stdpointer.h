@@ -62,6 +62,9 @@ public:
         if(wp.expired()) return nullptr;
         return static_cast<T*>(rp);
     }
+
+    inline T* get() const { return data(); }
+
     inline T* operator->() const
     { return data(); }
     inline T& operator*() const

@@ -23,14 +23,14 @@
 class TmpLoader : public eHddTask {
 public:
     TmpLoader(const qsptr<QTemporaryFile> &file,
-              HddCachable * const target);
+              HddCachableCont * const target);
 
     virtual void read(eReadStream& src) = 0;
     void process();
     void beforeProcessing(const Hardware);
 private:
     qsptr<QTemporaryFile> mTmpFile;
-    const stdptr<HddCachable> mTarget;
+    const stdptr<HddCachableCont> mTarget;
 };
 
 #endif // TMPLOADER_H

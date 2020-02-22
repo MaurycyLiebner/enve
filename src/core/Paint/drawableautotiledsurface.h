@@ -21,7 +21,7 @@
 #include "CacheHandlers/hddcachablecont.h"
 #include "tilebitmaps.h"
 
-class DrawableAutoTiledSurface : public HddCachable {
+class DrawableAutoTiledSurface : public HddCachableCont {
     e_OBJECT
     typedef QList<QList<SkBitmap>> Tiles;
 public:

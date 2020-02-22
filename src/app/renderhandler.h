@@ -108,7 +108,6 @@ private:
     int mMaxSoundSec;
     int mFirstEncodeSoundSecond;
 
-    QList<UsePointer<CacheContainer>> mUsed;
     FrameRange mCurrRenderRange;
     int mCurrentRenderFrame;
     int mMinRenderFrame = 0;
