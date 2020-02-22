@@ -22,21 +22,21 @@ DrawableAutoTiledSurface::DrawableAutoTiledSurface() :
     mColumnCount(mTileBitmaps.fColumnCount),
     mZeroTileRow(mTileBitmaps.fZeroTileRow),
     mZeroTileCol(mTileBitmaps.fZeroTileCol),
-    mBitmaps(mTileBitmaps.fBitmaps) {
-    afterDataReplaced();
-}
+    mBitmaps(mTileBitmaps.fBitmaps) {}
 
 DrawableAutoTiledSurface::DrawableAutoTiledSurface(
         const DrawableAutoTiledSurface &other) :
     DrawableAutoTiledSurface() {
     mSurface = other.mSurface;
     mTileBitmaps = other.mTileBitmaps;
+    afterDataReplaced();
 }
 
 DrawableAutoTiledSurface &DrawableAutoTiledSurface::operator=(
         const DrawableAutoTiledSurface &other) {
     mSurface = other.mSurface;
     mTileBitmaps = other.mTileBitmaps;
+    afterDataReplaced();
     return *this;
 }
 
@@ -313,8 +313,8 @@ protected:
                  const UndoableAutoTiledSurface &surface) :
         TmpSaver(target), mSurface(surface) {}
     SurfaceSaver(DrawableAutoTiledSurface* const target,
-                 UndoableAutoTiledSurface &&bitmaps) :
-        TmpSaver(target), mSurface(std::move(bitmaps)) {}
+                 UndoableAutoTiledSurface &&surface) :
+        TmpSaver(target), mSurface(std::move(surface)) {}
 
 
     void write(eWriteStream& dst) {
@@ -352,7 +352,7 @@ stdsptr<eHddTask> DrawableAutoTiledSurface::createTmpFileDataSaver() {
 
 stdsptr<eHddTask> DrawableAutoTiledSurface::createTmpFileDataLoader() {
     stdptr<DrawableAutoTiledSurface> thisP = this;
-    const SurfaceLoader::Func func =
+    const SurfaceLoader::Func finishedFunc =
     [thisP](UndoableAutoTiledSurface&& surface) {
         if(thisP) {
             thisP->mSurface = std::move(surface);
@@ -360,7 +360,7 @@ stdsptr<eHddTask> DrawableAutoTiledSurface::createTmpFileDataLoader() {
             thisP->afterDataLoadedFromTmpFile();
         }
     };
-    return enve::make_shared<SurfaceLoader>(mTmpFile, this, func);
+    return enve::make_shared<SurfaceLoader>(mTmpFile, this, finishedFunc);
 }
 
 int DrawableAutoTiledSurface::getByteCount() {
@@ -372,5 +372,6 @@ int DrawableAutoTiledSurface::clearMemory() {
     const int bytes = DrawableAutoTiledSurface::getByteCount();
     clearBitmaps();
     scheduleSaveToTmpFile();
+    mSurface.clear();
     return bytes;
 }
