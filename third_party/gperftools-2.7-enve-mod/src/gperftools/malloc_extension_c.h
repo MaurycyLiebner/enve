@@ -72,7 +72,9 @@ PERFTOOLS_DLL_DECL void MallocExtension_GetStats(char* buffer, int buffer_length
 /* void MallocExtension_GetHeapGrowthStacks(string* result); */
 
 PERFTOOLS_DLL_DECL int MallocExtension_GetNumericProperty(const char* property, size_t* value);
-PERFTOOLS_DLL_DECL void MallocExtension_GetAllocatedAndUnmapped(size_t* allocated, size_t* unmapped);
+PERFTOOLS_DLL_DECL void MallocExtension_GetAllocatedAndUnmapped(size_t* allocated_bytes,
+                                                                size_t* pageheap_unmapped_bytes,
+                                                                size_t* pageheap_free_bytes);
 PERFTOOLS_DLL_DECL int MallocExtension_SetNumericProperty(const char* property, size_t value);
 PERFTOOLS_DLL_DECL void MallocExtension_MarkThreadIdle(void);
 PERFTOOLS_DLL_DECL void MallocExtension_MarkThreadBusy(void);

@@ -118,7 +118,9 @@ bool MallocExtension::GetNumericProperty(const char* property, size_t* value) {
   return false;
 }
 
-void MallocExtension::GetAllocatedAndUnmapped(size_t* allocated, size_t* unmapped) {
+void MallocExtension::GetAllocatedAndUnmapped(size_t* allocated_bytes,
+                                              size_t* pageheap_unmapped_bytes,
+                                              size_t* pageheap_free_bytes) {
   return;
 }
 

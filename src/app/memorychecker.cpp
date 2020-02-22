@@ -41,45 +41,44 @@ MemoryChecker::MemoryChecker(QObject * const parent) : QObject(parent) {
 char MemoryChecker::sLine[256];
 
 void MemoryChecker::sGetFreeKB(intKB& procFreeKB, intKB& sysFreeKB) {
-    size_t allocatedB = 0;
-    size_t unmappedB = 0;
-    MallocExtension::instance()->GetAllocatedAndUnmapped(&allocatedB, &unmappedB);
+    size_t allocated_bytes = 0;
+    size_t pageheap_unmapped_bytes = 0;
+    size_t pageheap_free_bytes = 0;
+    MallocExtension::instance()->GetAllocatedAndUnmapped(
+                &allocated_bytes,
+                &pageheap_unmapped_bytes,
+                &pageheap_free_bytes);
+
     const auto usageCap = eSettings::sInstance->fRamMBCap;
-    procFreeKB = HardwareInfo::sRamKB();
+
     if(usageCap.fValue > 0) {
-        const longB enveUsedB(static_cast<long>(allocatedB));
+        const longB enveUsedB(static_cast<long>(allocated_bytes));
         procFreeKB = intKB(usageCap) - intKB(enveUsedB);
-        qDebug() << intMB(usageCap).fValue << intMB(enveUsedB).fValue;
-    }
+    } else procFreeKB = HardwareInfo::sRamKB();
 
     FILE * const meminfo = fopen("/proc/meminfo", "r");
-    if(meminfo) {
-        intKB ramKB(0);
-        int found = 0;
-        while(fgets(sLine, sizeof(sLine), meminfo)) {
-            int ramPartKB;
-            if(sscanf(sLine, "MemFree: %d kB", &ramPartKB) == 1) {
-                ramKB.fValue += ramPartKB;
-                found++;
-            } else if(sscanf(sLine, "Cached: %d kB", &ramPartKB) == 1) {
-                ramKB.fValue += ramPartKB;
-                found++;
-            } else if(sscanf(sLine, "Buffers: %d kB", &ramPartKB) == 1) {
-                ramKB.fValue += ramPartKB;
-                found++;
-            }
+    if(!meminfo) RuntimeThrow("Failed to open /proc/meminfo");
+    const long freeAndUnmapped = static_cast<long>(pageheap_unmapped_bytes +
+                                                   pageheap_free_bytes);
+    sysFreeKB = intKB(longB(freeAndUnmapped));
+    int found = 0;
+    while(fgets(sLine, sizeof(sLine), meminfo)) {
+        int ramPartKB;
+        if(sscanf(sLine, "MemFree: %d kB", &ramPartKB) == 1) {
+            sysFreeKB.fValue += ramPartKB;
+            found++;
+        } else if(sscanf(sLine, "Cached: %d kB", &ramPartKB) == 1) {
+            sysFreeKB.fValue += ramPartKB;
+            found++;
+        } else if(sscanf(sLine, "Buffers: %d kB", &ramPartKB) == 1) {
+            sysFreeKB.fValue += ramPartKB;
+            found++;
+        } else continue;
 
-            if(found >= 3) {
-                fclose(meminfo);
-                const intKB unmappedKB = intKB(longB(static_cast<long>(unmappedB)));
-                sysFreeKB = ramKB + unmappedKB;
-                return;
-            }
-        }
-        fclose(meminfo);
-        RuntimeThrow("Entries missing from /proc/meminfo");
+        if(found == 3) break;
     }
-    RuntimeThrow("Failed to open /proc/meminfo");
+    fclose(meminfo);
+    if(found != 3) RuntimeThrow("Entries missing from /proc/meminfo");
 }
 
 void MemoryChecker::checkMemory() {
