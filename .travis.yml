@@ -56,21 +56,21 @@ install:
     - cd libmypaint-1.5.0
     - export CFLAGS='-fopenmp -Ofast -ftree-vectorize -fopt-info-vec-optimized -funsafe-math-optimizations -funsafe-loop-optimizations -fPIC'
     - ./configure --enable-static --enable-openmp --enable-shared=false
-    - sudo make
+    - sudo make -j 2
     - unset CFLAGS
     - cd ..
     - # build quazip
     - tar xf quazip-0.8.1.tar.gz
     - cd quazip-0.8.1/quazip
     - qmake
-    - make
+    - make -j 2
     - sudo make install
     - cd ../../
     - # build gperftools
     - cd gperftools-2.7-enve-mod
     - ./autogen.sh
     - ./configure --prefix /usr LIBS=-lpthread
-    - make
+    - make -j 2
     - cd ../../
 before_script:
     - cd build
