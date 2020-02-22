@@ -22,6 +22,8 @@
 #include "../document.h"
 #include <QThread>
 
+#include "Private/Tasks/complextask.h"
+
 TaskScheduler *TaskScheduler::sInstance = nullptr;
 
 TaskScheduler::TaskScheduler() {
@@ -233,6 +235,19 @@ void TaskScheduler::afterCpuGpuTaskFinished() {
     processNextTasks();
     if(!cpuTasksBeingProcessed()) queTasks();
     callAllTasksFinishedFunc();
+}
+
+void TaskScheduler::addComplexTask(const qsptr<ComplexTask> &task) {
+    if(task->done()) return;
+    task->start();
+    mComplexTasks << task;
+    const QWeakPointer<ComplexTask> taskPtr = task;
+    const auto deleter = [this, taskPtr]() {
+        mComplexTasks.removeOne(taskPtr);
+    };
+    connect(task.data(), &ComplexTask::canceled, this, deleter);
+    connect(task.data(), &ComplexTask::finishedAll, this, deleter);
+    emit complexTaskAdded(task.data());
 }
 
 void TaskScheduler::processNextQuedCpuTask() {

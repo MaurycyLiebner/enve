@@ -16,15 +16,19 @@
 
 #ifndef TASKSCHEDULER_H
 #define TASKSCHEDULER_H
+
 #include <QObject>
+
 #include "Tasks/updatable.h"
 #include "gpupostprocessor.h"
 #include "taskquehandler.h"
 #include "Private/esettings.h"
+
 class Canvas;
 class CpuExecController;
 class HddExecController;
 class ExecController;
+class ComplexTask;
 
 class TaskScheduler : public QObject {
     Q_OBJECT
@@ -158,11 +162,14 @@ public:
     void setAlwaysQue(const bool alwaysQue) {
         mAlwaysQue = alwaysQue;
     }
+
+    void addComplexTask(const qsptr<ComplexTask>& task);
 signals:
     void finishedAllQuedTasks() const;
     void hddUsageChanged(bool);
     void gpuUsageChanged(bool);
     void cpuUsageChanged(int);
+    void complexTaskAdded(ComplexTask*);
 private:
     void queScheduledCpuTasks();
     void queScheduledHddTasks();
@@ -197,6 +204,8 @@ private:
 
     bool mAlwaysQue = false;
     bool mCpuQueing = false;
+
+    QList<qsptr<ComplexTask>> mComplexTasks;
 
     TaskQueHandler mQuedCpuTasks;
     QList<stdsptr<eTask>> mQuedHddTasks;

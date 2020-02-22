@@ -1,4 +1,4 @@
-// enve - 2D animations software
+﻿// enve - 2D animations software
 // Copyright (C) 2016-2020 Maurycy Liebner
 
 // This program is free software: you can redistribute it and/or modify
@@ -28,6 +28,8 @@
 #include "frameremapping.h"
 #include "typemenu.h"
 #include "GUI/animationboxtopaintobjectdialog.h"
+#include "Private/Tasks/complextask.h"
+#include "Private/Tasks/taskscheduler.h"
 
 AnimationBox::AnimationBox(const QString &name, const eBoxType type) :
     BoundingBox(name, type) {
@@ -143,6 +145,62 @@ FrameRange AnimationBox::prp_getIdenticalRelRange(const int relFrame) const {
     return BoundingBox::prp_getIdenticalRelRange(relFrame);
 }
 
+class AnimationToPaint : public QObject {
+public:
+    using Loader = std::function<void(int, int)>;
+    using Cancel = std::function<void()>;
+    AnimationToPaint(const int firstAbsFrame, const int firstRelFrame,
+                     const int iMax, const int increment,
+                     AnimationBox* const box,
+                     AnimationFrameHandler* const src,
+                     ComplexTask* const cplxTask,
+                     const Loader& loader,
+                     const Cancel& cancel,
+                     QObject* const parent) :
+        QObject(parent),
+        mFirstAbsFrame(firstAbsFrame), mFirstRelFrame(firstRelFrame),
+        mIMax(iMax), mIncrement(increment),
+        mBox(box), mSrc(src), mCplxTask(cplxTask),
+        mLoader(loader), mCancel(cancel) {}
+
+    void process() {
+        if(!mCplxTask) return;
+        if(!mBox || !mSrc) return mCplxTask->cancel();
+        for(; i <= mIMax; i += mIncrement) {
+            const int relFrame = mFirstRelFrame + i;
+            const int absFrame = mFirstAbsFrame + i;
+            const int animFrame = mBox->getAnimationFrameForRelFrame(relFrame);
+            const auto task = mSrc->scheduleFrameLoad(animFrame);
+            if(task) {
+                mCplxTask->addPlannedTask(task->ref<eTask>());
+                const QPointer<AnimationToPaint> ptr = this;
+                task->addDependent({[ptr, animFrame, absFrame]() {
+                    if(!ptr) return;
+                    ptr->mLoader(animFrame, absFrame);
+                    ptr->process();
+                }, mCancel});
+                break;
+            } else {
+                mLoader(animFrame, absFrame);
+                mCplxTask->removePlannedTasks(1);
+            }
+        }
+    }
+private:
+    const int mFirstAbsFrame;
+    const int mFirstRelFrame;
+    const int mIMax;
+    const int mIncrement;
+
+    const QPointer<AnimationBox> mBox;
+    const QPointer<AnimationFrameHandler> mSrc;
+    const QPointer<ComplexTask> mCplxTask;
+    const Loader mLoader;
+    const std::function<void()> mCancel;
+
+    int i = 0;
+};
+
 void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<AnimationBox>()) return;
     menu->addedActionsForType<AnimationBox>();
@@ -203,34 +261,31 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
             surface->anim_setAbsFrame(absFrame);
             surface->loadPixmap(img);
         };
-        eTask* lastTask = nullptr;
-        const int firstRelFrame = box->prp_absFrameToRelFrame(firstAbsFrame);
-        const int iMax = lastAbsFrame - firstAbsFrame;
-        for(int i = 0; i <= iMax; i += increment) {
-            const int relFrame = firstRelFrame + i;
-            const int absFrame = firstAbsFrame + i;
-            const int animFrame = box->getAnimationFrameForRelFrame(relFrame);
-            const auto task = src->scheduleFrameLoad(animFrame);
-            if(task) {
-                task->addDependent({[loader, animFrame, absFrame]() {
-                    loader(animFrame, absFrame);
-                }, nullptr});
-                lastTask = task;
-            } else {
-                loader(animFrame, absFrame);
-            }
-        }
         const auto adder = [paintObj, parent]() {
             if(!parent) return;
             parent->addContained(paintObj);
         };
-        if(lastTask) {
-            lastTask->addDependent({[adder]() {
-                adder();
-            }, nullptr});
-        } else {
-            adder();
-        }
+        const int firstRelFrame = box->prp_absFrameToRelFrame(firstAbsFrame);
+        const int iMax = lastAbsFrame - firstAbsFrame;
+        const auto complexTask = QSharedPointer<ComplexTask>(
+                    new ComplexTask("Video to Paint"));
+        const auto cancel = [complexTask]() {
+            complexTask->cancel();
+        };
+
+        const auto taskCreator = new AnimationToPaint(
+                    firstAbsFrame, firstRelFrame, iMax, increment,
+                    box, src, complexTask.get(), loader, cancel,
+                    complexTask.get());
+
+        complexTask->addPlannedTasks(iMax/increment);
+        taskCreator->process();
+
+        if(complexTask->count() > 0) {
+            connect(complexTask.get(), &ComplexTask::finishedAll,
+                    paintObj.get(), adder);
+            TaskScheduler::sInstance->addComplexTask(complexTask);
+        } else adder();
     };
     menu->addPlainAction("Create Paint Object...", createPaintObj);
 

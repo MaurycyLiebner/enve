@@ -15,12 +15,68 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "usagewidget.h"
+
+#include "GUI/global.h"
+#include "Private/Tasks/taskscheduler.h"
+#include "Private/Tasks/complextask.h"
+
 #include <QTimer>
 #include <QLocale>
 #include <QHBoxLayout>
-#include "GUI/global.h"
-#include "Private/Tasks/taskscheduler.h"
 #include <QProgressBar>
+#include <QPushButton>
+
+class ComplexTaskWidget : public QWidget {
+public:
+    ComplexTaskWidget(QWidget* const parent = nullptr) :
+        QWidget(parent),
+        mLabel(new QLabel(this)),
+        mProgress(new QProgressBar(this)),
+        mCancel(new QPushButton("x", this)) {
+
+        mProgress->setObjectName("task");
+        mProgress->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+
+        mCancel->setObjectName("complexTaskCancel");
+
+        const auto layout = new QHBoxLayout(this);
+        layout->setSpacing(0);
+        layout->setContentsMargins(0, 0, 0, 0);
+        mLabel->setFixedHeight(MIN_WIDGET_DIM/2);
+        mLabel->setContentsMargins(0, 0, MIN_WIDGET_DIM/2, 0);
+        mCancel->setFixedHeight(MIN_WIDGET_DIM/2);
+        mProgress->setFixedHeight(MIN_WIDGET_DIM/2);
+        layout->addWidget(mLabel);
+        layout->addWidget(mCancel);
+        layout->addWidget(mProgress);
+        setLayout(layout);
+    }
+
+    void setComplexTask(ComplexTask* const task) {
+        auto& conn = mTask.assign(task);
+        if(task) {
+            mLabel->setText(task->name() + ":");
+            mProgress->setMaximum(task->count());
+            mProgress->setValue(task->finishedCount());
+            conn << connect(task, &ComplexTask::finished,
+                            mProgress, &QProgressBar::setValue);
+            conn << connect(task, &ComplexTask::finishedAll,
+                            this, &ComplexTaskWidget::resetTask);
+            conn << connect(task, &ComplexTask::canceled,
+                            this, &ComplexTaskWidget::resetTask);
+            conn << connect(mCancel, &QPushButton::pressed,
+                            task, &ComplexTask::cancel);
+        }
+        setVisible(task);
+    }
+private:
+    void resetTask() { setComplexTask(nullptr); }
+
+    ConnContextQPtr<ComplexTask> mTask;
+    QLabel* const mLabel;
+    QProgressBar* const mProgress;
+    QPushButton* const mCancel;
+};
 
 class HardwareUsageWidget : public QProgressBar {
 public:
@@ -28,8 +84,7 @@ public:
         QProgressBar(parent) {
         setFixedHeight(MIN_WIDGET_DIM/2);
         setObjectName("hardwareUsage");
-        setSizePolicy(QSizePolicy::Maximum,
-                      QSizePolicy::Maximum);
+        setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     }
 
     void pushValue(const int value) {
@@ -105,6 +160,8 @@ UsageWidget::UsageWidget(QWidget * const parent) : QStatusBar(parent) {
             this, &UsageWidget::setGpuUsage);
     connect(TaskScheduler::sInstance, &TaskScheduler::cpuUsageChanged,
             this, &UsageWidget::setThreadsUsage);
+    connect(TaskScheduler::sInstance, &TaskScheduler::complexTaskAdded,
+            this, &UsageWidget::addComplexTask);
 }
 
 void UsageWidget::setThreadsUsage(const int threads) {
@@ -132,4 +189,16 @@ void UsageWidget::setRamUsage(const qreal thisGB) {
 
 void UsageWidget::setTotalRam(const qreal totalRamGB) {
     mRamBar->setRange(0, qRound(totalRamGB*1000));
+}
+
+void UsageWidget::addComplexTask(ComplexTask * const task) {
+    for(const auto wid : mTaskWidgets) {
+        if(wid->isHidden()) {
+            return wid->setComplexTask(task);
+        }
+    }
+    const auto taskWidget = new ComplexTaskWidget(this);
+    insertPermanentWidget(0, taskWidget);
+    taskWidget->setComplexTask(task);
+    mTaskWidgets << taskWidget;
 }

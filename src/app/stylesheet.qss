@@ -325,6 +325,19 @@ QPushButton#removeCanvasButton {
     border-bottom-left-radius: 0;
 }
 
+QPushButton#complexTaskCancel {
+    border-radius: 0;
+    border: 0;
+    border-right: 1px solid black;
+    background: rgb(40, 40, 40);
+    color: white;
+}
+
+QPushButton#complexTaskCancel:hover {
+    background: white;
+    color: black;
+}
+
 QComboBox#currentLayoutComboBox {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
@@ -576,6 +589,7 @@ QProgressBar::chunk {
     width: 5px;
 }
 
+QProgressBar#task,
 QProgressBar#hardwareUsage {
     border: 0;
     background-color: rgb(40, 40, 40);
@@ -585,6 +599,11 @@ QProgressBar#hardwareUsage::chunk {
     background-color: white;
     width: 5px;
     margin: 0.5px;
+}
+
+QProgressBar#task::chunk {
+    background-color: white;
+    width: 5px;
 }
 
 QToolButton {

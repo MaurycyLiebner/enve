@@ -22,6 +22,8 @@
 #include <QStatusBar>
 
 class HardwareUsageWidget;
+class ComplexTaskWidget;
+class ComplexTask;
 
 class UsageWidget : public QStatusBar {
 public:
@@ -32,12 +34,15 @@ public:
     void setGpuUsage(const bool used);
     void setRamUsage(const qreal thisGB);
     void setTotalRam(const qreal totalRamGB);
+
+    void addComplexTask(ComplexTask* const task);
 private:
     HardwareUsageWidget* mGpuBar;
     HardwareUsageWidget* mCpuBar;
     HardwareUsageWidget* mHddBar;
     HardwareUsageWidget* mRamBar;
     QLabel* mRamLabel;
+    QList<ComplexTaskWidget*> mTaskWidgets;
 };
 
 #endif // USAGEWIDGET_H
