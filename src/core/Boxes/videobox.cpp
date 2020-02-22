@@ -48,7 +48,7 @@ VideoBox::VideoBox() : AnimationBox("Video", eBoxType::video),
                  [this](ConnContext& conn, VideoFileHandler* obj) {
                      fileHandlerConnector(conn, obj);
                  }) {
-    const auto flar = mDurationRectangle->ref<FixedLenAnimationRect>();
+    const auto flar = getDurationRectangle()->ref<FixedLenAnimationRect>();
     mSound = enve::make_shared<eVideoSound>(flar);
     ca_addChild(mSound);
     mSound->hide();
@@ -126,20 +126,21 @@ void VideoBox::soundDataChanged() {
     const auto pScene = getParentScene();
     const auto soundHandler = mFileHandler ?
                 mFileHandler->getSoundHandler() : nullptr;
+    const auto durRect = getDurationRectangle();
     if(soundHandler) {
         if(!mSound->SWT_isVisible()) {
             if(pScene) {
                 pScene->getSoundComposition()->addSound(mSound);
             }
         }
-        mDurationRectangle->setSoundCacheHandler(&soundHandler->getCacheHandler());
+        durRect->setSoundCacheHandler(&soundHandler->getCacheHandler());
     } else {
         if(mSound->SWT_isVisible()) {
             if(pScene) {
                 pScene->getSoundComposition()->removeSound(mSound);
             }
         }
-        mDurationRectangle->setSoundCacheHandler(nullptr);
+        durRect->setSoundCacheHandler(nullptr);
     }
     mSound->setSoundDataHandler(soundHandler);
     mSound->SWT_setVisible(soundHandler);

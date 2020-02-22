@@ -25,10 +25,8 @@ eSoundObjectBase::eSoundObjectBase(const qsptr<FixedLenAnimationRect>& durRect) 
         if(!getParentScene()) return;
         updateDurationRectLength();
     });
-    setDurationRectangle(durRect);
-    mDurationRectangleLocked = true;
-
-    mDurationRectangle->setSoundCacheHandler(getCacheHandler());
+    setDurationRectangle(durRect, true);
+    durRect->setSoundCacheHandler(getCacheHandler());
 
     ca_addChild(mVolumeAnimator);
 }
@@ -84,6 +82,7 @@ QrealSnapshot eSoundObjectBase::getVolumeSnap() const {
 void eSoundObjectBase::setSoundDataHandler(SoundDataHandler* const newDataHandler) {
     if(newDataHandler) mCacheHandler = enve::make_shared<SoundHandler>(newDataHandler);
     else mCacheHandler.reset();
-    mDurationRectangle->setSoundCacheHandler(getCacheHandler());
+    const auto durRect = getDurationRectangle();
+    durRect->setSoundCacheHandler(getCacheHandler());
     updateDurationRectLength();
 }

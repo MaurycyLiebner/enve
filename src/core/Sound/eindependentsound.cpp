@@ -93,8 +93,8 @@ bool eIndependentSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                             const bool parentSatisfies,
                                             const bool parentMainTarget) const {
     Q_UNUSED(parentMainTarget);
-    if(rules.fRule == SWT_BoxRule::visible && !mVisible) return false;
-    if(rules.fRule == SWT_BoxRule::selected && !mSelected) return false;
+    if(rules.fRule == SWT_BoxRule::visible && !isVisible()) return false;
+    if(rules.fRule == SWT_BoxRule::selected && !isSelected()) return false;
     if(rules.fType == SWT_Type::sound) return true;
     if(rules.fType == SWT_Type::graphics) return false;
     return parentSatisfies;

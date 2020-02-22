@@ -40,7 +40,7 @@ void InternalLinkBox::setLinkTarget(BoundingBox * const linkTarget) {
         mSound = vidBox->sound()->createLink();
         conn << connect(this, &eBoxOrSound::parentChanged,
                         mSound.get(), &eBoxOrSound::setParentGroup);
-        mSound->setParentGroup(mParentGroup);
+        mSound->setParentGroup(getParentGroup());
     }
     planUpdate(UpdateReason::userChange);
 }

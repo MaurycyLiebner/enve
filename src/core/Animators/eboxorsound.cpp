@@ -175,9 +175,11 @@ void eBoxOrSound::prp_drawTimelineControls(
 
 void eBoxOrSound::setDurationRectangle(
         const qsptr<DurationRectangle>& durationRect,
-        const bool addUndoRedo) {
-    if(durationRect == mDurationRectangle) return;
+        const bool lock) {
     Q_ASSERT(!mDurationRectangleLocked);
+    if(durationRect == mDurationRectangle) return;
+    if(mDurationRectangleLocked) return;
+    if(lock) mDurationRectangleLocked = true;
     if(mDurationRectangle) {
         disconnect(mDurationRectangle.data(), nullptr, this, nullptr);
     }
@@ -191,21 +193,21 @@ void eBoxOrSound::setDurationRectangle(
     mDurationRectangle = durationRect;
     prp_afterFrameShiftChanged(oldRange, newRange);
 
-    if(addUndoRedo) {
+    {
         UndoRedo ur;
         ur.fUndo = [this]() {
-            setDurationRectangle(nullptr, false);
+            setDurationRectangle(nullptr);
         };
         ur.fRedo = [this, durationRect]() {
-            setDurationRectangle(durationRect, false);
+            setDurationRectangle(durationRect);
         };
         prp_addUndoRedo(ur);
     }
 
     if(!mDurationRectangle)
-        return anim_shiftAllKeys(oldDurRect->getRelShift(), addUndoRedo);
+        return anim_shiftAllKeys(oldDurRect->getRelShift());
     if(mDurationRectangle->getRelShift() != 0)
-        anim_shiftAllKeys(-mDurationRectangle->getRelShift(), addUndoRedo);
+        anim_shiftAllKeys(-mDurationRectangle->getRelShift());
 
     connect(mDurationRectangle.data(), &DurationRectangle::shiftChanged,
             this, [this](const int oldShift, const int newShift) {
@@ -226,6 +228,10 @@ void eBoxOrSound::setDurationRectangle(
         const int max = qMax(newMax, oldMax);
         prp_afterChangedRelRange(FrameRange{min, max}.adjusted(-1, 1), false);
     });
+}
+
+bool eBoxOrSound::durationRectangleLocked() const {
+    return mDurationRectangleLocked;
 }
 
 bool eBoxOrSound::isVisibleAndInVisibleDurationRect() const {

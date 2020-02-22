@@ -157,12 +157,13 @@ PathEffectCollection *BoxWithPathEffects::getOutlinePathEffectsAnimators() {
 bool BoxWithPathEffects::differenceInPathBetweenFrames(const int frame1, const int frame2) const {
     if(mPathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
         return true;
-    if(!mParentGroup) return false;
+    const auto parent = getParentGroup();
+    if(!parent) return false;
     const int absFrame1 = prp_relFrameToAbsFrame(frame1);
     const int absFrame2 = prp_relFrameToAbsFrame(frame2);
-    const int pFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
-    const int pFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
-    return mParentGroup->differenceInPathBetweenFrames(pFrame1, pFrame2);
+    const int pFrame1 = parent->prp_absFrameToRelFrame(absFrame1);
+    const int pFrame2 = parent->prp_absFrameToRelFrame(absFrame2);
+    return parent->differenceInPathBetweenFrames(pFrame1, pFrame2);
 }
 
 bool BoxWithPathEffects::differenceInOutlinePathBetweenFrames(const int frame1, const int frame2) const {
@@ -170,63 +171,65 @@ bool BoxWithPathEffects::differenceInOutlinePathBetweenFrames(const int frame1, 
         return true;
     if(mOutlinePathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
         return true;
-    if(!mParentGroup) return false;
+    const auto parent = getParentGroup();
+    if(!parent) return false;
     const int absFrame1 = prp_relFrameToAbsFrame(frame1);
     const int absFrame2 = prp_relFrameToAbsFrame(frame2);
-    const int pFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
-    const int pFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
-    return mParentGroup->differenceInOutlinePathBetweenFrames(pFrame1, pFrame2);
+    const int pFrame1 = parent->prp_absFrameToRelFrame(absFrame1);
+    const int pFrame2 = parent->prp_absFrameToRelFrame(absFrame2);
+    return parent->differenceInOutlinePathBetweenFrames(pFrame1, pFrame2);
 }
 
 bool BoxWithPathEffects::differenceInFillPathBetweenFrames(const int frame1, const int frame2) const {
     if(mFillPathEffectsAnimators->prp_differencesBetweenRelFrames(frame1, frame2))
         return true;
-    if(!mParentGroup) return false;
+    const auto parent = getParentGroup();
+    if(!parent) return false;
     const int absFrame1 = prp_relFrameToAbsFrame(frame1);
     const int absFrame2 = prp_relFrameToAbsFrame(frame2);
-    const int pFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
-    const int pFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
-    return mParentGroup->differenceInFillPathBetweenFrames(pFrame1, pFrame2);
+    const int pFrame1 = parent->prp_absFrameToRelFrame(absFrame1);
+    const int pFrame2 = parent->prp_absFrameToRelFrame(absFrame2);
+    return parent->differenceInFillPathBetweenFrames(pFrame1, pFrame2);
 }
 
 void BoxWithPathEffects::addBasePathEffects(const qreal relFrame,
                                         QList<stdsptr<PathEffectCaller>>& list) {
     mPathEffectsAnimators->addEffects(relFrame, list);
-    if(!mParentGroup) return;
+    const auto parent = getParentGroup();
+    if(!parent) return;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-    const qreal parentRelFrame =
-            mParentGroup->prp_absFrameToRelFrameF(absFrame);
-    mParentGroup->addBasePathEffects(parentRelFrame, list);
+    const qreal parentRelFrame = parent->prp_absFrameToRelFrameF(absFrame);
+    parent->addBasePathEffects(parentRelFrame, list);
 }
 
 void BoxWithPathEffects::addFillEffects(const qreal relFrame,
                                         QList<stdsptr<PathEffectCaller>>& list) {
     mFillPathEffectsAnimators->addEffects(relFrame, list);
-    if(!mParentGroup) return;
+    const auto parent = getParentGroup();
+    if(!parent) return;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-    const qreal parentRelFrame =
-            mParentGroup->prp_absFrameToRelFrameF(absFrame);
-    mParentGroup->addFillEffects(parentRelFrame, list);
+    const qreal parentRelFrame = parent->prp_absFrameToRelFrameF(absFrame);
+    parent->addFillEffects(parentRelFrame, list);
 }
 
 void BoxWithPathEffects::addOutlineBaseEffects(const qreal relFrame,
                                                QList<stdsptr<PathEffectCaller>>& list) {
     mOutlineBasePathEffectsAnimators->addEffects(relFrame, list);
-    if(!mParentGroup) return;
+    const auto parent = getParentGroup();
+    if(!parent) return;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-    const qreal parentRelFrame =
-            mParentGroup->prp_absFrameToRelFrameF(absFrame);
-    mParentGroup->addOutlineBaseEffects(parentRelFrame, list);
+    const qreal parentRelFrame = parent->prp_absFrameToRelFrameF(absFrame);
+    parent->addOutlineBaseEffects(parentRelFrame, list);
 }
 
 void BoxWithPathEffects::addOutlineEffects(const qreal relFrame,
                                            QList<stdsptr<PathEffectCaller>>& list) {
     mOutlinePathEffectsAnimators->addEffects(relFrame, list);
-    if(!mParentGroup) return;
+    const auto parent = getParentGroup();
+    if(!parent) return;
     const qreal absFrame = prp_relFrameToAbsFrameF(relFrame);
-    const qreal parentRelFrame =
-            mParentGroup->prp_absFrameToRelFrameF(absFrame);
-    mParentGroup->addOutlineEffects(parentRelFrame, list);
+    const qreal parentRelFrame = parent->prp_absFrameToRelFrameF(absFrame);
+    parent->addOutlineEffects(parentRelFrame, list);
 }
 
 void BoxWithPathEffects::getMotionBlurProperties(QList<Property*> &list) const {

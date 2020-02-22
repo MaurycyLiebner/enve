@@ -401,10 +401,10 @@ void ComplexAnimator::ca_addChild(const qsptr<Property> &child) {
     ca_insertChild(child, ca_getNumberOfChildren());
 }
 
-void ComplexAnimator::anim_shiftAllKeys(const int shift, const bool addUndoRedo) {
+void ComplexAnimator::anim_shiftAllKeys(const int shift) {
     for(const auto &property : ca_mChildren) {
         if(const auto asAnim = enve_cast<Animator*>(property.get())) {
-            asAnim->anim_shiftAllKeys(shift, addUndoRedo);
+            asAnim->anim_shiftAllKeys(shift);
         }
     }
 }

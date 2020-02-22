@@ -74,8 +74,9 @@ BoundingBox::BoundingBox(const QString& name, const eBoxType type) :
             &BoxTransformAnimator::totalTransformChanged,
             this, &BoundingBox::afterTotalTransformChanged);
     connect(this, &eBoxOrSound::parentChanged, this, [this]() {
-        if(mParentGroup) {
-            const auto trans = mParentGroup->getTransformAnimator();
+        const auto parent = getParentGroup();
+        if(parent) {
+            const auto trans = parent->getTransformAnimator();
             setParentTransform(trans);
         } else setParentTransform(nullptr);
     });
@@ -361,13 +362,14 @@ void BoundingBox::anim_setAbsFrame(const int frame) {
 bool BoundingBox::diffsIncludingInherited(
         const int relFrame1, const int relFrame2) const {
     const bool diffThis = prp_differencesBetweenRelFrames(relFrame1, relFrame2);
-    if(!mParentGroup || diffThis) return diffThis;
+    const auto parent = getParentGroup();
+    if(!parent || diffThis) return diffThis;
     const int absFrame1 = prp_relFrameToAbsFrame(relFrame1);
     const int absFrame2 = prp_relFrameToAbsFrame(relFrame2);
-    const int parentRelFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
-    const int parentRelFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
+    const int parentRelFrame1 = parent->prp_absFrameToRelFrame(absFrame1);
+    const int parentRelFrame2 = parent->prp_absFrameToRelFrame(absFrame2);
 
-    const bool diffInherited = mParentGroup->diffsAffectingContainedBoxes(
+    const bool diffInherited = parent->diffsAffectingContainedBoxes(
                 parentRelFrame1, parentRelFrame2);
     return diffThis || diffInherited;
 }
@@ -392,7 +394,9 @@ void BoundingBox::afterTotalTransformChanged(const UpdateReason reason) {
 }
 
 void BoundingBox::clearParent() {
-    setParentTransform(mParentGroup->getTransformAnimator());
+    const auto parent = getParentGroup();
+    if(parent) setParentTransform(parent->getTransformAnimator());
+    else setParentTransform(nullptr);
 }
 
 void BoundingBox::setPivotRelPos(const QPointF &relPos) {
@@ -446,7 +450,8 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 void BoundingBox::planUpdate(const UpdateReason reason) {
     if(mUpdatePlanned && mPlannedReason == UpdateReason::userChange) return;
     if(!isVisibleAndInVisibleDurationRect()) return;
-    if(mParentGroup) mParentGroup->planUpdate(reason);
+    const auto parent = getParentGroup();
+    if(parent) parent->planUpdate(reason);
     else if(!enve_cast<Canvas*>(this)) return;
     if(reason == UpdateReason::userChange) {
         mStateId++;
@@ -766,8 +771,9 @@ void BoundingBox::setupWithoutRasterEffects(const qreal relFrame,
     data->fBlendMode = getBlendMode();
 
     {
+        const auto parent = getParentGroup();
         QRectF maxBoundsF;
-        if(mParentGroup) maxBoundsF = mParentGroup->currentGlobalBounds();
+        if(parent) maxBoundsF = parent->currentGlobalBounds();
         else maxBoundsF = scene->getCurrentBounds();
         const QRectF scaledMaxBoundsF = data->fResolutionScale.mapRect(maxBoundsF);
         data->fMaxBoundsRect = scaledMaxBoundsF.toAlignedRect();
@@ -973,7 +979,7 @@ void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     menu->addSeparator();
     const PropertyMenu::CheckSelectedOp<BoundingBox> visRangeOp =
     [](BoundingBox* const box, const bool checked) {
-        if(box->mDurationRectangleLocked) return;
+        if(box->durationRectangleLocked()) return;
         const bool hasDur = box->hasDurationRectangle();
         if(hasDur == checked) return;
         if(checked) box->createDurationRectangle();
@@ -981,11 +987,13 @@ void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
     };
     menu->addCheckableAction("Visibility Range",
                              hasDurationRectangle(),
-                             visRangeOp);
+                             visRangeOp)->setEnabled(!durationRectangleLocked());
     menu->addPlainAction("Visibility Range Settings...",
                          [this, parentWidget]() {
-        mDurationRectangle->openDurationSettingsDialog(parentWidget);
-    })->setEnabled(mDurationRectangle);
+        const auto durRect = getDurationRectangle();
+        if(!durRect) return;
+        durRect->openDurationSettingsDialog(parentWidget);
+    })->setEnabled(hasDurationRectangle());
     menu->addSeparator();
     setupCanvasMenu(menu->addMenu("Actions"));
 }
@@ -993,7 +1001,8 @@ void BoundingBox::prp_setupTreeViewMenu(PropertyMenu * const menu) {
 FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
         const int relFrame, const bool takeAncestorsIntoAccount) {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
-    if(mVisible) {
+    if(isVisible()) {
+        const auto durRect = getDurationRectangle();
         if(isFrameInDurationRect(relFrame)) {
             QList<Property*> propertiesT;
             getMotionBlurProperties(propertiesT);
@@ -1003,21 +1012,22 @@ FrameRange BoundingBox::getFirstAndLastIdenticalForMotionBlur(
                 range *= childRange;
             }
 
-            range *= mDurationRectangle->getRelFrameRange();
+            if(durRect) range *= durRect->getRelFrameRange();
         } else {
-            if(relFrame > mDurationRectangle->getMaxRelFrame()) {
-                return mDurationRectangle->getAbsFrameRangeToTheRight();
-            } else if(relFrame < mDurationRectangle->getMinRelFrame()) {
-                return mDurationRectangle->getAbsFrameRangeToTheLeft();
+            if(relFrame > durRect->getMaxRelFrame()) {
+                return durRect->getAbsFrameRangeToTheRight();
+            } else if(relFrame < durRect->getMinRelFrame()) {
+                return durRect->getAbsFrameRangeToTheLeft();
             }
         }
     } else {
         return {FrameRange::EMIN, FrameRange::EMAX};
     }
-    if(!mParentGroup || takeAncestorsIntoAccount) return range;
+    const auto parent = getParentGroup();
+    if(!parent || takeAncestorsIntoAccount) return range;
     if(range.isUnary()) return range;
-    const int parentRel = mParentGroup->prp_absFrameToRelFrame(prp_relFrameToAbsFrame(relFrame));
-    auto parentRange = mParentGroup->BoundingBox::getFirstAndLastIdenticalForMotionBlur(parentRel);
+    const int parentRel = parent->prp_absFrameToRelFrame(prp_relFrameToAbsFrame(relFrame));
+    auto parentRange = parent->BoundingBox::getFirstAndLastIdenticalForMotionBlur(parentRel);
 
     return range*parentRange;
 }

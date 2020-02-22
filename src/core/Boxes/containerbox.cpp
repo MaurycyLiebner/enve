@@ -211,8 +211,8 @@ void ContainerBox::updateAllChildPaths(const UpdateReason reason,
 
 void ContainerBox::forcedMarginMeaningfulChange() {
     const auto thisMargin = mRasterEffectsAnimators->getMaxForcedMargin();
-    const auto inheritedMargin =
-            mParentGroup ? mParentGroup->mForcedMargin : QMargins();
+    const auto parent = getParentGroup();
+    const auto inheritedMargin = parent ? parent->mForcedMargin : QMargins();
     mForcedMargin.setTop(qMax(inheritedMargin.top(), thisMargin.top()));
     mForcedMargin.setLeft(qMax(inheritedMargin.left(), thisMargin.left()));
     mForcedMargin.setBottom(qMax(inheritedMargin.bottom(), thisMargin.bottom()));
@@ -438,8 +438,8 @@ Property* ContainerBox::ca_findPropertyWithPath(
 }
 
 void ContainerBox::shiftAll(const int shift) {
-    if(hasDurationRectangle()) {
-        mDurationRectangle->changeFramePosBy(shift);
+    if(const auto durRect = getDurationRectangle()) {
+        durRect->changeFramePosBy(shift);
     } else {
         anim_shiftAllKeys(shift);
         for(const auto& box : mContained) {
@@ -484,7 +484,8 @@ FrameRange ContainerBox::prp_getIdenticalRelRange(const int relFrame) const {
 FrameRange ContainerBox::getFirstAndLastIdenticalForMotionBlur(
         const int relFrame, const bool takeAncestorsIntoAccount) {
     FrameRange range{FrameRange::EMIN, FrameRange::EMAX};
-    if(mVisible) {
+    if(isVisible()) {
+        const auto durRect = getDurationRectangle();
         if(isFrameInDurationRect(relFrame)) {
             QList<Property*> propertiesT;
             getMotionBlurProperties(propertiesT);
@@ -501,22 +502,21 @@ FrameRange ContainerBox::getFirstAndLastIdenticalForMotionBlur(
                 range *= childRange;
             }
 
-            if(mDurationRectangle) {
-                range *= mDurationRectangle->getRelFrameRange();
-            }
+            if(durRect) range *= durRect->getRelFrameRange();
         } else {
-            if(relFrame > mDurationRectangle->getMaxRelFrame()) {
-                range = mDurationRectangle->getRelFrameRangeToTheRight();
-            } else if(relFrame < mDurationRectangle->getMinRelFrame()) {
-                range = mDurationRectangle->getRelFrameRangeToTheLeft();
+            if(relFrame > durRect->getMaxRelFrame()) {
+                range = durRect->getRelFrameRangeToTheRight();
+            } else if(relFrame < durRect->getMinRelFrame()) {
+                range = durRect->getRelFrameRangeToTheLeft();
             }
         }
     }
-    if(!mParentGroup || takeAncestorsIntoAccount) return range;
+    const auto parent = getParentGroup();
+    if(!parent || takeAncestorsIntoAccount) return range;
     if(range.isUnary()) return range;
-    int parentRel = mParentGroup->prp_absFrameToRelFrame(
+    int parentRel = parent->prp_absFrameToRelFrame(
                 prp_relFrameToAbsFrame(relFrame));
-    auto parentRange = mParentGroup->BoundingBox::getFirstAndLastIdenticalForMotionBlur(parentRel);
+    auto parentRange = parent->BoundingBox::getFirstAndLastIdenticalForMotionBlur(parentRel);
     return range*parentRange;
 }
 
@@ -541,7 +541,7 @@ void ContainerBox::setIsCurrentGroup_k(const bool bT) {
     mIsCurrentGroup = bT;
     setDescendantCurrentGroup(bT);
     if(!bT) {
-        if(mContained.isEmpty() && mParentGroup) {
+        if(mContained.isEmpty() && getParentGroup()) {
             removeFromParent_k();
         }
     }
@@ -567,8 +567,9 @@ bool ContainerBox::isDescendantCurrentGroup() const {
 void ContainerBox::setDescendantCurrentGroup(const bool bT) {
     mIsDescendantCurrentGroup = bT;
     if(!bT) planUpdate(UpdateReason::userChange);
-    if(!mParentGroup) return;
-    mParentGroup->setDescendantCurrentGroup(bT);
+    const auto parent = getParentGroup();
+    if(!parent) return;
+    parent->setDescendantCurrentGroup(bT);
 }
 
 BoundingBox *ContainerBox::getBoxAtFromAllDescendents(const QPointF &absPos) {
@@ -605,11 +606,12 @@ void ContainerBox::ungroupKeepTransform_k() {
 }
 
 void ContainerBox::ungroupAbandomTransform_k() {
+    const auto parent = getParentGroup();
     for(int i = mContained.count() - 1; i >= 0; i--) {
         auto box = mContained.at(i);
         if(enve_cast<BlendEffectBoxShadow*>(box.get())) continue;
         removeContained(box);
-        mParentGroup->addContained(box);
+        parent->addContained(box);
     }
     removeFromParent_k();
 }
@@ -921,14 +923,15 @@ bool ContainerBox::diffsAffectingContainedBoxes(
         const int relFrame1, const int relFrame2) {
     const auto idRange = BoundingBox::prp_getIdenticalRelRange(relFrame1);
     const bool diffThis = !idRange.inRange(relFrame2);
-    if(mParentGroup == nullptr || diffThis) return diffThis;
+    const auto parent = getParentGroup();
+    if(!parent || diffThis) return diffThis;
     const int absFrame1 = prp_relFrameToAbsFrame(relFrame1);
     const int absFrame2 = prp_relFrameToAbsFrame(relFrame2);
-    const int parentRelFrame1 = mParentGroup->prp_absFrameToRelFrame(absFrame1);
-    const int parentRelFrame2 = mParentGroup->prp_absFrameToRelFrame(absFrame2);
+    const int parentRelFrame1 = parent->prp_absFrameToRelFrame(absFrame1);
+    const int parentRelFrame2 = parent->prp_absFrameToRelFrame(absFrame2);
 
     const bool diffInherited =
-            mParentGroup->diffsAffectingContainedBoxes(
+            parent->diffsAffectingContainedBoxes(
                 parentRelFrame1, parentRelFrame2);
     return diffThis || diffInherited;
 }
@@ -1128,7 +1131,7 @@ qsptr<eBoxOrSound> ContainerBox::takeContained_k(const int id) {
 
 void ContainerBox::removeContained_k(const qsptr<eBoxOrSound> &child) {
     removeContained(child);
-    if(mContained.isEmpty() && mParentGroup) {
+    if(mContained.isEmpty() && getParentGroup()) {
         removeFromParent_k();
     }
 }

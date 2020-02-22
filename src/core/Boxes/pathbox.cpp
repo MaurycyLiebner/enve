@@ -31,6 +31,8 @@
 #include "PathEffects/patheffectstask.h"
 #include "Private/Tasks/taskscheduler.h"
 #include "clipboardcontainer.h"
+#include "circle.h"
+#include "Boxes/smartvectorpath.h"
 
 PathBox::PathBox(const QString &name, const eBoxType type) :
     BoxWithPathEffects(name, type) {
@@ -296,15 +298,12 @@ bool PathBox::differenceInOutlinePathBetweenFrames(const int frame1, const int f
     return BoxWithPathEffects::differenceInOutlinePathBetweenFrames(frame1, frame2);
 }
 
-#include "circle.h"
-#include "Boxes/smartvectorpath.h"
-
 SmartVectorPath *PathBox::objectToVectorPathBox() {
     if(enve_cast<SmartVectorPath*>(this)) return nullptr;
     const auto newPath = enve::make_shared<SmartVectorPath>();
     newPath->loadSkPath(mEditPathSk);
     copyPathBoxDataTo(newPath.get());
-    mParentGroup->addContained(newPath);
+    getParentGroup()->addContained(newPath);
     return newPath.get();
 }
 
@@ -313,7 +312,7 @@ SmartVectorPath *PathBox::strokeToVectorPathBox() {
     const auto newPath = enve::make_shared<SmartVectorPath>();
     newPath->loadSkPath(mOutlinePathSk);
     copyPathBoxDataTo(newPath.get());
-    mParentGroup->addContained(newPath);
+    getParentGroup()->addContained(newPath);
     return newPath.get();
 }
 
@@ -323,10 +322,9 @@ SculptPathBox *PathBox::objectToSculptPathBox() {
     PropertyClipboard::sCopyAndPaste(mFillSettings.get(),
                                      newPath->getFillSettings());
     copyBoundingBoxDataTo(newPath.get());
-    mParentGroup->addContained(newPath);
+    getParentGroup()->addContained(newPath);
     return newPath.get();
 }
-
 
 SkPath PathBox::getAbsolutePath(const qreal relFrame) const {
     SkPath result;

@@ -16,20 +16,18 @@
 
 #include "evideosound.h"
 
-#include "Boxes/videobox.h"
+#include "ReadWrite/basicreadwrite.h"
 
 eVideoSound::eVideoSound(const qsptr<FixedLenAnimationRect> &durRect) :
-    eSoundObjectBase(durRect) {
+    eSoundObjectBase(durRect) {}
 
-}
-
-#include "ReadWrite/basicreadwrite.h"
 void eVideoSound::prp_writeProperty(eWriteStream& dst) const {
     StaticComplexAnimator::prp_writeProperty(dst);
-    dst << mVisible;
+    dst << isVisible();
 }
 
 void eVideoSound::prp_readProperty(eReadStream& src) {
     StaticComplexAnimator::prp_readProperty(src);
-    src >> mVisible;
+    bool visible; src >> visible;
+    setVisible(visible);
 }

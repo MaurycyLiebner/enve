@@ -34,8 +34,7 @@ AnimationBox::AnimationBox(const QString &name, const eBoxType type) :
     connect(this, &eBoxOrSound::parentChanged,
             this, &AnimationBox::updateDurationRectangleAnimationRange);
 
-    setDurationRectangle(enve::make_shared<FixedLenAnimationRect>(*this));
-    mDurationRectangleLocked = true;
+    setDurationRectangle(enve::make_shared<FixedLenAnimationRect>(*this), true);
 
     mFrameRemapping = enve::make_shared<IntFrameRemapping>();
     ca_prependChild(mRasterEffectsAnimators.get(), mFrameRemapping);
@@ -46,7 +45,7 @@ AnimationBox::AnimationBox(const QString &name, const eBoxType type) :
 }
 
 FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() const {
-    return static_cast<FixedLenAnimationRect*>(mDurationRectangle.get());
+    return static_cast<FixedLenAnimationRect*>(getDurationRectangle());
 }
 
 void AnimationBox::updateDurationRectangleAnimationRange() {
@@ -65,9 +64,7 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
 }
 
 void AnimationBox::animationDataChanged() {
-    //if(mParentGroup) {
     updateDurationRectangleAnimationRange();
-    //}
     if(mFrameRemapping->enabled()) {
         int frameCount;
         if(mSrcFramesCache) frameCount = mSrcFramesCache->getFrameCount();

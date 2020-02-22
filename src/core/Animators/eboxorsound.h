@@ -64,7 +64,8 @@ public:
             const FrameRange &absFrameRange, const int rowHeight) const;
 
     void setDurationRectangle(const qsptr<DurationRectangle> &durationRect,
-                              const bool addUndoRedo = true);
+                              const bool lock = false);
+    bool durationRectangleLocked() const;
     bool hasDurationRectangle() const;
     void createDurationRectangle();
     bool isVisibleAndInVisibleDurationRect() const;
@@ -116,23 +117,22 @@ public:
     int getZIndex() const { return mZListIndex; }
 
     void rename(const QString& newName);
-private:
-protected:
-    bool mSelected = false;
-    bool mInVisibleRange = true;
-    bool mVisible = true;
-    bool mLocked = false;
-    int mZListIndex = 0;
-    ContainerBox* mParentGroup = nullptr;
-
-    bool mDurationRectangleLocked = false;
-    qsptr<DurationRectangle> mDurationRectangle;
 signals:
     void parentChanged(ContainerBox*);
     void aboutToChangeAncestor();
     void selectionChanged(bool);
     void visibilityChanged(bool);
     void lockedChanged(bool);
+private:
+    bool mSelected = false;
+    bool mVisible = true;
+    bool mLocked = false;
+    int mZListIndex = 0;
+
+    bool mDurationRectangleLocked = false;
+    qsptr<DurationRectangle> mDurationRectangle;
+
+    ContainerBox* mParentGroup = nullptr;
 };
 
 #endif // EBOXORSOUND_H

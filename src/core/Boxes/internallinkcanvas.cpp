@@ -71,7 +71,7 @@ void InternalLinkCanvas::setupRenderData(const qreal relFrame,
     //qreal res = mParentScene->getResolutionFraction();
     canvasData->fCanvasHeight = canvasTarget->getCanvasHeight();//*res;
     canvasData->fCanvasWidth = canvasTarget->getCanvasWidth();//*res;
-    if(mParentGroup->isLink()) {
+    if(getParentGroup()->isLink()) {
         const auto ilc = static_cast<InternalLinkCanvas*>(getLinkTarget());
         canvasData->fClipToCanvas = ilc->clipToCanvas();
     } else {

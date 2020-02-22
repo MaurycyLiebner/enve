@@ -30,15 +30,14 @@ void Animator::anim_scaleTime(const int pivotAbsFrame, const qreal scale) {
     }
 }
 
-void Animator::anim_shiftAllKeys(const int shift, const bool addUndoRedo) {
+void Animator::anim_shiftAllKeys(const int shift) {
     QList<Key*> keys;
     for(const auto& key : anim_mKeys) {
         keys << key;
     }
     for(const auto key : keys) {
         const int targetFrame = key->getRelFrame() + shift;
-        if(addUndoRedo) key->moveToRelFrameAction(targetFrame);
-        else key->moveToRelFrame(targetFrame);
+        key->moveToRelFrameAction(targetFrame);
     }
 }
 
