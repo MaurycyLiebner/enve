@@ -177,26 +177,23 @@ void eBoxOrSound::setDurationRectangle(
         const qsptr<DurationRectangle>& durationRect,
         const bool lock) {
     Q_ASSERT(!mDurationRectangleLocked);
-    if(durationRect == mDurationRectangle) return;
+    if(mDurationRectangle == durationRect) return;
     if(mDurationRectangleLocked) return;
     if(lock) mDurationRectangleLocked = true;
-    if(mDurationRectangle) {
-        disconnect(mDurationRectangle.data(), nullptr, this, nullptr);
-    }
     const FrameRange oldRange = mDurationRectangle ?
                 mDurationRectangle->getAbsFrameRange() :
                 FrameRange{FrameRange::EMIN, FrameRange::EMAX};
     const FrameRange newRange = durationRect ?
                 durationRect->getAbsFrameRange() :
                 FrameRange{FrameRange::EMIN, FrameRange::EMAX};
-    const auto oldDurRect = mDurationRectangle;
-    mDurationRectangle = durationRect;
+    const auto oldDurRect = mDurationRectangle.sptr();
+    auto& conn = mDurationRectangle.assign(durationRect);
     prp_afterFrameShiftChanged(oldRange, newRange);
 
     {
         UndoRedo ur;
-        ur.fUndo = [this]() {
-            setDurationRectangle(nullptr);
+        ur.fUndo = [this, oldDurRect]() {
+            setDurationRectangle(oldDurRect);
         };
         ur.fRedo = [this, durationRect]() {
             setDurationRectangle(durationRect);
@@ -204,25 +201,24 @@ void eBoxOrSound::setDurationRectangle(
         prp_addUndoRedo(ur);
     }
 
-    if(!mDurationRectangle)
-        return anim_shiftAllKeys(oldDurRect->getRelShift());
-    if(mDurationRectangle->getRelShift() != 0)
-        anim_shiftAllKeys(-mDurationRectangle->getRelShift());
+    if(!durationRect) return anim_shiftAllKeys(oldDurRect->getRelShift());
+    if(durationRect->getRelShift() != 0)
+        anim_shiftAllKeys(-durationRect->getRelShift());
 
-    connect(mDurationRectangle.data(), &DurationRectangle::shiftChanged,
+    conn << connect(durationRect.data(), &DurationRectangle::shiftChanged,
             this, [this](const int oldShift, const int newShift) {
         const auto newRange = prp_absInfluenceRange();
         const auto oldRange = newRange.shifted(oldShift - newShift);
         prp_afterFrameShiftChanged(oldRange, newRange);
     });
 
-    connect(mDurationRectangle.data(), &DurationRectangle::minRelFrameChanged,
+    conn << connect(durationRect.data(), &DurationRectangle::minRelFrameChanged,
             this, [this](const int oldMin, const int newMin) {
         const int min = qMin(newMin, oldMin);
         const int max = qMax(newMin, oldMin);
         prp_afterChangedRelRange(FrameRange{min, max}.adjusted(-1, 1), false);
     });
-    connect(mDurationRectangle.data(), &DurationRectangle::maxRelFrameChanged,
+    conn << connect(durationRect.data(), &DurationRectangle::maxRelFrameChanged,
             this, [this](const int oldMax, const int newMax) {
         const int min = qMin(newMax, oldMax);
         const int max = qMax(newMax, oldMax);

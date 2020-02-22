@@ -130,7 +130,7 @@ private:
     int mZListIndex = 0;
 
     bool mDurationRectangleLocked = false;
-    qsptr<DurationRectangle> mDurationRectangle;
+    ConnContextQSPtr<DurationRectangle> mDurationRectangle;
 
     ContainerBox* mParentGroup = nullptr;
 };

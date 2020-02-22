@@ -22,6 +22,7 @@
 template <typename T>
 class ConnContextPtr {
 public:
+    bool operator==(T* const t) const { return mPtr == t;}
     T* operator->() const { return mPtr; }
     operator T*() const { return mPtr; }
     operator bool() const { return mPtr; }
@@ -41,12 +42,18 @@ private:
 template <typename T>
 class ConnContextQPtr {
 public:
+    bool operator==(T* const t) const { return mPtr == t; }
+    bool operator==(const QPointer<T>& t) const { return mPtr == t; }
+
     T* operator->() const { return mPtr; }
     operator T*() const { return mPtr; }
     operator bool() const { return mPtr; }
     T* operator*() const { return mPtr; }
     ConnContext& operator<<(const QMetaObject::Connection& connection)
     { return mConnContext << connection; }
+
+    T* data() const { return mPtr.data(); }
+    T* get() const { return mPtr.data(); }
 
     ConnContext& assign(T* const ptr) {
         mPtr = ptr;
@@ -61,12 +68,18 @@ private:
 template <typename T>
 class ConnContextQSPtr {
 public:
+    bool operator==(T* const t) const { return mPtr == t;}
+    bool operator==(const QSharedPointer<T>& t) const { return mPtr == t; }
+
     T* operator->() const { return mPtr.get(); }
     operator T*() const { return mPtr.get(); }
     operator bool() const { return mPtr; }
     T* operator*() const { return mPtr.get(); }
     ConnContext& operator<<(const QMetaObject::Connection& connection)
     { return mConnContext << connection; }
+
+    T* data() const { return mPtr.data(); }
+    T* get() const { return mPtr.data(); }
 
     ConnContext& assign(const QSharedPointer<T>& ptr) {
         mPtr = ptr;
