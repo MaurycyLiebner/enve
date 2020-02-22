@@ -34,7 +34,7 @@ void ImageRenderData::setupRenderData() {
 
 void ImageRenderData::setupDirectDraw() {
     fBaseMargin = QMargins();
-    updateRelBoundingRect();
+    dataSet();
     updateGlobalRect();
     fRenderTransform.reset();
     fRenderTransform.translate(fRelBoundingRect.x(), fRelBoundingRect.y());
