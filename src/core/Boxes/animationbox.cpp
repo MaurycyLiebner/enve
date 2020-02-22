@@ -166,23 +166,26 @@ public:
     void process() {
         if(!mCplxTask) return;
         if(!mBox || !mSrc) return mCplxTask->cancel();
-        for(; i <= mIMax; i += mIncrement) {
-            const int relFrame = mFirstRelFrame + i;
-            const int absFrame = mFirstAbsFrame + i;
+        for(; mI <= mIMax; mI += mIncrement) {
+            const int relFrame = mFirstRelFrame + mI;
+            const int absFrame = mFirstAbsFrame + mI;
             const int animFrame = mBox->getAnimationFrameForRelFrame(relFrame);
             const auto task = mSrc->scheduleFrameLoad(animFrame);
             if(task) {
-                mCplxTask->addPlannedTask(task->ref<eTask>());
+                mCplxTask->addTask(task->ref<eTask>());
                 const QPointer<AnimationToPaint> ptr = this;
-                task->addDependent({[ptr, animFrame, absFrame]() {
+                const QPointer<ComplexTask> cplxPtr = mCplxTask;
+                const int i = mI;
+                task->addDependent({[ptr, cplxPtr, animFrame, absFrame, i]() {
                     if(!ptr) return;
                     ptr->mLoader(animFrame, absFrame);
                     ptr->process();
+                    if(cplxPtr) cplxPtr->setValue(i);
                 }, mCancel});
                 break;
             } else {
                 mLoader(animFrame, absFrame);
-                mCplxTask->removePlannedTasks(1);
+                mCplxTask->setValue(mI);
             }
         }
     }
@@ -198,7 +201,7 @@ private:
     const Loader mLoader;
     const std::function<void()> mCancel;
 
-    int i = 0;
+    int mI = 0;
 };
 
 void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
@@ -268,7 +271,7 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
         const int firstRelFrame = box->prp_absFrameToRelFrame(firstAbsFrame);
         const int iMax = lastAbsFrame - firstAbsFrame;
         const auto complexTask = QSharedPointer<ComplexTask>(
-                    new ComplexTask("Video to Paint"));
+                    new ComplexTask(iMax, "Video to Paint"));
         const auto cancel = [complexTask]() {
             complexTask->cancel();
         };
@@ -278,14 +281,15 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
                     box, src, complexTask.get(), loader, cancel,
                     complexTask.get());
 
-        complexTask->addPlannedTasks(iMax/increment);
         taskCreator->process();
 
-        if(complexTask->count() > 0) {
+        if(complexTask->done()) {
+            adder();
+        } else {
             connect(complexTask.get(), &ComplexTask::finishedAll,
                     paintObj.get(), adder);
             TaskScheduler::sInstance->addComplexTask(complexTask);
-        } else adder();
+        }
     };
     menu->addPlainAction("Create Paint Object...", createPaintObj);
 

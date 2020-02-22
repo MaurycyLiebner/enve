@@ -16,33 +16,15 @@
 
 #include "complextask.h"
 
-ComplexTask::ComplexTask(const QString &name) : mName(name) {}
-
-void ComplexTask::addPlannedTasks(const int tasks) {
-    mPlannedCount += tasks;
-}
-
-void ComplexTask::removePlannedTasks(const int tasks) {
-    mPlannedCount -= tasks;
-    finishedEmitters();
-}
-
-void ComplexTask::addPlannedTask(const stdsptr<eTask> &task) {
-    mPlannedCount--;
-    addTask(task);
-}
+ComplexTask::ComplexTask(const int finishValue, const QString &name) :
+    mFinishValue(finishValue), mName(name) {}
 
 void ComplexTask::addTask(const stdsptr<eTask> &task) {
-    const qptr<ComplexTask> ptr = this;
-    const auto finishedInc = [ptr]() {
-        if(ptr) ptr->incFinished();
-    };
     mTasks << task;
-    task->addDependent({finishedInc, finishedInc});
 }
 
 void ComplexTask::cancel() {
-    if(mDone || !mStarted) return;
+    if(mDone) return;
     mDone = true;
     for(const auto& task : mTasks) {
         const eTaskState state = task->getState();
@@ -51,22 +33,16 @@ void ComplexTask::cancel() {
     emit canceled();
 }
 
-int ComplexTask::count() const { return mTasks.count() + mPlannedCount; }
-
-const QString &ComplexTask::name() const { return mName; }
-
-int ComplexTask::finishedCount() const { return mFinishedCount; }
+void ComplexTask::setValue(const int value) {
+    mValue = value;
+    finishedEmitters();
+}
 
 void ComplexTask::finishedEmitters() {
-    if(mDone || !mStarted) return;
-    emit finished(mFinishedCount);
-    if(mFinishedCount >= count()) {
+    if(mDone) return;
+    emit finished(mValue);
+    if(mValue >= finishValue()) {
         emit finishedAll();
         mDone = true;
     }
-}
-
-void ComplexTask::incFinished() {
-    mFinishedCount++;
-    finishedEmitters();
 }

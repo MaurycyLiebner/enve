@@ -56,8 +56,8 @@ public:
         auto& conn = mTask.assign(task);
         if(task) {
             mLabel->setText(task->name() + ":");
-            mProgress->setMaximum(task->count());
-            mProgress->setValue(task->finishedCount());
+            mProgress->setMaximum(task->finishValue());
+            mProgress->setValue(task->value());
             conn << connect(task, &ComplexTask::finished,
                             mProgress, &QProgressBar::setValue);
             conn << connect(task, &ComplexTask::finishedAll,

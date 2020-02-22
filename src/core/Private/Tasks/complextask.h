@@ -25,33 +25,27 @@ class ComplexTask : public QObject {
     Q_OBJECT
     friend class TaskScheduler;
 public:
-    ComplexTask(const QString& name);
+    ComplexTask(const int finishValue, const QString& name);
 
-    void addPlannedTasks(const int tasks);
-    void removePlannedTasks(const int tasks);
-    void addPlannedTask(const stdsptr<eTask>& task);
     void addTask(const stdsptr<eTask>& task);
 
     void cancel();
+    void setValue(const int value);
 
-    int count() const;
-    const QString& name() const;
-    int finishedCount() const;
-
-    bool done() const { return mDone; }
+    const QString& name() const { return mName; }
+    int finishValue() const { return mFinishValue; }
+    int value() const { return mValue; }
+    bool done() const { return mDone || mFinishValue <= mValue; }
 signals:
-    void finished(const int nFinished);
+    void finished(const int value);
     void finishedAll();
     void canceled();
 private:
-    void start() { mStarted = true; }
     void finishedEmitters();
-    void incFinished();
 
-    bool mStarted = false;
     bool mDone = false;
-    int mPlannedCount = 0;
-    int mFinishedCount = 0;
+    int mFinishValue = 0;
+    int mValue = 0;
     const QString mName;
     QList<stdsptr<eTask>> mTasks;
 };

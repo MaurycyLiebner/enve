@@ -239,7 +239,6 @@ void TaskScheduler::afterCpuGpuTaskFinished() {
 
 void TaskScheduler::addComplexTask(const qsptr<ComplexTask> &task) {
     if(task->done()) return;
-    task->start();
     mComplexTasks << task;
     const QWeakPointer<ComplexTask> taskPtr = task;
     const auto deleter = [this, taskPtr]() {
