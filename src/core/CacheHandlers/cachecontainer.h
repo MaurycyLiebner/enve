@@ -22,6 +22,7 @@ class CacheContainer : public StdSelfRef {
     friend class UsePointerBase;
     friend class UsedRange;
     friend class MemoryHandler;
+    friend class MemoryDataHandler;
 protected:
     CacheContainer();
 public:

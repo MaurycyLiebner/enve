@@ -31,9 +31,7 @@ public:
     void containerUpdated(CacheContainer * const cont);
 
     bool isEmpty() const { return mContainers.isEmpty(); }
-    CacheContainer* takeFirst() {
-        return mContainers.takeFirst();
-    }
+    CacheContainer* takeFirst();
 private:
     QList<CacheContainer*> mContainers;
 };

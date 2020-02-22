@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "memorydatahandler.h"
+#include "CacheHandlers/cachecontainer.h"
 
 MemoryDataHandler *MemoryDataHandler::sInstance = nullptr;
 
@@ -34,4 +35,10 @@ void MemoryDataHandler::removeContainer(CacheContainer * const cont) {
 void MemoryDataHandler::containerUpdated(CacheContainer * const cont) {
     removeContainer(cont);
     addContainer(cont);
+}
+
+CacheContainer *MemoryDataHandler::takeFirst() {
+    const auto cont = mContainers.takeFirst();
+    cont->mHandledByMemoryHandler = false;
+    return cont;
 }
