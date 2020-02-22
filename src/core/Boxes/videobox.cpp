@@ -58,61 +58,6 @@ VideoBox::VideoBox() : AnimationBox("Video", eBoxType::video),
             mSound.get(), &eBoxOrSound::setParentGroup);
 }
 
-void VideoBox::setupCanvasMenu(PropertyMenu * const menu) {
-    if(menu->hasActionsForType<VideoBox>()) return;
-    menu->addedActionsForType<VideoBox>();
-
-    const auto widget = menu->getParentWidget();
-    const PropertyMenu::PlainSelectedOp<VideoBox> createPaintObj =
-    [widget](VideoBox * box) {
-        const qptr<ContainerBox> parent = box->getParentGroup();
-        if(!parent) return;
-        bool ok = false;
-        const int frameStep = QInputDialog::getInt(
-                    widget, "Increment for " + box->prp_getName(),
-                    "Frame Increment:", 1, 0, 100, 1, &ok);
-        if(!ok) return;
-        const auto paintObj = enve::make_shared<PaintBox>();
-        const auto surface = paintObj->getSurface();
-        surface->anim_setRecording(true);
-        const auto src = box->mSrcFramesCache.get();
-        const int frameCount = src->getFrameCount();
-        const auto loader = [src, surface](const int i) {
-            const auto img = src->getFrameCopyAtFrame(i);
-            surface->anim_setAbsFrame(i);
-            surface->loadPixmap(img);
-        };
-        eTask* lastTask = nullptr;
-        for(int i = 0; i < frameCount; i += frameStep) {
-            const auto task = src->scheduleFrameLoad(i);
-            if(task) {
-                task->addDependent({[loader, i]() {
-                    loader(i);
-                }, nullptr});
-                lastTask = task;
-            } else {
-                loader(i);
-            }
-        }
-        box->copyBoundingBoxDataTo(paintObj.get());
-        const auto adder = [paintObj, parent]() {
-            if(!parent) return;
-            parent->addContained(paintObj);
-        };
-        if(lastTask) {
-            lastTask->addDependent({[adder]() {
-                adder();
-            }, nullptr});
-        } else {
-            adder();
-        }
-    };
-    menu->addPlainAction("Create Paint Object...", createPaintObj);
-    menu->addSeparator();
-
-    AnimationBox::setupCanvasMenu(menu);
-}
-
 void VideoBox::fileHandlerConnector(ConnContext &conn, VideoFileHandler *obj) {
     const auto newDataHandler = obj ? obj->getFrameHandler() : nullptr;
     if(newDataHandler) {

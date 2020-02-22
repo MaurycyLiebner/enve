@@ -28,8 +28,6 @@ class VideoBox : public AnimationBox {
 protected:
     VideoBox();
 public:
-    void setupCanvasMenu(PropertyMenu * const menu);
-
     void changeSourceFile();
 
     void writeBoundingBox(eWriteStream& dst) const;

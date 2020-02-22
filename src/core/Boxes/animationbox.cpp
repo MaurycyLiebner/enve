@@ -15,7 +15,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "animationbox.h"
+
 #include <QMenu>
+#include <QInputDialog>
+
 #include "canvas.h"
 #include "FileCacheHandlers/animationcachehandler.h"
 #include "imagebox.h"
@@ -23,6 +26,7 @@
 #include "Animators/qrealkey.h"
 #include "RasterEffects/rastereffectcollection.h"
 #include "frameremapping.h"
+#include "typemenu.h"
 
 AnimationBox::AnimationBox(const QString &name, const eBoxType type) :
     BoundingBox(name, type) {
@@ -141,8 +145,6 @@ FrameRange AnimationBox::prp_getIdenticalRelRange(const int relFrame) const {
     return BoundingBox::prp_getIdenticalRelRange(relFrame);
 }
 
-#include "typemenu.h"
-#include <QInputDialog>
 void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<AnimationBox>()) return;
     menu->addedActionsForType<AnimationBox>();
@@ -180,6 +182,54 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
         box->setStretch(stretch*0.01);
     };
     menu->addPlainAction("Stretch...", stretchOp);
+
+    menu->addSeparator();
+    const PropertyMenu::PlainSelectedOp<AnimationBox> createPaintObj =
+    [widget](AnimationBox * box) {
+        const qptr<ContainerBox> parent = box->getParentGroup();
+        if(!parent) return;
+        bool ok = false;
+        const int frameStep = QInputDialog::getInt(
+                    widget, "Increment for " + box->prp_getName(),
+                    "Frame Increment:", 1, 0, 100, 1, &ok);
+        if(!ok) return;
+        const auto paintObj = enve::make_shared<PaintBox>();
+        const auto surface = paintObj->getSurface();
+        surface->anim_setRecording(true);
+        const auto src = box->mSrcFramesCache.get();
+        const int frameCount = src->getFrameCount();
+        const auto loader = [src, surface](const int i) {
+            const auto img = src->getFrameCopyAtFrame(i);
+            surface->anim_setAbsFrame(i);
+            surface->loadPixmap(img);
+        };
+        eTask* lastTask = nullptr;
+        for(int i = 0; i < frameCount; i += frameStep) {
+            const auto task = src->scheduleFrameLoad(i);
+            if(task) {
+                task->addDependent({[loader, i]() {
+                    loader(i);
+                }, nullptr});
+                lastTask = task;
+            } else {
+                loader(i);
+            }
+        }
+        box->copyBoundingBoxDataTo(paintObj.get());
+        const auto adder = [paintObj, parent]() {
+            if(!parent) return;
+            parent->addContained(paintObj);
+        };
+        if(lastTask) {
+            lastTask->addDependent({[adder]() {
+                adder();
+            }, nullptr});
+        } else {
+            adder();
+        }
+    };
+    menu->addPlainAction("Create Paint Object...", createPaintObj);
+    menu->addSeparator();
 
     BoundingBox::setupCanvasMenu(menu);
 }
