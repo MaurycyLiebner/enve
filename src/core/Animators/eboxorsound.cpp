@@ -388,7 +388,10 @@ void eBoxOrSound::setVisible(const bool visible) {
     }
     mVisible = visible;
 
-    prp_afterWholeInfluenceRangeChanged();
+    if(hasDurationRectangle() && enve_cast<BoundingBox*>(this)) {
+        const auto updateRange = prp_absInfluenceRange().adjusted(-1, 1);
+        prp_afterChangedAbsRange(updateRange, false);
+    } else prp_afterWholeInfluenceRangeChanged();
 
     SWT_scheduleContentUpdate(SWT_BoxRule::visible);
     SWT_scheduleContentUpdate(SWT_BoxRule::hidden);
