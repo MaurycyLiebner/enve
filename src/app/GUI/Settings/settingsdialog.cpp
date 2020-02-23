@@ -6,6 +6,7 @@
 
 #include "performancesettingswidget.h"
 #include "timelinesettingswidget.h"
+#include "externalappssettingswidget.h"
 
 #include <QVBoxLayout>
 #include <QPushButton>
@@ -27,6 +28,9 @@ SettingsDialog::SettingsDialog(QWidget * const parent) :
 
     const auto timeline = new TimelineSettingsWidget(this);
     addSettingsWidget(timeline, "Timeline");
+
+    const auto external = new ExternalAppsSettingsWidget(this);
+    addSettingsWidget(external, "External Apps");
 
     mainLauout->addWidget(mTabWidget);
 

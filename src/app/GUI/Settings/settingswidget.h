@@ -22,6 +22,7 @@ public:
 protected:
     eSettings& mSett;
 private:
+    using QWidget::layout;
     QVBoxLayout* mMainLauout = nullptr;
 };
 

@@ -94,6 +94,11 @@ public:
     QColor fTimelineAlternateRowColor;
     bool fTimelineHighlightRow;
     QColor fTimelineHighlightRowColor;
+
+    // external applications
+    QString fGimp = "gimp";
+    QString fMyPaint = "mypaint";
+    QString fKrita = "krita";
 };
 
 #endif // SETTINGS_H

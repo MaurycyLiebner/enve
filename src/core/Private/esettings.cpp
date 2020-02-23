@@ -161,6 +161,10 @@ eSettings::eSettings(const int cpuThreads, const intKB ramKB,
                      fTimelineHighlightRowColor, "timelineHighlightRowColor",
                      QColor(255, 0, 0, 15));
 
+    gSettings << std::make_shared<eStringSetting>(fGimp, "gimp", "gimp");
+    gSettings << std::make_shared<eStringSetting>(fMyPaint, "mypaint", "mypaint");
+    gSettings << std::make_shared<eStringSetting>(fKrita, "krita", "krita");
+
     loadDefaults();
 }
 

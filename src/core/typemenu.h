@@ -101,6 +101,14 @@ public:
         return mQMenu->addSeparator();
     }
 
+    void setEnabled(const bool enabled) {
+        mQMenu->setEnabled(enabled);
+    }
+
+    void setVisible(const bool visible) {
+        mQMenu->setVisible(visible);
+    }
+
     bool isEmpty() {
         return mQMenu->isEmpty();
     }

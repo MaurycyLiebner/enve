@@ -18,6 +18,7 @@
 #include "canvas.h"
 #include "MovablePoints/animatedpoint.h"
 #include "Animators/transformanimator.h"
+#include "Private/esettings.h"
 
 PaintBox::PaintBox() : BoundingBox("Paint Box", eBoxType::paint) {
     mSurface = enve::make_shared<AnimatedSurface>();
@@ -67,7 +68,8 @@ stdsptr<BoxRenderData> PaintBox::createRenderData() {
 void PaintBox::setupCanvasMenu(PropertyMenu * const menu) {
     if(menu->hasActionsForType<PaintBox>()) return;
     menu->addedActionsForType<PaintBox>();
-    PropertyMenu::PlainSelectedOp<PaintBox> op = [](PaintBox * box) {
+
+    PropertyMenu::PlainSelectedOp<PaintBox> loadOp = [](PaintBox * box) {
         const QString filters = FileExtensions::imageFilters();
         const QString importPath = eDialogs::openFile(
                                         "Load From Image", QDir::homePath(),
@@ -79,7 +81,57 @@ void PaintBox::setupCanvasMenu(PropertyMenu * const menu) {
             }
         }
     };
-    menu->addPlainAction("Load From Image", op);
+    menu->addPlainAction("Load From Image", loadOp);
+
+    const auto editMenu = menu->addMenu("Edit");
+
+    const auto settings = eSettings::sInstance;
+
+    const auto editOp = [settings](PaintBox * box, const QString& app) {
+        if(!box) return;
+        QString exec;
+        if(app == "Gimp") {
+            exec = settings->fGimp;
+        } else if(app == "MyPaint") {
+            exec = settings->fMyPaint;
+        } else if(app == "Krita") {
+            exec = settings->fKrita;
+        } else return;
+        const QString check = exec + " --version";
+        const auto checker = new QProcess();
+        checker->start(check);
+        checker->waitForFinished(3000);
+        if(checker->exitStatus() != QProcess::NormalExit ||
+           checker->exitCode() != 0) {
+            gPrintException(false, "Could not open " + app + " using \"" + exec + "\".\n"
+                                   "Make sure the path to " + app + " executable is valid.");
+            return;
+        }
+
+    };
+
+    if(!settings->fGimp.isEmpty()) {
+        PropertyMenu::PlainSelectedOp<PaintBox> gimpOp = [editOp](PaintBox * box) {
+            editOp(box, "Gimp");
+        };
+        editMenu->addPlainAction("Gimp", gimpOp);
+    }
+
+    if(!settings->fMyPaint.isEmpty()) {
+        PropertyMenu::PlainSelectedOp<PaintBox> mypaintOp = [editOp](PaintBox * box) {
+            editOp(box, "MyPaint");
+        };
+        editMenu->addPlainAction("MyPaint", mypaintOp);
+    }
+
+    if(!settings->fKrita.isEmpty()) {
+        PropertyMenu::PlainSelectedOp<PaintBox> kritaOp = [editOp](PaintBox * box) {
+            editOp(box, "Krita");
+        };
+        editMenu->addPlainAction("Krita", kritaOp);
+    }
+
+    if(editMenu->isEmpty()) editMenu->setVisible(false);
 
     BoundingBox::setupCanvasMenu(menu);
 }

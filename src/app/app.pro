@@ -81,6 +81,7 @@ SOURCES += main.cpp\
     GUI/RenderWidgets/outputsettingsdialog.cpp \
     GUI/RenderWidgets/rendersettingsdialog.cpp \
     GUI/RenderWidgets/rendersettingsdisplaywidget.cpp \
+    GUI/Settings/externalappssettingswidget.cpp \
     GUI/Settings/performancesettingswidget.cpp \
     GUI/Settings/settingsdialog.cpp \
     GUI/Settings/settingswidget.cpp \
@@ -192,6 +193,7 @@ HEADERS  += \
     GUI/RenderWidgets/outputsettingsdialog.h \
     GUI/RenderWidgets/rendersettingsdialog.h \
     GUI/RenderWidgets/rendersettingsdisplaywidget.h \
+    GUI/Settings/externalappssettingswidget.h \
     GUI/Settings/performancesettingswidget.h \
     GUI/Settings/settingsdialog.h \
     GUI/Settings/settingswidget.h \
