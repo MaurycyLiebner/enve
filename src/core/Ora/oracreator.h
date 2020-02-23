@@ -14,15 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ORAPARSER_H
-#define ORAPARSER_H
+#ifndef CREATORORA_H
+#define CREATORORA_H
 
 #include "orastructure.h"
 
-namespace ImportORA {
-    std::shared_ptr<OraImage_Qt> readOraFileQImage(const QString &filename);
-    std::shared_ptr<OraImage_Sk> readOraFileSkImage(const QString &filename);
-    sk_sp<SkImage> loadContainedMerged(const QString &filename);
-}
+namespace CreatorOra {
+    void save(const QString& path, const OraImage_Qt& ora,
+              const bool mergeImages);
+};
 
-#endif // ORAPARSER_H
+#endif // CREATORORA_H

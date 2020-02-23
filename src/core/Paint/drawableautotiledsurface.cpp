@@ -92,6 +92,11 @@ void DrawableAutoTiledSurface::loadPixmap(const QImage &src) {
     updateTileBitmaps();
 }
 
+QImage DrawableAutoTiledSurface::toImage(const bool use16Bit,
+                                         const QMargins &margin) const {
+    return mSurface.toImage(use16Bit, margin);
+}
+
 void DrawableAutoTiledSurface::updateTileBitmaps() {
     updateTileDimensions();
     updateTileRecBitmaps(mSurface.tileBoundingRect());

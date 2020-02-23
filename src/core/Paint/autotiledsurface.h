@@ -103,6 +103,11 @@ public:
         return mAutoTilesData.toBitmap(margin);
     }
 
+    QImage toImage(const bool use16bit,
+                   const QMargins& margin = QMargins()) const {
+        return mAutoTilesData.toImage(use16bit, margin);
+    }
+
     QPoint zeroTilePos() const {
         return mAutoTilesData.zeroTilePos();
     }

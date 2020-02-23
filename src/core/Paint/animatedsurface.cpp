@@ -47,10 +47,21 @@ void AnimatedSurface::prp_afterChangedAbsRange(const FrameRange &range, const bo
     mFrameImagesCache.remove(relRange);
 }
 
+void AnimatedSurface::afterSurfaceChanged(DrawableAutoTiledSurface * const surface) {
+    if(!anim_hasKeys() && mCurrent_d == surface)
+        prp_afterWholeInfluenceRangeChanged();
+    for(const auto& key : anim_getKeys()) {
+        const auto& asKey = static_cast<ASKey*>(key);
+        if(&asKey->dSurface() != surface) continue;
+        anim_updateAfterChangedKey(key);
+        break;
+    }
+}
+
 template <typename T>
 void AnimatedSurface::loadPixmapT(const T &src) {
     const bool createNewFrame = anim_isRecording() &&
-                                !anim_getKeyOnCurrentFrame();
+            !anim_getKeyOnCurrentFrame();
     if(createNewFrame) newEmptyFrame();
     auto& target = mCurrent_d->surface();
     const bool undoRedo = getParentScene();

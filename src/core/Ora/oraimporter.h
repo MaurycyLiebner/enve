@@ -18,9 +18,9 @@
 #define ORAIMPORTER_H
 
 #include <QString>
-#include "skia/skiaincludes.h"
 
-#include "smartPointers/selfref.h"
+#include "../skia/skiaincludes.h"
+#include "../smartPointers/selfref.h"
 
 class ContainerBox;
 class Gradient;

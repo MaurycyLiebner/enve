@@ -14,15 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ORAPARSER_H
-#define ORAPARSER_H
+#ifndef ZIPFILESAVER_H
+#define ZIPFILESAVER_H
 
-#include "orastructure.h"
+#include <quazip/quazipfile.h>
 
-namespace ImportORA {
-    std::shared_ptr<OraImage_Qt> readOraFileQImage(const QString &filename);
-    std::shared_ptr<OraImage_Sk> readOraFileSkImage(const QString &filename);
-    sk_sp<SkImage> loadContainedMerged(const QString &filename);
-}
+#include "exceptions.h"
 
-#endif // ORAPARSER_H
+class ZipFileSaver {
+public:
+    ZipFileSaver();
+    ~ZipFileSaver() { mZip.close(); }
+
+
+    void setZipPath(const QString& path);
+
+    using Processor = std::function<void(QIODevice* const dst)>;
+    void process(const QString& file, const bool text,
+                 const Processor& func);
+private:
+    QuaZip mZip;
+    QuaZipFile mFile;
+};
+
+#endif // ZIPFILESAVER_H

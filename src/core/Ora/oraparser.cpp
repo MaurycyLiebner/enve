@@ -16,6 +16,8 @@
 
 #include "oraparser.h"
 
+#include <QtXml/QDomDocument>
+
 #include "zipfileloader.h"
 
 SkBlendMode compositeOpToBlendMode(const QString& compOpStr) {
@@ -96,6 +98,9 @@ void parseOraElementAttributes(OraElement& oraEle,
 
     const QString compOpStr = domEle.attribute("composite-op");
     oraEle.fBlend = compositeOpToBlendMode(compOpStr);
+
+    const QString selectedStr = domEle.attribute("selected");
+    oraEle.fSelected = selectedStr == "true";
 }
 
 template <typename OraLayerPNG_XX,

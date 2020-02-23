@@ -195,6 +195,8 @@ public:
         }
     }
 
+    void afterSurfaceChanged(DrawableAutoTiledSurface* const surface);
+
     DrawableAutoTiledSurface * getCurrentSurface() {
         return mCurrent_d;
     }

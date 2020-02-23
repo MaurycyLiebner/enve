@@ -78,6 +78,9 @@ public:
     void loadPixmap(const SkPixmap& src);
     void loadPixmap(const QImage &src);
 
+    QImage toImage(const bool use16Bit,
+                   const QMargins &margin = QMargins()) const;
+
     void updateTileBitmaps();
 
     void clearBitmaps();
@@ -91,6 +94,12 @@ public:
 
     void crop(const QRect& crop);
     void move(const int dx, const int dy);
+
+    QPoint zeroTile() const
+    { return QPoint(mZeroTileCol, mZeroTileRow); }
+
+    QPoint zeroTilePos() const
+    { return zeroTile()*TILE_SIZE; }
 private:
     void removeFirstColumn();
     void removeLastColumn();
@@ -124,11 +133,6 @@ private:
     SkBitmap bitmapForTile(const int tx, const int ty) const;
     SkBitmap imageForTileId(const int colId, const int rowId) const;
 
-    QPoint zeroTile() const
-    { return QPoint(mZeroTileCol, mZeroTileRow); }
-
-    QPoint zeroTilePos() const
-    { return zeroTile()*TILE_SIZE; }
 
     QRect tileBoundingRect() const;
     QRect tileRectToPixRect(const QRect& tileRect) const;

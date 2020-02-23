@@ -19,6 +19,10 @@
 #include "MovablePoints/animatedpoint.h"
 #include "Animators/transformanimator.h"
 #include "Private/esettings.h"
+#include "Private/document.h"
+#include "Ora/oracreator.h"
+#include "Ora/oraparser.h"
+#include "Paint/externalpaintapphandler.h"
 
 PaintBox::PaintBox() : BoundingBox("Paint Box", eBoxType::paint) {
     mSurface = enve::make_shared<AnimatedSurface>();
@@ -85,48 +89,33 @@ void PaintBox::setupCanvasMenu(PropertyMenu * const menu) {
 
     const auto editMenu = menu->addMenu("Edit");
 
-    const auto settings = eSettings::sInstance;
-
-    const auto editOp = [settings](PaintBox * box, const QString& app) {
+    const auto editOp = [](PaintBox * box, const ExternalPaintAppHandler::App app) {
         if(!box) return;
-        QString exec;
-        if(app == "Gimp") {
-            exec = settings->fGimp;
-        } else if(app == "MyPaint") {
-            exec = settings->fMyPaint;
-        } else if(app == "Krita") {
-            exec = settings->fKrita;
-        } else return;
-        const QString check = exec + " --version";
-        const auto checker = new QProcess();
-        checker->start(check);
-        checker->waitForFinished(3000);
-        if(checker->exitStatus() != QProcess::NormalExit ||
-           checker->exitCode() != 0) {
-            gPrintException(false, "Could not open " + app + " using \"" + exec + "\".\n"
-                                   "Make sure the path to " + app + " executable is valid.");
-            return;
-        }
-
+        const auto handler = new ExternalPaintAppHandler(app);
+        const auto aSurface = box->getSurface();
+        QString layerName = box->prp_getName();
+        layerName.replace(' ', '_');
+        handler->setupFor(aSurface, layerName);
     };
 
+    const auto settings = eSettings::sInstance;
     if(!settings->fGimp.isEmpty()) {
         PropertyMenu::PlainSelectedOp<PaintBox> gimpOp = [editOp](PaintBox * box) {
-            editOp(box, "Gimp");
+            editOp(box, ExternalPaintAppHandler::gimp);
         };
         editMenu->addPlainAction("Gimp", gimpOp);
     }
 
     if(!settings->fMyPaint.isEmpty()) {
         PropertyMenu::PlainSelectedOp<PaintBox> mypaintOp = [editOp](PaintBox * box) {
-            editOp(box, "MyPaint");
+            editOp(box, ExternalPaintAppHandler::mypaint);
         };
         editMenu->addPlainAction("MyPaint", mypaintOp);
     }
 
     if(!settings->fKrita.isEmpty()) {
         PropertyMenu::PlainSelectedOp<PaintBox> kritaOp = [editOp](PaintBox * box) {
-            editOp(box, "Krita");
+            editOp(box, ExternalPaintAppHandler::krita);
         };
         editMenu->addPlainAction("Krita", kritaOp);
     }

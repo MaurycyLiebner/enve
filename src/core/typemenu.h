@@ -146,7 +146,11 @@ private:
                        const U& op) {
         const auto targetCanvas = mTargetCanvas;
         const auto canvasOp = [op, targetCanvas]() {
-            targetCanvas->execOpOnSelectedBoxes(op);
+            try {
+                targetCanvas->execOpOnSelectedBoxes(op);
+            } catch(const std::exception& e) {
+                gPrintExceptionCritical(e);
+            }
         };
         QObject::connect(qAction, &QAction::triggered, canvasOp);
     }
@@ -156,7 +160,11 @@ private:
                        const U& op) {
         const auto targetCanvas = mTargetCanvas;
         const auto canvasOp = [op, targetCanvas]() {
-            targetCanvas->execOpOnSelectedPoints(op);
+            try {
+                targetCanvas->execOpOnSelectedPoints(op);
+            } catch(const std::exception& e) {
+                gPrintExceptionCritical(e);
+            }
         };
         QObject::connect(qAction, &QAction::triggered, canvasOp);
     }
@@ -166,7 +174,11 @@ private:
                        const U& op) {
         const auto targetCanvas = mTargetCanvas;
         const auto canvasOp = [op, targetCanvas]() {
-            targetCanvas->execOpOnSelectedProperties(op);
+            try {
+                targetCanvas->execOpOnSelectedProperties(op);
+            } catch(const std::exception& e) {
+                gPrintExceptionCritical(e);
+            }
         };
         QObject::connect(qAction, &QAction::triggered, canvasOp);
     }

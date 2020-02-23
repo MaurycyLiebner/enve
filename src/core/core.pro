@@ -192,6 +192,7 @@ SOURCES += \
     GUI/valueinput.cpp \
     MovablePoints/gradientpoint.cpp \
     MovablePoints/pathpivot.cpp \
+    Ora/oracreator.cpp \
     Ora/oraimporter.cpp \
     Ora/oraparser.cpp \
     Paint/animatedsurface.cpp \
@@ -203,6 +204,7 @@ SOURCES += \
     Paint/brushstrokeset.cpp \
     Paint/colorconversions.cpp \
     Paint/drawableautotiledsurface.cpp \
+    Paint/externalpaintapphandler.cpp \
     Paint/onionskin.cpp \
     Paint/painttarget.cpp \
     Paint/simplebrushwrapper.cpp \
@@ -367,7 +369,8 @@ SOURCES += \
     MovablePoints/pathpointshandler.cpp \
     canvasbase.cpp \
     typemenu.cpp \
-    zipfileloader.cpp
+    zipfileloader.cpp \
+    zipfilesaver.cpp
 
 HEADERS += \
     Animators/Expressions/expressioncomplex.h \
@@ -496,6 +499,7 @@ HEADERS += \
     GUI/valueinput.h \
     MovablePoints/gradientpoint.h \
     MovablePoints/pathpivot.h \
+    Ora/oracreator.h \
     Ora/oraimporter.h \
     Ora/oraparser.h \
     Ora/orastructure.h \
@@ -508,6 +512,7 @@ HEADERS += \
     Paint/brushstrokeset.h \
     Paint/colorconversions.h \
     Paint/drawableautotiledsurface.h \
+    Paint/externalpaintapphandler.h \
     Paint/onionskin.h \
     Paint/painttarget.h \
     Paint/simplebrushwrapper.h \
@@ -687,7 +692,8 @@ HEADERS += \
     canvasbase.h \
     typemenu.h \
     pointtypemenu.h \
-    zipfileloader.h
+    zipfileloader.h \
+    zipfilesaver.h
 
 unix {
     target.path = /usr/lib

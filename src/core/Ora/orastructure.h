@@ -20,7 +20,7 @@
 #include <QString>
 #include <QImage>
 
-#include "skia/skiaincludes.h"
+#include "../skia/skiaincludes.h"
 
 enum class OraElementType {
     image,
@@ -41,6 +41,7 @@ struct OraElement {
     qreal fOpacity = 1;
     bool fLocked = false;
     bool fVisible = true;
+    bool fSelected = false;
     SkBlendMode fBlend = SkBlendMode::kSrcOver;
     const OraElementType fType;
 };
@@ -80,6 +81,14 @@ struct OraStack : public OraElement {
     OraStack(const QString& name, const OraElementType type) :
         OraElement(name, type) {}
     OraStack() : OraStack("Layer", OraElementType::stack) {}
+
+    using Finder = std::function<bool(OraElement&)>;
+    //! @brief Break after finder returns true
+    void findChildren(const Finder& finder) {
+        for(const auto& child : fChildren) {
+            if(finder(*child)) return;
+        }
+    }
 
     QList<std::shared_ptr<OraElement>> fChildren;
 };

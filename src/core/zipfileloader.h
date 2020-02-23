@@ -24,6 +24,7 @@
 class ZipFileLoader {
 public:
     ZipFileLoader();
+    ~ZipFileLoader() { mZip.close(); }
 
     void setZipPath(const QString& path);
 
@@ -34,7 +35,5 @@ private:
     QuaZip mZip;
     QuaZipFile mFile;
 };
-
-
 
 #endif // ZIPFILELOADER_H
