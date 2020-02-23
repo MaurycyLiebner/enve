@@ -17,87 +17,9 @@
 #ifndef ORAPARSER_H
 #define ORAPARSER_H
 
-#include <QString>
 #include <QtXml/QDomDocument>
-#include <QImage>
 
-#include "skia/skiaincludes.h"
-
-enum class OraElementType {
-    image,
-    stack,
-    layerPNG,
-    layerSVG,
-    text
-};
-
-struct OraElement {
-    OraElement(const QString& name,
-               const OraElementType type) :
-        fName(name), fType(type) {}
-
-    QString fName;
-    int fX = 0;
-    int fY = 0;
-    qreal fOpacity = 1;
-    bool fLocked = false;
-    bool fVisible = true;
-    SkBlendMode fBlend = SkBlendMode::kSrcOver;
-    const OraElementType fType;
-};
-
-struct OraLayer : public OraElement {
-    OraLayer(const OraElementType type) :
-        OraElement("Layer", type) {}
-
-    QString fSource;
-};
-
-//#define OraLayerPNG_SkImage
-
-template <typename T>
-struct OraLayerPNG : public OraLayer {
-    OraLayerPNG() : OraLayer(OraElementType::layerPNG) {}
-    T fImage;
-};
-
-using OraLayerPNG_Qt = OraLayerPNG<QImage>;
-using OraLayerPNG_Sk = OraLayerPNG<sk_sp<SkImage>>;
-
-struct OraLayerSVG : public OraLayer {
-    OraLayerSVG() : OraLayer(OraElementType::layerSVG) {}
-
-    QByteArray fDocument;
-};
-
-struct OraText : public OraElement {
-    OraText() : OraElement("Text", OraElementType::text) {}
-
-    QString fText;
-};
-
-template <typename OraLayerPNG_XX>
-struct OraStack : public OraElement {
-    OraStack(const QString& name, const OraElementType type) :
-        OraElement(name, type) {}
-    OraStack() : OraStack("Layer", OraElementType::stack) {}
-
-    QList<std::shared_ptr<OraElement>> fChildren;
-};
-
-using OraStack_Qt = OraStack<OraLayerPNG_Qt>;
-using OraStack_Sk = OraStack<OraLayerPNG_Sk>;
-
-template <typename OraLayerPNG_XX>
-struct OraImage : public OraStack<OraLayerPNG_XX> {
-    OraImage() : OraStack<OraLayerPNG_XX>("Image", OraElementType::image) {}
-
-    int fWidth;
-    int fHeight;
-};
-
-using OraImage_Qt = OraImage<OraLayerPNG_Qt>;
-using OraImage_Sk = OraImage<OraLayerPNG_Sk>;
+#include "orastructure.h"
 
 namespace ImportORA {
     std::shared_ptr<OraImage_Qt> readOraFileQImage(const QString &filename);

@@ -498,6 +498,7 @@ HEADERS += \
     MovablePoints/pathpivot.h \
     Ora/oraimporter.h \
     Ora/oraparser.h \
+    Ora/orastructure.h \
     Paint/animatedsurface.h \
     Paint/autotiledsurface.h \
     Paint/autotilesdata.h \
