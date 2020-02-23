@@ -363,10 +363,10 @@ bool AutoTilesData::tileToBitmap(const int tx, const int ty, SkBitmap &bitmap) {
 
 template<typename Addr>
 void clearRect(const QRect& rect, const int dstWidth, Addr * const dst) {
-    for(int y = rect.top(); y < rect.bottom(); y++) {
+    for(int y = rect.top(); y <= rect.bottom(); y++) {
         const int firstRowPixelId = y*dstWidth + rect.left();
         Addr * dstLine = dst + firstRowPixelId*4;
-        for(int x = rect.left(); x < rect.right(); x++) {
+        for(int x = rect.left(); x <= rect.right(); x++) {
             *dstLine++ = 0;
             *dstLine++ = 0;
             *dstLine++ = 0;
@@ -384,10 +384,10 @@ void clearMarginPixels(const QMargins& margin,
     const int rM = qMax(0, margin.right());
     const int bM = qMax(0, margin.bottom());
 
-    clearRect(QRect(0, 0, lM, dstHeight), dstWidth, dst);
-    clearRect(QRect(dstWidth - rM, 0, rM, dstHeight), dstWidth, dst);
-    clearRect(QRect(lM, 0, dstWidth - lM - rM, tM), dstWidth, dst);
-    clearRect(QRect(lM, dstHeight - bM, dstWidth - lM - rM, bM), dstWidth, dst);
+    clearRect(QRect(0, 0, lM - 1, dstHeight - 1), dstWidth, dst);
+    clearRect(QRect(dstWidth - rM, 0, rM - 1, dstHeight - 1), dstWidth, dst);
+    clearRect(QRect(lM, 0, dstWidth - lM - rM - 1, tM - 1), dstWidth, dst);
+    clearRect(QRect(lM, dstHeight - bM, dstWidth - lM - rM - 1, bM - 1), dstWidth, dst);
 }
 
 void premul_15_to_permul_8(uint8_t* dstLine, const uint16_t* srcLine) {
