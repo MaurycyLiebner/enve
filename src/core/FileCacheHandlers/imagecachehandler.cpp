@@ -17,7 +17,7 @@
 #include "imagecachehandler.h"
 
 #include "filecachehandler.h"
-#include "oraimporter.h"
+#include "Ora/oraimporter.h"
 #include "kraimporter.h"
 
 ImageDataHandler::ImageDataHandler() {}

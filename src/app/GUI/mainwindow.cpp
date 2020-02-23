@@ -62,7 +62,7 @@
 #include "ColorWidgets/bookmarkedcolors.h"
 #include "GUI/edialogs.h"
 #include "closesignalingdockwidget.h"
-#include "oraimporter.h"
+#include "Ora/oraimporter.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 

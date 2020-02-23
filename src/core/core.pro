@@ -192,6 +192,8 @@ SOURCES += \
     GUI/valueinput.cpp \
     MovablePoints/gradientpoint.cpp \
     MovablePoints/pathpivot.cpp \
+    Ora/oraimporter.cpp \
+    Ora/oraparser.cpp \
     Paint/animatedsurface.cpp \
     Paint/autotiledsurface.cpp \
     Paint/autotilesdata.cpp \
@@ -288,8 +290,6 @@ SOURCES += \
     matrixdecomposition.cpp \
     memorydatahandler.cpp \
     namefixer.cpp \
-    oraimporter.cpp \
-    oraparser.cpp \
     paintsettings.cpp \
     paintsettingsapplier.cpp \
     pathoperations.cpp \
@@ -496,6 +496,8 @@ HEADERS += \
     GUI/valueinput.h \
     MovablePoints/gradientpoint.h \
     MovablePoints/pathpivot.h \
+    Ora/oraimporter.h \
+    Ora/oraparser.h \
     Paint/animatedsurface.h \
     Paint/autotiledsurface.h \
     Paint/autotilesdata.h \
@@ -600,8 +602,6 @@ HEADERS += \
     matrixdecomposition.h \
     memorydatahandler.h \
     namefixer.h \
-    oraimporter.h \
-    oraparser.h \
     paintsettings.h \
     paintsettingsapplier.h \
     pathoperations.h \
