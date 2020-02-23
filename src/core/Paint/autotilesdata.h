@@ -62,6 +62,8 @@ struct AutoTilesData {
     bool tileToBitmap(const Tile &srcTile, SkBitmap& bitmap);
     SkBitmap tileToBitmap(const int tx, const int ty);
     SkBitmap toBitmap(const QMargins& margin = QMargins()) const;
+    QImage toImage(const QMargins& margin = QMargins(),
+                   const bool use16Bit);
 
     bool drawOnPixmap(SkPixmap &dst, int drawX, int drawY) const;
 
@@ -89,6 +91,10 @@ struct AutoTilesData {
 protected:
     stdsptr<Tile> getTileByIndex(const int colId, const int rowId) const;
 private:
+    template <typename Addr, void (*From15Bit)(Addr* dstLine, const uint16_t* srcLine)>
+    void toBitmap(Addr * const dst, const QMargins &margin,
+                  const int dstWidth, const int dstHeight) const;
+
     template <typename Addr, void (*To15Bit)(Addr const *& srcLine, uint16_t*& dstLine)>
     void loadPixmap(const Addr * const src, const int width, const int height);
 

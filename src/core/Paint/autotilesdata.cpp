@@ -361,12 +361,11 @@ bool AutoTilesData::tileToBitmap(const int tx, const int ty, SkBitmap &bitmap) {
     return tileToBitmap(*srcTile, bitmap);
 }
 
-void clearRect(const QRect& rect, SkBitmap& dst) {
-    uint8_t * const dstP = static_cast<uint8_t*>(dst.getPixels());
-
+template<typename Addr>
+void clearRect(const QRect& rect, const int dstWidth, Addr * const dst) {
     for(int y = rect.top(); y < rect.bottom(); y++) {
-        const int firstRowPixelId = y*dst.width() + rect.left();
-        uint8_t * dstLine = dstP + firstRowPixelId*4;
+        const int firstRowPixelId = y*dstWidth + rect.left();
+        Addr * dstLine = dst + firstRowPixelId*4;
         for(int x = rect.left(); x < rect.right(); x++) {
             *dstLine++ = 0;
             *dstLine++ = 0;
@@ -376,41 +375,45 @@ void clearRect(const QRect& rect, SkBitmap& dst) {
     }
 }
 
-void clearMarginPixels(const QMargins& margin, SkBitmap& dst) {
+template<typename Addr>
+void clearMarginPixels(const QMargins& margin,
+                       const int dstWidth, const int dstHeight,
+                       Addr * const dst) {
     const int lM = qMax(0, margin.left());
     const int tM = qMax(0, margin.top());
     const int rM = qMax(0, margin.right());
     const int bM = qMax(0, margin.bottom());
 
-    const int width = dst.width();
-    const int height = dst.height();
-
-    clearRect(QRect(0, 0, lM, height), dst);
-    clearRect(QRect(width - rM, 0, rM, height), dst);
-    clearRect(QRect(lM, 0, width - lM - rM, tM), dst);
-    clearRect(QRect(lM, height - bM, width - lM - rM, bM), dst);
+    clearRect(QRect(0, 0, lM, dstHeight), dstWidth, dst);
+    clearRect(QRect(dstWidth - rM, 0, rM, dstHeight), dstWidth, dst);
+    clearRect(QRect(lM, 0, dstWidth - lM - rM, tM), dstWidth, dst);
+    clearRect(QRect(lM, dstHeight - bM, dstWidth - lM - rM, bM), dstWidth, dst);
 }
 
-SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
+void premul_15_to_permul_8(uint8_t* dstLine, const uint16_t* srcLine) {
+    const uint32_t src = *srcLine;
+    *dstLine = (src * 255 + (1<<15)/2) / (1<<15);
+}
+
+void premul_15_to_permul_16(uint16_t* dstLine, const uint16_t* srcLine) {
+    const uint32_t src = *srcLine;
+    *dstLine = (src * USHRT_MAX + (1<<15)/2) / (1<<15);
+}
+
+template<typename Addr, void (*From15Bit)(Addr *dstLine, const uint16_t* srcLine)>
+void AutoTilesData::toBitmap(Addr * const dst, const QMargins &margin,
+                             const int dstWidth, const int dstHeight) const {
     const int lM = margin.left();
     const int tM = margin.top();
     const int rM = margin.right();
     const int bM = margin.bottom();
 
-    const int dstWidth  = width()  + lM + rM;
-    const int dstHeight = height() + tM + bM;
-    const auto info = SkiaHelpers::getPremulRGBAInfo(dstWidth, dstHeight);
-    SkBitmap dst;
-    dst.allocPixels(info);
-
-    clearMarginPixels(margin, dst);
-
-    uint8_t * const dstP = static_cast<uint8_t*>(dst.getPixels());
+    clearMarginPixels(margin, dstWidth, dstHeight, dst);
 
     const QPoint dstTL(qMax(0, lM),
                        qMax(0, tM));
-    const QPoint dstBR(dst.width()  - 1 - qMax(0, rM),
-                       dst.height() - 1 - qMax(0, bM));
+    const QPoint dstBR(dstWidth  - 1 - qMax(0, rM),
+                       dstHeight - 1 - qMax(0, bM));
 
     const QRect dstRect(dstTL, dstBR);
     const QPoint srcTL(qMax(0, -lM),
@@ -418,7 +421,7 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
     const QPoint srcBR(width()  - 1 - qMax(0, -rM),
                        height() - 1 - qMax(0, -bM));
     const QRect srcRect(srcTL, srcBR);
-    if(!srcRect.isValid()) return dst;
+    if(!srcRect.isValid()) return;
     const QPoint srcTileTL(srcRect.left()/ TILE_SIZE,
                            srcRect.top() / TILE_SIZE);
     const QPoint srcTileBR(srcRect.right() / TILE_SIZE,
@@ -440,7 +443,7 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
             const uint16_t * const srcP = srcTile->data();
             // if no tile data
             if(!srcP) {
-                clearRect(tileDstRect, dst);
+                clearRect(tileDstRect, dstWidth, dst);
             } else {
                 const QRect relTileRect = tClippedSrcRect.translated(
                                                     -srcCol*TILE_SIZE,
@@ -459,17 +462,52 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
                     const uint16_t * srcLine = srcP + srcPixelId*4;
                     const int dstY = minDstY + j;
                     const int dstPixelId = dstY*dstWidth + minDstX;
-                    uint8_t * dstLine = dstP + dstPixelId*4;
+                    Addr * dstLine = dst + dstPixelId*4;
                     for(int i = 0; i < iMax; i++) {
-                        const uint32_t val = *srcLine++;
-                        *dstLine++ = (val * 255 + (1<<15)/2) / (1<<15);
+                        From15Bit(dstLine++, srcLine++);
                     }
                 }
             }
 
         }
     }
+}
 
+SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
+    const int lM = margin.left();
+    const int tM = margin.top();
+    const int rM = margin.right();
+    const int bM = margin.bottom();
+
+    const int dstWidth  = width()  + lM + rM;
+    const int dstHeight = height() + tM + bM;
+    const auto info = SkiaHelpers::getPremulRGBAInfo(dstWidth, dstHeight);
+    SkBitmap dst;
+    dst.allocPixels(info);
+    uint8_t * const dstP = static_cast<uint8_t*>(dst.getPixels());
+    toBitmap<uint8_t, premul_15_to_permul_8>(dstP, margin, dstWidth, dstHeight);
+    return dst;
+}
+
+QImage AutoTilesData::toImage(const QMargins &margin, const bool use16Bit) {
+    const int lM = margin.left();
+    const int tM = margin.top();
+    const int rM = margin.right();
+    const int bM = margin.bottom();
+
+    const int dstWidth  = width()  + lM + rM;
+    const int dstHeight = height() + tM + bM;
+    const auto info = SkiaHelpers::getPremulRGBAInfo(dstWidth, dstHeight);
+    QImage dst;
+    if(use16Bit) {
+        dst = QImage(dstWidth, dstHeight, QImage::Format_RGBA64_Premultiplied);
+        uint16_t * const dstP = reinterpret_cast<uint16_t*>(dst.bits());
+        toBitmap<uint16_t, premul_15_to_permul_16>(dstP, margin, dstWidth, dstHeight);
+    } else {
+        dst = QImage(dstWidth, dstHeight, QImage::Format_RGBA8888_Premultiplied);
+        uint8_t * const dstP = static_cast<uint8_t*>(dst.bits());
+        toBitmap<uint8_t, premul_15_to_permul_8>(dstP, margin, dstWidth, dstHeight);
+    }
     return dst;
 }
 
