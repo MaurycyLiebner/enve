@@ -60,7 +60,7 @@ void EffectSubTaskSpawner_priv::splitSpawn(CpuRenderData& data,
             [this, data]() {
                 CpuRenderTools tools(mSrcBitmap, mDstBitmap);
                 mEffectCaller->processCpu(tools, data);
-            }, [this]() { decRemaining_k(); });
+            }, [this]() { decRemaining_k(); }, nullptr);
         subTask->queTask();
         return;
     }

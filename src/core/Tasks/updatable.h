@@ -164,10 +164,13 @@ private:
 class eCustomCpuTask : public eCpuTask {
     e_OBJECT
 protected:
-    eCustomCpuTask(const std::function<void(void)>& before,
-                  const std::function<void(void)>& run,
-                  const std::function<void(void)>& after) :
-        mBefore(before), mRun(run), mAfter(after) {}
+    using Func = std::function<void()>;
+    eCustomCpuTask(const Func& before,
+                   const Func& run,
+                   const Func& after,
+                   const Func& canceled) :
+        mBefore(before), mRun(run),
+        mAfter(after), mCanceled(canceled) {}
 
     void beforeProcessing(const Hardware) final {
         if(mBefore) mBefore();
@@ -177,11 +180,16 @@ protected:
         if(mAfter) mAfter();
     }
 
+    void afterCanceled() final {
+        if(mCanceled) mCanceled();
+    }
+
     void process() final { if(mRun) mRun(); }
 private:
-    const std::function<void(void)> mBefore;
-    const std::function<void(void)> mRun;
-    const std::function<void(void)> mAfter;
+    const Func mBefore;
+    const Func mRun;
+    const Func mAfter;
+    const Func mCanceled;
 };
 
 template <typename T>

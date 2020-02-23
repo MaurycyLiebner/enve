@@ -166,28 +166,35 @@ public:
     void process() {
         if(!mCplxTask) return;
         if(!mBox || !mSrc) return mCplxTask->cancel();
-        for(; mI <= mIMax; mI += mIncrement) {
-            const int relFrame = mFirstRelFrame + mI;
-            const int absFrame = mFirstAbsFrame + mI;
-            const int animFrame = mBox->getAnimationFrameForRelFrame(relFrame);
-            const auto task = mSrc->scheduleFrameLoad(animFrame);
-            if(task) {
-                mCplxTask->addTask(task->ref<eTask>());
-                const QPointer<AnimationToPaint> ptr = this;
-                const QPointer<ComplexTask> cplxPtr = mCplxTask;
-                const int i = mI;
-                task->addDependent({[ptr, cplxPtr, animFrame, absFrame, i]() {
-                    if(!ptr) return;
-                    ptr->mLoader(animFrame, absFrame);
-                    ptr->process();
-                    if(cplxPtr) cplxPtr->setValue(i);
-                }, mCancel});
-                break;
-            } else {
-                mLoader(animFrame, absFrame);
-                mCplxTask->setValue(mI);
-            }
+        if(mI > mIMax) {
+            const int finishValue = mCplxTask->finishValue();
+            mCplxTask->setValue(finishValue);
+            return;
+        };
+        const int relFrame = mFirstRelFrame + mI;
+        const int absFrame = mFirstAbsFrame + mI;
+        const int animFrame = mBox->getAnimationFrameForRelFrame(relFrame);
+        auto task = mSrc->scheduleFrameLoad(animFrame);
+        if(!task) {
+            const auto emptyTask = enve::make_shared<eCustomCpuTask>(
+                        nullptr, nullptr, nullptr, nullptr);
+            emptyTask->queTask();
+            task = emptyTask.get();
         }
+        mCplxTask->addTask(task->ref<eTask>());
+        const QPointer<AnimationToPaint> ptr = this;
+        const QPointer<ComplexTask> cplxPtr = mCplxTask;
+        const int i = mI;
+        task->addDependent({[ptr, cplxPtr, animFrame, absFrame, i]() {
+            if(!ptr) return;
+            ptr->mLoader(animFrame, absFrame);
+            ptr->process();
+            if(cplxPtr) {
+                const int newValue = qMax(cplxPtr->value(), i);
+                cplxPtr->setValue(newValue);
+            }
+        }, mCancel});
+        mI += mIncrement;
     }
 private:
     const int mFirstAbsFrame;

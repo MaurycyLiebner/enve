@@ -50,6 +50,7 @@ public:
         layout->addWidget(mCancel);
         layout->addWidget(mProgress);
         setLayout(layout);
+        setContentsMargins(0, 0, MIN_WIDGET_DIM/2, 0);
     }
 
     void setComplexTask(ComplexTask* const task) {
