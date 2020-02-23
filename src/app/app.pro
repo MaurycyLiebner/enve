@@ -124,6 +124,7 @@ SOURCES += main.cpp\
     GUI/widgetwrappernode.cpp \
     GUI/wrappernode.cpp \
     effectsloader.cpp \
+    eimporters.cpp \
     evfileio.cpp \
     hardwareinfo.cpp \
     iconloader.cpp \
@@ -235,6 +236,7 @@ HEADERS  += \
     GUI/widgetwrappernode.h \
     GUI/wrappernode.h \
     effectsloader.h \
+    eimporters.h \
     hardwareinfo.h \
     iconloader.h \
     outputsettings.h \

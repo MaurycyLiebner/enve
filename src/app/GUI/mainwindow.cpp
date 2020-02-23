@@ -31,7 +31,6 @@
 #include "timelinedockwidget.h"
 #include "Private/Tasks/taskexecutor.h"
 #include "qdoubleslider.h"
-#include "svgimporter.h"
 #include "canvaswindow.h"
 #include "GUI/BoxesList/boxscrollwidget.h"
 #include "clipboardcontainer.h"
@@ -62,87 +61,13 @@
 #include "ColorWidgets/bookmarkedcolors.h"
 #include "GUI/edialogs.h"
 #include "closesignalingdockwidget.h"
-#include "Ora/oraimporter.h"
+#include "eimporters.h"
 
 MainWindow *MainWindow::sInstance = nullptr;
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
     processKeyEvent(event);
 }
-
-class evImporter : public eImporter {
-public:
-    bool supports(const QFileInfo& fileInfo) const {
-        return fileInfo.suffix() == "ev";
-    }
-
-    qsptr<BoundingBox> import(const QFileInfo& fileInfo,
-                              Canvas* const scene) const {
-        Q_UNUSED(scene);
-        MainWindow::sGetInstance()->loadEVFile(fileInfo.absoluteFilePath());
-        return nullptr;
-    }
-};
-
-class eSvgImporter : public eImporter {
-public:
-    bool supports(const QFileInfo& fileInfo) const {
-        return fileInfo.suffix() == "svg";
-    }
-
-    qsptr<BoundingBox> import(const QFileInfo& fileInfo,
-                              Canvas* const scene) const {
-        const auto gradientCreator = [scene]() {
-            return scene->createNewGradient();
-        };
-        return ImportSVG::loadSVGFile(fileInfo.absoluteFilePath(),
-                                      gradientCreator);
-    }
-};
-
-class eOraImporter : public eImporter {
-public:
-    bool supports(const QFileInfo& fileInfo) const {
-        return fileInfo.suffix() == "ora";
-    }
-
-    qsptr<BoundingBox> import(const QFileInfo& fileInfo,
-                              Canvas* const scene) const {
-        const auto gradientCreator = [scene]() {
-            return scene->createNewGradient();
-        };
-        return ImportORA::loadORAFile(fileInfo.absoluteFilePath(),
-                                      gradientCreator);
-    }
-};
-
-class eKraImporter : public eImporter {
-public:
-    bool supports(const QFileInfo& fileInfo) const {
-        return fileInfo.suffix() == "kra";
-    }
-
-    qsptr<BoundingBox> import(const QFileInfo& fileInfo,
-                              Canvas* const scene) const {
-        QProcess oraConv;
-        oraConv.setProcessChannelMode(QProcess::ForwardedChannels);
-        const QString kritaPath = eSettings::sInstance->fKrita;
-        const QString oraPath = eSettings::sSettingsDir() + "/e_kra_to_ora.ora";
-        if(kritaPath.isEmpty()) RuntimeThrow("Invalid path to Krita executable.");
-        const QString command = QString("%1 %2 --export --export-filename %3").
-                arg(kritaPath).arg(fileInfo.absoluteFilePath()).arg(oraPath);
-        oraConv.start(command);
-        const bool success = oraConv.waitForFinished(10000);
-        if(!success) gPrintException(false, "Could not use Krita to convert the kra file to ora.\n"
-                                            "Please make sure you defined a proper path to Krita executable.");
-        const auto gradientCreator = [scene]() {
-            return scene->createNewGradient();
-        };
-        const auto result = ImportORA::loadORAFile(oraPath, gradientCreator);
-        QFile::remove(oraPath);
-        return result;
-    }
-};
 
 MainWindow::MainWindow(Document& document,
                        Actions& actions,
