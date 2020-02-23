@@ -489,7 +489,7 @@ SkBitmap AutoTilesData::toBitmap(const QMargins& margin) const {
     return dst;
 }
 
-QImage AutoTilesData::toImage(const QMargins &margin, const bool use16Bit) {
+QImage AutoTilesData::toImage(const bool use16Bit, const QMargins &margin) {
     const int lM = margin.left();
     const int tM = margin.top();
     const int rM = margin.right();
