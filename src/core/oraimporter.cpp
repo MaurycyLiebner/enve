@@ -28,6 +28,7 @@ void applyAttributesToBox(OraElement& ele, BoundingBox& box) {
     box.setRelativePos(QPointF(ele.fX, ele.fY));
     box.setOpacity(100*ele.fOpacity);
     box.setVisible(ele.fVisible);
+    box.setLocked(ele.fLocked);
     box.setBlendModeSk(ele.fBlend);
 }
 

@@ -40,6 +40,7 @@ struct OraElement {
     int fX = 0;
     int fY = 0;
     qreal fOpacity = 1;
+    bool fLocked = false;
     bool fVisible = true;
     SkBlendMode fBlend = SkBlendMode::kSrcOver;
     const OraElementType fType;

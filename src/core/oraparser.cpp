@@ -85,10 +85,15 @@ void parseOraElementAttributes(OraElement& oraEle,
         const qreal opa = opaStr.toDouble(&ok);
         if(ok) oraEle.fOpacity = opa;
     }
+
     const QString visStr = domEle.attribute("visibility");
     if(visStr == "visible" || visStr == "hidden") {
         oraEle.fVisible = visStr == "visible";
     }
+
+    const QString lockedStr = domEle.attribute("edit-locked");
+    oraEle.fLocked = lockedStr == "true";
+
     const QString compOpStr = domEle.attribute("composite-op");
     oraEle.fBlend = compositeOpToBlendMode(compOpStr);
 }
