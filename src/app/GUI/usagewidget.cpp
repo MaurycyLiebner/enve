@@ -181,15 +181,15 @@ void UsageWidget::setHddUsage(const bool used) {
     mHddBar->pushValue(used ? 100 : 0);
 }
 
-void UsageWidget::setRamUsage(const qreal thisGB) {
-    mRamBar->setValue(qRound(thisGB*1000));
+void UsageWidget::setRamUsage(const qreal thisMB) {
+    mRamBar->setValue(qRound(thisMB));
     mGpuBar->popAllButLast();
     mCpuBar->popAllButLast();
     mHddBar->popAllButLast();
 }
 
-void UsageWidget::setTotalRam(const qreal totalRamGB) {
-    mRamBar->setRange(0, qRound(totalRamGB*1000));
+void UsageWidget::setTotalRam(const qreal totalRamMB) {
+    mRamBar->setRange(0, qRound(totalRamMB));
 }
 
 void UsageWidget::addComplexTask(ComplexTask * const task) {

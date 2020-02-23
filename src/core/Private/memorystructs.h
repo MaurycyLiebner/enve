@@ -48,15 +48,21 @@ bool operator>(const intMB& a, const intMB& b);
 bool operator<(const intMB& a, const intMB& b);
 intMB operator-(const intMB& a, const intMB& b);
 intMB operator+(const intMB& a, const intMB& b);
+intMB operator*(const intMB& a, const int& b);
+intMB operator/(const intMB& a, const int& b);
 
 bool operator>(const intKB& a, const intKB& b);
 bool operator<(const intKB& a, const intKB& b);
 intKB operator-(const intKB& a, const intKB& b);
 intKB operator+(const intKB& a, const intKB& b);
+intKB operator*(const intKB& a, const int& b);
+intKB operator/(const intKB& a, const int& b);
 
 bool operator>(const longB& a, const longB& b);
 bool operator<(const longB& a, const longB& b);
 longB operator-(const longB& a, const longB& b);
 longB operator+(const longB& a, const longB& b);
+longB operator*(const longB& a, const long& b);
+longB operator/(const longB& a, const long& b);
 
 #endif // MEMORYSTRUCTS_H

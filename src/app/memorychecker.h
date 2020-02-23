@@ -43,6 +43,7 @@ private:
 
     intKB mLowFreeKB = intKB(0);
     intKB mVeryLowFreeKB = intKB(0);
+    intKB mCriticalFreeKB = intKB(0);
 
     static MemoryChecker *mInstance;
 signals:

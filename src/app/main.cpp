@@ -117,8 +117,12 @@ int main(int argc, char *argv[]) {
 
     splash->showMessage("Initialize task scheduler...");
     app.processEvents();
-    TaskScheduler taskScheduler;
     MemoryHandler memoryHandler;
+    TaskScheduler taskScheduler;
+    QObject::connect(&memoryHandler, &MemoryHandler::enteredCriticalState,
+                     &taskScheduler, &TaskScheduler::enterCriticalMemoryState);
+    QObject::connect(&memoryHandler, &MemoryHandler::finishedCriticalState,
+                     &taskScheduler, &TaskScheduler::finishCriticalMemoryState);
     try {
         taskScheduler.initializeGpu();
     } catch(const std::exception& e) {

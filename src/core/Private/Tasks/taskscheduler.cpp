@@ -192,6 +192,7 @@ void TaskScheduler::processNextQuedHddTask() {
 }
 
 void TaskScheduler::processNextTasks() {
+    if(mCriticalMemoryState) return;
     processNextQuedHddTask();
     processNextQuedGpuTask();
     processNextQuedCpuTask();
@@ -247,6 +248,18 @@ void TaskScheduler::addComplexTask(const qsptr<ComplexTask> &task) {
     connect(task.data(), &ComplexTask::canceled, this, deleter);
     connect(task.data(), &ComplexTask::finishedAll, this, deleter);
     emit complexTaskAdded(task.data());
+}
+
+void TaskScheduler::enterCriticalMemoryState() {
+    if(mCriticalMemoryState) return;
+    mCriticalMemoryState = true;
+}
+
+void TaskScheduler::finishCriticalMemoryState() {
+    if(!mCriticalMemoryState) return;
+    mCriticalMemoryState = false;
+    queTasks();
+    processNextTasks();
 }
 
 void TaskScheduler::processNextQuedCpuTask() {

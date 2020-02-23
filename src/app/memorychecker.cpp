@@ -32,23 +32,27 @@ MemoryChecker *MemoryChecker::mInstance;
 MemoryChecker::MemoryChecker(QObject * const parent) : QObject(parent) {
     mInstance = this;
 
-    mLowFreeKB = HardwareInfo::sRamKB();
-    mLowFreeKB.fValue *= 20; mLowFreeKB.fValue /= 100;
-    mVeryLowFreeKB = HardwareInfo::sRamKB();
-    mVeryLowFreeKB.fValue *= 15; mVeryLowFreeKB.fValue /= 100;
+    const intKB totRam = HardwareInfo::sRamKB();
+    mLowFreeKB = totRam*25/100;
+    mVeryLowFreeKB = totRam*20/100;
+    mCriticalFreeKB = totRam*15/100;
 }
 
 char MemoryChecker::sLine[256];
 
 void MemoryChecker::sGetFreeKB(intKB& procFreeKB, intKB& sysFreeKB) {
-    size_t allocated_bytes = 0;
-    size_t pageheap_unmapped_bytes = 0;
-    size_t pageheap_free_bytes = 0;
+//    qDebug() << "";
+    size_t allocated_bytes;
+    size_t pageheap_unmapped_bytes;
+    size_t pageheap_free_bytes;
     MallocExtension::instance()->GetAllocatedAndUnmapped(
                 &allocated_bytes,
                 &pageheap_unmapped_bytes,
                 &pageheap_free_bytes);
 
+//    qDebug() << "allocated" << intMB(longB(allocated_bytes)).fValue;
+//    qDebug() << "unmapped" << intMB(longB(pageheap_unmapped_bytes)).fValue;
+//    qDebug() << "free" << intMB(longB(pageheap_free_bytes)).fValue;
     const auto usageCap = eSettings::sInstance->fRamMBCap;
 
     if(usageCap.fValue > 0) {
@@ -65,20 +69,17 @@ void MemoryChecker::sGetFreeKB(intKB& procFreeKB, intKB& sysFreeKB) {
     while(fgets(sLine, sizeof(sLine), meminfo)) {
         int ramPartKB;
         if(sscanf(sLine, "MemFree: %d kB", &ramPartKB) == 1) {
-            sysFreeKB.fValue += ramPartKB;
-            found++;
-        } else if(sscanf(sLine, "Cached: %d kB", &ramPartKB) == 1) {
-            sysFreeKB.fValue += ramPartKB;
-            found++;
-        } else if(sscanf(sLine, "Buffers: %d kB", &ramPartKB) == 1) {
+//            qDebug() << "MemFree" << intMB(intKB(ramPartKB)).fValue;
             sysFreeKB.fValue += ramPartKB;
             found++;
         } else continue;
 
-        if(found == 3) break;
+        if(found == 1) break;
     }
+//    qDebug() << "total" << intMB(sysFreeKB).fValue;
+//    qDebug() << "usage" << 100 - 100*sysFreeKB.fValue/HardwareInfo::sRamKB().fValue;
     fclose(meminfo);
-    if(found != 3) RuntimeThrow("Entries missing from /proc/meminfo");
+    if(found != 1) RuntimeThrow("Entries missing from /proc/meminfo");
 }
 
 void MemoryChecker::checkMemory() {
@@ -88,7 +89,10 @@ void MemoryChecker::checkMemory() {
 
     if(sysFreeKB < mLowFreeKB) {
         const intKB toFree = mLowFreeKB - sysFreeKB;
-        if(sysFreeKB < mVeryLowFreeKB) {
+        if(sysFreeKB < mCriticalFreeKB) {
+            emit handleMemoryState(CRITICAL_MEMORY_STATE, longB(toFree));
+            mLastMemoryState = CRITICAL_MEMORY_STATE;
+        } else if(sysFreeKB < mVeryLowFreeKB) {
             emit handleMemoryState(VERY_LOW_MEMORY_STATE, longB(toFree));
             mLastMemoryState = VERY_LOW_MEMORY_STATE;
         } else {

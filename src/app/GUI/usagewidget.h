@@ -32,8 +32,8 @@ public:
     void setThreadsTotal(const int threads);
     void setHddUsage(const bool used);
     void setGpuUsage(const bool used);
-    void setRamUsage(const qreal thisGB);
-    void setTotalRam(const qreal totalRamGB);
+    void setRamUsage(const qreal thisMB);
+    void setTotalRam(const qreal totalRamMB);
 
     void addComplexTask(ComplexTask* const task);
 private:

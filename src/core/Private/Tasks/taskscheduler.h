@@ -164,6 +164,9 @@ public:
     }
 
     void addComplexTask(const qsptr<ComplexTask>& task);
+
+    void enterCriticalMemoryState();
+    void finishCriticalMemoryState();
 signals:
     void finishedAllQuedTasks() const;
     void hddUsageChanged(bool);
@@ -199,6 +202,8 @@ private:
             emit finishedAllQuedTasks();
         }
     }
+
+    bool mCriticalMemoryState = false;
 
     bool mHddThreadBusy = false;
 

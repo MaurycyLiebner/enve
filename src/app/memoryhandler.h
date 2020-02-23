@@ -27,15 +27,19 @@ public:
     ~MemoryHandler();
 
     static MemoryHandler *sInstance;
+    static MemoryState sMemoryState();
 signals:
     void allMemoryUsed();
     void memoryFreed();
+
+    void enteredCriticalState();
+    void finishedCriticalState();
 private:
-    void freeMemory(const MemoryState &state, const longB &minFreeBytes);
+    void freeMemory(const MemoryState newState, const longB &minFreeBytes);
     void memoryChecked(const intKB memKb, const intKB totMemKb);
 
     MemoryDataHandler mDataHandler;
-    MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;
+    MemoryState mMemoryState = NORMAL_MEMORY_STATE;
     QTimer *mTimer;
     QThread *mMemoryChekerThread;
     MemoryChecker *mMemoryChecker;

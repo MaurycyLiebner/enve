@@ -35,6 +35,14 @@ intMB operator+(const intMB& a, const intMB& b) {
     return intMB(a.fValue + b.fValue);
 }
 
+intMB operator*(const intMB& a, const int& b) {
+    return intMB(a.fValue*b);
+}
+
+intMB operator/(const intMB& a, const int& b) {
+    return intMB(a.fValue/b);
+}
+
 bool operator>(const intKB &a, const intKB &b) {
     return a.fValue > b.fValue;
 }
@@ -51,6 +59,14 @@ intKB operator+(const intKB& a, const intKB& b) {
     return intKB(a.fValue + b.fValue);
 }
 
+intKB operator*(const intKB& a, const int& b) {
+    return intKB(a.fValue*b);
+}
+
+intKB operator/(const intKB& a, const int& b) {
+    return intKB(a.fValue/b);
+}
+
 bool operator>(const longB &a, const longB &b) {
     return a.fValue > b.fValue;
 }
@@ -65,4 +81,12 @@ longB operator-(const longB& a, const longB& b) {
 
 longB operator+(const longB& a, const longB& b) {
     return longB(a.fValue + b.fValue);
+}
+
+longB operator*(const longB& a, const long& b) {
+    return longB(a.fValue*b);
+}
+
+longB operator/(const longB& a, const long& b) {
+    return longB(a.fValue/b);
 }
