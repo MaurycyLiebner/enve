@@ -81,7 +81,10 @@ int main(int argc, char *argv[]) {
     //    process->start("prlimit --data=3000000000 --pid " + QString::number(pId));
     //#endif
 
-    eSettings settings;
+    HardwareInfo::sUpdateInfo();
+    eSettings settings(HardwareInfo::sCpuThreads(),
+                       HardwareInfo::sRamKB(),
+                       HardwareInfo::sGpuVendor());
     eFilterSettings filterSettings;
     QDir(eSettings::sSettingsDir()).mkpath(eSettings::sIconsDir());
     try {
@@ -96,10 +99,6 @@ int main(int argc, char *argv[]) {
     const auto splash = new EnveSplash;
     splash->show();
     app.processEvents();
-
-    splash->showMessage("Update hardware info...");
-    app.processEvents();
-    HardwareInfo::sUpdateInfo();
 
     splash->showMessage("Load settings...");
     app.processEvents();

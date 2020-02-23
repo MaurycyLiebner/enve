@@ -21,11 +21,11 @@
 class HardwareInfo {
     HardwareInfo() = delete;
 public:
-    static GpuVendor sGpuVendor();
     static void sUpdateInfo();
-    static int sCpuThreads() { return mCpuThreads; }
 
+    static int sCpuThreads() { return mCpuThreads; }
     static intKB sRamKB() { return mRamKB; }
+    static GpuVendor sGpuVendor() { return mGpuVendor; }
 private:
     static int mCpuThreads;
     static intKB mRamKB;

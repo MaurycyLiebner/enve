@@ -26,6 +26,7 @@ struct eSetting {
 
     virtual bool setValueString(const QString& value) = 0;
     virtual void writeValue(QTextStream &textStream) const = 0;
+    virtual void loadDefault() = 0;
 
     void write(QTextStream &textStream) const {
         textStream << fName + ": ";
@@ -38,10 +39,13 @@ struct eSetting {
 
 template <typename T>
 struct eSettingBase : public eSetting {
-    eSettingBase(T& value, const QString& name) :
-        eSetting(name), fValue(value) {}
+    eSettingBase(T& value, const QString& name, const T& defaultValue) :
+        eSetting(name), fValue(value), fDefault(defaultValue) {}
+
+    void loadDefault() { fValue = fDefault; };
 
     T& fValue;
+    const T fDefault;
 };
 
 struct eBoolSetting : public eSettingBase<bool> {
@@ -125,34 +129,39 @@ eSettings* eSettings::sInstance = nullptr;
 
 static QList<stdsptr<eSetting>> gSettings;
 
-eSettings::eSettings() {
+eSettings::eSettings(const int cpuThreads, const intKB ramKB,
+                     const GpuVendor gpuVendor) :
+    fCpuThreads(cpuThreads), fRamKB(ramKB), fGpuVendor(gpuVendor) {
     Q_ASSERT(!sInstance);
     sInstance = this;
 
+    gSettings << std::make_shared<eIntSetting>(
+                     fCpuThreadsCap, "cpuThreadsCap", 0);
+    gSettings << std::make_shared<eIntSetting>(
+                     reinterpret_cast<int&>(fRamMBCap), "ramMBCap", 0);
+    gSettings << std::make_shared<eIntSetting>(
+                     reinterpret_cast<int&>(fAccPreference), "accPreference",
+                     static_cast<int>(AccPreference::defaultPreference));
+    gSettings << std::make_shared<eBoolSetting>(fPathGpuAcc, "pathGpuAcc",
+                                                fGpuVendor != GpuVendor::nvidia);
+    gSettings << std::make_shared<eBoolSetting>(fHddCache, "hddCache", true);
+    gSettings << std::make_shared<eIntSetting>(
+                     reinterpret_cast<int&>(fHddCacheMBCap),
+                     "hddCacheMBCap", 0);
+
+
+    gSettings << std::make_shared<eBoolSetting>(
+                     fTimelineAlternateRow, "timelineAlternateRow", true);
+    gSettings << std::make_shared<eColorSetting>(
+                     fTimelineAlternateRowColor, "timelineAlternateRowColor",
+                     QColor(0, 0, 0, 25));
+    gSettings << std::make_shared<eBoolSetting>(
+                     fTimelineHighlightRow, "timelineHighlightRow", false);
+    gSettings << std::make_shared<eColorSetting>(
+                     fTimelineHighlightRowColor, "timelineHighlightRowColor",
+                     QColor(255, 0, 0, 15));
+
     loadDefaults();
-
-    gSettings << std::make_shared<eIntSetting>(
-                     fCpuThreadsCap, "cpuThreadsCap");
-    gSettings << std::make_shared<eIntSetting>(
-                     reinterpret_cast<int&>(fRamMBCap), "ramMBCap");
-    gSettings << std::make_shared<eIntSetting>(
-                     reinterpret_cast<int&>(fAccPreference), "accPreference");
-    gSettings << std::make_shared<eBoolSetting>(
-                     fPathGpuAcc, "pathGpuAcc");
-    gSettings << std::make_shared<eBoolSetting>(
-                     fHddCache, "hddCache");
-    gSettings << std::make_shared<eIntSetting>(
-                     reinterpret_cast<int&>(fHddCacheMBCap), "hddCacheMBCap");
-
-
-    gSettings << std::make_shared<eBoolSetting>(
-                     fTimelineAlternateRow, "timelineAlternateRow");
-    gSettings << std::make_shared<eColorSetting>(
-                     fTimelineAlternateRowColor, "timelineAlternateRowColor");
-    gSettings << std::make_shared<eBoolSetting>(
-                     fTimelineHighlightRow, "timelineHighlightRow");
-    gSettings << std::make_shared<eColorSetting>(
-                     fTimelineHighlightRowColor, "timelineHighlightRowColor");
 }
 
 int eSettings::sCpuThreadsCapped() {
@@ -177,19 +186,9 @@ QString eSettings::sIconsDir() {
 }
 
 void eSettings::loadDefaults() {
-    fCpuThreadsCap = 0;
-    fRamMBCap = intMB(0);
-    fAccPreference = AccPreference::defaultPreference;
-    fPathGpuAcc = fGpuVendor != GpuVendor::nvidia;
-    fHddCache = true;
-    fHddCacheFolder = "";
-    fHddCacheMBCap = intMB(0);
-    fUndoCap = 25;
-
-    fTimelineAlternateRow = true;
-    fTimelineAlternateRowColor = QColor(0, 0, 0, 25);
-    fTimelineHighlightRow = false;
-    fTimelineHighlightRowColor = QColor(255, 0, 0, 15);
+    for(auto& setting : gSettings) {
+        setting->loadDefault();
+    }
 }
 
 void eSettings::loadFromFile() {

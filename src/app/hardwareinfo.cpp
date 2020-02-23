@@ -73,7 +73,4 @@ void HardwareInfo::sUpdateInfo() {
     mCpuThreads = QThread::idealThreadCount();
     mRamKB = getTotalRamBytes();
     mGpuVendor = gpuVendor();
-    eSettings::sInstance->fRamKB = mRamKB;
-    eSettings::sInstance->fCpuThreads = mCpuThreads;
-    eSettings::sInstance->fGpuVendor = mGpuVendor;
 }

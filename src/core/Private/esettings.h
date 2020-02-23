@@ -41,7 +41,8 @@ enum class AccPreference {
 
 class eSettings {
 public:
-    eSettings();
+    eSettings(const int cpuThreads, const intKB ramKB,
+              const GpuVendor gpuVendor);
 
     // accessors
     static intMB sRamMBCap();
@@ -62,13 +63,13 @@ public:
 #endif
 
     // performance settings
-    int fCpuThreads = 0;
+    const int fCpuThreads;
     int fCpuThreadsCap = 0; // <= 0 - use all available threads
 
-    intKB fRamKB = intKB(0);
+    const intKB fRamKB;
     intMB fRamMBCap = intMB(0); // <= 0 - cap at 80 %
 
-    GpuVendor fGpuVendor = GpuVendor::unrecognized;
+    const GpuVendor fGpuVendor;
     AccPreference fAccPreference = AccPreference::defaultPreference;
     bool fPathGpuAcc = true;
 
