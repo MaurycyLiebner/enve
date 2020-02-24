@@ -46,10 +46,6 @@ enum class PaintMode {
 
 class Document : public SingleWidgetTarget {
     Q_OBJECT
-    typedef stdsptr<FileDataCacheHandler> FileHandler;
-    struct FileCompare {
-        bool operator()(const FileHandler& f1, const FileHandler& f2);
-    };
 public:
     Document(TaskScheduler& taskScheduler);
 
@@ -87,8 +83,6 @@ public:
     SimpleBrushWrapper* fBrush = nullptr;
     bool fOnionVisible = false;
     PaintMode fPaintMode = PaintMode::normal;
-
-    std::set<FileHandler, FileCompare> fFiles;
 
     QList<qsptr<Canvas>> fScenes;
     std::map<Canvas*, int> fVisibleScenes;

@@ -20,9 +20,9 @@
 #include "Ora/oraimporter.h"
 #include "kraimporter.h"
 
-ImageDataHandler::ImageDataHandler() {}
+ImageFileDataHandler::ImageFileDataHandler() {}
 
-void ImageDataHandler::afterSourceChanged() {
+void ImageFileDataHandler::afterSourceChanged() {
     const QFileInfo info(getFilePath());
     const auto suffix = info.suffix();
     if(suffix == "ora") {
@@ -34,14 +34,16 @@ void ImageDataHandler::afterSourceChanged() {
     }
 }
 
-void ImageDataHandler::clearCache() {
+void ImageFileDataHandler::clearCache() {
     mImage.reset();
-    mImageCopies.clear();
     mImageLoader.reset();
 }
 
-ImageLoader *ImageDataHandler::scheduleLoad() {
-    if(mImage) return nullptr;
+eTask *ImageFileDataHandler::scheduleLoad() {
+    if(mImage) {
+        const auto task = mImage->scheduleLoadFromTmpFile();
+        if(task) return task;
+    }
     if(mImageLoader) return mImageLoader.get();
     switch(mType) {
     case Type::ora:
@@ -59,26 +61,25 @@ ImageLoader *ImageDataHandler::scheduleLoad() {
     return mImageLoader.get();
 }
 
-sk_sp<SkImage> ImageDataHandler::requestCopy(int &stateId) {
-    stateId = mStateId;
-    if(mImageCopies.isEmpty()) return SkiaHelpers::makeCopy(mImage);
-    else return mImageCopies.takeLast();
+bool ImageFileDataHandler::hasImage() const {
+    if(!mImage) return false;
+    return mImage->hasImage();
 }
 
-void ImageDataHandler::addImageCopy(const sk_sp<SkImage> &img, const int stateId) {
-    if(stateId != mStateId) return;
-    mImageCopies << img;
+sk_sp<SkImage> ImageFileDataHandler::getImage() const {
+    if(!mImage) return nullptr;
+    return mImage->getImage();
 }
 
-void ImageDataHandler::setImage(const sk_sp<SkImage> &img) {
-    mImage = img;
-    mStateId++;
-    mImageCopies.clear();
+void ImageFileDataHandler::replaceImage(const sk_sp<SkImage> &img) {
+    if(img) {
+        mImage = enve::make_shared<ImageCacheContainerX>(img, this);
+    } else mImage.reset();
     mImageLoader.reset();
 }
 
 ImageLoader::ImageLoader(const QString &filePath,
-                         ImageDataHandler * const handler) :
+                         ImageFileDataHandler * const handler) :
     mTargetHandler(handler), mFilePath(filePath) {}
 
 void ImageLoader::process() {
@@ -88,11 +89,11 @@ void ImageLoader::process() {
 }
 
 void ImageLoader::afterProcessing() {
-    mTargetHandler->setImage(mImage);
+    mTargetHandler->replaceImage(mImage);
 }
 
 void ImageLoader::afterCanceled() {
-    mTargetHandler->setImage(mImage);
+    mTargetHandler->replaceImage(mImage);
 }
 
 void OraLoader::process() {

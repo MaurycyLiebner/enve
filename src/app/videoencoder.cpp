@@ -665,7 +665,7 @@ void VideoEncoder::process() {
             const int nFrames = contRange.span();
             try {
                 writeVideoFrame(mFormatContext, &mVideoStream,
-                                cacheCont->getImageSk(), &hasVideo);
+                                cacheCont->getImage(), &hasVideo);
                 avcodec_flush_buffers(mVideoStream.fCodec);
             } catch(...) {
                 RuntimeThrow("Failed to write video frame");

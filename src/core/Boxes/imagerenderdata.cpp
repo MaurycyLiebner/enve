@@ -56,3 +56,16 @@ void ImageRenderData::drawSk(SkCanvas * const canvas) {
         canvas->drawImage(fImage, x, y, &paint);
     } else if(fImage) canvas->drawImage(fImage, x, y);
 }
+
+void ImageContainerRenderData::setContainer(ImageCacheContainer *container) {
+    if(!container) return;
+    mSrcContainer = container;
+    fImage = container->requestImageCopy();
+}
+
+void ImageContainerRenderData::afterProcessing() {
+    BoxRenderData::afterProcessing();
+    if(mSrcContainer && fImage) {
+        mSrcContainer->addImageCopy(fImage);
+    }
+}

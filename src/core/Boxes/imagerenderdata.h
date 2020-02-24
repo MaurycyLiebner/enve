@@ -17,6 +17,7 @@
 #ifndef IMAGERENDERDATA_H
 #define IMAGERENDERDATA_H
 #include "Boxes/boxrenderdata.h"
+#include "CacheHandlers/imagecachecontainer.h"
 
 struct ImageRenderData : public BoxRenderData {
     ImageRenderData(BoundingBox * const parentBoxT);
@@ -24,7 +25,6 @@ struct ImageRenderData : public BoxRenderData {
     virtual void loadImageFromHandler() = 0;
 
     void updateRelBoundingRect();
-
     void setupRenderData() final;
 
     sk_sp<SkImage> fImage;
@@ -32,6 +32,18 @@ private:
     void setupDirectDraw();
 
     void drawSk(SkCanvas * const canvas);
+};
+
+struct ImageContainerRenderData : public ImageRenderData {
+public:
+    using ImageRenderData::ImageRenderData;
+
+    void setContainer(ImageCacheContainer* container);
+
+    void afterProcessing();
+private:
+    using ImageRenderData::fImage;
+    stdptr<ImageCacheContainer> mSrcContainer;
 };
 
 #endif // IMAGERENDERDATA_H

@@ -21,11 +21,6 @@
 
 Document* Document::sInstance = nullptr;
 
-bool Document::FileCompare::operator()(const FileHandler &f1,
-                                       const FileHandler &f2) {
-    return f1->getFilePath() < f2->getFilePath();
-}
-
 Document::Document(TaskScheduler& taskScheduler) {
     Q_ASSERT(!sInstance);
     sInstance = this;

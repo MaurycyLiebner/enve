@@ -19,9 +19,11 @@
 #include "skia/skiaincludes.h"
 #include "skia/skiahelpers.h"
 #include "hddcachablerangecont.h"
+#include "imagedatahandler.h"
 class Canvas;
 
-class ImageCacheContainer : public HddCachableRangeCont {
+class ImageCacheContainer : public HddCachableRangeCont,
+                            public ImageDataHandler {
     e_OBJECT
 protected:
     ImageCacheContainer(const FrameRange& range,
@@ -35,16 +37,8 @@ protected:
 public:
     int getByteCount();
 
-    void drawSk(SkCanvas * const canvas, const SkFilterQuality filter);
-
-    sk_sp<SkImage> getImageSk();
-    sk_sp<SkImage> requestCopy();
-
     void setDataLoadedFromTmpFile(const sk_sp<SkImage> &img);
-    void replaceImageSk(const sk_sp<SkImage> &img);
-protected:
-    sk_sp<SkImage> mImage;
-    QList<sk_sp<SkImage>> mImageCopies;
+    void replaceImage(const sk_sp<SkImage> &img);
 };
 
 

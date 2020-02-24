@@ -223,7 +223,7 @@ public:
         const auto cont = mFrameImagesCache.atFrame<ImageCacheContainer>(relFrame);
         if(cont) {
             if(cont->storesDataInMemory()) {
-                img = cont->requestCopy();
+                img = cont->requestImageCopy();
                 return nullptr;
             }
             return cont->scheduleLoadFromTmpFile();

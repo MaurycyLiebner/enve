@@ -19,19 +19,21 @@
 #include "skia/skiahelpers.h"
 #include "filecachehandler.h"
 #include "Tasks/updatable.h"
-class ImageDataHandler;
+#include "CacheHandlers/usepointer.h"
+#include "CacheHandlers/imagecachecontainer.h"
+class ImageFileDataHandler;
 
 class ImageLoader : public eHddTask {
     e_OBJECT
 protected:
     ImageLoader(const QString &filePath,
-                ImageDataHandler * const handler);
+                ImageFileDataHandler * const handler);
 public:
     void process();
     void afterProcessing();
     void afterCanceled();
 protected:
-    ImageDataHandler * const mTargetHandler;
+    ImageFileDataHandler * const mTargetHandler;
     const QString mFilePath;
     sk_sp<SkImage> mImage;
 };
@@ -52,7 +54,7 @@ public:
     void process();
 };
 
-class ImageDataHandler : public FileDataCacheHandler {
+class ImageFileDataHandler : public FileDataCacheHandler {
     e_OBJECT
     friend class ImageLoader;
 
@@ -60,25 +62,39 @@ class ImageDataHandler : public FileDataCacheHandler {
         image, kra, ora, none
     };
 
+    class ImageCacheContainerX : public ImageCacheContainer {
+        e_OBJECT
+    protected:
+        ImageCacheContainerX(const sk_sp<SkImage>& img,
+                             ImageFileDataHandler* const handler) :
+            ImageCacheContainer(img, FrameRange::EMINMAX, nullptr),
+            mHandler(handler) {}
+
+        void noDataLeft_k() {
+            ImageCacheContainer::noDataLeft_k();
+            if(!mHandler) return;
+            mHandler->mImage.reset();
+        }
+    private:
+        const qptr<ImageFileDataHandler> mHandler;
+    };
 protected:
-    ImageDataHandler();
+    ImageFileDataHandler();
 public:
     void afterSourceChanged();
 
     void clearCache();
 
-    ImageLoader * scheduleLoad();
-    bool hasImage() const { return mImage.get(); }
-    sk_sp<SkImage> getImage() const { return mImage; }
-    sk_sp<SkImage> requestCopy(int& stateId);
-    void addImageCopy(const sk_sp<SkImage>& img, const int stateId);
-protected:
-    void setImage(const sk_sp<SkImage>& img);
+    eTask *scheduleLoad();
+
+    bool hasImage() const;
+    sk_sp<SkImage> getImage() const;
+    ImageCacheContainer* getImageContainer() { return mImage.get(); }
 private:
+    void replaceImage(const sk_sp<SkImage> &img);
+
+    stdsptr<ImageCacheContainerX> mImage;
     Type mType = Type::none;
-    int mStateId = 0;
-    sk_sp<SkImage> mImage;
-    QList<sk_sp<SkImage>> mImageCopies;
     stdsptr<ImageLoader> mImageLoader;
 };
 
@@ -91,7 +107,7 @@ protected:
         const QFileInfo info(path);
         mFileMissing = !info.exists();
         if(mFileMissing) return mDataHandler.reset();
-        mDataHandler = ImageDataHandler::sGetCreateDataHandler<ImageDataHandler>(path);
+        mDataHandler = ImageFileDataHandler::sGetCreateDataHandler<ImageFileDataHandler>(path);
     }
 
     void reload() {
@@ -100,7 +116,7 @@ protected:
 public:
     void replace();
 
-    ImageLoader * scheduleLoad() {
+    eTask * scheduleLoad() {
         if(!mDataHandler) return nullptr;
         return mDataHandler->scheduleLoad();
     }
@@ -115,17 +131,12 @@ public:
         return mDataHandler->getImage();
     }
 
-    sk_sp<SkImage> requestImageCopy(int& stateId) const {
+    ImageCacheContainer* getImageContainer() const {
         if(!mDataHandler) return nullptr;
-        return mDataHandler->requestCopy(stateId);
-    }
-
-    void addImageCopy(const sk_sp<SkImage>& img, const int stateId) {
-        if(!mDataHandler) return;
-        return mDataHandler->addImageCopy(img, stateId);
+        return mDataHandler->getImageContainer();
     }
 private:
-    qsptr<ImageDataHandler> mDataHandler;
+    qsptr<ImageFileDataHandler> mDataHandler;
 };
 
 #endif // IMAGECACHEHANDLER_H

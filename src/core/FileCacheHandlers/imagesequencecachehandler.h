@@ -26,12 +26,12 @@ protected:
 public:
     void replace();
 
-    sk_sp<SkImage> getFrameAtFrame(const int relFrame);
-    sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame);
+    ImageCacheContainer* getFrameAtFrame(const int relFrame);
+    ImageCacheContainer* getFrameAtOrBeforeFrame(const int relFrame);
     eTask* scheduleFrameLoad(const int frame);
     int getFrameCount() const { return mFrameImageHandlers.count(); }
 private:
-    QList<qsptr<ImageDataHandler>> mFrameImageHandlers;
+    QList<qsptr<ImageFileDataHandler>> mFrameImageHandlers;
 };
 
 class ImageSequenceCacheHandler : public AnimationFrameHandler {
@@ -39,11 +39,12 @@ class ImageSequenceCacheHandler : public AnimationFrameHandler {
 protected:
     ImageSequenceCacheHandler(ImageSequenceFileHandler* fileHandler);
 public:
-    sk_sp<SkImage> getFrameAtFrame(const int relFrame) {
+    ImageCacheContainer* getFrameAtFrame(const int relFrame) {
         if(!mFileHandler) return nullptr;
         return mFileHandler->getFrameAtFrame(relFrame);
     }
-    sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame) {
+
+    ImageCacheContainer* getFrameAtOrBeforeFrame(const int relFrame) {
         if(!mFileHandler) return nullptr;
         return mFileHandler->getFrameAtOrBeforeFrame(relFrame);
     }

@@ -22,17 +22,14 @@
 #include "imagerenderdata.h"
 #include "FileCacheHandlers/filehandlerobjref.h"
 
-struct ImageBoxRenderData : public ImageRenderData {
+struct ImageBoxRenderData : public ImageContainerRenderData {
     ImageBoxRenderData(ImageFileHandler * const cacheHandler,
-                       BoundingBox * const parentBoxT) :
-        ImageRenderData(parentBoxT),
+                       BoundingBox * const parentBox) :
+        ImageContainerRenderData(parentBox),
         fSrcCacheHandler(cacheHandler) {}
 
     void loadImageFromHandler();
-    void afterProcessing();
 
-    // return the image copy to the handler if ids match
-    int fImageId = -1;
     const qptr<ImageFileHandler> fSrcCacheHandler;
 };
 

@@ -14,22 +14,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ANIMATIONCACHEHANDLER_H
-#define ANIMATIONCACHEHANDLER_H
-#include "smartPointers/selfref.h"
-#include "skia/skiahelpers.h"
-class eTask;
-class ImageCacheContainer;
+#ifndef IMAGEDATAHANDLER_H
+#define IMAGEDATAHANDLER_H
 
-class AnimationFrameHandler : public SelfRef {
+#include "skia/skiaincludes.h"
+
+#include <QList>
+
+class ImageDataHandler {
 protected:
-    AnimationFrameHandler();
+    ImageDataHandler();
+    ImageDataHandler(const sk_sp<SkImage>& img);
+
+    int clearImageMemory();
+    void replaceImage(const sk_sp<SkImage> &img);
 public:
-    virtual ImageCacheContainer* getFrameAtFrame(const int relFrame) = 0;
-    virtual ImageCacheContainer* getFrameAtOrBeforeFrame(const int relFrame) = 0;
-    virtual eTask* scheduleFrameLoad(const int frame) = 0;
-    virtual int getFrameCount() const = 0;
-    virtual void reload() = 0;
+    int getImageByteCount() const;
+
+    void drawImage(SkCanvas * const canvas,
+                   const SkFilterQuality filter) const;
+
+    bool hasImage() const { return mImage.get(); }
+    const sk_sp<SkImage>& getImage() const;
+    sk_sp<SkImage> requestImageCopy();
+    void addImageCopy(const sk_sp<SkImage> &img);
+private:
+    sk_sp<SkImage> mImage;
+    QList<sk_sp<SkImage>> mImageCopies;
 };
 
-#endif // ANIMATIONCACHEHANDLER_H
+#endif // IMAGEDATAHANDLER_H

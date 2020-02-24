@@ -49,7 +49,6 @@ protected:
 
     bool mFileMissing = false;
     QString mPath; // filename / dirname
-
 private:
     int mReferenceCount = 0;
 };

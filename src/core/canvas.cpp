@@ -227,7 +227,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
                 drawTransparencyMesh(canvas, canvasRect);
             const float reversedRes = toSkScalar(1/mSceneFrame->fResolution);
             canvas->scale(reversedRes, reversedRes);
-            mSceneFrame->drawSk(canvas, filter);
+            mSceneFrame->drawImage(canvas, filter);
             canvas->restore();
         }
         return;
@@ -263,7 +263,7 @@ void Canvas::renderSk(SkCanvas * const canvas,
         canvas->save();
         const float reversedRes = toSkScalar(1/mSceneFrame->fResolution);
         canvas->scale(reversedRes, reversedRes);
-        mSceneFrame->drawSk(canvas, filter);
+        mSceneFrame->drawImage(canvas, filter);
         canvas->restore();
     }
 

@@ -267,9 +267,10 @@ void AnimationBox::setupCanvasMenu(PropertyMenu * const menu) {
         surface->anim_setRecording(true);
         const auto src = box->mSrcFramesCache.get();
         const auto loader = [src, surface](const int animFrame, const int absFrame) {
-            const auto img = src->getFrameCopyAtFrame(animFrame);
+            const auto cont = src->getFrameAtFrame(animFrame);
+            if(!cont) return;
             surface->anim_setAbsFrame(absFrame);
-            surface->loadPixmap(img);
+            surface->loadPixmap(cont->getImage());
         };
         const auto adder = [paintObj, parent]() {
             if(!parent) return;
@@ -307,18 +308,27 @@ void AnimationBox::setupRenderData(const qreal relFrame,
                                    BoxRenderData * const data,
                                    Canvas* const scene) {
     BoundingBox::setupRenderData(relFrame, data, scene);
-    const auto imageData = static_cast<AnimationBoxRenderData*>(data);
-    const int animationFrame = getAnimationFrameForRelFrame(relFrame);
-    imageData->fAnimationFrame = animationFrame;
-    const auto upd = mSrcFramesCache->scheduleFrameLoad(animationFrame);
-    if(upd) upd->addDependent(imageData);
-    else imageData->fImage = mSrcFramesCache->getFrameCopyAtFrame(animationFrame);
+    const auto imgData = static_cast<AnimationBoxRenderData*>(data);
+    const int animFrame = getAnimationFrameForRelFrame(relFrame);
+    imgData->fAnimFrame = animFrame;
+    const auto upd = mSrcFramesCache->scheduleFrameLoad(animFrame);
+    if(upd) upd->addDependent(imgData);
+    else {
+        const auto cont = mSrcFramesCache->getFrameAtFrame(animFrame);
+        imgData->setContainer(cont);
+    }
 }
 
 stdsptr<BoxRenderData> AnimationBox::createRenderData() {
     return enve::make_shared<AnimationBoxRenderData>(mSrcFramesCache.get(), this);
 }
 
+AnimationBoxRenderData::AnimationBoxRenderData(AnimationFrameHandler *cacheHandler, BoundingBox *parentBox) :
+    ImageContainerRenderData(parentBox),
+    fSrcCacheHandler(cacheHandler) {}
+
 void AnimationBoxRenderData::loadImageFromHandler() {
-    fImage = fSrcCacheHandler->getFrameCopyAtOrBeforeFrame(fAnimationFrame);
+    if(!fSrcCacheHandler) return;
+    const auto cont = fSrcCacheHandler->getFrameAtOrBeforeFrame(fAnimFrame);
+    setContainer(cont);
 }

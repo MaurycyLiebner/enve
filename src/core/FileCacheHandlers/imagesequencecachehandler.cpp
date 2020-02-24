@@ -26,21 +26,21 @@ void ImageSequenceFileHandler::afterPathSet(const QString &folderPath) {
     reload();
 }
 
-sk_sp<SkImage> ImageSequenceFileHandler::getFrameAtFrame(const int relFrame) {
+ImageCacheContainer* ImageSequenceFileHandler::getFrameAtFrame(const int relFrame) {
     if(mFrameImageHandlers.isEmpty()) return nullptr;
-    const auto cacheHandler = mFrameImageHandlers.at(relFrame);
-    if(!cacheHandler) return sk_sp<SkImage>();
-    return cacheHandler->getImage();
+    const auto& cacheHandler = mFrameImageHandlers.at(relFrame);
+    if(!cacheHandler) return nullptr;
+    return cacheHandler->getImageContainer();
 }
 
-sk_sp<SkImage> ImageSequenceFileHandler::getFrameAtOrBeforeFrame(
+ImageCacheContainer *ImageSequenceFileHandler::getFrameAtOrBeforeFrame(
         const int relFrame) {
     if(mFrameImageHandlers.isEmpty()) return nullptr;
     if(relFrame >= mFrameImageHandlers.count()) {
-        return mFrameImageHandlers.last()->getImage();
+        return mFrameImageHandlers.last()->getImageContainer();
     }
-    const auto cacheHandler = mFrameImageHandlers.at(relFrame);
-    return cacheHandler->getImage();
+    const auto& cacheHandler = mFrameImageHandlers.at(relFrame);
+    return cacheHandler->getImageContainer();
 }
 
 eTask *ImageSequenceFileHandler::scheduleFrameLoad(const int frame) {
@@ -62,7 +62,8 @@ void ImageSequenceFileHandler::reload() {
         const auto suffix = fileInfo.suffix();
         if(!isImageExt(suffix)) continue;
         const auto filePath = fileInfo.absoluteFilePath();
-        const auto handler = ImageDataHandler::sGetCreateDataHandler<ImageDataHandler>(filePath);
+        using IFDH = ImageFileDataHandler;
+        const auto handler = IFDH::sGetCreateDataHandler<IFDH>(filePath);
         handler->clearCache();
         mFrameImageHandlers << handler;
     }

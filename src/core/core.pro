@@ -158,6 +158,7 @@ SOURCES += \
     CacheHandlers/hddcachablecont.cpp \
     CacheHandlers/hddcachablerangecont.cpp \
     CacheHandlers/imagecachecontainer.cpp \
+    CacheHandlers/imagedatahandler.cpp \
     CacheHandlers/samples.cpp \
     CacheHandlers/sceneframecontainer.cpp \
     CacheHandlers/soundcachecontainer.cpp \
@@ -464,6 +465,7 @@ HEADERS += \
     CacheHandlers/hddcachablecont.h \
     CacheHandlers/hddcachablerangecont.h \
     CacheHandlers/imagecachecontainer.h \
+    CacheHandlers/imagedatahandler.h \
     CacheHandlers/samples.h \
     CacheHandlers/sceneframecontainer.h \
     CacheHandlers/soundcachecontainer.h \

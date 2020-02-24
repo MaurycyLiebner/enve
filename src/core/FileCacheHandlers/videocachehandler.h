@@ -38,8 +38,8 @@ public:
     void removeFrameLoader(const int frame);
     void frameLoaderFinished(const int frame, const sk_sp<SkImage>& image);
     eTask* scheduleFrameHddCacheLoad(const int frame);
-    sk_sp<SkImage> getFrameAtFrame(const int relFrame) const;
-    sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame) const;
+    ImageCacheContainer* getFrameAtFrame(const int relFrame) const;
+    ImageCacheContainer* getFrameAtOrBeforeFrame(const int relFrame) const;
     int getFrameCount() const;
     void setFrameCount(const int count);
 signals:
@@ -58,8 +58,8 @@ class VideoFrameHandler : public AnimationFrameHandler {
 protected:
     VideoFrameHandler(VideoDataHandler* const cacheHandler);
 public:
-    sk_sp<SkImage> getFrameAtFrame(const int relFrame);
-    sk_sp<SkImage> getFrameAtOrBeforeFrame(const int relFrame);
+    ImageCacheContainer* getFrameAtFrame(const int relFrame);
+    ImageCacheContainer* getFrameAtOrBeforeFrame(const int relFrame);
     eTask *scheduleFrameLoad(const int frame);
     int getFrameCount() const;
     void reload();

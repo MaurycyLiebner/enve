@@ -23,17 +23,14 @@
 class AnimationFrameHandler;
 class IntFrameRemapping;
 
-struct AnimationBoxRenderData : public ImageRenderData {
+struct AnimationBoxRenderData : public ImageContainerRenderData {
     AnimationBoxRenderData(AnimationFrameHandler *cacheHandler,
-                           BoundingBox *parentBox) :
-        ImageRenderData(parentBox) {
-        fSrcCacheHandler = cacheHandler;
-    }
+                           BoundingBox *parentBox);
 
     void loadImageFromHandler();
 
-    AnimationFrameHandler *fSrcCacheHandler;
-    int fAnimationFrame;
+    const qptr<AnimationFrameHandler> fSrcCacheHandler;
+    int fAnimFrame;
 };
 
 class AnimationBox : public BoundingBox {

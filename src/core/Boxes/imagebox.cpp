@@ -99,14 +99,24 @@ void ImageBox::setupCanvasMenu(PropertyMenu * const menu) {
 
     const PropertyMenu::PlainSelectedOp<ImageBox> createPaintObj =
     [](ImageBox * box) {
-        const auto parent = box->getParentGroup();
-        if(!parent) return;
-        const auto img = box->mFileHandler->getImage();
-        if(!img) return;
-        const auto paintObj = enve::make_shared<PaintBox>();
-        paintObj->getSurface()->loadPixmap(img);
-        box->copyBoundingBoxDataTo(paintObj.get());
-        parent->addContained(paintObj);
+        const qptr<ImageBox> boxPtr = box;
+        const auto loader = [boxPtr]() {
+            if(!boxPtr) return;
+            const auto parent = boxPtr->getParentGroup();
+            if(!parent) return;
+            const auto img = boxPtr->mFileHandler->getImage();
+            if(!img) return;
+            const auto paintObj = enve::make_shared<PaintBox>();
+            paintObj->getSurface()->loadPixmap(img);
+            boxPtr->copyBoundingBoxDataTo(paintObj.get());
+            parent->addContained(paintObj);
+        };
+        if(box->mFileHandler->hasImage()) {
+            loader();
+        } else {
+            const auto task = box->mFileHandler->scheduleLoad();
+            if(task) task->addDependent({loader, nullptr});
+        }
     };
     menu->addPlainAction("Create Paint Object", createPaintObj);
 
@@ -126,7 +136,7 @@ void ImageBox::setupRenderData(const qreal relFrame,
     BoundingBox::setupRenderData(relFrame, data, scene);
     const auto imgData = static_cast<ImageBoxRenderData*>(data);
     if(mFileHandler->hasImage()) {
-        imgData->fImage = mFileHandler->requestImageCopy(imgData->fImageId);
+        imgData->setContainer(mFileHandler->getImageContainer());
     } else {
         const auto loader = mFileHandler->scheduleLoad();
         if(loader) loader->addDependent(imgData);
@@ -138,12 +148,7 @@ stdsptr<BoxRenderData> ImageBox::createRenderData() {
 }
 
 void ImageBoxRenderData::loadImageFromHandler() {
-    if(fSrcCacheHandler) fImage = fSrcCacheHandler->requestImageCopy(fImageId);
-}
-
-void ImageBoxRenderData::afterProcessing() {
-    BoxRenderData::afterProcessing();
-    if(fSrcCacheHandler && fImage) {
-        fSrcCacheHandler->addImageCopy(fImage, fImageId);
+    if(fSrcCacheHandler) {
+        setContainer(fSrcCacheHandler->getImageContainer());
     }
 }

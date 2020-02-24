@@ -29,11 +29,11 @@ VideoFrameHandler::VideoFrameHandler(VideoDataHandler * const cacheHandler) :
     openVideoStream();
 }
 
-sk_sp<SkImage> VideoFrameHandler::getFrameAtFrame(const int relFrame) {
+ImageCacheContainer* VideoFrameHandler::getFrameAtFrame(const int relFrame) {
     return mDataHandler->getFrameAtFrame(relFrame);
 }
 
-sk_sp<SkImage> VideoFrameHandler::getFrameAtOrBeforeFrame(const int relFrame) {
+ImageCacheContainer* VideoFrameHandler::getFrameAtOrBeforeFrame(const int relFrame) {
     return mDataHandler->getFrameAtOrBeforeFrame(relFrame);
 }
 
@@ -195,16 +195,12 @@ eTask *VideoDataHandler::scheduleFrameHddCacheLoad(const int frame) {
     return nullptr;
 }
 
-sk_sp<SkImage> VideoDataHandler::getFrameAtFrame(const int relFrame) const {
-    const auto cont = mFramesCache.atFrame<ImageCacheContainer>(relFrame);
-    if(!cont) return sk_sp<SkImage>();
-    return cont->getImageSk();
+ImageCacheContainer* VideoDataHandler::getFrameAtFrame(const int relFrame) const {
+    return mFramesCache.atFrame<ImageCacheContainer>(relFrame);
 }
 
-sk_sp<SkImage> VideoDataHandler::getFrameAtOrBeforeFrame(const int relFrame) const {
-    const auto cont = mFramesCache.atOrBeforeFrame<ImageCacheContainer>(relFrame);
-    if(!cont) return sk_sp<SkImage>();
-    return cont->getImageSk();
+ImageCacheContainer* VideoDataHandler::getFrameAtOrBeforeFrame(const int relFrame) const {
+    return mFramesCache.atOrBeforeFrame<ImageCacheContainer>(relFrame);
 }
 
 int VideoDataHandler::getFrameCount() const { return mFrameCount; }
