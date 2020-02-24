@@ -1,4 +1,4 @@
-// enve - 2D animations software
+﻿// enve - 2D animations software
 // Copyright (C) 2016-2020 Maurycy Liebner
 
 // This program is free software: you can redistribute it and/or modify
@@ -33,53 +33,65 @@ MemoryChecker::MemoryChecker(QObject * const parent) : QObject(parent) {
     mInstance = this;
 
     const intKB totRam = HardwareInfo::sRamKB();
-    mLowFreeKB = totRam*25/100;
-    mVeryLowFreeKB = totRam*20/100;
-    mCriticalFreeKB = totRam*15/100;
+    mLowFreeKB = totRam*20/100;
+    mVeryLowFreeKB = totRam*15/100;
+    mCriticalFreeKB = totRam*10/100;
 }
 
 char MemoryChecker::sLine[256];
 
 void MemoryChecker::sGetFreeKB(intKB& procFreeKB, intKB& sysFreeKB) {
 //    qDebug() << "";
-    size_t allocated_bytes;
-    size_t pageheap_unmapped_bytes;
-    size_t pageheap_free_bytes;
-    MallocExtension::instance()->GetAllocatedAndUnmapped(
-                &allocated_bytes,
-                &pageheap_unmapped_bytes,
-                &pageheap_free_bytes);
+    size_t virtual_memory_used;
+    size_t physical_memory_used;
+    size_t bytes_in_use_by_app;
+    MallocExtension::instance()->eMemoryStats(&virtual_memory_used,
+                                              &physical_memory_used,
+                                              &bytes_in_use_by_app);
 
-//    qDebug() << "allocated" << intMB(longB(allocated_bytes)).fValue;
-//    qDebug() << "unmapped" << intMB(longB(pageheap_unmapped_bytes)).fValue;
-//    qDebug() << "free" << intMB(longB(pageheap_free_bytes)).fValue;
+//    qDebug() << "virtual_memory_used" << intMB(longB(virtual_memory_used)).fValue;
+//    qDebug() << "physical_memory_used" << intMB(longB(physical_memory_used)).fValue;
+//    qDebug() << "bytes_in_use_by_app" << intMB(longB(bytes_in_use_by_app)).fValue;
+
     const auto usageCap = eSettings::sInstance->fRamMBCap;
 
+    const longB enveUsedB(static_cast<long>(bytes_in_use_by_app));
+    const intKB enveUsedKB(enveUsedB);
     if(usageCap.fValue > 0) {
-        const longB enveUsedB(static_cast<long>(allocated_bytes));
-        procFreeKB = intKB(usageCap) - intKB(enveUsedB);
-    } else procFreeKB = HardwareInfo::sRamKB();
+        procFreeKB = intKB(usageCap) - enveUsedKB;
+    } else {
+        procFreeKB = HardwareInfo::sRamKB() - enveUsedKB;
+    }
 
+    const long freeInternal = physical_memory_used - bytes_in_use_by_app;
+    intKB freeExternal(0);
+    int found = 0;
     FILE * const meminfo = fopen("/proc/meminfo", "r");
     if(!meminfo) RuntimeThrow("Failed to open /proc/meminfo");
-    const long freeAndUnmapped = static_cast<long>(pageheap_unmapped_bytes +
-                                                   pageheap_free_bytes);
-    sysFreeKB = intKB(longB(freeAndUnmapped));
-    int found = 0;
     while(fgets(sLine, sizeof(sLine), meminfo)) {
         int ramPartKB;
         if(sscanf(sLine, "MemFree: %d kB", &ramPartKB) == 1) {
 //            qDebug() << "MemFree" << intMB(intKB(ramPartKB)).fValue;
-            sysFreeKB.fValue += ramPartKB;
-            found++;
+        } else if(sscanf(sLine, "Cached: %d kB", &ramPartKB) == 1) {
+//            qDebug() << "Cached" << intMB(intKB(ramPartKB)).fValue;
+        } else if(sscanf(sLine, "Buffers: %d kB", &ramPartKB) == 1) {
+//            qDebug() << "Buffers" << intMB(intKB(ramPartKB)).fValue;
         } else continue;
-
-        if(found == 1) break;
+        freeExternal.fValue += ramPartKB;
+        if(++found == 3) break;
     }
-//    qDebug() << "total" << intMB(sysFreeKB).fValue;
-//    qDebug() << "usage" << 100 - 100*sysFreeKB.fValue/HardwareInfo::sRamKB().fValue;
     fclose(meminfo);
-    if(found != 1) RuntimeThrow("Entries missing from /proc/meminfo");
+
+    sysFreeKB = intKB(longB(freeInternal)) + freeExternal;
+
+//    qDebug() << "free" << intMB(sysFreeKB).fValue;
+//    qDebug() << "usage" << 100 - 100*sysFreeKB.fValue/HardwareInfo::sRamKB().fValue;
+    if(found != 3) RuntimeThrow("Entries missing from /proc/meminfo");
+    const long releaseBytes = 500L*1024L*1024L;
+    if(freeInternal > releaseBytes) {
+        MallocExtension::instance()->ReleaseToSystem(releaseBytes);
+//        qDebug() << "released";
+    }
 }
 
 void MemoryChecker::checkMemory() {
