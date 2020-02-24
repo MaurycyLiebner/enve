@@ -51,12 +51,16 @@ bool eTask::readyToBeProcessed() {
     return mNDependancies == 0;
 }
 
-void eTask::addDependent(eTask * const updatable) {
-    if(!updatable) return;
-    if(mState != eTaskState::finished) {
-        if(mDependent.contains(updatable)) return;
-        mDependent << updatable;
-        updatable->incDependencies();
+void eTask::addDependent(eTask * const task) {
+    if(!task) return;
+    if(mState == eTaskState::finished) {
+        return;
+    } else if(mState == eTaskState::canceled) {
+        task->cancel();
+    } else {
+        if(mDependent.contains(task)) return;
+        mDependent << task;
+        task->incDependencies();
     }
 }
 

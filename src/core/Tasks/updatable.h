@@ -72,7 +72,7 @@ public:
     void finishedProcessing();
     bool readyToBeProcessed();
 
-    void addDependent(eTask * const updatable);
+    void addDependent(eTask * const task);
     void addDependent(const Dependent& func);
 
     bool finished();
