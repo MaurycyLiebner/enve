@@ -43,6 +43,8 @@ public:
     }
 
     void clear() {
+        for(const auto& task : mScheduledProcesses)
+            task->cancel();
         mScheduledProcesses.clear();
     }
 
