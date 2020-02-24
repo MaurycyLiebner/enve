@@ -86,6 +86,22 @@ void unpremul_8_to_15(uint8_t const *& srcLine, uint16_t*& dstLine) {
 }
 
 template <void (*Swapper)(uint8_t&, uint8_t&, uint8_t&, uint8_t&)>
+void opaque_8_to_15(uint8_t const *& srcLine, uint16_t*& dstLine) {
+    uint8_t r = *srcLine++;
+    uint8_t g = *srcLine++;
+    uint8_t b = *srcLine++;
+    srcLine++;
+    uint8_t a = 255;
+    Swapper(r, g, b, a);
+
+    // convert to fixed point (with rounding)
+    *dstLine++ = (r * (1<<15) + 255/2) / 255;
+    *dstLine++ = (g * (1<<15) + 255/2) / 255;
+    *dstLine++ = (b * (1<<15) + 255/2) / 255;
+    *dstLine++ = (a * (1<<15) + 255/2) / 255;
+}
+
+template <void (*Swapper)(uint8_t&, uint8_t&, uint8_t&, uint8_t&)>
 void premul_8_to_15(uint8_t const *& srcLine, uint16_t*& dstLine) {
     uint8_t r = *srcLine++;
     uint8_t g = *srcLine++;
@@ -124,6 +140,23 @@ void unpremul_16_to_15(uint16_t const *& srcLine, uint16_t*& dstLine) {
     *dstLine++ = (g32 * a32 + (1<<15)/2) / (1<<15);
     *dstLine++ = (b32 * a32 + (1<<15)/2) / (1<<15);
     *dstLine++ = a32;
+}
+
+
+template <void (*Swapper)(uint16_t&, uint16_t&, uint16_t&, uint16_t&)>
+void opaque_16_to_15(uint16_t const *& srcLine, uint16_t*& dstLine) {
+    uint16_t r = *srcLine++;
+    uint16_t g = *srcLine++;
+    uint16_t b = *srcLine++;
+    srcLine++;
+    uint16_t a = USHRT_MAX;
+    Swapper(r, g, b, a);
+
+    // convert to fixed point (with rounding)
+    *dstLine++ = (r * (1<<15) + 255/2) / 255;
+    *dstLine++ = (g * (1<<15) + 255/2) / 255;
+    *dstLine++ = (b * (1<<15) + 255/2) / 255;
+    *dstLine++ = (a * (1<<15) + 255/2) / 255;
 }
 
 template <void (*Swapper)(uint16_t&, uint16_t&, uint16_t&, uint16_t&)>
@@ -215,6 +248,8 @@ void AutoTilesData::loadPixmap_XXXA_8888(const uint8_t* const addr8,
         loadPixmap<uint8_t, unpremul_8_to_15<Swapper>>(addr8, width, height);
     } else if(alphaType == kPremul_SkAlphaType) {
         loadPixmap<uint8_t, premul_8_to_15<Swapper>>(addr8, width, height);
+    } else if(alphaType == kOpaque_SkAlphaType) {
+        loadPixmap<uint8_t, opaque_8_to_15<Swapper>>(addr8, width, height);
     } else RuntimeThrow("Unsupported alpha type");
 }
 
@@ -227,6 +262,8 @@ void AutoTilesData::loadPixmap_XXXA_16161616(const uint16_t* const addr16,
         loadPixmap<uint16_t, unpremul_16_to_15<Swapper>>(addr16, width, height);
     } else if(alphaType == kPremul_SkAlphaType) {
         loadPixmap<uint16_t, premul_16_to_15<Swapper>>(addr16, width, height);
+    } else if(alphaType == kOpaque_SkAlphaType) {
+        loadPixmap<uint16_t, opaque_16_to_15<Swapper>>(addr16, width, height);
     } else RuntimeThrow("Unsupported alpha type");
 }
 
@@ -258,7 +295,7 @@ void AutoTilesData::loadPixmap(const QImage &src) {
         loadPixmap_XXXA_16161616<RGBA_to_RGBA>(addr16, width, height, alphaType);
     } else {
         const QImage converted = src.convertToFormat(
-                    QImage::Format_RGBA8888_Premultiplied);
+                    QImage::Format_RGBA64_Premultiplied);
         loadPixmap(converted);
     }
 }
@@ -275,7 +312,21 @@ void AutoTilesData::loadPixmap(const SkPixmap &src) {
     } else if(colorType == SkColorType::kBGRA_8888_SkColorType) {
         const auto addr8 = static_cast<const uint8_t*>(src.addr());
         loadPixmap_XXXA_8888<BGRA_to_RGBA>(addr8, width, height, alphaType);
-    } else RuntimeThrow("Unsupported color type");
+    } else {
+        SkBitmap dst;
+        dst.allocPixels(SkiaHelpers::getPremulRGBAInfo(width, height));
+        if(dst.writePixels(src)) {
+            loadPixmap(dst.pixmap());
+        } else {
+            dst.eraseColor(SK_ColorTRANSPARENT);
+            SkCanvas canvas(dst);
+            SkBitmap srcBitmap;
+            srcBitmap.installPixels(src);
+            canvas.drawBitmap(srcBitmap, 0, 0);
+            canvas.flush();
+            loadPixmap(dst.pixmap());
+        }
+    }
 }
 
 AutoTilesData::~AutoTilesData() {
