@@ -28,6 +28,27 @@
 
 QSharedPointer<QFileSystemWatcher> ExternalPaintAppHandler::sFileWatcher;
 QSharedPointer<QTemporaryDir> ExternalPaintAppHandler::sTmpDir;
+ExternalPaintAppHandler::InstanceMap ExternalPaintAppHandler::sInstances;
+
+ExternalPaintAppHandler::ExternalPaintAppHandler(const App app) :
+    mApp(app) {
+    const auto settings = eSettings::sInstance;
+    switch(mApp) {
+    case App::gimp:
+        mExec = settings->fGimp;
+        break;
+    case App::mypaint:
+        mExec = settings->fMyPaint;
+        break;
+    case App::krita:
+        mExec = settings->fKrita;
+        break;
+    }
+}
+
+ExternalPaintAppHandler::~ExternalPaintAppHandler() {
+    removeFromInstanceMap();
+}
 
 void ExternalPaintAppHandler::sCreateFileWatcher() {
     const auto fileWatcher = new QFileSystemWatcher();
@@ -37,6 +58,32 @@ void ExternalPaintAppHandler::sCreateFileWatcher() {
 void ExternalPaintAppHandler::sCreateTmpDir() {
     const auto tmpDir = new QTemporaryDir(QDir::tempPath() + "/enve_paint");
     sTmpDir = QSharedPointer<QTemporaryDir>(tmpDir);
+}
+
+void ExternalPaintAppHandler::addToInstanceMap() {
+    if(mInMap) return;
+    sInstances.insert({mEditSurface.data(), this});
+    mInMap = true;
+}
+
+void ExternalPaintAppHandler::removeFromInstanceMap() {
+    if(!mInMap) return;
+    for(auto it = sInstances.begin(); it != sInstances.end(); ++it) {
+        if(it->second == this) {
+            sInstances.erase(it);
+            break;
+        }
+    }
+    mInMap = false;
+}
+
+bool ExternalPaintAppHandler::reassingTmpFile() {
+    const auto exists = QFile::exists(mEditFilePath);
+    if(exists) {
+        sFileWatcher->addPath(mEditFilePath);
+        mEditFile->setFileName(mEditFilePath);
+    }
+    return exists;
 }
 
 void ExternalPaintAppHandler::setupSuccess() {
@@ -50,24 +97,16 @@ void ExternalPaintAppHandler::setupSuccess() {
             this, [this](const QString& changedPath) {
         if(!mEditSurface) return deleteLater();
         if(mEditFilePath != changedPath) return;
-        if(mEditFile->exists()) {
-            // file may have been delete and stopped being watched
-            sFileWatcher->addPath(mEditFilePath);
-        } else {
+        if(!mEditFile->exists()) {
+            if(reassingTmpFile()) {
             // if it is the first time in the row the file is missing
-            if(mFileExists) {
-                mFileExists = false;
+            } else {
                 // check again after some time
                 QTimer::singleShot(1000, this, [this]() {
-                    mFileExists = mEditFile->exists();
-                    if(mFileExists) {
-                        sFileWatcher->addPath(mEditFilePath);
-                    } else {
-                        deleteLater();
-                    }
+                    if(!reassingTmpFile()) deleteLater();
                 });
+                return;
             }
-            return;
         }
         const auto oraImg = ImportORA::readOraFileQImage(mEditFilePath);
         bool foundImg = false;
@@ -111,22 +150,6 @@ void ExternalPaintAppHandler::setupSuccess() {
     });
 }
 
-ExternalPaintAppHandler::ExternalPaintAppHandler(const App app) :
-    mApp(app) {
-    const auto settings = eSettings::sInstance;
-    switch(mApp) {
-    case App::gimp:
-        mExec = settings->fGimp;
-        break;
-    case App::mypaint:
-        mExec = settings->fMyPaint;
-        break;
-    case App::krita:
-        mExec = settings->fKrita;
-        break;
-    }
-}
-
 bool ExternalPaintAppHandler::checkAppValid() const {
     const QString check = mExec + " --version";
     const auto checker = new QProcess();
@@ -142,12 +165,19 @@ bool ExternalPaintAppHandler::checkAppValid() const {
     return true;
 }
 
+void ExternalPaintAppHandler::setEditSurface(DrawableAutoTiledSurface* const surf) {
+    mEditSurface = surf;
+    const auto it = sInstances.find(surf);
+    if(it != sInstances.end()) delete it->second;
+    addToInstanceMap();
+}
+
 void ExternalPaintAppHandler::setupFor(AnimatedSurface * const aSurface,
                                        const QString& layerName) {
     mLayerName = layerName;
     mASurface = aSurface;
     setParent(mASurface);
-    mEditSurface = mASurface->getCurrentSurface();
+    setEditSurface(mASurface->getCurrentSurface());
     mInitial00Pos = mEditSurface->zeroTilePos();
     const QString frameStr = QString::number(mASurface->anim_getCurrentRelFrame());
     const auto img = mEditSurface->toImage(true);
@@ -194,7 +224,6 @@ void ExternalPaintAppHandler::setupFor(AnimatedSurface * const aSurface,
     }
 
     mEditFile->close();
-    mFileExists = true;
 
     const auto execProc = new QProcess;
     execProc->setProcessChannelMode(QProcess::ForwardedChannels);

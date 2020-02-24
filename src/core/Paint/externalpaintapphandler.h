@@ -35,6 +35,7 @@ public:
     };
 
     ExternalPaintAppHandler(const App app);
+    ~ExternalPaintAppHandler();
 
     bool checkAppValid() const;
     void setupFor(AnimatedSurface* const surface, const QString &name);
@@ -44,23 +45,30 @@ private:
     static void sCreateFileWatcher();
     static void sCreateTmpDir();
 
+    using InstanceMap = std::map<DrawableAutoTiledSurface*, ExternalPaintAppHandler*>;
+    static InstanceMap sInstances;
     static QSharedPointer<QFileSystemWatcher> sFileWatcher;
     static QSharedPointer<QTemporaryDir> sTmpDir;
 
+    void addToInstanceMap();
+    void removeFromInstanceMap();
+
+    bool reassingTmpFile();
+
+    void setEditSurface(DrawableAutoTiledSurface * const surf);
     void setupSuccess();
 
     QString mLayerName;
     QString mPivotName;
 
     QPoint mInitial00Pos;
-    bool mFileExists = false;
     QString mEditFilePath;
     const App mApp;
     QString mExec;
     QSharedPointer<QTemporaryFile> mEditFile;
     AnimatedSurface* mASurface = nullptr;
     stdptr<DrawableAutoTiledSurface> mEditSurface;
-
+    bool mInMap = false;
 };
 
 #endif // EXTERNALPAINTAPPHANDLER_H
