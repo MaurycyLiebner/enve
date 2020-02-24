@@ -38,11 +38,13 @@ public:
     void drawSk(SkCanvas * const canvas, const SkFilterQuality filter);
 
     sk_sp<SkImage> getImageSk();
+    sk_sp<SkImage> requestCopy();
 
     void setDataLoadedFromTmpFile(const sk_sp<SkImage> &img);
     void replaceImageSk(const sk_sp<SkImage> &img);
 protected:
-    sk_sp<SkImage> mImageSk;
+    sk_sp<SkImage> mImage;
+    QList<sk_sp<SkImage>> mImageCopies;
 };
 
 

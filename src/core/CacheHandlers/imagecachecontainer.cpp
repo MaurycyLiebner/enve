@@ -31,22 +31,24 @@ ImageCacheContainer::ImageCacheContainer(const sk_sp<SkImage> &img,
 }
 
 void ImageCacheContainer::replaceImageSk(const sk_sp<SkImage> &img) {
-    mImageSk = img;
+    mImage = img;
+    mImageCopies.clear();
     afterDataReplaced();
 }
 
 int ImageCacheContainer::getByteCount() {
-    if(!mImageSk) return 0;
+    if(!mImage) return 0;
     SkPixmap pixmap;
-    if(mImageSk->peekPixels(&pixmap)) {
+    if(mImage->peekPixels(&pixmap)) {
+        const int nCopies = mImageCopies.count();
         return pixmap.width()*pixmap.height()*
-                pixmap.info().bytesPerPixel();
+               pixmap.info().bytesPerPixel()*(1 + nCopies);
     }
     return 0;
 }
 
 sk_sp<SkImage> ImageCacheContainer::getImageSk() {
-    return mImageSk;
+    return mImage;
 }
 
 void ImageCacheContainer::setDataLoadedFromTmpFile(const sk_sp<SkImage> &img) {
@@ -59,17 +61,18 @@ void ImageCacheContainer::drawSk(SkCanvas * const canvas,
                                  const SkFilterQuality filter) {
     SkPaint paint;
     paint.setFilterQuality(filter);
-    canvas->drawImage(mImageSk, 0, 0, &paint);
+    canvas->drawImage(mImage, 0, 0, &paint);
 }
 
 int ImageCacheContainer::clearMemory() {
     const int bytes = getByteCount();
-    mImageSk.reset();
+    mImage.reset();
+    mImageCopies.clear();
     return bytes;
 }
 
 stdsptr<eHddTask> ImageCacheContainer::createTmpFileDataSaver() {
-    return enve::make_shared<ImgSaver>(this, mImageSk);
+    return enve::make_shared<ImgSaver>(this, mImage);
 }
 
 stdsptr<eHddTask> ImageCacheContainer::createTmpFileDataLoader() {
@@ -77,4 +80,9 @@ stdsptr<eHddTask> ImageCacheContainer::createTmpFileDataLoader() {
         setDataLoadedFromTmpFile(img);
     };
     return enve::make_shared<ImgLoader>(mTmpFile, this, func);
+}
+
+sk_sp<SkImage> ImageCacheContainer::requestCopy() {
+    if(mImageCopies.isEmpty()) return SkiaHelpers::makeCopy(mImage);
+    else return mImageCopies.takeLast();
 }

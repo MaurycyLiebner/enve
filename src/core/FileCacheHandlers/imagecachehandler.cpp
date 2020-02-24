@@ -22,6 +22,24 @@
 
 ImageDataHandler::ImageDataHandler() {}
 
+void ImageDataHandler::afterSourceChanged() {
+    const QFileInfo info(getFilePath());
+    const auto suffix = info.suffix();
+    if(suffix == "ora") {
+        mType = Type::ora;
+    } else if(suffix == "kra") {
+        mType = Type::kra;
+    } else {
+        mType = Type::image;
+    }
+}
+
+void ImageDataHandler::clearCache() {
+    mImage.reset();
+    mImageCopies.clear();
+    mImageLoader.reset();
+}
+
 ImageLoader *ImageDataHandler::scheduleLoad() {
     if(mImage) return nullptr;
     if(mImageLoader) return mImageLoader.get();
@@ -39,6 +57,24 @@ ImageLoader *ImageDataHandler::scheduleLoad() {
     }
     if(mImageLoader) mImageLoader->queTask();
     return mImageLoader.get();
+}
+
+sk_sp<SkImage> ImageDataHandler::requestCopy(int &stateId) {
+    stateId = mStateId;
+    if(mImageCopies.isEmpty()) return SkiaHelpers::makeCopy(mImage);
+    else return mImageCopies.takeLast();
+}
+
+void ImageDataHandler::addImageCopy(const sk_sp<SkImage> &img, const int stateId) {
+    if(stateId != mStateId) return;
+    mImageCopies << img;
+}
+
+void ImageDataHandler::setImage(const sk_sp<SkImage> &img) {
+    mImage = img;
+    mStateId++;
+    mImageCopies.clear();
+    mImageLoader.reset();
 }
 
 ImageLoader::ImageLoader(const QString &filePath,

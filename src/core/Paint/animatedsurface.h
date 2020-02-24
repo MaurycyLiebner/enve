@@ -223,7 +223,7 @@ public:
         const auto cont = mFrameImagesCache.atFrame<ImageCacheContainer>(relFrame);
         if(cont) {
             if(cont->storesDataInMemory()) {
-                img = SkiaHelpers::makeCopy(cont->getImageSk());
+                img = cont->requestCopy();
                 return nullptr;
             }
             return cont->scheduleLoadFromTmpFile();

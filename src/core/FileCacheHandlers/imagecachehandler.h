@@ -63,37 +63,22 @@ class ImageDataHandler : public FileDataCacheHandler {
 protected:
     ImageDataHandler();
 public:
-    void afterSourceChanged() {
-        const QFileInfo info(getFilePath());
-        const auto suffix = info.suffix();
-        if(suffix == "ora") {
-            mType = Type::ora;
-        } else if(suffix == "kra") {
-            mType = Type::kra;
-        } else {
-            mType = Type::image;
-        }
-    }
+    void afterSourceChanged();
 
-    void clearCache() {
-        mImage.reset();
-        mImageLoader.reset();
-    }
+    void clearCache();
 
     ImageLoader * scheduleLoad();
     bool hasImage() const { return mImage.get(); }
     sk_sp<SkImage> getImage() const { return mImage; }
-    sk_sp<SkImage> getImageCopy() const {
-        return SkiaHelpers::makeCopy(mImage);
-    }
+    sk_sp<SkImage> requestCopy(int& stateId);
+    void addImageCopy(const sk_sp<SkImage>& img, const int stateId);
 protected:
-    void setImage(const sk_sp<SkImage>& img) {
-        mImage = img;
-        mImageLoader.reset();
-    }
+    void setImage(const sk_sp<SkImage>& img);
 private:
     Type mType = Type::none;
+    int mStateId = 0;
     sk_sp<SkImage> mImage;
+    QList<sk_sp<SkImage>> mImageCopies;
     stdsptr<ImageLoader> mImageLoader;
 };
 
@@ -129,9 +114,15 @@ public:
         if(!mDataHandler) return nullptr;
         return mDataHandler->getImage();
     }
-    sk_sp<SkImage> getImageCopy() const {
+
+    sk_sp<SkImage> requestImageCopy(int& stateId) const {
         if(!mDataHandler) return nullptr;
-        return mDataHandler->getImageCopy();
+        return mDataHandler->requestCopy(stateId);
+    }
+
+    void addImageCopy(const sk_sp<SkImage>& img, const int stateId) {
+        if(!mDataHandler) return;
+        return mDataHandler->addImageCopy(img, stateId);
     }
 private:
     qsptr<ImageDataHandler> mDataHandler;

@@ -46,7 +46,7 @@ protected:
 
     void afterCanceled() {}
     void beforeProcessing(const Hardware hw) final;
-    void afterProcessing() final;
+    void afterProcessing();
     void afterQued();
     void queTaskNow() final;
 

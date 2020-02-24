@@ -25,13 +25,15 @@
 struct ImageBoxRenderData : public ImageRenderData {
     ImageBoxRenderData(ImageFileHandler * const cacheHandler,
                        BoundingBox * const parentBoxT) :
-        ImageRenderData(parentBoxT) {
-        fSrcCacheHandler = cacheHandler;
-    }
+        ImageRenderData(parentBoxT),
+        fSrcCacheHandler(cacheHandler) {}
 
     void loadImageFromHandler();
+    void afterProcessing();
 
-    qptr<ImageFileHandler> fSrcCacheHandler;
+    // return the image copy to the handler if ids match
+    int fImageId = -1;
+    const qptr<ImageFileHandler> fSrcCacheHandler;
 };
 
 class ImageBox : public BoundingBox {
