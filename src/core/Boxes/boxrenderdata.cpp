@@ -33,6 +33,7 @@ void BoxRenderData::transformRenderCanvas(SkCanvas &canvas) const {
 }
 
 void BoxRenderData::copyFrom(BoxRenderData *src) {
+    mCopySource = src;
     fRelTransform = src->fRelTransform;
     fInheritedTransform = src->fInheritedTransform;
     fTotalTransform = src->fTotalTransform;
@@ -46,7 +47,7 @@ void BoxRenderData::copyFrom(BoxRenderData *src) {
     fOpacity = src->fOpacity;
     fResolution = src->fResolution;
     fResolutionScale = src->fResolutionScale;
-    fRenderedImage = SkiaHelpers::makeCopy(src->fRenderedImage);
+    fRenderedImage = src->requestImageCopy();
     fBoxStateId = src->fBoxStateId;
     mState = eTaskState::finished;
     fRelBoundingRectSet = true;
@@ -54,9 +55,14 @@ void BoxRenderData::copyFrom(BoxRenderData *src) {
 
 stdsptr<BoxRenderData> BoxRenderData::makeCopy() {
     if(!fParentBox) return nullptr;
-    stdsptr<BoxRenderData> copy = fParentBox->createRenderData();
+    const auto copy = fParentBox->createRenderData();
     copy->copyFrom(this);
     return copy;
+}
+
+sk_sp<SkImage> BoxRenderData::requestImageCopy() {
+    if(mImageCopies.isEmpty()) return SkiaHelpers::makeCopy(fRenderedImage);
+    else return mImageCopies.takeLast();
 }
 
 void BoxRenderData::drawRenderedImageForParent(SkCanvas * const canvas) {
@@ -158,6 +164,8 @@ void BoxRenderData::afterProcessing() {
     }
     if(fParentBox && fParentIsTarget) {
         fParentBox->renderDataFinished(this);
+    } else if(mCopySource) {
+        mCopySource->addImageCopy(std::move(fRenderedImage));
     }
 }
 
@@ -199,6 +207,7 @@ void BoxRenderData::dataSet() {
     if(!fParentBox || !fParentIsTarget) return;
     fParentBox->updateCurrentPreviewDataFromRenderData(this);
 }
+
 #include "Boxes/textboxrenderdata.h"
 void BoxRenderData::updateGlobalRect() {
     fScaledTransform = fTotalTransform*fResolutionScale;
