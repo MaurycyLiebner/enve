@@ -25,6 +25,13 @@ void ZipFileSaver::setZipPath(const QString &path) {
     mFile.setZip(&mZip);
 }
 
+void ZipFileSaver::setIoDevice(QIODevice * const src) {
+    mZip.setIoDevice(src);
+    if(!mZip.open(QuaZip::mdCreate))
+        RuntimeThrow("Could not open QIODevice");
+    mFile.setZip(&mZip);
+}
+
 void ZipFileSaver::process(const QString &file, const bool text,
                            const Processor &func) {
     QIODevice::OpenMode openMode = QIODevice::WriteOnly;

@@ -45,33 +45,29 @@ void ExternalPaintAppHandler::setupSuccess() {
     const auto editFilePath = mEditFilePath;
     connect(this, &QObject::destroyed, sFileWatcher.get(), [editFilePath]() {
         sFileWatcher->removePath(editFilePath);
-        QFile::remove(editFilePath);
     });
     connect(sFileWatcher.get(), &QFileSystemWatcher::fileChanged,
             this, [this](const QString& changedPath) {
         if(!mEditSurface) return deleteLater();
         if(mEditFilePath != changedPath) return;
-        // check if file was deleted (some apps may delete, move, not overwrite)
-        if(!mEditFile->exists()) {
-            // check if file actually exists
-            if(QFile::exists(mEditFilePath)) {
-                sFileWatcher->addPath(mEditFilePath);
-            } else {
-                // if it is the first time in the row the file is missing
-                if(mFileExists) {
-                    mFileExists = false;
-                    // check again after some time
-                    QTimer::singleShot(1000, this, [this]() {
-                        mFileExists = QFile::exists(mEditFilePath);
-                        if(mFileExists) {
-                            sFileWatcher->addPath(mEditFilePath);
-                        } else {
-                            deleteLater();
-                        }
-                    });
-                }
-                return;
+        if(mEditFile->exists()) {
+            // file may have been delete and stopped being watched
+            sFileWatcher->addPath(mEditFilePath);
+        } else {
+            // if it is the first time in the row the file is missing
+            if(mFileExists) {
+                mFileExists = false;
+                // check again after some time
+                QTimer::singleShot(1000, this, [this]() {
+                    mFileExists = mEditFile->exists();
+                    if(mFileExists) {
+                        sFileWatcher->addPath(mEditFilePath);
+                    } else {
+                        deleteLater();
+                    }
+                });
             }
+            return;
         }
         const auto oraImg = ImportORA::readOraFileQImage(mEditFilePath);
         bool foundImg = false;
@@ -157,9 +153,13 @@ void ExternalPaintAppHandler::setupFor(AnimatedSurface * const aSurface,
     const auto img = mEditSurface->toImage(true);
 
     if(!sTmpDir) sCreateTmpDir();
-    const QString editFileName = mLayerName + "_" + frameStr + ".ora";
-    mEditFilePath = sTmpDir->path() + "/" + editFileName;
-    mEditFile = qsptr<QTemporaryFile>(new QTemporaryFile(mEditFilePath));
+    const QString editFileName = mLayerName + "_" + frameStr + "XXXXXX.ora";
+
+    const auto pathTemplate = sTmpDir->path() + "/" + editFileName;
+    mEditFile = qsptr<QTemporaryFile>(new QTemporaryFile(pathTemplate));
+    mEditFile->open();
+    mEditFilePath = mEditFile->fileName();
+
     OraImage_Qt oraImg;
     oraImg.fWidth = img.width();
     oraImg.fHeight = img.height();
@@ -186,7 +186,14 @@ void ExternalPaintAppHandler::setupFor(AnimatedSurface * const aSurface,
         oraStack->fChildren << pivotLayer;
     }
     oraImg.fChildren << oraStack;
-    CreatorOra::save(mEditFilePath, oraImg, false);
+    try {
+        CreatorOra::save(mEditFile.get(), oraImg, false);
+    } catch(...) {
+        mEditFile->close();
+        RuntimeThrow("Error while saving ora file.");
+    }
+
+    mEditFile->close();
     mFileExists = true;
 
     const auto execProc = new QProcess;

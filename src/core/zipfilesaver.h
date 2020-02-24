@@ -28,6 +28,7 @@ public:
 
 
     void setZipPath(const QString& path);
+    void setIoDevice(QIODevice * const src);
 
     using Processor = std::function<void(QIODevice* const dst)>;
     void process(const QString& file, const bool text,

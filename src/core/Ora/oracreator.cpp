@@ -175,10 +175,8 @@ QImage mergedImage(const OraImage_Qt &ora) {
     return img;
 }
 
-void CreatorOra::save(const QString &path, const OraImage_Qt &ora,
-                      const bool mergeImages) {
-    ZipFileSaver fileSaver;
-    fileSaver.setZipPath(path);
+void save(ZipFileSaver &fileSaver, const OraImage_Qt &ora,
+          const bool mergeImages) {
     writeMimeType(fileSaver);
 
     QDomDocument doc("stack.xml");
@@ -206,4 +204,18 @@ void CreatorOra::save(const QString &path, const OraImage_Qt &ora,
             img.scaled(256, 256, Qt::KeepAspectRatio).save(dst, "PNG");
         });
     }
+}
+
+void CreatorOra::save(QIODevice* const dst, const OraImage_Qt &ora,
+                      const bool mergeImages) {
+    ZipFileSaver fileSaver;
+    fileSaver.setIoDevice(dst);
+    save(fileSaver, ora, mergeImages);
+}
+
+void CreatorOra::save(const QString &path, const OraImage_Qt &ora,
+                      const bool mergeImages) {
+    ZipFileSaver fileSaver;
+    fileSaver.setZipPath(path);
+    save(fileSaver, ora, mergeImages);
 }

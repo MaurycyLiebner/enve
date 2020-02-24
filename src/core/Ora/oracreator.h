@@ -22,6 +22,8 @@
 namespace CreatorOra {
     void save(const QString& path, const OraImage_Qt& ora,
               const bool mergeImages);
+    void save(QIODevice* const dst, const OraImage_Qt& ora,
+              const bool mergeImages);
 };
 
 #endif // CREATORORA_H
