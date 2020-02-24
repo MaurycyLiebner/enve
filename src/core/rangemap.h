@@ -73,11 +73,16 @@ public:
     bool isEmpty() const { return this->empty(); }
 
     iterator atFrame(const int frame) {
-        return this->find({frame, frame});
+        const auto it = atOrAfterFrame(frame);
+        if(it.first.inRange(frame)) return it;
+        else return this->end();
     }
 
     const_iterator atFrame(const int frame) const {
-        return this->find({frame, frame});
+        const auto it = atOrAfterFrame(frame);
+        if(it == this->end()) return this->end();
+        if(it->first.inRange(frame)) return it;
+        else return this->end();
     }
 
     iterator atOrBeforeFrame(const int frame) {
