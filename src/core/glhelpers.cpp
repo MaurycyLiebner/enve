@@ -117,11 +117,6 @@ void iniProgram(QGL33 * const gl, GLuint& program,
     Q_INIT_RESOURCE(coreresources);
     std::string vertexCode;
     std::string fragmentCode;
-    std::ifstream vShaderFile;
-    std::ifstream fShaderFile;
-    // ensure ifstream objects can throw exceptions:
-    vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
         // Use QFile to enable reading from resource file
         QFile vShaderFile(vShaderPath);
