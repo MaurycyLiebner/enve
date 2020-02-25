@@ -14,8 +14,8 @@
 <!-- You should have received a copy of the GNU General Public License -->
 <!-- along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<ShaderEffect name="eDots">
-        <Animator name="dotDistance" type="float" glValue="true" resolutionScaled="true" min="0." max="999." step="1" ini="8"/>
-        <Animator name="dotRadius" type="float" glValue="true" resolutionScaled="true" min="0." max="999." step="1" ini="8"/>
-        <Animator name="opacity" type="float" glValue="true" min="0." max="1." step="0.1" ini="0.5"/>
+<ShaderEffect name="Dots">
+    <Property nameUI="dot distance" name="dotDistance" type="float" min="0" max="999" step="1"   ini="8"   glValue="true" resolutionScaled="true"/>
+    <Property nameUI="dot radius"   name="dotRadius"   type="float" min="0" max="999" step="1"   ini="8"   glValue="true" resolutionScaled="true"/>
+    <Property                       name="opacity"     type="float" min="0" max="1"   step="0.1" ini="0.5" glValue="true"/>
 </ShaderEffect>

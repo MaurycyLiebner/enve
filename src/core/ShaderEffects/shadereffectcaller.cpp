@@ -42,6 +42,8 @@ void ShaderEffectCaller::processGpu(QGL33 * const gl,
 QMargins ShaderEffectCaller::getMargin(const SkIRect &srcRect) {
     mEngine.evaluate("eTexSize = [" + QString::number(srcRect.width()) + "," +
                                       QString::number(srcRect.height()) + "]");
+    mEngine.evaluate("eGlobalPos = [" + QString::number(srcRect.x()) + "," +
+                                        QString::number(srcRect.y()) + "]");
     if(!mProgram.fMarginScript.isEmpty()) {
         const auto jsVal = mEngine.evaluate(mProgram.fMarginScript);
         if(jsVal.isNumber()) {

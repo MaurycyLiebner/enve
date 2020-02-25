@@ -33,6 +33,7 @@
 #include "Private/document.h"
 #include "matrixdecomposition.h"
 #include "transformvalues.h"
+#include "regexhelpers.h"
 
 class TextSvgAttributes {
 public:
@@ -864,12 +865,9 @@ void loadText(const QDomElement &pathElement,
     parentGroup->addContained(textBox);
 }
 
-#define eNUMERIC_SVG "\\s*(-?[\\.|\\d]+)"
-
-
 bool extractTranslation(const QString& str, QMatrix& target) {
     const QRegExp rx1("translate\\("
-                      eNUMERIC_SVG
+                      REGEX_SINGLE_FLOAT
                       "\\)", Qt::CaseInsensitive);
     if(rx1.exactMatch(str)) {
         rx1.indexIn(str);
@@ -879,8 +877,8 @@ bool extractTranslation(const QString& str, QMatrix& target) {
     }
 
     const QRegExp rx2("translate\\("
-                      eNUMERIC_SVG"[,|\\s+]?"
-                      eNUMERIC_SVG
+                      REGEX_FIRST_FLOAT
+                      REGEX_LAST_FLOAT
                       "\\)", Qt::CaseInsensitive);
     if(rx2.exactMatch(str)) {
         rx2.indexIn(str);
@@ -896,7 +894,7 @@ bool extractTranslation(const QString& str, QMatrix& target) {
 
 bool extractScale(const QString& str, QMatrix& target) {
     const QRegExp rx1("scale\\("
-                      eNUMERIC_SVG
+                      REGEX_SINGLE_FLOAT
                       "\\)", Qt::CaseInsensitive);
     if(rx1.exactMatch(str)) {
         rx1.indexIn(str);
@@ -907,8 +905,8 @@ bool extractScale(const QString& str, QMatrix& target) {
     }
 
     const QRegExp rx2("scale\\("
-                      eNUMERIC_SVG"[,|\\s+]?"
-                      eNUMERIC_SVG
+                      REGEX_FIRST_FLOAT
+                      REGEX_LAST_FLOAT
                       "\\)", Qt::CaseInsensitive);
     if(rx2.exactMatch(str)) {
         rx2.indexIn(str);
@@ -923,7 +921,7 @@ bool extractScale(const QString& str, QMatrix& target) {
 
 bool extractRotate(const QString& str, QMatrix& target) {
     const QRegExp rx5("rotate\\("
-                      eNUMERIC_SVG
+                      REGEX_SINGLE_FLOAT
                       "\\)", Qt::CaseInsensitive);
     if(rx5.exactMatch(str)) {
         rx5.indexIn(str);
@@ -936,12 +934,12 @@ bool extractRotate(const QString& str, QMatrix& target) {
 
 bool extractWholeMatrix(const QString& str, QMatrix& target) {
     const QRegExp rx("matrix\\("
-                     eNUMERIC_SVG"[,|\\s+]?"
-                     eNUMERIC_SVG"[,|\\s+]?"
-                     eNUMERIC_SVG"[,|\\s+]?"
-                     eNUMERIC_SVG"[,|\\s+]?"
-                     eNUMERIC_SVG"[,|\\s+]?"
-                     eNUMERIC_SVG
+                     REGEX_FIRST_FLOAT
+                     REGEX_INNER_FLOAT
+                     REGEX_INNER_FLOAT
+                     REGEX_INNER_FLOAT
+                     REGEX_INNER_FLOAT
+                     REGEX_LAST_FLOAT
                      "\\)", Qt::CaseInsensitive);
     if(rx.exactMatch(str)) {
         rx.indexIn(str);

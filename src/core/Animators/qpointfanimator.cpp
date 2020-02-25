@@ -26,6 +26,31 @@ QPointFAnimator::QPointFAnimator(const QString &name) :
     ca_addChild(mYAnimator);
 }
 
+QPointFAnimator::QPointFAnimator(const QPointF &iniValue,
+                                 const QPointF &minValue,
+                                 const QPointF &maxValue,
+                                 const QPointF &valueStep,
+                                 const QString &name) :
+    QPointFAnimator(name) {
+    mXAnimator->setValueRange(minValue.x(), maxValue.x());
+    mYAnimator->setValueRange(minValue.y(), maxValue.y());
+    mXAnimator->setPrefferedValueStep(valueStep.x());
+    mYAnimator->setPrefferedValueStep(valueStep.y());
+    setBaseValue(iniValue);
+}
+
+QPointFAnimator::QPointFAnimator(const QPointF &iniValue,
+                                 const QPointF &minValue,
+                                 const QPointF &maxValue,
+                                 const QPointF &valueStep,
+                                 const QString& nameX,
+                                 const QString& nameY,
+                                 const QString &name) :
+    QPointFAnimator(iniValue, minValue, maxValue, valueStep, name) {
+    mXAnimator->prp_setName(nameX);
+    mYAnimator->prp_setName(nameY);
+}
+
 QPointF QPointFAnimator::getBaseValue() const {
     return QPointF(mXAnimator->getCurrentBaseValue(),
                    mYAnimator->getCurrentBaseValue());

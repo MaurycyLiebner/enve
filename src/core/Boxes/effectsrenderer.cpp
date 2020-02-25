@@ -39,9 +39,9 @@ void EffectsRenderer::processGpu(QGL33 * const gl,
     renderData.fHeight = static_cast<uint>(srcHeight);
     auto& engine = renderData.fJSEngine;
     engine.evaluate("eTexSize = [" + QString::number(srcWidth) + "," +
-                    QString::number(srcHeight) + "]");
+                                     QString::number(srcHeight) + "]");
     engine.evaluate("eGlobalPos = [" + QString::number(gPos.x()) + "," +
-                    QString::number(gPos.y()) + "]");
+                                       QString::number(gPos.y()) + "]");
 
     GpuRenderTools renderTools(gl, context, srcImage);
     while(!mEffects.isEmpty()) {

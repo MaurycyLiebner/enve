@@ -22,9 +22,9 @@ UniformSpecifier qrealAnimatorCreate(
         Property * const property,
         const qreal relFrame,
         const qreal resolution) {
-    const auto qa = static_cast<QrealAnimator*>(property);
-    const qreal val = qa->getEffectiveValue(relFrame)*resolution;
-    const QString propName = property->prp_getName();
+    const auto anim = static_cast<QrealAnimator*>(property);
+    const qreal val = anim->getEffectiveValue(relFrame)*resolution;
+    const QString propName = anim->prp_getName();
     const QString valScript = propName + " = " + QString::number(val);
 
     if(glValue) {
@@ -45,11 +45,11 @@ UniformSpecifier intAnimatorCreate(
         const bool glValue,
         const GLint loc,
         Property * const property,
-        const qreal relFrame) {
-    const auto ia = static_cast<IntAnimator*>(property);
-    const int val = ia->getEffectiveIntValue(relFrame);
-    const QString propName = property->prp_getName();
-    const QString valScript = propName + " = " + QString::number(val);
+        const qreal relFrame,
+        const qreal resolution) {
+    const auto anim = static_cast<IntAnimator*>(property);
+    const int val = qRound(anim->getEffectiveIntValue(relFrame)*resolution);
+    const QString valScript = anim->prp_getName() + " = " + QString::number(val);
 
     if(glValue) {
         Q_ASSERT(loc >= 0);
@@ -65,30 +65,76 @@ UniformSpecifier intAnimatorCreate(
     }
 }
 
+QString vec2ValScript(const QString& name, const QPointF& value) {
+    return name + " = [" + QString::number(value.x()) + "," +
+                           QString::number(value.y()) + "]";
+}
+
+UniformSpecifier qPointFAnimatorCreate(
+        const bool glValue,
+        const GLint loc,
+        Property * const property,
+        const qreal relFrame,
+        const qreal resolution) {
+    const auto anim = static_cast<QPointFAnimator*>(property);
+    const QPointF val = anim->getEffectiveValue(relFrame)*resolution;
+    const QString valScript = vec2ValScript(anim->prp_getName(), val);
+
+    if(glValue) {
+        Q_ASSERT(loc >= 0);
+        return [loc, val, valScript](QGL33 * const gl, QJSEngine& e) {
+            e.evaluate(valScript);
+            gl->glUniform2f(loc, val.x(), val.y());
+        };
+    } else {
+        return [valScript](QGL33 * const gl, QJSEngine& e) {
+            Q_UNUSED(gl)
+            e.evaluate(valScript);
+        };
+    }
+}
+
 UniformSpecifier UniformSpecifierCreator::create(const GLint loc,
                                                  Property * const property,
                                                  const qreal relFrame,
                                                  const qreal resolution) const {
-    if(mType == ShaderPropertyType::qrealAnimator)
+    switch(mType) {
+    case ShaderPropertyType::floatProperty:
         return qrealAnimatorCreate(mGLValue, loc, property, relFrame,
                                    mResolutionScaled ? resolution : 1);
-    else if(mType == ShaderPropertyType::intAnimator)
-        return intAnimatorCreate(mGLValue, loc, property, relFrame);
-    else RuntimeThrow("Unsupported type");
+    case ShaderPropertyType::intProperty:
+        return intAnimatorCreate(mGLValue, loc, property, relFrame,
+                                 mResolutionScaled ? resolution : 1);
+    case ShaderPropertyType::vec2Property:
+        return qPointFAnimatorCreate(mGLValue, loc, property, relFrame,
+                                     mResolutionScaled ? resolution : 1);
+    default: RuntimeThrow("Unsupported type");
+    }
 }
 
 void UniformSpecifierCreator::evaluate(QJSEngine &engine,
                                        Property * const property,
                                        const qreal relFrame,
                                        const qreal resolution) const {
-    if(mType == ShaderPropertyType::qrealAnimator) {
-        const auto qa = static_cast<QrealAnimator*>(property);
-        qreal val = qa->getEffectiveValue(relFrame);
+    switch(mType) {
+    case ShaderPropertyType::floatProperty: {
+        const auto anim = static_cast<QrealAnimator*>(property);
+        qreal val = anim->getEffectiveValue(relFrame);
         if(mResolutionScaled) val *= resolution;
-        engine.evaluate(property->prp_getName() + " = " + QString::number(val));
-    } else if(mType == ShaderPropertyType::intAnimator) {
-        const auto ia = static_cast<IntAnimator*>(property);
-        const int val = ia->getEffectiveIntValue(relFrame);
-        engine.evaluate(property->prp_getName() + " = " + QString::number(val));
-    } else RuntimeThrow("Unsupported type");
+        engine.evaluate(anim->prp_getName() + " = " + QString::number(val));
+    } break;
+    case ShaderPropertyType::intProperty: {
+        const auto anim = static_cast<IntAnimator*>(property);
+        int val = anim->getEffectiveIntValue(relFrame);
+        if(mResolutionScaled) val = qRound(val*resolution);
+        engine.evaluate(anim->prp_getName() + " = " + QString::number(val));
+    } break;
+    case ShaderPropertyType::vec2Property: {
+        const auto anim = static_cast<QPointFAnimator*>(property);
+        QPointF val = anim->getEffectiveValue(relFrame);
+        if(mResolutionScaled) val *= resolution;
+        engine.evaluate(vec2ValScript(anim->prp_getName(), val));
+    } break;
+    default: RuntimeThrow("Unsupported type");
+    }
 }

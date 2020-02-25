@@ -14,23 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SHADERPROPERTYCREATOR_H
-#define SHADERPROPERTYCREATOR_H
-#include "Properties/property.h"
-#include "smartPointers/stdselfref.h"
-#include "glhelpers.h"
+#ifndef REGEXHELPERS_H
+#define REGEXHELPERS_H
 
-struct ShaderPropertyCreator : public StdSelfRef {
-    ShaderPropertyCreator(const bool glValue,
-                          const QString& name,
-                          const QString& nameUI) :
-        fGLValue(glValue), fName(name), fNameUI(nameUI) {}
+#define REGEX_SPACES "\\s*"
+#define REGEX_FLOAT "(-?[\\.|\\d]+)"
+#define REGEX_SINGLE_FLOAT REGEX_SPACES REGEX_FLOAT REGEX_SPACES
+#define REGEX_SEPARATOR REGEX_SPACES "[,|\\s+]" REGEX_SPACES
+#define REGEX_INNER_FLOAT REGEX_FLOAT REGEX_SEPARATOR
+#define REGEX_FIRST_FLOAT REGEX_SPACES REGEX_INNER_FLOAT
+#define REGEX_LAST_FLOAT REGEX_FLOAT REGEX_SPACES
 
-    const bool fGLValue;
-    const QString fName;
-    const QString fNameUI;
-
-    virtual qsptr<Property> create() const = 0;
-};
-
-#endif // SHADERPROPERTYCREATOR_H
+#endif // REGEXHELPERS_H

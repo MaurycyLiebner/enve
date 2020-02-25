@@ -14,23 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SHADERPROPERTYCREATOR_H
-#define SHADERPROPERTYCREATOR_H
-#include "Properties/property.h"
-#include "smartPointers/stdselfref.h"
-#include "glhelpers.h"
+// enve uses OpenGL 3.3
+#version 330 core
+// output color
+layout(location = 0) out vec4 fragColor;
 
-struct ShaderPropertyCreator : public StdSelfRef {
-    ShaderPropertyCreator(const bool glValue,
-                          const QString& name,
-                          const QString& nameUI) :
-        fGLValue(glValue), fName(name), fNameUI(nameUI) {}
+// processed texture coordinate, from the vertex shader
+in vec2 texCoord;
 
-    const bool fGLValue;
-    const QString fName;
-    const QString fNameUI;
+// texture provided by enve
+uniform sampler2D texture;
+// the value for the 'red' property
+uniform float red;
 
-    virtual qsptr<Property> create() const = 0;
-};
-
-#endif // SHADERPROPERTYCREATOR_H
+void main(void) {
+    // texture pixel color at the coordinate
+    vec4 color = texture2D(texture, texCoord);
+    // assign value to the output color,
+    // multiply red by the 'red' property value
+    fragColor = vec4(color.r * red, color.g, color.b, color.a); 
+}

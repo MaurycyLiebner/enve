@@ -18,11 +18,6 @@
 #define SHADEREFFECTCREATOR_H
 #include "shadereffectprogram.h"
 
-enum PropertyType {
-    PTYPE_FLOAT,
-    PTYPE_INT
-};
-
 class ShaderEffect;
 
 struct ShaderEffectCreator : public StdSelfRef {
@@ -36,12 +31,12 @@ public:
 
     struct Identifier {
         Identifier(const QString& grePath, const QString& name,
-                   const QList<PropertyType>& types) :
+                   const QList<ShaderPropertyType>& types) :
         fGrePath(grePath), fName(name), fTypes(types) {}
 
         const QString fGrePath;
         const QString fName;
-        const QList<PropertyType> fTypes;
+        const QList<ShaderPropertyType> fTypes;
     };
 
     const QString fName;
@@ -49,7 +44,7 @@ public:
     const QList<stdsptr<ShaderPropertyCreator>> fProperties;
     ShaderEffectProgram fProgram;
 
-    bool compatible(const QList<PropertyType>& props) const;
+    bool compatible(const QList<ShaderPropertyType> &props) const;
 
     void reloadProgram(QGL33 * const gl, const QString& fragPath);
 
@@ -67,17 +62,17 @@ public:
 
     static stdsptr<ShaderEffectCreator> sWithGrePathAndCompatible(
             const QString& grePath,
-            const QList<PropertyType>& props);
+            const QList<ShaderPropertyType>& props);
 
     static QList<stdsptr<ShaderEffectCreator>> sWithName(
             const QString &name);
 
     static QList<stdsptr<ShaderEffectCreator>> sWithNameAndCompatible(
             const QString &name,
-            const QList<PropertyType>& props);
+            const QList<ShaderPropertyType>& props);
 
     static QList<stdsptr<ShaderEffectCreator>> sWithCompatibleProps(
-            const QList<PropertyType>& props);
+            const QList<ShaderPropertyType>& props);
 
     static QList<stdsptr<ShaderEffectCreator>> sGetBestCompatibleEffects(
             const Identifier& id);

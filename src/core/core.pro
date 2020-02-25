@@ -566,6 +566,7 @@ HEADERS += \
     ReadWrite/ewritestream.h \
     ReadWrite/filefooter.h \
     ShaderEffects/intanimatorcreator.h \
+    ShaderEffects/qpointfanimatorcreator.h \
     ShaderEffects/qrealanimatorcreator.h \
     ShaderEffects/shadereffect.h \
     ShaderEffects/shadereffectcaller.h \
@@ -615,6 +616,7 @@ HEADERS += \
     pathoperations.h \
     randomgrid.h \
     rangemap.h \
+    regexhelpers.h \
     simpletask.h \
     smartPointers/ememory.h \
     smartPointers/eobject.h \

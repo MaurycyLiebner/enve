@@ -27,8 +27,9 @@ struct QrealAnimatorCreator : public ShaderPropertyCreator {
                          const qreal maxVal,
                          const qreal step,
                          const bool glValue,
-                         const QString& name) :
-        ShaderPropertyCreator(glValue, name),
+                         const QString& name,
+                         const QString& nameUI) :
+        ShaderPropertyCreator(glValue, name, nameUI),
         fIniVal(iniVal), fMinVal(minVal),
         fMaxVal(maxVal), fStep(step) {}
 
@@ -39,7 +40,8 @@ struct QrealAnimatorCreator : public ShaderPropertyCreator {
 
     qsptr<Property> create() const {
         return enve::make_shared<QrealAnimator>(
-                    fIniVal, fMinVal, fMaxVal, fStep, fName);
+                    fIniVal, fMinVal, fMaxVal, fStep, fNameUI);
     }
 };
+
 #endif // QREALANIMATORCREATOR_H

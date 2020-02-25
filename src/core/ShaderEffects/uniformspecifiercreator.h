@@ -18,11 +18,14 @@
 #define UNIFORMSPECIFIERCREATOR_H
 #include "qrealanimatorcreator.h"
 #include "intanimatorcreator.h"
+#include "qpointfanimatorcreator.h"
 #include <QJSEngine>
 
 enum class ShaderPropertyType {
-    qrealAnimator,
-    intAnimator
+    floatProperty,
+    intProperty,
+    vec2Property,
+    invalid
 };
 
 typedef std::function<void(QGL33 * const, QJSEngine&)> UniformSpecifier;

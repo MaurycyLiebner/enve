@@ -23,6 +23,18 @@ class QPointFAnimator : public StaticComplexAnimator {
     e_OBJECT
 protected:
     QPointFAnimator(const QString& name);
+    QPointFAnimator(const QPointF& iniValue,
+                    const QPointF& minValue,
+                    const QPointF& maxValue,
+                    const QPointF& valueStep,
+                    const QString& name);
+    QPointFAnimator(const QPointF& iniValue,
+                    const QPointF& minValue,
+                    const QPointF& maxValue,
+                    const QPointF& valueStep,
+                    const QString& nameX,
+                    const QString& nameY,
+                    const QString& name);
 public:
     void setBaseValue(const qreal valX, const qreal valY) {
         setBaseValue({valX, valY});

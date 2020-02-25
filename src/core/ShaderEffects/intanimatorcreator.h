@@ -22,11 +22,14 @@
 
 struct IntAnimatorCreator : public ShaderPropertyCreator {
     e_OBJECT
-    IntAnimatorCreator(const int iniVal, const int minVal,
-                       const int maxVal, const int step,
+    IntAnimatorCreator(const int iniVal,
+                       const int minVal,
+                       const int maxVal,
+                       const int step,
                        const bool glValue,
-                       const QString& name) :
-        ShaderPropertyCreator(glValue, name),
+                       const QString& name,
+                       const QString& nameUI) :
+        ShaderPropertyCreator(glValue, name, nameUI),
         fIniVal(iniVal), fMinVal(minVal),
         fMaxVal(maxVal), fStep(step) {}
 
@@ -37,7 +40,7 @@ struct IntAnimatorCreator : public ShaderPropertyCreator {
 
     qsptr<Property> create() const {
         return enve::make_shared<IntAnimator>(
-                    fIniVal, fMinVal, fMaxVal, fStep, fName);
+                    fIniVal, fMinVal, fMaxVal, fStep, fNameUI);
     }
 };
 #endif // INTANIMATORCREATOR_H
