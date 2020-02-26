@@ -481,6 +481,7 @@ ExprSPtr ExpressionParser::parse(QString exp, QrealAnimator* const parent,
     for(const auto& line : lines) {
         int pos = 0;
         QString varName;
+        skipSpaces(line, pos);
         if(plainVarsAllowed && parsePlainVariable(line, pos, varName)) {
             const auto var = ExpressionPlainVariable::sCreate(varName);
             plainVariables[varName] = var;
