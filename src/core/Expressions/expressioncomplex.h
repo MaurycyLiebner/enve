@@ -20,32 +20,7 @@
 #include "expressionsinglechild.h"
 #include "expressionvariable.h"
 #include "expressionmanualvariable.h"
-
-class ExpressionManualVariableId {
-    friend class ExpressionComplex;
-    friend class ExpressionVariableId;
-    ExpressionManualVariableId(const int id) : fId(id) {}
-    int fId;
-public:
-    bool isValid() const { return fId >= 0; }
-};
-
-class ExpressionVariableId {
-    friend class ExpressionComplex;
-    ExpressionVariableId(const bool isManual, const int id) :
-        fIsManual(isManual), fId(id) {}
-    ExpressionVariableId(const ExpressionManualVariableId& id) :
-        fIsManual(true), fId(id.fId) {}
-    bool fIsManual;
-    int fId;
-public:
-    ExpressionManualVariableId toManualVariableId() {
-        if(!fIsManual) return ExpressionManualVariableId{-1};
-        return ExpressionManualVariableId{fId};
-    }
-    bool isManual() const { return fIsManual; }
-    bool isValid() const { return fId >= 0; }
-};
+#include "expressionvariableid.h"
 
 using ExpressionVarSPtr = QSharedPointer<ExpressionVariable>;
 using PlainVarSPtr = QSharedPointer<ExpressionManualVariable>;
@@ -63,12 +38,12 @@ public:
     void collapse() override;
     QString toString() const override;
 
-    ExpressionManualVariableId getManualVariableId(const QString& name);
+    ExpressionManualVariableId getManualVariableId(const QString& name) const;
     void setManualVariableValue(const ExpressionManualVariableId& variableId,
-                                   const qreal value);
+                                const qreal value);
 
-    ExpressionVariableId getVariableId(const QString& name);
-    qreal getVariableValue(const ExpressionVariableId& id);
+    ExpressionVariableId getVariableId(const QString& name) const;
+    qreal getVariableValue(const ExpressionVariableId& id) const;
 private:
     QList<PlainVarSPtr> mManualVariables;
     QList<ExpressionVarSPtr> mVariables;

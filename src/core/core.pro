@@ -478,6 +478,7 @@ HEADERS += \
     CacheHandlers/tmpsaver.h \
     CacheHandlers/usedrange.h \
     CacheHandlers/usepointer.h \
+    Expressions/expressionvariableid.h \
     FileCacheHandlers/animationcachehandler.h \
     FileCacheHandlers/audiostreamsdata.h \
     FileCacheHandlers/filecachehandler.h \

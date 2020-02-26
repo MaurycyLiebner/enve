@@ -52,7 +52,7 @@ QString ExpressionComplex::toString() const {
 }
 
 ExpressionManualVariableId ExpressionComplex::getManualVariableId(
-        const QString &name) {
+        const QString &name) const {
     const int iMax = mManualVariables.count();
     for(int i = 0; i < iMax; i++) {
         const auto& var = mManualVariables.at(i);
@@ -68,7 +68,7 @@ void ExpressionComplex::setManualVariableValue(
     mManualVariables.at(id)->setValue(value);
 }
 
-ExpressionVariableId ExpressionComplex::getVariableId(const QString &name) {
+ExpressionVariableId ExpressionComplex::getVariableId(const QString &name) const {
     const auto manualVar = getManualVariableId(name);
     if(manualVar.isValid()) return manualVar;
     const int iMax = mVariables.count();
@@ -79,7 +79,7 @@ ExpressionVariableId ExpressionComplex::getVariableId(const QString &name) {
     return ExpressionVariableId{false, -1};
 }
 
-qreal ExpressionComplex::getVariableValue(const ExpressionVariableId &id) {
+qreal ExpressionComplex::getVariableValue(const ExpressionVariableId &id) const {
     if(id.isManual()) {
         return mManualVariables.at(id.fId)->currentValue();
     } else {
